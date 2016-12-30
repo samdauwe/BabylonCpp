@@ -1,0 +1,1011 @@
+#include <babylon/mesh/mesh_builder.h>
+
+#include <babylon/cameras/camera.h>
+#include <babylon/core/logging.h>
+#include <babylon/culling/bounding_info.h>
+#include <babylon/engine/scene.h>
+#include <babylon/math/axis.h>
+#include <babylon/math/path3d.h>
+#include <babylon/math/position_normal_vertex.h>
+#include <babylon/math/tmp.h>
+#include <babylon/mesh/ground_mesh.h>
+#include <babylon/mesh/lines_mesh.h>
+#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/mesh/vertex_data.h>
+#include <babylon/mesh/vertex_data_options.h>
+#include <babylon/tools/tools.h>
+
+namespace BABYLON {
+
+Mesh* MeshBuilder::CreateBox(const std::string& name, BoxOptions& options,
+                             Scene* scene)
+{
+  auto box = Mesh::New(name, scene);
+  options.sideOrientation
+    = updateSideOrientation(options.sideOrientation, scene);
+  auto vertexData = VertexData::CreateBox(options);
+
+  vertexData->applyToMesh(box, options.updatable);
+
+  return box;
+}
+
+Mesh* MeshBuilder::CreateSphere(const std::string& name, SphereOptions& options,
+                                Scene* scene)
+{
+  auto sphere = Mesh::New(name, scene);
+  options.sideOrientation
+    = updateSideOrientation(options.sideOrientation, scene);
+  auto vertexData = VertexData::CreateSphere(options);
+
+  vertexData->applyToMesh(sphere, options.updatable);
+
+  return sphere;
+}
+
+Mesh* MeshBuilder::CreateDisc(const std::string& name, DiscOptions& options,
+                              Scene* scene)
+{
+  auto disc = Mesh::New(name, scene);
+  options.sideOrientation
+    = updateSideOrientation(options.sideOrientation, scene);
+  auto vertexData = VertexData::CreateDisc(options);
+
+  vertexData->applyToMesh(disc, options.updatable);
+
+  return disc;
+}
+
+Mesh* MeshBuilder::CreateIcoSphere(const std::string& name,
+                                   IcoSphereOptions& options, Scene* scene)
+{
+  auto sphere = Mesh::New(name, scene);
+  options.sideOrientation
+    = updateSideOrientation(options.sideOrientation, scene);
+  auto vertexData = VertexData::CreateIcoSphere(options);
+
+  vertexData->applyToMesh(sphere, options.updatable);
+
+  return sphere;
+}
+
+Mesh* MeshBuilder::CreateRibbon(const std::string& name, RibbonOptions& options,
+                                Scene* scene)
+
+{
+  const auto& pathArray  = options.pathArray();
+  const auto& closeArray = options.closeArray;
+  const auto& closePath  = options.closePath;
+  const auto sideOrientation
+    = updateSideOrientation(options.sideOrientation, scene);
+  const auto& instance  = options.instance;
+  const auto& updatable = options.updatable;
+
+  if (instance) { // existing ribbon instance update
+                  // positionFunction : ribbon case
+    // only pathArray and sideOrientation parameters are taken into account for
+    // positions update
+    Vector3::FromFloatsToRef(std::numeric_limits<float>::max(),
+                             std::numeric_limits<float>::max(),
+                             std::numeric_limits<float>::max(),
+                             Tmp::Vector3Array[0]); // minimum
+    Vector3::FromFloatsToRef(
+      -std::numeric_limits<float>::max(), -std::numeric_limits<float>::max(),
+      -std::numeric_limits<float>::max(), Tmp::Vector3Array[1]);
+    auto positionFunction = [&](Float32Array& positions) {
+      auto minlg     = pathArray[0].size();
+      unsigned int i = 0;
+      unsigned int ns
+        = (instance->sideOrientation() == Mesh::DOUBLESIDE) ? 2 : 1;
+      for (unsigned int si = 1; si <= ns; ++si) {
+        for (unsigned int p = 0; p < pathArray.size(); ++p) {
+          const auto& path = pathArray[p];
+          const auto l     = path.size();
+          minlg            = (minlg < l) ? minlg : l;
+          unsigned int j   = 0;
+          while (j < minlg) {
+            positions[i]     = path[j].x;
+            positions[i + 1] = path[j].y;
+            positions[i + 2] = path[j].z;
+            if (path[j].x < Tmp::Vector3Array[0].x) {
+              Tmp::Vector3Array[0].x = path[j].x;
+            }
+            if (path[j].x > Tmp::Vector3Array[1].x) {
+              Tmp::Vector3Array[1].x = path[j].x;
+            }
+            if (path[j].y < Tmp::Vector3Array[0].y) {
+              Tmp::Vector3Array[0].y = path[j].y;
+            }
+            if (path[j].y > Tmp::Vector3Array[1].y) {
+              Tmp::Vector3Array[1].y = path[j].y;
+            }
+            if (path[j].z < Tmp::Vector3Array[0].z) {
+              Tmp::Vector3Array[0].z = path[j].z;
+            }
+            if (path[j].z > Tmp::Vector3Array[1].z) {
+              Tmp::Vector3Array[1].z = path[j].z;
+            }
+            ++j;
+            i += 3;
+          }
+          if (instance->_closePath) {
+            positions[i + 0] = path[0].x;
+            positions[i + 1] = path[0].y;
+            positions[i + 2] = path[0].z;
+            i += 3;
+          }
+        }
+      }
+    };
+    auto positions = instance->getVerticesData(VertexBuffer::PositionKind);
+    positionFunction(positions);
+    instance->setBoundingInfo(
+      BoundingInfo(Tmp::Vector3Array[0], Tmp::Vector3Array[1]));
+    instance->getBoundingInfo()->update(*instance->_worldMatrix);
+    instance->updateVerticesData(VertexBuffer::PositionKind, positions, false,
+                                 false);
+    if (!(instance->areNormalsFrozen())) {
+      auto indices = instance->getIndices();
+      auto normals = instance->getVerticesData(VertexBuffer::NormalKind);
+      VertexData::ComputeNormals(positions, indices, normals);
+
+      if (instance->_closePath) {
+        unsigned int indexFirst = 0;
+        size_t indexLast        = 0;
+        for (unsigned int p = 0; p < pathArray.size(); ++p) {
+          indexFirst = instance->_idx[p] * 3;
+          if (p + 1 < pathArray.size()) {
+            indexLast = (instance->_idx[p + 1] - 1) * 3;
+          }
+          else {
+            indexLast = normals.size() - 3;
+          }
+          normals[indexFirst]
+            = (normals[indexFirst] + normals[indexLast]) * 0.5f;
+          normals[indexFirst + 1]
+            = (normals[indexFirst + 1] + normals[indexLast + 1]) * 0.5f;
+          normals[indexFirst + 2]
+            = (normals[indexFirst + 2] + normals[indexLast + 2]) * 0.5f;
+          normals[indexLast]     = normals[indexFirst];
+          normals[indexLast + 1] = normals[indexFirst + 1];
+          normals[indexLast + 2] = normals[indexFirst + 2];
+        }
+      }
+
+      instance->updateVerticesData(VertexBuffer::NormalKind, normals, false,
+                                   false);
+    }
+
+    return instance;
+  }
+  else { // new ribbon creation
+    auto ribbon = Mesh::New(name, scene);
+    ribbon->setSideOrientation(sideOrientation);
+
+    auto vertexData = VertexData::CreateRibbon(options);
+    if (closePath) {
+      ribbon->_idx = vertexData->_idx;
+    }
+    ribbon->_closePath  = closePath;
+    ribbon->_closeArray = closeArray;
+
+    vertexData->applyToMesh(ribbon, updatable);
+
+    return ribbon;
+  }
+}
+
+Mesh* MeshBuilder::CreateCylinder(const std::string& name,
+                                  CylinderOptions& options, Scene* scene)
+{
+  auto cylinder = Mesh::New(name, scene);
+  options.sideOrientation
+    = updateSideOrientation(options.sideOrientation, scene);
+  auto vertexData = VertexData::CreateCylinder(options);
+
+  vertexData->applyToMesh(cylinder, options.updatable);
+
+  return cylinder;
+}
+
+Mesh* MeshBuilder::CreateTorus(const std::string& name, TorusOptions& options,
+                               Scene* scene)
+{
+  auto torus = Mesh::New(name, scene);
+  options.sideOrientation
+    = updateSideOrientation(options.sideOrientation, scene);
+  auto vertexData = VertexData::CreateTorus(options);
+
+  vertexData->applyToMesh(torus, options.updatable);
+
+  return torus;
+}
+
+Mesh* MeshBuilder::CreateTorusKnot(const std::string& name,
+                                   TorusKnotOptions& options, Scene* scene)
+{
+  auto torusKnot = Mesh::New(name, scene);
+  options.sideOrientation
+    = updateSideOrientation(options.sideOrientation, scene);
+  auto vertexData = VertexData::CreateTorusKnot(options);
+
+  vertexData->applyToMesh(torusKnot, options.updatable);
+
+  return torusKnot;
+}
+
+LinesMesh* MeshBuilder::CreateLineSystem(const std::string& name,
+                                         LineSystemOptions& options,
+                                         Scene* scene)
+{
+  const auto& instance = options.instance;
+  const auto& lines    = options.lines;
+
+  if (instance) { // lines update
+    auto positionFunction = [&](Float32Array& positions) {
+      unsigned int i = 0;
+      for (const auto& points : lines) {
+        for (unsigned int p = 0; p < points.size(); ++p) {
+          positions[i + 0] = points[p].x;
+          positions[i + 1] = points[p].y;
+          positions[i + 2] = points[p].z;
+          i += 3;
+        }
+      }
+    };
+    instance->updateMeshPositions(positionFunction, false);
+    return instance;
+  }
+
+  // line system creation
+  auto lineSystem = LinesMesh::New(name, scene);
+  auto vertexData = VertexData::CreateLineSystem(options);
+  vertexData->applyToMesh(lineSystem, options.updatable);
+  return lineSystem;
+}
+
+LinesMesh* MeshBuilder::CreateLines(const std::string& name,
+                                    LinesOptions& options, Scene* scene)
+{
+  LineSystemOptions lineSystemOptions(options);
+  return MeshBuilder::CreateLineSystem(name, lineSystemOptions, scene);
+}
+
+LinesMesh* MeshBuilder::CreateDashedLines(const std::string& name,
+                                          DashedLinesOptions& options,
+                                          Scene* scene)
+{
+  const auto& points   = options.points;
+  const auto& instance = options.instance;
+  const auto& gapSize  = options.gapSize;
+  const auto& dashSize = options.dashSize;
+
+  if (instance) { //  dashed lines update
+    auto positionFunction = [&](Float32Array& positions) -> void {
+      auto curvect    = Vector3::Zero();
+      auto nbSeg      = positions.size() / 6;
+      auto lg         = 0.f;
+      unsigned int nb = 0;
+      auto shft       = 0.f;
+      auto dashshft   = 0.f;
+      auto curshft    = 0.f;
+      unsigned int p  = 0;
+      unsigned int i  = 0;
+      unsigned int j  = 0;
+      for (i = 0; i < points.size() - 1; ++i) {
+        points[i + 1].subtractToRef(points[i], curvect);
+        lg += curvect.length();
+      }
+      shft     = lg / static_cast<float>(nbSeg);
+      dashshft = static_cast<float>(instance->dashSize) * shft
+                 / static_cast<float>(instance->dashSize + instance->gapSize);
+      for (i = 0; i < points.size() - 1; ++i) {
+        points[i + 1].subtractToRef(points[i], curvect);
+        nb = static_cast<unsigned int>(std::floor(curvect.length() / shft));
+        curvect.normalize();
+        j = 0;
+        while (j < nb && p < positions.size()) {
+          curshft          = shft * static_cast<float>(j);
+          positions[p]     = points[i].x + curshft * curvect.x;
+          positions[p + 1] = points[i].y + curshft * curvect.y;
+          positions[p + 2] = points[i].z + curshft * curvect.z;
+          positions[p + 3] = points[i].x + (curshft + dashshft) * curvect.x;
+          positions[p + 4] = points[i].y + (curshft + dashshft) * curvect.y;
+          positions[p + 5] = points[i].z + (curshft + dashshft) * curvect.z;
+          p += 6;
+          ++j;
+        }
+      }
+      while (p < positions.size()) {
+        positions[p]     = points[i].x;
+        positions[p + 1] = points[i].y;
+        positions[p + 2] = points[i].z;
+        p += 3;
+      }
+    };
+    instance->updateMeshPositions(positionFunction, false);
+    return instance;
+  }
+  // dashed lines creation
+  auto dashedLines = LinesMesh::New(name, scene);
+  auto vertexData  = VertexData::CreateDashedLines(options);
+  vertexData->applyToMesh(dashedLines, options.updatable);
+  dashedLines->dashSize = dashSize;
+  dashedLines->gapSize  = gapSize;
+  return dashedLines;
+}
+
+Mesh* MeshBuilder::ExtrudeShape(const std::string& name,
+                                ExtrudeShapeOptions& options, Scene* scene)
+{
+  options.sideOrientation
+    = updateSideOrientation(options.sideOrientation, scene);
+
+  return MeshBuilder::_ExtrudeShapeGeneric(
+    name, options.shape, options.path, options.scale, options.rotation, nullptr,
+    nullptr, false, false, options.cap, false, scene, options.updatable,
+    options.sideOrientation, options.instance, options.invertUV);
+}
+
+Mesh* MeshBuilder::ExtrudeShapeCustom(const std::string& name,
+                                      ExtrudeShapeCustomOptions& options,
+                                      Scene* scene)
+{
+  options.sideOrientation
+    = updateSideOrientation(options.sideOrientation, scene);
+
+  return MeshBuilder::_ExtrudeShapeGeneric(
+    name, options.shape, options.path, 0.f, 0.f, options.scaleFunction,
+    options.rotationFunction, options.ribbonCloseArray, options.ribbonClosePath,
+    options.cap, true, scene, options.updatable, options.sideOrientation,
+    options.instance, options.invertUV);
+}
+
+Mesh* MeshBuilder::CreateLathe(const std::string& name, LatheOptions& options,
+                               Scene* scene)
+{
+  const auto arc           = options.arc();
+  const auto& closed       = options.closed;
+  const auto& shape        = options.shape;
+  const auto& radius       = options.radius;
+  const auto& tessellation = static_cast<float>(options.tessellation);
+  const auto& updatable    = options.updatable;
+
+  unsigned int sideOrientation
+    = updateSideOrientation(options.sideOrientation, scene);
+  const auto& cap = options.cap;
+  const auto& pi2 = Math::PI2;
+  std::vector<std::vector<Vector3>> paths;
+  const auto& invertUV = options.invertUV;
+
+  float step = pi2 / tessellation * arc;
+  Vector3 rotated;
+  for (float i = 0.f; i <= tessellation; ++i) {
+    std::vector<Vector3> path;
+    if (cap == Mesh::CAP_START || cap == Mesh::CAP_ALL) {
+      path.emplace_back(Vector3(0.f, shape[0].y, 0.f));
+      path.emplace_back(Vector3(std::cos(i * step) * shape[0].x * radius,
+                                shape[0].y,
+                                std::sin(i * step) * shape[0].x * radius));
+    }
+    for (unsigned int p = 0; p < shape.size(); ++p) {
+      rotated = Vector3(std::cos(i * step) * shape[p].x * radius, shape[p].y,
+                        std::sin(i * step) * shape[p].x * radius);
+      path.emplace_back(rotated);
+    }
+    if (cap == Mesh::CAP_END || cap == Mesh::CAP_ALL) {
+      path.emplace_back(
+        Vector3(std::cos(i * step) * shape[shape.size() - 1].x * radius,
+                shape[shape.size() - 1].y,
+                std::sin(i * step) * shape[shape.size() - 1].x * radius));
+      path.emplace_back(Vector3(0.f, shape[shape.size() - 1].y, 0.f));
+    }
+    paths.emplace_back(path);
+  }
+
+  // lathe ribbon
+  RibbonOptions ribbonOptions(paths);
+  ribbonOptions.closeArray      = closed;
+  ribbonOptions.sideOrientation = sideOrientation;
+  ribbonOptions.updatable       = updatable;
+  ribbonOptions.invertUV        = invertUV;
+  auto lathe = MeshBuilder::CreateRibbon(name, ribbonOptions, scene);
+  return lathe;
+}
+
+Mesh* MeshBuilder::CreatePlane(const std::string& name, PlaneOptions& options,
+                               Scene* scene)
+{
+  auto plane = Mesh::New(name, scene);
+
+  options.sideOrientation
+    = updateSideOrientation(options.sideOrientation, scene);
+
+  auto vertexData = VertexData::CreatePlane(options);
+
+  vertexData->applyToMesh(plane, options.updatable);
+
+  if (options.sourcePlane) {
+    plane->translate(options.sourcePlane->normal, options.sourcePlane->d);
+
+    auto product
+      = std::acos(Vector3::Dot(options.sourcePlane->normal, Axis::Z));
+    auto vectorProduct = Vector3::Cross(Axis::Z, options.sourcePlane->normal);
+
+    plane->rotate(vectorProduct, product);
+  }
+
+  return plane;
+}
+
+Mesh* MeshBuilder::CreateGround(const std::string& name, GroundOptions& options,
+                                Scene* scene)
+{
+  auto ground = GroundMesh::New(name, scene);
+  ground->_setReady(false);
+  ground->_subdivisionsX = options.subdivisionsX;
+  ground->_subdivisionsY = options.subdivisionsY;
+  ground->_width         = static_cast<float>(options.width);
+  ground->_height        = static_cast<float>(options.height);
+  ground->_maxX          = ground->_width / 2.f;
+  ground->_maxZ          = ground->_height / 2.f;
+  ground->_minX          = -ground->_maxX;
+  ground->_minZ          = -ground->_maxZ;
+
+  auto vertexData = VertexData::CreateGround(options);
+
+  vertexData->applyToMesh(ground, options.updatable);
+
+  ground->_setReady(true);
+
+  return ground;
+}
+
+Mesh* MeshBuilder::CreateTiledGround(const std::string& name,
+                                     TiledGroundOptions& options, Scene* scene)
+{
+  auto tiledGround = Mesh::New(name, scene);
+
+  auto vertexData = VertexData::CreateTiledGround(options);
+
+  vertexData->applyToMesh(tiledGround, options.updatable);
+
+  return tiledGround;
+}
+
+GroundMesh* MeshBuilder::CreateGroundFromHeightMap(
+  const std::string& name, const std::string& url,
+  GroundFromHeightMapOptions& options, Scene* scene)
+{
+  auto ground            = GroundMesh::New(name, scene);
+  ground->_subdivisionsX = options.subdivisions;
+  ground->_subdivisionsY = options.subdivisions;
+  ground->_width         = options.width;
+  ground->_height        = options.height;
+  ground->_maxX          = ground->_width / 2.f;
+  ground->_maxZ          = ground->_height / 2.f;
+  ground->_minX          = -ground->_maxX;
+  ground->_minZ          = -ground->_maxZ;
+
+  ground->_setReady(false);
+
+  auto onload = [&](const Image& img) {
+    // Create VertexData from map data
+    options.bufferWidth  = static_cast<unsigned int>(img.width);
+    options.bufferHeight = static_cast<unsigned int>(img.height);
+    options.buffer       = img.data;
+
+    auto vertexData = VertexData::CreateGroundFromHeightMap(options);
+
+    vertexData->applyToMesh(ground, options.updatable);
+
+    ground->_setReady(true);
+
+    // execute ready callback, if set
+    if (options.onReady) {
+      options.onReady(ground);
+    }
+  };
+
+  auto onError
+    = [](const std::string& msg) { BABYLON_LOG_ERROR("Tools", msg); };
+
+  Tools::LoadImage(url, onload, onError);
+
+  return ground;
+}
+
+Mesh* MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
+                              Scene* scene)
+{
+  const auto& path           = options.path;
+  const auto& radius         = options.radius;
+  const auto& tessellation   = options.tessellation;
+  const auto& radiusFunction = options.radiusFunction;
+  auto cap                   = options.cap;
+  const auto& invertUV       = options.invertUV;
+  const auto& updatable      = options.updatable;
+  const auto sideOrientation
+    = updateSideOrientation(options.sideOrientation, scene);
+  auto instance  = options.instance;
+  const auto arc = options.arc();
+
+  // tube geometry
+  auto tubePathArray = [](
+    const std::vector<Vector3>& _path, Path3D& path3D,
+    std::vector<std::vector<Vector3>>& circlePaths, float _radius,
+    unsigned int _tessellation,
+    const std::function<float(unsigned int i, float distance)>& _radiusFunction,
+    unsigned int _cap, float _arc) {
+    auto& tangents        = path3D.getTangents();
+    const auto& normals   = path3D.getNormals();
+    const auto& distances = path3D.getDistances();
+    const auto& pi2       = Math::PI2;
+    const auto step       = pi2 / static_cast<float>(_tessellation) * _arc;
+
+    auto rad = 0.f;
+    Vector3 normal;
+    Vector3 rotated;
+    Matrix rotationMatrix = Tmp::MatrixArray[0];
+    unsigned int index
+      = (_cap == Mesh::NO_CAP || _cap == Mesh::CAP_END) ? 0 : 2;
+    circlePaths.resize(_path.size() + index + 2);
+    for (unsigned int i = 0; i < _path.size(); ++i) {
+      rad = (_radiusFunction == nullptr) ?
+              _radius :
+              _radiusFunction(i, distances[i]); // current radius
+      std::vector<Vector3> circlePath;          // current circle array
+      normal = normals[i];                      // current normal
+      for (unsigned int t = 0; t < _tessellation; ++t) {
+        Matrix::RotationAxisToRef(tangents[i], step * static_cast<float>(t),
+                                  rotationMatrix);
+        rotated
+          = (t + 1 <= circlePath.size()) ? circlePath[t] : Vector3::Zero();
+        Vector3::TransformCoordinatesToRef(normal, rotationMatrix, rotated);
+        rotated.scaleInPlace(rad).addInPlace(_path[i]);
+        circlePath.emplace_back(rotated);
+      }
+      circlePaths[index] = circlePath;
+      ++index;
+    }
+    // cap
+    auto capPath = [_path](unsigned int nbPoints, unsigned int pathIndex) {
+      std::vector<Vector3> pointCap;
+      for (unsigned int i = 0; i < nbPoints; ++i) {
+        pointCap.emplace_back(_path[pathIndex]);
+      }
+      return pointCap;
+    };
+    switch (_cap) {
+      case Mesh::NO_CAP:
+        break;
+      case Mesh::CAP_START:
+        circlePaths[0] = capPath(_tessellation, 0);
+        circlePaths[1] = circlePaths[2];
+        break;
+      case Mesh::CAP_END:
+        circlePaths[index] = circlePaths[index - 1];
+        circlePaths[index + 1]
+          = capPath(_tessellation, static_cast<unsigned int>(_path.size() - 1));
+        break;
+      case Mesh::CAP_ALL:
+        circlePaths[0]     = capPath(_tessellation, 0);
+        circlePaths[1]     = circlePaths[2];
+        circlePaths[index] = circlePaths[index - 1];
+        circlePaths[index + 1]
+          = capPath(_tessellation, static_cast<unsigned int>(_path.size() - 1));
+        break;
+      default:
+        break;
+    }
+    return circlePaths;
+  };
+  Path3D path3D;
+  std::vector<std::vector<Vector3>> pathArray;
+  if (instance) {
+    // tube update
+    path3D    = path3D.update(path);
+    pathArray = tubePathArray(path, path3D, pathArray, radius, tessellation,
+                              radiusFunction, cap, arc);
+    RibbonOptions ribbonOptions(pathArray);
+    ribbonOptions.instance = instance;
+    instance             = MeshBuilder::CreateRibbon("", ribbonOptions, scene);
+    instance->_path3D    = path3D;
+    instance->_pathArray = pathArray;
+    instance->_arc       = arc;
+
+    return instance;
+  }
+  // tube creation
+  path3D = Path3D(path);
+  std::vector<std::vector<Vector3>> newPathArray;
+  cap       = (cap > 3) ? 0 : cap;
+  pathArray = tubePathArray(path, path3D, newPathArray, radius, tessellation,
+                            radiusFunction, cap, arc);
+  RibbonOptions ribbonOptions(pathArray);
+  ribbonOptions.closePath       = true;
+  ribbonOptions.closeArray      = false;
+  ribbonOptions.updatable       = updatable;
+  ribbonOptions.sideOrientation = sideOrientation;
+  ribbonOptions.invertUV        = invertUV;
+  auto tube           = MeshBuilder::CreateRibbon(name, ribbonOptions, scene);
+  tube->_pathArray    = std::move(pathArray);
+  tube->_path3D       = std::move(path3D);
+  tube->_tessellation = tessellation;
+  tube->_cap          = cap;
+  tube->_arc          = arc;
+
+  return tube;
+}
+
+Mesh* MeshBuilder::CreatePolyhedron(const std::string& name,
+                                    PolyhedronOptions& options, Scene* scene)
+{
+  auto polyhedron = Mesh::New(name, scene);
+  options.sideOrientation
+    = updateSideOrientation(options.sideOrientation, scene);
+  auto vertexData = VertexData::CreatePolyhedron(options);
+
+  vertexData->applyToMesh(polyhedron, options.updatable);
+
+  return polyhedron;
+}
+
+Mesh* MeshBuilder::CreateDecal(const std::string& name,
+                               AbstractMesh* sourceMesh, DecalOptions& options)
+{
+  const auto indices = sourceMesh->getIndices();
+  const auto positions
+    = sourceMesh->getVerticesData(VertexBuffer::PositionKind);
+  auto normals         = sourceMesh->getVerticesData(VertexBuffer::NormalKind);
+  const auto& position = options.position;
+  auto normal          = options.normal;
+  const auto& size     = options.size;
+  const auto& angle    = options.angle;
+
+  // Getting correct rotation
+  if (options.calculateNormal) {
+    Vector3 target(0.f, 0.f, 1.f);
+    auto camera = sourceMesh->getScene()->activeCamera;
+    auto cameraWorldTarget
+      = Vector3::TransformCoordinates(target, *camera->getWorldMatrix());
+
+    normal = camera->globalPosition().subtract(cameraWorldTarget);
+  }
+
+  auto yaw   = -std::atan2(normal.z, normal.x) - Math::PI_2;
+  auto len   = std::sqrt(normal.x * normal.x + normal.z * normal.z);
+  auto pitch = std::atan2(normal.y, len);
+
+  // Matrix
+  auto decalWorldMatrix
+    = Matrix::RotationYawPitchRoll(yaw, pitch, angle)
+        .multiply(Matrix::Translation(position.x, position.y, position.z));
+  auto inverseDecalWorldMatrix = Matrix::Invert(decalWorldMatrix);
+  auto meshWorldMatrix         = sourceMesh->getWorldMatrix();
+  auto transformMatrix = meshWorldMatrix->multiply(inverseDecalWorldMatrix);
+
+  auto vertexData = std_util::make_unique<VertexData>();
+  vertexData->indices.clear();
+  vertexData->positions.clear();
+  vertexData->normals.clear();
+  vertexData->uvs.clear();
+
+  unsigned int currentVertexDataIndex = 0;
+
+  auto extractDecalVector3 = [&](unsigned int indexId) {
+    const auto& vertexId = indices[indexId];
+    PositionNormalVertex result;
+    result.position
+      = Vector3(positions[vertexId * 3], positions[vertexId * 3 + 1],
+                positions[vertexId * 3 + 2]);
+    // Send vector to decal local world
+    result.position
+      = Vector3::TransformCoordinates(result.position, transformMatrix);
+    // Get normal
+    result.normal
+      = Vector3(normals[vertexId * 3 + 0], normals[vertexId * 3 + 1],
+                normals[vertexId * 3 + 2]);
+    return result;
+  };
+
+  // Inspired by
+  // https://github.com/mrdoob/three.js/blob/eee231960882f6f3b6113405f524956145148146/examples/js/geometries/DecalGeometry.js
+  auto clip = [&size](const std::vector<PositionNormalVertex>& vertices,
+                      const Vector3& axis) {
+    if (vertices.empty()) {
+      return vertices;
+    }
+
+    auto clipSize = 0.5f * std::abs(Vector3::Dot(size, axis));
+
+    auto clipVertices
+      = [&](const PositionNormalVertex& v0, const PositionNormalVertex& v1) {
+          auto clipFactor
+            = Vector3::GetClipFactor(v0.position, v1.position, axis, clipSize);
+
+          return PositionNormalVertex(
+            Vector3::Lerp(v0.position, v1.position, clipFactor),
+            Vector3::Lerp(v0.normal, v1.normal, clipFactor));
+        };
+
+    std::vector<PositionNormalVertex> result;
+
+    bool v1Out, v2Out, v3Out;
+    unsigned int total;
+    PositionNormalVertex nV1, nV2, nV3, nV4;
+    float d1, d2, d3;
+    for (unsigned int index = 0; index < vertices.size(); index += 3) {
+      total = 0;
+
+      d1 = Vector3::Dot(vertices[index].position, axis) - clipSize;
+      d2 = Vector3::Dot(vertices[index + 1].position, axis) - clipSize;
+      d3 = Vector3::Dot(vertices[index + 2].position, axis) - clipSize;
+
+      v1Out = d1 > 0;
+      v2Out = d2 > 0;
+      v3Out = d3 > 0;
+
+      total = (v1Out ? 1 : 0) + (v2Out ? 1 : 0) + (v3Out ? 1 : 0);
+
+      switch (total) {
+        case 0:
+          result.emplace_back(vertices[index + 0]);
+          result.emplace_back(vertices[index + 1]);
+          result.emplace_back(vertices[index + 2]);
+          break;
+        case 1:
+
+          if (v1Out) {
+            nV1 = vertices[index + 1];
+            nV2 = vertices[index + 2];
+            nV3 = clipVertices(vertices[index], nV1);
+            nV4 = clipVertices(vertices[index], nV2);
+          }
+
+          if (v2Out) {
+            nV1 = vertices[index + 0];
+            nV2 = vertices[index + 2];
+            nV3 = clipVertices(vertices[index + 1], nV1);
+            nV4 = clipVertices(vertices[index + 1], nV2);
+
+            result.emplace_back(nV3);
+            result.emplace_back(nV2);
+            result.emplace_back(nV1);
+
+            result.emplace_back(nV2);
+            result.emplace_back(nV3);
+            result.emplace_back(nV4);
+            break;
+          }
+          if (v3Out) {
+            nV1 = vertices[index + 0];
+            nV2 = vertices[index + 1];
+            nV3 = clipVertices(vertices[index + 2], nV1);
+            nV4 = clipVertices(vertices[index + 2], nV2);
+          }
+
+          result.emplace_back(nV1);
+          result.emplace_back(nV2);
+          result.emplace_back(nV3);
+
+          result.emplace_back(nV4);
+          result.emplace_back(nV3);
+          result.emplace_back(nV2);
+          break;
+        case 2:
+          if (!v1Out) {
+            nV1 = vertices[index + 0];
+            nV2 = clipVertices(nV1, vertices[index + 1]);
+            nV3 = clipVertices(nV1, vertices[index + 2]);
+            result.emplace_back(nV1);
+            result.emplace_back(nV2);
+            result.emplace_back(nV3);
+          }
+          if (!v2Out) {
+            nV1 = vertices[index + 1];
+            nV2 = clipVertices(nV1, vertices[index + 2]);
+            nV3 = clipVertices(nV1, vertices[index + 0]);
+            result.emplace_back(nV1);
+            result.emplace_back(nV2);
+            result.emplace_back(nV3);
+          }
+          if (!v3Out) {
+            nV1 = vertices[index + 2];
+            nV2 = clipVertices(nV1, vertices[index + 0]);
+            nV3 = clipVertices(nV1, vertices[index + 1]);
+            result.emplace_back(nV1);
+            result.emplace_back(nV2);
+            result.emplace_back(nV3);
+          }
+          break;
+        case 3:
+          break;
+        default:
+          break;
+      }
+    }
+
+    return result;
+  };
+
+  for (unsigned int index = 0; index < indices.size(); index += 3) {
+    std::vector<PositionNormalVertex> faceVertices;
+
+    faceVertices.emplace_back(extractDecalVector3(index));
+    faceVertices.emplace_back(extractDecalVector3(index + 1));
+    faceVertices.emplace_back(extractDecalVector3(index + 2));
+
+    // Clip
+    faceVertices = clip(faceVertices, Vector3(1.f, 0.f, 0.f));
+    faceVertices = clip(faceVertices, Vector3(-1.f, 0.f, 0.f));
+    faceVertices = clip(faceVertices, Vector3(0.f, 1.f, 0.f));
+    faceVertices = clip(faceVertices, Vector3(0.f, -1.f, 0.f));
+    faceVertices = clip(faceVertices, Vector3(0.f, 0.f, 1.f));
+    faceVertices = clip(faceVertices, Vector3(0.f, 0.f, -1.f));
+
+    if (faceVertices.empty()) {
+      continue;
+    }
+
+    // Add UVs and get back to world
+    for (unsigned int vIndex = 0; vIndex < faceVertices.size(); ++vIndex) {
+      auto& vertex = faceVertices[vIndex];
+
+      vertexData->indices.emplace_back(currentVertexDataIndex);
+      vertex.position.toArray(vertexData->positions,
+                              currentVertexDataIndex * 3);
+      vertex.normal.toArray(vertexData->normals, currentVertexDataIndex * 3);
+      vertexData->uvs.emplace_back(0.5f + vertex.position.x / size.x);
+      vertexData->uvs.emplace_back(0.5f + vertex.position.y / size.y);
+
+      ++currentVertexDataIndex;
+    }
+  }
+
+  // Return mesh
+  auto decal = Mesh::New(name, sourceMesh->getScene());
+  vertexData->applyToMesh(decal);
+
+  // decal->setPosition(position.clone());
+  decal->setRotation(Vector3(pitch, yaw, angle));
+
+  return decal;
+}
+
+Mesh* MeshBuilder::_ExtrudeShapeGeneric(
+  const std::string& name, const std::vector<Vector3>& shape,
+  const std::vector<Vector3>& curve, float scale, float rotation,
+  const std::function<float(float i, float distance)>& scaleFunction,
+  const std::function<float(float i, float distance)>& rotateFunction,
+  bool rbCA, bool rbCP, unsigned int cap, bool custom, Scene* scene,
+  bool updtbl, unsigned int side, Mesh* instance, bool invertUV)
+{
+  // extrusion geometry
+  auto extrusionPathArray
+    = [](const std::vector<Vector3>& _shape, const std::vector<Vector3>& _curve,
+         Path3D& path3D, std::vector<std::vector<Vector3>> shapePaths,
+         float _scale, float _rotation,
+         const std::function<float(float i, float distance)>& _scaleFunction,
+         const std::function<float(float i, float distance)>& _rotateFunction,
+         unsigned int _cap, bool _custom) {
+        auto& tangents        = path3D.getTangents();
+        const auto& normals   = path3D.getNormals();
+        const auto& binormals = path3D.getBinormals();
+        const auto& distances = path3D.getDistances();
+
+        auto angle = 0.f;
+        auto returnScale
+          = [_scale](float /*i*/, float /*distance*/) { return _scale; };
+        auto returnRotation
+          = [_rotation](float /*i*/, float /*distance*/) { return _rotation; };
+        auto rotate = _custom ? _rotateFunction : returnRotation;
+        auto scl    = _custom ? _scaleFunction : returnScale;
+        unsigned int index
+          = (_cap == Mesh::NO_CAP || _cap == Mesh::CAP_END) ? 0 : 2;
+        auto& rotationMatrix = Tmp::MatrixArray[0];
+        shapePaths.resize(_curve.size());
+
+        for (unsigned int i = 0; i < _curve.size(); ++i) {
+          std::vector<Vector3> shapePath;
+          auto angleStep  = rotate(static_cast<float>(i), distances[i]);
+          auto scaleRatio = scl(static_cast<float>(i), distances[i]);
+          for (unsigned int p = 0; p < _shape.size(); ++p) {
+            Matrix::RotationAxisToRef(tangents[i], angle, rotationMatrix);
+            auto planed = ((tangents[i].scale(_shape[p].z))
+                             .add(normals[i].scale(_shape[p].x))
+                             .add(binormals[i].scale(_shape[p].y)));
+            auto rotated = Vector3::Zero();
+            Vector3::TransformCoordinatesToRef(planed, rotationMatrix, rotated);
+            rotated.scaleInPlace(scaleRatio).addInPlace(_curve[i]);
+            shapePath.emplace_back(rotated);
+          }
+          shapePaths[index] = shapePath;
+          angle += angleStep;
+          ++index;
+        }
+        // cap
+        auto capPath = [&](const std::vector<Vector3>& shapePath) {
+          std::vector<Vector3> pointCap;
+          auto barycenter = Vector3::Zero();
+          unsigned int i;
+          for (i = 0; i < shapePath.size(); ++i) {
+            barycenter.addInPlace(shapePath[i]);
+          }
+          barycenter.scaleInPlace(1.f / static_cast<float>(shapePath.size()));
+          for (i = 0; i < shapePath.size(); ++i) {
+            pointCap.emplace_back(barycenter);
+          }
+          return pointCap;
+        };
+        switch (_cap) {
+          case Mesh::NO_CAP:
+            break;
+          case Mesh::CAP_START:
+            shapePaths[0] = capPath(shapePaths[2]);
+            shapePaths[1] = shapePaths[2];
+            break;
+          case Mesh::CAP_END:
+            shapePaths[index + 0] = shapePaths[index - 1];
+            shapePaths[index + 1] = capPath(shapePaths[index - 1]);
+            break;
+          case Mesh::CAP_ALL:
+            shapePaths[0]         = capPath(shapePaths[2]);
+            shapePaths[1]         = shapePaths[2];
+            shapePaths[index + 0] = shapePaths[index - 1];
+            shapePaths[index + 1] = capPath(shapePaths[index - 1]);
+            break;
+          default:
+            break;
+        }
+        return shapePaths;
+      };
+
+  Path3D path3D;
+  std::vector<std::vector<Vector3>> pathArray;
+  if (instance) { // instance update
+    path3D    = path3D.update(curve);
+    pathArray = extrusionPathArray(
+      shape, curve, instance->_path3D, instance->_pathArray, scale, rotation,
+      scaleFunction, rotateFunction, instance->_cap, custom);
+    instance = Mesh::CreateRibbon("", pathArray, false, false, 0, scene, false,
+                                  Mesh::DEFAULTSIDE, instance);
+
+    return instance;
+  }
+  // extruded shape creation
+  path3D = Path3D(curve);
+  std::vector<std::vector<Vector3>> newShapePaths;
+  unsigned int _cap = (cap > 3) ? 0 : cap;
+  pathArray
+    = extrusionPathArray(shape, curve, path3D, newShapePaths, scale, rotation,
+                         scaleFunction, rotateFunction, _cap, custom);
+  RibbonOptions ribbonOptions(pathArray);
+  ribbonOptions.closeArray      = rbCA;
+  ribbonOptions.closePath       = rbCP;
+  ribbonOptions.updatable       = updtbl;
+  ribbonOptions.sideOrientation = side;
+  ribbonOptions.invertUV        = invertUV;
+  Mesh* extrudedGeneric = MeshBuilder::CreateRibbon(name, ribbonOptions, scene);
+  extrudedGeneric->_pathArray = std::move(pathArray);
+  extrudedGeneric->_path3D    = std::move(path3D);
+  extrudedGeneric->_cap       = _cap;
+
+  return extrudedGeneric;
+}
+
+unsigned int MeshBuilder::updateSideOrientation(unsigned int orientation,
+                                                Scene* /*scene*/)
+{
+  if (orientation == Mesh::DOUBLESIDE) {
+    return Mesh::DOUBLESIDE;
+  }
+
+  if (orientation == Mesh::DEFAULTSIDE) {
+    return Mesh::FRONTSIDE;
+  }
+
+  return orientation;
+}
+
+} // end of namespace BABYLON

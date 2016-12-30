@@ -1,0 +1,56 @@
+#include <babylon/mesh/geometryprimitives/ground.h>
+
+#include <babylon/engine/scene.h>
+#include <babylon/mesh/vertex_data.h>
+#include <babylon/mesh/vertex_data_options.h>
+#include <babylon/tools/tools.h>
+
+namespace BABYLON {
+namespace GeometryPrimitives {
+
+Ground::Ground(const std::string& _id, Scene* scene, unsigned int _width,
+               unsigned int _height, unsigned int _subdivisions,
+               bool canBeRegenerated, Mesh* mesh)
+    : _Primitive{_id, scene, canBeRegenerated, mesh}
+    , width{_width}
+    , height{_height}
+    , subdivisions{_subdivisions}
+{
+}
+
+Ground::~Ground()
+{
+}
+
+std::unique_ptr<VertexData> Ground::_regenerateVertexData()
+{
+  GroundOptions options(subdivisions);
+  options.width  = width;
+  options.height = height;
+
+  return VertexData::CreateGround(options);
+}
+
+Geometry* Ground::copy(const std::string& _id)
+{
+  return new Ground(_id, getScene(), width, height, subdivisions,
+                    canBeRegenerated(), nullptr);
+}
+
+Ground* Ground::Parse(const Json::value& parsedGround, Scene* scene)
+{
+  const std::string parsedGroundId = Json::GetString(parsedGround, "id", "");
+  if (scene->getGeometryByID(parsedGroundId)) {
+    return nullptr; // null since geometry could be something else than a
+                    // ground...
+  }
+
+  return Ground::New(
+    parsedGroundId, scene, Json::GetNumber(parsedGround, "width", 1u),
+    Json::GetNumber(parsedGround, "height", 1u),
+    Json::GetNumber(parsedGround, "subdivisions", 1u),
+    Json::GetBool(parsedGround, "canBeRegenerated", true), nullptr);
+}
+
+} // end of namespace GeometryPrimitives
+} // end of namespace BABYLON

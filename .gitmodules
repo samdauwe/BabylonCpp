@@ -1,0 +1,20 @@
+[submodule "external/glxw"]
+    path = external/glxw
+    url = https://github.com/rikusalminen/glxw
+    branch = master
+[submodule "external/glfw"]
+    path = external/glfw
+    url = https://github.com/glfw/glfw
+    branch = master
+[submodule "external/googletest"]
+    path = external/googletest
+    url = https://github.com/google/googletest
+    branch = master
+[submodule "external/imgui"]
+    path = external/imgui
+    url = https://github.com/ocornut/imgui
+    branch = master
+[submodule "external/earcut"]
+    path = external/earcut
+    url = https://github.com/mapbox/earcut.hpp
+    branch = master

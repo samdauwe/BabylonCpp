@@ -1,0 +1,113 @@
+﻿#include <babylon/materials/effect_shaders_store.h>
+
+#include <babylon/shaders/anaglyph_fragment_fx.h>
+#include <babylon/shaders/blackAndWhite_fragment_fx.h>
+#include <babylon/shaders/blur_fragment_fx.h>
+#include <babylon/shaders/chromaticAberration_fragment_fx.h>
+#include <babylon/shaders/color_fragment_fx.h>
+#include <babylon/shaders/color_vertex_fx.h>
+#include <babylon/shaders/colorCorrection_fragment_fx.h>
+#include <babylon/shaders/convolution_fragment_fx.h>
+#include <babylon/shaders/default_fragment_fx.h>
+#include <babylon/shaders/default_vertex_fx.h>
+#include <babylon/shaders/depth_fragment_fx.h>
+#include <babylon/shaders/depth_vertex_fx.h>
+#include <babylon/shaders/depthBoxBlur_fragment_fx.h>
+#include <babylon/shaders/depthOfField_fragment_fx.h>
+#include <babylon/shaders/displayPass_fragment_fx.h>
+#include <babylon/shaders/filter_fragment_fx.h>
+#include <babylon/shaders/fxaa_fragment_fx.h>
+#include <babylon/shaders/glowBlurPostProcess_fragment_fx.h>
+#include <babylon/shaders/glowMapGeneration_fragment_fx.h>
+#include <babylon/shaders/glowMapGeneration_vertex_fx.h>
+#include <babylon/shaders/glowMapMerge_fragment_fx.h>
+#include <babylon/shaders/glowMapMerge_vertex_fx.h>
+#include <babylon/shaders/hdr_fragment_fx.h>
+#include <babylon/shaders/layer_fragment_fx.h>
+#include <babylon/shaders/layer_vertex_fx.h>
+#include <babylon/shaders/lensFlare_fragment_fx.h>
+#include <babylon/shaders/lensFlare_vertex_fx.h>
+#include <babylon/shaders/lensHighlights_fragment_fx.h>
+#include <babylon/shaders/line_fragment_fx.h>
+#include <babylon/shaders/line_vertex_fx.h>
+#include <babylon/shaders/outline_fragment_fx.h>
+#include <babylon/shaders/outline_vertex_fx.h>
+#include <babylon/shaders/particles_fragment_fx.h>
+#include <babylon/shaders/particles_vertex_fx.h>
+#include <babylon/shaders/pass_fragment_fx.h>
+#include <babylon/shaders/pbr_fragment_fx.h>
+#include <babylon/shaders/pbr_vertex_fx.h>
+#include <babylon/shaders/postprocess_vertex_fx.h>
+#include <babylon/shaders/procedural_vertex_fx.h>
+#include <babylon/shaders/refraction_fragment_fx.h>
+#include <babylon/shaders/shadowMap_fragment_fx.h>
+#include <babylon/shaders/shadowMap_vertex_fx.h>
+#include <babylon/shaders/sprites_fragment_fx.h>
+#include <babylon/shaders/sprites_vertex_fx.h>
+#include <babylon/shaders/ssao_fragment_fx.h>
+#include <babylon/shaders/ssaoCombine_fragment_fx.h>
+#include <babylon/shaders/standard_fragment_fx.h>
+#include <babylon/shaders/stereoscopicInterlace_fragment_fx.h>
+#include <babylon/shaders/tonemap_fragment_fx.h>
+#include <babylon/shaders/volumetricLightScattering_fragment_fx.h>
+#include <babylon/shaders/volumetricLightScatteringPass_fragment_fx.h>
+#include <babylon/shaders/vrDistortionCorrection_fragment_fx.h>
+
+namespace BABYLON {
+
+std::unordered_map<std::string, const char*> EffectShadersStore::Shaders = {
+  {"anaglyphPixelShader", anaglyphPixelShader},
+  {"blackAndWhitePixelShader", blackAndWhitePixelShader},
+  {"blurPixelShader", blurPixelShader},
+  {"chromaticAberrationPixelShader", chromaticAberrationPixelShader},
+  {"colorPixelShader", colorPixelShader},
+  {"colorVertexShader", colorVertexShader},
+  {"colorCorrectionPixelShader", colorCorrectionPixelShader},
+  {"convolutionPixelShader", convolutionPixelShader},
+  {"defaultPixelShader", defaultPixelShader},
+  {"defaultVertexShader", defaultVertexShader},
+  {"depthPixelShader", depthPixelShader},
+  {"depthVertexShader", depthVertexShader},
+  {"depthBoxBlurPixelShader", depthBoxBlurPixelShader},
+  {"depthOfFieldPixelShader", depthOfFieldPixelShader},
+  {"displayPassPixelShader", displayPassPixelShader},
+  {"filterPixelShader", filterPixelShader},
+  {"fxaaPixelShader", fxaaPixelShader},
+  {"glowBlurPostProcessPixelShader", glowBlurPostProcessPixelShader},
+  {"glowMapGenerationPixelShader", glowMapGenerationPixelShader},
+  {"glowMapGenerationVertexShader", glowMapGenerationVertexShader},
+  {"glowMapMergePixelShader", glowMapMergePixelShader},
+  {"glowMapMergeVertexShader", glowMapMergeVertexShader},
+  {"hdrPixelShader", hdrPixelShader},
+  {"layerPixelShader", layerPixelShader},
+  {"layerVertexShader", layerVertexShader},
+  {"lensFlarePixelShader", lensFlarePixelShader},
+  {"lensFlareVertexShader", lensFlareVertexShader},
+  {"lensHighlightsPixelShader", lensHighlightsPixelShader},
+  {"linePixelShader", linePixelShader},
+  {"lineVertexShader", lineVertexShader},
+  {"outlinePixelShader", outlinePixelShader},
+  {"outlineVertexShader", outlineVertexShader},
+  {"particlesPixelShader", particlesPixelShader},
+  {"particlesVertexShader", particlesVertexShader},
+  {"passPixelShader", passPixelShader},
+  {"pbrPixelShader", pbrPixelShader},
+  {"pbrVertexShader", pbrVertexShader},
+  {"postprocessVertexShader", postprocessVertexShader},
+  {"proceduralVertexShader", proceduralVertexShader},
+  {"refractionPixelShader", refractionPixelShader},
+  {"shadowMapPixelShader", shadowMapPixelShader},
+  {"shadowMapVertexShader", shadowMapVertexShader},
+  {"spritesPixelShader", spritesPixelShader},
+  {"spritesVertexShader", spritesVertexShader},
+  {"ssaoPixelShader", ssaoPixelShader},
+  {"ssaoCombinePixelShader", ssaoCombinePixelShader},
+  {"standardPixelShader", standardPixelShader},
+  {"stereoscopicInterlacePixelShader", stereoscopicInterlacePixelShader},
+  {"tonemapPixelShader", tonemapPixelShader},
+  {"volumetricLightScatteringPixelShader", volumetricLightScatteringPixelShader},
+  {"volumetricLightScatteringPassPixelShader", volumetricLightScatteringPassPixelShader},
+  {"vrDistortionCorrectionPixelShader", vrDistortionCorrectionPixelShader}
+};
+
+} // end of namespace BABYLON

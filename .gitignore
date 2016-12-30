@@ -4,6 +4,17 @@
 *.o
 *.obj
 
+# Qt cache
+CMakeLists.txt.user
+CMakeLists.txt.user.*
+
+# IDE project files
+*.sublime-project
+*.sublime-workspace
+
+# Local config unix
+.localconfig
+
 # Precompiled Headers
 *.gch
 *.pch
@@ -22,6 +33,14 @@
 *.la
 *.a
 *.lib
+
+# Build dir
+build*
+debug_build
+release_build
+/bin
+/lib
+/install
 
 # Executables
 *.exe

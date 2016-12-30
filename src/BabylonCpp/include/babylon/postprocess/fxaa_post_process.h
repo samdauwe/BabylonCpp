@@ -1,0 +1,28 @@
+#ifndef BABYLON_POSTPROCESS_FXAA_POST_PROCESS_H
+#define BABYLON_POSTPROCESS_FXAA_POST_PROCESS_H
+
+#include <babylon/babylon_global.h>
+#include <babylon/postprocess/post_process.h>
+
+namespace BABYLON {
+
+/**
+ * @brief
+ */
+class BABYLON_SHARED_EXPORT FxaaPostProcess : public PostProcess {
+
+public:
+  FxaaPostProcess(const std::string& _name, float ratio, Camera* camera,
+                  unsigned int samplingMode, Engine* engine,
+                  bool reusable = false);
+  ~FxaaPostProcess();
+
+public:
+  float texelWidth;
+  float texelHeight;
+
+}; // end of class FxaaPostProcess
+
+} // end of namespace BABYLON
+
+#endif // end of BABYLON_POSTPROCESS_FXAA_POST_PROCESS_H

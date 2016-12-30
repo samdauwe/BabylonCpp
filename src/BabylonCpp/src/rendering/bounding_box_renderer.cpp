@@ -1,0 +1,133 @@
+#include <babylon/rendering/bounding_box_renderer.h>
+
+#include <babylon/culling/bounding_box.h>
+#include <babylon/engine/engine.h>
+#include <babylon/engine/scene.h>
+#include <babylon/materials/shader_material.h>
+#include <babylon/materials/shader_material_options.h>
+#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/mesh/vertex_data.h>
+#include <babylon/mesh/vertex_data_options.h>
+
+namespace BABYLON {
+
+BoundingBoxRenderer::BoundingBoxRenderer(Scene* scene)
+    : frontColor{Color3(1.f, 1.f, 1.f)}
+    , backColor{Color3(0.1f, 0.1f, 0.1f)}
+    , showBackLines{true}
+    , _scene{scene}
+    , _colorShader{nullptr}
+    , _indexBuffer{nullptr}
+{
+  renderList.reserve(32);
+}
+
+BoundingBoxRenderer::~BoundingBoxRenderer()
+{
+}
+
+void BoundingBoxRenderer::_prepareResources()
+{
+  if (_colorShader) {
+    return;
+  }
+
+  ShaderMaterialOptions shaderMaterialOptions;
+  shaderMaterialOptions.attributes = {VertexBuffer::PositionKindChars};
+  shaderMaterialOptions.uniforms   = {"worldViewProjection", "color"};
+
+  _colorShader = ShaderMaterial::New("colorShader", _scene, "color",
+                                     shaderMaterialOptions);
+
+  auto engine = _scene->getEngine();
+  BoxOptions options(1.f);
+  auto boxdata = VertexData::CreateBox(options);
+  _vertexBuffers.resize(VertexBuffer::PositionKind + 1);
+  _vertexBuffers[VertexBuffer::PositionKind]
+    = std_util::make_unique<VertexBuffer>(engine, boxdata->positions,
+                                          VertexBuffer::PositionKind, false);
+  _vertexBuffersMap[VertexBuffer::PositionKindChars]
+    = _vertexBuffers[VertexBuffer::PositionKind].get();
+  const Uint32Array indices{0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6,
+                            6, 7, 7, 4, 0, 7, 1, 6, 2, 5, 3, 4};
+  _indexBuffer = engine->createIndexBuffer(indices);
+}
+
+void BoundingBoxRenderer::reset()
+{
+  renderList.clear();
+}
+
+void BoundingBoxRenderer::render()
+{
+  if (renderList.empty()) {
+    return;
+  }
+
+  _prepareResources();
+
+  if (!_colorShader->isReady()) {
+    return;
+  }
+
+  auto engine = _scene->getEngine();
+  engine->setDepthWrite(false);
+  _colorShader->_preBind();
+  for (auto& boundingBox : renderList) {
+    const auto& min = boundingBox.minimum;
+    const auto& max = boundingBox.maximum;
+    auto diff       = max.subtract(min);
+    auto median     = min.add(diff.scale(0.5f));
+
+    auto worldMatrix
+      = Matrix::Scaling(diff.x, diff.y, diff.z)
+          .multiply(Matrix::Translation(median.x, median.y, median.z))
+          .multiply(boundingBox.getWorldMatrix());
+
+    // VBOs
+    engine->bindBuffers(_vertexBuffersMap, _indexBuffer.get(),
+                        _colorShader->getEffect());
+
+    if (showBackLines) {
+      // Back
+      engine->setDepthFunctionToGreaterOrEqual();
+      _scene->resetCachedMaterial();
+      _colorShader->setColor4("color", backColor.toColor4());
+      _colorShader->bind(&worldMatrix, nullptr);
+
+      // Draw order
+      engine->draw(false, 0, 24);
+    }
+
+    // Front
+    engine->setDepthFunctionToLess();
+    _scene->resetCachedMaterial();
+    _colorShader->setColor4("color", frontColor.toColor4());
+    _colorShader->bind(&worldMatrix);
+
+    // Draw order
+    engine->draw(false, 0, 24);
+  }
+  _colorShader->unbind();
+  engine->setDepthFunctionToLessOrEqual();
+  engine->setDepthWrite(true);
+}
+
+void BoundingBoxRenderer::dispose(bool /*doNotRecurse*/)
+{
+  if (!_colorShader) {
+    return;
+  }
+
+  _colorShader->dispose();
+
+  if (std_util::contains(_vertexBuffersMap, VertexBuffer::PositionKindChars)) {
+    _vertexBuffers[VertexBuffer::PositionKind]->dispose();
+    _vertexBuffers[VertexBuffer::PositionKind].reset(nullptr);
+    _vertexBuffersMap.erase(VertexBuffer::PositionKindChars);
+  }
+
+  _scene->getEngine()->_releaseBuffer(_indexBuffer.get());
+}
+
+} // end of namespace BABYLON
