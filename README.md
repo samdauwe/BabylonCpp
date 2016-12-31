@@ -5,7 +5,7 @@ BabylonCpp
 
 [Babylon.js](http://www.babylonjs.com) is a complete JavaScript framework for building 3D games with HTML 5 and WebGL.
 
-The goal with BabylonCpp is to fully implement the relevant portions of the excellent Babylon.js 3D engine in C++11, facilitating the creation of 3D games and applications with native performance.
+The goal with BabylonCpp is to fully implement the relevant portions of the excellent Babylon.js 3D framework/engine in C++11, facilitating the creation of lightweight, cross-platform 3D games and applications with native performance.
 
 ### Get the Sources ###
 * `git clone --recursive https://github.com/samdauwe/BabylonCpp.git`
@@ -54,7 +54,7 @@ void initializeScene(ICanvas* canvas, Scene* scene)
 
 ```
 
-This code result in the following scene:
+This code results in the following scene:
 
 ![Basic scene](assets/screenshots/basic_scene.png?raw=true "Basic scene")
 
