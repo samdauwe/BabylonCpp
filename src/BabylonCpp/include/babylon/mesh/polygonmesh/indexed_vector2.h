@@ -15,6 +15,10 @@ class BABYLON_SHARED_EXPORT IndexedVector2 : public Vector2 {
 public:
   IndexedVector2();
   IndexedVector2(const Vector2& original, int index);
+  IndexedVector2(const IndexedVector2& other);
+  IndexedVector2(IndexedVector2&& other);
+  IndexedVector2& operator=(const IndexedVector2& other);
+  IndexedVector2& operator=(IndexedVector2&& other);
   ~IndexedVector2();
 
 public:

@@ -71,8 +71,8 @@ Mesh* PolygonMeshBuilder::build(bool updatable, float depth)
   Float32Array positions;
   Float32Array uvs;
 
-  Bounds bounds                              = _points.computeBounds();
-  std::vector<IndexedVector2>& pointElements = _points.elements;
+  auto bounds         = _points.computeBounds();
+  auto& pointElements = _points.elements;
   for (auto& p : pointElements) {
     std_util::concat(normals, {0.f, 1.f, 0.f});
     std_util::concat(positions, {p.x, 0.f, p.y});
@@ -114,7 +114,7 @@ Mesh* PolygonMeshBuilder::build(bool updatable, float depth)
   std::vector<std::vector<Point2D>> polygon;
   // Earcut.hpp has no 'holes' argument, adding the holes to the input array
   addHoles(_epoints, _eholes, polygon);
-  std::vector<int32_t> res = mapbox::earcut<int32_t>(polygon);
+  auto res = mapbox::earcut<int32_t>(polygon);
 
   Uint32Array indices;
   for (auto r : res) {
@@ -122,8 +122,8 @@ Mesh* PolygonMeshBuilder::build(bool updatable, float depth)
   }
 
   if (depth > 0.f) {
-    size_t positionscount
-      = (positions.size() / 3); // get the current pointcount
+    // get the current pointcount
+    size_t positionscount = (positions.size() / 3);
 
     for (auto& p : pointElements) { // add the elements at the depth
       std_util::concat(normals, {0.f, -1.f, 0.f});
@@ -134,9 +134,9 @@ Mesh* PolygonMeshBuilder::build(bool updatable, float depth)
 
     size_t totalCount = indices.size();
     for (size_t i = 0; i < totalCount; i += 3) {
-      unsigned int i0 = indices[i + 0];
-      unsigned int i1 = indices[i + 1];
-      unsigned int i2 = indices[i + 2];
+      auto i0 = indices[i + 0];
+      auto i1 = indices[i + 1];
+      auto i2 = indices[i + 2];
 
       indices.emplace_back(i2 + positionscount);
       indices.emplace_back(i1 + positionscount);
@@ -169,7 +169,7 @@ void PolygonMeshBuilder::addSide(Float32Array& positions, Float32Array& normals,
   size_t startIndex = positions.size() / 3;
   float ulength     = 0.f;
   for (size_t i = 0; i < points.elements.size(); ++i) {
-    IndexedVector2 p = points.elements[i];
+    const auto& p = points.elements[i];
     IndexedVector2 p1;
     if ((i + 1) > points.elements.size() - 1) {
       p1 = points.elements[0];
@@ -202,7 +202,7 @@ void PolygonMeshBuilder::addSide(Float32Array& positions, Float32Array& normals,
       std_util::concat(normals, {-vn.x, -vn.y, -vn.z});
       std_util::concat(normals, {-vn.x, -vn.y, -vn.z});
 
-      indices.emplace_back(startIndex);
+      indices.emplace_back(startIndex + 0);
       indices.emplace_back(startIndex + 1);
       indices.emplace_back(startIndex + 2);
 
@@ -216,7 +216,7 @@ void PolygonMeshBuilder::addSide(Float32Array& positions, Float32Array& normals,
       std_util::concat(normals, {vn.x, vn.y, vn.z});
       std_util::concat(normals, {vn.x, vn.y, vn.z});
 
-      indices.emplace_back(startIndex);
+      indices.emplace_back(startIndex + 0);
       indices.emplace_back(startIndex + 2);
       indices.emplace_back(startIndex + 1);
 
