@@ -10,7 +10,7 @@
 #pragma GCC diagnostic ignored "-Wconversion" // conversion from int to char
 #endif
 #include <earcut.hpp>
-#ifndef _MSC_VER
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
 

@@ -9,7 +9,7 @@ include(../cmake/BuildEnvironment.cmake)
 # Earcut.hpp (A C++ port of earcut.js, a fast, header-only polygon triangulation library).
 include_directories("earcut.hpp")
 set(EARCUT_HPP_INCLUDE_DIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}/earcut.hpp/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/earcut.hpp/include/mapbox
     CACHE INTERNAL "Include directories of Earcut hpp")
 
 # GLXW (OpenGL loader).

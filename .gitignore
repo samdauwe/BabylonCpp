@@ -42,6 +42,9 @@ release_build
 /lib
 /install
 
+# Not yet finished code
+src/Examples
+
 # Executables
 *.exe
 *.out
