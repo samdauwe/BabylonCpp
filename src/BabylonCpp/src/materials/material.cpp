@@ -248,7 +248,7 @@ std::vector<AbstractMesh*> Material::getBindedMeshes()
 void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)
 {
   // Animations
-  // getScene()->stopAnimation(this);
+  getScene()->stopAnimation(this);
 
   // Remove from scene
   _scene->materials.erase(

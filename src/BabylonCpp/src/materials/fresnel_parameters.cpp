@@ -28,7 +28,7 @@ FresnelParameters::~FresnelParameters()
 
 std::unique_ptr<FresnelParameters> FresnelParameters::clone() const
 {
-  return nullptr; // std_util::make_unique<FresnelParameters>(this);
+  return std_util::make_unique<FresnelParameters>(*this);
 }
 
 Json::object FresnelParameters::serialize() const

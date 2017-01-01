@@ -49,7 +49,7 @@ bool EffectFallbacks::isMoreFallbacks() const
 std::string EffectFallbacks::reduce(const std::string& currentDefines)
 {
   std::string currentDefinesCpy(currentDefines);
-  const std::vector<std::string>& currentFallbacks = _defines[_currentRank];
+  const auto& currentFallbacks = _defines[_currentRank];
 
   for (unsigned int index = 0; index < currentFallbacks.size(); ++index) {
     String::replaceInPlace(

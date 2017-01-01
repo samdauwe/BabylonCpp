@@ -197,8 +197,15 @@ void Effect::_loadVertexShader(
   const std::string& vertex,
   std::function<void(const std::string& data)> callback)
 {
+  // Base64 encoded ?
+  if (vertex.substr(0, 7) == "base64:") {
+    auto vertexBinary = vertex.substr(7);
+    callback(vertexBinary);
+    return;
+  }
+
   // Is in local store ?
-  std::string vertexShaderName = vertex + "VertexShader";
+  const std::string vertexShaderName = vertex + "VertexShader";
   if (std_util::contains(EffectShadersStore::Shaders, vertexShaderName)) {
     callback(std::string(EffectShadersStore::Shaders[vertexShaderName]));
     return;
@@ -222,6 +229,13 @@ void Effect::_loadFragmentShader(
   const std::string& fragment,
   std::function<void(const std::string& data)> callback)
 {
+  // Base64 encoded ?
+  if (fragment.substr(0, 7) == "base64:") {
+    auto vertexBinary = fragment.substr(7);
+    callback(vertexBinary);
+    return;
+  }
+
   // Is in local store ?
   std::string fragmentShaderName = fragment + "PixelShader";
   if (std_util::contains(EffectShadersStore::Shaders, fragmentShaderName)) {
@@ -260,7 +274,7 @@ void Effect::_processIncludes(
   const std::function<void(const std::string& data)>& callback)
 {
   std::ostringstream returnValue;
-  std::vector<std::string> lines = String::split(sourceCode, '\n');
+  auto lines = String::split(sourceCode, '\n');
   std::regex regex;
   std::smatch match;
 
@@ -280,8 +294,7 @@ void Effect::_processIncludes(
 
     if (std_util::contains(EffectIncludesShadersStore::Shaders, includeFile)) {
       // Substitution
-      std::string includeContent
-        = EffectIncludesShadersStore::Shaders[includeFile];
+      auto includeContent = EffectIncludesShadersStore::Shaders[includeFile];
       // Instanced includes
       regex = std::regex("#include<(.+)>\\[(.*)]");
       if (std::regex_search(line, match, regex) && (match.size() == 3)) {
@@ -292,8 +305,8 @@ void Effect::_processIncludes(
           std::vector<std::string> indexSplits
             = String::split(indexString, '.');
           if (indexSplits.size() == 2) {
-            std::string minIndex = indexSplits[0];
-            std::string maxIndex = indexSplits[1];
+            auto minIndex = indexSplits[0];
+            auto maxIndex = indexSplits[1];
             std::ostringstream includeContentStream;
 
             if ((!String::isDigit(maxIndex))

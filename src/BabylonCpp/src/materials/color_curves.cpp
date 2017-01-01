@@ -365,10 +365,10 @@ void ColorCurves::getColorGradingDataToRef(float iHue, float iDensity,
                                            float iSaturation, float iExposure,
                                            Color4& result)
 {
-  float hue        = ColorCurves::clamp(iHue, 0, 360);
-  float density    = ColorCurves::clamp(iDensity, -100, 100);
-  float saturation = ColorCurves::clamp(iSaturation, -100, 100);
-  float exposure   = ColorCurves::clamp(iExposure, -100, 100);
+  auto hue        = ColorCurves::clamp(iHue, 0, 360);
+  auto density    = ColorCurves::clamp(iDensity, -100, 100);
+  auto saturation = ColorCurves::clamp(iSaturation, -100, 100);
+  auto exposure   = ColorCurves::clamp(iExposure, -100, 100);
 
   // Remap the slider/config filter density with non-linear mapping and also
   // scale by half so that the maximum filter density is only 50% control. This
@@ -407,9 +407,9 @@ float ColorCurves::applyColorGradingSliderNonlinear(float _value)
 void ColorCurves::fromHSBToRef(float hue, float saturation, float brightness,
                                Color4& result)
 {
-  float h = ColorCurves::clamp(hue, 0, 360);
-  float s = ColorCurves::clamp(saturation / 100.f, 0, 1);
-  float v = ColorCurves::clamp(brightness / 100.f, 0, 1);
+  auto h = ColorCurves::clamp(hue, 0, 360);
+  auto s = ColorCurves::clamp(saturation / 100.f, 0, 1);
+  auto v = ColorCurves::clamp(brightness / 100.f, 0, 1);
 
   if (std_util::almost_equal(s, 0.f)) {
     result.r = v;
