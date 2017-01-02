@@ -45,7 +45,7 @@ void initializeScene(ICanvas* canvas, Scene* scene)
   auto sphere = Mesh::CreateSphere("sphere1", 32, 2.f, scene);
 
   // Move the sphere upward 1/2 of its height
-  sphere->position.y = 1.f;
+  sphere->position().y = 1.f;
 
   // Create a built-in "ground" shape.
   // Params: name, width, depth, subdivs, scene

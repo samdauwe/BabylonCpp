@@ -90,7 +90,7 @@ void LensFlareSystem::setEmitter(Mesh* newEmitter)
 
 Vector3 LensFlareSystem::getEmitterPosition()
 {
-  return _emitter->position;
+  return _emitter->position();
 }
 
 bool LensFlareSystem::computeEffectivePosition(Viewport& globalViewport)

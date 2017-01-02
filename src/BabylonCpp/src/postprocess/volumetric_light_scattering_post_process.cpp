@@ -359,7 +359,7 @@ void VolumetricLightScatteringPostProcess::_updateMeshScreenCoordinates(
   }
   else {
     meshPosition
-      = mesh->parent() ? *mesh->getAbsolutePosition() : mesh->position;
+      = mesh->parent() ? *mesh->getAbsolutePosition() : mesh->position();
   }
 
   Matrix identityMatrix = Matrix::Identity();

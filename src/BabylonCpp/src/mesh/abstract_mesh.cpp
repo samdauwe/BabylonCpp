@@ -31,7 +31,6 @@ Vector3 AbstractMesh::_lookAtVectorCache = Vector3(0.f, 0.f, 0.f);
 AbstractMesh::AbstractMesh(const std::string& _name, Scene* scene)
     : Node(_name, scene)
     , definedFacingForward{true} // orientation for POV movement & rotation
-    , position{Vector3(0.f, 0.f, 0.f)}
     , _rotationQuaternionSet{false}
     , billboardMode{AbstractMesh::BILLBOARDMODE_NONE}
     , visibility{1.f}
@@ -79,6 +78,7 @@ AbstractMesh::AbstractMesh(const std::string& _name, Scene* scene)
     , _unIndexed{false}
     , _onCollideObserver{nullptr}
     , _onCollisionPositionChangeObserver{nullptr}
+    , _position{Vector3(0.f, 0.f, 0.f)}
     , _rotation{Vector3(0.f, 0.f, 0.f)}
     , _scaling{Vector3(1.f, 1.f, 1.f)}
     , _checkCollisions{false}
@@ -181,6 +181,16 @@ void AbstractMesh::setSkeleton(Skeleton* value)
 Skeleton* AbstractMesh::skeleton()
 {
   return _skeleton;
+}
+
+Vector3& AbstractMesh::position()
+{
+  return _position;
+}
+
+void AbstractMesh::setPosition(const Vector3& newPosition)
+{
+  _position = newPosition;
 }
 
 Vector3& AbstractMesh::rotation()
@@ -451,20 +461,20 @@ void AbstractMesh::setAbsolutePosition(const Vector3& absolutePosition_)
     Vector3 worldPosition(absolutePositionX, absolutePositionY,
                           absolutePositionZ);
 
-    position
+    _position
       = Vector3::TransformCoordinates(worldPosition, *invertParentWorldMatrix);
   }
   else {
-    position.x = absolutePositionX;
-    position.y = absolutePositionY;
-    position.z = absolutePositionZ;
+    _position.x = absolutePositionX;
+    _position.y = absolutePositionY;
+    _position.z = absolutePositionZ;
   }
 }
 
 void AbstractMesh::movePOV(float amountRight, float amountUp,
                            float amountForward)
 {
-  position.addInPlace(calcMovePOV(amountRight, amountUp, amountForward));
+  _position.addInPlace(calcMovePOV(amountRight, amountUp, amountForward));
 }
 
 Vector3 AbstractMesh::calcMovePOV(float amountRight, float amountUp,
@@ -529,7 +539,7 @@ bool AbstractMesh::_isSynchronized()
     return false;
   }
 
-  if (!_cache.position.equals(position)) {
+  if (!_cache.position.equals(_position)) {
     return false;
   }
 
@@ -610,7 +620,7 @@ Matrix AbstractMesh::computeWorldMatrix(bool force)
     return *_worldMatrix;
   }
 
-  _cache.position.copyFrom(position);
+  _cache.position.copyFrom(_position);
   _cache.scaling.copyFrom(scaling());
   _cache.pivotMatrixUpdated = false;
   _cache.billboardMode      = billboardMode;
@@ -654,14 +664,14 @@ Matrix AbstractMesh::computeWorldMatrix(bool force)
                                    cameraWorldMatrix->m[13],
                                    cameraWorldMatrix->m[14]);
 
-      Matrix::TranslationToRef(position.x + cameraGlobalPosition.x,
-                               position.y + cameraGlobalPosition.y,
-                               position.z + cameraGlobalPosition.z,
+      Matrix::TranslationToRef(_position.x + cameraGlobalPosition.x,
+                               _position.y + cameraGlobalPosition.y,
+                               _position.z + cameraGlobalPosition.z,
                                Tmp::MatrixArray[2]);
     }
   }
   else {
-    Matrix::TranslationToRef(position.x, position.y, position.z,
+    Matrix::TranslationToRef(_position.x, _position.y, _position.z,
                              Tmp::MatrixArray[2]);
   }
 
@@ -672,7 +682,7 @@ Matrix AbstractMesh::computeWorldMatrix(bool force)
   // Billboarding
   if (billboardMode != AbstractMesh::BILLBOARDMODE_NONE
       && getScene()->activeCamera) {
-    Tmp::Vector3Array[0].copyFrom(position);
+    Tmp::Vector3Array[0].copyFrom(_position);
     Vector3 localPosition = Tmp::Vector3Array[0];
 
     if (parent() && parent()->getWorldMatrix()) {
@@ -698,7 +708,7 @@ Matrix AbstractMesh::computeWorldMatrix(bool force)
     if (parent()) {
       AbstractMesh* parentMesh = dynamic_cast<AbstractMesh*>(parent());
       if (parentMesh) {
-        localPosition.addInPlace(parentMesh->position);
+        localPosition.addInPlace(parentMesh->_position);
         Matrix::TranslationToRef(localPosition.x, localPosition.y,
                                  localPosition.z, Tmp::MatrixArray[2]);
       }
@@ -783,7 +793,7 @@ void AbstractMesh::setPositionWithLocalVector(const Vector3& vector3)
 {
   computeWorldMatrix();
 
-  position = Vector3(Vector3::TransformNormal(vector3, _localWorld));
+  _position = Vector3(Vector3::TransformNormal(vector3, _localWorld));
 }
 
 Vector3 AbstractMesh::getPositionExpressedInLocalSpace()
@@ -792,21 +802,21 @@ Vector3 AbstractMesh::getPositionExpressedInLocalSpace()
   auto invLocalWorldMatrix = _localWorld;
   invLocalWorldMatrix.invert();
 
-  return Vector3::TransformNormal(position, invLocalWorldMatrix);
+  return Vector3::TransformNormal(_position, invLocalWorldMatrix);
 }
 
 void AbstractMesh::locallyTranslate(const Vector3& vector3)
 {
   computeWorldMatrix(true);
 
-  position = Vector3(Vector3::TransformCoordinates(vector3, _localWorld));
+  _position = Vector3(Vector3::TransformCoordinates(vector3, _localWorld));
 }
 
 void AbstractMesh::lookAt(const Vector3& targetPoint, float yawCor,
                           float pitchCor, float rollCor, Space space)
 {
   Vector3& dv = AbstractMesh::_lookAtVectorCache;
-  Vector3 pos = (space == Space::LOCAL) ? position : *getAbsolutePosition();
+  Vector3 pos = (space == Space::LOCAL) ? _position : *getAbsolutePosition();
   targetPoint.subtractToRef(pos, dv);
   float yaw   = -std::atan2(dv.z, dv.x) - Math::PI_2;
   float len   = std::sqrt(dv.x * dv.x + dv.z * dv.z);
@@ -1293,7 +1303,7 @@ void AbstractMesh::setPivotPoint(const Vector3& point, const Space& space)
     _point = Vector3::TransformCoordinates(_point, tmat);
   }
 
-  Vector3::TransformCoordinatesToRef(_point, *wm, position);
+  Vector3::TransformCoordinatesToRef(_point, *wm, _position);
 
   _pivotMatrix.m[12] = -_point.x;
   _pivotMatrix.m[13] = -_point.y;

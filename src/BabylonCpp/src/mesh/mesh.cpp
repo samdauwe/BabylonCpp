@@ -1100,7 +1100,7 @@ void Mesh::bakeCurrentTransformIntoVertices()
 {
   bakeTransformIntoVertices(computeWorldMatrix(true));
   scaling().copyFromFloats(1.f, 1.f, 1.f);
-  position.copyFromFloats(0.f, 0.f, 0.f);
+  position().copyFromFloats(0.f, 0.f, 0.f);
   rotation().copyFromFloats(0.f, 0.f, 0.f);
   // only if quaternion is already set
   if (rotationQuaternionSet()) {

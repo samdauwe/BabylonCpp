@@ -52,6 +52,8 @@ public:
   Scene* getScene() override;
   void setSkeleton(Skeleton* value);
   virtual Skeleton* skeleton();
+  Vector3& position();
+  void setPosition(const Vector3& newPosition);
   Vector3& rotation();
   void setRotation(const Vector3& newRotation);
   Vector3& scaling();
@@ -242,7 +244,6 @@ public:
   Observable<AbstractMesh> onAfterWorldMatrixUpdateObservable;
   // Properties
   bool definedFacingForward;
-  Vector3 position;
   bool _rotationQuaternionSet;
   Quaternion _rotationQuaternion;
   unsigned int billboardMode;
@@ -309,6 +310,7 @@ private:
   Observer<AbstractMesh>::Ptr _onCollideObserver;
   Observer<Vector3>::Ptr _onCollisionPositionChangeObserver;
   // Properties
+  Vector3 _position;
   Vector3 _rotation;
   Vector3 _scaling;
   // Collisions

@@ -49,12 +49,12 @@ void GroundMesh::optimize(size_t chunksCount, size_t octreeBlocksSize)
 float GroundMesh::getHeightAtCoordinates(float x, float z)
 {
   // express x and y in the ground local system
-  x -= position.x;
-  z -= position.z;
+  x -= position().x;
+  z -= position().z;
   x /= scaling().x;
   z /= scaling().z;
   if (x < _minX || x > _maxX || z < _minZ || z > _maxZ) {
-    return position.y;
+    return position().y;
   }
   if (_heightQuads.empty()) {
     _initHeightQuads();
@@ -63,7 +63,7 @@ float GroundMesh::getHeightAtCoordinates(float x, float z)
   auto facet = _getFacetAt(x, z);
   auto y     = -(facet.x * x + facet.z * z + facet.w) / facet.y;
   // return y in the World system
-  return y * scaling().y + position.y;
+  return y * scaling().y + position().y;
 }
 
 Vector3 GroundMesh::getNormalAtCoordinates(float x, float z)
@@ -76,8 +76,8 @@ Vector3 GroundMesh::getNormalAtCoordinates(float x, float z)
 void GroundMesh::getNormalAtCoordinatesToRef(float x, float z, Vector3& ref)
 {
   // express x and y in the ground local system
-  x -= position.x;
-  z -= position.z;
+  x -= position().x;
+  z -= position().z;
   x /= scaling().x;
   z /= scaling().z;
   if (x < _minX || x > _maxX || z < _minZ || z > _maxZ) {

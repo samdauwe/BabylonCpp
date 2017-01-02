@@ -46,11 +46,11 @@ void FollowCamera::follow(AbstractMesh* cameraTarget)
     yRotation = cameraTarget->rotation().y;
   }
   float radians = getRadians(rotationOffset) + yRotation;
-  float targetX = cameraTarget->position.x + std::sin(radians) * radius;
+  float targetX = cameraTarget->position().x + std::sin(radians) * radius;
 
-  float targetZ = cameraTarget->position.z + std::cos(radians) * radius;
+  float targetZ = cameraTarget->position().z + std::cos(radians) * radius;
   float dx      = targetX - position.x;
-  float dy      = (cameraTarget->position.y + heightOffset) - position.y;
+  float dy      = (cameraTarget->position().y + heightOffset) - position.y;
   float dz      = targetZ - position.z;
   float vx      = dx * cameraAcceleration * 2.f; // this is set to .05
   float vy      = dy * cameraAcceleration;
@@ -69,7 +69,7 @@ void FollowCamera::follow(AbstractMesh* cameraTarget)
   }
 
   position = Vector3(position.x + vx, position.y + vy, position.z + vz);
-  setTarget(cameraTarget->position);
+  setTarget(cameraTarget->position());
 }
 
 void FollowCamera::_checkInputs()

@@ -14,7 +14,7 @@ InstancedMesh::InstancedMesh(const std::string& _name, Mesh* source)
 
   _sourceMesh = source;
 
-  position.copyFrom(source->position);
+  position().copyFrom(source->position());
   rotation().copyFrom(source->rotation());
   scaling().copyFrom(source->scaling());
 
