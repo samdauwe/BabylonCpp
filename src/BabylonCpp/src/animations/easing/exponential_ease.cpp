@@ -2,8 +2,8 @@
 
 namespace BABYLON {
 
-ExponentialEase::ExponentialEase(int exponent)
-    : EasingFunction{}, _exponent{static_cast<float>(exponent)}
+ExponentialEase::ExponentialEase(int iExponent)
+    : EasingFunction{}, exponent{static_cast<float>(iExponent)}
 {
 }
 
@@ -13,12 +13,11 @@ ExponentialEase::~ExponentialEase()
 
 float ExponentialEase::easeInCore(float gradient) const
 {
-  if (_exponent <= 0) {
+  if (exponent <= 0) {
     return gradient;
   }
 
-  return ((std::exp(_exponent * gradient) - 1.f)
-          / (std::exp(_exponent) - 1.f));
+  return ((std::exp(exponent * gradient) - 1.f) / (std::exp(exponent) - 1.f));
 }
 
 } // end of namespace BABYLON

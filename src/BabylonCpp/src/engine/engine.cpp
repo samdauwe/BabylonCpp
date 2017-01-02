@@ -463,7 +463,7 @@ void Engine::renderFunction(const std::function<void()>& renderFunction)
 
   if (shouldRender) {
     // Backup GL state
-    // backupGLState();
+    //backupGLState();
     // Start new frame
     beginFrame();
     // Render
@@ -471,7 +471,7 @@ void Engine::renderFunction(const std::function<void()>& renderFunction)
     // Present
     endFrame();
     // Restore GL state
-    // restoreGLState();
+    //restoreGLState();
   }
 }
 

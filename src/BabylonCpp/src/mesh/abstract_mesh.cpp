@@ -1168,9 +1168,8 @@ void AbstractMesh::releaseSubMeshes()
       subMesh->dispose();
     }
   }
-  else {
-    subMeshes.clear();
-  }
+
+  subMeshes.clear();
 }
 
 void AbstractMesh::dispose(bool doNotRecurse)

@@ -15,9 +15,9 @@ public:
 
   float easeInCore(float gradient) const override;
 
-private:
-  float _bounces;
-  float _bounciness;
+public:
+  float bounces;
+  float bounciness;
 
 }; // end of class BounceEase
 

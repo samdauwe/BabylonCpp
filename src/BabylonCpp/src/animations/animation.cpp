@@ -23,7 +23,7 @@ std::unique_ptr<Animation> Animation::_PrepareAnimation(
   const AnimationValue& to, unsigned int loopMode,
   IEasingFunction* easingFunction)
 {
-  int dataType = from.dataType;
+  auto dataType = from.dataType;
 
   if (dataType == -1) {
     return nullptr;
@@ -69,22 +69,22 @@ Animatable* Animation::CreateMergeAndStartAnimation(
     name, targetProperty, framePerSecond, totalFrame, from, to, loopMode,
     easingFunction);
 
-  // node->animations.emplace_back(animation);
+  //node->animations.emplace_back(animation);
 
   return node->getScene()->beginAnimation(
     node, 0, totalFrame, (animation->loopMode == 1), 1.f, onAnimationEnd);
 }
 
-Animation::Animation(const std::string& _name,
-                     const std::string& _targetProperty, size_t _framePerSecond,
-                     int _dataType, unsigned int _loopMode)
+Animation::Animation(const std::string& iName,
+                     const std::string& iTargetProperty, size_t iFramePerSecond,
+                     int iDataType, unsigned int iLoopMode)
 
-    : name{_name}
-    , targetProperty{_targetProperty}
+    : name{iName}
+    , targetProperty{iTargetProperty}
     , targetPropertyPath{String::split(targetProperty, '.')}
-    , framePerSecond{_framePerSecond}
-    , dataType{_dataType}
-    , loopMode{_loopMode}
+    , framePerSecond{iFramePerSecond}
+    , dataType{iDataType}
+    , loopMode{iLoopMode}
     , allowMatricesInterpolation{false}
     , blendingSpeed{0.01f}
     , enableBlending{false}
@@ -151,12 +151,12 @@ void Animation::createRange(const std::string& _name, int from, int to)
   }
 }
 
-void Animation::deleteRange(const std::string& _name, bool deleteFrames)
+void Animation::deleteRange(const std::string& iName, bool deleteFrames)
 {
-  if (std_util::contains(_ranges, _name)) {
+  if (std_util::contains(_ranges, iName)) {
     if (deleteFrames) {
-      int from = _ranges[_name].from;
-      int to   = _ranges[_name].to;
+      auto from = _ranges[iName].from;
+      auto to   = _ranges[iName].to;
 
       _keys.erase(std::remove_if(_keys.begin(), _keys.end(),
                                  [from, to](const AnimationKey& key) {
@@ -164,13 +164,13 @@ void Animation::deleteRange(const std::string& _name, bool deleteFrames)
                                  }),
                   _keys.end());
     }
-    _ranges.erase(_name);
+    _ranges.erase(iName);
   }
 }
 
-AnimationRange& Animation::getRange(const std::string& _name)
+AnimationRange& Animation::getRange(const std::string& iName)
 {
-  return _ranges[_name];
+  return _ranges[iName];
 }
 
 void Animation::reset()
@@ -255,8 +255,8 @@ Color3 Animation::color3InterpolateFunction(const Color3& startValue,
   return Color3::Lerp(startValue, endValue, gradient);
 }
 
-Matrix Animation::matrixInterpolateFunction(Matrix& startValue,
-                                            Matrix& endValue,
+Matrix Animation::matrixInterpolateFunction(const Matrix& startValue,
+                                            const Matrix& endValue,
                                             float gradient) const
 {
   return Matrix::Lerp(startValue, endValue, gradient);
@@ -293,16 +293,16 @@ AnimationValue Animation::_getKeyValue(const AnimationValue& value) const
   return value;
 }
 
-AnimationValue Animation::_interpolate(int _currentFrame, int repeatCount,
-                                       unsigned int _loopMode,
+AnimationValue Animation::_interpolate(int iCurrentFrame, int repeatCount,
+                                       unsigned int iLoopMode,
                                        const AnimationValue& offsetValue,
                                        const AnimationValue& highLimitValue)
 {
-  if (_loopMode == Animation::ANIMATIONLOOPMODE_CONSTANT && repeatCount > 0) {
+  if (iLoopMode == Animation::ANIMATIONLOOPMODE_CONSTANT && repeatCount > 0) {
     return highLimitValue.copy();
   }
 
-  currentFrame       = _currentFrame;
+  currentFrame       = iCurrentFrame;
   float _repeatCount = static_cast<float>(repeatCount);
 
   // Try to get a hash to find the right key
@@ -326,8 +326,8 @@ AnimationValue Animation::_interpolate(int _currentFrame, int repeatCount,
        ++key) {
     if (_keys[key + 1].frame >= currentFrame) {
 
-      AnimationValue startValue = _getKeyValue(_keys[key].value);
-      AnimationValue endValue   = _getKeyValue(_keys[key + 1].value);
+      const auto startValue = _getKeyValue(_keys[key].value);
+      const auto endValue   = _getKeyValue(_keys[key + 1].value);
 
       // gradient : percent of currentFrame between the frame inf and the frame
       // sup
@@ -340,14 +340,14 @@ AnimationValue Animation::_interpolate(int _currentFrame, int repeatCount,
         gradient = _easingFunction->ease(gradient);
       }
 
-      AnimationValue newVale = _keys[key].value.copy();
+      auto newVale = _keys[key].value.copy();
 
       switch (dataType) {
         // Float
         case Animation::ANIMATIONTYPE_FLOAT:
           switch (loopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE:
-              // case Animation::ANIMATIONLOOPMODE_CONSTANT:
+            case Animation::ANIMATIONLOOPMODE_CONSTANT:
               newVale.floatData = floatInterpolateFunction(
                 startValue.floatData, endValue.floatData, gradient);
               return newVale;
@@ -365,7 +365,7 @@ AnimationValue Animation::_interpolate(int _currentFrame, int repeatCount,
         case Animation::ANIMATIONTYPE_QUATERNION:
           switch (loopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE:
-              // case Animation::ANIMATIONLOOPMODE_CONSTANT:
+            case Animation::ANIMATIONLOOPMODE_CONSTANT:
               newVale.quaternionData = quaternionInterpolateFunction(
                 startValue.quaternionData, endValue.quaternionData, gradient);
               return newVale;
@@ -384,7 +384,7 @@ AnimationValue Animation::_interpolate(int _currentFrame, int repeatCount,
         case Animation::ANIMATIONTYPE_VECTOR3:
           switch (loopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE:
-              // case Animation::ANIMATIONLOOPMODE_CONSTANT:
+            case Animation::ANIMATIONLOOPMODE_CONSTANT:
               newVale.vector3Data = vector3InterpolateFunction(
                 startValue.vector3Data, endValue.vector3Data, gradient);
               return newVale;
@@ -402,7 +402,7 @@ AnimationValue Animation::_interpolate(int _currentFrame, int repeatCount,
         case Animation::ANIMATIONTYPE_VECTOR2:
           switch (loopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE:
-              // case Animation::ANIMATIONLOOPMODE_CONSTANT:
+            case Animation::ANIMATIONLOOPMODE_CONSTANT:
               newVale.vector2Data = vector2InterpolateFunction(
                 startValue.vector2Data, endValue.vector2Data, gradient);
               return newVale;
@@ -420,7 +420,7 @@ AnimationValue Animation::_interpolate(int _currentFrame, int repeatCount,
         case Animation::ANIMATIONTYPE_SIZE:
           switch (loopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE:
-              // case Animation::ANIMATIONLOOPMODE_CONSTANT:
+            case Animation::ANIMATIONLOOPMODE_CONSTANT:
               newVale.sizeData = sizeInterpolateFunction(
                 startValue.sizeData, endValue.sizeData, gradient);
               return newVale;
@@ -438,7 +438,7 @@ AnimationValue Animation::_interpolate(int _currentFrame, int repeatCount,
         case Animation::ANIMATIONTYPE_COLOR3:
           switch (loopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE:
-              // case Animation::ANIMATIONLOOPMODE_CONSTANT:
+            case Animation::ANIMATIONLOOPMODE_CONSTANT:
               newVale.color3Data = color3InterpolateFunction(
                 startValue.color3Data, endValue.color3Data, gradient);
               return newVale;
@@ -453,7 +453,7 @@ AnimationValue Animation::_interpolate(int _currentFrame, int repeatCount,
           }
           break;
         // Matrix
-        /*case Animation::ANIMATIONTYPE_MATRIX:
+        case Animation::ANIMATIONTYPE_MATRIX:
           switch (loopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE:
             case Animation::ANIMATIONLOOPMODE_CONSTANT:
@@ -462,14 +462,15 @@ AnimationValue Animation::_interpolate(int _currentFrame, int repeatCount,
                   startValue.matrixData, endValue.matrixData, gradient);
                 return newVale;
               }
-              break;
+              newVale.matrixData = startValue.matrixData;
+              return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE:
               newVale.matrixData = startValue.matrixData;
               return newVale;
             default:
               break;
           }
-          break;*/
+          break;
         default:
           break;
       }
@@ -486,7 +487,7 @@ void Animation::setValue(const AnimationValue& /*currentValue*/, bool /*blend*/)
   AnimationValue destination;
 
   if (targetPropertyPath.size() > 1) {
-    AnimationValue property = (*_target)[targetPropertyPath[0]];
+    auto property = (*_target)[targetPropertyPath[0]];
 
     for (size_t index = 1; index < targetPropertyPath.size() - 1; ++index) {
       property = property[targetPropertyPath[index]];
@@ -496,8 +497,8 @@ void Animation::setValue(const AnimationValue& /*currentValue*/, bool /*blend*/)
     destination = property;
   }
   else {
-    path = targetPropertyPath[0];
-    // destination = _target;
+    path        = targetPropertyPath[0];
+    destination = _target;
   }
 
   // Blending
@@ -550,7 +551,7 @@ void Animation::goToFrame(int frame)
     _frame = _keys.back().frame;
   }
 
-  AnimationValue currentValue = _interpolate(_frame, 0, loopMode);
+  auto currentValue = _interpolate(_frame, 0, loopMode);
 
   setValue(currentValue);
 }
@@ -710,11 +711,11 @@ bool Animation::animate(millisecond_t delay, int from, int to, bool loop,
 Json::object Animation::serialize() const
 {
   auto serializationObject
-    = Json::object({/*Json::Pair("name", name),                     //
-                    Json::Pair("property", targetProperty),       //
-                    Json::Pair("framePerSecond", framePerSecond), //
-                    Json::Pair("dataType", dataType),             //
-                    Json::Pair("loopBehavior", loopMode)*/});
+    = Json::object({Json::Pair("name", name),                             //
+                    Json::Pair("property", targetProperty),               //
+                    Json::Pair<size_t>("framePerSecond", framePerSecond), //
+                    Json::Pair<int>("dataType", dataType),                //
+                    Json::Pair<unsigned>("loopBehavior", loopMode)});
 
   // Animation keys
   std::vector<Json::value> keys;
@@ -728,9 +729,9 @@ Json::object Animation::serialize() const
       case Animation::ANIMATIONTYPE_QUATERNION:
         std_util::concat(keyValues, value.quaternionData.asArray());
         break;
-      /*case Animation::ANIMATIONTYPE_MATRIX:
+      case Animation::ANIMATIONTYPE_MATRIX:
         std_util::concat(keyValues, value.matrixData.asArray());
-        break;*/
+        break;
       case Animation::ANIMATIONTYPE_VECTOR3:
         std_util::concat(keyValues, value.vector3Data.asArray());
         break;
@@ -739,22 +740,22 @@ Json::object Animation::serialize() const
         break;
     }
 
-    // keys.emplace_back(
-    //  Json::value(Json::object({Json::Pair("frame", animationKey.frame), //
-    //                            Json::Pair("values", keyValues)})));
+    keys.emplace_back(Json::value(
+      Json::object({Json::Pair<int>("frame", animationKey.frame), //
+                    /*Json::Pair("values", keyValues)*/})));
   }
   serializationObject["keys"] = Json::value(keys);
 
   // Animation ranges
-  /*std::vector<Json::value> ranges;
+  std::vector<Json::value> ranges;
   for (auto& range : _ranges) {
     ranges.emplace_back(
-      Json::value(Json::object({Json::Pair("name", range.first),       //
-                                Json::Pair("from", range.second.from), //
-                                Json::Pair("to", range.second.to)})    //
+      Json::value(Json::object({Json::Pair("name", range.first),            //
+                                Json::Pair<int>("from", range.second.from), //
+                                Json::Pair<int>("to", range.second.to)})    //
                   ));
   }
-  serializationObject["ranges"] = Json::value(ranges);*/
+  serializationObject["ranges"] = Json::value(ranges);
 
   return serializationObject;
 }
@@ -786,10 +787,10 @@ std::unique_ptr<Animation> Animation::Parse(const Json::value& parsedAnimation)
           data = AnimationValue(
             Quaternion::FromArray(Json::ToArray<float>(key, "values")));
           break;
-        /*case Animation::ANIMATIONTYPE_MATRIX:
+        case Animation::ANIMATIONTYPE_MATRIX:
           data = AnimationValue(
-            Matrix::FromArray(Tools::ToArray<float>(key, "values")));
-          break;*/
+            Matrix::FromArray(Json::ToArray<float>(key, "values")));
+          break;
         case Animation::ANIMATIONTYPE_COLOR3:
           data = AnimationValue(
             Color3::FromArray(Json::ToArray<float>(key, "values")));

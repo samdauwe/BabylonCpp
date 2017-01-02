@@ -15,8 +15,8 @@ public:
 
   float easeInCore(float gradient) const override;
 
-private:
-  float _amplitude;
+public:
+  float amplitude;
 
 }; // end of class BackEase
 

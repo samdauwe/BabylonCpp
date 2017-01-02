@@ -11,8 +11,8 @@ class BABYLON_SHARED_EXPORT AnimationRange {
 
 public:
   AnimationRange();
-  AnimationRange(const AnimationRange& other);
   AnimationRange(const std::string& name, int from, int to);
+  AnimationRange(const AnimationRange& other);
   ~AnimationRange();
 
   AnimationRange copy() const;

@@ -4,8 +4,8 @@
 
 namespace BABYLON {
 
-BezierCurveEase::BezierCurveEase(float x1, float y1, float x2, float y2)
-    : EasingFunction{}, _x1{x1}, _y1{y1}, _x2{x2}, _y2{y2}
+BezierCurveEase::BezierCurveEase(float iX1, float iY1, float iX2, float iY2)
+    : EasingFunction{}, x1{iX1}, y1{iY1}, x2{iX2}, y2{iY2}
 {
 }
 
@@ -15,7 +15,7 @@ BezierCurveEase::~BezierCurveEase()
 
 float BezierCurveEase::easeInCore(float gradient) const
 {
-  return BezierCurve::Interpolate(gradient, _x1, _y1, _x2, _y2);
+  return BezierCurve::Interpolate(gradient, x1, y1, x2, y2);
 }
 
 } // end of namespace BABYLON

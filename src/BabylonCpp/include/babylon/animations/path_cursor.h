@@ -20,11 +20,11 @@ public:
 
   // used by animation engine
   PathCursor& markAsDirty(const std::string& propertyName);
+  PathCursor& onchange(const std::function<void(const PathCursor& cursor)>& f);
 
 private:
   PathCursor ensureLimits();
   PathCursor& raiseOnChange();
-  PathCursor& onchange(std::function<void(const PathCursor& cursor)>& f);
 
 private:
   std::vector<std::function<void(const PathCursor& cursor)>> _onchange;

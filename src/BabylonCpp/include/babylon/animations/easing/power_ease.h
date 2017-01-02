@@ -15,8 +15,8 @@ public:
 
   float easeInCore(float gradient) const override;
 
-private:
-  float _power;
+public:
+  float power;
 
 }; // end of class PowerEase
 

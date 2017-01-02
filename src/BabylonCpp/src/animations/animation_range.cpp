@@ -6,8 +6,8 @@ AnimationRange::AnimationRange() : name{""}, from{0}, to{0}
 {
 }
 
-AnimationRange::AnimationRange(const std::string& _name, int _from, int _to)
-    : name{_name}, from{_from}, to{_to}
+AnimationRange::AnimationRange(const std::string& iName, int iFrom, int iTo)
+    : name{iName}, from{iFrom}, to{iTo}
 {
 }
 

@@ -15,9 +15,9 @@ public:
 
   float easeInCore(float gradient) const override;
 
-private:
-  float _oscillations;
-  float _springiness;
+public:
+  float oscillations;
+  float springiness;
 
 }; // end of class ElasticEase
 

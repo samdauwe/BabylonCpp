@@ -63,7 +63,7 @@ Animatable::getAnimationByTargetProperty(const std::string& property) const
                            return animation->targetProperty == property;
                          });
 
-  return (it != _animations.end()) ? *it : nullptr;
+  return (it == _animations.end()) ? nullptr : *it;
 }
 
 void Animatable::reset()
@@ -94,10 +94,10 @@ void Animatable::disableBlending()
 void Animatable::goToFrame(int frame)
 {
   if (!_animations.empty() && _animations[0]) {
-    size_t fps       = _animations[0]->framePerSecond;
-    int currentFrame = _animations[0]->currentFrame;
-    int adjustTime   = frame - currentFrame;
-    float delay
+    auto fps          = _animations[0]->framePerSecond;
+    auto currentFrame = _animations[0]->currentFrame;
+    auto adjustTime   = frame - currentFrame;
+    auto delay
       = static_cast<float>(adjustTime) * 1000.f / static_cast<float>(fps);
     _localDelayOffset -= std::chrono::milliseconds(static_cast<long>(delay));
   }
@@ -183,14 +183,16 @@ bool Animatable::_animate(const millisecond_t& delay)
 
   animationStarted = running;
 
-  /*if (!running) {
+  if (!running) {
     // Remove from active animatables
-    std::vector<AnimatablePtr>& activeAnimatables = _scene->_activeAnimatables;
-    auto it = find(activeAnimatables.begin(), activeAnimatables.end(), this);
-    if (it != activeAnimatables.end()) {
-      activeAnimatables.erase(it);
-    }
-  }*/
+    _scene->_activeAnimatables.erase(
+      std::remove_if(_scene->_activeAnimatables.begin(),
+                     _scene->_activeAnimatables.end(),
+                     [this](const std::unique_ptr<Animatable>& animatable) {
+                       return animatable.get() == this;
+                     }),
+      _scene->_activeAnimatables.end());
+  }
 
   if (!running && onAnimationEnd) {
     onAnimationEnd();

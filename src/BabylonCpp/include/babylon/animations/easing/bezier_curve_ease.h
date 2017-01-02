@@ -16,11 +16,11 @@ public:
 
   float easeInCore(float gradient) const override;
 
-private:
-  float _x1;
-  float _y1;
-  float _x2;
-  float _y2;
+public:
+  float x1;
+  float y1;
+  float x2;
+  float y2;
 
 }; // end of class BezierCurveEase
 

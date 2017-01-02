@@ -559,7 +559,7 @@ void Mesh::makeGeometryUnique()
     return;
   }
   auto oldGeometry = _geometry;
-  auto geometry_ = _geometry->copy(Geometry::RandomId());
+  auto geometry_   = _geometry->copy(Geometry::RandomId());
   oldGeometry->releaseForMesh(this, true);
   geometry_->applyToMesh(this);
 }
@@ -1264,7 +1264,7 @@ void Mesh::convertToFlatShadedMesh()
   }
 
   // Save previous submeshes
-  std::vector<SubMesh*> previousSubmeshes(subMeshes.size());
+  std::vector<SubMesh*> previousSubmeshes;
   std::for_each(subMeshes.begin(), subMeshes.end(),
                 [&previousSubmeshes](const std::unique_ptr<SubMesh>& subMesh) {
                   previousSubmeshes.emplace_back(subMesh.get());

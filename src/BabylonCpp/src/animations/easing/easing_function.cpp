@@ -11,12 +11,12 @@ EasingFunction::~EasingFunction()
 {
 }
 
-void EasingFunction::setEasingMode(int easingMode)
+void EasingFunction::setEasingMode(unsigned int easingMode)
 {
-  _easingMode = std::min(std::max(easingMode, 0), 2);
+  _easingMode = std::min(std::max(easingMode, 0u), 2u);
 }
 
-int EasingFunction::getEasingMode() const
+unsigned int EasingFunction::getEasingMode() const
 {
   return _easingMode;
 }
@@ -33,10 +33,10 @@ float EasingFunction::ease(float gradient)
   }
 
   if (gradient >= 0.5f) {
-    return (((1 - easeInCore((1 - gradient) * 2)) * 0.5f) + 0.5f);
+    return (((1.f - easeInCore((1.f - gradient) * 2.f)) * 0.5f) + 0.5f);
   }
 
-  return (easeInCore(gradient * 2) * 0.5f);
+  return (easeInCore(gradient * 2.f) * 0.5f);
 }
 
 } // end of namespace BABYLON

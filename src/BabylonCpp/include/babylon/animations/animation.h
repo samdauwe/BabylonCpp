@@ -95,7 +95,8 @@ public:
   Color3 color3InterpolateFunction(const Color3& startValue,
                                    const Color3& endValue,
                                    float gradient) const;
-  Matrix matrixInterpolateFunction(Matrix& startValue, Matrix& endValue,
+  Matrix matrixInterpolateFunction(const Matrix& startValue,
+                                   const Matrix& endValue,
                                    float gradient) const;
   std::unique_ptr<Animation> clone() const;
   void setKeys(const std::vector<AnimationKey>& values);

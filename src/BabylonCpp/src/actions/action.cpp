@@ -118,7 +118,7 @@ Json::object Action::_serialize(const Json::object& serializedAction,
                                 Json::object& /*parent*/) const
 {
   auto serializationObject = Json::object(
-    {Json::Pair("type", 1.0), Json::Pair("children", Json::array()),
+    {Json::Pair<int>("type", 1), // Json::Pair("children", Json::array()),
      Json::Pair("name", serializedAction.at("name")),
      Json::Pair("name", serializedAction.at("properties"))});
 

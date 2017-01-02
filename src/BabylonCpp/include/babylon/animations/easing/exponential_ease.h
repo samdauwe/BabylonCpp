@@ -15,8 +15,8 @@ public:
 
   float easeInCore(float gradient) const override;
 
-private:
-  float _exponent;
+public:
+  float exponent;
 
 }; // end of class ExponentialEase
 

@@ -40,7 +40,7 @@ Json::object ValueCondition::serialize() const
            Json::NameValuePair("propertyPath", _propertyPath),
            Json::NameValuePair("value",
                                Action::_SerializeValueAsString(*_value)),
-           Json::NameValuePair(
+           Json::NameValuePair<std::string>(
              "operator", ValueCondition::GetOperatorName(_operatorType))}}))});
   return _serialize(object);
 }

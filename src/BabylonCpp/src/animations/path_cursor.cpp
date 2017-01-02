@@ -24,7 +24,7 @@ PathCursor::~PathCursor()
 
 Vector3 PathCursor::getPoint() const
 {
-  Vector2 point = path.getPointAtLengthPosition(value);
+  auto point = path.getPointAtLengthPosition(value);
   return Vector3(point.x, 0.f, point.y);
 }
 
@@ -87,7 +87,7 @@ PathCursor& PathCursor::raiseOnChange()
 }
 
 PathCursor&
-PathCursor::onchange(std::function<void(const PathCursor& cursor)>& f)
+PathCursor::onchange(const std::function<void(const PathCursor& cursor)>& f)
 {
   _onchange.emplace_back(f);
 
