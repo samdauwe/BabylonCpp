@@ -56,7 +56,7 @@ public:
   // rotation
   Vector3 rotation;
   // quaternion, will overwrite rotation
-  Quaternion* rotationQuaternion;
+  std::unique_ptr<Quaternion> rotationQuaternion;
   // scale
   Vector3 scaling;
   // uvs
