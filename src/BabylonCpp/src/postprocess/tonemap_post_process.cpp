@@ -4,13 +4,13 @@
 
 namespace BABYLON {
 
-TonemapPostProcess::TonemapPostProcess(const std::string& _name,
+TonemapPostProcess::TonemapPostProcess(const std::string& iName,
                                        const TonemappingOperator& operator_,
                                        float exposureAdjustment, Camera* camera,
                                        unsigned int samplingMode,
                                        Engine* engine,
                                        unsigned int textureFormat)
-    : PostProcess{_name,        "tonemap",    {"_ExposureAdjustment"},
+    : PostProcess{iName,        "tonemap",    {"_ExposureAdjustment"},
                   {},           1.f,          camera,
                   samplingMode, engine,       true,
                   "",           textureFormat}

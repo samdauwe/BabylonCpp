@@ -16,19 +16,20 @@ public:
                           bool singleInstance = true);
   ~PostProcessRenderEffect();
 
+  bool isSupported() const;
   void _update();
   void addPass(PostProcessRenderPass* renderPass);
   void removePass(PostProcessRenderPass* renderPass);
   void addRenderEffectAsPass(PostProcessRenderEffect* renderEffect);
   PostProcessRenderPass* getPass(const std::string& passName);
   void emptyPasses();
-  void _attachCameras(std::vector<Camera*>& cameras);
-  void _detachCameras(std::vector<Camera*>& cameras);
+  void _attachCameras(const std::vector<Camera*>& cameras);
+  void _detachCameras(const std::vector<Camera*>& cameras);
   void _enable(const std::vector<Camera*> cameras);
   void _disable(std::vector<Camera*> cameras);
 
 private:
-  PostProcess* getPostProcess(Camera* camera);
+  PostProcess* getPostProcess(Camera* camera = nullptr);
   void _linkParameters();
   void _linkTextures(Effect* effect);
 

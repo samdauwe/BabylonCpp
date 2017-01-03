@@ -89,8 +89,20 @@ void PostProcessRenderPipelineManager::disableDisplayOnlyPassInPipeline(
 
 void PostProcessRenderPipelineManager::update()
 {
-  for (auto& element : _renderPipelines) {
-    element.second->_update();
+  std::vector<std::string> pipelinesToRemove;
+  for (auto& item : _renderPipelines) {
+    auto& pipeline = item.second;
+    if (!pipeline->isSupported()) {
+      pipeline->dispose();
+      pipelinesToRemove.emplace_back(item.first);
+    }
+    else {
+      pipeline->_update();
+    }
+  }
+
+  for (auto& renderPipelineName : pipelinesToRemove) {
+    _renderPipelines.erase(renderPipelineName);
   }
 }
 

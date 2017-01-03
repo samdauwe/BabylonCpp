@@ -15,8 +15,8 @@ class BABYLON_SHARED_EXPORT BlurPostProcess : public PostProcess {
 public:
   BlurPostProcess(const std::string& name, const Vector2& direction,
                   float blurWidth, float ratio, Camera* camera,
-                  unsigned int samplingMode, Engine* engine,
-                  bool reusable = false);
+                  unsigned int samplingMode = Texture::BILINEAR_SAMPLINGMODE,
+                  Engine* engine = nullptr, bool reusable = false);
   ~BlurPostProcess();
 
 public:

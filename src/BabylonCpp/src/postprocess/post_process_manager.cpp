@@ -3,6 +3,7 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/mesh/vertex_buffer.h>
 #include <babylon/postprocess/post_process.h>
 
 namespace BABYLON {
@@ -17,40 +18,41 @@ PostProcessManager::~PostProcessManager()
 
 void PostProcessManager::_prepareBuffers()
 {
-  if (_vertexBuffer) {
+  if (std_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)
+      && _vertexBuffers[VertexBuffer::PositionKindChars]) {
     return;
   }
 
   // VBO
-  Float32Array vertices = {1.f, 1.f, -1.f, 1.f, -1.f, -1.f, 1.f, -1.f};
-  _vertexBuffer         = _scene->getEngine()->createVertexBuffer(vertices);
+  Float32Array vertices{1.f, 1.f, -1.f, 1.f, -1.f, -1.f, 1.f, -1.f};
+  _vertexBuffers[VertexBuffer::PositionKindChars]
+    = std_util::make_unique<VertexBuffer>(_scene->getEngine(), vertices,
+                                          VertexBuffer::PositionKind, false,
+                                          false, 2);
+  _vertexBufferPtrs[VertexBuffer::PositionKindChars]
+    = _vertexBuffers[VertexBuffer::PositionKindChars].get();
 
   // Indices
-  Uint32Array indices = {0, 1, 2, 0, 2, 3};
-  _indexBuffer        = _scene->getEngine()->createIndexBuffer(indices);
+  Uint32Array indices{0, 1, 2, 0, 2, 3};
+  _indexBuffer = _scene->getEngine()->createIndexBuffer(indices);
 }
 
 bool PostProcessManager::_prepareFrame(GL::IGLTexture* sourceTexture)
 {
-  const std::vector<PostProcess*>& postProcesses
-    = _scene->activeCamera->_postProcesses;
-  const Uint32Array& postProcessesTakenIndices
-    = _scene->activeCamera->_postProcessesTakenIndices;
+  const auto& postProcesses = _scene->activeCamera->_postProcesses;
 
-  if (postProcessesTakenIndices.empty() || !_scene->postProcessesEnabled) {
+  if (postProcesses.empty() || !_scene->postProcessesEnabled) {
     return false;
   }
 
-  postProcesses[_scene->activeCamera->_postProcessesTakenIndices[0]]->activate(
-    _scene->activeCamera, sourceTexture);
-
+  postProcesses[0]->activate(_scene->activeCamera, sourceTexture);
   return true;
 }
 
 void PostProcessManager::directRender(
   const std::vector<PostProcess*>& postProcesses, GL::IGLTexture* targetTexture)
 {
-  Engine* engine = _scene->getEngine();
+  auto engine = _scene->getEngine();
 
   for (unsigned int index = 0; index < postProcesses.size(); ++index) {
     if (index < postProcesses.size() - 1) {
@@ -65,26 +67,20 @@ void PostProcessManager::directRender(
       }
     }
 
-    PostProcess* pp = postProcesses[index];
-    Effect* effect  = pp->apply();
+    auto pp     = postProcesses[index];
+    auto effect = pp->apply();
 
     if (effect) {
-      // if (pp->onBeforeRender) {
-      //  pp->onBeforeRender(effect);
-      //}
+      pp->onBeforeRenderObservable.notifyObservers(effect);
 
       // VBOs
       _prepareBuffers();
-      engine->bindBuffersDirectly(_vertexBuffer.get(), _indexBuffer.get(),
-                                  _vertexDeclaration, _vertexStrideSize,
-                                  effect);
+      engine->bindBuffers(_vertexBufferPtrs, _indexBuffer.get(), effect);
 
       // Draw order
       engine->draw(true, 0, 6);
 
-      // if (pp->onAfterRender) {
-      //  pp->onAfterRender(effect);
-      //}
+      pp->onAfterRenderObservable.notifyObservers(effect);
     }
   }
 
@@ -94,24 +90,20 @@ void PostProcessManager::directRender(
 }
 
 void PostProcessManager::_finalizeFrame(
-  bool doNotPresent, GL::IGLTexture* targetTexture, int faceIndex,
+  bool doNotPresent, GL::IGLTexture* targetTexture, unsigned int faceIndex,
   const std::vector<PostProcess*>& _postProcesses)
 {
-  const std::vector<PostProcess*>& postProcesses
-    = (!_postProcesses.empty()) ? _postProcesses :
-                                  _scene->activeCamera->_postProcesses;
-  const Uint32Array& postProcessesTakenIndices
-    = _scene->activeCamera->_postProcessesTakenIndices;
-  if (postProcessesTakenIndices.empty() || !_scene->postProcessesEnabled) {
+  const auto& postProcesses = _postProcesses.empty() ?
+                                _scene->activeCamera->_postProcesses :
+                                _postProcesses;
+  if (postProcesses.empty() || !_scene->postProcessesEnabled) {
     return;
   }
-  Engine* engine = _scene->getEngine();
+  auto engine = _scene->getEngine();
 
-  for (unsigned int index = 0; index < postProcessesTakenIndices.size();
-       ++index) {
-    if (index < postProcessesTakenIndices.size() - 1) {
-      postProcesses[postProcessesTakenIndices[index + 1]]->activate(
-        _scene->activeCamera);
+  for (unsigned int index = 0; index < postProcesses.size(); ++index) {
+    if (index < postProcesses.size() - 1) {
+      postProcesses[index + 1]->activate(_scene->activeCamera, targetTexture);
     }
     else {
       if (targetTexture) {
@@ -126,26 +118,20 @@ void PostProcessManager::_finalizeFrame(
       break;
     }
 
-    PostProcess* pp = postProcesses[postProcessesTakenIndices[index]];
-    Effect* effect  = pp->apply();
+    auto pp     = postProcesses[index];
+    auto effect = pp->apply();
 
     if (effect) {
-      // if (pp->onBeforeRender) {
-      //  pp->onBeforeRender(effect);
-      //}
+      pp->onBeforeRenderObservable.notifyObservers(effect);
 
       // VBOs
       _prepareBuffers();
-      engine->bindBuffersDirectly(_vertexBuffer.get(), _indexBuffer.get(),
-                                  _vertexDeclaration, _vertexStrideSize,
-                                  effect);
+      engine->bindBuffers(_vertexBufferPtrs, _indexBuffer.get(), effect);
 
       // Draw order
       engine->draw(true, 0, 6);
 
-      // if (pp->onAfterRender) {
-      //  pp->onAfterRender(effect);
-      //}
+      pp->onAfterRenderObservable.notifyObservers(effect);
     }
   }
 
@@ -156,9 +142,14 @@ void PostProcessManager::_finalizeFrame(
 
 void PostProcessManager::dispose(bool /*doNotRecurse*/)
 {
-  if (_vertexBuffer) {
-    _scene->getEngine()->_releaseBuffer(_vertexBuffer.get());
-    _vertexBuffer.reset(nullptr);
+  if (std_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)) {
+    auto& buffer = _vertexBuffers[VertexBuffer::PositionKindChars];
+    if (buffer) {
+      buffer->dispose();
+      _vertexBuffers[VertexBuffer::PositionKindChars].reset(nullptr);
+      _vertexBuffers.erase(VertexBuffer::PositionKindChars);
+      _vertexBufferPtrs.erase(VertexBuffer::PositionKindChars);
+    }
   }
 
   if (_indexBuffer) {

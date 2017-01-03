@@ -11,8 +11,7 @@ namespace BABYLON {
  * @brief
  */
 class BABYLON_SHARED_EXPORT HDRRenderingPipeline
-  : public PostProcessRenderPipeline,
-    public IDisposable {
+  : public PostProcessRenderPipeline {
 
 public:
   // Luminance steps

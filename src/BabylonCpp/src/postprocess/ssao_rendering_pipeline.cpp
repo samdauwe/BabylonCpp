@@ -39,7 +39,8 @@ SSAORenderingPipeline::SSAORenderingPipeline(
   // Force depth renderer "on"
   _depthTexture = scene->enableDepthRenderer()->getDepthMap();
 
-  _ratio.ssaoRatio = ratio.ssaoRatio, _ratio.combineRatio = ratio.combineRatio;
+  _ratio.ssaoRatio    = ratio.ssaoRatio;
+  _ratio.combineRatio = ratio.combineRatio;
 
   _originalColorPostProcess = new PassPostProcess(
     "SSAOOriginalSceneColor", _ratio.combineRatio, nullptr,
@@ -81,11 +82,12 @@ SSAORenderingPipeline::~SSAORenderingPipeline()
 void SSAORenderingPipeline::dispose(bool disableDepthRender)
 {
   for (auto& camera : _scene->cameras) {
-    _originalColorPostProcess->dispose(camera.get());
-    _ssaoPostProcess->dispose(camera.get());
-    _blurHPostProcess->dispose(camera.get());
-    _blurVPostProcess->dispose(camera.get());
-    _ssaoCombinePostProcess->dispose(camera.get());
+    auto _camera = camera.get();
+    _originalColorPostProcess->dispose(_camera);
+    _ssaoPostProcess->dispose(_camera);
+    _blurHPostProcess->dispose(_camera);
+    _blurVPostProcess->dispose(_camera);
+    _ssaoCombinePostProcess->dispose(_camera);
   }
 
   _randomTexture->dispose();
@@ -102,6 +104,7 @@ void SSAORenderingPipeline::dispose(bool disableDepthRender)
 void SSAORenderingPipeline::_createBlurPostProcess(float ratio)
 {
   Float32Array samplerOffsets;
+  samplerOffsets.reserve(16);
 
   for (int i = -8; i < 8; i++) {
     samplerOffsets.emplace_back(static_cast<float>(i) * 2.f);
@@ -201,8 +204,7 @@ void SSAORenderingPipeline::_createRandomTexture()
   _randomTexture->wrapU = Texture::WRAP_ADDRESSMODE;
   _randomTexture->wrapV = Texture::WRAP_ADDRESSMODE;
 
-  ICanvasRenderingContext2D* context
-    = dynamic_cast<DynamicTexture*>(_randomTexture)->getContext();
+  auto context = dynamic_cast<DynamicTexture*>(_randomTexture)->getContext();
 
   auto rand
     = [](float min, float max) { return Math::random() * (max - min) + min; };

@@ -13,8 +13,7 @@ struct SSARatio {
 }; // end of struct SSARatio
 
 class BABYLON_SHARED_EXPORT SSAORenderingPipeline
-  : public PostProcessRenderPipeline,
-    public IDisposable {
+  : public PostProcessRenderPipeline {
 
 public:
   /**

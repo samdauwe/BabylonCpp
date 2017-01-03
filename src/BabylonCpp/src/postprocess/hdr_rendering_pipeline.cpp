@@ -1,5 +1,6 @@
 #include <babylon/postprocess/hdr_rendering_pipeline.h>
 
+#include <babylon/core/time.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/texture.h>
@@ -8,15 +9,14 @@
 #include <babylon/postprocess/pass_post_process.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_effect.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_pipeline_manager.h>
-#include <babylon/core/time.h>
 
 namespace BABYLON {
 
-HDRRenderingPipeline::HDRRenderingPipeline(const std::string& name_,
+HDRRenderingPipeline::HDRRenderingPipeline(const std::string& iName,
                                            Scene* scene, float ratio,
                                            PostProcess* originalPostProcess,
                                            const std::vector<Camera*>& cameras)
-    : PostProcessRenderPipeline(scene->getEngine(), name_)
+    : PostProcessRenderPipeline(scene->getEngine(), iName)
     , gaussCoeff{0.3f}
     , gaussMean{1.f}
     , gaussStandDev{0.8f}
@@ -153,11 +153,10 @@ void HDRRenderingPipeline::_createHDRPostProcess(Scene* scene, float ratio)
       _hdrOutputLuminance = _hdrCurrentLuminance;
     }
     else {
-      float dt
-        = (hdrLastLuminance
-           - (hdrLastLuminance + Time::fpMillisecondsDuration<float>(
-                                   scene->getEngine()->getDeltaTime())))
-          / 1000.f;
+      float dt = (hdrLastLuminance
+                  - (hdrLastLuminance + Time::fpMillisecondsDuration<float>(
+                                          scene->getEngine()->getDeltaTime())))
+                 / 1000.f;
 
       if (_hdrCurrentLuminance
           < _hdrOutputLuminance + luminanceDecreaseRate * dt) {

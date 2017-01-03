@@ -17,15 +17,15 @@ const Float32Array ConvolutionPostProcess::EmbossKernel
 const Float32Array ConvolutionPostProcess::GaussianKernel
   = {0, 1, 0, 1, 1, 1, 0, 1, 0};
 
-ConvolutionPostProcess::ConvolutionPostProcess(const std::string& _name,
-                                               const Float32Array& _kernel,
+ConvolutionPostProcess::ConvolutionPostProcess(const std::string& iName,
+                                               const Float32Array& iKernel,
                                                float ratio, Camera* camera,
                                                unsigned int samplingMode,
                                                Engine* engine, bool reusable)
-    : PostProcess{_name,        "convolution", {"kernel", "screenSize"},
+    : PostProcess{iName,        "convolution", {"kernel", "screenSize"},
                   {},           ratio,         camera,
                   samplingMode, engine,        reusable}
-    , kernel{_kernel}
+    , kernel{iKernel}
 {
   setOnApply([&](Effect* effect) {
     effect->setFloat2("screenSize", static_cast<float>(width),

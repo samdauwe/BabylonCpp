@@ -40,8 +40,7 @@ struct LensRenderingPipelineParameters {
  * - grain texture
  */
 class BABYLON_SHARED_EXPORT LensRenderingPipeline
-  : public PostProcessRenderPipeline,
-    public IDisposable {
+  : public PostProcessRenderPipeline {
 
 public:
   /**

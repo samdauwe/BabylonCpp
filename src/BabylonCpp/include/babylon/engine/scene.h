@@ -220,6 +220,7 @@ public:
   Material* getMaterialByName(const std::string& name);
   LensFlareSystem* getLensFlareSystemByName(const std::string& name);
   LensFlareSystem* getLensFlareSystemByID(const std::string& id);
+  std::vector<Camera*> getCameras() const;
   Camera* getCameraByID(const std::string& id);
   Camera* getCameraByUniqueID(unsigned int uniqueId);
   /**

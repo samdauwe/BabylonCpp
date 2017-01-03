@@ -7,9 +7,9 @@
 namespace BABYLON {
 
 ColorCorrectionPostProcess::ColorCorrectionPostProcess(
-  const std::string& _name, const std::string& colorTableUrl, float ratio,
+  const std::string& iName, const std::string& colorTableUrl, float ratio,
   Camera* camera, unsigned int samplingMode, Engine* engine, bool reusable)
-    : PostProcess{_name,  "colorCorrection", {},     {"colorTable"}, ratio,
+    : PostProcess{iName,  "colorCorrection", {},     {"colorTable"}, ratio,
                   camera, samplingMode,      engine, reusable}
 {
   _colorTableTexture = Texture::New(colorTableUrl, camera->getScene(), true,

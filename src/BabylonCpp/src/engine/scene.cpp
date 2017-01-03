@@ -1263,6 +1263,18 @@ LensFlareSystem* Scene::getLensFlareSystemByID(const std::string& id)
   return (it == lensFlareSystems.end()) ? nullptr : (*it).get();
 }
 
+std::vector<Camera*> Scene::getCameras() const
+{
+  std::vector<Camera*> _cameras;
+  _cameras.reserve(cameras.size());
+  std::for_each(cameras.begin(), cameras.end(),
+                [&_cameras](const std::unique_ptr<Camera>& camera) {
+                  return _cameras.emplace_back(camera.get());
+                });
+
+  return _cameras;
+}
+
 Camera* Scene::getCameraByID(const std::string& id)
 {
   auto it = std::find_if(

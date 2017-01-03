@@ -21,7 +21,7 @@ public:
                     GL::IGLTexture* targetTexture);
   void _finalizeFrame(bool doNotPresent,
                       GL::IGLTexture* targetTexture = nullptr,
-                      int faceIndex                 = 0,
+                      unsigned int faceIndex        = 0,
                       const std::vector<PostProcess*>& postProcesses
                       = std::vector<PostProcess*>());
   void dispose(bool doNotRecurse = false) override;
@@ -32,9 +32,9 @@ private:
 private:
   Scene* _scene;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
-  std::vector<float> _vertexDeclaration;
-  int _vertexStrideSize;
-  std::unique_ptr<GL::IGLBuffer> _vertexBuffer;
+  Float32Array _vertexDeclaration;
+  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
+  std::unordered_map<std::string, VertexBuffer*> _vertexBufferPtrs;
 
 }; // end of class PostProcessManager
 

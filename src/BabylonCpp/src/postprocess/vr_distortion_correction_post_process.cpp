@@ -5,9 +5,9 @@
 namespace BABYLON {
 
 VRDistortionCorrectionPostProcess::VRDistortionCorrectionPostProcess(
-  const std::string& _name, Camera* camera, bool isRightEye,
+  const std::string& iName, Camera* camera, bool isRightEye,
   const VRCameraMetrics& vrMetrics)
-    : PostProcess{_name,
+    : PostProcess{iName,
                   "vrDistortionCorrection",
                   {"LensCenter", "Scale", "ScaleIn", "HmdWarpParam"},
                   {},

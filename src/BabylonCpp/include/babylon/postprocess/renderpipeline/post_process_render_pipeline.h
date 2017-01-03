@@ -2,13 +2,14 @@
 #define BABYLON_POSTPROCESS_RENDERPIPELINE_POST_PROCESS_RENDER_PIPELINE_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/interfaces/idisposable.h>
 
 namespace BABYLON {
 
 /**
  * @brief
  */
-class BABYLON_SHARED_EXPORT PostProcessRenderPipeline {
+class BABYLON_SHARED_EXPORT PostProcessRenderPipeline : public IDisposable {
 
 public:
   static constexpr const char* PASS_EFFECT_NAME  = "passEffect";
@@ -16,8 +17,9 @@ public:
 
 public:
   PostProcessRenderPipeline(Engine* engine, const std::string& name);
-  ~PostProcessRenderPipeline();
+  virtual ~PostProcessRenderPipeline();
 
+  bool isSupported() const;
   void addEffect(PostProcessRenderEffect* renderEffect);
   void _enableEffect(const std::string& renderEffectName,
                      const std::vector<Camera*>& cameras);
@@ -30,6 +32,7 @@ public:
   void _disableDisplayOnlyPass(const std::string& passName,
                                const std::vector<Camera*>& cameras);
   void _update();
+  virtual void dispose(bool doNotRecurse = false) override;
 
 public:
   std::string _name;

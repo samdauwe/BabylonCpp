@@ -4,12 +4,12 @@
 
 namespace BABYLON {
 
-BlurPostProcess::BlurPostProcess(const std::string& _name,
-                                 const Vector2& _direction, float _blurWidth,
+BlurPostProcess::BlurPostProcess(const std::string& iName,
+                                 const Vector2& iDirection, float iBlurWidth,
                                  float ratio, Camera* camera,
                                  unsigned int samplingMode, Engine* engine,
                                  bool reusable)
-    : PostProcess{_name,
+    : PostProcess{iName,
                   "blur",
                   {"screenSize", "direction", "blurWidth"},
                   {},
@@ -18,8 +18,8 @@ BlurPostProcess::BlurPostProcess(const std::string& _name,
                   samplingMode,
                   engine,
                   reusable}
-    , direction{_direction}
-    , blurWidth{_blurWidth}
+    , direction{iDirection}
+    , blurWidth{iBlurWidth}
 {
   onApplyObservable.add([&](Effect* effect) {
     effect->setFloat2("screenSize", static_cast<float>(width),

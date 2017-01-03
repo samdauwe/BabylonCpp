@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-PostProcess::PostProcess(const std::string& _name,
+PostProcess::PostProcess(const std::string& iName,
                          const std::string& fragmentUrl,
                          const std::vector<std::string>& parameters,
                          const std::vector<std::string>& samplers,
@@ -15,13 +15,13 @@ PostProcess::PostProcess(const std::string& _name,
                          unsigned int samplingMode, Engine* engine,
                          bool reusable, const std::string& defines,
                          unsigned int textureType)
-    : PostProcess(_name, fragmentUrl, parameters, samplers, {-1, -1}, camera,
+    : PostProcess(iName, fragmentUrl, parameters, samplers, {-1, -1}, camera,
                   samplingMode, engine, reusable, defines, textureType)
 {
   _renderRatio = renderRatio;
 }
 
-PostProcess::PostProcess(const std::string& _name,
+PostProcess::PostProcess(const std::string& iName,
                          const std::string& fragmentUrl,
                          const std::vector<std::string>& parameters,
                          const std::vector<std::string>& samplers,
@@ -29,7 +29,7 @@ PostProcess::PostProcess(const std::string& _name,
                          unsigned int samplingMode, Engine* engine,
                          bool reusable, const std::string& defines,
                          unsigned int textureType)
-    : name{_name}
+    : name{iName}
     , width{-1}
     , height{-1}
     , enablePixelPerfectMode{false}
@@ -115,7 +115,8 @@ void PostProcess::setOnAfterRender(
 
 void PostProcess::updateEffect(const std::string& defines)
 {
-  std::unordered_map<std::string, std::string> baseName;
+  std::unordered_map<std::string, std::string> baseName{
+    {"vertex", "postprocess"}, {"fragment", _fragmentUrl}};
 
   _effect = _engine->createEffect(baseName, {"position"}, _parameters,
                                   _samplers, defines);
@@ -133,10 +134,10 @@ void PostProcess::markTextureDirty()
 
 void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture)
 {
-  Camera* pCamera = camera ? camera : _camera;
+  auto pCamera = camera ? camera : _camera;
 
-  Scene* scene = pCamera->getScene();
-  int maxSize  = pCamera->getEngine()->getCaps().maxTextureSize;
+  auto scene  = pCamera->getScene();
+  int maxSize = pCamera->getEngine()->getCaps().maxTextureSize;
 
   int requiredWidth = static_cast<int>(
     static_cast<float>(sourceTexture ? sourceTexture->_width :
@@ -200,11 +201,11 @@ void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture)
 
   // Clear
   if (clearColor) {
-    _engine->clear(*clearColor, true, true);
+    _engine->clear(*clearColor, true, true, true);
   }
   else {
     _engine->clear(scene->clearColor, scene->autoClear || scene->forceWireframe,
-                   true);
+                   true, true);
   }
 
   if (_reusable) {
@@ -243,7 +244,7 @@ Effect* PostProcess::apply()
 
 void PostProcess::dispose(Camera* camera)
 {
-  Camera* pCamera = camera ? camera : _camera;
+  auto pCamera = camera ? camera : _camera;
 
   if (!_textures.empty()) {
     for (auto& texture : _textures) {

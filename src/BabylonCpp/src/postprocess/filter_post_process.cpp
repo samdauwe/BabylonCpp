@@ -4,11 +4,11 @@
 
 namespace BABYLON {
 
-FilterPostProcess::FilterPostProcess(const std::string& _name,
+FilterPostProcess::FilterPostProcess(const std::string& iName,
                                      const Matrix& _kernelMatrix, float ratio,
                                      Camera* camera, unsigned int samplingMode,
                                      Engine* engine, bool reusable)
-    : PostProcess{_name,  "filter",     {"kernelMatrix"}, {},      ratio,
+    : PostProcess{iName,  "filter",     {"kernelMatrix"}, {},      ratio,
                   camera, samplingMode, engine,           reusable}
     , kernelMatrix{_kernelMatrix}
 {

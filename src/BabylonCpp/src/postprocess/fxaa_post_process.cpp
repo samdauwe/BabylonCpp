@@ -4,10 +4,10 @@
 
 namespace BABYLON {
 
-FxaaPostProcess::FxaaPostProcess(const std::string& _name, float ratio,
+FxaaPostProcess::FxaaPostProcess(const std::string& iName, float ratio,
                                  Camera* camera, unsigned int samplingMode,
                                  Engine* engine, bool reusable)
-    : PostProcess{_name,  "fxaa",       {"texelSize"}, {},      ratio,
+    : PostProcess{iName,  "fxaa",       {"texelSize"}, {},      ratio,
                   camera, samplingMode, engine,        reusable}
 {
 

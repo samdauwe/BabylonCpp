@@ -366,6 +366,7 @@ class PostProcess;
 class PostProcessManager;
 class RefractionPostProcess;
 class SSAORenderingPipeline;
+class StandardRenderingPipeline;
 class StereoscopicInterlacePostProcess;
 class TonemapPostProcess;
 class VolumetricLightScatteringPostProcess;

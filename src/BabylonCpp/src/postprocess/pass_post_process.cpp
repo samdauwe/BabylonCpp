@@ -2,10 +2,10 @@
 
 namespace BABYLON {
 
-PassPostProcess::PassPostProcess(const std::string& _name, float ratio,
+PassPostProcess::PassPostProcess(const std::string& iName, float ratio,
                                  Camera* camera, unsigned int samplingMode,
                                  Engine* engine, bool reusable)
-    : PostProcess{_name,  "pass",       {},     {},      ratio,
+    : PostProcess{iName,  "pass",       {},     {},      ratio,
                   camera, samplingMode, engine, reusable}
 {
 }

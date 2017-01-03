@@ -2,6 +2,7 @@
 
 #include <babylon/cameras/camera.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/postprocess/post_process.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_pass.h>
 
@@ -21,10 +22,20 @@ PostProcessRenderEffect::~PostProcessRenderEffect()
 {
 }
 
+bool PostProcessRenderEffect::isSupported() const
+{
+  for (auto& item : _postProcesses) {
+    if (!item.second->isSupported()) {
+      return false;
+    }
+  }
+  return true;
+}
+
 void PostProcessRenderEffect::_update()
 {
-  for (auto& element : _renderPasses) {
-    element.second->_update();
+  for (auto& item : _renderPasses) {
+    item.second->_update();
   }
 }
 
@@ -35,10 +46,9 @@ void PostProcessRenderEffect::addPass(PostProcessRenderPass* renderPass)
   _linkParameters();
 }
 
-void PostProcessRenderEffect::removePass(PostProcessRenderPass* /*renderPass*/)
+void PostProcessRenderEffect::removePass(PostProcessRenderPass* renderPass)
 {
-  // TODO FIXME
-  // delete _renderPasses[renderPass->_name];
+  _renderPasses.erase(renderPass->_name);
 
   _linkParameters();
 }
@@ -54,8 +64,9 @@ void PostProcessRenderEffect::addRenderEffectAsPass(
 PostProcessRenderPass*
 PostProcessRenderEffect::getPass(const std::string& passName)
 {
-  if (std_util::contains(_renderPasses, passName))
+  if (std_util::contains(_renderPasses, passName)) {
     return _renderPasses[passName];
+  }
 
   return nullptr;
 }
@@ -67,15 +78,15 @@ void PostProcessRenderEffect::emptyPasses()
   _linkParameters();
 }
 
-void PostProcessRenderEffect::_attachCameras(std::vector<Camera*>& cameras)
+void PostProcessRenderEffect::_attachCameras(
+  const std::vector<Camera*>& cameras)
 {
   std::string cameraKey;
 
-  std::vector<Camera*> _cam
-    = cameras.empty() ? std_util::extract_values(_cameras) : cameras;
+  auto _cam = cameras.empty() ? std_util::extract_values(_cameras) : cameras;
 
   for (auto& camera : _cam) {
-    std::string cameraName = camera->name;
+    auto cameraName = camera->name;
 
     if (_singleInstance) {
       cameraKey = "0";
@@ -84,12 +95,14 @@ void PostProcessRenderEffect::_attachCameras(std::vector<Camera*>& cameras)
       cameraKey = cameraName;
     }
 
-    if (std_util::contains(_postProcesses, cameraKey))
+    if (std_util::contains(_postProcesses, cameraKey)) {
       _postProcesses[cameraKey] = _postProcesses[cameraKey];
-    else
+    }
+    else {
       _postProcesses[cameraKey] = _getPostProcess();
+    }
 
-    int index = camera->attachPostProcess(_postProcesses[cameraKey]);
+    auto index = camera->attachPostProcess(_postProcesses[cameraKey]);
 
     if (!std_util::contains(_indicesForCamera, cameraName)) {
       _indicesForCamera[cameraName].clear();
@@ -109,62 +122,63 @@ void PostProcessRenderEffect::_attachCameras(std::vector<Camera*>& cameras)
   _linkParameters();
 }
 
-void PostProcessRenderEffect::_detachCameras(std::vector<Camera*>& cameras)
+void PostProcessRenderEffect::_detachCameras(
+  const std::vector<Camera*>& cameras)
 {
-  std::vector<Camera*> _cam
-    = cameras.empty() ? std_util::extract_values(_cameras) : cameras;
+  auto _cam = cameras.empty() ? std_util::extract_values(_cameras) : cameras;
 
   for (auto& camera : _cam) {
-    std::string cameraName = camera->name;
+    auto cameraName = camera->name;
 
-    camera->detachPostProcess(_postProcesses[_singleInstance ? 0 : cameraName],
-                              _indicesForCamera[cameraName]);
+    camera->detachPostProcess(
+      _postProcesses[_singleInstance ? "0" : cameraName],
+      _indicesForCamera[cameraName]);
 
     _cameras.erase(cameraName);
     _indicesForCamera.erase(cameraName);
 
-    for (auto& pass : _renderPasses) {
-      pass.second->_decRefCount();
+    for (auto& item : _renderPasses) {
+      item.second->_decRefCount();
     }
   }
 }
 
 void PostProcessRenderEffect::_enable(const std::vector<Camera*> cameras)
 {
-  std::vector<Camera*> _cam
-    = cameras.empty() ? std_util::extract_values(_cameras) : cameras;
+  auto _cam = cameras.empty() ? std_util::extract_values(_cameras) : cameras;
 
   for (auto& camera : _cam) {
-    std::string cameraName = camera->name;
+    auto cameraName = camera->name;
 
     for (auto& j : _indicesForCamera[cameraName]) {
-      if (camera->_postProcesses[_indicesForCamera[cameraName][j]] == nullptr) {
+      auto index = _indicesForCamera[cameraName][j];
+      if (index >= camera->_postProcesses.size()
+          || camera->_postProcesses[index] == nullptr) {
         camera->attachPostProcess(
           _postProcesses[_singleInstance ? "0" : cameraName],
-          _indicesForCamera[cameraName][j]);
+          static_cast<int>(_indicesForCamera[cameraName][j]));
       }
     }
 
-    for (auto& pass : _renderPasses) {
-      pass.second->_incRefCount();
+    for (auto& item : _renderPasses) {
+      item.second->_incRefCount();
     }
   }
 }
 
 void PostProcessRenderEffect::_disable(std::vector<Camera*> cameras)
 {
-  std::vector<Camera*> _cam
-    = cameras.empty() ? std_util::extract_values(_cameras) : cameras;
+  auto _cam = cameras.empty() ? std_util::extract_values(_cameras) : cameras;
 
   for (auto& camera : _cam) {
-    std::string cameraName = camera->name;
+    auto cameraName = camera->name;
 
     camera->detachPostProcess(
       _postProcesses[_singleInstance ? "0" : cameraName],
       _indicesForCamera[cameraName]);
 
-    for (auto& pass : _renderPasses) {
-      pass.second->_decRefCount();
+    for (auto& item : _renderPasses) {
+      item.second->_decRefCount();
     }
   }
 }
@@ -175,35 +189,32 @@ PostProcess* PostProcessRenderEffect::getPostProcess(Camera* camera)
     return _postProcesses["0"];
   }
   else {
-    return _postProcesses[camera->name];
+    return camera ? _postProcesses[camera->name] : nullptr;
   }
 }
 
 void PostProcessRenderEffect::_linkParameters()
 {
-  for (auto& element : _postProcesses) {
+  for (auto& item : _postProcesses) {
     if (applyParameters) {
-      applyParameters(element.second);
+      applyParameters(item.second);
     }
 
-    // element.second->onBeforeRender
-    //  = [this](Effect* effect) { _linkTextures(effect); };
+    item.second->onBeforeRenderObservable.add(
+      [this](Effect* effect) { _linkTextures(effect); });
   }
 }
 
-void PostProcessRenderEffect::_linkTextures(Effect* /*effect*/)
+void PostProcessRenderEffect::_linkTextures(Effect* effect)
 {
-  // TODO FIXME
-  //std::cout << (effect == nullptr) << std::endl;
-  /*for (auto& element : _renderPasses) {
-    effect->setTexture(element.first, static_cast<BaseTexture*>(
-                                        element.second->getRenderTexture()));
+  for (auto& item : _renderPasses) {
+    effect->setTexture(item.first, item.second->getRenderTexture());
   }
 
-  for (auto& element : _renderEffectAsPasses) {
-    effect->setTextureFromPostProcess(concatString(element.first, "Sampler"),
-                                      element.second->getPostProcess());
-  }*/
+  for (auto& item : _renderEffectAsPasses) {
+    effect->setTextureFromPostProcess(item.first + "Sampler",
+                                      item.second->getPostProcess());
+  }
 }
 
 } // end of namespace BABYLON

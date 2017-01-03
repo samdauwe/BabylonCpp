@@ -18,7 +18,8 @@ PostProcessRenderPass::PostProcessRenderPass(
     , _scene{scene}
     , _refCount{0}
 {
-  _renderTexture = new RenderTargetTexture(name, size, scene);
+  _renderTexture
+    = std_util::make_unique<RenderTargetTexture>(name, size, scene);
   setRenderList(renderList);
 
   _renderTexture->onBeforeRenderObservable.add(beforeRender);
@@ -32,7 +33,7 @@ PostProcessRenderPass::~PostProcessRenderPass()
 int PostProcessRenderPass::_incRefCount()
 {
   if (_refCount == 0) {
-    _scene->customRenderTargets.emplace_back(_renderTexture);
+    _scene->customRenderTargets.emplace_back(_renderTexture.get());
   }
 
   return ++_refCount;
@@ -43,11 +44,11 @@ int PostProcessRenderPass::_decRefCount()
   --_refCount;
 
   if (_refCount <= 0) {
-    auto it = std::find(_scene->customRenderTargets.begin(),
-                        _scene->customRenderTargets.end(), _renderTexture);
-    if (it != _scene->customRenderTargets.end()) {
-      _scene->customRenderTargets.erase(it);
-    }
+    _scene->customRenderTargets.erase(std::remove_if(
+      _scene->customRenderTargets.begin(), _scene->customRenderTargets.end(),
+      [this](const RenderTargetTexture* renderTargetTexture) {
+        return _renderTexture.get() == renderTargetTexture;
+      }));
   }
 
   return _refCount;
@@ -69,7 +70,7 @@ void PostProcessRenderPass::setRenderList(const std::vector<Mesh*>& renderList)
 
 RenderTargetTexture* PostProcessRenderPass::getRenderTexture()
 {
-  return _renderTexture;
+  return _renderTexture.get();
 }
 
 } // end of namespace BABYLON

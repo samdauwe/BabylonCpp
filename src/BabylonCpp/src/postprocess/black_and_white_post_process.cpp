@@ -2,12 +2,12 @@
 
 namespace BABYLON {
 
-BlackAndWhitePostProcess::BlackAndWhitePostProcess(const std::string& _name,
+BlackAndWhitePostProcess::BlackAndWhitePostProcess(const std::string& iName,
                                                    float ratio, Camera* camera,
                                                    unsigned int samplingMode,
                                                    Engine* engine,
                                                    bool reusable)
-    : PostProcess{_name,  "blackAndWhite", {},     {},      ratio,
+    : PostProcess{iName,  "blackAndWhite", {},     {},      ratio,
                   camera, samplingMode,    engine, reusable}
 {
 }
