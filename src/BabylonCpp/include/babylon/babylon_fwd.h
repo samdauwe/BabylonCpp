@@ -146,6 +146,7 @@ class Scene;
 class ICanvas;
 class ICanvasRenderingContext2D;
 class IDisposable;
+class IReflect;
 namespace GL {
 struct GLInfo;
 class IGLFramebuffer;

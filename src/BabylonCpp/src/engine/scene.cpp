@@ -147,6 +147,11 @@ Scene::~Scene()
 {
 }
 
+IReflect::Type Scene::type() const
+{
+  return IReflect::Type::SCENE;
+}
+
 // Events
 void Scene::setOnDispose(const std::function<void()>& callback)
 {
@@ -941,18 +946,16 @@ std::vector<Animation*> Scene::getAnimations()
   return std::vector<Animation*>();
 }
 
-Animatable*
-Scene::beginAnimation(IAnimatable* /*target*/, int /*from*/, int /*to*/,
-                      bool /*loop*/, float /*speedRatio*/,
-                      const std::function<void()>& /*onAnimationEnd*/,
-                      Animatable* animatable)
+Animatable* Scene::beginAnimation(IAnimatable* target, float from, float to,
+                                  bool loop, float speedRatio,
+                                  const std::function<void()>& onAnimationEnd,
+                                  Animatable* animatable)
 {
-#if 0
   stopAnimation(target);
 
   if (!animatable) {
-    animatable = std::make_shared<Animatable>(this, target, from, to, loop,
-                                              speedRatio, onAnimationEnd);
+    animatable = new Animatable(this, target, from, to, loop, speedRatio,
+                                onAnimationEnd);
   }
 
   // Local animations
@@ -979,34 +982,30 @@ Scene::beginAnimation(IAnimatable* /*target*/, int /*from*/, int /*to*/,
   }
 
   animatable->reset();
-#endif
+
   return animatable;
 }
 
-Animatable* Scene::beginDirectAnimation(
-  IAnimatable* /*target*/, const std::vector<Animation*>& /*_animations*/,
-  int /*from*/, int /*to*/, bool /*loop*/, float /*speedRatio*/,
-  const std::function<void()>& /*onAnimationEnd*/)
+Animatable*
+Scene::beginDirectAnimation(IAnimatable* target,
+                            const std::vector<Animation*>& _animations,
+                            int from, int to, bool loop, float speedRatio,
+                            const std::function<void()>& onAnimationEnd)
 {
-#if 0
-   return std::make_shared<Animatable>(this, target, from, to, loop,
-   speedRatio,
-                                      onAnimationEnd, _animations);
-#endif
-  return nullptr;
+  return new Animatable(this, target, from, to, loop, speedRatio,
+                        onAnimationEnd, _animations);
 }
 
 Animatable* Scene::getAnimatableByTarget(IAnimatable* target)
 {
-  auto it
-    = std::find_if(_activeAnimatables.begin(), _activeAnimatables.end(),
-                   [&target](const std::unique_ptr<Animatable>& animatable) {
-                     return animatable->target == target;
-                   });
-  return (it == _activeAnimatables.end()) ? nullptr : (*it).get();
+  auto it = std::find_if(_activeAnimatables.begin(), _activeAnimatables.end(),
+                         [&target](const Animatable* animatable) {
+                           return animatable->target == target;
+                         });
+  return (it == _activeAnimatables.end()) ? nullptr : *it;
 }
 
-std::vector<std::unique_ptr<Animatable>>& Scene::animatables()
+std::vector<Animatable*>& Scene::animatables()
 {
   return _activeAnimatables;
 }
@@ -1031,7 +1030,8 @@ void Scene::_animate(const millisecond_t& /*delay*/)
     //    return;
     //}
 
-    _animationStartDate = Time::highresTimepointNow();
+    _animationStartDate    = Time::highresTimepointNow();
+    _animationStartDateSet = true;
   }
   // Getting time
   auto delay = Time::fpTimeSince<size_t, std::milli>(_animationStartDate);

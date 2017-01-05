@@ -22,7 +22,7 @@ public:
   }
   ~InstancedMesh();
 
-  Node::Type type() const override;
+  IReflect::Type type() const override;
 
   /** Methods **/
   bool receiveShadows() const;

@@ -18,6 +18,7 @@ class BABYLON_SHARED_EXPORT BaseTexture : public IAnimatable,
 public:
   virtual ~BaseTexture();
 
+  virtual IReflect::Type type() const override;
   void addToScene(std::unique_ptr<BaseTexture>&& newTexture);
 
   std::string uid();

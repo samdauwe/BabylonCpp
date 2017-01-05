@@ -29,9 +29,9 @@ DirectionalLight::~DirectionalLight()
 {
 }
 
-Node::Type DirectionalLight::type() const
+IReflect::Type DirectionalLight::type() const
 {
-  return Node::Type::DIRECTIONALLIGHT;
+  return IReflect::Type::DIRECTIONALLIGHT;
 }
 
 Scene* DirectionalLight::getScene()

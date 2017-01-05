@@ -18,9 +18,9 @@ GroundMesh::~GroundMesh()
 {
 }
 
-Node::Type GroundMesh::type() const
+IReflect::Type GroundMesh::type() const
 {
-  return Node::Type::GROUNDMESH;
+  return IReflect::Type::GROUNDMESH;
 }
 
 size_t GroundMesh::subdivisions() const

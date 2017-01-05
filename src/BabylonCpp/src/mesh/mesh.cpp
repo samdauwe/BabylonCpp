@@ -113,9 +113,9 @@ Mesh::~Mesh()
 {
 }
 
-Node::Type Mesh::type() const
+IReflect::Type Mesh::type() const
 {
-  return Node::Type::MESH;
+  return IReflect::Type::MESH;
 }
 
 void Mesh::setOnBeforeDraw(const std::function<void()>& callback)

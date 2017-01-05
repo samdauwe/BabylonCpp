@@ -20,7 +20,7 @@ public:
   }
   ~MultiMaterial();
 
-  Material::Type type() const override;
+  IReflect::Type type() const override;
 
   /** Properties **/
   Material* getSubMaterial(unsigned int index);

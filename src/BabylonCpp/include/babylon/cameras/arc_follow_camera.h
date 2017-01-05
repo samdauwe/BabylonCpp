@@ -20,7 +20,7 @@ public:
   }
   ~ArcFollowCamera();
 
-  virtual Node::Type type() const override;
+  virtual IReflect::Type type() const override;
 
   void _checkInputs() override;
   std::string getTypeName() const override;

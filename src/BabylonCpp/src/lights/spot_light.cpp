@@ -23,9 +23,9 @@ SpotLight::~SpotLight()
 {
 }
 
-Node::Type SpotLight::type() const
+IReflect::Type SpotLight::type() const
 {
-  return Node::Type::SPOTLIGHT;
+  return IReflect::Type::SPOTLIGHT;
 }
 
 Scene* SpotLight::getScene()

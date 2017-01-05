@@ -2,6 +2,7 @@
 #define BABYLON_ANIMATIONS_ANIMATION_VALUE_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/any.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/matrix.h>
@@ -33,6 +34,8 @@ public:
   AnimationValue operator!();
   AnimationValue operator[](const std::string& property);
   AnimationValue copy() const;
+
+  any getValue() const;
 
 public:
   int dataType;

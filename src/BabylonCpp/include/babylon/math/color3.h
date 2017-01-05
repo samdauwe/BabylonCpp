@@ -67,6 +67,7 @@ public:
   static Color3 Purple();
   static Color3 Magenta();
   static Color3 Yellow();
+  static Color3 Cyan();
   static Color3 Gray();
 
 public:

@@ -84,7 +84,7 @@ Material* SubMesh::getMaterial()
   auto rootMaterial = _renderingMesh->getMaterial();
 
   if (rootMaterial) {
-    if (rootMaterial->type() == Material::Type::MULTIMATERIAL) {
+    if (rootMaterial->type() == IReflect::Type::MULTIMATERIAL) {
       auto multiMaterial = dynamic_cast<MultiMaterial*>(rootMaterial);
       return multiMaterial->getSubMaterial(materialIndex);
     }
@@ -192,8 +192,8 @@ SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions,
   std::unique_ptr<IntersectionInfo> intersectInfo = nullptr;
 
   // LineMesh first as it's also a Mesh...
-  if (_mesh->type() == Node::Type::LINESMESH) {
-    LinesMesh* lineMesh = dynamic_cast<LinesMesh*>(_mesh);
+  if (_mesh->type() == IReflect::Type::LINESMESH) {
+    auto lineMesh = dynamic_cast<LinesMesh*>(_mesh);
 
     // Line test
     float length;

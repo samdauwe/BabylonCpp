@@ -34,7 +34,7 @@ public:
 public:
   virtual ~Camera();
 
-  virtual Node::Type type() const override;
+  virtual IReflect::Type type() const override;
   void addToScene(std::unique_ptr<Camera>&& newCamera);
 
   /**

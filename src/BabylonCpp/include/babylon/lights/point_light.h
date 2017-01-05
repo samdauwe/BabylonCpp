@@ -20,7 +20,7 @@ public:
   }
   ~PointLight();
 
-  Node::Type type() const override;
+  IReflect::Type type() const override;
   Scene* getScene() override;
   Vector3 getAbsolutePosition() override;
   bool computeTransformedPosition() override;

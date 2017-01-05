@@ -18,32 +18,6 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT Node : public IAnimatable, public IDisposable {
 
 public:
-  enum class Type : unsigned int {
-    NODE = 0,
-    // Bones
-    BONE = 1,
-    // Cameras
-    CAMERA          = 10,
-    ARCFOLLOWCAMERA = 11,
-    ARCROTATECAMERA = 12,
-    FOLLOWCAMERA    = 13,
-    FREECAMERA      = 14,
-    TARGETCAMERA    = 15,
-    // Lights
-    LIGHT            = 20,
-    DIRECTIONALLIGHT = 21,
-    HEMISPHERICLIGHT = 22,
-    POINTLIGHT       = 23,
-    SPOTLIGHT        = 24,
-    // Meshes
-    ABSTRACTMESH  = 30,
-    GROUNDMESH    = 31,
-    INSTANCEDMESH = 32,
-    LINESMESH     = 33,
-    MESH          = 34
-  }; // end of enum class Type
-
-public:
   /**
    * Constructor
    * @param {string} name - the name and id to be given to this node
@@ -52,8 +26,7 @@ public:
   Node(const std::string& name, Scene* scene);
   virtual ~Node();
 
-  virtual Type type() const;
-
+  virtual IReflect::Type type() const override;
   void setParent(Node* parent);
   Node* parent() const override;
   void setOnDispose(const std::function<void()>& callback);
@@ -158,7 +131,6 @@ public:
   virtual void dispose(bool doNotRecurse = false) override;
   static void ParseAnimationRanges(Node* node, const Json::value& parsedNode,
                                    Scene* scene);
-  static std::string TypeToString(Type type);
 
 public:
   std::string name;

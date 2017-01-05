@@ -31,7 +31,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #                       Project configuration options                          #
 # ============================================================================ #
 option(BUILD_SHARED_LIBS     "Build shared instead of static libraries."     ON)
-option(OPTION_BUILD_TESTS    "Build tests."                                 OFF)
+option(OPTION_BUILD_TESTS    "Build tests."                                  ON)
 
 # ============================================================================ #
 #                       Project description and (meta) information             #
@@ -62,9 +62,10 @@ configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${BABYLON_NAMESP
 #                       Sources                                                #
 # ============================================================================ #
 
-# Include and Source path
+# Include, Source and Tests path
 set(INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/${BABYLON_NAMESPACE}")
 set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(TESTS_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 
 # Header files
 file(GLOB ACTIONS_HDR_FILES         ${INCLUDE_PATH}/actions/*.h
@@ -329,7 +330,7 @@ set_target_properties(${TARGET}
 # ============================================================================ #
 
 # Check if tests are enabled
-if(OPTION_BUILD_TESTS)
+if(OPTION_BUILD_TESTS AND EXISTS ${TESTS_PATH})
 
 # DISABLE CMP0037: Target names should not be reserved and should match a
 # validity pattern.
@@ -378,7 +379,7 @@ set_target_properties(BabylonCppUnitTests
 # Tests
 add_test_without_ctest(tests)
 
-endif(OPTION_BUILD_TESTS)
+endif(OPTION_BUILD_TESTS AND EXISTS ${TESTS_PATH})
 
 # ============================================================================ #
 #                       Deployment                                             #

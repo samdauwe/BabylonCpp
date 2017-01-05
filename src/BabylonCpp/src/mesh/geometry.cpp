@@ -42,7 +42,7 @@ Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData,
 
   // applyToMesh
   if (mesh) {
-    if (mesh->type() == Node::Type::LINESMESH) {
+    if (mesh->type() == IReflect::Type::LINESMESH) {
       auto linesMesh = dynamic_cast<LinesMesh*>(mesh);
       setBoundingBias(Vector2(0, linesMesh->intersectionThreshold()));
       _hasBoundingBias = true;

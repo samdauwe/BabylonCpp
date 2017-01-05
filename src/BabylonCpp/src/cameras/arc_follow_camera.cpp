@@ -21,9 +21,9 @@ ArcFollowCamera::~ArcFollowCamera()
 {
 }
 
-Node::Type ArcFollowCamera::type() const
+IReflect::Type ArcFollowCamera::type() const
 {
-  return Node::Type::ARCFOLLOWCAMERA;
+  return IReflect::Type::ARCFOLLOWCAMERA;
 }
 
 void ArcFollowCamera::follow()

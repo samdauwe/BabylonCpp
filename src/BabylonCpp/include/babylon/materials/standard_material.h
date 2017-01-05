@@ -43,7 +43,7 @@ public:
   }
   ~StandardMaterial();
 
-  Material::Type type() const override;
+  IReflect::Type type() const override;
 
   void setAmbientColor(const Color3& color) override;
   void setDiffuseColor(const Color3& color) override;

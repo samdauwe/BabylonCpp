@@ -27,7 +27,7 @@ AnimationValue::AnimationValue(const Quaternion& value)
 }
 
 AnimationValue::AnimationValue(const Matrix& value)
-    : dataType{/*Animation::ANIMATIONTYPE_MATRIX*/0}, matrixData{value}
+    : dataType{Animation::ANIMATIONTYPE_MATRIX}, matrixData{value}
 {
 }
 
@@ -75,10 +75,8 @@ AnimationValue AnimationValue::subtract(const AnimationValue& fromValue)
       return AnimationValue(vector3Data.subtract(fromValue.vector3Data));
     case Animation::ANIMATIONTYPE_QUATERNION:
       return AnimationValue(quaternionData.subtract(fromValue.quaternionData));
-    /*case Animation::ANIMATIONTYPE_MATRIX:
-      return AnimationValue(
-        matrixData.subtract(fromValue.matrixData);
-      break;*/
+    case Animation::ANIMATIONTYPE_MATRIX:
+      return AnimationValue(matrixData.subtract(fromValue.matrixData));
     case Animation::ANIMATIONTYPE_COLOR3:
       return AnimationValue(color3Data.subtract(fromValue.color3Data));
     case Animation::ANIMATIONTYPE_VECTOR2:
@@ -126,9 +124,9 @@ AnimationValue AnimationValue::copy() const
     case Animation::ANIMATIONTYPE_QUATERNION:
       v.quaternionData = quaternionData;
       break;
-    //case Animation::ANIMATIONTYPE_MATRIX:
-    //  v.matrixData = matrixData;
-    //  break;
+    case Animation::ANIMATIONTYPE_MATRIX:
+      v.matrixData = matrixData;
+      break;
     case Animation::ANIMATIONTYPE_COLOR3:
       v.color3Data = color3Data;
       break;
@@ -155,6 +153,50 @@ AnimationValue AnimationValue::copy() const
   }
 
   return v;
+}
+
+any AnimationValue::getValue() const
+{
+  any value = nullptr;
+  switch (dataType) {
+    case Animation::ANIMATIONTYPE_FLOAT:
+      value = &floatData;
+      break;
+    case Animation::ANIMATIONTYPE_VECTOR3:
+      value = &vector3Data;
+      break;
+    case Animation::ANIMATIONTYPE_QUATERNION:
+      value = &quaternionData;
+      break;
+    case Animation::ANIMATIONTYPE_MATRIX:
+      value = &matrixData;
+      break;
+    case Animation::ANIMATIONTYPE_COLOR3:
+      value = &color3Data;
+      break;
+    case Animation::ANIMATIONTYPE_VECTOR2:
+      value = &vector2Data;
+      break;
+    case Animation::ANIMATIONTYPE_SIZE:
+      value = &sizeData;
+      break;
+    case Animation::ANIMATIONTYPE_BOOL:
+      value = &boolData;
+      break;
+    case Animation::ANIMATIONTYPE_INT:
+      value = &intData;
+      break;
+    case Animation::ANIMATIONTYPE_STRING:
+      value = &stringData;
+      break;
+    case Animation::ANIMATIONTYPE_COLOR4:
+      value = &color4Data;
+      break;
+    default:
+      break;
+  }
+
+  return value;
 }
 
 } // end of namespace BABYLON

@@ -34,9 +34,9 @@ InstancedMesh::~InstancedMesh()
 {
 }
 
-Node::Type InstancedMesh::type() const
+IReflect::Type InstancedMesh::type() const
 {
-  return Node::Type::INSTANCEDMESH;
+  return IReflect::Type::INSTANCEDMESH;
 }
 
 bool InstancedMesh::receiveShadows() const

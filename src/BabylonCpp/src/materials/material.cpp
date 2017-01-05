@@ -42,6 +42,11 @@ Material::~Material()
 {
 }
 
+IReflect::Type Material::type() const
+{
+  return IReflect::Type::MATERIAL;
+}
+
 void Material::addMaterialToScene(std::unique_ptr<Material>&& newMaterial)
 {
   _scene->materials.emplace_back(std::move(newMaterial));

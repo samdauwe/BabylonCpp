@@ -17,11 +17,13 @@
 
 namespace BABYLON {
 
-std::unique_ptr<Animation> Animation::_PrepareAnimation(
-  const std::string& name, const std::string& targetProperty,
-  int framePerSecond, int totalFrame, const AnimationValue& from,
-  const AnimationValue& to, unsigned int loopMode,
-  IEasingFunction* easingFunction)
+Animation* Animation::_PrepareAnimation(const std::string& name,
+                                        const std::string& targetProperty,
+                                        size_t framePerSecond, int totalFrame,
+                                        const AnimationValue& from,
+                                        const AnimationValue& to,
+                                        unsigned int loopMode,
+                                        IEasingFunction* easingFunction)
 {
   auto dataType = from.dataType;
 
@@ -29,8 +31,8 @@ std::unique_ptr<Animation> Animation::_PrepareAnimation(
     return nullptr;
   }
 
-  auto animation = std_util::make_unique<Animation>(
-    name, targetProperty, framePerSecond, dataType, loopMode);
+  auto animation
+    = new Animation(name, targetProperty, framePerSecond, dataType, loopMode);
 
   animation->setKeys({
     AnimationKey(0, from), AnimationKey(totalFrame, to),
@@ -45,7 +47,7 @@ std::unique_ptr<Animation> Animation::_PrepareAnimation(
 
 Animatable* Animation::CreateAndStartAnimation(
   const std::string& name, Node* node, const std::string& targetProperty,
-  int framePerSecond, int totalFrame, const AnimationValue& from,
+  size_t framePerSecond, int totalFrame, const AnimationValue& from,
   const AnimationValue& to, unsigned int loopMode,
   IEasingFunction* easingFunction, const std::function<void()>& onAnimationEnd)
 {
@@ -55,13 +57,13 @@ Animatable* Animation::CreateAndStartAnimation(
     easingFunction);
 
   return node->getScene()->beginDirectAnimation(
-    node, {animation.get()}, 0, totalFrame, (animation->loopMode == 1), 1.f,
+    node, {animation}, 0, totalFrame, (animation->loopMode == 1), 1.f,
     onAnimationEnd);
 }
 
 Animatable* Animation::CreateMergeAndStartAnimation(
   const std::string& name, Node* node, const std::string& targetProperty,
-  int framePerSecond, int totalFrame, const AnimationValue& from,
+  size_t framePerSecond, int totalFrame, const AnimationValue& from,
   const AnimationValue& to, unsigned int loopMode,
   IEasingFunction* easingFunction, const std::function<void()>& onAnimationEnd)
 {
@@ -69,7 +71,7 @@ Animatable* Animation::CreateMergeAndStartAnimation(
     name, targetProperty, framePerSecond, totalFrame, from, to, loopMode,
     easingFunction);
 
-  //node->animations.emplace_back(animation);
+  node->animations.emplace_back(animation);
 
   return node->getScene()->beginAnimation(
     node, 0, totalFrame, (animation->loopMode == 1), 1.f, onAnimationEnd);
@@ -143,7 +145,7 @@ void Animation::removeEvents(int frame)
                 _events.end());
 }
 
-void Animation::createRange(const std::string& _name, int from, int to)
+void Animation::createRange(const std::string& _name, float from, float to)
 {
   // check name not already in use; could happen for bones after serialized
   if (!std_util::contains(_ranges, _name)) {
@@ -480,17 +482,17 @@ AnimationValue Animation::_interpolate(int iCurrentFrame, int repeatCount,
   return _getKeyValue(_keys.back().value);
 }
 
-void Animation::setValue(const AnimationValue& /*currentValue*/, bool /*blend*/)
+void Animation::setValue(const AnimationValue& currentValue, bool /*blend*/)
 {
   // Set value
   std::string path;
-  AnimationValue destination;
+  any destination;
 
   if (targetPropertyPath.size() > 1) {
-    auto property = (*_target)[targetPropertyPath[0]];
+    auto property = _target->getProperty(targetPropertyPath[0]);
 
     for (size_t index = 1; index < targetPropertyPath.size() - 1; ++index) {
-      property = property[targetPropertyPath[index]];
+      property = _target->getProperty(property, targetPropertyPath[index]);
     }
 
     path        = targetPropertyPath.back();
@@ -502,43 +504,12 @@ void Animation::setValue(const AnimationValue& /*currentValue*/, bool /*blend*/)
   }
 
   // Blending
-  /*if (enableBlending && _blendingFactor <= 1.f) {
-    if (!_originalBlendValue) {
-      if (destination[path].clone) {
-        _originalBlendValue = destination[path].clone();
-      }
-      else {
-        _originalBlendValue = destination[path];
-      }
-    }
-
-    if (_originalBlendValue.prototype) { // Complex value
-
-      if (_originalBlendValue.prototype.Lerp) { // Lerp supported
-        destination[path] = _originalBlendValue.construtor.prototype.Lerp(
-          currentValue, _originalBlendValue, _blendingFactor);
-      }
-      else { // Blending not supported
-        destination[path] = currentValue;
-      }
-    }
-    else if (_originalBlendValue.m) { // Matrix
-      destination[path]
-        = Matrix::Lerp(_originalBlendValue, currentValue, _blendingFactor);
-    }
-    else { // Direct value
-      destination[path] = _originalBlendValue * (1.f - _blendingFactor)
-                          + _blendingFactor * currentValue;
-    }
-    _blendingFactor += blendingSpeed;
+  if (enableBlending && _blendingFactor <= 1.f) {
   }
   else {
-    destination[path] = currentValue;
-  }*/
-
-  // if (_target->markAsDirty()) {
-  //  _target->markAsDirty(targetProperty);
-  //}
+    any newValue = currentValue.getValue();
+    _target->setProperty(destination, path, newValue);
+  }
 }
 
 void Animation::goToFrame(int frame)
@@ -556,7 +527,7 @@ void Animation::goToFrame(int frame)
   setValue(currentValue);
 }
 
-bool Animation::animate(millisecond_t delay, int from, int to, bool loop,
+bool Animation::animate(millisecond_t delay, float from, float to, bool loop,
                         float speedRatio)
 {
   if (this->targetProperty.empty()) {
@@ -581,8 +552,7 @@ bool Animation::animate(millisecond_t delay, int from, int to, bool loop,
   }
 
   // Compute ratio
-  int range    = to - from;
-  float rangef = static_cast<float>(range);
+  float range = to - from;
   AnimationValue offsetValue;
   // ratio represents the frame delta between from and to
   float ratio
@@ -590,7 +560,7 @@ bool Animation::animate(millisecond_t delay, int from, int to, bool loop,
       / 1000.f;
   AnimationValue highLimitValue;
 
-  if (ratio > rangef && !loop) {
+  if (ratio > range && !loop) {
     // If we are out of range and not looping get back to caller
     returnValue    = false;
     highLimitValue = _getKeyValue(_keys.back().value);
@@ -600,10 +570,10 @@ bool Animation::animate(millisecond_t delay, int from, int to, bool loop,
     if (loopMode != Animation::ANIMATIONLOOPMODE_CYCLE) {
       std::string keyOffset = std::to_string(to) + std::to_string(from);
       if (!_offsetsCache.count(keyOffset)) {
-        AnimationValue fromValue
-          = _interpolate(from, 0, Animation::ANIMATIONLOOPMODE_CYCLE);
-        AnimationValue toValue
-          = _interpolate(to, 0, Animation::ANIMATIONLOOPMODE_CYCLE);
+        AnimationValue fromValue = _interpolate(
+          static_cast<int>(from), 0, Animation::ANIMATIONLOOPMODE_CYCLE);
+        AnimationValue toValue = _interpolate(
+          static_cast<int>(to), 0, Animation::ANIMATIONLOOPMODE_CYCLE);
         switch (dataType) {
           // Float
           case Animation::ANIMATIONTYPE_FLOAT:
@@ -673,10 +643,10 @@ bool Animation::animate(millisecond_t delay, int from, int to, bool loop,
   }
 
   // Compute value
-  int repeatCount = static_cast<int>(ratio / rangef);
+  int repeatCount = static_cast<int>(ratio / range);
   int _currentFrame
-    = returnValue ? static_cast<int>(static_cast<float>(from) + ratio) % range :
-                    to;
+    = returnValue ? static_cast<int>(from + ratio) % static_cast<int>(range) :
+                    static_cast<int>(to);
   AnimationValue currentValue = _interpolate(
     _currentFrame, repeatCount, loopMode, offsetValue, highLimitValue);
 
@@ -740,20 +710,19 @@ Json::object Animation::serialize() const
         break;
     }
 
-    keys.emplace_back(Json::value(
-      Json::object({Json::Pair<int>("frame", animationKey.frame), //
-                    /*Json::Pair("values", keyValues)*/})));
+    keys.emplace_back(
+      Json::value(Json::object({Json::Pair<int>("frame", animationKey.frame), //
+                                /*Json::Pair("values", keyValues)*/})));
   }
   serializationObject["keys"] = Json::value(keys);
 
   // Animation ranges
   std::vector<Json::value> ranges;
   for (auto& range : _ranges) {
-    ranges.emplace_back(
-      Json::value(Json::object({Json::Pair("name", range.first),            //
-                                Json::Pair<int>("from", range.second.from), //
-                                Json::Pair<int>("to", range.second.to)})    //
-                  ));
+    ranges.emplace_back(Json::value(Json::object(
+      {Json::Pair("name", range.first),                              //
+       Json::Pair<int>("from", static_cast<int>(range.second.from)), //
+       Json::Pair<int>("to", static_cast<int>(range.second.to))})));
   }
   serializationObject["ranges"] = Json::value(ranges);
 

@@ -21,7 +21,7 @@ public:
   }
   ~DirectionalLight();
 
-  Node::Type type() const override;
+  IReflect::Type type() const override;
   Scene* getScene() override;
   Vector3 getAbsolutePosition() override;
   Vector3& setDirectionToTarget(Vector3& target);

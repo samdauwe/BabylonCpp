@@ -137,6 +137,11 @@ PBRMaterial::~PBRMaterial()
 {
 }
 
+IReflect::Type PBRMaterial::type() const
+{
+  return IReflect::Type::PBRMATERIAL;
+}
+
 bool PBRMaterial::useLogarithmicDepth() const
 {
   return _useLogarithmicDepth;

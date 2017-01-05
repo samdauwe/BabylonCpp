@@ -29,9 +29,9 @@ FreeCamera::~FreeCamera()
 {
 }
 
-Node::Type FreeCamera::type() const
+IReflect::Type FreeCamera::type() const
 {
-  return Node::Type::FREECAMERA;
+  return IReflect::Type::FREECAMERA;
 }
 
 /** Controls **/

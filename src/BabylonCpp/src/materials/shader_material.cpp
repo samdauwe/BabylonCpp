@@ -35,9 +35,9 @@ ShaderMaterial::~ShaderMaterial()
 {
 }
 
-Material::Type ShaderMaterial::type() const
+IReflect::Type ShaderMaterial::type() const
 {
-  return Material::Type::SHADERMATERIAL;
+  return IReflect::Type::SHADERMATERIAL;
 }
 
 bool ShaderMaterial::needAlphaBlending()

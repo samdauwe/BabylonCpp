@@ -11,4 +11,5 @@ IShadowLight::IShadowLight() : _shadowGenerator{nullptr}
 IShadowLight::~IShadowLight()
 {
 }
-}
+
+} // end of namespace BABYLON

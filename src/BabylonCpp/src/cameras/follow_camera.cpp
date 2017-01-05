@@ -20,9 +20,9 @@ FollowCamera::~FollowCamera()
 {
 }
 
-Node::Type FollowCamera::type() const
+IReflect::Type FollowCamera::type() const
 {
-  return Node::Type::FOLLOWCAMERA;
+  return IReflect::Type::FOLLOWCAMERA;
 }
 
 float FollowCamera::getRadians(float degrees) const

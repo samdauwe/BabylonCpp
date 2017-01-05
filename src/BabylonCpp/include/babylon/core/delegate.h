@@ -367,6 +367,6 @@ struct hash<::delegate<R(A...)>> {
 };
 }
 #endif
-} // namespace BABYLON
+} // end of namespace BABYLON
 
 #endif // end of BABYLON_CORE_DELEGATE_H

@@ -8,8 +8,12 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT Animatable {
 
 public:
-  template <typename... Ts>
-  static Animatable* New(Ts&&... args);
+  Animatable(Scene* scene, IAnimatable* target, int fromFrame = 0,
+             int toFrame = 100, bool loopAnimation = false,
+             float speedRatio                            = 1.f,
+             const std::function<void()>& onAnimationEnd = nullptr,
+             const std::vector<Animation*>& animations
+             = std::vector<Animation*>());
   ~Animatable();
 
   /** Methods **/
@@ -25,14 +29,6 @@ public:
   void restart();
   void stop(const std::string& animationName = "");
   bool _animate(const millisecond_t& delay);
-
-protected:
-  Animatable(Scene* scene, IAnimatable* target, int fromFrame = 0,
-             int toFrame = 100, bool loopAnimation = false,
-             float speedRatio                            = 1.f,
-             const std::function<void()>& onAnimationEnd = nullptr,
-             const std::vector<Animation*>& animations
-             = std::vector<Animation*>());
 
 public:
   IAnimatable* target;

@@ -2,8 +2,8 @@
 
 namespace BABYLON {
 
-AnimationKey::AnimationKey(int frame_, AnimationValue value_)
-    : frame{frame_}, value{value_}
+AnimationKey::AnimationKey(int iFrame, AnimationValue iValue)
+    : frame{iFrame}, value{iValue}
 {
 }
 

@@ -1,5 +1,5 @@
-#ifndef BABYLON_CORE_uuid_H
-#define BABYLON_CORE_uuid_H
+#ifndef BABYLON_CORE_UUID_H
+#define BABYLON_CORE_UUID_H
 
 #include <babylon/babylon_stl.h>
 
@@ -60,4 +60,4 @@ struct hash<BABYLON::uuid> {
 
 } // end of namespace std
 
-#endif // end of BABYLON_CORE_uuid_H
+#endif // end of BABYLON_CORE_UUID_H

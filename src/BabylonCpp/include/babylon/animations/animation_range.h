@@ -11,7 +11,7 @@ class BABYLON_SHARED_EXPORT AnimationRange {
 
 public:
   AnimationRange();
-  AnimationRange(const std::string& name, int from, int to);
+  AnimationRange(const std::string& name, float from, float to);
   AnimationRange(const AnimationRange& other);
   ~AnimationRange();
 
@@ -20,8 +20,8 @@ public:
 
 public:
   std::string name;
-  int from;
-  int to;
+  float from;
+  float to;
 
 }; // end of class AnimationRange
 

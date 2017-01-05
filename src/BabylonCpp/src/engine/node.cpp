@@ -13,9 +13,9 @@
 
 namespace BABYLON {
 
-Node::Node(const std::string& _name, Scene* scene)
-    : name{_name}
-    , id{_name}
+Node::Node(const std::string& iName, Scene* scene)
+    : name{iName}
+    , id{iName}
     , state{""}
     , doNotSerialize{false}
     , _currentRenderId{-1}
@@ -34,9 +34,9 @@ Node::~Node()
 {
 }
 
-Node::Type Node::type() const
+IReflect::Type Node::type() const
 {
-  return Node::Type::NODE;
+  return IReflect::Type::NODE;
 }
 
 void Node::setParent(Node* parent)
@@ -107,7 +107,6 @@ void Node::_updateCache(bool /*ignoreParentClass*/)
 {
 }
 
-// override it in derived class if you add new variables to the cache
 bool Node::_isSynchronized()
 {
   return true;
@@ -131,7 +130,7 @@ bool Node::isSynchronizedWithParent()
   return parent()->isSynchronized();
 }
 
-bool Node::isSynchronized(bool _updateCache)
+bool Node::isSynchronized(bool iUpdateCache)
 {
   bool check = hasNewParent();
 
@@ -139,7 +138,7 @@ bool Node::isSynchronized(bool _updateCache)
 
   check = check ? check : !_isSynchronized();
 
-  if (_updateCache) {
+  if (iUpdateCache) {
     updateCache(true);
   }
 
@@ -159,10 +158,6 @@ bool Node::hasNewParent(bool update)
   return true;
 }
 
-/**
- * Is this node ready to be used/rendered
- * @return {boolean} is it ready
- */
 bool Node::isReady() const
 {
   return _isReady;
@@ -266,13 +261,13 @@ Node::getChildMeshes(bool directDecendantsOnly,
   return results;
 }
 
-void Node::_setReady(bool _state)
+void Node::_setReady(bool iState)
 {
-  if (_state == _isReady) {
+  if (iState == _isReady) {
     return;
   }
 
-  if (!_state) {
+  if (!iState) {
     _isReady = false;
     return;
   }
@@ -374,45 +369,6 @@ void Node::ParseAnimationRanges(Node* node, const Json::value& parsedNode,
                                  Json::GetNumber(range, "from", 0),
                                  Json::GetNumber(range, "to", 0));
     }
-  }
-}
-
-std::string Node::TypeToString(Type type)
-{
-  switch (type) {
-    case Type::BONE:
-      return "Bone";
-    case Type::CAMERA:
-      return "Camera";
-    case Type::FOLLOWCAMERA:
-      return "FollowCamera";
-    case Type::FREECAMERA:
-      return "FreeCamera";
-    case Type::TARGETCAMERA:
-      return "TargetCamera";
-    case Type::LIGHT:
-      return "Light";
-    case Type::DIRECTIONALLIGHT:
-      return "DirectionalLight";
-    case Type::HEMISPHERICLIGHT:
-      return "HemisphericLight";
-    case Type::POINTLIGHT:
-      return "PointLight";
-    case Type::SPOTLIGHT:
-      return "SpotLight";
-    case Type::ABSTRACTMESH:
-      return "AbstractMesh";
-    case Type::GROUNDMESH:
-      return "GroundMesh";
-    case Type::INSTANCEDMESH:
-      return "InstancedMesh";
-    case Type::LINESMESH:
-      return "LinesMesh";
-    case Type::MESH:
-      return "Mesh";
-    case Type::NODE:
-    default:
-      return "Node";
   }
 }
 

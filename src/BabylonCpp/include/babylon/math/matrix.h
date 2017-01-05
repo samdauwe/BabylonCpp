@@ -32,6 +32,8 @@ public:
   Float32Array asArray() const;
   Matrix& invert();
   Matrix& reset();
+  Matrix subtract(const Matrix& other);
+  Matrix& subtractFromRef(const Matrix& other, Matrix& result);
   Matrix add(const Matrix& other);
   Matrix& addToRef(const Matrix& other, Matrix& result);
   Matrix& addToSelf(const Matrix& other);
@@ -57,6 +59,7 @@ public:
   /** Operator overloading **/
   Matrix operator+(const Matrix& other);
   Matrix& operator+=(const Matrix& other);
+  Matrix operator-(const Matrix& other);
   Matrix operator*(Matrix& other);
   bool operator==(const Matrix& other) const;
   bool operator!=(const Matrix& other) const;

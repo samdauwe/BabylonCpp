@@ -19,9 +19,9 @@ PointLight::~PointLight()
 {
 }
 
-Node::Type PointLight::type() const
+IReflect::Type PointLight::type() const
 {
-  return Node::Type::POINTLIGHT;
+  return IReflect::Type::POINTLIGHT;
 }
 
 Scene* PointLight::getScene()

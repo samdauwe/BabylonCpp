@@ -27,7 +27,7 @@ public:
   }
   virtual ~ShaderMaterial();
 
-  Material::Type type() const override;
+  IReflect::Type type() const override;
 
   bool needAlphaBlending() override;
   bool needAlphaTesting() override;

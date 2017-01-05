@@ -82,6 +82,11 @@ Texture::~Texture()
 {
 }
 
+IReflect::Type Texture::type() const
+{
+  return IReflect::Type::TEXTURE;
+}
+
 bool Texture::noMipmap() const
 {
   return _noMipmap;

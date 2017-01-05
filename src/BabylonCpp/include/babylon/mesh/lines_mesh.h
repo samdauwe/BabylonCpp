@@ -24,7 +24,7 @@ public:
   }
   ~LinesMesh();
 
-  Node::Type type() const override;
+  IReflect::Type type() const override;
 
   /**
    * The intersection Threshold is the margin applied when intersection a

@@ -74,16 +74,16 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
     defines.lights[lightIndex] = true;
 
     switch (light->type()) {
-      case Node::Type::SPOTLIGHT:
+      case IReflect::Type::SPOTLIGHT:
         defines.spotlights[lightIndex] = true;
         break;
-      case Node::Type::HEMISPHERICLIGHT:
+      case IReflect::Type::HEMISPHERICLIGHT:
         defines.hemilights[lightIndex] = true;
         break;
-      case Node::Type::POINTLIGHT:
+      case IReflect::Type::POINTLIGHT:
         defines.pointlights[lightIndex] = true;
         break;
-      case Node::Type::DIRECTIONALLIGHT:
+      case IReflect::Type::DIRECTIONALLIGHT:
       default:
         defines.dirlights[lightIndex] = true;
     }
@@ -265,20 +265,20 @@ void MaterialHelper::BindLightProperties(Light* light, Effect* effect,
   const std::string lightIndexStr = std::to_string(lightIndex);
 
   switch (light->type()) {
-    case Node::Type::POINTLIGHT:
+    case IReflect::Type::POINTLIGHT:
       // Point Light
       light->transferToEffect(effect, "vLightData" + lightIndexStr);
       break;
-    case Node::Type::DIRECTIONALLIGHT:
+    case IReflect::Type::DIRECTIONALLIGHT:
       // Directional Light
       light->transferToEffect(effect, "vLightData" + lightIndexStr);
       break;
-    case Node::Type::SPOTLIGHT:
+    case IReflect::Type::SPOTLIGHT:
       // Spot Light
       light->transferToEffect(effect, "vLightData" + lightIndexStr,
                               "vLightDirection" + lightIndexStr);
       break;
-    case Node::Type::HEMISPHERICLIGHT:
+    case IReflect::Type::HEMISPHERICLIGHT:
       // Hemispheric Light
       light->transferToEffect(effect, "vLightData" + lightIndexStr,
                               "vLightGround" + lightIndexStr);

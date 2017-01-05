@@ -28,22 +28,22 @@ public:
   static constexpr unsigned int ANIMATIONLOOPMODE_CYCLE    = 1;
   static constexpr unsigned int ANIMATIONLOOPMODE_CONSTANT = 2;
 
-  static std::unique_ptr<Animation>
+  static Animation*
   _PrepareAnimation(const std::string& name, const std::string& targetProperty,
-                    int framePerSecond, int totalFrame,
+                    size_t framePerSecond, int totalFrame,
                     const AnimationValue& from, const AnimationValue& to,
                     unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE,
                     IEasingFunction* easingFunction = nullptr);
   static Animatable* CreateAndStartAnimation(
     const std::string& name, Node* node, const std::string& targetProperty,
-    int framePerSecond, int totalFrame, const AnimationValue& from,
+    size_t framePerSecond, int totalFrame, const AnimationValue& from,
     const AnimationValue& to,
     unsigned int loopMode           = Animation::ANIMATIONLOOPMODE_CYCLE,
     IEasingFunction* easingFunction = nullptr,
     const std::function<void()>& onAnimationEnd = nullptr);
   static Animatable* CreateMergeAndStartAnimation(
     const std::string& name, Node* node, const std::string& targetProperty,
-    int framePerSecond, int totalFrame, const AnimationValue& from,
+    size_t framePerSecond, int totalFrame, const AnimationValue& from,
     const AnimationValue& to,
     unsigned int loopMode           = Animation::ANIMATIONLOOPMODE_CYCLE,
     IEasingFunction* easingFunction = nullptr,
@@ -70,7 +70,7 @@ public:
    * @param frame
    */
   void removeEvents(int frame);
-  void createRange(const std::string& name, int from, int to);
+  void createRange(const std::string& name, float from, float to);
   void deleteRange(const std::string& name, bool deleteFrames = true);
   AnimationRange& getRange(const std::string& name);
   void reset();
@@ -102,7 +102,7 @@ public:
   void setKeys(const std::vector<AnimationKey>& values);
   void setValue(const AnimationValue& currentValue, bool blend = false);
   void goToFrame(int frame);
-  bool animate(millisecond_t delay, int from, int to, bool loop,
+  bool animate(millisecond_t delay, float from, float to, bool loop,
                float speedRatio);
   Json::object serialize() const;
   static std::unique_ptr<Animation> Parse(const Json::value& parsedAnimation);

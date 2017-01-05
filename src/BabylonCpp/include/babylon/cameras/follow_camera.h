@@ -19,7 +19,7 @@ public:
   }
   ~FollowCamera();
 
-  Node::Type type() const override;
+  IReflect::Type type() const override;
 
   void _checkInputs() override;
   std::string getTypeName() const override;

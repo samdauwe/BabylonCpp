@@ -12,14 +12,6 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT Material : public IAnimatable {
 
 public:
-  enum class Type : unsigned int {
-    MULTIMATERIAL    = 0,
-    SHADERMATERIAL   = 1,
-    STANDARDMATERIAL = 2,
-    NORMALMATERIAL   = 3
-  }; // end of enum class Type
-
-public:
   static constexpr unsigned int TriangleFillMode  = 0;
   static constexpr unsigned int WireFrameFillMode = 1;
   static constexpr unsigned int PointFillMode     = 2;
@@ -29,7 +21,7 @@ public:
 
   virtual ~Material();
 
-  virtual Type type() const = 0;
+  virtual IReflect::Type type() const override;
   void addMaterialToScene(std::unique_ptr<Material>&& newMaterial);
   void
   addMultiMaterialToScene(std::unique_ptr<MultiMaterial>&& newMultiMaterial);

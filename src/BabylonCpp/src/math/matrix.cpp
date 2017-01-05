@@ -148,6 +148,24 @@ Matrix& Matrix::reset()
   return *this;
 }
 
+Matrix Matrix::subtract(const Matrix& other)
+{
+  Matrix result;
+
+  subtractFromRef(other, result);
+
+  return result;
+}
+
+Matrix& Matrix::subtractFromRef(const Matrix& other, Matrix& result)
+{
+  for (unsigned int index = 0; index < 16; ++index) {
+    result.m[index] = m[index] - other.m[index];
+  }
+
+  return *this;
+}
+
 Matrix Matrix::add(const Matrix& other)
 {
   Matrix result;
@@ -475,6 +493,11 @@ Matrix Matrix::operator+(const Matrix& other)
 Matrix& Matrix::operator+=(const Matrix& other)
 {
   return addToSelf(other);
+}
+
+Matrix Matrix::operator-(const Matrix& other)
+{
+  return subtract(other);
 }
 
 Matrix Matrix::operator*(Matrix& other)

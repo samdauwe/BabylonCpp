@@ -6,15 +6,6 @@
 
 namespace BABYLON {
 
-template <typename... Ts>
-Animatable* Animatable::New(Ts&&... args)
-{
-  auto animatable
-    = std_util::make_unique<Animatable>(std::forward<Ts>(args)...);
-  animatable->_scene->_activeAnimatables.emplace_back(animatable);
-  return animatable.get();
-}
-
 Animatable::Animatable(Scene* scene, IAnimatable* iTarget, int iFromFrame,
                        int iToFrame, bool iLoopAnimation, float iSpeedRatio,
                        const std::function<void()>& iOnAnimationEnd,
@@ -34,6 +25,8 @@ Animatable::Animatable(Scene* scene, IAnimatable* iTarget, int iFromFrame,
   if (!animations.empty()) {
     appendAnimations(target, animations);
   }
+
+  scene->_activeAnimatables.emplace_back(this);
 }
 
 Animatable::~Animatable()
@@ -122,11 +115,9 @@ void Animatable::restart()
 
 void Animatable::stop(const std::string& animationName)
 {
-  auto it = find_if(_scene->_activeAnimatables.begin(),
-                    _scene->_activeAnimatables.end(),
-                    [this](const std::unique_ptr<Animatable>& animatable) {
-                      return animatable.get() == this;
-                    });
+  auto it = find_if(
+    _scene->_activeAnimatables.begin(), _scene->_activeAnimatables.end(),
+    [this](const Animatable* animatable) { return animatable == this; });
   if (it != _scene->_activeAnimatables.end()) {
     size_t numberOfAnimationsStopped = 0;
     for (size_t index = _animations.size(); index > 0; --index) {
@@ -186,11 +177,9 @@ bool Animatable::_animate(const millisecond_t& delay)
   if (!running) {
     // Remove from active animatables
     _scene->_activeAnimatables.erase(
-      std::remove_if(_scene->_activeAnimatables.begin(),
-                     _scene->_activeAnimatables.end(),
-                     [this](const std::unique_ptr<Animatable>& animatable) {
-                       return animatable.get() == this;
-                     }),
+      std::remove_if(
+        _scene->_activeAnimatables.begin(), _scene->_activeAnimatables.end(),
+        [this](const Animatable* animatable) { return animatable == this; }),
       _scene->_activeAnimatables.end());
   }
 

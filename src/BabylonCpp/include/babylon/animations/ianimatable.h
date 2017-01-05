@@ -3,10 +3,11 @@
 
 #include <babylon/animations/animation_value.h>
 #include <babylon/babylon_global.h>
+#include <babylon/interfaces/ireflect.h>
 
 namespace BABYLON {
 
-struct BABYLON_SHARED_EXPORT IAnimatable {
+struct BABYLON_SHARED_EXPORT IAnimatable : public IReflect {
   enum class Type {
     UNKNOWN = 0,
     CAMERA  = 1,
@@ -16,7 +17,10 @@ struct BABYLON_SHARED_EXPORT IAnimatable {
   }; // end of enum class Type
 
   std::string state;
-  virtual Node* parent() const {return nullptr;}
+  virtual Node* parent() const
+  {
+    return nullptr;
+  }
   virtual Type animatableType() const
   {
     return Type::UNKNOWN;

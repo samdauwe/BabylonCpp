@@ -19,9 +19,9 @@ HemisphericLight::~HemisphericLight()
 {
 }
 
-Node::Type HemisphericLight::type() const
+IReflect::Type HemisphericLight::type() const
 {
-  return Node::Type::HEMISPHERICLIGHT;
+  return IReflect::Type::HEMISPHERICLIGHT;
 }
 
 Vector3 HemisphericLight::setDirectionToTarget(const Vector3& target)

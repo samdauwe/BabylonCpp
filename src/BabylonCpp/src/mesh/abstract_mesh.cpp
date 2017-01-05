@@ -102,9 +102,9 @@ AbstractMesh::~AbstractMesh()
 {
 }
 
-Node::Type AbstractMesh::type() const
+IReflect::Type AbstractMesh::type() const
 {
-  return Node::Type::ABSTRACTMESH;
+  return IReflect::Type::ABSTRACTMESH;
 }
 
 void AbstractMesh::addToScene(std::unique_ptr<AbstractMesh>&& newMesh)
@@ -135,7 +135,7 @@ std::string AbstractMesh::toString(bool fullDetails) const
 {
   std::ostringstream oss;
   oss << "Name: " << name << ", isInstance: ";
-  oss << ((type() == Node::Type::INSTANCEDMESH) ? "YES" : "NO");
+  oss << ((type() == IReflect::Type::INSTANCEDMESH) ? "YES" : "NO");
   oss << ", # of submeshes: " << (subMeshes.size());
   if (_skeleton) {
     oss << ", skeleton: " << _skeleton->name;
@@ -243,7 +243,7 @@ void AbstractMesh::resetRotationQuaternion()
 
 AbstractMesh* AbstractMesh::getParent()
 {
-  if (parent()->type() == Node::Type::ABSTRACTMESH) {
+  if (parent()->type() == IReflect::Type::ABSTRACTMESH) {
     return dynamic_cast<AbstractMesh*>(parent());
   }
 

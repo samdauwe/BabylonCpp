@@ -35,9 +35,9 @@ TargetCamera::~TargetCamera()
 {
 }
 
-Node::Type TargetCamera::type() const
+IReflect::Type TargetCamera::type() const
 {
-  return Node::Type::TARGETCAMERA;
+  return IReflect::Type::TARGETCAMERA;
 }
 
 Vector3 TargetCamera::getFrontPosition(float distance)
@@ -119,6 +119,16 @@ float TargetCamera::_computeLocalCameraSpeed()
   return speed * std::sqrt(
                    (Time::fpMillisecondsDuration<float>(engine->getDeltaTime())
                     / (engine->getFps() * 100.f)));
+}
+
+void TargetCamera::setRotation(const Vector3& newRotation)
+{
+  rotation = std_util::make_unique<Vector3>(newRotation);
+}
+
+Vector3& TargetCamera::getRotation()
+{
+  return *rotation;
 }
 
 /** Target **/

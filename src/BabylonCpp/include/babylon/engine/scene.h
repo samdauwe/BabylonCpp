@@ -40,6 +40,8 @@ public:
   }
   virtual ~Scene();
 
+  IReflect::Type type() const override;
+
   // Events
   void setOnDispose(const std::function<void()>& callback);
   void setBeforeRender(const std::function<void()>& callback);
@@ -150,7 +152,7 @@ public:
    * @see BABYLON.Animatable
    * @see http://doc.babylonjs.com/page.php?p=22081
    */
-  Animatable* beginAnimation(IAnimatable* target, int from, int to,
+  Animatable* beginAnimation(IAnimatable* target, float from, float to,
                              bool loop = false, float speedRatio = 1.f,
                              const std::function<void()>& onAnimationEnd
                              = nullptr,
@@ -161,7 +163,7 @@ public:
                        int to, bool loop = false, float speedRatio = 1.f,
                        const std::function<void()>& onAnimationEnd = nullptr);
   Animatable* getAnimatableByTarget(IAnimatable* target);
-  std::vector<std::unique_ptr<Animatable>>& animatables();
+  std::vector<Animatable*>& animatables();
   /**
    * Will stop the animation of the given target
    * @param target - the target
@@ -749,7 +751,7 @@ public:
   Material* _cachedMaterial;
   std::vector<IDisposable*> _toBeDisposed;
   std::vector<ParticleSystem*> _activeParticleSystems;
-  std::vector<std::unique_ptr<Animatable>> _activeAnimatables;
+  std::vector<Animatable*> _activeAnimatables;
 
 private:
   // Events

@@ -31,7 +31,7 @@ public:
   }
   ~GroundMesh();
 
-  Node::Type type() const override;
+  IReflect::Type type() const override;
 
   size_t subdivisions() const;
   size_t subdivisionsX() const;

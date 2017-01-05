@@ -52,9 +52,9 @@ Camera::~Camera()
 {
 }
 
-Node::Type Camera::type() const
+IReflect::Type Camera::type() const
 {
-  return Node::Type::CAMERA;
+  return IReflect::Type::CAMERA;
 }
 
 void Camera::addToScene(std::unique_ptr<Camera>&& newCamera)

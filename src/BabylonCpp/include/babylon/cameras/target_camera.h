@@ -20,7 +20,7 @@ public:
   }
   ~TargetCamera();
 
-  virtual Node::Type type() const override;
+  virtual IReflect::Type type() const override;
 
   Vector3 getFrontPosition(float distance);
   Vector3* _getLockedTargetPosition();
@@ -36,6 +36,8 @@ public:
   float _computeLocalCameraSpeed();
 
   /** Target **/
+  void setRotation(const Vector3& rotation);
+  Vector3& getRotation();
   void setTarget(const Vector3& target);
   Vector3& getTarget();
   virtual bool _decideIfNeedsToMove();

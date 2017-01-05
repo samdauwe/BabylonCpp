@@ -31,9 +31,14 @@ BaseTexture::~BaseTexture()
 {
 }
 
+IReflect::Type BaseTexture::type() const
+{
+  return IReflect::Type::BASETEXTURE;
+}
+
 void BaseTexture::addToScene(std::unique_ptr<BaseTexture>&& newTexture)
 {
-    _scene->textures.emplace_back(std::move(newTexture));
+  _scene->textures.emplace_back(std::move(newTexture));
 }
 
 std::string BaseTexture::uid()

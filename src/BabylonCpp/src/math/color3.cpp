@@ -344,6 +344,11 @@ Color3 Color3::Yellow()
   return Color3(1.f, 1.f, 0.f);
 }
 
+Color3 Color3::Cyan()
+{
+  return Color3(0.f, 1.f, 1.f);
+}
+
 Color3 Color3::Gray()
 {
   return Color3(0.5f, 0.5f, 0.5f);

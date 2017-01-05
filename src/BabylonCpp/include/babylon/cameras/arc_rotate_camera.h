@@ -24,7 +24,7 @@ public:
   }
   ~ArcRotateCamera();
 
-  virtual Node::Type type() const override;
+  virtual IReflect::Type type() const override;
 
   // Cache
   void _initCache() override;

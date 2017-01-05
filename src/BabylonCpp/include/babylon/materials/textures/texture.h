@@ -40,6 +40,8 @@ public:
   }
   virtual ~Texture();
 
+  virtual IReflect::Type type() const override;
+
   bool noMipmap() const;
   void delayLoad() override;
   void updateSamplingMode(unsigned int samplingMode);

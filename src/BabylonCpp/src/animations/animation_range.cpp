@@ -2,11 +2,11 @@
 
 namespace BABYLON {
 
-AnimationRange::AnimationRange() : name{""}, from{0}, to{0}
+AnimationRange::AnimationRange() : name{""}, from{0.f}, to{0.f}
 {
 }
 
-AnimationRange::AnimationRange(const std::string& iName, int iFrom, int iTo)
+AnimationRange::AnimationRange(const std::string& iName, float iFrom, float iTo)
     : name{iName}, from{iFrom}, to{iTo}
 {
 }

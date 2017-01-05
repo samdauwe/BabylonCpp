@@ -38,9 +38,9 @@ LinesMesh::~LinesMesh()
 {
 }
 
-Node::Type LinesMesh::type() const
+IReflect::Type LinesMesh::type() const
 {
-  return Node::Type::LINESMESH;
+  return IReflect::Type::LINESMESH;
 }
 
 float LinesMesh::intersectionThreshold() const

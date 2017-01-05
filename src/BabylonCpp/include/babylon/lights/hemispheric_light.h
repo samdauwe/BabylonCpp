@@ -19,7 +19,7 @@ public:
   }
   ~HemisphericLight();
 
-  Node::Type type() const override;
+  IReflect::Type type() const override;
   Vector3 setDirectionToTarget(const Vector3& target);
   ShadowGenerator* getShadowGenerator() override;
   void transferToEffect(Effect* effect, const std::string& directionUniformName,

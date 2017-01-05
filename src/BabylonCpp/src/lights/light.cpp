@@ -27,9 +27,9 @@ Light::~Light()
 {
 }
 
-Node::Type Light::type() const
+IReflect::Type Light::type() const
 {
-  return Node::Type::LIGHT;
+  return IReflect::Type::LIGHT;
 }
 
 void Light::addToScene(std::unique_ptr<Light>&& newLight)

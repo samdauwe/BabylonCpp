@@ -21,7 +21,7 @@ public:
   }
   ~FreeCamera();
 
-  Node::Type type() const override;
+  IReflect::Type type() const override;
 
   /** Controls **/
   void attachControl(ICanvas* canvas, bool noPreventDefault = false,

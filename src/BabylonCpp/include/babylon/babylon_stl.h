@@ -505,8 +505,6 @@ private:
 
 } // end of namespace std_util
 
-// end of namespace std_util
-
 // Bugfix for Visual Studio 2013 which does not handle well
 // std::packaged_task<void()>.
 // Ref: workarounds at

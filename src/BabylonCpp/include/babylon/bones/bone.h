@@ -15,7 +15,7 @@ public:
   static Bone* New(Ts&&... args);
   ~Bone();
 
-  virtual Node::Type type() const override;
+  virtual IReflect::Type type() const override;
 
   /** Members **/
   Bone* getParent();

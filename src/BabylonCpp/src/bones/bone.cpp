@@ -55,9 +55,9 @@ Bone::~Bone()
 {
 }
 
-Node::Type Bone::type() const
+IReflect::Type Bone::type() const
 {
-  return Node::Type::BONE;
+  return IReflect::Type::BONE;
 }
 
 // Members

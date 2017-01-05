@@ -35,6 +35,8 @@ public:
   }
   ~PBRMaterial();
 
+  IReflect::Type type() const override;
+
   bool useLogarithmicDepth() const;
   void setUseLogarithmicDepth(bool value);
   bool needAlphaBlending() override;

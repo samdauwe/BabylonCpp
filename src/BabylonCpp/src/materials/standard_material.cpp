@@ -185,9 +185,9 @@ StandardMaterial::~StandardMaterial()
 {
 }
 
-Material::Type StandardMaterial::type() const
+IReflect::Type StandardMaterial::type() const
 {
-  return Material::Type::STANDARDMATERIAL;
+  return IReflect::Type::STANDARDMATERIAL;
 }
 
 void StandardMaterial::setAmbientColor(const Color3& color)

@@ -89,7 +89,7 @@ public:
   }
   ~Mesh();
 
-  virtual Node::Type type() const override;
+  virtual IReflect::Type type() const override;
 
   /** Methods **/
   void setOnBeforeDraw(const std::function<void()>& callback);

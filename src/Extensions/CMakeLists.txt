@@ -62,9 +62,10 @@ configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${BABYLON_NAMESP
 #                       Sources                                                #
 # ============================================================================ #
 
-# Include and Source path
+# Include, Source and Tests path
 set(INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/${BABYLON_EXTENSIONS_NAMESPACE}")
 set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(TESTS_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 
 # Header files
 file(GLOB EXTENSIONS_HDR_FILES  ${INCLUDE_PATH}/extensions/polyhedron/*.h
@@ -181,7 +182,7 @@ set_target_properties(${TARGET}
 # ============================================================================ #
 
 # Check if tests are enabled
-if(OPTION_BUILD_TESTS)
+if(OPTION_BUILD_TESTS AND EXISTS ${TESTS_PATH})
 
 # DISABLE CMP0037: Target names should not be reserved and should match a
 # validity pattern.
@@ -216,7 +217,7 @@ set_target_properties(BabylonCppExtensionsUnitTests
 # Tests
 add_test_without_ctest(tests)
 
-endif(OPTION_BUILD_TESTS)
+endif(OPTION_BUILD_TESTS AND EXISTS ${TESTS_PATH})
 
 # ============================================================================ #
 #                       Deployment                                             #

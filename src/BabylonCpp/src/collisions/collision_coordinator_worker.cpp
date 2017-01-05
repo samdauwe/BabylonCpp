@@ -58,11 +58,11 @@ SerializedMesh CollisionCoordinatorWorker::SerializeMesh(AbstractMesh* mesh)
   }
 
   std::string geometryId;
-  if (mesh->type() == Node::Type::MESH) {
+  if (mesh->type() == IReflect::Type::MESH) {
     Mesh* _mesh = dynamic_cast<Mesh*>(mesh);
     geometryId  = _mesh->geometry() ? _mesh->geometry()->id : "";
   }
-  else if (mesh->type() == Node::Type::INSTANCEDMESH) {
+  else if (mesh->type() == IReflect::Type::INSTANCEDMESH) {
     InstancedMesh* _mesh = dynamic_cast<InstancedMesh*>(mesh);
     geometryId = (_mesh->sourceMesh() && _mesh->sourceMesh()->geometry()) ?
                    _mesh->sourceMesh()->geometry()->id :

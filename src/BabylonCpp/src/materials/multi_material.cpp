@@ -15,9 +15,9 @@ MultiMaterial::~MultiMaterial()
 {
 }
 
-Material::Type MultiMaterial::type() const
+IReflect::Type MultiMaterial::type() const
 {
-  return Material::Type::MULTIMATERIAL;
+  return IReflect::Type::MULTIMATERIAL;
 }
 
 // Properties
