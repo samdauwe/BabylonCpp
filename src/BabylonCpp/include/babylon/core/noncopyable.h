@@ -21,6 +21,6 @@ private:
 
 }; // end of class NonCopyable
 
-} // namespace BABYLON
+} // end of namespace BABYLON
 
 #endif // end of BABYLON_CORE_NONCOPYABLE_H

@@ -45,7 +45,7 @@ struct MoveOnCopy {
   {
     return std::move(_moveOnly);
   }
-};
+}; // end of struct MoveOnCopy
 
 } // end of namespace BABYLON
 

@@ -35,6 +35,6 @@ std::future<typename std::result_of<Func()>::type> spawn_task(Func func,
   return std::move(result);
 }
 
-} // namespace BABYLON
+} // end of namespace BABYLON
 
 #endif // end of BABYLON_CORE_DELEGATE_H

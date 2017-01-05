@@ -351,7 +351,7 @@ private:
       static_cast<T*>(object_ptr)->first->*static_cast<T*>(object_ptr)->second)(
       ::std::forward<A>(args)...);
   }
-};
+}; //  end of class delegate
 
 #if 0
 namespace _std {
@@ -367,6 +367,7 @@ struct hash<::delegate<R(A...)>> {
 };
 }
 #endif
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_CORE_DELEGATE_H

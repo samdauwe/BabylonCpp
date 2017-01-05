@@ -60,8 +60,9 @@ private:
   SharedQueue<Callback> _messageQueue;
   std::thread _thread;
   bool _done;
-};
 
-} // namespace BABYLON
+}; // end of class Active
+
+} // end of namespace BABYLON
 
 #endif // end of BABYLON_CORE_ACTIVE_H

@@ -39,7 +39,8 @@ public:
 
 private:
   std::array<value_type, 16> id_;
-};
+
+}; // end of class uuid
 
 } // end of namespace BABYLON
 
@@ -56,7 +57,7 @@ struct hash<BABYLON::uuid> {
       x ^= static_cast<size_t>(byte) + 0x9e3779b9 + (x << 6) + (x >> 2);
     return x;
   }
-};
+}; // end of struct hash
 
 } // end of namespace std
 

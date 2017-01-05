@@ -15,14 +15,14 @@ struct static_max;
 template <size_t arg>
 struct static_max<arg> {
   static const size_t value = arg;
-};
+}; // end of struct static_max<arg>
 
 template <size_t arg1, size_t arg2, size_t... others>
 struct static_max<arg1, arg2, others...> {
   static const size_t value = arg1 >= arg2 ?
                                 static_max<arg1, others...>::value :
                                 static_max<arg2, others...>::value;
-};
+}; // end of struct static_max<arg1, arg2, others...>
 
 template <typename... Ts>
 struct variant_helper;
@@ -52,7 +52,7 @@ struct variant_helper<F, Ts...> {
     else
       variant_helper<Ts...>::copy(old_t, old_v, new_v);
   }
-};
+}; // end of struct variant_helper
 
 template <>
 struct variant_helper<> {
@@ -66,7 +66,7 @@ struct variant_helper<> {
                           void* /*new_v*/)
   {
   }
-};
+}; // end of struct variant_helper<>
 
 template <typename... Ts>
 struct variant {
@@ -144,7 +144,7 @@ public:
   {
     helper_t::destroy(type_id, &data);
   }
-};
+}; // end of struct variant
 
 } // end of namespace BABYLON
 
