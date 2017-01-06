@@ -125,10 +125,10 @@ MinMax Tools::ExtractMinAndMax(const Float32Array& positions, size_t start,
                                size_t count, const Vector2& bias,
                                unsigned int stride)
 {
-  MinMax minMax = Tools::ExtractMinAndMax(positions, start, count, stride);
+  auto minMax = Tools::ExtractMinAndMax(positions, start, count, stride);
 
-  Vector3& minimum = minMax.min;
-  Vector3& maximum = minMax.max;
+  auto& minimum = minMax.min;
+  auto& maximum = minMax.max;
 
   minimum.x -= minimum.x * bias.x + bias.y;
   minimum.y -= minimum.y * bias.x + bias.y;
@@ -142,13 +142,14 @@ MinMax Tools::ExtractMinAndMax(const Float32Array& positions, size_t start,
 
 void Tools::LoadImage(
   const std::string& url, const std::function<void(const Image& img)>& onLoad,
-  const std::function<void(const std::string& msg)>& onError)
+  const std::function<void(const std::string& msg)>& onError,
+  bool flipVertically)
 {
   typedef std::unique_ptr<unsigned char, std::function<void(unsigned char*)>>
     stbi_ptr;
 
   int w, h, n;
-  stbi_set_flip_vertically_on_load(true);
+  stbi_set_flip_vertically_on_load(flipVertically);
   stbi_ptr data(stbi_load(url.c_str(), &w, &h, &n, STBI_rgb_alpha),
                 [](unsigned char* _data) {
                   if (_data) {
@@ -162,7 +163,7 @@ void Tools::LoadImage(
   }
 
   n = STBI_rgb_alpha;
-  Image image(data.get(), w * h * n, w, h, (n == 3) ? GL::RGB : GL::RGBA);
+  Image image(data.get(), w * h * n, w, h, n, (n == 3) ? GL::RGB : GL::RGBA);
   onLoad(image);
 }
 

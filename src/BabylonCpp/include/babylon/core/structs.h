@@ -85,24 +85,31 @@ struct Image {
   Image() : width(0), height(0), mode(0)
   {
   }
-  Image(unsigned char* buffer, int bufferLength, int _width, int _height,
-        unsigned int _mode)
+  Image(unsigned char* buffer, int bufferLength, int iWidth, int iHeight,
+        int iDepth, unsigned int iMode)
       : data(buffer, buffer + bufferLength)
-      , width(_width)
-      , height(_height)
-      , mode(_mode)
+      , width{iWidth}
+      , height{iHeight}
+      , depth{iDepth}
+      , mode{iMode}
   {
   }
-  Image(Uint8Array _data, int _width, int _height, unsigned int _mode)
-      : data(std::move(_data)), width(_width), height(_height), mode(_mode)
+  Image(Uint8Array iData, int iWidth, int iHeight, int iDepth,
+        unsigned int iMode)
+      : data(std::move(iData))
+      , width{iWidth}
+      , height{iHeight}
+      , depth{iDepth}
+      , mode{iMode}
   {
   }
   bool valid() const
   {
-    return data.size() > 0 && width > 0 && height > 0;
+    return data.size() > 0 && width > 0 && height > 0 && depth > 0;
   }
   Uint8Array data;
   int width, height;
+  int depth;
   unsigned int mode;
 }; // end of struct Image
 
