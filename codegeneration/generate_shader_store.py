@@ -18,6 +18,14 @@ def createDir(path):
         if exception.errno != errno.EEXIST:
             raise
 
+def prepareFilename(name):
+    """
+    Converts upper case characters to lower case and adds '_' in front.
+    """
+    import re
+    s = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s).lower()
+
 def shaderFilenameToVariableName(filename, isInclude = False):
     """
     Determines the variable name from the filename.
@@ -32,22 +40,33 @@ def shaderFilenameToVariableName(filename, isInclude = False):
         varName = varName.replace("FragmentShader", "PixelShader")
     return varName
 
-def processShaderFile(sourcedir, shaderPath, outputDir, isInclude = False):
+def processShaderFile(shaderPath, outputDir, definePath="BABYLON_SHADERS",
+                      isInclude = False):
     """
     Puts the shader file content into a header file.
     """
     import codecs
+    # name case fixes in output path
+    if "triPlanar" in outputDir:
+        outputDir = outputDir.replace("triPlanar", "triplanar")
     # read shader file contents
-    shaderFilename = os.path.basename(shaderPath)
+    shaderVarName = os.path.basename(shaderPath)
+    if "triplanar" in outputDir:
+        shaderVarName = shaderVarName.replace("triplanar", "triPlanar")
+    shaderFilename = prepareFilename(shaderVarName)
     lines = [line.rstrip('\n').rstrip('\r').decode("utf-8-sig") \
                                                 for line in open(shaderPath)]
     # generate header file content
     outputFileName = "%s.h" % shaderFilename.replace(".", "_")
-    defineName = "BABYLON_SHADERS_%s" % outputFileName.replace(".", "_").upper()
+    defineName = "%s_%s" % (definePath,
+                            outputFileName.replace(".", "_").upper())
     if isInclude:
-        defineName = defineName.replace("BABYLON_SHADERS_",
-                                        "BABYLON_SHADERS_SHADERS_INCLUDE_")
-    varName = shaderFilenameToVariableName(shaderFilename, isInclude)
+        defineName = defineName.replace("BABYLON_SHADERS",
+                                        "BABYLON_SHADERS_SHADERS_INCLUDE")
+    varName = shaderFilenameToVariableName(shaderVarName, isInclude)
+    if isInclude:
+        varName = shaderFilenameToVariableName(os.path.basename(shaderPath),
+                                               isInclude)
     eol = '\n'
     output = "#ifndef %s%s" % (defineName, eol)
     output += "#define %s%s%s" % (defineName, eol, eol)
@@ -113,6 +132,7 @@ def generateShadersStore(shaderFiles, outputDir,
     for shaderFile in shaderFiles:
         shaderFilename = os.path.basename(shaderFile)
         shaderNames.append(shaderFilenameToVariableName(shaderFilename))
+        shaderFilename = prepareFilename(shaderFilename)
         output += "#include <babylon/shaders/%s>%s" % ("%s.h" % \
                                         shaderFilename.replace(".", "_"), eol)
     output += "%snamespace BABYLON {%s%s" % (eol, eol, eol)
@@ -151,7 +171,7 @@ def generateIncludesShadersStore(shaderFiles, outputDir,
     output += "// end of BABYLON_MATERIALS_EFFECT_INCLUDES_SHADERS_STORE_H%s"  \
                                                                         % eol
     # write output to file
-    hdir = outputDir.replace("source", os.path.join("include", "babylon"))
+    hdir = rreplace(outputDir, "src", os.path.join("include", "babylon"), 1)
     outputFileLocation = os.path.join(hdir, headerFilename)
     with codecs.open(outputFileLocation, "w", "utf-8-sig") as file:
         file.write(output)
@@ -161,6 +181,7 @@ def generateIncludesShadersStore(shaderFiles, outputDir,
     for shaderFile in shaderFiles:
         shaderFilename = os.path.basename(shaderFile)
         shaderNames.append(shaderFilenameToVariableName(shaderFilename, True))
+        shaderFilename = prepareFilename(shaderFilename)
         output += "#include <babylon/shaders/shadersinclude/%s>%s" % ("%s.h" % \
                                         shaderFilename.replace(".", "_"), eol)
     output += "%snamespace BABYLON {%s%s" % (eol, eol, eol)
@@ -205,128 +226,172 @@ def getDirectoriesInDir(directory):
             directories[d] = path
     return directories
 
-def generateShadersStores(shadersInputDir, shadersOutputDir, shadersStoreDir,
-                          processProceduralTextures = False,
-                          processMaterialsLibrary = False):
+def generateShadersStores(shadersInputDir, shadersOutputDir):
     """
-    Generates the shaders stores files from the Babylon.js shaders input folder.
+    Generates the shaders stores files from the Babylon.js shaders folder.
     """
     #### process the shader files ####
     import time
     # - standard shaders
+    shadersInputDir = os.path.join(inputDir, "src", "Shaders")
+    shadersOutputDir = os.path.join(outputDir, "..", "BabylonCpp", "include",
+                                    "babylon", "shaders")
+    shadersStoreDir = os.path.join(outputDir, "..", "BabylonCpp", "src",
+                                   "materials")
     shaderFiles = getFilesnamesInDir(shadersInputDir)
     dlc = len(shaderFiles)
-    # - procedural textures
-    ptlc = 0
-    if processProceduralTextures:
-        proceduralTexturesInputDir = os.path.join(shadersInputDir, "../../",
-                                                    "proceduralTexturesLibrary",
-                                                    "proceduralTextures")
-        if os.path.isdir(proceduralTexturesInputDir):
-            procTexturesDirs = getDirectoriesInDir(proceduralTexturesInputDir)
-            for shaderName, path in procTexturesDirs.items():
-                proceduralTextures = getFilesnamesInDir(path)
-                shaderFiles.update(proceduralTextures)
-                ptlc += len(proceduralTextures)
-    # - materials library
-    mlc = 0
-    if processMaterialsLibrary:
-        materialsLibraryInputDir = os.path.join(shadersInputDir, "../../",
-                                                    "materialsLibrary",
-                                                    "materials")
-        if os.path.isdir(materialsLibraryInputDir):
-            materialsLibraryDirs = getDirectoriesInDir(materialsLibraryInputDir)
-            for shaderName, path in materialsLibraryDirs.items():
-                materials = getFilesnamesInDir(path)
-                shaderFiles.update(materials)
-                mlc += len(materials)
+    print "Found %d standard shaders" % dlc
     # - sort shader files by filename
     shaderFiles = sortDictionaryByKey(shaderFiles)
     # - process shader files
+    indent = ' ' * 6
     tic = time.time()
-    for filename, shaderPath in shaderFiles.items():
-        outputFileLocation = processShaderFile(shadersInputDir, shaderPath,
-                                               shadersOutputDir)
-        print "Written file: %s" % outputFileLocation
+    for shaderFileName, shaderPath in shaderFiles.items():
+        processShaderFile(shaderPath, shadersOutputDir)
+        print "%s|-Processed shader file: %s" % (indent, shaderFileName)
     toc = time.time()
-    indent = ' ' * 11
-    print "Processed %d shader files in %ss" % (len(shaderFiles), (toc - tic))
-    print "%s|-%d shaders found in default library" % (indent, dlc)
-    print "%s|-%d shaders found in procedural textures library" % (indent, ptlc)
-    print "%s|-%d shaders found in materials library" % (indent, mlc)
-    # generate the shader store
+    print "Processed %d shader files in %ss" % (dlc, (toc - tic))
+    # - generate the shader store
     generateShadersStore(shaderFiles, shadersStoreDir)
-
+    print "Generated shader store"
     ### process the includes shader files ###
     shadersInputDir = os.path.join(shadersInputDir, "ShadersInclude")
     shadersOutputDir = os.path.join(shadersOutputDir, "shadersinclude")
     createDir(shadersOutputDir)
     shaderFiles = getFilesnamesInDir(shadersInputDir)
+    slc = len(shaderFiles)
+    print "Found %d standard shaders includes" % slc
+    # - sort shader files by filename
+    shaderFiles = sortDictionaryByKey(shaderFiles)
     tic = time.time()
-    for filename, shaderPath in shaderFiles.items():
-        outputFileLocation = processShaderFile(shadersInputDir, shaderPath,
-                                               shadersOutputDir, True)
-        print "Written file: %s" % outputFileLocation
+    for shaderFileName, shaderPath in shaderFiles.items():
+        processShaderFile(shaderPath, shadersOutputDir, "BABYLON_SHADERS", True)
+        print "%s|-Processed shader incude file: %s" % (indent, shaderFileName)
     toc = time.time()
+    print "Processed %d shader include files in %ss" % (slc, (toc - tic))
     # generate the includes shader store
     generateIncludesShadersStore(shaderFiles, shadersStoreDir)
-    print "Processed %d includes shader files in %ss" % (len(shaderFiles),
-                                                         (toc - tic))
+    print "Generated shader include store"
+
+def generateProceduralTexturesShaderHeaders(inputDir, outputDir):
+    """
+    Generates procedural textures library header files.
+    """
+    import time
+    proceduralTexturesInputDir = os.path.join(inputDir,
+                                        "proceduralTexturesLibrary", "src")
+    proceduralTexturesOuputDir = os.path.join(outputDir, "..",
+                                        "ProceduralTexturesLibrary", "include",
+                                        "babylon", "proceduraltextureslibrary")
+    definePathPrefix = "BABYLON_PROCEDURAL_TEXTURES_LIBRARY"
+    shaderInputFiles = {}
+    shaderOutputFiles = {}
+    ptlc = 0
+    if os.path.isdir(proceduralTexturesInputDir):
+        materialsLibraryDirs = getDirectoriesInDir(proceduralTexturesInputDir)
+        for shaderName, path in materialsLibraryDirs.items():
+            proceduralTextures = getFilesnamesInDir(path)
+            shaderInputFiles.update(proceduralTextures)
+            for shaderFileName, shaderPath in proceduralTextures.items():
+                shaderOutputFiles[shaderFileName] = \
+                            os.path.join(proceduralTexturesOuputDir, shaderName)
+            ptlc += len(proceduralTextures)
+    print "Found %d shaders in procedural textures library" % ptlc
+    # - process shader files
+    indent = ' ' * 6
+    tic = time.time()
+    for shaderFileName, shaderInputPath in shaderInputFiles.items():
+        definePath = "%s_%s" % (definePathPrefix, os.path.basename(
+                                shaderOutputFiles[shaderFileName]).upper())
+        processShaderFile(shaderInputPath, shaderOutputFiles[shaderFileName],
+                          definePath)
+        print "%s|-Processed shader file: %s" % (indent, shaderFileName)
+    toc = time.time()
+    print "Processed %d shader files in %ss" % (ptlc, (toc - tic))
+
+def generateMaterialsLibraryShaderHeaders(inputDir, outputDir):
+    """
+    Generates materials library header files.
+    """
+    import time
+    materialsLibraryInputDir = os.path.join(inputDir,
+                                        "materialsLibrary", "src")
+    materialsLibraryOuputDir = os.path.join(outputDir, "..",
+                                        "MaterialsLibrary", "include",
+                                        "babylon", "materialslibrary")
+    definePathPrefix = "BABYLON_MATERIALS_LIBRARY"
+    shaderInputFiles = {}
+    shaderOutputFiles = {}
+    mlc = 0
+    if os.path.isdir(materialsLibraryInputDir):
+        materialsLibraryDirs = getDirectoriesInDir(materialsLibraryInputDir)
+        for shaderName, path in materialsLibraryDirs.items():
+            materials = getFilesnamesInDir(path)
+            shaderInputFiles.update(materials)
+            for shaderFileName, shaderPath in materials.items():
+                shaderOutputFiles[shaderFileName] = \
+                            os.path.join(materialsLibraryOuputDir, shaderName)
+            mlc += len(materials)
+    print "Found %d shaders in materials library" % mlc
+    # - process shader files
+    indent = ' ' * 6
+    tic = time.time()
+    for shaderFileName, shaderInputPath in shaderInputFiles.items():
+        definePath = "%s_%s" % (definePathPrefix, os.path.basename(
+                                shaderOutputFiles[shaderFileName]).upper())
+        processShaderFile(shaderInputPath, shaderOutputFiles[shaderFileName],
+                          definePath)
+        print "%s|-Processed shader file: %s" % (indent, shaderFileName)
+    toc = time.time()
+    print "Processed %d shader files in %ss" % (mlc, (toc - tic))
 
 if __name__ == "__main__":
     from optparse import OptionParser
 
     parser = OptionParser(usage="usage: %prog [options] inputDir outputDir",
                           version="%prog 1.0")
-    parser.add_option("-i", "--inputDir", action="store",
-                      dest="shadersInputDir", type="string",
-                      help="Babylon.js shaders path containing the " \
-                           "source shaders")
+    parser.add_option("-i", "--inputDir", action="store", dest="inputDir",
+                      type="string", help="Babylon.js root path")
     parser.add_option("-o", "--outputDir", action="store",
-                      dest="shadersOutputDir", type="string",
-                      help="Path where the C++ shader files should bes stored.")
+                      dest="outputDir", type="string",
+                      help="BabylonCpp root path")
     (options, args) = parser.parse_args()
 
     # set default values when input is missing
-    if not options.shadersInputDir:
-        options.shadersInputDir = os.path.join(os.getcwd(), "..", "..",
-                                               "Babylon.js-2.5", "src",
-                                               "Shaders")
-        args += [options.shadersInputDir]
-    if not options.shadersOutputDir:
-        options.shadersOutputDir = os.path.join(os.getcwd(), "..", "src",
-                                            "BabylonCpp", "include", "babylon",
-                                            "shaders")
-        args += [options.shadersOutputDir]
+    if not options.inputDir:
+        options.inputDir = os.path.join(os.getcwd(), "..", "..", "..",
+                                        "Projects", "Babylon.js-2.5")
+        args += [options.inputDir]
+    if not options.outputDir:
+        options.outputDir = os.path.join(os.getcwd(), "..", "src", "BabylonCpp")
+        args += [options.outputDir]
 
     # variables needed by the generator
-    shadersInputDir = None
-    shadersOutputDir = None
-    shadersStoreDir = None
+    inputDir = None
+    outputDir = None
 
     # check arguments
     if len(args) != 2:
-        if not options.shadersInputDir and not options.shadersOutputDir:
+        if not options.inputDir and not options.outputDir:
             parser.error("Incorrect number of arguments")
 
     # check if the shaders input folder exists
-    if options.shadersInputDir and os.path.isdir(options.shadersInputDir):
-        shadersInputDir = options.shadersInputDir
+    if options.inputDir and os.path.isdir(options.inputDir):
+        inputDir = options.inputDir
     else:
         parser.error("Incorrect input directory")
 
     # check if the shaders output folder exists
-    if options.shadersOutputDir and os.path.isdir(options.shadersOutputDir):
-        shadersOutputDir = options.shadersOutputDir
-        tmp = shadersOutputDir.replace(os.path.join("include", "babylon",
-                                                    "shaders"),
-                                       os.path.join("src", "materials"))
-        if os.path.isdir(tmp):
-            shadersStoreDir = tmp
-        else:
+    if options.outputDir and os.path.isdir(options.outputDir):
+        tmp = os.path.join(options.outputDir, "src", "materials")
+        if not os.path.isdir(tmp):
             parser.error("Incorrect output directory")
+        else:
+            outputDir = options.outputDir
     else:
         parser.error("Incorrect output directory")
 
     # generate the shader store
-    generateShadersStores(shadersInputDir, shadersOutputDir, shadersStoreDir)
+    generateShadersStores(inputDir, outputDir)
+    #generateProceduralTexturesShaderHeaders(inputDir, outputDir)
+    #generateMaterialsLibraryShaderHeaders(inputDir, outputDir)
