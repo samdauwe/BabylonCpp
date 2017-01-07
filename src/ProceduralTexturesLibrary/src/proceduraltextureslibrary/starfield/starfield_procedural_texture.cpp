@@ -1,4 +1,4 @@
-#include <babylon/proceduraltextureslibrary/starfield/star_field_procedural_texture.h>
+#include <babylon/proceduraltextureslibrary/starfield/starfield_procedural_texture.h>
 
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
