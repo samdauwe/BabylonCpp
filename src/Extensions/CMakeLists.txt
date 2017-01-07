@@ -15,12 +15,12 @@ project(${TARGET} C CXX)
 message(STATUS "Lib ${TARGET}")
 
 # Namespace
-set(BABYLON_EXTENSIONS_NAMESPACE babylon)
+set(BABYLON_NAMESPACE babylon)
 
 # Set API export file and macro
-string(TOUPPER ${BABYLON_EXTENSIONS_NAMESPACE} TARGET_UPPER)
-set(FEATURE_FILE "include/${BABYLON_EXTENSIONS_NAMESPACE}/${BABYLON_EXTENSIONS_NAMESPACE}_features.h")
-set(EXPORT_FILE  "include/${BABYLON_EXTENSIONS_NAMESPACE}/${BABYLON_EXTENSIONS_NAMESPACE}_api.h")
+string(TOUPPER ${BABYLON_NAMESPACE} TARGET_UPPER)
+set(FEATURE_FILE "include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_features.h")
+set(EXPORT_FILE  "include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_api.h")
 set(EXPORT_MACRO "${TARGET_UPPER}_SHARED_EXPORT")
 
 # Add compiler definitions
@@ -63,7 +63,7 @@ configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${BABYLON_NAMESP
 # ============================================================================ #
 
 # Include, Source and Tests path
-set(INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/${BABYLON_EXTENSIONS_NAMESPACE}")
+set(INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/${BABYLON_NAMESPACE}")
 set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(TESTS_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 
