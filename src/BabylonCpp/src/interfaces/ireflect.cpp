@@ -56,6 +56,8 @@ std::string IReflect::TypeToString(Type type)
       return "StandardMaterial";
     case Type::PBRMATERIAL:
       return "PBRMaterial";
+    case Type::NORMALMATERIAL:
+      return "NormalMaterial";
     // Meshes
     case Type::ABSTRACTMESH:
       return "AbstractMesh";
@@ -79,7 +81,7 @@ std::string IReflect::TypeToString(Type type)
 
 any IReflect::getProperty(const std::string& targetProperty)
 {
-  any property = this;
+  any property = dynamic_cast<IReflect*>(this);
 
   return getProperty(property, targetProperty);
 }
@@ -93,8 +95,8 @@ any IReflect::getProperty(const any& property,
   }
 
   // IAnimatable
-  if (property.is<IAnimatable*>()) {
-    switch (property._<IAnimatable*>()->type()) {
+  if (property.is<IReflect*>()) {
+    switch (property._<IReflect*>()->type()) {
       // Meshes
       case Type::ABSTRACTMESH:
       case Type::GROUNDMESH:
@@ -116,7 +118,30 @@ any IReflect::getProperty(const any& property,
     return _property;
   }
 
-  // Vector 3
+  // Float
+  if (property.is<float*>()) {
+    _property = &property._<float*>();
+    return _property;
+  }
+
+  // Quaternion
+  if (property.is<Quaternion*>()) {
+    if (targetProperty == "x") {
+      _property = &property._<Quaternion*>()->x;
+    }
+    else if (targetProperty == "y") {
+      _property = &property._<Quaternion*>()->y;
+    }
+    else if (targetProperty == "z") {
+      _property = &property._<Quaternion*>()->z;
+    }
+    else if (targetProperty == "w") {
+      _property = &property._<Quaternion*>()->w;
+    }
+    return _property;
+  }
+
+  // Vector3
   if (property.is<Vector3*>()) {
     if (targetProperty == "x") {
       _property = &property._<Vector3*>()->x;
@@ -126,6 +151,37 @@ any IReflect::getProperty(const any& property,
     }
     else if (targetProperty == "z") {
       _property = &property._<Vector3*>()->z;
+    }
+    return _property;
+  }
+
+  // Vector2
+  if (property.is<Vector2*>()) {
+    if (targetProperty == "x") {
+      _property = &property._<Vector2*>()->x;
+    }
+    else if (targetProperty == "y") {
+      _property = &property._<Vector2*>()->y;
+    }
+    return _property;
+  }
+
+  // Size
+  if (property.is<size_t*>()) {
+    _property = &property._<size_t*>();
+    return _property;
+  }
+
+  // Color3
+  if (property.is<Color3*>()) {
+    if (targetProperty == "x") {
+      _property = &property._<Color3*>()->r;
+    }
+    else if (targetProperty == "y") {
+      _property = &property._<Color3*>()->g;
+    }
+    else if (targetProperty == "z") {
+      _property = &property._<Color3*>()->b;
     }
     return _property;
   }
@@ -146,18 +202,33 @@ void IReflect::setProperty(const any& oldProperty,
     return;
   }
 
-  // Vector3 property update
-  if (_propertyToUpdate.is<Vector3*>() && newProperty.is<Vector3 const*>()) {
-    *_propertyToUpdate._<Vector3*>() = *newProperty._<Vector3 const*>();
+  // Float property update
+  if (_propertyToUpdate.is<float*>() && newProperty.is<float const*>()) {
+    *_propertyToUpdate._<float*>() = *newProperty._<float const*>();
   }
   // Quaternion property update
-  if (_propertyToUpdate.is<Quaternion*>()
-      && newProperty.is<Quaternion const*>()) {
+  else if (_propertyToUpdate.is<Quaternion*>()
+           && newProperty.is<Quaternion const*>()) {
     *_propertyToUpdate._<Quaternion*>() = *newProperty._<Quaternion const*>();
   }
-  // Float property update
-  else if (_propertyToUpdate.is<float*>() && newProperty.is<float const*>()) {
-    *_propertyToUpdate._<float*>() = *newProperty._<float const*>();
+  // Vector3 property update
+  else if (_propertyToUpdate.is<Vector3*>()
+           && newProperty.is<Vector3 const*>()) {
+    *_propertyToUpdate._<Vector3*>() = *newProperty._<Vector3 const*>();
+  }
+  // Vector2 property update
+  else if (_propertyToUpdate.is<Vector2*>()
+           && newProperty.is<Vector2 const*>()) {
+    *_propertyToUpdate._<Vector2*>() = *newProperty._<Vector2 const*>();
+  }
+  // Size property update
+  else if (_propertyToUpdate.is<size_t*>() && newProperty.is<size_t const*>()) {
+    *_propertyToUpdate._<size_t*>() = *newProperty._<size_t const*>();
+  }
+  // Color3 property update
+  else if (_propertyToUpdate.is<Color3*>()
+           && newProperty.is<Color3 const*>()) {
+    *_propertyToUpdate._<Color3*>() = *newProperty._<Color3 const*>();
   }
 }
 

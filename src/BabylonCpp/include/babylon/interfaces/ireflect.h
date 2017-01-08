@@ -36,6 +36,7 @@ public:
     SHADERMATERIAL   = 102,
     STANDARDMATERIAL = 103,
     PBRMATERIAL      = 104,
+    NORMALMATERIAL   = 105,
     // Meshes
     ABSTRACTMESH  = 150,
     GROUNDMESH    = 151,
