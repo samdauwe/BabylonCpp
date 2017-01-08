@@ -318,6 +318,25 @@ inline bool erase(C& c, const T& elem)
   return false;
 }
 
+template <typename C, typename FwdIt, typename P>
+void erase_if(C& container, FwdIt it, const FwdIt end, P predicate)
+{
+  while (it != end) {
+    if (predicate(*it)) {
+      container.erase(it++);
+    }
+    else {
+      ++it;
+    }
+  }
+}
+
+template <typename C, typename P>
+void erase_if(C& container, P predicate)
+{
+  erase_if(container, container.begin(), container.end(), predicate);
+}
+
 /**
  * Searches the array for the specified item, and returns its position.
  * Returns -1 if the item is not found.
