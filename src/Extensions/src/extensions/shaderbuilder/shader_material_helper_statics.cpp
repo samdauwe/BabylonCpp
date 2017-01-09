@@ -6,51 +6,53 @@ namespace Extensions {
 constexpr bool ShaderMaterialHelperStatics::Dark;
 constexpr bool ShaderMaterialHelperStatics::Light;
 
-constexpr const char* ShaderMaterialHelperStatics::PrecisionHighMode;
-constexpr const char* ShaderMaterialHelperStatics::PrecisionMediumMode;
+const std::string ShaderMaterialHelperStatics::PrecisionHighMode   = "highp";
+const std::string ShaderMaterialHelperStatics::PrecisionMediumMode = "mediump";
 
-constexpr const char* ShaderMaterialHelperStatics::face_back;
-constexpr const char* ShaderMaterialHelperStatics::face_front;
+const std::string ShaderMaterialHelperStatics::face_back  = "!gl_FrontFacing";
+const std::string ShaderMaterialHelperStatics::face_front = "gl_FrontFacing";
 
-constexpr const char* ShaderMaterialHelperStatics::AttrPosition;
-constexpr const char* ShaderMaterialHelperStatics::AttrNormal;
-constexpr const char* ShaderMaterialHelperStatics::AttrUv;
-constexpr const char* ShaderMaterialHelperStatics::AttrUv2;
+const std::string ShaderMaterialHelperStatics::AttrPosition = "position";
+const std::string ShaderMaterialHelperStatics::AttrNormal   = "normal";
+const std::string ShaderMaterialHelperStatics::AttrUv       = "uv";
+const std::string ShaderMaterialHelperStatics::AttrUv2      = "uv2";
 
-constexpr const char* ShaderMaterialHelperStatics::AttrTypeForPosition;
-constexpr const char* ShaderMaterialHelperStatics::AttrTypeForNormal;
-constexpr const char* ShaderMaterialHelperStatics::AttrTypeForUv;
-constexpr const char* ShaderMaterialHelperStatics::AttrTypeForUv2;
+const std::string ShaderMaterialHelperStatics::AttrTypeForPosition = "vec3";
+const std::string ShaderMaterialHelperStatics::AttrTypeForNormal   = "vec3";
+const std::string ShaderMaterialHelperStatics::AttrTypeForUv       = "vec2";
+const std::string ShaderMaterialHelperStatics::AttrTypeForUv2      = "vec2";
 
-constexpr const char* ShaderMaterialHelperStatics::uniformView;
-constexpr const char* ShaderMaterialHelperStatics::uniformWorld;
-constexpr const char* ShaderMaterialHelperStatics::uniformWorldView;
-constexpr const char* ShaderMaterialHelperStatics::uniformViewProjection;
-constexpr const char* ShaderMaterialHelperStatics::uniformWorldViewProjection;
+const std::string ShaderMaterialHelperStatics::uniformView      = "view";
+const std::string ShaderMaterialHelperStatics::uniformWorld     = "world";
+const std::string ShaderMaterialHelperStatics::uniformWorldView = "worldView";
+const std::string ShaderMaterialHelperStatics::uniformViewProjection
+  = "viewProjection";
+const std::string ShaderMaterialHelperStatics::uniformWorldViewProjection
+  = "worldViewProjection";
 
-constexpr const char* ShaderMaterialHelperStatics::uniformStandardType;
-constexpr const char* ShaderMaterialHelperStatics::uniformFlags;
+const std::string ShaderMaterialHelperStatics::uniformStandardType = "mat4";
+const std::string ShaderMaterialHelperStatics::uniformFlags        = "flags";
 
-constexpr const char* ShaderMaterialHelperStatics::Mouse;
-constexpr const char* ShaderMaterialHelperStatics::Screen;
-constexpr const char* ShaderMaterialHelperStatics::Camera;
-constexpr const char* ShaderMaterialHelperStatics::Look;
+const std::string ShaderMaterialHelperStatics::Mouse  = "mouse";
+const std::string ShaderMaterialHelperStatics::Screen = "screen";
+const std::string ShaderMaterialHelperStatics::Camera = "camera";
+const std::string ShaderMaterialHelperStatics::Look   = "look";
 
-constexpr const char* ShaderMaterialHelperStatics::Time;
-constexpr const char* ShaderMaterialHelperStatics::GlobalTime;
-constexpr const char* ShaderMaterialHelperStatics::Position;
-constexpr const char* ShaderMaterialHelperStatics::WorldPosition;
+const std::string ShaderMaterialHelperStatics::Time          = "time";
+const std::string ShaderMaterialHelperStatics::GlobalTime    = "gtime";
+const std::string ShaderMaterialHelperStatics::Position      = "pos";
+const std::string ShaderMaterialHelperStatics::WorldPosition = "wpos";
 
-constexpr const char* ShaderMaterialHelperStatics::Normal;
-constexpr const char* ShaderMaterialHelperStatics::WorldNormal;
-constexpr const char* ShaderMaterialHelperStatics::Uv;
-constexpr const char* ShaderMaterialHelperStatics::Uv2;
-constexpr const char* ShaderMaterialHelperStatics::Center;
+const std::string ShaderMaterialHelperStatics::Normal      = "nrm";
+const std::string ShaderMaterialHelperStatics::WorldNormal = "wnrm";
+const std::string ShaderMaterialHelperStatics::Uv          = "vuv";
+const std::string ShaderMaterialHelperStatics::Uv2         = "vuv2";
+const std::string ShaderMaterialHelperStatics::Center      = "center";
 
-constexpr const char* ShaderMaterialHelperStatics::ReflectMatrix;
+const std::string ShaderMaterialHelperStatics::ReflectMatrix = "refMat";
 
-constexpr const char* ShaderMaterialHelperStatics::Texture2D;
-constexpr const char* ShaderMaterialHelperStatics::TextureCube;
+const std::string ShaderMaterialHelperStatics::Texture2D   = "txtRef_";
+const std::string ShaderMaterialHelperStatics::TextureCube = "cubeRef_";
 
 int ShaderMaterialHelperStatics::IdentityHelper;
 

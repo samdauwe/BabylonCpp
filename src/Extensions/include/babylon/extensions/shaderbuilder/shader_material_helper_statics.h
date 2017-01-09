@@ -10,52 +10,51 @@ struct BABYLON_SHARED_EXPORT ShaderMaterialHelperStatics {
   static constexpr bool Dark  = false;
   static constexpr bool Light = true;
 
-  static constexpr const char* PrecisionHighMode   = "highp";
-  static constexpr const char* PrecisionMediumMode = "mediump";
+  static const std::string PrecisionHighMode;
+  static const std::string PrecisionMediumMode;
 
-  static constexpr const char* face_back  = "!gl_FrontFacing";
-  static constexpr const char* face_front = "gl_FrontFacing";
+  static const std::string face_back;
+  static const std::string face_front;
 
-  static constexpr const char* AttrPosition = "position";
-  static constexpr const char* AttrNormal   = "normal";
-  static constexpr const char* AttrUv       = "uv";
-  static constexpr const char* AttrUv2      = "uv2";
+  static const std::string AttrPosition;
+  static const std::string AttrNormal;
+  static const std::string AttrUv;
+  static const std::string AttrUv2;
 
-  static constexpr const char* AttrTypeForPosition = "vec3";
-  static constexpr const char* AttrTypeForNormal   = "vec3";
-  static constexpr const char* AttrTypeForUv       = "vec2";
-  static constexpr const char* AttrTypeForUv2      = "vec2";
+  static const std::string AttrTypeForPosition;
+  static const std::string AttrTypeForNormal;
+  static const std::string AttrTypeForUv;
+  static const std::string AttrTypeForUv2;
 
-  static constexpr const char* uniformView           = "view";
-  static constexpr const char* uniformWorld          = "world";
-  static constexpr const char* uniformWorldView      = "worldView";
-  static constexpr const char* uniformViewProjection = "viewProjection";
-  static constexpr const char* uniformWorldViewProjection
-    = "worldViewProjection";
+  static const std::string uniformView;
+  static const std::string uniformWorld;
+  static const std::string uniformWorldView;
+  static const std::string uniformViewProjection;
+  static const std::string uniformWorldViewProjection;
 
-  static constexpr const char* uniformStandardType = "mat4";
-  static constexpr const char* uniformFlags        = "flags";
+  static const std::string uniformStandardType;
+  static const std::string uniformFlags;
 
-  static constexpr const char* Mouse  = "mouse";
-  static constexpr const char* Screen = "screen";
-  static constexpr const char* Camera = "camera";
-  static constexpr const char* Look   = "look";
+  static const std::string Mouse;
+  static const std::string Screen;
+  static const std::string Camera;
+  static const std::string Look;
 
-  static constexpr const char* Time          = "time";
-  static constexpr const char* GlobalTime    = "gtime";
-  static constexpr const char* Position      = "pos";
-  static constexpr const char* WorldPosition = "wpos";
+  static const std::string Time;
+  static const std::string GlobalTime;
+  static const std::string Position;
+  static const std::string WorldPosition;
 
-  static constexpr const char* Normal      = "nrm";
-  static constexpr const char* WorldNormal = "wnrm";
-  static constexpr const char* Uv          = "vuv";
-  static constexpr const char* Uv2         = "vuv2";
-  static constexpr const char* Center      = "center";
+  static const std::string Normal;
+  static const std::string WorldNormal;
+  static const std::string Uv;
+  static const std::string Uv2;
+  static const std::string Center;
 
-  static constexpr const char* ReflectMatrix = "refMat";
+  static const std::string ReflectMatrix;
 
-  static constexpr const char* Texture2D   = "txtRef_";
-  static constexpr const char* TextureCube = "cubeRef_";
+  static const std::string Texture2D;
+  static const std::string TextureCube;
 
   static int IdentityHelper;
 }; // end of struct ShaderMaterialHelperStatics
