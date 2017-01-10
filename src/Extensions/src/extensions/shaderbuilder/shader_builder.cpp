@@ -1,11 +1,28 @@
 #include <babylon/extensions/shaderbuilder/shader_builder.h>
 
 #include <babylon/core/string.h>
+#include <babylon/extensions/shaderbuilder/helper.h>
+#include <babylon/extensions/shaderbuilder/icolor.h>
+#include <babylon/extensions/shaderbuilder/ieffect.h>
+#include <babylon/extensions/shaderbuilder/ilight.h>
+#include <babylon/extensions/shaderbuilder/imap.h>
+#include <babylon/extensions/shaderbuilder/inut.h>
+#include <babylon/extensions/shaderbuilder/irange.h>
+#include <babylon/extensions/shaderbuilder/ireflect_map.h>
+#include <babylon/extensions/shaderbuilder/ireplace_color.h>
 #include <babylon/extensions/shaderbuilder/shader.h>
 #include <babylon/extensions/shaderbuilder/shader_material_helper_statics.h>
 
 namespace BABYLON {
 namespace Extensions {
+
+ShaderBuilder::ShaderBuilder()
+{
+}
+
+ShaderBuilder::~ShaderBuilder()
+{
+}
 
 void ShaderBuilder::PrepareBeforeMaterialBuild()
 {
@@ -560,6 +577,371 @@ void ShaderBuilder::PrepareBeforePostProcessBuild()
   oss << "   if(discardState == 0) gl_FragColor = result; \n";
   oss << "}";
   Fragment.emplace_back(oss.str());
+}
+
+ShaderMaterial* ShaderBuilder::PrepareMaterial(ShaderMaterial* /*material*/,
+                                               Scene* /*scene*/)
+{
+  return nullptr;
+}
+
+std::string ShaderBuilder::Build()
+{
+  Shader::Me->Parent->Setting = Shader::Me->Setting;
+  Shader::Me                  = Shader::Me->Parent;
+
+  return Body;
+}
+
+std::string ShaderBuilder::BuildVertex()
+{
+  Shader::Me->Parent->Setting = Shader::Me->Setting;
+  Shader::Me                  = Shader::Me->Parent;
+
+  return VertexBody;
+}
+
+ShaderBuilder& ShaderBuilder::SetUniform(const std::string& name,
+                                         const std::string& type)
+{
+  if (Shader::Me->VertexUniforms.empty()) {
+    Shader::Me->VertexUniforms = "";
+  }
+  if (Shader::Me->FragmentUniforms.empty()) {
+    Shader::Me->FragmentUniforms = "";
+  }
+
+  VertexUniforms += "uniform " + type + " " + name + ";\n";
+  FragmentUniforms += "uniform " + type + " " + name + ";\n";
+
+  return *this;
+}
+
+ShaderMaterial* ShaderBuilder::BuildMaterial(Scene* /*scene*/)
+{
+  return nullptr;
+}
+
+PostProcess* ShaderBuilder::BuildPostProcess(Camera* /*camera*/,
+                                             Scene* /*scene*/, float /*scale*/,
+                                             const std::string& /*option*/)
+{
+  return nullptr;
+}
+
+ShaderBuilder& ShaderBuilder::Event(int index, const std::string& mat)
+{
+  Shader::Me->Setting.Flags = true;
+
+  ++Shader::Indexer;
+
+  std::ostringstream oss;
+  oss << Shader::Def(Body, "");
+  oss << "  if ( floor(mod( ";
+  oss << ShaderMaterialHelperStatics::uniformFlags;
+  oss << "/pow(2.,";
+  oss << Shader::Print(index);
+  oss << "),2.)) == 1.) { ";
+  oss << mat;
+  oss << " } ";
+
+  Body = oss.str();
+
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::EventVertex(int index, const std::string& mat)
+{
+  Shader::Me->Setting.Flags  = true;
+  Shader::Me->Setting.Vertex = true;
+  Shader::Indexer++;
+
+  std::ostringstream oss;
+  oss << Shader::Def(VertexBody, "");
+  oss << " if( floor(mod( ";
+  oss << ShaderMaterialHelperStatics::uniformFlags;
+  oss << "/pow(2.,";
+  oss << Shader::Print(index);
+  oss << "),2.)) == 1. ){ ";
+  oss << mat;
+  oss << "}";
+
+  VertexBody = oss.str();
+
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::Transparency()
+{
+  Shader::Me->Setting.Transparency = true;
+
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::PostEffect1(size_t id, const std::string& effect)
+{
+  if (id >= Shader::Me->PostEffect1Effects.size()) {
+    Shader::Me->PostEffect1Effects.resize(id + 1);
+  }
+  Shader::Me->PostEffect1Effects[id] = effect;
+
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::PostEffect2(size_t id, const std::string& effect)
+{
+  if (id >= Shader::Me->PostEffect2Effects.size()) {
+    Shader::Me->PostEffect2Effects.resize(id + 1);
+  }
+  Shader::Me->PostEffect2Effects[id] = effect;
+
+  return *this;
+}
+
+ShaderBuilder&
+ShaderBuilder::ImportSamplers(const std::vector<std::string>& txts)
+{
+  std_util::concat(Shader::Me->PPSSamplers, txts);
+
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::Wired()
+{
+  Shader::Me->Setting.Wire = true;
+
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::VertexShader(const std::string& mat)
+{
+  VertexBody = Shader::Def(VertexBody, "");
+  VertexBody += mat;
+
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::Solid(const IColor& iColor)
+{
+  IColor color;
+  color.a = Shader::Def(iColor.a, 1.f);
+  color.r = Shader::Def(iColor.r, 0.f);
+  color.g = Shader::Def(iColor.g, 0.f);
+  color.b = Shader::Def(iColor.b, 0.f);
+
+  std::ostringstream oss;
+  oss << Shader::Def(Body, "");
+  oss << " result = vec4(";
+  oss << Shader::Print(color.r) << ",";
+  oss << Shader::Print(color.g) << ",";
+  oss << Shader::Print(color.b) << ",";
+  oss << Shader::Print(color.a) << ");";
+
+  Body = oss.str();
+
+  return *this;
+}
+
+int ShaderBuilder::GetMapIndex(const std::string key)
+{
+  auto it = std::find_if(
+    Shader::Me->Setting.Texture2Ds.begin(),
+    Shader::Me->Setting.Texture2Ds.end(),
+    [&key](const ITexture& texture) { return texture.key == key; });
+
+  return (it == Shader::Me->Setting.Texture2Ds.end()) ?
+           -1 :
+           static_cast<int>(it - Shader::Me->Setting.Texture2Ds.begin());
+}
+
+int ShaderBuilder::GetCubeMapIndex(const std::string key)
+{
+  auto it = std::find_if(
+    Shader::Me->Setting.TextureCubes.begin(),
+    Shader::Me->Setting.TextureCubes.end(),
+    [&key](const ITexture& texture) { return texture.key == key; });
+
+  return (it == Shader::Me->Setting.TextureCubes.end()) ?
+           -1 :
+           static_cast<int>(it - Shader::Me->Setting.TextureCubes.begin());
+}
+
+std::string Nut(std::string& /*value*/, const INut& /*option*/)
+{
+  return "";
+}
+
+ShaderBuilder& ShaderBuilder::Map(const IMap& /*option*/)
+{
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::Multi(const std::vector<Material*>& /*mats*/,
+                                    bool /*combine*/)
+{
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::Back(const std::string& mat)
+{
+  Shader::Me->Setting.Back = true;
+
+  std::ostringstream oss;
+  oss << Shader::Def(Body, "");
+  oss << "if(";
+  oss << ShaderMaterialHelperStatics::face_back;
+  oss << "){";
+  oss << mat;
+  oss << ";}";
+
+  Body = oss.str();
+
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::InLine(const std::string& mat)
+{
+  std::ostringstream oss;
+  oss << Shader::Def(Body, "") << mat;
+
+  Body = oss.str();
+
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::Front(const std::string& mat)
+{
+  std::ostringstream oss;
+  oss << Shader::Def(Body, "");
+  oss << "if(";
+  oss << ShaderMaterialHelperStatics::face_front;
+  oss << "){";
+  oss << mat;
+  oss << ";}";
+
+  Body = oss.str();
+
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::Range(const std::string& /*mat1*/,
+                                    const std::string& /*mat2*/,
+                                    const IRange& /*option*/)
+{
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::Reference(size_t /*index*/,
+                                        const std::string& /*mat*/)
+{
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::ReplaceColor(int /*index*/, int /*color*/,
+                                           const std::string& /*mat*/,
+                                           const IReplaceColor& /*option*/)
+{
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::Blue(int index, const std::string& mat,
+                                   const IReplaceColor& option)
+{
+  return ReplaceColor(index, Helper::Blue, mat, option);
+}
+
+ShaderBuilder& ShaderBuilder::Cyan(int index, const std::string& mat,
+                                   const IReplaceColor& option)
+{
+  return ReplaceColor(index, Helper::Cyan, mat, option);
+}
+
+ShaderBuilder& ShaderBuilder::Red(int index, const std::string& mat,
+                                  const IReplaceColor& option)
+{
+  return ReplaceColor(index, Helper::Red, mat, option);
+}
+
+ShaderBuilder& ShaderBuilder::Yellow(int index, const std::string& mat,
+                                     const IReplaceColor& option)
+{
+  return ReplaceColor(index, Helper::Yellow, mat, option);
+}
+
+ShaderBuilder& ShaderBuilder::Green(int index, const std::string& mat,
+                                    const IReplaceColor& option)
+{
+  return ReplaceColor(index, Helper::Green, mat, option);
+}
+
+ShaderBuilder& ShaderBuilder::Pink(int index, const std::string& mat,
+                                   const IReplaceColor& option)
+{
+  return ReplaceColor(index, Helper::Pink, mat, option);
+}
+
+ShaderBuilder& ShaderBuilder::White(int index, const std::string& mat,
+                                    const IReplaceColor& option)
+{
+  return ReplaceColor(index, Helper::White, mat, option);
+}
+
+ShaderBuilder& ShaderBuilder::Black(int index, const std::string& mat,
+                                    const IReplaceColor& option)
+{
+  return ReplaceColor(index, Helper::Black, mat, option);
+}
+
+ShaderBuilder& ShaderBuilder::ReflectCube(const IReflectMap& /*option*/)
+{
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::NormalMap(const std::string& val,
+                                        const std::string& mat)
+{
+  Shader::Me->Setting.NormalOpacity = val;
+  Shader::Me->Setting.NormalMap     = mat;
+
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::SpecularMap(const std::string& mat)
+{
+  Shader::Me->Setting.SpecularMap = mat;
+
+  return *this;
+}
+
+std::unique_ptr<ShaderBuilder> ShaderBuilder::Instance()
+{
+  return nullptr;
+}
+
+ShaderBuilder& ShaderBuilder::Reflect(const IReflectMap& /*option*/,
+                                      float /*opacity*/)
+{
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::Light(const ILight& /*option*/)
+{
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::Effect(const IEffect& /*option*/)
+{
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::IdColor(float /*id*/, float /*w*/)
+{
+  return *this;
+}
+
+ShaderBuilder& ShaderBuilder::Discard()
+{
+  return *this;
 }
 
 } // end of namespace Extensions

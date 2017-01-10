@@ -7,10 +7,10 @@ namespace BABYLON {
 namespace Extensions {
 
 struct BABYLON_SHARED_EXPORT IColor {
-  float r;
-  float g;
-  float b;
-  float a;
+  float r = 0.f;
+  float g = 0.f;
+  float b = 0.f;
+  float a = 1.f;
 }; // end of struct IColor
 
 } // end of namespace Extensions
