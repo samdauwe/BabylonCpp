@@ -45,6 +45,11 @@ std::string Shader::Print(const std::string& /*s*/)
   return "";
 }
 
+std::string Shader::Print(const IColor& /*s*/)
+{
+  return "";
+}
+
 std::string Shader::Custom()
 {
   return "";

@@ -70,11 +70,11 @@ public:
                        const IReplaceColor& option);
   ShaderBuilder& Black(int index, const std::string& mat,
                        const IReplaceColor& option);
-  ShaderBuilder& ReflectCube(const IReflectMap& option);
+  ShaderBuilder& ReflectCube(IReflectMap& option);
   ShaderBuilder& NormalMap(const std::string& val, const std::string& mat);
   ShaderBuilder& SpecularMap(const std::string& mat);
   std::unique_ptr<ShaderBuilder> Instance();
-  ShaderBuilder& Reflect(const IReflectMap& option, float opacity);
+  ShaderBuilder& Reflect(const IReflectMap& option, float opacity = 1.f);
   ShaderBuilder& Light(const ILight& option);
   ShaderBuilder& Effect(const IEffect& option);
   ShaderBuilder& IdColor(float id, float w);

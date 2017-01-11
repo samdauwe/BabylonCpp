@@ -892,8 +892,101 @@ ShaderBuilder& ShaderBuilder::Black(int index, const std::string& mat,
   return ReplaceColor(index, Helper::Black, mat, option);
 }
 
-ShaderBuilder& ShaderBuilder::ReflectCube(const IReflectMap& /*option*/)
+ShaderBuilder& ShaderBuilder::ReflectCube(IReflectMap& option)
 {
+  Shader::Indexer++;
+  int s = Shader::Me->GetCubeMapIndex(option.path);
+
+  if (s == -1) {
+    Shader::Me->Setting.TextureCubes.emplace_back(
+      ITexture(option.path, option.useInVertex, true));
+  }
+  else {
+    size_t index                                     = static_cast<size_t>(s);
+    Shader::Me->Setting.TextureCubes[index].inVertex = true;
+  }
+
+  s = Shader::Me->GetCubeMapIndex(option.path);
+
+  std::ostringstream oss;
+
+  if (option.equirectangular) {
+    option.path = Shader::Def(option.path, "/images/cube/roofl1.jpg");
+    s           = Shader::Me->GetMapIndex(option.path);
+
+    if (s == -1) {
+      Shader::Me->Setting.Texture2Ds.emplace_back(
+        ITexture(option.path, option.useInVertex, true));
+    }
+    else {
+      size_t index                                   = static_cast<size_t>(s);
+      Shader::Me->Setting.Texture2Ds[index].inVertex = true;
+    }
+
+    s                                 = Shader::Me->GetMapIndex(option.path);
+    Shader::Me->Setting.VertexWorld   = true;
+    Shader::Me->Setting.FragmentWorld = true;
+
+    oss << " vec3 nWorld#[Ind] = normalize( mat3( world[0].xyz, world[1].xyz, "
+           "world[2].xyz ) *  "
+        << option.normal << "); "
+        << " vec3 vReflect#[Ind] = normalize( reflect( normalize(  "
+        << ShaderMaterialHelperStatics::Camera << "- vec3(world * vec4("
+        << ShaderMaterialHelperStatics::Position
+        << ", 1.0))),  nWorld#[Ind] ) ); "
+        << "float yaw#[Ind] = .5 - atan( vReflect#[Ind].z, -1.* "
+           "vReflect#[Ind].x ) / ( 2.0 * 3.14159265358979323846264);  "
+        << " float pitch#[Ind] = .5 - atan( vReflect#[Ind].y, length( "
+           "vReflect#[Ind].xz ) ) / ( 3.14159265358979323846264);  "
+        << " vec3 color#[Ind] = texture2D( ' + "
+           "ShaderMaterialHelperStatics::Texture2D + s + ', vec2( yaw#[Ind], "
+           "pitch#[Ind])"
+        << (option.bias.empty() || Shader::Print(option.bias) == "0." ?
+              "" :
+              "," + Shader::Print(option.bias))
+             + " ).rgb; result = vec4(color#[Ind] ,1.);";
+  }
+  else {
+    option.path = Shader::Def(option.path, "/images/cube/a");
+
+    oss << "vec3 viewDir#[Ind] =  " << ShaderMaterialHelperStatics::Position
+        << " - " << ShaderMaterialHelperStatics::Camera << " ;";
+    oss << "\n";
+    oss << "  viewDir#[Ind] =r_x(viewDir#[Ind] ,"
+        << Shader::Print(option.rotation.x) << ",  "
+        << ShaderMaterialHelperStatics::Center << ");";
+    oss << "\n";
+    oss << "  viewDir#[Ind] =r_y(viewDir#[Ind] ,"
+        << Shader::Print(option.rotation.y)
+        << "," + ShaderMaterialHelperStatics::Center << ");";
+    oss << "\n";
+    oss << "  viewDir#[Ind] =r_z(viewDir#[Ind] ,"
+        << Shader::Print(option.rotation.z)
+        << "," + ShaderMaterialHelperStatics::Center << ");";
+    oss << "\n";
+    oss << "vec3 coords#[Ind] = " << (option.refract ? "refract" : "reflect")
+        << "(viewDir#[Ind]" << (option.revers ? "*vec3(1.0)" : "*vec3(-1.0)")
+        << ", " + option.normal << " "
+        << (option.refract ? ",(" + Shader::Print(option.refractMap) + ")" : "")
+        << " )+" + ShaderMaterialHelperStatics::Position + "; ";
+    oss << "\n";
+    oss << "vec3 vReflectionUVW#[Ind] = vec3( "
+        << ShaderMaterialHelperStatics::ReflectMatrix
+        << " *  vec4(coords#[Ind], 0)); ";
+    oss << "\n";
+    oss << "vec3 rc#[Ind]= textureCube("
+        << ShaderMaterialHelperStatics::TextureCube << s
+        << ", vReflectionUVW#[Ind] "
+             + (option.bias.empty() || Shader::Print(option.bias) == "0." ?
+                  "" :
+                  "," + Shader::Print(option.bias))
+             + ").rgb;";
+    oss << "\n";
+    oss << "result =result  + vec4(rc#[Ind].x ,rc#[Ind].y,rc#[Ind].z, "
+        << (!option.alpha ? "1." : "(rc#[Ind].x+rc#[Ind].y+rc#[Ind].z)/3.0 ")
+        << ")*(min(1.,max(0.," + Shader::Print(option.reflectMap) << ")));  ";
+  }
+
   return *this;
 }
 
@@ -924,13 +1017,196 @@ ShaderBuilder& ShaderBuilder::Reflect(const IReflectMap& /*option*/,
   return *this;
 }
 
-ShaderBuilder& ShaderBuilder::Light(const ILight& /*option*/)
+ShaderBuilder& ShaderBuilder::Light(const ILight& option)
 {
+  IColor c_c;
+  if (option.darkColorMode) {
+    c_c.a = 1.f - c_c.a;
+
+    c_c.r = 1.f - c_c.r;
+    c_c.g = 1.f - c_c.g;
+    c_c.b = 1.f - c_c.b;
+    c_c.a = c_c.a - 1.f;
+  }
+
+  ++Shader::Indexer;
+
+  Shader::Me->Setting.Camera        = true;
+  Shader::Me->Setting.FragmentWorld = true;
+  Shader::Me->Setting.VertexWorld   = true;
+  Shader::Me->Setting.Helpers       = true;
+  Shader::Me->Setting.Center        = true;
+
+  std::ostringstream oss;
+  oss << "  vec3 dir#[Ind] = normalize(  vec3(world * vec4("
+      << ShaderMaterialHelperStatics::Position << ",1.)) - "
+      << ShaderMaterialHelperStatics::Camera << ");"
+      << "\n"
+      << "  dir#[Ind] =r_x(dir#[Ind] ," << Shader::Print(option.rotation.x)
+      << ",vec3(" + ShaderMaterialHelperStatics::Center << "));"
+      << "\n"
+      << "  dir#[Ind] =r_y(dir#[Ind] ," << Shader::Print(option.rotation.y)
+      << ",vec3(" + ShaderMaterialHelperStatics::Center << "));"
+      << "\n"
+      << "  dir#[Ind] =r_z(dir#[Ind] ," << Shader::Print(option.rotation.z)
+      << ",vec3(" + ShaderMaterialHelperStatics::Center << "));";
+  oss << "\n";
+  oss << "  vec3 vnrm#[Ind] = normalize(vec3(world * vec4(" << option.normal
+      << ", 0.0)));"
+      << "\n";
+  oss << "\n";
+  oss << "  vec3 l#[Ind]= normalize(p1#[Ind].xyz "
+      << (!option.parallel ?
+            "- vec3(world * vec4(" + ShaderMaterialHelperStatics::Position
+              + ",1.))  " :
+            "")
+      << ");"
+      << "\n";
+  oss << "\n";
+  oss << "  vec3 vw#[Ind]= normalize(camera -  vec3(world * vec4("
+      << ShaderMaterialHelperStatics::Position << ",1.)));"
+      << "\n";
+  oss << "\n";
+  oss << "vec3 aw#[Ind]= normalize(vw#[Ind]+ l#[Ind]);"
+      << "\n";
+  oss << "\n";
+  oss << "float sc#[Ind]= max(0.,min(1., dot(vnrm#[Ind], aw#[Ind])));"
+      << "\n";
+  oss << "\n";
+  oss << "sc#[Ind]= pow(sc#[Ind]*min(1.,max(0.,"
+      << Shader::Print(option.specular) + ")), ("
+      << Shader::Print(option.specularPower * 1000.f) << "))/"
+      << Shader::Print(option.specularLevel) << ";"
+      << "\n";
+  oss << "\n";
+  oss << " float  ph#[Ind]= pow(" + Shader::Print(option.phonge) + "*2., ("
+           + Shader::Print(option.phongePower) + "*0.3333))/("
+           + Shader::Print(option.phongeLevel) + "*3.);";
+  oss << "\n";
+  oss << "  float ndl#[Ind] = max(0., dot(vnrm#[Ind], l#[Ind]));";
+  oss << "\n";
+  oss << "  float ls#[Ind] = " << (option.supplement ? "1.0 -" : "")
+      << "max(0.,min(1.,ndl#[Ind]*ph#[Ind]*("
+      << Shader::Print(option.reducer) + ")));";
+  oss << "\n";
+  oss << "  result  += vec4( c1#[Ind].xyz*( ls#[Ind])*" + Shader::Print(c_c.a)
+           + " ,  ls#[Ind]); ";
+  oss << "\n";
+  oss << "  float ls2#[Ind] = " << (option.supplement ? "0.*" : "1.*")
+      << "max(0.,min(1., sc#[Ind]*(" << Shader::Print(option.reducer) + ")));";
+  oss << "\n";
+  oss << "  result  += vec4( c1#[Ind].xyz*( ls2#[Ind])*" << Shader::Print(c_c.a)
+      << " ,  ls2#[Ind]); ";
+
+  std::string sresult = Shader::Replace(
+    oss.str(), "#[Ind]", "_" + std::to_string(Shader::Indexer) + "_");
+
+  Body = Shader::Def(Body, "");
+  Body += sresult;
+
   return *this;
 }
 
-ShaderBuilder& ShaderBuilder::Effect(const IEffect& /*option*/)
+ShaderBuilder& ShaderBuilder::Effect(const IEffect& option)
 {
+  const IEffect& op = option;
+  ++Shader::Indexer;
+
+  std::ostringstream oss;
+  oss << "vec4 res#[Ind] = vec4(0.);\n";
+  oss << "res#[Ind].x = "
+      << (!op.px.empty() ?
+            Shader::Replace(
+              Shader::Replace(
+                Shader::Replace(Shader::Replace(op.px, "px", "result.x"), "py",
+                                "result.y"),
+                "pz", "result.z"),
+              "pw", "result.w")
+              + ";" :
+            " result.x;");
+  oss << "\n";
+  oss << "res#[Ind].y = "
+      << (!op.py.empty() ?
+            Shader::Replace(
+              Shader::Replace(
+                Shader::Replace(Shader::Replace(op.py, "px", "result.x"), "py",
+                                "result.y"),
+                "pz", "result.z"),
+              "pw", "result.w")
+              + ";" :
+            " result.y;");
+  oss << "\n";
+  oss << "res#[Ind].z = "
+      << (!op.pz.empty() ?
+            Shader::Replace(
+              Shader::Replace(
+                Shader::Replace(Shader::Replace(op.pz, "px", "result.x"), "py",
+                                "result.y"),
+                "pz", "result.z"),
+              "pw", "result.w")
+              + ";" :
+            " result.z;");
+  oss << "\n";
+  oss << "res#[Ind].w = "
+      << (!op.pw.empty() ?
+            Shader::Replace(
+              Shader::Replace(
+                Shader::Replace(Shader::Replace(op.pw, "px", "result.x"), "py",
+                                "result.y"),
+                "pz", "result.z"),
+              "pw", "result.w")
+              + ";" :
+            " result.w;");
+  oss
+    << "res#[Ind]  = "
+    << (!op.pr.empty() ?
+          " vec4("
+            + Shader::Replace(
+                Shader::Replace(
+                  Shader::Replace(
+                    Shader::Replace(Shader::Replace(op.pr, "pr", "res#[Ind].x"),
+                                    "px", "result.x"),
+                    "py", "result.y"),
+                  "pz", "result.z"),
+                "pw", "result.w")
+            + ","
+            + Shader::Replace(
+                Shader::Replace(
+                  Shader::Replace(
+                    Shader::Replace(Shader::Replace(op.pr, "pr", "res#[Ind].y"),
+                                    "px", "result.x"),
+                    "py", "result.y"),
+                  "pz", "result.z"),
+                "pw", "result.w")
+            + ","
+            + Shader::Replace(
+                Shader::Replace(
+                  Shader::Replace(
+                    Shader::Replace(Shader::Replace(op.pr, "pr", "res#[Ind].z"),
+                                    "px", "result.x"),
+                    "py", "result.y"),
+                  "pz", "result.z"),
+                "pw", "result.w")
+            + ","
+            + Shader::Replace(
+                Shader::Replace(
+                  Shader::Replace(
+                    Shader::Replace(Shader::Replace(op.pr, "pr", "res#[Ind].w"),
+                                    "px", "result.x"),
+                    "py", "result.y"),
+                  "pz", "result.z"),
+                "pw", "result.w")
+            + ");" :
+          " res#[Ind]*1.0;");
+  oss << "\n";
+  oss << "result = res#[Ind] ;";
+
+  std::string sresult = Shader::Replace(
+    oss.str(), "#[Ind]", "_" + std::to_string(Shader::Indexer) + "_");
+
+  Body = Shader::Def(Body, "");
+  Body += sresult;
+
   return *this;
 }
 

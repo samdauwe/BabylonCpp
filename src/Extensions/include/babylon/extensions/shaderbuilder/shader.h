@@ -22,6 +22,7 @@ struct BABYLON_SHARED_EXPORT Shader {
   static std::string Print(int i);
   static std::string Print(float i);
   static std::string Print(const std::string& s);
+  static std::string Print(const IColor& s);
   static std::string Custom();
   static std::string Index();
   static std::string DefCustom(const std::string& t, const std::string& c);

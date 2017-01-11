@@ -10,6 +10,7 @@ struct BABYLON_SHARED_EXPORT IEffect {
   std::string px;
   std::string py;
   std::string pz;
+  std::string pw;
   std::string pr;
 }; // end of struct IEffect
 
