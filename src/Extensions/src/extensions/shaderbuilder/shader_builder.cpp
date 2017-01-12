@@ -626,6 +626,28 @@ PostProcess* ShaderBuilder::BuildPostProcess(Camera* /*camera*/,
                                              Scene* /*scene*/, float /*scale*/,
                                              const std::string& /*option*/)
 {
+  Setting.Screen     = true;
+  Setting.Mouse      = true;
+  Setting.Time       = true;
+  Setting.CameraShot = true;
+
+  PrepareBeforePostProcessBuild();
+
+  ++Shader::ShaderIdentity;
+  std::vector<std::string> samplers;
+  for (size_t s = 0; s < Setting.Texture2Ds.size(); s++) {
+    samplers.emplace_back(ShaderMaterialHelperStatics::Texture2D
+                          + std::to_string(s));
+  }
+
+  if (!PPSSamplers.empty()) {
+    for (auto& PPSSampler : PPSSamplers) {
+      if (!PPSSampler.empty()) {
+        samplers.emplace_back(PPSSampler);
+      }
+    }
+  }
+
   return nullptr;
 }
 
@@ -637,13 +659,9 @@ ShaderBuilder& ShaderBuilder::Event(int index, const std::string& mat)
 
   std::ostringstream oss;
   oss << Shader::Def(Body, "");
-  oss << "  if ( floor(mod( ";
-  oss << ShaderMaterialHelperStatics::uniformFlags;
-  oss << "/pow(2.,";
-  oss << Shader::Print(index);
-  oss << "),2.)) == 1.) { ";
-  oss << mat;
-  oss << " } ";
+  oss << "  if ( floor(mod( " << ShaderMaterialHelperStatics::uniformFlags
+      << "/pow(2.," << Shader::Print(index) << "),2.)) == 1.) { " << mat
+      << " } ";
 
   Body = oss.str();
 
@@ -654,17 +672,12 @@ ShaderBuilder& ShaderBuilder::EventVertex(int index, const std::string& mat)
 {
   Shader::Me->Setting.Flags  = true;
   Shader::Me->Setting.Vertex = true;
-  Shader::Indexer++;
+  ++Shader::Indexer;
 
   std::ostringstream oss;
   oss << Shader::Def(VertexBody, "");
-  oss << " if( floor(mod( ";
-  oss << ShaderMaterialHelperStatics::uniformFlags;
-  oss << "/pow(2.,";
-  oss << Shader::Print(index);
-  oss << "),2.)) == 1. ){ ";
-  oss << mat;
-  oss << "}";
+  oss << " if( floor(mod( " << ShaderMaterialHelperStatics::uniformFlags
+      << "/pow(2.," << Shader::Print(index) << "),2.)) == 1. ){ " << mat << "}";
 
   VertexBody = oss.str();
 
@@ -731,11 +744,9 @@ ShaderBuilder& ShaderBuilder::Solid(const IColor& iColor)
 
   std::ostringstream oss;
   oss << Shader::Def(Body, "");
-  oss << " result = vec4(";
-  oss << Shader::Print(color.r) << ",";
-  oss << Shader::Print(color.g) << ",";
-  oss << Shader::Print(color.b) << ",";
-  oss << Shader::Print(color.a) << ");";
+  oss << " result = vec4(" << Shader::Print(color.r) << ","
+      << Shader::Print(color.g) << "," << Shader::Print(color.b) << ","
+      << Shader::Print(color.a) << ");";
 
   Body = oss.str();
 
@@ -776,9 +787,48 @@ ShaderBuilder& ShaderBuilder::Map(const IMap& /*option*/)
   return *this;
 }
 
-ShaderBuilder& ShaderBuilder::Multi(const std::vector<Material*>& /*mats*/,
-                                    bool /*combine*/)
+ShaderBuilder& ShaderBuilder::Multi(const std::vector<Material*>& mats,
+                                    bool combine)
 {
+  ++Shader::Indexer;
+  std::stringstream pre;
+  std::array<std::string, 4> ps{{"", "", "", ""}};
+  std::stringstream psh;
+  psh << "0.0";
+
+  for (size_t i = 0; i < mats.size(); ++i) {
+    pre << " vec4 result#[Ind]" << i << ";result#[Ind]" << i
+        << " = vec4(0.,0.,0.,0.); float rp#[Ind]" << i
+        << " = " /*<< Shader::Print(mats[i]->opacity)*/ << "; \n";
+    pre /*<< mats[i].result*/ << "\n";
+    pre << " result#[Ind]" << i << " = result; \n";
+
+    const std::string iStr = std::to_string(i);
+    const std::string comp = (i == 0 ? "" : " + ");
+    ps[0] += comp + "result#[Ind]" + iStr + ".x*rp#[Ind]" + iStr;
+    ps[1] += comp + "result#[Ind]" + iStr + ".y*rp#[Ind]" + iStr;
+    ps[2] += comp + "result#[Ind]" + iStr + ".z*rp#[Ind]" + iStr;
+    ps[3] += comp + "result#[Ind]" + iStr + ".w*rp#[Ind]" + iStr;
+
+    psh << "+" /*<< Shader::Print(mats[i]->opacity)*/;
+  }
+
+  if (combine) {
+    const std::string pshStr = Shader::Print(psh.str());
+
+    ps[0] = "(" + ps[0] + ")/(" + pshStr + ")";
+    ps[1] = "(" + ps[1] + ")/(" + pshStr + ")";
+    ps[2] = "(" + ps[2] + ")/(" + pshStr + ")";
+    ps[3] = "(" + ps[3] + ")/(" + pshStr + ")";
+  }
+
+  pre << "result = vec4(" << ps[0] << "," << ps[1] << "," << ps[2] << ","
+      << ps[3] << ");";
+
+  Body = Shader::Def(Body, "");
+  Body += Shader::Replace(pre.str(), "#[Ind]",
+                          "_" + std::to_string(Shader::Indexer) + "_");
+
   return *this;
 }
 
@@ -787,12 +837,8 @@ ShaderBuilder& ShaderBuilder::Back(const std::string& mat)
   Shader::Me->Setting.Back = true;
 
   std::ostringstream oss;
-  oss << Shader::Def(Body, "");
-  oss << "if(";
-  oss << ShaderMaterialHelperStatics::face_back;
-  oss << "){";
-  oss << mat;
-  oss << ";}";
+  oss << Shader::Def(Body, "") << "if("
+      << ShaderMaterialHelperStatics::face_back << "){" << mat << ";}";
 
   Body = oss.str();
 
@@ -801,10 +847,7 @@ ShaderBuilder& ShaderBuilder::Back(const std::string& mat)
 
 ShaderBuilder& ShaderBuilder::InLine(const std::string& mat)
 {
-  std::ostringstream oss;
-  oss << Shader::Def(Body, "") << mat;
-
-  Body = oss.str();
+  Body = Shader::Def(Body, "") + mat;
 
   return *this;
 }
@@ -813,34 +856,181 @@ ShaderBuilder& ShaderBuilder::Front(const std::string& mat)
 {
   std::ostringstream oss;
   oss << Shader::Def(Body, "");
-  oss << "if(";
-  oss << ShaderMaterialHelperStatics::face_front;
-  oss << "){";
-  oss << mat;
-  oss << ";}";
+  oss << "if(" << ShaderMaterialHelperStatics::face_front << "){" << mat
+      << ";}";
 
   Body = oss.str();
 
   return *this;
 }
 
-ShaderBuilder& ShaderBuilder::Range(const std::string& /*mat1*/,
-                                    const std::string& /*mat2*/,
-                                    const IRange& /*option*/)
+ShaderBuilder& ShaderBuilder::Range(const std::string& mat1,
+                                    const std::string& mat2,
+                                    const IRange& option)
 {
+  ++Shader::Indexer;
+  auto k = std::to_string(Shader::Indexer);
+
+  std::ostringstream oss;
+  oss << "float s_r_dim#[Ind] = " << option.direction << ";"
+      << "\n";
+  oss << "if(s_r_dim#[Ind] > " << Shader::Print(option.end) + "){"
+      << "\n";
+  oss << mat2 << "\n";
+  oss << "}"
+      << "\n";
+  oss << "else { "
+      << "\n";
+  oss << mat1 << "\n";
+  oss << "   vec4 mat1#[Ind]; mat1#[Ind]  = result;"
+      << "\n";
+  oss << "   if(s_r_dim#[Ind] > " + Shader::Print(option.start) + "){ "
+      << "\n";
+  oss << mat2 << "\n";
+  oss << " vec4 mati2#[Ind];mati2#[Ind] = result;"
+      << "\n";
+  oss << " float s_r_cp#[Ind]  = (s_r_dim#[Ind] - ("
+      << Shader::Print(option.start) << "))/(" << Shader::Print(option.end)
+      << "-(" + Shader::Print(option.start) + "));"
+      << "\n";
+  oss << " float s_r_c#[Ind]  = 1.0 - s_r_cp#[Ind];"
+      << "\n";
+  oss << " result = "
+      << "vec4(mat1#[Ind].x*s_r_c#[Ind]+mati2#[Ind].x*s_r_cp#[Ind],mat1#[Ind]."
+      << "y*s_r_c#[Ind]+mati2#[Ind].y*s_r_cp#[Ind],mat1#[Ind].z*s_r_c#[Ind]+"
+      << "mati2#[Ind].z*s_r_cp#[Ind],mat1#[Ind].w*s_r_c#[Ind]+mati2#[Ind].w*s_"
+      << "r_cp#[Ind]);"
+      << "\n";
+  oss << "   }"
+      << "\n";
+  oss << "   else { result = mat1#[Ind]; }"
+      << "\n";
+  oss << "}"
+      << "\n";
+  oss << "result = resHelp#[Ind] ;";
+
+  Body = Shader::Def(Body, "");
+  Body += Shader::Replace(oss.str(), "#[Ind]", "_" + k + "_");
+
   return *this;
 }
 
-ShaderBuilder& ShaderBuilder::Reference(size_t /*index*/,
-                                        const std::string& /*mat*/)
+ShaderBuilder& ShaderBuilder::Reference(size_t index, const std::string& mat)
 {
+  if (Shader::Me->References.empty()) {
+    Shader::Me->References = "";
+  }
+
+  std::ostringstream oss;
+  oss << "vec4 resHelp#[Ind] = result;";
+
+  std::string indexStr = std::to_string(index);
+  if (!String::contains(Shader::Me->References, "," + indexStr + ",")) {
+    Shader::Me->References += "," + indexStr + ",";
+    oss << " vec4 result_" << index << " = vec4(0.);\n";
+  }
+  if (mat.empty()) {
+    oss << "  result_" << indexStr << " = result;";
+  }
+  else {
+    oss << mat << "\nresult_" << indexStr << " = result;";
+  }
+
+  oss << "result = resHelp#[Ind] ;";
+  std::string sresult = Shader::Replace(
+    oss.str(), "#[Ind]", "_" + std::to_string(Shader::Indexer) + "_");
+
+  Body = Shader::Def(Body, "");
+  Body += sresult;
+
   return *this;
 }
 
-ShaderBuilder& ShaderBuilder::ReplaceColor(int /*index*/, int /*color*/,
-                                           const std::string& /*mat*/,
-                                           const IReplaceColor& /*option*/)
+ShaderBuilder& ShaderBuilder::ReplaceColor(int index, int color,
+                                           const std::string& mat,
+                                           const IReplaceColor& option)
 {
+  ++Shader::Indexer;
+  auto d   = option.rangeStep;
+  auto d2  = option.rangePower;
+  auto d3  = option.colorIndex;
+  auto d4  = option.colorStep;
+  auto ilg = option.indexToEnd;
+
+  auto indexStr = std::to_string(index);
+
+  auto lg = " > 0.5 + " + Shader::Print(d) + " ";
+  auto lw = " < 0.5 - " + Shader::Print(d) + " ";
+  auto rr = "((result_" + indexStr + ".x*" + Shader::Print(d4) + "-"
+            + Shader::Print(d3) + ")>1.0 ? 0. : max(0.,(result_" + indexStr
+            + ".x*" + Shader::Print(d4) + "-" + Shader::Print(d3) + ")))";
+  auto rg = "((result_" + indexStr + ".y*" + Shader::Print(d4) + "-"
+            + Shader::Print(d3) + ")>1.0 ? 0. : max(0.,(result_" + indexStr
+            + ".y*" + Shader::Print(d4) + "-" + Shader::Print(d3) + ")))";
+  auto rb = "((result_" + indexStr + ".z*" + Shader::Print(d4) + "-"
+            + Shader::Print(d3) + ")>1.0 ? 0. : max(0.,(result_" + indexStr
+            + ".z*" + Shader::Print(d4) + "-" + Shader::Print(d3) + ")))";
+  if (ilg) {
+    rr = "min(1.0, max(0.,(result_" + indexStr + ".x*" + Shader::Print(d4) + "-"
+         + Shader::Print(d3) + ")))";
+    rg = "min(1.0, max(0.,(result_" + indexStr + ".y*" + Shader::Print(d4) + "-"
+         + Shader::Print(d3) + ")))";
+    rb = "min(1.0, max(0.,(result_" + indexStr + ".z*" + Shader::Print(d4) + "-"
+         + Shader::Print(d3) + ")))";
+  }
+  auto a = " && ";
+  auto p = " + ";
+
+  std::string r    = "";
+  std::string cond = "";
+
+  switch (color) {
+    case Helper::White:
+      cond = rr + lg + a + rg + lg + a + rb + lg;
+      r    = "(" + rr + p + rg + p + rb + ")/3.0";
+      break;
+    case Helper::Cyan:
+      cond = rr + lw + a + rg + lg + a + rb + lg;
+      r    = "(" + rg + p + rb + ")/2.0 - (" + rr + ")/1.0";
+      break;
+    case Helper::Pink:
+      cond = rr + lg + a + rg + lw + a + rb + lg;
+      r    = "(" + rr + p + rb + ")/2.0 - (" + rg + ")/1.0";
+      break;
+    case Helper::Yellow:
+      cond = rr + lg + a + rg + lg + a + rb + lw;
+      r    = "(" + rr + p + rg + ")/2.0 - (" + rb + ")/1.0";
+      break;
+    case Helper::Blue:
+      cond = rr + lw + a + rg + lw + a + rb + lg;
+      r    = "(" + rb + ")/1.0 - (" + rr + p + rg + ")/2.0";
+      break;
+    case Helper::Red:
+      cond = rr + lg + a + rg + lw + a + rb + lw;
+      r    = "(" + rr + ")/1.0 - (" + rg + p + rb + ")/2.0";
+      break;
+    case Helper::Green:
+      cond = rr + lw + a + rg + lg + a + rb + lw;
+      r    = "(" + rg + ")/1.0 - (" + rr + p + rb + ")/2.0";
+      break;
+    case Helper::Black:
+      cond = rr + lw + a + rg + lw + a + rb + lw;
+      r    = "1.0-(" + rr + p + rg + p + rb + ")/3.0";
+      break;
+  }
+
+  auto sresult
+    = " if( " + cond
+      + " ) { vec4 oldrs#[Ind] = vec4(result);float al#[Ind] = max(0.0,min(1.0,"
+      + r + "+(" + Shader::Print(d2) + "))); float  l#[Ind] =  1.0-al#[Ind];  "
+      + mat + " result = result*al#[Ind] +  oldrs#[Ind] * l#[Ind]; }";
+
+  sresult = Shader::Replace(sresult, "#[Ind]",
+                            "_" + std::to_string(Shader::Indexer) + "_");
+
+  Body = Shader::Def(Body, "");
+  Body += sresult;
+
   return *this;
 }
 
@@ -1008,7 +1198,12 @@ ShaderBuilder& ShaderBuilder::SpecularMap(const std::string& mat)
 
 std::unique_ptr<ShaderBuilder> ShaderBuilder::Instance()
 {
-  return nullptr;
+  auto setting      = Shader::Me->Setting;
+  auto instance     = std_util::make_unique<ShaderBuilder>();
+  instance->Parent  = Shader::Me;
+  instance->Setting = setting;
+
+  return instance;
 }
 
 ShaderBuilder& ShaderBuilder::Reflect(const IReflectMap& /*option*/,
@@ -1217,6 +1412,9 @@ ShaderBuilder& ShaderBuilder::IdColor(float /*id*/, float /*w*/)
 
 ShaderBuilder& ShaderBuilder::Discard()
 {
+  Body = Shader::Def(Body, "");
+  Body += "discard;";
+
   return *this;
 }
 

@@ -45,10 +45,10 @@ public:
   // Func
   std::string Nut(std::string& value, const INut& option);
   ShaderBuilder& Map(const IMap& option);
-  ShaderBuilder& Multi(const std::vector<Material*>& mats, bool combine);
-  ShaderBuilder& Back(const std::string& mat);
-  ShaderBuilder& InLine(const std::string& mat);
-  ShaderBuilder& Front(const std::string& mat);
+  ShaderBuilder& Multi(const std::vector<Material*>& mats, bool combine = true);
+  ShaderBuilder& Back(const std::string& mat = "");
+  ShaderBuilder& InLine(const std::string& mat = "");
+  ShaderBuilder& Front(const std::string& mat = "");
   ShaderBuilder& Range(const std::string& mat1, const std::string& mat2,
                        const IRange& option);
   ShaderBuilder& Reference(size_t index, const std::string& mat);
