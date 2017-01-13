@@ -44,7 +44,7 @@ public:
   int GetCubeMapIndex(const std::string key);
   // Func
   std::string Nut(std::string& value, const INut& option);
-  ShaderBuilder& Map(const IMap& option);
+  ShaderBuilder& Map(IMap& option);
   ShaderBuilder& Multi(const std::vector<Material*>& mats, bool combine = true);
   ShaderBuilder& Back(const std::string& mat = "");
   ShaderBuilder& InLine(const std::string& mat = "");

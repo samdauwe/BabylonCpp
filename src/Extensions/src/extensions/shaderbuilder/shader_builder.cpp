@@ -367,7 +367,7 @@ void ShaderBuilder::PrepareBeforeMaterialBuild()
 
   /** start Build Fragment Frame **/
   if (!Setting.NormalMap.empty()) {
-    oss.clear();
+    oss.str(std::string());
     oss << "vec3 normalMap() { vec4 result = vec4(0.); ";
     oss << Setting.NormalMap << ";\n";
     oss << "result = vec4( normalize( " << Setting.Normal;
@@ -378,7 +378,7 @@ void ShaderBuilder::PrepareBeforeMaterialBuild()
   }
 
   if (!Setting.SpecularMap.empty()) {
-    oss.clear();
+    oss.str(std::string());
     oss << "float specularMap() { ";
     oss << "vec4 result = vec4(0.);float float_result = 0.; ";
     oss << Setting.SpecularMap << ";";
@@ -388,7 +388,7 @@ void ShaderBuilder::PrepareBeforeMaterialBuild()
 
   Fragment.emplace_back(FragmentBeforeMain);
 
-  oss.clear();
+  oss.str(std::string());
   oss << "void main(void) { \n";
   oss << "   int discardState = 0;\n";
   oss << "   vec4 result = vec4(0.);\n";
@@ -557,7 +557,7 @@ void ShaderBuilder::PrepareBeforePostProcessBuild()
 
   std::ostringstream oss;
   if (!Setting.NormalMap.empty()) {
-    oss.clear();
+    oss.str(std::string());
     oss << "vec3 normalMap() { ";
     oss << "vec4 result = vec4(0.);";
     oss << "return result.xyz;}";
@@ -567,7 +567,7 @@ void ShaderBuilder::PrepareBeforePostProcessBuild()
   /** start Build Fragment Frame **/
   Fragment.emplace_back(FragmentBeforeMain);
 
-  oss.clear();
+  oss.str(std::string());
   oss << "void main(void) { \n";
   oss << "   int discardState = 0;\n";
   oss << "   vec2 vuv = vUV;\n";
@@ -635,7 +635,7 @@ PostProcess* ShaderBuilder::BuildPostProcess(Camera* /*camera*/,
 
   ++Shader::ShaderIdentity;
   std::vector<std::string> samplers;
-  for (size_t s = 0; s < Setting.Texture2Ds.size(); s++) {
+  for (size_t s = 0; s < Setting.Texture2Ds.size(); ++s) {
     samplers.emplace_back(ShaderMaterialHelperStatics::Texture2D
                           + std::to_string(s));
   }
@@ -782,8 +782,160 @@ std::string Nut(std::string& /*value*/, const INut& /*option*/)
   return "";
 }
 
-ShaderBuilder& ShaderBuilder::Map(const IMap& /*option*/)
+ShaderBuilder& ShaderBuilder::Map(IMap& option)
 {
+  std::string refInd;
+
+  Shader::Me->Setting.Center  = true;
+  Shader::Me->Setting.Helpers = true;
+  Shader::Me->Setting.Uv      = true;
+
+  float frameLength
+    = std::min(option.animationFrameEnd - option.animationFrameStart,
+               static_cast<float>(option.indexCount * option.indexCount));
+
+  std::string uv = Shader::Def(option.uv, ShaderMaterialHelperStatics::Uv);
+
+  if (option.uv == "planar") {
+    uv = ShaderMaterialHelperStatics::Position;
+  }
+  else {
+    uv = "vec3(" + option.uv + ".x," + option.uv + ".y,0.)";
+  }
+
+  option.scaleX /= option.indexCount;
+  option.scaleY /= option.indexCount;
+
+  // rotate
+  std::ostringstream oss;
+  oss << "vec3 centeri#[Ind] = " << ShaderMaterialHelperStatics::Center << ";\n"
+      << "vec3 ppo#[Ind] = r_z( " << uv
+      << "," + Shader::Print(option.rotation.x) << ",centeri#[Ind]);\n"
+      << " ppo#[Ind] = r_y( ppo#[Ind]," << Shader::Print(option.rotation.y)
+      << ",centeri#[Ind]);\n"
+      << " ppo#[Ind] = r_x( ppo#[Ind]," << Shader::Print(option.rotation.x)
+      << ",centeri#[Ind]);\n"
+      << "vec3 nrm#[Ind] = r_z( " << option.normal + ","
+      << Shader::Print(option.rotation.x) << ",centeri#[Ind]);\n"
+      << " nrm#[Ind] = r_y( nrm#[Ind]," << Shader::Print(option.rotation.y)
+      << ",centeri#[Ind]);\n"
+      << " nrm#[Ind] = r_x( nrm#[Ind]," << Shader::Print(option.rotation.z)
+      << ",centeri#[Ind]);\n";
+
+  // sresult
+  oss << "vec4 color#[Ind] = texture2D(" << refInd << " ,ppo#[Ind].xy*vec2("
+      << Shader::Print(option.scaleX) << "," << Shader::Print(option.scaleY)
+      << ")+vec2(" << Shader::Print(option.x) << "," << Shader::Print(option.y)
+      << ")" << (option.bias.empty() || Shader::Print(option.bias) == "0." ?
+                   "" :
+                   "," + Shader::Print(option.bias))
+      << ");\n"
+      << "if(nrm#[Ind].z < " + Shader::Print(option.normalLevel) + "){\n"
+      << (option.alpha ? " result =  color#[Ind];" :
+                         "result = vec4(color#[Ind].rgb , 1.); ")
+      << "\n"
+      << "}\n";
+
+  if (option.indexCount > 1 || option.tiled) {
+    option.columnIndex = option.indexCount - option.columnIndex + 1;
+
+    oss.str(std::string());
+    oss << " vec3 uvt#[Ind] = vec3(" << uv << ".x*"
+        << Shader::Print(option.scaleX) << "+" << Shader::Print(option.x) << ","
+        << uv << ".y*" << Shader::Print(option.scaleY) << "+"
+        << Shader::Print(option.y) << ",0.0);\n"
+        << "\n"
+        << " float xst#[Ind] = 1./(" << Shader::Print(option.indexCount)
+        << "*2.);\n"
+        << " float yst#[Ind] =1./(" << Shader::Print(option.indexCount)
+        << "*2.);\n"
+        << " float xs#[Ind] = 1./" << Shader::Print(option.indexCount) << ";\n"
+        << " float ys#[Ind] = 1./" << Shader::Print(option.indexCount) << ";\n"
+        << " float yid#[Ind] = " << Shader::Print(option.columnIndex - 1.f)
+        << ";\n"
+        << " float xid#[Ind] = " << Shader::Print(option.rowIndex - 1.f)
+        << ";\n"
+        << (option.animation ?
+              " float ind_a#[Ind] = floor(mod(time*0.001*"
+                + Shader::Print(option.animationSpeed) + ", "
+                + Shader::Print(frameLength) + " )+"
+                + Shader::Print(option.animationFrameStart) + ");"
+                + " yid#[Ind] = " + Shader::Print(option.indexCount)
+                + "- floor(ind_a#[Ind] / " + Shader::Print(option.indexCount)
+                + ");" //
+                + " xid#[Ind] =  floor(mod(ind_a#[Ind] ,  "
+                + Shader::Print(option.indexCount) + ")); " :
+              "")
+        << "\n"
+        << " float xi#[Ind] = mod(uvt#[Ind].x ,xs#[Ind])+xs#[Ind]*xid#[Ind];\n"
+        << " float yi#[Ind] = mod(uvt#[Ind].y ,ys#[Ind])+ys#[Ind]*yid#[Ind];\n"
+        << "\n"
+        << " float xi2#[Ind] = mod(uvt#[Ind].x - "
+        << "xs#[Ind]*0.5,xs#[Ind])+xs#[Ind]*xid#[Ind];\n"
+        << " float yi2#[Ind] = mod(uvt#[Ind].y - "
+        << "ys#[Ind]*0.5,ys#[Ind])+ys#[Ind]*yid#[Ind];\n"
+        << "\n\n"
+        << " vec4 f#[Ind] = texture2D(" << refInd
+        << ",vec2(xi#[Ind],yi#[Ind]));\n"
+        << " result = f#[Ind];\n";
+
+    std::ostringstream ossTiled;
+    ossTiled
+      << " vec4 f2#[Ind] = texture2D(" << refInd
+      << ",vec2(xi2#[Ind]+xid#[Ind] ,yi#[Ind]));\n"
+      << " vec4 f3#[Ind] = texture2D(" << refInd
+      << ",vec2(xi#[Ind],yi2#[Ind]+yid#[Ind]));\n"
+      << " vec4 f4#[Ind] = texture2D(" << refInd
+      << ",vec2(xi2#[Ind]+xid#[Ind],yi2#[Ind]+yid#[Ind]));\n"
+      << "\n\n"
+      << " float ir#[Ind] = 0.,ir2#[Ind] = 0.;\n"
+      << "\n"
+      << "     if( yi2#[Ind]  >= yid#[Ind] *ys#[Ind] ){\n"
+      << "         ir2#[Ind]  = min(2.,max(0.,( yi2#[Ind]-yid#[Ind] "
+      << "*ys#[Ind])*2.0/ys#[Ind] ));\n"
+      << "         if(ir2#[Ind] > 1.0) ir2#[Ind] =1.0-(ir2#[Ind]-1.0);\n"
+      << "         ir2#[Ind] = min(1.0,max(0.0,pow(ir2#[Ind],"
+      << Shader::Print(15.f) + " )*" << Shader::Print(3.f) << "));\n"
+      << "         result =  result *(1.0-ir2#[Ind]) +f3#[Ind]*ir2#[Ind];\n"
+      << "     }\n"
+      << " if( xi2#[Ind]  >= xid#[Ind] *xs#[Ind] ){\n"
+      << "         ir2#[Ind]  = min(2.,max(0.,( xi2#[Ind]-xid#[Ind] "
+      << "*xs#[Ind])*2.0/xs#[Ind] ));\n"
+      << "         if(ir2#[Ind] > 1.0) ir2#[Ind] =1.0-(ir2#[Ind]-1.0);\n"
+      << "         ir2#[Ind] = min(1.0,max(0.0,pow(ir2#[Ind],"
+      << Shader::Print(15.f) << " )*" + Shader::Print(3.f) + "));\n"
+      << "         result = result*(1.0-ir2#[Ind])+f2#[Ind]*ir2#[Ind];\n"
+      << "     }\n"
+      << " if( xi2#[Ind]  >= xid#[Ind]*xs#[Ind] && xi2#[Ind] >= "
+      << "xid#[Ind]*xs#[Ind]){\n"
+      << "         ir2#[Ind] = min(2.,max(0.,( xi2#[Ind]-xid#[Ind] "
+      << "*xs#[Ind])*2.0/xs#[Ind] ));\n"
+      << "         float ir3#[Ind] = min(2.,max(0.,( yi2#[Ind]-yid#[Ind] "
+      << "*ys#[Ind])*2.0/ys#[Ind] ));\n"
+      << "         if(ir2#[Ind] > 1.0) ir2#[Ind] = 1.0-(ir2#[Ind]-1.0);\n"
+      << "         if(ir3#[Ind] > 1.0) ir3#[Ind] = 1.0-(ir3#[Ind]-1.0);\n"
+      << "         ir2#[Ind] = min(1.0,max(0.0,pow(ir2#[Ind],"
+      << Shader::Print(15.f) + " )*" + Shader::Print(3.f) + "));\n"
+      << "         ir3#[Ind] = min(1.0,max(0.0,pow(ir3#[Ind],"
+      << Shader::Print(15.f) + " )*" + Shader::Print(3.f) + "));\n"
+      << "         ir2#[Ind] = min(1.0,max(0.0, ir2#[Ind]* ir3#[Ind] ));\n"
+      << " if(nrm#[Ind].z < " + Shader::Print(option.normalLevel) + "){\n"
+      << (option.alpha ?
+            "    result = result *(1.0-ir2#[Ind]) +f4#[Ind]* ir2#[Ind];" :
+            "    result = vec4(result.xyz*(1.0-ir2#[Ind])+f4#[Ind].xyz* "
+            "ir2#[Ind],1.0);")
+      << "\n"
+      << "}\n"
+      << "}\n";
+
+    oss << (option.tiled ? ossTiled.str() : "");
+    oss << "\n";
+  }
+
+  Body = Shader::Def(Body, "");
+  Body += Shader::Replace(oss.str(), "#[Ind]",
+                          "_" + std::to_string(Shader::Indexer) + "_");
+
   return *this;
 }
 
