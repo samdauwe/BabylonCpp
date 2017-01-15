@@ -180,14 +180,20 @@ TEST(TestVector3, Divide)
   Vector3 b{-x, -y, -z};
   Vector3 c;
 
-  // c = a * b
+  // c = a / b
   c = a.divide(b);
   EXPECT_FLOAT_EQ(c.x, -1.f);
   EXPECT_FLOAT_EQ(c.y, -1.f);
   EXPECT_FLOAT_EQ(c.z, -1.f);
 
-  // c = b * b
+  // c = b / b
   b.divideToRef(b, c);
+  EXPECT_FLOAT_EQ(c.x, 1.f);
+  EXPECT_FLOAT_EQ(c.y, 1.f);
+  EXPECT_FLOAT_EQ(c.z, 1.f);
+
+  // c = c / c
+  c.divideInPlace(c);
   EXPECT_FLOAT_EQ(c.x, 1.f);
   EXPECT_FLOAT_EQ(c.y, 1.f);
   EXPECT_FLOAT_EQ(c.z, 1.f);

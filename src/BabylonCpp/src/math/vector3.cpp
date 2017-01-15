@@ -255,6 +255,15 @@ Vector3 Vector3::multiplyByFloats(float ix, float iy, float iz) const
   return Vector3(x * ix, y * iy, z * iz);
 }
 
+Vector3& Vector3::divideInPlace(const Vector3& otherVector)
+{
+  x /= otherVector.x;
+  y /= otherVector.y;
+  z /= otherVector.z;
+
+  return *this;
+}
+
 Vector3 Vector3::divide(const Vector3& otherVector) const
 {
   return Vector3(x / otherVector.x, y / otherVector.y, z / otherVector.z);
@@ -342,6 +351,11 @@ Vector3& Vector3::operator*=(const Vector3& otherVector)
 Vector3 Vector3::operator/(const Vector3& otherVector) const
 {
   return divide(otherVector);
+}
+
+Vector3& Vector3::operator/=(const Vector3& otherVector)
+{
+  return divideInPlace(otherVector);
 }
 
 bool Vector3::operator==(const Vector3& otherVector) const

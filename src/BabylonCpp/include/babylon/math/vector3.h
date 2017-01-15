@@ -51,6 +51,7 @@ public:
   Vector3 multiply(const Vector3& otherVector) const;
   Vector3& multiplyToRef(const Vector3& otherVector, Vector3& result);
   Vector3 multiplyByFloats(float ix, float iy, float iz) const;
+  Vector3& divideInPlace(const Vector3& otherVector);
   Vector3 divide(const Vector3& otherVector) const;
   Vector3& divideToRef(const Vector3& otherVector, Vector3& result);
   Vector3& minimizeInPlace(const Vector3& other);
@@ -67,6 +68,7 @@ public:
   Vector3 operator*(const Vector3& otherVector) const;
   Vector3& operator*=(const Vector3& otherVector);
   Vector3 operator/(const Vector3& otherVector) const;
+  Vector3& operator/=(const Vector3& otherVector);
   bool operator==(const Vector3& otherVector) const;
   bool operator!=(const Vector3& otherVector) const;
 
