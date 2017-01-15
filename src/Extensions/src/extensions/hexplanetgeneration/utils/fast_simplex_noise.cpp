@@ -1,4 +1,4 @@
-#include <babylon/extensions/hexplanetgeneration/util/fast_simplex_noise.h>
+#include <babylon/extensions/hexplanetgeneration/utils/fast_simplex_noise.h>
 
 #include <babylon/core/random.h>
 
