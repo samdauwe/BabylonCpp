@@ -23,7 +23,7 @@ struct ElevationBorderOrigin {
   float shear;
   Plate* plate;
   CalculateElevationFunc calculateElevation;
-};
+}; // end of struct ElevationBorderOrigin
 
 } // end of namespace Extensions
 } // end of namespace BABYLON

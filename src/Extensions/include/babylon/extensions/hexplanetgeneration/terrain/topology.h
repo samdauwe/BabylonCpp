@@ -17,7 +17,7 @@ struct Topology {
   std::vector<Corner> corners;
   std::vector<Border> borders;
   std::vector<Tile> tiles;
-};
+}; // end of struct Topology
 
 } // end of namespace Extensions
 } // end of namespace BABYLON

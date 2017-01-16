@@ -32,7 +32,7 @@ IcoEdge::IcoEdge(const std::vector<size_t>& _n) : n{_n}
 // -----------------------------------------------------------------------------
 
 IcoFace::IcoFace(const std::vector<size_t>& _n, const std::vector<size_t>& _e)
-    : n{_n}, e{_e}
+    : n{_n}, e{_e}, boundingSphere{Vector3::Zero(), Vector3::Zero()}
 {
 }
 
@@ -45,22 +45,22 @@ Icosphere::Icosphere(size_t icosahedronSubdivision,
     : _icosahedronSubdivision{icosahedronSubdivision}
     , _topologyDistortionRate{topologyDistortionRate}
 {
-  generateIcosahedron(_icosahedronMesh);
-  generateSubdividedIcosahedron(icosahedronSubdivision, _icosahedronMesh);
-  correctFaceIndices(_icosahedronMesh);
+  generateIcosahedron();
+  generateSubdividedIcosahedron(icosahedronSubdivision);
+  correctFaceIndices();
 }
 
 Icosphere::Icosphere()
 {
 }
 
-void Icosphere::generateIcosahedron(IcosahedronMesh& icosahedronMesh) const
+void Icosphere::generateIcosahedron()
 {
   float phi = (1.f + std::sqrt(5.f)) / 2.f;
   float du  = 1.f / std::sqrt(phi * phi + 1.f);
   float dv  = phi * du;
 
-  icosahedronMesh.nodes
+  _icosahedronMesh.nodes
     = {IcoNode(Vector3(0, +dv, +du)), IcoNode(Vector3(0, +dv, -du)),
        IcoNode(Vector3(0, -dv, +du)), IcoNode(Vector3(0, -dv, -du)),
        IcoNode(Vector3(+du, 0, +dv)), IcoNode(Vector3(-du, 0, +dv)),
@@ -68,7 +68,7 @@ void Icosphere::generateIcosahedron(IcosahedronMesh& icosahedronMesh) const
        IcoNode(Vector3(+dv, +du, 0)), IcoNode(Vector3(+dv, -du, 0)),
        IcoNode(Vector3(-dv, +du, 0)), IcoNode(Vector3(-dv, -du, 0))};
 
-  icosahedronMesh.edges
+  _icosahedronMesh.edges
     = {IcoEdge({0, 1}),  IcoEdge({0, 4}),  IcoEdge({0, 5}),  IcoEdge({0, 8}),
        IcoEdge({0, 10}), IcoEdge({1, 6}),  IcoEdge({1, 7}),  IcoEdge({1, 8}),
        IcoEdge({1, 10}), IcoEdge({2, 3}),  IcoEdge({2, 4}),  IcoEdge({2, 5}),
@@ -78,7 +78,7 @@ void Icosphere::generateIcosahedron(IcosahedronMesh& icosahedronMesh) const
        IcoEdge({6, 8}),  IcoEdge({6, 9}),  IcoEdge({7, 10}), IcoEdge({7, 11}),
        IcoEdge({8, 9}),  IcoEdge({10, 11})};
 
-  icosahedronMesh.faces = {
+  _icosahedronMesh.faces = {
     IcoFace({0, 1, 8}, {0, 7, 3}),     IcoFace({0, 4, 5}, {1, 18, 2}),
     IcoFace({0, 5, 10}, {2, 21, 4}),   IcoFace({0, 8, 4}, {3, 19, 1}),
     IcoFace({0, 10, 1}, {4, 8, 0}),    IcoFace({1, 6, 8}, {5, 24, 7}),
@@ -91,53 +91,52 @@ void Icosphere::generateIcosahedron(IcosahedronMesh& icosahedronMesh) const
     IcoFace({6, 9, 8}, {25, 28, 24}),  IcoFace({7, 10, 11}, {26, 29, 27}),
   };
 
-  icosahedronMesh.nodes.reserve(icosahedronMesh.edges.size() * 3);
-  for (size_t i = 0; i < icosahedronMesh.edges.size(); ++i) {
-    for (size_t j = 0; j < icosahedronMesh.edges[i].n.size(); ++j) {
-      icosahedronMesh.nodes[j].e.emplace_back(i);
+  _icosahedronMesh.nodes.reserve(_icosahedronMesh.edges.size() * 3);
+  for (size_t i = 0; i < _icosahedronMesh.edges.size(); ++i) {
+    for (size_t j = 0; j < _icosahedronMesh.edges[i].n.size(); ++j) {
+      _icosahedronMesh.nodes[j].e.emplace_back(i);
     }
   }
 
-  for (size_t i = 0; i < icosahedronMesh.faces.size(); ++i) {
-    for (size_t j = 0; j < icosahedronMesh.faces[i].n.size(); ++j) {
-      icosahedronMesh.nodes[j].f.emplace_back(i);
+  for (size_t i = 0; i < _icosahedronMesh.faces.size(); ++i) {
+    for (size_t j = 0; j < _icosahedronMesh.faces[i].n.size(); ++j) {
+      _icosahedronMesh.nodes[j].f.emplace_back(i);
     }
   }
 
-  icosahedronMesh.edges.reserve(icosahedronMesh.faces.size() * 3);
-  for (size_t i = 0; i < icosahedronMesh.faces.size(); ++i) {
-    for (size_t j = 0; j < icosahedronMesh.faces[i].e.size(); ++j) {
-      icosahedronMesh.edges[j].f.emplace_back(i);
+  _icosahedronMesh.edges.reserve(_icosahedronMesh.faces.size() * 3);
+  for (size_t i = 0; i < _icosahedronMesh.faces.size(); ++i) {
+    for (size_t j = 0; j < _icosahedronMesh.faces[i].e.size(); ++j) {
+      _icosahedronMesh.edges[j].f.emplace_back(i);
     }
   }
 }
 
-void Icosphere::generateSubdividedIcosahedron(
-  size_t degree, IcosahedronMesh& icosahedronMesh) const
+void Icosphere::generateSubdividedIcosahedron(size_t degree)
 {
-  auto& nodes = icosahedronMesh.nodes;
-  auto& edges = icosahedronMesh.edges;
-  auto& faces = icosahedronMesh.faces;
+  auto& nodes = _icosahedronMesh.nodes;
+  auto& edges = _icosahedronMesh.edges;
+  auto& faces = _icosahedronMesh.faces;
 
-  generateIcosahedron(icosahedronMesh);
+  generateIcosahedron();
 
   // Ico nodes
   nodes.reserve(
-    icosahedronMesh.nodes.size() + icosahedronMesh.edges.size() * (degree - 1)
-    + icosahedronMesh.faces.size() * (degree - 1) * (degree - 1) / 2);
-  for (auto& node : icosahedronMesh.nodes) {
+    _icosahedronMesh.nodes.size() + _icosahedronMesh.edges.size() * (degree - 1)
+    + _icosahedronMesh.faces.size() * (degree - 1) * (degree - 1) / 2);
+  for (auto& node : _icosahedronMesh.nodes) {
     nodes.emplace_back(IcoNode(node.p));
   }
 
   // Ico edges
   edges.reserve(
-    icosahedronMesh.edges.size() + icosahedronMesh.edges.size() * (degree - 1)
-    + 3 * icosahedronMesh.faces.size() * (degree - 1) * (degree - 1) / 2);
-  for (auto& edge : icosahedronMesh.edges) {
+    _icosahedronMesh.edges.size() + _icosahedronMesh.edges.size() * (degree - 1)
+    + 3 * _icosahedronMesh.faces.size() * (degree - 1) * (degree - 1) / 2);
+  for (auto& edge : _icosahedronMesh.edges) {
     edge.subdivided_n.clear();
     edge.subdivided_e.clear();
-    auto& n0 = icosahedronMesh.nodes[edge.n[0]];
-    auto& n1 = icosahedronMesh.nodes[edge.n[1]];
+    auto& n0 = _icosahedronMesh.nodes[edge.n[0]];
+    auto& n1 = _icosahedronMesh.nodes[edge.n[1]];
     auto p0  = n0.p;
     auto p1  = n1.p;
     nodes[edge.n[0]].e.emplace_back(edges.size());
@@ -160,12 +159,12 @@ void Icosphere::generateSubdividedIcosahedron(
   }
 
   // Ico faces
-  faces.reserve(2 * icosahedronMesh.faces.size() * (degree - 1) * (degree - 1)
+  faces.reserve(2 * _icosahedronMesh.faces.size() * (degree - 1) * (degree - 1)
                 / 2);
-  for (auto& face : icosahedronMesh.faces) {
-    auto& edge0 = icosahedronMesh.edges[face.e[0]];
-    auto& edge1 = icosahedronMesh.edges[face.e[1]];
-    auto& edge2 = icosahedronMesh.edges[face.e[2]];
+  for (auto& face : _icosahedronMesh.faces) {
+    auto& edge0 = _icosahedronMesh.edges[face.e[0]];
+    auto& edge1 = _icosahedronMesh.edges[face.e[1]];
+    auto& edge2 = _icosahedronMesh.edges[face.e[2]];
 
     auto getEdgeNode0 = [&face, &edge0, &degree](size_t k) {
       if (face.n[0] == edge0.n[0]) {
@@ -343,10 +342,10 @@ void Icosphere::generateSubdividedIcosahedron(
   }
 }
 
-void Icosphere::correctFaceIndices(IcosahedronMesh& icosahedronMesh)
+void Icosphere::correctFaceIndices()
 {
   unsigned int i = 0;
-  for (auto& node : icosahedronMesh.nodes) {
+  for (auto& node : _icosahedronMesh.nodes) {
     auto faceIndex = node.f[0];
     for (unsigned int j = 1; j < node.f.size() - 1; ++j) {
       faceIndex = findNextFaceIndex(i, faceIndex);
@@ -593,6 +592,11 @@ float Icosphere::relaxMesh(float multiplier)
   }
 
   return totalShift;
+}
+
+IcosahedronMesh& Icosphere::icosahedron()
+{
+  return _icosahedronMesh;
 }
 
 } // end of namespace Extensions

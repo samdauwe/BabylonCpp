@@ -27,7 +27,7 @@ struct Border : public UidObj {
   std::vector<Tile*> tiles;
   Vector3 midpoint;
   bool betweenPlates;
-};
+}; // end of struct Border
 
 } // end of namespace Extensions
 } // end of namespace BABYLON

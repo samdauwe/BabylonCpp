@@ -12,7 +12,7 @@ struct Stress {
 
   float pressure;
   float shear;
-};
+}; // end of struct Stress
 
 } // end of namespace Extensions
 } // end of namespace BABYLON

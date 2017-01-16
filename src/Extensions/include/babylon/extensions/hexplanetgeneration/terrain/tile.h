@@ -33,7 +33,7 @@ struct Tile : public UidObj {
   float moisture;
   std::string biome;
   Vector3 plateMovement;
-};
+}; // end of struct Tile
 
 } // end of namespace Extensions
 } // end of namespace BABYLON

@@ -13,7 +13,7 @@ struct UidObj {
   virtual bool operator==(const UidObj& other) const;
 
   size_t id;
-};
+}; // end of struct UidObj
 
 } // end of namespace Extensions
 } // end of namespace BABYLON

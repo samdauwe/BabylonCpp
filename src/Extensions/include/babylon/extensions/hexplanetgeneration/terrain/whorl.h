@@ -14,7 +14,7 @@ struct Whorl {
   Vector3 center;
   float strength;
   float radius;
-};
+}; // end of struct Whorl
 
 } // end of namespace Extensions
 } // end of namespace BABYLON

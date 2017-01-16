@@ -20,7 +20,7 @@ struct SpatialPartition {
   BoundingSphere boundingSphere;
   std::vector<SpatialPartition> partitions;
   std::vector<Tile*> tiles;
-};
+}; // end of struct SpatialPartition
 
 } // end of namespace Extensions
 } // end of namespace BABYLON

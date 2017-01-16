@@ -49,7 +49,7 @@ struct Corner : public UidObj {
   float precipitation;
   float precipitationRate;
   float maxPrecipitation;
-};
+}; // end of struct Corner
 
 } // end of namespace Extensions
 } // end of namespace BABYLON

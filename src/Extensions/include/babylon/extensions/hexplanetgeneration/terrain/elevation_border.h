@@ -21,7 +21,7 @@ struct ElevationBorder {
   Corner* corner;
   Corner* nextCorner;
   float distanceToPlateBoundary;
-};
+}; // end of struct ElevationBorder
 
 } // end of namespace Extensions
 } // end of namespace BABYLON

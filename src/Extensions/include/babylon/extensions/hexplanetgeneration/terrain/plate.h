@@ -29,7 +29,7 @@ struct Plate {
   std::vector<Border*> boundaryBorders;
   float area;
   float circumference;
-};
+}; // end of struct Plate
 
 } // end of namespace Extensions
 } // end of namespace BABYLON

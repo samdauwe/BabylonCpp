@@ -2,10 +2,13 @@
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_ICOSPHERE_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/culling/bounding_sphere.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
 namespace Extensions {
+
+struct Tile;
 
 struct BABYLON_SHARED_EXPORT IcoNode {
   IcoNode(const Vector3& p);
@@ -28,6 +31,8 @@ struct BABYLON_SHARED_EXPORT IcoFace {
   std::vector<size_t> n;
   std::vector<size_t> e;
   Vector3 centroid;
+  BoundingSphere boundingSphere;
+  std::vector<Tile*> children;
 }; // end of struct IcoEdge
 
 struct BABYLON_SHARED_EXPORT IcosahedronMesh {
@@ -48,10 +53,9 @@ public:
   Icosphere();
   Icosphere(size_t icosahedronSubdivision, float topologyDistortionRate);
 
-  void generateIcosahedron(IcosahedronMesh& icosahedronMesh) const;
-  void generateSubdividedIcosahedron(size_t degree,
-                                     IcosahedronMesh& icosahedronMesh) const;
-  void correctFaceIndices(IcosahedronMesh& icosahedronMesh);
+  void generateIcosahedron();
+  void generateSubdividedIcosahedron(size_t degree);
+  void correctFaceIndices();
   Vector3 calculateFaceCentroid(const Vector3& pa, const Vector3& pb,
                                 const Vector3& pc) const;
   size_t getEdgeOppositeFaceIndex(const IcoEdge& edge, size_t faceIndex) const;
