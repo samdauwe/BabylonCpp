@@ -13,6 +13,7 @@ struct IcoNode;
 struct IcosahedronMesh;
 struct IRandomFunction;
 struct Planet;
+struct PlanetStatistics;
 struct Plate;
 struct RenderData;
 struct RenderObject;
@@ -108,6 +109,19 @@ public:
   void generatePlanetRenderData(Topology& topology, IRandomFunction& random,
                                 RenderData& renderData);
   void doBuildTileWedge(RenderObject& ro, size_t b, size_t s, size_t t);
+  void buildSurfaceRenderObject(std::vector<Tile>& tiles,
+                                IRandomFunction& random, RenderObject& ro);
+  void buildPlateBoundariesRenderObject(std::vector<Border>& borders,
+                                        RenderObject& ro);
+  void buildPlateMovementsRenderObject(std::vector<Tile>& tiles,
+                                       RenderObject& ro);
+  void buildAirCurrentsRenderObject(std::vector<Corner>& corners,
+                                    RenderObject& ro);
+  void buildArrow(RenderObject& ro, const Vector3& position,
+                  const Vector3& direction, const Vector3& normal,
+                  float baseWidth, const Color3& color);
+  void generatePlanetStatistics(Topology& topology, std::vector<Plate>& plates,
+                                PlanetStatistics& planetStatistics);
 
 private:
   static const size_t UdefIdx;

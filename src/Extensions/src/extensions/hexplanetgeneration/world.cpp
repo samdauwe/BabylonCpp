@@ -1,7 +1,9 @@
 #include <babylon/extensions/hexplanetgeneration/world.h>
 
+#include <babylon/core/logging.h>
 #include <babylon/extensions/hexplanetgeneration/icosphere.h>
 #include <babylon/extensions/hexplanetgeneration/planet.h>
+#include <babylon/extensions/hexplanetgeneration/planet_statistics.h>
 #include <babylon/extensions/hexplanetgeneration/render_data.h>
 #include <babylon/extensions/hexplanetgeneration/terrain/distance_corner.h>
 #include <babylon/extensions/hexplanetgeneration/terrain/elevation_border.h>
@@ -1041,6 +1043,503 @@ void World::doBuildTileWedge(RenderObject& ro, size_t b, size_t s, size_t t)
   ro.triangle(b + s + 2, b, b + t + 2);
   ro.triangle(b + s + 1, b + t + 2, b + t + 1);
   ro.triangle(b + s + 1, b + s + 2, b + t + 2);
+}
+
+void World::buildSurfaceRenderObject(std::vector<Tile>& tiles,
+                                     IRandomFunction& random, RenderObject& ro)
+{
+  size_t baseIndex = 0;
+  for (auto& tile : tiles) {
+    auto colorDeviance = Color3(random.unit(), random.unit(), random.unit());
+    Color3 terrainColor;
+    if (tile.elevation <= 0) {
+      if (tile.biome == "ocean") {
+        terrainColor = lerp(lerp(Tools::ocv(0x0066FF), Tools::ocv(0x0044BB),
+                                 std::min(-tile.elevation, 1.f)),
+                            colorDeviance, 0.10f);
+      }
+      else if (tile.biome == "oceanGlacier") {
+        terrainColor = lerp(Tools::ocv(0xDDEEFF), colorDeviance, 0.10f);
+      }
+      else
+        terrainColor = Tools::ocv(0xFF00FF);
+    }
+    else if (tile.elevation < 0.6f) {
+      auto normalizedElevation = tile.elevation / 0.6f;
+      if (tile.biome == "desert") {
+        terrainColor = lerp(
+          lerp(Tools::ocv(0xDDDD77), Tools::ocv(0xBBBB55), normalizedElevation),
+          colorDeviance, 0.10f);
+      }
+      else if (tile.biome == "rainForest") {
+        terrainColor = lerp(
+          lerp(Tools::ocv(0x44DD00), Tools::ocv(0x229900), normalizedElevation),
+          colorDeviance, 0.20f);
+      }
+      else if (tile.biome == "rocky") {
+        terrainColor = lerp(
+          lerp(Tools::ocv(0xAA9977), Tools::ocv(0x887755), normalizedElevation),
+          colorDeviance, 0.15f);
+      }
+      else if (tile.biome == "plains") {
+        terrainColor = lerp(
+          lerp(Tools::ocv(0x99BB44), Tools::ocv(0x667722), normalizedElevation),
+          colorDeviance, 0.10f);
+      }
+      else if (tile.biome == "grassland") {
+        terrainColor = lerp(
+          lerp(Tools::ocv(0x77CC44), Tools::ocv(0x448822), normalizedElevation),
+          colorDeviance, 0.15f);
+      }
+      else if (tile.biome == "swamp") {
+        terrainColor = lerp(
+          lerp(Tools::ocv(0x77AA44), Tools::ocv(0x446622), normalizedElevation),
+          colorDeviance, 0.25f);
+      }
+      else if (tile.biome == "deciduousForest") {
+        terrainColor = lerp(
+          lerp(Tools::ocv(0x33AA22), Tools::ocv(0x116600), normalizedElevation),
+          colorDeviance, 0.10f);
+      }
+      else if (tile.biome == "tundra") {
+        terrainColor = lerp(
+          lerp(Tools::ocv(0x9999AA), Tools::ocv(0x777788), normalizedElevation),
+          colorDeviance, 0.15f);
+      }
+      else if (tile.biome == "landGlacier") {
+        terrainColor = lerp(Tools::ocv(0xDDEEFF), colorDeviance, 0.10f);
+      }
+      else {
+        terrainColor = Tools::ocv(0xFF00FF);
+      }
+    }
+    else if (tile.elevation < 0.8f) {
+      auto normalizedElevation = (tile.elevation - 0.6f) / 0.2f;
+      if (tile.biome == "tundra") {
+        terrainColor = lerp(
+          lerp(Tools::ocv(0x777788), Tools::ocv(0x666677), normalizedElevation),
+          colorDeviance, 0.10f);
+      }
+      else if (tile.biome == "coniferForest") {
+        terrainColor = lerp(
+          lerp(Tools::ocv(0x338822), Tools::ocv(0x116600), normalizedElevation),
+          colorDeviance, 0.10f);
+      }
+      else if (tile.biome == "snow") {
+        terrainColor = lerp(
+          lerp(Tools::ocv(0xEEEEEE), Tools::ocv(0xDDDDDD), normalizedElevation),
+          colorDeviance, 0.10f);
+      }
+      else if (tile.biome == "mountain") {
+        terrainColor = lerp(
+          lerp(Tools::ocv(0x555544), Tools::ocv(0x444433), normalizedElevation),
+          colorDeviance, 0.05f);
+      }
+      else {
+        terrainColor = Tools::ocv(0xFF00FF);
+      }
+    }
+    else {
+      auto normalizedElevation = std::min((tile.elevation - 0.8f) / 0.5f, 1.f);
+      if (tile.biome == "mountain") {
+        terrainColor = lerp(
+          lerp(Tools::ocv(0x444433), Tools::ocv(0x333322), normalizedElevation),
+          colorDeviance, 0.05f);
+      }
+      else if (tile.biome == "snowyMountain") {
+        terrainColor = lerp(
+          lerp(Tools::ocv(0xDDDDDD), Tools::ocv(0xFFFFFF), normalizedElevation),
+          colorDeviance, 0.10f);
+      }
+      else {
+        terrainColor = Tools::ocv(0xFF00FF);
+      }
+    }
+
+    Color3 elevationColor;
+    if (tile.elevation <= 0) {
+      elevationColor = lerp(
+        Tools::ocv(0x224488), Tools::ocv(0xAADDFF),
+        std::max(0.f,
+                 std::min((tile.elevation + 3.f / 4.f) / (3.f / 4.f), 1.f)));
+    }
+    else if (tile.elevation < 0.75f) {
+      elevationColor
+        = lerp(Tools::ocv(0x997755), Tools::ocv(0x553311),
+               std::max(0.f, std::min((tile.elevation) / (3.f / 4.f), 1.f)));
+    }
+    else {
+      elevationColor = lerp(
+        Tools::ocv(0x553311), Tools::ocv(0x222222),
+        std::max(0.f,
+                 std::min((tile.elevation - 3.f / 4.f) / (1.f / 2.f), 1.f)));
+    }
+
+    Color3 temperatureColor;
+    if (tile.temperature <= 0) {
+      temperatureColor = lerp(
+        Tools::ocv(0x0000FF), Tools::ocv(0xBBDDFF),
+        std::max(0.f,
+                 std::min((tile.temperature + 2.f / 3.f) / (2.f / 3.f), 1.f)));
+    }
+    else {
+      temperatureColor
+        = lerp(Tools::ocv(0xFFFF00), Tools::ocv(0xFF0000),
+               std::max(0.f, std::min((tile.temperature) / (3.f / 3.f), 1.f)));
+    }
+
+    ro.position(tile.averagePosition);
+    ro.normal(tile.normal);
+    ro.colour(terrainColor);
+    for (size_t j = 0; j < tile.corners.size(); ++j) {
+      auto& cornerPosition = tile.corners[j]->position;
+
+      ro.position(cornerPosition);
+      ro.normal(tile.normal);
+      ro.colour(terrainColor);
+
+      ro.position((tile.averagePosition - cornerPosition) * 0.1f
+                  + cornerPosition);
+      ro.normal(tile.normal);
+      ro.colour(terrainColor * 0.5f);
+
+      size_t i0 = j * 2;
+      size_t i1 = ((j + 1) % tile.corners.size()) * 2;
+      doBuildTileWedge(ro, baseIndex, i0, i1);
+    }
+
+    baseIndex += 1 + tile.corners.size() * 2;
+  }
+}
+
+void World::buildPlateBoundariesRenderObject(std::vector<Border>& borders,
+                                             RenderObject& ro)
+{
+  auto baseIndex = ro.getCurrentVertexCount();
+  for (auto& border : borders) {
+    if (border.betweenPlates) {
+      auto normal = border.midpoint.normalize();
+      auto offset = normal * 1;
+
+      auto& borderPoint0 = border.corners[0]->position;
+      auto& borderPoint1 = border.corners[1]->position;
+      auto& tilePoint0   = border.tiles[0]->averagePosition;
+      auto& tilePoint1   = border.tiles[1]->averagePosition;
+      auto nl = (border.tiles[0]->normal + border.tiles[1]->normal) / 2.f;
+
+      auto pressure = std::max(-1.f, std::min((border.corners[0]->pressure
+                                               + border.corners[1]->pressure)
+                                                / 2.f,
+                                              1.f));
+      auto shear = std::max(
+        0.f,
+        std::min((border.corners[0]->shear + border.corners[1]->shear) / 2.f,
+                 1.f));
+      auto innerColor = (pressure <= 0) ? Color3(1.f + pressure, 1.f, 0.f) :
+                                          Color3(1.f, 1.f - pressure, 0.f);
+      auto outerColor = Color3(0.f, shear / 2.f, shear);
+
+      ro.position(borderPoint0 + offset);
+      ro.normal(nl);
+      ro.colour(innerColor);
+
+      ro.position(borderPoint1 + offset);
+      ro.normal(nl);
+      ro.colour(innerColor);
+
+      ro.position((tilePoint0 - borderPoint0) * 0.2f + borderPoint0 + offset);
+      ro.normal(nl);
+      ro.colour(outerColor);
+
+      ro.position((tilePoint0 - borderPoint1) * 0.2f + borderPoint1 + offset);
+      ro.normal(nl);
+      ro.colour(outerColor);
+
+      ro.position((tilePoint1 - borderPoint0) * 0.2f + borderPoint0 + offset);
+      ro.normal(nl);
+      ro.colour(outerColor);
+
+      ro.position((tilePoint1 - borderPoint1) * 0.2f + borderPoint1 + offset);
+      ro.normal(nl);
+      ro.colour(outerColor);
+
+      ro.triangle(baseIndex + 0, baseIndex + 2, baseIndex + 1);
+      ro.triangle(baseIndex + 1, baseIndex + 2, baseIndex + 3);
+      ro.triangle(baseIndex + 1, baseIndex + 5, baseIndex + 0);
+      ro.triangle(baseIndex + 0, baseIndex + 5, baseIndex + 4);
+
+      baseIndex += 6;
+    }
+  }
+}
+
+void World::buildPlateMovementsRenderObject(std::vector<Tile>& tiles,
+                                            RenderObject& ro)
+{
+  for (auto& tile : tiles) {
+    auto& plate   = *tile.plate;
+    auto movement = plate.calculateMovement(tile.position);
+    auto plateMovementColor
+      = Color3(1.f - plate.color.r, 1.f - plate.color.g, 1.f - plate.color.b);
+
+    buildArrow(ro, tile.position * 1.002f, movement * 0.5f,
+               tile.position.normalize(), std::min(movement.length(), 4.f),
+               plateMovementColor);
+
+    tile.plateMovement = movement;
+  }
+}
+
+void World::buildAirCurrentsRenderObject(std::vector<Corner>& corners,
+                                         RenderObject& ro)
+{
+  for (auto& corner : corners) {
+    buildArrow(ro, corner.position * 1.002f, corner.airCurrent * 0.5f,
+               corner.position.normalize(),
+               std::min(corner.airCurrent.length(), 4.f),
+               Color3(1.f, 1.f, 1.f));
+  }
+}
+
+void World::buildArrow(RenderObject& ro, const Vector3& position,
+                       const Vector3& direction, const Vector3& normal,
+                       float baseWidth, const Color3& color)
+{
+  if (direction.lengthSquared() == 0.f) {
+    return;
+  }
+
+  auto sideOffset
+    = Tools::setLength(Vector3::Dot(direction, normal), baseWidth / 2.f);
+  auto baseIndex = ro.getCurrentVertexCount();
+
+  ro.position(position + sideOffset);
+  ro.normal(normal);
+  ro.colour(color);
+
+  ro.position(position + direction);
+  ro.normal(normal);
+  ro.colour(color);
+
+  ro.position(position - sideOffset);
+  ro.normal(normal);
+  ro.colour(color);
+
+  ro.triangle(baseIndex, baseIndex + 1, baseIndex + 2);
+}
+
+void World::generatePlanetStatistics(Topology& topology,
+                                     std::vector<Plate>& plates,
+                                     PlanetStatistics& planetStatistics)
+{
+  auto& statistics = planetStatistics;
+
+  statistics.corners.count = topology.corners.size();
+  statistics.corners.airCurrent.reset();
+  statistics.corners.elevation.reset();
+  statistics.corners.temperature.reset();
+  statistics.corners.moisture.reset();
+  statistics.corners.distanceToPlateBoundary.reset();
+  statistics.corners.distanceToPlateRoot.reset();
+  statistics.corners.pressure.reset();
+  statistics.corners.shear.reset();
+  statistics.corners.doublePlateBoundaryCount = 0;
+  statistics.corners.triplePlateBoundaryCount = 0;
+  statistics.corners.innerLandBoundaryCount   = 0;
+  statistics.corners.outerLandBoundaryCount   = 0;
+
+  for (auto& corner : topology.corners) {
+    updateMinMaxAvg(statistics.corners.airCurrent, corner.airCurrent.length());
+    updateMinMaxAvg(statistics.corners.elevation, corner.elevation);
+    updateMinMaxAvg(statistics.corners.temperature, corner.temperature);
+    updateMinMaxAvg(statistics.corners.moisture, corner.moisture);
+    updateMinMaxAvg(statistics.corners.distanceToPlateBoundary,
+                    corner.distanceToPlateBoundary);
+    updateMinMaxAvg(statistics.corners.distanceToPlateRoot,
+                    corner.distanceToPlateRoot);
+    if (corner.betweenPlates) {
+      updateMinMaxAvg(statistics.corners.pressure, corner.pressure);
+      updateMinMaxAvg(statistics.corners.shear, corner.shear);
+      if (!corner.borders[0]->betweenPlates || !corner.borders[1]->betweenPlates
+          || !corner.borders[2]->betweenPlates) {
+        statistics.corners.doublePlateBoundaryCount += 1;
+      }
+      else {
+        statistics.corners.triplePlateBoundaryCount += 1;
+      }
+    }
+    auto landCount = ((corner.tiles[0]->elevation > 0) ? 1 : 0)
+                     + ((corner.tiles[1]->elevation > 0) ? 1 : 0)
+                     + ((corner.tiles[2]->elevation > 0) ? 1 : 0);
+    if (landCount == 2) {
+      statistics.corners.innerLandBoundaryCount += 1;
+    }
+    else if (landCount == 1) {
+      statistics.corners.outerLandBoundaryCount += 1;
+    }
+    if (corner.corners.size() != 3) {
+      BABYLON_LOG_ERROR("World",
+                        "Corner has as invalid number of neighboring corners.");
+      return;
+    }
+    if (corner.borders.size() != 3) {
+      BABYLON_LOG_ERROR("World", "Corner has as invalid number of borders.");
+      return;
+    }
+    if (corner.tiles.size() != 3) {
+      BABYLON_LOG_ERROR("World", "Corner has as invalid number of tiles.");
+      return;
+    }
+  }
+
+  statistics.corners.airCurrent.avg /= statistics.corners.count;
+  statistics.corners.elevation.avg /= statistics.corners.count;
+  statistics.corners.temperature.avg /= statistics.corners.count;
+  statistics.corners.moisture.avg /= statistics.corners.count;
+  statistics.corners.distanceToPlateBoundary.avg /= statistics.corners.count;
+  statistics.corners.distanceToPlateRoot.avg /= statistics.corners.count;
+  statistics.corners.pressure.avg
+    /= (statistics.corners.doublePlateBoundaryCount
+        + statistics.corners.triplePlateBoundaryCount);
+  statistics.corners.shear.avg
+    /= (statistics.corners.doublePlateBoundaryCount
+        + statistics.corners.triplePlateBoundaryCount);
+
+  statistics.borders.count = topology.borders.size();
+  statistics.borders.length.reset();
+  statistics.borders.plateBoundaryCount      = 0;
+  statistics.borders.plateBoundaryPercentage = 0;
+  statistics.borders.landBoundaryCount       = 0;
+  statistics.borders.landBoundaryPercentage  = 0;
+
+  for (auto& border : topology.borders) {
+    auto length = border.length();
+    updateMinMaxAvg(statistics.borders.length, length);
+    if (border.betweenPlates) {
+      statistics.borders.plateBoundaryCount += 1;
+      statistics.borders.plateBoundaryPercentage += length;
+    }
+    if (border.isLandBoundary()) {
+      statistics.borders.landBoundaryCount += 1;
+      statistics.borders.landBoundaryPercentage += length;
+    }
+    if (border.corners.size() != 2) {
+      BABYLON_LOG_ERROR("World", "Border has as invalid number of corners.");
+      return;
+    }
+    if (border.borders.size() != 4) {
+      BABYLON_LOG_ERROR("World",
+                        "Border has as invalid number of neighboring borders.");
+      return;
+    }
+    if (border.tiles.size() != 2) {
+      BABYLON_LOG_ERROR("World", "Border has as invalid number of tiles.");
+      return;
+    }
+  }
+
+  statistics.borders.plateBoundaryPercentage /= statistics.borders.length.avg;
+  statistics.borders.landBoundaryPercentage /= statistics.borders.length.avg;
+  statistics.borders.length.avg /= statistics.borders.count;
+
+  statistics.tiles.count     = topology.tiles.size();
+  statistics.tiles.totalArea = 0;
+  statistics.tiles.area.reset();
+  statistics.tiles.elevation.reset();
+  statistics.tiles.temperature.reset();
+  statistics.tiles.moisture.reset();
+  statistics.tiles.plateMovement.reset();
+  statistics.tiles.biomeCounts.clear();
+  statistics.tiles.biomeAreas.clear();
+  statistics.tiles.pentagonCount = 0;
+  statistics.tiles.hexagonCount  = 0;
+  statistics.tiles.heptagonCount = 0;
+
+  for (auto& tile : topology.tiles) {
+    updateMinMaxAvg(statistics.tiles.area, tile.area);
+    updateMinMaxAvg(statistics.tiles.elevation, tile.elevation);
+    updateMinMaxAvg(statistics.tiles.temperature, tile.temperature);
+    updateMinMaxAvg(statistics.tiles.moisture, tile.moisture);
+    updateMinMaxAvg(statistics.tiles.plateMovement,
+                    tile.plateMovement.length());
+    if (!statistics.tiles.biomeCounts[tile.biome]) {
+      statistics.tiles.biomeCounts[tile.biome] = 0;
+    }
+    statistics.tiles.biomeCounts[tile.biome] += 1;
+    if (statistics.tiles.biomeAreas[tile.biome] == 0.f) {
+      statistics.tiles.biomeAreas[tile.biome] = 0;
+    }
+    statistics.tiles.biomeAreas[tile.biome] += tile.area;
+    if (tile.tiles.size() == 5) {
+      statistics.tiles.pentagonCount += 1;
+    }
+    else if (tile.tiles.size() == 6) {
+      statistics.tiles.hexagonCount += 1;
+    }
+    else if (tile.tiles.size() == 7) {
+      statistics.tiles.heptagonCount += 1;
+    }
+    else {
+      BABYLON_LOG_ERROR("World",
+                        "Tile has an invalid number of neighboring tiles.");
+      return;
+    }
+    if (tile.tiles.size() != tile.borders.size()) {
+      BABYLON_LOG_ERROR(
+        "World", "Tile has a neighbor and border count that do not match.");
+      return;
+    }
+    if (tile.tiles.size() != tile.corners.size()) {
+      BABYLON_LOG_ERROR(
+        "World", "Tile has a neighbor and corner count that do not match.");
+      return;
+    }
+  }
+
+  statistics.tiles.totalArea = statistics.tiles.area.avg;
+  statistics.tiles.area.avg /= statistics.tiles.count;
+  statistics.tiles.elevation.avg /= statistics.tiles.count;
+  statistics.tiles.temperature.avg /= statistics.tiles.count;
+  statistics.tiles.moisture.avg /= statistics.tiles.count;
+  statistics.tiles.plateMovement.avg /= statistics.tiles.count;
+
+  statistics.plates.count = plates.size();
+  statistics.plates.tileCount.reset();
+  statistics.plates.area.reset();
+  statistics.plates.boundaryElevation.reset();
+  statistics.plates.boundaryBorders.reset();
+  statistics.plates.circumference.reset();
+
+  for (auto& plate : plates) {
+    updateMinMaxAvg(statistics.plates.tileCount, plate.tiles.size());
+    plate.area = 0.f;
+    for (auto ptile : plate.tiles) {
+      auto& tile = *ptile;
+      plate.area += tile.area;
+    }
+    updateMinMaxAvg(statistics.plates.area, plate.area);
+    float elevation = 0.f;
+    for (auto pcorner : plate.boundaryCorners) {
+      auto& corner = *pcorner;
+      elevation += corner.elevation;
+    }
+    updateMinMaxAvg(statistics.plates.boundaryElevation,
+                    elevation / plate.boundaryCorners.size());
+    updateMinMaxAvg(statistics.plates.boundaryBorders,
+                    plate.boundaryBorders.size());
+    plate.circumference = 0.f;
+    for (auto pborder : plate.boundaryBorders) {
+      auto& border = *pborder;
+      plate.circumference += border.length();
+    }
+    updateMinMaxAvg(statistics.plates.circumference, plate.circumference);
+  }
+
+  statistics.plates.tileCount.avg /= statistics.plates.count;
+  statistics.plates.area.avg /= statistics.plates.count;
+  statistics.plates.boundaryElevation.avg /= statistics.plates.count;
+  statistics.plates.boundaryBorders.avg /= statistics.plates.count;
+  statistics.plates.circumference.avg /= statistics.plates.count;
 }
 
 } // end of namespace Extensions

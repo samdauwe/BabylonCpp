@@ -21,6 +21,14 @@ struct ValueStats {
   }
 };
 
+template <typename T>
+void updateMinMaxAvg(ValueStats<T>& stats, T value)
+{
+  stats.min = std::min(stats.min, value);
+  stats.max = std::max(stats.max, value);
+  stats.avg += value;
+}
+
 struct PlanetStatistics {
   struct Corners {
     size_t count;
@@ -32,7 +40,7 @@ struct PlanetStatistics {
     ValueStats<float> distanceToPlateRoot;
     ValueStats<float> pressure;
     ValueStats<float> shear;
-    size_t floatPlateBoundaryCount;
+    size_t doublePlateBoundaryCount;
     size_t triplePlateBoundaryCount;
     size_t innerLandBoundaryCount;
     size_t outerLandBoundaryCount;
