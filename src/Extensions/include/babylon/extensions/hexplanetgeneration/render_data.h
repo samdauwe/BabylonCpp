@@ -7,7 +7,7 @@ namespace BABYLON {
 namespace Extensions {
 
 struct RenderObject {
-  void colour(const Color3& /*color*/){}
+  void colour(const Color4& /*color*/){}
   void normal(const Vector3& /*normal*/){}
   void position(const Vector3& /*position*/){}
   void triangle(size_t /*p1*/, size_t /*p2*/, size_t /*p3*/){}

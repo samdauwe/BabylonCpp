@@ -13,7 +13,7 @@
 #include <babylon/extensions/hexplanetgeneration/terrain/topology.h>
 #include <babylon/extensions/hexplanetgeneration/terrain/whorl.h>
 #include <babylon/extensions/hexplanetgeneration/utils/tools.h>
-#include <babylon/math/color3.h>
+#include <babylon/math/color4.h>
 
 namespace BABYLON {
 namespace Extensions {
@@ -25,6 +25,15 @@ World::World()
 }
 
 World::~World()
+{
+}
+
+void World::generatePlanet(Planet*& /*planet*/, unsigned long /*originalSeed*/,
+                           unsigned long /*seed*/,
+                           size_t /*icosahedronSubdivision*/,
+                           float /*topologyDistortionRate*/,
+                           size_t /*plateCount*/, float /*oceanicRate*/,
+                           float /*heatLevel*/, float /*moistureLevel*/)
 {
 }
 
@@ -1050,8 +1059,8 @@ void World::buildSurfaceRenderObject(std::vector<Tile>& tiles,
 {
   size_t baseIndex = 0;
   for (auto& tile : tiles) {
-    auto colorDeviance = Color3(random.unit(), random.unit(), random.unit());
-    Color3 terrainColor;
+    auto colorDeviance = Color4(random.unit(), random.unit(), random.unit());
+    Color4 terrainColor;
     if (tile.elevation <= 0) {
       if (tile.biome == "ocean") {
         terrainColor = lerp(lerp(Tools::ocv(0x0066FF), Tools::ocv(0x0044BB),
@@ -1156,7 +1165,7 @@ void World::buildSurfaceRenderObject(std::vector<Tile>& tiles,
       }
     }
 
-    Color3 elevationColor;
+    Color4 elevationColor;
     if (tile.elevation <= 0) {
       elevationColor = lerp(
         Tools::ocv(0x224488), Tools::ocv(0xAADDFF),
@@ -1175,7 +1184,7 @@ void World::buildSurfaceRenderObject(std::vector<Tile>& tiles,
                  std::min((tile.elevation - 3.f / 4.f) / (1.f / 2.f), 1.f)));
     }
 
-    Color3 temperatureColor;
+    Color4 temperatureColor;
     if (tile.temperature <= 0) {
       temperatureColor = lerp(
         Tools::ocv(0x0000FF), Tools::ocv(0xBBDDFF),
@@ -1235,9 +1244,9 @@ void World::buildPlateBoundariesRenderObject(std::vector<Border>& borders,
         0.f,
         std::min((border.corners[0]->shear + border.corners[1]->shear) / 2.f,
                  1.f));
-      auto innerColor = (pressure <= 0) ? Color3(1.f + pressure, 1.f, 0.f) :
-                                          Color3(1.f, 1.f - pressure, 0.f);
-      auto outerColor = Color3(0.f, shear / 2.f, shear);
+      auto innerColor = (pressure <= 0) ? Color4(1.f + pressure, 1.f, 0.f) :
+                                          Color4(1.f, 1.f - pressure, 0.f);
+      auto outerColor = Color4(0.f, shear / 2.f, shear);
 
       ro.position(borderPoint0 + offset);
       ro.normal(nl);
@@ -1280,7 +1289,7 @@ void World::buildPlateMovementsRenderObject(std::vector<Tile>& tiles,
     auto& plate   = *tile.plate;
     auto movement = plate.calculateMovement(tile.position);
     auto plateMovementColor
-      = Color3(1.f - plate.color.r, 1.f - plate.color.g, 1.f - plate.color.b);
+      = Color4(1.f - plate.color.r, 1.f - plate.color.g, 1.f - plate.color.b);
 
     buildArrow(ro, tile.position * 1.002f, movement * 0.5f,
                tile.position.normalize(), std::min(movement.length(), 4.f),
@@ -1297,13 +1306,13 @@ void World::buildAirCurrentsRenderObject(std::vector<Corner>& corners,
     buildArrow(ro, corner.position * 1.002f, corner.airCurrent * 0.5f,
                corner.position.normalize(),
                std::min(corner.airCurrent.length(), 4.f),
-               Color3(1.f, 1.f, 1.f));
+               Color4(1.f, 1.f, 1.f));
   }
 }
 
 void World::buildArrow(RenderObject& ro, const Vector3& position,
                        const Vector3& direction, const Vector3& normal,
-                       float baseWidth, const Color3& color)
+                       float baseWidth, const Color4& color)
 {
   if (direction.lengthSquared() == 0.f) {
     return;

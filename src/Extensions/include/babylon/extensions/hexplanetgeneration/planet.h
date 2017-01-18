@@ -4,6 +4,7 @@
 #include <babylon/babylon_global.h>
 
 #include <babylon/extensions/hexplanetgeneration/planet_statistics.h>
+#include <babylon/extensions/hexplanetgeneration/render_data.h>
 #include <babylon/extensions/hexplanetgeneration/terrain/spatial_partition.h>
 #include <babylon/extensions/hexplanetgeneration/terrain/topology.h>
 
@@ -21,7 +22,7 @@ struct Planet {
 
   std::vector<Plate> plates;
   SpatialPartition partition;
-  // RenderData renderData;
+  RenderData renderData;
   PlanetStatistics statistics;
 };
 

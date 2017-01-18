@@ -27,12 +27,12 @@ Plate::Plate(const Color3& p_color, const Vector3& p_driftAxis,
 Vector3 Plate::calculateMovement(const Vector3& position)
 {
   auto movement = Tools::setLength(
-    Vector3::Dot(driftAxis, position),
+    Vector3::Cross(driftAxis, position),
     driftRate * Vector3::Distance(Tools::projectOnVector(position, driftAxis),
                                   position));
 
   auto tmp = Tools::setLength(
-    Vector3::Dot(root->position, position),
+    Vector3::Cross(root->position, position),
     spinRate * Vector3::Distance(
                  Tools::projectOnVector(position, root->position), position));
 

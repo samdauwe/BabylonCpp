@@ -26,9 +26,26 @@ struct Whorl;
 class BABYLON_SHARED_EXPORT World {
 
 public:
+  enum class eValues {
+    subdivisions    = 0,
+    distortionLevel = 1,
+    plateCount      = 2,
+    oceanicRate     = 3,
+    heatLevel       = 4,
+    moistureLevel   = 5,
+    seed            = 6,
+  }; // end of enum class eValues
+
+public:
   World();
   ~World();
 
+  void generatePlanet(Planet*& planet, unsigned long originalSeed,
+                      unsigned long seed, size_t icosahedronSubdivision,
+                      float topologyDistortionRate, size_t plateCount,
+                      float oceanicRate, float heatLevel, float moistureLevel);
+
+private:
   bool generatePlanetTopology(const IcosahedronMesh& mesh, Topology& ret);
   void generatePlanetPartition(std::vector<Tile>& tiles,
                                SpatialPartition& rootPartition);
@@ -119,7 +136,7 @@ public:
                                     RenderObject& ro);
   void buildArrow(RenderObject& ro, const Vector3& position,
                   const Vector3& direction, const Vector3& normal,
-                  float baseWidth, const Color3& color);
+                  float baseWidth, const Color4& color);
   void generatePlanetStatistics(Topology& topology, std::vector<Plate>& plates,
                                 PlanetStatistics& planetStatistics);
 

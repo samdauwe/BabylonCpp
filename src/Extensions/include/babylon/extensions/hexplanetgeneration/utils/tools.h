@@ -58,6 +58,9 @@ struct Tools {
   static float angleBetween(const Vector3& v1, const Vector3& v2);
   static Vector3 projectOnVector(const Vector3& v1, const Vector3& v2);
   static Vector3 projectOnPlane(const Vector3& v, const Vector3& rkNormal);
+  static Plane redefinedPlane(const Vector3& rkNormal, const Vector3& rkPoint);
+  static Plane redefinedPlane(const Vector3& rkPoint0, const Vector3& rkPoint1,
+                              const Vector3& rkPoint2);
   static bool intersectRayWithSphere(const Ray& ray,
                                      const BoundingSphere& sphere);
   static float calculateTriangleArea(const Vector3& pa, const Vector3& pb,
@@ -66,7 +69,7 @@ struct Tools {
                            float newMin, float newMax);
   static void setLength(Vector3& v, float len);
   static Vector3 setLength(Vector3&& v, float len);
-  static Color3 ocv(unsigned int rgb = 0xFF000000);
+  static Color4 ocv(unsigned int rgba = 0xFF000000);
 }; // end of struct Tools
 
 } // end of namespace Extensions

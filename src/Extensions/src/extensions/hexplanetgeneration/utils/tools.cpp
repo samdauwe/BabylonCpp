@@ -1,6 +1,10 @@
 #include <babylon/extensions/hexplanetgeneration/utils/tools.h>
 
-#include <babylon/math/color3.h>
+#include <babylon/culling/bounding_sphere.h>
+#include <babylon/culling/ray.h>
+#include <babylon/math/color4.h>
+#include <babylon/math/math_tools.h>
+#include <babylon/math/plane.h>
 #include <babylon/math/quaternion.h>
 #include <babylon/math/vector3.h>
 #include <babylon/tools/tools.h>
@@ -36,9 +40,18 @@ Quaternion Tools::randomQuaternion(IRandomFunction& random)
                     std::cos(phi) * sinGamma, std::cos(gamma));
 }
 
-float Tools::angleBetween(const Vector3& /*v1*/, const Vector3& /*v2*/)
+float Tools::angleBetween(const Vector3& v1, const Vector3& v2)
 {
-  return 0.f;
+  auto lenProduct = v1.length() * v2.length();
+
+  // Divide by zero check
+  if (lenProduct < 1e-6f) {
+    lenProduct = 1e-6f;
+  }
+
+  auto f = Vector3::Dot(v1, v2) / lenProduct;
+  f      = MathTools::Clamp(f, -1.f, 1.f);
+  return std::acos(f);
 }
 
 Vector3 Tools::projectOnVector(const Vector3& v1, const Vector3& v2)
@@ -74,16 +87,45 @@ Vector3 Tools::projectOnPlane(const Vector3& v, const Vector3& rkNormal)
   return kProd;
 }
 
-bool Tools::intersectRayWithSphere(const Ray& /*ray*/,
-                                   const BoundingSphere& /*sphere*/)
+bool Tools::intersectRayWithSphere(const Ray& ray, const BoundingSphere& sphere)
 {
-  return false;
+  auto v1 = sphere.center - ray.origin;
+  auto v2 = projectOnVector(v1, ray.direction);
+  float d = Vector3::Distance(v1, v2);
+  return d <= sphere.radius;
 }
 
-float Tools::calculateTriangleArea(const Vector3& /*pa*/, const Vector3& /*pb*/,
-                                   const Vector3& /*pc*/)
+Plane Tools::redefinedPlane(const Vector3& rkNormal, const Vector3& rkPoint)
 {
-  return 0.f;
+  Vector3 normal = rkNormal;
+  float d        = -Vector3::Dot(rkNormal, rkPoint);
+  return Plane(normal, d);
+}
+
+Plane Tools::redefinedPlane(const Vector3& rkPoint0, const Vector3& rkPoint1,
+                            const Vector3& rkPoint2)
+{
+  Vector3 kEdge1 = rkPoint1 - rkPoint0;
+  Vector3 kEdge2 = rkPoint2 - rkPoint0;
+  Vector3 normal = Vector3::Cross(kEdge1, kEdge2);
+  normal.normalize();
+  float d = -Vector3::Dot(normal, rkPoint0);
+  return Plane(normal, d);
+}
+
+float Tools::calculateTriangleArea(const Vector3& pa, const Vector3& pb,
+                                   const Vector3& pc)
+{
+  auto vab        = pb - pa;
+  auto vac        = pc - pa;
+  auto faceNormal = Vector3::Cross(vab, vac);
+  auto vabNormal  = Vector3::Cross(faceNormal, vab);
+  vabNormal.normalize();
+  auto plane  = redefinedPlane(vabNormal, pa);
+  auto height = plane.signedDistanceTo(pc);
+  auto width  = vab.length();
+  float area  = width * height * 0.5f;
+  return area;
 }
 
 float Tools::adjustRange(float value, float oldMin, float oldMax, float newMin,
@@ -105,10 +147,26 @@ Vector3 Tools::setLength(Vector3&& v, float len)
   return v;
 }
 
-Color3 Tools::ocv(unsigned int /*rgb = 0xFF000000*/)
+Color4 Tools::ocv(unsigned int val)
 {
-  Color3 ret;
-  return ret;
+  uint32_t val32 = val;
+
+  // Convert from 32bit pattern
+  // (ARGB = 8888)
+
+  // Alpha
+  float a = ((val32 >> 24) & 0xFF) / 255.0f;
+
+  // Red
+  float r = ((val32 >> 16) & 0xFF) / 255.0f;
+
+  // Green
+  float g = ((val32 >> 8) & 0xFF) / 255.0f;
+
+  // Blue
+  float b = (val32 & 0xFF) / 255.0f;
+
+  return Color4(r, g, b, a);
 }
 
 } // end of namespace Extensions
