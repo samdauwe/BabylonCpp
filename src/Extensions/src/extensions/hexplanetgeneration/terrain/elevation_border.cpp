@@ -11,7 +11,7 @@ ElevationBorder::ElevationBorder()
 {
 }
 
-ElevationBorder::ElevationBorder(ElevationBorderOrigin& p_origin,
+ElevationBorder::ElevationBorder(const ElevationBorderOrigin& p_origin,
                                  Border* p_border, Corner* p_corner,
                                  Corner* p_nextCorner,
                                  float p_distanceToPlateBoundary)

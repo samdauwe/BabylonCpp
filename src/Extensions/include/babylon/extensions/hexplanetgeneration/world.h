@@ -73,31 +73,31 @@ private:
     const std::vector<Corner*>& boundaryCorners,
     const std::vector<size_t>& boundaryCornerInnerBorderIndexes,
     std::vector<ElevationBorder>& elevationBorderQueue);
-  float calculateCollidingElevation(float distanceToPlateBoundary,
-                                    float distanceToPlateRoot,
-                                    float boundaryElevation,
-                                    float plateElevation) const;
-  float calculateSuperductingElevation(float distanceToPlateBoundary,
-                                       float distanceToPlateRoot,
-                                       float boundaryElevation,
-                                       float plateElevation,
-                                       float pressure) const;
-  float calculateSubductingElevation(float distanceToPlateBoundary,
-                                     float distanceToPlateRoot,
-                                     float boundaryElevation,
-                                     float plateElevation) const;
-  float calculateDivergingElevation(float distanceToPlateBoundary,
-                                    float distanceToPlateRoot,
-                                    float boundaryElevation,
-                                    float plateElevation) const;
-  float calculateShearingElevation(float distanceToPlateBoundary,
-                                   float distanceToPlateRoot,
-                                   float boundaryElevation,
-                                   float plateElevation) const;
-  float calculateDormantElevation(float distanceToPlateBoundary,
-                                  float distanceToPlateRoot,
-                                  float boundaryElevation,
-                                  float plateElevation) const;
+  static float calculateCollidingElevation(float distanceToPlateBoundary,
+                                           float distanceToPlateRoot,
+                                           float boundaryElevation,
+                                           float plateElevation);
+  static float calculateSuperductingElevation(float distanceToPlateBoundary,
+                                              float distanceToPlateRoot,
+                                              float boundaryElevation,
+                                              float plateElevation,
+                                              float pressure);
+  static float calculateSubductingElevation(float distanceToPlateBoundary,
+                                            float distanceToPlateRoot,
+                                            float boundaryElevation,
+                                            float plateElevation);
+  static float calculateDivergingElevation(float distanceToPlateBoundary,
+                                           float distanceToPlateRoot,
+                                           float boundaryElevation,
+                                           float plateElevation);
+  static float calculateShearingElevation(float distanceToPlateBoundary,
+                                          float distanceToPlateRoot,
+                                          float boundaryElevation,
+                                          float plateElevation);
+  static float calculateDormantElevation(float distanceToPlateBoundary,
+                                         float distanceToPlateRoot,
+                                         float boundaryElevation,
+                                         float plateElevation);
   void processElevationBorderQueue(
     std::vector<ElevationBorder>& elevationBorderQueue,
     const std::function<bool(const ElevationBorder&, const ElevationBorder&)>&

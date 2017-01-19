@@ -12,8 +12,10 @@
 #include <babylon/extensions/hexplanetgeneration/terrain/stress.h>
 #include <babylon/extensions/hexplanetgeneration/terrain/topology.h>
 #include <babylon/extensions/hexplanetgeneration/terrain/whorl.h>
+#include <babylon/extensions/hexplanetgeneration/utils/matrix3.h>
 #include <babylon/extensions/hexplanetgeneration/utils/tools.h>
 #include <babylon/math/color4.h>
+#include <babylon/tools/tools.h>
 
 namespace BABYLON {
 namespace Extensions {
@@ -277,13 +279,14 @@ void World::generatePlanetTectonicPlates(Topology& topology, size_t plateCount,
         break;
       }
     }
-    if (adjacentToExistingPlate)
+    if (adjacentToExistingPlate) {
       continue;
+    }
 
     failedCount = 0;
 
     bool oceanic = (random.unit() < oceanicRate);
-    plates.push_back(
+    plates.emplace_back(
       Plate(Color3(random.realInclusive(0, 1), random.realInclusive(0, 1),
                    random.realInclusive(0, 1)),
             Tools::randomUnitVector(random),
@@ -297,7 +300,7 @@ void World::generatePlanetTectonicPlates(Topology& topology, size_t plateCount,
 
     for (size_t i = 0; i < corner.tiles.size(); ++i) {
       corner.tiles[i]->plate = &plate;
-      plate.tiles.push_back(corner.tiles[i]);
+      plate.tiles.emplace_back(corner.tiles[i]);
     }
 
     for (size_t i = 0; i < corner.tiles.size(); ++i) {
@@ -305,7 +308,7 @@ void World::generatePlanetTectonicPlates(Topology& topology, size_t plateCount,
       for (size_t j = 0; j < tile.tiles.size(); ++j) {
         auto& adjacentTile = *tile.tiles[j];
         if (!adjacentTile.plate) {
-          plateless.push_back(Plateless{&adjacentTile, pplate});
+          plateless.emplace_back(Plateless{&adjacentTile, pplate});
         }
       }
     }
@@ -322,10 +325,10 @@ void World::generatePlanetTectonicPlates(Topology& topology, size_t plateCount,
     plateless.erase(indexit);
     if (!tile.plate) {
       tile.plate = &plate;
-      plate.tiles.push_back(ptile);
+      plate.tiles.emplace_back(ptile);
       for (size_t j = 0; j < tile.tiles.size(); ++j) {
         if (!tile.tiles[j]->plate) {
-          plateless.push_back(Plateless{tile.tiles[j], &plate});
+          plateless.emplace_back(Plateless{tile.tiles[j], &plate});
         }
       }
     }
@@ -341,7 +344,7 @@ void World::calculateCornerDistancesToPlateRoot(std::vector<Plate>& plates)
     auto& corner               = *plates[i].root;
     corner.distanceToPlateRoot = 0;
     for (size_t j = 0; j < corner.corners.size(); ++j) {
-      distanceCornerQueue.push_back(
+      distanceCornerQueue.emplace_back(
         DistanceCorner{corner.corners[j], corner.borders[j]->length()});
     }
   }
@@ -356,7 +359,7 @@ void World::calculateCornerDistancesToPlateRoot(std::vector<Plate>& plates)
           || corner.distanceToPlateRoot > distanceToPlateRoot) {
         corner.distanceToPlateRoot = distanceToPlateRoot;
         for (size_t j = 0; j < corner.corners.size(); ++j) {
-          distanceCornerQueue.push_back(
+          distanceCornerQueue.emplace_back(
             DistanceCorner{corner.corners[j],
                            distanceToPlateRoot + corner.borders[j]->length()});
         }
@@ -403,8 +406,8 @@ void World::identifyBoundaryBorders(std::vector<Border>& borders)
       border.betweenPlates             = true;
       border.corners[0]->betweenPlates = true;
       border.corners[1]->betweenPlates = true;
-      border.tiles[0]->plate->boundaryBorders.push_back(&border);
-      border.tiles[1]->plate->boundaryBorders.push_back(&border);
+      border.tiles[0]->plate->boundaryBorders.emplace_back(&border);
+      border.tiles[1]->plate->boundaryBorders.emplace_back(&border);
     }
   }
 }
@@ -414,14 +417,14 @@ void World::collectBoundaryCorners(std::vector<Corner>& corners,
 {
   for (auto& corner : corners) {
     if (corner.betweenPlates) {
-      boundaryCorners.push_back(&corner);
-      corner.tiles[0]->plate->boundaryCorners.push_back(&corner);
+      boundaryCorners.emplace_back(&corner);
+      corner.tiles[0]->plate->boundaryCorners.emplace_back(&corner);
       if (corner.tiles[1]->plate != corner.tiles[0]->plate) {
-        corner.tiles[1]->plate->boundaryCorners.push_back(&corner);
+        corner.tiles[1]->plate->boundaryCorners.emplace_back(&corner);
       }
       if (corner.tiles[2]->plate != corner.tiles[0]->plate
           && corner.tiles[2]->plate != corner.tiles[1]->plate) {
-        corner.tiles[2]->plate->boundaryCorners.push_back(&corner);
+        corner.tiles[2]->plate->boundaryCorners.emplace_back(&corner);
       }
     }
   }
@@ -437,8 +440,8 @@ void World::calculatePlateBoundaryStress(
     auto& corner                   = *pcorner;
     corner.distanceToPlateBoundary = 0;
 
-    Border* innerBorder = nullptr;
-    size_t innerBorderIndex;
+    Border* innerBorder     = nullptr;
+    size_t innerBorderIndex = 0;
     for (size_t j = 0; j < corner.borders.size(); ++j) {
       auto pborder = corner.borders[j];
       auto& border = *pborder;
@@ -557,16 +560,106 @@ void World::blurPlateBoundaryStress(const std::vector<Corner*>& boundaryCorners,
 }
 
 void World::populateElevationBorderQueue(
-  const std::vector<Corner*>& /*boundaryCorners*/,
-  const std::vector<size_t>& /*boundaryCornerInnerBorderIndexes*/,
-  std::vector<ElevationBorder>& /*elevationBorderQueue*/)
+  const std::vector<Corner*>& boundaryCorners,
+  const std::vector<size_t>& boundaryCornerInnerBorderIndexes,
+  std::vector<ElevationBorder>& elevationBorderQueue)
 {
+  size_t i = 0;
+  for (auto pcorner : boundaryCorners) {
+    auto& corner = *pcorner;
+
+    size_t innerBorderIndex = boundaryCornerInnerBorderIndexes[i];
+    if (innerBorderIndex != UdefIdx) {
+      auto& innerBorder = *corner.borders[innerBorderIndex];
+      auto& outerBorder0
+        = *corner.borders[(innerBorderIndex + 1) % corner.borders.size()];
+      auto& plate0 = *innerBorder.tiles[0]->plate;
+      auto& plate1 = *(outerBorder0.tiles[0]->plate != &plate0 ?
+                         outerBorder0.tiles[0]->plate :
+                         outerBorder0.tiles[1]->plate);
+
+      using namespace std::placeholders;
+      ElevationBorderOrigin::CalculateElevationFunc calculateElevation;
+
+      if (corner.pressure > 0.3f) {
+        corner.elevation
+          = std::max(plate0.elevation, plate1.elevation) + corner.pressure;
+        if (plate0.oceanic == plate1.oceanic) {
+          calculateElevation
+            = std::bind(&World::calculateCollidingElevation, _1, _2, _3, _4);
+        }
+        else if (plate0.oceanic) {
+          calculateElevation
+            = std::bind(&World::calculateSubductingElevation, _1, _2, _3, _4);
+        }
+        else {
+          calculateElevation = std::bind(&World::calculateSuperductingElevation,
+                                         _1, _2, _3, _4, _5);
+        }
+      }
+      else if (corner.pressure < -0.3f) {
+        corner.elevation = std::max(plate0.elevation, plate1.elevation)
+                           - corner.pressure / 4.f;
+        calculateElevation
+          = std::bind(&World::calculateDivergingElevation, _1, _2, _3, _4);
+      }
+      else if (corner.shear > 0.3f) {
+        corner.elevation
+          = std::max(plate0.elevation, plate1.elevation) + corner.shear / 8.f;
+        calculateElevation
+          = std::bind(&World::calculateShearingElevation, _1, _2, _3, _4);
+      }
+      else {
+        corner.elevation = (plate0.elevation + plate1.elevation) / 2.f;
+        calculateElevation
+          = std::bind(&World::calculateDormantElevation, _1, _2, _3, _4);
+      }
+
+      auto& nextCorner = innerBorder.oppositeCorner(corner);
+      if (!nextCorner.betweenPlates) {
+        elevationBorderQueue.emplace_back(ElevationBorder(
+          ElevationBorderOrigin(&corner, corner.pressure, corner.shear, &plate0,
+                                calculateElevation),
+          &innerBorder, &corner, &nextCorner, innerBorder.length()));
+      }
+    }
+    else {
+      auto& plate0 = *corner.tiles[0]->plate;
+      auto& plate1 = *corner.tiles[1]->plate;
+      auto& plate2 = *corner.tiles[2]->plate;
+
+      if (corner.pressure > 0.3f) {
+        corner.elevation
+          = std::max(plate0.elevation,
+                     std::max(plate1.elevation, plate2.elevation))
+            + corner.pressure;
+      }
+      else if (corner.pressure < -0.3f) {
+        corner.elevation
+          = std::max(plate0.elevation,
+                     std::max(plate1.elevation, plate2.elevation))
+            + corner.pressure / 4;
+      }
+      else if (corner.shear > 0.3f) {
+        corner.elevation
+          = std::max(plate0.elevation,
+                     std::max(plate1.elevation, plate2.elevation))
+            + corner.shear / 8;
+      }
+      else {
+        corner.elevation
+          = (plate0.elevation + plate1.elevation + plate2.elevation) / 3;
+      }
+    }
+
+    ++i;
+  }
 }
 
 float World::calculateCollidingElevation(float distanceToPlateBoundary,
                                          float distanceToPlateRoot,
                                          float boundaryElevation,
-                                         float plateElevation) const
+                                         float plateElevation)
 {
   float t
     = distanceToPlateBoundary / (distanceToPlateBoundary + distanceToPlateRoot);
@@ -584,7 +677,7 @@ float World::calculateSuperductingElevation(float distanceToPlateBoundary,
                                             float distanceToPlateRoot,
                                             float boundaryElevation,
                                             float plateElevation,
-                                            float pressure) const
+                                            float pressure)
 {
   float t
     = distanceToPlateBoundary / (distanceToPlateBoundary + distanceToPlateRoot);
@@ -605,7 +698,7 @@ float World::calculateSuperductingElevation(float distanceToPlateBoundary,
 float World::calculateSubductingElevation(float distanceToPlateBoundary,
                                           float distanceToPlateRoot,
                                           float boundaryElevation,
-                                          float plateElevation) const
+                                          float plateElevation)
 {
   float t
     = distanceToPlateBoundary / (distanceToPlateBoundary + distanceToPlateRoot);
@@ -616,7 +709,7 @@ float World::calculateSubductingElevation(float distanceToPlateBoundary,
 float World::calculateDivergingElevation(float distanceToPlateBoundary,
                                          float distanceToPlateRoot,
                                          float boundaryElevation,
-                                         float plateElevation) const
+                                         float plateElevation)
 {
   float t
     = distanceToPlateBoundary / (distanceToPlateBoundary + distanceToPlateRoot);
@@ -633,7 +726,7 @@ float World::calculateDivergingElevation(float distanceToPlateBoundary,
 float World::calculateShearingElevation(float distanceToPlateBoundary,
                                         float distanceToPlateRoot,
                                         float boundaryElevation,
-                                        float plateElevation) const
+                                        float plateElevation)
 {
   float t
     = distanceToPlateBoundary / (distanceToPlateBoundary + distanceToPlateRoot);
@@ -650,7 +743,7 @@ float World::calculateShearingElevation(float distanceToPlateBoundary,
 float World::calculateDormantElevation(float distanceToPlateBoundary,
                                        float distanceToPlateRoot,
                                        float boundaryElevation,
-                                       float plateElevation) const
+                                       float plateElevation)
 {
   float t
     = distanceToPlateBoundary / (distanceToPlateBoundary + distanceToPlateRoot);
@@ -686,7 +779,7 @@ void World::processElevationBorderQueue(
             if (nextCorner.distanceToPlateBoundary == 0.f
                 || nextCorner.distanceToPlateBoundary
                      > distanceToPlateBoundary) {
-              elevationBorderQueue.push_back(
+              elevationBorderQueue.emplace_back(
                 ElevationBorder(front.origin, &border, &corner, &nextCorner,
                                 distanceToPlateBoundary));
             }
@@ -753,16 +846,109 @@ void World::generatePlanetWeather(Topology& topology,
   calculateMoisture(topology.corners, topology.tiles);
 }
 
-void World::generateAirCurrentWhorls(float /*planetRadius*/,
-                                     IRandomFunction& /*random*/,
-                                     std::vector<Whorl>& /*whorls*/)
+void World::generateAirCurrentWhorls(float planetRadius,
+                                     IRandomFunction& random,
+                                     std::vector<Whorl>& whorls)
 {
+  float direction       = random.integer(0, 1) ? 1 : -1;
+  size_t layerCount     = random.integer(4, 7);
+  float circumference   = Math::PI2 * planetRadius;
+  float fullRevolution  = Math::PI2;
+  float baseWhorlRadius = circumference / (2.f * (layerCount - 1.f));
+
+  whorls.reserve(1
+                 + layerCount
+                     * static_cast<size_t>(std::ceil(
+                         planetRadius * fullRevolution / baseWhorlRadius))
+                     / 2
+                 + 1);
+
+  Matrix3 m1, m2;
+  m1.FromAngleAxis(Vector3(1.f, 0.f, 0.f),
+                   BABYLON::Tools::ToRadians(random.realInclusive(
+                     0, fullRevolution / (2 * (layerCount + 4)))));
+  m2.FromAngleAxis(Vector3(0.f, 1.f, 0.f),
+                   BABYLON::Tools::ToRadians(random.real(0, fullRevolution)));
+  whorls.emplace_back(Whorl{
+    m1 * m2 * Vector3(0, planetRadius, 0),
+    random.realInclusive(fullRevolution / 36, fullRevolution / 24) * direction,
+    random.realInclusive(baseWhorlRadius * 0.8f, baseWhorlRadius * 1.2f)});
+
+  for (size_t i = 1; i < layerCount - 1; ++i) {
+    direction              = -direction;
+    float baseTilt         = i / (layerCount - 1) * fullRevolution / 2;
+    size_t layerWhorlCount = static_cast<size_t>(std::ceil(
+      (std::sin(baseTilt) * planetRadius * fullRevolution) / baseWhorlRadius));
+    Matrix3 m3, m4;
+    m3.FromAngleAxis(Vector3(1, 0, 0), BABYLON::Tools::ToRadians(baseTilt));
+    for (size_t j = 0; j < layerWhorlCount; ++j) {
+      m4.FromAngleAxis(Vector3(0, 1, 0),
+                       BABYLON::Tools::ToRadians(
+                         fullRevolution * (j + (i % 2) / 2) / layerWhorlCount));
+      whorls.emplace_back(Whorl{
+        m1 * m2 * m3 * m4 * Vector3(0, planetRadius, 0),
+        random.realInclusive(fullRevolution / 48, fullRevolution / 32)
+          * direction,
+        random.realInclusive(baseWhorlRadius * 0.8f, baseWhorlRadius * 1.2f)});
+    }
+  }
+
+  direction = -direction;
+  Matrix3 m3;
+  m3.FromAngleAxis(Vector3(1, 0, 0),
+                   BABYLON::Tools::ToRadians(fullRevolution / 2));
+  whorls.emplace_back(Whorl{
+    m1 * m2 * m3 * Vector3(0, planetRadius, 0),
+    random.realInclusive(fullRevolution / 36, fullRevolution / 24) * direction,
+    random.realInclusive(baseWhorlRadius * 0.8f, baseWhorlRadius * 1.2f)});
 }
 
-void World::calculateAirCurrents(std::vector<Corner>& /*corners*/,
-                                 const std::vector<Whorl>& /*whorls*/,
-                                 float /*planetRadius*/)
+void World::calculateAirCurrents(std::vector<Corner>& corners,
+                                 const std::vector<Whorl>& whorls,
+                                 float planetRadius)
 {
+  for (auto& corner : corners) {
+    Vector3 airCurrent(0.f, 0.f, 0.f);
+    float weight = 0;
+    for (auto& whorl : whorls) {
+      auto angle     = Tools::angleBetween(whorl.center, corner.position);
+      float distance = BABYLON::Tools::ToRadians(angle) * planetRadius;
+      if (distance < whorl.radius) {
+        float normalizedDistance = distance / whorl.radius;
+        float whorlWeight        = 1.f - normalizedDistance;
+        float whorlStrength
+          = planetRadius * whorl.strength * whorlWeight * normalizedDistance;
+        Vector3 whorlCurrent = Tools::setLength(
+          Vector3::Cross(whorl.center, corner.position), whorlStrength);
+        airCurrent += whorlCurrent;
+        weight += whorlWeight;
+      }
+    }
+    airCurrent /= weight;
+    corner.airCurrent      = airCurrent;
+    corner.airCurrentSpeed = airCurrent.length(); // kilometers per hour
+
+    corner.airCurrentOutflows.reserve(corner.borders.size());
+    auto airCurrentDirection = airCurrent.normalize();
+    float outflowSum         = 0.f;
+    for (auto pcornerCorner : corner.corners) {
+      auto vector = corner.vectorTo(*pcornerCorner).normalize();
+      auto dot    = Vector3::Dot(vector, airCurrentDirection);
+      if (dot > 0.f) {
+        corner.airCurrentOutflows.emplace_back(dot);
+        outflowSum += dot;
+      }
+      else {
+        corner.airCurrentOutflows.emplace_back(0);
+      }
+    }
+
+    if (outflowSum > 0.f) {
+      for (size_t j = 0; j < corner.borders.size(); ++j) {
+        corner.airCurrentOutflows[j] /= outflowSum;
+      }
+    }
+  }
 }
 
 void World::initializeAirHeat(std::vector<Corner>& corners, float heatLevel,
@@ -787,7 +973,7 @@ void World::initializeAirHeat(std::vector<Corner>& corners, float heatLevel,
       corner.heatAbsorption *= 2.f;
     }
 
-    activeCorners.push_back(&corner);
+    activeCorners.emplace_back(&corner);
     airHeat += corner.airHeat;
   }
 }
@@ -819,7 +1005,7 @@ float World::processAirHeat(std::vector<Corner*>& activeCorners)
       const auto& outflow = corner.airCurrentOutflows[j];
       if (outflow > 0) {
         corner.corners[j]->newAirHeat += remainingCornerAirHeat * outflow;
-        activeCorners.push_back(corner.corners[j]);
+        activeCorners.emplace_back(corner.corners[j]);
       }
     }
   }
@@ -864,7 +1050,7 @@ void World::initializeAirMoisture(std::vector<Corner>& corners,
                                   std::vector<Corner*>& activeCorners,
                                   float& airMoisture)
 {
-  airMoisture = 0;
+  airMoisture = 0.f;
   for (auto& corner : corners) {
     corner.airMoisture
       = (corner.elevation > 0.f) ?
@@ -888,7 +1074,7 @@ void World::initializeAirMoisture(std::vector<Corner>& corners,
       corner.maxPrecipitation = corner.area * 0.25f;
     }
 
-    activeCorners.push_back(&corner);
+    activeCorners.emplace_back(&corner);
     airMoisture += corner.airMoisture;
   }
 }
@@ -924,7 +1110,7 @@ float World::processAirMoisture(std::vector<Corner*>& activeCorners)
       if (outflow > 0.f) {
         corner.corners[j]->newAirMoisture
           += remainingCornerAirMoisture * outflow;
-        activeCorners.push_back(corner.corners[j]);
+        activeCorners.emplace_back(corner.corners[j]);
       }
     }
   }
@@ -1036,15 +1222,15 @@ void World::generatePlanetBiomes(std::vector<Tile>& tiles,
   }
 }
 
-void World::generatePlanetRenderData(Topology& /*topology*/,
-                                     IRandomFunction& /*random*/,
-                                     RenderData& /*renderData*/)
+void World::generatePlanetRenderData(Topology& topology,
+                                     IRandomFunction& random,
+                                     RenderData& renderData)
 {
-  /*buildSurfaceRenderObject(topology.tiles, random, *renderData.surface);
+  buildSurfaceRenderObject(topology.tiles, random, renderData.surface);
   buildPlateBoundariesRenderObject(topology.borders,
-                                   *renderData.plateBoundaries);
-  buildPlateMovementsRenderObject(topology.tiles, *renderData.plateMovements);
-  buildAirCurrentsRenderObject(topology.corners, *renderData.airCurrents)*/;
+                                   renderData.plateBoundaries);
+  buildPlateMovementsRenderObject(topology.tiles, renderData.plateMovements);
+  buildAirCurrentsRenderObject(topology.corners, renderData.airCurrents);
 }
 
 void World::doBuildTileWedge(RenderObject& ro, size_t b, size_t s, size_t t)
@@ -1306,7 +1492,7 @@ void World::buildAirCurrentsRenderObject(std::vector<Corner>& corners,
     buildArrow(ro, corner.position * 1.002f, corner.airCurrent * 0.5f,
                corner.position.normalize(),
                std::min(corner.airCurrent.length(), 4.f),
-               Color4(1.f, 1.f, 1.f));
+               Color4(1.f, 1.f, 1.f, 1.f));
   }
 }
 
@@ -1319,7 +1505,7 @@ void World::buildArrow(RenderObject& ro, const Vector3& position,
   }
 
   auto sideOffset
-    = Tools::setLength(Vector3::Dot(direction, normal), baseWidth / 2.f);
+    = Tools::setLength(Vector3::Cross(direction, normal), baseWidth / 2.f);
   auto baseIndex = ro.getCurrentVertexCount();
 
   ro.position(position + sideOffset);

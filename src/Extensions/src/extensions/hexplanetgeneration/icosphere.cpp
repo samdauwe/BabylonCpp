@@ -344,6 +344,45 @@ void Icosphere::generateSubdividedIcosahedron(size_t degree)
 
 void Icosphere::correctFaceIndices()
 {
+
+  // Distorting Triangle Mesh
+  float totalDistortion
+    = std::ceil(_icosahedronMesh.edges.size() * _topologyDistortionRate);
+  for (size_t remainingIterations = 6; remainingIterations > 0;) {
+    float iterationDistortion
+      = std::floor(totalDistortion / remainingIterations);
+    totalDistortion -= iterationDistortion;
+    // distortMesh(iterationDistortion, random);
+    relaxMesh(0.5f);
+    --remainingIterations;
+  }
+
+  // Relaxing Triangle Mesh
+  float averageNodeRadius
+    = std::sqrt(4 * Math::PI / _icosahedronMesh.nodes.size());
+  float minShiftDelta
+    = averageNodeRadius / 50000 * _icosahedronMesh.nodes.size();
+
+  float priorShift = relaxMesh(0.5f);
+  for (int i = 0; i < 300; i++) {
+    float currentShift = relaxMesh(0.5f);
+    float shiftDelta   = std::abs(currentShift - priorShift);
+    if (shiftDelta < minShiftDelta) {
+      break;
+    }
+    priorShift = currentShift;
+  }
+
+  // Calculating Triangle Centroids
+  for (auto face : _icosahedronMesh.faces) {
+    auto& p0      = _icosahedronMesh.nodes[face.n[0]].p;
+    auto& p1      = _icosahedronMesh.nodes[face.n[1]].p;
+    auto& p2      = _icosahedronMesh.nodes[face.n[2]].p;
+    face.centroid = calculateFaceCentroid(p0, p1, p2);
+    face.centroid.normalize();
+  }
+
+  // Reordering Triangle Nodes
   unsigned int i = 0;
   for (auto& node : _icosahedronMesh.nodes) {
     auto faceIndex = node.f[0];
