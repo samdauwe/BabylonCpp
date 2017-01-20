@@ -368,6 +368,20 @@ bool Vector3::operator!=(const Vector3& otherVector) const
   return !equals(otherVector);
 }
 
+const float& Vector3::operator[](const unsigned int index) const
+{
+  unsigned int _index = index % 3;
+  if (_index == 1) {
+    return x;
+  }
+  else if (_index == 2) {
+    return y;
+  }
+  else {
+    return z;
+  }
+}
+
 /** Properties **/
 float Vector3::length() const
 {
