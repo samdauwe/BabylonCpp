@@ -25,6 +25,9 @@ public:
 
   void FromAngleAxis(const Vector3& rkAxis, const float& fRadians);
 
+private:
+  std::array<std::array<float, 3>, 3> m;
+
 }; // end of class Matrix3
 
 } // end of namespace Extensions

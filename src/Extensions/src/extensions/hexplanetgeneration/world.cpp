@@ -14,6 +14,7 @@
 #include <babylon/extensions/hexplanetgeneration/terrain/whorl.h>
 #include <babylon/extensions/hexplanetgeneration/utils/matrix3.h>
 #include <babylon/extensions/hexplanetgeneration/utils/tools.h>
+#include <babylon/extensions/hexplanetgeneration/utils/xor_shift_128.h>
 #include <babylon/math/color4.h>
 #include <babylon/tools/tools.h>
 
@@ -30,16 +31,39 @@ World::~World()
 {
 }
 
-void World::generatePlanet(Planet*& /*planet*/, unsigned long /*originalSeed*/,
-                           unsigned long /*seed*/,
-                           size_t /*icosahedronSubdivision*/,
-                           float /*topologyDistortionRate*/,
-                           size_t /*plateCount*/, float /*oceanicRate*/,
-                           float /*heatLevel*/, float /*moistureLevel*/)
+void World::generatePlanet(Planet*& planet, unsigned long originalSeed,
+                           unsigned long seed, size_t icosahedronSubdivision,
+                           float topologyDistortionRate, size_t plateCount,
+                           float oceanicRate, float heatLevel,
+                           float moistureLevel)
 {
+  XorShift128 random(seed);
+
+  generatePlanet(icosahedronSubdivision, topologyDistortionRate, plateCount,
+                 oceanicRate, heatLevel, moistureLevel, random, *planet);
+  planet->seed         = seed;
+  planet->originalSeed = originalSeed;
 }
 
-bool generatePlanetTopology(const IcosahedronMesh& mesh, Topology& ret)
+void World::generatePlanet(size_t icosahedronSubdivision,
+                           float topologyDistortionRate, size_t plateCount,
+                           float oceanicRate, float heatLevel,
+                           float moistureLevel, IRandomFunction& random,
+                           Planet& planet)
+{
+  auto mesh = Icosphere::generateIcosahedronMesh(
+    icosahedronSubdivision, topologyDistortionRate, random);
+
+  generatePlanetTopology(mesh, planet.topology);
+
+  generatePlanetPartition(planet.topology.tiles, planet.partition);
+  generatePlanetTerrain(planet, plateCount, oceanicRate, heatLevel,
+                        moistureLevel, random);
+  generatePlanetRenderData(planet.topology, random, planet.renderData);
+  generatePlanetStatistics(planet.topology, planet.plates, planet.statistics);
+}
+
+bool World::generatePlanetTopology(const IcosahedronMesh& mesh, Topology& ret)
 {
   auto& corners = ret.corners;
   auto& borders = ret.borders;
@@ -194,10 +218,8 @@ bool generatePlanetTopology(const IcosahedronMesh& mesh, Topology& ret)
 void World::generatePlanetPartition(std::vector<Tile>& tiles,
                                     SpatialPartition& rootPartition)
 {
-  Icosphere icosphere;
-  icosphere.generateIcosahedron();
-
-  auto& icosahedron = icosphere.icosahedron();
+  IcosahedronMesh icosahedron;
+  Icosphere::generateIcosahedron(icosahedron);
 
   for (auto& face : icosahedron.faces) {
     auto p0     = icosahedron.nodes[face.n[0]].p * 1000;

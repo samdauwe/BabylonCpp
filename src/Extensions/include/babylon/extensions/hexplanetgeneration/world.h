@@ -46,6 +46,10 @@ public:
                       float oceanicRate, float heatLevel, float moistureLevel);
 
 private:
+  void generatePlanet(size_t icosahedronSubdivision,
+                      float topologyDistortionRate, size_t plateCount,
+                      float oceanicRate, float heatLevel, float moistureLevel,
+                      IRandomFunction& random, Planet& planet);
   bool generatePlanetTopology(const IcosahedronMesh& mesh, Topology& ret);
   void generatePlanetPartition(std::vector<Tile>& tiles,
                                SpatialPartition& rootPartition);

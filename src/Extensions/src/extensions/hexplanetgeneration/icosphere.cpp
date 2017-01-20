@@ -40,35 +40,80 @@ IcoFace::IcoFace(const std::vector<size_t>& _n, const std::vector<size_t>& _e)
 // Icosphere
 // -----------------------------------------------------------------------------
 
-Icosphere::Icosphere(size_t icosahedronSubdivision,
-                     float topologyDistortionRate)
-    : _icosahedronSubdivision{icosahedronSubdivision}
-    , _topologyDistortionRate{topologyDistortionRate}
+IcosahedronMesh
+Icosphere::generateIcosahedronMesh(size_t icosahedronSubdivision,
+                                   float topologyDistortionRate,
+                                   IRandomFunction& random)
 {
-  generateIcosahedron();
-  generateSubdividedIcosahedron(icosahedronSubdivision);
-  correctFaceIndices();
+  IcosahedronMesh mesh;
+  generateSubdividedIcosahedron(icosahedronSubdivision, mesh);
+
+  // Distorting Triangle Mesh
+  float totalDistortion = std::ceil(mesh.edges.size() * topologyDistortionRate);
+  for (size_t remainingIterations = 6; remainingIterations > 0;) {
+    float iterationDistortion
+      = std::floor(totalDistortion / remainingIterations);
+    totalDistortion -= iterationDistortion;
+    distortMesh(mesh, static_cast<size_t>(iterationDistortion), random);
+    relaxMesh(mesh, 0.5f);
+    --remainingIterations;
+  }
+
+  // Relaxing Triangle Mesh
+  float averageNodeRadius = std::sqrt(4 * Math::PI / mesh.nodes.size());
+  float minShiftDelta     = averageNodeRadius / 50000 * mesh.nodes.size();
+
+  float priorShift = relaxMesh(mesh, 0.5f);
+  for (int i = 0; i < 300; i++) {
+    float currentShift = relaxMesh(mesh, 0.5f);
+    float shiftDelta   = std::abs(currentShift - priorShift);
+    if (shiftDelta < minShiftDelta) {
+      break;
+    }
+    priorShift = currentShift;
+  }
+
+  // Calculating Triangle Centroids
+  for (auto face : mesh.faces) {
+    auto& p0      = mesh.nodes[face.n[0]].p;
+    auto& p1      = mesh.nodes[face.n[1]].p;
+    auto& p2      = mesh.nodes[face.n[2]].p;
+    face.centroid = calculateFaceCentroid(p0, p1, p2);
+    face.centroid.normalize();
+  }
+
+  // Reordering Triangle Nodes
+  unsigned int i = 0;
+  for (auto& node : mesh.nodes) {
+    auto faceIndex = node.f[0];
+    for (size_t j = 1; j < node.f.size() - 1; ++j) {
+      faceIndex = findNextFaceIndex(mesh, i, faceIndex);
+      size_t k;
+      if (findIndex(node.f, faceIndex, k)) {
+        node.f[k] = node.f[j];
+        node.f[j] = faceIndex;
+      }
+    }
+    ++i;
+  }
+
+  return mesh;
 }
 
-Icosphere::Icosphere()
-{
-}
-
-void Icosphere::generateIcosahedron()
+void Icosphere::generateIcosahedron(IcosahedronMesh& mesh)
 {
   float phi = (1.f + std::sqrt(5.f)) / 2.f;
   float du  = 1.f / std::sqrt(phi * phi + 1.f);
   float dv  = phi * du;
 
-  _icosahedronMesh.nodes
-    = {IcoNode(Vector3(0, +dv, +du)), IcoNode(Vector3(0, +dv, -du)),
-       IcoNode(Vector3(0, -dv, +du)), IcoNode(Vector3(0, -dv, -du)),
-       IcoNode(Vector3(+du, 0, +dv)), IcoNode(Vector3(-du, 0, +dv)),
-       IcoNode(Vector3(+du, 0, -dv)), IcoNode(Vector3(-du, 0, -dv)),
-       IcoNode(Vector3(+dv, +du, 0)), IcoNode(Vector3(+dv, -du, 0)),
-       IcoNode(Vector3(-dv, +du, 0)), IcoNode(Vector3(-dv, -du, 0))};
+  mesh.nodes = {IcoNode(Vector3(0, +dv, +du)), IcoNode(Vector3(0, +dv, -du)),
+                IcoNode(Vector3(0, -dv, +du)), IcoNode(Vector3(0, -dv, -du)),
+                IcoNode(Vector3(+du, 0, +dv)), IcoNode(Vector3(-du, 0, +dv)),
+                IcoNode(Vector3(+du, 0, -dv)), IcoNode(Vector3(-du, 0, -dv)),
+                IcoNode(Vector3(+dv, +du, 0)), IcoNode(Vector3(+dv, -du, 0)),
+                IcoNode(Vector3(-dv, +du, 0)), IcoNode(Vector3(-dv, -du, 0))};
 
-  _icosahedronMesh.edges
+  mesh.edges
     = {IcoEdge({0, 1}),  IcoEdge({0, 4}),  IcoEdge({0, 5}),  IcoEdge({0, 8}),
        IcoEdge({0, 10}), IcoEdge({1, 6}),  IcoEdge({1, 7}),  IcoEdge({1, 8}),
        IcoEdge({1, 10}), IcoEdge({2, 3}),  IcoEdge({2, 4}),  IcoEdge({2, 5}),
@@ -78,7 +123,7 @@ void Icosphere::generateIcosahedron()
        IcoEdge({6, 8}),  IcoEdge({6, 9}),  IcoEdge({7, 10}), IcoEdge({7, 11}),
        IcoEdge({8, 9}),  IcoEdge({10, 11})};
 
-  _icosahedronMesh.faces = {
+  mesh.faces = {
     IcoFace({0, 1, 8}, {0, 7, 3}),     IcoFace({0, 4, 5}, {1, 18, 2}),
     IcoFace({0, 5, 10}, {2, 21, 4}),   IcoFace({0, 8, 4}, {3, 19, 1}),
     IcoFace({0, 10, 1}, {4, 8, 0}),    IcoFace({1, 6, 8}, {5, 24, 7}),
@@ -91,52 +136,52 @@ void Icosphere::generateIcosahedron()
     IcoFace({6, 9, 8}, {25, 28, 24}),  IcoFace({7, 10, 11}, {26, 29, 27}),
   };
 
-  _icosahedronMesh.nodes.reserve(_icosahedronMesh.edges.size() * 3);
-  for (size_t i = 0; i < _icosahedronMesh.edges.size(); ++i) {
-    for (size_t j = 0; j < _icosahedronMesh.edges[i].n.size(); ++j) {
-      _icosahedronMesh.nodes[j].e.emplace_back(i);
+  mesh.nodes.reserve(mesh.edges.size() * 3);
+  for (size_t i = 0; i < mesh.edges.size(); ++i) {
+    for (size_t j = 0; j < mesh.edges[i].n.size(); ++j) {
+      mesh.nodes[j].e.emplace_back(i);
     }
   }
 
-  for (size_t i = 0; i < _icosahedronMesh.faces.size(); ++i) {
-    for (size_t j = 0; j < _icosahedronMesh.faces[i].n.size(); ++j) {
-      _icosahedronMesh.nodes[j].f.emplace_back(i);
+  for (size_t i = 0; i < mesh.faces.size(); ++i) {
+    for (size_t j = 0; j < mesh.faces[i].n.size(); ++j) {
+      mesh.nodes[j].f.emplace_back(i);
     }
   }
 
-  _icosahedronMesh.edges.reserve(_icosahedronMesh.faces.size() * 3);
-  for (size_t i = 0; i < _icosahedronMesh.faces.size(); ++i) {
-    for (size_t j = 0; j < _icosahedronMesh.faces[i].e.size(); ++j) {
-      _icosahedronMesh.edges[j].f.emplace_back(i);
+  mesh.edges.reserve(mesh.faces.size() * 3);
+  for (size_t i = 0; i < mesh.faces.size(); ++i) {
+    for (size_t j = 0; j < mesh.faces[i].e.size(); ++j) {
+      mesh.edges[j].f.emplace_back(i);
     }
   }
 }
 
-void Icosphere::generateSubdividedIcosahedron(size_t degree)
+void Icosphere::generateSubdividedIcosahedron(size_t degree,
+                                              IcosahedronMesh& mesh)
 {
-  auto& nodes = _icosahedronMesh.nodes;
-  auto& edges = _icosahedronMesh.edges;
-  auto& faces = _icosahedronMesh.faces;
+  auto& nodes = mesh.nodes;
+  auto& edges = mesh.edges;
+  auto& faces = mesh.faces;
 
-  generateIcosahedron();
+  IcosahedronMesh icosahedron;
+  generateIcosahedron(icosahedron);
 
   // Ico nodes
-  nodes.reserve(
-    _icosahedronMesh.nodes.size() + _icosahedronMesh.edges.size() * (degree - 1)
-    + _icosahedronMesh.faces.size() * (degree - 1) * (degree - 1) / 2);
-  for (auto& node : _icosahedronMesh.nodes) {
+  nodes.reserve(mesh.nodes.size() + mesh.edges.size() * (degree - 1)
+                + mesh.faces.size() * (degree - 1) * (degree - 1) / 2);
+  for (auto& node : mesh.nodes) {
     nodes.emplace_back(IcoNode(node.p));
   }
 
   // Ico edges
-  edges.reserve(
-    _icosahedronMesh.edges.size() + _icosahedronMesh.edges.size() * (degree - 1)
-    + 3 * _icosahedronMesh.faces.size() * (degree - 1) * (degree - 1) / 2);
-  for (auto& edge : _icosahedronMesh.edges) {
+  edges.reserve(mesh.edges.size() + mesh.edges.size() * (degree - 1)
+                + 3 * mesh.faces.size() * (degree - 1) * (degree - 1) / 2);
+  for (auto& edge : mesh.edges) {
     edge.subdivided_n.clear();
     edge.subdivided_e.clear();
-    auto& n0 = _icosahedronMesh.nodes[edge.n[0]];
-    auto& n1 = _icosahedronMesh.nodes[edge.n[1]];
+    auto& n0 = mesh.nodes[edge.n[0]];
+    auto& n1 = mesh.nodes[edge.n[1]];
     auto p0  = n0.p;
     auto p1  = n1.p;
     nodes[edge.n[0]].e.emplace_back(edges.size());
@@ -159,12 +204,11 @@ void Icosphere::generateSubdividedIcosahedron(size_t degree)
   }
 
   // Ico faces
-  faces.reserve(2 * _icosahedronMesh.faces.size() * (degree - 1) * (degree - 1)
-                / 2);
-  for (auto& face : _icosahedronMesh.faces) {
-    auto& edge0 = _icosahedronMesh.edges[face.e[0]];
-    auto& edge1 = _icosahedronMesh.edges[face.e[1]];
-    auto& edge2 = _icosahedronMesh.edges[face.e[2]];
+  faces.reserve(2 * mesh.faces.size() * (degree - 1) * (degree - 1) / 2);
+  for (auto& face : mesh.faces) {
+    auto& edge0 = mesh.edges[face.e[0]];
+    auto& edge1 = mesh.edges[face.e[1]];
+    auto& edge2 = mesh.edges[face.e[2]];
 
     auto getEdgeNode0 = [&face, &edge0, &degree](size_t k) {
       if (face.n[0] == edge0.n[0]) {
@@ -342,65 +386,8 @@ void Icosphere::generateSubdividedIcosahedron(size_t degree)
   }
 }
 
-void Icosphere::correctFaceIndices()
-{
-
-  // Distorting Triangle Mesh
-  float totalDistortion
-    = std::ceil(_icosahedronMesh.edges.size() * _topologyDistortionRate);
-  for (size_t remainingIterations = 6; remainingIterations > 0;) {
-    float iterationDistortion
-      = std::floor(totalDistortion / remainingIterations);
-    totalDistortion -= iterationDistortion;
-    // distortMesh(iterationDistortion, random);
-    relaxMesh(0.5f);
-    --remainingIterations;
-  }
-
-  // Relaxing Triangle Mesh
-  float averageNodeRadius
-    = std::sqrt(4 * Math::PI / _icosahedronMesh.nodes.size());
-  float minShiftDelta
-    = averageNodeRadius / 50000 * _icosahedronMesh.nodes.size();
-
-  float priorShift = relaxMesh(0.5f);
-  for (int i = 0; i < 300; i++) {
-    float currentShift = relaxMesh(0.5f);
-    float shiftDelta   = std::abs(currentShift - priorShift);
-    if (shiftDelta < minShiftDelta) {
-      break;
-    }
-    priorShift = currentShift;
-  }
-
-  // Calculating Triangle Centroids
-  for (auto face : _icosahedronMesh.faces) {
-    auto& p0      = _icosahedronMesh.nodes[face.n[0]].p;
-    auto& p1      = _icosahedronMesh.nodes[face.n[1]].p;
-    auto& p2      = _icosahedronMesh.nodes[face.n[2]].p;
-    face.centroid = calculateFaceCentroid(p0, p1, p2);
-    face.centroid.normalize();
-  }
-
-  // Reordering Triangle Nodes
-  unsigned int i = 0;
-  for (auto& node : _icosahedronMesh.nodes) {
-    auto faceIndex = node.f[0];
-    for (unsigned int j = 1; j < node.f.size() - 1; ++j) {
-      faceIndex = findNextFaceIndex(i, faceIndex);
-      int k     = std_util::index_of(node.f, faceIndex);
-      if (k != -1) {
-        size_t _k  = static_cast<size_t>(k);
-        node.f[_k] = node.f[j];
-        node.f[j]  = faceIndex;
-      }
-    }
-    ++i;
-  }
-}
-
 size_t Icosphere::getEdgeOppositeFaceIndex(const IcoEdge& edge,
-                                           size_t faceIndex) const
+                                           size_t faceIndex)
 {
   if (edge.f[0] == faceIndex) {
     return edge.f[1];
@@ -412,7 +399,7 @@ size_t Icosphere::getEdgeOppositeFaceIndex(const IcoEdge& edge,
 }
 
 size_t Icosphere::getFaceOppositeNodeIndex(const IcoFace& face,
-                                           const IcoEdge& edge) const
+                                           const IcoEdge& edge)
 {
   if (face.n[0] != edge.n[0] && face.n[0] != edge.n[1]) {
     return 0;
@@ -426,25 +413,25 @@ size_t Icosphere::getFaceOppositeNodeIndex(const IcoFace& face,
   return 0;
 }
 
-size_t Icosphere::findNextFaceIndex(size_t nodeIndex, size_t faceIndex) const
+size_t Icosphere::findNextFaceIndex(const IcosahedronMesh& mesh,
+                                    size_t nodeIndex, size_t faceIndex)
 {
-  const auto& face = _icosahedronMesh.faces[faceIndex];
+  const auto& face = mesh.faces[faceIndex];
   size_t nodeFaceIndex;
   bool ok = findIndex(face.n, nodeIndex, nodeFaceIndex);
   if (!ok) {
     return 0;
   }
-  const auto& edge = _icosahedronMesh.edges[face.e[(nodeFaceIndex + 2) % 3]];
+  const auto& edge = mesh.edges[face.e[(nodeFaceIndex + 2) % 3]];
   return getEdgeOppositeFaceIndex(edge, faceIndex);
 }
 
-bool Icosphere::conditionalRotateEdge(IcosahedronMesh& icosahedronMesh,
-                                      size_t edgeIndex,
+bool Icosphere::conditionalRotateEdge(IcosahedronMesh& mesh, size_t edgeIndex,
                                       RotationPredicateType& predicate)
 {
-  auto& edge  = icosahedronMesh.edges[edgeIndex];
-  auto& face0 = icosahedronMesh.faces[edge.f[0]];
-  auto& face1 = icosahedronMesh.faces[edge.f[1]];
+  auto& edge  = mesh.edges[edgeIndex];
+  auto& face0 = mesh.faces[edge.f[0]];
+  auto& face1 = mesh.faces[edge.f[1]];
   size_t farNodeFaceIndex0;
   size_t farNodeFaceIndex1;
   farNodeFaceIndex0  = getFaceOppositeNodeIndex(face0, edge);
@@ -453,14 +440,14 @@ bool Icosphere::conditionalRotateEdge(IcosahedronMesh& icosahedronMesh,
   auto oldNodeIndex0 = face0.n[(farNodeFaceIndex0 + 1) % 3];
   auto newNodeIndex1 = face1.n[farNodeFaceIndex1];
   auto oldNodeIndex1 = face1.n[(farNodeFaceIndex1 + 1) % 3];
-  auto& oldNode0     = icosahedronMesh.nodes[oldNodeIndex0];
-  auto& oldNode1     = icosahedronMesh.nodes[oldNodeIndex1];
-  auto& newNode0     = icosahedronMesh.nodes[newNodeIndex0];
-  auto& newNode1     = icosahedronMesh.nodes[newNodeIndex1];
+  auto& oldNode0     = mesh.nodes[oldNodeIndex0];
+  auto& oldNode1     = mesh.nodes[oldNodeIndex1];
+  auto& newNode0     = mesh.nodes[newNodeIndex0];
+  auto& newNode1     = mesh.nodes[newNodeIndex1];
   auto newEdgeIndex0 = face1.e[(farNodeFaceIndex1 + 2) % 3];
   auto newEdgeIndex1 = face0.e[(farNodeFaceIndex0 + 2) % 3];
-  auto& newEdge0     = icosahedronMesh.edges[newEdgeIndex0];
-  auto& newEdge1     = icosahedronMesh.edges[newEdgeIndex1];
+  auto& newEdge0     = mesh.edges[newEdgeIndex0];
+  auto& newEdge1     = mesh.edges[newEdgeIndex1];
 
   if (!predicate(oldNode0, oldNode1, newNode0, newNode1)) {
     return false;
@@ -496,14 +483,15 @@ bool Icosphere::conditionalRotateEdge(IcosahedronMesh& icosahedronMesh,
 }
 
 Vector3 Icosphere::calculateFaceCentroid(const Vector3& pa, const Vector3& pb,
-                                         const Vector3& pc) const
+                                         const Vector3& pc)
 {
   auto centroid = pa + pb + pc;
   centroid /= 3.f;
   return centroid;
 }
 
-bool Icosphere::distortMesh(size_t degree, IRandomFunction& random)
+bool Icosphere::distortMesh(IcosahedronMesh& mesh, size_t degree,
+                            IRandomFunction& random)
 {
   auto rotationPredicate = RotationPredicateType(
     [&](const IcoNode& oldNode0, const IcoNode& oldNode1,
@@ -542,35 +530,34 @@ bool Icosphere::distortMesh(size_t degree, IRandomFunction& random)
 
   for (size_t i = 0; i < degree; i++) {
     size_t consecutiveFailedAttempts = 0;
-    auto edgeIndex = random.integerExclusive(0, _icosahedronMesh.edges.size());
-    while (
-      !conditionalRotateEdge(_icosahedronMesh, edgeIndex, rotationPredicate)) {
-      if (++consecutiveFailedAttempts >= _icosahedronMesh.edges.size()) {
+    auto edgeIndex = random.integerExclusive(0, mesh.edges.size());
+    while (!conditionalRotateEdge(mesh, edgeIndex, rotationPredicate)) {
+      if (++consecutiveFailedAttempts >= mesh.edges.size()) {
         return false;
       }
-      edgeIndex = (edgeIndex + 1) % _icosahedronMesh.edges.size();
+      edgeIndex = (edgeIndex + 1) % mesh.edges.size();
     }
   };
 
   return true;
 }
 
-float Icosphere::relaxMesh(float multiplier)
+float Icosphere::relaxMesh(IcosahedronMesh& mesh, float multiplier)
 {
   float totalSurfaceArea = 4.f * Math::PI;
   float idealFaceArea
-    = totalSurfaceArea / static_cast<float>(_icosahedronMesh.faces.size());
+    = totalSurfaceArea / static_cast<float>(mesh.faces.size());
   float idealEdgeLength = std::sqrt(idealFaceArea * 4.f / std::sqrt(3.f));
   float idealDistanceToCentroid = idealEdgeLength * std::sqrt(3.f) / 3.f * 0.9f;
 
-  std::vector<Vector3> pointShifts(_icosahedronMesh.nodes.size());
+  std::vector<Vector3> pointShifts(mesh.nodes.size());
   std::fill(pointShifts.begin(), pointShifts.end(), Vector3(0.f, 0.f, 0.f));
 
   size_t i = 0;
-  for (auto& face : _icosahedronMesh.faces) {
-    auto& n0      = _icosahedronMesh.nodes[face.n[0]];
-    auto& n1      = _icosahedronMesh.nodes[face.n[1]];
-    auto& n2      = _icosahedronMesh.nodes[face.n[2]];
+  for (auto& face : mesh.faces) {
+    auto& n0      = mesh.nodes[face.n[0]];
+    auto& n1      = mesh.nodes[face.n[1]];
+    auto& n2      = mesh.nodes[face.n[2]];
     auto& p0      = n0.p;
     auto& p1      = n1.p;
     auto& p2      = n2.p;
@@ -591,19 +578,18 @@ float Icosphere::relaxMesh(float multiplier)
     ++i;
   }
 
-  for (size_t i = 0; i < _icosahedronMesh.nodes.size(); ++i) {
-    pointShifts[i]
-      = _icosahedronMesh.nodes[i].p
-        + Tools::projectOnPlane(pointShifts[i], _icosahedronMesh.nodes[i].p);
+  for (size_t i = 0; i < mesh.nodes.size(); ++i) {
+    pointShifts[i] = mesh.nodes[i].p
+                     + Tools::projectOnPlane(pointShifts[i], mesh.nodes[i].p);
     pointShifts[i].normalize();
   }
 
-  Float32Array rotationSupressions(_icosahedronMesh.nodes.size());
+  Float32Array rotationSupressions(mesh.nodes.size());
   std::fill(rotationSupressions.begin(), rotationSupressions.end(), 0.f);
 
-  for (auto& edge : _icosahedronMesh.edges) {
-    auto& oldPoint0 = _icosahedronMesh.nodes[edge.n[0]].p;
-    auto& oldPoint1 = _icosahedronMesh.nodes[edge.n[1]].p;
+  for (auto& edge : mesh.edges) {
+    auto& oldPoint0 = mesh.nodes[edge.n[0]].p;
+    auto& oldPoint1 = mesh.nodes[edge.n[1]].p;
     auto& newPoint0 = pointShifts[edge.n[0]];
     auto& newPoint1 = pointShifts[edge.n[1]];
     auto oldVector  = oldPoint1 - oldPoint0;
@@ -619,7 +605,7 @@ float Icosphere::relaxMesh(float multiplier)
 
   float totalShift = 0.f;
   i                = 0;
-  for (auto& node : _icosahedronMesh.nodes) {
+  for (auto& node : mesh.nodes) {
     auto& point = node.p;
     auto delta  = point;
     point       = Vector3::Lerp(point, pointShifts[i],
@@ -631,11 +617,6 @@ float Icosphere::relaxMesh(float multiplier)
   }
 
   return totalShift;
-}
-
-IcosahedronMesh& Icosphere::icosahedron()
-{
-  return _icosahedronMesh;
 }
 
 } // end of namespace Extensions

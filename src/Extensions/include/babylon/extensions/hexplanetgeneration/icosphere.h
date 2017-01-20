@@ -43,44 +43,33 @@ struct BABYLON_SHARED_EXPORT IcosahedronMesh {
 
 struct IRandomFunction;
 
-class BABYLON_SHARED_EXPORT Icosphere {
+struct BABYLON_SHARED_EXPORT Icosphere {
 
-private:
   using RotationPredicateType = std::function<bool(
     const IcoNode&, const IcoNode&, const IcoNode&, const IcoNode&)>;
 
-public:
-  Icosphere();
-  Icosphere(size_t icosahedronSubdivision, float topologyDistortionRate);
+  static IcosahedronMesh generateIcosahedronMesh(size_t icosahedronSubdivision,
+                                                 float topologyDistortionRate,
+                                                 IRandomFunction& random);
+  static void generateIcosahedron(IcosahedronMesh& mesh);
+  static void generateSubdividedIcosahedron(size_t degree,
+                                            IcosahedronMesh& mesh);
+  static void correctFaceIndices();
+  static Vector3 calculateFaceCentroid(const Vector3& pa, const Vector3& pb,
+                                       const Vector3& pc);
+  static size_t getEdgeOppositeFaceIndex(const IcoEdge& edge, size_t faceIndex);
+  static size_t getFaceOppositeNodeIndex(const IcoFace& face,
+                                         const IcoEdge& edge);
+  static bool conditionalRotateEdge(IcosahedronMesh& icosahedronMesh,
+                                    size_t edgeIndex,
+                                    RotationPredicateType& predicate);
+  static size_t findNextFaceIndex(const IcosahedronMesh& icosahedronMesh,
+                                  size_t nodeIndex, size_t faceIndex);
+  static bool distortMesh(IcosahedronMesh& mesh, size_t degree,
+                          IRandomFunction& random);
+  static float relaxMesh(IcosahedronMesh& mesh, float multiplier);
 
-  void generateIcosahedron();
-  void generateSubdividedIcosahedron(size_t degree);
-  void correctFaceIndices();
-  Vector3 calculateFaceCentroid(const Vector3& pa, const Vector3& pb,
-                                const Vector3& pc) const;
-  size_t getEdgeOppositeFaceIndex(const IcoEdge& edge, size_t faceIndex) const;
-  size_t getFaceOppositeNodeIndex(const IcoFace& face,
-                                  const IcoEdge& edge) const;
-  bool conditionalRotateEdge(IcosahedronMesh& icosahedronMesh, size_t edgeIndex,
-                             RotationPredicateType& predicate);
-  size_t findNextFaceIndex(size_t nodeIndex, size_t faceIndex) const;
-  bool distortMesh(size_t degree, IRandomFunction& random);
-  float relaxMesh(float multiplier);
-  IcosahedronMesh& icosahedron();
-
-private:
-  /** Project a vector onto the plane. This  gives you the element of the input
-   * vector that is perpendicularto the normal of the plane.
-   */
-  Vector3 _projectVectorOnPlane(const Vector3& v,
-                                const Vector3& rkNormal) const;
-
-private:
-  size_t _icosahedronSubdivision;
-  float _topologyDistortionRate;
-  IcosahedronMesh _icosahedronMesh;
-
-}; // end of class Icosphere
+}; // end of struct Icosphere
 
 } // end of namespace Extensions
 } // end of namespace BABYLON
