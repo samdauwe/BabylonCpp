@@ -98,7 +98,8 @@ file(GLOB LOADING_HDR_FILES         ${INCLUDE_PATH}/loading/*.h
 file(GLOB MATERIALS_HDR_FILES       ${INCLUDE_PATH}/materials/*.h
                                     ${INCLUDE_PATH}/materials/textures/*.h
                                     ${INCLUDE_PATH}/materials/textures/procedurals/*.h)
-file(GLOB MATH_HDR_FILES            ${INCLUDE_PATH}/math/*.h)
+file(GLOB MATH_HDR_FILES            ${INCLUDE_PATH}/math/*.h
+                                    ${INCLUDE_PATH}/math/simd/*.h)
 file(GLOB MESH_HDR_FILES            ${INCLUDE_PATH}/mesh/*.h
                                     ${INCLUDE_PATH}/mesh/csg/*.h
                                     ${INCLUDE_PATH}/mesh/geometryprimitives/*.h
