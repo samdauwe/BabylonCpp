@@ -246,6 +246,11 @@ class Vector2;
 class Vector3;
 class Vector4;
 class Viewport;
+namespace SIMD {
+struct Float32x4;
+struct SIMDMatrix;
+struct SIMDVector3;
+} // end of namespace SIMD
 // --- Mesh ---
 class _InstancesBatch;
 class _VisibleInstances;

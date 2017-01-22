@@ -184,7 +184,8 @@ file(GLOB LOADING_SRC_FILES         ${SOURCE_PATH}/loading/*.cpp
 file(GLOB MATERIALS_SRC_FILES       ${SOURCE_PATH}/materials/*.cpp
                                     ${SOURCE_PATH}/materials/textures/*.cpp
                                     ${SOURCE_PATH}/materials/textures/procedurals/*.cpp)
-file(GLOB MATH_SRC_FILES            ${SOURCE_PATH}/math/*.cpp)
+file(GLOB MATH_SRC_FILES            ${SOURCE_PATH}/math/*.cpp
+                                    ${SOURCE_PATH}/math/simd/*.cpp)
 file(GLOB MESH_SRC_FILES            ${SOURCE_PATH}/mesh/*.cpp
                                     ${SOURCE_PATH}/mesh/csg/*.cpp
                                     ${SOURCE_PATH}/mesh/geometryprimitives/*.cpp
