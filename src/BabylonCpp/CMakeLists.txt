@@ -118,7 +118,8 @@ file(GLOB SHADERS_HDR_FILES         ${INCLUDE_PATH}/shaders/*.h
 file(GLOB SPRITES_HDR_FILES         ${INCLUDE_PATH}/sprites/*.h)
 file(GLOB STATES_HDR_FILES          ${INCLUDE_PATH}/states/*.h)
 file(GLOB TOOLS_HDR_FILES           ${INCLUDE_PATH}/tools/*.h
-                                    ${INCLUDE_PATH}/tools/hdr/*.h)
+                                    ${INCLUDE_PATH}/tools/hdr/*.h
+                                    ${INCLUDE_PATH}/tools/optimization/*.h)
 file(GLOB UTILS_HDR_FILES           ${INCLUDE_PATH}/utils/*.h)
 
 set(BABYLON_HEADERS
@@ -202,7 +203,8 @@ file(GLOB RENDERING_SRC_FILES       ${SOURCE_PATH}/rendering/*.cpp)
 file(GLOB SPRITES_SRC_FILES         ${SOURCE_PATH}/sprites/*.cpp)
 file(GLOB STATES_SRC_FILES          ${SOURCE_PATH}/states/*.cpp)
 file(GLOB TOOLS_SRC_FILES           ${SOURCE_PATH}/tools/*.cpp
-                                    ${SOURCE_PATH}/tools/hdr/*.cpp)
+                                    ${SOURCE_PATH}/tools/hdr/*.cpp
+                                    ${SOURCE_PATH}/tools/optimization/*.cpp)
 file(GLOB UTILS_SRC_FILES           ${SOURCE_PATH}/utils/*.cpp)
 
 set(BABYLON_SOURCES

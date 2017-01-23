@@ -405,7 +405,18 @@ class _StencilState;
 // --- Tools ---
 class PackedRect;
 struct RectPackingMap;
-
+// - Optimization
+class HardwareScalingOptimization;
+class LensFlaresOptimization;
+class MergeMeshesOptimization;
+class ParticlesOptimization;
+class PostProcessesOptimization;
+class RenderTargetsOptimization;
+class SceneOptimization;
+struct SceneOptimizer;
+class SceneOptimizerOptions;
+class ShadowsOptimization;
+class TextureOptimization;
 namespace picojson {
 class value;
 typedef std::vector<value> array;
