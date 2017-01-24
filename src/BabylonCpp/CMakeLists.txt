@@ -82,6 +82,7 @@ file(GLOB CAMERAS_HDR_FILES         ${INCLUDE_PATH}/cameras/*.h
 file(GLOB COLLISIONS_HDR_FILES      ${INCLUDE_PATH}/collisions/*.h)
 file(GLOB COMMON_HDR_FILES          ${INCLUDE_PATH}/*.h)
 file(GLOB CORE_HDR_FILES            ${INCLUDE_PATH}/core/*.h
+                                    ${INCLUDE_PATH}/core/filesystem/filesystem_common.h
                                     ${INCLUDE_PATH}/core/logging/*.h
                                     ${INCLUDE_PATH}/core/profiling/*.h)
 file(GLOB CULLING_HDR_FILES         ${INCLUDE_PATH}/culling/*.h
@@ -121,6 +122,10 @@ file(GLOB TOOLS_HDR_FILES           ${INCLUDE_PATH}/tools/*.h
                                     ${INCLUDE_PATH}/tools/hdr/*.h
                                     ${INCLUDE_PATH}/tools/optimization/*.h)
 file(GLOB UTILS_HDR_FILES           ${INCLUDE_PATH}/utils/*.h)
+
+if (UNIX)
+    set(CORE_HDR_FILES ${CORE_HDR_FILES} ${INCLUDE_PATH}/core/filesystem/filesystem_unix.h)
+endif (UNIX)
 
 set(BABYLON_HEADERS
     ${ACTIONS_HDR_FILES}
