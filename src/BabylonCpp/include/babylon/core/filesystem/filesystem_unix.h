@@ -71,7 +71,7 @@ inline bool remove_file(const std::string& path)
   return std::remove(path.c_str()) == 0;
 }
 
-} // end of Filesystem
+} // end of namespace Filesystem
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_CORE_FILESYSTEM_FILESYSTEM_UNIX_H
