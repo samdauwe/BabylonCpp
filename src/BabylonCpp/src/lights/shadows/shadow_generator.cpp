@@ -22,6 +22,11 @@
 
 namespace BABYLON {
 
+ShadowGenerator::ShadowGenerator(int mapSize, IShadowLight* light)
+    : ShadowGenerator(ISize{mapSize, mapSize}, light)
+{
+}
+
 ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light)
     : blurScale{2.f}
     , forceBackFacesOnly{false}
@@ -48,7 +53,7 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light)
     , _currentFaceIndexCache{0}
     , _useFullFloat{true}
 {
-  light->_shadowGenerator = shared_from_this();
+  light->_shadowGenerator = this;
 
   // Texture type fallback from float to int if not supported.
   unsigned int textureType = 0;

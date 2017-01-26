@@ -28,7 +28,7 @@ public:
   Vector3 direction;
   Vector3 transformedPosition;
   std::string name;
-  std::shared_ptr<ShadowGenerator> _shadowGenerator;
+  ShadowGenerator* _shadowGenerator;
 
 }; // end of class IShadowLight
 

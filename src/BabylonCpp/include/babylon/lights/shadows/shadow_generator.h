@@ -9,9 +9,7 @@
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT ShadowGenerator
-  : public std::enable_shared_from_this<ShadowGenerator>,
-    public IShadowGenerator {
+class BABYLON_SHARED_EXPORT ShadowGenerator : public IShadowGenerator {
 
 public:
   /** Statics **/
@@ -20,6 +18,7 @@ public:
   static constexpr unsigned int FILTER_POISSONSAMPLING       = 2;
   static constexpr unsigned int FILTER_BLURVARIANCESHADOWMAP = 3;
 
+  ShadowGenerator(int mapSize, IShadowLight* light);
   ShadowGenerator(const ISize& mapSize, IShadowLight* light);
   virtual ~ShadowGenerator();
 
