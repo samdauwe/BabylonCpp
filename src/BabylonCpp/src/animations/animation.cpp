@@ -729,15 +729,15 @@ Json::object Animation::serialize() const
   return serializationObject;
 }
 
-std::unique_ptr<Animation> Animation::Parse(const Json::value& parsedAnimation)
+Animation* Animation::Parse(const Json::value& parsedAnimation)
 {
-  auto animation = std_util::make_unique<Animation>(
-    Json::GetString(parsedAnimation, "name", ""),
-    Json::GetString(parsedAnimation, "property", ""),
-    Json::GetNumber(parsedAnimation, "framePerSecond", 30ull),
-    Json::GetNumber(parsedAnimation, "dataType", 0),
-    Json::GetNumber(parsedAnimation, "loopBehavior",
-                    Animation::ANIMATIONLOOPMODE_CYCLE));
+  auto animation
+    = new Animation(Json::GetString(parsedAnimation, "name", ""),
+                    Json::GetString(parsedAnimation, "property", ""),
+                    Json::GetNumber(parsedAnimation, "framePerSecond", 30ull),
+                    Json::GetNumber(parsedAnimation, "dataType", 0),
+                    Json::GetNumber(parsedAnimation, "loopBehavior",
+                                    Animation::ANIMATIONLOOPMODE_CYCLE));
 
   int dataType = Json::GetNumber(parsedAnimation, "dataType", 0);
   std::vector<AnimationKey> keys;

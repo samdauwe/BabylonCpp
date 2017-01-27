@@ -105,7 +105,7 @@ public:
   bool animate(millisecond_t delay, float from, float to, bool loop,
                float speedRatio);
   Json::object serialize() const;
-  static std::unique_ptr<Animation> Parse(const Json::value& parsedAnimation);
+  static Animation* Parse(const Json::value& parsedAnimation);
 
 private:
   AnimationValue _getKeyValue(const AnimationValue& value) const;
