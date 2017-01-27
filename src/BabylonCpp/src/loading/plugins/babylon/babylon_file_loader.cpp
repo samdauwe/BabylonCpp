@@ -35,17 +35,9 @@ Material* BabylonFileLoader::parseMaterialById(const std::string& id,
                                                Scene* scene,
                                                const std::string& rootUrl) const
 {
-  if (parsedData.contains("materials")
-      && (parsedData.get("materials").is<Json::array>())) {
-    for (const auto& parsedMaterial :
-         parsedData.get("materials").get<Json::array>()) {
-      if (parsedMaterial.contains("id")) {
-        const std::string parsedMaterialId
-          = parsedMaterial.get("id").get<std::string>();
-        if (parsedMaterialId == id) {
-          return Material::Parse(parsedMaterial, scene, rootUrl);
-        }
-      }
+  for (const auto& parsedMaterial : Json::GetArray(parsedData, "materials")) {
+    if (Json::GetString(parsedData, "id") == id) {
+      return Material::Parse(parsedMaterial, scene, rootUrl);
     }
   }
   return nullptr;
@@ -55,20 +47,16 @@ bool BabylonFileLoader::isDescendantOf(const Json::value& mesh,
                                        const std::vector<std::string>& names,
                                        std::vector<std::string>& hierarchyIds)
 {
-  const std::string meshName
-    = mesh.contains("name") ? mesh.get("name").get<std::string>() : "";
   for (auto& name : names) {
-    if (meshName == name) {
-      hierarchyIds.emplace_back(mesh.get("id").get<std::string>());
+    if (Json::GetString(mesh, "name") == name) {
+      hierarchyIds.emplace_back(Json::GetString(mesh, "id"));
       return true;
     }
   }
-  if (mesh.contains("parentId")) {
-    const std::string meshParentId = mesh.get("parentId").get<std::string>();
-    if (std_util::contains(hierarchyIds, meshParentId)) {
-      hierarchyIds.emplace_back(mesh.get("id").get<std::string>());
-      return true;
-    }
+  if (mesh.contains("parentId")
+      && std_util::contains(hierarchyIds, Json::GetString(mesh, "parentId"))) {
+    hierarchyIds.emplace_back(Json::GetString(mesh, "id"));
+    return true;
   }
   return false;
 }
@@ -81,10 +69,10 @@ std::string BabylonFileLoader::logOperation(const std::string& operation) const
 std::string BabylonFileLoader::logOperation(const std::string& operation,
                                             const Json::value& producer) const
 {
-  return operation + " of " + producer.get("file").get<std::string>() + " from "
-         + producer.get("name").get<std::string>() + " version: "
-         + producer.get("version").get<std::string>() + ", exporter version: "
-         + producer.get("exporter_version").get<std::string>();
+  return operation + " of " + Json::GetString(producer, "file") + " from "
+         + Json::GetString(producer, "name") + " version: "
+         + Json::GetString(producer, "version") + ", exporter version: "
+         + Json::GetString(producer, "exporter_version");
 }
 
 bool BabylonFileLoader::importMesh(
@@ -94,16 +82,14 @@ bool BabylonFileLoader::importMesh(
   std::vector<ParticleSystem*>& particleSystems,
   std::vector<Skeleton*>& skeletons)
 {
-  std::string log = "importMesh has failed JSON parse";
   Json::value parsedData;
-  const char* _data = data.c_str();
-  std::string err;
-  err = picojson::parse(parsedData, _data, _data + strlen(_data));
+  std::string err = Json::Parse(parsedData, data.c_str());
   if (!err.empty()) {
+    std::string log = "importMesh has failed JSON parse";
     BABYLON_LOGF_ERROR("BabylonFileLoader", "%s", log.c_str());
     return false;
   }
-  std::ostringstream logStream;
+  std::ostringstream log;
 
   bool fullDetails = SceneLoader::LoggingLevel == SceneLoader::DETAILED_LOGGING;
 
@@ -111,8 +97,7 @@ bool BabylonFileLoader::importMesh(
   std::vector<std::string> loadedMaterialsIds;
   std::vector<std::string> hierarchyIds;
 
-  Json::array parsedMeshes = parsedData.get("meshes").get<Json::array>();
-  for (auto& parsedMesh : parsedMeshes) {
+  for (auto& parsedMesh : Json::GetArray(parsedData, "meshes")) {
     if (meshesNames.empty()
         || isDescendantOf(parsedMesh, meshesNames, hierarchyIds)) {
 
@@ -122,28 +107,26 @@ bool BabylonFileLoader::importMesh(
       // Geometry ?
       if (parsedMesh.contains("geometryId")) {
         const std::string parsedMeshGeometryId
-          = Json::GetString(parsedMesh, "geometryId", "");
+          = Json::GetString(parsedMesh, "geometryId");
         // Does the file contain geometries?
         if (parsedData.contains("geometries")) {
+          auto& geometries = parsedData.get("geometries");
           // find the correct geometry and add it to the scene
           bool found = false;
           const std::array<std::string, 8> geometryTypes{
             {"boxes", "spheres", "cylinders", "toruses", "grounds", "planes",
              "torusKnots", "vertexData"}};
           for (const auto& geometryType : geometryTypes) {
-            if (found || !parsedData.get("geometries").contains(geometryType)
-                || !(parsedData.get("geometries")
-                       .get(geometryType)
-                       .is<Json::array>())) {
+            if (found || !geometries.contains(geometryType)
+                || !(geometries.get(geometryType).is<Json::array>())) {
               break;
             }
             else {
-              for (const auto& parsedGeometryData : parsedData.get("geometries")
-                                                      .get(geometryType)
-                                                      .get<Json::array>()) {
+              for (const auto& parsedGeometryData :
+                   Json::GetArray(geometries, geometryType)) {
                 const std::string parsedGeometryDataId
-                  = Json::GetString(parsedGeometryData, "id", "");
-                if ((!parsedGeometryDataId.empty())
+                  = Json::GetString(parsedGeometryData, "id");
+                if (!parsedGeometryDataId.empty()
                     && (parsedGeometryDataId == parsedMeshGeometryId)) {
                   if (geometryType == "boxes") {
                     GeometryPrimitives::Box::Parse(parsedGeometryData, scene);
@@ -189,14 +172,14 @@ bool BabylonFileLoader::importMesh(
       // Material ?
       if (parsedMesh.contains("materialId")) {
         const std::string parsedMeshMaterialId
-          = Json::GetString(parsedMesh, "materialId", "");
+          = Json::GetString(parsedMesh, "materialId");
         bool materialFound
           = std_util::contains(loadedMaterialsIds, parsedMeshMaterialId);
         if (!parsedMeshMaterialId.empty() && !materialFound
             && parsedData.contains("multiMaterials")
             && parsedData.get("multiMaterials").is<Json::array>()) {
           for (const auto& parsedMultiMaterial :
-               parsedData.get("multiMaterials").get<Json::array>()) {
+               Json::GetArray(parsedData, "multiMaterials")) {
             const std::string parsedMultiMaterialId
               = Json::GetString(parsedMultiMaterial, "id", "");
             if ((!parsedMultiMaterialId.empty())
@@ -204,18 +187,18 @@ bool BabylonFileLoader::importMesh(
               if (parsedMultiMaterial.contains("materials")
                   && parsedMultiMaterial.get("materials").is<Json::array>()) {
                 for (const auto& subMatId :
-                     parsedMultiMaterial.get("materials").get<Json::array>()) {
+                     Json::GetArray(parsedMultiMaterial, "materials")) {
                   loadedMaterialsIds.emplace_back(subMatId.get<std::string>());
-                  Material* mat = parseMaterialById(subMatId.get<std::string>(),
-                                                    parsedData, scene, rootUrl);
-                  logStream << "\n\tMaterial " << mat->toString(fullDetails);
+                  auto mat = parseMaterialById(subMatId.get<std::string>(),
+                                               parsedData, scene, rootUrl);
+                  log << "\n\tMaterial " << mat->toString(fullDetails);
                 }
               }
               loadedMaterialsIds.emplace_back(parsedMultiMaterialId);
-              Material* mmat
+              auto mmat
                 = Material::ParseMultiMaterial(parsedMultiMaterial, scene);
               materialFound = true;
-              logStream << "\n\tMulti-Material " << mmat->toString(fullDetails);
+              log << "\n\tMulti-Material " << mmat->toString(fullDetails);
               break;
             }
           }
@@ -223,15 +206,15 @@ bool BabylonFileLoader::importMesh(
 
         if (!materialFound) {
           loadedMaterialsIds.emplace_back(parsedMeshMaterialId);
-          Material* mat = parseMaterialById(parsedMeshMaterialId, parsedData,
-                                            scene, rootUrl);
+          auto mat = parseMaterialById(parsedMeshMaterialId, parsedData, scene,
+                                       rootUrl);
           if (!mat) {
             BABYLON_LOGF_WARN("BabylonFileLoader",
                               "Material not found for mesh %s",
                               parsedMeshId.c_str());
           }
           else {
-            logStream << "\n\tMaterial " << mat->toString(fullDetails);
+            log << "\n\tMaterial " << mat->toString(fullDetails);
           }
         }
       }
@@ -239,30 +222,30 @@ bool BabylonFileLoader::importMesh(
       // Skeleton ?
       if (parsedMesh.contains("skeletonId")) {
         const std::string parsedMeshSkeletonId
-          = Json::GetString(parsedMesh, "skeletonId", "");
+          = Json::GetString(parsedMesh, "skeletonId");
         bool skeletonAlreadyLoaded
           = std_util::contains(loadedSkeletonsIds, parsedMeshSkeletonId);
         if (!parsedMeshSkeletonId.empty() && !skeletonAlreadyLoaded
             && parsedData.contains("skeletons")
             && parsedData.get("skeletons").is<Json::array>()) {
           for (const auto& parsedSkeleton :
-               parsedData.get("skeletons").get<Json::array>()) {
+               Json::GetArray(parsedData, "skeletons")) {
             const std::string parsedSkeletonId
               = Json::GetString(parsedSkeleton, "id", "");
             if ((!parsedSkeletonId.empty())
                 && (parsedSkeletonId == parsedMeshSkeletonId)) {
-              Skeleton* skeleton = Skeleton::Parse(parsedSkeleton, scene);
+              auto skeleton = Skeleton::Parse(parsedSkeleton, scene);
               skeletons.emplace_back(skeleton);
               loadedSkeletonsIds.emplace_back(parsedSkeletonId);
-              logStream << "\n\tSkeleton " << skeleton->toString(fullDetails);
+              log << "\n\tSkeleton " << skeleton->toString(fullDetails);
             }
           }
         }
       }
 
-      Mesh* mesh = Mesh::Parse(parsedMesh, scene, rootUrl);
+      auto mesh = Mesh::Parse(parsedMesh, scene, rootUrl);
       meshes.emplace_back(mesh);
-      log += "\n\tMesh " + mesh->toString(fullDetails);
+      log << "\n\tMesh " << mesh->toString(fullDetails);
     }
   }
 
@@ -287,27 +270,24 @@ bool BabylonFileLoader::importMesh(
   }
 
   // Particles ?
-  if (parsedData.contains("particleSystems")
-      && parsedData.get("particleSystems").is<Json::array>()) {
-    for (const auto& parsedParticleSystem :
-         parsedData.get("particleSystems").get<Json::array>()) {
-      const std::string parsedParticleSystemEmitterId
-        = Json::GetString(parsedParticleSystem, "emitterId", "");
-      if (!parsedParticleSystemEmitterId.empty()
-          && std_util::contains(hierarchyIds, parsedParticleSystemEmitterId)) {
-        particleSystems.emplace_back(
-          ParticleSystem::Parse(parsedParticleSystem, scene, rootUrl));
-      }
+  for (const auto& parsedParticleSystem :
+       Json::GetArray(parsedData, "particleSystems")) {
+    const std::string parsedParticleSystemEmitterId
+      = Json::GetString(parsedParticleSystem, "emitterId");
+    if (!parsedParticleSystemEmitterId.empty()
+        && std_util::contains(hierarchyIds, parsedParticleSystemEmitterId)) {
+      particleSystems.emplace_back(
+        ParticleSystem::Parse(parsedParticleSystem, scene, rootUrl));
     }
   }
 
-  log = logStream.str();
-  if (!log.empty() && SceneLoader::LoggingLevel != SceneLoader::NO_LOGGING) {
+  const auto _log = log.str();
+  if (!_log.empty() && SceneLoader::LoggingLevel != SceneLoader::NO_LOGGING) {
     std::string msg = parsedData.contains("producer") ?
                         logOperation("importMesh", parsedData.get("producer")) :
                         logOperation("importMesh");
     std::string logStr
-      = SceneLoader::LoggingLevel != SceneLoader::MINIMAL_LOGGING ? log : "";
+      = SceneLoader::LoggingLevel != SceneLoader::MINIMAL_LOGGING ? _log : "";
     BABYLON_LOGF_INFO("BabylonFileLoader", "%s%s", msg.c_str(), logStr.c_str());
   }
 
@@ -317,22 +297,19 @@ bool BabylonFileLoader::importMesh(
 bool BabylonFileLoader::load(Scene* scene, const std::string& data,
                              const std::string& rootUrl)
 {
-  std::string parseLog = "importScene has failed JSON parse";
   Json::value parsedData;
-  const char* _data = data.c_str();
-  std::string err;
-  err = picojson::parse(parsedData, _data, _data + strlen(_data));
+  std::string err = Json::Parse(parsedData, data.c_str());
   if (!err.empty()) {
-    BABYLON_LOGF_ERROR("BabylonFileLoader", "%s", parseLog.c_str());
+    std::string log = "importScene has failed JSON parse";
+    BABYLON_LOGF_ERROR("BabylonFileLoader", "%s", log.c_str());
     return false;
   }
   std::ostringstream log;
-
   bool fullDetails = SceneLoader::LoggingLevel == SceneLoader::DETAILED_LOGGING;
 
   // Scene
   scene->useDelayedTextureLoading
-    = Json::GetBool(parsedData, "useDelayedTextureLoading", false)
+    = Json::GetBool(parsedData, "useDelayedTextureLoading")
       && !SceneLoader::ForceFullSceneLoadingForIncremental;
   scene->autoClear = Json::GetBool(parsedData, "autoClear", true);
   scene->clearColor
@@ -345,8 +322,7 @@ bool BabylonFileLoader::load(Scene* scene, const std::string& data,
   }
 
   // Fog
-  unsigned int fogMode
-    = Json::GetNumber(parsedData, "fogMode", Scene::FOGMODE_NONE);
+  auto fogMode = Json::GetNumber(parsedData, "fogMode", Scene::FOGMODE_NONE);
   if (fogMode != Scene::FOGMODE_NONE) {
     scene->fogMode = fogMode;
     scene->fogColor
@@ -371,192 +347,138 @@ bool BabylonFileLoader::load(Scene* scene, const std::string& data,
   }
 
   // Physics
-  bool physicsEnabled = Json::GetBool(parsedData, "physicsEnabled", false);
-  if (physicsEnabled) {
+  if (Json::GetBool(parsedData, "physicsEnabled")) {
   }
+
+  // Metadata
+  // if (parsedData.metadata !== undefined) {
+  //    scene.metadata = parsedData.metadata;
+  // }
 
   // Collisions, if defined. otherwise, default is true
   scene->collisionsEnabled = Json::GetBool(parsedData, "physicsEnabled", true);
-  scene->setWorkerCollisions(
-    Json::GetBool(parsedData, "workerCollisions", false));
+  scene->setWorkerCollisions(Json::GetBool(parsedData, "workerCollisions"));
 
   // Lights
   unsigned int index = 0;
-  if (parsedData.contains("lights")
-      && (parsedData.get("lights").is<Json::array>())) {
-    for (const auto& parsedLight :
-         parsedData.get("lights").get<Json::array>()) {
-      Light* light = Light::Parse(parsedLight, scene);
-      log << (index == 0 ? "\n\tLights:" : "");
-      log << "\n\t\t" << light->toString(fullDetails);
-      ++index;
-    }
+  for (const auto& parsedLight : Json::GetArray(parsedData, "lights")) {
+    auto light = Light::Parse(parsedLight, scene);
+    log << (index == 0 ? "\n\tLights:" : "");
+    log << "\n\t\t" << light->toString(fullDetails);
+    ++index;
   }
 
   // Animations
-  /*index = 0;
-  if (parsedData.contains("animations")
-      && (parsedData.get("animations").is<Json::array>())) {
-    for (const auto& parsedAnimation :
-         parsedData.get("animations").get<Json::array>()) {
-      Animation* animation = Animation::Parse(parsedAnimation);
-      scene->animations.emplace_back(animation);
-      log << (index == 0 ? "\n\tAnimations:" : "");
-      log << "\n\t\t" << animation->toString(fullDetails);
-      ++index;
-    }
+  index = 0;
+  for (const auto& parsedAnimation : Json::GetArray(parsedData, "animations")) {
+    auto animation = Animation::Parse(parsedAnimation);
+    scene->animations.emplace_back(animation);
+    log << (index == 0 ? "\n\tAnimations:" : "");
+    log << "\n\t\t" << animation->toString(fullDetails);
+    ++index;
   }
 
   if (Json::GetBool(parsedData, "autoAnimate", false)) {
     scene->beginAnimation(scene,
-                          Tools::GetNumber(parsedData, "autoAnimateFrom", 0),
-                          Tools::GetNumber(parsedData, "autoAnimateTo", 0),
-                          Json::GetBool(parsedData, "autoAnimateLoop", false),
-                          Tools::GetNumber(parsedData, "autoAnimateFrom", 1.f));
-  }*/
+                          Json::GetNumber(parsedData, "autoAnimateFrom", 0),
+                          Json::GetNumber(parsedData, "autoAnimateTo", 0),
+                          Json::GetBool(parsedData, "autoAnimateLoop"),
+                          Json::GetNumber(parsedData, "autoAnimateFrom", 1.f));
+  }
 
   // Materials
   index = 0;
-  if (parsedData.contains("materials")
-      && (parsedData.get("materials").is<Json::array>())) {
-    for (const auto& parsedMaterial :
-         parsedData.get("materials").get<Json::array>()) {
-      Material* mat = Material::Parse(parsedMaterial, scene, rootUrl);
-      log << (index == 0 ? "\n\tMaterials:" : "");
-      log << "\n\t\t" << mat->toString(fullDetails);
-      ++index;
-    }
+  for (const auto& parsedMaterial : Json::GetArray(parsedData, "materials")) {
+    auto mat = Material::Parse(parsedMaterial, scene, rootUrl);
+    log << (index == 0 ? "\n\tMaterials:" : "");
+    log << "\n\t\t" << mat->toString(fullDetails);
+    ++index;
   }
 
   // Multi materials
   index = 0;
-  if (parsedData.contains("multiMaterials")
-      && (parsedData.get("multiMaterials").is<Json::array>())) {
-    for (const auto& parsedMultiMaterial :
-         parsedData.get("multiMaterials").get<Json::array>()) {
-      MultiMaterial* mmat
-        = Material::ParseMultiMaterial(parsedMultiMaterial, scene);
-      log << (index == 0 ? "\n\tMultiMaterials:" : "");
-      log << "\n\t\t" << mmat->toString(fullDetails);
-      ++index;
-    }
+  for (const auto& parsedMultiMaterial :
+       Json::GetArray(parsedData, "multiMaterials")) {
+    auto mmat = Material::ParseMultiMaterial(parsedMultiMaterial, scene);
+    log << (index == 0 ? "\n\tMultiMaterials:" : "");
+    log << "\n\t\t" << mmat->toString(fullDetails);
+    ++index;
   }
 
   // Skeletons
   index = 0;
-  if (parsedData.contains("skeletons")
-      && (parsedData.get("skeletons").is<Json::array>())) {
-    for (const auto& parsedSkeleton :
-         parsedData.get("skeletons").get<Json::array>()) {
-      Skeleton* skeleton = Skeleton::Parse(parsedSkeleton, scene);
-      log << (index == 0 ? "\n\tSkeletons:" : "");
-      log << "\n\t\t" << skeleton->toString(fullDetails);
-      ++index;
-    }
+  for (const auto& parsedSkeleton : Json::GetArray(parsedData, "skeletons")) {
+    auto skeleton = Skeleton::Parse(parsedSkeleton, scene);
+    log << (index == 0 ? "\n\tSkeletons:" : "");
+    log << "\n\t\t" << skeleton->toString(fullDetails);
+    ++index;
   }
 
   if (parsedData.contains("geometries")) {
-    const Json::value& geometries = parsedData.get("geometries");
+    const auto& geometries = parsedData.get("geometries");
 
     // Boxes
-    if (geometries.contains("boxes")
-        && (geometries.get("boxes").is<Json::array>())) {
-      for (const auto& parsedBox : geometries.get("boxes").get<Json::array>()) {
-        GeometryPrimitives::Box::Parse(parsedBox, scene);
-      }
+    for (const auto& parsedBox : Json::GetArray(geometries, "boxes")) {
+      GeometryPrimitives::Box::Parse(parsedBox, scene);
     }
 
     // Spheres
-    if (geometries.contains("spheres")
-        && (geometries.get("spheres").is<Json::array>())) {
-      for (const auto& parsedSphere :
-           geometries.get("spheres").get<Json::array>()) {
-        GeometryPrimitives::Sphere::Parse(parsedSphere, scene);
-      }
+    for (const auto& parsedSphere : Json::GetArray(geometries, "spheres")) {
+      GeometryPrimitives::Sphere::Parse(parsedSphere, scene);
     }
 
     // Cylinders
-    if (geometries.contains("cylinders")
-        && (geometries.get("cylinders").is<Json::array>())) {
-      for (const auto& parsedCylinder :
-           geometries.get("cylinders").get<Json::array>()) {
-        GeometryPrimitives::Cylinder::Parse(parsedCylinder, scene);
-      }
+    for (const auto& parsedCylinder : Json::GetArray(geometries, "cylinders")) {
+      GeometryPrimitives::Cylinder::Parse(parsedCylinder, scene);
     }
 
     // Toruses
-    if (geometries.contains("toruses")
-        && (geometries.get("toruses").is<Json::array>())) {
-      for (const auto& parsedTorus :
-           geometries.get("toruses").get<Json::array>()) {
-        GeometryPrimitives::Torus::Parse(parsedTorus, scene);
-      }
+    for (const auto& parsedTorus : Json::GetArray(geometries, "toruses")) {
+      GeometryPrimitives::Torus::Parse(parsedTorus, scene);
     }
 
     // Grounds
-    if (geometries.contains("grounds")
-        && (geometries.get("grounds").is<Json::array>())) {
-      for (const auto& parsedGround :
-           geometries.get("grounds").get<Json::array>()) {
-        GeometryPrimitives::Ground::Parse(parsedGround, scene);
-      }
+    for (const auto& parsedGround : Json::GetArray(geometries, "grounds")) {
+      GeometryPrimitives::Ground::Parse(parsedGround, scene);
     }
 
     // Planes
-    if (geometries.contains("planes")
-        && (geometries.get("planes").is<Json::array>())) {
-      for (const auto& parsedPlane :
-           geometries.get("planes").get<Json::array>()) {
-        GeometryPrimitives::Plane::Parse(parsedPlane, scene);
-      }
+    for (const auto& parsedPlane : Json::GetArray(geometries, "planes")) {
+      GeometryPrimitives::Plane::Parse(parsedPlane, scene);
     }
 
     // TorusKnots
-    if (geometries.contains("torusKnots")
-        && (geometries.get("torusKnots").is<Json::array>())) {
-      for (const auto& parsedTorusKnot :
-           geometries.get("torusKnots").get<Json::array>()) {
-        GeometryPrimitives::TorusKnot::Parse(parsedTorusKnot, scene);
-      }
+    for (const auto& parsedTorusKnot :
+         Json::GetArray(geometries, "torusKnots")) {
+      GeometryPrimitives::TorusKnot::Parse(parsedTorusKnot, scene);
     }
 
     // VertexData
-    if (geometries.contains("vertexData")
-        && (geometries.get("vertexData").is<Json::array>())) {
-      for (const auto& parsedVertexData :
-           geometries.get("vertexData").get<Json::array>()) {
-        Geometry::Parse(parsedVertexData, scene, rootUrl);
-      }
+    for (const auto& parsedVertexData :
+         Json::GetArray(geometries, "vertexData")) {
+      Geometry::Parse(parsedVertexData, scene, rootUrl);
     }
   }
 
   // Meshes
   index = 0;
-  if (parsedData.contains("meshes")
-      && (parsedData.get("meshes").is<Json::array>())) {
-    for (const auto& parsedMesh : parsedData.get("meshes").get<Json::array>()) {
-      Mesh* mesh = Mesh::Parse(parsedMesh, scene, rootUrl);
-      log << (index == 0 ? "\n\tMeshes:" : "");
-      log << "\n\t\t" << mesh->toString(fullDetails);
-      ++index;
-    }
+  for (const auto& parsedMesh : Json::GetArray(parsedData, "meshes")) {
+    auto mesh = Mesh::Parse(parsedMesh, scene, rootUrl);
+    log << (index == 0 ? "\n\tMeshes:" : "");
+    log << "\n\t\t" << mesh->toString(fullDetails);
+    ++index;
   }
 
   // Cameras
   index = 0;
-  if (parsedData.contains("cameras")
-      && (parsedData.get("cameras").is<Json::array>())) {
-    for (const auto& parsedCamera :
-         parsedData.get("cameras").get<Json::array>()) {
-      Camera* camera = Camera::Parse(parsedCamera, scene);
-      log << (index == 0 ? "\n\tCameras:" : "");
-      log << "\n\t\t" << camera->toString(fullDetails);
-      ++index;
-    }
+  for (const auto& parsedCamera : Json::GetArray(parsedData, "cameras")) {
+    auto camera = Camera::Parse(parsedCamera, scene);
+    log << (index == 0 ? "\n\tCameras:" : "");
+    log << "\n\t\t" << camera->toString(fullDetails);
+    ++index;
   }
   if (parsedData.contains("activeCameraID")) {
-    scene->setActiveCameraByID(
-      Json::GetString(parsedData, "activeCameraID", ""));
+    scene->setActiveCameraByID(Json::GetString(parsedData, "activeCameraID"));
   }
 
   // Browsing all the graph to connect the dots
@@ -600,30 +522,21 @@ bool BabylonFileLoader::load(Scene* scene, const std::string& data,
   }
 
   // Particles Systems
-  if (parsedData.contains("particleSystems")
-      && (parsedData.get("particleSystems").is<Json::array>())) {
-    for (const auto& parsedParticleSystem :
-         parsedData.get("particleSystems").get<Json::array>()) {
-      ParticleSystem::Parse(parsedParticleSystem, scene, rootUrl);
-    }
+  for (const auto& parsedParticleSystem :
+       Json::GetArray(parsedData, "particleSystems")) {
+    ParticleSystem::Parse(parsedParticleSystem, scene, rootUrl);
   }
 
   // Lens flares
-  if (parsedData.contains("lensFlareSystems")
-      && (parsedData.get("lensFlareSystems").is<Json::array>())) {
-    for (const auto& parsedLensFlareSystem :
-         parsedData.get("lensFlareSystems").get<Json::array>()) {
-      LensFlareSystem::Parse(parsedLensFlareSystem, scene, rootUrl);
-    }
+  for (const auto& parsedLensFlareSystem :
+       Json::GetArray(parsedData, "lensFlareSystems")) {
+    LensFlareSystem::Parse(parsedLensFlareSystem, scene, rootUrl);
   }
 
   // Shadows
-  if (parsedData.contains("shadowGenerators")
-      && (parsedData.get("shadowGenerators").is<Json::array>())) {
-    for (const auto& parsedShadowGenerator :
-         parsedData.get("shadowGenerators").get<Json::array>()) {
-      ShadowGenerator::Parse(parsedShadowGenerator, scene);
-    }
+  for (const auto& parsedShadowGenerator :
+       Json::GetArray(parsedData, "shadowGenerators")) {
+    ShadowGenerator::Parse(parsedShadowGenerator, scene);
   }
 
   // Actions (scene)
@@ -633,7 +546,7 @@ bool BabylonFileLoader::load(Scene* scene, const std::string& data,
                          scene);
   }
 
-  const std::string _log = log.str();
+  const auto _log = log.str();
   if (!_log.empty() && SceneLoader::LoggingLevel != SceneLoader::NO_LOGGING) {
     std::string msg
       = parsedData.contains("producer") ?

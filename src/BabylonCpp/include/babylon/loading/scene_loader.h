@@ -36,6 +36,7 @@ struct BABYLON_SHARED_EXPORT SceneLoader {
     const std::function<void(Scene* scene, const std::string& message,
                              const std::string& exception)>& onerror
     = nullptr);
+
   /**
    * Load a scene
    * @param rootUrl a string that defines the root url for scene and
@@ -51,6 +52,7 @@ struct BABYLON_SHARED_EXPORT SceneLoader {
                    const std::function<void(Scene* scene)>& onsuccess = nullptr,
                    const std::function<void()>& progressCallBack      = nullptr,
                    const std::function<void(Scene* scene)>& onerror = nullptr);
+
   /**
    * Append a scene
    * @param rootUrl a string that defines the root url for scene and resources
