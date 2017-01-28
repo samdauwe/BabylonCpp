@@ -1457,25 +1457,22 @@ void Mesh::optimizeIndices(
   successCallback(nullptr);
 }
 
-Mesh* Mesh::Parse(const Json::value& /*parsedMesh*/, Scene* /*scene*/,
-                  const std::string& /*rootUrl*/)
+Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
+                  const std::string& rootUrl)
 {
-#if 0
-  //auto mesh; // = Mesh::New(Json::GetString(parsedMesh, "name", ""), scene);
-  //mesh->id = Json::GetString(parsedMesh, "id", "");
+  auto mesh = Mesh::New(Json::GetString(parsedMesh, "name", ""), scene);
+  mesh->id  = Json::GetString(parsedMesh, "id", "");
 
   // Tags.AddTagsTo(mesh, parsedMesh.tags);
 
   if (parsedMesh.contains("position")) {
-    // mesh->setPosition(
-    //  Vector3::FromArray(Json::ToArray<float>(parsedMesh, "position")));
+    mesh->setPosition(
+      Vector3::FromArray(Json::ToArray<float>(parsedMesh, "position")));
   }
 
   if (parsedMesh.contains("rotationQuaternion")) {
-    // mesh->setRotationQuaternion(
-    // Quaternion::FromArray(
-    //  Json::ToArray<float>(parsedMesh, "rotationQuaternion"))
-    //  .cloneToNewObject());
+    mesh->setRotationQuaternion(Quaternion::FromArray(
+      Json::ToArray<float>(parsedMesh, "rotationQuaternion")));
   }
   else if (parsedMesh.contains("rotation")) {
     mesh->setRotation(
@@ -1483,8 +1480,8 @@ Mesh* Mesh::Parse(const Json::value& /*parsedMesh*/, Scene* /*scene*/,
   }
 
   if (parsedMesh.contains("scaling")) {
-    // mesh->setPosition(
-    // Vector3::FromArray(Json::ToArray<float>(parsedMesh, "scaling")));
+    mesh->setPosition(
+      Vector3::FromArray(Json::ToArray<float>(parsedMesh, "scaling")));
   }
 
   if (parsedMesh.contains("localMatrix")) {
@@ -1497,9 +1494,8 @@ Mesh* Mesh::Parse(const Json::value& /*parsedMesh*/, Scene* /*scene*/,
   }
 
   mesh->setEnabled(Json::GetBool(parsedMesh, "isEnabled", true));
-  mesh->isVisible = Json::GetBool(parsedMesh, "isVisible", true);
-  mesh->infiniteDistance
-    = Json::GetBool(parsedMesh, "infiniteDistance", false);
+  mesh->isVisible        = Json::GetBool(parsedMesh, "isVisible", true);
+  mesh->infiniteDistance = Json::GetBool(parsedMesh, "infiniteDistance", false);
 
   mesh->showBoundingBox = Json::GetBool(parsedMesh, "showBoundingBox", false);
   mesh->showSubMeshesBoundingBox
@@ -1508,15 +1504,14 @@ Mesh* Mesh::Parse(const Json::value& /*parsedMesh*/, Scene* /*scene*/,
   mesh->applyFog   = Json::GetBool(parsedMesh, "applyFog", true);
   mesh->isPickable = Json::GetBool(parsedMesh, "isPickable", true);
   mesh->alphaIndex = Json::GetNumber(parsedMesh, "alphaIndex",
-                                      std::numeric_limits<int>::max());
+                                     std::numeric_limits<int>::max());
 
   mesh->receiveShadows = Json::GetBool(parsedMesh, "receiveShadows", false);
   mesh->billboardMode  = Json::GetNumber(parsedMesh, "billboardMode",
-                                         AbstractMesh::BILLBOARDMODE_NONE);
+                                        AbstractMesh::BILLBOARDMODE_NONE);
   mesh->visibility = Json::GetNumber(parsedMesh, "visibility", 1.f);
 
-  mesh->setCheckCollisions(
-    Json::GetBool(parsedMesh, "checkCollisions", false));
+  mesh->setCheckCollisions(Json::GetBool(parsedMesh, "checkCollisions", false));
   mesh->_shouldGenerateFlatShading
     = Json::GetBool(parsedMesh, "useFlatShading", false);
 
@@ -1541,11 +1536,11 @@ Mesh* Mesh::Parse(const Json::value& /*parsedMesh*/, Scene* /*scene*/,
     mesh->delayLoadingFile
       = rootUrl + Json::GetString(parsedMesh, "delayLoadingFile", "");
 
-    mesh->_boundingInfo.reset(std_util::make_unique<BoundingInfo>(
-      Vector3::FromArray(
-        Json::ToArray<float>(parsedMesh, "boundingBoxMinimum")),
-      Vector3::FromArray(
-        Json::ToArray<float>(parsedMesh, "boundingBoxMaximum"))));
+    // mesh->_boundingInfo.reset(std_util::make_unique<BoundingInfo>(
+    //  Vector3::FromArray(
+    //    Json::ToArray<float>(parsedMesh, "boundingBoxMinimum")),
+    //  Vector3::FromArray(
+    //    Json::ToArray<float>(parsedMesh, "boundingBoxMaximum"))));
 
     // if (parsedMesh.contains("_binaryInfo") {
     //    mesh->_binaryInfo = parsedMesh._binaryInfo;
@@ -1638,7 +1633,7 @@ Mesh* Mesh::Parse(const Json::value& /*parsedMesh*/, Scene* /*scene*/,
   }
 
   // Layer Mask
-  mesh->layerMask = Json::GetNumber(parsedMesh, "layerMask", 0x0FFFFFFF);
+  // mesh->layerMask = Json::GetNumber(parsedMesh, "layerMask", 0x0FFFFFFF);
 
   // Instances
   if (parsedMesh.contains("instances")) {
@@ -1646,8 +1641,6 @@ Mesh* Mesh::Parse(const Json::value& /*parsedMesh*/, Scene* /*scene*/,
   }
 
   return mesh;
-#endif
-  return nullptr;
 }
 
 // Statics
