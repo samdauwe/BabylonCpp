@@ -18,6 +18,8 @@ public:
   Skeleton(const std::string& name, const std::string& id, Scene* scene);
   virtual ~Skeleton();
 
+  virtual IReflect::Type type() const override;
+
   /** Members **/
   Float32Array& getTransformMatrices(AbstractMesh* mesh);
   Scene* getScene();

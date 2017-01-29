@@ -25,6 +25,8 @@ public:
                  Effect* customEffect = nullptr);
   virtual ~ParticleSystem();
 
+  virtual IReflect::Type type() const override;
+
   void setOnDispose(const FastFunc<void()>& callback);
   void recycleParticle(Particle* particle);
   size_t getCapacity() const;
@@ -54,7 +56,8 @@ public:
   std::string id;
   std::string name;
   unsigned int renderingGroupId;
-  Mesh* emitter;
+  AbstractMesh* emitter;
+  Vector3 emitterVec;
   int emitRate;
   int manualEmitCount;
   float updateSpeed;

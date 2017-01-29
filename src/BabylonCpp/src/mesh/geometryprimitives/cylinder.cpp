@@ -48,9 +48,8 @@ Geometry* Cylinder::copy(const std::string& _id)
 
 Cylinder* Cylinder::Parse(const Json::value& parsedCylinder, Scene* scene)
 {
-  const std::string parsedCylinderId
-    = Json::GetString(parsedCylinder, "id", "");
-  if (scene->getGeometryByID(parsedCylinderId)) {
+  const auto parsedCylinderId = Json::GetString(parsedCylinder, "id");
+  if (parsedCylinderId.empty() || scene->getGeometryByID(parsedCylinderId)) {
     return nullptr; // null since geometry could be something else than a
                     // cylinder...
   }

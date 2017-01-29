@@ -60,6 +60,8 @@ public:
   Json::object serialize() const;
 
   // Statics
+  static Light* GetConstructorFromName(unsigned int type,
+                                       const std::string& name, Scene* scene);
   static Light* Parse(const Json::value& parsedLight, Scene* scene);
 
 protected:

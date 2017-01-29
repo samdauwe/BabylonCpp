@@ -404,6 +404,7 @@ class _StencilState;
 } // end of namespace BABYLON
 // --- Tools ---
 class PackedRect;
+struct SerializationHelper;
 struct RectPackingMap;
 // - Optimization
 class HardwareScalingOptimization;

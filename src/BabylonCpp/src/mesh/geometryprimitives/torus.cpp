@@ -42,8 +42,8 @@ Geometry* Torus::copy(const std::string& _id)
 
 Torus* Torus::Parse(const Json::value& parsedTorus, Scene* scene)
 {
-  const std::string parsedTorusId = Json::GetString(parsedTorus, "id", "");
-  if (scene->getGeometryByID(parsedTorusId)) {
+  const auto parsedTorusId = Json::GetString(parsedTorus, "id");
+  if (parsedTorusId.empty() || scene->getGeometryByID(parsedTorusId)) {
     return nullptr; // null since geometry could be something else than a
                     // torus...
   }

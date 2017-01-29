@@ -39,8 +39,8 @@ Geometry* Ground::copy(const std::string& _id)
 
 Ground* Ground::Parse(const Json::value& parsedGround, Scene* scene)
 {
-  const std::string parsedGroundId = Json::GetString(parsedGround, "id", "");
-  if (scene->getGeometryByID(parsedGroundId)) {
+  const auto parsedGroundId = Json::GetString(parsedGround, "id");
+  if (parsedGroundId.empty() || scene->getGeometryByID(parsedGroundId)) {
     return nullptr; // null since geometry could be something else than a
                     // ground...
   }

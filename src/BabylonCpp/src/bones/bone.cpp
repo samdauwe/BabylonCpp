@@ -7,14 +7,6 @@
 
 namespace BABYLON {
 
-template <typename... Ts>
-Bone* Bone::New(Ts&&... args)
-{
-  auto bone = std_util::make_unique<Bone>(std::forward<Ts>(args)...);
-  bone->_skeleton->bones.emplace_back(bone);
-  return bone.get();
-}
-
 Bone::Bone(const std::string& _name, Skeleton* skeleton, Bone* parentBone,
            const Matrix& matrix)
     : Bone(_name, skeleton, parentBone, matrix, matrix)
@@ -58,6 +50,11 @@ Bone::~Bone()
 IReflect::Type Bone::type() const
 {
   return IReflect::Type::BONE;
+}
+
+void Bone::addToSkeleton(std::unique_ptr<Bone>&& newBone)
+{
+  _skeleton->bones.emplace_back(std::move(newBone));
 }
 
 // Members

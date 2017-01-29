@@ -954,8 +954,9 @@ Animatable* Scene::beginAnimation(IAnimatable* target, float from, float to,
   stopAnimation(target);
 
   if (!animatable) {
-    animatable = new Animatable(this, target, from, to, loop, speedRatio,
-                                onAnimationEnd);
+    animatable
+      = new Animatable(this, target, static_cast<int>(from),
+                       static_cast<int>(to), loop, speedRatio, onAnimationEnd);
   }
 
   // Local animations

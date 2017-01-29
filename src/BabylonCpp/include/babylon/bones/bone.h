@@ -12,10 +12,16 @@ class BABYLON_SHARED_EXPORT Bone : public Node {
 
 public:
   template <typename... Ts>
-  static Bone* New(Ts&&... args);
+  static Bone* New(Ts&&... args)
+  {
+    auto bone = new Bone(std::forward<Ts>(args)...);
+    bone->addToSkeleton(static_cast<std::unique_ptr<Bone>>(bone));
+    return bone;
+  }
   ~Bone();
 
   virtual IReflect::Type type() const override;
+  void addToSkeleton(std::unique_ptr<Bone>&& newBone);
 
   /** Members **/
   Bone* getParent();

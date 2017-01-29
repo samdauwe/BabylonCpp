@@ -732,7 +732,7 @@ void Geometry::ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh)
 Geometry* Geometry::Parse(const Json::value& parsedVertexData, Scene* scene,
                           const std::string& rootUrl)
 {
-  std::string parsedVertexDataId = Json::GetString(parsedVertexData, "id", "");
+  const auto parsedVertexDataId = Json::GetString(parsedVertexData, "id");
   if (parsedVertexDataId.empty()
       || scene->getGeometryByID(parsedVertexDataId)) {
     return nullptr; // nullptr since geometry could be something else than a

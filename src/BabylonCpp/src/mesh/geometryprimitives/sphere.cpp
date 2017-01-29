@@ -39,8 +39,8 @@ Geometry* Sphere::copy(const std::string& _id)
 
 Sphere* Sphere::Parse(const Json::value& parsedSphere, Scene* scene)
 {
-  const std::string parsedSphereId = Json::GetString(parsedSphere, "id", "");
-  if (scene->getGeometryByID(parsedSphereId)) {
+  const auto parsedSphereId = Json::GetString(parsedSphere, "id");
+  if (parsedSphereId.empty() || scene->getGeometryByID(parsedSphereId)) {
     return nullptr; // null since geometry could be something else than a
                     // sphere...
   }

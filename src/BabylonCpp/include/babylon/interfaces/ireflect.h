@@ -16,7 +16,8 @@ public:
     NODE  = 0,
     SCENE = 1,
     // Bones
-    BONE = 2,
+    BONE     = 2,
+    SKELETON = 3,
     // Cameras
     CAMERA          = 10,
     ARCFOLLOWCAMERA = 11,
@@ -43,9 +44,12 @@ public:
     INSTANCEDMESH = 152,
     LINESMESH     = 153,
     MESH          = 154,
+    // Particles
+    PARTICLE       = 200,
+    PARTICLESYSTEM = 201,
     // Texture
-    BASETEXTURE = 200,
-    TEXTURE     = 201
+    BASETEXTURE = 250,
+    TEXTURE     = 251
   }; // end of enum class Type
 
 public:

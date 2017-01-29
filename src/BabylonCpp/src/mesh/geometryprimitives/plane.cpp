@@ -33,8 +33,8 @@ Geometry* Plane::copy(const std::string& _id)
 
 Plane* Plane::Parse(const Json::value& parsedPlane, Scene* scene)
 {
-  const std::string parsedPlaneId = Json::GetString(parsedPlane, "id", "");
-  if (scene->getGeometryByID(parsedPlaneId)) {
+  const auto parsedPlaneId = Json::GetString(parsedPlane, "id");
+  if (parsedPlaneId.empty() || scene->getGeometryByID(parsedPlaneId)) {
     return nullptr; // null since geometry could be something else than a
                     // plane...
   }

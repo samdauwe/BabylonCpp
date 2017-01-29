@@ -35,8 +35,8 @@ std::unique_ptr<VertexData> Ribbon::_regenerateVertexData()
 
 Geometry* Ribbon::copy(const std::string& _id)
 {
-  return new Ribbon(_id, getScene(), pathArray, closeArray, closePath, offset,
-                    canBeRegenerated(), nullptr, side);
+  return Ribbon::New(_id, getScene(), pathArray, closeArray, closePath, offset,
+                     canBeRegenerated(), nullptr, side);
 }
 
 } // end of namespace GeometryPrimitives

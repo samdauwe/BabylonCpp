@@ -32,8 +32,8 @@ std::unique_ptr<VertexData> Disc::_regenerateVertexData()
 
 Geometry* Disc::copy(const std::string& _id)
 {
-  return new Disc(_id, getScene(), radius, tessellation, canBeRegenerated(),
-                  nullptr, side);
+  return Disc::New(_id, getScene(), radius, tessellation, canBeRegenerated(),
+                   nullptr, side);
 }
 
 } // end of namespace GeometryPrimitives

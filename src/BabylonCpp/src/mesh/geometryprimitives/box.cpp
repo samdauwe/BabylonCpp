@@ -33,8 +33,8 @@ Geometry* Box::copy(const std::string& _id)
 
 Box* Box::Parse(const Json::value& parsedBox, Scene* scene)
 {
-  const std::string parsedBoxId = Json::GetString(parsedBox, "id", "");
-  if (scene->getGeometryByID(parsedBoxId)) {
+  const auto parsedBoxId = Json::GetString(parsedBox, "id");
+  if (parsedBoxId.empty() || scene->getGeometryByID(parsedBoxId)) {
     return nullptr; // null since geometry could be something else than a box...
   }
 

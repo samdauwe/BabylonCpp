@@ -2,8 +2,13 @@
 
 #include <babylon/animations/animation.h>
 #include <babylon/engine/scene.h>
+#include <babylon/lights/directional_light.h>
+#include <babylon/lights/hemispheric_light.h>
+#include <babylon/lights/point_light.h>
 #include <babylon/lights/shadows/shadow_generator.h>
+#include <babylon/lights/spot_light.h>
 #include <babylon/mesh/abstract_mesh.h>
+#include <babylon/tools/serialization_helper.h>
 
 namespace BABYLON {
 
@@ -164,9 +169,67 @@ Json::object Light::serialize() const
   return Json::object();
 }
 
-Light* Light::Parse(const Json::value& /*parsedLight*/, Scene* /*scene*/)
+Light* Light::GetConstructorFromName(unsigned int type, const std::string& name,
+                                     Scene* scene)
 {
+  switch (type) {
+    case 0:
+      return PointLight::New(name, Vector3::Zero(), scene);
+    case 1:
+      return DirectionalLight::New(name, Vector3::Zero(), scene);
+    case 2:
+      return SpotLight::New(name, Vector3::Zero(), Vector3::Zero(), 0.f, 0.f,
+                            scene);
+    case 3:
+      return HemisphericLight::New(name, Vector3::Zero(), scene);
+  }
+
   return nullptr;
+}
+
+Light* Light::Parse(const Json::value& parsedLight, Scene* scene)
+{
+  auto light = SerializationHelper::Parse(
+    Light::GetConstructorFromName(Json::GetNumber(parsedLight, "type", 0u),
+                                  Json::GetString(parsedLight, "name"), scene),
+    parsedLight, scene);
+  if (!light) {
+    return nullptr;
+  }
+
+  // Inclusion / exclusions
+  if (parsedLight.contains("excludedMeshesIds")) {
+    light->_excludedMeshesIds
+      = Json::ToStringVector(parsedLight, "excludedMeshesIds");
+  }
+
+  if (parsedLight.contains("includedOnlyMeshesIds")) {
+    light->_includedOnlyMeshesIds
+      = Json::ToStringVector(parsedLight, "includedOnlyMeshesIds");
+  }
+
+  // Parent
+  if (parsedLight.contains("parentId")) {
+    light->_waitingParentId = Json::GetString(parsedLight, "parentId");
+  }
+
+  // Animations
+  if (parsedLight.contains("animations")) {
+    for (auto parsedAnimation : Json::GetArray(parsedLight, "animations")) {
+      light->animations.emplace_back(Animation::Parse(parsedAnimation));
+    }
+    Node::ParseAnimationRanges(light, parsedLight, scene);
+  }
+
+  if (parsedLight.contains("autoAnimate")) {
+    scene->beginAnimation(
+      light, Json::GetNumber(parsedLight, "autoAnimateFrom", 0.f),
+      Json::GetNumber(parsedLight, "autoAnimateTo", 0.f),
+      Json::GetBool(parsedLight, "autoAnimateLoop"),
+      Json::GetNumber(parsedLight, "autoAnimateSpeed", 1.f));
+  }
+
+  return light;
 }
 
 } // end of namespace BABYLON

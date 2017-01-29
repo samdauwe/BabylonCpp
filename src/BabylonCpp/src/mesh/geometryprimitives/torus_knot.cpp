@@ -50,9 +50,8 @@ Geometry* TorusKnot::copy(const std::string& _id)
 
 TorusKnot* TorusKnot::Parse(const Json::value& parsedTorusKnot, Scene* scene)
 {
-  const std::string parsedTorusKnotId
-    = Json::GetString(parsedTorusKnot, "id", "");
-  if (scene->getGeometryByID(parsedTorusKnotId)) {
+  const auto parsedTorusKnotId = Json::GetString(parsedTorusKnot, "id");
+  if (parsedTorusKnotId.empty() || scene->getGeometryByID(parsedTorusKnotId)) {
     return nullptr; // null since geometry could be something else than a torus
                     // knot...
   }

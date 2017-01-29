@@ -1460,14 +1460,18 @@ void Mesh::optimizeIndices(
 Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
                   const std::string& rootUrl)
 {
-  auto mesh = Mesh::New(Json::GetString(parsedMesh, "name", ""), scene);
-  mesh->id  = Json::GetString(parsedMesh, "id", "");
+  auto mesh = Mesh::New(Json::GetString(parsedMesh, "name"), scene);
+  mesh->id  = Json::GetString(parsedMesh, "id");
 
   // Tags.AddTagsTo(mesh, parsedMesh.tags);
 
   if (parsedMesh.contains("position")) {
     mesh->setPosition(
       Vector3::FromArray(Json::ToArray<float>(parsedMesh, "position")));
+  }
+
+  if (parsedMesh.contains("metadata")) {
+    // mesh.metadata = parsedMesh.metadata;
   }
 
   if (parsedMesh.contains("rotationQuaternion")) {
@@ -1495,37 +1499,70 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
 
   mesh->setEnabled(Json::GetBool(parsedMesh, "isEnabled", true));
   mesh->isVisible        = Json::GetBool(parsedMesh, "isVisible", true);
-  mesh->infiniteDistance = Json::GetBool(parsedMesh, "infiniteDistance", false);
+  mesh->infiniteDistance = Json::GetBool(parsedMesh, "infiniteDistance");
 
-  mesh->showBoundingBox = Json::GetBool(parsedMesh, "showBoundingBox", false);
+  mesh->showBoundingBox = Json::GetBool(parsedMesh, "showBoundingBox");
   mesh->showSubMeshesBoundingBox
-    = Json::GetBool(parsedMesh, "showSubMeshesBoundingBox", false);
+    = Json::GetBool(parsedMesh, "showSubMeshesBoundingBox");
 
-  mesh->applyFog   = Json::GetBool(parsedMesh, "applyFog", true);
-  mesh->isPickable = Json::GetBool(parsedMesh, "isPickable", true);
-  mesh->alphaIndex = Json::GetNumber(parsedMesh, "alphaIndex",
-                                     std::numeric_limits<int>::max());
+  if (parsedMesh.contains("applyFog")) {
+    mesh->applyFog = Json::GetBool(parsedMesh, "applyFog", true);
+  }
+
+  if (parsedMesh.contains("isPickable")) {
+    mesh->isPickable = Json::GetBool(parsedMesh, "isPickable", true);
+  }
+
+  if (parsedMesh.contains("alphaIndex")) {
+    mesh->alphaIndex = Json::GetNumber(parsedMesh, "alphaIndex",
+                                       std::numeric_limits<int>::max());
+  }
 
   mesh->receiveShadows = Json::GetBool(parsedMesh, "receiveShadows", false);
   mesh->billboardMode  = Json::GetNumber(parsedMesh, "billboardMode",
                                         AbstractMesh::BILLBOARDMODE_NONE);
-  mesh->visibility = Json::GetNumber(parsedMesh, "visibility", 1.f);
 
-  mesh->setCheckCollisions(Json::GetBool(parsedMesh, "checkCollisions", false));
+  if (parsedMesh.contains("visibility")) {
+    mesh->visibility = Json::GetNumber(parsedMesh, "visibility", 1.f);
+  }
+
+  mesh->setCheckCollisions(Json::GetBool(parsedMesh, "checkCollisions"));
+
+  if (parsedMesh.contains("isBlocker")) {
+    mesh->isBlocker = Json::GetBool(parsedMesh, "isBlocker");
+  }
+
   mesh->_shouldGenerateFlatShading
-    = Json::GetBool(parsedMesh, "useFlatShading", false);
+    = Json::GetBool(parsedMesh, "useFlatShading");
 
   // freezeWorldMatrix
-  mesh->_waitingFreezeWorldMatrix
-    = Json::GetBool(parsedMesh, "freezeWorldMatrix", false);
+  if (parsedMesh.contains("freezeWorldMatrix")) {
+    mesh->_waitingFreezeWorldMatrix
+      = Json::GetBool(parsedMesh, "freezeWorldMatrix");
+  }
 
   // Parent
-  mesh->_waitingParentId = Json::GetString(parsedMesh, "parentId", "");
+  if (parsedMesh.contains("parentId")) {
+    mesh->_waitingParentId = Json::GetString(parsedMesh, "parentId");
+  }
 
   // Actions
-  if (parsedMesh.contains("actions")
-      && parsedMesh.get("actions").is<Json::array>()) {
-    mesh->_waitingActions = parsedMesh.get("actions").get<Json::array>();
+  if (parsedMesh.contains("actions")) {
+    mesh->_waitingActions = Json::GetArray(parsedMesh, "actions");
+  }
+
+  // Overlay
+  if (parsedMesh.contains("overlayAlpha")) {
+    mesh->overlayAlpha = Json::GetNumber(parsedMesh, "overlayAlpha", 0.5f);
+  }
+
+  if (parsedMesh.contains("overlayColor")) {
+    mesh->overlayColor
+      = Color3::FromArray(Json::ToArray<float>(parsedMesh, "overlayColor"));
+  }
+
+  if (parsedMesh.contains("renderOverlay")) {
+    mesh->renderOverlay = Json::GetBool(parsedMesh, "renderOverlay");
   }
 
   // Geometry
@@ -1534,17 +1571,16 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
   if (parsedMesh.contains("delayLoadingFile")) {
     mesh->delayLoadState = Engine::DELAYLOADSTATE_NOTLOADED;
     mesh->delayLoadingFile
-      = rootUrl + Json::GetString(parsedMesh, "delayLoadingFile", "");
+      = rootUrl + Json::GetString(parsedMesh, "delayLoadingFile");
+    mesh->_boundingInfo = std_util::make_unique<BoundingInfo>(
+      Vector3::FromArray(
+        Json::ToArray<float>(parsedMesh, "boundingBoxMinimum")),
+      Vector3::FromArray(
+        Json::ToArray<float>(parsedMesh, "boundingBoxMaximum")));
 
-    // mesh->_boundingInfo.reset(std_util::make_unique<BoundingInfo>(
-    //  Vector3::FromArray(
-    //    Json::ToArray<float>(parsedMesh, "boundingBoxMinimum")),
-    //  Vector3::FromArray(
-    //    Json::ToArray<float>(parsedMesh, "boundingBoxMaximum"))));
-
-    // if (parsedMesh.contains("_binaryInfo") {
-    //    mesh->_binaryInfo = parsedMesh._binaryInfo;
-    //}
+    if (parsedMesh.contains("_binaryInfo")) {
+      mesh->_binaryInfo = Json::GetString(parsedMesh, "_binaryInfo");
+    }
 
     mesh->_delayInfoKinds.clear();
     if (parsedMesh.contains("hasUVs")) {
@@ -1595,7 +1631,7 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
 
   // Material
   if (parsedMesh.contains("materialId")) {
-    mesh->setMaterialByID(Json::GetString(parsedMesh, "materialId", ""));
+    mesh->setMaterialByID(Json::GetString(parsedMesh, "materialId"));
   }
   else {
     mesh->material = nullptr;
@@ -1603,8 +1639,7 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
 
   // Skeleton
   if (parsedMesh.contains("skeletonId")) {
-    std::string parsedSkeletonId
-      = Json::GetString(parsedMesh, "skeletonId", "");
+    std::string parsedSkeletonId = Json::GetString(parsedMesh, "skeletonId");
     if (!parsedSkeletonId.empty()) {
       mesh->setSkeleton(scene->getLastSkeletonByID(parsedSkeletonId));
       if (parsedMesh.contains("numBoneInfluencers")) {
@@ -1615,29 +1650,73 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
   }
 
   // Animations
-  if (parsedMesh.contains("animations")
-      && parsedMesh.get("animations").is<Json::array>()) {
-    for (auto& parsedAnimation :
-         parsedMesh.get("animations").get<Json::array>()) {
+  if (parsedMesh.contains("animations")) {
+    for (auto& parsedAnimation : Json::GetArray(parsedMesh, "animations")) {
       mesh->animations.emplace_back(Animation::Parse(parsedAnimation));
     }
     Node::ParseAnimationRanges(mesh, parsedMesh, scene);
   }
 
   if (parsedMesh.contains("autoAnimate")) {
-    // scene->beginAnimation(
-    //  mesh, Json::GetNumber(parsedMesh, "autoAnimateFrom", 0),
-    //  Json::GetNumber(parsedMesh, "autoAnimateTo", 0),
-    //  Json::GetBool(parsedMesh, "autoAnimateLoop", false),
-    //  Json::GetNumber(parsedMesh, "autoAnimateSpeed", 1.f));
+    scene->beginAnimation(mesh,
+                          Json::GetNumber(parsedMesh, "autoAnimateFrom", 0),
+                          Json::GetNumber(parsedMesh, "autoAnimateTo", 0),
+                          Json::GetBool(parsedMesh, "autoAnimateLoop", false),
+                          Json::GetNumber(parsedMesh, "autoAnimateSpeed", 1.f));
   }
 
   // Layer Mask
-  // mesh->layerMask = Json::GetNumber(parsedMesh, "layerMask", 0x0FFFFFFF);
+  if (parsedMesh.contains("layerMask")) {
+    auto layerMask = Json::GetString(parsedMesh, "layerMask");
+    if (!layerMask.empty()) {
+      mesh->layerMask = static_cast<unsigned>(std::stoi(layerMask));
+    }
+  }
+  else {
+    mesh->layerMask = static_cast<unsigned>(
+      Json::GetNumber(parsedMesh, "layerMask", 0x0FFFFFFF));
+  }
 
   // Instances
   if (parsedMesh.contains("instances")) {
-    // TODO
+    for (auto& parsedInstance : Json::GetArray(parsedMesh, "instances")) {
+      auto instance
+        = mesh->createInstance(Json::GetString(parsedInstance, "name"));
+
+      // Tags.AddTagsTo(instance, parsedInstance.tags);
+
+      mesh->setPosition(
+        Vector3::FromArray(Json::ToArray<float>(parsedInstance, "position")));
+
+      if (parsedInstance.contains("parentId")) {
+        instance->_waitingParentId
+          = Json::GetString(parsedInstance, "parentId");
+      }
+
+      if (parsedInstance.contains("rotationQuaternion")) {
+        instance->setRotationQuaternion(Quaternion::FromArray(
+          Json::ToArray<float>(parsedInstance, "rotationQuaternion")));
+      }
+      else if (parsedInstance.contains("rotation")) {
+        instance->setRotation(
+          Vector3::FromArray(Json::ToArray<float>(parsedInstance, "rotation")));
+      }
+
+      if (parsedMesh.contains("scaling")) {
+        instance->setPosition(
+          Vector3::FromArray(Json::ToArray<float>(parsedInstance, "scaling")));
+      }
+
+      instance->setCheckCollisions(
+        Json::GetBool(parsedInstance, "checkCollisions"));
+
+      if (parsedMesh.contains("animations")) {
+        for (auto& parsedAnimation : Json::GetArray(parsedMesh, "animations")) {
+          instance->animations.emplace_back(Animation::Parse(parsedAnimation));
+        }
+        Node::ParseAnimationRanges(instance, parsedMesh, scene);
+      }
+    }
   }
 
   return mesh;

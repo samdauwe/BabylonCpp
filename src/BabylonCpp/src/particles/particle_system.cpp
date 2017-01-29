@@ -148,6 +148,11 @@ ParticleSystem::~ParticleSystem()
 {
 }
 
+IReflect::Type ParticleSystem::type() const
+{
+  return IReflect::Type::PARTICLESYSTEM;
+}
+
 void ParticleSystem::setOnDispose(const FastFunc<void()>& /*callback*/)
 {
   /*if (_onDisposeObserver) {
@@ -481,11 +486,101 @@ ParticleSystem* ParticleSystem::clone(const std::string& /*iName*/,
   return nullptr;
 }
 
-ParticleSystem*
-ParticleSystem::Parse(const Json::value& /*parsedParticleSystem*/,
-                      Scene* /*scene*/, const std::string& /*url*/)
+ParticleSystem* ParticleSystem::Parse(const Json::value& parsedParticleSystem,
+                                      Scene* scene, const std::string& rootUrl)
 {
-  return nullptr;
+  auto name           = Json::GetString(parsedParticleSystem, "name");
+  auto particleSystem = new ParticleSystem(
+    name, Json::GetNumber(parsedParticleSystem, "capacity", 0ul), scene);
+
+  if (parsedParticleSystem.contains("id")) {
+    particleSystem->id = Json::GetString(parsedParticleSystem, "id");
+  }
+
+  // Texture
+  if (parsedParticleSystem.contains("textureName")) {
+    particleSystem->particleTexture = Texture::New(
+      rootUrl + Json::GetString(parsedParticleSystem, "textureName"), scene);
+    particleSystem->particleTexture->name
+      = Json::GetString(parsedParticleSystem, "textureName");
+  }
+
+  // Emitter
+  if (parsedParticleSystem.contains("emitterId")) {
+    particleSystem->emitter = scene->getLastMeshByID(
+      Json::GetString(parsedParticleSystem, "emitterId"));
+  }
+  else {
+    particleSystem->emitterVec = Vector3::FromArray(
+      Json::ToArray<float>(parsedParticleSystem, "emitter"));
+  }
+
+  // Animations
+  if (parsedParticleSystem.contains("animations")) {
+    for (auto& parsedAnimation :
+         Json::GetArray(parsedParticleSystem, "animations"))
+      particleSystem->animations.emplace_back(
+        Animation::Parse(parsedAnimation));
+  }
+
+  if (parsedParticleSystem.contains("autoAnimate")) {
+    scene->beginAnimation(
+      particleSystem,
+      Json::GetNumber(parsedParticleSystem, "autoAnimateFrom", 0.f),
+      Json::GetNumber(parsedParticleSystem, "autoAnimateTo", 0.f),
+      Json::GetBool(parsedParticleSystem, "autoAnimateLoop"),
+      Json::GetNumber(parsedParticleSystem, "autoAnimateSpeed", 1.f));
+  }
+
+  // Particle system
+  particleSystem->minAngularSpeed
+    = Json::GetNumber(parsedParticleSystem, "minAngularSpeed", 0.f);
+  particleSystem->maxAngularSpeed
+    = Json::GetNumber(parsedParticleSystem, "maxAngularSpeed", 0.f);
+  particleSystem->minSize
+    = Json::GetNumber(parsedParticleSystem, "minSize", 1.f);
+  particleSystem->maxSize
+    = Json::GetNumber(parsedParticleSystem, "maxSize", 1.f);
+  particleSystem->minLifeTime
+    = Json::GetNumber(parsedParticleSystem, "minLifeTime", 1.f);
+  particleSystem->maxLifeTime
+    = Json::GetNumber(parsedParticleSystem, "maxLifeTime", 1.f);
+  particleSystem->minEmitPower
+    = Json::GetNumber(parsedParticleSystem, "minEmitPower", 1.f);
+  particleSystem->maxEmitPower
+    = Json::GetNumber(parsedParticleSystem, "maxEmitPower", 1.f);
+  particleSystem->emitRate
+    = Json::GetNumber(parsedParticleSystem, "emitRate", 10);
+  particleSystem->minEmitBox = Vector3::FromArray(
+    Json::ToArray<float>(parsedParticleSystem, "minEmitBox"));
+  particleSystem->maxEmitBox = Vector3::FromArray(
+    Json::ToArray<float>(parsedParticleSystem, "maxEmitBox"));
+  particleSystem->gravity
+    = Vector3::FromArray(Json::ToArray<float>(parsedParticleSystem, "gravity"));
+  particleSystem->direction1 = Vector3::FromArray(
+    Json::ToArray<float>(parsedParticleSystem, "direction1"));
+  particleSystem->direction2 = Vector3::FromArray(
+    Json::ToArray<float>(parsedParticleSystem, "direction2"));
+  particleSystem->color1
+    = Color4::FromArray(Json::ToArray<float>(parsedParticleSystem, "color1"));
+  particleSystem->color2
+    = Color4::FromArray(Json::ToArray<float>(parsedParticleSystem, "color2"));
+  particleSystem->colorDead = Color4::FromArray(
+    Json::ToArray<float>(parsedParticleSystem, "colorDead"));
+  particleSystem->updateSpeed
+    = Json::GetNumber(parsedParticleSystem, "updateSpeed", 0.01f);
+  particleSystem->targetStopDuration
+    = Json::GetNumber(parsedParticleSystem, "targetStopDuration", 0);
+  particleSystem->textureMask = Color4::FromArray(
+    Json::ToArray<float>(parsedParticleSystem, "textureMask"));
+  particleSystem->blendMode = Json::GetNumber(parsedParticleSystem, "blendMode",
+                                              ParticleSystem::BLENDMODE_ONEONE);
+
+  if (!Json::GetBool(parsedParticleSystem, "preventAutoStart")) {
+    particleSystem->start();
+  }
+
+  return particleSystem;
 }
 
 } // end of namespace BABYLON

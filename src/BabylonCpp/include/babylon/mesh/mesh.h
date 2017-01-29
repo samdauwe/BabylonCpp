@@ -1369,7 +1369,7 @@ public:
   int delayLoadState;
   std::vector<InstancedMesh*> instances;
   std::string delayLoadingFile;
-  // int _binaryInfo;
+  std::string _binaryInfo;
   std::function<void(float distance, Mesh* mesh, Mesh* selectedLevel)>
     onLODLevelSelection;
   Geometry* _geometry;

@@ -40,8 +40,8 @@ std::unique_ptr<VertexData> TiledGround::_regenerateVertexData()
 
 Geometry* TiledGround::copy(const std::string& _id)
 {
-  return new TiledGround(_id, getScene(), xmin, zmin, xmax, zmax, subdivisions,
-                         precision, canBeRegenerated(), nullptr);
+  return TiledGround::New(_id, getScene(), xmin, zmin, xmax, zmax, subdivisions,
+                          precision, canBeRegenerated(), nullptr);
 }
 
 } // end of namespace GeometryPrimitives

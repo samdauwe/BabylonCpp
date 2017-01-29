@@ -118,6 +118,19 @@ inline std::vector<T> ToArray(const picojson::value& v, const std::string& key)
   return array;
 }
 
+inline std::vector<std::string> ToStringVector(const picojson::value& v,
+                                               const std::string& key)
+{
+  std::vector<std::string> stringVector;
+  if (v.contains(key) && (v.get(key).is<picojson::array>())) {
+    stringVector.reserve(v.get(key).get<picojson::array>().size());
+    for (auto& element : v.get(key).get<picojson::array>()) {
+      stringVector.emplace_back(element.get<std::string>());
+    }
+  }
+  return stringVector;
+}
+
 } // end of namespace json
 } // end of namespace BABYLON
 
