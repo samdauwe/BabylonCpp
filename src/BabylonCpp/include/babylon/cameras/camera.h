@@ -94,6 +94,10 @@ public:
   void getDirectionToRef(const Vector3& localAxis, Vector3& result);
 
   // Statics
+  static Camera* GetConstructorFromName(const std::string& type,
+                                        const std::string& name, Scene* scene,
+                                        float interaxial_distance     = 0.f,
+                                        bool isStereoscopicSideBySide = true);
   static Camera* Parse(const Json::value& parsedCamera, Scene* scene);
 
 protected:

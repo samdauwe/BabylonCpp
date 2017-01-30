@@ -1,5 +1,9 @@
 #include <babylon/cameras/camera.h>
 
+#include <babylon/cameras/arc_follow_camera.h>
+#include <babylon/cameras/arc_rotate_camera.h>
+#include <babylon/cameras/follow_camera.h>
+#include <babylon/cameras/free_camera.h>
 #include <babylon/core/json.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
@@ -7,6 +11,7 @@
 #include <babylon/math/frustum.h>
 #include <babylon/postprocess/pass_post_process.h>
 #include <babylon/postprocess/post_process.h>
+#include <babylon/tools/serialization_helper.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -585,9 +590,62 @@ void Camera::getDirectionToRef(const Vector3& localAxis, Vector3& result)
   Vector3::TransformNormalToRef(localAxis, *getWorldMatrix(), result);
 }
 
-Camera* Camera::Parse(const Json::value& /*parsedCamera*/, Scene* /*scene*/)
+Camera* Camera::GetConstructorFromName(const std::string& type,
+                                       const std::string& name, Scene* scene,
+                                       float /*interaxial_distance*/,
+                                       bool /*isStereoscopicSideBySide*/)
 {
+  if (type == "ArcRotateCamera") {
+    return ArcRotateCamera::New(name, 0, 0, 1.0, Vector3::Zero(), scene);
+  }
+  else if (type == "FollowCamera") {
+    return FollowCamera::New(name, Vector3::Zero(), scene);
+  }
+  else if (type == "ArcFollowCamera") {
+    return ArcFollowCamera::New(name, 0, 0, 1.f, nullptr, scene);
+  }
+  else if (type == "FreeCamera") {
+    return FreeCamera::New(name, Vector3::Zero(), scene);
+  }
+
   return nullptr;
+}
+
+Camera* Camera::Parse(const Json::value& parsedCamera, Scene* scene)
+{
+  auto type      = Json::GetString(parsedCamera, "type");
+  auto construct = Camera::GetConstructorFromName(
+    type, Json::GetString(parsedCamera, "name"), scene,
+    Json::GetNumber<float>(parsedCamera, "interaxial_distance", 0.f),
+    Json::GetBool(parsedCamera, "isStereoscopicSideBySide", true));
+  if (!construct) {
+    return nullptr;
+  }
+
+  auto camera = SerializationHelper::Parse(construct, parsedCamera, scene);
+
+  // Parent
+  if (parsedCamera.contains("parentId")) {
+    camera->_waitingParentId = Json::GetString(parsedCamera, "parentId");
+  }
+
+  // Animations
+  if (parsedCamera.contains("animations")) {
+    for (auto parsedAnimation : Json::GetArray(parsedCamera, "animations")) {
+      camera->animations.emplace_back(Animation::Parse(parsedAnimation));
+    }
+    Node::ParseAnimationRanges(camera, parsedCamera, scene);
+  }
+
+  if (parsedCamera.contains("autoAnimate")) {
+    scene->beginAnimation(
+      camera, Json::GetNumber(parsedCamera, "autoAnimateFrom", 0.f),
+      Json::GetNumber(parsedCamera, "autoAnimateTo", 0.f),
+      Json::GetBool(parsedCamera, "autoAnimateLoop"),
+      Json::GetNumber(parsedCamera, "autoAnimateSpeed", 1.f));
+  }
+
+  return camera;
 }
 
 } // end of namespace BABYLON

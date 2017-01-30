@@ -22,6 +22,7 @@
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
+#include <babylon/tools/serialization_helper.h>
 
 namespace BABYLON {
 
@@ -1122,11 +1123,13 @@ Json::object StandardMaterial::serialize() const
 }
 
 // Statics
-std::unique_ptr<StandardMaterial>
-StandardMaterial::Parse(const Json::value& /*source*/, Scene* /*scene*/,
-                        const std::string& /*url*/)
+StandardMaterial* StandardMaterial::Parse(const Json::value& source,
+                                          Scene* scene,
+                                          const std::string& rootUrl)
 {
-  return nullptr;
+  return SerializationHelper::Parse(
+    StandardMaterial::New(Json::GetString(source, "name"), scene), source,
+    scene, rootUrl);
 }
 
 } // end of namespace BABYLON

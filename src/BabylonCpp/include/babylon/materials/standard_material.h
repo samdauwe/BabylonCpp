@@ -69,8 +69,8 @@ public:
   Json::object serialize() const;
 
   // Statics
-  static std::unique_ptr<StandardMaterial>
-  Parse(const Json::value& source, Scene* scene, const std::string& url);
+  static StandardMaterial* Parse(const Json::value& source, Scene* scene,
+                                 const std::string& rootUrl);
 
 protected:
   StandardMaterial(const std::string& name, Scene* scene);

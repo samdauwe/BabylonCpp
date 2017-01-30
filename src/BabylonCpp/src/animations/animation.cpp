@@ -732,55 +732,50 @@ Json::object Animation::serialize() const
 Animation* Animation::Parse(const Json::value& parsedAnimation)
 {
   auto animation
-    = new Animation(Json::GetString(parsedAnimation, "name", ""),
-                    Json::GetString(parsedAnimation, "property", ""),
+    = new Animation(Json::GetString(parsedAnimation, "name"),
+                    Json::GetString(parsedAnimation, "property"),
                     Json::GetNumber(parsedAnimation, "framePerSecond", 30ull),
                     Json::GetNumber(parsedAnimation, "dataType", 0),
                     Json::GetNumber(parsedAnimation, "loopBehavior",
                                     Animation::ANIMATIONLOOPMODE_CYCLE));
 
-  int dataType = Json::GetNumber(parsedAnimation, "dataType", 0);
+  auto dataType = Json::GetNumber(parsedAnimation, "dataType", 0);
   std::vector<AnimationKey> keys;
 
-  if (parsedAnimation.contains("keys")
-      && (parsedAnimation.get("keys").is<Json::array>())) {
-    for (auto& key : parsedAnimation.get("keys").get<Json::array>()) {
-      int frame = Json::GetNumber(key, "frame", 0);
-      AnimationValue data;
+  for (auto& key : Json::GetArray(parsedAnimation, "keys")) {
+    AnimationValue data;
 
-      switch (dataType) {
-        case Animation::ANIMATIONTYPE_FLOAT:
-          data = AnimationValue(Json::ToArray<float>(key, "values")[0]);
-          break;
-        case Animation::ANIMATIONTYPE_QUATERNION:
-          data = AnimationValue(
-            Quaternion::FromArray(Json::ToArray<float>(key, "values")));
-          break;
-        case Animation::ANIMATIONTYPE_MATRIX:
-          data = AnimationValue(
-            Matrix::FromArray(Json::ToArray<float>(key, "values")));
-          break;
-        case Animation::ANIMATIONTYPE_COLOR3:
-          data = AnimationValue(
-            Color3::FromArray(Json::ToArray<float>(key, "values")));
-          break;
-        case Animation::ANIMATIONTYPE_VECTOR3:
-        default:
-          data = AnimationValue(
-            Vector3::FromArray(Json::ToArray<float>(key, "values")));
-          break;
-      }
-
-      keys.emplace_back(AnimationKey(frame, data));
+    switch (dataType) {
+      case Animation::ANIMATIONTYPE_FLOAT:
+        data = AnimationValue(Json::ToArray<float>(key, "values")[0]);
+        break;
+      case Animation::ANIMATIONTYPE_QUATERNION:
+        data = AnimationValue(
+          Quaternion::FromArray(Json::ToArray<float>(key, "values")));
+        break;
+      case Animation::ANIMATIONTYPE_MATRIX:
+        data = AnimationValue(
+          Matrix::FromArray(Json::ToArray<float>(key, "values")));
+        break;
+      case Animation::ANIMATIONTYPE_COLOR3:
+        data = AnimationValue(
+          Color3::FromArray(Json::ToArray<float>(key, "values")));
+        break;
+      case Animation::ANIMATIONTYPE_VECTOR3:
+      default:
+        data = AnimationValue(
+          Vector3::FromArray(Json::ToArray<float>(key, "values")));
+        break;
     }
+
+    keys.emplace_back(AnimationKey(Json::GetNumber(key, "frame", 0), data));
   }
 
   animation->setKeys(keys);
 
-  if (parsedAnimation.contains("ranges")
-      && (parsedAnimation.get("ranges").is<Json::array>())) {
-    for (auto& range : parsedAnimation.get("ranges").get<Json::array>()) {
-      animation->createRange(Json::GetString(range, "name", ""),
+  if (parsedAnimation.contains("ranges")) {
+    for (auto& range : Json::GetArray(parsedAnimation, "ranges")) {
+      animation->createRange(Json::GetString(range, "name"),
                              Json::GetNumber(range, "from", 0),
                              Json::GetNumber(range, "to", 0));
     }

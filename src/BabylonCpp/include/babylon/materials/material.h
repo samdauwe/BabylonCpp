@@ -80,8 +80,8 @@ public:
   // Statics
   static MultiMaterial*
   ParseMultiMaterial(const Json::value& parsedMultiMaterial, Scene* scene);
-  static MultiMaterial* Parse(const Json::value& parsedMaterial, Scene* scene,
-                              const std::string& rootUrl);
+  static Material* Parse(const Json::value& parsedMaterial, Scene* scene,
+                         const std::string& rootUrl);
 
 protected:
   Material(const std::string& name, Scene* scene, bool doNotAdd = false);

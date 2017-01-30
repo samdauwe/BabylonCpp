@@ -4,6 +4,7 @@
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/multi_material.h>
+#include <babylon/materials/standard_material.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
 
@@ -308,15 +309,37 @@ Json::object Material::serialize() const
 }
 
 MultiMaterial*
-Material::ParseMultiMaterial(const Json::value& /*parsedMultiMaterial*/,
-                             Scene* /*scene*/)
+Material::ParseMultiMaterial(const Json::value& parsedMultiMaterial,
+                             Scene* scene)
 {
-  return nullptr;
+  auto multiMaterial
+    = MultiMaterial::New(Json::GetString(parsedMultiMaterial, "name"), scene);
+
+  multiMaterial->id = Json::GetString(parsedMultiMaterial, "id");
+
+  // Tags.AddTagsTo(multiMaterial, parsedMultiMaterial.tags);
+
+  for (auto& subMatId : Json::GetArray(parsedMultiMaterial, "materials")) {
+    auto _subMatId = subMatId.get<std::string>();
+    if (!_subMatId.empty()) {
+      multiMaterial->subMaterials.emplace_back(
+        scene->getMaterialByID(_subMatId));
+    }
+    else {
+      multiMaterial->subMaterials.emplace_back(nullptr);
+    }
+  }
+
+  return multiMaterial;
 }
 
-MultiMaterial* Material::Parse(const Json::value& /*parsedMaterial*/,
-                               Scene* /*scene*/, const std::string& /*rootUrl*/)
+Material* Material::Parse(const Json::value& parsedMaterial, Scene* scene,
+                          const std::string& rootUrl)
 {
+  if (!parsedMaterial.contains("customType")) {
+    return StandardMaterial::Parse(parsedMaterial, scene, rootUrl);
+  }
+
   return nullptr;
 }
 
