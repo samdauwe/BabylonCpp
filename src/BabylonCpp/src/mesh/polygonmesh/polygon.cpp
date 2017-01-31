@@ -42,6 +42,7 @@ std::vector<Vector2> Polygon::Parse(const std::string& input)
   String::replaceInPlace(inputCpy, "  ", " ");
   std::vector<std::string> floats = String::split(inputCpy, ' ');
   size_t floatsSize               = floats.size() - (floats.size() % 2);
+  result.reserve(floatsSize / 2);
   for (size_t i = 0; i < floatsSize; i += 2) {
     result.emplace_back(
       Vector2(std::stof(floats[i]), std::stof(floats[i + 1])));

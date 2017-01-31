@@ -181,8 +181,9 @@ class SpotLight;
 // - Shadows
 class ShadowGenerator;
 // --- Loading ---
+struct IRegisteredPlugin;
 struct ISceneLoaderPlugin;
-struct SceneLoader;
+class SceneLoader;
 // - Plugins / babylon
 struct BabylonFileLoader;
 // --- Materials ---

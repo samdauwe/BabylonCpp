@@ -517,43 +517,37 @@ ShadowGenerator::Parse(const Json::value& parsedShadowGenerator, Scene* scene)
   // Casting to point light, as light is missing the position attr and
   // typescript complains.
   const std::string parsedShadowGeneratorLightId
-    = Json::GetString(parsedShadowGenerator, "lightId", "");
+    = Json::GetString(parsedShadowGenerator, "lightId");
 
   if (parsedShadowGeneratorLightId.empty()) {
     return nullptr;
   }
 
-  PointLight* light = dynamic_cast<PointLight*>(
+  auto light = dynamic_cast<PointLight*>(
     scene->getLightByID(parsedShadowGeneratorLightId));
 
   if (!light) {
     return nullptr;
   }
 
-  int size             = Json::GetNumber(parsedShadowGenerator, "mapSize", 0);
+  auto size            = Json::GetNumber(parsedShadowGenerator, "mapSize", 0);
   auto shadowGenerator = new ShadowGenerator(ISize(size, size), light);
 
-  if (parsedShadowGenerator.contains("renderList")
-      && parsedShadowGenerator.get("renderList").is<Json::array>()) {
-    for (const auto& renderItem :
-         parsedShadowGenerator.get("renderList").get<Json::array>()) {
-      std::vector<AbstractMesh*> meshes
-        = scene->getMeshesByID(renderItem.get<std::string>());
-      for (auto& mesh : meshes) {
-        shadowGenerator->getShadowMap()->renderList.emplace_back(mesh);
-      }
+  for (const auto& renderItem :
+       Json::GetArray(parsedShadowGenerator, "renderList")) {
+    auto meshes = scene->getMeshesByID(renderItem.get<std::string>());
+    for (auto& mesh : meshes) {
+      shadowGenerator->getShadowMap()->renderList.emplace_back(mesh);
     }
   }
 
-  if (Json::GetBool(parsedShadowGenerator, "usePoissonSampling", false)) {
+  if (Json::GetBool(parsedShadowGenerator, "usePoissonSampling")) {
     shadowGenerator->setUsePoissonSampling(true);
   }
-  else if (Json::GetBool(parsedShadowGenerator, "useVarianceShadowMap",
-                         false)) {
+  else if (Json::GetBool(parsedShadowGenerator, "useVarianceShadowMap")) {
     shadowGenerator->setUseVarianceShadowMap(true);
   }
-  else if (Json::GetBool(parsedShadowGenerator, "useBlurVarianceShadowMap",
-                         false)) {
+  else if (Json::GetBool(parsedShadowGenerator, "useBlurVarianceShadowMap")) {
     shadowGenerator->setUseBlurVarianceShadowMap(true);
 
     if (parsedShadowGenerator.contains("blurScale")) {
@@ -573,7 +567,7 @@ ShadowGenerator::Parse(const Json::value& parsedShadowGenerator, Scene* scene)
   }
 
   shadowGenerator->forceBackFacesOnly
-    = Json::GetBool(parsedShadowGenerator, "forceBackFacesOnly", false);
+    = Json::GetBool(parsedShadowGenerator, "forceBackFacesOnly");
 
   return shadowGenerator;
 }

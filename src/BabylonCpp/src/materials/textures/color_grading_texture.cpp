@@ -200,10 +200,19 @@ void ColorGradingTexture::PrepareUniformsAndSamplers(
 }
 
 std::unique_ptr<ColorGradingTexture>
-ColorGradingTexture::Parse(const Json::value& /*parsedTexture*/,
-                           Scene* /*scene*/, const std::string& /*rootUrl*/)
+ColorGradingTexture::Parse(const Json::value& parsedTexture, Scene* scene,
+                           const std::string& /*rootUrl*/)
 {
-  return nullptr;
+  std::unique_ptr<ColorGradingTexture> texture = nullptr;
+  if (parsedTexture.contains("name")
+      && !Json::GetBool(parsedTexture, "isRenderTarget")) {
+    auto parsedTextureName = Json::GetString(parsedTexture, "name");
+    texture
+      = std_util::make_unique<ColorGradingTexture>(parsedTextureName, scene);
+    texture->name  = parsedTextureName;
+    texture->level = Json::GetNumber<float>(parsedTexture, "level", 0.f);
+  }
+  return texture;
 }
 
 Json::object ColorGradingTexture::serialize() const

@@ -6,7 +6,7 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT ISceneLoaderPlugin {
-  std::string extensions;
+  std::pair<std::string, bool> extensions; // Extension name, isBinary
   virtual bool importMesh(const std::vector<std::string>& meshesNames,
                           Scene* scene, const std::string& data,
                           const std::string& rootUrl,

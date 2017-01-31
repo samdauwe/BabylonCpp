@@ -10,8 +10,19 @@ class BABYLON_SHARED_EXPORT LensFlareSystem : public IDisposable {
 
 public:
   template <typename... Ts>
-  static LensFlareSystem* New(Ts&&... args);
+  static LensFlareSystem* New(Ts&&... /*args*/)
+  {
+#if 0
+    auto lensFlareSystem = new LensFlareSystem(std::forward<Ts>(args)...);
+    lensFlareSystem->addToScene(
+      static_cast<std::unique_ptr<LensFlareSystem>>(lensFlareSystem));
+    return lensFlareSystem;
+#endif
+    return nullptr;
+  }
   virtual ~LensFlareSystem();
+
+  void addToScene(std::unique_ptr<LensFlareSystem>&& lensFlareSystem);
 
   bool isEnabled() const;
   void setIsEnabled(bool value);
@@ -26,9 +37,8 @@ public:
   Json::object serialize() const;
 
   // Statics
-  static std::unique_ptr<LensFlareSystem>
-  Parse(const Json::value& parsedLensFlareSystem, Scene* scene,
-        const std::string& url);
+  static LensFlareSystem* Parse(const Json::value& parsedLensFlareSystem,
+                                Scene* scene, const std::string& rootUrl);
 
 protected:
   LensFlareSystem(const std::string name, Mesh* emitter, Scene* scene);

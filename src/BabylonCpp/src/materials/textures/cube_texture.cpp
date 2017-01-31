@@ -1,9 +1,11 @@
 #include <babylon/materials/textures/cube_texture.h>
 
+#include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/matrix.h>
+#include <babylon/tools/serialization_helper.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -97,10 +99,25 @@ Matrix* CubeTexture::getReflectionTextureMatrix()
 }
 
 std::unique_ptr<CubeTexture>
-CubeTexture::Parse(const Json::value& /*parsedTexture*/, Scene* /*scene*/,
+CubeTexture::Parse(const Json::value& parsedTexture, Scene* scene,
                    const std::string& /*rootUrl*/)
 {
-  return nullptr;
+#if 0
+  auto cubeTexture = std_util::make_unique<CubeTexture>(
+    rootUrl + Json::GetString(parsedTexture, "name"), scene,
+    Json::ToStringVector(parsedTexture, "extensions"));
+#endif
+  std::unique_ptr<CubeTexture> cubeTexture = nullptr;
+  SerializationHelper::Parse(cubeTexture.get(), parsedTexture, scene);
+
+  // Animations
+  if (parsedTexture.contains("animations")) {
+    for (auto& parsedAnimation : Json::GetArray(parsedTexture, "animations")) {
+      cubeTexture->animations.emplace_back(Animation::Parse(parsedAnimation));
+    }
+  }
+
+  return cubeTexture;
 }
 
 std::unique_ptr<CubeTexture> CubeTexture::clone() const

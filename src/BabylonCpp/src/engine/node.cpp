@@ -342,10 +342,10 @@ Animatable* Node::beginAnimation(const std::string& iName, bool loop,
 std::vector<AnimationRange> Node::serializeAnimationRanges()
 {
   std::vector<AnimationRange> serializationRanges;
-  /*for (auto& item : _ranges) {
+  for (auto& item : _ranges) {
     serializationRanges.emplace_back(
       AnimationRange(item.first, item.second->from, item.second->to));
-  }*/
+  }
 
   return serializationRanges;
 }
@@ -362,10 +362,9 @@ void Node::dispose(bool /*doNotRecurse*/)
 void Node::ParseAnimationRanges(Node* node, const Json::value& parsedNode,
                                 Scene* /*scene*/)
 {
-  if (parsedNode.contains("ranges")
-      && (parsedNode.get("ranges").is<Json::array>())) {
-    for (auto& range : parsedNode.get("ranges").get<Json::array>()) {
-      node->createAnimationRange(Json::GetString(range, "name", ""),
+  if (parsedNode.contains("ranges")) {
+    for (auto& range : Json::GetArray(parsedNode, "ranges")) {
+      node->createAnimationRange(Json::GetString(range, "name"),
                                  Json::GetNumber(range, "from", 0),
                                  Json::GetNumber(range, "to", 0));
     }

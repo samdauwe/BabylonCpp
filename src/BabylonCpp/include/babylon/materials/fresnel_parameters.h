@@ -17,7 +17,7 @@ public:
   Json::object serialize() const;
 
   static std::unique_ptr<FresnelParameters>
-  Parse(const Json::value& source);
+  Parse(const Json::value& parsedFresnelParameters);
 
 public:
   bool isEnabled;

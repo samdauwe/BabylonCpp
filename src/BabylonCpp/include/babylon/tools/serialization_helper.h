@@ -7,6 +7,8 @@ namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT SerializationHelper {
 
+  static BaseTexture* Parse(BaseTexture* baseTexture,
+                            const Json::value& parsedBaseTexture, Scene* scene);
   static Camera* Parse(Camera* camera, const Json::value& parsedCamera,
                        Scene* scene);
   static Light* Parse(Light* light, const Json::value& parsedLight,

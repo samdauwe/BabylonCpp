@@ -12,15 +12,6 @@
 
 namespace BABYLON {
 
-template <typename... Ts>
-LensFlareSystem* LensFlareSystem::New(Ts&&... args)
-{
-  auto lensFlareSystem
-    = std_util::make_unique<LensFlareSystem>(std::forward<Ts>(args)...);
-  lensFlareSystem->_scene->lensFlareSystems.emplace_back(lensFlareSystem);
-  return lensFlareSystem.get();
-}
-
 LensFlareSystem::LensFlareSystem(const std::string iName, Mesh* emitter,
                                  Scene* scene)
     : id{iName}
@@ -61,6 +52,12 @@ LensFlareSystem::LensFlareSystem(const std::string iName, Mesh* emitter,
 
 LensFlareSystem::~LensFlareSystem()
 {
+}
+
+void LensFlareSystem::addToScene(
+  std::unique_ptr<LensFlareSystem>&& lensFlareSystem)
+{
+  _scene->lensFlareSystems.emplace_back(std::move(lensFlareSystem));
 }
 
 bool LensFlareSystem::isEnabled() const
@@ -318,10 +315,36 @@ void LensFlareSystem::dispose(bool /*doNotRecurse*/)
     _scene->lensFlareSystems.end());
 }
 
-std::unique_ptr<LensFlareSystem>
+LensFlareSystem*
 LensFlareSystem::Parse(const Json::value& /*parsedLensFlareSystem*/,
-                       Scene* /*scene*/, const std::string& /*url*/)
+                       Scene* /*scene*/, const std::string& /*rootUrl*/)
 {
+#if 0
+  auto emitterId = Json::GetString(parsedLensFlareSystem, "emitterId");
+  auto emitter   = scene->getLastEntryByID(emitterId);
+
+  std::string name = parsedLensFlareSystem.contains("name") ?
+                       Json::GetString(parsedLensFlareSystem, "name") :
+                       "lensFlareSystem#" + emitterId;
+
+  auto lensFlareSystem = LensFlareSystem::New(name, emitter, scene);
+
+  lensFlareSystem->id = parsedLensFlareSystem.contains("id") ?
+                          Json::GetString(parsedLensFlareSystem, "id") :
+                          name;
+  lensFlareSystem->borderLimit
+    = Json::GetNumber(parsedLensFlareSystem, "borderLimit", 300);
+
+  for (auto& parsedFlare : Json::GetArray(parsedLensFlareSystem, "flares")) {
+    LensFlare::New(
+      Json::GetNumber<float>(parsedFlare, "size", 0.f),
+      Vector3::FromArray(Json::ToArray<float>(parsedFlare, "position")),
+      Color3::FromArray(Json::ToArray<float>(parsedFlare, "color")),
+      rootUrl + Json::GetString(parsedFlare, "textureName"), lensFlareSystem);
+  }
+
+  return lensFlareSystem;
+#endif
   return nullptr;
 }
 

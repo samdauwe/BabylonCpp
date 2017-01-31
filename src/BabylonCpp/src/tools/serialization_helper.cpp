@@ -14,6 +14,14 @@
 
 namespace BABYLON {
 
+BaseTexture*
+SerializationHelper::Parse(BaseTexture* baseTexture,
+                           const Json::value& /*parsedBaseTexture*/,
+                           Scene* /*scene*/)
+{
+  return baseTexture;
+}
+
 Camera* SerializationHelper::Parse(Camera* camera,
                                    const Json::value& parsedCamera,
                                    Scene* /*scene*/)

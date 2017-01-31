@@ -3,6 +3,7 @@
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/loading/iregistered_plugin.h>
 
 namespace BABYLON {
 
@@ -10,40 +11,58 @@ bool SceneLoader::ForceFullSceneLoadingForIncremental = false;
 bool SceneLoader::ShowLoadingScreen                   = true;
 unsigned int SceneLoader::LoggingLevel                = SceneLoader::NO_LOGGING;
 
-std::vector<ISceneLoaderPlugin*> SceneLoader::RegisteredPlugins{};
+std::unordered_map<std::string, IRegisteredPlugin*>
+  SceneLoader::_registeredPlugins{};
+
+IRegisteredPlugin* SceneLoader::_getDefaultPlugin()
+{
+  return SceneLoader::_registeredPlugins[".babylon"];
+}
+
+IRegisteredPlugin*
+SceneLoader::_getPluginForExtension(const std::string& extension)
+{
+  auto registeredPlugin = SceneLoader::_registeredPlugins[extension];
+  if (registeredPlugin) {
+    return registeredPlugin;
+  }
+
+  return SceneLoader::_getDefaultPlugin();
+}
 
 ISceneLoaderPlugin*
 SceneLoader::_getPluginForFilename(const std::string& sceneFilename)
 {
-  size_t dotPosition = sceneFilename.find_last_of(".");
+  auto dotPosition = sceneFilename.find_last_of(".");
 
-  size_t queryStringPosition = sceneFilename.find("?", 0);
+  auto queryStringPosition = sceneFilename.find("?", 0);
 
   if (queryStringPosition == std::string::npos) {
     queryStringPosition = sceneFilename.size();
   }
 
-  std::string extension = sceneFilename.substr(dotPosition + 1);
-
+  std::string extension = String::toLowerCase(
+    sceneFilename.substr(dotPosition, queryStringPosition));
   return SceneLoader::GetPluginForExtension(extension);
+}
+
+std::string SceneLoader::_getDirectLoad(const std::string& sceneFilename)
+{
+  if ((sceneFilename.size() > 5) && sceneFilename.substr(0, 5) == "data:") {
+    return sceneFilename.substr(5);
+  }
+
+  return "";
 }
 
 ISceneLoaderPlugin*
 SceneLoader::GetPluginForExtension(const std::string& extension)
 {
-  auto it = std::find_if(RegisteredPlugins.begin(), RegisteredPlugins.end(),
-                         [&extension](const ISceneLoaderPlugin* plugin) {
-                           return plugin->extensions.find(extension)
-                                  != std::string::npos;
-                         });
-
-  return (it != RegisteredPlugins.end()) ? *it : nullptr;
+  return SceneLoader::_getPluginForExtension(extension)->plugin;
 }
 
-void SceneLoader::RegisterPlugin(ISceneLoaderPlugin* plugin)
+void SceneLoader::RegisterPlugin(ISceneLoaderPlugin* /*plugin*/)
 {
-  plugin->extensions = String::toLowerCase(plugin->extensions);
-  SceneLoader::RegisteredPlugins.emplace_back(plugin);
 }
 
 void SceneLoader::ImportMesh(
