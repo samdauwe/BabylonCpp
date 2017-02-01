@@ -11,20 +11,19 @@ bool SceneLoader::ForceFullSceneLoadingForIncremental = false;
 bool SceneLoader::ShowLoadingScreen                   = true;
 unsigned int SceneLoader::LoggingLevel                = SceneLoader::NO_LOGGING;
 
-std::unordered_map<std::string, IRegisteredPlugin*>
+std::unordered_map<std::string, IRegisteredPlugin>
   SceneLoader::_registeredPlugins{};
 
-IRegisteredPlugin* SceneLoader::_getDefaultPlugin()
+IRegisteredPlugin SceneLoader::_getDefaultPlugin()
 {
   return SceneLoader::_registeredPlugins[".babylon"];
 }
 
-IRegisteredPlugin*
+IRegisteredPlugin
 SceneLoader::_getPluginForExtension(const std::string& extension)
 {
-  auto registeredPlugin = SceneLoader::_registeredPlugins[extension];
-  if (registeredPlugin) {
-    return registeredPlugin;
+  if (std_util::contains(SceneLoader::_registeredPlugins, extension)) {
+    return SceneLoader::_registeredPlugins[extension];
   }
 
   return SceneLoader::_getDefaultPlugin();
@@ -41,7 +40,7 @@ SceneLoader::_getPluginForFilename(const std::string& sceneFilename)
     queryStringPosition = sceneFilename.size();
   }
 
-  std::string extension = String::toLowerCase(
+  auto extension = String::toLowerCase(
     sceneFilename.substr(dotPosition, queryStringPosition));
   return SceneLoader::GetPluginForExtension(extension);
 }
@@ -58,11 +57,18 @@ std::string SceneLoader::_getDirectLoad(const std::string& sceneFilename)
 ISceneLoaderPlugin*
 SceneLoader::GetPluginForExtension(const std::string& extension)
 {
-  return SceneLoader::_getPluginForExtension(extension)->plugin;
+  return SceneLoader::_getPluginForExtension(extension).plugin;
 }
 
-void SceneLoader::RegisterPlugin(ISceneLoaderPlugin* /*plugin*/)
+void SceneLoader::RegisterPlugin(ISceneLoaderPlugin* plugin)
 {
+  auto& extensions = plugin->extensions.mapping;
+  for (auto& item : extensions) {
+    SceneLoader::_registeredPlugins[String::toLowerCase(item.first)] = {
+      plugin,     // plugin
+      item.second // isBinary
+    };
+  }
 }
 
 void SceneLoader::ImportMesh(

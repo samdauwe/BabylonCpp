@@ -183,6 +183,7 @@ class ShadowGenerator;
 // --- Loading ---
 struct IRegisteredPlugin;
 struct ISceneLoaderPlugin;
+struct ISceneLoaderPluginExtensions;
 class SceneLoader;
 // - Plugins / babylon
 struct BabylonFileLoader;

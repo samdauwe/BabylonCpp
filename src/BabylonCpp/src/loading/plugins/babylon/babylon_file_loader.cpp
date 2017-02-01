@@ -23,7 +23,7 @@ namespace BABYLON {
 
 BabylonFileLoader::BabylonFileLoader()
 {
-  extensions = std::make_pair(".babylon", false);
+  extensions.mapping.emplace(std::make_pair(".babylon", false));
 }
 
 BabylonFileLoader::~BabylonFileLoader()

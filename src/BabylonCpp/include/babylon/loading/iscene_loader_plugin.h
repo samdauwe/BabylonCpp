@@ -2,11 +2,12 @@
 #define BABYLON_LOADING_ISCENE_LOADER_PLUGIN_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/loading/iscene_loader_plugin_extensions.h>
 
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT ISceneLoaderPlugin {
-  std::pair<std::string, bool> extensions; // Extension name, isBinary
+  ISceneLoaderPluginExtensions extensions; // Extension name, isBinary
   virtual bool importMesh(const std::vector<std::string>& meshesNames,
                           Scene* scene, const std::string& data,
                           const std::string& rootUrl,

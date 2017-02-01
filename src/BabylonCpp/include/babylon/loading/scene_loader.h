@@ -21,11 +21,10 @@ public:
 
 private:
   // Members
-  static std::unordered_map<std::string, IRegisteredPlugin*> _registeredPlugins;
+  static std::unordered_map<std::string, IRegisteredPlugin> _registeredPlugins;
   // Functions
-  static IRegisteredPlugin* _getDefaultPlugin();
-  static IRegisteredPlugin*
-  _getPluginForExtension(const std::string& extension);
+  static IRegisteredPlugin _getDefaultPlugin();
+  static IRegisteredPlugin _getPluginForExtension(const std::string& extension);
   static ISceneLoaderPlugin*
   _getPluginForFilename(const std::string& sceneFilename);
   static std::string _getDirectLoad(const std::string& sceneFilename);
