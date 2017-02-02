@@ -6,7 +6,7 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT IRegisteredPlugin {
-  ISceneLoaderPlugin* plugin;
+  std::shared_ptr<ISceneLoaderPlugin> plugin;
   bool isBinary;
 }; // end of struct IRegisteredPlugin
 

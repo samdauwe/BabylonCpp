@@ -921,7 +921,7 @@ void Scene::getWaitingItemsCount()
 {
 }
 
-void Scene::executeWhenReady(std::function<void()>& func)
+void Scene::executeWhenReady(const std::function<void()>& func)
 {
   onReadyObservable.add(func);
 

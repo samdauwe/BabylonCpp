@@ -169,7 +169,8 @@ void Tools::LoadImage(
 
 void Tools::LoadFile(
   const std::string& /*url*/,
-  const std::function<void(const std::string& text)>& /*callback*/)
+  const std::function<void(const std::string& text)>& /*callback*/,
+  const std::function<void()>& /*progressCallBack*/, bool /*useArrayBuffer*/)
 {
 }
 

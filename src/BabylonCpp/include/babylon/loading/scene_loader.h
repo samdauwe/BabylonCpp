@@ -25,14 +25,14 @@ private:
   // Functions
   static IRegisteredPlugin _getDefaultPlugin();
   static IRegisteredPlugin _getPluginForExtension(const std::string& extension);
-  static ISceneLoaderPlugin*
+  static IRegisteredPlugin
   _getPluginForFilename(const std::string& sceneFilename);
   static std::string _getDirectLoad(const std::string& sceneFilename);
 
 public:
   static ISceneLoaderPlugin*
   GetPluginForExtension(const std::string& extension);
-  static void RegisterPlugin(ISceneLoaderPlugin* plugin);
+  static void RegisterPlugin(std::shared_ptr<ISceneLoaderPlugin>&& plugin);
   static void ImportMesh(
     const std::vector<std::string>& meshesNames, const std::string& rootUrl,
     const std::string& sceneFilename, Scene* scene,
@@ -55,11 +55,12 @@ public:
    * @param engine is the instance of BABYLON.Engine to use to create the
    * scene
    */
-  static void Load(const std::string& rootUrl, const std::string& sceneFilename,
-                   Engine* engine,
-                   const std::function<void(Scene* scene)>& onsuccess = nullptr,
-                   const std::function<void()>& progressCallBack      = nullptr,
-                   const std::function<void(Scene* scene)>& onerror = nullptr);
+  std::unique_ptr<Scene>
+  Load(const std::string& rootUrl, const std::string& sceneFilename,
+       Engine* engine,
+       const std::function<void(Scene* scene)>& onsuccess = nullptr,
+       const std::function<void()>& progressCallBack      = nullptr,
+       const std::function<void(Scene* scene)>& onerror   = nullptr);
 
   /**
    * Append a scene

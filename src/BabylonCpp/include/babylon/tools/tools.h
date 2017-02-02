@@ -35,7 +35,9 @@ struct BABYLON_SHARED_EXPORT Tools {
             bool flipVertically = true);
   static void
   LoadFile(const std::string& url,
-           const std::function<void(const std::string& text)>& callback);
+           const std::function<void(const std::string& text)>& callback,
+           const std::function<void()>& progressCallBack = nullptr,
+           bool useArrayBuffer                           = false);
   static void CheckExtends(Vector3& v, Vector3& min, Vector3& max);
   static std::string RandomId();
   static void SetImmediate(const std::function<void()>& immediate);

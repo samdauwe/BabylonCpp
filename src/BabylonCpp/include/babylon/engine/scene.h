@@ -132,7 +132,7 @@ public:
    * Registers a function to be executed when the scene is ready.
    * @param {Function} func - the function to be executed.
    */
-  void executeWhenReady(std::function<void()>& func);
+  void executeWhenReady(const std::function<void()>& func);
   void _checkIsReady();
   /** Animations **/
   std::vector<Animation*> getAnimations() override;
