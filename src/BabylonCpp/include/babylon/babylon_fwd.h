@@ -128,6 +128,8 @@ class Octree;
 template <class T>
 class OctreeBlock;
 // --- Debug ---
+class AxesViewer;
+class BoneAxesViewer;
 class DebugLayer;
 class SkeletonViewer;
 // --- Engine ---

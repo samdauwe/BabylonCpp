@@ -11,14 +11,14 @@
 namespace BABYLON {
 
 SkeletonViewer::SkeletonViewer(Skeleton* iSkeleton, AbstractMesh* iMesh,
-                               Scene* scene, bool iAutoUpdateBonesMatrices,
+                               Scene* iScene, bool iAutoUpdateBonesMatrices,
                                unsigned int iRenderingGroupId)
     : color{Color3::White()}
     , skeleton{iSkeleton}
     , mesh{iMesh}
     , autoUpdateBonesMatrices{iAutoUpdateBonesMatrices}
     , renderingGroupId{iRenderingGroupId}
-    , _scene{scene}
+    , _scene{iScene}
     , _isEnabled{false}
 {
   update();
