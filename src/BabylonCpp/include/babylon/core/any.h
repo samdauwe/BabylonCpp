@@ -21,7 +21,7 @@ struct alloc {
   }
 
   template <typename D, typename V, typename B>
-  B* move(V&& v, B*& p)
+  B* move(V&& /*v*/, B*& p)
   {
     B* q = p;
     p    = nullptr;

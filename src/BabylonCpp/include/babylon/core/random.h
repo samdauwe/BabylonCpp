@@ -10,7 +10,7 @@ namespace Math {
 template <typename T>
 inline T randomNumber(T min, T max)
 {
-  if (min == max) {
+  if (std_util::almost_equal(min, max)) {
     return min;
   }
 
