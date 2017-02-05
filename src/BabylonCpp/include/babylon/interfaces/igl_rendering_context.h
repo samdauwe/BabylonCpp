@@ -571,6 +571,11 @@ public:
                          GLboolean alpha)
     = 0;
   virtual void compileShader(const std::unique_ptr<IGLShader>& shader) = 0;
+  virtual void compressedTexImage2D(GLenum target, GLint level,
+                                    GLenum internalformat, GLint width,
+                                    GLint height, GLint border,
+                                    const Uint8Array& pixels)
+    = 0;
   virtual void compressedTexSubImage2D(GLenum target, GLint level,
                                        GLint xoffset, GLint yoffset,
                                        GLint width, GLint height, GLenum format,
