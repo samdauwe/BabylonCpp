@@ -88,6 +88,9 @@ using high_res_time_point_t = std::chrono::time_point<high_res_clock_t>;
 using system_clock_t        = std::chrono::system_clock;
 using system_time_point_t   = std::chrono::time_point<system_clock_t>;
 
+// byte type
+using byte = unsigned char;
+
 // 32 bit (4 byte) floating point number array
 using Float32Array = std::vector<std::float_t>;
 using Int32Array   = std::vector<std::int32_t>;
@@ -179,6 +182,33 @@ inline float hex_to_float(unsigned int hex_value)
 inline float hex_to_float(const std::string& hex_string)
 {
   return hex_to_float(hex_string_to_uint(hex_string));
+}
+
+// byte conversion
+
+template <typename T>
+std::array<byte, sizeof(T)> to_bytes(const T& object)
+{
+  std::array<byte, sizeof(T)> bytes;
+
+  const byte* begin = reinterpret_cast<const byte*>(std::addressof(object));
+  const byte* end   = begin + sizeof(T);
+  std::copy(begin, end, std::begin(bytes));
+
+  return bytes;
+}
+
+template <typename T>
+T& from_bytes(const std::array<byte, sizeof(T)>& bytes, T& object)
+{
+  // http://en.cppreference.com/w/cpp/types/is_trivially_copyable
+  static_assert(std::is_trivially_copyable<T>::value,
+                "not a TriviallyCopyable type");
+
+  byte* begin_object = reinterpret_cast<byte*>(std::addressof(object));
+  std::copy(std::begin(bytes), std::end(bytes), begin_object);
+
+  return object;
 }
 
 // -- Helper Templates --

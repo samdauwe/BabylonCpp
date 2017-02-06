@@ -143,6 +143,20 @@ inline std::string join(const T& v, char delim)
 }
 
 /**
+ * @brief Strip whitespace from the beginning of a string.
+ * @param str The input string.
+ * @return Returns a string with whitespace stripped from the beginning of str.
+ */
+inline std::string& ltrim(std::string& str)
+{
+  auto it2 = std::find_if(str.begin(), str.end(), [](char ch) {
+    return !std::isspace<char>(ch, std::locale::classic());
+  });
+  str.erase(str.begin(), it2);
+  return str;
+}
+
+/**
  * @brief Searches a string for a specified value and replaces the specified
  * values.
  * @param source The source string where the specified value(s) should replaced
@@ -158,6 +172,20 @@ inline void replaceInPlace(std::string& source, const std::string& search,
     source.replace(pos, search.length(), replace);
     pos += replace.length();
   }
+}
+
+/**
+ * @brief Strip whitespace from the end of a string.
+ * @param str The input string.
+ * @return Returns a string with whitespace stripped from the end of str.
+ */
+inline std::string& rtrim(std::string& str)
+{
+  auto it1 = std::find_if(str.rbegin(), str.rend(), [](char ch) {
+    return !std::isspace<char>(ch, std::locale::classic());
+  });
+  str.erase(it1.base(), str.end());
+  return str;
 }
 
 /**
@@ -202,6 +230,29 @@ inline std::string toUpperCase(const std::string& source)
   std::string ucs = source;
   std::transform(ucs.begin(), ucs.end(), ucs.begin(), ::toupper);
   return ucs;
+}
+
+/**
+ * @brief Removes leading and trailing whitespace characters from a string.
+ * @param str The input string.
+ * @return Returns the string with whitespace stripped from the beginning end of
+ * str.
+ */
+inline std::string& trim(std::string& str)
+{
+  return ltrim(rtrim(str));
+}
+
+/**
+ * @brief Removes leading and trailing whitespace characters from a string.
+ * @param str The input string.
+ * @return Returns a copy of the string with whitespace stripped from the
+ * beginning end of str.
+ */
+inline std::string trimCopy(const std::string& str)
+{
+  auto s = str;
+  return ltrim(rtrim(s));
 }
 
 } // end of namespace String

@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_constants.h>
 #include <babylon/babylon_stl.h>
+#include <babylon/core/string.h>
 
 TEST(TestStdUtil, to_bitset)
 {
@@ -27,6 +28,56 @@ TEST(TestStdUtil, to_bitset)
   number   = std::sqrt(2.f);
   expected = "00111111101101010000010011110011";
   EXPECT_EQ(std_util::to_bitset(number).to_string(), expected);
+}
+
+TEST(TestStdUtil, to_bytes__from_bytes)
+{
+  using namespace BABYLON;
+
+  // double
+  {
+    // to_bytes
+    double d         = 123.456789;
+    const auto bytes = std_util::to_bytes(d);
+    std::ostringstream oss;
+    oss << std::hex << std::setfill('0');
+    for (byte b : bytes) {
+      oss << std::setw(2) << int(b) << ' ';
+    }
+    EXPECT_EQ(String::trimCopy(oss.str()), "0b 0b ee 07 3c dd 5e 40");
+
+    // from_bytes
+    oss.str("");
+    d = 0;
+    std_util::from_bytes(bytes, d);
+    oss << std::fixed << d;
+    EXPECT_EQ(oss.str(), "123.456789");
+  }
+
+  // Int32Array
+  {
+    // to_bytes
+    int arr[5]             = {1, 63, 256, 511, 1024};
+    const auto array_bytes = std_util::to_bytes(arr);
+    std::ostringstream oss;
+    oss << std::hex << std::setfill('0');
+    for (BABYLON::byte b : array_bytes) {
+      oss << std::setw(2) << int(b) << ' ';
+    }
+    EXPECT_EQ(String::trimCopy(oss.str()),
+              "01 00 00 00 3f 00 00 00 00 01 00 00 ff 01 00 00 00 04 00 00");
+
+    // from_bytes
+    oss.str("");
+    for (int& v : arr) {
+      v = -1;
+    }
+    std_util::from_bytes(array_bytes, arr);
+    for (int v : arr) {
+      oss << std::dec << v << ' ';
+    }
+    EXPECT_EQ(String::trimCopy(oss.str()), "1 63 256 511 1024");
+  }
 }
 
 TEST(TestStdUtil, to_hex_string)
