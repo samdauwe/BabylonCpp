@@ -22,6 +22,51 @@ inline std::string extension(const std::string& filename)
 }
 
 /**
+ * @brief Returns the base directory of a file of subdirectory.
+ * @param filepath The file path.
+ * @return The base directory of a file of subdirectory.
+ */
+inline std::string baseDir(const std::string& filepath)
+{
+  if (filepath.find_last_of("/\\") != std::string::npos) {
+    return filepath.substr(0, filepath.find_last_of("/\\"));
+  }
+  return "";
+}
+
+/**
+ * @brief Join two path components.
+ * @param path0 First path components.
+ * @param path1 Second path components.
+ * @return Concatenation of two path components with path separator character in
+ * between.
+ */
+template <typename T>
+inline T joinPath(const T& path0, const T& path1)
+{
+  if (path0.empty()) {
+    return path1;
+  }
+  else {
+    // check '/'
+    char lastChar0  = *path0.rbegin();
+    char firstChar1 = path1.empty() ? '\0' : *path1.cbegin();
+    if ((lastChar0 != '/') && (firstChar1 != '/')) {
+      return path0 + std::string("/") + path1;
+    }
+    else {
+      return path0 + path1;
+    }
+  }
+}
+
+template <typename T, typename... Args>
+inline T joinPath(const T& path0, const T& path1, Args... args)
+{
+  return joinPath(joinPath(path0, path1), args...);
+}
+
+/**
  * @brief Reads the file with the given filename into a string.
  * @param filename The path of the file to read from.
  * @return The contents of the file or an empty string in case the content could
