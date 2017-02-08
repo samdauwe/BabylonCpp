@@ -2,6 +2,7 @@
 #define BABYLON_LOADING_PLUGINS_GLTF_GLTF_FILE_LOADER_INTERFACES_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/loading/plugins/gltf/gltf_file_loader_enums.h>
 
 namespace BABYLON {
 
@@ -49,7 +50,7 @@ struct IGLTFProgram : IGLTFChildRootProperty {
 };
 
 struct IGLTFTechniqueParameter {
-  unsigned int type;
+  EParameterType type;
   size_t count;
   std::string semantic;
   std::string node;
