@@ -93,6 +93,8 @@ using byte = unsigned char;
 
 // 32 bit (4 byte) floating point number array
 using Float32Array = std::vector<std::float_t>;
+using Int8Array    = std::vector<std::int8_t>;
+using Int16Array   = std::vector<std::int16_t>;
 using Int32Array   = std::vector<std::int32_t>;
 using Uint8Array   = std::vector<std::uint8_t>;
 using Uint16Array  = std::vector<std::uint16_t>;
