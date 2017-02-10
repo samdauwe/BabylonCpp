@@ -133,14 +133,14 @@ public:
   /**
    * Configure node transformation from position, rotation and scaling
    */
-  void configureNode(std::string& newNode, const Vector3& position,
+  void configureNode(Mesh* newNode, const Vector3& position,
                      const Quaternion& rotation, const Vector3& scaling) const;
 
   /**
    * Configures node from transformation matrix
    */
-  void configureNodeFromMatrix(std::string& newNode,
-                               const IGLTFNode& node) const;
+  void configureNodeFromMatrix(Mesh* newNode, const IGLTFNode& node,
+                               Node* parent) const;
 
   /**
    * Imports a node

@@ -9,6 +9,7 @@
 #include <babylon/materials/shader_material.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/matrix.h>
+#include <babylon/mesh/mesh.h>
 #include <babylon/utils/picojson.h>
 
 namespace BABYLON {
@@ -116,8 +117,7 @@ std::string GLTFFileLoader::getAttribute(
     return "color";
   }
   else if (attributeParameter.semantic.find("TEXCOORD_") != std::string::npos) {
-    std::vector<std::string> splitString
-      = String::split(attributeParameter.semantic, '_');
+    auto splitString = String::split(attributeParameter.semantic, '_');
     if (splitString.size() > 1) {
       int channel = std::stoi(splitString[1]);
       return "uv" + (channel == 0 ? "" : std::to_string(channel + 1));
@@ -148,9 +148,9 @@ Matrix GLTFFileLoader::configureBoneTransformation(const IGLTFNode& node) const
   Matrix mat;
   if (!node.translation.empty() && !node.rotation.empty()
       && !node.scale.empty()) {
-    Vector3 scale       = Vector3::FromArray(node.scale);
-    Quaternion rotation = Quaternion::FromArray(node.rotation);
-    Vector3 position    = Vector3::FromArray(node.translation);
+    auto scale    = Vector3::FromArray(node.scale);
+    auto rotation = Quaternion::FromArray(node.rotation);
+    auto position = Vector3::FromArray(node.translation);
 
     // Y is Up
     if (GLTFFileLoader::MakeYUP) {
@@ -171,7 +171,7 @@ Bone* GLTFFileLoader::getParentBone(const IGLTFRuntime& gltfRuntime,
                                     const std::string& jointName,
                                     Skeleton* newSkeleton) const
 {
-  // Try to find
+// Try to find
 #if 0
   auto it = std::find_if(
     newSkeleton->bones.begin(), newSkeleton->bones.end(),
@@ -236,8 +236,8 @@ IJointNode GLTFFileLoader::getJointNode(const IGLTFRuntime& gltfRuntime,
 bool GLTFFileLoader::nodeIsInJoints(const IGLTFSkins& skins,
                                     const std::string& id) const
 {
-  auto it = std::find(skins.jointNames.begin(), skins.jointNames.end(), id);
-  return (it != skins.jointNames.end());
+  return (std::find(skins.jointNames.begin(), skins.jointNames.end(), id)
+          != skins.jointNames.end());
 }
 
 void GLTFFileLoader::getNodesToRoot(const IGLTFRuntime& gltfRuntime,
@@ -300,16 +300,34 @@ Mesh* GLTFFileLoader::importMesh(const IGLTFRuntime& gltfRuntime,
   return nullptr;
 }
 
-void GLTFFileLoader::configureNode(std::string& newNode,
-                                   const Vector3& position,
+void GLTFFileLoader::configureNode(Mesh* newNode, const Vector3& position,
                                    const Quaternion& rotation,
                                    const Vector3& scaling) const
 {
+  newNode->setPosition(position);
+  newNode->setRotationQuaternion(rotation);
+  newNode->setScaling(scaling);
 }
 
-void GLTFFileLoader::configureNodeFromMatrix(std::string& newNode,
-                                             const IGLTFNode& node) const
+void GLTFFileLoader::configureNodeFromMatrix(Mesh* newNode,
+                                             const IGLTFNode& node,
+                                             Node* /*parent*/) const
 {
+  if (!node.matrix.empty()) {
+    Vector3 position(0.f, 0.f, 0.f);
+    Quaternion rotation;
+    Vector3 scaling(0.f, 0.f, 0.f);
+    auto mat = Matrix::FromArray(node.matrix);
+    mat.decompose(scaling, rotation, position);
+
+    configureNode(newNode, position, rotation, scaling);
+    newNode->computeWorldMatrix(true);
+  }
+  else {
+    configureNode(newNode, Vector3::FromArray(node.translation),
+                  Quaternion::FromArray(node.rotation),
+                  Vector3::FromArray(node.scale));
+  }
 }
 
 Node* GLTFFileLoader::importNode(const IGLTFRuntime& gltfRuntime,
