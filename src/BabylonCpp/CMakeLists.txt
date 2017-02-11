@@ -83,8 +83,7 @@ file(GLOB COLLISIONS_HDR_FILES      ${INCLUDE_PATH}/collisions/*.h)
 file(GLOB COMMON_HDR_FILES          ${INCLUDE_PATH}/*.h)
 file(GLOB CORE_HDR_FILES            ${INCLUDE_PATH}/core/*.h
                                     ${INCLUDE_PATH}/core/filesystem/filesystem_common.h
-                                    ${INCLUDE_PATH}/core/logging/*.h
-                                    ${INCLUDE_PATH}/core/profiling/*.h)
+                                    ${INCLUDE_PATH}/core/logging/*.h)
 file(GLOB CULLING_HDR_FILES         ${INCLUDE_PATH}/culling/*.h
                                     ${INCLUDE_PATH}/culling/octrees/*.h)
 file(GLOB DEBUG_HDR_FILES           ${INCLUDE_PATH}/debug/*.h)
@@ -124,8 +123,13 @@ file(GLOB TOOLS_HDR_FILES           ${INCLUDE_PATH}/tools/*.h
 file(GLOB UTILS_HDR_FILES           ${INCLUDE_PATH}/utils/*.h)
 
 if (UNIX)
-    set(CORE_HDR_FILES ${CORE_HDR_FILES} ${INCLUDE_PATH}/core/filesystem/filesystem_unix.h)
+    set(CORE_HDR_FILES ${CORE_HDR_FILES} ${INCLUDE_PATH}/core/filesystem/filesystem_unix.h
+                                         ${INCLUDE_PATH}/core/profiling/timer_unix.h)
 endif (UNIX)
+
+if (WIN32)
+    set(CORE_HDR_FILES ${CORE_HDR_FILES} ${INCLUDE_PATH}/core/profiling/timer_win32.h)
+endif (WIN32)
 
 set(BABYLON_HEADERS
     ${ACTIONS_HDR_FILES}
@@ -174,8 +178,7 @@ file(GLOB CAMERAS_SRC_FILES         ${SOURCE_PATH}/cameras/*.cpp
 file(GLOB COLLISIONS_SRC_FILES      ${SOURCE_PATH}/collisions/*.cpp)
 file(GLOB COMMON_SRC_FILES          ${SOURCE_PATH}/*.cpp)
 file(GLOB CORE_SRC_FILES            ${SOURCE_PATH}/core/*.cpp
-                                    ${SOURCE_PATH}/core/logging/*.cpp
-                                    ${SOURCE_PATH}/core/profiling/*.cpp)
+                                    ${SOURCE_PATH}/core/logging/*.cpp)
 file(GLOB CULLING_SRC_FILES         ${SOURCE_PATH}/culling/*.cpp
                                     ${SOURCE_PATH}/culling/octrees/*.cpp)
 file(GLOB DEBUG_SRC_FILES           ${SOURCE_PATH}/debug/*.cpp)
@@ -211,6 +214,14 @@ file(GLOB TOOLS_SRC_FILES           ${SOURCE_PATH}/tools/*.cpp
                                     ${SOURCE_PATH}/tools/hdr/*.cpp
                                     ${SOURCE_PATH}/tools/optimization/*.cpp)
 file(GLOB UTILS_SRC_FILES           ${SOURCE_PATH}/utils/*.cpp)
+
+if (UNIX)
+    set(CORE_SRC_FILES ${CORE_SRC_FILES} ${SOURCE_PATH}/core/profiling/timer_unix.cpp)
+endif (UNIX)
+
+if (WIN32)
+    set(CORE_SRC_FILES ${CORE_SRC_FILES} ${SOURCE_PATH}/core/profiling/timer_win32.cpp)
+endif (WIN32)
 
 set(BABYLON_SOURCES
     ${ACTIONS_SRC_FILES}
