@@ -57,14 +57,6 @@ TEST(TestString, isDigit)
   EXPECT_FALSE(String::isDigit("*"));
 }
 
-TEST(TestString, ltrim)
-{
-  using namespace BABYLON;
-
-  std::string str{"  abc "};
-  EXPECT_EQ(String::ltrim(str), "abc ");
-}
-
 TEST(TestString, join)
 {
   using namespace BABYLON;
@@ -84,14 +76,6 @@ TEST(TestString, replace)
   std::string expected{"gl_FragColor=vec4(rightFrag.rgb*leftFrag.rgb,1.0);\n"};
   String::replaceInPlace(source, " ", "");
   EXPECT_EQ(source, expected);
-}
-
-TEST(TestString, rtrim)
-{
-  using namespace BABYLON;
-
-  std::string str{" abc  "};
-  EXPECT_EQ(String::rtrim(str), " abc");
 }
 
 TEST(TestString, split)
@@ -137,4 +121,20 @@ TEST(TestString, trimCopy)
   std::string strCopy{String::trimCopy(str)};
   EXPECT_EQ(str, "  abc ");
   EXPECT_EQ(strCopy, "abc");
+}
+
+TEST(TestString, trimLeft)
+{
+  using namespace BABYLON;
+
+  std::string str{"  abc "};
+  EXPECT_EQ(String::trimLeft(str), "abc ");
+}
+
+TEST(TestString, trimRight)
+{
+  using namespace BABYLON;
+
+  std::string str{" abc  "};
+  EXPECT_EQ(String::trimRight(str), " abc");
 }

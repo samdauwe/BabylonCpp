@@ -143,20 +143,6 @@ inline std::string join(const T& v, char delim)
 }
 
 /**
- * @brief Strip whitespace from the beginning of a string.
- * @param str The input string.
- * @return Returns a string with whitespace stripped from the beginning of str.
- */
-inline std::string& ltrim(std::string& str)
-{
-  auto it2 = std::find_if(str.begin(), str.end(), [](char ch) {
-    return !std::isspace<char>(ch, std::locale::classic());
-  });
-  str.erase(str.begin(), it2);
-  return str;
-}
-
-/**
  * @brief Searches a string for a specified value and replaces the specified
  * values.
  * @param source The source string where the specified value(s) should replaced
@@ -172,20 +158,6 @@ inline void replaceInPlace(std::string& source, const std::string& search,
     source.replace(pos, search.length(), replace);
     pos += replace.length();
   }
-}
-
-/**
- * @brief Strip whitespace from the end of a string.
- * @param str The input string.
- * @return Returns a string with whitespace stripped from the end of str.
- */
-inline std::string& rtrim(std::string& str)
-{
-  auto it1 = std::find_if(str.rbegin(), str.rend(), [](char ch) {
-    return !std::isspace<char>(ch, std::locale::classic());
-  });
-  str.erase(it1.base(), str.end());
-  return str;
 }
 
 /**
@@ -233,26 +205,53 @@ inline std::string toUpperCase(const std::string& source)
 }
 
 /**
- * @brief Removes leading and trailing whitespace characters from a string.
+ * @brief Strip whitespace from the beginning of a string.
  * @param str The input string.
- * @return Returns the string with whitespace stripped from the beginning end of
- * str.
+ * @return Returns a string with whitespace stripped from the beginning of str.
  */
-inline std::string& trim(std::string& str)
+inline std::string& trimLeft(std::string& str)
 {
-  return ltrim(rtrim(str));
+  auto it2 = std::find_if(str.begin(), str.end(), [](char ch) {
+    return !std::isspace<char>(ch, std::locale::classic());
+  });
+  str.erase(str.begin(), it2);
+  return str;
+}
+
+/**
+ * @brief Strip whitespace from the end of a string.
+ * @param str The input string.
+ * @return A string with whitespace stripped from the end of str.
+ */
+inline std::string& trimRight(std::string& str)
+{
+  auto it1 = std::find_if(str.rbegin(), str.rend(), [](char ch) {
+    return !std::isspace<char>(ch, std::locale::classic());
+  });
+  str.erase(it1.base(), str.end());
+  return str;
 }
 
 /**
  * @brief Removes leading and trailing whitespace characters from a string.
  * @param str The input string.
- * @return Returns a copy of the string with whitespace stripped from the
- * beginning end of str.
+ * @return The string with whitespace stripped from the beginning end of str.
+ */
+inline std::string& trim(std::string& str)
+{
+  return trimLeft(trimRight(str));
+}
+
+/**
+ * @brief Removes leading and trailing whitespace characters from a string.
+ * @param str The input string.
+ * @return A copy of the string with whitespace stripped from the beginning end
+ * of str.
  */
 inline std::string trimCopy(const std::string& str)
 {
   auto s = str;
-  return ltrim(rtrim(s));
+  return trimLeft(trimRight(s));
 }
 
 } // end of namespace String
