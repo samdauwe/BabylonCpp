@@ -130,6 +130,7 @@ TEST(TestNullable, CopyConstructor)
     EXPECT_FALSE(cpy.hasValue());
     EXPECT_FALSE(cpy);
     EXPECT_TRUE(cpy.isNull());
+
     test = 7;
     EXPECT_TRUE(test);
     EXPECT_FALSE(cpy);
@@ -144,6 +145,7 @@ TEST(TestNullable, CopyConstructor)
     EXPECT_TRUE(cpy);
     EXPECT_FALSE(cpy.isNull());
     EXPECT_EQ(test.value, cpy.value);
+
     test = 8;
     EXPECT_NE(test.value, cpy.value);
     EXPECT_EQ(test.value, 8);
@@ -175,6 +177,40 @@ TEST(TestNullable, MoveConstructor)
     EXPECT_FALSE(m.isNull());
     EXPECT_EQ(m.value, 7);
   }
+}
+
+TEST(TestNullable, NullptrType)
+{
+  using namespace BABYLON;
+
+  Nullable<int> test = nullptr;
+  EXPECT_FALSE(test.hasValue());
+  EXPECT_FALSE(test);
+  EXPECT_TRUE(test.isNull());
+
+  test = 0;
+  EXPECT_TRUE(test.hasValue());
+  EXPECT_TRUE(test);
+  EXPECT_FALSE(test.isNull());
+  EXPECT_EQ(test.value, 0);
+}
+
+TEST(TestNullable, Swap)
+{
+  using namespace BABYLON;
+
+  Nullable<int> a = 5;
+  Nullable<int> b = 7;
+  EXPECT_EQ(a.value, 5);
+  EXPECT_EQ(b.value, 7);
+
+  swap(a, b);
+  EXPECT_EQ(a.value, 7);
+  EXPECT_EQ(b.value, 5);
+
+  swap(a, b);
+  EXPECT_EQ(a.value, 5);
+  EXPECT_EQ(b.value, 7);
 }
 
 TEST(TestNullable, CustomType)

@@ -65,7 +65,7 @@ public:
 
   friend void swap(Nullable& n0, Nullable& n1)
   {
-    n0.swap(n1);
+    std::swap(n0, n1);
   }
 
   const Nullable<T>& operator=(const Nullable<T>& value)
