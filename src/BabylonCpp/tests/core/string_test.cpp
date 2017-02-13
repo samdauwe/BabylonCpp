@@ -47,6 +47,17 @@ TEST(TestString, fromCharCode)
   EXPECT_EQ(String::fromCharCode(72, 69, 76, 76, 79), "HELLO");
 }
 
+TEST(TestString, indexOf)
+{
+  using namespace BABYLON;
+
+  std::string str = "Hello world, welcome to the universe.";
+  EXPECT_EQ(String::indexOf(str, "welcome"), 13);
+  EXPECT_EQ(String::indexOf(str, "e"), 1);
+  EXPECT_EQ(String::indexOf(str, "e", 5), 14);
+  EXPECT_EQ(String::indexOf(str, "abc"), -1);
+}
+
 TEST(TestString, isDigit)
 {
   using namespace BABYLON;
@@ -64,6 +75,16 @@ TEST(TestString, join)
   std::vector<std::string> v{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
   const std::string expected{"A,B,C,D,E,F,G,H,I,J"};
   EXPECT_EQ(String::join(v, ','), expected);
+}
+
+TEST(TestString, lastIndexOf)
+{
+  using namespace BABYLON;
+
+  std::string str = "Hello planet earth, you are a great planet.";
+  EXPECT_EQ(String::lastIndexOf(str, "planet"), 36);
+  EXPECT_EQ(String::lastIndexOf(str, "planet", 20), 6);
+  EXPECT_EQ(String::lastIndexOf(str, "abc"), -1);
 }
 
 TEST(TestString, replace)

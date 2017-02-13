@@ -103,6 +103,26 @@ inline std::string fromCharCode(const T&... t0)
 }
 
 /**
+ * @brief Returns the position of the first occurrence of a specified value in a
+ * string.
+ * @param src The string to search in.
+ * @param searchvalue The string to search for.
+ * @param start At which position to start the search. Default 0.
+ * @return A Number, representing the position where the specified searchvalue
+ * occurs for the first time, or -1 if it never occurs.
+ */
+inline int indexOf(const std::string& src, const std::string& searchvalue,
+                   size_t start = 0)
+{
+  int index                  = -1;
+  std::string::size_type loc = src.find(searchvalue, start);
+  if (loc != std::string::npos) {
+    index = static_cast<int>(loc);
+  }
+  return index;
+}
+
+/**
  * @brief Returns whether or not the arhument is a digit.
  * @param x Required. The value to check.
  * @return A boolean value, whether or not the argument is a digit.
@@ -140,6 +160,32 @@ inline std::string join(const T& v, char delim)
     s << i;
   }
   return s.str();
+}
+
+/**
+ * @brief Returns the position of the last occurrence of a specified value in a
+ * string.
+ * @param src The string to search in.
+ * @param searchvalue The string to search for.
+ * @param start The position where to start the search (searching backwards). If
+ * omitted, the default value is the length of the string.
+ * @return A Number, representing the position where the specified searchvalue
+ * occurs for the first time, or -1 if it never occurs.
+ */
+inline int lastIndexOf(const std::string& src, const std::string& searchvalue,
+                       size_t start)
+{
+  int index                  = -1;
+  std::string::size_type loc = src.rfind(searchvalue, start);
+  if (loc != std::string::npos) {
+    index = static_cast<int>(loc);
+  }
+  return index;
+}
+
+inline int lastIndexOf(const std::string& src, const std::string& searchvalue)
+{
+  return lastIndexOf(src, searchvalue, src.size());
 }
 
 /**
