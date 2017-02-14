@@ -189,6 +189,24 @@ inline int lastIndexOf(const std::string& src, const std::string& searchvalue)
 }
 
 /**
+ * @brief Returns a new string with a specified number of copies of the string
+ * it was called on.
+ * @param str The string to repeat.
+ * @param count The number of times the original string value should be repeated
+ * in the new string.
+ * @return A String, a new string containing copies of the original string.
+ */
+inline std::string repeat(const std::string& str, size_t count)
+{
+  std::string result;
+  result.reserve(count * str.length());
+  for (size_t i = 0; i < count; ++i) {
+    result += str;
+  }
+  return result;
+}
+
+/**
  * @brief Searches a string for a specified value and replaces the specified
  * values.
  * @param source The source string where the specified value(s) should replaced

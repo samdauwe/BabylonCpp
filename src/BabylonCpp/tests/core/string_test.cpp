@@ -87,6 +87,15 @@ TEST(TestString, lastIndexOf)
   EXPECT_EQ(String::lastIndexOf(str, "abc"), -1);
 }
 
+TEST(TestString, repeat)
+{
+  using namespace BABYLON;
+
+  // remove whitespace characters
+  EXPECT_EQ(String::repeat("Hello world!", 0), "");
+  EXPECT_EQ(String::repeat("Hello world!", 2), "Hello world!Hello world!");
+}
+
 TEST(TestString, replace)
 {
   using namespace BABYLON;
