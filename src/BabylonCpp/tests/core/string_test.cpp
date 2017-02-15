@@ -19,6 +19,18 @@ TEST(TestString, contains)
   EXPECT_FALSE(String::contains(s, "babylon"));
 }
 
+TEST(TestString, count)
+{
+  using namespace BABYLON;
+
+  const std::string s("-- Babylon.js --");
+  EXPECT_EQ(String::count(s, "B"), 1);
+  EXPECT_EQ(String::count(s, "."), 1);
+  EXPECT_EQ(String::count(s, "z"), 0);
+  EXPECT_EQ(String::count(s, "-"), 4);
+  EXPECT_EQ(String::count(s, "--"), 2);
+}
+
 TEST(TestString, startsWith)
 {
   using namespace BABYLON;

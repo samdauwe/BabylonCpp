@@ -45,6 +45,24 @@ inline bool contains(const std::string& s, const std::string& toCheck)
 }
 
 /**
+ * @brief Returns the number of occurrences of the string str in the other
+ * string s.
+ * @param s. The source string.
+ * @param str. The string to search for and count.
+ * @return A number, representing the number of occurrences of the string str.
+ */
+inline size_t count(const std::string& s, const std::string& str)
+{
+  size_t count = 0;
+  size_t nPos  = s.find(str, 0); // first occurrence
+  while (nPos != std::string::npos) {
+    ++count;
+    nPos = s.find(str, nPos + 1);
+  }
+  return count;
+}
+
+/**
  * Variadic template for concatenating a string.
  */
 inline void charCodeToString(std::ostream& /*o*/)
