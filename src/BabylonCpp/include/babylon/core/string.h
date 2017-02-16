@@ -207,6 +207,18 @@ inline int lastIndexOf(const std::string& src, const std::string& searchvalue)
 }
 
 /**
+ * @brief String formatting like sprintf.
+ */
+template <typename... Args>
+inline std::string printf(const std::string& format, Args... args)
+{
+  size_t size = snprintf(nullptr, 0, format.c_str(), args...) + 1;
+  std::unique_ptr<char[]> buf(new char[size]);
+  snprintf(buf.get(), size, format.c_str(), args...);
+  return std::string(buf.get(), buf.get() + size - 1);
+}
+
+/**
  * @brief Returns a new string with a specified number of copies of the string
  * it was called on.
  * @param str The string to repeat.

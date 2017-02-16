@@ -99,6 +99,19 @@ TEST(TestString, lastIndexOf)
   EXPECT_EQ(String::lastIndexOf(str, "abc"), -1);
 }
 
+TEST(TestString, printf)
+{
+  using namespace BABYLON;
+
+  EXPECT_EQ(String::printf("%s", "Hello"), "Hello");
+  EXPECT_EQ(String::printf("Pi = %.5lf", 3.14159), "Pi = 3.14159");
+
+  auto test = String::printf("Hello %s, did you know that pi equals %.2lf?\n",
+                             "User", 3.14159);
+  std::string expected{"Hello User, did you know that pi equals 3.14?\n"};
+  EXPECT_EQ(test, expected);
+}
+
 TEST(TestString, repeat)
 {
   using namespace BABYLON;
