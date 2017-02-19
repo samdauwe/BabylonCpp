@@ -299,6 +299,33 @@ inline std::string toUpperCase(const std::string& source)
 }
 
 /**
+ * @brief Converts a string to a number.
+ * @param str Required. The string to convert.
+ * @return A number, representing the numeric value of the string.
+ */
+template <typename T>
+inline T toNumber(const std::string& str)
+{
+  T value;
+  std::stringstream ss(str);
+  ss >> value;
+  return value;
+}
+
+/**
+ * @brief Converts a number to a string.
+ * @param number Required. The number to convert.
+ * @return A string, representing the string value of the number.
+ */
+template <typename T>
+inline std::string toString(const T& number)
+{
+  std::stringstream ss;
+  ss << number;
+  return ss.str();
+}
+
+/**
  * @brief Strip whitespace from the beginning of a string.
  * @param str The input string.
  * @return Returns a string with whitespace stripped from the beginning of str.

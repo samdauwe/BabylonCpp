@@ -160,6 +160,26 @@ TEST(TestString, toUpperCase)
   EXPECT_EQ(String::toUpperCase(source), expected);
 }
 
+TEST(TestString, toNumber)
+{
+  using namespace BABYLON;
+
+  EXPECT_EQ(String::toNumber<int>("3"), 3);
+  EXPECT_EQ(String::toNumber<size_t>("3"), 3);
+  EXPECT_EQ(String::toNumber<float>("4.5"), 4.5f);
+  EXPECT_EQ(String::toNumber<double>("4.5"), 4.5);
+}
+
+TEST(TestString, toString)
+{
+  using namespace BABYLON;
+
+  EXPECT_EQ(String::toString<int>(3), "3");
+  EXPECT_EQ(String::toString<size_t>(3), "3");
+  EXPECT_EQ(String::toString<float>(4.5f), "4.5");
+  EXPECT_EQ(String::toString<double>(4.5), "4.5");
+}
+
 TEST(TestString, trim)
 {
   using namespace BABYLON;
