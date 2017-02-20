@@ -99,6 +99,15 @@ TEST(TestString, lastIndexOf)
   EXPECT_EQ(String::lastIndexOf(str, "abc"), -1);
 }
 
+TEST(TestString, nthChar)
+{
+  using namespace BABYLON;
+
+  EXPECT_EQ(String::nthChar("abc", 0), 'a');
+  EXPECT_EQ(String::nthChar("abc", 1), 'b');
+  EXPECT_EQ(String::nthChar("abc", 2), 'c');
+}
+
 TEST(TestString, printf)
 {
   using namespace BABYLON;

@@ -207,6 +207,19 @@ inline int lastIndexOf(const std::string& src, const std::string& searchvalue)
 }
 
 /**
+ * @brief Returns the nth character from a char array.
+ */
+template <unsigned N>
+inline char nthChar(const char (&arr)[N], unsigned i)
+{
+  if (i >= N) {
+    return '\0';
+  }
+
+  return arr[i];
+}
+
+/**
  * @brief String formatting like sprintf.
  */
 template <typename... Args>
