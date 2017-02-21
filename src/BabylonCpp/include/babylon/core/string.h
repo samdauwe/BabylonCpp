@@ -232,6 +232,16 @@ inline std::string printf(const std::string& format, Args... args)
 }
 
 /**
+ * @brief Inserts the contents of s2 at offset 0 in s1.
+ * @param s1 The string to update.
+ * @param s2 The string to prepend.
+ */
+inline void pushFront(std::string& s1, const std::string& s2)
+{
+  s1.insert(0, s2);
+}
+
+/**
  * @brief Returns a new string with a specified number of copies of the string
  * it was called on.
  * @param str The string to repeat.

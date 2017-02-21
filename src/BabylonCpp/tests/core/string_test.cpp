@@ -121,6 +121,15 @@ TEST(TestString, printf)
   EXPECT_EQ(test, expected);
 }
 
+TEST(TestString, pushFront)
+{
+  using namespace BABYLON;
+
+  std::string s = "World";
+  String::pushFront(s, "Hello ");
+  EXPECT_EQ(s, "Hello World");
+}
+
 TEST(TestString, repeat)
 {
   using namespace BABYLON;
