@@ -160,6 +160,16 @@ TEST(TestString, split)
   EXPECT_THAT(String::split(str, ','), ::testing::ContainerEq(expected));
 }
 
+TEST(TestString, slice)
+{
+  using namespace BABYLON;
+
+  const std::string str{"Hello world!"};
+  EXPECT_EQ(String::slice(str), "Hello world!");
+  EXPECT_EQ(String::slice(str, 0), "Hello world!");
+  EXPECT_EQ(String::slice(str, 3), "lo world!");
+}
+
 TEST(TestString, toLowerCase)
 {
   using namespace BABYLON;

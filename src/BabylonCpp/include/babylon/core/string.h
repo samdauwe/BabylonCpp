@@ -277,6 +277,11 @@ inline void replaceInPlace(std::string& source, const std::string& search,
   }
 }
 
+inline std::string slice(const std::string& s, size_t start = 0)
+{
+  return s.substr(start);
+}
+
 /**
  * @brief Splits a string into an array of substrings.
  * @param value Required. The string to split.
