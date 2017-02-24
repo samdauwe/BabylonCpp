@@ -220,6 +220,19 @@ inline char nthChar(const char (&arr)[N], unsigned i)
 }
 
 /**
+ * Pads a string with a number of occurrences of some character to a certain
+ * width.
+ */
+template <typename T>
+void pad(std::basic_string<T>& s, typename std::basic_string<T>::size_type n,
+         T c)
+{
+  if (n > s.length()) {
+    s.append(n - s.length(), c);
+  }
+}
+
+/**
  * @brief String formatting like sprintf.
  */
 template <typename... Args>

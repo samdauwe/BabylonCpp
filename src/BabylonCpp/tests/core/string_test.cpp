@@ -108,6 +108,17 @@ TEST(TestString, nthChar)
   EXPECT_EQ(String::nthChar("abc", 2), 'c');
 }
 
+TEST(TestString, pad)
+{
+  using namespace BABYLON;
+
+  std::string s{"Babylon.js"};
+  String::pad(s, 15, '.');
+  EXPECT_EQ(s, "Babylon.js.....");
+  String::pad(s, 10, '.');
+  EXPECT_EQ(s, "Babylon.js.....");
+}
+
 TEST(TestString, printf)
 {
   using namespace BABYLON;
