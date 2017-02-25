@@ -105,6 +105,22 @@ inline std::vector<std::string> readFileLines(const char* filename)
 }
 
 /**
+ * @brief Standardizes a path: use forward slashes only, end with slash.
+ * @param path The path to standardize.
+ * @return The standardized path.
+ */
+inline std::string standardizePath(const std::string& path)
+{
+  std::string _path = path;
+  std::replace(_path.begin(), _path.end(), '\\', '/');
+  if (_path.back() != '/') {
+    _path += '/';
+  }
+
+  return _path;
+}
+
+/**
  * @brief Writes the given string contents to a file.
  * @param filename The path of the file to read from.
  * @param contents The contents to write to the file.
