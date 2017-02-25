@@ -219,6 +219,14 @@ TEST(TestString, toString)
   EXPECT_EQ(String::toString<double>(4.5), "4.5");
 }
 
+TEST(TestString, toTitleCase)
+{
+  using namespace BABYLON;
+
+  std::string str{"hello world"};
+  EXPECT_EQ(String::toTitleCase(str), "Hello World");
+}
+
 TEST(TestString, trim)
 {
   using namespace BABYLON;

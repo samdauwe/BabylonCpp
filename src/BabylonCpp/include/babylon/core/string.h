@@ -367,6 +367,22 @@ inline std::string toString(const T& number)
 }
 
 /**
+ * @brief Upper-cases the first letter of each word.
+ * @param str. The string to titlecase.
+ */
+inline std::string& toTitleCase(std::string& str)
+{
+  auto it = str.begin();
+  *it     = static_cast<char>(toupper(*it));
+  for (; it != str.end() - 1; ++it) {
+    if (*it == ' ') {
+      *(it + 1) = static_cast<char>(toupper(*(it + 1)));
+    }
+  }
+  return str;
+}
+
+/**
  * @brief Strip whitespace from the beginning of a string.
  * @param str The input string.
  * @return Returns a string with whitespace stripped from the beginning of str.
