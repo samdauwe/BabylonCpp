@@ -14,7 +14,7 @@ namespace Filesystem {
  */
 inline std::string extension(const std::string& filename)
 {
-  size_t pos = filename.find_last_of(".");
+  auto pos = filename.find_last_of(".");
   if (pos == std::string::npos) {
     return "";
   }
@@ -28,8 +28,23 @@ inline std::string extension(const std::string& filename)
  */
 inline std::string baseDir(const std::string& filepath)
 {
-  if (filepath.find_last_of("/\\") != std::string::npos) {
-    return filepath.substr(0, filepath.find_last_of("/\\"));
+  auto pos = filepath.find_last_of("/\\");
+  if (pos != std::string::npos) {
+    return filepath.substr(0, pos);
+  }
+  return "";
+}
+
+/**
+ * @brief Returns the filename of a path.
+ * @param filepath The file path.
+ * @return The filename of a path.
+ */
+inline std::string baseName(const std::string& filepath)
+{
+  auto pos = filepath.find_last_of("/\\");
+  if (pos != std::string::npos) {
+    return filepath.substr(pos + 1);
   }
   return "";
 }
@@ -102,6 +117,17 @@ inline std::vector<std::string> readFileLines(const char* filename)
     }
   }
   return lines;
+}
+
+/**
+ * @brief Removes the extension from a filename.
+ * @param filename. The filename.
+ * @return The filename with the extension removes.
+ */
+inline std::string removeExtension(const std::string& filename)
+{
+  auto p = filename.find_last_of('.');
+  return p > 0 && p != std::string::npos ? filename.substr(0, p) : filename;
 }
 
 /**
