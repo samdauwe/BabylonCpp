@@ -255,6 +255,21 @@ inline void pushFront(std::string& s1, const std::string& s2)
 }
 
 /**
+ * @brief Removes a substring from a string.
+ * @param s. The input string.
+ * @param subStr. The substring to remove.
+ * @return Reference to the updated string.
+ */
+inline std::string& removeSubstring(std::string& s, const std::string& subStr)
+{
+  auto n = subStr.length();
+  for (auto i = s.find(subStr); i != std::string::npos; i = s.find(subStr)) {
+    s.erase(i, n);
+  }
+  return s;
+}
+
+/**
  * @brief Returns a new string with a specified number of copies of the string
  * it was called on.
  * @param str The string to repeat.

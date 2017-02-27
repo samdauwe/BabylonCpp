@@ -141,6 +141,16 @@ TEST(TestString, pushFront)
   EXPECT_EQ(s, "Hello World");
 }
 
+TEST(TestString, removeSubstring)
+{
+  using namespace BABYLON;
+
+  std::string s{"Line 1, Line 2, Line 3, Line 4, Line 5"};
+  const std::string subStr{"Line "};
+  const std::string expected{"1, 2, 3, 4, 5"};
+  EXPECT_EQ(String::removeSubstring(s, subStr), expected);
+}
+
 TEST(TestString, repeat)
 {
   using namespace BABYLON;
