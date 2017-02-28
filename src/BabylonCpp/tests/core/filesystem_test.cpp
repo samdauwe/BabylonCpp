@@ -27,6 +27,16 @@ TEST(TestFilesystem, baseName)
   EXPECT_EQ(Filesystem::baseName("c:\\windows\\winhelp.exe"), "winhelp.exe");
 }
 
+TEST(TestFilesystem, joinPath)
+{
+  using namespace BABYLON;
+
+  std::array<std::string, 4> path{{"/", "usr", "local", "bin"}};
+  EXPECT_EQ(
+    Filesystem::joinPath<std::string>(path[0], path[1], path[2], path[3]),
+    "/usr/local/bin");
+}
+
 TEST(TestFilesystem, removeExtension)
 {
   using namespace BABYLON;
