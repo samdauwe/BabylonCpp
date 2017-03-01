@@ -5,6 +5,7 @@
 #include <sstream>
 
 #include <oimo/math/quat.h>
+#include <oimo/math/vec3.h>
 #include <oimo/oimo_utils.h>
 
 namespace OIMO {
@@ -236,17 +237,20 @@ Mat33& Mat33::scaleEqual(float s)
   return *this;
 }
 
-Mat33& Mat33::mul(const Mat33& m1, const Mat33& m2)
+Mat33& Mat33::mul(const Mat33& m1, const Mat33& m2, bool transpose)
 {
   const std::array<float, 9>& tm1 = m1.elements;
-  const std::array<float, 9>& tm2 = m2.elements;
+  const std::array<float, 9>& tm2
+    = transpose ? m2.clone().transpose().elements : m2.elements;
 
-  float a0 = tm1[0], a3 = tm1[3], a6 = tm1[6], //
-    a1 = tm1[1], a4 = tm1[4], a7 = tm1[7],     //
-    a2 = tm1[2], a5 = tm1[5], a8 = tm1[8],     //
-    b0 = tm2[0], b3 = tm2[3], b6 = tm2[6],     //
-    b1 = tm2[1], b4 = tm2[4], b7 = tm2[7],     //
-    b2 = tm2[2], b5 = tm2[5], b8 = tm2[8];
+  float a0 = tm1[0], a3 = tm1[3], a6 = tm1[6];
+  float a1 = tm1[1], a4 = tm1[4], a7 = tm1[7];
+  float a2 = tm1[2], a5 = tm1[5], a8 = tm1[8];
+
+  float b0 = tm2[0], b3 = tm2[3], b6 = tm2[6];
+  float b1 = tm2[1], b4 = tm2[4], b7 = tm2[7];
+  float b2 = tm2[2], b5 = tm2[5], b8 = tm2[8];
+
   elements[0] = a0 * b0 + a1 * b3 + a2 * b6;
   elements[1] = a0 * b1 + a1 * b4 + a2 * b7;
   elements[2] = a0 * b2 + a1 * b5 + a2 * b8;
@@ -335,6 +339,18 @@ Mat33& Mat33::mulRotate(const Mat33& m, float rad, float ax, float ay, float az,
   return *this;
 }
 
+Mat33& Mat33::transpose()
+{
+  float a01 = elements[1], a02 = elements[2], a12 = elements[5];
+  elements[1] = elements[3];
+  elements[2] = elements[6];
+  elements[3] = a01;
+  elements[5] = elements[7];
+  elements[6] = a02;
+  elements[7] = a12;
+  return *this;
+}
+
 Mat33& Mat33::transpose(const Mat33& m)
 {
   elements[0] = m.elements[0];
@@ -351,47 +367,95 @@ Mat33& Mat33::transpose(const Mat33& m)
 
 Mat33& Mat33::setQuat(const Quat& q)
 {
-  float x2 = 2.f * q.x, y2 = 2.f * q.y, z2 = 2.f * q.z;
-  float xx = q.x * x2, yy = q.y * y2, zz = q.z * z2;
-  float xy = q.x * y2, yz = q.y * z2, xz = q.x * z2;
-  float sx = q.s * x2, sy = q.s * y2, sz = q.s * z2;
+  const float x = q.x, y = q.y, z = q.z, w = q.s;
+  const float x2 = x + x, y2 = y + y, z2 = z + z;
+  const float xx = x * x2, xy = x * y2, xz = x * z2;
+  const float yy = y * y2, yz = y * z2, zz = z * z2;
+  const float wx = w * x2, wy = w * y2, wz = w * z2;
 
-  elements[0] = 1.f - yy - zz;
-  elements[1] = xy - sz;
-  elements[2] = xz + sy;
-  elements[3] = xy + sz;
-  elements[4] = 1.f - xx - zz;
-  elements[5] = yz - sx;
-  elements[6] = xz - sy;
-  elements[7] = yz + sx;
-  elements[8] = 1.f - xx - yy;
+  elements[0] = 1.f - (yy + zz);
+  elements[1] = xy - wz;
+  elements[2] = xz + wy;
+
+  elements[3] = xy + wz;
+  elements[4] = 1.f - (xx + zz);
+  elements[5] = yz - wx;
+
+  elements[6] = xz - wy;
+  elements[7] = yz + wx;
+  elements[8] = 1.f - (xx + yy);
+
   return *this;
 }
 
 Mat33& Mat33::invert(const Mat33& m)
 {
   const std::array<float, 9>& tm = m.elements;
-  float a0 = tm[0], a3 = tm[3], a6 = tm[6];
-  float a1 = tm[1], a4 = tm[4], a7 = tm[7];
-  float a2 = tm[2], a5 = tm[5], a8 = tm[8];
-  float b01 = a4 * a8 - a7 * a5;
-  float b11 = a7 * a2 - a1 * a8;
-  float b21 = a1 * a5 - a4 * a2;
-  float dt  = a0 * (b01) + a3 * (b11) + a6 * (b21);
+  const float a00 = tm[0], a10 = tm[3], a20 = tm[6];
+  const float a01 = tm[1], a11 = tm[4], a21 = tm[7];
+  const float a02 = tm[2], a12 = tm[5], a22 = tm[8];
+  const float b01 = a22 * a11 - a12 * a21;
+  const float b11 = -a22 * a10 + a12 * a20;
+  const float b21 = a21 * a10 - a11 * a20;
+  float det       = a00 * b01 + a01 * b11 + a02 * b21;
 
-  if (!floats_are_equal(dt, 0.f)) {
-    dt = 1.f / dt;
+  if (floats_are_equal(det, 0.f)) {
+    // can't invert matrix, determinant is 0
+    return identity();
   }
 
-  elements[0] = dt * b01;
-  elements[1] = dt * b11;
-  elements[2] = dt * b21;
-  elements[3] = dt * (a5 * a6 - a3 * a8);
-  elements[4] = dt * (a0 * a8 - a2 * a6);
-  elements[5] = dt * (a2 * a3 - a0 * a5);
-  elements[6] = dt * (a3 * a7 - a4 * a6);
-  elements[7] = dt * (a1 * a6 - a0 * a7);
-  elements[8] = dt * (a0 * a4 - a1 * a3);
+  det         = 1.f / det;
+  elements[0] = b01 * det;
+  elements[1] = (-a22 * a01 + a02 * a21) * det;
+  elements[2] = (a12 * a01 - a02 * a11) * det;
+  elements[3] = b11 * det;
+  elements[4] = (a22 * a00 - a02 * a20) * det;
+  elements[5] = (-a12 * a00 + a02 * a10) * det;
+  elements[6] = b21 * det;
+  elements[7] = (-a21 * a00 + a01 * a20) * det;
+  elements[8] = (a11 * a00 - a01 * a10) * det;
+  return *this;
+}
+
+Mat33& Mat33::addOffset(float m, const Vec3& v)
+{
+  float relX = v.x;
+  float relY = v.y;
+  float relZ = v.z;
+
+  elements[0] += m * (relY * relY + relZ * relZ);
+  elements[4] += m * (relX * relX + relZ * relZ);
+  elements[8] += m * (relX * relX + relY * relY);
+  float xy = m * relX * relY;
+  float yz = m * relY * relZ;
+  float zx = m * relZ * relX;
+  elements[1] -= xy;
+  elements[3] -= xy;
+  elements[2] -= yz;
+  elements[6] -= yz;
+  elements[5] -= zx;
+  elements[7] -= zx;
+  return *this;
+}
+
+Mat33& Mat33::subOffset(float m, const Vec3& v)
+{
+  float relX = v.x;
+  float relY = v.y;
+  float relZ = v.z;
+
+  elements[0] -= m * (relY * relY + relZ * relZ);
+  elements[4] -= m * (relX * relX + relZ * relZ);
+  elements[8] -= m * (relX * relX + relY * relY);
+  float xy = m * relX * relY;
+  float yz = m * relY * relZ;
+  float zx = m * relZ * relX;
+  elements[1] += xy;
+  elements[3] += xy;
+  elements[2] += yz;
+  elements[6] += yz;
+  elements[5] += zx;
+  elements[7] += zx;
   return *this;
 }
 
@@ -401,6 +465,15 @@ Mat33& Mat33::copy(const Mat33& m)
       m.elements[1], m.elements[4], m.elements[7], //
       m.elements[2], m.elements[5], m.elements[8]);
   return *this;
+}
+
+float Mat33::determinant() const
+{
+  float a = elements[0], b = elements[1], c = elements[2], //
+    d = elements[3], e = elements[4], f = elements[5],     //
+    g = elements[6], h = elements[7], i = elements[8];
+
+  return a * e * i - a * f * h - b * d * i + b * f * g + c * d * h - c * e * g;
 }
 
 Mat33& Mat33::fromArray(const std::array<float, 9>& array)

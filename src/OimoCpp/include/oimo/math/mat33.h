@@ -8,6 +8,7 @@
 namespace OIMO {
 
 class Quat;
+class Vec3;
 
 class Mat33 {
 
@@ -39,15 +40,19 @@ public:
   Mat33& subEqual(const Mat33& m);
   Mat33& scale(const Mat33& m, float s);
   Mat33& scaleEqual(float s);
-  Mat33& mul(const Mat33& m1, const Mat33& m2);
+  Mat33& mul(const Mat33& m1, const Mat33& m2, bool transpose = false);
   Mat33& mulScale(const Mat33& m, float sx, float sy, float sz,
                   bool prepend = false);
   Mat33& mulRotate(const Mat33& m, float rad, float ax, float ay, float az,
                    bool prepend = false);
+  Mat33& transpose();
   Mat33& transpose(const Mat33& m);
   Mat33& setQuat(const Quat& q);
   Mat33& invert(const Mat33& m);
+  Mat33& addOffset(float m, const Vec3& v);
+  Mat33& subOffset(float m, const Vec3& v);
   Mat33& copy(const Mat33& m);
+  float determinant() const;
   Mat33& fromArray(const std::array<float, 9>& array);
   std::array<float, 9> toArray() const;
   std::string toString() const;
