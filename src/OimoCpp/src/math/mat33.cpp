@@ -367,7 +367,7 @@ Mat33& Mat33::transpose(const Mat33& m)
 
 Mat33& Mat33::setQuat(const Quat& q)
 {
-  const float x = q.x, y = q.y, z = q.z, w = q.s;
+  const float x = q.x, y = q.y, z = q.z, w = q.w;
   const float x2 = x + x, y2 = y + y, z2 = z + z;
   const float xx = x * x2, xy = x * y2, xz = x * z2;
   const float yy = y * y2, yz = y * z2, zz = z * z2;

@@ -16,8 +16,13 @@ const float PI      = 3.14159265358979323846f;  // pi
 const float PI2     = 6.28318530717958647692f;  // pi * 2
 const float PI_2    = 1.57079632679489661923f;  // pi/2
 const float PI_4    = 0.785398163397448309616f; // pi/4
+const float PI3_4   = 4.71238898038468985769f;  // pi*(3/4)
 const float SQRT2   = 1.41421356237309504880f;  // sqrt(2)
 const float SQRT2_2 = 0.707106781186547524401f; // sqrt(2)/2
+
+/** Epsilon **/
+const float EPZ  = 0.00001f;
+const float EPZ2 = 0.000001f;
 
 /** Conversions **/
 const float DEGTORAD = 0.0174532925199432957f; //  PI / 180

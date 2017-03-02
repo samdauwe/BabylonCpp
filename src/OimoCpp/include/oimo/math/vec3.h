@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <utility>
+#include <vector>
 
 namespace OIMO {
 
@@ -31,20 +32,25 @@ public:
   Vec3& sub(const Vec3& v1, const Vec3& v2);
   Vec3& subEqual(const Vec3& v);
   Vec3& addScale(const Vec3& v, float s);
+  Vec3& subScale(const Vec3& v, float s);
   Vec3& scale(const Quat& q, float s);
   Vec3& scale(const Vec3& v, float s);
   Vec3& scaleEqual(float s);
   Vec3& cross(const Vec3& v);
   Vec3& cross(const Vec3& v1, const Vec3& v2);
+  Vec3& mul(const Vec3& v);
   Vec3& mul(const Vec3& o, const Vec3& v, const Mat33& m);
   Vec3& mulMat(const Mat33 m, const Vec3& v);
+  Vec3& tangent(const Vec3& a);
   Vec3& normalize(const Vec3& v);
   Vec3& invert(const Vec3& v);
   Vec3& negate();
   float dot(const Vec3& v) const;
+  float addition() const;
   float lengthSq() const;
   float length() const;
   Vec3& copy(const Vec3& v);
+  Vec3& applyMatrix3(const Mat33& m, bool transpose);
   Vec3& applyQuaternion(const Quat& q);
   bool testZero() const;
   bool testDiff(const Vec3& v) const;
@@ -53,6 +59,8 @@ public:
   Vec3& multiplyScalar(float scalar);
   Vec3& divideScalar(float scalar);
   Vec3& norm();
+  void toArray(std::vector<float>& array, size_t offset = 0) const;
+  Vec3& fromArray(const std::vector<float>& array, size_t offset = 0);
   float angleTo(const Vec3& v) const;
 
 public:

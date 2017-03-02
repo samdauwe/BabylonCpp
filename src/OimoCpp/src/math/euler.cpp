@@ -274,43 +274,43 @@ Euler& Euler::setFromQuaternion(const Quat& q, const RotationOrder& order,
   float sqx = q.x * q.x;
   float sqy = q.y * q.y;
   float sqz = q.z * q.z;
-  float sqw = q.s * q.s;
+  float sqw = q.w * q.w;
 
   if (order == RotationOrder::XYZ) {
 
-    _x = std::atan2(2.f * (q.x * q.s - q.y * q.z), (sqw - sqx - sqy + sqz));
-    _y = std::asin(clamp(2.f * (q.x * q.z + q.y * q.s), -1.f, 1.f));
-    _z = std::atan2(2.f * (q.z * q.s - q.x * q.y), (sqw + sqx - sqy - sqz));
+    _x = std::atan2(2.f * (q.x * q.w - q.y * q.z), (sqw - sqx - sqy + sqz));
+    _y = std::asin(clamp(2.f * (q.x * q.z + q.y * q.w), -1.f, 1.f));
+    _z = std::atan2(2.f * (q.z * q.w - q.x * q.y), (sqw + sqx - sqy - sqz));
   }
   else if (order == RotationOrder::YXZ) {
 
-    _x = std::asin(clamp(2.f * (q.x * q.s - q.y * q.z), -1.f, 1.f));
-    _y = std::atan2(2.f * (q.x * q.z + q.y * q.s), (sqw - sqx - sqy + sqz));
-    _z = std::atan2(2.f * (q.x * q.y + q.z * q.s), (sqw - sqx + sqy - sqz));
+    _x = std::asin(clamp(2.f * (q.x * q.w - q.y * q.z), -1.f, 1.f));
+    _y = std::atan2(2.f * (q.x * q.z + q.y * q.w), (sqw - sqx - sqy + sqz));
+    _z = std::atan2(2.f * (q.x * q.y + q.z * q.w), (sqw - sqx + sqy - sqz));
   }
   else if (order == RotationOrder::ZXY) {
 
-    _x = std::asin(clamp(2.f * (q.x * q.s + q.y * q.z), -1.f, 1.f));
-    _y = std::atan2(2.f * (q.y * q.s - q.z * q.x), (sqw - sqx - sqy + sqz));
-    _z = std::atan2(2.f * (q.z * q.s - q.x * q.y), (sqw - sqx + sqy - sqz));
+    _x = std::asin(clamp(2.f * (q.x * q.w + q.y * q.z), -1.f, 1.f));
+    _y = std::atan2(2.f * (q.y * q.w - q.z * q.x), (sqw - sqx - sqy + sqz));
+    _z = std::atan2(2.f * (q.z * q.w - q.x * q.y), (sqw - sqx + sqy - sqz));
   }
   else if (order == RotationOrder::ZYX) {
 
-    _x = std::atan2(2.f * (q.x * q.s + q.z * q.y), (sqw - sqx - sqy + sqz));
-    _y = std::asin(clamp(2.f * (q.y * q.s - q.x * q.z), -1.f, 1.f));
-    _z = std::atan2(2.f * (q.x * q.y + q.z * q.s), (sqw + sqx - sqy - sqz));
+    _x = std::atan2(2.f * (q.x * q.w + q.z * q.y), (sqw - sqx - sqy + sqz));
+    _y = std::asin(clamp(2.f * (q.y * q.w - q.x * q.z), -1.f, 1.f));
+    _z = std::atan2(2.f * (q.x * q.y + q.z * q.w), (sqw + sqx - sqy - sqz));
   }
   else if (order == RotationOrder::YZX) {
 
-    _x = std::atan2(2.f * (q.x * q.s - q.z * q.y), (sqw - sqx + sqy - sqz));
-    _y = std::atan2(2.f * (q.y * q.s - q.x * q.z), (sqw + sqx - sqy - sqz));
-    _z = std::asin(clamp(2.f * (q.x * q.y + q.z * q.s), -1.f, 1.f));
+    _x = std::atan2(2.f * (q.x * q.w - q.z * q.y), (sqw - sqx + sqy - sqz));
+    _y = std::atan2(2.f * (q.y * q.w - q.x * q.z), (sqw + sqx - sqy - sqz));
+    _z = std::asin(clamp(2.f * (q.x * q.y + q.z * q.w), -1.f, 1.f));
   }
   else if (order == RotationOrder::XZY) {
 
-    _x = std::atan2(2.f * (q.x * q.s + q.y * q.z), (sqw - sqx + sqy - sqz));
-    _y = std::atan2(2.f * (q.x * q.z + q.y * q.s), (sqw + sqx - sqy - sqz));
-    _z = std::asin(clamp(2.f * (q.z * q.s - q.x * q.y), -1.f, 1.f));
+    _x = std::atan2(2.f * (q.x * q.w + q.y * q.z), (sqw - sqx + sqy - sqz));
+    _y = std::atan2(2.f * (q.x * q.z + q.y * q.w), (sqw + sqx - sqy - sqz));
+    _z = std::asin(clamp(2.f * (q.z * q.w - q.x * q.y), -1.f, 1.f));
   }
 
   _order = order;
@@ -323,8 +323,7 @@ Euler& Euler::setFromQuaternion(const Quat& q, const RotationOrder& order,
 
 bool Euler::equals(const Euler& euler) const
 {
-  return (floats_are_equal(euler._x, _x)
-          && floats_are_equal(euler._y, _y)
+  return (floats_are_equal(euler._x, _x) && floats_are_equal(euler._y, _y)
           && floats_are_equal(euler._z, _z) && (euler._order == _order));
 }
 

@@ -45,7 +45,7 @@ void AngularConstraint::preSolve(float /*timeStep*/, float invTimeStep)
   _relativeOrientation.invert(_b1->orientation);
   _relativeOrientation.mul(_targetOrientation, _relativeOrientation);
   _relativeOrientation.mul(_b2->orientation, _relativeOrientation);
-  inv = _relativeOrientation.s * 2.f;
+  inv = _relativeOrientation.w * 2.f;
 
   _vel.scale(_relativeOrientation, inv);
 

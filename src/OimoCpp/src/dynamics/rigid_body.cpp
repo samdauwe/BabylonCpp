@@ -302,7 +302,7 @@ void RigidBody::rotateInertia(const Mat33& rot, const Mat33& inertia,
 
 void RigidBody::syncShapes()
 {
-  float s  = orientation.s;
+  float s  = orientation.w;
   float x  = orientation.x;
   float y  = orientation.y;
   float z  = orientation.z;
@@ -376,7 +376,7 @@ void RigidBody::setPosition(const Vec3& pos)
 
 void RigidBody::setQuaternion(const Quat& q)
 {
-  newOrientation.set(q.x, q.y, q.z, q.s);
+  newOrientation.set(q.x, q.y, q.z, q.w);
   controlRot = true;
 }
 
@@ -397,7 +397,7 @@ void RigidBody::resetPosition(float x, float y, float z)
 void RigidBody::resetQuaternion(const Quat& q)
 {
   angularVelocity.set(0.f, 0.f, 0.f);
-  orientation = Quat(q.s, q.x, q.y, q.z);
+  orientation = Quat(q.x, q.y, q.z, q.w);
   awake();
 }
 

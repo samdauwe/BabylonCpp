@@ -136,6 +136,14 @@ Vec3& Vec3::addScale(const Vec3& v, float s)
   return *this;
 }
 
+Vec3& Vec3::subScale(const Vec3& v, float s)
+{
+  x -= v.x * s;
+  y -= v.y * s;
+  z -= v.z * s;
+  return *this;
+}
+
 Vec3& Vec3::scale(const Quat& q, float s)
 {
   x = q.x * s;
@@ -178,6 +186,14 @@ Vec3& Vec3::cross(const Vec3& v1, const Vec3& v2)
   return *this;
 }
 
+Vec3& Vec3::mul(const Vec3& v)
+{
+  x *= v.x;
+  y *= v.y;
+  z *= v.z;
+  return *this;
+}
+
 Vec3& Vec3::mul(const Vec3& o, const Vec3& v, const Mat33& m)
 {
   const std::array<float, 9>& te = m.elements;
@@ -196,6 +212,17 @@ Vec3& Vec3::mulMat(const Mat33 m, const Vec3& v)
   x = te[0] * v.x + te[1] * v.y + te[2] * v.z;
   y = te[3] * v.x + te[4] * v.y + te[5] * v.z;
   z = te[6] * v.x + te[7] * v.y + te[8] * v.z;
+
+  return *this;
+}
+
+Vec3& Vec3::tangent(const Vec3& a)
+{
+  const float ax = a.x, ay = a.y, az = a.z;
+
+  x = ay * ax - az * az;
+  y = -az * ay - ax * ax;
+  z = ax * az + ay * ay;
 
   return *this;
 }
@@ -234,6 +261,11 @@ float Vec3::dot(const Vec3& v) const
   return x * v.x + y * v.y + z * v.z;
 }
 
+float Vec3::addition() const
+{
+  return x + y + z;
+}
+
 float Vec3::lengthSq() const
 {
   return x * x + y * y + z * z;
@@ -252,25 +284,42 @@ Vec3& Vec3::copy(const Vec3& v)
   return *this;
 }
 
+Vec3& Vec3::applyMatrix3(const Mat33& m, bool transpose)
+{
+  const auto& e = m.elements;
+  if (transpose) {
+    x = e[0] * x + e[1] * y + e[2] * z;
+    y = e[3] * x + e[4] * y + e[5] * z;
+    z = e[6] * x + e[7] * y + e[8] * z;
+  }
+  else {
+    x = e[0] * x + e[3] * y + e[6] * z;
+    y = e[1] * x + e[4] * y + e[7] * z;
+    z = e[2] * x + e[5] * y + e[8] * z;
+  }
+
+  return *this;
+}
+
 Vec3& Vec3::applyQuaternion(const Quat& q)
 {
-  float qx = q.x;
-  float qy = q.y;
-  float qz = q.z;
-  float qs = q.s;
+  const float qx = q.x;
+  const float qy = q.y;
+  const float qz = q.z;
+  const float qw = q.w;
 
   // calculate quat * vector
 
-  float ix = qs * x + qy * z - qz * y;
-  float iy = qs * y + qz * x - qx * z;
-  float iz = qs * z + qx * y - qy * x;
-  float iw = -qx * x - qy * y - qz * z;
+  const float ix = qw * x + qy * z - qz * y;
+  const float iy = qw * y + qz * x - qx * z;
+  const float iz = qw * z + qx * y - qy * x;
+  const float iw = -qx * x - qy * y - qz * z;
 
   // calculate result * inverse quat
 
-  x = ix * qs + iw * -qx + iy * -qz - iz * -qy;
-  y = iy * qs + iw * -qy + iz * -qx - ix * -qz;
-  z = iz * qs + iw * -qz + ix * -qy - iy * -qx;
+  x = ix * qw + iw * -qx + iy * -qz - iz * -qy;
+  y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
+  z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
 
   return *this;
 }
@@ -334,6 +383,21 @@ Vec3& Vec3::divideScalar(float scalar)
 Vec3& Vec3::norm()
 {
   return divideScalar(length());
+}
+
+void Vec3::toArray(std::vector<float>& array, size_t offset) const
+{
+  array[offset]     = x;
+  array[offset + 1] = y;
+  array[offset + 2] = z;
+}
+
+Vec3& Vec3::fromArray(const std::vector<float>& array, size_t offset)
+{
+  x = array[offset];
+  y = array[offset + 1];
+  z = array[offset + 2];
+  return *this;
 }
 
 float Vec3::angleTo(const Vec3& v) const
