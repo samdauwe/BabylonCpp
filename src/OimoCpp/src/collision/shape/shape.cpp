@@ -2,6 +2,7 @@
 
 #include <oimo/collision/broadphase/aabb.h>
 #include <oimo/collision/shape/shape_config.h>
+#include <oimo/oimo_utils.h>
 
 namespace OIMO {
 
@@ -29,6 +30,11 @@ Shape::Shape(const ShapeConfig& config)
 
 Shape::~Shape()
 {
+}
+
+float Shape::volume() const
+{
+  return std::numeric_limits<float>::max();
 }
 
 void Shape::calculateMassInfo(MassInfo& /*out*/)

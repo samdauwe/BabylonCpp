@@ -5,17 +5,13 @@
 #include <oimo/collision/broadphase/aabb.h>
 #include <oimo/collision/broadphase/proxy.h>
 #include <oimo/collision/shape/mass_info.h>
-#include <oimo/collision/shape/shape_config.h>
 #include <oimo/oimo_constants.h>
 
 namespace OIMO {
 
 CylinderShape::CylinderShape(const ShapeConfig& config, float _radius,
                              float _height)
-    : Shape{config}
-    , radius{_radius}
-    , height{_height}
-    , halfHeight{height * 0.5f}
+    : Shape{config}, radius{_radius}, height{_height}, halfHeight{height * 0.5f}
 {
   type = Shape::Type::SHAPE_CYLINDER;
 }

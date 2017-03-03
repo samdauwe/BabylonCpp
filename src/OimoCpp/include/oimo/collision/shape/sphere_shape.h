@@ -17,6 +17,7 @@ public:
   SphereShape(const ShapeConfig& config, float radius);
   ~SphereShape();
 
+  float volume() const override;
   void calculateMassInfo(MassInfo& out) override;
   void updateProxy() override;
 

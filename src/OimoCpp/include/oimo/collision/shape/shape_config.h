@@ -16,7 +16,7 @@ struct ShapeConfig {
   // The rotation matrix of the shape in parent's coordinate system.
   Mat33 relativeRotation;
   // The coefficient of friction of the shape.
-  float friction = 0.4f;
+  float friction = 0.2f;
   // The coefficient of restitution of the shape.
   float restitution = 0.2f;
   // The density of the shape.

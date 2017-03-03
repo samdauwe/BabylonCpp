@@ -29,12 +29,19 @@ public:
     SHAPE_CYLINDER = 2,
     SHAPE_TETRA    = 3,
     SHAPE_POLYGON  = 4,
-    SHAPE_NULL     = 5
+    SHAPE_PARTICLE = 5,
+    SHAPE_PLANE    = 6,
+    SHAPE_NULL     = 50
   }; // end of enum class Type
 
 public:
   Shape(const ShapeConfig& config);
   virtual ~Shape();
+
+  /**
+   * Calculate the volume of the shape.
+   */
+  virtual float volume() const;
 
   /**
    * Calculate the mass information of the shape.

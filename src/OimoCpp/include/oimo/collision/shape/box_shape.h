@@ -3,8 +3,6 @@
 
 #include <oimo/collision/shape/shape.h>
 
-#include <array>
-
 namespace OIMO {
 
 struct MassInfo;

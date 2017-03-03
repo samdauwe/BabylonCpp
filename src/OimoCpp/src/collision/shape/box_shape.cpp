@@ -3,7 +3,6 @@
 #include <oimo/collision/broadphase/aabb.h>
 #include <oimo/collision/broadphase/proxy.h>
 #include <oimo/collision/shape/mass_info.h>
-#include <oimo/collision/shape/shape_config.h>
 
 namespace OIMO {
 
