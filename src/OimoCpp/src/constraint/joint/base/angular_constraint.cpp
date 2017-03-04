@@ -28,10 +28,7 @@ void AngularConstraint::preSolve(float /*timeStep*/, float invTimeStep)
   _ii1 = _i1.clone();
   _ii2 = _i2.clone();
 
-  Mat33 mtx;
-  mtx.add(_ii1, _ii2);
-  const std::array<float, 9>& v = mtx.elements;
-
+  std::array<float, 9> v = Mat33().add(_ii1, _ii2).elements;
   inv = 1.f / (v[0] * (v[4] * v[8] - v[7] * v[5])
                + v[3] * (v[7] * v[2] - v[1] * v[8])
                + v[6] * (v[1] * v[5] - v[4] * v[2]));
@@ -40,11 +37,12 @@ void AngularConstraint::preSolve(float /*timeStep*/, float invTimeStep)
               v[0] * v[8] - v[2] * v[6], v[2] * v[3] - v[0] * v[5],
               v[3] * v[7] - v[4] * v[6], v[1] * v[6] - v[0] * v[7],
               v[0] * v[4] - v[1] * v[3]);
-  _dd.multiply(inv);
+  _dd.multiplyScalar(inv);
 
-  _relativeOrientation.invert(_b1->orientation);
-  _relativeOrientation.mul(_targetOrientation, _relativeOrientation);
-  _relativeOrientation.mul(_b2->orientation, _relativeOrientation);
+  _relativeOrientation.invert(_b1->orientation)
+    .multiply(_targetOrientation)
+    .multiply(_b2->orientation);
+
   inv = _relativeOrientation.w * 2.f;
 
   _vel.scale(_relativeOrientation, inv);
@@ -53,28 +51,30 @@ void AngularConstraint::preSolve(float /*timeStep*/, float invTimeStep)
 
   if (len > 0.02f) {
     len = (0.02f - len) / len * invTimeStep * 0.05f;
-    _vel.scaleEqual(len);
+    _vel.multiplyScalar(len);
   }
   else {
-    _vel.init();
+    _vel.set(0.f, 0.f, 0.f);
   }
 
-  _rn1.mulMat(_ii1, _imp);
-  _rn2.mulMat(_ii2, _imp);
+  _rn1.copy(_imp).applyMatrix3(_ii1, true);
+  _rn2.copy(_imp).applyMatrix3(_ii2, true);
 
-  _a1.addEqual(_rn1);
-  _a2.subEqual(_rn2);
+  _a1.add(_rn1);
+  _a2.sub(_rn2);
 }
 
 void AngularConstraint::solve()
 {
-  Vec3 r = _a2.clone().subEqual(_a1).subEqual(_vel);
-  _rn0.mulMat(_dd, r);
-  _rn1.mulMat(_ii1, _rn0);
-  _rn2.mulMat(_ii2, _rn0);
-  _imp.addEqual(_rn0);
-  _a1.addEqual(_rn1);
-  _a2.subEqual(_rn2);
+  Vec3 r = _a2.clone().sub(_a1).sub(_vel);
+
+  _rn0.copy(r).applyMatrix3(_dd, true);
+  _rn1.copy(_rn0).applyMatrix3(_ii1, true);
+  _rn2.copy(_rn0).applyMatrix3(_ii2, true);
+
+  _imp.add(_rn0);
+  _a1.add(_rn1);
+  _a2.sub(_rn2);
 }
 
 } // end of namespace OIMO

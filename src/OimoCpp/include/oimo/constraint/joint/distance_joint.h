@@ -4,6 +4,7 @@
 #include <oimo/constraint/joint/joint.h>
 #include <oimo/constraint/joint/joint_config.h>
 #include <oimo/math/vec3.h>
+#include <oimo/oimo_utils.h>
 
 namespace OIMO {
 
@@ -26,10 +27,9 @@ public:
   void postSolve() override;
 
 private:
-  Vec3 _normal;
-  Vec3 _nr;
-  TranslationalConstraint* _t;
-  LimitMotor* _limitMotor;
+  Vec3 _nor;
+  std::unique_ptr<TranslationalConstraint> _t;
+  std::unique_ptr<LimitMotor> _limitMotor;
 
 }; // end of class DistanceJoint
 

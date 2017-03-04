@@ -3,6 +3,7 @@
 namespace OIMO {
 
 Constraint::Constraint()
+    : parent{nullptr}, body1{nullptr}, body2{nullptr}, addedToIsland{false}
 {
 }
 

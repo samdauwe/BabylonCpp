@@ -4,6 +4,7 @@
 #include <oimo/constraint/joint/joint.h>
 #include <oimo/constraint/joint/joint_config.h>
 #include <oimo/math/vec3.h>
+#include <oimo/oimo_utils.h>
 
 namespace OIMO {
 
@@ -27,9 +28,6 @@ public:
   void postSolve() override;
 
 private:
-  float _acosClamp(float cos) const;
-
-private:
   // The axis in the first body's coordinate system.
   Vec3 _localAxis1;
   // The axis in the second body's coordinate system.
@@ -43,9 +41,9 @@ private:
   Vec3 _bin;
   Vec3 _ax1, _ax2;
   Vec3 _an1, _an2;
-  LimitMotor* _limitMotor;
-  LinearConstraint* _lc;
-  Rotational3Constraint* _r3;
+  std::unique_ptr<LimitMotor> _limitMotor, _limitMotorTan, _limitMotorBin;
+  std::unique_ptr<LinearConstraint> _lc;
+  std::unique_ptr<Rotational3Constraint> _r3;
 
 }; // end of class HingeJoint
 

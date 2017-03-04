@@ -6,10 +6,11 @@ namespace OIMO {
 
 BallAndSocketJoint::BallAndSocketJoint(const JointConfig& config)
     : Joint{config}
-    , _lc{new LinearConstraint(this)}
 {
   // Set joint type
   type = Joint::Type::JOINT_BALL_AND_SOCKET;
+
+  _lc = make_unique<LinearConstraint>(this);
 }
 
 BallAndSocketJoint::~BallAndSocketJoint()
@@ -19,6 +20,9 @@ BallAndSocketJoint::~BallAndSocketJoint()
 void BallAndSocketJoint::preSolve(float timeStep, float invTimeStep)
 {
   updateAnchorPoints();
+
+  // preSolve
+
   _lc->preSolve(timeStep, invTimeStep);
 }
 

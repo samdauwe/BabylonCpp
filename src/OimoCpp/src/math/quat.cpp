@@ -96,7 +96,7 @@ Quat& Quat::setFromEuler(float x, float y, float z)
 
 Quat& Quat::setFromAxis(Vec3& axis, float rad)
 {
-  axis.norm();
+  axis.normalize();
   rad     = rad * 0.5f;
   float s = std::sin(rad);
   x       = s * axis.x;
@@ -217,6 +217,16 @@ Quat& Quat::mul(const Quat& a, const Quat& b)
   return *this;
 }
 
+Quat& Quat::multiply(const Quat& a)
+{
+  return mul(a);
+}
+
+Quat& Quat::multiplyQuaternions(const Quat& a, const Quat& b)
+{
+  return mul(a, b);
+}
+
 Quat& Quat::setFromUnitVectors(const Vec3& v1, const Vec3& v2)
 {
   Vec3 vx;
@@ -232,7 +242,7 @@ Quat& Quat::setFromUnitVectors(const Vec3& v1, const Vec3& v2)
     }
   }
   else {
-    vx.cross(v1, v2);
+    vx.crossVectors(v1, v2);
   }
 
   x = vx.x;

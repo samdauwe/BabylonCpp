@@ -4,6 +4,7 @@
 #include <oimo/constraint/joint/joint.h>
 #include <oimo/constraint/joint/joint_config.h>
 #include <oimo/math/vec3.h>
+#include <oimo/oimo_utils.h>
 
 namespace OIMO {
 
@@ -28,35 +29,24 @@ public:
   void postSolve() override;
 
 private:
-  float _acosClamp(float cos) const;
-
-private:
   // The first axis in local coordinate system.
   Vec3 _localAxis1;
   // The second axis in local coordinate system.
   Vec3 _localAxis2;
-  float _localAxis1X;
-  float _localAxis1Y;
-  float _localAxis1Z;
-  float _localAngAxis1X;
-  float _localAngAxis1Y;
-  float _localAngAxis1Z;
-  float _localAxis2X;
-  float _localAxis2Y;
-  float _localAxis2Z;
-  // make angle axis 2
-  float _localAngAxis2X;
-  float _localAngAxis2Y;
-  float _localAngAxis2Z;
-  Vec3 _nor;
-  Vec3 _tan;
-  Vec3 _bin;
+  Vec3 _localAngle1, _localAngle2;
+  Vec3 _ax1, _ax2;
+  Vec3 _an1, _an2;
+  Vec3 _tmp, _nor, _tan, _bin;
   // The limit and motor for the rotation
-  LimitMotor* _rotationalLimitMotor;
-  Rotational3Constraint* _r3;
+  std::unique_ptr<LimitMotor> _rotationalLimitMotor;
+  std::unique_ptr<LimitMotor> _rotationalLimitMotorTan;
+  std::unique_ptr<LimitMotor> _rotationalLimitMotorBin;
+  std::unique_ptr<Rotational3Constraint> _r3;
   // The limit and motor for the translation.
-  LimitMotor* _translationalLimitMotor;
-  Translational3Constraint* _t3;
+  std::unique_ptr<LimitMotor> _translationalLimitMotor;
+  std::unique_ptr<LimitMotor> _translationalLimitMotorTan;
+  std::unique_ptr<LimitMotor> _translationalLimitMotorBin;
+  std::unique_ptr<Translational3Constraint> _t3;
 
 }; // end of class SliderJoint
 

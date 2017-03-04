@@ -33,6 +33,8 @@ public:
   Quat& scale(const Quat& q, float s);
   Quat& mul(const Quat& a);
   Quat& mul(const Quat& a, const Quat& b);
+  Quat& multiply(const Quat& a);
+  Quat& multiplyQuaternions(const Quat& a, const Quat& b);
   Quat& setFromUnitVectors(const Vec3& v1, const Vec3& v2);
   Quat& arc(const Vec3& v1, const Vec3& v2);
   Quat& normalize();

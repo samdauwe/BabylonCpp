@@ -29,6 +29,7 @@ public:
   Vec3& add(const Vec3& v1, const Vec3& v2);
   Vec3& addEqual(const Vec3& v);
   Vec3& addTime(const Vec3& v, float t);
+  Vec3& sub(const Vec3& v);
   Vec3& sub(const Vec3& v1, const Vec3& v2);
   Vec3& subEqual(const Vec3& v);
   Vec3& addScale(const Vec3& v, float s);
@@ -37,7 +38,7 @@ public:
   Vec3& scale(const Vec3& v, float s);
   Vec3& scaleEqual(float s);
   Vec3& cross(const Vec3& v);
-  Vec3& cross(const Vec3& v1, const Vec3& v2);
+  Vec3& crossVectors(const Vec3& v1, const Vec3& v2);
   Vec3& mul(const Vec3& v);
   Vec3& mul(const Vec3& o, const Vec3& v, const Mat33& m);
   Vec3& mulMat(const Mat33 m, const Vec3& v);
@@ -58,7 +59,7 @@ public:
   std::string toString() const;
   Vec3& multiplyScalar(float scalar);
   Vec3& divideScalar(float scalar);
-  Vec3& norm();
+  Vec3& normalize();
   void toArray(std::vector<float>& array, size_t offset = 0) const;
   Vec3& fromArray(const std::vector<float>& array, size_t offset = 0);
   float angleTo(const Vec3& v) const;

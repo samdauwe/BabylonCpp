@@ -56,7 +56,7 @@ Vec3 RayCollisionDetector::_triangleIntersect(const Vec3& origin,
 
   edge1.sub(b, a);
   edge2.sub(c, a);
-  normal.cross(edge1, edge2);
+  normal.crossVectors(edge1, edge2);
 
   DdN = direction.dot(normal);
   if (DdN > 0.f) {
@@ -76,7 +76,7 @@ Vec3 RayCollisionDetector::_triangleIntersect(const Vec3& origin,
   }
 
   diff.sub(origin, a);
-  float DdQxE2 = sign * direction.dot(edge2.cross(diff, edge2));
+  float DdQxE2 = sign * direction.dot(edge2.crossVectors(diff, edge2));
 
   // b1 < 0, no intersection
   if (DdQxE2 < 0.f) {

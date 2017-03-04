@@ -112,6 +112,11 @@ Vec3& Vec3::addTime(const Vec3& v, float t)
   return *this;
 }
 
+Vec3& Vec3::sub(const Vec3& v)
+{
+  return subEqual(v);
+}
+
 Vec3& Vec3::sub(const Vec3& v1, const Vec3& v2)
 {
   x = v1.x - v2.x;
@@ -178,7 +183,7 @@ Vec3& Vec3::cross(const Vec3& v)
   return *this;
 }
 
-Vec3& Vec3::cross(const Vec3& v1, const Vec3& v2)
+Vec3& Vec3::crossVectors(const Vec3& v1, const Vec3& v2)
 {
   x = v1.y * v2.z - v1.z * v2.y;
   y = v1.z * v2.x - v1.x * v2.z;
@@ -380,7 +385,7 @@ Vec3& Vec3::divideScalar(float scalar)
   return multiplyScalar(1 / scalar);
 }
 
-Vec3& Vec3::norm()
+Vec3& Vec3::normalize()
 {
   return divideScalar(length());
 }

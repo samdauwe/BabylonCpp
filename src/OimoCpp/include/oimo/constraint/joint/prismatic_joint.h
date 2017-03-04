@@ -4,6 +4,7 @@
 #include <oimo/constraint/joint/joint.h>
 #include <oimo/constraint/joint/joint_config.h>
 #include <oimo/math/vec3.h>
+#include <oimo/oimo_utils.h>
 
 namespace OIMO {
 
@@ -31,19 +32,14 @@ private:
   Vec3 _localAxis1;
   // The axis in the second body's coordinate system.
   Vec3 _localAxis2;
-  float _localAxis1X;
-  float _localAxis1Y;
-  float _localAxis1Z;
-  float _localAxis2X;
-  float _localAxis2Y;
-  float _localAxis2Z;
-  Vec3 _nor;
-  Vec3 _tan;
-  Vec3 _bin;
+  Vec3 _ax1, _ax2;
+  Vec3 _nor, _tan, _bin;
   // The translational limit and motor information of the joint.
-  LimitMotor* _limitMotor;
-  AngularConstraint* _ac;
-  Translational3Constraint* _t3;
+  std::unique_ptr<LimitMotor> _limitMotor;
+  std::unique_ptr<LimitMotor> _limitMotorTan;
+  std::unique_ptr<LimitMotor> _limitMotorBin;
+  std::unique_ptr<AngularConstraint> _ac;
+  std::unique_ptr<Translational3Constraint> _t3;
 
 }; // end of class PrismaticJoint
 

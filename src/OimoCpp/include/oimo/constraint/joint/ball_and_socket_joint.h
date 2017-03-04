@@ -3,6 +3,7 @@
 
 #include <oimo/constraint/joint/joint.h>
 #include <oimo/constraint/joint/joint_config.h>
+#include <oimo/oimo_utils.h>
 
 namespace OIMO {
 
@@ -23,7 +24,7 @@ public:
   void postSolve() override;
 
 private:
-  LinearConstraint* _lc;
+  std::unique_ptr<LinearConstraint> _lc;
 
 }; // end of class BallAndSocketJoint
 

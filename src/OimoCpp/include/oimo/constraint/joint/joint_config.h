@@ -12,6 +12,9 @@ class RigidBody;
  * joint. Joint configurations can be reused safely.
  */
 struct JointConfig {
+  // Scale
+  float scale    = 1.f;
+  float invScale = 1.f;
   // The first rigid body of the joint.
   RigidBody* body1 = nullptr;
   // The second rigid body of the joint.

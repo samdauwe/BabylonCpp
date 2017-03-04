@@ -342,7 +342,9 @@ void RigidBody::applyImpulse(const Vec3& _position, const Vec3& force)
 {
   linearVelocity.addScale(force, inverseMass);
   Vec3 rel;
-  rel.sub(_position, _position).cross(rel, force).mulMat(inverseInertia, rel);
+  rel.sub(_position, _position)
+    .crossVectors(rel, force)
+    .mulMat(inverseInertia, rel);
   angularVelocity.addEqual(rel);
 }
 

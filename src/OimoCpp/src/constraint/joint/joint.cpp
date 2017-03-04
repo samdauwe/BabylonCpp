@@ -9,6 +9,8 @@ namespace OIMO {
 
 Joint::Joint(const JointConfig& config)
     : Constraint{}
+    , scale{1.f}
+    , invScale{1.f}
     , name{""}
     , type{Type::JOINT_NULL}
     , prev{nullptr}
@@ -18,8 +20,8 @@ Joint::Joint(const JointConfig& config)
     , localAnchorPoint1{Vec3().copy(config.localAnchorPoint1)}
     , localAnchorPoint2{Vec3().copy(config.localAnchorPoint2)}
     , allowCollision{config.allowCollision}
-    , b1Link{new JointLink(this)}
-    , b2Link{new JointLink(this)}
+    , b1Link{make_unique<JointLink>(this)}
+    , b2Link{make_unique<JointLink>(this)}
 {
 }
 
@@ -29,70 +31,81 @@ Joint::~Joint()
 
 void Joint::updateAnchorPoints()
 {
-  relativeAnchorPoint1.mulMat(body1->rotation, localAnchorPoint1);
-  relativeAnchorPoint2.mulMat(body2->rotation, localAnchorPoint2);
+  relativeAnchorPoint1.copy(localAnchorPoint1)
+    .applyMatrix3(body1->rotation, true);
+  relativeAnchorPoint2.copy(localAnchorPoint2)
+    .applyMatrix3(body2->rotation, true);
 
   anchorPoint1.add(relativeAnchorPoint1, body1->position);
   anchorPoint2.add(relativeAnchorPoint2, body2->position);
 }
 
-void Joint::attach()
+void Joint::attach(bool isX)
 {
   b1Link->body = body2;
   b2Link->body = body1;
-  if (body1->jointLink != nullptr) {
-    b1Link->next       = body1->jointLink;
-    b1Link->next->prev = b1Link;
+
+  if (isX) {
   }
   else {
-    b1Link->next = nullptr;
+    if (body1->jointLink != nullptr) {
+      b1Link->next       = body1->jointLink;
+      b1Link->next->prev = b1Link.get();
+    }
+    else {
+      b1Link->next = nullptr;
+    }
+    body1->jointLink = b1Link.get();
+    ++body1->numJoints;
+    if (body2->jointLink != nullptr) {
+      b2Link->next       = body2->jointLink;
+      b2Link->next->prev = b2Link.get();
+    }
+    else {
+      b2Link->next = nullptr;
+    }
+    body2->jointLink = b2Link.get();
+    ++body2->numJoints;
   }
-  body1->jointLink = b1Link;
-  ++body1->numJoints;
-  if (body2->jointLink != nullptr) {
-    b2Link->next       = body2->jointLink;
-    b2Link->next->prev = b2Link;
-  }
-  else {
-    b2Link->next = nullptr;
-  }
-  body2->jointLink = b2Link;
-  ++body2->numJoints;
 }
 
-void Joint::detach()
+void Joint::detach(bool isX)
 {
-  JointLink* _prev = b1Link->prev;
-  JointLink* _next = b1Link->next;
-  if (_prev != nullptr) {
-    _prev->next = _next;
+  if (isX) {
   }
-  if (_next != nullptr) {
-    _next->prev = _prev;
-  }
-  if (body1->jointLink == b1Link) {
-    body1->jointLink = _next;
-  }
-  b1Link->prev = nullptr;
-  b1Link->next = nullptr;
-  b1Link->body = nullptr;
-  --body1->numJoints;
+  else {
+    JointLink* _prev = b1Link->prev;
+    JointLink* _next = b1Link->next;
+    if (_prev != nullptr) {
+      _prev->next = _next;
+    }
+    if (_next != nullptr) {
+      _next->prev = _prev;
+    }
+    if (body1->jointLink == b1Link.get()) {
+      body1->jointLink = _next;
+    }
+    b1Link->prev = nullptr;
+    b1Link->next = nullptr;
+    b1Link->body = nullptr;
+    --body1->numJoints;
 
-  _prev = b2Link->prev;
-  _next = b2Link->next;
-  if (_prev != nullptr) {
-    _prev->next = _next;
+    _prev = b2Link->prev;
+    _next = b2Link->next;
+    if (_prev != nullptr) {
+      _prev->next = _next;
+    }
+    if (_next != nullptr) {
+      _next->prev = _prev;
+    }
+    if (body2->jointLink == b2Link.get()) {
+      body2->jointLink = _next;
+    }
+    b2Link->prev = nullptr;
+    b2Link->next = nullptr;
+    b2Link->body = nullptr;
+    --body2->numJoints;
   }
-  if (_next != nullptr) {
-    _next->prev = _prev;
-  }
-  if (body2->jointLink == b2Link) {
-    body2->jointLink = _next;
-  }
-  b2Link->prev = nullptr;
-  b2Link->next = nullptr;
-  b2Link->body = nullptr;
-  --body2->numJoints;
 
   b1Link->body = nullptr;
   b2Link->body = nullptr;
@@ -104,8 +117,14 @@ void Joint::awake()
   body2->awake();
 }
 
+void Joint::remove()
+{
+  dispose();
+}
+
 void Joint::dispose()
 {
+  // parent->removeJoint(this);
 }
 
 std::pair<Vec3, Vec3> Joint::getPosition() const

@@ -133,8 +133,7 @@ void LinearConstraint::preSolve(float /*timeStep*/, float invTimeStep)
               k[1] * k[5] - k[2] * k[4], k[5] * k[6] - k[3] * k[8],
               k[0] * k[8] - k[2] * k[6], k[2] * k[3] - k[0] * k[5],
               k[3] * k[7] - k[4] * k[6], k[1] * k[6] - k[0] * k[7],
-              k[0] * k[4] - k[1] * k[3]);
-  _dd.multiply(inv);
+              k[0] * k[4] - k[1] * k[3]).scaleEqual( inv );
 
   _velx     = _p2.x - _p1.x;
   _vely     = _p2.y - _p1.y;

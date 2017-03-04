@@ -7,6 +7,7 @@
 #include <oimo/constraint/constraint.h>
 #include <oimo/math/mat44.h>
 #include <oimo/math/vec3.h>
+#include <oimo/oimo_utils.h>
 
 namespace OIMO {
 
@@ -43,17 +44,24 @@ public:
   /**
    * Attach the joint to the bodies.
    */
-  void attach();
+  void attach(bool isX = false);
 
   /**
    * Detach the joint from the bodies.
    */
-  void detach();
+  void detach(bool isX = false);
 
   /**
-   * Awake the bodies.
-   */
+     * Cleanup.
+     */
   void awake();
+
+  /** Delete process **/
+
+  /**
+   * Cleanup.
+   */
+  void remove();
 
   /**
    * Cleanup.
@@ -65,6 +73,8 @@ public:
   Mat33 getMatrix() const;
 
 public:
+  // Scale
+  float scale, invScale;
   // joint name
   std::string name;
   // The type of the joint.
@@ -90,7 +100,8 @@ public:
   Vec3 anchorPoint2;
   //  Whether allow collision between connected rigid bodies or not.
   bool allowCollision;
-  JointLink *b1Link, *b2Link;
+  std::unique_ptr<JointLink> b1Link;
+  std::unique_ptr<JointLink> b2Link;
   Mat44 matrix;
 
 }; // end of class Joint

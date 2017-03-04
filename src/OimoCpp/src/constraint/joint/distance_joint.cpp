@@ -12,10 +12,10 @@ DistanceJoint::DistanceJoint(const JointConfig& config, float minDistance,
   // Set joint type
   type = Joint::Type::JOINT_DISTANCE;
   // The limit and motor information of the joint.
-  _limitMotor             = new LimitMotor(_normal, true);
+  _limitMotor             = make_unique<LimitMotor>(_nor, true);
   _limitMotor->lowerLimit = minDistance;
   _limitMotor->upperLimit = maxDistance;
-  _t                      = new TranslationalConstraint(this, _limitMotor);
+  _t = make_unique<TranslationalConstraint>(this, _limitMotor.get());
 }
 
 DistanceJoint::~DistanceJoint()
@@ -25,8 +25,11 @@ DistanceJoint::~DistanceJoint()
 void DistanceJoint::preSolve(float timeStep, float invTimeStep)
 {
   updateAnchorPoints();
-  _nr.sub(anchorPoint2, anchorPoint1);
-  _normal.normalize(_nr);
+
+  _nor.sub(anchorPoint2, anchorPoint1).normalize();
+
+  // preSolve
+
   _t->preSolve(timeStep, invTimeStep);
 }
 
