@@ -20,14 +20,24 @@ public:
   ~ContactManifold();
 
   /**
-   * Reset the manifold.
+   * @brief Reset the manifold.
    * @param   shape1
    * @param   shape2
    */
   void reset(Shape* shape1, Shape* shape2);
 
   /**
-   * Add a point into this manifold.
+   * @brief Add a point into this manifold.
+   * @param pos
+   * @param norm
+   * @param penetration
+   * @param flip
+   */
+  void addPointVec(const Vec3& pos, const Vec3& norm, bool penetration,
+                   bool flip);
+
+  /**
+   * @brief Add a point into this manifold.
    * @param   x
    * @param   y
    * @param   z

@@ -5,6 +5,7 @@
 
 #include <oimo/constraint/contact/impulse_data_buffer.h>
 #include <oimo/constraint/contact/manifold_point.h>
+#include <oimo/oimo_utils.h>
 
 namespace OIMO {
 
@@ -67,13 +68,16 @@ public:
   CollisionDetector* detector;
   // Whether the shapes are touching or not.
   bool touching;
+  // Shapes is very close and touching
+  bool close;
+  float dist;
   // Contact links
-  ContactLink *b1Link, *b2Link;
-  ContactLink *s1Link, *s2Link;
+  std::unique_ptr<ContactLink> b1Link, b2Link;
+  std::unique_ptr<ContactLink> s1Link, s2Link;
   // The contact manifold of the contact.
-  ContactManifold* manifold;
+  std::unique_ptr<ContactManifold> manifold;
   // The contact constraint of the contact.
-  ContactConstraint* constraint;
+  std::unique_ptr<ContactConstraint> constraint;
   std::array<ManifoldPoint, 4> points;
   std::array<ImpulseDataBuffer, 4> buffer;
 

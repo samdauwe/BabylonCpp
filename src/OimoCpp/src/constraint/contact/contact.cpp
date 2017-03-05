@@ -22,12 +22,14 @@ Contact::Contact()
     , sleeping{false}
     , detector{nullptr}
     , touching{false}
-    , b1Link{new ContactLink(this)}
-    , b2Link{new ContactLink(this)}
-    , s1Link{new ContactLink(this)}
-    , s2Link{new ContactLink(this)}
-    , manifold{new ContactManifold()}
-    , constraint{new ContactConstraint(manifold)}
+    , close{false}
+    , dist{std::numeric_limits<float>::infinity()}
+    , b1Link{make_unique<ContactLink>(this)}
+    , b2Link{make_unique<ContactLink>(this)}
+    , s1Link{make_unique<ContactLink>(this)}
+    , s2Link{make_unique<ContactLink>(this)}
+    , manifold{make_unique<ContactManifold>()}
+    , constraint{make_unique<ContactConstraint>(manifold.get())}
 {
   points = manifold->points;
 }
@@ -52,37 +54,44 @@ void Contact::updateManifold()
     = Contact::MixRestitution(shape1->restitution, shape2->restitution);
   constraint->friction
     = Contact::MixFriction(shape1->friction, shape2->friction);
-  unsigned int numBuffers = manifold->numPoints;
-  for (unsigned int i = numBuffers + 1; i > 0; --i) {
-    ImpulseDataBuffer& b = buffer[i - 1];
-    ManifoldPoint& p     = points[i - 1];
-    b.lp1X               = p.localPoint1.x;
-    b.lp1Y               = p.localPoint1.y;
-    b.lp1Z               = p.localPoint1.z;
-    b.lp2X               = p.localPoint2.x;
-    b.lp2Y               = p.localPoint2.y;
-    b.lp2Z               = p.localPoint2.z;
-    b.impulse            = p.normalImpulse;
+  auto numBuffers = manifold->numPoints;
+  for (unsigned int i = numBuffers; i-- > 0;) {
+    auto& b   = buffer[i];
+    auto& p   = points[i];
+    b.lp1X    = p.localPoint1.x;
+    b.lp1Y    = p.localPoint1.y;
+    b.lp1Z    = p.localPoint1.z;
+    b.lp2X    = p.localPoint2.x;
+    b.lp2Y    = p.localPoint2.y;
+    b.lp2Z    = p.localPoint2.z;
+    b.impulse = p.normalImpulse;
   }
   manifold->numPoints = 0;
-  detector->detectCollision(shape1, shape2, manifold);
-  unsigned int num = manifold->numPoints;
+  detector->detectCollision(shape1, shape2, manifold.get());
+  auto num = manifold->numPoints;
   if (num == 0) {
     touching = false;
+    close    = false;
+    dist     = std::numeric_limits<float>::infinity();
     return;
   }
+
+  if (touching || dist < 0.001f) {
+    close = true;
+  }
   touching = true;
-  for (unsigned int i = num + 1; i > 0; --i) {
-    ManifoldPoint& p  = points[i - 1];
-    float lp1x        = p.localPoint1.x;
-    float lp1y        = p.localPoint1.y;
-    float lp1z        = p.localPoint1.z;
-    float lp2x        = p.localPoint2.x;
-    float lp2y        = p.localPoint2.y;
-    float lp2z        = p.localPoint2.z;
-    int index         = -1;
-    float minDistance = 0.0004f;
-    for (int j = static_cast<int>(numBuffers); j >= 0; --j) {
+  for (unsigned int i = num; i-- > 0;) {
+    auto& p            = points[i];
+    float lp1x         = p.localPoint1.x;
+    float lp1y         = p.localPoint1.y;
+    float lp1z         = p.localPoint1.z;
+    float lp2x         = p.localPoint2.x;
+    float lp2y         = p.localPoint2.y;
+    float lp2z         = p.localPoint2.z;
+    bool indexSet      = false;
+    unsigned int index = 0;
+    float minDistance  = 0.0004f;
+    for (unsigned int j = numBuffers; j-- > 0;) {
       ImpulseDataBuffer& b = buffer[j];
       float dx             = b.lp1X - lp1x;
       float dy             = b.lp1Y - lp1y;
@@ -96,21 +105,23 @@ void Contact::updateManifold()
         if (distance1 < minDistance) {
           minDistance = distance1;
           index       = j;
+          indexSet    = true;
         }
       }
       else {
         if (distance2 < minDistance) {
           minDistance = distance2;
           index       = j;
+          indexSet    = true;
         }
       }
     }
-    if (index != -1) {
-      ImpulseDataBuffer& tmp = buffer[index];
-      buffer[index]          = buffer[--numBuffers];
-      buffer[numBuffers]     = tmp;
-      p.normalImpulse        = tmp.impulse;
-      p.warmStarted          = true;
+    if (indexSet) {
+      auto& tmp          = buffer[index];
+      buffer[index]      = buffer[--numBuffers];
+      buffer[numBuffers] = tmp;
+      p.normalImpulse    = tmp.impulse;
+      p.warmStarted      = true;
     }
     else {
       p.normalImpulse = 0;
@@ -139,22 +150,22 @@ void Contact::attach(Shape* _shape1, Shape* _shape2)
 
   if (shape1->contactLink != nullptr) {
     s1Link->next       = _shape1->contactLink;
-    s1Link->next->prev = s1Link;
+    s1Link->next->prev = s1Link.get();
   }
   else {
     s1Link->next = nullptr;
   }
-  _shape1->contactLink = s1Link;
+  _shape1->contactLink = s1Link.get();
   ++_shape1->numContacts;
 
   if (shape2->contactLink != nullptr) {
     s2Link->next       = _shape2->contactLink;
-    s2Link->next->prev = s2Link;
+    s2Link->next->prev = s2Link.get();
   }
   else {
     s2Link->next = nullptr;
   }
-  _shape2->contactLink = s2Link;
+  _shape2->contactLink = s2Link.get();
   ++_shape2->numContacts;
 
   b1Link->shape = _shape2;
@@ -164,23 +175,23 @@ void Contact::attach(Shape* _shape1, Shape* _shape2)
 
   if (body1->contactLink != nullptr) {
     b1Link->next       = body1->contactLink;
-    b1Link->next->prev = b1Link;
+    b1Link->next->prev = b1Link.get();
   }
   else {
     b1Link->next = nullptr;
   }
-  body1->contactLink = b1Link;
+  body1->contactLink = b1Link.get();
   ++body1->numContacts;
 
   if (body2->contactLink != nullptr) {
     b2Link->next       = body2->contactLink;
-    b2Link->next->prev = b2Link;
+    b2Link->next->prev = b2Link.get();
   }
   else {
     b2Link->next = nullptr;
   }
-  body2->contactLink = b2Link;
-  body2->numContacts++;
+  body2->contactLink = b2Link.get();
+  ++body2->numContacts;
 
   prev = nullptr;
   next = nullptr;
@@ -192,22 +203,22 @@ void Contact::attach(Shape* _shape1, Shape* _shape2)
 
 void Contact::detach()
 {
-  ContactLink* _prev = s1Link->prev;
-  ContactLink* _next = s1Link->next;
+  auto _prev = s1Link->prev;
+  auto _next = s1Link->next;
   if (_prev != nullptr) {
     _prev->next = _next;
   }
   if (_next != nullptr) {
     _next->prev = _prev;
   }
-  if (shape1->contactLink == s1Link) {
+  if (shape1->contactLink == s1Link.get()) {
     shape1->contactLink = _next;
   }
   s1Link->prev  = nullptr;
   s1Link->next  = nullptr;
   s1Link->shape = nullptr;
   s1Link->body  = nullptr;
-  shape1->numContacts--;
+  --shape1->numContacts;
 
   _prev = s2Link->prev;
   _next = s2Link->next;
@@ -217,14 +228,14 @@ void Contact::detach()
   if (_next != nullptr) {
     _next->prev = _prev;
   }
-  if (shape2->contactLink == s2Link) {
+  if (shape2->contactLink == s2Link.get()) {
     shape2->contactLink = _next;
   }
   s2Link->prev  = nullptr;
   s2Link->next  = nullptr;
   s2Link->shape = nullptr;
   s2Link->body  = nullptr;
-  shape2->numContacts--;
+  --shape2->numContacts;
 
   _prev = b1Link->prev;
   _next = b1Link->next;
@@ -234,7 +245,7 @@ void Contact::detach()
   if (_next != nullptr) {
     _next->prev = _prev;
   }
-  if (body1->contactLink == b1Link) {
+  if (body1->contactLink == b1Link.get()) {
     body1->contactLink = _next;
   }
   b1Link->prev  = nullptr;
@@ -251,7 +262,7 @@ void Contact::detach()
   if (_next != nullptr) {
     _next->prev = _prev;
   }
-  if (body2->contactLink == b2Link) {
+  if (body2->contactLink == b2Link.get()) {
     body2->contactLink = _next;
   }
   b2Link->prev  = nullptr;

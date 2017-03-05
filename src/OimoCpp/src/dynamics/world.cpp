@@ -313,12 +313,12 @@ bool World::callSleep(RigidBody* body)
 
 void World::step()
 {
-  //std::time_t time0 = 0, time1 = 0, time2 = 0, time3 = 0;
+  // std::time_t time0 = 0, time1 = 0, time2 = 0, time3 = 0;
 
   bool stat = !isNoStat ? true : false;
 
   if (stat) {
-    //time0 = highres_time_now();
+    // time0 = highres_time_now();
   }
 
   RigidBody* body = rigidBodies;
@@ -342,7 +342,7 @@ void World::step()
 
   // broad phase
   if (stat) {
-    //time1 = highres_time_now();
+    // time1 = highres_time_now();
   }
 
   broadPhase->detectPairs();
@@ -385,8 +385,8 @@ void World::step()
   }
 
   if (stat) {
-    //time2                      = highres_time_now();
-    //performance.broadPhaseTime = time2 - time1;
+    // time2                      = highres_time_now();
+    // performance.broadPhaseTime = time2 - time1;
   }
 
   // update & narrow phase
@@ -414,8 +414,8 @@ void World::step()
   }
 
   if (stat) {
-    //time3                       = highres_time_now();
-    //performance.narrowPhaseTime = time3 - time2;
+    // time3                       = highres_time_now();
+    // performance.narrowPhaseTime = time3 - time2;
   }
 
   //----------------------------------------------------------------------------
@@ -435,7 +435,7 @@ void World::step()
   islandConstraints.clear();
   islandStack.clear();
 
-  //time1      = highres_time_now();
+  // time1      = highres_time_now();
   numIslands = 0;
 
   // build and solve simulation islands
@@ -495,7 +495,7 @@ void World::step()
       // search connections
       for (cs = body->contactLink; cs != nullptr; cs = cs->next) {
         contact    = cs->contact;
-        constraint = contact->constraint;
+        constraint = contact->constraint.get();
         if (constraint->addedToIsland || !contact->touching) {
           // ignore
           continue;
@@ -609,17 +609,17 @@ void World::step()
   }
 
   if (stat) {
-    //time2                   = highres_time_now();
-    //performance.solvingTime = time2 - time1;
+    // time2                   = highres_time_now();
+    // performance.solvingTime = time2 - time1;
 
     //--------------------------------------------------------------------------
     //   END SIMULATION
     //--------------------------------------------------------------------------
 
-    //time2 = highres_time_now();
+    // time2 = highres_time_now();
     // fps update
     performance.upfps();
-    //performance.totalTime = time2 - time0;
+    // performance.totalTime = time2 - time0;
   }
 }
 

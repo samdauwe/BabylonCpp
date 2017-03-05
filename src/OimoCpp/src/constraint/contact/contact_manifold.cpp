@@ -7,7 +7,7 @@
 namespace OIMO {
 
 ContactManifold::ContactManifold()
-    : numPoints{0}, body1{new RigidBody()}, body2{new RigidBody()}
+    : numPoints{0}, body1{nullptr}, body2{nullptr}
 {
 }
 
@@ -22,42 +22,42 @@ void ContactManifold::reset(Shape* shape1, Shape* shape2)
   numPoints = 0;
 }
 
+void ContactManifold::addPointVec(const Vec3& pos, const Vec3& norm,
+                                  bool penetration, bool flip)
+{
+  auto& p = points[numPoints++];
+
+  p.position.copy(pos);
+  p.localPoint1.sub(pos, body1->position).applyMatrix3(body1->rotation);
+  p.localPoint2.sub(pos, body2->position).applyMatrix3(body2->rotation);
+
+  p.normal.copy(norm);
+  if (flip) {
+    p.normal.negate();
+  }
+
+  p.normalImpulse = 0;
+  p.penetration   = penetration;
+  p.warmStarted   = false;
+}
+
 void ContactManifold::addPoint(float x, float y, float z, float normalX,
                                float normalY, float normalZ, float penetration,
                                bool flip)
 {
-  ManifoldPoint& p = points[numPoints++];
-  p.position.x     = x;
-  p.position.y     = y;
-  p.position.z     = z;
-  Mat33 r          = body1->rotation;
-  float rx         = x - body1->position.x;
-  float ry         = y - body1->position.y;
-  float rz         = z - body1->position.z;
+  auto& p = points[numPoints++];
 
-  std::array<float, 9>& tr = r.elements;
-  p.localPoint1.x = rx * tr[0] + ry * tr[3] + rz * tr[6];
-  p.localPoint1.y = rx * tr[1] + ry * tr[4] + rz * tr[7];
-  p.localPoint1.z = rx * tr[2] + ry * tr[5] + rz * tr[8];
-  r               = body2->rotation;
-  rx              = x - body2->position.x;
-  ry              = y - body2->position.y;
-  rz              = z - body2->position.z;
-  p.localPoint2.x = rx * tr[0] + ry * tr[3] + rz * tr[6];
-  p.localPoint2.y = rx * tr[1] + ry * tr[4] + rz * tr[7];
-  p.localPoint2.z = rx * tr[2] + ry * tr[5] + rz * tr[8];
+  p.position.set(x, y, z);
+  p.localPoint1.sub(p.position, body1->position).applyMatrix3(body1->rotation);
+  p.localPoint2.sub(p.position, body2->position).applyMatrix3(body2->rotation);
 
   p.normalImpulse = 0;
+
+  p.normal.set(normalX, normalY, normalZ);
   if (flip) {
-    p.normal.x = -normalX;
-    p.normal.y = -normalY;
-    p.normal.z = -normalZ;
+    p.normal.negate();
   }
-  else {
-    p.normal.x = normalX;
-    p.normal.y = normalY;
-    p.normal.z = normalZ;
-  }
+
   p.penetration = penetration;
   p.warmStarted = false;
 }

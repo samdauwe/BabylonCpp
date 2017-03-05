@@ -149,6 +149,11 @@ Vec3& Vec3::subScale(const Vec3& v, float s)
   return *this;
 }
 
+Vec3& Vec3::subScaledVector(const Vec3& v, float s)
+{
+  return subScale(v, s);
+}
+
 Vec3& Vec3::scale(const Quat& q, float s)
 {
   x = q.x * s;
@@ -163,6 +168,11 @@ Vec3& Vec3::scale(const Vec3& v, float s)
   y = v.y * s;
   z = v.z * s;
   return *this;
+}
+
+Vec3& Vec3::addScaledVector(const Vec3& v, float s)
+{
+  return scale(v, s);
 }
 
 Vec3& Vec3::scaleEqual(float s)
@@ -291,16 +301,17 @@ Vec3& Vec3::copy(const Vec3& v)
 
 Vec3& Vec3::applyMatrix3(const Mat33& m, bool transpose)
 {
+  float _x = x, _y = y, _z = z;
   const auto& e = m.elements;
   if (transpose) {
-    x = e[0] * x + e[1] * y + e[2] * z;
-    y = e[3] * x + e[4] * y + e[5] * z;
-    z = e[6] * x + e[7] * y + e[8] * z;
+    x = e[0] * _x + e[1] * _y + e[2] * _z;
+    y = e[3] * _x + e[4] * _y + e[5] * _z;
+    z = e[6] * _x + e[7] * _y + e[8] * _z;
   }
   else {
-    x = e[0] * x + e[3] * y + e[6] * z;
-    y = e[1] * x + e[4] * y + e[7] * z;
-    z = e[2] * x + e[5] * y + e[8] * z;
+    x = e[0] * _x + e[3] * _y + e[6] * _z;
+    y = e[1] * _x + e[4] * _y + e[7] * _z;
+    z = e[2] * _x + e[5] * _y + e[8] * _z;
   }
 
   return *this;

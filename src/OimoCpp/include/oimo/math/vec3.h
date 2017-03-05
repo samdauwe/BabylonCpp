@@ -34,8 +34,10 @@ public:
   Vec3& subEqual(const Vec3& v);
   Vec3& addScale(const Vec3& v, float s);
   Vec3& subScale(const Vec3& v, float s);
+  Vec3& subScaledVector(const Vec3& v, float s);
   Vec3& scale(const Quat& q, float s);
   Vec3& scale(const Vec3& v, float s);
+  Vec3& addScaledVector(const Vec3& v, float s);
   Vec3& scaleEqual(float s);
   Vec3& cross(const Vec3& v);
   Vec3& crossVectors(const Vec3& v1, const Vec3& v2);
@@ -51,7 +53,7 @@ public:
   float lengthSq() const;
   float length() const;
   Vec3& copy(const Vec3& v);
-  Vec3& applyMatrix3(const Mat33& m, bool transpose);
+  Vec3& applyMatrix3(const Mat33& m, bool transpose = false);
   Vec3& applyQuaternion(const Quat& q);
   bool testZero() const;
   bool testDiff(const Vec3& v) const;
