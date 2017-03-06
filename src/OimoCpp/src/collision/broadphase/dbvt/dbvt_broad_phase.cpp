@@ -13,7 +13,7 @@ namespace OIMO {
 
 DBVTBroadPhase::DBVTBroadPhase()
     : BroadPhase{}
-    , _tree{new DBVT()}
+    , _tree{make_unique<DBVT>()}
     , _maxStack{256}
     , _numLeaves{0}
     , _maxLeaves{256}
@@ -27,32 +27,32 @@ DBVTBroadPhase::~DBVTBroadPhase()
 {
 }
 
-Proxy* DBVTBroadPhase::createProxy(Shape* shape)
+std::unique_ptr<Proxy> DBVTBroadPhase::createProxy(Shape* shape)
 {
-  return new DBVTProxy(shape);
+  return make_unique<DBVTProxy>(shape);
 }
 
 void DBVTBroadPhase::addProxy(Proxy* proxy)
 {
-  DBVTProxy* _proxy = dynamic_cast<DBVTProxy*>(proxy);
+  auto _proxy = dynamic_cast<DBVTProxy*>(proxy);
   if (_proxy == nullptr) {
     return;
   }
-  _tree->insertLeaf(_proxy->leaf);
-  _leaves.emplace_back(_proxy->leaf);
+  _tree->insertLeaf(_proxy->leaf.get());
+  _leaves.emplace_back(_proxy->leaf.get());
   ++_numLeaves;
 }
 
 void DBVTBroadPhase::removeProxy(Proxy* proxy)
 {
-  DBVTProxy* _proxy = dynamic_cast<DBVTProxy*>(proxy);
+  auto _proxy = dynamic_cast<DBVTProxy*>(proxy);
   if (_proxy == nullptr) {
     return;
   }
-  _tree->deleteLeaf(_proxy->leaf);
+  _tree->deleteLeaf(_proxy->leaf.get());
   auto it = std::find_if(
     _leaves.begin(), _leaves.end(),
-    [_proxy](const DBVTNode* node) { return node == _proxy->leaf; });
+    [_proxy](const DBVTNode* node) { return node == _proxy->leaf.get(); });
   if (it != _leaves.end()) {
     _leaves.erase(it);
     --_numLeaves;
@@ -66,8 +66,8 @@ void DBVTBroadPhase::collectPairs()
   }
   DBVTNode* leaf = nullptr;
   float margin   = 0.1f;
-  for (unsigned int i = _numLeaves; i > 0; --i) {
-    leaf = _leaves[i - 1];
+  for (unsigned int i = _numLeaves; i-- > 0;) {
+    leaf = _leaves[i];
     if (leaf->proxy->aabb->intersectTestTwo(*leaf->aabb)) {
       leaf->aabb->copy(*leaf->proxy->aabb, margin);
       _tree->deleteLeaf(leaf);

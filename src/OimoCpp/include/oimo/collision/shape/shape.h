@@ -1,6 +1,9 @@
 #ifndef OIMO_COLLISION_SHAPE_SHAPE_H
 #define OIMO_COLLISION_SHAPE_SHAPE_H
 
+#include <memory>
+
+#include <oimo/collision/broadphase/proxy.h>
 #include <oimo/math/mat33.h>
 #include <oimo/math/vec3.h>
 
@@ -61,7 +64,7 @@ public:
   // The next shape in parent rigid body.
   Shape* next;
   // The proxy of the shape used for broad-phase collision detection.
-  Proxy* proxy;
+  std::unique_ptr<Proxy> proxy;
   // The parent rigid body of the shape.
   RigidBody* parent;
   // The linked list of the contacts with the shape.

@@ -1,6 +1,10 @@
 #ifndef OIMO_UTILS_H
 #define OIMO_UTILS_H
 
+// Collections
+#include <array>
+#include <vector>
+
 // Time functions
 #include <chrono>
 #include <cmath>

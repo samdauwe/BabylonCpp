@@ -13,22 +13,26 @@ SAPBroadPhase::SAPBroadPhase()
 {
   type = BroadPhase::Type::BR_SWEEP_AND_PRUNE;
   // dynamic proxies
-  _axesD = {new SAPAxis(), //
-            new SAPAxis(), //
-            new SAPAxis()};
+  _axesD = {
+    SAPAxis(), //
+    SAPAxis(), //
+    SAPAxis()  //
+  };
   // static or sleeping proxies
-  _axesS = {new SAPAxis(), //
-            new SAPAxis(), //
-            new SAPAxis()};
+  _axesS = {
+    SAPAxis(), //
+    SAPAxis(), //
+    SAPAxis()  //
+  };
 }
 
 SAPBroadPhase::~SAPBroadPhase()
 {
 }
 
-Proxy* SAPBroadPhase::createProxy(Shape* shape)
+std::unique_ptr<Proxy> SAPBroadPhase::createProxy(Shape* shape)
 {
-  return new SAPProxy(this, shape);
+  return make_unique<SAPProxy>(this, shape);
 }
 
 void SAPBroadPhase::addProxy(Proxy* proxy)
@@ -38,16 +42,16 @@ void SAPBroadPhase::addProxy(Proxy* proxy)
     return;
   }
   if (p->isDynamic()) {
-    _axesD[0]->addElements(p->min[0], p->max[0]);
-    _axesD[1]->addElements(p->min[1], p->max[1]);
-    _axesD[2]->addElements(p->min[2], p->max[2]);
+    _axesD[0].addElements(&p->min[0], &p->max[0]);
+    _axesD[1].addElements(&p->min[1], &p->max[1]);
+    _axesD[2].addElements(&p->min[2], &p->max[2]);
     p->belongsTo = 1;
     _numElementsD += 2;
   }
   else {
-    _axesS[0]->addElements(p->min[0], p->max[0]);
-    _axesS[1]->addElements(p->min[1], p->max[1]);
-    _axesS[2]->addElements(p->min[2], p->max[2]);
+    _axesS[0].addElements(&p->min[0], &p->max[0]);
+    _axesS[1].addElements(&p->min[1], &p->max[1]);
+    _axesS[2].addElements(&p->min[2], &p->max[2]);
     p->belongsTo = 2;
     _numElementsS += 2;
   }
@@ -55,7 +59,7 @@ void SAPBroadPhase::addProxy(Proxy* proxy)
 
 void SAPBroadPhase::removeProxy(Proxy* proxy)
 {
-  SAPProxy* p = dynamic_cast<SAPProxy*>(proxy);
+  auto p = dynamic_cast<SAPProxy*>(proxy);
   if (p == nullptr) {
     return;
   }
@@ -65,15 +69,15 @@ void SAPBroadPhase::removeProxy(Proxy* proxy)
 
   switch (p->belongsTo) {
     case 1:
-      _axesD[0]->removeElements(p->min[0], p->max[0]);
-      _axesD[1]->removeElements(p->min[1], p->max[1]);
-      _axesD[2]->removeElements(p->min[2], p->max[2]);
+      _axesD[0].removeElements(&p->min[0], &p->max[0]);
+      _axesD[1].removeElements(&p->min[1], &p->max[1]);
+      _axesD[2].removeElements(&p->min[2], &p->max[2]);
       _numElementsD -= 2;
       break;
     case 2:
-      _axesS[0]->removeElements(p->min[0], p->max[0]);
-      _axesS[1]->removeElements(p->min[1], p->max[1]);
-      _axesS[2]->removeElements(p->min[2], p->max[2]);
+      _axesS[0].removeElements(&p->min[0], &p->max[0]);
+      _axesS[1].removeElements(&p->min[1], &p->max[1]);
+      _axesS[2].removeElements(&p->min[2], &p->max[2]);
       _numElementsS -= 2;
       break;
     default:
@@ -89,27 +93,27 @@ void SAPBroadPhase::collectPairs()
     return;
   }
 
-  SAPAxis* axis1 = _axesD[_index1];
-  SAPAxis* axis2 = _axesD[_index2];
+  SAPAxis& axis1 = _axesD[_index1];
+  SAPAxis& axis2 = _axesD[_index2];
 
-  axis1->sort();
-  axis2->sort();
+  axis1.sort();
+  axis2.sort();
 
-  int count1 = axis1->calculateTestCount();
-  int count2 = axis2->calculateTestCount();
+  int count1 = axis1.calculateTestCount();
+  int count2 = axis2.calculateTestCount();
   std::vector<SAPElement*> elementsD;
   std::vector<SAPElement*> elementsS;
   if (count1 <= count2) { // select the best axis
     axis2 = _axesS[_index1];
-    axis2->sort();
-    elementsD = axis1->elements;
-    elementsS = axis2->elements;
+    axis2.sort();
+    elementsD = axis1.elements;
+    elementsS = axis2.elements;
   }
   else {
     axis1 = _axesS[_index2];
-    axis1->sort();
-    elementsD = axis2->elements;
-    elementsS = axis1->elements;
+    axis1.sort();
+    elementsD = axis2.elements;
+    elementsS = axis1.elements;
     _index1 ^= _index2;
     _index2 ^= _index1;
     _index1 ^= _index2;
@@ -155,8 +159,9 @@ void SAPBroadPhase::collectPairs()
         ++numPairChecks;
         if (min1 > _e2->max1->value || max1 < _e2->min1->value
             || min2 > _e2->max2->value || max2 < _e2->min2->value
-            || !isAvailablePair(s1, s2))
+            || !isAvailablePair(s1, s2)) {
           continue;
+        }
         addPair(s1, s2);
       }
       if (dyn) {
@@ -167,8 +172,9 @@ void SAPBroadPhase::collectPairs()
 
           if (min1 > e2->max1->value || max1 < e2->min1->value
               || min2 > e2->max2->value || max2 < e2->min2->value
-              || !isAvailablePair(s1, s2))
+              || !isAvailablePair(s1, s2)) {
             continue;
+          }
           addPair(s1, s2);
         }
         e1->pair = activeD;

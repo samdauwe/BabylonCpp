@@ -30,7 +30,7 @@ void SAPAxis::removeElements(SAPElement* min, SAPElement* max)
   int minIndex = -1;
   int maxIndex = -1;
   for (unsigned int i = 0; i < numElements; ++i) {
-    SAPElement* e = elements[i];
+    auto e = elements[i];
     if (e == min || e == max) {
       if (minIndex == -1) {
         minIndex = static_cast<int>(i);
@@ -67,8 +67,8 @@ void SAPAxis::sort()
   SAPElement *tmp = nullptr, *tmp2 = nullptr;
   float pivot = 0.f;
   for (unsigned int i = 1; i < numElements; ++i) { // try insertion sort
-    tmp              = elements[i];
-    pivot            = tmp->value;
+    tmp               = elements[i];
+    pivot             = tmp->value;
     SAPElement* _tmp2 = elements[i - 1];
     if (_tmp2->value > pivot) {
       unsigned int j = i;
@@ -117,8 +117,9 @@ void SAPAxis::sort()
         do {
           ej = elements[--j];
         } while (pivot < ej->value && j != left);
-        if (i >= j)
+        if (i >= j) {
           break;
+        }
         elements[i] = ej;
         elements[j] = ei;
       }
@@ -147,8 +148,9 @@ void SAPAxis::sort()
           j = i;
           do {
             elements[j] = tmp2;
-            if (--j == 0)
+            if (--j == 0) {
               break;
+            }
             tmp2 = elements[j - 1];
           } while (tmp2->value > pivot);
           elements[j] = tmp;

@@ -1,9 +1,8 @@
 #ifndef OIMO_COLLISION_BROADPHASE_DBVT_DBVT_BROAD_PHASE_H
 #define OIMO_COLLISION_BROADPHASE_DBVT_DBVT_BROAD_PHASE_H
 
-#include <vector>
-
 #include <oimo/collision/broadphase/broad_phase.h>
+#include <oimo/oimo_utils.h>
 
 namespace OIMO {
 
@@ -21,7 +20,7 @@ public:
   DBVTBroadPhase();
   ~DBVTBroadPhase();
 
-  Proxy* createProxy(Shape* shape) override;
+  std::unique_ptr<Proxy> createProxy(Shape* shape) override;
   void addProxy(Proxy* proxy) override;
   void removeProxy(Proxy* proxy) override;
   void collectPairs() override;
@@ -30,7 +29,7 @@ private:
   void _collide(DBVTNode* node1, DBVTNode* node2);
 
 private:
-  DBVT* _tree;
+  std::unique_ptr<DBVT> _tree;
   std::vector<DBVTNode*> _stack;
   unsigned int _maxStack;
   std::vector<DBVTNode*> _leaves;

@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <oimo/collision/broadphase/broad_phase.h>
+#include <oimo/oimo_utils.h>
 
 namespace OIMO {
 
@@ -20,7 +21,7 @@ public:
   SAPBroadPhase();
   ~SAPBroadPhase();
 
-  Proxy* createProxy(Shape* shape) override;
+  std::unique_ptr<Proxy> createProxy(Shape* shape) override;
   void addProxy(Proxy* proxy) override;
   void removeProxy(Proxy* proxy) override;
   void collectPairs() override;
@@ -29,9 +30,9 @@ private:
   unsigned int _numElementsD;
   unsigned int _numElementsS;
   // Dynamic proxies
-  std::vector<SAPAxis*> _axesD;
+  std::vector<SAPAxis> _axesD;
   // static or sleeping proxies
-  std::vector<SAPAxis*> _axesS;
+  std::vector<SAPAxis> _axesS;
   // Indices
   unsigned int _index1;
   unsigned int _index2;

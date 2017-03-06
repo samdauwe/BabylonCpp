@@ -7,7 +7,7 @@ namespace OIMO {
 
 DBVTProxy::DBVTProxy(Shape* _shape) : Proxy{_shape}
 {
-  leaf        = new DBVTNode();
+  leaf        = make_unique<DBVTNode>();
   leaf->proxy = this;
 }
 

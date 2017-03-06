@@ -1,7 +1,7 @@
 #ifndef OIMO_COLLISION_BROADPHASE_DBVT_DBVT_H
 #define OIMO_COLLISION_BROADPHASE_DBVT_DBVT_H
 
-#include <array>
+#include <oimo/oimo_utils.h>
 
 namespace OIMO {
 
@@ -46,9 +46,10 @@ public:
   DBVTNode* root;
 
 private:
+  std::vector<std::unique_ptr<DBVTNode>> _freeList;
   std::array<DBVTNode*, 16384> _freeNodes;
   unsigned int _numFreeNodes;
-  AABB* _aabb;
+  std::unique_ptr<AABB> _aabb;
 
 }; // end of class DBVTBroadPhase
 

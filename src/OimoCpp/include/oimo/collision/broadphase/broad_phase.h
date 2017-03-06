@@ -1,6 +1,7 @@
 #ifndef OIMO_COLLISION_BROADPHASE_BROAD_PHASE_H
 #define OIMO_COLLISION_BROADPHASE_BROAD_PHASE_H
 
+#include <memory>
 #include <vector>
 
 #include <oimo/collision/broadphase/pair.h>
@@ -38,7 +39,7 @@ public:
    * @param   shape
    * @return
    */
-  virtual Proxy* createProxy(Shape* shape) = 0;
+  virtual std::unique_ptr<Proxy> createProxy(Shape* shape) = 0;
 
   /**
    * Add the proxy into the broad-phase.

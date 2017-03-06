@@ -10,7 +10,7 @@ DBVTNode::DBVTNode()
     , parent{nullptr}
     , proxy{nullptr}
     , height{0}
-    , aabb{new AABB()}
+    , aabb{make_unique<AABB>()}
 {
 }
 

@@ -17,8 +17,8 @@ BroadPhase::~BroadPhase()
 
 bool BroadPhase::isAvailablePair(Shape* s1, Shape* s2)
 {
-  RigidBody* b1 = s1->parent;
-  RigidBody* b2 = s2->parent;
+  auto b1 = s1->parent;
+  auto b2 = s2->parent;
   if (b1 == b2 ||                           // same parents
       (!b1->isDynamic && !b2->isDynamic) || // static or kinematic object
       (s1->belongsTo & s2->collidesWith) == 0
@@ -34,7 +34,7 @@ bool BroadPhase::isAvailablePair(Shape* s1, Shape* s2)
     js = b2->jointLink;
   }
   while (js != nullptr) {
-    Joint* joint = js->joint;
+    auto joint = js->joint;
     if (!joint->allowCollision
         && ((joint->body1 == b1 && joint->body2 == b2)
             || (joint->body1 == b2 && joint->body2 == b1))) {

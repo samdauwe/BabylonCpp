@@ -35,9 +35,9 @@ public:
   // 2:static]
   unsigned int belongsTo;
   // The maximum elements on each axis.
-  std::vector<SAPElement*> max;
+  std::vector<SAPElement> max;
   // The minimum elements on each axis.
-  std::vector<SAPElement*> min;
+  std::vector<SAPElement> min;
   SAPBroadPhase* sap;
 
 }; // end of class SAPProxy

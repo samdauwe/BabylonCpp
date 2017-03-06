@@ -5,7 +5,7 @@
 
 namespace OIMO {
 
-DBVT::DBVT() : root{nullptr}, _numFreeNodes{0}, _aabb{new AABB()}
+DBVT::DBVT() : root{nullptr}, _numFreeNodes{0}, _aabb{make_unique<AABB>()}
 {
 }
 
@@ -25,8 +25,8 @@ void DBVT::insertLeaf(DBVTNode* leaf)
     root = leaf;
     return;
   }
-  AABB* lb          = leaf->aabb;
-  DBVTNode* sibling = root;
+  auto lb      = leaf->aabb.get();
+  auto sibling = root;
   DBVTNode *c1 = nullptr, *c2 = nullptr;
   DBVTNode *oldParent = nullptr, *newParent = nullptr;
   AABB *b = nullptr, *c1b = nullptr, *c2b = nullptr;
@@ -37,9 +37,9 @@ void DBVT::insertLeaf(DBVTNode* leaf)
     // descend the node to search the best pair
     c1      = sibling->child1;
     c2      = sibling->child2;
-    b       = sibling->aabb;
-    c1b     = c1->aabb;
-    c2b     = c2->aabb;
+    b       = sibling->aabb.get();
+    c1b     = c1->aabb.get();
+    c2b     = c2->aabb.get();
     oldArea = b->surfaceArea();
     _aabb->combine(*lb, *b);
     newArea      = _aabb->surfaceArea();
@@ -88,7 +88,8 @@ void DBVT::insertLeaf(DBVTNode* leaf)
     newParent = _freeNodes[--_numFreeNodes];
   }
   else {
-    newParent = new DBVTNode();
+    _freeList.emplace_back(make_unique<DBVTNode>());
+    newParent = _freeList.back().get();
   }
 
   newParent->parent = oldParent;
@@ -133,7 +134,7 @@ void DBVT::deleteLeaf(DBVTNode* leaf)
     root = nullptr;
     return;
   }
-  DBVTNode* parent  = leaf->parent;
+  auto parent       = leaf->parent;
   DBVTNode* sibling = nullptr;
   if (parent->child1 == leaf) {
     sibling = parent->child2;
@@ -146,8 +147,8 @@ void DBVT::deleteLeaf(DBVTNode* leaf)
     sibling->parent = nullptr;
     return;
   }
-  DBVTNode* grandParent = parent->parent;
-  sibling->parent       = grandParent;
+  auto grandParent = parent->parent;
+  sibling->parent  = grandParent;
   if (grandParent->child1 == parent) {
     grandParent->child1 = sibling;
   }
@@ -166,16 +167,16 @@ void DBVT::deleteLeaf(DBVTNode* leaf)
 
 DBVTNode* DBVT::_balance(DBVTNode* node)
 {
-  int nh = node->height;
+  auto nh = node->height;
   if (nh < 2) {
     return node;
   }
-  DBVTNode* p = node->parent;
-  DBVTNode* l = node->child1;
-  DBVTNode* r = node->child2;
-  int lh      = l->height;
-  int rh      = r->height;
-  int balance = lh - rh;
+  auto p       = node->parent;
+  auto l       = node->child1;
+  auto r       = node->child2;
+  auto lh      = l->height;
+  auto rh      = r->height;
+  auto balance = lh - rh;
   int t; // for bit operation
 
   /**
@@ -188,10 +189,10 @@ DBVTNode* DBVT::_balance(DBVTNode* node)
 
   // Is the tree balanced?
   if (balance > 1) {
-    DBVTNode* ll = l->child1;
-    DBVTNode* lr = l->child2;
-    int llh      = ll->height;
-    int lrh      = lr->height;
+    auto ll  = l->child1;
+    auto lr  = l->child2;
+    auto llh = ll->height;
+    auto lrh = lr->height;
 
     // Is L-L higher than L-R?
     if (llh > lrh) {
@@ -277,10 +278,10 @@ DBVTNode* DBVT::_balance(DBVTNode* node)
     return l;
   }
   else if (balance < -1) {
-    DBVTNode* rl = r->child1;
-    DBVTNode* rr = r->child2;
-    int rlh      = rl->height;
-    int rrh      = rr->height;
+    auto rl  = r->child1;
+    auto rr  = r->child2;
+    auto rlh = rl->height;
+    auto rrh = rr->height;
 
     // Is R-L higher than R-R?
     if (rlh > rrh) {
@@ -369,8 +370,8 @@ DBVTNode* DBVT::_balance(DBVTNode* node)
 
 void DBVT::_fix(DBVTNode* node)
 {
-  DBVTNode* c1 = node->child1;
-  DBVTNode* c2 = node->child2;
+  auto c1 = node->child1;
+  auto c2 = node->child2;
   node->aabb->combine(*c1->aabb, *c2->aabb);
   node->height = c1->height < c2->height ? c2->height + 1 : c1->height + 1;
 }

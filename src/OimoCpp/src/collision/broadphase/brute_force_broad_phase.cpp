@@ -16,9 +16,9 @@ BruteForceBroadPhase::~BruteForceBroadPhase()
 {
 }
 
-Proxy* BruteForceBroadPhase::createProxy(Shape* shape)
+std::unique_ptr<Proxy> BruteForceBroadPhase::createProxy(Shape* shape)
 {
-  return new BasicProxy(shape);
+  return make_unique<BasicProxy>(shape);
 }
 
 void BruteForceBroadPhase::addProxy(Proxy* proxy)
@@ -36,16 +36,17 @@ void BruteForceBroadPhase::removeProxy(Proxy* proxy)
 void BruteForceBroadPhase::collectPairs()
 {
   Proxy *p1, *p2;
-  size_t lu      = _proxies.size();
-  int l          = static_cast<int>(lu);
+  size_t lu     = _proxies.size();
+  int l         = static_cast<int>(lu);
   numPairChecks = l * (l - 1) >> 1;
   for (size_t i = 0; i < _proxies.size(); ++i) {
     p1 = _proxies[i];
     for (size_t j = i + 1; j < _proxies.size(); ++j) {
       p2 = _proxies[j];
       if (p1->aabb->intersectTest(*p2->aabb)
-          || !isAvailablePair(p1->shape, p2->shape))
+          || !isAvailablePair(p1->shape, p2->shape)) {
         continue;
+      }
       addPair(p1->shape, p2->shape);
     }
   }

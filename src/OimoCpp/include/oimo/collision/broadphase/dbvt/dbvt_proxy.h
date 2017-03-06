@@ -2,6 +2,7 @@
 #define OIMO_COLLISION_BROADPHASE_DBVT_DBVT_PROXY_H
 
 #include <oimo/collision/broadphase/proxy.h>
+#include <oimo/oimo_utils.h>
 
 namespace OIMO {
 
@@ -29,7 +30,7 @@ public:
 
 public:
   // The leaf of the proxy.
-  DBVTNode* leaf;
+  std::unique_ptr<DBVTNode> leaf;
 
 }; // end of class DBVTProxy
 

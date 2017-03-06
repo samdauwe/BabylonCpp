@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <oimo/collision/broadphase/broad_phase.h>
+#include <oimo/oimo_utils.h>
 
 namespace OIMO {
 
@@ -20,7 +21,7 @@ public:
   BruteForceBroadPhase();
   ~BruteForceBroadPhase();
 
-  Proxy* createProxy(Shape* shape) override;
+  std::unique_ptr<Proxy> createProxy(Shape* shape) override;
   void addProxy(Proxy* proxy) override;
   void removeProxy(Proxy* proxy) override;
   void collectPairs() override;

@@ -2,6 +2,7 @@
 #define OIMO_COLLISION_BROADPHASE_DBVT_DBVT_NODE_H
 
 #include <oimo/collision/broadphase/proxy.h>
+#include <oimo/oimo_utils.h>
 
 namespace OIMO {
 
@@ -28,7 +29,7 @@ struct DBVTNode {
   // The maximum distance from leaf nodes.
   int height;
   // The AABB of this node.
-  AABB* aabb;
+  std::unique_ptr<AABB> aabb;
 
 }; // end of struct DBVTNode
 

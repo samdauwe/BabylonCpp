@@ -179,12 +179,12 @@ void World::addShape(Shape* shape)
   }
   shape->proxy = broadPhase->createProxy(shape);
   shape->updateProxy();
-  broadPhase->addProxy(shape->proxy);
+  broadPhase->addProxy(shape->proxy.get());
 }
 
 void World::removeShape(Shape* shape)
 {
-  broadPhase->removeProxy(shape->proxy);
+  broadPhase->removeProxy(shape->proxy.get());
   shape->proxy = nullptr;
 }
 
