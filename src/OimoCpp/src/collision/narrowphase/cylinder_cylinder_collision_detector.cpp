@@ -61,9 +61,8 @@ bool CylinderCylinderCollisionDetector::getSep(CylinderShape* c1,
   ny = v1z * v0x - v1x * v0z;
   nz = v1x * v0y - v1y * v0x;
   if (nx * nx + ny * ny + nz * nz == 0.f) {
-    sep.init(v1x - v0x, v1y - v0y, v1z - v0z);
-    sep.normalize(sep);
-    pos.init((v11x + v12x) * 0.5f, (v11y + v12y) * 0.5f, (v11z + v12z) * 0.5f);
+    sep.set(v1x - v0x, v1y - v0y, v1z - v0z).normalize();
+    pos.set((v11x + v12x) * 0.5f, (v11y + v12y) * 0.5f, (v11z + v12z) * 0.5f);
     return true;
   }
   supportPoint(c1, -nx, -ny, -nz, sup);
@@ -253,8 +252,8 @@ bool CylinderCylinderCollisionDetector::getSep(CylinderShape* c1,
       if ((v4x - v3x) * nx + (v4y - v3y) * ny + (v4z - v3z) * nz <= 0.01f
           || separation >= 0.f) {
         if (hit) {
-          sep.init(-nx, -ny, -nz);
-          pos.init((p1x + p2x) * 0.5f, (p1y + p2y) * 0.5f, (p1z + p2z) * 0.5f);
+          sep.set(-nx, -ny, -nz);
+          pos.set((p1x + p2x) * 0.5f, (p1y + p2y) * 0.5f, (p1z + p2z) * 0.5f);
           dep.x = separation;
           return true;
         }
@@ -322,15 +321,15 @@ void CylinderCylinderCollisionDetector::supportPoint(CylinderShape* c, float dx,
                                                      float dy, float dz,
                                                      Vec3& out)
 {
-  const std::array<float, 9>& rot = c->rotation.elements;
-  float ldx  = rot[0] * dx + rot[3] * dy + rot[6] * dz;
-  float ldy  = rot[1] * dx + rot[4] * dy + rot[7] * dz;
-  float ldz  = rot[2] * dx + rot[5] * dy + rot[8] * dz;
-  float radx = ldx;
-  float radz = ldz;
-  float len  = radx * radx + radz * radz;
-  float rad  = c->radius;
-  float hh   = c->halfHeight;
+  const auto& rot = c->rotation.elements;
+  float ldx       = rot[0] * dx + rot[3] * dy + rot[6] * dz;
+  float ldy       = rot[1] * dx + rot[4] * dy + rot[7] * dz;
+  float ldz       = rot[2] * dx + rot[5] * dy + rot[8] * dz;
+  float radx      = ldx;
+  float radz      = ldz;
+  float len       = radx * radx + radz * radz;
+  float rad       = c->radius;
+  float hh        = c->halfHeight;
   float ox, oy, oz;
   if (floats_are_equal(len, 0)) {
     if (ldy < 0) {
@@ -360,7 +359,7 @@ void CylinderCylinderCollisionDetector::supportPoint(CylinderShape* c, float dx,
   ldx = rot[0] * ox + rot[1] * oy + rot[2] * oz + c->position.x;
   ldy = rot[3] * ox + rot[4] * oy + rot[5] * oz + c->position.y;
   ldz = rot[6] * ox + rot[7] * oy + rot[8] * oz + c->position.z;
-  out.init(ldx, ldy, ldz);
+  out.set(ldx, ldy, ldz);
 }
 
 void CylinderCylinderCollisionDetector::detectCollision(
@@ -379,11 +378,11 @@ void CylinderCylinderCollisionDetector::detectCollision(
     _c1 = shape2;
     _c2 = shape1;
   }
-  CylinderShape* c1 = dynamic_cast<CylinderShape*>(_c1);
-  CylinderShape* c2 = dynamic_cast<CylinderShape*>(_c2);
+  auto c1 = dynamic_cast<CylinderShape*>(_c1);
+  auto c2 = dynamic_cast<CylinderShape*>(_c2);
 
-  const Vec3& p1 = c1->position;
-  const Vec3& p2 = c2->position;
+  const auto& p1 = c1->position;
+  const auto& p2 = c2->position;
 
   float p1x = p1.x;
   float p1y = p1.y;
@@ -394,10 +393,10 @@ void CylinderCylinderCollisionDetector::detectCollision(
   float h1  = c1->halfHeight;
   float h2  = c2->halfHeight;
 
-  const Vec3& n1 = c1->normalDirection;
-  const Vec3& n2 = c2->normalDirection;
-  const Vec3& d1 = c1->halfDirection;
-  const Vec3& d2 = c2->halfDirection;
+  const auto& n1 = c1->normalDirection;
+  const auto& n2 = c2->normalDirection;
+  const auto& d1 = c1->halfDirection;
+  const auto& d2 = c2->halfDirection;
 
   float r1  = c1->radius;
   float r2  = c2->radius;
@@ -426,12 +425,13 @@ void CylinderCylinderCollisionDetector::detectCollision(
   float dot;
   float t1, t2;
   Vec3 sep, pos, dep;
-  if (!getSep(c1, c2, sep, pos, dep))
+  if (!getSep(c1, c2, sep, pos, dep)) {
     return;
+  }
   float dot1  = sep.x * n1x + sep.y * n1y + sep.z * n1z;
   float dot2  = sep.x * n2x + sep.y * n2y + sep.z * n2z;
-  bool right1 = dot1 > 0;
-  bool right2 = dot2 > 0;
+  bool right1 = dot1 > 0.f;
+  bool right2 = dot2 > 0.f;
   if (!right1) {
     dot1 = -dot1;
   }
@@ -479,13 +479,15 @@ void CylinderCylinderCollisionDetector::detectCollision(
         nz  = -n1z;
       }
       dot = nx * n2x + ny * n2y + nz * n2z;
-      if (dot < 0.f)
+      if (dot < 0.f) {
         len = h2;
-      else
+      }
+      else {
         len = -h2;
-      c2x   = p2x + len * n2x;
-      c2y   = p2y + len * n2y;
-      c2z   = p2z + len * n2z;
+      }
+      c2x = p2x + len * n2x;
+      c2y = p2y + len * n2y;
+      c2z = p2z + len * n2z;
       if (dot2 >= 0.999999f) {
         tx = -ny;
         ty = nz;

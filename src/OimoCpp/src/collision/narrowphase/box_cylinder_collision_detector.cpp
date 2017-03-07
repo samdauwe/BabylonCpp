@@ -62,9 +62,8 @@ bool BoxCylinderCollisionDetector::getSep(BoxShape* b, CylinderShape* c,
   ny = v1z * v0x - v1x * v0z;
   nz = v1x * v0y - v1y * v0x;
   if (nx * nx + ny * ny + nz * nz == 0.f) {
-    sep.init(v1x - v0x, v1y - v0y, v1z - v0z);
-    sep.normalize(sep);
-    pos.init((v11x + v12x) * 0.5f, (v11y + v12y) * 0.5f, (v11z + v12z) * 0.5f);
+    sep.set(v1x - v0x, v1y - v0y, v1z - v0z).normalize();
+    pos.set((v11x + v12x) * 0.5f, (v11y + v12y) * 0.5f, (v11z + v12z) * 0.5f);
     return true;
   }
   supportPointB(b, -nx, -ny, -nz, sup);
@@ -254,8 +253,8 @@ bool BoxCylinderCollisionDetector::getSep(BoxShape* b, CylinderShape* c,
       if ((v4x - v3x) * nx + (v4y - v3y) * ny + (v4z - v3z) * nz <= 0.01f
           || separation >= 0.f) {
         if (hit) {
-          sep.init(-nx, -ny, -nz);
-          pos.init((p1x + p2x) * 0.5f, (p1y + p2y) * 0.5f, (p1z + p2z) * 0.5f);
+          sep.set(-nx, -ny, -nz);
+          pos.set((p1x + p2x) * 0.5f, (p1y + p2y) * 0.5f, (p1z + p2z) * 0.5f);
           dep.x = separation;
           return true;
         }
@@ -323,13 +322,13 @@ bool BoxCylinderCollisionDetector::getSep(BoxShape* b, CylinderShape* c,
 void BoxCylinderCollisionDetector::supportPointB(BoxShape* b, float dx,
                                                  float dy, float dz, Vec3& out)
 {
-  const std::array<float, 9>& rot = b->rotation.elements;
-  float ldx = rot[0] * dx + rot[3] * dy + rot[6] * dz;
-  float ldy = rot[1] * dx + rot[4] * dy + rot[7] * dz;
-  float ldz = rot[2] * dx + rot[5] * dy + rot[8] * dz;
-  float w   = b->halfWidth;
-  float h   = b->halfHeight;
-  float d   = b->halfDepth;
+  const auto& rot = b->rotation.elements;
+  float ldx       = rot[0] * dx + rot[3] * dy + rot[6] * dz;
+  float ldy       = rot[1] * dx + rot[4] * dy + rot[7] * dz;
+  float ldz       = rot[2] * dx + rot[5] * dy + rot[8] * dz;
+  float w         = b->halfWidth;
+  float h         = b->halfHeight;
+  float d         = b->halfDepth;
   float ox, oy, oz;
   if (ldx < 0.f) {
     ox = -w;
@@ -352,21 +351,21 @@ void BoxCylinderCollisionDetector::supportPointB(BoxShape* b, float dx,
   ldx = rot[0] * ox + rot[1] * oy + rot[2] * oz + b->position.x;
   ldy = rot[3] * ox + rot[4] * oy + rot[5] * oz + b->position.y;
   ldz = rot[6] * ox + rot[7] * oy + rot[8] * oz + b->position.z;
-  out.init(ldx, ldy, ldz);
+  out.set(ldx, ldy, ldz);
 }
 
 void BoxCylinderCollisionDetector::supportPointC(CylinderShape* c, float dx,
                                                  float dy, float dz, Vec3& out)
 {
-  const std::array<float, 9>& rot = c->rotation.elements;
-  float ldx  = rot[0] * dx + rot[3] * dy + rot[6] * dz;
-  float ldy  = rot[1] * dx + rot[4] * dy + rot[7] * dz;
-  float ldz  = rot[2] * dx + rot[5] * dy + rot[8] * dz;
-  float radx = ldx;
-  float radz = ldz;
-  float len  = radx * radx + radz * radz;
-  float rad  = c->radius;
-  float hh   = c->halfHeight;
+  const auto& rot = c->rotation.elements;
+  float ldx       = rot[0] * dx + rot[3] * dy + rot[6] * dz;
+  float ldy       = rot[1] * dx + rot[4] * dy + rot[7] * dz;
+  float ldz       = rot[2] * dx + rot[5] * dy + rot[8] * dz;
+  float radx      = ldx;
+  float radz      = ldz;
+  float len       = radx * radx + radz * radz;
+  float rad       = c->radius;
+  float hh        = c->halfHeight;
   float ox, oy, oz;
   if (floats_are_equal(len, 0.f)) {
     if (ldy < 0.f) {
@@ -396,7 +395,7 @@ void BoxCylinderCollisionDetector::supportPointC(CylinderShape* c, float dx,
   ldx = rot[0] * ox + rot[1] * oy + rot[2] * oz + c->position.x;
   ldy = rot[3] * ox + rot[4] * oy + rot[5] * oz + c->position.y;
   ldz = rot[6] * ox + rot[7] * oy + rot[8] * oz + c->position.z;
-  out.init(ldx, ldy, ldz);
+  out.set(ldx, ldy, ldz);
 }
 
 void BoxCylinderCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
@@ -415,8 +414,8 @@ void BoxCylinderCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
       || _c->type != Shape::Type::SHAPE_CYLINDER) {
     return;
   }
-  BoxShape* b      = dynamic_cast<BoxShape*>(_b);
-  CylinderShape* c = dynamic_cast<CylinderShape*>(_c);
+  auto b = dynamic_cast<BoxShape*>(_b);
+  auto c = dynamic_cast<CylinderShape*>(_c);
 
   Vec3 sep, pos, dep;
   if (!getSep(b, c, sep, pos, dep)) {
@@ -434,7 +433,7 @@ void BoxCylinderCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
   float ch  = c->halfHeight;
   float r   = c->radius;
 
-  const std::array<float, 18>& D = b->dimensions;
+  const auto& D = b->dimensions;
 
   float nwx = D[0]; // b.normalDirectionWidth.x;
   float nwy = D[1]; // b.normalDirectionWidth.y;
@@ -469,10 +468,10 @@ void BoxCylinderCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
   float doth  = nx * nhx + ny * nhy + nz * nhz;
   float dotd  = nx * ndx + ny * ndy + nz * ndz;
   float dotc  = nx * ncx + ny * ncy + nz * ncz;
-  bool right1 = dotw > 0;
-  bool right2 = doth > 0;
-  bool right3 = dotd > 0;
-  bool right4 = dotc > 0;
+  bool right1 = dotw > 0.f;
+  bool right2 = doth > 0.f;
+  bool right3 = dotd > 0.f;
+  bool right4 = dotc > 0.f;
   if (!right1) {
     dotw = -dotw;
   }
@@ -603,7 +602,7 @@ void BoxCylinderCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
       dot   = -dot1;
       state = 5;
     }
-    const std::array<float, 24>& v = b->elements;
+    const auto& v = b->elements;
     switch (state) {
       case 0:
         // v=b.vertex1;

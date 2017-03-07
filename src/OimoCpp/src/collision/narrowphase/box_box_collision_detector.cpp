@@ -11,7 +11,7 @@
 namespace OIMO {
 
 BoxBoxCollisionDetector::BoxBoxCollisionDetector()
-    : CollisionDetector{}, _inf{std::numeric_limits<float>::max()}
+    : CollisionDetector{}, _inf{std::numeric_limits<float>::infinity()}
 {
 }
 
@@ -71,17 +71,17 @@ void BoxBoxCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
     _b1 = shape2;
     _b2 = shape1;
   }
-  BoxShape* b1 = dynamic_cast<BoxShape*>(_b1);
-  BoxShape* b2 = dynamic_cast<BoxShape*>(_b2);
+  auto b1 = dynamic_cast<BoxShape*>(_b1);
+  auto b2 = dynamic_cast<BoxShape*>(_b2);
 
-  const std::array<float, 24>& V1 = b1->elements;
-  const std::array<float, 24>& V2 = b2->elements;
+  const auto& V1 = b1->elements;
+  const auto& V2 = b2->elements;
 
-  const std::array<float, 18>& D1 = b1->dimensions;
-  const std::array<float, 18>& D2 = b2->dimensions;
+  const auto& D1 = b1->dimensions;
+  const auto& D2 = b2->dimensions;
 
-  Vec3 p1   = b1->position;
-  Vec3 p2   = b2->position;
+  auto p1   = b1->position;
+  auto p2   = b2->position;
   float p1x = p1.x;
   float p1y = p1.y;
   float p1z = p1.z;
@@ -706,7 +706,7 @@ void BoxBoxCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
   float depth           = overlap1;
   float depth2          = overlap1;
   unsigned int minIndex = 0;
-  bool right           = right1;
+  bool right            = right1;
   if (overlap2 > depth2) {
     depth    = overlap2;
     depth2   = overlap2;
@@ -1536,18 +1536,18 @@ void BoxBoxCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
   float x1, y1, z1;
   float x2, y2, z2;
   float t;
-  _clipVertices1[0]     = q1x;
-  _clipVertices1[1]     = q1y;
-  _clipVertices1[2]     = q1z;
-  _clipVertices1[3]     = q2x;
-  _clipVertices1[4]     = q2y;
-  _clipVertices1[5]     = q2z;
-  _clipVertices1[6]     = q3x;
-  _clipVertices1[7]     = q3y;
-  _clipVertices1[8]     = q3z;
-  _clipVertices1[9]     = q4x;
-  _clipVertices1[10]    = q4y;
-  _clipVertices1[11]    = q4z;
+  _clipVertices1[0]    = q1x;
+  _clipVertices1[1]    = q1y;
+  _clipVertices1[2]    = q1z;
+  _clipVertices1[3]    = q2x;
+  _clipVertices1[4]    = q2y;
+  _clipVertices1[5]    = q2z;
+  _clipVertices1[6]    = q3x;
+  _clipVertices1[7]    = q3y;
+  _clipVertices1[8]    = q3z;
+  _clipVertices1[9]    = q4x;
+  _clipVertices1[10]   = q4y;
+  _clipVertices1[11]   = q4z;
   numAddedClipVertices = 0;
   x1                   = _clipVertices1[9];
   y1                   = _clipVertices1[10];
@@ -1572,7 +1572,7 @@ void BoxBoxCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
       else {
         index = numAddedClipVertices * 3;
         ++numAddedClipVertices;
-        t                        = dot1 / (dot1 - dot2);
+        t                         = dot1 / (dot1 - dot2);
         _clipVertices2[index]     = x1 + (x2 - x1) * t;
         _clipVertices2[index + 1] = y1 + (y2 - y1) * t;
         _clipVertices2[index + 2] = z1 + (z2 - z1) * t;
@@ -1582,11 +1582,11 @@ void BoxBoxCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
       if (dot2 > 0.f) {
         index = numAddedClipVertices * 3;
         ++numAddedClipVertices;
-        t                        = dot1 / (dot1 - dot2);
+        t                         = dot1 / (dot1 - dot2);
         _clipVertices2[index]     = x1 + (x2 - x1) * t;
         _clipVertices2[index + 1] = y1 + (y2 - y1) * t;
         _clipVertices2[index + 2] = z1 + (z2 - z1) * t;
-        index                    = numAddedClipVertices * 3;
+        index                     = numAddedClipVertices * 3;
         ++numAddedClipVertices;
         _clipVertices2[index]     = x2;
         _clipVertices2[index + 1] = y2;
@@ -1628,7 +1628,7 @@ void BoxBoxCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
       else {
         index = numAddedClipVertices * 3;
         ++numAddedClipVertices;
-        t                        = dot1 / (dot1 - dot2);
+        t                         = dot1 / (dot1 - dot2);
         _clipVertices1[index]     = x1 + (x2 - x1) * t;
         _clipVertices1[index + 1] = y1 + (y2 - y1) * t;
         _clipVertices1[index + 2] = z1 + (z2 - z1) * t;
@@ -1638,11 +1638,11 @@ void BoxBoxCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
       if (dot2 > 0.f) {
         index = numAddedClipVertices * 3;
         ++numAddedClipVertices;
-        t                        = dot1 / (dot1 - dot2);
+        t                         = dot1 / (dot1 - dot2);
         _clipVertices1[index]     = x1 + (x2 - x1) * t;
         _clipVertices1[index + 1] = y1 + (y2 - y1) * t;
         _clipVertices1[index + 2] = z1 + (z2 - z1) * t;
-        index                    = numAddedClipVertices * 3;
+        index                     = numAddedClipVertices * 3;
         ++numAddedClipVertices;
         _clipVertices1[index]     = x2;
         _clipVertices1[index + 1] = y2;
@@ -1685,7 +1685,7 @@ void BoxBoxCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
       else {
         index = numAddedClipVertices * 3;
         ++numAddedClipVertices;
-        t                        = dot1 / (dot1 - dot2);
+        t                         = dot1 / (dot1 - dot2);
         _clipVertices2[index]     = x1 + (x2 - x1) * t;
         _clipVertices2[index + 1] = y1 + (y2 - y1) * t;
         _clipVertices2[index + 2] = z1 + (z2 - z1) * t;
@@ -1695,11 +1695,11 @@ void BoxBoxCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
       if (dot2 > 0.f) {
         index = numAddedClipVertices * 3;
         ++numAddedClipVertices;
-        t                        = dot1 / (dot1 - dot2);
+        t                         = dot1 / (dot1 - dot2);
         _clipVertices2[index]     = x1 + (x2 - x1) * t;
         _clipVertices2[index + 1] = y1 + (y2 - y1) * t;
         _clipVertices2[index + 2] = z1 + (z2 - z1) * t;
-        index                    = numAddedClipVertices * 3;
+        index                     = numAddedClipVertices * 3;
         ++numAddedClipVertices;
         _clipVertices2[index]     = x2;
         _clipVertices2[index + 1] = y2;
@@ -1742,7 +1742,7 @@ void BoxBoxCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
       else {
         index = numAddedClipVertices * 3;
         ++numAddedClipVertices;
-        t                        = dot1 / (dot1 - dot2);
+        t                         = dot1 / (dot1 - dot2);
         _clipVertices1[index]     = x1 + (x2 - x1) * t;
         _clipVertices1[index + 1] = y1 + (y2 - y1) * t;
         _clipVertices1[index + 2] = z1 + (z2 - z1) * t;
@@ -1752,11 +1752,11 @@ void BoxBoxCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
       if (dot2 > 0.f) {
         index = numAddedClipVertices * 3;
         ++numAddedClipVertices;
-        t                        = dot1 / (dot1 - dot2);
+        t                         = dot1 / (dot1 - dot2);
         _clipVertices1[index]     = x1 + (x2 - x1) * t;
         _clipVertices1[index + 1] = y1 + (y2 - y1) * t;
         _clipVertices1[index + 2] = z1 + (z2 - z1) * t;
-        index                    = numAddedClipVertices * 3;
+        index                     = numAddedClipVertices * 3;
         ++numAddedClipVertices;
         _clipVertices1[index]     = x2;
         _clipVertices1[index + 1] = y2;
@@ -1772,8 +1772,8 @@ void BoxBoxCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
   numClipVertices = numAddedClipVertices;
   if (swap) {
     BoxShape* tb = b1;
-    b1       = b2;
-    b2       = tb;
+    b1           = b2;
+    b2           = tb;
   }
   if (numClipVertices == 0) {
     return;
@@ -1800,11 +1800,11 @@ void BoxBoxCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
     // while(i--){
     for (unsigned int i = 0; i < numClipVertices; ++i) {
       _used[i] = false;
-      index   = i * 3;
-      x1      = _clipVertices1[index];
-      y1      = _clipVertices1[index + 1];
-      z1      = _clipVertices1[index + 2];
-      dot     = x1 * n1x + y1 * n1y + z1 * n1z;
+      index    = i * 3;
+      x1       = _clipVertices1[index];
+      y1       = _clipVertices1[index + 1];
+      z1       = _clipVertices1[index + 2];
+      dot      = x1 * n1x + y1 * n1y + z1 * n1z;
       if (dot < minDot) {
         minDot = dot;
         index1 = i;
@@ -1817,8 +1817,8 @@ void BoxBoxCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
 
     _used[index1] = true;
     _used[index3] = true;
-    maxDot       = -_inf;
-    minDot       = _inf;
+    maxDot        = -_inf;
+    minDot        = _inf;
 
     for (unsigned int i = 0; i < numClipVertices; ++i) {
       if (_used[i]) {
