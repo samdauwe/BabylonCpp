@@ -25,7 +25,7 @@ public:
   void calculateMassInfo(MassInfo& out) override;
   void updateProxy() override;
 
-  static Face Mtri(float a, float b, float c);
+  static Face Mtri(unsigned int a, unsigned int b, unsigned int c);
 
 public:
   // Vertices and faces of tetra

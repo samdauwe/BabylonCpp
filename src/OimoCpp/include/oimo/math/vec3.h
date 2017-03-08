@@ -31,6 +31,7 @@ public:
   Vec3& addTime(const Vec3& v, float t);
   Vec3& sub(const Vec3& v);
   Vec3& sub(const Vec3& v1, const Vec3& v2);
+  Vec3& subVectors(const Vec3& v1, const Vec3& v2);
   Vec3& subEqual(const Vec3& v);
   Vec3& addScale(const Vec3& v, float s);
   Vec3& subScale(const Vec3& v, float s);

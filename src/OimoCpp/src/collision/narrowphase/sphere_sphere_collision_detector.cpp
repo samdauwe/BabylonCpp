@@ -25,17 +25,17 @@ void SphereSphereCollisionDetector::detectCollision(Shape* shape1,
       || shape2->type != Shape::Type::SHAPE_SPHERE) {
     return;
   }
-  SphereShape* s1 = dynamic_cast<SphereShape*>(shape1);
-  SphereShape* s2 = dynamic_cast<SphereShape*>(shape2);
-  Vec3& p1        = s1->position;
-  Vec3& p2        = s2->position;
-  float dx        = p2.x - p1.x;
-  float dy        = p2.y - p1.y;
-  float dz        = p2.z - p1.z;
-  float len       = dx * dx + dy * dy + dz * dz;
-  float r1        = s1->radius;
-  float r2        = s2->radius;
-  float rad       = r1 + r2;
+  auto s1        = dynamic_cast<SphereShape*>(shape1);
+  auto s2        = dynamic_cast<SphereShape*>(shape2);
+  const auto& p1 = s1->position;
+  const auto& p2 = s2->position;
+  float dx       = p2.x - p1.x;
+  float dy       = p2.y - p1.y;
+  float dz       = p2.z - p1.z;
+  float len      = dx * dx + dy * dy + dz * dz;
+  float r1       = s1->radius;
+  float r2       = s2->radius;
+  float rad      = r1 + r2;
   if (len > 0.f && len < rad * rad) {
     len          = std::sqrt(len);
     float invLen = 1.f / len;

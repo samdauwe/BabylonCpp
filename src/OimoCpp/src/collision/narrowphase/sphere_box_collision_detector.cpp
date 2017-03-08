@@ -35,16 +35,16 @@ void SphereBoxCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
       || _b->type != Shape::Type::SHAPE_BOX) {
     return;
   }
-  SphereShape* s = dynamic_cast<SphereShape*>(_s);
-  BoxShape* b    = dynamic_cast<BoxShape*>(_b);
+  auto s = dynamic_cast<SphereShape*>(_s);
+  auto b = dynamic_cast<BoxShape*>(_b);
 
-  const std::array<float, 18>& D = b->dimensions;
+  const auto& D = b->dimensions;
 
-  const Vec3& ps = s->position;
+  const auto& ps = s->position;
   float psx      = ps.x;
   float psy      = ps.y;
   float psz      = ps.z;
-  const Vec3& pb = b->position;
+  const auto& pb = b->position;
   float pbx      = pb.x;
   float pby      = pb.y;
   float pbz      = pb.z;
@@ -60,11 +60,8 @@ void SphereBoxCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
   float sx = D[0] * dx + D[1] * dy + D[2] * dz;
   float sy = D[3] * dx + D[4] * dy + D[5] * dz;
   float sz = D[6] * dx + D[7] * dy + D[8] * dz;
-  float cx;
-  float cy;
-  float cz;
-  float len;
-  float invLen;
+  float cx, cy, cz;
+  float len, invLen;
   unsigned int overlap = 0;
   if (sx > hw) {
     sx = hw;
@@ -191,9 +188,9 @@ void SphereBoxCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
     dy  = cy - ps.y;
     dz  = cz - ps.z;
     len = dx * dx + dy * dy + dz * dz;
-    if (len > 0 && len < rad * rad) {
+    if (len > 0.f && len < rad * rad) {
       len    = std::sqrt(len);
-      invLen = 1 / len;
+      invLen = 1.f / len;
       dx *= invLen;
       dy *= invLen;
       dz *= invLen;

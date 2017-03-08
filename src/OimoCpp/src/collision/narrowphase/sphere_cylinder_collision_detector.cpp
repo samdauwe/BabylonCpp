@@ -36,8 +36,8 @@ void SphereCylinderCollisionDetector::detectCollision(Shape* shape1,
       || _c->type != Shape::Type::SHAPE_CYLINDER) {
     return;
   }
-  SphereShape* s   = dynamic_cast<SphereShape*>(_s);
-  CylinderShape* c = dynamic_cast<CylinderShape*>(_c);
+  auto s = dynamic_cast<SphereShape*>(_s);
+  auto c = dynamic_cast<CylinderShape*>(_c);
 
   const Vec3& ps = s->position;
   float psx      = ps.x;
@@ -91,7 +91,7 @@ void SphereCylinderCollisionDetector::detectCollision(Shape* shape1,
   dz  = cz - psz;
   len = dx * dx + dy * dy + dz * dz;
   float invLen;
-  if (len > 0 && len < rads * rads) {
+  if (len > 0.f && len < rads * rads) {
     len    = std::sqrt(len);
     invLen = 1.f / len;
     dx *= invLen;

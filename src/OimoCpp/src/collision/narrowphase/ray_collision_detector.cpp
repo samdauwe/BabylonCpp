@@ -20,10 +20,10 @@ void RayCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
   if (shape2->type != Shape::Type::SHAPE_TETRA) {
     return;
   }
-  TetraShape* _shape2 = dynamic_cast<TetraShape*>(shape2);
+  auto _shape2 = dynamic_cast<TetraShape*>(shape2);
 
-  const Vec3& pos1 = shape1->position;
-  const Vec3& pos2 = shape2->position;
+  const auto& pos1 = shape1->position;
+  const auto& pos2 = shape2->position;
   Vec3 vec3_1(pos1.x, pos1.y, pos1.z);
   Vec3 vec3_2(pos2.x, pos2.y, pos2.z);
   Vec3 intersect;
@@ -54,8 +54,8 @@ Vec3 RayCollisionDetector::_triangleIntersect(const Vec3& origin,
   Vec3 c(_c.x, _c.y, _c.z);
   float sign, DdN;
 
-  edge1.sub(b, a);
-  edge2.sub(c, a);
+  edge1.subVectors(b, a);
+  edge2.subVectors(c, a);
   normal.crossVectors(edge1, edge2);
 
   DdN = direction.dot(normal);
@@ -75,7 +75,7 @@ Vec3 RayCollisionDetector::_triangleIntersect(const Vec3& origin,
     return result;
   }
 
-  diff.sub(origin, a);
+  diff.subVectors(origin, a);
   float DdQxE2 = sign * direction.dot(edge2.crossVectors(diff, edge2));
 
   // b1 < 0, no intersection

@@ -4,17 +4,11 @@ namespace OIMO {
 
 Face::Face()
 {
-  a.uses.emplace_back(this);
-  b.uses.emplace_back(this);
-  c.uses.emplace_back(this);
 }
 
-Face::Face(const Vertex& _a, const Vertex& _b, const Vertex& _c)
+Face::Face(unsigned int _a, unsigned int _b, unsigned int _c)
     : a{_a}, b{_b}, c{_c}
 {
-  a.uses.emplace_back(this);
-  b.uses.emplace_back(this);
-  c.uses.emplace_back(this);
 }
 
 Face::~Face()

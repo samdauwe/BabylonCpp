@@ -53,7 +53,7 @@ void TetraShape::updateProxy()
   }
 }
 
-Face TetraShape::Mtri(float a, float b, float c)
+Face TetraShape::Mtri(unsigned int a, unsigned int b, unsigned int c)
 {
   return Face(a, b, c);
 }

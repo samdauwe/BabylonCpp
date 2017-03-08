@@ -34,22 +34,22 @@ void TetraTetraCollisionDetector::detectCollision(Shape* shape1, Shape* shape2,
       || shape2->type != Shape::Type::SHAPE_TETRA) {
     return;
   }
-  TetraShape* tet1 = dynamic_cast<TetraShape*>(shape1);
-  // TetraShape* tet2 = dynamic_cast<TetraShape*>(shape2);
+  auto tet1 = dynamic_cast<TetraShape*>(shape1);
+  auto tet2 = dynamic_cast<TetraShape*>(shape2);
   // Faces
-  // const std::array<Face, 4>& fs1 = tet1->faces;
+  auto& fs1 = tet1->faces;
   // Vertices
-  const std::array<Vertex, 4>& vs1 = tet1->verts;
-  // const std::array<Vertex, 4>& vs2 = tet2->verts;
+  auto& vs1 = tet1->verts;
+  auto& vs2 = tet2->verts;
   // Triangle vertices `j1`, `j2` and `j3`
   Vertex j1, j2, j3;
   unsigned int ts = 0;
   for (unsigned int i = 0; i < 4; ++i) {
-    const Vertex& vec = vs1[i];
+    const auto& vec = vs1[i];
     for (unsigned int j = 0; j < 4; ++j) {
-      // j1 = vs2[fs1[i].a]; // a
-      // j2 = vs2[fs1[i].b]; // b
-      // j3 = vs2[fs1[i].c]; // c
+      j1 = vs2[fs1[i].a]; // a
+      j2 = vs2[fs1[i].b]; // b
+      j3 = vs2[fs1[i].c]; // c
 
       if (_tricheck(_pt(vec.x, vec.y), _pt(j1.x, j1.y), _pt(j2.x, j2.y),
                     _pt(j3.x, j3.y))
@@ -74,7 +74,7 @@ bool TetraTetraCollisionDetector::_tricheck(const Vec3& p, const Vec3& p0,
 {
   float A = 0.5f * (-p1.y * p2.x + p0.y * (-p1.x + p2.x) + p0.x * (p1.y - p2.y)
                     + p1.x * p2.y);
-  float sg = A < 0 ? -1 : 1;
+  float sg = A < 0.f ? -1.f : 1.f;
   float s
     = (p0.y * p2.x - p0.x * p2.y + (p2.y - p0.y) * p.x + (p0.x - p2.x) * p.y)
       * sg;

@@ -125,6 +125,11 @@ Vec3& Vec3::sub(const Vec3& v1, const Vec3& v2)
   return *this;
 }
 
+Vec3& Vec3::subVectors(const Vec3& v1, const Vec3& v2)
+{
+  return sub(v1, v2);
+}
+
 Vec3& Vec3::subEqual(const Vec3& v)
 {
   x -= v.x;

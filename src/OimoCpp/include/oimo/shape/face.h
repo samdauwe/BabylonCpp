@@ -8,15 +8,15 @@
 namespace OIMO {
 
 /**
- * @brief A polygon shape face, made from 3 vertices.
+ * @brief Represents a face of a tetra.
  */
 struct Face {
 
   Face();
-  Face(const Vertex& a, const Vertex& b, const Vertex& c);
+  Face(unsigned int a, unsigned int b, unsigned int c);
   ~Face();
 
-  Vertex a, b, c;
+  unsigned int a, b, c;
 
 }; // end of struct Face
 
