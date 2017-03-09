@@ -153,6 +153,11 @@ Mat33& Mat33::multiplyScalar(float s)
   return multiply(s);
 }
 
+Mat33& Mat33::add(const Mat33& m)
+{
+  return addEqual(m);
+}
+
 Mat33& Mat33::add(const Mat33& m1, const Mat33& m2)
 {
   elements[0] = m1.elements[0] + m2.elements[0];
@@ -261,6 +266,11 @@ Mat33& Mat33::mul(const Mat33& m1, const Mat33& m2, bool transpose)
   elements[7] = a6 * b1 + a7 * b4 + a8 * b7;
   elements[8] = a6 * b2 + a7 * b5 + a8 * b8;
   return *this;
+}
+
+Mat33& Mat33::multiplyMatrices(const Mat33& m1, const Mat33& m2, bool transpose)
+{
+  return mul(m1, m2, transpose);
 }
 
 Mat33& Mat33::mulScale(const Mat33& m, float sx, float sy, float sz,

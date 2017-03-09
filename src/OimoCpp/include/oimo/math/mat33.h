@@ -34,6 +34,7 @@ public:
   Mat33& identity();
   Mat33& multiply(float s);
   Mat33& multiplyScalar(float s);
+  Mat33& add(const Mat33& m);
   Mat33& add(const Mat33& m1, const Mat33& m2);
   Mat33& addEqual(const Mat33& m);
   Mat33& sub(const Mat33& m1, const Mat33& m2);
@@ -41,6 +42,8 @@ public:
   Mat33& scale(const Mat33& m, float s);
   Mat33& scaleEqual(float s);
   Mat33& mul(const Mat33& m1, const Mat33& m2, bool transpose = false);
+  Mat33& multiplyMatrices(const Mat33& m1, const Mat33& m2,
+                          bool transpose = false);
   Mat33& mulScale(const Mat33& m, float sx, float sy, float sz,
                   bool prepend = false);
   Mat33& mulRotate(const Mat33& m, float rad, float ax, float ay, float az,

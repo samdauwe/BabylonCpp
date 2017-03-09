@@ -80,6 +80,11 @@ public:
   void sleep();
 
   /**
+   * Test wakeup rigid body.
+   */
+  void testWakeUp();
+
+  /**
    * Get whether the rigid body has not any connection with others.
    * @return
    */
@@ -94,12 +99,17 @@ public:
    */
   void updatePosition(float timeStep);
 
+  Vec3 getAxis();
   void rotateInertia(const Mat33& rot, const Mat33& inertia, Mat33& out);
-  void syncShapes();
-  void applyImpulse(const Vec3& position, const Vec3& force);
-
   Quat rotationVectToQuad(const Vec3& rot);
   Quat rotationAxisToQuad(float rad, float ax, float ay, float az);
+  void syncShapes();
+
+  //----------------------------------------------------------------------------
+  // APPLY IMPULSE FORCE
+  //----------------------------------------------------------------------------
+
+  void applyImpulse(const Vec3& position, const Vec3& force);
 
   //----------------------------------------------------------------------------
   // SET DYNAMIC POSITION AND ROTATION
@@ -118,10 +128,14 @@ public:
   //----------------------------------------------------------------------------
   // GET POSITION AND ROTATION
   //----------------------------------------------------------------------------
-  Vec3 getPosition();
-  Euler getRotation();
-  Quat getQuaternion();
-  Mat44 getMatrix();
+  Vec3 getPosition() const;
+  Quat getQuaternion() const;
+  std::array<float, 16> getMatrix();
+
+  //----------------------------------------------------------------------------
+  // AUTO UPDATE MESH PROPERTIES
+  //----------------------------------------------------------------------------
+  void updateMesh();
 
 public:
   std::string name;
@@ -132,12 +146,15 @@ public:
   // It is the world coordinate of the center of gravity.
   Vec3 position;
   Quat orientation;
+  float scale, invScale;
   Vec3 newPosition;
   bool controlPos;
   Quat newOrientation;
   Vec3 newRotation;
   bool controlRot;
   bool controlRotInTime;
+  Quat quaternion;
+  Vec3 pos;
   // Is the translational velocity.
   Vec3 linearVelocity;
   // Is the angular velocity.
@@ -161,11 +178,12 @@ public:
   Vec3 sleepPosition;
   // It is a quaternion that represents the attitude of sleep just before.
   Quat sleepOrientation;
-  // I will show this rigid body to determine whether it is a rigid body static.
+  // Determines whether this rigid body is static.
   bool isStatic;
-  // I indicates that this rigid body to determine whether it is a rigid body
-  // dynamic.
+  // Determines whether this rigid body is dynamic.
   bool isDynamic;
+  // Determines whether this rigid body is kinematic.
+  bool isKinematic;
   // It is a rotation matrix representing the orientation.
   Mat33 rotation;
   // This is the weight.
@@ -176,6 +194,8 @@ public:
   Mat33 inverseInertia;
   // It is the inertia tensor in the initial state.
   Mat33 localInertia;
+  // Temporary inertia tensor.
+  Mat33 tmpInertia;
   // It is the inverse of the inertia tensor in the initial state.
   Mat33 inverseLocalInertia;
   // I indicates rigid body whether it has been added to the simulation Island.
@@ -186,6 +206,9 @@ public:
   float sleepTime;
   // I shows rigid body to determine whether it is a sleep state.
   bool sleeping;
+  // Mesh properties
+  Vec3 meshPosition;
+  Quat meshQuaternion;
 
 }; // end of class RigidBody
 
