@@ -10,6 +10,7 @@
 #include <oimo/constraint/constraint.h>
 #include <oimo/dynamics/rigid_body.h>
 #include <oimo/math/vec3.h>
+#include <oimo/oimo_utils.h>
 #include <oimo/util/performance.h>
 
 namespace OIMO {
@@ -109,7 +110,7 @@ public:
   unsigned int numIterations;
   // It is a wide-area collision judgment that is used in order to reduce as
   // much as possible a detailed collision judgment.
-  BroadPhase* broadPhase;
+  std::unique_ptr<BroadPhase> broadPhase;
   // This is the detailed information of the performance.
   Performance performance;
   bool isNoStat;
@@ -136,7 +137,7 @@ public:
   Vec3 gravity;
   unsigned int numShapeTypes;
   // Collision detectors (5 shape types)
-  std::array<std::array<CollisionDetector*, 5>, 5> detectors;
+  std::array<std::array<std::unique_ptr<CollisionDetector>, 5>, 5> detectors;
   // Rand
   unsigned int randX, randA, randB;
   std::vector<RigidBody*> islandRigidBodies;

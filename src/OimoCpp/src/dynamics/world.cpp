@@ -50,17 +50,20 @@ World::World(float _timeStep, BroadPhase::Type broadPhaseType,
   // Broad phase
   switch (broadPhaseType) {
     case BroadPhase::Type::BR_BRUTE_FORCE:
-      broadPhase = new BruteForceBroadPhase();
+      // BruteForce
+      broadPhase = make_unique<BruteForceBroadPhase>();
       break;
     case BroadPhase::Type::BR_SWEEP_AND_PRUNE:
-      broadPhase = new SAPBroadPhase();
+      // Sweep & Prune
+      broadPhase = make_unique<SAPBroadPhase>();
       break;
     case BroadPhase::Type::BR_BOUNDING_VOLUME_TREE:
-      broadPhase = new DBVTBroadPhase();
+      // Bounding Volume Tree
+      broadPhase = make_unique<DBVTBroadPhase>();
       break;
     default:
     case BroadPhase::Type::BR_NULL:
-      broadPhase = new SAPBroadPhase();
+      broadPhase = make_unique<SAPBroadPhase>();
   }
   // Convert enums to integers
   unsigned int shapeBoxType = static_cast<unsigned int>(Shape::Type::SHAPE_BOX);
@@ -73,26 +76,28 @@ World::World(float _timeStep, BroadPhase::Type broadPhaseType,
   // Detectors
   // SPHERE add
   detectors[shapeSphereType][shapeSphereType]
-    = new SphereSphereCollisionDetector();
+    = make_unique<SphereSphereCollisionDetector>();
   detectors[shapeSphereType][shapeBoxType]
-    = new SphereBoxCollisionDetector(false);
+    = make_unique<SphereBoxCollisionDetector>(false);
   // BOX add
   detectors[shapeBoxType][shapeSphereType]
-    = new SphereBoxCollisionDetector(true);
-  detectors[shapeBoxType][shapeBoxType] = new BoxBoxCollisionDetector();
+    = make_unique<SphereBoxCollisionDetector>(true);
+  detectors[shapeBoxType][shapeBoxType]
+    = make_unique<BoxBoxCollisionDetector>();
   // CYLINDER add
   detectors[shapeCylinderType][shapeCylinderType]
-    = new CylinderCylinderCollisionDetector();
+    = make_unique<CylinderCylinderCollisionDetector>();
   detectors[shapeCylinderType][shapeBoxType]
-    = new BoxCylinderCollisionDetector(true);
+    = make_unique<BoxCylinderCollisionDetector>(true);
   detectors[shapeBoxType][shapeCylinderType]
-    = new BoxCylinderCollisionDetector(false);
+    = make_unique<BoxCylinderCollisionDetector>(false);
   detectors[shapeCylinderType][shapeSphereType]
-    = new SphereCylinderCollisionDetector(true);
+    = make_unique<SphereCylinderCollisionDetector>(true);
   detectors[shapeSphereType][shapeCylinderType]
-    = new SphereCylinderCollisionDetector(false);
+    = make_unique<SphereCylinderCollisionDetector>(false);
   // TETRA add
-  detectors[shapeTetraType][shapeTetraType] = new TetraTetraCollisionDetector();
+  detectors[shapeTetraType][shapeTetraType]
+    = make_unique<TetraTetraCollisionDetector>();
 }
 
 World::~World()
@@ -124,9 +129,7 @@ void World::addRigidBody(RigidBody* rigidBody)
     return;
   }
   rigidBody->parent = this;
-  rigidBody->awake();
-  for (Shape* shape = rigidBody->shapes; shape != nullptr;
-       shape        = shape->next) {
+  for (auto shape = rigidBody->shapes; shape != nullptr; shape = shape->next) {
     addShape(shape);
   }
   if (rigidBodies != nullptr) {
@@ -139,23 +142,22 @@ void World::addRigidBody(RigidBody* rigidBody)
 
 void World::removeRigidBody(RigidBody* rigidBody)
 {
-  RigidBody* _remove = rigidBody;
+  auto _remove = rigidBody;
   if (_remove->parent != this) {
     return;
   }
   _remove->awake();
-  JointLink* js = _remove->jointLink;
+  auto js = _remove->jointLink;
   while (js != nullptr) {
-    Joint* joint = js->joint;
-    js           = js->next;
+    auto joint = js->joint;
+    js         = js->next;
     removeJoint(joint);
   }
-  for (Shape* shape = rigidBody->shapes; shape != nullptr;
-       shape        = shape->next) {
+  for (auto shape = rigidBody->shapes; shape != nullptr; shape = shape->next) {
     removeShape(shape);
   }
-  RigidBody* prevBody = _remove->prev;
-  RigidBody* nextBody = _remove->next;
+  auto prevBody = _remove->prev;
+  auto nextBody = _remove->next;
   if (prevBody != nullptr) {
     prevBody->next = nextBody;
   }
@@ -207,9 +209,9 @@ void World::addJoint(Joint* joint)
 
 void World::removeJoint(Joint* joint)
 {
-  Joint* _remove   = joint;
-  Joint* prevJoint = _remove->prev;
-  Joint* nextJoint = _remove->next;
+  auto _remove   = joint;
+  auto prevJoint = _remove->prev;
+  auto nextJoint = _remove->next;
   if (prevJoint != nullptr) {
     prevJoint->next = nextJoint;
   }
@@ -245,7 +247,8 @@ void World::addContact(Shape* s1, Shape* s2)
   }
   newContact->attach(s1, s2);
   newContact->detector = detectors[static_cast<unsigned int>(s1->type)]
-                                  [static_cast<unsigned int>(s2->type)];
+                                  [static_cast<unsigned int>(s2->type)]
+                                    .get();
   if (contacts != nullptr) {
     contacts->prev       = newContact;
     contacts->prev->next = contacts;
@@ -256,8 +259,8 @@ void World::addContact(Shape* s1, Shape* s2)
 
 void World::removeContact(Contact* contact)
 {
-  Contact* prevContact = contact->prev;
-  Contact* nextContact = contact->next;
+  auto prevContact = contact->prev;
+  auto nextContact = contact->next;
   if (nextContact != nullptr) {
     nextContact->prev = prevContact;
   }
@@ -278,7 +281,7 @@ void World::removeContact(Contact* contact)
 bool World::checkContact(const std::string& name1, const std::string& name2)
 {
   std::string n1, n2;
-  Contact* contact = contacts;
+  auto contact = contacts;
   while (contact != nullptr) {
     n1 = contact->body1->name;
     n2 = contact->body2->name;
@@ -321,23 +324,18 @@ void World::step()
     // time0 = highres_time_now();
   }
 
-  RigidBody* body = rigidBodies;
+  auto body = rigidBodies;
 
   while (body != nullptr) {
     body->addedToIsland = false;
     if (body->sleeping) {
-      if (body->linearVelocity.testZero() || body->angularVelocity.testZero()
-          || body->position.testDiff(body->sleepPosition)
-          || body->orientation.testDiff(body->sleepOrientation)) {
-        // awake the body
-        body->awake();
-      }
+      body->testWakeUp();
     }
     body = body->next;
   }
 
   //----------------------------------------------------------------------------
-  //   UPDATE CONTACT
+  //   UPDATE BROADPHASE CONTACT
   //----------------------------------------------------------------------------
 
   // broad phase
@@ -351,8 +349,8 @@ void World::step()
   ContactLink* link = nullptr;
   Contact* contact  = nullptr;
   bool exists       = false;
-  for (unsigned int i = broadPhase->numPairs; i > 0; --i) {
-    Pair& pair = pairs[i - 1];
+  for (unsigned int i = broadPhase->numPairs - 1; i-- > 0;) {
+    auto pair = pairs[i];
     if (pair.shape1->id < pair.shape2->id) {
       s1 = pair.shape1;
       s2 = pair.shape2;
@@ -389,6 +387,10 @@ void World::step()
     // performance.broadPhaseTime = time2 - time1;
   }
 
+  //----------------------------------------------------------------------------
+  //   UPDATE NARROWPHASE CONTACT
+  //----------------------------------------------------------------------------
+
   // update & narrow phase
   numContactPoints = 0;
   contact          = contacts;
@@ -396,7 +398,7 @@ void World::step()
   while (contact != nullptr) {
     if (!contact->persisting) {
       if (contact->shape1->aabb->intersectTest(*contact->shape2->aabb)) {
-        Contact* nextContact = contact->next;
+        auto nextContact = contact->next;
         removeContact(contact);
         contact = nextContact;
         continue;
@@ -445,7 +447,7 @@ void World::step()
   ContactLink* cs                   = nullptr;
   contact                           = nullptr;
   RigidBody* nextRigidBody          = nullptr;
-  for (RigidBody* base = rigidBodies; base != nullptr; base = base->next) {
+  for (auto base = rigidBodies; base != nullptr; base = base->next) {
 
     if (base->addedToIsland || base->isStatic || base->sleeping) {
       // ignore
@@ -454,7 +456,7 @@ void World::step()
 
     if (base->isLonely()) { // update single body
       if (base->isDynamic) {
-        base->linearVelocity.addTime(gravity, timeStep);
+        base->linearVelocity.addScaledVector(gravity, timeStep);
       }
       if (callSleep(base)) {
         base->sleepTime += timeStep;
@@ -514,7 +516,7 @@ void World::step()
         islandStack[stackCount++]    = nextRigidBody;
         nextRigidBody->addedToIsland = true;
       }
-      for (JointLink* js = body->jointLink; js != nullptr; js = js->next) {
+      for (auto js = body->jointLink; js != nullptr; js = js->next) {
         constraint = js->joint;
         if (constraint->addedToIsland) {
           // ignore
@@ -534,9 +536,9 @@ void World::step()
     } while (stackCount != 0);
 
     // update velocities
-    Vec3 gVel = Vec3().addTime(gravity, timeStep);
-    for (unsigned int j = islandNumRigidBodies; j > 0; --j) {
-      body = islandRigidBodies[j - 1];
+    auto gVel = Vec3().addScaledVector(gravity, timeStep);
+    for (unsigned int j = islandNumRigidBodies - 1; j-- > 0;) {
+      body = islandRigidBodies[j];
       if (body->isDynamic) {
         body->linearVelocity.addEqual(gVel);
       }
@@ -560,25 +562,25 @@ void World::step()
     }
 
     // solve contraints
-    for (unsigned int j = islandNumConstraints; j > 0; --j) {
+    for (unsigned int j = islandNumConstraints - 1; j-- > 0;) {
       // pre-solve
-      islandConstraints[j - 1]->preSolve(timeStep, invTimeStep);
+      islandConstraints[j]->preSolve(timeStep, invTimeStep);
     }
-    for (unsigned int k = numIterations; k > 0; --k) {
-      for (unsigned int j = islandNumConstraints; j > 0; --j) {
+    for (unsigned int k = 0; k < numIterations; ++k) {
+      for (unsigned int j = islandNumConstraints - 1; j-- > 0;) {
         // main-solve
-        islandConstraints[j - 1]->solve();
+        islandConstraints[j]->solve();
       }
     }
-    for (unsigned int j = islandNumConstraints; j > 0; --j) {
+    for (unsigned int j = islandNumConstraints - 1; j-- > 0;) {
       islandConstraints[j]->postSolve(); // post-solve
       islandConstraints[j] = nullptr;    // gc
     }
 
     // sleeping check
     float sleepTime = 10;
-    for (unsigned int j = islandNumRigidBodies; j > 0; --j) {
-      body = islandRigidBodies[j - 1];
+    for (unsigned int j = islandNumRigidBodies - 1; j-- > 0;) {
+      body = islandRigidBodies[j];
       if (callSleep(body)) {
         body->sleepTime += timeStep;
         if (body->sleepTime < sleepTime) {
@@ -593,16 +595,16 @@ void World::step()
     }
     if (sleepTime > 0.5f) {
       // sleep the island
-      for (unsigned int j = islandNumRigidBodies; j > 0; --j) {
-        islandRigidBodies[j - 1]->sleep();
-        islandRigidBodies[j - 1] = nullptr; // gc
+      for (unsigned int j = islandNumRigidBodies - 1; j-- > 0;) {
+        islandRigidBodies[j]->sleep();
+        islandRigidBodies[j] = nullptr; // gc
       }
     }
     else {
       // update positions
-      for (unsigned int j = islandNumRigidBodies; j > 0; --j) {
-        islandRigidBodies[j - 1]->updatePosition(timeStep);
-        islandRigidBodies[j - 1] = nullptr; // gc
+      for (unsigned int j = islandNumRigidBodies - 1; j-- > 0;) {
+        islandRigidBodies[j]->updatePosition(timeStep);
+        islandRigidBodies[j] = nullptr; // gc
       }
     }
     ++numIslands;
