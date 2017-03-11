@@ -30,12 +30,18 @@ public:
   // scale all by 100 so object is between 10 to 10000 three unit.
   static float WORLD_SCALE;
   static float INV_SCALE;
+  static const std::array<std::string, 4> Btypes;
 
 public:
   World(float timeStep                  = 0.01666f, // 1/60
         BroadPhase::Type broadPhaseType = BroadPhase::Type::BR_SWEEP_AND_PRUNE,
         unsigned int iterations = 8, bool noStat = false);
   ~World();
+
+  /**
+   * Sets the gravity in the world.
+   */
+  void setGravity(const std::vector<float>& ar);
 
   /**
    * Reset the randomizer and remove all rigid bodies, shapes, joints and any
@@ -106,11 +112,13 @@ public:
 public:
   // The time between each step
   float timeStep;
+  float timerate;
   // The number of iterations for constraint solvers.
   unsigned int numIterations;
   // It is a wide-area collision judgment that is used in order to reduce as
   // much as possible a detailed collision judgment.
   std::unique_ptr<BroadPhase> broadPhase;
+  std::string broadPhaseType;
   // This is the detailed information of the performance.
   Performance performance;
   bool isNoStat;

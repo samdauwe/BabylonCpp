@@ -1,14 +1,9 @@
 #ifndef OIMO_UTILS_H
 #define OIMO_UTILS_H
 
-// Collections
-#include <array>
-#include <vector>
-
-// Time functions
-#include <chrono>
 #include <cmath>
 #include <ctime>
+#include <limits>
 #include <memory>
 
 namespace OIMO {
@@ -59,25 +54,6 @@ inline float clamp(float x)
 inline float clamp(float x, float a, float b)
 {
   return (x < a) ? a : ((x > b) ? b : x);
-}
-
-// Time functions
-
-// Common types
-using millisecond_t  = std::chrono::duration<uint64_t, std::ratio<1, 1000>>;
-using milliseconds_t = std::chrono::milliseconds;
-using microsecond_t  = std::chrono::duration<uint64_t, std::ratio<1, 1000000>>;
-using microseconds_t = std::chrono::microseconds;
-using high_res_clock_t      = std::chrono::high_resolution_clock;
-using high_res_time_point_t = std::chrono::time_point<high_res_clock_t>;
-using system_clock_t        = std::chrono::system_clock;
-using system_time_point_t   = std::chrono::time_point<system_clock_t>;
-
-inline microseconds_t
-microseconds_since(const high_res_time_point_t& high_res_timepoint)
-{
-  return (std::chrono::duration_cast<microseconds_t>(
-    std::chrono::high_resolution_clock::now() - high_res_timepoint));
 }
 
 } // end of namespace OIMO

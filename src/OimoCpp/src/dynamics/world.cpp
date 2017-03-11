@@ -26,10 +26,13 @@ namespace OIMO {
 
 float World::WORLD_SCALE = 100.f;
 float World::INV_SCALE   = 0.01f;
+const std::array<std::string, 4> World::Btypes
+  = {{"None", "BruteForce", "Sweep & Prune", "Bounding Volume Tree"}};
 
-World::World(float _timeStep, BroadPhase::Type broadPhaseType,
+World::World(float _timeStep, BroadPhase::Type iBroadPhaseType,
              unsigned int _numIterations, bool noStat)
     : timeStep{_timeStep}
+    , timerate{timeStep * 1000.f}
     , numIterations{_numIterations}
     , performance{Performance(this)}
     , isNoStat{noStat}
@@ -48,22 +51,26 @@ World::World(float _timeStep, BroadPhase::Type broadPhaseType,
     , randB{123456789}
 {
   // Broad phase
-  switch (broadPhaseType) {
+  switch (iBroadPhaseType) {
     case BroadPhase::Type::BR_BRUTE_FORCE:
       // BruteForce
-      broadPhase = make_unique<BruteForceBroadPhase>();
+      broadPhase     = make_unique<BruteForceBroadPhase>();
+      broadPhaseType = Btypes[1];
       break;
     case BroadPhase::Type::BR_SWEEP_AND_PRUNE:
       // Sweep & Prune
-      broadPhase = make_unique<SAPBroadPhase>();
+      broadPhase     = make_unique<SAPBroadPhase>();
+      broadPhaseType = Btypes[2];
       break;
     case BroadPhase::Type::BR_BOUNDING_VOLUME_TREE:
       // Bounding Volume Tree
-      broadPhase = make_unique<DBVTBroadPhase>();
+      broadPhase     = make_unique<DBVTBroadPhase>();
+      broadPhaseType = Btypes[3];
       break;
     default:
     case BroadPhase::Type::BR_NULL:
-      broadPhase = make_unique<SAPBroadPhase>();
+      broadPhase     = make_unique<SAPBroadPhase>();
+      broadPhaseType = Btypes[0];
   }
   // Convert enums to integers
   unsigned int shapeBoxType = static_cast<unsigned int>(Shape::Type::SHAPE_BOX);
@@ -102,6 +109,11 @@ World::World(float _timeStep, BroadPhase::Type broadPhaseType,
 
 World::~World()
 {
+}
+
+void World::setGravity(const std::vector<float>& ar)
+{
+  gravity.fromArray(ar);
 }
 
 void World::clear()
@@ -316,12 +328,10 @@ bool World::callSleep(RigidBody* body)
 
 void World::step()
 {
-  // std::time_t time0 = 0, time1 = 0, time2 = 0, time3 = 0;
-
   bool stat = !isNoStat ? true : false;
 
   if (stat) {
-    // time0 = highres_time_now();
+    performance.setTime(0);
   }
 
   auto body = rigidBodies;
@@ -340,7 +350,7 @@ void World::step()
 
   // broad phase
   if (stat) {
-    // time1 = highres_time_now();
+    performance.setTime(1);
   }
 
   broadPhase->detectPairs();
@@ -383,8 +393,7 @@ void World::step()
   }
 
   if (stat) {
-    // time2                      = highres_time_now();
-    // performance.broadPhaseTime = time2 - time1;
+    performance.calcBroadPhase();
   }
 
   //----------------------------------------------------------------------------
@@ -416,8 +425,7 @@ void World::step()
   }
 
   if (stat) {
-    // time3                       = highres_time_now();
-    // performance.narrowPhaseTime = time3 - time2;
+    performance.calcNarrowPhase();
   }
 
   //----------------------------------------------------------------------------
@@ -437,7 +445,10 @@ void World::step()
   islandConstraints.clear();
   islandStack.clear();
 
-  // time1      = highres_time_now();
+  if (stat) {
+    performance.setTime(1);
+  }
+
   numIslands = 0;
 
   // build and solve simulation islands
@@ -546,18 +557,14 @@ void World::step()
 
     // randomizing order
     if (enableRandomizer) {
-      // for(var j=1, l=islandNumConstraints; j<l; j++){
-      unsigned int j = islandNumConstraints;
-      while ((j--) > 0) {
-        if (j != 0) {
-          randX = ((randX * randA) + (randB & 0x7fffffff));
-          float tmp
-            = static_cast<float>(randX) / static_cast<float>(2147483648 * j);
-          unsigned int swap       = static_cast<unsigned int>(tmp) | 0;
-          constraint              = islandConstraints[j];
-          islandConstraints[j]    = islandConstraints[swap];
-          islandConstraints[swap] = constraint;
-        }
+      for (unsigned int j = islandNumRigidBodies - 1; j-- > 0;) {
+        randX = ((randX * randA) + (randB & 0x7fffffff));
+        float tmp
+          = static_cast<float>(randX) / static_cast<float>(2147483648 * j);
+        unsigned int swap       = static_cast<unsigned int>(tmp) | 0;
+        constraint              = islandConstraints[j];
+        islandConstraints[j]    = islandConstraints[swap];
+        islandConstraints[swap] = constraint;
       }
     }
 
@@ -578,7 +585,7 @@ void World::step()
     }
 
     // sleeping check
-    float sleepTime = 10;
+    float sleepTime = 10.f;
     for (unsigned int j = islandNumRigidBodies - 1; j-- > 0;) {
       body = islandRigidBodies[j];
       if (callSleep(body)) {
@@ -610,18 +617,12 @@ void World::step()
     ++numIslands;
   }
 
+  //----------------------------------------------------------------------------
+  //   END SIMULATION
+  //----------------------------------------------------------------------------
+
   if (stat) {
-    // time2                   = highres_time_now();
-    // performance.solvingTime = time2 - time1;
-
-    //--------------------------------------------------------------------------
-    //   END SIMULATION
-    //--------------------------------------------------------------------------
-
-    // time2 = highres_time_now();
-    // fps update
-    performance.upfps();
-    // performance.totalTime = time2 - time0;
+    performance.calcEnd();
   }
 }
 
