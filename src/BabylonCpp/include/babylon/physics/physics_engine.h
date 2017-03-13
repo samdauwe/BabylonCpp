@@ -52,7 +52,8 @@ public:
    * @param {PhysicsJoint} the joint that will connect both impostors.
    */
   void addJoint(PhysicsImpostor* mainImpostor,
-                PhysicsImpostor* connectedImpostor, PhysicsJoint* joint);
+                PhysicsImpostor* connectedImpostor,
+                const std::shared_ptr<PhysicsJoint>& joint);
 
   void removeJoint(PhysicsImpostor* mainImpostor,
                    PhysicsImpostor* connectedImpostor, PhysicsJoint* joint);

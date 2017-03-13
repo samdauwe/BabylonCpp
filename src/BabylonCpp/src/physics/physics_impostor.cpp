@@ -1,10 +1,12 @@
 #include <babylon/physics/physics_impostor.h>
 
+#include <babylon/core/logging.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/engine/scene.h>
 #include <babylon/math/vector3.h>
 #include <babylon/mesh/abstract_mesh.h>
+#include <babylon/mesh/mesh.h>
 #include <babylon/physics/iphysics_enabled_object.h>
 #include <babylon/physics/iphysics_engine_plugin.h>
 #include <babylon/physics/joint/physics_joint.h>
@@ -18,11 +20,17 @@ PhysicsImpostor::PhysicsImpostor(IPhysicsEnabledObject* _object,
                                  unsigned int _type,
                                  PhysicsImpostorParameters& options,
                                  Scene* scene)
-    : object{_object}, type{_type}, _options{options}, _scene{scene}
+    : object{_object}
+    , type{_type}
+    , _options{options}
+    , _scene{scene}
+    , _bodyUpdateRequired{false}
+    , _deltaPosition{Vector3::Zero()}
 {
   // Sanity check!
   if (!object) {
-    // "No object was provided. A physics object is obligatory
+    BABYLON_LOG_ERROR("PhysicsImpostor",
+                      "No object was provided. A physics object is obligatory");
     return;
   }
 
@@ -32,19 +40,22 @@ PhysicsImpostor::PhysicsImpostor(IPhysicsEnabledObject* _object,
   }
 
   _physicsEngine = _scene->getPhysicsEngine();
-  if (_physicsEngine) {
-    // set the object's quaternion, if not set
-    //if (!object->rotationQuaternion()) {
-    //  if (object->rotation()) {
-        //object->setRotationQuaternion(
-        //  Quaternion::RotationYawPitchRoll(
-        //    object->rotation()->y, object->rotation()->x, object->rotation()->z)
-        //    .cloneToNewObject());
-    //  }
-    //  else {
-    //    object->setRotationQuaternion(new Quaternion());
-    //  }
-    //}
+  if (!_physicsEngine) {
+    BABYLON_LOG_ERROR("PhysicsImpostor",
+                      "Physics not enabled. Please use "
+                      "scene.enablePhysics(...) before creating impostors.");
+  }
+  else {
+    // Set the object's quaternion, if not set
+    if (!object->rotationQuaternionSet()) {
+      if (object->rotation() == Vector3::Zero()) {
+        object->setRotationQuaternion(Quaternion::RotationYawPitchRoll(
+          object->rotation().y, object->rotation().x, object->rotation().z));
+      }
+      else {
+        object->setRotationQuaternion(Quaternion());
+      }
+    }
     // If the mesh has a parent, don't initialize the physicsBody. Instead wait
     // for the parent to do that.
     if (!object->getParent()) {
@@ -69,7 +80,7 @@ void PhysicsImpostor::_init()
 
 PhysicsImpostor* PhysicsImpostor::_getPhysicsParent()
 {
-  return object->getParent()->physicsImpostor;
+  return object->getParent()->physicsImpostor.get();
 }
 
 bool PhysicsImpostor::isBodyInitRequired() const
@@ -100,6 +111,11 @@ PhysicsImpostor* PhysicsImpostor::parent()
   return _parent;
 }
 
+void PhysicsImpostor::setParent(PhysicsImpostor* value)
+{
+  _parent = value;
+}
+
 void PhysicsImpostor::setPhysicsBody(AbstractMesh* physicsBody)
 {
   if (_physicsBody) {
@@ -118,10 +134,8 @@ Vector3 PhysicsImpostor::getObjectExtendSize()
 {
   if (object->getBoundingInfo()) {
     object->computeWorldMatrix(true);
-    return object->getBoundingInfo()
-      ->boundingBox
-      .extendSize.scale(2)/*
-      .multiply(object->scaling())*/;
+    return object->getBoundingInfo()->boundingBox.extendSize.scale(2).multiply(
+      object->scaling());
   }
   else {
     return PhysicsImpostor::DEFAULT_OBJECT_SIZE;
@@ -134,7 +148,7 @@ Vector3 PhysicsImpostor::getObjectCenter()
     return object->getBoundingInfo()->boundingBox.center;
   }
   else {
-    return Vector3()/* *object->position()*/;
+    return object->position();
   }
 }
 
@@ -182,10 +196,10 @@ void PhysicsImpostor::setAngularVelocity(const Vector3& velocity)
 }
 
 void PhysicsImpostor::executeNativeFunction(
-  const FastFunc<void(Mesh* world, Mesh* physicsBody)>& /*func*/)
+  const FastFunc<void(Mesh* world, Mesh* physicsBody)>& func)
 {
-  // TODO FIXME
-  // func(_physicsEngine->getPhysicsPlugin()->world, physicsBody);
+  func(_physicsEngine->getPhysicsPlugin()->world,
+       dynamic_cast<Mesh*>(physicsBody()));
 }
 
 void PhysicsImpostor::registerBeforePhysicsStep(
@@ -197,11 +211,10 @@ void PhysicsImpostor::registerBeforePhysicsStep(
 void PhysicsImpostor::unregisterBeforePhysicsStep(
   const FastFunc<void(PhysicsImpostor* impostor)>& func)
 {
-  auto it = std::find(_onBeforePhysicsStepCallbacks.begin(),
-                      _onBeforePhysicsStepCallbacks.end(), func);
-  if (it != _onBeforePhysicsStepCallbacks.end()) {
-    _onBeforePhysicsStepCallbacks.erase(it);
-  }
+  _onBeforePhysicsStepCallbacks.erase(
+    std::remove(_onBeforePhysicsStepCallbacks.begin(),
+                _onBeforePhysicsStepCallbacks.end(), func),
+    _onBeforePhysicsStepCallbacks.end());
 }
 
 void PhysicsImpostor::registerAfterPhysicsStep(
@@ -213,11 +226,10 @@ void PhysicsImpostor::registerAfterPhysicsStep(
 void PhysicsImpostor::unregisterAfterPhysicsStep(
   const FastFunc<void(PhysicsImpostor* impostor)>& func)
 {
-  auto it = std::find(_onAfterPhysicsStepCallbacks.begin(),
-                      _onAfterPhysicsStepCallbacks.end(), func);
-  if (it != _onAfterPhysicsStepCallbacks.end()) {
-    _onAfterPhysicsStepCallbacks.erase(it);
-  }
+  _onAfterPhysicsStepCallbacks.erase(
+    std::remove(_onAfterPhysicsStepCallbacks.begin(),
+                _onAfterPhysicsStepCallbacks.end(), func),
+    _onAfterPhysicsStepCallbacks.end());
 }
 
 void PhysicsImpostor::registerOnPhysicsCollide()
@@ -230,15 +242,15 @@ void PhysicsImpostor::unregisterOnPhysicsCollide()
 
 void PhysicsImpostor::beforeStep()
 {
-  /*object->position()->subtractToRef(_deltaPosition, _tmpPositionWithDelta);
+  object->position().subtractToRef(_deltaPosition, _tmpPositionWithDelta);
   // conjugate deltaRotation
   if (_deltaRotationConjugated) {
-    object->rotationQuaternion()->multiplyToRef(*_deltaRotationConjugated,
-                                                _tmpRotationWithDelta);
+    object->rotationQuaternion().multiplyToRef(*_deltaRotationConjugated,
+                                               _tmpRotationWithDelta);
   }
   else {
-    _tmpRotationWithDelta.copyFrom(*object->rotationQuaternion());
-  }*/
+    _tmpRotationWithDelta.copyFrom(object->rotationQuaternion());
+  }
 
   _physicsEngine->getPhysicsPlugin()->setPhysicsBodyTransformation(
     this, _tmpPositionWithDelta, _tmpRotationWithDelta);
@@ -256,10 +268,10 @@ void PhysicsImpostor::afterStep()
 
   _physicsEngine->getPhysicsPlugin()->setTransformationFromPhysicsBody(this);
 
-  /*object->position()->addInPlace(_deltaPosition);
+  object->position().addInPlace(_deltaPosition);
   if (_deltaRotation) {
-    object->rotationQuaternion()->multiplyInPlace(*_deltaRotation);
-  }*/
+    object->rotationQuaternion().multiplyInPlace(*_deltaRotation);
+  }
 }
 
 void PhysicsImpostor::onCollide(AbstractMesh* /*body*/)
@@ -282,15 +294,15 @@ void PhysicsImpostor::createJoint(PhysicsImpostor* otherImpostor,
                                   unsigned int jointType,
                                   const PhysicsJointData& jointData)
 {
-  PhysicsJoint* joint = new PhysicsJoint(jointType, jointData);
-  addJoint(otherImpostor, joint);
+  addJoint(otherImpostor, std::make_shared<PhysicsJoint>(jointType, jointData));
 }
 
 void PhysicsImpostor::addJoint(PhysicsImpostor* otherImpostor,
-                               PhysicsJoint* joint)
+                               const std::shared_ptr<PhysicsJoint>& joint)
 {
   Joint _joint;
-  _joint.otherImpostor = otherImpostor, _joint.joint = joint;
+  _joint.otherImpostor = otherImpostor;
+  _joint.joint         = joint;
   _joints.emplace_back(_joint);
 
   _physicsEngine->addJoint(this, otherImpostor, joint);
@@ -306,28 +318,29 @@ void PhysicsImpostor::wakeUp()
   _physicsEngine->getPhysicsPlugin()->wakeUpBody(this);
 }
 
-PhysicsImpostor* PhysicsImpostor::clone(IPhysicsEnabledObject* newObject)
+std::unique_ptr<PhysicsImpostor>
+PhysicsImpostor::clone(IPhysicsEnabledObject* newObject)
 {
   if (!newObject) {
     return nullptr;
   }
-  return new PhysicsImpostor(newObject, type, _options, _scene);
+  return std_util::make_unique<PhysicsImpostor>(newObject, type, _options,
+                                                _scene);
 }
 
 void PhysicsImpostor::dispose(bool /*doNotRecurse*/)
 {
-  // no dispose if no physics engine is available.
+  // No dispose if no physics engine is available.
   if (!_physicsEngine) {
     return;
   }
 
   for (auto& j : _joints) {
-    _physicsEngine->removeJoint(this, j.otherImpostor, j.joint);
+    _physicsEngine->removeJoint(this, j.otherImpostor, j.joint.get());
   }
 
-  // dispose the physics body
+  // Dispose the physics body
   _physicsEngine->removeImpostor(this);
-
   if (parent()) {
     parent()->forceUpdate();
   }
@@ -341,10 +354,10 @@ void PhysicsImpostor::setDeltaPosition(const Vector3& position)
 void PhysicsImpostor::setDeltaRotation(const Quaternion& rotation)
 {
   if (!_deltaRotation) {
-    _deltaRotation = new Quaternion();
+    _deltaRotation = std_util::make_unique<Quaternion>();
   }
   _deltaRotation->copyFrom(rotation);
-  //_deltaRotationConjugated = _deltaRotation->conjugate().cloneToNewObject();
+  _deltaRotationConjugated->copyFrom(_deltaRotation->conjugate());
 }
 
 } // end of namespace BABYLON

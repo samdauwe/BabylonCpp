@@ -6,13 +6,14 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT IPhysicsEnabledObject {
-  //virtual Vector3 position(){return nullptr;};
-  //virtual Quaternion* rotationQuaternion()                   = 0;
-  //virtual void setRotationQuaternion(Quaternion* quaternion) = 0;
-  //virtual Vector3* scaling()                                 = 0;
-  //virtual Vector3* rotation()                                = 0;
-  virtual AbstractMesh* getParent()                          = 0;
-  virtual BoundingInfo* getBoundingInfo()                    = 0;
+  virtual Vector3& position()                                      = 0;
+  virtual Quaternion& rotationQuaternion()                         = 0;
+  virtual bool rotationQuaternionSet() const                       = 0;
+  virtual void setRotationQuaternion(const Quaternion& quaternion) = 0;
+  virtual Vector3& scaling()                                       = 0;
+  virtual Vector3& rotation()                                      = 0;
+  virtual AbstractMesh* getParent()                                = 0;
+  virtual BoundingInfo* getBoundingInfo()                          = 0;
   virtual Matrix computeWorldMatrix(bool force = false) = 0;
   virtual std::vector<AbstractMesh*>
   getChildMeshes(bool directDecendantsOnly,

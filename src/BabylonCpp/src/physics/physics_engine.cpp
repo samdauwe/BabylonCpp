@@ -68,7 +68,7 @@ void PhysicsEngine::removeImpostor(PhysicsImpostor* impostor)
 
 void PhysicsEngine::addJoint(PhysicsImpostor* mainImpostor,
                              PhysicsImpostor* connectedImpostor,
-                             PhysicsJoint* joint)
+                             const std::shared_ptr<PhysicsJoint>& joint)
 {
   PhysicsImpostorJoint* impostorJoint = new PhysicsImpostorJoint();
   impostorJoint->mainImpostor         = mainImpostor;
@@ -91,7 +91,7 @@ void PhysicsEngine::removeJoint(PhysicsImpostor* mainImpostor,
     [&connectedImpostor, &joint,
      &mainImpostor](const PhysicsImpostorJoint* impostorJoint) {
       return (impostorJoint->connectedImpostor == connectedImpostor
-              && impostorJoint->joint == joint
+              && impostorJoint->joint.get() == joint
               && impostorJoint->mainImpostor == mainImpostor);
     });
 

@@ -34,7 +34,7 @@ void PhysicsJoint::setPhysicsPlugin(IPhysicsEnginePlugin* physicsPlugin)
 }
 
 void PhysicsJoint::executeNativeFunction(
-  const std::function<void(IWorld* world, PhysicsJoint* physicsJoint)>& func)
+  const std::function<void(Mesh* world, PhysicsJoint* physicsJoint)>& func)
 {
   func(_physicsPlugin->world, _physicsJoint);
 }

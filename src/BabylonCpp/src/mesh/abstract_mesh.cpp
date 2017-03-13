@@ -890,7 +890,7 @@ bool AbstractMesh::intersectsPoint(const Vector3& point)
 
 PhysicsImpostor* AbstractMesh::getPhysicsImpostor()
 {
-  return physicsImpostor;
+  return physicsImpostor.get();
 }
 
 Vector3 AbstractMesh::getPositionInCameraSpace(Camera* camera)

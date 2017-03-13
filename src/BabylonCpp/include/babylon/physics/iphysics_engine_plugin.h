@@ -6,7 +6,7 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT IPhysicsEnginePlugin {
-  IWorld* world;
+  Mesh* world;
   std::string name;
   virtual void setGravity(const Vector3& gravity) = 0;
   virtual void setTimeStep(float timeStep)        = 0;

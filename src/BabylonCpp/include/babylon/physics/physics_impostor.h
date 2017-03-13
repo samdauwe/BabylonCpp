@@ -11,7 +11,7 @@
 namespace BABYLON {
 
 struct Joint {
-  PhysicsJoint* joint;
+  std::shared_ptr<PhysicsJoint> joint;
   PhysicsImpostor* otherImpostor;
 }; // end of class JointElement
 
@@ -62,6 +62,7 @@ public:
   AbstractMesh* physicsBody();
 
   PhysicsImpostor* parent();
+  void setParent(PhysicsImpostor* value);
 
   /**
    * Set the physics body. Used mainly by the physics engine/plugin
@@ -171,7 +172,8 @@ public:
   /**
    * Add a joint to this impostor with a different impostor.
    */
-  void addJoint(PhysicsImpostor* otherImpostor, PhysicsJoint* joint);
+  void addJoint(PhysicsImpostor* otherImpostor,
+                const std::shared_ptr<PhysicsJoint>& joint);
 
   /**
    * Will keep this body still, in a sleep mode.
@@ -183,7 +185,7 @@ public:
    */
   void wakeUp();
 
-  PhysicsImpostor* clone(IPhysicsEnabledObject* newObject);
+  std::unique_ptr<PhysicsImpostor> clone(IPhysicsEnabledObject* newObject);
   void dispose(bool doNotRecurse = false) override;
   void setDeltaPosition(const Vector3& position);
   void setDeltaRotation(const Quaternion& rotation);
@@ -209,8 +211,8 @@ private:
   std::vector<FastFunc<void(PhysicsImpostor* imposter)>>
     _onAfterPhysicsStepCallbacks;
   Vector3 _deltaPosition;
-  Quaternion* _deltaRotation;
-  Quaternion* _deltaRotationConjugated;
+  std::unique_ptr<Quaternion> _deltaRotation;
+  std::unique_ptr<Quaternion> _deltaRotationConjugated;
   // If set, this is this impostor's parent
   PhysicsImpostor* _parent;
   std::vector<Joint> _joints;

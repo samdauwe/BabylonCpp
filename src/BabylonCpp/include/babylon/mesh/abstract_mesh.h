@@ -52,15 +52,15 @@ public:
   Scene* getScene() override;
   void setSkeleton(Skeleton* value);
   virtual Skeleton* skeleton();
-  Vector3& position();
+  Vector3& position() override;
   void setPosition(const Vector3& newPosition);
-  Vector3& rotation();
+  Vector3& rotation() override;
   void setRotation(const Vector3& newRotation);
-  Vector3& scaling();
+  Vector3& scaling() override;
   void setScaling(const Vector3& newScaling);
-  Quaternion& rotationQuaternion();
-  bool rotationQuaternionSet() const;
-  void setRotationQuaternion(const Quaternion& quaternion);
+  Quaternion& rotationQuaternion() override;
+  bool rotationQuaternionSet() const override;
+  void setRotationQuaternion(const Quaternion& quaternion) override;
   void resetRotationQuaternion();
   virtual AbstractMesh* getParent() override;
 
@@ -278,7 +278,7 @@ public:
   // This scene's action manager
   ActionManager* actionManager;
   // Physics
-  PhysicsImpostor* physicsImpostor;
+  std::unique_ptr<PhysicsImpostor> physicsImpostor;
   // Collisions
   Vector3 ellipsoid;
   Vector3 ellipsoidOffset;
