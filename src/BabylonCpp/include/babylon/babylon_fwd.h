@@ -339,7 +339,7 @@ class ParticleSystem;
 class SolidParticle;
 class SolidParticleSystem;
 // --- Physics ---
-struct IBody;
+struct IPhysicsBody;
 struct IPhysicsEnabledObject;
 struct IPhysicsEnginePlugin;
 struct IWorld;

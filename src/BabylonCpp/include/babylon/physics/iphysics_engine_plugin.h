@@ -10,7 +10,9 @@ struct BABYLON_SHARED_EXPORT IPhysicsEnginePlugin {
   std::string name;
   virtual void setGravity(const Vector3& gravity) = 0;
   virtual void setTimeStep(float timeStep)        = 0;
-  virtual void executeStep(float delta, std::vector<PhysicsImpostor*> impostors)
+  virtual void
+  executeStep(float delta,
+              const std::vector<std::unique_ptr<PhysicsImpostor>>& impostors)
     = 0; // not forgetting pre and post events
   virtual void applyImpulse(PhysicsImpostor* impostor, const Vector3& force,
                             const Vector3& contactPoint)

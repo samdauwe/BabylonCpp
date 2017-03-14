@@ -1,5 +1,6 @@
 #include <babylon/physics/physics_engine.h>
 
+#include <babylon/core/logging.h>
 #include <babylon/physics/iphysics_engine_plugin.h>
 #include <babylon/physics/joint/physics_joint.h>
 #include <babylon/physics/physics_impostor.h>
@@ -15,6 +16,12 @@ PhysicsEngine::PhysicsEngine(const Vector3& _gravity,
     setGravity(_gravity);
     setTimeStep();
     _initialized = true;
+  }
+  else {
+    BABYLON_LOGF_ERROR(
+      "PhysicsEngine",
+      "Physics Engine %s cannot be found. Please make sure it is included.",
+      _physicsPlugin->name.c_str())
   }
 }
 
@@ -48,8 +55,8 @@ std::string PhysicsEngine::getPhysicsPluginName() const
 
 void PhysicsEngine::addImpostor(PhysicsImpostor* impostor)
 {
-  impostor->uniqueId = _impostors.size();
   _impostors.emplace_back(impostor);
+  impostor->uniqueId = _impostors.size();
   // if no parent, generate the body
   if (!impostor->parent()) {
     _physicsPlugin->generatePhysicsBody(impostor);
@@ -58,7 +65,11 @@ void PhysicsEngine::addImpostor(PhysicsImpostor* impostor)
 
 void PhysicsEngine::removeImpostor(PhysicsImpostor* impostor)
 {
-  auto it = std::find(_impostors.begin(), _impostors.end(), impostor);
+  auto it = std::find_if(
+    _impostors.begin(), _impostors.end(),
+    [&impostor](const std::unique_ptr<PhysicsImpostor>& _imposter) {
+      return _imposter.get() == impostor;
+    });
   if (it != _impostors.end()) {
     // this will also remove it from the world.
     (*it)->setPhysicsBody(nullptr);
@@ -70,26 +81,27 @@ void PhysicsEngine::addJoint(PhysicsImpostor* mainImpostor,
                              PhysicsImpostor* connectedImpostor,
                              const std::shared_ptr<PhysicsJoint>& joint)
 {
-  PhysicsImpostorJoint* impostorJoint = new PhysicsImpostorJoint();
-  impostorJoint->mainImpostor         = mainImpostor;
-  impostorJoint->connectedImpostor    = connectedImpostor;
-  impostorJoint->joint                = joint;
+  auto impostorJoint               = std::make_shared<PhysicsImpostorJoint>();
+  impostorJoint->mainImpostor      = mainImpostor;
+  impostorJoint->connectedImpostor = connectedImpostor;
+  impostorJoint->joint             = joint;
 
   joint->setPhysicsPlugin(_physicsPlugin);
   _joints.emplace_back(impostorJoint);
-  _physicsPlugin->generateJoint(impostorJoint);
+  _physicsPlugin->generateJoint(impostorJoint.get());
 }
 
 void PhysicsEngine::removeJoint(PhysicsImpostor* mainImpostor,
                                 PhysicsImpostor* connectedImpostor,
                                 PhysicsJoint* joint)
 {
-  std::vector<PhysicsImpostorJoint*> matchingJoints(_joints.size());
+  std::vector<std::shared_ptr<PhysicsImpostorJoint>> matchingJoints(
+    _joints.size());
 
   auto it = std::copy_if(
     _joints.begin(), _joints.end(), matchingJoints.begin(),
-    [&connectedImpostor, &joint,
-     &mainImpostor](const PhysicsImpostorJoint* impostorJoint) {
+    [&connectedImpostor, &joint, &mainImpostor](
+      const std::shared_ptr<PhysicsImpostorJoint>& impostorJoint) {
       return (impostorJoint->connectedImpostor == connectedImpostor
               && impostorJoint->joint.get() == joint
               && impostorJoint->mainImpostor == mainImpostor);
@@ -100,7 +112,7 @@ void PhysicsEngine::removeJoint(PhysicsImpostor* mainImpostor,
     static_cast<size_t>(std::distance(matchingJoints.begin(), it)));
 
   if (!matchingJoints.empty()) {
-    _physicsPlugin->removeJoint(matchingJoints[0]);
+    _physicsPlugin->removeJoint(matchingJoints[0].get());
   }
 }
 
@@ -109,7 +121,7 @@ void PhysicsEngine::_step(float delta)
   // check if any mesh has no body / requires an update
   for (auto& impostor : _impostors) {
     if (impostor->isBodyInitRequired()) {
-      _physicsPlugin->generatePhysicsBody(impostor);
+      _physicsPlugin->generatePhysicsBody(impostor.get());
     }
   }
 
@@ -131,20 +143,22 @@ IPhysicsEnginePlugin* PhysicsEngine::getPhysicsPlugin()
 PhysicsImpostor*
 PhysicsEngine::getImpostorForPhysicsObject(IPhysicsEnabledObject* object)
 {
-  auto it = std::find_if(_impostors.begin(), _impostors.end(),
-                         [&object](PhysicsImpostor* impostor) {
-                           return impostor->object == object;
-                         });
-  return (it == _impostors.end()) ? nullptr : (*it);
+  auto it
+    = std::find_if(_impostors.begin(), _impostors.end(),
+                   [&object](const std::unique_ptr<PhysicsImpostor>& impostor) {
+                     return impostor->object == object;
+                   });
+  return (it == _impostors.end()) ? nullptr : (*it).get();
 }
 
-PhysicsImpostor* PhysicsEngine::getImpostorWithPhysicsBody(AbstractMesh* body)
+PhysicsImpostor* PhysicsEngine::getImpostorWithPhysicsBody(IPhysicsBody* body)
 {
-  auto it = std::find_if(_impostors.begin(), _impostors.end(),
-                         [&body](PhysicsImpostor* impostor) {
-                           return impostor->physicsBody() == body;
-                         });
-  return (it == _impostors.end()) ? nullptr : (*it);
+  auto it
+    = std::find_if(_impostors.begin(), _impostors.end(),
+                   [&body](const std::unique_ptr<PhysicsImpostor>& impostor) {
+                     return impostor->physicsBody() == body;
+                   });
+  return (it == _impostors.end()) ? nullptr : (*it).get();
 }
 
 bool PhysicsEngine::isInitialized() const

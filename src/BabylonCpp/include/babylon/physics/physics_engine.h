@@ -67,7 +67,7 @@ public:
 
   PhysicsImpostor* getImpostorForPhysicsObject(IPhysicsEnabledObject* object);
 
-  PhysicsImpostor* getImpostorWithPhysicsBody(AbstractMesh* body);
+  PhysicsImpostor* getImpostorWithPhysicsBody(IPhysicsBody* body);
 
   bool isInitialized() const;
 
@@ -77,8 +77,8 @@ public:
 private:
   bool _initialized;
   IPhysicsEnginePlugin* _physicsPlugin;
-  std::vector<PhysicsImpostor*> _impostors;
-  std::vector<PhysicsImpostorJoint*> _joints;
+  std::vector<std::unique_ptr<PhysicsImpostor>> _impostors;
+  std::vector<std::shared_ptr<PhysicsImpostorJoint>> _joints;
 
 }; // end of class PhysicsEngine
 

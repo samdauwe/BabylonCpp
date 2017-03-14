@@ -1,6 +1,8 @@
 #include <babylon/physics/plugins/oimo_physics_engine_plugin.h>
 
+#include <babylon/core/logging.h>
 #include <babylon/mesh/abstract_mesh.h>
+#include <babylon/physics/iphysics_body.h>
 #include <babylon/physics/physics_impostor.h>
 #include <oimo/collision/broadphase/broad_phase.h>
 #include <oimo/constraint/contact/contact.h>
@@ -85,9 +87,24 @@ void OimoPhysicsEnginePlugin::executeStep(
 #endif
 }
 
-void applyForce(PhysicsImpostor* /*impostor*/, const Vector3& /*force*/,
-                const Vector3& /*contactPoint*/)
+void OimoPhysicsEnginePlugin::applyImpulse(PhysicsImpostor* impostor,
+                                           const Vector3& force,
+                                           const Vector3& contactPoint)
 {
+  auto mass = impostor->physicsBody()->getMass();
+  impostor->physicsBody()->applyImpulse(
+    contactPoint.scale(OIMO::World::INV_SCALE),
+    force.scale(OIMO::World::INV_SCALE * mass));
+}
+
+void OimoPhysicsEnginePlugin::applyForce(PhysicsImpostor* impostor,
+                                         const Vector3& force,
+                                         const Vector3& contactPoint)
+{
+  BABYLON_LOG_WARN(
+    "OimoPhysicsEnginePlugin",
+    "Oimo doesn't support applying force. Using impule instead.");
+  applyImpulse(impostor, force, contactPoint);
 }
 
 void OimoPhysicsEnginePlugin::generatePhysicsBody(PhysicsImpostor* /*impostor*/)
@@ -180,7 +197,7 @@ void OimoPhysicsEnginePlugin::setLimit(IMotorEnabledJoint* /*joint*/,
 
 void OimoPhysicsEnginePlugin::dispose()
 {
-    world->clear();
+  world->clear();
 }
 
 } // end of namespace BABYLON

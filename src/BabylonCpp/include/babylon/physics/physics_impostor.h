@@ -59,7 +59,7 @@ public:
   /**
    * Gets the body that holds this impostor. Either its own, or its parent.
    */
-  AbstractMesh* physicsBody();
+  IPhysicsBody* physicsBody();
 
   PhysicsImpostor* parent();
   void setParent(PhysicsImpostor* value);
@@ -67,7 +67,7 @@ public:
   /**
    * Set the physics body. Used mainly by the physics engine/plugin
    */
-  void setPhysicsBody(AbstractMesh* physicsBody);
+  void setPhysicsBody(IPhysicsBody* physicsBody);
 
   void resetUpdateFlags();
   Vector3 getObjectExtendSize();
@@ -109,7 +109,7 @@ public:
    * physics body object.
    */
   void executeNativeFunction(
-    const FastFunc<void(Mesh* world, Mesh* physicsBody)>& func);
+    const FastFunc<void(Mesh* world, IPhysicsBody* physicsBody)>& func);
 
   /**
    * Register a function that will be executed before the physics world is
@@ -204,7 +204,7 @@ private:
   Scene* _scene;
   PhysicsEngine* _physicsEngine;
   // The native cannon/oimo/energy physics body object.
-  AbstractMesh* _physicsBody;
+  IPhysicsBody* _physicsBody;
   bool _bodyUpdateRequired;
   std::vector<FastFunc<void(PhysicsImpostor* impostor)>>
     _onBeforePhysicsStepCallbacks;

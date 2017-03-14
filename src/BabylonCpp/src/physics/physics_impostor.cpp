@@ -101,7 +101,7 @@ void PhysicsImpostor::forceUpdate()
   }
 }
 
-AbstractMesh* PhysicsImpostor::physicsBody()
+IPhysicsBody* PhysicsImpostor::physicsBody()
 {
   return _parent ? _parent->physicsBody() : _physicsBody;
 }
@@ -116,7 +116,7 @@ void PhysicsImpostor::setParent(PhysicsImpostor* value)
   _parent = value;
 }
 
-void PhysicsImpostor::setPhysicsBody(AbstractMesh* physicsBody)
+void PhysicsImpostor::setPhysicsBody(IPhysicsBody* physicsBody)
 {
   if (_physicsBody) {
     _physicsEngine->getPhysicsPlugin()->removePhysicsBody(this);
@@ -196,10 +196,9 @@ void PhysicsImpostor::setAngularVelocity(const Vector3& velocity)
 }
 
 void PhysicsImpostor::executeNativeFunction(
-  const FastFunc<void(Mesh* world, Mesh* physicsBody)>& func)
+  const FastFunc<void(Mesh* world, IPhysicsBody* physicsBody)>& func)
 {
-  func(_physicsEngine->getPhysicsPlugin()->world,
-       dynamic_cast<Mesh*>(physicsBody()));
+  func(_physicsEngine->getPhysicsPlugin()->world, physicsBody());
 }
 
 void PhysicsImpostor::registerBeforePhysicsStep(

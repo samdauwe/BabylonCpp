@@ -52,7 +52,7 @@ private:
   OIMO::Shape* getLastShape(OIMO::Body* body);
 
 private:
-  OIMO::World* world;
+  std::unique_ptr<OIMO::World> world;
   std::string name;
   std::unordered_map<std::string, PhysicsImpostor*> _tmpImpostorsArray;
   Vector3 _tmpPositionVector;
