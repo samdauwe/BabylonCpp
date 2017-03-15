@@ -3,9 +3,13 @@
 #include <babylon/core/logging.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/physics/iphysics_body.h>
+#include <babylon/physics/joint/physics_joint.h>
 #include <babylon/physics/physics_impostor.h>
+#include <babylon/physics/physics_impostor_joint.h>
 #include <oimo/collision/broadphase/broad_phase.h>
+#include <oimo/collision/shape/shape.h>
 #include <oimo/constraint/contact/contact.h>
+#include <oimo/dynamics/rigid_body.h>
 #include <oimo/dynamics/world.h>
 #include <oimo/math/vec3.h>
 
@@ -91,7 +95,7 @@ void OimoPhysicsEnginePlugin::applyImpulse(PhysicsImpostor* impostor,
                                            const Vector3& force,
                                            const Vector3& contactPoint)
 {
-  auto mass = impostor->physicsBody()->getMass();
+  auto mass = impostor->physicsBody()->mass();
   impostor->physicsBody()->applyImpulse(
     contactPoint.scale(OIMO::World::INV_SCALE),
     force.scale(OIMO::World::INV_SCALE * mass));
@@ -123,11 +127,12 @@ void OimoPhysicsEnginePlugin::generateJoint(
 void OimoPhysicsEnginePlugin::removeJoint(
   PhysicsImpostorJoint* /*impostorJoint*/)
 {
+  // world->removeJoint(impostorJoint->joint->physicsJoint());
 }
 
 bool OimoPhysicsEnginePlugin::isSupported() const
 {
-  return false;
+  return true;
 }
 
 void OimoPhysicsEnginePlugin::setTransformationFromPhysicsBody(
@@ -136,44 +141,64 @@ void OimoPhysicsEnginePlugin::setTransformationFromPhysicsBody(
 }
 
 void OimoPhysicsEnginePlugin::setPhysicsBodyTransformation(
-  PhysicsImpostor* /*impostor*/, const Vector3& /*newPosition*/,
-  const Quaternion& /*newRotation*/)
+  PhysicsImpostor* impostor, const Vector3& newPosition,
+  const Quaternion& newRotation)
 {
+  auto body = impostor->physicsBody();
+  body->setPosition(newPosition.scale(OIMO::World::INV_SCALE));
+  body->setOrientation(newRotation);
+  body->syncShapes();
+  body->awake();
 }
 
-OIMO::Shape* OimoPhysicsEnginePlugin::getLastShape(OIMO::Body* /*body*/)
+OIMO::Shape* OimoPhysicsEnginePlugin::getLastShape(OIMO::RigidBody* body)
 {
-  return nullptr;
+  auto lastShape = body->shapes;
+  while (lastShape->next) {
+    lastShape = lastShape->next;
+  }
+  return lastShape;
 }
 
-void OimoPhysicsEnginePlugin::setLinearVelocity(PhysicsImpostor* /*impostor*/,
-                                                const Vector3& /*velocity*/)
+void OimoPhysicsEnginePlugin::setLinearVelocity(PhysicsImpostor* impostor,
+                                                const Vector3& velocity)
 {
+  impostor->physicsBody()->setLinearVelocity(velocity);
 }
 
-Vector3
-OimoPhysicsEnginePlugin::getLinearVelocity(PhysicsImpostor* /*impostor*/)
+void OimoPhysicsEnginePlugin::setAngularVelocity(PhysicsImpostor* impostor,
+                                                 const Vector3& velocity)
 {
-  return Vector3();
+  impostor->physicsBody()->setAngularVelocity(velocity);
 }
 
-Vector3
-OimoPhysicsEnginePlugin::getAngularVelocity(PhysicsImpostor* /*impostor*/)
+Vector3 OimoPhysicsEnginePlugin::getLinearVelocity(PhysicsImpostor* impostor)
 {
-  return Vector3();
+  return impostor->physicsBody()->linearVelocity();
 }
 
-void OimoPhysicsEnginePlugin::setBodyMass(PhysicsImpostor* /*impostor*/,
-                                          float /*mass*/)
+Vector3 OimoPhysicsEnginePlugin::getAngularVelocity(PhysicsImpostor* impostor)
 {
+  return impostor->physicsBody()->angularVelocity();
 }
 
-void OimoPhysicsEnginePlugin::sleepBody(PhysicsImpostor* /*impostor*/)
+void OimoPhysicsEnginePlugin::setBodyMass(PhysicsImpostor* impostor, float mass)
 {
+  bool staticBody = std_util::almost_equal(mass, 0.f);
+  // This will actually set the body's density and not its mass.
+  // But this is how oimo treats the mass variable.
+  impostor->physicsBody()->setShapesDensity(staticBody ? 1.f : mass);
+  impostor->physicsBody()->setupMass(staticBody ? 0x2 : 0x1);
 }
 
-void OimoPhysicsEnginePlugin::wakeUpBody(PhysicsImpostor* /*impostor*/)
+void OimoPhysicsEnginePlugin::sleepBody(PhysicsImpostor* impostor)
 {
+  impostor->physicsBody()->sleep();
+}
+
+void OimoPhysicsEnginePlugin::wakeUpBody(PhysicsImpostor* impostor)
+{
+  impostor->physicsBody()->awake();
 }
 
 void OimoPhysicsEnginePlugin::updateDistanceJoint(IMotorEnabledJoint* /*joint*/,

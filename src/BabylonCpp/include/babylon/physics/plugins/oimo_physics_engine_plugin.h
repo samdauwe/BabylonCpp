@@ -5,7 +5,7 @@
 #include <babylon/math/vector3.h>
 
 namespace OIMO {
-class Body;
+class RigidBody;
 class Shape;
 class World;
 }
@@ -35,6 +35,7 @@ public:
                                     const Vector3& newPosition,
                                     const Quaternion& newRotation);
   void setLinearVelocity(PhysicsImpostor* impostor, const Vector3& velocity);
+  void setAngularVelocity(PhysicsImpostor* impostor, const Vector3& velocity);
   Vector3 getLinearVelocity(PhysicsImpostor* impostor);
   Vector3 getAngularVelocity(PhysicsImpostor* impostor);
   void setBodyMass(PhysicsImpostor* impostor, float mass);
@@ -49,7 +50,7 @@ public:
   void dispose();
 
 private:
-  OIMO::Shape* getLastShape(OIMO::Body* body);
+  OIMO::Shape* getLastShape(OIMO::RigidBody* body);
 
 private:
   std::unique_ptr<OIMO::World> world;
