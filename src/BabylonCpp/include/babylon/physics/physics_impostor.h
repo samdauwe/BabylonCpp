@@ -151,7 +151,7 @@ public:
   /**
    * Event and body object due to cannon's event-based architecture.
    */
-  void onCollide(AbstractMesh* body);
+  void onCollide(IPhysicsBody* body);
 
   /**
    * Apply a force

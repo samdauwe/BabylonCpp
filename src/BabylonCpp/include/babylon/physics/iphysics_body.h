@@ -18,6 +18,7 @@ struct BABYLON_SHARED_EXPORT IPhysicsBody {
   virtual Vector3 linearVelocity()                         = 0;
   virtual void setLinearVelocity(const Vector3& velocity)  = 0;
   virtual void sleep()                                     = 0;
+  virtual bool sleeping()                                  = 0;
   virtual void awake()                                     = 0;
   virtual void syncShapes()                                = 0;
 

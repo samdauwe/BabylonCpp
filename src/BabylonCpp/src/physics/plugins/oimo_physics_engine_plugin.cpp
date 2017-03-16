@@ -3,6 +3,7 @@
 #include <babylon/core/logging.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/physics/iphysics_body.h>
+#include <babylon/physics/iworld.h>
 #include <babylon/physics/joint/physics_joint.h>
 #include <babylon/physics/physics_impostor.h>
 #include <babylon/physics/physics_impostor_joint.h>
@@ -16,14 +17,14 @@
 namespace BABYLON {
 
 OimoPhysicsEnginePlugin::OimoPhysicsEnginePlugin(unsigned int iterations)
-    : world{new OIMO::World(1.f / 60.f,
-                            OIMO::BroadPhase::Type::BR_BOUNDING_VOLUME_TREE,
-                            iterations, true)}
-    , _tmpPositionVector{Vector3::Zero()}
+    : world{nullptr}, _tmpPositionVector{Vector3::Zero()}
 {
+  world->create(1.f / 60.f, static_cast<unsigned int>(
+                              OIMO::BroadPhase::Type::BR_BOUNDING_VOLUME_TREE),
+                iterations, true);
   world->clear();
   // making sure no stats are calculated
-  world->isNoStat = true;
+  world->setNoStat(true);
 }
 
 OimoPhysicsEnginePlugin::~OimoPhysicsEnginePlugin()
@@ -32,18 +33,17 @@ OimoPhysicsEnginePlugin::~OimoPhysicsEnginePlugin()
 
 void OimoPhysicsEnginePlugin::setGravity(const Vector3& gravity)
 {
-  world->gravity.copy(OIMO::Vec3(gravity.x, gravity.y, gravity.z));
+  world->setGravity(gravity);
 }
 
 void OimoPhysicsEnginePlugin::setTimeStep(float timeStep)
 {
-  world->timeStep = timeStep;
+  world->setTimeStep(timeStep);
 }
 
 void OimoPhysicsEnginePlugin::executeStep(
-  float /*delta*/, const std::vector<PhysicsImpostor*>& /*impostors*/)
+  float /*delta*/, const std::vector<PhysicsImpostor*>& impostors)
 {
-#if 0
   for (auto& impostor : impostors) {
     impostor->beforeStep();
   }
@@ -55,9 +55,9 @@ void OimoPhysicsEnginePlugin::executeStep(
     // update the ordered impostors array
     _tmpImpostorsArray[std::to_string(impostor->uniqueId)] = impostor;
   }
-
+#if 0
   // check for collisions
-  OIMO::Contact* contact = world->contacts;
+  auto contact = world->contacts;
 
   while (contact != nullptr) {
     if (contact->touching && !contact->body1->sleeping
@@ -66,13 +66,13 @@ void OimoPhysicsEnginePlugin::executeStep(
       continue;
     }
     // is this body colliding with any other? get the impostor
-    PhysicsImpostor* mainImpostor
+    auto mainImpostor
       = (std::find(_tmpImpostorsArray.begin(), _tmpImpostorsArray.end(),
                    contact->body1->name)
          != _tmpImpostorsArray.end()) ?
           _tmpImpostorsArray[contact->body1->name] :
           nullptr;
-    PhysicsImpostor* collidingImpostor
+    auto collidingImpostor
       = (std::find(_tmpImpostorsArray.begin(), _tmpImpostorsArray.end(),
                    contact->body2->name)
          != _tmpImpostorsArray.end()) ?
@@ -111,23 +111,37 @@ void OimoPhysicsEnginePlugin::applyForce(PhysicsImpostor* impostor,
   applyImpulse(impostor, force, contactPoint);
 }
 
-void OimoPhysicsEnginePlugin::generatePhysicsBody(PhysicsImpostor* /*impostor*/)
+void OimoPhysicsEnginePlugin::generatePhysicsBody(PhysicsImpostor* impostor)
 {
+  // parent-child relationship. Does this impostor has a parent impostor?
+  if (impostor->parent()) {
+    if (impostor->physicsBody()) {
+      removePhysicsBody(impostor);
+      impostor->forceUpdate();
+    }
+    return;
+  }
 }
 
-void OimoPhysicsEnginePlugin::removePhysicsBody(PhysicsImpostor* /*impostor*/)
+void OimoPhysicsEnginePlugin::removePhysicsBody(PhysicsImpostor* impostor)
 {
+  world->removeRigidBody(impostor->physicsBody());
 }
 
-void OimoPhysicsEnginePlugin::generateJoint(
-  PhysicsImpostorJoint* /*impostorJoint*/)
+void OimoPhysicsEnginePlugin::generateJoint(PhysicsImpostorJoint* impostorJoint)
 {
+  auto mainBody      = impostorJoint->mainImpostor->physicsBody();
+  auto connectedBody = impostorJoint->connectedImpostor->physicsBody();
+
+  if (!mainBody || !connectedBody) {
+    return;
+  }
 }
 
 void OimoPhysicsEnginePlugin::removeJoint(
-  PhysicsImpostorJoint* /*impostorJoint*/)
+  PhysicsImpostorJoint* impostorJoint)
 {
-  // world->removeJoint(impostorJoint->joint->physicsJoint());
+  world->removeJoint(impostorJoint->joint->physicsJoint());
 }
 
 bool OimoPhysicsEnginePlugin::isSupported() const

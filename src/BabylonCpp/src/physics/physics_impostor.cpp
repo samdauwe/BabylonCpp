@@ -273,7 +273,7 @@ void PhysicsImpostor::afterStep()
   }
 }
 
-void PhysicsImpostor::onCollide(AbstractMesh* /*body*/)
+void PhysicsImpostor::onCollide(IPhysicsBody* /*body*/)
 {
 }
 
