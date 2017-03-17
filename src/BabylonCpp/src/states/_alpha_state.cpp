@@ -66,7 +66,7 @@ void _AlphaState::reset()
   _isBlendFunctionParametersDirty = false;
 }
 
-void _AlphaState::apply(GL::IGLRenderingContext* gl)
+void _AlphaState::apply(GL::IGLRenderingContext& gl)
 {
   if (!isDirty()) {
     return;
@@ -75,10 +75,10 @@ void _AlphaState::apply(GL::IGLRenderingContext* gl)
   // Alpha blend
   if (_isAlphaBlendDirty) {
     if (_alphaBlend) {
-      gl->enable(GL::BLEND);
+      gl.enable(GL::BLEND);
     }
     else {
-      gl->disable(GL::BLEND);
+      gl.disable(GL::BLEND);
     }
 
     _isAlphaBlendDirty = false;
@@ -86,7 +86,7 @@ void _AlphaState::apply(GL::IGLRenderingContext* gl)
 
   // Alpha function
   if (_isBlendFunctionParametersDirty) {
-    gl->blendFuncSeparate(
+    gl.blendFuncSeparate(
       static_cast<unsigned int>(_blendFunctionParameters[0]),
       static_cast<unsigned int>(_blendFunctionParameters[1]),
       static_cast<unsigned int>(_blendFunctionParameters[2]),

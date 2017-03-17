@@ -21,7 +21,7 @@ public:
   void setAlphaBlendFunctionParameters(int value0, int value1, int value2,
                                        int value3);
   void reset();
-  void apply(GL::IGLRenderingContext* gl);
+  void apply(GL::IGLRenderingContext& gl);
 
 private:
   bool _isAlphaBlendDirty;

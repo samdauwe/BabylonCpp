@@ -29,7 +29,7 @@ public:
   bool depthTest() const;
   void setDepthTest(int value);
   void reset();
-  void apply(GL::IGLRenderingContext* _gl);
+  void apply(GL::IGLRenderingContext& _gl);
 
 private:
   bool _isDepthTestDirty;

@@ -133,7 +133,7 @@ void _DepthCullingState::reset()
   _isZOffsetDirty   = false;
 }
 
-void _DepthCullingState::apply(GL::IGLRenderingContext* gl)
+void _DepthCullingState::apply(GL::IGLRenderingContext& gl)
 {
   if (!isDirty()) {
     return;
@@ -142,10 +142,10 @@ void _DepthCullingState::apply(GL::IGLRenderingContext* gl)
   // Cull
   if (_isCullDirty) {
     if (cull()) {
-      gl->enable(GL::CULL_FACE);
+      gl.enable(GL::CULL_FACE);
     }
     else {
-      gl->disable(GL::CULL_FACE);
+      gl.disable(GL::CULL_FACE);
     }
 
     _isCullDirty = false;
@@ -153,41 +153,41 @@ void _DepthCullingState::apply(GL::IGLRenderingContext* gl)
 
   // Cull face
   if (_isCullFaceDirty) {
-    gl->cullFace(static_cast<unsigned int>(cullFace()));
+    gl.cullFace(static_cast<unsigned int>(cullFace()));
     _isCullFaceDirty = false;
   }
 
   // Depth mask
   if (_isDepthMaskDirty) {
-    gl->depthMask(depthMask());
+    gl.depthMask(depthMask());
     _isDepthMaskDirty = false;
   }
 
   // Depth test
   if (_isDepthTestDirty) {
     if (depthTest()) {
-      gl->enable(GL::DEPTH_TEST);
+      gl.enable(GL::DEPTH_TEST);
     }
     else {
-      gl->disable(GL::DEPTH_TEST);
+      gl.disable(GL::DEPTH_TEST);
     }
     _isDepthTestDirty = false;
   }
 
   // Depth func
   if (_isDepthFuncDirty) {
-    gl->depthFunc(static_cast<unsigned int>(depthFunc()));
+    gl.depthFunc(static_cast<unsigned int>(depthFunc()));
     _isDepthFuncDirty = false;
   }
 
   // zOffset
   if (_isZOffsetDirty) {
     if (!std_util::almost_equal(zOffset(), 0.f)) {
-      gl->enable(GL::POLYGON_OFFSET_FILL);
-      gl->polygonOffset(zOffset(), 0);
+      gl.enable(GL::POLYGON_OFFSET_FILL);
+      gl.polygonOffset(zOffset(), 0);
     }
     else {
-      gl->disable(GL::POLYGON_OFFSET_FILL);
+      gl.disable(GL::POLYGON_OFFSET_FILL);
     }
 
     _isZOffsetDirty = false;

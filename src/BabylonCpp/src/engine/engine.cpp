@@ -1076,9 +1076,9 @@ void Engine::updateAndBindInstancesBuffer(
 
 void Engine::applyStates()
 {
-  _depthCullingState->apply(_gl);
-  _stencilState->apply(_gl);
-  _alphaState->apply(_gl);
+  _depthCullingState->apply(*_gl);
+  _stencilState->apply(*_gl);
+  _alphaState->apply(*_gl);
 }
 
 void Engine::draw(bool useTriangles, unsigned int indexStart, size_t indexCount,

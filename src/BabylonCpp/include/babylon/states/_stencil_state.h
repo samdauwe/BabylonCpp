@@ -33,7 +33,7 @@ public:
   bool stencilTest() const;
   void setStencilTest(bool value);
   void reset();
-  void apply(GL::IGLRenderingContext* gl);
+  void apply(GL::IGLRenderingContext& gl);
 
 private:
   bool _isStencilTestDirty;

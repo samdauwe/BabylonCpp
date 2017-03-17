@@ -164,7 +164,7 @@ void _StencilState::reset()
   _isStencilOpDirty   = true;
 }
 
-void _StencilState::apply(GL::IGLRenderingContext* gl)
+void _StencilState::apply(GL::IGLRenderingContext& gl)
 {
   if (!isDirty()) {
     return;
@@ -173,30 +173,30 @@ void _StencilState::apply(GL::IGLRenderingContext* gl)
   // Stencil test
   if (_isStencilTestDirty) {
     if (stencilTest()) {
-      gl->enable(GL::STENCIL_TEST);
+      gl.enable(GL::STENCIL_TEST);
     }
     else {
-      gl->disable(GL::STENCIL_TEST);
+      gl.disable(GL::STENCIL_TEST);
     }
     _isStencilTestDirty = false;
   }
 
   // Stencil mask
   if (_isStencilMaskDirty) {
-    gl->stencilMask(stencilMask());
+    gl.stencilMask(stencilMask());
     _isStencilMaskDirty = false;
   }
 
   // Stencil func
   if (_isStencilFuncDirty) {
-    gl->stencilFunc(stencilFunc(), stencilFuncRef(), stencilFuncMask());
+    gl.stencilFunc(stencilFunc(), stencilFuncRef(), stencilFuncMask());
     _isStencilFuncDirty = false;
   }
 
   // Stencil op
   if (_isStencilOpDirty) {
-    gl->stencilOp(stencilOpStencilFail(), stencilOpDepthFail(),
-                  stencilOpStencilDepthPass());
+    gl.stencilOp(stencilOpStencilFail(), stencilOpDepthFail(),
+                 stencilOpStencilDepthPass());
     _isStencilOpDirty = false;
   }
 }
