@@ -463,7 +463,7 @@ void Engine::renderFunction(const std::function<void()>& renderFunction)
 
   if (shouldRender) {
     // Backup GL state
-    //backupGLState();
+    // backupGLState();
     // Start new frame
     beginFrame();
     // Render
@@ -471,7 +471,7 @@ void Engine::renderFunction(const std::function<void()>& renderFunction)
     // Present
     endFrame();
     // Restore GL state
-    //restoreGLState();
+    // restoreGLState();
   }
 }
 
@@ -533,7 +533,7 @@ void Engine::clear(const Color4& color, bool backBuffer, bool depth,
 }
 
 void Engine::scissorClear(int x, int y, int width, int height,
-                          const Color4& clearColor)
+                          const Color4& clearColor, bool stencil)
 {
   // Save state
   int curScissor = _gl->getParameteri(GL::SCISSOR_TEST);
@@ -544,7 +544,7 @@ void Engine::scissorClear(int x, int y, int width, int height,
   _gl->scissor(x, y, width, height);
 
   // Clear
-  clear(clearColor, true, true, true);
+  clear(clearColor, true, true, stencil);
 
   // Restore state
   _gl->scissor(curScissorBox[0], curScissorBox[1], curScissorBox[2],
@@ -562,15 +562,22 @@ void Engine::setViewport(Viewport& viewport, int requiredWidth,
                          int requiredHeight)
 {
 
-  int width  = requiredWidth != 0 ? requiredWidth : _renderingCanvas->width;
-  int height = requiredHeight != 0 ? requiredHeight : _renderingCanvas->height;
-  int x      = viewport.x;
-  int y      = viewport.y;
+  if (_renderingCanvas->onlyRenderBoundingClientRect()) {
+    auto& rec = _renderingCanvas->getBoundingClientRect();
+    _gl->viewport(rec.bottom, rec.left, rec.width, rec.height);
+  }
+  else {
+    int width = requiredWidth != 0 ? requiredWidth : _renderingCanvas->width;
+    int height
+      = requiredHeight != 0 ? requiredHeight : _renderingCanvas->height;
+    int x = viewport.x;
+    int y = viewport.y;
+
+    _gl->viewport(x * width, y * height, width * viewport.width,
+                  height * viewport.height);
+  }
 
   _cachedViewport = &viewport;
-
-  _gl->viewport(x * width, y * height, width * viewport.width,
-                height * viewport.height);
 }
 
 Viewport& Engine::setDirectViewport(int x, int y, int width, int height)

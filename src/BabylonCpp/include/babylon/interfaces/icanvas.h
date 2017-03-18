@@ -14,7 +14,8 @@ class BABYLON_SHARED_EXPORT ICanvas {
 public:
   ICanvas();
   virtual ~ICanvas();
-  virtual ClientRect getBoundingClientRect()        = 0;
+  virtual ClientRect& getBoundingClientRect()       = 0;
+  virtual bool onlyRenderBoundingClientRect() const = 0;
   virtual bool initializeContext3d()                = 0;
   virtual ICanvasRenderingContext2D* getContext2d() = 0;
   virtual GL::IGLRenderingContext* getContext3d(const EngineOptions& options)
@@ -57,6 +58,7 @@ public:
   int mouseY;
   int tabIndex;
   Style style;
+  ClientRect _boundingClientRect;
 
 protected:
   std::unique_ptr<GL::IGLRenderingContext> _renderingContext;

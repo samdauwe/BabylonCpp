@@ -2117,8 +2117,15 @@ void Scene::render()
   }
 
   // Clear
-  _engine->clear(clearColor, autoClear || forceWireframe || forcePointsCloud,
-                 true);
+  if (_engine->getRenderingCanvas()->onlyRenderBoundingClientRect()) {
+    const auto& rec = _engine->getRenderingCanvas()->getBoundingClientRect();
+    _engine->scissorClear(rec.bottom, rec.left, rec.width, rec.height,
+                          clearColor.toColor4(), false);
+  }
+  else {
+    _engine->clear(clearColor, autoClear || forceWireframe || forcePointsCloud,
+                   true);
+  }
 
   // Shadows
   if (shadowsEnabled) {
