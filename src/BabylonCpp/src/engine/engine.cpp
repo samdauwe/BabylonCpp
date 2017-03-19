@@ -533,7 +533,7 @@ void Engine::clear(const Color4& color, bool backBuffer, bool depth,
 }
 
 void Engine::scissorClear(int x, int y, int width, int height,
-                          const Color4& clearColor, bool stencil)
+                          const Color4& clearColor)
 {
   // Save state
   int curScissor = _gl->getParameteri(GL::SCISSOR_TEST);
@@ -544,7 +544,7 @@ void Engine::scissorClear(int x, int y, int width, int height,
   _gl->scissor(x, y, width, height);
 
   // Clear
-  clear(clearColor, true, true, stencil);
+  clear(clearColor, true, true, true);
 
   // Restore state
   _gl->scissor(curScissorBox[0], curScissorBox[1], curScissorBox[2],
@@ -563,8 +563,8 @@ void Engine::setViewport(Viewport& viewport, int requiredWidth,
 {
 
   if (_renderingCanvas->onlyRenderBoundingClientRect()) {
-    auto& rec = _renderingCanvas->getBoundingClientRect();
-    _gl->viewport(rec.bottom, rec.left, rec.width, rec.height);
+    const auto& rec = _renderingCanvas->getBoundingClientRect();
+    _gl->viewport(rec.left, rec.bottom, rec.width, rec.height);
   }
   else {
     int width = requiredWidth != 0 ? requiredWidth : _renderingCanvas->width;

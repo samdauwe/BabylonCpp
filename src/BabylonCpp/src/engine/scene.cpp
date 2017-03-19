@@ -2119,12 +2119,12 @@ void Scene::render()
   // Clear
   if (_engine->getRenderingCanvas()->onlyRenderBoundingClientRect()) {
     const auto& rec = _engine->getRenderingCanvas()->getBoundingClientRect();
-    _engine->scissorClear(rec.bottom, rec.left, rec.width, rec.height,
-                          clearColor.toColor4(), false);
+    _engine->scissorClear(rec.left, rec.bottom, rec.width, rec.height,
+                          clearColor.toColor4());
   }
   else {
     _engine->clear(clearColor, autoClear || forceWireframe || forcePointsCloud,
-                   true);
+                   true, true);
   }
 
   // Shadows

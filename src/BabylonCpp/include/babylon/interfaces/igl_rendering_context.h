@@ -814,7 +814,7 @@ public:
   virtual void viewport(GLint x, GLint y, GLint width, GLint height) = 0;
 
 protected:
-  GLint last_program;
+  GLuint last_program;
   GLint last_texture;
   GLint last_active_texture;
   GLint last_array_buffer;

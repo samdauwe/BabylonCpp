@@ -190,7 +190,7 @@ public:
   void clear(const Color4& color, bool backBuffer, bool depth,
              bool stencil = false);
   void scissorClear(int x, int y, int width, int height,
-                    const Color4& clearColor, bool stencil = true);
+                    const Color4& clearColor);
 
   /**
    * Set the WebGL's viewport
