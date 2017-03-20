@@ -104,6 +104,7 @@ void ReflectionProbe::attachToMesh(AbstractMesh* mesh)
 
 void ReflectionProbe::dispose(bool /*doNotRecurse*/)
 {
+  // Remove from the scene if found
   _scene->reflectionProbes.erase(
     std::remove_if(
       _scene->reflectionProbes.begin(), _scene->reflectionProbes.end(),
