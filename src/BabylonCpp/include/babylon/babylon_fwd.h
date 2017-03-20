@@ -233,7 +233,6 @@ class Color4;
 class Curve3;
 class Frustum;
 struct ISize;
-class MathTools;
 class Matrix;
 class Path2;
 class Path3D;
