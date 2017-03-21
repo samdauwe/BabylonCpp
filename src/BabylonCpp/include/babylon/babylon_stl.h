@@ -213,6 +213,16 @@ T& from_bytes(const std::array<byte, sizeof(T)>& bytes, T& object)
   return object;
 }
 
+// -- String helper functions --
+
+// Compares two strings in compile time constant fashion
+constexpr int c_strcmp(char const* lhs, char const* rhs)
+{
+  return (('\0' == lhs[0]) && ('\0' == rhs[0])) ?
+           0 :
+           (lhs[0] != rhs[0]) ? (lhs[0] - rhs[0]) : c_strcmp(lhs + 1, rhs + 1);
+}
+
 // -- Helper Templates --
 
 // Floating point comparison

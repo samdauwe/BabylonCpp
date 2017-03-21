@@ -6,6 +6,11 @@
 #include <babylon/math/vector3.h>
 #include <babylon/math/viewport.h>
 
+// SIMD
+#if BABYLONCPP_OPTION_ENABLE_SIMD == true
+#include <babylon/math/simd/simd_vector3.h>
+#endif
+
 namespace BABYLON {
 
 Vector3::Vector3(float ix, float iy, float iz) : x{ix}, y{iy}, z{iz}

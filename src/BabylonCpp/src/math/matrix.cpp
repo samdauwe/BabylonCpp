@@ -10,6 +10,11 @@
 #include <babylon/math/vector4.h>
 #include <babylon/math/viewport.h>
 
+// SIMD
+#if BABYLONCPP_OPTION_ENABLE_SIMD == true
+#include <babylon/math/simd/simd_matrix.h>
+#endif
+
 namespace BABYLON {
 
 Matrix::Matrix()
