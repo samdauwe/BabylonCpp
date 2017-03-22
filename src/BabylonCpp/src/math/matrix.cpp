@@ -10,11 +10,6 @@
 #include <babylon/math/vector4.h>
 #include <babylon/math/viewport.h>
 
-// SIMD
-#if BABYLONCPP_OPTION_ENABLE_SIMD == true
-#include <babylon/math/simd/simd_matrix.h>
-#endif
-
 namespace BABYLON {
 
 Matrix::Matrix()
@@ -200,6 +195,9 @@ Matrix& Matrix::addToSelf(const Matrix& other)
 
 Matrix& Matrix::invertToRef(Matrix& other)
 {
+#if BABYLONCPP_OPTION_ENABLE_SIMD == true
+  simdMatrix.invertToRefSIMD(other);
+#else
   float l1  = m[0];
   float l2  = m[1];
   float l3  = m[2];
@@ -256,6 +254,7 @@ Matrix& Matrix::invertToRef(Matrix& other)
   other.m[7]  = (((l1 * l34) - (l3 * l37)) + (l4 * l38)) * l27;
   other.m[11] = -(((l1 * l35) - (l2 * l37)) + (l4 * l39)) * l27;
   other.m[15] = (((l1 * l36) - (l2 * l38)) + (l3 * l39)) * l27;
+#endif
 
   return *this;
 }
@@ -336,6 +335,9 @@ Matrix& Matrix::multiplyToArray(const Matrix& other,
                                 std::array<float, 16>& result,
                                 unsigned int offset)
 {
+#if BABYLONCPP_OPTION_ENABLE_SIMD == true
+  simdMatrix.multiplyToArraySIMD(other, result, offset);
+#else
   float tm0  = m[0];
   float tm1  = m[1];
   float tm2  = m[2];
@@ -389,6 +391,7 @@ Matrix& Matrix::multiplyToArray(const Matrix& other,
   result[offset + 13] = tm12 * om1 + tm13 * om5 + tm14 * om9 + tm15 * om13;
   result[offset + 14] = tm12 * om2 + tm13 * om6 + tm14 * om10 + tm15 * om14;
   result[offset + 15] = tm12 * om3 + tm13 * om7 + tm14 * om11 + tm15 * om15;
+#endif
 
   return *this;
 }
@@ -934,9 +937,12 @@ Matrix Matrix::LookAtLH(const Vector3& eye, Vector3& target, const Vector3& up)
 void Matrix::LookAtLHToRef(const Vector3& eye, const Vector3& target,
                            const Vector3& up, Matrix& result)
 {
-  Vector3 _xAxis = Vector3::Zero();
-  Vector3 _yAxis = Vector3::Zero();
-  Vector3 _zAxis = Vector3::Zero();
+#if BABYLONCPP_OPTION_ENABLE_SIMD == true
+  SIMD::SIMDMatrix::LookAtLHToRefSIMD(eye, target, up, result);
+#else
+  Vector3 _xAxis      = Vector3::Zero();
+  Vector3 _yAxis      = Vector3::Zero();
+  Vector3 _zAxis      = Vector3::Zero();
 
   // Z axis
   target.subtractToRef(eye, _zAxis);
@@ -965,6 +971,7 @@ void Matrix::LookAtLHToRef(const Vector3& eye, const Vector3& target,
                                  _xAxis.y, _yAxis.y, _zAxis.y, 0.f, //
                                  _xAxis.z, _yAxis.z, _zAxis.z, 0.f, //
                                  ex, ey, ez, 1.f, result);
+#endif
 }
 
 Matrix Matrix::LookAtRH(const Vector3& eye, Vector3& target, const Vector3& up)

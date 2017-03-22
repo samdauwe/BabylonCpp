@@ -63,7 +63,7 @@ configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${BABYLON_NAMESP
 # ============================================================================ #
 
 # Single Instruction Multiple Data (SIMD) support
-set(OPTION_ENABLE_SIMD        true)
+set(OPTION_ENABLE_SIMD        false)
 
 # Generate options-header
 configure_file(options.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_options.h)

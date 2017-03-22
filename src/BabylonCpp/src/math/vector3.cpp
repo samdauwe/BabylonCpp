@@ -513,6 +513,10 @@ void Vector3::TransformCoordinatesToRef(const Vector3& vector,
                                         const Matrix& transformation,
                                         Vector3& result)
 {
+#if BABYLONCPP_OPTION_ENABLE_SIMD == true
+  SIMD::SIMDVector3::TransformCoordinatesToRefSIMD(vector, transformation,
+                                                   result);
+#else
   float x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[4])
             + (vector.z * transformation.m[8]) + transformation.m[12];
   float y = (vector.x * transformation.m[1]) + (vector.y * transformation.m[5])
@@ -525,12 +529,17 @@ void Vector3::TransformCoordinatesToRef(const Vector3& vector,
   result.x = x / w;
   result.y = y / w;
   result.z = z / w;
+#endif
 }
 
 void Vector3::TransformCoordinatesFromFloatsToRef(float x, float y, float z,
                                                   const Matrix& transformation,
                                                   Vector3& result)
 {
+#if BABYLONCPP_OPTION_ENABLE_SIMD == true
+  SIMD::SIMDVector3::TransformCoordinatesFromFloatsToRefSIMD(
+    x, y, z, transformation, result);
+#else
   float rx = (x * transformation.m[0]) + (y * transformation.m[4])
              + (z * transformation.m[8]) + transformation.m[12];
   float ry = (x * transformation.m[1]) + (y * transformation.m[5])
@@ -543,6 +552,7 @@ void Vector3::TransformCoordinatesFromFloatsToRef(float x, float y, float z,
   result.x = rx / rw;
   result.y = ry / rw;
   result.z = rz / rw;
+#endif
 }
 
 Vector3 Vector3::TransformNormal(const Vector3& vector,

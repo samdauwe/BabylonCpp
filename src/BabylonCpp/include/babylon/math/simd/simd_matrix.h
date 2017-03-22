@@ -22,9 +22,7 @@ struct BABYLON_SHARED_EXPORT SIMDMatrix {
   SIMDMatrix& multiplyToArraySIMD(const Matrix& other,
                                   std::array<float, 16>& result,
                                   unsigned int offset);
-
   SIMDMatrix& invertToRefSIMD(Matrix& other);
-
   static void LookAtLHToRefSIMD(const Vector3& eyeRef, const Vector3& targetRef,
                                 const Vector3& upRef, Matrix& result);
 

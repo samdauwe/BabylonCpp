@@ -3,6 +3,11 @@
 
 #include <babylon/babylon_global.h>
 
+// SIMD
+#if BABYLONCPP_OPTION_ENABLE_SIMD == true
+#include <babylon/math/simd/simd_matrix.h>
+#endif
+
 namespace BABYLON {
 
 /**
@@ -163,6 +168,9 @@ public:
 
 public:
   std::array<float, 16> m;
+#if BABYLONCPP_OPTION_ENABLE_SIMD == true
+  SIMD::SIMDMatrix simdMatrix;
+#endif
 
 }; // end of class Matrix
 
