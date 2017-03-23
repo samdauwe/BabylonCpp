@@ -249,22 +249,6 @@ size_t get_address(std::function<T(U...)> f)
   return reinterpret_cast<size_t>(*fnPointer);
 }
 
-// File utilities
-
-inline bool file_exists(const std::string& name)
-{
-  std::ifstream f(name.c_str());
-  return f.good();
-}
-
-inline std::string read_file(const std::string& path)
-{
-  std::ostringstream buf;
-  std::ifstream input(path.c_str());
-  buf << input.rdbuf();
-  return buf.str();
-}
-
 // Container functions
 
 template <typename T, typename... Ts>
