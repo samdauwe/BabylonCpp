@@ -228,8 +228,9 @@ constexpr int c_strcmp(char const* lhs, char const* rhs)
 // Floating point comparison
 
 template <class T>
-inline typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type
-almost_equal(T x, T y, int ulp = 4)
+constexpr
+  typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type
+  almost_equal(T x, T y, int ulp = 4)
 {
   // the machine epsilon has to be scaled to the magnitude of the values used
   // and multiplied by the desired precision in ULPs (units in the last place)
@@ -286,7 +287,7 @@ inline C& concat_with_no_duplicates(C& a, const C& b)
 }
 
 template <typename C, typename T>
-inline bool contains(const C& c, const T& elem)
+constexpr bool contains(const C& c, const T& elem)
 {
   return std::find(c.begin(), c.end(), elem) != c.end();
 }
@@ -300,15 +301,15 @@ inline C& insert_at(C& c, size_t pIndex, const T& elem)
 }
 
 template <typename T>
-inline bool contains(const std::unordered_map<std::string, T>& c,
-                     const std::string& elem)
+constexpr bool contains(const std::unordered_map<std::string, T>& c,
+                        const std::string& elem)
 {
   return c.find(elem) != c.end();
 }
 
 template <typename T>
-inline bool contains(const std::unordered_map<std::string, T>& c,
-                     const char* elem)
+constexpr bool contains(const std::unordered_map<std::string, T>& c,
+                        const char* elem)
 {
   return contains(c, std::string(elem));
 }
