@@ -392,3 +392,30 @@ TEST(TestStdUtil, range)
   }
   EXPECT_THAT(result, ::testing::ContainerEq(expected));
 }
+
+TEST(TestStdUtil, spaceship)
+{
+  using namespace BABYLON;
+
+  // Integers
+  EXPECT_EQ(std_util::spaceship(1, 1), 0);
+  EXPECT_EQ(std_util::spaceship(1, 2), -1);
+  EXPECT_EQ(std_util::spaceship(2, 1), 1);
+
+  // Floats
+  EXPECT_EQ(std_util::spaceship(1.5f, 1.5f), 0);
+  EXPECT_EQ(std_util::spaceship(1.5f, 2.5f), -1);
+  EXPECT_EQ(std_util::spaceship(2.5f, 1.5f), 1);
+
+  // Doubles
+  EXPECT_EQ(std_util::spaceship(1.5, 1.5), 0);
+  EXPECT_EQ(std_util::spaceship(1.5, 2.5), -1);
+  EXPECT_EQ(std_util::spaceship(2.5, 1.5), 1);
+
+  // Strings
+  EXPECT_EQ(std_util::spaceship("a", "a"), 0);
+  EXPECT_EQ(std_util::spaceship("a", "b"), -1);
+  EXPECT_EQ(std_util::spaceship("b", "a"), 1);
+  EXPECT_EQ(std_util::spaceship("a", "aa"), -1);
+  EXPECT_EQ(std_util::spaceship("zz", "aa"), 1);
+}

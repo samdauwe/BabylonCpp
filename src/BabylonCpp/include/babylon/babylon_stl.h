@@ -250,6 +250,39 @@ size_t get_address(std::function<T(U...)> f)
   return reinterpret_cast<size_t>(*fnPointer);
 }
 
+// Three-way comparison
+
+/**
+ * @brief Combined Comparison (Spaceship) Operator.
+ *
+ * Operator (expr) <=> (expr) implementation, it returns 0 if both operands are
+ * equal, 1 if the left is greater, and -1 if the right is greater. It uses
+ * exactly the same comparison rules as used by our existing comparison
+ * operators: <, <=, ==, >= and >.
+ *
+ * @param lhs Left hand side operand.
+ * @param rhs Right hand side operand.
+ * @return 0 if values on either side are equal.
+ *         1 if value on the left is greater.
+ *        -1 if the value on the right is greater.
+ */
+template <typename T,
+          typename
+          = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+constexpr int spaceship(const T& lhs, const T& rhs)
+{
+  return (lhs < rhs) ? -1 : (rhs < lhs) ? 1 : 0;
+}
+
+/**
+ * @brief Combined Comparison (Spaceship) Operator for std::string.
+ */
+inline int spaceship(const std::string& lhs, const std::string& rhs)
+{
+  const int comparison = lhs.compare(rhs);
+  return (comparison < 0) ? -1 : (comparison > 0) ? 1 : 0;
+}
+
 // Container functions
 
 template <typename T, typename... Ts>
