@@ -31,6 +31,26 @@ TEST(TestString, count)
   EXPECT_EQ(String::count(s, "--"), 2);
 }
 
+TEST(TestString, escape)
+{
+  using namespace BABYLON;
+
+  EXPECT_THAT(String::escape("*"), "\\*");
+  EXPECT_THAT(String::escape("\\"), "\\\\");
+  EXPECT_THAT(String::escape("||"), "\\|\\|");
+  EXPECT_THAT(String::escape(","), ",");
+}
+
+TEST(TestString, escapeStrings)
+{
+  using namespace BABYLON;
+
+  const std::vector<std::string> input{",", "*", "||", ";", "\\"};
+  const std::vector<std::string> expected{",", "\\*", "\\|\\|", ";", "\\\\"};
+
+  EXPECT_THAT(String::escape(input), ::testing::ContainerEq(expected));
+}
+
 TEST(TestString, startsWith)
 {
   using namespace BABYLON;

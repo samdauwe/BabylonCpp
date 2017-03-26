@@ -77,6 +77,50 @@ inline void charCodeToString(std::ostream& o, const T& t0, const Ts&... ts)
 }
 
 /**
+ * @brief Escapes a character.
+ * @param character The character to escape.
+ * @return The escaped character.
+ */
+inline std::string escape(char character)
+{
+  static const std::unordered_map<char, std::string> escapedSpecialCharacters
+    = {{'.', "\\."}, {'|', "\\|"}, {'*', "\\*"}, {'?', "\\?"},  {'+', "\\+"},
+       {'(', "\\("}, {')', "\\)"}, {'{', "\\{"}, {'}', "\\}"},  {'[', "\\["},
+       {']', "\\]"}, {'^', "\\^"}, {'$', "\\$"}, {'\\', "\\\\"}};
+
+  auto it = escapedSpecialCharacters.find(character);
+  if (it == escapedSpecialCharacters.end()) {
+    return std::string(1, character);
+  }
+
+  return it->second;
+}
+
+/**
+ * @brief Escapes a string.
+ * @param s The string to escape.
+ * @return The escaped string.
+ */
+inline std::string escape(const std::string& s)
+{
+  std::ostringstream ostream;
+  std::for_each(s.begin(), s.end(), [&ostream](const char character) {
+    ostream << escape(character);
+  });
+  return ostream.str();
+}
+
+/**
+ * @brief Escapes a list of string.
+ * @param ss The list of string to escape.
+ * @return The escaped list of string.
+ */
+inline std::vector<std::string> escape(const std::vector<std::string>& ss)
+{
+  return std_util::map(ss, [](const std::string& s) { return escape(s); });
+}
+
+/**
  * @brief Checks if a string starts with the other string.
  * @param s. The string to check.
  * @param prefix. The substring to search for.

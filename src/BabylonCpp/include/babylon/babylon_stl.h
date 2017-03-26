@@ -418,6 +418,39 @@ inline int index_of(C& c, const T& elem)
 }
 
 /**
+ * @brief Filters a vector according to the specified predicate.
+ * @param original Vector to filter.
+ * @param pred Unary predicate which returns ​true for the required elements.
+ * @return A vector, containing the filtered values.
+ */
+template <typename T, class UnaryPredicate>
+inline std::vector<T> filter(const std::vector<T>& original,
+                             UnaryPredicate pred)
+{
+  std::vector<T> filtered;
+  std::copy_if(original.begin(), original.end(), std::back_inserter(filtered),
+               pred);
+  return filtered;
+}
+
+/**
+ * @brief Applies an operation sequentially to the elements of the input vector
+ * using the mapping function.
+ * @param original Vector to map.
+ * @param mappingFunction Unary mapping function.
+ * @return A vector, containing the mapped values.
+ */
+template <typename T, class UnaryOperation>
+inline std::vector<T> map(const std::vector<T>& original,
+                          UnaryOperation mappingFunction)
+{
+  std::vector<T> mapped;
+  std::transform(original.begin(), original.end(), std::back_inserter(mapped),
+                 mappingFunction);
+  return mapped;
+}
+
+/**
  * Returns the selected elements in an array, as a new array object.
  * The slice() method selects the elements starting at the given start argument,
  * and ends at, but does not include, the given end argument.

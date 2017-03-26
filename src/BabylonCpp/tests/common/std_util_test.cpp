@@ -232,6 +232,17 @@ TEST(TestStdUtil, erase)
   EXPECT_THAT(v, ::testing::ContainerEq(expected));
 }
 
+TEST(TestStdUtil, filter)
+{
+  using namespace BABYLON;
+
+  const std::vector<int> input{25, 15, 5, -5, -15};
+  auto filtered = std_util::filter(input, [](int i) { return !(i < 0); });
+
+  const std::vector<int> expected{25, 15, 5};
+  EXPECT_THAT(filtered, ::testing::ContainerEq(expected));
+}
+
 TEST(TestStdUtil, index_of)
 {
   using namespace BABYLON;
@@ -240,6 +251,17 @@ TEST(TestStdUtil, index_of)
   EXPECT_EQ(std_util::index_of(v, "DIFFUSE"), 0);
   EXPECT_EQ(std_util::index_of(v, "FOG"), 3);
   EXPECT_EQ(std_util::index_of(v, "VERTEXALPHA"), -1);
+}
+
+TEST(TestStdUtil, map)
+{
+  using namespace BABYLON;
+
+  const std::vector<int> input{10, 20, 30, 40, 50};
+  auto doubled = std_util::map(input, [](int i) { return i * 2; });
+
+  const std::vector<int> expected{20, 40, 60, 80, 100};
+  EXPECT_THAT(doubled, ::testing::ContainerEq(expected));
 }
 
 TEST(TestStdUtil, slice)
