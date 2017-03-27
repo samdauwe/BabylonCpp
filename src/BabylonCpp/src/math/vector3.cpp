@@ -3,6 +3,7 @@
 #include <babylon/math/axis.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/quaternion.h>
+#include <babylon/math/tmp.h>
 #include <babylon/math/vector3.h>
 #include <babylon/math/viewport.h>
 
@@ -65,11 +66,12 @@ std::unique_ptr<Vector3> Vector3::clone() const
   return std_util::make_unique<Vector3>(*this);
 }
 
-std::ostream& operator<<(std::ostream& os, const Vector3& vector)
+std::string Vector3::toString() const
 {
-  os << "{\"X\":" << vector.x << ",\"Y\":" << vector.y << ",\"Z\":" << vector.z
-     << "}";
-  return os;
+  std::ostringstream oss;
+  oss << *this;
+
+  return oss.str();
 }
 
 const char* Vector3::getClassName() const
@@ -198,18 +200,22 @@ Vector3 Vector3::scale(float iscale) const
   return Vector3(x * iscale, y * iscale, z * iscale);
 }
 
-void Vector3::scaleToRef(int iscale, Vector3& result)
+Vector3& Vector3::scaleToRef(int iscale, Vector3& result)
 {
   result.x = x * static_cast<float>(iscale);
   result.y = y * static_cast<float>(iscale);
   result.z = z * static_cast<float>(iscale);
+
+  return *this;
 }
 
-void Vector3::scaleToRef(float iscale, Vector3& result)
+Vector3& Vector3::scaleToRef(float iscale, Vector3& result)
 {
   result.x = x * iscale;
   result.y = y * iscale;
   result.z = z * iscale;
+
+  return *this;
 }
 
 bool Vector3::equals(const Vector3& otherVector) const
@@ -308,6 +314,13 @@ Vector3& Vector3::maximizeInPlace(const Vector3& other)
 }
 
 /** Operator overloading **/
+std::ostream& operator<<(std::ostream& os, const Vector3& vector)
+{
+  os << "{\"X\":" << vector.x << ",\"Y\":" << vector.y << ",\"Z\":" << vector.z
+     << "}";
+  return os;
+}
+
 Vector3 Vector3::operator+(const Vector3& otherVector) const
 {
   return add(otherVector);
@@ -432,6 +445,11 @@ Vector3& Vector3::copyFromFloats(float ix, float iy, float iz)
   z = iz;
 
   return *this;
+}
+
+Vector3& Vector3::set(float ix, float iy, float iz)
+{
+  return copyFromFloats(ix, iy, iz);
 }
 
 /** Statics **/
@@ -670,11 +688,17 @@ Vector3 Vector3::Hermite(const Vector3& value1, const Vector3& tangent1,
 
 Vector3 Vector3::Lerp(const Vector3& start, const Vector3& end, float amount)
 {
-  float x = start.x + ((end.x - start.x) * amount);
-  float y = start.y + ((end.y - start.y) * amount);
-  float z = start.z + ((end.z - start.z) * amount);
+  Vector3 result(0.f, 0.f, 0.f);
+  Vector3::LerpToRef(start, end, amount, result);
+  return result;
+}
 
-  return Vector3(x, y, z);
+void Vector3::LerpToRef(const Vector3& start, const Vector3& end, float amount,
+                        Vector3& result)
+{
+  result.x = start.x + ((end.x - start.x) * amount);
+  result.y = start.y + ((end.y - start.y) * amount);
+  result.z = start.z + ((end.z - start.z) * amount);
 }
 
 float Vector3::Dot(const Vector3& left, const Vector3& right)
@@ -721,10 +745,12 @@ Vector3 Vector3::Project(const Vector3& vector, Matrix& world,
   float cy = static_cast<float>(viewport.y);
 
   Matrix viewportMatrix
-    = Matrix::FromValues(cw / 2.f, 0.f, 0.f, 0.f, 0.f, -ch / 2.f, 0.f, 0.f, 0.f,
-                         0.f, 1.f, 0.f, cx + cw / 2.f, ch / 2.f + cy, 0.f, 1.f);
+    = Matrix::FromValues(cw / 2.f, 0.f, 0.f, 0.f,  //
+                         0.f, -ch / 2.f, 0.f, 0.f, //
+                         0.f, 0.f, 0.5f, 0.f,      //
+                         cx + cw / 2.f, ch / 2.f + cy, 0.5f, 1.f);
 
-  Matrix finalMatrix = world.multiply(transform).multiply(viewportMatrix);
+  auto finalMatrix = world.multiply(transform).multiply(viewportMatrix);
 
   return Vector3::TransformCoordinates(vector, finalMatrix);
 }
@@ -755,9 +781,10 @@ Vector3 Vector3::Unproject(const Vector3& source, float viewportWidth,
   Matrix matrix = world.multiply(view).multiply(projection);
   matrix.invert();
   Vector3 screenSource(source.x / viewportWidth * 2.f - 1,
-                       -(source.y / viewportHeight * 2.f - 1), source.z);
-  Vector3 vector = Vector3::TransformCoordinates(screenSource, matrix);
-  float num      = screenSource.x * matrix.m[3] + screenSource.y * matrix.m[7]
+                       -(source.y / viewportHeight * 2.f - 1),
+                       2.f * source.z - 1.f);
+  auto vector = Vector3::TransformCoordinates(screenSource, matrix);
+  float num   = screenSource.x * matrix.m[3] + screenSource.y * matrix.m[7]
               + screenSource.z * matrix.m[11] + matrix.m[15];
 
   if (MathTools::WithinEpsilon(num, 1.f)) {
@@ -802,143 +829,20 @@ Vector3 Vector3::Center(const Vector3& value1, const Vector3& value2)
   return center;
 }
 
-/**
- * Given three orthogonal left-handed oriented Vector3 axis in space (target
- * system),
- * RotationFromAxis() returns the rotation Euler angles (ex : rotation.x,
- * rotation.y, rotation.z)
- * to apply to something in order to rotate it from its local system to the
- * given target system.
- */
-Vector3 Vector3::RotationFromAxis(const Vector3& axis1, const Vector3& axis2,
-                                  const Vector3& axis3)
+Vector3 Vector3::RotationFromAxis(Vector3& axis1, Vector3& axis2,
+                                  Vector3& axis3)
 {
   Vector3 rotation = Vector3::Zero();
   Vector3::RotationFromAxisToRef(axis1, axis2, axis3, rotation);
   return rotation;
 }
 
-/**
- * The same than RotationFromAxis but updates the passed ref Vector3
- * parameter.
- */
-void Vector3::RotationFromAxisToRef(const Vector3& axis1, const Vector3& axis2,
-                                    const Vector3& axis3, Vector3& ref)
+void Vector3::RotationFromAxisToRef(Vector3& axis1, Vector3& axis2,
+                                    Vector3& axis3, Vector3& ref)
 {
-  Vector3 u = Vector3::Normalize(axis1);
-  Vector3 w = Vector3::Normalize(axis2);
-  w         = Vector3::Normalize(axis3);
-
-  // world axis
-  Vector3 X = Axis::X;
-  Vector3 Y = Axis::Y;
-
-  // equation unknowns and vars
-  float yaw    = 0.f;
-  float pitch  = 0.f;
-  float roll   = 0.f;
-  float x      = 0.f;
-  float y      = 0.f;
-  float z      = 0.f;
-  float t      = 0.f;
-  float sign   = -1.f;
-  int nbRevert = 0;
-  Vector3 cross;
-  float dot = 0.f;
-
-  // step 1  : rotation around w
-  // Rv3(u) = u1, and u1 belongs to plane xOz
-  // Rv3(w) = w1 = w invariant
-  if (MathTools::WithinEpsilon(w.z, 0.f)) {
-    z = 1.f;
-  }
-  else if (MathTools::WithinEpsilon(w.x, 0.f)) {
-    x = 1.f;
-  }
-  else {
-    t = w.z / w.x;
-    x = -t * std::sqrt(1.f / (1.f + t * t));
-    z = std::sqrt(1.f / (1.f + t * t));
-  }
-
-  Vector3 u1(x, y, z);
-  u1.normalize();
-  Vector3::CrossToRef(u, u1, cross); // returns same direction as w (=local z)
-                                     // if positive angle : cross(source, image)
-  cross.normalize();
-  if (Vector3::Dot(w, cross) < 0.f) {
-    sign = 1.f;
-  }
-
-  dot = Vector3::Dot(u, u1);
-  dot = std::min(
-    1.f, std::max(-1.f, dot)); // to force dot to be in the range [-1, 1]
-  roll = std::acos(dot) * sign;
-
-  if (Vector3::Dot(u1, X) < 0.f) { // checks X orientation
-    roll = Math::PI + roll;
-    u1   = u1.scaleInPlace(-1.f);
-    ++nbRevert;
-  }
-
-  // step 2 : rotate around u1
-  // Ru1(w1) = Ru1(w) = w2, and w2 belongs to plane xOz
-  // u1 is yet in xOz and invariant by Ru1, so after this step u1 and w2 will be
-  // in xOz
-  Vector3 v2;
-  x    = 0.f;
-  y    = 0.f;
-  z    = 0.f;
-  sign = -1.f;
-  if (MathTools::WithinEpsilon(w.z, 0.f)) {
-    x = 1.f;
-  }
-  else {
-    t = u1.z / u1.x;
-    x = -t * std::sqrt(1.f / (1.f + t * t));
-    z = std::sqrt(1.f / (1.f + t * t));
-  }
-
-  Vector3 w2(x, y, z);
-  w2.normalize();
-  Vector3::CrossToRef(w2, u1, v2); // v2 image of v1 through rotation around u1
-  v2.normalize();
-  Vector3::CrossToRef(w, w2, cross); // returns same direction as u1 (=local x)
-                                     // if positive angle : cross(source, image)
-  cross.normalize();
-  if (Vector3::Dot(u1, cross) < 0.f) {
-    sign = 1.f;
-  }
-
-  dot = Vector3::Dot(w, w2);
-  dot = std::min(
-    1.f, std::max(-1.f, dot)); // to force dot to be in the range [-1, 1]
-  pitch = std::acos(dot) * sign;
-  if (Vector3::Dot(v2, Y) < 0.f) { // checks for Y orientation
-    pitch = Math::PI + pitch;
-    ++nbRevert;
-  }
-
-  // step 3 : rotate around v2
-  // Rv2(u1) = X, same as Rv2(w2) = Z, with X=(1,0,0) and Z=(0,0,1)
-  sign = -1.f;
-  Vector3::CrossToRef(X, u1, cross); // returns same direction as Y if positive
-                                     // angle : cross(source, image)
-  cross.normalize();
-  if (Vector3::Dot(cross, Y) < 0.f) {
-    sign = 1.f;
-  }
-  dot = Vector3::Dot(u1, X);
-  // to force dot to be in the range [-1, 1]
-  dot = (std::min(1.f, std::max(-1.f, dot)));
-  yaw = -std::acos(dot) * sign; // negative : plane zOx oriented clockwise
-  if (dot < 0.f && static_cast<float>(nbRevert) < 2.f) {
-    yaw = Math::PI + yaw;
-  }
-
-  ref.x = pitch;
-  ref.y = yaw;
-  ref.z = roll;
+  auto& quat = Tmp::QuaternionArray[0];
+  Quaternion::RotationQuaternionFromAxisToRef(axis1, axis2, axis3, quat);
+  quat.toEulerAnglesToRef(ref);
 }
 
 } // end of namespace BABYLON

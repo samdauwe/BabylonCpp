@@ -72,6 +72,8 @@ public:
                                            float gamma);
   static void RotationAlphaBetaGammaToRef(float alpha, float beta, float gamma,
                                           Quaternion& result);
+  static void RotationQuaternionFromAxisToRef(Vector3& axis1, Vector3& axis2,
+                                              Vector3& axis3, Quaternion& ref);
   static Quaternion Slerp(const Quaternion& left, const Quaternion& right,
                           float amount);
   static void SlerpToRef(const Quaternion& left, const Quaternion& right,

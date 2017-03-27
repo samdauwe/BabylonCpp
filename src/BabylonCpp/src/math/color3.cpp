@@ -1,5 +1,6 @@
 #include <babylon/math/color3.h>
 
+#include <babylon/core/random.h>
 #include <babylon/core/string.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/math_tools.h>
@@ -59,11 +60,12 @@ std::unique_ptr<Color3> Color3::clone() const
   return std_util::make_unique<Color3>(*this);
 }
 
-std::ostream& operator<<(std::ostream& os, const Color3& color)
+std::string Color3::toString() const
 {
-  os << "{\"R\":" << color.r << ",\"G\":" << color.g << ",\"B\":" << color.b
-     << "}";
-  return os;
+  std::ostringstream oss;
+  oss << *this;
+
+  return oss.str();
 }
 
 const char* Color3::getClassName() const
@@ -195,6 +197,11 @@ Color3& Color3::copyFromFloats(float red, float green, float blue)
   return *this;
 }
 
+Color3& Color3::set(float red, float green, float blue)
+{
+  return copyFromFloats(red, green, blue);
+}
+
 std::string Color3::toHexString() const
 {
   int intR = static_cast<int>(r * 255) | 0;
@@ -241,6 +248,13 @@ Color3& Color3::toGammaSpaceToRef(Color3& convertedColor)
 }
 
 /** Operator overloading **/
+std::ostream& operator<<(std::ostream& os, const Color3& color)
+{
+  os << "{\"R\":" << color.r << ",\"G\":" << color.g << ",\"B\":" << color.b
+     << "}";
+  return os;
+}
+
 Color3 Color3::operator+(const Color3& otherColor) const
 {
   return add(otherColor);
@@ -352,6 +366,11 @@ Color3 Color3::Cyan()
 Color3 Color3::Gray()
 {
   return Color3(0.5f, 0.5f, 0.5f);
+}
+
+Color3 Color3::Random()
+{
+  return Color3(Math::random(), Math::random(), Math::random());
 }
 
 } // end of namespace BABYLON

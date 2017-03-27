@@ -53,11 +53,12 @@ std::unique_ptr<Vector2> Vector2::clone() const
   return std_util::make_unique<Vector2>(*this);
 }
 
-std::ostream& operator<<(std::ostream& os, const Vector2& vector)
+std::string Vector2::toString() const
 {
-  os << "{\"X\":" << vector.x << ",\"Y\":" << vector.y << "}";
+  std::ostringstream oss;
+  oss << *this;
 
-  return os;
+  return oss.str();
 }
 
 const char* Vector2::getClassName() const
@@ -102,6 +103,11 @@ Vector2& Vector2::copyFromFloats(float ix, float iy)
   y = iy;
 
   return *this;
+}
+
+Vector2& Vector2::set(float ix, float iy)
+{
+  return copyFromFloats(ix, iy);
 }
 
 Vector2 Vector2::add(const Vector2& otherVector) const
@@ -229,6 +235,13 @@ bool Vector2::equalsWithEpsilon(const Vector2& otherVector, float epsilon) const
 }
 
 /** Operator overloading **/
+std::ostream& operator<<(std::ostream& os, const Vector2& vector)
+{
+  os << "{\"X\":" << vector.x << ",\"Y\":" << vector.y << "}";
+
+  return os;
+}
+
 Vector2 Vector2::operator+(const Vector2& otherVector) const
 {
   return add(otherVector);

@@ -140,8 +140,8 @@ Vector3 SpotLight::getRotation()
 
   direction.normalize();
 
-  const Vector3 xaxis = Vector3::Cross(direction, Axis::Y);
-  const Vector3 yaxis = Vector3::Cross(xaxis, direction);
+  Vector3 xaxis = Vector3::Cross(direction, Axis::Y);
+  Vector3 yaxis = Vector3::Cross(xaxis, direction);
 
   return Vector3::RotationFromAxis(xaxis, yaxis, direction);
 }

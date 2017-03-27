@@ -62,13 +62,6 @@ std::unique_ptr<Color4> Color4::clone() const
   return std_util::make_unique<Color4>(*this);
 }
 
-std::ostream& operator<<(std::ostream& os, const Color4& color)
-{
-  os << "{\"R\":" << color.r << ",\"G\":" << color.g << ",\"B\":" << color.b
-     << ",\"A\":" << color.a << "}";
-  return os;
-}
-
 const char* Color4::getClassName() const
 {
   return "Color4";
@@ -178,10 +171,10 @@ Color4 Color4::multiplyToRef(const Color4& color, Color4& result)
 
 std::string Color4::toString() const
 {
-  std::stringstream ss;
-  ss << "{R:" << r << " G:" << g << " B:" << b << " A:" << a << "}";
+  std::ostringstream oss;
+  oss << *this;
 
-  return ss.str();
+  return oss.str();
 }
 
 Color4& Color4::copyFrom(const Color4& source)
@@ -192,6 +185,21 @@ Color4& Color4::copyFrom(const Color4& source)
   a = source.a;
 
   return *this;
+}
+
+Color4& Color4::copyFromFloats(float red, float green, float blue, float alpha)
+{
+  r = red;
+  g = green;
+  b = blue;
+  a = alpha;
+
+  return *this;
+}
+
+Color4& Color4::set(float red, float green, float blue, float alpha)
+{
+  return copyFromFloats(red, green, blue, alpha);
 }
 
 std::string Color4::toHexString() const
@@ -210,6 +218,13 @@ std::string Color4::toHexString() const
 }
 
 /** Operator overloading **/
+std::ostream& operator<<(std::ostream& os, const Color4& color)
+{
+  os << "{\"R\":" << color.r << ",\"G\":" << color.g << ",\"B\":" << color.b
+     << ",\"A\":" << color.a << "}";
+  return os;
+}
+
 Color4 Color4::operator+(const Color4& right) const
 {
   return add(right);

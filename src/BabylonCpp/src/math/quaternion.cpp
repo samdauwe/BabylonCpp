@@ -1,6 +1,7 @@
 #include <babylon/math/quaternion.h>
 
 #include <babylon/math/matrix.h>
+#include <babylon/math/tmp.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
@@ -455,6 +456,16 @@ void Quaternion::RotationAlphaBetaGammaToRef(float alpha, float beta,
   result.y = std::sin(halfGammaMinusAlpha) * std::sin(halfBeta);
   result.z = std::sin(halfGammaPlusAlpha) * std::cos(halfBeta);
   result.w = std::cos(halfGammaPlusAlpha) * std::cos(halfBeta);
+}
+
+void Quaternion::RotationQuaternionFromAxisToRef(Vector3& axis1, Vector3& axis2,
+                                                 Vector3& axis3,
+                                                 Quaternion& ref)
+{
+  auto& rotMat = Tmp::MatrixArray[0];
+  Matrix::FromXYZAxesToRef(axis1.normalize(), axis2.normalize(),
+                           axis3.normalize(), rotMat);
+  Quaternion::FromRotationMatrixToRef(rotMat, ref);
 }
 
 Quaternion Quaternion::Slerp(const Quaternion& left, const Quaternion& right,
