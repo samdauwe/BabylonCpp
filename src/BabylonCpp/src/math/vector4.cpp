@@ -1,5 +1,7 @@
 #include <babylon/math/vector4.h>
 
+#include <babylon/math/matrix.h>
+
 namespace BABYLON {
 
 Vector4::Vector4(float ix, float iy, float iz, float iw)
@@ -58,11 +60,12 @@ std::unique_ptr<Vector4> Vector4::clone() const
   return std_util::make_unique<Vector4>(*this);
 }
 
-std::ostream& operator<<(std::ostream& os, const Vector4& vector)
+std::string Vector4::toString() const
 {
-  os << "{\"X\":" << vector.x << ",\"Y\":" << vector.y << ",\"Z\":" << vector.z
-     << ",\"W\":" << vector.w << "}";
-  return os;
+  std::ostringstream oss;
+  oss << *this;
+
+  return oss.str();
 }
 
 const char* Vector4::getClassName() const
@@ -181,12 +184,14 @@ Vector4 Vector4::scale(float iscale) const
   return Vector4(x * iscale, y * iscale, z * iscale, w * iscale);
 }
 
-void Vector4::scaleToRef(float iscale, Vector4& result)
+Vector4& Vector4::scaleToRef(float iscale, Vector4& result)
 {
   result.x = x * iscale;
   result.y = y * iscale;
   result.z = z * iscale;
   result.w = w * iscale;
+
+  return *this;
 }
 
 bool Vector4::equals(const Vector4& otherVector) const
@@ -287,6 +292,13 @@ Vector4& Vector4::maximizeInPlace(const Vector4& other)
 }
 
 /** Operator overloading **/
+std::ostream& operator<<(std::ostream& os, const Vector4& vector)
+{
+  os << "{\"X\":" << vector.x << ",\"Y\":" << vector.y << ",\"Z\":" << vector.z
+     << ",\"W\":" << vector.w << "}";
+  return os;
+}
+
 Vector4 Vector4::operator+(const Vector4& otherVector) const
 {
   return add(otherVector);
@@ -401,6 +413,11 @@ Vector4& Vector4::copyFromFloats(float ix, float iy, float iz, float iw)
   return *this;
 }
 
+Vector4& Vector4::set(float x, float y, float z, float w)
+{
+  return copyFromFloats(x, y, z, w);
+}
+
 /** Statics **/
 Vector4 Vector4::FromArray(const Float32Array& array, unsigned int offset)
 {
@@ -478,6 +495,40 @@ Vector4 Vector4::Center(const Vector4& value1, const Vector4& value2)
   Vector4 center = value1.add(value2);
   center.scaleInPlace(0.5f);
   return center;
+}
+
+Vector4 Vector4::TransformNormal(const Vector4& vector,
+                                 const Matrix& transformation)
+{
+  Vector4 result = Vector4::Zero();
+  Vector4::TransformNormalToRef(vector, transformation, result);
+  return result;
+}
+
+void Vector4::TransformNormalToRef(const Vector4& vector,
+                                   const Matrix& transformation,
+                                   Vector4& result)
+{
+  result.x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[4])
+             + (vector.z * transformation.m[8]);
+  result.y = (vector.x * transformation.m[1]) + (vector.y * transformation.m[5])
+             + (vector.z * transformation.m[9]);
+  result.z = (vector.x * transformation.m[2]) + (vector.y * transformation.m[6])
+             + (vector.z * transformation.m[10]);
+  result.w = vector.w;
+}
+
+void TransformNormalFromFloatsToRef(float x, float y, float z, float w,
+                                    const Matrix& transformation,
+                                    Vector4& result)
+{
+  result.x = (x * transformation.m[0]) + (y * transformation.m[4])
+             + (z * transformation.m[8]);
+  result.y = (x * transformation.m[1]) + (y * transformation.m[5])
+             + (z * transformation.m[9]);
+  result.z = (x * transformation.m[2]) + (y * transformation.m[6])
+             + (z * transformation.m[10]);
+  result.w = w;
 }
 
 } // end of namespace BABYLON

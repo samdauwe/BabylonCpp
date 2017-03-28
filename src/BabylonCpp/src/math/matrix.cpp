@@ -57,16 +57,6 @@ std::unique_ptr<Matrix> Matrix::clone() const
   return std_util::make_unique<Matrix>(*this);
 }
 
-std::ostream& operator<<(std::ostream& os, const Matrix& matrix)
-{
-  os << "{\"M\":[";
-  for (unsigned int i = 0; i < 15; ++i) {
-    os << matrix.m[i] << ",";
-  }
-  os << matrix.m[15] << "}";
-  return os;
-}
-
 const char* Matrix::getClassName() const
 {
   return "Matrix";
@@ -259,6 +249,15 @@ Matrix& Matrix::invertToRef(Matrix& other)
   return *this;
 }
 
+Matrix& Matrix::setTranslationFromFloats(float x, float y, float z)
+{
+  m[12] = x;
+  m[13] = y;
+  m[14] = z;
+
+  return *this;
+}
+
 Matrix& Matrix::setTranslation(const Vector3& vector3)
 {
   m[12] = vector3.x;
@@ -271,6 +270,24 @@ Matrix& Matrix::setTranslation(const Vector3& vector3)
 Vector3 Matrix::getTranslation() const
 {
   return Vector3(m[12], m[13], m[14]);
+}
+
+Matrix& Matrix::getTranslationToRef(Vector3& result)
+{
+  result.x = m[12];
+  result.y = m[13];
+  result.z = m[14];
+
+  return *this;
+}
+
+Matrix& Matrix::removeRotationAndScaling()
+{
+  setRowFromFloats(0.f, 1.f, 0.f, 0.f, 0.f);
+  setRowFromFloats(1.f, 0.f, 1.f, 0.f, 0.f);
+  setRowFromFloats(2.f, 0.f, 0.f, 1.f, 0.f);
+
+  return *this;
 }
 
 Matrix Matrix::multiply(Matrix& other)
@@ -476,7 +493,7 @@ Matrix Matrix::getRotationMatrix() const
   return result;
 }
 
-void Matrix::getRotationMatrixToRef(Matrix& result) const
+Matrix const& Matrix::getRotationMatrixToRef(Matrix& result) const
 {
   float xs = m[0] * m[1] * m[2] * m[3] < 0 ? -1 : 1;
   float ys = m[4] * m[5] * m[6] * m[7] < 0 ? -1 : 1;
@@ -490,9 +507,21 @@ void Matrix::getRotationMatrixToRef(Matrix& result) const
                           m[4] / sy, m[5] / sy, m[6] / sy, 0.f,  //
                           m[8] / sz, m[9] / sz, m[10] / sz, 0.f, //
                           0.f, 0.f, 0.f, 1.f, result);
+
+  return *this;
 }
 
 /** Operator overloading **/
+std::ostream& operator<<(std::ostream& os, const Matrix& matrix)
+{
+  os << "{\"M\":[";
+  for (unsigned int i = 0; i < 15; ++i) {
+    os << matrix.m[i] << ",";
+  }
+  os << matrix.m[15] << "}";
+  return os;
+}
+
 Matrix Matrix::operator+(const Matrix& other)
 {
   return add(other);
@@ -603,11 +632,27 @@ Matrix& Matrix::setRow(unsigned int index, const Vector4& row)
     return *this;
   }
 
-  unsigned int i = index * 4;
-  m[i + 0]       = row.x;
-  m[i + 1]       = row.y;
-  m[i + 2]       = row.z;
-  m[i + 3]       = row.w;
+  const auto i = index * 4;
+  m[i + 0]     = row.x;
+  m[i + 1]     = row.y;
+  m[i + 2]     = row.z;
+  m[i + 3]     = row.w;
+
+  return *this;
+}
+
+Matrix& Matrix::setRowFromFloats(unsigned int index, float x, float y, float z,
+                                 float w)
+{
+  if (index > 3) {
+    return *this;
+  }
+
+  const auto i = index * 4;
+  m[i + 0]     = x;
+  m[i + 1]     = y;
+  m[i + 2]     = z;
+  m[i + 3]     = w;
 
   return *this;
 }
@@ -644,18 +689,24 @@ Matrix Matrix::FromValues(float initialM11, float initialM12, float initialM13,
 Matrix Matrix::Compose(const Vector3& scale, Quaternion& rotation,
                        const Vector3& translation)
 {
-  Matrix result = Matrix::FromValues(scale.x, 0.f, 0.f, 0.f, //
-                                     0.f, scale.y, 0.f, 0.f, //
-                                     0.f, 0.f, scale.z, 0.f, //
-                                     0.f, 0.f, 0.f, 1.f);
+  auto result = Matrix::Identity();
+  Matrix::ComposeToRef(scale, rotation, translation, result);
+  return result;
+}
 
-  Matrix rotationMatrix = Matrix::Identity();
-  rotation.toRotationMatrix(rotationMatrix);
-  result = result.multiply(rotationMatrix);
+void Matrix::ComposeToRef(const Vector3& scale, Quaternion& rotation,
+                          const Vector3& translation, Matrix& result)
+{
+  Matrix::FromValuesToRef(scale.x, 0.f, 0.f, 0.f, //
+                          0.f, scale.y, 0.f, 0.f, //
+                          0.f, 0.f, scale.z, 0.f, //
+                          0.f, 0.f, 0.f, 1.f, Tmp::MatrixArray[1]);
+
+  rotation.toRotationMatrix(Tmp::MatrixArray[0]);
+
+  Tmp::MatrixArray[1].multiplyToRef(Tmp::MatrixArray[0], result);
 
   result.setTranslation(translation);
-
-  return result;
 }
 
 Matrix Matrix::Identity()
@@ -1030,15 +1081,19 @@ Matrix Matrix::OrthoLH(float width, float height, float znear, float zfar)
 void Matrix::OrthoLHToRef(float width, float height, float znear, float zfar,
                           Matrix& result)
 {
-  float hw  = 2.f / width;
-  float hh  = 2.f / height;
-  float id  = 1.f / (zfar - znear);
-  float nid = znear / (znear - zfar);
+  const float n = znear;
+  const float f = zfar;
 
-  Matrix::FromValuesToRef(hw, 0.f, 0.f, 0.f, //
-                          0.f, hh, 0.f, 0.f, //
-                          0.f, 0.f, id, 0.f, //
-                          0.f, 0.f, nid, 1.f, result);
+  const float a = 2.f / width;
+  const float b = 2.f / height;
+  const float c = 2.f / (f - n);
+  const float d = -(f + n) / (f - n);
+
+  Matrix::FromValuesToRef(a, 0.f, 0.f, 0.f, //
+                          0.f, b, 0.f, 0.f, //
+                          0.f, 0.f, c, 0.f, //
+                          0.f, 0.f, d, 1.f, //
+                          result);
 }
 
 Matrix Matrix::OrthoOffCenterLH(float left, float right, float bottom,
@@ -1055,18 +1110,22 @@ void Matrix::OrthoOffCenterLHToRef(float left, float right, float bottom,
                                    float top, float znear, float zfar,
                                    Matrix& result)
 {
-  result.m[0] = 2.f / (right - left);
-  result.m[1] = result.m[2] = result.m[3] = 0.f;
-  result.m[5]                             = 2.f / (top - bottom);
-  result.m[4] = result.m[6] = result.m[7] = 0.f;
+  const float n = znear;
+  const float f = zfar;
 
-  result.m[10] = 1.f / (zfar - znear);
-  result.m[8] = result.m[9] = result.m[11] = 0.f;
-  result.m[12]                             = (left + right) / (left - right);
-  result.m[13]                             = (top + bottom) / (bottom - top);
+  const float a = 2.f / (right - left);
+  const float b = 2.f / (top - bottom);
+  const float c = 2.f / (f - n);
+  const float d = -(f + n) / (f - n);
 
-  result.m[14] = -znear / (zfar - znear);
-  result.m[15] = 1.f;
+  const float i0 = (left + right) / (left - right);
+  const float i1 = (top + bottom) / (bottom - top);
+
+  Matrix::FromValuesToRef(a, 0.f, 0.f, 0.f, //
+                          0.f, b, 0.f, 0.f, //
+                          0.f, 0.f, c, 0.f, //
+                          i0, i1, d, 1.f,   //
+                          result);
 }
 
 Matrix Matrix::OrthoOffCenterRH(float left, float right, float bottom,
@@ -1089,18 +1148,21 @@ void Matrix::OrthoOffCenterRHToRef(float left, float right, float bottom,
 
 Matrix Matrix::PerspectiveLH(float width, float height, float znear, float zfar)
 {
-  Matrix matrix = Matrix::Zero();
+  auto matrix = Matrix::Zero();
 
-  matrix.m[0] = (2.f * znear) / width;
-  matrix.m[1] = matrix.m[2] = matrix.m[3] = 0.f;
-  matrix.m[5]                             = (2.f * znear) / height;
-  matrix.m[4] = matrix.m[6] = matrix.m[7] = 0.f;
-  matrix.m[10]                            = -zfar / (znear - zfar);
-  matrix.m[8] = matrix.m[9] = 0.f;
-  matrix.m[11]              = 1.f;
-  matrix.m[12] = matrix.m[13] = matrix.m[15] = 0.f;
-  matrix.m[14]                               = (znear * zfar) / (znear - zfar);
+  float n = znear;
+  float f = zfar;
 
+  float a = 2.f * n / width;
+  float b = 2.f * n / height;
+  float c = (f + n) / (f - n);
+  float d = -2.f * f * n / (f - n);
+
+  Matrix::FromValuesToRef(a, 0.f, 0.f, 0.f, //
+                          0.f, b, 0.f, 0.f, //
+                          0.f, 0.f, c, 1.f, //
+                          0.f, 0.f, d, 0.f, //
+                          matrix);
   return matrix;
 }
 
@@ -1118,30 +1180,20 @@ void Matrix::PerspectiveFovLHToRef(float fov, float aspect, float znear,
                                    float zfar, Matrix& result,
                                    bool isVerticalFovFixed)
 {
-  float _tan = 1.f / (std::tan(fov * 0.5f));
+  float n = znear;
+  float f = zfar;
 
-  if (isVerticalFovFixed) {
-    result.m[0] = _tan / aspect;
-  }
-  else {
-    result.m[0] = _tan;
-  }
+  float t = 1.f / (std::tan(fov * 0.5f));
+  float a = isVerticalFovFixed ? (t / aspect) : t;
+  float b = isVerticalFovFixed ? t : (t * aspect);
+  float c = (f + n) / (f - n);
+  float d = -2.f * f * n / (f - n);
 
-  result.m[1] = result.m[2] = result.m[3] = 0.f;
-
-  if (isVerticalFovFixed) {
-    result.m[5] = _tan;
-  }
-  else {
-    result.m[5] = _tan * aspect;
-  }
-
-  result.m[4] = result.m[6] = result.m[7] = 0.f;
-  result.m[8] = result.m[9] = 0.0;
-  result.m[10]              = zfar / (zfar - znear);
-  result.m[11]              = 1.f;
-  result.m[12] = result.m[13] = result.m[15] = 0.f;
-  result.m[14]                               = -(znear * zfar) / (zfar - znear);
+  Matrix::FromValuesToRef(a, 0.f, 0.f, 0.f, //
+                          0.f, b, 0.f, 0.f, //
+                          0.f, 0.f, c, 1.f, //
+                          0.f, 0.f, d, 0.f, //
+                          result);
 }
 
 Matrix Matrix::PerspectiveFovRH(float fov, float aspect, float znear,
@@ -1158,54 +1210,49 @@ void Matrix::PerspectiveFovRHToRef(float fov, float aspect, float znear,
                                    float zfar, Matrix& result,
                                    bool isVerticalFovFixed)
 {
-  float _tan = 1.f / (std::tan(fov * 0.5f));
+  // alternatively this could be expressed as:
+  //    m = PerspectiveFovLHToRef
+  //    m[10] *= -1.0;
+  //    m[11] *= -1.0;
 
-  if (isVerticalFovFixed) {
-    result.m[0] = _tan / aspect;
-  }
-  else {
-    result.m[0] = _tan;
-  }
+  float n = znear;
+  float f = zfar;
 
-  result.m[1] = result.m[2] = result.m[3] = 0.0;
+  float t = 1.f / (std::tan(fov * 0.5f));
+  float a = isVerticalFovFixed ? (t / aspect) : t;
+  float b = isVerticalFovFixed ? t : (t * aspect);
+  float c = -(f + n) / (f - n);
+  float d = -2.f * f * n / (f - n);
 
-  if (isVerticalFovFixed) {
-    result.m[5] = _tan;
-  }
-  else {
-    result.m[5] = _tan * aspect;
-  }
-
-  result.m[4] = result.m[6] = result.m[7] = 0.f;
-  result.m[8] = result.m[9] = 0.f;
-  result.m[10]              = zfar / (znear - zfar);
-  result.m[11]              = -1.f;
-  result.m[12] = result.m[13] = result.m[15] = 0.f;
-  result.m[14]                               = (znear * zfar) / (znear - zfar);
+  Matrix::FromValuesToRef(a, 0.f, 0.f, 0.f,  //
+                          0.f, b, 0.f, 0.f,  //
+                          0.f, 0.f, c, -1.f, //
+                          0.f, 0.f, d, 0.f,  //
+                          result);
 }
 
 void Matrix::PerspectiveFovWebVRToRef(const VRFov& fov, float znear, float zfar,
-                                      Matrix& result,
-                                      bool /*isVerticalFovFixed*/)
+                                      Matrix& result, bool rightHanded)
 {
-  float upTan    = std::tan(fov.upDegrees * Math::PI / 180.f);
-  float downTan  = std::tan(fov.downDegrees * Math::PI / 180.f);
-  float leftTan  = std::tan(fov.leftDegrees * Math::PI / 180.f);
-  float rightTan = std::tan(fov.rightDegrees * Math::PI / 180.f);
-  float xScale   = 2.f / (leftTan + rightTan);
-  float yScale   = 2.f / (upTan + downTan);
-  result.m[0]    = xScale;
+  float rightHandedFactor = rightHanded ? -1.f : 1.f;
+  float upTan             = std::tan(fov.upDegrees * Math::PI / 180.f);
+  float downTan           = std::tan(fov.downDegrees * Math::PI / 180.f);
+  float leftTan           = std::tan(fov.leftDegrees * Math::PI / 180.f);
+  float rightTan          = std::tan(fov.rightDegrees * Math::PI / 180.f);
+  float xScale            = 2.f / (leftTan + rightTan);
+  float yScale            = 2.f / (upTan + downTan);
+  result.m[0]             = xScale;
   result.m[1] = result.m[2] = result.m[3] = result.m[4] = 0.f;
   result.m[5]                                           = yScale;
   result.m[6] = result.m[7] = 0.0;
-  result.m[8]               = ((leftTan - rightTan) * xScale * 0.5f);
-  result.m[9]               = -((upTan - downTan) * yScale * 0.5f);
-  result.m[10]              = -(znear + zfar) / (zfar - znear);
-  result.m[10]              = -zfar / (znear - zfar);
-  result.m[11]              = 1.f;
+  result.m[8]  = ((leftTan - rightTan) * xScale * 0.5f) * rightHandedFactor;
+  result.m[9]  = -((upTan - downTan) * yScale * 0.5f) * rightHandedFactor;
+  result.m[10] = -(znear + zfar) / (zfar - znear) * rightHandedFactor;
+  // result.m[10]              = -zfar / (znear - zfar);
+  result.m[11] = 1.f * rightHandedFactor;
   result.m[12] = result.m[13] = result.m[15] = 0.f;
   result.m[14] = -(2.f * zfar * znear) / (zfar - znear);
-  result.m[14] = (znear * zfar) / (znear - zfar);
+  // result.m[14] = (znear * zfar) / (znear - zfar);
 }
 
 Matrix Matrix::GetFinalMatrix(const Viewport& viewport, Matrix& world,

@@ -65,11 +65,12 @@ std::unique_ptr<Quaternion> Quaternion::clone() const
   return std_util::make_unique<Quaternion>(*this);
 }
 
-std::ostream& operator<<(std::ostream& os, const Quaternion& quaternion)
+std::string Quaternion::toString() const
 {
-  os << "{\"X\":" << quaternion.x << ",\"Y\":" << quaternion.y
-     << ",\"Z\":" << quaternion.z << ",\"W\":" << quaternion.w << "}";
-  return os;
+  std::ostringstream oss;
+  oss << *this;
+
+  return oss.str();
 }
 
 const char* Quaternion::getClassName() const
@@ -118,6 +119,11 @@ Quaternion& Quaternion::copyFromFloats(float ix, float iy, float iz, float iw)
   w = iw;
 
   return *this;
+}
+
+Quaternion& Quaternion::set(float x, float y, float z, float w)
+{
+  return copyFromFloats(x, y, z, w);
 }
 
 Quaternion Quaternion::add(const Quaternion& other) const
@@ -225,7 +231,6 @@ Quaternion& Quaternion::toEulerAnglesToRef(Vector3& result,
   if (zAxisY < -limit) {
     result.y = 2.f * std::atan2(qy, qw);
     result.x = Math::PI_2;
-
     result.z = 0.f;
   }
   else if (zAxisY > limit) {
@@ -281,6 +286,13 @@ Quaternion& Quaternion::fromRotationMatrix(const Matrix& matrix)
 }
 
 /** Operator overloading **/
+std::ostream& operator<<(std::ostream& os, const Quaternion& quaternion)
+{
+  os << "{\"X\":" << quaternion.x << ",\"Y\":" << quaternion.y
+     << ",\"Z\":" << quaternion.z << ",\"W\":" << quaternion.w << "}";
+  return os;
+}
+
 Quaternion Quaternion::operator+(const Quaternion& other) const
 {
   return add(other);
@@ -368,6 +380,11 @@ void Quaternion::FromRotationMatrixToRef(const Matrix& matrix,
   }
 }
 
+Quaternion Quaternion::Zero()
+{
+  return Quaternion(0.f, 0.f, 0.f, 0.f);
+}
+
 Quaternion Quaternion::Inverse(const Quaternion& q)
 {
   return Quaternion(-q.x, -q.y, -q.z, q.w);
@@ -376,6 +393,12 @@ Quaternion Quaternion::Inverse(const Quaternion& q)
 Quaternion Quaternion::Identity()
 {
   return Quaternion(0.f, 0.f, 0.f, 1.f);
+}
+
+bool Quaternion::IsIdentity(const Quaternion& quaternion)
+{
+  return quaternion.x == 0.f && quaternion.y == 0.f && quaternion.z == 0.f
+         && quaternion.w == 1.f;
 }
 
 Quaternion Quaternion::RotationAxis(Vector3& axis, float angle)
@@ -456,6 +479,15 @@ void Quaternion::RotationAlphaBetaGammaToRef(float alpha, float beta,
   result.y = std::sin(halfGammaMinusAlpha) * std::sin(halfBeta);
   result.z = std::sin(halfGammaPlusAlpha) * std::cos(halfBeta);
   result.w = std::cos(halfGammaPlusAlpha) * std::cos(halfBeta);
+}
+
+Quaternion Quaternion::RotationQuaternionFromAxis(Vector3& axis1,
+                                                  Vector3& axis2,
+                                                  Vector3& axis3)
+{
+  Quaternion quat(0.f, 0.f, 0.f, 0.f);
+  Quaternion::RotationQuaternionFromAxisToRef(axis1, axis2, axis3, quat);
+  return quat;
 }
 
 void Quaternion::RotationQuaternionFromAxisToRef(Vector3& axis1, Vector3& axis2,
