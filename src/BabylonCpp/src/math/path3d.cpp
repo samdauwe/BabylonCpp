@@ -244,9 +244,6 @@ void Path3D::_compute(const Vector3* firstNormal)
   }
 }
 
-// private function getFirstNonNullVector(index)
-// returns the first non null vector from index : curve[index +
-// N].subtract(curve[index])
 Vector3 Path3D::_getFirstNonNullVector(unsigned int index)
 {
   unsigned int i   = 1;
@@ -259,9 +256,6 @@ Vector3 Path3D::_getFirstNonNullVector(unsigned int index)
   return nNVector;
 }
 
-// private function getLastNonNullVector(index)
-// returns the last non null vector from index :
-// curve[index].subtract(curve[index - N])
 Vector3 Path3D::_getLastNonNullVector(unsigned int index)
 {
   unsigned int i   = 1;
@@ -273,11 +267,6 @@ Vector3 Path3D::_getLastNonNullVector(unsigned int index)
   return nLVector;
 }
 
-// private function normalVector(v0, vt, va) :
-// returns an arbitrary point in the plane defined by the point v0 and the
-// vector vt orthogonal to this plane
-// if va is passed, it returns the va projection on the plane orthogonal to vt
-// at the point v0
 Vector3 Path3D::_normalVector(const Vector3& /*v0*/, const Vector3& vt,
                               const Vector3* va)
 {
@@ -307,7 +296,6 @@ Vector3 Path3D::_normalVector(const Vector3& /*v0*/, const Vector3& vt,
   else {
     normal0 = Vector3::Cross(vt, *va);
     Vector3::CrossToRef(normal0, vt, normal0);
-    // normal0 = Vector3.Cross(normal0, vt);
   }
   normal0.normalize();
   return normal0;

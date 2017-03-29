@@ -13,13 +13,13 @@ class BABYLON_SHARED_EXPORT Path3D {
 public:
   Path3D();
   /**
-   * new Path3D(path, normal, raw)
-   * Creates a Path3D. A Path3D is a logical math object, so not a mesh.
+   * @brief Creates a Path3D. A Path3D is a logical math object, so not a mesh.
    * path : an array of Vector3, the curve axis of the Path3D
    * normal (optional) : Vector3, the first wanted normal to the curve. Ex (0,
-   * 1, 0) for a vertical normal.
+   *                     1, 0) for a vertical normal.
    * raw (optional, default false) : boolean, if true the returned Path3D isn't
-   * normalized. Useful to depict path acceleration or speed.
+   *                                 normalized. Useful to depict path
+   *                                 acceleration or speed.
    */
   Path3D(const std::vector<Vector3>& path);
   Path3D(const std::vector<Vector3>& path, const Vector3& firstNormal,
@@ -34,7 +34,7 @@ public:
   friend std::ostream& operator<<(std::ostream& os, const Path3D& path);
 
   /**
-   * Returns the Path3D array of successive Vector3 designing its curve.
+   * @brief Returns the Path3D array of successive Vector3 designing its curve.
    */
   std::vector<Vector3>& getCurve();
 
@@ -44,34 +44,54 @@ public:
   std::vector<Vector3>& getTangents();
 
   /**
-   * Returns an array populated with normal vectors on each Path3D curve point.
+   * @brief Returns an array populated with normal vectors on each Path3D curve
+   * point.
    */
   std::vector<Vector3>& getNormals();
 
   /**
-   * Returns an array populated with binormal vectors on each Path3D curve
-   * point.
+   * @brief Returns an array populated with binormal vectors on each Path3D
+   * curve point.
    */
   std::vector<Vector3>& getBinormals();
 
   /**
-   * Returns an array populated with distances (float) of the i-th point from
-   * the first curve point.
+   * @brief Returns an array populated with distances (float) of the i-th point
+   * from the first curve point.
    */
   std::vector<float>& getDistances();
 
   /**
-   * Forces the Path3D tangent, normal, binormal and distance recomputation.
-   * Returns the same object updated.
+   * @brief Forces the Path3D tangent, normal, binormal and distance
+   * recomputation.
+   * @returns The same object updated.
    */
   Path3D& update(const std::vector<Vector3>& path);
   Path3D& update(const std::vector<Vector3>& path, const Vector3& firstNormal);
 
 private:
-  // Computes tangents, normals and binormals.
+  /**
+   * @brief Computes tangents, normals and binormals.
+   */
   void _compute(const Vector3* firstNormal);
+
+  /**
+   * @brief Returns the first non null vector from index : curve[index +
+   * N].subtract(curve[index])
+   */
   Vector3 _getFirstNonNullVector(unsigned int index);
+
+  /**
+   * @brief Returns the last non null vector from index :
+   * curve[index].subtract(curve[index - N]).
+   */
   Vector3 _getLastNonNullVector(unsigned int index);
+
+  /**
+   * @brief returns an arbitrary point in the plane defined by the point v0 and
+   * the vector vt orthogonal to this plane if va is passed, it returns the va
+   * projection on the plane orthogonal to vt at the point v0.
+   */
   Vector3 _normalVector(const Vector3& v0, const Vector3& vt,
                         const Vector3* va);
 

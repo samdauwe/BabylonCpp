@@ -11,7 +11,7 @@ Angle::Angle()
 Angle::Angle(float iradians) : _radians{iradians}
 {
   if (_radians < 0.f) {
-    _radians += (2 * Math::PI);
+    _radians += Math::PI2;
   }
 }
 
@@ -73,8 +73,8 @@ float Angle::radians() const
 
 Angle Angle::BetweenTwoPoints(const Vector2& a, const Vector2& b)
 {
-  auto delta = b.subtract(a);
-  auto theta = std::atan2(delta.y, delta.x);
+  const auto delta = b.subtract(a);
+  const auto theta = std::atan2(delta.y, delta.x);
   return Angle(theta);
 }
 

@@ -11,6 +11,10 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT Viewport {
 
 public:
+  /**
+   * @brief Creates a Viewport object located at (x, y) and sized (width,
+   * height).
+   */
   Viewport();
   Viewport(int x, int y, int width, int height);
   Viewport(const Viewport& otherViewport);
@@ -19,7 +23,12 @@ public:
   Viewport& operator=(Viewport&& otherViewport);
   ~Viewport();
   Viewport copy() const;
+
+  /**
+   * @brief Returns a new Viewport copied from the current one.
+   */
   std::unique_ptr<Viewport> clone() const;
+
   friend std::ostream& operator<<(std::ostream& os, const Viewport& viewport);
 
   /** Methods **/

@@ -62,7 +62,7 @@ enum class TonemappingOperator {
 }; // end of enum class TonemappingOperator
 
 /** Math Enums **/
-enum class Space { LOCAL = 0, WORLD = 1 }; // end of enum class Space
+enum class Space { LOCAL = 0, WORLD = 1, BONE = 2 }; // end of enum class Space
 
 enum class Orientation { CW = 0, CCW = 1 }; // end of enum class Orientation
 

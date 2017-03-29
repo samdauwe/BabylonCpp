@@ -100,7 +100,8 @@ Curve3 Curve3::CreateQuadraticBezier(const Vector3& v0, const Vector3& v1,
 {
   float nbPointsVal = nbPoints > 2 ? static_cast<float>(nbPoints) : 3.f;
   std::vector<Vector3> bez;
-  auto equation = [](float t, float val0, float val1, float val2) -> float {
+  const auto equation
+    = [](float t, float val0, float val1, float val2) -> float {
     return (1.f - t) * (1.f - t) * val0 + 2.f * t * (1.f - t) * val1
            + t * t * val2;
   };
@@ -118,7 +119,7 @@ Curve3 Curve3::CreateCubicBezier(const Vector3& v0, const Vector3& v1,
 {
   float nbPointsVal = nbPoints > 3 ? static_cast<float>(nbPoints) : 4.f;
   std::vector<Vector3> bez;
-  auto equation
+  const auto equation
     = [](float t, float val0, float val1, float val2, float val3) -> float {
     return (1.f - t) * (1.f - t) * (1.f - t) * val0
            + 3.f * t * (1.f - t) * (1.f - t) * val1
@@ -144,6 +145,32 @@ Curve3 Curve3::CreateHermiteSpline(const Vector3& p1, const Vector3& t1,
     hermite.emplace_back(Vector3::Hermite(p1, t1, p2, t2, i * step));
   }
   return Curve3(hermite);
+}
+
+Curve3 Curve3::CreateCatmullRomSpline(const std::vector<Vector3> points,
+                                      size_t nbPoints)
+{
+  std::vector<Vector3> totalPoints{points[0]};
+  std_util::concat(totalPoints, points);
+  totalPoints.emplace_back(points.back());
+  std::vector<Vector3> catmullRom;
+  const float step = 1.f / static_cast<float>(nbPoints);
+  size_t i         = 0;
+  float amount     = 0.f;
+  for (i = 0; i < totalPoints.size() - 3; ++i) {
+    amount = 0.f;
+    for (size_t c = 0; c < nbPoints; ++c) {
+      catmullRom.emplace_back(
+        Vector3::CatmullRom(totalPoints[i], totalPoints[i + 1],
+                            totalPoints[i + 2], totalPoints[i + 3], amount));
+      amount += step;
+    }
+  }
+  --i;
+  catmullRom.emplace_back(
+    Vector3::CatmullRom(totalPoints[i], totalPoints[i + 1], totalPoints[i + 2],
+                        totalPoints[i + 3], amount));
+  return Curve3(catmullRom);
 }
 
 float Curve3::computeLength(const std::vector<Vector3>& path)

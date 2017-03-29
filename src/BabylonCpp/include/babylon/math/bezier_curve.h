@@ -11,6 +11,10 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT BezierCurve {
 
 public:
+  /**
+   * @brief Returns the cubic Bezier interpolated value (float) at "t" (float)
+   * from the passed x1, y1, x2, y2 floats.
+   */
   static float Interpolate(float t, float x1, float y1, float x2, float y2);
 
 }; // end of class BezierCurve

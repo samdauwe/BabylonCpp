@@ -14,6 +14,10 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT Arc2 {
 
 public:
+  /**
+   * @brief Creates an Arc object from the three passed points : start, middle
+   * and end.
+   */
   Arc2(const Vector2& startPoint, const Vector2& midPoint,
        const Vector2& endPoint);
   Arc2(const Arc2& otherArc);
