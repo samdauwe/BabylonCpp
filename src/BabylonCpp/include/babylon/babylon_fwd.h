@@ -131,6 +131,7 @@ class OctreeBlock;
 class AxesViewer;
 class BoneAxesViewer;
 class DebugLayer;
+class RayHelper;
 class SkeletonViewer;
 // --- Engine ---
 class Engine;
