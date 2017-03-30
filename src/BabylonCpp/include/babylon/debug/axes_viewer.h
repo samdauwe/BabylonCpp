@@ -8,7 +8,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT AxesViewer {
 
 public:
-  AxesViewer(Scene* scene, float scaleLines = 1);
+  AxesViewer(Scene* scene, float scaleLines = 1.f);
   ~AxesViewer();
 
   void update(const Vector3& position, const Vector3& xaxis,

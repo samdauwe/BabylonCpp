@@ -19,6 +19,7 @@ SkeletonViewer::SkeletonViewer(Skeleton* iSkeleton, AbstractMesh* iMesh,
     , autoUpdateBonesMatrices{iAutoUpdateBonesMatrices}
     , renderingGroupId{iRenderingGroupId}
     , _scene{iScene}
+    , _debugMesh{nullptr}
     , _isEnabled{false}
 {
   update();
@@ -99,8 +100,8 @@ void SkeletonViewer::_getLinesForBonesNoLength(
   _resizeDebugLines(bones.size());
 
   unsigned int boneNum = 0;
-  for (size_t i = bones.size(); i > 0; --i) {
-    auto childBone  = bones[i - 1].get();
+  for (size_t i = bones.size(); i-- > 0;) {
+    auto childBone  = bones[i].get();
     auto parentBone = childBone->getParent();
     if (!parentBone) {
       continue;
