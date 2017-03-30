@@ -43,6 +43,11 @@ public:
   }
   ~StandardMaterial();
 
+  /**
+   * @brief Returns the string "StandardMaterial".
+   */
+  const char* getClassName() const;
+
   IReflect::Type type() const override;
 
   void setAmbientColor(const Color3& color) override;
@@ -76,7 +81,7 @@ protected:
   StandardMaterial(const std::string& name, Scene* scene);
   StandardMaterial(const StandardMaterial& other);
 
-private:
+protected:
   bool _shouldUseAlphaFromDiffuseTexture();
   bool _checkCache(Scene* scene, AbstractMesh* mesh, bool useInstances = false);
 
@@ -116,14 +121,22 @@ public:
   std::unique_ptr<FresnelParameters> emissiveFresnelParameters;
   bool useGlossinessFromSpecularMapAlpha;
   unsigned int maxSimultaneousLights;
+
   /**
    * If sets to true, x component of normal map value will invert (x = 1.0 - x).
    */
   bool invertNormalMapX;
+
   /**
    * If sets to true, y component of normal map value will invert (y = 1.0 - y).
    */
   bool invertNormalMapY;
+
+  /**
+   * If sets to true and backfaceCulling is false, normals will be flipped on
+   * the backside.
+   */
+  bool twoSidedLighting;
 
   /**
    * Color Grading 2D Lookup Texture.
@@ -147,7 +160,7 @@ public:
    */
   ColorCurves* cameraColorCurves;
 
-private:
+protected:
   std::vector<RenderTargetTexture*> _renderTargets;
   Matrix _worldViewProjectionMatrix;
   Color3 _globalAmbientColor;

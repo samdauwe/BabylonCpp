@@ -80,6 +80,7 @@ StandardMaterial::StandardMaterial(const std::string& iName, Scene* scene)
     , maxSimultaneousLights{4}
     , invertNormalMapX{false}
     , invertNormalMapY{false}
+    , twoSidedLighting{false}
     , cameraColorGradingTexture{nullptr}
     , cameraColorCurves{nullptr}
     , _worldViewProjectionMatrix{Matrix::Zero()}
@@ -184,6 +185,11 @@ StandardMaterial::StandardMaterial(const StandardMaterial& other)
 
 StandardMaterial::~StandardMaterial()
 {
+}
+
+const char* StandardMaterial::getClassName() const
+{
+  return "StandardMaterial";
 }
 
 IReflect::Type StandardMaterial::type() const
@@ -437,6 +443,13 @@ bool StandardMaterial::isReady(AbstractMesh* mesh, bool useInstances)
         if (invertNormalMapY) {
           _defines.defines[SMD::INVERTNORMALMAPY] = true;
         }
+
+        if (scene->_mirroredCameraPosition) {
+          _defines.defines[SMD::INVERTNORMALMAPX]
+            = !_defines.defines[SMD::INVERTNORMALMAPX];
+          _defines.defines[SMD::INVERTNORMALMAPY]
+            = !_defines.defines[SMD::INVERTNORMALMAPY];
+        }
       }
     }
 
@@ -460,6 +473,10 @@ bool StandardMaterial::isReady(AbstractMesh* mesh, bool useInstances)
       else {
         _defines.defines[SMD::CAMERACOLORGRADING] = true;
       }
+    }
+
+    if (!backFaceCulling && twoSidedLighting) {
+      _defines.defines[SMD::TWOSIDEDLIGHTING] = true;
     }
   }
 
