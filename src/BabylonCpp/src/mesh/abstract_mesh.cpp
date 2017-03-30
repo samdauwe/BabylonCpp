@@ -4,6 +4,7 @@
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/collisions/picking_info.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/ray.h>
@@ -1082,7 +1083,7 @@ bool AbstractMesh::_generatePointsArray()
   return false;
 }
 
-PickingInfo* AbstractMesh::intersects(const Ray& /*ray*/, bool /*fastCheck*/)
+PickingInfo AbstractMesh::intersects(const Ray& /*ray*/, bool /*fastCheck*/)
 {
   /*var pickingInfo = new PickingInfo();
 
@@ -1161,7 +1162,7 @@ PickingInfo* AbstractMesh::intersects(const Ray& /*ray*/, bool /*fastCheck*/)
 
   return pickingInfo;*/
 
-  return nullptr;
+  return PickingInfo();
 }
 
 AbstractMesh* AbstractMesh::clone(const std::string& /*name*/,

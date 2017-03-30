@@ -162,7 +162,7 @@ bool BoundingInfo::intersects(const BoundingInfo& boundingInfo, bool precise)
 Extents BoundingInfo::computeBoxExtents(const Vector3& axis,
                                         const BoundingBox& box) const
 {
-  float p = Vector3::Dot(box.center, axis);
+  float p = Vector3::Dot(box.centerWorld, axis);
 
   float r0 = std::abs(Vector3::Dot(box.directions[0], axis)) * box.extendSize.x;
   float r1 = std::abs(Vector3::Dot(box.directions[1], axis)) * box.extendSize.y;

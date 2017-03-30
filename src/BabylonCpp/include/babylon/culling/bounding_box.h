@@ -38,7 +38,9 @@ public:
 public:
   std::vector<Vector3> vectors;
   Vector3 center;
+  Vector3 centerWorld;
   Vector3 extendSize;
+  Vector3 extendSizeWorld;
   std::vector<Vector3> directions;
   std::vector<Vector3> vectorsWorld;
   Vector3 minimumWorld;

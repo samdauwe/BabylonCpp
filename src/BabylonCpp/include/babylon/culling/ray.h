@@ -36,15 +36,21 @@ public:
                                                        const Vector3& vertex1,
                                                        const Vector3& vertex2);
   std::unique_ptr<float> intersectsPlane(const Plane& plane);
+  PickingInfo intersectsMesh(AbstractMesh* mesh, bool fastCheck);
+  std::vector<PickingInfo> intersectsMeshes(std::vector<AbstractMesh*>& meshes,
+                                            bool fastCheck,
+                                            std::vector<PickingInfo>& results);
 
   /**
    * Intersection test between the ray and a given segment whithin a given
    * tolerance (threshold)
-   * @param sega the first point of the segment to test the intersection against
+   * @param sega the first point of the segment to test the intersection
+   * against
    * @param segb the second point of the segment to test the intersection
    * against
    * @param threshold the tolerance margin, if the ray doesn't intersect the
-   * segment but is close to the given threshold, the intersection is successful
+   * segment but is close to the given threshold, the intersection is
+   * successful
    * @return the distance from the ray origin to the intersection point if
    * there's intersection, or -1 if there's no intersection
    */
@@ -70,6 +76,12 @@ public:
 
   static Ray Transform(const Ray& ray, const Matrix& matrix);
 
+  static void TransformToRef(const Ray& ray, const Matrix& matrix, Ray& result);
+
+private:
+  static int _comparePickingInfo(const PickingInfo& pickingInfoA,
+                                 const PickingInfo& pickingInfoB);
+
 public:
   Vector3 origin;
   Vector3 direction;
@@ -82,6 +94,8 @@ private:
   Vector3 _pvec;
   Vector3 _tvec;
   Vector3 _qvec;
+
+  std::unique_ptr<Ray> _tmpRay;
 
 }; // end of class Ray
 

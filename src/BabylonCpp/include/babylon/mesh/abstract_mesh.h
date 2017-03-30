@@ -209,7 +209,7 @@ public:
 
   /** Picking **/
   virtual bool _generatePointsArray();
-  virtual PickingInfo* intersects(const Ray& ray, bool fastCheck = true);
+  virtual PickingInfo intersects(const Ray& ray, bool fastCheck = true);
   AbstractMesh* clone(const std::string& name, Node* newParent,
                       bool doNotCloneChildren = true);
   void releaseSubMeshes();

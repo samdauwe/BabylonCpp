@@ -49,7 +49,7 @@ public:
   void _bind(SubMesh* subMesh, Effect* effect, unsigned int fillMode) override;
   void _draw(SubMesh* subMesh, int fillMode,
              size_t instancesCount = 0) override;
-  PickingInfo* intersects(const Ray& ray, bool fastCheck = true) override;
+  PickingInfo intersects(const Ray& ray, bool fastCheck = true) override;
   void dispose(bool doNotRecurse = false) override;
   LinesMesh* clone(const std::string& name, Node* newParent,
                    bool doNotCloneChildren);

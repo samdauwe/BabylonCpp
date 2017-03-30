@@ -107,9 +107,9 @@ void LinesMesh::_draw(SubMesh* subMesh, int /*fillMode*/,
   engine->draw(false, subMesh->indexStart, subMesh->indexCount);
 }
 
-PickingInfo* LinesMesh::intersects(const Ray& /*ray*/, bool /*fastCheck*/)
+PickingInfo LinesMesh::intersects(const Ray& /*ray*/, bool /*fastCheck*/)
 {
-  return nullptr;
+  return PickingInfo();
 }
 
 void LinesMesh::dispose(bool /*doNotRecurse*/)

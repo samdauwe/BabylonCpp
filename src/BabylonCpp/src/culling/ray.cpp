@@ -1,20 +1,24 @@
 #include <babylon/culling/ray.h>
 
 #include <babylon/collisions/intersection_info.h>
+#include <babylon/collisions/picking_info.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_sphere.h>
 #include <babylon/math/plane.h>
+#include <babylon/math/tmp.h>
+#include <babylon/mesh/abstract_mesh.h>
 
 namespace BABYLON {
 
 const float Ray::smallnum = 0.00000001f;
 const float Ray::rayl     = 10e8f;
 
-Ray::Ray(const Vector3& _origin, const Vector3& _direction, float _length)
-    : origin{_origin}
-    , direction{_direction}
-    , length{_length}
+Ray::Ray(const Vector3& iOrigin, const Vector3& iDirection, float iLength)
+    : origin{iOrigin}
+    , direction{iDirection}
+    , length{iLength}
     , _vectorsSet{false}
+    , _tmpRay{nullptr}
 {
 }
 
@@ -273,6 +277,53 @@ std::unique_ptr<float> Ray::intersectsPlane(const Plane& plane)
   }
 }
 
+PickingInfo Ray::intersectsMesh(AbstractMesh* mesh, bool fastCheck)
+{
+  auto& tm = Tmp::MatrixArray[0];
+
+  mesh->getWorldMatrix()->invertToRef(tm);
+
+  if (_tmpRay) {
+    Ray::TransformToRef(*this, tm, *_tmpRay);
+  }
+  else {
+    _tmpRay = std_util::make_unique<Ray>(Ray::Transform(*this, tm));
+  }
+
+  return mesh->intersects(*_tmpRay, fastCheck);
+}
+
+std::vector<PickingInfo>
+Ray::intersectsMeshes(std::vector<AbstractMesh*>& meshes, bool fastCheck,
+                      std::vector<PickingInfo>& results)
+{
+  for (auto& mesh : meshes) {
+    auto pickInfo = intersectsMesh(mesh, fastCheck);
+
+    if (pickInfo.hit) {
+      results.emplace_back(pickInfo);
+    }
+  }
+
+  std::sort(results.begin(), results.end(), _comparePickingInfo);
+
+  return results;
+}
+
+int Ray::_comparePickingInfo(const PickingInfo& pickingInfoA,
+                             const PickingInfo& pickingInfoB)
+{
+  if (pickingInfoA.distance < pickingInfoB.distance) {
+    return -1;
+  }
+  else if (pickingInfoA.distance > pickingInfoB.distance) {
+    return 1;
+  }
+  else {
+    return 0;
+  }
+}
+
 float Ray::intersectionSegment(const Vector3& sega, const Vector3& segb,
                                float threshold) const
 {
@@ -388,12 +439,28 @@ Ray Ray::CreateNewFromTo(const Vector3& origin, const Vector3& end,
 
 Ray Ray::Transform(const Ray& ray, const Matrix& matrix)
 {
-  auto newOrigin    = Vector3::TransformCoordinates(ray.origin, matrix);
-  auto newDirection = Vector3::TransformNormal(ray.direction, matrix);
+  Ray result(Vector3(0.f, 0.f, 0.f), Vector3(0.f, 0.f, 0.f));
+  Ray::TransformToRef(ray, matrix, result);
 
-  newDirection.normalize();
+  return result;
+}
 
-  return Ray(newOrigin, newDirection, ray.length);
+void Ray::TransformToRef(const Ray& ray, const Matrix& matrix, Ray& result)
+{
+  Vector3::TransformCoordinatesToRef(ray.origin, matrix, result.origin);
+  Vector3::TransformNormalToRef(ray.direction, matrix, result.direction);
+  result.length = ray.length;
+
+  auto& dir = result.direction;
+  auto len  = dir.length();
+
+  if (!(len == 0.f || len == 1.f)) {
+    float num = 1.f / len;
+    dir.x *= num;
+    dir.y *= num;
+    dir.z *= num;
+    result.length *= len;
+  }
 }
 
 } // end of namespace BABYLON

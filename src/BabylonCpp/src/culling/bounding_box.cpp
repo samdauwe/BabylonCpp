@@ -42,8 +42,10 @@ BoundingBox::BoundingBox(const Vector3& _minimum, const Vector3& _maximum)
   vectorsWorld.clear();
   vectorsWorld.reserve(vectors.size());
   std::fill(vectorsWorld.begin(), vectorsWorld.end(), Vector3::Zero());
-  minimumWorld = Vector3::Zero();
-  maximumWorld = Vector3::Zero();
+  minimumWorld    = Vector3::Zero();
+  maximumWorld    = Vector3::Zero();
+  centerWorld     = Vector3::Zero();
+  extendSizeWorld = Vector3::Zero();
 
   _update(Matrix::Identity());
 }
@@ -114,9 +116,13 @@ void BoundingBox::_update(const Matrix& world)
     ++index;
   }
 
+  // Extend
+  maximumWorld.subtractToRef(minimumWorld, extendSizeWorld);
+  extendSizeWorld.scaleInPlace(0.5f);
+
   // OBB
-  maximumWorld.addToRef(minimumWorld, center);
-  center.scaleInPlace(0.5f);
+  maximumWorld.addToRef(minimumWorld, centerWorld);
+  centerWorld.scaleInPlace(0.5f);
 
   Vector3::FromArrayToRef(world.m, 0, directions[0]);
   Vector3::FromArrayToRef(world.m, 4, directions[1]);
@@ -204,8 +210,8 @@ bool BoundingBox::IntersectsSphere(const Vector3& minPoint,
                                    const Vector3& sphereCenter,
                                    float sphereRadius)
 {
-  Vector3 vector = Vector3::Clamp(sphereCenter, minPoint, maxPoint);
-  float num      = Vector3::DistanceSquared(sphereCenter, vector);
+  auto vector = Vector3::Clamp(sphereCenter, minPoint, maxPoint);
+  float num   = Vector3::DistanceSquared(sphereCenter, vector);
   return (num <= (sphereRadius * sphereRadius));
 }
 
