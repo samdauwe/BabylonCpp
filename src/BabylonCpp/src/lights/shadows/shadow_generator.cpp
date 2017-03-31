@@ -34,6 +34,7 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light)
     , _blurBoxOffset{0}
     , _bias{0.00005f}
     , _lightDirection{Vector3::Zero()}
+    , _depthScale{30.f}
     , _light{light}
     , _scene{light->getScene()}
     , _shadowMap{nullptr}
@@ -52,37 +53,37 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light)
     , _currentFaceIndex{0}
     , _currentFaceIndexCache{0}
     , _useFullFloat{true}
+    , _textureType{0}
 {
   light->_shadowGenerator = this;
 
   // Texture type fallback from float to int if not supported.
-  unsigned int textureType = 0;
-  const auto& caps         = _scene->getEngine()->getCaps();
+  const auto& caps = _scene->getEngine()->getCaps();
   if (caps.textureFloat && caps.textureFloatLinearFiltering
       && caps.textureFloatRender) {
     _useFullFloat = true;
-    textureType   = Engine::TEXTURETYPE_FLOAT;
+    _textureType  = Engine::TEXTURETYPE_FLOAT;
   }
   else {
     _useFullFloat = false;
-    textureType   = Engine::TEXTURETYPE_UNSIGNED_INT;
+    _textureType  = Engine::TEXTURETYPE_UNSIGNED_INT;
   }
 
   // Render target
   _shadowMap = std_util::make_unique<RenderTargetTexture>(
-    light->name + "_shadowMap", mapSize, _scene, false, true, textureType,
+    light->name + "_shadowMap", mapSize, _scene, false, true, _textureType,
     light->needCube());
   _shadowMap->wrapU                     = Texture::CLAMP_ADDRESSMODE;
   _shadowMap->wrapV                     = Texture::CLAMP_ADDRESSMODE;
   _shadowMap->anisotropicFilteringLevel = 1;
-  _shadowMap->updateSamplingMode(Texture::NEAREST_SAMPLINGMODE);
+  _shadowMap->updateSamplingMode(Texture::BILINEAR_SAMPLINGMODE);
   _shadowMap->renderParticles = false;
 
   _shadowMap->onBeforeRenderObservable.add(
     [this](unsigned int faceIndex) { _currentFaceIndex = faceIndex; });
 
   _shadowMap->onAfterUnbindObservable.add([this]() {
-    if (!useBlurVarianceShadowMap()) {
+    if (!useBlurExponentialShadowMap()) {
       return;
     }
 
@@ -91,11 +92,11 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light)
         _light->name + "_shadowMap", _mapSize, _scene, false);
       _shadowMap2->wrapU = Texture::CLAMP_ADDRESSMODE;
       _shadowMap2->wrapV = Texture::CLAMP_ADDRESSMODE;
-      _shadowMap2->updateSamplingMode(Texture::TRILINEAR_SAMPLINGMODE);
+      _shadowMap2->updateSamplingMode(Texture::BILINEAR_SAMPLINGMODE);
 
       _downSamplePostprocess = std_util::make_unique<PassPostProcess>(
         "downScale", 1.f / blurScale, nullptr, Texture::BILINEAR_SAMPLINGMODE,
-        _scene->getEngine());
+        _scene->getEngine(), false, _textureType);
       _downSamplePostprocess->onApplyObservable.add([this](Effect* effect) {
         effect->setTexture("textureSampler", _shadowMap.get());
       });
@@ -109,9 +110,9 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light)
   });
 
   _shadowMap->customRenderFunction
-    = [&](const std::vector<SubMesh*>& opaqueSubMeshes,
-          const std::vector<SubMesh*>& transparentSubMeshes,
-          const std::vector<SubMesh*>& alphaTestSubMeshes) {
+    = [this](const std::vector<SubMesh*>& opaqueSubMeshes,
+             const std::vector<SubMesh*>& transparentSubMeshes,
+             const std::vector<SubMesh*>& alphaTestSubMeshes) {
 
         for (const auto& opaqueSubMesh : opaqueSubMeshes) {
           renderSubMesh(opaqueSubMesh);
@@ -128,8 +129,8 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light)
         }
       };
 
-  _shadowMap->onClearObservable.add([&](Engine* engine) {
-    if (useBlurVarianceShadowMap() || useVarianceShadowMap()) {
+  _shadowMap->onClearObservable.add([this](Engine* engine) {
+    if (useExponentialShadowMap() || useBlurExponentialShadowMap()) {
       engine->clear(Color4(0.f, 0.f, 0.f, 0.f), true, true, true);
     }
     else {
@@ -169,16 +170,30 @@ void ShadowGenerator::setBlurBoxOffset(int value)
     _boxBlurPostprocess->dispose();
   }
 
-  std::unique_ptr<PostProcess> _boxBlurPostprocessPtr(new PostProcess(
-    "DepthBoxBlur", "depthBoxBlur", {"screenSize", "boxOffset"}, {},
-    1.f / blurScale, nullptr, Texture::BILINEAR_SAMPLINGMODE,
-    _scene->getEngine(), false, "#define OFFSET " + std::to_string(value)));
+  unsigned textureType = _useFullFloat ? Engine::TEXTURETYPE_FLOAT :
+                                         Engine::TEXTURETYPE_UNSIGNED_INT;
+
+  std::unique_ptr<PostProcess> _boxBlurPostprocessPtr(
+    new PostProcess("DepthBoxBlur", "depthBoxBlur", {"screenSize", "boxOffset"},
+                    {}, 1.f / blurScale, nullptr,
+                    Texture::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
+                    "#define OFFSET " + std::to_string(value), textureType));
   _boxBlurPostprocess = std::move(_boxBlurPostprocessPtr);
   _boxBlurPostprocess->onApplyObservable.add([&](Effect* effect) {
     effect->setFloat2("screenSize",
                       static_cast<float>(_mapSize.width) / blurScale,
                       static_cast<float>(_mapSize.height) / blurScale);
   });
+}
+
+float ShadowGenerator::depthScale() const
+{
+  return _depthScale;
+}
+
+void ShadowGenerator::setDepthScale(float value)
+{
+  _depthScale = value;
 }
 
 unsigned int ShadowGenerator::filter() const
@@ -194,8 +209,8 @@ void ShadowGenerator::setFilter(unsigned int value)
 
   _filter = value;
 
-  if (useVarianceShadowMap() || useBlurVarianceShadowMap()
-      || usePoissonSampling()) {
+  if (usePoissonSampling() || useExponentialShadowMap()
+      || useBlurExponentialShadowMap()) {
     _shadowMap->anisotropicFilteringLevel = 16;
     _shadowMap->updateSamplingMode(Texture::BILINEAR_SAMPLINGMODE);
   }
@@ -205,24 +220,20 @@ void ShadowGenerator::setFilter(unsigned int value)
   }
 }
 
-bool ShadowGenerator::useVarianceShadowMap() const
+bool ShadowGenerator::useExponentialShadowMap() const
 {
-  return filter() == ShadowGenerator::FILTER_VARIANCESHADOWMAP
-         && _light->supportsVSM();
+  return filter() == ShadowGenerator::FILTER_EXPONENTIALSHADOWMAP;
 }
 
-void ShadowGenerator::setUseVarianceShadowMap(bool value)
+void ShadowGenerator::setUseExponentialShadowMap(bool value)
 {
-  setFilter(value ? ShadowGenerator::FILTER_VARIANCESHADOWMAP :
+  setFilter(value ? ShadowGenerator::FILTER_EXPONENTIALSHADOWMAP :
                     ShadowGenerator::FILTER_NONE);
 }
 
 bool ShadowGenerator::usePoissonSampling() const
 {
-  return filter() == ShadowGenerator::FILTER_POISSONSAMPLING
-         || (!_light->supportsVSM()
-             && (filter() == ShadowGenerator::FILTER_VARIANCESHADOWMAP
-                 || filter() == ShadowGenerator::FILTER_BLURVARIANCESHADOWMAP));
+  return filter() == ShadowGenerator::FILTER_POISSONSAMPLING;
 }
 
 void ShadowGenerator::setUsePoissonSampling(bool value)
@@ -231,16 +242,22 @@ void ShadowGenerator::setUsePoissonSampling(bool value)
                     ShadowGenerator::FILTER_NONE);
 }
 
-bool ShadowGenerator::useBlurVarianceShadowMap() const
+bool ShadowGenerator::useBlurExponentialShadowMap() const
 {
-  return filter() == ShadowGenerator::FILTER_BLURVARIANCESHADOWMAP
-         && _light->supportsVSM();
+  return filter() == ShadowGenerator::FILTER_BLUREXPONENTIALSHADOWMAP;
 }
 
-void ShadowGenerator::setUseBlurVarianceShadowMap(bool value)
+void ShadowGenerator::setUseBlurExponentialShadowMap(bool value)
 {
-  setFilter(value ? ShadowGenerator::FILTER_BLURVARIANCESHADOWMAP :
-                    ShadowGenerator::FILTER_NONE);
+  if (_light->needCube() && value) {
+    // Blurring the cubemap is going to be too expensive. Reverting to unblurred
+    // version
+    setUseExponentialShadowMap(true);
+  }
+  else {
+    setFilter(value ? ShadowGenerator::FILTER_BLUREXPONENTIALSHADOWMAP :
+                      ShadowGenerator::FILTER_NONE);
+  }
 }
 
 void ShadowGenerator::renderSubMesh(SubMesh* subMesh)
@@ -253,7 +270,7 @@ void ShadowGenerator::renderSubMesh(SubMesh* subMesh)
   engine->setState(subMesh->getMaterial()->backFaceCulling);
 
   // Managing instances
-  _InstancesBatch* batch = mesh->_getInstancesRenderList(subMesh->_id);
+  auto batch = mesh->_getInstancesRenderList(subMesh->_id);
 
   if (batch->mustReturn) {
     return;
@@ -269,6 +286,8 @@ void ShadowGenerator::renderSubMesh(SubMesh* subMesh)
     engine->enableEffect(_effect);
     mesh->_bind(subMesh, _effect, Material::TriangleFillMode);
     auto material = subMesh->getMaterial();
+
+    _effect->setFloat2("biasAndScale", bias(), depthScale());
 
     _effect->setMatrix("viewProjection", getTransformMatrix());
     _effect->setVector3("lightPosition", getLight()->position);
@@ -321,8 +340,8 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
     defines.emplace_back("#define FULLFLOAT");
   }
 
-  if (useVarianceShadowMap() || useBlurVarianceShadowMap()) {
-    defines.emplace_back("#define VSM");
+  if (useExponentialShadowMap() || useBlurExponentialShadowMap()) {
+    defines.emplace_back("#define ESM");
   }
 
   if (getLight()->needCube()) {
@@ -382,8 +401,9 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
   if (_cachedDefines != joined) {
     _cachedDefines = joined;
     _effect        = _scene->getEngine()->createEffect(
-      "shadowMap", attribs, {"world", "mBones", "viewProjection",
-                             "diffuseMatrix", "lightPosition", "depthValues"},
+      "shadowMap", attribs,
+      {"world", "mBones", "viewProjection", "diffuseMatrix", "lightPosition",
+       "depthValues", "biasAndScale"},
       {"diffuseSampler"}, joined);
   }
 
@@ -459,7 +479,7 @@ float ShadowGenerator::getDarkness() const
   return _darkness;
 }
 
-void ShadowGenerator::setDarkness(float darkness)
+ShadowGenerator& ShadowGenerator::setDarkness(float darkness)
 {
   if (darkness >= 1.f) {
     _darkness = 1.f;
@@ -470,11 +490,13 @@ void ShadowGenerator::setDarkness(float darkness)
   else {
     _darkness = darkness;
   }
+  return *this;
 }
 
-void ShadowGenerator::setTransparencyShadow(bool hasShadow)
+ShadowGenerator& ShadowGenerator::setTransparencyShadow(bool hasShadow)
 {
   _transparencyShadow = hasShadow;
+  return *this;
 }
 
 Vector2 ShadowGenerator::_packHalf(float depth)
@@ -504,6 +526,8 @@ void ShadowGenerator::dispose()
     _boxBlurPostprocess->dispose();
     _boxBlurPostprocess.reset(nullptr);
   }
+
+  _light->_shadowGenerator = nullptr;
 }
 
 Json::object ShadowGenerator::serialize() const
@@ -544,26 +568,32 @@ ShadowGenerator::Parse(const Json::value& parsedShadowGenerator, Scene* scene)
   if (Json::GetBool(parsedShadowGenerator, "usePoissonSampling")) {
     shadowGenerator->setUsePoissonSampling(true);
   }
-  else if (Json::GetBool(parsedShadowGenerator, "useVarianceShadowMap")) {
-    shadowGenerator->setUseVarianceShadowMap(true);
+  else if (Json::GetBool(parsedShadowGenerator, "useExponentialShadowMap")) {
+    shadowGenerator->setUseExponentialShadowMap(true);
   }
-  else if (Json::GetBool(parsedShadowGenerator, "useBlurVarianceShadowMap")) {
-    shadowGenerator->setUseBlurVarianceShadowMap(true);
+  else if (Json::GetBool(parsedShadowGenerator,
+                         "useBlurExponentialShadowMap")) {
+    shadowGenerator->setUseBlurExponentialShadowMap(true);
+  }
 
-    if (parsedShadowGenerator.contains("blurScale")) {
-      shadowGenerator->blurScale
-        = Json::GetNumber(parsedShadowGenerator, "blurScale", 2.f);
-    }
+  if (parsedShadowGenerator.contains("blurScale")) {
+    shadowGenerator->blurScale
+      = Json::GetNumber(parsedShadowGenerator, "blurScale", 2.f);
+  }
 
-    if (parsedShadowGenerator.contains("blurBoxOffset")) {
-      shadowGenerator->setBlurBoxOffset(
-        Json::GetNumber(parsedShadowGenerator, "blurBoxOffset", 0));
-    }
+  if (parsedShadowGenerator.contains("blurBoxOffset")) {
+    shadowGenerator->setBlurBoxOffset(
+      Json::GetNumber(parsedShadowGenerator, "blurBoxOffset", 0));
   }
 
   if (parsedShadowGenerator.contains("bias")) {
     shadowGenerator->setBias(
       Json::GetNumber(parsedShadowGenerator, "bias", 0.00005f));
+  }
+
+  if (parsedShadowGenerator.contains("darkness")) {
+    shadowGenerator->setDarkness(
+      Json::GetNumber(parsedShadowGenerator, "darkness", 0.f));
   }
 
   shadowGenerator->forceBackFacesOnly

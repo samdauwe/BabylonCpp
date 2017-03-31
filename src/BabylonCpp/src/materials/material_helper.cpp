@@ -101,13 +101,12 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
 
         defines.defines[static_cast<unsigned int>(SHADOWS)] = true;
 
-        if (shadowGenerator->useVarianceShadowMap()
-            || shadowGenerator->useBlurVarianceShadowMap()) {
-          defines.shadowvsms[lightIndex] = true;
-        }
-
         if (shadowGenerator->usePoissonSampling()) {
           defines.shadowpcfs[lightIndex] = true;
+        }
+        else if (shadowGenerator->useExponentialShadowMap()
+                 || shadowGenerator->useBlurExponentialShadowMap()) {
+          defines.shadowesms[lightIndex] = true;
         }
 
         needShadows = true;
@@ -192,8 +191,8 @@ void MaterialHelper::HandleFallbacksForShadows(
       fallbacks->addFallback(0, "SHADOWPCF" + lightIndexStr);
     }
 
-    if (defines.shadowvsms[lightIndex]) {
-      fallbacks->addFallback(0, "SHADOWVSM" + lightIndexStr);
+    if (defines.shadowesms[lightIndex]) {
+      fallbacks->addFallback(0, "SHADOWESM" + lightIndexStr);
     }
   }
 }
@@ -253,7 +252,7 @@ bool MaterialHelper::BindLightShadow(Light* light, Scene* scene,
       "shadowsInfo" + lightIndexStr, shadowGenerator->getDarkness(),
       shadowGenerator->blurScale
         / static_cast<float>(shadowGenerator->getShadowMap()->getSize().width),
-      shadowGenerator->bias());
+      shadowGenerator->depthScale());
   }
 
   return depthValuesAlreadySet;

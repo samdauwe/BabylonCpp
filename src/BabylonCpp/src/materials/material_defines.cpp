@@ -26,7 +26,7 @@ void MaterialDefines::resizeLights(unsigned int lightIndex)
       hemilights.emplace_back(false);
       spotlights.emplace_back(false);
       shadows.emplace_back(false);
-      shadowvsms.emplace_back(false);
+      shadowesms.emplace_back(false);
       shadowpcfs.emplace_back(false);
       lightmapexcluded.emplace_back(false);
       lightmapnospecular.emplace_back(false);
@@ -83,9 +83,9 @@ std::ostream& operator<<(std::ostream& os,
     }
   }
 
-  for (size_t i = 0; i < materialDefines.shadowvsms.size(); ++i) {
-    if (materialDefines.shadowvsms[i]) {
-      os << "#define SHADOWVSM" << i << "\n";
+  for (size_t i = 0; i < materialDefines.shadowesms.size(); ++i) {
+    if (materialDefines.shadowesms[i]) {
+      os << "#define SHADOWESM" << i << "\n";
     }
   }
 
@@ -108,7 +108,7 @@ bool MaterialDefines::isEqual(MaterialDefines& other) const
       || (hemilights.size() != other.hemilights.size())
       || (spotlights.size() != other.spotlights.size())
       || (shadows.size() != other.shadows.size())
-      || (shadowvsms.size() != other.shadowvsms.size())
+      || (shadowesms.size() != other.shadowesms.size())
       || (shadowpcfs.size() != other.shadowpcfs.size())) {
     return false;
   }
@@ -166,8 +166,8 @@ bool MaterialDefines::isEqual(MaterialDefines& other) const
     }
   }
 
-  for (size_t i = 0; i < shadowvsms.size(); ++i) {
-    if (shadowvsms[i] != other.shadowvsms[i]) {
+  for (size_t i = 0; i < shadowesms.size(); ++i) {
+    if (shadowesms[i] != other.shadowesms[i]) {
       return false;
     }
   }
@@ -195,7 +195,7 @@ void MaterialDefines::cloneTo(MaterialDefines& other)
   other.hemilights  = hemilights;
   other.spotlights  = spotlights;
   other.shadows     = shadows;
-  other.shadowvsms  = shadowvsms;
+  other.shadowesms  = shadowesms;
   other.shadowpcfs  = shadowpcfs;
 }
 
@@ -214,7 +214,7 @@ void MaterialDefines::reset()
   hemilights.clear();
   spotlights.clear();
   shadows.clear();
-  shadowvsms.clear();
+  shadowesms.clear();
   shadowpcfs.clear();
 }
 
