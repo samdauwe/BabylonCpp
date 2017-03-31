@@ -61,6 +61,8 @@ PBRMaterial::PBRMaterial(const std::string& _name, Scene* scene)
     , emissiveTexture{nullptr}
     , reflectivityTexture{nullptr}
     , metallicTexture{nullptr}
+    , metallic{1.f}
+    , roughness{1.f}
     , bumpTexture{nullptr}
     , lightmapTexture{nullptr}
     , refractionTexture{nullptr}
@@ -94,6 +96,7 @@ PBRMaterial::PBRMaterial(const std::string& _name, Scene* scene)
     , maxSimultaneousLights{4}
     , invertNormalMapX{false}
     , invertNormalMapY{false}
+    , twoSidedLighting{false}
     , _lightingInfos{Vector4(directIntensity, emissiveIntensity,
                              environmentIntensity, specularIntensity)}
     , _overloadedShadowInfos{Vector4(overloadedShadowIntensity,
@@ -135,6 +138,11 @@ PBRMaterial::PBRMaterial(const std::string& _name, Scene* scene)
 
 PBRMaterial::~PBRMaterial()
 {
+}
+
+const char* PBRMaterial::getClassName() const
+{
+  return "PBRMaterial";
 }
 
 IReflect::Type PBRMaterial::type() const
@@ -276,7 +284,7 @@ void PBRMaterial::BindLights(Scene* scene, AbstractMesh* mesh, Effect* effect,
 
 bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 {
-  if (checkReadyOnlyOnce) {
+  if (isFrozen()) {
     if (_wasPreviouslyReady) {
       return true;
     }
@@ -425,8 +433,9 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
           return false;
         }
         else {
-          needUVs                                 = true;
-          _defines.defines[PMD::METALLICWORKFLOW] = true;
+          needUVs                                     = true;
+          _defines.defines[PMD::METALLICWORKFLOW]     = true;
+          _defines.defines[PMD::METALLICROUGHNESSMAP] = true;
           _defines.defines[PMD::METALLICROUGHNESSGSTOREINALPHA]
             = useRoughnessFromMetallicTextureAlpha;
           _defines.defines[PMD::METALLICROUGHNESSGSTOREINGREEN]
@@ -473,6 +482,13 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
         if (invertNormalMapY) {
           _defines.defines[PMD::INVERTNORMALMAPY] = true;
         }
+
+        if (scene->_mirroredCameraPosition) {
+          _defines.defines[PMD::INVERTNORMALMAPX]
+            = !_defines.defines[PMD::INVERTNORMALMAPX];
+          _defines.defines[PMD::INVERTNORMALMAPY]
+            = !_defines.defines[PMD::INVERTNORMALMAPY];
+        }
       }
     }
 
@@ -508,6 +524,10 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
       else {
         _defines.defines[PMD::CAMERACOLORGRADING] = true;
       }
+    }
+
+    if (!backFaceCulling && twoSidedLighting) {
+      _defines.defines[PMD::TWOSIDEDLIGHTING] = true;
     }
   }
 
@@ -601,10 +621,17 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
     _defines.defines[PMD::RADIANCEOVERALPHA] = true;
   }
 
+  if ((metallic != 0.f) || (roughness != 0.f)) {
+    _defines.defines[PMD::METALLICWORKFLOW] = true;
+  }
+
   // Attribs
   if (mesh) {
     if (needNormals && mesh->isVerticesDataPresent(VertexBuffer::NormalKind)) {
       _defines.defines[PMD::NORMAL] = true;
+      if (mesh->isVerticesDataPresent(VertexBuffer::TangentKind)) {
+        _defines.defines[PMD::TANGENT] = true;
+      }
     }
     if (needUVs) {
       if (mesh->isVerticesDataPresent(VertexBuffer::UVKind)) {
@@ -711,6 +738,10 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 
     if (_defines[PMD::NORMAL]) {
       attribs.emplace_back(std::string(VertexBuffer::NormalKindChars));
+    }
+
+    if (_defines[PMD::TANGENT]) {
+      attribs.emplace_back(VertexBuffer::TangentKindChars);
     }
 
     if (_defines[PMD::UV1]) {
@@ -1070,16 +1101,24 @@ void PBRMaterial::bind(Matrix* world, Mesh* mesh)
     // Colors
     _myScene->ambientColor.multiplyToRef(ambientColor, _globalAmbientColor);
 
-    // GAMMA CORRECTION.
-    convertColorToLinearSpaceToRef(reflectivityColor,
-                                   PBRMaterial::_scaledReflectivity);
+    if (_defines[PMD::METALLICWORKFLOW]) {
+      PBRMaterial::_scaledReflectivity.r = metallic;
+      PBRMaterial::_scaledReflectivity.g = roughness;
+      _effect->setColor4("vReflectivityColor", PBRMaterial::_scaledReflectivity,
+                         0);
+    }
+    else {
+      // GAMMA CORRECTION.
+      convertColorToLinearSpaceToRef(reflectivityColor,
+                                     PBRMaterial::_scaledReflectivity);
+      _effect->setColor4("vReflectivityColor", PBRMaterial::_scaledReflectivity,
+                         microSurface);
+    }
 
     _effect->setVector3("vEyePosition", _myScene->_mirroredCameraPosition ?
                                           *_myScene->_mirroredCameraPosition :
                                           _myScene->activeCamera->position);
     _effect->setColor3("vAmbientColor", _globalAmbientColor);
-    _effect->setColor4("vReflectivityColor", PBRMaterial::_scaledReflectivity,
-                       microSurface);
 
     // GAMMA CORRECTION.
     convertColorToLinearSpaceToRef(emissiveColor, PBRMaterial::_scaledEmissive);
@@ -1139,8 +1178,7 @@ void PBRMaterial::bind(Matrix* world, Mesh* mesh)
     _overloadedIntensity.w = overloadedEmissiveIntensity;
     _effect->setVector4("vOverloadedIntensity", _overloadedIntensity);
 
-    convertColorToLinearSpaceToRef(overloadedAmbient, _tempColor);
-    _effect->setColor3("vOverloadedAmbient", _tempColor);
+    _effect->setColor3("vOverloadedAmbient", overloadedAmbient);
     convertColorToLinearSpaceToRef(overloadedAlbedo, _tempColor);
     _effect->setColor3("vOverloadedAlbedo", _tempColor);
     convertColorToLinearSpaceToRef(overloadedReflectivity, _tempColor);
@@ -1262,6 +1300,8 @@ void PBRMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
       cameraColorGradingTexture->dispose();
     }
   }
+
+  _renderTargets.clear();
 
   Material::dispose(forceDisposeEffect, forceDisposeTextures);
 }

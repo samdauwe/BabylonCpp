@@ -60,8 +60,8 @@ struct BABYLON_SHARED_EXPORT StandardMaterialDefines : public MaterialDefines {
   static constexpr unsigned int REFLECTIONOVERALPHA                 = 49;
   static constexpr unsigned int INVERTNORMALMAPX                    = 50;
   static constexpr unsigned int INVERTNORMALMAPY                    = 51;
-  static constexpr unsigned int SHADOWS                             = 52;
-  static constexpr unsigned int TWOSIDEDLIGHTING                    = 53;
+  static constexpr unsigned int TWOSIDEDLIGHTING                    = 52;
+  static constexpr unsigned int SHADOWS                             = 53;
   static constexpr unsigned int SHADOWFULLFLOAT                     = 54;
   static constexpr unsigned int CAMERACOLORGRADING                  = 55;
   static constexpr unsigned int CAMERACOLORCURVES                   = 56;

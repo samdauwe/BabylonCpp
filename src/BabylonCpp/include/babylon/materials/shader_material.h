@@ -27,6 +27,11 @@ public:
   }
   virtual ~ShaderMaterial();
 
+  /**
+   * @brief Returns the string "ShaderMaterial".
+   */
+  const char* getClassName() const;
+
   IReflect::Type type() const override;
 
   bool needAlphaBlending() override;

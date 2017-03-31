@@ -21,7 +21,7 @@ namespace BABYLON {
 ShaderMaterial::ShaderMaterial(const std::string& iName, Scene* scene,
                                const std::string& shaderPath,
                                const ShaderMaterialOptions& options)
-    : Material(iName, scene), _shaderPath(shaderPath), _renderId{-1}
+    : Material{iName, scene}, _shaderPath{shaderPath}, _renderId{-1}
 {
   _options.needAlphaBlending = options.needAlphaBlending;
   _options.needAlphaTesting  = options.needAlphaTesting;
@@ -33,6 +33,11 @@ ShaderMaterial::ShaderMaterial(const std::string& iName, Scene* scene,
 
 ShaderMaterial::~ShaderMaterial()
 {
+}
+
+const char* ShaderMaterial::getClassName() const
+{
+  return "ShaderMaterial";
 }
 
 IReflect::Type ShaderMaterial::type() const

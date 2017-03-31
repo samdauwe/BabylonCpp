@@ -25,6 +25,7 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
            "EMISSIVEFRESNEL",
            "FRESNEL",
            "NORMAL",
+           "TANGENT",
            "UV1",
            "UV2",
            "VERTEXCOLOR",
@@ -65,9 +66,11 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
            "OPENGLNORMALMAP",
            "INVERTNORMALMAPX",
            "INVERTNORMALMAPY",
+           "TWOSIDEDLIGHTING",
            "SHADOWS",
            "SHADOWFULLFLOAT",
            "METALLICWORKFLOW",
+           "METALLICROUGHNESSMAP",
            "METALLICROUGHNESSGSTOREINALPHA",
            "METALLICROUGHNESSGSTOREINGREEN"};
   defines.resize(_keys.size());

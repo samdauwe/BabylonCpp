@@ -20,6 +20,11 @@ public:
   }
   ~MultiMaterial();
 
+  /**
+   * @brief Returns the string "MultiMaterial".
+   */
+  const char* getClassName() const;
+
   IReflect::Type type() const override;
 
   /** Properties **/

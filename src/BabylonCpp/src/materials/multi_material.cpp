@@ -15,6 +15,11 @@ MultiMaterial::~MultiMaterial()
 {
 }
 
+const char* MultiMaterial::getClassName() const
+{
+  return "MultiMaterial";
+}
+
 IReflect::Type MultiMaterial::type() const
 {
   return IReflect::Type::MULTIMATERIAL;
@@ -45,7 +50,7 @@ bool MultiMaterial::isReady(AbstractMesh* mesh, bool /*useInstances*/)
 }
 
 Material* MultiMaterial::clone(const std::string& iName,
-                                               bool cloneChildren) const
+                               bool cloneChildren) const
 {
   auto newMultiMaterial = MultiMaterial::New(iName, getScene());
 

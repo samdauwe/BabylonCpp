@@ -56,8 +56,8 @@ StandardMaterialDefines::StandardMaterialDefines() : MaterialDefines{}
            "REFLECTIONOVERALPHA",
            "INVERTNORMALMAPX",
            "INVERTNORMALMAPY",
-           "SHADOWS",
            "TWOSIDEDLIGHTING",
+           "SHADOWS",
            "SHADOWFULLFLOAT",
            "CAMERACOLORGRADING",
            "CAMERACOLORCURVES"};

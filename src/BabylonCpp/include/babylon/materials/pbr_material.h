@@ -35,6 +35,11 @@ public:
   }
   ~PBRMaterial();
 
+  /**
+   * @brief Returns the string "PBRMaterial".
+   */
+  const char* getClassName() const;
+
   IReflect::Type type() const override;
 
   bool useLogarithmicDepth() const;
@@ -264,6 +269,18 @@ public:
    */
   BaseTexture* metallicTexture;
 
+  /**
+   * Specifies the metallic scalar of the metallic/roughness workflow.
+   * Can also be used to scale the metalness values of the metallic texture.
+   */
+  float metallic;
+
+  /**
+   * Specifies the roughness scalar of the metallic/roughness workflow.
+   * Can also be used to scale the roughness values of the metallic texture.
+   */
+  float roughness;
+
   BaseTexture* bumpTexture;
   BaseTexture* lightmapTexture;
   RenderTargetTexture* refractionTexture;
@@ -419,7 +436,13 @@ public:
   /**
    * If sets to true, y component of normal map value will invert (y = 1.0 - y).
    */
-  bool invertNormalMapY = false;
+  bool invertNormalMapY;
+
+  /**
+   * If sets to true and backfaceCulling is false, normals will be flipped on
+   * the backside.
+   */
+  bool twoSidedLighting;
 
 private:
   Vector4 _lightingInfos;

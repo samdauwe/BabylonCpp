@@ -7,6 +7,7 @@ namespace BABYLON {
 
 constexpr unsigned int VertexBuffer::PositionKind;
 constexpr unsigned int VertexBuffer::NormalKind;
+constexpr unsigned int VertexBuffer::TangentKind;
 constexpr unsigned int VertexBuffer::UVKind;
 constexpr unsigned int VertexBuffer::UV2Kind;
 constexpr unsigned int VertexBuffer::UV3Kind;
@@ -25,8 +26,9 @@ constexpr unsigned int VertexBuffer::World3Kind;
 constexpr unsigned int VertexBuffer::CellInfoKind;
 constexpr unsigned int VertexBuffer::OptionsKind;
 
-  constexpr const char* VertexBuffer::PositionKindChars;
+constexpr const char* VertexBuffer::PositionKindChars;
 constexpr const char* VertexBuffer::NormalKindChars;
+constexpr const char* VertexBuffer::TangentKindChars;
 constexpr const char* VertexBuffer::UVKindChars;
 constexpr const char* VertexBuffer::UV2KindChars;
 constexpr const char* VertexBuffer::UV3KindChars;
