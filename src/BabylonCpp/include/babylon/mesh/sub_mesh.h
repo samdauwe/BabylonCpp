@@ -28,33 +28,114 @@ public:
 
   void addToMesh(std::unique_ptr<SubMesh>&& newSubMesh);
   bool isGlobal() const;
+
+  /**
+   * @brief Returns the submesh BoudingInfo object.
+   */
   BoundingInfo* getBoundingInfo() const;
+
+  /**
+   * @brief Sets the submesh BoundingInfo.
+   * @returns The SubMesh.
+   */
+  SubMesh& setBoundingInfo(const BoundingInfo& boundingInfo);
+
+  /**
+   * @brief Returns the mesh of the current submesh.
+   */
   AbstractMesh* getMesh();
+
+  /**
+   * @brief Returns the rendering mesh of the submesh.
+   */
   Mesh* getRenderingMesh();
+
+  /**
+   * @brief Returns the submesh material.
+   */
   Material* getMaterial();
 
   /** Methods **/
-  void refreshBoundingInfo();
+
+  /**
+   * @brief Sets a new updated BoundingInfo object to the submesh.
+   * @returns The SubMesh.
+   */
+  SubMesh& refreshBoundingInfo();
+
   bool _checkCollision(const Collider& collider);
-  void updateBoundingInfo(const Matrix& world);
+
+  /**
+   * @brief Updates the submesh BoundingInfo.
+   * @returns The Submesh.
+   */
+  SubMesh& updateBoundingInfo(const Matrix& world);
+
+  /**
+   * @brief Returns if the submesh bounding box intersects the frustum defined
+   * by the passed array of planes.
+   */
   bool isInFrustum(const std::array<Plane, 6>& frustumPlanes) override;
+
+  /**
+   * @brief Returns if the submesh bounding box is completely inside the frustum
+   * defined by the passed array of planes.
+   */
   bool isCompletelyInFrustum(
     const std::array<Plane, 6>& frustumPlanes) const override;
-  void render(bool enableAlphaMode);
+
+  /**
+   * @brief Renders the submesh.
+   * @returns The Submesh.
+   */
+  SubMesh& render(bool enableAlphaMode);
+
+  /**
+   * @brief Returns a new Index Buffer.
+   * @returns The WebGLBuffer.
+   */
   GL::IGLBuffer* getLinesIndexBuffer(const Uint32Array& indices,
                                      Engine* engine);
+
+  /**
+   * @brief Returns if the passed Ray intersects the submesh bounding box.
+   */
   bool canIntersects(const Ray& ray) const;
+
+  /**
+   * @brief Returns an object IntersectionInfo.
+   */
   std::unique_ptr<IntersectionInfo>
   intersects(Ray& ray, const std::vector<Vector3>& positions,
              const Uint32Array& indices, bool fastCheck);
 
   /** Clone **/
+
+  /**
+   * @brief Creates a new Submesh from the passed Mesh.
+   */
   SubMesh* clone(AbstractMesh* newMesh, Mesh* newRenderingMesh) const;
 
   /** Dispose **/
+
+  /**
+   * @brief Disposes the Submesh.
+   */
   void dispose(bool doNotRecurse = false) override;
 
   /** Statics **/
+
+  /**
+   * @brief Creates a new Submesh from the passed parameters.
+   * @param materialIndex (integer) : the index of the main mesh material.
+   * @param startIndex (integer) : the index where to start the copy in the mesh
+   * indices array.
+   * @param indexCount (integer) : the number of indices to copy then from the
+   * startIndex.
+   * @param mesh (Mesh) : the main mesh to create the submesh from.
+   * @param renderingMesh (optional Mesh) : rendering mesh.
+   * @return The created SubMesh object.
+   */
   static SubMesh* CreateFromIndices(unsigned int materialIndex,
                                     unsigned int startIndex, size_t indexCount,
                                     AbstractMesh* mesh,

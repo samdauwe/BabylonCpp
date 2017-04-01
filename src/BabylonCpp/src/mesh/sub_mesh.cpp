@@ -69,6 +69,12 @@ BoundingInfo* SubMesh::getBoundingInfo() const
   return _boundingInfo.get();
 }
 
+SubMesh& SubMesh::setBoundingInfo(const BoundingInfo& boundingInfo)
+{
+  _boundingInfo = std_util::make_unique<BoundingInfo>(boundingInfo);
+  return *this;
+}
+
 AbstractMesh* SubMesh::getMesh()
 {
   return _mesh;
@@ -98,19 +104,19 @@ Material* SubMesh::getMaterial()
 }
 
 // Methods
-void SubMesh::refreshBoundingInfo()
+SubMesh& SubMesh::refreshBoundingInfo()
 {
   _lastColliderWorldVertices.clear();
 
   if (isGlobal()) {
-    return;
+    return *this;
   }
 
   auto data = _renderingMesh->getVerticesData(VertexBuffer::PositionKind);
 
   if (data.empty()) {
     _boundingInfo = std_util::make_unique<BoundingInfo>(*_mesh->_boundingInfo);
-    return;
+    return *this;
   }
 
   auto indices = _renderingMesh->getIndices();
@@ -129,6 +135,8 @@ void SubMesh::refreshBoundingInfo()
       _renderingMesh->geometry()->boundingBias());
   }
   _boundingInfo = std_util::make_unique<BoundingInfo>(extend.min, extend.max);
+
+  return *this;
 }
 
 bool SubMesh::_checkCollision(const Collider& collider)
@@ -136,12 +144,14 @@ bool SubMesh::_checkCollision(const Collider& collider)
   return getBoundingInfo()->_checkCollision(collider);
 }
 
-void SubMesh::updateBoundingInfo(const Matrix& world)
+SubMesh& SubMesh::updateBoundingInfo(const Matrix& world)
 {
   if (!getBoundingInfo()) {
     refreshBoundingInfo();
   }
   getBoundingInfo()->update(world);
+
+  return *this;
 }
 
 bool SubMesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes)
@@ -155,9 +165,10 @@ bool SubMesh::isCompletelyInFrustum(
   return getBoundingInfo()->isCompletelyInFrustum(frustumPlanes);
 }
 
-void SubMesh::render(bool enableAlphaMode)
+SubMesh& SubMesh::render(bool enableAlphaMode)
 {
   _renderingMesh->render(this, enableAlphaMode);
+  return *this;
 }
 
 GL::IGLBuffer* SubMesh::getLinesIndexBuffer(const Uint32Array& indices,
