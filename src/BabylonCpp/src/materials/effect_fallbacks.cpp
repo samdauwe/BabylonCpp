@@ -2,6 +2,7 @@
 
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
+#include <babylon/engine/scene.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/tools/tools.h>
 
@@ -36,6 +37,9 @@ void EffectFallbacks::addCPUSkinningFallback(unsigned int rank,
   _meshRank = rank;
   _mesh     = mesh;
 
+  if (rank < _currentRank) {
+    _currentRank = rank;
+  }
   if (rank > _maxRank) {
     _maxRank = rank;
   }
@@ -48,25 +52,37 @@ bool EffectFallbacks::isMoreFallbacks() const
 
 std::string EffectFallbacks::reduce(const std::string& currentDefines)
 {
+  // First we try to switch to CPU skinning
   std::string currentDefinesCpy(currentDefines);
-  const auto& currentFallbacks = _defines[_currentRank];
-
-  for (unsigned int index = 0; index < currentFallbacks.size(); ++index) {
-    String::replaceInPlace(
-      currentDefinesCpy, std::string("#define ") + currentFallbacks[index], "");
-  }
-
-  if (_mesh && _currentRank == _meshRank) {
+  if (_mesh && _mesh->computeBonesUsingShaders
+      && _mesh->numBoneInfluencers > 0) {
     _mesh->computeBonesUsingShaders = false;
-    std::string toReplace = std::string("#define NUM_BONE_INFLUENCERS ")
-                            + std::to_string(_mesh->numBoneInfluencers);
+    const std::string toReplace = std::string("#define NUM_BONE_INFLUENCERS ")
+                                  + std::to_string(_mesh->numBoneInfluencers);
     String::replaceInPlace(currentDefinesCpy, toReplace,
                            "#define NUM_BONE_INFLUENCERS 0");
     BABYLON_LOGF_DEBUG("EffectFallbacks", "Falling back to CPU skinning for %s",
                        _mesh->name.c_str());
-  }
 
-  ++_currentRank;
+    auto scene = _mesh->getScene();
+    for (auto& otherMesh : scene->meshes) {
+      if (otherMesh->material == _mesh->material
+          && otherMesh->computeBonesUsingShaders
+          && otherMesh->numBoneInfluencers > 0) {
+        otherMesh->computeBonesUsingShaders = false;
+      }
+    }
+  }
+  else {
+    if (_defines.find(_currentRank)!=_defines.end()
+        && !_defines[_currentRank].empty()) {
+      for (auto& currentFallback : _defines[_currentRank]) {
+        String::replaceInPlace(currentDefinesCpy, "#define " + currentFallback,
+                               "");
+      }
+    }
+    ++_currentRank;
+  }
 
   return currentDefinesCpy;
 }

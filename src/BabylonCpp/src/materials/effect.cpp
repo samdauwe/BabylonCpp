@@ -13,6 +13,8 @@
 
 namespace BABYLON {
 
+std::size_t Effect::_uniqueIdSeed = 0;
+
 Effect::Effect(
   const std::string& baseName, const std::vector<std::string>& attributesNames,
   const std::vector<std::string>& uniformsNames,
@@ -25,6 +27,7 @@ Effect::Effect(
     , defines{iDefines}
     , onCompiled{iOnCompiled}
     , onError{_onError}
+    , uniqueId{Effect::_uniqueIdSeed++}
     , _engine{engine}
     , _uniformsNames{uniformsNames}
     , _samplers{samplers}
@@ -123,6 +126,11 @@ Effect::~Effect()
 {
 }
 
+std::string Effect::key() const
+{
+  return _key;
+}
+
 bool Effect::isReady() const
 {
   return _isReady;
@@ -185,12 +193,14 @@ std::string Effect::getCompilationError()
 
 std::string Effect::getVertexShaderSource()
 {
-  return _engine->getVertexShaderSource(_program.get());
+  return _evaluateDefinesOnString(
+    _engine->getVertexShaderSource(_program.get()));
 }
 
 std::string Effect::getFragmentShaderSource()
 {
-  return _engine->getFragmentShaderSource(_program.get());
+  return _evaluateDefinesOnString(
+    _engine->getFragmentShaderSource(_program.get()));
 }
 
 void Effect::_loadVertexShader(
@@ -267,6 +277,59 @@ void Effect::_dumpShadersName()
 {
   BABYLON_LOG_ERROR("Materials::Effect", "Vertex shader:", name);
   BABYLON_LOG_ERROR("Materials::Effect", "Fragment shader:", name);
+}
+
+void Effect::_processShaderConversion(
+  const std::string& sourceCode, bool isFragment,
+  const std::function<void(const std::string& data)>& callback)
+{
+
+  auto preparedSourceCode = _processPrecision(sourceCode);
+
+  if (_engine->getWebGLVersion() == "1") {
+    callback(preparedSourceCode);
+    return;
+  }
+
+  // Already converted
+  if (String::contains(preparedSourceCode, "#version 3")) {
+    callback(preparedSourceCode);
+    return;
+  }
+
+  // Remove extensions
+  // #extension GL_OES_standard_derivatives : enable
+  // #extension GL_EXT_shader_texture_lod : enable
+  // #extension GL_EXT_frag_depth : enable
+  std::string regex(
+    "/#extension.+(GL_OES_standard_derivatives|GL_EXT_shader_texture_lod|GL_"
+    "EXT_frag_depth).+enable/g");
+  std::string result = String::regexReplace(preparedSourceCode, regex, "");
+
+  // Migrate to GLSL v300
+  result = String::regexReplace(preparedSourceCode, "/varying\\s/g",
+                                isFragment ? "in " : "out ");
+  result = String::regexReplace(preparedSourceCode, "/attribute[ \t]/g", "in ");
+  result = String::regexReplace(preparedSourceCode, "/[ \t]attribute/g", " in");
+
+  if (isFragment) {
+    result = String::regexReplace(preparedSourceCode, "/texture2DLodEXT\\(/g",
+                                  "textureLod(");
+    result = String::regexReplace(preparedSourceCode, "/textureCubeLodEXT\\(/g",
+                                  "textureLod(");
+    result
+      = String::regexReplace(preparedSourceCode, "/texture2D\\(/g", "texture(");
+    result = String::regexReplace(preparedSourceCode, "/textureCube\\(/g",
+                                  "texture(");
+    result = String::regexReplace(preparedSourceCode, "/gl_FragDepthEXT/g",
+                                  "gl_FragDepth");
+    result = String::regexReplace(preparedSourceCode, "/gl_FragColor/g",
+                                  "glFragColor");
+    result = String::regexReplace(preparedSourceCode, "/void\\s+?main\\(\\/g",
+                                  "out vec4 glFragColor;\nvoid main(");
+  }
+
+  callback(result);
 }
 
 void Effect::_processIncludes(
@@ -370,13 +433,9 @@ void Effect::_prepareEffect(const std::string& vertexSourceCode,
 
   auto engine = _engine;
 
-  // Precision
-  auto _vertexSourceCode   = _processPrecision(vertexSourceCode);
-  auto _fragmentSourceCode = _processPrecision(fragmentSourceCode);
-
   try {
-    _program = engine->createShaderProgram(_vertexSourceCode,
-                                           _fragmentSourceCode, iDefines);
+    _program = engine->createShaderProgram(vertexSourceCode, fragmentSourceCode,
+                                           iDefines);
 
     _uniforms   = engine->getUniforms(_program.get(), _uniformsNames);
     _attributes = engine->getAttributes(_program.get(), attributesNames);
@@ -410,7 +469,7 @@ void Effect::_prepareEffect(const std::string& vertexSourceCode,
     if (!fallbacks && fallbacks->isMoreFallbacks()) {
       BABYLON_LOG_ERROR("Effect", "Trying next fallback.");
       defines = fallbacks->reduce(defines);
-      _prepareEffect(_vertexSourceCode, _fragmentSourceCode, attributesNames,
+      _prepareEffect(vertexSourceCode, fragmentSourceCode, attributesNames,
                      defines, fallbacks);
     }
     else { // Sorry we did everything we can
@@ -804,6 +863,16 @@ Effect& Effect::setColor4(const std::string& uniformName, const Color3& color3,
   }
 
   return *this;
+}
+
+std::string Effect::_recombineShader(const std::string& node)
+{
+  return node;
+}
+
+std::string Effect::_evaluateDefinesOnString(const std::string& shaderString)
+{
+  return shaderString;
 }
 
 } // end of namespace BABYLON

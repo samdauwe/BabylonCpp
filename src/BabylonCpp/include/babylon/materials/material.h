@@ -21,6 +21,11 @@ public:
 
   virtual ~Material();
 
+  /**
+   * @brief Returns the string "Material".
+   */
+  const char* getClassName() const;
+
   virtual IReflect::Type type() const override;
   void addMaterialToScene(std::unique_ptr<Material>&& newMaterial);
   void
@@ -60,10 +65,10 @@ public:
   virtual bool needAlphaBlending();
   virtual bool needAlphaTesting();
   virtual BaseTexture* getAlphaTestTexture();
-  virtual void
-  trackCreation(const std::function<void(const Effect* effect)>& onCompiled,
-                const std::function<void(const Effect* effect,
-                                         const std::string& errors)>& onError);
+  virtual void trackCreation(
+    const std::function<void(const Effect* effect)>& onCompiled,
+    const std::function<void(const Effect* effect, const std::string& errors)>&
+      onError);
   void markDirty();
   void _preBind();
   virtual void bind(Matrix* world, Mesh* mesh);

@@ -314,6 +314,26 @@ inline std::string& removeSubstring(std::string& s, const std::string& subStr)
 }
 
 /**
+ * @brief Uses a regular expression to perform substitution on a sequence of
+ * characters.
+ * @param source The input character sequence.
+ * @param reSearch The regular expression that will be matched against the input
+ * sequence.
+ * @param replace The regex replacement format string.
+ * @return Result of the replacement.
+ */
+inline std::string regexReplace(const std::string& source,
+                                const std::string& reSearch,
+                                const std::string& replace)
+{
+  std::string result;
+  std::regex regex(reSearch);
+  std::regex_replace(std::back_inserter(result), source.begin(), source.end(),
+                     regex, replace);
+  return result;
+}
+
+/**
  * @brief Returns a new string with a specified number of copies of the string
  * it was called on.
  * @param str The string to repeat.

@@ -31,7 +31,7 @@ Material::Material(const std::string& iName, Scene* scene, bool /*doNotAdd*/)
     , _scene{scene}
     , _fillMode{Material::TriangleFillMode}
 {
-  if (scene->useRightHandedSystem) {
+  if (_scene->useRightHandedSystem) {
     sideOrientation = Material::ClockWiseSideOrientation;
   }
   else {
@@ -41,6 +41,11 @@ Material::Material(const std::string& iName, Scene* scene, bool /*doNotAdd*/)
 
 Material::~Material()
 {
+}
+
+const char* Material::getClassName() const
+{
+  return "Material";
 }
 
 IReflect::Type Material::type() const

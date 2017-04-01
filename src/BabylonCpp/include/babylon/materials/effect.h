@@ -31,6 +31,7 @@ public:
   ~Effect();
 
   /** Properties **/
+  std::string key() const;
   bool isReady() const;
   GL::IGLProgram* getProgram();
   std::vector<std::string>& getAttributesNames();
@@ -99,6 +100,9 @@ public:
 
 private:
   void _dumpShadersName();
+  void _processShaderConversion(
+    const std::string& sourceCode, bool isFragment,
+    const std::function<void(const std::string& data)>& callback);
   void _processIncludes(
     const std::string& sourceCode,
     const std::function<void(const std::string& data)>& callback);
@@ -107,6 +111,8 @@ private:
                       const std::string& fragmentSourceCode,
                       const std::vector<std::string>& attributesNames,
                       const std::string& defines, EffectFallbacks* fallbacks);
+  std::string _recombineShader(const std::string& node);
+  std::string _evaluateDefinesOnString(const std::string& shaderString);
 
 public:
   std::string name;
@@ -114,9 +120,11 @@ public:
   std::function<void(Effect* effect)> onCompiled;
   std::function<void(Effect* effect, const std::string& errors)> onError;
   std::function<void(Effect* effect)> onBind;
+  std::size_t uniqueId;
   std::string _key;
 
 private:
+  static std::size_t _uniqueIdSeed;
   Engine* _engine;
   std::vector<std::string> _uniformsNames;
   std::vector<std::string> _samplers;
