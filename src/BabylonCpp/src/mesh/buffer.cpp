@@ -24,7 +24,8 @@ Buffer::Buffer(Engine* engine, const Float32Array& data, bool updatable,
 
 Buffer::Buffer(Mesh* mesh, const Float32Array& data, bool updatable, int stride,
                bool postponeInternalCreation, bool instanced)
-    : _data{data}
+    : _buffer{nullptr}
+    , _data{data}
     , _updatable{updatable}
     , _strideSize{stride}
     , _instanced{instanced}
@@ -84,10 +85,10 @@ bool Buffer::getIsInstanced() const
 }
 
 // Methods
-void Buffer::create()
+GL::IGLBuffer* Buffer::create()
 {
   if (_buffer) {
-    return; // nothing to do
+    return nullptr; // nothing to do
   }
 
   if (!_buffer) { // create buffer
@@ -101,12 +102,14 @@ void Buffer::create()
   else if (_updatable) { // update buffer
     _engine->updateDynamicVertexBuffer(_buffer, _data);
   }
+
+  return _buffer ? _buffer.get() : nullptr;
 }
 
-void Buffer::create(const Float32Array& data)
+GL::IGLBuffer* Buffer::create(const Float32Array& data)
 {
   if (data.empty() && _buffer) {
-    return; // nothing to do
+    return nullptr; // nothing to do
   }
 
   if (!_buffer) { // create buffer
@@ -126,30 +129,34 @@ void Buffer::create(const Float32Array& data)
       _data = data;
     }
   }
+
+  return _buffer ? _buffer.get() : nullptr;
 }
 
-void Buffer::update(const Float32Array& data)
+GL::IGLBuffer* Buffer::update(const Float32Array& data)
 {
-  create(data);
+  return create(data);
 }
 
-void Buffer::updateDirectly(const Float32Array& data, int offset)
+GL::IGLBuffer* Buffer::updateDirectly(const Float32Array& data, int offset)
 {
   if (!_buffer) {
-    return;
+    return nullptr;
   }
 
   if (_updatable) { // update buffer
     _engine->updateDynamicVertexBuffer(_buffer, data, offset, -1);
     _data.clear();
   }
+
+  return _buffer ? _buffer.get() : nullptr;
 }
 
-void Buffer::updateDirectly(const Float32Array& data, int offset,
-                            size_t vertexCount)
+GL::IGLBuffer* Buffer::updateDirectly(const Float32Array& data, int offset,
+                                      size_t vertexCount)
 {
   if (!_buffer) {
-    return;
+    return nullptr;
   }
 
   if (_updatable) { // update buffer
@@ -157,6 +164,8 @@ void Buffer::updateDirectly(const Float32Array& data, int offset,
       _buffer, data, offset, static_cast<int>(vertexCount) * getStrideSize());
     _data.clear();
   }
+
+  return _buffer ? _buffer.get() : nullptr;
 }
 
 void Buffer::dispose(bool /*doNotRecurse*/)

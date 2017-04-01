@@ -31,11 +31,12 @@ public:
   bool getIsInstanced() const;
 
   // Methods
-  void create();
-  void create(const Float32Array& data);
-  void update(const Float32Array& data);
-  void updateDirectly(const Float32Array& data, int offset);
-  void updateDirectly(const Float32Array& data, int offset, size_t vertexCount);
+  GL::IGLBuffer* create();
+  GL::IGLBuffer* create(const Float32Array& data);
+  GL::IGLBuffer* update(const Float32Array& data);
+  GL::IGLBuffer* updateDirectly(const Float32Array& data, int offset);
+  GL::IGLBuffer* updateDirectly(const Float32Array& data, int offset,
+                                size_t vertexCount);
   void dispose(bool doNotRecurse = false) override;
 
 private:

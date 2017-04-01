@@ -72,20 +72,80 @@ public:
   static int KindToStride(unsigned int kind);
 
   /** Properties **/
+
+  /**
+   * @brief Returns the kind of the VertexBuffer (string).
+   */
   unsigned int getKind() const;
+
+  /**
+   * @brief Returns if the VertexBuffer is updatable.
+   */
   bool isUpdatable() const;
+
+  /**
+   * @brief Returns a Float32Array containing the VertexBuffer data.
+   */
   Float32Array& getData();
+
+  /**
+   * @brief Returns the WebGLBuffer associated to the VertexBuffer.
+   */
   GL::IGLBuffer* getBuffer();
+
+  /**
+   * Returns the stride of the VertexBuffer (integer).
+   */
   int getStrideSize() const;
+
+  /**
+   * @brief Returns the offset (integer).
+   */
   unsigned int getOffset() const;
+
+  /**
+   * @brief Returns the VertexBuffer total size (integer).
+   */
   int getSize() const;
+
+  /**
+   * @brief Returns if the WebGLBuffer of the VertexBuffer instanced now.
+   */
   bool getIsInstanced() const;
 
   /** Methods **/
-  void create();
-  void create(const Float32Array& data);
-  void update(const Float32Array& data);
-  void updateDirectly(const Float32Array& data, int offset);
+
+  /**
+   * @brief Creates the underlying WebGLBuffer from the passed numeric array or
+   * Float32Array.
+   * @returns The created WebGLBuffer.
+   */
+  GL::IGLBuffer* create();
+
+  /**
+   * @brief Creates the underlying WebGLBuffer from the passed numeric array or
+   * Float32Array.
+   * @returns The created WebGLBuffer.
+   */
+  GL::IGLBuffer* create(const Float32Array& data);
+
+  /**
+   * @brief Updates the underlying WebGLBuffer according to the passed numeric
+   * array or Float32Array.
+   * @returns The updated WebGLBuffer.
+   */
+  GL::IGLBuffer* update(const Float32Array& data);
+
+  /**
+   * @brief Updates directly the underlying WebGLBuffer according to the passed
+   * numeric array or Float32Array.
+   * @returns The directly updated WebGLBuffer.
+   */
+  GL::IGLBuffer* updateDirectly(const Float32Array& data, int offset);
+
+  /**
+   * @brief Disposes the VertexBuffer and the underlying WebGLBuffer.
+   */
   void dispose(bool doNotRecurse = false) override;
 
 private:

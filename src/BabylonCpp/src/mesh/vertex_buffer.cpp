@@ -91,6 +91,8 @@ std::string VertexBuffer::KindAsString(unsigned int kind)
       return std::string(VertexBuffer::PositionKindChars);
     case VertexBuffer::NormalKind:
       return std::string(VertexBuffer::NormalKindChars);
+    case VertexBuffer::TangentKind:
+      return std::string(VertexBuffer::TangentKindChars);
     case VertexBuffer::UVKind:
       return std::string(VertexBuffer::UVKindChars);
     case VertexBuffer::UV2Kind:
@@ -147,6 +149,7 @@ int VertexBuffer::KindToStride(unsigned int kind)
     case VertexBuffer::UV6Kind:
       stride = 2;
       break;
+    case VertexBuffer::TangentKind:
     case VertexBuffer::ColorKind:
       stride = 4;
       break;
@@ -215,22 +218,23 @@ bool VertexBuffer::getIsInstanced() const
 }
 
 // Methods
-void VertexBuffer::create()
+GL::IGLBuffer* VertexBuffer::create()
 {
   return _getBuffer()->create();
 }
 
-void VertexBuffer::create(const Float32Array& data)
+GL::IGLBuffer* VertexBuffer::create(const Float32Array& data)
 {
   return _getBuffer()->create(data);
 }
 
-void VertexBuffer::update(const Float32Array& data)
+GL::IGLBuffer* VertexBuffer::update(const Float32Array& data)
 {
   return _getBuffer()->update(data);
 }
 
-void VertexBuffer::updateDirectly(const Float32Array& data, int offset)
+GL::IGLBuffer* VertexBuffer::updateDirectly(const Float32Array& data,
+                                            int offset)
 {
   return _getBuffer()->updateDirectly(data, offset);
 }
