@@ -15,12 +15,13 @@ ReflectionProbe::ReflectionProbe(const std::string& name, const ISize& size,
     , _viewMatrix{Matrix::Identity()}
     , _target{Vector3::Zero()}
     , _add{Vector3::Zero()}
+    , _attachedMesh{nullptr}
 {
   _renderTargetTexture = std_util::make_unique<RenderTargetTexture>(
     name, size, scene, generateMipMaps, true, Engine::TEXTURETYPE_UNSIGNED_INT,
     true);
 
-  _renderTargetTexture->onBeforeRenderObservable.add([&](int faceIndex) {
+  _renderTargetTexture->onBeforeRenderObservable.add([this](int faceIndex) {
     switch (faceIndex) {
       case 0:
         _add.copyFromFloats(1.f, 0.f, 0.f);
@@ -52,11 +53,11 @@ ReflectionProbe::ReflectionProbe(const std::string& name, const ISize& size,
 
     Matrix::LookAtLHToRef(position, _target, Vector3::Up(), _viewMatrix);
 
-    scene->setTransformMatrix(_viewMatrix, _projectionMatrix);
+    _scene->setTransformMatrix(_viewMatrix, _projectionMatrix);
   });
 
   _renderTargetTexture->onAfterUnbindObservable.add(
-    [&]() { scene->updateTransformMatrix(true); });
+    [this]() { _scene->updateTransformMatrix(true); });
 
   _projectionMatrix = Matrix::PerspectiveFovLH(
     Math::PI_2, 1.f, scene->activeCamera->minZ, scene->activeCamera->maxZ);
@@ -70,6 +71,16 @@ void ReflectionProbe::addToScene(
   std::unique_ptr<ReflectionProbe>&& newReflectionProbe)
 {
   _scene->reflectionProbes.emplace_back(std::move(newReflectionProbe));
+}
+
+unsigned int ReflectionProbe::samples() const
+{
+  return _renderTargetTexture->samples();
+}
+
+void ReflectionProbe::setSamples(unsigned int value)
+{
+  _renderTargetTexture->setSamples(value);
 }
 
 int ReflectionProbe::refreshRate() const

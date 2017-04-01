@@ -95,8 +95,8 @@ std::unique_ptr<SphericalHarmonics> SphericalHarmonics::clone() const
 void SphericalHarmonics::addLight(const Vector3& direction, const Color3& color,
                                   float deltaSolidAngle)
 {
-  Vector3 colorVector(color.r, color.g, color.b);
-  Vector3 c = colorVector.scale(deltaSolidAngle);
+  const Vector3 colorVector(color.r, color.g, color.b);
+  const Vector3 c = colorVector.scale(deltaSolidAngle);
 
   L00 = L00.add(c.scale(0.282095f));
 

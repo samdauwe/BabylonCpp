@@ -75,7 +75,7 @@ const char* Vector4::getClassName() const
 
 size_t Vector4::getHashCode() const
 {
-  float tmp = (((x * 0.397f) + y * 3.97f) + z * 39.7f) + w;
+  const float tmp = (((x * 0.397f) + y * 3.97f) + z * 39.7f) + w;
   return std_util::to_bitset(tmp).to_ullong();
 }
 
@@ -85,7 +85,7 @@ Float32Array Vector4::asArray() const
   return {x, y, z, w};
 }
 
-Vector4& Vector4::toArray(Float32Array& array, unsigned int index)
+const Vector4& Vector4::toArray(Float32Array& array, unsigned int index) const
 {
   array[index]     = x;
   array[index + 1] = y;
@@ -111,7 +111,8 @@ Vector4 Vector4::add(const Vector4& otherVector) const
                  w + otherVector.w);
 }
 
-Vector4& Vector4::addToRef(const Vector4& otherVector, Vector4& result)
+const Vector4& Vector4::addToRef(const Vector4& otherVector,
+                                 Vector4& result) const
 {
   result.x = x + otherVector.x;
   result.y = y + otherVector.y;
@@ -137,7 +138,8 @@ Vector4 Vector4::subtract(const Vector4& otherVector) const
                  w - otherVector.w);
 }
 
-Vector4& Vector4::subtractToRef(const Vector4& otherVector, Vector4& result)
+const Vector4& Vector4::subtractToRef(const Vector4& otherVector,
+                                      Vector4& result) const
 {
   result.x = x - otherVector.x;
   result.y = y - otherVector.y;
@@ -153,8 +155,8 @@ Vector4 Vector4::subtractFromFloats(float ix, float iy, float iz,
   return Vector4(x - ix, y - iy, z - iz, w - iw);
 }
 
-Vector4& Vector4::subtractFromFloatsToRef(float ix, float iy, float iz,
-                                          float iw, Vector4& result)
+const Vector4& Vector4::subtractFromFloatsToRef(float ix, float iy, float iz,
+                                                float iw, Vector4& result) const
 {
   result.x = x - ix;
   result.y = y - iy;
@@ -184,7 +186,7 @@ Vector4 Vector4::scale(float iscale) const
   return Vector4(x * iscale, y * iscale, z * iscale, w * iscale);
 }
 
-Vector4& Vector4::scaleToRef(float iscale, Vector4& result)
+const Vector4& Vector4::scaleToRef(float iscale, Vector4& result) const
 {
   result.x = x * iscale;
   result.y = y * iscale;
@@ -232,7 +234,8 @@ Vector4 Vector4::multiply(const Vector4& otherVector) const
                  w * otherVector.w);
 }
 
-Vector4& Vector4::multiplyToRef(const Vector4& otherVector, Vector4& result)
+const Vector4& Vector4::multiplyToRef(const Vector4& otherVector,
+                                      Vector4& result) const
 {
   result.x = x * otherVector.x;
   result.y = y * otherVector.y;
@@ -253,7 +256,8 @@ Vector4 Vector4::divide(const Vector4& otherVector) const
                  w / otherVector.w);
 }
 
-Vector4& Vector4::divideToRef(const Vector4& otherVector, Vector4& result)
+const Vector4& Vector4::divideToRef(const Vector4& otherVector,
+                                    Vector4& result) const
 {
   result.x = x / otherVector.x;
   result.y = y / otherVector.y;
@@ -265,28 +269,36 @@ Vector4& Vector4::divideToRef(const Vector4& otherVector, Vector4& result)
 
 Vector4& Vector4::minimizeInPlace(const Vector4& other)
 {
-  if (other.x < x)
+  if (other.x < x) {
     x = other.x;
-  if (other.y < y)
+  }
+  if (other.y < y) {
     y = other.y;
-  if (other.z < z)
+  }
+  if (other.z < z) {
     z = other.z;
-  if (other.w < w)
+  }
+  if (other.w < w) {
     w = other.w;
+  }
 
   return *this;
 }
 
 Vector4& Vector4::maximizeInPlace(const Vector4& other)
 {
-  if (other.x > x)
+  if (other.x > x) {
     x = other.x;
-  if (other.y > y)
+  }
+  if (other.y > y) {
     y = other.y;
-  if (other.z > z)
+  }
+  if (other.z > z) {
     z = other.z;
-  if (other.w > w)
+  }
+  if (other.w > w) {
     w = other.w;
+  }
 
   return *this;
 }
@@ -373,12 +385,13 @@ float Vector4::lengthSquared() const
 /** Methods **/
 Vector4& Vector4::normalize()
 {
-  float len = length();
+  const float len = length();
 
-  if (std_util::almost_equal(len, 0.f))
+  if (std_util::almost_equal(len, 0.f)) {
     return *this;
+  }
 
-  float num = 1.f / len;
+  const float num = 1.f / len;
 
   x *= num;
   y *= num;
@@ -482,10 +495,10 @@ float Vector4::Distance(const Vector4& value1, const Vector4& value2)
 
 float Vector4::DistanceSquared(const Vector4& value1, const Vector4& value2)
 {
-  float x = value1.x - value2.x;
-  float y = value1.y - value2.y;
-  float z = value1.z - value2.z;
-  float w = value1.w - value2.w;
+  const float x = value1.x - value2.x;
+  const float y = value1.y - value2.y;
+  const float z = value1.z - value2.z;
+  const float w = value1.w - value2.w;
 
   return (x * x) + (y * y) + (z * z) + (w * w);
 }

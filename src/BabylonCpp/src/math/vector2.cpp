@@ -68,12 +68,12 @@ const char* Vector2::getClassName() const
 
 size_t Vector2::getHashCode() const
 {
-  float tmp = x * 0.397f + y;
+  const float tmp = x * 0.397f + y;
   return std_util::to_bitset(tmp).to_ullong();
 }
 
 /** Operators **/
-Vector2& Vector2::toArray(Float32Array& array, unsigned int index)
+const Vector2& Vector2::toArray(Float32Array& array, unsigned int index) const
 {
   array[index]     = x;
   array[index + 1] = y;
@@ -81,7 +81,7 @@ Vector2& Vector2::toArray(Float32Array& array, unsigned int index)
   return *this;
 }
 
-Float32Array Vector2::asArray()
+Float32Array Vector2::asArray() const
 {
   Float32Array result;
   toArray(result, 0);
@@ -115,7 +115,8 @@ Vector2 Vector2::add(const Vector2& otherVector) const
   return Vector2(x + otherVector.x, y + otherVector.y);
 }
 
-Vector2& Vector2::addToRef(const Vector2& otherVector, Vector2& result)
+const Vector2& Vector2::addToRef(const Vector2& otherVector,
+                                 Vector2& result) const
 {
   result.x = x + otherVector.x;
   result.y = y + otherVector.y;
@@ -141,7 +142,8 @@ Vector2 Vector2::subtract(const Vector2& otherVector) const
   return Vector2(x - otherVector.x, y - otherVector.y);
 }
 
-Vector2& Vector2::subtractToRef(const Vector2& otherVector, Vector2& result)
+const Vector2& Vector2::subtractToRef(const Vector2& otherVector,
+                                      Vector2& result) const
 {
   result.x = x - otherVector.x;
   result.y = y - otherVector.y;
@@ -170,7 +172,8 @@ Vector2 Vector2::multiply(const Vector2& otherVector) const
   return Vector2(x * otherVector.x, y * otherVector.y);
 }
 
-Vector2& Vector2::multiplyToRef(const Vector2& otherVector, Vector2& result)
+const Vector2& Vector2::multiplyToRef(const Vector2& otherVector,
+                                      Vector2& result) const
 {
   result.x = x * otherVector.x;
   result.y = y * otherVector.y;
@@ -196,7 +199,8 @@ Vector2& Vector2::divideInPlace(const Vector2& otherVector)
   return *this;
 }
 
-Vector2& Vector2::divideToRef(const Vector2& otherVector, Vector2& result)
+const Vector2& Vector2::divideToRef(const Vector2& otherVector,
+                                    Vector2& result) const
 {
   result.x = x / otherVector.x;
   result.y = y / otherVector.y;
@@ -382,12 +386,13 @@ float Vector2::lengthSquared() const
 /** Methods **/
 Vector2& Vector2::normalize()
 {
-  float len = length();
+  const float len = length();
 
-  if (std_util::almost_equal(len, 0.f))
+  if (std_util::almost_equal(len, 0.f)) {
     return *this;
+  }
 
-  float num = 1.f / len;
+  const float num = 1.f / len;
 
   x *= num;
   y *= num;
@@ -417,10 +422,10 @@ Vector2 Vector2::CatmullRom(const Vector2& value1, const Vector2& value2,
                             const Vector2& value3, const Vector2& value4,
                             float amount)
 {
-  float squared = amount * amount;
-  float cubed   = amount * squared;
+  const float squared = amount * amount;
+  const float cubed   = amount * squared;
 
-  float x
+  const float x
     = 0.5f
       * ((((2.f * value2.x) + ((-value1.x + value3.x) * amount))
           + (((((2.f * value1.x) - (5.f * value2.x)) + (4.f * value3.x))
@@ -429,7 +434,7 @@ Vector2 Vector2::CatmullRom(const Vector2& value1, const Vector2& value2,
          + ((((-value1.x + (3.f * value2.x)) - (3.f * value3.x)) + value4.x)
             * cubed));
 
-  float y
+  const float y
     = 0.5f
       * ((((2.f * value2.y) + ((-value1.y + value3.y) * amount))
           + (((((2.f * value1.y) - (5.f * value2.y)) + (4.f * value3.y))
@@ -461,25 +466,27 @@ Vector2 Vector2::Hermite(const Vector2& value1, const Vector2& tangent1,
                          const Vector2& value2, const Vector2& tangent2,
                          float amount)
 {
-  float squared = amount * amount;
-  float cubed   = amount * squared;
-  float part1   = ((2.f * cubed) - (3.f * squared)) + 1.f;
-  float part2   = (-2.f * cubed) + (3.f * squared);
-  float part3   = (cubed - (2.f * squared)) + amount;
-  float part4   = cubed - squared;
+  const float squared = amount * amount;
+  const float cubed   = amount * squared;
+  const float part1   = ((2.f * cubed) - (3.f * squared)) + 1.f;
+  const float part2   = (-2.f * cubed) + (3.f * squared);
+  const float part3   = (cubed - (2.f * squared)) + amount;
+  const float part4   = cubed - squared;
 
-  float x = (((value1.x * part1) + (value2.x * part2)) + (tangent1.x * part3))
-            + (tangent2.x * part4);
-  float y = (((value1.y * part1) + (value2.y * part2)) + (tangent1.y * part3))
-            + (tangent2.y * part4);
+  const float x
+    = (((value1.x * part1) + (value2.x * part2)) + (tangent1.x * part3))
+      + (tangent2.x * part4);
+  const float y
+    = (((value1.y * part1) + (value2.y * part2)) + (tangent1.y * part3))
+      + (tangent2.y * part4);
 
   return Vector2(x, y);
 }
 
 Vector2 Vector2::Lerp(const Vector2& start, const Vector2& end, float amount)
 {
-  float x = start.x + ((end.x - start.x) * amount);
-  float y = start.y + ((end.y - start.y) * amount);
+  const float x = start.x + ((end.x - start.x) * amount);
+  const float y = start.y + ((end.y - start.y) * amount);
 
   return Vector2(x, y);
 }
@@ -491,23 +498,23 @@ float Vector2::Dot(const Vector2& left, const Vector2& right)
 
 Vector2 Vector2::Normalize(Vector2& vector)
 {
-  Vector2 newVector = vector;
+  Vector2 newVector{vector};
   newVector.normalize();
   return newVector;
 }
 
 Vector2 Vector2::Minimize(const Vector2& left, const Vector2& right)
 {
-  float x = (left.x < right.x) ? left.x : right.x;
-  float y = (left.y < right.y) ? left.y : right.y;
+  const float x = (left.x < right.x) ? left.x : right.x;
+  const float y = (left.y < right.y) ? left.y : right.y;
 
   return Vector2(x, y);
 }
 
 Vector2 Vector2::Maximize(const Vector2& left, const Vector2& right)
 {
-  float x = (left.x > right.x) ? left.x : right.x;
-  float y = (left.y > right.y) ? left.y : right.y;
+  const float x = (left.x > right.x) ? left.x : right.x;
+  const float y = (left.y > right.y) ? left.y : right.y;
 
   return Vector2(x, y);
 }
@@ -522,10 +529,10 @@ Vector2 Vector2::Transform(const Vector2& vector, const Matrix& transformation)
 void Vector2::TransformToRef(const Vector2& vector,
                              const Matrix& transformation, Vector2& result)
 {
-  float x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[4])
-            + transformation.m[12];
-  float y = (vector.x * transformation.m[1]) + (vector.y * transformation.m[5])
-            + transformation.m[13];
+  const float x = (vector.x * transformation.m[0])
+                  + (vector.y * transformation.m[4]) + transformation.m[12];
+  const float y = (vector.x * transformation.m[1])
+                  + (vector.y * transformation.m[5]) + transformation.m[13];
   result.x = x;
   result.y = y;
 }
@@ -533,13 +540,13 @@ void Vector2::TransformToRef(const Vector2& vector,
 bool Vector2::PointInTriangle(const Vector2& p, const Vector2& p0,
                               const Vector2& p1, const Vector2& p2)
 {
-  float a = 1.f / 2.f * (-p1.y * p2.x + p0.y * (-p1.x + p2.x)
-                         + p0.x * (p1.y - p2.y) + p1.x * p2.y);
-  float sign = a < 0.f ? -1.f : 1.f;
-  float s
+  const float a = 1.f / 2.f * (-p1.y * p2.x + p0.y * (-p1.x + p2.x)
+                               + p0.x * (p1.y - p2.y) + p1.x * p2.y);
+  const float sign = a < 0.f ? -1.f : 1.f;
+  const float s
     = (p0.y * p2.x - p0.x * p2.y + (p2.y - p0.y) * p.x + (p0.x - p2.x) * p.y)
       * sign;
-  float t
+  const float t
     = (p0.x * p1.y - p0.y * p1.x + (p0.y - p1.y) * p.x + (p1.x - p0.x) * p.y)
       * sign;
 
@@ -553,8 +560,8 @@ float Vector2::Distance(const Vector2& value1, const Vector2& value2)
 
 float Vector2::DistanceSquared(const Vector2& value1, const Vector2& value2)
 {
-  float x = value1.x - value2.x;
-  float y = value1.y - value2.y;
+  const float x = value1.x - value2.x;
+  const float y = value1.y - value2.y;
 
   return (x * x) + (y * y);
 }
@@ -569,14 +576,14 @@ Vector2 Vector2::Center(const Vector2& value1, const Vector2& value2)
 float Vector2::DistanceOfPointFromSegment(const Vector2& p, const Vector2& segA,
                                           const Vector2& segB)
 {
-  float l2 = Vector2::DistanceSquared(segA, segB);
+  const float l2 = Vector2::DistanceSquared(segA, segB);
   if (std_util::almost_equal(l2, 0.f)) {
     return Vector2::Distance(p, segA);
   }
-  Vector2 v = segB.subtract(segA);
-  float t
+  const Vector2 v = segB.subtract(segA);
+  const float t
     = std::max(0.f, std::min(1.f, Vector2::Dot(p.subtract(segA), v) / l2));
-  Vector2 proj = segA.add(v.multiplyByFloats(t, t));
+  const Vector2 proj = segA.add(v.multiplyByFloats(t, t));
   return Vector2::Distance(p, proj);
 }
 

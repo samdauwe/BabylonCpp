@@ -96,14 +96,15 @@ public:
    * @brief Returns a new Quaternion set as the quaternion mulplication result
    * of the current one with the passed one "q1".
    */
-  Quaternion multiply(const Quaternion& q1);
+  Quaternion multiply(const Quaternion& q1) const;
 
   /**
    * @brief Sets the passed "result" as the quaternion mulplication result of
    * the current one with the passed one "q1".
    * @returns The current Quaternion.
    */
-  Quaternion& multiplyToRef(const Quaternion& q1, Quaternion& result);
+  const Quaternion& multiplyToRef(const Quaternion& q1,
+                                  Quaternion& result) const;
 
   /**
    * @brief Updates the current Quaternion with the quaternion mulplication
@@ -117,7 +118,7 @@ public:
    * Quaternion.
    * @returns The current Quaternion.
    */
-  Quaternion& conjugateToRef(Quaternion& ref);
+  const Quaternion& conjugateToRef(Quaternion& ref) const;
 
   /**
    * @brief Conjugates in place the current Quaternion.
@@ -145,22 +146,22 @@ public:
    * @brief Returns a new Vector3 set with the Euler angles translated from the
    * current Quaternion.
    */
-  Vector3 toEulerAngles();
+  Vector3 toEulerAngles() const;
 
   /**
    * @brief Sets the passed vector3 "result" with the Euler angles translated
    * from the current Quaternion.
    * @returns The current Quaternion.
    */
-  Quaternion& toEulerAnglesToRef(Vector3& result,
-                                 const std::string& order = "YZX");
+  const Quaternion& toEulerAnglesToRef(Vector3& result,
+                                       const std::string& order = "YZX") const;
 
   /**
    * @brief Updates the passed rotation matrix with the current Quaternion
    * values.
    * @returns The current Quaternion.
    */
-  Quaternion& toRotationMatrix(Matrix& result);
+  const Quaternion& toRotationMatrix(Matrix& result) const;
 
   /**
    * @brief Updates the current Quaternion from the passed rotation matrix
@@ -175,7 +176,7 @@ public:
   Quaternion operator+(const Quaternion& other) const;
   Quaternion operator-(const Quaternion& other) const;
   Quaternion operator*(float value) const;
-  Quaternion operator*(const Quaternion& other);
+  Quaternion operator*(const Quaternion& other) const;
   Quaternion& operator*=(const Quaternion& other);
   bool operator==(const Quaternion& other) const;
   bool operator!=(const Quaternion& other) const;

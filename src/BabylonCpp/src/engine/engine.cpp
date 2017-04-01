@@ -2099,6 +2099,13 @@ Engine::createRenderTargetTexture(ISize size,
   return _texture;
 }
 
+unsigned int
+Engine::updateRenderTargetTextureSampleCount(GL::IGLTexture* /*texture*/,
+                                             unsigned int /*samples*/)
+{
+  return 1;
+}
+
 GL::IGLTexture* Engine::createRenderTargetCubeTexture(
   const ISize& size, const RenderTargetCubeTextureOptions& options)
 {

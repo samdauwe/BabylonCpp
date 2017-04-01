@@ -141,21 +141,22 @@ Quaternion Quaternion::scale(float value) const
   return Quaternion(x * value, y * value, z * value, w * value);
 }
 
-Quaternion Quaternion::multiply(const Quaternion& q1)
+Quaternion Quaternion::multiply(const Quaternion& q1) const
 {
-  Quaternion result = Quaternion(0.f, 0.f, 0.f, 1.f);
+  Quaternion result(0.f, 0.f, 0.f, 1.f);
 
   multiplyToRef(q1, result);
 
   return result;
 }
 
-Quaternion& Quaternion::multiplyToRef(const Quaternion& q1, Quaternion& result)
+const Quaternion& Quaternion::multiplyToRef(const Quaternion& q1,
+                                            Quaternion& result) const
 {
-  float xTemp = x * q1.w + y * q1.z - z * q1.y + w * q1.x;
-  float yTemp = -x * q1.z + y * q1.w + z * q1.x + w * q1.y;
-  float zTemp = x * q1.y - y * q1.x + z * q1.w + w * q1.z;
-  float wTemp = -x * q1.x - y * q1.y - z * q1.z + w * q1.w;
+  const float xTemp = x * q1.w + y * q1.z - z * q1.y + w * q1.x;
+  const float yTemp = -x * q1.z + y * q1.w + z * q1.x + w * q1.y;
+  const float zTemp = x * q1.y - y * q1.x + z * q1.w + w * q1.z;
+  const float wTemp = -x * q1.x - y * q1.y - z * q1.z + w * q1.w;
   result.copyFromFloats(xTemp, yTemp, zTemp, wTemp);
 
   return *this;
@@ -168,7 +169,7 @@ Quaternion& Quaternion::multiplyInPlace(const Quaternion& q1)
   return *this;
 }
 
-Quaternion& Quaternion::conjugateToRef(Quaternion& ref)
+const Quaternion& Quaternion::conjugateToRef(Quaternion& ref) const
 {
   ref.copyFromFloats(-x, -y, -z, w);
   return *this;
@@ -194,7 +195,7 @@ float Quaternion::length() const
 
 Quaternion& Quaternion::normalize()
 {
-  float val = 1.f / length();
+  const float val = 1.f / length();
   x *= val;
   y *= val;
   z *= val;
@@ -203,7 +204,7 @@ Quaternion& Quaternion::normalize()
   return *this;
 }
 
-Vector3 Quaternion::toEulerAngles()
+Vector3 Quaternion::toEulerAngles() const
 {
   Vector3 result = Vector3::Zero();
 
@@ -212,21 +213,22 @@ Vector3 Quaternion::toEulerAngles()
   return result;
 }
 
-Quaternion& Quaternion::toEulerAnglesToRef(Vector3& result,
-                                           const std::string& /*order*/)
+const Quaternion&
+Quaternion::toEulerAnglesToRef(Vector3& result,
+                               const std::string& /*order*/) const
 {
-  float qz = z;
-  float qx = x;
-  float qy = y;
-  float qw = w;
+  const float qz = z;
+  const float qx = x;
+  const float qy = y;
+  const float qw = w;
 
-  float sqw = qw * qw;
-  float sqz = qz * qz;
-  float sqx = qx * qx;
-  float sqy = qy * qy;
+  const float sqw = qw * qw;
+  const float sqz = qz * qz;
+  const float sqx = qx * qx;
+  const float sqy = qy * qy;
 
-  float zAxisY = qy * qz - qx * qw;
-  float limit  = 0.4999999f;
+  const float zAxisY = qy * qz - qx * qw;
+  const float limit  = 0.4999999f;
 
   if (zAxisY < -limit) {
     result.y = 2.f * std::atan2(qy, qw);
@@ -247,7 +249,7 @@ Quaternion& Quaternion::toEulerAnglesToRef(Vector3& result,
   return *this;
 }
 
-Quaternion& Quaternion::toRotationMatrix(Matrix& result)
+const Quaternion& Quaternion::toRotationMatrix(Matrix& result) const
 {
   const float xx = x * x;
   const float yy = y * y;
@@ -308,7 +310,7 @@ Quaternion Quaternion::operator*(float value) const
   return scale(value);
 }
 
-Quaternion Quaternion::operator*(const Quaternion& other)
+Quaternion Quaternion::operator*(const Quaternion& other) const
 {
   return multiply(other);
 }
@@ -340,10 +342,10 @@ void Quaternion::FromRotationMatrixToRef(const Matrix& matrix,
                                          Quaternion& result)
 {
   const std::array<float, 16>& data = matrix.m;
-  float m11 = data[0], m12 = data[4], m13 = data[8];
-  float m21 = data[1], m22 = data[5], m23 = data[9];
-  float m31 = data[2], m32 = data[6], m33 = data[10];
-  float trace = m11 + m22 + m33;
+  const float m11 = data[0], m12 = data[4], m13 = data[8];
+  const float m21 = data[1], m22 = data[5], m23 = data[9];
+  const float m31 = data[2], m32 = data[6], m33 = data[10];
+  const float trace = m11 + m22 + m33;
   float s;
 
   if (trace > 0.f) {
@@ -410,7 +412,7 @@ Quaternion Quaternion::RotationAxis(Vector3& axis, float angle)
 Quaternion Quaternion::RotationAxisToRef(Vector3& axis, float angle,
                                          Quaternion& result)
 {
-  float _sin = std::sin(angle / 2.f);
+  const float _sin = std::sin(angle / 2.f);
 
   axis.normalize();
 
@@ -442,16 +444,16 @@ void Quaternion::RotationYawPitchRollToRef(float yaw, float pitch, float roll,
 {
   // Produces a quaternion from Euler angles in the z-y-x orientation
   // (Tait-Bryan angles)
-  float halfRoll  = roll * 0.5f;
-  float halfPitch = pitch * 0.5f;
-  float halfYaw   = yaw * 0.5f;
+  const float halfRoll  = roll * 0.5f;
+  const float halfPitch = pitch * 0.5f;
+  const float halfYaw   = yaw * 0.5f;
 
-  float sinRoll  = std::sin(halfRoll);
-  float cosRoll  = std::cos(halfRoll);
-  float sinPitch = std::sin(halfPitch);
-  float cosPitch = std::cos(halfPitch);
-  float sinYaw   = std::sin(halfYaw);
-  float cosYaw   = std::cos(halfYaw);
+  const float sinRoll  = std::sin(halfRoll);
+  const float cosRoll  = std::cos(halfRoll);
+  const float sinPitch = std::sin(halfPitch);
+  const float cosPitch = std::cos(halfPitch);
+  const float sinYaw   = std::sin(halfYaw);
+  const float cosYaw   = std::cos(halfYaw);
 
   result.x = (cosYaw * sinPitch * cosRoll) + (sinYaw * cosPitch * sinRoll);
   result.y = (sinYaw * cosPitch * cosRoll) - (cosYaw * sinPitch * sinRoll);
@@ -471,9 +473,9 @@ void Quaternion::RotationAlphaBetaGammaToRef(float alpha, float beta,
                                              float gamma, Quaternion& result)
 {
   // Produces a quaternion from Euler angles in the z-x-z orientation
-  float halfGammaPlusAlpha  = (gamma + alpha) * 0.5f;
-  float halfGammaMinusAlpha = (gamma - alpha) * 0.5f;
-  float halfBeta            = beta * 0.5f;
+  const float halfGammaPlusAlpha  = (gamma + alpha) * 0.5f;
+  const float halfGammaMinusAlpha = (gamma - alpha) * 0.5f;
+  const float halfBeta            = beta * 0.5f;
 
   result.x = std::cos(halfGammaMinusAlpha) * std::sin(halfBeta);
   result.y = std::sin(halfGammaMinusAlpha) * std::sin(halfBeta);
@@ -528,10 +530,10 @@ void Quaternion::SlerpToRef(const Quaternion& left, const Quaternion& right,
     num2 = flag ? -num : num;
   }
   else {
-    float num5 = std::acos(num4);
-    float num6 = (1.f / std::sin(num5));
-    num3       = (std::sin((1.f - num) * num5)) * num6;
-    num2       = flag ? ((-std::sin(num * num5)) * num6) :
+    const float num5 = std::acos(num4);
+    const float num6 = (1.f / std::sin(num5));
+    num3             = (std::sin((1.f - num) * num5)) * num6;
+    num2             = flag ? ((-std::sin(num * num5)) * num6) :
                   ((std::sin(num * num5)) * num6);
   }
 

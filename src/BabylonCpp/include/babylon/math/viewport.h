@@ -32,7 +32,7 @@ public:
   friend std::ostream& operator<<(std::ostream& os, const Viewport& viewport);
 
   /** Methods **/
-  Viewport toGlobal(int renderWidth, int renderHeight);
+  Viewport toGlobal(int renderWidth, int renderHeight) const;
 
 public:
   int x, y;

@@ -81,17 +81,17 @@ void Size::copyFrom(const Size& src)
   height = src.height;
 }
 
-Size& Size::copyFromFloats(float width, float height)
+Size& Size::copyFromFloats(float iWidth, float iHeight)
 {
-  width  = static_cast<int>(width);
-  height = static_cast<int>(height);
+  width  = static_cast<int>(iWidth);
+  height = static_cast<int>(iHeight);
 
   return *this;
 }
 
-Size& Size::set(float width, float height)
+Size& Size::set(float iWidth, float iHeight)
 {
-  return copyFromFloats(width, height);
+  return copyFromFloats(iWidth, iHeight);
 }
 
 Size Size::multiplyByFloats(float w, float h) const
@@ -114,12 +114,12 @@ Size Size::Zero()
   return Size(0, 0);
 }
 
-Size Size::add(const Size& otherSize)
+Size Size::add(const Size& otherSize) const
 {
   return Size(width + otherSize.width, height + otherSize.height);
 }
 
-Size Size::subtract(const Size& otherSize)
+Size Size::subtract(const Size& otherSize) const
 {
   return Size(width - otherSize.width, height - otherSize.height);
 }

@@ -86,13 +86,13 @@ public:
    * @brief Returns a new Size set as the addition result of the current Size
    * and the passed one.
    */
-  Size add(const Size& otherSize);
+  Size add(const Size& otherSize) const;
 
   /**
    * @brief Returns a new Size set as the subtraction result of  the passed one
    * from the current Size.
    */
-  Size subtract(const Size& otherSize);
+  Size subtract(const Size& otherSize) const;
 
   Size scale(float scale) const;
 

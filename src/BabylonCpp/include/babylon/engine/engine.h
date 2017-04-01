@@ -407,6 +407,8 @@ public:
   GL::IGLTexture*
   createRenderTargetTexture(ISize size,
                             const RenderTargetTextureOptions& options);
+  unsigned int updateRenderTargetTextureSampleCount(GL::IGLTexture* texture,
+                                                    unsigned int samples);
   GL::IGLTexture*
   createRenderTargetCubeTexture(const ISize& size,
                                 const RenderTargetCubeTextureOptions& options);

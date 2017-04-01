@@ -50,12 +50,12 @@ public:
    * from the passed index.
    * @returns The Vector2.
    */
-  Vector2& toArray(Float32Array& array, unsigned int index = 0);
+  const Vector2& toArray(Float32Array& array, unsigned int index = 0) const;
 
   /**
    * @brief Returns a new array with 2 elements : the Vector2 coordinates.
    */
-  Float32Array asArray();
+  Float32Array asArray() const;
 
   /**
    * @brief Sets the Vector2 coordinates with the passed Vector2 coordinates.
@@ -86,7 +86,7 @@ public:
    * Vector2 and the passed one coordinates.
    * @returns The Vector2.
    */
-  Vector2& addToRef(const Vector2& otherVector, Vector2& result);
+  const Vector2& addToRef(const Vector2& otherVector, Vector2& result) const;
 
   /**
    * @brief Set the Vector2 coordinates by adding the passed Vector2
@@ -112,7 +112,8 @@ public:
    * from the current Vector2 coordinates.
    * @returns The Vector2.
    */
-  Vector2& subtractToRef(const Vector2& otherVector, Vector2& result);
+  const Vector2& subtractToRef(const Vector2& otherVector,
+                               Vector2& result) const;
 
   /**
    * @brief Sets the current Vector2 coordinates by subtracting from it the
@@ -139,7 +140,8 @@ public:
    * Vector2 and the passed one coordinates.
    * @returns The Vector2.
    */
-  Vector2& multiplyToRef(const Vector2& otherVector, Vector2& result);
+  const Vector2& multiplyToRef(const Vector2& otherVector,
+                               Vector2& result) const;
 
   /**
    * @brief Returns a new Vector2 set with the Vector2 coordinates multiplied by
@@ -164,7 +166,7 @@ public:
    * one coordinates.
    * @returns The Vector2.
    */
-  Vector2& divideToRef(const Vector2& otherVector, Vector2& result);
+  const Vector2& divideToRef(const Vector2& otherVector, Vector2& result) const;
 
   /**
    * @brief Returns a new Vector2 with current Vector2 negated coordinates.

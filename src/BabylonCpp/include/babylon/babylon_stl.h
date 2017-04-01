@@ -100,6 +100,9 @@ using Uint8Array   = std::vector<std::uint8_t>;
 using Uint16Array  = std::vector<std::uint16_t>;
 using Uint32Array  = std::vector<std::uint32_t>;
 
+// Indices array alias
+using IndicesArray = Uint32Array;
+
 namespace std_util {
 
 // -- Implementation of std::make_unique function in C++11 --

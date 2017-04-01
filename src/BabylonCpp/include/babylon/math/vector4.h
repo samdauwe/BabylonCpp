@@ -57,7 +57,7 @@ public:
    * coordinates.
    * @returns The Vector4.
    */
-  Vector4& toArray(Float32Array& array, unsigned int index = 0);
+  const Vector4& toArray(Float32Array& array, unsigned int index = 0) const;
 
   /**
    * @brief Adds the passed vector to the current Vector4.
@@ -76,7 +76,7 @@ public:
    * of the current Vector4 and the passed one.
    * @returns The current Vector4.
    */
-  Vector4& addToRef(const Vector4& otherVector, Vector4& result);
+  const Vector4& addToRef(const Vector4& otherVector, Vector4& result) const;
 
   /**
    * @brief Subtract in place the passed vector from the current Vector4.
@@ -95,7 +95,8 @@ public:
    * of the passed vector from the current Vector4.
    * @returns The current Vector4.
    */
-  Vector4& subtractToRef(const Vector4& otherVector, Vector4& result);
+  const Vector4& subtractToRef(const Vector4& otherVector,
+                               Vector4& result) const;
 
   /**
    * @brief Sets the passed vector "result" set with the result of the
@@ -109,8 +110,8 @@ public:
    * subtraction of the passed floats from the current Vector4 coordinates.
    * @returns The current Vector4.
    */
-  Vector4& subtractFromFloatsToRef(float ix, float iy, float iz, float iw,
-                                   Vector4& result);
+  const Vector4& subtractFromFloatsToRef(float ix, float iy, float iz, float iw,
+                                         Vector4& result) const;
 
   /**
    * @brief Returns a new Vector4 set with the current Vector4 negated
@@ -135,7 +136,7 @@ public:
    * multiplied by scale (float).
    * @returns The current Vector4.
    */
-  Vector4& scaleToRef(float iscale, Vector4& result);
+  const Vector4& scaleToRef(float iscale, Vector4& result) const;
 
   /**
    * @brief Returns if the current Vector4 coordinates are stricly equal to the
@@ -173,7 +174,8 @@ public:
    * the current Vector4 and the passed one.
    * @returns The current Vector4.
    */
-  Vector4& multiplyToRef(const Vector4& otherVector, Vector4& result);
+  const Vector4& multiplyToRef(const Vector4& otherVector,
+                               Vector4& result) const;
 
   /**
    * @brief Returns a new Vector4 set with the multiplication result of the
@@ -192,7 +194,7 @@ public:
    * current Vector4 by the passed one.
    * @returns The current Vector4.
    */
-  Vector4& divideToRef(const Vector4& otherVector, Vector4& result);
+  const Vector4& divideToRef(const Vector4& otherVector, Vector4& result) const;
 
   /**
    * @brief Updates the Vector4 coordinates with the minimum values between its

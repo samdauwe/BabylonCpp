@@ -20,6 +20,8 @@ public:
   static LowestRoot GetLowestRoot(float a, float b, float c, float maxR);
 
   /** Methods **/
+  int collisionMask() const;
+  void setCollisionMask(int mask);
   void _initialize(Vector3& source, Vector3& dir, float e);
   bool _checkPointInTriangle(const Vector3& point, const Vector3& pa,
                              const Vector3& pb, const Vector3& pc,
@@ -27,9 +29,10 @@ public:
   bool _canDoCollision(const Vector3& sphereCenter, float sphereRadius,
                        const Vector3& vecMin, const Vector3& vecMax) const;
   void _testTriangle(size_t faceIndex, std::vector<Plane>& trianglePlaneArray,
-                     Vector3& p1, Vector3& p2, Vector3& p3, bool hasMaterial);
+                     const Vector3& p1, const Vector3& p2, const Vector3& p3,
+                     bool hasMaterial);
   void _collide(std::vector<Plane>& trianglePlaneArray,
-                const std::vector<Vector3> pts, const Uint32Array& indices,
+                const std::vector<Vector3> pts, const IndicesArray& indices,
                 size_t indexStart, size_t indexEnd, unsigned int decal,
                 bool hasMaterial);
   void _getResponse(Vector3& pos, Vector3& vel);
@@ -65,6 +68,7 @@ private:
   Vector3 _destinationPoint;
   Vector3 _slidePlaneNormal;
   Vector3 _displacementVector;
+  int _collisionMask;
 
 }; // end of class Collider
 

@@ -25,6 +25,8 @@ public:
 
   void addToScene(std::unique_ptr<ReflectionProbe>&& newReflectionProbe);
 
+  unsigned int samples() const;
+  void setSamples(unsigned int value);
   int refreshRate() const;
   void setRefreshRate(int value);
   Scene* getScene() const;

@@ -27,6 +27,7 @@ RenderTargetTexture::RenderTargetTexture(
     , _doNotChangeAspectRatio{doNotChangeAspectRatio}
     , _currentRefreshId{-1}
     , _refreshRate{1}
+    , _samples{1}
 {
   name           = iName;
   isRenderTarget = true;
@@ -101,6 +102,21 @@ void RenderTargetTexture::setOnClear(
     onClearObservable.remove(_onClearObserver);
   }
   _onClearObserver = onClearObservable.add(callback);
+}
+
+unsigned int RenderTargetTexture::samples() const
+{
+  return _samples;
+}
+
+void RenderTargetTexture::setSamples(unsigned int value)
+{
+  if (_samples == value) {
+    return;
+  }
+
+  _samples = getScene()->getEngine()->updateRenderTargetTextureSampleCount(
+    _texture, value);
 }
 
 void RenderTargetTexture::resetRefreshCounter()

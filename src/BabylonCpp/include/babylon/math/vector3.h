@@ -60,7 +60,7 @@ public:
    * with the successive coordinates of the Vector3.
    * @returns The Vector3.
    */
-  Vector3& toArray(Float32Array& array, unsigned int index = 0);
+  const Vector3& toArray(Float32Array& array, unsigned int index = 0) const;
 
   /**
    * @brief Returns a new Quaternion object, computed from the Vector3
@@ -85,7 +85,7 @@ public:
    * the vector "result".
    * @returns the current Vector3.
    */
-  Vector3& addToRef(const Vector3& otherVector, Vector3& result);
+  const Vector3& addToRef(const Vector3& otherVector, Vector3& result) const;
 
   /**
    * @brief Subtract the passed vector from the current Vector3.
@@ -118,7 +118,8 @@ public:
    * set the passed vector "result" with this result.
    * @returns The current Vector3.
    */
-  Vector3& subtractFromFloatsToRef(float x, float y, float z, Vector3& result);
+  const Vector3& subtractFromFloatsToRef(float x, float y, float z,
+                                         Vector3& result) const;
 
   /**
    * @brief Returns a new Vector3 set with the current Vector3 negated
@@ -143,8 +144,8 @@ public:
    * stores the result in the passed vector "result" coordinates.
    * @returns the current Vector3.
    */
-  Vector3& scaleToRef(int iscale, Vector3& result);
-  Vector3& scaleToRef(float iscale, Vector3& result);
+  const Vector3& scaleToRef(int iscale, Vector3& result) const;
+  const Vector3& scaleToRef(float iscale, Vector3& result) const;
 
   /**
    * @brief Returns if the current Vector3 and the passed vector coordinates are
@@ -181,7 +182,8 @@ public:
    * result in the passed vector "result".
    * @returns The current Vector3.
    */
-  Vector3& multiplyToRef(const Vector3& otherVector, Vector3& result);
+  const Vector3& multiplyToRef(const Vector3& otherVector,
+                               Vector3& result) const;
 
   /**
    * @brief Returns a new Vector3 set with the result of the mulliplication of
@@ -206,7 +208,7 @@ public:
    * stores the result in the passed vector "result".
    * @returns The current Vector3.
    */
-  Vector3& divideToRef(const Vector3& otherVector, Vector3& result);
+  const Vector3& divideToRef(const Vector3& otherVector, Vector3& result) const;
 
   /**
    * @brief Updates the current Vector3 with the minimal coordinate values

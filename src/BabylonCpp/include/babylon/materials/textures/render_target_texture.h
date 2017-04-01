@@ -33,6 +33,8 @@ public:
   void setOnAfterRender(const std::function<void(int faceIndex)>& callback);
   void setOnClear(const std::function<void(Engine* engine)>& callback);
 
+  unsigned int samples() const;
+  void setSamples(unsigned int value);
   void resetRefreshCounter();
   int refreshRate() const;
   void setRefreshRate(int value);
@@ -143,6 +145,7 @@ private:
   int _currentRefreshId;
   int _refreshRate;
   std::unique_ptr<Matrix> _textureMatrix;
+  unsigned int _samples;
 
 }; // end of class RenderTargetTexture
 

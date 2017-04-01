@@ -76,7 +76,7 @@ std::ostream& operator<<(std::ostream& os, const Viewport& viewport)
 }
 
 /** Methods **/
-Viewport Viewport::toGlobal(int renderWidth, int renderHeight)
+Viewport Viewport::toGlobal(int renderWidth, int renderHeight) const
 {
   return Viewport(x * renderWidth, y * renderHeight, width * renderWidth,
                   height * renderHeight);

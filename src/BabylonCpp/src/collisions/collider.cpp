@@ -22,6 +22,7 @@ Collider::Collider()
     , _destinationPoint{Vector3::Zero()}
     , _slidePlaneNormal{Vector3::Zero()}
     , _displacementVector{Vector3::Zero()}
+    , _collisionMask{-1}
 {
 }
 
@@ -93,6 +94,16 @@ LowestRoot Collider::GetLowestRoot(float a, float b, float c, float maxR)
   return result;
 }
 
+int Collider::collisionMask() const
+{
+  return _collisionMask;
+}
+
+void Collider::setCollisionMask(int mask)
+{
+  _collisionMask = !std::isnan(mask) ? mask : -1;
+}
+
 void Collider::_initialize(Vector3& source, Vector3& dir, float e)
 {
   velocity = dir;
@@ -155,8 +166,8 @@ bool Collider::_canDoCollision(const Vector3& sphereCenter, float sphereRadius,
 
 void Collider::_testTriangle(size_t faceIndex,
                              std::vector<Plane>& trianglePlaneArray,
-                             Vector3& p1, Vector3& p2, Vector3& p3,
-                             bool hasMaterial)
+                             const Vector3& p1, const Vector3& p2,
+                             const Vector3& p3, bool hasMaterial)
 {
   float f, t0;
   bool embeddedInPlane = false;
@@ -357,13 +368,13 @@ void Collider::_testTriangle(size_t faceIndex,
 
 void Collider::_collide(std::vector<Plane>& trianglePlaneArray,
                         const std::vector<Vector3> pts,
-                        const Uint32Array& indices, size_t indexStart,
+                        const IndicesArray& indices, size_t indexStart,
                         size_t indexEnd, unsigned int decal, bool hasMaterial)
 {
   for (size_t i = indexStart; i < indexEnd; i += 3) {
-    Vector3 p1 = pts[indices[i] - decal];
-    Vector3 p2 = pts[indices[i + 1] - decal];
-    Vector3 p3 = pts[indices[i + 2] - decal];
+    const auto& p1 = pts[indices[i] - decal];
+    const auto& p2 = pts[indices[i + 1] - decal];
+    const auto& p3 = pts[indices[i + 2] - decal];
 
     _testTriangle(i, trianglePlaneArray, p3, p2, p1, hasMaterial);
   }

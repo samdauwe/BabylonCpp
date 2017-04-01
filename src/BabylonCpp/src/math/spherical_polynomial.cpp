@@ -95,7 +95,7 @@ std::unique_ptr<SphericalPolynomial> SphericalPolynomial::clone() const
 
 void SphericalPolynomial::addAmbient(const Color3& color)
 {
-  Vector3 colorVector(color.r, color.g, color.b);
+  const Vector3 colorVector(color.r, color.g, color.b);
   xx = xx.add(colorVector);
   yy = yy.add(colorVector);
   zz = zz.add(colorVector);

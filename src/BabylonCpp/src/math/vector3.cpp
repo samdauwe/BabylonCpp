@@ -91,7 +91,7 @@ Float32Array Vector3::asArray() const
   return {x, y, z};
 }
 
-Vector3& Vector3::toArray(Float32Array& array, unsigned int index)
+const Vector3& Vector3::toArray(Float32Array& array, unsigned int index) const
 {
   array[index]     = x;
   array[index + 1] = y;
@@ -104,12 +104,12 @@ Quaternion Vector3::toQuaternion() const
 {
   Quaternion result(0.f, 0.f, 0.f, 1.f);
 
-  float cosxPlusz  = std::cos((x + z) * 0.5f);
-  float sinxPlusz  = std::sin((x + z) * 0.5f);
-  float coszMinusx = std::cos((z - x) * 0.5f);
-  float sinzMinusx = std::sin((z - x) * 0.5f);
-  float cosy       = std::cos(y * 0.5f);
-  float siny       = std::sin(y * 0.5f);
+  const float cosxPlusz  = std::cos((x + z) * 0.5f);
+  const float sinxPlusz  = std::sin((x + z) * 0.5f);
+  const float coszMinusx = std::cos((z - x) * 0.5f);
+  const float sinzMinusx = std::sin((z - x) * 0.5f);
+  const float cosy       = std::cos(y * 0.5f);
+  const float siny       = std::sin(y * 0.5f);
 
   result.x = coszMinusx * siny;
   result.y = -sinzMinusx * siny;
@@ -133,7 +133,8 @@ Vector3 Vector3::add(const Vector3& otherVector) const
   return Vector3(x + otherVector.x, y + otherVector.y, z + otherVector.z);
 }
 
-Vector3& Vector3::addToRef(const Vector3& otherVector, Vector3& result)
+const Vector3& Vector3::addToRef(const Vector3& otherVector,
+                                 Vector3& result) const
 {
   result.x = x + otherVector.x;
   result.y = y + otherVector.y;
@@ -171,8 +172,8 @@ Vector3 Vector3::subtractFromFloats(float ix, float iy, float iz) const
   return Vector3(x - ix, y - iy, z - iz);
 }
 
-Vector3& Vector3::subtractFromFloatsToRef(float ix, float iy, float iz,
-                                          Vector3& result)
+const Vector3& Vector3::subtractFromFloatsToRef(float ix, float iy, float iz,
+                                                Vector3& result) const
 {
   result.x = x - ix;
   result.y = y - iy;
@@ -200,7 +201,7 @@ Vector3 Vector3::scale(float iscale) const
   return Vector3(x * iscale, y * iscale, z * iscale);
 }
 
-Vector3& Vector3::scaleToRef(int iscale, Vector3& result)
+const Vector3& Vector3::scaleToRef(int iscale, Vector3& result) const
 {
   result.x = x * static_cast<float>(iscale);
   result.y = y * static_cast<float>(iscale);
@@ -209,7 +210,7 @@ Vector3& Vector3::scaleToRef(int iscale, Vector3& result)
   return *this;
 }
 
-Vector3& Vector3::scaleToRef(float iscale, Vector3& result)
+const Vector3& Vector3::scaleToRef(float iscale, Vector3& result) const
 {
   result.x = x * iscale;
   result.y = y * iscale;
@@ -252,7 +253,8 @@ Vector3 Vector3::multiply(const Vector3& otherVector) const
   return Vector3(x * otherVector.x, y * otherVector.y, z * otherVector.z);
 }
 
-Vector3& Vector3::multiplyToRef(const Vector3& otherVector, Vector3& result)
+const Vector3& Vector3::multiplyToRef(const Vector3& otherVector,
+                                      Vector3& result) const
 {
   result.x = x * otherVector.x;
   result.y = y * otherVector.y;
@@ -280,7 +282,8 @@ Vector3 Vector3::divide(const Vector3& otherVector) const
   return Vector3(x / otherVector.x, y / otherVector.y, z / otherVector.z);
 }
 
-Vector3& Vector3::divideToRef(const Vector3& otherVector, Vector3& result)
+const Vector3& Vector3::divideToRef(const Vector3& otherVector,
+                                    Vector3& result) const
 {
   result.x = x / otherVector.x;
   result.y = y / otherVector.y;
@@ -291,24 +294,30 @@ Vector3& Vector3::divideToRef(const Vector3& otherVector, Vector3& result)
 
 Vector3& Vector3::minimizeInPlace(const Vector3& other)
 {
-  if (other.x < x)
+  if (other.x < x) {
     x = other.x;
-  if (other.y < y)
+  }
+  if (other.y < y) {
     y = other.y;
-  if (other.z < z)
+  }
+  if (other.z < z) {
     z = other.z;
+  }
 
   return *this;
 }
 
 Vector3& Vector3::maximizeInPlace(const Vector3& other)
 {
-  if (other.x > x)
+  if (other.x > x) {
     x = other.x;
-  if (other.y > y)
+  }
+  if (other.y > y) {
     y = other.y;
-  if (other.z > z)
+  }
+  if (other.z > z) {
     z = other.z;
+  }
 
   return *this;
 }
@@ -388,7 +397,7 @@ bool Vector3::operator!=(const Vector3& otherVector) const
 
 const float& Vector3::operator[](const unsigned int index) const
 {
-  unsigned int _index = index % 3;
+  const unsigned int _index = index % 3;
   if (_index == 1) {
     return x;
   }
@@ -414,7 +423,7 @@ float Vector3::lengthSquared() const
 /** Methods **/
 Vector3& Vector3::normalize()
 {
-  float len = length();
+  const float len = length();
 
   if (std_util::almost_equal(len, 0.f) || std_util::almost_equal(len, 1.f)) {
     return *this;
@@ -456,10 +465,10 @@ Vector3& Vector3::set(float ix, float iy, float iz)
 float Vector3::GetClipFactor(const Vector3& vector0, const Vector3& vector1,
                              const Vector3& axis, float size)
 {
-  float d0 = Vector3::Dot(vector0, axis) - size;
-  float d1 = Vector3::Dot(vector1, axis) - size;
+  const float d0 = Vector3::Dot(vector0, axis) - size;
+  const float d1 = Vector3::Dot(vector1, axis) - size;
 
-  float s = d0 / (d0 - d1);
+  const float s = d0 / (d0 - d1);
 
   return s;
 }
@@ -535,18 +544,22 @@ void Vector3::TransformCoordinatesToRef(const Vector3& vector,
   SIMD::SIMDVector3::TransformCoordinatesToRefSIMD(vector, transformation,
                                                    result);
 #else
-  float x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[4])
-            + (vector.z * transformation.m[8]) + transformation.m[12];
-  float y = (vector.x * transformation.m[1]) + (vector.y * transformation.m[5])
-            + (vector.z * transformation.m[9]) + transformation.m[13];
-  float z = (vector.x * transformation.m[2]) + (vector.y * transformation.m[6])
-            + (vector.z * transformation.m[10]) + transformation.m[14];
-  float w = (vector.x * transformation.m[3]) + (vector.y * transformation.m[7])
-            + (vector.z * transformation.m[11]) + transformation.m[15];
+  const float x = (vector.x * transformation.m[0])
+                  + (vector.y * transformation.m[4])
+                  + (vector.z * transformation.m[8]) + transformation.m[12];
+  const float y = (vector.x * transformation.m[1])
+                  + (vector.y * transformation.m[5])
+                  + (vector.z * transformation.m[9]) + transformation.m[13];
+  const float z = (vector.x * transformation.m[2])
+                  + (vector.y * transformation.m[6])
+                  + (vector.z * transformation.m[10]) + transformation.m[14];
+  const float w = (vector.x * transformation.m[3])
+                  + (vector.y * transformation.m[7])
+                  + (vector.z * transformation.m[11]) + transformation.m[15];
 
-  result.x = x / w;
-  result.y = y / w;
-  result.z = z / w;
+  result.x       = x / w;
+  result.y       = y / w;
+  result.z       = z / w;
 #endif
 }
 
@@ -558,14 +571,14 @@ void Vector3::TransformCoordinatesFromFloatsToRef(float x, float y, float z,
   SIMD::SIMDVector3::TransformCoordinatesFromFloatsToRefSIMD(
     x, y, z, transformation, result);
 #else
-  float rx = (x * transformation.m[0]) + (y * transformation.m[4])
-             + (z * transformation.m[8]) + transformation.m[12];
-  float ry = (x * transformation.m[1]) + (y * transformation.m[5])
-             + (z * transformation.m[9]) + transformation.m[13];
-  float rz = (x * transformation.m[2]) + (y * transformation.m[6])
-             + (z * transformation.m[10]) + transformation.m[14];
-  float rw = (x * transformation.m[3]) + (y * transformation.m[7])
-             + (z * transformation.m[11]) + transformation.m[15];
+  const float rx = (x * transformation.m[0]) + (y * transformation.m[4])
+                   + (z * transformation.m[8]) + transformation.m[12];
+  const float ry = (x * transformation.m[1]) + (y * transformation.m[5])
+                   + (z * transformation.m[9]) + transformation.m[13];
+  const float rz = (x * transformation.m[2]) + (y * transformation.m[6])
+                   + (z * transformation.m[10]) + transformation.m[14];
+  const float rw = (x * transformation.m[3]) + (y * transformation.m[7])
+                   + (z * transformation.m[11]) + transformation.m[15];
 
   result.x = rx / rw;
   result.y = ry / rw;
@@ -611,10 +624,10 @@ Vector3 Vector3::CatmullRom(const Vector3& value1, const Vector3& value2,
                             const Vector3& value3, const Vector3& value4,
                             float amount)
 {
-  float squared = amount * amount;
-  float cubed   = amount * squared;
+  const float squared = amount * amount;
+  const float cubed   = amount * squared;
 
-  float x
+  const float x
     = 0.5f
       * ((((2.f * value2.x) + ((-value1.x + value3.x) * amount))
           + (((((2.f * value1.x) - (5.f * value2.x)) + (4.f * value3.x))
@@ -623,7 +636,7 @@ Vector3 Vector3::CatmullRom(const Vector3& value1, const Vector3& value2,
          + ((((-value1.x + (3.f * value2.x)) - (3.f * value3.x)) + value4.x)
             * cubed));
 
-  float y
+  const float y
     = 0.5f
       * ((((2.f * value2.y) + ((-value1.y + value3.y) * amount))
           + (((((2.f * value1.y) - (5.f * value2.y)) + (4.f * value3.y))
@@ -632,7 +645,7 @@ Vector3 Vector3::CatmullRom(const Vector3& value1, const Vector3& value2,
          + ((((-value1.y + (3.f * value2.y)) - (3.f * value3.y)) + value4.y)
             * cubed));
 
-  float z
+  const float z
     = 0.5f
       * ((((2.f * value2.z) + ((-value1.z + value3.z) * amount))
           + (((((2.f * value1.z) - (5.f * value2.z)) + (4.f * value3.z))
@@ -669,19 +682,22 @@ Vector3 Vector3::Hermite(const Vector3& value1, const Vector3& tangent1,
                          const Vector3& value2, const Vector3& tangent2,
                          float amount)
 {
-  float squared = amount * amount;
-  float cubed   = amount * squared;
-  float part1   = ((2.f * cubed) - (3.f * squared)) + 1.f;
-  float part2   = (-2.f * cubed) + (3.f * squared);
-  float part3   = (cubed - (2.f * squared)) + amount;
-  float part4   = cubed - squared;
+  const float squared = amount * amount;
+  const float cubed   = amount * squared;
+  const float part1   = ((2.f * cubed) - (3.f * squared)) + 1.f;
+  const float part2   = (-2.f * cubed) + (3.f * squared);
+  const float part3   = (cubed - (2.f * squared)) + amount;
+  const float part4   = cubed - squared;
 
-  float x = (((value1.x * part1) + (value2.x * part2)) + (tangent1.x * part3))
-            + (tangent2.x * part4);
-  float y = (((value1.y * part1) + (value2.y * part2)) + (tangent1.y * part3))
-            + (tangent2.y * part4);
-  float z = (((value1.z * part1) + (value2.z * part2)) + (tangent1.z * part3))
-            + (tangent2.z * part4);
+  const float x
+    = (((value1.x * part1) + (value2.x * part2)) + (tangent1.x * part3))
+      + (tangent2.x * part4);
+  const float y
+    = (((value1.y * part1) + (value2.y * part2)) + (tangent1.y * part3))
+      + (tangent2.y * part4);
+  const float z
+    = (((value1.z * part1) + (value2.z * part2)) + (tangent1.z * part3))
+      + (tangent2.z * part4);
 
   return Vector3(x, y, z);
 }
@@ -739,10 +755,10 @@ void Vector3::NormalizeToRef(const Vector3& vector, Vector3& result)
 Vector3 Vector3::Project(const Vector3& vector, Matrix& world,
                          Matrix& transform, const Viewport& viewport)
 {
-  float cw = static_cast<float>(viewport.width);
-  float ch = static_cast<float>(viewport.height);
-  float cx = static_cast<float>(viewport.x);
-  float cy = static_cast<float>(viewport.y);
+  const float cw = static_cast<float>(viewport.width);
+  const float ch = static_cast<float>(viewport.height);
+  const float cx = static_cast<float>(viewport.x);
+  const float cy = static_cast<float>(viewport.y);
 
   Matrix viewportMatrix
     = Matrix::FromValues(cw / 2.f, 0.f, 0.f, 0.f,  //
@@ -750,7 +766,7 @@ Vector3 Vector3::Project(const Vector3& vector, Matrix& world,
                          0.f, 0.f, 0.5f, 0.f,      //
                          cx + cw / 2.f, ch / 2.f + cy, 0.5f, 1.f);
 
-  auto finalMatrix = world.multiply(transform).multiply(viewportMatrix);
+  const auto finalMatrix = world.multiply(transform).multiply(viewportMatrix);
 
   return Vector3::TransformCoordinates(vector, finalMatrix);
 }
@@ -761,11 +777,11 @@ Vector3 Vector3::UnprojectFromTransform(Vector3& source, float viewportWidth,
 {
   Matrix matrix = world.multiply(transform);
   matrix.invert();
-  source.x       = source.x / viewportWidth * 2 - 1;
-  source.y       = -(source.y / viewportHeight * 2 - 1);
-  Vector3 vector = Vector3::TransformCoordinates(source, matrix);
-  float num      = source.x * matrix.m[3] + source.y * matrix.m[7]
-              + source.z * matrix.m[11] + matrix.m[15];
+  source.x        = source.x / viewportWidth * 2 - 1;
+  source.y        = -(source.y / viewportHeight * 2 - 1);
+  Vector3 vector  = Vector3::TransformCoordinates(source, matrix);
+  const float num = source.x * matrix.m[3] + source.y * matrix.m[7]
+                    + source.z * matrix.m[11] + matrix.m[15];
 
   if (MathTools::WithinEpsilon(num, 1.f)) {
     vector = vector.scale(1.f / num);
@@ -783,9 +799,9 @@ Vector3 Vector3::Unproject(const Vector3& source, float viewportWidth,
   Vector3 screenSource(source.x / viewportWidth * 2.f - 1,
                        -(source.y / viewportHeight * 2.f - 1),
                        2.f * source.z - 1.f);
-  auto vector = Vector3::TransformCoordinates(screenSource, matrix);
-  float num   = screenSource.x * matrix.m[3] + screenSource.y * matrix.m[7]
-              + screenSource.z * matrix.m[11] + matrix.m[15];
+  auto vector     = Vector3::TransformCoordinates(screenSource, matrix);
+  const float num = screenSource.x * matrix.m[3] + screenSource.y * matrix.m[7]
+                    + screenSource.z * matrix.m[11] + matrix.m[15];
 
   if (MathTools::WithinEpsilon(num, 1.f)) {
     vector = vector.scale(1.f / num);
@@ -815,9 +831,9 @@ float Vector3::Distance(const Vector3& value1, const Vector3& value2)
 
 float Vector3::DistanceSquared(const Vector3& value1, const Vector3& value2)
 {
-  float x = value1.x - value2.x;
-  float y = value1.y - value2.y;
-  float z = value1.z - value2.z;
+  const float x = value1.x - value2.x;
+  const float y = value1.y - value2.y;
+  const float z = value1.z - value2.z;
 
   return (x * x) + (y * y) + (z * z);
 }

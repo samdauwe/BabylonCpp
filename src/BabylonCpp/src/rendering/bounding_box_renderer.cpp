@@ -119,6 +119,8 @@ void BoundingBoxRenderer::dispose(bool /*doNotRecurse*/)
     return;
   }
 
+  renderList.clear();
+
   _colorShader->dispose();
 
   if (std_util::contains(_vertexBuffersMap, VertexBuffer::PositionKindChars)) {
