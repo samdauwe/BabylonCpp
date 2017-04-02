@@ -3,6 +3,8 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/core/structs.h>
+#include <babylon/culling/bounding_info.h>
+#include <babylon/math/color3.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/isize.h>
 #include <babylon/math/vector4.h>
@@ -36,6 +38,41 @@ public:
   std::array<Color4, 6> faceColors;
   unsigned int sideOrientation;
   bool updatable;
+
+}; // end of class BoxOptions
+
+//------------------------------------------------------------------------------
+// Compute normals options
+//------------------------------------------------------------------------------
+
+/**
+ * @brief Options used compute the vertex data normals.
+ */
+class BABYLON_SHARED_EXPORT ComputeNormalsOptions {
+
+public:
+  ComputeNormalsOptions();
+  ~ComputeNormalsOptions();
+
+public:
+  // Array of facet positions (vector3)
+  std::vector<Vector3> facetPositions;
+  // Array of facet normals (vector3)
+  std::vector<Vector3> facetNormals;
+  // Partitioning array, facetPositions is required for facetPartitioning
+  // computation
+  std::vector<Uint32Array> facetPartitioning;
+  // Partitioning data about subdivsions on each axis (int), required for
+  // facetPartitioning computation
+  Vector3 subDiv;
+  unsigned int subDivMax;
+  // Partitioning ratio / bounding box, required for facetPartitioning
+  // computation
+  float ratio;
+  // Bounding box size data, required for facetPartitioning computation
+  Vector3 bbSize;
+  // Bounding info, required for facetPartitioning computation
+  BoundingInfo bInfo;
 
 }; // end of class BoxOptions
 
@@ -227,6 +264,7 @@ public:
   Uint8Array buffer;
   unsigned int bufferWidth;
   unsigned int bufferHeight;
+  Color3 colorFilter;
   bool updatable;
   std::function<void(GroundMesh* mesh)> onReady;
 
@@ -429,6 +467,8 @@ public:
   unsigned int sideOrientation;
   bool updatable;
   Mesh* instance;
+  std::vector<Vector2> uvs;
+  std::vector<Color4> colors;
 
 private:
   std::vector<std::vector<Vector3>> _pathArray;

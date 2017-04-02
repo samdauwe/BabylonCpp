@@ -29,6 +29,9 @@ void VertexData::set(const Float32Array& data, unsigned int kind)
     case VertexBuffer::NormalKind:
       normals = data;
       break;
+    case VertexBuffer::TangentKind:
+      tangents = data;
+      break;
     case VertexBuffer::UVKind:
       uvs = data;
       break;
@@ -67,28 +70,34 @@ void VertexData::set(const Float32Array& data, unsigned int kind)
   }
 }
 
-void VertexData::applyToMesh(Mesh* mesh, bool updatable)
+VertexData& VertexData::applyToMesh(Mesh* mesh, bool updatable)
 {
   _applyTo(mesh, updatable);
+  return *this;
 }
 
-void VertexData::applyToGeometry(Geometry* geometry, bool updatable)
+VertexData& VertexData::applyToGeometry(Geometry* geometry, bool updatable)
 {
   _applyTo(geometry, updatable);
+  return *this;
 }
 
-void VertexData::updateMesh(Mesh* mesh, bool updateExtends, bool makeItUnique)
+VertexData& VertexData::updateMesh(Mesh* mesh, bool updateExtends,
+                                   bool makeItUnique)
 {
   _update(mesh, updateExtends, makeItUnique);
+  return *this;
 }
 
-void VertexData::updateGeometry(Geometry* geometry, bool updateExtends,
-                                bool makeItUnique)
+VertexData& VertexData::updateGeometry(Geometry* geometry, bool updateExtends,
+                                       bool makeItUnique)
 {
   _update(geometry, updateExtends, makeItUnique);
+  return *this;
 }
 
-void VertexData::_applyTo(IGetSetVerticesData* meshOrGeometry, bool updatable)
+VertexData& VertexData::_applyTo(IGetSetVerticesData* meshOrGeometry,
+                                 bool updatable)
 {
   if (!positions.empty()) {
     meshOrGeometry->setVerticesData(VertexBuffer::PositionKind, positions,
@@ -97,6 +106,11 @@ void VertexData::_applyTo(IGetSetVerticesData* meshOrGeometry, bool updatable)
 
   if (!normals.empty()) {
     meshOrGeometry->setVerticesData(VertexBuffer::NormalKind, normals,
+                                    updatable);
+  }
+
+  if (!tangents.empty()) {
+    meshOrGeometry->setVerticesData(VertexBuffer::TangentKind, tangents,
                                     updatable);
   }
 
@@ -151,10 +165,12 @@ void VertexData::_applyTo(IGetSetVerticesData* meshOrGeometry, bool updatable)
   if (!indices.empty()) {
     meshOrGeometry->setIndices(indices);
   }
+
+  return *this;
 }
 
-void VertexData::_update(IGetSetVerticesData* meshOrGeometry,
-                         bool updateExtends, bool makeItUnique)
+VertexData& VertexData::_update(IGetSetVerticesData* meshOrGeometry,
+                                bool updateExtends, bool makeItUnique)
 {
   if (!positions.empty()) {
     meshOrGeometry->updateVerticesData(VertexBuffer::PositionKind, positions,
@@ -163,6 +179,11 @@ void VertexData::_update(IGetSetVerticesData* meshOrGeometry,
 
   if (!normals.empty()) {
     meshOrGeometry->updateVerticesData(VertexBuffer::NormalKind, normals,
+                                       updateExtends, makeItUnique);
+  }
+
+  if (!tangents.empty()) {
+    meshOrGeometry->updateVerticesData(VertexBuffer::TangentKind, tangents,
                                        updateExtends, makeItUnique);
   }
 
@@ -228,9 +249,11 @@ void VertexData::_update(IGetSetVerticesData* meshOrGeometry,
   if (!indices.empty()) {
     meshOrGeometry->setIndices(indices);
   }
+
+  return *this;
 }
 
-void VertexData::transform(const Matrix& matrix)
+VertexData& VertexData::transform(const Matrix& matrix)
 {
   auto transformed = Vector3::Zero();
   if (!positions.empty()) {
@@ -258,9 +281,26 @@ void VertexData::transform(const Matrix& matrix)
       normals[index + 2] = transformed.z;
     }
   }
+
+  if (!tangents.empty()) {
+    auto tangent            = Vector4::Zero();
+    auto tangentTransformed = Vector4::Zero();
+
+    for (unsigned int index = 0; index < tangents.size(); index += 4) {
+      Vector4::FromArrayToRef(tangents, index, tangent);
+
+      Vector4::TransformNormalToRef(tangent, matrix, tangentTransformed);
+      tangents[index]     = tangentTransformed.x;
+      tangents[index + 1] = tangentTransformed.y;
+      tangents[index + 2] = tangentTransformed.z;
+      tangents[index + 3] = tangentTransformed.w;
+    }
+  }
+
+  return *this;
 }
 
-void VertexData::merge(VertexData* other)
+VertexData& VertexData::merge(VertexData* other)
 {
   if (!other->indices.empty()) {
     unsigned int offset
@@ -272,6 +312,7 @@ void VertexData::merge(VertexData* other)
 
   std_util::concat(positions, other->positions);
   std_util::concat(normals, other->normals);
+  std_util::concat(tangents, other->tangents);
   std_util::concat(uvs, other->uvs);
   std_util::concat(uvs2, other->uvs2);
   std_util::concat(uvs3, other->uvs3);
@@ -283,6 +324,8 @@ void VertexData::merge(VertexData* other)
   std_util::concat(matricesWeights, other->matricesWeights);
   std_util::concat(matricesIndicesExtra, other->matricesIndicesExtra);
   std_util::concat(matricesWeightsExtra, other->matricesWeightsExtra);
+
+  return *this;
 }
 
 Json::object VertexData::serialize() const
@@ -316,6 +359,11 @@ VertexData::_ExtractFrom(IGetSetVerticesData* meshOrGeometry,
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::NormalKind)) {
     result->normals = meshOrGeometry->getVerticesData(VertexBuffer::NormalKind,
                                                       copyWhenShared);
+  }
+
+  if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::TangentKind)) {
+    result->tangents = meshOrGeometry->getVerticesData(
+      VertexBuffer::TangentKind, copyWhenShared);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::UVKind)) {
@@ -390,6 +438,8 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   const auto& closePath       = options.closePath;
   const auto& invertUV        = options.invertUV;
   const auto& sideOrientation = options.sideOrientation;
+  const auto& customUV        = options.uvs;
+  const auto& customColors    = options.colors;
 
   Float32Array positions;
   Uint32Array indices;
@@ -433,7 +483,8 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   }
 
   // positions and horizontal distances (u)
-  size_t idc           = 0;
+  size_t idc = 0;
+  // the final index will be +1 if closePath
   size_t closePathCorr = (closePath) ? 1 : 0;
   std::vector<Vector3> path;
   size_t l;
@@ -459,7 +510,7 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
       ++j;
     }
 
-    if (closePath) {
+    if (closePath) { // an extra hidden vertex is added in the "positions" array
       --j;
       std_util::concat(positions, {path[0].x, path[0].y, path[0].z});
       vectlg = path[j].subtract(path[0]).length();
@@ -512,15 +563,22 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   // uvs
   float u;
   float v;
-  for (p = 0; p < pathArray.size(); ++p) {
-    for (i = 0; i < minlg + closePathCorr; ++i) {
-      u = us[p][i] / uTotalDistance[p];
-      v = vs[i][p] / vTotalDistance[i];
-      if (invertUV) {
-        std_util::concat(uvs, {v, u});
-      }
-      else {
-        std_util::concat(uvs, {u, v});
+  if (!customUV.empty()) {
+    for (const auto& customUVi : customUV) {
+      std_util::concat(uvs, {customUVi.x, customUVi.y});
+    }
+  }
+  else {
+    for (p = 0; p < pathArray.size(); ++p) {
+      for (i = 0; i < minlg + closePathCorr; ++i) {
+        u = (uTotalDistance[p] != 0.f) ? us[p][i] / uTotalDistance[p] : 0.f;
+        v = (vTotalDistance[i] != 0.f) ? vs[i][p] / vTotalDistance[i] : 0.f;
+        if (invertUV) {
+          std_util::concat(uvs, {v, u});
+        }
+        else {
+          std_util::concat(uvs, {u, v});
+        }
       }
     }
   }
@@ -565,6 +623,7 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   // normals
   VertexData::ComputeNormals(positions, indices, normals);
 
+  // update both the first and last vertex normals to their average value
   if (closePath) {
     size_t indexFirst = 0;
     size_t indexLast  = 0;
@@ -590,6 +649,18 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   // sides
   VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
 
+  // Colors
+  Float32Array colors;
+  if (!customColors.empty()) {
+    colors.resize(customColors.size() * 4);
+    for (unsigned int c = 0; c < customColors.size(); ++c) {
+      colors[c * 4]     = customColors[c].r;
+      colors[c * 4 + 1] = customColors[c].g;
+      colors[c * 4 + 2] = customColors[c].b;
+      colors[c * 4 + 3] = customColors[c].a;
+    }
+  }
+
   // Result
   auto vertexData = std_util::make_unique<VertexData>();
 
@@ -597,6 +668,10 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   vertexData->positions = std::move(positions);
   vertexData->normals   = std::move(normals);
   vertexData->uvs       = std::move(uvs);
+
+  if (!customColors.empty()) {
+    vertexData->set(colors, VertexBuffer::ColorKind);
+  }
 
   if (closePath) {
     vertexData->_idx = std::move(idx);
@@ -1247,7 +1322,7 @@ std::unique_ptr<VertexData> VertexData::CreateGround(GroundOptions& options)
       std_util::concat(positions, {position.x, position.y, position.z});
       std_util::concat(normals, {normal.x, normal.y, normal.z});
       std_util::concat(uvs,
-                       {colf / subdivisionsXf, 1.f - rowf / subdivisionsXf});
+                       {colf / subdivisionsXf, 1.f - rowf / subdivisionsYf});
     }
   }
 
@@ -1390,6 +1465,7 @@ VertexData::CreateGroundFromHeightMap(GroundFromHeightMapOptions& options)
   const auto bufferWidth   = static_cast<float>(options.bufferWidth);
   const auto bufferHeight  = static_cast<float>(options.bufferHeight);
   const auto& buffer       = options.buffer;
+  const auto& filter       = options.colorFilter;
 
   // Vertices
   for (row = 0; row <= subdivisions; ++row) {
@@ -1408,12 +1484,13 @@ VertexData::CreateGroundFromHeightMap(GroundFromHeightMapOptions& options)
       unsigned int heightMapY = static_cast<unsigned>(
         (1.f - (position.z + height / 2.f) / height) * (bufferHeight - 1.f));
 
-      unsigned int pos = (heightMapX + heightMapY * options.bufferWidth) * 4;
-      float r          = static_cast<float>(buffer[pos]) / 255.f;
-      float g          = static_cast<float>(buffer[pos + 1]) / 255.f;
-      float b          = static_cast<float>(buffer[pos + 2]) / 255.f;
+      const unsigned int pos
+        = (heightMapX + heightMapY * options.bufferWidth) * 4;
+      const float r = static_cast<float>(buffer[pos]) / 255.f;
+      const float g = static_cast<float>(buffer[pos + 1]) / 255.f;
+      const float b = static_cast<float>(buffer[pos + 2]) / 255.f;
 
-      float gradient = r * 0.3f + g * 0.59f + b * 0.11f;
+      const float gradient = r * filter.r + g * filter.g + b * filter.b;
 
       position.y = minHeight + (maxHeight - minHeight) * gradient;
 
@@ -2418,6 +2495,231 @@ void VertexData::ComputeNormals(const Float32Array& positions,
   }
 }
 
+void VertexData::ComputeNormals(const Float32Array& positions,
+                                const Uint32Array& indices,
+                                Float32Array& normals,
+                                ComputeNormalsOptions& options)
+{
+  // temporary scalar variables
+  unsigned int index         = 0;   // facet index
+  float p1p2x                = 0.f; // p1p2 vector x coordinate
+  float p1p2y                = 0.f; // p1p2 vector y coordinate
+  float p1p2z                = 0.f; // p1p2 vector z coordinate
+  float p3p2x                = 0.f; // p3p2 vector x coordinate
+  float p3p2y                = 0.f; // p3p2 vector y coordinate
+  float p3p2z                = 0.f; // p3p2 vector z coordinate
+  float faceNormalx          = 0.f; // facet normal x coordinate
+  float faceNormaly          = 0.f; // facet normal y coordinate
+  float faceNormalz          = 0.f; // facet normal z coordinate
+  float length               = 0.f; // facet normal length before normalization
+  unsigned int v1x           = 0;   // vector1 x index in the positions array
+  unsigned int v1y           = 0;   // vector1 y index in the positions array
+  unsigned int v1z           = 0;   // vector1 z index in the positions array
+  unsigned int v2x           = 0;   // vector2 x index in the positions array
+  unsigned int v2y           = 0;   // vector2 y index in the positions array
+  unsigned int v2z           = 0;   // vector2 z index in the positions array
+  unsigned int v3x           = 0;   // vector3 x index in the positions array
+  unsigned int v3y           = 0;   // vector3 y index in the positions array
+  unsigned int v3z           = 0;   // vector3 z index in the positions array
+  bool computeFacetNormals   = (!options.facetNormals.empty()) ? true : false;
+  bool computeFacetPositions = (!options.facetPositions.empty()) ? true : false;
+  bool computeFacetPartitioning
+    = (!options.facetPartitioning.empty()) ? true : false;
+
+  // facetPartitioning reinit if needed
+  unsigned int ox           = 0; // X partitioning index for facet position
+  unsigned int oy           = 0; // Y partinioning index for facet position
+  unsigned int oz           = 0; // Z partinioning index for facet position
+  unsigned int b1x          = 0; // X partitioning index for facet v1 vertex
+  unsigned int b1y          = 0; // Y partitioning index for facet v1 vertex
+  unsigned int b1z          = 0; // z partitioning index for facet v1 vertex
+  unsigned int b2x          = 0; // X partitioning index for facet v2 vertex
+  unsigned int b2y          = 0; // Y partitioning index for facet v2 vertex
+  unsigned int b2z          = 0; // Z partitioning index for facet v2 vertex
+  unsigned int b3x          = 0; // X partitioning index for facet v3 vertex
+  unsigned int b3y          = 0; // Y partitioning index for facet v3 vertex
+  unsigned int b3z          = 0; // Z partitioning index for facet v3 vertex
+  unsigned int block_idx_o  = 0; // facet barycenter block index
+  unsigned int block_idx_v1 = 0; // v1 vertex block index
+  unsigned int block_idx_v2 = 0; // v2 vertex block index
+  unsigned int block_idx_v3 = 0; // v3 vertex block index
+
+  float xSubRatio    = 0.f;
+  float ySubRatio    = 0.f;
+  float zSubRatio    = 0.f;
+  unsigned int subSq = 0.f;
+
+  if (computeFacetPartitioning) {
+    float bbSizeMax = (options.bbSize.x > options.bbSize.y) ? options.bbSize.x :
+                                                              options.bbSize.y;
+    bbSizeMax = (bbSizeMax > options.bbSize.z) ? bbSizeMax : options.bbSize.z;
+    xSubRatio = options.subDiv.x * options.ratio / options.bbSize.x;
+    ySubRatio = options.subDiv.y * options.ratio / options.bbSize.y;
+    zSubRatio = options.subDiv.z * options.ratio / options.bbSize.z;
+    subSq     = options.subDivMax * options.subDivMax;
+    options.facetPartitioning.clear();
+  }
+
+  // reset the normals
+  normals.resize(positions.size());
+  std::fill(normals.begin(), normals.end(), 0.f);
+
+  // Loop : 1 indice triplet = 1 facet
+  size_t nbFaces = indices.size() / 3;
+  for (index = 0; index < nbFaces; index++) {
+
+    // get the indexes of the coordinates of each vertex of the facet
+    v1x = indices[index * 3] * 3;
+    v1y = v1x + 1;
+    v1z = v1x + 2;
+    v2x = indices[index * 3 + 1] * 3;
+    v2y = v2x + 1;
+    v2z = v2x + 2;
+    v3x = indices[index * 3 + 2] * 3;
+    v3y = v3x + 1;
+    v3z = v3x + 2;
+
+    // compute two vectors per facet : p1p2 and p3p2
+    p1p2x = positions[v1x] - positions[v2x];
+    p1p2y = positions[v1y] - positions[v2y];
+    p1p2z = positions[v1z] - positions[v2z];
+
+    p3p2x = positions[v3x] - positions[v2x];
+    p3p2y = positions[v3y] - positions[v2y];
+    p3p2z = positions[v3z] - positions[v2z];
+
+    // compute the face normal with the cross product
+    faceNormalx = p1p2y * p3p2z - p1p2z * p3p2y;
+    faceNormaly = p1p2z * p3p2x - p1p2x * p3p2z;
+    faceNormalz = p1p2x * p3p2y - p1p2y * p3p2x;
+
+    // normalize this normal and store it in the array facetData
+    length = std::sqrt(faceNormalx * faceNormalx + faceNormaly * faceNormaly
+                       + faceNormalz * faceNormalz);
+    length = std_util::almost_equal(length, 0.f) ? 1.f : length;
+    faceNormalx /= length;
+    faceNormaly /= length;
+    faceNormalz /= length;
+
+    if (computeFacetNormals) {
+      options.facetNormals[index].x = faceNormalx;
+      options.facetNormals[index].y = faceNormaly;
+      options.facetNormals[index].z = faceNormalz;
+    }
+
+    if (computeFacetPositions) {
+      // compute and the facet barycenter coordinates in the array
+      // facetPositions
+      options.facetPositions[index].x
+        = (positions[v1x] + positions[v2x] + positions[v3x]) / 3.f;
+      options.facetPositions[index].y
+        = (positions[v1y] + positions[v2y] + positions[v3y]) / 3.f;
+      options.facetPositions[index].z
+        = (positions[v1z] + positions[v2z] + positions[v3z]) / 3.f;
+    }
+
+    if (computeFacetPartitioning) {
+      // store the facet indexes in arrays in the main facetPartitioning array :
+      // compute each facet vertex (+ facet barycenter) index in the partiniong
+      // array
+      ox = static_cast<unsigned>(
+        std::floor((options.facetPositions[index].x
+                    - options.bInfo.minimum.x * options.ratio)
+                   * xSubRatio));
+      oy = static_cast<unsigned>(
+        std::floor((options.facetPositions[index].y
+                    - options.bInfo.minimum.y * options.ratio)
+                   * ySubRatio));
+      oz = static_cast<unsigned>(
+        std::floor((options.facetPositions[index].z
+                    - options.bInfo.minimum.z * options.ratio)
+                   * zSubRatio));
+      b1x = static_cast<unsigned>(
+        std::floor((positions[v1x] - options.bInfo.minimum.x * options.ratio)
+                   * xSubRatio));
+      b1y = static_cast<unsigned>(
+        std::floor((positions[v1y] - options.bInfo.minimum.y * options.ratio)
+                   * ySubRatio));
+      b1z = static_cast<unsigned>(
+        std::floor((positions[v1z] - options.bInfo.minimum.z * options.ratio)
+                   * zSubRatio));
+      b2x = static_cast<unsigned>(
+        std::floor((positions[v2x] - options.bInfo.minimum.x * options.ratio)
+                   * xSubRatio));
+      b2y = static_cast<unsigned>(
+        std::floor((positions[v2y] - options.bInfo.minimum.y * options.ratio)
+                   * ySubRatio));
+      b2z = static_cast<unsigned>(
+        std::floor((positions[v2z] - options.bInfo.minimum.z * options.ratio)
+                   * zSubRatio));
+      b3x = static_cast<unsigned>(
+        std::floor((positions[v3x] - options.bInfo.minimum.x * options.ratio)
+                   * xSubRatio));
+      b3y = static_cast<unsigned>(
+        std::floor((positions[v3y] - options.bInfo.minimum.y * options.ratio)
+                   * ySubRatio));
+      b3z = static_cast<unsigned>(
+        std::floor((positions[v3z] - options.bInfo.minimum.z * options.ratio)
+                   * zSubRatio));
+
+      block_idx_v1 = b1x + options.subDivMax * b1y + subSq * b1z;
+      block_idx_v2 = b2x + options.subDivMax * b2y + subSq * b2z;
+      block_idx_v3 = b3x + options.subDivMax * b3y + subSq * b3z;
+      block_idx_o  = ox + options.subDivMax * oy + subSq * oz;
+
+      const std::array<unsigned int, 4> block_idxs{
+        {block_idx_o, block_idx_v1, block_idx_v2, block_idx_v3}};
+      for (auto& block_idx : block_idxs) {
+        // Check if facetPartitioning needs to be resized
+        if (options.facetPartitioning.size() <= block_idx) {
+          options.facetPartitioning.resize(block_idx + 1);
+        }
+      }
+
+      // push each facet index in each block containing the vertex
+      options.facetPartitioning[block_idx_v1].emplace_back(index);
+      if (block_idx_v2 != block_idx_v1) {
+        options.facetPartitioning[block_idx_v2].emplace_back(index);
+      }
+      if (!(block_idx_v3 == block_idx_v2 || block_idx_v3 == block_idx_v1)) {
+        options.facetPartitioning[block_idx_v3].emplace_back(index);
+      }
+      if (!(block_idx_o == block_idx_v1 || block_idx_o == block_idx_v2
+            || block_idx_o == block_idx_v3)) {
+        options.facetPartitioning[block_idx_o].emplace_back(index);
+      }
+    }
+
+    // compute the normals anyway
+    normals[v1x] += faceNormalx; // accumulate all the normals per face
+    normals[v1y] += faceNormaly;
+    normals[v1z] += faceNormalz;
+    normals[v2x] += faceNormalx;
+    normals[v2y] += faceNormaly;
+    normals[v2z] += faceNormalz;
+    normals[v3x] += faceNormalx;
+    normals[v3y] += faceNormaly;
+    normals[v3z] += faceNormalz;
+  }
+  // last normalization of each normal
+  for (index = 0; index < normals.size() / 3; ++index) {
+    faceNormalx = normals[index * 3];
+    faceNormaly = normals[index * 3 + 1];
+    faceNormalz = normals[index * 3 + 2];
+
+    length = std::sqrt(faceNormalx * faceNormalx + faceNormaly * faceNormaly
+                       + faceNormalz * faceNormalz);
+    length = std_util::almost_equal(length, 0.f) ? 1.f : length;
+    faceNormalx /= length;
+    faceNormaly /= length;
+    faceNormalz /= length;
+
+    normals[index * 3]     = faceNormalx;
+    normals[index * 3 + 1] = faceNormaly;
+    normals[index * 3 + 2] = faceNormalz;
+  }
+}
+
 void VertexData::_ComputeSides(unsigned int sideOrientation,
                                Float32Array& positions, Uint32Array& indices,
                                Float32Array& normals, Float32Array& uvs)
@@ -2486,6 +2788,12 @@ void VertexData::ImportVertexData(const Json::value& parsedVertexData,
   if (parsedVertexData.contains("normals")) {
     vertexData->set(Json::ToArray<float>(parsedVertexData, "normals"),
                     VertexBuffer::NormalKind);
+  }
+
+  // tangents
+  if (parsedVertexData.contains("tangents")) {
+    vertexData->set(Json::ToArray<float>(parsedVertexData, "tangents"),
+                    VertexBuffer::TangentKind);
   }
 
   // uvs

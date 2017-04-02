@@ -44,6 +44,19 @@ BoxOptions::~BoxOptions()
 }
 
 //------------------------------------------------------------------------------
+// Compute normals options
+//------------------------------------------------------------------------------
+
+ComputeNormalsOptions::ComputeNormalsOptions()
+    : subDivMax{0}, ratio{1.f}, bInfo{Vector3::Zero(), Vector3::Zero()}
+{
+}
+
+ComputeNormalsOptions::~ComputeNormalsOptions()
+{
+}
+
+//------------------------------------------------------------------------------
 // Cylinder or cone mesh options
 //------------------------------------------------------------------------------
 
@@ -212,6 +225,7 @@ GroundFromHeightMapOptions::GroundFromHeightMapOptions()
     , maxHeight{10.f}
     , bufferWidth{1}
     , bufferHeight{1}
+    , colorFilter{Color3(0.3f, 0.59f, 0.11f)}
     , updatable{false}
     , onReady{nullptr}
 {

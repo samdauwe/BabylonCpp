@@ -17,58 +17,174 @@ public:
   ~VertexData();
 
   void set(const Float32Array& data, unsigned int kind);
-  void applyToMesh(Mesh* mesh, bool updatable = false);
-  void applyToGeometry(Geometry* geometry, bool updatable = false);
-  void updateMesh(Mesh* mesh, bool updateExtends = false,
-                  bool makeItUnique = false);
-  void updateGeometry(Geometry* geometry, bool updateExtends = false,
-                      bool makeItUnique = false);
-  void transform(const Matrix& matrix);
-  void merge(VertexData* other);
+
+  /**
+   * @brief Associates the vertexData to the passed Mesh.
+   * Sets it as updatable or not (default `false`).
+   * @returns The VertexData.
+   */
+  VertexData& applyToMesh(Mesh* mesh, bool updatable = false);
+
+  /**
+   * @brief Associates the vertexData to the passed Geometry.
+   * Sets it as updatable or not (default `false`).
+   * @returns The VertexData.
+   */
+  VertexData& applyToGeometry(Geometry* geometry, bool updatable = false);
+
+  /**
+   * @brief Updates the associated mesh.
+   * @returns The VertexData.
+   */
+  VertexData& updateMesh(Mesh* mesh, bool updateExtends = false,
+                         bool makeItUnique = false);
+
+  /**
+   * @brief Updates the associated geometry.
+   * @returns The VertexData.
+   */
+  VertexData& updateGeometry(Geometry* geometry, bool updateExtends = false,
+                             bool makeItUnique = false);
+
+  /**
+   * @brief Transforms each position and each normal of the vertexData according
+   * to the passed Matrix.
+   * @returns The VertexData.
+   */
+  VertexData& transform(const Matrix& matrix);
+
+  /**
+   * @brief Merges the passed VertexData into the current one.
+   * @returns The modified VertexData.
+   */
+  VertexData& merge(VertexData* other);
+
+  /**
+   * @brief Serializes the VertexData.
+   * @returns The serialized object.
+   */
   Json::object serialize() const;
 
   /** Statics **/
+
+  /**
+   * @brief Returns the object VertexData associated to the passed mesh.
+   */
   static std::unique_ptr<VertexData>
   ExtractFromMesh(Mesh* mesh, bool copyWhenShared = false);
+
+  /**
+   * @brief Returns the object VertexData associated to the passed geometry.
+   */
   static std::unique_ptr<VertexData> ExtractFromGeometry(Geometry* geometry,
                                                          bool copyWhenShared);
+
+  /**
+   * @brief Creates the vertexData of the Ribbon.
+   */
   static std::unique_ptr<VertexData> CreateRibbon(RibbonOptions& options);
+
+  /**
+   * @brief Creates the VertexData of the Box.
+   */
   static std::unique_ptr<VertexData> CreateBox(BoxOptions& options);
+
+  /**
+   * @brief Creates the VertexData of the Sphere.
+   */
   static std::unique_ptr<VertexData> CreateSphere(SphereOptions& options);
-  // Cylinder and cone
+
+  /**
+   * @brief Creates the VertexData of the Cylinder or Cone.
+   */
   static std::unique_ptr<VertexData> CreateCylinder(CylinderOptions& options);
+
+  /**
+   * @brief Creates the VertexData of the Torus.
+   */
   static std::unique_ptr<VertexData> CreateTorus(TorusOptions& options);
+
+  /**
+   * @brief Creates the VertexData of the LineSystem.
+   */
   static std::unique_ptr<VertexData>
   CreateLineSystem(LineSystemOptions& options);
+
+  /**
+   * @brief Create the VertexData of the DashedLines.
+   */
   static std::unique_ptr<VertexData>
   CreateDashedLines(DashedLinesOptions& options);
+
+  /**
+   * @brief Creates the VertexData of the Ground.
+   */
   static std::unique_ptr<VertexData> CreateGround(GroundOptions& options);
+
+  /**
+   * @brief Creates the VertexData of the TiledGround.
+   */
   static std::unique_ptr<VertexData>
   CreateTiledGround(TiledGroundOptions& options);
+
+  /**
+   * @brief Creates the VertexData of the Ground designed from a heightmap.
+   */
   static std::unique_ptr<VertexData>
   CreateGroundFromHeightMap(GroundFromHeightMapOptions& options);
+
+  /**
+   * @brief Creates the VertexData of the Plane.
+   */
   static std::unique_ptr<VertexData> CreatePlane(PlaneOptions& options);
+
+  /**
+   * @brief Creates the VertexData of the Disc or regular Polygon.
+   */
   static std::unique_ptr<VertexData> CreateDisc(DiscOptions& options);
+
+  /**
+   * @brief Creates the VertexData of the IcoSphere.
+   */
   static std::unique_ptr<VertexData> CreateIcoSphere(IcoSphereOptions& options);
+
+  /**
+   * @brief Creates the VertexData of the Polyhedron.
+   */
   static std::unique_ptr<VertexData>
   CreatePolyhedron(PolyhedronOptions& options);
+
+  /**
+   * @brief Creates the VertexData of the Torus Knot.
+   */
   static std::unique_ptr<VertexData> CreateTorusKnot(TorusKnotOptions& options);
 
-  // Tools
+  /** Tools **/
+
   /**
-   * @param {any} - positions (number[] or Float32Array)
-   * @param {any} - indices   (number[] or Uint32Array)
-   * @param {any} - normals   (number[] or Float32Array)
+   * @brief Computes the normals of the vertex data object.
    */
   static void ComputeNormals(const Float32Array& positions,
                              const Uint32Array& indices, Float32Array& normals);
+
+  /**
+   * @brief Computes the normals of the vertex data object.
+   */
+  static void ComputeNormals(const Float32Array& positions,
+                             const Uint32Array& indices, Float32Array& normals,
+                             ComputeNormalsOptions& options);
+
+  /**
+   * @brief Creates a new VertexData from the imported parameters.
+   */
   static void ImportVertexData(const Json::value& parsedVertexData,
                                Geometry* geometry);
 
 private:
-  void _applyTo(IGetSetVerticesData* meshOrGeometry, bool updatable = false);
-  void _update(IGetSetVerticesData* meshOrGeometry, bool updateExtends = false,
-               bool makeItUnique = false);
+  VertexData& _applyTo(IGetSetVerticesData* meshOrGeometry,
+                       bool updatable = false);
+  VertexData& _update(IGetSetVerticesData* meshOrGeometry,
+                      bool updateExtends = false, bool makeItUnique = false);
   static std::unique_ptr<VertexData>
   _ExtractFrom(IGetSetVerticesData* meshOrGeometry, bool copyWhenShared);
   static void _ComputeSides(unsigned int sideOrientation,
@@ -78,6 +194,7 @@ private:
 public:
   Float32Array positions;
   Float32Array normals;
+  Float32Array tangents;
   Float32Array uvs;
   Float32Array uvs2;
   Float32Array uvs3;
@@ -89,7 +206,7 @@ public:
   Float32Array matricesWeights;
   Float32Array matricesIndicesExtra;
   Float32Array matricesWeightsExtra;
-  Uint32Array indices;
+  IndicesArray indices;
 
 public:
   Uint32Array _idx;

@@ -274,6 +274,7 @@ class VertexBuffer;
 class VertexData;
 // - Options
 class BoxOptions;
+class ComputeNormalsOptions;
 class CylinderOptions;
 class DashedLinesOptions;
 class DecalOptions;
