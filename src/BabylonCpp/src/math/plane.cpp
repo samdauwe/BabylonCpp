@@ -87,8 +87,8 @@ std::array<float, 4> Plane::asArray() const
 // Methods
 Plane& Plane::normalize()
 {
-  float norm = sqrtf((normal.x * normal.x) + (normal.y * normal.y)
-                     + (normal.z * normal.z));
+  const float norm = sqrtf((normal.x * normal.x) + (normal.y * normal.y)
+                           + (normal.z * normal.z));
   float magnitude = 0.f;
 
   if (!std_util::almost_equal(norm, 0.f)) {
@@ -106,24 +106,28 @@ Plane& Plane::normalize()
 
 Plane Plane::transform(const Matrix& transformation) const
 {
-  Matrix transposedMatrix = Matrix::Transpose(transformation);
-  float x                 = normal.x;
-  float y                 = normal.y;
-  float z                 = normal.z;
-  float dTemp             = d;
+  const auto transposedMatrix = Matrix::Transpose(transformation);
+  const float x               = normal.x;
+  const float y               = normal.y;
+  const float z               = normal.z;
+  const float dTemp           = d;
 
-  float normalX = (((x * transposedMatrix.m[0]) + (y * transposedMatrix.m[1]))
-                   + (z * transposedMatrix.m[2]))
-                  + (dTemp * transposedMatrix.m[3]);
-  float normalY = (((x * transposedMatrix.m[4]) + (y * transposedMatrix.m[5]))
-                   + (z * transposedMatrix.m[6]))
-                  + (dTemp * transposedMatrix.m[7]);
-  float normalZ = (((x * transposedMatrix.m[8]) + (y * transposedMatrix.m[9]))
-                   + (z * transposedMatrix.m[10]))
-                  + (dTemp * transposedMatrix.m[11]);
-  float finalD = (((x * transposedMatrix.m[12]) + (y * transposedMatrix.m[13]))
-                  + (z * transposedMatrix.m[14]))
-                 + (dTemp * transposedMatrix.m[15]);
+  const float normalX
+    = (((x * transposedMatrix.m[0]) + (y * transposedMatrix.m[1]))
+       + (z * transposedMatrix.m[2]))
+      + (dTemp * transposedMatrix.m[3]);
+  const float normalY
+    = (((x * transposedMatrix.m[4]) + (y * transposedMatrix.m[5]))
+       + (z * transposedMatrix.m[6]))
+      + (dTemp * transposedMatrix.m[7]);
+  const float normalZ
+    = (((x * transposedMatrix.m[8]) + (y * transposedMatrix.m[9]))
+       + (z * transposedMatrix.m[10]))
+      + (dTemp * transposedMatrix.m[11]);
+  const float finalD
+    = (((x * transposedMatrix.m[12]) + (y * transposedMatrix.m[13]))
+       + (z * transposedMatrix.m[14]))
+      + (dTemp * transposedMatrix.m[15]);
 
   return Plane(normalX, normalY, normalZ, finalD);
 }
@@ -137,17 +141,17 @@ float Plane::dotCoordinate(const Vector3& point) const
 Plane& Plane::copyFromPoints(const Vector3& point1, const Vector3& point2,
                              const Vector3& point3)
 {
-  float x1      = point2.x - point1.x;
-  float y1      = point2.y - point1.y;
-  float z1      = point2.z - point1.z;
-  float x2      = point3.x - point1.x;
-  float y2      = point3.y - point1.y;
-  float z2      = point3.z - point1.z;
-  float yz      = (y1 * z2) - (z1 * y2);
-  float xz      = (z1 * x2) - (x1 * z2);
-  float xy      = (x1 * y2) - (y1 * x2);
-  float pyth    = sqrtf((yz * yz) + (xz * xz) + (xy * xy));
-  float invPyth = 0.f;
+  const float x1   = point2.x - point1.x;
+  const float y1   = point2.y - point1.y;
+  const float z1   = point2.z - point1.z;
+  const float x2   = point3.x - point1.x;
+  const float y2   = point3.y - point1.y;
+  const float z2   = point3.z - point1.z;
+  const float yz   = (y1 * z2) - (z1 * y2);
+  const float xz   = (z1 * x2) - (x1 * z2);
+  const float xy   = (x1 * y2) - (y1 * x2);
+  const float pyth = sqrtf((yz * yz) + (xz * xz) + (xy * xy));
+  float invPyth    = 0.f;
 
   if (!std_util::almost_equal(pyth, 0.f)) {
     invPyth = 1.f / pyth;
@@ -166,7 +170,7 @@ Plane& Plane::copyFromPoints(const Vector3& point1, const Vector3& point2,
 
 bool Plane::isFrontFacingTo(const Vector3& direction, float epsilon) const
 {
-  float dot = Vector3::Dot(normal, direction);
+  const float dot = Vector3::Dot(normal, direction);
 
   return (dot <= epsilon);
 }
@@ -207,7 +211,8 @@ float Plane::SignedDistanceToPlaneFromPositionAndNormal(const Vector3& origin,
                                                         const Vector3& normal,
                                                         const Vector3& point)
 {
-  float id = -(normal.x * origin.x + normal.y * origin.y + normal.z * origin.z);
+  const float id
+    = -(normal.x * origin.x + normal.y * origin.y + normal.z * origin.z);
 
   return Vector3::Dot(point, normal) + id;
 }

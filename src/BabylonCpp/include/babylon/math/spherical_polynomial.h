@@ -19,6 +19,8 @@ public:
   std::unique_ptr<SphericalPolynomial> clone() const;
 
   void addAmbient(const Color3& color);
+
+  /** Statics **/
   static SphericalPolynomial
   getSphericalPolynomialFromHarmonics(const SphericalHarmonics& harmonics);
 

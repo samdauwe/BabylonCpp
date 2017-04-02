@@ -82,7 +82,7 @@ int Color3::getHashCode() const
 }
 
 /**  Operators **/
-Color3& Color3::toArray(Float32Array& array, unsigned int index)
+const Color3& Color3::toArray(Float32Array& array, unsigned int index) const
 {
   if (array.size() < index + 3) {
     array.resize(index + 3);
@@ -115,7 +115,8 @@ Color3 Color3::multiply(const Color3& otherColor) const
   return Color3(r * otherColor.r, g * otherColor.g, b * otherColor.b);
 }
 
-Color3& Color3::multiplyToRef(const Color3& otherColor, Color3& result)
+const Color3& Color3::multiplyToRef(const Color3& otherColor,
+                                    Color3& result) const
 {
   result.r = r * otherColor.r;
   result.g = g * otherColor.g;
@@ -142,7 +143,7 @@ Color3 Color3::scale(float iscale) const
   return Color3(r * iscale, g * iscale, b * iscale);
 }
 
-Color3& Color3::scaleToRef(float iscale, Color3& result)
+const Color3& Color3::scaleToRef(float iscale, Color3& result) const
 {
   result.r = r * iscale;
   result.g = g * iscale;
@@ -156,7 +157,7 @@ Color3 Color3::add(const Color3& otherColor) const
   return Color3(r + otherColor.r, g + otherColor.g, b + otherColor.b);
 }
 
-Color3& Color3::addToRef(const Color3& otherColor, Color3& result)
+const Color3& Color3::addToRef(const Color3& otherColor, Color3& result) const
 {
   result.r = r + otherColor.r;
   result.g = g + otherColor.g;
@@ -170,7 +171,8 @@ Color3 Color3::subtract(const Color3& otherColor) const
   return Color3(r - otherColor.r, g - otherColor.g, b - otherColor.b);
 }
 
-Color3& Color3::subtractToRef(const Color3& otherColor, Color3& result)
+const Color3& Color3::subtractToRef(const Color3& otherColor,
+                                    Color3& result) const
 {
   result.r = r - otherColor.r;
   result.g = g - otherColor.g;
@@ -204,15 +206,15 @@ Color3& Color3::set(float red, float green, float blue)
 
 std::string Color3::toHexString() const
 {
-  int intR = static_cast<int>(r * 255) | 0;
-  int intG = static_cast<int>(g * 255) | 0;
-  int intB = static_cast<int>(b * 255) | 0;
+  const int intR = static_cast<int>(r * 255) | 0;
+  const int intG = static_cast<int>(g * 255) | 0;
+  const int intB = static_cast<int>(b * 255) | 0;
 
-  std::stringstream stream;
-  stream << "#" << String::toUpperCase(MathTools::ToHex(intR))
-         << String::toUpperCase(MathTools::ToHex(intG))
-         << String::toUpperCase(MathTools::ToHex(intB));
-  return stream.str();
+  std::ostringstream ostream;
+  ostream << "#" << String::toUpperCase(MathTools::ToHex(intR))
+          << String::toUpperCase(MathTools::ToHex(intG))
+          << String::toUpperCase(MathTools::ToHex(intB));
+  return ostream.str();
 }
 
 Color3 Color3::toLinearSpace()
@@ -311,9 +313,9 @@ Color3 Color3::FromInts(int r, int g, int b)
 
 Color3 Color3::Lerp(const Color3& start, const Color3& end, float amount)
 {
-  float r = start.r + ((end.r - start.r) * amount);
-  float g = start.g + ((end.g - start.g) * amount);
-  float b = start.b + ((end.b - start.b) * amount);
+  const float r = start.r + ((end.r - start.r) * amount);
+  const float g = start.g + ((end.g - start.g) * amount);
+  const float b = start.b + ((end.b - start.b) * amount);
 
   return Color3(r, g, b);
 }

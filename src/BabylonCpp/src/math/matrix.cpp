@@ -76,8 +76,9 @@ bool Matrix::isIdentity() const
 {
   if (!std_util::almost_equal(m[0], 1.f) || !std_util::almost_equal(m[5], 1.f)
       || !std_util::almost_equal(m[10], 1.f)
-      || !std_util::almost_equal(m[15], 1.f))
+      || !std_util::almost_equal(m[15], 1.f)) {
     return false;
+  }
 
   if (!std_util::almost_equal(m[1], 0.f) || !std_util::almost_equal(m[2], 0.f)
       || !std_util::almost_equal(m[3], 0.f)
@@ -89,20 +90,21 @@ bool Matrix::isIdentity() const
       || !std_util::almost_equal(m[11], 0.f)
       || !std_util::almost_equal(m[12], 0.f)
       || !std_util::almost_equal(m[13], 0.f)
-      || !std_util::almost_equal(m[14], 0.f))
+      || !std_util::almost_equal(m[14], 0.f)) {
     return false;
+  }
 
   return true;
 }
 
 float Matrix::determinant() const
 {
-  float temp1 = (m[10] * m[15]) - (m[11] * m[14]);
-  float temp2 = (m[9] * m[15]) - (m[11] * m[13]);
-  float temp3 = (m[9] * m[14]) - (m[10] * m[13]);
-  float temp4 = (m[8] * m[15]) - (m[11] * m[12]);
-  float temp5 = (m[8] * m[14]) - (m[10] * m[12]);
-  float temp6 = (m[8] * m[13]) - (m[9] * m[12]);
+  const float temp1 = (m[10] * m[15]) - (m[11] * m[14]);
+  const float temp2 = (m[9] * m[15]) - (m[11] * m[13]);
+  const float temp3 = (m[9] * m[14]) - (m[10] * m[13]);
+  const float temp4 = (m[8] * m[15]) - (m[11] * m[12]);
+  const float temp5 = (m[8] * m[14]) - (m[10] * m[12]);
+  const float temp6 = (m[8] * m[13]) - (m[9] * m[12]);
 
   return ((((m[0] * (((m[5] * temp1) - (m[6] * temp2)) + (m[7] * temp3)))
             - (m[1] * (((m[4] * temp1) - (m[6] * temp4)) + (m[7] * temp5))))
@@ -138,7 +140,7 @@ Matrix& Matrix::reset()
   return *this;
 }
 
-Matrix Matrix::subtract(const Matrix& other)
+Matrix Matrix::subtract(const Matrix& other) const
 {
   Matrix result;
 
@@ -147,7 +149,7 @@ Matrix Matrix::subtract(const Matrix& other)
   return result;
 }
 
-Matrix& Matrix::subtractFromRef(const Matrix& other, Matrix& result)
+const Matrix& Matrix::subtractFromRef(const Matrix& other, Matrix& result) const
 {
   for (unsigned int index = 0; index < 16; ++index) {
     result.m[index] = m[index] - other.m[index];
@@ -156,7 +158,7 @@ Matrix& Matrix::subtractFromRef(const Matrix& other, Matrix& result)
   return *this;
 }
 
-Matrix Matrix::add(const Matrix& other)
+const Matrix Matrix::add(const Matrix& other) const
 {
   Matrix result;
 
@@ -165,7 +167,7 @@ Matrix Matrix::add(const Matrix& other)
   return result;
 }
 
-Matrix& Matrix::addToRef(const Matrix& other, Matrix& result)
+const Matrix& Matrix::addToRef(const Matrix& other, Matrix& result) const
 {
   for (unsigned int index = 0; index < 16; ++index) {
     result.m[index] = m[index] + other.m[index];
@@ -183,50 +185,51 @@ Matrix& Matrix::addToSelf(const Matrix& other)
   return *this;
 }
 
-Matrix& Matrix::invertToRef(Matrix& other)
+const Matrix& Matrix::invertToRef(Matrix& other) const
 {
 #if BABYLONCPP_OPTION_ENABLE_SIMD == true
   simdMatrix.invertToRefSIMD(other);
 #else
-  float l1  = m[0];
-  float l2  = m[1];
-  float l3  = m[2];
-  float l4  = m[3];
-  float l5  = m[4];
-  float l6  = m[5];
-  float l7  = m[6];
-  float l8  = m[7];
-  float l9  = m[8];
-  float l10 = m[9];
-  float l11 = m[10];
-  float l12 = m[11];
-  float l13 = m[12];
-  float l14 = m[13];
-  float l15 = m[14];
-  float l16 = m[15];
-  float l17 = (l11 * l16) - (l12 * l15);
-  float l18 = (l10 * l16) - (l12 * l14);
-  float l19 = (l10 * l15) - (l11 * l14);
-  float l20 = (l9 * l16) - (l12 * l13);
-  float l21 = (l9 * l15) - (l11 * l13);
-  float l22 = (l9 * l14) - (l10 * l13);
-  float l23 = ((l6 * l17) - (l7 * l18)) + (l8 * l19);
-  float l24 = -(((l5 * l17) - (l7 * l20)) + (l8 * l21));
-  float l25 = ((l5 * l18) - (l6 * l20)) + (l8 * l22);
-  float l26 = -(((l5 * l19) - (l6 * l21)) + (l7 * l22));
-  float l27 = 1.f / ((((l1 * l23) + (l2 * l24)) + (l3 * l25)) + (l4 * l26));
-  float l28 = (l7 * l16) - (l8 * l15);
-  float l29 = (l6 * l16) - (l8 * l14);
-  float l30 = (l6 * l15) - (l7 * l14);
-  float l31 = (l5 * l16) - (l8 * l13);
-  float l32 = (l5 * l15) - (l7 * l13);
-  float l33 = (l5 * l14) - (l6 * l13);
-  float l34 = (l7 * l12) - (l8 * l11);
-  float l35 = (l6 * l12) - (l8 * l10);
-  float l36 = (l6 * l11) - (l7 * l10);
-  float l37 = (l5 * l12) - (l8 * l9);
-  float l38 = (l5 * l11) - (l7 * l9);
-  float l39 = (l5 * l10) - (l6 * l9);
+  const float l1  = m[0];
+  const float l2  = m[1];
+  const float l3  = m[2];
+  const float l4  = m[3];
+  const float l5  = m[4];
+  const float l6  = m[5];
+  const float l7  = m[6];
+  const float l8  = m[7];
+  const float l9  = m[8];
+  const float l10 = m[9];
+  const float l11 = m[10];
+  const float l12 = m[11];
+  const float l13 = m[12];
+  const float l14 = m[13];
+  const float l15 = m[14];
+  const float l16 = m[15];
+  const float l17 = (l11 * l16) - (l12 * l15);
+  const float l18 = (l10 * l16) - (l12 * l14);
+  const float l19 = (l10 * l15) - (l11 * l14);
+  const float l20 = (l9 * l16) - (l12 * l13);
+  const float l21 = (l9 * l15) - (l11 * l13);
+  const float l22 = (l9 * l14) - (l10 * l13);
+  const float l23 = ((l6 * l17) - (l7 * l18)) + (l8 * l19);
+  const float l24 = -(((l5 * l17) - (l7 * l20)) + (l8 * l21));
+  const float l25 = ((l5 * l18) - (l6 * l20)) + (l8 * l22);
+  const float l26 = -(((l5 * l19) - (l6 * l21)) + (l7 * l22));
+  const float l27
+    = 1.f / ((((l1 * l23) + (l2 * l24)) + (l3 * l25)) + (l4 * l26));
+  const float l28 = (l7 * l16) - (l8 * l15);
+  const float l29 = (l6 * l16) - (l8 * l14);
+  const float l30 = (l6 * l15) - (l7 * l14);
+  const float l31 = (l5 * l16) - (l8 * l13);
+  const float l32 = (l5 * l15) - (l7 * l13);
+  const float l33 = (l5 * l14) - (l6 * l13);
+  const float l34 = (l7 * l12) - (l8 * l11);
+  const float l35 = (l6 * l12) - (l8 * l10);
+  const float l36 = (l6 * l11) - (l7 * l10);
+  const float l37 = (l5 * l12) - (l8 * l9);
+  const float l38 = (l5 * l11) - (l7 * l9);
+  const float l39 = (l5 * l10) - (l6 * l9);
 
   other.m[0]  = l23 * l27;
   other.m[4]  = l24 * l27;
@@ -272,7 +275,7 @@ Vector3 Matrix::getTranslation() const
   return Vector3(m[12], m[13], m[14]);
 }
 
-Matrix& Matrix::getTranslationToRef(Vector3& result)
+const Matrix& Matrix::getTranslationToRef(Vector3& result) const
 {
   result.x = m[12];
   result.y = m[13];
@@ -290,7 +293,7 @@ Matrix& Matrix::removeRotationAndScaling()
   return *this;
 }
 
-Matrix Matrix::multiply(Matrix& other)
+const Matrix Matrix::multiply(Matrix& other) const
 {
   Matrix result;
 
@@ -299,7 +302,7 @@ Matrix Matrix::multiply(Matrix& other)
   return result;
 }
 
-Matrix Matrix::multiply(Matrix&& other)
+const Matrix Matrix::multiply(Matrix&& other) const
 {
   Matrix result;
 
@@ -317,10 +320,12 @@ Matrix& Matrix::copyFrom(const Matrix& other)
   return *this;
 }
 
-Matrix& Matrix::copyToArray(std::array<float, 16>& array, unsigned int offset)
+const Matrix& Matrix::copyToArray(std::array<float, 16>& array,
+                                  unsigned int offset) const
 {
-  if (offset != 0)
+  if (offset != 0) {
     return *this;
+  }
 
   for (unsigned int index = 0; index != 16; ++index) {
     array[offset + index] = m[index];
@@ -329,10 +334,12 @@ Matrix& Matrix::copyToArray(std::array<float, 16>& array, unsigned int offset)
   return *this;
 }
 
-Matrix& Matrix::copyToArray(Float32Array& array, unsigned int offset)
+const Matrix& Matrix::copyToArray(Float32Array& array,
+                                  unsigned int offset) const
 {
-  if (array.size() < 16 + offset)
+  if (array.size() < 16 + offset) {
     return *this;
+  }
 
   for (unsigned int index = 0; index != 16; ++index) {
     array[offset + index] = m[index];
@@ -341,53 +348,53 @@ Matrix& Matrix::copyToArray(Float32Array& array, unsigned int offset)
   return *this;
 }
 
-Matrix& Matrix::multiplyToRef(const Matrix& other, Matrix& result)
+const Matrix& Matrix::multiplyToRef(const Matrix& other, Matrix& result) const
 {
   multiplyToArray(other, result.m, 0);
 
   return *this;
 }
 
-Matrix& Matrix::multiplyToArray(const Matrix& other,
-                                std::array<float, 16>& result,
-                                unsigned int offset)
+const Matrix& Matrix::multiplyToArray(const Matrix& other,
+                                      std::array<float, 16>& result,
+                                      unsigned int offset) const
 {
 #if BABYLONCPP_OPTION_ENABLE_SIMD == true
   simdMatrix.multiplyToArraySIMD(other, result, offset);
 #else
-  float tm0  = m[0];
-  float tm1  = m[1];
-  float tm2  = m[2];
-  float tm3  = m[3];
-  float tm4  = m[4];
-  float tm5  = m[5];
-  float tm6  = m[6];
-  float tm7  = m[7];
-  float tm8  = m[8];
-  float tm9  = m[9];
-  float tm10 = m[10];
-  float tm11 = m[11];
-  float tm12 = m[12];
-  float tm13 = m[13];
-  float tm14 = m[14];
-  float tm15 = m[15];
+  const float tm0  = m[0];
+  const float tm1  = m[1];
+  const float tm2  = m[2];
+  const float tm3  = m[3];
+  const float tm4  = m[4];
+  const float tm5  = m[5];
+  const float tm6  = m[6];
+  const float tm7  = m[7];
+  const float tm8  = m[8];
+  const float tm9  = m[9];
+  const float tm10 = m[10];
+  const float tm11 = m[11];
+  const float tm12 = m[12];
+  const float tm13 = m[13];
+  const float tm14 = m[14];
+  const float tm15 = m[15];
 
-  float om0  = other.m[0];
-  float om1  = other.m[1];
-  float om2  = other.m[2];
-  float om3  = other.m[3];
-  float om4  = other.m[4];
-  float om5  = other.m[5];
-  float om6  = other.m[6];
-  float om7  = other.m[7];
-  float om8  = other.m[8];
-  float om9  = other.m[9];
-  float om10 = other.m[10];
-  float om11 = other.m[11];
-  float om12 = other.m[12];
-  float om13 = other.m[13];
-  float om14 = other.m[14];
-  float om15 = other.m[15];
+  const float om0  = other.m[0];
+  const float om1  = other.m[1];
+  const float om2  = other.m[2];
+  const float om3  = other.m[3];
+  const float om4  = other.m[4];
+  const float om5  = other.m[5];
+  const float om6  = other.m[6];
+  const float om7  = other.m[7];
+  const float om8  = other.m[8];
+  const float om9  = other.m[9];
+  const float om10 = other.m[10];
+  const float om11 = other.m[11];
+  const float om12 = other.m[12];
+  const float om13 = other.m[13];
+  const float om14 = other.m[14];
+  const float om15 = other.m[15];
 
   result[offset]     = tm0 * om0 + tm1 * om4 + tm2 * om8 + tm3 * om12;
   result[offset + 1] = tm0 * om1 + tm1 * om5 + tm2 * om9 + tm3 * om13;
@@ -413,11 +420,12 @@ Matrix& Matrix::multiplyToArray(const Matrix& other,
   return *this;
 }
 
-Matrix& Matrix::multiplyToArray(const Matrix& other, Float32Array& result,
-                                unsigned int offset)
+const Matrix& Matrix::multiplyToArray(const Matrix& other, Float32Array& result,
+                                      unsigned int offset) const
 {
-  if (result.size() < 16 + offset)
+  if (result.size() < 16 + offset) {
     return *this;
+  }
 
   std::array<float, 16> array;
   multiplyToArray(other, array, offset);
@@ -455,9 +463,10 @@ bool Matrix::decompose(Vector3& scale, Quaternion& rotation,
   translation.y = m[13];
   translation.z = m[14];
 
-  float xs = MathTools::Sign(m[0] * m[1] * m[2] * m[3]) < 0 ? -1.f : 1.f;
-  float ys = MathTools::Sign(m[4] * m[5] * m[6] * m[7]) < 0 ? -1.f : 1.f;
-  float zs = MathTools::Sign(m[8] * m[9] * m[10] * m[11]) < 0 ? -1.f : 1.f;
+  const float xs = MathTools::Sign(m[0] * m[1] * m[2] * m[3]) < 0 ? -1.f : 1.f;
+  const float ys = MathTools::Sign(m[4] * m[5] * m[6] * m[7]) < 0 ? -1.f : 1.f;
+  const float zs
+    = MathTools::Sign(m[8] * m[9] * m[10] * m[11]) < 0 ? -1.f : 1.f;
 
   scale.x = xs * std::sqrt(m[0] * m[0] + m[1] * m[1] + m[2] * m[2]);
   scale.y = ys * std::sqrt(m[4] * m[4] + m[5] * m[5] + m[6] * m[6]);
@@ -493,15 +502,15 @@ Matrix Matrix::getRotationMatrix() const
   return result;
 }
 
-Matrix const& Matrix::getRotationMatrixToRef(Matrix& result) const
+const Matrix& Matrix::getRotationMatrixToRef(Matrix& result) const
 {
-  float xs = m[0] * m[1] * m[2] * m[3] < 0 ? -1 : 1;
-  float ys = m[4] * m[5] * m[6] * m[7] < 0 ? -1 : 1;
-  float zs = m[8] * m[9] * m[10] * m[11] < 0 ? -1 : 1;
+  const float xs = m[0] * m[1] * m[2] * m[3] < 0 ? -1 : 1;
+  const float ys = m[4] * m[5] * m[6] * m[7] < 0 ? -1 : 1;
+  const float zs = m[8] * m[9] * m[10] * m[11] < 0 ? -1 : 1;
 
-  float sx = xs * std::sqrt(m[0] * m[0] + m[1] * m[1] + m[2] * m[2]);
-  float sy = ys * std::sqrt(m[4] * m[4] + m[5] * m[5] + m[6] * m[6]);
-  float sz = zs * std::sqrt(m[8] * m[8] + m[9] * m[9] + m[10] * m[10]);
+  const float sx = xs * std::sqrt(m[0] * m[0] + m[1] * m[1] + m[2] * m[2]);
+  const float sy = ys * std::sqrt(m[4] * m[4] + m[5] * m[5] + m[6] * m[6]);
+  const float sz = zs * std::sqrt(m[8] * m[8] + m[9] * m[9] + m[10] * m[10]);
 
   Matrix::FromValuesToRef(m[0] / sx, m[1] / sx, m[2] / sx, 0.f,  //
                           m[4] / sy, m[5] / sy, m[6] / sy, 0.f,  //
@@ -522,7 +531,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix& matrix)
   return os;
 }
 
-Matrix Matrix::operator+(const Matrix& other)
+Matrix Matrix::operator+(const Matrix& other) const
 {
   return add(other);
 }
@@ -532,12 +541,12 @@ Matrix& Matrix::operator+=(const Matrix& other)
   return addToSelf(other);
 }
 
-Matrix Matrix::operator-(const Matrix& other)
+Matrix Matrix::operator-(const Matrix& other) const
 {
   return subtract(other);
 }
 
-Matrix Matrix::operator*(Matrix& other)
+Matrix Matrix::operator*(Matrix& other) const
 {
   return multiply(other);
 }
@@ -622,7 +631,7 @@ Vector4 Matrix::getRow(unsigned int index) const
     return Vector4(-1.f, -1.f, -1.f, -1.f);
   }
 
-  unsigned int i = index * 4;
+  const unsigned int i = index * 4;
   return Vector4(m[i + 0], m[i + 1], m[i + 2], m[i + 3]);
 }
 
@@ -753,8 +762,8 @@ Matrix Matrix::Invert(Matrix& source)
 
 void Matrix::RotationXToRef(float angle, Matrix& result)
 {
-  float s = std::sin(angle);
-  float c = std::cos(angle);
+  const float s = std::sin(angle);
+  const float c = std::cos(angle);
 
   result.m[0]  = 1.f;
   result.m[15] = 1.f;
@@ -787,8 +796,8 @@ Matrix Matrix::RotationY(float angle)
 
 void Matrix::RotationYToRef(float angle, Matrix& result)
 {
-  float s = std::sin(angle);
-  float c = std::cos(angle);
+  const float s = std::sin(angle);
+  const float c = std::cos(angle);
 
   result.m[5]  = 1.f;
   result.m[15] = 1.f;
@@ -821,8 +830,8 @@ Matrix Matrix::RotationZ(float angle)
 
 void Matrix::RotationZToRef(float angle, Matrix& result)
 {
-  float s = std::sin(angle);
-  float c = std::cos(angle);
+  const float s = std::sin(angle);
+  const float c = std::cos(angle);
 
   result.m[10] = 1.f;
   result.m[15] = 1.f;
@@ -853,9 +862,9 @@ Matrix Matrix::RotationAxis(Vector3& axis, float angle)
 
 void Matrix::RotationAxisToRef(Vector3& axis, float angle, Matrix& result)
 {
-  float s  = std::sin(-angle);
-  float c  = std::cos(-angle);
-  float c1 = 1.f - c;
+  const float s  = std::sin(-angle);
+  const float c  = std::cos(-angle);
+  const float c1 = 1.f - c;
 
   axis.normalize();
 
@@ -1014,9 +1023,9 @@ void Matrix::LookAtLHToRef(const Vector3& eye, const Vector3& target,
   _yAxis.normalize();
 
   // Eye angles
-  float ex = -Vector3::Dot(_xAxis, eye);
-  float ey = -Vector3::Dot(_yAxis, eye);
-  float ez = -Vector3::Dot(_zAxis, eye);
+  const float ex = -Vector3::Dot(_xAxis, eye);
+  const float ey = -Vector3::Dot(_yAxis, eye);
+  const float ez = -Vector3::Dot(_zAxis, eye);
 
   return Matrix::FromValuesToRef(_xAxis.x, _yAxis.x, _zAxis.x, 0.f, //
                                  _xAxis.y, _yAxis.y, _zAxis.y, 0.f, //
@@ -1060,9 +1069,9 @@ void Matrix::LookAtRHToRef(const Vector3& eye, const Vector3& target,
   _yAxis.normalize();
 
   // Eye angles
-  float ex = -Vector3::Dot(_xAxis, eye);
-  float ey = -Vector3::Dot(_yAxis, eye);
-  float ez = -Vector3::Dot(_zAxis, eye);
+  const float ex = -Vector3::Dot(_xAxis, eye);
+  const float ey = -Vector3::Dot(_yAxis, eye);
+  const float ez = -Vector3::Dot(_zAxis, eye);
 
   return Matrix::FromValuesToRef(_xAxis.x, _yAxis.x, _zAxis.x, 0, _xAxis.y,
                                  _yAxis.y, _zAxis.y, 0.f, _xAxis.z, _yAxis.z,
@@ -1150,13 +1159,13 @@ Matrix Matrix::PerspectiveLH(float width, float height, float znear, float zfar)
 {
   auto matrix = Matrix::Zero();
 
-  float n = znear;
-  float f = zfar;
+  const float n = znear;
+  const float f = zfar;
 
-  float a = 2.f * n / width;
-  float b = 2.f * n / height;
-  float c = (f + n) / (f - n);
-  float d = -2.f * f * n / (f - n);
+  const float a = 2.f * n / width;
+  const float b = 2.f * n / height;
+  const float c = (f + n) / (f - n);
+  const float d = -2.f * f * n / (f - n);
 
   Matrix::FromValuesToRef(a, 0.f, 0.f, 0.f, //
                           0.f, b, 0.f, 0.f, //
@@ -1180,14 +1189,14 @@ void Matrix::PerspectiveFovLHToRef(float fov, float aspect, float znear,
                                    float zfar, Matrix& result,
                                    bool isVerticalFovFixed)
 {
-  float n = znear;
-  float f = zfar;
+  const float n = znear;
+  const float f = zfar;
 
-  float t = 1.f / (std::tan(fov * 0.5f));
-  float a = isVerticalFovFixed ? (t / aspect) : t;
-  float b = isVerticalFovFixed ? t : (t * aspect);
-  float c = (f + n) / (f - n);
-  float d = -2.f * f * n / (f - n);
+  const float t = 1.f / (std::tan(fov * 0.5f));
+  const float a = isVerticalFovFixed ? (t / aspect) : t;
+  const float b = isVerticalFovFixed ? t : (t * aspect);
+  const float c = (f + n) / (f - n);
+  const float d = -2.f * f * n / (f - n);
 
   Matrix::FromValuesToRef(a, 0.f, 0.f, 0.f, //
                           0.f, b, 0.f, 0.f, //
@@ -1215,14 +1224,14 @@ void Matrix::PerspectiveFovRHToRef(float fov, float aspect, float znear,
   //    m[10] *= -1.0;
   //    m[11] *= -1.0;
 
-  float n = znear;
-  float f = zfar;
+  const float n = znear;
+  const float f = zfar;
 
-  float t = 1.f / (std::tan(fov * 0.5f));
-  float a = isVerticalFovFixed ? (t / aspect) : t;
-  float b = isVerticalFovFixed ? t : (t * aspect);
-  float c = -(f + n) / (f - n);
-  float d = -2.f * f * n / (f - n);
+  const float t = 1.f / (std::tan(fov * 0.5f));
+  const float a = isVerticalFovFixed ? (t / aspect) : t;
+  const float b = isVerticalFovFixed ? t : (t * aspect);
+  const float c = -(f + n) / (f - n);
+  const float d = -2.f * f * n / (f - n);
 
   Matrix::FromValuesToRef(a, 0.f, 0.f, 0.f,  //
                           0.f, b, 0.f, 0.f,  //
@@ -1234,14 +1243,14 @@ void Matrix::PerspectiveFovRHToRef(float fov, float aspect, float znear,
 void Matrix::PerspectiveFovWebVRToRef(const VRFov& fov, float znear, float zfar,
                                       Matrix& result, bool rightHanded)
 {
-  float rightHandedFactor = rightHanded ? -1.f : 1.f;
-  float upTan             = std::tan(fov.upDegrees * Math::PI / 180.f);
-  float downTan           = std::tan(fov.downDegrees * Math::PI / 180.f);
-  float leftTan           = std::tan(fov.leftDegrees * Math::PI / 180.f);
-  float rightTan          = std::tan(fov.rightDegrees * Math::PI / 180.f);
-  float xScale            = 2.f / (leftTan + rightTan);
-  float yScale            = 2.f / (upTan + downTan);
-  result.m[0]             = xScale;
+  const float rightHandedFactor = rightHanded ? -1.f : 1.f;
+  const float upTan             = std::tan(fov.upDegrees * Math::PI / 180.f);
+  const float downTan           = std::tan(fov.downDegrees * Math::PI / 180.f);
+  const float leftTan           = std::tan(fov.leftDegrees * Math::PI / 180.f);
+  const float rightTan          = std::tan(fov.rightDegrees * Math::PI / 180.f);
+  const float xScale            = 2.f / (leftTan + rightTan);
+  const float yScale            = 2.f / (upTan + downTan);
+  result.m[0]                   = xScale;
   result.m[1] = result.m[2] = result.m[3] = result.m[4] = 0.f;
   result.m[5]                                           = yScale;
   result.m[6] = result.m[7] = 0.0;
@@ -1259,10 +1268,10 @@ Matrix Matrix::GetFinalMatrix(const Viewport& viewport, Matrix& world,
                               Matrix& view, Matrix& projection, float zmin,
                               float zmax)
 {
-  float cw = static_cast<float>(viewport.width);
-  float ch = static_cast<float>(viewport.height);
-  float cx = static_cast<float>(viewport.x);
-  float cy = static_cast<float>(viewport.y);
+  const float cw = static_cast<float>(viewport.width);
+  const float ch = static_cast<float>(viewport.height);
+  const float cx = static_cast<float>(viewport.x);
+  const float cy = static_cast<float>(viewport.y);
 
   Matrix viewportMatrix
     = Matrix::FromValues(cw / 2.f, 0.f, 0.f, 0.f,    //

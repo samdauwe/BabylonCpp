@@ -32,6 +32,9 @@ public:
 
 }; // end of class PositionNormalVertex
 
+std::ostream& operator<<(std::ostream& os,
+                         const PositionNormalVertex& positionNormalVertex);
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_MATH_POSITION_NORMAL_VERTEX_H

@@ -94,7 +94,7 @@ void BABYLON::CSG::Plane::splitPolygon(
   int polygonType = 0;
   Int32Array types;
   for (unsigned int i = 0; i < polygon->vertices.size(); ++i) {
-    float t = Vector3::Dot(normal, polygon->vertices[i]->pos) - w;
+    const float t = Vector3::Dot(normal, polygon->vertices[i]->pos) - w;
     int type
       = (t < -Plane::EPSILON) ? BACK : (t > Plane::EPSILON) ? FRONT : COPLANAR;
     polygonType |= type;
@@ -118,7 +118,7 @@ void BABYLON::CSG::Plane::splitPolygon(
     case SPANNING:
       std::vector<BABYLON::CSG::Vertex *> f, b;
       for (size_t i = 0; i < polygon->vertices.size(); ++i) {
-        size_t j  = (i + 1) % polygon->vertices.size();
+        size_t j = (i + 1) % polygon->vertices.size();
         int ti = types[i], tj = types[j];
         Vertex *vi = polygon->vertices[i], *vj = polygon->vertices[j];
         if (ti != BACK) {
@@ -158,8 +158,8 @@ void BABYLON::CSG::Plane::splitPolygon(
 CSG::Plane CSG::Plane::FromPoints(const Vector3& a, const Vector3& b,
                                   const Vector3& c, bool& hasPlane)
 {
-  Vector3 v0 = c.subtract(a);
-  Vector3 v1 = b.subtract(a);
+  const auto v0 = c.subtract(a);
+  const auto v1 = b.subtract(a);
 
   if (std_util::almost_equal(v0.lengthSquared(), 0.f)
       || std_util::almost_equal(v1.lengthSquared(), 0.f)) {
@@ -167,7 +167,7 @@ CSG::Plane CSG::Plane::FromPoints(const Vector3& a, const Vector3& b,
     return Plane();
   }
 
-  Vector3 n = Vector3::Normalize(Vector3::Cross(v0, v1));
+  const Vector3 n = Vector3::Normalize(Vector3::Cross(v0, v1));
   return Plane(n, Vector3::Dot(n, a));
 }
 

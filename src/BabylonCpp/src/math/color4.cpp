@@ -87,7 +87,7 @@ Color4& Color4::addInPlace(const Color4& right)
   return *this;
 }
 
-Float32Array Color4::asArray()
+const Float32Array Color4::asArray() const
 {
   Float32Array result;
   toArray(result, 0);
@@ -95,7 +95,7 @@ Float32Array Color4::asArray()
   return result;
 }
 
-Color4& Color4::toArray(Float32Array& array, unsigned int index)
+const Color4& Color4::toArray(Float32Array& array, unsigned int index) const
 {
   if (array.size() < index + 4) {
     array.resize(index + 4);
@@ -119,7 +119,7 @@ Color4 Color4::subtract(const Color4& right) const
   return Color4(r - right.r, g - right.g, b - right.b, a - right.a);
 }
 
-Color4& Color4::subtractToRef(const Color4& right, Color4& result)
+const Color4& Color4::subtractToRef(const Color4& right, Color4& result) const
 {
   result.r = r - right.r;
   result.g = g - right.g;
@@ -134,7 +134,7 @@ Color4 Color4::scale(float iscale) const
   return Color4(r * iscale, g * iscale, b * iscale, a * iscale);
 }
 
-Color4& Color4::scaleToRef(int iscale, Color4& result)
+const Color4& Color4::scaleToRef(int iscale, Color4& result) const
 {
   result.r = r * static_cast<float>(iscale);
   result.g = g * static_cast<float>(iscale);
@@ -144,7 +144,7 @@ Color4& Color4::scaleToRef(int iscale, Color4& result)
   return *this;
 }
 
-Color4& Color4::scaleToRef(float iscale, Color4& result)
+const Color4& Color4::scaleToRef(float iscale, Color4& result) const
 {
   result.r = r * iscale;
   result.g = g * iscale;
@@ -159,7 +159,7 @@ Color4 Color4::multiply(const Color4& color) const
   return Color4(r * color.r, g * color.g, b * color.b, a * color.a);
 }
 
-Color4 Color4::multiplyToRef(const Color4& color, Color4& result)
+const Color4 Color4::multiplyToRef(const Color4& color, Color4& result) const
 {
   result.r = r * color.r;
   result.g = g * color.g;
@@ -204,17 +204,17 @@ Color4& Color4::set(float red, float green, float blue, float alpha)
 
 std::string Color4::toHexString() const
 {
-  int intR = static_cast<int>(r * 255) | 0;
-  int intG = static_cast<int>(g * 255) | 0;
-  int intB = static_cast<int>(b * 255) | 0;
-  int intA = static_cast<int>(a * 255) | 0;
+  const int intR = static_cast<int>(r * 255) | 0;
+  const int intG = static_cast<int>(g * 255) | 0;
+  const int intB = static_cast<int>(b * 255) | 0;
+  const int intA = static_cast<int>(a * 255) | 0;
 
-  std::stringstream stream;
-  stream << "#" << String::toUpperCase(MathTools::ToHex(intR))
-         << String::toUpperCase(MathTools::ToHex(intG))
-         << String::toUpperCase(MathTools::ToHex(intB))
-         << String::toUpperCase(MathTools::ToHex(intA));
-  return stream.str();
+  std::ostringstream ostream;
+  ostream << "#" << String::toUpperCase(MathTools::ToHex(intR))
+          << String::toUpperCase(MathTools::ToHex(intG))
+          << String::toUpperCase(MathTools::ToHex(intB))
+          << String::toUpperCase(MathTools::ToHex(intA));
+  return ostream.str();
 }
 
 /** Operator overloading **/

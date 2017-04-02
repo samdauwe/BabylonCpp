@@ -36,6 +36,10 @@ public:
 
 }; // end of class PositionNormalTextureVertex
 
+std::ostream&
+operator<<(std::ostream& os,
+           const PositionNormalTextureVertex& positionNormalTextureVertex);
+
 } // namespace BABYLON
 
 #endif // end of BABYLON_MATH_POSITION_NORMAL_TEXTURE_VERTEX_H

@@ -84,21 +84,20 @@ float Curve3::length() const
 
 Curve3 Curve3::continueCurve3(Curve3& curve) const
 {
-  Vector3 lastPoint                    = _points[_points.size() - 1];
+  const Vector3 lastPoint              = _points[_points.size() - 1];
   std::vector<Vector3> continuedPoints = _points;
   std::vector<Vector3> curvePoints     = curve.getPoints();
   for (unsigned int i = 1; i < curvePoints.size(); ++i) {
     continuedPoints.emplace_back(
       curvePoints[i].subtract(curvePoints[0]).add(lastPoint));
   }
-  Curve3 continuedCurve(continuedPoints);
-  return continuedCurve;
+  return Curve3(continuedPoints);
 }
 
 Curve3 Curve3::CreateQuadraticBezier(const Vector3& v0, const Vector3& v1,
                                      const Vector3& v2, int nbPoints)
 {
-  float nbPointsVal = nbPoints > 2 ? static_cast<float>(nbPoints) : 3.f;
+  const float nbPointsVal = nbPoints > 2 ? static_cast<float>(nbPoints) : 3.f;
   std::vector<Vector3> bez;
   const auto equation
     = [](float t, float val0, float val1, float val2) -> float {
@@ -117,7 +116,7 @@ Curve3 Curve3::CreateCubicBezier(const Vector3& v0, const Vector3& v1,
                                  const Vector3& v2, const Vector3& v3,
                                  int nbPoints)
 {
-  float nbPointsVal = nbPoints > 3 ? static_cast<float>(nbPoints) : 4.f;
+  const float nbPointsVal = nbPoints > 3 ? static_cast<float>(nbPoints) : 4.f;
   std::vector<Vector3> bez;
   const auto equation
     = [](float t, float val0, float val1, float val2, float val3) -> float {
@@ -139,8 +138,8 @@ Curve3 Curve3::CreateHermiteSpline(const Vector3& p1, const Vector3& t1,
                                    int nbPoints)
 {
   std::vector<Vector3> hermite;
-  float nbPointsVal = static_cast<float>(nbPoints);
-  float step        = 1.f / nbPointsVal;
+  const float nbPointsVal = static_cast<float>(nbPoints);
+  const float step        = 1.f / nbPointsVal;
   for (float i = 0; i <= nbPointsVal; ++i) {
     hermite.emplace_back(Vector3::Hermite(p1, t1, p2, t2, i * step));
   }

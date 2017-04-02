@@ -50,7 +50,7 @@ public:
    * green, blue values as successive elements.
    * @returns The Color3.
    */
-  Color3& toArray(Float32Array& array, unsigned int index = 0);
+  const Color3& toArray(Float32Array& array, unsigned int index = 0) const;
 
   /**
    * @brief Returns a new Color4 object from the current Color3 and the passed
@@ -76,7 +76,7 @@ public:
    * stores the result in the object "result".
    * @returns The current Color3.
    */
-  Color3& multiplyToRef(const Color3& otherColor, Color3& result);
+  const Color3& multiplyToRef(const Color3& otherColor, Color3& result) const;
 
   /**
    * @brief Returns if the rgb values are equal to the passed ones.
@@ -99,7 +99,7 @@ public:
    * "result".
    * @returns the unmodified current Color3.
    */
-  Color3& scaleToRef(float iscale, Color3& result);
+  const Color3& scaleToRef(float iscale, Color3& result) const;
 
   /**
    * @brief Returns a new Color3 set with the added values of the current Color3
@@ -112,7 +112,7 @@ public:
    * one rgb values into "result".
    * @returns The unmodified current Color3.
    */
-  Color3& addToRef(const Color3& otherColor, Color3& result);
+  const Color3& addToRef(const Color3& otherColor, Color3& result) const;
 
   /**
    * @brief Returns a new Color3 set with the subtracted values of the passed
@@ -125,7 +125,7 @@ public:
    * Color3 rgb values into "result".
    * @returns The unmodified current Color3.
    */
-  Color3& subtractToRef(const Color3& otherColor, Color3& result);
+  const Color3& subtractToRef(const Color3& otherColor, Color3& result) const;
 
   /**
    * @brief Copies the rgb values from the source in the current Color3.

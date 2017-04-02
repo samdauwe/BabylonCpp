@@ -75,8 +75,8 @@ Path2& Path2::addLineTo(float x, float y)
   if (closed) {
     return *this;
   }
-  Vector2 newPoint(x, y);
-  Vector2 previousPoint = _points.back();
+  const Vector2 newPoint(x, y);
+  const Vector2 previousPoint = _points.back();
   _points.emplace_back(newPoint);
   _length += newPoint.subtract(previousPoint).length();
   return *this;
@@ -88,11 +88,11 @@ Path2& Path2::addArcTo(float midX, float midY, float endX, float endY,
   if (closed) {
     return *this;
   }
-  Vector2 startPoint = _points.back();
-  Vector2 midPoint(midX, midY);
-  Vector2 endPoint(endX, endY);
+  const Vector2 startPoint = _points.back();
+  const Vector2 midPoint(midX, midY);
+  const Vector2 endPoint(endX, endY);
 
-  Arc2 arc(startPoint, midPoint, endPoint);
+  const Arc2 arc(startPoint, midPoint, endPoint);
 
   float increment = arc.angle.radians() / static_cast<float>(numberOfSegments);
   if (arc.orientation == Orientation::CW) {
@@ -121,8 +121,8 @@ float Path2::length() const
   float result = _length;
 
   if (!closed) {
-    Vector2 lastPoint  = _points[_points.size() - 1];
-    Vector2 firstPoint = _points[0];
+    const Vector2 lastPoint  = _points[_points.size() - 1];
+    const Vector2 firstPoint = _points[0];
     result += (firstPoint.subtract(lastPoint).length());
   }
 
@@ -145,20 +145,20 @@ Vector2 Path2::getPointAtLengthPosition(float normalizedLengthPosition) const
     return Vector2::Zero();
   }
 
-  float lengthPosition = normalizedLengthPosition * length();
+  const float lengthPosition = normalizedLengthPosition * length();
 
   float previousOffset = 0;
   for (unsigned int i = 0; i < _points.size(); ++i) {
     size_t j = (i + 1) % _points.size();
 
-    Vector2 a    = _points[i];
-    Vector2 b    = _points[j];
-    Vector2 bToA = b.subtract(a);
+    const Vector2 a = _points[i];
+    const Vector2 b = _points[j];
+    Vector2 bToA    = b.subtract(a);
 
-    float nextOffset = (bToA.length() + previousOffset);
+    const float nextOffset = (bToA.length() + previousOffset);
     if (lengthPosition >= previousOffset && lengthPosition <= nextOffset) {
-      Vector2 dir       = bToA.normalize();
-      float localOffset = lengthPosition - previousOffset;
+      const Vector2 dir       = bToA.normalize();
+      const float localOffset = lengthPosition - previousOffset;
 
       return Vector2(a.x + (dir.x * localOffset), //
                      a.y + (dir.y * localOffset));

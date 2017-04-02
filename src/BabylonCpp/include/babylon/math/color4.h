@@ -52,14 +52,14 @@ public:
    * @brief Returns a new array populated with 4 numeric elements : red, green,
    * blue, alpha values.
    */
-  Float32Array asArray();
+  const Float32Array asArray() const;
 
   /**
    * @brief Stores from the starting index in the passed array the Color4
    * successive values.
    * @returns The Color4.
    */
-  Color4& toArray(Float32Array& array, unsigned int index = 0);
+  const Color4& toArray(Float32Array& array, unsigned int index = 0) const;
 
   /**
    * @brief Returns a new Color4 set with the added values of the current Color4
@@ -78,7 +78,7 @@ public:
    * the results in "result".
    * @returns The Color4.
    */
-  Color4& subtractToRef(const Color4& right, Color4& result);
+  const Color4& subtractToRef(const Color4& right, Color4& result) const;
 
   /**
    * @brief Creates a new Color4 with the current Color4 values multiplied by
@@ -91,8 +91,8 @@ public:
    * in "result".
    * @returns The Color4.
    */
-  Color4& scaleToRef(int iscale, Color4& result);
-  Color4& scaleToRef(float iscale, Color4& result);
+  const Color4& scaleToRef(int iscale, Color4& result) const;
+  const Color4& scaleToRef(float iscale, Color4& result) const;
 
   /**
    * @brief Multipy an RGBA Color4 value by another and return a new Color4
@@ -109,7 +109,7 @@ public:
    * @param result The Color4 (RGBA) to fill the result in
    * @returns The result Color4.
    */
-  Color4 multiplyToRef(const Color4& color, Color4& result);
+  const Color4 multiplyToRef(const Color4& color, Color4& result) const;
 
   /**
    * @brief Returns a string with the Color4 values.

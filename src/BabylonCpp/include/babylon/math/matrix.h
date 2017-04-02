@@ -75,22 +75,22 @@ public:
    */
   Matrix& reset();
 
-  Matrix subtract(const Matrix& other);
+  Matrix subtract(const Matrix& other) const;
 
-  Matrix& subtractFromRef(const Matrix& other, Matrix& result);
+  const Matrix& subtractFromRef(const Matrix& other, Matrix& result) const;
 
   /**
    * @brief Returns a new Matrix as the addition result of the current Matrix
    * and the passed one.
    */
-  Matrix add(const Matrix& other);
+  const Matrix add(const Matrix& other) const;
 
   /**
    * @brief Sets the passed matrix "result" with the ddition result of the
    * current Matrix and the passed one.
    * @returns The Matrix.
    */
-  Matrix& addToRef(const Matrix& other, Matrix& result);
+  const Matrix& addToRef(const Matrix& other, Matrix& result) const;
 
   /**
    * @brief Adds in place the passed matrix to the current Matrix.
@@ -102,7 +102,7 @@ public:
    * @brief Sets the passed matrix with the current inverted Matrix.
    * @returns The unmodified current Matrix.
    */
-  Matrix& invertToRef(Matrix& other);
+  const Matrix& invertToRef(Matrix& other) const;
 
   /**
    * @brief Inserts the translation vector (using 3 x floats) in the current
@@ -125,7 +125,7 @@ public:
   /**
    * @brief Fill a Vector3 with the extracted translation from the Matrix.
    */
-  Matrix& getTranslationToRef(Vector3& result);
+  const Matrix& getTranslationToRef(Vector3& result) const;
 
   /**
    * @brief Remove rotation and scaling part from the Matrix.
@@ -137,13 +137,13 @@ public:
    * @brief Returns a new Matrix set with the multiplication result of the
    * current Matrix and the passed one.
    */
-  Matrix multiply(Matrix& other);
+  const Matrix multiply(Matrix& other) const;
 
   /**
    * @brief Returns a new Matrix set with the multiplication result of the
    * current Matrix and the passed one.
    */
-  Matrix multiply(Matrix&& other);
+  const Matrix multiply(Matrix&& other) const;
 
   /**
    * @brief Returns a new Matrix set with the multiplication result of the
@@ -156,34 +156,36 @@ public:
    * values.
    * @returns The Matrix.
    */
-  Matrix& copyToArray(std::array<float, 16>& array, unsigned int offset = 0);
+  const Matrix& copyToArray(std::array<float, 16>& array,
+                            unsigned int offset = 0) const;
 
   /**
    * @brief Populates the passed array from the starting index with the Matrix
    * values.
    * @returns The Matrix.
    */
-  Matrix& copyToArray(Float32Array& array, unsigned int offset = 0);
+  const Matrix& copyToArray(Float32Array& array, unsigned int offset = 0) const;
 
   /**
    * @brief Sets the passed matrix "result" with the multiplication result of
    * the current Matrix and the passed one.
    */
-  Matrix& multiplyToRef(const Matrix& other, Matrix& result);
+  const Matrix& multiplyToRef(const Matrix& other, Matrix& result) const;
 
   /**
    * @brief Sets the Float32Array "result" from the passed index "offset" with
    * the multiplication result of the current Matrix and the passed one.
    */
-  Matrix& multiplyToArray(const Matrix& other, std::array<float, 16>& result,
-                          unsigned int offset);
+  const Matrix& multiplyToArray(const Matrix& other,
+                                std::array<float, 16>& result,
+                                unsigned int offset) const;
 
   /**
    * @brief Sets the Float32Array "result" from the passed index "offset" with
    * the multiplication result of the current Matrix and the passed one.
    */
-  Matrix& multiplyToArray(const Matrix& other, Float32Array& result,
-                          unsigned int offset);
+  const Matrix& multiplyToArray(const Matrix& other, Float32Array& result,
+                                unsigned int offset) const;
 
   /**
    * @brief Returns if the current Matrix and the passed one values are strictly
@@ -212,14 +214,14 @@ public:
    * passed "result".
    * @returns The current Matrix.
    */
-  Matrix const& getRotationMatrixToRef(Matrix& result) const;
+  const Matrix& getRotationMatrixToRef(Matrix& result) const;
 
   /** Operator overloading **/
   friend std::ostream& operator<<(std::ostream& os, const Matrix& matrix);
-  Matrix operator+(const Matrix& other);
+  Matrix operator+(const Matrix& other) const;
   Matrix& operator+=(const Matrix& other);
-  Matrix operator-(const Matrix& other);
-  Matrix operator*(Matrix& other);
+  Matrix operator-(const Matrix& other) const;
+  Matrix operator*(Matrix& other) const;
   bool operator==(const Matrix& other) const;
   bool operator!=(const Matrix& other) const;
   float& operator[](unsigned int index);

@@ -181,7 +181,7 @@ Path3D& Path3D::update(const std::vector<Vector3>& path,
 
 void Path3D::_compute(const Vector3* firstNormal)
 {
-  size_t l = _curve.size();
+  const size_t l = _curve.size();
 
   _binormals.resize(l);
   _distances.resize(l);
@@ -200,9 +200,9 @@ void Path3D::_compute(const Vector3* firstNormal)
 
   // normals and binormals at first point : arbitrary vector with
   // _normalVector()
-  Vector3 tg0 = _tangents[0];
-  Vector3 pp0 = _normalVector(_curve[0], tg0, firstNormal);
-  _normals[0] = pp0;
+  const auto& tg0   = _tangents[0];
+  const Vector3 pp0 = _normalVector(_curve[0], tg0, firstNormal);
+  _normals[0]       = pp0;
   if (!_raw) {
     _normals[0].normalize();
   }
