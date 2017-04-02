@@ -33,6 +33,7 @@ PostProcess::PostProcess(const std::string& iName,
     , width{-1}
     , height{-1}
     , enablePixelPerfectMode{false}
+    , samples{1}
     , _currentRenderTextureInd{0}
     , _renderRatio{1.f}
     , _options{options}
@@ -136,14 +137,14 @@ void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture)
 {
   auto pCamera = camera ? camera : _camera;
 
-  auto scene  = pCamera->getScene();
-  int maxSize = pCamera->getEngine()->getCaps().maxTextureSize;
+  auto scene        = pCamera->getScene();
+  const int maxSize = pCamera->getEngine()->getCaps().maxTextureSize;
 
-  int requiredWidth = static_cast<int>(
+  const int requiredWidth = static_cast<int>(
     static_cast<float>(sourceTexture ? sourceTexture->_width :
                                        _engine->getRenderingCanvas()->width)
     * _renderRatio);
-  int requiredHeight = static_cast<int>(
+  const int requiredHeight = static_cast<int>(
     static_cast<float>(sourceTexture ? sourceTexture->_height :
                                        _engine->getRenderingCanvas()->height)
     * _renderRatio);
@@ -183,6 +184,12 @@ void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture)
     }*/
 
     onSizeChangedObservable.notifyObservers(this);
+  }
+
+  for (auto& texture : _textures) {
+    if (texture->samples != samples) {
+      _engine->updateRenderTargetTextureSampleCount(texture, samples);
+    }
   }
 
   if (enablePixelPerfectMode) {
@@ -250,15 +257,16 @@ void PostProcess::dispose(Camera* camera)
     for (auto& texture : _textures) {
       _engine->_releaseTexture(texture);
     }
-    _textures.clear();
   }
+
+  _textures.clear();
 
   if (!pCamera) {
     return;
   }
   pCamera->detachPostProcess(this);
 
-  int index = std_util::index_of(pCamera->_postProcesses, this);
+  const int index = std_util::index_of(pCamera->_postProcesses, this);
   if (index == 0 && pCamera->_postProcesses.size() > 0) {
     _camera->_postProcesses[0]->markTextureDirty();
   }

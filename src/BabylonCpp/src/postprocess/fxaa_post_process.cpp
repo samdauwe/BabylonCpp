@@ -11,12 +11,12 @@ FxaaPostProcess::FxaaPostProcess(const std::string& iName, float ratio,
                   camera, samplingMode, engine,        reusable}
 {
 
-  onSizeChangedObservable.add([&]() {
+  onSizeChangedObservable.add([this]() {
     texelWidth  = 1.f / static_cast<float>(width);
     texelHeight = 1.f / static_cast<float>(height);
   });
 
-  onApplyObservable.add([&](Effect* effect) {
+  onApplyObservable.add([this](Effect* effect) {
     effect->setFloat2("texelSize", texelWidth, texelHeight);
   });
 }

@@ -2,6 +2,7 @@
 #define BABYLON_POSTPROCESS_FXAA_POST_PROCESS_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/materials/textures/texture.h>
 #include <babylon/postprocess/post_process.h>
 
 namespace BABYLON {
@@ -13,8 +14,8 @@ class BABYLON_SHARED_EXPORT FxaaPostProcess : public PostProcess {
 
 public:
   FxaaPostProcess(const std::string& _name, float ratio, Camera* camera,
-                  unsigned int samplingMode, Engine* engine,
-                  bool reusable = false);
+                  unsigned int samplingMode = Texture::BILINEAR_SAMPLINGMODE,
+                  Engine* engine = nullptr, bool reusable = false);
   ~FxaaPostProcess();
 
 public:

@@ -456,6 +456,7 @@ public:
       , _baseWidth{-1}
       , _baseHeight{-1}
       , samplingMode{0}
+      , samples{1}
       , references{0}
       , isCube{false}
       , isReady{false}
@@ -479,6 +480,7 @@ public:
   int _baseWidth;
   int _baseHeight;
   unsigned int samplingMode;
+  unsigned int samples;
   int references;
   bool isCube;
   bool isReady;

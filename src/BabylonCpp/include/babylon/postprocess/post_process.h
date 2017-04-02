@@ -63,32 +63,28 @@ public:
   // Enable Pixel Perfect mode where texture is not scaled to be power of 2.
   // Can only be used on a single postprocess or on the last one of a chain.
   bool enablePixelPerfectMode;
+  unsigned int samples;
   std::vector<GL::IGLTexture*> _textures;
   unsigned int _currentRenderTextureInd;
   // Events
   /**
    * An event triggered when the postprocess is activated.
-   * @type {BABYLON.Observable}
    */
   Observable<Camera> onActivateObservable;
   /**
    * An event triggered when the postprocess changes its size.
-   * @type {BABYLON.Observable}
    */
   Observable<PostProcess> onSizeChangedObservable;
   /**
    * An event triggered when the postprocess applies its effect.
-   * @type {BABYLON.Observable}
    */
   Observable<Effect> onApplyObservable;
   /**
    * An event triggered before rendering the postprocess
-   * @type {BABYLON.Observable}
    */
   Observable<Effect> onBeforeRenderObservable;
   /**
    * An event triggered after rendering the postprocess
-   * @type {BABYLON.Observable}
    */
   Observable<Effect> onAfterRenderObservable;
 
