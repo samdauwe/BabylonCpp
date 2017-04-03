@@ -11,6 +11,7 @@
 #include <babylon/math/color3.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/matrix.h>
+#include <babylon/mesh/facet_parameters.h>
 #include <babylon/physics/iphysics_enabled_object.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
@@ -40,11 +41,57 @@ public:
   virtual IReflect::Type type() const override;
   void addToScene(std::unique_ptr<AbstractMesh>&& newMesh);
 
+  // FacetData private properties
+
+  /**
+   * @brief Returns the number of facets in the mesh.
+   */
+  size_t facetNb() const;
+
+  /**
+   * @brief Returns the number (integer) of subdivisions per axis in the
+   * partioning space
+   */
+  size_t partitioningSubdivisions() const;
+
+  void setPartitioningSubdivisions(size_t nb);
+
+  /**
+   * @brief Returns the ratio (float) to apply to the bouding box size to set to
+   * the partioning space.
+   * Ex : 1.01 (default) the partioning space is 1% bigger than the bounding
+   * box.
+   */
+  float partitioningBBoxRatio() const;
+
+  /**
+   * @brief Sets the ratio (float) to apply to the bouding box size to set to
+   * the partioning space.
+   */
+  void setPartitioningBBoxRatio(float ratio);
+
+  /**
+   * @brief Returns if the feature facetData enabled ?
+   */
+  bool isFacetDataEnabled() const;
+
   // Events
   void setOnCollide(const std::function<void()>& callback);
   void setOnCollisionPositionChange(const std::function<void()>& callback);
 
+  // Collisions
+  int collisionMask() const;
+  void setCollisionMask(int mask);
+  int getCollisionGroup() const;
+  void setCollisionGroup(int mask);
+
   /**
+   * Returns the string "AbstractMesh"
+   */
+  const char* getClassName() const;
+
+  /**
+   * @brief Returns the string representatin of the AbstractMesh Object.
    * @param {boolean} fullDetails - support for multiple levels of logging
    * within scene loading
    */
@@ -54,12 +101,51 @@ public:
   virtual Skeleton* skeleton();
   Vector3& position() override;
   void setPosition(const Vector3& newPosition);
+
+  /**
+   * @brief Returns the rotation property: a Vector3 depicting the rotation
+   * value in radians around each local axis X, Y, Z.
+   * If rotation quaternion is set, this Vector3 will (almost always) be the
+   * Zero vector!
+   * Default : (0.0, 0.0, 0.0)
+   */
   Vector3& rotation() override;
+
+  /**
+   * @brief Sets the rotation property.
+   */
   void setRotation(const Vector3& newRotation);
+
+  /**
+   * @brief Returns the scaling property: a Vector3 depicting the mesh scaling
+   * along each local axis X, Y, Z.
+   * Default : (1.0, 1.0, 1.0)
+   */
   Vector3& scaling() override;
+
+  /**
+   * @brief Sets the scaling property.
+   */
   void setScaling(const Vector3& newScaling);
+
+  /**
+   * @brief Returns the rotation Quaternion property: this a Quaternion object
+   * depicting the mesh rotation by using a unit quaternion.
+   * It's null by default.
+   * If set, only the rotationQuaternion is then used to compute the mesh
+   * rotation and its property `.rotation\ is then ignored and set to (0.0, 0.0,
+   * 0.0)
+   */
   Quaternion& rotationQuaternion() override;
+
+  /**
+   * @brief Returns if the rotation Quaternion property is set.
+   */
   bool rotationQuaternionSet() const override;
+
+  /**
+   * @brief Sets the rotation Quaternion property.
+   */
   void setRotationQuaternion(const Quaternion& quaternion) override;
   void resetRotationQuaternion();
   virtual AbstractMesh* getParent() override;
@@ -70,157 +156,623 @@ public:
   getChildMeshes(bool directDecendantsOnly,
                  const std::function<bool(Node* node)>& predicate
                  = nullptr) override;
-  void updatePoseMatrix(const Matrix& matrix);
+
+  /**
+   * @brief Copies the paramater passed Matrix into the mesh Pose matrix.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& updatePoseMatrix(const Matrix& matrix);
+
+  /**
+   * @brief Returns the mesh Pose matrix.
+   * @returns The mesh Pose matrix.
+   */
   Matrix& getPoseMatrix();
-  void disableEdgesRendering();
-  void enableEdgesRendering(float epsilon                      = 0.95f,
-                            bool checkVerticesInsteadOfIndices = false);
+
+  /**
+   * @brief Disables the mesh edger rendering mode.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& disableEdgesRendering();
+
+  /**
+   * @brief Enables the edge rendering mode on the mesh.
+   * This mode makes the mesh edges visible.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& enableEdgesRendering(float epsilon = 0.95f,
+                                     bool checkVerticesInsteadOfIndices
+                                     = false);
+
+  /**
+   * @brief Returns true if the mesh is blocked. Used by the class Mesh.
+   * @returns The boolean `false` by default.
+   */
   bool isBlocked() const;
+
+  /**
+   * @brief Returns the mesh itself by default, used by the class Mesh.
+   * @returns The AbstractMesh.
+   */
   virtual AbstractMesh* getLOD(Camera* camera,
                                BoundingSphere* boundingSphere = nullptr);
+
+  /**
+   * @brief Returns 0 by default, used by the class Mesh.
+   * @returns An integer.
+   */
   virtual size_t getTotalVertices() const;
+
+  /**
+   * @brief Returns an empty integer array by default, used by the class Mesh.
+   * @returns An integer array
+   */
   virtual Uint32Array getIndices(bool copyWhenShared = false) override;
+
+  /**
+   * @brief Returns the array of the requested vertex data kind. Used by the
+   * class Mesh. Returns an empty Float32Array here.
+   * @returns A Float32Array.
+   */
   virtual Float32Array getVerticesData(unsigned int kind,
                                        bool copyWhenShared = false) override;
+
+  /**
+   * @brief Returns false by default, used by the class Mesh.
+   * @returns A boolean.
+   */
   virtual bool isVerticesDataPresent(unsigned int kind);
+
+  /**
+   * @brief Returns the mesh BoundingInfo object or creates a new one and
+   * returns it if undefined.
+   * @returns A BoundingInfo.
+   */
   BoundingInfo* getBoundingInfo() override;
-  void setBoundingInfo(const BoundingInfo& boundingInfo);
+
+  /**
+   * @brief Sets a mesh new object BoundingInfo.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& setBoundingInfo(const BoundingInfo& boundingInfo);
+
   bool useBones();
   virtual void _preActivate();
   virtual void _preActivateForIntermediateRendering(int /*renderId*/);
   virtual void _activate(int renderId);
+
+  /**
+   * @brief Returns the last update of the World matrix.
+   * @returns A Matrix.
+   */
   Matrix* getWorldMatrix() override;
+
+  /**
+   * @brief Returns directly the last state of the mesh World matrix.
+   * @returns A Matrix.
+   */
   Matrix& worldMatrixFromCache();
+
+  /**
+   * @brief Returns the current mesh absolute position.
+   * @returns A Vector3.
+   */
   Vector3* absolutePosition();
-  void freezeWorldMatrix();
-  void unfreezeWorldMatrix();
+
+  /**
+   * @brief Prevents the World matrix to be computed any longer.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& freezeWorldMatrix();
+
+  /**
+   * @brief Allows back the World matrix computation.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& unfreezeWorldMatrix();
+
+  /**
+   * @brief Returns If the World matrix has been frozen.
+   * @returns A boolean.
+   */
   bool isWorldMatrixFrozen();
-  void rotate(Vector3& axis, float amount, const Space& space = Space::LOCAL);
-  void translate(Vector3& axis, float distance,
-                 const Space& space = Space::LOCAL);
+
+  /**
+   * @brief Rotates the mesh around the axis vector for the passed angle
+   * (amount) expressed in radians, in the given space.
+   * space (default LOCAL) can be either BABYLON.Space.LOCAL, either
+   * BABYLON.Space.WORLD.
+   * Note that the property `rotationQuaternion` is then automatically updated
+   * and the property `rotation` is set to (0,0,0) and no longer used.
+   * The passed axis is also normalized.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& rotate(Vector3& axis, float amount,
+                       const Space& space = Space::LOCAL);
+
+  /**
+   * @brief Translates the mesh along the axis vector for the passed distance in
+   * the given space.
+   * space (default LOCAL) can be either BABYLON.Space.LOCAL, either
+   * BABYLON.Space.WORLD.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& translate(Vector3& axis, float distance,
+                          const Space& space = Space::LOCAL);
+
+  /**
+   * @brief Adds a rotation step to the mesh current rotation.
+   * x, y, z are Euler angles expressed in radians.
+   * This methods updates the current mesh rotation, either mesh.rotation,
+   * either mesh.rotationQuaternion if it's set.
+   * This means this rotation is made in the mesh local space only.
+   * It's useful to set a custom rotation order different from the BJS standard
+   * one YXZ.
+   * Example : this rotates the mesh first around its local X axis, then around
+   * its local Z axis, finally around its local Y axis.
+   * ```javascript
+   * mesh.addRotation(x1, 0, 0).addRotation(0, 0, z2).addRotation(0, 0, y3);
+   * ```
+   * Note that `addRotation()` accumulates the passed rotation values to the
+   * current ones and computes the .rotation or .rotationQuaternion updated
+   * values.
+   * Under the hood, only quaternions are used. So it's a little faster is you
+   * use .rotationQuaternion because it doesn't need to translate them back to
+   * Euler angles.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& addRotation(float x, float y, float z);
+
+  /**
+   * @brief Retuns the mesh absolute position in the World.
+   * @returns A Vector3.
+   */
   Vector3* getAbsolutePosition();
-  void setAbsolutePosition(const Vector3& absolutePosition);
+
+  /**
+   * @brief Sets the mesh absolute position in the World from a Vector3 or an
+   * Array(3).
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& setAbsolutePosition(const Vector3& absolutePosition);
 
   // ========================= Point of View Movement ==========================
   /**
-   * Perform relative position change from the point of view of behind the front
+   * @brief Perform relative position change from the point of view of behind
+   * the front
    * of the mesh. This is performed taking into account the meshes current
    * rotation, so you do not have to care. Supports definition of mesh facing
    * forward or backward.
    * @param {number} amountRight
    * @param {number} amountUp
    * @param {number} amountForward
+   * @returns The AbstractMesh.
    */
-  void movePOV(float amountRight, float amountUp, float amountForward);
+  AbstractMesh& movePOV(float amountRight, float amountUp, float amountForward);
 
   /**
-   * Calculate relative position change from the point of view of behind the
-   * front of the mesh. This is performed taking into account the meshes current
-   * rotation, so you do not have to care. Supports definition of mesh facing
-   * forward or backward.
+   * @brief Calculate relative position change from the point of view of behind
+   * the front of the mesh. This is performed taking into account the meshes
+   * current rotation, so you do not have to care. Supports definition of mesh
+   * facing forward or backward.
    * @param {number} amountRight
    * @param {number} amountUp
    * @param {number} amountForward
+   * @returns A new Vector3.
    */
   Vector3 calcMovePOV(float amountRight, float amountUp, float amountForward);
 
   // ========================= Point of View Rotation ==========================
   /**
-   * Perform relative rotation change from the point of view of behind the front
-   * of the mesh. Supports definition of mesh facing forward or backward.
+   * @brief Perform relative rotation change from the point of view of behind
+   * the front of the mesh. Supports definition of mesh facing forward or
+   * backward.
    * @param {number} flipBack
    * @param {number} twirlClockwise
    * @param {number} tiltRight
+   * @returns The AbstractMesh.
    */
-  void rotatePOV(float flipBack, float twirlClockwise, float tiltRight);
+  AbstractMesh& rotatePOV(float flipBack, float twirlClockwise,
+                          float tiltRight);
 
   /**
-   * Calculate relative rotation change from the point of view of behind the
-   * front of the mesh. Supports definition of mesh facing forward or backward.
+   * @brief Calculate relative rotation change from the point of view of behind
+   * the front of the mesh. Supports definition of mesh facing forward or
+   * backward.
    * @param {number} flipBack
    * @param {number} twirlClockwise
    * @param {number} tiltRight
+   * @returns A new Vector3.
    */
   Vector3 calcRotatePOV(float flipBack, float twirlClockwise, float tiltRight);
 
-  void setPivotMatrix(const Matrix& matrix);
+  /**
+   * @brief Sets a new pivot matrix to the mesh.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& setPivotMatrix(const Matrix& matrix);
+
+  /**
+   * @brief Returns the mesh pivot matrix.
+   * Default: Identity.
+   * @returns A Matrix.
+   */
   Matrix& getPivotMatrix();
+
   bool _isSynchronized() override;
   void _initCache() override;
   void markAsDirty(const std::string& property) override;
-  void _updateBoundingInfo();
-  void _updateSubMeshesBoundingInfo(Matrix& matrix);
+
+  /**
+   * @brief Updates the mesh BoundingInfo object and all its children
+   * BoundingInfo objects also.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& _updateBoundingInfo();
+
+  /**
+   * @brief Update a mesh's children BoundingInfo objects only.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& _updateSubMeshesBoundingInfo(Matrix& matrix);
+
+  /**
+   * @brief Computes the mesh World matrix and returns it.
+   * If the mesh world matrix is frozen, this computation does nothing more than
+   * returning the last frozen values.
+   * If the parameter `force` is let to `false` (default), the current cached
+   * World matrix is returned.
+   * If the parameter `force`is set to `true`, the actual computation is done.
+   * @returns The mesh World Matrix.
+   */
   Matrix computeWorldMatrix(bool force = false) override;
 
   /**
-   * If you'd like to be callbacked after the mesh position, rotation or scaling
-   * has been updated
+   * @brief If you'd like to be called back after the mesh position, rotation or
+   * scaling has been updated.
    * @param func: callback function to add
+   * @returns The AbstractMesh.
    */
-  void registerAfterWorldMatrixUpdate(
+  AbstractMesh& registerAfterWorldMatrixUpdate(
     const std::function<void(AbstractMesh* mesh)>& func);
 
-  void unregisterAfterWorldMatrixUpdate(
+  /**
+   * @brief Removes a registered callback function.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& unregisterAfterWorldMatrixUpdate(
     const std::function<void(AbstractMesh* mesh)>& func);
-  void setPositionWithLocalVector(const Vector3& vector3);
+
+  /**
+   * @brief Sets the mesh position in its local space.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& setPositionWithLocalVector(const Vector3& vector3);
+
+  /**
+   * @brief Returns the mesh position in the local space from the current World
+   * matrix values.
+   * @returns A new Vector3.
+   */
   Vector3 getPositionExpressedInLocalSpace();
-  void locallyTranslate(const Vector3& vector3);
-  void lookAt(const Vector3& targetPoint, float yawCor = 0.f,
-              float pitchCor = 0.f, float rollCor = 0.f,
-              Space space = Space::LOCAL);
-  void attachToBone(Bone* bone, AbstractMesh* affectedMesh);
-  void detachFromBone();
+
+  /**
+   * @brief Translates the mesh along the passed Vector3 in its local space.
+   *  @returns The AbstractMesh.
+   */
+  AbstractMesh& locallyTranslate(const Vector3& vector3);
+
+  AbstractMesh& lookAt(const Vector3& targetPoint, float yawCor = 0.f,
+                       float pitchCor = 0.f, float rollCor = 0.f,
+                       Space space = Space::LOCAL);
+  AbstractMesh& attachToBone(Bone* bone, AbstractMesh* affectedMesh);
+  AbstractMesh& detachFromBone();
+
+  /**
+   * @brief Returns if the mesh is within the frustum defined by the passed
+   * array of planes.
+   * A mesh is in the frustum if its bounding box intersects the frustum.
+   * @returns A Boolean.
+   */
   bool isInFrustum(const std::array<Plane, 6>& frustumPlanes) override;
+
+  /**
+   * @brief Returns if the mesh is completely in the frustum defined be the
+   * passed array of planes.
+   * A mesh is completely in the frustum if its bounding box it completely
+   * inside the frustum.
+   * @returns A Boolean.
+   */
   bool isCompletelyInFrustum(
     const std::array<Plane, 6>& frustumPlanes) const override;
+
+  /**
+   * @brief Returns if the mesh intersects another mesh object.
+   * Unless the parameter `precise` is set to `true` the intersection is
+   * computed according to Axis Aligned Bounding Boxes (AABB), else according to
+   * OBB (Oriented BBoxes)
+   * @returns A Boolean.
+   */
   bool intersectsMesh(AbstractMesh* mesh, bool precise);
+
+  /**
+   * @brief Returns if the mesh intersects a SolidParticle object.
+   * Unless the parameter `precise` is set to `true` the intersection is
+   * computed according to Axis Aligned Bounding Boxes (AABB), else according to
+   * OBB (Oriented BBoxes)
+   * @returns A Boolean.
+   */
   bool intersectsMesh(SolidParticle* sp, bool precise);
+
+  /**
+   * @brief Returns if the passed point (Vector3) is inside the mesh bounding
+   * box.
+   * @returns A Boolean.
+   */
   bool intersectsPoint(const Vector3& point);
 
   /** Physics **/
   PhysicsImpostor* getPhysicsImpostor();
   Vector3 getPositionInCameraSpace(Camera* camera);
+
+  /**
+   * @brief Returns the distance from the mesh to the active camera.
+   * @returns A float.
+   */
   float getDistanceToCamera(Camera* camera);
-  void applyImpulse(const Vector3& force, const Vector3& contactPoint);
-  void setPhysicsLinkWith(Mesh* otherMesh, const Vector3& pivot1,
-                          const Vector3& pivot2, const PhysicsParams& options);
+
+  AbstractMesh& applyImpulse(const Vector3& force, const Vector3& contactPoint);
+  AbstractMesh& setPhysicsLinkWith(Mesh* otherMesh, const Vector3& pivot1,
+                                   const Vector3& pivot2,
+                                   const PhysicsParams& options);
 
   /** Collisions **/
+
+  /**
+   * @brief Returns whether the camera should check the collisions against the
+   * mesh.
+   * @returns A Boolean, default `false`.
+   */
   bool checkCollisions() const;
+
   void setCheckCollisions(bool collisionEnabled);
-  void moveWithCollisions(const Vector3& velocity);
+  AbstractMesh& moveWithCollisions(const Vector3& velocity);
 
   /** Submeshes octree **/
+
   /**
-    * This function will create an octree to help select the right submeshes for
-    * rendering, picking and collisions
-    * Please note that you must have a decent number of submeshes to get
-    * performance improvements when using octree
-    */
+   * @brief This function will create an octree to help to select the right
+   * submeshes for rendering, picking and collision computations.
+   * Please note that you must have a decent number of submeshes to get
+   * performance improvements when using an octree.
+   * @returns An Octree of submeshes.
+   */
   Octree<SubMesh*>* createOrUpdateSubmeshesOctree(size_t maxCapacity = 64,
                                                   size_t maxDepth    = 2);
 
   /** Collisions **/
-  void _collideForSubMesh(SubMesh* subMesh, const Matrix& transformMatrix,
-                          Collider* collider);
-  void _processCollisionsForSubMeshes(Collider* collider,
-                                      const Matrix& transformMatrix);
-  void _checkCollision(Collider* collider);
+  AbstractMesh& _collideForSubMesh(SubMesh* subMesh,
+                                   const Matrix& transformMatrix,
+                                   Collider* collider);
+  AbstractMesh& _processCollisionsForSubMeshes(Collider* collider,
+                                               const Matrix& transformMatrix);
+  AbstractMesh& _checkCollision(Collider* collider);
 
   /** Picking **/
   virtual bool _generatePointsArray();
+
+  /**
+   * @brief Checks if the passed Ray intersects with the mesh.
+   * @returns An object PickingInfo.
+   */
   virtual PickingInfo intersects(const Ray& ray, bool fastCheck = true);
+
+  /**
+   * @brief Clones the mesh, used by the class Mesh.
+   * @returns Just returns `null` for an AbstractMesh.
+   */
   AbstractMesh* clone(const std::string& name, Node* newParent,
                       bool doNotCloneChildren = true);
-  void releaseSubMeshes();
+
+  /**
+   * @brief Disposes all the mesh submeshes.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& releaseSubMeshes();
+
+  /**
+   * @brief Disposes the AbstractMesh.
+   * Some internal references are kept for further use.
+   * By default, all the mesh children are also disposed unless the parameter
+   * `doNotRecurse` is set to `true`.
+   */
   virtual void dispose(bool doNotRecurse = false) override;
+
+  /**
+   * @brief Returns a new Vector3 what is the localAxis, expressed in the mesh
+   * local space, rotated like the mesh.
+   * This Vector3 is expressed in the World space.
+   */
   Vector3 getDirection(const Vector3& localAxis);
-  void getDirectionToRef(const Vector3& localAxis, Vector3& result);
-  void setPivotPoint(const Vector3& point, const Space& space = Space::LOCAL);
+
+  /**
+   * @brief Sets the Vector3 "result" as the rotated Vector3 "localAxis" in the
+   * same rotation than the mesh.
+   * localAxis is expressed in the mesh local space.
+   * result is computed in the Wordl space from the mesh World matrix.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& getDirectionToRef(const Vector3& localAxis, Vector3& result);
+
+  /**
+   * @brief Sets the mesh pivot point coordinates in the passed space.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& setPivotPoint(const Vector3& point,
+                              const Space& space = Space::LOCAL);
+
+  /**
+   * @brief Returns a new Vector3 set with the mesh pivot point coordinates in
+   * the local space.
+   */
   Vector3 getPivotPoint() const;
-  void getPivotPointToRef(Vector3& result) const;
+
+  /**
+   * @brief Sets the passed Vector3 "result" with the coordinates of the mesh
+   * pivot point in the local space.
+   * @returns The AbstractMesh.
+   */
+  const AbstractMesh& getPivotPointToRef(Vector3& result) const;
+
+  /**
+   * @brief Returns a new Vector3 set with the mesh pivot point World
+   * coordinates.
+   */
   Vector3 getAbsolutePivotPoint();
-  void getAbsolutePivotPointToRef(Vector3& result);
+
+  /**
+   * @brief Defines the passed mesh as the parent of the current mesh.
+   * If keepWorldPositionRotation is set to `true` (default `false`), the
+   * current mesh position and rotation are kept.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& setParent(AbstractMesh* mesh,
+                          bool keepWorldPositionRotation = false);
+
+  /**
+   * @brief Adds the passed mesh as a child to the current mesh.
+   * If keepWorldPositionRotation is set to `true` (default `false`), the child
+   * world position and rotation are kept.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& addChild(AbstractMesh* mesh,
+                         bool keepWorldPositionRotation = false);
+
+  /**
+   * @brief Removes the passed mesh from the current mesh children list.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& removeChild(AbstractMesh* mesh,
+                            bool keepWorldPositionRotation = false);
+
+  /**
+   * @brief Sets the Vector3 "result" coordinates with the mesh pivot point
+   * World coordinates.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& getAbsolutePivotPointToRef(Vector3& result);
+
+  // Facet data
+
+  /**
+   * @brief Updates the mesh facetData arrays and the internal partitioning when
+   * the mesh is morphed or updated.
+   * This method can be called within the render loop.
+   * You don't need to call this method by yourself in the render loop when you
+   * update/morph a mesh with the methods CreateXXX() as they automatically
+   * manage this computation.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& updateFacetData();
+
+  /**
+   * @brief Returns the facetLocalNormals array.
+   * The normals are expressed in the mesh local space.
+   */
+  std::vector<Vector3>& getFacetLocalNormals();
+
+  /**
+   * @brief Returns the facetLocalPositions array.
+   * The facet positions are expressed in the mesh local space.
+   */
+  std::vector<Vector3>& getFacetLocalPositions();
+
+  /**
+   * @brief Returns the facetLocalPartioning array.
+   */
+  std::vector<Uint32Array>& getFacetLocalPartitioning();
+
+  /**
+   * @brief Returns the i-th facet position in the world system.
+   * This method allocates a new Vector3 per call.
+   */
+  Vector3 getFacetPosition(unsigned int i);
+
+  /**
+   * @brief Sets the reference Vector3 with the i-th facet position in the world
+   * system.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& getFacetPositionToRef(unsigned int i, Vector3& ref);
+
+  /**
+   * Returns the i-th facet normal in the world system.
+   * This method allocates a new Vector3 per call.
+   */
+  Vector3 getFacetNormal(unsigned int i);
+
+  /**
+   * @brief Sets the reference Vector3 with the i-th facet normal in the world
+   * system.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& getFacetNormalToRef(unsigned int i, Vector3& ref);
+
+  /**
+   * @brief Returns the facets (in an array) in the same partitioning block than
+   * the one the passed coordinates are located (expressed in the mesh local
+   * system).
+   */
+  Uint32Array getFacetsAtLocalCoordinates(float x, float y, float z);
+
+  /**
+   * @brief Returns the closest mesh facet index at (x,y,z) World coordinates,
+   * -1 if not found.
+   * If the parameter projected (vector3) is passed, it is set as the (x,y,z)
+   * World projection on the facet.
+   * If checkFace is true (default false), only the facet "facing" to (x,y,z) or
+   * only the ones "turning their backs", according to the parameter "facing"
+   * are returned.
+   * If facing and checkFace are true, only the facet "facing" to (x, y, z) are
+   * returned : positive dot (x, y, z) * facet position.
+   * If facing si false and checkFace is true, only the facet "turning their
+   * backs" to (x, y, z) are returned : negative dot (x, y, z) * facet position.
+   */
+  int getClosestFacetAtCoordinates(float x, float y, float z,
+                                   Vector3& projected, bool projectedSet = true,
+                                   bool checkFace = false, bool facing = true);
+
+  /**
+   * @brief Returns the closest mesh facet index at (x,y,z) local coordinates,
+   * null if not found.
+   * If the parameter projected (vector3) is passed, it is set as the (x,y,z)
+   * local projection on the facet.
+   * If checkFace is true (default false), only the facet "facing" to (x,y,z) or
+   * only the ones "turning their backs", according to the parameter "facing"
+   * are returned.
+   * If facing and checkFace are true, only the facet "facing" to (x, y, z) are
+   * returned : positive dot (x, y, z) * facet position.
+   * If facing si false and checkFace is true, only the facet "turning their
+   * backs"  to (x, y, z) are returned : negative dot (x, y, z) * facet
+   * position.
+   */
+  int getClosestFacetAtLocalCoordinates(float x, float y, float z,
+                                        Vector3& projected,
+                                        bool projectedSet = true,
+                                        bool checkFace    = false,
+                                        bool facing       = true);
+
+  /**
+   * @brief Returns the object "parameter" set with all the expected parameters
+   * for facetData computation by ComputeNormals()
+   */
+  FacetParameters& getFacetDataParameters();
+
+  /**
+   * @brief Disables the feature FacetData and frees the related memory.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& disableFacetData();
 
 protected:
   AbstractMesh(const std::string& name, Scene* scene);
@@ -228,6 +780,14 @@ protected:
 private:
   void _onCollisionPositionChange(int collisionId, const Vector3& newPosition,
                                   AbstractMesh* collidedMesh = nullptr);
+  // Facet data
+
+  /**
+   * @brief Initialize the facet data arrays : facetNormals, facetPositions and
+   * facetPartitioning.
+   * @returns The AbstractMesh.
+   */
+  AbstractMesh& _initFacetData();
 
 public:
   /**
@@ -274,6 +834,9 @@ public:
   bool useOctreeForPicking;
   bool useOctreeForCollisions;
   unsigned int layerMask;
+  /**
+   * True if the mesh must be rendered in any case.
+   */
   bool alwaysSelectAsActiveMesh;
   // This scene's action manager
   ActionManager* actionManager;
@@ -306,6 +869,27 @@ public:
   Float32Array _bonesTransformMatrices;
 
 private:
+  // FacetData private properties
+  // Facet local positions
+  std::vector<Vector3> _facetPositions;
+  // Facet local normals
+  std::vector<Vector3> _facetNormals;
+  // Partitioning array of facet index arrays
+  std::vector<Uint32Array> _facetPartitioning;
+  // facet number
+  size_t _facetNb;
+  // Number of subdivisions per axis in the partioning space
+  unsigned int _partitioningSubdivisions;
+  // The partioning array space is by default 1% bigger than the bounding box
+  float _partitioningBBoxRatio;
+  // Is the facet data feature enabled on this mesh ?
+  bool _facetDataEnabled;
+  // Keep a reference to the object parameters to avoid memory re-allocation
+  FacetParameters _facetParameters;
+  // bbox size approximated for facet data
+  Vector3 _bbSize;
+  // Actual number of subdivisions per axis for ComputeNormals()
+  SubdivisionsPerAxis _subDiv;
   // Events
   Observer<AbstractMesh>::Ptr _onCollideObserver;
   Observer<Vector3>::Ptr _onCollisionPositionChangeObserver;
@@ -315,6 +899,8 @@ private:
   Vector3 _scaling;
   // Collisions
   bool _checkCollisions;
+  int _collisionMask;
+  int _collisionGroup;
   // Collider* _collider;
   Vector3 _oldPositionForCollisions;
   Vector3 _diffPositionForCollisions;

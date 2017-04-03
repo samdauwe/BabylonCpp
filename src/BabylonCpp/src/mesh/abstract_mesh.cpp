@@ -77,12 +77,20 @@ AbstractMesh::AbstractMesh(const std::string& _name, Scene* scene)
     , _renderId{0}
     , _submeshesOctree{nullptr}
     , _unIndexed{false}
+    , _facetNb{0}
+    , _partitioningSubdivisions{10}
+    , _partitioningBBoxRatio{1.01f}
+    , _facetDataEnabled{false}
+    , _bbSize{Vector3::Zero()}
+    , _subDiv{1, 1, 1, 1}
     , _onCollideObserver{nullptr}
     , _onCollisionPositionChangeObserver{nullptr}
     , _position{Vector3(0.f, 0.f, 0.f)}
     , _rotation{Vector3(0.f, 0.f, 0.f)}
     , _scaling{Vector3(1.f, 1.f, 1.f)}
     , _checkCollisions{false}
+    , _collisionMask{-1}
+    , _collisionGroup{-1}
     , _oldPositionForCollisions{Vector3(0.f, 0.f, 0.f)}
     , _diffPositionForCollisions{Vector3(0.f, 0.f, 0.f)}
     , _newPositionForCollisions{Vector3(0.f, 0.f, 0.f)}
@@ -113,6 +121,36 @@ void AbstractMesh::addToScene(std::unique_ptr<AbstractMesh>&& newMesh)
   getScene()->addMesh(std::move(newMesh));
 }
 
+size_t AbstractMesh::facetNb() const
+{
+  return _facetNb;
+}
+
+size_t AbstractMesh::partitioningSubdivisions() const
+{
+  return _partitioningSubdivisions;
+}
+
+void AbstractMesh::setPartitioningSubdivisions(size_t nb)
+{
+  _partitioningSubdivisions = nb;
+}
+
+float AbstractMesh::partitioningBBoxRatio() const
+{
+  return _partitioningBBoxRatio;
+}
+
+void AbstractMesh::setPartitioningBBoxRatio(float ratio)
+{
+  _partitioningBBoxRatio = ratio;
+}
+
+bool AbstractMesh::isFacetDataEnabled() const
+{
+  return _facetDataEnabled;
+}
+
 void AbstractMesh::setOnCollide(const std::function<void()>& callback)
 {
   if (_onCollideObserver) {
@@ -130,6 +168,31 @@ void AbstractMesh::setOnCollisionPositionChange(
   }
   _onCollisionPositionChangeObserver
     = onCollisionPositionChangeObservable.add(callback);
+}
+
+int AbstractMesh::collisionMask() const
+{
+  return _collisionMask;
+}
+
+void AbstractMesh::setCollisionMask(int mask)
+{
+  _collisionMask = !std::isnan(mask) ? mask : -1;
+}
+
+int AbstractMesh::getCollisionGroup() const
+{
+  return _collisionGroup;
+}
+
+void AbstractMesh::setCollisionGroup(int mask)
+{
+  _collisionGroup = !std::isnan(mask) ? mask : -1;
+}
+
+const char* AbstractMesh::getClassName() const
+{
+  return "AbstractMesh";
 }
 
 std::string AbstractMesh::toString(bool fullDetails) const
@@ -263,9 +326,10 @@ AbstractMesh::getChildMeshes(bool directDecendantsOnly,
   return Node::getChildMeshes(directDecendantsOnly, predicate);
 }
 
-void AbstractMesh::updatePoseMatrix(const Matrix& matrix)
+AbstractMesh& AbstractMesh::updatePoseMatrix(const Matrix& matrix)
 {
   _poseMatrix->copyFrom(matrix);
+  return *this;
 }
 
 Matrix& AbstractMesh::getPoseMatrix()
@@ -273,21 +337,25 @@ Matrix& AbstractMesh::getPoseMatrix()
   return *_poseMatrix;
 }
 
-void AbstractMesh::disableEdgesRendering()
+AbstractMesh& AbstractMesh::disableEdgesRendering()
 {
   if (_edgesRenderer != nullptr) {
     _edgesRenderer->dispose();
     _edgesRenderer.reset(nullptr);
   }
+  return *this;
 }
 
-void AbstractMesh::enableEdgesRendering(float epsilon,
-                                        bool checkVerticesInsteadOfIndices)
+AbstractMesh&
+AbstractMesh::enableEdgesRendering(float epsilon,
+                                   bool checkVerticesInsteadOfIndices)
 {
   disableEdgesRendering();
 
   _edgesRenderer = std_util::make_unique<EdgesRenderer>(
     this, epsilon, checkVerticesInsteadOfIndices);
+
+  return *this;
 }
 
 bool AbstractMesh::isBlocked() const
@@ -334,9 +402,10 @@ BoundingInfo* AbstractMesh::getBoundingInfo()
   return _boundingInfo.get();
 }
 
-void AbstractMesh::setBoundingInfo(const BoundingInfo& boundingInfo)
+AbstractMesh& AbstractMesh::setBoundingInfo(const BoundingInfo& boundingInfo)
 {
   _boundingInfo = std_util::make_unique<BoundingInfo>(boundingInfo);
+  return *this;
 }
 
 bool AbstractMesh::useBones()
@@ -365,7 +434,7 @@ Matrix* AbstractMesh::getWorldMatrix()
     return _masterMesh->getWorldMatrix();
   }
 
-  if (_currentRenderId != getScene()->getRenderId()) {
+  if (_currentRenderId != getScene()->getRenderId() || !isSynchronized()) {
     computeWorldMatrix();
   }
   return _worldMatrix.get();
@@ -381,18 +450,20 @@ Vector3* AbstractMesh::absolutePosition()
   return _absolutePosition.get();
 }
 
-void AbstractMesh::freezeWorldMatrix()
+AbstractMesh& AbstractMesh::freezeWorldMatrix()
 {
   // no guarantee world is not already frozen, switch off temporarily
   _isWorldMatrixFrozen = false;
   computeWorldMatrix(true);
   _isWorldMatrixFrozen = true;
+  return *this;
 }
 
-void AbstractMesh::unfreezeWorldMatrix()
+AbstractMesh& AbstractMesh::unfreezeWorldMatrix()
 {
   _isWorldMatrixFrozen = false;
   computeWorldMatrix(true);
+  return *this;
 }
 
 bool AbstractMesh::isWorldMatrixFrozen()
@@ -400,7 +471,8 @@ bool AbstractMesh::isWorldMatrixFrozen()
   return _isWorldMatrixFrozen;
 }
 
-void AbstractMesh::rotate(Vector3& axis, float amount, const Space& space)
+AbstractMesh& AbstractMesh::rotate(Vector3& axis, float amount,
+                                   const Space& space)
 {
   axis.normalize();
 
@@ -428,9 +500,11 @@ void AbstractMesh::rotate(Vector3& axis, float amount, const Space& space)
     rotationQuaternionTmp.multiplyToRef(rotationQuaternion(),
                                         rotationQuaternion());
   }
+  return *this;
 }
 
-void AbstractMesh::translate(Vector3& axis, float distance, const Space& space)
+AbstractMesh& AbstractMesh::translate(Vector3& axis, float distance,
+                                      const Space& space)
 {
   auto displacementVector = axis.scale(distance);
 
@@ -441,6 +515,27 @@ void AbstractMesh::translate(Vector3& axis, float distance, const Space& space)
   else {
     setAbsolutePosition(getAbsolutePosition()->add(displacementVector));
   }
+  return *this;
+}
+
+AbstractMesh& AbstractMesh::addRotation(float x, float y, float z)
+{
+  Quaternion rotationQuaternionTmp;
+  if (rotationQuaternionSet()) {
+    rotationQuaternionTmp = rotationQuaternion();
+  }
+  else {
+    rotationQuaternionTmp = Tmp::QuaternionArray[1];
+    Quaternion::RotationYawPitchRollToRef(rotation().y, rotation().x,
+                                          rotation().z, rotationQuaternionTmp);
+  }
+  auto accumulation = Tmp::QuaternionArray[0];
+  Quaternion::RotationYawPitchRollToRef(y, x, z, accumulation);
+  rotationQuaternionTmp.multiplyInPlace(accumulation);
+  if (!rotationQuaternionSet()) {
+    rotationQuaternionTmp.toEulerAnglesToRef(rotation());
+  }
+  return *this;
 }
 
 Vector3* AbstractMesh::getAbsolutePosition()
@@ -449,11 +544,12 @@ Vector3* AbstractMesh::getAbsolutePosition()
   return _absolutePosition.get();
 }
 
-void AbstractMesh::setAbsolutePosition(const Vector3& absolutePosition_)
+AbstractMesh&
+AbstractMesh::setAbsolutePosition(const Vector3& absolutePosition_)
 {
-  float absolutePositionX = absolutePosition_.x;
-  float absolutePositionY = absolutePosition_.y;
-  float absolutePositionZ = absolutePosition_.z;
+  const float absolutePositionX = absolutePosition_.x;
+  const float absolutePositionY = absolutePosition_.y;
+  const float absolutePositionZ = absolutePosition_.z;
 
   if (parent()) {
     auto invertParentWorldMatrix = parent()->getWorldMatrix();
@@ -470,12 +566,15 @@ void AbstractMesh::setAbsolutePosition(const Vector3& absolutePosition_)
     _position.y = absolutePositionY;
     _position.z = absolutePositionZ;
   }
+
+  return *this;
 }
 
-void AbstractMesh::movePOV(float amountRight, float amountUp,
-                           float amountForward)
+AbstractMesh& AbstractMesh::movePOV(float amountRight, float amountUp,
+                                    float amountForward)
 {
   _position.addInPlace(calcMovePOV(amountRight, amountUp, amountForward));
+  return *this;
 }
 
 Vector3 AbstractMesh::calcMovePOV(float amountRight, float amountUp,
@@ -496,10 +595,11 @@ Vector3 AbstractMesh::calcMovePOV(float amountRight, float amountUp,
   return translationDelta;
 }
 
-void AbstractMesh::rotatePOV(float flipBack, float twirlClockwise,
-                             float tiltRight)
+AbstractMesh& AbstractMesh::rotatePOV(float flipBack, float twirlClockwise,
+                                      float tiltRight)
 {
   rotation().addInPlace(calcRotatePOV(flipBack, twirlClockwise, tiltRight));
+  return *this;
 }
 
 Vector3 AbstractMesh::calcRotatePOV(float flipBack, float twirlClockwise,
@@ -510,10 +610,11 @@ Vector3 AbstractMesh::calcRotatePOV(float flipBack, float twirlClockwise,
                  tiltRight * defForwardMult);
 }
 
-void AbstractMesh::setPivotMatrix(const Matrix& matrix)
+AbstractMesh& AbstractMesh::setPivotMatrix(const Matrix& matrix)
 {
   _pivotMatrix              = matrix;
   _cache.pivotMatrixUpdated = true;
+  return *this;
 }
 
 Matrix& AbstractMesh::getPivotMatrix()
@@ -583,7 +684,7 @@ void AbstractMesh::markAsDirty(const std::string& property)
   _isDirty         = true;
 }
 
-void AbstractMesh::_updateBoundingInfo()
+AbstractMesh& AbstractMesh::_updateBoundingInfo()
 {
   if (!_boundingInfo) {
     auto absolutePos = absolutePosition();
@@ -594,12 +695,14 @@ void AbstractMesh::_updateBoundingInfo()
   _boundingInfo->update(worldMatrixFromCache());
 
   _updateSubMeshesBoundingInfo(worldMatrixFromCache());
+
+  return *this;
 }
 
-void AbstractMesh::_updateSubMeshesBoundingInfo(Matrix& matrix)
+AbstractMesh& AbstractMesh::_updateSubMeshesBoundingInfo(Matrix& matrix)
 {
   if (subMeshes.empty()) {
-    return;
+    return *this;
   }
 
   for (auto& subMesh : subMeshes) {
@@ -607,6 +710,8 @@ void AbstractMesh::_updateSubMeshesBoundingInfo(Matrix& matrix)
       subMesh->updateBoundingInfo(matrix);
     }
   }
+
+  return *this;
 }
 
 Matrix AbstractMesh::computeWorldMatrix(bool force)
@@ -616,7 +721,7 @@ Matrix AbstractMesh::computeWorldMatrix(bool force)
   }
 
   if (!force && (_currentRenderId == getScene()->getRenderId()
-                 || isSynchronized(true))) {
+                 && isSynchronized(true))) {
     _currentRenderId = getScene()->getRenderId();
     return *_worldMatrix;
   }
@@ -680,81 +785,96 @@ Matrix AbstractMesh::computeWorldMatrix(bool force)
   _pivotMatrix.multiplyToRef(Tmp::MatrixArray[1], Tmp::MatrixArray[4]);
   Tmp::MatrixArray[4].multiplyToRef(Tmp::MatrixArray[0], Tmp::MatrixArray[5]);
 
-  // Billboarding
+  // Billboarding (testing PG:http://www.babylonjs-playground.com/#UJEIL#13)
   if (billboardMode != AbstractMesh::BILLBOARDMODE_NONE
       && getScene()->activeCamera) {
-    Tmp::Vector3Array[0].copyFrom(_position);
-    Vector3 localPosition = Tmp::Vector3Array[0];
-
-    if (parent() && parent()->getWorldMatrix()) {
-      _markSyncedWithParent();
-
-      Matrix parentMatrix;
-      if (_meshToBoneReferal) {
-        parent()->getWorldMatrix()->multiplyToRef(
-          *_meshToBoneReferal->getWorldMatrix(), Tmp::MatrixArray[6]);
-        parentMatrix = Tmp::MatrixArray[6];
-      }
-      else {
-        parentMatrix = *parent()->getWorldMatrix();
-      }
-
-      Vector3::TransformNormalToRef(localPosition, parentMatrix,
-                                    Tmp::Vector3Array[1]);
-      localPosition = Tmp::Vector3Array[1];
-    }
-
-    Vector3 zero = getScene()->activeCamera->globalPosition();
-
-    if (parent()) {
-      AbstractMesh* parentMesh = dynamic_cast<AbstractMesh*>(parent());
-      if (parentMesh) {
-        localPosition.addInPlace(parentMesh->_position);
-        Matrix::TranslationToRef(localPosition.x, localPosition.y,
-                                 localPosition.z, Tmp::MatrixArray[2]);
-      }
-    }
-
     if ((billboardMode & AbstractMesh::BILLBOARDMODE_ALL)
         != AbstractMesh::BILLBOARDMODE_ALL) {
-      if (billboardMode & AbstractMesh::BILLBOARDMODE_X) {
-        zero.x = localPosition.x + MathTools::Epsilon;
+      // Need to decompose each rotation here
+      auto currentPosition = Tmp::Vector3Array[3];
+
+      if (parent() && parent()->getWorldMatrix()) {
+        if (_meshToBoneReferal) {
+          parent()->getWorldMatrix()->multiplyToRef(
+            *_meshToBoneReferal->getWorldMatrix(), Tmp::MatrixArray[6]);
+          Vector3::TransformCoordinatesToRef(position(), Tmp::MatrixArray[6],
+                                             currentPosition);
+        }
+        else {
+          Vector3::TransformCoordinatesToRef(
+            position(), *parent()->getWorldMatrix(), currentPosition);
+        }
       }
-      if (billboardMode & AbstractMesh::BILLBOARDMODE_Y) {
-        zero.y = localPosition.y + MathTools::Epsilon;
+      else {
+        currentPosition.copyFrom(position());
       }
-      if (billboardMode & AbstractMesh::BILLBOARDMODE_Z) {
-        zero.z = localPosition.z + MathTools::Epsilon;
+
+      currentPosition.subtractInPlace(
+        getScene()->activeCamera->globalPosition());
+
+      auto finalEuler = Tmp::Vector3Array[4].copyFromFloats(0.f, 0.f, 0.f);
+      if ((billboardMode & AbstractMesh::BILLBOARDMODE_X)
+          == AbstractMesh::BILLBOARDMODE_X) {
+        finalEuler.x = std::atan2(-currentPosition.y, currentPosition.z);
       }
+
+      if ((billboardMode & AbstractMesh::BILLBOARDMODE_Y)
+          == AbstractMesh::BILLBOARDMODE_Y) {
+        finalEuler.y = std::atan2(currentPosition.x, currentPosition.z);
+      }
+
+      if ((billboardMode & AbstractMesh::BILLBOARDMODE_Z)
+          == AbstractMesh::BILLBOARDMODE_Z) {
+        finalEuler.z = std::atan2(currentPosition.y, currentPosition.x);
+      }
+
+      Matrix::RotationYawPitchRollToRef(finalEuler.y, finalEuler.x,
+                                        finalEuler.z, Tmp::MatrixArray[0]);
+    }
+    else {
+      Tmp::MatrixArray[1].copyFrom(getScene()->activeCamera->getViewMatrix());
+
+      Tmp::MatrixArray[1].setTranslationFromFloats(0, 0, 0);
+      Tmp::MatrixArray[1].invertToRef(Tmp::MatrixArray[0]);
     }
 
-    Matrix::LookAtLHToRef(localPosition, zero, Vector3::Up(),
-                          Tmp::MatrixArray[3]);
-    Tmp::MatrixArray[3].m[12]     = Tmp::MatrixArray[3].m[13]
-      = Tmp::MatrixArray[3].m[14] = 0.f;
-
-    Tmp::MatrixArray[3].invert();
-
-    Tmp::MatrixArray[5].multiplyToRef(Tmp::MatrixArray[3], _localWorld);
-    _rotateYByPI.multiplyToRef(_localWorld, Tmp::MatrixArray[5]);
+    Tmp::MatrixArray[1].copyFrom(Tmp::MatrixArray[5]);
+    Tmp::MatrixArray[1].multiplyToRef(Tmp::MatrixArray[0], Tmp::MatrixArray[5]);
   }
 
   // Local world
   Tmp::MatrixArray[5].multiplyToRef(Tmp::MatrixArray[2], _localWorld);
 
   // Parent
-  if (parent() && parent()->getWorldMatrix()
-      && billboardMode == AbstractMesh::BILLBOARDMODE_NONE) {
+  if (parent() && parent()->getWorldMatrix()) {
     _markSyncedWithParent();
 
-    if (_meshToBoneReferal) {
-      _localWorld.multiplyToRef(*parent()->getWorldMatrix(),
-                                Tmp::MatrixArray[6]);
-      Tmp::MatrixArray[6].multiplyToRef(*_meshToBoneReferal->getWorldMatrix(),
-                                        *_worldMatrix);
+    if (billboardMode != AbstractMesh::BILLBOARDMODE_NONE) {
+      if (_meshToBoneReferal) {
+        parent()->getWorldMatrix()->multiplyToRef(
+          *_meshToBoneReferal->getWorldMatrix(), Tmp::MatrixArray[6]);
+        Tmp::MatrixArray[5].copyFrom(Tmp::MatrixArray[6]);
+      }
+      else {
+        Tmp::MatrixArray[5].copyFrom(*parent()->getWorldMatrix());
+      }
+
+      _localWorld.getTranslationToRef(Tmp::Vector3Array[5]);
+      Vector3::TransformCoordinatesToRef(
+        Tmp::Vector3Array[5], Tmp::MatrixArray[5], Tmp::Vector3Array[5]);
+      _worldMatrix->copyFrom(_localWorld);
+      _worldMatrix->setTranslation(Tmp::Vector3Array[5]);
     }
     else {
-      _localWorld.multiplyToRef(*parent()->getWorldMatrix(), *_worldMatrix);
+      if (_meshToBoneReferal) {
+        _localWorld.multiplyToRef(*parent()->getWorldMatrix(),
+                                  Tmp::MatrixArray[6]);
+        Tmp::MatrixArray[6].multiplyToRef(*_meshToBoneReferal->getWorldMatrix(),
+                                          *_worldMatrix);
+      }
+      else {
+        _localWorld.multiplyToRef(*parent()->getWorldMatrix(), *_worldMatrix);
+      }
     }
   }
   else {
@@ -778,23 +898,27 @@ Matrix AbstractMesh::computeWorldMatrix(bool force)
   return *_worldMatrix;
 }
 
-void AbstractMesh::registerAfterWorldMatrixUpdate(
+AbstractMesh& AbstractMesh::registerAfterWorldMatrixUpdate(
   const std::function<void(AbstractMesh* mesh)>& func)
 {
   onAfterWorldMatrixUpdateObservable.add(func);
+  return *this;
 }
 
-void AbstractMesh::unregisterAfterWorldMatrixUpdate(
+AbstractMesh& AbstractMesh::unregisterAfterWorldMatrixUpdate(
   const std::function<void(AbstractMesh* mesh)>& func)
 {
   onAfterWorldMatrixUpdateObservable.removeCallback(func);
+  return *this;
 }
 
-void AbstractMesh::setPositionWithLocalVector(const Vector3& vector3)
+AbstractMesh& AbstractMesh::setPositionWithLocalVector(const Vector3& vector3)
 {
   computeWorldMatrix();
 
   _position = Vector3(Vector3::TransformNormal(vector3, _localWorld));
+
+  return *this;
 }
 
 Vector3 AbstractMesh::getPositionExpressedInLocalSpace()
@@ -806,15 +930,17 @@ Vector3 AbstractMesh::getPositionExpressedInLocalSpace()
   return Vector3::TransformNormal(_position, invLocalWorldMatrix);
 }
 
-void AbstractMesh::locallyTranslate(const Vector3& vector3)
+AbstractMesh& AbstractMesh::locallyTranslate(const Vector3& vector3)
 {
   computeWorldMatrix(true);
 
   _position = Vector3(Vector3::TransformCoordinates(vector3, _localWorld));
+
+  return *this;
 }
 
-void AbstractMesh::lookAt(const Vector3& targetPoint, float yawCor,
-                          float pitchCor, float rollCor, Space space)
+AbstractMesh& AbstractMesh::lookAt(const Vector3& targetPoint, float yawCor,
+                                   float pitchCor, float rollCor, Space space)
 {
   Vector3& dv = AbstractMesh::_lookAtVectorCache;
   Vector3 pos = (space == Space::LOCAL) ? _position : *getAbsolutePosition();
@@ -828,9 +954,10 @@ void AbstractMesh::lookAt(const Vector3& targetPoint, float yawCor,
   }
   Quaternion::RotationYawPitchRollToRef(yaw + yawCor, pitch + pitchCor, rollCor,
                                         _rotationQuaternion);
+  return *this;
 }
 
-void AbstractMesh::attachToBone(Bone* bone, AbstractMesh* affectedMesh)
+AbstractMesh& AbstractMesh::attachToBone(Bone* bone, AbstractMesh* affectedMesh)
 {
   _meshToBoneReferal = affectedMesh;
   setParent(dynamic_cast<Node*>(bone));
@@ -838,9 +965,11 @@ void AbstractMesh::attachToBone(Bone* bone, AbstractMesh* affectedMesh)
   if (bone->getWorldMatrix()->determinant() < 0.f) {
     scalingDeterminant *= -1.f;
   }
+
+  return *this;
 }
 
-void AbstractMesh::detachFromBone()
+AbstractMesh& AbstractMesh::detachFromBone()
 {
   if (parent()->getWorldMatrix()->determinant() < 0.f) {
     scalingDeterminant *= -1.f;
@@ -848,6 +977,8 @@ void AbstractMesh::detachFromBone()
 
   _meshToBoneReferal = nullptr;
   setParent(nullptr);
+
+  return *this;
 }
 
 bool AbstractMesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes)
@@ -913,24 +1044,28 @@ float AbstractMesh::getDistanceToCamera(Camera* camera)
   return _absolutePosition->subtract(camera->position).length();
 }
 
-void AbstractMesh::applyImpulse(const Vector3& force,
-                                const Vector3& contactPoint)
+AbstractMesh& AbstractMesh::applyImpulse(const Vector3& force,
+                                         const Vector3& contactPoint)
 {
   if (!physicsImpostor) {
-    return;
+    return *this;
   }
 
   physicsImpostor->applyImpulse(force, contactPoint);
+
+  return *this;
 }
 
-void AbstractMesh::setPhysicsLinkWith(Mesh* otherMesh,
-                                      const Vector3& /*pivot1*/,
-                                      const Vector3& /*pivot2*/,
-                                      const PhysicsParams& /*options*/)
+AbstractMesh& AbstractMesh::setPhysicsLinkWith(Mesh* otherMesh,
+                                               const Vector3& /*pivot1*/,
+                                               const Vector3& /*pivot2*/,
+                                               const PhysicsParams& /*options*/)
 {
   if (!physicsImpostor || !otherMesh->physicsImpostor) {
-    return;
+    return *this;
   }
+
+  return *this;
 }
 
 bool AbstractMesh::checkCollisions() const
@@ -946,7 +1081,7 @@ void AbstractMesh::setCheckCollisions(bool collisionEnabled)
   }*/
 }
 
-void AbstractMesh::moveWithCollisions(const Vector3& /*velocity*/)
+AbstractMesh& AbstractMesh::moveWithCollisions(const Vector3& /*velocity*/)
 {
   /*var globalPosition = getAbsolutePosition();
 
@@ -958,6 +1093,7 @@ void AbstractMesh::moveWithCollisions(const Vector3& /*velocity*/)
   getScene().collisionCoordinator.getNewPosition(
     _oldPositionForCollisions, velocity, _collider, 3, this,
     _onCollisionPositionChange, uniqueId);*/
+  return *this;
 }
 
 void AbstractMesh::_onCollisionPositionChange(int /*collisionId*/,
@@ -1002,9 +1138,10 @@ AbstractMesh::createOrUpdateSubmeshesOctree(size_t maxCapacity, size_t maxDepth)
   return _submeshesOctree;
 }
 
-void AbstractMesh::_collideForSubMesh(SubMesh* /*subMesh*/,
-                                      const Matrix& /*transformMatrix*/,
-                                      Collider* /*collider*/)
+AbstractMesh&
+AbstractMesh::_collideForSubMesh(SubMesh* /*subMesh*/,
+                                 const Matrix& /*transformMatrix*/,
+                                 Collider* /*collider*/)
 {
   /*_generatePointsArray();
   // Transformation
@@ -1028,10 +1165,12 @@ void AbstractMesh::_collideForSubMesh(SubMesh* /*subMesh*/,
   if (collider.collisionFound) {
     collider.collidedMesh = this;
   }*/
+  return *this;
 }
 
-void AbstractMesh::_processCollisionsForSubMeshes(
-  Collider* /*collider*/, const Matrix& /*transformMatrix*/)
+AbstractMesh&
+AbstractMesh::_processCollisionsForSubMeshes(Collider* /*collider*/,
+                                             const Matrix& /*transformMatrix*/)
 {
   /*var subMeshes : SubMesh[];
   var len : number;
@@ -1061,9 +1200,10 @@ void AbstractMesh::_processCollisionsForSubMeshes(
 
     _collideForSubMesh(subMesh, transformMatrix, collider);
   }*/
+  return *this;
 }
 
-void AbstractMesh::_checkCollision(Collider* /*collider*/)
+AbstractMesh& AbstractMesh::_checkCollision(Collider* /*collider*/)
 {
   // Bounding box test
   /*if (!_boundingInfo->_checkCollision(collider))
@@ -1076,6 +1216,7 @@ void AbstractMesh::_checkCollision(Collider* /*collider*/)
                                      _collisionsTransformMatrix);
 
   _processCollisionsForSubMeshes(collider, _collisionsTransformMatrix);*/
+  return *this;
 }
 
 bool AbstractMesh::_generatePointsArray()
@@ -1172,7 +1313,7 @@ AbstractMesh* AbstractMesh::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-void AbstractMesh::releaseSubMeshes()
+AbstractMesh& AbstractMesh::releaseSubMeshes()
 {
   if (!subMeshes.empty()) {
     for (auto& subMesh : subMeshes) {
@@ -1181,6 +1322,8 @@ void AbstractMesh::releaseSubMeshes()
   }
 
   subMeshes.clear();
+
+  return *this;
 }
 
 void AbstractMesh::dispose(bool doNotRecurse)
@@ -1236,10 +1379,12 @@ void AbstractMesh::dispose(bool doNotRecurse)
   }
 
   // SubMeshes
-  releaseSubMeshes();
+  if (type() != IReflect::Type::INSTANCEDMESH) {
+    releaseSubMeshes();
+  }
 
   // Engine
-  getScene()->getEngine()->unbindAllAttributes();
+  getScene()->getEngine()->wipeCaches();
 
   // Remove from scene
   getScene()->removeMesh(this);
@@ -1266,6 +1411,11 @@ void AbstractMesh::dispose(bool doNotRecurse)
     }
   }
 
+  // facet data
+  if (_facetDataEnabled) {
+    disableFacetData();
+  }
+
   onAfterWorldMatrixUpdateObservable.clear();
   onCollideObservable.clear();
   onCollisionPositionChangeObservable.clear();
@@ -1284,12 +1434,15 @@ Vector3 AbstractMesh::getDirection(const Vector3& localAxis)
   return result;
 }
 
-void AbstractMesh::getDirectionToRef(const Vector3& localAxis, Vector3& result)
+AbstractMesh& AbstractMesh::getDirectionToRef(const Vector3& localAxis,
+                                              Vector3& result)
 {
   Vector3::TransformNormalToRef(localAxis, *getWorldMatrix(), result);
+  return *this;
 }
 
-void AbstractMesh::setPivotPoint(const Vector3& point, const Space& space)
+AbstractMesh& AbstractMesh::setPivotPoint(const Vector3& point,
+                                          const Space& space)
 {
   auto _point = point;
   if (getScene()->getRenderId() == 0) {
@@ -1311,6 +1464,8 @@ void AbstractMesh::setPivotPoint(const Vector3& point, const Space& space)
   _pivotMatrix.m[14] = -_point.z;
 
   _cache.pivotMatrixUpdated = true;
+
+  return *this;
 }
 
 Vector3 AbstractMesh::getPivotPoint() const
@@ -1322,11 +1477,13 @@ Vector3 AbstractMesh::getPivotPoint() const
   return point;
 }
 
-void AbstractMesh::getPivotPointToRef(Vector3& result) const
+const AbstractMesh& AbstractMesh::getPivotPointToRef(Vector3& result) const
 {
   result.x = -_pivotMatrix.m[12];
   result.y = -_pivotMatrix.m[13];
   result.z = -_pivotMatrix.m[14];
+
+  return *this;
 }
 
 Vector3 AbstractMesh::getAbsolutePivotPoint()
@@ -1338,15 +1495,343 @@ Vector3 AbstractMesh::getAbsolutePivotPoint()
   return point;
 }
 
-void AbstractMesh::getAbsolutePivotPointToRef(Vector3& result)
+AbstractMesh& AbstractMesh::setParent(AbstractMesh* mesh,
+                                      bool keepWorldPositionRotation)
+{
+  auto child  = this;
+  auto parent = mesh;
+
+  if (mesh == nullptr) {
+    if (child->parent() && keepWorldPositionRotation) {
+      auto& rotation = Tmp::QuaternionArray[0];
+      auto& position = Tmp::Vector3Array[0];
+      auto& scale    = Tmp::Vector3Array[1];
+
+      child->getWorldMatrix()->decompose(scale, rotation, position);
+
+      if (child->rotationQuaternionSet()) {
+        child->rotationQuaternion().copyFrom(rotation);
+      }
+      else {
+        rotation.toEulerAnglesToRef(child->rotation());
+      }
+
+      child->position().x = position.x;
+      child->position().y = position.y;
+      child->position().z = position.z;
+    }
+  }
+  else {
+    if (keepWorldPositionRotation) {
+      auto& rotation = Tmp::QuaternionArray[0];
+      auto& position = Tmp::Vector3Array[0];
+      auto& scale    = Tmp::Vector3Array[1];
+      auto& m1       = Tmp::MatrixArray[0];
+      auto& m2       = Tmp::MatrixArray[1];
+
+      parent->getWorldMatrix()->decompose(scale, rotation, position);
+
+      rotation.toRotationMatrix(m1);
+      m2.setTranslation(position);
+
+      m2.multiplyToRef(m1, m1);
+
+      auto invParentMatrix = Matrix::Invert(m1);
+
+      auto m = child->getWorldMatrix()->multiply(invParentMatrix);
+
+      m.decompose(scale, rotation, position);
+
+      if (child->rotationQuaternionSet()) {
+        child->rotationQuaternion().copyFrom(rotation);
+      }
+      else {
+        rotation.toEulerAnglesToRef(child->rotation());
+      }
+
+      invParentMatrix = Matrix::Invert(*parent->getWorldMatrix());
+
+      m = child->getWorldMatrix()->multiply(invParentMatrix);
+
+      m.decompose(scale, rotation, position);
+
+      child->position().x = position.x;
+      child->position().y = position.y;
+      child->position().z = position.z;
+    }
+  }
+
+  child->setParent(parent);
+
+  return *this;
+}
+
+AbstractMesh& AbstractMesh::addChild(AbstractMesh* mesh,
+                                     bool keepWorldPositionRotation)
+{
+  mesh->setParent(this, keepWorldPositionRotation);
+  return *this;
+}
+
+AbstractMesh& AbstractMesh::removeChild(AbstractMesh* mesh,
+                                        bool keepWorldPositionRotation)
+{
+  mesh->setParent(nullptr, keepWorldPositionRotation);
+  return *this;
+}
+
+AbstractMesh& AbstractMesh::getAbsolutePivotPointToRef(Vector3& result)
 {
   result.x = _pivotMatrix.m[12];
   result.y = _pivotMatrix.m[13];
   result.z = _pivotMatrix.m[14];
-
   getPivotPointToRef(result);
-
   Vector3::TransformCoordinatesToRef(result, *getWorldMatrix(), result);
+
+  return *this;
+}
+
+AbstractMesh& AbstractMesh::_initFacetData()
+{
+  _facetNb = getIndices().size() / 3;
+
+  _facetNormals.resize(_facetNb);
+  std::fill(_facetNormals.begin(), _facetNormals.end(), Vector3::Zero());
+
+  _facetPositions.resize(_facetNb);
+  std::fill(_facetPositions.begin(), _facetPositions.end(), Vector3::Zero());
+
+  _facetDataEnabled = true;
+
+  return *this;
+}
+
+AbstractMesh& AbstractMesh::updateFacetData()
+{
+  if (!_facetDataEnabled) {
+    _initFacetData();
+  }
+  auto positions = getVerticesData(VertexBuffer::PositionKind);
+  auto indices   = getIndices();
+  auto normals   = getVerticesData(VertexBuffer::NormalKind);
+  auto bInfo     = getBoundingInfo();
+  _bbSize.x      = (bInfo->maximum.x - bInfo->minimum.x > MathTools::Epsilon) ?
+                bInfo->maximum.x - bInfo->minimum.x :
+                MathTools::Epsilon;
+  _bbSize.y = (bInfo->maximum.y - bInfo->minimum.y > MathTools::Epsilon) ?
+                bInfo->maximum.y - bInfo->minimum.y :
+                MathTools::Epsilon;
+  _bbSize.z = (bInfo->maximum.z - bInfo->minimum.z > MathTools::Epsilon) ?
+                bInfo->maximum.z - bInfo->minimum.z :
+                MathTools::Epsilon;
+  auto bbSizeMax = (_bbSize.x > _bbSize.y) ? _bbSize.x : _bbSize.y;
+  bbSizeMax      = (bbSizeMax > _bbSize.z) ? bbSizeMax : _bbSize.z;
+  _subDiv.max    = _partitioningSubdivisions;
+  // adjust the number of subdivisions per axis
+  _subDiv.X
+    = static_cast<unsigned>(std::floor(_subDiv.max * _bbSize.x / bbSizeMax));
+  // according to each bbox size per axis
+  _subDiv.Y
+    = static_cast<unsigned>(std::floor(_subDiv.max * _bbSize.y / bbSizeMax));
+  _subDiv.Z
+    = static_cast<unsigned>(std::floor(_subDiv.max * _bbSize.z / bbSizeMax));
+  _subDiv.X = _subDiv.X < 1 ? 1 : _subDiv.X; // at least one subdivision
+  _subDiv.Y = _subDiv.Y < 1 ? 1 : _subDiv.Y;
+  _subDiv.Z = _subDiv.Z < 1 ? 1 : _subDiv.Z;
+  // set the parameters for ComputeNormals()
+  _facetParameters.facetNormals      = getFacetLocalNormals();
+  _facetParameters.facetPositions    = getFacetLocalPositions();
+  _facetParameters.facetPartitioning = getFacetLocalPartitioning();
+  _facetParameters.bInfo             = bInfo;
+  _facetParameters.bbSize            = _bbSize;
+  _facetParameters.subDiv            = _subDiv;
+  _facetParameters.ratio             = partitioningBBoxRatio;
+  // VertexData::ComputeNormals(positions, indices, normals, _facetParameters);
+  return *this;
+}
+
+std::vector<Vector3>& AbstractMesh::getFacetLocalNormals()
+{
+  if (_facetNormals.empty()) {
+    updateFacetData();
+  }
+  return _facetNormals;
+}
+
+std::vector<Vector3>& AbstractMesh::getFacetLocalPositions()
+{
+  if (_facetPositions.empty()) {
+    updateFacetData();
+  }
+  return _facetPositions;
+}
+
+std::vector<Uint32Array>& AbstractMesh::getFacetLocalPartitioning()
+{
+  if (_facetPartitioning.empty()) {
+    updateFacetData();
+  }
+  return _facetPartitioning;
+}
+
+Vector3 AbstractMesh::getFacetPosition(unsigned int i)
+{
+  auto pos = Vector3::Zero();
+  getFacetPositionToRef(i, pos);
+  return pos;
+}
+
+AbstractMesh& AbstractMesh::getFacetPositionToRef(unsigned int i, Vector3& ref)
+{
+  auto localPos = (getFacetLocalPositions())[i];
+  auto world    = getWorldMatrix();
+  Vector3::TransformCoordinatesToRef(localPos, *world, ref);
+  return *this;
+}
+
+Vector3 AbstractMesh::getFacetNormal(unsigned int i)
+{
+  auto norm = Vector3::Zero();
+  getFacetNormalToRef(i, norm);
+  return norm;
+}
+
+AbstractMesh& AbstractMesh::getFacetNormalToRef(unsigned int i, Vector3& ref)
+{
+  auto localNorm = (getFacetLocalNormals())[i];
+  Vector3::TransformNormalToRef(localNorm, *getWorldMatrix(), ref);
+  return *this;
+}
+
+Uint32Array AbstractMesh::getFacetsAtLocalCoordinates(float x, float y, float z)
+{
+  auto bInfo = getBoundingInfo();
+  int ox     = static_cast<int>(
+    std::floor((x - bInfo->minimum.x * _partitioningBBoxRatio) * _subDiv.X
+               * _partitioningBBoxRatio / _bbSize.x));
+  int oy = static_cast<int>(
+    std::floor((y - bInfo->minimum.y * _partitioningBBoxRatio) * _subDiv.Y
+               * _partitioningBBoxRatio / _bbSize.y));
+  int oz = static_cast<int>(
+    std::floor((z - bInfo->minimum.z * _partitioningBBoxRatio) * _subDiv.Z
+               * _partitioningBBoxRatio / _bbSize.z));
+
+  if (ox < 0 || oy < 0 || oz < 0) {
+    return Uint32Array();
+  }
+
+  unsigned int _ox = static_cast<unsigned>(ox);
+  unsigned int _oy = static_cast<unsigned>(oy);
+  unsigned int _oz = static_cast<unsigned>(oz);
+  if (_ox > _subDiv.max || _oy > _subDiv.max || _oz > _subDiv.max) {
+    return Uint32Array();
+  }
+
+  return _facetPartitioning[_ox + _subDiv.max * _oy
+                            + _subDiv.max * _subDiv.max * _oz];
+}
+
+int AbstractMesh::getClosestFacetAtCoordinates(float x, float y, float z,
+                                               Vector3& projected,
+                                               bool projectedSet,
+                                               bool checkFace, bool facing)
+{
+  auto world   = getWorldMatrix();
+  auto& invMat = Tmp::MatrixArray[5];
+  world->invertToRef(invMat);
+  auto& invVect = Tmp::Vector3Array[8];
+  int closest   = -1;
+  // transform (x,y,z) to coordinates in the mesh local space
+  Vector3::TransformCoordinatesFromFloatsToRef(x, y, z, invMat, invVect);
+  closest = getClosestFacetAtLocalCoordinates(invVect.x, invVect.y, invVect.z,
+                                              projected, checkFace, facing);
+  if (projectedSet) {
+    // tranform the local computed projected vector to world coordinates
+    Vector3::TransformCoordinatesFromFloatsToRef(
+      projected.x, projected.y, projected.z, *world, projected);
+  }
+  return closest;
+}
+
+int AbstractMesh::getClosestFacetAtLocalCoordinates(float x, float y, float z,
+                                                    Vector3& projected,
+                                                    bool projectedSet,
+                                                    bool checkFace, bool facing)
+{
+  int closest = -1;
+  float tmpx  = 0.f;
+  float tmpy  = 0.f;
+  float tmpz  = 0.f;
+  float d     = 0.f; // tmp dot facet normal * facet position
+  float t0    = 0.f;
+  float projx = 0.f;
+  float projy = 0.f;
+  float projz = 0.f;
+  // Get all the facets in the same partitioning block than (x, y, z)
+  auto facetPositions = getFacetLocalPositions();
+  auto facetNormals   = getFacetLocalNormals();
+  auto facetsInBlock  = getFacetsAtLocalCoordinates(x, y, z);
+  if (facetsInBlock.empty()) {
+    return closest;
+  }
+  // Get the closest facet to (x, y, z)
+  float shortest    = std::numeric_limits<float>::max(); // init distance vars
+  float tmpDistance = shortest;
+  size_t fib;   // current facet in the block
+  Vector3 norm; // current facet normal
+  Vector3 p0;   // current facet barycenter position
+  // loop on all the facets in the current partitioning block
+  for (size_t idx = 0; idx < facetsInBlock.size(); ++idx) {
+    fib  = facetsInBlock[idx];
+    norm = facetNormals[fib];
+    p0   = facetPositions[fib];
+
+    d = (x - p0.x) * norm.x + (y - p0.y) * norm.y + (z - p0.z) * norm.z;
+    if (!checkFace || (checkFace && facing && d >= 0.f)
+        || (checkFace && !facing && d <= 0.f)) {
+      // compute (x,y,z) projection on the facet = (projx, projy, projz)
+      d  = norm.x * p0.x + norm.y * p0.y + norm.z * p0.z;
+      t0 = -(norm.x * x + norm.y * y + norm.z * z - d)
+           / (norm.x * norm.x + norm.y * norm.y + norm.z * norm.z);
+      projx = x + norm.x * t0;
+      projy = y + norm.y * t0;
+      projz = z + norm.z * t0;
+
+      tmpx = projx - x;
+      tmpy = projy - y;
+      tmpz = projz - z;
+      // compute length between (x, y, z) and its projection on the facet
+      tmpDistance = tmpx * tmpx + tmpy * tmpy + tmpz * tmpz;
+      // just keep the closest facet to (x, y, z)
+      if (tmpDistance < shortest) {
+        shortest = tmpDistance;
+        closest  = static_cast<int>(fib);
+        if (projectedSet) {
+          projected.x = projx;
+          projected.y = projy;
+          projected.z = projz;
+        }
+      }
+    }
+  }
+  return closest;
+}
+
+FacetParameters& AbstractMesh::getFacetDataParameters()
+{
+  return _facetParameters;
+}
+
+AbstractMesh& AbstractMesh::disableFacetData()
+{
+  if (_facetDataEnabled) {
+    _facetDataEnabled = false;
+    _facetPositions.clear();
+    _facetNormals.clear();
+    _facetPartitioning.clear();
+    _facetParameters.clear();
+  }
+  return *this;
 }
 
 } // end of namespace BABYLON
