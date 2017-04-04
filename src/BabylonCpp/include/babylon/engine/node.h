@@ -28,6 +28,7 @@ public:
 
   virtual IReflect::Type type() const override;
   void setParent(Node* parent);
+  virtual const char* getClassName() const;
   Node* parent() const override;
   void setOnDispose(const std::function<void()>& callback);
   virtual Scene* getScene();
@@ -103,15 +104,7 @@ public:
   std::vector<Node*>
   getDescendants(bool directDescendantsOnly                       = false,
                  const std::function<bool(Node* node)>& predicate = nullptr);
-  /**
-   * @param predicate: an optional predicate that will be called on every
-   * evaluated children, the predicate must return true for a given child to be
-   * part of the result, otherwise it will be ignored.
-   * @deprecated legacy support.
-   * use getDecendants instead.
-   */
-  std::vector<Node*>
-  getChildren(const std::function<bool(Node* node)>& predicate);
+
   /**
    * Get all child-meshes of this node.
    */

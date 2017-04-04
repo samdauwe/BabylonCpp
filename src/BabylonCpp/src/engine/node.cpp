@@ -64,6 +64,11 @@ Node* Node::parent() const
   return _parentNode;
 }
 
+const char* Node::getClassName() const
+{
+  return "Node";
+}
+
 void Node::setOnDispose(const std::function<void()>& callback)
 {
   if (_onDisposeObserver) {
@@ -241,12 +246,6 @@ Node::getDescendants(bool directDescendantsOnly,
   _getDescendants(results, directDescendantsOnly, predicate);
 
   return results;
-}
-
-std::vector<Node*>
-Node::getChildren(const std::function<bool(Node* node)>& predicate)
-{
-  return getDescendants(true, predicate);
 }
 
 std::vector<AbstractMesh*>

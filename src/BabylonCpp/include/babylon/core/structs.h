@@ -257,6 +257,13 @@ struct Style {
   std::string cursor;
 }; // end of struct cursor
 
+struct SubdivisionsPerAxis {
+  unsigned int max;
+  unsigned int X;
+  unsigned int Y;
+  unsigned int Z;
+}; // end of struct SubdivisionsPerAxis
+
 struct TriggerOptions {
   std::string parameter;
   unsigned int trigger;

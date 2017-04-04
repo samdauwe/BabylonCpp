@@ -35,7 +35,6 @@ public:
   static Quaternion _rotationAxisCache;
   static Vector3 _lookAtVectorCache;
 
-  // Constructor
   ~AbstractMesh();
 
   virtual IReflect::Type type() const override;
@@ -52,9 +51,13 @@ public:
    * @brief Returns the number (integer) of subdivisions per axis in the
    * partioning space
    */
-  size_t partitioningSubdivisions() const;
+  unsigned int partitioningSubdivisions() const;
 
-  void setPartitioningSubdivisions(size_t nb);
+  /**
+   * @brief Sets the number (integer) of subdivisions per axis in the partioning
+   * space
+   */
+  void setPartitioningSubdivisions(unsigned int nb);
 
   /**
    * @brief Returns the ratio (float) to apply to the bouding box size to set to
@@ -88,7 +91,7 @@ public:
   /**
    * Returns the string "AbstractMesh"
    */
-  const char* getClassName() const;
+  const char* getClassName() const override;
 
   /**
    * @brief Returns the string representatin of the AbstractMesh Object.
@@ -535,7 +538,12 @@ public:
    */
   bool checkCollisions() const;
 
+  /**
+   * @brief Sets whether the camera should check the collisions against the
+   * mesh.
+   */
   void setCheckCollisions(bool collisionEnabled);
+
   AbstractMesh& moveWithCollisions(const Vector3& velocity);
 
   /** Submeshes octree **/
@@ -909,7 +917,6 @@ private:
   AbstractMesh* _meshToBoneReferal;
   // Cache
   Matrix _localWorld;
-  Matrix _rotateYByPI;
   std::unique_ptr<Vector3> _absolutePosition;
   Matrix _collisionsTransformMatrix;
   Matrix _collisionsScalingMatrix;

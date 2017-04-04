@@ -261,6 +261,7 @@ class _VisibleInstances;
 class AbstractMesh;
 class Buffer;
 struct BufferPointer;
+class FacetParameters;
 class Geometry;
 class GroundMesh;
 struct IGetSetVerticesData;
@@ -274,7 +275,6 @@ class VertexBuffer;
 class VertexData;
 // - Options
 class BoxOptions;
-class ComputeNormalsOptions;
 class CylinderOptions;
 class DashedLinesOptions;
 class DecalOptions;

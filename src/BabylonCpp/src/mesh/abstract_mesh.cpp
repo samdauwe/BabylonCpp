@@ -96,7 +96,6 @@ AbstractMesh::AbstractMesh(const std::string& _name, Scene* scene)
     , _newPositionForCollisions{Vector3(0.f, 0.f, 0.f)}
     , _meshToBoneReferal{nullptr}
     , _localWorld{Matrix::Zero()}
-    , _rotateYByPI{Matrix::RotationY(Math::PI)}
     , _absolutePosition{std_util::make_unique<Vector3>(Vector3::Zero())}
     , _collisionsTransformMatrix{Matrix::Zero()}
     , _collisionsScalingMatrix{Matrix::Zero()}
@@ -126,12 +125,12 @@ size_t AbstractMesh::facetNb() const
   return _facetNb;
 }
 
-size_t AbstractMesh::partitioningSubdivisions() const
+unsigned int AbstractMesh::partitioningSubdivisions() const
 {
   return _partitioningSubdivisions;
 }
 
-void AbstractMesh::setPartitioningSubdivisions(size_t nb)
+void AbstractMesh::setPartitioningSubdivisions(unsigned int nb)
 {
   _partitioningSubdivisions = nb;
 }
@@ -960,7 +959,7 @@ AbstractMesh& AbstractMesh::lookAt(const Vector3& targetPoint, float yawCor,
 AbstractMesh& AbstractMesh::attachToBone(Bone* bone, AbstractMesh* affectedMesh)
 {
   _meshToBoneReferal = affectedMesh;
-  setParent(dynamic_cast<Node*>(bone));
+  setParent(dynamic_cast<AbstractMesh*>(bone));
 
   if (bone->getWorldMatrix()->determinant() < 0.f) {
     scalingDeterminant *= -1.f;
@@ -1119,15 +1118,16 @@ void AbstractMesh::_onCollisionPositionChange(int /*collisionId*/,
 }
 
 Octree<SubMesh*>*
-AbstractMesh::createOrUpdateSubmeshesOctree(size_t maxCapacity, size_t maxDepth)
+  AbstractMesh::createOrUpdateSubmeshesOctree(size_t /*maxCapacity*/,
+                                              size_t /*maxDepth*/)
 {
-  if (!_submeshesOctree) {
-    _submeshesOctree = new Octree<SubMesh*>(
-      [](SubMesh* entry, OctreeBlock<SubMesh*>& block) {
-        Octree<AbstractMesh*>::CreationFuncForSubMeshes(entry, block);
-      },
-      maxCapacity, maxDepth);
-  }
+  // if (!_submeshesOctree) {
+  //  _submeshesOctree = new Octree<SubMesh*>(
+  //    [](SubMesh* entry, OctreeBlock<SubMesh*>& block) {
+  //      Octree<AbstractMesh*>::CreationFuncForSubMeshes(entry, block);
+  //    },
+  //    maxCapacity, maxDepth);
+  //}
 
   computeWorldMatrix(true);
 
@@ -1335,8 +1335,10 @@ void AbstractMesh::dispose(bool doNotRecurse)
   }
 
   // Skeleton
-  // auto skeletonTmp = skeleton();
-  // skeletonTmp      = nullptr;
+  auto skeletonTmp = skeleton();
+  if (skeletonTmp) {
+    skeletonTmp = nullptr;
+  }
 
   // Animations
   getScene()->stopAnimation(this);
@@ -1585,7 +1587,9 @@ AbstractMesh& AbstractMesh::getAbsolutePivotPointToRef(Vector3& result)
   result.x = _pivotMatrix.m[12];
   result.y = _pivotMatrix.m[13];
   result.z = _pivotMatrix.m[14];
+
   getPivotPointToRef(result);
+
   Vector3::TransformCoordinatesToRef(result, *getWorldMatrix(), result);
 
   return *this;
@@ -1642,10 +1646,10 @@ AbstractMesh& AbstractMesh::updateFacetData()
   _facetParameters.facetNormals      = getFacetLocalNormals();
   _facetParameters.facetPositions    = getFacetLocalPositions();
   _facetParameters.facetPartitioning = getFacetLocalPartitioning();
-  _facetParameters.bInfo             = bInfo;
+  _facetParameters.bInfo             = *bInfo;
   _facetParameters.bbSize            = _bbSize;
   _facetParameters.subDiv            = _subDiv;
-  _facetParameters.ratio             = partitioningBBoxRatio;
+  _facetParameters.ratio             = partitioningBBoxRatio();
   // VertexData::ComputeNormals(positions, indices, normals, _facetParameters);
   return *this;
 }
@@ -1829,7 +1833,7 @@ AbstractMesh& AbstractMesh::disableFacetData()
     _facetPositions.clear();
     _facetNormals.clear();
     _facetPartitioning.clear();
-    _facetParameters.clear();
+    _facetParameters = FacetParameters();
   }
   return *this;
 }
