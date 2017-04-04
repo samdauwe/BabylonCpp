@@ -16,7 +16,7 @@ LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent,
     : Mesh(iName, scene, iParent, source, doNotCloneChildren)
     , dashSize{0.f}
     , gapSize{0.f}
-    , color{Color3(1, 1, 1)}
+    , color{Color3(1.f, 1.f, 1.f)}
     , alpha{1.f}
     , _intersectionThreshold{0.1f}
 {
@@ -38,6 +38,11 @@ LinesMesh::~LinesMesh()
 {
 }
 
+const char* LinesMesh::getClassName() const
+{
+  return "LinesMesh";
+}
+
 IReflect::Type LinesMesh::type() const
 {
   return IReflect::Type::LINESMESH;
@@ -56,7 +61,7 @@ void LinesMesh::setIntersectionThreshold(float value)
 
   _intersectionThreshold = value;
   if (geometry()) {
-    geometry()->setBoundingBias(Vector2(0, value));
+    geometry()->setBoundingBias(Vector2(0.f, value));
   }
 }
 
@@ -122,7 +127,7 @@ void LinesMesh::dispose(bool /*doNotRecurse*/)
 LinesMesh* LinesMesh::clone(const std::string& iName, Node* newParent,
                             bool doNotCloneChildren)
 {
-  return new LinesMesh(iName, getScene(), newParent, this, doNotCloneChildren);
+  return LinesMesh::New(iName, getScene(), newParent, this, doNotCloneChildren);
 }
 
 } // end of namespace BABYLON

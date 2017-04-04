@@ -24,10 +24,15 @@ public:
   }
   ~LinesMesh();
 
+  /**
+   * @brief Returns the string "LineMesh".
+   */
+  const char* getClassName() const override;
+
   IReflect::Type type() const override;
 
   /**
-   * The intersection Threshold is the margin applied when intersection a
+   * @brief The intersection Threshold is the margin applied when intersection a
    * segment of the LinesMesh with a Ray.
    * This margin is expressed in world space coordinates, so its value may vary.
    * Default value is 0.1
@@ -36,7 +41,7 @@ public:
   float intersectionThreshold() const;
 
   /**
-   * The intersection Threshold is the margin applied when intersection a
+   * @brief The intersection Threshold is the margin applied when intersection a
    * segment of the LinesMesh with a Ray.
    * This margin is expressed in world space coordinates, so its value may vary.
    * @param value the new threshold to apply
@@ -51,6 +56,10 @@ public:
              size_t instancesCount = 0) override;
   PickingInfo intersects(const Ray& ray, bool fastCheck = true) override;
   void dispose(bool doNotRecurse = false) override;
+
+  /**
+   * @brief Returns a new LineMesh object cloned from the current one.
+   */
   LinesMesh* clone(const std::string& name, Node* newParent,
                    bool doNotCloneChildren);
 
