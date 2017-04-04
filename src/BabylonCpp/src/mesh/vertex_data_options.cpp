@@ -44,19 +44,6 @@ BoxOptions::~BoxOptions()
 }
 
 //------------------------------------------------------------------------------
-// Compute normals options
-//------------------------------------------------------------------------------
-
-ComputeNormalsOptions::ComputeNormalsOptions()
-    : subDivMax{0}, ratio{1.f}, bInfo{Vector3::Zero(), Vector3::Zero()}
-{
-}
-
-ComputeNormalsOptions::~ComputeNormalsOptions()
-{
-}
-
-//------------------------------------------------------------------------------
 // Cylinder or cone mesh options
 //------------------------------------------------------------------------------
 

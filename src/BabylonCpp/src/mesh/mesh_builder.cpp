@@ -22,7 +22,8 @@ Mesh* MeshBuilder::CreateBox(const std::string& name, BoxOptions& options,
 {
   auto box = Mesh::New(name, scene);
   options.sideOrientation
-    = updateSideOrientation(options.sideOrientation, scene);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
+  box->setSideOrientation(options.sideOrientation);
   auto vertexData = VertexData::CreateBox(options);
 
   vertexData->applyToMesh(box, options.updatable);
@@ -35,7 +36,8 @@ Mesh* MeshBuilder::CreateSphere(const std::string& name, SphereOptions& options,
 {
   auto sphere = Mesh::New(name, scene);
   options.sideOrientation
-    = updateSideOrientation(options.sideOrientation, scene);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
+  sphere->setSideOrientation(options.sideOrientation);
   auto vertexData = VertexData::CreateSphere(options);
 
   vertexData->applyToMesh(sphere, options.updatable);
@@ -48,7 +50,8 @@ Mesh* MeshBuilder::CreateDisc(const std::string& name, DiscOptions& options,
 {
   auto disc = Mesh::New(name, scene);
   options.sideOrientation
-    = updateSideOrientation(options.sideOrientation, scene);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
+  disc->setSideOrientation(options.sideOrientation);
   auto vertexData = VertexData::CreateDisc(options);
 
   vertexData->applyToMesh(disc, options.updatable);
@@ -61,7 +64,8 @@ Mesh* MeshBuilder::CreateIcoSphere(const std::string& name,
 {
   auto sphere = Mesh::New(name, scene);
   options.sideOrientation
-    = updateSideOrientation(options.sideOrientation, scene);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
+  sphere->setSideOrientation(options.sideOrientation);
   auto vertexData = VertexData::CreateIcoSphere(options);
 
   vertexData->applyToMesh(sphere, options.updatable);
@@ -77,7 +81,7 @@ Mesh* MeshBuilder::CreateRibbon(const std::string& name, RibbonOptions& options,
   const auto& closeArray = options.closeArray;
   const auto& closePath  = options.closePath;
   const auto sideOrientation
-    = updateSideOrientation(options.sideOrientation, scene);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
   const auto& instance  = options.instance;
   const auto& updatable = options.updatable;
 
@@ -92,7 +96,7 @@ Mesh* MeshBuilder::CreateRibbon(const std::string& name, RibbonOptions& options,
     Vector3::FromFloatsToRef(
       -std::numeric_limits<float>::max(), -std::numeric_limits<float>::max(),
       -std::numeric_limits<float>::max(), Tmp::Vector3Array[1]);
-    auto positionFunction = [&](Float32Array& positions) {
+    const auto positionFunction = [&](Float32Array& positions) {
       auto minlg     = pathArray[0].size();
       unsigned int i = 0;
       unsigned int ns
@@ -144,10 +148,35 @@ Mesh* MeshBuilder::CreateRibbon(const std::string& name, RibbonOptions& options,
     instance->getBoundingInfo()->update(*instance->_worldMatrix);
     instance->updateVerticesData(VertexBuffer::PositionKind, positions, false,
                                  false);
-    if (!(instance->areNormalsFrozen())) {
+    if (!options.colors.empty()) {
+      auto colors = instance->getVerticesData(VertexBuffer::ColorKind);
+      for (size_t c = 0; c < options.colors.size(); ++c) {
+        colors[c * 4]     = options.colors[c].r;
+        colors[c * 4 + 1] = options.colors[c].g;
+        colors[c * 4 + 2] = options.colors[c].b;
+        colors[c * 4 + 3] = options.colors[c].a;
+      }
+      instance->updateVerticesData(VertexBuffer::ColorKind, colors, false,
+                                   false);
+    }
+    if (!options.uvs.empty()) {
+      auto uvs = instance->getVerticesData(VertexBuffer::UVKind);
+      for (size_t i = 0; i < options.uvs.size(); ++i) {
+        uvs[i * 2]     = options.uvs[i].x;
+        uvs[i * 2 + 1] = options.uvs[i].y;
+      }
+      instance->updateVerticesData(VertexBuffer::UVKind, uvs, false, false);
+    }
+    if (!instance->areNormalsFrozen() || instance->isFacetDataEnabled()) {
       auto indices = instance->getIndices();
       auto normals = instance->getVerticesData(VertexBuffer::NormalKind);
-      VertexData::ComputeNormals(positions, indices, normals);
+      if (instance->isFacetDataEnabled()) {
+        auto params = instance->getFacetDataParameters();
+        VertexData::ComputeNormals(positions, indices, normals, params);
+      }
+      else {
+        VertexData::ComputeNormals(positions, indices, normals);
+      }
 
       if (instance->_closePath) {
         unsigned int indexFirst = 0;
@@ -172,8 +201,10 @@ Mesh* MeshBuilder::CreateRibbon(const std::string& name, RibbonOptions& options,
         }
       }
 
-      instance->updateVerticesData(VertexBuffer::NormalKind, normals, false,
-                                   false);
+      if (!instance->areNormalsFrozen()) {
+        instance->updateVerticesData(VertexBuffer::NormalKind, normals, false,
+                                     false);
+      }
     }
 
     return instance;
@@ -200,7 +231,8 @@ Mesh* MeshBuilder::CreateCylinder(const std::string& name,
 {
   auto cylinder = Mesh::New(name, scene);
   options.sideOrientation
-    = updateSideOrientation(options.sideOrientation, scene);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
+  cylinder->setSideOrientation(options.sideOrientation);
   auto vertexData = VertexData::CreateCylinder(options);
 
   vertexData->applyToMesh(cylinder, options.updatable);
@@ -213,7 +245,8 @@ Mesh* MeshBuilder::CreateTorus(const std::string& name, TorusOptions& options,
 {
   auto torus = Mesh::New(name, scene);
   options.sideOrientation
-    = updateSideOrientation(options.sideOrientation, scene);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
+  torus->setSideOrientation(options.sideOrientation);
   auto vertexData = VertexData::CreateTorus(options);
 
   vertexData->applyToMesh(torus, options.updatable);
@@ -226,7 +259,8 @@ Mesh* MeshBuilder::CreateTorusKnot(const std::string& name,
 {
   auto torusKnot = Mesh::New(name, scene);
   options.sideOrientation
-    = updateSideOrientation(options.sideOrientation, scene);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
+  torusKnot->setSideOrientation(options.sideOrientation);
   auto vertexData = VertexData::CreateTorusKnot(options);
 
   vertexData->applyToMesh(torusKnot, options.updatable);
@@ -281,7 +315,7 @@ LinesMesh* MeshBuilder::CreateDashedLines(const std::string& name,
   const auto& dashSize = options.dashSize;
 
   if (instance) { //  dashed lines update
-    auto positionFunction = [&](Float32Array& positions) -> void {
+    const auto positionFunction = [&](Float32Array& positions) -> void {
       auto curvect    = Vector3::Zero();
       auto nbSeg      = positions.size() / 6;
       auto lg         = 0.f;
@@ -352,7 +386,7 @@ Mesh* MeshBuilder::ExtrudeShapeCustom(const std::string& name,
                                       Scene* scene)
 {
   options.sideOrientation
-    = updateSideOrientation(options.sideOrientation, scene);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
 
   return MeshBuilder::_ExtrudeShapeGeneric(
     name, options.shape, options.path, 0.f, 0.f, options.scaleFunction,
@@ -371,14 +405,14 @@ Mesh* MeshBuilder::CreateLathe(const std::string& name, LatheOptions& options,
   const auto& tessellation = static_cast<float>(options.tessellation);
   const auto& updatable    = options.updatable;
 
-  unsigned int sideOrientation
-    = updateSideOrientation(options.sideOrientation, scene);
+  const unsigned int sideOrientation
+    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
   const auto& cap = options.cap;
   const auto& pi2 = Math::PI2;
   std::vector<std::vector<Vector3>> paths;
   const auto& invertUV = options.invertUV;
 
-  float step = pi2 / tessellation * arc;
+  const float step = pi2 / tessellation * arc;
   Vector3 rotated;
   for (float i = 0.f; i <= tessellation; ++i) {
     std::vector<Vector3> path;
@@ -419,7 +453,8 @@ Mesh* MeshBuilder::CreatePlane(const std::string& name, PlaneOptions& options,
   auto plane = Mesh::New(name, scene);
 
   options.sideOrientation
-    = updateSideOrientation(options.sideOrientation, scene);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
+  plane->setSideOrientation(options.sideOrientation);
 
   auto vertexData = VertexData::CreatePlane(options);
 
@@ -477,6 +512,8 @@ GroundMesh* MeshBuilder::CreateGroundFromHeightMap(
   const std::string& name, const std::string& url,
   GroundFromHeightMapOptions& options, Scene* scene)
 {
+  const auto& filter = options.colorFilter;
+
   auto ground            = GroundMesh::New(name, scene);
   ground->_subdivisionsX = options.subdivisions;
   ground->_subdivisionsY = options.subdivisions;
@@ -489,11 +526,12 @@ GroundMesh* MeshBuilder::CreateGroundFromHeightMap(
 
   ground->_setReady(false);
 
-  auto onload = [&](const Image& img) {
+  const auto onload = [&](const Image& img) {
     // Create VertexData from map data
     options.bufferWidth  = static_cast<unsigned int>(img.width);
     options.bufferHeight = static_cast<unsigned int>(img.height);
     options.buffer       = img.data;
+    options.colorFilter  = filter;
 
     auto vertexData = VertexData::CreateGroundFromHeightMap(options);
 
@@ -507,7 +545,7 @@ GroundMesh* MeshBuilder::CreateGroundFromHeightMap(
     }
   };
 
-  auto onError
+  const auto onError
     = [](const std::string& msg) { BABYLON_LOG_ERROR("Tools", msg); };
 
   Tools::LoadImage(url, onload, onError, false);
@@ -526,12 +564,12 @@ Mesh* MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
   const auto& invertUV       = options.invertUV;
   const auto& updatable      = options.updatable;
   const auto sideOrientation
-    = updateSideOrientation(options.sideOrientation, scene);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
   auto instance  = options.instance;
   const auto arc = options.arc();
 
   // tube geometry
-  auto tubePathArray = [](
+  const auto tubePathArray = [](
     const std::vector<Vector3>& _path, Path3D& path3D,
     std::vector<std::vector<Vector3>>& circlePaths, float _radius,
     unsigned int _tessellation,
@@ -569,13 +607,14 @@ Mesh* MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
       ++index;
     }
     // cap
-    auto capPath = [_path](unsigned int nbPoints, unsigned int pathIndex) {
-      std::vector<Vector3> pointCap;
-      for (unsigned int i = 0; i < nbPoints; ++i) {
-        pointCap.emplace_back(_path[pathIndex]);
-      }
-      return pointCap;
-    };
+    const auto capPath
+      = [_path](unsigned int nbPoints, unsigned int pathIndex) {
+          std::vector<Vector3> pointCap;
+          for (unsigned int i = 0; i < nbPoints; ++i) {
+            pointCap.emplace_back(_path[pathIndex]);
+          }
+          return pointCap;
+        };
     switch (_cap) {
       case Mesh::NO_CAP:
         break;
@@ -643,7 +682,8 @@ Mesh* MeshBuilder::CreatePolyhedron(const std::string& name,
 {
   auto polyhedron = Mesh::New(name, scene);
   options.sideOrientation
-    = updateSideOrientation(options.sideOrientation, scene);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
+  polyhedron->setSideOrientation(options.sideOrientation);
   auto vertexData = VertexData::CreatePolyhedron(options);
 
   vertexData->applyToMesh(polyhedron, options.updatable);
@@ -693,7 +733,7 @@ Mesh* MeshBuilder::CreateDecal(const std::string& name,
 
   unsigned int currentVertexDataIndex = 0;
 
-  auto extractDecalVector3 = [&](unsigned int indexId) {
+  const auto extractDecalVector3 = [&](unsigned int indexId) {
     const auto& vertexId = indices[indexId];
     PositionNormalVertex result;
     result.position
@@ -706,20 +746,21 @@ Mesh* MeshBuilder::CreateDecal(const std::string& name,
     result.normal
       = Vector3(normals[vertexId * 3 + 0], normals[vertexId * 3 + 1],
                 normals[vertexId * 3 + 2]);
+    result.normal = Vector3::TransformNormal(result.normal, transformMatrix);
     return result;
   };
 
   // Inspired by
   // https://github.com/mrdoob/three.js/blob/eee231960882f6f3b6113405f524956145148146/examples/js/geometries/DecalGeometry.js
-  auto clip = [&size](const std::vector<PositionNormalVertex>& vertices,
-                      const Vector3& axis) {
+  const auto clip = [&size](const std::vector<PositionNormalVertex>& vertices,
+                            const Vector3& axis) {
     if (vertices.empty()) {
       return vertices;
     }
 
     auto clipSize = 0.5f * std::abs(Vector3::Dot(size, axis));
 
-    auto clipVertices
+    const auto clipVertices
       = [&](const PositionNormalVertex& v0, const PositionNormalVertex& v1) {
           auto clipFactor
             = Vector3::GetClipFactor(v0.position, v1.position, axis, clipSize);
@@ -882,7 +923,7 @@ Mesh* MeshBuilder::_ExtrudeShapeGeneric(
   bool updtbl, unsigned int side, Mesh* instance, bool invertUV)
 {
   // extrusion geometry
-  auto extrusionPathArray
+  const auto extrusionPathArray
     = [](const std::vector<Vector3>& _shape, const std::vector<Vector3>& _curve,
          Path3D& path3D, std::vector<std::vector<Vector3>> shapePaths,
          float _scale, float _rotation,
@@ -925,7 +966,7 @@ Mesh* MeshBuilder::_ExtrudeShapeGeneric(
           ++index;
         }
         // cap
-        auto capPath = [&](const std::vector<Vector3>& shapePath) {
+        const auto capPath = [&](const std::vector<Vector3>& shapePath) {
           std::vector<Vector3> pointCap;
           auto barycenter = Vector3::Zero();
           unsigned int i;

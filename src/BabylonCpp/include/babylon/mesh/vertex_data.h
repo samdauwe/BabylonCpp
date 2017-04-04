@@ -172,7 +172,7 @@ public:
    */
   static void ComputeNormals(const Float32Array& positions,
                              const Uint32Array& indices, Float32Array& normals,
-                             ComputeNormalsOptions& options);
+                             FacetParameters& options);
 
   /**
    * @brief Creates a new VertexData from the imported parameters.

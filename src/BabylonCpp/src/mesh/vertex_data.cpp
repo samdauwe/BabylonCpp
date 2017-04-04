@@ -5,6 +5,7 @@
 #include <babylon/math/axis.h>
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector3.h>
+#include <babylon/mesh/facet_parameters.h>
 #include <babylon/mesh/geometry.h>
 #include <babylon/mesh/vertex_buffer.h>
 #include <babylon/mesh/vertex_data_options.h>
@@ -2497,8 +2498,7 @@ void VertexData::ComputeNormals(const Float32Array& positions,
 
 void VertexData::ComputeNormals(const Float32Array& positions,
                                 const Uint32Array& indices,
-                                Float32Array& normals,
-                                ComputeNormalsOptions& options)
+                                Float32Array& normals, FacetParameters& options)
 {
   // temporary scalar variables
   unsigned int index         = 0;   // facet index
@@ -2553,10 +2553,10 @@ void VertexData::ComputeNormals(const Float32Array& positions,
     float bbSizeMax = (options.bbSize.x > options.bbSize.y) ? options.bbSize.x :
                                                               options.bbSize.y;
     bbSizeMax = (bbSizeMax > options.bbSize.z) ? bbSizeMax : options.bbSize.z;
-    xSubRatio = options.subDiv.x * options.ratio / options.bbSize.x;
-    ySubRatio = options.subDiv.y * options.ratio / options.bbSize.y;
-    zSubRatio = options.subDiv.z * options.ratio / options.bbSize.z;
-    subSq     = options.subDivMax * options.subDivMax;
+    xSubRatio = options.subDiv.X * options.ratio / options.bbSize.x;
+    ySubRatio = options.subDiv.Y * options.ratio / options.bbSize.y;
+    zSubRatio = options.subDiv.Z * options.ratio / options.bbSize.z;
+    subSq     = options.subDiv.max * options.subDiv.max;
     options.facetPartitioning.clear();
   }
 
@@ -2662,10 +2662,10 @@ void VertexData::ComputeNormals(const Float32Array& positions,
         std::floor((positions[v3z] - options.bInfo.minimum.z * options.ratio)
                    * zSubRatio));
 
-      block_idx_v1 = b1x + options.subDivMax * b1y + subSq * b1z;
-      block_idx_v2 = b2x + options.subDivMax * b2y + subSq * b2z;
-      block_idx_v3 = b3x + options.subDivMax * b3y + subSq * b3z;
-      block_idx_o  = ox + options.subDivMax * oy + subSq * oz;
+      block_idx_v1 = b1x + options.subDiv.max * b1y + subSq * b1z;
+      block_idx_v2 = b2x + options.subDiv.max * b2y + subSq * b2z;
+      block_idx_v3 = b3x + options.subDiv.max * b3y + subSq * b3z;
+      block_idx_o  = ox + options.subDiv.max * oy + subSq * oz;
 
       const std::array<unsigned int, 4> block_idxs{
         {block_idx_o, block_idx_v1, block_idx_v2, block_idx_v3}};

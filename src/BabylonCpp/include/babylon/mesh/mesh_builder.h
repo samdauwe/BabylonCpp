@@ -14,7 +14,7 @@ class BABYLON_SHARED_EXPORT MeshBuilder {
 
 public:
   /**
-   * Creates a box mesh.
+   * @brief Creates a box mesh.
    * tuto :
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#box
    * The parameter `size` sets the size (float) of each box side (default 1).
@@ -38,7 +38,7 @@ public:
                          Scene* scene);
 
   /**
-   * Creates a sphere mesh.
+   * @brief Creates a sphere mesh.
    * tuto :
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#sphere
    * The parameter `diameter` sets the diameter size (float) of the sphere
@@ -67,7 +67,7 @@ public:
                             Scene* scene);
 
   /**
-   * Creates a plane polygonal mesh.  By default, this is a disc.
+   * @brief Creates a plane polygonal mesh.  By default, this is a disc.
    * tuto :
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#disc
    * The parameter `radius` sets the radius size (float) of the polygon (default
@@ -91,7 +91,8 @@ public:
                           Scene* scene);
 
   /**
-   * Creates a sphere based upon an icosahedron with 20 triangular faces which
+   * @brief Creates a sphere based upon an icosahedron with 20 triangular faces
+   * which
    * can be subdivided.
    * tuto :
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#icosphere
@@ -119,7 +120,7 @@ public:
                                IcoSphereOptions& options, Scene* scene);
 
   /**
-   * Creates a ribbon mesh.
+   * @brief Creates a ribbon mesh.
    * The ribbon is a parametric shape :
    * http://doc.babylonjs.com/tutorials/Parametric_Shapes.  It has no predefined
    * shape. Its final shape will depend on the input parameters.
@@ -148,6 +149,18 @@ public:
    * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
    * The optional parameter `invertUV` (boolean, default false) swaps in the
    * geometry the U and V coordinates to apply a texture.
+   * The parameter `uvs` is an optional flat array of `Vector2` to update/set
+   * each ribbon vertex with its own custom UV values instead of the computed
+   * ones.
+   * The parameters `colors` is an optional flat array of `Color4` to set/update
+   * each ribbon vertex with its own custom color values.
+   * Note that if you use the parameters `uvs` or `colors`, the passed arrays
+   * must be populated with the right number of elements, it is to say the
+   * number of ribbon vertices. Remember that
+   * if you set `closePath` to `true`, there's one extra vertex per path in the
+   * geometry.
+   * Moreover, you can use the parameter `color` with `instance` (to update the
+   * ribbon), only if you previously used it at creation time.
    * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.
@@ -156,7 +169,7 @@ public:
                             Scene* scene = nullptr);
 
   /**
-   * Creates a cylinder or a cone mesh.
+   * @brief Creates a cylinder or a cone mesh.
    * tuto :
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#cylinder-or-cone
    * The parameter `height` sets the height size (float) of the cylinder/cone
@@ -207,7 +220,7 @@ public:
                               Scene* scene);
 
   /**
-   * Creates a torus mesh.
+   * @brief Creates a torus mesh.
    * tuto :
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#torus
    * The parameter `diameter` sets the diameter size (float) of the torus
@@ -229,7 +242,7 @@ public:
                            Scene* scene);
 
   /**
-   * Creates a torus knot mesh.
+   * @brief Creates a torus knot mesh.
    * tuto :
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#torus-knot
    * The parameter `radius` sets the global radius size (float) of the torus
@@ -253,7 +266,7 @@ public:
                                TorusKnotOptions& options, Scene* scene);
 
   /**
-   * Creates a line system mesh.
+   * @brief Creates a line system mesh.
    * A line system is a pool of many lines gathered in a single mesh.
    * tuto :
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#linesystem
@@ -302,7 +315,7 @@ public:
                                 Scene* scene);
 
   /**
-   * Creates a dashed line mesh.
+   * @brief Creates a dashed line mesh.
    * tuto :
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#dashed-lines
    * A dashed line mesh is considered as a parametric shape since it has no
@@ -331,7 +344,7 @@ public:
                                       Scene* scene);
 
   /**
-   * Creates an extruded shape mesh.
+   * @brief Creates an extruded shape mesh.
    * The extrusion is a parametric shape :
    * http://doc.babylonjs.com/tutorials/Parametric_Shapes.  It has no predefined
    * shape. Its final shape will depend on the input parameters.
@@ -374,7 +387,7 @@ public:
                             ExtrudeShapeOptions& options, Scene* scene);
 
   /**
-   * Creates an custom extruded shape mesh.
+   * @brief Creates an custom extruded shape mesh.
    * The custom extrusion is a parametric shape :
    * http://doc.babylonjs.com/tutorials/Parametric_Shapes.  It has no predefined
    * shape. Its final shape will depend on the input parameters.
@@ -441,7 +454,7 @@ public:
                                   Scene* scene);
 
   /**
-   * Creates lathe mesh.
+   * @brief Creates lathe mesh.
    * The lathe is a shape with a symetry axis : a 2D model shape is rotated
    * around this axis to design the lathe.
    * tuto :
@@ -479,7 +492,7 @@ public:
                            Scene* scene);
 
   /**
-   * Creates a plane mesh.
+   * @brief Creates a plane mesh.
    * tuto :
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#plane
    * The parameter `size` sets the size (float) of both sides of the plane at
@@ -501,7 +514,7 @@ public:
                            Scene* scene);
 
   /**
-   * Creates a ground mesh.
+   * @brief Creates a ground mesh.
    * tuto :
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#plane
    * The parameters `width` and `height` (floats, default 1) set the width and
@@ -516,7 +529,7 @@ public:
                             Scene* scene);
 
   /**
-   * Creates a tiled ground mesh.
+   * @brief Creates a tiled ground mesh.
    * tuto :
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#tiled-ground
    * The parameters `xmin` and `xmax` (floats, default -1 and 1) set the ground
@@ -538,7 +551,7 @@ public:
                                  TiledGroundOptions& options, Scene* scene);
 
   /**
-   * Creates a ground mesh from a height map.
+   * @brief Creates a ground mesh from a height map.
    * tuto : http://doc.babylonjs.com/tutorials/14._Height_Map
    * tuto :
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#ground-from-a-height-map
@@ -551,6 +564,8 @@ public:
    * the ground.
    * The parameter `maxHeight` (float, default 1) is the maximum altitude on
    * the ground.
+   * The parameter `colorFilter` (optional Color3, default (0.3, 0.59, 0.11) )
+   * is the filter to apply to the image pixel colors to compute the height.
    * The parameter `onReady` is a javascript callback function that will be
    * called  once the mesh is just built (the height map download can last some
    * time).
@@ -568,7 +583,7 @@ public:
                             GroundFromHeightMapOptions& options, Scene* scene);
 
   /**
-   * Creates a tube mesh.
+   * @brief Creates a tube mesh.
    * The tube is a parametric shape :
    * http://doc.babylonjs.com/tutorials/Parametric_Shapes.  It has no predefined
    * shape. Its final shape will depend on the input parameters.
@@ -616,7 +631,7 @@ public:
                           Scene* scene = nullptr);
 
   /**
-   * Creates a polyhedron mesh.
+   * @brief Creates a polyhedron mesh.
    *
    * tuto :
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#polyhedron
@@ -655,7 +670,7 @@ public:
   static Mesh* CreatePolyhedron(const std::string& name,
                                 PolyhedronOptions& options, Scene* scene);
   /**
-   * Creates a decal mesh.
+   * @brief Creates a decal mesh.
    * tuto :
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#decals
    * A decal is a mesh usually applied as a model onto the surface of another

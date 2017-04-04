@@ -42,41 +42,6 @@ public:
 }; // end of class BoxOptions
 
 //------------------------------------------------------------------------------
-// Compute normals options
-//------------------------------------------------------------------------------
-
-/**
- * @brief Options used compute the vertex data normals.
- */
-class BABYLON_SHARED_EXPORT ComputeNormalsOptions {
-
-public:
-  ComputeNormalsOptions();
-  ~ComputeNormalsOptions();
-
-public:
-  // Array of facet positions (vector3)
-  std::vector<Vector3> facetPositions;
-  // Array of facet normals (vector3)
-  std::vector<Vector3> facetNormals;
-  // Partitioning array, facetPositions is required for facetPartitioning
-  // computation
-  std::vector<Uint32Array> facetPartitioning;
-  // Partitioning data about subdivsions on each axis (int), required for
-  // facetPartitioning computation
-  Vector3 subDiv;
-  unsigned int subDivMax;
-  // Partitioning ratio / bounding box, required for facetPartitioning
-  // computation
-  float ratio;
-  // Bounding box size data, required for facetPartitioning computation
-  Vector3 bbSize;
-  // Bounding info, required for facetPartitioning computation
-  BoundingInfo bInfo;
-
-}; // end of class BoxOptions
-
-//------------------------------------------------------------------------------
 // Cylinder or cone mesh options
 //------------------------------------------------------------------------------
 
