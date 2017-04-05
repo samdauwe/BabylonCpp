@@ -252,8 +252,8 @@ bool BabylonFileLoader::importMesh(
   // Connecting parents
   for (auto& currentMesh : scene->meshes) {
     if (!currentMesh->_waitingParentId.empty()) {
-      currentMesh->setParent(
-        scene->getLastEntryByID(currentMesh->_waitingParentId));
+      static_cast<Node*>(currentMesh.get())
+        ->setParent(scene->getLastEntryByID(currentMesh->_waitingParentId));
       currentMesh->_waitingParentId = "";
     }
   }
@@ -501,7 +501,8 @@ bool BabylonFileLoader::load(Scene* scene, const std::string& data,
   // Connect parents & children and parse actions
   for (auto& mesh : scene->meshes) {
     if (!mesh->_waitingParentId.empty()) {
-      mesh->setParent(scene->getLastEntryByID(mesh->_waitingParentId));
+      static_cast<Node*>(mesh.get())
+        ->setParent(scene->getLastEntryByID(mesh->_waitingParentId));
       mesh->_waitingParentId.clear();
     }
     if (!mesh->_waitingActions.empty()) {

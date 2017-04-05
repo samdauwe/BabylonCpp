@@ -959,7 +959,7 @@ AbstractMesh& AbstractMesh::lookAt(const Vector3& targetPoint, float yawCor,
 AbstractMesh& AbstractMesh::attachToBone(Bone* bone, AbstractMesh* affectedMesh)
 {
   _meshToBoneReferal = affectedMesh;
-  setParent(dynamic_cast<AbstractMesh*>(bone));
+  Node::setParent(bone);
 
   if (bone->getWorldMatrix()->determinant() < 0.f) {
     scalingDeterminant *= -1.f;
@@ -975,7 +975,7 @@ AbstractMesh& AbstractMesh::detachFromBone()
   }
 
   _meshToBoneReferal = nullptr;
-  setParent(nullptr);
+  Node::setParent(nullptr);
 
   return *this;
 }
@@ -1563,7 +1563,7 @@ AbstractMesh& AbstractMesh::setParent(AbstractMesh* mesh,
     }
   }
 
-  child->setParent(parent);
+  static_cast<Node*>(child)->setParent(parent);
 
   return *this;
 }

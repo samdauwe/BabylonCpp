@@ -170,7 +170,7 @@ InstancedMesh* InstancedMesh::clone(const std::string& /*iNname*/,
 
   // Parent
   if (newParent) {
-    result->setParent(newParent);
+    static_cast<Node*>(result)->setParent(newParent);
   }
 
   if (!doNotCloneChildren) {
