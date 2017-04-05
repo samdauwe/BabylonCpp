@@ -47,6 +47,7 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , _preActivateId{-1}
     , _sideOrientation{Mesh::DEFAULTSIDE}
     , _areNormalsFrozen{false}
+    , _source{nullptr}
     , _tessellation{0}
     , _cap{Mesh::NO_CAP}
     , _arc{1.f}
@@ -111,6 +112,11 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
 
 Mesh::~Mesh()
 {
+}
+
+Mesh* Mesh::source()
+{
+  return _source;
 }
 
 IReflect::Type Mesh::type() const

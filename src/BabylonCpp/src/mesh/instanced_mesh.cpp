@@ -34,6 +34,11 @@ InstancedMesh::~InstancedMesh()
 {
 }
 
+const char* InstancedMesh::getClassName() const
+{
+  return "InstancedMesh";
+}
+
 IReflect::Type InstancedMesh::type() const
 {
   return IReflect::Type::INSTANCEDMESH;
@@ -85,7 +90,7 @@ bool InstancedMesh::isVerticesDataPresent(unsigned int kind)
   return _sourceMesh->isVerticesDataPresent(kind);
 }
 
-Uint32Array InstancedMesh::getIndices(bool /*copyWhenShared*/)
+IndicesArray InstancedMesh::getIndices(bool /*copyWhenShared*/)
 {
   return _sourceMesh->getIndices();
 }
@@ -95,7 +100,7 @@ std::vector<Vector3> InstancedMesh::_positions()
   return _sourceMesh->_positions;
 }
 
-void InstancedMesh::refreshBoundingInfo()
+InstancedMesh& InstancedMesh::refreshBoundingInfo()
 {
   auto meshBB = _sourceMesh->getBoundingInfo();
 
@@ -103,6 +108,8 @@ void InstancedMesh::refreshBoundingInfo()
     new BoundingInfo(meshBB->minimum, meshBB->maximum));
 
   _updateBoundingInfo();
+
+  return *this;
 }
 
 void InstancedMesh::_preActivate()
@@ -133,7 +140,7 @@ AbstractMesh* InstancedMesh::getLOD(Camera* /*camera*/,
   return _currentLOD;
 }
 
-void InstancedMesh::_syncSubMeshes()
+InstancedMesh& InstancedMesh::_syncSubMeshes()
 {
   releaseSubMeshes();
   if (!_sourceMesh->subMeshes.empty()) {
@@ -141,6 +148,8 @@ void InstancedMesh::_syncSubMeshes()
       subMesh->clone(this, _sourceMesh);
     }
   }
+
+  return *this;
 }
 
 bool InstancedMesh::_generatePointsArray()

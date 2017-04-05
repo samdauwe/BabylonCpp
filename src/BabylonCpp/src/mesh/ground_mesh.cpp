@@ -1,6 +1,7 @@
 #include <babylon/mesh/ground_mesh.h>
 
 #include <babylon/collisions/picking_info.h>
+#include <babylon/core/json.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/ray.h>
@@ -16,6 +17,11 @@ GroundMesh::GroundMesh(const std::string& iName, Scene* scene)
 
 GroundMesh::~GroundMesh()
 {
+}
+
+const char* GroundMesh::getClassName() const
+{
+  return "GroundMesh";
 }
 
 IReflect::Type GroundMesh::type() const
@@ -48,11 +54,14 @@ void GroundMesh::optimize(size_t chunksCount, size_t octreeBlocksSize)
 
 float GroundMesh::getHeightAtCoordinates(float x, float z)
 {
-  // express x and y in the ground local system
-  x -= position().x;
-  z -= position().z;
-  x /= scaling().x;
-  z /= scaling().z;
+  auto world   = getWorldMatrix();
+  auto& invMat = Tmp::MatrixArray[5];
+  world->invertToRef(invMat);
+  auto& tmpVect = Tmp::Vector3Array[8];
+  // transform x,z in the mesh local space
+  Vector3::TransformCoordinatesFromFloatsToRef(x, 0.0, z, invMat, tmpVect);
+  x = tmpVect.x;
+  z = tmpVect.z;
   if (x < _minX || x > _maxX || z < _minZ || z > _maxZ) {
     return position().y;
   }
@@ -63,7 +72,8 @@ float GroundMesh::getHeightAtCoordinates(float x, float z)
   auto facet = _getFacetAt(x, z);
   auto y     = -(facet.x * x + facet.z * z + facet.w) / facet.y;
   // return y in the World system
-  return y * scaling().y + position().y;
+  Vector3::TransformCoordinatesFromFloatsToRef(0.f, y, 0.f, *world, tmpVect);
+  return tmpVect.y;
 }
 
 Vector3 GroundMesh::getNormalAtCoordinates(float x, float z)
@@ -73,32 +83,37 @@ Vector3 GroundMesh::getNormalAtCoordinates(float x, float z)
   return normal;
 }
 
-void GroundMesh::getNormalAtCoordinatesToRef(float x, float z, Vector3& ref)
+GroundMesh& GroundMesh::getNormalAtCoordinatesToRef(float x, float z,
+                                                    Vector3& ref)
 {
-  // express x and y in the ground local system
-  x -= position().x;
-  z -= position().z;
-  x /= scaling().x;
-  z /= scaling().z;
+  auto world   = getWorldMatrix();
+  auto& tmpMat = Tmp::MatrixArray[5];
+  world->invertToRef(tmpMat);
+  auto& tmpVect = Tmp::Vector3Array[8];
+  // transform x,z in the mesh local space
+  Vector3::TransformCoordinatesFromFloatsToRef(x, 0.0, z, tmpMat, tmpVect);
+  x = tmpVect.x;
+  z = tmpVect.z;
   if (x < _minX || x > _maxX || z < _minZ || z > _maxZ) {
-    return;
+    return *this;
   }
   if (_heightQuads.empty()) {
     _initHeightQuads();
     _computeHeightQuads();
   }
   auto facet = _getFacetAt(x, z);
-  ref.x      = facet.x;
-  ref.y      = facet.y;
-  ref.z      = facet.z;
+  Vector3::TransformNormalFromFloatsToRef(facet.x, facet.y, facet.z, *world,
+                                          ref);
+  return *this;
 }
 
-void GroundMesh::updateCoordinateHeights()
+GroundMesh& GroundMesh::updateCoordinateHeights()
 {
   if (_heightQuads.empty()) {
     _initHeightQuads();
   }
   _computeHeightQuads();
+  return *this;
 }
 
 Vector4 GroundMesh::_getFacetAt(float x, float z)
@@ -121,7 +136,7 @@ Vector4 GroundMesh::_getFacetAt(float x, float z)
   return facet;
 }
 
-void GroundMesh::_initHeightQuads()
+GroundMesh& GroundMesh::_initHeightQuads()
 {
   for (size_t row = 0; row < _subdivisionsY; ++row) {
     for (size_t col = 0; col < _subdivisionsX; ++col) {
@@ -133,9 +148,10 @@ void GroundMesh::_initHeightQuads()
       _heightQuads[row * _subdivisionsX + col] = std::move(quad);
     }
   }
+  return *this;
 }
 
-void GroundMesh::_computeHeightQuads()
+GroundMesh& GroundMesh::_computeHeightQuads()
 {
   auto positions = getVerticesData(VertexBuffer::PositionKind);
   auto v1        = Tmp::Vector3Array[3];
@@ -201,6 +217,33 @@ void GroundMesh::_computeHeightQuads()
       quad.facet2.copyFromFloats(norm2.x, norm2.y, norm2.z, d2);
     }
   }
+  return *this;
+}
+
+Json::object GroundMesh::serialize(Json::object& /*serializationObject*/) const
+{
+  return Json::object();
+}
+
+GroundMesh* GroundMesh::Parse(const Json::value& parsedMesh, Scene* scene)
+{
+  auto result = GroundMesh::New(Json::GetString(parsedMesh, "name"), scene);
+
+  result->_subdivisionsX
+    = Json::GetNumber<size_t>(parsedMesh, "subdivisionsX", 1);
+  result->_subdivisionsY
+    = Json::GetNumber<size_t>(parsedMesh, "subdivisionsY", 1);
+
+  result->_minX = Json::GetNumber(parsedMesh, "minX", 1.f);
+  result->_maxX = Json::GetNumber(parsedMesh, "maxX", 1.f);
+
+  result->_minZ = Json::GetNumber(parsedMesh, "minZ", 1.f);
+  result->_maxZ = Json::GetNumber(parsedMesh, "maxZ", 1.f);
+
+  result->_width  = Json::GetNumber(parsedMesh, "width", 1.f);
+  result->_height = Json::GetNumber(parsedMesh, "height", 1.f);
+
+  return result;
 }
 
 } // end of namespace BABYLON

@@ -31,6 +31,11 @@ public:
   }
   ~GroundMesh();
 
+  /**
+   * @brief Returns the string "GroundMesh"
+   */
+  const char* getClassName() const override;
+
   IReflect::Type type() const override;
 
   size_t subdivisions() const;
@@ -39,17 +44,16 @@ public:
   void optimize(size_t chunksCount, size_t octreeBlocksSize = 32);
 
   /**
-   * Returns a height (y) value in the Worl system :
+   * @brief Returns a height (y) value in the Worl system :
    * the ground altitude at the coordinates (x, z) expressed in the World
    * system.
    * Returns the ground y position if (x, z) are outside the ground
    * surface.
-   * Not pertinent if the ground is rotated.
    */
   float getHeightAtCoordinates(float x, float z);
 
   /**
-   * Returns a normalized vector (Vector3) orthogonal to the ground
+   * @brief Returns a normalized vector (Vector3) orthogonal to the ground
    * at the ground coordinates (x, z) expressed in the World system.
    * Returns Vector3(0, 1, 0) if (x, z) are outside the ground surface.
    * Not pertinent if the ground is rotated.
@@ -57,30 +61,33 @@ public:
   Vector3 getNormalAtCoordinates(float x, float z);
 
   /**
-   * Updates the Vector3 passed a reference with a normalized vector orthogonal
-   * to the ground
+   * @brief Updates the Vector3 passed a reference with a normalized vector
+   * orthogonal to the ground
    * at the ground coordinates (x, z) expressed in the World system.
    * Doesn't uptade the reference Vector3 if (x, z) are outside the ground
    * surface.
-   * Not pertinent if the ground is rotated.
+   * @returns The GroundMesh.
    */
-  void getNormalAtCoordinatesToRef(float x, float z, Vector3& ref);
+  GroundMesh& getNormalAtCoordinatesToRef(float x, float z, Vector3& ref);
 
   /**
-   * Force the heights to be recomputed for getHeightAtCoordinates() or
+   * @brief Force the heights to be recomputed for getHeightAtCoordinates() or
    * getNormalAtCoordinates()
    * if the ground has been updated.
    * This can be used in the render loop
+   * @returns The GroundMesh.
    */
-  void updateCoordinateHeights();
+  GroundMesh& updateCoordinateHeights();
 
 private:
-  // Returns the element "facet" from the heightQuads array relative to (x, z)
-  // local coordinates
+  /**
+   * @brief Returns the element "facet" from the heightQuads array relative to
+   * (x, z) local coordinates
+   */
   Vector4 _getFacetAt(float x, float z);
 
   /**
-   * Creates and populates the heightMap array with "facet" elements :
+   * @brief Creates and populates the heightMap array with "facet" elements:
    * a quad is two triangular facets separated by a slope, so a "facet" element
    * is 1 slope + 2 facets
    * slope : Vector2(c, h) = 2D diagonal line equation setting appart two
@@ -89,19 +96,29 @@ private:
    * + d = 0
    * facet2 :  Vector4(a, b, c, d) = second facet 3D plane equation : ax + by +
    * cz + d = 0
+   * facet2 :  Vector4(a, b, c, d) = second facet 3D plane equation : ax + by +
+   * cz + d = 0
+   * @returns The GroundMesh.
    */
-  void _initHeightQuads();
+  GroundMesh& _initHeightQuads();
 
   /**
-   * Compute each quad element values and update the the heightMap array :
+   * @brief Compute each quad element values and update the the heightMap array:
    * slope : Vector2(c, h) = 2D diagonal line equation setting appart two
    * triangular facets in a quad : z = cx + h
    * facet1 : Vector4(a, b, c, d) = first facet 3D plane equation : ax + by + cz
    * + d = 0
    * facet2 :  Vector4(a, b, c, d) = second facet 3D plane equation : ax + by +
    * cz + d = 0
+   * facet2 :  Vector4(a, b, c, d) = second facet 3D plane equation : ax + by +
+   * cz + d = 0
+   * @returns The GroundMesh.
    */
-  void _computeHeightQuads();
+  GroundMesh& _computeHeightQuads();
+
+  Json::object serialize(Json::object& serializationObject) const;
+
+  static GroundMesh* Parse(const Json::value& parsedMesh, Scene* scene);
 
 protected:
   GroundMesh(const std::string& name, Scene* scene);

@@ -22,6 +22,11 @@ public:
   }
   ~InstancedMesh();
 
+  /**
+   * @brief Returns the string "InstancedMesh"
+   */
+  const char* getClassName() const override;
+
   IReflect::Type type() const override;
 
   /** Methods **/
@@ -30,26 +35,68 @@ public:
   float visibility() const;
   Skeleton* skeleton() override;
   unsigned int renderingGroupId() const;
+
+  /**
+   * @brief Returns the total number of vertices (integer).
+   */
   size_t getTotalVertices() const override;
+
   Mesh* sourceMesh() const;
+
+  /**
+   * @brief Returns Float32Array of the requested kind of data : positons,
+   * normals, uvs, etc.
+   */
   Float32Array getVerticesData(unsigned int kind,
                                bool copyWhenShared = false) override;
+
+  /**
+   * @brief Returns if the mesh owns the requested kind of data.
+   */
   bool isVerticesDataPresent(unsigned int kind) override;
-  Uint32Array getIndices(bool copyWhenShared = false) override;
+
+  /**
+   * @brief Returns an array of indices (IndicesArray).
+   */
+  IndicesArray getIndices(bool copyWhenShared = false) override;
+
   std::vector<Vector3> _positions();
-  void refreshBoundingInfo();
+
+  /**
+   * @brief Sets a new updated BoundingInfo to the mesh.
+   * @returns The mesh.
+   */
+  InstancedMesh& refreshBoundingInfo();
+
   void _preActivate() override;
+
   void _activate(int renderId) override;
+
+  /**
+   * @brief Returns the current associated LOD AbstractMesh.
+   */
   AbstractMesh* getLOD(Camera* camera,
                        BoundingSphere* boundingSphere = nullptr) override;
-  void _syncSubMeshes();
+
+  InstancedMesh& _syncSubMeshes();
+
   bool _generatePointsArray() override;
 
-  /** Clone **/
+  /**
+   * @brief Creates a new InstancedMesh from the current mesh.
+   * @param name (string) : the cloned mesh name
+   * @param  newParent (optional Node) : the optional Node to parent the clone
+   * to.
+   * @param  doNotCloneChildren (optional boolean, default `false`) : if `true`
+   * the model children aren't cloned.
+   * @returns The clone.
+   */
   InstancedMesh* clone(const std::string& name, Node* newParent,
-                       bool doNotCloneChildren);
+                       bool doNotCloneChildren = false);
 
-  /** Dispose **/
+  /**
+   * @brief Disposes the InstancedMesh.
+   */
   void dispose(bool doNotRecurse = false) override;
 
 protected:

@@ -89,6 +89,8 @@ public:
   }
   ~Mesh();
 
+  Mesh* source();
+
   virtual IReflect::Type type() const override;
 
   /** Methods **/
@@ -1395,6 +1397,8 @@ private:
   bool _areNormalsFrozen;
   // Will be used to save original positions when using software skinning
   Float32Array _sourcePositions;
+  // Will be used to save a source mesh reference, If any
+  Mesh* _source;
   // Will be used to save original normals when using software skinning
   Float32Array _sourceNormals;
   // For extrusion and tube
