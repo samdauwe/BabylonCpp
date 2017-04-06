@@ -21,6 +21,7 @@
 #include <babylon/mesh/_visible_instances.h>
 #include <babylon/mesh/buffer.h>
 #include <babylon/mesh/geometry.h>
+#include <babylon/mesh/ground_mesh.h>
 #include <babylon/mesh/instanced_mesh.h>
 #include <babylon/mesh/mesh_builder.h>
 #include <babylon/mesh/mesh_lod_level.h>
@@ -57,6 +58,9 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
   _boundingInfo = nullptr;
 
   if (source) {
+    // Source mesh
+    _source = source;
+
     // Geometry
     if (source->_geometry) {
       source->_geometry->applyToMesh(this);
@@ -119,6 +123,11 @@ Mesh* Mesh::source()
   return _source;
 }
 
+const char* Mesh::getClassName() const
+{
+  return "Mesh";
+}
+
 IReflect::Type Mesh::type() const
 {
   return IReflect::Type::MESH;
@@ -137,9 +146,9 @@ std::string Mesh::toString(bool fullDetails)
   std::ostringstream oss;
   oss << AbstractMesh::toString(fullDetails);
   oss << ", n vertices: " << getTotalVertices();
-  // oss << ", parent: "
-  //    << ((!_waitingParentId.empty()) ? _waitingParentId :
-  //                                      (parent() ? parent()->name : "NONE"));
+  oss << ", parent: "
+      << ((!_waitingParentId.empty()) ? _waitingParentId :
+                                        (parent() ? parent()->name : "NONE"));
 
   if (!animations.empty()) {
     for (auto& animation : animations) {
@@ -163,7 +172,7 @@ void Mesh::addSubMesh(SubMesh* subMesh)
   subMeshes.emplace_back(subMesh);
 }
 
-bool Mesh::hasLODLevels()
+bool Mesh::hasLODLevels() const
 {
   return _LODLevels.size() > 0;
 }
@@ -345,7 +354,7 @@ size_t Mesh::getTotalIndices()
   return _geometry->getTotalIndices();
 }
 
-Uint32Array Mesh::getIndices(bool copyWhenShared)
+IndicesArray Mesh::getIndices(bool copyWhenShared)
 {
   if (!_geometry) {
     return Uint32Array();
@@ -387,14 +396,16 @@ bool Mesh::areNormalsFrozen() const
   return _areNormalsFrozen;
 }
 
-void Mesh::freezeNormals()
+Mesh& Mesh::freezeNormals()
 {
   _areNormalsFrozen = true;
+  return *this;
 }
 
-void Mesh::unfreezeNormals()
+Mesh& Mesh::unfreezeNormals()
 {
   _areNormalsFrozen = false;
+  return *this;
 }
 
 void Mesh::setOverridenInstanceCount(size_t count)
@@ -420,7 +431,7 @@ void Mesh::_preActivateForIntermediateRendering(int renderId)
   }
 }
 
-void Mesh::_registerInstanceForRenderId(InstancedMesh* instance, int renderId)
+Mesh& Mesh::_registerInstanceForRenderId(InstancedMesh* instance, int renderId)
 {
   if (!_visibleInstances) {
     _visibleInstances = std_util::make_unique<_VisibleInstances>();
@@ -434,12 +445,14 @@ void Mesh::_registerInstanceForRenderId(InstancedMesh* instance, int renderId)
   }
 
   _visibleInstances->meshes[renderId].emplace_back(instance);
+
+  return *this;
 }
 
-void Mesh::refreshBoundingInfo()
+Mesh& Mesh::refreshBoundingInfo()
 {
   if (_boundingInfo->isLocked()) {
-    return;
+    return *this;
   }
 
   auto data = getVerticesData(VertexBuffer::PositionKind);
@@ -456,6 +469,8 @@ void Mesh::refreshBoundingInfo()
   }
 
   _updateBoundingInfo();
+
+  return *this;
 }
 
 SubMesh* Mesh::_createGlobalSubMesh()
@@ -518,15 +533,26 @@ void Mesh::setVerticesData(unsigned int kind, const Float32Array& data,
   }
 }
 
-void Mesh::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
+void Mesh::markVerticesDataAsUpdatable(unsigned int kind, bool updatable)
+{
+  if (getVertexBuffer(kind)->isUpdatable() == updatable) {
+    return;
+  }
+
+  setVerticesData(kind, getVerticesData(kind), updatable);
+}
+
+Mesh& Mesh::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
 {
   if (!_geometry) {
     auto scene = getScene();
 
-    Geometry(Geometry::RandomId(), scene).applyToMesh(this);
+    Geometry::New(Geometry::RandomId(), scene)->applyToMesh(this);
   }
 
   _geometry->setVerticesBuffer(std::move(buffer));
+
+  return *this;
 }
 
 void Mesh::updateVerticesData(unsigned int kind, const Float32Array& data,
@@ -544,7 +570,7 @@ void Mesh::updateVerticesData(unsigned int kind, const Float32Array& data,
   }
 }
 
-void Mesh::updateMeshPositions(
+Mesh& Mesh::updateMeshPositions(
   std::function<void(Float32Array& positions)> positionFunction,
   bool computeNormals)
 {
@@ -557,20 +583,23 @@ void Mesh::updateMeshPositions(
     VertexData::ComputeNormals(positions, indices, normals);
     updateVerticesData(VertexBuffer::NormalKind, normals, false, false);
   }
+  return *this;
 }
 
-void Mesh::makeGeometryUnique()
+Mesh& Mesh::makeGeometryUnique()
 {
   if (!_geometry) {
-    return;
+    return *this;
   }
   auto oldGeometry = _geometry;
   auto geometry_   = _geometry->copy(Geometry::RandomId());
   oldGeometry->releaseForMesh(this, true);
   geometry_->applyToMesh(this);
+
+  return *this;
 }
 
-void Mesh::setIndices(const Uint32Array& indices, int totalVertices)
+void Mesh::setIndices(const IndicesArray& indices, int totalVertices)
 {
   if (!_geometry) {
     auto vertexData     = std_util::make_unique<VertexData>();
@@ -585,13 +614,15 @@ void Mesh::setIndices(const Uint32Array& indices, int totalVertices)
   }
 }
 
-void Mesh::toLeftHanded()
+Mesh& Mesh::toLeftHanded()
 {
   if (!_geometry) {
-    return;
+    return *this;
   }
 
   _geometry->toLeftHanded();
+
+  return *this;
 }
 
 void Mesh::_bind(SubMesh* subMesh, Effect* effect, unsigned int fillMode)
@@ -620,7 +651,7 @@ void Mesh::_bind(SubMesh* subMesh, Effect* effect, unsigned int fillMode)
   }
 
   // VBOs
-  engine->bindBuffers(_geometry->getVertexBuffers(), indexToBind, effect);
+  _geometry->_bind(effect, indexToBind);
 }
 
 void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount)
@@ -666,28 +697,32 @@ void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount)
   }
 }
 
-void Mesh::registerBeforeRender(
+Mesh& Mesh::registerBeforeRender(
   const std::function<void(AbstractMesh* mesh)>& func)
 {
   onBeforeRenderObservable.add(func);
+  return *this;
 }
 
-void Mesh::unregisterBeforeRender(
+Mesh& Mesh::unregisterBeforeRender(
   const std::function<void(AbstractMesh* mesh)>& func)
 {
   onBeforeRenderObservable.removeCallback(func);
+  return *this;
 }
 
-void Mesh::registerAfterRender(
+Mesh& Mesh::registerAfterRender(
   const std::function<void(AbstractMesh* mesh)>& func)
 {
   onAfterRenderObservable.add(func);
+  return *this;
 }
 
-void Mesh::unregisterAfterRender(
+Mesh& Mesh::unregisterAfterRender(
   const std::function<void(AbstractMesh* mesh)>& func)
 {
   onAfterRenderObservable.removeCallback(func);
+  return *this;
 }
 
 _InstancesBatch* Mesh::_getInstancesRenderList(size_t subMeshId)
@@ -734,13 +769,14 @@ _InstancesBatch* Mesh::_getInstancesRenderList(size_t subMeshId)
   return _batchCache.get();
 }
 
-void Mesh::_renderWithInstances(SubMesh* subMesh, int fillMode,
-                                _InstancesBatch* batch, Effect* effect,
-                                Engine* engine)
+Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, int fillMode,
+                                 _InstancesBatch* batch, Effect* effect,
+                                 Engine* engine)
 {
   if (batch->visibleInstances.find(subMesh->_id)
-      == batch->visibleInstances.end())
-    return;
+      == batch->visibleInstances.end()) {
+    return *this;
+  }
 
   std::vector<InstancedMesh*> visibleInstances
     = batch->visibleInstances[subMesh->_id];
@@ -798,21 +834,23 @@ void Mesh::_renderWithInstances(SubMesh* subMesh, int fillMode,
   else {
     _instancesBuffer->updateDirectly(_instancesData, 0, instancesCount);
   }
-  engine->bindBuffers(_geometry->getVertexBuffers(),
-                      _geometry->getIndexBuffer(), effect);
+
+  geometry()->_bind(effect);
 
   _draw(subMesh, fillMode, instancesCount);
 
   engine->unbindInstanceAttributes();
+
+  return *this;
 }
 
-void Mesh::_processRendering(SubMesh* subMesh, Effect* effect, int fillMode,
-                             _InstancesBatch* batch,
-                             bool hardwareInstancedRendering,
-                             std::function<void(bool isInstance, Matrix world,
-                                                Material* effectiveMaterial)>
-                               onBeforeDraw,
-                             Material* effectiveMaterial)
+Mesh& Mesh::_processRendering(SubMesh* subMesh, Effect* effect, int fillMode,
+                              _InstancesBatch* batch,
+                              bool hardwareInstancedRendering,
+                              std::function<void(bool isInstance, Matrix world,
+                                                 Material* effectiveMaterial)>
+                                onBeforeDraw,
+                              Material* effectiveMaterial)
 {
   auto scene  = getScene();
   auto engine = scene->getEngine();
@@ -843,9 +881,11 @@ void Mesh::_processRendering(SubMesh* subMesh, Effect* effect, int fillMode,
       }
     }
   }
+
+  return *this;
 }
 
-void Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
+Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
 {
   auto scene = getScene();
 
@@ -853,13 +893,13 @@ void Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
   auto batch = _getInstancesRenderList(subMesh->_id);
 
   if (batch->mustReturn) {
-    return;
+    return *this;
   }
 
   // Checking geometry state
   if (!_geometry || _geometry->getVertexBuffers().empty()
       || !_geometry->getIndexBuffer()) {
-    return;
+    return *this;
   }
 
   onBeforeRenderObservable.notifyObservers(this);
@@ -876,7 +916,7 @@ void Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
 
   if (!effectiveMaterial
       || !effectiveMaterial->isReady(this, hardwareInstancedRendering)) {
-    return;
+    return *this;
   }
 
   // Outline - step 1
@@ -934,14 +974,17 @@ void Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
   }
 
   onAfterRenderObservable.notifyObservers(this);
+
+  return *this;
 }
 
-void Mesh::_onBeforeDraw(bool isInstance, Matrix& world,
-                         Material* effectiveMaterial)
+Mesh& Mesh::_onBeforeDraw(bool isInstance, Matrix& world,
+                          Material* effectiveMaterial)
 {
   if (isInstance) {
     effectiveMaterial->bindOnlyWorldMatrix(world);
   }
+  return *this;
 }
 
 std::vector<ParticleSystem*> Mesh::getEmittedParticleSystems()
@@ -985,7 +1028,7 @@ std::vector<BABYLON::Node*> Mesh::getChildren()
   return results;
 }
 
-void Mesh::_checkDelayState()
+Mesh& Mesh::_checkDelayState()
 {
   auto scene = getScene();
 
@@ -997,11 +1040,14 @@ void Mesh::_checkDelayState()
 
     _queueLoad(this, scene);
   }
+
+  return *this;
 }
 
-void Mesh::_queueLoad(Mesh* mesh, Scene* scene)
+Mesh& Mesh::_queueLoad(Mesh* mesh, Scene* scene)
 {
   scene->_addPendingData(mesh);
+  return *this;
 }
 
 bool Mesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes)
@@ -1019,13 +1065,13 @@ bool Mesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes)
   return true;
 }
 
-void Mesh::setMaterialByID(const std::string& iId)
+Mesh& Mesh::setMaterialByID(const std::string& iId)
 {
   const auto& materials = getScene()->materials;
   for (auto& _material : materials) {
     if (_material->id == iId) {
       material = _material.get();
-      return;
+      return *this;
     }
   }
 
@@ -1034,9 +1080,11 @@ void Mesh::setMaterialByID(const std::string& iId)
   for (auto& multiMaterial : multiMaterials) {
     if (multiMaterial->id == iId) {
       material = multiMaterial.get();
-      return;
+      return *this;
     }
   }
+
+  return *this;
 }
 
 std::vector<IAnimatable*> Mesh::getAnimatables()
@@ -1055,11 +1103,11 @@ std::vector<IAnimatable*> Mesh::getAnimatables()
 }
 
 // Geometry
-void Mesh::bakeTransformIntoVertices(const Matrix& transform)
+Mesh& Mesh::bakeTransformIntoVertices(const Matrix& transform)
 {
   // Position
   if (!isVerticesDataPresent(VertexBuffer::PositionKind)) {
-    return;
+    return *this;
   }
 
   auto _submeshes = std::move(subMeshes);
@@ -1079,7 +1127,7 @@ void Mesh::bakeTransformIntoVertices(const Matrix& transform)
 
   // Normals
   if (!isVerticesDataPresent(VertexBuffer::NormalKind)) {
-    return;
+    return *this;
   }
   data = getVerticesData(VertexBuffer::NormalKind);
   temp.clear();
@@ -1099,10 +1147,12 @@ void Mesh::bakeTransformIntoVertices(const Matrix& transform)
   // Restore submeshes
   releaseSubMeshes();
   subMeshes = std::move(_submeshes);
+
+  return *this;
 }
 
 // Will apply current transform to mesh and reset world matrix
-void Mesh::bakeCurrentTransformIntoVertices()
+Mesh& Mesh::bakeCurrentTransformIntoVertices()
 {
   bakeTransformIntoVertices(computeWorldMatrix(true));
   scaling().copyFromFloats(1.f, 1.f, 1.f);
@@ -1113,11 +1163,13 @@ void Mesh::bakeCurrentTransformIntoVertices()
     setRotationQuaternion(Quaternion::Identity());
   }
   _worldMatrix = std_util::make_unique<Matrix>(Matrix::Identity());
+  return *this;
 }
 
-void Mesh::_resetPointsArrayCache()
+Mesh& Mesh::_resetPointsArrayCache()
 {
   _positions.clear();
+  return *this;
 }
 
 bool Mesh::_generatePointsArray()
@@ -1154,6 +1206,17 @@ void Mesh::dispose(bool /*doNotRecurse*/)
   if (_geometry) {
     _geometry->releaseForMesh(this, true);
   }
+
+  // Sources
+  for (auto& mesh : getScene()->meshes) {
+    if (mesh->type() == IReflect::Type::MESH) {
+      auto _mesh = static_cast<Mesh*>(mesh.get());
+      if (_mesh->_source && _mesh->_source == this) {
+        _mesh->_source = nullptr;
+      }
+    }
+  }
+  _source = nullptr;
 
   // Instances
   if (_instancesBuffer) {
@@ -1244,7 +1307,7 @@ void Mesh::applyDisplacementMapFromBuffer(const Uint8Array& buffer,
   updateVerticesData(VertexBuffer::NormalKind, normals);
 }
 
-void Mesh::convertToFlatShadedMesh()
+Mesh& Mesh::convertToFlatShadedMesh()
 {
   auto kinds = getVerticesDataKinds();
   std::map<unsigned int, VertexBuffer*> vbs;
@@ -1339,9 +1402,10 @@ void Mesh::convertToFlatShadedMesh()
   }
 
   synchronizeInstances();
+  return *this;
 }
 
-void Mesh::convertToUnIndexedMesh()
+Mesh& Mesh::convertToUnIndexedMesh()
 {
   auto kinds = getVerticesDataKinds();
   std::map<unsigned int, VertexBuffer*> vbs;
@@ -1415,9 +1479,10 @@ void Mesh::convertToUnIndexedMesh()
   _unIndexed = true;
 
   synchronizeInstances();
+  return *this;
 }
 
-void Mesh::flipFaces(bool flipNormals)
+Mesh& Mesh::flipFaces(bool flipNormals)
 {
   auto vertex_data = VertexData::ExtractFromMesh(this);
   unsigned int i;
@@ -1433,6 +1498,7 @@ void Mesh::flipFaces(bool flipNormals)
   }
 
   vertex_data->applyToMesh(this);
+  return *this;
 }
 
 InstancedMesh* Mesh::createInstance(const std::string& iName)
@@ -1440,11 +1506,12 @@ InstancedMesh* Mesh::createInstance(const std::string& iName)
   return InstancedMesh::New(iName, this);
 }
 
-void Mesh::synchronizeInstances()
+Mesh& Mesh::synchronizeInstances()
 {
   for (auto& instance : instances) {
     instance->_syncSubMeshes();
   }
+  return *this;
 }
 
 /*void Mesh::simplify(
@@ -1466,8 +1533,14 @@ void Mesh::optimizeIndices(
 Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
                   const std::string& rootUrl)
 {
-  auto mesh = Mesh::New(Json::GetString(parsedMesh, "name"), scene);
-  mesh->id  = Json::GetString(parsedMesh, "id");
+  Mesh* mesh = nullptr;
+  if (Json::GetString(parsedMesh, "type") == "GroundMesh") {
+    mesh = GroundMesh::Parse(parsedMesh, scene);
+  }
+  else {
+    mesh = Mesh::New(Json::GetString(parsedMesh, "name"), scene);
+  }
+  mesh->id = Json::GetString(parsedMesh, "id");
 
   // Tags.AddTagsTo(mesh, parsedMesh.tags);
 
@@ -2061,11 +2134,11 @@ Float32Array& Mesh::setNormalsForCPUSkinning()
 Mesh* Mesh::applySkeleton(Skeleton* skeleton)
 {
   if (!_geometry) {
-    return nullptr;
+    return this;
   }
 
   if (_geometry->_softwareSkinningRenderId == getScene()->getRenderId()) {
-    return nullptr;
+    return this;
   }
 
   _geometry->_softwareSkinningRenderId = getScene()->getRenderId();
@@ -2213,7 +2286,8 @@ Vector3 Mesh::Center(const std::vector<AbstractMesh*>& meshes)
 }
 
 Mesh* Mesh::MergeMeshes(std::vector<Mesh*>& meshes, bool disposeSource,
-                        bool allow32BitsIndices, Mesh* meshSubclass)
+                        bool allow32BitsIndices, Mesh* meshSubclass,
+                        bool subdivideWithSubMeshes)
 {
   unsigned int index;
   if (!allow32BitsIndices) {
@@ -2239,6 +2313,7 @@ Mesh* Mesh::MergeMeshes(std::vector<Mesh*>& meshes, bool disposeSource,
   std::unique_ptr<VertexData> vertexData      = nullptr;
   std::unique_ptr<VertexData> otherVertexData = nullptr;
 
+  IndicesArray indiceArray;
   Mesh* source = nullptr;
   for (index = 0; index < meshes.size(); ++index) {
     if (meshes[index]) {
@@ -2252,6 +2327,10 @@ Mesh* Mesh::MergeMeshes(std::vector<Mesh*>& meshes, bool disposeSource,
       else {
         vertexData = std::move(otherVertexData);
         source     = meshes[index];
+      }
+
+      if (subdivideWithSubMeshes) {
+        indiceArray.emplace_back(meshes[index]->getTotalIndices());
       }
     }
   }
@@ -2275,6 +2354,20 @@ Mesh* Mesh::MergeMeshes(std::vector<Mesh*>& meshes, bool disposeSource,
       if (mesh) {
         mesh->dispose();
       }
+    }
+  }
+
+  // Subdivide
+  if (subdivideWithSubMeshes) {
+    //-- Suppresions du submesh global
+    meshSubclass->releaseSubMeshes();
+    index               = 0;
+    unsigned int offset = 0;
+    //-- aplique la subdivision en fonction du tableau d'indices
+    while (index < indiceArray.size()) {
+      SubMesh::CreateFromIndices(0, offset, indiceArray[index], meshSubclass);
+      offset += indiceArray[index];
+      ++index;
     }
   }
 

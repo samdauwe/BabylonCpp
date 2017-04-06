@@ -79,6 +79,10 @@ public:
    */
   GroundMesh& updateCoordinateHeights();
 
+  Json::object serialize(Json::object& serializationObject) const;
+
+  static GroundMesh* Parse(const Json::value& parsedMesh, Scene* scene);
+
 private:
   /**
    * @brief Returns the element "facet" from the heightQuads array relative to
@@ -115,10 +119,6 @@ private:
    * @returns The GroundMesh.
    */
   GroundMesh& _computeHeightQuads();
-
-  Json::object serialize(Json::object& serializationObject) const;
-
-  static GroundMesh* Parse(const Json::value& parsedMesh, Scene* scene);
 
 protected:
   GroundMesh(const std::string& name, Scene* scene);

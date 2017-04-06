@@ -91,41 +91,59 @@ public:
 
   Mesh* source();
 
+  /**
+   * @brief Returns the string "Mesh".
+   */
+  const char* getClassName() const override;
+
   virtual IReflect::Type type() const override;
 
   /** Methods **/
   void setOnBeforeDraw(const std::function<void()>& callback);
-  std::string toString(bool fullDetails = false);
-  void addSubMesh(SubMesh* subMesh);
-  bool hasLODLevels();
 
   /**
-   * Add a mesh as LOD level triggered at the given distance.
+   * @brief Returns a string.
+   * @param {boolean} fullDetails - support for multiple levels of logging
+   * within scene loading
+   */
+  std::string toString(bool fullDetails = false);
+
+  void addSubMesh(SubMesh* subMesh);
+
+  /**
+   * @brief Returns if the mesh has some Levels Of Details (LOD).
+   */
+  bool hasLODLevels() const;
+
+  /**
+   * @brief Add a mesh as LOD level triggered at the given distance.
    * tuto : http://doc.babylonjs.com/tutorials/How_to_use_LOD
    * @param {number} distance The distance from the center of the object to show
    * this level
    * @param {Mesh} mesh The mesh to be added as LOD level
-   * @return {Mesh} This mesh (for chaining)
+   * @returns {Mesh} This mesh (for chaining)
    */
   Mesh& addLODLevel(float distance, Mesh* mesh);
 
   /**
-   * Returns the LOD level mesh at the passed distance or null if not found.
+   * @brief Returns the LOD level mesh at the passed distance or null if not
+   * found.
    * It is related to the method `addLODLevel(distance, mesh)`.
    * tuto : http://doc.babylonjs.com/tutorials/How_to_use_LOD
+   * @returns An object Mesh or `null`.
    */
   Mesh* getLODLevelAtDistance(float distance);
 
   /**
-   * Remove a mesh from the LOD array
+   * @brief Remove a mesh from the LOD array
    * tuto : http://doc.babylonjs.com/tutorials/How_to_use_LOD
    * @param {Mesh} mesh The mesh to be removed.
-   * @return {Mesh} This mesh (for chaining)
+   * @returns {Mesh} This mesh (for chaining)
    */
   Mesh& removeLODLevel(Mesh* mesh);
 
   /**
-   * Returns the registered LOD mesh distant from the parameter `camera`
+   * @brief Returns the registered LOD mesh distant from the parameter `camera`
    * position if any, else returns the current mesh.
    * tuto : http://doc.babylonjs.com/tutorials/How_to_use_LOD
    */
@@ -133,25 +151,24 @@ public:
                        BoundingSphere* boundingSphere = nullptr) override;
 
   /**
-   * Returns the mesh internal Geometry object.
+   * @brief Returns the mesh internal Geometry object.
    */
   Geometry* geometry() const;
 
   void setGeometry(Geometry* geometry);
 
   /**
-   * Returns a positive integer : the total number of vertices within the mesh
-   * geometry or zero if the mesh has no geometry.
+   * @brief Returns a positive integer : the total number of vertices within the
+   * mesh geometry or zero if the mesh has no geometry.
    */
   size_t getTotalVertices() const override;
 
   /**
-   * Returns an array of integers or floats, or a Float32Array, depending on the
-   * requested `kind` (positions, indices, normals, etc).
+   * @brief Returns an array of integers or floats, or a Float32Array, depending
+   * on the requested `kind` (positions, indices, normals, etc).
    * If `copywhenShared` is true (default false) and if the mesh geometry is
    * shared among some other meshes, the returned array is a copy of the
    * internal one.
-   * Returns null if the mesh has no geometry or no vertex buffer.
    * Possible `kind` values :
    * - BABYLON.VertexBuffer.PositionKind
    * - BABYLON.VertexBuffer.UVKind
@@ -170,9 +187,8 @@ public:
                                bool copyWhenShared = false) override;
 
   /**
-   * Returns the mesh VertexBuffer object from the requested `kind` : positions,
-   * indices, normals, etc.
-   * Returns `undefined` if the mesh has no geometry.
+   * @brief Returns the mesh VertexBuffer object from the requested `kind` :
+   * positions, indices, normals, etc.
    * Possible `kind` values :
    * - BABYLON.VertexBuffer.PositionKind
    * - BABYLON.VertexBuffer.UVKind
@@ -190,8 +206,8 @@ public:
   VertexBuffer* getVertexBuffer(unsigned int kind);
 
   /**
-   * Returns a boolean depending on the existence of the Vertex Data for the
-   * requested `kind`.
+   * @brief Returns a boolean depending on the existence of the Vertex Data for
+   * the requested `kind`.
    * Possible `kind` values :
    * - BABYLON.VertexBuffer.PositionKind
    * - BABYLON.VertexBuffer.UVKind
@@ -209,8 +225,8 @@ public:
   bool isVerticesDataPresent(unsigned int kind) override;
 
   /**
-   * Returns a string : the list of existing `kinds` of Vertex Data for this
-   * mesh.
+   * @brief Returns a string : the list of existing `kinds` of Vertex Data for
+   * this mesh.
    * Possible `kind` values :
    * - BABYLON.VertexBuffer.PositionKind
    * - BABYLON.VertexBuffer.UVKind
@@ -228,39 +244,38 @@ public:
   Uint32Array getVerticesDataKinds();
 
   /**
-   * Returns a positive integer : the total number of indices in this mesh
-   * geometry.
-   * Returns zero if the mesh has no geometry.
+   * @brief Returns a positive integer : the total number of indices in this
+   * mesh geometry.
+   * @returns Zero if the mesh has no geometry.
    */
   size_t getTotalIndices();
 
   /**
-   * Returns an array of integers or a Uint32Array populated with the mesh
-   * indices.
+   * @brief Returns an IndicesArray populated with the mesh indices.
    * If the parameter `copyWhenShared` is true (default false) and and if the
    * mesh geometry is shared among some other meshes, the returned array is a
    * copy of the internal one.
-   * Returns an empty array if the mesh has no geometry.
+   * @returns An empty array if the mesh has no geometry.
    */
-  Uint32Array getIndices(bool copyWhenShared = false) override;
+  IndicesArray getIndices(bool copyWhenShared = false) override;
 
   bool isBlocked();
 
   /**
-   * Boolean : true once the mesh is ready after all the delayed process
+   * @brief Returns true once the mesh is ready after all the delayed process
    * (loading, etc) are complete.
    */
   bool isReady() const;
 
   /**
-   * Boolean : true if the mesh has been disposed.
+   * @brief Returns true if the mesh has been disposed.
    */
   bool isDisposed() const;
 
   unsigned int sideOrientation() const;
 
   /**
-   * Sets the mesh side orientation : BABYLON.Mesh.FRONTSIDE,
+   * @brief Sets the mesh side orientation : BABYLON.Mesh.FRONTSIDE,
    * BABYLON.Mesh.BACKSIDE, BABYLON.Mesh.DOUBLESIDE or BABYLON.Mesh.DEFAULTSIDE
    * tuto :
    * http://doc.babylonjs.com/tutorials/Discover_Basic_Elements#side-orientation
@@ -268,31 +283,33 @@ public:
   void setSideOrientation(unsigned int sideO);
 
   /**
-   * Boolean : true if the normals aren't to be recomputed on next mesh
+   * @brief Returns true if the normals aren't to be recomputed on next mesh
    * `positions` array update.
    * This property is pertinent only for updatable parametric shapes.
    */
   bool areNormalsFrozen() const;
 
   /**
-   * This function affects parametric shapes on vertex position update only :
-   * ribbons, tubes, etc.
+   * @brief This function affects parametric shapes on vertex position update
+   * only : ribbons, tubes, etc.
    * It has no effect at all on other shapes.
    * It prevents the mesh normals from being recomputed on next `positions`
    * array update.
+   * @returns the Mesh.
    */
-  void freezeNormals();
+  Mesh& freezeNormals();
 
   /**
-   * This function affects parametric shapes on vertex position update only :
-   * ribbons, tubes, etc.
+   * @brief This function affects parametric shapes on vertex position update
+   * only : ribbons, tubes, etc.
    * It has no effect at all on other shapes.
    * It reactivates the mesh normals computation if it was previously frozen.
+   * @returns the Mesh.
    */
-  void unfreezeNormals();
+  Mesh& unfreezeNormals();
 
   /**
-   * Overrides instance count. Only applicable when custom instanced
+   * @brief Overrides instance count. Only applicable when custom instanced
    * InterleavedVertexBuffer are used rather than InstancedMeshs
    */
   void setOverridenInstanceCount(size_t count);
@@ -300,20 +317,21 @@ public:
   /** Methods **/
   void _preActivate() override;
   void _preActivateForIntermediateRendering(int renderId) override;
-  void _registerInstanceForRenderId(InstancedMesh* instance, int renderId);
+  Mesh& _registerInstanceForRenderId(InstancedMesh* instance, int renderId);
 
   /**
-   * This method recomputes and sets a new BoundingInfo to the mesh unless it is
-   * locked.
+   * @brief This method recomputes and sets a new BoundingInfo to the mesh
+   * unless it is locked.
    * This means the mesh underlying bounding box and sphere are recomputed.
+   * @returns The Mesh.
    */
-  void refreshBoundingInfo();
+  Mesh& refreshBoundingInfo();
 
   SubMesh* _createGlobalSubMesh();
   void subdivide(size_t count);
 
   /**
-   * Sets the vertex data of the mesh geometry for the requested `kind`.
+   * @brief Sets the vertex data of the mesh geometry for the requested `kind`.
    * If the mesh has no geometry, a new Geometry object is set to the mesh and
    * then passed this vertex data.
    * The `data` are either a numeric array either a Float32Array.
@@ -343,11 +361,17 @@ public:
   void setVerticesData(unsigned int kind, const Float32Array& data,
                        bool updatable = false, int stride = -1) override;
 
-  void setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer);
+  void markVerticesDataAsUpdatable(unsigned int kind, bool updatable = true);
 
   /**
-   * Updates the existing vertex data of the mesh geometry for the requested
-   * `kind`.
+   * @brief Sets the mesh VertexBuffer.
+   * @returns The Mesh.
+   */
+  Mesh& setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer);
+
+  /**
+   * @brief Updates the existing vertex data of the mesh geometry for the
+   * requested `kind`.
    * If the mesh has no geometry, it is simply returned as it is.
    * The `data` are either a numeric array either a Float32Array.
    * No new underlying VertexBuffer object is created.
@@ -376,7 +400,8 @@ public:
                           bool makeItUnique  = false) override;
 
   /**
-   * This method updates the vertex positions of an updatable mesh according to
+   * @brief This method updates the vertex positions of an updatable mesh
+   * according to
    * the `positionFunction` returned values.
    * tuto :
    * http://doc.babylonjs.com/tutorials/How_to_dynamically_morph_a_mesh#other-shapes-updatemeshpositions
@@ -385,147 +410,163 @@ public:
    * The parameter `computeNormals` is a boolean (default true) to
    * enable/disable the mesh normal recomputation after the vertex position
    * update.
+   * @returns The Mesh.
    */
-  void updateMeshPositions(
+  Mesh& updateMeshPositions(
     std::function<void(Float32Array& positions)> positionFunction,
     bool computeNormals = true);
 
-  void makeGeometryUnique();
+  /**
+   * @brief Creates a un-shared specific occurence of the geometry for the mesh.
+   * @returns The Mesh.
+   */
+  Mesh& makeGeometryUnique();
 
   /**
-   * Sets the mesh indices.
-   * Expects an array populated with integers or a Uint32Array.
+   * @brief Sets the mesh indices.
+   * Expects an IndicesArray.
    * If the mesh has no geometry, a new Geometry object is created and set to
    * the mesh.
    * This method creates a new index buffer each call.
    */
-  void setIndices(const Uint32Array& indices, int totalVertices = -1) override;
+  void setIndices(const IndicesArray& indices, int totalVertices = -1) override;
 
   /**
-   * Invert the geometry to move from a right handed system to a left handed
-   * one.
+   * @brief Invert the geometry to move from a right handed system to a left
+   * handed one.
+   * @returns The Mesh.
    */
-  void toLeftHanded();
+  Mesh& toLeftHanded();
 
   virtual void _bind(SubMesh* subMesh, Effect* effect, unsigned int fillMode);
   virtual void _draw(SubMesh* subMesh, int fillMode, size_t instancesCount = 0);
 
   /**
-   * Registers for this mesh a javascript function called just before the
+   * @brief Registers for this mesh a javascript function called just before the
    * rendering process.
-   * This function is passed the current mesh and doesn't return anything.
+   * This function is passed the current mesh.
+   * @returns The Mesh.
    */
-  void
+  Mesh&
   registerBeforeRender(const std::function<void(AbstractMesh* mesh)>& func);
 
   /**
-   * Disposes a previously registered javascript function called before the
-   * rendering.
-   * This function is passed the current mesh and doesn't return anything.
+   * @brief Disposes a previously registered javascript function called before
+   * the rendering.
+   * This function is passed the current mesh.
+   * @returns The Mesh.
    */
-  void
+  Mesh&
   unregisterBeforeRender(const std::function<void(AbstractMesh* mesh)>& func);
 
   /**
-   * Registers for this mesh a javascript function called just after the
+   * @brief Registers for this mesh a javascript function called just after the
    * rendering is complete.
-   * This function is passed the current mesh and doesn't return anything.
+   * This function is passed the current mesh.
+   * @returns The Mesh.
    */
-  void registerAfterRender(const std::function<void(AbstractMesh* mesh)>& func);
+  Mesh&
+  registerAfterRender(const std::function<void(AbstractMesh* mesh)>& func);
 
   /**
-   * Disposes a previously registered javascript function called after the
-   * rendering.
-   * This function is passed the current mesh and doesn't return anything.
+   * @brief Disposes a previously registered javascript function called after
+   * the rendering.
+   * This function is passed the current mesh.
+   * @returns The Mesh.
    */
-  void
+  Mesh&
   unregisterAfterRender(const std::function<void(AbstractMesh* mesh)>& func);
 
   _InstancesBatch* _getInstancesRenderList(size_t subMeshId);
-  void _renderWithInstances(SubMesh* subMesh, int fillMode,
-                            _InstancesBatch* batch, Effect* effect,
-                            Engine* engine);
-  void _processRendering(SubMesh* subMesh, Effect* effect, int fillMode,
-                         _InstancesBatch* batch,
-                         bool hardwareInstancedRendering,
-                         std::function<void(bool isInstance, Matrix world,
-                                            Material* effectiveMaterial)>
-                           onBeforeDraw,
-                         Material* effectiveMaterial = nullptr);
+  Mesh& _renderWithInstances(SubMesh* subMesh, int fillMode,
+                             _InstancesBatch* batch, Effect* effect,
+                             Engine* engine);
+  Mesh& _processRendering(SubMesh* subMesh, Effect* effect, int fillMode,
+                          _InstancesBatch* batch,
+                          bool hardwareInstancedRendering,
+                          std::function<void(bool isInstance, Matrix world,
+                                             Material* effectiveMaterial)>
+                            onBeforeDraw,
+                          Material* effectiveMaterial = nullptr);
 
   /**
-   * Triggers the draw call for the mesh.
+   * @brief Triggers the draw call for the mesh.
    * Usually, you don't need to call this method by your own because the mesh
    * rendering is handled by the scene rendering manager.
+   * @returns Returns the Mesh.
    */
-  void render(SubMesh* subMesh, bool enableAlphaMode);
+  Mesh& render(SubMesh* subMesh, bool enableAlphaMode);
 
   /**
-   * Returns an array populated with ParticleSystem objects whose the mesh is
-   * the emitter.
+   * @brief Returns an array populated with ParticleSystem objects whose the
+   * mesh is the emitter.
    */
   std::vector<ParticleSystem*> getEmittedParticleSystems();
 
   /**
-   * Returns an array populated with ParticleSystem objects whose the mesh or
-   * its children are the emitter.
+   * @brief Returns an array populated with ParticleSystem objects whose the
+   * mesh or its children are the emitter.
    */
   std::vector<ParticleSystem*> getHierarchyEmittedParticleSystems();
 
   std::vector<Node*> getChildren();
-  void _checkDelayState();
+  Mesh& _checkDelayState();
 
   /**
-   * Boolean, true is the mesh in the frustum defined by the Plane objects from
-   * the `frustumPlanes` array parameter.
+   * @brief Returns true if the mesh in the frustum defined by the Plane objects
+   * from the `frustumPlanes` array parameter.
    */
   bool isInFrustum(const std::array<Plane, 6>& frustumPlanes) override;
 
   /**
-   * Sets the mesh material by the material or multiMaterial `id` property.
+   * @brief Sets the mesh material by the material or multiMaterial `id`
+   * property.
    * The material `id` is a string identifying the material or the
    * multiMaterial.
-   * This method returns nothing.
+   * @returns the Mesh.
    */
-  void setMaterialByID(const std::string& id);
+  Mesh& setMaterialByID(const std::string& id);
 
   /**
-   * Returns as a new array populated with the mesh material and/or skeleton, if
-   * any.
+   * @brief Returns as a new array populated with the mesh material and/or
+   * skeleton, if any.
    */
   std::vector<IAnimatable*> getAnimatables();
 
   /**
-   * Modifies the mesh geometry according to the passed transformation matrix.
+   * @brief Modifies the mesh geometry according to the passed transformation
+   * matrix.
    * This method returns nothing but it really modifies the mesh even if it's
    * originally not set as updatable.
    * The mesh normals are modified accordingly the same transformation.
    * tuto :
    * http://doc.babylonjs.com/tutorials/How_Rotations_and_Translations_Work#baking-transform
    * Note that, under the hood, this method sets a new VertexBuffer each call.
+   * @returns the Mesh.
    */
-  void bakeTransformIntoVertices(const Matrix& transform);
+  Mesh& bakeTransformIntoVertices(const Matrix& transform);
 
   /**
-   * Modifies the mesh geometry according to its own current World Matrix.
-   * The mesh World Matrix is then reset.
+   * @brief Modifies the mesh geometry according to its own current World
+   * Matrix. The mesh World Matrix is then reset.
    * This method returns nothing but really modifies the mesh even if it's
    * originally not set as updatable.
    * tuto : tuto :
    * http://doc.babylonjs.com/tutorials/How_Rotations_and_Translations_Work#baking-transform
    * Note that, under the hood, this method sets a new VertexBuffer each call.
+   * @returns the Mesh.
    */
-  void bakeCurrentTransformIntoVertices();
+  Mesh& bakeCurrentTransformIntoVertices();
 
   /** Cache **/
-  void _resetPointsArrayCache();
+  Mesh& _resetPointsArrayCache();
   bool _generatePointsArray() override;
 
   /** Clone **/
 
   /**
-   * Returns a new Mesh object generated from the current mesh properties.
-   * This method must not get confused with createInstance().
+   * @brief Returns a new Mesh object generated from the current mesh
+   * properties. This method must not get confused with createInstance().
    * The parameter `name` is a string, the name given to the new mesh.
    * The optional parameter `newParent` can be any `Node` object (default
    * `null`).
@@ -543,7 +584,7 @@ public:
   /** Dispose **/
 
   /**
-   * Disposes the mesh.
+   * @brief Disposes the mesh.
    * This also frees the memory allocated under the hood to all the buffers used
    * by WebGL.
    */
@@ -552,7 +593,7 @@ public:
   /** Geometric tools **/
 
   /**
-   * Modifies the mesh geometry according to a displacement map.
+   * @brief Modifies the mesh geometry according to a displacement map.
    * A displacement map is a colored image. Each pixel color value (actually a
    * gradient computed from red, green, blue values) will give the displacement
    * to apply to each mesh vertex.
@@ -572,7 +613,7 @@ public:
                             const std::function<void(Mesh* mesh)> onSuccess);
 
   /**
-   * Modifies the mesh geometry according to a displacementMap buffer.
+   * @brief Modifies the mesh geometry according to a displacementMap buffer.
    * A displacement map is a colored image. Each pixel color value (actually a
    * gradient computed from red, green, blue values) will give the displacement
    * to apply to each mesh vertex.
@@ -593,39 +634,40 @@ public:
                                       int minHeight, int maxHeight);
 
   /**
-   * Modify the mesh to get a flat shading rendering.
+   * @brief Modify the mesh to get a flat shading rendering.
    * This means each mesh facet will then have its own normals. Usually new
    * vertices are added in the mesh geometry to get this result.
    * This method returns nothing.
    * Warning : the mesh is really modified even if not set originally as
    * updatable and, under the hood, a new VertexBuffer is allocated.
+   * @returns the Mesh.
    */
-  void convertToFlatShadedMesh();
+  Mesh& convertToFlatShadedMesh();
 
   /**
-   * This method removes all the mesh indices and add new vertices (duplication)
-   * in order to unfold facets into buffers.
+   * @brief This method removes all the mesh indices and add new vertices
+   * (duplication) in order to unfold facets into buffers.
    * In other words, more vertices, no more indices and a single bigger VBO.
    * This method returns nothing.
    * The mesh is really modified even if not set originally as updatable. Under
    * the hood, a new VertexBuffer is allocated.
-   *
+   * @returns the Mesh.
    */
-  void convertToUnIndexedMesh();
+  Mesh& convertToUnIndexedMesh();
 
   /**
-   * Inverses facet orientations and inverts also the normals with `flipNormals`
-   * (default `false`) if true.
-   * This method returns nothing.
+   * @brief Inverses facet orientations and inverts also the normals with
+   * `flipNormals` (default `false`) if true.
+   * @returns the Mesh.
    * Warning : the mesh is really modified even if not set originally as
    * updatable. A new VertexBuffer is created under the hood each call.
    */
-  void flipFaces(bool flipNormals = false);
+  Mesh& flipFaces(bool flipNormals = false);
 
   /** Instances **/
 
   /**
-   * Creates a new InstancedMesh object from the mesh model.
+   * @brief Creates a new InstancedMesh object from the mesh model.
    * An instance shares the same properties and the same material than its
    * model.
    * Only these properties of each instance can then be set individually :
@@ -640,16 +682,16 @@ public:
   InstancedMesh* createInstance(const std::string& name);
 
   /**
-   * Synchronises all the mesh instance submeshes to the current mesh submeshes,
-   * if any.
+   * @brief Synchronises all the mesh instance submeshes to the current mesh
+   * submeshes, if any.
    * After this call, all the mesh instances have the same submeshes than the
    * current mesh.
-   * This method returns nothing.
+   * @returns the Mesh.
    */
-  void synchronizeInstances();
+  Mesh& synchronizeInstances();
 
   /**
-   * Simplify the mesh according to the given array of settings.
+   * @brief Simplify the mesh according to the given array of settings.
    * Function will return immediately and will simplify async.
    * @param settings a collection of simplification settings.
    * @param parallelProcessing should all levels calculate parallel or one after
@@ -665,9 +707,9 @@ public:
                                            = SimplificationType::QUADRATIC);*/
 
   /**
-   * Optimization of the mesh's indices, in case a mesh has duplicated vertices.
-   * The function will only reorder the indices and will not remove unused
-   * vertices to avoid problems with submeshes.
+   * @brief Optimization of the mesh's indices, in case a mesh has duplicated
+   * vertices. The function will only reorder the indices and will not remove
+   * unused vertices to avoid problems with submeshes.
    * This should be used together with the simplification to avoid disappearing
    * triangles.
    * @param successCallback an optional success callback to be called after the
@@ -678,7 +720,7 @@ public:
   /** Statics **/
 
   /**
-   * Returns a new Mesh object what is a deep copy of the passed mesh.
+   * @brief Returns a new Mesh object what is a deep copy of the passed mesh.
    * The parameter `parsedMesh` is the mesh to be copied.
    * The parameter `rootUrl` is a string, it's the root URL to prefix the
    * `delayLoadingFile` property with
@@ -687,7 +729,7 @@ public:
                      const std::string& rootUrl);
 
   /**
-   * Creates a ribbon mesh.
+   * @brief Creates a ribbon mesh.
    * Please consider using the same method from the MeshBuilder class instead.
    * The ribbon is a parametric shape :
    * http://doc.babylonjs.com/tutorials/Parametric_Shapes.  It has no predefined
@@ -728,7 +770,7 @@ public:
                             Mesh* ribbonInstance         = nullptr);
 
   /**
-   * Creates a plane polygonal mesh.  By default, this is a disc.
+   * @brief Creates a plane polygonal mesh.  By default, this is a disc.
    * Please consider using the same method from the MeshBuilder class instead.
    * The parameter `radius` sets the radius size (float) of the polygon (default
    * 0.5).
@@ -750,7 +792,7 @@ public:
                           unsigned int sideOrientation = Mesh::DEFAULTSIDE);
 
   /**
-   * Creates a box mesh.
+   * @brief Creates a box mesh.
    * Please consider using the same method from the MeshBuilder class instead.
    * The parameter `size` sets the size (float) of each box side (default 1).
    * You can also set the mesh side orientation with the values :
@@ -767,7 +809,7 @@ public:
                          unsigned int sideOrientation = Mesh::DEFAULTSIDE);
 
   /**
-   * Creates a sphere mesh.
+   * @brief Creates a sphere mesh.
    * Please consider using the same method from the MeshBuilder class instead.
    * The parameter `diameter` sets the diameter size (float) of the sphere
    * (default 1).
@@ -788,7 +830,7 @@ public:
                             unsigned int sideOrientation = Mesh::DEFAULTSIDE);
 
   /**
-   * Creates a cylinder or a cone mesh.
+   * @brief Creates a cylinder or a cone mesh.
    * Please consider using the same method from the MeshBuilder class instead.
    * The parameter `height` sets the height size (float) of the cylinder/cone
    * (float, default 2).
@@ -820,7 +862,7 @@ public:
 
   // Torus  (Code from SharpDX.org)
   /**
-   * Creates a torus mesh.
+   * @brief Creates a torus mesh.
    * Please consider using the same method from the MeshBuilder class instead.
    * The parameter `diameter` sets the diameter size (float) of the torus
    * (default 1).
@@ -844,7 +886,7 @@ public:
                            unsigned int sideOrientation = Mesh::DEFAULTSIDE);
 
   /**
-   * Creates a torus knot mesh.
+   * @brief Creates a torus knot mesh.
    * Please consider using the same method from the MeshBuilder class instead.
    * The parameter `radius` sets the global radius size (float) of the torus
    * knot (default 2).
@@ -871,7 +913,7 @@ public:
                   unsigned int sideOrientation = Mesh::DEFAULTSIDE);
 
   /**
-   * Creates a line mesh.
+   * @brief Creates a line mesh.
    * Please consider using the same method from the MeshBuilder class instead.
    * A line mesh is considered as a parametric shape since it has no predefined
    * original shape. Its shape is determined by the passed array of points as an
@@ -894,7 +936,7 @@ public:
                                 LinesMesh* linesInstance = nullptr);
 
   /**
-   * Creates a dashed line mesh.
+   * @brief Creates a dashed line mesh.
    * Please consider using the same method from the MeshBuilder class instead.
    * A dashed line mesh is considered as a parametric shape since it has no
    * predefined original shape. Its shape is determined by the passed array of
@@ -925,7 +967,7 @@ public:
                                       LinesMesh* linesInstance = nullptr);
 
   /**
-   * Creates an extruded shape mesh.
+   * @brief Creates an extruded shape mesh.
    * The extrusion is a parametric shape :
    * http://doc.babylonjs.com/tutorials/Parametric_Shapes.  It has no predefined
    * shape. Its final shape will depend on the input parameters.
@@ -970,7 +1012,7 @@ public:
                             Mesh* instance               = nullptr);
 
   /**
-   * Creates an custom extruded shape mesh.
+   * @brief Creates an custom extruded shape mesh.
    * The custom extrusion is a parametric shape :
    * http://doc.babylonjs.com/tutorials/Parametric_Shapes.  It has no predefined
    * shape. Its final shape will depend on the input parameters.
@@ -1039,7 +1081,7 @@ public:
     Mesh* instance = nullptr);
 
   /**
-   * Creates lathe mesh.
+   * @brief Creates lathe mesh.
    * The lathe is a shape with a symetry axis : a 2D model shape is rotated
    * around this axis to design the lathe.
    * Please consider using the same method from the MeshBuilder class instead.
@@ -1069,7 +1111,7 @@ public:
                            unsigned int sideOrientation = Mesh::DEFAULTSIDE);
 
   /**
-   * Creates a plane mesh.
+   * @brief Creates a plane mesh.
    * Please consider using the same method from the MeshBuilder class instead.
    * The parameter `size` sets the size (float) of both sides of the plane at
    * once (default 1).
@@ -1087,7 +1129,7 @@ public:
                            unsigned int sideOrientation = Mesh::DEFAULTSIDE);
 
   /**
-   * Creates a ground mesh.
+   * @brief Creates a ground mesh.
    * Please consider using the same method from the MeshBuilder class instead.
    * The parameters `width` and `height` (floats, default 1) set the width and
    * height sizes of the ground.
@@ -1103,7 +1145,7 @@ public:
                             bool updatable = false);
 
   /**
-   * Creates a tiled ground mesh.
+   * @brief Creates a tiled ground mesh.
    * Please consider using the same method from the MeshBuilder class instead.
    * The parameters `xmin` and `xmax` (floats, default -1 and 1) set the ground
    * minimum and maximum X coordinates.
@@ -1127,7 +1169,7 @@ public:
                                  Scene* = nullptr, bool updatable = false);
 
   /**
-   * Creates a ground mesh from a height map.
+   * @brief Creates a ground mesh from a height map.
    * tuto : http://doc.babylonjs.com/tutorials/14._Height_Map
    * Please consider using the same method from the MeshBuilder class instead.
    * The parameter `url` sets the URL of the height map image resource.
@@ -1158,7 +1200,7 @@ public:
     const std::function<void(GroundMesh* mesh)>& onReady = nullptr);
 
   /**
-   * Creates a tube mesh.
+   * @brief Creates a tube mesh.
    * The tube is a parametric shape :
    * http://doc.babylonjs.com/tutorials/Parametric_Shapes.  It has no predefined
    * shape. Its final shape will depend on the input parameters.
@@ -1207,7 +1249,7 @@ public:
     unsigned int sideOrientation = Mesh::DEFAULTSIDE, Mesh* instance = nullptr);
 
   /**
-   * Creates a polyhedron mesh.
+   * @brief Creates a polyhedron mesh.
    *
    * Please consider using the same method from the MeshBuilder class instead.
    * The parameter `type` (positive integer, max 14, default 0) sets the
@@ -1246,8 +1288,8 @@ public:
                                 PolyhedronOptions& options, Scene*);
 
   /**
-   * Creates a sphere based upon an icosahedron with 20 triangular faces which
-   * can be subdivided.
+   * @brief Creates a sphere based upon an icosahedron with 20 triangular faces
+   * which can be subdivided.
    * Please consider using the same method from the MeshBuilder class instead.
    * The parameter `radius` sets the radius size (float) of the icosphere
    * (default 1).
@@ -1273,7 +1315,7 @@ public:
                                IcoSphereOptions& options, Scene*);
 
   /**
-   * Creates a decal mesh.
+   * @brief Creates a decal mesh.
    * Please consider using the same method from the MeshBuilder class instead.
    * A decal is a mesh usually applied as a model onto the surface of another
    * mesh. So don't forget the parameter `sourceMesh` depicting the decal.
@@ -1292,19 +1334,19 @@ public:
   /** Skeletons **/
 
   /**
-   * @returns original positions used for CPU skinning.  Useful for integrating
-   * Morphing with skeletons in same mesh.
+   * @brief Returns the original positions used for CPU skinning.  Useful for
+   * integrating Morphing with skeletons in same mesh.
    */
   Float32Array& setPositionsForCPUSkinning();
 
   /**
-   * @returns original normals used for CPU skinning.  Useful for integrating
-   * Morphing with skeletons in same mesh.
+   * @brief Returns original normals used for CPU skinning.  Useful for
+   * integrating Morphing with skeletons in same mesh.
    */
   Float32Array& setNormalsForCPUSkinning();
 
   /**
-   * Update the vertex buffers by applying transformation from the bones
+   * @brief Update the vertex buffers by applying transformation from the bones.
    * @param {skeleton} skeleton to apply
    */
   Mesh* applySkeleton(Skeleton* skeleton);
@@ -1312,22 +1354,23 @@ public:
   /** Tools **/
 
   /**
-   * Returns an object `{min:` Vector3`, max:` Vector3`}`
+   * @brief Returns an object `{min:` Vector3`, max:` Vector3`}`
    * This min and max Vector3 are the minimum and maximum vectors of each mesh
    * bounding box from the passed array, in the World system
    */
   static MinMax GetMinMax(const std::vector<AbstractMesh*>& meshes);
 
   /**
-   * Returns a Vector3, the center of the `{min:` Vector3`, max:` Vector3`}` or
-   * the center of MinMax vector3 computed from a mesh array.
+   * @brief Returns a Vector3, the center of the `{min:` Vector3`, max:`
+   * Vector3`}` or the center of MinMax vector3 computed from a mesh array.
    */
   static Vector3 Center(const MinMaxDistance& MinMaxVectorAndDistance);
   static Vector3 Center(const MinMax& minMaxVector);
   static Vector3 Center(const std::vector<AbstractMesh*>& meshes);
 
   /**
-   * Merge the array of meshes into a single mesh for performance reasons.
+   * @brief Merge the array of meshes into a single mesh for performance
+   * reasons.
    * @param {Array<Mesh>} meshes - The vertices source.  They should all be of
    * the same material.  Entries can empty
    * @param {boolean} disposeSource - When true (default), dispose of the
@@ -1336,15 +1379,18 @@ public:
    * this must be set to true.
    * @param {Mesh} meshSubclass - When set, vertices inserted into this Mesh.
    * Meshes can then be merged into a Mesh sub-class.
+   * @param {boolean} subdivideWithSubMeshes - When true (false default),
+   * subdivide mesh to his subMesh array with meshes source.
    */
   static Mesh* MergeMeshes(std::vector<Mesh*>& meshes,
-                           bool disposeSource      = true,
-                           bool allow32BitsIndices = true,
-                           Mesh* meshSubclass      = nullptr);
+                           bool disposeSource          = true,
+                           bool allow32BitsIndices     = true,
+                           Mesh* meshSubclass          = nullptr,
+                           bool subdivideWithSubMeshes = false);
 
 protected:
   /**
-   * Constructor
+   * @brief Constructor
    *
    * @param {string} name The value used by scene.getMeshByName() to do a
    *                 lookup.
@@ -1363,9 +1409,9 @@ protected:
 
 private:
   void _sortLODLevels();
-  void _onBeforeDraw(bool isInstance, Matrix& world,
-                     Material* effectiveMaterial);
-  void _queueLoad(Mesh* mesh, Scene* scene);
+  Mesh& _onBeforeDraw(bool isInstance, Matrix& world,
+                      Material* effectiveMaterial);
+  Mesh& _queueLoad(Mesh* mesh, Scene* scene);
 
 public:
   int delayLoadState;
@@ -1397,10 +1443,10 @@ private:
   bool _areNormalsFrozen;
   // Will be used to save original positions when using software skinning
   Float32Array _sourcePositions;
-  // Will be used to save a source mesh reference, If any
-  Mesh* _source;
   // Will be used to save original normals when using software skinning
   Float32Array _sourceNormals;
+  // Will be used to save a source mesh reference, If any
+  Mesh* _source;
   // For extrusion and tube
   Path3D _path3D;
   std::vector<std::vector<Vector3>> _pathArray;
