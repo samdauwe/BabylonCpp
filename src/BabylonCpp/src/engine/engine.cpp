@@ -874,6 +874,19 @@ void Engine::vertexAttribPointer(GL::IGLBuffer* buffer, unsigned int indx,
   }
 }
 
+GL::IGLVertexArrayObject* Engine::recordVertexArrayObject(
+  const std::unordered_map<std::string, VertexBuffer*>& /*vertexBuffers*/,
+  GL::IGLBuffer* /*indexBuffer*/, Effect* /*effect*/)
+{
+  return nullptr;
+}
+
+void Engine::bindVertexArrayObject(
+  GL::IGLVertexArrayObject* /*vertexArrayObject*/,
+  GL::IGLBuffer* /*indexBuffer*/)
+{
+}
+
 void Engine::bindBuffersDirectly(GL::IGLBuffer* vertexBuffer,
                                  GL::IGLBuffer* indexBuffer,
                                  const std::vector<float>& vertexDeclaration,
@@ -996,6 +1009,10 @@ void Engine::unbindInstanceAttributes()
   }
   _currentInstanceBuffers.clear();
   _currentInstanceLocations.clear();
+}
+
+void Engine::releaseVertexArrayObject(GL::IGLVertexArrayObject* /*vao*/)
+{
 }
 
 bool Engine::_releaseBuffer(GL::IGLBuffer* buffer)

@@ -242,6 +242,11 @@ public:
   GLBufferPtr createIndexBuffer(const Uint32Array& indices);
   void bindArrayBuffer(GL::IGLBuffer* buffer);
   void updateArrayBuffer(const Float32Array& data);
+  GL::IGLVertexArrayObject* recordVertexArrayObject(
+    const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
+    GL::IGLBuffer* indexBuffer, Effect* effect);
+  void bindVertexArrayObject(GL::IGLVertexArrayObject* vertexArrayObject,
+                             GL::IGLBuffer* indexBuffer);
   void bindBuffersDirectly(GL::IGLBuffer* vertexBuffer,
                            GL::IGLBuffer* indexBuffer,
                            const std::vector<float>& vertexDeclaration,
@@ -250,6 +255,7 @@ public:
     const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
     GL::IGLBuffer* indexBuffer, Effect* effect);
   void unbindInstanceAttributes();
+  void releaseVertexArrayObject(GL::IGLVertexArrayObject* vao);
   bool _releaseBuffer(GL::IGLBuffer* buffer);
   GLBufferPtr createInstancesBuffer(unsigned int capacity);
   void deleteInstancesBuffer(GL::IGLBuffer* buffer);

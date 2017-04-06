@@ -834,6 +834,13 @@ protected:
 
 }; // end of class GLRenderContext
 
+class BABYLON_SHARED_EXPORT IGLVertexArrayObject {
+
+public:
+  IGLVertexArrayObject();
+
+}; // end of class IGLVertexArrayObject
+
 } // end of namespace GL
 } // end of namespace BABYLON
 

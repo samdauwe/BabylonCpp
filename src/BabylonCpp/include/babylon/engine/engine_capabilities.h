@@ -43,6 +43,7 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   bool textureHalfFloatRender;
   bool textureLOD;
   int drawBuffersExtension;
+  GL::IGLVertexArrayObject* vertexArrayObject;
 }; // end of struct EngineCapabilities
 
 } // end of namespace BABYLON
