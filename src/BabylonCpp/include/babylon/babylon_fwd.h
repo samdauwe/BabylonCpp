@@ -161,6 +161,7 @@ class IGLShader;
 class IGLShaderPrecisionFormat;
 class IGLTexture;
 class IGLUniformLocation;
+class IGLVertexArrayObject;
 } // end of namespace GL
 class ILoadingScreen;
 class IRenderableScene;

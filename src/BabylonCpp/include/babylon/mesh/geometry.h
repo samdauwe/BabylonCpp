@@ -35,9 +35,9 @@ public:
   void addToScene(std::unique_ptr<Geometry>&& newGeometry);
 
   /**
-   * The Bias Vector to apply on the bounding elements (box/sphere), the max
-   * extend is computed as v += v * bias.x + bias.y, the min is computed as v -=
-   * v * bias.x + bias.y
+   * @brief The Bias Vector to apply on the bounding elements (box/sphere), the
+   * max extend is computed as v += v * bias.x + bias.y, the min is computed as
+   * v -= * v * bias.x + bias.y
    * @returns The Bias Vector
    */
   Vector2& boundingBias();
@@ -58,6 +58,7 @@ public:
   void updateVerticesData(unsigned int kind, const Float32Array& data,
                           bool updateExtends = false,
                           bool makeItUnique  = false) override;
+  void _bind(Effect* effect, GL::IGLBuffer* indexToBind = nullptr);
   size_t getTotalVertices() const;
   Float32Array getVerticesData(unsigned int kind,
                                bool copyWhenShared = false) override;
@@ -65,9 +66,9 @@ public:
   std::unordered_map<std::string, VertexBuffer*> getVertexBuffers();
   bool isVerticesDataPresent(unsigned int kind) override;
   Uint32Array getVerticesDataKinds();
-  void setIndices(const Uint32Array& indices, int totalVertices = -1) override;
+  void setIndices(const IndicesArray& indices, int totalVertices = -1) override;
   size_t getTotalIndices();
-  Uint32Array getIndices(bool copyWhenShared = false) override;
+  IndicesArray getIndices(bool copyWhenShared = false) override;
   GL::IGLBuffer* getIndexBuffer();
   void releaseForMesh(Mesh* mesh, bool shouldDispose = true);
   void applyToMesh(Mesh* mesh);
@@ -103,6 +104,7 @@ private:
   void _applyToMesh(Mesh* mesh);
   void notifyUpdate(unsigned int kind = 1);
   void _queueLoad(Scene* scene, const std::function<void()>& onLoaded);
+  void _disposeVertexArrayObjects();
 
 public:
   std::string id;
@@ -114,6 +116,8 @@ public:
   std::function<void(const Json::value& parsedVertexData, Geometry* geometry)>
     _delayLoadingFunction;
   int _softwareSkinningRenderId;
+  std::unordered_map<std::string, GL::IGLVertexArrayObject*>
+    _vertexArrayObjects;
   std::vector<Vector3> centroids;
 
 private:
@@ -121,7 +125,7 @@ private:
   Engine* _engine;
   std::vector<Mesh*> _meshes;
   size_t _totalVertices;
-  Uint32Array _indices;
+  IndicesArray _indices;
   std::unordered_map<unsigned int, std::unique_ptr<VertexBuffer>>
     _vertexBuffers;
   bool _isDisposed;

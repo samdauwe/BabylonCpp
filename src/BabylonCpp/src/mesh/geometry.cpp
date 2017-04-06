@@ -5,6 +5,7 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/igl_rendering_context.h>
+#include <babylon/materials/effect.h>
 #include <babylon/mesh/lines_mesh.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/sub_mesh.h>
@@ -38,6 +39,10 @@ Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData,
   else {
     _totalVertices = 0;
     _indices.clear();
+  }
+
+  if (_engine->getCaps().vertexArrayObject) {
+    _vertexArrayObjects.clear();
   }
 
   // applyToMesh
@@ -154,6 +159,12 @@ void Geometry::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
   }
 
   notifyUpdate(kind);
+
+  if (!_vertexArrayObjects.empty()) {
+    _disposeVertexArrayObjects();
+    // Will trigger a rebuild of the VAO if supported
+    _vertexArrayObjects.clear();
+  }
 }
 
 void Geometry::updateVerticesDataDirectly(unsigned int kind,
@@ -207,6 +218,27 @@ void Geometry::updateBoundingInfo(bool updateExtends, const Float32Array& data)
       }
     }
   }
+}
+
+void Geometry::_bind(Effect* effect, GL::IGLBuffer* indexToBind)
+{
+  if (indexToBind == nullptr) {
+    indexToBind = _indexBuffer.get();
+  }
+
+  if (indexToBind != _indexBuffer.get() || _vertexArrayObjects.empty()) {
+    _engine->bindBuffers(getVertexBuffers(), indexToBind, effect);
+    return;
+  }
+
+  // Using VAO
+  if (!std_util::contains(_vertexArrayObjects, effect->key())) {
+    _vertexArrayObjects[effect->key()] = _engine->recordVertexArrayObject(
+      getVertexBuffers(), indexToBind, effect);
+  }
+
+  _engine->bindVertexArrayObject(_vertexArrayObjects[effect->key()],
+                                 indexToBind);
 }
 
 size_t Geometry::getTotalVertices() const
@@ -294,11 +326,13 @@ Uint32Array Geometry::getVerticesDataKinds()
   return result;
 }
 
-void Geometry::setIndices(const Uint32Array& indices, int totalVertices)
+void Geometry::setIndices(const IndicesArray& indices, int totalVertices)
 {
   if (_indexBuffer) {
     _engine->_releaseBuffer(_indexBuffer.get());
   }
+
+  _disposeVertexArrayObjects();
 
   _indices = indices;
   if (!_meshes.empty() && !_indices.empty()) {
@@ -325,16 +359,16 @@ size_t Geometry::getTotalIndices()
   return _indices.size();
 }
 
-Uint32Array Geometry::getIndices(bool copyWhenShared)
+IndicesArray Geometry::getIndices(bool copyWhenShared)
 {
   if (!isReady()) {
-    return Uint32Array();
+    return IndicesArray();
   }
   if (!copyWhenShared || _meshes.size() == 1) {
     return _indices;
   }
   else {
-    Uint32Array _copy(_indices.size());
+    IndicesArray _copy(_indices.size());
     std::copy(_indices.begin(), _indices.end(), _copy.begin());
     return _copy;
   }
@@ -353,16 +387,6 @@ void Geometry::releaseForMesh(Mesh* mesh, bool shouldDispose)
   auto it = std::find(_meshes.begin(), _meshes.end(), mesh);
   if (it == _meshes.end()) {
     return;
-  }
-
-  for (auto& item : _vertexBuffers) {
-    _vertexBuffers[item.first]->dispose();
-    _vertexBuffers[item.first].reset(nullptr);
-  }
-  _vertexBuffers.clear();
-
-  if (_indexBuffer && _engine->_releaseBuffer(_indexBuffer.get())) {
-    _indexBuffer = nullptr;
   }
 
   _meshes.erase(it);
@@ -425,7 +449,11 @@ void Geometry::_applyToMesh(Mesh* mesh)
     if (numOfMeshes == 1) {
       _vertexBuffers[kind]->create();
     }
-    _vertexBuffers[kind]->getBuffer()->references = numOfMeshes;
+
+    auto buffer = _vertexBuffers[kind]->getBuffer();
+    if (buffer) {
+      buffer->references = numOfMeshes;
+    }
 
     if (kind == VertexBuffer::PositionKind) {
       mesh->_resetPointsArrayCache();
@@ -521,12 +549,24 @@ bool Geometry::isDisposed() const
   return _isDisposed;
 }
 
+void Geometry::_disposeVertexArrayObjects()
+{
+  if (!_vertexArrayObjects.empty()) {
+    for (auto& item : _vertexArrayObjects) {
+      _engine->releaseVertexArrayObject(item.second);
+    }
+    _vertexArrayObjects.clear();
+  }
+}
+
 void Geometry::dispose(bool /*doNotRecurse*/)
 {
   for (const auto& mesh : _meshes) {
     releaseForMesh(mesh);
   }
   _meshes.clear();
+
+  _disposeVertexArrayObjects();
 
   for (auto& item : _vertexBuffers) {
     _vertexBuffers[item.first]->dispose();
