@@ -6,6 +6,10 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Actions are a simple way to add interactions in your scenes. An action
+ * is launched when its trigger is fired.
+ */
 class BABYLON_SHARED_EXPORT Action
   : public std::enable_shared_from_this<Action> {
 
