@@ -19,18 +19,23 @@
 namespace BABYLON {
 
 /**
- * @brief
+ * @brief This class represents a mesh which can't be instantiated.
  */
 class BABYLON_SHARED_EXPORT AbstractMesh : public Node,
                                            public IPhysicsEnabledObject,
                                            public ICullable {
 
 public:
+  // The billboard Mode None, the object is normal by default
   static constexpr unsigned int BILLBOARDMODE_NONE = 0;
-  static constexpr unsigned int BILLBOARDMODE_X    = 1;
-  static constexpr unsigned int BILLBOARDMODE_Y    = 2;
-  static constexpr unsigned int BILLBOARDMODE_Z    = 4;
-  static constexpr unsigned int BILLBOARDMODE_ALL  = 7;
+  // The billboard Mode X
+  static constexpr unsigned int BILLBOARDMODE_X = 1;
+  // The billboard Mode Y
+  static constexpr unsigned int BILLBOARDMODE_Y = 2;
+  // The billboard Mode Z
+  static constexpr unsigned int BILLBOARDMODE_Z = 4;
+  // The billboard Mode All
+  static constexpr unsigned int BILLBOARDMODE_ALL = 7;
 
   static Quaternion _rotationAxisCache;
   static Vector3 _lookAtVectorCache;
@@ -783,6 +788,11 @@ public:
   AbstractMesh& disableFacetData();
 
 protected:
+  /**
+   * @brief The AbstractMesh constructor.
+   * @param name The new name.
+   * @param scene The scene where the mesh is.
+   */
   AbstractMesh(const std::string& name, Scene* scene);
 
 private:
