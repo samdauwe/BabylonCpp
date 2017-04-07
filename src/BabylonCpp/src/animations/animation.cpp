@@ -270,6 +270,9 @@ std::unique_ptr<Animation> Animation::clone() const
     name, String::join(targetPropertyPath, '.'), framePerSecond, dataType,
     loopMode);
 
+  clonedAnimation->enableBlending = enableBlending;
+  clonedAnimation->blendingSpeed  = blendingSpeed;
+
   if (!_keys.empty()) {
     clonedAnimation->setKeys(_keys);
   }
@@ -741,6 +744,16 @@ Animation* Animation::Parse(const Json::value& parsedAnimation)
 
   auto dataType = Json::GetNumber(parsedAnimation, "dataType", 0);
   std::vector<AnimationKey> keys;
+
+  if (parsedAnimation.contains("enableBlending")) {
+    animation->enableBlending
+      = Json::GetBool(parsedAnimation, "enableBlending");
+  }
+
+  if (parsedAnimation.contains("blendingSpeed")) {
+    animation->blendingSpeed
+      = Json::GetNumber(parsedAnimation, "blendingSpeed", 0.01f);
+  }
 
   for (auto& key : Json::GetArray(parsedAnimation, "keys")) {
     AnimationValue data;
