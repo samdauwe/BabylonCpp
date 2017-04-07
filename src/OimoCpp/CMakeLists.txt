@@ -131,6 +131,9 @@ add_library(${TARGET}
 # Create namespaced alias
 add_library(${META_PROJECT_NAME}::${TARGET} ALIAS ${TARGET})
 
+# Export library for downstream projects
+export(TARGETS ${TARGET} NAMESPACE ${META_PROJECT_NAME}:: FILE ${CMAKE_OUTPUT_PATH}/${TARGET}-export.cmake)
+
 # Create feature detection header
 # Compilers: https://cmake.org/cmake/help/v3.1/variable/CMAKE_LANG_COMPILER_ID.html#variable:CMAKE_%3CLANG%3E_COMPILER_ID
 # Feature: https://cmake.org/cmake/help/v3.1/prop_gbl/CMAKE_CXX_KNOWN_FEATURES.html
@@ -172,6 +175,8 @@ target_include_directories(${TARGET}
     PUBLIC
     INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:include>
 )
 
 # Libraries
@@ -204,19 +209,8 @@ set_target_properties(${TARGET}
 
 # 'make install' to the correct location
 install(TARGETS ${TARGET}
-    EXPORT   ${TARGET}Config
-    ARCHIVE  DESTINATION ${ARCHIVE_OUTPUT_PATH}
-    RUNTIME  DESTINATION ${EXECUTABLE_OUTPUT_PATH}
-    LIBRARY  DESTINATION ${LIBRARY_OUTPUT_PATH}
-)
-install(DIRECTORY include/ DESTINATION ${INCLUDE_OUTPUT_PATH})
-
-# Make the project importable from the install directory
-install(EXPORT ${TARGET}Config
-    DESTINATION ${TARGET}/${CMAKE_OUTPUT_PATH}
-)
-
-# Make the project importable from the build directory
-export(TARGETS ${TARGET}
-    FILE ${TARGET}Config.cmake
+    EXPORT   "${TARGET}-export"                    COMPONENT dev
+    ARCHIVE  DESTINATION ${ARCHIVE_OUTPUT_PATH}    COMPONENT dev
+    RUNTIME  DESTINATION ${EXECUTABLE_OUTPUT_PATH} COMPONENT runtime
+    LIBRARY  DESTINATION ${LIBRARY_OUTPUT_PATH}    COMPONENT runtime
 )
