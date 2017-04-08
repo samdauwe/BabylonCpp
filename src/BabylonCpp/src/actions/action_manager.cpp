@@ -10,6 +10,8 @@
 
 namespace BABYLON {
 
+std::array<unsigned int, 17> ActionManager::Triggers{
+  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
 size_t ActionManager::DragMovementThreshold = 10;  // in pixels
 size_t ActionManager::LongPressDelay        = 500; // in milliseconds
 
@@ -31,6 +33,13 @@ ActionManager::~ActionManager()
 
 void ActionManager::dispose(bool /*doNotRecurse*/)
 {
+  for (auto& action : actions) {
+    if ((action->trigger < ActionManager::Triggers.size())
+        && (ActionManager::Triggers[action->trigger] > 0)) {
+      --ActionManager::Triggers[action->trigger];
+    }
+  }
+
   _scene->_actionManagers.erase(
     std::remove_if(_scene->_actionManagers.begin(),
                    _scene->_actionManagers.end(),
@@ -87,6 +96,29 @@ bool ActionManager::hasPickTriggers() const
          != actions.end();
 }
 
+bool ActionManager::HasTriggers()
+{
+  return std::accumulate(ActionManager::Triggers.begin(),
+                         ActionManager::Triggers.end(), 0)
+         != 0;
+}
+
+bool ActionManager::HasPickTriggers()
+{
+  const auto start = ActionManager::OnPickTrigger;
+  const auto end   = ActionManager::OnPickUpTrigger + 1;
+
+  return std::accumulate(ActionManager::Triggers.begin() + start,
+                         ActionManager::Triggers.begin() + end, 0)
+         != 0;
+}
+
+bool ActionManager::HasSpecificTrigger(unsigned int trigger)
+{
+  return (trigger < ActionManager::Triggers.size())
+         && (ActionManager::Triggers[trigger] > 0);
+}
+
 Action* ActionManager::registerAction(Action* action)
 {
   if (action->trigger == ActionManager::OnEveryFrameTrigger) {
@@ -99,6 +131,10 @@ Action* ActionManager::registerAction(Action* action)
   }
 
   actions.emplace_back(action);
+
+  if (action->trigger < ActionManager::Triggers.size()) {
+    ++ActionManager::Triggers[action->trigger];
+  }
 
   action->_actionManager = this;
   action->_prepare();
@@ -114,7 +150,7 @@ void ActionManager::processTrigger(unsigned int trigger,
       if (trigger == ActionManager::OnKeyUpTrigger
           || trigger == ActionManager::OnKeyDownTrigger) {
         const std::string parameter = action->getTriggerParameter();
-        if (!parameter.empty()) {
+        if (!parameter.empty() && parameter != evt.sourceEvent.keyCode) {
           // Actual key
           const char* unicode = evt.sourceEvent.charCode ?
                                   evt.sourceEvent.charCode :
@@ -181,6 +217,8 @@ std::string ActionManager::GetTriggerName(unsigned int trigger)
       return "OnCenterPickTrigger";
     case ActionManager::OnPickDownTrigger:
       return "OnPickDownTrigger";
+    case ActionManager::OnDoublePickTrigger:
+      return "_OnDoublePickTrigger";
     case ActionManager::OnPickUpTrigger:
       return "OnPickUpTrigger";
     case ActionManager::OnLongPressTrigger:
