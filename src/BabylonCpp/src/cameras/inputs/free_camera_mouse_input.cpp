@@ -137,7 +137,7 @@ void FreeCameraMouseInput::checkInputs()
 {
 }
 
-const char* FreeCameraMouseInput::getTypeName() const
+const char* FreeCameraMouseInput::getClassName() const
 {
   return "FreeCameraMouseInput";
 }

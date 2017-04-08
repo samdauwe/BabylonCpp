@@ -40,7 +40,8 @@ public:
   void _checkInputs() override;
   void rebuildAnglesAndRadius();
   void setPosition(const Vector3& position);
-  void setTarget(const Vector3& target, bool toBoundingCenter = false);
+  void setTarget(const Vector3& target, bool toBoundingCenter = false,
+                 bool allowSamePosition = false);
   Matrix _getViewMatrix() override;
   void zoomOn(const std::vector<AbstractMesh*> meshes,
               bool doNotUpdateMaxZ = false);
@@ -49,7 +50,7 @@ public:
   Camera* createRigCamera(const std::string& name, int cameraIndex) override;
   void _updateRigCameras() override;
   void dispose(bool doNotRecurse = false) override;
-  std::string getTypeName() const override;
+  const char* getClassName() const override;
   Json::object serialize() const override;
 
 protected:

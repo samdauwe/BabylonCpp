@@ -64,7 +64,7 @@ void CameraInputsManager<TCamera>::removeByType(const std::string& inputType)
 {
   for (auto& item : attached) {
     auto& input = item.second;
-    if (input->getTypeName() == inputType) {
+    if (input->getClassName() == inputType) {
       input->detachControl(attachedElement);
       attached.erase(item.first);
       rebuildInputCheck();

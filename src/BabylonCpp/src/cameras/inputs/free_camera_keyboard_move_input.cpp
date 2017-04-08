@@ -111,7 +111,7 @@ void FreeCameraKeyboardMoveInput::checkInputs()
   }
 }
 
-const char* FreeCameraKeyboardMoveInput::getTypeName() const
+const char* FreeCameraKeyboardMoveInput::getClassName() const
 {
   return "FreeCameraKeyboardMoveInput";
 }

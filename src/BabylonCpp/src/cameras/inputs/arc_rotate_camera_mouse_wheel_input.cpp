@@ -59,7 +59,7 @@ void ArcRotateCameraMouseWheelInput::checkInputs()
 {
 }
 
-const char* ArcRotateCameraMouseWheelInput::getTypeName() const
+const char* ArcRotateCameraMouseWheelInput::getClassName() const
 {
   return "ArcRotateCameraMouseWheelInput";
 }

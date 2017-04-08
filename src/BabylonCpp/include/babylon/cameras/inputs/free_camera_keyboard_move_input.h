@@ -18,7 +18,7 @@ public:
   void attachControl(ICanvas* canvas, bool noPreventDefault) override;
   void detachControl(ICanvas* canvas) override;
   void checkInputs() override;
-  const char* getTypeName() const override;
+  const char* getClassName() const override;
   const char* getSimpleName() const override;
 
 public:

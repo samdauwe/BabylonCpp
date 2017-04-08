@@ -22,7 +22,7 @@ public:
   IReflect::Type type() const override;
 
   void _checkInputs() override;
-  std::string getTypeName() const override;
+  const char* getClassName() const override;
   Json::object serialize() const override;
 
 protected:

@@ -23,7 +23,7 @@ public:
   virtual IReflect::Type type() const override;
 
   void _checkInputs() override;
-  std::string getTypeName() const override;
+  const char* getClassName() const override;
 
 protected:
   ArcFollowCamera(const std::string& name, float alpha, float beta,

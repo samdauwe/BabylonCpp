@@ -75,7 +75,7 @@ std::string Camera::toString(bool fullDetails) const
 {
   std::ostringstream oss;
   oss << "Name: " << name;
-  oss << ", type: " << getTypeName();
+  oss << ", type: " << getClassName();
   if (!animations.empty()) {
     for (size_t i = 0; i < animations.size(); ++i) {
       oss << ", animation[" << i << "]: ";
@@ -566,7 +566,7 @@ Json::object Camera::serialize() const
   return Json::object();
 }
 
-std::string Camera::getTypeName() const
+const char* Camera::getClassName() const
 {
   return "Camera";
 }

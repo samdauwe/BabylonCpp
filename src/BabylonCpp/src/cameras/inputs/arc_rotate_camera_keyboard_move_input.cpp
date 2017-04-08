@@ -99,7 +99,7 @@ void ArcRotateCameraKeyboardMoveInput::checkInputs()
   }
 }
 
-const char* ArcRotateCameraKeyboardMoveInput::getTypeName() const
+const char* ArcRotateCameraKeyboardMoveInput::getClassName() const
 {
   return "ArcRotateCameraKeyboardMoveInput";
 }

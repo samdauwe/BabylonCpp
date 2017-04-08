@@ -142,7 +142,7 @@ void FreeCamera::dispose(bool doNotRecurse)
   TargetCamera::dispose(doNotRecurse);
 }
 
-std::string FreeCamera::getTypeName() const
+const char* FreeCamera::getClassName() const
 {
   return "FreeCamera";
 }

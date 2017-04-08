@@ -30,7 +30,8 @@ Camera* SerializationHelper::Parse(Camera* camera,
     return nullptr;
   }
 
-  if (camera->getTypeName() == "ArcRotateCamera") {
+  std::string cameraClassName{camera->getClassName()};
+  if (cameraClassName == "ArcRotateCamera") {
     /** ArcRotateCamera **/
     auto arcRotateCamera = dynamic_cast<ArcRotateCamera*>(camera);
     // alpha
@@ -118,8 +119,8 @@ Camera* SerializationHelper::Parse(Camera* camera,
         = Json::GetBool(parsedCamera, "allowUpsideDown", true);
     }
   }
-  else if ((camera->getTypeName() == "FollowCamera")
-           || (camera->getTypeName() == "ArcFollowCamera")) {
+  else if ((cameraClassName == "FollowCamera")
+           || (cameraClassName == "ArcFollowCamera")) {
     /** FollowCamera / ArcFollowCamera **/
     auto followCamera = dynamic_cast<FollowCamera*>(camera);
     // zoomOnFactor
@@ -148,7 +149,7 @@ Camera* SerializationHelper::Parse(Camera* camera,
         = Json::GetNumber<float>(parsedCamera, "maxCameraSpeed", 20.f);
     }
   }
-  else if (camera->getTypeName() == "FreeCamera") {
+  else if (cameraClassName == "FreeCamera") {
     /** FreeCamera **/
     auto freeCamera = dynamic_cast<FreeCamera*>(camera);
     // ellipsoid

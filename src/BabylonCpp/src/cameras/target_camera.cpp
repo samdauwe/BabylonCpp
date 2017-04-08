@@ -363,7 +363,7 @@ void TargetCamera::_getRigCamPosition(float halfSpace, Vector3& result)
   Vector3::TransformCoordinatesToRef(position, _rigCamTransformMatrix, result);
 }
 
-std::string TargetCamera::getTypeName() const
+const char* TargetCamera::getClassName() const
 {
   return "TargetCamera";
 }

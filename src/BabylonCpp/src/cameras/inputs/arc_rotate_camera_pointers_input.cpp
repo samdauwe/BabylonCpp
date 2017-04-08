@@ -222,7 +222,7 @@ void ArcRotateCameraPointersInput::checkInputs()
 {
 }
 
-const char* ArcRotateCameraPointersInput::getTypeName() const
+const char* ArcRotateCameraPointersInput::getClassName() const
 {
   return "ArcRotateCameraPointersInput";
 }

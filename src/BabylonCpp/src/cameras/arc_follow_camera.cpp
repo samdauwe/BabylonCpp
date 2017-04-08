@@ -42,7 +42,7 @@ void ArcFollowCamera::_checkInputs()
   follow();
 }
 
-std::string ArcFollowCamera::getTypeName() const
+const char *ArcFollowCamera::getClassName() const
 {
   return "ArcFollowCamera";
 }

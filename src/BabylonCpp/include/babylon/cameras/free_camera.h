@@ -34,7 +34,7 @@ public:
   bool _decideIfNeedsToMove() override;
   void _updatePosition() override;
   void dispose(bool doNotRecurse = false) override;
-  std::string getTypeName() const override;
+  const char* getClassName() const override;
   Json::object serialize() const override;
 
 private:

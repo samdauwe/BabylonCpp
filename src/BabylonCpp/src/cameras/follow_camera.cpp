@@ -78,7 +78,7 @@ void FollowCamera::_checkInputs()
   follow(lockedTarget);
 }
 
-std::string FollowCamera::getTypeName() const
+const char* FollowCamera::getClassName() const
 {
   return "FollowCamera";
 }

@@ -209,7 +209,7 @@ void ArcRotateCamera::_checkLimits()
 {
   if (lowerBetaLimit == 0.f) {
     if (allowUpsideDown && beta > Math::PI) {
-      beta = beta - (2 * Math::PI);
+      beta = beta - (2 * Math::PI2);
     }
   }
   else {
@@ -279,9 +279,10 @@ void ArcRotateCamera::setPosition(const Vector3& iPosition)
 }
 
 void ArcRotateCamera::setTarget(const Vector3& iTarget,
-                                bool /*toBoundingCenter*/)
+                                bool /*toBoundingCenter*/,
+                                bool allowSamePosition)
 {
-  if (_getTargetPosition().equals(iTarget)) {
+  if (!allowSamePosition && _getTargetPosition().equals(iTarget)) {
     return;
   }
 
@@ -321,7 +322,7 @@ Matrix ArcRotateCamera::_getViewMatrix()
     position.copyFrom(_newPosition);
 
     auto up = upVector;
-    if (allowUpsideDown && beta < 0.f) {
+    if (allowUpsideDown && sinb < 0.f) {
       up = up.negate();
     }
 
@@ -468,7 +469,7 @@ void ArcRotateCamera::dispose(bool doNotRecurse)
   TargetCamera::dispose(doNotRecurse);
 }
 
-std::string ArcRotateCamera::getTypeName() const
+const char* ArcRotateCamera::getClassName() const
 {
   return "ArcRotateCamera";
 }

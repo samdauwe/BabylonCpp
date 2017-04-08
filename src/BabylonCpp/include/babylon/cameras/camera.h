@@ -88,7 +88,7 @@ public:
   virtual void _updateRigCameras();
   virtual void _setupInputs();
   virtual Json::object serialize() const;
-  virtual std::string getTypeName() const;
+  virtual const char* getClassName() const;
   Camera* clone(const std::string& name);
   Vector3 getDirection(const Vector3& localAxis);
   void getDirectionToRef(const Vector3& localAxis, Vector3& result);
