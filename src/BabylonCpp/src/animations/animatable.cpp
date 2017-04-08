@@ -115,29 +115,31 @@ void Animatable::restart()
 
 void Animatable::stop(const std::string& animationName)
 {
-  auto it = find_if(
-    _scene->_activeAnimatables.begin(), _scene->_activeAnimatables.end(),
-    [this](const Animatable* animatable) { return animatable == this; });
-  if (it != _scene->_activeAnimatables.end()) {
-    size_t numberOfAnimationsStopped = 0;
-    for (size_t index = _animations.size(); index > 0; --index) {
-      const int _index = static_cast<int>(index - 1);
-      if (animationName.empty()
-          || _animations[index - 1]->name != animationName) {
-        continue;
+  if (!animationName.empty()) {
+    auto idx = std_util::index_of(_scene->_activeAnimatables, this);
+    if (idx > -1) {
+      for (size_t index = _animations.size() - 1; index-- > 0;) {
+        if (_animations[index]->name != animationName) {
+          continue;
+        }
+        _animations[index]->reset();
+        std_util::splice(_animations, static_cast<int>(index), 1);
       }
-      _animations[index - 1]->reset();
-      std_util::splice(_animations, _index, 1);
-      ++numberOfAnimationsStopped;
+      if (_animations.empty()) {
+        std_util::splice(_scene->_activeAnimatables, idx, 1);
+        if (onAnimationEnd) {
+          onAnimationEnd();
+        }
+      }
     }
-
-    for (auto& animation : _animations) {
-      animation->reset();
-    }
-
-    if (_animations.size() == numberOfAnimationsStopped) {
-      _scene->_activeAnimatables.erase(it);
-
+  }
+  else {
+    auto index = std_util::index_of(_scene->_activeAnimatables, this);
+    if (index > -1) {
+      std_util::splice(_scene->_activeAnimatables, index, 1);
+      for (auto& animation : _animations) {
+        animation->reset();
+      }
       if (onAnimationEnd) {
         onAnimationEnd();
       }
