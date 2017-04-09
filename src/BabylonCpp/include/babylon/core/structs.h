@@ -40,6 +40,8 @@ struct CameraRigParams {
   float stereoHalfAngle;
   Matrix vrHMatrix;
   Matrix vrWorkMatrix;
+  bool vrPreViewMatrixSet;
+  Matrix vrPreViewMatrix;
   VRMetrics vrMetrics;
   std::unordered_map<std::string, float> params;
 }; // end of struct CameraRigParams

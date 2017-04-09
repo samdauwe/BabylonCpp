@@ -71,6 +71,7 @@ struct ArcRotateCameraInputsManager;
 class Camera;
 template <class TCamera>
 class CameraInputsManager;
+class DeviceOrientationCamera;
 class FollowCamera;
 class FreeCamera;
 struct FreeCameraInputsManager;

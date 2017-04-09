@@ -65,6 +65,9 @@ public:
   virtual void detachControl(ICanvas* canvas);
   void _update();
   virtual void _checkInputs();
+  std::vector<Camera*>& rigCameras();
+  const std::vector<Camera*>& rigCameras() const;
+  PostProcess* rigPostProcess();
   int attachPostProcess(PostProcess* postProcess, int insertAt = -1);
   Int32Array detachPostProcess(PostProcess* postProcess,
                                const Uint32Array& atIndices = Uint32Array());
@@ -88,7 +91,7 @@ public:
   virtual void _updateRigCameras();
   virtual void _setupInputs();
   virtual Json::object serialize() const;
-  virtual const char* getClassName() const;
+  virtual const char* getClassName() const override;
   Camera* clone(const std::string& name);
   Vector3 getDirection(const Vector3& localAxis);
   void getDirectionToRef(const Vector3& localAxis, Vector3& result);
