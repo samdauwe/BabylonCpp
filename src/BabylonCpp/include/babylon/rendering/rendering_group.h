@@ -59,7 +59,9 @@ public:
   render(std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
                             const std::vector<SubMesh*>& transparentSubMeshes,
                             const std::vector<SubMesh*>& alphaTestSubMeshes)>&
-           customRenderFunction);
+           customRenderFunction,
+         bool renderSprites, bool renderParticles,
+         const std::vector<AbstractMesh*> activeMeshes);
 
   /**
    * Build in function which can be applied to ensure meshes of a special queue
@@ -99,11 +101,17 @@ public:
    */
   void prepare();
 
+  void dispose();
+
   /**
    * Inserts the submesh in its correct queue depending on its material.
    * @param subMesh The submesh to dispatch
    */
   void dispatch(SubMesh* subMesh);
+
+  void dispatchSprites(SpriteManager* spriteManager);
+
+  void dispatchParticles(ParticleSystem* particleSystem);
 
 private:
   /**
@@ -124,6 +132,10 @@ private:
    * @param subMeshes The submeshes to render
    */
   void renderTransparentSorted(const std::vector<SubMesh*>& subMeshes);
+
+  void _renderParticles(const std::vector<AbstractMesh*>& activeMeshes);
+
+  void _renderSprites();
 
   /**
    * Renders the submeshes in a specified order.
@@ -153,6 +165,8 @@ private:
   std::vector<SubMesh*> _opaqueSubMeshes;
   std::vector<SubMesh*> _transparentSubMeshes;
   std::vector<SubMesh*> _alphaTestSubMeshes;
+  std::vector<ParticleSystem*> _particleSystems;
+  std::vector<SpriteManager*> _spriteManagers;
   size_t _activeVertices;
 
   std::function<int(SubMesh* a, SubMesh* b)> _opaqueSortCompareFn;

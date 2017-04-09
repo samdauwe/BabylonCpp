@@ -8,6 +8,8 @@
 #include <babylon/materials/material.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/sub_mesh.h>
+#include <babylon/particles/particle_system.h>
+#include <babylon/sprites/sprite_manager.h>
 
 namespace BABYLON {
 
@@ -16,13 +18,13 @@ RenderingGroup::RenderingGroup(
   const std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn,
   const std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn,
   const std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn)
-    : index{iIndex}
-    , onBeforeTransparentRendering{nullptr}
-    , _scene{scene}
+    : index{iIndex}, onBeforeTransparentRendering{nullptr}, _scene{scene}
 {
   _opaqueSubMeshes.reserve(256);
   _transparentSubMeshes.reserve(256);
   _alphaTestSubMeshes.reserve(256);
+  _particleSystems.reserve(256);
+  _spriteManagers.reserve(256);
 
   setOpaqueSortCompareFn(opaqueSortCompareFn);
   setAlphaTestSortCompareFn(alphaTestSortCompareFn);
@@ -85,7 +87,9 @@ bool RenderingGroup::render(
   std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
                      const std::vector<SubMesh*>& transparentSubMeshes,
                      const std::vector<SubMesh*>& alphaTestSubMeshes)>&
-    customRenderFunction)
+    customRenderFunction,
+  bool renderSprites, bool renderParticles,
+  const std::vector<AbstractMesh*> activeMeshes)
 {
   if (customRenderFunction) {
     customRenderFunction(_opaqueSubMeshes, _alphaTestSubMeshes,
@@ -93,30 +97,39 @@ bool RenderingGroup::render(
     return true;
   }
 
-  if (_opaqueSubMeshes.empty() && _alphaTestSubMeshes.empty()
-      && _transparentSubMeshes.empty()) {
-    if (onBeforeTransparentRendering) {
-      onBeforeTransparentRendering();
-    }
-    return false;
-  }
   auto engine = _scene->getEngine();
 
   // Opaque
-  _renderOpaque(_opaqueSubMeshes);
+  if (!_opaqueSubMeshes.empty()) {
+    _renderOpaque(_opaqueSubMeshes);
+  }
 
   // Alpha test
-  engine->setAlphaTesting(true);
-  _renderAlphaTest(_alphaTestSubMeshes);
-  engine->setAlphaTesting(false);
+  if (!_alphaTestSubMeshes.empty()) {
+    engine->setAlphaTesting(true);
+    _renderAlphaTest(_alphaTestSubMeshes);
+    engine->setAlphaTesting(false);
+  }
+
+  // Sprites
+  if (renderSprites) {
+    _renderSprites();
+  }
+
+  // Particles
+  if (renderParticles) {
+    _renderParticles(activeMeshes);
+  }
 
   if (onBeforeTransparentRendering) {
     onBeforeTransparentRendering();
   }
 
   // Transparent
-  _renderTransparent(_transparentSubMeshes);
-  engine->setAlphaMode(Engine::ALPHA_DISABLE);
+  if (_transparentSubMeshes.empty()) {
+    _renderTransparent(_transparentSubMeshes);
+    engine->setAlphaMode(Engine::ALPHA_DISABLE);
+  }
 
   return true;
 }
@@ -217,6 +230,17 @@ void RenderingGroup::prepare()
   _opaqueSubMeshes.clear();
   _transparentSubMeshes.clear();
   _alphaTestSubMeshes.clear();
+  _particleSystems.clear();
+  _spriteManagers.clear();
+}
+
+void RenderingGroup::dispose()
+{
+  _opaqueSubMeshes.clear();
+  _transparentSubMeshes.clear();
+  _alphaTestSubMeshes.clear();
+  _particleSystems.clear();
+  _spriteManagers.clear();
 }
 
 void RenderingGroup::dispatch(SubMesh* subMesh)
@@ -234,6 +258,55 @@ void RenderingGroup::dispatch(SubMesh* subMesh)
   else {
     _opaqueSubMeshes.emplace_back(subMesh); // Opaque
   }
+}
+
+void RenderingGroup::dispatchSprites(SpriteManager* spriteManager)
+{
+  _spriteManagers.emplace_back(spriteManager);
+}
+
+void RenderingGroup::dispatchParticles(ParticleSystem* particleSystem)
+{
+  _particleSystems.emplace_back(particleSystem);
+}
+
+void RenderingGroup::_renderParticles(
+  const std::vector<AbstractMesh*>& activeMeshes)
+{
+  if (_particleSystems.empty()) {
+    return;
+  }
+
+  // Particles
+  auto& activeCamera = _scene->activeCamera;
+  _scene->_particlesDuration.beginMonitoring();
+  for (auto& particleSystem : _scene->_activeParticleSystems) {
+    if ((activeCamera->layerMask & particleSystem->layerMask) == 0) {
+      continue;
+    }
+    if (!activeMeshes.empty()
+        || std_util::index_of(activeMeshes, particleSystem->emitter) != -1) {
+      _scene->_activeParticles.addCount(particleSystem->render(), false);
+    }
+  }
+  _scene->_particlesDuration.endMonitoring(false);
+}
+
+void RenderingGroup::_renderSprites()
+{
+  if (!_scene->spritesEnabled || _spriteManagers.empty()) {
+    return;
+  }
+
+  // Sprites
+  auto& activeCamera = _scene->activeCamera;
+  _scene->_spritesDuration.beginMonitoring();
+  for (auto& spriteManager : _spriteManagers) {
+    if (((activeCamera->layerMask & spriteManager->layerMask) != 0)) {
+      spriteManager->render();
+    }
+  }
+  _scene->_spritesDuration.endMonitoring(false);
 }
 
 } // end of namespace BABYLON
