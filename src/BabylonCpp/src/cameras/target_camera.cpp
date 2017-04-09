@@ -5,6 +5,7 @@
 #include <babylon/core/time.h>
 #include <babylon/engine/engine.h>
 #include <babylon/math/math_tools.h>
+#include <babylon/math/tmp.h>
 
 namespace BABYLON {
 
@@ -184,6 +185,13 @@ bool TargetCamera::_decideIfNeedsToMove()
 
 void TargetCamera::_updatePosition()
 {
+  if (parent()) {
+    parent()->getWorldMatrix()->invertToRef(Tmp::MatrixArray[0]);
+    Vector3::TransformNormalToRef(*cameraDirection, Tmp::MatrixArray[0],
+                                  Tmp::Vector3Array[0]);
+    position.addInPlace(Tmp::Vector3Array[0]);
+    return;
+  }
   position.addInPlace(*cameraDirection);
 }
 
@@ -202,6 +210,15 @@ void TargetCamera::_checkInputs()
   if (needToRotate) {
     rotation->x += cameraRotation->x;
     rotation->y += cameraRotation->y;
+
+    // Rotate, if quaternion is set and rotation was used
+    if (rotationQuaternion) {
+      float len = rotation->lengthSquared();
+      if (len > 0) {
+        Quaternion::RotationYawPitchRollToRef(rotation->y, rotation->x,
+                                              rotation->z, *rotationQuaternion);
+      }
+    }
 
     if (!noRotationConstraint) {
       float limit = Math::PI_2 * 0.95f;
@@ -332,8 +349,7 @@ void TargetCamera::_updateRigCameras()
       camLeft->setTarget(getTarget());
       camRight->setTarget(getTarget());
     } break;
-    case Camera::RIG_MODE_VR:
-    case Camera::RIG_MODE_WEBVR: {
+    case Camera::RIG_MODE_VR: {
       if (camLeft->rotationQuaternion) {
         camLeft->rotationQuaternion->copyFrom(*rotationQuaternion);
         camRight->rotationQuaternion->copyFrom(*rotationQuaternion);

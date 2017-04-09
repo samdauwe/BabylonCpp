@@ -17,6 +17,7 @@ FreeCamera::FreeCamera(const std::string& iName, const Vector3& iPosition,
     , applyGravity{false}
     , inputs{std_util::make_unique<FreeCameraInputsManager>(this)}
     , _collider{std_util::make_unique<Collider>()}
+    , _collisionMask{-1}
     , _needMoveForGravity{false}
     , _oldPosition{Vector3::Zero()}
     , _diffPosition{Vector3::Zero()}
@@ -50,6 +51,16 @@ void FreeCamera::detachControl(ICanvas* canvas)
   cameraRotation  = std_util::make_unique<Vector2>(0.f, 0.f);
 }
 
+int FreeCamera::collisionMask()
+{
+  return _collisionMask;
+}
+
+void FreeCamera::setCollisionMask(int mask)
+{
+  _collisionMask = !std::isnan(mask) ? mask : -1;
+}
+
 void FreeCamera::_collideWithWorld(Vector3& velocity)
 {
   Vector3 globalPosition_;
@@ -64,6 +75,8 @@ void FreeCamera::_collideWithWorld(Vector3& velocity)
 
   globalPosition_.subtractFromFloatsToRef(0, ellipsoid.y, 0, _oldPosition);
   _collider->radius = ellipsoid;
+
+  _collider->setCollisionMask(_collisionMask);
 
   // no need for clone, as long as gravity is not on.
   auto actualVelocity = velocity;
@@ -132,7 +145,7 @@ void FreeCamera::_updatePosition()
     _collideWithWorld(*cameraDirection);
   }
   else {
-    position.addInPlace(*cameraDirection);
+    TargetCamera::_updatePosition();
   }
 }
 

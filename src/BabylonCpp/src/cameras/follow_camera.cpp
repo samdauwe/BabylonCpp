@@ -6,7 +6,7 @@ namespace BABYLON {
 
 FollowCamera::FollowCamera(const std::string& iName, const Vector3& iPosition,
                            Scene* scene, AbstractMesh* iLockedTarget)
-    : TargetCamera(iName, iPosition, scene)
+    : TargetCamera{iName, iPosition, scene}
     , radius{12.f}
     , rotationOffset{0.f}
     , heightOffset{4.f}
@@ -45,16 +45,17 @@ void FollowCamera::follow(AbstractMesh* cameraTarget)
   else {
     yRotation = cameraTarget->rotation().y;
   }
-  float radians = getRadians(rotationOffset) + yRotation;
-  float targetX = cameraTarget->position().x + std::sin(radians) * radius;
+  float radians       = getRadians(rotationOffset) + yRotation;
+  auto targetPosition = cameraTarget->getAbsolutePosition();
+  float targetX       = targetPosition->x + std::sin(radians) * radius;
+  float targetZ       = targetPosition->z + std::cos(radians) * radius;
 
-  float targetZ = cameraTarget->position().z + std::cos(radians) * radius;
-  float dx      = targetX - position.x;
-  float dy      = (cameraTarget->position().y + heightOffset) - position.y;
-  float dz      = targetZ - position.z;
-  float vx      = dx * cameraAcceleration * 2.f; // this is set to .05
-  float vy      = dy * cameraAcceleration;
-  float vz      = dz * cameraAcceleration * 2.f;
+  float dx = targetX - position.x;
+  float dy = (targetPosition->y + heightOffset) - position.y;
+  float dz = targetZ - position.z;
+  float vx = dx * cameraAcceleration * 2.f; // this is set to .05
+  float vy = dy * cameraAcceleration;
+  float vz = dz * cameraAcceleration * 2.f;
 
   if (vx > maxCameraSpeed || vx < -maxCameraSpeed) {
     vx = vx < 1.f ? -maxCameraSpeed : maxCameraSpeed;
@@ -69,7 +70,7 @@ void FollowCamera::follow(AbstractMesh* cameraTarget)
   }
 
   position = Vector3(position.x + vx, position.y + vy, position.z + vz);
-  setTarget(cameraTarget->position());
+  setTarget(*targetPosition);
 }
 
 void FollowCamera::_checkInputs()

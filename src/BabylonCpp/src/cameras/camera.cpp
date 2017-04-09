@@ -45,12 +45,6 @@ Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene)
     , _refreshFrustumPlanes{true}
 {
   _initCache();
-
-  /*scene->addCamera(shared_from_this());
-
-  if (!scene->activeCamera) {
-    scene->activeCamera = this;
-  }*/
 }
 
 Camera::~Camera()
@@ -230,6 +224,21 @@ void Camera::_checkInputs()
 {
 }
 
+std::vector<Camera*>& Camera::rigCameras()
+{
+  return _rigCameras;
+}
+
+const std::vector<Camera*>& Camera::rigCameras() const
+{
+  return _rigCameras;
+}
+
+PostProcess* Camera::rigPostProcess()
+{
+  return _rigPostProcess;
+}
+
 void Camera::_cascadePostProcessesToRigCams()
 {
   // invalidate framebuffer
@@ -285,6 +294,7 @@ Int32Array Camera::detachPostProcess(PostProcess* postProcess,
 {
   Int32Array result;
   size_t i;
+  int index;
   if (!atIndices.empty()) {
     _postProcesses.erase(
       std::remove(_postProcesses.begin(), _postProcesses.end(), postProcess),
@@ -292,12 +302,13 @@ Int32Array Camera::detachPostProcess(PostProcess* postProcess,
   }
   else {
     // iterate descending, so can just splice as we go
-    for (i = atIndices.size(); i > 0; --i) {
-      if (_postProcesses[atIndices[i - 1]] != postProcess) {
-        result.emplace_back(i - 1);
+    for (i = atIndices.size() - 1; i-- > 0;) {
+      if (_postProcesses[atIndices[i]] != postProcess) {
+        result.emplace_back(i);
         continue;
       }
-      std_util::splice(_postProcesses, static_cast<int>(i), 1);
+      index = static_cast<int>(atIndices[i]);
+      std_util::splice(_postProcesses, index, 1);
     }
   }
   _cascadePostProcessesToRigCams(); // also ensures framebuffer invalidated
@@ -351,6 +362,11 @@ Matrix& Camera::getViewMatrix(bool force)
     _computedViewMatrix.invert();
 
     _markSyncedWithParent();
+  }
+
+  if (_cameraRigParams.vrPreViewMatrixSet) {
+    _computedViewMatrix.multiplyToRef(_cameraRigParams.vrPreViewMatrix,
+                                      _computedViewMatrix);
   }
 
   _currentRenderId = getScene()->getRenderId();
@@ -487,8 +503,8 @@ void Camera::dispose(bool /*doNotRecurse*/)
   _rigCameras.clear();
 
   // Postprocesses
-  for (auto& postProcess : _postProcesses) {
-    postProcess->dispose(this);
+  for (size_t i = _postProcesses.size() - 1; i-- > 0;) {
+    _postProcesses[i]->dispose(this);
   }
 
   _postProcesses.clear();

@@ -39,7 +39,13 @@ public:
   void setRotation(const Vector3& rotation);
   Vector3& getRotation();
   void setTarget(const Vector3& target);
+
+  /**
+   * @brief Return the current target position of the camera. This value is
+   * expressed in local space.
+   */
   Vector3& getTarget();
+
   virtual bool _decideIfNeedsToMove();
   virtual void _updatePosition();
   void _checkInputs() override;

@@ -7,7 +7,7 @@ namespace BABYLON {
 ArcFollowCamera::ArcFollowCamera(const std::string& iName, float iAlpha,
                                  float iBeta, float iRadius,
                                  AbstractMesh* iTarget, Scene* scene)
-    : TargetCamera(iName, Vector3::Zero(), scene)
+    : TargetCamera{iName, Vector3::Zero(), scene}
     , alpha{iAlpha}
     , beta{iBeta}
     , radius{iRadius}
@@ -32,8 +32,9 @@ void ArcFollowCamera::follow()
   _cartesianCoordinates.y = radius * std::sin(beta);
   _cartesianCoordinates.z = radius * std::sin(alpha) * std::cos(beta);
 
-  position = target->position().add(_cartesianCoordinates);
-  setTarget(target->position());
+  auto targetPosition = target->getAbsolutePosition();
+  position            = targetPosition->add(_cartesianCoordinates);
+  setTarget(*targetPosition);
 }
 
 void ArcFollowCamera::_checkInputs()
@@ -42,7 +43,7 @@ void ArcFollowCamera::_checkInputs()
   follow();
 }
 
-const char *ArcFollowCamera::getClassName() const
+const char* ArcFollowCamera::getClassName() const
 {
   return "ArcFollowCamera";
 }

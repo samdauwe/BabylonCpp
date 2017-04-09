@@ -14,6 +14,7 @@ struct BABYLON_SHARED_EXPORT FreeCameraInputsManager
 
   FreeCameraInputsManager& addKeyboard();
   FreeCameraInputsManager& addMouse(bool touchEnabled = true);
+  FreeCameraInputsManager& addDeviceOrientation();
 
 }; // end of struct FreeCameraInputsManager
 

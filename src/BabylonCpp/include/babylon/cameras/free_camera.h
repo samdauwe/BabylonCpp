@@ -29,6 +29,8 @@ public:
                      MouseButtonType panningMouseButton
                      = MouseButtonType::RIGHT) override;
   void detachControl(ICanvas* canvas) override;
+  int collisionMask();
+  void setCollisionMask(int mask);
   void _collideWithWorld(Vector3& velocity);
   void _checkInputs() override;
   bool _decideIfNeedsToMove() override;
@@ -58,6 +60,7 @@ public:
 private:
   // Collisions
   std::unique_ptr<Collider> _collider;
+  int _collisionMask;
   bool _needMoveForGravity;
   Vector3 _oldPosition;
   Vector3 _diffPosition;
