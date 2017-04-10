@@ -1394,7 +1394,7 @@ void Matrix::FromXYZAxesToRef(const Vector3& xaxis, const Vector3& yaxis,
   mat.m[15] = 1.f;
 }
 
-void FromQuaternionToRef(const Quaternion& quat, Matrix& result)
+void Matrix::FromQuaternionToRef(const Quaternion& quat, Matrix& result)
 {
   const float xx = quat.x * quat.x;
   const float yy = quat.y * quat.y;
