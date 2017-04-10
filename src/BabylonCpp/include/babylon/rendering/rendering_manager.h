@@ -6,6 +6,16 @@
 
 namespace BABYLON {
 
+/**
+ * Interface describing the different options available in the rendering manager
+ * regarding Auto Clear between groups.
+ */
+struct BABYLON_SHARED_EXPORT RenderingManageAutoClearOptions {
+  bool autoClear;
+  bool depth;
+  bool stencil;
+}; // end of class RenderingManageAutoClearOptions
+
 class BABYLON_SHARED_EXPORT RenderingManager {
 
 public:
@@ -31,11 +41,14 @@ public:
          const std::vector<AbstractMesh*>& activeMeshes, bool renderParticles,
          bool renderSprites);
   void reset();
+  void dispose();
+  void dispatchSprites(SpriteManager* spriteManager);
+  void dispatchParticles(ParticleSystem* particleSystem);
   void dispatch(SubMesh* subMesh);
 
   /**
-   * Overrides the default sort function applied in the renderging group to
-   * prepare the meshes.
+   * @brief Overrides the default sort function applied in the renderging group
+   * to prepare the meshes.
    * This allowed control for front to back rendering or reversly depending of
    * the special needs.
    *
@@ -57,35 +70,35 @@ public:
     = nullptr);
 
   /**
-   * Specifies whether or not the stencil and depth buffer are cleared between
-   * two rendering groups.
+   * @brief Specifies whether or not the stencil and depth buffer are cleared
+   * between two rendering groups.
    *
    * @param renderingGroupId The rendering group id corresponding to its index
    * @param autoClearDepthStencil Automatically clears depth and stencil between
    * groups if true.
+   * @param depth Automatically clears depth between groups if true and
+   * autoClear is true.
+   * @param stencil Automatically clears stencil between groups if true and
+   * autoClear is true.
    */
   void setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
-                                         bool autoClearDepthStencil);
+                                         bool autoClearDepthStencil,
+                                         bool depth   = true,
+                                         bool stencil = true);
 
 private:
-  void _renderParticles(unsigned int index,
-                        const std::vector<AbstractMesh*>& activeMeshes);
-  void _renderSprites(unsigned int index);
-  void _clearDepthStencilBuffer();
-  void _renderSpritesAndParticles();
+  void _clearDepthStencilBuffer(bool depth = true, bool stencil = true);
+  void _prepareRenderingGroup(unsigned int renderingGroupId);
 
 private:
   Scene* _scene;
   std::vector<std::unique_ptr<RenderingGroup>> _renderingGroups;
-  bool _depthBufferAlreadyCleaned;
+  bool _depthStencilBufferAlreadyCleaned;
 
   unsigned int _currentIndex;
-  std::vector<AbstractMesh*> _currentActiveMeshes;
-  bool _currentRenderParticles;
-  bool _currentRenderSprites;
   Color4 _clearColor;
 
-  std::vector<bool> _autoClearDepthStencil;
+  std::vector<RenderingManageAutoClearOptions> _autoClearDepthStencil;
   std::vector<std::function<int(SubMesh* a, SubMesh* b)>>
     _customOpaqueSortCompareFn;
   std::vector<std::function<int(SubMesh* a, SubMesh* b)>>

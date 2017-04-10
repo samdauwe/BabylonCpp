@@ -22,7 +22,7 @@ RenderingManager::RenderingManager(Scene* scene)
 
   for (unsigned int i = RenderingManager::MIN_RENDERINGGROUPS;
        i < RenderingManager::MAX_RENDERINGGROUPS; ++i) {
-    _autoClearDepthStencil[i]          = true;
+    _autoClearDepthStencil[i]          = {true, true, true};
     _customOpaqueSortCompareFn[i]      = nullptr;
     _customAlphaTestSortCompareFn[i]   = nullptr;
     _customTransparentSortCompareFn[i] = nullptr;
@@ -33,75 +33,14 @@ RenderingManager::~RenderingManager()
 {
 }
 
-void RenderingManager::_renderParticles(
-  unsigned int index, const std::vector<AbstractMesh*>& activeMeshes)
+void RenderingManager::_clearDepthStencilBuffer(bool depth, bool stencil)
 {
-  if (_scene->_activeParticleSystems.empty()) {
+  if (_depthStencilBufferAlreadyCleaned) {
     return;
   }
 
-  // Particles
-  auto activeCamera = _scene->activeCamera;
-  _scene->_particlesDuration.beginMonitoring();
-  for (auto& particleSystem : _scene->_activeParticleSystems) {
-    if (particleSystem->renderingGroupId != index) {
-      continue;
-    }
-
-    if ((activeCamera->layerMask & particleSystem->layerMask) == 0) {
-      continue;
-    }
-
-    _clearDepthStencilBuffer();
-
-    if (activeMeshes.empty()
-        || (std::find(activeMeshes.begin(), activeMeshes.end(),
-                      particleSystem->emitter)
-            != activeMeshes.end())) {
-      _scene->_activeParticles.addCount(particleSystem->render(), false);
-    }
-  }
-  _scene->_particlesDuration.endMonitoring(false);
-}
-
-void RenderingManager::_renderSprites(unsigned int index)
-{
-  if (!_scene->spritesEnabled || _scene->spriteManagers.empty()) {
-    return;
-  }
-
-  // Sprites
-  auto activeCamera = _scene->activeCamera;
-  _scene->_spritesDuration.beginMonitoring();
-  for (auto& spriteManager : _scene->spriteManagers) {
-    if (spriteManager->renderingGroupId == index
-        && ((activeCamera->layerMask & spriteManager->layerMask) != 0)) {
-      _clearDepthStencilBuffer();
-      spriteManager->render();
-    }
-  }
-  _scene->_spritesDuration.endMonitoring(false);
-}
-
-void RenderingManager::_clearDepthStencilBuffer()
-{
-  if (_depthBufferAlreadyCleaned) {
-    return;
-  }
-
-  _scene->getEngine()->clear(_clearColor, false, true, true);
-  _depthBufferAlreadyCleaned = true;
-}
-
-void RenderingManager::_renderSpritesAndParticles()
-{
-  if (_currentRenderSprites) {
-    _renderSprites(_currentIndex);
-  }
-
-  if (_currentRenderParticles) {
-    _renderParticles(_currentIndex, _currentActiveMeshes);
-  }
+  _scene->getEngine()->clear(_clearColor, false, depth, stencil);
+  _depthStencilBufferAlreadyCleaned = true;
 }
 
 void RenderingManager::render(
@@ -123,89 +62,68 @@ void RenderingManager::render(
     _renderinGroupInfo->camera = _scene->activeCamera;
   }
 
-  _currentActiveMeshes    = activeMeshes;
-  _currentRenderParticles = renderParticles;
-  _currentRenderSprites   = renderSprites;
+  // Dispatch sprites
+  if (renderSprites) {
+    for (auto& manager : _scene->spriteManagers) {
+      dispatchSprites(manager.get());
+    }
+  }
 
+  // Render
   auto info = _renderinGroupInfo.get();
-
   for (unsigned int index = RenderingManager::MIN_RENDERINGGROUPS;
        index < RenderingManager::MAX_RENDERINGGROUPS; ++index) {
-    _depthBufferAlreadyCleaned
+    _depthStencilBufferAlreadyCleaned
       = (index == RenderingManager::MIN_RENDERINGGROUPS);
     RenderingGroup* renderingGroup = (index < _renderingGroups.size()) ?
                                        _renderingGroups[index].get() :
                                        nullptr;
-    bool needToStepBack = false;
+    if (!renderingGroup && !hasObservable) {
+      continue;
+    }
 
-    _currentIndex          = index;
+    _currentIndex = index;
+
     int renderingGroupMask = 0;
 
-    if (renderingGroup) {
-      // Fire PRECLEAR stage
-      if (hasObservable) {
-        renderingGroupMask     = static_cast<int>(std::pow(2, index));
-        info->renderStage      = RenderingGroupInfo::STAGE_PRECLEAR;
-        info->renderingGroupId = index;
-        _scene->onRenderingGroupObservable.notifyObservers(info,
-                                                           renderingGroupMask);
-      }
+    // Fire PRECLEAR stage
+    if (hasObservable) {
+      renderingGroupMask     = static_cast<int>(std::pow(2, index));
+      info->renderStage      = RenderingGroupInfo::STAGE_PRECLEAR;
+      info->renderingGroupId = index;
+      _scene->onRenderingGroupObservable.notifyObservers(info,
+                                                         renderingGroupMask);
+    }
 
-      // Clear depth/stencil if needed
-      if (_autoClearDepthStencil[index]) {
-        _clearDepthStencilBuffer();
+    // Clear depth/stencil if needed
+    if (index < _autoClearDepthStencil.size()) {
+      auto& autoClear = _autoClearDepthStencil[index];
+      if (autoClear.autoClear) {
+        _clearDepthStencilBuffer(autoClear.depth, autoClear.stencil);
       }
+    }
 
+    if (hasObservable) {
       // Fire PREOPAQUE stage
-      if (hasObservable) {
-        info->renderStage = RenderingGroupInfo::STAGE_PREOPAQUE;
-        _scene->onRenderingGroupObservable.notifyObservers(info,
-                                                           renderingGroupMask);
-      }
-
-      if (!renderingGroup->onBeforeTransparentRendering) {
-        renderingGroup->onBeforeTransparentRendering
-          = [this]() { _renderSpritesAndParticles(); };
-      }
-
+      info->renderStage = RenderingGroupInfo::STAGE_PREOPAQUE;
+      _scene->onRenderingGroupObservable.notifyObservers(info,
+                                                         renderingGroupMask);
       // Fire PRETRANSPARENT stage
-      if (hasObservable) {
-        info->renderStage = RenderingGroupInfo::STAGE_PRETRANSPARENT;
-        _scene->onRenderingGroupObservable.notifyObservers(info,
-                                                           renderingGroupMask);
-      }
-
-      if (!renderingGroup->render(customRenderFunction)) {
-        _renderingGroups.erase(_renderingGroups.begin() + index);
-        needToStepBack = true;
-        _renderSpritesAndParticles();
-      }
-
-      // Fire POSTTRANSPARENT stage
-      if (hasObservable) {
-        info->renderStage = RenderingGroupInfo::STAGE_POSTTRANSPARENT;
-        _scene->onRenderingGroupObservable.notifyObservers(info,
-                                                           renderingGroupMask);
-      }
-    }
-    else {
-      _renderSpritesAndParticles();
-
-      if (hasObservable) {
-        renderingGroupMask     = static_cast<int>(std::pow(2, index));
-        info->renderStage      = RenderingGroupInfo::STAGE_PRECLEAR;
-        info->renderingGroupId = index;
-        _scene->onRenderingGroupObservable.notifyObservers(info,
-                                                           renderingGroupMask);
-
-        info->renderStage = RenderingGroupInfo::STAGE_POSTTRANSPARENT;
-        _scene->onRenderingGroupObservable.notifyObservers(info,
-                                                           renderingGroupMask);
-      }
+      info->renderStage = RenderingGroupInfo::STAGE_PRETRANSPARENT;
+      _scene->onRenderingGroupObservable.notifyObservers(info,
+                                                         renderingGroupMask);
     }
 
-    if (needToStepBack) {
-      --index;
+    if (renderingGroup) {
+      renderingGroup->render(customRenderFunction, renderSprites,
+                             renderParticles, activeMeshes);
+    }
+
+    // Fire POSTTRANSPARENT stage
+    if (hasObservable) {
+      info->renderStage = RenderingGroupInfo::STAGE_POSTTRANSPARENT;
+      _scene->onRenderingGroupObservable.notifyObservers(info,
+                                                         renderingGroupMask);
     }
   }
 }
@@ -214,20 +132,31 @@ void RenderingManager::reset()
 {
   for (unsigned index = RenderingManager::MIN_RENDERINGGROUPS;
        index < RenderingManager::MAX_RENDERINGGROUPS; ++index) {
-    RenderingGroup* renderingGroup = (index < _renderingGroups.size()) ?
-                                       _renderingGroups[index].get() :
-                                       nullptr;
-    if (renderingGroup) {
-      renderingGroup->prepare();
+    if (index < _renderingGroups.size()) {
+      auto& renderingGroup = _renderingGroups[index];
+      if (renderingGroup) {
+        renderingGroup->prepare();
+      }
     }
   }
 }
 
-void RenderingManager::dispatch(SubMesh* subMesh)
+void RenderingManager::dispose()
 {
-  auto mesh             = subMesh->getMesh();
-  auto renderingGroupId = mesh->renderingGroupId;
+  for (unsigned index = RenderingManager::MIN_RENDERINGGROUPS;
+       index < RenderingManager::MAX_RENDERINGGROUPS; ++index) {
+    if (index < _renderingGroups.size()) {
+      auto& renderingGroup = _renderingGroups[index];
+      if (renderingGroup) {
+        renderingGroup->dispose();
+      }
+    }
+  }
+  _renderingGroups.clear();
+}
 
+void RenderingManager::_prepareRenderingGroup(unsigned int renderingGroupId)
+{
   // Resize render groups vector if needed
   if (renderingGroupId >= _renderingGroups.size()) {
     for (size_t i = _renderingGroups.size(); i <= renderingGroupId; ++i) {
@@ -242,6 +171,32 @@ void RenderingManager::dispatch(SubMesh* subMesh)
         _customAlphaTestSortCompareFn[renderingGroupId],
         _customTransparentSortCompareFn[renderingGroupId]));
   }
+}
+
+void RenderingManager::dispatchSprites(SpriteManager* spriteManager)
+{
+  const auto& renderingGroupId = spriteManager->renderingGroupId;
+
+  _prepareRenderingGroup(renderingGroupId);
+
+  _renderingGroups[renderingGroupId]->dispatchSprites(spriteManager);
+}
+
+void RenderingManager::dispatchParticles(ParticleSystem* particleSystem)
+{
+  const auto& renderingGroupId = particleSystem->renderingGroupId;
+
+  _prepareRenderingGroup(renderingGroupId);
+
+  _renderingGroups[renderingGroupId]->dispatchParticles(particleSystem);
+}
+
+void RenderingManager::dispatch(SubMesh* subMesh)
+{
+  auto mesh                    = subMesh->getMesh();
+  const auto& renderingGroupId = mesh->renderingGroupId;
+
+  _prepareRenderingGroup(renderingGroupId);
 
   _renderingGroups[renderingGroupId]->dispatch(subMesh);
 }
@@ -267,9 +222,11 @@ void RenderingManager::setRenderingOrder(
 }
 
 void RenderingManager::setRenderingAutoClearDepthStencil(
-  unsigned int renderingGroupId, bool autoClearDepthStencil)
+  unsigned int renderingGroupId, bool autoClearDepthStencil, bool depth,
+  bool stencil)
 {
-  _autoClearDepthStencil[renderingGroupId] = autoClearDepthStencil;
+  _autoClearDepthStencil[renderingGroupId]
+    = {autoClearDepthStencil, depth, stencil};
 }
 
 } // end of namespace BABYLON
