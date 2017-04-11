@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/math/matrix.h>
+#include <babylon/math/quaternion.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
@@ -10,8 +11,14 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT BoneIKController {
 
 public:
-  BoneIKController(AbstractMesh* mesh, Bone* bone, AbstractMesh* target,
-                   AbstractMesh* poleTarget, float poleAngle = 0.f);
+  BoneIKController(AbstractMesh* mesh, Bone* bone,
+                   AbstractMesh* targetMesh             = nullptr,
+                   AbstractMesh* poleTargetMesh         = nullptr,
+                   Bone* poleTargetBone                 = nullptr,
+                   const Vector3& poleTargetLocalOffset = Vector3::Zero(),
+                   float poleAngle                      = 0.f,
+                   const Vector3& bendAxis              = Vector3::Right(),
+                   float maxAngle = Math::PI, float slerpAmount = 1.f);
   ~BoneIKController();
 
   float maxAngle() const;
@@ -22,29 +29,35 @@ private:
   void _setMaxAngle(float ang);
 
 public:
-  AbstractMesh* target;
-  AbstractMesh* poleTarget;
+  AbstractMesh* targetMesh;
+  AbstractMesh* poleTargetMesh;
+  Bone* poleTargetBone;
+  Vector3 targetPosition;
+  Vector3 poleTargetPosition;
+  Vector3 poleTargetLocalOffset;
   float poleAngle;
   AbstractMesh* mesh;
+  float slerpAmount;
 
 private:
+  static std::array<Vector3, 6> _tmpVecs;
+  static Quaternion _tmpQuat;
+  static std::array<Matrix, 2> _tmpMats;
+
+private:
+  Quaternion _bone1Quat;
+  Matrix _bone1Mat;
+  float _bone2Ang;
   Bone* _bone1;
   Bone* _bone2;
   float _bone1Length;
   float _bone2Length;
   float _maxAngle;
   float _maxReach;
-
-  Vector3 _tmpVec1;
-  Vector3 _tmpVec2;
-  Vector3 _tmpVec3;
-  Vector3 _tmpVec4;
-  Vector3 _tmpVec5;
-
-  Matrix _tmpMat1;
-  Matrix _tmpMat2;
-
   bool _rightHandedSystem;
+  Vector3 _bendAxis;
+  bool _slerping;
+  float _adjustRoll;
 
 }; // end of class BoneIKController
 
