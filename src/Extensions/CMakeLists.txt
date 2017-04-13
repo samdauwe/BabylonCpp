@@ -23,10 +23,6 @@ set(FEATURE_FILE "include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_features.h")
 set(EXPORT_FILE  "include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_api.h")
 set(EXPORT_MACRO "${TARGET_UPPER}_SHARED_EXPORT")
 
-# Add compiler definitions
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 # ============================================================================ #
 #                       Project configuration options                          #
 # ============================================================================ #

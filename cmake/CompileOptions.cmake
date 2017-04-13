@@ -21,16 +21,27 @@ else()
     set(CMAKE_RELEASE_POSTFIX "_s")
 endif()
 
+# Check if compiler support the c++14 standard
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
+if(COMPILER_SUPPORTS_CXX14)
+    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    message(STATUS "The compiler '${CMAKE_CXX_COMPILER}' has c++14 support!")
+else(COMPILER_SUPPORTS_CXX14)
+    message(STATUS "The compiler '${CMAKE_CXX_COMPILER}' has no C++14 support. Please use a more recent C++ compiler!")
+endif()
+
 # Check compiler version
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    # require at least gcc 4.8
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8.1)
-        message(FATAL_ERROR "GCC version must be at least 4.8.1!")
+    # c++14 require at least gcc 5.0.0
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.0.0)
+        message(FATAL_ERROR "GCC version must be at least 5.0.0!")
     endif()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    # require at least clang 3.2
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.2)
-        message(FATAL_ERROR "Clang version must be at least 3.2!")
+    # c++14 require at least clang 3.4
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.4)
+        message(FATAL_ERROR "Clang version must be at least 3.4!")
     endif()
 else()
     message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}")
@@ -126,7 +137,7 @@ endif()
 # Add -stdlib=libc++ when using Clang if possible
 if(NOT OPTION_NO_AUTO_LIBCPP AND "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   set(CXXFLAGS_BACKUP "${CMAKE_CXX_FLAGS}")
-  set(CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++")
+  set(CMAKE_CXX_FLAGS "-std=c++1y -stdlib=libc++")
   try_run(ProgramResult
           CompilationSucceeded
           "${CMAKE_CURRENT_BINARY_DIR}"
@@ -175,7 +186,7 @@ endif(OPTION_ENABLE_ADDRESS_SANITIZER)
 
 # Check if the user provided CXXFLAGS, set defaults otherwise
 if(NOT CMAKE_CXX_FLAGS)
-  set(CMAKE_CXX_FLAGS                   "-std=c++11 -Wextra -Wall -pedantic ${EXTRA_FLAGS}")
+  set(CMAKE_CXX_FLAGS                   "-Wextra -Wall -pedantic ${EXTRA_FLAGS}")
 endif()
 if(NOT CMAKE_CXX_FLAGS_DEBUG)
   set(CMAKE_CXX_FLAGS_DEBUG             "-O0 -g")
