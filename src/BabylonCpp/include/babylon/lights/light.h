@@ -37,6 +37,11 @@ public:
 public:
   ~Light();
 
+  /**
+   * @brief Returns the string "Light".
+   */
+  const char* getClassName() const override;
+
   virtual IReflect::Type type() const override;
   void addToScene(std::unique_ptr<Light>&& newLight);
 
@@ -45,26 +50,75 @@ public:
    * within scene loading
    */
   std::string toString(bool fullDetails = false) const;
+
+  /**
+   * @brief Returns the Light associated shadow generator.
+   */
   virtual ShadowGenerator* getShadowGenerator();
+
+  /**
+   * @brief Returns a Vector3, the absolute light position in the World.
+   */
   virtual Vector3 getAbsolutePosition();
+
   virtual void transferToEffect(Effect* effect,
                                 const std::string& uniformName0);
   virtual void transferToEffect(Effect* effect, const std::string& uniformName0,
                                 const std::string& uniformName1);
   virtual Matrix* _getWorldMatrix();
+
+  /**
+   * @brief Returns if the light will affect the passed mesh.
+   */
   bool canAffectMesh(AbstractMesh* mesh);
+
+  /**
+   * @brief Returns the light World matrix.
+   */
   Matrix* getWorldMatrix() override;
+
+  /**
+   * @brief Disposes the light.
+   */
   virtual void dispose(bool doNotRecurse = false) override;
+
+  /**
+   * @brief Returns the light type ID (integer).
+   */
   virtual unsigned int getTypeID() const;
+
+  /**
+   * @brief Returns a new Light object, named "name", from the current one.
+   */
   std::unique_ptr<Light> clone(const std::string& name);
+
+  /**
+   * @brief Serializes the current light into a Serialization object.
+   * @returns The serialized object.
+   */
   Json::object serialize() const;
 
   // Statics
+
+  /**
+   * @brief Creates a new typed light from the passed type (integer) : point
+   * light = 0, directional light = 1, spot light = 2, hemispheric light = 3.
+   * This new light is named "name" and added to the passed scene.
+   */
   static Light* GetConstructorFromName(unsigned int type,
                                        const std::string& name, Scene* scene);
+
+  /**
+   * @brief Parses the passed "parsedLight" and returns a new instanced Light
+   * from this parsing.
+   */
   static Light* Parse(const Json::value& parsedLight, Scene* scene);
 
 protected:
+  /**
+   * @brief Creates a Light object in the scene.
+   * Documentation : http://doc.babylonjs.com/tutorials/lights
+   */
   Light(const std::string& name, Scene* scene);
 
 public:

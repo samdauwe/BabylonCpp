@@ -19,6 +19,11 @@ PointLight::~PointLight()
 {
 }
 
+const char* PointLight::getClassName() const
+{
+  return "PointLight";
+}
+
 IReflect::Type PointLight::type() const
 {
   return IReflect::Type::POINTLIGHT;
@@ -71,11 +76,6 @@ bool PointLight::needCube() const
   return true;
 }
 
-bool PointLight::supportsVSM() const
-{
-  return false;
-}
-
 bool PointLight::needRefreshPerFrame() const
 {
   return false;
@@ -109,12 +109,19 @@ ShadowGenerator* PointLight::getShadowGenerator()
 }
 
 void PointLight::setShadowProjectionMatrix(
-  Matrix& matrix, const Matrix& /*viewMatrix*/,
-  const std::vector<AbstractMesh*>& /*renderList*/)
+  Matrix& matrix, const Matrix& viewMatrix,
+  const std::vector<AbstractMesh*>& renderList)
 {
-  auto activeCamera = getScene()->activeCamera;
-  Matrix::PerspectiveFovLHToRef(Math::PI_2, 1.f, activeCamera->minZ,
-                                activeCamera->maxZ, matrix);
+  if (customProjectionMatrixBuilder) {
+    customProjectionMatrixBuilder(viewMatrix, renderList, matrix);
+  }
+  else {
+    auto activeCamera = getScene()->activeCamera;
+    Matrix::PerspectiveFovLHToRef(
+      Math::PI_2, 1.f,
+      shadowMinZ.hasValue() ? shadowMinZ.value : activeCamera->minZ,
+      shadowMaxZ.hasValue() ? shadowMaxZ.value : activeCamera->maxZ, matrix);
+  }
 }
 
 Matrix* PointLight::_getWorldMatrix()

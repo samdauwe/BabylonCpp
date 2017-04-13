@@ -17,7 +17,7 @@ public:
   setShadowProjectionMatrix(Matrix& matrix, const Matrix& viewMatrix,
                             const std::vector<AbstractMesh*>& renderList)
     = 0;
-  virtual bool supportsVSM() const         = 0;
+
   virtual bool needRefreshPerFrame() const = 0;
   virtual bool needCube() const            = 0;
   virtual Vector3 getShadowDirection(unsigned int faceIndex = 0) = 0;
@@ -28,7 +28,13 @@ public:
   Vector3 direction;
   Vector3 transformedPosition;
   std::string name;
+  float shadowMinZ;
+  float shadowMaxZ;
   ShadowGenerator* _shadowGenerator;
+  std::function<void(const Matrix& viewMatrix,
+                     const std::vector<AbstractMesh*>& renderList,
+                     Matrix& result)>
+    customProjectionMatrixBuilder;
 
 }; // end of class IShadowLight
 

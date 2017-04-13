@@ -19,6 +19,11 @@ HemisphericLight::~HemisphericLight()
 {
 }
 
+const char* HemisphericLight::getClassName() const
+{
+  return "HemisphericLight";
+}
+
 IReflect::Type HemisphericLight::type() const
 {
   return IReflect::Type::HEMISPHERICLIGHT;

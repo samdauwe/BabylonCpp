@@ -32,6 +32,11 @@ Light::~Light()
 {
 }
 
+const char* Light::getClassName() const
+{
+  return "Light";
+}
+
 IReflect::Type Light::type() const
 {
   return IReflect::Type::LIGHT;
@@ -120,7 +125,7 @@ Matrix* Light::getWorldMatrix()
 {
   _currentRenderId = getScene()->getRenderId();
 
-  Matrix* worldMatrix = _getWorldMatrix();
+  auto worldMatrix = _getWorldMatrix();
 
   if (parent() && parent()->getWorldMatrix()) {
     if (!_parentedWorldMatrix) {

@@ -23,6 +23,11 @@ SpotLight::~SpotLight()
 {
 }
 
+const char* SpotLight::getClassName() const
+{
+  return "SpotLight";
+}
+
 IReflect::Type SpotLight::type() const
 {
   return IReflect::Type::SPOTLIGHT;
@@ -39,22 +44,23 @@ Vector3 SpotLight::getAbsolutePosition()
 }
 
 void SpotLight::setShadowProjectionMatrix(
-  Matrix& matrix, const Matrix& /*viewMatrix*/,
-  const std::vector<AbstractMesh*>& /*renderList*/)
+  Matrix& matrix, const Matrix& viewMatrix,
+  const std::vector<AbstractMesh*>& renderList)
 {
-  auto activeCamera = getScene()->activeCamera;
-  Matrix::PerspectiveFovLHToRef(angle, 1.f, activeCamera->minZ,
-                                activeCamera->maxZ, matrix);
+  if (customProjectionMatrixBuilder) {
+    customProjectionMatrixBuilder(viewMatrix, renderList, matrix);
+  }
+  else {
+    auto activeCamera = getScene()->activeCamera;
+    Matrix::PerspectiveFovLHToRef(
+      angle, 1.f, shadowMinZ.hasValue() ? shadowMinZ.value : activeCamera->minZ,
+      shadowMaxZ.hasValue() ? shadowMaxZ.value : activeCamera->maxZ, matrix);
+  }
 }
 
 bool SpotLight::needCube() const
 {
   return false;
-}
-
-bool SpotLight::supportsVSM() const
-{
-  return true;
 }
 
 bool SpotLight::needRefreshPerFrame() const
@@ -104,19 +110,27 @@ void SpotLight::transferToEffect(Effect* effect,
     Vector3::TransformNormalToRef(direction, *parent()->getWorldMatrix(),
                                   *_transformedDirection);
 
-    effect->setFloat4(positionUniformName, transformedPosition->x,
-                      transformedPosition->y, transformedPosition->z, exponent);
+    effect->setFloat4(positionUniformName,    // Name
+                      transformedPosition->x, // X
+                      transformedPosition->y, // Y
+                      transformedPosition->z, // Z
+                      exponent);              // Value
     normalizeDirection = Vector3::Normalize(*_transformedDirection);
   }
   else {
-    effect->setFloat4(positionUniformName, position.x, position.y, position.z,
-                      exponent);
+    effect->setFloat4(positionUniformName, // Name
+                      position.x,          // X
+                      position.y,          // Y
+                      position.z,          // Z
+                      exponent);           // Value
     normalizeDirection = Vector3::Normalize(direction);
   }
 
-  effect->setFloat4(directionUniformName, normalizeDirection.x,
-                    normalizeDirection.y, normalizeDirection.z,
-                    std::cos(angle * 0.5f));
+  effect->setFloat4(directionUniformName,    // Name
+                    normalizeDirection.x,    // X
+                    normalizeDirection.y,    // Y
+                    normalizeDirection.z,    // Z
+                    std::cos(angle * 0.5f)); // Value
 }
 
 Matrix* SpotLight::_getWorldMatrix()
@@ -140,8 +154,8 @@ Vector3 SpotLight::getRotation()
 
   direction.normalize();
 
-  Vector3 xaxis = Vector3::Cross(direction, Axis::Y);
-  Vector3 yaxis = Vector3::Cross(xaxis, direction);
+  auto xaxis = Vector3::Cross(direction, Axis::Y);
+  auto yaxis = Vector3::Cross(xaxis, direction);
 
   return Vector3::RotationFromAxis(xaxis, yaxis, direction);
 }

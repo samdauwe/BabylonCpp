@@ -19,15 +19,48 @@ public:
   }
   ~HemisphericLight();
 
+  /**
+   * @brief Returns the string "HemisphericLight".
+   */
+  const char* getClassName() const override;
+
   IReflect::Type type() const override;
+
+  /**
+   * @brief Sets the HemisphericLight direction towards the passed target
+   * (Vector3).
+   * @returns The updated direction.
+   */
   Vector3 setDirectionToTarget(const Vector3& target);
+
   ShadowGenerator* getShadowGenerator() override;
+
+  /**
+   * @brief Sets the passed Effect object with the HemisphericLight normalized
+   * direction and color and the passed name (string).
+   */
   void transferToEffect(Effect* effect, const std::string& directionUniformName,
                         const std::string& groundColorUniformName) override;
+
+  /**
+   * @brief Returns the light world matrix.
+   */
   Matrix* _getWorldMatrix() override;
+
+  /**
+   * @brief Returns the integer 3.
+   */
   unsigned int getTypeID() const override;
 
 protected:
+  /**
+   * @brief Creates a HemisphericLight object in the scene according to the
+   * passed direction (Vector3).
+   * The HemisphericLight simulates the ambient environment light, so the passed
+   * direction is the light reflection direction, not the incoming direction.
+   * The HemisphericLight can't cast shadows.
+   * Documentation : http://doc.babylonjs.com/tutorials/lights
+   */
   HemisphericLight(const std::string& name, const Vector3& direction,
                    Scene* scene);
 

@@ -29,6 +29,11 @@ DirectionalLight::~DirectionalLight()
 {
 }
 
+const char* DirectionalLight::getClassName() const
+{
+  return "DirectionalLight";
+}
+
 IReflect::Type DirectionalLight::type() const
 {
   return IReflect::Type::DIRECTIONALLIGHT;
@@ -54,61 +59,66 @@ void DirectionalLight::setShadowProjectionMatrix(
   Matrix& matrix, const Matrix& viewMatrix,
   const std::vector<AbstractMesh*>& renderList)
 {
-  auto activeCamera = getScene()->activeCamera;
-
-  // Check extends
-  if (autoUpdateExtends || std_util::almost_equal(
-                             _orthoLeft, std::numeric_limits<float>::max())) {
-    Vector3 tempVector3 = Vector3::Zero();
-
-    _orthoLeft   = std::numeric_limits<float>::max();
-    _orthoRight  = std::numeric_limits<float>::min();
-    _orthoTop    = std::numeric_limits<float>::min();
-    _orthoBottom = std::numeric_limits<float>::max();
+  if (customProjectionMatrixBuilder) {
+    customProjectionMatrixBuilder(viewMatrix, renderList, matrix);
+  }
+  else {
+    auto activeCamera = getScene()->activeCamera;
 
     // Check extends
-    for (const auto& mesh : renderList) {
-      if (!mesh) {
-        continue;
-      }
+    if (autoUpdateExtends || std_util::almost_equal(
+                               _orthoLeft, std::numeric_limits<float>::max())) {
+      auto tempVector3 = Vector3::Zero();
 
-      auto boundingInfo = mesh->getBoundingInfo();
-      if (!boundingInfo) {
-        continue;
-      }
+      _orthoLeft   = std::numeric_limits<float>::max();
+      _orthoRight  = std::numeric_limits<float>::min();
+      _orthoTop    = std::numeric_limits<float>::min();
+      _orthoBottom = std::numeric_limits<float>::max();
 
-      const auto& boundingBox = boundingInfo->boundingBox;
+      // Check extends
+      for (const auto& mesh : renderList) {
+        if (!mesh) {
+          continue;
+        }
 
-      for (const auto& vector : boundingBox.vectorsWorld) {
-        Vector3::TransformCoordinatesToRef(vector, viewMatrix, tempVector3);
+        auto boundingInfo = mesh->getBoundingInfo();
+        if (!boundingInfo) {
+          continue;
+        }
 
-        if (tempVector3.x < _orthoLeft)
-          _orthoLeft = tempVector3.x;
-        if (tempVector3.y < _orthoBottom)
-          _orthoBottom = tempVector3.y;
+        const auto& boundingBox = boundingInfo->boundingBox;
 
-        if (tempVector3.x > _orthoRight)
-          _orthoRight = tempVector3.x;
-        if (tempVector3.y > _orthoTop)
-          _orthoTop = tempVector3.y;
+        for (const auto& vector : boundingBox.vectorsWorld) {
+          Vector3::TransformCoordinatesToRef(vector, viewMatrix, tempVector3);
+
+          if (tempVector3.x < _orthoLeft) {
+            _orthoLeft = tempVector3.x;
+          }
+          if (tempVector3.y < _orthoBottom) {
+            _orthoBottom = tempVector3.y;
+          }
+
+          if (tempVector3.x > _orthoRight) {
+            _orthoRight = tempVector3.x;
+          }
+          if (tempVector3.y > _orthoTop) {
+            _orthoTop = tempVector3.y;
+          }
+        }
       }
     }
+
+    const float xOffset = _orthoRight - _orthoLeft;
+    const float yOffset = _orthoTop - _orthoBottom;
+
+    Matrix::OrthoOffCenterLHToRef(
+      _orthoLeft - xOffset * shadowOrthoScale,
+      _orthoRight + xOffset * shadowOrthoScale,
+      _orthoBottom - yOffset * shadowOrthoScale,
+      _orthoTop + yOffset * shadowOrthoScale,
+      shadowMinZ.hasValue() ? shadowMinZ.value : activeCamera->minZ,
+      shadowMaxZ.hasValue() ? shadowMaxZ.value : activeCamera->maxZ, matrix);
   }
-
-  const float xOffset = _orthoRight - _orthoLeft;
-  const float yOffset = _orthoTop - _orthoBottom;
-
-  Matrix::OrthoOffCenterLHToRef(_orthoLeft - xOffset * shadowOrthoScale,
-                                _orthoRight + xOffset * shadowOrthoScale,
-                                _orthoBottom - yOffset * shadowOrthoScale,
-                                _orthoTop + yOffset * shadowOrthoScale,
-                                -activeCamera->maxZ, activeCamera->maxZ,
-                                matrix);
-}
-
-bool DirectionalLight::supportsVSM() const
-{
-  return true;
 }
 
 bool DirectionalLight::needRefreshPerFrame() const
