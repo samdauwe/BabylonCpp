@@ -2,6 +2,7 @@
 
 #include <babylon/bones/bone.h>
 #include <babylon/core/json.h>
+#include <babylon/core/logging.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/math/tmp.h>
@@ -9,18 +10,18 @@
 
 namespace BABYLON {
 
-Skeleton::Skeleton(const std::string& _name, const std::string& _id,
+Skeleton::Skeleton(const std::string& iName, const std::string& iId,
                    Scene* scene)
     : needInitialSkinMatrix{false}
-    , name{_name}
-    , id{_id}
+    , name{iName}
+    , id{iId}
     , _scene{scene}
     , _isDirty{true}
     , _identity{Matrix::Identity()}
+    , _lastAbsoluteTransformsUpdateId{-1}
 {
   bones.clear();
   scene->skeletons.emplace_back(this);
-  prepare();
   // make sure it will recalculate the matrix next time prepare is called.
   _isDirty = true;
 }
@@ -40,6 +41,11 @@ Float32Array& Skeleton::getTransformMatrices(AbstractMesh* mesh)
   if (needInitialSkinMatrix && !mesh->_bonesTransformMatrices.empty()) {
     return mesh->_bonesTransformMatrices;
   }
+
+  if (_transformMatrices.empty()) {
+    prepare();
+  }
+
   return _transformMatrices;
 }
 
@@ -144,12 +150,16 @@ bool Skeleton::copyAnimationRange(Skeleton* source, const std::string& _name,
   }
 
   if (bones.size() != sourceBones.size()) {
+    BABYLON_LOGF_WARN(
+      "Skeleton",
+      "copyAnimationRange: this rig has %zu bones, while source as %zu",
+      bones.size(), sourceBones.size())
     ret = false;
   }
 
   Vector3 skelDimensionsRatio;
   bool hasSkelDimensionsRatio = false;
-  if (rescaleAsRequired && dimensionsAtRest) {
+  if (rescaleAsRequired && dimensionsAtRest && source->dimensionsAtRest) {
     dimensionsAtRest->divide(*source->dimensionsAtRest);
   }
 
@@ -161,12 +171,15 @@ bool Skeleton::copyAnimationRange(Skeleton* source, const std::string& _name,
                  skelDimensionsRatio, hasSkelDimensionsRatio);
     }
     else {
+      BABYLON_LOGF_WARN(
+        "Skeleton", "copyAnimationRange: not same rig, missing source bone %s",
+        bone->name.c_str());
       ret = false;
     }
   }
   // do not call createAnimationRange(), since it also is done to bones, which
   // was already done
-  AnimationRange* range = source->getAnimationRange(_name);
+  auto range = source->getAnimationRange(_name);
   if (range) {
     _ranges[_name] = AnimationRange(_name, range->from + frameOffset,
                                     range->to + frameOffset);
@@ -237,9 +250,11 @@ void Skeleton::_computeTransformMatrices(Float32Array& targetMatrix,
                                          const Matrix& initialSkinMatrix,
                                          bool initialSkinMatrixSet)
 {
+  onBeforeComputeObservable.notifyObservers(this);
+
   unsigned int index = 0;
   for (const auto& bone : bones) {
-    Bone* parentBone = bone->getParent();
+    auto parentBone = bone->getParent();
 
     if (parentBone) {
       bone->getLocalMatrix().multiplyToRef(*parentBone->getWorldMatrix(),
@@ -273,19 +288,22 @@ void Skeleton::prepare()
   if (needInitialSkinMatrix) {
     for (auto& mesh : _meshesWithPoseMatrix) {
 
+      auto poseMatrix = mesh->getPoseMatrix();
+
       if (mesh->_bonesTransformMatrices.size() != 16 * (bones.size() + 1)) {
         mesh->_bonesTransformMatrices.resize(16 * (bones.size() + 1));
       }
 
-      Matrix poseMatrix = mesh->getPoseMatrix();
-
-      // Prepare bones
-      for (auto& bone : bones) {
-        if (!bone->getParent()) {
-          auto& tmpMatrix = Tmp::MatrixArray[0];
-          auto& matrix    = bone->getBaseMatrix();
-          matrix.multiplyToRef(poseMatrix, tmpMatrix);
-          bone->_updateDifferenceMatrix(tmpMatrix);
+      if (_synchronizedWithMesh != mesh) {
+        _synchronizedWithMesh = mesh;
+        // Prepare bones
+        for (auto& bone : bones) {
+          if (!bone->getParent()) {
+            auto& tmpMatrix = Tmp::MatrixArray[0];
+            auto& matrix    = bone->getBaseMatrix();
+            matrix.multiplyToRef(poseMatrix, tmpMatrix);
+            bone->_updateDifferenceMatrix(tmpMatrix);
+          }
         }
       }
 
@@ -302,7 +320,7 @@ void Skeleton::prepare()
 
   _isDirty = false;
 
-  //_scene->_activeBones += bones.size();
+  _scene->_activeBones.addCount(bones.size(), false);
 }
 
 std::vector<IAnimatable*> Skeleton::getAnimatables()
@@ -362,7 +380,7 @@ void Skeleton::dispose(bool /*doNotRecurse*/)
   _meshesWithPoseMatrix.clear();
 
   // Animations
-  // getScene()->stopAnimation(this);
+  getScene()->stopAnimation(this);
 
   // Remove from scene
   getScene()->removeSkeleton(this);
@@ -447,9 +465,9 @@ Matrix* Skeleton::getPoseMatrix() const
 {
   Matrix* poseMatrix = nullptr;
 
-  // if (!_meshesWithPoseMatrix.empty()) {
-  //  poseMatrix = _meshesWithPoseMatrix[0]->getPoseMatrix();
-  //}
+  if (!_meshesWithPoseMatrix.empty()) {
+    poseMatrix = &_meshesWithPoseMatrix[0]->getPoseMatrix();
+  }
 
   return poseMatrix;
 }

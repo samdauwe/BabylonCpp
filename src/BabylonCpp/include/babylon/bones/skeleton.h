@@ -6,6 +6,7 @@
 #include <babylon/babylon_global.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/matrix.h>
+#include <babylon/tools/observable.h>
 
 namespace BABYLON {
 
@@ -92,6 +93,11 @@ public:
   bool needInitialSkinMatrix;
   std::string name;
   std::string id;
+  // Events
+  /**
+   * An event triggered before computing the skeleton's matrices
+   */
+  Observable<Skeleton> onBeforeComputeObservable;
 
 private:
   Scene* _scene;
@@ -100,6 +106,7 @@ private:
   std::vector<AbstractMesh*> _meshesWithPoseMatrix;
   std::vector<IAnimatable*> _animatables;
   Matrix _identity;
+  AbstractMesh* _synchronizedWithMesh;
   std::unordered_map<std::string, AnimationRange> _ranges;
   int _lastAbsoluteTransformsUpdateId;
 
