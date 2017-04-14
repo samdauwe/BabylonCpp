@@ -51,14 +51,18 @@ public:
   template <typename D, typename V>
   D* copy(V&& v)
   {
-#ifdef __GNUC__
+#if !defined(__clang__)
+#if __GNUC__ > 5
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wplacement-new="
 #endif
+#endif
     return fits<D>() ? new (space) D{std::forward<V>(v)} :
                        new D{std::forward<V>(v)};
-#ifdef __GNUC__
+#if !defined(__clang__)
+#if __GNUC__ > 5
 #pragma GCC diagnostic pop
+#endif
 #endif
   }
 

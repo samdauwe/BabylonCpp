@@ -57,6 +57,11 @@ if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang"
   set(EXTRA_FLAGS "-ftemplate-depth=512 -ftemplate-backtrace-limit=0")
 endif()
 
+# GCC compiles large C++ programs faster if you increase its GC limit
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+  set(EXTRA_FLAGS "${EXTRA_FLAGS} --param ggc-min-heapsize=524288")
+endif()
+
 # MSVC compiler options
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
     set(WFLAGS ${WFLAGS}

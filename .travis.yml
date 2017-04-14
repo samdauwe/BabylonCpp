@@ -49,7 +49,7 @@ install:
   - if [ "$TRAVIS_OS_NAME" = "linux" -a "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
 
 script:
-  - mkdir build
-  - cd build
+  - cd ${TRAVIS_BUILD_DIR}
+  - mkdir build && cd build
   - cmake ../
   - make all
