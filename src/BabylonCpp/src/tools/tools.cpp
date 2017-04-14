@@ -5,8 +5,10 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcast-qual"
 #pragma GCC diagnostic ignored "-Wconversion"
+#if __GNUC__ > 5
 #pragma GCC diagnostic ignored "-Wmisleading-indentation"
 #pragma GCC diagnostic ignored "-Wshift-negative-value"
+#endif
 #pragma GCC diagnostic ignored "-Wswitch-default"
 #endif
 #include <babylon/utils/stb_image.h>

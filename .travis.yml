@@ -53,3 +53,8 @@ script:
   - mkdir build && cd build
   - cmake ../
   - make all
+
+notifications:
+  email:
+    on_success: never
+    on_failure: always
