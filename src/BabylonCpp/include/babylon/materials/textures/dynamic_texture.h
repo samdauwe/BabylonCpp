@@ -2,6 +2,7 @@
 #define BABYLON_MATERIALS_TEXTURES_DYNAMIC_TEXTURE_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/engine/engine.h>
 #include <babylon/materials/textures/texture.h>
 
 namespace BABYLON {
@@ -17,7 +18,8 @@ class BABYLON_SHARED_EXPORT DynamicTexture : public Texture {
 public:
   DynamicTexture(const std::string& name, const DynamicTextureOptions& options,
                  Scene* scene, bool generateMipMaps,
-                 unsigned int samplingMode = Texture::TRILINEAR_SAMPLINGMODE);
+                 unsigned int samplingMode = Texture::TRILINEAR_SAMPLINGMODE,
+                 unsigned int format       = Engine::TEXTUREFORMAT_RGBA);
   ~DynamicTexture();
 
   bool canRescale();

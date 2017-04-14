@@ -1,6 +1,6 @@
 #include <babylon/materials/textures/dynamic_texture.h>
 
-#include <babylon/engine/engine.h>
+#include <babylon/core/string.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/interfaces/icanvas_rendering_context2D.h>
@@ -10,8 +10,9 @@ namespace BABYLON {
 DynamicTexture::DynamicTexture(const std::string& iName,
                                const DynamicTextureOptions& options,
                                Scene* scene, bool generateMipMaps,
-                               unsigned int samplingMode)
-    : Texture(nullptr, scene, !generateMipMaps)
+                               unsigned int samplingMode, unsigned int format)
+    : Texture{nullptr, scene,   !generateMipMaps, true,  samplingMode,
+              nullptr, nullptr, nullptr,          false, format}
     , _samplingMode{samplingMode}
     , _generateMipMaps{generateMipMaps}
 {
@@ -31,10 +32,10 @@ DynamicTexture::DynamicTexture(const std::string& iName,
   }
 
   if (_canvas) {
-    ISize textureSize = getSize();
-    _canvas->width    = textureSize.width;
-    _canvas->height   = textureSize.height;
-    _context          = _canvas->getContext2d();
+    auto textureSize = getSize();
+    _canvas->width   = textureSize.width;
+    _canvas->height  = textureSize.height;
+    _context         = _canvas->getContext2d();
   }
 }
 
@@ -49,7 +50,7 @@ bool DynamicTexture::canRescale()
 
 void DynamicTexture::scale(float ratio)
 {
-  ISize textureSize = getSize();
+  auto textureSize = getSize();
 
   textureSize.width  = static_cast<int>(textureSize.width * ratio);
   textureSize.height = static_cast<int>(textureSize.height * ratio);
@@ -70,13 +71,14 @@ ICanvasRenderingContext2D* DynamicTexture::getContext()
 
 void DynamicTexture::clear()
 {
-  ISize size = getSize();
+  auto size = getSize();
   _context->fillRect(0, 0, size.width, size.height);
 }
 
 void DynamicTexture::update(bool invertY)
 {
-  getScene()->getEngine()->updateDynamicTexture(_texture, _canvas, invertY);
+  getScene()->getEngine()->updateDynamicTexture(_texture, _canvas, invertY,
+                                                false, _format);
 }
 
 void DynamicTexture::drawText(const std::string& text, int x, int y,
@@ -84,17 +86,25 @@ void DynamicTexture::drawText(const std::string& text, int x, int y,
                               const std::string& clearColor, bool invertY,
                               bool _update)
 {
-  ISize size = getSize();
+  auto size = getSize();
   if (!clearColor.empty()) {
     _context->fillStyle = clearColor;
     _context->fillRect(0, 0, size.width, size.height);
   }
 
   _context->font = font;
-  int _x         = x;
-  if (_x == 0) {
-    ISize textSize = _context->measureText(text);
-    _x             = (size.width - textSize.width) / 2;
+
+  if (x == 0) {
+    auto textSize = _context->measureText(text);
+    x             = (size.width - textSize.width) / 2;
+  }
+
+  if (y == 0) {
+    auto _font = font;
+    String::replaceInPlace(_font, "/\\D/g", "");
+    float fontSize = static_cast<float>(std::stoi(_font));
+    y              = static_cast<int>((static_cast<float>(size.height) / 2.f)
+                         + (fontSize / 3.65f));
   }
 
   _context->fillStyle = color;
@@ -107,7 +117,7 @@ void DynamicTexture::drawText(const std::string& text, int x, int y,
 
 std::unique_ptr<DynamicTexture> DynamicTexture::clone() const
 {
-  ISize textureSize = getSize();
+  auto textureSize = getSize();
   DynamicTextureOptions options;
   options.canvas  = _canvas;
   options.width   = textureSize.width;

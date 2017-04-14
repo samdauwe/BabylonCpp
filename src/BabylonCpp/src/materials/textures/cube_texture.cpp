@@ -21,12 +21,14 @@ CubeTexture::CubeTexture(const std::string& rootUrl, Scene* scene,
                          const std::vector<std::string>& extensions,
                          bool noMipmap, const std::vector<std::string>& iFiles,
                          const std::function<void()>& onLoad,
-                         const std::function<void()>& onError)
+                         const std::function<void()>& onError,
+                         unsigned int format)
     : BaseTexture{scene}
     , url{rootUrl}
     , coordinatesMode{Texture::CUBIC_MODE}
     , _noMipmap{noMipmap}
     , _textureMatrix{std_util::make_unique<Matrix>(Matrix::Identity())}
+    , _format{format}
 {
   name     = rootUrl;
   hasAlpha = false;
@@ -55,7 +57,7 @@ CubeTexture::CubeTexture(const std::string& rootUrl, Scene* scene,
   if (!_texture) {
     if (!scene->useDelayedTextureLoading) {
       _texture = scene->getEngine()->createCubeTexture(
-        rootUrl, scene, extensions, noMipmap, onLoad, onError);
+        rootUrl, scene, extensions, noMipmap, onLoad, onError, _format);
     }
     else {
       delayLoadState = Engine::DELAYLOADSTATE_NOTLOADED;
@@ -89,7 +91,7 @@ void CubeTexture::delayLoad()
 
   if (!_texture) {
     _texture = getScene()->getEngine()->createCubeTexture(
-      url, getScene(), _extensions, _noMipmap);
+      url, getScene(), _files, _noMipmap, nullptr, nullptr, _format);
   }
 }
 
@@ -98,17 +100,17 @@ Matrix* CubeTexture::getReflectionTextureMatrix()
   return _textureMatrix.get();
 }
 
-std::unique_ptr<CubeTexture>
+CubeTexture*
 CubeTexture::Parse(const Json::value& parsedTexture, Scene* scene,
                    const std::string& /*rootUrl*/)
 {
 #if 0
-  auto cubeTexture = std_util::make_unique<CubeTexture>(
-    rootUrl + Json::GetString(parsedTexture, "name"), scene,
-    Json::ToStringVector(parsedTexture, "extensions"));
+  auto cubeTexture
+    = new CubeTexture(rootUrl + Json::GetString(parsedTexture, "name"), scene,
+                      Json::ToStringVector(parsedTexture, "extensions"));
 #endif
-  std::unique_ptr<CubeTexture> cubeTexture = nullptr;
-  SerializationHelper::Parse(cubeTexture.get(), parsedTexture, scene);
+  CubeTexture* cubeTexture = nullptr;
+  SerializationHelper::Parse(cubeTexture, parsedTexture, scene);
 
   // Animations
   if (parsedTexture.contains("animations")) {

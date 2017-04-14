@@ -9,19 +9,19 @@ namespace BABYLON {
 
 MapTexture::MapTexture(const std::string& iName, Scene* scene,
                        const ISize& size, unsigned int samplingMode,
-                       bool useMipMap)
-    : Texture("", scene, !useMipMap, false, samplingMode), _size{size}
+                       bool useMipMap, float margin)
+    : Texture{"", scene, !useMipMap, false, samplingMode}, _size{size}
 {
   name  = iName;
   wrapU = Texture::CLAMP_ADDRESSMODE;
   wrapV = Texture::CLAMP_ADDRESSMODE;
 
   // Create the rectPackMap that will allocate portion of the texture
-  _rectPackingMap
-    = std_util::make_unique<RectPackingMap>(Size(size.width, size.height));
+  _rectPackingMap = std_util::make_unique<RectPackingMap>(
+    Size(size.width, size.height), margin);
 
   // Create the texture that will store the content
-  RenderTargetTextureOptions options;
+  RenderTargetOptions options;
   options.generateMipMaps = !noMipmap();
   options.type            = Engine::TEXTURETYPE_UNSIGNED_INT;
 

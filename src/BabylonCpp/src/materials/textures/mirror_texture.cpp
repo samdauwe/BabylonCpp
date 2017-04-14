@@ -8,15 +8,20 @@
 namespace BABYLON {
 
 MirrorTexture::MirrorTexture(const std::string& iName, const ISize& size,
-                             Scene* scene, bool generateMipMaps)
+                             Scene* scene, bool generateMipMaps,
+                             unsigned int type, unsigned int samplingMode,
+                             bool generateDepthBuffer)
 
-    : RenderTargetTexture{iName, size, scene, generateMipMaps, true}
+    : RenderTargetTexture{iName, size,  scene,        generateMipMaps,    true,
+                          type,  false, samplingMode, generateDepthBuffer}
     , mirrorPlane{Plane(0.f, 1.f, 0.f, 1.f)}
     , _transformMatrix{Matrix::Zero()}
     , _mirrorMatrix{Matrix::Zero()}
+    , _savedViewMatrix{Matrix::Zero()}
 
 {
-  onBeforeRender = [&]() {
+  onBeforeRender = [this]() {
+    auto scene = getScene();
     Matrix::ReflectionToRef(mirrorPlane, _mirrorMatrix);
     _savedViewMatrix = scene->getViewMatrix();
     _mirrorMatrix.multiplyToRef(_savedViewMatrix, _transformMatrix);
@@ -27,7 +32,8 @@ MirrorTexture::MirrorTexture(const std::string& iName, const ISize& size,
       scene->activeCamera->position, _mirrorMatrix));
   };
 
-  onAfterRender = [&]() {
+  onAfterRender = [this]() {
+    auto scene = getScene();
     scene->setTransformMatrix(_savedViewMatrix, scene->getProjectionMatrix());
     scene->getEngine()->cullBackFaces = true;
     scene->_mirroredCameraPosition.reset(nullptr);
@@ -41,9 +47,12 @@ MirrorTexture::~MirrorTexture()
 
 std::unique_ptr<MirrorTexture> MirrorTexture::clone() const
 {
-  /*auto textureSize = getSize();
+  auto textureSize = getSize();
   auto newTexture  = std_util::make_unique<MirrorTexture>(
-    name, textureSize.width, getScene(), _generateMipMaps);
+    name, Size(textureSize.width, textureSize.height), getScene(),
+    _renderTargetOptions.generateMipMaps, _renderTargetOptions.type,
+    _renderTargetOptions.samplingMode,
+    _renderTargetOptions.generateDepthBuffer);
 
   // Base texture
   newTexture->hasAlpha = hasAlpha;
@@ -53,8 +62,7 @@ std::unique_ptr<MirrorTexture> MirrorTexture::clone() const
   newTexture->mirrorPlane = mirrorPlane;
   newTexture->renderList  = renderList;
 
-  return newTexture;*/
-  return nullptr;
+  return newTexture;
 }
 
 Json::object MirrorTexture::serialize() const

@@ -11,9 +11,10 @@ RefractionTexture::RefractionTexture(const std::string& iName, ISize size,
     , refractionPlane{Plane(0.f, 1.f, 0.f, 1.f)}
     , depth{2.f}
 {
-  onBeforeRenderObservable.add([&]() { scene->setClipPlane(refractionPlane); });
+  onBeforeRenderObservable.add(
+    [this]() { getScene()->setClipPlane(refractionPlane); });
 
-  onAfterRenderObservable.add([&]() { scene->resetClipPlane(); });
+  onAfterRenderObservable.add([this]() { getScene()->resetClipPlane(); });
 }
 
 RefractionTexture::~RefractionTexture()
@@ -22,9 +23,10 @@ RefractionTexture::~RefractionTexture()
 
 std::unique_ptr<RefractionTexture> RefractionTexture::clone() const
 {
-  /*auto textureSize = getSize();
+  auto textureSize = getSize();
   auto newTexture  = std_util::make_unique<RefractionTexture>(
-    name, textureSize.width, getScene(), _generateMipMaps);
+    name, Size(textureSize.width, textureSize.height), getScene(),
+    _generateMipMaps);
 
   // Base texture
   newTexture->hasAlpha = hasAlpha;
@@ -35,8 +37,7 @@ std::unique_ptr<RefractionTexture> RefractionTexture::clone() const
   newTexture->renderList      = renderList;
   newTexture->depth           = depth;
 
-  return newTexture;*/
-  return nullptr;
+  return newTexture;
 }
 
 Json::object RefractionTexture::serialize() const

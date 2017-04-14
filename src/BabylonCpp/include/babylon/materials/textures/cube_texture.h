@@ -9,12 +9,16 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT CubeTexture : public BaseTexture {
 
 public:
+  static constexpr unsigned int ENGINE_TEXTUREFORMAT_RGBA = 5;
+
+public:
   CubeTexture(const std::string& rootUrl, Scene* scene,
               const std::vector<std::string>& extensions, bool noMipmap,
               const std::vector<std::string>& files
               = std::vector<std::string>(),
               const std::function<void()>& onLoad  = nullptr,
-              const std::function<void()>& onError = nullptr);
+              const std::function<void()>& onError = nullptr,
+              unsigned int format                  = ENGINE_TEXTUREFORMAT_RGBA);
   ~CubeTexture();
 
   /** Methods **/
@@ -25,9 +29,8 @@ public:
   /** Static methods **/
   static CubeTexture* CreateFromImages(const std::vector<std::string>& files,
                                        Scene* scene, bool noMipmap = false);
-  static std::unique_ptr<CubeTexture> Parse(const Json::value& parsedTexture,
-                                            Scene* scene,
-                                            const std::string& rootUrl);
+  static CubeTexture* Parse(const Json::value& parsedTexture, Scene* scene,
+                            const std::string& rootUrl);
 
 public:
   std::string url;
@@ -38,6 +41,7 @@ private:
   std::vector<std::string> _files;
   std::vector<std::string> _extensions;
   std::unique_ptr<Matrix> _textureMatrix;
+  unsigned int _format;
 
 }; // end of class CubeTexture
 

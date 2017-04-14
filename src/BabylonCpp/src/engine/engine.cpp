@@ -682,7 +682,8 @@ void Engine::bindUnboundFramebuffer(GL::IGLFramebuffer* framebuffer)
 }
 
 void Engine::unBindFramebuffer(GL::IGLTexture* texture,
-                               bool disableGenerateMipMaps)
+                               bool disableGenerateMipMaps,
+                               const std::function<void()>& /*onBeforeUnbind*/)
 {
   _currentRenderTarget = nullptr;
   if (texture->generateMipMaps && !disableGenerateMipMaps) {
@@ -1753,12 +1754,12 @@ GL::IGLTexture* Engine::createTexture(const std::vector<std::string>& list,
                        onError, buffer);
 }
 
-GL::IGLTexture* Engine::createTexture(const std::string& _url, bool noMipmap,
-                                      bool invertY, Scene* scene,
-                                      unsigned int samplingMode,
-                                      const std::function<void()>& /*onLoad*/,
-                                      const std::function<void()>& onError,
-                                      Buffer* /*buffer*/)
+GL::IGLTexture*
+Engine::createTexture(const std::string& _url, bool noMipmap, bool invertY,
+                      Scene* scene, unsigned int samplingMode,
+                      const std::function<void()>& /*onLoad*/,
+                      const std::function<void()>& onError, Buffer* /*buffer*/,
+                      GL::IGLTexture* /*fallBack*/, unsigned int /*format*/)
 {
   auto texture  = _gl->createTexture();
   auto _texture = texture.get();
@@ -1982,7 +1983,8 @@ void Engine::updateTextureSamplingMode(unsigned int samplingMode,
 }
 
 void Engine::updateDynamicTexture(GL::IGLTexture* texture, ICanvas* /*canvas*/,
-                                  bool invertY, bool premulAlpha)
+                                  bool invertY, bool premulAlpha,
+                                  unsigned int /*format*/)
 {
   _bindTextureDirectly(GL::TEXTURE_2D, texture);
   _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL, invertY ? 1 : 0);
@@ -2004,7 +2006,7 @@ void Engine::updateDynamicTexture(GL::IGLTexture* texture, ICanvas* /*canvas*/,
 
 GL::IGLTexture*
 Engine::createRenderTargetTexture(ISize size,
-                                  const RenderTargetTextureOptions& options)
+                                  const RenderTargetOptions& options)
 {
   // old version had a "generateMipMaps" arg instead of options.
   // if options.generateMipMaps is undefined, consider that options itself if
@@ -2123,8 +2125,9 @@ Engine::updateRenderTargetTextureSampleCount(GL::IGLTexture* /*texture*/,
   return 1;
 }
 
-GL::IGLTexture* Engine::createRenderTargetCubeTexture(
-  const ISize& size, const RenderTargetCubeTextureOptions& options)
+GL::IGLTexture*
+Engine::createRenderTargetCubeTexture(const ISize& size,
+                                      const RenderTargetOptions& options)
 {
   auto texture  = _gl->createTexture();
   auto _texture = texture.get();
@@ -2215,12 +2218,11 @@ GL::IGLTexture* Engine::createRenderTargetCubeTexture(
   return _texture;
 }
 
-GL::IGLTexture*
-Engine::createCubeTexture(const std::string& /*rootUrl*/, Scene* /*scene*/,
-                          const std::vector<std::string>& /*extensions*/,
-                          bool /*noMipmap*/,
-                          const std::function<void()>& /*onLoad*/,
-                          const std::function<void()>& /*onError*/)
+GL::IGLTexture* Engine::createCubeTexture(
+  const std::string& /*rootUrl*/, Scene* /*scene*/,
+  const std::vector<std::string>& /*extensions*/, bool /*noMipmap*/,
+  const std::function<void()>& /*onLoad*/,
+  const std::function<void()>& /*onError*/, unsigned int /*format*/)
 {
   return nullptr;
 }

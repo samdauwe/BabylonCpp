@@ -12,11 +12,11 @@ class BABYLON_SHARED_EXPORT MapTexture : public Texture {
 public:
   MapTexture(const std::string& name, Scene* scene, const ISize& size,
              unsigned int samplingMode = Texture::TRILINEAR_SAMPLINGMODE,
-             bool useMipMap            = false);
+             bool useMipMap = false, float margin = 0.f);
   ~MapTexture();
 
   /**
-   * Allocate a rectangle of a given size in the texture map
+   * @brief Allocate a rectangle of a given size in the texture map
    * @param size the size of the rectangle to allocation
    * @return the PackedRect instance corresponding to the allocated rect or null
    * is there was not enough space to allocate it.
@@ -24,14 +24,14 @@ public:
   PackedRect* allocateRect(const Size& size);
 
   /**
-   * Free a given rectangle from the texture map
+   * @brief Free a given rectangle from the texture map
    * @param rectInfo the instance corresponding to the rect to free.
    */
   void freeRect(PackedRect* rectInfo);
 
   /**
-   * Return the available space in the range of [O;1]. 0 being not space left at
-   * all, 1 being an empty texture map.
+   * @brief Return the available space in the range of [O;1]. 0 being not space
+   * left at all, 1 being an empty texture map.
    * This is the cumulated space, not the biggest available surface. Due to
    * fragmentation you may not allocate a rect corresponding to this surface.
    * @returns {}
@@ -39,8 +39,8 @@ public:
   float freeSpace() const;
 
   /**
-   * Bind the texture to the rendering engine to render in the zone of a given
-   * rectangle.
+   * @brief Bind the texture to the rendering engine to render in the zone of a
+   * given rectangle.
    * Use this method when you want to render into the texture map with a
    * clipspace set to the location and size of the given rect.
    * Don't forget to call unbindTexture when you're done rendering
@@ -50,8 +50,8 @@ public:
   void bindTextureForRect(const PackedRect& rect, bool clear);
 
   /**
-   * Bind the texture to the rendering engine to render in the zone of the given
-   * size at the given position.
+   * @brief Bind the texture to the rendering engine to render in the zone of
+   * the given size at the given position.
    * Use this method when you want to render into the texture map with a
    * clipspace set to the location and size of the given rect.
    * Don't forget to call unbindTexture when you're done rendering
@@ -62,7 +62,7 @@ public:
   void bindTextureForPosSize(const Vector2& pos, const Size& size, bool clear);
 
   /**
-   * Unbind the texture map from the rendering engine.
+   * @brief Unbind the texture map from the rendering engine.
    * Call this method when you're done rendering. A previous call to
    * bindTextureForRect has to be made.
    * @param dumpForDebug if set to true the content of the texture map will be

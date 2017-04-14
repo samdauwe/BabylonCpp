@@ -2,6 +2,7 @@
 #define BABYLON_MATERIALS_TEXTURES_MIRROR_TEXTURE_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/engine/engine.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/plane.h>
@@ -12,7 +13,10 @@ class BABYLON_SHARED_EXPORT MirrorTexture : public RenderTargetTexture {
 
 public:
   MirrorTexture(const std::string& name, const ISize& size, Scene* scene,
-                bool generateMipMaps=false);
+                bool generateMipMaps      = false,
+                unsigned int type         = Engine::TEXTURETYPE_UNSIGNED_INT,
+                unsigned int samplingMode = Texture::BILINEAR_SAMPLINGMODE,
+                bool generateDepthBuffer  = true);
   ~MirrorTexture();
 
   std::unique_ptr<MirrorTexture> clone() const;

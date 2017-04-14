@@ -31,37 +31,29 @@ ProceduralTexture::ProceduralTexture(
   auto engine = scene->getEngine();
 
   if (isCube) {
-    RenderTargetCubeTextureOptions options;
+    RenderTargetOptions options;
     options.generateMipMaps = generateMipMaps;
     _texture = engine->createRenderTargetCubeTexture(size, options);
     setFloat("face", 0);
   }
   else {
-    RenderTargetTextureOptions options;
+    RenderTargetOptions options;
     options.generateMipMaps = generateMipMaps;
     _texture                = engine->createRenderTargetTexture(size, options);
   }
 
   // VBO
-  Float32Array vertices;
-  std_util::concat(vertices, {1.f, 1.f,   //
-                              -1.f, 1.f,  //
-                              -1.f, -1.f, //
-                              1.f, -1.f});
+  Float32Array vertices{1.f,  1.f,  //
+                        -1.f, 1.f,  //
+                        -1.f, -1.f, //
+                        1.f,  -1.f};
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
     = std_util::make_unique<VertexBuffer>(
       engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   // Indices
-  Uint32Array indices;
-  indices.emplace_back(0);
-  indices.emplace_back(1);
-  indices.emplace_back(2);
-
-  indices.emplace_back(0);
-  indices.emplace_back(2);
-  indices.emplace_back(3);
+  Uint32Array indices{0, 1, 2, 0, 2, 3};
 
   _indexBuffer = engine->createIndexBuffer(indices);
 }
@@ -89,37 +81,29 @@ ProceduralTexture::ProceduralTexture(const std::string& _name, const Size& size,
   auto engine = scene->getEngine();
 
   if (isCube) {
-    RenderTargetCubeTextureOptions options;
+    RenderTargetOptions options;
     options.generateMipMaps = generateMipMaps;
     _texture = engine->createRenderTargetCubeTexture(size, options);
     setFloat("face", 0);
   }
   else {
-    RenderTargetTextureOptions options;
+    RenderTargetOptions options;
     options.generateMipMaps = generateMipMaps;
     _texture                = engine->createRenderTargetTexture(size, options);
   }
 
   // VBO
-  Float32Array vertices;
-  std_util::concat(vertices, {1.f, 1.f,   //
-                              -1.f, 1.f,  //
-                              -1.f, -1.f, //
-                              1.f, -1.f});
+  Float32Array vertices{1.f,  1.f,  //
+                        -1.f, 1.f,  //
+                        -1.f, -1.f, //
+                        1.f,  -1.f};
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
     = std_util::make_unique<VertexBuffer>(
       engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   // Indices
-  Uint32Array indices;
-  indices.emplace_back(0);
-  indices.emplace_back(1);
-  indices.emplace_back(2);
-
-  indices.emplace_back(0);
-  indices.emplace_back(2);
-  indices.emplace_back(3);
+  Uint32Array indices{0, 1, 2, 0, 2, 3};
 
   _indexBuffer = engine->createIndexBuffer(indices);
 }
@@ -245,7 +229,7 @@ void ProceduralTexture::resize(const Size& size, bool generateMipMaps)
   }
 
   releaseInternalTexture();
-  RenderTargetTextureOptions options;
+  RenderTargetOptions options;
   options.generateMipMaps = generateMipMaps;
   _texture = getScene()->getEngine()->createRenderTargetTexture(size, options);
 }
@@ -389,11 +373,13 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
   for (const auto& item : _vertexBuffers) {
     vertexBuffersTmp[item.first] = item.second.get();
   }
-  engine->bindBuffers(vertexBuffersTmp, _indexBuffer.get(), _effect);
 
   if (isCube) {
     for (unsigned int face = 0; face < 6; ++face) {
       engine->bindFramebuffer(_texture, face);
+
+      // VBOs
+      engine->bindBuffers(vertexBuffersTmp, _indexBuffer.get(), _effect);
 
       _effect->setFloat("face", static_cast<float>(face));
 
@@ -411,6 +397,9 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
   }
   else {
     engine->bindFramebuffer(_texture);
+
+    // VBOs
+    engine->bindBuffers(vertexBuffersTmp, _indexBuffer.get(), _effect);
 
     // Clear
     engine->clear(scene->clearColor, true, true, true);

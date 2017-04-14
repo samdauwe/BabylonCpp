@@ -2,10 +2,11 @@
 
 namespace BABYLON {
 
-RectPackingMap::RectPackingMap(const Size& size)
-    : PackedRect(nullptr, nullptr, Vector2::Zero(), size)
+RectPackingMap::RectPackingMap(const Size& size, float margin)
+    : PackedRect{nullptr, nullptr, Vector2::Zero(), size}
 {
-  _root = this;
+  _margin = margin;
+  _root   = this;
 }
 
 RectPackingMap::~RectPackingMap()

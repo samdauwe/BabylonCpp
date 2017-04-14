@@ -13,8 +13,7 @@
 
 namespace BABYLON {
 
-struct RenderTargetCubeTextureOptions;
-struct RenderTargetTextureOptions;
+struct RenderTargetOptions;
 
 /**
  * @brief The engine class is responsible for interfacing with all lower-level
@@ -228,7 +227,8 @@ public:
   void bindFramebuffer(GL::IGLTexture* texture, unsigned int faceIndex = 0,
                        int requiredWidth = 0, int requiredHeight = 0);
   void unBindFramebuffer(GL::IGLTexture* texture,
-                         bool disableGenerateMipMaps = false);
+                         bool disableGenerateMipMaps                 = false,
+                         const std::function<void()>& onBeforeUnbind = nullptr);
   void generateMipMapsForCubemap(GL::IGLTexture* texture);
   void flushFramebuffer();
   void restoreDefaultFramebuffer();
@@ -389,13 +389,14 @@ public:
                                 const std::function<void()>& onLoad  = nullptr,
                                 const std::function<void()>& onError = nullptr,
                                 Buffer* buffer                       = nullptr);
-  GL::IGLTexture* createTexture(const std::string& url, bool noMipmap,
-                                bool invertY, Scene* scene,
-                                unsigned int samplingMode
-                                = Texture::TRILINEAR_SAMPLINGMODE,
-                                const std::function<void()>& onLoad  = nullptr,
-                                const std::function<void()>& onError = nullptr,
-                                Buffer* buffer                       = nullptr);
+  GL::IGLTexture*
+  createTexture(const std::string& urlArg, bool noMipmap, bool invertY,
+                Scene* scene,
+                unsigned int samplingMode = Texture::TRILINEAR_SAMPLINGMODE,
+                const std::function<void()>& onLoad  = nullptr,
+                const std::function<void()>& onError = nullptr,
+                Buffer* buffer = nullptr, GL::IGLTexture* fallBack = nullptr,
+                unsigned int format = Engine::TEXTUREFORMAT_RGBA);
   void updateRawTexture(GL::IGLTexture* texture, const Uint8Array& data,
                         int format, bool invertY = true,
                         const std::string& compression = "");
@@ -409,20 +410,21 @@ public:
   void updateTextureSamplingMode(unsigned int samplingMode,
                                  GL::IGLTexture* texture);
   void updateDynamicTexture(GL::IGLTexture* texture, ICanvas* canvas,
-                            bool invertY, bool premulAlpha = false);
-  GL::IGLTexture*
-  createRenderTargetTexture(ISize size,
-                            const RenderTargetTextureOptions& options);
+                            bool invertY, bool premulAlpha = false,
+                            unsigned int format = Engine::TEXTUREFORMAT_RGBA);
+  GL::IGLTexture* createRenderTargetTexture(ISize size,
+                                            const RenderTargetOptions& options);
   unsigned int updateRenderTargetTextureSampleCount(GL::IGLTexture* texture,
                                                     unsigned int samples);
   GL::IGLTexture*
   createRenderTargetCubeTexture(const ISize& size,
-                                const RenderTargetCubeTextureOptions& options);
+                                const RenderTargetOptions& options);
   GL::IGLTexture*
   createCubeTexture(const std::string& rootUrl, Scene* scene,
                     const std::vector<std::string>& extensions, bool noMipmap,
                     const std::function<void()>& onLoad  = nullptr,
-                    const std::function<void()>& onError = nullptr);
+                    const std::function<void()>& onError = nullptr,
+                    unsigned int format                  = 0);
   void updateTextureSize(GL::IGLTexture* texture, int width, int height);
   void _releaseTexture(GL::IGLTexture* texture);
   void bindSamplers(Effect* effect);
@@ -599,20 +601,13 @@ private:
 
 }; // end of class Engine
 
-struct RenderTargetCubeTextureOptions {
-  bool generateMipMaps       = true;
-  bool generateDepthBuffer   = true;
-  bool generateStencilBuffer = false;
-  unsigned int samplingMode  = Texture::TRILINEAR_SAMPLINGMODE;
-}; // end of struct RenderTargetTexture
-
-struct RenderTargetTextureOptions {
+struct RenderTargetOptions {
   bool generateMipMaps       = false;
   bool generateDepthBuffer   = true;
   bool generateStencilBuffer = false;
   unsigned int type          = Engine::TEXTURETYPE_UNSIGNED_INT;
   unsigned int samplingMode  = Texture::TRILINEAR_SAMPLINGMODE;
-}; // end of struct RenderTargetTexture
+}; // end of struct RenderTargetOptions
 
 } // end of namespace BABYLON
 

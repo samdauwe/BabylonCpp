@@ -19,27 +19,44 @@ public:
   ~PackedRect();
 
   /**
-   * @returns the position of this node into the map
+   * @brief Returns the position of this node into the map.
    */
-  const Vector2 &pos() const;
+  const Vector2& pos() const;
 
   /**
-   * @returns the size of the rectangle this node handles
+   * @brief Returns the size of the rectangle this node handles.
    */
-  Size *contentSize() const;
+  Size* contentSize() const;
 
   /**
-   * Compute the UV of the top/left, top/right, bottom/right, bottom/left points
-   * of the rectangle this node handles into the map
+   * @brief Retrieve the inner position (considering the margin) and stores it
+   * into the res object.
+   * @param res must be a valid Vector2 that will contain the inner position
+   * after this call.
+   */
+  void getInnerPosToRef(Vector2& res);
+
+  /**
+   * @brief Retrieve the inner size (considering the margin) and stores it into
+   * the res object.
+   * @param res must be a valid Size that will contain the inner size after this
+   * call.
+   */
+  void getInnerSizeToRef(Size& res);
+
+  /**
+   * @brief Compute the UV of the top/left, top/right, bottom/right, bottom/left
+   * points of the rectangle this node handles into the map
    * @returns And array of 4 Vector2, containing UV coordinates for the four
    * corners of the Rectangle into the map
    */
   std::vector<Vector2> UVs();
 
   /**
-   * You may have allocated the PackedRect using over-provisioning (you
+   * @brief You may have allocated the PackedRect using over-provisioning (you
    * allocated more than you need in order to prevent frequent
-   * deallocations/reallocations) and then using only a part of the PackRect.
+   * deallocations/reallocations)
+   * and then using only a part of the PackRect.
    * This method will return the UVs for this part by given the custom size of
    * what you really use
    * @param customSize must be less/equal to the allocated size, UV will be
@@ -48,7 +65,7 @@ public:
   std::vector<Vector2> getUVsForCustomSize(const Size& customSize);
 
   /**
-   * Free this rectangle from the map.
+   * @brief Free this rectangle from the map.
    * Call this method when you no longer need the rectangle to be in the map.
    */
   void freeContent();
@@ -69,6 +86,9 @@ protected:
   PackedRect* _root;
   PackedRect* _parent;
   Size _size;
+
+private:
+  static Size TpsSize;
 
 private:
   std::unique_ptr<Size> _contentSize;

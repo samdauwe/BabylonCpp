@@ -11,8 +11,8 @@ class BABYLON_SHARED_EXPORT RefractionTexture : public RenderTargetTexture {
 
 public:
   /**
-   * Creates a refraction texture used by refraction channel of the standard
-   * material.
+   * @brief Creates a refraction texture used by refraction channel of the
+   * standard material.
    * @param name the texture name
    * @param size size of the underlying texture
    * @param scene root scene

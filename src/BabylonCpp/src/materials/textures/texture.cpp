@@ -16,7 +16,7 @@ Texture::Texture(const std::string& _url, Scene* scene, bool noMipmap,
                  bool invertY, unsigned int samplingMode,
                  const std::function<void()>& onLoad,
                  const std::function<void()>& onError, Buffer* buffer,
-                 bool deleteBuffer)
+                 bool deleteBuffer, unsigned int format)
     : BaseTexture{scene}
     , url{_url}
     , uOffset{0.f}
@@ -28,6 +28,7 @@ Texture::Texture(const std::string& _url, Scene* scene, bool noMipmap,
     , wAng{0.f}
     , _invertY{invertY}
     , _samplingMode{samplingMode}
+    , _format{format}
     , _noMipmap{noMipmap}
     , _rowGenerationMatrix{nullptr}
     , _cachedTextureMatrix{nullptr}
@@ -56,7 +57,8 @@ Texture::Texture(const std::string& _url, Scene* scene, bool noMipmap,
   if (!_texture) {
     if (!scene->useDelayedTextureLoading) {
       _texture = scene->getEngine()->createTexture(
-        url, noMipmap, invertY, scene, _samplingMode, _load, onError, _buffer);
+        url, noMipmap, invertY, scene, _samplingMode, _load, onError, _buffer,
+        nullptr, _format);
       if (deleteBuffer) {
         delete _buffer;
       }
@@ -104,7 +106,7 @@ void Texture::delayLoad()
   if (!_texture) {
     _texture = getScene()->getEngine()->createTexture(
       url, _noMipmap, _invertY, getScene(), _samplingMode, _delayedOnLoad,
-      _delayedOnError, _buffer);
+      _delayedOnError, _buffer, nullptr, _format);
     if (_deleteBuffer) {
       delete _buffer;
     }
@@ -124,16 +126,15 @@ void Texture::updateSamplingMode(unsigned int samplingMode)
 void Texture::_prepareRowForTextureGeneration(float x, float y, float z,
                                               Vector3& t)
 {
-  float _x = x * uScale;
-  float _y = y * vScale;
-  float _z = z;
+  x *= uScale;
+  y *= vScale;
 
-  _x -= 0.5f * uScale;
-  _y -= 0.5f * vScale;
-  _z -= 0.5f;
+  x -= 0.5f * uScale;
+  y -= 0.5f * vScale;
+  z -= 0.5f;
 
-  Vector3::TransformCoordinatesFromFloatsToRef(_x, _y, _z,
-                                               *_rowGenerationMatrix, t);
+  Vector3::TransformCoordinatesFromFloatsToRef(x, y, z, *_rowGenerationMatrix,
+                                               t);
 
   t.x += 0.5f * uScale + uOffset;
   t.y += 0.5f * vScale + vOffset;
@@ -269,10 +270,11 @@ Texture* Texture::CreateFromBase64String(const std::string& /*data*/,
                                          bool noMipmap, bool invertY,
                                          unsigned int samplingMode,
                                          const std::function<void()>& onLoad,
-                                         const std::function<void()>& onError)
+                                         const std::function<void()>& onError,
+                                         unsigned int format)
 {
   return Texture::New("data:" + name, scene, noMipmap, invertY, samplingMode,
-                      onLoad, onError);
+                      onLoad, onError, nullptr, false, format);
 }
 
 std::unique_ptr<BaseTexture>
@@ -287,7 +289,8 @@ Texture* Texture::LoadFromDataString(const std::string& name, Buffer* buffer,
                                      bool noMipmap, bool invertY,
                                      unsigned int samplingMode,
                                      const std::function<void()>& onLoad,
-                                     const std::function<void()>& onError)
+                                     const std::function<void()>& onError,
+                                     unsigned int format)
 {
   std::string _name = name;
   if (_name.substr(0, 5) != "data:") {
@@ -295,7 +298,7 @@ Texture* Texture::LoadFromDataString(const std::string& name, Buffer* buffer,
   }
 
   return Texture::New(name, scene, noMipmap, invertY, samplingMode, onLoad,
-                      onError, buffer, deleteBuffer);
+                      onError, buffer, deleteBuffer, format);
 }
 
 } // end of namespace BABYLON

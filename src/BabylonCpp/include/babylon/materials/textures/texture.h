@@ -30,6 +30,8 @@ public:
   static constexpr unsigned int WRAP_ADDRESSMODE   = 1;
   static constexpr unsigned int MIRROR_ADDRESSMODE = 2;
 
+  static constexpr unsigned int ENGINE_TEXTUREFORMAT_RGBA = 5;
+
   template <typename... Ts>
   static Texture* New(Ts&&... args)
   {
@@ -55,7 +57,8 @@ public:
     bool noMipmap = false, bool invertY = false,
     unsigned int samplingMode            = Texture::TRILINEAR_SAMPLINGMODE,
     const std::function<void()>& onLoad  = nullptr,
-    const std::function<void()>& onError = nullptr);
+    const std::function<void()>& onError = nullptr,
+    unsigned int format                  = ENGINE_TEXTUREFORMAT_RGBA);
   static std::unique_ptr<BaseTexture> Parse(const Json::value& parsedTexture,
                                             Scene* scene,
                                             const std::string& rootUrl);
@@ -65,7 +68,8 @@ public:
                      bool invertY = true, unsigned int samplingMode
                                           = Texture::TRILINEAR_SAMPLINGMODE,
                      const std::function<void()>& onLoad  = nullptr,
-                     const std::function<void()>& onError = nullptr);
+                     const std::function<void()>& onError = nullptr,
+                     unsigned int format = ENGINE_TEXTUREFORMAT_RGBA);
 
 protected:
   Texture(const std::string& url, Scene* scene, bool noMipmap = false,
@@ -73,7 +77,8 @@ protected:
           unsigned int samplingMode           = Texture::TRILINEAR_SAMPLINGMODE,
           const std::function<void()>& onLoad = nullptr,
           const std::function<void()>& onError = nullptr,
-          Buffer* buffer = nullptr, bool deleteBuffer = false);
+          Buffer* buffer = nullptr, bool deleteBuffer = false,
+          unsigned int format = ENGINE_TEXTUREFORMAT_RGBA);
 
 private:
   void _prepareRowForTextureGeneration(float x, float y, float z, Vector3& t);
@@ -89,6 +94,9 @@ public:
   float wAng;
   bool _invertY;
   unsigned int _samplingMode;
+
+protected:
+  unsigned int _format;
 
 private:
   bool _noMipmap;

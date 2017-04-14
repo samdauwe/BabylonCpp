@@ -44,18 +44,17 @@ public:
   bool canRescale() const;
   void scale(float ratio);
   Matrix* getReflectionTextureMatrix();
-  void resize(const ISize& size, bool generateMipMaps);
+  void resize(const ISize& size);
   void render(bool useCameraPostProcess = false, bool dumpForDebug = false);
   void renderToTarget(unsigned int faceIndex,
                       const std::vector<AbstractMesh*>& currentRenderList,
                       size_t currentRenderListLength, bool useCameraPostProcess,
                       bool dumpForDebug);
   /**
-   * Overrides the default sort function applied in the renderging group to
-   * prepare the meshes.
+   * @brief Overrides the default sort function applied in the renderging group
+   * to prepare the meshes.
    * This allowed control for front to back rendering or reversly depending of
-   * the special needs.
-   *
+   * the special needs.   *
    * @param renderingGroupId The rendering group id corresponding to its index
    * @param opaqueSortCompareFn The opaque queue comparison function use to
    * sort.
@@ -65,22 +64,22 @@ public:
    * use to sort.
    */
   void setRenderingOrder(
-    int renderingGroupId,
+    unsigned int renderingGroupId,
     const std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn
     = nullptr,
     const std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn
     = nullptr,
     const std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn
     = nullptr);
+
   /**
-   * Specifies whether or not the stencil and depth buffer are cleared between
-   * two rendering groups.
-   *
+   * @brief Specifies whether or not the stencil and depth buffer are cleared
+   * between two rendering groups.
    * @param renderingGroupId The rendering group id corresponding to its index
    * @param autoClearDepthStencil Automatically clears depth and stencil between
    * groups if true.
    */
-  void setRenderingAutoClearDepthStencil(int renderingGroupId,
+  void setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
                                          bool autoClearDepthStencil);
   std::unique_ptr<RenderTargetTexture> clone() const;
   Json::object serialize() const;
@@ -132,6 +131,9 @@ public:
    */
   Observable<Engine> onClearObservable;
 
+protected:
+  RenderTargetOptions _renderTargetOptions;
+
 private:
   // Events
   Observer<RenderTargetTexture>::Ptr _onAfterUnbindObserver;
@@ -146,6 +148,7 @@ private:
   int _refreshRate;
   std::unique_ptr<Matrix> _textureMatrix;
   unsigned int _samples;
+  int _faceIndex;
 
 }; // end of class RenderTargetTexture
 

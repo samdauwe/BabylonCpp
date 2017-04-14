@@ -6,6 +6,7 @@
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/sub_mesh.h>
+#include <babylon/particles/particle_system.h>
 #include <babylon/postprocess/post_process_manager.h>
 #include <babylon/rendering/rendering_manager.h>
 #include <babylon/tools/tools.h>
@@ -33,31 +34,26 @@ RenderTargetTexture::RenderTargetTexture(
   isRenderTarget = true;
   isCube         = iIsCube;
 
+  _renderTargetOptions.generateMipMaps       = generateMipMaps;
+  _renderTargetOptions.type                  = type;
+  _renderTargetOptions.samplingMode          = samplingMode;
+  _renderTargetOptions.generateDepthBuffer   = generateDepthBuffer;
+  _renderTargetOptions.generateStencilBuffer = generateStencilBuffer;
+
   if (samplingMode == Texture::NEAREST_SAMPLINGMODE) {
     wrapU = Texture::CLAMP_ADDRESSMODE;
     wrapV = Texture::CLAMP_ADDRESSMODE;
   }
 
   if (iIsCube) {
-    RenderTargetCubeTextureOptions options;
-    options.generateMipMaps       = generateMipMaps;
-    options.samplingMode          = samplingMode;
-    options.generateDepthBuffer   = generateDepthBuffer;
-    options.generateStencilBuffer = generateStencilBuffer;
-
-    _texture = scene->getEngine()->createRenderTargetCubeTexture(size, options);
+    _texture = scene->getEngine()->createRenderTargetCubeTexture(
+      size, _renderTargetOptions);
     coordinatesMode = Texture::INVCUBIC_MODE;
     _textureMatrix  = std_util::make_unique<Matrix>(Matrix::Identity());
   }
   else {
-    RenderTargetTextureOptions options;
-    options.generateMipMaps       = generateMipMaps;
-    options.type                  = type;
-    options.samplingMode          = samplingMode;
-    options.generateDepthBuffer   = generateDepthBuffer;
-    options.generateStencilBuffer = generateStencilBuffer;
-
-    _texture = scene->getEngine()->createRenderTargetTexture(size, options);
+    _texture = scene->getEngine()->createRenderTargetTexture(
+      size, _renderTargetOptions);
   }
 
   // Rendering groups
@@ -174,7 +170,7 @@ void RenderTargetTexture::scale(float ratio)
   ISize newSize = {static_cast<int>(static_cast<float>(_size.width) * ratio),
                    static_cast<int>(static_cast<float>(_size.height) * ratio)};
 
-  resize(newSize, _generateMipMaps);
+  resize(newSize);
 }
 
 Matrix* RenderTargetTexture::getReflectionTextureMatrix()
@@ -186,30 +182,23 @@ Matrix* RenderTargetTexture::getReflectionTextureMatrix()
   return Texture::getReflectionTextureMatrix();
 }
 
-void RenderTargetTexture::resize(const ISize& size, bool generateMipMaps)
+void RenderTargetTexture::resize(const ISize& size)
 {
   releaseInternalTexture();
   if (isCube) {
-    RenderTargetCubeTextureOptions options;
-    _texture
-      = getScene()->getEngine()->createRenderTargetCubeTexture(size, options);
+    _texture = getScene()->getEngine()->createRenderTargetCubeTexture(
+      size, _renderTargetOptions);
   }
   else {
-    RenderTargetTextureOptions options;
-    options.generateMipMaps = generateMipMaps;
-    _texture
-      = getScene()->getEngine()->createRenderTargetTexture(size, options);
+    _texture = getScene()->getEngine()->createRenderTargetTexture(
+      size, _renderTargetOptions);
   }
 }
 
 void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
 {
-  auto scene = getScene();
-
-  if (activeCamera && activeCamera != scene->activeCamera) {
-    scene->setTransformMatrix(activeCamera->getViewMatrix(),
-                              activeCamera->getProjectionMatrix(true));
-  }
+  auto scene  = getScene();
+  auto engine = scene->getEngine();
 
   if (!_waitingRenderList.empty()) {
     renderList.clear();
@@ -224,28 +213,42 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
   if (renderListPredicate) {
     renderList.clear(); // Clear previous renderList
 
-    /*for (auto& mesh : getScene()->meshes) {
-      if (renderListPredicate(mesh)) {
-        renderList.emplace_back(mesh);
+    for (auto& mesh : getScene()->meshes) {
+      if (renderListPredicate(mesh.get())) {
+        renderList.emplace_back(mesh.get());
       }
-    }*/
+    }
   }
 
   if (renderList.empty()) {
     return;
   }
 
+  // Set custom projection.
+  // Needs to be before binding to prevent changing the aspect ratio.
+  if (activeCamera) {
+    engine->setViewport(activeCamera->viewport);
+
+    if (activeCamera != scene->activeCamera) {
+      scene->setTransformMatrix(activeCamera->getViewMatrix(),
+                                activeCamera->getProjectionMatrix(true));
+    }
+  }
+  else {
+    engine->setViewport(scene->activeCamera->viewport);
+  }
+
   // Prepare renderingManager
   _renderingManager->reset();
 
-  auto& currentRenderList      = renderList;
-  auto currentRenderListLength = currentRenderList.size();
+  auto& currentRenderList = renderList;
   if (renderList.empty()) {
     auto& activeMeshes = scene->getActiveMeshes();
     for (auto& mesh : activeMeshes) {
       currentRenderList.emplace_back(dynamic_cast<AbstractMesh*>(mesh));
     }
   }
+  auto currentRenderListLength = currentRenderList.size();
 
   for (auto& mesh : currentRenderList) {
     if (mesh) {
@@ -259,9 +262,19 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
         mesh->_activate(scene->getRenderId());
         for (auto& subMesh : mesh->subMeshes) {
           scene->_activeIndices.addCount(subMesh->indexCount, false);
-          //_renderingManager->dispatch(subMesh);
+          _renderingManager->dispatch(subMesh.get());
         }
       }
+    }
+  }
+
+  for (auto& particleSystem : scene->particleSystems) {
+    if (!particleSystem->isStarted() || !particleSystem->emitter
+        || !particleSystem->emitter->isEnabled()) {
+      continue;
+    }
+    if (std_util::index_of(currentRenderList, particleSystem->emitter) >= 0) {
+      _renderingManager->dispatchParticles(particleSystem.get());
     }
   }
 
@@ -284,6 +297,8 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
     scene->setTransformMatrix(scene->activeCamera->getViewMatrix(),
                               scene->activeCamera->getProjectionMatrix(true));
   }
+
+  engine->setViewport(scene->activeCamera->viewport);
 
   scene->resetCachedMaterial();
 }
@@ -308,7 +323,7 @@ void RenderTargetTexture::renderToTarget(
     }
   }
 
-  int _faceIndex = static_cast<int>(faceIndex);
+  _faceIndex = static_cast<int>(faceIndex);
   onBeforeRenderObservable.notifyObservers(&_faceIndex);
 
   // Clear
@@ -328,14 +343,13 @@ void RenderTargetTexture::renderToTarget(
                             renderParticles, renderSprites);
 
   if (useCameraPostProcess) {
-    scene->postProcessManager->_finalizeFrame(false, _texture, _faceIndex);
+    scene->postProcessManager->_finalizeFrame(
+      false, _texture, static_cast<unsigned>(_faceIndex));
   }
 
   if (!_doNotChangeAspectRatio) {
     scene->updateTransformMatrix(true);
   }
-
-  onAfterRenderObservable.notifyObservers(&_faceIndex);
 
   // Dump ?
   if (dumpForDebug) {
@@ -350,12 +364,17 @@ void RenderTargetTexture::renderToTarget(
       }
     }
 
-    engine->unBindFramebuffer(_texture, isCube);
+    engine->unBindFramebuffer(_texture, isCube, [this]() {
+      onAfterRenderObservable.notifyObservers(&_faceIndex);
+    });
+  }
+  else {
+    onAfterRenderObservable.notifyObservers(&_faceIndex);
   }
 }
 
 void RenderTargetTexture::setRenderingOrder(
-  int renderingGroupId,
+  unsigned int renderingGroupId,
   const std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn,
   const std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn,
   const std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn)
@@ -366,7 +385,7 @@ void RenderTargetTexture::setRenderingOrder(
 }
 
 void RenderTargetTexture::setRenderingAutoClearDepthStencil(
-  int renderingGroupId, bool autoClearDepthStencil)
+  unsigned int renderingGroupId, bool autoClearDepthStencil)
 {
   _renderingManager->setRenderingAutoClearDepthStencil(renderingGroupId,
                                                        autoClearDepthStencil);
@@ -376,7 +395,10 @@ std::unique_ptr<RenderTargetTexture> RenderTargetTexture::clone() const
 {
   auto textureSize = getSize();
   auto newTexture  = std_util::make_unique<RenderTargetTexture>(
-    name, textureSize, getScene(), _generateMipMaps);
+    name, textureSize, getScene(), _renderTargetOptions.generateMipMaps,
+    _doNotChangeAspectRatio, _renderTargetOptions.type, isCube,
+    _renderTargetOptions.samplingMode, _renderTargetOptions.generateDepthBuffer,
+    _renderTargetOptions.generateStencilBuffer);
 
   // Base texture
   newTexture->hasAlpha = hasAlpha;
