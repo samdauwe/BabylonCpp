@@ -203,7 +203,8 @@ struct BABYLON_SHARED_EXPORT Float32x4 {
    */
   static inline float32x4_t load(const std::array<float, 4>& f)
   {
-    return _mm_load_ps(f.data());
+    const float ALIGN_16 data[4] = {f[0], f[1], f[2], f[3]};
+    return _mm_load_ps(data);
   }
 
   /**
@@ -215,7 +216,7 @@ struct BABYLON_SHARED_EXPORT Float32x4 {
    */
   static inline float32x4_t load(const std::array<float, 16>& m, unsigned int i)
   {
-    float ALIGN_16 f[4] = {m[i], m[i + 1], m[i + 2], m[i + 3]};
+    const float ALIGN_16 f[4] = {m[i], m[i + 1], m[i + 2], m[i + 3]};
     return _mm_load_ps(f);
   }
 
@@ -238,12 +239,12 @@ struct BABYLON_SHARED_EXPORT Float32x4 {
   static inline void store(std::array<float, 16>& dest, unsigned int i,
                            float32x4_t src)
   {
-    std::array<float, 4> p;
-    _mm_store_ps(p.data(), src);
+    float p[4] = {0.f, 0.f, 0.f, 0.f};
+    _mm_store_ps(p, src);
     dest[i]     = p[0];
-    dest[i + 1] = p[2];
-    dest[i + 2] = p[3];
-    dest[i + 3] = p[4];
+    dest[i + 1] = p[1];
+    dest[i + 2] = p[2];
+    dest[i + 3] = p[3];
   }
 
   /**
@@ -256,10 +257,10 @@ struct BABYLON_SHARED_EXPORT Float32x4 {
   static inline float32x4_t replaceLane(float32x4_t src, unsigned int i,
                                         float v)
   {
-    std::array<float, 4> dest;
-    _mm_store_ps(dest.data(), src);
+    float ALIGN_16 dest[4] = {0.f, 0.f, 0.f, 0.f};
+    _mm_store_ps(dest, src);
     dest[i] = v;
-    return _mm_load_ps(dest.data());
+    return _mm_load_ps(dest);
   }
 
   /**
@@ -416,11 +417,11 @@ struct BABYLON_SHARED_EXPORT Float32x4 {
   static inline float32x4_t swizzle(Float32x4 a, unsigned int x, unsigned int y,
                                     unsigned int z, unsigned int w)
   {
-    std::array<float, 4> p;
-    _mm_store_ps(p.data(), a.xmm);
-    std::array<float, 4> res{{p[x], p[y], p[z], p[w]}};
+    float ALIGN_16 p[4] = {0.f, 0.f, 0.f, 0.f};
+    _mm_store_ps(p, a.xmm);
+    const float ALIGN_16 res[4] = {p[x], p[y], p[z], p[w]};
 
-    return _mm_load_ps(res.data());
+    return _mm_load_ps(res);
   }
 
   /**
@@ -439,11 +440,11 @@ struct BABYLON_SHARED_EXPORT Float32x4 {
                                     unsigned int y, unsigned int z,
                                     unsigned int w)
   {
-    std::array<float, 4> p;
-    _mm_store_ps(p.data(), a);
-    std::array<float, 4> res{{p[x], p[y], p[z], p[w]}};
+    float ALIGN_16 p[4] = {0.f, 0.f, 0.f, 0.f};
+    _mm_store_ps(p, a);
+    const float ALIGN_16 res[4] = {p[x], p[y], p[z], p[w]};
 
-    return _mm_load_ps(res.data());
+    return _mm_load_ps(res);
   }
 
   /**

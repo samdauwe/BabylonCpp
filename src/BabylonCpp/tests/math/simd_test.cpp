@@ -108,7 +108,7 @@ TEST(TestSIMDFloat32x4, reciprocalSqrtApproximation)
   EXPECT_TRUE(std::abs(dest[3] - (1.f / std::sqrt(input[3]))) < 1e-3f);
 }
 
-TEST(TestSIMDFloat32x4, DISABLED_replaceLane)
+TEST(TestSIMDFloat32x4, replaceLane)
 {
   using namespace BABYLON;
 
