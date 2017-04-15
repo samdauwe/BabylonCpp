@@ -13,6 +13,11 @@ branches:
   only:
     - master
 
+env:
+  # Workaround for https://github.com/travis-ci/travis-ci/issues/4681
+  matrix:
+    - TRAVIS_EMPTY_JOB_WORKAROUND=true
+
 addons:
   apt:
     sources:
@@ -23,6 +28,25 @@ addons:
       - clang-3.7
       - g++-5
       - gcc-5
+
+matrix:
+  exclude:
+    - env: TRAVIS_EMPTY_JOB_WORKAROUND=true
+
+  include:
+    ####################################################################
+    # Build with the main configuration on all the supported compilers #
+    ####################################################################
+
+    # Clang 3.7
+    - os: linux
+      env: CXX="clang++-3.7" CC="clang-3.7"
+      compiler: clang
+
+    # GCC 5
+    - os: linux
+      env: CXX="g++-5" CC="gcc-5"
+      compiler: gcc
 
 install:
   ###################################################################
@@ -41,17 +65,15 @@ install:
       export PATH=${DEPS_DIR}/cmake/bin:${PATH}
     fi
   - cmake --version
-  
-  ############################
-  # Set the compiler version #
-  ############################
-  - if [ "$TRAVIS_OS_NAME" = "linux" -a "$CXX" = "clang++" ]; then export CXX="clang++-3.7" CC="clang-3.7"; fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" -a "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
+
+before_script:
+  ####################################################################
+  # Go back to the root of the project and setup the build directory #
+  ####################################################################
+  - cd ${TRAVIS_BUILD_DIR}
+  - mkdir build && cd build && cmake ../
 
 script:
-  - cd ${TRAVIS_BUILD_DIR}
-  - mkdir build && cd build
-  - cmake ../
   - make all
 
 notifications:
