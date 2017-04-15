@@ -171,7 +171,13 @@ void RenderingGroup::renderSorted(
   }
 
   auto sortedArray = subMeshes;
-  std::sort(sortedArray.begin(), sortedArray.end(), sortCompareFn);
+
+  // sort using a custom function object
+  std::sort(
+    sortedArray.begin(), sortedArray.end(),
+    [&sortCompareFn](SubMesh* a, SubMesh* b) { return sortCompareFn(a, b); });
+
+  // std::sort(sortedArray.begin(), sortedArray.end(), sortCompareFn);
 
   for (auto& subMesh : sortedArray) {
     subMesh->render(transparent);

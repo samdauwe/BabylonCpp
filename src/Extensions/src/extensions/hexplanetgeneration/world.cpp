@@ -815,7 +815,10 @@ void World::processElevationBorderQueue(
     elevationBorderQueue.erase(elevationBorderQueue.begin(), itend);
 
     std::sort(elevationBorderQueue.begin(), elevationBorderQueue.end(),
-              elevationBorderQueueSorter);
+              [&elevationBorderQueueSorter](const ElevationBorder& a,
+                                            const ElevationBorder& b) {
+                return elevationBorderQueueSorter(a, b);
+              });
   }
 }
 
