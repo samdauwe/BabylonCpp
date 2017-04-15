@@ -66,13 +66,18 @@ install:
     fi
   - cmake --version
 
+  ############################
+  # Set the compiler version #
+  ############################
+  - if [ "$TRAVIS_OS_NAME" = "linux" -a "$CXX" = "clang++" ]; then export CXX="clang++-3.7" CC="clang-3.7"; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" -a "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
+
 before_script:
   ####################################################################
   # Go back to the root of the project and setup the build directory #
   ####################################################################
   - cd ${TRAVIS_BUILD_DIR}
-  - mkdir build && cd build
-  - cmake ../
+  - mkdir build && cd build && cmake ../
 
 script:
   - make all
