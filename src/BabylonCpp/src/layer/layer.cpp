@@ -9,9 +9,9 @@
 namespace BABYLON {
 
 Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene,
-             bool _isBackground, const Color4& _color)
-    : isBackground{_isBackground}
-    , color{_color}
+             bool iIsBackground, const Color4& iColor)
+    : isBackground{iIsBackground}
+    , color{iColor}
     , scale{Vector2(1.f, 1.f)}
     , offset{Vector2(0.f, 0.f)}
     , alphaBlendingMode{Engine::ALPHA_COMBINE}
@@ -30,9 +30,9 @@ Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene,
   // VBO
   Float32Array vertices{1.f, 1.f, -1.f, 1.f, -1.f, -1.f, 1.f, -1.f};
 
-  VertexBuffer* vertexBuffer = new VertexBuffer(
-    engine, vertices, VertexBuffer::PositionKind, false, false, 2);
-  _vertexBuffers[VertexBuffer::PositionKindChars] = vertexBuffer;
+  _vertexBuffers[VertexBuffer::PositionKindChars]
+    = std_util::make_unique<VertexBuffer>(
+      engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   // Indices
   Uint32Array indices{0, 1, 2, 0, 2, 3};
@@ -83,14 +83,14 @@ void Layer::setOnAfterRender(const std::function<void()>& callback)
 
 void Layer::render()
 {
-  Effect* currentEffect = alphaTest ? _alphaTestEffect : _effect;
+  auto currentEffect = alphaTest ? _alphaTestEffect : _effect;
 
   // Check
   if (!currentEffect->isReady() || !texture || !texture->isReady()) {
     return;
   }
 
-  Engine* engine = _scene->getEngine();
+  auto engine = _scene->getEngine();
 
   onBeforeRenderObservable.notifyObservers(this);
 
@@ -110,7 +110,11 @@ void Layer::render()
   currentEffect->setVector2("scale", scale);
 
   // VBOs
-  engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), currentEffect);
+  std::unordered_map<std::string, VertexBuffer*> vertexBuffersTmp;
+  for (auto& item : _vertexBuffers) {
+    vertexBuffersTmp[item.first] = item.second.get();
+  }
+  engine->bindBuffers(vertexBuffersTmp, _indexBuffer.get(), currentEffect);
 
   // Draw order
   if (!_alphaTestEffect) {
@@ -127,7 +131,7 @@ void Layer::render()
 
 void Layer::dispose(bool /*doNotRecurse*/)
 {
-  VertexBuffer* vertexBuffer = _vertexBuffers[VertexBuffer::PositionKindChars];
+  auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKindChars];
   if (vertexBuffer) {
     vertexBuffer->dispose();
     _vertexBuffers.erase(VertexBuffer::PositionKindChars);

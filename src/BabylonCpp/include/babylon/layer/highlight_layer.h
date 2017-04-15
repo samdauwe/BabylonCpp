@@ -45,57 +45,57 @@ public:
   ~HighlightLayer();
 
   /**
-   * Specifies the horizontal size of the blur.
+   * @brief Specifies the horizontal size of the blur.
    */
   void setBlurHorizontalSize(float value);
 
   /**
-   * Specifies the vertical size of the blur.
+   * @brief Specifies the vertical size of the blur.
    */
   void setBlurVerticalSize(float value);
 
   /**
-   * Gets the horizontal size of the blur.
+   * @brief Gets the horizontal size of the blur.
    */
   float blurHorizontalSize() const;
 
   /**
-   * Gets the vertical size of the blur.
+   * @brief Gets the vertical size of the blur.
    */
   float blurVerticalSize() const;
 
   /**
-   * Gets the camera attached to the layer.
+   * @brief Gets the camera attached to the layer.
    */
   Camera* camera() const;
 
   /**
-   * Gets the render target texture.
+   * @brief Gets the render target texture.
    */
   RenderTargetTexture* mainTexture() const;
 
   /**
-   * Renders the glowing part of the scene by blending the blurred glowing
-   * meshes on top of the rendered scene.
+   * @brief Renders the glowing part of the scene by blending the blurred
+   * glowing meshes on top of the rendered scene.
    */
   void render();
 
   /**
-   * Add a mesh in the exclusion list to prevent it to impact or being impacted
-   * by the highlight layer.
+   * @brief Add a mesh in the exclusion list to prevent it to impact or being
+   * impacted by the highlight layer.
    * @param mesh The mesh to exclude from the highlight layer
    */
   void addExcludedMesh(Mesh* mesh);
 
   /**
-    * Remove a mesh from the exclusion list to let it impact or being impacted
-   * by the highlight layer.
-    * @param mesh The mesh to highlight
-    */
+   * @brief Remove a mesh from the exclusion list to let it impact or being
+   * impacted by the highlight layer.
+   * @param mesh The mesh to highlight
+   */
   void removeExcludedMesh(Mesh* mesh);
 
   /**
-   * Add a mesh in the highlight layer in order to make it glow with the
+   * @brief Add a mesh in the highlight layer in order to make it glow with the
    * chosen color.
    * @param mesh The mesh to highlight
    * @param color The color of the highlight
@@ -104,24 +104,26 @@ public:
   void addMesh(Mesh* mesh, const Color3& color, bool glowEmissiveOnly = false);
 
   /**
-   * Remove a mesh from the highlight layer in order to make it stop glowing.
+   * @brief Remove a mesh from the highlight layer in order to make it stop
+   * glowing.
    * @param mesh The mesh to highlight
    */
   void removeMesh(Mesh* mesh);
 
   /**
-   * Returns true if the layer contains information to display, otherwise false.
+   * @brief Returns true if the layer contains information to display, otherwise
+   * false.
    */
   bool shouldRender() const;
 
   /**
-   * Dispose the highlight layer and free resources.
+   * @brief Dispose the highlight layer and free resources.
    */
   void dispose();
 
 protected:
   /**
-   * Instantiates a new highlight Layer and references it to the scene..
+   * @brief Instantiates a new highlight Layer and references it to the scene..
    * @param name The name of the layer
    * @param scene The scene to use the layer in
    * @param options Sets of none mandatory options to use with the layer (see
@@ -133,19 +135,18 @@ protected:
 
 private:
   /**
-   * Creates the render target textures and post processes used in the
-   * highlight
-   * layer.
+   * @brief Creates the render target textures and post processes used in the
+   * highlight layer.
    */
   void createTextureAndPostProcesses();
 
   /**
-   * Custom render function.
+   * @brief Custom render function.
    */
   void renderSubMesh(SubMesh* subMesh);
 
   /**
-   * Checks for the readiness of the element composing the layer.
+   * @brief Checks for the readiness of the element composing the layer.
    * @param subMesh the mesh to check for
    * @param useInstances specify wether or not to use instances to render the
    * mesh
@@ -157,18 +158,19 @@ private:
                BaseTexture* emissiveTexture);
 
   /**
-   * Sets the main texture desired size which is the closest power of two
+   * @brief Sets the main texture desired size which is the closest power of two
    * of the engine canvas size.
    */
   void setMainTextureSize();
 
   /**
-   * Force the stencil to the normal expected value for none glowing parts
+   * @brief Force the stencil to the normal expected value for none glowing
+   * parts
    */
   void defaultStencilReference(Mesh* mesh);
 
   /**
-   * Dispose only the render target textures and post process.
+   * @brief Dispose only the render target textures and post process.
    */
   void disposeTextureAndPostProcesses();
 
@@ -244,11 +246,11 @@ private:
   std::unique_ptr<RenderTargetTexture> _blurTexture;
   std::unique_ptr<RenderTargetTexture> _mainTexture;
   ISize _mainTextureDesiredSize;
-  std::unordered_map<std::string, IHighlightLayerMesh> _meshes;
+  std::unordered_map<unsigned int, IHighlightLayerMesh> _meshes;
   int _maxSize;
   bool _shouldRender;
   int _instanceGlowingMeshStencilReference;
-  std::unordered_map<std::string, IHighlightLayerExcludedMesh> _excludedMeshes;
+  std::unordered_map<unsigned int, IHighlightLayerExcludedMesh> _excludedMeshes;
 
 }; // end of struct HighlightLayer
 

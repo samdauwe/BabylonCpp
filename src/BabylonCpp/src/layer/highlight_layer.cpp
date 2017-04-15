@@ -134,11 +134,13 @@ void HighlightLayer::createTextureAndPostProcesses()
   blurTextureWidth  = Tools::GetExponentOfTwo(blurTextureWidth, _maxSize);
   blurTextureHeight = Tools::GetExponentOfTwo(blurTextureHeight, _maxSize);
 
-  /*_mainTexture
+#if 0
+  _mainTexture
     = std_util::make_unique<RenderTargetTexture>(new RenderTargetTexture(
       "HighlightLayerMainRTT",
       {_mainTextureDesiredSize.width, _mainTextureDesiredSize.height}, _scene,
-      false, true, Engine::TEXTURETYPE_UNSIGNED_INT));*/
+      false, true, Engine::TEXTURETYPE_UNSIGNED_INT));
+#endif
   _mainTexture->activeCamera              = _options.camera;
   _mainTexture->wrapU                     = Texture::CLAMP_ADDRESSMODE;
   _mainTexture->wrapV                     = Texture::CLAMP_ADDRESSMODE;
@@ -147,10 +149,12 @@ void HighlightLayer::createTextureAndPostProcesses()
   _mainTexture->renderParticles = false;
   _mainTexture->renderList.clear();
 
-  /*_blurTexture
+#if 0
+  _blurTexture
     = std_util::make_unique<RenderTargetTexture>(new RenderTargetTexture(
       "HighlightLayerBlurRTT", {blurTextureWidth, blurTextureHeight}, _scene,
-      false, true, Engine::TEXTURETYPE_UNSIGNED_INT));*/
+      false, true, Engine::TEXTURETYPE_UNSIGNED_INT));
+#endif
   _blurTexture->wrapU                     = Texture::CLAMP_ADDRESSMODE;
   _blurTexture->wrapV                     = Texture::CLAMP_ADDRESSMODE;
   _blurTexture->anisotropicFilteringLevel = 16;
@@ -207,9 +211,9 @@ void HighlightLayer::createTextureAndPostProcesses()
   });
 
   _mainTexture->customRenderFunction
-    = [&](const std::vector<SubMesh*>& opaqueSubMeshes,
-          const std::vector<SubMesh*>& transparentSubMeshes,
-          const std::vector<SubMesh*>& alphaTestSubMeshes) {
+    = [this](const std::vector<SubMesh*>& opaqueSubMeshes,
+             const std::vector<SubMesh*>& transparentSubMeshes,
+             const std::vector<SubMesh*>& alphaTestSubMeshes) {
         onBeforeRenderMainTextureObservable.notifyObservers(this);
 
         for (auto& opaqueSubMesh : opaqueSubMeshes) {
@@ -225,7 +229,7 @@ void HighlightLayer::createTextureAndPostProcesses()
         }
       };
 
-  _mainTexture->onClearObservable.add([&](Engine* engine) {
+  _mainTexture->onClearObservable.add([this](Engine* engine) {
     engine->clear(HighlightLayer::neutralColor, true, true, true);
   });
 }
@@ -246,21 +250,20 @@ void HighlightLayer::renderSubMesh(SubMesh* subMesh)
   }
 
   // Excluded Mesh
-  if (std_util::contains(_excludedMeshes, mesh->id)) {
+  if (std_util::contains(_excludedMeshes, mesh->uniqueId)) {
     return;
   };
 
   bool hardwareInstancedRendering
     = (engine->getCaps().instancedArrays != nullptr)
-    /*&& (std::find(batch->visibleInstances.begin(),
-                    batch->visibleInstances.end(), subMesh->_id)
-          != batch->visibleInstances.end())
-      && (!batch->visibleInstances[subMesh->_id].empty())*/;
+      && std_util::contains(batch->visibleInstances, subMesh->_id)
+      && (!batch->visibleInstances[subMesh->_id].empty());
 
-  bool hashighlightLayerMesh   = std_util::contains(_meshes, mesh->id);
+  bool hashighlightLayerMesh   = std_util::contains(_meshes, mesh->uniqueId);
   auto material                = subMesh->getMaterial();
   BaseTexture* emissiveTexture = nullptr;
-  if (hashighlightLayerMesh && _meshes[mesh->id].glowEmissiveOnly && material) {
+  if (hashighlightLayerMesh && _meshes[mesh->uniqueId].glowEmissiveOnly
+      && material) {
     auto standardMaterial = dynamic_cast<StandardMaterial*>(material);
     if (standardMaterial) {
       emissiveTexture = standardMaterial->emissiveTexture;
@@ -274,7 +277,7 @@ void HighlightLayer::renderSubMesh(SubMesh* subMesh)
     _glowMapGenerationEffect->setMatrix("viewProjection",
                                         scene->getTransformMatrix());
     if (hashighlightLayerMesh) {
-      auto& highlightLayerMesh = _meshes[mesh->id];
+      auto& highlightLayerMesh = _meshes[mesh->uniqueId];
       _glowMapGenerationEffect->setFloat4("color", highlightLayerMesh.color.r,
                                           highlightLayerMesh.color.g,
                                           highlightLayerMesh.color.b, 1.f);
@@ -443,12 +446,9 @@ void HighlightLayer::render()
 
   // VBOs
   std::unordered_map<std::string, VertexBuffer*> _vertexBuffersTmp;
-  /*std::for_each(
-    _vertexBuffers.begin(), _vertexBuffers.end(),
-    [&_vertexBuffersTmp](
-      const std::pair<std::string, std::unique_ptr<VertexBuffer>>& item) {
-      _vertexBuffersTmp[item.first] = item.second.get();
-    });*/
+  for (auto& item : _vertexBuffers) {
+    _vertexBuffersTmp[item.first] = item.second.get();
+  }
   engine->bindBuffers(_vertexBuffersTmp, _indexBuffer.get(), currentEffect);
 
   // Draw order
@@ -490,32 +490,32 @@ void HighlightLayer::render()
 
 void HighlightLayer::addExcludedMesh(Mesh* mesh)
 {
-  if (!std_util::contains(_excludedMeshes, mesh->id)) {
+  if (!std_util::contains(_excludedMeshes, mesh->uniqueId)) {
     IHighlightLayerExcludedMesh meshExcluded;
     meshExcluded.mesh         = mesh;
     meshExcluded.beforeRender = mesh->onBeforeRenderObservable.add(
       [](Mesh* mesh) { mesh->getEngine()->setStencilBuffer(false); });
     meshExcluded.afterRender = mesh->onAfterRenderObservable.add(
       [](Mesh* mesh) { mesh->getEngine()->setStencilBuffer(true); });
-    _excludedMeshes[mesh->id] = meshExcluded;
+    _excludedMeshes[mesh->uniqueId] = meshExcluded;
   }
 }
 
 void HighlightLayer::removeExcludedMesh(Mesh* mesh)
 {
-  if (std_util::contains(_excludedMeshes, mesh->id)) {
-    auto& meshExcluded = _excludedMeshes[mesh->id];
+  if (std_util::contains(_excludedMeshes, mesh->uniqueId)) {
+    auto& meshExcluded = _excludedMeshes[mesh->uniqueId];
     mesh->onBeforeRenderObservable.remove(meshExcluded.beforeRender);
     mesh->onAfterRenderObservable.remove(meshExcluded.afterRender);
-    _excludedMeshes.erase(mesh->id);
+    _excludedMeshes.erase(mesh->uniqueId);
   }
 }
 
 void HighlightLayer::addMesh(Mesh* mesh, const Color3& color,
                              bool glowEmissiveOnly)
 {
-  if (std_util::contains(_meshes, mesh->id)) {
-    _meshes[mesh->id].color = color;
+  if (std_util::contains(_meshes, mesh->uniqueId)) {
+    _meshes[mesh->uniqueId].color = color;
   }
   else {
     IHighlightLayerMesh newMesh;
@@ -524,7 +524,7 @@ void HighlightLayer::addMesh(Mesh* mesh, const Color3& color,
     // Lambda required for capture due to Observable this context
     newMesh.observerHighlight
       = mesh->onBeforeRenderObservable.add([&](Mesh* mesh) {
-          if (std_util::contains(_excludedMeshes, mesh->id)) {
+          if (std_util::contains(_excludedMeshes, mesh->uniqueId)) {
             defaultStencilReference(mesh);
           }
           else {
@@ -535,7 +535,7 @@ void HighlightLayer::addMesh(Mesh* mesh, const Color3& color,
     newMesh.observerDefault = mesh->onAfterRenderObservable.add(
       [&](Mesh* mesh) { defaultStencilReference(mesh); });
     newMesh.glowEmissiveOnly = glowEmissiveOnly;
-    _meshes[mesh->id]        = newMesh;
+    _meshes[mesh->uniqueId]  = newMesh;
   }
 
   _shouldRender = true;
@@ -543,11 +543,11 @@ void HighlightLayer::addMesh(Mesh* mesh, const Color3& color,
 
 void HighlightLayer::removeMesh(Mesh* mesh)
 {
-  if (std_util::contains(_meshes, mesh->id)) {
-    auto& meshHighlight = _meshes[mesh->id];
+  if (std_util::contains(_meshes, mesh->uniqueId)) {
+    auto& meshHighlight = _meshes[mesh->uniqueId];
     mesh->onBeforeRenderObservable.remove(meshHighlight.observerHighlight);
     mesh->onAfterRenderObservable.remove(meshHighlight.observerDefault);
-    _meshes.erase(mesh->id);
+    _meshes.erase(mesh->uniqueId);
   }
 
   _shouldRender = _meshes.empty() ? false : true;

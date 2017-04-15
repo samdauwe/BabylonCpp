@@ -322,10 +322,26 @@ inline C& concat_with_no_duplicates(C& a, const C& b)
   return a;
 }
 
-template <typename C, typename T>
-constexpr bool contains(const C& c, const T& elem)
+// Sequence (i.e. std::vector or std::list)
+template <template <typename, typename> class C, template <typename> class A,
+          typename T, typename V>
+constexpr bool contains(const C<T, A<T>>& c, const V& elem)
 {
-  return std::find(c.begin(), c.end(), elem) != c.end();
+  return std::find(c.begin(), c.end(), T(elem)) != c.end();
+}
+
+// Set
+template <typename C, typename A>
+constexpr bool contains(const std::set<C>& c, const A& elem)
+{
+  return c.find(C(elem)) != c.end();
+}
+
+// Unordered Map
+template <typename C, typename A, typename T>
+constexpr bool contains(const std::unordered_map<C, T>& c, const A& elem)
+{
+  return c.find(C(elem)) != c.end();
 }
 
 template <typename C, typename T>
@@ -334,20 +350,6 @@ inline C& insert_at(C& c, size_t pIndex, const T& elem)
   c.insert(c.begin() + pIndex, elem);
 
   return c;
-}
-
-template <typename T>
-constexpr bool contains(const std::unordered_map<std::string, T>& c,
-                        const std::string& elem)
-{
-  return c.find(elem) != c.end();
-}
-
-template <typename T>
-constexpr bool contains(const std::unordered_map<std::string, T>& c,
-                        const char* elem)
-{
-  return contains(c, std::string(elem));
 }
 
 template <typename K, typename V>

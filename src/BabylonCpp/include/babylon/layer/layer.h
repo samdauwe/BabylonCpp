@@ -17,7 +17,7 @@ public:
   Layer(const std::string& name, const std::string& imgUrl, Scene* scene,
         bool isBackground   = true,
         const Color4& color = Color4(1.f, 1.f, 1.f, 1.f));
-  ~Layer();
+  virtual ~Layer();
 
   // Events
   void setOnDispose(const std::function<void()>& callback);
@@ -31,17 +31,14 @@ public:
   // Events
   /**
    * An event triggered when the layer is disposed.
-   * @type {BABYLON.Observable}
    */
   Observable<Layer> onDisposeObservable;
   /**
    * An event triggered before rendering the scene
-   * @type {BABYLON.Observable}
    */
   Observable<Layer> onBeforeRenderObservable;
   /**
    * An event triggered after rendering the scene
-   * @type {BABYLON.Observable}
    */
   Observable<Layer> onAfterRenderObservable;
   // Properties
@@ -61,7 +58,7 @@ private:
   // Properties
   std::string _name;
   Scene* _scene;
-  std::unordered_map<std::string, VertexBuffer*> _vertexBuffers;
+  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   Effect* _effect;
   Effect* _alphaTestEffect;
