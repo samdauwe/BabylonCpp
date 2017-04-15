@@ -154,10 +154,16 @@ if(NOT OPTION_NO_AUTO_LIBCPP AND "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
                    "(OPTION_NO_AUTO_LIBCPP not defined)")
     set(EXTRA_FLAGS "${EXTRA_FLAGS} -stdlib=libc++")
   endif()
-  # restore CXX flags
+  # Restore CXX flags
   set(CMAKE_CXX_FLAGS "${CXXFLAGS_BACKUP}")
 endif()
 
+# Allow unused private fields when using clang
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+  set(EXTRA_FLAGS "${EXTRA_FLAGS} -Wno-unused-private-field")
+endif()
+
+# Enable Position Independent Code (PIC) in shared libraries
 if(NOT MINGW)
   set(EXTRA_FLAGS "${EXTRA_FLAGS} -fPIC")
 endif()
@@ -210,5 +216,5 @@ if(NOT CMAKE_BUILD_TYPE)
 #  set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
 
-# needed by subprojects
+# Needed by subprojects
 set(LD_FLAGS ${LD_FLAGS} ${CMAKE_LD_LIBS})
