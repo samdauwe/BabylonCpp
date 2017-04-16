@@ -7,7 +7,7 @@
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/vector3.h>
-//#include <babylon/tools/observable.h>
+#include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
@@ -73,7 +73,9 @@ public:
   float maxAngularSpeed;
   Texture* particleTexture;
   unsigned int layerMask;
-  // Observable<ParticleSystem> onDisposeObservable;
+  std::string customShader;
+  bool preventAutoStart;
+  Observable<ParticleSystem> onDisposeObservable;
   std::function<void(std::vector<Particle*>& particles)> updateFunction;
   int blendMode;
   bool forceDepthWrite;
@@ -94,15 +96,15 @@ public:
     startPositionFunction;
 
 private:
-  // Observer<ParticleSystem> _onDisposeObserver;
+  Observer<ParticleSystem>::Ptr _onDisposeObserver;
   std::vector<Particle*> particles;
   size_t _capacity;
   Scene* _scene;
   std::vector<Particle*> _stockParticles;
   int _newPartsExcess;
   Float32Array _vertexData;
-  Buffer* _vertexBuffer;
-  std::unordered_map<std::string, VertexBuffer*> _vertexBuffers;
+  std::unique_ptr<Buffer> _vertexBuffer;
+  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   Effect* _effect;
   Effect* _customEffect;

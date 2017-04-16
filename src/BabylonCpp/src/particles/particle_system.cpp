@@ -13,10 +13,10 @@
 
 namespace BABYLON {
 
-ParticleSystem::ParticleSystem(const std::string& _name, size_t capacity,
+ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
                                Scene* scene, Effect* customEffect)
-    : id{_name}
-    , name{_name}
+    : id{iName}
+    , name{iName}
     , renderingGroupId{0}
     , emitter{nullptr}
     , emitRate{10}
@@ -24,15 +24,16 @@ ParticleSystem::ParticleSystem(const std::string& _name, size_t capacity,
     , updateSpeed{0.01f}
     , targetStopDuration{0}
     , disposeOnStop{false}
-    , minEmitPower{1}
-    , maxEmitPower{1}
-    , minLifeTime{1}
-    , maxLifeTime{1}
-    , minSize{1}
-    , maxSize{1}
-    , minAngularSpeed{0}
-    , maxAngularSpeed{0}
+    , minEmitPower{1.f}
+    , maxEmitPower{1.f}
+    , minLifeTime{1.f}
+    , maxLifeTime{1.f}
+    , minSize{1.f}
+    , maxSize{1.f}
+    , minAngularSpeed{0.f}
+    , maxAngularSpeed{0.f}
     , layerMask{0x0FFFFFFF}
+    , preventAutoStart{false}
     , blendMode{ParticleSystem::BLENDMODE_ONEONE}
     , forceDepthWrite{false}
     , gravity{Vector3::Zero()}
@@ -76,25 +77,27 @@ ParticleSystem::ParticleSystem(const std::string& _name, size_t capacity,
   // 11 floats per particle (x, y, z, r, g, b, a, angle, size, offsetX, offsetY)
   // + 1 filler
   _vertexData.resize(capacity * 11 * 4);
-  /*_vertexBuffer = new Buffer(scene->getEngine(), _vertexData, true, 11);
+  _vertexBuffer
+    = std_util::make_unique<Buffer>(scene->getEngine(), _vertexData, true, 11);
 
-  VertexBuffer* positions
+  auto positions
     = _vertexBuffer->createVertexBuffer(VertexBuffer::PositionKind, 0, 3);
-  VertexBuffer* colors
-    = _vertexBuffer->createVertexBuffer(VertexBuffer::ColorKindChars, 3, 4);
-  VertexBuffer* options = _vertexBuffer->createVertexBuffer("options", 7, 4);
+  auto colors
+    = _vertexBuffer->createVertexBuffer(VertexBuffer::ColorKind, 3, 4);
+  auto options
+    = _vertexBuffer->createVertexBuffer(VertexBuffer::OptionsKind, 7, 4);
 
-  _vertexBuffers[VertexBuffer::PositionKindChars] = positions;
-  _vertexBuffers[VertexBuffer::ColorKindChars]    = colors;
-  _vertexBuffers["options"]                       = options;*/
+  _vertexBuffers[VertexBuffer::PositionKindChars] = std::move(positions);
+  _vertexBuffers[VertexBuffer::ColorKindChars]    = std::move(colors);
+  _vertexBuffers["options"]                       = std::move(options);
 
   // Default behaviors
   startDirectionFunction
     = [this](float emitPower, const Matrix& worldMatrix,
              Vector3& directionToUpdate, Particle* /*particle*/) {
-        float randX = Math::randomNumber(direction1.x, direction2.x);
-        float randY = Math::randomNumber(direction1.y, direction2.y);
-        float randZ = Math::randomNumber(direction1.z, direction2.z);
+        const float randX = Math::randomNumber(direction1.x, direction2.x);
+        const float randY = Math::randomNumber(direction1.y, direction2.y);
+        const float randZ = Math::randomNumber(direction1.z, direction2.z);
 
         Vector3::TransformNormalFromFloatsToRef(
           randX * emitPower, randY * emitPower, randZ * emitPower, worldMatrix,
@@ -104,9 +107,9 @@ ParticleSystem::ParticleSystem(const std::string& _name, size_t capacity,
   startPositionFunction = [this](const Matrix& worldMatrix,
                                  Vector3& positionToUpdate,
                                  Particle* /*particle*/) {
-    float randX = Math::randomNumber(minEmitBox.x, maxEmitBox.x);
-    float randY = Math::randomNumber(minEmitBox.y, maxEmitBox.y);
-    float randZ = Math::randomNumber(minEmitBox.z, maxEmitBox.z);
+    const float randX = Math::randomNumber(minEmitBox.x, maxEmitBox.x);
+    const float randY = Math::randomNumber(minEmitBox.y, maxEmitBox.y);
+    const float randZ = Math::randomNumber(minEmitBox.z, maxEmitBox.z);
 
     Vector3::TransformCoordinatesFromFloatsToRef(randX, randY, randZ,
                                                  worldMatrix, positionToUpdate);
@@ -114,7 +117,7 @@ ParticleSystem::ParticleSystem(const std::string& _name, size_t capacity,
 
   updateFunction = [this](std::vector<Particle*>& _particles) {
     for (unsigned int pIndex = 0; pIndex < _particles.size(); ++pIndex) {
-      Particle* particle = _particles[pIndex];
+      auto particle = _particles[pIndex];
       particle->age += static_cast<float>(_scaledUpdateSpeed);
 
       if (particle->age >= particle->lifeTime) {
@@ -153,17 +156,17 @@ IReflect::Type ParticleSystem::type() const
   return IReflect::Type::PARTICLESYSTEM;
 }
 
-void ParticleSystem::setOnDispose(const FastFunc<void()>& /*callback*/)
+void ParticleSystem::setOnDispose(const FastFunc<void()>& callback)
 {
-  /*if (_onDisposeObserver) {
+  if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);
   }
-  _onDisposeObserver = onDisposeObservable.add(callback);*/
+  _onDisposeObserver = onDisposeObservable.add(callback);
 }
 
 void ParticleSystem::recycleParticle(Particle* particle)
 {
-  Particle* lastParticle = particles.back();
+  auto lastParticle = particles.back();
   particles.pop_back();
 
   if (lastParticle != particle) {
@@ -225,14 +228,7 @@ void ParticleSystem::_update(int newParticles)
   updateFunction(particles);
 
   // Add new ones
-  Matrix worldMatrix;
-
-  // if (emitter->position()) {
-  //  worldMatrix = *emitter->getWorldMatrix();
-  //}
-  // else {
-  // worldMatrix = Matrix::Translation(emitter->x, emitter->y, emitter->z);
-  //}
+  auto worldMatrix = *emitter->getWorldMatrix();
 
   for (int index = 0; index < newParticles; ++index) {
     if (particles.size() == _capacity) {
@@ -304,7 +300,7 @@ void ParticleSystem::animate()
   if (!_started)
     return;
 
-  Effect* effect = _getEffect();
+  auto effect = _getEffect();
 
   // Check
   if (!emitter || !effect->isReady() || !particleTexture
@@ -370,12 +366,13 @@ void ParticleSystem::animate()
     _appendParticleVertex(++offset, particle, 1, 1);
     _appendParticleVertex(++offset, particle, 0, 1);
   }
-  //_scene->getEngine()->updateDynamicVertexBuffer(_vertexBuffer, _vertices);
+
+  _vertexBuffer->update(_vertexData);
 }
 
 size_t ParticleSystem::render()
 {
-  Effect* effect = _getEffect();
+  auto effect = _getEffect();
 
   // Check
   if (!emitter || !effect->isReady() || !particleTexture
@@ -383,13 +380,13 @@ size_t ParticleSystem::render()
     return 0;
   }
 
-  Engine* engine = _scene->getEngine();
+  auto engine = _scene->getEngine();
 
   // Render
   engine->enableEffect(effect);
   engine->setState(false);
 
-  Matrix viewMatrix = _scene->getViewMatrix();
+  auto viewMatrix = _scene->getViewMatrix();
   effect->setTexture("diffuseSampler", particleTexture);
   effect->setMatrix("view", viewMatrix);
   effect->setMatrix("projection", _scene->getProjectionMatrix());
@@ -397,8 +394,8 @@ size_t ParticleSystem::render()
                     textureMask.a);
 
   if (_scene->clipPlane()) {
-    Plane* clipPlane = _scene->clipPlane();
-    Matrix invView   = viewMatrix;
+    auto clipPlane = _scene->clipPlane();
+    auto invView   = viewMatrix;
     invView.invert();
     effect->setMatrix("invView", invView);
     effect->setFloat4("vClipPlane", clipPlane->normal.x, clipPlane->normal.y,
@@ -406,7 +403,11 @@ size_t ParticleSystem::render()
   }
 
   // VBOs
-  engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), effect);
+  std::unordered_map<std::string, VertexBuffer*> vertexBuffersTmp;
+  for (auto& item : _vertexBuffers) {
+    vertexBuffersTmp[item.first] = item.second.get();
+  }
+  engine->bindBuffers(vertexBuffersTmp, _indexBuffer.get(), effect);
 
   // Draw order
   if (blendMode == ParticleSystem::BLENDMODE_ONEONE) {
@@ -429,7 +430,7 @@ size_t ParticleSystem::render()
 void ParticleSystem::dispose(bool /*doNotRecurse*/)
 {
   if (_vertexBuffer) {
-    //_scene->getEngine()->_releaseBuffer(_vertexBuffer);
+    _vertexBuffer->dispose();
     _vertexBuffer = nullptr;
   }
 
@@ -444,17 +445,17 @@ void ParticleSystem::dispose(bool /*doNotRecurse*/)
   }
 
   // Remove from scene
-  // TODO FIXME
-  /*auto it = std::find(_scene->particleSystems.begin(),
-                      _scene->particleSystems.end(), this);
-  if (it != _scene->particleSystems.end()) {
-    _scene->particleSystems.erase(it);
-  }*/
+  _scene->particleSystems.erase(
+    std::remove_if(
+      _scene->particleSystems.begin(), _scene->particleSystems.end(),
+      [this](const std::unique_ptr<ParticleSystem>& particleSystem) {
+        return particleSystem.get() == this;
+      }),
+    _scene->particleSystems.end());
 
   // Callback
-  // if (onDispose) {
-  //  onDispose();
-  //}
+  onDisposeObservable.notifyObservers(this);
+  onDisposeObservable.clear();
 }
 
 std::vector<Animation*> ParticleSystem::getAnimations()
@@ -495,6 +496,12 @@ ParticleSystem* ParticleSystem::Parse(const Json::value& parsedParticleSystem,
 
   if (parsedParticleSystem.contains("id")) {
     particleSystem->id = Json::GetString(parsedParticleSystem, "id");
+  }
+
+  // Auto start
+  if (parsedParticleSystem.contains("preventAutoStart")) {
+    particleSystem->preventAutoStart
+      = Json::GetBool(parsedParticleSystem, "preventAutoStart");
   }
 
   // Texture
@@ -576,7 +583,7 @@ ParticleSystem* ParticleSystem::Parse(const Json::value& parsedParticleSystem,
   particleSystem->blendMode = Json::GetNumber(parsedParticleSystem, "blendMode",
                                               ParticleSystem::BLENDMODE_ONEONE);
 
-  if (!Json::GetBool(parsedParticleSystem, "preventAutoStart")) {
+  if (!particleSystem->preventAutoStart) {
     particleSystem->start();
   }
 

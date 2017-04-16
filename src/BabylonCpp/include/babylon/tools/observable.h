@@ -44,7 +44,7 @@ public:
   }
 
   /**
-   * Create a new Observer with the specified callback
+   * @brief Create a new Observer with the specified callback.
    * @param callback the callback that will be executed for that
    * Observer
    * @param mask the mask used to filter observers
@@ -73,10 +73,9 @@ public:
   }
 
   /**
-   * Remove an Observer from the Observable object
+   * @brief Remove an Observer from the Observable object.
    * @param observer the instance of the Observer to remove. If it doesn't
-   * belong
-   * to this Observable, false will be returned.
+   * belong to this Observable, false will be returned.
    */
   bool remove(typename Observer<T>::Ptr observer)
   {
@@ -92,8 +91,8 @@ public:
   }
 
   /**
-   * Remove a callback from the Observable object
-   * @param callback the callback to remove. If it doesn't belong to this
+   * @brief Remove a callback from the Observable object.
+   * @param callback the callback to remove. If it doesn't belong to this.
    * Observable, false will be returned.
    */
   bool removeCallback(const CallbackFunc& callback)
@@ -110,8 +109,8 @@ public:
   }
 
   /**
-   * Notify all Observers by calling their respective callback with the
-   * given data
+   * @brief Notify all Observers by calling their respective callback with the
+   * given data.
    * @param eventData
    * @param mask
    */
@@ -133,7 +132,7 @@ public:
   }
 
   /**
-   * return true is the Observable has at least one Observer registered
+   * @brief Return true is the Observable has at least one Observer registered.
    */
   bool hasObservers() const
   {
@@ -141,7 +140,7 @@ public:
   }
 
   /**
-   * Clear the list of observers
+   * @brief Clear the list of observers.
    */
   void clear()
   {
@@ -149,7 +148,7 @@ public:
   }
 
   /**
-   * Clone the current observable
+   * @brief Clone the current observable.
    */
   Observable<T>::SPtr clone() const
   {
@@ -158,6 +157,22 @@ public:
     result->_observers = _observers;
 
     return result;
+  }
+
+  /**
+   * @brief Does this observable handles observer registered with a given mask.
+   * @param {number} trigger - the mask to be tested
+   * @returns Whether or not one observer registered with the given mask is
+   *          handeled.
+   **/
+  bool hasSpecificMask(int mask = -1)
+  {
+    for (const auto& obs : _observers) {
+      if (obs.mask & mask && obs.mask == mask) {
+        return true;
+      }
+    }
+    return false;
   }
 
 private:
