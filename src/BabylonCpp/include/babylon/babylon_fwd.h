@@ -135,6 +135,7 @@ class DebugLayer;
 class RayHelper;
 class SkeletonViewer;
 // --- Engine ---
+class ClickInfo;
 class Engine;
 struct EngineCapabilities;
 struct EngineOptions;

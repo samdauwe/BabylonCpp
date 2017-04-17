@@ -274,8 +274,8 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
   };
 
   // Render target texture callbacks
-  Color3 savedSceneClearColor;
-  Color3 sceneClearColor(0.f, 0.f, 0.f);
+  Color4 savedSceneClearColor;
+  Color4 sceneClearColor(0.f, 0.f, 0.f, 1.f);
 
   _volumetricLightScatteringRTT->onBeforeRenderObservable.add([&]() {
     savedSceneClearColor = scene->clearColor;

@@ -32,6 +32,13 @@ public:
   static microseconds_t MinDeltaTime;
   static microseconds_t MaxDeltaTime;
 
+  static unsigned int DragMovementThreshold; // in pixels
+  static milliseconds_t LongPressDelay;      // in milliseconds
+  static milliseconds_t DoubleClickDelay;    // in milliseconds
+  static bool ExclusiveDoubleClickMode; // If you need to check double click
+                                        // without raising a single click at
+                                        // first click, enable this flag
+
   template <typename... Ts>
   static std::unique_ptr<Scene> New(Ts&&... args)
   {
@@ -58,26 +65,33 @@ public:
   void resetClipPlane();
   void setMirroredCameraPosition(const Vector3& newPosition);
   StandardMaterial* defaultMaterial();
+  std::array<Plane, 6>& frustumPlanes();
+  const std::array<Plane, 6>& frustumPlanes() const;
   DebugLayer* debugLayer();
   void setWorkerCollisions(bool enabled);
   bool workerCollisions() const;
   Octree<AbstractMesh*>* SelectionOctree();
+
   /**
-   * The mesh that is currently under the pointer.
+   * @brief The mesh that is currently under the pointer.
    * @return {BABYLON.AbstractMesh} mesh under the pointer/mouse cursor or null
    * if none.
    */
   AbstractMesh* meshUnderPointer();
+
   /**
-   * Current on-screen X position of the pointer
+   * @brief Current on-screen X position of the pointer
    * @return {number} X position of the pointer
    */
+
   int pointerX();
+
   /**
-   * Current on-screen Y position of the pointer
+   * @brief Current on-screen Y position of the pointer
    * @return {number} Y position of the pointer
    */
   int pointerY();
+
   Material* getCachedMaterial();
   BoundingBoxRenderer* getBoundingBoxRenderer();
   OutlineRenderer* getOutlineRenderer();
@@ -106,10 +120,12 @@ public:
   float getAnimationRatio() const;
   int getRenderId() const;
   void incrementRenderId();
+
   /** Pointers handling **/
+
   /**
-   * Attach events to the canvas (To handle actionManagers triggers and raise
-   * onPointerMove, onPointerDown and onPointerUp
+   * @brief Attach events to the canvas (To handle actionManagers triggers and
+   * raise onPointerMove, onPointerDown and onPointerUp
    * @param attachUp defines if you want to attach events to pointerup
    * @param attachDown defines if you want to attach events to pointerdown
    * @param attachMove defines if you want to attach events to pointermove
@@ -128,16 +144,19 @@ public:
   void _addPendingData(GL::IGLTexture* texure);
   void _removePendingData(GL::IGLTexture* texture);
   void getWaitingItemsCount();
+
   /**
-   * Registers a function to be executed when the scene is ready.
+   * @brief Registers a function to be executed when the scene is ready.
    * @param {Function} func - the function to be executed.
    */
   void executeWhenReady(const std::function<void()>& func);
   void _checkIsReady();
+
   /** Animations **/
   std::vector<Animation*> getAnimations() override;
+
   /**
-   * Will start the animation sequence of a given target
+   * @brief Will start the animation sequence of a given target.
    * @param target - the target
    * @param {number} from - from which frame should animation start
    * @param {number} to - till which frame should animation run.
@@ -164,8 +183,9 @@ public:
                        const std::function<void()>& onAnimationEnd = nullptr);
   Animatable* getAnimatableByTarget(IAnimatable* target);
   std::vector<Animatable*>& animatables();
+
   /**
-   * Will stop the animation of the given target
+   * @brief Will stop the animation of the given target.
    * @param target - the target
    * @param animationName - the name of the animation to stop (all animations
    * will be stopped is empty)
@@ -179,6 +199,7 @@ public:
   const Matrix& getProjectionMatrix() const;
   Matrix getTransformMatrix();
   void setTransformMatrix(Matrix& view, Matrix& projection);
+
   /** Methods **/
   void addMesh(std::unique_ptr<AbstractMesh>&& newMesh);
   int removeMesh(AbstractMesh* toRemove);
@@ -187,144 +208,168 @@ public:
   int removeCamera(Camera* toRemove);
   void addLight(std::unique_ptr<Light>&& newLight);
   void addCamera(std::unique_ptr<Camera>&& newCamera);
+
   /**
-   * Switch active camera
+   * @brief Switch active camera.
    * @param {Camera} newCamera - new active camera
    * @param {boolean} attachControl - call attachControl for the new active
    * camera (default: true)
    */
   void switchActiveCamera(Camera* newCamera, bool attachControl = true);
+
   /**
-   * sets the active camera of the scene using its ID
+   * @brief Sets the active camera of the scene using its ID.
    * @param {string} id - the camera's ID
    * @return {BABYLON.Camera|null} the new active camera or null if none found.
    * @see activeCamera
    */
   Camera* setActiveCameraByID(const std::string& id);
+
   /**
-   * sets the active camera of the scene using its name
+   * @brief Sets the active camera of the scene using its name.
    * @param {string} name - the camera's name
    * @return {BABYLON.Camera|null} the new active camera or null if none found.
    * @see activeCamera
    */
   Camera* setActiveCameraByName(const std::string& name);
+
   /**
-   * get a material using its id
+   * @brief Get a material using its id.
    * @param {string} the material's ID
    * @return {BABYLON.Material|null} the material or null if none found.
    */
   Material* getMaterialByID(const std::string& id);
+
   /**
-   * get a material using its name
+   * @brief Get a material using its name.
    * @param {string} the material's name
    * @return {BABYLON.Material|null} the material or null if none found.
    */
   Material* getMaterialByName(const std::string& name);
+
   LensFlareSystem* getLensFlareSystemByName(const std::string& name);
   LensFlareSystem* getLensFlareSystemByID(const std::string& id);
   std::vector<Camera*> getCameras() const;
   Camera* getCameraByID(const std::string& id);
   Camera* getCameraByUniqueID(unsigned int uniqueId);
+
   /**
-   * get a camera using its name
+   * @brief Get a camera using its name.
    * @param {string} the camera's name
    * @return {BABYLON.Camera|null} the camera or null if none found.
    */
   Camera* getCameraByName(const std::string& name);
+
   /**
-   * get a bone using its id
+   * @brief Get a bone using its id.
    * @param {string} the bone's id
    * @return {BABYLON.Bone|null} the bone or null if not found
    */
   Bone* getBoneByID(const std::string& id);
+
   /**
-   * get a bone using its id
+   * @brief Get a bone using its id.
    * @param {string} the bone's name
    * @return {BABYLON.Bone|null} the bone or null if not found
    */
   Bone* getBoneByName(const std::string& name);
+
   /**
-   * get a light node using its name
+   * @brief Get a light node using its name.
    * @param {string} the light's name
    * @return {BABYLON.Light|null} the light or null if none found.
    */
   Light* getLightByName(const std::string& name);
+
   /**
-   * get a light node using its ID
+   * @brief Get a light node using its ID.
    * @param {string} the light's id
    * @return {BABYLON.Light|null} the light or null if none found.
    */
   Light* getLightByID(const std::string& id);
+
   /**
-   * get a light node using its scene-generated unique ID
+   * @brief Get a light node using its scene-generated unique ID.
    * @param {number} the light's unique id
    * @return {BABYLON.Light|null} the light or null if none found.
    */
   Light* getLightByUniqueID(unsigned int uniqueId);
+
   /**
-   * get a particle system by id
+   * @brief Get a particle system by id.
    * @param id {number} the particle system id
    * @return {BABYLON.ParticleSystem|null} the corresponding system or null if
    * none found.
    */
   ParticleSystem* getParticleSystemByID(const std::string& id);
+
   /**
-   * get a geometry using its ID
+   * @brief Get a geometry using its ID.
    * @param {string} the geometry's id
    * @return {BABYLON.Geometry|null} the geometry or null if none found.
    */
   Geometry* getGeometryByID(const std::string& id);
+
   /**
-   * add a new geometry to this scene.
+   * @brief Add a new geometry to this scene.
    * @param {BABYLON.Geometry} geometry - the geometry to be added to the scene.
    * @param {boolean} [force] - force addition, even if a geometry with this ID
    * already exists
    * @return {boolean} was the geometry added or not
    */
   bool pushGeometry(std::unique_ptr<Geometry>&& geometry, bool force = false);
+
   /**
-   * Removes an existing geometry
+   * @brief Removes an existing geometry.
    * @param {BABYLON.Geometry} geometry - the geometry to be removed from the
    * scene.
    * @return {boolean} was the geometry removed or not
    */
   bool removeGeometry(Geometry* geometry);
+
   std::vector<std::unique_ptr<Geometry>>& getGeometries();
+
   /**
-   * Get the first added mesh found of a given ID
+   * @brief Get the first added mesh found of a given ID.
    * @param {string} id - the id to search for
    * @return {BABYLON.AbstractMesh|null} the mesh found or null if not found at
    * all.
    */
   AbstractMesh* getMeshByID(const std::string& id);
+
   /**
-   * Get the all added meshes found of a given ID
+   * @brief Get the all added meshes found of a given ID.
    * @param {string} id - the id to search for
    * @return {BABYLON.AbstractMesh[]|[]]} the meshes found or an empty list if
    * not found at all.
    */
   std::vector<AbstractMesh*> getMeshesByID(const std::string& id);
+
   /**
-   * Get a mesh with its auto-generated unique id
+   * @brief Get a mesh with its auto-generated unique id.
    * @param {number} uniqueId - the unique id to search for
    * @return {BABYLON.AbstractMesh|null} the mesh found or null if not found at
    * all.
    */
   AbstractMesh* getMeshByUniqueID(unsigned int uniqueId);
+
   /**
-   * Get a the last added mesh found of a given ID
+   * @brief Get a the last added mesh found of a given ID.
    * @param {string} id - the id to search for
    * @return {BABYLON.AbstractMesh|null} the mesh found or null if not found at
    * all.
    */
   AbstractMesh* getLastMeshByID(const std::string& id);
+
   std::vector<AbstractMesh*> getMeshes() const;
+
   /**
-   * Get a the last added node (Mesh, Camera, Light) found of a given ID
+   * @brief Get a the last added node (Mesh, Camera, Light) found of a given ID.
    * @param {string} id - the id to search for
    * @return {BABYLON.Node|null} the node found or null if not found at all.
    */
   Node* getLastEntryByID(const std::string& id);
+
   Node* getNodeByID(const std::string& id);
   Node* getNodeByName(const std::string& name);
   AbstractMesh* getMeshByName(const std::string& name);
@@ -333,14 +378,24 @@ public:
   Skeleton* getSkeletonById(const std::string& id);
   Skeleton* getSkeletonByName(const std::string& name);
   bool isActiveMesh(Mesh* mesh);
+
   /**
-   * Return a unique id as a string which can serve as an identifier for the
-   * scene
+   * @brief Return a the first highlight layer of the scene with a given name.
+   * @param name The name of the highlight layer to look for.
+   * @return The highlight layer if found otherwise null.
+   */
+  HighlightLayer* getHighlightLayerByName(const std::string& name);
+
+  /**
+   * @brief Return a unique id as a string which can serve as an identifier for
+   * the scene.
    */
   std::string uid();
+
   bool _isInIntermediateRendering() const;
   void updateTransformMatrix(bool force = false);
   void render();
+
   /** Audio **/
   bool audioEnabled() const;
   void setAudioEnabled(bool value);
@@ -348,21 +403,27 @@ public:
   void setHeadphone(bool value);
   void _switchAudioModeForHeadphones();
   void _switchAudioModeForNormalSpeakers();
+
   /** Rendering **/
   DepthRenderer* enableDepthRenderer();
   void disableDepthRenderer();
   void freezeMaterials();
   void unfreezeMaterials();
   void dispose(bool doNotRecurse = false) override;
+  bool isDisposed() const;
+
   /** Release sounds & sounds tracks **/
   void disposeSounds();
+
   /** Octrees **/
   MinMax getWorldExtends();
   Octree<AbstractMesh*>* createOrUpdateSelectionOctree(size_t maxCapacity = 64,
                                                        size_t maxDepth    = 2);
+
   /** Picking **/
   Ray* createPickingRay(int x, int y, Matrix* world, Camera* camera);
   Ray* createPickingRayInCameraSpace(int x, int y, Camera* camera);
+
   /**
    * @brief Launch a ray to try to pick a mesh in the scene
    * @param x X position on screen
@@ -378,6 +439,7 @@ public:
   PickingInfo* pick(int x, int y,
                     const std::function<bool(AbstractMesh* mesh)>& predicate,
                     bool fastCheck = false, Camera* camera = nullptr);
+
   /**
    * @brief Launch a ray to try to pick a mesh in the scene
    * @param x X position on screen
@@ -395,6 +457,7 @@ public:
   PickingInfo* pickWithRay(const Ray& ray,
                            const std::function<bool(Mesh* mesh)>& predicate,
                            bool fastCheck = false);
+
   /**
    * @brief Launch a ray to try to pick a mesh in the scene
    * @param x X position on screen
@@ -410,6 +473,7 @@ public:
   multiPick(int x, int y,
             const std::function<bool(AbstractMesh* mesh)>& predicate,
             Camera* camera);
+
   /**
    * @brief Launch a ray to try to pick a mesh in the scene
    * @param ray Ray to use
@@ -425,8 +489,10 @@ public:
   void setPointerOverMesh(AbstractMesh* mesh);
   void setPointerOverSprite(Sprite* sprite);
   Sprite* getPointerOverSprite() const;
+
   /** Physics **/
   PhysicsEngine* getPhysicsEngine();
+
   /**
    * Enables physics to the current scene
    * @param {BABYLON.Vector3} [gravity] - the scene's gravity for the physics
@@ -436,10 +502,13 @@ public:
    * @return {boolean} was the physics engine initialized
    */
   bool enablePhysics(const Vector3& gravity, IPhysicsEnginePlugin* plugin);
+
   void disablePhysicsEngine();
   bool isPhysicsEnabled();
+
   /** Misc. **/
-  void createDefaultCameraOrLight();
+  void createDefaultCameraOrLight(bool createArcRotateCamera = false);
+
   /** Tags **/
   std::vector<Mesh*> getMeshesByTags();
   std::vector<Camera*> getCamerasByTags();
@@ -447,11 +516,10 @@ public:
   std::vector<Material*> getMaterialByTags();
 
   /**
-   * Overrides the default sort function applied in the renderging group to
-   * prepare the meshes.
+   * @brief Overrides the default sort function applied in the renderging group
+   * to prepare the meshes.
    * This allowed control for front to back rendering or reversly depending of
    * the special needs.
-   *
    * @param renderingGroupId The rendering group id corresponding to its index
    * @param opaqueSortCompareFn The opaque queue comparison function use to
    * sort.
@@ -461,7 +529,7 @@ public:
    * use to sort.
    */
   void setRenderingOrder(
-    int renderingGroupId,
+    unsigned int renderingGroupId,
     const std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn
     = nullptr,
     const std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn
@@ -470,19 +538,24 @@ public:
     = nullptr);
 
   /**
-   * Specifies whether or not the stencil and depth buffer are cleared between
-   * two rendering groups.
-   *
+   * @brief Specifies whether or not the stencil and depth buffer are cleared
+   * between two rendering groups.
    * @param renderingGroupId The rendering group id corresponding to its index
    * @param autoClearDepthStencil Automatically clears depth and stencil between
    * groups if true.
+   * @param depth Automatically clears depth between groups if true and
+   * autoClear is true.
+   * @param stencil Automatically clears stencil between groups if true and
+   * autoClear is true.
    */
-  void setRenderingAutoClearDepthStencil(int renderingGroupId,
-                                         bool autoClearDepthStencil);
+  void setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
+                                         bool autoClearDepthStencil,
+                                         bool depth   = true,
+                                         bool stencil = true);
 
 protected:
   /**
-   * Constructor
+   * @brief Constructor.
    * @param {BABYLON.Engine} engine - the engine to be used to render this
    * scene.
    */
@@ -490,7 +563,7 @@ protected:
 
 private:
   void _updatePointerPosition(const PointerEvent evt);
-  void _animate(const millisecond_t& delay = std::chrono::milliseconds(0));
+  void _animate();
   void _evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh);
   void _evaluateActiveMeshes();
   void _activeMesh(AbstractMesh* mesh);
@@ -527,7 +600,7 @@ private:
 public:
   // Members
   bool autoClear;
-  Color3 clearColor;
+  Color4 clearColor;
   Color3 ambientColor;
   // Events
   /**
@@ -764,12 +837,36 @@ private:
   std::function<void(PointerEvent&& evt)> _onPointerMove;
   std::function<void(PointerEvent&& evt)> _onPointerDown;
   std::function<void(PointerEvent&& evt)> _onPointerUp;
+  std::function<void(
+    Observable<PointerInfoPre>& obs1, Observable<PointerInfo>& obs2,
+    PointerEvent&& evt,
+    const std::function<void(const ClickInfo& clickInfo,
+                             const PointerInfo& pickResult)>& cb)>
+    _initClickEvent;
+  std::function<ActionManager*(ActionManager* act, const ClickInfo& clickInfo)>
+    _initActionManager;
+  std::function<void(
+    unsigned int btn, const ClickInfo& clickInfo,
+    const std::function<void(const ClickInfo& clickInfo,
+                             const PointerInfo& pickResult)>& cb)>
+    _delayedSimpleClick;
+  milliseconds_t _delayedSimpleClickTimeout;
+  milliseconds_t _previousDelayedSimpleClickTimeout;
+  bool _meshPickProceed;
+  bool _previousButtonPressed;
+  bool _previousHasSwiped;
+  std::unique_ptr<PickingInfo> _currentPickResult;
+  std::unique_ptr<PickingInfo> _previousPickResult;
+  bool _isButtonPressed;
+  bool _doubleClickOccured;
   int _pointerX;
   int _pointerY;
   int _unTranslatedPointerX;
   int _unTranslatedPointerY;
   Vector2 _startingPointerPosition;
+  Vector2 _previousStartingPointerPosition;
   high_res_time_point_t _startingPointerTime;
+  high_res_time_point_t _previousStartingPointerTime;
   // AbstractMesh* _meshUnderPointer;
   std::function<void()> beforeRender;
   std::function<void()> afterRender;
@@ -800,12 +897,14 @@ private:
   PerfCounter _renderTargetsDuration;
   PerfCounter _renderDuration;
   float _animationRatio;
-  bool _animationStartDateSet;
-  high_res_time_point_t _animationStartDate;
+  bool _animationTimeLastSet;
+  high_res_time_point_t _animationTimeLast;
+  int _animationTime;
+  size_t animationTimeScale;
   int _renderId;
   int _executeWhenReadyTimeoutId;
   bool _intermediateRendering;
-  // _pendingData = [];//ANY
+  std::vector<std::string> _pendingData;
   std::vector<Mesh*> _activeMeshes;
   std::vector<Material*> _processedMaterials;
   std::vector<RenderTargetTexture*> _renderTargets;
@@ -829,6 +928,7 @@ private:
   std::unique_ptr<DepthRenderer> _depthRenderer;
   unsigned int _uniqueIdCounter;
   AbstractMesh* _pickedDownMesh;
+  AbstractMesh* _pickedUpMesh;
   Sprite* _pickedDownSprite;
   std::string _uid;
 

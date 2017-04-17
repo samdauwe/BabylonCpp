@@ -6,6 +6,7 @@
 #include <babylon/audio/sound_track.h>
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
+#include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/cameras/free_camera.h>
 #include <babylon/collisions/collision_coordinator_legacy.h>
@@ -53,9 +54,14 @@ namespace BABYLON {
 microseconds_t Scene::MinDeltaTime = std::chrono::milliseconds(1);
 microseconds_t Scene::MaxDeltaTime = std::chrono::milliseconds(1000);
 
+unsigned int Scene::DragMovementThreshold = 10;
+milliseconds_t Scene::LongPressDelay      = std::chrono::milliseconds(500);
+milliseconds_t Scene::DoubleClickDelay    = std::chrono::milliseconds(300);
+bool Scene::ExclusiveDoubleClickMode      = false;
+
 Scene::Scene(Engine* engine)
     : autoClear{true}
-    , clearColor{Color3(0.2f, 0.2f, 0.3f)}
+    , clearColor{Color4(0.2f, 0.2f, 0.3f, 1.f)}
     , ambientColor{Color3(0.f, 0.f, 0.f)}
     , forceWireframe{false}
     , forcePointsCloud{false}
@@ -95,15 +101,22 @@ Scene::Scene(Engine* engine)
     , _onAfterRenderObserver{nullptr}
     , _onBeforeCameraRenderObserver{nullptr}
     , _onAfterCameraRenderObserver{nullptr}
-    , _startingPointerPosition{Vector2(0, 0)}
+    , _meshPickProceed{false}
+    , _previousHasSwiped{false}
+    , _isButtonPressed{false}
+    , _doubleClickOccured{false}
+    , _startingPointerPosition{Vector2(0.f, 0.f)}
+    , _previousStartingPointerPosition{Vector2(0.f, 0.f)}
     , _startingPointerTime{high_res_time_point_t()}
+    , _previousStartingPointerTime{high_res_time_point_t()}
     , _defaultMaterial{nullptr}
     , _hasAudioEngine{false}
     , _audioEnabled{true}
     , _headphone{false}
     , _engine{engine}
     , _animationRatio{0}
-    , _animationStartDateSet{false}
+    , _animationTimeLastSet{false}
+    , animationTimeScale{1}
     , _renderId{0}
     , _executeWhenReadyTimeoutId{-1}
     , _intermediateRendering{false}
@@ -117,6 +130,7 @@ Scene::Scene(Engine* engine)
     , _depthRenderer{nullptr}
     , _uniqueIdCounter{0}
     , _pickedDownMesh{nullptr}
+    , _pickedUpMesh{nullptr}
     , _pickedDownSprite{nullptr}
     , _uid{""}
 {
@@ -229,6 +243,16 @@ StandardMaterial* Scene::defaultMaterial()
   }
 
   return _defaultMaterial;
+}
+
+std::array<Plane, 6>& Scene::frustumPlanes()
+{
+  return _frustumPlanes;
+}
+
+const std::array<Plane, 6>& Scene::frustumPlanes() const
+{
+  return _frustumPlanes;
 }
 
 DebugLayer* Scene::debugLayer()
@@ -865,6 +889,10 @@ bool Scene::isReady()
   }
 
   for (const auto& mesh : meshes) {
+    if (!mesh->isEnabled()) {
+      continue;
+    }
+
     if (!mesh->isReady()) {
       return false;
     }
@@ -1020,25 +1048,27 @@ void Scene::stopAnimation(IAnimatable* target, const std::string& animationName)
   }
 }
 
-void Scene::_animate(const millisecond_t& /*delay*/)
+void Scene::_animate()
 {
   if (!animationsEnabled || _activeAnimatables.empty()) {
     return;
   }
 
-  if (!_animationStartDateSet) {
-    // if (_pendingData.length > 0) {
-    //    return;
-    //}
-
-    _animationStartDate    = Time::highresTimepointNow();
-    _animationStartDateSet = true;
-  }
   // Getting time
-  auto delay = Time::fpTimeSince<size_t, std::milli>(_animationStartDate);
-
+  auto now = Time::highresTimepointNow();
+  if (!_animationTimeLastSet) {
+    if (!_pendingData.empty()) {
+      return;
+    }
+    _animationTimeLast    = now;
+    _animationTimeLastSet = true;
+  }
+  auto deltaTime = Time::fpTimeSince<size_t, std::milli>(_animationTimeLast)
+                   * animationTimeScale;
+  _animationTime += deltaTime;
+  _animationTimeLast = now;
   for (auto& activeAnimatable : _activeAnimatables) {
-    activeAnimatable->_animate(std::chrono::milliseconds(delay));
+    activeAnimatable->_animate(std::chrono::milliseconds(_animationTime));
   }
 }
 
@@ -1602,6 +1632,17 @@ bool Scene::isActiveMesh(Mesh* mesh)
          != _activeMeshes.end();
 }
 
+HighlightLayer* Scene::getHighlightLayerByName(const std::string& name)
+{
+  auto it = std::find_if(
+    highlightLayers.begin(), highlightLayers.end(),
+    [&name](const std::unique_ptr<HighlightLayer>& highlightLayer) {
+      return highlightLayer->name == name;
+    });
+
+  return (it == highlightLayers.end()) ? nullptr : (*it).get();
+}
+
 std::string Scene::uid()
 {
   if (_uid.empty()) {
@@ -1738,6 +1779,7 @@ void Scene::_evaluateActiveMeshes()
       if (particleSystem->emitter && particleSystem->emitter->isEnabled()) {
         _activeParticleSystems.emplace_back(particleSystem.get());
         particleSystem->animate();
+        _renderingManager->dispatchParticles(particleSystem.get());
       }
     }
     Tools::EndPerformanceCounter("Particles", !particleSystems.empty());
@@ -2017,6 +2059,10 @@ void Scene::_checkIntersections()
 
 void Scene::render()
 {
+  if (isDisposed()) {
+    return;
+  }
+
   _lastFrameDuration.beginMonitoring();
   _particlesDuration.fetchNewFrame();
   _spritesDuration.fetchNewFrame();
@@ -2120,7 +2166,7 @@ void Scene::render()
   if (_engine->getRenderingCanvas()->onlyRenderBoundingClientRect()) {
     const auto& rec = _engine->getRenderingCanvas()->getBoundingClientRect();
     _engine->scissorClear(rec.left, rec.bottom, rec.width, rec.height,
-                          clearColor.toColor4());
+                          clearColor);
   }
   else {
     _engine->clear(clearColor, autoClear || forceWireframe || forcePointsCloud,
@@ -2317,6 +2363,22 @@ void Scene::dispose(bool /*doNotRecurse*/)
     _depthRenderer->dispose();
   }
 
+  // Smart arrays
+  if (activeCamera) {
+    activeCamera->_activeMeshes.clear();
+    activeCamera = nullptr;
+  }
+  _activeMeshes.clear();
+  _renderingManager->dispose();
+  _processedMaterials.clear();
+  _activeParticleSystems.clear();
+  _activeSkeletons.clear();
+  _softwareSkinnedMeshes.clear();
+  _boundingBoxRenderer->dispose();
+  _edgesRenderers.clear();
+  _meshesForIntersections.clear();
+  _toBeDisposed.clear();
+
   // Debug layer
   if (_debugLayer) {
     _debugLayer->hide();
@@ -2400,6 +2462,12 @@ void Scene::dispose(bool /*doNotRecurse*/)
     _engine->scenes.end());
 
   _engine->wipeCaches();
+  _engine = nullptr;
+}
+
+bool Scene::isDisposed() const
+{
+  return _engine == nullptr;
 }
 
 /** Release sounds & sounds tracks **/
@@ -2648,7 +2716,7 @@ bool Scene::isPhysicsEnabled()
   return _physicsEngine != nullptr;
 }
 
-void Scene::createDefaultCameraOrLight()
+void Scene::createDefaultCameraOrLight(bool createArcRotateCamera)
 {
   // Light
   if (lights.empty()) {
@@ -2657,19 +2725,28 @@ void Scene::createDefaultCameraOrLight()
 
   // Camera
   if (!activeCamera) {
-    auto camera = FreeCamera::New("default camera", Vector3::Zero(), this);
-
     // Compute position
     auto worldExtends = getWorldExtends();
     auto worldCenter  = worldExtends.min.add(
       worldExtends.max.subtract(worldExtends.min).scale(0.5f));
 
-    camera->position
-      = Vector3(worldCenter.x, worldCenter.y,
-                worldExtends.min.z - (worldExtends.max.z - worldExtends.min.z));
-    camera->setTarget(worldCenter);
-
-    activeCamera = camera;
+    if (createArcRotateCamera) {
+      auto camera = ArcRotateCamera::New("default camera", 0, 0, 10, Vector3::Zero(),
+                                    this);
+      camera->setPosition(Vector3(
+        worldCenter.x, worldCenter.y,
+        worldExtends.min.z - (worldExtends.max.z - worldExtends.min.z)));
+      camera->setTarget(worldCenter);
+      activeCamera = camera;
+    }
+    else {
+      auto camera = FreeCamera::New("default camera", Vector3::Zero(), this);
+      camera->position = Vector3(worldCenter.x, worldCenter.y,
+                                 worldExtends.min.z
+                                   - (worldExtends.max.z - worldExtends.min.z));
+      camera->setTarget(worldCenter);
+      activeCamera = camera;
+    }
   }
 }
 
@@ -2699,7 +2776,7 @@ std::vector<Material*> Scene::getMaterialByTags()
 }
 
 void Scene::setRenderingOrder(
-  int renderingGroupId,
+  unsigned int renderingGroupId,
   const std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn,
   const std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn,
   const std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn)
@@ -2709,11 +2786,12 @@ void Scene::setRenderingOrder(
                                        transparentSortCompareFn);
 }
 
-void Scene::setRenderingAutoClearDepthStencil(int renderingGroupId,
-                                              bool autoClearDepthStencil)
+void Scene::setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
+                                              bool autoClearDepthStencil,
+                                              bool depth, bool stencil)
 {
-  _renderingManager->setRenderingAutoClearDepthStencil(renderingGroupId,
-                                                       autoClearDepthStencil);
+  _renderingManager->setRenderingAutoClearDepthStencil(
+    renderingGroupId, autoClearDepthStencil, depth, stencil);
 }
 
 } // end of namespace BABYLON

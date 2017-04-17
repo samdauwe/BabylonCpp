@@ -313,7 +313,7 @@ bool BabylonFileLoader::load(Scene* scene, const std::string& data,
       && !SceneLoader::ForceFullSceneLoadingForIncremental;
   scene->autoClear = Json::GetBool(parsedData, "autoClear", true);
   scene->clearColor
-    = Color3::FromArray(Json::ToArray<float>(parsedData, "clearColor"));
+    = Color4::FromArray(Json::ToArray<float>(parsedData, "clearColor"));
   scene->ambientColor
     = Color3::FromArray(Json::ToArray<float>(parsedData, "ambientColor"));
   if (parsedData.contains("gravity")) {
