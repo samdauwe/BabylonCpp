@@ -31,8 +31,11 @@ public:
    */
   SolidParticle(unsigned int particleIndex, unsigned int positionIndex,
                 ModelShape* model, int shapeId, unsigned int idxInShape,
+                SolidParticleSystem* sps);
+  SolidParticle(unsigned int particleIndex, unsigned int positionIndex,
+                ModelShape* model, int shapeId, unsigned int idxInShape,
                 SolidParticleSystem* sps,
-                BoundingInfo* modelBoundingInfo = nullptr);
+                const BoundingInfo& modelBoundingInfo);
   ~SolidParticle();
 
   /**
@@ -76,9 +79,9 @@ public:
   // index of the particle in its shape id
   unsigned int idxInShape;
   // reference to the shape model BoundingInfo object
-  BoundingInfo* _modelBoundingInfo;
+  std::unique_ptr<BoundingInfo> _modelBoundingInfo;
   // particle BoundingInfo
-  BoundingInfo* _boundingInfo;
+  std::unique_ptr<BoundingInfo> _boundingInfo;
   // reference to the SPS what the particle belongs to
   SolidParticleSystem* _sps;
   std::unordered_map<std::string, float> extraFields;

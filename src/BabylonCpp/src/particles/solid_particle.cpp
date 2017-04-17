@@ -9,8 +9,7 @@ namespace BABYLON {
 SolidParticle::SolidParticle(unsigned int particleIndex,
                              unsigned int positionIndex, ModelShape* model,
                              int iShapeId, unsigned int iIdxInShape,
-                             SolidParticleSystem* sps,
-                             BoundingInfo* modelBoundingInfo)
+                             SolidParticleSystem* sps)
     : idx{particleIndex}
     , color{new Color4(1.f, 1.f, 1.f, 1.f)}
     , position{Vector3::Zero()}
@@ -26,11 +25,19 @@ SolidParticle::SolidParticle(unsigned int particleIndex,
     , idxInShape{iIdxInShape}
     , _sps{sps}
 {
-  if (modelBoundingInfo) {
-    _modelBoundingInfo = modelBoundingInfo;
-    _boundingInfo      = new BoundingInfo(modelBoundingInfo->minimum,
-                                     modelBoundingInfo->maximum);
-  }
+}
+
+SolidParticle::SolidParticle(unsigned int particleIndex,
+                             unsigned int positionIndex, ModelShape* model,
+                             int iShapeId, unsigned int iIdxInShape,
+                             SolidParticleSystem* sps,
+                             const BoundingInfo& modelBoundingInfo)
+    : SolidParticle(particleIndex, positionIndex, model, iShapeId, iIdxInShape,
+                    sps)
+{
+  _modelBoundingInfo = std_util::make_unique<BoundingInfo>(modelBoundingInfo);
+  _boundingInfo      = std_util::make_unique<BoundingInfo>(
+    modelBoundingInfo.minimum, modelBoundingInfo.maximum);
 }
 
 SolidParticle::~SolidParticle()
