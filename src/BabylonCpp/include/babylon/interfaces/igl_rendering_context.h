@@ -106,7 +106,7 @@ enum GLEnums : GLenum {
   SAMPLE_ALPHA_TO_COVERAGE = 0x809E,
   SAMPLE_COVERAGE          = 0x80A0,
   /* ErrorCode */
-  // NO_ERROR          = 0x0000,
+  NO_ERROR          = 0x0000,
   INVALID_ENUM      = 0x0500,
   INVALID_VALUE     = 0x0501,
   INVALID_OPERATION = 0x0502,
@@ -332,6 +332,7 @@ enum GLEnums : GLenum {
   RENDERBUFFER                                 = 0x8D41,
   RGBA4                                        = 0x8056,
   RGB5_A1                                      = 0x8057,
+  RGBA8                                        = 0x8058,
   RGB565                                       = 0x8D62,
   DEPTH_COMPONENT16                            = 0x81A5,
   STENCIL_INDEX                                = 0x1901,
@@ -346,6 +347,7 @@ enum GLEnums : GLenum {
   RENDERBUFFER_ALPHA_SIZE                      = 0x8D53,
   RENDERBUFFER_DEPTH_SIZE                      = 0x8D54,
   RENDERBUFFER_STENCIL_SIZE                    = 0x8D55,
+  MAX_SAMPLES                                  = 0x8D57,
   FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE           = 0x8CD0,
   FRAMEBUFFER_ATTACHMENT_OBJECT_NAME           = 0x8CD1,
   FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL         = 0x8CD2,
@@ -362,6 +364,8 @@ enum GLEnums : GLenum {
   FRAMEBUFFER_UNSUPPORTED                      = 0x8CDD,
   FRAMEBUFFER_BINDING                          = 0x8CA6,
   RENDERBUFFER_BINDING                         = 0x8CA7,
+  READ_FRAMEBUFFER                             = 0x8CA8,
+  DRAW_FRAMEBUFFER                             = 0x8CA9,
   MAX_RENDERBUFFER_SIZE                        = 0x84E8,
   INVALID_FRAMEBUFFER_OPERATION                = 0x0506,
   /* WebGL-specific enums */
@@ -466,6 +470,8 @@ public:
       , _cachedWrapU{0}
       , _cachedWrapV{0}
       , _cachedCoordinatesMode{0}
+      , _generateDepthBuffer{false}
+      , _generateStencilBuffer{false}
       , url{""}
       , _framebuffer{nullptr}
       , _depthBuffer{nullptr}
@@ -489,10 +495,15 @@ public:
   unsigned int type;
   unsigned int _cachedWrapU;
   unsigned int _cachedWrapV;
-  unsigned _cachedCoordinatesMode;
+  unsigned int _cachedCoordinatesMode;
+  bool _generateDepthBuffer;
+  bool _generateStencilBuffer;
   std::string url;
   std::unique_ptr<IGLFramebuffer> _framebuffer;
+  std::unique_ptr<IGLFramebuffer> _MSAAFramebuffer;
   std::unique_ptr<IGLRenderbuffer> _depthBuffer;
+  std::unique_ptr<IGLRenderbuffer> _depthStencilBuffer;
+  std::unique_ptr<IGLRenderbuffer> _MSAARenderBuffer;
   std::vector<std::function<void()>> onLoadedCallbacks;
 }; // end of class IGLTexture
 
@@ -548,6 +559,11 @@ public:
   virtual void blendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha,
                                  GLenum dstAlpha)
     = 0;
+  virtual void blitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1,
+                               GLint srcY1, GLint dstX0, GLint dstY0,
+                               GLint dstX1, GLint dstY1, GLbitfield mask,
+                               GLenum filter)
+    = 0;
   virtual void bufferData(GLenum target, GLsizeiptr size, GLenum usage) = 0;
   virtual void bufferData(GLenum target, const Float32Array& data, GLenum usage)
     = 0;
@@ -562,8 +578,9 @@ public:
     = 0;
   virtual void bufferSubData(GLenum target, GLintptr offset, Int32Array& data)
     = 0;
-  virtual GLenum checkFramebufferStatus(GLenum target) = 0;
-  virtual void clear(GLuint mask)                      = 0;
+  virtual void bindVertexArray(GL::IGLVertexArrayObject* vao) = 0;
+  virtual GLenum checkFramebufferStatus(GLenum target)        = 0;
+  virtual void clear(GLuint mask)                             = 0;
   virtual void clearColor(GLclampf red, GLclampf green, GLclampf blue,
                           GLclampf alpha)
     = 0;
@@ -591,16 +608,15 @@ public:
                                  GLint yoffset, GLint x, GLint y, GLint width,
                                  GLint height)
     = 0;
-  virtual std::unique_ptr<IGLBuffer> createBuffer()             = 0;
-  virtual std::unique_ptr<IGLFramebuffer> createFramebuffer()   = 0;
-  virtual std::unique_ptr<IGLProgram> createProgram()           = 0;
-  virtual std::unique_ptr<IGLRenderbuffer> createRenderbuffer() = 0;
-  virtual std::unique_ptr<IGLShader> createShader(GLenum type)  = 0;
-  virtual std::unique_ptr<IGLTexture> createTexture()           = 0;
-
-  virtual void cullFace(GLenum mode) = 0;
-
-  virtual void deleteBuffer(IGLBuffer* buffer) = 0;
+  virtual std::unique_ptr<IGLBuffer> createBuffer()                 = 0;
+  virtual std::unique_ptr<IGLFramebuffer> createFramebuffer()       = 0;
+  virtual std::unique_ptr<IGLProgram> createProgram()               = 0;
+  virtual std::unique_ptr<IGLRenderbuffer> createRenderbuffer()     = 0;
+  virtual std::unique_ptr<IGLShader> createShader(GLenum type)      = 0;
+  virtual std::unique_ptr<IGLTexture> createTexture()               = 0;
+  virtual std::unique_ptr<IGLVertexArrayObject> createVertexArray() = 0;
+  virtual void cullFace(GLenum mode)                                = 0;
+  virtual void deleteBuffer(IGLBuffer* buffer)                      = 0;
   virtual void
   deleteFramebuffer(const std::unique_ptr<IGLFramebuffer>& framebuffer)
     = 0;
@@ -610,16 +626,22 @@ public:
     = 0;
   virtual void deleteShader(const std::unique_ptr<IGLShader>& shader) = 0;
   virtual void deleteTexture(IGLTexture* texture)                     = 0;
-
-  virtual void depthFunc(GLenum func)    = 0;
-  virtual void depthMask(GLboolean flag) = 0;
+  virtual void deleteVertexArray(IGLVertexArrayObject* vao)           = 0;
+  virtual void depthFunc(GLenum func)                                 = 0;
+  virtual void depthMask(GLboolean flag)                              = 0;
   virtual void depthRange(GLclampf zNear, GLclampf zFar)            = 0;
   virtual void detachShader(IGLProgram* program, IGLShader* shader) = 0;
   virtual void disable(GLenum cap)                    = 0;
   virtual void disableVertexAttribArray(GLuint index) = 0;
   virtual void drawArrays(GLenum mode, GLint first, GLint count) = 0;
+  virtual void drawArraysInstanced(GLenum mode, GLint first, GLsizei count,
+                                   GLsizei instanceCount)
+    = 0;
   virtual void drawElements(GLenum mode, GLint count, GLenum type,
                             GLintptr offset)
+    = 0;
+  virtual void drawElementsInstanced(GLenum mode, GLsizei count, GLenum type,
+                                     GLintptr offset, GLsizei instanceCount)
     = 0;
   virtual void enable(GLenum cap)                    = 0;
   virtual void enableVertexAttribArray(GLuint index) = 0;
@@ -634,19 +656,11 @@ public:
                                     GLenum textarget, IGLTexture* texture,
                                     GLint level)
     = 0;
-  virtual void frontFace(GLenum mode)        = 0;
-  virtual void generateMipmap(GLenum target) = 0;
-
-  // virtual IGLActiveInfo* getActiveAttrib(IGLProgram* program,
-  //                                            GLuint index)
-  //   = 0;
-  // virtual IGLActiveInfo* getActiveUniform(IGLProgram* program,
-  //                                             GLuint index)
-  //   = 0;
+  virtual void frontFace(GLenum mode)                                     = 0;
+  virtual void generateMipmap(GLenum target)                              = 0;
   virtual std::vector<IGLShader*> getAttachedShaders(IGLProgram* program) = 0;
   virtual GLint getAttribLocation(IGLProgram* program, const std::string& name)
     = 0;
-  // virtual any getBufferParameter(GLenum target, GLenum pname) = 0;
   virtual bool hasExtension(const std::string& extension) = 0;
   virtual std::array<int, 3> getScissorBoxParameter() = 0; // GL::SCISSOR_BOX
   virtual GLint getParameteri(GLenum pname)      = 0;
@@ -656,10 +670,6 @@ public:
   virtual GLfloat getTexParameterf(GLenum pname) = 0;
   virtual GLenum getError()                      = 0;
   virtual const char* getErrorString(GLenum err) = 0;
-  // virtual any getFramebufferAttachmentParameter(GLenum target,
-  //                                              GLenum attachment, GLenum
-  //                                              pname)
-  //  = 0;
   virtual GLint getProgramParameter(IGLProgram* program, GLenum pname) = 0;
   virtual std::string
   getProgramInfoLog(const std::unique_ptr<IGLProgram>& program)
@@ -674,16 +684,9 @@ public:
   virtual std::string getShaderInfoLog(const std::unique_ptr<IGLShader>& shader)
     = 0;
   virtual std::string getShaderSource(IGLShader* shader) = 0;
-  // virtual any getTexParameter(GLenum target, GLenum pname) = 0;
-
-  // virtual any getUniform(IGLProgram* program,
-  //                       IGLUniformLocation* location)
-  //  = 0;
   virtual std::unique_ptr<IGLUniformLocation>
   getUniformLocation(IGLProgram* program, const std::string& name) = 0;
-  // virtual any getVertexAttrib(GLuint index, GLenum pname) = 0;
-  // virtual GLsizeiptr getVertexAttribOffset(GLuint index, GLenum pname) = 0;
-  virtual void hint(GLenum target, GLenum mode) = 0;
+  virtual void hint(GLenum target, GLenum mode)                    = 0;
   virtual GLboolean isBuffer(IGLBuffer* buffer)                           = 0;
   virtual GLboolean isEnabled(GLenum cap)                                 = 0;
   virtual GLboolean isFramebuffer(IGLFramebuffer* framebuffer)            = 0;
@@ -695,13 +698,16 @@ public:
   virtual bool linkProgram(const std::unique_ptr<IGLProgram>& program)    = 0;
   virtual void pixelStorei(GLenum pname, GLint param)       = 0;
   virtual void polygonOffset(GLfloat factor, GLfloat units) = 0;
-
   virtual void readPixels(GLint x, GLint y, GLint width, GLint height,
                           GLenum format, GLenum type, Uint8Array& pixels)
     = 0;
 
   virtual void renderbufferStorage(GLenum target, GLenum internalformat,
                                    GLint width, GLint height)
+    = 0;
+  virtual void renderbufferStorageMultisample(GLenum target, GLsizei samples,
+                                              GLenum internalFormat,
+                                              GLsizei width, GLsizei height)
     = 0;
   virtual void sampleCoverage(GLclampf value, GLboolean invert) = 0;
   virtual void scissor(GLint x, GLint y, GLint width, GLint height) = 0;
@@ -722,34 +728,12 @@ public:
                           GLint width, GLint height, GLint border,
                           GLenum format, GLenum type, const Uint8Array& pixels)
     = 0;
-  // virtual void texImage2D(GLenum target, GLint level, GLenum
-  // internalformat,
-  //                         GLenum format, GLenum type, IVideo::Ptr video)
-  //  = 0; // May throw DOMException
   virtual void texParameterf(GLenum target, GLenum pname, GLfloat param) = 0;
   virtual void texParameteri(GLenum target, GLenum pname, GLint param)   = 0;
   virtual void texSubImage2D(GLenum target, GLint level, GLint xoffset,
                              GLint yoffset, GLint width, GLint height,
                              GLenum format, GLenum type, any pixels)
     = 0;
-  // virtual void texSubImage2D(GLenum target, GLint level, GLint xoffset,
-  //                           GLint yoffset, GLenum format, GLenum type,
-  //                           any pixels)
-  //  = 0;
-  // // virtual void texSubImage2D(GLenum target, GLint level, GLint xoffset,
-  // GLint
-  // yoffset,
-  //  GLenum format, GLenum type, HTMLImageElement image) = 0; // May throw
-  //  DOMException
-  // virtual void texSubImage2D(GLenum target, GLint level, GLint xoffset,
-  //                           GLint yoffset, GLenum format, GLenum type,
-  //                           ICanvas* canvas)
-  //  = 0; // May throw DOMException
-  // // virtual void texSubImage2D(GLenum target, GLint level, GLint xoffset,
-  // GLint
-  // yoffset,
-  //  GLenum format, GLenum type, HTMLVideoElement video) = 0; // May throw
-  //  DOMException
   virtual void uniform1f(IGLUniformLocation* location, GLfloat x) = 0;
   virtual void uniform1fv(GL::IGLUniformLocation* uniform,
                           const Float32Array& array)
@@ -809,6 +793,7 @@ public:
                               GLfloat w)
     = 0;
   virtual void vertexAttrib4fv(GLuint indx, Float32Array& values) = 0;
+  virtual void vertexAttribDivisor(GLuint index, GLuint divisor)  = 0;
   virtual void vertexAttribPointer(GLuint indx, GLint size, GLenum type,
                                    GLboolean normalized, GLint stride,
                                    GLintptr offset)
