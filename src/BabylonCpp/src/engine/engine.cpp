@@ -2938,7 +2938,7 @@ bool Engine::isSupported()
 std::unique_ptr<GL::IGLShader>
 Engine::CompileShader(GL::IGLRenderingContext* gl, const std::string& source,
                       const std::string& type, const std::string& defines,
-                      const std::__cxx11::string& shaderVersion)
+                      const std::string& shaderVersion)
 {
   auto shader = gl->createShader(type == "vertex" ? GL::VERTEX_SHADER :
                                                     GL::FRAGMENT_SHADER);
