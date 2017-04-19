@@ -1,7 +1,6 @@
 BabylonCpp
 ===========
 
-[![version](http://img.shields.io/SemVer/2.5.0.png)](http://semver.org/spec/v2.5.0.html)
 [![Build Status](https://travis-ci.org/samdauwe/BabylonCpp.svg?branch=master)](https://travis-ci.org/samdauwe/BabylonCpp)
 
 #### A port of Babylon.js to C++ #####
