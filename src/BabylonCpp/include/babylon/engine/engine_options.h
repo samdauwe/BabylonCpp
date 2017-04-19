@@ -6,12 +6,14 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT EngineOptions {
-  bool adaptToDeviceRatio    = true;
+  bool adaptToDeviceRatio    = false;
   bool antialias             = true;
   int limitDeviceRatio       = false;
   bool autoEnableWebVR       = false;
   bool preserveDrawingBuffer = false;
   bool stencil               = true;
+  bool disableWebGL2Support  = true;
+  bool audioEngine           = false;
 }; // end of struct EngineOptions
 
 } // end of namespace BABYLON

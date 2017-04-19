@@ -61,7 +61,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type)
     }
 
     bool hardwareInstancedRendering
-      = (engine->getCaps().instancedArrays != nullptr)
+      = (engine->getCaps().instancedArrays != false)
         && (batch->visibleInstances.find(subMesh->_id)
             != batch->visibleInstances.end());
 

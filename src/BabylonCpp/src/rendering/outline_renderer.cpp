@@ -26,7 +26,7 @@ void OutlineRenderer::render(SubMesh* subMesh, _InstancesBatch* batch,
   auto engine = _scene->getEngine();
 
   bool hardwareInstancedRendering
-    = (engine->getCaps().instancedArrays != nullptr)
+    = (engine->getCaps().instancedArrays != false)
       && (batch->visibleInstances.find(subMesh->_id)
           != batch->visibleInstances.end())
       && (!batch->visibleInstances[subMesh->_id].empty());

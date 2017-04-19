@@ -22,20 +22,25 @@ struct RenderTargetOptions;
 class BABYLON_SHARED_EXPORT Engine : public IDisposable {
 
 public:
-  using GLBufferPtr       = std::unique_ptr<GL::IGLBuffer>;
-  using GLFrameBufferPtr  = std::unique_ptr<GL::IGLFramebuffer>;
-  using GLRenderBufferPtr = std::unique_ptr<GL::IGLRenderbuffer>;
-  using GLTexturePtr      = std::unique_ptr<GL::IGLTexture>;
+  using GLBufferPtr            = std::unique_ptr<GL::IGLBuffer>;
+  using GLFrameBufferPtr       = std::unique_ptr<GL::IGLFramebuffer>;
+  using GLFrameProgramPtr      = std::unique_ptr<GL::IGLProgram>;
+  using GLRenderBufferPtr      = std::unique_ptr<GL::IGLRenderbuffer>;
+  using GLShaderPtr            = std::unique_ptr<GL::IGLShader>;
+  using GLTexturePtr           = std::unique_ptr<GL::IGLTexture>;
+  using GLUniformLocationPtr   = std::unique_ptr<GL::IGLUniformLocation>;
+  using GLVertexArrayObjectPtr = std::unique_ptr<GL::IGLVertexArrayObject>;
 
 public:
   // Const statics
-  static constexpr unsigned int ALPHA_DISABLE   = 0;
-  static constexpr unsigned int ALPHA_ADD       = 1;
-  static constexpr unsigned int ALPHA_COMBINE   = 2;
-  static constexpr unsigned int ALPHA_SUBTRACT  = 3;
-  static constexpr unsigned int ALPHA_MULTIPLY  = 4;
-  static constexpr unsigned int ALPHA_MAXIMIZED = 5;
-  static constexpr unsigned int ALPHA_ONEONE    = 6;
+  static constexpr unsigned int ALPHA_DISABLE       = 0;
+  static constexpr unsigned int ALPHA_ADD           = 1;
+  static constexpr unsigned int ALPHA_COMBINE       = 2;
+  static constexpr unsigned int ALPHA_SUBTRACT      = 3;
+  static constexpr unsigned int ALPHA_MULTIPLY      = 4;
+  static constexpr unsigned int ALPHA_MAXIMIZED     = 5;
+  static constexpr unsigned int ALPHA_ONEONE        = 6;
+  static constexpr unsigned int ALPHA_PREMULTIPLIED = 7;
 
   static constexpr unsigned int DELAYLOADSTATE_NONE      = 0;
   static constexpr unsigned int DELAYLOADSTATE_LOADED    = 1;
@@ -78,8 +83,15 @@ public:
   // stored value.
   static constexpr unsigned int GEQUAL = 0x0206;
   // Passed to depthFunction or stencilFunction to specify depth or stencil
-  // tests will pass if the new depth value is not equal to the store d value.
+  // tests will pass if the new depth value is not equal to the stored value.
   static constexpr unsigned int NOTEQUAL = 0x0205;
+
+  // Half floating-point type (16-bit).
+  static constexpr unsigned int HALF_FLOAT_OES = 0x8D61;
+  // RGBA 16-bit floating-point color-renderable internal sized format.
+  static constexpr unsigned int RGBA16F = 0x881A;
+  // RGBA 32-bit floating-point color-renderable internal sized format.
+  static constexpr unsigned int RGBA32F = 0x8814;
 
   // Stencil Actions Constants.
   static constexpr unsigned int KEEP      = 0x1E00;
@@ -89,8 +101,6 @@ public:
   static constexpr unsigned int INVERT    = 0x150A;
   static constexpr unsigned int INCR_WRAP = 0x8507;
   static constexpr unsigned int DECR_WRAP = 0x8508;
-
-  static constexpr unsigned int HALF_FLOAT_OES = 0x8D61;
 
   static std::string Version();
 
@@ -110,11 +120,11 @@ public:
 
   std::vector<std::string>& texturesSupported();
   std::string textureFormatInUse() const;
-  std::string getWebGLVersion() const;
+  float webGLVersion() const;
 
   /**
-   * Returns true if the stencil buffer has been enabled through the creation
-   * option of the context.
+   * @brief Returns true if the stencil buffer has been enabled through the
+   * creation option of the context.
    */
   bool isStencilEnable() const;
   void resetTextureCache();
@@ -158,16 +168,17 @@ public:
   void setStencilOperationPass(unsigned int operation);
 
   /**
-   * stop executing a render loop function and remove it from the execution
-   * array
+   * @brief Stop executing a render loop function and remove it from the
+   * execution array.
    * @param {Function} [renderFunction] the function to be removed. If not
    * provided all functions will be removed.
    */
   void stopRenderLoop(const FastFunc<void()>& renderFunction = nullptr);
   void _renderLoop();
+
   /**
-   * Register and execute a render loop. The engine can have more than one
-   * render function.
+   * @brief Register and execute a render loop. The engine can have more than
+   * one render function.
    * @param {Function} renderFunction - the function to continuesly execute
    * starting the next render loop.
    * Example:
@@ -179,20 +190,19 @@ public:
   void renderFunction(const std::function<void()>& renderFunction);
 
   /**
-   * Toggle full screen mode.
+   * @brief Toggle full screen mode.
    * @param {boolean} requestPointerLock - should a pointer lock be requested
    * from the user
    */
   void switchFullscreen(bool requestPointerLock);
-  void clear(const Color3& color, bool backBuffer, bool depth,
-             bool stencil = false);
+  void clear(bool depth, bool stencil = false);
   void clear(const Color4& color, bool backBuffer, bool depth,
              bool stencil = false);
   void scissorClear(int x, int y, int width, int height,
                     const Color4& clearColor);
 
   /**
-   * Set the WebGL's viewport
+   * @brief Set the WebGL's viewport.
    * @param {BABYLON.Viewport} viewport - the viewport element to be used.
    * @param {number} [requiredWidth] - the width required for rendering. If not
    * provided the rendering canvas' width is used.
@@ -204,16 +214,14 @@ public:
   Viewport& setDirectViewport(int x, int y, int width, int height);
   void beginFrame();
   void endFrame();
+
   /**
-   * resize the view according to the canvas' size.
-   * Example
-   *   window.addEventListener("resize", function () {
-   *      engine.resize();
-   *   });
+   * @brief resize the view according to the canvas' size.
    */
   void resize();
+
   /**
-   * force a specific size of the canvas
+   * @brief Force a specific size of the canvas.
    * @param {number} width - the new canvas' width
    * @param {number} height - the new canvas' height
    */
@@ -239,10 +247,10 @@ public:
   void updateDynamicVertexBuffer(const GLBufferPtr& vertexBuffer,
                                  const Float32Array& vertices, int offset = -1,
                                  int count = -1);
-  GLBufferPtr createIndexBuffer(const Uint32Array& indices);
+  GLBufferPtr createIndexBuffer(const IndicesArray& indices);
   void bindArrayBuffer(GL::IGLBuffer* buffer);
   void updateArrayBuffer(const Float32Array& data);
-  GL::IGLVertexArrayObject* recordVertexArrayObject(
+  GLVertexArrayObjectPtr recordVertexArrayObject(
     const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
     GL::IGLBuffer* indexBuffer, Effect* effect);
   void bindVertexArrayObject(GL::IGLVertexArrayObject* vertexArrayObject,
@@ -266,12 +274,12 @@ public:
     GL::IGLBuffer* instancesBuffer, const Float32Array& data,
     const std::vector<InstancingAttributeInfo>& offsetLocations);
   void applyStates();
-  void draw(bool useTriangles, unsigned int indexStart, size_t indexCount,
-            size_t instancesCount = 0);
-  void drawPointClouds(int verticesStart, size_t verticesCount,
-                       size_t instancesCount);
-  void drawUnIndexed(bool useTriangles, int verticesStart, size_t verticesCount,
-                     size_t instancesCount = 0);
+  void draw(bool useTriangles, unsigned int indexStart, int indexCount,
+            int instancesCount = 0);
+  void drawPointClouds(int verticesStart, int verticesCount,
+                       int instancesCount);
+  void drawUnIndexed(bool useTriangles, int verticesStart, int verticesCount,
+                     int instancesCount = 0);
 
   /** Shaders **/
   void _releaseEffect(Effect* effect);
@@ -308,10 +316,11 @@ public:
     const std::function<void(const Effect* effect, const std::string& errors)>&
       onError
     = nullptr);
-  std::unique_ptr<GL::IGLProgram> createShaderProgram(
-    const std::string& vertexCode, const std::string& fragmentCode,
-    const std::string& defines, GL::IGLRenderingContext* gl = nullptr);
-  std::unordered_map<std::string, std::unique_ptr<GL::IGLUniformLocation>>
+  GLFrameProgramPtr createShaderProgram(const std::string& vertexCode,
+                                        const std::string& fragmentCode,
+                                        const std::string& defines,
+                                        GL::IGLRenderingContext* gl = nullptr);
+  std::unordered_map<std::string, GLUniformLocationPtr>
   getUniforms(GL::IGLProgram* shaderProgram,
               const std::vector<std::string>& uniformsNames);
   Int32Array getAttributes(GL::IGLProgram* shaderProgram,
@@ -364,20 +373,29 @@ public:
 
   /** Textures **/
   void wipeCaches();
-  void setSamplingMode(GL::IGLTexture* texture, unsigned int samplingMode);
+
   /**
-   * Set the compressed texture format to use, based on the formats you have,
-   * the formats supported by the hardware / browser, and those currently
-   * implemented
-   * in BJS.
+   * @brief Set the compressed texture format to use, based on the formats you
+   * have, and the formats supported by the hardware / browser.
    *
-   * Note: The result of this call is not taken into account texture is base64
-   * or when
-   * using a database / manifest.
+   * Khronos Texture Container (.ktx) files are used to support this.  This
+   * format has the advantage of being specifically designed for OpenGL.  Header
+   * elements directly correspond to API arguments needed to compressed
+   * textures.  This puts the burden on the container generator to house the
+   * arcane code for determining these for current & future formats.
    *
-   * @param {Array<string>} formatsAvailable - Extension names including dot.
-   * Case
-   * and order do not matter.
+   * for description see https://www.khronos.org/opengles/sdk/tools/KTX/
+   * for file layout see
+   * https://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/
+   *
+   * Note: The result of this call is not taken into account when a texture is
+   * base64.
+   *
+   * @param {Array<string>} formatsAvailable- The list of those format families
+   * you have created on your server. Syntax: '-' + format family + '.ktx'.
+   * (Case and order do not matter.)
+   *
+   * Current families are astc, dxt, pvrtc, etc2, atc, & etc1.
    * @returns The extension selected.
    */
   std::string&
@@ -398,7 +416,7 @@ public:
                 Buffer* buffer = nullptr, GL::IGLTexture* fallBack = nullptr,
                 unsigned int format = Engine::TEXTUREFORMAT_RGBA);
   void updateRawTexture(GL::IGLTexture* texture, const Uint8Array& data,
-                        int format, bool invertY = true,
+                        unsigned int format, bool invertY = true,
                         const std::string& compression = "");
   GL::IGLTexture* createRawTexture(const Uint8Array& data, int width,
                                    int height, int format, bool generateMipMaps,
@@ -460,10 +478,11 @@ public:
 
   /** Statics **/
   static bool isSupported();
-  static std::unique_ptr<GL::IGLShader>
-  CompileShader(GL::IGLRenderingContext* gl, const std::string& source,
-                const std::string& type, const std::string& defines);
-  static unsigned int GetGLTextureType(unsigned int type);
+  static GLShaderPtr CompileShader(GL::IGLRenderingContext* gl,
+                                   const std::string& source,
+                                   const std::string& type,
+                                   const std::string& defines,
+                                   const std::string& shaderVersion);
   static SamplingParameters GetSamplingParameters(unsigned int samplingMode,
                                                   bool generateMipMaps);
   static void PrepareGLTexture(
@@ -475,7 +494,7 @@ public:
 
 protected:
   /**
-   * Constructor
+   * @brief Constructor.
    * @param {HTMLCanvasElement} canvas - the canvas to be used for rendering
    * @param options - further options to be sent to the getContext function
    */
@@ -489,11 +508,23 @@ private:
   void vertexAttribPointer(GL::IGLBuffer* buffer, unsigned int indx, int size,
                            unsigned int type, bool normalized, int stride,
                            int offset);
+  void _bindIndexBufferWithCache(GL::IGLBuffer* indexBuffer);
+  void _bindVertexBuffersAttributes(
+    const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
+    Effect* effect);
   void bindIndexBuffer(GL::IGLBuffer* buffer);
+  void _unBindVertexArrayObject();
   void bindBuffer(GL::IGLBuffer*, int target);
   void setProgram(GL::IGLProgram* program);
   void activateTexture(unsigned int texture);
-  GL::GLenum _getInternalFormat(int format) const;
+  GL::GLenum _getInternalFormat(unsigned int format) const;
+  GLRenderBufferPtr
+  _setupFramebufferDepthAttachments(bool generateStencilBuffer,
+                                    bool generateDepthBuffer, int width,
+                                    int height, int samples = 1);
+  ArrayBufferView _convertRGBtoRGBATextureData(const ArrayBufferView& rgbData,
+                                               int width, int height,
+                                               unsigned int textureType);
   /** VBOs **/
   void _resetVertexBufferBinding();
   void _resetIndexBufferBinding();
@@ -502,8 +533,9 @@ private:
 
   bool _canRenderToFloatTexture();
   bool _canRenderToHalfFloatTexture();
-  bool _canRenderToTextureOfType(unsigned int format,
-                                 const std::string& extension);
+  bool _canRenderToFramebuffer(unsigned int type);
+  GL::GLenum _getWebGLTextureType(unsigned int type) const;
+  GL::GLenum _getRGBABufferInternalSizedFormat(unsigned int type) const;
 
 public:
   // Public members
@@ -511,6 +543,7 @@ public:
   bool isPointerLock;
   bool cullBackFaces;
   bool renderEvenInBackground;
+  bool preventCacheWipeBetweenFrames;
   // To enable/disable IDB support and avoid XHR on .manifest
   bool enableOfflineSupport;
   std::vector<Scene*> scenes;
@@ -534,7 +567,7 @@ private:
   // Private Members
   ICanvas* _renderingCanvas;
   bool _windowIsBackground;
-  std::string _webGLVersion;
+  float _webGLVersion;
 
   bool _badOS;
 
@@ -582,6 +615,7 @@ private:
   std::unordered_map<std::string, std::unique_ptr<Effect>> _compiledEffects;
   std::vector<bool> _vertexAttribArraysEnabled;
   Viewport* _cachedViewport;
+  GL::IGLVertexArrayObject* _cachedVertexArrayObject;
   std::unordered_map<std::string, VertexBuffer*> _cachedVertexBuffersMap;
   GL::IGLBuffer* _cachedVertexBuffers;
   GL::IGLBuffer* _cachedIndexBuffer;
@@ -594,7 +628,8 @@ private:
   Int32Array _currentInstanceLocations;
   std::vector<GL::IGLBuffer*> _currentInstanceBuffers;
   Int32Array _textureUnits;
-
+  bool _vaoRecordInProgress;
+  bool _mustWipeVertexAttributes;
   // Hardware supported Compressed Textures
   std::vector<std::string> _texturesSupported;
   std::string _textureFormatInUse;

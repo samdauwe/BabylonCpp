@@ -286,7 +286,7 @@ void Effect::_processShaderConversion(
 
   auto preparedSourceCode = _processPrecision(sourceCode);
 
-  if (_engine->getWebGLVersion() == "1") {
+  if (_engine->webGLVersion() == 1.f) {
     callback(preparedSourceCode);
     return;
   }

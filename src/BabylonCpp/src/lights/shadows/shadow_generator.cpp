@@ -277,7 +277,7 @@ void ShadowGenerator::renderSubMesh(SubMesh* subMesh)
   }
 
   bool hardwareInstancedRendering
-    = (engine->getCaps().instancedArrays != nullptr)
+    = (engine->getCaps().instancedArrays != false)
       && (batch->visibleInstances.find(subMesh->_id)
           != batch->visibleInstances.end())
       && (!batch->visibleInstances[subMesh->_id].empty());

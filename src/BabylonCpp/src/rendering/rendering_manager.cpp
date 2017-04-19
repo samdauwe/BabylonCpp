@@ -11,9 +11,7 @@
 namespace BABYLON {
 
 RenderingManager::RenderingManager(Scene* scene)
-    : _scene{scene}
-    , _clearColor{Color4(0.f, 0.f, 0.f, 0.f)}
-    , _renderinGroupInfo{nullptr}
+    : _scene{scene}, _renderinGroupInfo{nullptr}
 {
   _autoClearDepthStencil.resize(MAX_RENDERINGGROUPS);
   _customOpaqueSortCompareFn.resize(MAX_RENDERINGGROUPS);
@@ -39,7 +37,7 @@ void RenderingManager::_clearDepthStencilBuffer(bool depth, bool stencil)
     return;
   }
 
-  _scene->getEngine()->clear(_clearColor, false, depth, stencil);
+  _scene->getEngine()->clear(depth, stencil);
   _depthStencilBufferAlreadyCleaned = true;
 }
 

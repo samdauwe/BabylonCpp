@@ -96,7 +96,6 @@ private:
   bool _depthStencilBufferAlreadyCleaned;
 
   unsigned int _currentIndex;
-  Color4 _clearColor;
 
   std::vector<RenderingManageAutoClearOptions> _autoClearDepthStencil;
   std::vector<std::function<int(SubMesh* a, SubMesh* b)>>

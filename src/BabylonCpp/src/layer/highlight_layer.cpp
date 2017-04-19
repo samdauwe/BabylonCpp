@@ -255,7 +255,7 @@ void HighlightLayer::renderSubMesh(SubMesh* subMesh)
   };
 
   bool hardwareInstancedRendering
-    = (engine->getCaps().instancedArrays != nullptr)
+    = (engine->getCaps().instancedArrays != false)
       && std_util::contains(batch->visibleInstances, subMesh->_id)
       && (!batch->visibleInstances[subMesh->_id].empty());
 

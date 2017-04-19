@@ -27,12 +27,21 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   int maxCubemapTextureSize;
   int maxRenderTextureSize;
   int maxVertexAttribs;
+  int maxVaryingVectors;
+  int maxVertexUniformVectors;
+  int maxFragmentUniformVectors;
   bool standardDerivatives;
   GL::any s3tc;
+  GL::any pvrtc; // WEBGL_compressed_texture_pvrtc;
+  GL::any etc1;  // WEBGL_compressed_texture_etc1;
+  GL::any etc2;  // WEBGL_compressed_texture_etc;
+  GL::any astc;  // WEBGL_compressed_texture_astc;
+  GL::any atc;   // WEBGL_compressed_texture_atc;
   bool textureFloat;
+  bool vertexArrayObject;
   bool textureAnisotropicFilterExtension;
   unsigned int maxAnisotropy;
-  InstancedArrays* instancedArrays;
+  bool instancedArrays;
   bool uintIndices;
   bool highPrecisionShaderSupported;
   bool fragmentDepthSupported;
@@ -43,7 +52,7 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   bool textureHalfFloatRender;
   bool textureLOD;
   int drawBuffersExtension;
-  GL::IGLVertexArrayObject* vertexArrayObject;
+  bool colorBufferFloat;
 }; // end of struct EngineCapabilities
 
 } // end of namespace BABYLON

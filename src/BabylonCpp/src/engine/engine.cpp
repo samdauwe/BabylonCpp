@@ -45,11 +45,12 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , isPointerLock{false}
     , cullBackFaces{true}
     , renderEvenInBackground{true}
+    , preventCacheWipeBetweenFrames{false}
     , enableOfflineSupport{true}
     , _gl{nullptr}
     , _renderingCanvas{canvas}
     , _windowIsBackground{false}
-    , _webGLVersion{"1.0"}
+    , _webGLVersion{1.f}
     , _badOS{false}
     , _alphaTest{false}
     , _videoTextureSupported{false}
@@ -67,6 +68,8 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _cachedIndexBuffer{nullptr}
     , _cachedEffectForVertexBuffers{nullptr}
     , _currentRenderTarget{nullptr}
+    , _vaoRecordInProgress{false}
+    , _mustWipeVertexAttributes{false}
 {
   // Checks if some of the format renders first to allow the use of webgl
   // inspector.
@@ -85,6 +88,12 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
   if (!_gl) {
     BABYLON_LOG_ERROR("Engine", "GL not supported");
     return;
+  }
+
+  if (!options.disableWebGL2Support) {
+    if (_gl) {
+      _webGLVersion = 2.f;
+    }
   }
 
   _onBlur = [this]() { _windowIsBackground = true; };
@@ -133,7 +142,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
                           static_cast<unsigned>(_gl->getParameteri(
                             GL::MAX_TEXTURE_MAX_ANISOTROPY_EXT)) :
                           0;
-  _caps.instancedArrays              = nullptr;
+  _caps.instancedArrays              = false;
   _caps.uintIndices                  = true;
   _caps.fragmentDepthSupported       = true;
   _caps.highPrecisionShaderSupported = true;
@@ -190,7 +199,7 @@ std::string Engine::textureFormatInUse() const
   return _textureFormatInUse;
 }
 
-std::string Engine::getWebGLVersion() const
+float Engine::webGLVersion() const
 {
   return _webGLVersion;
 }
@@ -486,17 +495,11 @@ void Engine::switchFullscreen(bool requestPointerLock)
   }
 }
 
-void Engine::clear(const Color3& color, bool backBuffer, bool depth,
-                   bool stencil)
+void Engine::clear(bool depth, bool stencil)
 {
   applyStates();
 
   unsigned int mode = 0;
-  if (backBuffer) {
-    _gl->clearColor(color.r, color.g, color.b, 1.f);
-    mode |= GL::COLOR_BUFFER_BIT;
-  }
-
   if (depth) {
     _gl->clearDepth(1.f);
     mode |= GL::DEPTH_BUFFER_BIT;
@@ -567,11 +570,10 @@ void Engine::setViewport(Viewport& viewport, int requiredWidth,
     _gl->viewport(rec.left, rec.bottom, rec.width, rec.height);
   }
   else {
-    int width = requiredWidth != 0 ? requiredWidth : _renderingCanvas->width;
-    int height
-      = requiredHeight != 0 ? requiredHeight : _renderingCanvas->height;
-    int x = viewport.x;
-    int y = viewport.y;
+    int width  = requiredWidth != 0 ? requiredWidth : getRenderWidth();
+    int height = requiredHeight != 0 ? requiredHeight : getRenderHeight();
+    int x      = viewport.x;
+    int y      = viewport.y;
 
     _gl->viewport(x * width, y * height, width * viewport.width,
                   height * viewport.height);
@@ -610,16 +612,12 @@ void Engine::endFrame()
 
 void Engine::resize()
 {
-  int width  = _renderingCanvas->clientWidth;
-  int height = _renderingCanvas->clientHeight;
-
-  setSize(width / _hardwareScalingLevel, height / _hardwareScalingLevel);
-
-  // for (auto& scene : scenes) {
-  //  if (scene->debugLayer()->isVisible()) {
-  //    scene->debugLayer->_syncPositions();
-  //  }
-  //}
+  // We're not resizing the size of the canvas while in VR mode & presenting
+  if (!_vrDisplayEnabled) {
+    const int width  = _renderingCanvas->clientWidth;
+    const int height = _renderingCanvas->clientHeight;
+    setSize(width / _hardwareScalingLevel, height / _hardwareScalingLevel);
+  }
 }
 
 void Engine::setSize(int width, int height)
@@ -659,7 +657,9 @@ void Engine::bindFramebuffer(GL::IGLTexture* texture, unsigned int faceIndex,
 {
   _currentRenderTarget = texture;
 
-  bindUnboundFramebuffer(texture->_framebuffer.get());
+  bindUnboundFramebuffer(texture->_MSAAFramebuffer ?
+                           texture->_MSAAFramebuffer.get() :
+                           texture->_framebuffer.get());
 
   if (texture->isCube) {
     _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
@@ -683,13 +683,31 @@ void Engine::bindUnboundFramebuffer(GL::IGLFramebuffer* framebuffer)
 
 void Engine::unBindFramebuffer(GL::IGLTexture* texture,
                                bool disableGenerateMipMaps,
-                               const std::function<void()>& /*onBeforeUnbind*/)
+                               const std::function<void()>& onBeforeUnbind)
 {
   _currentRenderTarget = nullptr;
+
+  // If MSAA, we need to bitblt back to main texture
+  if (texture->_MSAAFramebuffer) {
+    _gl->bindFramebuffer(GL::READ_FRAMEBUFFER, texture->_MSAAFramebuffer.get());
+    _gl->bindFramebuffer(GL::DRAW_FRAMEBUFFER, texture->_framebuffer.get());
+    _gl->blitFramebuffer(0, 0, texture->_width, texture->_height, 0, 0,
+                         texture->_width, texture->_height,
+                         GL::COLOR_BUFFER_BIT, GL::NEAREST);
+  }
+
   if (texture->generateMipMaps && !disableGenerateMipMaps) {
     _bindTextureDirectly(GL::TEXTURE_2D, texture);
     _gl->generateMipmap(GL::TEXTURE_2D);
     _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
+  }
+
+  if (onBeforeUnbind) {
+    if (texture->_MSAAFramebuffer) {
+      // Bind the correct framebuffer
+      bindUnboundFramebuffer(texture->_framebuffer.get());
+    }
+    onBeforeUnbind();
   }
 
   bindUnboundFramebuffer(nullptr);
@@ -774,7 +792,7 @@ void Engine::_resetIndexBufferBinding()
   _cachedIndexBuffer = nullptr;
 }
 
-Engine::GLBufferPtr Engine::createIndexBuffer(const Uint32Array& indices)
+Engine::GLBufferPtr Engine::createIndexBuffer(const IndicesArray& indices)
 {
   auto vbo = _gl->createBuffer();
   bindIndexBuffer(vbo.get());
@@ -809,17 +827,24 @@ Engine::GLBufferPtr Engine::createIndexBuffer(const Uint32Array& indices)
 
 void Engine::bindArrayBuffer(GL::IGLBuffer* buffer)
 {
+  if (!_vaoRecordInProgress) {
+    _unBindVertexArrayObject();
+  }
   bindBuffer(buffer, GL::ARRAY_BUFFER);
 }
 
 void Engine::bindIndexBuffer(GL::IGLBuffer* buffer)
 {
+  if (!_vaoRecordInProgress) {
+    _unBindVertexArrayObject();
+  }
   bindBuffer(buffer, GL::ELEMENT_ARRAY_BUFFER);
 }
 
 void Engine::bindBuffer(GL::IGLBuffer* buffer, int target)
 {
-  if ((_currentBoundBuffer.find(target) == _currentBoundBuffer.end())
+  if (_vaoRecordInProgress
+      || (_currentBoundBuffer.find(target) == _currentBoundBuffer.end())
       || (_currentBoundBuffer[target] != buffer)) {
     _gl->bindBuffer(static_cast<unsigned int>(target), buffer);
     _currentBoundBuffer[target] = buffer;
@@ -842,7 +867,7 @@ void Engine::vertexAttribPointer(GL::IGLBuffer* buffer, unsigned int indx,
       = BufferPointer(indx, size, type, normalized, stride, offset, buffer);
   }
   else {
-    BufferPointer& pointer = _currentBufferPointers[indx];
+    auto& pointer = _currentBufferPointers[indx];
     if (pointer.buffer != buffer) {
       pointer.buffer = buffer;
       changed        = true;
@@ -869,23 +894,103 @@ void Engine::vertexAttribPointer(GL::IGLBuffer* buffer, unsigned int indx,
     }
   }
 
-  if (changed) {
+  if (changed || _vaoRecordInProgress) {
     bindArrayBuffer(buffer);
     _gl->vertexAttribPointer(indx, size, type, normalized, stride, offset);
   }
 }
 
-GL::IGLVertexArrayObject* Engine::recordVertexArrayObject(
-  const std::unordered_map<std::string, VertexBuffer*>& /*vertexBuffers*/,
-  GL::IGLBuffer* /*indexBuffer*/, Effect* /*effect*/)
+void Engine::_bindIndexBufferWithCache(GL::IGLBuffer* indexBuffer)
 {
-  return nullptr;
+  if (indexBuffer == nullptr) {
+    return;
+  }
+  if (_cachedIndexBuffer != indexBuffer) {
+    _cachedIndexBuffer = indexBuffer;
+    bindIndexBuffer(indexBuffer);
+    _uintIndicesCurrentlySet = indexBuffer->is32Bits;
+  }
 }
 
-void Engine::bindVertexArrayObject(
-  GL::IGLVertexArrayObject* /*vertexArrayObject*/,
-  GL::IGLBuffer* /*indexBuffer*/)
+void Engine::_bindVertexBuffersAttributes(
+  const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
+  Effect* effect)
 {
+  auto attributes = effect->getAttributesNames();
+
+  if (!_vaoRecordInProgress) {
+    _unBindVertexArrayObject();
+  }
+
+  unbindAllAttributes();
+
+  unsigned int _order = 0;
+  for (unsigned int index = 0; index < attributes.size(); ++index) {
+    auto order = effect->getAttributeLocation(index);
+
+    if (order >= 0) {
+      _order             = static_cast<unsigned int>(order);
+      auto& vertexBuffer = vertexBuffers.at(attributes[index]);
+
+      if (!vertexBuffer) {
+        continue;
+      }
+
+      _gl->enableVertexAttribArray(_order);
+      if (!_vaoRecordInProgress) {
+        _vertexAttribArraysEnabled[_order] = true;
+      }
+
+      auto buffer = vertexBuffer->getBuffer();
+      vertexAttribPointer(buffer, _order, vertexBuffer->getSize(), GL::FLOAT,
+                          false, vertexBuffer->getStrideSize() * 4,
+                          static_cast<int>(vertexBuffer->getOffset() * 4));
+
+      if (vertexBuffer->getIsInstanced()) {
+        _gl->vertexAttribDivisor(_order, 1);
+        if (!_vaoRecordInProgress) {
+          _currentInstanceLocations.emplace_back(order);
+          _currentInstanceBuffers.emplace_back(buffer);
+        }
+      }
+    }
+  }
+}
+
+std::unique_ptr<GL::IGLVertexArrayObject> Engine::recordVertexArrayObject(
+  const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
+  GL::IGLBuffer* indexBuffer, Effect* effect)
+{
+  auto vao = _gl->createVertexArray();
+
+  _vaoRecordInProgress = true;
+
+  _gl->bindVertexArray(vao.get());
+
+  _mustWipeVertexAttributes = true;
+  _bindVertexBuffersAttributes(vertexBuffers, effect);
+
+  bindIndexBuffer(indexBuffer);
+
+  _vaoRecordInProgress = false;
+  _gl->bindVertexArray(nullptr);
+
+  return vao;
+}
+
+void Engine::bindVertexArrayObject(GL::IGLVertexArrayObject* vertexArrayObject,
+                                   GL::IGLBuffer* indexBuffer)
+{
+  if (_cachedVertexArrayObject != vertexArrayObject) {
+    _cachedVertexArrayObject = vertexArrayObject;
+
+    _gl->bindVertexArray(vertexArrayObject);
+    _cachedVertexBuffers = nullptr;
+    _cachedIndexBuffer   = nullptr;
+
+    _uintIndicesCurrentlySet  = indexBuffer != nullptr && indexBuffer->is32Bits;
+    _mustWipeVertexAttributes = true;
+  }
 }
 
 void Engine::bindBuffersDirectly(GL::IGLBuffer* vertexBuffer,
@@ -899,6 +1004,9 @@ void Engine::bindBuffersDirectly(GL::IGLBuffer* vertexBuffer,
     _cachedEffectForVertexBuffers = effect;
 
     size_t attributesCount = effect->getAttributesCount();
+
+    _unBindVertexArrayObject();
+    unbindAllAttributes();
 
     int offset = 0;
     for (unsigned int index = 0; index < attributesCount; ++index) {
@@ -920,25 +1028,20 @@ void Engine::bindBuffersDirectly(GL::IGLBuffer* vertexBuffer,
         }
         offset += vertexDeclarationi * 4;
       }
-      else {
-        // disable effect attributes that have no data
-        int order = effect->getAttributeLocation(index);
-        if (order >= 0) {
-          unsigned int _order = static_cast<unsigned int>(order);
-          if (_order + 1 <= _vertexAttribArraysEnabled[_order]) {
-            _gl->disableVertexAttribArray(_order);
-            _vertexAttribArraysEnabled[_order] = false;
-          }
-        }
-      }
     }
   }
 
-  if (_cachedIndexBuffer != indexBuffer) {
-    _cachedIndexBuffer = indexBuffer;
-    bindIndexBuffer(indexBuffer);
-    _uintIndicesCurrentlySet = indexBuffer->is32Bits;
+  _bindIndexBufferWithCache(indexBuffer);
+}
+
+void Engine::_unBindVertexArrayObject()
+{
+  if (!_cachedVertexArrayObject) {
+    return;
   }
+
+  _cachedVertexArrayObject = nullptr;
+  _gl->bindVertexArray(nullptr);
 }
 
 void Engine::bindBuffers(
@@ -950,49 +1053,10 @@ void Engine::bindBuffers(
     _cachedVertexBuffersMap       = vertexBuffers;
     _cachedEffectForVertexBuffers = effect;
 
-    std::vector<std::string>& attributes = effect->getAttributesNames();
-
-    for (unsigned int index = 0; index < attributes.size(); ++index) {
-      int order = effect->getAttributeLocation(index);
-
-      if (order >= 0) {
-        unsigned int _order      = static_cast<unsigned int>(order);
-        const auto& vertexBuffer = vertexBuffers.at(attributes[index]);
-
-        if (!vertexBuffer) {
-          if (_order + 1 <= _vertexAttribArraysEnabled.size()) {
-            _gl->disableVertexAttribArray(_order);
-            _vertexAttribArraysEnabled[_order] = false;
-          }
-          continue;
-        }
-
-        if (_order + 1 > _vertexAttribArraysEnabled.size()) {
-          _gl->enableVertexAttribArray(_order);
-          _vertexAttribArraysEnabled.resize(_order + 1);
-          _vertexAttribArraysEnabled[_order] = true;
-        }
-
-        auto buffer = vertexBuffer->getBuffer();
-        vertexAttribPointer(buffer, _order,
-                            static_cast<int>(vertexBuffer->getSize()),
-                            GL::FLOAT, false, vertexBuffer->getStrideSize() * 4,
-                            static_cast<int>(vertexBuffer->getOffset() * 4));
-
-        if (vertexBuffer->getIsInstanced()) {
-          _caps.instancedArrays->vertexAttribDivisorANGLE(_order, 1);
-          _currentInstanceLocations.emplace_back(order);
-          _currentInstanceBuffers.emplace_back(buffer);
-        }
-      }
-    }
+    _bindVertexBuffersAttributes(vertexBuffers, effect);
   }
 
-  if (indexBuffer != nullptr && _cachedIndexBuffer != indexBuffer) {
-    _cachedIndexBuffer = indexBuffer;
-    bindIndexBuffer(indexBuffer);
-    _uintIndicesCurrentlySet = indexBuffer->is32Bits;
-  }
+  _bindIndexBufferWithCache(indexBuffer);
 }
 
 void Engine::unbindInstanceAttributes()
@@ -1006,14 +1070,15 @@ void Engine::unbindInstanceAttributes()
     }
     auto offsetLocation
       = static_cast<unsigned int>(_currentInstanceLocations[i]);
-    _caps.instancedArrays->vertexAttribDivisorANGLE(offsetLocation, 0);
+    _gl->vertexAttribDivisor(offsetLocation, 0);
   }
   _currentInstanceBuffers.clear();
   _currentInstanceLocations.clear();
 }
 
-void Engine::releaseVertexArrayObject(GL::IGLVertexArrayObject* /*vao*/)
+void Engine::releaseVertexArrayObject(GL::IGLVertexArrayObject* vao)
 {
+  _gl->deleteVertexArray(vao);
 }
 
 bool Engine::_releaseBuffer(GL::IGLBuffer* buffer)
@@ -1063,7 +1128,7 @@ void Engine::updateAndBindInstancesBuffer(GL::IGLBuffer* instancesBuffer,
 
     vertexAttribPointer(instancesBuffer, offsetLocation, 4, GL::FLOAT, false,
                         64, static_cast<int>(index * 16));
-    _caps.instancedArrays->vertexAttribDivisorANGLE(offsetLocation, 1);
+    _gl->vertexAttribDivisor(offsetLocation, 1);
     _currentInstanceLocations.emplace_back(offsetLocation);
     _currentInstanceBuffers.emplace_back(instancesBuffer);
   }
@@ -1093,7 +1158,7 @@ void Engine::updateAndBindInstancesBuffer(
     _gl->enableVertexAttribArray(ai.index);
     vertexAttribPointer(instancesBuffer, ai.index, ai.attributeSize,
                         ai.attribyteType, ai.normalized, stride, ai.offset);
-    _caps.instancedArrays->vertexAttribDivisorANGLE(ai.index, 1);
+    _gl->vertexAttribDivisor(ai.index, 1);
     _currentInstanceLocations.emplace_back(ai.index);
     _currentInstanceBuffers.emplace_back(instancesBuffer);
   }
@@ -1106,24 +1171,22 @@ void Engine::applyStates()
   _alphaState->apply(*_gl);
 }
 
-void Engine::draw(bool useTriangles, unsigned int indexStart, size_t indexCount,
-                  size_t instancesCount)
+void Engine::draw(bool useTriangles, unsigned int indexStart, int indexCount,
+                  int instancesCount)
 {
   // Apply states
   applyStates();
   _drawCalls.addCount(1, false);
 
   // Render
-  GL::GLenum indexFormat
+  auto indexFormat
     = _uintIndicesCurrentlySet ? GL::UNSIGNED_INT : GL::UNSIGNED_SHORT;
   unsigned int mult = _uintIndicesCurrentlySet ? 4 : 2;
 
   if (instancesCount) {
-#if 0
-    _caps.instancedArrays->drawElementsInstancedANGLE(
-      useTriangles ? GL::TRIANGLES : GL::LINES, indexCount, indexFormat,
-      indexStart * mult, instancesCount);
-#endif
+    _gl->drawElementsInstanced(useTriangles ? GL::TRIANGLES : GL::LINES,
+                               indexCount, indexFormat, indexStart * mult,
+                               instancesCount);
     return;
   }
 
@@ -1132,17 +1195,16 @@ void Engine::draw(bool useTriangles, unsigned int indexStart, size_t indexCount,
                     indexStart * mult);
 }
 
-void Engine::drawPointClouds(int verticesStart, size_t verticesCount,
-                             size_t instancesCount)
+void Engine::drawPointClouds(int verticesStart, int verticesCount,
+                             int instancesCount)
 {
   // Apply states
   applyStates();
   _drawCalls.addCount(1, false);
 
   if (instancesCount) {
-    _caps.instancedArrays->drawArraysInstancedANGLE(
-      GL::POINTS, verticesStart, static_cast<int>(verticesCount),
-      static_cast<int>(instancesCount));
+    _gl->drawArraysInstanced(GL::POINTS, verticesStart, verticesCount,
+                             instancesCount);
     return;
   }
 
@@ -1150,16 +1212,15 @@ void Engine::drawPointClouds(int verticesStart, size_t verticesCount,
 }
 
 void Engine::drawUnIndexed(bool useTriangles, int verticesStart,
-                           size_t verticesCount, size_t instancesCount)
+                           int verticesCount, int instancesCount)
 {
   // Apply states
   applyStates();
   _drawCalls.addCount(1, false);
 
   if (instancesCount > 0) {
-    _caps.instancedArrays->drawArraysInstancedANGLE(
-      useTriangles ? GL::TRIANGLES : GL::LINES, verticesStart,
-      static_cast<int>(verticesCount), static_cast<int>(instancesCount));
+    _gl->drawArraysInstanced(useTriangles ? GL::TRIANGLES : GL::LINES,
+                             verticesStart, verticesCount, instancesCount);
     return;
   }
 
@@ -1267,9 +1328,12 @@ std::unique_ptr<GL::IGLProgram> Engine::createShaderProgram(
 {
   auto gl = iGl ? iGl : _gl;
 
-  auto vertexShader = Engine::CompileShader(gl, vertexCode, "vertex", defines);
-  auto fragmentShader
-    = Engine::CompileShader(gl, fragmentCode, "fragment", defines);
+  const std::string shaderVersion
+    = (_webGLVersion > 1.f) ? "#version 300 es\n" : "";
+  auto vertexShader
+    = Engine::CompileShader(gl, vertexCode, "vertex", defines, shaderVersion);
+  auto fragmentShader = Engine::CompileShader(gl, fragmentCode, "fragment",
+                                              defines, shaderVersion);
 
   auto shaderProgram = gl->createProgram();
   gl->attachShader(shaderProgram, vertexShader);
@@ -1611,6 +1675,11 @@ void Engine::setAlphaMode(int mode, bool noDepthWriteChange)
     case Engine::ALPHA_DISABLE:
       _alphaState->setAlphaBlend(false);
       break;
+    case Engine::ALPHA_PREMULTIPLIED:
+      _alphaState->setAlphaBlendFunctionParameters(
+        GL::ONE, GL::ONE_MINUS_SRC_ALPHA, GL::ONE, GL::ONE);
+      _alphaState->setAlphaBlend(true);
+      break;
     case Engine::ALPHA_COMBINE:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::SRC_ALPHA, GL::ONE_MINUS_SRC_ALPHA, GL::ONE, GL::ONE);
@@ -1668,6 +1737,9 @@ bool Engine::getAlphaTesting() const
 // Textures
 void Engine::wipeCaches()
 {
+  if (preventCacheWipeBetweenFrames) {
+    return;
+  }
   resetTextureCache();
   _currentEffect = nullptr;
 
@@ -1679,53 +1751,15 @@ void Engine::wipeCaches()
   _cachedVertexBuffers          = nullptr;
   _cachedIndexBuffer            = nullptr;
   _cachedEffectForVertexBuffers = nullptr;
-}
-
-void Engine::setSamplingMode(GL::IGLTexture* texture, unsigned int samplingMode)
-{
-  _bindTextureDirectly(GL::TEXTURE_2D, texture);
-
-  auto magFilter = GL::NEAREST;
-  auto minFilter = GL::NEAREST;
-
-  if (samplingMode == Texture::BILINEAR_SAMPLINGMODE) {
-    magFilter = GL::LINEAR;
-    minFilter = GL::LINEAR;
-  }
-  else if (samplingMode == Texture::TRILINEAR_SAMPLINGMODE) {
-    magFilter = GL::LINEAR;
-    minFilter = GL::LINEAR_MIPMAP_LINEAR;
-  }
-
-  _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER,
-                     static_cast<int>(magFilter));
-  _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER,
-                     static_cast<int>(minFilter));
-
-  _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
-
-  texture->samplingMode = samplingMode;
+  _unBindVertexArrayObject();
+  bindIndexBuffer(nullptr);
+  bindArrayBuffer(nullptr);
 }
 
 std::string&
 Engine::setTextureFormatToUse(const std::vector<std::string>& formatsAvailable)
 {
   for (size_t i = 0; i < _texturesSupported.size(); ++i) {
-    // code to allow the formats to be added as they can be developed / hw
-    // tested
-    if (_texturesSupported[i] == ".astc") {
-      continue;
-    }
-    if (_texturesSupported[i] == ".pvr") {
-      continue;
-    }
-    if (_texturesSupported[i] == ".etc1") {
-      continue;
-    }
-    if (_texturesSupported[i] == ".etc2") {
-      continue;
-    }
-
     for (const auto& formatAvailable : formatsAvailable) {
       if (_texturesSupported[i] == String::toLowerCase(formatAvailable)) {
         _textureFormatInUse = _texturesSupported[i];
@@ -1754,20 +1788,22 @@ GL::IGLTexture* Engine::createTexture(const std::vector<std::string>& list,
                        onError, buffer);
 }
 
-GL::IGLTexture*
-Engine::createTexture(const std::string& _url, bool noMipmap, bool invertY,
-                      Scene* scene, unsigned int samplingMode,
-                      const std::function<void()>& /*onLoad*/,
-                      const std::function<void()>& onError, Buffer* /*buffer*/,
-                      GL::IGLTexture* /*fallBack*/, unsigned int /*format*/)
+GL::IGLTexture* Engine::createTexture(const std::string& urlArg, bool noMipmap,
+                                      bool invertY, Scene* scene,
+                                      unsigned int samplingMode,
+                                      const std::function<void()>& onLoad,
+                                      const std::function<void()>& onError,
+                                      Buffer* buffer, GL::IGLTexture* fallBack,
+                                      unsigned int /*format*/)
 {
   auto texture  = _gl->createTexture();
   auto _texture = texture.get();
 
-  std::string url = _url;
   std::string extension;
+  bool isKTX        = false;
   bool fromDataBool = false;
   std::vector<std::string> fromDataArray;
+  std::string url = urlArg;
 
   if ((url.size() >= 5) && (url.substr(0, 5) == "data:")) {
     fromDataBool = true;
@@ -1775,7 +1811,17 @@ Engine::createTexture(const std::string& _url, bool noMipmap, bool invertY,
 
   if (!fromDataBool) {
     if (url.size() >= 4) {
-      extension = String::toLowerCase(url.substr(url.size() - 4, 4));
+      auto lastDot = String::lastIndexOf(url, ".");
+      if (lastDot != -1) {
+        size_t _lastDot = static_cast<size_t>(lastDot);
+        extension       = String::toLowerCase(url.substr(_lastDot));
+
+        if (!_textureFormatInUse.empty() && !fromDataBool && !fallBack) {
+          extension = _textureFormatInUse;
+          url       = url.substr(0, _lastDot) + _textureFormatInUse;
+          isKTX     = true;
+        }
+      }
     }
   }
   else {
@@ -1788,7 +1834,7 @@ Engine::createTexture(const std::string& _url, bool noMipmap, bool invertY,
     }
   }
 
-  bool isDDS = (extension == ".dds");
+  bool isDDS = getCaps().s3tc && (extension == ".dds");
   bool isTGA = (extension == ".tga");
 
   scene->_addPendingData(_texture);
@@ -1796,13 +1842,24 @@ Engine::createTexture(const std::string& _url, bool noMipmap, bool invertY,
   _texture->noMipmap     = noMipmap;
   _texture->references   = 1;
   _texture->samplingMode = samplingMode;
-  // texture->onLoadedCallbacks = {onLoad};
-  _loadedTexturesCache.emplace_back(std::move(texture));
+  texture->onLoadedCallbacks.clear();
+  if (onLoad) {
+    texture->onLoadedCallbacks.emplace_back(onLoad);
+  }
+  if (!fallBack) {
+    _loadedTexturesCache.emplace_back(std::move(texture));
+  }
 
-  auto onerror = [&scene, &_texture, &onError](const std::string& msg) {
+  auto onerror = [&](const std::string& msg) {
     scene->_removePendingData(_texture);
 
-    if (onError) {
+    // fallback for when compressed file not found to try again.  For instance,
+    // etc1 does not have an alpha capable type
+    if (isKTX) {
+      createTexture(urlArg, noMipmap, invertY, scene, samplingMode, onLoad,
+                    onError, buffer, texture.get());
+    }
+    else if (onError) {
       BABYLON_LOG_ERROR("Engine", msg);
       onError();
     }
@@ -1841,7 +1898,7 @@ Engine::createTexture(const std::string& _url, bool noMipmap, bool invertY,
   return _texture;
 }
 
-GL::GLenum Engine::_getInternalFormat(int format) const
+GL::GLenum Engine::_getInternalFormat(unsigned int format) const
 {
   GL::GLenum internalFormat = GL::RGBA;
   switch (format) {
@@ -1868,7 +1925,7 @@ GL::GLenum Engine::_getInternalFormat(int format) const
 }
 
 void Engine::updateRawTexture(GL::IGLTexture* texture, const Uint8Array& data,
-                              int format, bool invertY,
+                              unsigned int format, bool invertY,
                               const std::string& compression)
 {
   auto internalFormat = _getInternalFormat(format);
@@ -1916,11 +1973,15 @@ GL::IGLTexture* Engine::createRawTexture(const Uint8Array& data, int width,
   _bindTextureDirectly(GL::TEXTURE_2D, _texture);
 
   // Filters
-  SamplingParameters filters
-    = GetSamplingParameters(samplingMode, generateMipMaps);
+  auto filters = GetSamplingParameters(samplingMode, generateMipMaps);
 
   _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, filters.mag);
   _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, filters.min);
+
+  if (generateMipMaps) {
+    _gl->generateMipmap(GL::TEXTURE_2D);
+  }
+
   _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
 
   _texture->samplingMode = samplingMode;
@@ -1934,10 +1995,10 @@ GL::IGLTexture* Engine::createDynamicTexture(int width, int height,
                                              bool generateMipMaps,
                                              unsigned int samplingMode)
 {
-  auto texture          = _gl->createTexture();
-  auto _texture         = texture.get();
-  _texture->_baseWidth  = width;
-  _texture->_baseHeight = height;
+  auto texture         = _gl->createTexture();
+  auto _texture        = texture.get();
+  texture->_baseWidth  = width;
+  texture->_baseHeight = height;
 
   if (generateMipMaps) {
     width  = Tools::GetExponentOfTwo(width, _caps.maxTextureSize);
@@ -1945,12 +2006,12 @@ GL::IGLTexture* Engine::createDynamicTexture(int width, int height,
   }
 
   resetTextureCache();
-  _texture->_width          = width;
-  _texture->_height         = height;
-  _texture->isReady         = false;
-  _texture->generateMipMaps = generateMipMaps;
-  _texture->references      = 1;
-  _texture->samplingMode    = samplingMode;
+  texture->_width          = width;
+  texture->_height         = height;
+  texture->isReady         = false;
+  texture->generateMipMaps = generateMipMaps;
+  texture->references      = 1;
+  texture->samplingMode    = samplingMode;
 
   updateTextureSamplingMode(samplingMode, _texture);
 
@@ -1980,19 +2041,22 @@ void Engine::updateTextureSamplingMode(unsigned int samplingMode,
     _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, filters.min);
     _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
   }
+
+  texture->samplingMode = samplingMode;
 }
 
-void Engine::updateDynamicTexture(GL::IGLTexture* texture, ICanvas* /*canvas*/,
+void Engine::updateDynamicTexture(GL::IGLTexture* texture, ICanvas* canvas,
                                   bool invertY, bool premulAlpha,
-                                  unsigned int /*format*/)
+                                  unsigned int format)
 {
   _bindTextureDirectly(GL::TEXTURE_2D, texture);
   _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL, invertY ? 1 : 0);
   if (premulAlpha) {
     _gl->pixelStorei(GL::UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
   }
-  //_gl->texImage2D(GL::TEXTURE_2D, 0, GL::RGBA, GL::RGBA, GL::UNSIGNED_BYTE,
-  //                canvas);
+  auto internalFormat = format ? _getInternalFormat(format) : GL::RGBA;
+  _gl->texImage2D(GL::TEXTURE_2D, 0, internalFormat, internalFormat,
+                  GL::UNSIGNED_BYTE, canvas);
   if (texture->generateMipMaps) {
     _gl->generateMipmap(GL::TEXTURE_2D);
   }
@@ -2037,8 +2101,7 @@ Engine::createRenderTargetTexture(ISize size,
   int width  = size.width;
   int height = size.height;
 
-  SamplingParameters filters
-    = GetSamplingParameters(samplingMode, generateMipMaps);
+  auto filters = GetSamplingParameters(samplingMode, generateMipMaps);
 
   if (type == Engine::TEXTURETYPE_FLOAT && !_caps.textureFloat) {
     type = Engine::TEXTURETYPE_UNSIGNED_INT;
@@ -2053,40 +2116,19 @@ Engine::createRenderTargetTexture(ISize size,
   _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE);
   _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T, GL::CLAMP_TO_EDGE);
 
-  _gl->texImage2D(GL::TEXTURE_2D, 0, GL::RGBA, width, height, 0, GL::RGBA,
-                  GetGLTextureType(type), Uint8Array());
-
-  GLRenderBufferPtr depthStencilBuffer = nullptr;
-
-  // Create the depth/stencil buffer
-  if (generateStencilBuffer) {
-    depthStencilBuffer = _gl->createRenderbuffer();
-    _gl->bindRenderbuffer(GL::RENDERBUFFER, depthStencilBuffer);
-    _gl->renderbufferStorage(GL::RENDERBUFFER, GL::DEPTH_STENCIL, width,
-                             height);
-  }
-  else if (generateDepthBuffer) {
-    depthStencilBuffer = _gl->createRenderbuffer();
-    _gl->bindRenderbuffer(GL::RENDERBUFFER, depthStencilBuffer);
-    _gl->renderbufferStorage(GL::RENDERBUFFER, GL::DEPTH_COMPONENT16, width,
-                             height);
-  }
+  _gl->texImage2D(GL::TEXTURE_2D, 0, _getRGBABufferInternalSizedFormat(type),
+                  width, height, 0, GL::RGBA, _getWebGLTextureType(type),
+                  Uint8Array());
 
   // Create the framebuffer
   auto framebuffer = _gl->createFramebuffer();
   bindUnboundFramebuffer(framebuffer.get());
 
-  // Manage attachments
-  if (generateStencilBuffer) {
-    _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::DEPTH_STENCIL_ATTACHMENT,
-                                 GL::RENDERBUFFER, depthStencilBuffer);
-  }
-  else if (generateDepthBuffer) {
-    _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::DEPTH_ATTACHMENT,
-                                 GL::RENDERBUFFER, depthStencilBuffer);
-  }
   _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
                             GL::TEXTURE_2D, _texture, 0);
+
+  _texture->_depthStencilBuffer = _setupFramebufferDepthAttachments(
+    generateStencilBuffer, generateDepthBuffer, width, height);
 
   if (generateMipMaps) {
     _gl->generateMipmap(GL::TEXTURE_2D);
@@ -2097,19 +2139,19 @@ Engine::createRenderTargetTexture(ISize size,
   _gl->bindRenderbuffer(GL::RENDERBUFFER, nullptr);
   bindUnboundFramebuffer(nullptr);
 
-  _texture->_framebuffer = std::move(framebuffer);
-  if (generateDepthBuffer) {
-    _texture->_depthBuffer = std::move(depthStencilBuffer);
-  }
-  _texture->_baseWidth      = width;
-  _texture->_baseHeight     = height;
-  _texture->_width          = width;
-  _texture->_height         = height;
-  _texture->isReady         = true;
-  _texture->generateMipMaps = generateMipMaps;
-  _texture->references      = 1;
-  _texture->samplingMode    = samplingMode;
-  _texture->type            = type;
+  _texture->_framebuffer           = std::move(framebuffer);
+  _texture->_baseWidth             = width;
+  _texture->_baseHeight            = height;
+  _texture->_width                 = width;
+  _texture->_height                = height;
+  _texture->isReady                = true;
+  _texture->samples                = 1;
+  _texture->generateMipMaps        = generateMipMaps;
+  _texture->references             = 1;
+  _texture->samplingMode           = samplingMode;
+  _texture->type                   = type;
+  _texture->_generateDepthBuffer   = generateDepthBuffer;
+  _texture->_generateStencilBuffer = generateStencilBuffer;
 
   resetTextureCache();
 
@@ -2118,11 +2160,105 @@ Engine::createRenderTargetTexture(ISize size,
   return _texture;
 }
 
-unsigned int
-Engine::updateRenderTargetTextureSampleCount(GL::IGLTexture* /*texture*/,
-                                             unsigned int /*samples*/)
+std::unique_ptr<GL::IGLRenderbuffer>
+Engine::_setupFramebufferDepthAttachments(bool generateStencilBuffer,
+                                          bool generateDepthBuffer, int width,
+                                          int height, int samples)
 {
-  return 1;
+  GLRenderBufferPtr depthStencilBuffer = nullptr;
+
+  // Create the depth/stencil buffer
+  if (generateStencilBuffer) {
+    depthStencilBuffer = _gl->createRenderbuffer();
+    _gl->bindRenderbuffer(GL::RENDERBUFFER, depthStencilBuffer);
+
+    if (samples > 1) {
+      _gl->renderbufferStorageMultisample(GL::RENDERBUFFER, samples,
+                                          GL::DEPTH_STENCIL, width, height);
+    }
+    else {
+      _gl->renderbufferStorage(GL::RENDERBUFFER, GL::DEPTH_STENCIL, width,
+                               height);
+    }
+
+    _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::DEPTH_STENCIL_ATTACHMENT,
+                                 GL::RENDERBUFFER, depthStencilBuffer);
+  }
+  else if (generateDepthBuffer) {
+    depthStencilBuffer = _gl->createRenderbuffer();
+    _gl->bindRenderbuffer(GL::RENDERBUFFER, depthStencilBuffer);
+
+    if (samples > 1) {
+      _gl->renderbufferStorageMultisample(GL::RENDERBUFFER, samples,
+                                          GL::DEPTH_COMPONENT16, width, height);
+    }
+    else {
+      _gl->renderbufferStorage(GL::RENDERBUFFER, GL::DEPTH_COMPONENT16, width,
+                               height);
+    }
+
+    _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::DEPTH_ATTACHMENT,
+                                 GL::RENDERBUFFER, depthStencilBuffer);
+  }
+
+  return depthStencilBuffer;
+}
+
+unsigned int
+Engine::updateRenderTargetTextureSampleCount(GL::IGLTexture* texture,
+                                             unsigned int samples)
+{
+  if (webGLVersion() < 2.f) {
+    return 1;
+  }
+
+  if (texture->samples == samples) {
+    return samples;
+  }
+
+  samples = std::min(
+    samples, static_cast<unsigned int>(_gl->getParameteri(GL::MAX_SAMPLES)));
+
+  // Dispose previous render buffers
+  if (texture->_depthStencilBuffer) {
+    _gl->deleteRenderbuffer(texture->_depthStencilBuffer);
+  }
+
+  if (texture->_MSAAFramebuffer) {
+    _gl->deleteFramebuffer(texture->_MSAAFramebuffer);
+  }
+
+  if (texture->_MSAARenderBuffer) {
+    _gl->deleteRenderbuffer(texture->_MSAARenderBuffer);
+  }
+
+  if (samples > 1) {
+    texture->_MSAAFramebuffer = _gl->createFramebuffer();
+    bindUnboundFramebuffer(texture->_MSAAFramebuffer.get());
+
+    auto colorRenderbuffer = _gl->createRenderbuffer();
+    _gl->bindRenderbuffer(GL::RENDERBUFFER, colorRenderbuffer);
+    _gl->renderbufferStorageMultisample(GL::RENDERBUFFER, samples, GL::RGBA8,
+                                        texture->_width, texture->_height);
+
+    _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
+                                 GL::RENDERBUFFER, colorRenderbuffer);
+
+    texture->_MSAARenderBuffer = std::move(colorRenderbuffer);
+  }
+  else {
+    bindUnboundFramebuffer(texture->_framebuffer.get());
+  }
+
+  texture->samples             = samples;
+  texture->_depthStencilBuffer = _setupFramebufferDepthAttachments(
+    texture->_generateStencilBuffer, texture->_generateDepthBuffer,
+    texture->_width, texture->_height, static_cast<int>(samples));
+
+  _gl->bindRenderbuffer(GL::RENDERBUFFER, nullptr);
+  bindUnboundFramebuffer(nullptr);
+
+  return samples;
 }
 
 GL::IGLTexture*
@@ -2142,10 +2278,10 @@ Engine::createRenderTargetCubeTexture(const ISize& size,
   _texture->isCube          = true;
   _texture->references      = 1;
   _texture->generateMipMaps = generateMipMaps;
+  _texture->samples         = 1;
   _texture->samplingMode    = samplingMode;
 
-  SamplingParameters filters
-    = Engine::GetSamplingParameters(samplingMode, generateMipMaps);
+  auto filters = Engine::GetSamplingParameters(samplingMode, generateMipMaps);
 
   _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, _texture);
 
@@ -2165,32 +2301,12 @@ Engine::createRenderTargetCubeTexture(const ISize& size,
   // Create the depth buffer
   GLRenderBufferPtr depthStencilBuffer = nullptr;
 
-  // Create the depth/stencil buffer
-  if (generateStencilBuffer) {
-    depthStencilBuffer = _gl->createRenderbuffer();
-    _gl->bindRenderbuffer(GL::RENDERBUFFER, depthStencilBuffer);
-    _gl->renderbufferStorage(GL::RENDERBUFFER, GL::DEPTH_STENCIL, size.width,
-                             size.height);
-  }
-  else if (generateDepthBuffer) {
-    depthStencilBuffer = _gl->createRenderbuffer();
-    _gl->bindRenderbuffer(GL::RENDERBUFFER, depthStencilBuffer);
-    _gl->renderbufferStorage(GL::RENDERBUFFER, GL::DEPTH_COMPONENT16,
-                             size.width, size.height);
-  }
   // Create the framebuffer
   GLFrameBufferPtr framebuffer = _gl->createFramebuffer();
   bindUnboundFramebuffer(framebuffer.get());
 
-  // Manage attachments
-  if (generateStencilBuffer) {
-    _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::DEPTH_STENCIL_ATTACHMENT,
-                                 GL::RENDERBUFFER, depthStencilBuffer);
-  }
-  else if (generateDepthBuffer) {
-    _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::DEPTH_ATTACHMENT,
-                                 GL::RENDERBUFFER, depthStencilBuffer);
-  }
+  texture->_depthStencilBuffer = _setupFramebufferDepthAttachments(
+    generateStencilBuffer, generateDepthBuffer, size.width, size.height);
 
   // Mipmaps
   if (_texture->generateMipMaps) {
@@ -2204,15 +2320,12 @@ Engine::createRenderTargetCubeTexture(const ISize& size,
   bindUnboundFramebuffer(nullptr);
 
   _texture->_framebuffer = std::move(framebuffer);
-  if (generateDepthBuffer) {
-    _texture->_depthBuffer = std::move(depthStencilBuffer);
-  }
-
-  _texture->_width  = size.width;
-  _texture->_height = size.height;
-  _texture->isReady = true;
+  _texture->_width       = size.width;
+  _texture->_height      = size.height;
+  _texture->isReady      = true;
 
   resetTextureCache();
+
   _loadedTexturesCache.emplace_back(std::move(texture));
 
   return _texture;
@@ -2236,14 +2349,67 @@ void Engine::updateTextureSize(GL::IGLTexture* texture, int width, int height)
   texture->_baseHeight = height;
 }
 
+ArrayBufferView
+Engine::_convertRGBtoRGBATextureData(const ArrayBufferView& rgbData, int width,
+                                     int height, unsigned int textureType)
+{
+  // Create new RGBA data container.
+  if (textureType == Engine::TEXTURETYPE_FLOAT) {
+    Float32Array rgbaData(static_cast<size_t>(width * height * 4));
+    // Convert each pixel.
+    for (int x = 0; x < width; x++) {
+      for (int y = 0; y < height; y++) {
+        size_t index    = static_cast<size_t>((y * width + x) * 3);
+        size_t newIndex = static_cast<size_t>((y * width + x) * 4);
+
+        // Map Old Value to new value.
+        rgbaData[newIndex + 0] = rgbData.float32Array[index + 0];
+        rgbaData[newIndex + 1] = rgbData.float32Array[index + 1];
+        rgbaData[newIndex + 2] = rgbData.float32Array[index + 2];
+
+        // Add fully opaque alpha channel.
+        rgbaData[newIndex + 3] = 1.f;
+      }
+    }
+    return ArrayBufferView(rgbaData);
+  }
+  else {
+    Uint32Array rgbaData(static_cast<size_t>(width * height * 4));
+    // Convert each pixel.
+    for (int x = 0; x < width; x++) {
+      for (int y = 0; y < height; y++) {
+        size_t index    = static_cast<size_t>((y * width + x) * 3);
+        size_t newIndex = static_cast<size_t>((y * width + x) * 4);
+
+        // Map Old Value to new value.
+        rgbaData[newIndex + 0] = rgbData.uint32Array[index + 0];
+        rgbaData[newIndex + 1] = rgbData.uint32Array[index + 1];
+        rgbaData[newIndex + 2] = rgbData.uint32Array[index + 2];
+
+        // Add fully opaque alpha channel.
+        rgbaData[newIndex + 3] = 1;
+      }
+    }
+    return ArrayBufferView(rgbaData);
+  }
+}
+
 void Engine::_releaseTexture(GL::IGLTexture* texture)
 {
   if (texture->_framebuffer) {
     _gl->deleteFramebuffer(texture->_framebuffer);
   }
 
-  if (texture->_depthBuffer) {
-    _gl->deleteRenderbuffer(texture->_depthBuffer);
+  if (texture->_depthStencilBuffer) {
+    _gl->deleteRenderbuffer(texture->_depthStencilBuffer);
+  }
+
+  if (texture->_MSAAFramebuffer) {
+    _gl->deleteFramebuffer(texture->_MSAAFramebuffer);
+  }
+
+  if (texture->_MSAARenderBuffer) {
+    _gl->deleteRenderbuffer(texture->_MSAARenderBuffer);
   }
 
   _gl->deleteTexture(texture);
@@ -2301,7 +2467,7 @@ void Engine::_bindTexture(int channel, GL::IGLTexture* texture)
     return;
   }
 
-  activateTexture((*_gl)["TEXTURE" + std::to_string(channel)]);
+  activateTexture((*_gl)["TEXTURE0" + std::to_string(channel)]);
   _bindTextureDirectly(GL::TEXTURE_2D, texture);
 }
 
@@ -2514,6 +2680,18 @@ void Engine::releaseInternalTexture(GL::IGLTexture* texture)
 
 void Engine::unbindAllAttributes()
 {
+  if (_mustWipeVertexAttributes) {
+    _mustWipeVertexAttributes = false;
+
+    for (unsigned int i = 0, ul = static_cast<unsigned>(_caps.maxVertexAttribs);
+         i < ul; ++i) {
+      _gl->disableVertexAttribArray(i);
+      _vertexAttribArraysEnabled[i] = false;
+    }
+    _currentBufferPointers.clear();
+    return;
+  }
+
   for (unsigned int i = 0; i < _vertexAttribArraysEnabled.size(); i++) {
     if (i >= static_cast<unsigned>(_caps.maxVertexAttribs)
         || !_vertexAttribArraysEnabled[i]) {
@@ -2522,6 +2700,7 @@ void Engine::unbindAllAttributes()
     _gl->disableVertexAttribArray(i);
     _vertexAttribArraysEnabled[i] = false;
   }
+  _currentBufferPointers.clear();
 }
 
 // Dispose
@@ -2648,138 +2827,106 @@ void Engine::_measureFps()
 
 bool Engine::_canRenderToFloatTexture()
 {
-  return _canRenderToTextureOfType(Engine::TEXTURETYPE_FLOAT,
-                                   "OES_texture_float");
+  if (_webGLVersion > 1.f) {
+    return _caps.colorBufferFloat;
+  }
+  return _canRenderToFramebuffer(Engine::TEXTURETYPE_FLOAT);
 }
 
 bool Engine::_canRenderToHalfFloatTexture()
 {
-  return _canRenderToTextureOfType(Engine::TEXTURETYPE_HALF_FLOAT,
-                                   "OES_texture_half_float");
+  if (_webGLVersion > 1.f) {
+    return _caps.colorBufferFloat;
+  }
+
+  return _canRenderToFramebuffer(Engine::TEXTURETYPE_HALF_FLOAT);
 }
 
 // Thank you :
+// Thank you :
 // http://stackoverflow.com/questions/28827511/webgl-ios-render-to-floating-point-texture
-bool Engine::_canRenderToTextureOfType(unsigned int /*format*/,
-                                       const std::string& /*extension*/)
+bool Engine::_canRenderToFramebuffer(unsigned int type)
 {
-#if 0
-  ICanvas* tempcanvas = _renderingCanvas;
-  tempcanvas->height  = 16;
-  tempcanvas->width   = 16;
-  EngineOptions options;
-  GL::IGLRenderingContext* gl = tempcanvas->getContext3d(options);
-
-  // extension.
-  if (!gl->hasExtension(extension)) {
-    return false;
+  // clear existing errors
+  while (_gl->getError() != GL::NO_ERROR) {
   }
 
-  // setup GLSL program
-  const char* vertexCode
-    = "attribute vec4 a_position;"
-      "void main() {"
-      "    gl_Position = a_position;"
-      "}";
-  const char* fragmentCode
-    = "precision mediump float;"
-      "uniform vec4 u_color;"
-      "uniform sampler2D u_texture;"
-      ""
-      "void main() {"
-      "    gl_FragColor = texture2D(u_texture, vec2(0.5, 0.5)) * u_color;"
-      "}";
-  auto program = createShaderProgram(vertexCode, fragmentCode, nullptr, gl);
-  gl->useProgram(program.get());
+  bool successful = true;
 
-  // look up where the vertex data needs to go.
-  GL::GLint _positionLocation
-    = gl->getAttribLocation(program.get(), "a_position");
-  if (_positionLocation < 0) {
-    return false;
-  }
-  GL::GLuint positionLocation = static_cast<GL::GLuint>(_positionLocation);
-  GL::IGLUniformLocation* colorLoc
-    = gl->getUniformLocation(program.get(), "u_color");
+  auto texture = _gl->createTexture();
+  _gl->bindTexture(GL::TEXTURE_2D, texture.get());
+  _gl->texImage2D(GL::TEXTURE_2D, 0, _getRGBABufferInternalSizedFormat(type), 1,
+                  1, 0, GL::RGBA, _getWebGLTextureType(type), nullptr);
+  _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, GL::NEAREST);
+  _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, GL::NEAREST);
 
-  // provide texture coordinates for the rectangle.
-  GL::IGLBuffer* positionBuffer = gl->createBuffer();
-  gl->bindBuffer(GL::ARRAY_BUFFER, positionBuffer);
-  Float32Array data{-1.f, -1.f, //
-                    1.f,  -1.f, //
-                    -1.f, 1.f,  //
-                    -1.f, 1.f,  //
-                    1.f,  -1.f, //
-                    1.f,  1.f};
-  gl->bufferData(GL::ARRAY_BUFFER, data, GL::STATIC_DRAW);
-  gl->enableVertexAttribArray(positionLocation);
-  gl->vertexAttribPointer(positionLocation, 2, GL::FLOAT, false, 0, 0);
+  auto fb = _gl->createFramebuffer();
+  _gl->bindFramebuffer(GL::FRAMEBUFFER, fb.get());
+  _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
+                            GL::TEXTURE_2D, texture.get(), 0);
+  auto status = _gl->checkFramebufferStatus(GL::FRAMEBUFFER);
 
-  GL::IGLTexture* whiteTex = gl->createTexture();
-  gl->bindTexture(GL::TEXTURE_2D, whiteTex);
-  Uint8Array texImage2DData{255, 255, 255, 255};
-  gl->texImage2D(GL::TEXTURE_2D, 0, GL::RGBA, 1, 1, 0, GL::RGBA,
-                 GL::UNSIGNED_BYTE, texImage2DData);
+  successful = successful && (status == GL::FRAMEBUFFER_COMPLETE);
+  successful = successful && (_gl->getError() == GL::NO_ERROR);
 
-  GL::IGLTexture* tex = gl->createTexture();
-  gl->bindTexture(GL::TEXTURE_2D, tex);
-  gl->texImage2D(GL::TEXTURE_2D, 0, GL::RGBA, 1, 1, 0, GL::RGBA,
-                 GetGLTextureType(format), Uint8Array());
-  gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, GL::NEAREST);
-  gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, GL::NEAREST);
-
-  GL::IGLFramebuffer* fb = gl->createFramebuffer();
-  gl->bindFramebuffer(GL::FRAMEBUFFER, fb);
-  gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
-                           GL::TEXTURE_2D, tex, 0);
-
-  auto cleanup = [&]() {
-    gl->deleteProgram(program.get());
-    gl->disableVertexAttribArray(positionLocation);
-    gl->deleteBuffer(positionBuffer);
-    gl->deleteFramebuffer(fb);
-    gl->deleteTexture(whiteTex);
-    gl->deleteTexture(tex);
-  };
-
-  GL::GLenum status = gl->checkFramebufferStatus(GL::FRAMEBUFFER);
-  if (status != GL::FRAMEBUFFER_COMPLETE) {
-    BABYLON_LOGF_ERROR("Engine", "GL Support: can **NOT** render to %d texture",
-                       format)
-    cleanup();
-    return false;
+  // try render by clearing frame buffer's color buffer
+  if (successful) {
+    _gl->clear(GL::COLOR_BUFFER_BIT);
+    successful = successful && (_gl->getError() == GL::NO_ERROR);
   }
 
-  // Draw the rectangle.
-  gl->bindTexture(GL::TEXTURE_2D, whiteTex);
-  Float32Array colorData1{0.f, 10.f, 20.f, 1.f};
-  gl->uniform4fv(colorLoc, colorData1);
-  gl->drawArrays(GL::TRIANGLES, 0, 6);
-
-  gl->bindTexture(GL::TEXTURE_2D, tex);
-  gl->bindFramebuffer(GL::FRAMEBUFFER, nullptr);
-
-  gl->clearColor(1, 0, 0, 1);
-  gl->clear(GL::COLOR_BUFFER_BIT);
-
-  Float32Array colorData2{0.f, 1.f / 10.f, 1.f / 20.f, 1.f};
-  gl->uniform4fv(colorLoc, colorData2);
-  gl->drawArrays(GL::TRIANGLES, 0, 6);
-
-  Uint8Array pixel(4);
-  gl->readPixels(0, 0, 1, 1, GL::RGBA, GL::UNSIGNED_BYTE, pixel);
-  if (pixel[0] != 0 || pixel[1] < 248 || pixel[2] < 248 || pixel[3] < 254) {
-    BABYLON_LOGF_ERROR(
-      "Engine", "GL Support: Was not able to actually render to %d texture",
-      format);
-    cleanup();
-    return false;
+  // try reading from frame to ensure render occurs (just creating the FBO is
+  // not sufficient to determine if rendering is supported)
+  if (successful) {
+    // in practice it's sufficient to just read from the backbuffer rather than
+    // handle potentially issues reading from the texture
+    _gl->bindFramebuffer(GL::FRAMEBUFFER, nullptr);
+    auto readFormat = GL::RGBA;
+    auto readType   = GL::UNSIGNED_BYTE;
+    Uint8Array buffer(4);
+    _gl->readPixels(0, 0, 1, 1, readFormat, readType, buffer);
+    successful = successful && (_gl->getError() == GL::NO_ERROR);
   }
 
-  // Succesfully rendered to "format" texture.
-  cleanup();
-#endif
-  return true;
+  // clean up
+  _gl->deleteTexture(texture.get());
+  _gl->deleteFramebuffer(fb);
+  _gl->bindFramebuffer(GL::FRAMEBUFFER, nullptr);
+
+  // clear accumulated errors
+  while (!successful && (_gl->getError() != GL::NO_ERROR)) {
+  }
+
+  return successful;
+}
+
+GL::GLenum Engine::_getWebGLTextureType(unsigned int type) const
+{
+  if (type == Engine::TEXTURETYPE_FLOAT) {
+    return GL::FLOAT;
+  }
+  else if (type == Engine::TEXTURETYPE_HALF_FLOAT) {
+    // Add Half Float Constant.
+    return Engine::HALF_FLOAT_OES;
+  }
+
+  return GL::UNSIGNED_BYTE;
+}
+
+GL::GLenum Engine::_getRGBABufferInternalSizedFormat(unsigned int type) const
+{
+  if (_webGLVersion == 1.f) {
+    return GL::RGBA;
+  }
+
+  if (type == Engine::TEXTURETYPE_FLOAT) {
+    return Engine::RGBA32F;
+  }
+  else if (type == Engine::TEXTURETYPE_HALF_FLOAT) {
+    return Engine::RGBA16F;
+  }
+
+  return GL::RGBA;
 }
 
 // Statics
@@ -2790,11 +2937,14 @@ bool Engine::isSupported()
 
 std::unique_ptr<GL::IGLShader>
 Engine::CompileShader(GL::IGLRenderingContext* gl, const std::string& source,
-                      const std::string& type, const std::string& defines)
+                      const std::string& type, const std::string& defines,
+                      const std::__cxx11::string& shaderVersion)
 {
   auto shader = gl->createShader(type == "vertex" ? GL::VERTEX_SHADER :
                                                     GL::FRAGMENT_SHADER);
-  gl->shaderSource(shader, ((!defines.empty()) ? defines + "\n" : "") + source);
+  gl->shaderSource(shader, shaderVersion
+                             + ((!defines.empty()) ? defines + "\n" : "")
+                             + source);
   gl->compileShader(shader);
 
   if (!gl->getShaderParameter(shader, GL::COMPILE_STATUS)) {
@@ -2802,19 +2952,6 @@ Engine::CompileShader(GL::IGLRenderingContext* gl, const std::string& source,
     return nullptr;
   }
   return shader;
-}
-
-GL::GLenum Engine::GetGLTextureType(GL::GLenum type)
-{
-  if (type == Engine::TEXTURETYPE_FLOAT) {
-    return GL::FLOAT;
-  }
-  else if (type == Engine::TEXTURETYPE_HALF_FLOAT) {
-    // Add Half Float Constant.
-    return HALF_FLOAT_OES;
-  }
-
-  return GL::UNSIGNED_BYTE;
 }
 
 SamplingParameters Engine::GetSamplingParameters(unsigned int samplingMode,
@@ -2860,6 +2997,9 @@ void Engine::PrepareGLTexture(
   bool invertY, unsigned int samplingMode)
 {
   auto engine = scene->getEngine();
+  if (!engine) {
+    return;
+  }
   auto potWidth
     = Tools::GetExponentOfTwo(width, engine->getCaps().maxTextureSize);
   auto potHeight

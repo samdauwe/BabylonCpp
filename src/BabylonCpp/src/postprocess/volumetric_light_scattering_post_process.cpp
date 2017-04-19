@@ -220,7 +220,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
     }
 
     bool hardwareInstancedRendering
-      = (engine_->getCaps().instancedArrays != nullptr)
+      = (engine_->getCaps().instancedArrays != false)
         && (batch->visibleInstances.find(subMesh->_id)
             != batch->visibleInstances.end());
 

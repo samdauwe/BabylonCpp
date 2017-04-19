@@ -728,6 +728,13 @@ public:
                           GLint width, GLint height, GLint border,
                           GLenum format, GLenum type, const Uint8Array& pixels)
     = 0;
+  virtual void texImage2D(GLenum target, GLint level, GLenum internalformat,
+                          GLenum format, GLenum type, ICanvas* pixels)
+    = 0;
+  virtual void texImage2D(GLenum target, GLint level, GLenum internalformat,
+                          GLsizei width, GLsizei height, GLsizei border,
+                          GLenum format, GLenum type, ICanvas* pixels)
+    = 0;
   virtual void texParameterf(GLenum target, GLenum pname, GLfloat param) = 0;
   virtual void texParameteri(GLenum target, GLenum pname, GLint param)   = 0;
   virtual void texSubImage2D(GLenum target, GLint level, GLint xoffset,

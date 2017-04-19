@@ -116,7 +116,7 @@ public:
   std::function<void(const Json::value& parsedVertexData, Geometry* geometry)>
     _delayLoadingFunction;
   int _softwareSkinningRenderId;
-  std::unordered_map<std::string, GL::IGLVertexArrayObject*>
+  std::unordered_map<std::string, std::unique_ptr<GL::IGLVertexArrayObject>>
     _vertexArrayObjects;
   std::vector<Vector3> centroids;
 

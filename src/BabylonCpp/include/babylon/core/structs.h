@@ -10,15 +10,25 @@
 namespace BABYLON {
 
 struct ArrayBufferView {
-  ArrayBufferView(Float32Array iFloat32Array) : float32Array{iFloat32Array}
+  enum class Type {
+    FLOAT32ARRAY_TYPE = 0,
+    UINT8ARRAY_TYPE   = 1,
+    UINT32ARRAY_TYPE  = 2
+  }; // end of enum class Type
+
+  ArrayBufferView(Float32Array iFloat32Array)
+      : type{Type::FLOAT32ARRAY_TYPE}, float32Array{iFloat32Array}
   {
   }
-  ArrayBufferView(Uint8Array iUint8Array) : uint8Array{iUint8Array}
+  ArrayBufferView(Uint8Array iUint8Array)
+      : type{Type::UINT8ARRAY_TYPE}, uint8Array{iUint8Array}
   {
   }
-  ArrayBufferView(Uint32Array iUint32Array) : uint32Array{iUint32Array}
+  ArrayBufferView(Uint32Array iUint32Array)
+      : type{Type::UINT32ARRAY_TYPE}, uint32Array{iUint32Array}
   {
   }
+  Type type;
   Float32Array float32Array;
   Uint8Array uint8Array;
   Uint32Array uint32Array;

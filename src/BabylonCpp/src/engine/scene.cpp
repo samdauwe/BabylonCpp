@@ -2202,11 +2202,10 @@ void Scene::render()
 
   // Multi-cameras?
   if (!activeCameras.empty()) {
-    Color3 clearColor;
     for (unsigned int cameraIndex = 0; cameraIndex < activeCameras.size();
          ++cameraIndex) {
       if (cameraIndex > 0) {
-        _engine->clear(clearColor, false, true, true);
+        _engine->clear(true, true);
       }
 
       _processSubCameras(activeCameras[cameraIndex]);

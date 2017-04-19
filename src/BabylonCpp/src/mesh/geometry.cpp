@@ -237,7 +237,7 @@ void Geometry::_bind(Effect* effect, GL::IGLBuffer* indexToBind)
       getVertexBuffers(), indexToBind, effect);
   }
 
-  _engine->bindVertexArrayObject(_vertexArrayObjects[effect->key()],
+  _engine->bindVertexArrayObject(_vertexArrayObjects[effect->key()].get(),
                                  indexToBind);
 }
 
@@ -553,7 +553,7 @@ void Geometry::_disposeVertexArrayObjects()
 {
   if (!_vertexArrayObjects.empty()) {
     for (auto& item : _vertexArrayObjects) {
-      _engine->releaseVertexArrayObject(item.second);
+      _engine->releaseVertexArrayObject(item.second.get());
     }
     _vertexArrayObjects.clear();
   }

@@ -906,7 +906,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
 
   auto engine = scene->getEngine();
   auto hardwareInstancedRendering
-    = (engine->getCaps().instancedArrays != nullptr)
+    = (engine->getCaps().instancedArrays != false)
       && (batch->visibleInstances.find(subMesh->_id)
           != batch->visibleInstances.end())
       && (!batch->visibleInstances[subMesh->_id].empty());
