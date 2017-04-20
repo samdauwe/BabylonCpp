@@ -253,6 +253,20 @@ size_t get_address(std::function<T(U...)> f)
   return reinterpret_cast<size_t>(*fnPointer);
 }
 
+// Finding of a minimum and maximum with variadic templates and C++11
+
+template <typename... Ts>
+auto min(Ts... ts) -> typename std::common_type<Ts...>::type
+{
+  return std::min({static_cast<typename std::common_type<Ts...>::type>(ts)...});
+}
+
+template <typename... Ts>
+auto max(Ts... ts) -> typename std::common_type<Ts...>::type
+{
+  return std::max({static_cast<typename std::common_type<Ts...>::type>(ts)...});
+}
+
 // Three-way comparison
 
 /**

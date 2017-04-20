@@ -253,6 +253,17 @@ TEST(TestStdUtil, index_of)
   EXPECT_EQ(std_util::index_of(v, "VERTEXALPHA"), -1);
 }
 
+TEST(TestStdUtil, min)
+{
+  using namespace BABYLON;
+
+  EXPECT_EQ(std_util::min(10, 5.5), 5.5);
+  EXPECT_EQ(std_util::min(0.5, -10.1, -200), -200);
+  EXPECT_EQ(std_util::min(std::string{"var1"}, std::string{"var2"}), "var1");
+  EXPECT_EQ(std_util::min(std::string{"var1"}, "var2"), "var1");
+  EXPECT_EQ(std_util::min("var1", std::string{"var2"}), "var1");
+}
+
 TEST(TestStdUtil, map)
 {
   using namespace BABYLON;
@@ -262,6 +273,19 @@ TEST(TestStdUtil, map)
 
   const std::vector<int> expected{20, 40, 60, 80, 100};
   EXPECT_THAT(doubled, ::testing::ContainerEq(expected));
+}
+
+TEST(TestStdUtil, max)
+{
+  using namespace BABYLON;
+
+  EXPECT_EQ(std_util::max(10, 5.5), 10);
+  EXPECT_EQ(std_util::max(0.5, -10.1, -200), 0.5);
+  EXPECT_EQ(std_util::max(std::string{"var1"}, std::string{"var2"}), "var2");
+  EXPECT_EQ(
+    std_util::max(std::string{"var1"}, static_cast<char const* const>("var2")),
+    "var2");
+  EXPECT_EQ(std_util::max("var1", std::string{"var2"}), "var2");
 }
 
 TEST(TestStdUtil, slice)
