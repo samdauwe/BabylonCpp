@@ -65,18 +65,17 @@ bool Collider::IntersectBoxAASphere(const Vector3& boxMin,
 LowestRoot Collider::GetLowestRoot(float a, float b, float c, float maxR)
 {
   LowestRoot result{0.f, false};
-  float determinant = b * b - 4.f * a * c;
-  if (determinant < 0.f)
+  const float determinant = b * b - 4.f * a * c;
+  if (determinant < 0.f) {
     return result;
+  }
 
-  float sqrtD = std::sqrt(determinant);
-  float r1    = (-b - sqrtD) / (2.f * a);
-  float r2    = (-b + sqrtD) / (2.f * a);
+  const float sqrtD = std::sqrt(determinant);
+  float r1          = (-b - sqrtD) / (2.f * a);
+  float r2          = (-b + sqrtD) / (2.f * a);
 
   if (r1 > r2) {
-    float temp = r2;
-    r2         = r1;
-    r1         = temp;
+    std::swap(r1, r2);
   }
 
   if (r1 > 0 && r1 < maxR) {
@@ -141,7 +140,7 @@ bool Collider::_checkPointInTriangle(const Vector3& point, const Vector3& pa,
 
   Vector3::CrossToRef(_tempVector3, _tempVector, _tempVector4);
   d = Vector3::Dot(_tempVector4, n);
-  return d >= 0;
+  return d >= 0.f;
 }
 
 bool Collider::_canDoCollision(const Vector3& sphereCenter, float sphereRadius,
@@ -150,7 +149,7 @@ bool Collider::_canDoCollision(const Vector3& sphereCenter, float sphereRadius,
 {
   float distance = Vector3::Distance(basePointWorld, sphereCenter);
 
-  float max = std::max(std::max(radius.x, radius.y), radius.z);
+  float max = std_util::max(radius.x, radius.y, radius.z);
 
   if (distance > velocityWorldLength + max + sphereRadius) {
     return false;
@@ -179,7 +178,7 @@ void Collider::_testTriangle(size_t faceIndex,
     trianglePlaneArray[faceIndex].copyFromPoints(p1, p2, p3);
   }
 
-  Plane& trianglePlane = trianglePlaneArray[faceIndex];
+  auto& trianglePlane = trianglePlaneArray[faceIndex];
 
   if ((!hasMaterial) && !trianglePlane.isFrontFacingTo(normalizedVelocity, 0)) {
     return;
@@ -242,7 +241,7 @@ void Collider::_testTriangle(size_t faceIndex,
     float b = 2.f * (Vector3::Dot(velocity, _tempVector));
     float c = _tempVector.lengthSquared() - 1.f;
 
-    LowestRoot lowestRoot = GetLowestRoot(a, b, c, t);
+    auto lowestRoot = GetLowestRoot(a, b, c, t);
     if (lowestRoot.found) {
       t     = lowestRoot.root;
       found = true;

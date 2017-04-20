@@ -179,7 +179,7 @@ void AbstractMesh::setCollisionMask(int mask)
   _collisionMask = !std::isnan(mask) ? mask : -1;
 }
 
-int AbstractMesh::getCollisionGroup() const
+int AbstractMesh::collisionGroup() const
 {
   return _collisionGroup;
 }

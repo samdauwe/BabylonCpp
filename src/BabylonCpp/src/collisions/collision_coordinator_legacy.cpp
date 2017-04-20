@@ -91,12 +91,17 @@ void CollisionCoordinatorLegacy::_collideWithWorld(
     return;
   }
 
+  // Check if this is a mesh else camera or -1
+  auto collisionMask = (excludedMesh ? excludedMesh->collisionMask() :
+                                       collider->collisionMask());
+
   collider->_initialize(position, velocity, closeDistance);
 
   // Check all meshes
   for (auto& mesh : _scene->meshes) {
     if (mesh->isEnabled() && mesh->checkCollisions()
-        && (!mesh->subMeshes.empty()) && mesh.get() != excludedMesh) {
+        && (!mesh->subMeshes.empty()) && mesh.get() != excludedMesh
+        &&  ((collisionMask & mesh->collisionGroup()) != 0)    ) {
       mesh->_checkCollision(collider);
     }
   }

@@ -90,7 +90,7 @@ public:
   // Collisions
   int collisionMask() const;
   void setCollisionMask(int mask);
-  int getCollisionGroup() const;
+  int collisionGroup() const;
   void setCollisionGroup(int mask);
 
   /**
