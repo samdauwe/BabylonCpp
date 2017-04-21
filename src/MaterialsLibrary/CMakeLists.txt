@@ -64,7 +64,8 @@ set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(TESTS_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 
 # Header files
-file(GLOB MATERIALS_HDR_FILES   ${INCLUDE_PATH}/materialslibrary/fire/*.h
+file(GLOB MATERIALS_HDR_FILES   ${INCLUDE_PATH}/materialslibrary/custom/*.h
+                                ${INCLUDE_PATH}/materialslibrary/fire/*.h
                                 ${INCLUDE_PATH}/materialslibrary/fur/*.h
                                 ${INCLUDE_PATH}/materialslibrary/gradient/*.h
                                 ${INCLUDE_PATH}/materialslibrary/grid/*.h
@@ -81,7 +82,8 @@ set(BABYLON_MATERIALS_HEADERS
 )
 
 # Source files
-file(GLOB MATERIALS_SRC_FILES   ${SOURCE_PATH}/materialslibrary/fire/*.cpp
+file(GLOB MATERIALS_SRC_FILES   ${SOURCE_PATH}/materialslibrary/custom/*.cpp
+                                ${SOURCE_PATH}/materialslibrary/fire/*.cpp
                                 ${SOURCE_PATH}/materialslibrary/fur/*.cpp
                                 ${SOURCE_PATH}/materialslibrary/gradient/*.cpp
                                 ${SOURCE_PATH}/materialslibrary/grid/*.cpp
