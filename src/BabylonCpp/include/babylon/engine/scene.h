@@ -93,6 +93,7 @@ public:
   int pointerY();
 
   Material* getCachedMaterial();
+  Effect* getCachedEffect();
   BoundingBoxRenderer* getBoundingBoxRenderer();
   OutlineRenderer* getOutlineRenderer();
   Engine* getEngine();
@@ -822,6 +823,7 @@ public:
   PerfCounter _spritesDuration;
   PerfCounter _activeBones;
   Material* _cachedMaterial;
+  Effect* _cachedEffect;
   std::vector<IDisposable*> _toBeDisposed;
   std::vector<ParticleSystem*> _activeParticleSystems;
   std::vector<Animatable*> _activeAnimatables;

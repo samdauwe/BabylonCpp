@@ -324,6 +324,11 @@ Material* Scene::getCachedMaterial()
   return _cachedMaterial;
 }
 
+Effect* Scene::getCachedEffect()
+{
+  return _cachedEffect;
+}
+
 BoundingBoxRenderer* Scene::getBoundingBoxRenderer()
 {
   return _boundingBoxRenderer.get();
@@ -2730,8 +2735,8 @@ void Scene::createDefaultCameraOrLight(bool createArcRotateCamera)
       worldExtends.max.subtract(worldExtends.min).scale(0.5f));
 
     if (createArcRotateCamera) {
-      auto camera = ArcRotateCamera::New("default camera", 0, 0, 10, Vector3::Zero(),
-                                    this);
+      auto camera = ArcRotateCamera::New("default camera", 0, 0, 10,
+                                         Vector3::Zero(), this);
       camera->setPosition(Vector3(
         worldCenter.x, worldCenter.y,
         worldExtends.min.z - (worldExtends.max.z - worldExtends.min.z)));

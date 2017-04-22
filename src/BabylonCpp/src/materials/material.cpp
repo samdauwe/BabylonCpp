@@ -19,6 +19,7 @@ Material::Material(const std::string& iName, Scene* scene, bool /*doNotAdd*/)
     , alpha{1.f}
     , backFaceCulling{true}
     , doNotSerialize{false}
+    , storeEffectOnSubMeshes{false}
     , alphaMode{Engine::ALPHA_COMBINE}
     , disableDepthWrite{false}
     , fogEnabled{true}
@@ -162,6 +163,12 @@ bool Material::isReady(AbstractMesh* /*mesh*/, bool /*useInstances*/)
   return true;
 }
 
+bool Material::isReadyForSubMesh(AbstractMesh* /*mesh*/, SubMesh* /*subMesh*/,
+                                 bool /*useInstances*/)
+{
+  return false;
+}
+
 Effect* Material::getEffect()
 {
   return _effect;
@@ -223,8 +230,25 @@ void Material::bind(Matrix* /*world*/, Mesh* mesh)
   }
 }
 
+void bindForSubMesh(Matrix* /*world*/, Mesh* /*mesh*/, SubMesh* /*subMesh*/)
+{
+}
+
 void Material::bindOnlyWorldMatrix(Matrix& /*world*/)
 {
+}
+
+void Material::_afterBind(Mesh* mesh)
+{
+  _scene->_cachedMaterial = this;
+
+  onBindObservable.notifyObservers(mesh);
+
+  if (disableDepthWrite) {
+    auto engine            = _scene->getEngine();
+    _cachedDepthWriteState = engine->getDepthWrite();
+    engine->setDepthWrite(false);
+  }
 }
 
 void Material::unbind()

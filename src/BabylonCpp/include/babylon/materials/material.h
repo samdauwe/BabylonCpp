@@ -19,6 +19,12 @@ public:
   static constexpr unsigned int ClockWiseSideOrientation        = 0;
   static constexpr unsigned int CounterClockWiseSideOrientation = 1;
 
+  static constexpr unsigned int TextureDirtyFlag    = 0;
+  static constexpr unsigned int LightDirtyFlag      = 1;
+  static constexpr unsigned int FresnelDirtyFlag    = 2;
+  static constexpr unsigned int AttributesDirtyFlag = 4;
+  static constexpr unsigned int MiscDirtyFlag       = 8;
+
   virtual ~Material();
 
   /**
@@ -60,6 +66,8 @@ public:
   void freeze();
   void unfreeze();
   virtual bool isReady(AbstractMesh* mesh = nullptr, bool useInstances = false);
+  virtual bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+                                 bool useInstances = false);
   Effect* getEffect();
   Scene* getScene() const;
   virtual bool needAlphaBlending();
@@ -72,6 +80,7 @@ public:
   void markDirty();
   void _preBind();
   virtual void bind(Matrix* world, Mesh* mesh);
+  virtual void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh);
   virtual void bindOnlyWorldMatrix(Matrix& world);
   virtual void unbind();
   virtual Material* clone(const std::string& name,
@@ -90,6 +99,8 @@ public:
 
 protected:
   Material(const std::string& name, Scene* scene, bool doNotAdd = false);
+
+  void _afterBind(Mesh* mesh);
 
 public:
   // Events
@@ -118,6 +129,7 @@ public:
   std::function<void(const Effect* effect, const std::string& errors)> onError;
   std::function<std::vector<RenderTargetTexture*>()> getRenderTargetTextures;
   bool doNotSerialize;
+  bool storeEffectOnSubMeshes;
   int alphaMode;
   bool disableDepthWrite;
   bool fogEnabled;

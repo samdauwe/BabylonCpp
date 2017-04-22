@@ -162,12 +162,15 @@ public:
   int _alphaIndex;
   float _distanceToCamera;
   size_t _id;
+  MaterialDefines* _materialDefines;
+  Effect* _materialEffect;
 
 private:
   AbstractMesh* _mesh;
   Mesh* _renderingMesh;
   std::unique_ptr<BoundingInfo> _boundingInfo;
   std::unique_ptr<GL::IGLBuffer> _linesIndexBuffer;
+  Material* _currentMaterial;
 
 }; // end of class SubMesh
 

@@ -208,6 +208,7 @@ class MaterialHelper;
 class MultiMaterial;
 class PBRMaterial;
 struct PBRMaterialDefines;
+class PushMaterial;
 class ShaderMaterial;
 struct ShaderMaterialOptions;
 class StandardMaterial;
