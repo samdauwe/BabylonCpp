@@ -241,6 +241,13 @@ public:
   void flushFramebuffer();
   void restoreDefaultFramebuffer();
 
+  /** UBOs **/
+  GLBufferPtr createUniformBuffer(const Float32Array& elements);
+  GLBufferPtr createDynamicUniformBuffer(const Float32Array& elements);
+  void updateUniformBuffer(GL::IGLBuffer* uniformBuffer,
+                           const Float32Array& elements, int offset = -1,
+                           int count = -1);
+
   /** VBOs **/
   GLBufferPtr createVertexBuffer(const Float32Array& vertices);
   GLBufferPtr createDynamicVertexBuffer(const Float32Array& vertices);

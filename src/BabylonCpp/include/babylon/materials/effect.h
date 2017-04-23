@@ -63,6 +63,7 @@ public:
   bool _cacheFloat3(const std::string& uniformName, float x, float y, float z);
   bool _cacheFloat4(const std::string& uniformName, float x, float y, float z,
                     float w);
+  void bindUniformBuffer(GL::IGLBuffer* _buffer, const std::string& name);
   Effect& setIntArray(const std::string& uniformName, const Int32Array& array);
   Effect& setIntArray2(const std::string& uniformName, const Int32Array& array);
   Effect& setIntArray3(const std::string& uniformName, const Int32Array& array);

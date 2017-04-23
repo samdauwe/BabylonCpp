@@ -213,6 +213,7 @@ class ShaderMaterial;
 struct ShaderMaterialOptions;
 class StandardMaterial;
 struct StandardMaterialDefines;
+class UniformBuffer;
 // - Textures
 class BaseTexture;
 class ColorGradingTexture;

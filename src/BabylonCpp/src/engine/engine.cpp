@@ -737,6 +737,25 @@ void Engine::restoreDefaultFramebuffer()
   wipeCaches();
 }
 
+// UBOs
+std::unique_ptr<GL::IGLBuffer>
+Engine::createUniformBuffer(const Float32Array& /*elements*/)
+{
+  return nullptr;
+}
+
+std::unique_ptr<GL::IGLBuffer>
+Engine::createDynamicUniformBuffer(const Float32Array& /*elements*/)
+{
+  return nullptr;
+}
+
+void Engine::updateUniformBuffer(GL::IGLBuffer* /*uniformBuffer*/,
+                                 const Float32Array& /*elements*/,
+                                 int /*offset*/, int /*count*/)
+{
+}
+
 // VBOs
 void Engine::_resetVertexBufferBinding()
 {

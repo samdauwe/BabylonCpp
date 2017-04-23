@@ -612,6 +612,11 @@ bool Effect::_cacheFloat4(const std::string& uniformName, float x, float y,
   return changed;
 }
 
+void Effect::bindUniformBuffer(GL::IGLBuffer* /*_buffer*/,
+                               const std::string& /*name*/)
+{
+}
+
 Effect& Effect::setIntArray(const std::string& uniformName,
                             const Int32Array& array)
 {

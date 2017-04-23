@@ -230,7 +230,8 @@ void Material::bind(Matrix* /*world*/, Mesh* mesh)
   }
 }
 
-void bindForSubMesh(Matrix* /*world*/, Mesh* /*mesh*/, SubMesh* /*subMesh*/)
+void Material::bindForSubMesh(Matrix* /*world*/, Mesh* /*mesh*/,
+                              SubMesh* /*subMesh*/)
 {
 }
 
