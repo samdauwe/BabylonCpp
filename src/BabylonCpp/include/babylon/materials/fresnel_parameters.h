@@ -11,7 +11,13 @@ class BABYLON_SHARED_EXPORT FresnelParameters {
 public:
   FresnelParameters();
   FresnelParameters(const FresnelParameters& other);
+  FresnelParameters(FresnelParameters&& other);
+  FresnelParameters& operator=(const FresnelParameters& other);
+  FresnelParameters& operator=(FresnelParameters&& other);
   ~FresnelParameters();
+
+  bool isEnabled() const;
+  void setIsEnabled(bool value);
 
   std::unique_ptr<FresnelParameters> clone() const;
   Json::object serialize() const;
@@ -20,11 +26,13 @@ public:
   Parse(const Json::value& parsedFresnelParameters);
 
 public:
-  bool isEnabled;
   Color3 leftColor;
   Color3 rightColor;
   float bias;
   float power;
+
+private:
+  bool _isEnabled;
 
 }; // end of class FresnelParameters
 

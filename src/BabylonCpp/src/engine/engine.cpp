@@ -189,6 +189,12 @@ Engine::~Engine()
 {
 }
 
+void Engine::MarkAllMaterialsAsDirty(
+  unsigned int /*flag*/, const std::function<bool(Material* mat)>& /*predicate*/
+  )
+{
+}
+
 std::vector<std::string>& Engine::texturesSupported()
 {
   return _texturesSupported;

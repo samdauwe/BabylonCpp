@@ -10,6 +10,7 @@ struct BABYLON_SHARED_EXPORT ShaderMaterialOptions {
   bool needAlphaTesting               = false;
   std::vector<std::string> attributes = {"position", "normal", "uv"};
   std::vector<std::string> uniforms   = {"worldViewProjection"};
+  std::vector<std::string> uniformBuffers;
   std::vector<std::string> samplers;
   std::vector<std::string> defines;
 }; // end of struct ShaderMaterialOptions

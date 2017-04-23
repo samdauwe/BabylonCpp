@@ -38,7 +38,7 @@ public:
   bool needAlphaTesting() override;
   ShaderMaterial& setTexture(const std::string& name, Texture* texture);
   ShaderMaterial& setTextureArray(const std::string& iName,
-                                  const std::vector<Texture*>& textures);
+                                  const std::vector<BaseTexture*>& textures);
   ShaderMaterial& setFloat(const std::string& name, float value);
   ShaderMaterial& setFloats(const std::string& name,
                             const std::vector<float>& value);
@@ -81,7 +81,7 @@ private:
   std::string _shaderPath;
   ShaderMaterialOptions _options;
   std::unordered_map<std::string, Texture*> _textures;
-  std::unordered_map<std::string, std::vector<Texture*>> _textureArrays;
+  std::unordered_map<std::string, std::vector<BaseTexture*>> _textureArrays;
   std::unordered_map<std::string, float> _floats;
   std::unordered_map<std::string, std::vector<float>> _floatsArrays;
   std::unordered_map<std::string, Color3> _colors3;

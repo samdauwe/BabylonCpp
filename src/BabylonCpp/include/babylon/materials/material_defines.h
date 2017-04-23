@@ -12,11 +12,23 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   virtual ~MaterialDefines();
 
   bool operator[](unsigned int define) const;
+  bool operator==(const MaterialDefines& rhs) const;
+  bool operator!=(const MaterialDefines& rhs) const;
   void resizeLights(unsigned int lightIndex);
   friend std::ostream& operator<<(std::ostream& os,
                                   const MaterialDefines& materialDefines);
 
-  virtual bool isEqual(MaterialDefines& other) const override;
+  bool isDirty() const override;
+  void markAsProcessed() override;
+  void markAsUnprocessed() override;
+  void markAllAsDirty() override;
+  void markAsLightDirty() override;
+  void markAsAttributesDirty() override;
+  void markAsTexturesDirty() override;
+  void markAsFresnelDirty() override;
+  void markAsMiscDirty() override;
+  void rebuild() override;
+  virtual bool isEqual(const MaterialDefines& other) const override;
   virtual void cloneTo(MaterialDefines& other) override;
   virtual void reset() override;
   virtual std::string toString() const override;
@@ -40,6 +52,21 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   bool LIGHTMAPEXCLUDED;
   std::vector<bool> lightmapexcluded;
   std::vector<bool> lightmapnospecular;
+
+  bool _isDirty;
+  int _renderId;
+
+  bool _areLightsDirty;
+  bool _areAttributesDirty;
+  bool _areTexturesDirty;
+  bool _areFresnelDirty;
+  bool _areMiscDirty;
+
+  bool _normals;
+  bool _uvs;
+
+  bool _needNormals;
+  bool _needUVs;
 
 }; // end of struct MaterialDefines
 

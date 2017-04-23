@@ -277,24 +277,24 @@ bool CustomMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 
   if (StandardMaterial::FresnelEnabled) {
     // Fresnel
-    if ((diffuseFresnelParameters && diffuseFresnelParameters->isEnabled)
-        || (opacityFresnelParameters && opacityFresnelParameters->isEnabled)
-        || (emissiveFresnelParameters && emissiveFresnelParameters->isEnabled)
+    if ((diffuseFresnelParameters && diffuseFresnelParameters->isEnabled())
+        || (opacityFresnelParameters && opacityFresnelParameters->isEnabled())
+        || (emissiveFresnelParameters && emissiveFresnelParameters->isEnabled())
         || (refractionFresnelParameters
-            && refractionFresnelParameters->isEnabled)
+            && refractionFresnelParameters->isEnabled())
         || (reflectionFresnelParameters
-            && reflectionFresnelParameters->isEnabled)) {
+            && reflectionFresnelParameters->isEnabled())) {
 
-      if (diffuseFresnelParameters && diffuseFresnelParameters->isEnabled) {
+      if (diffuseFresnelParameters && diffuseFresnelParameters->isEnabled()) {
         _defines.defines[SMD::DIFFUSEFRESNEL] = true;
       }
 
-      if (opacityFresnelParameters && opacityFresnelParameters->isEnabled) {
+      if (opacityFresnelParameters && opacityFresnelParameters->isEnabled()) {
         _defines.defines[SMD::OPACITYFRESNEL] = true;
       }
 
       if (reflectionFresnelParameters
-          && reflectionFresnelParameters->isEnabled) {
+          && reflectionFresnelParameters->isEnabled()) {
         _defines.defines[SMD::REFLECTIONFRESNEL] = true;
 
         if (useReflectionFresnelFromSpecular) {
@@ -303,11 +303,11 @@ bool CustomMaterial::isReady(AbstractMesh* mesh, bool useInstances)
       }
 
       if (refractionFresnelParameters
-          && refractionFresnelParameters->isEnabled) {
+          && refractionFresnelParameters->isEnabled()) {
         _defines.defines[SMD::REFRACTIONFRESNEL] = true;
       }
 
-      if (emissiveFresnelParameters && emissiveFresnelParameters->isEnabled) {
+      if (emissiveFresnelParameters && emissiveFresnelParameters->isEnabled()) {
         _defines.defines[SMD::EMISSIVEFRESNEL] = true;
       }
 

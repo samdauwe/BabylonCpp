@@ -197,6 +197,7 @@ struct BabylonFileLoader;
 // - Common
 class ColorCurves;
 class Effect;
+struct EffectCreationOptions;
 class EffectFallbacks;
 struct EffectIncludesShadersStore;
 struct EffectShadersStore;

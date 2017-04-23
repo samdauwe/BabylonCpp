@@ -168,7 +168,7 @@ bool PBRMaterial::needAlphaBlending()
   }
   return (alpha < 1.f) || (opacityTexture != nullptr)
          || _shouldUseAlphaFromAlbedoTexture()
-         || (opacityFresnelParameters && opacityFresnelParameters->isEnabled);
+         || (opacityFresnelParameters && opacityFresnelParameters->isEnabled());
 }
 
 bool PBRMaterial::needAlphaTesting()
@@ -592,15 +592,15 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 
   if (StandardMaterial::FresnelEnabled) {
     // Fresnel
-    if ((opacityFresnelParameters && opacityFresnelParameters->isEnabled)
+    if ((opacityFresnelParameters && opacityFresnelParameters->isEnabled())
         || (emissiveFresnelParameters
-            && emissiveFresnelParameters->isEnabled)) {
+            && emissiveFresnelParameters->isEnabled())) {
 
-      if (opacityFresnelParameters && opacityFresnelParameters->isEnabled) {
+      if (opacityFresnelParameters && opacityFresnelParameters->isEnabled()) {
         _defines.defines[PMD::OPACITYFRESNEL] = true;
       }
 
-      if (emissiveFresnelParameters && emissiveFresnelParameters->isEnabled) {
+      if (emissiveFresnelParameters && emissiveFresnelParameters->isEnabled()) {
         _defines.defines[PMD::EMISSIVEFRESNEL] = true;
       }
 
@@ -890,7 +890,7 @@ void PBRMaterial::bind(Matrix* world, Mesh* mesh)
     _effect->setMatrix("viewProjection", _myScene->getTransformMatrix());
 
     if (StandardMaterial::FresnelEnabled) {
-      if (opacityFresnelParameters && opacityFresnelParameters->isEnabled) {
+      if (opacityFresnelParameters && opacityFresnelParameters->isEnabled()) {
         _effect->setColor4(
           "opacityParts",
           Color3(opacityFresnelParameters->leftColor.toLuminance(),
@@ -899,7 +899,7 @@ void PBRMaterial::bind(Matrix* world, Mesh* mesh)
           opacityFresnelParameters->power);
       }
 
-      if (emissiveFresnelParameters && emissiveFresnelParameters->isEnabled) {
+      if (emissiveFresnelParameters && emissiveFresnelParameters->isEnabled()) {
         _effect->setColor4("emissiveLeftColor",
                            emissiveFresnelParameters->leftColor,
                            emissiveFresnelParameters->power);

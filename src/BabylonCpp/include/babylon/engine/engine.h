@@ -484,6 +484,14 @@ public:
   microseconds_t getDeltaTime() const;
 
   /** Statics **/
+  /**
+   * @brief Will flag all materials in all scenes in all engines as dirty to
+   * trigger new shader compilation
+   */
+  static void
+  MarkAllMaterialsAsDirty(unsigned int flag,
+                          const std::function<bool(Material* mat)>& predicate
+                          = nullptr);
   static bool isSupported();
   static GLShaderPtr CompileShader(GL::IGLRenderingContext* gl,
                                    const std::string& source,

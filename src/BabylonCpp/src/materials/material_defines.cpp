@@ -3,7 +3,20 @@
 namespace BABYLON {
 
 MaterialDefines::MaterialDefines()
-    : NUM_BONE_INFLUENCERS{0}, BonesPerMesh{0}, LIGHTMAPEXCLUDED{false}
+    : NUM_BONE_INFLUENCERS{0}
+    , BonesPerMesh{0}
+    , LIGHTMAPEXCLUDED{false}
+    , _isDirty{true}
+    , _renderId{-1}
+    , _areLightsDirty{true}
+    , _areAttributesDirty{true}
+    , _areTexturesDirty{true}
+    , _areFresnelDirty{true}
+    , _areMiscDirty{true}
+    , _normals{false}
+    , _uvs{false}
+    , _needNormals{false}
+    , _needUVs{false}
 {
 }
 
@@ -14,6 +27,16 @@ MaterialDefines::~MaterialDefines()
 bool MaterialDefines::operator[](unsigned int define) const
 {
   return (define < defines.size()) ? defines[define] : false;
+}
+
+bool MaterialDefines::operator==(const MaterialDefines& rhs) const
+{
+  return isEqual(rhs);
+}
+
+bool MaterialDefines::operator!=(const MaterialDefines& rhs) const
+{
+  return !(operator==(rhs));
 }
 
 void MaterialDefines::resizeLights(unsigned int lightIndex)
@@ -98,7 +121,71 @@ std::ostream& operator<<(std::ostream& os,
   return os;
 }
 
-bool MaterialDefines::isEqual(MaterialDefines& other) const
+bool MaterialDefines::isDirty() const
+{
+  return _isDirty;
+}
+
+void MaterialDefines::markAsProcessed()
+{
+  _isDirty            = false;
+  _areAttributesDirty = false;
+  _areTexturesDirty   = false;
+  _areFresnelDirty    = false;
+  _areLightsDirty     = false;
+  _areMiscDirty       = false;
+}
+
+void MaterialDefines::markAsUnprocessed()
+{
+  _isDirty = true;
+}
+
+void MaterialDefines::markAllAsDirty()
+{
+  _areTexturesDirty   = true;
+  _areAttributesDirty = true;
+  _areLightsDirty     = true;
+  _areFresnelDirty    = true;
+  _areMiscDirty       = true;
+  _isDirty            = true;
+}
+
+void MaterialDefines::markAsLightDirty()
+{
+  _areLightsDirty = true;
+  _isDirty        = true;
+}
+
+void MaterialDefines::markAsAttributesDirty()
+{
+  _areAttributesDirty = true;
+  _isDirty            = true;
+}
+
+void MaterialDefines::markAsTexturesDirty()
+{
+  _areTexturesDirty = true;
+  _isDirty          = true;
+}
+
+void MaterialDefines::markAsFresnelDirty()
+{
+  _areFresnelDirty = true;
+  _isDirty         = true;
+}
+
+void MaterialDefines::markAsMiscDirty()
+{
+  _areMiscDirty = true;
+  _isDirty      = true;
+}
+
+void MaterialDefines::rebuild()
+{
+}
+
+bool MaterialDefines::isEqual(const MaterialDefines& other) const
 {
   if ((defines.size() != other.defines.size())
       || (_keys.size() != other._keys.size())
@@ -114,7 +201,15 @@ bool MaterialDefines::isEqual(MaterialDefines& other) const
   }
 
   if ((NUM_BONE_INFLUENCERS != other.NUM_BONE_INFLUENCERS)
-      || (BonesPerMesh != other.BonesPerMesh)) {
+      || (BonesPerMesh != other.BonesPerMesh) || (_isDirty != other._isDirty)
+      || (_renderId != other._renderId)
+      || (_areLightsDirty != other._areLightsDirty)
+      || (_areAttributesDirty != other._areAttributesDirty)
+      || (_areTexturesDirty != other._areTexturesDirty)
+      || (_areFresnelDirty != other._areFresnelDirty)
+      || (_areMiscDirty != other._areMiscDirty) || (_normals != other._normals)
+      || (_uvs != other._uvs) || (_needNormals != other._needNormals)
+      || (_needUVs != other._needUVs)) {
     return false;
   }
 
@@ -188,6 +283,17 @@ void MaterialDefines::cloneTo(MaterialDefines& other)
 
   other.NUM_BONE_INFLUENCERS = NUM_BONE_INFLUENCERS;
   other.BonesPerMesh         = BonesPerMesh;
+  other._isDirty             = _isDirty;
+  other._renderId            = _renderId;
+  other._areLightsDirty      = _areLightsDirty;
+  other._areAttributesDirty  = _areAttributesDirty;
+  other._areTexturesDirty    = _areTexturesDirty;
+  other._areFresnelDirty     = _areFresnelDirty;
+  other._areMiscDirty        = _areMiscDirty;
+  other._normals             = _normals;
+  other._uvs                 = _uvs;
+  other._needNormals         = _needNormals;
+  other._needUVs             = _needUVs;
 
   other.lights      = lights;
   other.pointlights = pointlights;
@@ -207,6 +313,17 @@ void MaterialDefines::reset()
 
   NUM_BONE_INFLUENCERS = 0;
   BonesPerMesh         = 0;
+  _isDirty             = true;
+  _renderId            = -1;
+  _areLightsDirty      = true;
+  _areAttributesDirty  = true;
+  _areTexturesDirty    = true;
+  _areFresnelDirty     = true;
+  _areMiscDirty        = true;
+  _normals             = false;
+  _uvs                 = false;
+  _needNormals         = false;
+  _needUVs             = false;
 
   lights.clear();
   pointlights.clear();

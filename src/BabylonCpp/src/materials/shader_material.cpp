@@ -7,6 +7,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material_helper.h>
+#include <babylon/materials/textures/texture.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/vector2.h>
@@ -27,6 +28,7 @@ ShaderMaterial::ShaderMaterial(const std::string& iName, Scene* scene,
   _options.needAlphaTesting  = options.needAlphaTesting;
   _options.attributes        = options.attributes;
   _options.uniforms          = options.uniforms;
+  _options.uniformBuffers    = options.uniformBuffers;
   _options.samplers          = options.samplers;
   _options.defines           = options.defines;
 }
@@ -57,8 +59,7 @@ bool ShaderMaterial::needAlphaTesting()
 
 void ShaderMaterial::_checkUniform(const std::string& uniformName)
 {
-  if (std::find(_options.uniforms.begin(), _options.uniforms.end(), uniformName)
-      == _options.uniforms.end()) {
+  if (!std_util::contains(_options.uniforms, uniformName)) {
     _options.uniforms.emplace_back(uniformName);
   }
 }
@@ -66,8 +67,7 @@ void ShaderMaterial::_checkUniform(const std::string& uniformName)
 ShaderMaterial& ShaderMaterial::setTexture(const std::string& iName,
                                            Texture* texture)
 {
-  if (std::find(_options.samplers.begin(), _options.samplers.end(), name)
-      == _options.samplers.end()) {
+  if (!std_util::contains(_options.samplers, iName)) {
     _options.samplers.emplace_back(iName);
   }
   _textures[name] = texture;
@@ -77,10 +77,9 @@ ShaderMaterial& ShaderMaterial::setTexture(const std::string& iName,
 
 ShaderMaterial&
 ShaderMaterial::setTextureArray(const std::string& iName,
-                                const std::vector<Texture*>& textures)
+                                const std::vector<BaseTexture*>& textures)
 {
-  if (std::find(_options.samplers.begin(), _options.samplers.end(), name)
-      == _options.samplers.end()) {
+  if (!std_util::contains(_options.samplers, iName)) {
     _options.samplers.emplace_back(iName);
   }
 
@@ -207,8 +206,8 @@ bool ShaderMaterial::_checkCache(Scene* /*scene*/, AbstractMesh* mesh,
 
 bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 {
-  Scene* scene   = getScene();
-  Engine* engine = scene->getEngine();
+  auto scene  = getScene();
+  auto engine = scene->getEngine();
 
   if (!checkReadyOnEveryCall) {
     if (_renderId == scene->getRenderId()) {
@@ -236,6 +235,13 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
     defines.emplace_back("#define BonesPerMesh "
                          + std::to_string(mesh->skeleton()->bones.size() + 1));
     fallbacks->addCPUSkinningFallback(0, mesh);
+  }
+
+  // Textures
+  for (auto& item : _textures) {
+    if (!item.second->isReady()) {
+      return false;
+    }
   }
 
   // Alpha test
@@ -267,21 +273,17 @@ void ShaderMaterial::bindOnlyWorldMatrix(Matrix& world)
 {
   auto scene = getScene();
 
-  if (std::find(_options.uniforms.begin(), _options.uniforms.end(), "world")
-      != _options.uniforms.end()) {
+  if (!std_util::contains(_options.uniforms, "world")) {
     _effect->setMatrix("world", world);
   }
 
-  if (std::find(_options.uniforms.begin(), _options.uniforms.end(), "worldView")
-      != _options.uniforms.end()) {
+  if (!std_util::contains(_options.uniforms, "worldView")) {
     world.multiplyToRef(scene->getViewMatrix(), _cachedWorldViewMatrix);
     _effect->setMatrix("worldView", _cachedWorldViewMatrix);
   }
 
-  if (std::find(_options.uniforms.begin(), _options.uniforms.end(),
-                "worldViewProjection")
-      != _options.uniforms.end()) {
-    Matrix transformMatrix = scene->getTransformMatrix();
+  if (!std_util::contains(_options.uniforms, "worldViewProjection")) {
+    auto transformMatrix = scene->getTransformMatrix();
     _effect->setMatrix("worldViewProjection", world.multiply(transformMatrix));
   }
 }
@@ -292,20 +294,15 @@ void ShaderMaterial::bind(Matrix* world, Mesh* mesh)
   bindOnlyWorldMatrix(*world);
 
   if (getScene()->getCachedMaterial() != this) {
-    if (std::find(_options.uniforms.begin(), _options.uniforms.end(), "view")
-        != _options.uniforms.end()) {
+    if (!std_util::contains(_options.uniforms, "view")) {
       _effect->setMatrix("view", getScene()->getViewMatrix());
     }
 
-    if (std::find(_options.uniforms.begin(), _options.uniforms.end(),
-                  "projection")
-        != _options.uniforms.end()) {
+    if (!std_util::contains(_options.uniforms, "projection")) {
       _effect->setMatrix("projection", getScene()->getProjectionMatrix());
     }
 
-    if (std::find(_options.uniforms.begin(), _options.uniforms.end(),
-                  "viewProjection")
-        != _options.uniforms.end()) {
+    if (!std_util::contains(_options.uniforms, "viewProjection")) {
       _effect->setMatrix("viewProjection", getScene()->getTransformMatrix());
     }
 
@@ -317,15 +314,15 @@ void ShaderMaterial::bind(Matrix* world, Mesh* mesh)
       _effect->setTexture(kv.first, kv.second);
     }
 
+    // Texture arrays
+    for (auto& kv : _textureArrays) {
+      _effect->setTextureArray(kv.first, kv.second);
+    }
+
     // Float
     for (auto& kv : _floats) {
       _effect->setFloat(kv.first, kv.second);
     }
-
-    // Texture arrays
-    /*for (auto& kv : _textureArrays) {
-      _effect->setTextureArray(kv.first, kv.second);
-    }*/
 
     // Floats
     for (auto& kv : _floatsArrays) {
@@ -379,7 +376,7 @@ void ShaderMaterial::bind(Matrix* world, Mesh* mesh)
     }
   }
 
-  Material::bind(world, mesh);
+  _afterBind(mesh);
 }
 
 Material* ShaderMaterial::clone(const std::string& iName,
