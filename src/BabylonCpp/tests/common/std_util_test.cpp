@@ -154,12 +154,41 @@ TEST(TestStdUtil, contains)
 {
   using namespace BABYLON;
 
-  const Int32Array v{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-  EXPECT_TRUE(std_util::contains(v, 2));
-  EXPECT_TRUE(std_util::contains(v, 7));
-  EXPECT_TRUE(std_util::contains(v, 10));
-  EXPECT_FALSE(std_util::contains(v, -1));
-  EXPECT_FALSE(std_util::contains(v, 11));
+  {
+    const Int32Array v{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    EXPECT_TRUE(std_util::contains(v, 2));
+    EXPECT_TRUE(std_util::contains(v, 7));
+    EXPECT_TRUE(std_util::contains(v, 10));
+    EXPECT_FALSE(std_util::contains(v, -1));
+    EXPECT_FALSE(std_util::contains(v, 11));
+  }
+
+  {
+    // Create vector of unique pointers
+    auto numbers = std::vector<std::unique_ptr<int>>(10);
+    for (unsigned int i = 0; i < numbers.size(); ++i) {
+      numbers[i] = std_util::make_unique<int>(i);
+    }
+
+    // Filter vector
+    auto numbersFiltered = std::vector<std::reference_wrapper<const int>>{};
+    std::for_each(numbers.begin(), numbers.end(), [&numbersFiltered](auto& v) {
+      if (*v > 5) {
+        numbersFiltered.emplace_back(std::ref(*v.get()));
+      }
+    });
+
+    // Perform check
+    {
+      auto number = numbersFiltered[1].get();
+      EXPECT_TRUE(std_util::contains(numbersFiltered, number));
+    }
+
+    {
+      auto number = std::ref(*numbers[0].get());
+      EXPECT_FALSE(std_util::contains(numbersFiltered, number));
+    }
+  }
 }
 
 TEST(TestStdUtil, insert_at)
