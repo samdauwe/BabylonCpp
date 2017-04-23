@@ -392,7 +392,7 @@ bool Vector3::operator==(const Vector3& otherVector) const
 
 bool Vector3::operator!=(const Vector3& otherVector) const
 {
-  return !equals(otherVector);
+  return !(operator==(otherVector));
 }
 
 const float& Vector3::operator[](const unsigned int index) const

@@ -349,7 +349,7 @@ bool Vector2::operator==(const Vector2& otherVector) const
 
 bool Vector2::operator!=(const Vector2& otherVector) const
 {
-  return !equals(otherVector);
+  return !(operator==(otherVector));
 }
 
 bool Vector2::operator<(const Vector2& otherVector) const

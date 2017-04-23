@@ -558,7 +558,7 @@ bool Matrix::operator==(const Matrix& other) const
 
 bool Matrix::operator!=(const Matrix& other) const
 {
-  return !equals(other);
+  return !(operator==(other));
 }
 
 float& Matrix::operator[](unsigned int index)

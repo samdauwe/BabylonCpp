@@ -327,7 +327,7 @@ bool Quaternion::operator==(const Quaternion& other) const
 
 bool Quaternion::operator!=(const Quaternion& other) const
 {
-  return !equals(other);
+  return !(operator==(other));
 }
 
 /** Statics **/

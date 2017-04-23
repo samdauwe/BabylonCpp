@@ -368,7 +368,7 @@ bool Vector4::operator==(const Vector4& otherVector) const
 
 bool Vector4::operator!=(const Vector4& otherVector) const
 {
-  return !equals(otherVector);
+  return !(operator==(otherVector));
 }
 
 /** Properties **/

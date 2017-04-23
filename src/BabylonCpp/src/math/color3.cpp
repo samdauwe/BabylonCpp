@@ -284,7 +284,7 @@ bool Color3::operator==(const Color3& otherColor) const
 
 bool Color3::operator!=(const Color3& otherColor) const
 {
-  return !equals(otherColor);
+  return !(operator==(otherColor));
 }
 
 /** Statics **/
