@@ -52,6 +52,7 @@ public:
   void setAllVerticesData(VertexData* vertexData, bool updatable = false);
   void setVerticesData(unsigned int kind, const Float32Array& data,
                        bool updatable = false, int stride = -1) override;
+  void removeVerticesData(unsigned int kind);
   void setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer);
   void updateVerticesDataDirectly(unsigned int kind, const Float32Array& data,
                                   int offset);

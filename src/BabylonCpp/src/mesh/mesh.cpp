@@ -28,6 +28,8 @@
 #include <babylon/mesh/vertex_buffer.h>
 #include <babylon/mesh/vertex_data.h>
 #include <babylon/mesh/vertex_data_options.h>
+#include <babylon/morph/morph_target.h>
+#include <babylon/morph/morph_target_manager.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/physics/physics_engine.h>
 #include <babylon/physics/physics_impostor.h>
@@ -116,6 +118,20 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
 
 Mesh::~Mesh()
 {
+}
+
+MorphTargetManager* Mesh::morphTargetManager()
+{
+  return _morphTargetManager;
+}
+
+void Mesh::setMorphTargetManager(MorphTargetManager* value)
+{
+  if (_morphTargetManager == value) {
+    return;
+  }
+  _morphTargetManager = value;
+  _syncGeometryWithMorphTargetManager();
 }
 
 Mesh* Mesh::source()
@@ -1528,6 +1544,51 @@ void Mesh::optimizeIndices(
   const std::function<void(Mesh* mesh)>& successCallback)
 {
   successCallback(nullptr);
+}
+
+void Mesh::_syncGeometryWithMorphTargetManager()
+{
+  if (!geometry()) {
+    return;
+  }
+
+  _markSubMeshesAsAttributesDirty();
+
+  if (_morphTargetManager && _morphTargetManager->vertexCount()) {
+    if (_morphTargetManager->vertexCount() != getTotalVertices()) {
+      BABYLON_LOG_ERROR("Mesh",
+                        "Mesh is incompatible with morph targets. Targets and "
+                        "mesh must all have the same vertices count.");
+      setMorphTargetManager(nullptr);
+      return;
+    }
+
+    for (unsigned int index = 0; index < morphTargetManager()->numInfluencers();
+         ++index) {
+      auto morphTarget = morphTargetManager()->getActiveTarget(index);
+      geometry()->setVerticesData(VertexBuffer::PositionKind + index,
+                                  morphTarget->getPositions(), false, 3);
+
+      if (morphTarget->hasNormals()) {
+        geometry()->setVerticesData(VertexBuffer::NormalKind + index,
+                                    morphTarget->getNormals(), false, 3);
+      }
+    }
+  }
+  else {
+    unsigned int index = 0;
+
+    // Positions
+    while (
+      geometry()->isVerticesDataPresent(VertexBuffer::PositionKind + index)) {
+      geometry()->removeVerticesData(VertexBuffer::PositionKind + index);
+
+      if (geometry()->isVerticesDataPresent(VertexBuffer::NormalKind + index)) {
+        geometry()->removeVerticesData(VertexBuffer::NormalKind + index);
+      }
+      index++;
+    }
+  }
 }
 
 Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,

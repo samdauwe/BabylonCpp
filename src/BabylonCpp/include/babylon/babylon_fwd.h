@@ -339,6 +339,9 @@ class QuadraticMatrix;
 class Reference;
 class SimplificationQueue;
 class SimplificationSettings;
+// --- Morph ---
+class MorphTarget;
+class MorphTargetManager;
 // --- Particles ---
 class ModelShape;
 class Particle;

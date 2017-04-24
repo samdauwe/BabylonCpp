@@ -104,6 +104,7 @@ public:
    * within scene loading
    */
   std::string toString(bool fullDetails = false) const;
+  void _markSubMeshesAsAttributesDirty();
   Scene* getScene() override;
   void setSkeleton(Skeleton* value);
   virtual Skeleton* skeleton();

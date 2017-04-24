@@ -219,6 +219,10 @@ std::string AbstractMesh::toString(bool fullDetails) const
   return oss.str();
 }
 
+void AbstractMesh::_markSubMeshesAsAttributesDirty()
+{
+}
+
 Scene* AbstractMesh::getScene()
 {
   return Node::getScene();

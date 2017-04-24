@@ -202,6 +202,7 @@ public:
   void setTransformMatrix(Matrix& view, Matrix& projection);
 
   /** Methods **/
+  unsigned int getUniqueId();
   void addMesh(std::unique_ptr<AbstractMesh>&& newMesh);
   int removeMesh(AbstractMesh* toRemove);
   int removeSkeleton(Skeleton* toRemove);
@@ -777,6 +778,8 @@ public:
   // Skeletons
   bool skeletonsEnabled;
   std::vector<std::unique_ptr<Skeleton>> skeletons;
+  // Morph targets
+  std::vector<std::unique_ptr<MorphTargetManager>> morphTargetManagers;
   // Lens flares
   bool lensFlaresEnabled;
   std::vector<std::unique_ptr<LensFlareSystem>> lensFlareSystems;

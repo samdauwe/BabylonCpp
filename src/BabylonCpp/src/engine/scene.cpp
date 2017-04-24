@@ -36,6 +36,7 @@
 #include <babylon/mesh/geometry.h>
 #include <babylon/mesh/simplification/simplification_queue.h>
 #include <babylon/mesh/sub_mesh.h>
+#include <babylon/morph/morph_target_manager.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/physics/physics_engine.h>
 #include <babylon/postprocess/post_process_manager.h>
@@ -1113,14 +1114,21 @@ void Scene::setTransformMatrix(Matrix& view, Matrix& projection)
   }
 }
 
+unsigned int Scene::getUniqueId()
+{
+  return _uniqueIdCounter++;
+}
+
 void Scene::addMesh(std::unique_ptr<AbstractMesh>&& newMesh)
 {
-  newMesh->uniqueId = _uniqueIdCounter++;
+  newMesh->uniqueId = getUniqueId();
   auto _newMesh     = newMesh.get();
   meshes.emplace_back(std::move(newMesh));
 
   // notify the collision coordinator
-  collisionCoordinator->onMeshAdded(_newMesh);
+  if (collisionCoordinator) {
+    collisionCoordinator->onMeshAdded(_newMesh);
+  }
 
   onNewMeshAddedObservable.notifyObservers(_newMesh);
 }

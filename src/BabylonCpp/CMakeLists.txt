@@ -111,6 +111,7 @@ file(GLOB MESH_HDR_FILES            ${INCLUDE_PATH}/mesh/*.h
                                     ${INCLUDE_PATH}/mesh/geometryprimitives/*.h
                                     ${INCLUDE_PATH}/mesh/polygonmesh/*.h
                                     ${INCLUDE_PATH}/mesh/simplification/*.h)
+file(GLOB MORPH_HDR_FILES           ${INCLUDE_PATH}/morph/*.h)
 file(GLOB PARTICLES_HDR_FILES       ${INCLUDE_PATH}/particles/*.h)
 file(GLOB PHYSICS_HDR_FILES         ${INCLUDE_PATH}/physics/*.h
                                     ${INCLUDE_PATH}/physics/joint/*.h
@@ -158,6 +159,7 @@ set(BABYLON_HEADERS
     ${MATERIALS_HDR_FILES}
     ${MATH_HDR_FILES}
     ${MESH_HDR_FILES}
+    ${MORPH_HDR_FILES}
     ${PARTICLES_HDR_FILES}
     ${PHYSICS_HDR_FILES}
     ${POSTPROCESS_HDR_FILES}
@@ -207,6 +209,7 @@ file(GLOB MESH_SRC_FILES            ${SOURCE_PATH}/mesh/*.cpp
                                     ${SOURCE_PATH}/mesh/geometryprimitives/*.cpp
                                     ${SOURCE_PATH}/mesh/polygonmesh/*.cpp
                                     ${SOURCE_PATH}/mesh/simplification/*.cpp)
+file(GLOB MORPH_SRC_FILES           ${SOURCE_PATH}/morph/*.cpp)
 file(GLOB PARTICLES_SRC_FILES       ${SOURCE_PATH}/particles/*.cpp)
 file(GLOB PHYSICS_SRC_FILES         ${SOURCE_PATH}/physics/*.cpp
                                     ${SOURCE_PATH}/physics/joint/*.cpp
@@ -250,6 +253,7 @@ set(BABYLON_SOURCES
     ${MATERIALS_SRC_FILES}
     ${MATH_SRC_FILES}
     ${MESH_SRC_FILES}
+    ${MORPH_SRC_FILES}
     ${PARTICLES_SRC_FILES}
     ${PHYSICS_SRC_FILES}
     ${POSTPROCESS_SRC_FILES}

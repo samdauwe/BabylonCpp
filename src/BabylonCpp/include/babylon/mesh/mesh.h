@@ -89,6 +89,9 @@ public:
   }
   ~Mesh();
 
+  MorphTargetManager* morphTargetManager();
+  void setMorphTargetManager(MorphTargetManager* value);
+
   Mesh* source();
 
   /**
@@ -716,6 +719,8 @@ public:
    * optimization finished.
    */
   void optimizeIndices(const std::function<void(Mesh* mesh)>& successCallback);
+
+  void _syncGeometryWithMorphTargetManager();
 
   /** Statics **/
 
@@ -1430,6 +1435,8 @@ public:
 private:
   Observer<Mesh>::Ptr _onBeforeDrawObserver;
   std::vector<std::unique_ptr<MeshLODLevel>> _LODLevels;
+  // Morph
+  MorphTargetManager* _morphTargetManager;
   std::vector<VertexBuffer*> _delayInfo;
   Int32Array _renderIdForInstances;
   std::unique_ptr<_InstancesBatch> _batchCache;

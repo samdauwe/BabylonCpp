@@ -131,6 +131,14 @@ void Geometry::setVerticesData(unsigned int kind, const Float32Array& data,
   setVerticesBuffer(std::move(buffer));
 }
 
+void Geometry::removeVerticesData(unsigned int kind)
+{
+  if (kind < _vertexBuffers.size() && _vertexBuffers[kind]) {
+    _vertexBuffers[kind]->dispose();
+    _vertexBuffers[kind].reset(nullptr);
+  }
+}
+
 void Geometry::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
 {
   unsigned int kind = buffer->getKind();
