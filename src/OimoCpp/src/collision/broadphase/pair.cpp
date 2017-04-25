@@ -37,8 +37,8 @@ Pair& Pair::operator=(const Pair& p)
 Pair& Pair::operator=(Pair&& p)
 {
   if (&p != this) {
-    std::swap(shape1, p.shape1);
-    std::swap(shape2, p.shape2);
+    shape1 = std::move(p.shape1);
+    shape2 = std::move(p.shape2);
   }
 
   return *this;

@@ -42,10 +42,10 @@ Quaternion& Quaternion::operator=(const Quaternion& otherQuaternion)
 Quaternion& Quaternion::operator=(Quaternion&& otherQuaternion)
 {
   if (&otherQuaternion != this) {
-    std::swap(x, otherQuaternion.x);
-    std::swap(y, otherQuaternion.y);
-    std::swap(z, otherQuaternion.z);
-    std::swap(w, otherQuaternion.w);
+    x = std::move(otherQuaternion.x);
+    y = std::move(otherQuaternion.y);
+    z = std::move(otherQuaternion.z);
+    w = std::move(otherQuaternion.w);
   }
 
   return *this;

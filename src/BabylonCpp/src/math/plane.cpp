@@ -40,8 +40,8 @@ Plane& Plane::operator=(const Plane& otherPlane)
 Plane& Plane::operator=(Plane&& otherPlane)
 {
   if (&otherPlane != this) {
-    std::swap(normal, otherPlane.normal);
-    std::swap(d, otherPlane.d);
+    normal = std::move(otherPlane.normal);
+    d      = std::move(otherPlane.d);
   }
 
   return *this;

@@ -37,7 +37,7 @@ Matrix& Matrix::operator=(const Matrix& otherMatrix)
 Matrix& Matrix::operator=(Matrix&& otherMatrix)
 {
   if (&otherMatrix != this) {
-    std::swap(m, otherMatrix.m);
+    m = std::move(otherMatrix.m);
   }
 
   return *this;

@@ -60,15 +60,15 @@ Ray& Ray::operator=(const Ray& otherRay)
 Ray& Ray::operator=(Ray&& otherRay)
 {
   if (&otherRay != this) {
-    std::swap(origin, otherRay.origin);
-    std::swap(direction, otherRay.direction);
-    std::swap(length, otherRay.length);
-    std::swap(_vectorsSet, otherRay._vectorsSet);
-    std::swap(_edge1, otherRay._edge1);
-    std::swap(_edge2, otherRay._edge2);
-    std::swap(_pvec, otherRay._pvec);
-    std::swap(_tvec, otherRay._tvec);
-    std::swap(_qvec, otherRay._qvec);
+    origin      = std::move(otherRay.origin);
+    direction   = std::move(otherRay.direction);
+    length      = std::move(otherRay.length);
+    _vectorsSet = std::move(otherRay._vectorsSet);
+    _edge1      = std::move(otherRay._edge1);
+    _edge2      = std::move(otherRay._edge2);
+    _pvec       = std::move(otherRay._pvec);
+    _tvec       = std::move(otherRay._tvec);
+    _qvec       = std::move(otherRay._qvec);
   }
 
   return *this;

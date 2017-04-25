@@ -40,9 +40,9 @@ Vec3& Vec3::operator=(const Vec3& v)
 Vec3& Vec3::operator=(Vec3&& v)
 {
   if (&v != this) {
-    std::swap(x, v.x);
-    std::swap(y, v.y);
-    std::swap(z, v.z);
+    x = std::move(v.x);
+    y = std::move(v.y);
+    z = std::move(v.z);
   }
 
   return *this;

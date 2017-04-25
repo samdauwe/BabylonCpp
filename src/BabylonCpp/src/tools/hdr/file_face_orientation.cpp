@@ -46,10 +46,10 @@ operator=(const FileFaceOrientation& other)
 FileFaceOrientation& FileFaceOrientation::operator=(FileFaceOrientation&& other)
 {
   if (&other != this) {
-    std::swap(name, other.name);
-    std::swap(worldAxisForNormal, other.worldAxisForNormal);
-    std::swap(worldAxisForFileX, other.worldAxisForFileX);
-    std::swap(worldAxisForFileY, other.worldAxisForFileY);
+    name               = std::move(other.name);
+    worldAxisForNormal = std::move(other.worldAxisForNormal);
+    worldAxisForFileX  = std::move(other.worldAxisForFileX);
+    worldAxisForFileY  = std::move(other.worldAxisForFileY);
   }
 
   return *this;

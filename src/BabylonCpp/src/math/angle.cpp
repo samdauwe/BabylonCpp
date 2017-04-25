@@ -35,7 +35,7 @@ Angle& Angle::operator=(const Angle& otherAngle)
 Angle& Angle::operator=(Angle&& otherAngle)
 {
   if (&otherAngle != this) {
-    std::swap(_radians, otherAngle._radians);
+    _radians = std::move(otherAngle._radians);
   }
 
   return *this;

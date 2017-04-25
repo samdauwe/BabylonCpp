@@ -30,8 +30,8 @@ EventState& EventState::operator=(const EventState& other)
 EventState& EventState::operator=(EventState&& other)
 {
   if (&other != this) {
-    std::swap(skipNextObservers, other.skipNextObservers);
-    std::swap(mask, other.mask);
+    skipNextObservers = std::move(other.skipNextObservers);
+    mask              = std::move(other.mask);
   }
 
   return *this;

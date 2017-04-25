@@ -48,9 +48,9 @@ Vector3& Vector3::operator=(const Vector3& otherVector)
 Vector3& Vector3::operator=(Vector3&& otherVector)
 {
   if (&otherVector != this) {
-    std::swap(x, otherVector.x);
-    std::swap(y, otherVector.y);
-    std::swap(z, otherVector.z);
+    x = std::move(otherVector.x);
+    y = std::move(otherVector.y);
+    z = std::move(otherVector.z);
   }
 
   return *this;

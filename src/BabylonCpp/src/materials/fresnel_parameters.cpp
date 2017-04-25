@@ -49,11 +49,11 @@ FresnelParameters& FresnelParameters::operator=(const FresnelParameters& other)
 FresnelParameters& FresnelParameters::operator=(FresnelParameters&& other)
 {
   if (&other != this) {
-    std::swap(leftColor, other.leftColor);
-    std::swap(rightColor, other.rightColor);
-    std::swap(bias, other.bias);
-    std::swap(power, other.power);
-    std::swap(_isEnabled, other._isEnabled);
+    leftColor  = std::move(other.leftColor);
+    rightColor = std::move(other.rightColor);
+    bias       = std::move(other.bias);
+    power      = std::move(other.power);
+    _isEnabled = std::move(other._isEnabled);
   }
 
   return *this;

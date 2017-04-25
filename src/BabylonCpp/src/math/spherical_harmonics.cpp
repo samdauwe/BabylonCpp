@@ -64,15 +64,15 @@ operator=(const SphericalHarmonics& other)
 SphericalHarmonics& SphericalHarmonics::operator=(SphericalHarmonics&& other)
 {
   if (&other != this) {
-    std::swap(L00, other.L00);
-    std::swap(L1_1, other.L1_1);
-    std::swap(L10, other.L10);
-    std::swap(L11, other.L11);
-    std::swap(L2_2, other.L2_2);
-    std::swap(L2_1, other.L2_1);
-    std::swap(L20, other.L20);
-    std::swap(L21, other.L21);
-    std::swap(L22, other.L22);
+    L00  = std::move(other.L00);
+    L1_1 = std::move(other.L1_1);
+    L10  = std::move(other.L10);
+    L11  = std::move(other.L11);
+    L2_2 = std::move(other.L2_2);
+    L2_1 = std::move(other.L2_1);
+    L20  = std::move(other.L20);
+    L21  = std::move(other.L21);
+    L22  = std::move(other.L22);
   }
 
   return *this;

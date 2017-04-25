@@ -37,10 +37,10 @@ Vector4& Vector4::operator=(const Vector4& otherVector)
 Vector4& Vector4::operator=(Vector4&& otherVector)
 {
   if (&otherVector != this) {
-    std::swap(x, otherVector.x);
-    std::swap(y, otherVector.y);
-    std::swap(z, otherVector.z);
-    std::swap(w, otherVector.w);
+    x = std::move(otherVector.x);
+    y = std::move(otherVector.y);
+    z = std::move(otherVector.z);
+    w = std::move(otherVector.w);
   }
 
   return *this;

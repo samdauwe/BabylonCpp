@@ -38,9 +38,9 @@ CSG::Polygon& CSG::Polygon::operator=(const BABYLON::CSG::Polygon& otherPolygon)
 CSG::Polygon& CSG::Polygon::operator=(BABYLON::CSG::Polygon&& otherPolygon)
 {
   if (&otherPolygon != this) {
-    std::swap(vertices, otherPolygon.vertices);
-    std::swap(shared, otherPolygon.shared);
-    std::swap(plane, otherPolygon.plane);
+    vertices = std::move(otherPolygon.vertices);
+    shared   = std::move(otherPolygon.shared);
+    plane    = std::move(otherPolygon.plane);
   }
 
   return *this;

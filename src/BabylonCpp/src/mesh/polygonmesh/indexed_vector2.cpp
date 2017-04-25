@@ -35,7 +35,7 @@ IndexedVector2& IndexedVector2::operator=(IndexedVector2&& other)
 {
   if (&other != this) {
     Vector2::operator=(std::move(other));
-    std::swap(index, other.index);
+    index            = std::move(other.index);
   }
 
   return *this;

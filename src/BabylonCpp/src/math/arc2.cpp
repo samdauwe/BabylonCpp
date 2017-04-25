@@ -81,11 +81,11 @@ Arc2& Arc2::operator=(const Arc2& otherArc)
 Arc2& Arc2::operator=(Arc2&& otherArc)
 {
   if (&otherArc != this) {
-    std::swap(centerPoint, otherArc.centerPoint);
-    std::swap(radius, otherArc.radius);
-    std::swap(angle, otherArc.angle);
-    std::swap(startAngle, otherArc.startAngle);
-    std::swap(orientation, otherArc.orientation);
+    centerPoint = std::move(otherArc.centerPoint);
+    radius      = std::move(otherArc.radius);
+    angle       = std::move(otherArc.angle);
+    startAngle  = std::move(otherArc.startAngle);
+    orientation = std::move(otherArc.orientation);
   }
 
   return *this;

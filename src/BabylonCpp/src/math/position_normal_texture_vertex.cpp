@@ -38,9 +38,9 @@ PositionNormalTextureVertex& PositionNormalTextureVertex::
 operator=(PositionNormalTextureVertex&& other)
 {
   if (&other != this) {
-    std::swap(position, other.position);
-    std::swap(normal, other.normal);
-    std::swap(uv, other.uv);
+    position = std::move(other.position);
+    normal   = std::move(other.normal);
+    uv       = std::move(other.uv);
   }
 
   return *this;

@@ -53,15 +53,15 @@ Particle& Particle::operator=(const Particle& other)
 Particle& Particle::operator=(Particle&& other)
 {
   if (&other != this) {
-    std::swap(position, other.position);
-    std::swap(direction, other.direction);
-    std::swap(color, other.color);
-    std::swap(colorStep, other.colorStep);
-    std::swap(lifeTime, other.lifeTime);
-    std::swap(age, other.age);
-    std::swap(size, other.size);
-    std::swap(angle, other.angle);
-    std::swap(angularSpeed, other.angularSpeed);
+    position     = std::move(other.position);
+    direction    = std::move(other.direction);
+    color        = std::move(other.color);
+    colorStep    = std::move(other.colorStep);
+    lifeTime     = std::move(other.lifeTime);
+    age          = std::move(other.age);
+    size         = std::move(other.size);
+    angle        = std::move(other.angle);
+    angularSpeed = std::move(other.angularSpeed);
   }
 
   return *this;

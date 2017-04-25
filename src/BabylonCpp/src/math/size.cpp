@@ -33,8 +33,8 @@ Size& Size::operator=(const Size& otherSize)
 Size& Size::operator=(Size&& otherSize)
 {
   if (&otherSize != this) {
-    std::swap(width, otherSize.width);
-    std::swap(height, otherSize.height);
+    width  = std::move(otherSize.width);
+    height = std::move(otherSize.height);
   }
 
   return *this;

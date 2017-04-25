@@ -32,9 +32,9 @@ CSG::Vertex& CSG::Vertex::operator=(const BABYLON::CSG::Vertex& otherVertex)
 CSG::Vertex& CSG::Vertex::operator=(BABYLON::CSG::Vertex&& otherVertex)
 {
   if (&otherVertex != this) {
-    std::swap(pos, otherVertex.pos);
-    std::swap(normal, otherVertex.normal);
-    std::swap(uv, otherVertex.uv);
+    pos    = std::move(otherVertex.pos);
+    normal = std::move(otherVertex.normal);
+    uv     = std::move(otherVertex.uv);
   }
 
   return *this;

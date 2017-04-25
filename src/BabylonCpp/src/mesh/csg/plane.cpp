@@ -40,8 +40,8 @@ BABYLON::CSG::Plane& BABYLON::CSG::Plane::
 operator=(BABYLON::CSG::Plane&& otherPlane)
 {
   if (&otherPlane != this) {
-    std::swap(normal, otherPlane.normal);
-    std::swap(w, otherPlane.w);
+    normal = std::move(otherPlane.normal);
+    w      = std::move(otherPlane.w);
   }
 
   return *this;

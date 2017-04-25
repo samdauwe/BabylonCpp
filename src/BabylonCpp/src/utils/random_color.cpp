@@ -36,8 +36,8 @@ Range& Range::operator=(const Range& otherRange)
 Range& Range::operator=(Range&& otherRange)
 {
   if (&otherRange != this) {
-    std::swap(_start, otherRange._start);
-    std::swap(_end, otherRange._end);
+    _start = std::move(otherRange._start);
+    _end   = std::move(otherRange._end);
   }
 
   return *this;
@@ -118,12 +118,12 @@ ColorInfo& ColorInfo::operator=(const ColorInfo& other)
 ColorInfo& ColorInfo::operator=(ColorInfo&& other)
 {
   if (&other != this) {
-    std::swap(_hueRange, other._hueRange);
-    std::swap(_hasHueRange, other._hasHueRange);
-    std::swap(_saturationRange, other._saturationRange);
-    std::swap(_brightnessRange, other._brightnessRange);
-    std::swap(_lowerBounds, other._lowerBounds);
-    std::swap(_isValid, other._isValid);
+    _hueRange        = std::move(other._hueRange);
+    _hasHueRange     = std::move(other._hasHueRange);
+    _saturationRange = std::move(other._saturationRange);
+    _brightnessRange = std::move(other._brightnessRange);
+    _lowerBounds     = std::move(other._lowerBounds);
+    _isValid         = std::move(other._isValid);
   }
 
   return *this;

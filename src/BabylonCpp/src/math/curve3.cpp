@@ -38,8 +38,8 @@ Curve3& Curve3::operator=(const Curve3& otherCurve)
 Curve3& Curve3::operator=(Curve3&& otherCurve)
 {
   if (&otherCurve != this) {
-    std::swap(_points, otherCurve._points);
-    std::swap(_length, otherCurve._length);
+    _points = std::move(otherCurve._points);
+    _length = std::move(otherCurve._length);
   }
 
   return *this;

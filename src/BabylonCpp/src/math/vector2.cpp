@@ -32,8 +32,8 @@ Vector2& Vector2::operator=(const Vector2& otherVector)
 Vector2& Vector2::operator=(Vector2&& otherVector)
 {
   if (&otherVector != this) {
-    std::swap(x, otherVector.x);
-    std::swap(y, otherVector.y);
+    x = std::move(otherVector.x);
+    y = std::move(otherVector.y);
   }
 
   return *this;

@@ -42,10 +42,10 @@ Quat& Quat::operator=(const Quat& q)
 Quat& Quat::operator=(Quat&& q)
 {
   if (&q != this) {
-    std::swap(x, q.x);
-    std::swap(y, q.y);
-    std::swap(z, q.z);
-    std::swap(w, q.w);
+    x = std::move(q.x);
+    y = std::move(q.y);
+    z = std::move(q.z);
+    w = std::move(q.w);
   }
 
   return *this;

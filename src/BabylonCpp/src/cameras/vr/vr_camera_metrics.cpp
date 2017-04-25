@@ -79,19 +79,19 @@ VRCameraMetrics& VRCameraMetrics::operator=(const VRCameraMetrics& other)
 VRCameraMetrics& VRCameraMetrics::operator=(VRCameraMetrics&& other)
 {
   if (&other != this) {
-    std::swap(hResolution, other.hResolution);
-    std::swap(vResolution, other.vResolution);
-    std::swap(hScreenSize, other.hScreenSize);
-    std::swap(vScreenSize, other.vScreenSize);
-    std::swap(vScreenCenter, other.vScreenCenter);
-    std::swap(eyeToScreenDistance, other.eyeToScreenDistance);
-    std::swap(lensSeparationDistance, other.lensSeparationDistance);
-    std::swap(interpupillaryDistance, other.interpupillaryDistance);
-    std::swap(distortionK, other.distortionK);
-    std::swap(chromaAbCorrection, other.chromaAbCorrection);
-    std::swap(postProcessScaleFactor, other.postProcessScaleFactor);
-    std::swap(lensCenterOffset, other.lensCenterOffset);
-    std::swap(compensateDistortion, other.compensateDistortion);
+    hResolution            = std::move(other.hResolution);
+    vResolution            = std::move(other.vResolution);
+    hScreenSize            = std::move(other.hScreenSize);
+    vScreenSize            = std::move(other.vScreenSize);
+    vScreenCenter          = std::move(other.vScreenCenter);
+    eyeToScreenDistance    = std::move(other.eyeToScreenDistance);
+    lensSeparationDistance = std::move(other.lensSeparationDistance);
+    interpupillaryDistance = std::move(other.interpupillaryDistance);
+    distortionK            = std::move(other.distortionK);
+    chromaAbCorrection     = std::move(other.chromaAbCorrection);
+    postProcessScaleFactor = std::move(other.postProcessScaleFactor);
+    lensCenterOffset       = std::move(other.lensCenterOffset);
+    compensateDistortion   = std::move(other.compensateDistortion);
   }
 
   return *this;

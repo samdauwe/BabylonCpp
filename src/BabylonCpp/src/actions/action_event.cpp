@@ -53,12 +53,12 @@ ActionEvent& ActionEvent::operator=(const ActionEvent& other)
 ActionEvent& ActionEvent::operator=(ActionEvent&& other)
 {
   if (&other != this) {
-    std::swap(source, other.source);
-    std::swap(sprite, other.sprite);
-    std::swap(pointerX, other.pointerX);
-    std::swap(pointerY, other.pointerY);
-    std::swap(meshUnderPointer, other.meshUnderPointer);
-    std::swap(sourceEvent, other.sourceEvent);
+    source           = std::move(other.source);
+    sprite           = std::move(other.sprite);
+    pointerX         = std::move(other.pointerX);
+    pointerY         = std::move(other.pointerY);
+    meshUnderPointer = std::move(other.meshUnderPointer);
+    sourceEvent      = std::move(other.sourceEvent);
   }
 
   return *this;

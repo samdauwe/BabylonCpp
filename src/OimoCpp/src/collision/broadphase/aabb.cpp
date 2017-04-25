@@ -47,7 +47,7 @@ AABB& AABB::operator=(const AABB& aabb)
 AABB& AABB::operator=(AABB&& aabb)
 {
   if (&aabb != this) {
-    std::swap(elements, aabb.elements);
+    elements = std::move(aabb.elements);
   }
 
   return *this;

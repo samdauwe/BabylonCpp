@@ -67,15 +67,15 @@ Mat33& Mat33::operator=(const Mat33& m)
 Mat33& Mat33::operator=(Mat33&& m)
 {
   if (&m != this) {
-    std::swap(elements[0], m.elements[0]);
-    std::swap(elements[1], m.elements[1]);
-    std::swap(elements[2], m.elements[2]);
-    std::swap(elements[3], m.elements[3]);
-    std::swap(elements[4], m.elements[4]);
-    std::swap(elements[5], m.elements[5]);
-    std::swap(elements[6], m.elements[6]);
-    std::swap(elements[7], m.elements[7]);
-    std::swap(elements[8], m.elements[8]);
+    elements[0] = std::move(m.elements[0]);
+    elements[1] = std::move(m.elements[1]);
+    elements[2] = std::move(m.elements[2]);
+    elements[3] = std::move(m.elements[3]);
+    elements[4] = std::move(m.elements[4]);
+    elements[5] = std::move(m.elements[5]);
+    elements[6] = std::move(m.elements[6]);
+    elements[7] = std::move(m.elements[7]);
+    elements[8] = std::move(m.elements[8]);
   }
 
   return *this;

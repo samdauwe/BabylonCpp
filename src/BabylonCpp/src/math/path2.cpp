@@ -35,9 +35,9 @@ Path2& Path2::operator=(const Path2& otherPath)
 Path2& Path2::operator=(Path2&& otherPath)
 {
   if (&otherPath != this) {
-    std::swap(closed, otherPath.closed);
-    std::swap(_points, otherPath._points);
-    std::swap(_length, otherPath._length);
+    closed  = std::move(otherPath.closed);
+    _points = std::move(otherPath._points);
+    _length = std::move(otherPath._length);
   }
 
   return *this;

@@ -41,10 +41,10 @@ ClickInfo& ClickInfo::operator=(const ClickInfo& otherClickInfo)
 ClickInfo& ClickInfo::operator=(ClickInfo&& otherClickInfo)
 {
   if (&otherClickInfo != this) {
-    std::swap(_singleClick, otherClickInfo._singleClick);
-    std::swap(_doubleClick, otherClickInfo._doubleClick);
-    std::swap(_hasSwiped, otherClickInfo._hasSwiped);
-    std::swap(_ignore, otherClickInfo._ignore);
+    _singleClick = std::move(otherClickInfo._singleClick);
+    _doubleClick = std::move(otherClickInfo._doubleClick);
+    _hasSwiped   = std::move(otherClickInfo._hasSwiped);
+    _ignore      = std::move(otherClickInfo._ignore);
   }
 
   return *this;

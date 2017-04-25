@@ -55,14 +55,14 @@ LogMessage& LogMessage::operator=(const LogMessage& otherLogMessage)
 LogMessage& LogMessage::operator=(LogMessage&& otherLogMessage)
 {
   if (&otherLogMessage != this) {
-    std::swap(_level, otherLogMessage._level);
-    std::swap(_timestamp, otherLogMessage._timestamp);
-    std::swap(_file, otherLogMessage._file);
-    std::swap(_lineNumber, otherLogMessage._lineNumber);
-    std::swap(_threadId, otherLogMessage._threadId);
-    std::swap(_context, otherLogMessage._context);
-    std::swap(_function, otherLogMessage._function);
-    std::swap(_prettyFunction, otherLogMessage._prettyFunction);
+    _level          = std::move(otherLogMessage._level);
+    _timestamp      = std::move(otherLogMessage._timestamp);
+    _file           = std::move(otherLogMessage._file);
+    _lineNumber     = std::move(otherLogMessage._lineNumber);
+    _threadId       = std::move(otherLogMessage._threadId);
+    _context        = std::move(otherLogMessage._context);
+    _function       = std::move(otherLogMessage._function);
+    _prettyFunction = std::move(otherLogMessage._prettyFunction);
     _oss.clear();
     _oss << otherLogMessage._oss.str();
     otherLogMessage._oss.clear();

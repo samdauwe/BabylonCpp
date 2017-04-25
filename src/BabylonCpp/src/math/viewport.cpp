@@ -44,10 +44,10 @@ Viewport& Viewport::operator=(const Viewport& otherViewport)
 Viewport& Viewport::operator=(Viewport&& otherViewport)
 {
   if (&otherViewport != this) {
-    std::swap(x, otherViewport.x);
-    std::swap(y, otherViewport.y);
-    std::swap(width, otherViewport.width);
-    std::swap(height, otherViewport.height);
+    x      = std::move(otherViewport.x);
+    y      = std::move(otherViewport.y);
+    width  = std::move(otherViewport.width);
+    height = std::move(otherViewport.height);
   }
 
   return *this;

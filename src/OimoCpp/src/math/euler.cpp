@@ -48,11 +48,11 @@ Euler& Euler::operator=(const Euler& e)
 Euler& Euler::operator=(Euler&& e)
 {
   if (&e != this) {
-    std::swap(onChangeCallback, e.onChangeCallback);
-    std::swap(_x, e._x);
-    std::swap(_y, e._y);
-    std::swap(_z, e._z);
-    std::swap(_order, e._order);
+    onChangeCallback = std::move(e.onChangeCallback);
+    _x               = std::move(e._x);
+    _y               = std::move(e._y);
+    _z               = std::move(e._z);
+    _order           = std::move(e._order);
   }
 
   return *this;

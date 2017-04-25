@@ -39,10 +39,10 @@ Color4& Color4::operator=(const Color4& otherColor)
 Color4& Color4::operator=(Color4&& otherColor)
 {
   if (&otherColor != this) {
-    std::swap(r, otherColor.r);
-    std::swap(g, otherColor.g);
-    std::swap(b, otherColor.b);
-    std::swap(a, otherColor.a);
+    r = std::move(otherColor.r);
+    g = std::move(otherColor.g);
+    b = std::move(otherColor.b);
+    a = std::move(otherColor.a);
   }
 
   return *this;

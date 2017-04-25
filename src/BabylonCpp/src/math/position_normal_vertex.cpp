@@ -38,8 +38,8 @@ PositionNormalVertex& PositionNormalVertex::
 operator=(PositionNormalVertex&& other)
 {
   if (&other != this) {
-    std::swap(position, other.position);
-    std::swap(normal, other.normal);
+    position = std::move(other.position);
+    normal   = std::move(other.normal);
   }
 
   return *this;

@@ -64,12 +64,12 @@ Path3D& Path3D::operator=(const Path3D& otherPath)
 Path3D& Path3D::operator=(Path3D&& otherPath)
 {
   if (&otherPath != this) {
-    std::swap(_curve, otherPath._curve);
-    std::swap(_distances, otherPath._distances);
-    std::swap(_tangents, otherPath._tangents);
-    std::swap(_normals, otherPath._normals);
-    std::swap(_binormals, otherPath._binormals);
-    std::swap(_raw, otherPath._raw);
+    _curve     = std::move(otherPath._curve);
+    _distances = std::move(otherPath._distances);
+    _tangents  = std::move(otherPath._tangents);
+    _normals   = std::move(otherPath._normals);
+    _binormals = std::move(otherPath._binormals);
+    _raw       = std::move(otherPath._raw);
   }
 
   return *this;

@@ -38,9 +38,9 @@ Condition& Condition::operator=(const Condition& other)
 Condition& Condition::operator=(Condition&& other)
 {
   if (&other != this) {
-    std::swap(_actionManager, other._actionManager);
-    std::swap(_evaluationId, other._evaluationId);
-    std::swap(_currentResult, other._currentResult);
+    _actionManager = std::move(other._actionManager);
+    _evaluationId  = std::move(other._evaluationId);
+    _currentResult = std::move(other._currentResult);
   }
 
   return *this;

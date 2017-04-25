@@ -54,14 +54,14 @@ LimitMotor& LimitMotor::operator=(const LimitMotor& lm)
 LimitMotor& LimitMotor::operator=(LimitMotor&& lm)
 {
   if (&lm != this) {
-    std::swap(axis, lm.axis);
-    std::swap(angle, lm.angle);
-    std::swap(lowerLimit, lm.lowerLimit);
-    std::swap(upperLimit, lm.upperLimit);
-    std::swap(motorSpeed, lm.motorSpeed);
-    std::swap(maxMotorForce, lm.maxMotorForce);
-    std::swap(frequency, lm.frequency);
-    std::swap(dampingRatio, lm.dampingRatio);
+    axis          = std::move(lm.axis);
+    angle         = std::move(lm.angle);
+    lowerLimit    = std::move(lm.lowerLimit);
+    upperLimit    = std::move(lm.upperLimit);
+    motorSpeed    = std::move(lm.motorSpeed);
+    maxMotorForce = std::move(lm.maxMotorForce);
+    frequency     = std::move(lm.frequency);
+    dampingRatio  = std::move(lm.dampingRatio);
   }
 
   return *this;

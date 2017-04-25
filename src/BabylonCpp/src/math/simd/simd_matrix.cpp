@@ -47,7 +47,7 @@ SIMDMatrix& SIMDMatrix::operator=(const Matrix& otherMatrix)
 SIMDMatrix& SIMDMatrix::operator=(SIMDMatrix&& otherMatrix)
 {
   if (&otherMatrix != this) {
-    std::swap(m, otherMatrix.m);
+    m = std::move(otherMatrix.m);
   }
 
   return *this;
@@ -55,7 +55,7 @@ SIMDMatrix& SIMDMatrix::operator=(SIMDMatrix&& otherMatrix)
 
 SIMDMatrix& SIMDMatrix::operator=(Matrix&& otherMatrix)
 {
-  std::swap(m, otherMatrix.m);
+  m = std::move(otherMatrix.m);
 
   return *this;
 }

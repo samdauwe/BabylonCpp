@@ -47,9 +47,9 @@ SceneOptimizerOptions& SceneOptimizerOptions::
 operator=(SceneOptimizerOptions&& other)
 {
   if (&other != this) {
-    std::swap(optimizations, other.optimizations);
-    std::swap(targetFrameRate, other.targetFrameRate);
-    std::swap(trackerDuration, other.trackerDuration);
+    optimizations   = std::move(other.optimizations);
+    targetFrameRate = std::move(other.targetFrameRate);
+    trackerDuration = std::move(other.trackerDuration);
   }
 
   return *this;

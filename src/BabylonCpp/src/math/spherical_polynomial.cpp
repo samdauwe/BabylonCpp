@@ -65,15 +65,15 @@ operator=(const SphericalPolynomial& other)
 SphericalPolynomial& SphericalPolynomial::operator=(SphericalPolynomial&& other)
 {
   if (&other != this) {
-    std::swap(x, other.x);
-    std::swap(y, other.y);
-    std::swap(z, other.z);
-    std::swap(xx, other.xx);
-    std::swap(yy, other.yy);
-    std::swap(zz, other.zz);
-    std::swap(xy, other.xy);
-    std::swap(yz, other.yz);
-    std::swap(zx, other.zx);
+    x  = std::move(other.x);
+    y  = std::move(other.y);
+    z  = std::move(other.z);
+    xx = std::move(other.xx);
+    yy = std::move(other.yy);
+    zz = std::move(other.zz);
+    xy = std::move(other.xy);
+    yz = std::move(other.yz);
+    zx = std::move(other.zx);
   }
 
   return *this;
