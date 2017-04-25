@@ -39,6 +39,11 @@ public:
    */
   int getHashCode() const;
 
+  /**
+   * @brief Mark matrix as updated.
+   */
+  void _markAsUpdated();
+
   /** Properties **/
 
   /**
@@ -617,10 +622,18 @@ public:
   static void FromQuaternionToRef(const Quaternion& quat, Matrix& result);
 
 public:
+  int updateFlag;
   std::array<float, 16> m;
 #if BABYLONCPP_OPTION_ENABLE_SIMD == true
   SIMD::SIMDMatrix simdMatrix;
 #endif
+
+private:
+  static Quaternion _tempQuaternion;
+  static Vector3 _xAxis;
+  static Vector3 _yAxis;
+  static Vector3 _zAxis;
+  static int _updateFlagSeed;
 
 }; // end of class Matrix
 

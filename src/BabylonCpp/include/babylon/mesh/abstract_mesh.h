@@ -410,7 +410,7 @@ public:
 
   bool _isSynchronized() override;
   void _initCache() override;
-  void markAsDirty(const std::string& property) override;
+  void markAsDirty(unsigned int flag) override;
 
   /**
    * @brief Updates the mesh BoundingInfo object and all its children

@@ -947,7 +947,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
   auto effect = effectiveMaterial->getEffect();
 
   // Bind
-  auto fillMode = scene->forcePointsCloud ?
+  auto fillMode = scene->forcePointsCloud() ?
                     Material::PointFillMode :
                     (scene->forceWireframe ? Material::WireFrameFillMode :
                                              effectiveMaterial->fillMode());

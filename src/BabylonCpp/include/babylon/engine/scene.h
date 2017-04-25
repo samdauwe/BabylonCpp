@@ -60,6 +60,21 @@ public:
   Vector2 unTranslatedPointer() const;
 
   /** Properties **/
+  bool forcePointsCloud() const;
+  void setForcePointsCloud(bool value);
+  bool fogEnabled() const;
+  void setFogEnabled(bool value);
+  bool fogMode() const;
+  void setFogMode(bool value);
+  bool shadowsEnabled() const;
+  void setShadowsEnabled(bool value);
+  bool lightsEnabled() const;
+  void setLightsEnabled(bool value);
+  bool texturesEnabled() const;
+  void setTexturesEnabled(bool value);
+  bool skeletonsEnabled() const;
+  void setSkeletonsEnabled(bool value);
+  PostProcessRenderPipelineManager* postProcessRenderPipelineManager();
   Plane* clipPlane();
   void setClipPlane(const Plane& plane);
   void resetClipPlane();
@@ -70,7 +85,7 @@ public:
   DebugLayer* debugLayer();
   void setWorkerCollisions(bool enabled);
   bool workerCollisions() const;
-  Octree<AbstractMesh*>* SelectionOctree();
+  Octree<AbstractMesh*>* selectionOctree();
 
   /**
    * @brief The mesh that is currently under the pointer.
@@ -200,12 +215,14 @@ public:
   const Matrix& getProjectionMatrix() const;
   Matrix getTransformMatrix();
   void setTransformMatrix(Matrix& view, Matrix& projection);
+  UniformBuffer* getSceneUniformBuffer();
 
   /** Methods **/
   unsigned int getUniqueId();
   void addMesh(std::unique_ptr<AbstractMesh>&& newMesh);
   int removeMesh(AbstractMesh* toRemove);
   int removeSkeleton(Skeleton* toRemove);
+  int removeMorphTargetManager(MorphTargetManager* toRemove);
   int removeLight(Light* toRemove);
   int removeCamera(Camera* toRemove);
   void addLight(std::unique_ptr<Light>&& newLight);
@@ -379,6 +396,7 @@ public:
   Skeleton* getLastSkeletonByID(const std::string& id);
   Skeleton* getSkeletonById(const std::string& id);
   Skeleton* getSkeletonByName(const std::string& name);
+  MorphTargetManager* getMorphTargetManagerById(unsigned int id);
   bool isActiveMesh(Mesh* mesh);
 
   /**
@@ -555,6 +573,16 @@ public:
                                          bool depth   = true,
                                          bool stencil = true);
 
+  /**
+   * @brief Will flag all materials as dirty to trigger new shader compilation
+   * @param predicate If not null, it will be used to specifiy if a material has
+   * to be marked as dirty
+   */
+  void
+  markAllMaterialsAsDirty(unsigned int flag,
+                          const std::function<bool(Material* mat)>& predicate
+                          = nullptr);
+
 protected:
   /**
    * @brief Constructor.
@@ -565,6 +593,7 @@ protected:
 
 private:
   void _updatePointerPosition(const PointerEvent evt);
+  void _createUbo();
   void _animate();
   void _evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh);
   void _evaluateActiveMeshes();
@@ -688,7 +717,6 @@ public:
   std::function<bool(AbstractMesh* Mesh)> pointerMovePredicate;
 
   bool forceWireframe;
-  bool forcePointsCloud;
   bool forceShowBoundingBoxes;
   std::unique_ptr<Plane> _clipPlane;
   bool animationsEnabled;
@@ -721,25 +749,11 @@ public:
   Camera* cameraToUseForPointers;
   // Mirror
   std::unique_ptr<Vector3> _mirroredCameraPosition;
-  // Fog
-  /**
-   * is fog enabled on this scene.
-   */
-  bool fogEnabled;
-  unsigned int fogMode;
   Color3 fogColor;
   float fogDensity;
   float fogStart;
   float fogEnd;
   // Lights
-  /**
-   * is shadow enabled on this scene.
-   */
-  bool shadowsEnabled;
-  /**
-   * is light enabled on this scene.
-   */
-  bool lightsEnabled;
   /**
    * All of the lights added to this scene.
    * @see BABYLON.Light
@@ -763,7 +777,6 @@ public:
   std::vector<std::unique_ptr<Material>> materials;
   std::vector<std::unique_ptr<MultiMaterial>> multiMaterials;
   // Textures
-  bool texturesEnabled;
   std::vector<std::unique_ptr<BaseTexture>> textures;
   // Particles
   bool particlesEnabled;
@@ -776,7 +789,6 @@ public:
   std::vector<Layer*> layers;
   std::vector<std::unique_ptr<HighlightLayer>> highlightLayers;
   // Skeletons
-  bool skeletonsEnabled;
   std::vector<std::unique_ptr<Skeleton>> skeletons;
   // Morph targets
   std::vector<std::unique_ptr<MorphTargetManager>> morphTargetManagers;
@@ -790,8 +802,6 @@ public:
   // Postprocesses
   bool postProcessesEnabled;
   std::unique_ptr<PostProcessManager> postProcessManager;
-  std::unique_ptr<PostProcessRenderPipelineManager>
-    postProcessRenderPipelineManager;
   // Customs render targets
   bool renderTargetsEnabled;
   bool dumpNextRenderTargets;
@@ -878,10 +888,34 @@ private:
   // Keyboard
   std::function<void(Event&& evt)> _onKeyDown;
   std::function<void(Event&& evt)> _onKeyUp;
+  // Members
+  bool _forcePointsCloud;
+  // Fog
+  /**
+   * is fog enabled on this scene.
+   */
+  bool _fogEnabled;
+  unsigned int _fogMode;
+  // Lights
+  /**
+   * is shadow enabled on this scene.
+   */
+  bool _shadowsEnabled;
+  /**
+   * is light enabled on this scene.
+   */
+  bool _lightsEnabled;
   // Geometries
   std::vector<std::unique_ptr<Geometry>> _geometries;
   // Materials
   StandardMaterial* _defaultMaterial;
+  // Textures
+  bool _texturesEnabled;
+  // Skeletons
+  bool _skeletonsEnabled;
+  // Postprocesses
+  std::unique_ptr<PostProcessRenderPipelineManager>
+    _postProcessRenderPipelineManager;
   // Collisions
   bool _workerCollisions;
   // Actions
@@ -890,6 +924,7 @@ private:
   bool _hasAudioEngine;
   bool _audioEnabled;
   bool _headphone;
+  // Render engine
   Engine* _engine;
   // Performance counters
   PerfCounter _totalMeshesCounter;
@@ -909,6 +944,8 @@ private:
   int _renderId;
   int _executeWhenReadyTimeoutId;
   bool _intermediateRendering;
+  int _viewUpdateFlag;
+  int _projectionUpdateFlag;
   std::vector<std::string> _pendingData;
   std::vector<Mesh*> _activeMeshes;
   std::vector<Material*> _processedMaterials;
@@ -918,6 +955,7 @@ private:
   std::unique_ptr<RenderingManager> _renderingManager;
   std::unique_ptr<PhysicsEngine> _physicsEngine;
   Matrix _transformMatrix;
+  std::unique_ptr<UniformBuffer> _sceneUbo;
   Matrix _pickWithRayInverseMatrix;
   std::vector<EdgesRenderer*> _edgesRenderers;
   std::unique_ptr<BoundingBoxRenderer> _boundingBoxRenderer;

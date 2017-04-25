@@ -413,7 +413,7 @@ AbstractMesh& AbstractMesh::setBoundingInfo(const BoundingInfo& boundingInfo)
 
 bool AbstractMesh::useBones()
 {
-  return _skeleton && getScene()->skeletonsEnabled
+  return _skeleton && getScene()->skeletonsEnabled()
          && isVerticesDataPresent(VertexBuffer::MatricesIndicesKind)
          && isVerticesDataPresent(VertexBuffer::MatricesWeightsKind);
 }
@@ -678,9 +678,9 @@ void AbstractMesh::_initCache()
   _cache.billboardMode      = AbstractMesh::BILLBOARDMODE_NONE;
 }
 
-void AbstractMesh::markAsDirty(const std::string& property)
+void AbstractMesh::markAsDirty(unsigned int property)
 {
-  if (property == "rotation") {
+  if (property == static_cast<unsigned>(PropertyType::ROTATION)) {
     resetRotationQuaternion();
   }
   _currentRenderId = std::numeric_limits<int>::max();

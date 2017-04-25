@@ -12,9 +12,16 @@
 
 namespace BABYLON {
 
+Quaternion Matrix::_tempQuaternion = Quaternion::Zero();
+Vector3 Matrix::_xAxis             = Vector3::Zero();
+Vector3 Matrix::_yAxis             = Vector3::Zero();
+Vector3 Matrix::_zAxis             = Vector3::Zero();
+int Matrix::_updateFlagSeed        = 0;
+
 Matrix::Matrix()
 {
   std::fill(m.begin(), m.end(), 0.f);
+  _markAsUpdated();
 }
 
 Matrix::Matrix(const Matrix& otherMatrix) : m{otherMatrix.m}
@@ -69,6 +76,11 @@ int Matrix::getHashCode() const
     hash = std::pow((hash * 397), m[i]);
   }
   return static_cast<int>(hash);
+}
+
+void Matrix::_markAsUpdated()
+{
+  updateFlag = Matrix::_updateFlagSeed++;
 }
 
 /** Properties **/

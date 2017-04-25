@@ -100,7 +100,7 @@ bool TriPlanarMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   _defines.reset();
 
   // Textures
-  if (scene->texturesEnabled) {
+  if (scene->texturesEnabled()) {
     if (StandardMaterial::DiffuseTextureEnabled) {
       std::vector<Texture*> textures{diffuseTextureX, diffuseTextureY,
                                      diffuseTextureZ};
@@ -146,18 +146,18 @@ bool TriPlanarMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Point size
-  if (pointsCloud() || scene->forcePointsCloud) {
+  if (pointsCloud() || scene->forcePointsCloud()) {
     _defines.defines[TPMD::POINTSIZE] = true;
   }
 
   // Fog
-  if (scene->fogEnabled && mesh && mesh->applyFog
-      && scene->fogMode != Scene::FOGMODE_NONE && fogEnabled) {
+  if (scene->fogEnabled() && mesh && mesh->applyFog
+      && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled) {
     _defines.defines[TPMD::FOG] = true;
   }
 
   // Lights
-  if (scene->lightsEnabled && !disableLighting) {
+  if (scene->lightsEnabled() && !disableLighting) {
     needNormals = MaterialHelper::PrepareDefinesForLights(
       scene, mesh, _defines, maxSimultaneousLights, TPMD::SPECULARTERM,
       TPMD::SHADOWS);
@@ -320,15 +320,15 @@ void TriPlanarMaterial::bind(Matrix* world, Mesh* mesh)
     _effect->setColor4("vSpecularColor", specularColor, specularPower);
   }
 
-  if (scene->lightsEnabled && !disableLighting) {
+  if (scene->lightsEnabled() && !disableLighting) {
     MaterialHelper::BindLights(scene, mesh, _effect,
                                _defines.defines[TPMD::SPECULARTERM],
                                maxSimultaneousLights);
   }
 
   // View
-  if (scene->fogEnabled && mesh->applyFog
-      && scene->fogMode != Scene::FOGMODE_NONE) {
+  if (scene->fogEnabled() && mesh->applyFog
+      && scene->fogMode() != Scene::FOGMODE_NONE) {
     _effect->setMatrix("view", scene->getViewMatrix());
   }
 

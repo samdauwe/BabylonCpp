@@ -269,7 +269,7 @@ void PBRMaterial::BindLights(Scene* scene, AbstractMesh* mesh, Effect* effect,
     }
 
     // Shadows
-    if (scene->shadowsEnabled) {
+    if (scene->shadowsEnabled()) {
       depthValuesAlreadySet = MaterialHelper::BindLightShadow(
         light.get(), scene, mesh, lightIndex, effect, depthValuesAlreadySet);
     }
@@ -297,7 +297,7 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 
   _defines.reset();
 
-  if (scene->lightsEnabled && !disableLighting) {
+  if (scene->lightsEnabled() && !disableLighting) {
     needNormals = MaterialHelper::PrepareDefinesForLights(
                     scene, mesh, _defines, maxSimultaneousLights,
                     PMD::SPECULARTERM, PMD::SHADOWS, PMD::SHADOWFULLFLOAT)
@@ -313,7 +313,7 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Textures
-  if (scene->texturesEnabled) {
+  if (scene->texturesEnabled()) {
     if (scene->getEngine()->getCaps().textureLOD) {
       _defines.defines[PMD::LODBASEDMICROSFURACE] = true;
     }
@@ -580,13 +580,13 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Point size
-  if (pointsCloud() || scene->forcePointsCloud) {
+  if (pointsCloud() || scene->forcePointsCloud()) {
     _defines.defines[PMD::POINTSIZE] = true;
   }
 
   // Fog
-  if (scene->fogEnabled && mesh && mesh->applyFog
-      && scene->fogMode != scene->FOGMODE_NONE && fogEnabled) {
+  if (scene->fogEnabled() && mesh && mesh->applyFog
+      && scene->fogMode() != scene->FOGMODE_NONE && fogEnabled) {
     _defines.defines[PMD::FOG] = true;
   }
 
@@ -910,7 +910,7 @@ void PBRMaterial::bind(Matrix* world, Mesh* mesh)
     }
 
     // Textures
-    if (_myScene->texturesEnabled) {
+    if (_myScene->texturesEnabled()) {
       if (albedoTexture && StandardMaterial::DiffuseTextureEnabled) {
         _effect->setTexture("albedoSampler", albedoTexture);
 
@@ -1137,15 +1137,15 @@ void PBRMaterial::bind(Matrix* world, Mesh* mesh)
                        alpha * mesh->visibility);
 
     // Lights
-    if (_myScene->lightsEnabled && !disableLighting) {
+    if (_myScene->lightsEnabled() && !disableLighting) {
       PBRMaterial::BindLights(_myScene, mesh, _effect, _defines,
                               useScalarInLinearSpace, maxSimultaneousLights,
                               usePhysicalLightFalloff);
     }
 
     // View
-    if ((_myScene->fogEnabled && mesh->applyFog
-         && _myScene->fogMode != Scene::FOGMODE_NONE)
+    if ((_myScene->fogEnabled() && mesh->applyFog
+         && _myScene->fogMode() != Scene::FOGMODE_NONE)
         || reflectionTexture) {
       _effect->setMatrix("view", _myScene->getViewMatrix());
     }

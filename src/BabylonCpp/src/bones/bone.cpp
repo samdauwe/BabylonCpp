@@ -163,7 +163,7 @@ void Bone::_updateDifferenceMatrix(Matrix& rootMatrix)
   }
 }
 
-void Bone::markAsDirty(const std::string& /*property*/)
+void Bone::markAsDirty(unsigned int /*property*/)
 {
   ++_currentRenderId;
   _skeleton->_markAsDirty();

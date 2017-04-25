@@ -43,7 +43,7 @@ public:
   void updateMatrix(const Matrix& matrix, bool updateDifferenceMatrix = true);
   void _updateDifferenceMatrix();
   void _updateDifferenceMatrix(Matrix& rootMatrix);
-  void markAsDirty(const std::string& property = "") override;
+  void markAsDirty(unsigned int property = 0) override;
   bool copyAnimationRange(Bone* source, const std::string& rangeName,
                           int frameOffset, bool rescaleAsRequired = false,
                           const Vector3& skelDimensionsRatio = Vector3(),

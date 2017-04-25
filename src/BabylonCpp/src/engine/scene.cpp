@@ -31,6 +31,7 @@
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
+#include <babylon/materials/uniform_buffer.h>
 #include <babylon/math/frustum.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/geometry.h>
@@ -64,8 +65,10 @@ Scene::Scene(Engine* engine)
     : autoClear{true}
     , clearColor{Color4(0.2f, 0.2f, 0.3f, 1.f)}
     , ambientColor{Color3(0.f, 0.f, 0.f)}
+    , pointerDownPredicate{nullptr}
+    , pointerUpPredicate{nullptr}
+    , pointerMovePredicate{nullptr}
     , forceWireframe{false}
-    , forcePointsCloud{false}
     , forceShowBoundingBoxes{false}
     , _clipPlane{nullptr}
     , animationsEnabled{true}
@@ -74,43 +77,62 @@ Scene::Scene(Engine* engine)
     , hoverCursor{"pointer"}
     , cameraToUseForPointers(nullptr)
     , _mirroredCameraPosition{nullptr}
-    , fogEnabled{true}
-    , fogMode{Scene::FOGMODE_NONE}
     , fogColor{Color3(0.2f, 0.2f, 0.3f)}
     , fogDensity{0.1f}
     , fogStart{0.f}
     , fogEnd{1000.f}
-    , shadowsEnabled{true}
-    , lightsEnabled{true}
     , activeCamera{nullptr}
-    , texturesEnabled{true}
     , particlesEnabled{true}
     , spritesEnabled{true}
-    , skeletonsEnabled{true}
     , lensFlaresEnabled{true}
     , collisionsEnabled{true}
     , collisionCoordinator{nullptr}
     , gravity{Vector3(0.f, -9.807f, 0.f)}
     , postProcessesEnabled{true}
+    , postProcessManager{nullptr}
     , renderTargetsEnabled{true}
     , dumpNextRenderTargets{false}
     , probesEnabled{true}
     , actionManager{nullptr}
     , proceduralTexturesEnabled{true}
+    , mainSoundTrack{nullptr}
+    , simplificationQueue{nullptr}
+    , _cachedMaterial{nullptr}
+    , _cachedEffect{nullptr}
     , _onDisposeObserver{nullptr}
     , _onBeforeRenderObserver{nullptr}
     , _onAfterRenderObserver{nullptr}
     , _onBeforeCameraRenderObserver{nullptr}
     , _onAfterCameraRenderObserver{nullptr}
+    , _onPointerMove{nullptr}
+    , _onPointerDown{nullptr}
+    , _onPointerUp{nullptr}
+    , _initClickEvent{nullptr}
+    , _initActionManager{nullptr}
+    , _delayedSimpleClick{nullptr}
     , _meshPickProceed{false}
     , _previousHasSwiped{false}
+    , _currentPickResult{nullptr}
+    , _previousPickResult{nullptr}
     , _isButtonPressed{false}
     , _doubleClickOccured{false}
     , _startingPointerPosition{Vector2(0.f, 0.f)}
     , _previousStartingPointerPosition{Vector2(0.f, 0.f)}
     , _startingPointerTime{high_res_time_point_t()}
     , _previousStartingPointerTime{high_res_time_point_t()}
+    , beforeRender{nullptr}
+    , afterRender{nullptr}
+    , _onKeyDown{nullptr}
+    , _onKeyUp{nullptr}
+    , _forcePointsCloud{false}
+    , _fogEnabled{true}
+    , _fogMode{Scene::FOGMODE_NONE}
+    , _shadowsEnabled{true}
+    , _lightsEnabled{true}
     , _defaultMaterial{nullptr}
+    , _texturesEnabled{true}
+    , _skeletonsEnabled{true}
+    , _postProcessRenderPipelineManager{nullptr}
     , _hasAudioEngine{false}
     , _audioEnabled{true}
     , _headphone{false}
@@ -121,8 +143,14 @@ Scene::Scene(Engine* engine)
     , _renderId{0}
     , _executeWhenReadyTimeoutId{-1}
     , _intermediateRendering{false}
+    , _viewUpdateFlag{-1}
+    , _projectionUpdateFlag{-1}
+    , _renderingManager{nullptr}
     , _physicsEngine{nullptr}
     , _transformMatrix{Matrix::Zero()}
+    , _sceneUbo{nullptr}
+    , _boundingBoxRenderer{nullptr}
+    , _outlineRenderer{nullptr}
     , _frustumPlanesSet{false}
     , _selectionOctree{nullptr}
     , _pointerOverMesh{nullptr}
@@ -141,11 +169,6 @@ Scene::Scene(Engine* engine)
 
   postProcessManager = std_util::make_unique<PostProcessManager>(this);
 
-  postProcessRenderPipelineManager
-    = std_util::make_unique<PostProcessRenderPipelineManager>();
-
-  _boundingBoxRenderer = std_util::make_unique<BoundingBoxRenderer>(this);
-
   _outlineRenderer = std_util::make_unique<OutlineRenderer>(this);
 
   attachControl();
@@ -155,7 +178,11 @@ Scene::Scene(Engine* engine)
   // simplification queue
   simplificationQueue = std_util::make_unique<SimplificationQueue>();
 
+  // Collision coordinator initialization.
   setWorkerCollisions(false);
+
+  // Uniform Buffer
+  _createUbo();
 }
 
 Scene::~Scene()
@@ -217,6 +244,114 @@ Vector2 Scene::unTranslatedPointer() const
 }
 
 // Properties
+bool Scene::forcePointsCloud() const
+{
+  return _forcePointsCloud;
+}
+
+void Scene::setForcePointsCloud(bool value)
+{
+  if (_forcePointsCloud == value) {
+    return;
+  }
+  _forcePointsCloud = value;
+  markAllMaterialsAsDirty(Material::MiscDirtyFlag);
+}
+
+bool Scene::fogEnabled() const
+{
+  return _fogEnabled;
+}
+
+void Scene::setFogEnabled(bool value)
+{
+  if (_fogEnabled == value) {
+    return;
+  }
+  _fogEnabled = value;
+  markAllMaterialsAsDirty(Material::MiscDirtyFlag);
+}
+
+bool Scene::fogMode() const
+{
+  return _fogMode;
+}
+
+void Scene::setFogMode(bool value)
+{
+  if (_fogMode == value) {
+    return;
+  }
+  _fogMode = value;
+  markAllMaterialsAsDirty(Material::MiscDirtyFlag);
+}
+
+bool Scene::shadowsEnabled() const
+{
+  return _shadowsEnabled;
+}
+
+void Scene::setShadowsEnabled(bool value)
+{
+  if (_shadowsEnabled == value) {
+    return;
+  }
+  _shadowsEnabled = value;
+  markAllMaterialsAsDirty(Material::LightDirtyFlag);
+}
+
+bool Scene::lightsEnabled() const
+{
+  return _lightsEnabled;
+}
+
+void Scene::setLightsEnabled(bool value)
+{
+  if (_lightsEnabled == value) {
+    return;
+  }
+  _lightsEnabled = value;
+  markAllMaterialsAsDirty(Material::LightDirtyFlag);
+}
+
+bool Scene::texturesEnabled() const
+{
+  return _texturesEnabled;
+}
+
+void Scene::setTexturesEnabled(bool value)
+{
+  if (_texturesEnabled == value) {
+    return;
+  }
+  _texturesEnabled = value;
+  markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+}
+
+bool Scene::skeletonsEnabled() const
+{
+  return _skeletonsEnabled;
+}
+
+void Scene::setSkeletonsEnabled(bool value)
+{
+  if (_skeletonsEnabled == value) {
+    return;
+  }
+  _skeletonsEnabled = value;
+  markAllMaterialsAsDirty(Material::AttributesDirtyFlag);
+}
+
+PostProcessRenderPipelineManager* Scene::postProcessRenderPipelineManager()
+{
+  if (!_postProcessRenderPipelineManager) {
+    _postProcessRenderPipelineManager
+      = std_util::make_unique<PostProcessRenderPipelineManager>();
+  }
+
+  return _postProcessRenderPipelineManager.get();
+}
+
 Plane* Scene::clipPlane()
 {
   return _clipPlane ? _clipPlane.get() : nullptr;
@@ -300,7 +435,7 @@ std::vector<AbstractMesh*> Scene::getMeshes() const
   return _meshes;
 }
 
-Octree<AbstractMesh*>* Scene::SelectionOctree()
+Octree<AbstractMesh*>* Scene::selectionOctree()
 {
   return _selectionOctree;
 }
@@ -332,6 +467,10 @@ Effect* Scene::getCachedEffect()
 
 BoundingBoxRenderer* Scene::getBoundingBoxRenderer()
 {
+  if (!_boundingBoxRenderer) {
+    _boundingBoxRenderer = std_util::make_unique<BoundingBoxRenderer>(this);
+  }
+
   return _boundingBoxRenderer.get();
 }
 
@@ -473,6 +612,13 @@ void Scene::_updatePointerPosition(const PointerEvent evt)
       = _pointerY
         - cameraToUseForPointers->viewport.y * _engine->getRenderHeight();
   }
+}
+
+void Scene::_createUbo()
+{
+  _sceneUbo = std::make_unique<UniformBuffer>(_engine, Float32Array(), true);
+  _sceneUbo->addUniform("viewProjection", 16);
+  _sceneUbo->addUniform("view", 16);
 }
 
 void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
@@ -884,18 +1030,24 @@ void Scene::_onKeyUpEvent(Event&& evt)
 
 bool Scene::isReady()
 {
-  /*if (_pendingData.length > 0) {
+  if (!_pendingData.empty()) {
     return false;
-  }*/
+  }
 
+  // Geometries
   for (const auto& geometry : _geometries) {
     if (geometry->delayLoadState == Engine::DELAYLOADSTATE_LOADING) {
       return false;
     }
   }
 
+  // Meshes
   for (const auto& mesh : meshes) {
     if (!mesh->isEnabled()) {
+      continue;
+    }
+
+    if (mesh->subMeshes.empty()) {
       continue;
     }
 
@@ -917,6 +1069,7 @@ bool Scene::isReady()
 void Scene::resetCachedMaterial()
 {
   _cachedMaterial = nullptr;
+  _cachedEffect   = nullptr;
 }
 
 void Scene::registerBeforeRender(const std::function<void()>& func)
@@ -1100,8 +1253,15 @@ Matrix Scene::getTransformMatrix()
 
 void Scene::setTransformMatrix(Matrix& view, Matrix& projection)
 {
-  _viewMatrix       = view;
-  _projectionMatrix = projection;
+  if (_viewUpdateFlag == view.updateFlag
+      && _projectionUpdateFlag == projection.updateFlag) {
+    return;
+  }
+
+  _viewUpdateFlag       = view.updateFlag;
+  _projectionUpdateFlag = projection.updateFlag;
+  _viewMatrix           = view;
+  _projectionMatrix     = projection;
 
   _viewMatrix.multiplyToRef(_projectionMatrix, _transformMatrix);
 
@@ -1112,6 +1272,17 @@ void Scene::setTransformMatrix(Matrix& view, Matrix& projection)
   else {
     Frustum::GetPlanesToRef(_transformMatrix, _frustumPlanes);
   }
+
+  if (_sceneUbo->useUbo()) {
+    _sceneUbo->updateMatrix("viewProjection", _transformMatrix);
+    _sceneUbo->updateMatrix("view", _viewMatrix);
+    _sceneUbo->update();
+  }
+}
+
+UniformBuffer* Scene::getSceneUniformBuffer()
+{
+  return _sceneUbo.get();
 }
 
 unsigned int Scene::getUniqueId()
@@ -1145,7 +1316,9 @@ int Scene::removeMesh(AbstractMesh* toRemove)
     meshes.erase(it);
   }
   // notify the collision coordinator
-  collisionCoordinator->onMeshRemoved(toRemove);
+  if (collisionCoordinator) {
+    collisionCoordinator->onMeshRemoved(toRemove);
+  }
 
   onMeshRemovedObservable.notifyObservers(toRemove);
 
@@ -1161,7 +1334,24 @@ int Scene::removeSkeleton(Skeleton* toRemove)
                    });
   int index = static_cast<int>(it - skeletons.begin());
   if (it != skeletons.end()) {
+    // Remove from the scene if found
     skeletons.erase(it);
+  }
+
+  return index;
+}
+
+int Scene::removeMorphTargetManager(MorphTargetManager* toRemove)
+{
+  auto it = std::find_if(
+    morphTargetManagers.begin(), morphTargetManagers.end(),
+    [&toRemove](const std::unique_ptr<MorphTargetManager>& morphTargetManager) {
+      return morphTargetManager.get() == toRemove;
+    });
+  int index = static_cast<int>(it - morphTargetManagers.begin());
+  if (it != morphTargetManagers.end()) {
+    // Remove from the scene if found
+    morphTargetManagers.erase(it);
   }
 
   return index;
@@ -1175,6 +1365,7 @@ int Scene::removeLight(Light* toRemove)
                          });
   int index = static_cast<int>(it - lights.begin());
   if (it != lights.end()) {
+    // Remove from the scene if mesh found
     lights.erase(it);
   }
 
@@ -1217,7 +1408,7 @@ int Scene::removeCamera(Camera* toRemove)
 
 void Scene::addLight(std::unique_ptr<Light>&& newLight)
 {
-  newLight->uniqueId = _uniqueIdCounter++;
+  newLight->uniqueId = getUniqueId();
   auto _newLight     = newLight.get();
   lights.emplace_back(std::move(newLight));
   onNewLightAddedObservable.notifyObservers(_newLight);
@@ -1225,7 +1416,7 @@ void Scene::addLight(std::unique_ptr<Light>&& newLight)
 
 void Scene::addCamera(std::unique_ptr<Camera>&& newCamera)
 {
-  newCamera->uniqueId = _uniqueIdCounter++;
+  newCamera->uniqueId = getUniqueId();
   auto _newCamera     = newCamera.get();
   cameras.emplace_back(std::move(newCamera));
   onNewCameraAddedObservable.notifyObservers(_newCamera);
@@ -1434,7 +1625,9 @@ bool Scene::pushGeometry(std::unique_ptr<Geometry>&& geometry, bool force)
   _geometries.emplace_back(std::move(geometry));
 
   // Notify the collision coordinator
-  collisionCoordinator->onGeometryAdded(_geometry);
+  if (collisionCoordinator) {
+    collisionCoordinator->onGeometryAdded(_geometry);
+  }
 
   onNewGeometryAddedObservable.notifyObservers(_geometry);
 
@@ -1452,7 +1645,9 @@ bool Scene::removeGeometry(Geometry* geometry)
     _geometries.erase(it);
 
     // notify the collision coordinator
-    collisionCoordinator->onGeometryDeleted(geometry);
+    if (collisionCoordinator) {
+      collisionCoordinator->onGeometryDeleted(geometry);
+    }
 
     onGeometryRemovedObservable.notifyObservers(geometry);
 
@@ -1639,6 +1834,17 @@ Skeleton* Scene::getSkeletonByName(const std::string& name)
   return (it == skeletons.end()) ? nullptr : (*it).get();
 }
 
+MorphTargetManager* Scene::getMorphTargetManagerById(unsigned int id)
+{
+  auto it = std::find_if(
+    morphTargetManagers.begin(), morphTargetManagers.end(),
+    [&id](const std::unique_ptr<MorphTargetManager>& morphTargetManager) {
+      return morphTargetManager->uniqueId() == id;
+    });
+
+  return (it == morphTargetManagers.end()) ? nullptr : (*it).get();
+}
+
 bool Scene::isActiveMesh(Mesh* mesh)
 {
   return std::find(_activeMeshes.begin(), _activeMeshes.end(), mesh)
@@ -1671,7 +1877,7 @@ void Scene::_evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh)
     auto material = subMesh->getMaterial();
 
     if (mesh->showSubMeshesBoundingBox) {
-      _boundingBoxRenderer->renderList.emplace_back(
+      getBoundingBoxRenderer()->renderList.emplace_back(
         subMesh->getBoundingInfo()->boundingBox);
     }
 
@@ -1713,7 +1919,9 @@ void Scene::_evaluateActiveMeshes()
   _activeParticleSystems.clear();
   _activeSkeletons.clear();
   _softwareSkinnedMeshes.clear();
-  _boundingBoxRenderer->reset();
+  if (_boundingBoxRenderer) {
+    _boundingBoxRenderer->reset();
+  }
   _edgesRenderers.clear();
 
   if (!_frustumPlanesSet) {
@@ -1802,7 +2010,7 @@ void Scene::_evaluateActiveMeshes()
 
 void Scene::_activeMesh(AbstractMesh* mesh)
 {
-  if (mesh->skeleton() && skeletonsEnabled) {
+  if (mesh->skeleton() && skeletonsEnabled()) {
     if (std::find(_activeSkeletons.begin(), _activeSkeletons.end(),
                   mesh->skeleton())
         == _activeSkeletons.end()) {
@@ -1823,7 +2031,7 @@ void Scene::_activeMesh(AbstractMesh* mesh)
   }
 
   if (mesh->showBoundingBox || forceShowBoundingBoxes) {
-    _boundingBoxRenderer->renderList.emplace_back(
+    getBoundingBoxRenderer()->renderList.emplace_back(
       mesh->getBoundingInfo()->boundingBox);
   }
 
@@ -1990,7 +2198,9 @@ void Scene::_renderForCamera(Camera* camera)
   Tools::EndPerformanceCounter("Main render");
 
   // Bounding boxes
-  _boundingBoxRenderer->render();
+  if (_boundingBoxRenderer) {
+    _boundingBoxRenderer->render();
+  }
 
   // Edges
   for (auto& _edgesRenderer : _edgesRenderers) {
@@ -2182,12 +2392,13 @@ void Scene::render()
                           clearColor);
   }
   else {
-    _engine->clear(clearColor, autoClear || forceWireframe || forcePointsCloud,
-                   true, true);
+    _engine->clear(clearColor,
+                   autoClear || forceWireframe || forcePointsCloud(), true,
+                   true);
   }
 
   // Shadows
-  if (shadowsEnabled) {
+  if (shadowsEnabled()) {
     for (auto& light : lights) {
       auto shadowGenerator = light->getShadowGenerator();
       if (light->isEnabled() && shadowGenerator) {
@@ -2211,7 +2422,9 @@ void Scene::render()
   }
 
   // RenderPipeline
-  postProcessRenderPipelineManager->update();
+  if (_postProcessRenderPipelineManager) {
+    _postProcessRenderPipelineManager->update();
+  }
 
   // Multi-cameras?
   if (!activeCameras.empty()) {
@@ -2368,8 +2581,7 @@ void Scene::dispose(bool /*doNotRecurse*/)
   afterRender  = nullptr;
 
   skeletons.clear();
-
-  _boundingBoxRenderer->dispose();
+  morphTargetManagers.clear();
 
   if (_depthRenderer) {
     _depthRenderer->dispose();
@@ -2386,7 +2598,9 @@ void Scene::dispose(bool /*doNotRecurse*/)
   _activeParticleSystems.clear();
   _activeSkeletons.clear();
   _softwareSkinnedMeshes.clear();
-  _boundingBoxRenderer->dispose();
+  if (_boundingBoxRenderer) {
+    _boundingBoxRenderer->dispose();
+  }
   _edgesRenderers.clear();
   _meshesForIntersections.clear();
   _toBeDisposed.clear();
@@ -2459,6 +2673,9 @@ void Scene::dispose(bool /*doNotRecurse*/)
   for (auto& texture : textures) {
     texture->dispose();
   }
+
+  // Release UBO
+  _sceneUbo->dispose();
 
   // Post-processes
   postProcessManager->dispose();
@@ -2748,7 +2965,11 @@ void Scene::createDefaultCameraOrLight(bool createArcRotateCamera)
       camera->setPosition(Vector3(
         worldCenter.x, worldCenter.y,
         worldExtends.min.z - (worldExtends.max.z - worldExtends.min.z)));
+      camera->lowerRadiusLimit = 0.5f;
       camera->setTarget(worldCenter);
+      camera->minZ = 0.1f;
+      // auto maxDist = worldExtends.max.subtract(worldExtends.min).length();
+      // camera->wheelPrecision = 100.f / maxDist;
       activeCamera = camera;
     }
     else {
@@ -2757,6 +2978,9 @@ void Scene::createDefaultCameraOrLight(bool createArcRotateCamera)
                                  worldExtends.min.z
                                    - (worldExtends.max.z - worldExtends.min.z));
       camera->setTarget(worldCenter);
+      camera->minZ = 0.1f;
+      // auto maxDist = worldExtends.max.subtract(worldExtends.min).length();
+      // camera->wheelPrecision = 100.f / maxDist;
       activeCamera = camera;
     }
   }
@@ -2804,6 +3028,17 @@ void Scene::setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
 {
   _renderingManager->setRenderingAutoClearDepthStencil(
     renderingGroupId, autoClearDepthStencil, depth, stencil);
+}
+
+void Scene::markAllMaterialsAsDirty(
+  unsigned int flag, const std::function<bool(Material* mat)>& predicate)
+{
+  for (auto& material : materials) {
+    if (predicate && !predicate(material.get())) {
+      continue;
+    }
+    material->markAsDirty(flag);
+  }
 }
 
 } // end of namespace BABYLON

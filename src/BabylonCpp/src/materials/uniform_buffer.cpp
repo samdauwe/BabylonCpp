@@ -7,8 +7,7 @@
 
 namespace BABYLON {
 
-Float32Array UniformBuffer::_tempBuffer
-  = Float32Array(UniformBuffer::_MAX_UNIFORM_SIZE);
+Float32Array UniformBuffer::_tempBuffer{};
 
 UniformBuffer::UniformBuffer(Engine* engine, const Float32Array& data,
                              bool dynamic)

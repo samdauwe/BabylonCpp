@@ -41,6 +41,11 @@ enum class PointerType {
   TOUCH     = 1,
 }; // end of enum class MouseButtonType
 
+/** Property types **/
+enum class PropertyType : unsigned int {
+  ROTATION = 100
+}; // end of enum class PropertyType
+
 /** Collisions Enums **/
 enum class WorkerTaskType {
   INIT    = 0,

@@ -103,7 +103,7 @@ bool NormalMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   _defines.reset();
 
   // Textures
-  if (scene->texturesEnabled) {
+  if (scene->texturesEnabled()) {
     if (diffuseTexture && StandardMaterial::DiffuseTextureEnabled) {
       if (!diffuseTexture->isReady()) {
         return false;
@@ -125,17 +125,17 @@ bool NormalMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Point size
-  if (pointsCloud() || scene->forcePointsCloud) {
+  if (pointsCloud() || scene->forcePointsCloud()) {
     _defines.defines[NMD::POINTSIZE] = true;
   }
 
   // Fog
-  if (scene->fogEnabled && mesh && mesh->applyFog
-      && scene->fogMode != Scene::FOGMODE_NONE && fogEnabled) {
+  if (scene->fogEnabled() && mesh && mesh->applyFog
+      && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled) {
     _defines.defines[NMD::FOG] = true;
   }
 
-  if (scene->lightsEnabled && !disableLighting) {
+  if (scene->lightsEnabled() && !disableLighting) {
     needNormals = MaterialHelper::PrepareDefinesForLights(
       scene, mesh, _defines, maxSimultaneousLights, NMD::SPECULARTERM,
       NMD::SHADOWS);
@@ -309,14 +309,14 @@ void NormalMaterial::bind(Matrix* world, Mesh* mesh)
   _effect->setColor4("vDiffuseColor", diffuseColor, alpha * mesh->visibility);
 
   // Lights
-  if (scene->lightsEnabled && !disableLighting) {
+  if (scene->lightsEnabled() && !disableLighting) {
     MaterialHelper::BindLights(scene, mesh, _effect,
                                _defines.defines[NMD::SPECULARTERM]);
   }
 
   // View
-  if (scene->fogEnabled && mesh->applyFog
-      && scene->fogMode != Scene::FOGMODE_NONE) {
+  if (scene->fogEnabled() && mesh->applyFog
+      && scene->fogMode() != Scene::FOGMODE_NONE) {
     _effect->setMatrix("view", scene->getViewMatrix());
   }
 

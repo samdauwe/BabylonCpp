@@ -94,7 +94,7 @@ bool FireMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   _defines.reset();
 
   // Textures
-  if (scene->texturesEnabled) {
+  if (scene->texturesEnabled()) {
     if (diffuseTexture && StandardMaterial::DiffuseTextureEnabled) {
       if (!diffuseTexture->isReady()) {
         return false;
@@ -114,13 +114,13 @@ bool FireMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   _defines.defines[FMD::ALPHATEST] = true;
 
   // Point size
-  if (pointsCloud() || scene->forcePointsCloud) {
+  if (pointsCloud() || scene->forcePointsCloud()) {
     _defines.defines[FMD::POINTSIZE] = true;
   }
 
   // Fog
-  if (scene->fogEnabled && mesh && mesh->applyFog
-      && scene->fogMode != Scene::FOGMODE_NONE && fogEnabled) {
+  if (scene->fogEnabled() && mesh && mesh->applyFog
+      && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled) {
     _defines.defines[FMD::FOG] = true;
   }
 
@@ -268,8 +268,8 @@ void FireMaterial::bind(Matrix* world, Mesh* mesh)
   _effect->setColor4("vDiffuseColor", _scaledDiffuse, alpha * mesh->visibility);
 
   // View
-  if (scene->fogEnabled && mesh->applyFog
-      && scene->fogMode != Scene::FOGMODE_NONE) {
+  if (scene->fogEnabled() && mesh->applyFog
+      && scene->fogMode() != Scene::FOGMODE_NONE) {
     _effect->setMatrix("view", scene->getViewMatrix());
   }
 

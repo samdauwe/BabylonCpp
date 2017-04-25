@@ -96,10 +96,10 @@ StandardRenderingPipeline::StandardRenderingPipeline(
   _createDepthOfFieldPostProcess(scene, ratio);
 
   // Finish
-  scene->postProcessRenderPipelineManager->addPipeline(this);
+  scene->postProcessRenderPipelineManager()->addPipeline(this);
 
   if (!cameras.empty()) {
-    scene->postProcessRenderPipelineManager->attachCamerasToRenderPipeline(
+    scene->postProcessRenderPipelineManager()->attachCamerasToRenderPipeline(
       iName, cameras);
   }
 
@@ -117,20 +117,20 @@ void StandardRenderingPipeline::setDepthOfFieldEnabled(bool enabled)
   auto blurIndexStr = std::to_string(gaussianBlurHPostProcesses.size() - 1);
 
   if (enabled && !_depthOfFieldEnabled) {
-    _scene->postProcessRenderPipelineManager->enableEffectInPipeline(
+    _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
       _name, "HDRGaussianBlurH" + blurIndexStr, _scene->getCameras());
-    _scene->postProcessRenderPipelineManager->enableEffectInPipeline(
+    _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
       _name, "HDRGaussianBlurV" + blurIndexStr, _scene->getCameras());
-    _scene->postProcessRenderPipelineManager->enableEffectInPipeline(
+    _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
       _name, "HDRDepthOfField", _scene->getCameras());
     _depthRenderer = _scene->enableDepthRenderer();
   }
   else if (!enabled && _depthOfFieldEnabled) {
-    _scene->postProcessRenderPipelineManager->disableEffectInPipeline(
+    _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
       _name, "HDRGaussianBlurH" + blurIndexStr, _scene->getCameras());
-    _scene->postProcessRenderPipelineManager->disableEffectInPipeline(
+    _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
       _name, "HDRGaussianBlurV" + blurIndexStr, _scene->getCameras());
-    _scene->postProcessRenderPipelineManager->disableEffectInPipeline(
+    _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
       _name, "HDRDepthOfField", _scene->getCameras());
   }
 
@@ -147,27 +147,27 @@ void StandardRenderingPipeline::setLensFlareEnabled(bool enabled)
   auto blurIndexStr = std::to_string(gaussianBlurHPostProcesses.size() - 1);
 
   if (enabled && !_lensFlareEnabled) {
-    _scene->postProcessRenderPipelineManager->enableEffectInPipeline(
+    _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
       _name, "HDRLensFlare", _scene->getCameras());
-    _scene->postProcessRenderPipelineManager->enableEffectInPipeline(
+    _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
       _name, "HDRLensFlareShift", _scene->getCameras());
-    _scene->postProcessRenderPipelineManager->enableEffectInPipeline(
+    _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
       _name, "HDRGaussianBlurH" + blurIndexStr, _scene->getCameras());
-    _scene->postProcessRenderPipelineManager->enableEffectInPipeline(
+    _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
       _name, "HDRGaussianBlurV" + blurIndexStr, _scene->getCameras());
-    _scene->postProcessRenderPipelineManager->enableEffectInPipeline(
+    _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
       _name, "HDRLensFlareCompose", _scene->getCameras());
   }
   else if (!enabled && _lensFlareEnabled) {
-    _scene->postProcessRenderPipelineManager->disableEffectInPipeline(
+    _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
       _name, "HDRLensFlare", _scene->getCameras());
-    _scene->postProcessRenderPipelineManager->disableEffectInPipeline(
+    _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
       _name, "HDRLensFlareShift", _scene->getCameras());
-    _scene->postProcessRenderPipelineManager->disableEffectInPipeline(
+    _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
       _name, "HDRGaussianBlurH" + blurIndexStr, _scene->getCameras());
-    _scene->postProcessRenderPipelineManager->disableEffectInPipeline(
+    _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
       _name, "HDRGaussianBlurV" + blurIndexStr, _scene->getCameras());
-    _scene->postProcessRenderPipelineManager->disableEffectInPipeline(
+    _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
       _name, "HDRLensFlareCompose", _scene->getCameras());
   }
 
@@ -453,7 +453,7 @@ void StandardRenderingPipeline::dispose(bool doNotRecurse)
     depthOfFieldPostProcess->dispose(camera);
   }
 
-  _scene->postProcessRenderPipelineManager->detachCamerasFromRenderPipeline(
+  _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(
     _name, _scene->getCameras());
 
   PostProcessRenderPipeline::dispose(doNotRecurse);

@@ -20,7 +20,8 @@ public:
    * https://www.khronos.org/opengl/wiki/Uniform_Buffer_Object
    */
   UniformBuffer(Engine* engine, const Float32Array& data = Float32Array(),
-                bool dynamic = false);
+                bool dynamic          = false);
+  UniformBuffer(UniformBuffer& other) = delete;
   ~UniformBuffer();
 
   // Properties

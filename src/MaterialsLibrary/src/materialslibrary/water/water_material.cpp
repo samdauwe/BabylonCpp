@@ -164,7 +164,7 @@ bool WaterMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   _defines.reset();
 
   // Textures
-  if (scene->texturesEnabled) {
+  if (scene->texturesEnabled()) {
     if (bumpTexture && StandardMaterial::BumpTextureEnabled) {
       if (!bumpTexture->isReady()) {
         return false;
@@ -190,7 +190,7 @@ bool WaterMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Point size
-  if (pointsCloud() || scene->forcePointsCloud) {
+  if (pointsCloud() || scene->forcePointsCloud()) {
     _defines.defines[WMD::POINTSIZE] = true;
   }
 
@@ -211,13 +211,13 @@ bool WaterMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Fog
-  if (scene->fogEnabled && mesh && mesh->applyFog
-      && scene->fogMode != Scene::FOGMODE_NONE && fogEnabled) {
+  if (scene->fogEnabled() && mesh && mesh->applyFog
+      && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled) {
     _defines.defines[WMD::FOG] = true;
   }
 
   // Lights
-  if (scene->lightsEnabled && !disableLighting) {
+  if (scene->lightsEnabled() && !disableLighting) {
     needNormals = MaterialHelper::PrepareDefinesForLights(
       scene, mesh, _defines, maxSimultaneousLights, WMD::SPECULARTERM,
       WMD::SHADOWS);
@@ -394,15 +394,15 @@ void WaterMaterial::bind(Matrix* world, Mesh* mesh)
     _effect->setColor4("vSpecularColor", specularColor, specularPower);
   }
 
-  if (scene->lightsEnabled && !disableLighting) {
+  if (scene->lightsEnabled() && !disableLighting) {
     MaterialHelper::BindLights(scene, mesh, _effect,
                                _defines.defines[WMD::SPECULARTERM],
                                maxSimultaneousLights);
   }
 
   // View
-  if (scene->fogEnabled && mesh->applyFog
-      && scene->fogMode != Scene::FOGMODE_NONE) {
+  if (scene->fogEnabled() && mesh->applyFog
+      && scene->fogMode() != Scene::FOGMODE_NONE) {
     _effect->setMatrix("view", scene->getViewMatrix());
   }
 

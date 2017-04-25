@@ -91,10 +91,10 @@ HDRRenderingPipeline::HDRRenderingPipeline(const std::string& iName,
     scene->getEngine(), "HDR", [&]() { return _hdrPostProcess; }, true));
 
   // Finish
-  scene->postProcessRenderPipelineManager->addPipeline(this);
+  scene->postProcessRenderPipelineManager()->addPipeline(this);
 
   if (!cameras.empty()) {
-    scene->postProcessRenderPipelineManager->attachCamerasToRenderPipeline(
+    scene->postProcessRenderPipelineManager()->attachCamerasToRenderPipeline(
       _name, cameras);
   }
 

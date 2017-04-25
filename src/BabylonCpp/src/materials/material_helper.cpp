@@ -94,7 +94,7 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
     }
 
     // Shadows
-    if (scene->shadowsEnabled) {
+    if (scene->shadowsEnabled()) {
       auto shadowGenerator = light->getShadowGenerator();
       if (mesh && mesh->receiveShadows && shadowGenerator) {
         defines.shadows[lightIndex] = true;
@@ -315,7 +315,7 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
     }
 
     // Shadows
-    if (scene->shadowsEnabled) {
+    if (scene->shadowsEnabled()) {
       depthValuesAlreadySet = BindLightShadow(
         light.get(), scene, mesh, lightIndex, effect, depthValuesAlreadySet);
     }
@@ -331,9 +331,9 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
 void MaterialHelper::BindFogParameters(Scene* scene, AbstractMesh* mesh,
                                        Effect* effect)
 {
-  if (scene->fogEnabled && mesh->applyFog
-      && scene->fogMode != Scene::FOGMODE_NONE) {
-    effect->setFloat4("vFogInfos", static_cast<float>(scene->fogMode),
+  if (scene->fogEnabled() && mesh->applyFog
+      && scene->fogMode() != Scene::FOGMODE_NONE) {
+    effect->setFloat4("vFogInfos", static_cast<float>(scene->fogMode()),
                       scene->fogStart, scene->fogEnd, scene->fogDensity);
     effect->setColor3("vFogColor", scene->fogColor);
   }

@@ -33,7 +33,7 @@ struct BABYLON_SHARED_EXPORT IAnimatable : public IReflect {
   {
     return false;
   }
-  virtual void markAsDirty(const std::string& /*property = ""*/)
+  virtual void markAsDirty(unsigned int /*flag*/)
   {
   }
   virtual Matrix* getWorldMatrix()

@@ -64,9 +64,9 @@ LensRenderingPipeline::LensRenderingPipeline(
   }
 
   // Finish
-  scene->postProcessRenderPipelineManager->addPipeline(this);
+  scene->postProcessRenderPipelineManager()->addPipeline(this);
   if (!cameras.empty()) {
-    scene->postProcessRenderPipelineManager->attachCamerasToRenderPipeline(
+    scene->postProcessRenderPipelineManager()->attachCamerasToRenderPipeline(
       name, cameras);
   }
 }

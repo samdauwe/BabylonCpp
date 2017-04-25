@@ -324,7 +324,7 @@ bool BabylonFileLoader::load(Scene* scene, const std::string& data,
   // Fog
   auto fogMode = Json::GetNumber(parsedData, "fogMode", Scene::FOGMODE_NONE);
   if (fogMode != Scene::FOGMODE_NONE) {
-    scene->fogMode = fogMode;
+    scene->setFogMode(fogMode);
     scene->fogColor
       = Color3::FromArray(Json::ToArray<float>(parsedData, "fogColor"));
     scene->fogStart   = Json::GetNumber(parsedData, "fogStart", 0.f);
