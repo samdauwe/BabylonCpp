@@ -149,6 +149,8 @@ Matrix& Matrix::reset()
 {
   std::fill(m.begin(), m.end(), 0.f);
 
+  _markAsUpdated();
+
   return *this;
 }
 
@@ -170,21 +172,20 @@ const Matrix& Matrix::subtractFromRef(const Matrix& other, Matrix& result) const
   return *this;
 }
 
-const Matrix Matrix::add(const Matrix& other) const
+Matrix Matrix::add(const Matrix& other)
 {
   Matrix result;
-
   addToRef(other, result);
-
   return result;
 }
 
-const Matrix& Matrix::addToRef(const Matrix& other, Matrix& result) const
+Matrix& Matrix::addToRef(const Matrix& other, Matrix& result)
 {
   for (unsigned int index = 0; index < 16; ++index) {
     result.m[index] = m[index] + other.m[index];
   }
 
+  _markAsUpdated();
   return *this;
 }
 
@@ -194,10 +195,11 @@ Matrix& Matrix::addToSelf(const Matrix& other)
     m[index] += other.m[index];
   }
 
+  _markAsUpdated();
   return *this;
 }
 
-const Matrix& Matrix::invertToRef(Matrix& other) const
+Matrix& Matrix::invertToRef(Matrix& other)
 {
 #if BABYLONCPP_OPTION_ENABLE_SIMD == true
   simdMatrix.invertToRefSIMD(other);
@@ -261,6 +263,7 @@ const Matrix& Matrix::invertToRef(Matrix& other) const
   other.m[15] = (((l1 * l36) - (l2 * l38)) + (l3 * l39)) * l27;
 #endif
 
+  _markAsUpdated();
   return *this;
 }
 
@@ -270,6 +273,7 @@ Matrix& Matrix::setTranslationFromFloats(float x, float y, float z)
   m[13] = y;
   m[14] = z;
 
+  _markAsUpdated();
   return *this;
 }
 
@@ -279,6 +283,7 @@ Matrix& Matrix::setTranslation(const Vector3& vector3)
   m[13] = vector3.y;
   m[14] = vector3.z;
 
+  _markAsUpdated();
   return *this;
 }
 
@@ -305,7 +310,7 @@ Matrix& Matrix::removeRotationAndScaling()
   return *this;
 }
 
-const Matrix Matrix::multiply(Matrix& other) const
+Matrix Matrix::multiply(Matrix& other)
 {
   Matrix result;
 
@@ -314,7 +319,7 @@ const Matrix Matrix::multiply(Matrix& other) const
   return result;
 }
 
-const Matrix Matrix::multiply(Matrix&& other) const
+Matrix Matrix::multiply(Matrix&& other)
 {
   Matrix result;
 
@@ -329,6 +334,7 @@ Matrix& Matrix::copyFrom(const Matrix& other)
     m[index] = other.m[index];
   }
 
+  _markAsUpdated();
   return *this;
 }
 
@@ -360,10 +366,11 @@ const Matrix& Matrix::copyToArray(Float32Array& array,
   return *this;
 }
 
-const Matrix& Matrix::multiplyToRef(const Matrix& other, Matrix& result) const
+Matrix& Matrix::multiplyToRef(const Matrix& other, Matrix& result)
 {
   multiplyToArray(other, result.m, 0);
 
+  _markAsUpdated();
   return *this;
 }
 
@@ -543,7 +550,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix& matrix)
   return os;
 }
 
-Matrix Matrix::operator+(const Matrix& other) const
+Matrix Matrix::operator+(const Matrix& other)
 {
   return add(other);
 }
@@ -558,7 +565,7 @@ Matrix Matrix::operator-(const Matrix& other) const
   return subtract(other);
 }
 
-Matrix Matrix::operator*(Matrix& other) const
+Matrix Matrix::operator*(Matrix& other)
 {
   return multiply(other);
 }
@@ -599,6 +606,7 @@ void Matrix::FromArrayToRef(const Float32Array& array, unsigned int offset,
   for (unsigned int index = 0; index < 16; ++index) {
     result.m[index] = array[index + offset];
   }
+  result._markAsUpdated();
 }
 
 void Matrix::FromFloat32ArrayToRefScaled(const Float32Array& array,
@@ -608,6 +616,7 @@ void Matrix::FromFloat32ArrayToRefScaled(const Float32Array& array,
   for (unsigned int index = 0; index < 16; ++index) {
     result.m[index] = array[index + offset] * scale;
   }
+  result._markAsUpdated();
 }
 
 void Matrix::FromValuesToRef(float initialM11, float initialM12,
@@ -635,6 +644,8 @@ void Matrix::FromValuesToRef(float initialM11, float initialM12,
   result.m[13] = initialM42;
   result.m[14] = initialM43;
   result.m[15] = initialM44;
+
+  result._markAsUpdated();
 }
 
 Vector4 Matrix::getRow(unsigned int index) const
@@ -659,6 +670,8 @@ Matrix& Matrix::setRow(unsigned int index, const Vector4& row)
   m[i + 2]     = row.z;
   m[i + 3]     = row.w;
 
+  _markAsUpdated();
+
   return *this;
 }
 
@@ -674,6 +687,8 @@ Matrix& Matrix::setRowFromFloats(unsigned int index, float x, float y, float z,
   m[i + 1]     = y;
   m[i + 2]     = z;
   m[i + 3]     = w;
+
+  _markAsUpdated();
 
   return *this;
 }
@@ -795,6 +810,8 @@ void Matrix::RotationXToRef(float angle, Matrix& result)
   result.m[12] = 0.f;
   result.m[13] = 0.f;
   result.m[14] = 0.f;
+
+  result._markAsUpdated();
 }
 
 Matrix Matrix::RotationY(float angle)
@@ -825,10 +842,12 @@ void Matrix::RotationYToRef(float angle, Matrix& result)
   result.m[6]  = 0.f;
   result.m[7]  = 0.f;
   result.m[9]  = 0.f;
-  result.m[11] = 0;
-  result.m[12] = 0;
-  result.m[13] = 0;
-  result.m[14] = 0;
+  result.m[11] = 0.f;
+  result.m[12] = 0.f;
+  result.m[13] = 0.f;
+  result.m[14] = 0.f;
+
+  result._markAsUpdated();
 }
 
 Matrix Matrix::RotationZ(float angle)
@@ -863,6 +882,8 @@ void Matrix::RotationZToRef(float angle, Matrix& result)
   result.m[12] = 0.f;
   result.m[13] = 0.f;
   result.m[14] = 0.f;
+
+  result._markAsUpdated();
 }
 
 Matrix Matrix::RotationAxis(Vector3& axis, float angle)
@@ -896,6 +917,8 @@ void Matrix::RotationAxisToRef(Vector3& axis, float angle, Matrix& result)
   result.m[11] = 0.f;
 
   result.m[15] = 1.f;
+
+  result._markAsUpdated();
 }
 
 Matrix Matrix::RotationYawPitchRoll(float yaw, float pitch, float roll)
@@ -943,6 +966,8 @@ void Matrix::ScalingToRef(float x, float y, float z, Matrix& result)
   result.m[13] = 0.f;
   result.m[14] = 0.f;
   result.m[15] = 1.f;
+
+  result._markAsUpdated();
 }
 
 Matrix Matrix::Translation(float x, float y, float z)
@@ -971,6 +996,8 @@ Matrix Matrix::Lerp(const Matrix& startValue, const Matrix& endValue,
     result.m[index]
       = startValue.m[index] * (1.f - gradient) + endValue.m[index] * gradient;
   }
+
+  result._markAsUpdated();
 
   return result;
 }
@@ -1266,14 +1293,16 @@ void Matrix::PerspectiveFovWebVRToRef(const VRFov& fov, float znear, float zfar,
   result.m[1] = result.m[2] = result.m[3] = result.m[4] = 0.f;
   result.m[5]                                           = yScale;
   result.m[6] = result.m[7] = 0.0;
-  result.m[8]  = ((leftTan - rightTan) * xScale * 0.5f) * rightHandedFactor;
-  result.m[9]  = -((upTan - downTan) * yScale * 0.5f) * rightHandedFactor;
-  result.m[10] = -(znear + zfar) / (zfar - znear) * rightHandedFactor;
-  // result.m[10]              = -zfar / (znear - zfar);
+  result.m[8] = ((leftTan - rightTan) * xScale * 0.5f); // * rightHandedFactor;
+  result.m[9] = -((upTan - downTan) * yScale * 0.5f);   // * rightHandedFactor;
+  // result.m[10] = -(znear + zfar) / (zfar - znear) * rightHandedFactor;
+  result.m[10] = -zfar / (znear - zfar);
   result.m[11] = 1.f * rightHandedFactor;
   result.m[12] = result.m[13] = result.m[15] = 0.f;
   result.m[14] = -(2.f * zfar * znear) / (zfar - znear);
   // result.m[14] = (znear * zfar) / (znear - zfar);
+
+  result._markAsUpdated();
 }
 
 Matrix Matrix::GetFinalMatrix(const Viewport& viewport, Matrix& world,
@@ -1376,34 +1405,38 @@ void Matrix::ReflectionToRef(Plane& plane, Matrix& result)
   result.m[13] = temp2 * plane.d;
   result.m[14] = temp3 * plane.d;
   result.m[15] = 1.f;
+
+  result._markAsUpdated();
 }
 
 void Matrix::FromXYZAxesToRef(const Vector3& xaxis, const Vector3& yaxis,
-                              const Vector3& zaxis, Matrix& mat)
+                              const Vector3& zaxis, Matrix& result)
 {
-  mat.m[0] = xaxis.x;
-  mat.m[1] = xaxis.y;
-  mat.m[2] = xaxis.z;
+  result.m[0] = xaxis.x;
+  result.m[1] = xaxis.y;
+  result.m[2] = xaxis.z;
 
-  mat.m[3] = 0.f;
+  result.m[3] = 0.f;
 
-  mat.m[4] = yaxis.x;
-  mat.m[5] = yaxis.y;
-  mat.m[6] = yaxis.z;
+  result.m[4] = yaxis.x;
+  result.m[5] = yaxis.y;
+  result.m[6] = yaxis.z;
 
-  mat.m[7] = 0.f;
+  result.m[7] = 0.f;
 
-  mat.m[8]  = zaxis.x;
-  mat.m[9]  = zaxis.y;
-  mat.m[10] = zaxis.z;
+  result.m[8]  = zaxis.x;
+  result.m[9]  = zaxis.y;
+  result.m[10] = zaxis.z;
 
-  mat.m[11] = 0.f;
+  result.m[11] = 0.f;
 
-  mat.m[12] = 0.f;
-  mat.m[13] = 0.f;
-  mat.m[14] = 0.f;
+  result.m[12] = 0.f;
+  result.m[13] = 0.f;
+  result.m[14] = 0.f;
 
-  mat.m[15] = 1.f;
+  result.m[15] = 1.f;
+
+  result._markAsUpdated();
 }
 
 void Matrix::FromQuaternionToRef(const Quaternion& quat, Matrix& result)
@@ -1436,6 +1469,8 @@ void Matrix::FromQuaternionToRef(const Quaternion& quat, Matrix& result)
   result.m[14] = 0.f;
 
   result.m[15] = 1.f;
+
+  result._markAsUpdated();
 }
 
 } // end of namespace BABYLON

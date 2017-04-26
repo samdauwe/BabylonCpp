@@ -88,14 +88,14 @@ public:
    * @brief Returns a new Matrix as the addition result of the current Matrix
    * and the passed one.
    */
-  const Matrix add(const Matrix& other) const;
+  Matrix add(const Matrix& other);
 
   /**
    * @brief Sets the passed matrix "result" with the ddition result of the
    * current Matrix and the passed one.
    * @returns The Matrix.
    */
-  const Matrix& addToRef(const Matrix& other, Matrix& result) const;
+  Matrix& addToRef(const Matrix& other, Matrix& result);
 
   /**
    * @brief Adds in place the passed matrix to the current Matrix.
@@ -107,7 +107,7 @@ public:
    * @brief Sets the passed matrix with the current inverted Matrix.
    * @returns The unmodified current Matrix.
    */
-  const Matrix& invertToRef(Matrix& other) const;
+  Matrix& invertToRef(Matrix& other);
 
   /**
    * @brief Inserts the translation vector (using 3 x floats) in the current
@@ -142,13 +142,13 @@ public:
    * @brief Returns a new Matrix set with the multiplication result of the
    * current Matrix and the passed one.
    */
-  const Matrix multiply(Matrix& other) const;
+  Matrix multiply(Matrix& other);
 
   /**
    * @brief Returns a new Matrix set with the multiplication result of the
    * current Matrix and the passed one.
    */
-  const Matrix multiply(Matrix&& other) const;
+  Matrix multiply(Matrix&& other);
 
   /**
    * @brief Returns a new Matrix set with the multiplication result of the
@@ -175,7 +175,7 @@ public:
    * @brief Sets the passed matrix "result" with the multiplication result of
    * the current Matrix and the passed one.
    */
-  const Matrix& multiplyToRef(const Matrix& other, Matrix& result) const;
+  Matrix& multiplyToRef(const Matrix& other, Matrix& result);
 
   /**
    * @brief Sets the Float32Array "result" from the passed index "offset" with
@@ -223,10 +223,10 @@ public:
 
   /** Operator overloading **/
   friend std::ostream& operator<<(std::ostream& os, const Matrix& matrix);
-  Matrix operator+(const Matrix& other) const;
+  Matrix operator+(const Matrix& other);
   Matrix& operator+=(const Matrix& other);
   Matrix operator-(const Matrix& other) const;
-  Matrix operator*(Matrix& other) const;
+  Matrix operator*(Matrix& other);
   bool operator==(const Matrix& other) const;
   bool operator!=(const Matrix& other) const;
   float& operator[](unsigned int index);
@@ -613,7 +613,7 @@ public:
    * 3 passed left handed axis.
    */
   static void FromXYZAxesToRef(const Vector3& xaxis, const Vector3& yaxis,
-                               const Vector3& zaxis, Matrix& mat);
+                               const Vector3& zaxis, Matrix& result);
 
   /**
    * @brief Sets the passed matrix "result" as a rotation matrix according to

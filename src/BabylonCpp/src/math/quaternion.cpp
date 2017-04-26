@@ -278,6 +278,8 @@ const Quaternion& Quaternion::toRotationMatrix(Matrix& result) const
   result.m[14] = 0;
   result.m[15] = 1.f;
 
+  result._markAsUpdated();
+
   return *this;
 }
 

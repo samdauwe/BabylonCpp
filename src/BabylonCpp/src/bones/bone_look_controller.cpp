@@ -419,7 +419,9 @@ void BoneLookController::update()
       bone->getRotationQuaternionToRef(_boneQuat, Space::WORLD, mesh);
     }
     if (_transformYawPitch) {
-      _transformYawPitch.value.multiplyToRef(_tmpMat1, _tmpMat1);
+      Matrix transformYawPitch = _transformYawPitch.value;
+      transformYawPitch.multiplyToRef(_tmpMat1, _tmpMat1);
+      _transformYawPitch = std::move(transformYawPitch);
     }
     Quaternion::FromRotationMatrixToRef(_tmpMat1, _tmpQuat);
     Quaternion::SlerpToRef(_boneQuat, _tmpQuat, slerpAmount, _boneQuat);
@@ -429,7 +431,9 @@ void BoneLookController::update()
   }
   else {
     if (_transformYawPitch) {
-      _transformYawPitch.value.multiplyToRef(_tmpMat1, _tmpMat1);
+      Matrix transformYawPitch = _transformYawPitch.value;
+      transformYawPitch.multiplyToRef(_tmpMat1, _tmpMat1);
+      _transformYawPitch = std::move(transformYawPitch);
     }
     bone->setRotationMatrix(_tmpMat1, Space::WORLD, mesh);
     _slerping = false;
