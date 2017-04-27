@@ -4,13 +4,14 @@
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/uniform_buffer.h>
 #include <babylon/mesh/abstract_mesh.h>
 
 namespace BABYLON {
 
 DirectionalLight::DirectionalLight(const std::string& iName,
                                    const Vector3& iDirection, Scene* scene)
-    : Light{iName, scene}
+    : IShadowLight{iName, scene}
     , position{iDirection.scale(-1.f)}
     , direction{iDirection}
     , transformedPosition{nullptr}
@@ -27,6 +28,15 @@ DirectionalLight::DirectionalLight(const std::string& iName,
 
 DirectionalLight::~DirectionalLight()
 {
+}
+
+void DirectionalLight::_buildUniformLayout()
+{
+  _uniformBuffer->addUniform("vLightData", 4);
+  _uniformBuffer->addUniform("vLightDiffuse", 4);
+  _uniformBuffer->addUniform("vLightSpecular", 3);
+  _uniformBuffer->addUniform("shadowsInfo", 3);
+  _uniformBuffer->create();
 }
 
 const char* DirectionalLight::getClassName() const
@@ -53,6 +63,11 @@ Vector3& DirectionalLight::setDirectionToTarget(Vector3& target)
 {
   direction = Vector3::Normalize(target.subtract(position));
   return direction;
+}
+
+float DirectionalLight::getDepthScale() const
+{
+  return 30.f;
 }
 
 void DirectionalLight::setShadowProjectionMatrix(
@@ -151,8 +166,8 @@ bool DirectionalLight::computeTransformedPosition()
   return false;
 }
 
-void DirectionalLight::transferToEffect(Effect* effect,
-                                        const std::string& directionUniformName)
+void DirectionalLight::transferToEffect(Effect* /*effect*/,
+                                        const std::string& lightIndex)
 {
   if (parent() && parent()->getWorldMatrix()) {
     if (!_transformedDirection) {
@@ -161,14 +176,16 @@ void DirectionalLight::transferToEffect(Effect* effect,
 
     Vector3::TransformNormalToRef(direction, *parent()->getWorldMatrix(),
                                   *_transformedDirection);
-    effect->setFloat4(directionUniformName, _transformedDirection->x,
-                      _transformedDirection->y, _transformedDirection->z, 1.f);
+
+    _uniformBuffer->updateFloat4("vLightData", _transformedDirection->x,
+                                 _transformedDirection->y,
+                                 _transformedDirection->z, 1, lightIndex);
 
     return;
   }
 
-  effect->setFloat4(directionUniformName, direction.x, direction.y, direction.z,
-                    1.f);
+  _uniformBuffer->updateFloat4("vLightData", direction.x, direction.y,
+                               direction.z, 1, lightIndex);
 }
 
 Matrix* DirectionalLight::_getWorldMatrix()

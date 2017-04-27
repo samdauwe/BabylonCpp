@@ -8,7 +8,7 @@
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT PointLight : public Light, public IShadowLight {
+class BABYLON_SHARED_EXPORT PointLight : public IShadowLight {
 
 public:
   template <typename... Ts>
@@ -44,8 +44,7 @@ public:
    * @brief Sets the passed Effect "effect" with the PointLight transformed
    * position (or position, if none) and passed name (string).
    */
-  void transferToEffect(Effect* effect,
-                        const std::string& positionUniformName) override;
+  void transferToEffect(Effect* effect, const std::string& lightIndex) override;
 
   /**
    * @returns True by default.
@@ -62,6 +61,11 @@ public:
    * according to the passed cube face index (integer).
    */
   Vector3 getShadowDirection(unsigned int faceIndex = 0) override;
+
+  /**
+   * @brief Return the depth scale used for the shadow map.
+   */
+  float getDepthScale() const override;
 
   ShadowGenerator* getShadowGenerator() override;
 
@@ -95,6 +99,8 @@ protected:
    * Documentation : http://doc.babylonjs.com/tutorials/lights
    */
   PointLight(const std::string& name, const Vector3& position, Scene* scene);
+
+  void _buildUniformLayout() override;
 
 public:
   std::unique_ptr<Vector3> transformedPosition;

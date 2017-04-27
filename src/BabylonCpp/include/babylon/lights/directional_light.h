@@ -8,8 +8,7 @@
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT DirectionalLight : public Light,
-                                               public IShadowLight {
+class BABYLON_SHARED_EXPORT DirectionalLight : public IShadowLight {
 
 public:
   template <typename... Ts>
@@ -41,6 +40,11 @@ public:
    * @returns The updated DirectionalLight direction (Vector3).
    */
   Vector3& setDirectionToTarget(Vector3& target);
+
+  /**
+   * @brief Returns the depth scale used for the shadow map.
+   */
+  float getDepthScale() const override;
 
   /**
    * @brief Sets the passed matrix "matrix" as projection matrix for the shadows
@@ -76,8 +80,7 @@ public:
    * @brief Sets the passed Effect object with the DirectionalLight transformed
    * position (or position if not parented) and the passed name.
    */
-  void transferToEffect(Effect* effect,
-                        const std::string& directionUniformName) override;
+  void transferToEffect(Effect* effect, const std::string& lightIndex) override;
 
   /**
    * @brief Returns the light world matrix.
@@ -99,6 +102,8 @@ protected:
    */
   DirectionalLight(const std::string& name, const Vector3& direction,
                    Scene* scene);
+
+  void _buildUniformLayout() override;
 
 public:
   Vector3 position;

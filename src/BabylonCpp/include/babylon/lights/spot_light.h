@@ -8,7 +8,7 @@
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT SpotLight : public Light, public IShadowLight {
+class BABYLON_SHARED_EXPORT SpotLight : public IShadowLight {
 
 public:
   template <typename... Ts>
@@ -33,6 +33,11 @@ public:
    * @brief Returns the SpotLight absolute position in the World (Vector3).
    */
   Vector3 getAbsolutePosition() override;
+
+  /**
+   * @brief Return the depth scale used for the shadow map.
+   */
+  float getDepthScale() const override;
 
   /**
    * @brief Sets the passed matrix "matrix" as perspective projection matrix for
@@ -74,8 +79,7 @@ public:
    * @brief Sets the passed Effect object with the SpotLight transfomed position
    * (or position if not parented) and normalized direction.
    */
-  void transferToEffect(Effect* effect, const std::string& positionUniformName,
-                        const std::string& directionUniformName) override;
+  void transferToEffect(Effect* effect, const std::string& lightIndex) override;
 
   /**
    * @brief Returns the light World matrix.
@@ -107,6 +111,8 @@ protected:
   SpotLight(const std::string& name, const Vector3& position,
             const Vector3& direction, float angle, float exponent,
             Scene* scene);
+
+  void _buildUniformLayout() override;
 
 public:
   std::unique_ptr<Vector3> transformedPosition;

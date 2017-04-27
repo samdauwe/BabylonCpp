@@ -39,8 +39,7 @@ public:
    * @brief Sets the passed Effect object with the HemisphericLight normalized
    * direction and color and the passed name (string).
    */
-  void transferToEffect(Effect* effect, const std::string& directionUniformName,
-                        const std::string& groundColorUniformName) override;
+  void transferToEffect(Effect* effect, const std::string& lightIndex) override;
 
   /**
    * @brief Returns the light world matrix.
@@ -63,6 +62,8 @@ protected:
    */
   HemisphericLight(const std::string& name, const Vector3& direction,
                    Scene* scene);
+
+  void _buildUniformLayout() override;
 
 public:
   Color3 groundColor;

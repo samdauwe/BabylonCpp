@@ -52,6 +52,25 @@ public:
   std::string toString(bool fullDetails = false) const;
 
   /**
+   * @brief Set the enabled state of this node.
+   * @param {boolean} value - the new enabled state
+   * @see isEnabled
+   */
+  void setEnabled(bool value);
+
+  //** Getters / Setters **/
+  std::vector<AbstractMesh*>& includedOnlyMeshes();
+  void setIncludedOnlyMeshes(const std::vector<AbstractMesh*>& value);
+  std::vector<AbstractMesh*>& excludedMeshes();
+  void setExcludedMeshes(const std::vector<AbstractMesh*>& value);
+  unsigned int includeOnlyWithLayerMask() const;
+  void setIncludeOnlyWithLayerMask(unsigned int value);
+  unsigned int excludeWithLayerMask() const;
+  void setExcludeWithLayerMask(unsigned int value);
+  unsigned int lightmapMode() const;
+  void setLightmapMode(unsigned int value);
+
+  /**
    * @brief Returns the Light associated shadow generator.
    */
   virtual ShadowGenerator* getShadowGenerator();
@@ -61,8 +80,7 @@ public:
    */
   virtual Vector3 getAbsolutePosition();
 
-  virtual void transferToEffect(Effect* effect,
-                                const std::string& uniformName0);
+  virtual void transferToEffect(Effect* effect, const std::string& lightIndex);
   virtual void transferToEffect(Effect* effect, const std::string& uniformName0,
                                 const std::string& uniformName1);
   virtual Matrix* _getWorldMatrix();
@@ -76,6 +94,11 @@ public:
    * @brief Returns the light World matrix.
    */
   Matrix* getWorldMatrix() override;
+
+  /**
+   * @brief Marks the meshes as dirty.
+   */
+  void _markMeshesAsLightDirty();
 
   /**
    * @brief Disposes the light.
@@ -121,22 +144,31 @@ protected:
    */
   Light(const std::string& name, Scene* scene);
 
+  virtual void _buildUniformLayout();
+
+private:
+  void _hookArrayForExcluded(const std::vector<AbstractMesh*>& array);
+  void _hookArrayForIncludedOnly(const std::vector<AbstractMesh*>& array);
+  void _resyncMeshes();
+
 public:
   Color3 diffuse;
   Color3 specular;
   float intensity;
   float range;
-  unsigned int includeOnlyWithLayerMask;
-  std::vector<AbstractMesh*> includedOnlyMeshes;
-  std::vector<AbstractMesh*> excludedMeshes;
-  unsigned int excludeWithLayerMask;
-  unsigned int lightmapMode;
   float radius;
   ShadowGenerator* _shadowGenerator;
   std::vector<std::string> _excludedMeshesIds;
   std::vector<std::string> _includedOnlyMeshesIds;
+  // Light uniform buffer
+  std::unique_ptr<UniformBuffer> _uniformBuffer;
 
 private:
+  std::vector<AbstractMesh*> _includedOnlyMeshes;
+  std::vector<AbstractMesh*> _excludedMeshes;
+  unsigned int _includeOnlyWithLayerMask;
+  unsigned int _excludeWithLayerMask;
+  unsigned int _lightmapMode;
   std::unique_ptr<Matrix> _parentedWorldMatrix;
   std::unique_ptr<Matrix> _worldMatrix;
 

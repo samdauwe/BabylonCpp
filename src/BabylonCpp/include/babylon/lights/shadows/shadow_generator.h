@@ -2,6 +2,7 @@
 #define BABYLON_LIGHTS_SHADOWS_SHADOW_GENERATOR_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/nullable.h>
 #include <babylon/lights/shadows/ishadow_generator.h>
 #include <babylon/math/isize.h>
 #include <babylon/math/matrix.h>
@@ -56,7 +57,7 @@ public:
   /**
    * @brief Returns true when the ShadowGenerator is finally computed.
    */
-  bool isReady(SubMesh* subMesh, bool useInstances);
+  bool isReady(SubMesh* subMesh, bool useInstances) override;
 
   /**
    * @brief Returns a RenderTargetTexture object : the shadow map texture.
@@ -128,7 +129,7 @@ private:
   int _blurBoxOffset;
   float _bias;
   Vector3 _lightDirection;
-  float _depthScale;
+  Nullable<float> _depthScale;
   IShadowLight* _light;
   Scene* _scene;
   std::unique_ptr<RenderTargetTexture> _shadowMap;

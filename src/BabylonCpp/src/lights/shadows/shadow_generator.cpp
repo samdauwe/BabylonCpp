@@ -34,7 +34,6 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light)
     , _blurBoxOffset{0}
     , _bias{0.00005f}
     , _lightDirection{Vector3::Zero()}
-    , _depthScale{30.f}
     , _light{light}
     , _scene{light->getScene()}
     , _shadowMap{nullptr}
@@ -56,6 +55,7 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light)
     , _textureType{0}
 {
   light->_shadowGenerator = this;
+  light->_markMeshesAsLightDirty();
 
   // Texture type fallback from float to int if not supported.
   const auto& caps = _scene->getEngine()->getCaps();
@@ -188,7 +188,7 @@ void ShadowGenerator::setBlurBoxOffset(int value)
 
 float ShadowGenerator::depthScale() const
 {
-  return _depthScale;
+  return _depthScale.hasValue() ? _depthScale.value : _light->getDepthScale();
 }
 
 void ShadowGenerator::setDepthScale(float value)
@@ -218,6 +218,8 @@ void ShadowGenerator::setFilter(unsigned int value)
     _shadowMap->anisotropicFilteringLevel = 1;
     _shadowMap->updateSamplingMode(Texture::NEAREST_SAMPLINGMODE);
   }
+
+  _light->_markMeshesAsLightDirty();
 }
 
 bool ShadowGenerator::useExponentialShadowMap() const
@@ -528,6 +530,7 @@ void ShadowGenerator::dispose()
   }
 
   _light->_shadowGenerator = nullptr;
+  _light->_markMeshesAsLightDirty();
 }
 
 Json::object ShadowGenerator::serialize() const
@@ -574,6 +577,18 @@ ShadowGenerator::Parse(const Json::value& parsedShadowGenerator, Scene* scene)
   else if (Json::GetBool(parsedShadowGenerator,
                          "useBlurExponentialShadowMap")) {
     shadowGenerator->setUseBlurExponentialShadowMap(true);
+  }
+  // Backward compat
+  else if (Json::GetBool(parsedShadowGenerator, "useVarianceShadowMap")) {
+    shadowGenerator->setUseExponentialShadowMap(true);
+  }
+  else if (Json::GetBool(parsedShadowGenerator, "useBlurVarianceShadowMap")) {
+    shadowGenerator->setUseExponentialShadowMap(true);
+  }
+
+  if (parsedShadowGenerator.contains("depthScale")) {
+    shadowGenerator->setDepthScale(
+      Json::GetNumber(parsedShadowGenerator, "depthScale", 30.f));
   }
 
   if (parsedShadowGenerator.contains("blurScale")) {

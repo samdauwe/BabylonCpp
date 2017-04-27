@@ -7,6 +7,7 @@
 #include <babylon/lights/point_light.h>
 #include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/lights/spot_light.h>
+#include <babylon/materials/uniform_buffer.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/tools/serialization_helper.h>
 
@@ -18,14 +19,19 @@ Light::Light(const std::string& iName, Scene* scene)
     , specular{Color3(1.f, 1.f, 1.f)}
     , intensity{1.f}
     , range{std::numeric_limits<float>::max()}
-    , includeOnlyWithLayerMask{0}
-    , excludeWithLayerMask{0}
-    , lightmapMode{0}
     , radius{0.00001f}
     , _shadowGenerator{nullptr}
+    , _uniformBuffer{std_util::make_unique<UniformBuffer>(scene->getEngine())}
+    , _includedOnlyMeshes{}
+    , _excludedMeshes{}
+    , _includeOnlyWithLayerMask{0}
+    , _excludeWithLayerMask{0}
+    , _lightmapMode{0}
     , _parentedWorldMatrix{nullptr}
     , _worldMatrix{std_util::make_unique<Matrix>(Matrix::Identity())}
 {
+  _buildUniformLayout();
+  _resyncMeshes();
 }
 
 Light::~Light()
@@ -65,6 +71,75 @@ std::string Light::toString(bool fullDetails) const
   return oss.str();
 }
 
+void Light::_buildUniformLayout()
+{
+}
+
+void Light::setEnabled(bool value)
+{
+  Node::setEnabled(value);
+  _resyncMeshes();
+}
+
+std::vector<AbstractMesh*>& Light::includedOnlyMeshes()
+{
+  return _includedOnlyMeshes;
+}
+
+void Light::setIncludedOnlyMeshes(const std::vector<AbstractMesh*>& value)
+{
+  _includedOnlyMeshes = value;
+  _hookArrayForIncludedOnly(value);
+}
+
+std::vector<AbstractMesh*>& Light::excludedMeshes()
+{
+  return _excludedMeshes;
+}
+
+void Light::setExcludedMeshes(const std::vector<AbstractMesh*>& value)
+{
+  _excludedMeshes = value;
+  _hookArrayForExcluded(value);
+}
+
+unsigned int Light::includeOnlyWithLayerMask() const
+{
+  return _includeOnlyWithLayerMask;
+}
+
+void Light::setIncludeOnlyWithLayerMask(unsigned int value)
+{
+  _includeOnlyWithLayerMask = value;
+  _resyncMeshes();
+}
+
+unsigned int Light::excludeWithLayerMask() const
+{
+  return _excludeWithLayerMask;
+}
+
+void Light::setExcludeWithLayerMask(unsigned int value)
+{
+  _excludeWithLayerMask = value;
+  _resyncMeshes();
+}
+
+unsigned int Light::lightmapMode() const
+{
+  return _lightmapMode;
+}
+
+void Light::setLightmapMode(unsigned int value)
+{
+  if (_lightmapMode == value) {
+    return;
+  }
+
+  _lightmapMode = value;
+  _markMeshesAsLightDirty();
+}
+
 ShadowGenerator* Light::getShadowGenerator()
 {
   return _shadowGenerator;
@@ -76,7 +151,7 @@ Vector3 Light::getAbsolutePosition()
 }
 
 void Light::transferToEffect(Effect* /*effect*/,
-                             const std::string& /*uniformName0*/)
+                             const std::string& /*lightIndex*/)
 {
 }
 
@@ -99,22 +174,22 @@ bool Light::canAffectMesh(AbstractMesh* mesh)
   }
 
   auto it1
-    = std::find(includedOnlyMeshes.begin(), includedOnlyMeshes.end(), mesh);
-  if (includedOnlyMeshes.size() > 0 && it1 == includedOnlyMeshes.end()) {
+    = std::find(_includedOnlyMeshes.begin(), _includedOnlyMeshes.end(), mesh);
+  if (_includedOnlyMeshes.size() > 0 && it1 == _includedOnlyMeshes.end()) {
     return false;
   }
 
-  auto it2 = std::find(excludedMeshes.begin(), excludedMeshes.end(), mesh);
-  if (excludedMeshes.size() > 0 && it2 != excludedMeshes.end()) {
+  auto it2 = std::find(_excludedMeshes.begin(), _excludedMeshes.end(), mesh);
+  if (_excludedMeshes.size() > 0 && it2 != _excludedMeshes.end()) {
     return false;
   }
 
-  if (includeOnlyWithLayerMask != 0
-      && (includeOnlyWithLayerMask & mesh->layerMask) == 0) {
+  if (_includeOnlyWithLayerMask != 0
+      && (_includeOnlyWithLayerMask & mesh->layerMask) == 0) {
     return false;
   }
 
-  if (excludeWithLayerMask != 0 && excludeWithLayerMask & mesh->layerMask) {
+  if (_excludeWithLayerMask != 0 && _excludeWithLayerMask & mesh->layerMask) {
     return false;
   }
 
@@ -152,6 +227,13 @@ void Light::dispose(bool /*doNotRecurse*/)
 
   // Animations
   getScene()->stopAnimation(this);
+
+  // Remove from meshes
+  for (auto& mesh : getScene()->meshes) {
+    mesh->_removeLightSource(this);
+  }
+
+  _uniformBuffer->dispose();
 
   // Remove from scene
   getScene()->removeLight(this);
@@ -235,6 +317,31 @@ Light* Light::Parse(const Json::value& parsedLight, Scene* scene)
   }
 
   return light;
+}
+
+void Light::_hookArrayForExcluded(const std::vector<AbstractMesh*>& /*array*/)
+{
+}
+
+void Light::_hookArrayForIncludedOnly(
+  const std::vector<AbstractMesh*>& /*array*/)
+{
+}
+
+void Light::_resyncMeshes()
+{
+  for (auto& mesh : getScene()->meshes) {
+    mesh->_resyncLighSource(this);
+  }
+}
+
+void Light::_markMeshesAsLightDirty()
+{
+  for (auto& mesh : getScene()->meshes) {
+    if (std_util::contains(mesh->_lightSources, this)) {
+      mesh->_markSubMeshesAsLightDirty();
+    }
+  }
 }
 
 } // end of namespace BABYLON

@@ -2,6 +2,7 @@
 
 #include <babylon/cameras/camera.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/uniform_buffer.h>
 #include <babylon/math/axis.h>
 
 namespace BABYLON {
@@ -9,7 +10,7 @@ namespace BABYLON {
 SpotLight::SpotLight(const std::string& iName, const Vector3& iPosition,
                      const Vector3& iDirection, float iAngle, float iExponent,
                      Scene* scene)
-    : Light{iName, scene}
+    : IShadowLight{iName, scene}
     , position{iPosition}
     , direction{iDirection}
     , angle{iAngle}
@@ -21,6 +22,16 @@ SpotLight::SpotLight(const std::string& iName, const Vector3& iPosition,
 
 SpotLight::~SpotLight()
 {
+}
+
+void SpotLight::_buildUniformLayout()
+{
+  _uniformBuffer->addUniform("vLightData", 4);
+  _uniformBuffer->addUniform("vLightDiffuse", 4);
+  _uniformBuffer->addUniform("vLightSpecular", 3);
+  _uniformBuffer->addUniform("vLightDirection", 3);
+  _uniformBuffer->addUniform("shadowsInfo", 3);
+  _uniformBuffer->create();
 }
 
 const char* SpotLight::getClassName() const
@@ -41,6 +52,11 @@ Scene* SpotLight::getScene()
 Vector3 SpotLight::getAbsolutePosition()
 {
   return transformedPosition ? *transformedPosition : position;
+}
+
+float SpotLight::getDepthScale() const
+{
+  return 30.f;
 }
 
 void SpotLight::setShadowProjectionMatrix(
@@ -94,9 +110,8 @@ bool SpotLight::computeTransformedPosition()
   return false;
 }
 
-void SpotLight::transferToEffect(Effect* effect,
-                                 const std::string& positionUniformName,
-                                 const std::string& directionUniformName)
+void SpotLight::transferToEffect(Effect* /*effect*/,
+                                 const std::string& lightIndex)
 {
   auto normalizeDirection = Vector3::Zero();
 
@@ -110,27 +125,31 @@ void SpotLight::transferToEffect(Effect* effect,
     Vector3::TransformNormalToRef(direction, *parent()->getWorldMatrix(),
                                   *_transformedDirection);
 
-    effect->setFloat4(positionUniformName,    // Name
-                      transformedPosition->x, // X
-                      transformedPosition->y, // Y
-                      transformedPosition->z, // Z
-                      exponent);              // Value
+    _uniformBuffer->updateFloat4("vLightData",           // Name
+                                 transformedPosition->x, // X
+                                 transformedPosition->y, // Y
+                                 transformedPosition->z, // Z
+                                 exponent,               // Value
+                                 lightIndex);            // Index
+
     normalizeDirection = Vector3::Normalize(*_transformedDirection);
   }
   else {
-    effect->setFloat4(positionUniformName, // Name
-                      position.x,          // X
-                      position.y,          // Y
-                      position.z,          // Z
-                      exponent);           // Value
+    _uniformBuffer->updateFloat4("vLightData", // Name
+                                 position.x,   // X
+                                 position.y,   // Y
+                                 position.z,   // Z
+                                 exponent,     // Value
+                                 lightIndex);  // Index
     normalizeDirection = Vector3::Normalize(direction);
   }
 
-  effect->setFloat4(directionUniformName,    // Name
-                    normalizeDirection.x,    // X
-                    normalizeDirection.y,    // Y
-                    normalizeDirection.z,    // Z
-                    std::cos(angle * 0.5f)); // Value
+  _uniformBuffer->updateFloat4("vLightDirection",      // Name
+                               normalizeDirection.x,   // X
+                               normalizeDirection.y,   // Y
+                               normalizeDirection.z,   // Z
+                               std::cos(angle * 0.5f), // Value
+                               lightIndex);            // Index
 }
 
 Matrix* SpotLight::_getWorldMatrix()

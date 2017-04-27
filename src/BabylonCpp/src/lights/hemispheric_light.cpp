@@ -3,6 +3,7 @@
 #include <babylon/core/json.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/uniform_buffer.h>
 
 namespace BABYLON {
 
@@ -17,6 +18,16 @@ HemisphericLight::HemisphericLight(const std::string& iName,
 
 HemisphericLight::~HemisphericLight()
 {
+}
+
+void HemisphericLight::_buildUniformLayout()
+{
+  _uniformBuffer->addUniform("vLightData", 4);
+  _uniformBuffer->addUniform("vLightDiffuse", 4);
+  _uniformBuffer->addUniform("vLightSpecular", 3);
+  _uniformBuffer->addUniform("vLightGround", 3);
+  _uniformBuffer->addUniform("shadowsInfo", 3);
+  _uniformBuffer->create();
 }
 
 const char* HemisphericLight::getClassName() const
@@ -40,14 +51,20 @@ ShadowGenerator* HemisphericLight::getShadowGenerator()
   return nullptr;
 }
 
-void HemisphericLight::transferToEffect(
-  Effect* effect, const std::string& directionUniformName,
-  const std::string& groundColorUniformName)
+void HemisphericLight::transferToEffect(Effect* /*effect*/,
+                                        const std::string& lightIndex)
 {
   auto normalizeDirection = Vector3::Normalize(direction);
-  effect->setFloat4(directionUniformName, normalizeDirection.x,
-                    normalizeDirection.y, normalizeDirection.z, 0.f);
-  effect->setColor3(groundColorUniformName, groundColor.scale(intensity));
+
+  _uniformBuffer->updateFloat4("vLightData",         //
+                               normalizeDirection.x, //
+                               normalizeDirection.y, //
+                               normalizeDirection.z, //
+                               0.f,                  //
+                               lightIndex);
+
+  _uniformBuffer->updateColor3("vLightGround", groundColor.scale(intensity),
+                               lightIndex);
 }
 
 Matrix* HemisphericLight::_getWorldMatrix()

@@ -4,7 +4,8 @@
 
 namespace BABYLON {
 
-IShadowLight::IShadowLight() : _shadowGenerator{nullptr}
+IShadowLight::IShadowLight(const std::string& iName, Scene* scene)
+    : Light{iName, scene}, _shadowGenerator{nullptr}
 {
 }
 

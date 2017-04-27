@@ -3,12 +3,13 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/uniform_buffer.h>
 
 namespace BABYLON {
 
 PointLight::PointLight(const std::string& iName, const Vector3& iPosition,
                        Scene* scene)
-    : Light{iName, scene}
+    : IShadowLight{iName, scene}
     , transformedPosition{nullptr}
     , position{iPosition}
     , _worldMatrix{nullptr}
@@ -17,6 +18,15 @@ PointLight::PointLight(const std::string& iName, const Vector3& iPosition,
 
 PointLight::~PointLight()
 {
+}
+
+void PointLight::_buildUniformLayout()
+{
+  _uniformBuffer->addUniform("vLightData", 4);
+  _uniformBuffer->addUniform("vLightDiffuse", 4);
+  _uniformBuffer->addUniform("vLightSpecular", 3);
+  _uniformBuffer->addUniform("shadowsInfo", 3);
+  _uniformBuffer->create();
 }
 
 const char* PointLight::getClassName() const
@@ -55,20 +65,22 @@ bool PointLight::computeTransformedPosition()
   return false;
 }
 
-void PointLight::transferToEffect(Effect* effect,
-                                  const std::string& positionUniformName)
+void PointLight::transferToEffect(Effect* /*effect*/,
+                                  const std::string& lightIndex)
 {
   if (parent() && parent()->getWorldMatrix()) {
     computeTransformedPosition();
-
-    effect->setFloat4(positionUniformName, transformedPosition->x,
-                      transformedPosition->y, transformedPosition->z, 0.f);
-
+    _uniformBuffer->updateFloat4("vLightData",           //
+                                 transformedPosition->x, //
+                                 transformedPosition->y, //
+                                 transformedPosition->z, //
+                                 0.f,                    //
+                                 lightIndex);
     return;
   }
 
-  effect->setFloat4(positionUniformName, position.x, position.y, position.z,
-                    0.f);
+  _uniformBuffer->updateFloat4("vLightData", position.x, position.y, position.z,
+                               0, lightIndex);
 }
 
 bool PointLight::needCube() const
@@ -101,6 +113,11 @@ Vector3 PointLight::getShadowDirection(unsigned int faceIndex)
   }
 
   return Vector3::Zero();
+}
+
+float PointLight::getDepthScale() const
+{
+  return 30.f;
 }
 
 ShadowGenerator* PointLight::getShadowGenerator()
