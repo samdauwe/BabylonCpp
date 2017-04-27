@@ -2,10 +2,15 @@
 
 #include <babylon/animations/animation.h>
 #include <babylon/bones/skeleton.h>
-#include <babylon/math/tmp.h>
 #include <babylon/mesh/abstract_mesh.h>
 
 namespace BABYLON {
+
+std::array<Vector3, 2> Bone::_tmpVecs{{Vector3::Zero(), Vector3::Zero()}};
+Quaternion Bone::_tmpQuat{Quaternion::Identity()};
+std::array<Matrix, 5> Bone::_tmpMats{{Matrix::Identity(), Matrix::Identity(),
+                                      Matrix::Identity(), Matrix::Identity(),
+                                      Matrix::Identity()}};
 
 Bone::Bone(const std::string& _name, Skeleton* skeleton, Bone* parentBone,
            const Matrix& matrix)
@@ -268,8 +273,8 @@ void Bone::translate(const Vector3& vec, Space space, AbstractMesh* mesh)
     }
 
     _skeleton->computeAbsoluteTransforms();
-    auto& tmat = Tmp::MatrixArray[0];
-    auto& tvec = Tmp::Vector3Array[0];
+    auto& tmat = Bone::_tmpMats[0];
+    auto& tvec = Bone::_tmpVecs[0];
 
     if (mesh) {
       tmat.copyFrom(_parent->getAbsoluteTransform());
@@ -317,8 +322,8 @@ void Bone::setPosition(const Vector3& position, Space space, AbstractMesh* mesh)
 
     _skeleton->computeAbsoluteTransforms();
 
-    auto& tmat = Tmp::MatrixArray[0];
-    auto& vec  = Tmp::Vector3Array[0];
+    auto& tmat = Bone::_tmpMats[0];
+    auto& vec  = Bone::_tmpVecs[0];
 
     if (mesh) {
       tmat.copyFrom(_parent->getAbsoluteTransform());
@@ -364,14 +369,14 @@ void Bone::setScale(float x, float y, float z, bool scaleChildren)
 void Bone::scale(float x, float y, float z, bool scaleChildren)
 {
   auto& locMat     = getLocalMatrix();
-  auto& origLocMat = Tmp::MatrixArray[0];
+  auto& origLocMat = Bone::_tmpMats[0];
   origLocMat.copyFrom(locMat);
 
-  auto& origLocMatInv = Tmp::MatrixArray[1];
+  auto& origLocMatInv = Bone::_tmpMats[1];
   origLocMatInv.copyFrom(origLocMat);
   origLocMatInv.invert();
 
-  auto& scaleMat = Tmp::MatrixArray[2];
+  auto& scaleMat = Bone::_tmpMats[2];
   Matrix::FromValuesToRef(x, 0, 0, 0, // M11-M14
                           0, y, 0, 0, // M21-M24
                           0, 0, z, 0, // M31-M34
@@ -421,10 +426,10 @@ void Bone::scale(float x, float y, float z, bool scaleChildren)
 void Bone::setYawPitchRoll(float yaw, float pitch, float roll, Space space,
                            AbstractMesh* mesh)
 {
-  auto& rotMat = Tmp::MatrixArray[0];
+  auto& rotMat = Bone::_tmpMats[0];
   Matrix::RotationYawPitchRollToRef(yaw, pitch, roll, rotMat);
 
-  auto& rotMatInv = Tmp::MatrixArray[1];
+  auto& rotMatInv = Bone::_tmpMats[1];
 
   _getNegativeRotationToRef(rotMatInv, space, mesh);
 
@@ -435,7 +440,7 @@ void Bone::setYawPitchRoll(float yaw, float pitch, float roll, Space space,
 
 void Bone::rotate(Vector3& axis, float amount, Space space, AbstractMesh* mesh)
 {
-  auto& rmat = Tmp::MatrixArray[0];
+  auto& rmat = Bone::_tmpMats[0];
   rmat.m[12] = 0.f;
   rmat.m[13] = 0.f;
   rmat.m[14] = 0.f;
@@ -448,9 +453,9 @@ void Bone::rotate(Vector3& axis, float amount, Space space, AbstractMesh* mesh)
 void Bone::setAxisAngle(Vector3& axis, float angle, Space space,
                         AbstractMesh* mesh)
 {
-  auto& rotMat = Tmp::MatrixArray[0];
+  auto& rotMat = Bone::_tmpMats[0];
   Matrix::RotationAxisToRef(axis, angle, rotMat);
-  auto& rotMatInv = Tmp::MatrixArray[1];
+  auto& rotMatInv = Bone::_tmpMats[1];
 
   _getNegativeRotationToRef(rotMatInv, space, mesh);
 
@@ -466,11 +471,11 @@ void Bone::setRotation(const Vector3& rotation, Space space, AbstractMesh* mesh)
 void Bone::setRotationQuaternion(const Quaternion& quat, Space space,
                                  AbstractMesh* mesh)
 {
-  auto& rotMatInv = Tmp::MatrixArray[0];
+  auto& rotMatInv = Bone::_tmpMats[0];
 
   _getNegativeRotationToRef(rotMatInv, space, mesh);
 
-  auto& rotMat = Tmp::MatrixArray[1];
+  auto& rotMat = Bone::_tmpMats[1];
   Matrix::FromQuaternionToRef(quat, rotMat);
 
   rotMatInv.multiplyToRef(rotMat, rotMat);
@@ -481,11 +486,11 @@ void Bone::setRotationQuaternion(const Quaternion& quat, Space space,
 void Bone::setRotationMatrix(const Matrix& rotMat, Space space,
                              AbstractMesh* mesh)
 {
-  auto& rotMatInv = Tmp::MatrixArray[0];
+  auto& rotMatInv = Bone::_tmpMats[0];
 
   _getNegativeRotationToRef(rotMatInv, space, mesh);
 
-  auto& rotMat2 = Tmp::MatrixArray[1];
+  auto& rotMat2 = Bone::_tmpMats[1];
   rotMat2.copyFrom(rotMat);
 
   rotMatInv.multiplyToRef(rotMat, rotMat2);
@@ -501,8 +506,8 @@ void Bone::_rotateWithMatrix(const Matrix& rmat, Space space,
   float ly             = lmat.m[13];
   float lz             = lmat.m[14];
   auto parent          = getParent();
-  auto& parentScale    = Tmp::MatrixArray[3];
-  auto& parentScaleInv = Tmp::MatrixArray[4];
+  auto& parentScale    = Bone::_tmpMats[3];
+  auto& parentScaleInv = Bone::_tmpMats[4];
 
   if (parent) {
     if (space == Space::WORLD) {
@@ -550,13 +555,13 @@ void Bone::_getNegativeRotationToRef(Matrix& rotMatInv, Space space,
                                      AbstractMesh* mesh)
 {
   if (space == Space::WORLD) {
-    auto& scaleMatrix = Tmp::MatrixArray[2];
+    auto& scaleMatrix = Bone::_tmpMats[2];
     scaleMatrix.copyFrom(_scaleMatrix);
     rotMatInv.copyFrom(getAbsoluteTransform());
 
     if (mesh) {
       rotMatInv.multiplyToRef(*mesh->getWorldMatrix(), rotMatInv);
-      auto& meshScale = Tmp::MatrixArray[3];
+      auto& meshScale = Bone::_tmpMats[3];
       Matrix::ScalingToRef(mesh->scaling().x, mesh->scaling().y,
                            mesh->scaling().z, meshScale);
       scaleMatrix.multiplyToRef(meshScale, scaleMatrix);
@@ -569,11 +574,11 @@ void Bone::_getNegativeRotationToRef(Matrix& rotMatInv, Space space,
   else {
     rotMatInv.copyFrom(getLocalMatrix());
     rotMatInv.invert();
-    auto& scaleMatrix = Tmp::MatrixArray[2];
+    auto& scaleMatrix = Bone::_tmpMats[2];
     scaleMatrix.copyFrom(_scaleMatrix);
 
     if (_parent) {
-      auto& pscaleMatrix = Tmp::MatrixArray[3];
+      auto& pscaleMatrix = Bone::_tmpMats[3];
       pscaleMatrix.copyFrom(_parent->_scaleMatrix);
       pscaleMatrix.invert();
       pscaleMatrix.multiplyToRef(rotMatInv, rotMatInv);
@@ -627,7 +632,7 @@ void Bone::getPositionToRef(Vector3& result, Space space,
 
     _skeleton->computeAbsoluteTransforms();
 
-    auto& tmat = Tmp::MatrixArray[0];
+    auto& tmat = Bone::_tmpMats[0];
 
     if (mesh) {
       tmat.copyFrom(getAbsoluteTransform());
@@ -730,7 +735,7 @@ void Bone::getDirectionToRef(const Vector3& localAxis, Vector3& result,
 
   _skeleton->computeAbsoluteTransforms();
 
-  auto& mat = Tmp::MatrixArray[0];
+  auto& mat = Bone::_tmpMats[0];
 
   mat.copyFrom(getAbsoluteTransform());
 
@@ -755,7 +760,7 @@ Vector3 Bone::getRotation(Space space, AbstractMesh* mesh) const
 void Bone::getRotationToRef(Vector3& result, Space space,
                             AbstractMesh* mesh) const
 {
-  auto& quat = Tmp::QuaternionArray[0];
+  auto& quat = Bone::_tmpQuat;
 
   getRotationQuaternionToRef(quat, space, mesh);
 
@@ -775,11 +780,10 @@ void Bone::getRotationQuaternionToRef(Quaternion& result, Space space,
                                       AbstractMesh* mesh) const
 {
   if (space == Space::LOCAL) {
-    getLocalMatrix().decompose(Tmp::Vector3Array[0], result,
-                               Tmp::Vector3Array[1]);
+    getLocalMatrix().decompose(Bone::_tmpVecs[0], result, Bone::_tmpVecs[1]);
   }
   else {
-    auto& mat = Tmp::MatrixArray[0];
+    auto& mat = Bone::_tmpMats[0];
     auto amat = getAbsoluteTransform();
 
     if (mesh) {
@@ -793,7 +797,7 @@ void Bone::getRotationQuaternionToRef(Quaternion& result, Space space,
     mat.m[1] *= _scalingDeterminant;
     mat.m[2] *= _scalingDeterminant;
 
-    mat.decompose(Tmp::Vector3Array[0], result, Tmp::Vector3Array[1]);
+    mat.decompose(Bone::_tmpVecs[0], result, Bone::_tmpVecs[1]);
   }
 }
 
@@ -813,7 +817,7 @@ void Bone::getRotationMatrixToRef(Matrix& result, Space space,
     getLocalMatrix().getRotationMatrixToRef(result);
   }
   else {
-    auto& mat = Tmp::MatrixArray[0];
+    auto& mat = Bone::_tmpMats[0];
     auto amat = getAbsoluteTransform();
 
     if (mesh) {
@@ -854,7 +858,7 @@ void Bone::getAbsolutePositionFromLocalToRef(const Vector3& position,
 
   _skeleton->computeAbsoluteTransforms();
 
-  auto& tmat = Tmp::MatrixArray[0];
+  auto& tmat = Bone::_tmpMats[0];
 
   if (mesh) {
     tmat.copyFrom(getAbsoluteTransform());
@@ -892,7 +896,7 @@ void Bone::getLocalPositionFromAbsoluteToRef(const Vector3& position,
 
   _skeleton->computeAbsoluteTransforms();
 
-  auto tmat = Tmp::MatrixArray[0];
+  auto tmat = Bone::_tmpMats[0];
 
   tmat.copyFrom(getAbsoluteTransform());
 

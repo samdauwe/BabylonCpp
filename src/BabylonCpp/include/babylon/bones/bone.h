@@ -362,6 +362,11 @@ public:
   int length;
 
 private:
+  static std::array<Vector3, 2> _tmpVecs;
+  static Quaternion _tmpQuat;
+  static std::array<Matrix, 5> _tmpMats;
+
+private:
   Skeleton* _skeleton;
   Matrix _localMatrix;
   Matrix _restPose;
