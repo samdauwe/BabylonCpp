@@ -219,7 +219,27 @@ std::string AbstractMesh::toString(bool fullDetails) const
   return oss.str();
 }
 
+void AbstractMesh::_resyncLightSources()
+{
+}
+
+void AbstractMesh::_resyncLighSource(Light* /*light*/)
+{
+}
+
+void AbstractMesh::_removeLightSource(Light* /*light*/)
+{
+}
+
+void AbstractMesh::_markSubMeshesAsLightDirty()
+{
+}
+
 void AbstractMesh::_markSubMeshesAsAttributesDirty()
+{
+}
+
+void AbstractMesh::_markSubMeshesAsMiscDirty()
 {
 }
 
@@ -1363,11 +1383,11 @@ void AbstractMesh::dispose(bool doNotRecurse)
   // Lights
   for (auto& light : getScene()->lights) {
     // Included meshes
-    std::remove(light->includedOnlyMeshes.begin(),
-                light->includedOnlyMeshes.end(), this);
+    std::remove(light->includedOnlyMeshes().begin(),
+                light->includedOnlyMeshes().end(), this);
 
     // Excluded meshes
-    std::remove(light->excludedMeshes.begin(), light->excludedMeshes.end(),
+    std::remove(light->excludedMeshes().begin(), light->excludedMeshes().end(),
                 this);
 
     // Shadow generators

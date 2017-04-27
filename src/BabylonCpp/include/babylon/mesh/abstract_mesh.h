@@ -104,7 +104,12 @@ public:
    * within scene loading
    */
   std::string toString(bool fullDetails = false) const;
+  void _resyncLightSources();
+  void _resyncLighSource(Light* light);
+  void _removeLightSource(Light* light);
+  void _markSubMeshesAsLightDirty();
   void _markSubMeshesAsAttributesDirty();
+  void _markSubMeshesAsMiscDirty();
   Scene* getScene() override;
   void setSkeleton(Skeleton* value);
   virtual Skeleton* skeleton();
@@ -881,6 +886,7 @@ public:
   std::vector<AbstractMesh*> _intersectionsInProgress;
   bool _unIndexed;
   std::unique_ptr<Matrix> _poseMatrix;
+  std::vector<Light*> _lightSources;
   // Loading properties
   std::vector<Json::value> _waitingActions;
   bool _waitingFreezeWorldMatrix;
