@@ -43,7 +43,7 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
           = scene->getMeshByID(light->_excludedMeshesIds[excludedIndex]);
 
         if (excludedMesh) {
-          light->excludedMeshes.emplace_back(excludedMesh);
+          light->excludedMeshes().emplace_back(excludedMesh);
         }
       }
 
@@ -59,7 +59,7 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
           light->_includedOnlyMeshesIds[includedOnlyIndex]);
 
         if (includedOnlyMesh) {
-          light->includedOnlyMeshes.emplace_back(includedOnlyMesh);
+          light->includedOnlyMeshes().emplace_back(includedOnlyMesh);
         }
       }
 
@@ -113,10 +113,10 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
       }
     }
 
-    if (light->lightmapMode != Light::LIGHTMAP_DEFAULT) {
+    if (light->lightmapMode() != Light::LIGHTMAP_DEFAULT) {
       lightmapMode                         = true;
       defines.lightmapexcluded[lightIndex] = true;
-      if (light->lightmapMode == Light::LIGHTMAP_SHADOWSONLY) {
+      if (light->lightmapMode() == Light::LIGHTMAP_SHADOWSONLY) {
         defines.lightmapnospecular[lightIndex] = true;
       }
     }

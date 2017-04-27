@@ -53,9 +53,8 @@ public:
    * Render all the sub meshes contained in the group.
    * @param customRenderFunction Used to override the default render behaviour
    * of the group.
-   * @returns true if rendered some submeshes.
    */
-  bool
+  void
   render(std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
                             const std::vector<SubMesh*>& transparentSubMeshes,
                             const std::vector<SubMesh*>& alphaTestSubMeshes)>&

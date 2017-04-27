@@ -83,7 +83,7 @@ void RenderingGroup::setTransparentSortCompareFn(
   };
 }
 
-bool RenderingGroup::render(
+void RenderingGroup::render(
   std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
                      const std::vector<SubMesh*>& transparentSubMeshes,
                      const std::vector<SubMesh*>& alphaTestSubMeshes)>&
@@ -94,7 +94,7 @@ bool RenderingGroup::render(
   if (customRenderFunction) {
     customRenderFunction(_opaqueSubMeshes, _alphaTestSubMeshes,
                          _transparentSubMeshes);
-    return true;
+    return;
   }
 
   auto engine = _scene->getEngine();
@@ -110,6 +110,9 @@ bool RenderingGroup::render(
     _renderAlphaTest(_alphaTestSubMeshes);
     engine->setAlphaTesting(false);
   }
+
+  auto stencilState = engine->getStencilBuffer();
+  engine->setStencilBuffer(false);
 
   // Sprites
   if (renderSprites) {
@@ -131,7 +134,7 @@ bool RenderingGroup::render(
     engine->setAlphaMode(Engine::ALPHA_DISABLE);
   }
 
-  return true;
+  engine->setStencilBuffer(stencilState);
 }
 
 void RenderingGroup::renderOpaqueSorted(const std::vector<SubMesh*>& subMeshes)

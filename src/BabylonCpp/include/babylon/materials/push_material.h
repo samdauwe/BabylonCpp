@@ -31,7 +31,7 @@ public:
   bool isReady(AbstractMesh* mesh, bool useInstances) override;
   void bindOnlyWorldMatrix(Matrix& world) override;
   void bind(Matrix* world, Mesh* mesh) override;
-  void markAsDirty(unsigned int flag);
+  void markAsDirty(unsigned int flag) override;
 
 protected:
   PushMaterial(const std::string& name, Scene* scene);
