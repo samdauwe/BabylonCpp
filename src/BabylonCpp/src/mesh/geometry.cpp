@@ -48,7 +48,7 @@ Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData,
   // applyToMesh
   if (mesh) {
     if (mesh->type() == IReflect::Type::LINESMESH) {
-      auto linesMesh = dynamic_cast<LinesMesh*>(mesh);
+      auto linesMesh = static_cast<LinesMesh*>(mesh);
       setBoundingBias(Vector2(0, linesMesh->intersectionThreshold()));
       _hasBoundingBias = true;
       updateExtend(Float32Array());
@@ -133,7 +133,7 @@ void Geometry::setVerticesData(unsigned int kind, const Float32Array& data,
 
 void Geometry::removeVerticesData(unsigned int kind)
 {
-  if (kind < _vertexBuffers.size() && _vertexBuffers[kind]) {
+  if (std_util::contains(_vertexBuffers, kind)) {
     _vertexBuffers[kind]->dispose();
     _vertexBuffers[kind].reset(nullptr);
   }
@@ -142,7 +142,7 @@ void Geometry::removeVerticesData(unsigned int kind)
 void Geometry::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
 {
   unsigned int kind = buffer->getKind();
-  if (_vertexBuffers.find(kind) != _vertexBuffers.end()) {
+  if (std_util::contains(_vertexBuffers, kind)) {
     _vertexBuffers[kind]->dispose();
   }
 
@@ -390,6 +390,18 @@ GL::IGLBuffer* Geometry::getIndexBuffer()
   return _indexBuffer.get();
 }
 
+void Geometry::_releaseVertexArrayObject(Effect* effect)
+{
+  if (!effect) {
+    return;
+  }
+
+  if (std_util::contains(_vertexArrayObjects, effect->key())) {
+    _engine->releaseVertexArrayObject(_vertexArrayObjects[effect->key()].get());
+    _vertexArrayObjects[effect->key()].reset(nullptr);
+  }
+}
+
 void Geometry::releaseForMesh(Mesh* mesh, bool shouldDispose)
 {
   auto it = std::find(_meshes.begin(), _meshes.end(), mesh);
@@ -496,6 +508,10 @@ void Geometry::notifyUpdate(unsigned int kind)
 {
   if (onGeometryUpdated) {
     onGeometryUpdated(this, kind);
+  }
+
+  for (auto& mesh : _meshes) {
+    mesh->_markSubMeshesAsAttributesDirty();
   }
 }
 

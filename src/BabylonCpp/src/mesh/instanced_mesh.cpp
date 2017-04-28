@@ -85,6 +85,35 @@ Float32Array InstancedMesh::getVerticesData(unsigned int kind,
   return _sourceMesh->getVerticesData(kind, copyWhenShared);
 }
 
+Mesh* InstancedMesh::setVerticesData(unsigned int kind,
+                                     const Float32Array& data, bool updatable,
+                                     int stride)
+{
+  if (sourceMesh()) {
+    sourceMesh()->setVerticesData(kind, data, updatable, stride);
+  }
+  return sourceMesh();
+}
+
+Mesh* InstancedMesh::updateVerticesData(unsigned int kind,
+                                        const Float32Array& data,
+                                        bool updateExtends, bool makeItUnique)
+{
+  if (sourceMesh()) {
+    sourceMesh()->updateVerticesData(kind, data, updateExtends, makeItUnique);
+  }
+  return sourceMesh();
+}
+
+Mesh* InstancedMesh::setIndices(const IndicesArray& indices,
+                                size_t totalVertices)
+{
+  if (sourceMesh()) {
+    sourceMesh()->setIndices(indices, totalVertices);
+  }
+  return sourceMesh();
+}
+
 bool InstancedMesh::isVerticesDataPresent(unsigned int kind)
 {
   return _sourceMesh->isVerticesDataPresent(kind);

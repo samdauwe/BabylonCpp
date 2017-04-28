@@ -71,6 +71,7 @@ public:
   size_t getTotalIndices();
   IndicesArray getIndices(bool copyWhenShared = false) override;
   GL::IGLBuffer* getIndexBuffer();
+  void _releaseVertexArrayObject(Effect* effect);
   void releaseForMesh(Mesh* mesh, bool shouldDispose = true);
   void applyToMesh(Mesh* mesh);
   void load(Scene* scene, const std::function<void()>& onLoaded = nullptr);
