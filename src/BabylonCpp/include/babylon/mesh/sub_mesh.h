@@ -27,10 +27,10 @@ public:
   virtual ~SubMesh();
 
   void addToMesh(std::unique_ptr<SubMesh>&& newSubMesh);
-  bool isGlobal() const;
-  Effect* effect();
   void setEffect(Effect* effect);
   void setEffect(Effect* effect, const MaterialDefines& defines);
+  bool isGlobal() const;
+  Effect* effect();
 
   /**
    * @brief Returns the submesh BoudingInfo object.
@@ -165,7 +165,7 @@ public:
   int _alphaIndex;
   float _distanceToCamera;
   size_t _id;
-  MaterialDefines* _materialDefines;
+  std::unique_ptr<MaterialDefines> _materialDefines;
   Effect* _materialEffect;
 
 private:

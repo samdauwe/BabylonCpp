@@ -110,7 +110,7 @@ void PushMaterial::_markAllSubMeshesAsDirty(
         return;
       }
 
-      func(subMesh->_materialDefines);
+      func(subMesh->_materialDefines.get());
     }
   }
 }

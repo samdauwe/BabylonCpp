@@ -80,7 +80,9 @@ int Matrix::getHashCode() const
 
 void Matrix::_markAsUpdated()
 {
-  updateFlag = Matrix::_updateFlagSeed++;
+  updateFlag = (Matrix::_updateFlagSeed < std::numeric_limits<int>::max()) ?
+                 Matrix::_updateFlagSeed++ :
+                 0;
 }
 
 /** Properties **/

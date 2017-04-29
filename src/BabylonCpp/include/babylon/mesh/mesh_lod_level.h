@@ -12,7 +12,14 @@ class BABYLON_SHARED_EXPORT MeshLODLevel {
 
 public:
   MeshLODLevel(float distance, Mesh* mesh);
+  MeshLODLevel(const MeshLODLevel& other);
+  MeshLODLevel(MeshLODLevel&& other);
+  MeshLODLevel& operator=(const MeshLODLevel& other);
+  MeshLODLevel& operator=(MeshLODLevel&& other);
   ~MeshLODLevel();
+
+  bool operator==(const MeshLODLevel& other) const;
+  bool operator!=(const MeshLODLevel& other) const;
 
 public:
   float distance;

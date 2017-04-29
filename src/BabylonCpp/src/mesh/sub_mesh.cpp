@@ -28,13 +28,16 @@ SubMesh::SubMesh(unsigned int iMaterialIndex, unsigned int iVerticesStart,
     , indexCount{iIndexCount}
     , createBoundingBox{iCreateBoundingBox}
     , _renderId{0}
+    , _materialDefines{nullptr}
+    , _materialEffect{nullptr}
     , _mesh{mesh}
     , _renderingMesh{renderingMesh}
     , _boundingInfo{nullptr}
     , _linesIndexBuffer{nullptr}
+    , _currentMaterial{nullptr}
 {
   if (!_renderingMesh) {
-    _renderingMesh = dynamic_cast<Mesh*>(mesh);
+    _renderingMesh = static_cast<Mesh*>(mesh);
   }
 
   _id = mesh->subMeshes.size() - 1;
@@ -54,22 +57,32 @@ void SubMesh::addToMesh(std::unique_ptr<SubMesh>&& newSubMesh)
   _mesh->subMeshes.emplace_back(std::move(newSubMesh));
 }
 
+Effect* SubMesh::effect()
+{
+  return _materialEffect;
+}
+
+void SubMesh::setEffect(Effect* effect)
+{
+  if (_materialEffect == effect) {
+    return;
+  }
+  _materialDefines = nullptr;
+  _materialEffect  = effect;
+}
+
+void SubMesh::setEffect(Effect* effect, const MaterialDefines& defines)
+{
+  if (_materialEffect == effect) {
+    return;
+  }
+  _materialDefines = std_util::make_unique<MaterialDefines>(defines);
+  _materialEffect  = effect;
+}
+
 bool SubMesh::isGlobal() const
 {
   return (verticesStart == 0 && verticesCount == _mesh->getTotalVertices());
-}
-
-Effect* SubMesh::effect()
-{
-  return nullptr;
-}
-
-void SubMesh::setEffect(Effect* /*effect*/)
-{
-}
-
-void SubMesh::setEffect(Effect* /*effect*/, const MaterialDefines& /*defines*/)
-{
 }
 
 BoundingInfo* SubMesh::getBoundingInfo() const
@@ -101,11 +114,17 @@ Material* SubMesh::getMaterial()
 {
   auto rootMaterial = _renderingMesh->getMaterial();
 
-  if (rootMaterial) {
-    if (rootMaterial->type() == IReflect::Type::MULTIMATERIAL) {
-      auto multiMaterial = dynamic_cast<MultiMaterial*>(rootMaterial);
-      return multiMaterial->getSubMaterial(materialIndex);
+  if (rootMaterial && (rootMaterial->type() == IReflect::Type::MULTIMATERIAL)) {
+    auto multiMaterial     = static_cast<MultiMaterial*>(rootMaterial);
+    auto effectiveMaterial = multiMaterial->getSubMaterial(materialIndex);
+    if (_currentMaterial != effectiveMaterial) {
+      _currentMaterial = effectiveMaterial;
+      if (_materialDefines) {
+        _materialDefines->markAllAsDirty();
+      }
     }
+
+    return effectiveMaterial;
   }
 
   if (!rootMaterial) {
@@ -216,7 +235,7 @@ SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions,
 
   // LineMesh first as it's also a Mesh...
   if (_mesh->type() == IReflect::Type::LINESMESH) {
-    auto lineMesh = dynamic_cast<LinesMesh*>(_mesh);
+    auto lineMesh = static_cast<LinesMesh*>(_mesh);
 
     // Line test
     float length;
@@ -312,7 +331,7 @@ SubMesh* SubMesh::CreateFromIndices(unsigned int materialIndex,
   unsigned int maxVertexIndex = std::numeric_limits<unsigned>::min();
 
   auto _renderingMesh
-    = renderingMesh ? renderingMesh : dynamic_cast<Mesh*>(mesh);
+    = renderingMesh ? renderingMesh : static_cast<Mesh*>(mesh);
   auto indices = _renderingMesh->getIndices();
 
   for (size_t index = startIndex; index < startIndex + indexCount; ++index) {
