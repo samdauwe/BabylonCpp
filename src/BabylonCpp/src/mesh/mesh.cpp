@@ -42,8 +42,12 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
            bool doNotCloneChildren, bool clonePhysicsImpostor)
     : AbstractMesh{iName, scene}
     , delayLoadState{Engine::DELAYLOADSTATE_NONE}
+    , onLODLevelSelection{nullptr}
     , _geometry{nullptr}
+    , _visibleInstances{nullptr}
+    , _shouldGenerateFlatShading{false}
     , _onBeforeDrawObserver{nullptr}
+    , _morphTargetManager{nullptr}
     , _batchCache{std_util::make_unique<_InstancesBatch>()}
     , _instancesBufferSize{32 * 16 * 4} // maximum of 32 instances
     , _overridenInstanceCount{0}
@@ -936,8 +940,17 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
   // Material
   auto effectiveMaterial = subMesh->getMaterial();
 
-  if (!effectiveMaterial
-      || !effectiveMaterial->isReady(this, hardwareInstancedRendering)) {
+  if (!effectiveMaterial) {
+    return *this;
+  }
+
+  if (effectiveMaterial->storeEffectOnSubMeshes) {
+    if (!effectiveMaterial->isReadyForSubMesh(this, subMesh,
+                                              hardwareInstancedRendering)) {
+      return *this;
+    }
+  }
+  else if (!effectiveMaterial->isReady(this, hardwareInstancedRendering)) {
     return *this;
   }
 
@@ -949,8 +962,15 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
     engine->setDepthWrite(savedDepthWrite);
   }
 
-  effectiveMaterial->_preBind();
-  auto effect = effectiveMaterial->getEffect();
+  Effect* effect = nullptr;
+  if (effectiveMaterial->storeEffectOnSubMeshes) {
+    effect = subMesh->effect();
+  }
+  else {
+    effect = effectiveMaterial->getEffect();
+  }
+
+  effectiveMaterial->_preBind(effect);
 
   // Bind
   auto fillMode = scene->forcePointsCloud() ?
@@ -961,7 +981,12 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
 
   auto _world = getWorldMatrix();
 
-  effectiveMaterial->bind(_world, this);
+  if (effectiveMaterial->storeEffectOnSubMeshes) {
+    effectiveMaterial->bindForSubMesh(_world, this, subMesh);
+  }
+  else {
+    effectiveMaterial->bind(_world, this);
+  }
 
   // Alpha mode
   if (enableAlphaMode) {
@@ -1225,6 +1250,8 @@ Mesh* Mesh::clone(const std::string& iName, Node* newParent,
 
 void Mesh::dispose(bool /*doNotRecurse*/)
 {
+  setMorphTargetManager(nullptr);
+
   if (_geometry) {
     _geometry->releaseForMesh(this, true);
   }
@@ -1592,7 +1619,7 @@ void Mesh::_syncGeometryWithMorphTargetManager()
       if (geometry()->isVerticesDataPresent(VertexBuffer::NormalKind + index)) {
         geometry()->removeVerticesData(VertexBuffer::NormalKind + index);
       }
-      index++;
+      ++index;
     }
   }
 }
@@ -1781,6 +1808,14 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
   }
   else {
     mesh->setMaterial(nullptr);
+  }
+
+  // Morph targets
+  const int morphTargetManagerId
+    = Json::GetNumber(parsedMesh, "morphTargetManagerId", -1);
+  if (morphTargetManagerId > -1) {
+    mesh->setMorphTargetManager(scene->getMorphTargetManagerById(
+      static_cast<unsigned>(morphTargetManagerId)));
   }
 
   // Skeleton

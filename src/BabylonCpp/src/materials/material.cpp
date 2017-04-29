@@ -206,13 +206,13 @@ void Material::markDirty()
   _wasPreviouslyReady = false;
 }
 
-void Material::_preBind()
+void Material::_preBind(Effect* effect)
 {
   auto engine = _scene->getEngine();
 
   const bool reverse = sideOrientation == Material::ClockWiseSideOrientation;
 
-  engine->enableEffect(_effect);
+  engine->enableEffect(effect ? effect : _effect);
 
   engine->setState(backFaceCulling, zOffset, false, reverse);
 }

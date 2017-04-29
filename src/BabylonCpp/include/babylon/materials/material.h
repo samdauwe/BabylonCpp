@@ -78,7 +78,7 @@ public:
     const std::function<void(const Effect* effect, const std::string& errors)>&
       onError);
   void markDirty();
-  void _preBind();
+  void _preBind(Effect* effect = nullptr);
   virtual void bind(Matrix* world, Mesh* mesh);
   virtual void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh);
   virtual void bindOnlyWorldMatrix(Matrix& world);
