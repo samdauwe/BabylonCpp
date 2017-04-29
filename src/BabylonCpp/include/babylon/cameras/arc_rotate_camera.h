@@ -40,6 +40,8 @@ public:
   void _checkInputs() override;
   void rebuildAnglesAndRadius();
   void setPosition(const Vector3& position);
+  void setTarget(AbstractMesh* target, bool toBoundingCenter = false,
+                 bool allowSamePosition = false);
   void setTarget(const Vector3& target, bool toBoundingCenter = false,
                  bool allowSamePosition = false);
   Matrix _getViewMatrix() override;
@@ -97,6 +99,7 @@ public:
   std::unique_ptr<Vector3> collisionRadius;
 
 private:
+  AbstractMesh* _targetHost;
   // Panning
   std::unique_ptr<Vector3> _localDirection;
   Vector3 _transformedDirection;

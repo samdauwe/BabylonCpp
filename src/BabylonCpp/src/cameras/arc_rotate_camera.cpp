@@ -40,7 +40,8 @@ ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha,
     , panningAxis{std_util::make_unique<Vector3>(1.f, 0.f, 1.f)}
     , checkCollisions{false}
     , collisionRadius{std_util::make_unique<Vector3>(0.5f, 0.5f, 0.5f)}
-    , _collider{std_util::make_unique<Collider>()}
+    , _targetHost{nullptr}
+    , _collider{nullptr}
     , _previousPosition{Vector3::Zero()}
     , _collisionVelocity{Vector3::Zero()}
     , _newPosition{Vector3::Zero()}
@@ -87,6 +88,11 @@ void ArcRotateCamera::_updateCache(bool ignoreParentClass)
 
 Vector3 ArcRotateCamera::_getTargetPosition() const
 {
+  if (_targetHost && _targetHost->getAbsolutePosition()) {
+    auto pos = _targetHost->getAbsolutePosition();
+    return _targetBoundingCenter ? pos->add(*_targetBoundingCenter) : *pos;
+  }
+
   return target;
 }
 
@@ -278,16 +284,35 @@ void ArcRotateCamera::setPosition(const Vector3& iPosition)
   rebuildAnglesAndRadius();
 }
 
+void ArcRotateCamera::setTarget(AbstractMesh* iTarget, bool toBoundingCenter,
+                                bool /*allowSamePosition*/)
+{
+  if (iTarget->getBoundingInfo()) {
+    if (toBoundingCenter) {
+      _targetBoundingCenter
+        = iTarget->getBoundingInfo()->boundingBox.centerWorld.clone();
+    }
+    else {
+      _targetBoundingCenter.reset(nullptr);
+    }
+    _targetHost = iTarget;
+    target      = _getTargetPosition();
+  }
+
+  rebuildAnglesAndRadius();
+}
+
 void ArcRotateCamera::setTarget(const Vector3& iTarget,
                                 bool /*toBoundingCenter*/,
                                 bool allowSamePosition)
 {
-  if (!allowSamePosition && _getTargetPosition().equals(iTarget)) {
+  Vector3 newTarget{iTarget};
+  if (!allowSamePosition && _getTargetPosition().equals(newTarget)) {
     return;
   }
-
+  target = newTarget;
   _targetBoundingCenter.reset(nullptr);
-  target = iTarget;
+
   rebuildAnglesAndRadius();
 }
 
@@ -308,6 +333,9 @@ Matrix ArcRotateCamera::_getViewMatrix()
     Vector3(radius * cosa * sinb, radius * cosb, radius * sina * sinb),
     _newPosition);
   if (getScene()->collisionsEnabled && checkCollisions) {
+    if (!_collider) {
+      _collider = std_util::make_unique<Collider>();
+    }
     _collider->radius = *collisionRadius;
     _newPosition.subtractToRef(position, _collisionVelocity);
     _collisionTriggered = true;

@@ -16,7 +16,7 @@ FreeCamera::FreeCamera(const std::string& iName, const Vector3& iPosition,
     , checkCollisions{false}
     , applyGravity{false}
     , inputs{std_util::make_unique<FreeCameraInputsManager>(this)}
-    , _collider{std_util::make_unique<Collider>()}
+    , _collider{nullptr}
     , _collisionMask{-1}
     , _needMoveForGravity{false}
     , _oldPosition{Vector3::Zero()}
@@ -74,8 +74,12 @@ void FreeCamera::_collideWithWorld(Vector3& velocity)
   }
 
   globalPosition_.subtractFromFloatsToRef(0, ellipsoid.y, 0, _oldPosition);
-  _collider->radius = ellipsoid;
 
+  if (!_collider) {
+    _collider = std_util::make_unique<Collider>();
+  }
+
+  _collider->radius = ellipsoid;
   _collider->setCollisionMask(_collisionMask);
 
   // no need for clone, as long as gravity is not on.
