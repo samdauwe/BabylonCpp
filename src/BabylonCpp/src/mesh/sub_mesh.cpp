@@ -59,7 +59,19 @@ bool SubMesh::isGlobal() const
   return (verticesStart == 0 && verticesCount == _mesh->getTotalVertices());
 }
 
-// Properties
+Effect* SubMesh::effect()
+{
+  return nullptr;
+}
+
+void SubMesh::setEffect(Effect* /*effect*/)
+{
+}
+
+void SubMesh::setEffect(Effect* /*effect*/, const MaterialDefines& /*defines*/)
+{
+}
+
 BoundingInfo* SubMesh::getBoundingInfo() const
 {
   if (isGlobal()) {

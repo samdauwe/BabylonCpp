@@ -86,7 +86,7 @@ Mesh* QuickTreeGenerator::CreateTree(float sizeBranch, float sizeTrunk,
   leaves->setVerticesData(VertexBuffer::NormalKind, normals);
   leaves->convertToFlatShadedMesh();
 
-  leaves->material     = leafMaterial;
+  leaves->setMaterial(leafMaterial);
   leaves->position().y = sizeTrunk + sizeBranch / 2.f - 2.f;
 
   auto trunk = Mesh::CreateCylinder("trunk", sizeTrunk,
@@ -95,7 +95,7 @@ Mesh* QuickTreeGenerator::CreateTree(float sizeBranch, float sizeTrunk,
 
   trunk->position().y = (sizeBranch / 2.f + 2.f) - sizeTrunk / 2.f;
 
-  trunk->material = trunkMaterial;
+  trunk->setMaterial(trunkMaterial);
   trunk->convertToFlatShadedMesh();
 
   leaves->setParent(tree);

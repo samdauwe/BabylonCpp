@@ -229,9 +229,9 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Bones
-  if (mesh && mesh->useBones() && mesh->computeBonesUsingShaders) {
+  if (mesh && mesh->useBones() && mesh->computeBonesUsingShaders()) {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
-                         + std::to_string(mesh->numBoneInfluencers));
+                         + std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back("#define BonesPerMesh "
                          + std::to_string(mesh->skeleton()->bones.size() + 1));
     fallbacks->addCPUSkinningFallback(0, mesh);

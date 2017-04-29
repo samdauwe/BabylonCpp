@@ -81,7 +81,7 @@ public:
    * @returns The Mesh.
    */
   Mesh* setVerticesData(unsigned int kind, const Float32Array& data,
-                        bool updatable = false, int stride = -1);
+                        bool updatable = false, int stride = -1) override;
 
   /**
    * @brief Updates the existing vertex data of the mesh geometry for the
@@ -113,7 +113,7 @@ public:
    */
   Mesh* updateVerticesData(unsigned int kind, const Float32Array& data,
                            bool updateExtends = false,
-                           bool makeItUnique  = false);
+                           bool makeItUnique  = false) override;
 
   /**
    * @brief Sets the mesh indices.
@@ -125,7 +125,8 @@ public:
    *
    * @returns The Mesh.
    */
-  Mesh* setIndices(const IndicesArray& indices, size_t totalVertices = 0);
+  Mesh* setIndices(const IndicesArray& indices,
+                   size_t totalVertices = 0) override;
 
   /**
    * @brief Returns if the mesh owns the requested kind of data.

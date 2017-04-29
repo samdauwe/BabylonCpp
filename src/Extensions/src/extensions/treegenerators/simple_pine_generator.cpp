@@ -39,10 +39,10 @@ Mesh* SimplePineGenerator::CreateTree(unsigned int canopies,
     = Mesh::CreateCylinder("trunk", nbS / nbL, nbL * 1.5f - nbL / 2.f - 1.f,
                            nbL * 1.5f - nbL / 2.f - 1.f, 12, 1, scene);
 
-  leaves->material = leafMaterial;
-  trunk->material  = trunkMaterial;
-  auto tree        = Mesh::CreateBox("", 1, scene);
-  tree->isVisible  = false;
+  leaves->setMaterial(leafMaterial);
+  trunk->setMaterial(trunkMaterial);
+  auto tree       = Mesh::CreateBox("", 1, scene);
+  tree->isVisible = false;
   leaves->setParent(tree);
   trunk->setParent(tree);
   return tree;

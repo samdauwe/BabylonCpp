@@ -54,11 +54,11 @@ std::string EffectFallbacks::reduce(const std::string& currentDefines)
 {
   // First we try to switch to CPU skinning
   std::string currentDefinesCpy(currentDefines);
-  if (_mesh && _mesh->computeBonesUsingShaders
-      && _mesh->numBoneInfluencers > 0) {
-    _mesh->computeBonesUsingShaders = false;
+  if (_mesh && _mesh->computeBonesUsingShaders()
+      && _mesh->numBoneInfluencers() > 0) {
+    _mesh->setComputeBonesUsingShaders(false);
     const std::string toReplace = std::string("#define NUM_BONE_INFLUENCERS ")
-                                  + std::to_string(_mesh->numBoneInfluencers);
+                                  + std::to_string(_mesh->numBoneInfluencers());
     String::replaceInPlace(currentDefinesCpy, toReplace,
                            "#define NUM_BONE_INFLUENCERS 0");
     BABYLON_LOGF_DEBUG("EffectFallbacks", "Falling back to CPU skinning for %s",
@@ -66,15 +66,15 @@ std::string EffectFallbacks::reduce(const std::string& currentDefines)
 
     auto scene = _mesh->getScene();
     for (auto& otherMesh : scene->meshes) {
-      if (otherMesh->material == _mesh->material
-          && otherMesh->computeBonesUsingShaders
-          && otherMesh->numBoneInfluencers > 0) {
-        otherMesh->computeBonesUsingShaders = false;
+      if (otherMesh->material() == _mesh->material()
+          && otherMesh->computeBonesUsingShaders()
+          && otherMesh->numBoneInfluencers() > 0) {
+        otherMesh->setComputeBonesUsingShaders(false);
       }
     }
   }
   else {
-    if (_defines.find(_currentRank)!=_defines.end()
+    if (_defines.find(_currentRank) != _defines.end()
         && !_defines[_currentRank].empty()) {
       for (auto& currentFallback : _defines[_currentRank]) {
         String::replaceInPlace(currentDefinesCpy, "#define " + currentFallback,

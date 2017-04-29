@@ -119,7 +119,7 @@ bool FireMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Fog
-  if (scene->fogEnabled() && mesh && mesh->applyFog
+  if (scene->fogEnabled() && mesh && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled) {
     _defines.defines[FMD::FOG] = true;
   }
@@ -131,16 +131,16 @@ bool FireMaterial::isReady(AbstractMesh* mesh, bool useInstances)
         _defines.defines[FMD::UV1] = true;
       }
     }
-    if (mesh->useVertexColors
+    if (mesh->useVertexColors()
         && mesh->isVerticesDataPresent(VertexBuffer::ColorKind)) {
       _defines.defines[FMD::VERTEXCOLOR] = true;
 
-      if (mesh->hasVertexAlpha) {
+      if (mesh->hasVertexAlpha()) {
         _defines.defines[FMD::VERTEXALPHA] = true;
       }
     }
-    if (mesh->useBones() && mesh->computeBonesUsingShaders) {
-      _defines.NUM_BONE_INFLUENCERS = mesh->numBoneInfluencers;
+    if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
+      _defines.NUM_BONE_INFLUENCERS = mesh->numBoneInfluencers();
       _defines.BonesPerMesh         = mesh->skeleton()->bones.size() + 1;
     }
 
@@ -268,7 +268,7 @@ void FireMaterial::bind(Matrix* world, Mesh* mesh)
   _effect->setColor4("vDiffuseColor", _scaledDiffuse, alpha * mesh->visibility);
 
   // View
-  if (scene->fogEnabled() && mesh->applyFog
+  if (scene->fogEnabled() && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE) {
     _effect->setMatrix("view", scene->getViewMatrix());
   }

@@ -28,6 +28,9 @@ public:
 
   void addToMesh(std::unique_ptr<SubMesh>&& newSubMesh);
   bool isGlobal() const;
+  Effect* effect();
+  void setEffect(Effect* effect);
+  void setEffect(Effect* effect, const MaterialDefines& defines);
 
   /**
    * @brief Returns the submesh BoudingInfo object.

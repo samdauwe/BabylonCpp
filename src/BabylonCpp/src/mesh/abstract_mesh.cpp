@@ -4,6 +4,7 @@
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/collisions/icollision_coordinator.h>
 #include <babylon/collisions/picking_info.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
@@ -11,6 +12,7 @@
 #include <babylon/engine/engine.h>
 #include <babylon/lights/light.h>
 #include <babylon/lights/shadows/shadow_generator.h>
+#include <babylon/materials/material.h>
 #include <babylon/materials/material_defines.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/math/frustum.h>
@@ -18,6 +20,7 @@
 #include <babylon/math/tmp.h>
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
+#include <babylon/mesh/vertex_data.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/physics/joint/physics_joint.h>
 #include <babylon/physics/physics_engine.h>
@@ -29,8 +32,8 @@ namespace BABYLON {
 Quaternion AbstractMesh::_rotationAxisCache;
 Vector3 AbstractMesh::_lookAtVectorCache = Vector3(0.f, 0.f, 0.f);
 
-AbstractMesh::AbstractMesh(const std::string& _name, Scene* scene)
-    : Node(_name, scene)
+AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
+    : Node(iName, scene)
     , definedFacingForward{true} // orientation for POV movement & rotation
     , _rotationQuaternionSet{false}
     , billboardMode{AbstractMesh::BILLBOARDMODE_NONE}
@@ -43,20 +46,13 @@ AbstractMesh::AbstractMesh(const std::string& _name, Scene* scene)
     , showSubMeshesBoundingBox{false}
     , isBlocker{false}
     , renderingGroupId{0}
-    , material{nullptr}
-    , receiveShadows{false}
     , renderOutline{false}
     , outlineColor{Color3::Red()}
     , outlineWidth{0.02f}
     , renderOverlay{false}
     , overlayColor{Color3::Red()}
     , overlayAlpha{0.5f}
-    , hasVertexAlpha{false}
-    , useVertexColors{true}
-    , applyFog{true}
-    , computeBonesUsingShaders{true}
     , scalingDeterminant{1.f}
-    , numBoneInfluencers{4}
     , useOctreeForRenderingSelection{true}
     , useOctreeForPicking{true}
     , useOctreeForCollisions{true}
@@ -88,9 +84,17 @@ AbstractMesh::AbstractMesh(const std::string& _name, Scene* scene)
     , _position{Vector3(0.f, 0.f, 0.f)}
     , _rotation{Vector3(0.f, 0.f, 0.f)}
     , _scaling{Vector3(1.f, 1.f, 1.f)}
+    , _material{nullptr}
+    , _receiveShadows{false}
+    , _hasVertexAlpha{false}
+    , _useVertexColors{true}
+    , _computeBonesUsingShaders{true}
+    , _numBoneInfluencers{4}
+    , _applyFog{true}
     , _checkCollisions{false}
     , _collisionMask{-1}
     , _collisionGroup{-1}
+    , _collider{nullptr}
     , _oldPositionForCollisions{Vector3(0.f, 0.f, 0.f)}
     , _diffPositionForCollisions{Vector3(0.f, 0.f, 0.f)}
     , _newPositionForCollisions{Vector3(0.f, 0.f, 0.f)}
@@ -104,6 +108,7 @@ AbstractMesh::AbstractMesh(const std::string& _name, Scene* scene)
     , _isWorldMatrixFrozen{false}
     , _skeleton{nullptr}
 {
+  _resyncLightSources();
 }
 
 AbstractMesh::~AbstractMesh()
@@ -169,6 +174,117 @@ void AbstractMesh::setOnCollisionPositionChange(
     = onCollisionPositionChangeObservable.add(callback);
 }
 
+Material* AbstractMesh::material()
+{
+  return _material;
+}
+
+void AbstractMesh::setMaterial(Material* value)
+{
+  if (_material == value) {
+    return;
+  }
+
+  _material = value;
+  if (subMeshes.empty()) {
+    return;
+  }
+
+  for (auto& subMesh : subMeshes) {
+    subMesh->setEffect(nullptr);
+  }
+}
+
+bool AbstractMesh::receiveShadows() const
+{
+  return _receiveShadows;
+}
+
+void AbstractMesh::setReceiveShadows(bool value)
+{
+  if (_receiveShadows == value) {
+    return;
+  }
+
+  _receiveShadows = value;
+  _markSubMeshesAsLightDirty();
+}
+
+bool AbstractMesh::hasVertexAlpha() const
+{
+  return _hasVertexAlpha;
+}
+
+void AbstractMesh::setHasVertexAlpha(bool value)
+{
+  if (_hasVertexAlpha == value) {
+    return;
+  }
+
+  _hasVertexAlpha = value;
+  _markSubMeshesAsAttributesDirty();
+}
+
+bool AbstractMesh::useVertexColors() const
+{
+  return _useVertexColors;
+}
+
+void AbstractMesh::setUseVertexColors(bool value)
+{
+  if (_useVertexColors == value) {
+    return;
+  }
+
+  _useVertexColors = value;
+  _markSubMeshesAsAttributesDirty();
+}
+
+bool AbstractMesh::computeBonesUsingShaders() const
+{
+  return _computeBonesUsingShaders;
+}
+
+void AbstractMesh::setComputeBonesUsingShaders(bool value)
+{
+  if (_computeBonesUsingShaders == value) {
+    return;
+  }
+
+  _computeBonesUsingShaders = value;
+  _markSubMeshesAsAttributesDirty();
+}
+
+unsigned int AbstractMesh::numBoneInfluencers() const
+{
+  return _numBoneInfluencers;
+}
+
+void AbstractMesh::setNumBoneInfluencers(unsigned int value)
+{
+  if (_numBoneInfluencers == value) {
+    return;
+  }
+
+  _numBoneInfluencers = value;
+  _markSubMeshesAsAttributesDirty();
+}
+
+bool AbstractMesh::applyFog() const
+{
+  return _applyFog;
+}
+
+void AbstractMesh::setApplyFog(bool value)
+{
+  if (_applyFog == value) {
+    return;
+  }
+
+  _applyFog = value;
+  _markSubMeshesAsMiscDirty();
+}
+
 int AbstractMesh::collisionMask() const
 {
   return _collisionMask;
@@ -221,14 +337,66 @@ std::string AbstractMesh::toString(bool fullDetails) const
 
 void AbstractMesh::_resyncLightSources()
 {
+  _lightSources.clear();
+
+  for (auto& light : getScene()->lights) {
+    if (!light->isEnabled()) {
+      continue;
+    }
+
+    if (light->canAffectMesh(this)) {
+      _lightSources.emplace_back(light.get());
+    }
+  }
+
+  _markSubMeshesAsLightDirty();
 }
 
-void AbstractMesh::_resyncLighSource(Light* /*light*/)
+void AbstractMesh::_resyncLighSource(Light* light)
 {
+  bool isIn = light->isEnabled() && light->canAffectMesh(this);
+
+  auto index = std::find(_lightSources.begin(), _lightSources.end(), light);
+
+  if (index != _lightSources.end()) {
+    if (!isIn) {
+      return;
+    }
+    _lightSources.emplace_back(light);
+  }
+  else {
+    if (isIn) {
+      return;
+    }
+    _lightSources.erase(index);
+  }
+
+  _markSubMeshesAsLightDirty();
 }
 
-void AbstractMesh::_removeLightSource(Light* /*light*/)
+void AbstractMesh::_removeLightSource(Light* light)
 {
+  auto index = std::find(_lightSources.begin(), _lightSources.end(), light);
+
+  if (index == _lightSources.end()) {
+    return;
+  }
+
+  _lightSources.erase(index);
+}
+
+void AbstractMesh::_markSubMeshesAsDirty(
+  const std::function<void(const MaterialDefines& defines)>& func)
+{
+  if (subMeshes.empty()) {
+    return;
+  }
+
+  for (auto& subMesh : subMeshes) {
+    if (subMesh->_materialDefines) {
+      func(*subMesh->_materialDefines);
+    }
+  }
 }
 
 void AbstractMesh::_markSubMeshesAsLightDirty()
@@ -241,6 +409,16 @@ void AbstractMesh::_markSubMeshesAsAttributesDirty()
 
 void AbstractMesh::_markSubMeshesAsMiscDirty()
 {
+  if (subMeshes.empty()) {
+    return;
+  }
+
+  for (auto& subMesh : subMeshes) {
+    auto material = subMesh->getMaterial();
+    if (material) {
+      material->markAsDirty(Material::MiscDirtyFlag);
+    }
+  }
 }
 
 Scene* AbstractMesh::getScene()
@@ -263,6 +441,8 @@ void AbstractMesh::setSkeleton(Skeleton* value)
   if (!_skeleton) {
     _bonesTransformMatrices.clear();
   }
+
+  _markSubMeshesAsAttributesDirty();
 }
 
 Skeleton* AbstractMesh::skeleton()
@@ -339,7 +519,7 @@ AbstractMesh* AbstractMesh::getParent()
 
 Material* AbstractMesh::getMaterial()
 {
-  return material;
+  return material();
 }
 
 std::vector<AbstractMesh*>
@@ -406,6 +586,27 @@ Float32Array AbstractMesh::getVerticesData(unsigned int /*kind*/,
                                            bool /*copyWhenShared*/)
 {
   return Float32Array();
+}
+
+Mesh* AbstractMesh::setVerticesData(unsigned int /*kind*/,
+                                    const Float32Array& /*data*/,
+                                    bool /*updatable*/, int /*stride*/)
+{
+  return nullptr;
+}
+
+Mesh* AbstractMesh::updateVerticesData(unsigned int /*kind*/,
+                                       const Float32Array& /*data*/,
+                                       bool /*updateExtends*/,
+                                       bool /*makeItUnique*/)
+{
+  return nullptr;
+}
+
+Mesh* AbstractMesh::setIndices(const IndicesArray& /*indices*/,
+                               size_t /*totalVertices*/)
+{
+  return nullptr;
 }
 
 bool AbstractMesh::isVerticesDataPresent(unsigned int /*kind*/)
@@ -743,8 +944,7 @@ Matrix AbstractMesh::computeWorldMatrix(bool force)
     return *_worldMatrix;
   }
 
-  if (!force && (_currentRenderId == getScene()->getRenderId()
-                 && isSynchronized(true))) {
+  if (!force && isSynchronized(true)) {
     _currentRenderId = getScene()->getRenderId();
     return *_worldMatrix;
   }
@@ -1106,16 +1306,22 @@ void AbstractMesh::setCheckCollisions(bool collisionEnabled)
 
 AbstractMesh& AbstractMesh::moveWithCollisions(const Vector3& /*velocity*/)
 {
-  /*var globalPosition = getAbsolutePosition();
+  auto globalPosition = getAbsolutePosition();
 
-  globalPosition.subtractFromFloatsToRef(0, ellipsoid.y, 0,
-                                         _oldPositionForCollisions);
+  globalPosition->subtractFromFloatsToRef(0.f, ellipsoid.y, 0.f,
+                                          _oldPositionForCollisions);
   _oldPositionForCollisions.addInPlace(ellipsoidOffset);
-  _collider.radius = ellipsoid;
 
-  getScene().collisionCoordinator.getNewPosition(
-    _oldPositionForCollisions, velocity, _collider, 3, this,
-    _onCollisionPositionChange, uniqueId);*/
+  if (!_collider) {
+    _collider = std_util::make_unique<Collider>();
+  }
+
+  _collider->radius = ellipsoid;
+
+  // getScene()->collisionCoordinator->getNewPosition(
+  //  _oldPositionForCollisions, velocity, _collider.get(), 3, this,
+  //  _onCollisionPositionChange(), uniqueId);
+
   return *this;
 }
 
@@ -1407,6 +1613,15 @@ void AbstractMesh::dispose(bool doNotRecurse)
   // SubMeshes
   if (type() != IReflect::Type::INSTANCEDMESH) {
     releaseSubMeshes();
+  }
+
+  // Octree
+  auto sceneOctree = getScene()->selectionOctree();
+  if (sceneOctree) {
+    sceneOctree->dynamicContent.erase(
+      std::remove(sceneOctree->dynamicContent.begin(),
+                  sceneOctree->dynamicContent.end(), this),
+      sceneOctree->dynamicContent.end());
   }
 
   // Engine
@@ -1860,6 +2075,20 @@ AbstractMesh& AbstractMesh::disableFacetData()
     _facetParameters = FacetParameters();
   }
   return *this;
+}
+
+void AbstractMesh::createNormals(bool updatable)
+{
+  auto positions = getVerticesData(VertexBuffer::PositionKind);
+  auto indices   = getIndices();
+  Float32Array normals;
+
+  if (isVerticesDataPresent(VertexBuffer::NormalKind)) {
+    normals = getVerticesData(VertexBuffer::NormalKind);
+  }
+
+  VertexData::ComputeNormals(positions, indices, normals);
+  setVerticesData(VertexBuffer::NormalKind, normals, updatable);
 }
 
 } // end of namespace BABYLON

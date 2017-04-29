@@ -127,7 +127,7 @@ bool LavaMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Fog
-  if (scene->fogEnabled() && mesh && mesh->applyFog
+  if (scene->fogEnabled() && mesh && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled) {
     _defines.defines[LMD::FOG] = true;
   }
@@ -151,16 +151,16 @@ bool LavaMaterial::isReady(AbstractMesh* mesh, bool useInstances)
         _defines.defines[LMD::UV2] = true;
       }
     }
-    if (mesh->useVertexColors
+    if (mesh->useVertexColors()
         && mesh->isVerticesDataPresent(VertexBuffer::ColorKind)) {
       _defines.defines[LMD::VERTEXCOLOR] = true;
 
-      if (mesh->hasVertexAlpha) {
+      if (mesh->hasVertexAlpha()) {
         _defines.defines[LMD::VERTEXALPHA] = true;
       }
     }
-    if (mesh->useBones() && mesh->computeBonesUsingShaders) {
-      _defines.NUM_BONE_INFLUENCERS = mesh->numBoneInfluencers;
+    if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
+      _defines.NUM_BONE_INFLUENCERS = mesh->numBoneInfluencers();
       _defines.BonesPerMesh         = mesh->skeleton()->bones.size() + 1;
     }
 
@@ -343,7 +343,7 @@ void LavaMaterial::bind(Matrix* world, Mesh* mesh)
   }
 
   // View
-  if (scene->fogEnabled() && mesh->applyFog
+  if (scene->fogEnabled() && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE) {
     _effect->setMatrix("view", scene->getViewMatrix());
   }

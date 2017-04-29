@@ -14,14 +14,15 @@ struct BABYLON_SHARED_EXPORT IGetSetVerticesData {
                                        bool copyWhenShared = false)
     = 0;
   virtual IndicesArray getIndices(bool copyWhenShared = false) = 0;
-  virtual void setVerticesData(unsigned int kind, const Float32Array& data,
-                               bool updatable = false, int stride = -1)
+  virtual Mesh* setVerticesData(unsigned int kind, const Float32Array& data,
+                                bool updatable = false, int stride = -1)
     = 0;
-  virtual void updateVerticesData(unsigned int kind, const Float32Array& data,
-                                  bool updateExtends = false,
-                                  bool makeItUnique  = false)
+  virtual Mesh* updateVerticesData(unsigned int kind, const Float32Array& data,
+                                   bool updateExtends = false,
+                                   bool makeItUnique  = false)
     = 0;
-  virtual void setIndices(const IndicesArray& indices, int totalVertices = -1)
+  virtual Mesh* setIndices(const IndicesArray& indices,
+                           size_t totalVertices = 0)
     = 0;
 }; // end of struct IGetSetVerticesData
 

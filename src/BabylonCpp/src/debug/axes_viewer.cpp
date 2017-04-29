@@ -22,12 +22,12 @@ AxesViewer::AxesViewer(Scene* iScene, float iScaleLines)
   _ymesh->renderingGroupId = 2;
   _zmesh->renderingGroupId = 2;
 
-  _xmesh->material->checkReadyOnlyOnce = true;
-  _xmesh->color                        = Color3(1.f, 0.f, 0.f);
-  _ymesh->material->checkReadyOnlyOnce = true;
-  _ymesh->color                        = Color3(0.f, 1.f, 0.f);
-  _zmesh->material->checkReadyOnlyOnce = true;
-  _zmesh->color                        = Color3(0.f, 0.f, 1.f);
+  _xmesh->material()->checkReadyOnlyOnce = true;
+  _xmesh->color                          = Color3(1.f, 0.f, 0.f);
+  _ymesh->material()->checkReadyOnlyOnce = true;
+  _ymesh->color                          = Color3(0.f, 1.f, 0.f);
+  _zmesh->material()->checkReadyOnlyOnce = true;
+  _zmesh->color                          = Color3(0.f, 0.f, 1.f);
 }
 
 AxesViewer::~AxesViewer()

@@ -585,7 +585,7 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Fog
-  if (scene->fogEnabled() && mesh && mesh->applyFog
+  if (scene->fogEnabled() && mesh && mesh->applyFog()
       && scene->fogMode() != scene->FOGMODE_NONE && fogEnabled) {
     _defines.defines[PMD::FOG] = true;
   }
@@ -641,16 +641,16 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
         _defines.defines[PMD::UV2] = true;
       }
     }
-    if (mesh->useVertexColors
+    if (mesh->useVertexColors()
         && mesh->isVerticesDataPresent(VertexBuffer::ColorKind)) {
       _defines.defines[PMD::VERTEXCOLOR] = true;
 
-      if (mesh->hasVertexAlpha) {
+      if (mesh->hasVertexAlpha()) {
         _defines.defines[PMD::VERTEXALPHA] = true;
       }
     }
-    if (mesh->useBones() && mesh->computeBonesUsingShaders) {
-      _defines.NUM_BONE_INFLUENCERS = mesh->numBoneInfluencers;
+    if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
+      _defines.NUM_BONE_INFLUENCERS = mesh->numBoneInfluencers();
       _defines.BonesPerMesh         = (mesh->skeleton()->bones.size() + 1);
     }
 
@@ -1144,7 +1144,7 @@ void PBRMaterial::bind(Matrix* world, Mesh* mesh)
     }
 
     // View
-    if ((_myScene->fogEnabled() && mesh->applyFog
+    if ((_myScene->fogEnabled() && mesh->applyFog()
          && _myScene->fogMode() != Scene::FOGMODE_NONE)
         || reflectionTexture) {
       _effect->setMatrix("view", _myScene->getViewMatrix());

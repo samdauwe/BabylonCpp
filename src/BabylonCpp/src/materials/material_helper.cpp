@@ -96,7 +96,7 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
     // Shadows
     if (scene->shadowsEnabled()) {
       auto shadowGenerator = light->getShadowGenerator();
-      if (mesh && mesh->receiveShadows && shadowGenerator) {
+      if (mesh && mesh->receiveShadows() && shadowGenerator) {
         defines.shadows[lightIndex] = true;
 
         defines.defines[static_cast<unsigned int>(SHADOWS)] = true;
@@ -233,8 +233,8 @@ bool MaterialHelper::BindLightShadow(Light* light, Scene* scene,
   ShadowGenerator* shadowGenerator = light->getShadowGenerator();
   const std::string lightIndexStr  = std::to_string(lightIndex);
 
-  if (mesh->receiveShadows && shadowGenerator) {
-    IShadowLight* shadowLight = dynamic_cast<IShadowLight*>(light);
+  if (mesh->receiveShadows() && shadowGenerator) {
+    auto shadowLight = static_cast<IShadowLight*>(light);
     if (shadowLight && !shadowLight->needCube()) {
       effect->setMatrix("lightMatrix" + lightIndexStr,
                         shadowGenerator->getTransformMatrix());
@@ -331,7 +331,7 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
 void MaterialHelper::BindFogParameters(Scene* scene, AbstractMesh* mesh,
                                        Effect* effect)
 {
-  if (scene->fogEnabled() && mesh->applyFog
+  if (scene->fogEnabled() && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE) {
     effect->setFloat4("vFogInfos", static_cast<float>(scene->fogMode()),
                       scene->fogStart, scene->fogEnd, scene->fogDensity);
@@ -341,7 +341,7 @@ void MaterialHelper::BindFogParameters(Scene* scene, AbstractMesh* mesh,
 
 void MaterialHelper::BindBonesParameters(AbstractMesh* mesh, Effect* effect)
 {
-  if (mesh && mesh->useBones() && mesh->computeBonesUsingShaders) {
+  if (mesh && mesh->useBones() && mesh->computeBonesUsingShaders()) {
     const auto& matrices = mesh->skeleton()->getTransformMatrices(mesh);
     if (!matrices.empty()) {
       effect->setMatrices("mBones", matrices);

@@ -112,7 +112,7 @@ bool GradientMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Fog
-  if (scene->fogEnabled() && mesh && mesh->applyFog
+  if (scene->fogEnabled() && mesh && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled) {
     _defines.defines[GMD::FOG] = true;
   }
@@ -136,16 +136,16 @@ bool GradientMaterial::isReady(AbstractMesh* mesh, bool useInstances)
         _defines.defines[GMD::UV2] = true;
       }
     }
-    if (mesh->useVertexColors
+    if (mesh->useVertexColors()
         && mesh->isVerticesDataPresent(VertexBuffer::ColorKind)) {
       _defines.defines[GMD::VERTEXCOLOR] = true;
 
-      if (mesh->hasVertexAlpha) {
+      if (mesh->hasVertexAlpha()) {
         _defines.defines[GMD::VERTEXALPHA] = true;
       }
     }
-    if (mesh->useBones() && mesh->computeBonesUsingShaders) {
-      _defines.NUM_BONE_INFLUENCERS = mesh->numBoneInfluencers;
+    if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
+      _defines.NUM_BONE_INFLUENCERS = mesh->numBoneInfluencers();
       _defines.BonesPerMesh         = mesh->skeleton()->bones.size() + 1;
     }
 
@@ -289,7 +289,7 @@ void GradientMaterial::bind(Matrix* world, Mesh* mesh)
   }
 
   // View
-  if (scene->fogEnabled() && mesh->applyFog
+  if (scene->fogEnabled() && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE) {
     _effect->setMatrix("view", scene->getViewMatrix());
   }

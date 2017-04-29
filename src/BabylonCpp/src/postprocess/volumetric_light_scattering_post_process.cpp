@@ -82,7 +82,7 @@ bool VolumetricLightScatteringPostProcess::isReady(SubMesh* subMesh,
 
   // Render mesh as default
   if (_mesh == mesh) {
-    return _mesh->material->isReady(mesh);
+    return _mesh->material()->isReady(mesh);
   }
 
   std::vector<std::string> defines;
@@ -106,11 +106,11 @@ bool VolumetricLightScatteringPostProcess::isReady(SubMesh* subMesh,
   }
 
   // Bones
-  if (mesh->useBones() && mesh->computeBonesUsingShaders) {
+  if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
     attribs.emplace_back(VertexBuffer::MatricesIndicesKindChars);
     attribs.emplace_back(VertexBuffer::MatricesWeightsKindChars);
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
-                         + std::to_string(mesh->numBoneInfluencers));
+                         + std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back("#define BonesPerMesh "
                          + std::to_string(mesh->skeleton()->bones.size() + 1));
   }
@@ -256,7 +256,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
         }
 
         // Bones
-        if (mesh->useBones() && mesh->computeBonesUsingShaders) {
+        if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
           _volumetricLightScatteringPass->setMatrices(
             "mBones", mesh->skeleton()->getTransformMatrices(mesh));
         }
@@ -382,7 +382,7 @@ Mesh* VolumetricLightScatteringPostProcess::CreateDefaultMesh(
   auto material = StandardMaterial::New(name + "Material", scene);
   material->setEmissiveColor(Color3(1.f, 1.f, 1.f));
 
-  mesh->material = material;
+  mesh->setMaterial(material);
 
   return mesh;
 }

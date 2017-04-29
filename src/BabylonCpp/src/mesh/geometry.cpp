@@ -122,13 +122,15 @@ void Geometry::setAllVerticesData(VertexData* vertexData, bool updatable)
   notifyUpdate();
 }
 
-void Geometry::setVerticesData(unsigned int kind, const Float32Array& data,
-                               bool updatable, int stride)
+Mesh* Geometry::setVerticesData(unsigned int kind, const Float32Array& data,
+                                bool updatable, int stride)
 {
   auto buffer = std_util::make_unique<VertexBuffer>(
     _engine, data, kind, updatable, _meshes.empty(), stride);
 
   setVerticesBuffer(std::move(buffer));
+
+  return nullptr;
 }
 
 void Geometry::removeVerticesData(unsigned int kind)
@@ -188,13 +190,13 @@ void Geometry::updateVerticesDataDirectly(unsigned int kind,
   notifyUpdate(kind);
 }
 
-void Geometry::updateVerticesData(unsigned int kind, const Float32Array& data,
-                                  bool updateExtends, bool /*makeItUnique*/)
+Mesh* Geometry::updateVerticesData(unsigned int kind, const Float32Array& data,
+                                   bool updateExtends, bool /*makeItUnique*/)
 {
   auto vertexBuffer = getVertexBuffer(kind);
 
   if (!vertexBuffer) {
-    return;
+    return nullptr;
   }
 
   vertexBuffer->update(data);
@@ -207,6 +209,8 @@ void Geometry::updateVerticesData(unsigned int kind, const Float32Array& data,
     updateBoundingInfo(updateExtends, data);
   }
   notifyUpdate(kind);
+
+  return nullptr;
 }
 
 void Geometry::updateBoundingInfo(bool updateExtends, const Float32Array& data)
@@ -334,7 +338,7 @@ Uint32Array Geometry::getVerticesDataKinds()
   return result;
 }
 
-void Geometry::setIndices(const IndicesArray& indices, int totalVertices)
+Mesh* Geometry::setIndices(const IndicesArray& indices, size_t totalVertices)
 {
   if (_indexBuffer) {
     _engine->_releaseBuffer(_indexBuffer.get());
@@ -348,7 +352,7 @@ void Geometry::setIndices(const IndicesArray& indices, int totalVertices)
       = std::unique_ptr<GL::IGLBuffer>(_engine->createIndexBuffer(_indices));
   }
 
-  if (totalVertices != -1) {
+  if (totalVertices != 0) {
     _totalVertices = static_cast<size_t>(totalVertices);
   }
 
@@ -357,6 +361,8 @@ void Geometry::setIndices(const IndicesArray& indices, int totalVertices)
   }
 
   notifyUpdate();
+
+  return nullptr;
 }
 
 size_t Geometry::getTotalIndices()

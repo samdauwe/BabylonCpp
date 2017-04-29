@@ -1055,7 +1055,7 @@ bool Scene::isReady()
       return false;
     }
 
-    auto& mat = mesh->material;
+    auto mat = mesh->material();
     if (mat) {
       if (!mat->isReady(mesh.get())) {
         return false;
@@ -2018,7 +2018,7 @@ void Scene::_activeMesh(AbstractMesh* mesh)
       mesh->skeleton()->prepare();
     }
 
-    if (!mesh->computeBonesUsingShaders) {
+    if (!mesh->computeBonesUsingShaders()) {
       auto _mesh = dynamic_cast<Mesh*>(mesh);
       if (_mesh) {
         if (std::find(_softwareSkinnedMeshes.begin(),

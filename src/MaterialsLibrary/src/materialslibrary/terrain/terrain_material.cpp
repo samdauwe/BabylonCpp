@@ -113,7 +113,7 @@ bool TerrainMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Fog
-  if (scene->fogEnabled() && mesh && mesh->applyFog
+  if (scene->fogEnabled() && mesh && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled) {
     _defines.defines[TMD::FOG] = true;
   }
@@ -157,16 +157,16 @@ bool TerrainMaterial::isReady(AbstractMesh* mesh, bool useInstances)
         _defines.defines[TMD::UV2] = true;
       }
     }
-    if (mesh->useVertexColors
+    if (mesh->useVertexColors()
         && mesh->isVerticesDataPresent(VertexBuffer::ColorKind)) {
       _defines.defines[TMD::VERTEXCOLOR] = true;
 
-      if (mesh->hasVertexAlpha) {
+      if (mesh->hasVertexAlpha()) {
         _defines.defines[TMD::VERTEXALPHA] = true;
       }
     }
-    if (mesh->useBones() && mesh->computeBonesUsingShaders) {
-      _defines.NUM_BONE_INFLUENCERS = mesh->numBoneInfluencers;
+    if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
+      _defines.NUM_BONE_INFLUENCERS = mesh->numBoneInfluencers();
       _defines.BonesPerMesh         = (mesh->skeleton()->bones.size() + 1);
     }
 
@@ -341,7 +341,7 @@ void TerrainMaterial::bind(Matrix* world, Mesh* mesh)
   }
 
   // View
-  if (scene->fogEnabled() && mesh->applyFog
+  if (scene->fogEnabled() && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE) {
     _effect->setMatrix("view", scene->getViewMatrix());
   }

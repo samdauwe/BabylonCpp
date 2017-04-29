@@ -258,7 +258,7 @@ void RenderingGroup::dispatch(SubMesh* subMesh)
   auto mesh     = subMesh->getMesh();
 
   if (material->needAlphaBlending() || mesh->visibility < 1.f
-      || mesh->hasVertexAlpha) { // Transparent
+      || mesh->hasVertexAlpha()) { // Transparent
     _transparentSubMeshes.emplace_back(subMesh);
   }
   else if (material->needAlphaTesting()) { // Alpha test

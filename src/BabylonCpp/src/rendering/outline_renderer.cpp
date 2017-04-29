@@ -46,7 +46,7 @@ void OutlineRenderer::render(SubMesh* subMesh, _InstancesBatch* batch,
   _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
 
   // Bones
-  if (mesh->useBones() && mesh->computeBonesUsingShaders) {
+  if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
     _effect->setMatrices("mBones",
                          mesh->skeleton()->getTransformMatrices(mesh));
   }
@@ -90,15 +90,15 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
   }
 
   // Bones
-  if (mesh->useBones() && mesh->computeBonesUsingShaders) {
+  if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
     attribs.emplace_back(VertexBuffer::MatricesIndicesKindChars);
     attribs.emplace_back(VertexBuffer::MatricesWeightsKindChars);
-    if (mesh->numBoneInfluencers > 4) {
+    if (mesh->numBoneInfluencers() > 4) {
       attribs.emplace_back(VertexBuffer::MatricesIndicesExtraKindChars);
       attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKindChars);
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
-                         + std::to_string(mesh->numBoneInfluencers));
+                         + std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back(
       "#define BonesPerMesh "
       + std::to_string((mesh->skeleton()->bones.size() + 1)));

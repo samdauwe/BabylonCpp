@@ -81,7 +81,7 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     id = name + "." + source->id;
 
     // Material
-    material = source->getMaterial();
+    setMaterial(source->getMaterial());
     if (!doNotCloneChildren) {
       // Children
       for (auto& mesh : scene->meshes) {
@@ -532,8 +532,8 @@ void Mesh::subdivide(size_t count)
   synchronizeInstances();
 }
 
-void Mesh::setVerticesData(unsigned int kind, const Float32Array& data,
-                           bool updatable, int stride)
+Mesh* Mesh::setVerticesData(unsigned int kind, const Float32Array& data,
+                            bool updatable, int stride)
 {
   if (!_geometry) {
     auto vertexData = std_util::make_unique<VertexData>();
@@ -547,6 +547,8 @@ void Mesh::setVerticesData(unsigned int kind, const Float32Array& data,
   else {
     _geometry->setVerticesData(kind, data, updatable, stride);
   }
+
+  return this;
 }
 
 void Mesh::markVerticesDataAsUpdatable(unsigned int kind, bool updatable)
@@ -571,11 +573,11 @@ Mesh& Mesh::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
   return *this;
 }
 
-void Mesh::updateVerticesData(unsigned int kind, const Float32Array& data,
-                              bool updateExtends, bool makeItUnique)
+Mesh* Mesh::updateVerticesData(unsigned int kind, const Float32Array& data,
+                               bool updateExtends, bool makeItUnique)
 {
   if (!_geometry) {
-    return;
+    return this;
   }
   if (!makeItUnique) {
     _geometry->updateVerticesData(kind, data, updateExtends);
@@ -584,6 +586,8 @@ void Mesh::updateVerticesData(unsigned int kind, const Float32Array& data,
     makeGeometryUnique();
     updateVerticesData(kind, data, updateExtends, false);
   }
+
+  return this;
 }
 
 Mesh& Mesh::updateMeshPositions(
@@ -615,7 +619,7 @@ Mesh& Mesh::makeGeometryUnique()
   return *this;
 }
 
-void Mesh::setIndices(const IndicesArray& indices, int totalVertices)
+Mesh* Mesh::setIndices(const IndicesArray& indices, size_t totalVertices)
 {
   if (!_geometry) {
     auto vertexData     = std_util::make_unique<VertexData>();
@@ -628,6 +632,8 @@ void Mesh::setIndices(const IndicesArray& indices, int totalVertices)
   else {
     _geometry->setIndices(indices, totalVertices);
   }
+
+  return this;
 }
 
 Mesh& Mesh::toLeftHanded()
@@ -1086,7 +1092,7 @@ Mesh& Mesh::setMaterialByID(const std::string& iId)
   const auto& materials = getScene()->materials;
   for (auto& _material : materials) {
     if (_material->id == iId) {
-      material = _material.get();
+      setMaterial(_material.get());
       return *this;
     }
   }
@@ -1095,7 +1101,7 @@ Mesh& Mesh::setMaterialByID(const std::string& iId)
   const auto& multiMaterials = getScene()->multiMaterials;
   for (auto& multiMaterial : multiMaterials) {
     if (multiMaterial->id == iId) {
-      material = multiMaterial.get();
+      setMaterial(multiMaterial.get());
       return *this;
     }
   }
@@ -1107,8 +1113,8 @@ std::vector<IAnimatable*> Mesh::getAnimatables()
 {
   std::vector<IAnimatable*> results;
 
-  if (material) {
-    results.emplace_back(material);
+  if (material()) {
+    results.emplace_back(material());
   }
 
   if (skeleton()) {
@@ -1646,7 +1652,7 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
     = Json::GetBool(parsedMesh, "showSubMeshesBoundingBox");
 
   if (parsedMesh.contains("applyFog")) {
-    mesh->applyFog = Json::GetBool(parsedMesh, "applyFog", true);
+    mesh->setApplyFog(Json::GetBool(parsedMesh, "applyFog", true));
   }
 
   if (parsedMesh.contains("isPickable")) {
@@ -1658,8 +1664,8 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
                                        std::numeric_limits<int>::max());
   }
 
-  mesh->receiveShadows = Json::GetBool(parsedMesh, "receiveShadows", false);
-  mesh->billboardMode  = Json::GetNumber(parsedMesh, "billboardMode",
+  mesh->setReceiveShadows(Json::GetBool(parsedMesh, "receiveShadows", false));
+  mesh->billboardMode = Json::GetNumber(parsedMesh, "billboardMode",
                                         AbstractMesh::BILLBOARDMODE_NONE);
 
   if (parsedMesh.contains("visibility")) {
@@ -1706,7 +1712,7 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
   }
 
   // Geometry
-  mesh->hasVertexAlpha = Json::GetBool(parsedMesh, "hasVertexAlpha", false);
+  mesh->setHasVertexAlpha(Json::GetBool(parsedMesh, "hasVertexAlpha", false));
 
   if (parsedMesh.contains("delayLoadingFile")) {
     mesh->delayLoadState = Engine::DELAYLOADSTATE_NOTLOADED;
@@ -1774,7 +1780,7 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
     mesh->setMaterialByID(Json::GetString(parsedMesh, "materialId"));
   }
   else {
-    mesh->material = nullptr;
+    mesh->setMaterial(nullptr);
   }
 
   // Skeleton
@@ -1783,8 +1789,8 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
     if (!parsedSkeletonId.empty()) {
       mesh->setSkeleton(scene->getLastSkeletonByID(parsedSkeletonId));
       if (parsedMesh.contains("numBoneInfluencers")) {
-        mesh->numBoneInfluencers
-          = Json::GetNumber(parsedMesh, "numBoneInfluencers", 0u);
+        mesh->setNumBoneInfluencers(
+          Json::GetNumber(parsedMesh, "numBoneInfluencers", 0u));
       }
     }
   }
@@ -2236,7 +2242,7 @@ Mesh* Mesh::applySkeleton(Skeleton* skeleton)
   auto matricesIndicesData = getVerticesData(VertexBuffer::MatricesIndicesKind);
   auto matricesWeightsData = getVerticesData(VertexBuffer::MatricesWeightsKind);
 
-  bool needExtras = numBoneInfluencers > 4;
+  bool needExtras = numBoneInfluencers() > 4;
   auto matricesIndicesExtraData
     = needExtras ? getVerticesData(VertexBuffer::MatricesIndicesExtraKind) :
                    Float32Array();
@@ -2406,7 +2412,7 @@ Mesh* Mesh::MergeMeshes(std::vector<Mesh*>& meshes, bool disposeSource,
   vertexData->applyToMesh(meshSubclass);
 
   // Setting properties
-  meshSubclass->material = source->getMaterial();
+  meshSubclass->setMaterial(source->getMaterial());
   meshSubclass->setCheckCollisions(source->checkCollisions());
 
   // Cleaning

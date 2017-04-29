@@ -97,18 +97,18 @@ bool SkyMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Fog
-  if (scene->fogEnabled() && mesh && mesh->applyFog
+  if (scene->fogEnabled() && mesh && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled) {
     _defines.defines[SMD::FOG] = true;
   }
 
   // Attribs
   if (mesh) {
-    if (mesh->useVertexColors
+    if (mesh->useVertexColors()
         && mesh->isVerticesDataPresent(VertexBuffer::ColorKind)) {
       _defines.defines[SMD::VERTEXCOLOR] = true;
 
-      if (mesh->hasVertexAlpha) {
+      if (mesh->hasVertexAlpha()) {
         _defines.defines[SMD::VERTEXALPHA] = true;
       }
     }
@@ -193,7 +193,7 @@ void SkyMaterial::bind(Matrix* world, Mesh* mesh)
   }
 
   // View
-  if (scene->fogEnabled() && mesh->applyFog
+  if (scene->fogEnabled() && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE) {
     _effect->setMatrix("view", scene->getViewMatrix());
   }

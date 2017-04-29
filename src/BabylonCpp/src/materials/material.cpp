@@ -273,7 +273,7 @@ std::vector<AbstractMesh*> Material::getBindedMeshes()
   std::vector<AbstractMesh*> result;
 
   for (auto& mesh : _scene->meshes) {
-    if (mesh->material == this) {
+    if (mesh->material() == this) {
       result.emplace_back(mesh.get());
     }
   }
@@ -303,8 +303,8 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)
 
   // Remove from meshes
   for (auto& mesh : _scene->meshes) {
-    if (mesh->material == this) {
-      mesh->material = nullptr;
+    if (mesh->material() == this) {
+      mesh->setMaterial(nullptr);
     }
   }
 

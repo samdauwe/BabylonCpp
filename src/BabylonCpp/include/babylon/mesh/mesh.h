@@ -12,8 +12,7 @@ namespace BABYLON {
 /**
  * @brief
  */
-class BABYLON_SHARED_EXPORT Mesh : public AbstractMesh,
-                                   public IGetSetVerticesData {
+class BABYLON_SHARED_EXPORT Mesh : public AbstractMesh {
 
   friend class MeshBuilder;
 
@@ -361,8 +360,8 @@ public:
    * - BABYLON.VertexBuffer.MatricesWeightsKind
    * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
    */
-  void setVerticesData(unsigned int kind, const Float32Array& data,
-                       bool updatable = false, int stride = -1) override;
+  Mesh* setVerticesData(unsigned int kind, const Float32Array& data,
+                        bool updatable = false, int stride = -1) override;
 
   void markVerticesDataAsUpdatable(unsigned int kind, bool updatable = true);
 
@@ -398,9 +397,9 @@ public:
    * - BABYLON.VertexBuffer.MatricesWeightsKind
    * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
    */
-  void updateVerticesData(unsigned int kind, const Float32Array& data,
-                          bool updateExtends = false,
-                          bool makeItUnique  = false) override;
+  Mesh* updateVerticesData(unsigned int kind, const Float32Array& data,
+                           bool updateExtends = false,
+                           bool makeItUnique  = false) override;
 
   /**
    * @brief This method updates the vertex positions of an updatable mesh
@@ -432,7 +431,8 @@ public:
    * the mesh.
    * This method creates a new index buffer each call.
    */
-  void setIndices(const IndicesArray& indices, int totalVertices = -1) override;
+  Mesh* setIndices(const IndicesArray& indices,
+                   size_t totalVertices = 0) override;
 
   /**
    * @brief Invert the geometry to move from a right handed system to a left

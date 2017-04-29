@@ -12,6 +12,7 @@
 #include <babylon/math/color4.h>
 #include <babylon/math/matrix.h>
 #include <babylon/mesh/facet_parameters.h>
+#include <babylon/mesh/iget_set_vertices_data.h>
 #include <babylon/physics/iphysics_enabled_object.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
@@ -23,7 +24,8 @@ namespace BABYLON {
  */
 class BABYLON_SHARED_EXPORT AbstractMesh : public Node,
                                            public IPhysicsEnabledObject,
-                                           public ICullable {
+                                           public ICullable,
+                                           public IGetSetVerticesData {
 
 public:
   // The billboard Mode None, the object is normal by default
@@ -86,6 +88,22 @@ public:
   // Events
   void setOnCollide(const std::function<void()>& callback);
   void setOnCollisionPositionChange(const std::function<void()>& callback);
+
+  // Properties
+  Material* material();
+  void setMaterial(Material* value);
+  bool receiveShadows() const;
+  void setReceiveShadows(bool value);
+  bool hasVertexAlpha() const;
+  void setHasVertexAlpha(bool value);
+  bool useVertexColors() const;
+  void setUseVertexColors(bool value);
+  bool computeBonesUsingShaders() const;
+  void setComputeBonesUsingShaders(bool value);
+  unsigned int numBoneInfluencers() const;
+  void setNumBoneInfluencers(unsigned int value);
+  bool applyFog() const;
+  void setApplyFog(bool value);
 
   // Collisions
   int collisionMask() const;
@@ -232,10 +250,89 @@ public:
                                        bool copyWhenShared = false) override;
 
   /**
+   * @brief Sets the vertex data of the mesh geometry for the requested `kind`.
+   * If the mesh has no geometry, a new Geometry object is set to the mesh and
+   * then passed this vertex data.
+   * The `data` are either a numeric array either a Float32Array.
+   * The parameter `updatable` is passed as is to the underlying Geometry object
+   * constructor (if initianilly none) or updater.
+   * The parameter `stride` is an optional positive integer, it is usually
+   * automatically deducted from the `kind` (3 for positions or normals, 2 for
+   * UV, etc).
+   * Note that a new underlying VertexBuffer object is created each call.
+   * If the `kind` is the `PositionKind`, the mesh BoundingInfo is renewed, so
+   * the bounding box and sphere, and the mesh World Matrix is recomputed.
+   *
+   * Possible `kind` values :
+   * - BABYLON.VertexBuffer.PositionKind
+   * - BABYLON.VertexBuffer.UVKind
+   * - BABYLON.VertexBuffer.UV2Kind
+   * - BABYLON.VertexBuffer.UV3Kind
+   * - BABYLON.VertexBuffer.UV4Kind
+   * - BABYLON.VertexBuffer.UV5Kind
+   * - BABYLON.VertexBuffer.UV6Kind
+   * - BABYLON.VertexBuffer.ColorKind
+   * - BABYLON.VertexBuffer.MatricesIndicesKind
+   * - BABYLON.VertexBuffer.MatricesIndicesExtraKind
+   * - BABYLON.VertexBuffer.MatricesWeightsKind
+   * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
+   *
+   * @returns The Mesh.
+   */
+  virtual Mesh* setVerticesData(unsigned int kind, const Float32Array& data,
+                                bool updatable = false,
+                                int stride     = -1) override;
+
+  /**
+   * @brief Updates the existing vertex data of the mesh geometry for the
+   * requested `kind`.
+   * If the mesh has no geometry, it is simply returned as it is.
+   * The `data` are either a numeric array either a Float32Array.
+   * No new underlying VertexBuffer object is created.
+   * If the `kind` is the `PositionKind` and if `updateExtends` is true, the
+   * mesh BoundingInfo is renewed, so the bounding box and sphere, and the mesh
+   * World Matrix is recomputed.
+   * If the parameter `makeItUnique` is true, a new global geometry is created
+   * from this positions and is set to the mesh.
+   *
+   * Possible `kind` values :
+   * - BABYLON.VertexBuffer.PositionKind
+   * - BABYLON.VertexBuffer.UVKind
+   * - BABYLON.VertexBuffer.UV2Kind
+   * - BABYLON.VertexBuffer.UV3Kind
+   * - BABYLON.VertexBuffer.UV4Kind
+   * - BABYLON.VertexBuffer.UV5Kind
+   * - BABYLON.VertexBuffer.UV6Kind
+   * - BABYLON.VertexBuffer.ColorKind
+   * - BABYLON.VertexBuffer.MatricesIndicesKind
+   * - BABYLON.VertexBuffer.MatricesIndicesExtraKind
+   * - BABYLON.VertexBuffer.MatricesWeightsKind
+   * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
+   *
+   * @returns The Mesh.
+   */
+  virtual Mesh* updateVerticesData(unsigned int kind, const Float32Array& data,
+                                   bool updateExtends = false,
+                                   bool makeItUnique  = false) override;
+
+  /**
+   * @brief Sets the mesh indices.
+   * Expects an array populated with integers or a typed array (Int32Array,
+   * Uint32Array, Uint16Array).
+   * If the mesh has no geometry, a new Geometry object is created and set to
+   * the mesh.
+   * This method creates a new index buffer each call.
+   *
+   * @returns The Mesh.
+   */
+  virtual Mesh* setIndices(const IndicesArray& indices,
+                           size_t totalVertices = 0) override;
+
+  /**
    * @brief Returns false by default, used by the class Mesh.
    * @returns A boolean.
    */
-  virtual bool isVerticesDataPresent(unsigned int kind);
+  virtual bool isVerticesDataPresent(unsigned int kind) override;
 
   /**
    * @brief Returns the mesh BoundingInfo object or creates a new one and
@@ -793,6 +890,12 @@ public:
    */
   AbstractMesh& disableFacetData();
 
+  /**
+   * @brief Creates new normals data for the mesh.
+   * @param updatable.
+   */
+  void createNormals(bool updatable);
+
 protected:
   /**
    * @brief The AbstractMesh constructor.
@@ -802,6 +905,8 @@ protected:
   AbstractMesh(const std::string& name, Scene* scene);
 
 private:
+  void _markSubMeshesAsDirty(
+    const std::function<void(const MaterialDefines& defines)>& func);
   void _onCollisionPositionChange(int collisionId, const Vector3& newPosition,
                                   AbstractMesh* collidedMesh = nullptr);
   // Facet data
@@ -840,20 +945,13 @@ public:
   bool showSubMeshesBoundingBox;
   bool isBlocker;
   unsigned int renderingGroupId;
-  Material* material;
-  bool receiveShadows;
   bool renderOutline;
   Color3 outlineColor;
   float outlineWidth;
   bool renderOverlay;
   Color3 overlayColor;
   float overlayAlpha;
-  bool hasVertexAlpha;
-  bool useVertexColors;
-  bool applyFog;
-  bool computeBonesUsingShaders;
   float scalingDeterminant;
-  unsigned int numBoneInfluencers;
   bool useOctreeForRenderingSelection;
   bool useOctreeForPicking;
   bool useOctreeForCollisions;
@@ -922,11 +1020,18 @@ private:
   Vector3 _position;
   Vector3 _rotation;
   Vector3 _scaling;
+  Material* _material;
+  bool _receiveShadows;
+  bool _hasVertexAlpha;
+  bool _useVertexColors;
+  bool _computeBonesUsingShaders;
+  unsigned int _numBoneInfluencers;
+  bool _applyFog;
   // Collisions
   bool _checkCollisions;
   int _collisionMask;
   int _collisionGroup;
-  // Collider* _collider;
+  std::unique_ptr<Collider> _collider;
   Vector3 _oldPositionForCollisions;
   Vector3 _diffPositionForCollisions;
   Vector3 _newPositionForCollisions;

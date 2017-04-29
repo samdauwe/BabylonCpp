@@ -27,7 +27,7 @@ Mesh* SPSTreeGenerator::CreateTree(
   auto _base
     = createTreeBase(trunkHeight, trunkTaper, trunkSlices, boughs, forks,
                      forkAngle, forkRatio, bowFreq, bowHeight, scene);
-  _base.tree->material = trunkMaterial;
+  _base.tree->setMaterial(trunkMaterial);
 
   // Create one leaf
   float _branch_length = trunkHeight * std::pow(forkRatio, _boughs);
@@ -212,8 +212,8 @@ Mesh* SPSTreeGenerator::CreateTree(
   spsBuilderOptionsBranches.positionFunction = _set_branches;
   _mini_trees_SPS->addShape(_base.tree, branches, spsBuilderOptionsBranches);
   // Form mesh with all mini trees
-  auto _tree_crown      = _mini_trees_SPS->buildMesh();
-  _tree_crown->material = trunkMaterial;
+  auto _tree_crown = _mini_trees_SPS->buildMesh();
+  _tree_crown->setMaterial(trunkMaterial);
 
   // Add leaves mesh enough for all the final forked branches
   _mini_leaves_SPS->addShape(_leaves,
@@ -225,7 +225,7 @@ Mesh* SPSTreeGenerator::CreateTree(
   // Form mesh of all leaves
   auto _leaves_crown = _mini_leaves_SPS->buildMesh();
   _leaves->dispose();
-  _leaves_crown->material = leafMaterial;
+  _leaves_crown->setMaterial(leafMaterial);
 
   // Give the three mesh elements of full tree the same parent.
   BoxOptions boxOptions;

@@ -46,12 +46,12 @@ IReflect::Type InstancedMesh::type() const
 
 bool InstancedMesh::receiveShadows() const
 {
-  return _sourceMesh->receiveShadows;
+  return _sourceMesh->receiveShadows();
 }
 
 Material* InstancedMesh::material() const
 {
-  return _sourceMesh->material;
+  return _sourceMesh->material();
 }
 
 float InstancedMesh::visibility() const

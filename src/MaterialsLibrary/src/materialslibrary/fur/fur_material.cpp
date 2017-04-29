@@ -77,7 +77,7 @@ BaseTexture* FurMaterial::getAlphaTestTexture()
 void FurMaterial::updateFur()
 {
   for (unsigned int i = 1; i < _meshes.size(); ++i) {
-    if (auto offsetFur = dynamic_cast<FurMaterial*>(_meshes[i]->material)) {
+    if (auto offsetFur = static_cast<FurMaterial*>(_meshes[i]->material())) {
       offsetFur->furLength      = furLength;
       offsetFur->furAngle       = furAngle;
       offsetFur->furGravity     = furGravity;
@@ -172,7 +172,7 @@ bool FurMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Fog
-  if (scene->fogEnabled() && mesh && mesh->applyFog
+  if (scene->fogEnabled() && mesh && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled) {
     _defines.defines[FMD::FOG] = true;
   }
@@ -202,17 +202,17 @@ bool FurMaterial::isReady(AbstractMesh* mesh, bool useInstances)
         _defines.defines[FMD::UV2] = true;
       }
     }
-    if (mesh->useVertexColors
+    if (mesh->useVertexColors()
         && mesh->isVerticesDataPresent(VertexBuffer::ColorKind)) {
       _defines.defines[FMD::VERTEXCOLOR] = true;
 
-      if (mesh->hasVertexAlpha) {
+      if (mesh->hasVertexAlpha()) {
         _defines.defines[FMD::VERTEXALPHA] = true;
       }
     }
 
-    if (mesh->useBones() && mesh->computeBonesUsingShaders) {
-      _defines.NUM_BONE_INFLUENCERS = mesh->numBoneInfluencers;
+    if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
+      _defines.NUM_BONE_INFLUENCERS = mesh->numBoneInfluencers();
       _defines.BonesPerMesh         = mesh->skeleton()->bones.size() + 1;
     }
 
@@ -359,7 +359,7 @@ void FurMaterial::bind(Matrix* world, Mesh* mesh)
   }
 
   // View
-  if (scene->fogEnabled() && mesh->applyFog
+  if (scene->fogEnabled() && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE) {
     _effect->setMatrix("view", scene->getViewMatrix());
   }
@@ -411,7 +411,7 @@ void FurMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
 
   if (!_meshes.empty()) {
     for (auto& mesh : _meshes) {
-      mesh->material->dispose(forceDisposeEffect);
+      mesh->material()->dispose(forceDisposeEffect);
       mesh->dispose();
     }
   }

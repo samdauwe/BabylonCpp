@@ -307,7 +307,7 @@ void ShadowGenerator::renderSubMesh(SubMesh* subMesh)
     }
 
     // Bones
-    if (mesh->useBones() && mesh->computeBonesUsingShaders) {
+    if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
       _effect->setMatrices("mBones",
                            mesh->skeleton()->getTransformMatrices(mesh));
     }
@@ -372,15 +372,15 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
   }
 
   // Bones
-  if (mesh->useBones() && mesh->computeBonesUsingShaders) {
+  if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
     attribs.emplace_back(VertexBuffer::MatricesIndicesKindChars);
     attribs.emplace_back(VertexBuffer::MatricesWeightsKindChars);
-    if (mesh->numBoneInfluencers > 4) {
+    if (mesh->numBoneInfluencers() > 4) {
       attribs.emplace_back(VertexBuffer::MatricesIndicesExtraKindChars);
       attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKindChars);
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
-                         + std::to_string(mesh->numBoneInfluencers));
+                         + std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back(
       String::concat("#define BonesPerMesh "
                      + std::to_string(mesh->skeleton()->bones.size() + 1)));

@@ -386,7 +386,7 @@ Mesh* CSG::CSG::toMesh(const std::string& name, Material* material,
 {
   Mesh* mesh = buildMeshGeometry(name, scene, keepSubMeshes);
 
-  mesh->material = material;
+  mesh->setMaterial(material);
 
   // mesh->position->copyFrom(position);
   mesh->rotation().copyFrom(*rotation);

@@ -23,9 +23,9 @@ LensFlareSystem::LensFlareSystem(const std::string iName, Mesh* emitter,
     , _emitter{emitter}
     , _isEnabled{true}
 {
-  meshesSelectionPredicate = [&](Mesh* m) {
-    return m->material && m->isVisible && m->isEnabled() && m->isBlocker
-           && ((m->layerMask & scene->activeCamera->layerMask) != 0);
+  meshesSelectionPredicate = [this](Mesh* m) {
+    return m->material() && m->isVisible && m->isEnabled() && m->isBlocker
+           && ((m->layerMask & _scene->activeCamera->layerMask) != 0);
   };
 
   auto engine = scene->getEngine();

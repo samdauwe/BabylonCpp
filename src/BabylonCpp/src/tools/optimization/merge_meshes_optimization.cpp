@@ -87,7 +87,7 @@ bool MergeMeshesOptimization::_apply(Scene* scene, bool updateSelectionTree)
         continue;
       }
 
-      if (otherMesh->material != current->material) {
+      if (otherMesh->material() != current->material()) {
         continue;
       }
 
@@ -95,7 +95,7 @@ bool MergeMeshesOptimization::_apply(Scene* scene, bool updateSelectionTree)
         continue;
       }
 
-      currentPool.emplace_back(dynamic_cast<Mesh*>(otherMesh));
+      currentPool.emplace_back(static_cast<Mesh*>(otherMesh));
       --globalLength;
 
       std_util::splice(globalPool, static_cast<int>(subIndex), 1);

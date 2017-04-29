@@ -48,14 +48,14 @@ void _Primitive::setAllVerticesData(VertexData* vertexData, bool /*updatable*/)
   Geometry::setAllVerticesData(vertexData, false);
 }
 
-void _Primitive::setVerticesData(unsigned int kind, const Float32Array& data,
-                                 bool /*updatable*/, int /*stride*/)
+Mesh* _Primitive::setVerticesData(unsigned int kind, const Float32Array& data,
+                                  bool /*updatable*/, int /*stride*/)
 {
   if (!_beingRegenerated) {
-    return;
+    return nullptr;
   }
 
-  Geometry::setVerticesData(kind, data, false);
+  return Geometry::setVerticesData(kind, data, false);
 }
 
 } // end of namespace GeometryPrimitives
