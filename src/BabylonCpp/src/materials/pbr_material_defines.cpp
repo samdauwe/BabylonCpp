@@ -6,6 +6,7 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
 {
   _keys = {"ALBEDO",
            "AMBIENT",
+           "AMBIENTINGRAYSCALE",
            "OPACITY",
            "OPACITYRGB",
            "REFLECTION",
@@ -45,6 +46,8 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
            "REFLECTIONMAP_SKYBOX",
            "REFLECTIONMAP_EXPLICIT",
            "REFLECTIONMAP_EQUIRECTANGULAR",
+           "REFLECTIONMAP_EQUIRECTANGULAR_FIXED",
+           "REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED",
            "INVERTCUBICMAP",
            "LOGARITHMICDEPTH",
            "CAMERATONEMAP",
@@ -63,23 +66,20 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
            "RADIANCEOVERALPHA",
            "USEPMREMREFLECTION",
            "USEPMREMREFRACTION",
-           "OPENGLNORMALMAP",
            "INVERTNORMALMAPX",
            "INVERTNORMALMAPY",
            "TWOSIDEDLIGHTING",
-           "SHADOWS",
            "SHADOWFULLFLOAT",
            "METALLICWORKFLOW",
-           "METALLICROUGHNESSMAP",
-           "METALLICROUGHNESSGSTOREINALPHA",
-           "METALLICROUGHNESSGSTOREINGREEN"};
-  defines.resize(_keys.size());
-  for (size_t i = 0; i < _keys.size(); ++i) {
-    defines[i] = false;
-  }
-
-  NUM_BONE_INFLUENCERS = 0;
-  BonesPerMesh         = 0;
+           "METALLICMAP",
+           "ROUGHNESSSTOREINMETALMAPALPHA",
+           "ROUGHNESSSTOREINMETALMAPGREEN",
+           "METALLNESSSTOREINMETALMAPBLUE",
+           "AOSTOREINMETALMAPRED",
+           "MICROSURFACEMAP",
+           "MORPHTARGETS",
+           "MORPHTARGETS_NORMAL"};
+  rebuild();
 }
 
 PBRMaterialDefines::~PBRMaterialDefines()

@@ -58,6 +58,7 @@ public:
 
   /** Overriden Methods **/
   bool isReady(AbstractMesh* mesh, bool useInstances) override;
+  void buildUniformLayout();
   void unbind() override;
   void bindOnlyWorldMatrix(Matrix& world) override;
   void bind(Matrix* world, Mesh* mesh) override;
@@ -281,6 +282,14 @@ public:
    */
   float roughness;
 
+  /**
+   * Used to enable roughness/glossiness fetch from a separate chanel depending
+   * on the current mode.
+   * Gray Scale represents roughness in metallic mode and glossiness in specular
+   * mode.
+   */
+  BaseTexture* microSurfaceTexture;
+
   BaseTexture* bumpTexture;
   BaseTexture* lightmapTexture;
   RenderTargetTexture* refractionTexture;
@@ -371,6 +380,24 @@ public:
    * green channel.
    */
   bool useRoughnessFromMetallicTextureGreen;
+
+  /**
+   * Specifies if the metallic texture contains the metallness information in
+   * its blue channel.
+   */
+  bool useMetallnessFromMetallicTextureBlue;
+
+  /**
+   * Specifies if the metallic texture contains the ambient occlusion
+   * information in its red channel.
+   */
+  bool useAmbientOcclusionFromMetallicTextureRed;
+
+  /**
+   * Specifies if the ambient texture contains the ambient occlusion information
+   * in its red channel only.
+   */
+  bool useAmbientInGrayScale;
 
   /**
    * In case the reflectivity map does not contain the microsurface information
