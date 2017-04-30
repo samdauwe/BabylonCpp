@@ -39,6 +39,7 @@ std::string Engine::Version()
 float Engine::CollisionsEpsilon       = 0.001f;
 std::string Engine::CodeRepository    = "src/";
 std::string Engine::ShadersRepository = "src/shaders/";
+std::vector<Engine*> Engine::Instances{};
 
 Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     : isFullscreen{false}
@@ -71,6 +72,8 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _vaoRecordInProgress{false}
     , _mustWipeVertexAttributes{false}
 {
+  Engine::Instances.emplace_back(this);
+
   // Checks if some of the format renders first to allow the use of webgl
   // inspector.
   auto renderToFullFloat = _canRenderToFloatTexture();
@@ -189,10 +192,37 @@ Engine::~Engine()
 {
 }
 
-void Engine::MarkAllMaterialsAsDirty(
-  unsigned int /*flag*/, const std::function<bool(Material* mat)>& /*predicate*/
-  )
+Engine* Engine::LastCreatedEngine()
 {
+  if (Engine::Instances.empty()) {
+    return nullptr;
+  }
+
+  return Engine::Instances.back();
+}
+
+Scene* Engine::LastCreatedScene()
+{
+  auto lastCreatedEngine = Engine::LastCreatedEngine();
+  if (!lastCreatedEngine) {
+    return nullptr;
+  }
+
+  if (lastCreatedEngine->scenes.empty()) {
+    return nullptr;
+  }
+
+  return lastCreatedEngine->scenes.back();
+}
+
+void Engine::MarkAllMaterialsAsDirty(
+  unsigned int flag, const std::function<bool(Material* mat)>& predicate)
+{
+  for (auto& engine : Engine::Instances) {
+    for (auto& scene : engine->scenes) {
+      scene->markAllMaterialsAsDirty(flag, predicate);
+    }
+  }
 }
 
 std::vector<std::string>& Engine::texturesSupported()
@@ -858,6 +888,23 @@ void Engine::bindArrayBuffer(GL::IGLBuffer* buffer)
   bindBuffer(buffer, GL::ARRAY_BUFFER);
 }
 
+void Engine::bindUniformBuffer(GL::IGLBuffer* buffer)
+{
+  _gl->bindBuffer(GL::UNIFORM_BUFFER, buffer);
+}
+
+void Engine::bindUniformBufferBase(GL::IGLBuffer* buffer, unsigned int location)
+{
+  _gl->bindBufferBase(GL::UNIFORM_BUFFER, location, buffer);
+}
+
+void Engine::bindUniformBlock(GL::IGLProgram* shaderProgram,
+                              const std::string blockName, unsigned int index)
+{
+  auto uniformLocation = _gl->getUniformBlockIndex(shaderProgram, blockName);
+  _gl->uniformBlockBinding(shaderProgram, uniformLocation, index);
+}
+
 void Engine::bindIndexBuffer(GL::IGLBuffer* buffer)
 {
   if (!_vaoRecordInProgress) {
@@ -1254,6 +1301,13 @@ void Engine::drawUnIndexed(bool useTriangles, int verticesStart,
 }
 
 // Shaders
+Effect* Engine::createEffect(const std::string& /*baseName*/,
+                             EffectCreationOptions& /*options*/,
+                             Engine* /*engine*/)
+{
+  return nullptr;
+}
+
 void Engine::_releaseEffect(Effect* effect)
 {
   if (std_util::contains(_compiledEffects, effect->_key)) {
@@ -2564,13 +2618,13 @@ void Engine::_setTexture(unsigned int channel, BaseTexture* texture)
   if (internalTexture->isCube) {
     _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, internalTexture);
 
-    if (internalTexture->_cachedCoordinatesMode != texture->coordinatesMode) {
-      internalTexture->_cachedCoordinatesMode = texture->coordinatesMode;
+    if (internalTexture->_cachedCoordinatesMode != texture->coordinatesMode()) {
+      internalTexture->_cachedCoordinatesMode = texture->coordinatesMode();
       // CUBIC_MODE and SKYBOX_MODE both require CLAMP_TO_EDGE.  All other modes
       // use REPEAT.
       auto textureWrapMode
-        = (texture->coordinatesMode != Texture::CUBIC_MODE
-           && texture->coordinatesMode != Texture::SKYBOX_MODE) ?
+        = (texture->coordinatesMode() != Texture::CUBIC_MODE
+           && texture->coordinatesMode() != Texture::SKYBOX_MODE) ?
             GL::REPEAT :
             GL::CLAMP_TO_EDGE;
       _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_S,
@@ -2755,6 +2809,11 @@ void Engine::dispose(bool /*doNotRecurse*/)
 
   // WebVR
   // disableVR();
+
+  // Remove from Instances
+  Engine::Instances.erase(
+    std::remove(Engine::Instances.begin(), Engine::Instances.end(), this),
+    Engine::Instances.end());
 }
 
 // Loading screen

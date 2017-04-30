@@ -109,6 +109,9 @@ public:
   static std::string CodeRepository;
   static std::string ShadersRepository;
 
+  // Engine instances
+  static std::vector<Engine*> Instances;
+
 public:
   template <typename... Ts>
   static std::unique_ptr<Engine> New(Ts&&... args)
@@ -256,6 +259,10 @@ public:
                                  int count = -1);
   GLBufferPtr createIndexBuffer(const IndicesArray& indices);
   void bindArrayBuffer(GL::IGLBuffer* buffer);
+  void bindUniformBuffer(GL::IGLBuffer* buffer);
+  void bindUniformBufferBase(GL::IGLBuffer* buffer, unsigned int location);
+  void bindUniformBlock(GL::IGLProgram* shaderProgram,
+                        const std::string blockName, unsigned int index);
   void updateArrayBuffer(const Float32Array& data);
   GLVertexArrayObjectPtr recordVertexArrayObject(
     const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
@@ -290,6 +297,8 @@ public:
 
   /** Shaders **/
   void _releaseEffect(Effect* effect);
+  Effect* createEffect(const std::string& baseName,
+                       EffectCreationOptions& options, Engine* engine);
   Effect* createEffect(
     std::unordered_map<std::string, std::string>& baseName,
     const std::vector<std::string>& attributesNames,
@@ -484,6 +493,10 @@ public:
   microseconds_t getDeltaTime() const;
 
   /** Statics **/
+
+  static Engine* LastCreatedEngine();
+  static Scene* LastCreatedScene();
+
   /**
    * @brief Will flag all materials in all scenes in all engines as dirty to
    * trigger new shader compilation
@@ -520,6 +533,8 @@ private:
   void _getVRDisplays();
   void _setTexture(unsigned int channel, BaseTexture* texture);
   void bindUnboundFramebuffer(GL::IGLFramebuffer* framebuffer);
+  void bindIndexBuffer(GL::IGLBuffer* buffer);
+  void bindBuffer(GL::IGLBuffer* buffer, int target);
   void vertexAttribPointer(GL::IGLBuffer* buffer, unsigned int indx, int size,
                            unsigned int type, bool normalized, int stride,
                            int offset);
@@ -527,9 +542,7 @@ private:
   void _bindVertexBuffersAttributes(
     const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
     Effect* effect);
-  void bindIndexBuffer(GL::IGLBuffer* buffer);
   void _unBindVertexArrayObject();
-  void bindBuffer(GL::IGLBuffer*, int target);
   void setProgram(GL::IGLProgram* program);
   void activateTexture(unsigned int texture);
   GL::GLenum _getInternalFormat(unsigned int format) const;
