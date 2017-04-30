@@ -21,6 +21,11 @@ public:
   virtual IReflect::Type type() const override;
   void addToScene(std::unique_ptr<BaseTexture>&& newTexture);
 
+  bool hasAlpha() const;
+  void setHasAlpha(bool value);
+  unsigned int coordinatesMode() const;
+  void setCoordinatesMode(unsigned int value);
+
   std::string uid();
   virtual std::string toString() const;
   void setOnDispose(const std::function<void()>& callback);
@@ -48,11 +53,9 @@ protected:
 
 public:
   std::string name;
-  bool hasAlpha;
   bool getAlphaFromRGB;
   float level;
   unsigned int coordinatesIndex;
-  unsigned int coordinatesMode;
   unsigned int wrapU;
   unsigned int wrapV;
   unsigned int anisotropicFilteringLevel;
@@ -68,6 +71,8 @@ public:
   GL::IGLTexture* _texture;
 
 private:
+  bool _hasAlpha;
+  unsigned int _coordinatesMode;
   Scene* _scene;
   std::string _uid;
   Observer<BaseTexture>::Ptr _onDisposeObserver;

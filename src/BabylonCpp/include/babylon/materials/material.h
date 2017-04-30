@@ -28,6 +28,11 @@ public:
   virtual ~Material();
 
   /**
+   * @brief Child classes can use it to update shaders
+   */
+  virtual void markAsDirty(unsigned int flag) override;
+
+  /**
    * @brief Returns the string "Material".
    */
   const char* getClassName() const;
@@ -36,6 +41,11 @@ public:
   void addMaterialToScene(std::unique_ptr<Material>&& newMaterial);
   void
   addMultiMaterialToScene(std::unique_ptr<MultiMaterial>&& newMultiMaterial);
+
+  bool backFaceCulling() const;
+  void setBackFaceCulling(bool value);
+  bool fogEnabled() const;
+  void setFogEnabled(bool value);
 
   virtual void setAmbientColor(const Color3& color);
   virtual void setDiffuseColor(const Color3& color);
@@ -82,6 +92,9 @@ public:
   virtual void bind(Matrix* world, Mesh* mesh);
   virtual void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh);
   virtual void bindOnlyWorldMatrix(Matrix& world);
+  void bindSceneUniformBuffer(Effect* effect, UniformBuffer* sceneUbo);
+  void bindView(Effect* effect);
+  void bindViewProjection(Effect* effect);
   virtual void unbind();
   virtual Material* clone(const std::string& name,
                           bool cloneChildren = false) const;
@@ -123,7 +136,6 @@ public:
   bool checkReadyOnlyOnce;
   std::string state;
   float alpha;
-  bool backFaceCulling;
   int sideOrientation;
   std::function<void(const Effect* effect)> onCompiled;
   std::function<void(const Effect* effect, const std::string& errors)> onError;
@@ -132,17 +144,22 @@ public:
   bool storeEffectOnSubMeshes;
   int alphaMode;
   bool disableDepthWrite;
-  bool fogEnabled;
   float pointSize;
   float zOffset;
   Effect* _effect;
   bool _wasPreviouslyReady;
+
+protected:
+  bool _backFaceCulling;
+  std::unique_ptr<UniformBuffer> _uniformBuffer;
 
 private:
   // Events
   Observer<Material>::Ptr _onDisposeObserver;
   Observer<AbstractMesh>::Ptr _onBindObserver;
   // Properties
+  bool _fogEnabled;
+  bool _useUBO;
   Scene* _scene;
   unsigned int _fillMode;
   bool _cachedDepthWriteState;

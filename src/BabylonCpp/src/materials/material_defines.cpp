@@ -5,6 +5,9 @@ namespace BABYLON {
 MaterialDefines::MaterialDefines()
     : NUM_BONE_INFLUENCERS{0}
     , BonesPerMesh{0}
+    , NUM_MORPH_INFLUENCERS{0}
+    , TANGENT{false}
+    , SHADOWS{false}
     , LIGHTMAPEXCLUDED{false}
     , _isDirty{true}
     , _renderId{-1}
@@ -69,6 +72,11 @@ std::ostream& operator<<(std::ostream& os,
   os << "#define NUM_BONE_INFLUENCERS " << materialDefines.NUM_BONE_INFLUENCERS
      << "\n";
   os << "#define BonesPerMesh " << materialDefines.BonesPerMesh << "\n";
+  os << "#define NUM_MORPH_INFLUENCERS "
+     << materialDefines.NUM_MORPH_INFLUENCERS << "\n";
+  os << "#define TANGENT " << materialDefines.TANGENT << "\n";
+  os << "#define SHADOWS " << materialDefines.SHADOWS << "\n";
+  os << "#define LIGHTMAPEXCLUDED " << materialDefines.LIGHTMAPEXCLUDED << "\n";
 
   for (size_t i = 0; i < materialDefines.lights.size(); ++i) {
     if (materialDefines.lights[i]) {
@@ -183,6 +191,17 @@ void MaterialDefines::markAsMiscDirty()
 
 void MaterialDefines::rebuild()
 {
+  defines.resize(_keys.size());
+  for (size_t i = 0; i < _keys.size(); ++i) {
+    defines[i] = false;
+  }
+
+  NUM_BONE_INFLUENCERS  = 0;
+  BonesPerMesh          = 0;
+  NUM_MORPH_INFLUENCERS = 0;
+  TANGENT               = false;
+  SHADOWS               = false;
+  LIGHTMAPEXCLUDED      = false;
 }
 
 bool MaterialDefines::isEqual(const MaterialDefines& other) const
@@ -201,8 +220,11 @@ bool MaterialDefines::isEqual(const MaterialDefines& other) const
   }
 
   if ((NUM_BONE_INFLUENCERS != other.NUM_BONE_INFLUENCERS)
-      || (BonesPerMesh != other.BonesPerMesh) || (_isDirty != other._isDirty)
-      || (_renderId != other._renderId)
+      || (BonesPerMesh != other.BonesPerMesh)
+      || (NUM_MORPH_INFLUENCERS != other.NUM_MORPH_INFLUENCERS)
+      || (TANGENT != other.TANGENT) || (SHADOWS != other.SHADOWS)
+      || (LIGHTMAPEXCLUDED != other.LIGHTMAPEXCLUDED)
+      || (_isDirty != other._isDirty) || (_renderId != other._renderId)
       || (_areLightsDirty != other._areLightsDirty)
       || (_areAttributesDirty != other._areAttributesDirty)
       || (_areTexturesDirty != other._areTexturesDirty)
@@ -281,19 +303,23 @@ void MaterialDefines::cloneTo(MaterialDefines& other)
   other.defines = defines;
   other._keys   = _keys;
 
-  other.NUM_BONE_INFLUENCERS = NUM_BONE_INFLUENCERS;
-  other.BonesPerMesh         = BonesPerMesh;
-  other._isDirty             = _isDirty;
-  other._renderId            = _renderId;
-  other._areLightsDirty      = _areLightsDirty;
-  other._areAttributesDirty  = _areAttributesDirty;
-  other._areTexturesDirty    = _areTexturesDirty;
-  other._areFresnelDirty     = _areFresnelDirty;
-  other._areMiscDirty        = _areMiscDirty;
-  other._normals             = _normals;
-  other._uvs                 = _uvs;
-  other._needNormals         = _needNormals;
-  other._needUVs             = _needUVs;
+  other.NUM_BONE_INFLUENCERS  = NUM_BONE_INFLUENCERS;
+  other.BonesPerMesh          = BonesPerMesh;
+  other.NUM_MORPH_INFLUENCERS = NUM_MORPH_INFLUENCERS;
+  other.TANGENT               = TANGENT;
+  other.SHADOWS               = SHADOWS;
+  other.LIGHTMAPEXCLUDED      = LIGHTMAPEXCLUDED;
+  other._isDirty              = _isDirty;
+  other._renderId             = _renderId;
+  other._areLightsDirty       = _areLightsDirty;
+  other._areAttributesDirty   = _areAttributesDirty;
+  other._areTexturesDirty     = _areTexturesDirty;
+  other._areFresnelDirty      = _areFresnelDirty;
+  other._areMiscDirty         = _areMiscDirty;
+  other._normals              = _normals;
+  other._uvs                  = _uvs;
+  other._needNormals          = _needNormals;
+  other._needUVs              = _needUVs;
 
   other.lights      = lights;
   other.pointlights = pointlights;
@@ -311,19 +337,23 @@ void MaterialDefines::reset()
     defines[i] = false;
   }
 
-  NUM_BONE_INFLUENCERS = 0;
-  BonesPerMesh         = 0;
-  _isDirty             = true;
-  _renderId            = -1;
-  _areLightsDirty      = true;
-  _areAttributesDirty  = true;
-  _areTexturesDirty    = true;
-  _areFresnelDirty     = true;
-  _areMiscDirty        = true;
-  _normals             = false;
-  _uvs                 = false;
-  _needNormals         = false;
-  _needUVs             = false;
+  NUM_BONE_INFLUENCERS  = 0;
+  BonesPerMesh          = 0;
+  NUM_MORPH_INFLUENCERS = 0;
+  TANGENT               = false;
+  SHADOWS               = false;
+  LIGHTMAPEXCLUDED      = false;
+  _isDirty              = true;
+  _renderId             = -1;
+  _areLightsDirty       = true;
+  _areAttributesDirty   = true;
+  _areTexturesDirty     = true;
+  _areFresnelDirty      = true;
+  _areMiscDirty         = true;
+  _normals              = false;
+  _uvs                  = false;
+  _needNormals          = false;
+  _needUVs              = false;
 
   lights.clear();
   pointlights.clear();

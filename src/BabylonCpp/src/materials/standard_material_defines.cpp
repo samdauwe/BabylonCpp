@@ -49,6 +49,7 @@ StandardMaterialDefines::StandardMaterialDefines() : MaterialDefines{}
            "REFLECTIONMAP_EXPLICIT",
            "REFLECTIONMAP_EQUIRECTANGULAR",
            "REFLECTIONMAP_EQUIRECTANGULAR_FIXED",
+           "REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED",
            "INVERTCUBICMAP",
            "LOGARITHMICDEPTH",
            "REFRACTION",
@@ -57,18 +58,30 @@ StandardMaterialDefines::StandardMaterialDefines() : MaterialDefines{}
            "INVERTNORMALMAPX",
            "INVERTNORMALMAPY",
            "TWOSIDEDLIGHTING",
-           "SHADOWS",
            "SHADOWFULLFLOAT",
            "CAMERACOLORGRADING",
-           "CAMERACOLORCURVES"};
-  defines.resize(_keys.size());
-  for (size_t i = 0; i < _keys.size(); ++i) {
-    defines[i] = false;
-  }
+           "CAMERACOLORCURVES",
+           "MORPHTARGETS",
+           "MORPHTARGETS_NORMAL"};
+  rebuild();
 }
 
 StandardMaterialDefines::~StandardMaterialDefines()
 {
+}
+
+void StandardMaterialDefines::setReflectionMode(unsigned int modeToEnable)
+{
+  static const std::array<unsigned int, 9> modes{{
+    REFLECTIONMAP_CUBIC, REFLECTIONMAP_EXPLICIT, REFLECTIONMAP_PLANAR,
+    REFLECTIONMAP_PROJECTION, REFLECTIONMAP_SKYBOX, REFLECTIONMAP_SPHERICAL,
+    REFLECTIONMAP_EQUIRECTANGULAR, REFLECTIONMAP_EQUIRECTANGULAR_FIXED,
+    REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED,
+  }};
+
+  for (auto& mode : modes) {
+    defines[mode] = (mode == modeToEnable);
+  }
 }
 
 } // end of namespace BABYLON

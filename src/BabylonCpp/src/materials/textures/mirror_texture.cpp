@@ -55,8 +55,8 @@ std::unique_ptr<MirrorTexture> MirrorTexture::clone() const
     _renderTargetOptions.generateDepthBuffer);
 
   // Base texture
-  newTexture->hasAlpha = hasAlpha;
-  newTexture->level    = level;
+  newTexture->setHasAlpha(hasAlpha());
+  newTexture->level = level;
 
   // Mirror Texture
   newTexture->mirrorPlane = mirrorPlane;

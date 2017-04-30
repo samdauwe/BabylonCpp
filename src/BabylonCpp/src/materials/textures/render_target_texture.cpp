@@ -401,8 +401,8 @@ std::unique_ptr<RenderTargetTexture> RenderTargetTexture::clone() const
     _renderTargetOptions.generateStencilBuffer);
 
   // Base texture
-  newTexture->hasAlpha = hasAlpha;
-  newTexture->level    = level;
+  newTexture->setHasAlpha(hasAlpha());
+  newTexture->level = level;
 
   // RenderTarget Texture
   newTexture->coordinatesMode = coordinatesMode;

@@ -4,16 +4,15 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/igl_rendering_context.h>
+#include <babylon/materials/material.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
 
 BaseTexture::BaseTexture(Scene* scene)
-    : hasAlpha{false}
-    , getAlphaFromRGB{false}
+    : getAlphaFromRGB{false}
     , level{1.f}
     , coordinatesIndex{0}
-    , coordinatesMode{Texture::EXPLICIT_MODE}
     , wrapU{Texture::WRAP_ADDRESSMODE}
     , wrapV{Texture::WRAP_ADDRESSMODE}
     , anisotropicFilteringLevel{4}
@@ -22,6 +21,8 @@ BaseTexture::BaseTexture(Scene* scene)
     , delayLoadState{Engine::DELAYLOADSTATE_NONE}
     , _cachedAnisotropicFilteringLevel{0}
     , _texture{nullptr}
+    , _hasAlpha{false}
+    , _coordinatesMode{Texture::EXPLICIT_MODE}
     , _scene{scene}
     , _onDisposeObserver{nullptr}
 {
@@ -39,6 +40,34 @@ IReflect::Type BaseTexture::type() const
 void BaseTexture::addToScene(std::unique_ptr<BaseTexture>&& newTexture)
 {
   _scene->textures.emplace_back(std::move(newTexture));
+}
+
+bool BaseTexture::hasAlpha() const
+{
+  return _hasAlpha;
+}
+
+void BaseTexture::setHasAlpha(bool value)
+{
+  if (_hasAlpha == value) {
+    return;
+  }
+  _hasAlpha = value;
+  _scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+}
+
+unsigned int BaseTexture::coordinatesMode() const
+{
+  return _coordinatesMode;
+}
+
+void BaseTexture::setCoordinatesMode(unsigned int value)
+{
+  if (_coordinatesMode == value) {
+    return;
+  }
+  _coordinatesMode = value;
+  _scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag);
 }
 
 std::string BaseTexture::uid()

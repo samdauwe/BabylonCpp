@@ -210,7 +210,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
     auto engine_ = scene_->getEngine();
 
     // Culling
-    engine_->setState(subMesh->getMaterial()->backFaceCulling);
+    engine_->setState(subMesh->getMaterial()->backFaceCulling());
 
     // Managing instances
     auto batch = _mesh->_getInstancesRenderList(subMesh->_id);

@@ -14,6 +14,7 @@
 namespace BABYLON {
 
 std::size_t Effect::_uniqueIdSeed = 0;
+std::unordered_map<unsigned int, GL::IGLBuffer*> Effect::_baseCache{};
 
 Effect::Effect(
   const std::string& baseName, const std::vector<std::string>& attributesNames,
@@ -273,10 +274,10 @@ void Effect::_loadFragmentShader(
   Tools::LoadFile(fragmentShaderUrl + ".fragment.fx", callback);
 }
 
-void Effect::_dumpShadersName()
+void Effect::_dumpShadersSource(const std::string& /*vertexCode*/,
+                                const std::string& /*fragmentCode*/,
+                                const std::string& /*defines*/)
 {
-  BABYLON_LOG_ERROR("Materials::Effect", "Vertex shader:", name);
-  BABYLON_LOG_ERROR("Materials::Effect", "Fragment shader:", name);
 }
 
 void Effect::_processShaderConversion(
@@ -437,6 +438,12 @@ void Effect::_prepareEffect(const std::string& vertexSourceCode,
     _program = engine->createShaderProgram(vertexSourceCode, fragmentSourceCode,
                                            iDefines);
 
+    if (engine->webGLVersion() > 1.f) {
+      for (auto& item : _uniformBuffersNames) {
+        bindUniformBlock(name, item.second);
+      }
+    }
+
     _uniforms   = engine->getUniforms(_program.get(), _uniformsNames);
     _attributes = engine->getAttributes(_program.get(), attributesNames);
 
@@ -464,7 +471,6 @@ void Effect::_prepareEffect(const std::string& vertexSourceCode,
     BABYLON_LOG_ERROR("Effect", "Unable to compile effect: ");
     BABYLON_LOGF_ERROR("Effect", "Defines: %s", defines.c_str());
     BABYLON_LOGF_ERROR("Effect", "Error: %s", _compilationError.c_str());
-    _dumpShadersName();
 
     if (!fallbacks && fallbacks->isMoreFallbacks()) {
       BABYLON_LOG_ERROR("Effect", "Trying next fallback.");
@@ -520,19 +526,16 @@ void Effect::setTextureFromPostProcess(const std::string& channel,
 
 bool Effect::_cacheMatrix(const std::string& uniformName, const Matrix& matrix)
 {
-  bool changed = false;
-  if (!std_util::contains(_valueCache, uniformName)) {
-    changed                  = true;
-    _valueCache[uniformName] = Float32Array(16);
+  auto flag = matrix.updateFlag;
+  if (std_util::contains(_valueCache, uniformName)
+      && !_valueCache[uniformName].empty()
+      && static_cast<int>(_valueCache[uniformName][0]) == flag) {
+    return false;
   }
 
-  Float32Array matrixElements(matrix.m.begin(), matrix.m.end());
-  if (_valueCache[uniformName] != matrixElements) {
-    changed                  = true;
-    _valueCache[uniformName] = matrixElements;
-  }
+  _valueCache[uniformName].emplace_back(static_cast<float>(flag));
 
-  return changed;
+  return true;
 }
 
 bool Effect::_cacheFloat2(const std::string& uniformName, float x, float y)
@@ -612,9 +615,25 @@ bool Effect::_cacheFloat4(const std::string& uniformName, float x, float y,
   return changed;
 }
 
-void Effect::bindUniformBuffer(GL::IGLBuffer* /*_buffer*/,
-                               const std::string& /*name*/)
+void Effect::bindUniformBuffer(GL::IGLBuffer* _buffer, const std::string& name)
 {
+  if (std_util::contains(_uniformBuffersNames, name)) {
+    if (std_util::contains(Effect::_baseCache, _uniformBuffersNames[name])
+        && Effect::_baseCache[_uniformBuffersNames[name]] == _buffer) {
+      return;
+    }
+  }
+  else {
+    _uniformBuffersNames[name] = 0;
+  }
+
+  Effect::_baseCache[_uniformBuffersNames[name]] = _buffer;
+  _engine->bindUniformBufferBase(_buffer, _uniformBuffersNames[name]);
+}
+
+void Effect::bindUniformBlock(const std::string& blockName, unsigned index)
+{
+  _engine->bindUniformBlock(_program.get(), blockName, index);
 }
 
 Effect& Effect::setIntArray(const std::string& uniformName,

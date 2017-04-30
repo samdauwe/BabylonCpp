@@ -18,9 +18,9 @@ ColorGradingTexture::ColorGradingTexture(const std::string& iUrl, Scene* scene)
     return;
   }
 
-  name                      = iUrl;
-  url                       = iUrl;
-  hasAlpha                  = false;
+  name = iUrl;
+  url  = iUrl;
+  setHasAlpha(false);
   isCube                    = false;
   wrapU                     = Texture::CLAMP_ADDRESSMODE;
   wrapV                     = Texture::CLAMP_ADDRESSMODE;

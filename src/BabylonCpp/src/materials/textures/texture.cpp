@@ -200,7 +200,7 @@ Matrix* Texture::getReflectionTextureMatrix()
       && std_util::almost_equal(vOffset, _cachedVOffset)
       && std_util::almost_equal(uScale, _cachedUScale)
       && std_util::almost_equal(vScale, _cachedVScale)
-      && (coordinatesMode == _cachedCoordinatesMode)) {
+      && (coordinatesMode() == _cachedCoordinatesMode)) {
     return _cachedTextureMatrix.get();
   }
 
@@ -209,9 +209,9 @@ Matrix* Texture::getReflectionTextureMatrix()
     _projectionModeMatrix = std_util::make_unique<Matrix>(Matrix::Zero());
   }
 
-  _cachedCoordinatesMode = coordinatesMode;
+  _cachedCoordinatesMode = coordinatesMode();
 
-  switch (coordinatesMode) {
+  switch (coordinatesMode()) {
     case Texture::PLANAR_MODE:
       Matrix::IdentityToRef(*_cachedTextureMatrix);
       _cachedTextureMatrix->m[0]  = uScale;
@@ -246,12 +246,12 @@ Texture* Texture::clone() const
                                  _samplingMode);
 
   // Base texture
-  newTexture->hasAlpha         = hasAlpha;
+  newTexture->setHasAlpha(hasAlpha());
   newTexture->level            = level;
   newTexture->wrapU            = wrapU;
   newTexture->wrapV            = wrapV;
   newTexture->coordinatesIndex = coordinatesIndex;
-  newTexture->coordinatesMode  = coordinatesMode;
+  newTexture->setCoordinatesMode(coordinatesMode());
 
   // Texture
   newTexture->uOffset = uOffset;

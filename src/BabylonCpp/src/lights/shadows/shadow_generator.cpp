@@ -269,7 +269,7 @@ void ShadowGenerator::renderSubMesh(SubMesh* subMesh)
   auto engine = scene->getEngine();
 
   // Culling
-  engine->setState(subMesh->getMaterial()->backFaceCulling);
+  engine->setState(subMesh->getMaterial()->backFaceCulling());
 
   // Managing instances
   auto batch = mesh->_getInstancesRenderList(subMesh->_id);

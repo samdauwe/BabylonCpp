@@ -291,48 +291,48 @@ StandardMaterial* SerializationHelper::Parse(StandardMaterial* standardMaterial,
   }
   // useAlphaFromDiffuseTexture
   if (parsedMaterial.contains("useAlphaFromDiffuseTexture")) {
-    standardMaterial->useAlphaFromDiffuseTexture
-      = Json::GetBool(parsedMaterial, "useAlphaFromDiffuseTexture");
+    standardMaterial->setUseAlphaFromDiffuseTexture(
+      Json::GetBool(parsedMaterial, "useAlphaFromDiffuseTexture"));
   }
   // useEmissiveAsIllumination
   if (parsedMaterial.contains("useEmissiveAsIllumination")) {
-    standardMaterial->useEmissiveAsIllumination
-      = Json::GetBool(parsedMaterial, "useEmissiveAsIllumination");
+    standardMaterial->setUseEmissiveAsIllumination(
+      Json::GetBool(parsedMaterial, "useEmissiveAsIllumination"));
   }
   // linkEmissiveWithDiffuse
   if (parsedMaterial.contains("linkEmissiveWithDiffuse")) {
-    standardMaterial->linkEmissiveWithDiffuse
-      = Json::GetBool(parsedMaterial, "linkEmissiveWithDiffuse");
+    standardMaterial->setLinkEmissiveWithDiffuse(
+      Json::GetBool(parsedMaterial, "linkEmissiveWithDiffuse"));
   }
   // useReflectionFresnelFromSpecular
   if (parsedMaterial.contains("useReflectionFresnelFromSpecular")) {
-    standardMaterial->useReflectionFresnelFromSpecular
-      = Json::GetBool(parsedMaterial, "useReflectionFresnelFromSpecular");
+    standardMaterial->setUseReflectionFresnelFromSpecular(
+      Json::GetBool(parsedMaterial, "useReflectionFresnelFromSpecular"));
   }
   // useSpecularOverAlpha
   if (parsedMaterial.contains("useSpecularOverAlpha")) {
-    standardMaterial->useSpecularOverAlpha
-      = Json::GetBool(parsedMaterial, "useSpecularOverAlpha");
+    standardMaterial->setUseSpecularOverAlpha(
+      Json::GetBool(parsedMaterial, "useSpecularOverAlpha"));
   }
   // useReflectionOverAlpha
   if (parsedMaterial.contains("useReflectionOverAlpha")) {
-    standardMaterial->useReflectionOverAlpha
-      = Json::GetBool(parsedMaterial, "useReflectionOverAlpha");
+    standardMaterial->setUseReflectionOverAlpha(
+      Json::GetBool(parsedMaterial, "useReflectionOverAlpha"));
   }
   // disableLighting
   if (parsedMaterial.contains("disableLighting")) {
-    standardMaterial->disableLighting
-      = Json::GetBool(parsedMaterial, "disableLighting");
+    standardMaterial->setDisableLighting(
+      Json::GetBool(parsedMaterial, "disableLighting"));
   }
   // useParallax
   if (parsedMaterial.contains("useParallax")) {
-    standardMaterial->useParallax
-      = Json::GetBool(parsedMaterial, "useParallax");
+    standardMaterial->setUseParallax(
+      Json::GetBool(parsedMaterial, "useParallax"));
   }
   // useParallaxOcclusion
   if (parsedMaterial.contains("useParallaxOcclusion")) {
-    standardMaterial->useParallaxOcclusion
-      = Json::GetBool(parsedMaterial, "useParallaxOcclusion");
+    standardMaterial->setUseParallaxOcclusion(
+      Json::GetBool(parsedMaterial, "useParallaxOcclusion"));
   }
   // parallaxScaleBias
   if (parsedMaterial.contains("parallaxScaleBias")) {
@@ -341,8 +341,8 @@ StandardMaterial* SerializationHelper::Parse(StandardMaterial* standardMaterial,
   }
   // roughness
   if (parsedMaterial.contains("roughness")) {
-    standardMaterial->roughness
-      = Json::GetNumber<float>(parsedMaterial, "roughness", 0.f);
+    standardMaterial->setRoughness(
+      Json::GetNumber<float>(parsedMaterial, "roughness", 0.f));
   }
   // indexOfRefraction
   if (parsedMaterial.contains("indexOfRefraction")) {
@@ -356,28 +356,28 @@ StandardMaterial* SerializationHelper::Parse(StandardMaterial* standardMaterial,
   }
   // useLightmapAsShadowmap
   if (parsedMaterial.contains("useLightmapAsShadowmap")) {
-    standardMaterial->useLightmapAsShadowmap
-      = Json::GetBool(parsedMaterial, "useLightmapAsShadowmap", true);
+    standardMaterial->setUseLightmapAsShadowmap(
+      Json::GetBool(parsedMaterial, "useLightmapAsShadowmap", true));
   }
   // useGlossinessFromSpecularMapAlpha
   if (parsedMaterial.contains("useGlossinessFromSpecularMapAlpha")) {
-    standardMaterial->useGlossinessFromSpecularMapAlpha
-      = Json::GetBool(parsedMaterial, "useGlossinessFromSpecularMapAlpha");
+    standardMaterial->setUseGlossinessFromSpecularMapAlpha(
+      Json::GetBool(parsedMaterial, "useGlossinessFromSpecularMapAlpha"));
   }
   // maxSimultaneousLights
   if (parsedMaterial.contains("maxSimultaneousLights")) {
-    standardMaterial->maxSimultaneousLights
-      = Json::GetNumber<unsigned>(parsedMaterial, "maxSimultaneousLights", 4);
+    standardMaterial->setMaxSimultaneousLights(
+      Json::GetNumber<unsigned>(parsedMaterial, "maxSimultaneousLights", 4));
   }
   // invertNormalMapX
   if (parsedMaterial.contains("invertNormalMapX")) {
-    standardMaterial->invertNormalMapX
-      = Json::GetBool(parsedMaterial, "invertNormalMapX");
+    standardMaterial->setInvertNormalMapX(
+      Json::GetBool(parsedMaterial, "invertNormalMapX"));
   }
   // invertNormalMapY
   if (parsedMaterial.contains("invertNormalMapY")) {
-    standardMaterial->invertNormalMapY
-      = Json::GetBool(parsedMaterial, "invertNormalMapY");
+    standardMaterial->setInvertNormalMapY(
+      Json::GetBool(parsedMaterial, "invertNormalMapY"));
   }
 
   return standardMaterial;

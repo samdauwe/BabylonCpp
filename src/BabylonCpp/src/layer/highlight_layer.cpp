@@ -241,7 +241,7 @@ void HighlightLayer::renderSubMesh(SubMesh* subMesh)
   auto engine = scene->getEngine();
 
   // Culling
-  engine->setState(subMesh->getMaterial()->backFaceCulling);
+  engine->setState(subMesh->getMaterial()->backFaceCulling());
 
   // Managing instances
   auto batch = mesh->_getInstancesRenderList(subMesh->_id);
@@ -266,7 +266,7 @@ void HighlightLayer::renderSubMesh(SubMesh* subMesh)
       && material) {
     auto standardMaterial = dynamic_cast<StandardMaterial*>(material);
     if (standardMaterial) {
-      emissiveTexture = standardMaterial->emissiveTexture;
+      emissiveTexture = standardMaterial->emissiveTexture();
     }
   }
 

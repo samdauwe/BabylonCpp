@@ -9,7 +9,14 @@ class BABYLON_SHARED_EXPORT EffectFallbacks {
 
 public:
   EffectFallbacks();
+  EffectFallbacks(const EffectFallbacks& other);
+  EffectFallbacks(EffectFallbacks&& other);
+  EffectFallbacks& operator=(const EffectFallbacks& other);
+  EffectFallbacks& operator=(EffectFallbacks&& other);
   ~EffectFallbacks();
+
+  bool operator==(const EffectFallbacks& other) const;
+  bool operator!=(const EffectFallbacks& other) const;
 
   void addFallback(unsigned int rank, const std::string& define);
   void addCPUSkinningFallback(unsigned int rank, AbstractMesh* mesh);

@@ -2,34 +2,30 @@
 #define BABYLON_MATERIALS_STANDARD_MATERIAL_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/materials/material.h>
-#include <babylon/materials/standard_material_defines.h>
+#include <babylon/materials/push_material.h>
 #include <babylon/math/color3.h>
-#include <babylon/math/matrix.h>
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT StandardMaterial : public Material {
+class BABYLON_SHARED_EXPORT StandardMaterial : public PushMaterial {
 
 public:
+  using SMD = StandardMaterialDefines;
+
+private:
   // Flags used to enable or disable a type of texture for all Standard
   // Materials
-  static bool DiffuseTextureEnabled;
-  static bool AmbientTextureEnabled;
-  static bool OpacityTextureEnabled;
-  static bool ReflectionTextureEnabled;
-  static bool EmissiveTextureEnabled;
-  static bool SpecularTextureEnabled;
-  static bool BumpTextureEnabled;
-  static bool FresnelEnabled;
-  static bool LightmapTextureEnabled;
-  static bool RefractionTextureEnabled;
-  static bool ColorGradingTextureEnabled;
-
-  static const Color3 _scaledDiffuse;
-  static const Color3 _scaledSpecular;
-
-  using SMD = StandardMaterialDefines;
+  static bool _DiffuseTextureEnabled;
+  static bool _AmbientTextureEnabled;
+  static bool _OpacityTextureEnabled;
+  static bool _ReflectionTextureEnabled;
+  static bool _EmissiveTextureEnabled;
+  static bool _SpecularTextureEnabled;
+  static bool _BumpTextureEnabled;
+  static bool _FresnelEnabled;
+  static bool _LightmapTextureEnabled;
+  static bool _RefractionTextureEnabled;
+  static bool _ColorGradingTextureEnabled;
 
 public:
   template <typename... Ts>
@@ -61,11 +57,14 @@ public:
   bool needAlphaTesting() override;
   BaseTexture* getAlphaTestTexture() override;
 
-  /** Overriden Methods **/
-  bool isReady(AbstractMesh* mesh, bool useInstances) override;
+  /**
+   * Child classes can use it to update shaders
+   */
+  bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+                         bool useInstances = false) override;
+  void buildUniformLayout();
   void unbind() override;
-  void bindOnlyWorldMatrix(Matrix& world) override;
-  void bind(Matrix* world, Mesh* mesh) override;
+  void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatable*> getAnimatables();
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
@@ -73,9 +72,64 @@ public:
                   bool cloneChildren = false) const override;
   Json::object serialize() const;
 
+  // Getters / Setters
+  BaseTexture* emissiveTexture() const;
+  bool useAlphaFromDiffuseTexture() const;
+  void setUseAlphaFromDiffuseTexture(bool value);
+  bool useEmissiveAsIllumination() const;
+  void setUseEmissiveAsIllumination(bool value);
+  bool linkEmissiveWithDiffuse() const;
+  void setLinkEmissiveWithDiffuse(bool value);
+  bool useReflectionFresnelFromSpecular() const;
+  void setUseReflectionFresnelFromSpecular(bool value);
+  bool useSpecularOverAlpha() const;
+  void setUseSpecularOverAlpha(bool value);
+  bool useReflectionOverAlpha() const;
+  void setUseReflectionOverAlpha(bool value);
+  bool disableLighting() const;
+  void setDisableLighting(bool value);
+  bool useParallax() const;
+  void setUseParallax(bool value);
+  bool useParallaxOcclusion() const;
+  void setUseParallaxOcclusion(bool value);
+  float roughness() const;
+  void setRoughness(float value);
+  bool useLightmapAsShadowmap() const;
+  void setUseLightmapAsShadowmap(bool value);
+  bool useGlossinessFromSpecularMapAlpha() const;
+  void setUseGlossinessFromSpecularMapAlpha(bool value);
+  unsigned int maxSimultaneousLights() const;
+  void setMaxSimultaneousLights(unsigned int value);
+  bool invertNormalMapX() const;
+  void setInvertNormalMapX(bool value);
+  bool invertNormalMapY() const;
+  void setInvertNormalMapY(bool value);
+
   // Statics
   static StandardMaterial* Parse(const Json::value& source, Scene* scene,
                                  const std::string& rootUrl);
+  static bool DiffuseTextureEnabled();
+  static void SetDiffuseTextureEnabled(bool value);
+  static bool AmbientTextureEnabled();
+  static void SetAmbientTextureEnabled(bool value);
+  static bool OpacityTextureEnabled();
+  static void SetOpacityTextureEnabled(bool value);
+  static bool ReflectionTextureEnabled();
+  static void SetReflectionTextureEnabled(bool value);
+  static bool EmissiveTextureEnabled();
+  static void SetEmissiveTextureEnabled(bool value);
+  static bool SpecularTextureEnabled();
+  static void SetSpecularTextureEnabled(bool value);
+  static bool BumpTextureEnabled();
+  static void SetBumpTextureEnabled(bool value);
+  static bool LightmapTextureEnabled();
+  static void SetLightmapTextureEnabled(bool value);
+  static bool RefractionTextureEnabled();
+  static void SetRefractionTextureEnabled(bool value);
+  static bool ColorGradingTextureEnabled();
+  static void SetColorGradingTextureEnabled(bool value);
+  static bool FresnelEnabled();
+  static void SetFresnelEnabled(bool value);
 
 protected:
   StandardMaterial(const std::string& name, Scene* scene);
@@ -86,64 +140,74 @@ protected:
   bool _checkCache(Scene* scene, AbstractMesh* mesh, bool useInstances = false);
 
 public:
-  BaseTexture* diffuseTexture;
-  BaseTexture* ambientTexture;
-  BaseTexture* opacityTexture;
-  RenderTargetTexture* reflectionTexture;
-  BaseTexture* emissiveTexture;
-  BaseTexture* specularTexture;
-  BaseTexture* bumpTexture;
-  BaseTexture* lightmapTexture;
-  RenderTargetTexture* refractionTexture;
   Color3 ambientColor;
   Color3 diffuseColor;
   Color3 specularColor;
   Color3 emissiveColor;
   float specularPower;
-  bool useAlphaFromDiffuseTexture;
-  bool useEmissiveAsIllumination;
-  bool linkEmissiveWithDiffuse;
-  bool useReflectionFresnelFromSpecular;
-  bool useSpecularOverAlpha;
-  bool useReflectionOverAlpha;
-  bool disableLighting;
-  bool useParallax;
-  bool useParallaxOcclusion;
   float parallaxScaleBias;
-  float roughness;
   float indexOfRefraction;
   bool invertRefractionY;
-  bool useLightmapAsShadowmap;
-  std::unique_ptr<FresnelParameters> diffuseFresnelParameters;
-  std::unique_ptr<FresnelParameters> opacityFresnelParameters;
-  std::unique_ptr<FresnelParameters> reflectionFresnelParameters;
-  std::unique_ptr<FresnelParameters> refractionFresnelParameters;
-  std::unique_ptr<FresnelParameters> emissiveFresnelParameters;
-  bool useGlossinessFromSpecularMapAlpha;
-  unsigned int maxSimultaneousLights;
+  std::function<std::string(const std::string& shaderName)>
+    customShaderNameResolve;
+
+protected:
+  std::vector<RenderTargetTexture*> _renderTargets;
+  Matrix _worldViewProjectionMatrix;
+  Color3 _globalAmbientColor;
+  bool _useLogarithmicDepth;
+
+private:
+  BaseTexture* _diffuseTexture;
+  BaseTexture* _ambientTexture;
+  BaseTexture* _opacityTexture;
+  RenderTargetTexture* _reflectionTexture;
+  BaseTexture* _emissiveTexture;
+  BaseTexture* _specularTexture;
+  BaseTexture* _bumpTexture;
+  BaseTexture* _lightmapTexture;
+  RenderTargetTexture* _refractionTexture;
+  bool _useAlphaFromDiffuseTexture;
+  bool _useEmissiveAsIllumination;
+  bool _linkEmissiveWithDiffuse;
+  bool _useReflectionFresnelFromSpecular;
+  bool _useSpecularOverAlpha;
+  bool _useReflectionOverAlpha;
+  bool _disableLighting;
+  bool _useParallax;
+  bool _useParallaxOcclusion;
+  float _roughness;
+  bool _useLightmapAsShadowmap;
+  std::unique_ptr<FresnelParameters> _diffuseFresnelParameters;
+  std::unique_ptr<FresnelParameters> _opacityFresnelParameters;
+  std::unique_ptr<FresnelParameters> _reflectionFresnelParameters;
+  std::unique_ptr<FresnelParameters> _refractionFresnelParameters;
+  std::unique_ptr<FresnelParameters> _emissiveFresnelParameters;
+  bool _useGlossinessFromSpecularMapAlpha;
+  unsigned int _maxSimultaneousLights;
 
   /**
    * If sets to true, x component of normal map value will invert (x = 1.0 - x).
    */
-  bool invertNormalMapX;
+  bool _invertNormalMapX;
 
   /**
    * If sets to true, y component of normal map value will invert (y = 1.0 - y).
    */
-  bool invertNormalMapY;
+  bool _invertNormalMapY;
 
   /**
    * If sets to true and backfaceCulling is false, normals will be flipped on
    * the backside.
    */
-  bool twoSidedLighting;
+  bool _twoSidedLighting;
 
   /**
    * Color Grading 2D Lookup Texture.
    * This allows special effects like sepia, black and white to sixties
    * rendering style.
    */
-  BaseTexture* cameraColorGradingTexture;
+  BaseTexture* _cameraColorGradingTexture;
 
   /**
    * The color grading curves provide additional color adjustmnent that is
@@ -158,16 +222,7 @@ public:
    * corresponding to low luminance, medium luminance, and high luminance areas
    * respectively.
    */
-  ColorCurves* cameraColorCurves;
-
-protected:
-  std::vector<RenderTargetTexture*> _renderTargets;
-  Matrix _worldViewProjectionMatrix;
-  Color3 _globalAmbientColor;
-  int _renderId;
-  StandardMaterialDefines _defines;
-  std::unique_ptr<StandardMaterialDefines> _cachedDefines;
-  bool _useLogarithmicDepth;
+  ColorCurves* _cameraColorCurves;
 
 }; // end of class StandardMaterial
 

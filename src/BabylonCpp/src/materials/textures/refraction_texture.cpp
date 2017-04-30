@@ -29,8 +29,8 @@ std::unique_ptr<RefractionTexture> RefractionTexture::clone() const
     _generateMipMaps);
 
   // Base texture
-  newTexture->hasAlpha = hasAlpha;
-  newTexture->level    = level;
+  newTexture->setHasAlpha(hasAlpha());
+  newTexture->level = level;
 
   // Mirror Texture
   newTexture->refractionPlane = refractionPlane;

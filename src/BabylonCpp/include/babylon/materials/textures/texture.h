@@ -16,15 +16,16 @@ public:
   static constexpr unsigned int BILINEAR_SAMPLINGMODE  = 2;
   static constexpr unsigned int TRILINEAR_SAMPLINGMODE = 3;
 
-  static constexpr unsigned int EXPLICIT_MODE              = 0;
-  static constexpr unsigned int SPHERICAL_MODE             = 1;
-  static constexpr unsigned int PLANAR_MODE                = 2;
-  static constexpr unsigned int CUBIC_MODE                 = 3;
-  static constexpr unsigned int PROJECTION_MODE            = 4;
-  static constexpr unsigned int SKYBOX_MODE                = 5;
-  static constexpr unsigned int INVCUBIC_MODE              = 6;
-  static constexpr unsigned int EQUIRECTANGULAR_MODE       = 7;
-  static constexpr unsigned int FIXED_EQUIRECTANGULAR_MODE = 8;
+  static constexpr unsigned int EXPLICIT_MODE                       = 0;
+  static constexpr unsigned int SPHERICAL_MODE                      = 1;
+  static constexpr unsigned int PLANAR_MODE                         = 2;
+  static constexpr unsigned int CUBIC_MODE                          = 3;
+  static constexpr unsigned int PROJECTION_MODE                     = 4;
+  static constexpr unsigned int SKYBOX_MODE                         = 5;
+  static constexpr unsigned int INVCUBIC_MODE                       = 6;
+  static constexpr unsigned int EQUIRECTANGULAR_MODE                = 7;
+  static constexpr unsigned int FIXED_EQUIRECTANGULAR_MODE          = 8;
+  static constexpr unsigned int FIXED_EQUIRECTANGULAR_MIRRORED_MODE = 9;
 
   static constexpr unsigned int CLAMP_ADDRESSMODE  = 0;
   static constexpr unsigned int WRAP_ADDRESSMODE   = 1;

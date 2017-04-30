@@ -30,8 +30,8 @@ CubeTexture::CubeTexture(const std::string& rootUrl, Scene* scene,
     , _textureMatrix{std_util::make_unique<Matrix>(Matrix::Identity())}
     , _format{format}
 {
-  name     = rootUrl;
-  hasAlpha = false;
+  name = rootUrl;
+  setHasAlpha(false);
 
   if (rootUrl.empty() && iFiles.empty()) {
     return;
@@ -100,9 +100,8 @@ Matrix* CubeTexture::getReflectionTextureMatrix()
   return _textureMatrix.get();
 }
 
-CubeTexture*
-CubeTexture::Parse(const Json::value& parsedTexture, Scene* scene,
-                   const std::string& /*rootUrl*/)
+CubeTexture* CubeTexture::Parse(const Json::value& parsedTexture, Scene* scene,
+                                const std::string& /*rootUrl*/)
 {
 #if 0
   auto cubeTexture

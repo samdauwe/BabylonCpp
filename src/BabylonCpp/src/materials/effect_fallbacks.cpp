@@ -12,8 +12,64 @@ EffectFallbacks::EffectFallbacks() : _currentRank{32}, _maxRank{0}
 {
 }
 
+EffectFallbacks::EffectFallbacks(const EffectFallbacks& other)
+    : _defines{other._defines}
+    , _currentRank{other._currentRank}
+    , _maxRank{other._maxRank}
+    , _mesh{other._mesh}
+    , _meshRank{other._meshRank}
+{
+}
+
+EffectFallbacks::EffectFallbacks(EffectFallbacks&& other)
+    : _defines{std::move(other._defines)}
+    , _currentRank{std::move(other._currentRank)}
+    , _maxRank{std::move(other._maxRank)}
+    , _mesh{std::move(other._mesh)}
+    , _meshRank{std::move(other._meshRank)}
+{
+}
+
+EffectFallbacks& EffectFallbacks::operator=(const EffectFallbacks& other)
+{
+  if (&other != this) {
+    _defines     = other._defines;
+    _currentRank = other._currentRank;
+    _maxRank     = other._maxRank;
+    _mesh        = other._mesh;
+    _meshRank    = other._meshRank;
+  }
+
+  return *this;
+}
+
+EffectFallbacks& EffectFallbacks::operator=(EffectFallbacks&& other)
+{
+  if (&other != this) {
+    _defines     = std::move(other._defines);
+    _currentRank = std::move(other._currentRank);
+    _maxRank     = std::move(other._maxRank);
+    _mesh        = std::move(other._mesh);
+    _meshRank    = std::move(other._meshRank);
+  }
+
+  return *this;
+}
+
 EffectFallbacks::~EffectFallbacks()
 {
+}
+
+bool EffectFallbacks::operator==(const EffectFallbacks& other) const
+{
+  return (_defines == other._defines) && (_currentRank == other._currentRank)
+         && (_maxRank == other._maxRank) && (_mesh == other._mesh)
+         && (_meshRank == other._meshRank);
+}
+
+bool EffectFallbacks::operator!=(const EffectFallbacks& other) const
+{
+  return !(operator==(other));
 }
 
 void EffectFallbacks::addFallback(unsigned int rank, const std::string& define)

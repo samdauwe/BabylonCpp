@@ -8,26 +8,46 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT MaterialHelper {
 
 public:
+  static void PrepareDefinesForMisc(AbstractMesh* mesh, Scene* scene,
+                                    bool useLogarithmicDepth, bool pointsCloud,
+                                    bool fogEnabled, MaterialDefines& defines,
+                                    unsigned int LOGARITHMICDEPTH,
+                                    unsigned int POINTSIZE, unsigned int FOG);
+  static void PrepareDefinesForFrameBoundValues(
+    Scene* scene, Engine* engine, MaterialDefines& defines, bool useInstances,
+    unsigned int CLIPPLANE, unsigned int ALPHATEST, unsigned int INSTANCES);
+  static void PrepareDefinesForAttributes(
+    AbstractMesh* mesh, MaterialDefines& defines, bool useVertexColor,
+    bool useBones, bool useMorphTargets, unsigned int NORMAL, unsigned int UV1,
+    unsigned int UV2, unsigned int VERTEXCOLOR, unsigned int VERTEXALPHA,
+    unsigned int MORPHTARGETS_NORMAL, unsigned int MORPHTARGETS);
   static bool PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
                                       MaterialDefines& defines,
-                                      unsigned int maxSimultaneousLights = 4,
-                                      int SPECULARTERM = -1, int SHADOWS = -1,
-                                      int SHADOWFULLFLOAT = -1);
+                                      bool specularSupported,
+                                      unsigned int maxSimultaneousLights,
+                                      bool disableLighting,
+                                      unsigned int SPECULARTERM,
+                                      unsigned int SHADOWFULLFLOAT);
   static void
   PrepareUniformsAndSamplersList(std::vector<std::string>& uniformsList,
                                  std::vector<std::string>& samplersList,
                                  MaterialDefines& defines,
                                  unsigned int maxSimultaneousLights = 4);
+  static void PrepareUniformsAndSamplersList(EffectCreationOptions& options);
   static void HandleFallbacksForShadows(MaterialDefines& defines,
-                                        EffectFallbacks* fallbacks,
-                                        unsigned int maxSimultaneousLights = 4);
+                                        EffectFallbacks& fallbacks,
+                                        unsigned int maxSimultaneousLights);
+  static void
+  PrepareAttributesForMorphTargets(std::vector<std::string>& attribs,
+                                   AbstractMesh* mesh, MaterialDefines& defines,
+                                   unsigned int NORMAL);
   static void PrepareAttributesForBones(std::vector<std::string>& attribs,
                                         AbstractMesh* mesh,
-                                        std::size_t numBoneInfluencers,
-                                        EffectFallbacks* fallbacks);
+                                        MaterialDefines& defines,
+                                        EffectFallbacks& fallbacks);
   static void PrepareAttributesForInstances(std::vector<std::string>& attribs,
                                             MaterialDefines& defines,
-                                            int INSTANCES = -1);
+                                            unsigned int INSTANCES);
 
   // Bindings
   static bool BindLightShadow(Light* light, Scene* scene, AbstractMesh* mesh,
@@ -36,12 +56,16 @@ public:
   static void BindLightProperties(Light* light, Effect* effect,
                                   unsigned int lightIndex);
   static void BindLights(Scene* scene, AbstractMesh* mesh, Effect* effect,
-                         bool specularTerm,
-                         unsigned int maxSimultaneousLights = 4);
+                         MaterialDefines& defines,
+                         unsigned int maxSimultaneousLights,
+                         unsigned int SPECULARTERM);
   static void BindFogParameters(Scene* scene, AbstractMesh* mesh,
                                 Effect* effect);
   static void BindBonesParameters(AbstractMesh* mesh, Effect* effect);
-  static void BindLogDepth(bool logarithmicDepth, Effect* effect, Scene* scene);
+  static void BindMorphTargetParameters(AbstractMesh* abstractMesh,
+                                        Effect* effect);
+  static void BindLogDepth(MaterialDefines& defines, Effect* effect,
+                           Scene* scene, unsigned int LOGARITHMICDEPTH);
   static void BindClipPlane(Effect* effect, Scene* scene);
 
 }; // end of class MaterialHelper

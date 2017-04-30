@@ -5,8 +5,11 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/multi_material.h>
 #include <babylon/materials/standard_material.h>
+#include <babylon/materials/uniform_buffer.h>
 #include <babylon/mesh/abstract_mesh.h>
+#include <babylon/mesh/geometry.h>
 #include <babylon/mesh/mesh.h>
+#include <babylon/mesh/sub_mesh.h>
 
 namespace BABYLON {
 
@@ -17,18 +20,20 @@ Material::Material(const std::string& iName, Scene* scene, bool /*doNotAdd*/)
     , checkReadyOnlyOnce{false}
     , state{""}
     , alpha{1.f}
-    , backFaceCulling{true}
     , doNotSerialize{false}
     , storeEffectOnSubMeshes{false}
     , alphaMode{Engine::ALPHA_COMBINE}
     , disableDepthWrite{false}
-    , fogEnabled{true}
     , pointSize{1.f}
     , zOffset{0.f}
     , _effect{nullptr}
     , _wasPreviouslyReady{false}
+    , _backFaceCulling{true}
+    , _uniformBuffer{std_util::make_unique<UniformBuffer>(scene->getEngine())}
     , _onDisposeObserver{nullptr}
     , _onBindObserver{nullptr}
+    , _fogEnabled{true}
+    , _useUBO{false}
     , _scene{scene}
     , _fillMode{Material::TriangleFillMode}
 {
@@ -38,9 +43,15 @@ Material::Material(const std::string& iName, Scene* scene, bool /*doNotAdd*/)
   else {
     sideOrientation = Material::CounterClockWiseSideOrientation;
   }
+
+  _useUBO = getScene()->getEngine()->webGLVersion() > 1.f;
 }
 
 Material::~Material()
+{
+}
+
+void Material::markAsDirty(unsigned int /*flag*/)
 {
 }
 
@@ -63,6 +74,34 @@ void Material::addMultiMaterialToScene(
   std::unique_ptr<MultiMaterial>&& newMultiMaterial)
 {
   _scene->multiMaterials.emplace_back(std::move(newMultiMaterial));
+}
+
+bool Material::backFaceCulling() const
+{
+  return _backFaceCulling;
+}
+
+void Material::setBackFaceCulling(bool value)
+{
+  if (_backFaceCulling == value) {
+    return;
+  }
+  _backFaceCulling = value;
+  markAsDirty(Material::TextureDirtyFlag);
+}
+
+bool Material::fogEnabled() const
+{
+  return _fogEnabled;
+}
+
+void Material::setFogEnabled(bool value)
+{
+  if (_fogEnabled == value) {
+    return;
+  }
+  _fogEnabled = value;
+  markAsDirty(Material::MiscDirtyFlag);
 }
 
 void Material::setAmbientColor(const Color3& /*color*/)
@@ -131,7 +170,12 @@ unsigned int Material::fillMode() const
 
 void Material::setFillMode(unsigned int value)
 {
+  if (_fillMode == value) {
+    return;
+  }
+
   _fillMode = value;
+  markAsDirty(Material::MiscDirtyFlag);
 }
 
 std::string Material::toString(bool fullDetails) const
@@ -214,20 +258,11 @@ void Material::_preBind(Effect* effect)
 
   engine->enableEffect(effect ? effect : _effect);
 
-  engine->setState(backFaceCulling, zOffset, false, reverse);
+  engine->setState(backFaceCulling(), zOffset, false, reverse);
 }
 
-void Material::bind(Matrix* /*world*/, Mesh* mesh)
+void Material::bind(Matrix* /*world*/, Mesh* /*mesh*/)
 {
-  _scene->_cachedMaterial = this;
-
-  onBindObservable.notifyObservers(mesh);
-
-  if (disableDepthWrite) {
-    auto engine            = _scene->getEngine();
-    _cachedDepthWriteState = engine->getDepthWrite();
-    engine->setDepthWrite(false);
-  }
 }
 
 void Material::bindForSubMesh(Matrix* /*world*/, Mesh* /*mesh*/,
@@ -237,6 +272,31 @@ void Material::bindForSubMesh(Matrix* /*world*/, Mesh* /*mesh*/,
 
 void Material::bindOnlyWorldMatrix(Matrix& /*world*/)
 {
+}
+
+void Material::bindSceneUniformBuffer(Effect* effect, UniformBuffer* sceneUbo)
+{
+  sceneUbo->bindToEffect(effect, "Scene");
+}
+
+void Material::bindView(Effect* effect)
+{
+  if (!_useUBO) {
+    effect->setMatrix("view", getScene()->getViewMatrix());
+  }
+  else {
+    bindSceneUniformBuffer(effect, getScene()->getSceneUniformBuffer());
+  }
+}
+
+void Material::bindViewProjection(Effect* effect)
+{
+  if (!_useUBO) {
+    effect->setMatrix("viewProjection", getScene()->getTransformMatrix());
+  }
+  else {
+    bindSceneUniformBuffer(effect, getScene()->getSceneUniformBuffer());
+  }
 }
 
 void Material::_afterBind(Mesh* mesh)
@@ -294,18 +354,42 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)
                    }),
     _scene->materials.end());
 
-  // Shader are kept in cache for further use but we can get rid of this by
-  // using forceDisposeEffect
-  if (forceDisposeEffect && _effect) {
-    _scene->getEngine()->_releaseEffect(_effect);
-    _effect = nullptr;
-  }
-
   // Remove from meshes
+  Mesh* _mesh = nullptr;
   for (auto& mesh : _scene->meshes) {
     if (mesh->material() == this) {
       mesh->setMaterial(nullptr);
+
+      _mesh = static_cast<Mesh*>(mesh.get());
+      if (_mesh && _mesh->geometry()) {
+        auto geometry = _mesh->geometry();
+        if (storeEffectOnSubMeshes) {
+          for (auto& subMesh : mesh->subMeshes) {
+            geometry->_releaseVertexArrayObject(subMesh->_materialEffect);
+          }
+        }
+        else {
+          geometry->_releaseVertexArrayObject(_effect);
+        }
+      }
     }
+  }
+
+  _uniformBuffer->dispose();
+
+  // Shader are kept in cache for further use but we can get rid of this by
+  // using forceDisposeEffect
+  if (forceDisposeEffect && _effect && _mesh) {
+    if (storeEffectOnSubMeshes) {
+      for (auto& subMesh : _mesh->subMeshes) {
+        _scene->getEngine()->_releaseEffect(subMesh->_materialEffect);
+      }
+    }
+    else {
+      _scene->getEngine()->_releaseEffect(_effect);
+    }
+
+    _effect = nullptr;
   }
 
   // Callback
@@ -322,9 +406,9 @@ void Material::copyTo(Material* other) const
   other->checkReadyOnEveryCall = checkReadyOnEveryCall;
   other->alpha                 = alpha;
   other->setFillMode(fillMode());
-  other->backFaceCulling = backFaceCulling;
+  other->setBackFaceCulling(backFaceCulling());
   other->setWireframe(wireframe());
-  other->fogEnabled        = fogEnabled;
+  other->setFogEnabled(fogEnabled());
   other->zOffset           = zOffset;
   other->alphaMode         = alphaMode;
   other->sideOrientation   = sideOrientation;

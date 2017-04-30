@@ -424,11 +424,11 @@ std::unique_ptr<ProceduralTexture> ProceduralTexture::clone() const
     _generateMipMaps);
 
   // Base texture
-  newTexture->hasAlpha = hasAlpha;
-  newTexture->level    = level;
+  newTexture->setHasAlpha(hasAlpha());
+  newTexture->level = level;
 
   // RenderTarget Texture
-  newTexture->coordinatesMode = coordinatesMode;
+  newTexture->setCoordinatesMode(coordinatesMode());
 
   return newTexture;
 }

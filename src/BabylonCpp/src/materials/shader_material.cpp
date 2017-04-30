@@ -5,6 +5,7 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/textures/texture.h>
@@ -252,9 +253,17 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   auto previousEffect = _effect;
   auto join           = String::join(defines, '\n');
 
-  _effect = engine->createEffect(_shaderPath, _options.attributes,
-                                 _options.uniforms, _options.samplers, join,
-                                 fallbacks.get(), onCompiled, onError);
+  EffectCreationOptions options;
+  options.attributes          = _options.attributes;
+  options.uniformsNames       = _options.uniforms;
+  options.uniformBuffersNames = _options.uniformBuffers;
+  options.samplers            = _options.samplers;
+  options.defines             = std::move(join);
+  options.fallbacks           = std::move(fallbacks);
+  options.onCompiled          = onCompiled;
+  options.onError             = onError;
+
+  _effect = engine->createEffect(_shaderPath, options, engine);
 
   if (!_effect->isReady()) {
     return false;

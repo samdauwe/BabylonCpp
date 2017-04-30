@@ -190,6 +190,8 @@ enum GLEnums : GLenum {
   UNSIGNED_SHORT_4_4_4_4 = 0x8033,
   UNSIGNED_SHORT_5_5_5_1 = 0x8034,
   UNSIGNED_SHORT_5_6_5   = 0x8363,
+  /* Uniform Buffers*/
+  UNIFORM_BUFFER = 0x8A11,
   /* Shaders */
   FRAGMENT_SHADER                  = 0x8B30,
   VERTEX_SHADER                    = 0x8B31,
@@ -545,6 +547,8 @@ public:
     = 0;
   virtual void bindBuffer(GLenum target, IGLBuffer* buffer)                = 0;
   virtual void bindFramebuffer(GLenum target, IGLFramebuffer* framebuffer) = 0;
+  virtual void bindBufferBase(GLenum target, GLuint index, IGLBuffer* buffer)
+    = 0;
   virtual void
   bindRenderbuffer(GLenum target,
                    const std::unique_ptr<IGLRenderbuffer>& renderbuffer)
@@ -684,6 +688,9 @@ public:
   virtual std::string getShaderInfoLog(const std::unique_ptr<IGLShader>& shader)
     = 0;
   virtual std::string getShaderSource(IGLShader* shader) = 0;
+  virtual GLuint getUniformBlockIndex(IGLProgram* program,
+                                      const std::string& uniformBlockName)
+    = 0;
   virtual std::unique_ptr<IGLUniformLocation>
   getUniformLocation(IGLProgram* program, const std::string& name) = 0;
   virtual void hint(GLenum target, GLenum mode)                    = 0;
@@ -774,6 +781,10 @@ public:
                          GLint z, GLint w)
     = 0;
   virtual void uniform4iv(IGLUniformLocation* location, const Int32Array& v)
+    = 0;
+  virtual void uniformBlockBinding(IGLProgram* program,
+                                   GLuint uniformBlockIndex,
+                                   GLuint uniformBlockBinding)
     = 0;
   virtual void uniformMatrix2fv(IGLUniformLocation* location,
                                 GLboolean transpose, const Float32Array& value)

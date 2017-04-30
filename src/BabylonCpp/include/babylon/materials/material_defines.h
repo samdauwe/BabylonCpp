@@ -27,7 +27,7 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   void markAsTexturesDirty() override;
   void markAsFresnelDirty() override;
   void markAsMiscDirty() override;
-  void rebuild() override;
+  virtual void rebuild() override;
   virtual bool isEqual(const MaterialDefines& other) const override;
   virtual void cloneTo(MaterialDefines& other) override;
   virtual void reset() override;
@@ -37,8 +37,9 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   std::vector<bool> defines;
   std::vector<std::string> _keys;
 
-  std::size_t NUM_BONE_INFLUENCERS;
-  std::size_t BonesPerMesh;
+  unsigned int NUM_BONE_INFLUENCERS;
+  unsigned int BonesPerMesh;
+  unsigned int NUM_MORPH_INFLUENCERS;
 
   std::vector<bool> lights;
   std::vector<bool> pointlights;
@@ -49,6 +50,8 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   std::vector<bool> shadowesms;
   std::vector<bool> shadowpcfs;
 
+  bool TANGENT;
+  bool SHADOWS;
   bool LIGHTMAPEXCLUDED;
   std::vector<bool> lightmapexcluded;
   std::vector<bool> lightmapnospecular;

@@ -126,8 +126,8 @@ std::unique_ptr<DynamicTexture> DynamicTexture::clone() const
     name, options, getScene(), _generateMipMaps);
 
   // Base texture
-  newTexture->hasAlpha = hasAlpha;
-  newTexture->level    = level;
+  newTexture->setHasAlpha(hasAlpha());
+  newTexture->level = level;
 
   // Dynamic Texture
   newTexture->wrapU = wrapU;

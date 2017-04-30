@@ -7,6 +7,7 @@
 #include <babylon/engine/scene.h>
 #include <babylon/materials/multi_material.h>
 #include <babylon/materials/standard_material.h>
+#include <babylon/materials/standard_material_defines.h>
 #include <babylon/math/plane.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/geometry.h>
