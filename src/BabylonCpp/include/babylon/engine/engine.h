@@ -299,30 +299,8 @@ public:
   void _releaseEffect(Effect* effect);
   Effect* createEffect(const std::string& baseName,
                        EffectCreationOptions& options, Engine* engine);
-  Effect* createEffect(
-    std::unordered_map<std::string, std::string>& baseName,
-    const std::vector<std::string>& attributesNames,
-    const std::vector<std::string>& uniformsNames,
-    const std::vector<std::string>& samplers, const std::string& defines,
-    EffectFallbacks* fallbacks                                  = nullptr,
-    const std::function<void(const Effect* effect)>& onCompiled = nullptr,
-    const std::function<void(const Effect* effect, const std::string& errors)>&
-      onError
-    = nullptr,
-    const std::unordered_map<std::string, unsigned int>& indexParameters
-    = std::unordered_map<std::string, unsigned int>());
-  Effect* createEffect(
-    const std::string& baseName,
-    const std::vector<std::string>& attributesNames,
-    const std::vector<std::string>& uniformsNames,
-    const std::vector<std::string>& samplers, const std::string& defines,
-    EffectFallbacks* fallbacks                                  = nullptr,
-    const std::function<void(const Effect* effect)>& onCompiled = nullptr,
-    const std::function<void(const Effect* effect, const std::string& errors)>&
-      onError
-    = nullptr,
-    const std::unordered_map<std::string, unsigned int>& indexParameters
-    = std::unordered_map<std::string, unsigned int>());
+  Effect* createEffect(std::unordered_map<std::string, std::string>& baseName,
+                       EffectCreationOptions& options, Engine* engine);
   Effect* createEffectForParticles(
     const std::string& fragmentName,
     const std::vector<std::string>& uniformsNames,
@@ -474,6 +452,7 @@ public:
   Uint8Array readPixels(int x, int y, int width, int height);
   void releaseInternalTexture(GL::IGLTexture* texture);
   void unbindAllAttributes();
+  void releaseEffects();
 
   /** Dispose **/
   void dispose(bool doNotRecurse = false) override;

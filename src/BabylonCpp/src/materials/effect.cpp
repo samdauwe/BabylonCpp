@@ -3,6 +3,7 @@
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
+#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/effect_includes_shaders_store.h>
 #include <babylon/materials/effect_shaders_store.h>
@@ -16,31 +17,27 @@ namespace BABYLON {
 std::size_t Effect::_uniqueIdSeed = 0;
 std::unordered_map<unsigned int, GL::IGLBuffer*> Effect::_baseCache{};
 
-Effect::Effect(
-  const std::string& baseName, const std::vector<std::string>& attributesNames,
-  const std::vector<std::string>& uniformsNames,
-  const std::vector<std::string>& samplers, Engine* engine,
-  const std::string& iDefines, EffectFallbacks* fallbacks,
-  const std::function<void(Effect* effect)>& iOnCompiled,
-  const std::function<void(Effect* effect, const std::string& errors)> _onError,
-  const std::unordered_map<std::string, unsigned int>& indexParameters)
+Effect::Effect(const std::string& baseName, EffectCreationOptions& options,
+               Engine* engine)
     : name{baseName}
-    , defines{iDefines}
-    , onCompiled{iOnCompiled}
-    , onError{_onError}
+    , defines{options.defines}
+    , onCompiled{options.onCompiled}
+    , onError{options.onError}
     , uniqueId{Effect::_uniqueIdSeed++}
     , _engine{engine}
-    , _uniformsNames{uniformsNames}
-    , _samplers{samplers}
+    , _uniformsNames{options.uniformsNames}
+    , _samplers{options.samplers}
     , _isReady{false}
     , _compilationError{""}
-    , _attributesNames{attributesNames}
-    , _indexParameters{indexParameters}
+    , _attributesNames{options.attributes}
+    , _indexParameters{options.indexParameters}
 {
-  std_util::concat(_uniformsNames, samplers);
+  std_util::concat(_uniformsNames, options.samplers);
 
   std::string vertexSource   = baseName;
   std::string fragmentSource = baseName;
+
+  auto fallbacks = options.fallbacks.get();
 
   _loadVertexShader(vertexSource, [this, &fragmentSource,
                                    &fallbacks](const std::string& vertexCode) {
@@ -60,27 +57,20 @@ Effect::Effect(
   });
 }
 
-Effect::Effect(
-  const std::unordered_map<std::string, std::string>& baseName,
-  const std::vector<std::string>& attributesNames,
-  const std::vector<std::string>& uniformsNames,
-  const std::vector<std::string>& samplers, Engine* engine,
-  const std::string& iDefines, EffectFallbacks* fallbacks,
-  const std::function<void(Effect* effect)>& iOnCompiled,
-  const std::function<void(Effect* effect, const std::string& errors)> _onError,
-  const std::unordered_map<std::string, unsigned int>& indexParameters)
-    : defines{iDefines}
-    , onCompiled{iOnCompiled}
-    , onError{_onError}
+Effect::Effect(const std::unordered_map<std::string, std::string>& baseName,
+               EffectCreationOptions& options, Engine* engine)
+    : defines{options.defines}
+    , onCompiled{options.onCompiled}
+    , onError{options.onError}
     , _engine{engine}
-    , _uniformsNames{uniformsNames}
-    , _samplers{samplers}
+    , _uniformsNames{options.uniformsNames}
+    , _samplers{options.samplers}
     , _isReady{false}
     , _compilationError{""}
-    , _attributesNames{attributesNames}
-    , _indexParameters{indexParameters}
+    , _attributesNames{options.attributes}
+    , _indexParameters{options.indexParameters}
 {
-  std_util::concat(_uniformsNames, samplers);
+  std_util::concat(_uniformsNames, options.samplers);
 
   std::string vertexSource   = "";
   std::string fragmentSource = "";
@@ -104,6 +94,8 @@ Effect::Effect(
   }
 
   name = fragmentSource;
+
+  auto fallbacks = options.fallbacks.get();
 
   _loadVertexShader(vertexSource, [this, &fragmentSource,
                                    &fallbacks](const std::string& vertexCode) {

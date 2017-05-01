@@ -6,6 +6,8 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/effect_creation_options.h>
+#include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/matrix.h>
@@ -87,18 +89,30 @@ SpriteManager::SpriteManager(const std::string& iName,
   _vertexBuffers[VertexBuffer::ColorKindChars]    = std::move(colors);
 
   // Effects
-  _effectBase = _scene->getEngine()->createEffect(
-    "sprites", {VertexBuffer::PositionKindChars, "options", "cellInfo",
-                VertexBuffer::ColorKindChars},
-    {"view", "projection", "textureInfos", "alphaTest"}, {"diffuseSampler"},
-    "");
 
-  _effectFog = _scene->getEngine()->createEffect(
-    "sprites", {VertexBuffer::PositionKindChars, "options", "cellInfo",
-                VertexBuffer::ColorKindChars},
-    {"view", "projection", "textureInfos", "alphaTest", "vFogInfos",
-     "vFogColor"},
-    {"diffuseSampler"}, "#define FOG");
+  {
+    EffectCreationOptions options;
+    options.attributes = {VertexBuffer::PositionKindChars, "options",
+                          "cellInfo", VertexBuffer::ColorKindChars};
+    options.uniformsNames = {"view", "projection", "textureInfos", "alphaTest"};
+    options.samplers      = {"diffuseSampler"};
+
+    _effectBase = _scene->getEngine()->createEffect("sprites", options,
+                                                    _scene->getEngine());
+  }
+
+  {
+    EffectCreationOptions options;
+    options.attributes = {VertexBuffer::PositionKindChars, "options",
+                          "cellInfo", VertexBuffer::ColorKindChars};
+    options.uniformsNames = {"view",      "projection", "textureInfos",
+                             "alphaTest", "vFogInfos",  "vFogColor"};
+    options.samplers = {"diffuseSampler"};
+    options.defines  = "#define FOG";
+
+    _effectFog = _scene->getEngine()->createEffect("sprites", options,
+                                                   _scene->getEngine());
+  }
 }
 
 SpriteManager::~SpriteManager()

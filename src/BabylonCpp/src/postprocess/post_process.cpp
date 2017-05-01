@@ -3,6 +3,8 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/effect_creation_options.h>
+#include <babylon/materials/effect_fallbacks.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -119,8 +121,13 @@ void PostProcess::updateEffect(const std::string& defines)
   std::unordered_map<std::string, std::string> baseName{
     {"vertex", "postprocess"}, {"fragment", _fragmentUrl}};
 
-  _effect = _engine->createEffect(baseName, {"position"}, _parameters,
-                                  _samplers, defines);
+  EffectCreationOptions options;
+  options.attributes    = {"position"};
+  options.uniformsNames = _parameters;
+  options.samplers      = _samplers;
+  options.defines       = defines;
+
+  _effect = _engine->createEffect(baseName, options, _scene->getEngine());
 }
 
 bool PostProcess::isReusable() const

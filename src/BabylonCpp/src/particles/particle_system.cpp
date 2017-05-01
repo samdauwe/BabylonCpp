@@ -5,6 +5,8 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/effect_creation_options.h>
+#include <babylon/materials/effect_fallbacks.h>
 #include <babylon/mesh/buffer.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
@@ -285,11 +287,16 @@ Effect* ParticleSystem::_getEffect()
   if (_cachedDefines != joined) {
     _cachedDefines = joined;
 
-    _effect = _scene->getEngine()->createEffect(
-      "particles", {VertexBuffer::PositionKindChars,
-                    VertexBuffer::ColorKindChars, "options"},
-      {"invView", "view", "projection", "vClipPlane", "textureMask"},
-      {"diffuseSampler"}, joined);
+    EffectCreationOptions options;
+    options.attributes = {VertexBuffer::PositionKindChars,
+                          VertexBuffer::ColorKindChars, "options"};
+    options.uniformsNames
+      = {"invView", "view", "projection", "vClipPlane", "textureMask"};
+    options.samplers = {"diffuseSampler"};
+    options.defines  = std::move(joined);
+
+    _effect = _scene->getEngine()->createEffect("particles", options,
+                                                _scene->getEngine());
   }
 
   return _effect;
@@ -297,8 +304,9 @@ Effect* ParticleSystem::_getEffect()
 
 void ParticleSystem::animate()
 {
-  if (!_started)
+  if (!_started) {
     return;
+  }
 
   auto effect = _getEffect();
 
@@ -421,7 +429,7 @@ size_t ParticleSystem::render()
     engine->setDepthWrite(true);
   }
 
-  engine->draw(true, 0, particles.size() * 6);
+  engine->draw(true, 0, static_cast<int>(particles.size() * 6));
   engine->setAlphaMode(Engine::ALPHA_DISABLE);
 
   return particles.size();

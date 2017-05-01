@@ -7,6 +7,8 @@
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/layer/glow_blur_post_process.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/effect_creation_options.h>
+#include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/pbr_material.h>
 #include <babylon/materials/standard_material.h>
@@ -78,9 +80,13 @@ HighlightLayer::HighlightLayer(const std::string& iName, Scene* scene,
   _indexBuffer = _engine->createIndexBuffer(indices);
 
   // Effect
-  _glowMapMergeEffect
-    = _engine->createEffect("glowMapMerge", {VertexBuffer::PositionKindChars},
-                            {"offset"}, {"textureSampler"}, "");
+  EffectCreationOptions effectCreationOptions;
+  effectCreationOptions.attributes    = {VertexBuffer::PositionKindChars};
+  effectCreationOptions.uniformsNames = {"offset"};
+  effectCreationOptions.samplers      = {"textureSampler"};
+
+  _glowMapMergeEffect = _engine->createEffect(
+    "glowMapMerge", effectCreationOptions, _scene->getEngine());
 
   // Render target
   setMainTextureSize();
@@ -407,12 +413,17 @@ bool HighlightLayer::isReady(SubMesh* subMesh, bool useInstances,
   // Get correct effect
   auto join = String::join(defines, '\n');
   if (_cachedDefines != join) {
-    _cachedDefines           = join;
+    _cachedDefines = join;
+
+    EffectCreationOptions options;
+    options.attributes    = attribs;
+    options.uniformsNames = {"world",         "mBones", "viewProjection",
+                             "diffuseMatrix", "color",  "emissiveMatrix"};
+    options.samplers = {"diffuseSampler", "emissiveSampler"};
+    options.defines  = join;
+
     _glowMapGenerationEffect = _scene->getEngine()->createEffect(
-      "glowMapGeneration", attribs,
-      {"world", "mBones", "viewProjection", "diffuseMatrix", "color",
-       "emissiveMatrix"},
-      {"diffuseSampler", "emissiveSampler"}, join);
+      "glowMapGeneration", options, _scene->getEngine());
   }
 
   return _glowMapGenerationEffect->isReady();

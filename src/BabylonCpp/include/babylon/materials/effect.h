@@ -8,26 +8,10 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT Effect {
 
 public:
-  Effect(const std::string& baseName,
-         const std::vector<std::string>& attributesNames,
-         const std::vector<std::string>& uniformsNames,
-         const std::vector<std::string>& samplers, Engine* engine,
-         const std::string& defines, EffectFallbacks* fallbacks,
-         const std::function<void(Effect* effect)>& onCompiled,
-         const std::function<void(Effect* effect, const std::string& errors)>
-           onError,
-         const std::unordered_map<std::string, unsigned int>& indexParameters
-         = std::unordered_map<std::string, unsigned int>());
+  Effect(const std::string& baseName, EffectCreationOptions& options,
+         Engine* engine);
   Effect(const std::unordered_map<std::string, std::string>& baseName,
-         const std::vector<std::string>& attributesNames,
-         const std::vector<std::string>& uniformsNames,
-         const std::vector<std::string>& samplers, Engine* engine,
-         const std::string& defines, EffectFallbacks* fallbacks,
-         const std::function<void(Effect* effect)>& onCompiled,
-         const std::function<void(Effect* effect, const std::string& errors)>
-           onError,
-         const std::unordered_map<std::string, unsigned int>& indexParameters
-         = std::unordered_map<std::string, unsigned int>());
+         EffectCreationOptions& options, Engine* engine);
   ~Effect();
 
   /** Properties **/

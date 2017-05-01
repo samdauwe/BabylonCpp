@@ -3,6 +3,8 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/effect_creation_options.h>
+#include <babylon/materials/effect_fallbacks.h>
 #include <babylon/mesh/vertex_buffer.h>
 
 namespace BABYLON {
@@ -142,19 +144,23 @@ bool ProceduralTexture::isReady()
     return false;
   }
 
-  _effect = engine->createEffect(
-    shaders, {VertexBuffer::PositionKindChars}, _uniforms, _samplers, "",
-    nullptr, nullptr,
-    [this](const Effect* /*effect*/, const std::string& /*errors*/) {
-      releaseInternalTexture();
+  EffectCreationOptions options;
+  options.attributes    = {VertexBuffer::PositionKindChars};
+  options.uniformsNames = _uniforms;
+  options.samplers      = _samplers;
+  options.onError
+    = [this](const Effect* /*effect*/, const std::string& /*errors*/) {
+        releaseInternalTexture();
 
-      if (_fallbackTexture) {
-        _texture = _fallbackTexture->_texture;
-        ++_texture->references;
-      }
+        if (_fallbackTexture) {
+          _texture = _fallbackTexture->_texture;
+          ++_texture->references;
+        }
 
-      _fallbackTextureUsed = true;
-    });
+        _fallbackTextureUsed = true;
+      };
+
+  _effect = engine->createEffect(shaders, options, getScene()->getEngine());
 
   return _effect->isReady();
 }

@@ -10,6 +10,8 @@
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/interfaces/iloading_screen.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/effect_creation_options.h>
+#include <babylon/materials/effect_fallbacks.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/color4.h>
 #include <babylon/mesh/vertex_buffer.h>
@@ -507,16 +509,12 @@ void Engine::renderFunction(const std::function<void()>& renderFunction)
   }
 
   if (shouldRender) {
-    // Backup GL state
-    // backupGLState();
     // Start new frame
     beginFrame();
     // Render
     renderFunction();
     // Present
     endFrame();
-    // Restore GL state
-    // restoreGLState();
   }
 }
 
@@ -775,21 +773,54 @@ void Engine::restoreDefaultFramebuffer()
 
 // UBOs
 std::unique_ptr<GL::IGLBuffer>
-Engine::createUniformBuffer(const Float32Array& /*elements*/)
+Engine::createUniformBuffer(const Float32Array& elements)
 {
-  return nullptr;
+  auto ubo = _gl->createBuffer();
+  bindUniformBuffer(ubo.get());
+
+  _gl->bufferData(GL::UNIFORM_BUFFER, elements, GL::STATIC_DRAW);
+
+  bindUniformBuffer(nullptr);
+
+  ubo->references = 1;
+  return ubo;
 }
 
 std::unique_ptr<GL::IGLBuffer>
-Engine::createDynamicUniformBuffer(const Float32Array& /*elements*/)
+Engine::createDynamicUniformBuffer(const Float32Array& elements)
 {
-  return nullptr;
+  auto ubo = _gl->createBuffer();
+  bindUniformBuffer(ubo.get());
+
+  _gl->bufferData(GL::UNIFORM_BUFFER, elements, GL::DYNAMIC_DRAW);
+
+  bindUniformBuffer(nullptr);
+
+  ubo->references = 1;
+  return ubo;
 }
 
-void Engine::updateUniformBuffer(GL::IGLBuffer* /*uniformBuffer*/,
-                                 const Float32Array& /*elements*/,
-                                 int /*offset*/, int /*count*/)
+void Engine::updateUniformBuffer(GL::IGLBuffer* uniformBuffer,
+                                 const Float32Array& elements, int offset,
+                                 int count)
 {
+  bindUniformBuffer(uniformBuffer);
+
+  if (offset == -1) {
+    offset = 0;
+  }
+
+  if (count == -1) {
+    _gl->bufferSubData(GL::UNIFORM_BUFFER, offset, elements);
+  }
+  else {
+    Float32Array subvector;
+    std::copy(elements.begin() + offset, elements.begin() + offset + count,
+              std::back_inserter(subvector));
+    _gl->bufferSubData(GL::UNIFORM_BUFFER, 0, subvector);
+  }
+
+  bindUniformBuffer(nullptr);
 }
 
 // VBOs
@@ -826,14 +857,16 @@ void Engine::updateDynamicVertexBuffer(const Engine::GLBufferPtr& vertexBuffer,
 {
   bindArrayBuffer(vertexBuffer.get());
 
-  int _offset = (offset < 0) ? 0 : offset;
+  if (offset == -1) {
+    offset = 0;
+  }
 
   if (count == -1) {
     _gl->bufferSubData(GL::ARRAY_BUFFER, offset, vertices);
   }
   else {
     Float32Array subvector;
-    std::copy(vertices.begin() + _offset, vertices.begin() + _offset + count,
+    std::copy(vertices.begin() + offset, vertices.begin() + offset + count,
               std::back_inserter(subvector));
     _gl->bufferSubData(GL::ARRAY_BUFFER, 0, subvector);
   }
@@ -1075,7 +1108,7 @@ void Engine::bindBuffersDirectly(GL::IGLBuffer* vertexBuffer,
     _cachedVertexBuffers          = vertexBuffer;
     _cachedEffectForVertexBuffers = effect;
 
-    size_t attributesCount = effect->getAttributesCount();
+    auto attributesCount = effect->getAttributesCount();
 
     _unBindVertexArrayObject();
     unbindAllAttributes();
@@ -1083,19 +1116,18 @@ void Engine::bindBuffersDirectly(GL::IGLBuffer* vertexBuffer,
     int offset = 0;
     for (unsigned int index = 0; index < attributesCount; ++index) {
       if (index < vertexDeclaration.size()) {
-        int vertexDeclarationi = static_cast<int>(vertexDeclaration[index]);
-        int order              = effect->getAttributeLocation(index);
+        auto vertexDeclarationi = static_cast<int>(vertexDeclaration[index]);
+        auto order              = effect->getAttributeLocation(index);
 
         if (order >= 0) {
-          unsigned int _order = static_cast<unsigned int>(order);
+          auto _order = static_cast<unsigned int>(order);
           if (_order + 1 > _vertexAttribArraysEnabled.size()) {
             _gl->enableVertexAttribArray(_order);
             _vertexAttribArraysEnabled.resize(_order + 1);
             _vertexAttribArraysEnabled[_order] = true;
           }
 
-          _gl->vertexAttribPointer(static_cast<unsigned int>(order),
-                                   vertexDeclarationi, GL::FLOAT, false,
+          _gl->vertexAttribPointer(_order, vertexDeclarationi, GL::FLOAT, false,
                                    vertexStrideSize, offset);
         }
         offset += vertexDeclarationi * 4;
@@ -1301,33 +1333,34 @@ void Engine::drawUnIndexed(bool useTriangles, int verticesStart,
 }
 
 // Shaders
-Effect* Engine::createEffect(const std::string& /*baseName*/,
-                             EffectCreationOptions& /*options*/,
-                             Engine* /*engine*/)
-{
-  return nullptr;
-}
-
 void Engine::_releaseEffect(Effect* effect)
 {
   if (std_util::contains(_compiledEffects, effect->_key)) {
-    _compiledEffects.erase(effect->_key);
     if (effect->getProgram()) {
       _gl->deleteProgram(effect->getProgram());
     }
+    _compiledEffects.erase(effect->_key);
   }
 }
 
-Effect* Engine::createEffect(
-  std::unordered_map<std::string, std::string>& baseName,
-  const std::vector<std::string>& attributesNames,
-  const std::vector<std::string>& uniformsNames,
-  const std::vector<std::string>& samplers, const std::string& defines,
-  EffectFallbacks* fallbacks,
-  const std::function<void(const Effect* effect)>& onCompiled,
-  const std::function<void(const Effect* effect, const std::string& errors)>&
-    onError,
-  const std::unordered_map<std::string, unsigned int>& indexParameters)
+Effect* Engine::createEffect(const std::string& baseName,
+                             EffectCreationOptions& options, Engine* engine)
+{
+  std::string name = baseName + "+" + baseName + "@" + options.defines;
+  if (std_util::contains(_compiledEffects, name)) {
+    return _compiledEffects[name].get();
+  }
+
+  auto effect  = std_util::make_unique<Effect>(baseName, options, engine);
+  effect->_key = name;
+  _compiledEffects[name] = std::move(effect);
+
+  return _compiledEffects[name].get();
+}
+
+Effect*
+Engine::createEffect(std::unordered_map<std::string, std::string>& baseName,
+                     EffectCreationOptions& options, Engine* engine)
 {
   std::string vertex
     = std_util::contains(baseName, "vertexElement") ?
@@ -1339,44 +1372,16 @@ Effect* Engine::createEffect(
                            baseName["fragment"] :
                            "fragment";
 
-  std::string name = vertex + "+" + fragment + "@" + defines;
+  std::string name = vertex + "+" + fragment + "@" + options.defines;
   if (std_util::contains(_compiledEffects, name)) {
     return _compiledEffects[name].get();
   }
 
-  auto effect = std_util::make_unique<Effect>(
-    baseName, attributesNames, uniformsNames, samplers, this, defines,
-    fallbacks, onCompiled, onError, indexParameters);
-  auto _effect           = effect.get();
-  effect->_key           = name;
+  auto effect  = std_util::make_unique<Effect>(baseName, options, engine);
+  effect->_key = name;
   _compiledEffects[name] = std::move(effect);
 
-  return _effect;
-}
-
-Effect* Engine::createEffect(
-  const std::string& baseName, const std::vector<std::string>& attributesNames,
-  const std::vector<std::string>& uniformsNames,
-  const std::vector<std::string>& samplers, const std::string& defines,
-  EffectFallbacks* fallbacks,
-  const std::function<void(const Effect* effect)>& onCompiled,
-  const std::function<void(const Effect* effect, const std::string& errors)>&
-    onError,
-  const std::unordered_map<std::string, unsigned int>& indexParameters)
-{
-  std::string name = baseName + "+" + baseName + "@" + defines;
-  if (std_util::contains(_compiledEffects, name)) {
-    return _compiledEffects[name].get();
-  }
-
-  auto effect = std_util::make_unique<Effect>(
-    baseName, attributesNames, uniformsNames, samplers, this, defines,
-    fallbacks, onCompiled, onError, indexParameters);
-  auto _effect           = effect.get();
-  effect->_key           = name;
-  _compiledEffects[name] = std::move(effect);
-
-  return _effect;
+  return _compiledEffects[name].get();
 }
 
 Effect* Engine::createEffectForParticles(
@@ -1388,17 +1393,24 @@ Effect* Engine::createEffectForParticles(
   const std::function<void(const Effect* effect, const std::string& errors)>&
     onError)
 {
-  std::unordered_map<std::string, std::string> baseName;
-  baseName["vertex"]                      = "particles";
-  baseName["fragmentElement"]             = fragmentName;
+  std::unordered_map<std::string, std::string> baseName{
+    {"vertex", "particles"}, {"fragmentElement", fragmentName}};
+  std::vector<std::string> attributesNames{"position", "color", "options"};
   std::vector<std::string> _uniformsNames = {"view", "projection"};
   std_util::concat(_uniformsNames, uniformsNames);
   std::vector<std::string> _samplers = {"diffuseSampler"};
   std_util::concat(_samplers, samplers);
 
-  return createEffect(baseName, {"position", "color", "options"},
-                      _uniformsNames, _samplers, defines, fallbacks, onCompiled,
-                      onError);
+  EffectCreationOptions options;
+  options.attributes    = std::move(attributesNames);
+  options.uniformsNames = std::move(_uniformsNames);
+  options.samplers      = std::move(_samplers);
+  options.defines       = defines;
+  options.fallbacks     = std_util::make_unique<EffectFallbacks>(*fallbacks);
+  options.onCompiled    = onCompiled;
+  options.onError       = onError;
+
+  return createEffect(baseName, options, this);
 }
 
 std::unique_ptr<GL::IGLProgram> Engine::createShaderProgram(
@@ -2589,16 +2601,8 @@ void Engine::_setTexture(unsigned int channel, BaseTexture* texture)
     return;
   }
 
-  // Video
+  // Video (not supported)
   bool alreadyActivated = false;
-  /*VideoTexture* videoTexturePointer
-    = dynamic_cast<VideoTexture*>(texture);
-  if (videoTexturePointer != nullptr) {
-    activateTexture(_gl["TEXTURE" + channel]);
-    alreadyActivated = true;
-    videoTexturePointer->update();
-  }
-  else*/
   if (texture->delayLoadState == Engine::DELAYLOADSTATE_NOTLOADED) {
     // Delay loading
     texture->delayLoad();
@@ -2709,8 +2713,8 @@ void Engine::setTextureArray(int channel, GL::IGLUniformLocation* uniform,
 
 void Engine::_setAnisotropicLevel(unsigned int key, BaseTexture* texture)
 {
-  bool anisotropicFilterExtension = _caps.textureAnisotropicFilterExtension;
-  unsigned int value              = texture->anisotropicFilteringLevel;
+  auto anisotropicFilterExtension = _caps.textureAnisotropicFilterExtension;
+  auto value                      = texture->anisotropicFilteringLevel;
 
   if (texture->getInternalTexture()->samplingMode
       == Texture::NEAREST_SAMPLINGMODE) {
@@ -2782,6 +2786,15 @@ void Engine::unbindAllAttributes()
   _currentBufferPointers.clear();
 }
 
+void Engine::releaseEffects()
+{
+  for (auto& item : _compiledEffects) {
+    _gl->deleteProgram(item.second->getProgram());
+  }
+
+  _compiledEffects.clear();
+}
+
 // Dispose
 void Engine::dispose(bool /*doNotRecurse*/)
 {
@@ -2798,9 +2811,7 @@ void Engine::dispose(bool /*doNotRecurse*/)
   // Engine::audioEngine->dispose();
 
   // Release effects
-  for (auto& pair : _compiledEffects) {
-    _gl->deleteProgram(pair.second->getProgram());
-  }
+  releaseEffects();
 
   // Unbind
   unbindAllAttributes();

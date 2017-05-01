@@ -6,6 +6,8 @@
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/bounding_sphere.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/effect_creation_options.h>
+#include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/render_target_texture.h>
@@ -134,11 +136,17 @@ bool VolumetricLightScatteringPostProcess::isReady(SubMesh* subMesh,
     std::unordered_map<std::string, std::string> baseName{
       {"vertexElement", "depth"},
       {"fragmentElement", "volumetricLightScatteringPass"}};
+
+    EffectCreationOptions options;
+    options.attributes = std::move(attribs);
+    options.uniformsNames
+      = {"world", "mBones", "viewProjection", "diffuseMatrix"};
+    options.samplers = {"diffuseSampler"};
+    options.defines  = std::move(join);
+
     _volumetricLightScatteringPass
       = mesh->getScene()->getEngine()->createEffect(
-        baseName, attribs,
-        {"world", "mBones", "viewProjection", "diffuseMatrix"},
-        {"diffuseSampler"}, join);
+        baseName, options, mesh->getScene()->getEngine());
   }
 
   return _volumetricLightScatteringPass->isReady();

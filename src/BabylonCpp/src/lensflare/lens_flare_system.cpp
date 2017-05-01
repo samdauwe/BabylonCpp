@@ -6,6 +6,8 @@
 #include <babylon/engine/engine.h>
 #include <babylon/lensflare/lens_flare.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/effect_creation_options.h>
+#include <babylon/materials/effect_fallbacks.h>
 #include <babylon/math/vector3.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
@@ -45,9 +47,13 @@ LensFlareSystem::LensFlareSystem(const std::string iName, Mesh* emitter,
   _indexBuffer        = engine->createIndexBuffer(indices);
 
   // Effects
+  EffectCreationOptions effectCreationOptions;
+  effectCreationOptions.attributes    = {VertexBuffer::PositionKindChars};
+  effectCreationOptions.uniformsNames = {"color", "viewportMatrix"};
+  effectCreationOptions.samplers      = {"textureSampler"};
+
   _effect = _scene->getEngine()->createEffect(
-    "lensFlare", {VertexBuffer::PositionKindChars}, {"color", "viewportMatrix"},
-    {"textureSampler"}, "");
+    "lensFlare", effectCreationOptions, _scene->getEngine());
 }
 
 LensFlareSystem::~LensFlareSystem()

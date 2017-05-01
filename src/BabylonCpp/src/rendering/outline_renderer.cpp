@@ -5,6 +5,8 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/effect_creation_options.h>
+#include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material.h>
 #include <babylon/mesh/_instances_batch.h>
 #include <babylon/mesh/sub_mesh.h>
@@ -120,10 +122,16 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
   std::string join = String::join(defines, '\n');
   if (_cachedDefines != join) {
     _cachedDefines = join;
-    _effect        = _scene->getEngine()->createEffect(
-      "outline", attribs,
-      {"world", "mBones", "viewProjection", "diffuseMatrix", "offset", "color"},
-      {"diffuseSampler"}, join);
+
+    EffectCreationOptions options;
+    options.attributes    = std::move(attribs);
+    options.uniformsNames = {"world",         "mBones", "viewProjection",
+                             "diffuseMatrix", "offset", "color"};
+    options.samplers = {"diffuseSampler"};
+    options.defines  = std::move(join);
+
+    _effect = _scene->getEngine()->createEffect("outline", options,
+                                                _scene->getEngine());
   }
 
   return _effect->isReady();

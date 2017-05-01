@@ -2,6 +2,8 @@
 
 #include <babylon/engine/engine.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/effect_creation_options.h>
+#include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/matrix.h>
 #include <babylon/mesh/vertex_buffer.h>
@@ -39,17 +41,25 @@ Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene,
   _indexBuffer = engine->createIndexBuffer(indices);
 
   // Effects
-  _effect
-    = engine->createEffect("layer",                                       //
-                           {VertexBuffer::PositionKindChars},             //
-                           {"textureMatrix", "color", "scale", "offset"}, //
-                           {"textureSampler"}, "");
+  {
+    EffectCreationOptions options;
+    options.attributes    = {VertexBuffer::PositionKindChars};
+    options.uniformsNames = {"textureMatrix", "color", "scale", "offset"};
+    options.samplers      = {"textureSampler"};
 
-  _alphaTestEffect
-    = engine->createEffect("layer",                                       //
-                           {VertexBuffer::PositionKindChars},             //
-                           {"textureMatrix", "color", "scale", "offset"}, //
-                           {"textureSampler"}, "#define ALPHATEST");
+    _effect = engine->createEffect("layer", options, _scene->getEngine());
+  }
+
+  {
+    EffectCreationOptions options;
+    options.attributes    = {VertexBuffer::PositionKindChars};
+    options.uniformsNames = {"textureMatrix", "color", "scale", "offset"};
+    options.samplers      = {"textureSampler"};
+    options.defines       = "#define ALPHATEST";
+
+    _alphaTestEffect
+      = engine->createEffect("layer", options, _scene->getEngine());
+  }
 }
 
 Layer::~Layer()

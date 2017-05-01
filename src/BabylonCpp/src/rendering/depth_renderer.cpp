@@ -6,6 +6,8 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/effect_creation_options.h>
+#include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture.h>
@@ -171,10 +173,16 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
   std::string join = String::join(defines, '\n');
   if (_cachedDefines != join) {
     _cachedDefines = join;
-    _effect        = _scene->getEngine()->createEffect(
-      "depth", attribs,
-      {"world", "mBones", "viewProjection", "diffuseMatrix", "far"},
-      {"diffuseSampler"}, join);
+
+    EffectCreationOptions options;
+    options.attributes = std::move(attribs);
+    options.uniformsNames
+      = {"world", "mBones", "viewProjection", "diffuseMatrix", "far"};
+    options.samplers = {"diffuseSampler"};
+    options.defines  = std::move(join);
+
+    _effect = _scene->getEngine()->createEffect("depth", options,
+                                                _scene->getEngine());
   }
 
   return _effect->isReady();

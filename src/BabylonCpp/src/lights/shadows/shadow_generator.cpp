@@ -8,6 +8,8 @@
 #include <babylon/lights/ishadow_light.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/effect_creation_options.h>
+#include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
@@ -402,11 +404,17 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
   std::string joined = String::join(defines, '\n');
   if (_cachedDefines != joined) {
     _cachedDefines = joined;
-    _effect        = _scene->getEngine()->createEffect(
-      "shadowMap", attribs,
-      {"world", "mBones", "viewProjection", "diffuseMatrix", "lightPosition",
-       "depthValues", "biasAndScale"},
-      {"diffuseSampler"}, joined);
+
+    EffectCreationOptions options;
+    options.attributes = std::move(attribs);
+    options.uniformsNames
+      = {"world",         "mBones",      "viewProjection", "diffuseMatrix",
+         "lightPosition", "depthValues", "biasAndScale"};
+    options.samplers = {"diffuseSampler"};
+    options.defines  = std::move(joined);
+
+    _effect = _scene->getEngine()->createEffect("shadowMap", options,
+                                                _scene->getEngine());
   }
 
   return _effect->isReady();
