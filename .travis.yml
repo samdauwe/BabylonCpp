@@ -33,6 +33,7 @@ matrix:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.7
           packages:
+            - libxrandr-dev
             - clang-3.7
       env: CC_VERSION=clang-3.7 CXX_VERSION=clang++-3.7
 
@@ -44,6 +45,7 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
+            - libxrandr-dev
             - g++-5
             - gcc-5
       env: CC_VERSION=gcc-5 CXX_VERSION=g++-5
@@ -56,6 +58,7 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
+            - libxrandr-dev
             - g++-6
             - gcc-6
       env: CC_VERSION=gcc-6 CXX_VERSION=g++-6
