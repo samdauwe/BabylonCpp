@@ -542,24 +542,108 @@ public:
   virtual void attachShader(const std::unique_ptr<IGLProgram>& program,
                             const std::unique_ptr<IGLShader>& shader)
     = 0;
+
+  /**
+   * @brief Binds a generic vertex index to a named attribute variable.
+   * @param program A IGLProgram object to bind.
+   * @param index A GLuint specifying the index of the generic vertex to bind.
+   * @param name A string specifying the name of the variable to bind to the
+   * generic vertex index.
+   */
   virtual void bindAttribLocation(IGLProgram* program, GLuint index,
                                   const std::string& name)
     = 0;
-  virtual void bindBuffer(GLenum target, IGLBuffer* buffer)                = 0;
+
+  /**
+   * @brief Binds a given IGLBuffer to a target.
+   * @param target A GLenum specifying the binding point (target).
+   * @param buffer A IGLBuffer to bind.
+   */
+  virtual void bindBuffer(GLenum target, IGLBuffer* buffer) = 0;
+
+  /**
+   * @brief Binds a given IGLFramebuffer to a target.
+   * @param target A GLenum specifying the binding point (target).
+   * @param framebuffer A IGLFramebuffer object to bind.
+   */
   virtual void bindFramebuffer(GLenum target, IGLFramebuffer* framebuffer) = 0;
+
+  /**
+   * @brief bindBufferBase
+   * @param target
+   * @param index
+   * @param buffer
+   */
   virtual void bindBufferBase(GLenum target, GLuint index, IGLBuffer* buffer)
     = 0;
+
+  /**
+   * @brief Binds a IGLRenderbuffer object to a given target.
+   * @param target A GLenum specifying the binding point (target).
+   * @param renderbuffer A IGLRenderbuffer object to bind.
+   */
   virtual void
   bindRenderbuffer(GLenum target,
                    const std::unique_ptr<IGLRenderbuffer>& renderbuffer)
     = 0;
+
+  /**
+   * @brief Binds a IGLTexture object to a given target.
+   * @param target A GLenum specifying the binding point (target).
+   * @param texture A IGLTexture object to bind.
+   */
   virtual void bindTexture(GLenum target, IGLTexture* texture) = 0;
+
+  /**
+   * @brief Sets the source and destination blending factors.
+   * @param red A GLclampf for the red component in the range of 0 to 1.
+   * @param green A GLclampf for the green component in the range of 0 to 1.
+   * @param blue A GLclampf for the blue component in the range of 0 to 1.
+   * @param alpha A GLclampf for the alpha component (transparency) in the range
+   * of 0 to 1.
+   */
   virtual void blendColor(GLclampf red, GLclampf green, GLclampf blue,
                           GLclampf alpha)
     = 0;
+
+  /**
+   * @brief Sets both the RGB blend equation and alpha blend equation to a
+   * single equation.
+   * @param mode A GLenum specifying how source and destination colors are
+   * combined.
+   */
   virtual void blendEquation(GLenum mode) = 0;
+
+  /**
+   * @brief Sets the RGB blend equation and alpha blend equation separately.
+   * @param modeRGB A GLenum specifying how the red, green and blue components
+   * of source and destination colors are combined.
+   * @param modeAlpha A GLenum specifying how the alpha component (transparency)
+   * of source and destination colors are combined.
+   */
   virtual void blendEquationSeparate(GLenum modeRGB, GLenum modeAlpha) = 0;
-  virtual void blendFunc(GLenum sfactor, GLenum dfactor)               = 0;
+
+  /**
+   * @brief Defines which function is used for blending pixel arithmetic.
+   * @param sfactor A GLenum specifying a multiplier for the source blending
+   * factors.
+   * @param dfactor A GLenum specifying a multiplier for the destination
+   * blending factors.
+   */
+  virtual void blendFunc(GLenum sfactor, GLenum dfactor) = 0;
+
+  /**
+   * @brief defines which function is used for blending pixel arithmetic for RGB
+   * and alpha components separately.
+   * @param srcRGB A GLenum specifying a multiplier for the red, green and blue
+   * (RGB) source blending factors.
+   * @param dstRGB A GLenum specifying a multiplier for the red, green and blue
+   * (RGB) destination blending factors.
+   * @param srcAlpha A GLenum specifying a multiplier for the alpha source
+   * blending factor.
+   * @param dstAlpha A GLenum specifying a multiplier for the alpha destination
+   * blending factor.
+   */
   virtual void blendFuncSeparate(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha,
                                  GLenum dstAlpha)
     = 0;
@@ -568,75 +652,404 @@ public:
                                GLint dstX1, GLint dstY1, GLbitfield mask,
                                GLenum filter)
     = 0;
+
+  /**
+   * @brief Initializes and creates the buffer object's data store.
+   * @param target A GLenum specifying the binding point (target).
+   * @param size A GLsizeiptr setting the size of the buffer object's data
+   * store.
+   * @param usage A GLenum specifying the usage pattern of the data store.
+   */
   virtual void bufferData(GLenum target, GLsizeiptr size, GLenum usage) = 0;
+
+  /**
+   * @brief Initializes and creates the buffer object's data store.
+   * @param target A GLenum specifying the binding point (target).
+   * @param data A Float32Array typed array that will be copied into the data
+   * store.
+   * @param usage A GLenum specifying the usage pattern of the data store.
+   */
   virtual void bufferData(GLenum target, const Float32Array& data, GLenum usage)
     = 0;
+
+  /**
+   * @brief Initializes and creates the buffer object's data store.
+   * @param target A GLenum specifying the binding point (target).
+   * @param data An Int32Array typed array that will be copied into the data
+   * store.
+   * @param usage A GLenum specifying the usage pattern of the data store.
+   */
   virtual void bufferData(GLenum target, const Int32Array& data, GLenum usage)
     = 0;
+
+  /**
+   * @brief Initializes and creates the buffer object's data store.
+   * @param target A GLenum specifying the binding point (target).
+   * @param data An Uint16Array typed array that will be copied into the data
+   * store.
+   * @param usage A GLenum specifying the usage pattern of the data store.
+   */
   virtual void bufferData(GLenum target, const Uint16Array& data, GLenum usage)
     = 0;
+
+  /**
+   * @brief Initializes and creates the buffer object's data store.
+   * @param target A GLenum specifying the binding point (target).
+   * @param data An Uint32Array typed array that will be copied into the data
+   * store.
+   * @param usage A GLenum specifying the usage pattern of the data store.
+   */
   virtual void bufferData(GLenum target, const Uint32Array& data, GLenum usage)
     = 0;
+
+  /**
+   * @brief Updates a subset of a buffer object's data store.
+   * @param target A GLenum specifying the binding point (target).
+   * @param offset A GLintptr specifying an offset in bytes where the data
+   * replacement will start.
+   * @param data A Float32Array typed array that will be copied into the data
+   * store.
+   */
   virtual void bufferSubData(GLenum target, GLintptr offset,
                              const Float32Array& data)
     = 0;
+
+  /**
+   * @brief Updates a subset of a buffer object's data store.
+   * @param target A GLenum specifying the binding point (target).
+   * @param offset A GLintptr specifying an offset in bytes where the data
+   * replacement will start.
+   * @param data An Int32Array typed array that will be copied into the data
+   * store.
+   */
   virtual void bufferSubData(GLenum target, GLintptr offset, Int32Array& data)
     = 0;
+
+  /**
+   * @brief Binds a passed IGLVertexArrayObject object to the buffer.
+   * @param vao A IGLVertexArrayObject (VAO) object to bind.
+   */
   virtual void bindVertexArray(GL::IGLVertexArrayObject* vao) = 0;
-  virtual GLenum checkFramebufferStatus(GLenum target)        = 0;
-  virtual void clear(GLuint mask)                             = 0;
+
+  /**
+   * @brief Returns the completeness status of the IGLFramebuffer object.
+   * @param target A GLenum specifying the binding point (target).
+   * @return A GLenum indicating the completeness status of the framebuffer or 0
+   * if an error occurs.
+   */
+  virtual GLenum checkFramebufferStatus(GLenum target) = 0;
+
+  /**
+   * @brief Clears buffers to preset values.
+   * @param mask A GLbitfield bitwise OR mask that indicates the buffers to be
+   * cleared.
+   */
+  virtual void clear(GLbitfield mask) = 0;
+
+  /**
+   * @brief Specifies the color values used when clearing color buffers.
+   * @param red A GLclampf specifying the red color value used when the color
+   * buffers are cleared.
+   * @param green A GLclampf specifying the green color value used when the
+   * color buffers are cleared.
+   * @param blue A GLclampf specifying the blue color value used when the color
+   * buffers are cleared.
+   * @param alpha A GLclampf specifying the alpha (transparency) value used when
+   * the color buffers are cleared.
+   */
   virtual void clearColor(GLclampf red, GLclampf green, GLclampf blue,
                           GLclampf alpha)
     = 0;
-  virtual void clearDepth(GLclampf depth)  = 0;
+
+  /**
+   * @brief Specifies the clear value for the depth buffer.
+   * @param depth A GLclampf specifying the depth value used when the depth
+   * buffer is cleared.
+   */
+  virtual void clearDepth(GLclampf depth) = 0;
+
+  /**
+   * @brief Apecifies the clear value for the stencil buffer.
+   * @param stencil A GLint specifying the index used when the stencil buffer is
+   * cleared.
+   */
   virtual void clearStencil(GLint stencil) = 0;
+
+  /**
+   * @brief Sets which color components to enable or to disable when drawing or
+   * rendering to a IGLFramebuffer.
+   * @param red A GLboolean specifying whether or not the red color component
+   * can be written into the frame buffer.
+   * @param green A GLboolean specifying whether or not the green color
+   * component can be written into the frame buffer.
+   * @param blue A GLboolean specifying whether or not the blue color component
+   * can be written into the frame buffer.
+   * @param alpha A GLboolean specifying whether or not the alpha (transparency)
+   * component can be written into the frame buffer.
+   */
   virtual void colorMask(GLboolean red, GLboolean green, GLboolean blue,
                          GLboolean alpha)
     = 0;
+
+  /**
+   * @brief Compiles a GLSL shader into binary data so that it can be used by a
+   * IGLProgram.
+   * @param shader A fragment or vertex IGLShader.
+   */
   virtual void compileShader(const std::unique_ptr<IGLShader>& shader) = 0;
+
+  /**
+   * @brief Specifies a two-dimensional texture image in a compressed format.
+   * @param target A GLenum specifying the binding point (target) of the active
+   * texture.
+   * @param level A GLint specifying the level of detail. Level 0 is the base
+   * image level and level n is the nth mipmap reduction level.
+   * @param internalformat A GLenum specifying the compressed image format.
+   * @param width A GLsizei specifying the width of the texture.
+   * @param height A GLsizei specifying the height of the texture.
+   * @param border A GLint specifying the width of the border. Must be 0.
+   * @param pixels An Uint8Array that be used as a data store for the compressed
+   * image data in memory.
+   */
   virtual void compressedTexImage2D(GLenum target, GLint level,
-                                    GLenum internalformat, GLint width,
-                                    GLint height, GLint border,
+                                    GLenum internalformat, GLsizei width,
+                                    GLsizei height, GLint border,
                                     const Uint8Array& pixels)
     = 0;
+
+  /**
+   * @brief Specifies a two-dimensional sub-rectangle for a texture image in a
+   * compressed format.
+   * @param target A GLenum specifying the binding point (target) of the active
+   * compressed texture.
+   * @param level A GLint specifying the level of detail. Level 0 is the base
+   * image level and level n is the nth mipmap reduction level.
+   * @param xoffset A GLint specifying the horizontal offset within the
+   * compressed texture image.
+   * @param yoffset A GLint specifying the vertical offset within the compressed
+   * texture image.
+   * @param width A GLsizei specifying the width of the compressed texture.
+   * @param height A GLsizei specifying the height of the compressed texture.
+   * @param format A GLenum specifying the compressed image format.
+   * @param size A GLsizeiptr setting the size of the buffer object's data
+   * store.
+   */
   virtual void compressedTexSubImage2D(GLenum target, GLint level,
                                        GLint xoffset, GLint yoffset,
-                                       GLint width, GLint height, GLenum format,
-                                       GLsizeiptr size)
+                                       GLsizei width, GLsizei height,
+                                       GLenum format, GLsizeiptr size)
     = 0;
+
+  /**
+   * @brief Copies pixels from the current WebGLFramebuffer into a 2D texture
+   * image.
+   * @param target A GLenum specifying the binding point (target) of the active
+   * texture.
+   * @param level A GLint specifying the level of detail. Level 0 is the base
+   * image level and level n is the nth mipmap reduction level.
+   * @param internalformat A GLint specifying the color components in the
+   * texture.
+   * @param x A GLint specifying the x coordinate of the lower left corner where
+   * to start copying.
+   * @param y A GLint specifying the y coordinate of the lower left corner where
+   * to start copying.
+   * @param width A GLsizei specifying the width of the texture.
+   * @param height A GLsizei specifying the height of the texture.
+   * @param border A GLint specifying the width of the border. Must be 0.
+   */
   virtual void copyTexImage2D(GLenum target, GLint level, GLenum internalformat,
-                              GLint x, GLint y, GLint width, GLint height,
+                              GLint x, GLint y, GLsizei width, GLsizei height,
                               GLint border)
     = 0;
+
+  /**
+   * @brief Copies pixels from the current WebGLFramebuffer into an existing 2D
+   * texture sub-image.
+   * @param target A GLenum specifying the binding point (target) of the active
+   * texture.
+   * @param level A GLint specifying the level of detail. Level 0 is the base
+   * image level and level n is the nth mipmap reduction level.
+   * @param xoffset A GLint specifying the horizontal offset within the texture
+   * image.
+   * @param yoffset A GLint specifying the vertical offset within the texture
+   * image.
+   * @param x A GLint specifying the x coordinate of the lower left corner where
+   * to start copying.
+   * @param y A GLint specifying the y coordinate of the lower left corner where
+   * to start copying.
+   * @param width A GLsizei specifying the width of the texture.
+   * @param height A GLsizei specifying the height of the texture.
+   */
   virtual void copyTexSubImage2D(GLenum target, GLint level, GLint xoffset,
                                  GLint yoffset, GLint x, GLint y, GLint width,
                                  GLint height)
     = 0;
-  virtual std::unique_ptr<IGLBuffer> createBuffer()                 = 0;
-  virtual std::unique_ptr<IGLFramebuffer> createFramebuffer()       = 0;
-  virtual std::unique_ptr<IGLProgram> createProgram()               = 0;
-  virtual std::unique_ptr<IGLRenderbuffer> createRenderbuffer()     = 0;
-  virtual std::unique_ptr<IGLShader> createShader(GLenum type)      = 0;
-  virtual std::unique_ptr<IGLTexture> createTexture()               = 0;
+
+  /**
+   * @brief Creates and initializes a IGLBuffer storing data such as vertices or
+   * colors.
+   * @return An IGLBuffer storing data such as vertices or colors.
+   */
+  virtual std::unique_ptr<IGLBuffer> createBuffer() = 0;
+
+  /**
+   * @brief Creates and initializes a WebGLFramebuffer object.
+   * @return An IGLFramebuffer object.
+   */
+  virtual std::unique_ptr<IGLFramebuffer> createFramebuffer() = 0;
+
+  /**
+   * @brief Creates and initializes a IGLProgram object.
+   * @return An IGLProgram object that is a combination of two compiled
+   * WebGLShaders consisting of a vertex shader and a fragment shader (both
+   * written in GLSL). These are then linked into a usable program.
+   */
+  virtual std::unique_ptr<IGLProgram> createProgram() = 0;
+
+  /**
+   * @brief Creates and initializes a IGLRenderbuffer object.
+   * @return A IGLRenderbuffer object that stores data such an image, or can be
+   * source or target of an rendering operation.
+   */
+  virtual std::unique_ptr<IGLRenderbuffer> createRenderbuffer() = 0;
+
+  /**
+   * @brief Creates a IGLShader that can then be configured further using
+   * IGLRenderingContext.shaderSource() and IGLRenderingContext.compileShader().
+   * @param type Either VERTEX_SHADER or FRAGMENT_SHADER.
+   * @return An IGLShader object.
+   */
+  virtual std::unique_ptr<IGLShader> createShader(GLenum type) = 0;
+
+  /**
+   * @brief Creates and initializes a IGLTexture object.
+   * @return An IGLTexture object to which images can be bound to.
+   */
+  virtual std::unique_ptr<IGLTexture> createTexture() = 0;
+
+  /**
+   * @brief Creates and initializes a WebGLVertexArrayObject object that
+   * represents a vertex array object (VAO) pointing to vertex array data and
+   * which provides names for different sets of vertex data.
+   * @return An IGLVertexArrayObject representing a vertex array object (VAO)
+   * which points to vertex array data.
+   */
   virtual std::unique_ptr<IGLVertexArrayObject> createVertexArray() = 0;
-  virtual void cullFace(GLenum mode)                                = 0;
-  virtual void deleteBuffer(IGLBuffer* buffer)                      = 0;
+
+  /**
+   * @brief Specifies whether or not front- and/or back-facing polygons can be
+   * culled.
+   * @param mode A GLenum specifying whether front- or back-facing polygons are
+   * candidates for culling.
+   */
+  virtual void cullFace(GLenum mode) = 0;
+
+  /**
+   * @brief Deletes a given IGLBuffer. This method has no effect if the buffer
+   * has already been deleted.
+   * @param buffer An IGLBuffer object to delete.
+   */
+  virtual void deleteBuffer(IGLBuffer* buffer) = 0;
+
+  /**
+   * @brief deletes a given IGLFramebuffer object. This method has no effect if
+   * the frame buffer has already been deleted.
+   * @param framebuffer A IGLFramebuffer object to delete.
+   */
   virtual void
   deleteFramebuffer(const std::unique_ptr<IGLFramebuffer>& framebuffer)
     = 0;
+
+  /**
+   * @brief Deletes a given IGLProgram object. This method has no effect if the
+   * program has already been deleted.
+   * @param program An IGLProgram object to delete.
+   */
   virtual void deleteProgram(IGLProgram* program) = 0;
+
+  /**
+   * @brief Deletes a given IGLRenderbuffer object. This method has no effect if
+   * the render buffer has already been deleted.
+   * @param renderbuffer An IGLRenderbuffer object to delete.
+   */
   virtual void
   deleteRenderbuffer(const std::unique_ptr<IGLRenderbuffer>& renderbuffer)
     = 0;
+
+  /**
+   * @brief Deletes a given IGLShader object. This method has no effect if the
+   * shader has already been deleted.
+   * @param shader An IGLShader object to delete.
+   */
   virtual void deleteShader(const std::unique_ptr<IGLShader>& shader) = 0;
-  virtual void deleteTexture(IGLTexture* texture)                     = 0;
-  virtual void deleteVertexArray(IGLVertexArrayObject* vao)           = 0;
-  virtual void depthFunc(GLenum func)                                 = 0;
-  virtual void depthMask(GLboolean flag)                              = 0;
-  virtual void depthRange(GLclampf zNear, GLclampf zFar)            = 0;
+
+  /**
+   * @brief Deletes a given IGLTexture object. This method has no effect if the
+   * texture has already been deleted.
+   * @param texture A IGLTexture object to delete.
+   */
+  virtual void deleteTexture(IGLTexture* texture) = 0;
+
+  /**
+   * @brief Deletes a given IGLVertexArrayObject object.
+   * @param vao An IGLVertexArrayObject (VAO) object to delete.
+   */
+  virtual void deleteVertexArray(IGLVertexArrayObject* vao) = 0;
+
+  /**
+   * @brief Specifies a function that compares incoming pixel depth to the
+   * current depth buffer value.
+   * @param func A GLenum specifying the depth comparison function, which sets
+   * the conditions under which the pixel will be drawn.
+   */
+  virtual void depthFunc(GLenum func) = 0;
+
+  /**
+   * @brief Sets whether writing into the depth buffer is enabled or disabled.
+   * @param flag A GLboolean specifying whether or not writing into the depth
+   * buffer is enabled.
+   */
+  virtual void depthMask(GLboolean flag) = 0;
+
+  /**
+   * @brief Specifies the depth range mapping from normalized device coordinates
+   * to window or viewport coordinates.
+   * @param zNear A GLclampf specifying the mapping of the near clipping plane
+   * to window or viewport coordinates. Clamped to the range 0 to 1 and must be
+   * less than or equal to zFar.
+   * @param zFar A GLclampf specifying the mapping of the far clipping plane to
+   * window or viewport coordinates. Clamped to the range 0 to 1.
+   */
+  virtual void depthRange(GLclampf zNear, GLclampf zFar) = 0;
+
+  /**
+   * @brief Detaches a previously attached IGLProgram from a IGLShader.
+   * @param An IGLProgram to detach.
+   * @param shader A fragment or vertex IGLShader.
+   */
   virtual void detachShader(IGLProgram* program, IGLShader* shader) = 0;
-  virtual void disable(GLenum cap)                    = 0;
+
+  /**
+   * @brief Disables specific GL capabilities for this context.
+   * @param cap A GLenum specifying which WebGL capability to disable.
+   */
+  virtual void disable(GLenum cap) = 0;
+
+  /**
+   * @brief Turns the generic vertex attribute array off at a given index
+   * position.
+   * @param index A GLuint specifying the index of the vertex attribute to
+   * disable.
+   */
   virtual void disableVertexAttribArray(GLuint index) = 0;
+
+  /**
+   * @brief Renders primitives from array data.
+   * @param mode A GLenum specifying the type primitive to render.
+   * @param first A GLint specifying the starting index in the array of vector
+   * points.
+   * @param count A GLsizei specifying the number of indices to be rendered.
+   */
   virtual void drawArrays(GLenum mode, GLint first, GLint count) = 0;
   virtual void drawArraysInstanced(GLenum mode, GLint first, GLsizei count,
                                    GLsizei instanceCount)
