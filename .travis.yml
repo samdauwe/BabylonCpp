@@ -1,14 +1,11 @@
+# Ubuntu 14.04 Trusty support
+sudo: required
+dist: trusty
+
+# Enable C++ support
 language: cpp
 
-sudo: required
-
-os:
-  - linux
-
-compiler:
-  - clang
-  - gcc
-
+# The branch to build
 branches:
   only:
     - master
@@ -17,17 +14,6 @@ env:
   # Workaround for https://github.com/travis-ci/travis-ci/issues/4681
   matrix:
     - TRAVIS_EMPTY_JOB_WORKAROUND=true
-
-addons:
-  apt:
-    sources:
-      - llvm-toolchain-precise-3.7
-      - ubuntu-toolchain-r-test
-      - george-edison55-precise-backports
-    packages:
-      - clang-3.7
-      - g++-5
-      - gcc-5
 
 matrix:
   exclude:
@@ -40,13 +26,39 @@ matrix:
 
     # Clang 3.7
     - os: linux
-      env: CC_VERSION=clang-3.7 CXX_VERSION=clang++-3.7
       compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - clang-3.7
+      env: CC_VERSION=clang-3.7 CXX_VERSION=clang++-3.7
 
     # GCC 5
     - os: linux
-      env: CC_VERSION=gcc-5 CXX_VERSION=g++-5
       compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+            - gcc-5
+      env: CC_VERSION=gcc-5 CXX_VERSION=g++-5
+
+    # GCC 6
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+            - gcc-6
+      env: CC_VERSION=gcc-6 CXX_VERSION=g++-6
 
 install:
   ###################################################################
@@ -79,9 +91,11 @@ before_script:
   - cd ${TRAVIS_BUILD_DIR}
   - mkdir build && cd build && cmake ../
 
+# Build steps
 script:
   - make all
 
+# Notifications settings
 notifications:
   email:
     on_success: never
