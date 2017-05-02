@@ -24,6 +24,8 @@ public:
   Angle copy() const;
   std::unique_ptr<Angle> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Angle& angle);
+  friend bool operator==(const Angle& lhs, const Angle& rhs);
+  friend bool operator!=(const Angle& lhs, const Angle& rhs);
 
   /**
    * @brief Returns the Angle value in degrees (float).
@@ -59,6 +61,8 @@ private:
 }; // end of class Angle
 
 std::ostream& operator<<(std::ostream& os, const Angle& angle);
+inline bool operator==(const Angle& lhs, const Angle& rhs);
+inline bool operator!=(const Angle& lhs, const Angle& rhs);
 
 } // end of namespace BABYLON
 

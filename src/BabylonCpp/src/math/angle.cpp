@@ -61,6 +61,16 @@ std::ostream& operator<<(std::ostream& os, const Angle& angle)
   return os;
 }
 
+bool operator==(const Angle& lhs, const Angle& rhs)
+{
+  return std_util::almost_equal(lhs._radians, rhs._radians);
+}
+
+bool operator!=(const Angle& lhs, const Angle& rhs)
+{
+  return !(lhs == rhs);
+}
+
 float Angle::degrees() const
 {
   return _radians * 180.f / Math::PI;
