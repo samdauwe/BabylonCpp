@@ -841,7 +841,7 @@ public:
     = 0;
 
   /**
-   * @brief Copies pixels from the current WebGLFramebuffer into a 2D texture
+   * @brief Copies pixels from the current IGLFramebuffer into a 2D texture
    * image.
    * @param target A GLenum specifying the binding point (target) of the active
    * texture.
@@ -863,7 +863,7 @@ public:
     = 0;
 
   /**
-   * @brief Copies pixels from the current WebGLFramebuffer into an existing 2D
+   * @brief Copies pixels from the current IGLFramebuffer into an existing 2D
    * texture sub-image.
    * @param target A GLenum specifying the binding point (target) of the active
    * texture.
@@ -893,7 +893,7 @@ public:
   virtual std::unique_ptr<IGLBuffer> createBuffer() = 0;
 
   /**
-   * @brief Creates and initializes a WebGLFramebuffer object.
+   * @brief Creates and initializes a IGLFramebuffer object.
    * @return An IGLFramebuffer object.
    */
   virtual std::unique_ptr<IGLFramebuffer> createFramebuffer() = 0;
@@ -901,7 +901,7 @@ public:
   /**
    * @brief Creates and initializes a IGLProgram object.
    * @return An IGLProgram object that is a combination of two compiled
-   * WebGLShaders consisting of a vertex shader and a fragment shader (both
+   * IGLShaders consisting of a vertex shader and a fragment shader (both
    * written in GLSL). These are then linked into a usable program.
    */
   virtual std::unique_ptr<IGLProgram> createProgram() = 0;
@@ -928,7 +928,7 @@ public:
   virtual std::unique_ptr<IGLTexture> createTexture() = 0;
 
   /**
-   * @brief Creates and initializes a WebGLVertexArrayObject object that
+   * @brief Creates and initializes a IGLVertexArrayObject object that
    * represents a vertex array object (VAO) pointing to vertex array data and
    * which provides names for different sets of vertex data.
    * @return An IGLVertexArrayObject representing a vertex array object (VAO)
@@ -1031,7 +1031,7 @@ public:
 
   /**
    * @brief Disables specific GL capabilities for this context.
-   * @param cap A GLenum specifying which WebGL capability to disable.
+   * @param cap A GLenum specifying which GL capability to disable.
    */
   virtual void disable(GLenum cap) = 0;
 
@@ -1051,33 +1051,137 @@ public:
    * @param count A GLsizei specifying the number of indices to be rendered.
    */
   virtual void drawArrays(GLenum mode, GLint first, GLint count) = 0;
+
+  /**
+   * @brief Renders primitives from array data like the gl.drawArrays() method.
+   * In addition, it can execute multiple instances of the range of elements.
+   * @param mode A GLenum specifying the type primitive to render.
+   * @param first A GLint specifying the starting index in the array of vector
+   * points.
+   * @param count A GLsizei specifying the number of indices to be rendered.
+   * @param instanceCount A GLsizei specifying the number of instances of the
+   * range of elements to execute.
+   */
   virtual void drawArraysInstanced(GLenum mode, GLint first, GLsizei count,
                                    GLsizei instanceCount)
     = 0;
-  virtual void drawElements(GLenum mode, GLint count, GLenum type,
+
+  /**
+   * @brief Renders primitives from array data.
+   * @param mode A GLenum specifying the type primitive to render.
+   * @param count A GLsizei specifying the number of elements to be rendered.
+   * @param type A GLenum specifying the type of the values in the element array
+   * buffer.
+   * @param offset A GLintptr specifying an offset in the element array buffer.
+   */
+  virtual void drawElements(GLenum mode, GLsizei count, GLenum type,
                             GLintptr offset)
     = 0;
+
+  /**
+   * @brief Renders primitives from array data like the drawElements() method.
+   * In addition, it can execute multiple instances of a set of elements.
+   * @param mode A GLenum specifying the type primitive to render.
+   * @param count A GLsizei specifying the number of elements to be rendered.
+   * @param type A GLenum specifying the type of the values in the element array
+   * buffer.
+   * @param offset A GLintptr specifying an offset in the element array buffer.
+   * Must be a valid multiple of the size of the given type.
+   * @param instanceCount A GLsizei specifying the number of instances of the
+   * set of elements to execute.
+   */
   virtual void drawElementsInstanced(GLenum mode, GLsizei count, GLenum type,
                                      GLintptr offset, GLsizei instanceCount)
     = 0;
-  virtual void enable(GLenum cap)                    = 0;
+
+  /**
+   * @brief Anables specific GL capabilities for this context.
+   * @param cap A GLenum specifying which GL capability to enable.
+   */
+  virtual void enable(GLenum cap) = 0;
+
+  /**
+   * @brief Turns the generic vertex attribute array on at a given index
+   * position.
+   * @param index A GLuint specifying the index of the vertex attribute to
+   * enable.
+   */
   virtual void enableVertexAttribArray(GLuint index) = 0;
-  virtual void finish()                              = 0;
-  virtual void flush()                               = 0;
+
+  /**
+   * @brief Blocks execution until all previously called commands are finished.
+   */
+  virtual void finish() = 0;
+
+  /**
+   * @brief Empties different buffer commands, causing all commands to be
+   * executed as quickly as possible.
+   */
+  virtual void flush() = 0;
+
+  /**
+   * @brief Attaches an IGLRenderbuffer object to an IGLFramebuffer object.
+   * @param target A GLenum specifying the binding point (target) for the
+   * framebuffer.
+   * @param attachment A GLenum specifying the attachment point for the render
+   * buffer.
+   * @param renderbuffertarget A GLenum specifying the binding point (target)
+   * for the render buffer.
+   * @param renderbuffer An IGLRenderbuffer object to attach.
+   */
   virtual void
   framebufferRenderbuffer(GLenum target, GLenum attachment,
                           GLenum renderbuffertarget,
                           const std::unique_ptr<IGLRenderbuffer>& renderbuffer)
     = 0;
+
+  /**
+   * @brief Attaches a texture to an IGLFramebuffer.
+   * @param target A GLenum specifying the binding point (target).
+   * @param attachment A GLenum specifying the attachment point for the texture.
+   * @param textarget A GLenum specifying the texture target.
+   * @param texture An IGLTexture object whose image to attach.
+   * @param level A GLint specifying the mipmap level of the texture image to be
+   * attached. Must be 0.
+   */
   virtual void framebufferTexture2D(GLenum target, GLenum attachment,
                                     GLenum textarget, IGLTexture* texture,
                                     GLint level)
     = 0;
-  virtual void frontFace(GLenum mode)                                     = 0;
-  virtual void generateMipmap(GLenum target)                              = 0;
+
+  /**
+   * @brief Specifies whether polygons are front- or back-facing by setting a
+   * winding orientation.
+   * @param mode Sets the winding orientation.
+   */
+  virtual void frontFace(GLenum mode) = 0;
+
+  /**
+   * @brief Generates a set of mipmaps for an IGLTexture object.
+   * @param target A GLenum specifying the binding point (target) of the active
+   * texture whose mipmaps will be generated.
+   */
+  virtual void generateMipmap(GLenum target) = 0;
+
+  /**
+   * @brief Returns a list of IGLShader objects attached to a IGLProgram.
+   * @param program A IGLProgram object to get attached shaders for.
+   * @return An Array of IGLShader objects that are attached to the given
+   * IGLProgram.
+   */
   virtual std::vector<IGLShader*> getAttachedShaders(IGLProgram* program) = 0;
+
+  /**
+   * @brief Returns the location of an attribute variable in a given IGLProgram.
+   * @param program A IGLProgram containing the attribute variable.
+   * @param name A String specifying the name of the attribute variable whose
+   * location to get.
+   * @return A GLint number indicating the location of the variable name if
+   * found. Returns -1 otherwise.
+   */
   virtual GLint getAttribLocation(IGLProgram* program, const std::string& name)
     = 0;
+
   virtual bool hasExtension(const std::string& extension) = 0;
   virtual std::array<int, 3> getScissorBoxParameter() = 0; // GL::SCISSOR_BOX
   virtual GLint getParameteri(GLenum pname)      = 0;
@@ -1085,80 +1189,439 @@ public:
   virtual std::string getString(GLenum pname)    = 0;
   virtual GLint getTexParameteri(GLenum pname)   = 0;
   virtual GLfloat getTexParameterf(GLenum pname) = 0;
+
+  /**
+   * @brief Returns error information.
+   * @return Error information.
+   */
   virtual GLenum getError()                      = 0;
   virtual const char* getErrorString(GLenum err) = 0;
+
+  /**
+   * @brief Returns information about the given program.
+   * @param program A IGLProgram to get parameter information from.
+   * @param pname A Glenum specifying the information to query.
+   * @return The requested program information (as specified with pname).
+   */
   virtual GLint getProgramParameter(IGLProgram* program, GLenum pname) = 0;
+
+  /**
+   * @brief Returns the information log for the specified IGLProgram object.
+   * It contains errors that occurred during failed linking or validation of
+   * IGLProgram objects.
+   * @param program An IGLProgram to query.
+   * @return A String that contains diagnostic messages, warning messages, and
+   * other information about the last linking or validation operation. When an
+   * IGLProgram object is initially created, its information log will be a
+   * string of length 0.
+   */
   virtual std::string
   getProgramInfoLog(const std::unique_ptr<IGLProgram>& program)
     = 0;
+
+  /**
+   * @brief Returns information about the renderbuffer.
+   * @param target A Glenum specifying the target renderbuffer object.
+   * @param pname A Glenum specifying the information to query.
+   * @return Depends on the requested information (as specified with pname).
+   * Either a GLint or a GLenum.
+   */
   virtual any getRenderbufferParameter(GLenum target, GLenum pname) = 0;
+
+  /**
+   * @brief Returns the information log for the specified IGLShader object. It
+   * contains warnings, debugging and compile information.
+   * @param shader An IGLShader to query.
+   * @return A String that contains diagnostic messages, warning messages, and
+   * other information about the last compile operation. When an IGLShader
+   * object is initially created, its information log will be a string of length
+   * 0.
+   */
+  virtual std::string getShaderInfoLog(const std::unique_ptr<IGLShader>& shader)
+    = 0;
+
+  /**
+   * @brief Returns information about the given shader.
+   * @param shader An IGLShader to get parameter information from.
+   * @param pname A Glenum specifying the information to query.
+   * @return Returns the requested shader information (as specified with pname).
+   */
   virtual GLint getShaderParameter(const std::unique_ptr<IGLShader>& shader,
                                    GLenum pname)
     = 0;
+
+  /**
+   * @brief Returns a new IGLShaderPrecisionFormat object describing the range
+   * and precision for the specified shader numeric format.
+   * @param shadertype Either a FRAGMENT_SHADER or a VERTEX_SHADER.
+   * @param precisiontype A precision type value. Either LOW_FLOAT,
+   * MEDIUM_FLOAT, HIGH_FLOAT, LOW_INT, MEDIUM_INT, or HIGH_INT.
+   * @return A IGLShaderPrecisionFormat object or nullptr, if an error occurs.
+   */
   virtual IGLShaderPrecisionFormat*
   getShaderPrecisionFormat(GLenum shadertype, GLenum precisiontype)
     = 0;
-  virtual std::string getShaderInfoLog(const std::unique_ptr<IGLShader>& shader)
-    = 0;
+
+  /**
+   * @brief Returns the source code of an IGLShader as a String.
+   * @param shader A IGLShader object to get the source code from.
+   * @return A String containing the source code of the shader.
+   */
   virtual std::string getShaderSource(IGLShader* shader) = 0;
+
+  /**
+   * @brief Retrieves the index of a uniform block within a IGLProgram.
+   * @param program An IGLProgram containing the uniform block.
+   * @param uniformBlockName A String specifying the name of the uniform block
+   * to whose index to retrieve.
+   * @return A GLuint indicating the uniform block index.
+   */
   virtual GLuint getUniformBlockIndex(IGLProgram* program,
                                       const std::string& uniformBlockName)
     = 0;
+
   virtual std::unique_ptr<IGLUniformLocation>
   getUniformLocation(IGLProgram* program, const std::string& name) = 0;
-  virtual void hint(GLenum target, GLenum mode)                    = 0;
-  virtual GLboolean isBuffer(IGLBuffer* buffer)                           = 0;
-  virtual GLboolean isEnabled(GLenum cap)                                 = 0;
-  virtual GLboolean isFramebuffer(IGLFramebuffer* framebuffer)            = 0;
+
+  /**
+   * @brief Specifies hints for certain behaviors. The interpretation of these
+   * hints depend on the implementation.
+   * @param target Sets which behavior to be controlled.
+   * @param mode Sets the behavior.
+   */
+  virtual void hint(GLenum target, GLenum mode) = 0;
+
+  /**
+   * @brief Returns true if the passed IGLBuffer is valid and false otherwise.
+   * @param buffer A IGLBuffer to check.
+   * @return A GLboolean indicating whether or not the buffer is valid.
+   */
+  virtual GLboolean isBuffer(IGLBuffer* buffer) = 0;
+
+  /**
+   * @brief Tests whether a specific GL capability is enabled or not for this
+   * context.
+   * @param cap A GLenum specifying which GL capability to test.
+   * @return A GLboolean indicating if the capability cap is enabled (true), or
+   * not (false).
+   */
+  virtual GLboolean isEnabled(GLenum cap) = 0;
+
+  /**
+   * @brief Returns true if the passed IGLFramebuffer is valid and false
+   * otherwise.
+   * @param framebuffer A IGLFramebuffer to check.
+   * @return A GLboolean indicating whether or not the frame buffer is valid.
+   */
+  virtual GLboolean isFramebuffer(IGLFramebuffer* framebuffer) = 0;
+
+  /**
+   * @brief Returns true if the passed IGLProgram is valid, false otherwise.
+   * @param program A IGLProgram to check.
+   * @return A GLboolean indicating whether or not the program is valid.
+   */
   virtual GLboolean isProgram(const std::unique_ptr<IGLProgram>& program) = 0;
-  virtual GLboolean isRenderbuffer(IGLRenderbuffer* renderbuffer)         = 0;
-  virtual GLboolean isShader(IGLShader* shader)                           = 0;
-  virtual GLboolean isTexture(IGLTexture* texture)                        = 0;
-  virtual void lineWidth(GLfloat width)                                   = 0;
-  virtual bool linkProgram(const std::unique_ptr<IGLProgram>& program)    = 0;
-  virtual void pixelStorei(GLenum pname, GLint param)       = 0;
+
+  /**
+   * @brief Returns true if the passed IGLRenderbuffer is valid and false
+   * otherwise.
+   * @param renderbuffer An IGLRenderbuffer to check.
+   * @return A GLboolean indicating whether or not the renderbuffer is valid.
+   */
+  virtual GLboolean isRenderbuffer(IGLRenderbuffer* renderbuffer) = 0;
+
+  /**
+   * @brief Returns true if the passed IGLShader is valid, false otherwise.
+   * @param shader An IGLShader to check.
+   * @return A GLboolean indicating whether or not the shader is valid.
+   */
+  virtual GLboolean isShader(IGLShader* shader) = 0;
+
+  /**
+   * @brief Returns true if the passed IGLTexture is valid and false otherwise.
+   * @param texture An IGLTexture to check.
+   * @return A GLboolean indicating whether or not the texture is valid.
+   */
+  virtual GLboolean isTexture(IGLTexture* texture) = 0;
+
+  /**
+   * @brief Sets the line width of rasterized lines.
+   * @param width A GLfloat specifying the width of rasterized lines.
+   */
+  virtual void lineWidth(GLfloat width) = 0;
+
+  /**
+   * @brief Links a given IGLProgram to the attached vertex and fragment
+   * shaders.
+   * @param program An IGLProgram to link.
+   * @return Whether or not the linking succeeded.
+   */
+  virtual bool linkProgram(const std::unique_ptr<IGLProgram>& program) = 0;
+
+  /**
+   * @brief Specifies the pixel storage modes.
+   * @param pname A Glenum specifying which parameter to set. See below for
+   * possible values.
+   * @param param A GLint specifying a value to set the pname parameter to. See
+   * below for possible values.
+   */
+  virtual void pixelStorei(GLenum pname, GLint param) = 0;
+
+  /**
+   * @brief Specifies the scale factors and units to calculate depth values.
+   * @param factor A GLfloat which sets the scale factor for the variable depth
+   * offset for each polygon.
+   * @param units A GLfloat which sets the multiplier by which an
+   * implementation-specific value is multiplied with to create a constant depth
+   * offset.
+   */
   virtual void polygonOffset(GLfloat factor, GLfloat units) = 0;
-  virtual void readPixels(GLint x, GLint y, GLint width, GLint height,
+
+  /**
+   * @brief Reads a block of pixels from a specified rectangle of the current
+   * color framebuffer into an Uint8Array object.
+   * @param x A GLint specifying the first horizontal pixel that is read from
+   * the lower left corner of a rectangular block of pixels.
+   * @param y A GLint specifying the first vertical pixel that is read from the
+   * lower left corner of a rectangular block of pixels.
+   * @param width A GLsizei specifying the width of the rectangle.
+   * @param height A GLsizei specifying the height of the rectangle.
+   * @param format A GLenum specifying the format of the pixel data.
+   * @param type A GLenum specifying the data type of the pixel data.
+   * @param pixels An Uint8Array object to read data into.
+   */
+  virtual void readPixels(GLint x, GLint y, GLsizei width, GLsizei height,
                           GLenum format, GLenum type, Uint8Array& pixels)
     = 0;
 
+  /**
+   * @brief Creates and initializes a renderbuffer object's data store.
+   * @param target A Glenum specifying the target renderbuffer object.
+   * @param internalformat A Glenum specifying the internal format of the
+   * renderbuffer.
+   * @param width A GLsizei specifying the width of the renderbuffer in pixels.
+   * @param height A GLsizei specifying the height of the renderbuffer in
+   * pixels.
+   */
   virtual void renderbufferStorage(GLenum target, GLenum internalformat,
-                                   GLint width, GLint height)
+                                   GLsizei width, GLsizei height)
     = 0;
+
+  /**
+   * @brief Returns creates and initializes a renderbuffer object's data store
+   * and allows specifying a number of samples to be used.
+   * @param target A GLenum specifying the target renderbuffer object.
+   * @param samples A GLsizei specifying the number of samples to be used for
+   * the renderbuffer storage.
+   * @param internalFormat A GLenum specifying the internal format of the
+   * renderbuffer.
+   * @param width A GLsizei specifying the width of the renderbuffer in pixels.
+   * @param height A GLsizei specifying the height of the renderbuffer in
+   * pixels.
+   */
   virtual void renderbufferStorageMultisample(GLenum target, GLsizei samples,
                                               GLenum internalFormat,
                                               GLsizei width, GLsizei height)
     = 0;
+
+  /**
+   * @brief Specifies multi-sample coverage parameters for anti-aliasing
+   * effects.
+   * @param value A GLclampf which sets a single floating-point coverage value
+   * clamped to the range [0,1].
+   * @param invert A GLboolean which sets whether or not the coverage masks
+   * should be inverted.
+   */
   virtual void sampleCoverage(GLclampf value, GLboolean invert) = 0;
-  virtual void scissor(GLint x, GLint y, GLint width, GLint height) = 0;
+
+  /**
+   * @brief Sets a scissor box, which limits the drawing to a specified
+   * rectangle.
+   * @param x A GLint specifying the horizontal coordinate for the lower left
+   * corner of the box.
+   * @param y A GLint specifying the vertical coordinate for the lower left
+   * corner of the box.
+   * @param width A non-negative GLsizei specifying the width of the scissor
+   * box.
+   * @param height A non-negative GLsizei specifying the height of the scissor
+   * box.
+   */
+  virtual void scissor(GLint x, GLint y, GLsizei width, GLsizei height) = 0;
+
+  /**
+   * @brief Returns the source code of an IGLShader as a String.
+   * @param shader An IGLShader object to get the source code from.
+   * @param source A String containing the source code of the shader.
+   */
   virtual void shaderSource(const std::unique_ptr<IGLShader>& shader,
                             const std::string& source)
     = 0;
+
+  /**
+   * @brief Sets the front and back function and reference value for stencil
+   * testing.
+   * @param func A GLenum specifying the test function.
+   * @param ref A GLint specifying the reference value for the stencil test.
+   * @param mask A GLuint specifying a bit-wise mask that is used to AND the
+   * reference value and the stored stencil value when the test is done.
+   */
   virtual void stencilFunc(GLenum func, GLint ref, GLuint mask) = 0;
+
+  /**
+   * @brief Sets the front and/or back function and reference value for stencil
+   * testing. Stencilling enables and disables drawing on a per-pixel basis. It
+   * is typically used in multipass rendering to achieve special effects.
+   * @param face A GLenum specifying whether the front and/or back stencil state
+   * is updated.
+   * @param func A GLenum specifying the test function.
+   * @param ref A GLint specifying the reference value for the stencil test.
+   * This value is clamped to the range 0 to 2^(n-1) where n is the number of
+   * bitplanes in the stencil buffer.
+   * @param mask A GLuint specifying a bit-wise mask that is used to AND the
+   * reference value and the stored stencil value when the test is done.
+   */
   virtual void stencilFuncSeparate(GLenum face, GLenum func, GLint ref,
                                    GLuint mask)
     = 0;
+
+  /**
+   * @brief Controls enabling and disabling of both the front and back writing
+   * of individual bits in the stencil planes.
+   * @param mask A GLuint specifying a bit mask to enable or disable writing of
+   * individual bits in the stencil planes.
+   */
   virtual void stencilMask(GLuint mask) = 0;
+
+  /**
+   * @brief Controls enabling and disabling of front and/or back writing of
+   * individual bits in the stencil planes.
+   * @param face A GLenum specifying whether the front and/or back stencil
+   * writemask is updated.
+   * @param mask A GLuint specifying a bit mask to enable or disable writing of
+   * individual bits in the stencil planes.
+   */
   virtual void stencilMaskSeparate(GLenum face, GLuint mask) = 0;
+
+  /**
+   * @brief Sets both the front and back-facing stencil test actions.
+   * @param fail A GLenum specifying the function to use when the stencil test
+   * fails.
+   * @param zfail A GLenum specifying the function to use when the stencil test
+   * passes, but the depth test fails.
+   * @param zpass A GLenum specifying the function to use when both the stencil
+   * test and the depth test pass, or when the stencil test passes and there is
+   * no depth buffer or depth testing is disabled.
+   */
   virtual void stencilOp(GLenum fail, GLenum zfail, GLenum zpass) = 0;
+
+  /**
+   * @brief Sets the front and/or back-facing stencil test actions.
+   * @param face A GLenum specifying whether the front and/or back stencil state
+   * is updated.
+   * @param fail A GLenum specifying the function to use when the stencil test
+   * fails.
+   * @param zfail A GLenum specifying the function to use when the stencil test
+   * passes, but the depth test fails.
+   * @param zpass A GLenum specifying the function to use when both the stencil
+   * test and the depth test pass, or when the stencil test passes and there is
+   * no depth buffer or depth testing is disabled.
+   */
   virtual void stencilOpSeparate(GLenum face, GLenum fail, GLenum zfail,
                                  GLenum zpass)
     = 0;
+
+  /**
+   * @brief Specifies a two-dimensional texture image.
+   * @param target A GLenum specifying the binding point (target) of the active
+   * texture.
+   * @param level A GLint specifying the level of detail. Level 0 is the base
+   * image level and level n is the nth mipmap reduction level.
+   * @param internalformat A GLint specifying the color components in the
+   * texture.
+   * @param width A GLsizei specifying the width of the texture.
+   * @param height A GLsizei specifying the height of the texture.
+   * @param border A GLint specifying the width of the border. Must be 0.
+   * @param format A GLenum specifying the format of the texel data.
+   * @param type A GLenum specifying the data type of the texel data.
+   * @param pixels An Uint8Array pixel source for the texture.
+   */
   virtual void texImage2D(GLenum target, GLint level, GLint internalformat,
-                          GLint width, GLint height, GLint border,
+                          GLsizei width, GLsizei height, GLint border,
                           GLenum format, GLenum type, const Uint8Array& pixels)
     = 0;
+
+  /**
+   * @brief Specifies a two-dimensional texture image.
+   * @param target A GLenum specifying the binding point (target) of the active
+   * texture.
+   * @param level A GLint specifying the level of detail. Level 0 is the base
+   * image level and level n is the nth mipmap reduction level.
+   * @param internalformat A GLint specifying the color components in the
+   * texture.
+   * @param format A GLenum specifying the format of the texel data.
+   * @param type A GLenum specifying the data type of the texel data.
+   * @param pixels An ICanvas pixel source for the texture.
+   */
   virtual void texImage2D(GLenum target, GLint level, GLenum internalformat,
                           GLenum format, GLenum type, ICanvas* pixels)
     = 0;
+
+  /**
+   * @brief Specifies a two-dimensional texture image.
+   * @param target A GLenum specifying the binding point (target) of the active
+   * texture.
+   * @param level A GLint specifying the level of detail. Level 0 is the base
+   * image level and level n is the nth mipmap reduction level.
+   * @param internalformat A GLint specifying the color components in the
+   * texture.
+   * @param width A GLsizei specifying the width of the texture.
+   * @param height A GLsizei specifying the height of the texture.
+   * @param border A GLint specifying the width of the border. Must be 0.
+   * @param format A GLenum specifying the format of the texel data.
+   * @param type A GLenum specifying the data type of the texel data.
+   * @param pixels An ICanvas pixel source for the texture.
+   */
   virtual void texImage2D(GLenum target, GLint level, GLenum internalformat,
                           GLsizei width, GLsizei height, GLsizei border,
                           GLenum format, GLenum type, ICanvas* pixels)
     = 0;
+
+  /**
+   * @brief Sets texture parameters.
+   * @param target A GLenum specifying the binding point (target).
+   * @param pname A Glenum specifying the texture parameter to set.
+   * @param param A GLfloat or GLint specifying the value for the specified
+   * parameter pname.
+   */
   virtual void texParameterf(GLenum target, GLenum pname, GLfloat param) = 0;
-  virtual void texParameteri(GLenum target, GLenum pname, GLint param)   = 0;
+
+  /**
+   * @brief Set texture parameters.
+   * @param target A GLenum specifying the binding point (target).
+   * @param pname A Glenum specifying the texture parameter to set.
+   * @param param A GLfloat or GLint specifying the value for the specified
+   * parameter pname.
+   */
+  virtual void texParameteri(GLenum target, GLenum pname, GLint param) = 0;
+
+  /**
+   * @brief pecifies a sub-rectangle of the current texture.
+   * @param target A GLenum specifying the binding point (target) of the active
+   * texture.
+   * @param level A GLint specifying the level of detail. Level 0 is the base
+   * image level and level n is the nth mipmap reduction level.
+   * @param xoffset A GLint specifying the horizontal offset within the texture
+   * image.
+   * @param yoffset A GLint specifying the vertical offset within the texture
+   * image.
+   * @param width A GLsizei specifying the width of the texture.
+   * @param height A GLsizei specifying the height of the texture.
+   * @param format A GLenum specifying the format of the texel data.
+   * @param type A GLenum specifying the data type of the texel data.
+   * @param pixels A pixel source for the texture.
+   */
   virtual void texSubImage2D(GLenum target, GLint level, GLint xoffset,
-                             GLint yoffset, GLint width, GLint height,
+                             GLint yoffset, GLsizei width, GLsizei height,
                              GLenum format, GLenum type, any pixels)
     = 0;
   virtual void uniform1f(IGLUniformLocation* location, GLfloat x) = 0;
@@ -1195,41 +1658,194 @@ public:
     = 0;
   virtual void uniform4iv(IGLUniformLocation* location, const Int32Array& v)
     = 0;
+
+  /**
+   * @brief Assigns binding points for active uniform blocks.
+   * @param program An IGLProgram containing the active uniform block whose
+   * binding to assign.
+   * @param uniformBlockIndex A GLuint specifying the index of the active
+   * uniform block within the program.
+   * @param uniformBlockBinding A GLuint specifying the binding point to which
+   * to bind the uniform block.
+   */
   virtual void uniformBlockBinding(IGLProgram* program,
                                    GLuint uniformBlockIndex,
                                    GLuint uniformBlockBinding)
     = 0;
+
+  /**
+   * @brief Specify matrix values for uniform variables.
+   * @param location An IGLUniformLocation object containing the location of the
+   * uniform attribute to modify.
+   * @param transpose A GLboolean specifying whether to transpose the matrix.
+   * Must be false.
+   * @param value A Float32Array of float values.
+   */
   virtual void uniformMatrix2fv(IGLUniformLocation* location,
                                 GLboolean transpose, const Float32Array& value)
     = 0;
+
+  /**
+   * @brief Specify matrix values for uniform variables.
+   * @param location An IGLUniformLocation object containing the location of the
+   * uniform attribute to modify.
+   * @param transpose A GLboolean specifying whether to transpose the matrix.
+   * Must be false.
+   * @param value A Float32Array of float values.
+   */
   virtual void uniformMatrix3fv(IGLUniformLocation* location,
                                 GLboolean transpose, const Float32Array& value)
     = 0;
+
+  /**
+   * @brief Specify matrix values for uniform variables.
+   * @param location An IGLUniformLocation object containing the location of the
+   * uniform attribute to modify.
+   * @param transpose A GLboolean specifying whether to transpose the matrix.
+   * Must be false.
+   * @param value A Float32Array of float values.
+   */
   virtual void uniformMatrix4fv(IGLUniformLocation* location,
                                 GLboolean transpose, const Float32Array& value)
     = 0;
+
+  /**
+   * @brief Specify matrix values for uniform variables.
+   * @param location An IGLUniformLocation object containing the location of the
+   * uniform attribute to modify.
+   * @param transpose A GLboolean specifying whether to transpose the matrix.
+   * Must be false.
+   * @param value A Float32Array of float values.
+   */
   virtual void uniformMatrix4fv(IGLUniformLocation* location,
                                 GLboolean transpose,
                                 const std::array<float, 16>& value)
     = 0;
-  virtual void useProgram(IGLProgram* program)      = 0;
+
+  /**
+   * @brief Sets the specified IGLProgram as part the current rendering state.
+   * @param An IGLProgram to use.
+   */
+  virtual void useProgram(IGLProgram* program) = 0;
+
+  /**
+   * @brief Validates an IGLProgram. It checks if it is successfully linked and
+   * if it can be used in the current GL state.
+   * @param program An IGLProgram to validate.
+   */
   virtual void validateProgram(IGLProgram* program) = 0;
-  virtual void vertexAttrib1f(GLuint indx, GLfloat x)             = 0;
+
+  /**
+   * @brief Specifies values for generic vertex attributes.
+   * @param index A GLuint specifying the position of the vertex attribute to be
+   * modified.
+   * @param v0 A floating point Number for the vertex attribute value.
+   */
+  virtual void vertexAttrib1f(GLuint index, GLfloat v0)           = 0;
   virtual void vertexAttrib1fv(GLuint indx, Float32Array& values) = 0;
-  virtual void vertexAttrib2f(GLuint indx, GLfloat x, GLfloat y) = 0;
-  virtual void vertexAttrib2fv(GLuint indx, Float32Array& values) = 0;
-  virtual void vertexAttrib3f(GLuint indx, GLfloat x, GLfloat y, GLfloat z) = 0;
-  virtual void vertexAttrib3fv(GLuint indx, Float32Array& values) = 0;
-  virtual void vertexAttrib4f(GLuint indx, GLfloat x, GLfloat y, GLfloat z,
-                              GLfloat w)
+
+  /**
+   * @brief Specifies values for generic vertex attributes.
+   * @param index A GLuint specifying the position of the vertex attribute to be
+   * modified.
+   * @param v0 A floating point Number for the vertex attribute value.
+   * @param v1 A floating point Number for the vertex attribute value.
+   */
+  virtual void vertexAttrib2f(GLuint index, GLfloat v0, GLfloat v1) = 0;
+
+  /**
+   * @brief Specifies values for generic vertex attributes.
+   * @param index A GLuint specifying the position of the vertex attribute to be
+   * modified.
+   * @param values A Float32Array for floating point vector vertex attribute
+   * values.
+   */
+  virtual void vertexAttrib2fv(GLuint index, Float32Array& values) = 0;
+
+  /**
+   * @brief Specifies values for generic vertex attributes.
+   * @param index A GLuint specifying the position of the vertex attribute to be
+   * modified.
+   * @param v0 A floating point Number for the vertex attribute value.
+   * @param v1 A floating point Number for the vertex attribute value.
+   * @param v2 A floating point Number for the vertex attribute value.
+   */
+  virtual void vertexAttrib3f(GLuint index, GLfloat v0, GLfloat v1, GLfloat v2)
     = 0;
-  virtual void vertexAttrib4fv(GLuint indx, Float32Array& values) = 0;
-  virtual void vertexAttribDivisor(GLuint index, GLuint divisor)  = 0;
-  virtual void vertexAttribPointer(GLuint indx, GLint size, GLenum type,
+
+  /**
+   * @brief Specifies values for generic vertex attributes.
+   * @param index A GLuint specifying the position of the vertex attribute to be
+   * modified.
+   * @param values A Float32Array for floating point vector vertex attribute
+   * values.
+   */
+  virtual void vertexAttrib3fv(GLuint index, Float32Array& values) = 0;
+
+  /**
+   * @brief Specifies values for generic vertex attributes.
+   * @param index A GLuint specifying the position of the vertex attribute to be
+   * modified.
+   * @param v0 A floating point Number for the vertex attribute value.
+   * @param v1 A floating point Number for the vertex attribute value.
+   * @param v2 A floating point Number for the vertex attribute value.
+   * @param v3 A floating point Number for the vertex attribute value.
+   */
+  virtual void vertexAttrib4f(GLuint index, GLfloat v0, GLfloat v1, GLfloat v2,
+                              GLfloat v3)
+    = 0;
+
+  /**
+   * @brief Specifies values for generic vertex attributes.
+   * @param index A GLuint specifying the position of the vertex attribute to be
+   * modified.
+   * @param values A Float32Array for floating point vector vertex attribute
+   * values.
+   */
+  virtual void vertexAttrib4fv(GLuint index, Float32Array& values) = 0;
+
+  /**
+   * @brief Modifies the rate at which generic vertex attributes advance when
+   * rendering multiple instances of primitives with drawArraysInstanced() and
+   * drawElementsInstanced().
+   * @param index A GLuint specifying the index of the generic vertex
+   * attributes.
+   * @param divisor A GLuint specifying the number of instances that will pass
+   * between updates of the generic attribute.
+   */
+  virtual void vertexAttribDivisor(GLuint index, GLuint divisor) = 0;
+
+  /**
+   * @brief Specifies integer data formats and locations of vertex attributes in
+   * a vertex attributes array.
+   * @param index A GLuint specifying the index of the vertex attribute that is
+   * to be modified.
+   * @param size A GLint specifying the number of components per vertex
+   * attribute. Must be 1, 2, 3, or 4.
+   * @param type A GLenum specifying the data type of each component in the
+   * array.
+   * @param normalized A GLboolean specifying if the data is normalized
+   * @param stride A GLsizei specifying the offset in bytes between the
+   * beginning of consecutive vertex attributes.
+   * @param offset A GLintptr specifying an offset in bytes of the first
+   * component in the vertex attribute array.
+   */
+  virtual void vertexAttribPointer(GLuint index, GLint size, GLenum type,
                                    GLboolean normalized, GLint stride,
                                    GLintptr offset)
     = 0;
-  virtual void viewport(GLint x, GLint y, GLint width, GLint height) = 0;
+
+  /**
+   * @brief Sets the viewport, which specifies the affine transformation of x
+   * and y from normalized device coordinates to window coordinates.
+   * @param x A GLint specifying the horizontal coordinate for the lower left
+   * corner of the viewport origin.
+   * @param y A GLint specifying the vertical coordinate for the lower left
+   * corner of the viewport origin.
+   * @param width A non-negative GLsizei specifying the width of the viewport.
+   * @param height A non-negative GLsizei specifying the height of the viewport.
+   */
+  virtual void viewport(GLint x, GLint y, GLsizei width, GLsizei height) = 0;
 
 protected:
   GLuint last_program;
