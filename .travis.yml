@@ -31,7 +31,7 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
+            - llvm-toolchain-trusty-3.7
           packages:
             - libxcursor-dev
             - libxinerama-dev
