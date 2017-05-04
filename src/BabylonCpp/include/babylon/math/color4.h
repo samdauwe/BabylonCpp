@@ -112,6 +112,11 @@ public:
   const Color4 multiplyToRef(const Color4& color, Color4& result) const;
 
   /**
+   * @brief Returns true if the rgb values are equal to the passed ones.
+   */
+  bool equals(const Color4& otherColor) const;
+
+  /**
    * @brief Returns a string with the Color4 values.
    */
   std::string toString() const;
@@ -141,6 +146,8 @@ public:
 
   /** Operator overloading **/
   friend std::ostream& operator<<(std::ostream& os, const Color4& color);
+  friend bool operator==(const Color4& lhs, const Color4& rhs);
+  friend bool operator!=(const Color4& lhs, const Color4& rhs);
   Color4 operator+(const Color4& right) const;
   Color4& operator+=(const Color4& right);
   Color4 operator-(const Color4& right) const;
@@ -192,6 +199,8 @@ public:
 }; // end of class Color4
 
 std::ostream& operator<<(std::ostream& os, const Color4& color);
+bool operator==(const Color4& lhs, const Color4& rhs);
+bool operator!=(const Color4& lhs, const Color4& rhs);
 
 } // end of namespace BABYLON
 

@@ -61,8 +61,8 @@ private:
 }; // end of class Angle
 
 std::ostream& operator<<(std::ostream& os, const Angle& angle);
-inline bool operator==(const Angle& lhs, const Angle& rhs);
-inline bool operator!=(const Angle& lhs, const Angle& rhs);
+bool operator==(const Angle& lhs, const Angle& rhs);
+bool operator!=(const Angle& lhs, const Angle& rhs);
 
 } // end of namespace BABYLON
 

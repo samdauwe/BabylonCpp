@@ -257,6 +257,16 @@ std::ostream& operator<<(std::ostream& os, const Color3& color)
   return os;
 }
 
+bool operator==(const Color3& lhs, const Color3& rhs)
+{
+  return lhs.equals(rhs);
+}
+
+bool operator!=(const Color3& lhs, const Color3& rhs)
+{
+  return !(lhs == rhs);
+}
+
 Color3 Color3::operator+(const Color3& otherColor) const
 {
   return add(otherColor);
@@ -275,16 +285,6 @@ Color3 Color3::operator*(float iscale) const
 Color3 Color3::operator*(const Color3& otherColor) const
 {
   return multiply(otherColor);
-}
-
-bool Color3::operator==(const Color3& otherColor) const
-{
-  return equals(otherColor);
-}
-
-bool Color3::operator!=(const Color3& otherColor) const
-{
-  return !(operator==(otherColor));
 }
 
 /** Statics **/

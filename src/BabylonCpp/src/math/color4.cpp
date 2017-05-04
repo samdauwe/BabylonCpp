@@ -169,6 +169,14 @@ const Color4 Color4::multiplyToRef(const Color4& color, Color4& result) const
   return result;
 }
 
+bool Color4::equals(const Color4& otherColor) const
+{
+  return std_util::almost_equal(r, otherColor.r)
+         && std_util::almost_equal(g, otherColor.g)
+         && std_util::almost_equal(b, otherColor.b)
+         && std_util::almost_equal(a, otherColor.a);
+}
+
 std::string Color4::toString() const
 {
   std::ostringstream oss;
@@ -223,6 +231,16 @@ std::ostream& operator<<(std::ostream& os, const Color4& color)
   os << "{\"R\":" << color.r << ",\"G\":" << color.g << ",\"B\":" << color.b
      << ",\"A\":" << color.a << "}";
   return os;
+}
+
+bool operator==(const Color4& lhs, const Color4& rhs)
+{
+  return lhs.equals(rhs);
+}
+
+bool operator!=(const Color4& lhs, const Color4& rhs)
+{
+  return !(lhs == rhs);
 }
 
 Color4 Color4::operator+(const Color4& right) const

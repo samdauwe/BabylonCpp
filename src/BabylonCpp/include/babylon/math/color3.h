@@ -79,12 +79,12 @@ public:
   const Color3& multiplyToRef(const Color3& otherColor, Color3& result) const;
 
   /**
-   * @brief Returns if the rgb values are equal to the passed ones.
+   * @brief Returns true if the rgb values are equal to the passed ones.
    */
   bool equals(const Color3& otherColor) const;
 
   /**
-   * @brief Returns if the rgb values are equal to the passed ones.
+   * @brief Returns true if the rgb values are equal to the passed ones.
    */
   bool equalsFloats(float red, float green, float blue) const;
 
@@ -176,12 +176,12 @@ public:
 
   /** Operator overloading **/
   friend std::ostream& operator<<(std::ostream& os, const Color3& color);
+  friend bool operator==(const Color3& lhs, const Color3& rhs);
+  friend bool operator!=(const Color3& lhs, const Color3& rhs);
   Color3 operator+(const Color3& otherColor) const;
   Color3 operator-(const Color3& otherColor) const;
   Color3 operator*(float iscale) const;
   Color3 operator*(const Color3& otherColor) const;
-  bool operator==(const Color3& otherColor) const;
-  bool operator!=(const Color3& otherColor) const;
 
   /** Statics **/
 
@@ -230,6 +230,8 @@ public:
 }; // end of class Color3
 
 std::ostream& operator<<(std::ostream& os, const Color3& color);
+bool operator==(const Color3& lhs, const Color3& rhs);
+bool operator!=(const Color3& lhs, const Color3& rhs);
 
 } // end of namespace BABYLON
 

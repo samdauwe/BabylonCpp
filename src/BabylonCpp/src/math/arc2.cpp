@@ -113,4 +113,17 @@ std::ostream& operator<<(std::ostream& os, const Arc2& arc)
   return os;
 }
 
+bool operator==(const Arc2& lhs, const Arc2& rhs)
+{
+  return (lhs.centerPoint == rhs.centerPoint)
+         && std_util::almost_equal(lhs.radius, rhs.radius)
+         && (lhs.angle == rhs.angle) && (lhs.startAngle == rhs.startAngle)
+         && (lhs.orientation == rhs.orientation);
+}
+
+bool operator!=(const Arc2& lhs, const Arc2& rhs)
+{
+  return !(lhs == rhs);
+}
+
 } // end of namespace BABYLON

@@ -28,6 +28,8 @@ public:
   Arc2 copy() const;
   std::unique_ptr<Arc2> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Arc2& arc);
+  friend bool operator==(const Arc2& lhs, const Arc2& rhs);
+  friend bool operator!=(const Arc2& lhs, const Arc2& rhs);
 
 public:
   Vector2 centerPoint;
@@ -38,6 +40,8 @@ public:
 }; // end of class Arc2
 
 std::ostream& operator<<(std::ostream& os, const Arc2& arc);
+bool operator==(const Arc2& lhs, const Arc2& rhs);
+bool operator!=(const Arc2& lhs, const Arc2& rhs);
 
 } // end of namespace BABYLON
 
