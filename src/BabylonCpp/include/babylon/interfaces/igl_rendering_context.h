@@ -451,6 +451,9 @@ public:
   GLint precision;
 }; // end of class IGLShaderPrecisionFormat
 
+/**
+ * @brief The IGLTexture interface provides the GL rendering context
+ */
 class BABYLON_SHARED_EXPORT IGLTexture {
 
 public:
@@ -1182,12 +1185,48 @@ public:
   virtual GLint getAttribLocation(IGLProgram* program, const std::string& name)
     = 0;
 
-  virtual bool hasExtension(const std::string& extension) = 0;
+  /**
+   * @brief Returns true if the specified GL extension is supported.
+   * @param extension A String specifying the extension to query.
+   * @return A GLboolean indicating whether or not the GL extension is
+   * supported.
+   */
+  virtual GLboolean hasExtension(const std::string& extension) = 0;
+
   virtual std::array<int, 3> getScissorBoxParameter() = 0; // GL::SCISSOR_BOX
-  virtual GLint getParameteri(GLenum pname)      = 0;
-  virtual GLfloat getParameterf(GLenum pname)    = 0;
-  virtual std::string getString(GLenum pname)    = 0;
-  virtual GLint getTexParameteri(GLenum pname)   = 0;
+
+  /**
+   * @brief Returns a value for the passed parameter name.
+   * @param pname A GLenum specifying which parameter value to return. See below
+   * for possible values.
+   * @return A GLint representing the value for the passed parameter name.
+   */
+  virtual GLint getParameteri(GLenum pname) = 0;
+
+  /**
+   * @brief Returns a value for the passed parameter name.
+   * @param pname A GLenum specifying which parameter value to return. See below
+   * for possible values.
+   * @return A GLenum representing the value for the passed parameter name.
+   */
+  virtual GLfloat getParameterf(GLenum pname) = 0;
+
+  virtual std::string getString(GLenum pname) = 0;
+
+  /**
+   * @brief Returns information about the given texture.
+   * @param pname A Glenum specifying the information to query.
+   * @return A GLint representing the requested texture information (as
+   * specified with pname).
+   */
+  virtual GLint getTexParameteri(GLenum pname) = 0;
+
+  /**
+   * @brief Returns information about the given texture.
+   * @param pname A Glenum specifying the information to query.
+   * @return A GLfloat representing the requested texture information (as
+   * specified with pname).
+   */
   virtual GLfloat getTexParameterf(GLenum pname) = 0;
 
   /**
@@ -1605,7 +1644,7 @@ public:
   virtual void texParameteri(GLenum target, GLenum pname, GLint param) = 0;
 
   /**
-   * @brief pecifies a sub-rectangle of the current texture.
+   * @brief Specifies a sub-rectangle of the current texture.
    * @param target A GLenum specifying the binding point (target) of the active
    * texture.
    * @param level A GLint specifying the level of detail. Level 0 is the base
@@ -1624,38 +1663,162 @@ public:
                              GLint yoffset, GLsizei width, GLsizei height,
                              GLenum format, GLenum type, any pixels)
     = 0;
-  virtual void uniform1f(IGLUniformLocation* location, GLfloat x) = 0;
-  virtual void uniform1fv(GL::IGLUniformLocation* uniform,
+
+  /**
+   * @brief Specifies the value of the uniform variable.
+   * @param location An IGLUniformLocation object containing the location of the
+   * uniform attribute to modify.
+   * @param v0 A GLfloat to be used for the uniform variable.
+   */
+  virtual void uniform1f(IGLUniformLocation* location, GLfloat v0) = 0;
+
+  /**
+   * @brief Specifies the values of the uniform variable.
+   * @param location An IGLUniformLocation object containing the location of the
+   * uniform attribute to modify.
+   * @param array A Float32Array to be used for the uniform variable.
+   */
+  virtual void uniform1fv(GL::IGLUniformLocation* location,
                           const Float32Array& array)
     = 0;
-  virtual void uniform1i(IGLUniformLocation* location, GLint x) = 0;
+
+  /**
+   * @brief Specifies the value of the uniform variable.
+   * @param location An IGLUniformLocation object containing the location of the
+   * uniform attribute to modify.
+   * @param v0 A GLint to be used for the uniform variable.
+   */
+  virtual void uniform1i(IGLUniformLocation* location, GLint v0) = 0;
+
+  /**
+   * @brief Specifies the values of the uniform variable.
+   * @param location An IGLUniformLocation object containing the location of the
+   * uniform attribute to modify.
+   * @param v An Int32Array to be used for the uniform variable.
+   */
   virtual void uniform1iv(IGLUniformLocation* location, const Int32Array& v)
     = 0;
-  virtual void uniform2f(IGLUniformLocation* location, GLfloat x, GLfloat y)
+
+  /**
+   * @brief Specifies the values of the uniform variable.
+   * @param location An IGLUniformLocation object containing the location of the
+   * uniform attribute to modify.
+   * @param v0 A GLfloat to be used for the uniform variable.
+   * @param v1 A GLfloat to be used for the uniform variable.
+   */
+  virtual void uniform2f(IGLUniformLocation* location, GLfloat v0, GLfloat v1)
     = 0;
+
+  /**
+   * @brief Specifies the values of the uniform variable.
+   * @param location An IGLUniformLocation object containing the location of the
+   * uniform attribute to modify.
+   * @param v A Float32Array to be used for the uniform variable.
+   */
   virtual void uniform2fv(IGLUniformLocation* location, const Float32Array& v)
     = 0;
-  virtual void uniform2i(IGLUniformLocation* location, GLint x, GLint y) = 0;
+
+  /**
+   * @brief Specifies the values of the uniform variable.
+   * @param location An IGLUniformLocation object containing the location of the
+   * uniform attribute to modify.
+   * @param v0 A GLint to be used for the uniform variable.
+   * @param v1 A GLint to be used for the uniform variable.
+   */
+  virtual void uniform2i(IGLUniformLocation* location, GLint v0, GLint v1) = 0;
+
+  /**
+   * @brief Specifies the values of the uniform variable.
+   * @param location An IGLUniformLocation object containing the location of the
+   * uniform attribute to modify.
+   * @param v An Int32Array to be used for the uniform variable.
+   */
   virtual void uniform2iv(IGLUniformLocation* location, const Int32Array& v)
     = 0;
-  virtual void uniform3f(IGLUniformLocation* location, GLfloat x, GLfloat y,
-                         GLfloat z)
+
+  /**
+   * @brief Specifies the values of the uniform variable.
+   * @param location An IGLUniformLocation object containing the location of the
+   * uniform attribute to modify.
+   * @param v0 A GLfloat to be used for the uniform variable.
+   * @param v1 A GLfloat to be used for the uniform variable.
+   * @param v2 A GLfloat to be used for the uniform variable.
+   */
+  virtual void uniform3f(IGLUniformLocation* location, GLfloat v0, GLfloat v1,
+                         GLfloat v2)
     = 0;
+
+  /**
+   * @brief Specifies the values of the uniform variable.
+   * @param location An IGLUniformLocation object containing the location of the
+   * uniform attribute to modify.
+   * @param v A Float32Array to be used for the uniform variable.
+   */
   virtual void uniform3fv(IGLUniformLocation* location, const Float32Array& v)
     = 0;
-  virtual void uniform3i(IGLUniformLocation* location, GLint x, GLint y,
-                         GLint z)
+
+  /**
+   * @brief Specifies the values of the uniform variable.
+   * @param location An IGLUniformLocation object containing the location of the
+   * uniform attribute to modify.
+   * @param v0 A GLint to be used for the uniform variable.
+   * @param v1 A GLint to be used for the uniform variable.
+   * @param v2 A GLint to be used for the uniform variable.
+   */
+  virtual void uniform3i(IGLUniformLocation* location, GLint v0, GLint v1,
+                         GLint v2)
     = 0;
+
+  /**
+   * @brief Specifies the values of the uniform variable.
+   * @param location An IGLUniformLocation object containing the location of the
+   * uniform attribute to modify.
+   * @param v An Int32Array to be used for the uniform variable.
+   */
   virtual void uniform3iv(IGLUniformLocation* location, const Int32Array& v)
     = 0;
-  virtual void uniform4f(IGLUniformLocation* location, GLfloat x, GLfloat y,
-                         GLfloat z, GLfloat w)
+
+  /**
+   * @brief Specifies the values of the uniform variable.
+   * @param location An IGLUniformLocation object containing the location of the
+   * uniform attribute to modify.
+   * @param v0 A GLfloat to be used for the uniform variable.
+   * @param v1 A GLfloat to be used for the uniform variable.
+   * @param v2 A GLfloat to be used for the uniform variable.
+   * @param v3 A GLfloat to be used for the uniform variable.
+   */
+  virtual void uniform4f(IGLUniformLocation* location, GLfloat v0, GLfloat v1,
+                         GLfloat v2, GLfloat v3)
     = 0;
+
+  /**
+   * @brief Specifies the values of the uniform variable.
+   * @param location An IGLUniformLocation object containing the location of the
+   * uniform attribute to modify.
+   * @param v A Float32Array to be used for the uniform variable.
+   */
   virtual void uniform4fv(IGLUniformLocation* location, const Float32Array& v)
     = 0;
-  virtual void uniform4i(IGLUniformLocation* location, GLint x, GLint y,
-                         GLint z, GLint w)
+
+  /**
+   * @brief Specifies the values of the uniform variable.
+   * @param location An IGLUniformLocation object containing the location of the
+   * uniform attribute to modify.
+   * @param v0 A GLint to be used for the uniform variable.
+   * @param v1 A GLint to be used for the uniform variable.
+   * @param v2 A GLint to be used for the uniform variable.
+   * @param v3 A GLint to be used for the uniform variable.
+   */
+  virtual void uniform4i(IGLUniformLocation* location, GLint v0, GLint v1,
+                         GLint v2, GLint v3)
     = 0;
+
+  /**
+   * @brief Specifies the values of the uniform variable.
+   * @param location An IGLUniformLocation object containing the location of the
+   * uniform attribute to modify.
+   * @param An Int32Array to be used for the uniform variable.
+   */
   virtual void uniform4iv(IGLUniformLocation* location, const Int32Array& v)
     = 0;
 
@@ -1674,7 +1837,7 @@ public:
     = 0;
 
   /**
-   * @brief Specify matrix values for uniform variables.
+   * @brief Specifies the matrix values for uniform variable.
    * @param location An IGLUniformLocation object containing the location of the
    * uniform attribute to modify.
    * @param transpose A GLboolean specifying whether to transpose the matrix.
@@ -1686,7 +1849,7 @@ public:
     = 0;
 
   /**
-   * @brief Specify matrix values for uniform variables.
+   * @brief Specifies the matrix values for uniform variable.
    * @param location An IGLUniformLocation object containing the location of the
    * uniform attribute to modify.
    * @param transpose A GLboolean specifying whether to transpose the matrix.
@@ -1698,7 +1861,7 @@ public:
     = 0;
 
   /**
-   * @brief Specify matrix values for uniform variables.
+   * @brief Specifies the matrix values for uniform variable.
    * @param location An IGLUniformLocation object containing the location of the
    * uniform attribute to modify.
    * @param transpose A GLboolean specifying whether to transpose the matrix.
@@ -1710,7 +1873,7 @@ public:
     = 0;
 
   /**
-   * @brief Specify matrix values for uniform variables.
+   * @brief Specifies the matrix values for uniform variable.
    * @param location An IGLUniformLocation object containing the location of the
    * uniform attribute to modify.
    * @param transpose A GLboolean specifying whether to transpose the matrix.
@@ -1796,7 +1959,7 @@ public:
     = 0;
 
   /**
-   * @brief Specifies values for generic vertex attributes.
+   * @brief Specifies the values for generic vertex attributes.
    * @param index A GLuint specifying the position of the vertex attribute to be
    * modified.
    * @param values A Float32Array for floating point vector vertex attribute
