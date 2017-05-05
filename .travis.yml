@@ -1,6 +1,6 @@
 # Ubuntu 14.04 Trusty support
-sudo: required
 dist: trusty
+sudo: required
 
 # Enable C++ support
 language: cpp
@@ -31,13 +31,16 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-3.7
           packages:
             - libxcursor-dev
             - libxinerama-dev
             - libxrandr-dev
-            - clang-3.7
       env: CC_VERSION=clang-3.7 CXX_VERSION=clang++-3.7
+      before_install:
+        - wget -nv -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
+        - sudo apt-add-repository -y 'deb http://llvm.org/apt/trusty llvm-toolchain-trusty-3.7 main'
+        - sudo apt-get update -qq
+        - sudo apt-get install -qq -y clang-3.7
 
     # GCC 5
     - os: linux
