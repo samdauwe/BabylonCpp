@@ -24,7 +24,7 @@ matrix:
     # Build with the main configuration on all the supported compilers #
     ####################################################################
 
-    # Clang 3.7
+    # Clang 3.8
     - os: linux
       compiler: clang
       addons:
@@ -35,12 +35,14 @@ matrix:
             - libxcursor-dev
             - libxinerama-dev
             - libxrandr-dev
-      env: CC_VERSION=clang-3.7 CXX_VERSION=clang++-3.7
+            - clang-3.8
+      env: CC_VERSION=clang-3.8 CXX_VERSION=clang++-3.8
       before_install:
-        - wget -nv -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
-        - sudo apt-add-repository -y 'deb http://llvm.org/apt/trusty llvm-toolchain-trusty-3.7 main'
-        - sudo apt-get update -qq
-        - sudo apt-get install -qq -y clang-3.7 lldb-3.7 libc++-dev libc++abi-dev
+        # Clang-3.8
+        - sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-3.8 90
+        - sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-3.8 90
+        # Clang STL
+        - sudo apt-get install -y libc++-dev libc++abi-dev
 
     # GCC 5
     - os: linux
