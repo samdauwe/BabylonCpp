@@ -14,10 +14,12 @@ struct BABYLON_SHARED_EXPORT FireMaterialDefines : public MaterialDefines {
   static constexpr unsigned int ALPHATEST   = 2;
   static constexpr unsigned int POINTSIZE   = 3;
   static constexpr unsigned int FOG         = 4;
-  static constexpr unsigned int UV1         = 5;
-  static constexpr unsigned int VERTEXCOLOR = 6;
-  static constexpr unsigned int VERTEXALPHA = 7;
-  static constexpr unsigned int INSTANCES   = 8;
+  static constexpr unsigned int NORMAL      = 5;
+  static constexpr unsigned int UV1         = 6;
+  static constexpr unsigned int UV2         = 7;
+  static constexpr unsigned int VERTEXCOLOR = 8;
+  static constexpr unsigned int VERTEXALPHA = 9;
+  static constexpr unsigned int INSTANCES   = 10;
 
   FireMaterialDefines();
   ~FireMaterialDefines();

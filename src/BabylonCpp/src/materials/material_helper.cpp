@@ -104,7 +104,8 @@ void MaterialHelper::PrepareDefinesForAttributes(
   if (useBones) {
     if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
       defines.NUM_BONE_INFLUENCERS = mesh->numBoneInfluencers();
-      defines.BonesPerMesh         = (mesh->skeleton()->bones.size() + 1);
+      defines.BonesPerMesh
+        = static_cast<unsigned>(mesh->skeleton()->bones.size() + 1);
     }
     else {
       defines.NUM_BONE_INFLUENCERS = 0;
@@ -119,7 +120,8 @@ void MaterialHelper::PrepareDefinesForAttributes(
       defines.defines[MORPHTARGETS_NORMAL]
         = manager->supportsNormals() && defines[NORMAL];
       defines.defines[MORPHTARGETS] = (manager->numInfluencers() > 0);
-      defines.NUM_MORPH_INFLUENCERS = manager->numInfluencers();
+      defines.NUM_MORPH_INFLUENCERS
+        = static_cast<unsigned>(manager->numInfluencers());
     }
     else {
       defines.defines[MORPHTARGETS_NORMAL] = false;

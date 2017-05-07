@@ -2,14 +2,14 @@
 #define BABYLON_MATERIALS_LIBRARY_FIRE_FIRE_MATERIAL_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/materials/material.h>
+#include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/fire/fire_material_defines.h>
 #include <babylon/math/color3.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {
 
-class BABYLON_SHARED_EXPORT FireMaterial : public Material {
+class BABYLON_SHARED_EXPORT FireMaterial : public PushMaterial {
 
 public:
   using FMD = FireMaterialDefines;
@@ -19,14 +19,14 @@ public:
 
 public:
   FireMaterial(const std::string& name, Scene* scene);
-  ~FireMaterial();
+  virtual ~FireMaterial();
 
   bool needAlphaBlending() override;
   bool needAlphaTesting() override;
   BaseTexture* getAlphaTestTexture() override;
-  bool isReady(AbstractMesh* mesh, bool useInstances) override;
-  void bindOnlyWorldMatrix(Matrix& world) override;
-  void bind(Matrix* world, Mesh* mesh) override;
+  bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+                         bool useInstances) override;
+  void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatable*> getAnimatables();
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
@@ -38,21 +38,17 @@ public:
   static FireMaterial* Parse(const Json::value& source, Scene* scene,
                              const std::string& rootUrl);
 
-private:
-  bool _checkCache(Scene* scene, AbstractMesh* mesh, bool useInstances = false);
-
 public:
-  BaseTexture* diffuseTexture;
-  BaseTexture* distortionTexture;
-  BaseTexture* opacityTexture;
   Color3 diffuseColor;
   float speed;
 
 private:
+  BaseTexture* _diffuseTexture;
+  BaseTexture* _distortionTexture;
+  BaseTexture* _opacityTexture;
   Color3 _scaledDiffuse;
   int _renderId;
   FireMaterialDefines _defines;
-  std::unique_ptr<FireMaterialDefines> _cachedDefines;
   microseconds_t _lastTime;
 
 }; // end of class FireMaterial

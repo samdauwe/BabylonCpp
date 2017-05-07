@@ -7,10 +7,12 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/mesh/mesh.h>
+#include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
 
 namespace BABYLON {
@@ -19,18 +21,15 @@ namespace MaterialsLibrary {
 unsigned int FireMaterial::maxSimultaneousLights = 4;
 
 FireMaterial::FireMaterial(const std::string& iName, Scene* scene)
-    : Material{iName, scene}
-    , diffuseTexture{nullptr}
-    , distortionTexture{nullptr}
-    , opacityTexture{nullptr}
+    : PushMaterial{iName, scene}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
     , speed{1.f}
+    , _diffuseTexture{nullptr}
+    , _distortionTexture{nullptr}
+    , _opacityTexture{nullptr}
     , _renderId{-1}
-    , _cachedDefines{std_util::make_unique<FireMaterialDefines>()}
     , _lastTime{std::chrono::microseconds(0)}
 {
-  _cachedDefines->BonesPerMesh         = 0;
-  _cachedDefines->NUM_BONE_INFLUENCERS = 0;
 }
 
 FireMaterial::~FireMaterial()
@@ -39,12 +38,12 @@ FireMaterial::~FireMaterial()
 
 bool FireMaterial::needAlphaBlending()
 {
-  return (alpha < 1.f);
+  return false;
 }
 
 bool FireMaterial::needAlphaTesting()
 {
-  return false;
+  return true;
 }
 
 BaseTexture* FireMaterial::getAlphaTestTexture()
@@ -52,254 +51,221 @@ BaseTexture* FireMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool FireMaterial::_checkCache(Scene* /*scene*/, AbstractMesh* mesh,
-                               bool useInstances)
+bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+                                     bool useInstances)
 {
-  if (!mesh) {
-    return true;
-  }
-
-  if (_defines[FMD::INSTANCES] != useInstances) {
-    return false;
-  }
-
-  if (mesh->_materialDefines && mesh->_materialDefines->isEqual(_defines)) {
-    return true;
-  }
-
-  return false;
-}
-
-bool FireMaterial::isReady(AbstractMesh* mesh, bool useInstances)
-{
-  if (checkReadyOnlyOnce) {
-    if (_wasPreviouslyReady) {
+  if (isFrozen()) {
+    if (_wasPreviouslyReady && subMesh->effect()) {
       return true;
     }
   }
 
+  if (!subMesh->_materialDefines) {
+    subMesh->_materialDefines = std_util::make_unique<FireMaterialDefines>();
+  }
+
+  auto defines
+    = *(static_cast<FireMaterialDefines*>(subMesh->_materialDefines.get()));
   auto scene = getScene();
 
-  if (!checkReadyOnEveryCall) {
+  if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
-      if (_checkCache(scene, mesh, useInstances)) {
-        return true;
-      }
+      return true;
     }
   }
 
-  auto engine  = scene->getEngine();
-  auto needUVs = false;
-
-  _defines.reset();
+  auto engine = scene->getEngine();
 
   // Textures
-  if (scene->texturesEnabled()) {
-    if (diffuseTexture && StandardMaterial::DiffuseTextureEnabled) {
-      if (!diffuseTexture->isReady()) {
+  if (defines._areTexturesDirty) {
+    defines._needUVs = false;
+    if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
+      if (!_diffuseTexture->isReady()) {
         return false;
       }
       else {
-        needUVs                        = true;
+        defines._needUVs               = true;
         _defines.defines[FMD::DIFFUSE] = true;
       }
     }
   }
 
-  // Effect
-  if (scene->clipPlane()) {
-    _defines.defines[FMD::CLIPPLANE] = true;
+  // Misc.
+  if (defines._areMiscDirty) {
+    _defines.defines[FMD::POINTSIZE]
+      = (pointsCloud() || scene->forcePointsCloud());
+    _defines.defines[FMD::FOG]
+      = (scene->fogEnabled() && mesh->applyFog()
+         && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled());
   }
 
-  _defines.defines[FMD::ALPHATEST] = true;
-
-  // Point size
-  if (pointsCloud() || scene->forcePointsCloud()) {
-    _defines.defines[FMD::POINTSIZE] = true;
-  }
-
-  // Fog
-  if (scene->fogEnabled() && mesh && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled) {
-    _defines.defines[FMD::FOG] = true;
-  }
+  // Values that need to be evaluated on every frame
+  MaterialHelper::PrepareDefinesForFrameBoundValues(
+    scene, engine, defines, useInstances, FMD::CLIPPLANE, FMD::ALPHATEST,
+    FMD::INSTANCES);
 
   // Attribs
-  if (mesh) {
-    if (needUVs) {
-      if (mesh->isVerticesDataPresent(VertexBuffer::UVKind)) {
-        _defines.defines[FMD::UV1] = true;
-      }
-    }
-    if (mesh->useVertexColors()
-        && mesh->isVerticesDataPresent(VertexBuffer::ColorKind)) {
-      _defines.defines[FMD::VERTEXCOLOR] = true;
-
-      if (mesh->hasVertexAlpha()) {
-        _defines.defines[FMD::VERTEXALPHA] = true;
-      }
-    }
-    if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
-      _defines.NUM_BONE_INFLUENCERS = mesh->numBoneInfluencers();
-      _defines.BonesPerMesh         = mesh->skeleton()->bones.size() + 1;
-    }
-
-    // Instances
-    if (useInstances) {
-      _defines.defines[FMD::INSTANCES] = true;
-    }
-  }
+  MaterialHelper::PrepareDefinesForAttributes(
+    mesh, defines, false, true, FMD::NORMAL, FMD::UV1, FMD::UV2,
+    FMD::VERTEXCOLOR, FMD::VERTEXALPHA, 0, 0);
 
   // Get correct effect
-  if (!_defines.isEqual(*_cachedDefines)) {
-    _defines.cloneTo(*_cachedDefines);
+  if (defines.isDirty()) {
+    defines.markAsProcessed();
 
     scene->resetCachedMaterial();
 
     // Fallbacks
-    auto fallbacks = std_util::make_unique<EffectFallbacks>();
-    if (_defines[FMD::FOG]) {
+    auto fallbacks = std::unique_ptr<EffectFallbacks>();
+    if (defines[FMD::FOG]) {
       fallbacks->addFallback(1, "FOG");
     }
 
-    if (_defines.NUM_BONE_INFLUENCERS > 0) {
+    if (defines.NUM_BONE_INFLUENCERS > 0) {
       fallbacks->addCPUSkinningFallback(0, mesh);
     }
 
     // Attributes
     std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
 
-    if (_defines[FMD::UV1]) {
+    if (defines[FMD::UV1]) {
       attribs.emplace_back(VertexBuffer::UVKindChars);
     }
 
-    if (_defines[FMD::VERTEXCOLOR]) {
+    if (defines[FMD::VERTEXCOLOR]) {
       attribs.emplace_back(VertexBuffer::ColorKindChars);
     }
 
-    MaterialHelper::PrepareAttributesForBones(
-      attribs, mesh, _defines.NUM_BONE_INFLUENCERS, fallbacks.get());
-    MaterialHelper::PrepareAttributesForInstances(attribs, _defines,
+    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
+                                              *fallbacks);
+    MaterialHelper::PrepareAttributesForInstances(attribs, defines,
                                                   FMD::INSTANCES);
 
     // Legacy browser patch
-    std::string shaderName = "fire";
+    const std::string shaderName = "fire";
 
-    std::string join = _defines.toString();
-    std::vector<std::string> uniforms{"world", "view", "viewProjection",
-                                      "vEyePosition", "vFogInfos", "vFogColor",
-                                      "pointSize", "vDiffuseInfos", "mBones",
-                                      "vClipPlane", "diffuseMatrix",
-                                      // Fire
-                                      "time", "speed"};
-    std::vector<std::string> samplers{"diffuseSampler",
-                                      // Fire
-                                      "distortionSampler", "opacitySampler"};
+    auto join = defines.toString();
+    EffectCreationOptions options;
+    options.attributes = std::move(attribs);
+    options.uniformsNames
+      = {"world", "view", "viewProjection", "vEyePosition", "vFogInfos",
+         "vFogColor", "pointSize", "vDiffuseInfos", "mBones", "vClipPlane",
+         "diffuseMatrix",
+         // Fire
+         "time", "speed"};
+    options.samplers = {"diffuseSampler",
+                        // Fire
+                        "distortionSampler", "opacitySampler"};
+    options.defines    = std::move(join);
+    options.fallbacks  = std::move(fallbacks);
+    options.onCompiled = onCompiled;
+    options.onError    = onError;
 
-    _effect = engine->createEffect(shaderName, attribs, uniforms, samplers,
-                                   join, fallbacks.get(), onCompiled, onError);
+    subMesh->setEffect(
+      scene->getEngine()->createEffect(shaderName, options, engine), defines);
   }
 
-  if (!_effect->isReady()) {
+  if (!subMesh->effect()->isReady()) {
     return false;
   }
 
   _renderId           = scene->getRenderId();
   _wasPreviouslyReady = true;
 
-  if (mesh) {
-    if (!mesh->_materialDefines) {
-      mesh->_materialDefines = std_util::make_unique<FireMaterialDefines>();
-    }
-
-    _defines.cloneTo(*mesh->_materialDefines);
-  }
-
   return true;
 }
 
-void FireMaterial::bindOnlyWorldMatrix(Matrix& world)
-{
-  _effect->setMatrix("world", world);
-}
-
-void FireMaterial::bind(Matrix* world, Mesh* mesh)
+void FireMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
+  auto _defines
+    = static_cast<FireMaterialDefines*>(subMesh->_materialDefines.get());
+  if (!_defines) {
+    return;
+  }
+
+  auto effect   = subMesh->effect();
+  _activeEffect = effect;
+
   // Matrices
   bindOnlyWorldMatrix(*world);
-  _effect->setMatrix("viewProjection", scene->getTransformMatrix());
+  _activeEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
   // Bones
-  MaterialHelper::BindBonesParameters(mesh, _effect);
+  MaterialHelper::BindBonesParameters(mesh, _activeEffect);
 
-  if (scene->getCachedMaterial() != this) {
+  if (_mustRebind(scene, effect)) {
     // Textures
-    if (diffuseTexture && StandardMaterial::DiffuseTextureEnabled) {
-      _effect->setTexture("diffuseSampler", diffuseTexture);
+    if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
+      _activeEffect->setTexture("diffuseSampler", _diffuseTexture);
 
-      _effect->setFloat2("vDiffuseInfos",
-                         static_cast<float>(diffuseTexture->coordinatesIndex),
-                         diffuseTexture->level);
-      _effect->setMatrix("diffuseMatrix", *diffuseTexture->getTextureMatrix());
+      _activeEffect->setFloat2("vDiffuseInfos",
+                               _diffuseTexture->coordinatesIndex,
+                               _diffuseTexture->level);
+      _activeEffect->setMatrix("diffuseMatrix",
+                               *_diffuseTexture->getTextureMatrix());
 
-      _effect->setTexture("distortionSampler", distortionTexture);
-      _effect->setTexture("opacitySampler", opacityTexture);
+      _activeEffect->setTexture("distortionSampler", _distortionTexture);
+      _activeEffect->setTexture("opacitySampler", _opacityTexture);
     }
 
     // Clip plane
     if (scene->clipPlane()) {
       auto clipPlane = scene->clipPlane();
-      _effect->setFloat4("vClipPlane", clipPlane->normal.x, clipPlane->normal.y,
-                         clipPlane->normal.z, clipPlane->d);
+      _activeEffect->setFloat4("vClipPlane", clipPlane->normal.x,
+                               clipPlane->normal.y, clipPlane->normal.z,
+                               clipPlane->d);
     }
 
     // Point size
     if (pointsCloud()) {
-      _effect->setFloat("pointSize", pointSize);
+      _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    _effect->setVector3("vEyePosition", scene->_mirroredCameraPosition ?
-                                          *scene->_mirroredCameraPosition :
-                                          scene->activeCamera->position);
+    _activeEffect->setVector3("vEyePosition",
+                              scene->_mirroredCameraPosition ?
+                                *scene->_mirroredCameraPosition :
+                                scene->activeCamera->position);
   }
 
-  _effect->setColor4("vDiffuseColor", _scaledDiffuse, alpha * mesh->visibility);
+  _activeEffect->setColor4("vDiffuseColor", _scaledDiffuse,
+                           alpha * mesh->visibility);
 
   // View
-  if (scene->fogEnabled() && mesh->applyFog()
+  if (scene->fogEnabled && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE) {
-    _effect->setMatrix("view", scene->getViewMatrix());
+    _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
   // Fog
-  MaterialHelper::BindFogParameters(scene, mesh, _effect);
+  MaterialHelper::BindFogParameters(scene, mesh, _activeEffect);
 
   // Time
   _lastTime += scene->getEngine()->getDeltaTime();
-  _effect->setFloat("time", Time::fpMillisecondsDuration<float>(_lastTime));
+  _activeEffect->setFloat("time",
+                          Time::fpMillisecondsDuration<float>(_lastTime));
 
   // Speed
-  _effect->setFloat("speed", speed);
+  _activeEffect->setFloat("speed", speed);
 
-  Material::bind(world, mesh);
+  _afterBind(mesh, _activeEffect);
 }
 
 std::vector<IAnimatable*> FireMaterial::getAnimatables()
 {
   std::vector<IAnimatable*> results;
 
-  if (diffuseTexture && diffuseTexture->animations.size() > 0) {
-    results.emplace_back(diffuseTexture);
+  if (_diffuseTexture && _diffuseTexture->animations.size() > 0) {
+    results.emplace_back(_diffuseTexture);
   }
 
-  if (distortionTexture && distortionTexture->animations.size() > 0) {
-    results.emplace_back(distortionTexture);
+  if (_distortionTexture && _distortionTexture->animations.size() > 0) {
+    results.emplace_back(_distortionTexture);
   }
 
-  if (opacityTexture && opacityTexture->animations.size() > 0) {
-    results.emplace_back(opacityTexture);
+  if (_opacityTexture && _opacityTexture->animations.size() > 0) {
+    results.emplace_back(_opacityTexture);
   }
 
   return results;
@@ -307,12 +273,12 @@ std::vector<IAnimatable*> FireMaterial::getAnimatables()
 
 void FireMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
 {
-  if (diffuseTexture) {
-    diffuseTexture->dispose();
+  if (_diffuseTexture) {
+    _diffuseTexture->dispose();
   }
 
-  if (distortionTexture) {
-    distortionTexture->dispose();
+  if (_distortionTexture) {
+    _distortionTexture->dispose();
   }
 
   Material::dispose(forceDisposeEffect, forceDisposeTextures);
