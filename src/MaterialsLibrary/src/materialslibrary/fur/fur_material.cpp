@@ -7,23 +7,21 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/dynamic_texture.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
+#include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {
 
-unsigned int FurMaterial::maxSimultaneousLights = 4;
-
 FurMaterial::FurMaterial(const std::string& iName, Scene* scene)
-    : Material{iName, scene}
-    , diffuseTexture{nullptr}
-    , heightTexture{nullptr}
+    : PushMaterial{iName, scene}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
     , furLength{1.f}
     , furAngle{0.f}
@@ -34,15 +32,15 @@ FurMaterial::FurMaterial(const std::string& iName, Scene* scene)
     , furSpeed{100.f}
     , furDensity{20.f}
     , furTexture{nullptr}
-    , disableLighting{false}
     , highLevelFur{true}
+    , _diffuseTexture{nullptr}
+    , _heightTexture{nullptr}
+    , _disableLighting{false}
+    , _maxSimultaneousLights{4}
     , _worldViewProjectionMatrix{Matrix::Zero()}
     , _renderId{-1}
     , _furTime{0.f}
-    , _cachedDefines{std_util::make_unique<FurMaterialDefines>()}
 {
-  _cachedDefines->BonesPerMesh         = 0;
-  _cachedDefines->NUM_BONE_INFLUENCERS = 0;
 }
 
 FurMaterial::~FurMaterial()
@@ -78,196 +76,142 @@ void FurMaterial::updateFur()
 {
   for (unsigned int i = 1; i < _meshes.size(); ++i) {
     if (auto offsetFur = static_cast<FurMaterial*>(_meshes[i]->material())) {
-      offsetFur->furLength      = furLength;
-      offsetFur->furAngle       = furAngle;
-      offsetFur->furGravity     = furGravity;
-      offsetFur->furSpacing     = furSpacing;
-      offsetFur->furSpeed       = furSpeed;
-      offsetFur->furColor       = furColor;
-      offsetFur->diffuseTexture = diffuseTexture;
-      offsetFur->furTexture     = furTexture;
-      offsetFur->highLevelFur   = highLevelFur;
+      offsetFur->furLength       = furLength;
+      offsetFur->furAngle        = furAngle;
+      offsetFur->furGravity      = furGravity;
+      offsetFur->furSpacing      = furSpacing;
+      offsetFur->furSpeed        = furSpeed;
+      offsetFur->furColor        = furColor;
+      offsetFur->_diffuseTexture = _diffuseTexture;
+      offsetFur->furTexture      = furTexture;
+      offsetFur->highLevelFur    = highLevelFur;
       offsetFur->setFurTime(furTime());
       offsetFur->furDensity = furDensity;
     }
   }
 }
 
-bool FurMaterial::_checkCache(Scene* /*scene*/, AbstractMesh* mesh,
-                              bool useInstances)
+bool FurMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+                                    bool useInstances)
 {
-  if (!mesh) {
-    return true;
-  }
-
-  if (_defines[FMD::INSTANCES] != useInstances) {
-    return false;
-  }
-
-  if (mesh->_materialDefines && mesh->_materialDefines->isEqual(_defines)) {
-    return true;
-  }
-
-  return false;
-}
-
-bool FurMaterial::isReady(AbstractMesh* mesh, bool useInstances)
-{
-  if (checkReadyOnlyOnce) {
-    if (_wasPreviouslyReady) {
+  if (isFrozen()) {
+    if (_wasPreviouslyReady && subMesh->effect()) {
       return true;
     }
   }
 
+  if (!subMesh->_materialDefines) {
+    subMesh->_materialDefines = std_util::make_unique<FurMaterialDefines>();
+  }
+
+  auto defines
+    = *(static_cast<FurMaterialDefines*>(subMesh->_materialDefines.get()));
   auto scene = getScene();
 
-  if (!checkReadyOnEveryCall) {
+  if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
-      if (_checkCache(scene, mesh, useInstances)) {
-        return true;
-      }
+      return true;
     }
   }
 
-  auto engine      = scene->getEngine();
-  bool needNormals = false;
-  bool needUVs     = false;
-
-  _defines.reset();
+  auto engine = scene->getEngine();
 
   // Textures
-  if (scene->texturesEnabled()) {
-    if (diffuseTexture && StandardMaterial::DiffuseTextureEnabled) {
-      if (!diffuseTexture->isReady()) {
-        return false;
+  if (defines._areTexturesDirty) {
+    if (scene->texturesEnabled()) {
+      if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
+        if (!_diffuseTexture->isReady()) {
+          return false;
+        }
+        else {
+          defines._needUVs              = true;
+          defines.defines[FMD::DIFFUSE] = true;
+        }
       }
-      else {
-        needUVs                        = true;
-        _defines.defines[FMD::DIFFUSE] = true;
+      if (_heightTexture && engine->getCaps().maxVertexTextureImageUnits) {
+        if (!_heightTexture->isReady()) {
+          return false;
+        }
+        else {
+          defines._needUVs                = true;
+          defines.defines[FMD::HEIGHTMAP] = true;
+        }
       }
     }
-    if (heightTexture) {
-      if (!heightTexture->isReady()) {
-        return false;
-      }
-      else {
-        needUVs                          = true;
-        _defines.defines[FMD::HEIGHTMAP] = true;
-      }
-    }
-  }
-
-  // Effect
-  if (scene->clipPlane()) {
-    _defines.defines[FMD::CLIPPLANE] = true;
-  }
-
-  if (engine->getAlphaTesting()) {
-    _defines.defines[FMD::ALPHATEST] = true;
-  }
-
-  // Point size
-  if (pointsCloud() || scene->forcePointsCloud()) {
-    _defines.defines[FMD::POINTSIZE] = true;
-  }
-
-  // Fog
-  if (scene->fogEnabled() && mesh && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled) {
-    _defines.defines[FMD::FOG] = true;
   }
 
   // High level
-  if (highLevelFur) {
-    _defines.defines[FMD::HIGHLEVEL] = true;
+  if (highLevelFur != defines[FMD::HIGHLEVEL]) {
+    defines.defines[FMD::HIGHLEVEL] = true;
+    defines.markAsUnprocessed();
   }
+
+  // Misc.
+  MaterialHelper::PrepareDefinesForMisc(
+    mesh, scene, false, pointsCloud(), fogEnabled(), defines,
+    FMD::LOGARITHMICDEPTH, FMD::POINTSIZE, FMD::FOG);
 
   // Lights
-  if (scene->lightsEnabled() && !disableLighting) {
-    needNormals = MaterialHelper::PrepareDefinesForLights(
-      scene, mesh, _defines, maxSimultaneousLights, FMD::SPECULARTERM,
-      FMD::SHADOWS);
-  }
+  defines._needNormals = MaterialHelper::PrepareDefinesForLights(
+    scene, mesh, defines, false, _maxSimultaneousLights, _disableLighting,
+    FMD::SPECULARTERM, FMD::SHADOWFULLFLOAT);
+
+  // Values that need to be evaluated on every frame
+  MaterialHelper::PrepareDefinesForFrameBoundValues(
+    scene, engine, defines, useInstances, FMD::CLIPPLANE, FMD::ALPHATEST,
+    FMD::INSTANCES);
 
   // Attribs
-  if (mesh) {
-    if (needNormals && mesh->isVerticesDataPresent(VertexBuffer::NormalKind)) {
-      _defines.defines[FMD::NORMAL] = true;
-    }
-    if (needUVs) {
-      if (mesh->isVerticesDataPresent(VertexBuffer::UVKind)) {
-        _defines.defines[FMD::UV1] = true;
-      }
-      if (mesh->isVerticesDataPresent(VertexBuffer::UV2Kind)) {
-        _defines.defines[FMD::UV2] = true;
-      }
-    }
-    if (mesh->useVertexColors()
-        && mesh->isVerticesDataPresent(VertexBuffer::ColorKind)) {
-      _defines.defines[FMD::VERTEXCOLOR] = true;
-
-      if (mesh->hasVertexAlpha()) {
-        _defines.defines[FMD::VERTEXALPHA] = true;
-      }
-    }
-
-    if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
-      _defines.NUM_BONE_INFLUENCERS = mesh->numBoneInfluencers();
-      _defines.BonesPerMesh         = mesh->skeleton()->bones.size() + 1;
-    }
-
-    // Instances
-    if (useInstances) {
-      _defines.defines[FMD::INSTANCES] = true;
-    }
-  }
+  MaterialHelper::PrepareDefinesForAttributes(
+    mesh, defines, true, true, false, FMD::NORMAL, FMD::UV1, FMD::UV2,
+    FMD::VERTEXCOLOR, FMD::VERTEXALPHA);
 
   // Get correct effect
-  if (!_defines.isEqual(*_cachedDefines)) {
-    _defines.cloneTo(*_cachedDefines);
+  if (defines.isDirty()) {
+    defines.markAsProcessed();
 
     scene->resetCachedMaterial();
 
     // Fallbacks
     auto fallbacks = std_util::make_unique<EffectFallbacks>();
-    if (_defines[FMD::FOG]) {
+    if (defines[FMD::FOG]) {
       fallbacks->addFallback(1, "FOG");
     }
 
-    MaterialHelper::HandleFallbacksForShadows(_defines, fallbacks.get(),
-                                              maxSimultaneousLights);
+    MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
+                                              _maxSimultaneousLights);
 
-    if (_defines.NUM_BONE_INFLUENCERS > 0) {
+    if (defines.NUM_BONE_INFLUENCERS > 0) {
       fallbacks->addCPUSkinningFallback(0, mesh);
     }
 
     // Attributes
     std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
 
-    if (_defines[FMD::NORMAL]) {
+    if (defines[FMD::NORMAL]) {
       attribs.emplace_back(VertexBuffer::NormalKindChars);
     }
 
-    if (_defines[FMD::UV1]) {
+    if (defines[FMD::UV1]) {
       attribs.emplace_back(VertexBuffer::UVKindChars);
     }
 
-    if (_defines[FMD::UV2]) {
+    if (defines[FMD::UV2]) {
       attribs.emplace_back(VertexBuffer::UV2KindChars);
     }
 
-    if (_defines[FMD::VERTEXCOLOR]) {
+    if (defines[FMD::VERTEXCOLOR]) {
       attribs.emplace_back(VertexBuffer::ColorKindChars);
     }
 
-    MaterialHelper::PrepareAttributesForBones(
-      attribs, mesh, _defines.NUM_BONE_INFLUENCERS, fallbacks.get());
-    MaterialHelper::PrepareAttributesForInstances(attribs, _defines,
+    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
+                                              *fallbacks);
+    MaterialHelper::PrepareAttributesForInstances(attribs, defines,
                                                   FMD::INSTANCES);
 
     // Legacy browser patch
-    std::string shaderName = "fur";
-    std::string join       = _defines.toString();
+    const std::string shaderName{"fur"};
+    auto join = defines.toString();
     std::vector<std::string> uniforms{
       "world",         "view",          "viewProjection", "vEyePosition",
       "vLightsType",   "vDiffuseColor", "vFogInfos",      "vFogColor",
@@ -278,126 +222,133 @@ bool FurMaterial::isReady(AbstractMesh* mesh, bool useInstances)
     std::vector<std::string> samplers{"diffuseSampler", "heightTexture",
                                       "furTexture"};
 
-    MaterialHelper::PrepareUniformsAndSamplersList(uniforms, samplers, _defines,
-                                                   maxSimultaneousLights);
+    std::vector<std::string> uniformBuffers{};
 
-    std::unordered_map<std::string, unsigned int> indexParameters{
-      {"maxSimultaneousLights", maxSimultaneousLights}};
+    EffectCreationOptions options;
+    options.attributes            = attribs;
+    options.uniformsNames         = std::move(uniforms);
+    options.uniformBuffersNames   = std::move(uniformBuffers);
+    options.samplers              = std::move(samplers);
+    options.materialDefines       = &defines;
+    options.defines               = std::move(join);
+    options.maxSimultaneousLights = _maxSimultaneousLights;
+    options.fallbacks             = std::move(fallbacks);
+    options.onCompiled            = onCompiled;
+    options.onError               = onError;
+    options.indexParameters
+      = {{"maxSimultaneousLights", _maxSimultaneousLights}};
 
-    _effect = engine->createEffect(shaderName, attribs, uniforms, samplers,
-                                   join, fallbacks.get(), onCompiled, onError,
-                                   indexParameters);
+    MaterialHelper::PrepareUniformsAndSamplersList(options);
+    subMesh->setEffect(
+      scene->getEngine()->createEffect(shaderName, options, engine), defines);
   }
-  if (!_effect->isReady()) {
+
+  if (!subMesh->effect()->isReady()) {
     return false;
   }
 
   _renderId           = scene->getRenderId();
   _wasPreviouslyReady = true;
 
-  if (mesh) {
-    if (!mesh->_materialDefines) {
-      mesh->_materialDefines = std_util::make_unique<FurMaterialDefines>();
-    }
-
-    _defines.cloneTo(*mesh->_materialDefines);
-  }
-
   return true;
 }
 
-void FurMaterial::bindOnlyWorldMatrix(Matrix& world)
-{
-  _effect->setMatrix("world", world);
-}
-
-void FurMaterial::bind(Matrix* world, Mesh* mesh)
+void FurMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
+  auto defines
+    = static_cast<FurMaterialDefines*>(subMesh->_materialDefines.get());
+  if (!defines) {
+    return;
+  }
+
+  auto effect   = subMesh->effect();
+  _activeEffect = effect;
+
   // Matrices
   bindOnlyWorldMatrix(*world);
-  _effect->setMatrix("viewProjection", scene->getTransformMatrix());
+  _activeEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
   // Bones
-  MaterialHelper::BindBonesParameters(mesh, _effect);
+  MaterialHelper::BindBonesParameters(mesh, _activeEffect);
 
   if (scene->getCachedMaterial() != this) {
     // Textures
-    if (diffuseTexture && StandardMaterial::DiffuseTextureEnabled) {
-      _effect->setTexture("diffuseSampler", diffuseTexture);
+    if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
+      _activeEffect->setTexture("diffuseSampler", _diffuseTexture);
 
-      _effect->setFloat2("vDiffuseInfos",
-                         static_cast<float>(diffuseTexture->coordinatesIndex),
-                         diffuseTexture->level);
-      _effect->setMatrix("diffuseMatrix", *diffuseTexture->getTextureMatrix());
+      _activeEffect->setFloat2("vDiffuseInfos",
+                               _diffuseTexture->coordinatesIndex,
+                               _diffuseTexture->level);
+      _activeEffect->setMatrix("diffuseMatrix",
+                               *_diffuseTexture->getTextureMatrix());
     }
 
-    if (heightTexture) {
-      _effect->setTexture("heightTexture", heightTexture);
+    if (_heightTexture) {
+      _activeEffect->setTexture("heightTexture", _heightTexture);
     }
 
     // Clip plane
-    MaterialHelper::BindClipPlane(_effect, scene);
+    MaterialHelper::BindClipPlane(_activeEffect, scene);
 
     // Point size
     if (pointsCloud()) {
-      _effect->setFloat("pointSize", pointSize);
+      _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    _effect->setVector3("vEyePosition", scene->_mirroredCameraPosition ?
-                                          *scene->_mirroredCameraPosition :
-                                          scene->activeCamera->position);
+    _activeEffect->setVector3("vEyePosition",
+                              scene->_mirroredCameraPosition ?
+                                *scene->_mirroredCameraPosition :
+                                scene->activeCamera->position);
   }
 
-  _effect->setColor4("vDiffuseColor", diffuseColor, alpha * mesh->visibility);
+  _activeEffect->setColor4("vDiffuseColor", diffuseColor,
+                           alpha * mesh->visibility);
 
-  if (scene->lightsEnabled() && !disableLighting) {
-    MaterialHelper::BindLights(scene, mesh, _effect,
-                               _defines.defines[FMD::SPECULARTERM],
-                               maxSimultaneousLights);
+  if (scene->lightsEnabled() && !_disableLighting) {
+    MaterialHelper::BindLights(scene, mesh, _activeEffect, defines,
+                               _maxSimultaneousLights, FMD::SPECULARTERM);
   }
 
   // View
   if (scene->fogEnabled() && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE) {
-    _effect->setMatrix("view", scene->getViewMatrix());
+    _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
   // Fog
-  MaterialHelper::BindFogParameters(scene, mesh, _effect);
+  MaterialHelper::BindFogParameters(scene, mesh, _activeEffect);
 
-  _effect->setFloat("furLength", furLength);
-  _effect->setFloat("furAngle", furAngle);
-  _effect->setColor4("furColor", furColor, 1.f);
+  _activeEffect->setFloat("furLength", furLength);
+  _activeEffect->setFloat("furAngle", furAngle);
+  _activeEffect->setColor4("furColor", furColor, 1.f);
 
   if (highLevelFur) {
-    _effect->setVector3("furGravity", furGravity);
-    _effect->setFloat("furOffset", furOffset);
-    _effect->setFloat("furSpacing", furSpacing);
-    _effect->setFloat("furDensity", furDensity);
+    _activeEffect->setVector3("furGravity", furGravity);
+    _activeEffect->setFloat("furOffset", furOffset);
+    _activeEffect->setFloat("furSpacing", furSpacing);
+    _activeEffect->setFloat("furDensity", furDensity);
 
-    _furTime += Time::fpMillisecondsDuration<float>(
-                  getScene()->getEngine()->getDeltaTime())
-                / furSpeed;
-    _effect->setFloat("furTime", _furTime);
+    _furTime += getScene()->getEngine()->getDeltaTime() / furSpeed;
+    _activeEffect->setFloat("furTime", _furTime);
 
-    _effect->setTexture("furTexture", furTexture);
+    _activeEffect->setTexture("furTexture", furTexture);
   }
 
-  Material::bind(world, mesh);
+  _afterBind(mesh, _activeEffect);
 }
 
 std::vector<IAnimatable*> FurMaterial::getAnimatables()
 {
   std::vector<IAnimatable*> results;
 
-  if (diffuseTexture && diffuseTexture->animations.size() > 0) {
-    results.emplace_back(diffuseTexture);
+  if (_diffuseTexture && _diffuseTexture->animations.size() > 0) {
+    results.emplace_back(_diffuseTexture);
   }
 
-  if (heightTexture && heightTexture->animations.size() > 0) {
-    results.emplace_back(heightTexture);
+  if (_heightTexture && _heightTexture->animations.size() > 0) {
+    results.emplace_back(_heightTexture);
   }
 
   return results;
@@ -405,8 +356,8 @@ std::vector<IAnimatable*> FurMaterial::getAnimatables()
 
 void FurMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
 {
-  if (diffuseTexture) {
-    diffuseTexture->dispose();
+  if (_diffuseTexture) {
+    _diffuseTexture->dispose();
   }
 
   if (!_meshes.empty()) {
@@ -416,7 +367,7 @@ void FurMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
     }
   }
 
-  Material::dispose(forceDisposeEffect, forceDisposeTextures);
+  PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
 Material* FurMaterial::clone(const std::string& /*name*/,

@@ -2,7 +2,7 @@
 #define BABYLON_MATERIALS_LIBRARY_FUR_FUR_MATERIAL_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/materials/material.h>
+#include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/fur/fur_material_defines.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/matrix.h>
@@ -11,13 +11,10 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
-class BABYLON_SHARED_EXPORT FurMaterial : public Material {
+class BABYLON_SHARED_EXPORT FurMaterial : public PushMaterial {
 
 public:
   using FMD = FurMaterialDefines;
-
-public:
-  static unsigned int maxSimultaneousLights;
 
 public:
   FurMaterial(const std::string& name, Scene* scene);
@@ -29,9 +26,9 @@ public:
   bool needAlphaTesting() override;
   BaseTexture* getAlphaTestTexture() override;
   void updateFur();
-  bool isReady(AbstractMesh* mesh, bool useInstances) override;
-  void bindOnlyWorldMatrix(Matrix& world) override;
-  void bind(Matrix* world, Mesh* mesh) override;
+  bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+                         bool useInstances) override;
+  void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatable*> getAnimatables();
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
@@ -51,12 +48,7 @@ public:
    */
   static std::vector<Mesh*> FurifyMesh(Mesh* sourceMesh, unsigned int quality);
 
-private:
-  bool _checkCache(Scene* scene, AbstractMesh* mesh, bool useInstances = false);
-
 public:
-  BaseTexture* diffuseTexture;
-  BaseTexture* heightTexture;
   Color3 diffuseColor;
   float furLength;
   float furAngle;
@@ -67,16 +59,18 @@ public:
   float furSpeed;
   float furDensity;
   DynamicTexture* furTexture;
-  bool disableLighting;
   bool highLevelFur;
   std::vector<AbstractMesh*> _meshes;
 
 private:
+  BaseTexture* _diffuseTexture;
+  BaseTexture* _heightTexture;
+  bool _disableLighting;
+  unsigned int _maxSimultaneousLights;
   Matrix _worldViewProjectionMatrix;
   int _renderId;
   float _furTime;
   FurMaterialDefines _defines;
-  std::unique_ptr<FurMaterialDefines> _cachedDefines;
 
 }; // end of class FurMaterial
 

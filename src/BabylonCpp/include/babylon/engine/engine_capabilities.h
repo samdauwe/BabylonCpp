@@ -45,6 +45,7 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   bool uintIndices;
   bool highPrecisionShaderSupported;
   bool fragmentDepthSupported;
+  bool maxVertexTextureImageUnits;
   bool textureFloatLinearFiltering;
   bool textureFloatRender;
   bool textureHalfFloat;
