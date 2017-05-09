@@ -112,6 +112,33 @@ TEST(TestVector3, Add)
   EXPECT_FLOAT_EQ(c.z, 2 * b.z);
 }
 
+TEST(TestVector3, AttributeIterate)
+{
+  using namespace BABYLON;
+
+  Vector3 pos{x, 3 * y, -2 * z};
+  Vector3 boundingBoxMin{-x, -y, -z};
+  Vector3 boundingBoxMax{2 * x, 2 * y, 2 * z};
+
+  const auto attrs = {&Vector3::x, &Vector3::y, &Vector3::z};
+  for (auto& attr : attrs) {
+    if (pos.*attr < boundingBoxMin.*attr) {
+      boundingBoxMin.*attr = pos.*attr;
+    }
+    if (pos.*attr > boundingBoxMax.*attr) {
+      boundingBoxMax.*attr = pos.*attr;
+    }
+  }
+
+  EXPECT_FLOAT_EQ(boundingBoxMin.x, -x);
+  EXPECT_FLOAT_EQ(boundingBoxMin.y, -y);
+  EXPECT_FLOAT_EQ(boundingBoxMin.z, -2 * z);
+
+  EXPECT_FLOAT_EQ(boundingBoxMax.x, 2 * x);
+  EXPECT_FLOAT_EQ(boundingBoxMax.y, 3 * y);
+  EXPECT_FLOAT_EQ(boundingBoxMax.z, 2 * z);
+}
+
 TEST(TestVector3, Subtract)
 {
   using namespace BABYLON;
