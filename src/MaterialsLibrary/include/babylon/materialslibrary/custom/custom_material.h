@@ -16,8 +16,6 @@ public:
                  Scene* scene);
   ~CustomMaterial();
 
-  bool isReady(AbstractMesh* mesh, bool useInstances) override;
-
 public:
   ICustomMaterialBuilder* builder;
 
