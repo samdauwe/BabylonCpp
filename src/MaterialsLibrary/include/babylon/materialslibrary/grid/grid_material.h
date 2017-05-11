@@ -2,7 +2,7 @@
 #define BABYLON_MATERIALS_LIBRARY_GRID_GRID_MATERIAL_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/materials/material.h>
+#include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/grid/grid_material_defines.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/vector4.h>
@@ -14,14 +14,14 @@ namespace MaterialsLibrary {
  * @brief The grid materials allows you to wrap any shape with a grid.
  * Colors are customizable.
  */
-class BABYLON_SHARED_EXPORT GridMaterial : public Material {
+class BABYLON_SHARED_EXPORT GridMaterial : public PushMaterial {
 
 public:
   using GMD = GridMaterialDefines;
 
 public:
   /**
-   * constructor
+   * @brief constructor
    * @param name The name given to the material in order to identify it
    * afterwards.
    * @param scene The scene the material is used in.
@@ -30,12 +30,12 @@ public:
   ~GridMaterial();
 
   /**
-   * Returns wehter or not the grid requires alpha blending.
+   * Returns whether or not the grid requires alpha blending.
    */
   bool needAlphaBlending() override;
-  bool isReady(AbstractMesh* mesh, bool useInstances) override;
-  void bindOnlyWorldMatrix(Matrix& world) override;
-  void bind(Matrix* world, Mesh* mesh) override;
+  bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+                         bool useInstances = false) override;
+  void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
   Material* clone(const std::string& name,
@@ -45,9 +45,6 @@ public:
   /** Statics **/
   static GridMaterial* Parse(const Json::value& source, Scene* scene,
                              const std::string& rootUrl);
-
-private:
-  bool _checkCache(Scene* scene, AbstractMesh* mesh, bool useInstances = false);
 
 public:
   /**
@@ -83,8 +80,6 @@ public:
 private:
   Vector4 _gridControl;
   int _renderId;
-  GridMaterialDefines _defines;
-  std::unique_ptr<GridMaterialDefines> _cachedDefines;
 
 }; // end of class GridMaterial
 

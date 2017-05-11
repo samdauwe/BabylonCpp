@@ -5,11 +5,8 @@ namespace MaterialsLibrary {
 
 GridMaterialDefines::GridMaterialDefines() : MaterialDefines{}
 {
-  _keys = {"TRANSPARENT", "FOG"};
-  defines.resize(_keys.size());
-  for (size_t i = 0; i < _keys.size(); ++i) {
-    defines[i] = false;
-  }
+  _keys = {"TRANSPARENT", "FOG", "LOGARITHMICDEPTH", "POINTSIZE"};
+  rebuild();
 }
 
 GridMaterialDefines::~GridMaterialDefines()

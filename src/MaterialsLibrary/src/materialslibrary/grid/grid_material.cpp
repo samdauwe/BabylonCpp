@@ -4,25 +4,26 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
+#include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {
 
 GridMaterial::GridMaterial(const std::string& iName, Scene* scene)
-    : Material{iName, scene}
+    : PushMaterial{iName, scene}
     , mainColor{Color3::White()}
     , lineColor{Color3::Black()}
     , gridRatio{1.f}
     , majorUnitFrequency{10.f}
     , minorUnitVisibility{0.33f}
     , opacity{1.f}
-    , _gridControl{Vector4(gridRatio, majorUnitFrequency, minorUnitVisibility,
-                           opacity)}
-    , _cachedDefines{std_util::make_unique<GridMaterialDefines>()}
+    , _gridControl{
+        Vector4(gridRatio, majorUnitFrequency, minorUnitVisibility, opacity)}
 {
 }
 
@@ -35,60 +36,56 @@ bool GridMaterial::needAlphaBlending()
   return (alpha < 1.f);
 }
 
-bool GridMaterial::_checkCache(Scene* /*scene*/, AbstractMesh* mesh,
-                               bool /*useInstances*/)
+bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+                                     bool /*useInstances*/)
 {
-  if (!mesh) {
-    return true;
-  }
-
-  if (mesh->_materialDefines && mesh->_materialDefines->isEqual(_defines)) {
-    return true;
-  }
-
-  return false;
-}
-
-bool GridMaterial::isReady(AbstractMesh* mesh, bool useInstances)
-{
-  if (checkReadyOnlyOnce) {
-    if (_wasPreviouslyReady) {
+  if (isFrozen()) {
+    if (_wasPreviouslyReady && subMesh->effect()) {
       return true;
     }
   }
 
+  if (!subMesh->_materialDefines) {
+    subMesh->_materialDefines = std_util::make_unique<GridMaterialDefines>();
+  }
+
+  auto defines
+    = *(static_cast<GridMaterialDefines*>(subMesh->_materialDefines.get()));
   auto scene = getScene();
 
-  if (!checkReadyOnEveryCall) {
+  if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
-      if (_checkCache(scene, mesh, useInstances)) {
-        return true;
-      }
+      return true;
     }
   }
 
   auto engine = scene->getEngine();
 
-  _defines.reset();
-
-  if (opacity < 1.f) {
-    _defines.defines[GMD::TRANSPARENT] = true;
+  if (opacity < 1.f && !defines[GMD::TRANSPARENT]) {
+    defines.defines[GMD::TRANSPARENT] = true;
+    defines.markAsUnprocessed();
   }
 
-  // Fog
-  if (scene->fogEnabled() && mesh && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled) {
-    _defines.defines[GMD::FOG] = true;
-  }
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, false, fogEnabled(),
+                                        defines, GMD::LOGARITHMICDEPTH,
+                                        GMD::POINTSIZE, GMD::FOG);
 
   // Get correct effect
-  if (!_effect || !_defines.isEqual(*_cachedDefines)) {
-    _defines.cloneTo(*_cachedDefines);
+  if (defines.isDirty()) {
+    defines.markAsProcessed();
     scene->resetCachedMaterial();
 
     // Attributes
     std::vector<std::string> attribs{VertexBuffer::PositionKindChars,
                                      VertexBuffer::NormalKindChars};
+
+    // Effect
+    auto shaderName = scene->getEngine()->getCaps().standardDerivatives ?
+                        "grid" :
+                        "legacygrid";
+
+    // Defines
+    const std::string join = defines.toString();
 
     // Uniforms
     std::vector<std::string> uniforms{
@@ -96,20 +93,24 @@ bool GridMaterial::isReady(AbstractMesh* mesh, bool useInstances)
       "vFogInfos",           "vFogColor", "world",     "view"};
 
     // Samplers
-    std::vector<std::string> samplers;
+    std::vector<std::string> samplers{};
 
-    // Effect
-    std::string shaderName = scene->getEngine()->getCaps().standardDerivatives ?
-                               "grid" :
-                               "legacygrid";
+    EffectCreationOptions options;
+    options.attributes            = std::move(attribs);
+    options.uniformsNames         = std::move(uniforms);
+    options.samplers              = std::move(samplers);
+    options.materialDefines       = &defines;
+    options.defines               = std::move(join);
+    options.maxSimultaneousLights = 4;
+    options.fallbacks             = nullptr;
+    options.onCompiled            = onCompiled;
+    options.onError               = onError;
 
-    // Defines
-    std::string join = _defines.toString();
-    _effect = engine->createEffect(shaderName, attribs, uniforms, samplers,
-                                   join, nullptr, onCompiled, onError);
+    subMesh->setEffect(
+      scene->getEngine()->createEffect(shaderName, options, engine), defines);
   }
 
-  if (!_effect->isReady()) {
+  if (!subMesh->effect()->isReady()) {
     return false;
   }
 
@@ -119,45 +120,40 @@ bool GridMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   return true;
 }
 
-void GridMaterial::bindOnlyWorldMatrix(Matrix& world)
+void GridMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
-  _effect->setMatrix("worldViewProjection",
-                     world.multiply(getScene()->getTransformMatrix()));
-  _effect->setMatrix("world", world);
-  _effect->setMatrix("view", scene->getViewMatrix());
-}
+  auto defines
+    = static_cast<GridMaterialDefines*>(subMesh->_materialDefines.get());
+  if (!defines) {
+    return;
+  }
 
-void GridMaterial::bind(Matrix* world, Mesh* mesh)
-{
-  auto scene = getScene();
+  auto effect   = subMesh->effect();
+  _activeEffect = effect;
 
   // Matrices
   bindOnlyWorldMatrix(*world);
+  _activeEffect->setMatrix("worldViewProjection",
+                           world->multiply(scene->getTransformMatrix()));
+  _activeEffect->setMatrix("view", scene->getViewMatrix());
 
   // Uniforms
-  if (scene->getCachedMaterial() != this) {
-    _effect->setColor3("mainColor", mainColor);
-    _effect->setColor3("lineColor", lineColor);
+  if (_mustRebind(scene, effect)) {
+    _activeEffect->setColor3("mainColor", mainColor);
+    _activeEffect->setColor3("lineColor", lineColor);
 
     _gridControl.x = gridRatio;
     _gridControl.y = std::round(majorUnitFrequency);
     _gridControl.z = minorUnitVisibility;
     _gridControl.w = opacity;
-    _effect->setVector4("gridControl", _gridControl);
+    _activeEffect->setVector4("gridControl", _gridControl);
   }
-
-  // View
-  if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
-    _effect->setMatrix("view", scene->getViewMatrix());
-  }
-
   // Fog
-  MaterialHelper::BindFogParameters(scene, mesh, _effect);
+  MaterialHelper::BindFogParameters(scene, mesh, _activeEffect);
 
-  Material::bind(world, mesh);
+  _afterBind(mesh, _activeEffect);
 }
 
 void GridMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
