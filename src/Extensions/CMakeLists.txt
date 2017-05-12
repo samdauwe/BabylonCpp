@@ -67,6 +67,8 @@ set(TESTS_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 file(GLOB EXTENSIONS_HDR_FILES  ${INCLUDE_PATH}/extensions/hexplanetgeneration/*.h
                                 ${INCLUDE_PATH}/extensions/hexplanetgeneration/terrain/*.h
                                 ${INCLUDE_PATH}/extensions/hexplanetgeneration/utils/*.h
+                                ${INCLUDE_PATH}/extensions/noisegeneration/*.h
+                                ${INCLUDE_PATH}/extensions/pathfinding/*.h
                                 ${INCLUDE_PATH}/extensions/polyhedron/*.h
                                 ${INCLUDE_PATH}/extensions/shaderbuilder/*.h
                                 ${INCLUDE_PATH}/extensions/treegenerators/*.h)
@@ -79,6 +81,7 @@ set(BABYLON_EXTENSIONS_HEADERS
 file(GLOB EXTENSIONS_SRC_FILES  ${SOURCE_PATH}/extensions/hexplanetgeneration/*.cpp
                                 ${SOURCE_PATH}/extensions/hexplanetgeneration/terrain/*.cpp
                                 ${SOURCE_PATH}/extensions/hexplanetgeneration/utils/*.cpp
+                                ${SOURCE_PATH}/extensions/noisegeneration/*.cpp
                                 ${SOURCE_PATH}/extensions/polyhedron/*.cpp
                                 ${SOURCE_PATH}/extensions/shaderbuilder/*.cpp
                                 ${SOURCE_PATH}/extensions/treegenerators/*.cpp)
