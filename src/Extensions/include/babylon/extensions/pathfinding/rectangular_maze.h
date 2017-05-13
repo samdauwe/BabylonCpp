@@ -34,15 +34,13 @@ enum class WallType {
 };
 
 struct Cell {
-  bool leftOpen        = false;
-  bool rightOpen       = false;
-  bool upOpen          = false;
-  bool downOpen        = false;
-  bool visited         = false;
-  std::size_t id       = 0;
-  std::size_t parentId = 0;
-  double cost          = 0.0;
-  double costSoFar     = 0.0;
+  bool leftOpen  = false;
+  bool rightOpen = false;
+  bool upOpen    = false;
+  bool downOpen  = false;
+  bool visited   = false;
+  std::size_t id = 0;
+  double cost    = 0.0;
 }; // end of struct Cell
 
 bool operator==(const Cell& lhs, const Cell& rhs)
@@ -62,7 +60,7 @@ struct RectangularMaze {
   std::size_t _rows;
   std::size_t _columns;
   std::vector<Cell> _cells;
-  std::vector<Cell> _path;
+  std::vector<NodeId> _path;
 
   RectangularMaze(size_t rows, size_t columns)
       : _rows{rows}
@@ -73,6 +71,11 @@ struct RectangularMaze {
 
   ~RectangularMaze()
   {
+  }
+
+  std::size_t size() const
+  {
+    return _cells.size();
   }
 
   Location location(const std::size_t cellId) const
@@ -122,11 +125,11 @@ struct RectangularMaze {
     return cellId(location) < _cells.size();
   }
 
-  std::vector<Cell> neighbors(const Cell& _cell) const
+  std::vector<Cell> neighbors(const std::size_t _cellId) const
   {
     std::vector<Cell> neighborsNodes;
     std::size_t row, col;
-    std::tie(row, col) = location(_cell.id);
+    std::tie(row, col) = location(_cellId);
 
     // Can go up
     if (row != 0 && cell(row - 1, col).downOpen) {
@@ -151,7 +154,7 @@ struct RectangularMaze {
     return neighborsNodes;
   }
 
-  double cost(const Cell& /*cell1*/, const Cell& cell2) const
+  double cost(const std::size_t& /*cell1Id*/, const Cell& cell2) const
   {
     return cell2.cost;
   }
@@ -164,7 +167,7 @@ struct RectangularMaze {
     cell(cellId(location)).cost = cost;
   }
 
-  double heuristic(const Cell& cell1, const Cell& cell2) const
+  double heuristicCostEstimate(const Cell& cell1, const Cell& cell2) const
   {
     std::size_t x1, y1, x2, y2;
     std::tie(x1, y1) = location(cell1.id);
@@ -176,13 +179,13 @@ struct RectangularMaze {
 
   void reset()
   {
-    Cell cell{false, false, false, false, false, 0, 0, 1.0, 0.0};
+    Cell cell{false, false, false, false, false, 0, 0.0};
     std::fill(_cells.begin(), _cells.end(), cell);
   }
 
   void generateEmptyGrid()
   {
-    Cell cell{true, true, true, true, true, 0, 0, 1.0, 0.0};
+    Cell cell{true, true, true, true, true, 0, 0.0};
     std::fill(_cells.begin(), _cells.end(), cell);
   }
 
@@ -318,8 +321,8 @@ struct RectangularMaze {
     _path = AStarSearch(*this, cell(startCellId), cell(goalCellId));
     // Convert to path of locations
     result.reserve(_path.size());
-    for (auto& cell : _path) {
-      result.emplace_back(location(cell.id));
+    for (auto& cellId : _path) {
+      result.emplace_back(location(cellId));
     }
     return result;
   }
@@ -373,8 +376,8 @@ operator<<(std::basic_iostream<char>::basic_ostream& out,
   // Print path
   for (std::size_t i = 0; i < maze._path.size() - 1; ++i) {
     std::size_t r1, c1, r2, c2;
-    std::tie(r1, c1) = maze.location(maze._path[i].id);
-    std::tie(r2, c2) = maze.location(maze._path[i + 1].id);
+    std::tie(r1, c1) = maze.location(maze._path[i]);
+    std::tie(r2, c2) = maze.location(maze._path[i + 1]);
     const auto renderRow        = r1 * 2 + 1;
     const auto renderCol        = c1 * 2 + 1;
     cells[renderRow][renderCol] = WallType::Used;
@@ -404,7 +407,7 @@ operator<<(std::basic_iostream<char>::basic_ostream& out,
   {
     auto& loc = maze._path.back();
     std::size_t r, c;
-    std::tie(r, c) = maze.location(loc.id);
+    std::tie(r, c) = maze.location(loc);
     cells[r * 2 + 1][c * 2 + 1] = WallType::Used;
   }
 

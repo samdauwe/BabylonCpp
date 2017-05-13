@@ -31,43 +31,67 @@ struct PriorityQueue {
   }
 }; // end of struct PriorityQueue
 
+template <typename NodeId>
+struct AStarNode {
+  // Id of the node it can most efficiently be reached from
+  NodeId cameFrom;
+  // The cost of getting from the start node to that node
+  double gScore;
+  // The total cost of getting from the start node to the goal by passing by
+  // that node. That value is partly known, partly heuristic
+  double fScore;
+  // Whether or not the node has already been visited
+  bool visited;
+}; // end of struct
+
 template <typename Graph>
-std::vector<typename Graph::Node> AStarSearch(Graph& graph,
-                                              typename Graph::Node& start,
-                                              typename Graph::Node& goal)
+std::vector<typename Graph::NodeId> AStarSearch(Graph& graph,
+                                                typename Graph::Node& start,
+                                                typename Graph::Node& goal)
 {
-  typedef typename Graph::Node Node;
   typedef typename Graph::NodeId NodeId;
-  std::vector<Node> path;
+  std::vector<NodeId> path;
   PriorityQueue<NodeId, double> frontier;
   frontier.put(start.id, 0);
 
-  start.parentId  = start.id;
-  start.costSoFar = 0.0;
+  std::unordered_map<NodeId, AStarNode<NodeId>> aStarNodes(graph.size());
+  aStarNodes[start.id] = AStarNode<NodeId>{
+    start.id,                                 // cameFrom
+    0.0,                                      // gScore
+    graph.heuristicCostEstimate(start, goal), // fScore
+    true                                      // visited
+  };
 
   while (!frontier.empty()) {
-    auto& current = graph(frontier.get());
+    // The node in frontier having the lowest fScore
+    auto current = frontier.get();
 
-    if (current == goal) {
-      auto curr = current;
-      while (curr.parentId != start.id) {
-        path.emplace_back(curr);
-        curr = graph(curr.parentId);
+    if (current == goal.id) {
+      while (aStarNodes[current].cameFrom != start.id) {
+        path.emplace_back(current);
+        current = aStarNodes[current].cameFrom;
       }
-      path.emplace_back(curr);
-      path.emplace_back(start);
+      path.emplace_back(current);
+      path.emplace_back(start.id);
       std::reverse(path.begin(), path.end());
       break;
     }
 
     for (auto&& next : graph.neighbors(current)) {
-      const auto newCost = current.costSoFar + graph.cost(current, next);
-      if (!next.visited || newCost < next.costSoFar) {
-        graph(next.id).visited   = true;
-        graph(next.id).costSoFar = newCost;
-        const auto priority      = newCost + graph.heuristic(next, goal);
-        frontier.put(next.id, priority);
-        graph(next.id).parentId = current.id;
+      // The distance from start to a neighbor
+      const auto tentative_gScore
+        = aStarNodes[current].gScore + graph.cost(current, next);
+      if (!aStarNodes.count(next.id)) {
+        aStarNodes[next.id] = AStarNode<NodeId>{0, 0.0, 0.0, false};
+      }
+      auto& neighbor = aStarNodes[next.id];
+      if (!neighbor.visited || tentative_gScore < neighbor.gScore) {
+        neighbor.visited  = true;
+        neighbor.cameFrom = current;
+        neighbor.gScore   = tentative_gScore;
+        neighbor.fScore
+          = tentative_gScore + graph.heuristicCostEstimate(next, goal);
+        frontier.put(next.id, neighbor.fScore);
       }
     }
   }
