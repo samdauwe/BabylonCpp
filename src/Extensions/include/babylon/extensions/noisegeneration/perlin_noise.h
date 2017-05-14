@@ -1,5 +1,5 @@
-#ifndef BABYLON_EXTENSIONS_NOISE_GENERATION_FAST_NOISE_H
-#define BABYLON_EXTENSIONS_NOISE_GENERATION_FAST_NOISE_H
+#ifndef BABYLON_EXTENSIONS_NOISE_GENERATION_PERLIN_NOISE_H
+#define BABYLON_EXTENSIONS_NOISE_GENERATION_PERLIN_NOISE_H
 
 #include <babylon/babylon_global.h>
 
@@ -27,30 +27,57 @@ constexpr T grad(I hash, T x, T y, T z)
   return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
 }
 
+/**
+ * @brief Perlin noise generator class.
+ */
 class PerlinNoise {
+
 public:
-  PerlinNoise(uint32_t seed = 0);
+  /**
+   * @brief Default constructor. Initialize the permutation vector with the
+   * reference values.
+   */
+  PerlinNoise();
 
-  // 1D Perlin noise
-  double noise(double x) const
-  {
-    return noise(x, 0, 0);
-  }
+  /**
+   * @brief Constructor. Generate a new permutation vector based on the value of
+   * seed.
+   * @param seed Custom seed value.
+   */
+  PerlinNoise(uint32_t seed);
 
-  // 2D Perlin noise
-  double noise(double x, double y) const
-  {
-    return noise(x, y, 0);
-  }
+  /**
+   * @brief Returns 1D Perlin noise value.
+   * @param x X value.
+   * @return 1D Perlin noise value.
+   */
+  double noise(double x) const;
 
-  // 3D Perlin noise
+  /**
+   * @brief Returns 2D Perlin noise value.
+   * @param x X value.
+   * @param y Y value.
+   * @return 2D Perlin noise value.
+   */
+  double noise(double x, double y) const;
+
+  /**
+   * @brief Returns 3D Perlin noise value.
+   * @param x X value.
+   * @param y Y value.
+   * @param z Z value.
+   * @return 3D Perlin noise value
+   */
   double noise(double x, double y, double z) const;
 
 private:
+  // The permutation vector
   std::array<int, 512> p;
-};
+
+}; // end of class PerlinNoise
 
 class PerlinNoiseOctave {
+
 public:
   PerlinNoiseOctave(int octaves, uint32_t seed = 0);
 
@@ -69,9 +96,10 @@ public:
 private:
   PerlinNoise _perlinNoise;
   int _octaves;
-};
+
+}; // end of class PerlinNoiseOctave
 
 } // end of namespace Extensions
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_EXTENSIONS_NOISE_GENERATION_FAST_NOISE_H
+#endif // end of BABYLON_EXTENSIONS_NOISE_GENERATION_PERLIN_NOISE_H
