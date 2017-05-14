@@ -45,6 +45,7 @@ target_include_directories(${TARGET}
 target_link_libraries(${TARGET}
     PRIVATE
     BabylonCpp
+    Extensions
     gmock-dev
 )
 
