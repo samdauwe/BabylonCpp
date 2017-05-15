@@ -64,7 +64,8 @@ set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(TESTS_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 
 # Header files
-file(GLOB EXTENSIONS_HDR_FILES  ${INCLUDE_PATH}/extensions/hexplanetgeneration/*.h
+file(GLOB EXTENSIONS_HDR_FILES  ${INCLUDE_PATH}/extensions/dynamicterrain/*.h
+                                ${INCLUDE_PATH}/extensions/hexplanetgeneration/*.h
                                 ${INCLUDE_PATH}/extensions/hexplanetgeneration/terrain/*.h
                                 ${INCLUDE_PATH}/extensions/hexplanetgeneration/utils/*.h
                                 ${INCLUDE_PATH}/extensions/navigationmesh/*.h
@@ -79,7 +80,8 @@ set(BABYLON_EXTENSIONS_HEADERS
 )
 
 # Source files
-file(GLOB EXTENSIONS_SRC_FILES  ${SOURCE_PATH}/extensions/hexplanetgeneration/*.cpp
+file(GLOB EXTENSIONS_SRC_FILES  ${SOURCE_PATH}/extensions/dynamicterrain/*.cpp
+                                ${SOURCE_PATH}/extensions/hexplanetgeneration/*.cpp
                                 ${SOURCE_PATH}/extensions/hexplanetgeneration/terrain/*.cpp
                                 ${SOURCE_PATH}/extensions/hexplanetgeneration/utils/*.cpp
                                 ${SOURCE_PATH}/extensions/navigationmesh/*.cpp
