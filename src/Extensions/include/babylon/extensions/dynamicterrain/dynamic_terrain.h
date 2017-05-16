@@ -50,7 +50,7 @@ public:
    */
   DynamicTerrain(const std::string& name, DynamicTerrainOptions& options,
                  Scene* scene);
-  ~DynamicTerrain();
+  virtual ~DynamicTerrain();
 
   /**
    * @brief Updates the terrain position and shape according to the camera
@@ -72,7 +72,8 @@ public:
    * @param normal
    * @return The altitude at the coordinates (x, z) of the map.
    */
-  float getHeightFromMap(float x, float z, const Vector3& normal);
+  float getHeightFromMap(float x, float z,
+                         const Vector3& normal = Vector3::Zero());
 
   /**
    * @brief Returns true if the World coordinates (x, z) are in the current
@@ -81,7 +82,7 @@ public:
    * @param z
    * @return
    */
-  bool contains(float x, float z);
+  bool contains(float x, float z) const;
 
   // Getters / Setters
 
@@ -181,20 +182,20 @@ public:
    * Current position of terrain center in its local space.
    * Returns a Vector3.
    */
-  Vector3& centerLocal() const;
+  const Vector3& centerLocal() const;
 
   /**
    * Current position of terrain center in the World space.
    * Returns a Vector3.
    */
-  Vector3& centerWorld() const;
+  const Vector3& centerWorld() const;
 
   /**
    * The array of the limit values to change the LOD factor.
    * Returns an array of integers or an empty array.
    * This array is always sorted in the descending order once set.
    */
-  Uint32Array& LODLimits() const;
+  const Uint32Array& LODLimits() const;
   void LODLimits(Uint32Array ar);
 
   /**
@@ -203,7 +204,7 @@ public:
    * This property can be set only if a mapData array was passed at construction
    * time.
    */
-  Float32Array& mapData() const;
+  const Float32Array& mapData() const;
   void setMapData(const Float32Array& val);
 
   /**
@@ -226,7 +227,7 @@ public:
    * This property can be set only if a mapColors array was passed at
    * construction time.
    */
-  Float32Array& mapColors();
+  const Float32Array& mapColors() const;
   void setMapColors(const Float32Array& val);
 
   /**
@@ -235,15 +236,15 @@ public:
    * This property can be set only if a mapUVs array was passed at construction
    * time.
    */
-  Float32Array& mapUVs() const;
-  Float32Array& setMapUVs(const Float32Array& val);
+  const Float32Array& mapUVs() const;
+  void setMapUVs(const Float32Array& val);
 
   /**
    * The map of normals.
    * A flat array of successive floats as normal vector coordinates (x, y, z) on
    * each map point.
    */
-  Float32Array& mapNormals() const;
+  const Float32Array& mapNormals() const;
   void setMapNormals(const Float32Array& val);
 
   /**
@@ -271,7 +272,8 @@ public:
    * This function is called only if the property useCustomVertexFunction is set
    * to true.
    */
-  virtual void updateVertex(unsigned int vertex, unsigned int i, unsigned j);
+  virtual void updateVertex(DynamicTerrainVertex& vertex, unsigned int i,
+                            unsigned j);
 
   /**
    * @brief Custom function called each frame and passed the terrain camera
