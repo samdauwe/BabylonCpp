@@ -18,10 +18,9 @@ public:
     unsigned int CLIPPLANE, unsigned int ALPHATEST, unsigned int INSTANCES);
   static void PrepareDefinesForAttributes(
     AbstractMesh* mesh, MaterialDefines& defines, bool useVertexColor,
-    bool useBones, bool useMorphTargets = false, unsigned int NORMAL = 0,
-    unsigned int UV1 = 0, unsigned int UV2 = 0, unsigned int VERTEXCOLOR = 0,
-    unsigned int VERTEXALPHA = 0, unsigned int MORPHTARGETS_NORMAL = 0,
-    unsigned int MORPHTARGETS = 0);
+    bool useBones, bool useMorphTargets, unsigned int NORMAL, unsigned int UV1,
+    unsigned int UV2, unsigned int VERTEXCOLOR, unsigned int VERTEXALPHA,
+    unsigned int MORPHTARGETS_NORMAL = 0, unsigned int MORPHTARGETS = 0);
   static bool PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
                                       MaterialDefines& defines,
                                       bool specularSupported,
