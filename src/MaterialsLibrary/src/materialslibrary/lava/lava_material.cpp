@@ -175,7 +175,7 @@ bool LavaMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
     const std::vector<std::string> uniformBuffers{};
 
     EffectCreationOptions options;
-    options.attributes            = attribs;
+    options.attributes            = std::move(attribs);
     options.uniformsNames         = std::move(uniforms);
     options.uniformBuffersNames   = std::move(uniformBuffers);
     options.samplers              = std::move(samplers);

@@ -19,6 +19,10 @@ struct BABYLON_SHARED_EXPORT ShadowOnlyMaterialDefines
   static constexpr unsigned int LOGARITHMICDEPTH = 6;
   static constexpr unsigned int SHADOWFULLFLOAT  = 7;
   static constexpr unsigned int SPECULARTERM     = 8;
+  static constexpr unsigned int UV1              = 9;
+  static constexpr unsigned int UV2              = 10;
+  static constexpr unsigned int VERTEXCOLOR      = 11;
+  static constexpr unsigned int VERTEXALPHA      = 12;
 
   ShadowOnlyMaterialDefines();
   ~ShadowOnlyMaterialDefines();
