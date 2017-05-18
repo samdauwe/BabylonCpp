@@ -2,7 +2,7 @@
 #define BABYLON_MATERIALS_LIBRARY_TERRAIN_TERRAIN_MATERIAL_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/materials/material.h>
+#include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/terrain/terrain_material_defines.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/matrix.h>
@@ -10,7 +10,7 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
-class BABYLON_SHARED_EXPORT TerrainMaterial : public Material {
+class BABYLON_SHARED_EXPORT TerrainMaterial : public PushMaterial {
 
 public:
   using TMD = TerrainMaterialDefines;
@@ -22,9 +22,9 @@ public:
   bool needAlphaBlending() override;
   bool needAlphaTesting() override;
   BaseTexture* getAlphaTestTexture() override;
-  bool isReady(AbstractMesh* mesh, bool useInstances) override;
-  void bindOnlyWorldMatrix(Matrix& world) override;
-  void bind(Matrix* world, Mesh* mesh) override;
+  bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+                         bool useInstances = false) override;
+  void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatable*> getAnimatables();
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
@@ -36,28 +36,23 @@ public:
   static TerrainMaterial* Parse(const Json::value& source, Scene* scene,
                                 const std::string& rootUrl);
 
-private:
-  bool _checkCache(Scene* scene, AbstractMesh* mesh, bool useInstances = false);
-
 public:
-  BaseTexture* mixTexture;
-  Texture* diffuseTexture1;
-  Texture* diffuseTexture2;
-  Texture* diffuseTexture3;
-  Texture* bumpTexture1;
-  Texture* bumpTexture2;
-  Texture* bumpTexture3;
   Color3 diffuseColor;
   Color3 specularColor;
   float specularPower;
-  bool disableLighting;
-  unsigned int maxSimultaneousLights;
 
 private:
+  BaseTexture* _mixTexture;
+  Texture* _diffuseTexture1;
+  Texture* _diffuseTexture2;
+  Texture* _diffuseTexture3;
+  Texture* _bumpTexture1;
+  Texture* _bumpTexture2;
+  Texture* _bumpTexture3;
+  bool _disableLighting;
+  unsigned int _maxSimultaneousLights;
   Matrix _worldViewProjectionMatrix;
   int _renderId;
-  TerrainMaterialDefines _defines;
-  std::unique_ptr<TerrainMaterialDefines> _cachedDefines;
 
 }; // end of class TerrainMaterial
 
