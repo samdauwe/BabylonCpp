@@ -2,7 +2,7 @@
 #define BABYLON_MATERIALS_LIBRARY_SIMPLE_SIMPLE_MATERIAL_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/materials/material.h>
+#include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/simple/simple_material_defines.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/matrix.h>
@@ -10,7 +10,7 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
-class BABYLON_SHARED_EXPORT SimpleMaterial : public Material {
+class BABYLON_SHARED_EXPORT SimpleMaterial : public PushMaterial {
 
 public:
   using SMD = SimpleMaterialDefines;
@@ -22,9 +22,9 @@ public:
   bool needAlphaBlending() override;
   bool needAlphaTesting() override;
   BaseTexture* getAlphaTestTexture() override;
-  bool isReady(AbstractMesh* mesh, bool useInstances) override;
-  void bindOnlyWorldMatrix(Matrix& world) override;
-  void bind(Matrix* world, Mesh* mesh) override;
+  bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+                         bool useInstances = false) override;
+  void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatable*> getAnimatables();
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
@@ -36,21 +36,16 @@ public:
   static SimpleMaterial* Parse(const Json::value& source, Scene* scene,
                                const std::string& rootUrl);
 
-private:
-  bool _checkCache(Scene* scene, AbstractMesh* mesh, bool useInstances = false);
-
 public:
-  BaseTexture* diffuseTexture;
   Color3 diffuseColor;
-  bool disableLighting;
-  unsigned int maxSimultaneousLights;
 
 private:
+  BaseTexture* _diffuseTexture;
+  bool _disableLighting;
+  unsigned int _maxSimultaneousLights;
   Matrix _worldViewProjectionMatrix;
   Color3 _scaledDiffuse;
   int _renderId;
-  SimpleMaterialDefines _defines;
-  std::unique_ptr<SimpleMaterialDefines> _cachedDefines;
 
 }; // end of class SimpleMaterial
 

@@ -5,13 +5,11 @@ namespace MaterialsLibrary {
 
 SimpleMaterialDefines::SimpleMaterialDefines() : MaterialDefines{}
 {
-  _keys = {"DIFFUSE",   "CLIPPLANE",  "ALPHATEST", "POINTSIZE",   "FOG",
-           "NORMAL",    "UV1",        "UV2",       "VERTEXCOLOR", "VERTEXALPHA",
-           "INSTANCES", "REFLECTION", "SHADOWS",   "SPECULARTERM"};
-  defines.resize(_keys.size());
-  for (size_t i = 0; i < _keys.size(); ++i) {
-    defines[i] = false;
-  }
+  _keys = {"DIFFUSE",      "CLIPPLANE",      "ALPHATEST", "POINTSIZE",
+           "FOG",          "NORMAL",         "UV1",       "UV2",
+           "VERTEXCOLOR",  "VERTEXALPHA",    "INSTANCES", "LOGARITHMICDEPTH",
+           "SPECULARTERM", "SHADOWFULLFLOAT"};
+  rebuild();
 }
 
 SimpleMaterialDefines::~SimpleMaterialDefines()
