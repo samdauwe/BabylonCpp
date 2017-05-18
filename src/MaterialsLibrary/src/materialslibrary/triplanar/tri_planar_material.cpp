@@ -6,37 +6,36 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
+#include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {
 
 TriPlanarMaterial::TriPlanarMaterial(const std::string& iName, Scene* scene)
-    : Material{iName, scene}
-    , mixTexture{nullptr}
-    , diffuseTextureX{nullptr}
-    , diffuseTextureY{nullptr}
-    , diffuseTextureZ{nullptr}
-    , normalTextureX{nullptr}
-    , normalTextureY{nullptr}
-    , normalTextureZ{nullptr}
+    : PushMaterial{iName, scene}
     , tileSize{1.f}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
     , specularColor{Color3(0.2f, 0.2f, 0.2f)}
     , specularPower{64.f}
-    , disableLighting{false}
-    , maxSimultaneousLights{4}
+    , _mixTexture{nullptr}
+    , _diffuseTextureX{nullptr}
+    , _diffuseTextureY{nullptr}
+    , _diffuseTextureZ{nullptr}
+    , _normalTextureX{nullptr}
+    , _normalTextureY{nullptr}
+    , _normalTextureZ{nullptr}
+    , _disableLighting{false}
+    , _maxSimultaneousLights{4}
     , _worldViewProjectionMatrix{Matrix::Zero()}
     , _renderId{-1}
-    , _cachedDefines{std_util::make_unique<TriPlanarMaterialDefines>()}
 {
-  _cachedDefines->BonesPerMesh         = 0;
-  _cachedDefines->NUM_BONE_INFLUENCERS = 0;
 }
 
 TriPlanarMaterial::~TriPlanarMaterial()
@@ -58,292 +57,256 @@ BaseTexture* TriPlanarMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool TriPlanarMaterial::_checkCache(Scene* /*scene*/, AbstractMesh* mesh,
-                                    bool useInstances)
+bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+                                          bool useInstances)
 {
-  if (!mesh) {
-    return true;
-  }
-
-  if (_defines[TPMD::INSTANCES] != useInstances) {
-    return false;
-  }
-
-  if (mesh->_materialDefines && mesh->_materialDefines->isEqual(_defines)) {
-    return true;
-  }
-
-  return false;
-}
-
-bool TriPlanarMaterial::isReady(AbstractMesh* mesh, bool useInstances)
-{
-  if (checkReadyOnlyOnce) {
-    if (_wasPreviouslyReady) {
+  if (isFrozen()) {
+    if (_wasPreviouslyReady && subMesh->effect()) {
       return true;
     }
   }
 
+  if (!subMesh->_materialDefines) {
+    subMesh->_materialDefines
+      = std_util::make_unique<TriPlanarMaterialDefines>();
+  }
+
+  auto defines = *(
+    static_cast<TriPlanarMaterialDefines*>(subMesh->_materialDefines.get()));
   auto scene = getScene();
 
-  if (!checkReadyOnEveryCall) {
+  if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
-      if (_checkCache(scene, mesh, useInstances)) {
-        return true;
-      }
+      return true;
     }
   }
 
-  auto engine      = scene->getEngine();
-  auto needNormals = false;
-
-  _defines.reset();
+  auto engine = scene->getEngine();
 
   // Textures
-  if (scene->texturesEnabled()) {
-    if (StandardMaterial::DiffuseTextureEnabled) {
-      std::vector<Texture*> textures{diffuseTextureX, diffuseTextureY,
-                                     diffuseTextureZ};
-      Uint32Array textureDefines{TPMD::DIFFUSEX, TPMD::DIFFUSEY,
-                                 TPMD::DIFFUSEZ};
-
-      for (unsigned int i = 0; i < textures.size(); ++i) {
-        if (textures[i]) {
-          if (!textures[i]->isReady()) {
-            return false;
+  if (defines._areTexturesDirty) {
+    if (scene->texturesEnabled()) {
+      if (StandardMaterial::DiffuseTextureEnabled()) {
+        std::vector<Texture*> textures{_diffuseTextureX, _diffuseTextureY,
+                                       _diffuseTextureZ};
+        const Uint32Array textureDefines{TPMD::DIFFUSEX, TPMD::DIFFUSEY,
+                                         TPMD::DIFFUSEZ};
+        for (unsigned int i = 0; i < textures.size(); i++) {
+          if (textures[i]) {
+            if (!textures[i]->isReady()) {
+              return false;
+            }
+            else {
+              defines.defines[textureDefines[i]] = true;
+            }
           }
-          else {
-            _defines.defines[textureDefines[i]] = true;
+        }
+      }
+      if (StandardMaterial::BumpTextureEnabled()) {
+        std::vector<Texture*> textures{_normalTextureX, _normalTextureY,
+                                       _normalTextureZ};
+        const Uint32Array textureDefines{"BUMPX", "BUMPY", "BUMPZ"};
+
+        for (unsigned int i = 0; i < textures.size(); i++) {
+          if (textures[i]) {
+            if (!textures[i]->isReady()) {
+              return false;
+            }
+            else {
+              defines.defines[textureDefines[i]] = true;
+            }
           }
         }
       }
     }
-    if (StandardMaterial::BumpTextureEnabled) {
-      std::vector<Texture*> textures{normalTextureX, normalTextureY,
-                                     normalTextureZ};
-      Uint32Array textureDefines{TPMD::BUMPX, TPMD::BUMPY, TPMD::BUMPZ};
-
-      for (unsigned int i = 0; i < textures.size(); ++i) {
-        if (textures[i]) {
-          if (!textures[i]->isReady()) {
-            return false;
-          }
-          else {
-            _defines.defines[textureDefines[i]] = true;
-          }
-        }
-      }
-    }
   }
 
-  // Effect
-  if (scene->clipPlane()) {
-    _defines.defines[TPMD::CLIPPLANE] = true;
-  }
-
-  if (engine->getAlphaTesting()) {
-    _defines.defines[TPMD::ALPHATEST] = true;
-  }
-
-  // Point size
-  if (pointsCloud() || scene->forcePointsCloud()) {
-    _defines.defines[TPMD::POINTSIZE] = true;
-  }
-
-  // Fog
-  if (scene->fogEnabled() && mesh && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled) {
-    _defines.defines[TPMD::FOG] = true;
-  }
+  // Misc.
+  MaterialHelper::PrepareDefinesForMisc(
+    mesh, scene, false, pointsCloud(), fogEnabled(), defines,
+    TPMD::LOGARITHMICDEPTH, TPMD::POINTSIZE, TPMD::FOG);
 
   // Lights
-  if (scene->lightsEnabled() && !disableLighting) {
-    needNormals = MaterialHelper::PrepareDefinesForLights(
-      scene, mesh, _defines, maxSimultaneousLights, TPMD::SPECULARTERM,
-      TPMD::SHADOWS);
-  }
+  defines._needNormals = MaterialHelper::PrepareDefinesForLights(
+    scene, mesh, defines, false, _maxSimultaneousLights, _disableLighting,
+    TPMD::SPECULARTERM, TPMD::SHADOWFULLFLOAT);
+
+  // Values that need to be evaluated on every frame
+  MaterialHelper::PrepareDefinesForFrameBoundValues(
+    scene, engine, defines, useInstances, TPMD::CLIPPLANE, TPMD::ALPHATEST,
+    TPMD::INSTANCES);
 
   // Attribs
-  if (mesh) {
-    if (needNormals && mesh->isVerticesDataPresent(VertexBuffer::NormalKind)) {
-      _defines.defines[TPMD::NORMAL] = true;
-    }
-    if (mesh->useVertexColors()
-        && mesh->isVerticesDataPresent(VertexBuffer::ColorKind)) {
-      _defines.defines[TPMD::VERTEXCOLOR] = true;
-
-      if (mesh->hasVertexAlpha()) {
-        _defines.defines[TPMD::VERTEXALPHA] = true;
-      }
-    }
-
-    if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
-      _defines.NUM_BONE_INFLUENCERS = mesh->numBoneInfluencers();
-      _defines.BonesPerMesh         = mesh->skeleton()->bones.size() + 1;
-    }
-
-    // Instances
-    if (useInstances) {
-      _defines.defines[TPMD::INSTANCES] = true;
-    }
-  }
+  MaterialHelper::PrepareDefinesForAttributes(
+    mesh, defines, true, true, false, TPMD::NORMAL, TPMD::UV1, TPMD::UV2,
+    TPMD::VERTEXCOLOR, TPMD::VERTEXALPHA);
 
   // Get correct effect
-  if (!_defines.isEqual(*_cachedDefines)) {
-    _defines.cloneTo(*_cachedDefines);
-
+  if (defines.isDirty()) {
+    defines.markAsProcessed();
     scene->resetCachedMaterial();
 
     // Fallbacks
     auto fallbacks = std_util::make_unique<EffectFallbacks>();
-    if (_defines[TPMD::FOG]) {
+    if (defines[TPMD::FOG]) {
       fallbacks->addFallback(1, "FOG");
     }
 
-    MaterialHelper::HandleFallbacksForShadows(_defines, fallbacks.get(),
-                                              maxSimultaneousLights);
+    MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
+                                              _maxSimultaneousLights);
 
-    if (_defines.NUM_BONE_INFLUENCERS > 0) {
+    if (defines.NUM_BONE_INFLUENCERS > 0) {
       fallbacks->addCPUSkinningFallback(0, mesh);
     }
 
     // Attributes
     std::vector<std::string> attribs = {VertexBuffer::PositionKindChars};
 
-    if (_defines[TPMD::NORMAL]) {
+    if (defines[TPMD::NORMAL]) {
       attribs.emplace_back(VertexBuffer::NormalKindChars);
     }
 
-    if (_defines[TPMD::VERTEXCOLOR]) {
+    if (defines[TPMD::VERTEXCOLOR]) {
       attribs.emplace_back(VertexBuffer::ColorKindChars);
     }
 
-    MaterialHelper::PrepareAttributesForBones(
-      attribs, mesh, _defines.NUM_BONE_INFLUENCERS, fallbacks.get());
-    MaterialHelper::PrepareAttributesForInstances(attribs, _defines,
+    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
+                                              *fallbacks);
+    MaterialHelper::PrepareAttributesForInstances(attribs, defines,
                                                   TPMD::INSTANCES);
 
     // Legacy browser patch
-    std::string shaderName = "triplanar";
-    std::string join       = _defines.toString();
-    std::vector<std::string> uniforms{
+    const std::string shaderName{"triplanar"};
+    auto join = defines.toString();
+
+    const std::vector<std::string> uniforms{
       "world",       "view",          "viewProjection", "vEyePosition",
       "vLightsType", "vDiffuseColor", "vSpecularColor", "vFogInfos",
       "vFogColor",   "pointSize",     "mBones",         "vClipPlane",
       "tileSize"};
-    std::vector<std::string> samplers{"diffuseSamplerX", "diffuseSamplerY",
-                                      "diffuseSamplerZ", "normalSamplerX",
-                                      "normalSamplerY",  "normalSamplerZ"};
-    std::unordered_map<std::string, unsigned int> indexParameters{
-      {"maxSimultaneousLights", maxSimultaneousLights}};
 
-    MaterialHelper::PrepareUniformsAndSamplersList(uniforms, samplers, _defines,
-                                                   maxSimultaneousLights);
+    const std::vector<std::string> samplers{
+      "diffuseSamplerX", "diffuseSamplerY", "diffuseSamplerZ",
+      "normalSamplerX",  "normalSamplerY",  "normalSamplerZ"};
+    const std::vector<std::string> uniformBuffers{};
 
-    _effect = engine->createEffect(shaderName, attribs, uniforms, samplers,
-                                   join, fallbacks.get(), onCompiled, onError,
-                                   indexParameters);
+    EffectCreationOptions options;
+    options.attributes            = std::move(attribs);
+    options.uniformsNames         = std::move(uniforms);
+    options.uniformBuffersNames   = std::move(uniformBuffers);
+    options.samplers              = std::move(samplers);
+    options.materialDefines       = &defines;
+    options.defines               = std::move(join);
+    options.maxSimultaneousLights = _maxSimultaneousLights;
+    options.fallbacks             = std::move(fallbacks);
+    options.onCompiled            = onCompiled;
+    options.onError               = onError;
+    options.indexParameters
+      = {{"maxSimultaneousLights", _maxSimultaneousLights}};
+
+    MaterialHelper::PrepareUniformsAndSamplersList(options);
+    subMesh->setEffect(
+      scene->getEngine()->createEffect(shaderName, options, engine), defines);
   }
-  if (!_effect->isReady()) {
+
+  if (!subMesh->effect()->isReady()) {
     return false;
   }
 
   _renderId           = scene->getRenderId();
   _wasPreviouslyReady = true;
 
-  if (mesh) {
-    if (!mesh->_materialDefines) {
-      mesh->_materialDefines
-        = std_util::make_unique<TriPlanarMaterialDefines>();
-    }
-
-    _defines.cloneTo(*mesh->_materialDefines);
-  }
-
   return true;
 }
 
-void TriPlanarMaterial::bindOnlyWorldMatrix(Matrix& world)
-{
-  _effect->setMatrix("world", world);
-}
-
-void TriPlanarMaterial::bind(Matrix* world, Mesh* mesh)
+void TriPlanarMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
+                                       SubMesh* subMesh)
 {
   auto scene = getScene();
 
+  auto _defines
+    = static_cast<TriPlanarMaterialDefines*>(subMesh->_materialDefines.get());
+  if (!_defines) {
+    return;
+  }
+  auto defines = *_defines;
+
+  auto effect   = subMesh->effect();
+  _activeEffect = effect;
+
   // Matrices
   bindOnlyWorldMatrix(*world);
-  _effect->setMatrix("viewProjection", scene->getTransformMatrix());
+  _activeEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
   // Bones
-  MaterialHelper::BindBonesParameters(mesh, _effect);
+  MaterialHelper::BindBonesParameters(mesh, _activeEffect);
 
-  _effect->setFloat("tileSize", tileSize);
+  _activeEffect->setFloat("tileSize", tileSize);
 
   if (scene->getCachedMaterial() != this) {
     // Textures
-    if (diffuseTextureX) {
-      _effect->setTexture("diffuseSamplerX", diffuseTextureX);
+    if (_diffuseTextureX) {
+      _activeEffect->setTexture("diffuseSamplerX", _diffuseTextureX);
     }
-    if (diffuseTextureY) {
-      _effect->setTexture("diffuseSamplerY", diffuseTextureY);
+    if (_diffuseTextureY) {
+      _activeEffect->setTexture("diffuseSamplerY", _diffuseTextureY);
     }
-    if (diffuseTextureZ) {
-      _effect->setTexture("diffuseSamplerZ", diffuseTextureZ);
+    if (_diffuseTextureZ) {
+      _activeEffect->setTexture("diffuseSamplerZ", _diffuseTextureZ);
     }
-    if (normalTextureX) {
-      _effect->setTexture("normalSamplerX", normalTextureX);
+    if (_normalTextureX) {
+      _activeEffect->setTexture("normalSamplerX", _normalTextureX);
     }
-    if (normalTextureY) {
-      _effect->setTexture("normalSamplerY", normalTextureY);
+    if (_normalTextureY) {
+      _activeEffect->setTexture("normalSamplerY", _normalTextureY);
     }
-    if (normalTextureZ) {
-      _effect->setTexture("normalSamplerZ", normalTextureZ);
+    if (_normalTextureZ) {
+      _activeEffect->setTexture("normalSamplerZ", _normalTextureZ);
     }
     // Clip plane
-    MaterialHelper::BindClipPlane(_effect, scene);
+    MaterialHelper::BindClipPlane(_activeEffect, scene);
 
     // Point size
     if (pointsCloud()) {
-      _effect->setFloat("pointSize", pointSize);
+      _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    _effect->setVector3("vEyePosition", scene->_mirroredCameraPosition ?
-                                          *scene->_mirroredCameraPosition :
-                                          scene->activeCamera->position);
+    _activeEffect->setVector3("vEyePosition",
+                              scene->_mirroredCameraPosition ?
+                                *scene->_mirroredCameraPosition :
+                                scene->activeCamera->position);
   }
 
-  _effect->setColor4("vDiffuseColor", diffuseColor, alpha * mesh->visibility);
+  _activeEffect->setColor4("vDiffuseColor", diffuseColor,
+                           alpha * mesh->visibility);
 
-  if (_defines[TPMD::SPECULARTERM]) {
-    _effect->setColor4("vSpecularColor", specularColor, specularPower);
+  if (defines[TPMD::SPECULARTERM]) {
+    _activeEffect->setColor4("vSpecularColor", specularColor, specularPower);
   }
 
-  if (scene->lightsEnabled() && !disableLighting) {
-    MaterialHelper::BindLights(scene, mesh, _effect,
-                               _defines.defines[TPMD::SPECULARTERM],
-                               maxSimultaneousLights);
+  if (scene->lightsEnabled() && !_disableLighting) {
+    MaterialHelper::BindLights(scene, mesh, _activeEffect, defines,
+                               _maxSimultaneousLights, TPMD::SPECULARTERM);
   }
 
   // View
   if (scene->fogEnabled() && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE) {
-    _effect->setMatrix("view", scene->getViewMatrix());
+    _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
   // Fog
-  MaterialHelper::BindFogParameters(scene, mesh, _effect);
+  MaterialHelper::BindFogParameters(scene, mesh, _activeEffect);
 
-  Material::bind(world, mesh);
+  _afterBind(mesh, _activeEffect);
 }
 
 std::vector<IAnimatable*> TriPlanarMaterial::getAnimatables()
 {
   std::vector<IAnimatable*> results;
 
-  if (mixTexture && mixTexture->animations.size() > 0) {
-    results.emplace_back(mixTexture);
+  if (_mixTexture && _mixTexture->animations.size() > 0) {
+    results.emplace_back(_mixTexture);
   }
 
   return results;
@@ -353,8 +316,8 @@ void TriPlanarMaterial::dispose(bool forceDisposeEffect,
                                 bool forceDisposeTextures)
 {
 
-  if (mixTexture) {
-    mixTexture->dispose();
+  if (_mixTexture) {
+    _mixTexture->dispose();
   }
 
   Material::dispose(forceDisposeEffect, forceDisposeTextures);

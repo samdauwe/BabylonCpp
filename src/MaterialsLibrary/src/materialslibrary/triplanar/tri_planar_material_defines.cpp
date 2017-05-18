@@ -5,14 +5,25 @@ namespace MaterialsLibrary {
 
 TriPlanarMaterialDefines::TriPlanarMaterialDefines() : MaterialDefines{}
 {
-  _keys = {"DIFFUSEX",    "DIFFUSEY",    "DIFFUSEZ",     "BUMPX",
-           "BUMPY",       "BUMPZ",       "CLIPPLANE",    "ALPHATEST",
-           "POINTSIZE",   "FOG",         "SPECULARTERM", "NORMAL",
-           "VERTEXCOLOR", "VERTEXALPHA", "INSTANCES",    "SHADOWS"};
-  defines.resize(_keys.size());
-  for (size_t i = 0; i < _keys.size(); ++i) {
-    defines[i] = false;
-  }
+  _keys = {"DIFFUSEX",
+           "DIFFUSEY",
+           "DIFFUSEZ",
+           "BUMPX",
+           "BUMPY",
+           "BUMPZ",
+           "CLIPPLANE",
+           "ALPHATEST",
+           "POINTSIZE",
+           "FOG",
+           "SPECULARTERM",
+           "NORMAL",
+           "VERTEXCOLOR",
+           "VERTEXALPHA",
+           "INSTANCES",
+           "SHADOWS",
+           "LOGARITHMICDEPTH",
+           "SHADOWFULLFLOAT"};
+  rebuild();
 }
 
 TriPlanarMaterialDefines::~TriPlanarMaterialDefines()
