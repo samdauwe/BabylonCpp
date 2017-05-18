@@ -78,7 +78,9 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
     SMD::SHADOWFULLFLOAT);
 
   // Attribs
-  MaterialHelper::PrepareDefinesForAttributes(mesh, defines, false, true);
+  MaterialHelper::PrepareDefinesForAttributes(
+    mesh, defines, false, true, false, SMD::NORMAL, SMD::UV1, SMD::UV2,
+    SMD::VERTEXCOLOR, SMD::VERTEXALPHA);
 
   // Get correct effect
   if (defines.isDirty()) {

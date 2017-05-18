@@ -5,9 +5,19 @@ namespace MaterialsLibrary {
 
 ShadowOnlyMaterialDefines::ShadowOnlyMaterialDefines() : MaterialDefines{}
 {
-  _keys = {"CLIPPLANE",        "POINTSIZE",       "FOG",
-           "NORMAL",           "INSTANCES",       "ALPHATEST",
-           "LOGARITHMICDEPTH", "SHADOWFULLFLOAT", "SPECULARTERM"};
+  _keys = {"CLIPPLANE",
+           "POINTSIZE",
+           "FOG",
+           "NORMAL",
+           "INSTANCES",
+           "ALPHATEST",
+           "LOGARITHMICDEPTH",
+           "SHADOWFULLFLOAT",
+           "SPECULARTERM",
+           "UV1",
+           "UV2",
+           "VERTEXCOLOR",
+           "VERTEXALPHA"};
   rebuild();
 }
 
