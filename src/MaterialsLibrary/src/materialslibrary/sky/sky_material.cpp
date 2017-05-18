@@ -5,17 +5,19 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
+#include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {
 
 SkyMaterial::SkyMaterial(const std::string& iName, Scene* scene)
-    : Material{iName, scene}
+    : PushMaterial{iName, scene}
     , luminance{1.f}
     , turbidity{10.f}
     , rayleigh{2.f}
@@ -28,7 +30,6 @@ SkyMaterial::SkyMaterial(const std::string& iName, Scene* scene)
     , useSunPosition{false}
     , _cameraPosition{Vector3::Zero()}
     , _renderId{-1}
-    , _cachedDefines{std_util::make_unique<SkyMaterialDefines>()}
 {
 }
 
@@ -51,188 +52,166 @@ BaseTexture* SkyMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool SkyMaterial::_checkCache(Scene* /*scene*/, AbstractMesh* mesh,
-                              bool /*useInstances*/)
+bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+                                    bool /*useInstances*/)
 {
-  if (!mesh) {
-    return true;
-  }
-
-  if (mesh->_materialDefines && mesh->_materialDefines->isEqual(_defines)) {
-    return true;
-  }
-
-  return false;
-}
-
-bool SkyMaterial::isReady(AbstractMesh* mesh, bool useInstances)
-{
-  if (checkReadyOnlyOnce) {
-    if (_wasPreviouslyReady) {
+  if (isFrozen()) {
+    if (_wasPreviouslyReady && subMesh->effect()) {
       return true;
     }
   }
 
+  if (!subMesh->_materialDefines) {
+    subMesh->_materialDefines = std_util::make_unique<SkyMaterialDefines>();
+  }
+
+  auto defines
+    = *(static_cast<SkyMaterialDefines*>(subMesh->_materialDefines.get()));
   auto scene = getScene();
 
-  if (!checkReadyOnEveryCall) {
+  if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
-      if (_checkCache(scene, mesh, useInstances)) {
-        return true;
-      }
+      return true;
     }
   }
 
   auto engine = scene->getEngine();
-  _defines.reset();
 
-  // Effect
-  if (scene->clipPlane()) {
-    _defines.defines[SMD::CLIPPLANE] = true;
-  }
-
-  // Point size
-  if (pointsCloud() || scene->forcePointsCloud()) {
-    _defines.defines[SMD::POINTSIZE] = true;
-  }
-
-  // Fog
-  if (scene->fogEnabled() && mesh && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled) {
-    _defines.defines[SMD::FOG] = true;
-  }
+  MaterialHelper::PrepareDefinesForMisc(
+    mesh, scene, false, pointsCloud(), fogEnabled(), defines,
+    SMD::LOGARITHMICDEPTH, SMD::POINTSIZE, SMD::FOG);
 
   // Attribs
-  if (mesh) {
-    if (mesh->useVertexColors()
-        && mesh->isVerticesDataPresent(VertexBuffer::ColorKind)) {
-      _defines.defines[SMD::VERTEXCOLOR] = true;
-
-      if (mesh->hasVertexAlpha()) {
-        _defines.defines[SMD::VERTEXALPHA] = true;
-      }
-    }
-  }
+  MaterialHelper::PrepareDefinesForAttributes(
+    mesh, defines, true, false, false, SMD::NORMAL, SMD::UV1, SMD::UV2,
+    SMD::VERTEXCOLOR, SMD::VERTEXALPHA);
 
   // Get correct effect
-  if (!_defines.isEqual(*_cachedDefines) || !_effect) {
-    _defines.cloneTo(*_cachedDefines);
+  if (defines.isDirty()) {
+    defines.markAsProcessed();
 
     scene->resetCachedMaterial();
 
     // Fallbacks
     auto fallbacks = std_util::make_unique<EffectFallbacks>();
-    if (_defines[SMD::FOG]) {
+    if (defines[SMD::FOG]) {
       fallbacks->addFallback(1, "FOG");
     }
 
     // Attributes
     std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
 
-    if (_defines[SMD::VERTEXCOLOR]) {
+    if (defines[SMD::VERTEXCOLOR]) {
       attribs.emplace_back(VertexBuffer::ColorKindChars);
     }
 
-    // Legacy browser patch
-    std::string shaderName = "sky";
-    std::string join       = _defines.toString();
-    std::vector<std::string> uniforms{
+    const std::string shaderName{"sky"};
+    auto join = defines.toString();
+    const std::vector<std::string> uniforms{
       "world",       "viewProjection", "view",           "vFogInfos",
       "vFogColor",   "pointSize",      "vClipPlane",     "luminance",
       "turbidity",   "rayleigh",       "mieCoefficient", "mieDirectionalG",
       "sunPosition", "cameraPosition"};
-    std::vector<std::string> samplers;
+    const std::vector<std::string> samplers{};
+    const std::vector<std::string> uniformBuffers{};
 
-    _effect = engine->createEffect(shaderName, attribs, uniforms, samplers,
-                                   join, fallbacks.get(), onCompiled, onError);
+    EffectCreationOptions options;
+    options.attributes          = std::move(attribs);
+    options.uniformsNames       = std::move(uniforms);
+    options.uniformBuffersNames = std::move(uniformBuffers);
+    options.samplers            = std::move(samplers);
+    options.materialDefines     = &defines;
+    options.defines             = std::move(join);
+    options.fallbacks           = std::move(fallbacks);
+    options.onCompiled          = onCompiled;
+    options.onError             = onError;
+
+    subMesh->setEffect(
+      scene->getEngine()->createEffect(shaderName, options, engine), defines);
   }
 
-  if (!_effect->isReady()) {
+  if (!subMesh->effect()->isReady()) {
     return false;
   }
 
   _renderId           = scene->getRenderId();
   _wasPreviouslyReady = true;
 
-  if (mesh) {
-    if (!mesh->_materialDefines) {
-      mesh->_materialDefines = std_util::make_unique<SkyMaterialDefines>();
-    }
-
-    _defines.cloneTo(*mesh->_materialDefines);
-  }
-
   return true;
 }
 
-void SkyMaterial::bindOnlyWorldMatrix(Matrix& world)
-{
-  _effect->setMatrix("world", world);
-}
-
-void SkyMaterial::bind(Matrix* world, Mesh* mesh)
+void SkyMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
+  auto defines
+    = static_cast<SkyMaterialDefines*>(subMesh->_materialDefines.get());
+  if (!defines) {
+    return;
+  }
+
+  auto effect   = subMesh->effect();
+  _activeEffect = effect;
+
   // Matrices
   bindOnlyWorldMatrix(*world);
-  _effect->setMatrix("viewProjection", scene->getTransformMatrix());
+  _activeEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
-  if (scene->getCachedMaterial() != this) {
+  if (_mustRebind(scene, effect)) {
     // Clip plane
     if (scene->clipPlane()) {
       auto clipPlane = scene->clipPlane();
-      _effect->setFloat4("vClipPlane", clipPlane->normal.x, clipPlane->normal.y,
-                         clipPlane->normal.z, clipPlane->d);
+      _activeEffect->setFloat4("vClipPlane", clipPlane->normal.x,
+                               clipPlane->normal.y, clipPlane->normal.z,
+                               clipPlane->d);
     }
 
     // Point size
     if (pointsCloud()) {
-      _effect->setFloat("pointSize", pointSize);
+      _activeEffect->setFloat("pointSize", pointSize);
     }
   }
 
   // View
   if (scene->fogEnabled() && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE) {
-    _effect->setMatrix("view", scene->getViewMatrix());
+    _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
   // Fog
-  MaterialHelper::BindFogParameters(scene, mesh, _effect);
+  MaterialHelper::BindFogParameters(scene, mesh, _activeEffect);
 
   // Sky
   auto camera = scene->activeCamera;
   if (camera) {
-    auto cameraWorldMatrix = camera->getWorldMatrix();
-    _cameraPosition.x      = cameraWorldMatrix->m[12];
-    _cameraPosition.y      = cameraWorldMatrix->m[13];
-    _cameraPosition.z      = cameraWorldMatrix->m[14];
-    _effect->setVector3("cameraPosition", _cameraPosition);
+    auto cameraWorldMatrix = *camera->getWorldMatrix();
+    _cameraPosition.x      = cameraWorldMatrix.m[12];
+    _cameraPosition.y      = cameraWorldMatrix.m[13];
+    _cameraPosition.z      = cameraWorldMatrix.m[14];
+    _activeEffect->setVector3("cameraPosition", _cameraPosition);
   }
 
-  if (luminance > 0.f) {
-    _effect->setFloat("luminance", luminance);
+  if (luminance > 0) {
+    _activeEffect->setFloat("luminance", luminance);
   }
 
-  _effect->setFloat("luminance", luminance);
-  _effect->setFloat("turbidity", turbidity);
-  _effect->setFloat("rayleigh", rayleigh);
-  _effect->setFloat("mieCoefficient", mieCoefficient);
-  _effect->setFloat("mieDirectionalG", mieDirectionalG);
+  _activeEffect->setFloat("turbidity", turbidity);
+  _activeEffect->setFloat("rayleigh", rayleigh);
+  _activeEffect->setFloat("mieCoefficient", mieCoefficient);
+  _activeEffect->setFloat("mieDirectionalG", mieDirectionalG);
 
   if (!useSunPosition) {
-    float theta = Math::PI * (inclination - 0.5f);
-    float phi   = Math::PI2 * (azimuth - 0.5f);
+    auto theta = Math::PI * (inclination - 0.5f);
+    auto phi   = 2 * Math::PI * (azimuth - 0.5f);
 
     sunPosition.x = distance * std::cos(phi);
     sunPosition.y = distance * std::sin(phi) * std::sin(theta);
     sunPosition.z = distance * std::sin(phi) * std::cos(theta);
   }
 
-  _effect->setVector3("sunPosition", sunPosition);
+  _activeEffect->setVector3("sunPosition", sunPosition);
 
-  Material::bind(world, mesh);
+  _afterBind(mesh, _activeEffect);
 }
 
 std::vector<IAnimatable*> SkyMaterial::getAnimatables()
