@@ -224,7 +224,7 @@ void SimpleMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
     }
 
     // Clip plane
-    MaterialHelper.BindClipPlane(_activeEffect, scene);
+    MaterialHelper::BindClipPlane(_activeEffect, scene);
 
     // Point size
     if (pointsCloud()) {
@@ -242,7 +242,7 @@ void SimpleMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
 
   // Lights
   if (scene->lightsEnabled() && !_disableLighting) {
-    MaterialHelper::BindLights(scene, mesh, _activeEffect, defines,
+    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines,
                                _maxSimultaneousLights, SMD::SPECULARTERM);
   }
 

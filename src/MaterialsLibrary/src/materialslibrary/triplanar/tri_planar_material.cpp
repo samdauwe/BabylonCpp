@@ -105,7 +105,7 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
       if (StandardMaterial::BumpTextureEnabled()) {
         std::vector<Texture*> textures{_normalTextureX, _normalTextureY,
                                        _normalTextureZ};
-        const Uint32Array textureDefines{"BUMPX", "BUMPY", "BUMPZ"};
+        const Uint32Array textureDefines{TPMD::BUMPX, TPMD::BUMPY, TPMD::BUMPZ};
 
         for (unsigned int i = 0; i < textures.size(); i++) {
           if (textures[i]) {

@@ -5,6 +5,7 @@
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
+#include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
@@ -88,12 +89,12 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
     const std::string join = defines.toString();
 
     // Uniforms
-    std::vector<std::string> uniforms{
+    const std::vector<std::string> uniforms{
       "worldViewProjection", "mainColor", "lineColor", "gridControl",
       "vFogInfos",           "vFogColor", "world",     "view"};
 
     // Samplers
-    std::vector<std::string> samplers{};
+    const std::vector<std::string> samplers{};
 
     EffectCreationOptions options;
     options.attributes            = std::move(attribs);

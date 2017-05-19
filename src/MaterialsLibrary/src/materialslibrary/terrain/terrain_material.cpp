@@ -295,7 +295,7 @@ void TerrainMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   }
 
   // View
-  if (scene->fogEnabled && mesh->applyFog()
+  if (scene->fogEnabled() && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }

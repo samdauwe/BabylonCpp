@@ -181,7 +181,7 @@ void ShadowOnlyMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
 
   // Lights
   if (scene->lightsEnabled()) {
-    MaterialHelper::BindLights(scene, mesh, _activeEffect, defines, 1,
+    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines, 1,
                                SMD::SPECULARTERM);
   }
 

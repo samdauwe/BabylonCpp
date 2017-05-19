@@ -142,8 +142,7 @@ bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
                                                   FMD::INSTANCES);
 
     // Legacy browser patch
-    const std::string shaderName = "fire";
-
+    const std::string shaderName{"fire"};
     auto join = defines.toString();
     EffectCreationOptions options;
     options.attributes = std::move(attribs);
@@ -233,7 +232,7 @@ void FireMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
                            alpha * mesh->visibility);
 
   // View
-  if (scene->fogEnabled && mesh->applyFog()
+  if (scene->fogEnabled() && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }

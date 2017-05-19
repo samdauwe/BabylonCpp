@@ -140,15 +140,14 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
     // Legacy browser patch
     const std::string shaderName{"gradient"};
     auto join = defines.toString();
-
-    std::vector<std::string> uniforms{
+    const std::vector<std::string> uniforms{
       "world",         "view",          "viewProjection", "vEyePosition",
       "vLightsType",   "vDiffuseColor", "vFogInfos",      "vFogColor",
       "pointSize",     "vDiffuseInfos", "mBones",         "vClipPlane",
       "diffuseMatrix", "depthValues",   "topColor",       "bottomColor",
       "offset",        "smoothness"};
-    std::vector<std::string> samplers{"diffuseSampler"};
-    std::vector<std::string> uniformBuffers{};
+    const std::vector<std::string> samplers{"diffuseSampler"};
+    const std::vector<std::string> uniformBuffers{};
 
     EffectCreationOptions options;
     options.attributes            = std::move(attribs);
@@ -211,14 +210,14 @@ void GradientMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     _activeEffect->setVector3("vEyePosition",
                               scene->_mirroredCameraPosition ?
                                 *scene->_mirroredCameraPosition :
-                                scene->activeCamera.position);
+                                scene->activeCamera->position);
   }
 
   _activeEffect->setColor4("vDiffuseColor", _scaledDiffuse,
                            alpha * mesh->visibility);
 
   if (scene->lightsEnabled() && !disableLighting) {
-    MaterialHelper::BindLights(scene, mesh, _activeEffect, defines,
+    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines,
                                _maxSimultaneousLights, GMD::SPECULARTERM);
   }
 

@@ -28,9 +28,9 @@ LavaMaterial::LavaMaterial(const std::string& iName, Scene* scene)
     , movingSpeed{1.f}
     , lowFrequencySpeed{1.f}
     , fogDensity{0.15f}
-    , _lastTime{std::chrono::milliseconds(0)}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
     , _diffuseTexture{nullptr}
+    , _lastTime{std::chrono::milliseconds(0)}
     , _disableLighting{false}
     , _maxSimultaneousLights{4}
     , _worldViewProjectionMatrix{Matrix::Zero()}
@@ -257,12 +257,12 @@ void LavaMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
                            alpha * mesh->visibility);
 
   if (scene->lightsEnabled() && !_disableLighting) {
-    MaterialHelper::BindLights(scene, mesh, _activeEffect, defines,
+    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines,
                                _maxSimultaneousLights, LMD::SPECULARTERM);
   }
 
   // View
-  if (scene->fogEnabled && mesh->applyFog()
+  if (scene->fogEnabled() && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }

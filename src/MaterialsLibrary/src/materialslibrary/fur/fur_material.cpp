@@ -212,20 +212,19 @@ bool FurMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
     // Legacy browser patch
     const std::string shaderName{"fur"};
     auto join = defines.toString();
-    std::vector<std::string> uniforms{
+    const std::vector<std::string> uniforms{
       "world",         "view",          "viewProjection", "vEyePosition",
       "vLightsType",   "vDiffuseColor", "vFogInfos",      "vFogColor",
       "pointSize",     "vDiffuseInfos", "mBones",         "vClipPlane",
       "diffuseMatrix", "furLength",     "furAngle",       "furColor",
       "furOffset",     "furGravity",    "furTime",        "furSpacing",
       "furDensity"};
-    std::vector<std::string> samplers{"diffuseSampler", "heightTexture",
-                                      "furTexture"};
-
-    std::vector<std::string> uniformBuffers{};
+    const std::vector<std::string> samplers{"diffuseSampler", "heightTexture",
+                                            "furTexture"};
+    const std::vector<std::string> uniformBuffers{};
 
     EffectCreationOptions options;
-    options.attributes            = attribs;
+    options.attributes            = std::move(attribs);
     options.uniformsNames         = std::move(uniforms);
     options.uniformBuffersNames   = std::move(uniformBuffers);
     options.samplers              = std::move(samplers);
@@ -307,7 +306,7 @@ void FurMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
                            alpha * mesh->visibility);
 
   if (scene->lightsEnabled() && !_disableLighting) {
-    MaterialHelper::BindLights(scene, mesh, _activeEffect, defines,
+    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines,
                                _maxSimultaneousLights, FMD::SPECULARTERM);
   }
 
@@ -330,7 +329,9 @@ void FurMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
     _activeEffect->setFloat("furSpacing", furSpacing);
     _activeEffect->setFloat("furDensity", furDensity);
 
-    _furTime += getScene()->getEngine()->getDeltaTime() / furSpeed;
+    _furTime += Time::fpMillisecondsDuration<float>(
+                  getScene()->getEngine()->getDeltaTime())
+                / furSpeed;
     _activeEffect->setFloat("furTime", _furTime);
 
     _activeEffect->setTexture("furTexture", furTexture);

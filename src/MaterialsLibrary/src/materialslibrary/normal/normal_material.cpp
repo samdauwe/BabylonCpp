@@ -254,7 +254,7 @@ void NormalMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
 
   // Lights
   if (scene->lightsEnabled() && !_disableLighting) {
-    MaterialHelper::BindLights(scene, mesh, _activeEffect, defines,
+    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines,
                                _maxSimultaneousLights, NMD::SPECULARTERM);
   }
 
