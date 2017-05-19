@@ -27,6 +27,7 @@ struct BABYLON_SHARED_EXPORT WaterMaterialDefines : public MaterialDefines {
   static constexpr unsigned int BUMPSUPERIMPOSE       = 15;
   static constexpr unsigned int BUMPAFFECTSREFLECTION = 16;
   static constexpr unsigned int SHADOWS               = 17;
+  static constexpr unsigned int SHADOWFULLFLOAT       = 18;
 
   WaterMaterialDefines();
   ~WaterMaterialDefines();

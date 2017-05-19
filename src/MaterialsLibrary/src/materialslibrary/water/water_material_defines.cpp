@@ -22,11 +22,9 @@ WaterMaterialDefines::WaterMaterialDefines() : MaterialDefines{}
            "FRESNELSEPARATE",
            "BUMPSUPERIMPOSE",
            "BUMPAFFECTSREFLECTION",
-           "SHADOWS"};
-  defines.resize(_keys.size());
-  for (size_t i = 0; i < _keys.size(); ++i) {
-    defines[i] = false;
-  }
+           "SHADOWS",
+           "SHADOWFULLFLOAT"};
+  rebuild();
 }
 
 WaterMaterialDefines::~WaterMaterialDefines()

@@ -6,12 +6,14 @@
 #include <babylon/core/random.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
+#include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
 
 namespace BABYLON {
@@ -19,26 +21,26 @@ namespace MaterialsLibrary {
 
 WaterMaterial::WaterMaterial(const std::string& iName, Scene* scene,
                              const Vector2& renderTargetSize)
-    : Material{iName, scene}
-    , bumpTexture{nullptr}
+    : PushMaterial{iName, scene}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
     , specularColor{Color3(0.f, 0.f, 0.f)}
     , specularPower{64.f}
-    , disableLighting{false}
-    , maxSimultaneousLights{4}
     , windForce{6.f}
     , windDirection{Vector2(0.f, 1.f)}
     , waveHeight{0.4f}
     , bumpHeight{0.4f}
-    , bumpSuperimpose{false}
-    , fresnelSeparate{false}
-    , bumpAffectsReflection{false}
     , waterColor{Color3(0.1f, 0.1f, 0.6f)}
     , colorBlendFactor{0.2f}
     , waterColor2{Color3(0.1f, 0.1f, 0.6f)}
     , colorBlendFactor2{0.2f}
     , waveLength{0.1f}
     , waveSpeed{1.f}
+    , _bumpTexture{nullptr}
+    , _disableLighting{false}
+    , _maxSimultaneousLights{4}
+    , _bumpSuperimpose{false}
+    , _fresnelSeparate{false}
+    , _bumpAffectsReflection{false}
     , _mesh{nullptr}
     , _refractionRTT{nullptr}
     , _reflectionRTT{nullptr}
@@ -46,7 +48,6 @@ WaterMaterial::WaterMaterial(const std::string& iName, Scene* scene,
     , _reflectionTransform{Matrix::Zero()}
     , _lastTime{std::chrono::microseconds(0)}
     , _renderId{-1}
-    , _cachedDefines{std_util::make_unique<WaterMaterialDefines>()}
     , _isVisible{false}
     , _clipPlane{nullptr}
     , _savedViewMatrix{Matrix::Zero()}
@@ -70,16 +71,17 @@ void WaterMaterial::setUseLogarithmicDepth(bool value)
 {
   _useLogarithmicDepth
     = value && getScene()->getEngine()->getCaps().fragmentDepthSupported;
+  _markAllSubMeshesAsMiscDirty();
 }
 
 RenderTargetTexture* WaterMaterial::refractionTexture()
 {
-  return _refractionRTT;
+  return _refractionRTT.get();
 }
 
 RenderTargetTexture* WaterMaterial::reflectionTexture()
 {
-  return _reflectionRTT;
+  return _reflectionRTT.get();
 }
 
 void WaterMaterial::addToRenderList(AbstractMesh* node)
@@ -121,194 +123,136 @@ BaseTexture* WaterMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool WaterMaterial::_checkCache(Scene* /*scene*/, AbstractMesh* mesh,
-                                bool useInstances)
+bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+                                      bool useInstances)
 {
-  if (!mesh) {
-    return true;
-  }
-
-  if (_defines[WMD::INSTANCES] != useInstances) {
-    return false;
-  }
-
-  if (mesh->_materialDefines && mesh->_materialDefines->isEqual(_defines)) {
-    return true;
-  }
-
-  return false;
-}
-
-bool WaterMaterial::isReady(AbstractMesh* mesh, bool useInstances)
-{
-  if (checkReadyOnlyOnce) {
-    if (_wasPreviouslyReady) {
+  if (isFrozen()) {
+    if (_wasPreviouslyReady && subMesh->effect()) {
       return true;
     }
   }
 
+  if (!subMesh->_materialDefines) {
+    subMesh->_materialDefines = std_util::make_unique<WaterMaterialDefines>();
+  }
+
+  auto defines
+    = *(static_cast<WaterMaterialDefines*>(subMesh->_materialDefines.get()));
   auto scene = getScene();
 
-  if (!checkReadyOnEveryCall) {
+  if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
-      if (_checkCache(scene, mesh, useInstances)) {
-        return true;
-      }
+      return true;
     }
   }
 
-  auto engine      = scene->getEngine();
-  auto needNormals = false;
-  auto needUVs     = false;
-
-  _defines.reset();
+  auto engine = scene->getEngine();
 
   // Textures
-  if (scene->texturesEnabled()) {
-    if (bumpTexture && StandardMaterial::BumpTextureEnabled) {
-      if (!bumpTexture->isReady()) {
-        return false;
+  if (defines._areTexturesDirty) {
+    defines._needUVs = false;
+    if (scene->texturesEnabled()) {
+      if (_bumpTexture && StandardMaterial::BumpTextureEnabled()) {
+        if (!_bumpTexture->isReady()) {
+          return false;
+        }
+        else {
+          defines._needUVs           = true;
+          defines.defines[WMD::BUMP] = true;
+        }
       }
-      else {
-        needUVs                     = true;
-        _defines.defines[WMD::BUMP] = true;
+
+      if (StandardMaterial::ReflectionTextureEnabled()) {
+        defines.defines[WMD::REFLECTION] = true;
       }
     }
+  }
 
-    if (StandardMaterial::ReflectionTextureEnabled) {
-      _defines.defines[WMD::REFLECTION] = true;
+  MaterialHelper::PrepareDefinesForFrameBoundValues(
+    scene, engine, defines, useInstances, WMD::CLIPPLANE, WMD::ALPHATEST,
+    WMD::INSTANCES);
+
+  MaterialHelper::PrepareDefinesForMisc(
+    mesh, scene, _useLogarithmicDepth, pointsCloud(), fogEnabled(), defines,
+    WMD::LOGARITHMICDEPTH, WMD::POINTSIZE, WMD::FOG);
+
+  if (defines._areMiscDirty) {
+    if (_fresnelSeparate) {
+      defines.defines[WMD::FRESNELSEPARATE] = true;
     }
-  }
 
-  // Effect
-  if (scene->clipPlane()) {
-    _defines.defines[WMD::CLIPPLANE] = true;
-  }
+    if (_bumpSuperimpose) {
+      defines.defines[WMD::BUMPSUPERIMPOSE] = true;
+    }
 
-  if (engine->getAlphaTesting()) {
-    _defines.defines[WMD::ALPHATEST] = true;
-  }
-
-  // Point size
-  if (pointsCloud() || scene->forcePointsCloud()) {
-    _defines.defines[WMD::POINTSIZE] = true;
-  }
-
-  if (useLogarithmicDepth()) {
-    _defines.defines[WMD::LOGARITHMICDEPTH] = true;
-  }
-
-  if (fresnelSeparate) {
-    _defines.defines[WMD::FRESNELSEPARATE] = true;
-  }
-
-  if (bumpSuperimpose) {
-    _defines.defines[WMD::BUMPSUPERIMPOSE] = true;
-  }
-
-  if (bumpAffectsReflection) {
-    _defines.defines[WMD::BUMPAFFECTSREFLECTION] = true;
-  }
-
-  // Fog
-  if (scene->fogEnabled() && mesh && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled) {
-    _defines.defines[WMD::FOG] = true;
+    if (_bumpAffectsReflection) {
+      defines.defines[WMD::BUMPAFFECTSREFLECTION] = true;
+    }
   }
 
   // Lights
-  if (scene->lightsEnabled() && !disableLighting) {
-    needNormals = MaterialHelper::PrepareDefinesForLights(
-      scene, mesh, _defines, maxSimultaneousLights, WMD::SPECULARTERM,
-      WMD::SHADOWS);
-  }
+  defines._needNormals = MaterialHelper::PrepareDefinesForLights(
+    scene, mesh, defines, true, _maxSimultaneousLights, _disableLighting,
+    WMD::SPECULARTERM, WMD::SHADOWFULLFLOAT);
 
   // Attribs
-  if (mesh) {
-    if (needNormals && mesh->isVerticesDataPresent(VertexBuffer::NormalKind)) {
-      _defines.defines[WMD::NORMAL] = true;
-    }
-    if (needUVs) {
-      if (mesh->isVerticesDataPresent(VertexBuffer::UVKind)) {
-        _defines.defines[WMD::UV1] = true;
-      }
-      if (mesh->isVerticesDataPresent(VertexBuffer::UV2Kind)) {
-        _defines.defines[WMD::UV2] = true;
-      }
-    }
-    if (mesh->useVertexColors()
-        && mesh->isVerticesDataPresent(VertexBuffer::ColorKind)) {
-      _defines.defines[WMD::VERTEXCOLOR] = true;
-
-      if (mesh->hasVertexAlpha()) {
-        _defines.defines[WMD::VERTEXALPHA] = true;
-      }
-    }
-
-    if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
-      _defines.NUM_BONE_INFLUENCERS = mesh->numBoneInfluencers();
-      _defines.BonesPerMesh         = mesh->skeleton()->bones.size() + 1;
-    }
-
-    // Instances
-    if (useInstances) {
-      _defines.defines[WMD::INSTANCES] = true;
-    }
-  }
+  MaterialHelper::PrepareDefinesForAttributes(
+    mesh, defines, true, true, false, WMD::NORMAL, WMD::UV1, WMD::UV2,
+    WMD::VERTEXCOLOR, WMD::VERTEXALPHA);
 
   _mesh = mesh;
 
   // Get correct effect
-  if (!_defines.isEqual(*_cachedDefines)) {
-    _defines.cloneTo(*_cachedDefines);
-
+  if (defines.isDirty()) {
+    defines.markAsProcessed();
     scene->resetCachedMaterial();
 
     // Fallbacks
     auto fallbacks = std_util::make_unique<EffectFallbacks>();
-    if (_defines[WMD::FOG]) {
+    if (defines[WMD::FOG]) {
       fallbacks->addFallback(1, "FOG");
     }
 
-    if (_defines[WMD::LOGARITHMICDEPTH]) {
+    if (defines[WMD::LOGARITHMICDEPTH]) {
       fallbacks->addFallback(0, "LOGARITHMICDEPTH");
     }
 
-    MaterialHelper::HandleFallbacksForShadows(_defines, fallbacks.get(),
-                                              maxSimultaneousLights);
+    MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
+                                              _maxSimultaneousLights);
 
-    if (_defines.NUM_BONE_INFLUENCERS > 0) {
+    if (defines.NUM_BONE_INFLUENCERS > 0) {
       fallbacks->addCPUSkinningFallback(0, mesh);
     }
 
     // Attributes
     std::vector<std::string> attribs = {VertexBuffer::PositionKindChars};
 
-    if (_defines[WMD::NORMAL]) {
+    if (defines[WMD::NORMAL]) {
       attribs.emplace_back(VertexBuffer::NormalKindChars);
     }
 
-    if (_defines[WMD::UV1]) {
+    if (defines[WMD::UV1]) {
       attribs.emplace_back(VertexBuffer::UVKindChars);
     }
 
-    if (_defines[WMD::UV2]) {
+    if (defines[WMD::UV2]) {
       attribs.emplace_back(VertexBuffer::UV2KindChars);
     }
 
-    if (_defines[WMD::VERTEXCOLOR]) {
+    if (defines[WMD::VERTEXCOLOR]) {
       attribs.emplace_back(VertexBuffer::ColorKindChars);
     }
 
-    MaterialHelper::PrepareAttributesForBones(
-      attribs, mesh, _defines.NUM_BONE_INFLUENCERS, fallbacks.get());
-    MaterialHelper::PrepareAttributesForInstances(attribs, _defines,
+    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
+                                              *fallbacks);
+    MaterialHelper::PrepareAttributesForInstances(attribs, defines,
                                                   WMD::INSTANCES);
 
     // Legacy browser patch
-    std::string shaderName = "water";
-    std::string join       = _defines.toString();
-    std::vector<std::string> uniforms{
+    const std::string shaderName{"water"};
+    auto join = defines.toString();
+
+    const std::vector<std::string> uniforms{
       "world", "view", "viewProjection", "vEyePosition", "vLightsType",
       "vDiffuseColor", "vSpecularColor", "vFogInfos", "vFogColor", "pointSize",
       "vNormalInfos", "mBones", "vClipPlane", "normalMatrix",
@@ -317,105 +261,116 @@ bool WaterMaterial::isReady(AbstractMesh* mesh, bool useInstances)
       "worldReflectionViewProjection", "windDirection", "waveLength", "time",
       "windForce", "cameraPosition", "bumpHeight", "waveHeight", "waterColor",
       "waterColor2", "colorBlendFactor", "colorBlendFactor2", "waveSpeed"};
-    std::vector<std::string> samplers{"normalSampler",
-                                      // Water
-                                      "refractionSampler", "reflectionSampler"};
 
-    MaterialHelper::PrepareUniformsAndSamplersList(uniforms, samplers, _defines,
-                                                   maxSimultaneousLights);
+    const std::vector<std::string> samplers{"normalSampler",
+                                            // Water
+                                            "refractionSampler",
+                                            "reflectionSampler"};
+    const std::vector<std::string> uniformBuffers{};
 
-    std::unordered_map<std::string, unsigned int> indexParameters{
-      {"maxSimultaneousLights", maxSimultaneousLights}};
+    EffectCreationOptions options;
+    options.attributes            = std::move(attribs);
+    options.uniformsNames         = std::move(uniforms);
+    options.uniformBuffersNames   = std::move(uniformBuffers);
+    options.samplers              = std::move(samplers);
+    options.materialDefines       = &defines;
+    options.defines               = std::move(join);
+    options.maxSimultaneousLights = _maxSimultaneousLights;
+    options.fallbacks             = std::move(fallbacks);
+    options.onCompiled            = onCompiled;
+    options.onError               = onError;
+    options.indexParameters
+      = {{"maxSimultaneousLights", _maxSimultaneousLights}};
 
-    _effect = engine->createEffect(shaderName, attribs, uniforms, samplers,
-                                   join, fallbacks.get(), onCompiled, onError,
-                                   indexParameters);
+    MaterialHelper::PrepareUniformsAndSamplersList(options);
+    subMesh->setEffect(
+      scene->getEngine()->createEffect(shaderName, options, engine), defines);
   }
-  if (!_effect->isReady()) {
+
+  if (!subMesh->effect()->isReady()) {
     return false;
   }
 
   _renderId           = scene->getRenderId();
   _wasPreviouslyReady = true;
 
-  if (mesh) {
-    if (!mesh->_materialDefines) {
-      mesh->_materialDefines = std_util::make_unique<WaterMaterialDefines>();
-    }
-
-    _defines.cloneTo(*mesh->_materialDefines);
-  }
-
   return true;
 }
 
-void WaterMaterial::bindOnlyWorldMatrix(Matrix& world)
-{
-  _effect->setMatrix("world", world);
-}
-
-void WaterMaterial::bind(Matrix* world, Mesh* mesh)
+void WaterMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
+  auto _defines
+    = static_cast<WaterMaterialDefines*>(subMesh->_materialDefines.get());
+  if (!_defines) {
+    return;
+  }
+  auto defines = *_defines;
+
+  auto effect   = subMesh->effect();
+  _activeEffect = effect;
+
   // Matrices
   bindOnlyWorldMatrix(*world);
-  _effect->setMatrix("viewProjection", scene->getTransformMatrix());
+  _activeEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
   // Bones
-  MaterialHelper::BindBonesParameters(mesh, _effect);
+  MaterialHelper::BindBonesParameters(mesh, _activeEffect);
 
-  if (scene->getCachedMaterial() != this) {
+  if (_mustRebind(scene, effect)) {
     // Textures
-    if (bumpTexture && StandardMaterial::BumpTextureEnabled) {
-      _effect->setTexture("normalSampler", bumpTexture);
+    if (_bumpTexture && StandardMaterial::BumpTextureEnabled()) {
+      _activeEffect->setTexture("normalSampler", _bumpTexture);
 
-      _effect->setFloat2("vNormalInfos",
-                         static_cast<float>(bumpTexture->coordinatesIndex),
-                         bumpTexture->level);
-      _effect->setMatrix("normalMatrix", *bumpTexture->getTextureMatrix());
+      _activeEffect->setFloat2("vNormalInfos", _bumpTexture->coordinatesIndex,
+                               _bumpTexture->level);
+      _activeEffect->setMatrix("normalMatrix",
+                               *_bumpTexture->getTextureMatrix());
     }
     // Clip plane
-    MaterialHelper::BindClipPlane(_effect, scene);
+    MaterialHelper::BindClipPlane(_activeEffect, scene);
 
     // Point size
     if (pointsCloud()) {
-      _effect->setFloat("pointSize", pointSize);
+      _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    _effect->setVector3("vEyePosition", scene->_mirroredCameraPosition ?
-                                          *scene->_mirroredCameraPosition :
-                                          scene->activeCamera->position);
+    _activeEffect->setVector3("vEyePosition",
+                              scene->_mirroredCameraPosition ?
+                                *scene->_mirroredCameraPosition :
+                                scene->activeCamera->position);
   }
 
-  _effect->setColor4("vDiffuseColor", diffuseColor, alpha * mesh->visibility);
+  _activeEffect->setColor4("vDiffuseColor", diffuseColor,
+                           alpha * mesh->visibility);
 
-  if (_defines[WMD::SPECULARTERM]) {
-    _effect->setColor4("vSpecularColor", specularColor, specularPower);
+  if (defines[WMD::SPECULARTERM]) {
+    _activeEffect->setColor4("vSpecularColor", specularColor, specularPower);
   }
 
-  if (scene->lightsEnabled() && !disableLighting) {
-    MaterialHelper::BindLights(scene, mesh, _effect,
-                               _defines.defines[WMD::SPECULARTERM],
-                               maxSimultaneousLights);
+  if (scene->lightsEnabled() && !_disableLighting) {
+    MaterialHelper::BindLights(scene, mesh, _activeEffect, defines,
+                               _maxSimultaneousLights, WMD::SPECULARTERM);
   }
 
   // View
   if (scene->fogEnabled() && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE) {
-    _effect->setMatrix("view", scene->getViewMatrix());
+    _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
   // Fog
-  MaterialHelper::BindFogParameters(scene, mesh, _effect);
+  MaterialHelper::BindFogParameters(scene, mesh, _activeEffect);
 
   // Log. depth
-  MaterialHelper::BindLogDepth(_defines[WMD::LOGARITHMICDEPTH], _effect, scene);
+  MaterialHelper::BindLogDepth(defines, _activeEffect, scene,
+                               WMD::LOGARITHMICDEPTH);
 
   // Water
-  if (StandardMaterial::ReflectionTextureEnabled) {
-    _effect->setTexture("refractionSampler", _refractionRTT);
-    _effect->setTexture("reflectionSampler", _reflectionRTT);
+  if (StandardMaterial::ReflectionTextureEnabled()) {
+    _activeEffect->setTexture("refractionSampler", _refractionRTT.get());
+    _activeEffect->setTexture("reflectionSampler", _reflectionRTT.get());
   }
 
   auto wrvp = _mesh->getWorldMatrix()
@@ -423,21 +378,21 @@ void WaterMaterial::bind(Matrix* world, Mesh* mesh)
                 .multiply(scene->getProjectionMatrix());
   _lastTime += scene->getEngine()->getDeltaTime();
 
-  _effect->setMatrix("worldReflectionViewProjection", wrvp);
-  _effect->setVector2("windDirection", windDirection);
-  _effect->setFloat("waveLength", waveLength);
-  _effect->setFloat("time",
-                    Time::fpMillisecondsDuration<float>(_lastTime) / 100000.f);
-  _effect->setFloat("windForce", windForce);
-  _effect->setFloat("waveHeight", waveHeight);
-  _effect->setFloat("bumpHeight", bumpHeight);
-  _effect->setColor4("waterColor", waterColor, 1.f);
-  _effect->setFloat("colorBlendFactor", colorBlendFactor);
-  _effect->setColor4("waterColor2", waterColor2, 1.0);
-  _effect->setFloat("colorBlendFactor2", colorBlendFactor2);
-  _effect->setFloat("waveSpeed", waveSpeed);
+  _activeEffect->setMatrix("worldReflectionViewProjection", wrvp);
+  _activeEffect->setVector2("windDirection", windDirection);
+  _activeEffect->setFloat("waveLength", waveLength);
+  _activeEffect->setFloat("time", Time::fpMillisecondsDuration<float>(_lastTime)
+                                    / 100000.f);
+  _activeEffect->setFloat("windForce", windForce);
+  _activeEffect->setFloat("waveHeight", waveHeight);
+  _activeEffect->setFloat("bumpHeight", bumpHeight);
+  _activeEffect->setColor4("waterColor", waterColor, 1.0);
+  _activeEffect->setFloat("colorBlendFactor", colorBlendFactor);
+  _activeEffect->setColor4("waterColor2", waterColor2, 1.0);
+  _activeEffect->setFloat("colorBlendFactor2", colorBlendFactor2);
+  _activeEffect->setFloat("waveSpeed", waveSpeed);
 
-  Material::bind(world, mesh);
+  _afterBind(mesh, _activeEffect);
 }
 
 void WaterMaterial::_createRenderTargets(Scene* scene,
@@ -447,20 +402,22 @@ void WaterMaterial::_createRenderTargets(Scene* scene,
   auto renderTargetSizeY = static_cast<int>(renderTargetSize.y);
 
   // Render targets
-  _refractionRTT = new RenderTargetTexture(
-    name + "_refraction", {renderTargetSizeX, renderTargetSizeY}, scene, false,
-    true);
+  _refractionRTT = std_util::make_unique<RenderTargetTexture>(
+    name + "_refraction", ISize{renderTargetSizeX, renderTargetSizeY}, scene,
+    false, true, Engine::TEXTURETYPE_UNSIGNED_INT, false,
+    Texture::TRILINEAR_SAMPLINGMODE, true, false);
   _refractionRTT->wrapU = Texture::MIRROR_ADDRESSMODE;
   _refractionRTT->wrapV = Texture::MIRROR_ADDRESSMODE;
 
-  _reflectionRTT = new RenderTargetTexture(
-    name + "_reflection", {renderTargetSizeX, renderTargetSizeY}, scene, false,
-    true);
+  _reflectionRTT = std_util::make_unique<RenderTargetTexture>(
+    name + "_reflection", ISize{renderTargetSizeX, renderTargetSizeY}, scene,
+    false, true, Engine::TEXTURETYPE_UNSIGNED_INT, false,
+    Texture::TRILINEAR_SAMPLINGMODE, true, false);
   _reflectionRTT->wrapU = Texture::MIRROR_ADDRESSMODE;
   _reflectionRTT->wrapV = Texture::MIRROR_ADDRESSMODE;
 
-  scene->customRenderTargets.emplace_back(_refractionRTT);
-  scene->customRenderTargets.emplace_back(_reflectionRTT);
+  scene->customRenderTargets.emplace_back(_refractionRTT.get());
+  scene->customRenderTargets.emplace_back(_reflectionRTT.get());
 
   _refractionRTT->onBeforeRender = [this, &scene]() {
     if (_mesh) {
@@ -531,14 +488,14 @@ std::vector<IAnimatable*> WaterMaterial::getAnimatables()
 {
   std::vector<IAnimatable*> results;
 
-  if (bumpTexture && bumpTexture->animations.size() > 0) {
-    results.emplace_back(bumpTexture);
+  if (_bumpTexture && _bumpTexture->animations.size() > 0) {
+    results.emplace_back(_bumpTexture);
   }
   if (_reflectionRTT && _reflectionRTT->animations.size() > 0) {
-    results.emplace_back(_reflectionRTT);
+    results.emplace_back(_reflectionRTT.get());
   }
   if (_refractionRTT && _refractionRTT->animations.size() > 0) {
-    results.emplace_back(_refractionRTT);
+    results.emplace_back(_refractionRTT.get());
   }
 
   return results;
@@ -546,25 +503,27 @@ std::vector<IAnimatable*> WaterMaterial::getAnimatables()
 
 void WaterMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
 {
-  if (bumpTexture) {
-    bumpTexture->dispose();
+  if (_bumpTexture) {
+    _bumpTexture->dispose();
   }
 
   getScene()->customRenderTargets.erase(
     std::remove(getScene()->customRenderTargets.begin(),
-                getScene()->customRenderTargets.end(), _refractionRTT),
+                getScene()->customRenderTargets.end(), _refractionRTT.get()),
     getScene()->customRenderTargets.end());
 
   getScene()->customRenderTargets.erase(
     std::remove(getScene()->customRenderTargets.begin(),
-                getScene()->customRenderTargets.end(), _reflectionRTT),
+                getScene()->customRenderTargets.end(), _reflectionRTT.get()),
     getScene()->customRenderTargets.end());
 
   if (_reflectionRTT) {
     _reflectionRTT->dispose();
+    _reflectionRTT.reset(nullptr);
   }
   if (_refractionRTT) {
     _refractionRTT->dispose();
+    _refractionRTT.reset(nullptr);
   }
 
   Material::dispose(forceDisposeEffect, forceDisposeTextures);
@@ -586,6 +545,12 @@ WaterMaterial* WaterMaterial::Parse(const Json::value& /*source*/,
                                     const std::string& /*rootUrl*/)
 {
   return nullptr;
+}
+
+Mesh* WaterMaterial::CreateDefaultMesh(const std::string& name, Scene* scene)
+{
+  auto mesh = Mesh::CreateGround(name, 512, 512, 32, scene, false);
+  return mesh;
 }
 
 } // end of namespace MaterialsLibrary

@@ -2,7 +2,7 @@
 #define BABYLON_MATERIALS_LIBRARY_WATER_WATER_MATERIAL_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/materials/material.h>
+#include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/water/water_material_defines.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/matrix.h>
@@ -11,7 +11,7 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
-class BABYLON_SHARED_EXPORT WaterMaterial : public Material {
+class BABYLON_SHARED_EXPORT WaterMaterial : public PushMaterial {
 
 public:
   using WMD = WaterMaterialDefines;
@@ -35,9 +35,9 @@ public:
   bool needAlphaBlending() override;
   bool needAlphaTesting() override;
   BaseTexture* getAlphaTestTexture() override;
-  bool isReady(AbstractMesh* mesh, bool useInstances) override;
-  void bindOnlyWorldMatrix(Matrix& world) override;
-  void bind(Matrix* world, Mesh* mesh) override;
+  bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+                         bool useInstances = false) override;
+  void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatable*> getAnimatables();
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
@@ -48,86 +48,85 @@ public:
   /** Statics **/
   static WaterMaterial* Parse(const Json::value& source, Scene* scene,
                               const std::string& rootUrl);
+  static Mesh* CreateDefaultMesh(const std::string& name, Scene* scene);
 
 private:
-  bool _checkCache(Scene* scene, AbstractMesh* mesh, bool useInstances = false);
   void _createRenderTargets(Scene* scene, const Vector2& renderTargetSize);
 
 public:
-  BaseTexture* bumpTexture;
   Color3 diffuseColor;
   Color3 specularColor;
   float specularPower;
-  bool disableLighting;
-  unsigned int maxSimultaneousLights;
   /**
-   * @param {number}: Represents the wind force
+   * @param Represents the wind force
    */
   float windForce;
   /**
-   * @param {Vector2}: The direction of the wind in the plane (X, Z)
+   * @param The direction of the wind in the plane (X, Z)
    */
   Vector2 windDirection;
   /**
-   * @param {number}: Wave height, represents the height of the waves
+   * @param Wave height, represents the height of the waves
    */
   float waveHeight;
   /**
-   * @param {number}: Bump height, represents the bump height related to the
+   * @param Bump height, represents the bump height related to the
    * bump map
    */
   float bumpHeight;
   /**
-  * @param {boolean}: Add a smaller moving bump to less steady waves.
-  */
-  bool bumpSuperimpose;
-  /**
-   * @param {boolean}: Color refraction and reflection differently with
-   * .waterColor2 and .colorBlendFactor2. Non-linear (physically correct)
-   * fresnel.
-   */
-  bool fresnelSeparate;
-  /**
-   * @param {boolean}: bump Waves modify the reflection.
-   */
-  bool bumpAffectsReflection;
-  /**
-   * @param {number}: The water color blended with the reflection and refraction
-   * samplers
+   * @param The water color blended with the reflection and refraction samplers
    */
   Color3 waterColor;
   /**
-   * @param {number}: The blend factor related to the water color
+   * @param The blend factor related to the water color
    */
   float colorBlendFactor;
   /**
-   * @param {number}: The water color blended with the reflection (far)
+   * @param The water color blended with the reflection (far)
    */
   Color3 waterColor2;
   /**
-   * @param {number}: The blend factor related to the water color (reflection,
+   * @param The blend factor related to the water color (reflection,
    * far)
    */
   float colorBlendFactor2;
   /**
-   * @param {number}: Represents the maximum length of a wave
+   * @param Represents the maximum length of a wave
    */
   float waveLength;
   /**
-   * @param {number}: Defines the waves speed
+   * @param Defines the waves speed
    */
   float waveSpeed;
 
 private:
+  BaseTexture* _bumpTexture;
+  bool _disableLighting;
+  unsigned int _maxSimultaneousLights;
+
+  /**
+   * @param Add a smaller moving bump to less steady waves.
+   */
+  bool _bumpSuperimpose;
+  /**
+   * @param Color refraction and reflection differently with .waterColor2 and
+   * .colorBlendFactor2. Non-linear (physically correct)
+   * fresnel.
+   */
+  bool _fresnelSeparate;
+  /**
+   * @param Bump Waves modify the reflection.
+   */
+  bool _bumpAffectsReflection;
+
   AbstractMesh* _mesh;
-  RenderTargetTexture* _refractionRTT;
-  RenderTargetTexture* _reflectionRTT;
+  std::unique_ptr<RenderTargetTexture> _refractionRTT;
+  std::unique_ptr<RenderTargetTexture> _reflectionRTT;
   ShaderMaterial* _material;
   Matrix _reflectionTransform;
   microseconds_t _lastTime;
   int _renderId;
-  WaterMaterialDefines _defines;
-  std::unique_ptr<WaterMaterialDefines> _cachedDefines;
   // Needed for callbacks
   bool _isVisible;
   Plane* _clipPlane;
