@@ -78,9 +78,9 @@ Ray::~Ray()
 {
 }
 
-Ray* Ray::clone() const
+std::unique_ptr<Ray> Ray::clone() const
 {
-  return new Ray(*this);
+  return std_util::make_unique<Ray>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Ray& ray)

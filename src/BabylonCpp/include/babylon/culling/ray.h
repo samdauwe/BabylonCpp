@@ -24,7 +24,7 @@ public:
   Ray& operator=(const Ray& otherRay);
   Ray& operator=(Ray&& otherRay);
   ~Ray();
-  Ray* clone() const;
+  std::unique_ptr<Ray> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Ray& ray);
 
   /** Methods **/

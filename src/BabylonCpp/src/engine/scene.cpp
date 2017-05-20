@@ -2746,7 +2746,9 @@ Octree<AbstractMesh*>* Scene::createOrUpdateSelectionOctree(size_t maxCapacity,
 }
 
 /** Picking **/
-Ray* Scene::createPickingRay(int x, int y, Matrix* world, Camera* camera)
+std::unique_ptr<Ray> Scene::createPickingRay(int x, int y, Matrix* world,
+                                             Camera* camera,
+                                             bool /*cameraViewSpace*/)
 {
   auto engine = _engine;
 
@@ -2781,7 +2783,8 @@ Ray* Scene::createPickingRay(int x, int y, Matrix* world, Camera* camera)
     .clone();
 }
 
-Ray* Scene::createPickingRayInCameraSpace(int x, int y, Camera* camera)
+std::unique_ptr<Ray> Scene::createPickingRayInCameraSpace(int x, int y,
+                                                          Camera* camera)
 {
   auto engine = _engine;
 

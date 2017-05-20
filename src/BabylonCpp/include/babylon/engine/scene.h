@@ -441,8 +441,11 @@ public:
                                                        size_t maxDepth    = 2);
 
   /** Picking **/
-  Ray* createPickingRay(int x, int y, Matrix* world, Camera* camera);
-  Ray* createPickingRayInCameraSpace(int x, int y, Camera* camera);
+  std::unique_ptr<Ray> createPickingRay(int x, int y, Matrix* world,
+                                        Camera* camera,
+                                        bool cameraViewSpace = false);
+  std::unique_ptr<Ray> createPickingRayInCameraSpace(int x, int y,
+                                                     Camera* camera);
 
   /**
    * @brief Launch a ray to try to pick a mesh in the scene
