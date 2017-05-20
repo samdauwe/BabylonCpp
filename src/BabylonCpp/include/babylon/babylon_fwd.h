@@ -417,6 +417,7 @@ class _StencilState;
 } // end of namespace Internals
 } // end of namespace BABYLON
 // --- Tools ---
+class EventState;
 class PackedRect;
 struct SerializationHelper;
 struct RectPackingMap;

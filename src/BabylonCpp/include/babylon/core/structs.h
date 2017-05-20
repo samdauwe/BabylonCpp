@@ -220,8 +220,10 @@ struct PointerEvent : public Event {
   int pointerId;
   PointerType pointerType;
   bool ctrlKey;
+  bool shiftKey;
   EventType type;
   MouseButtonType button;
+  int buttons;
   ICanvas* srcElement;
   void preventDefault()
   {
