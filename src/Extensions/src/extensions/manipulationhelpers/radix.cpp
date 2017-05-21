@@ -1,6 +1,7 @@
 #include <babylon/extensions/manipulationhelpers/radix.h>
 
 #include <babylon/core/string.h>
+#include <babylon/culling/ray.h>
 #include <babylon/engine/node.h>
 #include <babylon/engine/scene.h>
 #include <babylon/lights/point_light.h>
@@ -180,8 +181,7 @@ void Radix::hide()
 void Radix::setVisibleState(AbstractMesh* mesh, bool state)
 {
   mesh->isVisible = state;
-  auto meshes     = mesh->getChildMeshes(true);
-  for (auto mesh : meshes) {
+  for (auto& mesh : mesh->getChildMeshes(true)) {
     setVisibleState(mesh, state);
   }
 }
@@ -189,13 +189,13 @@ void Radix::setVisibleState(AbstractMesh* mesh, bool state)
 float Radix::intersectMeshes(const Vector2& pos, const std::string& startName,
                              float currentClosest)
 {
-  auto meshes = mesh->getChildMeshes(true, [&startName](Node* node) {
+  auto meshes = _rootMesh->getChildMeshes(true, [&startName](Node* node) {
     return String::startsWith(node->name, startName);
   });
-  for (auto mesh : meshes) {
+  for (auto& mesh : meshes) {
     auto ray = _scene->createPickingRay(pos.x, pos.y, mesh->getWorldMatrix(),
                                         _scene->activeCamera);
-    auto pi = mesh->intersects(ray, false);
+    auto pi = mesh->intersects(*ray, false);
     if (pi.hit && pi.distance < currentClosest) {
       currentClosest = pi.distance;
     }
@@ -298,7 +298,7 @@ void Radix::constructArrow(RadixFeatures feature, const std::string& name,
   addSymbolicMeshToLit(arrow);
 }
 
-void Radix::constructPlaneSelection(RadixFeatures feature,
+void Radix::constructPlaneSelection(RadixFeatures /*feature*/,
                                     const std::string& name,
                                     const Matrix& transform)
 {
@@ -416,7 +416,7 @@ void Radix::setWireSelectionThreshold(float value)
   for (auto mesh : meshes) {
     auto lm = static_cast<LinesMesh*>(mesh);
     if (lm) {
-      lm->intersectionThreshold = value;
+      lm->setIntersectionThreshold(value);
     }
   }
 }

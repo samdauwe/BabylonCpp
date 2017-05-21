@@ -68,7 +68,7 @@ file(GLOB EXTENSIONS_HDR_FILES  ${INCLUDE_PATH}/extensions/dynamicterrain/*.h
                                 ${INCLUDE_PATH}/extensions/hexplanetgeneration/*.h
                                 ${INCLUDE_PATH}/extensions/hexplanetgeneration/terrain/*.h
                                 ${INCLUDE_PATH}/extensions/hexplanetgeneration/utils/*.h
-                                #${INCLUDE_PATH}/extensions/manipulationhelpers/*.h
+                                ${INCLUDE_PATH}/extensions/manipulationhelpers/*.h
                                 ${INCLUDE_PATH}/extensions/navigationmesh/*.h
                                 ${INCLUDE_PATH}/extensions/noisegeneration/*.h
                                 ${INCLUDE_PATH}/extensions/pathfinding/*.h
@@ -85,7 +85,7 @@ file(GLOB EXTENSIONS_SRC_FILES  ${SOURCE_PATH}/extensions/dynamicterrain/*.cpp
                                 ${SOURCE_PATH}/extensions/hexplanetgeneration/*.cpp
                                 ${SOURCE_PATH}/extensions/hexplanetgeneration/terrain/*.cpp
                                 ${SOURCE_PATH}/extensions/hexplanetgeneration/utils/*.cpp
-                                #${SOURCE_PATH}/extensions/manipulationhelpers/*.cpp
+                                ${SOURCE_PATH}/extensions/manipulationhelpers/*.cpp
                                 ${SOURCE_PATH}/extensions/navigationmesh/*.cpp
                                 ${SOURCE_PATH}/extensions/noisegeneration/*.cpp
                                 ${SOURCE_PATH}/extensions/polyhedron/*.cpp

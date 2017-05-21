@@ -9,7 +9,7 @@ namespace Extensions {
 
 enum class RadixFeatures : int {
 
-  None = 0,
+  None = 0x0000,
 
   /**
    * Display the Arrow that follows the X Axis

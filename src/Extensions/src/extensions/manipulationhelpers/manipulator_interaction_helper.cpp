@@ -30,6 +30,18 @@ ManipulatorInteractionHelper::~ManipulatorInteractionHelper()
 {
 }
 
+void ManipulatorInteractionHelper::attachManipulatedNode(Node* node)
+{
+  _manipulatedNode = node;
+  _radix.show();
+}
+
+void ManipulatorInteractionHelper::detachManipulatedNode(Node* /*node*/)
+{
+  _manipulatedNode = nullptr;
+  _radix.hide();
+}
+
 void ManipulatorInteractionHelper::onBeforeRender(Scene* /*scene*/,
                                                   const EventState& /*state*/)
 {
@@ -75,7 +87,7 @@ void ManipulatorInteractionHelper::onPointer(const PointerInfo& e,
       }
     }
     else {
-      _radix.highlighted = _radix.intersect(rayPos);
+      _radix.setHighlighted(_radix.intersect(rayPos));
     }
   }
 
@@ -101,7 +113,7 @@ void ManipulatorInteractionHelper::onPointer(const PointerInfo& e,
     if (hasManFlags(ManFlags::DragMode)) {
       state.skipNextObservers = true;
     }
-    _radix.highlighted = _radix.intersect(rayPos);
+    _radix.setHighlighted(_radix.intersect(rayPos));
 
     // Left up: end manipulation
     if (e.pointerEvent.button == MouseButtonType::LEFT) {
@@ -140,10 +152,10 @@ void ManipulatorInteractionHelper::doRot(const Vector2& rayPos)
     return;
   }
 
-  float dx = rayPos.x - _prevMousePos.x;
-  float dy = rayPos.y - _prevMousePos.y;
+  const float dx = rayPos.x - _prevMousePos.x;
+  const float dy = rayPos.y - _prevMousePos.y;
 
-  auto cr = _scene->getEngine()->getRenderingCanvasClientRect();
+  const auto cr = _scene->getEngine()->getRenderingCanvasClientRect();
 
   float ax = (dx / cr.width) * Math::PI2 * _rotationFactor;
   float ay = (dy / cr.height) * Math::PI2 * _rotationFactor;
@@ -339,8 +351,7 @@ bool ManipulatorInteractionHelper::instanceofAbstractMesh(Node* node)
           || (nodeType == IReflect::Type::MESH));
 }
 
-void ManipulatorInteractionHelper::setManipulatedNodeWorldMatrix(
-  const Matrix& mtx)
+void ManipulatorInteractionHelper::setManipulatedNodeWorldMatrix(Matrix mtx)
 {
   if (!_manipulatedNode) {
     return;
@@ -373,6 +384,8 @@ Matrix* ManipulatorInteractionHelper::getManipulatedNodeWorldMatrix()
   if (instanceofAbstractMesh(_manipulatedNode)) {
     return _manipulatedNode->getWorldMatrix();
   }
+
+  return nullptr;
 }
 
 std::tuple<Plane, Vector3>
@@ -395,7 +408,17 @@ ManipulatorInteractionHelper::setupIntersectionPlane(RadixFeatures mode,
     case RadixFeatures::ArrowZ:
       axis = _view;
       break;
-    default:
+    case RadixFeatures::None:
+    case RadixFeatures::ArrowsXYZ:
+    case RadixFeatures::PlaneSelectionXY:
+    case RadixFeatures::PlaneSelectionXZ:
+    case RadixFeatures::PlaneSelectionYZ:
+    case RadixFeatures::AllPlanesSelection:
+    case RadixFeatures::RotationX:
+    case RadixFeatures::RotationY:
+    case RadixFeatures::RotationZ:
+    case RadixFeatures::Rotations:
+    case RadixFeatures::CenterSquare:
       axis = Vector3::Zero();
       break;
   }
@@ -423,6 +446,19 @@ ManipulatorInteractionHelper::setupIntersectionPlanes(RadixFeatures mode)
       p0 = Plane::FromPoints(_pos, _pos.add(_view), _pos.add(_right));
       p1 = Plane::FromPoints(_pos, _pos.add(_view), _pos.add(_up));
       break;
+
+    case RadixFeatures::None:
+    case RadixFeatures::ArrowsXYZ:
+    case RadixFeatures::PlaneSelectionXY:
+    case RadixFeatures::PlaneSelectionXZ:
+    case RadixFeatures::PlaneSelectionYZ:
+    case RadixFeatures::AllPlanesSelection:
+    case RadixFeatures::RotationX:
+    case RadixFeatures::RotationY:
+    case RadixFeatures::RotationZ:
+    case RadixFeatures::Rotations:
+    case RadixFeatures::CenterSquare:
+      break;
   }
 
   return {p0, p1};
@@ -430,10 +466,10 @@ ManipulatorInteractionHelper::setupIntersectionPlanes(RadixFeatures mode)
 
 Vector2 ManipulatorInteractionHelper::getRayPosition(const PointerEvent& event)
 {
-  auto canvasRect = _scene->getEngine()->getRenderingCanvasClientRect();
+  const auto canvasRect = _scene->getEngine()->getRenderingCanvasClientRect();
 
-  auto x = event.clientX - canvasRect.left;
-  auto y = event.clientY - canvasRect.top;
+  const auto x = event.clientX - canvasRect.left;
+  const auto y = event.clientY - canvasRect.top;
 
   return Vector2(x, y);
 }
@@ -450,7 +486,7 @@ void ManipulatorInteractionHelper::renderManipulator()
     auto l        = Vector3::Distance(_scene->activeCamera->position,
                                worldMtx->getTranslation());
     auto vpWidth  = _scene->getEngine()->getRenderWidth();
-    auto s        = fromScreenToWorld(vpWidth / 100, l) * 20;
+    auto s        = fromScreenToWorld(vpWidth / 100.f, l) * 20.f;
     auto scale    = Vector3::Zero();
     auto position = Vector3::Zero();
     auto rotation = Quaternion::Identity();

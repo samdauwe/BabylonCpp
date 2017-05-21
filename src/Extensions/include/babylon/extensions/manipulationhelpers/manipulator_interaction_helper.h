@@ -105,7 +105,7 @@ private:
   ManFlags setManFlags(ManFlags values);
   static Vector3 ComputeRayHit(const Ray& ray, float distance);
   static bool instanceofAbstractMesh(Node* node);
-  void setManipulatedNodeWorldMatrix(const Matrix& mtx);
+  void setManipulatedNodeWorldMatrix(Matrix mtx);
   Matrix* getManipulatedNodeWorldMatrix();
   std::tuple<Plane, Vector3> setupIntersectionPlane(RadixFeatures mode,
                                                     bool plane2);

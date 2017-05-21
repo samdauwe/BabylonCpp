@@ -14,10 +14,8 @@ SimpleInteractionHelper::SimpleInteractionHelper(Scene* scene)
     : _actionStack{}, _scene{scene}, _manipulator{nullptr}
 {
   _pointerObserver = _scene->onPointerObservable.add(
-    [this](const PointerInfo& p, EventState& s) {
-      pointerCallback(p, s);
-    },
-    -1, true);
+    [this](const PointerInfo& p, EventState& s) { pointerCallback(p, s); }, -1,
+    true);
 }
 
 SimpleInteractionHelper::~SimpleInteractionHelper()
@@ -55,8 +53,12 @@ void SimpleInteractionHelper::pointerCallback(const PointerInfo& p,
     case SIHCurrentAction::Camerator:
       if (p.type
           & (PointerEventTypes::POINTERUP | PointerEventTypes::POINTERWHEEL)) {
-        _actionStack.pop_back();
+        if (!_actionStack.empty()) {
+          _actionStack.pop_back();
+        }
       }
+      break;
+    case SIHCurrentAction::None:
       break;
   }
 }

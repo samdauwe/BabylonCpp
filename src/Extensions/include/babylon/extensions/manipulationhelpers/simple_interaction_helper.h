@@ -17,7 +17,7 @@ class ManipulatorInteractionHelper;
 class BABYLON_SHARED_EXPORT SimpleInteractionHelper {
 
 public:
-  enum class SIHCurrentAction {
+  enum class SIHCurrentAction : int {
     None      = 0,
     Selector  = 1,
     Camerator = 2,
