@@ -423,7 +423,7 @@ ManipulatorInteractionHelper::setupIntersectionPlane(RadixFeatures mode,
       break;
   }
 
-  return {pl, axis};
+  return std::make_tuple(pl, axis);
 }
 
 std::tuple<Plane, Plane>
@@ -461,7 +461,7 @@ ManipulatorInteractionHelper::setupIntersectionPlanes(RadixFeatures mode)
       break;
   }
 
-  return {p0, p1};
+  return std::make_tuple(p0, p1);
 }
 
 Vector2 ManipulatorInteractionHelper::getRayPosition(const PointerEvent& event)
