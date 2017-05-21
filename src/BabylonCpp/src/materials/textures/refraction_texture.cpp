@@ -24,7 +24,7 @@ RefractionTexture::~RefractionTexture()
 std::unique_ptr<RefractionTexture> RefractionTexture::clone() const
 {
   auto textureSize = getSize();
-  auto newTexture  = std_util::make_unique<RefractionTexture>(
+  auto newTexture  = std::make_unique<RefractionTexture>(
     name, Size(textureSize.width, textureSize.height), getScene(),
     _generateMipMaps);
 

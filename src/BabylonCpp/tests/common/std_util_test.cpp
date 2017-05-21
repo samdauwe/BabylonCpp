@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_constants.h>
 #include <babylon/babylon_stl.h>
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
 
 TEST(TestStdUtil, to_bitset)
@@ -12,22 +13,22 @@ TEST(TestStdUtil, to_bitset)
   // 0
   float number         = 0.f;
   std::string expected = "00000000000000000000000000000000";
-  EXPECT_EQ(std_util::to_bitset(number).to_string(), expected);
+  EXPECT_EQ(stl_util::to_bitset(number).to_string(), expected);
 
   // PI
   number   = Math::PI;
   expected = "01000000010010010000111111011011";
-  EXPECT_EQ(std_util::to_bitset(number).to_string(), expected);
+  EXPECT_EQ(stl_util::to_bitset(number).to_string(), expected);
 
   // -PI
   number   = -Math::PI;
   expected = "11000000010010010000111111011011";
-  EXPECT_EQ(std_util::to_bitset(number).to_string(), expected);
+  EXPECT_EQ(stl_util::to_bitset(number).to_string(), expected);
 
   // sqrt(2)
   number   = std::sqrt(2.f);
   expected = "00111111101101010000010011110011";
-  EXPECT_EQ(std_util::to_bitset(number).to_string(), expected);
+  EXPECT_EQ(stl_util::to_bitset(number).to_string(), expected);
 }
 
 TEST(TestStdUtil, to_bytes__from_bytes)
@@ -38,7 +39,7 @@ TEST(TestStdUtil, to_bytes__from_bytes)
   {
     // to_bytes
     double d         = 123.456789;
-    const auto bytes = std_util::to_bytes(d);
+    const auto bytes = stl_util::to_bytes(d);
     std::ostringstream oss;
     oss << std::hex << std::setfill('0');
     for (byte b : bytes) {
@@ -49,7 +50,7 @@ TEST(TestStdUtil, to_bytes__from_bytes)
     // from_bytes
     oss.str("");
     d = 0;
-    std_util::from_bytes(bytes, d);
+    stl_util::from_bytes(bytes, d);
     oss << std::fixed << d;
     EXPECT_EQ(oss.str(), "123.456789");
   }
@@ -58,7 +59,7 @@ TEST(TestStdUtil, to_bytes__from_bytes)
   {
     // to_bytes
     int arr[5]             = {1, 63, 256, 511, 1024};
-    const auto array_bytes = std_util::to_bytes(arr);
+    const auto array_bytes = stl_util::to_bytes(arr);
     std::ostringstream oss;
     oss << std::hex << std::setfill('0');
     for (BABYLON::byte b : array_bytes) {
@@ -72,7 +73,7 @@ TEST(TestStdUtil, to_bytes__from_bytes)
     for (int& v : arr) {
       v = -1;
     }
-    std_util::from_bytes(array_bytes, arr);
+    stl_util::from_bytes(array_bytes, arr);
     for (int v : arr) {
       oss << std::dec << v << ' ';
     }
@@ -87,22 +88,22 @@ TEST(TestStdUtil, to_hex_string)
   // 0
   std::string bitString = "00000000000000000000000000000000";
   std::string expected  = "0x00000000";
-  EXPECT_EQ(std_util::to_hex_string(bitString), expected);
+  EXPECT_EQ(stl_util::to_hex_string(bitString), expected);
 
   // PI
   bitString = "01000000010010010000111111011011";
   expected  = "0x40490fdb";
-  EXPECT_EQ(std_util::to_hex_string(bitString), expected);
+  EXPECT_EQ(stl_util::to_hex_string(bitString), expected);
 
   // -PI
   bitString = "11000000010010010000111111011011";
   expected  = "0xc0490fdb";
-  EXPECT_EQ(std_util::to_hex_string(bitString), expected);
+  EXPECT_EQ(stl_util::to_hex_string(bitString), expected);
 
   // sqrt(2)
   bitString = "00111111101101010000010011110011";
   expected  = "0x3fb504f3";
-  EXPECT_EQ(std_util::to_hex_string(bitString), expected);
+  EXPECT_EQ(stl_util::to_hex_string(bitString), expected);
 }
 
 TEST(TestStdUtil, hex_to_float)
@@ -112,29 +113,29 @@ TEST(TestStdUtil, hex_to_float)
   // 0
   std::string hexString = "0x00000000";
   float expected        = 0.f;
-  EXPECT_EQ(std_util::hex_to_float(hexString), expected);
+  EXPECT_EQ(stl_util::hex_to_float(hexString), expected);
 
   // PI
   hexString = "0x40490fdb";
   expected  = Math::PI;
-  EXPECT_EQ(std_util::hex_to_float(hexString), expected);
+  EXPECT_EQ(stl_util::hex_to_float(hexString), expected);
 
   // -PI
   hexString = "0xc0490fdb";
   expected  = -Math::PI;
-  EXPECT_EQ(std_util::hex_to_float(hexString), expected);
+  EXPECT_EQ(stl_util::hex_to_float(hexString), expected);
 
   // sqrt(2)
   hexString = "0x3fb504f3";
   expected  = std::sqrt(2.f);
-  EXPECT_EQ(std_util::hex_to_float(hexString), expected);
+  EXPECT_EQ(stl_util::hex_to_float(hexString), expected);
 }
 
 TEST(TestStdUtil, to_vector)
 {
   using namespace BABYLON;
 
-  const Int32Array test = std_util::to_vector(0, 1, 2, 3, 4, 5);
+  const Int32Array test = stl_util::to_vector(0, 1, 2, 3, 4, 5);
   const Int32Array expected{0, 1, 2, 3, 4, 5};
   EXPECT_THAT(test, ::testing::ContainerEq(expected));
 }
@@ -144,8 +145,8 @@ TEST(TestStdUtil, concat)
   using namespace BABYLON;
 
   Int32Array test{0, 1, 2, 3, 4, 5};
-  std_util::concat(test, {6, 7, 8});
-  std_util::concat(test, {9, 10});
+  stl_util::concat(test, {6, 7, 8});
+  stl_util::concat(test, {9, 10});
   const Int32Array expected{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
   EXPECT_THAT(test, ::testing::ContainerEq(expected));
 }
@@ -156,18 +157,18 @@ TEST(TestStdUtil, contains)
 
   {
     const Int32Array v{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    EXPECT_TRUE(std_util::contains(v, 2));
-    EXPECT_TRUE(std_util::contains(v, 7));
-    EXPECT_TRUE(std_util::contains(v, 10));
-    EXPECT_FALSE(std_util::contains(v, -1));
-    EXPECT_FALSE(std_util::contains(v, 11));
+    EXPECT_TRUE(stl_util::contains(v, 2));
+    EXPECT_TRUE(stl_util::contains(v, 7));
+    EXPECT_TRUE(stl_util::contains(v, 10));
+    EXPECT_FALSE(stl_util::contains(v, -1));
+    EXPECT_FALSE(stl_util::contains(v, 11));
   }
 
   {
     // Create vector of unique pointers
     auto numbers = std::vector<std::unique_ptr<int>>(10);
     for (unsigned int i = 0; i < numbers.size(); ++i) {
-      numbers[i] = std_util::make_unique<int>(i);
+      numbers[i] = std::make_unique<int>(i);
     }
 
     // Filter vector
@@ -181,12 +182,12 @@ TEST(TestStdUtil, contains)
     // Perform check
     {
       auto number = numbersFiltered[1].get();
-      EXPECT_TRUE(std_util::contains(numbersFiltered, number));
+      EXPECT_TRUE(stl_util::contains(numbersFiltered, number));
     }
 
     {
       auto number = std::ref(*numbers[0].get());
-      EXPECT_FALSE(std_util::contains(numbersFiltered, number));
+      EXPECT_FALSE(stl_util::contains(numbersFiltered, number));
     }
   }
 }
@@ -198,7 +199,7 @@ TEST(TestStdUtil, insert_at)
   std::vector<std::string> v{"DIFFUSE", "CLIPPLANE", "POINTSIZE", "FOG"};
   const std::vector<std::string> expected{"DIFFUSE", "CLIPPLANE", "ALPHATEST",
                                           "POINTSIZE", "FOG"};
-  EXPECT_THAT(std_util::insert_at(v, 2, "ALPHATEST"),
+  EXPECT_THAT(stl_util::insert_at(v, 2, "ALPHATEST"),
               ::testing::ContainerEq(expected));
 }
 
@@ -209,9 +210,9 @@ TEST(TestStdUtil, unordered_map_contains)
   const std::unordered_map<std::string, int> c{
     {"DIFFUSE", 0},   {"CLIPPLANE", 2}, {"VERTEXALPHA", 4},
     {"ALPHATEST", 6}, {"POINTSIZE", 8}, {"FOG", 10}};
-  EXPECT_TRUE(std_util::contains(c, "DIFFUSE"));
-  EXPECT_TRUE(std_util::contains(c, "CLIPPLANE"));
-  EXPECT_FALSE(std_util::contains(c, "SHADOWS"));
+  EXPECT_TRUE(stl_util::contains(c, "DIFFUSE"));
+  EXPECT_TRUE(stl_util::contains(c, "CLIPPLANE"));
+  EXPECT_FALSE(stl_util::contains(c, "SHADOWS"));
 }
 
 TEST(TestStdUtil, extract_keys)
@@ -221,14 +222,14 @@ TEST(TestStdUtil, extract_keys)
   const std::unordered_map<std::string, int> c{
     {"DIFFUSE", 0},   {"CLIPPLANE", 2}, {"VERTEXALPHA", 4},
     {"ALPHATEST", 6}, {"POINTSIZE", 8}, {"FOG", 10}};
-  const std::vector<std::string> keys = std_util::extract_keys(c);
-  EXPECT_TRUE(std_util::contains(keys, "DIFFUSE"));
-  EXPECT_TRUE(std_util::contains(keys, "CLIPPLANE"));
-  EXPECT_TRUE(std_util::contains(keys, "VERTEXALPHA"));
-  EXPECT_TRUE(std_util::contains(keys, "ALPHATEST"));
-  EXPECT_TRUE(std_util::contains(keys, "POINTSIZE"));
-  EXPECT_TRUE(std_util::contains(keys, "FOG"));
-  EXPECT_FALSE(std_util::contains(keys, "VERTEXCOLOR"));
+  const std::vector<std::string> keys = stl_util::extract_keys(c);
+  EXPECT_TRUE(stl_util::contains(keys, "DIFFUSE"));
+  EXPECT_TRUE(stl_util::contains(keys, "CLIPPLANE"));
+  EXPECT_TRUE(stl_util::contains(keys, "VERTEXALPHA"));
+  EXPECT_TRUE(stl_util::contains(keys, "ALPHATEST"));
+  EXPECT_TRUE(stl_util::contains(keys, "POINTSIZE"));
+  EXPECT_TRUE(stl_util::contains(keys, "FOG"));
+  EXPECT_FALSE(stl_util::contains(keys, "VERTEXCOLOR"));
 }
 
 TEST(TestStdUtil, extract_values)
@@ -238,14 +239,14 @@ TEST(TestStdUtil, extract_values)
   const std::unordered_map<std::string, int> c{
     {"DIFFUSE", 0},   {"CLIPPLANE", 2}, {"VERTEXALPHA", 4},
     {"ALPHATEST", 6}, {"POINTSIZE", 8}, {"FOG", 10}};
-  const Int32Array values = std_util::extract_values(c);
-  EXPECT_TRUE(std_util::contains(values, 0));
-  EXPECT_FALSE(std_util::contains(values, 1));
-  EXPECT_TRUE(std_util::contains(values, 2));
-  EXPECT_TRUE(std_util::contains(values, 4));
-  EXPECT_TRUE(std_util::contains(values, 6));
-  EXPECT_TRUE(std_util::contains(values, 8));
-  EXPECT_TRUE(std_util::contains(values, 10));
+  const Int32Array values = stl_util::extract_values(c);
+  EXPECT_TRUE(stl_util::contains(values, 0));
+  EXPECT_FALSE(stl_util::contains(values, 1));
+  EXPECT_TRUE(stl_util::contains(values, 2));
+  EXPECT_TRUE(stl_util::contains(values, 4));
+  EXPECT_TRUE(stl_util::contains(values, 6));
+  EXPECT_TRUE(stl_util::contains(values, 8));
+  EXPECT_TRUE(stl_util::contains(values, 10));
 }
 
 TEST(TestStdUtil, erase)
@@ -254,10 +255,10 @@ TEST(TestStdUtil, erase)
 
   std::vector<std::string> v{"DIFFUSE", "CLIPPLANE", "POINTSIZE", "FOG"};
   const std::vector<std::string> expected{"DIFFUSE", "FOG"};
-  EXPECT_TRUE(std_util::erase(v, "CLIPPLANE"));
-  EXPECT_TRUE(std_util::erase(v, "POINTSIZE"));
-  EXPECT_FALSE(std_util::erase(v, "POINTSIZE"));
-  EXPECT_FALSE(std_util::erase(v, "VERTEXALPHA"));
+  EXPECT_TRUE(stl_util::erase(v, "CLIPPLANE"));
+  EXPECT_TRUE(stl_util::erase(v, "POINTSIZE"));
+  EXPECT_FALSE(stl_util::erase(v, "POINTSIZE"));
+  EXPECT_FALSE(stl_util::erase(v, "VERTEXALPHA"));
   EXPECT_THAT(v, ::testing::ContainerEq(expected));
 }
 
@@ -266,7 +267,7 @@ TEST(TestStdUtil, filter)
   using namespace BABYLON;
 
   const std::vector<int> input{25, 15, 5, -5, -15};
-  auto filtered = std_util::filter(input, [](int i) { return !(i < 0); });
+  auto filtered = stl_util::filter(input, [](int i) { return !(i < 0); });
 
   const std::vector<int> expected{25, 15, 5};
   EXPECT_THAT(filtered, ::testing::ContainerEq(expected));
@@ -277,20 +278,20 @@ TEST(TestStdUtil, index_of)
   using namespace BABYLON;
 
   std::vector<std::string> v{"DIFFUSE", "CLIPPLANE", "POINTSIZE", "FOG"};
-  EXPECT_EQ(std_util::index_of(v, "DIFFUSE"), 0);
-  EXPECT_EQ(std_util::index_of(v, "FOG"), 3);
-  EXPECT_EQ(std_util::index_of(v, "VERTEXALPHA"), -1);
+  EXPECT_EQ(stl_util::index_of(v, "DIFFUSE"), 0);
+  EXPECT_EQ(stl_util::index_of(v, "FOG"), 3);
+  EXPECT_EQ(stl_util::index_of(v, "VERTEXALPHA"), -1);
 }
 
 TEST(TestStdUtil, min)
 {
   using namespace BABYLON;
 
-  EXPECT_EQ(std_util::min(10, 5.5), 5.5);
-  EXPECT_EQ(std_util::min(0.5, -10.1, -200), -200);
-  EXPECT_EQ(std_util::min(std::string{"var1"}, std::string{"var2"}), "var1");
-  EXPECT_EQ(std_util::min(std::string{"var1"}, "var2"), "var1");
-  EXPECT_EQ(std_util::min("var1", std::string{"var2"}), "var1");
+  EXPECT_EQ(stl_util::min(10, 5.5), 5.5);
+  EXPECT_EQ(stl_util::min(0.5, -10.1, -200), -200);
+  EXPECT_EQ(stl_util::min(std::string{"var1"}, std::string{"var2"}), "var1");
+  EXPECT_EQ(stl_util::min(std::string{"var1"}, "var2"), "var1");
+  EXPECT_EQ(stl_util::min("var1", std::string{"var2"}), "var1");
 }
 
 TEST(TestStdUtil, map)
@@ -298,7 +299,7 @@ TEST(TestStdUtil, map)
   using namespace BABYLON;
 
   const std::vector<int> input{10, 20, 30, 40, 50};
-  auto doubled = std_util::map(input, [](int i) { return i * 2; });
+  auto doubled = stl_util::map(input, [](int i) { return i * 2; });
 
   const std::vector<int> expected{20, 40, 60, 80, 100};
   EXPECT_THAT(doubled, ::testing::ContainerEq(expected));
@@ -308,13 +309,13 @@ TEST(TestStdUtil, max)
 {
   using namespace BABYLON;
 
-  EXPECT_EQ(std_util::max(10, 5.5), 10);
-  EXPECT_EQ(std_util::max(0.5, -10.1, -200), 0.5);
-  EXPECT_EQ(std_util::max(std::string{"var1"}, std::string{"var2"}), "var2");
+  EXPECT_EQ(stl_util::max(10, 5.5), 10);
+  EXPECT_EQ(stl_util::max(0.5, -10.1, -200), 0.5);
+  EXPECT_EQ(stl_util::max(std::string{"var1"}, std::string{"var2"}), "var2");
   EXPECT_EQ(
-    std_util::max(std::string{"var1"}, static_cast<char const* const>("var2")),
+    stl_util::max(std::string{"var1"}, static_cast<char const* const>("var2")),
     "var2");
-  EXPECT_EQ(std_util::max("var1", std::string{"var2"}), "var2");
+  EXPECT_EQ(stl_util::max("var1", std::string{"var2"}), "var2");
 }
 
 TEST(TestStdUtil, slice)
@@ -324,25 +325,25 @@ TEST(TestStdUtil, slice)
   const Int32Array v{1, 2, 3, 4, 5};
 
   {
-    const Int32Array result = std_util::slice(v, 1, 3);
+    const Int32Array result = stl_util::slice(v, 1, 3);
     const Int32Array expected{2, 3};
     EXPECT_THAT(result, ::testing::ContainerEq(expected));
   }
 
   {
-    const Int32Array result = std_util::slice(v, 1);
+    const Int32Array result = stl_util::slice(v, 1);
     const Int32Array expected{2, 3, 4, 5};
     EXPECT_THAT(result, ::testing::ContainerEq(expected));
   }
 
   {
-    const Int32Array result = std_util::slice(v, 3, 1);
+    const Int32Array result = stl_util::slice(v, 3, 1);
     const Int32Array expected{2, 3};
     EXPECT_THAT(result, ::testing::ContainerEq(expected));
   }
 
   {
-    const Int32Array result = std_util::slice(v, -3, 2);
+    const Int32Array result = stl_util::slice(v, -3, 2);
     const Int32Array expected{1, 2};
     EXPECT_THAT(result, ::testing::ContainerEq(expected));
   }
@@ -354,28 +355,28 @@ TEST(TestStdUtil, slice_in_place)
 
   {
     Int32Array v{1, 2, 3, 4, 5};
-    std_util::slice_in_place(v, 1, 3);
+    stl_util::slice_in_place(v, 1, 3);
     const Int32Array expected{2, 3};
     EXPECT_THAT(v, ::testing::ContainerEq(expected));
   }
 
   {
     Int32Array v{1, 2, 3, 4, 5};
-    std_util::slice_in_place(v, 1);
+    stl_util::slice_in_place(v, 1);
     const Int32Array expected{2, 3, 4, 5};
     EXPECT_THAT(v, ::testing::ContainerEq(expected));
   }
 
   {
     Int32Array v{1, 2, 3, 4, 5};
-    std_util::slice_in_place(v, 3, 1);
+    stl_util::slice_in_place(v, 3, 1);
     const Int32Array expected{2, 3};
     EXPECT_THAT(v, ::testing::ContainerEq(expected));
   }
 
   {
     Int32Array v{1, 2, 3, 4, 5};
-    std_util::slice_in_place(v, -3, 2);
+    stl_util::slice_in_place(v, -3, 2);
     const Int32Array expected{1, 2};
     EXPECT_THAT(v, ::testing::ContainerEq(expected));
   }
@@ -391,7 +392,7 @@ TEST(TestStdUtil, splice)
     std::vector<std::string> expected{"DIFFUSE",     "CLIPPLANE", "SHADOW",
                                       "VERTEXALPHA", "POINTSIZE", "FOG"};
     std::vector<std::string> r
-      = std_util::splice(v, 2, 0, {"SHADOW", "VERTEXALPHA"});
+      = stl_util::splice(v, 2, 0, {"SHADOW", "VERTEXALPHA"});
     EXPECT_THAT(v, ::testing::ContainerEq(expected));
     EXPECT_TRUE(r.empty());
   }
@@ -403,7 +404,7 @@ TEST(TestStdUtil, splice)
                                       "VERTEXALPHA", "FOG"};
     std::vector<std::string> expectedRemovedItem{"POINTSIZE"};
     std::vector<std::string> r
-      = std_util::splice(v, 2, 1, {"SHADOW", "VERTEXALPHA"});
+      = stl_util::splice(v, 2, 1, {"SHADOW", "VERTEXALPHA"});
     EXPECT_THAT(v, ::testing::ContainerEq(expected));
     EXPECT_THAT(r, ::testing::ContainerEq(expectedRemovedItem));
   }
@@ -414,7 +415,7 @@ TEST(TestStdUtil, splice)
                                "FOG"};
     std::vector<std::string> expected{"DIFFUSE", "CLIPPLANE", "FOG"};
     std::vector<std::string> expectedRemovedItems{"SHADOW", "VERTEXALPHA"};
-    std::vector<std::string> r = std_util::splice(v, 2, 2);
+    std::vector<std::string> r = stl_util::splice(v, 2, 2);
     EXPECT_THAT(v, ::testing::ContainerEq(expected));
     EXPECT_THAT(r, ::testing::ContainerEq(expectedRemovedItems));
   }
@@ -424,7 +425,7 @@ TEST(TestStdUtil, splice)
     std::vector<std::string> v{"DIFFUSE", "CLIPPLANE", "SHADOW", "FOG"};
     std::vector<std::string> expected{"DIFFUSE", "CLIPPLANE", "SHADOW"};
     std::vector<std::string> expectedRemovedItem{"FOG"};
-    std::vector<std::string> r = std_util::splice(v, -1, 1);
+    std::vector<std::string> r = stl_util::splice(v, -1, 1);
     EXPECT_THAT(v, ::testing::ContainerEq(expected));
     EXPECT_THAT(r, ::testing::ContainerEq(expectedRemovedItem));
   }
@@ -436,8 +437,8 @@ TEST(TestStdUtil, remove)
 
   std::vector<std::string> v{"DIFFUSE", "CLIPPLANE", "POINTSIZE", "FOG"};
   const std::vector<std::string> expected{"CLIPPLANE", "POINTSIZE"};
-  std_util::remove(v, 0);
-  std_util::remove(v, v.size() - 1);
+  stl_util::remove(v, 0);
+  stl_util::remove(v, v.size() - 1);
   EXPECT_THAT(v, ::testing::ContainerEq(expected));
 }
 
@@ -449,7 +450,7 @@ TEST(TestStdUtil, push_unique)
   const Int32Array v{1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5};
   const Int32Array expected{1, 2, 3, 4, 5};
   for (auto& iv : v) {
-    std_util::push_unique(result, iv);
+    stl_util::push_unique(result, iv);
   }
   EXPECT_THAT(result, ::testing::ContainerEq(expected));
 }
@@ -462,7 +463,7 @@ TEST(TestStdUtil, range)
   const size_t end   = 20;
   std::vector<size_t> result;
   const std::vector<size_t> expected{10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
-  for (auto i : std_util::range(start, end)) {
+  for (auto i : stl_util::range(start, end)) {
     result.emplace_back(i);
   }
   EXPECT_THAT(result, ::testing::ContainerEq(expected));
@@ -473,24 +474,24 @@ TEST(TestStdUtil, spaceship)
   using namespace BABYLON;
 
   // Integers
-  EXPECT_EQ(std_util::spaceship(1, 1), 0);
-  EXPECT_EQ(std_util::spaceship(1, 2), -1);
-  EXPECT_EQ(std_util::spaceship(2, 1), 1);
+  EXPECT_EQ(stl_util::spaceship(1, 1), 0);
+  EXPECT_EQ(stl_util::spaceship(1, 2), -1);
+  EXPECT_EQ(stl_util::spaceship(2, 1), 1);
 
   // Floats
-  EXPECT_EQ(std_util::spaceship(1.5f, 1.5f), 0);
-  EXPECT_EQ(std_util::spaceship(1.5f, 2.5f), -1);
-  EXPECT_EQ(std_util::spaceship(2.5f, 1.5f), 1);
+  EXPECT_EQ(stl_util::spaceship(1.5f, 1.5f), 0);
+  EXPECT_EQ(stl_util::spaceship(1.5f, 2.5f), -1);
+  EXPECT_EQ(stl_util::spaceship(2.5f, 1.5f), 1);
 
   // Doubles
-  EXPECT_EQ(std_util::spaceship(1.5, 1.5), 0);
-  EXPECT_EQ(std_util::spaceship(1.5, 2.5), -1);
-  EXPECT_EQ(std_util::spaceship(2.5, 1.5), 1);
+  EXPECT_EQ(stl_util::spaceship(1.5, 1.5), 0);
+  EXPECT_EQ(stl_util::spaceship(1.5, 2.5), -1);
+  EXPECT_EQ(stl_util::spaceship(2.5, 1.5), 1);
 
   // Strings
-  EXPECT_EQ(std_util::spaceship("a", "a"), 0);
-  EXPECT_EQ(std_util::spaceship("a", "b"), -1);
-  EXPECT_EQ(std_util::spaceship("b", "a"), 1);
-  EXPECT_EQ(std_util::spaceship("a", "aa"), -1);
-  EXPECT_EQ(std_util::spaceship("zz", "aa"), 1);
+  EXPECT_EQ(stl_util::spaceship("a", "a"), 0);
+  EXPECT_EQ(stl_util::spaceship("a", "b"), -1);
+  EXPECT_EQ(stl_util::spaceship("b", "a"), 1);
+  EXPECT_EQ(stl_util::spaceship("a", "aa"), -1);
+  EXPECT_EQ(stl_util::spaceship("zz", "aa"), 1);
 }

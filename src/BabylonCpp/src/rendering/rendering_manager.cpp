@@ -54,7 +54,7 @@ void RenderingManager::render(
   bool hasObservable = _scene->onRenderingGroupObservable.hasObservers();
   if (hasObservable) {
     if (!_renderinGroupInfo) {
-      _renderinGroupInfo = std_util::make_unique<RenderingGroupInfo>();
+      _renderinGroupInfo = std::make_unique<RenderingGroupInfo>();
     }
     _renderinGroupInfo->scene  = _scene;
     _renderinGroupInfo->camera = _scene->activeCamera;

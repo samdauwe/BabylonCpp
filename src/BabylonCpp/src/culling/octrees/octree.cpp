@@ -1,5 +1,6 @@
 #include <babylon/culling/octrees/octree.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/octrees/octree_block.h>
@@ -57,10 +58,10 @@ std::vector<T>& Octree<T>::select(const std::array<Plane, 6>& frustumPlanes,
   }
 
   if (allowDuplicate) {
-    std_util::concat(_selectionContent, dynamicContent);
+    stl_util::concat(_selectionContent, dynamicContent);
   }
   else {
-    std_util::concat_with_no_duplicates(_selectionContent, dynamicContent);
+    stl_util::concat_with_no_duplicates(_selectionContent, dynamicContent);
   }
 
   return _selectionContent;
@@ -78,10 +79,10 @@ std::vector<T>& Octree<T>::intersects(const Vector3& sphereCenter,
   }
 
   if (allowDuplicate) {
-    std_util::concat(_selectionContent, dynamicContent);
+    stl_util::concat(_selectionContent, dynamicContent);
   }
   else {
-    std_util::concat_with_no_duplicates(_selectionContent, dynamicContent);
+    stl_util::concat_with_no_duplicates(_selectionContent, dynamicContent);
   }
 
   return _selectionContent;
@@ -96,7 +97,7 @@ std::vector<T>& Octree<T>::intersectsRay(const Ray& ray)
     block.intersectsRay(ray, _selectionContent);
   }
 
-  std_util::concat_with_no_duplicates(_selectionContent, dynamicContent);
+  stl_util::concat_with_no_duplicates(_selectionContent, dynamicContent);
 
   return _selectionContent;
 }

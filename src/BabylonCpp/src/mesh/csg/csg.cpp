@@ -1,5 +1,6 @@
 #include <babylon/mesh/csg/csg.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
 #include <babylon/math/quaternion.h>
 #include <babylon/mesh/csg/node.h>
@@ -316,24 +317,24 @@ Mesh* CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene,
         std::string vertexId = String::concat(localVertex.x, ",", localVertex.y,
                                               ",", localVertex.z);
 
-        if (std_util::contains(vertice_dict, vertexId)) {
+        if (stl_util::contains(vertice_dict, vertexId)) {
           vertex_idx       = vertice_dict[vertexId];
           vertexIdxDefined = true;
         }
 
         // Check if 2 points can be merged
         if (!(vertexIdxDefined
-              && std_util::almost_equal(normals[vertex_idx * 3], localNormal.x)
-              && std_util::almost_equal(normals[vertex_idx * 3 + 1],
+              && stl_util::almost_equal(normals[vertex_idx * 3], localNormal.x)
+              && stl_util::almost_equal(normals[vertex_idx * 3 + 1],
                                         localNormal.y)
-              && std_util::almost_equal(normals[vertex_idx * 3 + 2],
+              && stl_util::almost_equal(normals[vertex_idx * 3 + 2],
                                         localNormal.z)
-              && std_util::almost_equal(uvs[vertex_idx * 2], uv.x)
-              && std_util::almost_equal(uvs[vertex_idx * 2 + 1], uv.y))) {
-          std_util::concat(vertices,
+              && stl_util::almost_equal(uvs[vertex_idx * 2], uv.x)
+              && stl_util::almost_equal(uvs[vertex_idx * 2 + 1], uv.y))) {
+          stl_util::concat(vertices,
                            {localVertex.x, localVertex.y, localVertex.z});
-          std_util::concat(uvs, {uv.x, uv.y});
-          std_util::concat(normals, {normal.x, normal.y, normal.z});
+          stl_util::concat(uvs, {uv.x, uv.y});
+          stl_util::concat(normals, {normal.x, normal.y, normal.z});
           vertex_idx             = (vertices.size() / 3) - 1;
           vertice_dict[vertexId] = vertex_idx;
           vertexIdxDefined       = true;

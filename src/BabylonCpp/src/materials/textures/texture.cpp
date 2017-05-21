@@ -1,5 +1,6 @@
 #include <babylon/materials/textures/texture.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/igl_rendering_context.h>
@@ -143,13 +144,13 @@ void Texture::_prepareRowForTextureGeneration(float x, float y, float z,
 
 Matrix* Texture::getTextureMatrix()
 {
-  if (std_util::almost_equal(uOffset, _cachedUOffset)
-      && std_util::almost_equal(vOffset, _cachedVOffset)
-      && std_util::almost_equal(uScale, _cachedUScale)
-      && std_util::almost_equal(vScale, _cachedVScale)
-      && std_util::almost_equal(uAng, _cachedUAng)
-      && std_util::almost_equal(vAng, _cachedVAng)
-      && std_util::almost_equal(wAng, _cachedWAng)) {
+  if (stl_util::almost_equal(uOffset, _cachedUOffset)
+      && stl_util::almost_equal(vOffset, _cachedVOffset)
+      && stl_util::almost_equal(uScale, _cachedUScale)
+      && stl_util::almost_equal(vScale, _cachedVScale)
+      && stl_util::almost_equal(uAng, _cachedUAng)
+      && stl_util::almost_equal(vAng, _cachedVAng)
+      && stl_util::almost_equal(wAng, _cachedWAng)) {
     return _cachedTextureMatrix.get();
   }
 
@@ -162,8 +163,8 @@ Matrix* Texture::getTextureMatrix()
   _cachedWAng    = wAng;
 
   if (!_cachedTextureMatrix) {
-    _cachedTextureMatrix = std_util::make_unique<Matrix>(Matrix::Zero());
-    _rowGenerationMatrix = std_util::make_unique<Matrix>();
+    _cachedTextureMatrix = std::make_unique<Matrix>(Matrix::Zero());
+    _rowGenerationMatrix = std::make_unique<Matrix>();
     _t0                  = Vector3::Zero();
     _t1                  = Vector3::Zero();
     _t2                  = Vector3::Zero();
@@ -196,17 +197,17 @@ Matrix* Texture::getTextureMatrix()
 
 Matrix* Texture::getReflectionTextureMatrix()
 {
-  if (std_util::almost_equal(uOffset, _cachedUOffset)
-      && std_util::almost_equal(vOffset, _cachedVOffset)
-      && std_util::almost_equal(uScale, _cachedUScale)
-      && std_util::almost_equal(vScale, _cachedVScale)
+  if (stl_util::almost_equal(uOffset, _cachedUOffset)
+      && stl_util::almost_equal(vOffset, _cachedVOffset)
+      && stl_util::almost_equal(uScale, _cachedUScale)
+      && stl_util::almost_equal(vScale, _cachedVScale)
       && (coordinatesMode() == _cachedCoordinatesMode)) {
     return _cachedTextureMatrix.get();
   }
 
   if (!_cachedTextureMatrix) {
-    _cachedTextureMatrix  = std_util::make_unique<Matrix>(Matrix::Zero());
-    _projectionModeMatrix = std_util::make_unique<Matrix>(Matrix::Zero());
+    _cachedTextureMatrix  = std::make_unique<Matrix>(Matrix::Zero());
+    _projectionModeMatrix = std::make_unique<Matrix>(Matrix::Zero());
   }
 
   _cachedCoordinatesMode = coordinatesMode();

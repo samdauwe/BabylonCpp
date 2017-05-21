@@ -15,7 +15,7 @@ FreeCamera::FreeCamera(const std::string& iName, const Vector3& iPosition,
     , ellipsoid{Vector3(0.5f, 1.f, 0.5f)}
     , checkCollisions{false}
     , applyGravity{false}
-    , inputs{std_util::make_unique<FreeCameraInputsManager>(this)}
+    , inputs{std::make_unique<FreeCameraInputsManager>(this)}
     , _collider{nullptr}
     , _collisionMask{-1}
     , _needMoveForGravity{false}
@@ -47,8 +47,8 @@ void FreeCamera::detachControl(ICanvas* canvas)
 {
   inputs->detachElement(canvas);
 
-  cameraDirection = std_util::make_unique<Vector3>(0.f, 0.f, 0.f);
-  cameraRotation  = std_util::make_unique<Vector2>(0.f, 0.f);
+  cameraDirection = std::make_unique<Vector3>(0.f, 0.f, 0.f);
+  cameraRotation  = std::make_unique<Vector2>(0.f, 0.f);
 }
 
 int FreeCamera::collisionMask()
@@ -76,7 +76,7 @@ void FreeCamera::_collideWithWorld(Vector3& velocity)
   globalPosition_.subtractFromFloatsToRef(0, ellipsoid.y, 0, _oldPosition);
 
   if (!_collider) {
-    _collider = std_util::make_unique<Collider>();
+    _collider = std::make_unique<Collider>();
   }
 
   _collider->radius = ellipsoid;
@@ -127,7 +127,7 @@ void FreeCamera::_onCollisionPositionChange(int /*collisionId*/,
 void FreeCamera::_checkInputs()
 {
   if (!_localDirection) {
-    _localDirection       = std_util::make_unique<Vector3>(Vector3::Zero());
+    _localDirection       = std::make_unique<Vector3>(Vector3::Zero());
     _transformedDirection = Vector3::Zero();
   }
 

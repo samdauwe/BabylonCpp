@@ -1,5 +1,6 @@
 #include <babylon/extensions/navigationmesh/navigation.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/extensions/navigationmesh/channel.h>
 #include <babylon/math/plane.h>
 #include <babylon/math/vector3.h>
@@ -35,7 +36,7 @@ void Navigation::setZoneData(const std::string& zone,
 int Navigation::getGroup(const std::string& zone, const Vector3& position)
 {
   int closestNodeGroup = -1;
-  if (!std_util::contains(_zoneNodes, zone)) {
+  if (!stl_util::contains(_zoneNodes, zone)) {
     return closestNodeGroup;
   }
 
@@ -370,7 +371,7 @@ size_t Navigation::_mergeVertices(Geometry* geometry)
        << "_" << std::round(v.z * precision);
     std::string key = ss.str();
 
-    if (!std_util::contains(verticesMap, key)) {
+    if (!stl_util::contains(verticesMap, key)) {
       verticesMap[key] = i / 3;
       unique.emplace_back(v);
       changes[i / 3] = static_cast<std::uint32_t>(unique.size()) - 1;
@@ -403,14 +404,14 @@ size_t Navigation::_mergeVertices(Geometry* geometry)
   }
 
   for (size_t i = faceIndicesToRemove.size() - 1; i-- > 0;) {
-    std_util::splice(ind, faceIndicesToRemove[i], 3);
+    stl_util::splice(ind, faceIndicesToRemove[i], 3);
   }
 
   // Use unique set of vertices
   size_t diff = vert.size() / 3 - unique.size();
   vert.clear();
   for (auto& vec : unique) {
-    std_util::concat(vert, {vec.x, vec.y, vec.z});
+    stl_util::concat(vert, {vec.x, vec.y, vec.z});
   }
 
   geometry->setIndices(ind);
@@ -431,15 +432,15 @@ Uint32Array Navigation::_getSharedVerticesInOrder(NavigationPolygon& a,
     return Uint32Array();
   }
 
-  if (std_util::contains(sharedVertices, aList[0])
-      && std_util::contains(sharedVertices, aList.back())) {
+  if (stl_util::contains(sharedVertices, aList[0])
+      && stl_util::contains(sharedVertices, aList.back())) {
     // Vertices on both edges are bad, so shift them once to the left
     std::vector<Uint32Array::value_type>(aList.begin() + 1, aList.end())
       .swap(aList);
   }
 
-  if (std_util::contains(sharedVertices, bList[0])
-      && std_util::contains(sharedVertices, bList.back())) {
+  if (stl_util::contains(sharedVertices, bList[0])
+      && stl_util::contains(sharedVertices, bList.back())) {
     // Vertices on both edges are bad, so shift them once to the left
     std::vector<Uint32Array::value_type>(bList.begin() + 1, bList.end())
       .swap(bList);
@@ -465,7 +466,7 @@ GroupedNavigationMesh Navigation::_groupNavMesh(NavigationMesh& navigationMesh)
 
   const auto findPolygonIndex = [](const std::vector<NavigationPolygon>& group,
                                    const NavigationPolygon& p) -> int {
-    return std_util::index_of(group, p);
+    return stl_util::index_of(group, p);
   };
 
   for (auto& group : groups) {

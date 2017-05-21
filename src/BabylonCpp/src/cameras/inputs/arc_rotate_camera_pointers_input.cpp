@@ -1,5 +1,6 @@
 #include <babylon/cameras/inputs/arc_rotate_camera_pointers_input.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/pointer_event_types.h>
 #include <babylon/interfaces/icanvas.h>
@@ -101,7 +102,7 @@ void ArcRotateCameraPointersInput::attachControl(ICanvas* canvas,
 
       // One button down
       if (_pointADefined && !_pointBDefined) {
-        if (!std_util::almost_equal(panningSensibility, 0.f)
+        if (!stl_util::almost_equal(panningSensibility, 0.f)
             && ((evt.ctrlKey && camera->_useCtrlForPanning)
                 || (!camera->_useCtrlForPanning && _isPanClick))) {
           camera->inertialPanningX
@@ -135,12 +136,12 @@ void ArcRotateCameraPointersInput::attachControl(ICanvas* canvas,
         auto distY    = _pointA.y - _pointB.y;
         auto pinchSquaredDistance
           = static_cast<float>((distX * distX) + (distY * distY));
-        if (std_util::almost_equal(_previousPinchDistance, 0.f)) {
+        if (stl_util::almost_equal(_previousPinchDistance, 0.f)) {
           _previousPinchDistance = pinchSquaredDistance;
           return;
         }
 
-        if (!std_util::almost_equal(pinchSquaredDistance,
+        if (!stl_util::almost_equal(pinchSquaredDistance,
                                     _previousPinchDistance)) {
           camera->inertialRadiusOffset
             += (pinchSquaredDistance - _previousPinchDistance)

@@ -65,7 +65,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , edgesWidth{1.f}
     , edgesColor{Color4(1.f, 0.f, 0.f, 1.f)}
     , _edgesRenderer{nullptr}
-    , _worldMatrix{std_util::make_unique<Matrix>(Matrix::Zero())}
+    , _worldMatrix{std::make_unique<Matrix>(Matrix::Zero())}
     , _masterMesh{nullptr}
     , _materialDefines{nullptr}
     , _boundingInfo{nullptr}
@@ -100,7 +100,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , _newPositionForCollisions{Vector3(0.f, 0.f, 0.f)}
     , _meshToBoneReferal{nullptr}
     , _localWorld{Matrix::Zero()}
-    , _absolutePosition{std_util::make_unique<Vector3>(Vector3::Zero())}
+    , _absolutePosition{std::make_unique<Vector3>(Vector3::Zero())}
     , _collisionsTransformMatrix{Matrix::Zero()}
     , _collisionsScalingMatrix{Matrix::Zero()}
     , _isDirty{false}
@@ -555,7 +555,7 @@ AbstractMesh::enableEdgesRendering(float epsilon,
 {
   disableEdgesRendering();
 
-  _edgesRenderer = std_util::make_unique<EdgesRenderer>(
+  _edgesRenderer = std::make_unique<EdgesRenderer>(
     this, epsilon, checkVerticesInsteadOfIndices);
 
   return *this;
@@ -628,7 +628,7 @@ BoundingInfo* AbstractMesh::getBoundingInfo()
 
 AbstractMesh& AbstractMesh::setBoundingInfo(const BoundingInfo& boundingInfo)
 {
-  _boundingInfo = std_util::make_unique<BoundingInfo>(boundingInfo);
+  _boundingInfo = std::make_unique<BoundingInfo>(boundingInfo);
   return *this;
 }
 
@@ -912,8 +912,7 @@ AbstractMesh& AbstractMesh::_updateBoundingInfo()
 {
   if (!_boundingInfo) {
     auto absolutePos = absolutePosition();
-    _boundingInfo
-      = std_util::make_unique<BoundingInfo>(*absolutePos, *absolutePos);
+    _boundingInfo = std::make_unique<BoundingInfo>(*absolutePos, *absolutePos);
   }
 
   _boundingInfo->update(worldMatrixFromCache());
@@ -1115,7 +1114,7 @@ Matrix AbstractMesh::computeWorldMatrix(bool force)
   onAfterWorldMatrixUpdateObservable.notifyObservers(this);
 
   if (!_poseMatrix) {
-    _poseMatrix = std_util::make_unique<Matrix>(Matrix::Invert(*_worldMatrix));
+    _poseMatrix = std::make_unique<Matrix>(Matrix::Invert(*_worldMatrix));
   }
 
   return *_worldMatrix;
@@ -1313,7 +1312,7 @@ AbstractMesh& AbstractMesh::moveWithCollisions(const Vector3& /*velocity*/)
   _oldPositionForCollisions.addInPlace(ellipsoidOffset);
 
   if (!_collider) {
-    _collider = std_util::make_unique<Collider>();
+    _collider = std::make_unique<Collider>();
   }
 
   _collider->radius = ellipsoid;

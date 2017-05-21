@@ -1,5 +1,6 @@
 #include <babylon/bones/skeleton.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
 #include <babylon/core/json.h>
 #include <babylon/core/logging.h>
@@ -94,7 +95,7 @@ int Skeleton::getBoneIndexByName(const std::string& _name)
 void Skeleton::createAnimationRange(const std::string& _name, int from, int to)
 {
   // check name not already in use
-  if (!std_util::contains(_ranges, _name)) {
+  if (!stl_util::contains(_ranges, _name)) {
     _ranges[_name] = AnimationRange(_name, from, to);
     for (auto& bone : bones) {
       if (!bone->animations.empty() && (bone->animations[0] != nullptr)) {
@@ -116,7 +117,7 @@ void Skeleton::deleteAnimationRange(const std::string& _name, bool deleteFrames)
 
 AnimationRange* Skeleton::getAnimationRange(const std::string& _name)
 {
-  if (!std_util::contains(_ranges, _name)) {
+  if (!stl_util::contains(_ranges, _name)) {
     return &_ranges[_name];
   }
 
@@ -135,7 +136,7 @@ std::vector<AnimationRange> Skeleton::getAnimationRanges()
 bool Skeleton::copyAnimationRange(Skeleton* source, const std::string& _name,
                                   bool rescaleAsRequired)
 {
-  if (std_util::contains(_ranges, _name) || !source->getAnimationRange(_name)) {
+  if (stl_util::contains(_ranges, _name) || !source->getAnimationRange(_name)) {
     return false;
   }
   bool ret        = true;
@@ -164,7 +165,7 @@ bool Skeleton::copyAnimationRange(Skeleton* source, const std::string& _name,
   }
 
   for (auto& bone : bones) {
-    if (std_util::contains(boneDict, bone->name)) {
+    if (stl_util::contains(boneDict, bone->name)) {
       ret = ret
             && bone->copyAnimationRange(
                  boneDict[bone->name], _name, frameOffset, rescaleAsRequired,
@@ -238,7 +239,7 @@ void Skeleton::_registerMeshWithPoseMatrix(AbstractMesh* mesh)
 
 void Skeleton::_unregisterMeshWithPoseMatrix(AbstractMesh* mesh)
 {
-  std_util::erase(_meshesWithPoseMatrix, mesh);
+  stl_util::erase(_meshesWithPoseMatrix, mesh);
 }
 
 void Skeleton::_computeTransformMatrices(Float32Array& targetMatrix)
@@ -397,9 +398,8 @@ Skeleton* Skeleton::Parse(const Json::value& parsedSkeleton, Scene* scene)
                                Json::GetString(parsedSkeleton, "id"), scene);
 
   if (parsedSkeleton.contains("dimensionsAtRest")) {
-    skeleton->dimensionsAtRest
-      = std_util::make_unique<Vector3>(Vector3::FromArray(
-        Json::ToArray<float>(parsedSkeleton, "dimensionsAtRest")));
+    skeleton->dimensionsAtRest = std::make_unique<Vector3>(Vector3::FromArray(
+      Json::ToArray<float>(parsedSkeleton, "dimensionsAtRest")));
   }
 
   skeleton->needInitialSkinMatrix

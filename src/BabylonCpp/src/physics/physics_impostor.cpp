@@ -1,5 +1,6 @@
 #include <babylon/physics/physics_impostor.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
@@ -169,7 +170,7 @@ void PhysicsImpostor::setParam(const std::string& paramName, float value)
 
 void PhysicsImpostor::setMass(float mass)
 {
-  if (std_util::almost_equal(getParam("mass"), mass)) {
+  if (stl_util::almost_equal(getParam("mass"), mass)) {
     setParam("mass", mass);
   }
   _physicsEngine->getPhysicsPlugin()->setBodyMass(this, mass);
@@ -323,8 +324,7 @@ PhysicsImpostor::clone(IPhysicsEnabledObject* newObject)
   if (!newObject) {
     return nullptr;
   }
-  return std_util::make_unique<PhysicsImpostor>(newObject, type, _options,
-                                                _scene);
+  return std::make_unique<PhysicsImpostor>(newObject, type, _options, _scene);
 }
 
 void PhysicsImpostor::dispose(bool /*doNotRecurse*/)
@@ -353,7 +353,7 @@ void PhysicsImpostor::setDeltaPosition(const Vector3& position)
 void PhysicsImpostor::setDeltaRotation(const Quaternion& rotation)
 {
   if (!_deltaRotation) {
-    _deltaRotation = std_util::make_unique<Quaternion>();
+    _deltaRotation = std::make_unique<Quaternion>();
   }
   _deltaRotation->copyFrom(rotation);
   _deltaRotationConjugated->copyFrom(_deltaRotation->conjugate());

@@ -1,5 +1,6 @@
 #include <babylon/materials/effect.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
@@ -32,7 +33,7 @@ Effect::Effect(const std::string& baseName, EffectCreationOptions& options,
     , _attributesNames{options.attributes}
     , _indexParameters{options.indexParameters}
 {
-  std_util::concat(_uniformsNames, options.samplers);
+  stl_util::concat(_uniformsNames, options.samplers);
 
   std::string vertexSource   = baseName;
   std::string fragmentSource = baseName;
@@ -70,22 +71,22 @@ Effect::Effect(const std::unordered_map<std::string, std::string>& baseName,
     , _attributesNames{options.attributes}
     , _indexParameters{options.indexParameters}
 {
-  std_util::concat(_uniformsNames, options.samplers);
+  stl_util::concat(_uniformsNames, options.samplers);
 
   std::string vertexSource   = "";
   std::string fragmentSource = "";
 
-  if (std_util::contains(baseName, "vertexElement")) {
+  if (stl_util::contains(baseName, "vertexElement")) {
     vertexSource = baseName.at("vertexElement");
   }
-  else if (std_util::contains(baseName, "vertex")) {
+  else if (stl_util::contains(baseName, "vertex")) {
     vertexSource = baseName.at("vertex");
   }
 
-  if (std_util::contains(baseName, "fragmentElement")) {
+  if (stl_util::contains(baseName, "fragmentElement")) {
     fragmentSource = baseName.at("fragmentElement");
   }
-  else if (std_util::contains(baseName, "fragment")) {
+  else if (stl_util::contains(baseName, "fragment")) {
     fragmentSource = baseName.at("fragment");
   }
 
@@ -150,7 +151,7 @@ int Effect::getAttributeLocation(unsigned int index)
 
 int Effect::getAttributeLocationByName(const std::string& _name)
 {
-  int index = std_util::index_of(_attributesNames, _name);
+  int index = stl_util::index_of(_attributesNames, _name);
 
   return (index != -1) ? _attributes[static_cast<size_t>(index)] : -1;
 }
@@ -162,12 +163,12 @@ size_t Effect::getAttributesCount()
 
 int Effect::getUniformIndex(const std::string& uniformName)
 {
-  return std_util::index_of(_uniformsNames, uniformName);
+  return stl_util::index_of(_uniformsNames, uniformName);
 }
 
 GL::IGLUniformLocation* Effect::getUniform(const std::string& uniformName)
 {
-  if (std_util::contains(_uniforms, uniformName)) {
+  if (stl_util::contains(_uniforms, uniformName)) {
     return _uniforms[uniformName].get();
   }
 
@@ -209,7 +210,7 @@ void Effect::_loadVertexShader(
 
   // Is in local store ?
   const std::string vertexShaderName = vertex + "VertexShader";
-  if (std_util::contains(EffectShadersStore::Shaders, vertexShaderName)) {
+  if (stl_util::contains(EffectShadersStore::Shaders, vertexShaderName)) {
     callback(std::string(EffectShadersStore::Shaders[vertexShaderName]));
     return;
   }
@@ -241,13 +242,13 @@ void Effect::_loadFragmentShader(
 
   // Is in local store ?
   std::string fragmentShaderName = fragment + "PixelShader";
-  if (std_util::contains(EffectShadersStore::Shaders, fragmentShaderName)) {
+  if (stl_util::contains(EffectShadersStore::Shaders, fragmentShaderName)) {
     callback(std::string(EffectShadersStore::Shaders[fragmentShaderName]));
     return;
   }
 
   fragmentShaderName = fragment + "FragmentShader";
-  if (std_util::contains(EffectShadersStore::Shaders, fragmentShaderName)) {
+  if (stl_util::contains(EffectShadersStore::Shaders, fragmentShaderName)) {
     callback(std::string(EffectShadersStore::Shaders[fragmentShaderName]));
     return;
   }
@@ -348,7 +349,7 @@ void Effect::_processIncludes(
       continue;
     }
 
-    if (std_util::contains(EffectIncludesShadersStore::Shaders, includeFile)) {
+    if (stl_util::contains(EffectIncludesShadersStore::Shaders, includeFile)) {
       // Substitution
       auto includeContent = EffectIncludesShadersStore::Shaders[includeFile];
       // Instanced includes
@@ -366,7 +367,7 @@ void Effect::_processIncludes(
             std::ostringstream includeContentStream;
 
             if ((!String::isDigit(maxIndex))
-                && std_util::contains(_indexParameters, maxIndex)) {
+                && stl_util::contains(_indexParameters, maxIndex)) {
               maxIndex = std::to_string(_indexParameters[maxIndex]);
             }
 
@@ -485,41 +486,41 @@ bool Effect::isSupported() const
 
 void Effect::_bindTexture(const std::string& channel, GL::IGLTexture* texture)
 {
-  _engine->_bindTexture(std_util::index_of(_samplers, channel), texture);
+  _engine->_bindTexture(stl_util::index_of(_samplers, channel), texture);
 }
 
 void Effect::setTexture(const std::string& channel, BaseTexture* texture)
 {
-  _engine->setTexture(std_util::index_of(_samplers, channel),
+  _engine->setTexture(stl_util::index_of(_samplers, channel),
                       getUniform(channel), texture);
 }
 
 void Effect::setTextureArray(const std::string& channel,
                              const std::vector<BaseTexture*>& textures)
 {
-  if (std_util::index_of(_samplers, channel + "Ex") == -1) {
-    int initialPos = std_util::index_of(_samplers, channel);
+  if (stl_util::index_of(_samplers, channel + "Ex") == -1) {
+    int initialPos = stl_util::index_of(_samplers, channel);
     for (unsigned int index = 1; index < textures.size(); ++index) {
-      std_util::splice(_samplers, initialPos + static_cast<int>(index), 0,
+      stl_util::splice(_samplers, initialPos + static_cast<int>(index), 0,
                        {channel + "Ex"});
     }
   }
 
-  _engine->setTextureArray(std_util::index_of(_samplers, channel),
+  _engine->setTextureArray(stl_util::index_of(_samplers, channel),
                            getUniform(channel), textures);
 }
 
 void Effect::setTextureFromPostProcess(const std::string& channel,
                                        PostProcess* postProcess)
 {
-  _engine->setTextureFromPostProcess(std_util::index_of(_samplers, channel),
+  _engine->setTextureFromPostProcess(stl_util::index_of(_samplers, channel),
                                      postProcess);
 }
 
 bool Effect::_cacheMatrix(const std::string& uniformName, const Matrix& matrix)
 {
   auto flag = matrix.updateFlag;
-  if (std_util::contains(_valueCache, uniformName)
+  if (stl_util::contains(_valueCache, uniformName)
       && !_valueCache[uniformName].empty()
       && static_cast<int>(_valueCache[uniformName][0]) == flag) {
     return false;
@@ -532,18 +533,18 @@ bool Effect::_cacheMatrix(const std::string& uniformName, const Matrix& matrix)
 
 bool Effect::_cacheFloat2(const std::string& uniformName, float x, float y)
 {
-  if (!std_util::contains(_valueCache, uniformName)) {
+  if (!stl_util::contains(_valueCache, uniformName)) {
     _valueCache[uniformName] = {x, y};
     return true;
   }
 
   bool changed = false;
   auto& cache  = _valueCache[uniformName];
-  if (!std_util::almost_equal(cache[0], x)) {
+  if (!stl_util::almost_equal(cache[0], x)) {
     cache[0] = x;
     changed  = true;
   }
-  if (!std_util::almost_equal(cache[1], y)) {
+  if (!stl_util::almost_equal(cache[1], y)) {
     cache[1] = y;
     changed  = true;
   }
@@ -554,22 +555,22 @@ bool Effect::_cacheFloat2(const std::string& uniformName, float x, float y)
 bool Effect::_cacheFloat3(const std::string& uniformName, float x, float y,
                           float z)
 {
-  if (!std_util::contains(_valueCache, uniformName)) {
+  if (!stl_util::contains(_valueCache, uniformName)) {
     _valueCache[uniformName] = {x, y, z};
     return true;
   }
 
   bool changed = false;
   auto& cache  = _valueCache[uniformName];
-  if (!std_util::almost_equal(cache[0], x)) {
+  if (!stl_util::almost_equal(cache[0], x)) {
     cache[0] = x;
     changed  = true;
   }
-  if (!std_util::almost_equal(cache[1], y)) {
+  if (!stl_util::almost_equal(cache[1], y)) {
     cache[1] = y;
     changed  = true;
   }
-  if (!std_util::almost_equal(cache[2], z)) {
+  if (!stl_util::almost_equal(cache[2], z)) {
     cache[2] = z;
     changed  = true;
   }
@@ -580,26 +581,26 @@ bool Effect::_cacheFloat3(const std::string& uniformName, float x, float y,
 bool Effect::_cacheFloat4(const std::string& uniformName, float x, float y,
                           float z, float w)
 {
-  if (!std_util::contains(_valueCache, uniformName)) {
+  if (!stl_util::contains(_valueCache, uniformName)) {
     _valueCache[uniformName] = {x, y, z, w};
     return true;
   }
 
   bool changed = false;
   auto& cache  = _valueCache[uniformName];
-  if (!std_util::almost_equal(cache[0], x)) {
+  if (!stl_util::almost_equal(cache[0], x)) {
     cache[0] = x;
     changed  = true;
   }
-  if (!std_util::almost_equal(cache[1], y)) {
+  if (!stl_util::almost_equal(cache[1], y)) {
     cache[1] = y;
     changed  = true;
   }
-  if (!std_util::almost_equal(cache[2], z)) {
+  if (!stl_util::almost_equal(cache[2], z)) {
     cache[2] = z;
     changed  = true;
   }
-  if (!std_util::almost_equal(cache[3], w)) {
+  if (!stl_util::almost_equal(cache[3], w)) {
     cache[3] = w;
     changed  = true;
   }
@@ -609,8 +610,8 @@ bool Effect::_cacheFloat4(const std::string& uniformName, float x, float y,
 
 void Effect::bindUniformBuffer(GL::IGLBuffer* _buffer, const std::string& name)
 {
-  if (std_util::contains(_uniformBuffersNames, name)) {
-    if (std_util::contains(Effect::_baseCache, _uniformBuffersNames[name])
+  if (stl_util::contains(_uniformBuffersNames, name)) {
+    if (stl_util::contains(Effect::_baseCache, _uniformBuffersNames[name])
         && Effect::_baseCache[_uniformBuffersNames[name]] == _buffer) {
       return;
     }
@@ -774,8 +775,8 @@ Effect& Effect::setMatrix2x2(const std::string& uniformName,
 
 Effect& Effect::setFloat(const std::string& uniformName, float value)
 {
-  if (std_util::contains(_valueCache, uniformName)
-      && std_util::almost_equal(_valueCache[uniformName][0], value)) {
+  if (stl_util::contains(_valueCache, uniformName)
+      && stl_util::almost_equal(_valueCache[uniformName][0], value)) {
     return *this;
   }
 
@@ -788,8 +789,8 @@ Effect& Effect::setFloat(const std::string& uniformName, float value)
 
 Effect& Effect::setBool(const std::string& uniformName, bool _bool)
 {
-  if (std_util::contains(_valueCache, uniformName)
-      && std_util::almost_equal(_valueCache[uniformName][0],
+  if (stl_util::contains(_valueCache, uniformName)
+      && stl_util::almost_equal(_valueCache[uniformName][0],
                                 _bool ? 1.f : 0.f)) {
     return *this;
   }

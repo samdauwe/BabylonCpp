@@ -1,5 +1,6 @@
 #include <babylon/debug/skeleton_viewer.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/engine/scene.h>
@@ -59,8 +60,8 @@ void SkeletonViewer::_getBonePosition(Vector3& position, Bone* bone,
   auto parentBone = bone->getParent();
   tmat.copyFrom(bone->getLocalMatrix());
 
-  if (!std_util::almost_equal(x, 0.f) || !std_util::almost_equal(y, 0.f)
-      || !std_util::almost_equal(z, 0.f)) {
+  if (!stl_util::almost_equal(x, 0.f) || !stl_util::almost_equal(y, 0.f)
+      || !stl_util::almost_equal(z, 0.f)) {
     auto& tmat2 = Tmp::MatrixArray[1];
     Matrix::IdentityToRef(tmat2);
     tmat2.m[12] = x;

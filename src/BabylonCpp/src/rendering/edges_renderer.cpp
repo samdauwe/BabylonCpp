@@ -317,9 +317,9 @@ void EdgesRenderer::_generateEdgesLines()
   // Merge into a single mesh
   auto engine = _source->getScene()->getEngine();
 
-  _buffers[VertexBuffer::PositionKind] = std_util::make_unique<VertexBuffer>(
+  _buffers[VertexBuffer::PositionKind] = std::make_unique<VertexBuffer>(
     engine, _linesPositions, VertexBuffer::PositionKind, false);
-  _buffers[VertexBuffer::NormalKind] = std_util::make_unique<VertexBuffer>(
+  _buffers[VertexBuffer::NormalKind] = std::make_unique<VertexBuffer>(
     engine, _linesNormals, VertexBuffer::NormalKind, false, false, 4);
   _bufferPtrs[VertexBuffer::PositionKindChars]
     = _buffers[VertexBuffer::PositionKind].get();

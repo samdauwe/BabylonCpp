@@ -1,5 +1,6 @@
 #include <babylon/lensflare/lens_flare_system.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/collisions/picking_info.h>
 #include <babylon/culling/ray.h>
@@ -39,7 +40,7 @@ LensFlareSystem::LensFlareSystem(const std::string iName, Mesh* emitter,
                            1.f,  -1.f};
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
-    = std_util::make_unique<VertexBuffer>(
+    = std::make_unique<VertexBuffer>(
       engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   // Indices
@@ -291,7 +292,7 @@ bool LensFlareSystem::render()
 
 void LensFlareSystem::dispose(bool /*doNotRecurse*/)
 {
-  if (std_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)) {
+  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)) {
     auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKindChars];
     if (vertexBuffer) {
       vertexBuffer->dispose();

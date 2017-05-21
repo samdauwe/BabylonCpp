@@ -213,7 +213,7 @@ void ManipulatorInteractionHelper::doRot(const Vector2& rayPos)
 void ManipulatorInteractionHelper::doPos(const Vector2& rayPos)
 {
   auto v        = Vector3::Zero();
-  auto identity = std_util::make_unique<Matrix>(Matrix::Identity());
+  auto identity = std::make_unique<Matrix>(Matrix::Identity());
   auto ray      = _scene->createPickingRay(static_cast<int>(rayPos.x),
                                       static_cast<int>(rayPos.y),
                                       identity.get(), _scene->activeCamera);
@@ -502,9 +502,9 @@ void ManipulatorInteractionHelper::renderManipulator()
 float ManipulatorInteractionHelper::fromScreenToWorld(float l, float z)
 {
   auto camera   = _scene->activeCamera;
-  auto identity = std_util::make_unique<Matrix>(Matrix::Identity());
+  auto identity = std::make_unique<Matrix>(Matrix::Identity());
   auto r0       = _scene->createPickingRay(0, 0, identity.get(), camera, true);
-  identity      = std_util::make_unique<Matrix>(Matrix::Identity());
+  identity      = std::make_unique<Matrix>(Matrix::Identity());
   auto r1 = _scene->createPickingRay(static_cast<int>(l), 0, identity.get(),
                                      camera, true);
 

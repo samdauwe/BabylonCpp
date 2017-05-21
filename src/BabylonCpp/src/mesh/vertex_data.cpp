@@ -1,5 +1,6 @@
 #include <babylon/mesh/vertex_data.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/math/axis.h>
@@ -311,20 +312,20 @@ VertexData& VertexData::merge(VertexData* other)
     }
   }
 
-  std_util::concat(positions, other->positions);
-  std_util::concat(normals, other->normals);
-  std_util::concat(tangents, other->tangents);
-  std_util::concat(uvs, other->uvs);
-  std_util::concat(uvs2, other->uvs2);
-  std_util::concat(uvs3, other->uvs3);
-  std_util::concat(uvs4, other->uvs4);
-  std_util::concat(uvs5, other->uvs5);
-  std_util::concat(uvs6, other->uvs6);
-  std_util::concat(colors, other->colors);
-  std_util::concat(matricesIndices, other->matricesIndices);
-  std_util::concat(matricesWeights, other->matricesWeights);
-  std_util::concat(matricesIndicesExtra, other->matricesIndicesExtra);
-  std_util::concat(matricesWeightsExtra, other->matricesWeightsExtra);
+  stl_util::concat(positions, other->positions);
+  stl_util::concat(normals, other->normals);
+  stl_util::concat(tangents, other->tangents);
+  stl_util::concat(uvs, other->uvs);
+  stl_util::concat(uvs2, other->uvs2);
+  stl_util::concat(uvs3, other->uvs3);
+  stl_util::concat(uvs4, other->uvs4);
+  stl_util::concat(uvs5, other->uvs5);
+  stl_util::concat(uvs6, other->uvs6);
+  stl_util::concat(colors, other->colors);
+  stl_util::concat(matricesIndices, other->matricesIndices);
+  stl_util::concat(matricesWeights, other->matricesWeights);
+  stl_util::concat(matricesIndicesExtra, other->matricesIndicesExtra);
+  stl_util::concat(matricesWeightsExtra, other->matricesWeightsExtra);
 
   return *this;
 }
@@ -350,7 +351,7 @@ std::unique_ptr<VertexData>
 VertexData::_ExtractFrom(IGetSetVerticesData* meshOrGeometry,
                          bool copyWhenShared)
 {
-  auto result = std_util::make_unique<VertexData>();
+  auto result = std::make_unique<VertexData>();
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::PositionKind)) {
     result->positions = meshOrGeometry->getVerticesData(
@@ -501,7 +502,7 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
 
     j = 0;
     while (j < l) {
-      std_util::concat(positions, {path[j].x, path[j].y, path[j].z});
+      stl_util::concat(positions, {path[j].x, path[j].y, path[j].z});
       if (j > 0) {
         vectlg = path[j].subtract(path[j - 1]).length();
         dist   = vectlg + uTotalDistance[p];
@@ -513,7 +514,7 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
 
     if (closePath) { // an extra hidden vertex is added in the "positions" array
       --j;
-      std_util::concat(positions, {path[0].x, path[0].y, path[0].z});
+      stl_util::concat(positions, {path[0].x, path[0].y, path[0].z});
       vectlg = path[j].subtract(path[0]).length();
       dist   = vectlg + uTotalDistance[p];
       us[p].emplace_back(dist);
@@ -566,7 +567,7 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   float v;
   if (!customUV.empty()) {
     for (const auto& customUVi : customUV) {
-      std_util::concat(uvs, {customUVi.x, customUVi.y});
+      stl_util::concat(uvs, {customUVi.x, customUVi.y});
     }
   }
   else {
@@ -575,10 +576,10 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
         u = (uTotalDistance[p] != 0.f) ? us[p][i] / uTotalDistance[p] : 0.f;
         v = (vTotalDistance[i] != 0.f) ? vs[i][p] / vTotalDistance[i] : 0.f;
         if (invertUV) {
-          std_util::concat(uvs, {v, u});
+          stl_util::concat(uvs, {v, u});
         }
         else {
-          std_util::concat(uvs, {u, v});
+          stl_util::concat(uvs, {u, v});
         }
       }
     }
@@ -598,8 +599,8 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
     //  stay under min and don't go over next to last path
     // draw two triangles between path1 (p1) and path2 (p2) : (p1.pi, p2.pi,
     // p1.pi+1) and (p2.pi+1, p1.pi+1, p2.pi) clockwise
-    std_util::concat(indices, {pi, pi + shft, pi + 1});
-    std_util::concat(indices, {pi + shft + 1, pi + 1, pi + shft});
+    stl_util::concat(indices, {pi, pi + shft, pi + 1});
+    stl_util::concat(indices, {pi + shft + 1, pi + 1, pi + shft});
     pi += 1;
     if (pi == min) {
       // if end of one of two consecutive paths reached, go to next existing
@@ -663,7 +664,7 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   }
 
   // Result
-  auto vertexData = std_util::make_unique<VertexData>();
+  auto vertexData = std::make_unique<VertexData>();
 
   vertexData->indices   = std::move(indices);
   vertexData->positions = std::move(positions);
@@ -728,38 +729,38 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
 
     // Four vertices per face.
     auto vertex = normal.subtract(side1).subtract(side2).multiply(scaleVector);
-    std_util::concat(positions, {vertex.x, vertex.y, vertex.z});
-    std_util::concat(normals, {normal.x, normal.y, normal.z});
-    std_util::concat(uvs, {faceUV[index].z, faceUV[index].w});
+    stl_util::concat(positions, {vertex.x, vertex.y, vertex.z});
+    stl_util::concat(normals, {normal.x, normal.y, normal.z});
+    stl_util::concat(uvs, {faceUV[index].z, faceUV[index].w});
     if (!faceColors.empty()) {
-      std_util::concat(colors, {faceColors[index].r, faceColors[index].g,
+      stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
                                 faceColors[index].b, faceColors[index].a});
     }
 
     vertex = normal.subtract(side1).add(side2).multiply(scaleVector);
-    std_util::concat(positions, {vertex.x, vertex.y, vertex.z});
-    std_util::concat(normals, {normal.x, normal.y, normal.z});
-    std_util::concat(uvs, {faceUV[index].x, faceUV[index].w});
+    stl_util::concat(positions, {vertex.x, vertex.y, vertex.z});
+    stl_util::concat(normals, {normal.x, normal.y, normal.z});
+    stl_util::concat(uvs, {faceUV[index].x, faceUV[index].w});
     if (!faceColors.empty()) {
-      std_util::concat(colors, {faceColors[index].r, faceColors[index].g,
+      stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
                                 faceColors[index].b, faceColors[index].a});
     }
 
     vertex = normal.add(side1).add(side2).multiply(scaleVector);
-    std_util::concat(positions, {vertex.x, vertex.y, vertex.z});
-    std_util::concat(normals, {normal.x, normal.y, normal.z});
-    std_util::concat(uvs, {faceUV[index].x, faceUV[index].y});
+    stl_util::concat(positions, {vertex.x, vertex.y, vertex.z});
+    stl_util::concat(normals, {normal.x, normal.y, normal.z});
+    stl_util::concat(uvs, {faceUV[index].x, faceUV[index].y});
     if (!faceColors.empty()) {
-      std_util::concat(colors, {faceColors[index].r, faceColors[index].g,
+      stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
                                 faceColors[index].b, faceColors[index].a});
     }
 
     vertex = normal.add(side1).subtract(side2).multiply(scaleVector);
-    std_util::concat(positions, {vertex.x, vertex.y, vertex.z});
-    std_util::concat(normals, {normal.x, normal.y, normal.z});
-    std_util::concat(uvs, {faceUV[index].z, faceUV[index].y});
+    stl_util::concat(positions, {vertex.x, vertex.y, vertex.z});
+    stl_util::concat(normals, {normal.x, normal.y, normal.z});
+    stl_util::concat(uvs, {faceUV[index].z, faceUV[index].y});
     if (!faceColors.empty()) {
-      std_util::concat(colors, {faceColors[index].r, faceColors[index].g,
+      stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
                                 faceColors[index].b, faceColors[index].a});
     }
   }
@@ -768,7 +769,7 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
   VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
 
   // Result
-  auto vertexData = std_util::make_unique<VertexData>();
+  auto vertexData = std::make_unique<VertexData>();
 
   vertexData->indices   = std::move(indices);
   vertexData->positions = std::move(positions);
@@ -826,9 +827,9 @@ std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
       auto vertex = complete.multiply(radius);
       auto normal = complete.divide(radius).normalize();
 
-      std_util::concat(positions, {vertex.x, vertex.y, vertex.z});
-      std_util::concat(normals, {normal.x, normal.y, normal.z});
-      std_util::concat(uvs, {normalizedY, normalizedZ});
+      stl_util::concat(positions, {vertex.x, vertex.y, vertex.z});
+      stl_util::concat(normals, {normal.x, normal.y, normal.z});
+      stl_util::concat(uvs, {normalizedY, normalizedZ});
     }
 
     if (zRotationStep > 0) {
@@ -853,7 +854,7 @@ std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
   VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
 
   // Result
-  auto vertexData = std_util::make_unique<VertexData>();
+  auto vertexData = std::make_unique<VertexData>();
 
   vertexData->indices   = std::move(indices);
   vertexData->positions = std::move(positions);
@@ -940,7 +941,7 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
         ringVertex.y = -height / 2.f + h * height;
         ringVertex.z = std::sin(-angle) * radius;
 
-        if (std_util::almost_equal(diameterTop, 0.f) && i == subdivisions) {
+        if (stl_util::almost_equal(diameterTop, 0.f) && i == subdivisions) {
           // if no top cap, reuse former normals
           ringNormal.x = normals[normals.size() - (tessellation + 1) * 3 + 0];
           ringNormal.y = normals[normals.size() - (tessellation + 1) * 3 + 1];
@@ -961,39 +962,39 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
           ringFirstNormal.copyFrom(ringNormal);
         }
 
-        std_util::concat(positions, {ringVertex.x, ringVertex.y, ringVertex.z});
-        std_util::concat(normals, {ringNormal.x, ringNormal.y, ringNormal.z});
+        stl_util::concat(positions, {ringVertex.x, ringVertex.y, ringVertex.z});
+        stl_util::concat(normals, {ringNormal.x, ringNormal.y, ringNormal.z});
         if (hasRings) {
           v = (cs != s) ? faceUV[s].y : faceUV[s].w;
         }
         else {
           v = faceUV[s].y + (faceUV[s].w - faceUV[s].y) * h;
         }
-        std_util::concat(uvs, {faceUV[s].x
+        stl_util::concat(uvs, {faceUV[s].x
                                  + (faceUV[s].z - faceUV[s].x)
                                      * static_cast<float>(j)
                                      / static_cast<float>(tessellation),
                                v});
         if (!faceColors.empty()) {
-          std_util::concat(colors, {faceColors[s].r, faceColors[s].g,
+          stl_util::concat(colors, {faceColors[s].r, faceColors[s].g,
                                     faceColors[s].b, faceColors[s].a});
         }
       }
 
       // if enclose, add four vertices and their dedicated normals
-      if (!std_util::almost_equal(arc, 1.f) && enclose) {
-        std_util::concat(positions, {ringVertex.x, ringVertex.y, ringVertex.z});
-        std_util::concat(positions, {0.f, ringVertex.y, 0.f});
-        std_util::concat(positions, {0.f, ringVertex.y, 0.f});
-        std_util::concat(
+      if (!stl_util::almost_equal(arc, 1.f) && enclose) {
+        stl_util::concat(positions, {ringVertex.x, ringVertex.y, ringVertex.z});
+        stl_util::concat(positions, {0.f, ringVertex.y, 0.f});
+        stl_util::concat(positions, {0.f, ringVertex.y, 0.f});
+        stl_util::concat(
           positions, {ringFirstVertex.x, ringFirstVertex.y, ringFirstVertex.z});
         Vector3::CrossToRef(Y, ringNormal, quadNormal);
         quadNormal.normalize();
-        std_util::concat(normals, {quadNormal.x, quadNormal.y, quadNormal.z,
+        stl_util::concat(normals, {quadNormal.x, quadNormal.y, quadNormal.z,
                                    quadNormal.x, quadNormal.y, quadNormal.z});
         Vector3::CrossToRef(ringFirstNormal, Y, quadNormal);
         quadNormal.normalize();
-        std_util::concat(normals, {quadNormal.x, quadNormal.y, quadNormal.z,
+        stl_util::concat(normals, {quadNormal.x, quadNormal.y, quadNormal.z,
                                    quadNormal.x, quadNormal.y, quadNormal.z});
         if (hasRings) {
           v = (cs != s) ? faceUV[s + 1].y : faceUV[s + 1].w;
@@ -1001,24 +1002,24 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
         else {
           v = faceUV[s + 1].y + (faceUV[s + 1].w - faceUV[s + 1].y) * h;
         }
-        std_util::concat(uvs, {faceUV[s + 1].x, v});
-        std_util::concat(uvs, {faceUV[s + 1].z, v});
+        stl_util::concat(uvs, {faceUV[s + 1].x, v});
+        stl_util::concat(uvs, {faceUV[s + 1].z, v});
         if (hasRings) {
           v = (cs != s) ? faceUV[s + 2].y : faceUV[s + 2].w;
         }
         else {
           v = faceUV[s + 2].y + (faceUV[s + 2].w - faceUV[s + 2].y) * h;
         }
-        std_util::concat(uvs, {faceUV[s + 2].x, v});
-        std_util::concat(uvs, {faceUV[s + 2].z, v});
+        stl_util::concat(uvs, {faceUV[s + 2].x, v});
+        stl_util::concat(uvs, {faceUV[s + 2].z, v});
         if (!faceColors.empty()) {
-          std_util::concat(colors, {faceColors[s + 1].r, faceColors[s + 1].g,
+          stl_util::concat(colors, {faceColors[s + 1].r, faceColors[s + 1].g,
                                     faceColors[s + 1].b, faceColors[s + 1].a});
-          std_util::concat(colors, {faceColors[s + 1].r, faceColors[s + 1].g,
+          stl_util::concat(colors, {faceColors[s + 1].r, faceColors[s + 1].g,
                                     faceColors[s + 1].b, faceColors[s + 1].a});
-          std_util::concat(colors, {faceColors[s + 2].r, faceColors[s + 2].g,
+          stl_util::concat(colors, {faceColors[s + 2].r, faceColors[s + 2].g,
                                     faceColors[s + 2].b, faceColors[s + 2].a});
-          std_util::concat(colors, {faceColors[s + 2].r, faceColors[s + 2].g,
+          stl_util::concat(colors, {faceColors[s + 2].r, faceColors[s + 2].g,
                                     faceColors[s + 2].b, faceColors[s + 2].a});
         }
       }
@@ -1030,7 +1031,7 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
 
   // indices
   // correction of number of iteration if enclose
-  unsigned int e = (!std_util::almost_equal(arc, 1.f) && enclose) ?
+  unsigned int e = (!stl_util::almost_equal(arc, 1.f) && enclose) ?
                      tessellation + 4 :
                      tessellation;
   i = 0;
@@ -1041,15 +1042,15 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
       i1 = (i + 1) * (e + 1) + j;
       i2 = i * (e + 1) + (j + 1);
       i3 = (i + 1) * (e + 1) + (j + 1);
-      std_util::concat(indices, {i0, i1, i2});
-      std_util::concat(indices, {i3, i2, i1});
+      stl_util::concat(indices, {i0, i1, i2});
+      stl_util::concat(indices, {i3, i2, i1});
     }
-    if (!std_util::almost_equal(arc, 1.f) && enclose) {
+    if (!stl_util::almost_equal(arc, 1.f) && enclose) {
       // if enclose, add two quads
-      std_util::concat(indices, {i0 + 2, i1 + 2, i2 + 2});
-      std_util::concat(indices, {i3 + 2, i2 + 2, i1 + 2});
-      std_util::concat(indices, {i0 + 4, i1 + 4, i2 + 4});
-      std_util::concat(indices, {i3 + 4, i2 + 4, i1 + 4});
+      stl_util::concat(indices, {i0 + 2, i1 + 2, i2 + 2});
+      stl_util::concat(indices, {i3 + 2, i2 + 2, i1 + 2});
+      stl_util::concat(indices, {i0 + 4, i1 + 4, i2 + 4});
+      stl_util::concat(indices, {i3 + 4, i2 + 4, i1 + 4});
     }
     i = (hasRings) ? (i + 2) : (i + 1);
   }
@@ -1057,7 +1058,7 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
   // Caps
   auto createCylinderCap = [&](bool isTop) -> void {
     float _radius = isTop ? diameterTop / 2.f : diameterBottom / 2.f;
-    if (std_util::almost_equal(_radius, 0.f)) {
+    if (stl_util::almost_equal(_radius, 0.f)) {
       return;
     }
 
@@ -1074,11 +1075,11 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
     uint32_t vbase = static_cast<uint32_t>(positions.size() / 3);
     float offset   = isTop ? height / 2.f : -height / 2.f;
     Vector3 center(0.f, offset, 0.f);
-    std_util::concat(positions, {center.x, center.y, center.z});
-    std_util::concat(normals, {0, isTop ? 1.f : -1.f, 0.f});
-    std_util::concat(uvs, {u.x + (u.z - u.x) * 0.5f, u.y + (u.w - u.y) * 0.5f});
+    stl_util::concat(positions, {center.x, center.y, center.z});
+    stl_util::concat(normals, {0, isTop ? 1.f : -1.f, 0.f});
+    stl_util::concat(uvs, {u.x + (u.z - u.x) * 0.5f, u.y + (u.w - u.y) * 0.5f});
     if (!faceColors.empty()) {
-      std_util::concat(colors, {c.r, c.g, c.b, c.a});
+      stl_util::concat(colors, {c.r, c.g, c.b, c.a});
     }
 
     Vector2 textureScale(0.5f, 0.5f);
@@ -1090,13 +1091,13 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
       circleVector = Vector3(_cos * _radius, offset, _sin * _radius);
       textureCoordinate
         = Vector2(_cos * textureScale.x + 0.5f, _sin * textureScale.y + 0.5f);
-      std_util::concat(positions,
+      stl_util::concat(positions,
                        {circleVector.x, circleVector.y, circleVector.z});
-      std_util::concat(normals, {0.f, isTop ? 1.f : -1.f, 0.f});
-      std_util::concat(uvs, {u.x + (u.z - u.x) * textureCoordinate.x,
+      stl_util::concat(normals, {0.f, isTop ? 1.f : -1.f, 0.f});
+      stl_util::concat(uvs, {u.x + (u.z - u.x) * textureCoordinate.x,
                              u.y + (u.w - u.y) * textureCoordinate.y});
       if (!faceColors.empty()) {
-        std_util::concat(colors, {c.r, c.g, c.b, c.a});
+        stl_util::concat(colors, {c.r, c.g, c.b, c.a});
       }
     }
     // Cap indices
@@ -1121,7 +1122,7 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
   // Sides
   VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
 
-  auto vertexData = std_util::make_unique<VertexData>();
+  auto vertexData = std::make_unique<VertexData>();
 
   vertexData->indices   = std::move(indices);
   vertexData->positions = std::move(positions);
@@ -1176,9 +1177,9 @@ std::unique_ptr<VertexData> VertexData::CreateTorus(TorusOptions& options)
       position = Vector3::TransformCoordinates(position, transform);
       normal   = Vector3::TransformNormal(normal, transform);
 
-      std_util::concat(positions, {position.x, position.y, position.z});
-      std_util::concat(normals, {normal.x, normal.y, normal.z});
-      std_util::concat(uvs, {textureCoordinate.x, textureCoordinate.y});
+      stl_util::concat(positions, {position.x, position.y, position.z});
+      stl_util::concat(normals, {normal.x, normal.y, normal.z});
+      stl_util::concat(uvs, {textureCoordinate.x, textureCoordinate.y});
 
       // And create indices for two triangles.
       unsigned int nextI = (i + 1) % stride;
@@ -1198,7 +1199,7 @@ std::unique_ptr<VertexData> VertexData::CreateTorus(TorusOptions& options)
   VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
 
   // Result
-  auto vertexData = std_util::make_unique<VertexData>();
+  auto vertexData = std::make_unique<VertexData>();
 
   vertexData->indices   = std::move(indices);
   vertexData->positions = std::move(positions);
@@ -1218,7 +1219,7 @@ VertexData::CreateLineSystem(LineSystemOptions& options)
 
   for (const auto& points : lines) {
     for (size_t index = 0; index < points.size(); ++index) {
-      std_util::concat(positions,
+      stl_util::concat(positions,
                        {points[index].x, points[index].y, points[index].z});
 
       if (index > 0) {
@@ -1230,7 +1231,7 @@ VertexData::CreateLineSystem(LineSystemOptions& options)
   }
 
   // Result
-  auto vertexData = std_util::make_unique<VertexData>();
+  auto vertexData = std::make_unique<VertexData>();
 
   vertexData->indices   = std::move(indices);
   vertexData->positions = std::move(positions);
@@ -1269,20 +1270,20 @@ VertexData::CreateDashedLines(DashedLinesOptions& options)
     curvect.normalize();
     for (float j = 0.f; j < nb; ++j) {
       curshft = shft * j;
-      std_util::concat(positions, {points[i].x + curshft * curvect.x,
+      stl_util::concat(positions, {points[i].x + curshft * curvect.x,
                                    points[i].y + curshft * curvect.y,
                                    points[i].z + curshft * curvect.z});
-      std_util::concat(positions,
+      stl_util::concat(positions,
                        {points[i].x + (curshft + dashshft) * curvect.x,
                         points[i].y + (curshft + dashshft) * curvect.y,
                         points[i].z + (curshft + dashshft) * curvect.z});
-      std_util::concat(indices, {idx, idx + 1});
+      stl_util::concat(indices, {idx, idx + 1});
       idx += 2;
     }
   }
 
   // Result
-  auto vertexData       = std_util::make_unique<VertexData>();
+  auto vertexData       = std::make_unique<VertexData>();
   vertexData->positions = std::move(positions);
   vertexData->indices   = std::move(indices);
 
@@ -1320,9 +1321,9 @@ std::unique_ptr<VertexData> VertexData::CreateGround(GroundOptions& options)
       Vector3 position(x, y, z);
       Vector3 normal(0.f, 1.f, 0.f);
 
-      std_util::concat(positions, {position.x, position.y, position.z});
-      std_util::concat(normals, {normal.x, normal.y, normal.z});
-      std_util::concat(uvs,
+      stl_util::concat(positions, {position.x, position.y, position.z});
+      stl_util::concat(normals, {normal.x, normal.y, normal.z});
+      stl_util::concat(uvs,
                        {colf / subdivisionsXf, 1.f - rowf / subdivisionsYf});
     }
   }
@@ -1340,7 +1341,7 @@ std::unique_ptr<VertexData> VertexData::CreateGround(GroundOptions& options)
   }
 
   // Result
-  auto vertexData = std_util::make_unique<VertexData>();
+  auto vertexData = std::make_unique<VertexData>();
 
   vertexData->indices   = std::move(indices);
   vertexData->positions = std::move(positions);
@@ -1417,9 +1418,9 @@ VertexData::CreateTiledGround(TiledGroundOptions& options)
                 + xTileMin;
             position.y = 0.f;
 
-            std_util::concat(positions, {position.x, position.y, position.z});
-            std_util::concat(normals, {normal.x, normal.y, normal.z});
-            std_util::concat(uvs, {colf / static_cast<float>(precision_w),
+            stl_util::concat(positions, {position.x, position.y, position.z});
+            stl_util::concat(normals, {normal.x, normal.y, normal.z});
+            stl_util::concat(uvs, {colf / static_cast<float>(precision_w),
                                    rowf / static_cast<float>(precision_h)});
           }
         }
@@ -1437,7 +1438,7 @@ VertexData::CreateTiledGround(TiledGroundOptions& options)
   }
 
   // Result
-  auto vertexData = std_util::make_unique<VertexData>();
+  auto vertexData = std::make_unique<VertexData>();
 
   vertexData->indices   = std::move(indices);
   vertexData->positions = std::move(positions);
@@ -1496,9 +1497,9 @@ VertexData::CreateGroundFromHeightMap(GroundFromHeightMapOptions& options)
       position.y = minHeight + (maxHeight - minHeight) * gradient;
 
       // Add  vertex
-      std_util::concat(positions, {position.x, position.y, position.z});
-      std_util::concat(normals, {0.f, 0.f, 0.f});
-      std_util::concat(uvs, {colf / subdivisionsf, 1.f - rowf / subdivisionsf});
+      stl_util::concat(positions, {position.x, position.y, position.z});
+      stl_util::concat(normals, {0.f, 0.f, 0.f});
+      stl_util::concat(uvs, {colf / subdivisionsf, 1.f - rowf / subdivisionsf});
     }
   }
 
@@ -1519,7 +1520,7 @@ VertexData::CreateGroundFromHeightMap(GroundFromHeightMapOptions& options)
   VertexData::ComputeNormals(positions, indices, normals);
 
   // Result
-  auto vertexData = std_util::make_unique<VertexData>();
+  auto vertexData = std::make_unique<VertexData>();
 
   vertexData->indices   = std::move(indices);
   vertexData->positions = std::move(positions);
@@ -1540,21 +1541,21 @@ std::unique_ptr<VertexData> VertexData::CreatePlane(PlaneOptions& options)
   float halfWidth  = options.width / 2.f;
   float halfHeight = options.height / 2.f;
 
-  std_util::concat(positions, {-halfWidth, -halfHeight, 0.f});
-  std_util::concat(normals, {0.f, 0.f, -1.f});
-  std_util::concat(uvs, {0.f, 0.f});
+  stl_util::concat(positions, {-halfWidth, -halfHeight, 0.f});
+  stl_util::concat(normals, {0.f, 0.f, -1.f});
+  stl_util::concat(uvs, {0.f, 0.f});
 
-  std_util::concat(positions, {halfWidth, -halfHeight, 0.f});
-  std_util::concat(normals, {0.f, 0.f, -1.f});
-  std_util::concat(uvs, {1.f, 0.f});
+  stl_util::concat(positions, {halfWidth, -halfHeight, 0.f});
+  stl_util::concat(normals, {0.f, 0.f, -1.f});
+  stl_util::concat(uvs, {1.f, 0.f});
 
-  std_util::concat(positions, {halfWidth, halfHeight, 0.f});
-  std_util::concat(normals, {0.f, 0.f, -1.f});
-  std_util::concat(uvs, {1.f, 1.f});
+  stl_util::concat(positions, {halfWidth, halfHeight, 0.f});
+  stl_util::concat(normals, {0.f, 0.f, -1.f});
+  stl_util::concat(uvs, {1.f, 1.f});
 
-  std_util::concat(positions, {-halfWidth, halfHeight, 0.f});
-  std_util::concat(normals, {0.f, 0.f, -1.f});
-  std_util::concat(uvs, {0.f, 1.f});
+  stl_util::concat(positions, {-halfWidth, halfHeight, 0.f});
+  stl_util::concat(normals, {0.f, 0.f, -1.f});
+  stl_util::concat(uvs, {0.f, 1.f});
 
   // Indices
   indices.emplace_back(0);
@@ -1570,7 +1571,7 @@ std::unique_ptr<VertexData> VertexData::CreatePlane(PlaneOptions& options)
                             normals, uvs);
 
   // Result
-  auto vertexData = std_util::make_unique<VertexData>();
+  auto vertexData = std::make_unique<VertexData>();
 
   vertexData->indices   = std::move(indices);
   vertexData->positions = std::move(positions);
@@ -1593,8 +1594,8 @@ std::unique_ptr<VertexData> VertexData::CreateDisc(DiscOptions& options)
   const auto& sideOrientation = options.sideOrientation;
 
   // positions and uvs
-  std_util::concat(positions, {0.f, 0.f, 0.f}); // disc center first
-  std_util::concat(uvs, {0.5f, 0.5f});
+  stl_util::concat(positions, {0.f, 0.f, 0.f}); // disc center first
+  stl_util::concat(uvs, {0.5f, 0.5f});
 
   float theta = Math::PI2 * arc;
   float step  = theta / static_cast<float>(tessellation);
@@ -1603,26 +1604,26 @@ std::unique_ptr<VertexData> VertexData::CreateDisc(DiscOptions& options)
     float y = std::sin(a);
     float u = (x + 1.f) / 2.f;
     float v = (1.f - y) / 2.f;
-    std_util::concat(positions, {radius * x, radius * y, 0.f});
-    std_util::concat(uvs, {u, v});
+    stl_util::concat(positions, {radius * x, radius * y, 0.f});
+    stl_util::concat(uvs, {u, v});
   }
-  if (std_util::almost_equal(arc, 1.f)) {
+  if (stl_util::almost_equal(arc, 1.f)) {
     // close the circle
-    std_util::concat(positions, {positions[3], positions[4], positions[5]});
-    std_util::concat(uvs, {uvs[2], uvs[3]});
+    stl_util::concat(positions, {positions[3], positions[4], positions[5]});
+    stl_util::concat(uvs, {uvs[2], uvs[3]});
   }
 
   // indices
   size_t vertexNb = positions.size() / 3;
   for (unsigned int i = 1; i < vertexNb - 1; ++i) {
-    std_util::concat(indices, {i + 1, 0, i});
+    stl_util::concat(indices, {i + 1, 0, i});
   }
 
   // result
   VertexData::ComputeNormals(positions, indices, normals);
   VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
 
-  auto vertexData = std_util::make_unique<VertexData>();
+  auto vertexData = std::make_unique<VertexData>();
 
   vertexData->indices   = std::move(indices);
   vertexData->positions = std::move(positions);
@@ -1876,12 +1877,12 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
             face_vertex_uv[2] :
             Vector2::Lerp(uv_x0, uv_x1,
                           i1 / (subdivisionsf - static_cast<float>(i2)));
-      std_util::concat(positions,
+      stl_util::concat(positions,
                        {pos_interp.x * radiusX, pos_interp.y * radiusY,
                         pos_interp.z * radiusZ});
-      std_util::concat(normals,
+      stl_util::concat(normals,
                        {vertex_normal.x, vertex_normal.y, vertex_normal.z});
-      std_util::concat(uvs, {uv_interp.x, uv_interp.y});
+      stl_util::concat(uvs, {uv_interp.x, uv_interp.y});
       // push each vertex has member of a face
       // Same vertex can bleong to multiple face, it is pushed multiple time
       // (duplicate vertex are present)
@@ -1913,7 +1914,7 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
   VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
 
   // Result
-  auto vertexData       = std_util::make_unique<VertexData>();
+  auto vertexData       = std::make_unique<VertexData>();
   vertexData->indices   = std::move(indices);
   vertexData->positions = std::move(positions);
   vertexData->normals   = std::move(normals);
@@ -2266,14 +2267,14 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
   }
   if (!flat) {
     for (i = 0; i < dataVertices.size(); ++i) {
-      std_util::concat(positions,
+      stl_util::concat(positions,
                        {dataVertices[i][0] * sizeX, dataVertices[i][1] * sizeY,
                         dataVertices[i][2] * sizeZ});
-      std_util::concat(uvs, {0.f, 0.f});
+      stl_util::concat(uvs, {0.f, 0.f});
     }
     for (f = 0; f < nbfaces; ++f) {
       for (i = 0; i < dataFaces[f].size() - 2; ++i) {
-        std_util::concat(
+        stl_util::concat(
           indices, {dataFaces[f][0], dataFaces[f][i + 2], dataFaces[f][i + 1]});
       }
     }
@@ -2288,7 +2289,7 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
       // positions, uvs, colors
       for (i = 0; i < fl; ++i) {
         // positions
-        std_util::concat(positions, {dataVertices[dataFaces[f][i]][0] * sizeX,
+        stl_util::concat(positions, {dataVertices[dataFaces[f][i]][0] * sizeX,
                                      dataVertices[dataFaces[f][i]][1] * sizeY,
                                      dataVertices[dataFaces[f][i]][2] * sizeZ});
         indexes.emplace_back(index);
@@ -2296,20 +2297,20 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
         // uvs
         u = faceUV[f].x + (faceUV[f].z - faceUV[f].x) * (0.5f + x);
         v = faceUV[f].y + (faceUV[f].w - faceUV[f].y) * (y - 0.5f);
-        std_util::concat(uvs, {u, v});
+        stl_util::concat(uvs, {u, v});
         tmp = x * std::cos(ang) - y * std::sin(ang);
         y   = x * std::sin(ang) + y * std::cos(ang);
         x   = tmp;
         // colors
         if (!faceColors.empty()) {
-          std_util::concat(colors, {faceColors[f].r, faceColors[f].g,
+          stl_util::concat(colors, {faceColors[f].r, faceColors[f].g,
                                     faceColors[f].b, faceColors[f].a});
         }
       }
 
       // indices from indexes
       for (i = 0; i < fl - 2; ++i) {
-        std_util::concat(indices,
+        stl_util::concat(indices,
                          {indexes[0 + faceIdx], indexes[i + 2 + faceIdx],
                           indexes[i + 1 + faceIdx]});
       }
@@ -2320,7 +2321,7 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
   VertexData::ComputeNormals(positions, indices, normals);
   VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
 
-  auto vertexData       = std_util::make_unique<VertexData>();
+  auto vertexData       = std::make_unique<VertexData>();
   vertexData->positions = std::move(positions);
   vertexData->indices   = std::move(indices);
   vertexData->normals   = std::move(normals);
@@ -2425,7 +2426,7 @@ VertexData::CreateTorusKnot(TorusKnotOptions& options)
   VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
 
   // Result
-  auto vertexData = std_util::make_unique<VertexData>();
+  auto vertexData = std::make_unique<VertexData>();
 
   vertexData->indices   = std::move(indices);
   vertexData->positions = std::move(positions);
@@ -2596,7 +2597,7 @@ void VertexData::ComputeNormals(const Float32Array& positions,
     // normalize this normal and store it in the array facetData
     length = std::sqrt(faceNormalx * faceNormalx + faceNormaly * faceNormaly
                        + faceNormalz * faceNormalz);
-    length = std_util::almost_equal(length, 0.f) ? 1.f : length;
+    length = stl_util::almost_equal(length, 0.f) ? 1.f : length;
     faceNormalx /= length;
     faceNormaly /= length;
     faceNormalz /= length;
@@ -2709,7 +2710,7 @@ void VertexData::ComputeNormals(const Float32Array& positions,
 
     length = std::sqrt(faceNormalx * faceNormalx + faceNormaly * faceNormaly
                        + faceNormalz * faceNormalz);
-    length = std_util::almost_equal(length, 0.f) ? 1.f : length;
+    length = stl_util::almost_equal(length, 0.f) ? 1.f : length;
     faceNormalx /= length;
     faceNormaly /= length;
     faceNormalz /= length;

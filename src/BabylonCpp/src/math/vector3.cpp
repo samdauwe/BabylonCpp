@@ -1,5 +1,6 @@
 #include <babylon/math/vector3.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/math/axis.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/quaternion.h>
@@ -63,7 +64,7 @@ Vector3 Vector3::copy() const
 
 std::unique_ptr<Vector3> Vector3::clone() const
 {
-  return std_util::make_unique<Vector3>(*this);
+  return std::make_unique<Vector3>(*this);
 }
 
 std::string Vector3::toString() const
@@ -82,7 +83,7 @@ const char* Vector3::getClassName() const
 size_t Vector3::getHashCode() const
 {
   float tmp = ((x * 0.397f) + y * 3.97f) + z;
-  return std_util::to_bitset(tmp).to_ullong();
+  return stl_util::to_bitset(tmp).to_ullong();
 }
 
 /** Operators **/
@@ -221,9 +222,9 @@ const Vector3& Vector3::scaleToRef(float iscale, Vector3& result) const
 
 bool Vector3::equals(const Vector3& otherVector) const
 {
-  return std_util::almost_equal(x, otherVector.x)
-         && std_util::almost_equal(y, otherVector.y)
-         && std_util::almost_equal(z, otherVector.z);
+  return stl_util::almost_equal(x, otherVector.x)
+         && stl_util::almost_equal(y, otherVector.y)
+         && stl_util::almost_equal(z, otherVector.z);
 }
 
 bool Vector3::equalsWithEpsilon(const Vector3& otherVector, float epsilon) const
@@ -235,8 +236,8 @@ bool Vector3::equalsWithEpsilon(const Vector3& otherVector, float epsilon) const
 
 bool Vector3::equalsToFloats(float ix, float iy, float iz) const
 {
-  return std_util::almost_equal(x, ix) && std_util::almost_equal(y, iy)
-         && std_util::almost_equal(z, iz);
+  return stl_util::almost_equal(x, ix) && stl_util::almost_equal(y, iy)
+         && stl_util::almost_equal(z, iz);
 }
 
 Vector3& Vector3::multiplyInPlace(const Vector3& otherVector)
@@ -425,7 +426,7 @@ Vector3& Vector3::normalize()
 {
   const float len = length();
 
-  if (std_util::almost_equal(len, 0.f) || std_util::almost_equal(len, 1.f)) {
+  if (stl_util::almost_equal(len, 0.f) || stl_util::almost_equal(len, 1.f)) {
     return *this;
   }
 

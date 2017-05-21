@@ -1,5 +1,6 @@
 #include <babylon/mesh/geometry.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/json.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/engine/engine.h>
@@ -125,8 +126,8 @@ void Geometry::setAllVerticesData(VertexData* vertexData, bool updatable)
 Mesh* Geometry::setVerticesData(unsigned int kind, const Float32Array& data,
                                 bool updatable, int stride)
 {
-  auto buffer = std_util::make_unique<VertexBuffer>(
-    _engine, data, kind, updatable, _meshes.empty(), stride);
+  auto buffer = std::make_unique<VertexBuffer>(_engine, data, kind, updatable,
+                                               _meshes.empty(), stride);
 
   setVerticesBuffer(std::move(buffer));
 
@@ -135,7 +136,7 @@ Mesh* Geometry::setVerticesData(unsigned int kind, const Float32Array& data,
 
 void Geometry::removeVerticesData(unsigned int kind)
 {
-  if (std_util::contains(_vertexBuffers, kind)) {
+  if (stl_util::contains(_vertexBuffers, kind)) {
     _vertexBuffers[kind]->dispose();
     _vertexBuffers[kind].reset(nullptr);
   }
@@ -144,7 +145,7 @@ void Geometry::removeVerticesData(unsigned int kind)
 void Geometry::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
 {
   unsigned int kind = buffer->getKind();
-  if (std_util::contains(_vertexBuffers, kind)) {
+  if (stl_util::contains(_vertexBuffers, kind)) {
     _vertexBuffers[kind]->dispose();
   }
 
@@ -244,7 +245,7 @@ void Geometry::_bind(Effect* effect, GL::IGLBuffer* indexToBind)
   }
 
   // Using VAO
-  if (!std_util::contains(_vertexArrayObjects, effect->key())) {
+  if (!stl_util::contains(_vertexArrayObjects, effect->key())) {
     _vertexArrayObjects[effect->key()] = _engine->recordVertexArrayObject(
       getVertexBuffers(), indexToBind, effect);
   }
@@ -402,7 +403,7 @@ void Geometry::_releaseVertexArrayObject(Effect* effect)
     return;
   }
 
-  if (std_util::contains(_vertexArrayObjects, effect->key())) {
+  if (stl_util::contains(_vertexArrayObjects, effect->key())) {
     _engine->releaseVertexArrayObject(_vertexArrayObjects[effect->key()].get());
     _vertexArrayObjects[effect->key()].reset(nullptr);
   }
@@ -624,7 +625,7 @@ void Geometry::dispose(bool /*doNotRecurse*/)
 
 Geometry* Geometry::copy(const std::string& iId)
 {
-  auto vertexData = std_util::make_unique<VertexData>();
+  auto vertexData = std::make_unique<VertexData>();
 
   vertexData->indices.clear();
 
@@ -657,7 +658,7 @@ Geometry* Geometry::copy(const std::string& iId)
 
   // Bounding info
   geometry->_boundingInfo
-    = std_util::make_unique<BoundingInfo>(_extend.min, _extend.max);
+    = std::make_unique<BoundingInfo>(_extend.min, _extend.max);
 
   return geometry;
 }
@@ -817,7 +818,7 @@ Geometry* Geometry::Parse(const Json::value& parsedVertexData, Scene* scene,
     geometry->delayLoadState = Engine::DELAYLOADSTATE_NOTLOADED;
     geometry->delayLoadingFile
       = rootUrl + Json::GetString(parsedVertexData, "delayLoadingFile", "");
-    geometry->_boundingInfo = std_util::make_unique<BoundingInfo>(
+    geometry->_boundingInfo = std::make_unique<BoundingInfo>(
       Vector3::FromArray(
         Json::ToArray<float>(parsedVertexData, "boundingBoxMinimum")),
       Vector3::FromArray(

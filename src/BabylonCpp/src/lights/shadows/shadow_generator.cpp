@@ -1,5 +1,6 @@
 #include <babylon/lights/shadows/shadow_generator.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
@@ -72,7 +73,7 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light)
   }
 
   // Render target
-  _shadowMap = std_util::make_unique<RenderTargetTexture>(
+  _shadowMap = std::make_unique<RenderTargetTexture>(
     light->name + "_shadowMap", mapSize, _scene, false, true, _textureType,
     light->needCube());
   _shadowMap->wrapU                     = Texture::CLAMP_ADDRESSMODE;
@@ -90,13 +91,13 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light)
     }
 
     if (!_shadowMap2) {
-      _shadowMap2 = std_util::make_unique<RenderTargetTexture>(
+      _shadowMap2 = std::make_unique<RenderTargetTexture>(
         _light->name + "_shadowMap", _mapSize, _scene, false);
       _shadowMap2->wrapU = Texture::CLAMP_ADDRESSMODE;
       _shadowMap2->wrapV = Texture::CLAMP_ADDRESSMODE;
       _shadowMap2->updateSamplingMode(Texture::BILINEAR_SAMPLINGMODE);
 
-      _downSamplePostprocess = std_util::make_unique<PassPostProcess>(
+      _downSamplePostprocess = std::make_unique<PassPostProcess>(
         "downScale", 1.f / blurScale, nullptr, Texture::BILINEAR_SAMPLINGMODE,
         _scene->getEngine(), false, _textureType);
       _downSamplePostprocess->onApplyObservable.add([this](Effect* effect) {
@@ -454,7 +455,7 @@ Matrix ShadowGenerator::getTransformMatrix()
   Vector3::NormalizeToRef(_light->getShadowDirection(_currentFaceIndex),
                           _lightDirection);
 
-  if (std_util::almost_equal(
+  if (stl_util::almost_equal(
         std::abs(Vector3::Dot(_lightDirection, Vector3::Up())), 1.f)) {
     // Required to avoid perfectly perpendicular light
     _lightDirection.z = 0.0000000000001f;

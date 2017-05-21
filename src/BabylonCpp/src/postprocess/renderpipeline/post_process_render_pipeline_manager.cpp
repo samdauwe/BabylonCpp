@@ -1,5 +1,6 @@
 #include <babylon/postprocess/renderpipeline/post_process_render_pipeline_manager.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_pipeline.h>
 
 namespace BABYLON {
@@ -22,7 +23,7 @@ void PostProcessRenderPipelineManager::attachCamerasToRenderPipeline(
   const std::string& renderPipelineName, const std::vector<Camera*>& cameras,
   bool unique)
 {
-  if (!std_util::contains(_renderPipelines, renderPipelineName)) {
+  if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
     return;
   }
 
@@ -32,7 +33,7 @@ void PostProcessRenderPipelineManager::attachCamerasToRenderPipeline(
 void PostProcessRenderPipelineManager::detachCamerasFromRenderPipeline(
   const std::string& renderPipelineName, const std::vector<Camera*>& cameras)
 {
-  if (!std_util::contains(_renderPipelines, renderPipelineName)) {
+  if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
     return;
   }
 
@@ -43,7 +44,7 @@ void PostProcessRenderPipelineManager::enableEffectInPipeline(
   const std::string& renderPipelineName, const std::string& renderEffectName,
   const std::vector<Camera*>& cameras)
 {
-  if (!std_util::contains(_renderPipelines, renderPipelineName)) {
+  if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
     return;
   }
 
@@ -55,7 +56,7 @@ void PostProcessRenderPipelineManager::disableEffectInPipeline(
   const std::string& renderPipelineName, const std::string& renderEffectName,
   const std::vector<Camera*>& cameras)
 {
-  if (!std_util::contains(_renderPipelines, renderPipelineName)) {
+  if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
     return;
   }
 
@@ -67,7 +68,7 @@ void PostProcessRenderPipelineManager::enableDisplayOnlyPassInPipeline(
   const std::string& renderPipelineName, const std::string& passName,
   const std::vector<Camera*>& cameras)
 {
-  if (!std_util::contains(_renderPipelines, renderPipelineName)) {
+  if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
     return;
   }
 
@@ -79,7 +80,7 @@ void PostProcessRenderPipelineManager::disableDisplayOnlyPassInPipeline(
   const std::string& renderPipelineName, const std::string& passName,
   const std::vector<Camera*>& cameras)
 {
-  if (!std_util::contains(_renderPipelines, renderPipelineName)) {
+  if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
     return;
   }
 

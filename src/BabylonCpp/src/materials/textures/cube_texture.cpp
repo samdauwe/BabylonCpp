@@ -27,7 +27,7 @@ CubeTexture::CubeTexture(const std::string& rootUrl, Scene* scene,
     , url{rootUrl}
     , coordinatesMode{Texture::CUBIC_MODE}
     , _noMipmap{noMipmap}
-    , _textureMatrix{std_util::make_unique<Matrix>(Matrix::Identity())}
+    , _textureMatrix{std::make_unique<Matrix>(Matrix::Identity())}
     , _format{format}
 {
   name = rootUrl;
@@ -123,8 +123,8 @@ CubeTexture* CubeTexture::Parse(const Json::value& parsedTexture, Scene* scene,
 
 std::unique_ptr<CubeTexture> CubeTexture::clone() const
 {
-  auto newTexture = std_util::make_unique<CubeTexture>(
-    url, getScene(), _extensions, _noMipmap, _files);
+  auto newTexture = std::make_unique<CubeTexture>(url, getScene(), _extensions,
+                                                  _noMipmap, _files);
 
   return newTexture;
 }

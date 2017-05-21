@@ -1,5 +1,6 @@
 #include <babylon/utils/random_color.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/random.h>
 
 namespace BABYLON {
@@ -437,7 +438,7 @@ Range RandomColor::getHueRange(float number)
 
 Range RandomColor::getHueRange(const std::string& name)
 {
-  if (std_util::contains(_colors, name)) {
+  if (stl_util::contains(_colors, name)) {
     return _colors[name].getHueRange();
   }
 

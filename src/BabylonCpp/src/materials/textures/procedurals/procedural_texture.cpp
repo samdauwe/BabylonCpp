@@ -1,5 +1,6 @@
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
@@ -23,7 +24,7 @@ ProceduralTexture::ProceduralTexture(
     , _fallbackTextureUsed{false}
 {
   // scene->_proceduralTextures.emplace_back(
-  //  std_util::make_unique<ProceduralTexture>(this));
+  //  std::make_unique<ProceduralTexture>(this));
 
   name           = _name;
   isRenderTarget = true;
@@ -51,7 +52,7 @@ ProceduralTexture::ProceduralTexture(
                         1.f,  -1.f};
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
-    = std_util::make_unique<VertexBuffer>(
+    = std::make_unique<VertexBuffer>(
       engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   // Indices
@@ -101,7 +102,7 @@ ProceduralTexture::ProceduralTexture(const std::string& _name, const Size& size,
                         1.f,  -1.f};
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
-    = std_util::make_unique<VertexBuffer>(
+    = std::make_unique<VertexBuffer>(
       engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   // Indices
@@ -136,7 +137,7 @@ bool ProceduralTexture::isReady()
     return true;
   }
 
-  if (std_util::contains(_fragment, "fragmentElement")) {
+  if (stl_util::contains(_fragment, "fragmentElement")) {
     shaders["vertex"]          = "procedural";
     shaders["fragmentElement"] = _fragment["fragmentElement"];
   }
@@ -425,7 +426,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
 std::unique_ptr<ProceduralTexture> ProceduralTexture::clone() const
 {
   ISize textureSize = getSize();
-  auto newTexture   = std_util::make_unique<ProceduralTexture>(
+  auto newTexture   = std::make_unique<ProceduralTexture>(
     name, textureSize.width, _fragment, getScene(), _fallbackTexture,
     _generateMipMaps);
 

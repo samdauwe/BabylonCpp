@@ -1,5 +1,6 @@
 #include <babylon/materials/uniform_buffer.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/engine/engine.h>
 #include <babylon/materials/effect.h>
@@ -163,7 +164,7 @@ void UniformBuffer::addUniform(const std::string& name, size_t size)
     return;
   }
 
-  if (std_util::contains(_uniformLocations, name)) {
+  if (stl_util::contains(_uniformLocations, name)) {
     // Already existing uniform
     return;
   }
@@ -191,7 +192,7 @@ void UniformBuffer::addUniform(const std::string& name,
     return;
   }
 
-  if (std_util::contains(_uniformLocations, name)) {
+  if (stl_util::contains(_uniformLocations, name)) {
     // Already existing uniform
     return;
   }
@@ -303,7 +304,7 @@ void UniformBuffer::updateUniform(const std::string& uniformName,
                                   const Float32Array& data, size_t size)
 {
   size_t location = _uniformLocations[uniformName];
-  if (!std_util::contains(_uniformLocations, uniformName)) {
+  if (!stl_util::contains(_uniformLocations, uniformName)) {
     if (_buffer) {
       // Cannot add an uniform if the buffer is already created
       BABYLON_LOG_ERROR("UniformBuffer",
@@ -322,7 +323,7 @@ void UniformBuffer::updateUniform(const std::string& uniformName,
     // Cache for static uniform buffers
     bool changed = false;
     for (size_t i = 0; i < size; ++i) {
-      if (!std_util::almost_equal(_bufferData[location + i], data[i])) {
+      if (!stl_util::almost_equal(_bufferData[location + i], data[i])) {
         changed                   = true;
         _bufferData[location + i] = data[i];
       }

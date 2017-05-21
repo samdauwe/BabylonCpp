@@ -1,5 +1,6 @@
 #include <babylon/culling/ray.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/collisions/intersection_info.h>
 #include <babylon/collisions/picking_info.h>
 #include <babylon/culling/bounding_box.h>
@@ -80,7 +81,7 @@ Ray::~Ray()
 
 std::unique_ptr<Ray> Ray::clone() const
 {
-  return std_util::make_unique<Ray>(*this);
+  return std::make_unique<Ray>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Ray& ray)
@@ -108,7 +109,7 @@ bool Ray::intersectsBoxMinMax(const Vector3& minimum,
     inv = 1.f / direction.x;
     min = (minimum.x - origin.x) * inv;
     max = (maximum.x - origin.x) * inv;
-    if (std_util::almost_equal(max, -std::numeric_limits<float>::infinity())) {
+    if (stl_util::almost_equal(max, -std::numeric_limits<float>::infinity())) {
       max = std::numeric_limits<float>::infinity();
     }
 
@@ -134,7 +135,7 @@ bool Ray::intersectsBoxMinMax(const Vector3& minimum,
     min = (minimum.y - origin.y) * inv;
     max = (maximum.y - origin.y) * inv;
 
-    if (std_util::almost_equal(max, -std::numeric_limits<float>::infinity())) {
+    if (stl_util::almost_equal(max, -std::numeric_limits<float>::infinity())) {
       max = std::numeric_limits<float>::infinity();
     }
 
@@ -160,7 +161,7 @@ bool Ray::intersectsBoxMinMax(const Vector3& minimum,
     min = (minimum.z - origin.z) * inv;
     max = (maximum.z - origin.z) * inv;
 
-    if (std_util::almost_equal(max, -std::numeric_limits<float>::infinity())) {
+    if (stl_util::almost_equal(max, -std::numeric_limits<float>::infinity())) {
       max = std::numeric_limits<float>::infinity();
     }
 
@@ -223,7 +224,7 @@ Ray::intersectsTriangle(const Vector3& vertex0, const Vector3& vertex1,
   Vector3::CrossToRef(direction, _edge2, _pvec);
   float det = Vector3::Dot(_edge1, _pvec);
 
-  if (std_util::almost_equal(det, 0.f)) {
+  if (stl_util::almost_equal(det, 0.f)) {
     return nullptr;
   }
 
@@ -251,7 +252,7 @@ Ray::intersectsTriangle(const Vector3& vertex0, const Vector3& vertex1,
     return nullptr;
   }
 
-  return std_util::make_unique<IntersectionInfo>(bu, bv, distance);
+  return std::make_unique<IntersectionInfo>(bu, bv, distance);
 }
 
 std::unique_ptr<float> Ray::intersectsPlane(const Plane& plane)
@@ -269,11 +270,11 @@ std::unique_ptr<float> Ray::intersectsPlane(const Plane& plane)
         return nullptr;
       }
       else {
-        return std_util::make_unique<float>(0.f);
+        return std::make_unique<float>(0.f);
       }
     }
 
-    return std_util::make_unique<float>(distance);
+    return std::make_unique<float>(distance);
   }
 }
 
@@ -287,7 +288,7 @@ PickingInfo Ray::intersectsMesh(AbstractMesh* mesh, bool fastCheck)
     Ray::TransformToRef(*this, tm, *_tmpRay);
   }
   else {
-    _tmpRay = std_util::make_unique<Ray>(Ray::Transform(*this, tm));
+    _tmpRay = std::make_unique<Ray>(Ray::Transform(*this, tm));
   }
 
   return mesh->intersects(*_tmpRay, fastCheck);

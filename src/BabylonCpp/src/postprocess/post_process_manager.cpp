@@ -1,5 +1,6 @@
 #include <babylon/postprocess/post_process_manager.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -18,7 +19,7 @@ PostProcessManager::~PostProcessManager()
 
 void PostProcessManager::_prepareBuffers()
 {
-  if (std_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)
+  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)
       && _vertexBuffers[VertexBuffer::PositionKindChars]) {
     return;
   }
@@ -26,9 +27,9 @@ void PostProcessManager::_prepareBuffers()
   // VBO
   Float32Array vertices{1.f, 1.f, -1.f, 1.f, -1.f, -1.f, 1.f, -1.f};
   _vertexBuffers[VertexBuffer::PositionKindChars]
-    = std_util::make_unique<VertexBuffer>(_scene->getEngine(), vertices,
-                                          VertexBuffer::PositionKind, false,
-                                          false, 2);
+    = std::make_unique<VertexBuffer>(_scene->getEngine(), vertices,
+                                     VertexBuffer::PositionKind, false, false,
+                                     2);
   _vertexBufferPtrs[VertexBuffer::PositionKindChars]
     = _vertexBuffers[VertexBuffer::PositionKindChars].get();
 
@@ -142,7 +143,7 @@ void PostProcessManager::_finalizeFrame(
 
 void PostProcessManager::dispose(bool /*doNotRecurse*/)
 {
-  if (std_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)) {
+  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)) {
     auto& buffer = _vertexBuffers[VertexBuffer::PositionKindChars];
     if (buffer) {
       buffer->dispose();

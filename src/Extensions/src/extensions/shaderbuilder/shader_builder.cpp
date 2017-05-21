@@ -1,5 +1,6 @@
 #include <babylon/extensions/shaderbuilder/shader_builder.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
 #include <babylon/extensions/shaderbuilder/helper.h>
 #include <babylon/extensions/shaderbuilder/icolor.h>
@@ -36,7 +37,7 @@ void ShaderBuilder::PrepareBeforeMaterialBuild()
     Attributes.emplace_back(ShaderMaterialHelperStatics::AttrUv2);
   }
 
-  std_util::concat(Uniforms,
+  stl_util::concat(Uniforms,
                    {ShaderMaterialHelperStatics::uniformView,
                     ShaderMaterialHelperStatics::uniformWorld,
                     ShaderMaterialHelperStatics::uniformWorldView,
@@ -714,7 +715,7 @@ ShaderBuilder& ShaderBuilder::PostEffect2(size_t id, const std::string& effect)
 ShaderBuilder&
 ShaderBuilder::ImportSamplers(const std::vector<std::string>& txts)
 {
-  std_util::concat(Shader::Me->PPSSamplers, txts);
+  stl_util::concat(Shader::Me->PPSSamplers, txts);
 
   return *this;
 }
@@ -1351,7 +1352,7 @@ ShaderBuilder& ShaderBuilder::SpecularMap(const std::string& mat)
 std::unique_ptr<ShaderBuilder> ShaderBuilder::Instance()
 {
   auto setting      = Shader::Me->Setting;
-  auto instance     = std_util::make_unique<ShaderBuilder>();
+  auto instance     = std::make_unique<ShaderBuilder>();
   instance->Parent  = Shader::Me;
   instance->Setting = setting;
 

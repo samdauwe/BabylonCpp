@@ -1,5 +1,6 @@
 #include <babylon/loading/scene_loader.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
@@ -30,7 +31,7 @@ IRegisteredPlugin SceneLoader::_getDefaultPlugin()
 IRegisteredPlugin
 SceneLoader::_getPluginForExtension(const std::string& extension)
 {
-  if (std_util::contains(SceneLoader::_registeredPlugins, extension)) {
+  if (stl_util::contains(SceneLoader::_registeredPlugins, extension)) {
     return SceneLoader::_registeredPlugins[extension];
   }
 

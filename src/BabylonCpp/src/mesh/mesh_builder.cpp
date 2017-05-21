@@ -725,7 +725,7 @@ Mesh* MeshBuilder::CreateDecal(const std::string& name,
   auto meshWorldMatrix         = sourceMesh->getWorldMatrix();
   auto transformMatrix = meshWorldMatrix->multiply(inverseDecalWorldMatrix);
 
-  auto vertexData = std_util::make_unique<VertexData>();
+  auto vertexData = std::make_unique<VertexData>();
   vertexData->indices.clear();
   vertexData->positions.clear();
   vertexData->normals.clear();

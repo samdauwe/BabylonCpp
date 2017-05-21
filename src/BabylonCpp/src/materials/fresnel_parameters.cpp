@@ -80,7 +80,7 @@ void FresnelParameters::setIsEnabled(bool value)
 
 std::unique_ptr<FresnelParameters> FresnelParameters::clone() const
 {
-  return std_util::make_unique<FresnelParameters>(*this);
+  return std::make_unique<FresnelParameters>(*this);
 }
 
 Json::object FresnelParameters::serialize() const
@@ -91,7 +91,7 @@ Json::object FresnelParameters::serialize() const
 std::unique_ptr<FresnelParameters>
 FresnelParameters::Parse(const Json::value& parsedFresnelParameters)
 {
-  auto fresnelParameters = std_util::make_unique<FresnelParameters>();
+  auto fresnelParameters = std::make_unique<FresnelParameters>();
 
   fresnelParameters->setIsEnabled(
     Json::GetBool(parsedFresnelParameters, "isEnabled", true));

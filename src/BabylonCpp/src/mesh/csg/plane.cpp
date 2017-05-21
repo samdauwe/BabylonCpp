@@ -1,5 +1,6 @@
 #include <babylon/mesh/csg/plane.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/mesh/csg/polygon.h>
 #include <babylon/mesh/csg/vertex.h>
 
@@ -161,8 +162,8 @@ CSG::Plane CSG::Plane::FromPoints(const Vector3& a, const Vector3& b,
   const auto v0 = c.subtract(a);
   const auto v1 = b.subtract(a);
 
-  if (std_util::almost_equal(v0.lengthSquared(), 0.f)
-      || std_util::almost_equal(v1.lengthSquared(), 0.f)) {
+  if (stl_util::almost_equal(v0.lengthSquared(), 0.f)
+      || stl_util::almost_equal(v1.lengthSquared(), 0.f)) {
     hasPlane = false;
     return Plane();
   }

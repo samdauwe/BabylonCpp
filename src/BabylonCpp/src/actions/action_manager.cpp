@@ -18,7 +18,7 @@ size_t ActionManager::LongPressDelay        = 500; // in milliseconds
 template <typename... Ts>
 ActionManager* ActionManager::New(Ts&&... args)
 {
-  auto actionManager = std_util::make_unique<Action>(std::forward<Ts>(args)...);
+  auto actionManager = std::make_unique<Action>(std::forward<Ts>(args)...);
   actionManager->_scene->_actionManagers.emplace_back(actionManager);
   return actionManager.get();
 }

@@ -1,5 +1,6 @@
 #include <babylon/culling/bounding_box.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/culling/bounding_sphere.h>
 #include <babylon/math/math_tools.h>
 #include <babylon/math/plane.h>
@@ -35,7 +36,7 @@ BoundingBox::BoundingBox(const Vector3& _minimum, const Vector3& _maximum)
   // OBB
   center     = maximum.add(minimum).scale(0.5f);
   extendSize = maximum.subtract(minimum).scale(0.5f);
-  std_util::concat(directions,
+  stl_util::concat(directions,
                    {Vector3::Zero(), Vector3::Zero(), Vector3::Zero()});
 
   // World

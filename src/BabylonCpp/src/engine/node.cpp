@@ -2,6 +2,7 @@
 
 #include <babylon/animations/animation.h>
 #include <babylon/animations/animation_range.h>
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
@@ -25,7 +26,7 @@ Node::Node(const std::string& iName, Scene* scene)
     , _parentRenderId{-1}
     , _scene{scene}
     , _parentNode{nullptr}
-    , _worldMatrix{std_util::make_unique<Matrix>(Matrix::Identity())}
+    , _worldMatrix{std::make_unique<Matrix>(Matrix::Identity())}
 {
   _initCache();
 }
@@ -294,8 +295,8 @@ Animation* Node::getAnimationByName(const std::string& iName)
 void Node::createAnimationRange(const std::string& iName, int from, int to)
 {
   // check name not already in use
-  if (!std_util::contains(_ranges, iName)) {
-    _ranges[iName] = std_util::make_unique<AnimationRange>(iName, from, to);
+  if (!stl_util::contains(_ranges, iName)) {
+    _ranges[iName] = std::make_unique<AnimationRange>(iName, from, to);
     for (auto& animation : animations) {
       if (animation) {
         animation->createRange(iName, from, to);
@@ -317,7 +318,7 @@ void Node::deleteAnimationRange(const std::string& iName, bool deleteFrames)
 
 AnimationRange* Node::getAnimationRange(const std::string& iName)
 {
-  if (std_util::contains(_ranges, iName)) {
+  if (stl_util::contains(_ranges, iName)) {
     return _ranges[iName].get();
   }
 

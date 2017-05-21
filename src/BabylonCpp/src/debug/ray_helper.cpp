@@ -10,7 +10,7 @@ namespace BABYLON {
 std::unique_ptr<RayHelper>
 RayHelper::CreateAndShow(const Ray& ray, Scene* scene, const Color3& color)
 {
-  auto helper = std_util::make_unique<RayHelper>(ray);
+  auto helper = std::make_unique<RayHelper>(ray);
 
   helper->show(scene, color);
 

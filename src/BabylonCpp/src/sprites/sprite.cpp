@@ -9,7 +9,7 @@ namespace BABYLON {
 Sprite::Sprite(const std::string& iName, SpriteManager* manager)
     : name{iName}
     , position{Vector3::Zero()}
-    , color{std_util::make_unique<Color4>(1.f, 1.f, 1.f, 1.f)}
+    , color{std::make_unique<Color4>(1.f, 1.f, 1.f, 1.f)}
     , width{1}
     , height{1}
     , angle{0}

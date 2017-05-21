@@ -62,7 +62,7 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std_util::make_unique<SkyMaterialDefines>();
+    subMesh->_materialDefines = std::make_unique<SkyMaterialDefines>();
   }
 
   auto defines
@@ -93,7 +93,7 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
     scene->resetCachedMaterial();
 
     // Fallbacks
-    auto fallbacks = std_util::make_unique<EffectFallbacks>();
+    auto fallbacks = std::make_unique<EffectFallbacks>();
     if (defines[SMD::FOG]) {
       fallbacks->addFallback(1, "FOG");
     }

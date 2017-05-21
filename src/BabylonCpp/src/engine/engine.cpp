@@ -1,5 +1,6 @@
 #include <babylon/engine/engine.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/babylon_version.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
@@ -61,9 +62,9 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , fpsRange{60}
     , fps{60.f}
     , deltaTime{std::chrono::microseconds(0)}
-    , _depthCullingState{std_util::make_unique<Internals::_DepthCullingState>()}
-    , _stencilState{std_util::make_unique<Internals::_StencilState>()}
-    , _alphaState{std_util::make_unique<Internals::_AlphaState>()}
+    , _depthCullingState{std::make_unique<Internals::_DepthCullingState>()}
+    , _stencilState{std::make_unique<Internals::_StencilState>()}
+    , _alphaState{std::make_unique<Internals::_AlphaState>()}
     , _alphaMode{Engine::ALPHA_DISABLE}
     , _maxTextureChannels{16}
     , _currentProgram{nullptr}
@@ -140,9 +141,9 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
   }
 
   _caps.standardDerivatives = true;
-  _caps.textureFloat = std_util::contains(extensions, "GL_ARB_texture_float");
+  _caps.textureFloat = stl_util::contains(extensions, "GL_ARB_texture_float");
   _caps.textureAnisotropicFilterExtension
-    = std_util::contains(extensions, "GL_EXT_texture_filter_anisotropic");
+    = stl_util::contains(extensions, "GL_EXT_texture_filter_anisotropic");
   _caps.maxAnisotropy = _caps.textureAnisotropicFilterExtension ?
                           static_cast<unsigned>(_gl->getParameteri(
                             GL::MAX_TEXTURE_MAX_ANISOTROPY_EXT)) :
@@ -152,16 +153,16 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
   _caps.fragmentDepthSupported       = true;
   _caps.highPrecisionShaderSupported = true;
   _caps.drawBuffersExtension
-    = std_util::contains(extensions, "GL_ARB_draw_buffers");
+    = stl_util::contains(extensions, "GL_ARB_draw_buffers");
   _caps.textureFloatLinearFiltering = true;
   _caps.textureLOD
-    = std_util::contains(extensions, "GL_ARB_shader_texture_lod");
+    = stl_util::contains(extensions, "GL_ARB_shader_texture_lod");
   _caps.textureFloatRender = renderToFullFloat;
 
   _caps.textureHalfFloat
-    = std_util::contains(extensions, "OES_texture_half_float");
+    = stl_util::contains(extensions, "OES_texture_half_float");
   _caps.textureHalfFloatLinearFiltering
-    = std_util::contains(extensions, "OES_texture_half_float_linear");
+    = stl_util::contains(extensions, "OES_texture_half_float_linear");
   _caps.textureHalfFloatRender = renderToHalfFloat;
 
   GL::IGLShaderPrecisionFormat* highp
@@ -179,7 +180,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
 
   // Default loading screen
   //_loadingScreen
-  //  = std_util::make_unique<DefaultLoadingScreen>(_renderingCanvas);
+  //  = std::make_unique<DefaultLoadingScreen>(_renderingCanvas);
 
   // Load WebVR Devices
   // if (options.autoEnableWebVR) {
@@ -1335,7 +1336,7 @@ void Engine::drawUnIndexed(bool useTriangles, int verticesStart,
 // Shaders
 void Engine::_releaseEffect(Effect* effect)
 {
-  if (std_util::contains(_compiledEffects, effect->_key)) {
+  if (stl_util::contains(_compiledEffects, effect->_key)) {
     if (effect->getProgram()) {
       _gl->deleteProgram(effect->getProgram());
     }
@@ -1347,12 +1348,12 @@ Effect* Engine::createEffect(const std::string& baseName,
                              EffectCreationOptions& options, Engine* engine)
 {
   std::string name = baseName + "+" + baseName + "@" + options.defines;
-  if (std_util::contains(_compiledEffects, name)) {
+  if (stl_util::contains(_compiledEffects, name)) {
     return _compiledEffects[name].get();
   }
 
-  auto effect  = std_util::make_unique<Effect>(baseName, options, engine);
-  effect->_key = name;
+  auto effect            = std::make_unique<Effect>(baseName, options, engine);
+  effect->_key           = name;
   _compiledEffects[name] = std::move(effect);
 
   return _compiledEffects[name].get();
@@ -1363,22 +1364,22 @@ Engine::createEffect(std::unordered_map<std::string, std::string>& baseName,
                      EffectCreationOptions& options, Engine* engine)
 {
   std::string vertex
-    = std_util::contains(baseName, "vertexElement") ?
+    = stl_util::contains(baseName, "vertexElement") ?
         baseName["vertexElement"] :
-        std_util::contains(baseName, "vertex") ? baseName["vertex"] : "vertex";
-  std::string fragment = std_util::contains(baseName, "fragmentElement") ?
+        stl_util::contains(baseName, "vertex") ? baseName["vertex"] : "vertex";
+  std::string fragment = stl_util::contains(baseName, "fragmentElement") ?
                            baseName["fragmentElement"] :
-                           std_util::contains(baseName, "fragment") ?
+                           stl_util::contains(baseName, "fragment") ?
                            baseName["fragment"] :
                            "fragment";
 
   std::string name = vertex + "+" + fragment + "@" + options.defines;
-  if (std_util::contains(_compiledEffects, name)) {
+  if (stl_util::contains(_compiledEffects, name)) {
     return _compiledEffects[name].get();
   }
 
-  auto effect  = std_util::make_unique<Effect>(baseName, options, engine);
-  effect->_key = name;
+  auto effect            = std::make_unique<Effect>(baseName, options, engine);
+  effect->_key           = name;
   _compiledEffects[name] = std::move(effect);
 
   return _compiledEffects[name].get();
@@ -1397,16 +1398,16 @@ Effect* Engine::createEffectForParticles(
     {"vertex", "particles"}, {"fragmentElement", fragmentName}};
   std::vector<std::string> attributesNames{"position", "color", "options"};
   std::vector<std::string> _uniformsNames = {"view", "projection"};
-  std_util::concat(_uniformsNames, uniformsNames);
+  stl_util::concat(_uniformsNames, uniformsNames);
   std::vector<std::string> _samplers = {"diffuseSampler"};
-  std_util::concat(_samplers, samplers);
+  stl_util::concat(_samplers, samplers);
 
   EffectCreationOptions options;
   options.attributes    = std::move(attributesNames);
   options.uniformsNames = std::move(_uniformsNames);
   options.samplers      = std::move(_samplers);
   options.defines       = defines;
-  options.fallbacks     = std_util::make_unique<EffectFallbacks>(*fallbacks);
+  options.fallbacks     = std::make_unique<EffectFallbacks>(*fallbacks);
   options.onCompiled    = onCompiled;
   options.onError       = onError;
 

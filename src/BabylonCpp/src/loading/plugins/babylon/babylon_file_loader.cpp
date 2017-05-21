@@ -2,6 +2,7 @@
 
 #include <babylon/actions/action_manager.h>
 #include <babylon/animations/animation.h>
+#include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
@@ -54,7 +55,7 @@ bool BabylonFileLoader::isDescendantOf(const Json::value& mesh,
     }
   }
   if (mesh.contains("parentId")
-      && std_util::contains(hierarchyIds, Json::GetString(mesh, "parentId"))) {
+      && stl_util::contains(hierarchyIds, Json::GetString(mesh, "parentId"))) {
     hierarchyIds.emplace_back(Json::GetString(mesh, "id"));
     return true;
   }
@@ -174,7 +175,7 @@ bool BabylonFileLoader::importMesh(
         const std::string parsedMeshMaterialId
           = Json::GetString(parsedMesh, "materialId");
         bool materialFound
-          = std_util::contains(loadedMaterialsIds, parsedMeshMaterialId);
+          = stl_util::contains(loadedMaterialsIds, parsedMeshMaterialId);
         if (!parsedMeshMaterialId.empty() && !materialFound
             && parsedData.contains("multiMaterials")
             && parsedData.get("multiMaterials").is<Json::array>()) {
@@ -224,7 +225,7 @@ bool BabylonFileLoader::importMesh(
         const std::string parsedMeshSkeletonId
           = Json::GetString(parsedMesh, "skeletonId");
         bool skeletonAlreadyLoaded
-          = std_util::contains(loadedSkeletonsIds, parsedMeshSkeletonId);
+          = stl_util::contains(loadedSkeletonsIds, parsedMeshSkeletonId);
         if (!parsedMeshSkeletonId.empty() && !skeletonAlreadyLoaded
             && parsedData.contains("skeletons")
             && parsedData.get("skeletons").is<Json::array>()) {
@@ -275,7 +276,7 @@ bool BabylonFileLoader::importMesh(
     const std::string parsedParticleSystemEmitterId
       = Json::GetString(parsedParticleSystem, "emitterId");
     if (!parsedParticleSystemEmitterId.empty()
-        && std_util::contains(hierarchyIds, parsedParticleSystemEmitterId)) {
+        && stl_util::contains(hierarchyIds, parsedParticleSystemEmitterId)) {
       particleSystems.emplace_back(
         ParticleSystem::Parse(parsedParticleSystem, scene, rootUrl));
     }

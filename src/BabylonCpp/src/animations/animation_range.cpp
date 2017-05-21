@@ -27,7 +27,7 @@ AnimationRange AnimationRange::copy() const
 
 std::unique_ptr<AnimationRange> AnimationRange::clone() const
 {
-  return std_util::make_unique<AnimationRange>(name, from, to);
+  return std::make_unique<AnimationRange>(name, from, to);
 }
 
 } // end of namespace BABYLON

@@ -47,7 +47,7 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std_util::make_unique<GridMaterialDefines>();
+    subMesh->_materialDefines = std::make_unique<GridMaterialDefines>();
   }
 
   auto defines

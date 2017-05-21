@@ -122,8 +122,8 @@ std::unique_ptr<DynamicTexture> DynamicTexture::clone() const
   options.canvas  = _canvas;
   options.width   = textureSize.width;
   options.height  = textureSize.height;
-  auto newTexture = std_util::make_unique<DynamicTexture>(
-    name, options, getScene(), _generateMipMaps);
+  auto newTexture = std::make_unique<DynamicTexture>(name, options, getScene(),
+                                                     _generateMipMaps);
 
   // Base texture
   newTexture->setHasAlpha(hasAlpha());

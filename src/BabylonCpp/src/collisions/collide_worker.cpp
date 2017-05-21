@@ -1,5 +1,6 @@
 #include <babylon/collisions/collide_worker.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/collisions/collider.h>
 #include <babylon/core/logging.h>
 #include <babylon/math/plane.h>
@@ -56,9 +57,9 @@ void CollideWorker::collideWithWorld(Vector3& position, Vector3& velocity,
     return;
   }
 
-  if (!std_util::almost_equal(velocity.x, 0.f)
-      || !std_util::almost_equal(velocity.y, 0.f)
-      || !std_util::almost_equal(velocity.z, 0.f)) {
+  if (!stl_util::almost_equal(velocity.x, 0.f)
+      || !stl_util::almost_equal(velocity.y, 0.f)
+      || !stl_util::almost_equal(velocity.z, 0.f)) {
     collider->_getResponse(position, velocity);
   }
 

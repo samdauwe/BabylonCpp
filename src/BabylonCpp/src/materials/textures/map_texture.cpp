@@ -17,8 +17,8 @@ MapTexture::MapTexture(const std::string& iName, Scene* scene,
   wrapV = Texture::CLAMP_ADDRESSMODE;
 
   // Create the rectPackMap that will allocate portion of the texture
-  _rectPackingMap = std_util::make_unique<RectPackingMap>(
-    Size(size.width, size.height), margin);
+  _rectPackingMap
+    = std::make_unique<RectPackingMap>(Size(size.width, size.height), margin);
 
   // Create the texture that will store the content
   RenderTargetOptions options;
@@ -60,7 +60,7 @@ void MapTexture::bindTextureForPosSize(const Vector2& pos, const Size& size,
 
   auto engine = getScene()->getEngine();
   engine->bindFramebuffer(_texture);
-  _replacedViewport = std_util::make_unique<Viewport>(
+  _replacedViewport = std::make_unique<Viewport>(
     engine->setDirectViewport(posX, posY, size.width, size.height));
   if (clear) {
     // We only want to clear the part of the texture we're binding to, only the

@@ -17,7 +17,7 @@ ReflectionProbe::ReflectionProbe(const std::string& name, const ISize& size,
     , _add{Vector3::Zero()}
     , _attachedMesh{nullptr}
 {
-  _renderTargetTexture = std_util::make_unique<RenderTargetTexture>(
+  _renderTargetTexture = std::make_unique<RenderTargetTexture>(
     name, size, scene, generateMipMaps, true, Engine::TEXTURETYPE_UNSIGNED_INT,
     true);
 

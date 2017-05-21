@@ -1,5 +1,6 @@
 #include <babylon/mesh/polygonmesh/polygon_mesh_builder.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/math/path2.h>
 #include <babylon/math/vector2.h>
 #include <babylon/mesh/mesh.h>
@@ -74,9 +75,9 @@ Mesh* PolygonMeshBuilder::build(bool updatable, float depth)
   auto bounds         = _points.computeBounds();
   auto& pointElements = _points.elements;
   for (auto& p : pointElements) {
-    std_util::concat(normals, {0.f, 1.f, 0.f});
-    std_util::concat(positions, {p.x, 0.f, p.y});
-    std_util::concat(uvs, {(p.x - bounds.min.x) / bounds.width,
+    stl_util::concat(normals, {0.f, 1.f, 0.f});
+    stl_util::concat(positions, {p.x, 0.f, p.y});
+    stl_util::concat(uvs, {(p.x - bounds.min.x) / bounds.width,
                            (p.y - bounds.min.y) / bounds.height});
   }
 
@@ -126,9 +127,9 @@ Mesh* PolygonMeshBuilder::build(bool updatable, float depth)
     size_t positionscount = (positions.size() / 3);
 
     for (auto& p : pointElements) { // add the elements at the depth
-      std_util::concat(normals, {0.f, -1.f, 0.f});
-      std_util::concat(positions, {p.x, -depth, p.y});
-      std_util::concat(uvs, {1.f - (p.x - bounds.min.x) / bounds.width,
+      stl_util::concat(normals, {0.f, -1.f, 0.f});
+      stl_util::concat(positions, {p.x, -depth, p.y});
+      stl_util::concat(uvs, {1.f - (p.x - bounds.min.x) / bounds.width,
                              1.f - (p.y - bounds.min.y) / bounds.height});
     }
 
@@ -178,10 +179,10 @@ void PolygonMeshBuilder::addSide(Float32Array& positions, Float32Array& normals,
       p1 = points.elements[i + 1];
     }
 
-    std_util::concat(positions, {p.x, 0.f, p.y});
-    std_util::concat(positions, {p.x, -depth, p.y});
-    std_util::concat(positions, {p1.x, 0.f, p1.y});
-    std_util::concat(positions, {p1.x, -depth, p1.y});
+    stl_util::concat(positions, {p.x, 0.f, p.y});
+    stl_util::concat(positions, {p.x, -depth, p.y});
+    stl_util::concat(positions, {p1.x, 0.f, p1.y});
+    stl_util::concat(positions, {p1.x, -depth, p1.y});
 
     Vector3 v1(p.x, 0.f, p.y);
     Vector3 v2(p1.x, 0.f, p1.y);
@@ -190,17 +191,17 @@ void PolygonMeshBuilder::addSide(Float32Array& positions, Float32Array& normals,
     Vector3 vn = Vector3::Cross(v3, v4);
     vn         = vn.normalize();
 
-    std_util::concat(uvs, {ulength / bounds.width, 0.f});
-    std_util::concat(uvs, {ulength / bounds.width, 1.f});
+    stl_util::concat(uvs, {ulength / bounds.width, 0.f});
+    stl_util::concat(uvs, {ulength / bounds.width, 1.f});
     ulength += v3.length();
-    std_util::concat(uvs, {(ulength / bounds.width), 0.f});
-    std_util::concat(uvs, {(ulength / bounds.width), 1.f});
+    stl_util::concat(uvs, {(ulength / bounds.width), 0.f});
+    stl_util::concat(uvs, {(ulength / bounds.width), 1.f});
 
     if (!flip) {
-      std_util::concat(normals, {-vn.x, -vn.y, -vn.z});
-      std_util::concat(normals, {-vn.x, -vn.y, -vn.z});
-      std_util::concat(normals, {-vn.x, -vn.y, -vn.z});
-      std_util::concat(normals, {-vn.x, -vn.y, -vn.z});
+      stl_util::concat(normals, {-vn.x, -vn.y, -vn.z});
+      stl_util::concat(normals, {-vn.x, -vn.y, -vn.z});
+      stl_util::concat(normals, {-vn.x, -vn.y, -vn.z});
+      stl_util::concat(normals, {-vn.x, -vn.y, -vn.z});
 
       indices.emplace_back(startIndex + 0);
       indices.emplace_back(startIndex + 1);
@@ -211,10 +212,10 @@ void PolygonMeshBuilder::addSide(Float32Array& positions, Float32Array& normals,
       indices.emplace_back(startIndex + 2);
     }
     else {
-      std_util::concat(normals, {vn.x, vn.y, vn.z});
-      std_util::concat(normals, {vn.x, vn.y, vn.z});
-      std_util::concat(normals, {vn.x, vn.y, vn.z});
-      std_util::concat(normals, {vn.x, vn.y, vn.z});
+      stl_util::concat(normals, {vn.x, vn.y, vn.z});
+      stl_util::concat(normals, {vn.x, vn.y, vn.z});
+      stl_util::concat(normals, {vn.x, vn.y, vn.z});
+      stl_util::concat(normals, {vn.x, vn.y, vn.z});
 
       indices.emplace_back(startIndex + 0);
       indices.emplace_back(startIndex + 2);

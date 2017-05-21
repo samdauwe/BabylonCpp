@@ -1,5 +1,6 @@
 #include <babylon/math/vector4.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/math/matrix.h>
 
 namespace BABYLON {
@@ -57,7 +58,7 @@ Vector4 Vector4::copy() const
 
 std::unique_ptr<Vector4> Vector4::clone() const
 {
-  return std_util::make_unique<Vector4>(*this);
+  return std::make_unique<Vector4>(*this);
 }
 
 std::string Vector4::toString() const
@@ -76,7 +77,7 @@ const char* Vector4::getClassName() const
 size_t Vector4::getHashCode() const
 {
   const float tmp = (((x * 0.397f) + y * 3.97f) + z * 39.7f) + w;
-  return std_util::to_bitset(tmp).to_ullong();
+  return stl_util::to_bitset(tmp).to_ullong();
 }
 
 /** Operators **/
@@ -198,10 +199,10 @@ const Vector4& Vector4::scaleToRef(float iscale, Vector4& result) const
 
 bool Vector4::equals(const Vector4& otherVector) const
 {
-  return std_util::almost_equal(x, otherVector.x)
-         && std_util::almost_equal(y, otherVector.y)
-         && std_util::almost_equal(z, otherVector.z)
-         && std_util::almost_equal(w, otherVector.w);
+  return stl_util::almost_equal(x, otherVector.x)
+         && stl_util::almost_equal(y, otherVector.y)
+         && stl_util::almost_equal(z, otherVector.z)
+         && stl_util::almost_equal(w, otherVector.w);
 }
 
 bool Vector4::equalsWithEpsilon(const Vector4& otherVector, float epsilon) const
@@ -214,8 +215,8 @@ bool Vector4::equalsWithEpsilon(const Vector4& otherVector, float epsilon) const
 
 bool Vector4::equalsToFloats(float ix, float iy, float iz, float iw) const
 {
-  return std_util::almost_equal(x, ix) && std_util::almost_equal(y, iy)
-         && std_util::almost_equal(z, iz) && std_util::almost_equal(w, iw);
+  return stl_util::almost_equal(x, ix) && stl_util::almost_equal(y, iy)
+         && stl_util::almost_equal(z, iz) && stl_util::almost_equal(w, iw);
 }
 
 Vector4& Vector4::multiplyInPlace(const Vector4& otherVector)
@@ -387,7 +388,7 @@ Vector4& Vector4::normalize()
 {
   const float len = length();
 
-  if (std_util::almost_equal(len, 0.f)) {
+  if (stl_util::almost_equal(len, 0.f)) {
     return *this;
   }
 

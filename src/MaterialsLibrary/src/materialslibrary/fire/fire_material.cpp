@@ -61,7 +61,7 @@ bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std_util::make_unique<FireMaterialDefines>();
+    subMesh->_materialDefines = std::make_unique<FireMaterialDefines>();
   }
 
   auto defines

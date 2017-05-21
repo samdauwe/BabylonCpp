@@ -35,7 +35,7 @@ SimpleInteractionHelper::currentAction() const
 ManipulatorInteractionHelper* SimpleInteractionHelper::manipulator()
 {
   if (!_manipulator) {
-    _manipulator = std_util::make_unique<ManipulatorInteractionHelper>(_scene);
+    _manipulator = std::make_unique<ManipulatorInteractionHelper>(_scene);
   }
 
   return _manipulator.get();

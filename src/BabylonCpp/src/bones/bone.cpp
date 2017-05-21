@@ -1,6 +1,7 @@
 #include <babylon/bones/bone.h>
 
 #include <babylon/animations/animation.h>
+#include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/mesh/abstract_mesh.h>
 
@@ -26,8 +27,8 @@ Bone::Bone(const std::string& _name, Skeleton* skeleton, Bone* parentBone,
     , _localMatrix{matrix}
     , _restPose{restPose}
     , _baseMatrix{matrix}
-    , _worldTransform{std_util::make_unique<Matrix>()}
-    , _invertedAbsoluteTransform{std_util::make_unique<Matrix>()}
+    , _worldTransform{std::make_unique<Matrix>()}
+    , _invertedAbsoluteTransform{std::make_unique<Matrix>()}
     , _scaleMatrix{Matrix::Identity()}
     , _scaleVector{Vector3(1.f, 1.f, 1.f)}
     , _negateScaleChildren{Vector3(1.f, 1.f, 1.f)}
@@ -211,9 +212,9 @@ bool Bone::copyAnimationRange(Bone* source, const std::string& rangeName,
 
   bool dimensionsScalingReqd
     = rescaleAsRequired && !parent && hasSkelDimensionsRatio
-      && (!std_util::almost_equal(skelDimensionsRatio.x, 1.f)
-          || !std_util::almost_equal(skelDimensionsRatio.y, 1.f)
-          || !std_util::almost_equal(skelDimensionsRatio.z, 1.f));
+      && (!stl_util::almost_equal(skelDimensionsRatio.x, 1.f)
+          || !stl_util::almost_equal(skelDimensionsRatio.y, 1.f)
+          || !stl_util::almost_equal(skelDimensionsRatio.z, 1.f));
 
   auto& destKeys = animations[0]->getKeys();
 

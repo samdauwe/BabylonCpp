@@ -1,5 +1,6 @@
 #include <babylon/extensions/manipulationhelpers/radix.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
 #include <babylon/culling/ray.h>
 #include <babylon/engine/node.h>
@@ -181,8 +182,8 @@ void Radix::hide()
 void Radix::setVisibleState(AbstractMesh* mesh, bool state)
 {
   mesh->isVisible = state;
-  for (auto& mesh : mesh->getChildMeshes(true)) {
-    setVisibleState(mesh, state);
+  for (auto& childMesh : mesh->getChildMeshes(true)) {
+    setVisibleState(childMesh, state);
   }
 }
 
@@ -270,8 +271,8 @@ void Radix::constructArrow(RadixFeatures feature, const std::string& name,
   auto rotation = Quaternion::FromRotationMatrix(transform);
 
   Float32Array points;
-  std_util::concat(points, {0.f, hasRot ? _coneLength : 0.f, 0.f});
-  std_util::concat(points, {0.f, _arrowLength - _coneLength, 0.f});
+  stl_util::concat(points, {0.f, hasRot ? _coneLength : 0.f, 0.f});
+  stl_util::concat(points, {0.f, _arrowLength - _coneLength, 0.f});
 
   auto wireMesh = LinesMesh::New(name + "Wire", _scene);
   wireMesh->setRotationQuaternion(rotation);
@@ -281,7 +282,7 @@ void Radix::constructArrow(RadixFeatures feature, const std::string& name,
   wireMesh->setIntersectionThreshold(wireSelectionThreshold());
   wireMesh->isPickable = false;
 
-  auto vd       = std_util::make_unique<VertexData>();
+  auto vd       = std::make_unique<VertexData>();
   vd->positions = points;
   vd->indices   = {0, 1};
   vd->applyToMesh(wireMesh);
@@ -393,7 +394,7 @@ void Radix::updateMaterialFromHighlighted(RadixFeatures feature,
 
 StandardMaterial* Radix::getMaterial(const std::string& name)
 {
-  if (!std_util::contains(_materials, name)) {
+  if (!stl_util::contains(_materials, name)) {
     return nullptr;
   }
 

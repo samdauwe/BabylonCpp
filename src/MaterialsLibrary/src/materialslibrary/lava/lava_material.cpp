@@ -67,7 +67,7 @@ bool LavaMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std_util::make_unique<LavaMaterialDefines>();
+    subMesh->_materialDefines = std::make_unique<LavaMaterialDefines>();
   }
 
   auto defines
@@ -124,7 +124,7 @@ bool LavaMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
     scene->resetCachedMaterial();
 
     // Fallbacks
-    auto fallbacks = std_util::make_unique<EffectFallbacks>();
+    auto fallbacks = std::make_unique<EffectFallbacks>();
     if (defines[LMD::FOG]) {
       fallbacks->addFallback(1, "FOG");
     }
@@ -275,7 +275,7 @@ void LavaMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
                               * speed / 1000.f);
 
   if (!fogColor) {
-    fogColor = std_util::make_unique<Color3>(Color3::Black());
+    fogColor = std::make_unique<Color3>(Color3::Black());
   }
   _activeEffect->setColor3("fogColor", *fogColor);
   _activeEffect->setFloat("fogDensity", fogDensity);

@@ -1,5 +1,6 @@
 #include <babylon/states/_depth_culling_state.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 
 namespace BABYLON {
@@ -33,7 +34,7 @@ float _DepthCullingState::zOffset() const
 
 void _DepthCullingState::setZOffset(float value)
 {
-  if (std_util::almost_equal(_zOffset, value)) {
+  if (stl_util::almost_equal(_zOffset, value)) {
     return;
   }
 
@@ -182,7 +183,7 @@ void _DepthCullingState::apply(GL::IGLRenderingContext& gl)
 
   // zOffset
   if (_isZOffsetDirty) {
-    if (!std_util::almost_equal(zOffset(), 0.f)) {
+    if (!stl_util::almost_equal(zOffset(), 0.f)) {
       gl.enable(GL::POLYGON_OFFSET_FILL);
       gl.polygonOffset(zOffset(), 0);
     }

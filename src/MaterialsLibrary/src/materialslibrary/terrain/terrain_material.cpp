@@ -65,7 +65,7 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std_util::make_unique<TerrainMaterialDefines>();
+    subMesh->_materialDefines = std::make_unique<TerrainMaterialDefines>();
   }
 
   auto defines
@@ -125,7 +125,7 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
     scene->resetCachedMaterial();
 
     // Fallbacks
-    auto fallbacks = std_util::make_unique<EffectFallbacks>();
+    auto fallbacks = std::make_unique<EffectFallbacks>();
     if (defines[TMD::FOG]) {
       fallbacks->addFallback(1, "FOG");
     }

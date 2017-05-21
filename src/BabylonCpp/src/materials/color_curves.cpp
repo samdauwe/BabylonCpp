@@ -1,5 +1,6 @@
 #include <babylon/materials/color_curves.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/json.h>
 #include <babylon/materials/effect.h>
 
@@ -354,7 +355,7 @@ void ColorCurves::Bind(ColorCurves& colorCurves, Effect* effect)
 
 void ColorCurves::PrepareUniforms(std::vector<std::string>& uniformsList)
 {
-  std_util::concat(uniformsList, {
+  stl_util::concat(uniformsList, {
                                    "vCameraColorCurveNeutral",  //
                                    "vCameraColorCurvePositive", //
                                    "vCameraColorCurveNegative"  //
@@ -411,7 +412,7 @@ void ColorCurves::fromHSBToRef(float hue, float saturation, float brightness,
   auto s = ColorCurves::clamp(saturation / 100.f, 0, 1);
   auto v = ColorCurves::clamp(brightness / 100.f, 0, 1);
 
-  if (std_util::almost_equal(s, 0.f)) {
+  if (stl_util::almost_equal(s, 0.f)) {
     result.r = v;
     result.g = v;
     result.b = v;

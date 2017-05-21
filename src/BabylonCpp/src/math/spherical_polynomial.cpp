@@ -90,7 +90,7 @@ SphericalPolynomial SphericalPolynomial::copy() const
 
 std::unique_ptr<SphericalPolynomial> SphericalPolynomial::clone() const
 {
-  return std_util::make_unique<SphericalPolynomial>(*this);
+  return std::make_unique<SphericalPolynomial>(*this);
 }
 
 void SphericalPolynomial::addAmbient(const Color3& color)

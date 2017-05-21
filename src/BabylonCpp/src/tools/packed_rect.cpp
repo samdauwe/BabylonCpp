@@ -172,7 +172,7 @@ PackedRect* PackedRect::splitNode(const Size& contentSize)
   // contentSize)
   if (!_contentSize && _initialSize) {
     _contentSize = cs.clone();
-    _leftNode    = std_util::make_unique<PackedRect>(
+    _leftNode    = std::make_unique<PackedRect>(
       _root, this, Vector2(_pos.x, _pos.y),
       Size(_initialSize->width, _initialSize->height));
     return _leftNode->splitNode(contentSize);
@@ -182,13 +182,13 @@ PackedRect* PackedRect::splitNode(const Size& contentSize)
     _initialSize = cs.clone();
 
     if (cs.width != _size.width) {
-      _rightNode = std_util::make_unique<PackedRect>(
+      _rightNode = std::make_unique<PackedRect>(
         _root, this, Vector2(_pos.x + cs.width, _pos.y),
         Size(_size.width - cs.width, cs.height));
     }
 
     if (cs.height != _size.height) {
-      _bottomNode = std_util::make_unique<PackedRect>(
+      _bottomNode = std::make_unique<PackedRect>(
         _root, this, Vector2(_pos.x, _pos.y + cs.height),
         Size(_size.width, _size.height - cs.height));
     }

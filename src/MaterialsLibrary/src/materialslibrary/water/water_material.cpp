@@ -133,7 +133,7 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std_util::make_unique<WaterMaterialDefines>();
+    subMesh->_materialDefines = std::make_unique<WaterMaterialDefines>();
   }
 
   auto defines
@@ -208,7 +208,7 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
     scene->resetCachedMaterial();
 
     // Fallbacks
-    auto fallbacks = std_util::make_unique<EffectFallbacks>();
+    auto fallbacks = std::make_unique<EffectFallbacks>();
     if (defines[WMD::FOG]) {
       fallbacks->addFallback(1, "FOG");
     }
@@ -402,14 +402,14 @@ void WaterMaterial::_createRenderTargets(Scene* scene,
   auto renderTargetSizeY = static_cast<int>(renderTargetSize.y);
 
   // Render targets
-  _refractionRTT = std_util::make_unique<RenderTargetTexture>(
+  _refractionRTT = std::make_unique<RenderTargetTexture>(
     name + "_refraction", ISize{renderTargetSizeX, renderTargetSizeY}, scene,
     false, true, Engine::TEXTURETYPE_UNSIGNED_INT, false,
     Texture::TRILINEAR_SAMPLINGMODE, true, false);
   _refractionRTT->wrapU = Texture::MIRROR_ADDRESSMODE;
   _refractionRTT->wrapV = Texture::MIRROR_ADDRESSMODE;
 
-  _reflectionRTT = std_util::make_unique<RenderTargetTexture>(
+  _reflectionRTT = std::make_unique<RenderTargetTexture>(
     name + "_reflection", ISize{renderTargetSizeX, renderTargetSizeY}, scene,
     false, true, Engine::TEXTURETYPE_UNSIGNED_INT, false,
     Texture::TRILINEAR_SAMPLINGMODE, true, false);

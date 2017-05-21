@@ -1,5 +1,6 @@
 #include <babylon/particles/solid_particle_system.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/cameras/target_camera.h>
 #include <babylon/core/random.h>
@@ -35,8 +36,8 @@ SolidParticleSystem::SolidParticleSystem(
     , _isVisibilityBoxLocked{false}
     , _alwaysVisible{false}
     , _shapeCounter{0}
-    , _copy{std_util::make_unique<SolidParticle>(0, 0, nullptr, 0, 0, nullptr)}
-    , _color{std_util::make_unique<Color4>(0.f, 0.f, 0.f, 0.f)}
+    , _copy{std::make_unique<SolidParticle>(0, 0, nullptr, 0, 0, nullptr)}
+    , _color{std::make_unique<Color4>(0.f, 0.f, 0.f, 0.f)}
     , _computeParticleColor{true}
     , _computeParticleTexture{true}
     , _computeParticleRotation{true}
@@ -105,7 +106,7 @@ Mesh* SolidParticleSystem::buildMesh()
   if (_mustUnrotateFixedNormals) {
     _unrotateFixedNormals();
   }
-  auto vertexData = std_util::make_unique<VertexData>();
+  auto vertexData = std::make_unique<VertexData>();
   vertexData->set(_positions32, VertexBuffer::PositionKind);
   vertexData->indices = _indices;
   vertexData->set(_normals32, VertexBuffer::NormalKind);
@@ -184,13 +185,13 @@ SolidParticleSystem::digest(Mesh* _mesh,
     for (size_t j = f * 3; j < (f + size) * 3; ++j) {
       facetInd.emplace_back(fi);
       auto i = static_cast<unsigned int>(meshInd[j]);
-      std_util::concat(
+      stl_util::concat(
         facetPos, {meshPos[i * 3], meshPos[i * 3 + 1], meshPos[i * 3 + 2]});
       if (!meshUV.empty()) {
-        std_util::concat(facetUV, {meshUV[i * 2], meshUV[i * 2 + 1]});
+        stl_util::concat(facetUV, {meshUV[i * 2], meshUV[i * 2 + 1]});
       }
       if (!meshCol.empty()) {
-        std_util::concat(facetCol, {meshCol[i * 4 + 0], meshCol[i * 4 + 1],
+        stl_util::concat(facetCol, {meshCol[i * 4 + 0], meshCol[i * 4 + 1],
                                     meshCol[i * 4 + 2], meshCol[i * 4 + 3]});
       }
       ++fi;
@@ -215,8 +216,8 @@ SolidParticleSystem::digest(Mesh* _mesh,
     if (_particlesIntersect) {
       bInfo = BoundingInfo(barycenter, barycenter);
     }
-    auto modelShape = std_util::make_unique<ModelShape>(
-      _shapeCounter, shape, shapeUV, nullptr, nullptr);
+    auto modelShape = std::make_unique<ModelShape>(_shapeCounter, shape,
+                                                   shapeUV, nullptr, nullptr);
 
     // add the particle in the SPS
     auto currentPos = static_cast<unsigned int>(_positions.size());
@@ -331,18 +332,18 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
     _vertex.z *= _copy->scaling.z;
 
     Vector3::TransformCoordinatesToRef(_vertex, _rotMatrix, _rotated);
-    std_util::concat(positions, {_copy->position.x + _rotated.x,
+    stl_util::concat(positions, {_copy->position.x + _rotated.x,
                                  _copy->position.y + _rotated.y,
                                  _copy->position.z + _rotated.z});
     if (!meshUV.empty()) {
-      std_util::concat(
+      stl_util::concat(
         uvs, {(_copy->uvs.z - _copy->uvs.x) * meshUV[u] + _copy->uvs.x,
               (_copy->uvs.w - _copy->uvs.y) * meshUV[u + 1] + _copy->uvs.y});
       u += 2;
     }
 
     if (_copy->color) {
-      _color = std_util::make_unique<Color4>(*_copy->color);
+      _color = std::make_unique<Color4>(*_copy->color);
     }
     else if (!meshCol.empty() && (c + 3 < meshCol.size())) {
       _color->r = meshCol[c];
@@ -356,7 +357,7 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
       _color->b = 1.f;
       _color->a = 1.f;
     }
-    std_util::concat(colors, {_color->r, _color->g, _color->b, _color->a});
+    stl_util::concat(colors, {_color->r, _color->g, _color->b, _color->a});
     c += 4;
 
     if (!recomputeNormals && (n + 3 < meshNor.size())) {
@@ -364,7 +365,7 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
       _normal.y = meshNor[n + 1];
       _normal.z = meshNor[n + 2];
       Vector3::TransformNormalToRef(_normal, _rotMatrix, _normal);
-      std_util::concat(normals, {_normal.x, _normal.y, _normal.z});
+      stl_util::concat(normals, {_normal.x, _normal.y, _normal.z});
       n += 3;
     }
   }
@@ -412,7 +413,7 @@ SolidParticleSystem::_addParticle(unsigned int /*idx*/, unsigned int /*idxpos*/,
                                   const BoundingInfo& /*bInfo*/)
 {
 #if 0
-  particles.emplace_back(std_util::make_unique<SolidParticle>(new SolidParticle(
+  particles.emplace_back(std::make_unique<SolidParticle>(new SolidParticle(
     idx, idxpos, model.get(), shapeId, idxInShape, this, bInfo)));
   return particles.back().get();
 #endif
@@ -438,8 +439,8 @@ int SolidParticleSystem::addShape(
   auto& posfunc = options.positionFunction;
   auto& vtxfunc = options.vertexFunction;
 
-  auto modelShape = std_util::make_unique<ModelShape>(
-    _shapeCounter, shape, shapeUV, posfunc, vtxfunc);
+  auto modelShape = std::make_unique<ModelShape>(_shapeCounter, shape, shapeUV,
+                                                 posfunc, vtxfunc);
 
   // particles
   SolidParticle* sp;

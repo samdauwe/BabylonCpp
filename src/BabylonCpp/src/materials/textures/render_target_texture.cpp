@@ -1,5 +1,6 @@
 #include <babylon/materials/textures/render_target_texture.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/scene.h>
 #include <babylon/math/matrix.h>
@@ -49,7 +50,7 @@ RenderTargetTexture::RenderTargetTexture(
     _texture = scene->getEngine()->createRenderTargetCubeTexture(
       size, _renderTargetOptions);
     coordinatesMode = Texture::INVCUBIC_MODE;
-    _textureMatrix  = std_util::make_unique<Matrix>(Matrix::Identity());
+    _textureMatrix  = std::make_unique<Matrix>(Matrix::Identity());
   }
   else {
     _texture = scene->getEngine()->createRenderTargetTexture(
@@ -57,7 +58,7 @@ RenderTargetTexture::RenderTargetTexture(
   }
 
   // Rendering groups
-  _renderingManager = std_util::make_unique<RenderingManager>(scene);
+  _renderingManager = std::make_unique<RenderingManager>(scene);
 }
 
 RenderTargetTexture::~RenderTargetTexture()
@@ -273,7 +274,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
         || !particleSystem->emitter->isEnabled()) {
       continue;
     }
-    if (std_util::index_of(currentRenderList, particleSystem->emitter) >= 0) {
+    if (stl_util::index_of(currentRenderList, particleSystem->emitter) >= 0) {
       _renderingManager->dispatchParticles(particleSystem.get());
     }
   }
@@ -394,7 +395,7 @@ void RenderTargetTexture::setRenderingAutoClearDepthStencil(
 std::unique_ptr<RenderTargetTexture> RenderTargetTexture::clone() const
 {
   auto textureSize = getSize();
-  auto newTexture  = std_util::make_unique<RenderTargetTexture>(
+  auto newTexture  = std::make_unique<RenderTargetTexture>(
     name, textureSize, getScene(), _renderTargetOptions.generateMipMaps,
     _doNotChangeAspectRatio, _renderTargetOptions.type, isCube,
     _renderTargetOptions.samplingMode, _renderTargetOptions.generateDepthBuffer,

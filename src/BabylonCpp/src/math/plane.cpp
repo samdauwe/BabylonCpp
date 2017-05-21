@@ -1,5 +1,6 @@
 #include <babylon/math/plane.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/math/matrix.h>
 
 namespace BABYLON {
@@ -58,7 +59,7 @@ Plane Plane::copy() const
 
 std::unique_ptr<Plane> Plane::clone() const
 {
-  return std_util::make_unique<Plane>(*this);
+  return std::make_unique<Plane>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Plane& plane)
@@ -75,7 +76,7 @@ const char* Plane::getClassName() const
 size_t Plane::getHashCode() const
 {
   size_t hash = normal.getHashCode();
-  hash        = (hash * 397) + std_util::to_bitset(d).to_ullong();
+  hash        = (hash * 397) + stl_util::to_bitset(d).to_ullong();
   return hash;
 }
 
@@ -91,7 +92,7 @@ Plane& Plane::normalize()
                            + (normal.z * normal.z));
   float magnitude = 0.f;
 
-  if (!std_util::almost_equal(norm, 0.f)) {
+  if (!stl_util::almost_equal(norm, 0.f)) {
     magnitude = 1.f / norm;
   }
 
@@ -153,7 +154,7 @@ Plane& Plane::copyFromPoints(const Vector3& point1, const Vector3& point2,
   const float pyth = sqrtf((yz * yz) + (xz * xz) + (xy * xy));
   float invPyth    = 0.f;
 
-  if (!std_util::almost_equal(pyth, 0.f)) {
+  if (!stl_util::almost_equal(pyth, 0.f)) {
     invPyth = 1.f / pyth;
   }
   else {

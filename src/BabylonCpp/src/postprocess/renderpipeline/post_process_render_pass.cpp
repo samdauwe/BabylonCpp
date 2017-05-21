@@ -19,7 +19,7 @@ PostProcessRenderPass::PostProcessRenderPass(
     , _refCount{0}
 {
   _renderTexture
-    = std_util::make_unique<RenderTargetTexture>(name, size, scene);
+    = std::make_unique<RenderTargetTexture>(name, size, scene);
   setRenderList(renderList);
 
   _renderTexture->onBeforeRenderObservable.add(beforeRender);

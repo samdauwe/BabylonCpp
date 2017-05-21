@@ -1,5 +1,6 @@
 #include <babylon/mesh/mesh_lod_level.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/mesh/mesh.h>
 
 namespace BABYLON {
@@ -45,7 +46,7 @@ MeshLODLevel::~MeshLODLevel()
 
 bool MeshLODLevel::operator==(const MeshLODLevel& other) const
 {
-  return std_util::almost_equal(distance, other.distance)
+  return stl_util::almost_equal(distance, other.distance)
          && (mesh == other.mesh);
 }
 

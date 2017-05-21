@@ -1,5 +1,7 @@
 #include <babylon/math/arc2.h>
 
+#include <babylon/babylon_stl_util.h>
+
 namespace BABYLON {
 
 Arc2::Arc2(const Vector2& startPoint, const Vector2& midPoint,
@@ -102,7 +104,7 @@ Arc2 Arc2::copy() const
 
 std::unique_ptr<Arc2> Arc2::clone() const
 {
-  return std_util::make_unique<Arc2>(*this);
+  return std::make_unique<Arc2>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Arc2& arc)
@@ -116,7 +118,7 @@ std::ostream& operator<<(std::ostream& os, const Arc2& arc)
 bool operator==(const Arc2& lhs, const Arc2& rhs)
 {
   return (lhs.centerPoint == rhs.centerPoint)
-         && std_util::almost_equal(lhs.radius, rhs.radius)
+         && stl_util::almost_equal(lhs.radius, rhs.radius)
          && (lhs.angle == rhs.angle) && (lhs.startAngle == rhs.startAngle)
          && (lhs.orientation == rhs.orientation);
 }

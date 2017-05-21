@@ -69,8 +69,7 @@ SpriteManager::SpriteManager(const std::string& iName,
   // invertU, invertV, cellIndexX, cellIndexY, color r, color g, color b, color
   // a)
   _vertexData.resize(capacity * 16 * 4);
-  _buffer
-    = std_util::make_unique<Buffer>(scene->getEngine(), _vertexData, true, 16);
+  _buffer = std::make_unique<Buffer>(scene->getEngine(), _vertexData, true, 16);
 
   auto positions
     = _buffer->createVertexBuffer(VertexBuffer::PositionKind, 0, 4);

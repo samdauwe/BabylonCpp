@@ -1,5 +1,6 @@
 #include <babylon/extensions/dynamicterrain/dynamic_terrain.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/scene.h>
 #include <babylon/extensions/dynamicterrain/dynamic_terrain_options.h>
@@ -438,7 +439,7 @@ void DynamicTerrain::_updateTerrain()
                                false);
   _terrain->updateVerticesData(VertexBuffer::UVKind, _uvs, false, false);
   _terrain->updateVerticesData(VertexBuffer::ColorKind, _colors, false, false);
-  _terrain->_boundingInfo = std_util::make_unique<BoundingInfo>(_bbMin, _bbMax);
+  _terrain->_boundingInfo = std::make_unique<BoundingInfo>(_bbMin, _bbMax);
   _terrain->_boundingInfo->update(*_terrain->_worldMatrix);
 }
 
@@ -501,8 +502,8 @@ float DynamicTerrain::getHeightFromMap(float x, float z, const Vector3& normal)
 
   const float xv4v1 = _v4.x - _v1.x;
   const float zv4v1 = _v4.z - _v1.z;
-  if (std_util::almost_equal(xv4v1, 0.f)
-      || std_util::almost_equal(zv4v1, 0.f)) {
+  if (stl_util::almost_equal(xv4v1, 0.f)
+      || stl_util::almost_equal(zv4v1, 0.f)) {
     return _v1.y;
   }
   const float cd = zv4v1 / xv4v1;
@@ -527,7 +528,7 @@ float DynamicTerrain::getHeightFromMap(float x, float z, const Vector3& normal)
   }
   const float d = -(_norm.x * v.x + _norm.y * v.y + _norm.z * v.z);
   float y       = v.y;
-  if (!std_util::almost_equal(_norm.y, 0.f)) {
+  if (!stl_util::almost_equal(_norm.y, 0.f)) {
     y = -(_norm.x * x + _norm.z * z + d) / _norm.y;
   }
 

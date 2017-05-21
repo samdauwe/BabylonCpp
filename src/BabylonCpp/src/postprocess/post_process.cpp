@@ -1,5 +1,6 @@
 #include <babylon/postprocess/post_process.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/materials/effect.h>
@@ -180,13 +181,13 @@ void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture)
     height = desiredHeight;
     /*_textures.emplace_back(_engine->createRenderTargetTexture(
       ISize(width, height), false,
-      std_util::index_of(pCamera->_postProcesses, this) == 0,
+      stl_util::index_of(pCamera->_postProcesses, this) == 0,
       renderTargetSamplingMode, _textureType));
 
     if (_reusable) {
       _textures.emplace_back(_engine->createRenderTargetTexture(
         ISize(width, height), false,
-        std_util::index_of(pCamera->_postProcesses, this) == 0,
+        stl_util::index_of(pCamera->_postProcesses, this) == 0,
         renderTargetSamplingMode, _textureType));
     }*/
 
@@ -273,7 +274,7 @@ void PostProcess::dispose(Camera* camera)
   }
   pCamera->detachPostProcess(this);
 
-  const int index = std_util::index_of(pCamera->_postProcesses, this);
+  const int index = stl_util::index_of(pCamera->_postProcesses, this);
   if (index == 0 && pCamera->_postProcesses.size() > 0) {
     _camera->_postProcesses[0]->markTextureDirty();
   }

@@ -1,5 +1,6 @@
 #include <babylon/collisions/collision_coordinator_legacy.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/collisions/collider.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -101,7 +102,7 @@ void CollisionCoordinatorLegacy::_collideWithWorld(
   for (auto& mesh : _scene->meshes) {
     if (mesh->isEnabled() && mesh->checkCollisions()
         && (!mesh->subMeshes.empty()) && mesh.get() != excludedMesh
-        &&  ((collisionMask & mesh->collisionGroup()) != 0)    ) {
+        && ((collisionMask & mesh->collisionGroup()) != 0)) {
       mesh->_checkCollision(collider);
     }
   }
@@ -111,9 +112,9 @@ void CollisionCoordinatorLegacy::_collideWithWorld(
     return;
   }
 
-  if (!std_util::almost_equal(velocity.x, 0.f)
-      || !std_util::almost_equal(velocity.y, 0.f)
-      || !std_util::almost_equal(velocity.z, 0.f)) {
+  if (!stl_util::almost_equal(velocity.x, 0.f)
+      || !stl_util::almost_equal(velocity.y, 0.f)
+      || !stl_util::almost_equal(velocity.z, 0.f)) {
     collider->_getResponse(position, velocity);
   }
 

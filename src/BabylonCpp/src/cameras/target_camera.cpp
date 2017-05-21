@@ -12,9 +12,9 @@ namespace BABYLON {
 TargetCamera::TargetCamera(const std::string& iName, const Vector3& iPosition,
                            Scene* scene)
     : Camera(iName, iPosition, scene)
-    , cameraDirection{std_util::make_unique<Vector3>(0.f, 0.f, 0.f)}
-    , cameraRotation{std_util::make_unique<Vector2>(0.f, 0.f)}
-    , rotation{std_util::make_unique<Vector3>(0.f, 0.f, 0.f)}
+    , cameraDirection{std::make_unique<Vector3>(0.f, 0.f, 0.f)}
+    , cameraRotation{std::make_unique<Vector2>(0.f, 0.f)}
+    , rotation{std::make_unique<Vector3>(0.f, 0.f, 0.f)}
     , speed{2.f}
     , noRotationConstraint{false}
     , lockedTarget{nullptr}
@@ -23,11 +23,11 @@ TargetCamera::TargetCamera(const std::string& iName, const Vector3& iPosition,
     , _camMatrix{Matrix::Zero()}
     , _cameraTransformMatrix{Matrix::Zero()}
     , _cameraRotationMatrix{Matrix::Zero()}
-    , _referencePoint{std_util::make_unique<Vector3>(0.f, 0.f, 1.f)}
+    , _referencePoint{std::make_unique<Vector3>(0.f, 0.f, 1.f)}
     , _transformedReferencePoint{Vector3::Zero()}
     , _lookAtTemp{Matrix::Zero()}
     , _tempMatrix{Matrix::Zero()}
-    , _defaultUpVector{std_util::make_unique<Vector3>(0.f, 1.f, 0.f)}
+    , _defaultUpVector{std::make_unique<Vector3>(0.f, 1.f, 0.f)}
 {
   _initCache();
 }
@@ -62,7 +62,7 @@ Vector3* TargetCamera::_getLockedTargetPosition()
 void TargetCamera::_initCache()
 {
   Camera::_initCache();
-  _cache.lockedTarget = std_util::make_unique<Vector3>(
+  _cache.lockedTarget = std::make_unique<Vector3>(
     std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
     std::numeric_limits<float>::max());
   _cache.rotation = Vector3(std::numeric_limits<float>::max(),
@@ -124,7 +124,7 @@ float TargetCamera::_computeLocalCameraSpeed()
 
 void TargetCamera::setRotation(const Vector3& newRotation)
 {
-  rotation = std_util::make_unique<Vector3>(newRotation);
+  rotation = std::make_unique<Vector3>(newRotation);
 }
 
 Vector3& TargetCamera::getRotation()
@@ -310,9 +310,9 @@ Camera* TargetCamera::createRigCamera(const std::string& iName,
     if (cameraRigMode == Camera::RIG_MODE_VR
         || cameraRigMode == Camera::RIG_MODE_WEBVR) {
       if (!rotationQuaternion) {
-        rotationQuaternion = std_util::make_unique<Quaternion>();
+        rotationQuaternion = std::make_unique<Quaternion>();
       }
-      rigCamera->rotationQuaternion = std_util::make_unique<Quaternion>();
+      rigCamera->rotationQuaternion = std::make_unique<Quaternion>();
     }
     return rigCamera;
   }

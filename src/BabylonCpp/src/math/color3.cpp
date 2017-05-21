@@ -1,5 +1,6 @@
 #include <babylon/math/color3.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/random.h>
 #include <babylon/core/string.h>
 #include <babylon/math/color4.h>
@@ -57,7 +58,7 @@ Color3 Color3::copy() const
 
 std::unique_ptr<Color3> Color3::clone() const
 {
-  return std_util::make_unique<Color3>(*this);
+  return std::make_unique<Color3>(*this);
 }
 
 std::string Color3::toString() const
@@ -127,15 +128,15 @@ const Color3& Color3::multiplyToRef(const Color3& otherColor,
 
 bool Color3::equals(const Color3& otherColor) const
 {
-  return std_util::almost_equal(r, otherColor.r)
-         && std_util::almost_equal(g, otherColor.g)
-         && std_util::almost_equal(b, otherColor.b);
+  return stl_util::almost_equal(r, otherColor.r)
+         && stl_util::almost_equal(g, otherColor.g)
+         && stl_util::almost_equal(b, otherColor.b);
 }
 
 bool Color3::equalsFloats(float red, float green, float blue) const
 {
-  return std_util::almost_equal(r, red) && std_util::almost_equal(g, green)
-         && std_util::almost_equal(b, blue);
+  return stl_util::almost_equal(r, red) && stl_util::almost_equal(g, green)
+         && stl_util::almost_equal(b, blue);
 }
 
 Color3 Color3::scale(float iscale) const

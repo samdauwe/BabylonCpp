@@ -1,5 +1,6 @@
 #include <babylon/mesh/sub_mesh.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/collisions/intersection_info.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/ray.h>
@@ -77,7 +78,7 @@ void SubMesh::setEffect(Effect* effect, const MaterialDefines& defines)
   if (_materialEffect == effect) {
     return;
   }
-  _materialDefines = std_util::make_unique<MaterialDefines>(defines);
+  _materialDefines = std::make_unique<MaterialDefines>(defines);
   _materialEffect  = effect;
 }
 
@@ -97,7 +98,7 @@ BoundingInfo* SubMesh::getBoundingInfo() const
 
 SubMesh& SubMesh::setBoundingInfo(const BoundingInfo& boundingInfo)
 {
-  _boundingInfo = std_util::make_unique<BoundingInfo>(boundingInfo);
+  _boundingInfo = std::make_unique<BoundingInfo>(boundingInfo);
   return *this;
 }
 
@@ -147,7 +148,7 @@ SubMesh& SubMesh::refreshBoundingInfo()
   auto data = _renderingMesh->getVerticesData(VertexBuffer::PositionKind);
 
   if (data.empty()) {
-    _boundingInfo = std_util::make_unique<BoundingInfo>(*_mesh->_boundingInfo);
+    _boundingInfo = std::make_unique<BoundingInfo>(*_mesh->_boundingInfo);
     return *this;
   }
 
@@ -166,7 +167,7 @@ SubMesh& SubMesh::refreshBoundingInfo()
       data, indices, indexStart, indexCount,
       _renderingMesh->geometry()->boundingBias());
   }
-  _boundingInfo = std_util::make_unique<BoundingInfo>(extend.min, extend.max);
+  _boundingInfo = std::make_unique<BoundingInfo>(extend.min, extend.max);
 
   return *this;
 }
@@ -211,7 +212,7 @@ GL::IGLBuffer* SubMesh::getLinesIndexBuffer(const Uint32Array& indices,
 
     for (size_t index = indexStart; index < indexStart + indexCount;
          index += 3) {
-      std_util::concat(linesIndices, {indices[index + 0], indices[index + 1],
+      stl_util::concat(linesIndices, {indices[index + 0], indices[index + 1],
                                       indices[index + 1], indices[index + 2],
                                       indices[index + 2], indices[index + 0]});
     }
@@ -252,7 +253,7 @@ SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions,
       }
 
       if (fastCheck || !intersectInfo || length < intersectInfo->distance) {
-        intersectInfo = std_util::make_unique<IntersectionInfo>(length);
+        intersectInfo = std::make_unique<IntersectionInfo>(length);
 
         if (fastCheck) {
           break;
@@ -299,7 +300,7 @@ SubMesh* SubMesh::clone(AbstractMesh* newMesh, Mesh* newRenderingMesh) const
                    indexCount, newMesh, newRenderingMesh, false);
 
   if (!isGlobal()) {
-    result->_boundingInfo = std_util::make_unique<BoundingInfo>(
+    result->_boundingInfo = std::make_unique<BoundingInfo>(
       getBoundingInfo()->minimum, getBoundingInfo()->maximum);
   }
 

@@ -1,5 +1,6 @@
 #include <babylon/math/color4.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
 #include <babylon/math/math_tools.h>
 #include <babylon/tools/tools.h>
@@ -59,7 +60,7 @@ Color4 Color4::copy() const
 
 std::unique_ptr<Color4> Color4::clone() const
 {
-  return std_util::make_unique<Color4>(*this);
+  return std::make_unique<Color4>(*this);
 }
 
 const char* Color4::getClassName() const
@@ -171,10 +172,10 @@ const Color4 Color4::multiplyToRef(const Color4& color, Color4& result) const
 
 bool Color4::equals(const Color4& otherColor) const
 {
-  return std_util::almost_equal(r, otherColor.r)
-         && std_util::almost_equal(g, otherColor.g)
-         && std_util::almost_equal(b, otherColor.b)
-         && std_util::almost_equal(a, otherColor.a);
+  return stl_util::almost_equal(r, otherColor.r)
+         && stl_util::almost_equal(g, otherColor.g)
+         && stl_util::almost_equal(b, otherColor.b)
+         && stl_util::almost_equal(a, otherColor.a);
 }
 
 std::string Color4::toString() const

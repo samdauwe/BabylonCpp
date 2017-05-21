@@ -1,5 +1,6 @@
 #include <babylon/collisions/collider.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/math/plane.h>
 
 namespace BABYLON {
@@ -149,7 +150,7 @@ bool Collider::_canDoCollision(const Vector3& sphereCenter, float sphereRadius,
 {
   float distance = Vector3::Distance(basePointWorld, sphereCenter);
 
-  float max = std_util::max(radius.x, radius.y, radius.z);
+  float max = stl_util::max(radius.x, radius.y, radius.z);
 
   if (distance > velocityWorldLength + max + sphereRadius) {
     return false;
@@ -187,7 +188,7 @@ void Collider::_testTriangle(size_t faceIndex,
   float signedDistToTrianglePlane = trianglePlane.signedDistanceTo(basePoint);
   float normalDotVelocity = Vector3::Dot(trianglePlane.normal, velocity);
 
-  if (std_util::almost_equal(normalDotVelocity, 0.f)) {
+  if (stl_util::almost_equal(normalDotVelocity, 0.f)) {
     if (std::abs(signedDistToTrianglePlane) >= 1.f) {
       return;
     }

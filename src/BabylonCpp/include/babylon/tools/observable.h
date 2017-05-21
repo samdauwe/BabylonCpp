@@ -181,8 +181,7 @@ private:
 }; // end of class Observable
 
 template <class T>
-EventState::UPtr Observable<T>::_eventState
-  = std_util::make_unique<EventState>(0);
+EventState::UPtr Observable<T>::_eventState = std::make_unique<EventState>(0);
 
 } // end of namespace BABYLON
 

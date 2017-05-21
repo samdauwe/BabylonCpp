@@ -80,7 +80,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
   // + 1 filler
   _vertexData.resize(capacity * 11 * 4);
   _vertexBuffer
-    = std_util::make_unique<Buffer>(scene->getEngine(), _vertexData, true, 11);
+    = std::make_unique<Buffer>(scene->getEngine(), _vertexData, true, 11);
 
   auto positions
     = _vertexBuffer->createVertexBuffer(VertexBuffer::PositionKind, 0, 3);

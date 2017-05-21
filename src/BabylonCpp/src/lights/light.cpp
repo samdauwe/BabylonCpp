@@ -1,6 +1,7 @@
 #include <babylon/lights/light.h>
 
 #include <babylon/animations/animation.h>
+#include <babylon/babylon_stl_util.h>
 #include <babylon/engine/scene.h>
 #include <babylon/lights/directional_light.h>
 #include <babylon/lights/hemispheric_light.h>
@@ -21,14 +22,14 @@ Light::Light(const std::string& iName, Scene* scene)
     , range{std::numeric_limits<float>::max()}
     , radius{0.00001f}
     , _shadowGenerator{nullptr}
-    , _uniformBuffer{std_util::make_unique<UniformBuffer>(scene->getEngine())}
+    , _uniformBuffer{std::make_unique<UniformBuffer>(scene->getEngine())}
     , _includedOnlyMeshes{}
     , _excludedMeshes{}
     , _includeOnlyWithLayerMask{0}
     , _excludeWithLayerMask{0}
     , _lightmapMode{0}
     , _parentedWorldMatrix{nullptr}
-    , _worldMatrix{std_util::make_unique<Matrix>(Matrix::Identity())}
+    , _worldMatrix{std::make_unique<Matrix>(Matrix::Identity())}
 {
   _buildUniformLayout();
   _resyncMeshes();
@@ -204,7 +205,7 @@ Matrix* Light::getWorldMatrix()
 
   if (parent() && parent()->getWorldMatrix()) {
     if (!_parentedWorldMatrix) {
-      _parentedWorldMatrix = std_util::make_unique<Matrix>(Matrix::Identity());
+      _parentedWorldMatrix = std::make_unique<Matrix>(Matrix::Identity());
     }
 
     worldMatrix->multiplyToRef(*parent()->getWorldMatrix(),
@@ -338,7 +339,7 @@ void Light::_resyncMeshes()
 void Light::_markMeshesAsLightDirty()
 {
   for (auto& mesh : getScene()->meshes) {
-    if (std_util::contains(mesh->_lightSources, this)) {
+    if (stl_util::contains(mesh->_lightSources, this)) {
       mesh->_markSubMeshesAsLightDirty();
     }
   }

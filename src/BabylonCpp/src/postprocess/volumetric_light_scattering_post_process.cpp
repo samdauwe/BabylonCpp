@@ -1,5 +1,6 @@
 #include <babylon/postprocess/volumetric_light_scattering_post_process.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/string.h>
@@ -183,7 +184,7 @@ RenderTargetTexture* VolumetricLightScatteringPostProcess::getPass()
 bool VolumetricLightScatteringPostProcess::_meshExcluded(AbstractMesh* mesh_)
 {
   if (!excludedMeshes.empty()
-      && (std_util::index_of(excludedMeshes, mesh_) != -1)) {
+      && (stl_util::index_of(excludedMeshes, mesh_) != -1)) {
     return true;
   }
 
@@ -319,7 +320,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
                                        .length();
       }
 
-      auto sortedArray = std_util::slice(
+      auto sortedArray = stl_util::slice(
         transparentSubMeshes, 0, static_cast<int>(transparentSubMeshes.size()));
       std::sort(sortedArray.begin(), sortedArray.end(),
                 [](const SubMesh* a, const SubMesh* b) {

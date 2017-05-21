@@ -53,7 +53,7 @@ bool PointLight::computeTransformedPosition()
 {
   if (parent() && parent()->getWorldMatrix()) {
     if (!transformedPosition) {
-      transformedPosition = std_util::make_unique<Vector3>(Vector3::Zero());
+      transformedPosition = std::make_unique<Vector3>(Vector3::Zero());
     }
 
     Vector3::TransformCoordinatesToRef(position, *parent()->getWorldMatrix(),
@@ -144,7 +144,7 @@ void PointLight::setShadowProjectionMatrix(
 Matrix* PointLight::_getWorldMatrix()
 {
   if (!_worldMatrix) {
-    _worldMatrix = std_util::make_unique<Matrix>(Matrix::Identity());
+    _worldMatrix = std::make_unique<Matrix>(Matrix::Identity());
   }
 
   Matrix::TranslationToRef(position.x, position.y, position.z, *_worldMatrix);

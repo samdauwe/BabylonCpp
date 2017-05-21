@@ -1,5 +1,6 @@
 #include <babylon/tools/optimization/merge_meshes_optimization.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/engine/scene.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
@@ -98,7 +99,7 @@ bool MergeMeshesOptimization::_apply(Scene* scene, bool updateSelectionTree)
       currentPool.emplace_back(static_cast<Mesh*>(otherMesh));
       --globalLength;
 
-      std_util::splice(globalPool, static_cast<int>(subIndex), 1);
+      stl_util::splice(globalPool, static_cast<int>(subIndex), 1);
 
       --subIndex;
     }

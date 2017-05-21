@@ -1,5 +1,6 @@
 #include <babylon/cameras/arc_rotate_camera.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/collisions/icollision_coordinator.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
@@ -37,9 +38,9 @@ ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha,
     , zoomOnFactor{1.f}
     , targetScreenOffset{Vector2::Zero()}
     , allowUpsideDown{true}
-    , panningAxis{std_util::make_unique<Vector3>(1.f, 0.f, 1.f)}
+    , panningAxis{std::make_unique<Vector3>(1.f, 0.f, 1.f)}
     , checkCollisions{false}
-    , collisionRadius{std_util::make_unique<Vector3>(0.5f, 0.5f, 0.5f)}
+    , collisionRadius{std::make_unique<Vector3>(0.5f, 0.5f, 0.5f)}
     , _targetHost{nullptr}
     , _collider{nullptr}
     , _previousPosition{Vector3::Zero()}
@@ -48,7 +49,7 @@ ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha,
     , _collisionTriggered{false}
 {
   getViewMatrix();
-  inputs = std_util::make_unique<ArcRotateCameraInputsManager>(this);
+  inputs = std::make_unique<ArcRotateCameraInputsManager>(this);
   inputs->addKeyboard().addMouseWheel().addPointers();
 }
 
@@ -103,9 +104,9 @@ bool ArcRotateCamera::_isSynchronizedViewMatrix()
   }
 
   return _cache.target.equals(target)
-         && std_util::almost_equal(_cache.alpha, alpha)
-         && std_util::almost_equal(_cache.beta, beta)
-         && std_util::almost_equal(_cache.radius, radius)
+         && stl_util::almost_equal(_cache.alpha, alpha)
+         && stl_util::almost_equal(_cache.beta, beta)
+         && stl_util::almost_equal(_cache.radius, radius)
          && _cache.targetScreenOffset.equals(targetScreenOffset);
 }
 
@@ -145,9 +146,9 @@ void ArcRotateCamera::_checkInputs()
   inputs->checkInputs();
 
   // Inertia
-  if (!std_util::almost_equal(inertialAlphaOffset, 0.f)
-      || !std_util::almost_equal(inertialBetaOffset, 0.f)
-      || !std_util::almost_equal(inertialRadiusOffset, 0.f)) {
+  if (!stl_util::almost_equal(inertialAlphaOffset, 0.f)
+      || !stl_util::almost_equal(inertialBetaOffset, 0.f)
+      || !stl_util::almost_equal(inertialRadiusOffset, 0.f)) {
 
     if (getScene()->useRightHandedSystem) {
       alpha -= beta <= 0.f ? -inertialAlphaOffset : inertialAlphaOffset;
@@ -174,10 +175,10 @@ void ArcRotateCamera::_checkInputs()
   }
 
   // Panning inertia
-  if (!std_util::almost_equal(inertialPanningX, 0.f)
-      || !std_util::almost_equal(inertialPanningY, 0.f)) {
+  if (!stl_util::almost_equal(inertialPanningX, 0.f)
+      || !stl_util::almost_equal(inertialPanningY, 0.f)) {
     if (!_localDirection) {
-      _localDirection       = std_util::make_unique<Vector3>(Vector3::Zero());
+      _localDirection       = std::make_unique<Vector3>(Vector3::Zero());
       _transformedDirection = Vector3::Zero();
     }
 
@@ -198,7 +199,7 @@ void ArcRotateCamera::_checkInputs()
     Vector3::TransformNormalToRef(*_localDirection, _cameraTransformMatrix,
                                   _transformedDirection);
     // Eliminate y if map panning is enabled (panningAxis == 1,0,1)
-    if (!std_util::almost_equal(panningAxis->y, 0.f)) {
+    if (!stl_util::almost_equal(panningAxis->y, 0.f)) {
       _transformedDirection.y = 0;
     }
 
@@ -235,20 +236,20 @@ void ArcRotateCamera::_checkLimits()
     }
   }
 
-  if ((!std_util::almost_equal(lowerAlphaLimit, 0.f))
+  if ((!stl_util::almost_equal(lowerAlphaLimit, 0.f))
       && alpha < lowerAlphaLimit) {
     alpha = lowerAlphaLimit;
   }
-  if ((!std_util::almost_equal(upperAlphaLimit, 0.f))
+  if ((!stl_util::almost_equal(upperAlphaLimit, 0.f))
       && alpha > upperAlphaLimit) {
     alpha = upperAlphaLimit;
   }
 
-  if ((!std_util::almost_equal(lowerRadiusLimit, 0.f))
+  if ((!stl_util::almost_equal(lowerRadiusLimit, 0.f))
       && radius < lowerRadiusLimit) {
     radius = lowerRadiusLimit;
   }
-  if ((!std_util::almost_equal(upperRadiusLimit, 0.f))
+  if ((!stl_util::almost_equal(upperRadiusLimit, 0.f))
       && radius > upperRadiusLimit) {
     radius = upperRadiusLimit;
   }
@@ -334,7 +335,7 @@ Matrix ArcRotateCamera::_getViewMatrix()
     _newPosition);
   if (getScene()->collisionsEnabled && checkCollisions) {
     if (!_collider) {
-      _collider = std_util::make_unique<Collider>();
+      _collider = std::make_unique<Collider>();
     }
     _collider->radius = *collisionRadius;
     _newPosition.subtractToRef(position, _collisionVelocity);
@@ -393,7 +394,7 @@ void ArcRotateCamera::_onCollisionPositionChange(int /*collisionId*/,
   float cosb = std::cos(beta);
   float sinb = std::sin(beta);
 
-  if (std_util::almost_equal(sinb, 0.f)) {
+  if (stl_util::almost_equal(sinb, 0.f)) {
     sinb = 0.0001f;
   }
 

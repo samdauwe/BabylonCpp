@@ -1,5 +1,6 @@
 #include <babylon/materials/shader_material.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
@@ -60,7 +61,7 @@ bool ShaderMaterial::needAlphaTesting()
 
 void ShaderMaterial::_checkUniform(const std::string& uniformName)
 {
-  if (!std_util::contains(_options.uniforms, uniformName)) {
+  if (!stl_util::contains(_options.uniforms, uniformName)) {
     _options.uniforms.emplace_back(uniformName);
   }
 }
@@ -68,7 +69,7 @@ void ShaderMaterial::_checkUniform(const std::string& uniformName)
 ShaderMaterial& ShaderMaterial::setTexture(const std::string& iName,
                                            Texture* texture)
 {
-  if (!std_util::contains(_options.samplers, iName)) {
+  if (!stl_util::contains(_options.samplers, iName)) {
     _options.samplers.emplace_back(iName);
   }
   _textures[name] = texture;
@@ -80,7 +81,7 @@ ShaderMaterial&
 ShaderMaterial::setTextureArray(const std::string& iName,
                                 const std::vector<BaseTexture*>& textures)
 {
-  if (!std_util::contains(_options.samplers, iName)) {
+  if (!stl_util::contains(_options.samplers, iName)) {
     _options.samplers.emplace_back(iName);
   }
 
@@ -220,7 +221,7 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 
   // Instances
   std::vector<std::string> defines;
-  auto fallbacks = std_util::make_unique<EffectFallbacks>();
+  auto fallbacks = std::make_unique<EffectFallbacks>();
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
   }
@@ -282,16 +283,16 @@ void ShaderMaterial::bindOnlyWorldMatrix(Matrix& world)
 {
   auto scene = getScene();
 
-  if (!std_util::contains(_options.uniforms, "world")) {
+  if (!stl_util::contains(_options.uniforms, "world")) {
     _effect->setMatrix("world", world);
   }
 
-  if (!std_util::contains(_options.uniforms, "worldView")) {
+  if (!stl_util::contains(_options.uniforms, "worldView")) {
     world.multiplyToRef(scene->getViewMatrix(), _cachedWorldViewMatrix);
     _effect->setMatrix("worldView", _cachedWorldViewMatrix);
   }
 
-  if (!std_util::contains(_options.uniforms, "worldViewProjection")) {
+  if (!stl_util::contains(_options.uniforms, "worldViewProjection")) {
     auto transformMatrix = scene->getTransformMatrix();
     _effect->setMatrix("worldViewProjection", world.multiply(transformMatrix));
   }
@@ -303,15 +304,15 @@ void ShaderMaterial::bind(Matrix* world, Mesh* mesh)
   bindOnlyWorldMatrix(*world);
 
   if (getScene()->getCachedMaterial() != this) {
-    if (!std_util::contains(_options.uniforms, "view")) {
+    if (!stl_util::contains(_options.uniforms, "view")) {
       _effect->setMatrix("view", getScene()->getViewMatrix());
     }
 
-    if (!std_util::contains(_options.uniforms, "projection")) {
+    if (!stl_util::contains(_options.uniforms, "projection")) {
       _effect->setMatrix("projection", getScene()->getProjectionMatrix());
     }
 
-    if (!std_util::contains(_options.uniforms, "viewProjection")) {
+    if (!stl_util::contains(_options.uniforms, "viewProjection")) {
       _effect->setMatrix("viewProjection", getScene()->getTransformMatrix());
     }
 

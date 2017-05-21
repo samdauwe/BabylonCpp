@@ -54,7 +54,7 @@ Path2 Path2::copy() const
 
 std::unique_ptr<Path2> Path2::clone() const
 {
-  return std_util::make_unique<Path2>(*this);
+  return std::make_unique<Path2>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Path2& path)

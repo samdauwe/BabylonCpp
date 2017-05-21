@@ -1,5 +1,6 @@
 #include <babylon/mesh/csg/node.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/mesh/csg/polygon.h>
 
 namespace BABYLON {
@@ -66,7 +67,7 @@ CSG::Node::clipPolygons(const std::vector<BABYLON::CSG::Polygon*>& polygons)
   else {
     back.clear();
   }
-  std_util::concat(front, back);
+  stl_util::concat(front, back);
   return front;
 }
 
@@ -85,10 +86,10 @@ std::vector<BABYLON::CSG::Polygon*> BABYLON::CSG::Node::allPolygons()
 {
   std::vector<Polygon*> polygons = _polygons;
   if (_front) {
-    polygons = std_util::concat(polygons, _front->allPolygons());
+    polygons = stl_util::concat(polygons, _front->allPolygons());
   }
   if (_back) {
-    polygons = std_util::concat(polygons, _back->allPolygons());
+    polygons = stl_util::concat(polygons, _back->allPolygons());
   }
   return polygons;
 }

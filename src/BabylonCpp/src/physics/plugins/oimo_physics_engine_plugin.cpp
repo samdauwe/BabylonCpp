@@ -1,5 +1,6 @@
 #include <babylon/physics/plugins/oimo_physics_engine_plugin.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/physics/iphysics_body.h>
@@ -138,8 +139,7 @@ void OimoPhysicsEnginePlugin::generateJoint(PhysicsImpostorJoint* impostorJoint)
   }
 }
 
-void OimoPhysicsEnginePlugin::removeJoint(
-  PhysicsImpostorJoint* impostorJoint)
+void OimoPhysicsEnginePlugin::removeJoint(PhysicsImpostorJoint* impostorJoint)
 {
   world->removeJoint(impostorJoint->joint->physicsJoint());
 }
@@ -198,7 +198,7 @@ Vector3 OimoPhysicsEnginePlugin::getAngularVelocity(PhysicsImpostor* impostor)
 
 void OimoPhysicsEnginePlugin::setBodyMass(PhysicsImpostor* impostor, float mass)
 {
-  bool staticBody = std_util::almost_equal(mass, 0.f);
+  bool staticBody = stl_util::almost_equal(mass, 0.f);
   // This will actually set the body's density and not its mass.
   // But this is how oimo treats the mass variable.
   impostor->physicsBody()->setShapesDensity(staticBody ? 1.f : mass);

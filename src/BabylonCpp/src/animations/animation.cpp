@@ -1,6 +1,7 @@
 #include <babylon/animations/animation.h>
 
 #include <babylon/animations/easing/ieasing_function.h>
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/json.h>
 #include <babylon/core/json.h>
 #include <babylon/core/string.h>
@@ -148,14 +149,14 @@ void Animation::removeEvents(int frame)
 void Animation::createRange(const std::string& _name, float from, float to)
 {
   // check name not already in use; could happen for bones after serialized
-  if (!std_util::contains(_ranges, _name)) {
+  if (!stl_util::contains(_ranges, _name)) {
     _ranges[name] = AnimationRange(_name, from, to);
   }
 }
 
 void Animation::deleteRange(const std::string& iName, bool deleteFrames)
 {
-  if (std_util::contains(_ranges, iName)) {
+  if (stl_util::contains(_ranges, iName)) {
     if (deleteFrames) {
       auto from = _ranges[iName].from;
       auto to   = _ranges[iName].to;
@@ -266,9 +267,9 @@ Matrix Animation::matrixInterpolateFunction(const Matrix& startValue,
 
 std::unique_ptr<Animation> Animation::clone() const
 {
-  auto clonedAnimation = std_util::make_unique<Animation>(
-    name, String::join(targetPropertyPath, '.'), framePerSecond, dataType,
-    loopMode);
+  auto clonedAnimation
+    = std::make_unique<Animation>(name, String::join(targetPropertyPath, '.'),
+                                  framePerSecond, dataType, loopMode);
 
   clonedAnimation->enableBlending = enableBlending;
   clonedAnimation->blendingSpeed  = blendingSpeed;
@@ -700,16 +701,16 @@ Json::object Animation::serialize() const
         keyValues.emplace_back(value.floatData);
         break;
       case Animation::ANIMATIONTYPE_QUATERNION:
-        std_util::concat(keyValues, value.quaternionData.asArray());
+        stl_util::concat(keyValues, value.quaternionData.asArray());
         break;
       case Animation::ANIMATIONTYPE_MATRIX:
-        std_util::concat(keyValues, value.matrixData.asArray());
+        stl_util::concat(keyValues, value.matrixData.asArray());
         break;
       case Animation::ANIMATIONTYPE_VECTOR3:
-        std_util::concat(keyValues, value.vector3Data.asArray());
+        stl_util::concat(keyValues, value.vector3Data.asArray());
         break;
       case Animation::ANIMATIONTYPE_COLOR3:
-        std_util::concat(keyValues, value.color3Data.asArray());
+        stl_util::concat(keyValues, value.color3Data.asArray());
         break;
     }
 

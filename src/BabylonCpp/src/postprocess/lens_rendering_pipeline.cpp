@@ -1,5 +1,6 @@
 #include <babylon/postprocess/lens_rendering_pipeline.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/random.h>
 #include <babylon/engine/scene.h>
@@ -59,7 +60,7 @@ LensRenderingPipeline::LensRenderingPipeline(
     scene->getEngine(), LensDepthOfFieldEffect,
     [&]() { return _depthOfFieldPostProcess; }, true));
 
-  if (std_util::almost_equal(_highlightsGain, -1.f)) {
+  if (stl_util::almost_equal(_highlightsGain, -1.f)) {
     _disableEffect(HighlightsEnhancingEffect, std::vector<Camera*>());
   }
 
@@ -162,7 +163,7 @@ void LensRenderingPipeline::setHighlightsGain(float amount)
 
 void LensRenderingPipeline::setHighlightsThreshold(float amount)
 {
-  if (std_util::almost_equal(_highlightsGain, -1.f)) {
+  if (stl_util::almost_equal(_highlightsGain, -1.f)) {
     _highlightsGain = 1.f;
   }
   _highlightsThreshold = amount;
@@ -263,7 +264,7 @@ void LensRenderingPipeline::_createDepthOfFieldPostProcess(float ratio)
 
     effect->setFloat("distortion", _distortion);
 
-    effect->setBool("dof_enabled", !std_util::almost_equal(_dofDistance, -1.f));
+    effect->setBool("dof_enabled", !stl_util::almost_equal(_dofDistance, -1.f));
     effect->setFloat("screen_distance", 1.f / (0.1f - 1.f / _dofDistance));
     effect->setFloat("aperture", _dofAperture);
     effect->setFloat("darken", _dofDarken);
@@ -271,7 +272,7 @@ void LensRenderingPipeline::_createDepthOfFieldPostProcess(float ratio)
     effect->setFloat("edge_blur", _edgeBlur);
 
     effect->setBool("highlights",
-                    !std_util::almost_equal(_highlightsGain, -1.f));
+                    !stl_util::almost_equal(_highlightsGain, -1.f));
 
     effect->setFloat("near", _scene->activeCamera->minZ);
     effect->setFloat("far", _scene->activeCamera->maxZ);

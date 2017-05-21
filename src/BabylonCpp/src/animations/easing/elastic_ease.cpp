@@ -1,5 +1,7 @@
 #include <babylon/animations/easing/elastic_ease.h>
 
+#include <babylon/babylon_stl_util.h>
+
 namespace BABYLON {
 
 ElasticEase::ElasticEase(int iOscillations, int iSpringiness)
@@ -19,7 +21,7 @@ float ElasticEase::easeInCore(float gradient) const
   float num3 = std::max(0.f, oscillations);
   float num  = std::max(0.f, springiness);
 
-  if (std_util::almost_equal(num, 0.f)) {
+  if (stl_util::almost_equal(num, 0.f)) {
     num2 = gradient;
   }
   else {

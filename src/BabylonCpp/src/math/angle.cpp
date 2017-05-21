@@ -1,5 +1,6 @@
 #include <babylon/math/angle.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/math/vector2.h>
 
 namespace BABYLON {
@@ -52,7 +53,7 @@ Angle Angle::copy() const
 
 std::unique_ptr<Angle> Angle::clone() const
 {
-  return std_util::make_unique<Angle>(*this);
+  return std::make_unique<Angle>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Angle& angle)
@@ -63,7 +64,7 @@ std::ostream& operator<<(std::ostream& os, const Angle& angle)
 
 bool operator==(const Angle& lhs, const Angle& rhs)
 {
-  return std_util::almost_equal(lhs._radians, rhs._radians);
+  return stl_util::almost_equal(lhs._radians, rhs._radians);
 }
 
 bool operator!=(const Angle& lhs, const Angle& rhs)

@@ -47,7 +47,7 @@ Size Size::copy() const
 
 std::unique_ptr<Size> Size::clone() const
 {
-  return std_util::make_unique<Size>(*this);
+  return std::make_unique<Size>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Size& size)

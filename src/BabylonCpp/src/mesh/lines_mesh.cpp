@@ -1,5 +1,6 @@
 #include <babylon/mesh/lines_mesh.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/culling/ray.h>
 #include <babylon/engine/engine.h>
@@ -55,7 +56,7 @@ float LinesMesh::intersectionThreshold() const
 
 void LinesMesh::setIntersectionThreshold(float value)
 {
-  if (std_util::almost_equal(_intersectionThreshold, value)) {
+  if (stl_util::almost_equal(_intersectionThreshold, value)) {
     return;
   }
 

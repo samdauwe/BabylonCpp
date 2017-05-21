@@ -64,7 +64,7 @@ Viewport Viewport::copy() const
 
 std::unique_ptr<Viewport> Viewport::clone() const
 {
-  return std_util::make_unique<Viewport>(*this);
+  return std::make_unique<Viewport>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Viewport& viewport)

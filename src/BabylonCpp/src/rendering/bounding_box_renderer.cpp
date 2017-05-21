@@ -1,5 +1,6 @@
 #include <babylon/rendering/bounding_box_renderer.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -43,9 +44,8 @@ void BoundingBoxRenderer::_prepareResources()
   BoxOptions options(1.f);
   auto boxdata = VertexData::CreateBox(options);
   _vertexBuffers.resize(VertexBuffer::PositionKind + 1);
-  _vertexBuffers[VertexBuffer::PositionKind]
-    = std_util::make_unique<VertexBuffer>(engine, boxdata->positions,
-                                          VertexBuffer::PositionKind, false);
+  _vertexBuffers[VertexBuffer::PositionKind] = std::make_unique<VertexBuffer>(
+    engine, boxdata->positions, VertexBuffer::PositionKind, false);
   _vertexBuffersMap[VertexBuffer::PositionKindChars]
     = _vertexBuffers[VertexBuffer::PositionKind].get();
   const Uint32Array indices{0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6,
@@ -123,7 +123,7 @@ void BoundingBoxRenderer::dispose(bool /*doNotRecurse*/)
 
   _colorShader->dispose();
 
-  if (std_util::contains(_vertexBuffersMap, VertexBuffer::PositionKindChars)) {
+  if (stl_util::contains(_vertexBuffersMap, VertexBuffer::PositionKindChars)) {
     _vertexBuffers[VertexBuffer::PositionKind]->dispose();
     _vertexBuffers[VertexBuffer::PositionKind].reset(nullptr);
     _vertexBuffersMap.erase(VertexBuffer::PositionKindChars);

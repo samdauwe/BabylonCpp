@@ -1,5 +1,6 @@
 #include <babylon/lights/directional_light.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
@@ -81,7 +82,7 @@ void DirectionalLight::setShadowProjectionMatrix(
     auto activeCamera = getScene()->activeCamera;
 
     // Check extends
-    if (autoUpdateExtends || std_util::almost_equal(
+    if (autoUpdateExtends || stl_util::almost_equal(
                                _orthoLeft, std::numeric_limits<float>::max())) {
       auto tempVector3 = Vector3::Zero();
 
@@ -155,7 +156,7 @@ bool DirectionalLight::computeTransformedPosition()
 {
   if (parent() && parent()->getWorldMatrix()) {
     if (!transformedPosition) {
-      transformedPosition = std_util::make_unique<Vector3>(Vector3::Zero());
+      transformedPosition = std::make_unique<Vector3>(Vector3::Zero());
     }
 
     Vector3::TransformCoordinatesToRef(position, *parent()->getWorldMatrix(),
@@ -171,7 +172,7 @@ void DirectionalLight::transferToEffect(Effect* /*effect*/,
 {
   if (parent() && parent()->getWorldMatrix()) {
     if (!_transformedDirection) {
-      _transformedDirection = std_util::make_unique<Vector3>(Vector3::Zero());
+      _transformedDirection = std::make_unique<Vector3>(Vector3::Zero());
     }
 
     Vector3::TransformNormalToRef(direction, *parent()->getWorldMatrix(),
@@ -191,7 +192,7 @@ void DirectionalLight::transferToEffect(Effect* /*effect*/,
 Matrix* DirectionalLight::_getWorldMatrix()
 {
   if (!_worldMatrix) {
-    _worldMatrix = std_util::make_unique<Matrix>(Matrix::Identity());
+    _worldMatrix = std::make_unique<Matrix>(Matrix::Identity());
   }
 
   Matrix::TranslationToRef(position.x, position.y, position.z, *_worldMatrix);

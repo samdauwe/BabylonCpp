@@ -1,5 +1,6 @@
 #include <babylon/math/vector2.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/vector3.h>
 
@@ -50,7 +51,7 @@ Vector2 Vector2::copy() const
 
 std::unique_ptr<Vector2> Vector2::clone() const
 {
-  return std_util::make_unique<Vector2>(*this);
+  return std::make_unique<Vector2>(*this);
 }
 
 std::string Vector2::toString() const
@@ -69,7 +70,7 @@ const char* Vector2::getClassName() const
 size_t Vector2::getHashCode() const
 {
   const float tmp = x * 0.397f + y;
-  return std_util::to_bitset(tmp).to_ullong();
+  return stl_util::to_bitset(tmp).to_ullong();
 }
 
 /** Operators **/
@@ -228,8 +229,8 @@ Vector2 Vector2::scale(float scaleVal) const
 
 bool Vector2::equals(const Vector2& otherVector) const
 {
-  return std_util::almost_equal(x, otherVector.x)
-         && std_util::almost_equal(y, otherVector.y);
+  return stl_util::almost_equal(x, otherVector.x)
+         && stl_util::almost_equal(y, otherVector.y);
 }
 
 bool Vector2::equalsWithEpsilon(const Vector2& otherVector, float epsilon) const
@@ -388,7 +389,7 @@ Vector2& Vector2::normalize()
 {
   const float len = length();
 
-  if (std_util::almost_equal(len, 0.f)) {
+  if (stl_util::almost_equal(len, 0.f)) {
     return *this;
   }
 
@@ -577,7 +578,7 @@ float Vector2::DistanceOfPointFromSegment(const Vector2& p, const Vector2& segA,
                                           const Vector2& segB)
 {
   const float l2 = Vector2::DistanceSquared(segA, segB);
-  if (std_util::almost_equal(l2, 0.f)) {
+  if (stl_util::almost_equal(l2, 0.f)) {
     return Vector2::Distance(p, segA);
   }
   const Vector2 v = segB.subtract(segA);

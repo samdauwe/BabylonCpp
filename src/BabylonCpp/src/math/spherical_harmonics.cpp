@@ -89,7 +89,7 @@ SphericalHarmonics SphericalHarmonics::copy() const
 
 std::unique_ptr<SphericalHarmonics> SphericalHarmonics::clone() const
 {
-  return std_util::make_unique<SphericalHarmonics>(*this);
+  return std::make_unique<SphericalHarmonics>(*this);
 }
 
 void SphericalHarmonics::addLight(const Vector3& direction, const Color3& color,

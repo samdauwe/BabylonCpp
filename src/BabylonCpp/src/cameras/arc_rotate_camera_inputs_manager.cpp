@@ -18,19 +18,19 @@ ArcRotateCameraInputsManager::~ArcRotateCameraInputsManager()
 
 ArcRotateCameraInputsManager& ArcRotateCameraInputsManager::addMouseWheel()
 {
-  add(std_util::make_unique<ArcRotateCameraMouseWheelInput>());
+  add(std::make_unique<ArcRotateCameraMouseWheelInput>());
   return *this;
 }
 
 ArcRotateCameraInputsManager& ArcRotateCameraInputsManager::addPointers()
 {
-  add(std_util::make_unique<ArcRotateCameraPointersInput>());
+  add(std::make_unique<ArcRotateCameraPointersInput>());
   return *this;
 }
 
 ArcRotateCameraInputsManager& ArcRotateCameraInputsManager::addKeyboard()
 {
-  add(std_util::make_unique<ArcRotateCameraKeyboardMoveInput>());
+  add(std::make_unique<ArcRotateCameraKeyboardMoveInput>());
   return *this;
 }
 

@@ -1,11 +1,13 @@
 #include <babylon/physics/physics_impostor_parameters.h>
 
+#include <babylon/babylon_stl_util.h>
+
 namespace BABYLON {
 
 bool PhysicsImpostorParameters::contains(const std::string& key) const
 {
   return (key == "mass") || (key == "friction") || (key == "restitution")
-         || std_util::contains(nativeOptions, key);
+         || stl_util::contains(nativeOptions, key);
 }
 
 float PhysicsImpostorParameters::operator[](const std::string& key) const
@@ -22,7 +24,7 @@ float PhysicsImpostorParameters::operator[](const std::string& key) const
   else {
     auto it = nativeOptions.find(key);
     if (it != nativeOptions.end()) {
-       return it->second;
+      return it->second;
     }
   }
 

@@ -1,5 +1,6 @@
 #include <babylon/math/curve3.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
@@ -56,7 +57,7 @@ Curve3 Curve3::copy() const
 
 std::unique_ptr<Curve3> Curve3::clone() const
 {
-  return std_util::make_unique<Curve3>(*this);
+  return std::make_unique<Curve3>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Curve3& curve)
@@ -150,7 +151,7 @@ Curve3 Curve3::CreateCatmullRomSpline(const std::vector<Vector3> points,
                                       size_t nbPoints)
 {
   std::vector<Vector3> totalPoints{points[0]};
-  std_util::concat(totalPoints, points);
+  stl_util::concat(totalPoints, points);
   totalPoints.emplace_back(points.back());
   std::vector<Vector3> catmullRom;
   const float step = 1.f / static_cast<float>(nbPoints);

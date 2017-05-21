@@ -1,5 +1,6 @@
 #include <babylon/bones/bone_look_controller.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
 #include <babylon/mesh/abstract_mesh.h>
 
@@ -215,12 +216,12 @@ void BoneLookController::update()
   bool checkYaw   = false;
   bool checkPitch = false;
 
-  if (!std_util::almost_equal(_maxYaw, Math::PI)
-      || std_util::almost_equal(_minYaw, -Math::PI)) {
+  if (!stl_util::almost_equal(_maxYaw, Math::PI)
+      || stl_util::almost_equal(_minYaw, -Math::PI)) {
     checkYaw = true;
   }
-  if (!std_util::almost_equal(_maxPitch, Math::PI)
-      || std_util::almost_equal(_minPitch, -Math::PI)) {
+  if (!stl_util::almost_equal(_maxPitch, Math::PI)
+      || stl_util::almost_equal(_minPitch, -Math::PI)) {
     checkPitch = true;
   }
 
@@ -283,7 +284,7 @@ void BoneLookController::update()
         newPitch      = _minPitch;
       }
 
-      if (!std_util::almost_equal(pitch, newPitch)) {
+      if (!stl_util::almost_equal(pitch, newPitch)) {
         Vector3::TransformCoordinatesToRef(localTarget, spaceMat, localTarget);
         localTarget.addInPlace(bonePos);
         target = localTarget;
@@ -375,7 +376,7 @@ void BoneLookController::update()
         }
       }
 
-      if (!std_util::almost_equal(yaw, newYaw)) {
+      if (!stl_util::almost_equal(yaw, newYaw)) {
         Vector3::TransformCoordinatesToRef(localTarget, spaceMat, localTarget);
         localTarget.addInPlace(bonePos);
         target = localTarget;

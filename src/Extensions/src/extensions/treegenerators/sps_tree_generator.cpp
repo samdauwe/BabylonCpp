@@ -1,5 +1,6 @@
 #include <babylon/extensions/treegenerators/sps_tree_generator.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/random.h>
 #include <babylon/math/axis.h>
 #include <babylon/mesh/mesh_builder.h>
@@ -119,39 +120,39 @@ Mesh* SPSTreeGenerator::CreateTree(
 
   // The _set_mini_trees function positions mini base trees and leaves at the
   // end of base tree branches, one for each of the forks
-  auto _set_mini_trees
-    = [&](SolidParticle* particle, const Vector3& /*i*/, unsigned int s) {
-        unsigned int _a = s % static_cast<unsigned>(std::pow(forks, boughs));
-        if (boughs == 1) {
-          _a++;
-        }
-        else {
-          _a = 2 + _a % forks
-               + static_cast<unsigned>(std::floor(static_cast<float>(_a)
-                                                  / static_cast<float>(forks)))
-                   * (forks + 1);
-        }
-        CoordSystem& _mini_sys = _base.directions[_a];
-        Vector3 mini_top(_base.paths[_a][_base.paths[_a].size() - 1].x,
-                         _base.paths[_a][_base.paths[_a].size() - 1].y,
-                         _base.paths[_a][_base.paths[_a].size() - 1].z);
-        float turn = _turns[s];
-        Vector3 _mini_direction
-          = _mini_sys.y.scale(std::cos(randPct(forkAngle, 0.f)))
-              .add(_mini_sys.x.scale(std::sin(randPct(forkAngle, 0.f))
-                                     * std::sin(turn)))
-              .add(_mini_sys.z.scale(std::sin(randPct(forkAngle, 0.f))
-                                     * std::cos(turn)));
-        Vector3 axis = Vector3::Cross(Axis::Y, _mini_direction);
-        float _theta = std::acos(Vector3::Dot(_mini_direction, Axis::Y)
-                                 / _mini_direction.length());
-        particle->scaling = Vector3(std::pow(trunkTaper, _boughs + 1.f),
-                                    std::pow(trunkTaper, _boughs + 1.f),
-                                    std::pow(trunkTaper, _boughs + 1.f));
-        particle->rotationQuaternion = std_util::make_unique<Quaternion>(
-          Quaternion::RotationAxis(axis, _theta));
-        particle->position = mini_top;
-      };
+  auto _set_mini_trees = [&](SolidParticle* particle, const Vector3& /*i*/,
+                             unsigned int s) {
+    unsigned int _a = s % static_cast<unsigned>(std::pow(forks, boughs));
+    if (boughs == 1) {
+      _a++;
+    }
+    else {
+      _a = 2 + _a % forks
+           + static_cast<unsigned>(
+               std::floor(static_cast<float>(_a) / static_cast<float>(forks)))
+               * (forks + 1);
+    }
+    CoordSystem& _mini_sys = _base.directions[_a];
+    Vector3 mini_top(_base.paths[_a][_base.paths[_a].size() - 1].x,
+                     _base.paths[_a][_base.paths[_a].size() - 1].y,
+                     _base.paths[_a][_base.paths[_a].size() - 1].z);
+    float turn = _turns[s];
+    Vector3 _mini_direction
+      = _mini_sys.y.scale(std::cos(randPct(forkAngle, 0.f)))
+          .add(_mini_sys.x.scale(std::sin(randPct(forkAngle, 0.f))
+                                 * std::sin(turn)))
+          .add(_mini_sys.z.scale(std::sin(randPct(forkAngle, 0.f))
+                                 * std::cos(turn)));
+    Vector3 axis = Vector3::Cross(Axis::Y, _mini_direction);
+    float _theta = std::acos(Vector3::Dot(_mini_direction, Axis::Y)
+                             / _mini_direction.length());
+    particle->scaling = Vector3(std::pow(trunkTaper, _boughs + 1.f),
+                                std::pow(trunkTaper, _boughs + 1.f),
+                                std::pow(trunkTaper, _boughs + 1.f));
+    particle->rotationQuaternion
+      = std::make_unique<Quaternion>(Quaternion::RotationAxis(axis, _theta));
+    particle->position = mini_top;
+  };
 
   // The mini base trees and leaves added to both the SPS systems have to be
   // positioned at the same places and angles.
@@ -174,31 +175,31 @@ Mesh* SPSTreeGenerator::CreateTree(
 
   // The _set_branches function positions mini base trees and leaves at random
   // positions along random branches
-  auto _set_branches
-    = [&](SolidParticle* particle, const Vector3& /*i*/, unsigned int s) {
-        unsigned int _a        = _places[s][0];
-        unsigned int _b        = _places[s][1];
-        CoordSystem& _mini_sys = _base.directions[_a];
-        Vector3 _mini_place(_base.paths[_a][_b].x, _base.paths[_a][_b].y,
-                            _base.paths[_a][_b].z);
-        _mini_place.addInPlace(_mini_sys.z.scale(_base.radii[_a][_b] / 2.f));
-        float _turn = _bturns[s];
-        Vector3 _mini_direction
-          = _mini_sys.y.scale(std::cos(randPct(branchAngle, 0.f)))
-              .add(_mini_sys.x.scale(std::sin(randPct(branchAngle, 0.f))
-                                     * std::sin(_turn)))
-              .add(_mini_sys.z.scale(std::sin(randPct(branchAngle, 0.f))
-                                     * std::cos(_turn)));
-        Vector3 _axis = Vector3::Cross(Axis::Y, _mini_direction);
-        float _theta  = std::acos(Vector3::Dot(_mini_direction, Axis::Y)
-                                 / _mini_direction.length());
-        particle->scaling = Vector3(std::pow(trunkTaper, _boughs + 1.f),
-                                    std::pow(trunkTaper, _boughs + 1.f),
-                                    std::pow(trunkTaper, _boughs + 1.f));
-        particle->rotationQuaternion = std_util::make_unique<Quaternion>(
-          Quaternion::RotationAxis(_axis, _theta));
-        particle->position = _mini_place;
-      };
+  auto _set_branches = [&](SolidParticle* particle, const Vector3& /*i*/,
+                           unsigned int s) {
+    unsigned int _a        = _places[s][0];
+    unsigned int _b        = _places[s][1];
+    CoordSystem& _mini_sys = _base.directions[_a];
+    Vector3 _mini_place(_base.paths[_a][_b].x, _base.paths[_a][_b].y,
+                        _base.paths[_a][_b].z);
+    _mini_place.addInPlace(_mini_sys.z.scale(_base.radii[_a][_b] / 2.f));
+    float _turn = _bturns[s];
+    Vector3 _mini_direction
+      = _mini_sys.y.scale(std::cos(randPct(branchAngle, 0.f)))
+          .add(_mini_sys.x.scale(std::sin(randPct(branchAngle, 0.f))
+                                 * std::sin(_turn)))
+          .add(_mini_sys.z.scale(std::sin(randPct(branchAngle, 0.f))
+                                 * std::cos(_turn)));
+    Vector3 _axis = Vector3::Cross(Axis::Y, _mini_direction);
+    float _theta  = std::acos(Vector3::Dot(_mini_direction, Axis::Y)
+                             / _mini_direction.length());
+    particle->scaling = Vector3(std::pow(trunkTaper, _boughs + 1.f),
+                                std::pow(trunkTaper, _boughs + 1.f),
+                                std::pow(trunkTaper, _boughs + 1.f));
+    particle->rotationQuaternion
+      = std::make_unique<Quaternion>(Quaternion::RotationAxis(_axis, _theta));
+    particle->position = _mini_place;
+  };
 
   // Add base tree mesh enough for all the final forked branches
   SolidParticleSystemMeshBuilderOptions spsBuilderOptionsMiniTrees;
@@ -242,8 +243,8 @@ CoordSystem SPSTreeGenerator::coordSystem(Vector3& vec3)
 {
   Vector3 _x;
   auto _y = vec3.normalize();
-  if (std_util::almost_equal(std::abs(vec3.x), 0.f)
-      && std_util::almost_equal(std::abs(vec3.y), 0.f)) {
+  if (stl_util::almost_equal(std::abs(vec3.x), 0.f)
+      && stl_util::almost_equal(std::abs(vec3.y), 0.f)) {
     _x = Vector3(vec3.z, 0.f, 0.f).normalize();
   }
   else {
@@ -255,7 +256,7 @@ CoordSystem SPSTreeGenerator::coordSystem(Vector3& vec3)
 
 float SPSTreeGenerator::randPct(float v, float p)
 {
-  if (std_util::almost_equal(p, 0.f)) {
+  if (stl_util::almost_equal(p, 0.f)) {
     return v;
   }
 

@@ -2,6 +2,7 @@
 #define BABYLON_CORE_RANDOM_H
 
 #include <babylon/babylon_stl.h>
+#include <babylon/babylon_stl_util.h>
 
 namespace BABYLON {
 namespace Math {
@@ -10,7 +11,7 @@ namespace Math {
 template <typename T>
 inline T randomNumber(T min, T max)
 {
-  if (std_util::almost_equal(min, max)) {
+  if (stl_util::almost_equal(min, max)) {
     return min;
   }
 

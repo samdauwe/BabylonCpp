@@ -1,5 +1,6 @@
 #include <babylon/materials/pbr_material.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
@@ -565,11 +566,11 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
     _defines.defines[PMD::LOGARITHMICDEPTH] = true;
   }
 
-  if (!std_util::almost_equal(cameraContrast, 1.f)) {
+  if (!stl_util::almost_equal(cameraContrast, 1.f)) {
     _defines.defines[PMD::CAMERACONTRAST] = true;
   }
 
-  if (!std_util::almost_equal(cameraExposure, 1.f)) {
+  if (!stl_util::almost_equal(cameraExposure, 1.f)) {
     _defines.defines[PMD::CAMERATONEMAP] = true;
   }
 
@@ -577,8 +578,8 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
     _defines.defines[PMD::CAMERACOLORCURVES] = true;
   }
 
-  if ((!std_util::almost_equal(overloadedShadeIntensity, 1.f))
-      || (!std_util::almost_equal(overloadedShadowIntensity, 1.f))) {
+  if ((!stl_util::almost_equal(overloadedShadeIntensity, 1.f))
+      || (!stl_util::almost_equal(overloadedShadowIntensity, 1.f))) {
     _defines.defines[PMD::OVERLOADEDSHADOWVALUES] = true;
   }
 
@@ -696,7 +697,7 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
     scene->resetCachedMaterial();
 
     // Fallbacks
-    auto fallbacks = std_util::make_unique<EffectFallbacks>();
+    auto fallbacks = std::make_unique<EffectFallbacks>();
     if (_defines[PMD::REFLECTION]) {
       fallbacks->addFallback(0, "REFLECTION");
     }

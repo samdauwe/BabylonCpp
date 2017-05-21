@@ -1,6 +1,7 @@
 #include <babylon/materials/standard_material.h>
 
 #include <babylon/animations/animation.h>
+#include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/scene.h>
@@ -251,8 +252,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines
-      = std_util::make_unique<StandardMaterialDefines>();
+    subMesh->_materialDefines = std::make_unique<StandardMaterialDefines>();
   }
 
   auto scene = getScene();
@@ -558,7 +558,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
     scene->resetCachedMaterial();
 
     // Fallbacks
-    auto fallbacks = std_util::make_unique<EffectFallbacks>();
+    auto fallbacks = std::make_unique<EffectFallbacks>();
     if (defines[SMD::REFLECTION]) {
       fallbacks->addFallback(0, "REFLECTION");
     }
@@ -1390,7 +1390,7 @@ void StandardMaterial::setInvertNormalMapY(bool value)
 
 void StandardMaterial::setRoughness(float value)
 {
-  if (std_util::almost_equal(_roughness, value)) {
+  if (stl_util::almost_equal(_roughness, value)) {
     return;
   }
   _roughness = value;

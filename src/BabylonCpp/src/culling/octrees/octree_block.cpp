@@ -1,5 +1,6 @@
 #include <babylon/culling/octrees/octree_block.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/ray.h>
@@ -103,10 +104,10 @@ void OctreeBlock<T>::select(const std::array<Plane, 6>& frustumPlanes,
     }
 
     if (allowDuplicate) {
-      std_util::concat(selection, entries);
+      stl_util::concat(selection, entries);
     }
     else {
-      std_util::concat_with_no_duplicates(selection, entries);
+      stl_util::concat_with_no_duplicates(selection, entries);
     }
   }
 }
@@ -125,10 +126,10 @@ void OctreeBlock<T>::intersects(const Vector3& sphereCenter, float sphereRadius,
     }
 
     if (allowDuplicate) {
-      std_util::concat(selection, entries);
+      stl_util::concat(selection, entries);
     }
     else {
-      std_util::concat_with_no_duplicates(selection, entries);
+      stl_util::concat_with_no_duplicates(selection, entries);
     }
   }
 }
@@ -143,7 +144,7 @@ void OctreeBlock<T>::intersectsRay(const Ray& ray, std::vector<T>& selection)
       }
       return;
     }
-    std_util::concat_with_no_duplicates(selection, entries);
+    stl_util::concat_with_no_duplicates(selection, entries);
   }
 }
 

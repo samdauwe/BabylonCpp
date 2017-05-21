@@ -1,5 +1,6 @@
 #include <babylon/mesh/sub_mesh.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
@@ -48,7 +49,7 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , _shouldGenerateFlatShading{false}
     , _onBeforeDrawObserver{nullptr}
     , _morphTargetManager{nullptr}
-    , _batchCache{std_util::make_unique<_InstancesBatch>()}
+    , _batchCache{std::make_unique<_InstancesBatch>()}
     , _instancesBufferSize{32 * 16 * 4} // maximum of 32 instances
     , _overridenInstanceCount{0}
     , _preActivateId{-1}
@@ -220,7 +221,7 @@ Mesh& Mesh::addLODLevel(float distance, Mesh* mesh)
     return *this;
   }
 
-  _LODLevels.emplace_back(std_util::make_unique<MeshLODLevel>(distance, mesh));
+  _LODLevels.emplace_back(std::make_unique<MeshLODLevel>(distance, mesh));
 
   if (mesh) {
     mesh->_masterMesh = this;
@@ -234,7 +235,7 @@ Mesh& Mesh::addLODLevel(float distance, Mesh* mesh)
 Mesh* Mesh::getLODLevelAtDistance(float distance)
 {
   for (const auto& level : _LODLevels) {
-    if (std_util::almost_equal(level->distance, distance)) {
+    if (stl_util::almost_equal(level->distance, distance)) {
       return level->mesh;
     }
   }
@@ -245,7 +246,7 @@ Mesh& Mesh::removeLODLevel(Mesh* mesh)
 {
   for (auto& level : _LODLevels) {
     if (level->mesh == mesh) {
-      std_util::erase(_LODLevels, level);
+      stl_util::erase(_LODLevels, level);
       if (mesh) {
         mesh->_masterMesh = nullptr;
       }
@@ -454,8 +455,8 @@ void Mesh::_preActivateForIntermediateRendering(int renderId)
 Mesh& Mesh::_registerInstanceForRenderId(InstancedMesh* instance, int renderId)
 {
   if (!_visibleInstances) {
-    _visibleInstances = std_util::make_unique<_VisibleInstances>();
-    _visibleInstances->defaultRenderId     = renderId;
+    _visibleInstances                  = std::make_unique<_VisibleInstances>();
+    _visibleInstances->defaultRenderId = renderId;
     _visibleInstances->selfDefaultRenderId = _renderId;
   }
 
@@ -479,7 +480,7 @@ Mesh& Mesh::refreshBoundingInfo()
 
   if (!data.empty()) {
     auto extend   = Tools::ExtractMinAndMax(data, 0, getTotalVertices());
-    _boundingInfo = std_util::make_unique<BoundingInfo>(extend.min, extend.max);
+    _boundingInfo = std::make_unique<BoundingInfo>(extend.min, extend.max);
   }
 
   if (!subMeshes.empty()) {
@@ -540,7 +541,7 @@ Mesh* Mesh::setVerticesData(unsigned int kind, const Float32Array& data,
                             bool updatable, int stride)
 {
   if (!_geometry) {
-    auto vertexData = std_util::make_unique<VertexData>();
+    auto vertexData = std::make_unique<VertexData>();
     vertexData->set(data, kind);
 
     auto scene = getScene();
@@ -626,7 +627,7 @@ Mesh& Mesh::makeGeometryUnique()
 Mesh* Mesh::setIndices(const IndicesArray& indices, size_t totalVertices)
 {
   if (!_geometry) {
-    auto vertexData     = std_util::make_unique<VertexData>();
+    auto vertexData     = std::make_unique<VertexData>();
     vertexData->indices = indices;
 
     auto scene = getScene();
@@ -845,8 +846,8 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, int fillMode,
       _instancesBuffer->dispose();
     }
 
-    _instancesBuffer = std_util::make_unique<Buffer>(engine, _instancesData,
-                                                     true, 16, false, true);
+    _instancesBuffer
+      = std::make_unique<Buffer>(engine, _instancesData, true, 16, false, true);
 
     setVerticesBuffer(
       _instancesBuffer->createVertexBuffer(VertexBuffer::World0Kind, 0, 4));
@@ -1209,7 +1210,7 @@ Mesh& Mesh::bakeCurrentTransformIntoVertices()
   if (rotationQuaternionSet()) {
     setRotationQuaternion(Quaternion::Identity());
   }
-  _worldMatrix = std_util::make_unique<Matrix>(Matrix::Identity());
+  _worldMatrix = std::make_unique<Matrix>(Matrix::Identity());
   return *this;
 }
 
@@ -1745,7 +1746,7 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
     mesh->delayLoadState = Engine::DELAYLOADSTATE_NOTLOADED;
     mesh->delayLoadingFile
       = rootUrl + Json::GetString(parsedMesh, "delayLoadingFile");
-    mesh->_boundingInfo = std_util::make_unique<BoundingInfo>(
+    mesh->_boundingInfo = std::make_unique<BoundingInfo>(
       Vector3::FromArray(
         Json::ToArray<float>(parsedMesh, "boundingBoxMinimum")),
       Vector3::FromArray(

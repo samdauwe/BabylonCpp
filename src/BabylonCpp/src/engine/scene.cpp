@@ -165,18 +165,18 @@ Scene::Scene(Engine* engine)
 {
   engine->scenes.emplace_back(this);
 
-  _renderingManager = std_util::make_unique<RenderingManager>(this);
+  _renderingManager = std::make_unique<RenderingManager>(this);
 
-  postProcessManager = std_util::make_unique<PostProcessManager>(this);
+  postProcessManager = std::make_unique<PostProcessManager>(this);
 
-  _outlineRenderer = std_util::make_unique<OutlineRenderer>(this);
+  _outlineRenderer = std::make_unique<OutlineRenderer>(this);
 
   attachControl();
 
-  mainSoundTrack = std_util::make_unique<SoundTrack>(this, true);
+  mainSoundTrack = std::make_unique<SoundTrack>(this, true);
 
   // simplification queue
-  simplificationQueue = std_util::make_unique<SimplificationQueue>();
+  simplificationQueue = std::make_unique<SimplificationQueue>();
 
   // Collision coordinator initialization.
   setWorkerCollisions(false);
@@ -346,7 +346,7 @@ PostProcessRenderPipelineManager* Scene::postProcessRenderPipelineManager()
 {
   if (!_postProcessRenderPipelineManager) {
     _postProcessRenderPipelineManager
-      = std_util::make_unique<PostProcessRenderPipelineManager>();
+      = std::make_unique<PostProcessRenderPipelineManager>();
   }
 
   return _postProcessRenderPipelineManager.get();
@@ -359,7 +359,7 @@ Plane* Scene::clipPlane()
 
 void Scene::setClipPlane(const Plane& plane)
 {
-  _clipPlane = std_util::make_unique<Plane>(plane);
+  _clipPlane = std::make_unique<Plane>(plane);
 }
 
 void Scene::resetClipPlane()
@@ -369,7 +369,7 @@ void Scene::resetClipPlane()
 
 void Scene::setMirroredCameraPosition(const Vector3& newPosition)
 {
-  _mirroredCameraPosition = std_util::make_unique<Vector3>(newPosition);
+  _mirroredCameraPosition = std::make_unique<Vector3>(newPosition);
 }
 
 StandardMaterial* Scene::defaultMaterial()
@@ -394,7 +394,7 @@ const std::array<Plane, 6>& Scene::frustumPlanes() const
 DebugLayer* Scene::debugLayer()
 {
   if (!_debugLayer) {
-    _debugLayer = std_util::make_unique<DebugLayer>(this);
+    _debugLayer = std::make_unique<DebugLayer>(this);
   }
   return _debugLayer.get();
 }
@@ -408,10 +408,10 @@ void Scene::setWorkerCollisions(bool enabled)
   }
 
   if (enabled) {
-    collisionCoordinator = std_util::make_unique<CollisionCoordinatorWorker>();
+    collisionCoordinator = std::make_unique<CollisionCoordinatorWorker>();
   }
   else {
-    collisionCoordinator = std_util::make_unique<CollisionCoordinatorLegacy>();
+    collisionCoordinator = std::make_unique<CollisionCoordinatorLegacy>();
   }
 
   collisionCoordinator->init(this);
@@ -468,7 +468,7 @@ Effect* Scene::getCachedEffect()
 BoundingBoxRenderer* Scene::getBoundingBoxRenderer()
 {
   if (!_boundingBoxRenderer) {
-    _boundingBoxRenderer = std_util::make_unique<BoundingBoxRenderer>(this);
+    _boundingBoxRenderer = std::make_unique<BoundingBoxRenderer>(this);
   }
 
   return _boundingBoxRenderer.get();
@@ -690,8 +690,8 @@ void Scene::_onPointerMoveEvent(PointerEvent&& evt)
     auto type = evt.type == EventType::MOUSE_WHEEL ?
                   PointerEventTypes::POINTERWHEEL :
                   PointerEventTypes::POINTERMOVE;
-    auto pi = std_util::make_unique<PointerInfoPre>(
-      type, evt, _unTranslatedPointerX, _unTranslatedPointerY);
+    auto pi = std::make_unique<PointerInfoPre>(type, evt, _unTranslatedPointerX,
+                                               _unTranslatedPointerY);
     onPrePointerObservable.notifyObservers(pi.get(), static_cast<int>(type));
     if (pi->skipOnPointerObservable) {
       return;
@@ -761,7 +761,7 @@ void Scene::_onPointerMoveEvent(PointerEvent&& evt)
     auto type = evt.type == EventType::MOUSE_WHEEL ?
                   PointerEventTypes::POINTERWHEEL :
                   PointerEventTypes::POINTERMOVE;
-    auto pi = std_util::make_unique<PointerInfo>(type, evt, *pickResult);
+    auto pi = std::make_unique<PointerInfo>(type, evt, *pickResult);
     onPointerObservable.notifyObservers(pi.get(), static_cast<int>(type));
   }
 }
@@ -773,8 +773,8 @@ void Scene::_onPointerDownEvent(PointerEvent&& evt)
   // PreObservable support
   if (onPrePointerObservable.hasObservers()) {
     auto type = PointerEventTypes::POINTERDOWN;
-    auto pi   = std_util::make_unique<PointerInfoPre>(
-      type, evt, _unTranslatedPointerX, _unTranslatedPointerY);
+    auto pi = std::make_unique<PointerInfoPre>(type, evt, _unTranslatedPointerX,
+                                               _unTranslatedPointerY);
     onPrePointerObservable.notifyObservers(pi.get(), static_cast<int>(type));
     if (pi->skipOnPointerObservable) {
       return;
@@ -865,7 +865,7 @@ void Scene::_onPointerDownEvent(PointerEvent&& evt)
 
   if (onPointerObservable.hasObservers()) {
     auto type = PointerEventTypes::POINTERDOWN;
-    auto pi   = std_util::make_unique<PointerInfo>(type, evt, *pickResult);
+    auto pi   = std::make_unique<PointerInfo>(type, evt, *pickResult);
     onPointerObservable.notifyObservers(pi.get(), static_cast<int>(type));
   }
 
@@ -917,8 +917,8 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
   // PreObservable support
   if (onPrePointerObservable.hasObservers()) {
     auto type = PointerEventTypes::POINTERUP;
-    auto pi   = std_util::make_unique<PointerInfoPre>(
-      type, evt, _unTranslatedPointerX, _unTranslatedPointerY);
+    auto pi = std::make_unique<PointerInfoPre>(type, evt, _unTranslatedPointerX,
+                                               _unTranslatedPointerY);
     onPrePointerObservable.notifyObservers(pi.get(), static_cast<int>(type));
     if (pi->skipOnPointerObservable) {
       return;
@@ -944,7 +944,7 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
         && pickResult->pickedMesh == _pickedDownMesh) {
       if (onPointerObservable.hasObservers()) {
         auto type = PointerEventTypes::POINTERPICK;
-        auto pi   = std_util::make_unique<PointerInfo>(type, evt, *pickResult);
+        auto pi   = std::make_unique<PointerInfo>(type, evt, *pickResult);
         onPointerObservable.notifyObservers(pi.get(), static_cast<int>(type));
       }
     }
@@ -973,7 +973,7 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
 
   if (onPointerObservable.hasObservers()) {
     auto type = PointerEventTypes::POINTERUP;
-    auto pi   = std_util::make_unique<PointerInfo>(type, evt, *pickResult);
+    auto pi   = std::make_unique<PointerInfo>(type, evt, *pickResult);
     onPointerObservable.notifyObservers(pi.get(), static_cast<int>(type));
   }
 
@@ -2546,7 +2546,7 @@ DepthRenderer* Scene::enableDepthRenderer()
     return _depthRenderer.get();
   }
 
-  _depthRenderer = std_util::make_unique<DepthRenderer>(this);
+  _depthRenderer = std::make_unique<DepthRenderer>(this);
 
   return _depthRenderer.get();
 }
@@ -2924,7 +2924,7 @@ bool Scene::enablePhysics(const Vector3& iGravity, IPhysicsEnginePlugin* plugin)
     return true;
   }
 
-  _physicsEngine     = std_util::make_unique<PhysicsEngine>(iGravity, plugin);
+  _physicsEngine     = std::make_unique<PhysicsEngine>(iGravity, plugin);
   bool isInitialized = _physicsEngine->isInitialized();
   if (!isInitialized) {
     _physicsEngine = nullptr;

@@ -2,6 +2,7 @@
 
 #include <babylon/animations/animation.h>
 #include <babylon/animations/animation_value.h>
+#include <babylon/babylon_stl_util.h>
 #include <babylon/engine/scene.h>
 
 namespace BABYLON {
@@ -116,17 +117,17 @@ void Animatable::restart()
 void Animatable::stop(const std::string& animationName)
 {
   if (!animationName.empty()) {
-    auto idx = std_util::index_of(_scene->_activeAnimatables, this);
+    auto idx = stl_util::index_of(_scene->_activeAnimatables, this);
     if (idx > -1) {
       for (size_t index = _animations.size() - 1; index-- > 0;) {
         if (_animations[index]->name != animationName) {
           continue;
         }
         _animations[index]->reset();
-        std_util::splice(_animations, static_cast<int>(index), 1);
+        stl_util::splice(_animations, static_cast<int>(index), 1);
       }
       if (_animations.empty()) {
-        std_util::splice(_scene->_activeAnimatables, idx, 1);
+        stl_util::splice(_scene->_activeAnimatables, idx, 1);
         if (onAnimationEnd) {
           onAnimationEnd();
         }
@@ -134,9 +135,9 @@ void Animatable::stop(const std::string& animationName)
     }
   }
   else {
-    auto index = std_util::index_of(_scene->_activeAnimatables, this);
+    auto index = stl_util::index_of(_scene->_activeAnimatables, this);
     if (index > -1) {
-      std_util::splice(_scene->_activeAnimatables, index, 1);
+      stl_util::splice(_scene->_activeAnimatables, index, 1);
       for (auto& animation : _animations) {
         animation->reset();
       }

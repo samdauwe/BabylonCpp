@@ -70,7 +70,7 @@ void HemisphericLight::transferToEffect(Effect* /*effect*/,
 Matrix* HemisphericLight::_getWorldMatrix()
 {
   if (!_worldMatrix) {
-    _worldMatrix = std_util::make_unique<Matrix>(Matrix::Identity());
+    _worldMatrix = std::make_unique<Matrix>(Matrix::Identity());
   }
 
   return _worldMatrix.get();

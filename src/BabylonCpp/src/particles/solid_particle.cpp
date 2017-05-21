@@ -35,9 +35,9 @@ SolidParticle::SolidParticle(unsigned int particleIndex,
     : SolidParticle(particleIndex, positionIndex, model, iShapeId, iIdxInShape,
                     sps)
 {
-  _modelBoundingInfo = std_util::make_unique<BoundingInfo>(modelBoundingInfo);
-  _boundingInfo      = std_util::make_unique<BoundingInfo>(
-    modelBoundingInfo.minimum, modelBoundingInfo.maximum);
+  _modelBoundingInfo = std::make_unique<BoundingInfo>(modelBoundingInfo);
+  _boundingInfo      = std::make_unique<BoundingInfo>(modelBoundingInfo.minimum,
+                                                 modelBoundingInfo.maximum);
 }
 
 SolidParticle::~SolidParticle()

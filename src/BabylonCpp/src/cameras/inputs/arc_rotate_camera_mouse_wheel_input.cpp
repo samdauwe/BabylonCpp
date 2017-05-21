@@ -1,5 +1,6 @@
 #include <babylon/cameras/inputs/arc_rotate_camera_mouse_wheel_input.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/engine/pointer_event_types.h>
 
 namespace BABYLON {
@@ -26,14 +27,14 @@ void ArcRotateCameraMouseWheelInput::attachControl(ICanvas* canvas,
     }
     const auto& event = p.mouseWheelEvent;
     float delta       = 0.f;
-    if (!std_util::almost_equal(event.wheelDelta, 0.f)) {
+    if (!stl_util::almost_equal(event.wheelDelta, 0.f)) {
       delta = event.wheelDelta / (wheelPrecision * 40.f);
     }
-    else if (!std_util::almost_equal(event.detail, 0.f)) {
+    else if (!stl_util::almost_equal(event.detail, 0.f)) {
       delta = -event.detail / wheelPrecision;
     }
 
-    if (!std_util::almost_equal(delta, 0.f)) {
+    if (!stl_util::almost_equal(delta, 0.f)) {
       camera->inertialRadiusOffset += delta;
     }
 

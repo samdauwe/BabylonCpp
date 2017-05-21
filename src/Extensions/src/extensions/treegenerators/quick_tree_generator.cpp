@@ -1,5 +1,6 @@
 #include <babylon/extensions/treegenerators/quick_tree_generator.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/random.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
@@ -59,7 +60,7 @@ Mesh* QuickTreeGenerator::CreateTree(float sizeBranch, float sizeTrunk,
   }
 
   auto randomNumber = [](float min, float max) {
-    if (std_util::almost_equal(min, max)) {
+    if (stl_util::almost_equal(min, max)) {
       return min;
     }
     auto random = Math::random();

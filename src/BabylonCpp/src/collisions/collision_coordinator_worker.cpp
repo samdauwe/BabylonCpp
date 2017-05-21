@@ -1,5 +1,6 @@
 #include <babylon/collisions/collision_coordinator_worker.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/collisions/babylon_message.h>
 #include <babylon/collisions/collide_payload.h>
 #include <babylon/collisions/serialized_collider_to_worker.h>
@@ -227,7 +228,7 @@ void CollisionCoordinatorWorker::_afterRender()
   std::vector<ArrayBufferView> serializable;
   for (auto item : payload.updatedGeometries) {
     const std::string& id = item.first;
-    if (std_util::contains(payload.updatedGeometries, id)) {
+    if (stl_util::contains(payload.updatedGeometries, id)) {
       // prepare transferables
       serializable.emplace_back(
         ArrayBufferView(message.updatePayload.updatedGeometries[id].indices));

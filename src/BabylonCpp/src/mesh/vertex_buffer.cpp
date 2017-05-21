@@ -57,8 +57,8 @@ VertexBuffer::VertexBuffer(Engine* engine, const Float32Array& data,
   _stride = (stride == -1) ? VertexBuffer::KindToStride(kind) : stride;
   _stride = (_stride == -1) ? 3 : _stride;
 
-  _ownedBuffer = std_util::make_unique<Buffer>(
-    engine, data, updatable, _stride, postponeInternalCreation, instanced);
+  _ownedBuffer = std::make_unique<Buffer>(engine, data, updatable, _stride,
+                                          postponeInternalCreation, instanced);
 
   _offset = (offset != -1) ? static_cast<unsigned int>(offset) : 0;
   _size   = (size != -1) ? size : _stride;

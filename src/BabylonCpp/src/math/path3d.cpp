@@ -1,5 +1,6 @@
 #include <babylon/math/path3d.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/math/vector3.h>
 #include <babylon/tools/tools.h>
 
@@ -86,7 +87,7 @@ Path3D Path3D::copy() const
 
 std::unique_ptr<Path3D> Path3D::clone() const
 {
-  return std_util::make_unique<Path3D>(*this);
+  return std::make_unique<Path3D>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Path3D& path)
@@ -248,7 +249,7 @@ Vector3 Path3D::_getFirstNonNullVector(unsigned int index)
 {
   unsigned int i   = 1;
   Vector3 nNVector = _curve[index + i].subtract(_curve[index]);
-  while (std_util::almost_equal(nNVector.length(), 0.f)
+  while (stl_util::almost_equal(nNVector.length(), 0.f)
          && index + i + 1 < _curve.size()) {
     ++i;
     nNVector = _curve[index + i].subtract(_curve[index]);
@@ -260,7 +261,7 @@ Vector3 Path3D::_getLastNonNullVector(unsigned int index)
 {
   unsigned int i   = 1;
   Vector3 nLVector = _curve[index].subtract(_curve[index - i]);
-  while (std_util::almost_equal(nLVector.length(), 0.f) && index > i + 1) {
+  while (stl_util::almost_equal(nLVector.length(), 0.f) && index > i + 1) {
     ++i;
     nLVector = _curve[index].subtract(_curve[index - i]);
   }
@@ -272,7 +273,7 @@ Vector3 Path3D::_normalVector(const Vector3& /*v0*/, const Vector3& vt,
 {
   Vector3 normal0;
   float tgl = vt.length();
-  if (std_util::almost_equal(tgl, 0.f)) {
+  if (stl_util::almost_equal(tgl, 0.f)) {
     tgl = 1.f;
   }
 

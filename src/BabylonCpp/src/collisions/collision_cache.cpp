@@ -1,5 +1,7 @@
 #include <babylon/collisions/collision_cache.h>
 
+#include <babylon/babylon_stl_util.h>
+
 namespace BABYLON {
 
 CollisionCache::CollisionCache()
@@ -43,7 +45,7 @@ void CollisionCache::removeMesh(unsigned int uniqueId)
 
 bool CollisionCache::containsGeometry(const std::string& id) const
 {
-  return std_util::contains(_geometries, id);
+  return stl_util::contains(_geometries, id);
 }
 
 SerializedGeometry& CollisionCache::getGeometry(const std::string& id)

@@ -69,7 +69,7 @@ bool NormalMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std_util::make_unique<NormalMaterialDefines>();
+    subMesh->_materialDefines = std::make_unique<NormalMaterialDefines>();
   }
 
   auto defines
@@ -127,7 +127,7 @@ bool NormalMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
     scene->resetCachedMaterial();
 
     // Fallbacks
-    auto fallbacks = std_util::make_unique<EffectFallbacks>();
+    auto fallbacks = std::make_unique<EffectFallbacks>();
     if (defines[NMD::FOG]) {
       fallbacks->addFallback(1, "FOG");
     }

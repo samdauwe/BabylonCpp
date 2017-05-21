@@ -1,5 +1,6 @@
 #include <babylon/layer/highlight_layer.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
@@ -31,7 +32,7 @@ template <typename... Ts>
 HighlightLayer* HighlightLayer::New(Ts&&... args)
 {
   auto highlightLayer
-    = std_util::make_unique<HighlightLayer>(std::forward<Ts>(args)...);
+    = std::make_unique<HighlightLayer>(std::forward<Ts>(args)...);
   highlightLayer->_scene->highlightLayers.emplace_back(highlightLayer);
   return highlightLayer.get();
 }
@@ -71,7 +72,7 @@ HighlightLayer::HighlightLayer(const std::string& iName, Scene* scene,
   Float32Array vertices{1, 1, -1, 1, -1, -1, 1, -1};
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
-    = std_util::make_unique<VertexBuffer>(
+    = std::make_unique<VertexBuffer>(
       _engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   // Indices
@@ -142,7 +143,7 @@ void HighlightLayer::createTextureAndPostProcesses()
 
 #if 0
   _mainTexture
-    = std_util::make_unique<RenderTargetTexture>(new RenderTargetTexture(
+    = std::make_unique<RenderTargetTexture>(new RenderTargetTexture(
       "HighlightLayerMainRTT",
       {_mainTextureDesiredSize.width, _mainTextureDesiredSize.height}, _scene,
       false, true, Engine::TEXTURETYPE_UNSIGNED_INT));
@@ -157,7 +158,7 @@ void HighlightLayer::createTextureAndPostProcesses()
 
 #if 0
   _blurTexture
-    = std_util::make_unique<RenderTargetTexture>(new RenderTargetTexture(
+    = std::make_unique<RenderTargetTexture>(new RenderTargetTexture(
       "HighlightLayerBlurRTT", {blurTextureWidth, blurTextureHeight}, _scene,
       false, true, Engine::TEXTURETYPE_UNSIGNED_INT));
 #endif
@@ -167,7 +168,7 @@ void HighlightLayer::createTextureAndPostProcesses()
   _blurTexture->updateSamplingMode(Texture::TRILINEAR_SAMPLINGMODE);
   _blurTexture->renderParticles = false;
 
-  _downSamplePostprocess = std_util::make_unique<PassPostProcess>(
+  _downSamplePostprocess = std::make_unique<PassPostProcess>(
     "HighlightLayerPPP", _options.blurTextureSizeRatio, nullptr,
     Texture::BILINEAR_SAMPLINGMODE, _scene->getEngine());
   _downSamplePostprocess->onApplyObservable.add([&](Effect* effect) {
@@ -175,14 +176,14 @@ void HighlightLayer::createTextureAndPostProcesses()
   });
 
   if (_options.alphaBlendingMode == Engine::ALPHA_COMBINE) {
-    _horizontalBlurPostprocess = std_util::make_unique<GlowBlurPostProcess>(
+    _horizontalBlurPostprocess = std::make_unique<GlowBlurPostProcess>(
       "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize, 1,
       nullptr, Texture::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _horizontalBlurPostprocess->onApplyObservable.add([&](Effect* effect) {
       effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
     });
 
-    _verticalBlurPostprocess = std_util::make_unique<GlowBlurPostProcess>(
+    _verticalBlurPostprocess = std::make_unique<GlowBlurPostProcess>(
       "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize, 1,
       nullptr, Texture::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _verticalBlurPostprocess->onApplyObservable.add([&](Effect* effect) {
@@ -190,14 +191,14 @@ void HighlightLayer::createTextureAndPostProcesses()
     });
   }
   else {
-    _horizontalBlurPostprocess = std_util::make_unique<GlowBlurPostProcess>(
+    _horizontalBlurPostprocess = std::make_unique<GlowBlurPostProcess>(
       "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize, 1,
       nullptr, Texture::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _horizontalBlurPostprocess->onApplyObservable.add([&](Effect* effect) {
       effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
     });
 
-    _verticalBlurPostprocess = std_util::make_unique<GlowBlurPostProcess>(
+    _verticalBlurPostprocess = std::make_unique<GlowBlurPostProcess>(
       "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize, 1,
       nullptr, Texture::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _verticalBlurPostprocess->onApplyObservable.add([&](Effect* effect) {
@@ -256,16 +257,16 @@ void HighlightLayer::renderSubMesh(SubMesh* subMesh)
   }
 
   // Excluded Mesh
-  if (std_util::contains(_excludedMeshes, mesh->uniqueId)) {
+  if (stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
     return;
   };
 
   bool hardwareInstancedRendering
     = (engine->getCaps().instancedArrays != false)
-      && std_util::contains(batch->visibleInstances, subMesh->_id)
+      && stl_util::contains(batch->visibleInstances, subMesh->_id)
       && (!batch->visibleInstances[subMesh->_id].empty());
 
-  bool hashighlightLayerMesh   = std_util::contains(_meshes, mesh->uniqueId);
+  bool hashighlightLayerMesh   = stl_util::contains(_meshes, mesh->uniqueId);
   auto material                = subMesh->getMaterial();
   BaseTexture* emissiveTexture = nullptr;
   if (hashighlightLayerMesh && _meshes[mesh->uniqueId].glowEmissiveOnly
@@ -501,7 +502,7 @@ void HighlightLayer::render()
 
 void HighlightLayer::addExcludedMesh(Mesh* mesh)
 {
-  if (!std_util::contains(_excludedMeshes, mesh->uniqueId)) {
+  if (!stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
     IHighlightLayerExcludedMesh meshExcluded;
     meshExcluded.mesh         = mesh;
     meshExcluded.beforeRender = mesh->onBeforeRenderObservable.add(
@@ -514,7 +515,7 @@ void HighlightLayer::addExcludedMesh(Mesh* mesh)
 
 void HighlightLayer::removeExcludedMesh(Mesh* mesh)
 {
-  if (std_util::contains(_excludedMeshes, mesh->uniqueId)) {
+  if (stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
     auto& meshExcluded = _excludedMeshes[mesh->uniqueId];
     mesh->onBeforeRenderObservable.remove(meshExcluded.beforeRender);
     mesh->onAfterRenderObservable.remove(meshExcluded.afterRender);
@@ -525,7 +526,7 @@ void HighlightLayer::removeExcludedMesh(Mesh* mesh)
 void HighlightLayer::addMesh(Mesh* mesh, const Color3& color,
                              bool glowEmissiveOnly)
 {
-  if (std_util::contains(_meshes, mesh->uniqueId)) {
+  if (stl_util::contains(_meshes, mesh->uniqueId)) {
     _meshes[mesh->uniqueId].color = color;
   }
   else {
@@ -535,7 +536,7 @@ void HighlightLayer::addMesh(Mesh* mesh, const Color3& color,
     // Lambda required for capture due to Observable this context
     newMesh.observerHighlight
       = mesh->onBeforeRenderObservable.add([&](Mesh* mesh) {
-          if (std_util::contains(_excludedMeshes, mesh->uniqueId)) {
+          if (stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
             defaultStencilReference(mesh);
           }
           else {
@@ -554,7 +555,7 @@ void HighlightLayer::addMesh(Mesh* mesh, const Color3& color,
 
 void HighlightLayer::removeMesh(Mesh* mesh)
 {
-  if (std_util::contains(_meshes, mesh->uniqueId)) {
+  if (stl_util::contains(_meshes, mesh->uniqueId)) {
     auto& meshHighlight = _meshes[mesh->uniqueId];
     mesh->onBeforeRenderObservable.remove(meshHighlight.observerHighlight);
     mesh->onAfterRenderObservable.remove(meshHighlight.observerDefault);
@@ -606,7 +607,7 @@ void HighlightLayer::disposeTextureAndPostProcesses()
 
 void HighlightLayer::dispose()
 {
-  if (std_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)) {
+  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)) {
     auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKindChars];
     vertexBuffer->dispose();
     _vertexBuffers.erase(VertexBuffer::PositionKindChars);

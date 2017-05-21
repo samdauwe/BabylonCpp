@@ -1,5 +1,6 @@
 #include <babylon/cameras/camera.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/arc_follow_camera.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/follow_camera.h>
@@ -176,8 +177,8 @@ bool Camera::_isSynchronizedViewMatrix()
 
 bool Camera::_isSynchronizedProjectionMatrix()
 {
-  bool check = _cache.mode == mode && std_util::almost_equal(_cache.minZ, minZ)
-               && std_util::almost_equal(_cache.maxZ, maxZ);
+  bool check = _cache.mode == mode && stl_util::almost_equal(_cache.minZ, minZ)
+               && stl_util::almost_equal(_cache.maxZ, maxZ);
   if (!check) {
     return false;
   }
@@ -185,15 +186,15 @@ bool Camera::_isSynchronizedProjectionMatrix()
   auto engine = getEngine();
 
   if (mode == Camera::PERSPECTIVE_CAMERA) {
-    check = std_util::almost_equal(_cache.fov, fov) && _cache.fovMode == fovMode
-            && std_util::almost_equal(_cache.aspectRatio,
+    check = stl_util::almost_equal(_cache.fov, fov) && _cache.fovMode == fovMode
+            && stl_util::almost_equal(_cache.aspectRatio,
                                       engine->getAspectRatio(this));
   }
   else {
-    check = std_util::almost_equal(_cache.orthoLeft, orthoLeft)
-            && std_util::almost_equal(_cache.orthoRight, orthoRight)
-            && std_util::almost_equal(_cache.orthoBottom, orthoBottom)
-            && std_util::almost_equal(_cache.orthoTop, orthoTop)
+    check = stl_util::almost_equal(_cache.orthoLeft, orthoLeft)
+            && stl_util::almost_equal(_cache.orthoRight, orthoRight)
+            && stl_util::almost_equal(_cache.orthoBottom, orthoBottom)
+            && stl_util::almost_equal(_cache.orthoTop, orthoTop)
             && _cache.renderWidth == engine->getRenderWidth()
             && _cache.renderHeight == engine->getRenderHeight();
   }
@@ -259,12 +260,12 @@ void Camera::_cascadePostProcessesToRigCams()
         // isIntermediate when there are also user postProcesses
         cam->isIntermediate = _postProcesses.empty();
       }
-      cam->_postProcesses = std_util::slice(_postProcesses, 0);
+      cam->_postProcesses = stl_util::slice(_postProcesses, 0);
       cam->_postProcesses.emplace_back(rigPostProcess);
       rigPostProcess->markTextureDirty();
     }
     else {
-      cam->_postProcesses = std_util::slice(_postProcesses, 0);
+      cam->_postProcesses = stl_util::slice(_postProcesses, 0);
     }
   }
 }
@@ -272,7 +273,7 @@ void Camera::_cascadePostProcessesToRigCams()
 int Camera::attachPostProcess(PostProcess* postProcess, int insertAt)
 {
   if (!postProcess->isReusable()
-      && std_util::index_of(_postProcesses, postProcess) > -1) {
+      && stl_util::index_of(_postProcesses, postProcess) > -1) {
     BABYLON_LOG_WARN(
       "Camera",
       "You're trying to reuse a post process not defined as reusable.");
@@ -283,10 +284,10 @@ int Camera::attachPostProcess(PostProcess* postProcess, int insertAt)
     _postProcesses.emplace_back(postProcess);
   }
   else {
-    std_util::splice(_postProcesses, insertAt, 0, {postProcess});
+    stl_util::splice(_postProcesses, insertAt, 0, {postProcess});
   }
   _cascadePostProcessesToRigCams(); // also ensures framebuffer invalidated
-  return std_util::index_of(_postProcesses, postProcess);
+  return stl_util::index_of(_postProcesses, postProcess);
 }
 
 Int32Array Camera::detachPostProcess(PostProcess* postProcess,
@@ -308,7 +309,7 @@ Int32Array Camera::detachPostProcess(PostProcess* postProcess,
         continue;
       }
       index = static_cast<int>(atIndices[i]);
-      std_util::splice(_postProcesses, index, 1);
+      stl_util::splice(_postProcesses, index, 1);
     }
   }
   _cascadePostProcessesToRigCams(); // also ensures framebuffer invalidated
@@ -318,7 +319,7 @@ Int32Array Camera::detachPostProcess(PostProcess* postProcess,
 Matrix* Camera::getWorldMatrix()
 {
   if (!_worldMatrix) {
-    _worldMatrix = std_util::make_unique<Matrix>(Matrix::Identity());
+    _worldMatrix = std::make_unique<Matrix>(Matrix::Identity());
   }
 
   auto viewMatrix = getViewMatrix();
@@ -348,7 +349,7 @@ Matrix& Camera::getViewMatrix(bool force)
   }
   else {
     if (!_worldMatrix) {
-      _worldMatrix = std_util::make_unique<Matrix>(Matrix::Identity());
+      _worldMatrix = std::make_unique<Matrix>(Matrix::Identity());
     }
 
     _computedViewMatrix.invertToRef(*_worldMatrix);
@@ -435,18 +436,18 @@ Matrix& Camera::getProjectionMatrix(bool force)
   float halfHeight = static_cast<float>(engine->getRenderHeight()) / 2.f;
   if (scene->useRightHandedSystem) {
     Matrix::OrthoOffCenterRHToRef(
-      !std_util::almost_equal(orthoLeft, 0.f) ? orthoLeft : -halfWidth,
-      !std_util::almost_equal(orthoRight, 0.f) ? orthoRight : halfWidth,
-      !std_util::almost_equal(orthoBottom, 0.f) ? orthoBottom : -halfHeight,
-      !std_util::almost_equal(orthoTop, 0.f) ? orthoTop : halfHeight, minZ,
+      !stl_util::almost_equal(orthoLeft, 0.f) ? orthoLeft : -halfWidth,
+      !stl_util::almost_equal(orthoRight, 0.f) ? orthoRight : halfWidth,
+      !stl_util::almost_equal(orthoBottom, 0.f) ? orthoBottom : -halfHeight,
+      !stl_util::almost_equal(orthoTop, 0.f) ? orthoTop : halfHeight, minZ,
       maxZ, _projectionMatrix);
   }
   else {
     Matrix::OrthoOffCenterLHToRef(
-      !std_util::almost_equal(orthoLeft, 0.f) ? orthoLeft : -halfWidth,
-      !std_util::almost_equal(orthoRight, 0.f) ? orthoRight : halfWidth,
-      !std_util::almost_equal(orthoBottom, 0.f) ? orthoBottom : -halfHeight,
-      !std_util::almost_equal(orthoTop, 0.f) ? orthoTop : halfHeight, minZ,
+      !stl_util::almost_equal(orthoLeft, 0.f) ? orthoLeft : -halfWidth,
+      !stl_util::almost_equal(orthoRight, 0.f) ? orthoRight : halfWidth,
+      !stl_util::almost_equal(orthoBottom, 0.f) ? orthoBottom : -halfHeight,
+      !stl_util::almost_equal(orthoTop, 0.f) ? orthoTop : halfHeight, minZ,
       maxZ, _projectionMatrix);
   }
   return _projectionMatrix;

@@ -1,5 +1,6 @@
 #include <babylon/cameras/camera_inputs_manager.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
 #include <babylon/core/logging.h>
@@ -23,7 +24,7 @@ void CameraInputsManager<TCamera>::add(
   std::unique_ptr<ICameraInput<TCamera>>&& input)
 {
   const std::string type = input->getSimpleName();
-  if (std_util::contains(attached, type)) {
+  if (stl_util::contains(attached, type)) {
     BABYLON_LOGF_WARN("CameraInputsManager",
                       "camera input of type %s already exists on camera",
                       type.c_str());

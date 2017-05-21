@@ -29,7 +29,7 @@ Material::Material(const std::string& iName, Scene* scene, bool /*doNotAdd*/)
     , _effect{nullptr}
     , _wasPreviouslyReady{false}
     , _backFaceCulling{true}
-    , _uniformBuffer{std_util::make_unique<UniformBuffer>(scene->getEngine())}
+    , _uniformBuffer{std::make_unique<UniformBuffer>(scene->getEngine())}
     , _onDisposeObserver{nullptr}
     , _onBindObserver{nullptr}
     , _fogEnabled{true}

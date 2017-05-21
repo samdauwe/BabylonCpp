@@ -1,5 +1,6 @@
 #include <babylon/postprocess/renderpipeline/post_process_render_effect.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/render_target_texture.h>
@@ -64,7 +65,7 @@ void PostProcessRenderEffect::addRenderEffectAsPass(
 PostProcessRenderPass*
 PostProcessRenderEffect::getPass(const std::string& passName)
 {
-  if (std_util::contains(_renderPasses, passName)) {
+  if (stl_util::contains(_renderPasses, passName)) {
     return _renderPasses[passName];
   }
 
@@ -83,7 +84,7 @@ void PostProcessRenderEffect::_attachCameras(
 {
   std::string cameraKey;
 
-  auto _cam = cameras.empty() ? std_util::extract_values(_cameras) : cameras;
+  auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
   for (auto& camera : _cam) {
     auto cameraName = camera->name;
@@ -95,7 +96,7 @@ void PostProcessRenderEffect::_attachCameras(
       cameraKey = cameraName;
     }
 
-    if (std_util::contains(_postProcesses, cameraKey)) {
+    if (stl_util::contains(_postProcesses, cameraKey)) {
       _postProcesses[cameraKey] = _postProcesses[cameraKey];
     }
     else {
@@ -104,13 +105,13 @@ void PostProcessRenderEffect::_attachCameras(
 
     auto index = camera->attachPostProcess(_postProcesses[cameraKey]);
 
-    if (!std_util::contains(_indicesForCamera, cameraName)) {
+    if (!stl_util::contains(_indicesForCamera, cameraName)) {
       _indicesForCamera[cameraName].clear();
     }
 
     _indicesForCamera[cameraName].emplace_back(index);
 
-    if (!std_util::contains(_cameras, camera->name)) {
+    if (!stl_util::contains(_cameras, camera->name)) {
       _cameras[cameraName] = camera;
     }
 
@@ -125,7 +126,7 @@ void PostProcessRenderEffect::_attachCameras(
 void PostProcessRenderEffect::_detachCameras(
   const std::vector<Camera*>& cameras)
 {
-  auto _cam = cameras.empty() ? std_util::extract_values(_cameras) : cameras;
+  auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
   for (auto& camera : _cam) {
     auto cameraName = camera->name;
@@ -145,7 +146,7 @@ void PostProcessRenderEffect::_detachCameras(
 
 void PostProcessRenderEffect::_enable(const std::vector<Camera*> cameras)
 {
-  auto _cam = cameras.empty() ? std_util::extract_values(_cameras) : cameras;
+  auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
   for (auto& camera : _cam) {
     auto cameraName = camera->name;
@@ -168,7 +169,7 @@ void PostProcessRenderEffect::_enable(const std::vector<Camera*> cameras)
 
 void PostProcessRenderEffect::_disable(std::vector<Camera*> cameras)
 {
-  auto _cam = cameras.empty() ? std_util::extract_values(_cameras) : cameras;
+  auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
   for (auto& camera : _cam) {
     auto cameraName = camera->name;

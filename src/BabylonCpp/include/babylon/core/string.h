@@ -2,6 +2,7 @@
 #define BABYLON_CORE_STRING_H
 
 #include <babylon/babylon_stl.h>
+#include <babylon/babylon_stl_util.h>
 
 namespace BABYLON {
 namespace String {
@@ -117,7 +118,7 @@ inline std::string escape(const std::string& s)
  */
 inline std::vector<std::string> escape(const std::vector<std::string>& ss)
 {
-  return std_util::map(ss, [](const std::string& s) { return escape(s); });
+  return stl_util::map(ss, [](const std::string& s) { return escape(s); });
 }
 
 /**

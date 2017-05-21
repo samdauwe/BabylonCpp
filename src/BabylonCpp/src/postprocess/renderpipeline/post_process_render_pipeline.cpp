@@ -1,5 +1,6 @@
 #include <babylon/postprocess/renderpipeline/post_process_render_pipeline.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/postprocess/display_pass_post_process.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_effect.h>
@@ -42,31 +43,31 @@ void PostProcessRenderPipeline::_enableEffect(
     return;
   }
 
-  auto _cam = cameras.empty() ? std_util::extract_values(_cameras) : cameras;
+  auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
   renderEffects->_enable(_cam);
 }
 
 void PostProcessRenderPipeline::_disableEffect(
   const std::string& renderEffectName, const std::vector<Camera*>& cameras)
 {
-  if (!std_util::contains(_renderEffects, renderEffectName)) {
+  if (!stl_util::contains(_renderEffects, renderEffectName)) {
     return;
   }
 
-  auto _cam = cameras.empty() ? std_util::extract_values(_cameras) : cameras;
+  auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
   _renderEffects[renderEffectName]->_disable(_cam);
 }
 
 void PostProcessRenderPipeline::_attachCameras(
   const std::vector<Camera*>& cameras, bool unique)
 {
-  auto _cam = cameras.empty() ? std_util::extract_values(_cameras) : cameras;
+  auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
   std::vector<Camera*> camerasToDelete;
   for (auto& camera : _cam) {
     const auto& cameraName = camera->name;
 
-    if (std_util::contains(_cameras, camera->name)) {
+    if (stl_util::contains(_cameras, camera->name)) {
       _cameras[cameraName] = camera;
     }
     else if (unique) {
@@ -88,7 +89,7 @@ void PostProcessRenderPipeline::_attachCameras(
 void PostProcessRenderPipeline::_detachCameras(
   const std::vector<Camera*>& cameras)
 {
-  auto _cam = cameras.empty() ? std_util::extract_values(_cameras) : cameras;
+  auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
   for (auto& item : _renderEffects) {
     item.second->_detachCameras(_cam);
@@ -104,7 +105,7 @@ void PostProcessRenderPipeline::_detachCameras(
 void PostProcessRenderPipeline::_enableDisplayOnlyPass(
   const std::string& passName, const std::vector<Camera*>& cameras)
 {
-  auto _cam = cameras.empty() ? std_util::extract_values(_cameras) : cameras;
+  auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
   PostProcessRenderPass* pass = nullptr;
   for (auto& item : _renderEffects) {
@@ -127,7 +128,7 @@ void PostProcessRenderPipeline::_enableDisplayOnlyPass(
 
   for (auto& camera : _cam) {
     const auto& cameraName = camera->name;
-    if (!std_util::contains(_renderEffectsForIsolatedPass, cameraName)) {
+    if (!stl_util::contains(_renderEffectsForIsolatedPass, cameraName)) {
       _renderEffectsForIsolatedPass[cameraName] = new PostProcessRenderEffect(
         _engine, PostProcessRenderPipeline::PASS_EFFECT_NAME, [this]() {
           return new DisplayPassPostProcess(
@@ -144,11 +145,11 @@ void PostProcessRenderPipeline::_enableDisplayOnlyPass(
 void PostProcessRenderPipeline::_disableDisplayOnlyPass(
   const std::string& /*passName*/, const std::vector<Camera*>& cameras)
 {
-  auto _cam = cameras.empty() ? std_util::extract_values(_cameras) : cameras;
+  auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
   for (auto& camera : _cam) {
     const auto& cameraName = camera->name;
-    if (!std_util::contains(_renderEffectsForIsolatedPass, cameraName)) {
+    if (!stl_util::contains(_renderEffectsForIsolatedPass, cameraName)) {
       _renderEffectsForIsolatedPass[cameraName] = new PostProcessRenderEffect(
         _engine, PostProcessRenderPipeline::PASS_EFFECT_NAME, [this]() {
           return new DisplayPassPostProcess(
@@ -172,7 +173,7 @@ void PostProcessRenderPipeline::_update()
 
   for (auto& item : _cameras) {
     const auto& cameraName = item.first;
-    if (std_util::contains(_renderEffectsForIsolatedPass, cameraName)) {
+    if (stl_util::contains(_renderEffectsForIsolatedPass, cameraName)) {
       _renderEffectsForIsolatedPass[cameraName]->_update();
     }
   }

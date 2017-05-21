@@ -1,5 +1,6 @@
 #include <babylon/bones/bone_ik_controller.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
 #include <babylon/mesh/abstract_mesh.h>
 
@@ -161,9 +162,9 @@ void BoneIKController::update()
 
   poleTarget.subtractToRef(bonePos, upAxis);
 
-  if (std_util::almost_equal(upAxis.x, 0.f)
-      && std_util::almost_equal(upAxis.y, 0.f)
-      && std_util::almost_equal(upAxis.z, 0.f)) {
+  if (stl_util::almost_equal(upAxis.x, 0.f)
+      && stl_util::almost_equal(upAxis.y, 0.f)
+      && stl_util::almost_equal(upAxis.z, 0.f)) {
     upAxis.y = 1.f;
   }
   else {

@@ -1,5 +1,6 @@
 #include <babylon/morph/morph_target.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/json.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
@@ -23,7 +24,7 @@ float MorphTarget::influence() const
 
 void MorphTarget::setInfluence(float influence)
 {
-  if (std_util::almost_equal(_influence, influence)) {
+  if (stl_util::almost_equal(_influence, influence)) {
     return;
   }
 
@@ -31,8 +32,7 @@ void MorphTarget::setInfluence(float influence)
   _influence     = influence;
 
   if (onInfluenceChanged.hasObservers()) {
-    auto value
-      = std_util::make_unique<bool>(previous == 0.f || influence == 0.f);
+    auto value = std::make_unique<bool>(previous == 0.f || influence == 0.f);
     onInfluenceChanged.notifyObservers(value.get());
   }
 }
@@ -80,7 +80,7 @@ Json::object MorphTarget::serialize() const
 std::unique_ptr<MorphTarget>
 MorphTarget::Parse(const Json::value& serializationObject)
 {
-  auto result = std_util::make_unique<MorphTarget>(
+  auto result = std::make_unique<MorphTarget>(
     Json::GetString(serializationObject, "name"),
     Json::GetNumber<float>(serializationObject, "influence", 0.f));
 
@@ -102,7 +102,7 @@ std::unique_ptr<MorphTarget> MorphTarget::FromMesh(AbstractMesh* mesh,
     morphTargetName = mesh->name;
   }
 
-  auto result = std_util::make_unique<MorphTarget>(morphTargetName, influence);
+  auto result = std::make_unique<MorphTarget>(morphTargetName, influence);
 
   result->setPositions(mesh->getVerticesData(VertexBuffer::PositionKind));
 

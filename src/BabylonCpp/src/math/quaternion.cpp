@@ -1,5 +1,6 @@
 #include <babylon/math/quaternion.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/tmp.h>
 #include <babylon/math/vector3.h>
@@ -62,7 +63,7 @@ Quaternion Quaternion::copy() const
 
 std::unique_ptr<Quaternion> Quaternion::clone() const
 {
-  return std_util::make_unique<Quaternion>(*this);
+  return std::make_unique<Quaternion>(*this);
 }
 
 std::string Quaternion::toString() const
@@ -95,10 +96,10 @@ Float32Array Quaternion::asArray() const
 
 bool Quaternion::equals(const Quaternion& otherQuaternion) const
 {
-  return std_util::almost_equal(x, otherQuaternion.x)
-         && std_util::almost_equal(y, otherQuaternion.y)
-         && std_util::almost_equal(z, otherQuaternion.z)
-         && std_util::almost_equal(w, otherQuaternion.w);
+  return stl_util::almost_equal(x, otherQuaternion.x)
+         && stl_util::almost_equal(y, otherQuaternion.y)
+         && stl_util::almost_equal(z, otherQuaternion.z)
+         && stl_util::almost_equal(w, otherQuaternion.w);
 }
 
 Quaternion& Quaternion::copyFrom(const Quaternion& other)

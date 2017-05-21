@@ -1,5 +1,6 @@
 #include <babylon/materials/material_helper.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
@@ -252,7 +253,7 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
     }
 
     const std::string lightIndexStr = std::to_string(lightIndex);
-    std_util::concat(uniformsList, {
+    stl_util::concat(uniformsList, {
                                      "vLightData" + lightIndexStr,      //
                                      "vLightDiffuse" + lightIndexStr,   //
                                      "vLightSpecular" + lightIndexStr,  //
@@ -282,7 +283,7 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
     }
 
     const std::string lightIndexStr = std::to_string(lightIndex);
-    std_util::concat(options.uniformsNames,
+    stl_util::concat(options.uniformsNames,
                      {
                        "vLightData" + lightIndexStr,      //
                        "vLightDiffuse" + lightIndexStr,   //

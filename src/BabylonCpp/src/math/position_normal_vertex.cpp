@@ -56,7 +56,7 @@ PositionNormalVertex PositionNormalVertex::copy() const
 
 std::unique_ptr<PositionNormalVertex> PositionNormalVertex::clone() const
 {
-  return std_util::make_unique<PositionNormalVertex>(*this);
+  return std::make_unique<PositionNormalVertex>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os,

@@ -48,7 +48,7 @@ MirrorTexture::~MirrorTexture()
 std::unique_ptr<MirrorTexture> MirrorTexture::clone() const
 {
   auto textureSize = getSize();
-  auto newTexture  = std_util::make_unique<MirrorTexture>(
+  auto newTexture  = std::make_unique<MirrorTexture>(
     name, Size(textureSize.width, textureSize.height), getScene(),
     _renderTargetOptions.generateMipMaps, _renderTargetOptions.type,
     _renderTargetOptions.samplingMode,

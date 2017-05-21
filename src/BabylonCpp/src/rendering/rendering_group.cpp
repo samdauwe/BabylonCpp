@@ -1,5 +1,6 @@
 #include <babylon/rendering/rendering_group.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/bounding_sphere.h>
@@ -294,7 +295,7 @@ void RenderingGroup::_renderParticles(
       continue;
     }
     if (!activeMeshes.empty()
-        || std_util::index_of(activeMeshes, particleSystem->emitter) != -1) {
+        || stl_util::index_of(activeMeshes, particleSystem->emitter) != -1) {
       _scene->_activeParticles.addCount(particleSystem->render(), false);
     }
   }
