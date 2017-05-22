@@ -13,4 +13,3 @@ add_subdirectory(ProceduralTexturesLibrary)
 
 # Applications
 #add_subdirectory(Editor)
-#add_subdirectory(Examples)

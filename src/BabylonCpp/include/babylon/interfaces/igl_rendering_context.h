@@ -8,11 +8,11 @@ namespace GL {
 
 using GLenum     = unsigned int;
 using GLboolean  = bool;
-using GLbitfield = unsigned long;
+using GLbitfield = unsigned int;
 using GLbyte     = char;
 using GLshort    = short;
 using GLint      = int;
-using GLsizei    = long;
+using GLsizei    = int;
 using GLintptr   = long long;
 using GLsizeiptr = long long;
 using GLubyte    = unsigned char;
@@ -2032,7 +2032,12 @@ protected:
 class BABYLON_SHARED_EXPORT IGLVertexArrayObject {
 
 public:
-  IGLVertexArrayObject();
+  IGLVertexArrayObject(GLuint iValue) : value{iValue}
+  {
+  }
+
+public:
+  GLuint value;
 
 }; // end of class IGLVertexArrayObject
 
