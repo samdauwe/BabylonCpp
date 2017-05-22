@@ -140,6 +140,28 @@ std::string base64_decode(std::string const& encoded_string)
   return ret;
 }
 
+/**
+ * @brief Encodes a string in base-64. This method uses the "A-Z", "a-z", "0-9",
+ * "+", "/" and "=" characters to encode the string.
+ * @param str The string to be encoded.
+ * @return A String, representing the base-64 encoded string.
+ */
+std::string base64_btoa(const std::string& str)
+{
+  return base64_encode(reinterpret_cast<const unsigned char*>(str.c_str()),
+                       static_cast<unsigned int>(str.length()));
+}
+
+/**
+ * @brief Decodes a base-64 encoded string.
+ * @param str The string which has been encoded by the btoa() method.
+ * @return A String, representing the decoded string.
+ */
+std::string base64_atob(const std::string& str)
+{
+  return base64_decode(str);
+}
+
 #ifndef _MSC_VER
 #pragma GCC diagnostic pop
 #endif

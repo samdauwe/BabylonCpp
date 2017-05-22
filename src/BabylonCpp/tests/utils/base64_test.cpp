@@ -3,6 +3,22 @@
 #include <babylon/utils/base64.h>
 #include <iostream>
 
+TEST(TestBase64, btoa)
+{
+  const std::string testString            = "Hello World!";
+  const std::string expectedBase64Encoded = "SGVsbG8gV29ybGQh";
+  const std::string base64Encoded         = base64_btoa(testString);
+  EXPECT_EQ(base64Encoded, expectedBase64Encoded);
+}
+
+TEST(TestBase64, atob)
+{
+  const std::string testString            = "SGVsbG8gV29ybGQh";
+  const std::string expectedBase64Decoded = "Hello World!";
+  const std::string base64Encoded         = base64_atob(testString);
+  EXPECT_EQ(base64Encoded, expectedBase64Decoded);
+}
+
 TEST(TestBase64, Encode)
 {
   const std::string testString
