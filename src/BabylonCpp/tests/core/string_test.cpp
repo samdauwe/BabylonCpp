@@ -161,6 +161,52 @@ TEST(TestString, pushFront)
   EXPECT_EQ(s, "Hello World");
 }
 
+std::string my_callback(const std::smatch& m)
+{
+  int int_m = atoi(m.str(0).c_str());
+  return std::to_string(int_m + 1);
+}
+
+TEST(TestString, regexReplaceWithCallback)
+{
+  using namespace BABYLON;
+
+  // Using free function
+  {
+    const std::string s{"1, 9, 19"};
+    const std::string r{
+      String::regexReplace(s, std::regex("\\d+"), my_callback)};
+    const std::string e{"2, 10, 20"};
+    EXPECT_EQ(r, e);
+  }
+
+  // Using lambda function
+  {
+    const auto callback = [](const std::smatch& m) {
+      int int_m = std::atoi(m.str(0).c_str());
+      return std::to_string(int_m + 1);
+    };
+    const std::string s{"1, 9, 19"};
+    const std::string r{String::regexReplace(s, std::regex("\\d+"), callback)};
+    const std::string e{"2, 10, 20"};
+    EXPECT_EQ(r, e);
+  }
+
+  // Example: Replacing a Fahrenheit degree with its Celsius equivalent
+  // Note: only integer based
+  {
+    const auto f2c = [](const std::string& x) {
+      const auto convert = [](const std::smatch& m) {
+        const int fval = std::atoi(m.str(0).c_str());
+        const int cval = static_cast<int>((fval - 32) * 5.f / 9.f);
+        return std::to_string(cval) + 'C';
+      };
+      return String::regexReplace(x, std::regex("(\\d+)F"), convert);
+    };
+    EXPECT_EQ(f2c("212F"), "100C");
+  }
+}
+
 TEST(TestString, removeSubstring)
 {
   using namespace BABYLON;

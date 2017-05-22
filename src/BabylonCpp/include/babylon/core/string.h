@@ -314,12 +314,48 @@ inline std::string& removeSubstring(std::string& s, const std::string& subStr)
   return s;
 }
 
+template <class BidirIt, class Traits, class CharT, class UnaryFunction>
+std::basic_string<CharT> inline regexReplace(
+  BidirIt first, BidirIt last, const std::basic_regex<CharT, Traits>& re,
+  UnaryFunction f)
+{
+  std::basic_string<CharT> s;
+
+  typename std::match_results<BidirIt>::difference_type positionOfLastMatch = 0;
+  auto endOfLastMatch = first;
+
+  auto callback = [&](const std::match_results<BidirIt>& match) {
+    auto positionOfThisMatch = match.position(0);
+    auto diff                = positionOfThisMatch - positionOfLastMatch;
+
+    auto startOfThisMatch = endOfLastMatch;
+    std::advance(startOfThisMatch, diff);
+
+    s.append(endOfLastMatch, startOfThisMatch);
+    s.append(f(match));
+
+    auto lengthOfMatch = match.length(0);
+
+    positionOfLastMatch = positionOfThisMatch + lengthOfMatch;
+
+    endOfLastMatch = startOfThisMatch;
+    std::advance(endOfLastMatch, lengthOfMatch);
+  };
+
+  std::sregex_iterator begin(first, last, re), end;
+  std::for_each(begin, end, callback);
+
+  s.append(endOfLastMatch, last);
+
+  return s;
+}
+
 /**
  * @brief Uses a regular expression to perform substitution on a sequence of
  * characters.
  * @param source The input character sequence.
- * @param reSearch The regular expression that will be matched against the input
- * sequence.
+ * @param reSearch The regular expression string that will be matched against
+ * the input sequence.
  * @param replace The regex replacement format string.
  * @return Result of the replacement.
  */
@@ -332,6 +368,23 @@ inline std::string regexReplace(const std::string& source,
   std::regex_replace(std::back_inserter(result), source.begin(), source.end(),
                      regex, replace);
   return result;
+}
+
+/**
+ * @brief Uses a regular expression to perform substitution on a sequence of
+ * characters.
+ * @param source The input character sequence.
+ * @param reSearch The regular expression that will be matched against the input
+ * sequence.
+ * @param replace The regex replacement format string.
+ * @return Result of the replacement.
+ */
+template <class Traits, class CharT, class UnaryFunction>
+inline std::string regexReplace(const std::string& source,
+                                const std::basic_regex<CharT, Traits>& reSearch,
+                                UnaryFunction f)
+{
+  return regexReplace(source.cbegin(), source.cend(), reSearch, f);
 }
 
 /**
