@@ -167,6 +167,67 @@ std::string my_callback(const std::smatch& m)
   return std::to_string(int_m + 1);
 }
 
+TEST(TestString, regexReplace)
+{
+  using namespace BABYLON;
+
+  {
+    const std::string s{"#extension GL_OES_standard_derivatives : enable"};
+    const std::string regex{
+      "#extension.+(GL_OES_standard_derivatives|GL_EXT_shader_texture_lod|GL_"
+      "EXT_frag_depth).+enable"};
+    const std::string r{String::regexReplace(s, regex, "")};
+    const std::string e{""};
+    EXPECT_EQ(r, e);
+  }
+
+  {
+    const std::string s{";#extension GL_EXT_frag_depth : enable;"};
+    const std::string regex{
+      "#extension.+(GL_OES_standard_derivatives|GL_EXT_shader_texture_lod|GL_"
+      "EXT_frag_depth).+enable"};
+    const std::string r{String::regexReplace(s, regex, "")};
+    const std::string e{";;"};
+    EXPECT_EQ(r, e);
+  }
+
+  {
+    const std::string s{"varying vec2 vUV;varying vec4 vColor;"};
+    const std::string r{String::regexReplace(s, "varying\\s", "in ")};
+    const std::string e{"in vec2 vUV;in vec4 vColor;"};
+    EXPECT_EQ(r, e);
+  }
+
+  {
+    const std::string s{"attribute\tvec4 matricesIndices;"};
+    const std::string r{String::regexReplace(s, "attribute[ \\t]", "in ")};
+    const std::string e{"in vec4 matricesIndices;"};
+    EXPECT_EQ(r, e);
+  }
+
+  {
+    const std::string s{"\tattribute vec4 matricesIndicesExtra;"};
+    const std::string r{String::regexReplace(s, "[ \\t]attribute", " in")};
+    const std::string e{" in vec4 matricesIndicesExtra;"};
+    EXPECT_EQ(r, e);
+  }
+
+  {
+    const std::string s{"vec4 color = texture2D(textureSampler, vUV);"};
+    const std::string r{String::regexReplace(s, "texture2D\\(", "texture(")};
+    const std::string e{"vec4 color = texture(textureSampler, vUV);"};
+    EXPECT_EQ(r, e);
+  }
+
+  {
+    const std::string s{"void main(void)"};
+    const std::string r{String::regexReplace(
+      s, "void\\s+?main\\(", "out vec4 glFragColor;\nvoid main(")};
+    const std::string e{"out vec4 glFragColor;\nvoid main(void)"};
+    EXPECT_EQ(r, e);
+  }
+}
+
 TEST(TestString, regexReplaceWithCallback)
 {
   using namespace BABYLON;
