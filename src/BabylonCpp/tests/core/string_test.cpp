@@ -266,6 +266,19 @@ TEST(TestString, regexReplaceWithCallback)
     };
     EXPECT_EQ(f2c("212F"), "100C");
   }
+
+  // Example: number lines
+  {
+    const std::string s{"line1\nline2\nline3"};
+    int i               = 2;
+    const auto callback = [&i](const std::smatch& /*m*/) {
+      return "\n" + std::to_string(i++) + "\t";
+    };
+    const std::string r{"1\t"
+                        + String::regexReplace(s, std::regex("\n"), callback)};
+    const std::string e{"1\tline1\n2\tline2\n3\tline3"};
+    EXPECT_EQ(r, e);
+  }
 }
 
 TEST(TestString, removeSubstring)
