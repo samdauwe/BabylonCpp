@@ -12,6 +12,7 @@
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector4.h>
 #include <babylon/tools/tools.h>
+#include <babylon/utils/base64.h>
 
 namespace BABYLON {
 
@@ -203,7 +204,7 @@ void Effect::_loadVertexShader(
 {
   // Base64 encoded ?
   if (vertex.substr(0, 7) == "base64:") {
-    auto vertexBinary = vertex.substr(7);
+    auto vertexBinary = base64_atob(vertex.substr(7));
     callback(vertexBinary);
     return;
   }
@@ -235,7 +236,7 @@ void Effect::_loadFragmentShader(
 {
   // Base64 encoded ?
   if (fragment.substr(0, 7) == "base64:") {
-    auto vertexBinary = fragment.substr(7);
+    auto vertexBinary = base64_atob(fragment.substr(7));
     callback(vertexBinary);
     return;
   }
@@ -267,10 +268,36 @@ void Effect::_loadFragmentShader(
   Tools::LoadFile(fragmentShaderUrl + ".fragment.fx", callback);
 }
 
-void Effect::_dumpShadersSource(const std::string& /*vertexCode*/,
-                                const std::string& /*fragmentCode*/,
-                                const std::string& /*defines*/)
+void Effect::_dumpShadersSource(std::string vertexCode,
+                                std::string fragmentCode, std::string defines)
 {
+  // Rebuild shaders source code
+  auto shaderVersion
+    = (_engine->webGLVersion() > 1.f) ? "#version 300 es\n" : "";
+  auto prefix  = shaderVersion + (!defines.empty() ? defines + "\n" : "");
+  vertexCode   = prefix + vertexCode;
+  fragmentCode = prefix + fragmentCode;
+
+  // Number lines of shaders source code
+  unsigned int i = 2;
+  const std::regex regex("\n");
+  auto formattedVertexCode
+    = "\n1\t"
+      + String::regexReplace(vertexCode, regex, [&i](const std::smatch& /*m*/) {
+          return "\n" + std::to_string(i++) + "\t";
+        });
+  i = 2;
+  auto formattedFragmentCode
+    = "\n1\t" + String::regexReplace(fragmentCode, regex,
+                                     [&i](const std::smatch& /*m*/) {
+                                       return "\n" + std::to_string(i++) + "\t";
+                                     });
+
+  // Dump shaders name and formatted source code
+  BABYLON_LOGF_ERROR("Effect", "Vertex shader: %s%s", name.c_str(),
+                     formattedVertexCode.c_str());
+  BABYLON_LOGF_ERROR("Effect", "Fragment shader: %s%s", name.c_str(),
+                     formattedFragmentCode.c_str());
 }
 
 void Effect::_processShaderConversion(
@@ -295,32 +322,32 @@ void Effect::_processShaderConversion(
   // #extension GL_OES_standard_derivatives : enable
   // #extension GL_EXT_shader_texture_lod : enable
   // #extension GL_EXT_frag_depth : enable
-  std::string regex(
-    "/#extension.+(GL_OES_standard_derivatives|GL_EXT_shader_texture_lod|GL_"
-    "EXT_frag_depth).+enable/g");
+  const std::string regex(
+    "#extension.+(GL_OES_standard_derivatives|GL_EXT_shader_texture_lod|GL_"
+    "EXT_frag_depth).+enable");
   std::string result = String::regexReplace(preparedSourceCode, regex, "");
 
   // Migrate to GLSL v300
-  result = String::regexReplace(preparedSourceCode, "/varying\\s/g",
+  result = String::regexReplace(preparedSourceCode, "varying\\s",
                                 isFragment ? "in " : "out ");
-  result = String::regexReplace(preparedSourceCode, "/attribute[ \t]/g", "in ");
-  result = String::regexReplace(preparedSourceCode, "/[ \t]attribute/g", " in");
+  result = String::regexReplace(preparedSourceCode, "attribute[ \\t]", "in ");
+  result = String::regexReplace(preparedSourceCode, "[ \\t]attribute", " in");
 
   if (isFragment) {
-    result = String::regexReplace(preparedSourceCode, "/texture2DLodEXT\\(/g",
-                                  "textureLod(");
-    result = String::regexReplace(preparedSourceCode, "/textureCubeLodEXT\\(/g",
-                                  "textureLod(");
-    result
-      = String::regexReplace(preparedSourceCode, "/texture2D\\(/g", "texture(");
-    result = String::regexReplace(preparedSourceCode, "/textureCube\\(/g",
-                                  "texture(");
-    result = String::regexReplace(preparedSourceCode, "/gl_FragDepthEXT/g",
-                                  "gl_FragDepth");
-    result = String::regexReplace(preparedSourceCode, "/gl_FragColor/g",
-                                  "glFragColor");
-    result = String::regexReplace(preparedSourceCode, "/void\\s+?main\\(\\/g",
-                                  "out vec4 glFragColor;\nvoid main(");
+    const std::vector<std::pair<std::string, std::string>> fragMapping{
+      std::make_pair("texture2DLodEXT\\(", "textureLod("),   //
+      std::make_pair("textureCubeLodEXT\\(", "textureLod("), //
+      std::make_pair("texture2D\\(", "texture("),            //
+      std::make_pair("textureCube\\(", "texture("),          //
+      std::make_pair("gl_FragDepthEXT", "gl_FragDepth"),     //
+      std::make_pair("gl_FragColor", "glFragColor"),         //
+      std::make_pair("void\\s+?main\\(",                     //
+                     "out vec4 glFragColor;\nvoid main("),   //
+    };
+    for (const auto& mapping : fragMapping) {
+      result = String::regexReplace(preparedSourceCode, mapping.first,
+                                    mapping.second);
+    }
   }
 
   callback(result);
@@ -396,21 +423,20 @@ void Effect::_processIncludes(
   callback(returnValue.str());
 }
 
-std::string Effect::_processPrecision(const std::string& source)
+std::string Effect::_processPrecision(std::string source)
 {
-  std::string _source = source;
-  if (_source.find("precision highp float") != std::string::npos) {
+  if (String::contains(source, "precision highp float")) {
     if (!_engine->getCaps().highPrecisionShaderSupported) {
-      _source = "precision mediump float;\n" + _source;
+      source = "precision mediump float;\n" + source;
     }
     else {
-      _source = "#ifdef GL_ES\nprecision highp float;\n#endif\n" + _source;
+      source = "precision highp float;\n" + source;
     }
   }
   else {
     if (!_engine->getCaps().highPrecisionShaderSupported) {
       // Moving highp to mediump
-      String::replaceInPlace(_source, "precision highp float",
+      String::replaceInPlace(source, "precision highp float",
                              "precision mediump float");
     }
   }
@@ -463,6 +489,11 @@ void Effect::_prepareEffect(const std::string& vertexSourceCode,
     // Let's go through fallbacks then
     BABYLON_LOG_ERROR("Effect", "Unable to compile effect: ");
     BABYLON_LOGF_ERROR("Effect", "Defines: %s", defines.c_str());
+    _dumpShadersSource(vertexSourceCode, fragmentSourceCode, defines);
+    BABYLON_LOGF_ERROR("Effect", "Uniforms: %s",
+                       String::join(_uniformsNames, ' ').c_str());
+    BABYLON_LOGF_ERROR("Effect", "Attributes: %s",
+                       String::join(attributesNames, ' ').c_str());
     BABYLON_LOGF_ERROR("Effect", "Error: %s", _compilationError.c_str());
 
     if (!fallbacks && fallbacks->isMoreFallbacks()) {
@@ -882,14 +913,163 @@ Effect& Effect::setColor4(const std::string& uniformName, const Color3& color3,
   return *this;
 }
 
-std::string Effect::_recombineShader(const std::string& node)
+std::string Effect::_recombineShader(const std::vector<ShaderNode>& shaderNodes,
+                                     std::size_t rootNodeId)
 {
-  return node;
+  const auto& node = shaderNodes[rootNodeId];
+  if (!node.define.empty()) {
+    if (!node.condition.empty()) {
+      auto defineIndex = String::indexOf(defines, "#define " + node.define);
+      if (defineIndex == -1) {
+        return "";
+      }
+
+      auto _defineIndex = static_cast<std::size_t>(defineIndex);
+      auto nextComma    = String::indexOf(defines, "\n", _defineIndex);
+      if (nextComma == -1) {
+        return "";
+      }
+
+      auto _nextComma = static_cast<std::size_t>(nextComma);
+      auto defineValue
+        = defines.substr(_defineIndex + 7, _nextComma - _defineIndex - 7);
+      String::replaceInPlace(defineValue, node.define, "");
+      String::trim(defineValue);
+      auto condition  = defineValue + node.condition;
+      const auto eval = [](const std::string&) { return false; };
+      if (!eval(condition)) {
+        return "";
+      }
+    }
+    else if (node.ndef) {
+      if (String::indexOf(defines, "#define " + node.define) != -1) {
+        return "";
+      }
+    }
+    else if (String::indexOf(defines, "#define " + node.define) == -1) {
+      return "";
+    }
+  }
+
+  std::string result = "";
+  for (std::size_t index = 0; index < node.children.size(); ++index) {
+    auto childNode = node.children[index];
+
+    auto childNodeId = childNode.first;
+    if (childNodeId != 0 && !shaderNodes[childNodeId].children.empty()) {
+      auto combined = _recombineShader(shaderNodes, index);
+      if (!combined.empty()) {
+        result += combined + "\r\n";
+      }
+
+      continue;
+    }
+
+    const auto& line = childNode.second;
+    if (!line.empty()) {
+      result += line + "\r\n";
+    }
+  }
+
+  return result;
 }
 
 std::string Effect::_evaluateDefinesOnString(const std::string& shaderString)
 {
-  return shaderString;
+  std::vector<ShaderNode> shaderNodes;
+  shaderNodes.emplace_back(ShaderNode{
+    "",    // condition
+    "",    // define
+    false, // ndef
+    {},    // children
+    0      // parent
+  });
+
+  auto currentNodeId = shaderNodes.size() - 1;
+  auto lines         = String::split(shaderString, '\n');
+
+  for (auto& line : lines) {
+    String::trim(line);
+
+    // #ifdef
+    auto pos = String::indexOf(line, "#ifdef ");
+    if (pos != -1) {
+      auto define = line.substr(static_cast<std::size_t>(pos) + 7);
+
+      shaderNodes.emplace_back(ShaderNode{
+        "",           // condition
+        define,       // define
+        false,        // ndef
+        {},           // children
+        currentNodeId // parent
+      });
+
+      auto newNodeId = shaderNodes.size() - 1;
+      auto childNode = std::make_pair(newNodeId, "");
+      shaderNodes[currentNodeId].children.emplace_back(childNode);
+      currentNodeId = newNodeId;
+      continue;
+    }
+
+    // #ifndef
+    pos = String::indexOf(line, "#ifndef ");
+    if (pos != -1) {
+      auto define = line.substr(static_cast<std::size_t>(pos) + 8);
+
+      shaderNodes.emplace_back(ShaderNode{
+        "",           // condition
+        define,       // define
+        true,         // ndef
+        {},           // children
+        currentNodeId // parent
+      });
+
+      auto newNodeId = shaderNodes.size() - 1;
+      auto childNode = std::make_pair(newNodeId, "");
+      shaderNodes[currentNodeId].children.emplace_back(childNode);
+      currentNodeId = newNodeId;
+      continue;
+    }
+
+    // #if
+    pos = String::indexOf(line, "#if ");
+    if (pos != -1) {
+      auto define = line.substr(static_cast<std::size_t>(pos) + 4);
+      String::trim(define);
+      int conditionPos = String::indexOf(define, " ");
+      if (pos == -1) {
+        continue;
+      }
+
+      auto _conditionPos = static_cast<std::size_t>(conditionPos);
+
+      shaderNodes.emplace_back(ShaderNode{
+        define.substr(_conditionPos + 1), // condition
+        define.substr(0, _conditionPos),  // define
+        false,                            // ndef
+        {},                               // children
+        currentNodeId                     // parent
+      });
+
+      auto newNodeId = shaderNodes.size() - 1;
+      auto childNode = std::make_pair(newNodeId, "");
+      shaderNodes[currentNodeId].children.emplace_back(childNode);
+      currentNodeId = newNodeId;
+      continue;
+    }
+
+    // #endif
+    pos = String::indexOf(line, "#endif");
+    if (pos != -1) {
+      currentNodeId = shaderNodes[currentNodeId].parent;
+      continue;
+    }
+
+    shaderNodes[currentNodeId].children.emplace_back(std::make_pair(0, line));
+  }
+
+  // Recombine
+  return _recombineShader(shaderNodes);
 }
 
 } // end of namespace BABYLON

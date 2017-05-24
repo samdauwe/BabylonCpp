@@ -8,6 +8,16 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT Effect {
 
 public:
+  using ChildShaderNode = std::pair<std::size_t, std::string>;
+  struct ShaderNode {
+    std::string condition;
+    std::string define;
+    bool ndef;
+    std::vector<ChildShaderNode> children;
+    std::size_t parent;
+  }; // end of struct ShaderNode
+
+public:
   Effect(const std::string& baseName, EffectCreationOptions& options,
          Engine* engine);
   Effect(const std::unordered_map<std::string, std::string>& baseName,
@@ -85,21 +95,21 @@ public:
                     float alpha);
 
 private:
-  void _dumpShadersSource(const std::string& vertexCode,
-                          const std::string& fragmentCode,
-                          const std::string& defines);
+  void _dumpShadersSource(std::string vertexCode, std::string fragmentCode,
+                          std::string defines);
   void _processShaderConversion(
     const std::string& sourceCode, bool isFragment,
     const std::function<void(const std::string& data)>& callback);
   void _processIncludes(
     const std::string& sourceCode,
     const std::function<void(const std::string& data)>& callback);
-  std::string _processPrecision(const std::string& source);
+  std::string _processPrecision(std::string source);
   void _prepareEffect(const std::string& vertexSourceCode,
                       const std::string& fragmentSourceCode,
                       const std::vector<std::string>& attributesNames,
                       const std::string& defines, EffectFallbacks* fallbacks);
-  std::string _recombineShader(const std::string& node);
+  std::string _recombineShader(const std::vector<ShaderNode>& shaderNodes,
+                               std::size_t rootNodeId = 0);
   std::string _evaluateDefinesOnString(const std::string& shaderString);
 
 public:
