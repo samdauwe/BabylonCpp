@@ -334,7 +334,7 @@ void Effect::_processShaderConversion(
   result = String::regexReplace(preparedSourceCode, "[ \\t]attribute", " in");
 
   if (isFragment) {
-    const std::vector<std::pair<std::string, std::string>> fragMapping{
+    const std::vector<std::pair<std::string, std::string>> fragMappings{
       std::make_pair("texture2DLodEXT\\(", "textureLod("),   //
       std::make_pair("textureCubeLodEXT\\(", "textureLod("), //
       std::make_pair("texture2D\\(", "texture("),            //
@@ -344,9 +344,9 @@ void Effect::_processShaderConversion(
       std::make_pair("void\\s+?main\\(",                     //
                      "out vec4 glFragColor;\nvoid main("),   //
     };
-    for (const auto& mapping : fragMapping) {
-      result = String::regexReplace(preparedSourceCode, mapping.first,
-                                    mapping.second);
+    for (const auto& fragMapping : fragMappings) {
+      result = String::regexReplace(preparedSourceCode, fragMapping.first,
+                                    fragMapping.second);
     }
   }
 
@@ -530,7 +530,7 @@ void Effect::setTextureArray(const std::string& channel,
                              const std::vector<BaseTexture*>& textures)
 {
   if (stl_util::index_of(_samplers, channel + "Ex") == -1) {
-    int initialPos = stl_util::index_of(_samplers, channel);
+    auto initialPos = stl_util::index_of(_samplers, channel);
     for (unsigned int index = 1; index < textures.size(); ++index) {
       stl_util::splice(_samplers, initialPos + static_cast<int>(index), 0,
                        {channel + "Ex"});
