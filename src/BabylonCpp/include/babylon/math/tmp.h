@@ -8,9 +8,8 @@ namespace BABYLON {
 /**
  * @brief Temporary pre-allocated objects for engine internal use.
  */
-class BABYLON_SHARED_EXPORT Tmp {
+struct BABYLON_SHARED_EXPORT Tmp {
 
-public:
   static std::array<Color3, 3> Color3Array;
   static std::array<Vector2, 3> Vector2Array;
   static std::array<Vector3, 9> Vector3Array;

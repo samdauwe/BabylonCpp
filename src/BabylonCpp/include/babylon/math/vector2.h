@@ -284,7 +284,7 @@ public:
                        const Vector2& max);
 
   /**
-   * @brief Returns a new Vecto2 located for "amount" (float) on the Hermite
+   * @brief Returns a new Vector2 located for "amount" (float) on the Hermite
    * spline defined by the vectors "value1", "value3", "tangent1", "tangent2".
    */
   static Vector2 Hermite(const Vector2& value1, const Vector2& tangent1,

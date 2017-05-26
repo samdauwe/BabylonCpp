@@ -8,9 +8,8 @@ namespace BABYLON {
 /**
  * @brief Represents an Axis.
  */
-class BABYLON_SHARED_EXPORT Axis {
+struct BABYLON_SHARED_EXPORT Axis {
 
-public:
   /** Statics **/
   static const Vector3 X;
   static const Vector3 Y;

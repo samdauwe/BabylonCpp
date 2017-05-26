@@ -8,9 +8,8 @@ namespace BABYLON {
 /**
  * @brief Represents a BezierCurve.
  */
-class BABYLON_SHARED_EXPORT BezierCurve {
+struct BABYLON_SHARED_EXPORT BezierCurve {
 
-public:
   /**
    * @brief Returns the cubic Bezier interpolated value (float) at "t" (float)
    * from the passed x1, y1, x2, y2 floats.

@@ -280,6 +280,16 @@ public:
   static void SlerpToRef(const Quaternion& left, const Quaternion& right,
                          float amount, Quaternion& result);
 
+  /**
+   * @brief Returns a new Quaternion located for "amount" (float) on the Hermite
+   * interpolation spline defined by the vectors "value1", "tangent1", "value2",
+   * "tangent2".
+   */
+  static Quaternion Hermite(const Quaternion& value1,
+                            const Quaternion& tangent1,
+                            const Quaternion& value2,
+                            const Quaternion& tangent2, float amount);
+
 public:
   float x;
   float y;

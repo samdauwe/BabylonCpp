@@ -546,4 +546,32 @@ void Quaternion::SlerpToRef(const Quaternion& left, const Quaternion& right,
   result.w = (num3 * left.w) + (num2 * right.w);
 }
 
+Quaternion Quaternion::Hermite(const Quaternion& value1,
+                               const Quaternion& tangent1,
+                               const Quaternion& value2,
+                               const Quaternion& tangent2, float amount)
+{
+  const float squared = amount * amount;
+  const float cubed   = amount * squared;
+  const float part1   = ((2.f * cubed) - (3.f * squared)) + 1.f;
+  const float part2   = (-2.f * cubed) + (3.f * squared);
+  const float part3   = (cubed - (2.f * squared)) + amount;
+  const float part4   = cubed - squared;
+
+  const float x
+    = (((value1.x * part1) + (value2.x * part2)) + (tangent1.x * part3))
+      + (tangent2.x * part4);
+  const float y
+    = (((value1.y * part1) + (value2.y * part2)) + (tangent1.y * part3))
+      + (tangent2.y * part4);
+  const float z
+    = (((value1.z * part1) + (value2.z * part2)) + (tangent1.z * part3))
+      + (tangent2.z * part4);
+  const float w
+    = (((value1.w * part1) + (value2.w * part2)) + (tangent1.w * part3))
+      + (tangent2.w * part4);
+
+  return Quaternion(x, y, z, w);
+}
+
 } // end of namespace BABYLON
