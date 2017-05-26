@@ -1,6 +1,5 @@
 #include <babylon/materialslibrary/fur/fur_material.h>
 
-#include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
 #include <babylon/core/time.h>

@@ -1,6 +1,5 @@
 #include <babylon/materialslibrary/simple/simple_material.h>
 
-#include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
 #include <babylon/engine/engine.h>

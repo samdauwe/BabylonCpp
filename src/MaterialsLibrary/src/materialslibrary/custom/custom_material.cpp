@@ -10,11 +10,6 @@ CustomMaterial::CustomMaterial(const std::string& iName,
                                ICustomMaterialBuilder* iBuilder, Scene* scene)
     : StandardMaterial{iName, scene}, builder{iBuilder}
 {
-  customShaderNameResolve = [this](const std::string& shaderName) {
-    CustomShaderHelper helper;
-    return builder->build(helper, shaderName, _mainPart, _diffusePart,
-                          _vertexPositionPart);
-  };
 }
 
 CustomMaterial::~CustomMaterial()

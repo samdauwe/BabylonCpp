@@ -1,9 +1,9 @@
 #include <babylon/materialslibrary/water/water_material.h>
 
-#include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
 #include <babylon/core/random.h>
+#include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
@@ -404,17 +404,17 @@ void WaterMaterial::_createRenderTargets(Scene* scene,
   // Render targets
   _refractionRTT = std::make_unique<RenderTargetTexture>(
     name + "_refraction", ISize{renderTargetSizeX, renderTargetSizeY}, scene,
-    false, true, Engine::TEXTURETYPE_UNSIGNED_INT, false,
-    Texture::TRILINEAR_SAMPLINGMODE, true, false);
-  _refractionRTT->wrapU = Texture::MIRROR_ADDRESSMODE;
-  _refractionRTT->wrapV = Texture::MIRROR_ADDRESSMODE;
+    false, true, EngineConstants::TEXTURETYPE_UNSIGNED_INT, false,
+    TextureConstants::TRILINEAR_SAMPLINGMODE, true, false);
+  _refractionRTT->wrapU = TextureConstants::MIRROR_ADDRESSMODE;
+  _refractionRTT->wrapV = TextureConstants::MIRROR_ADDRESSMODE;
 
   _reflectionRTT = std::make_unique<RenderTargetTexture>(
     name + "_reflection", ISize{renderTargetSizeX, renderTargetSizeY}, scene,
-    false, true, Engine::TEXTURETYPE_UNSIGNED_INT, false,
-    Texture::TRILINEAR_SAMPLINGMODE, true, false);
-  _reflectionRTT->wrapU = Texture::MIRROR_ADDRESSMODE;
-  _reflectionRTT->wrapV = Texture::MIRROR_ADDRESSMODE;
+    false, true, EngineConstants::TEXTURETYPE_UNSIGNED_INT, false,
+    TextureConstants::TRILINEAR_SAMPLINGMODE, true, false);
+  _reflectionRTT->wrapU = TextureConstants::MIRROR_ADDRESSMODE;
+  _reflectionRTT->wrapV = TextureConstants::MIRROR_ADDRESSMODE;
 
   scene->customRenderTargets.emplace_back(_refractionRTT.get());
   scene->customRenderTargets.emplace_back(_reflectionRTT.get());

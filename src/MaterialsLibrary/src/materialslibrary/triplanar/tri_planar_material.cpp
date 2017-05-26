@@ -1,6 +1,5 @@
 #include <babylon/materialslibrary/triplanar/tri_planar_material.h>
 
-#include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
@@ -10,6 +9,7 @@
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/standard_material.h>
+#include <babylon/materials/textures/texture.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/sub_mesh.h>
