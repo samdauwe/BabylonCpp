@@ -7,6 +7,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/textures/texture.h>
 #include <babylon/mesh/buffer.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
@@ -419,10 +420,10 @@ size_t ParticleSystem::render()
 
   // Draw order
   if (blendMode == ParticleSystem::BLENDMODE_ONEONE) {
-    engine->setAlphaMode(Engine::ALPHA_ONEONE);
+    engine->setAlphaMode(EngineConstants::ALPHA_ONEONE);
   }
   else {
-    engine->setAlphaMode(Engine::ALPHA_COMBINE);
+    engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
   }
 
   if (forceDepthWrite) {
@@ -430,7 +431,7 @@ size_t ParticleSystem::render()
   }
 
   engine->draw(true, 0, static_cast<int>(particles.size() * 6));
-  engine->setAlphaMode(Engine::ALPHA_DISABLE);
+  engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
 
   return particles.size();
 }

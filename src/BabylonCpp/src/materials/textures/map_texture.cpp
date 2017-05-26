@@ -2,6 +2,7 @@
 
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/math/size.h>
 #include <babylon/tools/tools.h>
 
@@ -13,17 +14,17 @@ MapTexture::MapTexture(const std::string& iName, Scene* scene,
     : Texture{"", scene, !useMipMap, false, samplingMode}, _size{size}
 {
   name  = iName;
-  wrapU = Texture::CLAMP_ADDRESSMODE;
-  wrapV = Texture::CLAMP_ADDRESSMODE;
+  wrapU = TextureConstants::CLAMP_ADDRESSMODE;
+  wrapV = TextureConstants::CLAMP_ADDRESSMODE;
 
   // Create the rectPackMap that will allocate portion of the texture
   _rectPackingMap
     = std::make_unique<RectPackingMap>(Size(size.width, size.height), margin);
 
   // Create the texture that will store the content
-  RenderTargetOptions options;
+  IRenderTargetOptions options;
   options.generateMipMaps = !noMipmap();
-  options.type            = Engine::TEXTURETYPE_UNSIGNED_INT;
+  options.type            = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
 
   _texture = scene->getEngine()->createRenderTargetTexture(size, options);
 }

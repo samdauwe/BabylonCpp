@@ -4,6 +4,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/lights/directional_light.h>
 #include <babylon/lights/hemispheric_light.h>
@@ -326,37 +327,38 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
           defines.defines[SMD::ROUGHNESS]           = (_roughness > 0);
           defines.defines[SMD::REFLECTIONOVERALPHA] = _useReflectionOverAlpha;
           defines.defines[SMD::INVERTCUBICMAP]
-            = (_reflectionTexture->coordinatesMode == Texture::INVCUBIC_MODE);
+            = (_reflectionTexture->coordinatesMode
+               == TextureConstants::INVCUBIC_MODE);
           defines.defines[SMD::REFLECTIONMAP_3D] = _reflectionTexture->isCube;
 
           switch (_reflectionTexture->coordinatesMode) {
-            case Texture::CUBIC_MODE:
-            case Texture::INVCUBIC_MODE:
+            case TextureConstants::CUBIC_MODE:
+            case TextureConstants::INVCUBIC_MODE:
               defines.setReflectionMode(SMD::REFLECTIONMAP_CUBIC);
               break;
-            case Texture::EXPLICIT_MODE:
+            case TextureConstants::EXPLICIT_MODE:
               defines.setReflectionMode(SMD::REFLECTIONMAP_EXPLICIT);
               break;
-            case Texture::PLANAR_MODE:
+            case TextureConstants::PLANAR_MODE:
               defines.setReflectionMode(SMD::REFLECTIONMAP_PLANAR);
               break;
-            case Texture::PROJECTION_MODE:
+            case TextureConstants::PROJECTION_MODE:
               defines.setReflectionMode(SMD::REFLECTIONMAP_PROJECTION);
               break;
-            case Texture::SKYBOX_MODE:
+            case TextureConstants::SKYBOX_MODE:
               defines.setReflectionMode(SMD::REFLECTIONMAP_SKYBOX);
               break;
-            case Texture::SPHERICAL_MODE:
+            case TextureConstants::SPHERICAL_MODE:
               defines.setReflectionMode(SMD::REFLECTIONMAP_SPHERICAL);
               break;
-            case Texture::EQUIRECTANGULAR_MODE:
+            case TextureConstants::EQUIRECTANGULAR_MODE:
               defines.setReflectionMode(SMD::REFLECTIONMAP_EQUIRECTANGULAR);
               break;
-            case Texture::FIXED_EQUIRECTANGULAR_MODE:
+            case TextureConstants::FIXED_EQUIRECTANGULAR_MODE:
               defines.setReflectionMode(
                 SMD::REFLECTIONMAP_EQUIRECTANGULAR_FIXED);
               break;
-            case Texture::FIXED_EQUIRECTANGULAR_MIRRORED_MODE:
+            case TextureConstants::FIXED_EQUIRECTANGULAR_MIRRORED_MODE:
               defines.setReflectionMode(
                 SMD::REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED);
               break;
@@ -649,12 +651,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
                                                      SMD::NORMAL);
 
     std::string shaderName{"default"};
-
-    if (customShaderNameResolve) {
-      shaderName = customShaderNameResolve(shaderName);
-    }
-
-    auto join = defines.toString();
+    const auto join = defines.toString();
     std::vector<std::string> uniforms{"world",
                                       "view",
                                       "viewProjection",
@@ -731,6 +728,11 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
     options.maxSimultaneousLights = _maxSimultaneousLights;
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
+
+    if (customShaderNameResolve) {
+      shaderName = customShaderNameResolve(shaderName, uniforms, uniformBuffers,
+                                           samplers, defines);
+    }
 
     subMesh->setEffect(
       scene->getEngine()->createEffect(shaderName, options, engine), defines);
@@ -823,7 +825,7 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
 
   // Bones
   MaterialHelper::BindBonesParameters(mesh, effect);
-  if (_mustRebind(scene, effect)) {
+  if (_mustRebind(scene, effect, mesh->visibility)) {
     _uniformBuffer->bindToEffect(effect, "Material");
 
     bindViewProjection(effect);

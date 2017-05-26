@@ -3,7 +3,7 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/interfaces/idisposable.h>
-#include <babylon/materials/textures/texture.h>
+#include <babylon/materials/textures/texture_constants.h>
 #include <babylon/sprites/sprite.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
@@ -38,8 +38,9 @@ public:
 protected:
   SpriteManager(const std::string& name, const std::string& imgUrl,
                 unsigned int capacity, const ISize& cellSize, Scene* scene,
-                float epsilon             = 0.01f,
-                unsigned int samplingMode = Texture::TRILINEAR_SAMPLINGMODE);
+                float epsilon = 0.01f,
+                unsigned int samplingMode
+                = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
 private:
   void _appendSpriteVertex(size_t index, Sprite* sprite, int offsetX,

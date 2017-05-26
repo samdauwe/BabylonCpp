@@ -1,5 +1,6 @@
 #include <babylon/cameras/camera.h>
 
+#include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/arc_follow_camera.h>
 #include <babylon/cameras/arc_rotate_camera.h>
@@ -9,6 +10,7 @@
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/culling/icullable.h>
+#include <babylon/engine/engine.h>
 #include <babylon/math/frustum.h>
 #include <babylon/postprocess/pass_post_process.h>
 #include <babylon/postprocess/post_process.h>

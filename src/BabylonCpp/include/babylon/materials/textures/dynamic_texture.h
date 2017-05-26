@@ -2,7 +2,7 @@
 #define BABYLON_MATERIALS_TEXTURES_DYNAMIC_TEXTURE_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/engine/engine.h>
+#include <babylon/engine/engine_constants.h>
 #include <babylon/materials/textures/texture.h>
 
 namespace BABYLON {
@@ -18,12 +18,14 @@ class BABYLON_SHARED_EXPORT DynamicTexture : public Texture {
 public:
   DynamicTexture(const std::string& name, const DynamicTextureOptions& options,
                  Scene* scene, bool generateMipMaps,
-                 unsigned int samplingMode = Texture::TRILINEAR_SAMPLINGMODE,
-                 unsigned int format       = Engine::TEXTUREFORMAT_RGBA);
+                 unsigned int samplingMode
+                 = TextureConstants::TRILINEAR_SAMPLINGMODE,
+                 unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
   ~DynamicTexture();
 
   bool canRescale();
   void scale(float ratio);
+  void scaleTo(int width, int height);
   ICanvasRenderingContext2D* getContext();
   void clear();
   void update(bool invertY = true);
@@ -31,6 +33,9 @@ public:
                 const std::string& color, const std::string& clearColor,
                 bool invertY = true, bool update = true);
   std::unique_ptr<DynamicTexture> clone() const;
+
+private:
+  void _recreate(const ISize& textureSize);
 
 public:
   unsigned int _samplingMode;

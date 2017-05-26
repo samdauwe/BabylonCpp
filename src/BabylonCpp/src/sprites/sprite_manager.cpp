@@ -31,8 +31,8 @@ SpriteManager::SpriteManager(const std::string& iName,
     , _scene{scene}
 {
   _spriteTexture = Texture::New(imgUrl, scene, true, false, samplingMode);
-  _spriteTexture->wrapU = Texture::CLAMP_ADDRESSMODE;
-  _spriteTexture->wrapV = Texture::CLAMP_ADDRESSMODE;
+  _spriteTexture->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
+  _spriteTexture->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
 
   if (cellSize.width != -1 && cellSize.height != -1) {
     cellWidth  = cellSize.width;
@@ -321,9 +321,9 @@ void SpriteManager::render()
   engine->setColorWrite(true);
   effect->setBool("alphaTest", false);
 
-  engine->setAlphaMode(Engine::ALPHA_COMBINE);
+  engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
   engine->draw(true, 0, static_cast<int>(max * 6));
-  engine->setAlphaMode(Engine::ALPHA_DISABLE);
+  engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
 }
 
 void SpriteManager::dispose(bool /*doNotRecurse*/)

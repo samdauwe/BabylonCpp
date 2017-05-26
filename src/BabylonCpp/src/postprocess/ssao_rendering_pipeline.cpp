@@ -44,7 +44,7 @@ SSAORenderingPipeline::SSAORenderingPipeline(
 
   _originalColorPostProcess = new PassPostProcess(
     "SSAOOriginalSceneColor", _ratio.combineRatio, nullptr,
-    Texture::BILINEAR_SAMPLINGMODE, scene->getEngine(), false);
+    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false);
   _createSSAOPostProcess(ratio.ssaoRatio);
   _createBlurPostProcess(ratio.ssaoRatio);
   _createSSAOCombinePostProcess(ratio.combineRatio);
@@ -112,7 +112,8 @@ void SSAORenderingPipeline::_createBlurPostProcess(float ratio)
 
   _blurHPostProcess = new PostProcess(
     "BlurH", "ssao", {"outSize", "samplerOffsets"}, {"depthSampler"}, ratio,
-    nullptr, Texture::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
+    nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(),
+    false,
     "#define BILATERAL_BLUR\n#define BILATERAL_BLUR_H\n#define SAMPLES 16");
   _blurHPostProcess->setOnApply([&](Effect* effect) {
     effect->setFloat("outSize",
@@ -126,8 +127,8 @@ void SSAORenderingPipeline::_createBlurPostProcess(float ratio)
 
   _blurVPostProcess = new PostProcess(
     "BlurV", "ssao", {"outSize", "samplerOffsets"}, {"depthSampler"}, ratio,
-    nullptr, Texture::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
-    "#define BILATERAL_BLUR\n#define SAMPLES 16");
+    nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(),
+    false, "#define BILATERAL_BLUR\n#define SAMPLES 16");
   _blurVPostProcess->setOnApply([&](Effect* effect) {
     effect->setFloat("outSize",
                      static_cast<float>(_ssaoCombinePostProcess->height));
@@ -157,7 +158,7 @@ void SSAORenderingPipeline::_createSSAOPostProcess(float ratio)
     "ssao", "ssao",
     {"sampleSphere", "samplesFactor", "randTextureTiles", "totalStrength",
      "radius", "area", "fallOff", "base", "range", "viewport"},
-    {"randomSampler"}, ratio, nullptr, Texture::BILINEAR_SAMPLINGMODE,
+    {"randomSampler"}, ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
     _scene->getEngine(), false,
     "#define SAMPLES " + std::to_string(numSamples) + "\n#define SSAO");
 
@@ -183,7 +184,7 @@ void SSAORenderingPipeline::_createSSAOCombinePostProcess(float ratio)
 {
   _ssaoCombinePostProcess = new PostProcess(
     "ssaoCombine", "ssaoCombine", {}, {"originalColor"}, ratio, nullptr,
-    Texture::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
+    TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
 
   _ssaoCombinePostProcess->setOnApply([&](Effect* effect) {
     effect->setTextureFromPostProcess("originalColor",
@@ -199,14 +200,15 @@ void SSAORenderingPipeline::_createRandomTexture()
   options.width  = static_cast<int>(size);
   options.height = static_cast<int>(size);
 
-  _randomTexture = new DynamicTexture("SSAORandomTexture", options, _scene,
-                                      false, Texture::TRILINEAR_SAMPLINGMODE);
-  _randomTexture->wrapU = Texture::WRAP_ADDRESSMODE;
-  _randomTexture->wrapV = Texture::WRAP_ADDRESSMODE;
+  _randomTexture
+    = new DynamicTexture("SSAORandomTexture", options, _scene, false,
+                         TextureConstants::TRILINEAR_SAMPLINGMODE);
+  _randomTexture->wrapU = TextureConstants::WRAP_ADDRESSMODE;
+  _randomTexture->wrapV = TextureConstants::WRAP_ADDRESSMODE;
 
   auto context = dynamic_cast<DynamicTexture*>(_randomTexture)->getContext();
 
-  auto rand
+  const auto rand
     = [](float min, float max) { return Math::random() * (max - min) + min; };
 
   Vector3 randVector = Vector3::Zero();

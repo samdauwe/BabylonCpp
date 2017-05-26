@@ -42,6 +42,11 @@ bool MorphTarget::hasNormals() const
   return !_normals.empty();
 }
 
+bool MorphTarget::hasTangents() const
+{
+  return !_tangents.empty();
+}
+
 void MorphTarget::setPositions(const Float32Array& data)
 {
   _positions = data;
@@ -72,6 +77,21 @@ const Float32Array& MorphTarget::getNormals() const
   return _normals;
 }
 
+void MorphTarget::setTangents(const Float32Array& data)
+{
+  _tangents = data;
+}
+
+Float32Array& MorphTarget::getTangents()
+{
+  return _tangents;
+}
+
+const Float32Array& MorphTarget::getTangents() const
+{
+  return _tangents;
+}
+
 Json::object MorphTarget::serialize() const
 {
   return Json::object();
@@ -88,6 +108,10 @@ MorphTarget::Parse(const Json::value& serializationObject)
 
   if (serializationObject.contains("normals")) {
     result->setNormals(Json::ToArray<float>(serializationObject, "normals"));
+  }
+
+  if (serializationObject.contains("tangents")) {
+    result->setNormals(Json::ToArray<float>(serializationObject, "tangents"));
   }
 
   return result;
@@ -108,6 +132,10 @@ std::unique_ptr<MorphTarget> MorphTarget::FromMesh(AbstractMesh* mesh,
 
   if (mesh->isVerticesDataPresent(VertexBuffer::NormalKind)) {
     result->setNormals(mesh->getVerticesData(VertexBuffer::NormalKind));
+  }
+
+  if (mesh->isVerticesDataPresent(VertexBuffer::TangentKind)) {
+    result->setTangents(mesh->getVerticesData(VertexBuffer::TangentKind));
   }
 
   return result;

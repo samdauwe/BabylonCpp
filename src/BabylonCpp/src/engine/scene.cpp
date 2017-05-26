@@ -99,6 +99,7 @@ Scene::Scene(Engine* engine)
     , simplificationQueue{nullptr}
     , _cachedMaterial{nullptr}
     , _cachedEffect{nullptr}
+    , _cachedVisibility{0.f}
     , _onDisposeObserver{nullptr}
     , _onBeforeRenderObserver{nullptr}
     , _onAfterRenderObserver{nullptr}
@@ -463,6 +464,18 @@ Material* Scene::getCachedMaterial()
 Effect* Scene::getCachedEffect()
 {
   return _cachedEffect;
+}
+
+float Scene::getCachedVisibility()
+{
+  return _cachedVisibility;
+}
+
+bool Scene::isCachedMaterialValid(Material* material, Effect* effect,
+                                  float visibility)
+{
+  return _cachedEffect != effect || _cachedMaterial != material
+         || _cachedVisibility != visibility;
 }
 
 BoundingBoxRenderer* Scene::getBoundingBoxRenderer()
@@ -1036,7 +1049,7 @@ bool Scene::isReady()
 
   // Geometries
   for (const auto& geometry : _geometries) {
-    if (geometry->delayLoadState == Engine::DELAYLOADSTATE_LOADING) {
+    if (geometry->delayLoadState == EngineConstants::DELAYLOADSTATE_LOADING) {
       return false;
     }
   }
@@ -1068,8 +1081,9 @@ bool Scene::isReady()
 
 void Scene::resetCachedMaterial()
 {
-  _cachedMaterial = nullptr;
-  _cachedEffect   = nullptr;
+  _cachedMaterial   = nullptr;
+  _cachedEffect     = nullptr;
+  _cachedVisibility = 0.f;
 }
 
 void Scene::registerBeforeRender(const std::function<void()>& func)

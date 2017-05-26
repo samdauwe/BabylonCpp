@@ -328,10 +328,10 @@ void Effect::_processShaderConversion(
   std::string result = String::regexReplace(preparedSourceCode, regex, "");
 
   // Migrate to GLSL v300
-  result = String::regexReplace(preparedSourceCode, "varying\\s",
+  result = String::regexReplace(preparedSourceCode, "varying(?![\n\r])\\s",
                                 isFragment ? "in " : "out ");
-  result = String::regexReplace(preparedSourceCode, "attribute[ \\t]", "in ");
-  result = String::regexReplace(preparedSourceCode, "[ \\t]attribute", " in");
+  result = String::regexReplace(preparedSourceCode, "attribute[ \t]", "in ");
+  result = String::regexReplace(preparedSourceCode, "[ \t]attribute", " in");
 
   if (isFragment) {
     const std::vector<std::pair<std::string, std::string>> fragMappings{
@@ -771,6 +771,10 @@ Effect& Effect::setArray4(const std::string& uniformName,
 Effect& Effect::setMatrices(const std::string& uniformName,
                             Float32Array matrices)
 {
+  if (matrices.empty()) {
+    return *this;
+  }
+
   _valueCache.erase(uniformName);
   _engine->setMatrices(getUniform(uniformName), matrices);
 

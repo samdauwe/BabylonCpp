@@ -22,7 +22,7 @@ Material::Material(const std::string& iName, Scene* scene, bool /*doNotAdd*/)
     , alpha{1.f}
     , doNotSerialize{false}
     , storeEffectOnSubMeshes{false}
-    , alphaMode{Engine::ALPHA_COMBINE}
+    , alphaMode{EngineConstants::ALPHA_COMBINE}
     , disableDepthWrite{false}
     , pointSize{1.f}
     , zOffset{0.f}

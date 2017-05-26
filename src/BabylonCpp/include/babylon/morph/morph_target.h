@@ -15,12 +15,16 @@ public:
   float influence() const;
   void setInfluence(float influence);
   bool hasNormals() const;
+  bool hasTangents() const;
   void setPositions(const Float32Array& data);
   Float32Array& getPositions();
   const Float32Array& getPositions() const;
   void setNormals(const Float32Array& data);
   Float32Array& getNormals();
   const Float32Array& getNormals() const;
+  void setTangents(const Float32Array& data);
+  Float32Array& getTangents();
+  const Float32Array& getTangents() const;
 
   /**
    * @brief Serializes the current target into a Serialization object.
@@ -39,8 +43,10 @@ public:
 
 private:
   std::string _name;
+  std::vector<Animation*> animations;
   Float32Array _positions;
   Float32Array _normals;
+  Float32Array _tangents;
   float _influence;
 
 }; // end of class MorphTarget

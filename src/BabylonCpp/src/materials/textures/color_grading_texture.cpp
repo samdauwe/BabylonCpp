@@ -22,8 +22,8 @@ ColorGradingTexture::ColorGradingTexture(const std::string& iUrl, Scene* scene)
   url  = iUrl;
   setHasAlpha(false);
   isCube                    = false;
-  wrapU                     = Texture::CLAMP_ADDRESSMODE;
-  wrapV                     = Texture::CLAMP_ADDRESSMODE;
+  wrapU                     = TextureConstants::CLAMP_ADDRESSMODE;
+  wrapV                     = TextureConstants::CLAMP_ADDRESSMODE;
   anisotropicFilteringLevel = 1;
 
   _texture = _getFromCache(url, true);
@@ -33,7 +33,7 @@ ColorGradingTexture::ColorGradingTexture(const std::string& iUrl, Scene* scene)
       loadTexture();
     }
     else {
-      delayLoadState = Engine::DELAYLOADSTATE_NOTLOADED;
+      delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
     }
   }
 }
@@ -50,8 +50,8 @@ Matrix* ColorGradingTexture::getTextureMatrix()
 GL::IGLTexture* ColorGradingTexture::load3dlTexture()
 {
   _texture = getScene()->getEngine()->createRawTexture(
-    Uint8Array(), 1, 1, Engine::TEXTUREFORMAT_RGBA, false, false,
-    Texture::BILINEAR_SAMPLINGMODE);
+    Uint8Array(), 1, 1, EngineConstants::TEXTUREFORMAT_RGBA, false, false,
+    TextureConstants::BILINEAR_SAMPLINGMODE);
 
   auto callback = [&](const std::string& text) {
     Uint8Array data;
@@ -121,7 +121,7 @@ GL::IGLTexture* ColorGradingTexture::load3dlTexture()
     getScene()->getEngine()->updateTextureSize(
       _texture, static_cast<int>(size * size), static_cast<int>(size));
     getScene()->getEngine()->updateRawTexture(
-      _texture, data, Engine::TEXTUREFORMAT_RGBA, false);
+      _texture, data, EngineConstants::TEXTUREFORMAT_RGBA, false);
   };
 
   Tools::LoadFile(url, callback);
@@ -147,11 +147,11 @@ std::unique_ptr<ColorGradingTexture> ColorGradingTexture::clone() const
 
 void ColorGradingTexture::delayLoad()
 {
-  if (delayLoadState != Engine::DELAYLOADSTATE_NOTLOADED) {
+  if (delayLoadState != EngineConstants::DELAYLOADSTATE_NOTLOADED) {
     return;
   }
 
-  delayLoadState = Engine::DELAYLOADSTATE_LOADED;
+  delayLoadState = EngineConstants::DELAYLOADSTATE_LOADED;
   _texture       = nullptr; // _getFromCache(url, true);
 
   if (!_texture) {

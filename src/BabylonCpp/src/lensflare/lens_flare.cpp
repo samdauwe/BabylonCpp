@@ -22,7 +22,7 @@ LensFlare::LensFlare(float iSize, const Vector3& iPosition,
     , color{iColor}
     , texture{!imgUrl.empty() ? Texture::New(imgUrl, system->getScene(), true) :
                                 nullptr}
-    , alphaMode{Engine::ALPHA_ONEONE}
+    , alphaMode{EngineConstants::ALPHA_ONEONE}
     , _system{system}
 {
 }

@@ -16,7 +16,7 @@ Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene,
     , color{iColor}
     , scale{Vector2(1.f, 1.f)}
     , offset{Vector2(0.f, 0.f)}
-    , alphaBlendingMode{Engine::ALPHA_COMBINE}
+    , alphaBlendingMode{EngineConstants::ALPHA_COMBINE}
     , _onDisposeObserver{nullptr}
     , _onBeforeRenderObserver{nullptr}
     , _onAfterRenderObserver{nullptr}
@@ -130,7 +130,7 @@ void Layer::render()
   if (!_alphaTestEffect) {
     engine->setAlphaMode(alphaBlendingMode);
     engine->draw(true, 0, 6);
-    engine->setAlphaMode(Engine::ALPHA_DISABLE);
+    engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
   }
   else {
     engine->draw(true, 0, 6);

@@ -2,6 +2,7 @@
 #define BABYLON_POSTPROCESS_VOLUMETRIC_LIGHT_SCATTERING_POST_PROCESS_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/math/viewport.h>
 #include <babylon/postprocess/post_process.h>
 
 namespace BABYLON {
@@ -35,7 +36,7 @@ public:
   VolumetricLightScatteringPostProcess(
     const std::string& name, float ratio, Camera* camera, Mesh* mesh,
     unsigned int samples      = 100,
-    unsigned int samplingMode = Texture::BILINEAR_SAMPLINGMODE,
+    unsigned int samplingMode = TextureConstants::BILINEAR_SAMPLINGMODE,
     Engine* engine = nullptr, bool reusable = false, Scene* scene = nullptr);
   ~VolumetricLightScatteringPostProcess();
 
@@ -83,7 +84,6 @@ public:
   /**
    * If not undefined, the mesh position is computed from the attached node
    * position
-   * @type {{position: Vector3}}
    */
   Vector3* attachedNode;
   /**

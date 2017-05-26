@@ -132,7 +132,7 @@ void RenderingGroup::render(
   // Transparent
   if (_transparentSubMeshes.empty()) {
     _renderTransparent(_transparentSubMeshes);
-    engine->setAlphaMode(Engine::ALPHA_DISABLE);
+    engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
   }
 
   engine->setStencilBuffer(stencilState);

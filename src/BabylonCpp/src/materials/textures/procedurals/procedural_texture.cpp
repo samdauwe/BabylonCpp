@@ -6,6 +6,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/mesh/vertex_buffer.h>
 
 namespace BABYLON {
@@ -34,13 +35,13 @@ ProceduralTexture::ProceduralTexture(
   auto engine = scene->getEngine();
 
   if (isCube) {
-    RenderTargetOptions options;
+    IRenderTargetOptions options;
     options.generateMipMaps = generateMipMaps;
     _texture = engine->createRenderTargetCubeTexture(size, options);
     setFloat("face", 0);
   }
   else {
-    RenderTargetOptions options;
+    IRenderTargetOptions options;
     options.generateMipMaps = generateMipMaps;
     _texture                = engine->createRenderTargetTexture(size, options);
   }
@@ -84,13 +85,13 @@ ProceduralTexture::ProceduralTexture(const std::string& _name, const Size& size,
   auto engine = scene->getEngine();
 
   if (isCube) {
-    RenderTargetOptions options;
+    IRenderTargetOptions options;
     options.generateMipMaps = generateMipMaps;
     _texture = engine->createRenderTargetCubeTexture(size, options);
     setFloat("face", 0);
   }
   else {
-    RenderTargetOptions options;
+    IRenderTargetOptions options;
     options.generateMipMaps = generateMipMaps;
     _texture                = engine->createRenderTargetTexture(size, options);
   }
@@ -236,7 +237,7 @@ void ProceduralTexture::resize(const Size& size, bool generateMipMaps)
   }
 
   releaseInternalTexture();
-  RenderTargetOptions options;
+  IRenderTargetOptions options;
   options.generateMipMaps = generateMipMaps;
   _texture = getScene()->getEngine()->createRenderTargetTexture(size, options);
 }

@@ -25,7 +25,7 @@ CubeTexture::CubeTexture(const std::string& rootUrl, Scene* scene,
                          unsigned int format)
     : BaseTexture{scene}
     , url{rootUrl}
-    , coordinatesMode{Texture::CUBIC_MODE}
+    , coordinatesMode{TextureConstants::CUBIC_MODE}
     , _noMipmap{noMipmap}
     , _textureMatrix{std::make_unique<Matrix>(Matrix::Identity())}
     , _format{format}
@@ -60,7 +60,7 @@ CubeTexture::CubeTexture(const std::string& rootUrl, Scene* scene,
         rootUrl, scene, extensions, noMipmap, onLoad, onError, _format);
     }
     else {
-      delayLoadState = Engine::DELAYLOADSTATE_NOTLOADED;
+      delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
     }
   }
   else if (onLoad) {
@@ -82,11 +82,11 @@ CubeTexture::~CubeTexture()
 // Methods
 void CubeTexture::delayLoad()
 {
-  if (delayLoadState != Engine::DELAYLOADSTATE_NOTLOADED) {
+  if (delayLoadState != EngineConstants::DELAYLOADSTATE_NOTLOADED) {
     return;
   }
 
-  delayLoadState = Engine::DELAYLOADSTATE_LOADED;
+  delayLoadState = EngineConstants::DELAYLOADSTATE_LOADED;
   _texture       = _getFromCache(url, _noMipmap);
 
   if (!_texture) {

@@ -65,10 +65,9 @@ void PushMaterial::_afterBind(Mesh* mesh, Effect* effect)
   getScene()->_cachedEffect = effect;
 }
 
-bool PushMaterial::_mustRebind(Scene* scene, Effect* effect)
+bool PushMaterial::_mustRebind(Scene* scene, Effect* effect, float visibility)
 {
-  return scene->getCachedEffect() != effect
-         || scene->getCachedMaterial() != this;
+  return scene->isCachedMaterialValid(this, effect, visibility);
 }
 
 void PushMaterial::markAsDirty(unsigned int flag)

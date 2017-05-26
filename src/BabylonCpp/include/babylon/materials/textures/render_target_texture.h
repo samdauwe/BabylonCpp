@@ -2,7 +2,8 @@
 #define BABYLON_MATERIALS_TEXTURES_RENDER_TARGET_TEXTURE_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/engine/engine.h>
+#include <babylon/engine/engine_constants.h>
+#include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
@@ -17,14 +18,13 @@ public:
   static constexpr unsigned int REFRESHRATE_RENDER_ONEVERYTWOFRAMES = 2;
 
 public:
-  RenderTargetTexture(const std::string& name, const ISize& size, Scene* scene,
-                      bool generateMipMaps        = false,
-                      bool doNotChangeAspectRatio = true,
-                      unsigned int type = Engine::TEXTURETYPE_UNSIGNED_INT,
-                      bool isCube       = false, unsigned int samplingMode
-                                           = Texture::TRILINEAR_SAMPLINGMODE,
-                      bool generateDepthBuffer   = true,
-                      bool generateStencilBuffer = false);
+  RenderTargetTexture(
+    const std::string& name, const ISize& size, Scene* scene,
+    bool generateMipMaps = false, bool doNotChangeAspectRatio = true,
+    unsigned int type         = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+    bool isCube               = false,
+    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
+    bool generateDepthBuffer = true, bool generateStencilBuffer = false);
   ~RenderTargetTexture();
 
   /** Events **/
@@ -33,6 +33,8 @@ public:
   void setOnAfterRender(const std::function<void(int faceIndex)>& callback);
   void setOnClear(const std::function<void(Engine* engine)>& callback);
 
+  IRenderTargetOptions& renderTargetOptions();
+  const IRenderTargetOptions& renderTargetOptions() const;
   unsigned int samples() const;
   void setSamples(unsigned int value);
   void resetRefreshCounter();
@@ -132,7 +134,7 @@ public:
   Observable<Engine> onClearObservable;
 
 protected:
-  RenderTargetOptions _renderTargetOptions;
+  IRenderTargetOptions _renderTargetOptions;
 
 private:
   // Events

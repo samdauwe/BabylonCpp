@@ -78,7 +78,8 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
            "AOSTOREINMETALMAPRED",
            "MICROSURFACEMAP",
            "MORPHTARGETS",
-           "MORPHTARGETS_NORMAL"};
+           "MORPHTARGETS_NORMAL",
+           "MORPHTARGETS_TANGENT"};
   rebuild();
 }
 

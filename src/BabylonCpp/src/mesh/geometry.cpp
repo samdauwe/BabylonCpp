@@ -19,7 +19,7 @@ namespace BABYLON {
 Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData,
                    bool updatable, Mesh* mesh)
     : id{iId}
-    , delayLoadState{Engine::DELAYLOADSTATE_NONE}
+    , delayLoadState{EngineConstants::DELAYLOADSTATE_NONE}
     , _scene{scene}
     , _engine{scene->getEngine()}
     , _totalVertices{0}
@@ -102,8 +102,8 @@ Engine* Geometry::getEngine()
 
 bool Geometry::isReady() const
 {
-  return delayLoadState == Engine::DELAYLOADSTATE_LOADED
-         || delayLoadState == Engine::DELAYLOADSTATE_NONE;
+  return delayLoadState == EngineConstants::DELAYLOADSTATE_LOADED
+         || delayLoadState == EngineConstants::DELAYLOADSTATE_NONE;
 }
 
 bool Geometry::doNotSerialize() const
@@ -524,7 +524,7 @@ void Geometry::notifyUpdate(unsigned int kind)
 
 void Geometry::load(Scene* scene, const std::function<void()>& onLoaded)
 {
-  if (delayLoadState == Engine::DELAYLOADSTATE_LOADING) {
+  if (delayLoadState == EngineConstants::DELAYLOADSTATE_LOADING) {
     return;
   }
 
@@ -535,7 +535,7 @@ void Geometry::load(Scene* scene, const std::function<void()>& onLoaded)
     return;
   }
 
-  delayLoadState = Engine::DELAYLOADSTATE_LOADING;
+  delayLoadState = EngineConstants::DELAYLOADSTATE_LOADING;
 
   _queueLoad(scene, onLoaded);
 }
@@ -612,7 +612,7 @@ void Geometry::dispose(bool /*doNotRecurse*/)
   _indexBuffer = nullptr;
   _indices.clear();
 
-  delayLoadState = Engine::DELAYLOADSTATE_NONE;
+  delayLoadState = EngineConstants::DELAYLOADSTATE_NONE;
   delayLoadingFile.clear();
   _delayLoadingFunction = nullptr;
   _delayInfo.clear();
@@ -815,7 +815,7 @@ Geometry* Geometry::Parse(const Json::value& parsedVertexData, Scene* scene,
   // Tags.AddTagsTo(geometry, parsedVertexData.tags);
 
   if (parsedVertexData.contains("delayLoadingFile")) {
-    geometry->delayLoadState = Engine::DELAYLOADSTATE_NOTLOADED;
+    geometry->delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
     geometry->delayLoadingFile
       = rootUrl + Json::GetString(parsedVertexData, "delayLoadingFile", "");
     geometry->_boundingInfo = std::make_unique<BoundingInfo>(

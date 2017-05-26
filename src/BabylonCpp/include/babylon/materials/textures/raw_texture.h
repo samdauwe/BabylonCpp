@@ -10,7 +10,8 @@ struct BABYLON_SHARED_EXPORT RawTexture : public Texture {
 
   RawTexture(const Uint8Array& data, int width, int height, int format,
              Scene* scene, bool generateMipMaps = true, bool invertY = false,
-             unsigned int samplingMode = Texture::TRILINEAR_SAMPLINGMODE);
+             unsigned int samplingMode
+             = TextureConstants::TRILINEAR_SAMPLINGMODE);
   ~RawTexture();
 
   void update(const Uint8Array& data);
@@ -19,29 +20,29 @@ struct BABYLON_SHARED_EXPORT RawTexture : public Texture {
   static std::unique_ptr<RawTexture> CreateLuminanceTexture(
     const Uint8Array& data, int width, int height, Scene* scene,
     bool generateMipMaps = true, bool invertY = false,
-    unsigned int samplingMode = Texture::TRILINEAR_SAMPLINGMODE);
+    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
   static std::unique_ptr<RawTexture> CreateLuminanceAlphaTexture(
     const Uint8Array& data, int width, int height, Scene* scene,
     bool generateMipMaps = true, bool invertY = false,
-    unsigned int samplingMode = Texture::TRILINEAR_SAMPLINGMODE);
+    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
-  static std::unique_ptr<RawTexture>
-  CreateAlphaTexture(const Uint8Array& data, int width, int height,
-                     Scene* scene, bool generateMipMaps = true,
-                     bool invertY = false, unsigned int samplingMode
-                                           = Texture::TRILINEAR_SAMPLINGMODE);
+  static std::unique_ptr<RawTexture> CreateAlphaTexture(
+    const Uint8Array& data, int width, int height, Scene* scene,
+    bool generateMipMaps = true, bool invertY = false,
+    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
   static std::unique_ptr<RawTexture>
   CreateRGBTexture(const Uint8Array& data, int width, int height, Scene* scene,
                    bool generateMipMaps = true, bool invertY = false,
-                   unsigned int samplingMode = Texture::TRILINEAR_SAMPLINGMODE);
+                   unsigned int samplingMode
+                   = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
   static std::unique_ptr<RawTexture>
   CreateRGBATexture(const Uint8Array& data, int width, int height, Scene* scene,
                     bool generateMipMaps = true, bool invertY = false,
                     unsigned int samplingMode
-                    = Texture::TRILINEAR_SAMPLINGMODE);
+                    = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
   int format;
   unsigned int wrapU;

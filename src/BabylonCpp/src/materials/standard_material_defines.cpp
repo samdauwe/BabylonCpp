@@ -62,7 +62,8 @@ StandardMaterialDefines::StandardMaterialDefines() : MaterialDefines{}
            "CAMERACOLORGRADING",
            "CAMERACOLORCURVES",
            "MORPHTARGETS",
-           "MORPHTARGETS_NORMAL"};
+           "MORPHTARGETS_NORMAL",
+           "MORPHTARGETS_TANGENT"};
   rebuild();
 }
 

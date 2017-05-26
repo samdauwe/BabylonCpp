@@ -6,6 +6,7 @@
 #include <babylon/core/string.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/bounding_sphere.h>
+#include <babylon/engine/engine.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
@@ -201,9 +202,9 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
     ISize(
       static_cast<int>(static_cast<float>(engine->getRenderWidth()) * ratio),
       static_cast<int>(static_cast<float>(engine->getRenderHeight()) * ratio)),
-    scene, false, true, Engine::TEXTURETYPE_UNSIGNED_INT);
-  _volumetricLightScatteringRTT->wrapU = Texture::CLAMP_ADDRESSMODE;
-  _volumetricLightScatteringRTT->wrapV = Texture::CLAMP_ADDRESSMODE;
+    scene, false, true, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+  _volumetricLightScatteringRTT->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
+  _volumetricLightScatteringRTT->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
   _volumetricLightScatteringRTT->renderList.clear();
   _volumetricLightScatteringRTT->renderParticles = false;
   scene->customRenderTargets.emplace_back(_volumetricLightScatteringRTT);
@@ -344,11 +345,11 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
                 });
 
       // Render sub meshes
-      pEngine->setAlphaMode(Engine::ALPHA_COMBINE);
+      pEngine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
       for (const auto& subMesh : sortedArray) {
         renderSubMesh(subMesh);
       }
-      pEngine->setAlphaMode(Engine::ALPHA_DISABLE);
+      pEngine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
     }
   };
 }

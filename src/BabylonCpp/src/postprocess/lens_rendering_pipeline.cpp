@@ -3,6 +3,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/random.h>
+#include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/interfaces/icanvas_rendering_context2D.h>
@@ -197,8 +198,8 @@ void LensRenderingPipeline::_createChromaticAberrationPostProcess(float ratio)
     "LensChromaticAberration", "chromaticAberration",
     {"chromatic_aberration", "screen_width", "screen_height"}, // uniforms
     {},                                                        // samplers
-    ratio, nullptr, Texture::TRILINEAR_SAMPLINGMODE, _scene->getEngine(),
-    false);
+    ratio, nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE,
+    _scene->getEngine(), false);
 
   _chromaticAberrationPostProcess->setOnApply([&](Effect* effect) {
     effect->setFloat("chromatic_aberration", _chromaticAberration);
@@ -217,8 +218,8 @@ void LensRenderingPipeline::_createHighlightsPostProcess(float ratio)
     "LensHighlights", "lensHighlights",
     {"gain", "threshold", "screen_width", "screen_height"}, // uniforms
     {},                                                     // samplers
-    ratio, nullptr, Texture::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
-    _dofPentagon ? "#define PENTAGON\n" : "");
+    ratio, nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE,
+    _scene->getEngine(), false, _dofPentagon ? "#define PENTAGON\n" : "");
 
   _highlightsPostProcess->setOnApply([&](Effect* effect) {
     effect->setFloat("gain", _highlightsGain);
@@ -242,7 +243,7 @@ void LensRenderingPipeline::_createDepthOfFieldPostProcess(float ratio)
      "distortion", "dof_enabled", "screen_distance", "aperture", "darken",
      "edge_blur", "highlights", "near", "far"},
     {"depthSampler", "grainSampler", "highlightsSampler"}, ratio, nullptr,
-    Texture::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
+    TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
 
   _depthOfFieldPostProcess->setOnApply([&](Effect* effect) {
 
@@ -288,9 +289,9 @@ void LensRenderingPipeline::_createGrainTexture()
   options.height = static_cast<int>(size);
 
   _grainTexture = new DynamicTexture("LensNoiseTexture", options, _scene, false,
-                                     Texture::BILINEAR_SAMPLINGMODE);
-  _grainTexture->wrapU = Texture::WRAP_ADDRESSMODE;
-  _grainTexture->wrapV = Texture::WRAP_ADDRESSMODE;
+                                     TextureConstants::BILINEAR_SAMPLINGMODE);
+  _grainTexture->wrapU = TextureConstants::WRAP_ADDRESSMODE;
+  _grainTexture->wrapV = TextureConstants::WRAP_ADDRESSMODE;
 
   ICanvasRenderingContext2D* context
     = dynamic_cast<DynamicTexture*>(_grainTexture)->getContext();

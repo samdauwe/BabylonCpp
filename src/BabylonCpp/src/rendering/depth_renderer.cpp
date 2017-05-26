@@ -35,8 +35,8 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type)
     = static_cast<std::unique_ptr<RenderTargetTexture>>(new RenderTargetTexture(
       "depthMap", {engine->getRenderWidth(), engine->getRenderHeight()}, _scene,
       false, true, type));
-  _depthMap->wrapU = Texture::CLAMP_ADDRESSMODE;
-  _depthMap->wrapV = Texture::CLAMP_ADDRESSMODE;
+  _depthMap->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
+  _depthMap->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
   _depthMap->setRefreshRate(1);
   _depthMap->renderParticles = false;
   _depthMap->renderList.clear();

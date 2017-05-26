@@ -4,6 +4,7 @@
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
+#include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/lights/ishadow_light.h>
 #include <babylon/lights/light.h>

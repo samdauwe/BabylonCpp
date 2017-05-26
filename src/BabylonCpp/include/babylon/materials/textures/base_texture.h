@@ -14,6 +14,8 @@ namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT BaseTexture : public IAnimatable,
                                           public IDisposable {
+public:
+  static unsigned int DEFAULT_ANISOTROPIC_FILTERING_LEVEL;
 
 public:
   virtual ~BaseTexture();

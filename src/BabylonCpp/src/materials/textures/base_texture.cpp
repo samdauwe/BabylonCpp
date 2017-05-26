@@ -9,20 +9,23 @@
 
 namespace BABYLON {
 
+unsigned int BaseTexture::DEFAULT_ANISOTROPIC_FILTERING_LEVEL = 4;
+
 BaseTexture::BaseTexture(Scene* scene)
     : getAlphaFromRGB{false}
     , level{1.f}
     , coordinatesIndex{0}
-    , wrapU{Texture::WRAP_ADDRESSMODE}
-    , wrapV{Texture::WRAP_ADDRESSMODE}
-    , anisotropicFilteringLevel{4}
+    , wrapU{TextureConstants::WRAP_ADDRESSMODE}
+    , wrapV{TextureConstants::WRAP_ADDRESSMODE}
+    , anisotropicFilteringLevel{BaseTexture::
+                                  DEFAULT_ANISOTROPIC_FILTERING_LEVEL}
     , isCube{false}
     , isRenderTarget{false}
-    , delayLoadState{Engine::DELAYLOADSTATE_NONE}
+    , delayLoadState{EngineConstants::DELAYLOADSTATE_NONE}
     , _cachedAnisotropicFilteringLevel{0}
     , _texture{nullptr}
     , _hasAlpha{false}
-    , _coordinatesMode{Texture::EXPLICIT_MODE}
+    , _coordinatesMode{TextureConstants::EXPLICIT_MODE}
     , _scene{scene}
     , _onDisposeObserver{nullptr}
 {
@@ -113,8 +116,9 @@ GL::IGLTexture* BaseTexture::getInternalTexture()
 
 bool BaseTexture::isReady()
 {
-  if (delayLoadState == Engine::DELAYLOADSTATE_NOTLOADED) {
-    return true;
+  if (delayLoadState == EngineConstants::DELAYLOADSTATE_NOTLOADED) {
+    delayLoad();
+    return false;
   }
 
   if (_texture) {

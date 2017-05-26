@@ -22,11 +22,14 @@ public:
   void addToScene(std::unique_ptr<MorphTargetManager>&& newMorphTargetManager);
 
   unsigned int uniqueId() const;
-  size_t vertexCount() const;
+  std::size_t vertexCount() const;
   bool supportsNormals() const;
+  bool supportsTangents() const;
+  std::size_t numTargets() const;
   size_t numInfluencers() const;
   Float32Array& influences();
-  MorphTarget* getActiveTarget(size_t index);
+  MorphTarget* getActiveTarget(std::size_t index);
+  MorphTarget* getTarget(std::size_t index);
   void addTarget(std::unique_ptr<MorphTarget>&& target);
   void removeTarget(MorphTarget* target);
 
@@ -54,6 +57,7 @@ private:
   Scene* _scene;
   Float32Array _influences;
   bool _supportsNormals;
+  bool _supportsTangents;
   size_t _vertexCount;
   unsigned int _uniqueId;
 

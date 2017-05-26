@@ -1,6 +1,7 @@
 #include <babylon/materials/textures/dynamic_texture.h>
 
 #include <babylon/core/string.h>
+#include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/interfaces/icanvas_rendering_context2D.h>
@@ -18,17 +19,18 @@ DynamicTexture::DynamicTexture(const std::string& iName,
 {
   name = iName;
 
-  wrapU = Texture::CLAMP_ADDRESSMODE;
-  wrapV = Texture::CLAMP_ADDRESSMODE;
+  auto engine = getScene()->getEngine();
+  wrapU       = TextureConstants::CLAMP_ADDRESSMODE;
+  wrapV       = TextureConstants::CLAMP_ADDRESSMODE;
 
   if (options.canvas) {
     _canvas  = options.canvas;
-    _texture = scene->getEngine()->createDynamicTexture(
-      options.width, options.height, generateMipMaps, samplingMode);
+    _texture = engine->createDynamicTexture(options.width, options.height,
+                                            generateMipMaps, samplingMode);
   }
   else {
-    _texture = scene->getEngine()->createDynamicTexture(
-      options.width, options.height, generateMipMaps, samplingMode);
+    _texture = engine->createDynamicTexture(options.width, options.height,
+                                            generateMipMaps, samplingMode);
   }
 
   if (_canvas) {
@@ -48,13 +50,8 @@ bool DynamicTexture::canRescale()
   return true;
 }
 
-void DynamicTexture::scale(float ratio)
+void DynamicTexture::_recreate(const ISize& textureSize)
 {
-  auto textureSize = getSize();
-
-  textureSize.width  = static_cast<int>(textureSize.width * ratio);
-  textureSize.height = static_cast<int>(textureSize.height * ratio);
-
   _canvas->width  = textureSize.width;
   _canvas->height = textureSize.height;
 
@@ -62,6 +59,26 @@ void DynamicTexture::scale(float ratio)
 
   _texture = getScene()->getEngine()->createDynamicTexture(
     textureSize.width, textureSize.height, _generateMipMaps, _samplingMode);
+}
+
+void DynamicTexture::scale(float ratio)
+{
+  auto textureSize = getSize();
+
+  textureSize.width  = static_cast<int>(textureSize.width * ratio);
+  textureSize.height = static_cast<int>(textureSize.height * ratio);
+
+  _recreate(textureSize);
+}
+
+void DynamicTexture::scaleTo(int width, int height)
+{
+  auto textureSize = getSize();
+
+  textureSize.width  = width;
+  textureSize.height = height;
+
+  _recreate(textureSize);
 }
 
 ICanvasRenderingContext2D* DynamicTexture::getContext()

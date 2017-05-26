@@ -1,6 +1,7 @@
 #include <babylon/probes/reflection_probe.h>
 
 #include <babylon/cameras/camera.h>
+#include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/mesh/abstract_mesh.h>
@@ -18,8 +19,8 @@ ReflectionProbe::ReflectionProbe(const std::string& name, const ISize& size,
     , _attachedMesh{nullptr}
 {
   _renderTargetTexture = std::make_unique<RenderTargetTexture>(
-    name, size, scene, generateMipMaps, true, Engine::TEXTURETYPE_UNSIGNED_INT,
-    true);
+    name, size, scene, generateMipMaps, true,
+    EngineConstants::TEXTURETYPE_UNSIGNED_INT, true);
 
   _renderTargetTexture->onBeforeRenderObservable.add([this](int faceIndex) {
     switch (faceIndex) {

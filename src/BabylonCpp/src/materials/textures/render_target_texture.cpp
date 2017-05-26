@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/math/matrix.h>
 #include <babylon/mesh/abstract_mesh.h>
@@ -23,7 +24,7 @@ RenderTargetTexture::RenderTargetTexture(
     : Texture{"", scene, !generateMipMaps}
     , renderParticles{true}
     , renderSprites{false}
-    , coordinatesMode{Texture::PROJECTION_MODE}
+    , coordinatesMode{TextureConstants::PROJECTION_MODE}
     , _generateMipMaps{generateMipMaps}
     , _size{size}
     , _doNotChangeAspectRatio{doNotChangeAspectRatio}
@@ -41,15 +42,15 @@ RenderTargetTexture::RenderTargetTexture(
   _renderTargetOptions.generateDepthBuffer   = generateDepthBuffer;
   _renderTargetOptions.generateStencilBuffer = generateStencilBuffer;
 
-  if (samplingMode == Texture::NEAREST_SAMPLINGMODE) {
-    wrapU = Texture::CLAMP_ADDRESSMODE;
-    wrapV = Texture::CLAMP_ADDRESSMODE;
+  if (samplingMode == TextureConstants::NEAREST_SAMPLINGMODE) {
+    wrapU = TextureConstants::CLAMP_ADDRESSMODE;
+    wrapV = TextureConstants::CLAMP_ADDRESSMODE;
   }
 
   if (iIsCube) {
     _texture = scene->getEngine()->createRenderTargetCubeTexture(
       size, _renderTargetOptions);
-    coordinatesMode = Texture::INVCUBIC_MODE;
+    coordinatesMode = TextureConstants::INVCUBIC_MODE;
     _textureMatrix  = std::make_unique<Matrix>(Matrix::Identity());
   }
   else {
@@ -99,6 +100,16 @@ void RenderTargetTexture::setOnClear(
     onClearObservable.remove(_onClearObserver);
   }
   _onClearObserver = onClearObservable.add(callback);
+}
+
+IRenderTargetOptions& RenderTargetTexture::renderTargetOptions()
+{
+  return _renderTargetOptions;
+}
+
+const IRenderTargetOptions& RenderTargetTexture::renderTargetOptions() const
+{
+  return _renderTargetOptions;
 }
 
 unsigned int RenderTargetTexture::samples() const

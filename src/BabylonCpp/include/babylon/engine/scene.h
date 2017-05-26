@@ -109,6 +109,9 @@ public:
 
   Material* getCachedMaterial();
   Effect* getCachedEffect();
+  float getCachedVisibility();
+  bool isCachedMaterialValid(Material* material, Effect* effect,
+                             float visibility = 0.f);
   BoundingBoxRenderer* getBoundingBoxRenderer();
   OutlineRenderer* getOutlineRenderer();
   Engine* getEngine();
@@ -840,6 +843,7 @@ public:
   PerfCounter _activeBones;
   Material* _cachedMaterial;
   Effect* _cachedEffect;
+  float _cachedVisibility;
   std::vector<IDisposable*> _toBeDisposed;
   std::vector<ParticleSystem*> _activeParticleSystems;
   std::vector<Animatable*> _activeAnimatables;

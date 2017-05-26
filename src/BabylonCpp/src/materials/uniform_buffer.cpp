@@ -4,6 +4,7 @@
 #include <babylon/core/logging.h>
 #include <babylon/engine/engine.h>
 #include <babylon/materials/effect.h>
+#include <babylon/math/color3.h>
 #include <babylon/math/vector4.h>
 
 namespace BABYLON {
@@ -18,7 +19,6 @@ UniformBuffer::UniformBuffer(Engine* engine, const Float32Array& data,
     , _uniformLocationPointer{0}
     , _needSync{false}
     , _noUBO{engine->webGLVersion() == 1.f}
-
 {
   if (_noUBO) {
     updateMatrix3x3
@@ -272,6 +272,8 @@ void UniformBuffer::create()
     return; // nothing to do
   }
 
+  // See spec, alignment must be filled as a vec4
+  _fillAlignment(4);
   _bufferData = Float32Array(_data);
 
   if (_dynamic) {

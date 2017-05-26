@@ -13,7 +13,7 @@ VRDistortionCorrectionPostProcess::VRDistortionCorrectionPostProcess(
                   {},
                   vrMetrics.postProcessScaleFactor,
                   camera,
-                  Texture::BILINEAR_SAMPLINGMODE,
+                  TextureConstants::BILINEAR_SAMPLINGMODE,
                   nullptr,
                   false}
     , _isRightEye{isRightEye}

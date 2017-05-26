@@ -150,13 +150,13 @@ void _StencilState::reset()
   _stencilTest = false;
   _stencilMask = 0xFF;
 
-  _stencilFunc     = Engine::ALWAYS;
+  _stencilFunc     = EngineConstants::ALWAYS;
   _stencilFuncRef  = 1;
   _stencilFuncMask = 0xFF;
 
-  _stencilOpStencilFail      = Engine::KEEP;
-  _stencilOpDepthFail        = Engine::KEEP;
-  _stencilOpStencilDepthPass = Engine::REPLACE;
+  _stencilOpStencilFail      = EngineConstants::KEEP;
+  _stencilOpDepthFail        = EngineConstants::KEEP;
+  _stencilOpStencilDepthPass = EngineConstants::REPLACE;
 
   _isStencilTestDirty = true;
   _isStencilMaskDirty = true;

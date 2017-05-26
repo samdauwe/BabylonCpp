@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/engine/engine.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
@@ -160,7 +161,7 @@ void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture)
   int desiredWidth  = _options.width == -1 ? requiredWidth : _options.width;
   int desiredHeight = _options.height == -1 ? requiredHeight : _options.height;
 
-  if (renderTargetSamplingMode != Texture::NEAREST_SAMPLINGMODE) {
+  if (renderTargetSamplingMode != TextureConstants::NEAREST_SAMPLINGMODE) {
     if (_options.width <= 0) {
       desiredWidth = Tools::GetExponentOfTwo(desiredWidth, maxSize);
     }
@@ -243,7 +244,7 @@ Effect* PostProcess::apply()
   // States
   _engine->enableEffect(_effect);
   _engine->setState(false);
-  _engine->setAlphaMode(Engine::ALPHA_DISABLE);
+  _engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
   _engine->setDepthBuffer(false);
   _engine->setDepthWrite(false);
 

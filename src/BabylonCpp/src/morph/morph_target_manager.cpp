@@ -9,7 +9,12 @@
 
 namespace BABYLON {
 
-MorphTargetManager::MorphTargetManager(Scene* scene) : _scene{scene}
+MorphTargetManager::MorphTargetManager(Scene* scene)
+    : _scene{scene}
+    , _supportsNormals{false}
+    , _supportsTangents{false}
+    , _vertexCount{0}
+    , _uniqueId{0}
 {
   _uniqueId = _scene->getUniqueId();
 }
@@ -39,6 +44,16 @@ bool MorphTargetManager::supportsNormals() const
   return _supportsNormals;
 }
 
+bool MorphTargetManager::supportsTangents() const
+{
+  return _supportsTangents;
+}
+
+std::size_t MorphTargetManager::numTargets() const
+{
+  return _targets.size();
+}
+
 size_t MorphTargetManager::numInfluencers() const
 {
   return _activeTargets.size();
@@ -53,6 +68,15 @@ MorphTarget* MorphTargetManager::getActiveTarget(size_t index)
 {
   if (index < _activeTargets.size()) {
     return _activeTargets[index];
+  }
+
+  return nullptr;
+}
+
+MorphTarget* MorphTargetManager::getTarget(std::size_t index)
+{
+  if (index < _targets.size()) {
+    return _targets[index].get();
   }
 
   return nullptr;
@@ -106,13 +130,15 @@ void MorphTargetManager::_syncActiveTargets(bool needUpdate)
 {
   _activeTargets.clear();
   _influences.clear();
-  _supportsNormals = true;
+  _supportsNormals  = true;
+  _supportsTangents = true;
   for (auto& target : _targets) {
     if (target->influence() > 0.f) {
       _activeTargets.emplace_back(target.get());
       _influences.emplace_back(target->influence());
 
-      _supportsNormals = _supportsNormals && target->hasNormals();
+      _supportsNormals  = _supportsNormals && target->hasNormals();
+      _supportsTangents = _supportsTangents && target->hasTangents();
 
       if (_vertexCount == 0) {
         _vertexCount = target->getPositions().size() / 3;

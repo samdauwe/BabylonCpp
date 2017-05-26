@@ -4,6 +4,7 @@
 #include <babylon/bones/skeleton.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
+#include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/layer/glow_blur_post_process.h>
@@ -14,6 +15,7 @@
 #include <babylon/materials/pbr_material.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/render_target_texture.h>
+#include <babylon/materials/textures/texture_constants.h>
 #include <babylon/mesh/_instances_batch.h>
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
@@ -149,10 +151,10 @@ void HighlightLayer::createTextureAndPostProcesses()
       false, true, Engine::TEXTURETYPE_UNSIGNED_INT));
 #endif
   _mainTexture->activeCamera              = _options.camera;
-  _mainTexture->wrapU                     = Texture::CLAMP_ADDRESSMODE;
-  _mainTexture->wrapV                     = Texture::CLAMP_ADDRESSMODE;
+  _mainTexture->wrapU                     = TextureConstants::CLAMP_ADDRESSMODE;
+  _mainTexture->wrapV                     = TextureConstants::CLAMP_ADDRESSMODE;
   _mainTexture->anisotropicFilteringLevel = 1;
-  _mainTexture->updateSamplingMode(Texture::BILINEAR_SAMPLINGMODE);
+  _mainTexture->updateSamplingMode(TextureConstants::BILINEAR_SAMPLINGMODE);
   _mainTexture->renderParticles = false;
   _mainTexture->renderList.clear();
 
@@ -162,30 +164,30 @@ void HighlightLayer::createTextureAndPostProcesses()
       "HighlightLayerBlurRTT", {blurTextureWidth, blurTextureHeight}, _scene,
       false, true, Engine::TEXTURETYPE_UNSIGNED_INT));
 #endif
-  _blurTexture->wrapU                     = Texture::CLAMP_ADDRESSMODE;
-  _blurTexture->wrapV                     = Texture::CLAMP_ADDRESSMODE;
+  _blurTexture->wrapU                     = TextureConstants::CLAMP_ADDRESSMODE;
+  _blurTexture->wrapV                     = TextureConstants::CLAMP_ADDRESSMODE;
   _blurTexture->anisotropicFilteringLevel = 16;
-  _blurTexture->updateSamplingMode(Texture::TRILINEAR_SAMPLINGMODE);
+  _blurTexture->updateSamplingMode(TextureConstants::TRILINEAR_SAMPLINGMODE);
   _blurTexture->renderParticles = false;
 
   _downSamplePostprocess = std::make_unique<PassPostProcess>(
     "HighlightLayerPPP", _options.blurTextureSizeRatio, nullptr,
-    Texture::BILINEAR_SAMPLINGMODE, _scene->getEngine());
+    TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
   _downSamplePostprocess->onApplyObservable.add([&](Effect* effect) {
     effect->setTexture("textureSampler", _mainTexture.get());
   });
 
-  if (_options.alphaBlendingMode == Engine::ALPHA_COMBINE) {
+  if (_options.alphaBlendingMode == EngineConstants::ALPHA_COMBINE) {
     _horizontalBlurPostprocess = std::make_unique<GlowBlurPostProcess>(
       "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize, 1,
-      nullptr, Texture::BILINEAR_SAMPLINGMODE, _scene->getEngine());
+      nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _horizontalBlurPostprocess->onApplyObservable.add([&](Effect* effect) {
       effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
     });
 
     _verticalBlurPostprocess = std::make_unique<GlowBlurPostProcess>(
       "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize, 1,
-      nullptr, Texture::BILINEAR_SAMPLINGMODE, _scene->getEngine());
+      nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _verticalBlurPostprocess->onApplyObservable.add([&](Effect* effect) {
       effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
     });
@@ -193,14 +195,14 @@ void HighlightLayer::createTextureAndPostProcesses()
   else {
     _horizontalBlurPostprocess = std::make_unique<GlowBlurPostProcess>(
       "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize, 1,
-      nullptr, Texture::BILINEAR_SAMPLINGMODE, _scene->getEngine());
+      nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _horizontalBlurPostprocess->onApplyObservable.add([&](Effect* effect) {
       effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
     });
 
     _verticalBlurPostprocess = std::make_unique<GlowBlurPostProcess>(
       "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize, 1,
-      nullptr, Texture::BILINEAR_SAMPLINGMODE, _scene->getEngine());
+      nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _verticalBlurPostprocess->onApplyObservable.add([&](Effect* effect) {
       effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
     });
@@ -471,12 +473,12 @@ void HighlightLayer::render()
 
   if (outerGlow) {
     currentEffect->setFloat("offset", 0.f);
-    engine->setStencilFunction(Engine::NOTEQUAL);
+    engine->setStencilFunction(EngineConstants::NOTEQUAL);
     engine->draw(true, 0, 6);
   }
   if (innerGlow) {
     currentEffect->setFloat("offset", 1);
-    engine->setStencilFunction(Engine::EQUAL);
+    engine->setStencilFunction(EngineConstants::EQUAL);
     engine->draw(true, 0, 6);
   }
 

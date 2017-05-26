@@ -3,6 +3,7 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
 #include <babylon/core/structs.h>
+#include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 
 namespace BABYLON {

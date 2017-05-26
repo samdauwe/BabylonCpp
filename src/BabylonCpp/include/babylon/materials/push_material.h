@@ -37,7 +37,7 @@ protected:
   PushMaterial(const std::string& name, Scene* scene);
 
   void _afterBind(Mesh* mesh, Effect* effect);
-  bool _mustRebind(Scene* scene, Effect* effect);
+  bool _mustRebind(Scene* scene, Effect* effect, float visibility = 0.f);
   void _markAllSubMeshesAsDirty(
     const std::function<void(MaterialDefines* defines)>& func);
   void _markAllSubMeshesAsTexturesDirty();

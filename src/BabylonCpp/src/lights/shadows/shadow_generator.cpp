@@ -5,6 +5,7 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
 #include <babylon/core/string.h>
+#include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/lights/ishadow_light.h>
 #include <babylon/lights/point_light.h>
@@ -65,21 +66,21 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light)
   if (caps.textureFloat && caps.textureFloatLinearFiltering
       && caps.textureFloatRender) {
     _useFullFloat = true;
-    _textureType  = Engine::TEXTURETYPE_FLOAT;
+    _textureType  = EngineConstants::TEXTURETYPE_FLOAT;
   }
   else {
     _useFullFloat = false;
-    _textureType  = Engine::TEXTURETYPE_UNSIGNED_INT;
+    _textureType  = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
   }
 
   // Render target
   _shadowMap = std::make_unique<RenderTargetTexture>(
     light->name + "_shadowMap", mapSize, _scene, false, true, _textureType,
     light->needCube());
-  _shadowMap->wrapU                     = Texture::CLAMP_ADDRESSMODE;
-  _shadowMap->wrapV                     = Texture::CLAMP_ADDRESSMODE;
+  _shadowMap->wrapU                     = TextureConstants::CLAMP_ADDRESSMODE;
+  _shadowMap->wrapV                     = TextureConstants::CLAMP_ADDRESSMODE;
   _shadowMap->anisotropicFilteringLevel = 1;
-  _shadowMap->updateSamplingMode(Texture::BILINEAR_SAMPLINGMODE);
+  _shadowMap->updateSamplingMode(TextureConstants::BILINEAR_SAMPLINGMODE);
   _shadowMap->renderParticles = false;
 
   _shadowMap->onBeforeRenderObservable.add(
@@ -93,13 +94,14 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light)
     if (!_shadowMap2) {
       _shadowMap2 = std::make_unique<RenderTargetTexture>(
         _light->name + "_shadowMap", _mapSize, _scene, false);
-      _shadowMap2->wrapU = Texture::CLAMP_ADDRESSMODE;
-      _shadowMap2->wrapV = Texture::CLAMP_ADDRESSMODE;
-      _shadowMap2->updateSamplingMode(Texture::BILINEAR_SAMPLINGMODE);
+      _shadowMap2->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
+      _shadowMap2->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
+      _shadowMap2->updateSamplingMode(TextureConstants::BILINEAR_SAMPLINGMODE);
 
       _downSamplePostprocess = std::make_unique<PassPostProcess>(
-        "downScale", 1.f / blurScale, nullptr, Texture::BILINEAR_SAMPLINGMODE,
-        _scene->getEngine(), false, _textureType);
+        "downScale", 1.f / blurScale, nullptr,
+        TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
+        _textureType);
       _downSamplePostprocess->onApplyObservable.add([this](Effect* effect) {
         effect->setTexture("textureSampler", _shadowMap.get());
       });
@@ -173,14 +175,15 @@ void ShadowGenerator::setBlurBoxOffset(int value)
     _boxBlurPostprocess->dispose();
   }
 
-  unsigned textureType = _useFullFloat ? Engine::TEXTURETYPE_FLOAT :
-                                         Engine::TEXTURETYPE_UNSIGNED_INT;
+  unsigned textureType = _useFullFloat ?
+                           EngineConstants::TEXTURETYPE_FLOAT :
+                           EngineConstants::TEXTURETYPE_UNSIGNED_INT;
 
-  std::unique_ptr<PostProcess> _boxBlurPostprocessPtr(
-    new PostProcess("DepthBoxBlur", "depthBoxBlur", {"screenSize", "boxOffset"},
-                    {}, 1.f / blurScale, nullptr,
-                    Texture::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
-                    "#define OFFSET " + std::to_string(value), textureType));
+  std::unique_ptr<PostProcess> _boxBlurPostprocessPtr(new PostProcess(
+    "DepthBoxBlur", "depthBoxBlur", {"screenSize", "boxOffset"}, {},
+    1.f / blurScale, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
+    _scene->getEngine(), false, "#define OFFSET " + std::to_string(value),
+    textureType));
   _boxBlurPostprocess = std::move(_boxBlurPostprocessPtr);
   _boxBlurPostprocess->onApplyObservable.add([&](Effect* effect) {
     effect->setFloat2("screenSize",
@@ -215,11 +218,11 @@ void ShadowGenerator::setFilter(unsigned int value)
   if (usePoissonSampling() || useExponentialShadowMap()
       || useBlurExponentialShadowMap()) {
     _shadowMap->anisotropicFilteringLevel = 16;
-    _shadowMap->updateSamplingMode(Texture::BILINEAR_SAMPLINGMODE);
+    _shadowMap->updateSamplingMode(TextureConstants::BILINEAR_SAMPLINGMODE);
   }
   else {
     _shadowMap->anisotropicFilteringLevel = 1;
-    _shadowMap->updateSamplingMode(Texture::NEAREST_SAMPLINGMODE);
+    _shadowMap->updateSamplingMode(TextureConstants::NEAREST_SAMPLINGMODE);
   }
 
   _light->_markMeshesAsLightDirty();

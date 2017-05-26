@@ -11,7 +11,8 @@ class BABYLON_SHARED_EXPORT MapTexture : public Texture {
 
 public:
   MapTexture(const std::string& name, Scene* scene, const ISize& size,
-             unsigned int samplingMode = Texture::TRILINEAR_SAMPLINGMODE,
+             unsigned int samplingMode
+             = TextureConstants::TRILINEAR_SAMPLINGMODE,
              bool useMipMap = false, float margin = 0.f);
   ~MapTexture();
 

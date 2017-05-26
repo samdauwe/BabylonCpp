@@ -17,6 +17,7 @@
 #include <babylon/math/vector4.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
+#include <babylon/mesh/vertex_buffer.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -221,6 +222,7 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 
   // Instances
   std::vector<std::string> defines;
+  std::vector<std::string> attribs;
   auto fallbacks = std::make_unique<EffectFallbacks>();
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
@@ -230,13 +232,31 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
     defines.emplace_back(_define);
   }
 
+  for (std::size_t index = 0; index < _options.attributes.size(); ++index) {
+    attribs.emplace_back(_options.attributes[index]);
+  }
+
+  if (mesh && mesh->isVerticesDataPresent(VertexBuffer::ColorKind)) {
+    attribs.emplace_back(VertexBuffer::ColorKindChars);
+    defines.emplace_back("#define VERTEXCOLOR");
+  }
+
   // Bones
   if (mesh && mesh->useBones() && mesh->computeBonesUsingShaders()) {
+    attribs.emplace_back(VertexBuffer::MatricesIndicesKindChars);
+    attribs.emplace_back(VertexBuffer::MatricesWeightsKindChars);
+    if (mesh->numBoneInfluencers() > 4) {
+      attribs.emplace_back(VertexBuffer::MatricesIndicesExtraKindChars);
+      attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKindChars);
+    }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
                          + std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back("#define BonesPerMesh "
                          + std::to_string(mesh->skeleton()->bones.size() + 1));
     fallbacks->addCPUSkinningFallback(0, mesh);
+  }
+  else {
+    defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
   }
 
   // Textures
@@ -255,7 +275,7 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   auto join           = String::join(defines, '\n');
 
   EffectCreationOptions options;
-  options.attributes          = _options.attributes;
+  options.attributes          = std::move(attribs);
   options.uniformsNames       = _options.uniforms;
   options.uniformBuffersNames = _options.uniformBuffers;
   options.samplers            = _options.samplers;

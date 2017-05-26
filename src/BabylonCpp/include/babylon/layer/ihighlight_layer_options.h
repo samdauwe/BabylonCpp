@@ -2,7 +2,7 @@
 #define BABYLON_LAYER_IHIGHLIGHT_LAYER_OPTIONS_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/engine/engine.h>
+#include <babylon/engine/engine_constants.h>
 
 namespace BABYLON {
 
@@ -44,7 +44,7 @@ struct BABYLON_SHARED_EXPORT IHighlightLayerOptions {
   /**
    * Alpha blending mode used to apply the blur. Default is combine.
    */
-  int alphaBlendingMode = Engine::ALPHA_COMBINE;
+  int alphaBlendingMode = EngineConstants::ALPHA_COMBINE;
 
   /**
    * The camera attached to the layer.

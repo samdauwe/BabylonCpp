@@ -3,8 +3,8 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/core/structs.h>
-#include <babylon/engine/engine.h>
-#include <babylon/materials/textures/texture.h>
+#include <babylon/engine/engine_constants.h>
+#include <babylon/materials/textures/texture_constants.h>
 #include <babylon/math/color4.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
@@ -20,19 +20,22 @@ public:
   PostProcess(const std::string& name, const std::string& fragmentUrl,
               const std::vector<std::string>& parameters,
               const std::vector<std::string>& samplers, float renderRatio,
-              Camera* camera,
-              unsigned int samplingMode = Texture::NEAREST_SAMPLINGMODE,
+              Camera* camera, unsigned int samplingMode
+                              = TextureConstants::NEAREST_SAMPLINGMODE,
               Engine* engine = nullptr, bool reusable = false,
               const std::string& defines = "",
-              unsigned int textureType   = Engine::TEXTURETYPE_UNSIGNED_INT);
+              unsigned int textureType
+              = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   PostProcess(const std::string& name, const std::string& fragmentUrl,
               const std::vector<std::string>& parameters,
               const std::vector<std::string>& samplers,
               const PostProcessOptions& options, Camera* camera,
-              unsigned int samplingMode = Texture::NEAREST_SAMPLINGMODE,
+              unsigned int samplingMode
+              = TextureConstants::NEAREST_SAMPLINGMODE,
               Engine* engine = nullptr, bool reusable = false,
               const std::string& defines = "",
-              unsigned int textureType   = Engine::TEXTURETYPE_UNSIGNED_INT);
+              unsigned int textureType
+              = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   virtual ~PostProcess();
 
   // Events

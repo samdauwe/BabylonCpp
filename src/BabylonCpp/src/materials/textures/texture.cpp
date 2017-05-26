@@ -9,10 +9,6 @@
 
 namespace BABYLON {
 
-constexpr unsigned int Texture::NEAREST_SAMPLINGMODE;
-constexpr unsigned int Texture::BILINEAR_SAMPLINGMODE;
-constexpr unsigned int Texture::TRILINEAR_SAMPLINGMODE;
-
 Texture::Texture(const std::string& _url, Scene* scene, bool noMipmap,
                  bool invertY, unsigned int samplingMode,
                  const std::function<void()>& onLoad,
@@ -65,7 +61,7 @@ Texture::Texture(const std::string& _url, Scene* scene, bool noMipmap,
       }
     }
     else {
-      delayLoadState = Engine::DELAYLOADSTATE_NOTLOADED;
+      delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
 
       _delayedOnLoad  = _load;
       _delayedOnError = onError;
@@ -97,11 +93,11 @@ bool Texture::noMipmap() const
 
 void Texture::delayLoad()
 {
-  if (delayLoadState != Engine::DELAYLOADSTATE_NOTLOADED) {
+  if (delayLoadState != EngineConstants::DELAYLOADSTATE_NOTLOADED) {
     return;
   }
 
-  delayLoadState = Engine::DELAYLOADSTATE_LOADED;
+  delayLoadState = EngineConstants::DELAYLOADSTATE_LOADED;
   _texture       = _getFromCache(url, _noMipmap, _samplingMode);
 
   if (!_texture) {
@@ -213,14 +209,14 @@ Matrix* Texture::getReflectionTextureMatrix()
   _cachedCoordinatesMode = coordinatesMode();
 
   switch (coordinatesMode()) {
-    case Texture::PLANAR_MODE:
+    case TextureConstants::PLANAR_MODE:
       Matrix::IdentityToRef(*_cachedTextureMatrix);
       _cachedTextureMatrix->m[0]  = uScale;
       _cachedTextureMatrix->m[5]  = vScale;
       _cachedTextureMatrix->m[12] = uOffset;
       _cachedTextureMatrix->m[13] = vOffset;
       break;
-    case Texture::PROJECTION_MODE:
+    case TextureConstants::PROJECTION_MODE:
       Matrix::IdentityToRef(*_projectionModeMatrix);
 
       _projectionModeMatrix->m[0]  = 0.5f;

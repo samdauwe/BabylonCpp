@@ -2,14 +2,12 @@
 #define BABYLON_MATERIALS_TEXTURES_CUBE_TEXTURE_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/engine/engine_constants.h>
 #include <babylon/materials/textures/base_texture.h>
 
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT CubeTexture : public BaseTexture {
-
-public:
-  static constexpr unsigned int ENGINE_TEXTUREFORMAT_RGBA = 5;
 
 public:
   CubeTexture(const std::string& rootUrl, Scene* scene,
@@ -18,7 +16,7 @@ public:
               = std::vector<std::string>(),
               const std::function<void()>& onLoad  = nullptr,
               const std::function<void()>& onError = nullptr,
-              unsigned int format                  = ENGINE_TEXTUREFORMAT_RGBA);
+              unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
   ~CubeTexture();
 
   /** Methods **/

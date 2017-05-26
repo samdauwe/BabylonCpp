@@ -9,6 +9,8 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/textures/base_texture.h>
+#include <babylon/materials/textures/texture.h>
 #include <babylon/math/vector3.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
@@ -243,7 +245,7 @@ bool LensFlareSystem::render()
   engine->enableEffect(_effect);
   engine->setState(false);
   engine->setDepthBuffer(false);
-  engine->setAlphaMode(Engine::ALPHA_ONEONE);
+  engine->setAlphaMode(EngineConstants::ALPHA_ONEONE);
 
   // VBOs
   std::unordered_map<std::string, VertexBuffer*> vertexBuffersTmp;
@@ -286,7 +288,7 @@ bool LensFlareSystem::render()
   }
 
   engine->setDepthBuffer(true);
-  engine->setAlphaMode(Engine::ALPHA_DISABLE);
+  engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
   return true;
 }
 

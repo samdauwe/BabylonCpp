@@ -1,5 +1,6 @@
 #include <babylon/bones/skeleton.h>
 
+#include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
 #include <babylon/core/json.h>

@@ -360,39 +360,40 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 
       _defines.defines[PMD::REFLECTION] = true;
 
-      if (reflectionTexture->coordinatesMode == Texture::INVCUBIC_MODE) {
+      if (reflectionTexture->coordinatesMode
+          == TextureConstants::INVCUBIC_MODE) {
         _defines.defines[PMD::INVERTCUBICMAP] = true;
       }
 
       _defines.defines[PMD::REFLECTIONMAP_3D] = reflectionTexture->isCube;
 
       switch (reflectionTexture->coordinatesMode) {
-        case Texture::CUBIC_MODE:
-        case Texture::INVCUBIC_MODE:
+        case TextureConstants::CUBIC_MODE:
+        case TextureConstants::INVCUBIC_MODE:
           _defines.defines[PMD::REFLECTIONMAP_CUBIC] = true;
           break;
-        case Texture::EXPLICIT_MODE:
+        case TextureConstants::EXPLICIT_MODE:
           _defines.defines[PMD::REFLECTIONMAP_EXPLICIT] = true;
           break;
-        case Texture::PLANAR_MODE:
+        case TextureConstants::PLANAR_MODE:
           _defines.defines[PMD::REFLECTIONMAP_PLANAR] = true;
           break;
-        case Texture::PROJECTION_MODE:
+        case TextureConstants::PROJECTION_MODE:
           _defines.defines[PMD::REFLECTIONMAP_PROJECTION] = true;
           break;
-        case Texture::SKYBOX_MODE:
+        case TextureConstants::SKYBOX_MODE:
           _defines.defines[PMD::REFLECTIONMAP_SKYBOX] = true;
           break;
-        case Texture::SPHERICAL_MODE:
+        case TextureConstants::SPHERICAL_MODE:
           _defines.defines[PMD::REFLECTIONMAP_SPHERICAL] = true;
           break;
-        case Texture::EQUIRECTANGULAR_MODE:
+        case TextureConstants::EQUIRECTANGULAR_MODE:
           _defines.defines[PMD::REFLECTIONMAP_EQUIRECTANGULAR] = true;
           break;
-        case Texture::FIXED_EQUIRECTANGULAR_MODE:
+        case TextureConstants::FIXED_EQUIRECTANGULAR_MODE:
           _defines.defines[PMD::REFLECTIONMAP_EQUIRECTANGULAR_FIXED] = true;
           break;
-        case Texture::FIXED_EQUIRECTANGULAR_MIRRORED_MODE:
+        case TextureConstants::FIXED_EQUIRECTANGULAR_MIRRORED_MODE:
           _defines.defines[PMD::REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED]
             = true;
           break;
@@ -636,7 +637,8 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 
   // Attribs
   if (mesh) {
-    if (!mesh->isVerticesDataPresent(VertexBuffer::NormalKind)) {
+    if (!scene->getEngine()->getCaps().standardDerivatives
+        && !mesh->isVerticesDataPresent(VertexBuffer::NormalKind)) {
       mesh->createNormals(true);
       BABYLON_LOGF_WARN(
         "PBRMaterial",
@@ -681,6 +683,8 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
       auto _mesh = static_cast<Mesh*>(mesh);
       if (_mesh && _mesh->morphTargetManager()) {
         auto manager = _mesh->morphTargetManager();
+        _defines.defines[PMD::MORPHTARGETS_TANGENT]
+          = manager->supportsTangents() && _defines[PMD::TANGENT];
         _defines.defines[PMD::MORPHTARGETS_NORMAL]
           = manager->supportsNormals() && _defines[PMD::NORMAL];
         _defines.defines[PMD::MORPHTARGETS] = (manager->numInfluencers() > 0);

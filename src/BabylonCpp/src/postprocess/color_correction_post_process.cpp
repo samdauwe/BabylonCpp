@@ -12,11 +12,12 @@ ColorCorrectionPostProcess::ColorCorrectionPostProcess(
     : PostProcess{iName,  "colorCorrection", {},     {"colorTable"}, ratio,
                   camera, samplingMode,      engine, reusable}
 {
-  _colorTableTexture = Texture::New(colorTableUrl, camera->getScene(), true,
-                                    false, Texture::TRILINEAR_SAMPLINGMODE);
+  _colorTableTexture
+    = Texture::New(colorTableUrl, camera->getScene(), true, false,
+                   TextureConstants::TRILINEAR_SAMPLINGMODE);
   _colorTableTexture->anisotropicFilteringLevel = 1;
-  _colorTableTexture->wrapU                     = Texture::CLAMP_ADDRESSMODE;
-  _colorTableTexture->wrapV                     = Texture::CLAMP_ADDRESSMODE;
+  _colorTableTexture->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
+  _colorTableTexture->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
 
   setOnApply([&](Effect* effect) {
     effect->setTexture("colorTable", _colorTableTexture);

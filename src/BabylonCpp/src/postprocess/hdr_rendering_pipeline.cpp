@@ -1,6 +1,7 @@
 #include <babylon/postprocess/hdr_rendering_pipeline.h>
 
 #include <babylon/core/time.h>
+#include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/texture.h>
@@ -50,9 +51,9 @@ HDRRenderingPipeline::HDRRenderingPipeline(const std::string& iName,
 
   // Pass postprocess
   if (originalPostProcess == nullptr) {
-    _originalPostProcess = new PassPostProcess("hdr", ratio, nullptr,
-                                               Texture::BILINEAR_SAMPLINGMODE,
-                                               scene->getEngine(), false);
+    _originalPostProcess = new PassPostProcess(
+      "hdr", ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
+      scene->getEngine(), false);
   }
   else {
     _originalPostProcess = originalPostProcess;
@@ -145,7 +146,7 @@ void HDRRenderingPipeline::_createHDRPostProcess(Scene* scene, float ratio)
   _hdrCurrentLuminance   = 1.f;
   _hdrPostProcess = new PostProcess("hdr", "hdr", {"exposure", "avgLuminance"},
                                     {"otherSampler"}, ratio, nullptr,
-                                    Texture::BILINEAR_SAMPLINGMODE,
+                                    TextureConstants::BILINEAR_SAMPLINGMODE,
                                     scene->getEngine(), false, "#define HDR");
 
   _hdrPostProcess->setOnApply([&](Effect* effect) {
@@ -191,8 +192,8 @@ void HDRRenderingPipeline::_createTextureAdderPostProcess(Scene* scene,
 {
   _textureAdderPostProcess
     = new PostProcess("hdr", "hdr", {}, {"otherSampler"}, ratio, nullptr,
-                      Texture::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-                      "#define TEXTURE_ADDER");
+                      TextureConstants::BILINEAR_SAMPLINGMODE,
+                      scene->getEngine(), false, "#define TEXTURE_ADDER");
 
   _textureAdderPostProcess->setOnApply([&](Effect* effect) {
     effect->setTextureFromPostProcess("otherSampler", _originalPostProcess);
@@ -205,8 +206,8 @@ void HDRRenderingPipeline::_createDownSampleX4PostProcess(Scene* scene,
   Float32Array downSampleX4Offsets(32);
   _downSampleX4PostProcess
     = new PostProcess("hdr", "hdr", {"dsOffsets"}, {}, ratio / 4.f, nullptr,
-                      Texture::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-                      "#define DOWN_SAMPLE_X4");
+                      TextureConstants::BILINEAR_SAMPLINGMODE,
+                      scene->getEngine(), false, "#define DOWN_SAMPLE_X4");
 
   _downSampleX4PostProcess->setOnApply([&](Effect* effect) {
     if (_needUpdate) {
@@ -254,7 +255,7 @@ void HDRRenderingPipeline::_createBrightPassPostProcess(Scene* scene,
 
   _brightPassPostProcess
     = new PostProcess("hdr", "hdr", {"dsOffsets", "brightThreshold"}, {}, ratio,
-                      nullptr, Texture::BILINEAR_SAMPLINGMODE,
+                      nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
                       scene->getEngine(), false, "#define BRIGHT_PASS");
   _brightPassPostProcess->setOnApply(brightPassCallback);
 }
@@ -342,10 +343,10 @@ void HDRRenderingPipeline::_createLuminanceGeneratorPostProcess(Scene* scene)
   int width  = static_cast<int>(std::pow(3, lumSteps - 1));
   int height = static_cast<int>(std::pow(3, lumSteps - 1));
   PostProcessOptions ratio{width, height};
-  _downSamplePostProcesses[lumSteps - 1]
-    = new PostProcess("hdr", "hdr", {"lumOffsets"}, {}, ratio, nullptr,
-                      Texture::NEAREST_SAMPLINGMODE, scene->getEngine(), false,
-                      "#define LUMINANCE_GENERATOR", Engine::TEXTURETYPE_FLOAT);
+  _downSamplePostProcesses[lumSteps - 1] = new PostProcess(
+    "hdr", "hdr", {"lumOffsets"}, {}, ratio, nullptr,
+    TextureConstants::NEAREST_SAMPLINGMODE, scene->getEngine(), false,
+    "#define LUMINANCE_GENERATOR", EngineConstants::TEXTURETYPE_FLOAT);
   _downSamplePostProcesses[lumSteps - 1]->setOnApply(luminanceCallback);
 
   // Create down sample post-processes
@@ -361,8 +362,8 @@ void HDRRenderingPipeline::_createLuminanceGeneratorPostProcess(Scene* scene)
 
     _downSamplePostProcesses[_i] = new PostProcess(
       "hdr", "hdr", {"dsOffsets", "halfDestPixelSize"}, {}, ratio, nullptr,
-      Texture::NEAREST_SAMPLINGMODE, scene->getEngine(), false, defines,
-      Engine::TEXTURETYPE_FLOAT);
+      TextureConstants::NEAREST_SAMPLINGMODE, scene->getEngine(), false,
+      defines, EngineConstants::TEXTURETYPE_FLOAT);
     _downSamplePostProcesses[_i]->setOnApply(downSampleCallback(i));
 
     if (_i == 0) {
@@ -427,15 +428,15 @@ void HDRRenderingPipeline::_createGaussianBlurPostProcess(Scene* scene,
   // Create horizontal gaussian blur post-processes
   _guassianBlurHPostProcess
     = new PostProcess("hdr", "hdr", uniforms, {}, ratio / 4.f, nullptr,
-                      Texture::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-                      "#define GAUSSIAN_BLUR_H");
+                      TextureConstants::BILINEAR_SAMPLINGMODE,
+                      scene->getEngine(), false, "#define GAUSSIAN_BLUR_H");
   _guassianBlurHPostProcess->setOnApply(gaussianBlurCallback(false));
 
   // Create vertical gaussian blur post-process
   _guassianBlurVPostProcess
     = new PostProcess("hdr", "hdr", uniforms, {}, ratio / 4.f, nullptr,
-                      Texture::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-                      "#define GAUSSIAN_BLUR_V");
+                      TextureConstants::BILINEAR_SAMPLINGMODE,
+                      scene->getEngine(), false, "#define GAUSSIAN_BLUR_V");
   _guassianBlurVPostProcess->setOnApply(gaussianBlurCallback(true));
 }
 

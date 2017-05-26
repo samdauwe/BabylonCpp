@@ -84,6 +84,7 @@ struct BABYLON_SHARED_EXPORT PBRMaterialDefines : public MaterialDefines {
   static constexpr unsigned int MICROSURFACEMAP               = 72;
   static constexpr unsigned int MORPHTARGETS                  = 73;
   static constexpr unsigned int MORPHTARGETS_NORMAL           = 74;
+  static constexpr unsigned int MORPHTARGETS_TANGENT          = 75;
 
   PBRMaterialDefines();
   ~PBRMaterialDefines();

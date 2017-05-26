@@ -51,8 +51,8 @@ StandardRenderingPipeline::StandardRenderingPipeline(
   if (!originalPostProcess) {
     originalPostProcess = new PostProcess(
       "HDRPass", "standard", {}, {}, ratio, nullptr,
-      Texture::BILINEAR_SAMPLINGMODE, scene->getEngine(), true,
-      "#define PASS_POST_PROCESS", Engine::TEXTURETYPE_FLOAT);
+      TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), true,
+      "#define PASS_POST_PROCESS", EngineConstants::TEXTURETYPE_FLOAT);
   }
   else {
     originalPostProcess = iOriginalPostProcess;
@@ -80,8 +80,8 @@ StandardRenderingPipeline::StandardRenderingPipeline(
   // Create depth-of-field source post-process
   textureAdderFinalPostProcess = new PostProcess(
     "HDRDepthOfFieldSource", "standard", {}, {}, ratio, nullptr,
-    Texture::BILINEAR_SAMPLINGMODE, scene->getEngine(), true,
-    "#define PASS_POST_PROCESS", Engine::TEXTURETYPE_UNSIGNED_INT);
+    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), true,
+    "#define PASS_POST_PROCESS", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), "HDRDepthOfFieldSource",
     [&]() { return textureAdderFinalPostProcess; }, true));
@@ -184,8 +184,8 @@ void StandardRenderingPipeline::_createDownSampleX4PostProcess(Scene* scene,
 {
   downSampleX4PostProcess = new PostProcess(
     "HDRDownSampleX4", "standard", {"dsOffsets"}, {}, ratio, nullptr,
-    Texture::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-    "#define DOWN_SAMPLE_X4", Engine::TEXTURETYPE_UNSIGNED_INT);
+    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
+    "#define DOWN_SAMPLE_X4", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
   downSampleX4PostProcess->setOnApply([&](Effect* effect) {
     Float32Array downSampleX4Offsets(32);
@@ -213,8 +213,8 @@ void StandardRenderingPipeline::_createBrightPassPostProcess(Scene* scene,
 {
   brightPassPostProcess = new PostProcess(
     "HDRBrightPass", "standard", {"dsOffsets", "brightThreshold"}, {}, ratio,
-    nullptr, Texture::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-    "#define BRIGHT_PASS", Engine::TEXTURETYPE_UNSIGNED_INT);
+    nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
+    "#define BRIGHT_PASS", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
   brightPassPostProcess->setOnApply([&](Effect* effect) {
     float sU = (1.f / brightPassPostProcess->width);
@@ -280,16 +280,16 @@ void StandardRenderingPipeline::_createGaussianBlurPostProcesses(
   auto ratioStr                 = std::to_string(ratio);
   auto gaussianBlurHPostProcess = new PostProcess(
     "HDRGaussianBlurH" + ratioStr, "standard", uniforms, {}, ratio, nullptr,
-    Texture::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-    "#define GAUSSIAN_BLUR_H", Engine::TEXTURETYPE_UNSIGNED_INT);
+    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
+    "#define GAUSSIAN_BLUR_H", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   gaussianBlurHPostProcess->setOnApply(
     [&](Effect* /*effect*/) { callback(false); });
 
   // Create vertical gaussian blur post-process
   auto gaussianBlurVPostProcess = new PostProcess(
     "HDRGaussianBlurV" + ratioStr, "standard", uniforms, {}, ratio, nullptr,
-    Texture::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-    "#define GAUSSIAN_BLUR_V", Engine::TEXTURETYPE_UNSIGNED_INT);
+    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
+    "#define GAUSSIAN_BLUR_V", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   gaussianBlurVPostProcess->setOnApply(
     [&](Effect* /*effect*/) { callback(true); });
 
@@ -313,8 +313,8 @@ void StandardRenderingPipeline::_createTextureAdderPostProcess(Scene* scene,
   textureAdderPostProcess = new PostProcess(
     "HDRTextureAdder", "standard", {"exposure"},
     {"otherSampler", "lensSampler"}, ratio, nullptr,
-    Texture::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-    "#define TEXTURE_ADDER", Engine::TEXTURETYPE_UNSIGNED_INT);
+    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
+    "#define TEXTURE_ADDER", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   textureAdderPostProcess->setOnApply([&](Effect* effect) {
     effect->setTextureFromPostProcess("otherSampler", originalPostProcess);
     effect->setTexture("lensSampler", lensTexture);
@@ -333,9 +333,9 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
   lensFlarePostProcess = new PostProcess(
     "HDRLensFlare", "standard", {"strength", "ghostDispersal", "haloWidth",
                                  "resolution", "distortionStrength"},
-    {"lensColorSampler"}, ratio / 2.f, nullptr, Texture::BILINEAR_SAMPLINGMODE,
-    scene->getEngine(), true, "#define LENS_FLARE",
-    Engine::TEXTURETYPE_UNSIGNED_INT);
+    {"lensColorSampler"}, ratio / 2.f, nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), true,
+    "#define LENS_FLARE", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   addEffect(new PostProcessRenderEffect(scene->getEngine(), "HDRLensFlare",
                                         [&]() { return lensFlarePostProcess; },
                                         false));
@@ -345,8 +345,8 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
   lensFlareComposePostProcess = new PostProcess(
     "HDRLensFlareCompose", "standard", {"lensStarMatrix"},
     {"otherSampler", "lensDirtSampler", "lensStarSampler"}, ratio, nullptr,
-    Texture::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-    "#define LENS_FLARE_COMPOSE", Engine::TEXTURETYPE_UNSIGNED_INT);
+    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
+    "#define LENS_FLARE_COMPOSE", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), "HDRLensFlareCompose",
     [&]() { return lensFlareComposePostProcess; }, false));
@@ -415,8 +415,8 @@ void StandardRenderingPipeline::_createDepthOfFieldPostProcess(Scene* scene,
   depthOfFieldPostProcess = new PostProcess(
     "HDRDepthOfField", "standard", {"distance"},
     {"otherSampler", "depthSampler"}, ratio, nullptr,
-    Texture::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-    "#define DEPTH_OF_FIELD", Engine::TEXTURETYPE_UNSIGNED_INT);
+    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
+    "#define DEPTH_OF_FIELD", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   depthOfFieldPostProcess->setOnApply([&](Effect* effect) {
     effect->setTextureFromPostProcess("otherSampler",
                                       textureAdderFinalPostProcess);

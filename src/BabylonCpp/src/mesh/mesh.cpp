@@ -1,5 +1,6 @@
 #include <babylon/mesh/sub_mesh.h>
 
+#include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
@@ -42,7 +43,7 @@ namespace BABYLON {
 Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
            bool doNotCloneChildren, bool clonePhysicsImpostor)
     : AbstractMesh{iName, scene}
-    , delayLoadState{Engine::DELAYLOADSTATE_NONE}
+    , delayLoadState{EngineConstants::DELAYLOADSTATE_NONE}
     , onLODLevelSelection{nullptr}
     , _geometry{nullptr}
     , _visibleInstances{nullptr}
@@ -390,7 +391,7 @@ bool Mesh::isBlocked()
 
 bool Mesh::isReady() const
 {
-  if (delayLoadState == Engine::DELAYLOADSTATE_LOADING) {
+  if (delayLoadState == EngineConstants::DELAYLOADSTATE_LOADING) {
     return false;
   }
 
@@ -1016,7 +1017,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
   // Overlay
   if (renderOverlay) {
     int currentMode = engine->getAlphaMode();
-    engine->setAlphaMode(Engine::ALPHA_COMBINE);
+    engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
     scene->getOutlineRenderer()->render(subMesh, batch, true);
     engine->setAlphaMode(currentMode);
   }
@@ -1083,8 +1084,8 @@ Mesh& Mesh::_checkDelayState()
   if (_geometry) {
     _geometry->load(scene);
   }
-  else if (delayLoadState == Engine::DELAYLOADSTATE_NOTLOADED) {
-    delayLoadState = Engine::DELAYLOADSTATE_LOADING;
+  else if (delayLoadState == EngineConstants::DELAYLOADSTATE_NOTLOADED) {
+    delayLoadState = EngineConstants::DELAYLOADSTATE_LOADING;
 
     _queueLoad(this, scene);
   }
@@ -1100,7 +1101,7 @@ Mesh& Mesh::_queueLoad(Mesh* mesh, Scene* scene)
 
 bool Mesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes)
 {
-  if (delayLoadState == Engine::DELAYLOADSTATE_LOADING) {
+  if (delayLoadState == EngineConstants::DELAYLOADSTATE_LOADING) {
     return false;
   }
 
@@ -1743,7 +1744,7 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
   mesh->setHasVertexAlpha(Json::GetBool(parsedMesh, "hasVertexAlpha", false));
 
   if (parsedMesh.contains("delayLoadingFile")) {
-    mesh->delayLoadState = Engine::DELAYLOADSTATE_NOTLOADED;
+    mesh->delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
     mesh->delayLoadingFile
       = rootUrl + Json::GetString(parsedMesh, "delayLoadingFile");
     mesh->_boundingInfo = std::make_unique<BoundingInfo>(

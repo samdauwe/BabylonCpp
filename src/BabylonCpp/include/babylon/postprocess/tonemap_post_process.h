@@ -15,10 +15,11 @@ public:
   TonemapPostProcess(const std::string& name,
                      const TonemappingOperator& operator_,
                      float exposureAdjustment, Camera* camera,
-                     unsigned int samplingMode = Texture::BILINEAR_SAMPLINGMODE,
-                     Engine* engine            = nullptr,
+                     unsigned int samplingMode
+                     = TextureConstants::BILINEAR_SAMPLINGMODE,
+                     Engine* engine = nullptr,
                      unsigned int textureFormat
-                     = Engine::TEXTURETYPE_UNSIGNED_INT);
+                     = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   virtual ~TonemapPostProcess();
 
 private:

@@ -13,6 +13,8 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/textures/irender_target_options.h>
+#include <babylon/materials/textures/texture.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/color4.h>
 #include <babylon/mesh/vertex_buffer.h>
@@ -23,16 +25,6 @@
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
-
-constexpr unsigned int Engine::TEXTUREFORMAT_ALPHA;
-constexpr unsigned int Engine::TEXTUREFORMAT_LUMINANCE;
-constexpr unsigned int Engine::TEXTUREFORMAT_LUMINANCE_ALPHA;
-constexpr unsigned int Engine::TEXTUREFORMAT_RGB;
-constexpr unsigned int Engine::TEXTUREFORMAT_RGBA;
-
-constexpr unsigned int Engine::TEXTURETYPE_UNSIGNED_INT;
-constexpr unsigned int Engine::TEXTURETYPE_FLOAT;
-constexpr unsigned int Engine::TEXTURETYPE_HALF_FLOAT;
 
 std::string Engine::Version()
 {
@@ -65,7 +57,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _depthCullingState{std::make_unique<Internals::_DepthCullingState>()}
     , _stencilState{std::make_unique<Internals::_StencilState>()}
     , _alphaState{std::make_unique<Internals::_AlphaState>()}
-    , _alphaMode{Engine::ALPHA_DISABLE}
+    , _alphaMode{EngineConstants::ALPHA_DISABLE}
     , _maxTextureChannels{16}
     , _currentProgram{nullptr}
     , _cachedVertexBuffers{nullptr}
@@ -1764,40 +1756,40 @@ void Engine::setAlphaMode(int mode, bool noDepthWriteChange)
   }
 
   switch (mode) {
-    case Engine::ALPHA_DISABLE:
+    case EngineConstants::ALPHA_DISABLE:
       _alphaState->setAlphaBlend(false);
       break;
-    case Engine::ALPHA_PREMULTIPLIED:
+    case EngineConstants::ALPHA_PREMULTIPLIED:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::ONE, GL::ONE_MINUS_SRC_ALPHA, GL::ONE, GL::ONE);
       _alphaState->setAlphaBlend(true);
       break;
-    case Engine::ALPHA_COMBINE:
+    case EngineConstants::ALPHA_COMBINE:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::SRC_ALPHA, GL::ONE_MINUS_SRC_ALPHA, GL::ONE, GL::ONE);
       _alphaState->setAlphaBlend(true);
       break;
-    case Engine::ALPHA_ONEONE:
+    case EngineConstants::ALPHA_ONEONE:
       _alphaState->setAlphaBlendFunctionParameters(GL::ONE, GL::ONE, GL::ZERO,
                                                    GL::ONE);
       _alphaState->setAlphaBlend(true);
       break;
-    case Engine::ALPHA_ADD:
+    case EngineConstants::ALPHA_ADD:
       _alphaState->setAlphaBlendFunctionParameters(GL::SRC_ALPHA, GL::ONE,
                                                    GL::ZERO, GL::ONE);
       _alphaState->setAlphaBlend(true);
       break;
-    case Engine::ALPHA_SUBTRACT:
+    case EngineConstants::ALPHA_SUBTRACT:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::ZERO, GL::ONE_MINUS_SRC_COLOR, GL::ONE, GL::ONE);
       _alphaState->setAlphaBlend(true);
       break;
-    case Engine::ALPHA_MULTIPLY:
+    case EngineConstants::ALPHA_MULTIPLY:
       _alphaState->setAlphaBlendFunctionParameters(GL::DST_COLOR, GL::ZERO,
                                                    GL::ONE, GL::ONE);
       _alphaState->setAlphaBlend(true);
       break;
-    case Engine::ALPHA_MAXIMIZED:
+    case EngineConstants::ALPHA_MAXIMIZED:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::SRC_ALPHA, GL::ONE_MINUS_SRC_COLOR, GL::ONE, GL::ONE);
       _alphaState->setAlphaBlend(true);
@@ -1806,7 +1798,7 @@ void Engine::setAlphaMode(int mode, bool noDepthWriteChange)
       break;
   }
   if (!noDepthWriteChange) {
-    setDepthWrite(mode == Engine::ALPHA_DISABLE);
+    setDepthWrite(mode == EngineConstants::ALPHA_DISABLE);
   }
   _alphaMode = mode;
 }
@@ -1994,19 +1986,19 @@ GL::GLenum Engine::_getInternalFormat(unsigned int format) const
 {
   GL::GLenum internalFormat = GL::RGBA;
   switch (format) {
-    case Engine::TEXTUREFORMAT_ALPHA:
+    case EngineConstants::TEXTUREFORMAT_ALPHA:
       internalFormat = GL::ALPHA;
       break;
-    case Engine::TEXTUREFORMAT_LUMINANCE:
+    case EngineConstants::TEXTUREFORMAT_LUMINANCE:
       internalFormat = GL::LUMINANCE;
       break;
-    case Engine::TEXTUREFORMAT_LUMINANCE_ALPHA:
+    case EngineConstants::TEXTUREFORMAT_LUMINANCE_ALPHA:
       internalFormat = GL::LUMINANCE_ALPHA;
       break;
-    case Engine::TEXTUREFORMAT_RGB:
+    case EngineConstants::TEXTUREFORMAT_RGB:
       internalFormat = GL::RGB;
       break;
-    case Engine::TEXTUREFORMAT_RGBA:
+    case EngineConstants::TEXTUREFORMAT_RGBA:
       internalFormat = GL::RGBA;
       break;
     default:
@@ -2162,7 +2154,7 @@ void Engine::updateDynamicTexture(GL::IGLTexture* texture, ICanvas* canvas,
 
 GL::IGLTexture*
 Engine::createRenderTargetTexture(ISize size,
-                                  const RenderTargetOptions& options)
+                                  const IRenderTargetOptions& options)
 {
   // old version had a "generateMipMaps" arg instead of options.
   // if options.generateMipMaps is undefined, consider that options itself if
@@ -2176,14 +2168,15 @@ Engine::createRenderTargetTexture(ISize size,
   unsigned int type         = options.type;
   unsigned int samplingMode = options.samplingMode;
 
-  if (type == Engine::TEXTURETYPE_FLOAT && !_caps.textureFloatLinearFiltering) {
+  if (type == EngineConstants::TEXTURETYPE_FLOAT
+      && !_caps.textureFloatLinearFiltering) {
     // if floating point linear (GL::FLOAT) then force to NEAREST_SAMPLINGMODE
-    samplingMode = Texture::NEAREST_SAMPLINGMODE;
+    samplingMode = TextureConstants::NEAREST_SAMPLINGMODE;
   }
-  else if (type == Engine::TEXTURETYPE_HALF_FLOAT
+  else if (type == EngineConstants::TEXTURETYPE_HALF_FLOAT
            && !_caps.textureHalfFloatLinearFiltering) {
     // if floating point linear (HALF_FLOAT) then force to NEAREST_SAMPLINGMODE
-    samplingMode = Texture::NEAREST_SAMPLINGMODE;
+    samplingMode = TextureConstants::NEAREST_SAMPLINGMODE;
   }
 
   auto texture  = _gl->createTexture();
@@ -2195,8 +2188,8 @@ Engine::createRenderTargetTexture(ISize size,
 
   auto filters = GetSamplingParameters(samplingMode, generateMipMaps);
 
-  if (type == Engine::TEXTURETYPE_FLOAT && !_caps.textureFloat) {
-    type = Engine::TEXTURETYPE_UNSIGNED_INT;
+  if (type == EngineConstants::TEXTURETYPE_FLOAT && !_caps.textureFloat) {
+    type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
     BABYLON_LOG_WARN(
       "Engine",
       "Float textures are not supported. Render target forced to "
@@ -2330,7 +2323,8 @@ Engine::updateRenderTargetTextureSampleCount(GL::IGLTexture* texture,
 
     auto colorRenderbuffer = _gl->createRenderbuffer();
     _gl->bindRenderbuffer(GL::RENDERBUFFER, colorRenderbuffer);
-    _gl->renderbufferStorageMultisample(GL::RENDERBUFFER, samples, GL::RGBA8,
+    _gl->renderbufferStorageMultisample(GL::RENDERBUFFER,
+                                        static_cast<int>(samples), GL::RGBA8,
                                         texture->_width, texture->_height);
 
     _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
@@ -2355,7 +2349,7 @@ Engine::updateRenderTargetTextureSampleCount(GL::IGLTexture* texture,
 
 GL::IGLTexture*
 Engine::createRenderTargetCubeTexture(const ISize& size,
-                                      const RenderTargetOptions& options)
+                                      const IRenderTargetOptions& options)
 {
   auto texture  = _gl->createTexture();
   auto _texture = texture.get();
@@ -2446,7 +2440,7 @@ Engine::_convertRGBtoRGBATextureData(const ArrayBufferView& rgbData, int width,
                                      int height, unsigned int textureType)
 {
   // Create new RGBA data container.
-  if (textureType == Engine::TEXTURETYPE_FLOAT) {
+  if (textureType == EngineConstants::TEXTURETYPE_FLOAT) {
     Float32Array rgbaData(static_cast<size_t>(width * height * 4));
     // Convert each pixel.
     for (int x = 0; x < width; x++) {
@@ -2604,7 +2598,7 @@ void Engine::_setTexture(unsigned int channel, BaseTexture* texture)
 
   // Video (not supported)
   bool alreadyActivated = false;
-  if (texture->delayLoadState == Engine::DELAYLOADSTATE_NOTLOADED) {
+  if (texture->delayLoadState == EngineConstants::DELAYLOADSTATE_NOTLOADED) {
     // Delay loading
     texture->delayLoad();
     return;
@@ -2628,8 +2622,8 @@ void Engine::_setTexture(unsigned int channel, BaseTexture* texture)
       // CUBIC_MODE and SKYBOX_MODE both require CLAMP_TO_EDGE.  All other modes
       // use REPEAT.
       auto textureWrapMode
-        = (texture->coordinatesMode() != Texture::CUBIC_MODE
-           && texture->coordinatesMode() != Texture::SKYBOX_MODE) ?
+        = (texture->coordinatesMode() != TextureConstants::CUBIC_MODE
+           && texture->coordinatesMode() != TextureConstants::SKYBOX_MODE) ?
             GL::REPEAT :
             GL::CLAMP_TO_EDGE;
       _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_S,
@@ -2647,14 +2641,14 @@ void Engine::_setTexture(unsigned int channel, BaseTexture* texture)
       internalTexture->_cachedWrapU = texture->wrapU;
 
       switch (texture->wrapU) {
-        case Texture::WRAP_ADDRESSMODE:
+        case TextureConstants::WRAP_ADDRESSMODE:
           _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::REPEAT);
           break;
-        case Texture::CLAMP_ADDRESSMODE:
+        case TextureConstants::CLAMP_ADDRESSMODE:
           _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S,
                              GL::CLAMP_TO_EDGE);
           break;
-        case Texture::MIRROR_ADDRESSMODE:
+        case TextureConstants::MIRROR_ADDRESSMODE:
           _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S,
                              GL::MIRRORED_REPEAT);
           break;
@@ -2666,14 +2660,14 @@ void Engine::_setTexture(unsigned int channel, BaseTexture* texture)
     if (internalTexture->_cachedWrapV != texture->wrapV) {
       internalTexture->_cachedWrapV = texture->wrapV;
       switch (texture->wrapV) {
-        case Texture::WRAP_ADDRESSMODE:
+        case TextureConstants::WRAP_ADDRESSMODE:
           _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T, GL::REPEAT);
           break;
-        case Texture::CLAMP_ADDRESSMODE:
+        case TextureConstants::CLAMP_ADDRESSMODE:
           _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T,
                              GL::CLAMP_TO_EDGE);
           break;
-        case Texture::MIRROR_ADDRESSMODE:
+        case TextureConstants::MIRROR_ADDRESSMODE:
           _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T,
                              GL::MIRRORED_REPEAT);
           break;
@@ -2718,7 +2712,7 @@ void Engine::_setAnisotropicLevel(unsigned int key, BaseTexture* texture)
   auto value                      = texture->anisotropicFilteringLevel;
 
   if (texture->getInternalTexture()->samplingMode
-      == Texture::NEAREST_SAMPLINGMODE) {
+      == TextureConstants::NEAREST_SAMPLINGMODE) {
     value = 1;
   }
 
@@ -2926,7 +2920,7 @@ bool Engine::_canRenderToFloatTexture()
   if (_webGLVersion > 1.f) {
     return _caps.colorBufferFloat;
   }
-  return _canRenderToFramebuffer(Engine::TEXTURETYPE_FLOAT);
+  return _canRenderToFramebuffer(EngineConstants::TEXTURETYPE_FLOAT);
 }
 
 bool Engine::_canRenderToHalfFloatTexture()
@@ -2935,14 +2929,14 @@ bool Engine::_canRenderToHalfFloatTexture()
     return _caps.colorBufferFloat;
   }
 
-  return _canRenderToFramebuffer(Engine::TEXTURETYPE_HALF_FLOAT);
+  return _canRenderToFramebuffer(EngineConstants::TEXTURETYPE_HALF_FLOAT);
 }
 
 // Thank you :
-// Thank you :
 // http://stackoverflow.com/questions/28827511/webgl-ios-render-to-floating-point-texture
-bool Engine::_canRenderToFramebuffer(unsigned int type)
+bool Engine::_canRenderToFramebuffer(unsigned int /*type*/)
 {
+#if 0
   // clear existing errors
   while (_gl->getError() != GL::NO_ERROR) {
   }
@@ -2994,16 +2988,18 @@ bool Engine::_canRenderToFramebuffer(unsigned int type)
   }
 
   return successful;
+#endif
+  return true;
 }
 
 GL::GLenum Engine::_getWebGLTextureType(unsigned int type) const
 {
-  if (type == Engine::TEXTURETYPE_FLOAT) {
+  if (type == EngineConstants::TEXTURETYPE_FLOAT) {
     return GL::FLOAT;
   }
-  else if (type == Engine::TEXTURETYPE_HALF_FLOAT) {
+  else if (type == EngineConstants::TEXTURETYPE_HALF_FLOAT) {
     // Add Half Float Constant.
-    return Engine::HALF_FLOAT_OES;
+    return EngineConstants::HALF_FLOAT_OES;
   }
 
   return GL::UNSIGNED_BYTE;
@@ -3015,11 +3011,11 @@ GL::GLenum Engine::_getRGBABufferInternalSizedFormat(unsigned int type) const
     return GL::RGBA;
   }
 
-  if (type == Engine::TEXTURETYPE_FLOAT) {
-    return Engine::RGBA32F;
+  if (type == EngineConstants::TEXTURETYPE_FLOAT) {
+    return EngineConstants::RGBA32F;
   }
-  else if (type == Engine::TEXTURETYPE_HALF_FLOAT) {
-    return Engine::RGBA16F;
+  else if (type == EngineConstants::TEXTURETYPE_HALF_FLOAT) {
+    return EngineConstants::RGBA16F;
   }
 
   return GL::RGBA;
@@ -3055,7 +3051,7 @@ SamplingParameters Engine::GetSamplingParameters(unsigned int samplingMode,
 {
   GL::GLenum magFilter = GL::NEAREST;
   GL::GLenum minFilter = GL::NEAREST;
-  if (samplingMode == Texture::BILINEAR_SAMPLINGMODE) {
+  if (samplingMode == TextureConstants::BILINEAR_SAMPLINGMODE) {
     magFilter = GL::LINEAR;
     if (generateMipMaps) {
       minFilter = GL::LINEAR_MIPMAP_NEAREST;
@@ -3064,7 +3060,7 @@ SamplingParameters Engine::GetSamplingParameters(unsigned int samplingMode,
       minFilter = GL::LINEAR;
     }
   }
-  else if (samplingMode == Texture::TRILINEAR_SAMPLINGMODE) {
+  else if (samplingMode == TextureConstants::TRILINEAR_SAMPLINGMODE) {
     magFilter = GL::LINEAR;
     if (generateMipMaps) {
       minFilter = GL::LINEAR_MIPMAP_LINEAR;
@@ -3073,7 +3069,7 @@ SamplingParameters Engine::GetSamplingParameters(unsigned int samplingMode,
       minFilter = GL::LINEAR;
     }
   }
-  else if (samplingMode == Texture::NEAREST_SAMPLINGMODE) {
+  else if (samplingMode == TextureConstants::NEAREST_SAMPLINGMODE) {
     magFilter = GL::NEAREST;
     if (generateMipMaps) {
       minFilter = GL::NEAREST_MIPMAP_LINEAR;

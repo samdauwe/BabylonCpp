@@ -2,18 +2,19 @@
 #define BABYLON_ENGINE_ENGINE_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/fast_func.h>
 #include <babylon/core/structs.h>
 #include <babylon/engine/engine_capabilities.h>
+#include <babylon/engine/engine_constants.h>
 #include <babylon/engine/engine_options.h>
 #include <babylon/interfaces/idisposable.h>
-#include <babylon/materials/textures/texture.h>
+#include <babylon/materials/textures/texture_constants.h>
+#include <babylon/math/size.h>
 #include <babylon/math/viewport.h>
 #include <babylon/mesh/buffer_pointer.h>
 #include <babylon/tools/perf_counter.h>
 
 namespace BABYLON {
-
-struct RenderTargetOptions;
 
 /**
  * @brief The engine class is responsible for interfacing with all lower-level
@@ -32,76 +33,6 @@ public:
   using GLVertexArrayObjectPtr = std::unique_ptr<GL::IGLVertexArrayObject>;
 
 public:
-  // Const statics
-  static constexpr unsigned int ALPHA_DISABLE       = 0;
-  static constexpr unsigned int ALPHA_ADD           = 1;
-  static constexpr unsigned int ALPHA_COMBINE       = 2;
-  static constexpr unsigned int ALPHA_SUBTRACT      = 3;
-  static constexpr unsigned int ALPHA_MULTIPLY      = 4;
-  static constexpr unsigned int ALPHA_MAXIMIZED     = 5;
-  static constexpr unsigned int ALPHA_ONEONE        = 6;
-  static constexpr unsigned int ALPHA_PREMULTIPLIED = 7;
-
-  static constexpr unsigned int DELAYLOADSTATE_NONE      = 0;
-  static constexpr unsigned int DELAYLOADSTATE_LOADED    = 1;
-  static constexpr unsigned int DELAYLOADSTATE_LOADING   = 2;
-  static constexpr unsigned int DELAYLOADSTATE_NOTLOADED = 4;
-
-  static constexpr unsigned int TEXTUREFORMAT_ALPHA           = 0;
-  static constexpr unsigned int TEXTUREFORMAT_LUMINANCE       = 1;
-  static constexpr unsigned int TEXTUREFORMAT_LUMINANCE_ALPHA = 2;
-  static constexpr unsigned int TEXTUREFORMAT_RGB             = 4;
-  static constexpr unsigned int TEXTUREFORMAT_RGBA            = 5;
-
-  static constexpr unsigned int TEXTURETYPE_UNSIGNED_INT = 0;
-  static constexpr unsigned int TEXTURETYPE_FLOAT        = 1;
-  static constexpr unsigned int TEXTURETYPE_HALF_FLOAT   = 2;
-
-  // Depht or Stencil test Constants.
-  // Passed to depthFunction or stencilFunction to specify depth or stencil
-  // tests will never pass. i.e. Nothing will be drawn.
-  static constexpr unsigned int NEVER = 0x0200;
-  // Passed to depthFunction or stencilFunction to specify depth or stencil
-  // tests will always pass. i.e. Pixels will be drawn in the order they are
-  // drawn.
-  static constexpr unsigned int ALWAYS = 0x0207;
-  // Passed to depthFunction or stencilFunction to specify depth or stencil
-  // tests will pass if the new depth value is less than the stored value.
-  static constexpr unsigned int LESS = 0x0201;
-  // Passed to depthFunction or stencilFunction to specify depth or stencil
-  // tests will pass if the new depth value is equals to the stored value.
-  static constexpr unsigned int EQUAL = 0x0202;
-  // Passed to depthFunction or stencilFunction to specify depth or stencil
-  // tests will pass if the new depth value is less than or equal to the stored
-  // value.
-  static constexpr unsigned int LEQUAL = 0x0203;
-  // Passed to depthFunction or stencilFunction to specify depth or stencil
-  // tests will pass if the new depth value is greater than the stored value.
-  static constexpr unsigned int GREATER = 0x0204;
-  // Passed to depthFunction or stencilFunction to specify depth or stencil
-  // tests will pass if the new depth value is greater than or equal to the
-  // stored value.
-  static constexpr unsigned int GEQUAL = 0x0206;
-  // Passed to depthFunction or stencilFunction to specify depth or stencil
-  // tests will pass if the new depth value is not equal to the stored value.
-  static constexpr unsigned int NOTEQUAL = 0x0205;
-
-  // Half floating-point type (16-bit).
-  static constexpr unsigned int HALF_FLOAT_OES = 0x8D61;
-  // RGBA 16-bit floating-point color-renderable internal sized format.
-  static constexpr unsigned int RGBA16F = 0x881A;
-  // RGBA 32-bit floating-point color-renderable internal sized format.
-  static constexpr unsigned int RGBA32F = 0x8814;
-
-  // Stencil Actions Constants.
-  static constexpr unsigned int KEEP      = 0x1E00;
-  static constexpr unsigned int REPLACE   = 0x1E01;
-  static constexpr unsigned int INCR      = 0x1E02;
-  static constexpr unsigned int DECR      = 0x1E03;
-  static constexpr unsigned int INVERT    = 0x150A;
-  static constexpr unsigned int INCR_WRAP = 0x8507;
-  static constexpr unsigned int DECR_WRAP = 0x8508;
-
   static std::string Version();
 
   // Updatable statics so stick with vars here
@@ -397,18 +328,18 @@ public:
   GL::IGLTexture* createTexture(const std::vector<std::string>& list,
                                 bool noMipmap, bool invertY, Scene* scene,
                                 unsigned int samplingMode
-                                = Texture::TRILINEAR_SAMPLINGMODE,
+                                = TextureConstants::TRILINEAR_SAMPLINGMODE,
                                 const std::function<void()>& onLoad  = nullptr,
                                 const std::function<void()>& onError = nullptr,
                                 Buffer* buffer                       = nullptr);
   GL::IGLTexture*
   createTexture(const std::string& urlArg, bool noMipmap, bool invertY,
-                Scene* scene,
-                unsigned int samplingMode = Texture::TRILINEAR_SAMPLINGMODE,
+                Scene* scene, unsigned int samplingMode
+                              = TextureConstants::TRILINEAR_SAMPLINGMODE,
                 const std::function<void()>& onLoad  = nullptr,
                 const std::function<void()>& onError = nullptr,
                 Buffer* buffer = nullptr, GL::IGLTexture* fallBack = nullptr,
-                unsigned int format = Engine::TEXTUREFORMAT_RGBA);
+                unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
   void updateRawTexture(GL::IGLTexture* texture, const Uint8Array& data,
                         unsigned int format, bool invertY = true,
                         const std::string& compression = "");
@@ -423,14 +354,15 @@ public:
                                  GL::IGLTexture* texture);
   void updateDynamicTexture(GL::IGLTexture* texture, ICanvas* canvas,
                             bool invertY, bool premulAlpha = false,
-                            unsigned int format = Engine::TEXTUREFORMAT_RGBA);
-  GL::IGLTexture* createRenderTargetTexture(ISize size,
-                                            const RenderTargetOptions& options);
+                            unsigned int format
+                            = EngineConstants::TEXTUREFORMAT_RGBA);
+  GL::IGLTexture*
+  createRenderTargetTexture(ISize size, const IRenderTargetOptions& options);
   unsigned int updateRenderTargetTextureSampleCount(GL::IGLTexture* texture,
                                                     unsigned int samples);
   GL::IGLTexture*
   createRenderTargetCubeTexture(const ISize& size,
-                                const RenderTargetOptions& options);
+                                const IRenderTargetOptions& options);
   GL::IGLTexture*
   createCubeTexture(const std::string& rootUrl, Scene* scene,
                     const std::vector<std::string>& extensions, bool noMipmap,
@@ -497,7 +429,7 @@ public:
     int width, int height, bool noMipmap, bool isCompressed,
     const std::function<void(int width, int height)>& processFunction,
     bool invertY              = true,
-    unsigned int samplingMode = Texture::TRILINEAR_SAMPLINGMODE);
+    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
 protected:
   /**
@@ -642,14 +574,6 @@ private:
   std::string _textureFormatInUse;
 
 }; // end of class Engine
-
-struct RenderTargetOptions {
-  bool generateMipMaps       = false;
-  bool generateDepthBuffer   = true;
-  bool generateStencilBuffer = false;
-  unsigned int type          = Engine::TEXTURETYPE_UNSIGNED_INT;
-  unsigned int samplingMode  = Texture::TRILINEAR_SAMPLINGMODE;
-}; // end of struct RenderTargetOptions
 
 } // end of namespace BABYLON
 
