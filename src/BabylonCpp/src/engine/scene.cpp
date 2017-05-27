@@ -4,11 +4,13 @@
 #include <babylon/actions/action_manager.h>
 #include <babylon/animations/animatable.h>
 #include <babylon/audio/sound_track.h>
+#include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/cameras/free_camera.h>
+#include <babylon/cameras/target_camera.h>
 #include <babylon/collisions/collision_coordinator_legacy.h>
 #include <babylon/collisions/collision_coordinator_worker.h>
 #include <babylon/collisions/icollision_coordinator.h>
@@ -100,6 +102,7 @@ Scene::Scene(Engine* engine)
     , _cachedMaterial{nullptr}
     , _cachedEffect{nullptr}
     , _cachedVisibility{0.f}
+    , offscreenRenderTarget{nullptr}
     , _onDisposeObserver{nullptr}
     , _onBeforeRenderObserver{nullptr}
     , _onAfterRenderObserver{nullptr}
@@ -373,13 +376,18 @@ void Scene::setMirroredCameraPosition(const Vector3& newPosition)
   _mirroredCameraPosition = std::make_unique<Vector3>(newPosition);
 }
 
-StandardMaterial* Scene::defaultMaterial()
+Material* Scene::defaultMaterial()
 {
   if (!_defaultMaterial) {
     _defaultMaterial = StandardMaterial::New("default material", this);
   }
 
   return _defaultMaterial;
+}
+
+void Scene::setDefaultMaterial(Material* value)
+{
+  _defaultMaterial = value;
 }
 
 std::array<Plane, 6>& Scene::frustumPlanes()
@@ -475,7 +483,7 @@ bool Scene::isCachedMaterialValid(Material* material, Effect* effect,
                                   float visibility)
 {
   return _cachedEffect != effect || _cachedMaterial != material
-         || _cachedVisibility != visibility;
+         || !stl_util::almost_equal(_cachedVisibility, visibility);
 }
 
 BoundingBoxRenderer* Scene::getBoundingBoxRenderer()
@@ -2173,7 +2181,12 @@ void Scene::_renderForCamera(Camera* camera)
   }
 
   if (needsRestoreFrameBuffer) {
-    engine->restoreDefaultFramebuffer();
+    if (offscreenRenderTarget) {
+      engine->bindFramebuffer(offscreenRenderTarget->_texture);
+    }
+    else {
+      engine->restoreDefaultFramebuffer(); // Restore back buffer
+    }
   }
 
   _renderTargetsDuration.endMonitoring(false);
@@ -2383,6 +2396,17 @@ void Scene::render()
   if (!customRenderTargets.empty()) { // Restore back buffer
     engine->restoreDefaultFramebuffer();
   }
+
+  if (offscreenRenderTarget) {
+    engine->bindFramebuffer(offscreenRenderTarget->_texture);
+  }
+  else {
+    // Restore back buffer
+    if (!customRenderTargets.empty()) {
+      engine->restoreDefaultFramebuffer();
+    }
+  }
+
   _renderTargetsDuration.endMonitoring();
   activeCamera = currentActiveCamera;
 
@@ -2596,6 +2620,8 @@ void Scene::dispose(bool /*doNotRecurse*/)
 
   skeletons.clear();
   morphTargetManagers.clear();
+
+  importedMeshesFiles.clear();
 
   if (_depthRenderer) {
     _depthRenderer->dispose();
@@ -2971,35 +2997,31 @@ void Scene::createDefaultCameraOrLight(bool createArcRotateCamera)
 
   // Camera
   if (!activeCamera) {
-    // Compute position
     auto worldExtends = getWorldExtends();
-    auto worldCenter  = worldExtends.min.add(
-      worldExtends.max.subtract(worldExtends.min).scale(0.5f));
+    auto worldSize    = worldExtends.max.subtract(worldExtends.min);
+    auto worldCenter  = worldExtends.min.add(worldSize.scale(0.5f));
 
+    TargetCamera* camera = nullptr;
+    auto radius          = worldSize.length() * 1.5f;
     if (createArcRotateCamera) {
-      auto camera = ArcRotateCamera::New("default camera", 0, 0, 10,
-                                         Vector3::Zero(), this);
-      camera->setPosition(Vector3(
-        worldCenter.x, worldCenter.y,
-        worldExtends.min.z - (worldExtends.max.z - worldExtends.min.z)));
-      camera->lowerRadiusLimit = 0.5f;
-      camera->setTarget(worldCenter);
-      camera->minZ = 0.1f;
-      // auto maxDist = worldExtends.max.subtract(worldExtends.min).length();
-      // camera->wheelPrecision = 100.f / maxDist;
-      activeCamera = camera;
+      auto arcRotateCamera = ArcRotateCamera::New(
+        "default camera", 4.712f, 1.571f, radius, worldCenter, this);
+      arcRotateCamera->lowerRadiusLimit = radius * 0.01f;
+      arcRotateCamera->wheelPrecision   = 100.f / radius;
+      camera                            = arcRotateCamera;
     }
     else {
-      auto camera = FreeCamera::New("default camera", Vector3::Zero(), this);
-      camera->position = Vector3(worldCenter.x, worldCenter.y,
-                                 worldExtends.min.z
-                                   - (worldExtends.max.z - worldExtends.min.z));
-      camera->setTarget(worldCenter);
-      camera->minZ = 0.1f;
-      // auto maxDist = worldExtends.max.subtract(worldExtends.min).length();
-      // camera->wheelPrecision = 100.f / maxDist;
-      activeCamera = camera;
+      auto freeCamera = FreeCamera::New(
+        "default camera", Vector3(worldCenter.x, worldCenter.y,
+                                  useRightHandedSystem ? -radius : radius),
+        this);
+      freeCamera->setTarget(worldCenter);
+      camera = freeCamera;
     }
+    camera->minZ  = radius * 0.01f;
+    camera->maxZ  = radius * 100.f;
+    camera->speed = radius * 0.2f;
+    activeCamera  = camera;
   }
 }
 

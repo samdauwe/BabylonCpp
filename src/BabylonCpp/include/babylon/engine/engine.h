@@ -12,6 +12,7 @@
 #include <babylon/math/size.h>
 #include <babylon/math/viewport.h>
 #include <babylon/mesh/buffer_pointer.h>
+#include <babylon/tools/observable.h>
 #include <babylon/tools/perf_counter.h>
 
 namespace BABYLON {
@@ -100,6 +101,7 @@ public:
   void setStencilOperationFail(unsigned int operation);
   void setStencilOperationDepthFail(unsigned int operation);
   void setStencilOperationPass(unsigned int operation);
+  void setDitheringState(bool value);
 
   /**
    * @brief Stop executing a render loop function and remove it from the
@@ -486,6 +488,11 @@ public:
   // To enable/disable IDB support and avoid XHR on .manifest
   bool enableOfflineSupport;
   std::vector<Scene*> scenes;
+  // Observables
+  /**
+   * Observable event triggered each time the rendering canvas is resized.
+   */
+  Observable<Engine> onResizeObservable;
   // WebVR
   // The new WebVR uses promises.
   // this promise resolves with the current devices available.

@@ -439,6 +439,16 @@ void Engine::setStencilOperationPass(unsigned int operation)
   _stencilState->setStencilOpStencilDepthPass(operation);
 }
 
+void Engine::setDitheringState(bool value)
+{
+  if (value) {
+    _gl->enable(GL::DITHER);
+  }
+  else {
+    _gl->disable(GL::DITHER);
+  }
+}
+
 void Engine::stopRenderLoop(const FastFunc<void()>& renderFunction)
 {
   if (renderFunction == nullptr) {
@@ -649,6 +659,10 @@ void Engine::resize()
 
 void Engine::setSize(int width, int height)
 {
+  if (_renderingCanvas->width == width && _renderingCanvas->height == height) {
+    return;
+  }
+
   _renderingCanvas->width  = width;
   _renderingCanvas->height = height;
 
@@ -656,6 +670,10 @@ void Engine::setSize(int width, int height)
     for (auto& cam : scene->cameras) {
       cam->_currentRenderId = 0;
     }
+  }
+
+  if (onResizeObservable.hasObservers()) {
+    onResizeObservable.notifyObservers(this);
   }
 }
 
@@ -1161,7 +1179,7 @@ void Engine::unbindInstanceAttributes()
   GL::IGLBuffer* boundBuffer = nullptr;
   for (size_t i = 0, ul = _currentInstanceLocations.size(); i < ul; ++i) {
     auto instancesBuffer = _currentInstanceBuffers[i];
-    if (boundBuffer != instancesBuffer) {
+    if (boundBuffer != instancesBuffer && instancesBuffer->references) {
       boundBuffer = instancesBuffer;
       bindArrayBuffer(instancesBuffer);
     }
@@ -2803,7 +2821,9 @@ void Engine::dispose(bool /*doNotRecurse*/)
   scenes.clear();
 
   // Release audio engine
-  // Engine::audioEngine->dispose();
+  // if (Engine::audioEngine) {
+  //  Engine::audioEngine->dispose();
+  // }
 
   // Release effects
   releaseEffects();
@@ -2825,12 +2845,16 @@ void Engine::dispose(bool /*doNotRecurse*/)
 // Loading screen
 void Engine::displayLoadingUI()
 {
-  _loadingScreen->displayLoadingUI();
+  if (_loadingScreen) {
+    _loadingScreen->displayLoadingUI();
+  }
 }
 
 void Engine::hideLoadingUI()
 {
-  _loadingScreen->hideLoadingUI();
+  if (_loadingScreen) {
+    _loadingScreen->hideLoadingUI();
+  }
 }
 
 ILoadingScreen* Engine::loadingScreen()

@@ -79,7 +79,8 @@ public:
   void setClipPlane(const Plane& plane);
   void resetClipPlane();
   void setMirroredCameraPosition(const Vector3& newPosition);
-  StandardMaterial* defaultMaterial();
+  Material* defaultMaterial();
+  void setDefaultMaterial(Material* value);
   std::array<Plane, 6>& frustumPlanes();
   const std::array<Plane, 6>& frustumPlanes() const;
   DebugLayer* debugLayer();
@@ -847,6 +848,7 @@ public:
   std::vector<IDisposable*> _toBeDisposed;
   std::vector<ParticleSystem*> _activeParticleSystems;
   std::vector<Animatable*> _activeAnimatables;
+  RenderTargetTexture* offscreenRenderTarget;
 
 private:
   // Events
@@ -915,7 +917,7 @@ private:
   // Geometries
   std::vector<std::unique_ptr<Geometry>> _geometries;
   // Materials
-  StandardMaterial* _defaultMaterial;
+  Material* _defaultMaterial;
   // Textures
   bool _texturesEnabled;
   // Skeletons
