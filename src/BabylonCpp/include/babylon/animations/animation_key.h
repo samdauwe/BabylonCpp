@@ -7,14 +7,14 @@
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT AnimationKey {
+struct BABYLON_SHARED_EXPORT AnimationKey {
 
-public:
   AnimationKey(int frame, AnimationValue value);
 
-public:
   int frame;
   AnimationValue value;
+  AnimationValue inTangent;
+  AnimationValue outTangent;
 
 }; // end of class AnimationKey
 

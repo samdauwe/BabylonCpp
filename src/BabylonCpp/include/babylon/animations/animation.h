@@ -81,15 +81,32 @@ public:
   void setEasingFunction(IEasingFunction* easingFunction);
   float floatInterpolateFunction(float startValue, float endValue,
                                  float gradient) const;
+  float floatInterpolateFunctionWithTangents(float startValue, float outTangent,
+                                             float endValue, float inTangent,
+                                             float gradient) const;
   Quaternion quaternionInterpolateFunction(const Quaternion& startValue,
                                            const Quaternion& endValue,
                                            float gradient) const;
+  Quaternion quaternionInterpolateFunctionWithTangents(
+    const Quaternion& startValue, const Quaternion& outTangent,
+    const Quaternion& endValue, const Quaternion& inTangent,
+    float gradient) const;
   Vector3 vector3InterpolateFunction(const Vector3& startValue,
                                      const Vector3& endValue,
                                      float gradient) const;
+  Vector3 vector3InterpolateFunctionWithTangents(const Vector3& startValue,
+                                                 const Vector3& outTangent,
+                                                 const Vector3& endValue,
+                                                 const Vector3& inTangent,
+                                                 float gradient) const;
   Vector2 vector2InterpolateFunction(const Vector2& startValue,
                                      const Vector2& endValue,
                                      float gradient) const;
+  Vector2 vector2InterpolateFunctionWithTangents(const Vector2& startValue,
+                                                 const Vector2& outTangent,
+                                                 const Vector2& endValue,
+                                                 const Vector2& inTangent,
+                                                 float gradient) const;
   Size sizeInterpolateFunction(const Size& startValue, const Size& endValue,
                                float gradient) const;
   Color3 color3InterpolateFunction(const Color3& startValue,

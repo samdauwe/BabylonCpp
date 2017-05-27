@@ -9,6 +9,7 @@
 #include <babylon/math/color3.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/quaternion.h>
+#include <babylon/math/scalar.h>
 #include <babylon/math/size.h>
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector3.h>
@@ -219,7 +220,16 @@ void Animation::setEasingFunction(IEasingFunction* easingFunction)
 float Animation::floatInterpolateFunction(float startValue, float endValue,
                                           float gradient) const
 {
-  return startValue + (endValue - startValue) * gradient;
+  return Scalar::Lerp(startValue, endValue, gradient);
+}
+
+float Animation::floatInterpolateFunctionWithTangents(float startValue,
+                                                      float outTangent,
+                                                      float endValue,
+                                                      float inTangent,
+                                                      float gradient) const
+{
+  return Scalar::Hermite(startValue, outTangent, endValue, inTangent, gradient);
 }
 
 Quaternion
@@ -230,6 +240,15 @@ Animation::quaternionInterpolateFunction(const Quaternion& startValue,
   return Quaternion::Slerp(startValue, endValue, gradient);
 }
 
+Quaternion Animation::quaternionInterpolateFunctionWithTangents(
+  const Quaternion& startValue, const Quaternion& outTangent,
+  const Quaternion& endValue, const Quaternion& inTangent, float gradient) const
+{
+  return Quaternion::Hermite(startValue, outTangent, endValue, inTangent,
+                             gradient)
+    .normalize();
+}
+
 Vector3 Animation::vector3InterpolateFunction(const Vector3& startValue,
                                               const Vector3& endValue,
                                               float gradient) const
@@ -237,11 +256,27 @@ Vector3 Animation::vector3InterpolateFunction(const Vector3& startValue,
   return Vector3::Lerp(startValue, endValue, gradient);
 }
 
+Vector3 Animation::vector3InterpolateFunctionWithTangents(
+  const Vector3& startValue, const Vector3& outTangent, const Vector3& endValue,
+  const Vector3& inTangent, float gradient) const
+{
+  return Vector3::Hermite(startValue, outTangent, endValue, inTangent,
+                          gradient);
+}
+
 Vector2 Animation::vector2InterpolateFunction(const Vector2& startValue,
                                               const Vector2& endValue,
                                               float gradient) const
 {
   return Vector2::Lerp(startValue, endValue, gradient);
+}
+
+Vector2 Animation::vector2InterpolateFunctionWithTangents(
+  const Vector2& startValue, const Vector2& outTangent, const Vector2& endValue,
+  const Vector2& inTangent, float gradient) const
+{
+  return Vector2::Hermite(startValue, outTangent, endValue, inTangent,
+                          gradient);
 }
 
 Size Animation::sizeInterpolateFunction(const Size& startValue,
@@ -330,16 +365,21 @@ AnimationValue Animation::_interpolate(int iCurrentFrame, int repeatCount,
 
   for (size_t key = static_cast<unsigned int>(startKey); key < _keys.size();
        ++key) {
-    if (_keys[key + 1].frame >= currentFrame) {
+    const auto& endKey = _keys[key + 1];
 
-      const auto startValue = _getKeyValue(_keys[key].value);
-      const auto endValue   = _getKeyValue(_keys[key + 1].value);
+    if (endKey.frame >= currentFrame) {
+
+      const auto& startKey  = _keys[key];
+      const auto startValue = _getKeyValue(startKey.value);
+      const auto endValue   = _getKeyValue(endKey.value);
+
+      bool useTangent = startKey.outTangent && endKey.inTangent;
+      int frameDelta  = endKey.frame - startKey.frame;
 
       // gradient : percent of currentFrame between the frame inf and the frame
       // sup
       float gradient
-        = static_cast<float>(currentFrame - _keys[key].frame)
-          / static_cast<float>(_keys[key + 1].frame - _keys[key].frame);
+        = static_cast<float>(currentFrame - startKey.frame) / frameDelta;
 
       // check for easingFunction and correction of gradient
       if (_easingFunction != nullptr) {
@@ -350,78 +390,98 @@ AnimationValue Animation::_interpolate(int iCurrentFrame, int repeatCount,
 
       switch (dataType) {
         // Float
-        case Animation::ANIMATIONTYPE_FLOAT:
+        case Animation::ANIMATIONTYPE_FLOAT: {
+          const auto floatValue
+            = useTangent ?
+                floatInterpolateFunctionWithTangents(
+                  startValue.floatData, startKey.outTangent * frameDelta,
+                  endValue.floatData, endKey.inTangent * frameDelta, gradient) :
+                floatInterpolateFunction(startValue.floatData,
+                                         endValue.floatData, gradient);
           switch (loopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE:
             case Animation::ANIMATIONLOOPMODE_CONSTANT:
-              newVale.floatData = floatInterpolateFunction(
-                startValue.floatData, endValue.floatData, gradient);
+              newVale.floatData = floatValue;
               return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE:
               newVale.floatData
-                = offsetValue.floatData * _repeatCount
-                  + floatInterpolateFunction(startValue.floatData,
-                                             endValue.floatData, gradient);
+                = offsetValue.floatData * _repeatCount + floatValue;
               return newVale;
             default:
               break;
           }
-          break;
+        } break;
         // Quaternion
-        case Animation::ANIMATIONTYPE_QUATERNION:
+        case Animation::ANIMATIONTYPE_QUATERNION: {
+          const auto quatValue
+            = useTangent ?
+                quaternionInterpolateFunctionWithTangents(
+                  startValue.quaternionData,
+                  startKey.outTangent.quaternionData.scale(frameDelta),
+                  endValue.quaternionData,
+                  endKey.inTangent.quaternionData.scale(frameDelta), gradient) :
+                quaternionInterpolateFunction(
+                  startValue.quaternionData, endValue.quaternionData, gradient);
           switch (loopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE:
             case Animation::ANIMATIONLOOPMODE_CONSTANT:
-              newVale.quaternionData = quaternionInterpolateFunction(
-                startValue.quaternionData, endValue.quaternionData, gradient);
-              return newVale;
+              newVale.quaternionData = quatValue;
             case Animation::ANIMATIONLOOPMODE_RELATIVE:
               newVale.quaternionData
-                = quaternionInterpolateFunction(startValue.quaternionData,
-                                                endValue.quaternionData,
-                                                gradient)
-                    .add(offsetValue.quaternionData.scale(_repeatCount));
+                = quatValue.add(offsetValue.quaternionData.scale(_repeatCount));
               return newVale;
             default:
               break;
           }
-          break;
+        } break;
         // Vector3
-        case Animation::ANIMATIONTYPE_VECTOR3:
+        case Animation::ANIMATIONTYPE_VECTOR3: {
+          const auto vec3Value
+            = useTangent ?
+                vector3InterpolateFunctionWithTangents(
+                  startValue.vector3Data,
+                  startKey.outTangent.vector3Data.scale(frameDelta),
+                  endValue.vector3Data,
+                  endKey.inTangent.vector3Data.scale(frameDelta), gradient) :
+                vector3InterpolateFunction(startValue.vector3Data,
+                                           endValue.vector3Data, gradient);
           switch (loopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE:
             case Animation::ANIMATIONLOOPMODE_CONSTANT:
-              newVale.vector3Data = vector3InterpolateFunction(
-                startValue.vector3Data, endValue.vector3Data, gradient);
+              newVale.vector3Data = vec3Value;
               return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE:
               newVale.vector3Data
-                = vector3InterpolateFunction(startValue.vector3Data,
-                                             endValue.vector3Data, gradient)
-                    .add(offsetValue.vector3Data.scale(_repeatCount));
+                = vec3Value.add(offsetValue.vector3Data.scale(_repeatCount));
               return newVale;
             default:
               break;
           }
-          break;
+        } break;
         // Vector2
-        case Animation::ANIMATIONTYPE_VECTOR2:
+        case Animation::ANIMATIONTYPE_VECTOR2: {
+          const auto vec2Value
+            = useTangent ?
+                vector2InterpolateFunctionWithTangents(
+                  startValue.vector2Data,
+                  startKey.outTangent.vector2Data.scale(frameDelta),
+                  endValue.vector2Data,
+                  endKey.inTangent.vector2Data.scale(frameDelta), gradient) :
+                vector2InterpolateFunction(startValue.vector2Data,
+                                           endValue.vector2Data, gradient);
           switch (loopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE:
             case Animation::ANIMATIONLOOPMODE_CONSTANT:
-              newVale.vector2Data = vector2InterpolateFunction(
-                startValue.vector2Data, endValue.vector2Data, gradient);
+              newVale.vector2Data = vec2Value;
               return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE:
               newVale.vector2Data
-                = vector2InterpolateFunction(startValue.vector2Data,
-                                             endValue.vector2Data, gradient)
-                    .add(offsetValue.vector2Data.scale(_repeatCount));
+                = vec2Value.add(offsetValue.vector2Data.scale(_repeatCount));
               return newVale;
             default:
               break;
           }
-          break;
+        } break;
         // Size
         case Animation::ANIMATIONTYPE_SIZE:
           switch (loopMode) {

@@ -34,7 +34,7 @@ class InterpolateValueAction;
 class Animatable;
 class Animation;
 class AnimationEvent;
-class AnimationKey;
+struct AnimationKey;
 class AnimationRange;
 class AnimationValue;
 struct IAnimatable;

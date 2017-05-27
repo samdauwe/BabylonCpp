@@ -35,6 +35,11 @@ public:
   AnimationValue operator[](const std::string& property);
   AnimationValue copy() const;
 
+  operator bool() const
+  {
+    return dataType != -1;
+  }
+
   any getValue() const;
 
 public:
