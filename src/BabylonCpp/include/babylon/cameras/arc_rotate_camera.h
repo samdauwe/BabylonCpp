@@ -84,6 +84,7 @@ public:
   float inertialPanningX;
   float inertialPanningY;
   float zoomOnFactor;
+  float wheelPrecision;
   Vector2 targetScreenOffset;
   bool allowUpsideDown;
   Matrix _viewMatrix;
