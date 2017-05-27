@@ -86,20 +86,24 @@ void SkeletonViewer::_getLinesForBonesWithLength(
 {
   _resizeDebugLines(bones.size());
 
+  auto meshPos   = mesh->position();
   unsigned int i = 0;
   for (auto& bone : bones) {
-    _getBonePosition(_debugLines[i][0], bone.get(), meshMat);
-    _getBonePosition(_debugLines[i][1], bone.get(), meshMat, 0, bones.size(),
-                     0);
+    auto& points = _debugLines[i];
+    _getBonePosition(points[0], bone.get(), meshMat);
+    _getBonePosition(points[1], bone.get(), meshMat, 0, bones.size(), 0);
+    points[0].subtractInPlace(meshPos);
+    points[1].subtractInPlace(meshPos);
     ++i;
   }
 }
 
 void SkeletonViewer::_getLinesForBonesNoLength(
-  const std::vector<std::unique_ptr<Bone>>& bones, const Matrix& meshMat)
+  const std::vector<std::unique_ptr<Bone>>& bones, const Matrix& /*meshMat*/)
 {
   _resizeDebugLines(bones.size());
 
+  auto meshPos         = mesh->position();
   unsigned int boneNum = 0;
   for (size_t i = bones.size(); i-- > 0;) {
     auto childBone  = bones[i].get();
@@ -107,8 +111,11 @@ void SkeletonViewer::_getLinesForBonesNoLength(
     if (!parentBone) {
       continue;
     }
-    _getBonePosition(_debugLines[boneNum][0], childBone, meshMat);
-    _getBonePosition(_debugLines[boneNum][1], parentBone, meshMat);
+    auto& points = _debugLines[i];
+    childBone->getAbsolutePositionToRef(mesh, points[0]);
+    parentBone->getAbsolutePositionToRef(mesh, points[1]);
+    points[0].subtractInPlace(meshPos);
+    points[1].subtractInPlace(meshPos);
     ++boneNum;
   }
 }
@@ -127,8 +134,8 @@ void SkeletonViewer::_resizeDebugLines(size_t bonesSize)
 
 void SkeletonViewer::update()
 {
-  if (autoUpdateBonesMatrices && (!skeleton->bones.empty())) {
-    _updateBoneMatrix(skeleton->bones[0].get());
+  if (autoUpdateBonesMatrices) {
+    skeleton->computeAbsoluteTransforms();
   }
 
   if (!skeleton->bones.empty() && skeleton->bones[0]->length == -1) {
@@ -150,20 +157,8 @@ void SkeletonViewer::update()
     options.instance = _debugMesh;
     MeshBuilder::CreateLineSystem("", options, _scene);
   }
+  _debugMesh->position().copyFrom(mesh->position());
   _debugMesh->color = color;
-}
-
-void SkeletonViewer::_updateBoneMatrix(Bone* bone)
-{
-  if (bone->getParent()) {
-    bone->getLocalMatrix().multiplyToRef(
-      bone->getParent()->getAbsoluteTransform(), bone->getAbsoluteTransform());
-  }
-
-  auto& children = bone->children;
-  for (auto& child : children) {
-    _updateBoneMatrix(child);
-  }
 }
 
 void SkeletonViewer::dispose()

@@ -37,41 +37,27 @@ AxesViewer::~AxesViewer()
 void AxesViewer::update(const Vector3& position, const Vector3& xaxis,
                         const Vector3& yaxis, const Vector3& zaxis)
 {
-  {
-    auto& point1 = _xline[0];
-    auto& point2 = _xline[1];
-    point1.x     = position.x;
-    point1.y     = position.y;
-    point1.z     = position.z;
-    point2.x     = point1.x + xaxis.x * scaleLines;
-    point2.y     = point1.y + xaxis.y * scaleLines;
-    point2.z     = point1.z + xaxis.z * scaleLines;
-    Mesh::CreateLines("xline", _xline, nullptr, false, _xmesh);
-  }
+  _xmesh->position().copyFrom(position);
+  _ymesh->position().copyFrom(position);
+  _zmesh->position().copyFrom(position);
 
-  {
-    auto& point1 = _yline[0];
-    auto& point2 = _yline[1];
-    point1.x     = position.x;
-    point1.y     = position.y;
-    point1.z     = position.z;
-    point2.x     = point1.x + yaxis.x * scaleLines;
-    point2.y     = point1.y + yaxis.y * scaleLines;
-    point2.z     = point1.z + yaxis.z * scaleLines;
-    Mesh::CreateLines("yline", _yline, nullptr, false, _ymesh);
-  }
+  auto point2 = _xline[1];
+  point2.x    = xaxis.x * scaleLines;
+  point2.y    = xaxis.y * scaleLines;
+  point2.z    = xaxis.z * scaleLines;
+  Mesh::CreateLines(nullptr, _xline, nullptr, false, _xmesh);
 
-  {
-    auto& point1 = _zline[0];
-    auto& point2 = _zline[1];
-    point1.x     = position.x;
-    point1.y     = position.y;
-    point1.z     = position.z;
-    point2.x     = point1.x + zaxis.x * scaleLines;
-    point2.y     = point1.y + zaxis.y * scaleLines;
-    point2.z     = point1.z + zaxis.z * scaleLines;
-    Mesh::CreateLines("zline", _zline, nullptr, false, _zmesh);
-  }
+  point2   = _yline[1];
+  point2.x = yaxis.x * scaleLines;
+  point2.y = yaxis.y * scaleLines;
+  point2.z = yaxis.z * scaleLines;
+  Mesh::CreateLines(nullptr, _yline, nullptr, false, _ymesh);
+
+  point2   = _zline[1];
+  point2.x = zaxis.x * scaleLines;
+  point2.y = zaxis.y * scaleLines;
+  point2.z = zaxis.z * scaleLines;
+  Mesh::CreateLines(nullptr, _zline, nullptr, false, _zmesh);
 }
 
 void AxesViewer::dispose()

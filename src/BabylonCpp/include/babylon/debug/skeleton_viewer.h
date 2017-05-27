@@ -29,7 +29,6 @@ private:
   void
   _getLinesForBonesNoLength(const std::vector<std::unique_ptr<Bone>>& bones,
                             const Matrix& meshMat);
-  void _updateBoneMatrix(Bone* bone);
 
 public:
   Color3 color;
