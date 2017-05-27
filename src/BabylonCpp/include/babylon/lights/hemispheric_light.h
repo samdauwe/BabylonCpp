@@ -60,6 +60,7 @@ protected:
    * The HemisphericLight can't cast shadows.
    * Documentation : http://doc.babylonjs.com/tutorials/lights
    */
+  HemisphericLight(const std::string& name, Scene* scene);
   HemisphericLight(const std::string& name, const Vector3& direction,
                    Scene* scene);
 

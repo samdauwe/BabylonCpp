@@ -7,6 +7,11 @@
 
 namespace BABYLON {
 
+HemisphericLight::HemisphericLight(const std::string& iName, Scene* scene)
+    : HemisphericLight(iName, Vector3::Up(), scene)
+{
+}
+
 HemisphericLight::HemisphericLight(const std::string& iName,
                                    const Vector3& iDirection, Scene* scene)
     : Light{iName, scene}
