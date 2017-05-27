@@ -129,6 +129,32 @@ const Matrix& Bone::getAbsoluteTransform() const
   return _absoluteTransform;
 }
 
+// Properties (matches AbstractMesh properties)
+Vector3 Bone::position() const
+{
+  return getPosition();
+}
+
+Vector3 Bone::rotation() const
+{
+  return getRotation();
+}
+
+Quaternion Bone::rotationQuaternion() const
+{
+  return getRotationQuaternion();
+}
+
+Vector3 Bone::scaling() const
+{
+  return getScale();
+}
+
+void Bone::setScaling(const Vector3& newScaling)
+{
+  setScale(newScaling.x, newScaling.y, newScaling.z);
+}
+
 // Methods
 std::vector<Animation*> Bone::getAnimations()
 {

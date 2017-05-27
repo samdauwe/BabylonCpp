@@ -38,6 +38,13 @@ public:
   Matrix& getAbsoluteTransform();
   const Matrix& getAbsoluteTransform() const;
 
+  /** Properties (matches AbstractMesh properties) **/
+  Vector3 position() const;
+  Vector3 rotation() const;
+  Quaternion rotationQuaternion() const;
+  Vector3 scaling() const;
+  void setScaling(const Vector3& newScaling);
+
   /** Methods **/
   std::vector<Animation*> getAnimations() override;
   void updateMatrix(const Matrix& matrix, bool updateDifferenceMatrix = true);
