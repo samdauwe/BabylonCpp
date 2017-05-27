@@ -359,7 +359,7 @@ void World::step()
   ContactLink* link = nullptr;
   Contact* contact  = nullptr;
   bool exists       = false;
-  for (unsigned int i = broadPhase->numPairs - 1; i-- > 0;) {
+  for (unsigned int i = broadPhase->numPairs; i-- > 0;) {
     auto pair = pairs[i];
     if (pair.shape1->id < pair.shape2->id) {
       s1 = pair.shape1;
@@ -548,7 +548,7 @@ void World::step()
 
     // update velocities
     auto gVel = Vec3().addScaledVector(gravity, timeStep);
-    for (unsigned int j = islandNumRigidBodies - 1; j-- > 0;) {
+    for (unsigned int j = islandNumRigidBodies; j-- > 0;) {
       body = islandRigidBodies[j];
       if (body->isDynamic) {
         body->linearVelocity.addEqual(gVel);
@@ -557,7 +557,7 @@ void World::step()
 
     // randomizing order
     if (enableRandomizer) {
-      for (unsigned int j = islandNumRigidBodies - 1; j-- > 0;) {
+      for (unsigned int j = islandNumRigidBodies; j-- > 0;) {
         randX = ((randX * randA) + (randB & 0x7fffffff));
         float tmp
           = static_cast<float>(randX) / static_cast<float>(2147483648 * j);
@@ -569,24 +569,24 @@ void World::step()
     }
 
     // solve contraints
-    for (unsigned int j = islandNumConstraints - 1; j-- > 0;) {
+    for (unsigned int j = islandNumConstraints; j-- > 0;) {
       // pre-solve
       islandConstraints[j]->preSolve(timeStep, invTimeStep);
     }
     for (unsigned int k = 0; k < numIterations; ++k) {
-      for (unsigned int j = islandNumConstraints - 1; j-- > 0;) {
+      for (unsigned int j = islandNumConstraints; j-- > 0;) {
         // main-solve
         islandConstraints[j]->solve();
       }
     }
-    for (unsigned int j = islandNumConstraints - 1; j-- > 0;) {
+    for (unsigned int j = islandNumConstraints; j-- > 0;) {
       islandConstraints[j]->postSolve(); // post-solve
       islandConstraints[j] = nullptr;    // gc
     }
 
     // sleeping check
     float sleepTime = 10.f;
-    for (unsigned int j = islandNumRigidBodies - 1; j-- > 0;) {
+    for (unsigned int j = islandNumRigidBodies; j-- > 0;) {
       body = islandRigidBodies[j];
       if (callSleep(body)) {
         body->sleepTime += timeStep;
@@ -602,14 +602,14 @@ void World::step()
     }
     if (sleepTime > 0.5f) {
       // sleep the island
-      for (unsigned int j = islandNumRigidBodies - 1; j-- > 0;) {
+      for (unsigned int j = islandNumRigidBodies; j-- > 0;) {
         islandRigidBodies[j]->sleep();
         islandRigidBodies[j] = nullptr; // gc
       }
     }
     else {
       // update positions
-      for (unsigned int j = islandNumRigidBodies - 1; j-- > 0;) {
+      for (unsigned int j = islandNumRigidBodies; j-- > 0;) {
         islandRigidBodies[j]->updatePosition(timeStep);
         islandRigidBodies[j] = nullptr; // gc
       }

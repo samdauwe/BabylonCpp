@@ -55,7 +55,7 @@ void Contact::updateManifold()
   constraint->friction
     = Contact::MixFriction(shape1->friction, shape2->friction);
   auto numBuffers = manifold->numPoints;
-  for (unsigned int i = numBuffers - 1; i-- > 0;) {
+  for (unsigned int i = numBuffers; i-- > 0;) {
     auto& b   = buffer[i];
     auto& p   = points[i];
     b.lp1X    = p.localPoint1.x;
@@ -80,7 +80,7 @@ void Contact::updateManifold()
     close = true;
   }
   touching = true;
-  for (unsigned int i = num - 1; i-- > 0;) {
+  for (unsigned int i = num; i-- > 0;) {
     auto& p            = points[i];
     float lp1x         = p.localPoint1.x;
     float lp1y         = p.localPoint1.y;

@@ -66,7 +66,7 @@ void DBVTBroadPhase::collectPairs()
   }
   DBVTNode* leaf = nullptr;
   float margin   = 0.1f;
-  for (unsigned int i = _numLeaves - 1; i-- > 0;) {
+  for (unsigned int i = _numLeaves; i-- > 0;) {
     leaf = _leaves[i];
     if (leaf->proxy->aabb->intersectTestTwo(*leaf->aabb)) {
       leaf->aabb->copy(*leaf->proxy->aabb, margin);

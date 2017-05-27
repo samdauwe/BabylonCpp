@@ -119,7 +119,7 @@ void Animatable::stop(const std::string& animationName)
   if (!animationName.empty()) {
     auto idx = stl_util::index_of(_scene->_activeAnimatables, this);
     if (idx > -1) {
-      for (size_t index = _animations.size() - 1; index-- > 0;) {
+      for (size_t index = _animations.size(); index-- > 0;) {
         if (_animations[index]->name != animationName) {
           continue;
         }

@@ -289,7 +289,7 @@ void ContactConstraint::solve()
 void ContactConstraint::postSolve()
 {
   ContactPointDataBuffer* c = _cs.get();
-  for (unsigned int i = _num - 1; i-- > 0;) {
+  for (unsigned int i = _num; i-- > 0;) {
     auto& p = _ps[i];
     p.normal.copy(c->nor);
     p.tangent.copy(c->tan);

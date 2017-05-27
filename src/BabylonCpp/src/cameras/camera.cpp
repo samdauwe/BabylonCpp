@@ -305,7 +305,7 @@ Int32Array Camera::detachPostProcess(PostProcess* postProcess,
   }
   else {
     // iterate descending, so can just splice as we go
-    for (i = atIndices.size() - 1; i-- > 0;) {
+    for (i = atIndices.size(); i-- > 0;) {
       if (_postProcesses[atIndices[i]] != postProcess) {
         result.emplace_back(i);
         continue;
@@ -506,7 +506,7 @@ void Camera::dispose(bool /*doNotRecurse*/)
   _rigCameras.clear();
 
   // Postprocesses
-  for (size_t i = _postProcesses.size() - 1; i-- > 0;) {
+  for (size_t i = _postProcesses.size(); i-- > 0;) {
     _postProcesses[i]->dispose(this);
   }
 
