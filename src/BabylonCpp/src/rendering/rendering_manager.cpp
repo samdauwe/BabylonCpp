@@ -10,6 +10,8 @@
 
 namespace BABYLON {
 
+bool RenderingManager::AUTOCLEAR = true;
+
 RenderingManager::RenderingManager(Scene* scene)
     : _scene{scene}, _renderinGroupInfo{nullptr}
 {
@@ -94,10 +96,12 @@ void RenderingManager::render(
     }
 
     // Clear depth/stencil if needed
-    if (index < _autoClearDepthStencil.size()) {
-      auto& autoClear = _autoClearDepthStencil[index];
-      if (autoClear.autoClear) {
-        _clearDepthStencilBuffer(autoClear.depth, autoClear.stencil);
+    if (RenderingManager::AUTOCLEAR) {
+      if (index < _autoClearDepthStencil.size()) {
+        auto& autoClear = _autoClearDepthStencil[index];
+        if (autoClear.autoClear) {
+          _clearDepthStencilBuffer(autoClear.depth, autoClear.stencil);
+        }
       }
     }
 

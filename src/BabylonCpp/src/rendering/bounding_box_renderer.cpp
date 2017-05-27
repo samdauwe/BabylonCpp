@@ -35,7 +35,7 @@ void BoundingBoxRenderer::_prepareResources()
 
   ShaderMaterialOptions shaderMaterialOptions;
   shaderMaterialOptions.attributes = {VertexBuffer::PositionKindChars};
-  shaderMaterialOptions.uniforms   = {"worldViewProjection", "color"};
+  shaderMaterialOptions.uniforms   = {"world", "viewProjection", "color"};
 
   _colorShader = ShaderMaterial::New("colorShader", _scene, "color",
                                      shaderMaterialOptions);

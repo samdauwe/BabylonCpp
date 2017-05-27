@@ -29,6 +29,11 @@ public:
    */
   static constexpr unsigned int MIN_RENDERINGGROUPS = 0;
 
+  /**
+   * Used to globally prevent autoclearing scenes.
+   */
+  static bool AUTOCLEAR;
+
 public:
   RenderingManager(Scene* scene);
   ~RenderingManager();
