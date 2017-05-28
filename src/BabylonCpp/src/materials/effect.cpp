@@ -357,41 +357,51 @@ void Effect::_processIncludes(
   const std::string& sourceCode,
   const std::function<void(const std::string& data)>& callback)
 {
-  std::ostringstream returnValue;
+  const std::regex regex("#include<(.+)>(\\((.*)\\))*(\\[(.*)\\])*");
   auto lines = String::split(sourceCode, '\n');
-  std::regex regex;
-  std::smatch match;
+
+  auto returnValue = sourceCode;
 
   for (const auto& line : lines) {
-    // Shader includes
-    regex = std::regex("#include<(.+)>");
-    std::string includeFile;
-    if (std::regex_search(line, match, regex) && (match.size() == 2)) {
-      // Shader include found
-      includeFile = match.str(1);
-    }
-    else {
-      // Line without shader include
-      returnValue << line << std::endl;
-      continue;
+    auto match       = String::regexMatch(line, regex);
+    auto includeFile = match[1];
+
+    // Uniform declaration
+    if (String::contains(includeFile, "__decl__")) {
+      String::replaceInPlace(includeFile, "__decl__", "");
+      if (_engine->webGLVersion() != 1.f) {
+        String::replaceInPlace(includeFile, "Vertex", "Ubo");
+        String::replaceInPlace(includeFile, "Fragment", "Ubo");
+      }
+      includeFile += "Declaration";
     }
 
     if (stl_util::contains(EffectIncludesShadersStore::Shaders, includeFile)) {
       // Substitution
-      auto includeContent = EffectIncludesShadersStore::Shaders[includeFile];
-      // Instanced includes
-      regex = std::regex("#include<(.+)>\\[(.*)]");
-      if (std::regex_search(line, match, regex) && (match.size() == 3)) {
-        // Perform instanced includes
-        std::string indexString(match.str(2));
-        if (indexString.find("..") != std::string::npos) {
+      std::string includeContent
+        = EffectIncludesShadersStore::Shaders[includeFile];
+      if (!match[2].empty()) {
+        auto splits = String::split(match[3], ',');
+
+        for (std::size_t index = 0; index < splits.size(); index += 2) {
+          const std::string source{splits[index]};
+          const std::string dest{splits[index + 1]};
+
+          includeContent = String::regexReplace(includeContent, source, dest);
+        }
+      }
+
+      if (!match[4].empty()) {
+        auto indexString = match[5];
+
+        if (String::contains(indexString, "..")) {
           String::replaceInPlace(indexString, "..", ".");
-          std::vector<std::string> indexSplits
-            = String::split(indexString, '.');
+          auto indexSplits = String::split(indexString, '.');
           if (indexSplits.size() == 2) {
-            auto minIndex = indexSplits[0];
-            auto maxIndex = indexSplits[1];
-            std::ostringstream includeContentStream;
+            auto minIndex             = indexSplits[0];
+            auto maxIndex             = indexSplits[1];
+            auto sourceIncludeContent = includeContent;
+            includeContent = "";
 
             if ((!String::isDigit(maxIndex))
                 && stl_util::contains(_indexParameters, maxIndex)) {
@@ -401,26 +411,36 @@ void Effect::_processIncludes(
             if (String::isDigit(minIndex) && String::isDigit(maxIndex)) {
               size_t _minIndex = std::stoul(minIndex, nullptr, 0);
               size_t _maxIndex = std::stoul(maxIndex, nullptr, 0);
-              for (size_t i = _minIndex; i <= _maxIndex; ++i) {
-                std::string _includeContent(includeContent);
-                String::replaceInPlace(_includeContent, "{X}",
-                                       std::to_string(i));
-                includeContentStream << _includeContent << std::endl;
+              for (size_t i = _minIndex; i < _maxIndex; ++i) {
+                const auto istr = std::to_string(i);
+                if (_engine->webGLVersion() == 1.f) {
+                  // Ubo replacement
+                }
+                includeContent
+                  += String::regexReplace(sourceIncludeContent, "\\{X\\}", istr)
+                     + "\n";
               }
             }
-
-            returnValue << includeContentStream.str();
           }
         }
+        else {
+          if (_engine->webGLVersion() == 1.f) {
+            // Ubo replacement
+          }
+          includeContent
+            = String::regexReplace(includeContent, "\\{X\\}", indexString);
+        }
       }
-      else {
-        // No instanced includes
-        returnValue << includeContent;
-      }
+
+      // Replace
+      String::replaceInPlace(returnValue, match[0], includeContent);
+    }
+    else {
+      // Load from file
     }
   }
 
-  callback(returnValue.str());
+  callback(returnValue);
 }
 
 std::string Effect::_processPrecision(std::string source)
