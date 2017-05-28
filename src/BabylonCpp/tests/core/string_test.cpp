@@ -167,6 +167,38 @@ std::string my_callback(const std::smatch& m)
   return std::to_string(int_m + 1);
 }
 
+TEST(TestString, regexMatch)
+{
+  using namespace BABYLON;
+
+  const std::regex re("#include<(.+)>(\\((.*)\\))*(\\[(.*)\\])*");
+
+  {
+    const std::string s{"#include<helperFunctions>"};
+    const auto r = String::regexMatch(s, re);
+    const std::vector<std::string> e{s, "helperFunctions", "", "", "", ""};
+    EXPECT_THAT(r, ::testing::ContainerEq(e));
+  }
+
+  {
+    const std::string s{"#include<__decl__defaultFragment>"};
+    const auto r = String::regexMatch(s, re);
+    const std::vector<std::string> e{s, "__decl__defaultFragment", "", "", "",
+                                     ""};
+    EXPECT_THAT(r, ::testing::ContainerEq(e));
+  }
+
+  {
+    const std::string s{
+      "#include<__decl__lightFragment>[0..maxSimultaneousLights]"};
+    const auto r = String::regexMatch(s, re);
+    const std::vector<std::string> e{
+      s,  "__decl__lightFragment",      "",
+      "", "[0..maxSimultaneousLights]", "0..maxSimultaneousLights"};
+    EXPECT_THAT(r, ::testing::ContainerEq(e));
+  }
+}
+
 TEST(TestString, regexReplace)
 {
   using namespace BABYLON;

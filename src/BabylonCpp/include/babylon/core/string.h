@@ -314,6 +314,25 @@ inline std::string& removeSubstring(std::string& s, const std::string& subStr)
   return s;
 }
 
+/**
+ * @brief Searches a string for a match against a regular expression, and
+ * returns the matches, as a vector object.
+ * @param s The source string.
+ * @param re The value to search for, as a regular expression.
+ * @return List with matches.
+ */
+template <typename T>
+inline std::vector<T> regexMatch(const T& s, const std::regex& re)
+{
+  std::vector<T> result;
+  std::smatch smatch;
+  if (regex_search(s, smatch, re)) {
+    std::copy(smatch.begin(), smatch.end(), std::back_inserter(result));
+  }
+
+  return result;
+}
+
 template <class BidirIt, class Traits, class CharT, class UnaryFunction>
 std::basic_string<CharT> inline regexReplace(
   BidirIt first, BidirIt last, const std::basic_regex<CharT, Traits>& re,
