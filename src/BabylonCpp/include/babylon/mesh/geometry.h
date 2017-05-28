@@ -61,8 +61,8 @@ public:
                            bool makeItUnique  = false) override;
   void _bind(Effect* effect, GL::IGLBuffer* indexToBind = nullptr);
   size_t getTotalVertices() const;
-  Float32Array getVerticesData(unsigned int kind,
-                               bool copyWhenShared = false) override;
+  Float32Array getVerticesData(unsigned int kind, bool copyWhenShared = false,
+                               bool forceCopy = false) override;
   VertexBuffer* getVertexBuffer(unsigned int kind) const;
   std::unordered_map<std::string, VertexBuffer*> getVertexBuffers();
   bool isVerticesDataPresent(unsigned int kind) override;

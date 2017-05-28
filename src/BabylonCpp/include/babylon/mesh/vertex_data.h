@@ -71,13 +71,15 @@ public:
    * @brief Returns the object VertexData associated to the passed mesh.
    */
   static std::unique_ptr<VertexData>
-  ExtractFromMesh(Mesh* mesh, bool copyWhenShared = false);
+  ExtractFromMesh(Mesh* mesh, bool copyWhenShared = false,
+                  bool forceCopy = false);
 
   /**
    * @brief Returns the object VertexData associated to the passed geometry.
    */
-  static std::unique_ptr<VertexData> ExtractFromGeometry(Geometry* geometry,
-                                                         bool copyWhenShared);
+  static std::unique_ptr<VertexData>
+  ExtractFromGeometry(Geometry* geometry, bool copyWhenShared,
+                      bool forceCopy = false);
 
   /**
    * @brief Creates the vertexData of the Ribbon.
@@ -186,7 +188,8 @@ private:
   VertexData& _update(IGetSetVerticesData* meshOrGeometry,
                       bool updateExtends = false, bool makeItUnique = false);
   static std::unique_ptr<VertexData>
-  _ExtractFrom(IGetSetVerticesData* meshOrGeometry, bool copyWhenShared);
+  _ExtractFrom(IGetSetVerticesData* meshOrGeometry, bool copyWhenShared = false,
+               bool forceCopy = false);
   static void _ComputeSides(unsigned int sideOrientation,
                             Float32Array& positions, Uint32Array& indices,
                             Float32Array& normals, Float32Array& uvs);

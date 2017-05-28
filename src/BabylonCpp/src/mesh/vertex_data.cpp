@@ -335,96 +335,97 @@ Json::object VertexData::serialize() const
   return Json::object();
 }
 
-std::unique_ptr<VertexData> VertexData::ExtractFromMesh(Mesh* mesh,
-                                                        bool copyWhenShared)
+std::unique_ptr<VertexData>
+VertexData::ExtractFromMesh(Mesh* mesh, bool copyWhenShared, bool forceCopy)
 {
-  return VertexData::_ExtractFrom(mesh, copyWhenShared);
+  return VertexData::_ExtractFrom(mesh, copyWhenShared, forceCopy);
 }
 
 std::unique_ptr<VertexData> VertexData::ExtractFromGeometry(Geometry* geometry,
-                                                            bool copyWhenShared)
+                                                            bool copyWhenShared,
+                                                            bool forceCopy)
 {
-  return VertexData::_ExtractFrom(geometry, copyWhenShared);
+  return VertexData::_ExtractFrom(geometry, copyWhenShared, forceCopy);
 }
 
 std::unique_ptr<VertexData>
 VertexData::_ExtractFrom(IGetSetVerticesData* meshOrGeometry,
-                         bool copyWhenShared)
+                         bool copyWhenShared, bool forceCopy)
 {
   auto result = std::make_unique<VertexData>();
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::PositionKind)) {
     result->positions = meshOrGeometry->getVerticesData(
-      VertexBuffer::PositionKind, copyWhenShared);
+      VertexBuffer::PositionKind, copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::NormalKind)) {
-    result->normals = meshOrGeometry->getVerticesData(VertexBuffer::NormalKind,
-                                                      copyWhenShared);
+    result->normals = meshOrGeometry->getVerticesData(
+      VertexBuffer::NormalKind, copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::TangentKind)) {
     result->tangents = meshOrGeometry->getVerticesData(
-      VertexBuffer::TangentKind, copyWhenShared);
+      VertexBuffer::TangentKind, copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::UVKind)) {
-    result->uvs
-      = meshOrGeometry->getVerticesData(VertexBuffer::UVKind, copyWhenShared);
+    result->uvs = meshOrGeometry->getVerticesData(VertexBuffer::UVKind,
+                                                  copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::UV2Kind)) {
-    result->uvs2
-      = meshOrGeometry->getVerticesData(VertexBuffer::UV2Kind, copyWhenShared);
+    result->uvs2 = meshOrGeometry->getVerticesData(VertexBuffer::UV2Kind,
+                                                   copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::UV3Kind)) {
-    result->uvs3
-      = meshOrGeometry->getVerticesData(VertexBuffer::UV3Kind, copyWhenShared);
+    result->uvs3 = meshOrGeometry->getVerticesData(VertexBuffer::UV3Kind,
+                                                   copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::UV4Kind)) {
-    result->uvs4
-      = meshOrGeometry->getVerticesData(VertexBuffer::UV4Kind, copyWhenShared);
+    result->uvs4 = meshOrGeometry->getVerticesData(VertexBuffer::UV4Kind,
+                                                   copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::UV5Kind)) {
-    result->uvs5
-      = meshOrGeometry->getVerticesData(VertexBuffer::UV5Kind, copyWhenShared);
+    result->uvs5 = meshOrGeometry->getVerticesData(VertexBuffer::UV5Kind,
+                                                   copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::UV6Kind)) {
-    result->uvs6
-      = meshOrGeometry->getVerticesData(VertexBuffer::UV6Kind, copyWhenShared);
+    result->uvs6 = meshOrGeometry->getVerticesData(VertexBuffer::UV6Kind,
+                                                   copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(VertexBuffer::ColorKind)) {
     result->colors = meshOrGeometry->getVerticesData(VertexBuffer::ColorKind,
-                                                     copyWhenShared);
+                                                     copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(
         VertexBuffer::MatricesIndicesKind)) {
     result->matricesIndices = meshOrGeometry->getVerticesData(
-      VertexBuffer::MatricesIndicesKind, copyWhenShared);
+      VertexBuffer::MatricesIndicesKind, copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(
         VertexBuffer::MatricesWeightsKind)) {
     result->matricesWeights = meshOrGeometry->getVerticesData(
-      VertexBuffer::MatricesWeightsKind, copyWhenShared);
+      VertexBuffer::MatricesWeightsKind, copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(
         VertexBuffer::MatricesIndicesExtraKind)) {
     result->matricesIndicesExtra = meshOrGeometry->getVerticesData(
-      VertexBuffer::MatricesIndicesExtraKind, copyWhenShared);
+      VertexBuffer::MatricesIndicesExtraKind, copyWhenShared, forceCopy);
   }
 
   if (meshOrGeometry->isVerticesDataPresent(
         VertexBuffer::MatricesWeightsExtraKind)) {
     result->matricesWeightsExtra = meshOrGeometry->getVerticesData(
-      VertexBuffer::MatricesWeightsExtraKind, copyWhenShared);
+      VertexBuffer::MatricesWeightsExtraKind, copyWhenShared, forceCopy);
   }
 
   result->indices = meshOrGeometry->getIndices(copyWhenShared);
@@ -2526,6 +2527,7 @@ void VertexData::ComputeNormals(const Float32Array& positions,
   bool computeFacetPositions = (!options.facetPositions.empty()) ? true : false;
   bool computeFacetPartitioning
     = (!options.facetPartitioning.empty()) ? true : false;
+  float faceNormalSign = options.useRightHandedSystem ? -1.f : 1.f;
 
   // facetPartitioning reinit if needed
   unsigned int ox           = 0; // X partitioning index for facet position
@@ -2590,9 +2592,9 @@ void VertexData::ComputeNormals(const Float32Array& positions,
     p3p2z = positions[v3z] - positions[v2z];
 
     // compute the face normal with the cross product
-    faceNormalx = p1p2y * p3p2z - p1p2z * p3p2y;
-    faceNormaly = p1p2z * p3p2x - p1p2x * p3p2z;
-    faceNormalz = p1p2x * p3p2y - p1p2y * p3p2x;
+    faceNormalx = faceNormalSign * (p1p2y * p3p2z - p1p2z * p3p2y);
+    faceNormaly = faceNormalSign * (p1p2z * p3p2x - p1p2x * p3p2z);
+    faceNormalz = faceNormalSign * (p1p2x * p3p2y - p1p2y * p3p2x);
 
     // normalize this normal and store it in the array facetData
     length = std::sqrt(faceNormalx * faceNormalx + faceNormaly * faceNormaly

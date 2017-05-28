@@ -20,7 +20,8 @@ struct BABYLON_SHARED_EXPORT IPhysicsEnabledObject {
                  const std::function<bool(Node* node)>& predicate)
     = 0;
   virtual Float32Array getVerticesData(unsigned int kind,
-                                       bool copyWhenShared = false)
+                                       bool copyWhenShared = false,
+                                       bool forceCopy      = false)
     = 0;
   virtual Uint32Array getIndices(bool copyWhenShared = false) = 0;
   virtual Scene* getScene()                                   = 0;

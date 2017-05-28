@@ -47,8 +47,8 @@ public:
    * @brief Returns Float32Array of the requested kind of data : positons,
    * normals, uvs, etc.
    */
-  Float32Array getVerticesData(unsigned int kind,
-                               bool copyWhenShared = false) override;
+  Float32Array getVerticesData(unsigned int kind, bool copyWhenShared = false,
+                               bool forceCopy = false) override;
 
   /**
    * @brief Sets the vertex data of the mesh geometry for the requested `kind`.

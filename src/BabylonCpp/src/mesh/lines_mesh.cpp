@@ -13,7 +13,8 @@
 namespace BABYLON {
 
 LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent,
-                     LinesMesh* source, bool doNotCloneChildren)
+                     LinesMesh* source, bool doNotCloneChildren,
+                     bool useVertexColor)
     : Mesh(iName, scene, iParent, source, doNotCloneChildren)
     , dashSize{0.f}
     , gapSize{0.f}
@@ -22,17 +23,22 @@ LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent,
     , _intersectionThreshold{0.1f}
 {
   if (source) {
-    color = source->color;
-    alpha = source->alpha;
+    color          = source->color;
+    alpha          = source->alpha;
+    useVertexColor = source->useVertexColor;
   }
 
-  ShaderMaterialOptions shaderMaterialOptions;
-  shaderMaterialOptions.attributes        = {VertexBuffer::PositionKindChars};
-  shaderMaterialOptions.uniforms          = {"worldViewProjection", "color"};
-  shaderMaterialOptions.needAlphaBlending = true;
+  ShaderMaterialOptions options;
+  options.attributes        = {VertexBuffer::PositionKindChars};
+  options.uniforms          = {"world", "viewProjection"};
+  options.needAlphaBlending = false;
 
-  _colorShader
-    = ShaderMaterial::New("colorShader", scene, "color", shaderMaterialOptions);
+  if (!useVertexColor) {
+    options.uniforms.emplace_back("color");
+    options.needAlphaBlending = true;
+  }
+
+  _colorShader = ShaderMaterial::New("colorShader", scene, "color", options);
 }
 
 LinesMesh::~LinesMesh()
@@ -86,17 +92,13 @@ InstancedMesh* LinesMesh::createInstance(const std::string& /*name*/)
 void LinesMesh::_bind(SubMesh* /*subMesh*/, Effect* /*effect*/,
                       unsigned int /*fillMode*/)
 {
-  auto engine = getScene()->getEngine();
-
-  _positionBuffer[VertexBuffer::PositionKindChars]
-    = _geometry->getVertexBuffer(VertexBuffer::PositionKind);
-
   // VBOs
-  engine->bindBuffers(_positionBuffer, _geometry->getIndexBuffer(),
-                      _colorShader->getEffect());
+  _geometry->_bind(_colorShader->getEffect());
 
   // Color
-  _colorShader->setColor4("color", color.toColor4(alpha));
+  if (!useVertexColor) {
+    _colorShader->setColor4("color", color.toColor4(alpha));
+  }
 }
 
 void LinesMesh::_draw(SubMesh* subMesh, int /*fillMode*/,

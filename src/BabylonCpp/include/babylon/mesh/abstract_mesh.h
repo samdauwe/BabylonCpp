@@ -247,7 +247,8 @@ public:
    * @returns A Float32Array.
    */
   virtual Float32Array getVerticesData(unsigned int kind,
-                                       bool copyWhenShared = false) override;
+                                       bool copyWhenShared = false,
+                                       bool forceCopy      = false) override;
 
   /**
    * @brief Sets the vertex data of the mesh geometry for the requested `kind`.
@@ -752,8 +753,7 @@ public:
    * current mesh position and rotation are kept.
    * @returns The AbstractMesh.
    */
-  AbstractMesh& setParent(AbstractMesh* mesh,
-                          bool keepWorldPositionRotation = false);
+  AbstractMesh& setParent(AbstractMesh* mesh);
 
   /**
    * @brief Adds the passed mesh as a child to the current mesh.
@@ -761,15 +761,13 @@ public:
    * world position and rotation are kept.
    * @returns The AbstractMesh.
    */
-  AbstractMesh& addChild(AbstractMesh* mesh,
-                         bool keepWorldPositionRotation = false);
+  AbstractMesh& addChild(AbstractMesh* mesh);
 
   /**
    * @brief Removes the passed mesh from the current mesh children list.
    * @returns The AbstractMesh.
    */
-  AbstractMesh& removeChild(AbstractMesh* mesh,
-                            bool keepWorldPositionRotation = false);
+  AbstractMesh& removeChild(AbstractMesh* mesh);
 
   /**
    * @brief Sets the Vector3 "result" coordinates with the mesh pivot point
@@ -933,8 +931,6 @@ public:
   Observable<AbstractMesh> onAfterWorldMatrixUpdateObservable;
   // Properties
   bool definedFacingForward;
-  bool _rotationQuaternionSet;
-  Quaternion _rotationQuaternion;
   unsigned int billboardMode;
   float visibility;
   int alphaIndex;
@@ -1019,6 +1015,8 @@ private:
   // Properties
   Vector3 _position;
   Vector3 _rotation;
+  bool _rotationQuaternionSet;
+  Quaternion _rotationQuaternion;
   Vector3 _scaling;
   Material* _material;
   bool _receiveShadows;

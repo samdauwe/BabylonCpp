@@ -34,6 +34,8 @@ public:
   Vector3 bbSize;
   // Bounding info, required for facetPartitioning computation
   BoundingInfo bInfo;
+  // Whether or not to use a right-handed coordinate system
+  bool useRightHandedSystem;
 
 }; // end of class FacetParameters
 

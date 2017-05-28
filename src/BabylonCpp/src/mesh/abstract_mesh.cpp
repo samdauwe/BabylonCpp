@@ -35,7 +35,6 @@ Vector3 AbstractMesh::_lookAtVectorCache = Vector3(0.f, 0.f, 0.f);
 AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     : Node(iName, scene)
     , definedFacingForward{true} // orientation for POV movement & rotation
-    , _rotationQuaternionSet{false}
     , billboardMode{AbstractMesh::BILLBOARDMODE_NONE}
     , visibility{1.f}
     , alphaIndex{std::numeric_limits<int>::max()}
@@ -83,6 +82,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , _onCollisionPositionChangeObserver{nullptr}
     , _position{Vector3(0.f, 0.f, 0.f)}
     , _rotation{Vector3(0.f, 0.f, 0.f)}
+    , _rotationQuaternionSet{false}
     , _scaling{Vector3(1.f, 1.f, 1.f)}
     , _material{nullptr}
     , _receiveShadows{false}
@@ -583,7 +583,8 @@ Uint32Array AbstractMesh::getIndices(bool /*copyWhenShared*/)
 }
 
 Float32Array AbstractMesh::getVerticesData(unsigned int /*kind*/,
-                                           bool /*copyWhenShared*/)
+                                           bool /*copyWhenShared*/,
+                                           bool /*forceCopy*/)
 {
   return Float32Array();
 }
@@ -1735,88 +1736,77 @@ Vector3 AbstractMesh::getAbsolutePivotPoint()
   return point;
 }
 
-AbstractMesh& AbstractMesh::setParent(AbstractMesh* mesh,
-                                      bool keepWorldPositionRotation)
+AbstractMesh& AbstractMesh::setParent(AbstractMesh* mesh)
 {
   auto child  = this;
   auto parent = mesh;
 
   if (mesh == nullptr) {
-    if (child->parent() && keepWorldPositionRotation) {
-      auto& rotation = Tmp::QuaternionArray[0];
-      auto& position = Tmp::Vector3Array[0];
-      auto& scale    = Tmp::Vector3Array[1];
+    auto& rotation = Tmp::QuaternionArray[0];
+    auto& position = Tmp::Vector3Array[0];
+    auto& scale    = Tmp::Vector3Array[1];
 
-      child->getWorldMatrix()->decompose(scale, rotation, position);
+    child->getWorldMatrix()->decompose(scale, rotation, position);
 
-      if (child->rotationQuaternionSet()) {
-        child->rotationQuaternion().copyFrom(rotation);
-      }
-      else {
-        rotation.toEulerAnglesToRef(child->rotation());
-      }
-
-      child->position().x = position.x;
-      child->position().y = position.y;
-      child->position().z = position.z;
+    if (child->_rotationQuaternionSet) {
+      child->rotationQuaternion().copyFrom(rotation);
     }
+    else {
+      rotation.toEulerAnglesToRef(child->rotation());
+    }
+
+    child->position().x = position.x;
+    child->position().y = position.y;
+    child->position().z = position.z;
   }
   else {
-    if (keepWorldPositionRotation) {
-      auto& rotation = Tmp::QuaternionArray[0];
-      auto& position = Tmp::Vector3Array[0];
-      auto& scale    = Tmp::Vector3Array[1];
-      auto& m1       = Tmp::MatrixArray[0];
-      auto& m2       = Tmp::MatrixArray[1];
+    auto& rotation = Tmp::QuaternionArray[0];
+    auto& position = Tmp::Vector3Array[0];
+    auto& scale    = Tmp::Vector3Array[1];
+    auto& m1       = Tmp::MatrixArray[0];
+    auto& m2       = Tmp::MatrixArray[1];
 
-      parent->getWorldMatrix()->decompose(scale, rotation, position);
+    parent->getWorldMatrix()->decompose(scale, rotation, position);
 
-      rotation.toRotationMatrix(m1);
-      m2.setTranslation(position);
+    rotation.toRotationMatrix(m1);
+    m2.setTranslation(position);
 
-      m2.multiplyToRef(m1, m1);
+    m2.multiplyToRef(m1, m1);
 
-      auto invParentMatrix = Matrix::Invert(m1);
+    auto invParentMatrix = Matrix::Invert(m1);
 
-      auto m = child->getWorldMatrix()->multiply(invParentMatrix);
+    auto m = child->getWorldMatrix()->multiply(invParentMatrix);
+    m.decompose(scale, rotation, position);
 
-      m.decompose(scale, rotation, position);
-
-      if (child->rotationQuaternionSet()) {
-        child->rotationQuaternion().copyFrom(rotation);
-      }
-      else {
-        rotation.toEulerAnglesToRef(child->rotation());
-      }
-
-      invParentMatrix = Matrix::Invert(*parent->getWorldMatrix());
-
-      m = child->getWorldMatrix()->multiply(invParentMatrix);
-
-      m.decompose(scale, rotation, position);
-
-      child->position().x = position.x;
-      child->position().y = position.y;
-      child->position().z = position.z;
+    if (child->_rotationQuaternionSet) {
+      child->rotationQuaternion().copyFrom(rotation);
     }
+    else {
+      rotation.toEulerAnglesToRef(child->rotation());
+    }
+
+    invParentMatrix = Matrix::Invert(*parent->getWorldMatrix());
+
+    m = child->getWorldMatrix()->multiply(invParentMatrix);
+    m.decompose(scale, rotation, position);
+
+    child->position().x = position.x;
+    child->position().y = position.y;
+    child->position().z = position.z;
   }
-
   static_cast<Node*>(child)->setParent(parent);
-
   return *this;
 }
 
-AbstractMesh& AbstractMesh::addChild(AbstractMesh* mesh,
-                                     bool keepWorldPositionRotation)
+AbstractMesh& AbstractMesh::addChild(AbstractMesh* mesh)
 {
-  mesh->setParent(this, keepWorldPositionRotation);
+  mesh->setParent(this);
   return *this;
 }
 
-AbstractMesh& AbstractMesh::removeChild(AbstractMesh* mesh,
-                                        bool keepWorldPositionRotation)
+AbstractMesh& AbstractMesh::removeChild(AbstractMesh* mesh)
 {
-  mesh->setParent(nullptr, keepWorldPositionRotation);
+  mesh->setParent(nullptr);
   return *this;
 }
 
@@ -2086,7 +2076,9 @@ void AbstractMesh::createNormals(bool updatable)
     normals = getVerticesData(VertexBuffer::NormalKind);
   }
 
-  VertexData::ComputeNormals(positions, indices, normals);
+  FacetParameters options;
+  options.useRightHandedSystem = getScene()->useRightHandedSystem;
+  VertexData::ComputeNormals(positions, indices, normals, options);
   setVerticesData(VertexBuffer::NormalKind, normals, updatable);
 }
 

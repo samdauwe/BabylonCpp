@@ -80,9 +80,9 @@ Mesh* InstancedMesh::sourceMesh() const
 }
 
 Float32Array InstancedMesh::getVerticesData(unsigned int kind,
-                                            bool copyWhenShared)
+                                            bool copyWhenShared, bool forceCopy)
 {
-  return _sourceMesh->getVerticesData(kind, copyWhenShared);
+  return _sourceMesh->getVerticesData(kind, copyWhenShared, forceCopy);
 }
 
 Mesh* InstancedMesh::setVerticesData(unsigned int kind,

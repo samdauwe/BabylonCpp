@@ -65,18 +65,19 @@ public:
 
 protected:
   LinesMesh(const std::string& name, Scene* scene, Node* parent = nullptr,
-            LinesMesh* source = nullptr, bool doNotCloneChildren = true);
+            LinesMesh* source = nullptr, bool doNotCloneChildren = true,
+            bool useVertexColor = false);
 
 public:
   float dashSize;
   float gapSize;
   Color3 color;
   float alpha;
+  bool useVertexColor;
 
 private:
   float _intersectionThreshold;
   ShaderMaterial* _colorShader;
-  std::unordered_map<std::string, VertexBuffer*> _positionBuffer;
 
 }; // end of class LinesMesh
 

@@ -171,6 +171,7 @@ public:
    * If `copywhenShared` is true (default false) and if the mesh geometry is
    * shared among some other meshes, the returned array is a copy of the
    * internal one.
+   * You can force the copy with forceCopy == true
    * Possible `kind` values :
    * - BABYLON.VertexBuffer.PositionKind
    * - BABYLON.VertexBuffer.UVKind
@@ -185,8 +186,8 @@ public:
    * - BABYLON.VertexBuffer.MatricesWeightsKind
    * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
    */
-  Float32Array getVerticesData(unsigned int kind,
-                               bool copyWhenShared = false) override;
+  Float32Array getVerticesData(unsigned int kind, bool copyWhenShared = false,
+                               bool forceCopy = false) override;
 
   /**
    * @brief Returns the mesh VertexBuffer object from the requested `kind` :

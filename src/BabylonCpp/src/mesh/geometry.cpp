@@ -263,14 +263,15 @@ size_t Geometry::getTotalVertices() const
   return _totalVertices;
 }
 
-Float32Array Geometry::getVerticesData(unsigned int kind, bool copyWhenShared)
+Float32Array Geometry::getVerticesData(unsigned int kind, bool copyWhenShared,
+                                       bool forceCopy)
 {
   auto vertexBuffer = getVertexBuffer(kind);
   if (!vertexBuffer) {
     return Float32Array();
   }
   Float32Array& orig = vertexBuffer->getData();
-  if (!copyWhenShared || _meshes.size() == 1) {
+  if ((!forceCopy && !copyWhenShared) || _meshes.size() == 1) {
     return orig;
   }
   else {
@@ -399,7 +400,7 @@ GL::IGLBuffer* Geometry::getIndexBuffer()
 
 void Geometry::_releaseVertexArrayObject(Effect* effect)
 {
-  if (!effect) {
+  if (!effect || _vertexArrayObjects.empty()) {
     return;
   }
 

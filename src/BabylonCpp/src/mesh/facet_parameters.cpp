@@ -3,7 +3,10 @@
 namespace BABYLON {
 
 FacetParameters::FacetParameters()
-    : subDiv{1, 1, 1, 1}, ratio{1.f}, bInfo{Vector3::Zero(), Vector3::Zero()}
+    : subDiv{1, 1, 1, 1}
+    , ratio{1.f}
+    , bInfo{Vector3::Zero(), Vector3::Zero()}
+    , useRightHandedSystem{false}
 {
 }
 

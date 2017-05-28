@@ -323,12 +323,13 @@ size_t Mesh::getTotalVertices() const
   return _geometry->getTotalVertices();
 }
 
-Float32Array Mesh::getVerticesData(unsigned int kind, bool copyWhenShared)
+Float32Array Mesh::getVerticesData(unsigned int kind, bool copyWhenShared,
+                                   bool forceCopy)
 {
   if (!_geometry) {
     return Float32Array();
   }
-  return _geometry->getVerticesData(kind, copyWhenShared);
+  return _geometry->getVerticesData(kind, copyWhenShared, forceCopy);
 }
 
 VertexBuffer* Mesh::getVertexBuffer(unsigned int kind)
@@ -1117,18 +1118,18 @@ bool Mesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes)
 Mesh& Mesh::setMaterialByID(const std::string& iId)
 {
   const auto& materials = getScene()->materials;
-  for (auto& _material : materials) {
-    if (_material->id == iId) {
-      setMaterial(_material.get());
+  for (std::size_t index = materials.size(); index-- > 0;) {
+    if (materials[index]->id == iId) {
+      setMaterial(materials[index].get());
       return *this;
     }
   }
 
   // Multi
   const auto& multiMaterials = getScene()->multiMaterials;
-  for (auto& multiMaterial : multiMaterials) {
-    if (multiMaterial->id == iId) {
-      setMaterial(multiMaterial.get());
+  for (std::size_t index = multiMaterials.size(); index-- > 0;) {
+    if (multiMaterials[index]->id == iId) {
+      setMaterial(multiMaterials[index].get());
       return *this;
     }
   }
@@ -1583,7 +1584,8 @@ void Mesh::optimizeIndices(
 
 void Mesh::_syncGeometryWithMorphTargetManager()
 {
-  if (!geometry()) {
+  auto _geometry = geometry();
+  if (!_geometry) {
     return;
   }
 
@@ -1601,12 +1603,16 @@ void Mesh::_syncGeometryWithMorphTargetManager()
     for (unsigned int index = 0; index < morphTargetManager()->numInfluencers();
          ++index) {
       auto morphTarget = morphTargetManager()->getActiveTarget(index);
-      geometry()->setVerticesData(VertexBuffer::PositionKind + index,
-                                  morphTarget->getPositions(), false, 3);
+      _geometry->setVerticesData(VertexBuffer::PositionKind + index,
+                                 morphTarget->getPositions(), false, 3);
 
       if (morphTarget->hasNormals()) {
-        geometry()->setVerticesData(VertexBuffer::NormalKind + index,
-                                    morphTarget->getNormals(), false, 3);
+        _geometry->setVerticesData(VertexBuffer::NormalKind + index,
+                                   morphTarget->getNormals(), false, 3);
+      }
+      if (morphTarget->hasTangents()) {
+        _geometry->setVerticesData(VertexBuffer::TangentKind + index,
+                                   morphTarget->getTangents(), false, 3);
       }
     }
   }
@@ -1615,11 +1621,14 @@ void Mesh::_syncGeometryWithMorphTargetManager()
 
     // Positions
     while (
-      geometry()->isVerticesDataPresent(VertexBuffer::PositionKind + index)) {
-      geometry()->removeVerticesData(VertexBuffer::PositionKind + index);
+      _geometry->isVerticesDataPresent(VertexBuffer::PositionKind + index)) {
+      _geometry->removeVerticesData(VertexBuffer::PositionKind + index);
 
-      if (geometry()->isVerticesDataPresent(VertexBuffer::NormalKind + index)) {
-        geometry()->removeVerticesData(VertexBuffer::NormalKind + index);
+      if (_geometry->isVerticesDataPresent(VertexBuffer::NormalKind + index)) {
+        _geometry->removeVerticesData(VertexBuffer::NormalKind + index);
+      }
+      if (_geometry->isVerticesDataPresent(VertexBuffer::TangentKind + index)) {
+        _geometry->removeVerticesData(VertexBuffer::TangentKind + index);
       }
       ++index;
     }
@@ -2416,14 +2425,13 @@ Mesh* Mesh::MergeMeshes(std::vector<Mesh*>& meshes, bool disposeSource,
   // Merge
   std::unique_ptr<VertexData> vertexData      = nullptr;
   std::unique_ptr<VertexData> otherVertexData = nullptr;
-
   IndicesArray indiceArray;
   Mesh* source = nullptr;
-  for (index = 0; index < meshes.size(); ++index) {
-    if (meshes[index]) {
-      meshes[index]->computeWorldMatrix(true);
-      otherVertexData = VertexData::ExtractFromMesh(meshes[index], true);
-      otherVertexData->transform(*meshes[index]->getWorldMatrix());
+  for (auto& mesh : meshes) {
+    if (mesh) {
+      mesh->computeWorldMatrix(true);
+      otherVertexData = VertexData::ExtractFromMesh(mesh, false, true);
+      otherVertexData->transform(*mesh->getWorldMatrix());
 
       if (vertexData) {
         vertexData->merge(otherVertexData.get());

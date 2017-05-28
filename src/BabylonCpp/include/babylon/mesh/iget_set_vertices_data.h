@@ -11,7 +11,8 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT IGetSetVerticesData {
   virtual bool isVerticesDataPresent(unsigned int kind) = 0;
   virtual Float32Array getVerticesData(unsigned int kind,
-                                       bool copyWhenShared = false)
+                                       bool copyWhenShared = false,
+                                       bool forceCopy      = false)
     = 0;
   virtual IndicesArray getIndices(bool copyWhenShared = false) = 0;
   virtual Mesh* setVerticesData(unsigned int kind, const Float32Array& data,
