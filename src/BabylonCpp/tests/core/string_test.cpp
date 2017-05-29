@@ -285,6 +285,24 @@ TEST(TestString, regexReplaceWithCallback)
     EXPECT_EQ(r, e);
   }
 
+  {
+    const auto callback = [](const std::smatch& m) {
+      if (m.size() == 2) {
+        return m.str(1) + "{X}";
+      }
+      return m.str(0);
+    };
+    const std::string s{
+      "notShadowLevel = computeShadowWithESMCube(light{X}.vLightData.xyz, "
+      "shadowSampler{X}, light{X}.shadowsInfo.x, light{X}.shadowsInfo.z);"};
+    const std::regex regex{"light\\{X\\}.(\\w*)"};
+    const std::string r{String::regexReplace(s, regex, callback)};
+    const std::string e{
+      "notShadowLevel = computeShadowWithESMCube(vLightData{X}.xyz, "
+      "shadowSampler{X}, shadowsInfo{X}.x, shadowsInfo{X}.z);"};
+    EXPECT_EQ(r, e);
+  }
+
   // Example: Replacing a Fahrenheit degree with its Celsius equivalent
   // Note: only integer based
   {
