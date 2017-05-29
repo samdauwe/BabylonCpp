@@ -134,7 +134,7 @@ private:
   std::unordered_map<std::string, std::unique_ptr<GL::IGLUniformLocation>>
     _uniforms;
   std::unordered_map<std::string, unsigned int> _indexParameters;
-  EffectFallbacks* _fallbacks;
+  std::unique_ptr<EffectFallbacks> _fallbacks;
   std::unique_ptr<GL::IGLProgram> _program;
   std::unordered_map<std::string, Float32Array> _valueCache;
   static std::unordered_map<unsigned int, GL::IGLBuffer*> _baseCache;

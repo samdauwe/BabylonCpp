@@ -33,26 +33,41 @@ Effect::Effect(const std::string& baseName, EffectCreationOptions& options,
     , _compilationError{""}
     , _attributesNames{options.attributes}
     , _indexParameters{options.indexParameters}
+    , _fallbacks{std::move(options.fallbacks)}
 {
   stl_util::concat(_uniformsNames, options.samplers);
 
-  std::string vertexSource   = baseName;
-  std::string fragmentSource = baseName;
+  if (!options.uniformBuffersNames.empty()) {
+    for (unsigned int i = 0; i < options.uniformBuffersNames.size(); ++i) {
+      _uniformBuffersNames[options.uniformBuffersNames[i]] = i;
+    }
+  }
 
-  auto fallbacks = options.fallbacks.get();
+  const std::string vertexSource   = baseName;
+  const std::string fragmentSource = baseName;
 
-  _loadVertexShader(vertexSource, [this, &fragmentSource,
-                                   &fallbacks](const std::string& vertexCode) {
-    _processIncludes(vertexCode, [this, &fragmentSource, &fallbacks](
+  _loadVertexShader(vertexSource, [this, &fragmentSource](
+                                    const std::string& vertexCode) {
+    _processIncludes(vertexCode, [this, &fragmentSource](
                                    const std::string& vertexCodeWithIncludes) {
-      _loadFragmentShader(
-        fragmentSource, [this, &vertexCodeWithIncludes,
-                         &fallbacks](const std::string& fragmentCode) {
-          _processIncludes(
-            fragmentCode, [this, &vertexCodeWithIncludes, &fallbacks](
-                            const std::string& fragmentCodeWithIncludes) {
-              _prepareEffect(vertexCodeWithIncludes, fragmentCodeWithIncludes,
-                             _attributesNames, defines, fallbacks);
+      _processShaderConversion(
+        vertexCodeWithIncludes, false,
+        [this, &fragmentSource](const std::string& migratedVertexCode) {
+          _loadFragmentShader(
+            fragmentSource,
+            [this, &migratedVertexCode](const std::string& fragmentCode) {
+              _processIncludes(
+                fragmentCode, [this, &migratedVertexCode](
+                                const std::string& fragmentCodeWithIncludes) {
+                  _processShaderConversion(
+                    fragmentCodeWithIncludes, true,
+                    [this, &migratedVertexCode](
+                      const std::string& migratedFragmentCode) {
+                      _prepareEffect(migratedVertexCode, migratedFragmentCode,
+                                     _attributesNames, defines,
+                                     _fallbacks.get());
+                    });
+                });
             });
         });
     });
@@ -64,6 +79,7 @@ Effect::Effect(const std::unordered_map<std::string, std::string>& baseName,
     : defines{options.defines}
     , onCompiled{options.onCompiled}
     , onError{options.onError}
+    , uniqueId{Effect::_uniqueIdSeed++}
     , _engine{engine}
     , _uniformsNames{options.uniformsNames}
     , _samplers{options.samplers}
@@ -71,8 +87,15 @@ Effect::Effect(const std::unordered_map<std::string, std::string>& baseName,
     , _compilationError{""}
     , _attributesNames{options.attributes}
     , _indexParameters{options.indexParameters}
+    , _fallbacks{std::move(options.fallbacks)}
 {
   stl_util::concat(_uniformsNames, options.samplers);
+
+  if (!options.uniformBuffersNames.empty()) {
+    for (unsigned int i = 0; i < options.uniformBuffersNames.size(); ++i) {
+      _uniformBuffersNames[options.uniformBuffersNames[i]] = i;
+    }
+  }
 
   std::string vertexSource   = "";
   std::string fragmentSource = "";
@@ -97,20 +120,28 @@ Effect::Effect(const std::unordered_map<std::string, std::string>& baseName,
 
   name = fragmentSource;
 
-  auto fallbacks = options.fallbacks.get();
-
-  _loadVertexShader(vertexSource, [this, &fragmentSource,
-                                   &fallbacks](const std::string& vertexCode) {
-    _processIncludes(vertexCode, [this, &fragmentSource, &fallbacks](
+  _loadVertexShader(vertexSource, [this, &fragmentSource](
+                                    const std::string& vertexCode) {
+    _processIncludes(vertexCode, [this, &fragmentSource](
                                    const std::string& vertexCodeWithIncludes) {
-      _loadFragmentShader(
-        fragmentSource, [this, &vertexCodeWithIncludes,
-                         &fallbacks](const std::string& fragmentCode) {
-          _processIncludes(
-            fragmentCode, [this, &vertexCodeWithIncludes, &fallbacks](
-                            const std::string& fragmentCodeWithIncludes) {
-              _prepareEffect(vertexCodeWithIncludes, fragmentCodeWithIncludes,
-                             _attributesNames, defines, fallbacks);
+      _processShaderConversion(
+        vertexCodeWithIncludes, false,
+        [this, &fragmentSource](const std::string& migratedVertexCode) {
+          _loadFragmentShader(
+            fragmentSource,
+            [this, &migratedVertexCode](const std::string& fragmentCode) {
+              _processIncludes(
+                fragmentCode, [this, &migratedVertexCode](
+                                const std::string& fragmentCodeWithIncludes) {
+                  _processShaderConversion(
+                    fragmentCodeWithIncludes, true,
+                    [this, &migratedVertexCode](
+                      const std::string& migratedFragmentCode) {
+                      _prepareEffect(migratedVertexCode, migratedFragmentCode,
+                                     _attributesNames, defines,
+                                     _fallbacks.get());
+                    });
+                });
             });
         });
     });
@@ -360,9 +391,9 @@ void Effect::_processIncludes(
   const std::regex regex("#include<(.+)>(\\((.*)\\))*(\\[(.*)\\])*");
   auto lines = String::split(sourceCode, '\n');
 
-  auto returnValue = sourceCode;
+  std::ostringstream returnValue;
 
-  for (const auto& line : lines) {
+  for (auto& line : lines) {
     auto match       = String::regexMatch(line, regex);
     auto includeFile = match[1];
 
@@ -401,7 +432,7 @@ void Effect::_processIncludes(
             auto minIndex             = indexSplits[0];
             auto maxIndex             = indexSplits[1];
             auto sourceIncludeContent = includeContent;
-            includeContent = "";
+            includeContent            = "";
 
             if ((!String::isDigit(maxIndex))
                 && stl_util::contains(_indexParameters, maxIndex)) {
@@ -409,12 +440,21 @@ void Effect::_processIncludes(
             }
 
             if (String::isDigit(minIndex) && String::isDigit(maxIndex)) {
-              size_t _minIndex = std::stoul(minIndex, nullptr, 0);
-              size_t _maxIndex = std::stoul(maxIndex, nullptr, 0);
+              const size_t _minIndex = std::stoul(minIndex, nullptr, 0);
+              const size_t _maxIndex = std::stoul(maxIndex, nullptr, 0);
               for (size_t i = _minIndex; i < _maxIndex; ++i) {
                 const auto istr = std::to_string(i);
                 if (_engine->webGLVersion() == 1.f) {
                   // Ubo replacement
+                  const auto callback = [](const std::smatch& m) {
+                    if (m.size() == 2) {
+                      return m.str(1) + "{X}";
+                    }
+                    return m.str(0);
+                  };
+                  const std::regex regex{"light\\{X\\}.(\\w*)"};
+                  sourceIncludeContent = String::regexReplace(
+                    sourceIncludeContent, regex, callback);
                 }
                 includeContent
                   += String::regexReplace(sourceIncludeContent, "\\{X\\}", istr)
@@ -426,6 +466,15 @@ void Effect::_processIncludes(
         else {
           if (_engine->webGLVersion() == 1.f) {
             // Ubo replacement
+            const auto callback = [](const std::smatch& m) {
+              if (m.size() == 2) {
+                return m.str(1) + "{X}";
+              }
+              return m.str(0);
+            };
+            const std::regex regex{"light\\{X\\}.(\\w*)"};
+            includeContent
+              = String::regexReplace(includeContent, regex, callback);
           }
           includeContent
             = String::regexReplace(includeContent, "\\{X\\}", indexString);
@@ -433,14 +482,16 @@ void Effect::_processIncludes(
       }
 
       // Replace
-      String::replaceInPlace(returnValue, match[0], includeContent);
+      String::replaceInPlace(line, match[0], includeContent);
     }
     else {
       // Load from file
     }
+
+    returnValue << line << std::endl;
   }
 
-  callback(returnValue);
+  callback(returnValue.str());
 }
 
 std::string Effect::_processPrecision(std::string source)
