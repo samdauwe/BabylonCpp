@@ -47,12 +47,20 @@ def processShaderFile(shaderPath, outputDir, definePath="BABYLON_SHADERS",
     """
     import codecs
     # name case fixes in output path
+    if "normalMap" in outputDir:
+        outputDir = outputDir.replace("normalMap", "normalmap")
     if "triPlanar" in outputDir:
         outputDir = outputDir.replace("triPlanar", "triplanar")
+    if "shadowOnly" in outputDir:
+        outputDir = outputDir.replace("shadowOnly", "shadowonly")
     # read shader file contents
     shaderVarName = os.path.basename(shaderPath)
+    if "normalmap" in outputDir:
+        shaderVarName = shaderVarName.replace("normalmap", "normalMap")
     if "triplanar" in outputDir:
         shaderVarName = shaderVarName.replace("triplanar", "triPlanar")
+    if "shadowonly" in outputDir:
+        shaderVarName = shaderVarName.replace("shadowonly", "shadowOnly")
     shaderFilename = prepareFilename(shaderVarName)
     lines = [line.rstrip('\n').rstrip('\r').decode("utf-8-sig") \
                                                 for line in open(shaderPath)]
@@ -226,7 +234,7 @@ def getDirectoriesInDir(directory):
             directories[d] = path
     return directories
 
-def generateShadersStores(shadersInputDir, shadersOutputDir):
+def generateShadersStores(inputDir, outputDir):
     """
     Generates the shaders stores files from the Babylon.js shaders folder.
     """
@@ -360,7 +368,7 @@ if __name__ == "__main__":
     # set default values when input is missing
     if not options.inputDir:
         options.inputDir = os.path.join(os.getcwd(), "..", "..", "..",
-                                        "Projects", "Babylon.js-2.5")
+                                        "Projects", "Babylon.js-3.0.0_alpha_25_05_2017")
         args += [options.inputDir]
     if not options.outputDir:
         options.outputDir = os.path.join(os.getcwd(), "..", "src", "BabylonCpp")
@@ -393,5 +401,5 @@ if __name__ == "__main__":
 
     # generate the shader store
     generateShadersStores(inputDir, outputDir)
-    #generateProceduralTexturesShaderHeaders(inputDir, outputDir)
-    #generateMaterialsLibraryShaderHeaders(inputDir, outputDir)
+    generateProceduralTexturesShaderHeaders(inputDir, outputDir)
+    generateMaterialsLibraryShaderHeaders(inputDir, outputDir)
