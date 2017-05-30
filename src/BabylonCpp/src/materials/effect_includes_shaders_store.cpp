@@ -4,6 +4,8 @@
 #include <babylon/shaders/shadersinclude/bones_vertex_fx.h>
 #include <babylon/shaders/shadersinclude/bump_fragment_fx.h>
 #include <babylon/shaders/shadersinclude/bump_fragment_functions_fx.h>
+#include <babylon/shaders/shadersinclude/bump_vertex_fx.h>
+#include <babylon/shaders/shadersinclude/bump_vertex_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/clip_plane_fragment_fx.h>
 #include <babylon/shaders/shadersinclude/clip_plane_fragment_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/clip_plane_vertex_fx.h>
@@ -12,6 +14,9 @@
 #include <babylon/shaders/shadersinclude/color_curves_definition_fx.h>
 #include <babylon/shaders/shadersinclude/color_grading_fx.h>
 #include <babylon/shaders/shadersinclude/color_grading_definition_fx.h>
+#include <babylon/shaders/shadersinclude/default_fragment_declaration_fx.h>
+#include <babylon/shaders/shadersinclude/default_ubo_declaration_fx.h>
+#include <babylon/shaders/shadersinclude/default_vertex_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/fog_fragment_fx.h>
 #include <babylon/shaders/shadersinclude/fog_fragment_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/fog_vertex_fx.h>
@@ -23,14 +28,20 @@
 #include <babylon/shaders/shadersinclude/instances_vertex_fx.h>
 #include <babylon/shaders/shadersinclude/light_fragment_fx.h>
 #include <babylon/shaders/shadersinclude/light_fragment_declaration_fx.h>
+#include <babylon/shaders/shadersinclude/light_ubo_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/lights_fragment_functions_fx.h>
 #include <babylon/shaders/shadersinclude/log_depth_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/log_depth_fragment_fx.h>
 #include <babylon/shaders/shadersinclude/log_depth_vertex_fx.h>
+#include <babylon/shaders/shadersinclude/morph_targets_vertex_fx.h>
+#include <babylon/shaders/shadersinclude/morph_targets_vertex_declaration_fx.h>
+#include <babylon/shaders/shadersinclude/morph_targets_vertex_global_declaration_fx.h>
+#include <babylon/shaders/shadersinclude/pbr_fragment_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_functions_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_light_functions_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_light_functions_call_fx.h>
-#include <babylon/shaders/shadersinclude/pbr_shadow_functions_fx.h>
+#include <babylon/shaders/shadersinclude/pbr_ubo_declaration_fx.h>
+#include <babylon/shaders/shadersinclude/pbr_vertex_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/point_cloud_vertex_fx.h>
 #include <babylon/shaders/shadersinclude/point_cloud_vertex_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/reflection_function_fx.h>
@@ -45,6 +56,8 @@ std::unordered_map<std::string, const char*> EffectIncludesShadersStore::Shaders
    {"bonesVertex", bonesVertex},
    {"bumpFragment", bumpFragment},
    {"bumpFragmentFunctions", bumpFragmentFunctions},
+   {"bumpVertex", bumpVertex},
+   {"bumpVertexDeclaration", bumpVertexDeclaration},
    {"clipPlaneFragment", clipPlaneFragment},
    {"clipPlaneFragmentDeclaration", clipPlaneFragmentDeclaration},
    {"clipPlaneVertex", clipPlaneVertex},
@@ -53,6 +66,9 @@ std::unordered_map<std::string, const char*> EffectIncludesShadersStore::Shaders
    {"colorCurvesDefinition", colorCurvesDefinition},
    {"colorGrading", colorGrading},
    {"colorGradingDefinition", colorGradingDefinition},
+   {"defaultFragmentDeclaration", defaultFragmentDeclaration},
+   {"defaultUboDeclaration", defaultUboDeclaration},
+   {"defaultVertexDeclaration", defaultVertexDeclaration},
    {"fogFragment", fogFragment},
    {"fogFragmentDeclaration", fogFragmentDeclaration},
    {"fogVertex", fogVertex},
@@ -64,14 +80,20 @@ std::unordered_map<std::string, const char*> EffectIncludesShadersStore::Shaders
    {"instancesVertex", instancesVertex},
    {"lightFragment", lightFragment},
    {"lightFragmentDeclaration", lightFragmentDeclaration},
+   {"lightUboDeclaration", lightUboDeclaration},
    {"lightsFragmentFunctions", lightsFragmentFunctions},
    {"logDepthDeclaration", logDepthDeclaration},
    {"logDepthFragment", logDepthFragment},
    {"logDepthVertex", logDepthVertex},
+   {"morphTargetsVertex", morphTargetsVertex},
+   {"morphTargetsVertexDeclaration", morphTargetsVertexDeclaration},
+   {"morphTargetsVertexGlobalDeclaration", morphTargetsVertexGlobalDeclaration},
+   {"pbrFragmentDeclaration", pbrFragmentDeclaration},
    {"pbrFunctions", pbrFunctions},
    {"pbrLightFunctions", pbrLightFunctions},
    {"pbrLightFunctionsCall", pbrLightFunctionsCall},
-   {"pbrShadowFunctions", pbrShadowFunctions},
+   {"pbrUboDeclaration", pbrUboDeclaration},
+   {"pbrVertexDeclaration", pbrVertexDeclaration},
    {"pointCloudVertex", pointCloudVertex},
    {"pointCloudVertexDeclaration", pointCloudVertexDeclaration},
    {"reflectionFunction", reflectionFunction},

@@ -7,7 +7,7 @@ extern const char* fogVertexDeclaration;
 
 const char* fogVertexDeclaration
   = "#ifdef FOG\n"
-    "  varying float fFogDistance;\n"
+    "  varying vec3 vFogDistance;\n"
     "#endif\n";
 
 } // end of namespace BABYLON

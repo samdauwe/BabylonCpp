@@ -9,7 +9,11 @@ const char* bumpFragment
   = "vec2 uvOffset = vec2(0.0, 0.0);\n"
     "\n"
     "#if defined(BUMP) || defined(PARALLAX)\n"
-    "  mat3 TBN = cotangent_frame(normalW * vBumpInfos.y, -viewDirectionW, vBumpUV);\n"
+    "  #if defined(TANGENT) && defined(NORMAL)\n"
+    "  mat3 TBN = vTBN;\n"
+    "  #else\n"
+    "  mat3 TBN = cotangent_frame(normalW * vBumpInfos.y, vPositionW, vBumpUV);\n"
+    "  #endif\n"
     "#endif\n"
     "\n"
     "#ifdef PARALLAX\n"
@@ -23,7 +27,7 @@ const char* bumpFragment
     "#endif\n"
     "\n"
     "#ifdef BUMP\n"
-    "  normalW = perturbNormal(viewDirectionW, TBN, vBumpUV + uvOffset);\n"
+    "  normalW = perturbNormal(TBN, vBumpUV + uvOffset);\n"
     "#endif\n";
 
 } // end of namespace BABYLON

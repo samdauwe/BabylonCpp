@@ -11,6 +11,8 @@ const char* lightFragmentDeclaration
     "  uniform vec4 vLightDiffuse{X};\n"
     "  #ifdef SPECULARTERM\n"
     "  uniform vec3 vLightSpecular{X};\n"
+    "  #else\n"
+    "  vec3 vLightSpecular{X} = vec3(0.);\n"
     "  #endif\n"
     "  #ifdef SHADOW{X}\n"
     "  #if defined(SPOTLIGHT{X}) || defined(DIRLIGHT{X})\n"

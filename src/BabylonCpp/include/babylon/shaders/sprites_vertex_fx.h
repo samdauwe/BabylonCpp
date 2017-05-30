@@ -54,7 +54,7 @@ const char* spritesVertexShader
     "\n"
     "  // Fog\n"
     "#ifdef FOG\n"
-    "  fFogDistance = viewPos.z;\n"
+    "  vFogDistance = viewPos;\n"
     "#endif\n"
     "}\n";
 
