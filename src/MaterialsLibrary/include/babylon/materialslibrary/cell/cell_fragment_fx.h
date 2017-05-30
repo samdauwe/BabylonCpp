@@ -1,11 +1,11 @@
-﻿#ifndef BABYLON_MATERIALS_LIBRARY_SIMPLE_SIMPLE_FRAGMENT_FX_H
-#define BABYLON_MATERIALS_LIBRARY_SIMPLE_SIMPLE_FRAGMENT_FX_H
+﻿#ifndef BABYLON_MATERIALS_LIBRARY_CELL_CELL_FRAGMENT_FX_H
+#define BABYLON_MATERIALS_LIBRARY_CELL_CELL_FRAGMENT_FX_H
 
 namespace BABYLON {
 
-extern const char* simplePixelShader;
+extern const char* cellPixelShader;
 
-const char* simplePixelShader
+const char* cellPixelShader
   = "#ifdef GL_ES\n"
     "precision highp float;\n"
     "#endif\n"
@@ -28,7 +28,6 @@ const char* simplePixelShader
     "// Lights\n"
     "#include<__decl__lightFragment>[0..maxSimultaneousLights]\n"
     "\n"
-    "\n"
     "#include<lightsFragmentFunctions>\n"
     "#include<shadowsFragmentFunctions>\n"
     "\n"
@@ -44,7 +43,58 @@ const char* simplePixelShader
     "// Fog\n"
     "#include<fogFragmentDeclaration>\n"
     "\n"
-    "void main(void) {\n"
+    "// Custom\n"
+    "vec3 computeCustomDiffuseLighting(lightingInfo info, vec3 diffuseBase, float shadow)\n"
+    "{\n"
+    "  diffuseBase = info.diffuse * shadow;\n"
+    "\n"
+    "#ifdef CELLBASIC\n"
+    "  float level = 1.0;\n"
+    "  if (info.ndl < 0.5)\n"
+    "  level = 0.5;\n"
+    "  \n"
+    "  diffuseBase.rgb * vec3(level, level, level);\n"
+    "#else\n"
+    "  float ToonThresholds[4];\n"
+    "  ToonThresholds[0] = 0.95;\n"
+    "  ToonThresholds[1] = 0.5;\n"
+    "  ToonThresholds[2] = 0.2;\n"
+    "  ToonThresholds[3] = 0.03;\n"
+    "\n"
+    "  float ToonBrightnessLevels[5];\n"
+    "  ToonBrightnessLevels[0] = 1.0;\n"
+    "  ToonBrightnessLevels[1] = 0.8;\n"
+    "  ToonBrightnessLevels[2] = 0.6;\n"
+    "  ToonBrightnessLevels[3] = 0.35;\n"
+    "  ToonBrightnessLevels[4] = 0.2;\n"
+    "\n"
+    "  if (info.ndl > ToonThresholds[0])\n"
+    "  {\n"
+    "  diffuseBase.rgb *= ToonBrightnessLevels[0];\n"
+    "  }\n"
+    "  else if (info.ndl > ToonThresholds[1])\n"
+    "  {\n"
+    "  diffuseBase.rgb *= ToonBrightnessLevels[1];\n"
+    "  }\n"
+    "  else if (info.ndl > ToonThresholds[2])\n"
+    "  {\n"
+    "  diffuseBase.rgb *= ToonBrightnessLevels[2];\n"
+    "  }\n"
+    "  else if (info.ndl > ToonThresholds[3])\n"
+    "  {\n"
+    "  diffuseBase.rgb *= ToonBrightnessLevels[3];\n"
+    "  }\n"
+    "  else\n"
+    "  {\n"
+    "  diffuseBase.rgb *= ToonBrightnessLevels[4];\n"
+    "  }\n"
+    "#endif\n"
+    "\n"
+    "  return max(diffuseBase, vec3(0.2));\n"
+    "}\n"
+    "\n"
+    "void main(void)\n"
+    "{\n"
     "#include<clipPlaneFragment>\n"
     "\n"
     "  vec3 viewDirectionW = normalize(vEyePosition - vPositionW);\n"
@@ -79,8 +129,8 @@ const char* simplePixelShader
     "#endif\n"
     "\n"
     "  // Lighting\n"
-    "  vec3 diffuseBase = vec3(0., 0., 0.);\n"
     "  lightingInfo info;\n"
+    "  vec3 diffuseBase = vec3(0., 0., 0.);\n"
     "  float shadow = 1.;\n"
     "  float glossiness = 0.;\n"
     "\n"
@@ -89,12 +139,11 @@ const char* simplePixelShader
     "#endif    \n"
     "#include<lightFragment>[0..maxSimultaneousLights]\n"
     "\n"
-    "\n"
     "#ifdef VERTEXALPHA\n"
     "  alpha *= vColor.a;\n"
     "#endif\n"
     "\n"
-    "  vec3 finalDiffuse = clamp(diffuseBase * diffuseColor, 0.0, 1.0) * baseColor.rgb;\n"
+    "  vec3 finalDiffuse = clamp(diffuseBase * diffuseColor, 0.0, 1.0) * baseColor.rgb;;\n"
     "\n"
     "  // Composition\n"
     "  vec4 color = vec4(finalDiffuse, alpha);\n"
@@ -106,4 +155,4 @@ const char* simplePixelShader
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_MATERIALS_LIBRARY_SIMPLE_SIMPLE_FRAGMENT_FX_H
+#endif // end of BABYLON_MATERIALS_LIBRARY_CELL_CELL_FRAGMENT_FX_H

@@ -26,7 +26,7 @@ const char* triPlanarPixelShader
     "#endif\n"
     "\n"
     "// Lights\n"
-    "#include<lightFragmentDeclaration>[0..maxSimultaneousLights]\n"
+    "#include<__decl__lightFragment>[0..maxSimultaneousLights]\n"
     "\n"
     "// Samplers\n"
     "#ifdef DIFFUSEX\n"
