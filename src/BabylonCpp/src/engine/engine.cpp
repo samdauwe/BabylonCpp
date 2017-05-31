@@ -1054,6 +1054,9 @@ void Engine::_bindVertexBuffersAttributes(
 
       _gl->enableVertexAttribArray(_order);
       if (!_vaoRecordInProgress) {
+        if (_order >= _vertexAttribArraysEnabled.size()) {
+          _vertexAttribArraysEnabled.resize(_order + 1);
+        }
         _vertexAttribArraysEnabled[_order] = true;
       }
 

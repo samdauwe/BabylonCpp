@@ -180,7 +180,7 @@ bool MaterialHelper::PrepareDefinesForLights(
       }
 
       // Shadows
-      defines.shadows[lightIndex] = true;
+      defines.shadows[lightIndex] = false;
       if (scene->shadowsEnabled()) {
         auto shadowGenerator = light->getShadowGenerator();
         if (mesh && mesh->receiveShadows() && shadowGenerator) {

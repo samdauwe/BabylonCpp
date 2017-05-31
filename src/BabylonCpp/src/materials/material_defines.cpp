@@ -74,9 +74,16 @@ std::ostream& operator<<(std::ostream& os,
   os << "#define BonesPerMesh " << materialDefines.BonesPerMesh << "\n";
   os << "#define NUM_MORPH_INFLUENCERS "
      << materialDefines.NUM_MORPH_INFLUENCERS << "\n";
-  os << "#define TANGENT " << materialDefines.TANGENT << "\n";
-  os << "#define SHADOWS " << materialDefines.SHADOWS << "\n";
-  os << "#define LIGHTMAPEXCLUDED " << materialDefines.LIGHTMAPEXCLUDED << "\n";
+  if (materialDefines.TANGENT) {
+    os << "#define TANGENT " << materialDefines.TANGENT << "\n";
+  }
+  if (materialDefines.SHADOWS) {
+    os << "#define SHADOWS " << materialDefines.SHADOWS << "\n";
+  }
+  if (materialDefines.LIGHTMAPEXCLUDED) {
+    os << "#define LIGHTMAPEXCLUDED " << materialDefines.LIGHTMAPEXCLUDED
+       << "\n";
+  }
 
   for (size_t i = 0; i < materialDefines.lights.size(); ++i) {
     if (materialDefines.lights[i]) {

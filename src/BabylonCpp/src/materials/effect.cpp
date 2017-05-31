@@ -394,7 +394,12 @@ void Effect::_processIncludes(
   std::ostringstream returnValue;
 
   for (auto& line : lines) {
-    auto match       = String::regexMatch(line, regex);
+    auto match = String::regexMatch(line, regex);
+    if (match.size() != 6) {
+      returnValue << line << std::endl;
+      continue;
+    }
+
     auto includeFile = match[1];
 
     // Uniform declaration
@@ -483,12 +488,11 @@ void Effect::_processIncludes(
 
       // Replace
       String::replaceInPlace(line, match[0], includeContent);
+      returnValue << line << std::endl;
     }
     else {
       // Load from file
     }
-
-    returnValue << line << std::endl;
   }
 
   callback(returnValue.str());
