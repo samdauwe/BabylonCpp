@@ -19,11 +19,10 @@ ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha,
 ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha,
                                  float iBeta, float iRadius,
                                  const Vector3& iTarget, Scene* scene)
-    : TargetCamera(iName, Vector3::Zero(), scene)
+    : TargetCamera{iName, Vector3::Zero(), scene}
     , alpha{iAlpha}
     , beta{iBeta}
     , radius{iRadius}
-    , target{iTarget}
     , inertialAlphaOffset{0.f}
     , inertialBetaOffset{0.f}
     , inertialRadiusOffset{0.f}
@@ -38,7 +37,7 @@ ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha,
     , zoomOnFactor{1.f}
     , targetScreenOffset{Vector2::Zero()}
     , allowUpsideDown{true}
-    , panningAxis{std::make_unique<Vector3>(1.f, 0.f, 1.f)}
+    , panningAxis{std::make_unique<Vector3>(1.f, 1.f, 0.f)}
     , checkCollisions{false}
     , collisionRadius{std::make_unique<Vector3>(0.5f, 0.5f, 0.5f)}
     , _targetHost{nullptr}
@@ -48,6 +47,7 @@ ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha,
     , _newPosition{Vector3::Zero()}
     , _collisionTriggered{false}
 {
+  setTarget(iTarget);
   getViewMatrix();
   inputs = std::make_unique<ArcRotateCameraInputsManager>(this);
   inputs->addKeyboard().addMouseWheel().addPointers();
@@ -65,9 +65,10 @@ IReflect::Type ArcRotateCamera::type() const
 void ArcRotateCamera::_initCache()
 {
   TargetCamera::_initCache();
-  _cache.target = Vector3(std::numeric_limits<float>::max(),
-                          std::numeric_limits<float>::max(),
-                          std::numeric_limits<float>::max());
+
+  _cache._target = Vector3(std::numeric_limits<float>::max(),
+                           std::numeric_limits<float>::max(),
+                           std::numeric_limits<float>::max());
   _cache.alpha              = 0.f;
   _cache.beta               = 0.f;
   _cache.radius             = 0.f;
@@ -80,21 +81,26 @@ void ArcRotateCamera::_updateCache(bool ignoreParentClass)
     TargetCamera::_updateCache(ignoreParentClass);
   }
 
-  _cache.target.copyFrom(_getTargetPosition());
+  _cache._target.copyFrom(_getTargetPosition());
   _cache.alpha  = alpha;
   _cache.beta   = beta;
   _cache.radius = radius;
   _cache.targetScreenOffset.copyFrom(targetScreenOffset);
 }
 
-Vector3 ArcRotateCamera::_getTargetPosition() const
+Vector3 ArcRotateCamera::_getTargetPosition()
 {
   if (_targetHost && _targetHost->getAbsolutePosition()) {
     auto pos = _targetHost->getAbsolutePosition();
-    return _targetBoundingCenter ? pos->add(*_targetBoundingCenter) : *pos;
+    if (_targetBoundingCenter) {
+      pos->addToRef(*_targetBoundingCenter, _target);
+    }
+    else {
+      _target.copyFrom(*pos);
+    }
   }
 
-  return target;
+  return _target;
 }
 
 bool ArcRotateCamera::_isSynchronizedViewMatrix()
@@ -103,7 +109,7 @@ bool ArcRotateCamera::_isSynchronizedViewMatrix()
     return false;
   }
 
-  return _cache.target.equals(target)
+  return _cache._target.equals(_target)
          && stl_util::almost_equal(_cache.alpha, alpha)
          && stl_util::almost_equal(_cache.beta, beta)
          && stl_util::almost_equal(_cache.radius, radius)
@@ -163,13 +169,13 @@ void ArcRotateCamera::_checkInputs()
     inertialAlphaOffset *= inertia;
     inertialBetaOffset *= inertia;
     inertialRadiusOffset *= inertia;
-    if (std::abs(inertialAlphaOffset) < MathTools::Epsilon) {
+    if (std::abs(inertialAlphaOffset) < speed * MathTools::Epsilon) {
       inertialAlphaOffset = 0.f;
     }
-    if (std::abs(inertialBetaOffset) < MathTools::Epsilon) {
+    if (std::abs(inertialBetaOffset) < speed * MathTools::Epsilon) {
       inertialBetaOffset = 0.f;
     }
-    if (std::abs(inertialRadiusOffset) < MathTools::Epsilon) {
+    if (std::abs(inertialRadiusOffset) < speed * MathTools::Epsilon) {
       inertialRadiusOffset = 0.f;
     }
   }
@@ -180,16 +186,6 @@ void ArcRotateCamera::_checkInputs()
     if (!_localDirection) {
       _localDirection       = std::make_unique<Vector3>(Vector3::Zero());
       _transformedDirection = Vector3::Zero();
-    }
-
-    inertialPanningX *= inertia;
-    inertialPanningY *= inertia;
-
-    if (std::abs(inertialPanningX) < MathTools::Epsilon) {
-      inertialPanningX = 0.f;
-    }
-    if (std::abs(inertialPanningY) < MathTools::Epsilon) {
-      inertialPanningY = 0.f;
     }
 
     _localDirection->copyFromFloats(inertialPanningX, inertialPanningY,
@@ -203,7 +199,19 @@ void ArcRotateCamera::_checkInputs()
       _transformedDirection.y = 0;
     }
 
-    target.addInPlace(_transformedDirection);
+    if (!_targetHost) {
+      _target.addInPlace(_transformedDirection);
+    }
+
+    inertialPanningX *= inertia;
+    inertialPanningY *= inertia;
+
+    if (std::abs(inertialPanningX) < speed * MathTools::Epsilon) {
+      inertialPanningX = 0.f;
+    }
+    if (std::abs(inertialPanningY) < speed * MathTools::Epsilon) {
+      inertialPanningY = 0.f;
+    }
   }
 
   // Limits
@@ -216,7 +224,7 @@ void ArcRotateCamera::_checkLimits()
 {
   if (lowerBetaLimit == 0.f) {
     if (allowUpsideDown && beta > Math::PI) {
-      beta = beta - (2 * Math::PI2);
+      beta = beta - (2 * Math::PI);
     }
   }
   else {
@@ -285,6 +293,16 @@ void ArcRotateCamera::setPosition(const Vector3& iPosition)
   rebuildAnglesAndRadius();
 }
 
+Vector3& ArcRotateCamera::target()
+{
+  return _target;
+}
+
+const Vector3& ArcRotateCamera::target() const
+{
+  return _target;
+}
+
 void ArcRotateCamera::setTarget(AbstractMesh* iTarget, bool toBoundingCenter,
                                 bool /*allowSamePosition*/)
 {
@@ -297,7 +315,7 @@ void ArcRotateCamera::setTarget(AbstractMesh* iTarget, bool toBoundingCenter,
       _targetBoundingCenter.reset(nullptr);
     }
     _targetHost = iTarget;
-    target      = _getTargetPosition();
+    _target     = _getTargetPosition();
   }
 
   rebuildAnglesAndRadius();
@@ -311,7 +329,7 @@ void ArcRotateCamera::setTarget(const Vector3& iTarget,
   if (!allowSamePosition && _getTargetPosition().equals(newTarget)) {
     return;
   }
-  target = newTarget;
+  _target = newTarget;
   _targetBoundingCenter.reset(nullptr);
 
   rebuildAnglesAndRadius();
@@ -320,12 +338,12 @@ void ArcRotateCamera::setTarget(const Vector3& iTarget,
 Matrix ArcRotateCamera::_getViewMatrix()
 {
   // Compute
-  float cosa = std::cos(alpha);
-  float sina = std::sin(alpha);
-  float cosb = std::cos(beta);
-  float sinb = std::sin(beta);
+  const float cosa = std::cos(alpha);
+  const float sina = std::sin(alpha);
+  const float cosb = std::cos(beta);
+  float sinb       = std::sin(beta);
 
-  if (sinb == 0.f) {
+  if (stl_util::almost_equal(sinb, 0.f)) {
     sinb = 0.0001f;
   }
 
@@ -356,15 +374,15 @@ Matrix ArcRotateCamera::_getViewMatrix()
     }
 
     if (getScene()->useRightHandedSystem) {
-      Matrix::LookAtRHToRef(position, target, up, _viewMatrix);
+      Matrix::LookAtRHToRef(position, _target, up, _viewMatrix);
     }
     else {
-      Matrix::LookAtLHToRef(position, target, up, _viewMatrix);
+      Matrix::LookAtLHToRef(position, _target, up, _viewMatrix);
     }
     _viewMatrix.m[12] += targetScreenOffset.x;
     _viewMatrix.m[13] += targetScreenOffset.y;
   }
-  _currentTarget = target;
+  _currentTarget = _target;
 
   return _viewMatrix;
 }
@@ -389,16 +407,16 @@ void ArcRotateCamera::_onCollisionPositionChange(int /*collisionId*/,
   }
 
   // Recompute because of constraints
-  float cosa = std::cos(alpha);
-  float sina = std::sin(alpha);
-  float cosb = std::cos(beta);
-  float sinb = std::sin(beta);
+  const float cosa = std::cos(alpha);
+  const float sina = std::sin(alpha);
+  const float cosb = std::cos(beta);
+  float sinb       = std::sin(beta);
 
   if (stl_util::almost_equal(sinb, 0.f)) {
     sinb = 0.0001f;
   }
 
-  Vector3 _target = _getTargetPosition();
+  auto _target = _getTargetPosition();
   _target.addToRef(
     Vector3(radius * cosa * sinb, radius * cosb, radius * sina * sinb),
     _newPosition);
@@ -419,8 +437,7 @@ void ArcRotateCamera::_onCollisionPositionChange(int /*collisionId*/,
 void ArcRotateCamera::zoomOn(const std::vector<AbstractMesh*> meshes,
                              bool doNotUpdateMaxZ)
 {
-  std::vector<AbstractMesh*> _meshes
-    = meshes.empty() ? getScene()->getMeshes() : meshes;
+  auto _meshes = meshes.empty() ? getScene()->getMeshes() : meshes;
 
   auto minMaxVector = Mesh::GetMinMax(_meshes);
   auto distance     = Vector3::Distance(minMaxVector.min, minMaxVector.max);
@@ -433,7 +450,7 @@ void ArcRotateCamera::zoomOn(const std::vector<AbstractMesh*> meshes,
 void ArcRotateCamera::focusOn(
   const MinMaxDistance& meshesOrMinMaxVectorAndDistance, bool doNotUpdateMaxZ)
 {
-  target = Mesh::Center(meshesOrMinMaxVectorAndDistance);
+  _target = Mesh::Center(meshesOrMinMaxVectorAndDistance);
 
   if (!doNotUpdateMaxZ) {
     maxZ = meshesOrMinMaxVectorAndDistance.distance * 2.f;
@@ -461,8 +478,8 @@ Camera* ArcRotateCamera::createRigCamera(const std::string& iName,
       break;
   }
 
-  auto rigCam = new ArcRotateCamera(iName, alpha + alphaShift, beta, radius,
-                                    target, getScene());
+  auto rigCam = ArcRotateCamera::New(iName, alpha + alphaShift, beta, radius,
+                                     _target, getScene());
   return rigCam;
 }
 

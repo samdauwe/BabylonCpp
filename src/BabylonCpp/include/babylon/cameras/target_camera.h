@@ -62,7 +62,7 @@ protected:
 
 private:
   void _getRigCamPosition(float halfSpace, Vector3& result);
-  void _updateCameraRotationMatrix();
+  void _updateCameraRotationMatrix() override;
 
 public:
   std::unique_ptr<Vector3> cameraDirection;

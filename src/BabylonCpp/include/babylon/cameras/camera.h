@@ -82,9 +82,17 @@ public:
   Matrix& getTranformationMatrix();
   bool isInFrustum(ICullable* target);
   bool isCompletelyInFrustum(ICullable* target);
+  Ray getForwardRay(float length = 100.f);
+  Ray getForwardRay(float length, const Matrix& transform);
+  Ray getForwardRay(float length, const Matrix& transform,
+                    const Vector3& origin);
   virtual void dispose(bool doNotRecurse = false) override;
 
   /** Camera rigs section **/
+  FreeCamera* leftCamera();
+  FreeCamera* rightCamera();
+  Vector3* getLeftTarget();
+  Vector3* getRightTarget();
   void setCameraRigMode(int mode, const std::string& rigParams);
   void setCameraRigParameter(const std::string& name, float value);
   virtual Camera* createRigCamera(const std::string& name, int cameraIndex);
@@ -110,8 +118,10 @@ private:
   void _cascadePostProcessesToRigCams();
   void updateFrustumPlanes();
   Matrix& _getVRProjectionMatrix();
-  Matrix& _getWebVRProjectionMatrix();
-  Matrix& _getWebVRViewMatrix();
+  virtual void _updateCameraRotationMatrix();
+  virtual void _updateWebVRCameraRotationMatrix();
+  virtual Matrix& _getWebVRProjectionMatrix();
+  virtual Matrix& _getWebVRViewMatrix();
 
 public:
   /** Members **/
@@ -150,6 +160,7 @@ private:
   bool _doNotComputeProjectionMatrix;
   std::unique_ptr<Matrix> _worldMatrix;
   Matrix _transformMatrix;
+  Matrix _webvrProjectionMatrix;
   Matrix _webvrViewMatrix;
   Vector3 _globalPosition;
   std::array<Plane, 6> _frustumPlanes;

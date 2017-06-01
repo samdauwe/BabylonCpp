@@ -199,7 +199,7 @@ struct NodeCache {
   // TargetCamera
   std::unique_ptr<Vector3> lockedTarget;
   // ArcRotateCamera
-  Vector3 target;
+  Vector3 _target;
   float alpha;
   float beta;
   float gamma;

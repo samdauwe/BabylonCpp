@@ -10,6 +10,7 @@
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/culling/icullable.h>
+#include <babylon/culling/ray.h>
 #include <babylon/engine/engine.h>
 #include <babylon/math/frustum.h>
 #include <babylon/postprocess/pass_post_process.h>
@@ -43,6 +44,7 @@ Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene)
     , _computedViewMatrix{Matrix::Identity()}
     , _doNotComputeProjectionMatrix{false}
     , _transformMatrix{Matrix::Zero()}
+    , _webvrProjectionMatrix{Matrix::Identity()}
     , _webvrViewMatrix{Matrix::Identity()}
     , _globalPosition{Vector3::Zero()}
     , _refreshFrustumPlanes{true}
@@ -493,6 +495,27 @@ bool Camera::isCompletelyInFrustum(ICullable* target)
   return target->isCompletelyInFrustum(_frustumPlanes);
 }
 
+Ray Camera::getForwardRay(float length)
+{
+  return getForwardRay(length, *getWorldMatrix(), position);
+}
+
+Ray Camera::getForwardRay(float length, const Matrix& transform)
+{
+  return getForwardRay(length, transform, position);
+}
+
+Ray Camera::getForwardRay(float length, const Matrix& transform,
+                          const Vector3& origin)
+{
+  Vector3 forward(0.f, 0.f, 1.f);
+  auto forwardWorld = Vector3::TransformNormal(forward, transform);
+
+  auto direction = Vector3::Normalize(forwardWorld);
+
+  return Ray(origin, direction, length);
+}
+
 void Camera::dispose(bool /*doNotRecurse*/)
 {
   // Animations
@@ -516,6 +539,38 @@ void Camera::dispose(bool /*doNotRecurse*/)
 }
 
 // ---- Camera rigs section ----
+FreeCamera* Camera::leftCamera()
+{
+  if (_rigCameras.size() < 1) {
+    return nullptr;
+  }
+  return static_cast<FreeCamera*>(_rigCameras[0]);
+}
+
+FreeCamera* Camera::rightCamera()
+{
+  if (_rigCameras.size() < 2) {
+    return nullptr;
+  }
+  return static_cast<FreeCamera*>(_rigCameras[1]);
+}
+
+Vector3* Camera::getLeftTarget()
+{
+  if (_rigCameras.size() < 1) {
+    return nullptr;
+  }
+  return &static_cast<TargetCamera*>(_rigCameras[0])->getTarget();
+}
+
+Vector3* Camera::getRightTarget()
+{
+  if (_rigCameras.size() < 2) {
+    return nullptr;
+  }
+  return &static_cast<TargetCamera*>(_rigCameras[1])->getTarget();
+}
+
 void Camera::setCameraRigMode(int /*iMode*/, const std::string& /*rigParams*/)
 {
 }
@@ -530,11 +585,31 @@ Matrix& Camera::_getVRProjectionMatrix()
   return _projectionMatrix;
 }
 
-Matrix& Camera::_getWebVRProjectionMatrix()
+void Camera::_updateCameraRotationMatrix()
 {
-  return _projectionMatrix;
+  // Here for WebVR
 }
 
+void Camera::_updateWebVRCameraRotationMatrix()
+{
+  // Here for WebVR
+}
+
+/**
+ * This function MUST be overwritten by the different WebVR cameras available.
+ * The context in which it is running is the RIG camera. So 'this' is the
+ * TargetCamera, left or right.
+ */
+Matrix& Camera::_getWebVRProjectionMatrix()
+{
+  return _webvrProjectionMatrix;
+}
+
+/**
+ * This function MUST be overwritten by the different WebVR cameras available.
+ * The context in which it is running is the RIG camera. So 'this' is the
+ * TargetCamera, left or right.
+ */
 Matrix& Camera::_getWebVRViewMatrix()
 {
   return _webvrViewMatrix;

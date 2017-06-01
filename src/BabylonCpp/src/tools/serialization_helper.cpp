@@ -50,8 +50,8 @@ Camera* SerializationHelper::Parse(Camera* camera,
     }
     // target
     if (parsedCamera.contains("target")) {
-      arcRotateCamera->target
-        = Vector3::FromArray(Json::ToArray<float>(parsedCamera, "target"));
+      arcRotateCamera->setTarget(
+        Vector3::FromArray(Json::ToArray<float>(parsedCamera, "target")));
     }
     // inertialAlphaOffset
     if (parsedCamera.contains("inertialAlphaOffset")) {

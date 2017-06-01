@@ -40,6 +40,8 @@ public:
   void _checkInputs() override;
   void rebuildAnglesAndRadius();
   void setPosition(const Vector3& position);
+  Vector3& target();
+  const Vector3& target() const;
   void setTarget(AbstractMesh* target, bool toBoundingCenter = false,
                  bool allowSamePosition = false);
   void setTarget(const Vector3& target, bool toBoundingCenter = false,
@@ -62,7 +64,7 @@ protected:
                   float radius, const Vector3& target, Scene* scene);
 
 private:
-  Vector3 _getTargetPosition() const;
+  Vector3 _getTargetPosition();
   void _checkLimits();
   void _onCollisionPositionChange(int collisionId, Vector3& newPosition,
                                   AbstractMesh* collidedMesh = nullptr);
@@ -71,7 +73,6 @@ public:
   float alpha;
   float beta;
   float radius;
-  Vector3 target;
   float inertialAlphaOffset;
   float inertialBetaOffset;
   float inertialRadiusOffset;
@@ -100,6 +101,7 @@ public:
   std::unique_ptr<Vector3> collisionRadius;
 
 private:
+  Vector3 _target;
   AbstractMesh* _targetHost;
   // Panning
   std::unique_ptr<Vector3> _localDirection;

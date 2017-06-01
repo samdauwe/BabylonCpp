@@ -234,25 +234,25 @@ void TargetCamera::_checkInputs()
 
   // Inertia
   if (needToMove) {
-    if (std::abs(cameraDirection->x) < MathTools::Epsilon) {
+    if (std::abs(cameraDirection->x) < speed * MathTools::Epsilon) {
       cameraDirection->x = 0.f;
     }
 
-    if (std::abs(cameraDirection->y) < MathTools::Epsilon) {
+    if (std::abs(cameraDirection->y) < speed * MathTools::Epsilon) {
       cameraDirection->y = 0.f;
     }
 
-    if (std::abs(cameraDirection->z) < MathTools::Epsilon) {
+    if (std::abs(cameraDirection->z) < speed * MathTools::Epsilon) {
       cameraDirection->z = 0.f;
     }
     cameraDirection->scaleInPlace(inertia);
   }
   if (needToRotate) {
-    if (std::abs(cameraRotation->x) < MathTools::Epsilon) {
+    if (std::abs(cameraRotation->x) < speed * MathTools::Epsilon) {
       cameraRotation->x = 0.f;
     }
 
-    if (std::abs(cameraRotation->y) < MathTools::Epsilon) {
+    if (std::abs(cameraRotation->y) < speed * MathTools::Epsilon) {
       cameraRotation->y = 0.f;
     }
     cameraRotation->scaleInPlace(inertia);
