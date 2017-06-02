@@ -25,7 +25,8 @@ public:
               Engine* engine = nullptr, bool reusable = false,
               const std::string& defines = "",
               unsigned int textureType
-              = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+              = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+              const std::string& vertexUrl = "postprocess");
   PostProcess(const std::string& name, const std::string& fragmentUrl,
               const std::vector<std::string>& parameters,
               const std::vector<std::string>& samplers,
@@ -35,7 +36,8 @@ public:
               Engine* engine = nullptr, bool reusable = false,
               const std::string& defines = "",
               unsigned int textureType
-              = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+              = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+              const std::string& vertexUrl = "postprocess");
   virtual ~PostProcess();
 
   // Events
@@ -102,6 +104,7 @@ private:
   Effect* _effect;
   std::vector<std::string> _samplers;
   std::string _fragmentUrl;
+  std::string _vertexUrl;
   std::vector<std::string> _parameters;
   Vector2 _scaleRatio;
   // Events

@@ -7,6 +7,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -18,9 +19,10 @@ PostProcess::PostProcess(const std::string& iName,
                          float renderRatio, Camera* camera,
                          unsigned int samplingMode, Engine* engine,
                          bool reusable, const std::string& defines,
-                         unsigned int textureType)
+                         unsigned int textureType, const std::string& vertexUrl)
     : PostProcess(iName, fragmentUrl, parameters, samplers, {-1, -1}, camera,
-                  samplingMode, engine, reusable, defines, textureType)
+                  samplingMode, engine, reusable, defines, textureType,
+                  vertexUrl)
 {
   _renderRatio = renderRatio;
 }
@@ -32,7 +34,7 @@ PostProcess::PostProcess(const std::string& iName,
                          const PostProcessOptions& options, Camera* camera,
                          unsigned int samplingMode, Engine* engine,
                          bool reusable, const std::string& defines,
-                         unsigned int textureType)
+                         unsigned int textureType, const std::string& vertexUrl)
     : name{iName}
     , width{-1}
     , height{-1}
@@ -43,6 +45,7 @@ PostProcess::PostProcess(const std::string& iName,
     , _options{options}
     , _reusable{false}
     , _fragmentUrl{fragmentUrl}
+    , _vertexUrl{vertexUrl}
     , _parameters{parameters}
     , _scaleRatio{Vector2(1.f, 1.f)}
 {
@@ -121,7 +124,7 @@ void PostProcess::setOnAfterRender(
 void PostProcess::updateEffect(const std::string& defines)
 {
   std::unordered_map<std::string, std::string> baseName{
-    {"vertex", "postprocess"}, {"fragment", _fragmentUrl}};
+    {"vertex", _vertexUrl}, {"fragment", _fragmentUrl}};
 
   EffectCreationOptions options;
   options.attributes    = {"position"};
@@ -180,17 +183,25 @@ void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture)
     }
     width  = desiredWidth;
     height = desiredHeight;
-    /*_textures.emplace_back(_engine->createRenderTargetTexture(
-      ISize(width, height), false,
-      stl_util::index_of(pCamera->_postProcesses, this) == 0,
-      renderTargetSamplingMode, _textureType));
+
+    auto textureSize = ISize(width, height);
+    IRenderTargetOptions textureOptions;
+    textureOptions.generateMipMaps = false;
+    textureOptions.generateDepthBuffer
+      = stl_util::index_of(pCamera->_postProcesses, this) == 0;
+    textureOptions.generateStencilBuffer
+      = (stl_util::index_of(pCamera->_postProcesses, this) == 0)
+        && _engine->isStencilEnable();
+    textureOptions.samplingMode = renderTargetSamplingMode;
+    textureOptions.type         = _textureType;
+
+    _textures.emplace_back(
+      _engine->createRenderTargetTexture(textureSize, textureOptions));
 
     if (_reusable) {
-      _textures.emplace_back(_engine->createRenderTargetTexture(
-        ISize(width, height), false,
-        stl_util::index_of(pCamera->_postProcesses, this) == 0,
-        renderTargetSamplingMode, _textureType));
-    }*/
+      _textures.emplace_back(
+        _engine->createRenderTargetTexture(textureSize, textureOptions));
+    }
 
     onSizeChangedObservable.notifyObservers(this);
   }

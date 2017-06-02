@@ -15,6 +15,8 @@
 
 namespace BABYLON {
 
+unsigned int StandardRenderingPipeline::LuminanceSteps = 6;
+
 StandardRenderingPipeline::StandardRenderingPipeline(
   const std::string& iName, Scene* scene, float ratio,
   PostProcess* iOriginalPostProcess, const std::vector<Camera*>& cameras)
@@ -24,8 +26,13 @@ StandardRenderingPipeline::StandardRenderingPipeline(
     , brightPassPostProcess{nullptr}
     , textureAdderPostProcess{nullptr}
     , textureAdderFinalPostProcess{nullptr}
+    , lensFlareFinalPostProcess{nullptr}
+    , luminancePostProcess{nullptr}
+    , hdrPostProcess{nullptr}
+    , hdrFinalPostProcess{nullptr}
     , lensFlarePostProcess{nullptr}
     , lensFlareComposePostProcess{nullptr}
+    , motionBlurPostProcess{nullptr}
     , depthOfFieldPostProcess{nullptr}
     , brightThreshold{1.f}
     , blurWidth{2.f}
@@ -33,6 +40,9 @@ StandardRenderingPipeline::StandardRenderingPipeline(
     , gaussianMean{1.f}
     , gaussianStandardDeviation{1.f}
     , exposure{1.f}
+    , hdrMinimumLuminance{1.f}
+    , hdrDecreaseRate{0.5f}
+    , hdrIncreaseRate{0.5f}
     , lensTexture{nullptr}
     , lensColorTexture{nullptr}
     , lensFlareStrength{20.f}
@@ -42,17 +52,30 @@ StandardRenderingPipeline::StandardRenderingPipeline(
     , lensStarTexture{nullptr}
     , lensFlareDirtTexture{nullptr}
     , depthOfFieldDistance{10.f}
+    , depthOfFieldBlurWidth{2.f}
+    , motionStrength{1.f}
     , _scene{scene}
     , _depthRenderer{nullptr}
+    , _currentDepthOfFieldSource{nullptr}
+    , _currentHDRSource{nullptr}
+    , _hdrCurrentLuminance{1.f}
+    , _motionBlurSamples{64}
     , _depthOfFieldEnabled{true}
     , _lensFlareEnabled{true}
+    , _hdrEnabled{true}
+    , _motionBlurEnabled{true}
 {
+  // Misc
+  auto floatTextureType = scene->getEngine()->getCaps().textureFloatRender ?
+                            EngineConstants::TEXTURETYPE_FLOAT :
+                            EngineConstants::TEXTURETYPE_HALF_FLOAT;
+
   // Create pass post-process
   if (!originalPostProcess) {
     originalPostProcess = new PostProcess(
       "HDRPass", "standard", {}, {}, ratio, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), true,
-      "#define PASS_POST_PROCESS", EngineConstants::TEXTURETYPE_FLOAT);
+      "#define PASS_POST_PROCESS", floatTextureType);
   }
   else {
     originalPostProcess = iOriginalPostProcess;
@@ -89,11 +112,39 @@ StandardRenderingPipeline::StandardRenderingPipeline(
   // Create lens flare post-process
   _createLensFlarePostProcess(scene, ratio);
 
+  // Create depth-of-field source post-process post lens-flare and disable it
+  // now
+  lensFlareFinalPostProcess = new PostProcess(
+    "HDRPostLensFlareDepthOfFieldSource", "standard", {}, {}, ratio, nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
+    "#define PASS_POST_PROCESS", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+  addEffect(new PostProcessRenderEffect(
+    scene->getEngine(), "HDRPostLensFlareDepthOfFieldSource",
+    [&]() { return lensFlareFinalPostProcess; }, true));
+
+  // Create luminance
+  _createLuminancePostProcesses(scene, floatTextureType);
+
+  // Create HDR
+  _createHdrPostProcess(scene, ratio);
+
+  // Create depth-of-field source post-process post hdr and disable it now
+  hdrFinalPostProcess = new PostProcess(
+    "HDRPostHDReDepthOfFieldSource", "standard", {}, {}, ratio, nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
+    "#define PASS_POST_PROCESS", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+  addEffect(new PostProcessRenderEffect(
+    scene->getEngine(), "HDRPostHDReDepthOfFieldSource",
+    [&]() { return hdrFinalPostProcess; }, true));
+
   // Create gaussian blur used by depth-of-field
   _createGaussianBlurPostProcesses(scene, ratio / 2.f, 5);
 
   // Create depth-of-field post-process
   _createDepthOfFieldPostProcess(scene, ratio);
+
+  // Create motion blur post-process
+  _createMotionBlurPostProcess(scene, ratio);
 
   // Finish
   scene->postProcessRenderPipelineManager()->addPipeline(this);
@@ -106,6 +157,8 @@ StandardRenderingPipeline::StandardRenderingPipeline(
   // Deactivate
   setLensFlareEnabled(false);
   setDepthOfFieldEnabled(false);
+  setHDREnabled(false);
+  setMotionBlurEnabled(false);
 }
 
 StandardRenderingPipeline::~StandardRenderingPipeline()
@@ -157,6 +210,8 @@ void StandardRenderingPipeline::setLensFlareEnabled(bool enabled)
       _name, "HDRGaussianBlurV" + blurIndexStr, _scene->getCameras());
     _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
       _name, "HDRLensFlareCompose", _scene->getCameras());
+    _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
+      _name, "HDRPostLensFlareDepthOfFieldSource", _scene->getCameras());
   }
   else if (!enabled && _lensFlareEnabled) {
     _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
@@ -169,6 +224,8 @@ void StandardRenderingPipeline::setLensFlareEnabled(bool enabled)
       _name, "HDRGaussianBlurV" + blurIndexStr, _scene->getCameras());
     _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
       _name, "HDRLensFlareCompose", _scene->getCameras());
+    _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
+      _name, "HDRPostLensFlareDepthOfFieldSource", _scene->getCameras());
   }
 
   _lensFlareEnabled = enabled;
@@ -177,6 +234,76 @@ void StandardRenderingPipeline::setLensFlareEnabled(bool enabled)
 bool StandardRenderingPipeline::lensFlareEnabled() const
 {
   return _lensFlareEnabled;
+}
+
+void StandardRenderingPipeline::setHDREnabled(bool enabled)
+{
+  if (enabled && !_hdrEnabled) {
+    _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
+      _name, "HDRLuminance", _scene->getCameras());
+    for (std::size_t i = 0; i < luminanceDownSamplePostProcesses.size(); ++i) {
+      _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
+        _name, "HDRLuminanceDownSample" + std::to_string(i),
+        _scene->getCameras());
+    }
+    _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
+      _name, "HDR", _scene->getCameras());
+    _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
+      _name, "HDRPostHDReDepthOfFieldSource", _scene->getCameras());
+  }
+  else if (!enabled && _hdrEnabled) {
+    _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
+      _name, "HDRLuminance", _scene->getCameras());
+    for (std::size_t i = 0; i < luminanceDownSamplePostProcesses.size(); ++i) {
+      _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
+        _name, "HDRLuminanceDownSample" + std::to_string(i),
+        _scene->getCameras());
+    }
+    _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
+      _name, "HDR", _scene->getCameras());
+    _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
+      _name, "HDRPostHDReDepthOfFieldSource", _scene->getCameras());
+  }
+
+  _hdrEnabled = enabled;
+}
+
+bool StandardRenderingPipeline::HDREnabled() const
+{
+  return _hdrEnabled;
+}
+
+void StandardRenderingPipeline::setMotionBlurEnabled(bool enabled)
+{
+  if (enabled && !_motionBlurEnabled) {
+    _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
+      _name, "HDRMotionBlur", _scene->getCameras());
+    _depthRenderer = _scene->enableDepthRenderer();
+  }
+  else if (!enabled && _motionBlurEnabled) {
+    _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
+      _name, "HDRMotionBlur", _scene->getCameras());
+  }
+
+  _motionBlurEnabled = enabled;
+}
+
+bool StandardRenderingPipeline::motionBlurEnabled() const
+{
+  return _motionBlurEnabled;
+}
+
+unsigned int StandardRenderingPipeline::motionBlurSamples() const
+{
+  return _motionBlurSamples;
+}
+
+void StandardRenderingPipeline::setMotionBlurSamples(unsigned int samples)
+{
+  motionBlurPostProcess->updateEffect(
+    "#define MOTION_BLUR\n#define MAX_MOTION_SAMPLES "
+    + std::to_string(samples));
+  _motionBlurSamples = samples;
 }
 
 void StandardRenderingPipeline::_createDownSampleX4PostProcess(Scene* scene,
@@ -319,12 +446,163 @@ void StandardRenderingPipeline::_createTextureAdderPostProcess(Scene* scene,
     effect->setTextureFromPostProcess("otherSampler", originalPostProcess);
     effect->setTexture("lensSampler", lensTexture);
     effect->setFloat("exposure", exposure);
+
+    _currentDepthOfFieldSource = textureAdderFinalPostProcess;
+    _currentHDRSource          = textureAdderFinalPostProcess;
   });
 
   // Add to pipeline
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), "HDRTextureAdder",
     [&]() { return textureAdderPostProcess; }, true));
+}
+
+void StandardRenderingPipeline::_createLuminancePostProcesses(
+  Scene* scene, unsigned int textureType)
+{
+  // Create luminance
+  float size = static_cast<float>(
+    std::pow(3, StandardRenderingPipeline::LuminanceSteps));
+  luminancePostProcess = new PostProcess(
+    "HDRLuminance", "standard", {"lumOffsets"}, {}, size, nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
+    "#define LUMINANCE", textureType);
+
+  luminancePostProcess->setOnApply([&](Effect* effect) {
+    float sU = (1.f / luminancePostProcess->width);
+    float sV = (1.f / luminancePostProcess->height);
+
+    Float32Array offsets(8);
+    offsets[0] = -0.5f * sU;
+    offsets[1] = 0.5f * sV;
+    offsets[2] = 0.5f * sU;
+    offsets[3] = 0.5f * sV;
+    offsets[4] = -0.5f * sU;
+    offsets[5] = -0.5f * sV;
+    offsets[6] = 0.5f * sU;
+    offsets[7] = -0.5f * sV;
+
+    effect->setArray2("lumOffsets", offsets);
+  });
+
+  // Add to pipeline
+  addEffect(new PostProcessRenderEffect(scene->getEngine(), "HDRLuminance",
+                                        [this] { return luminancePostProcess; },
+                                        true));
+
+  // Create down sample luminance
+  for (unsigned int i = StandardRenderingPipeline::LuminanceSteps; i-- > 0;) {
+    const std::string iStr = std::to_string(i);
+    float size             = static_cast<float>(std::pow(3, i));
+
+    std::string defines = "#define LUMINANCE_DOWN_SAMPLE\n";
+    if (i == 0) {
+      defines += "#define FINAL_DOWN_SAMPLER";
+    }
+
+    auto postProcess
+      = new PostProcess("HDRLuminanceDownSample" + iStr, "standard",
+                        {"dsOffsets", "halfDestPixelSize"}, {}, size, nullptr,
+                        TextureConstants::BILINEAR_SAMPLINGMODE,
+                        scene->getEngine(), false, defines, textureType);
+    luminanceDownSamplePostProcesses.emplace_back(postProcess);
+  }
+
+  // Create callbacks and add effects
+  auto lastLuminance = luminancePostProcess;
+
+  std::size_t index = 0;
+  for (auto& pp : luminanceDownSamplePostProcesses) {
+    const std::string indexStr = std::to_string(index);
+    Float32Array downSampleOffsets(18);
+
+    pp->setOnApply([&](Effect* effect) {
+      unsigned int id = 0;
+      for (float x = -1; x < 2; ++x) {
+        for (float y = -1; y < 2; ++y) {
+          downSampleOffsets[id]     = x / lastLuminance->width;
+          downSampleOffsets[id + 1] = y / lastLuminance->height;
+          id += 2;
+        }
+      }
+
+      effect->setArray2("dsOffsets", downSampleOffsets);
+      effect->setFloat("halfDestPixelSize", 0.5f / lastLuminance->width);
+
+      if (index == luminanceDownSamplePostProcesses.size() - 1) {
+        lastLuminance = luminancePostProcess;
+      }
+      else {
+        lastLuminance = pp;
+      }
+    });
+
+    if (index == luminanceDownSamplePostProcesses.size() - 1) {
+      pp->setOnAfterRender([&](Effect* /*effect*/) {
+        auto pixel = scene->getEngine()->readPixels(0, 0, 1, 1);
+        Vector4 bit_shift(1.f / (255.f * 255.f * 255.f), 1.f / (255.f * 255.f),
+                          1.f / 255.f, 1.f);
+        _hdrCurrentLuminance
+          = (pixel[0] * bit_shift.x + pixel[1] * bit_shift.y
+             + pixel[2] * bit_shift.z + pixel[3] * bit_shift.w)
+            / 100.f;
+      });
+    }
+
+    addEffect(new PostProcessRenderEffect(scene->getEngine(),
+                                          "HDRLuminanceDownSample" + indexStr,
+                                          [&]() { return pp; }, true));
+    ++index;
+  };
+}
+
+// Create HDR post-process
+void StandardRenderingPipeline::_createHdrPostProcess(Scene* scene, float ratio)
+{
+  hdrPostProcess = new PostProcess(
+    "HDR", "standard", {"averageLuminance"}, {"textureAdderSampler"}, ratio,
+    nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
+    "#define HDR", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+
+  float outputLiminance = 1.f;
+  float time            = 0.f;
+  float lastTime        = 0.f;
+
+  hdrPostProcess->setOnApply([&](Effect* effect) {
+    effect->setTextureFromPostProcess("textureAdderSampler", _currentHDRSource);
+
+    time += Time::fpMillisecondsDuration<float>(
+      scene->getEngine()->getDeltaTime());
+
+    if (outputLiminance < 0) {
+      outputLiminance = _hdrCurrentLuminance;
+    }
+    else {
+      float dt = (lastTime - time) / 1000.f;
+
+      if (_hdrCurrentLuminance < outputLiminance + hdrDecreaseRate * dt) {
+        outputLiminance += hdrDecreaseRate * dt;
+      }
+      else if (_hdrCurrentLuminance > outputLiminance - hdrIncreaseRate * dt) {
+        outputLiminance -= hdrIncreaseRate * dt;
+      }
+      else {
+        outputLiminance = _hdrCurrentLuminance;
+      }
+    }
+
+    outputLiminance
+      = MathTools::Clamp(outputLiminance, hdrMinimumLuminance, 1e20f);
+
+    effect->setFloat("averageLuminance", outputLiminance);
+
+    lastTime = time;
+
+    _currentDepthOfFieldSource = hdrFinalPostProcess;
+  });
+
+  addEffect(new PostProcessRenderEffect(
+    scene->getEngine(), "HDR", [&]() { return hdrPostProcess; }, true));
 }
 
 void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
@@ -406,6 +684,9 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
       = scaleBias2.multiply(starRotation).multiply(scaleBias1);
 
     effect->setMatrix("lensStarMatrix", lensStarMatrix);
+
+    _currentDepthOfFieldSource = lensFlareFinalPostProcess;
+    _currentHDRSource          = lensFlareFinalPostProcess;
   });
 }
 
@@ -430,6 +711,52 @@ void StandardRenderingPipeline::_createDepthOfFieldPostProcess(Scene* scene,
     [&]() { return depthOfFieldPostProcess; }, true));
 }
 
+// Create motion blur post-process
+void StandardRenderingPipeline::_createMotionBlurPostProcess(Scene* scene,
+                                                             float ratio)
+{
+  motionBlurPostProcess = new PostProcess(
+    "HDRMotionBlur", "standard",
+    {"inverseViewProjection", "prevViewProjection", "screenSize", "motionScale",
+     "motionStrength"},
+    {"depthSampler"}, ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
+    scene->getEngine(), false,
+    "#define MOTION_BLUR\n#define MAX_MOTION_SAMPLES "
+      + std::to_string(motionBlurSamples()),
+    EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+
+  auto motionScale        = 0.f;
+  auto prevViewProjection = Matrix::Identity();
+  auto invViewProjection  = Matrix::Identity();
+  auto viewProjection     = Matrix::Identity();
+  auto screenSize         = Vector2::Zero();
+
+  motionBlurPostProcess->setOnApply([&](Effect* effect) {
+    viewProjection
+      = scene->getProjectionMatrix().multiply(scene->getViewMatrix());
+
+    viewProjection.invertToRef(invViewProjection);
+    effect->setMatrix("inverseViewProjection", invViewProjection);
+
+    effect->setMatrix("prevViewProjection", prevViewProjection);
+    prevViewProjection = viewProjection;
+
+    screenSize.x = motionBlurPostProcess->width;
+    screenSize.y = motionBlurPostProcess->height;
+    effect->setVector2("screenSize", screenSize);
+
+    motionScale = scene->getEngine()->getFps() / 60.f;
+    effect->setFloat("motionScale", motionScale);
+    effect->setFloat("motionStrength", motionStrength);
+
+    effect->setTexture("depthSampler", _depthRenderer->getDepthMap());
+  });
+
+  addEffect(new PostProcessRenderEffect(scene->getEngine(), "HDRMotionBlur",
+                                        [&]() { return motionBlurPostProcess; },
+                                        true));
+}
+
 void StandardRenderingPipeline::dispose(bool doNotRecurse)
 {
   for (auto& _camera : _scene->cameras) {
@@ -451,6 +778,7 @@ void StandardRenderingPipeline::dispose(bool doNotRecurse)
     lensFlarePostProcess->dispose(camera);
     lensFlareComposePostProcess->dispose(camera);
     depthOfFieldPostProcess->dispose(camera);
+    motionBlurPostProcess->dispose(camera);
   }
 
   _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(
