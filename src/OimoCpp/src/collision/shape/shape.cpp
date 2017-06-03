@@ -19,7 +19,7 @@ Shape::Shape(const ShapeConfig& config)
     , numContacts{0}
     , relativePosition{Vec3().copy(config.relativePosition)}
     , relativeRotation{Mat33().copy(config.relativeRotation)}
-    , aabb{new AABB()}
+    , aabb{std::make_unique<AABB>()}
     , density{config.density}
     , friction{config.friction}
     , restitution{config.restitution}

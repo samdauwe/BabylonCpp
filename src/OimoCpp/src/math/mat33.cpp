@@ -86,9 +86,9 @@ Mat33 Mat33::clone() const
   return Mat33(*this);
 }
 
-Mat33* Mat33::cloneToNewObject() const
+std::unique_ptr<Mat33> Mat33::cloneToNewObject() const
 {
-  return new Mat33(*this);
+  return std::make_unique<Mat33>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Mat33& m)

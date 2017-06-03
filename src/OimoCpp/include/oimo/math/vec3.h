@@ -2,6 +2,7 @@
 #define OIMO_MATH_VEC3_H
 
 #include <iostream>
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -20,7 +21,7 @@ public:
   Vec3& operator=(const Vec3& v);
   Vec3& operator=(Vec3&& v);
   Vec3 clone() const;
-  Vec3* cloneToNewObject() const;
+  std::unique_ptr<Vec3> cloneToNewObject() const;
   friend std::ostream& operator<<(std::ostream& os, const Vec3& v);
 
   Vec3& init(float x = 0.f, float y = 0.f, float z = 0.f);

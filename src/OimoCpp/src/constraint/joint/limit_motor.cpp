@@ -72,9 +72,9 @@ LimitMotor LimitMotor::clone() const
   return LimitMotor(*this);
 }
 
-LimitMotor* LimitMotor::cloneToNewObject() const
+std::unique_ptr<LimitMotor> LimitMotor::cloneToNewObject() const
 {
-  return new LimitMotor(*this);
+  return std::make_unique<LimitMotor>(*this);
 }
 
 void LimitMotor::setLimit(float _lowerLimit, float _upperLimit)

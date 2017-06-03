@@ -2,6 +2,7 @@
 #define OIMO_MATH_EULER_H
 
 #include <functional>
+#include <memory>
 
 namespace OIMO {
 
@@ -29,7 +30,7 @@ public:
   Euler& operator=(const Euler& e);
   Euler& operator=(Euler&& e);
   Euler clone() const;
-  Euler* cloneToNewObject() const;
+  std::unique_ptr<Euler> cloneToNewObject() const;
 
   float x() const;
   void setX(float value);

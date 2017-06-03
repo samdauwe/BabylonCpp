@@ -1,6 +1,7 @@
 #ifndef OIMO_CONSTRAINT_JOINT_LIMIT_MOTOR_H
 #define OIMO_CONSTRAINT_JOINT_LIMIT_MOTOR_H
 
+#include <memory.h>
 #include <oimo/math/vec3.h>
 
 namespace OIMO {
@@ -18,7 +19,7 @@ public:
   LimitMotor& operator=(const LimitMotor& lm);
   LimitMotor& operator=(LimitMotor&& lm);
   LimitMotor clone() const;
-  LimitMotor* cloneToNewObject() const;
+  std::unique_ptr<LimitMotor> cloneToNewObject() const;
 
   /**
    * Set limit data into this constraint.

@@ -63,9 +63,9 @@ Euler Euler::clone() const
   return Euler(*this);
 }
 
-Euler* Euler::cloneToNewObject() const
+std::unique_ptr<Euler> Euler::cloneToNewObject() const
 {
-  return new Euler(*this);
+  return std::make_unique<Euler>(*this);
 }
 
 float Euler::x() const

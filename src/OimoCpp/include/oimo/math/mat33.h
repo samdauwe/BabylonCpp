@@ -3,6 +3,7 @@
 
 #include <array>
 #include <iostream>
+#include <memory>
 #include <utility>
 
 namespace OIMO {
@@ -22,7 +23,7 @@ public:
   Mat33& operator=(const Mat33& m);
   Mat33& operator=(Mat33&& m);
   Mat33 clone() const;
-  Mat33* cloneToNewObject() const;
+  std::unique_ptr<Mat33> cloneToNewObject() const;
   friend std::ostream& operator<<(std::ostream& os, const Mat33& m);
 
   Mat33& set(float e00 = 1.f, float e01 = 0.f, float e02 = 0.f, //

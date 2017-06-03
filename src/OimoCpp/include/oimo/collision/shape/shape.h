@@ -80,7 +80,7 @@ public:
   // The rotation matrix of the shape in parent's coordinate system.
   Mat33 relativeRotation;
   // The axis-aligned bounding box of the shape.
-  AABB* aabb;
+  std::unique_ptr<AABB> aabb;
   // The density of the shape.
   float density;
   // The coefficient of friction of the shape.

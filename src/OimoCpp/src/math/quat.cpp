@@ -56,9 +56,9 @@ Quat Quat::clone() const
   return Quat(*this);
 }
 
-Quat* Quat::cloneToNewObject() const
+std::unique_ptr<Quat> Quat::cloneToNewObject() const
 {
-  return new Quat(*this);
+  return std::make_unique<Quat>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Quat& q)

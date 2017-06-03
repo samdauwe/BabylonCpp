@@ -2,6 +2,7 @@
 #define OIMO_MATH_QUAT_H
 
 #include <array>
+#include <memory>
 #include <vector>
 
 namespace OIMO {
@@ -19,7 +20,7 @@ public:
   Quat& operator=(const Quat& q);
   Quat& operator=(Quat&& q);
   Quat clone() const;
-  Quat* cloneToNewObject() const;
+  std::unique_ptr<Quat> cloneToNewObject() const;
   friend std::ostream& operator<<(std::ostream& os, const Quat& q);
 
   Quat& set(float x, float y, float z, float w);

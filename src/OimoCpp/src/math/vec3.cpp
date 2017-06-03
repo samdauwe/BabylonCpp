@@ -53,9 +53,9 @@ Vec3 Vec3::clone() const
   return Vec3(*this);
 }
 
-Vec3* Vec3::cloneToNewObject() const
+std::unique_ptr<Vec3> Vec3::cloneToNewObject() const
 {
-  return new Vec3(*this);
+  return std::make_unique<Vec3>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Vec3& v)
