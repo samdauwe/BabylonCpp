@@ -28,7 +28,7 @@ std::unique_ptr<VertexData> Box::_regenerateVertexData()
 
 Geometry* Box::copy(const std::string& _id)
 {
-  return new Box(_id, getScene(), size, canBeRegenerated(), nullptr, side);
+  return Box::New(_id, getScene(), size, canBeRegenerated(), nullptr, side);
 }
 
 Box* Box::Parse(const Json::value& parsedBox, Scene* scene)

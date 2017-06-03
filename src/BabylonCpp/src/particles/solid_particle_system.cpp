@@ -406,18 +406,13 @@ Float32Array SolidParticleSystem::_uvsToShapeUV(const Float32Array& uvs)
   return shapeUV;
 }
 
-SolidParticle*
-SolidParticleSystem::_addParticle(unsigned int /*idx*/, unsigned int /*idxpos*/,
-                                  std::unique_ptr<ModelShape>&& /*model*/,
-                                  int /*shapeId*/, unsigned int /*idxInShape*/,
-                                  const BoundingInfo& /*bInfo*/)
+SolidParticle* SolidParticleSystem::_addParticle(
+  unsigned int idx, unsigned int idxpos, std::unique_ptr<ModelShape>&& model,
+  int shapeId, unsigned int idxInShape, const BoundingInfo& bInfo)
 {
-#if 0
-  particles.emplace_back(std::make_unique<SolidParticle>(new SolidParticle(
-    idx, idxpos, model.get(), shapeId, idxInShape, this, bInfo)));
+  particles.emplace_back(std::make_unique<SolidParticle>(
+    idx, idxpos, model.get(), shapeId, idxInShape, this, bInfo));
   return particles.back().get();
-#endif
-  return nullptr;
 }
 
 int SolidParticleSystem::addShape(

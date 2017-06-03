@@ -33,8 +33,8 @@ std::unique_ptr<VertexData> Ground::_regenerateVertexData()
 
 Geometry* Ground::copy(const std::string& _id)
 {
-  return new Ground(_id, getScene(), width, height, subdivisions,
-                    canBeRegenerated(), nullptr);
+  return Ground::New(_id, getScene(), width, height, subdivisions,
+                     canBeRegenerated(), nullptr);
 }
 
 Ground* Ground::Parse(const Json::value& parsedGround, Scene* scene)

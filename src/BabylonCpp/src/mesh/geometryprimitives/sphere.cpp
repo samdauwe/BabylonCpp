@@ -33,8 +33,8 @@ std::unique_ptr<VertexData> Sphere::_regenerateVertexData()
 
 Geometry* Sphere::copy(const std::string& _id)
 {
-  return new Sphere(_id, getScene(), segments, diameter, canBeRegenerated(),
-                    nullptr, side);
+  return Sphere::New(_id, getScene(), segments, diameter, canBeRegenerated(),
+                     nullptr, side);
 }
 
 Sphere* Sphere::Parse(const Json::value& parsedSphere, Scene* scene)

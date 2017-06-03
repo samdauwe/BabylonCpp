@@ -133,8 +133,8 @@ InstancedMesh& InstancedMesh::refreshBoundingInfo()
 {
   auto meshBB = _sourceMesh->getBoundingInfo();
 
-  _boundingInfo = std::unique_ptr<BoundingInfo>(
-    new BoundingInfo(meshBB->minimum, meshBB->maximum));
+  _boundingInfo
+    = std::make_unique<BoundingInfo>(meshBB->minimum, meshBB->maximum);
 
   _updateBoundingInfo();
 

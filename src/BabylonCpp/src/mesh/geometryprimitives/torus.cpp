@@ -36,8 +36,8 @@ std::unique_ptr<VertexData> Torus::_regenerateVertexData()
 
 Geometry* Torus::copy(const std::string& _id)
 {
-  return new Torus(_id, getScene(), diameter, thickness, tessellation,
-                   canBeRegenerated(), nullptr, side);
+  return Torus::New(_id, getScene(), diameter, thickness, tessellation,
+                    canBeRegenerated(), nullptr, side);
 }
 
 Torus* Torus::Parse(const Json::value& parsedTorus, Scene* scene)

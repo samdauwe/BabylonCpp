@@ -28,7 +28,7 @@ std::unique_ptr<VertexData> Plane::_regenerateVertexData()
 
 Geometry* Plane::copy(const std::string& _id)
 {
-  return new Plane(_id, getScene(), size, canBeRegenerated(), nullptr, side);
+  return Plane::New(_id, getScene(), size, canBeRegenerated(), nullptr, side);
 }
 
 Plane* Plane::Parse(const Json::value& parsedPlane, Scene* scene)

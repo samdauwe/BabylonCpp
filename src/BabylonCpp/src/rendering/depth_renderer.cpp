@@ -31,10 +31,9 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type)
   auto engine = scene->getEngine();
 
   // Render target
-  _depthMap
-    = static_cast<std::unique_ptr<RenderTargetTexture>>(new RenderTargetTexture(
-      "depthMap", {engine->getRenderWidth(), engine->getRenderHeight()}, _scene,
-      false, true, type));
+  _depthMap = std::make_unique<RenderTargetTexture>(
+    "depthMap", ISize{engine->getRenderWidth(), engine->getRenderHeight()},
+    _scene, false, true, type);
   _depthMap->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
   _depthMap->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
   _depthMap->setRefreshRate(1);

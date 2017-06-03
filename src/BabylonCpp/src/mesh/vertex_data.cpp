@@ -2779,7 +2779,7 @@ void VertexData::_ComputeSides(unsigned int sideOrientation,
 void VertexData::ImportVertexData(const Json::value& parsedVertexData,
                                   Geometry* geometry)
 {
-  VertexData* vertexData = new VertexData();
+  auto vertexData = std::make_unique<VertexData>();
 
   // positions
   Float32Array positions = Json::ToArray<float>(parsedVertexData, "positions");
@@ -2861,7 +2861,7 @@ void VertexData::ImportVertexData(const Json::value& parsedVertexData,
   }
 
   geometry->setAllVerticesData(
-    vertexData, Json::GetBool(parsedVertexData, "updatable", false));
+    vertexData.get(), Json::GetBool(parsedVertexData, "updatable", false));
 }
 
 } // end of namespace BABYLON

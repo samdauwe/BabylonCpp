@@ -41,9 +41,9 @@ std::unique_ptr<VertexData> Cylinder::_regenerateVertexData()
 
 Geometry* Cylinder::copy(const std::string& _id)
 {
-  return new Cylinder(_id, getScene(), height, diameterTop, diameterBottom,
-                      tessellation, subdivisions, canBeRegenerated(), nullptr,
-                      side);
+  return Cylinder::New(_id, getScene(), height, diameterTop, diameterBottom,
+                       tessellation, subdivisions, canBeRegenerated(), nullptr,
+                       side);
 }
 
 Cylinder* Cylinder::Parse(const Json::value& parsedCylinder, Scene* scene)

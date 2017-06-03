@@ -162,8 +162,8 @@ void Geometry::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
 
     for (auto& mesh : _meshes) {
       mesh->_resetPointsArrayCache();
-      mesh->_boundingInfo = std::unique_ptr<BoundingInfo>(
-        new BoundingInfo(_extend.min, _extend.max));
+      mesh->_boundingInfo
+        = std::make_unique<BoundingInfo>(_extend.min, _extend.max);
       mesh->_createGlobalSubMesh();
       mesh->computeWorldMatrix(true);
     }
@@ -223,8 +223,8 @@ void Geometry::updateBoundingInfo(bool updateExtends, const Float32Array& data)
   for (auto& mesh : _meshes) {
     mesh->_resetPointsArrayCache();
     if (updateExtends) {
-      mesh->_boundingInfo = std::unique_ptr<BoundingInfo>(
-        new BoundingInfo(_extend.min, _extend.max));
+      mesh->_boundingInfo
+        = std::make_unique<BoundingInfo>(_extend.min, _extend.max);
 
       for (auto& subMesh : mesh->subMeshes) {
         subMesh->refreshBoundingInfo();
@@ -491,8 +491,8 @@ void Geometry::_applyToMesh(Mesh* mesh)
                                           _totalVertices);
         _extendSet = true;
       }
-      mesh->_boundingInfo = std::unique_ptr<BoundingInfo>(
-        new BoundingInfo(_extend.min, _extend.max));
+      mesh->_boundingInfo
+        = std::make_unique<BoundingInfo>(_extend.min, _extend.max);
 
       mesh->_createGlobalSubMesh();
 

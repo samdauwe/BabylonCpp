@@ -43,9 +43,9 @@ std::unique_ptr<VertexData> TorusKnot::_regenerateVertexData()
 
 Geometry* TorusKnot::copy(const std::string& _id)
 {
-  return new TorusKnot(_id, getScene(), radius, tube, radialSegments,
-                       tubularSegments, p, q, canBeRegenerated(), nullptr,
-                       side);
+  return TorusKnot::New(_id, getScene(), radius, tube, radialSegments,
+                        tubularSegments, p, q, canBeRegenerated(), nullptr,
+                        side);
 }
 
 TorusKnot* TorusKnot::Parse(const Json::value& parsedTorusKnot, Scene* scene)

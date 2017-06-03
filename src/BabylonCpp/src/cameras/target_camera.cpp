@@ -306,7 +306,7 @@ Camera* TargetCamera::createRigCamera(const std::string& iName,
                                       int /*cameraIndex*/)
 {
   if (cameraRigMode != Camera::RIG_MODE_NONE) {
-    auto rigCamera = new TargetCamera(iName, position, getScene());
+    auto rigCamera = TargetCamera::New(iName, position, getScene());
     if (cameraRigMode == Camera::RIG_MODE_VR
         || cameraRigMode == Camera::RIG_MODE_WEBVR) {
       if (!rotationQuaternion) {

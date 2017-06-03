@@ -68,8 +68,8 @@ CollisionDetectorTransferable::onCollision(const CollidePayload& payload)
   colliderWorker.collideWithWorld(position, velocity, payload.maximumRetry,
                                   payload.excludedMeshUniqueId);
   CollisionReplyPayload replyPayload;
-  replyPayload.collidedMeshUniqueId = collider->collidedMeshId,
-  replyPayload.collisionId          = payload.collisionId,
+  replyPayload.collidedMeshUniqueId = collider->collidedMeshId;
+  replyPayload.collisionId          = payload.collisionId;
   replyPayload.newPosition          = finalPosition.asArray();
 
   WorkerReply reply;

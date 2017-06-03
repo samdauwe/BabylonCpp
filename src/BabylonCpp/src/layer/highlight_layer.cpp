@@ -143,13 +143,10 @@ void HighlightLayer::createTextureAndPostProcesses()
   blurTextureWidth  = Tools::GetExponentOfTwo(blurTextureWidth, _maxSize);
   blurTextureHeight = Tools::GetExponentOfTwo(blurTextureHeight, _maxSize);
 
-#if 0
-  _mainTexture
-    = std::make_unique<RenderTargetTexture>(new RenderTargetTexture(
-      "HighlightLayerMainRTT",
-      {_mainTextureDesiredSize.width, _mainTextureDesiredSize.height}, _scene,
-      false, true, Engine::TEXTURETYPE_UNSIGNED_INT));
-#endif
+  _mainTexture = std::make_unique<RenderTargetTexture>(
+    "HighlightLayerMainRTT",
+    ISize{_mainTextureDesiredSize.width, _mainTextureDesiredSize.height},
+    _scene, false, true, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   _mainTexture->activeCamera              = _options.camera;
   _mainTexture->wrapU                     = TextureConstants::CLAMP_ADDRESSMODE;
   _mainTexture->wrapV                     = TextureConstants::CLAMP_ADDRESSMODE;
@@ -158,12 +155,9 @@ void HighlightLayer::createTextureAndPostProcesses()
   _mainTexture->renderParticles = false;
   _mainTexture->renderList.clear();
 
-#if 0
-  _blurTexture
-    = std::make_unique<RenderTargetTexture>(new RenderTargetTexture(
-      "HighlightLayerBlurRTT", {blurTextureWidth, blurTextureHeight}, _scene,
-      false, true, Engine::TEXTURETYPE_UNSIGNED_INT));
-#endif
+  _blurTexture = std::make_unique<RenderTargetTexture>(
+    "HighlightLayerBlurRTT", ISize{blurTextureWidth, blurTextureHeight}, _scene,
+    false, true, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   _blurTexture->wrapU                     = TextureConstants::CLAMP_ADDRESSMODE;
   _blurTexture->wrapV                     = TextureConstants::CLAMP_ADDRESSMODE;
   _blurTexture->anisotropicFilteringLevel = 16;

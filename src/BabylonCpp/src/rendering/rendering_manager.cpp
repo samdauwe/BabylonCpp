@@ -167,11 +167,10 @@ void RenderingManager::_prepareRenderingGroup(unsigned int renderingGroupId)
   }
 
   if (!_renderingGroups[renderingGroupId]) {
-    _renderingGroups[renderingGroupId]
-      = std::unique_ptr<RenderingGroup>(new RenderingGroup(
-        renderingGroupId, _scene, _customOpaqueSortCompareFn[renderingGroupId],
-        _customAlphaTestSortCompareFn[renderingGroupId],
-        _customTransparentSortCompareFn[renderingGroupId]));
+    _renderingGroups[renderingGroupId] = std::make_unique<RenderingGroup>(
+      renderingGroupId, _scene, _customOpaqueSortCompareFn[renderingGroupId],
+      _customAlphaTestSortCompareFn[renderingGroupId],
+      _customTransparentSortCompareFn[renderingGroupId]);
   }
 }
 
