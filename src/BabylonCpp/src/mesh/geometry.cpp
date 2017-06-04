@@ -153,15 +153,15 @@ void Geometry::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
   auto _buffer         = _vertexBuffers[kind].get();
 
   if (kind == VertexBuffer::PositionKind) {
-    Float32Array& data = _buffer->getData();
-    int stride         = _buffer->getStrideSize();
+    auto& data  = _buffer->getData();
+    auto stride = _buffer->getStrideSize();
 
     _totalVertices = data.size() / static_cast<size_t>(stride);
 
     updateExtend(data, stride);
+    _resetPointsArrayCache();
 
     for (auto& mesh : _meshes) {
-      mesh->_resetPointsArrayCache();
       mesh->_boundingInfo
         = std::make_unique<BoundingInfo>(_extend.min, _extend.max);
       mesh->_createGlobalSubMesh();
@@ -220,8 +220,9 @@ void Geometry::updateBoundingInfo(bool updateExtends, const Float32Array& data)
     updateExtend(data);
   }
 
+  _resetPointsArrayCache();
+
   for (auto& mesh : _meshes) {
-    mesh->_resetPointsArrayCache();
     if (updateExtends) {
       mesh->_boundingInfo
         = std::make_unique<BoundingInfo>(_extend.min, _extend.max);
@@ -574,6 +575,32 @@ void Geometry::toLeftHanded()
     }
     setVerticesData(VertexBuffer::NormalKind, tNormals, false);
   }
+}
+
+void Geometry::_resetPointsArrayCache()
+{
+  _positions.clear();
+}
+
+bool Geometry::_generatePointsArray()
+{
+  if (!_positions.empty()) {
+    return true;
+  }
+
+  _positions.clear();
+
+  auto data = getVerticesData(VertexBuffer::PositionKind);
+
+  if (data.empty()) {
+    return false;
+  }
+
+  for (unsigned int index = 0; index < data.size(); index += 3) {
+    _positions.emplace_back(Vector3::FromArray(data, index));
+  }
+
+  return true;
 }
 
 bool Geometry::isDisposed() const

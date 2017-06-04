@@ -650,7 +650,8 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   }
 
   // sides
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
+                            options.frontUVs, options.backUVs);
 
   // Colors
   Float32Array colors;
@@ -767,7 +768,8 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
   }
 
   // sides
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
+                            options.frontUVs, options.backUVs);
 
   // Result
   auto vertexData = std::make_unique<VertexData>();
@@ -852,7 +854,8 @@ std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
   }
 
   // Sides
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
+                            options.frontUVs, options.backUVs);
 
   // Result
   auto vertexData = std::make_unique<VertexData>();
@@ -1121,7 +1124,8 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
   createCylinderCap(true);
 
   // Sides
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
+                            options.frontUVs, options.backUVs);
 
   auto vertexData = std::make_unique<VertexData>();
 
@@ -1197,7 +1201,8 @@ std::unique_ptr<VertexData> VertexData::CreateTorus(TorusOptions& options)
   }
 
   // Sides
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
+                            options.frontUVs, options.backUVs);
 
   // Result
   auto vertexData = std::make_unique<VertexData>();
@@ -1569,7 +1574,7 @@ std::unique_ptr<VertexData> VertexData::CreatePlane(PlaneOptions& options)
 
   // Sides
   VertexData::_ComputeSides(options.sideOrientation, positions, indices,
-                            normals, uvs);
+                            normals, uvs, options.frontUVs, options.backUVs);
 
   // Result
   auto vertexData = std::make_unique<VertexData>();
@@ -1622,10 +1627,35 @@ std::unique_ptr<VertexData> VertexData::CreateDisc(DiscOptions& options)
 
   // result
   VertexData::ComputeNormals(positions, indices, normals);
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
+
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
+                            options.frontUVs, options.backUVs);
 
   auto vertexData = std::make_unique<VertexData>();
 
+  vertexData->indices   = std::move(indices);
+  vertexData->positions = std::move(positions);
+  vertexData->normals   = std::move(normals);
+  vertexData->uvs       = std::move(uvs);
+
+  return vertexData;
+}
+
+std::unique_ptr<VertexData>
+VertexData::CreatePolygon(Mesh* polygon, unsigned int sideOrientation,
+                          Vector4& frontUVs, Vector4& backUVs)
+{
+  auto positions = polygon->getVerticesData(VertexBuffer::PositionKind);
+  auto normals   = polygon->getVerticesData(VertexBuffer::NormalKind);
+  auto uvs       = polygon->getVerticesData(VertexBuffer::UVKind);
+  auto indices   = polygon->getIndices();
+
+  // sides
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
+                            frontUVs, backUVs);
+
+  // Result
+  auto vertexData       = std::make_unique<VertexData>();
   vertexData->indices   = std::move(indices);
   vertexData->positions = std::move(positions);
   vertexData->normals   = std::move(normals);
@@ -1912,7 +1942,8 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
   }
 
   // Sides
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
+                            options.frontUVs, options.backUVs);
 
   // Result
   auto vertexData       = std::make_unique<VertexData>();
@@ -2320,7 +2351,8 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
   }
 
   VertexData::ComputeNormals(positions, indices, normals);
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
+                            options.frontUVs, options.backUVs);
 
   auto vertexData       = std::make_unique<VertexData>();
   vertexData->positions = std::move(positions);
@@ -2424,7 +2456,8 @@ VertexData::CreateTorusKnot(TorusKnotOptions& options)
   VertexData::ComputeNormals(positions, indices, normals);
 
   // Sides
-  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs);
+  VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
+                            options.frontUVs, options.backUVs);
 
   // Result
   auto vertexData = std::make_unique<VertexData>();
@@ -2725,7 +2758,8 @@ void VertexData::ComputeNormals(const Float32Array& positions,
 
 void VertexData::_ComputeSides(unsigned int sideOrientation,
                                Float32Array& positions, Uint32Array& indices,
-                               Float32Array& normals, Float32Array& uvs)
+                               Float32Array& normals, Float32Array& uvs,
+                               const Vector4& frontUVs, const Vector4& backUVs)
 {
   size_t li = indices.size();
   size_t ln = normals.size();
@@ -2768,9 +2802,16 @@ void VertexData::_ComputeSides(unsigned int sideOrientation,
         normals[ln + n] = -normals[n];
       }
       // uvs
-      size_t lu = uvs.size();
-      for (unsigned int u = 0; u < lu; ++u) {
+      const std::size_t lu = uvs.size();
+      for (std::size_t u = 0; u < lu; ++u) {
         uvs[u + lu] = uvs[u];
+      }
+      for (std::size_t u = 0, i = 0; i < lu / 2; ++i) {
+        uvs[u]          = frontUVs.x + (frontUVs.z - frontUVs.x) * uvs[u];
+        uvs[u + 1]      = frontUVs.y + (frontUVs.w - frontUVs.y) * uvs[u + 1];
+        uvs[u + lu]     = backUVs.x + (backUVs.z - backUVs.x) * uvs[u + lu];
+        uvs[u + lu + 1] = backUVs.y + (backUVs.w - backUVs.y) * uvs[u + lu + 1];
+        u += 2;
       }
       break;
   }

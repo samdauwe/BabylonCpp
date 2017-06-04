@@ -83,6 +83,10 @@ public:
    */
   void toLeftHanded();
 
+  // Cache
+  void _resetPointsArrayCache();
+  bool _generatePointsArray();
+
   bool isDisposed() const;
   void dispose(bool doNotRecurse = false) override;
   Geometry* copy(const std::string& id);
@@ -119,6 +123,7 @@ public:
   std::function<void(const Json::value& parsedVertexData, Geometry* geometry)>
     _delayLoadingFunction;
   int _softwareSkinningRenderId;
+  std::vector<Vector3> _positions; // Cache
   std::unordered_map<std::string, std::unique_ptr<GL::IGLVertexArrayObject>>
     _vertexArrayObjects;
   std::vector<Vector3> centroids;

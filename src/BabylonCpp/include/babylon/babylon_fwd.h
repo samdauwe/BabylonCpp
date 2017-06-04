@@ -296,6 +296,7 @@ class LatheOptions;
 class LinesOptions;
 class LineSystemOptions;
 class PlaneOptions;
+class PolygonOptions;
 class PolyhedronOptions;
 class RibbonOptions;
 class SphereOptions;

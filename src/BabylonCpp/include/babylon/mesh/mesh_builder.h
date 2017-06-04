@@ -28,6 +28,9 @@ public:
    * You can also set the mesh side orientation with the values :
    * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
    * BABYLON.Mesh.DOUBLESIDE
+   * If you create a double-sided mesh, you can choose what parts of the texture
+   * image to crop and stick respectively on the front and the back sides with
+   * the parameters `frontUVs` and `backUVs` (Vector4).
    * Detail here :
    * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
@@ -57,6 +60,9 @@ public:
    * You can also set the mesh side orientation with the values :
    * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
    * BABYLON.Mesh.DOUBLESIDE
+   * If you create a double-sided mesh, you can choose what parts of the texture
+   * image to crop and stick respectively on the front and the back sides with
+   * the parameters `frontUVs` and `backUVs` (Vector4).
    * Detail here :
    * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
@@ -81,6 +87,9 @@ public:
    * You can also set the mesh side orientation with the values :
    * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
    * BABYLON.Mesh.DOUBLESIDE
+   * If you create a double-sided mesh, you can choose what parts of the texture
+   * image to crop and stick respectively on the front and the back sides with
+   * the parameters `frontUVs` and `backUVs` (Vector4).
    * Detail here :
    * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
@@ -110,6 +119,9 @@ public:
    * You can also set the mesh side orientation with the values :
    * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
    * BABYLON.Mesh.DOUBLESIDE
+   * If you create a double-sided mesh, you can choose what parts of the texture
+   * image to crop and stick respectively on the front and the back sides with
+   * the parameters `frontUVs` and `backUVs` (Vector4).
    * Detail here :
    * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
@@ -145,6 +157,9 @@ public:
    * You can also set the mesh side orientation with the values :
    * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
    * BABYLON.Mesh.DOUBLESIDE
+   * If you create a double-sided mesh, you can choose what parts of the texture
+   * image to crop and stick respectively on the front and the back sides with
+   * the parameters `frontUVs` and `backUVs` (Vector4).
    * Detail here :
    * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
    * The optional parameter `invertUV` (boolean, default false) swaps in the
@@ -210,6 +225,9 @@ public:
    * You can also set the mesh side orientation with the values :
    * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
    * BABYLON.Mesh.DOUBLESIDE
+   * If you create a double-sided mesh, you can choose what parts of the texture
+   * image to crop and stick respectively on the front and the back sides with
+   * the parameters `frontUVs` and `backUVs` (Vector4).
    * Detail here :
    * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
@@ -232,6 +250,9 @@ public:
    * You can also set the mesh side orientation with the values :
    * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
    * BABYLON.Mesh.DOUBLESIDE
+   * If you create a double-sided mesh, you can choose what parts of the texture
+   * image to crop and stick respectively on the front and the back sides with
+   * the parameters `frontUVs` and `backUVs` (Vector4).
    * Detail here :
    * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
@@ -256,6 +277,9 @@ public:
    * You can also set the mesh side orientation with the values :
    * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
    * BABYLON.Mesh.DOUBLESIDE
+   * If you create a double-sided mesh, you can choose what parts of the texture
+   * image to crop and stick respectively on the front and the back sides with
+   * the parameters `frontUVs` and `backUVs` (Vector4).
    * Detail here :
    * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
@@ -375,6 +399,9 @@ public:
    * You can also set the mesh side orientation with the values :
    * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
    * BABYLON.Mesh.DOUBLESIDE
+   * If you create a double-sided mesh, you can choose what parts of the texture
+   * image to crop and stick respectively on the front and the back sides with
+   * the parameters `frontUVs` and `backUVs` (Vector4).
    * Detail here :
    * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
    * The optional parameter `invertUV` (boolean, default false) swaps in the
@@ -441,6 +468,9 @@ public:
    * You can also set the mesh side orientation with the values :
    * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
    * BABYLON.Mesh.DOUBLESIDE
+   * If you create a double-sided mesh, you can choose what parts of the texture
+   * image to crop and stick respectively on the front and the back sides with
+   * the parameters `frontUVs` and `backUVs` (Vector4).
    * Detail here :
    * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
    * The optional parameter `invertUV` (boolean, default false) swaps in the
@@ -480,6 +510,9 @@ public:
    * You can also set the mesh side orientation with the values :
    * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
    * BABYLON.Mesh.DOUBLESIDE
+   * If you create a double-sided mesh, you can choose what parts of the texture
+   * image to crop and stick respectively on the front and the back sides with
+   * the parameters `frontUVs` and `backUVs` (Vector4).
    * Detail here :
    * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
    * The optional parameter `invertUV` (boolean, default false) swaps in the
@@ -504,6 +537,9 @@ public:
    * You can also set the mesh side orientation with the values :
    * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
    * BABYLON.Mesh.DOUBLESIDE
+   * If you create a double-sided mesh, you can choose what parts of the texture
+   * image to crop and stick respectively on the front and the back sides with
+   * the parameters `frontUVs` and `backUVs` (Vector4).
    * Detail here :
    * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
@@ -583,6 +619,34 @@ public:
                             GroundFromHeightMapOptions& options, Scene* scene);
 
   /**
+   * @ brief Creates a polygon mesh.
+   * The polygon's shape will depend on the input parameters and is constructed
+   * parallel to a ground mesh.
+   * The parameter `shape` is a required array of successive Vector3
+   * representing the corners of the polygon in th XoZ plane, that is y = 0 for
+   * all vectors.
+   * You can set the mesh side orientation with the values :
+   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
+   * BABYLON.Mesh.DOUBLESIDE
+   * The mesh can be set to updatable with the boolean parameter `updatable`
+   * (default false) if its internal geometry is supposed to change once
+   * created.
+   * If you create a double-sided mesh, you can choose what parts of the texture
+   * image to crop and stick respectively on the front and the back sides with
+   * the parameters `frontUVs` and `backUVs` (Vector4).
+   * Remember you can only change the shape positions, not their number when
+   * updating a polygon.
+   */
+  static Mesh* CreatePolygon(const std::string& name, PolygonOptions& options,
+                             Scene* scene);
+
+  /**
+   * @brief Creates an extruded polygon mesh, with depth in the Y direction.
+   */
+  static Mesh* ExtrudePolygon(const std::string& name, PolygonOptions& options,
+                              Scene* scene);
+
+  /**
    * @brief Creates a tube mesh.
    * The tube is a parametric shape :
    * http://doc.babylonjs.com/tutorials/Parametric_Shapes.  It has no predefined
@@ -619,6 +683,9 @@ public:
    * You can also set the mesh side orientation with the values :
    * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
    * BABYLON.Mesh.DOUBLESIDE
+   * If you create a double-sided mesh, you can choose what parts of the texture
+   * image to crop and stick respectively on the front and the back sides with
+   * the parameters `frontUVs` and `backUVs` (Vector4).
    * Detail here :
    * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
    * The optional parameter `invertUV` (boolean, default false) swaps in the
@@ -661,6 +728,9 @@ public:
    * You can also set the mesh side orientation with the values :
    * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
    * BABYLON.Mesh.DOUBLESIDE
+   * If you create a double-sided mesh, you can choose what parts of the texture
+   * image to crop and stick respectively on the front and the back sides with
+   * the parameters `frontUVs` and `backUVs` (Vector4).
    * Detail here :
    * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
@@ -692,7 +762,8 @@ public:
     const std::function<float(float i, float distance)>& scaleFunction,
     const std::function<float(float i, float distance)>& rotateFunction,
     bool rbCA, bool rbCP, unsigned int cap, bool custom, Scene* scene,
-    bool updtbl, unsigned int side, Mesh* instance, bool invertUV);
+    bool updtbl, unsigned int side, Mesh* instance, bool invertUV,
+    Vector4& frontUVs, Vector4& backUVs);
 
 private:
   static unsigned int updateSideOrientation(unsigned int orientation,

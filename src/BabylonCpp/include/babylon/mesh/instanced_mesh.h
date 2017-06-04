@@ -138,7 +138,7 @@ public:
    */
   IndicesArray getIndices(bool copyWhenShared = false) override;
 
-  std::vector<Vector3> _positions();
+  std::vector<Vector3>& _positions() override;
 
   /**
    * @brief Sets a new updated BoundingInfo to the mesh.

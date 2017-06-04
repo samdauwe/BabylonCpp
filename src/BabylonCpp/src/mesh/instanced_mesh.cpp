@@ -124,9 +124,9 @@ IndicesArray InstancedMesh::getIndices(bool /*copyWhenShared*/)
   return _sourceMesh->getIndices();
 }
 
-std::vector<Vector3> InstancedMesh::_positions()
+std::vector<Vector3>& InstancedMesh::_positions()
 {
-  return _sourceMesh->_positions;
+  return _sourceMesh->_positions();
 }
 
 InstancedMesh& InstancedMesh::refreshBoundingInfo()

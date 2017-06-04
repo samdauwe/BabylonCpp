@@ -24,6 +24,8 @@ public:
   /** Statics **/
   static std::array<Vector4, 6> DefaultBoxFaceUV;
   static std::array<Color4, 6> DefaultBoxFaceColors;
+  static Vector4 DefaultFrontUVs;
+  static Vector4 DefaultBackUVs;
 
 public:
   BoxOptions();
@@ -37,6 +39,8 @@ public:
   std::array<Vector4, 6> faceUV;
   std::array<Color4, 6> faceColors;
   unsigned int sideOrientation;
+  Vector4 frontUVs;
+  Vector4 backUVs;
   bool updatable;
 
 }; // end of class BoxOptions
@@ -54,6 +58,8 @@ public:
   /** Statics **/
   static std::vector<Vector4> DefaultCylinderFaceUV;
   static std::vector<Color4> DefaultCylinderFaceColors;
+  static Vector4 DefaultFrontUVs;
+  static Vector4 DefaultBackUVs;
 
 public:
   CylinderOptions();
@@ -71,9 +77,11 @@ public:
   unsigned int subdivisions;
   bool hasRings;
   bool enclose;
-  std::vector<Vector4> faceUV    = DefaultCylinderFaceUV;
-  std::vector<Color4> faceColors = DefaultCylinderFaceColors;
+  std::vector<Vector4> faceUV;
+  std::vector<Color4> faceColors;
   unsigned int sideOrientation;
+  Vector4 frontUVs;
+  Vector4 backUVs;
   bool updatable;
 
 private:
@@ -136,6 +144,11 @@ public:
 class BABYLON_SHARED_EXPORT DiscOptions {
 
 public:
+  /** Statics **/
+  static Vector4 DefaultFrontUVs;
+  static Vector4 DefaultBackUVs;
+
+public:
   DiscOptions();
   ~DiscOptions();
 
@@ -146,6 +159,8 @@ public:
   float radius;
   unsigned int tessellation;
   unsigned int sideOrientation;
+  Vector4 frontUVs;
+  Vector4 backUVs;
   bool updatable;
 
 private:
@@ -163,6 +178,11 @@ private:
 class BABYLON_SHARED_EXPORT ExtrudeShapeOptions {
 
 public:
+  /** Statics **/
+  static Vector4 DefaultFrontUVs;
+  static Vector4 DefaultBackUVs;
+
+public:
   ExtrudeShapeOptions();
   ~ExtrudeShapeOptions();
 
@@ -175,6 +195,8 @@ public:
   Mesh* instance;
   bool invertUV;
   unsigned int sideOrientation;
+  Vector4 frontUVs;
+  Vector4 backUVs;
   bool updatable;
 
 }; // end of class ExtrudeShapeOptions
@@ -187,6 +209,11 @@ public:
  * @brief Options used to create an custom extruded shape mesh.
  */
 class BABYLON_SHARED_EXPORT ExtrudeShapeCustomOptions {
+
+public:
+  /** Statics **/
+  static Vector4 DefaultFrontUVs;
+  static Vector4 DefaultBackUVs;
 
 public:
   ExtrudeShapeCustomOptions();
@@ -203,6 +230,8 @@ public:
   Mesh* instance;
   bool invertUV;
   unsigned int sideOrientation;
+  Vector4 frontUVs;
+  Vector4 backUVs;
   bool updatable;
 
 }; // end of class ExtrudeShapeCustomOptions
@@ -267,6 +296,11 @@ public:
 class BABYLON_SHARED_EXPORT IcoSphereOptions {
 
 public:
+  /** Statics **/
+  static Vector4 DefaultFrontUVs;
+  static Vector4 DefaultBackUVs;
+
+public:
   IcoSphereOptions();
   IcoSphereOptions(float radius);
   ~IcoSphereOptions();
@@ -279,6 +313,8 @@ public:
   bool flat;
   unsigned int subdivisions;
   unsigned int sideOrientation;
+  Vector4 frontUVs;
+  Vector4 backUVs;
   bool updatable;
 
 }; // end of class IcoSphereOptions
@@ -291,6 +327,11 @@ public:
  * @brief Options used to a lathe mesh.
  */
 class BABYLON_SHARED_EXPORT LatheOptions {
+
+public:
+  /** Statics **/
+  static Vector4 DefaultFrontUVs;
+  static Vector4 DefaultBackUVs;
 
 public:
   LatheOptions();
@@ -306,6 +347,8 @@ public:
   bool closed;
   bool updatable;
   unsigned int sideOrientation;
+  Vector4 frontUVs;
+  Vector4 backUVs;
   unsigned int cap;
   bool invertUV;
 
@@ -365,6 +408,11 @@ public:
 class BABYLON_SHARED_EXPORT PlaneOptions {
 
 public:
+  /** Statics **/
+  static Vector4 DefaultFrontUVs;
+  static Vector4 DefaultBackUVs;
+
+public:
   PlaneOptions();
   PlaneOptions(float size);
   ~PlaneOptions();
@@ -373,10 +421,41 @@ public:
   float width;
   float height;
   unsigned int sideOrientation;
+  Vector4 frontUVs;
+  Vector4 backUVs;
   bool updatable;
   Plane* sourcePlane;
 
 }; // end of class PlaneOptions
+
+//------------------------------------------------------------------------------
+// Polygon mesh options
+//------------------------------------------------------------------------------
+
+/**
+ * @brief Options used to create a polygon mesh.
+ */
+class BABYLON_SHARED_EXPORT PolygonOptions {
+
+public:
+  /** Statics **/
+  static Vector4 DefaultFrontUVs;
+  static Vector4 DefaultBackUVs;
+
+public:
+  PolygonOptions();
+  ~PolygonOptions();
+
+public:
+  std::vector<Vector3> shape;
+  std::vector<std::vector<Vector3>> holes;
+  float depth;
+  bool updatable;
+  unsigned int sideOrientation;
+  Vector4 frontUVs;
+  Vector4 backUVs;
+
+}; // end of class PolygonOptions
 
 //------------------------------------------------------------------------------
 // Polyhedron mesh options
@@ -386,6 +465,11 @@ public:
  * @brief Options used to create a polyhedron mesh.
  */
 class BABYLON_SHARED_EXPORT PolyhedronOptions {
+
+public:
+  /** Statics **/
+  static Vector4 DefaultFrontUVs;
+  static Vector4 DefaultBackUVs;
 
 public:
   PolyhedronOptions();
@@ -403,6 +487,8 @@ public:
   Polyhedron custom;
   bool flat;
   unsigned int sideOrientation;
+  Vector4 frontUVs;
+  Vector4 backUVs;
   bool updatable;
 
 }; // end of class PolyhedronOptions
@@ -415,6 +501,11 @@ public:
  * @brief Options used to create a ribbon mesh.
  */
 class BABYLON_SHARED_EXPORT RibbonOptions {
+
+public:
+  /** Statics **/
+  static Vector4 DefaultFrontUVs;
+  static Vector4 DefaultBackUVs;
 
 public:
   RibbonOptions(const std::vector<std::vector<Vector3>>& pathArray,
@@ -430,6 +521,8 @@ public:
   bool closePath;
   bool invertUV;
   unsigned int sideOrientation;
+  Vector4 frontUVs;
+  Vector4 backUVs;
   bool updatable;
   Mesh* instance;
   std::vector<Vector2> uvs;
@@ -451,6 +544,11 @@ private:
 class BABYLON_SHARED_EXPORT SphereOptions {
 
 public:
+  /** Statics **/
+  static Vector4 DefaultFrontUVs;
+  static Vector4 DefaultBackUVs;
+
+public:
   SphereOptions();
   SphereOptions(float diameter);
   ~SphereOptions();
@@ -466,6 +564,8 @@ public:
   float diameterY;
   float diameterZ;
   unsigned int sideOrientation;
+  Vector4 frontUVs;
+  Vector4 backUVs;
   bool updatable;
 
 private:
@@ -506,6 +606,11 @@ public:
 class BABYLON_SHARED_EXPORT TorusKnotOptions {
 
 public:
+  /** Statics **/
+  static Vector4 DefaultFrontUVs;
+  static Vector4 DefaultBackUVs;
+
+public:
   TorusKnotOptions();
   ~TorusKnotOptions();
 
@@ -517,6 +622,8 @@ public:
   float p;
   float q;
   unsigned int sideOrientation;
+  Vector4 frontUVs;
+  Vector4 backUVs;
   bool updatable;
 
 }; // end of class TorusKnotOptions
@@ -531,6 +638,11 @@ public:
 class BABYLON_SHARED_EXPORT TorusOptions {
 
 public:
+  /** Statics **/
+  static Vector4 DefaultFrontUVs;
+  static Vector4 DefaultBackUVs;
+
+public:
   TorusOptions();
   ~TorusOptions();
 
@@ -539,6 +651,8 @@ public:
   float thickness;
   unsigned int tessellation;
   unsigned int sideOrientation;
+  Vector4 frontUVs;
+  Vector4 backUVs;
   bool updatable;
 
 }; // end of class TorusOptions
@@ -551,6 +665,11 @@ public:
  * @brief Options used to create a tube mesh.
  */
 class BABYLON_SHARED_EXPORT TubeOptions {
+
+public:
+  /** Statics **/
+  static Vector4 DefaultFrontUVs;
+  static Vector4 DefaultBackUVs;
 
 public:
   TubeOptions();
@@ -566,6 +685,8 @@ public:
   std::function<float(unsigned int i, unsigned int distance)> radiusFunction;
   unsigned int cap;
   unsigned int sideOrientation;
+  Vector4 frontUVs;
+  Vector4 backUVs;
   Mesh* instance;
   bool invertUV;
   bool updatable;

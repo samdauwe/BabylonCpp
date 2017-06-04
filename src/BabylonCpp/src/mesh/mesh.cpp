@@ -1216,32 +1216,30 @@ Mesh& Mesh::bakeCurrentTransformIntoVertices()
   return *this;
 }
 
+// Cache
+std::vector<Vector3>& Mesh::_positions()
+{
+  if (_geometry) {
+    return _geometry->_positions;
+  }
+  return _emptyPositions;
+}
+
 Mesh& Mesh::_resetPointsArrayCache()
 {
-  _positions.clear();
+  if (_geometry) {
+    _geometry->_resetPointsArrayCache();
+  }
   return *this;
 }
 
 bool Mesh::_generatePointsArray()
 {
-  if (!_positions.empty()) {
-    return true;
+  if (_geometry) {
+    return _geometry->_generatePointsArray();
   }
 
-  _positions.clear();
-
-  auto data = getVerticesData(VertexBuffer::PositionKind);
-
-  if (data.empty()) {
-    return false;
-  }
-
-  _positions.resize(data.size());
-  for (unsigned int index = 0; index < data.size(); index += 3) {
-    _positions.emplace_back(Vector3::FromArray(data, index));
-  }
-
-  return true;
+  return false;
 }
 
 Mesh* Mesh::clone(const std::string& iName, Node* newParent,
@@ -2052,6 +2050,36 @@ LinesMesh* Mesh::CreateDashedLines(const std::string& name,
   return MeshBuilder::CreateDashedLines(name, options, scene);
 }
 
+Mesh* Mesh::CreatePolygon(const std::string& name,
+                          const std::vector<Vector3>& shape, Scene* scene,
+                          const std::vector<std::vector<Vector3>>& holes,
+                          bool updatable, unsigned int sideOrientation)
+{
+  PolygonOptions options;
+  options.shape           = shape;
+  options.holes           = holes;
+  options.updatable       = updatable;
+  options.sideOrientation = sideOrientation;
+
+  return MeshBuilder::CreatePolygon(name, options, scene);
+}
+
+Mesh* Mesh::ExtrudePolygon(const std::string& name,
+                           const std::vector<Vector3>& shape, float depth,
+                           Scene* scene,
+                           const std::vector<std::vector<Vector3>>& holes,
+                           bool updatable, unsigned int sideOrientation)
+{
+  PolygonOptions options;
+  options.shape           = shape;
+  options.holes           = holes;
+  options.depth           = depth;
+  options.updatable       = updatable;
+  options.sideOrientation = sideOrientation;
+
+  return MeshBuilder::ExtrudePolygon(name, options, scene);
+}
+
 Mesh* Mesh::ExtrudeShape(const std::string& name,
                          const std::vector<Vector3>& shape,
                          const std::vector<Vector3>& path, float scale,
@@ -2430,7 +2458,7 @@ Mesh* Mesh::MergeMeshes(std::vector<Mesh*>& meshes, bool disposeSource,
   for (auto& mesh : meshes) {
     if (mesh) {
       mesh->computeWorldMatrix(true);
-      otherVertexData = VertexData::ExtractFromMesh(mesh, false, true);
+      otherVertexData = VertexData::ExtractFromMesh(mesh, true);
       otherVertexData->transform(*mesh->getWorldMatrix());
 
       if (vertexData) {

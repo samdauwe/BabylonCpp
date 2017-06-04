@@ -131,6 +131,7 @@ public:
   Scene* getScene() override;
   void setSkeleton(Skeleton* value);
   virtual Skeleton* skeleton();
+  virtual std::vector<Vector3>& _positions();
   Vector3& position() override;
   void setPosition(const Vector3& newPosition);
 
@@ -969,7 +970,6 @@ public:
   std::unique_ptr<EdgesRenderer> _edgesRenderer;
   // Cache
   std::unique_ptr<Matrix> _worldMatrix;
-  std::vector<Vector3> _positions;
   AbstractMesh* _masterMesh;
   std::unique_ptr<MaterialDefines> _materialDefines;
   std::unique_ptr<BoundingInfo> _boundingInfo;
@@ -1043,6 +1043,7 @@ private:
   bool _isDirty;
   Matrix _pivotMatrix;
   bool _isWorldMatrixFrozen;
+  std::vector<Vector3> _emptyPositions;
   // Skeleton
   Skeleton* _skeleton;
 

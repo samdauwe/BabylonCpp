@@ -450,6 +450,11 @@ Skeleton* AbstractMesh::skeleton()
   return _skeleton;
 }
 
+std::vector<Vector3>& AbstractMesh::_positions()
+{
+  return _emptyPositions;
+}
+
 Vector3& AbstractMesh::position()
 {
   return _position;

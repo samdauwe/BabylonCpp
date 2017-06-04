@@ -10,6 +10,7 @@
 #include <babylon/math/tmp.h>
 #include <babylon/mesh/ground_mesh.h>
 #include <babylon/mesh/lines_mesh.h>
+#include <babylon/mesh/polygonmesh/polygon_mesh_builder.h>
 #include <babylon/mesh/vertex_buffer.h>
 #include <babylon/mesh/vertex_data.h>
 #include <babylon/mesh/vertex_data_options.h>
@@ -101,8 +102,8 @@ Mesh* MeshBuilder::CreateRibbon(const std::string& name, RibbonOptions& options,
       unsigned int i = 0;
       unsigned int ns
         = (instance->sideOrientation() == Mesh::DOUBLESIDE) ? 2 : 1;
-      for (unsigned int si = 1; si <= ns; ++si) {
-        for (unsigned int p = 0; p < pathArray.size(); ++p) {
+      for (std::size_t si = 1; si <= ns; ++si) {
+        for (std::size_t p = 0; p < pathArray.size(); ++p) {
           const auto& path = pathArray[p];
           const auto l     = path.size();
           minlg            = (minlg < l) ? minlg : l;
@@ -181,7 +182,7 @@ Mesh* MeshBuilder::CreateRibbon(const std::string& name, RibbonOptions& options,
       if (instance->_closePath) {
         unsigned int indexFirst = 0;
         size_t indexLast        = 0;
-        for (unsigned int p = 0; p < pathArray.size(); ++p) {
+        for (std::size_t p = 0; p < pathArray.size(); ++p) {
           indexFirst = instance->_idx[p] * 3;
           if (p + 1 < pathArray.size()) {
             indexLast = (instance->_idx[p + 1] - 1) * 3;
@@ -279,7 +280,7 @@ LinesMesh* MeshBuilder::CreateLineSystem(const std::string& name,
     auto positionFunction = [&](Float32Array& positions) {
       unsigned int i = 0;
       for (const auto& points : lines) {
-        for (unsigned int p = 0; p < points.size(); ++p) {
+        for (std::size_t p = 0; p < points.size(); ++p) {
           positions[i + 0] = points[p].x;
           positions[i + 1] = points[p].y;
           positions[i + 2] = points[p].z;
@@ -324,15 +325,15 @@ LinesMesh* MeshBuilder::CreateDashedLines(const std::string& name,
       auto dashshft   = 0.f;
       auto curshft    = 0.f;
       unsigned int p  = 0;
-      unsigned int i  = 0;
       unsigned int j  = 0;
-      for (i = 0; i < points.size() - 1; ++i) {
+      for (std::size_t i = 0; i < points.size() - 1; ++i) {
         points[i + 1].subtractToRef(points[i], curvect);
         lg += curvect.length();
       }
       shft     = lg / static_cast<float>(nbSeg);
       dashshft = static_cast<float>(instance->dashSize) * shft
                  / static_cast<float>(instance->dashSize + instance->gapSize);
+      std::size_t i = 0;
       for (i = 0; i < points.size() - 1; ++i) {
         points[i + 1].subtractToRef(points[i], curvect);
         nb = static_cast<unsigned int>(std::floor(curvect.length() / shft));
@@ -378,7 +379,8 @@ Mesh* MeshBuilder::ExtrudeShape(const std::string& name,
   return MeshBuilder::_ExtrudeShapeGeneric(
     name, options.shape, options.path, options.scale, options.rotation, nullptr,
     nullptr, false, false, options.cap, false, scene, options.updatable,
-    options.sideOrientation, options.instance, options.invertUV);
+    options.sideOrientation, options.instance, options.invertUV,
+    options.frontUVs, options.backUVs);
 }
 
 Mesh* MeshBuilder::ExtrudeShapeCustom(const std::string& name,
@@ -392,7 +394,7 @@ Mesh* MeshBuilder::ExtrudeShapeCustom(const std::string& name,
     name, options.shape, options.path, 0.f, 0.f, options.scaleFunction,
     options.rotationFunction, options.ribbonCloseArray, options.ribbonClosePath,
     options.cap, true, scene, options.updatable, options.sideOrientation,
-    options.instance, options.invertUV);
+    options.instance, options.invertUV, options.frontUVs, options.backUVs);
 }
 
 Mesh* MeshBuilder::CreateLathe(const std::string& name, LatheOptions& options,
@@ -422,7 +424,7 @@ Mesh* MeshBuilder::CreateLathe(const std::string& name, LatheOptions& options,
                                 shape[0].y,
                                 std::sin(i * step) * shape[0].x * radius));
     }
-    for (unsigned int p = 0; p < shape.size(); ++p) {
+    for (std::size_t p = 0; p < shape.size(); ++p) {
       rotated = Vector3(std::cos(i * step) * shape[p].x * radius, shape[p].y,
                         std::sin(i * step) * shape[p].x * radius);
       path.emplace_back(rotated);
@@ -553,6 +555,47 @@ GroundMesh* MeshBuilder::CreateGroundFromHeightMap(
   return ground;
 }
 
+Mesh* MeshBuilder::CreatePolygon(const std::string& name,
+                                 PolygonOptions& options, Scene* scene)
+{
+  options.sideOrientation
+    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
+  const auto& shape = options.shape;
+  const auto& holes = options.holes;
+  const auto& depth = options.depth;
+  std::vector<Vector2> contours(shape.size());
+  std::vector<Vector2> hole;
+  for (std::size_t i = 0; i < shape.size(); ++i) {
+    contours[i] = Vector2(shape[i].x, shape[i].z);
+  }
+  float epsilon = 0.00000001f;
+  if (contours[0].equalsWithEpsilon(contours.back(), epsilon)) {
+    contours.pop_back();
+  }
+
+  PolygonMeshBuilder polygonTriangulation(name, contours, scene);
+  for (std::size_t hNb = 0; hNb < holes.size(); ++hNb) {
+    hole.clear();
+    for (std::size_t hPoint = 0; hPoint < holes[hNb].size(); ++hPoint) {
+      hole.emplace_back(Vector2(holes[hNb][hPoint].x, holes[hNb][hPoint].z));
+    }
+    polygonTriangulation.addHole(hole);
+  }
+  auto polygon = polygonTriangulation.build(options.updatable, depth);
+  polygon->setSideOrientation(options.sideOrientation);
+  auto vertexData = VertexData::CreatePolygon(
+    polygon, options.sideOrientation, options.frontUVs, options.backUVs);
+  vertexData->applyToMesh(polygon, options.updatable);
+
+  return polygon;
+}
+
+Mesh* MeshBuilder::ExtrudePolygon(const std::string& name,
+                                  PolygonOptions& options, Scene* scene)
+{
+  return MeshBuilder::CreatePolygon(name, options, scene);
+}
+
 Mesh* MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
                               Scene* scene)
 {
@@ -594,7 +637,7 @@ Mesh* MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
               _radiusFunction(i, distances[i]); // current radius
       std::vector<Vector3> circlePath;          // current circle array
       normal = normals[i];                      // current normal
-      for (unsigned int t = 0; t < _tessellation; ++t) {
+      for (std::size_t t = 0; t < _tessellation; ++t) {
         Matrix::RotationAxisToRef(tangents[i], step * static_cast<float>(t),
                                   rotationMatrix);
         rotated
@@ -610,7 +653,7 @@ Mesh* MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
     const auto capPath
       = [_path](unsigned int nbPoints, unsigned int pathIndex) {
           std::vector<Vector3> pointCap;
-          for (unsigned int i = 0; i < nbPoints; ++i) {
+          for (std::size_t i = 0; i < nbPoints; ++i) {
             pointCap.emplace_back(_path[pathIndex]);
           }
           return pointCap;
@@ -733,7 +776,7 @@ Mesh* MeshBuilder::CreateDecal(const std::string& name,
 
   unsigned int currentVertexDataIndex = 0;
 
-  const auto extractDecalVector3 = [&](unsigned int indexId) {
+  const auto extractDecalVector3 = [&](std::size_t indexId) {
     const auto& vertexId = indices[indexId];
     PositionNormalVertex result;
     result.position
@@ -776,7 +819,7 @@ Mesh* MeshBuilder::CreateDecal(const std::string& name,
     unsigned int total;
     PositionNormalVertex nV1, nV2, nV3, nV4;
     float d1, d2, d3;
-    for (unsigned int index = 0; index < vertices.size(); index += 3) {
+    for (std::size_t index = 0; index < vertices.size(); index += 3) {
       total = 0;
 
       d1 = Vector3::Dot(vertices[index].position, axis) - clipSize;
@@ -870,7 +913,7 @@ Mesh* MeshBuilder::CreateDecal(const std::string& name,
     return result;
   };
 
-  for (unsigned int index = 0; index < indices.size(); index += 3) {
+  for (std::size_t index = 0; index < indices.size(); index += 3) {
     std::vector<PositionNormalVertex> faceVertices;
 
     faceVertices.emplace_back(extractDecalVector3(index));
@@ -890,7 +933,7 @@ Mesh* MeshBuilder::CreateDecal(const std::string& name,
     }
 
     // Add UVs and get back to world
-    for (unsigned int vIndex = 0; vIndex < faceVertices.size(); ++vIndex) {
+    for (std::size_t vIndex = 0; vIndex < faceVertices.size(); ++vIndex) {
       auto& vertex = faceVertices[vIndex];
 
       vertexData->indices.emplace_back(currentVertexDataIndex);
@@ -920,7 +963,8 @@ Mesh* MeshBuilder::_ExtrudeShapeGeneric(
   const std::function<float(float i, float distance)>& scaleFunction,
   const std::function<float(float i, float distance)>& rotateFunction,
   bool rbCA, bool rbCP, unsigned int cap, bool custom, Scene* scene,
-  bool updtbl, unsigned int side, Mesh* instance, bool invertUV)
+  bool updtbl, unsigned int side, Mesh* instance, bool invertUV,
+  Vector4& frontUVs, Vector4& backUVs)
 {
   // extrusion geometry
   const auto extrusionPathArray
@@ -947,11 +991,11 @@ Mesh* MeshBuilder::_ExtrudeShapeGeneric(
         auto& rotationMatrix = Tmp::MatrixArray[0];
         shapePaths.resize(_curve.size());
 
-        for (unsigned int i = 0; i < _curve.size(); ++i) {
+        for (std::size_t i = 0; i < _curve.size(); ++i) {
           std::vector<Vector3> shapePath;
           auto angleStep  = rotate(static_cast<float>(i), distances[i]);
           auto scaleRatio = scl(static_cast<float>(i), distances[i]);
-          for (unsigned int p = 0; p < _shape.size(); ++p) {
+          for (std::size_t p = 0; p < _shape.size(); ++p) {
             Matrix::RotationAxisToRef(tangents[i], angle, rotationMatrix);
             auto planed = ((tangents[i].scale(_shape[p].z))
                              .add(normals[i].scale(_shape[p].x))
@@ -969,12 +1013,11 @@ Mesh* MeshBuilder::_ExtrudeShapeGeneric(
         const auto capPath = [&](const std::vector<Vector3>& shapePath) {
           std::vector<Vector3> pointCap;
           auto barycenter = Vector3::Zero();
-          unsigned int i;
-          for (i = 0; i < shapePath.size(); ++i) {
+          for (std::size_t i = 0; i < shapePath.size(); ++i) {
             barycenter.addInPlace(shapePath[i]);
           }
           barycenter.scaleInPlace(1.f / static_cast<float>(shapePath.size()));
-          for (i = 0; i < shapePath.size(); ++i) {
+          for (std::size_t i = 0; i < shapePath.size(); ++i) {
             pointCap.emplace_back(barycenter);
           }
           return pointCap;
@@ -1027,7 +1070,9 @@ Mesh* MeshBuilder::_ExtrudeShapeGeneric(
   ribbonOptions.updatable       = updtbl;
   ribbonOptions.sideOrientation = side;
   ribbonOptions.invertUV        = invertUV;
-  Mesh* extrudedGeneric = MeshBuilder::CreateRibbon(name, ribbonOptions, scene);
+  ribbonOptions.frontUVs        = frontUVs;
+  ribbonOptions.backUVs         = backUVs;
+  auto extrudedGeneric = MeshBuilder::CreateRibbon(name, ribbonOptions, scene);
   extrudedGeneric->_pathArray = std::move(pathArray);
   extrudedGeneric->_path3D    = std::move(path3D);
   extrudedGeneric->_cap       = _cap;

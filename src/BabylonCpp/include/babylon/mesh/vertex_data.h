@@ -146,6 +146,14 @@ public:
   static std::unique_ptr<VertexData> CreateDisc(DiscOptions& options);
 
   /**
+   * @brief Re-creates the VertexData of the Polygon for sideOrientation.
+   */
+  static std::unique_ptr<VertexData> CreatePolygon(Mesh* polygon,
+                                                   unsigned int sideOrientation,
+                                                   Vector4& frontUVs,
+                                                   Vector4& backUVs);
+
+  /**
    * @brief Creates the VertexData of the IcoSphere.
    */
   static std::unique_ptr<VertexData> CreateIcoSphere(IcoSphereOptions& options);
@@ -190,9 +198,11 @@ private:
   static std::unique_ptr<VertexData>
   _ExtractFrom(IGetSetVerticesData* meshOrGeometry, bool copyWhenShared = false,
                bool forceCopy = false);
-  static void _ComputeSides(unsigned int sideOrientation,
-                            Float32Array& positions, Uint32Array& indices,
-                            Float32Array& normals, Float32Array& uvs);
+  static void
+  _ComputeSides(unsigned int sideOrientation, Float32Array& positions,
+                Uint32Array& indices, Float32Array& normals, Float32Array& uvs,
+                const Vector4& frontUVs = Vector4(0.f, 0.f, 1.f, 1.f),
+                const Vector4& backUVs  = Vector4(0.f, 0.f, 1.f, 1.f));
 
 public:
   Float32Array positions;

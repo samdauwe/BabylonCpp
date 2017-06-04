@@ -563,6 +563,7 @@ public:
   Mesh& bakeCurrentTransformIntoVertices();
 
   /** Cache **/
+  std::vector<Vector3>& _positions() override;
   Mesh& _resetPointsArrayCache();
   bool _generatePointsArray() override;
 
@@ -971,6 +972,39 @@ public:
                                       unsigned int dashNb = 200,
                                       Scene* = nullptr, bool updatable = false,
                                       LinesMesh* linesInstance = nullptr);
+  /**
+   * @brief Creates a polygon mesh.
+   * Please consider using the same method from the MeshBuilder class instead.
+   * The polygon's shape will depend on the input parameters and is constructed
+   * parallel to a ground mesh.
+   * The parameter `shape` is a required array of successive Vector3
+   * representing the corners of the polygon in th XoZ plane, that is y = 0 for
+   * all vectors.
+   * You can set the mesh side orientation with the values :
+   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
+   * BABYLON.Mesh.DOUBLESIDE
+   * The mesh can be set to updatable with the boolean parameter `updatable`
+   * (default false) if its internal geometry is supposed to change once
+   * created.
+   * Remember you can only change the shape positions, not their number when
+   * updating a polygon.
+   */
+  static Mesh* CreatePolygon(const std::string& name,
+                             const std::vector<Vector3>& shape, Scene* scene,
+                             const std::vector<std::vector<Vector3>>& holes,
+                             bool updatable               = false,
+                             unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+
+  /**
+   * Creates an extruded polygon mesh, with depth in the Y direction.
+   * Please consider using the same method from the MeshBuilder class instead.
+   */
+  static Mesh* ExtrudePolygon(const std::string& name,
+                              const std::vector<Vector3>& shape, float depth,
+                              Scene* scene,
+                              const std::vector<std::vector<Vector3>>& holes,
+                              bool updatable               = false,
+                              unsigned int sideOrientation = Mesh::DEFAULTSIDE);
 
   /**
    * @brief Creates an extruded shape mesh.
@@ -1436,6 +1470,7 @@ public:
 private:
   Observer<Mesh>::Ptr _onBeforeDrawObserver;
   std::vector<std::unique_ptr<MeshLODLevel>> _LODLevels;
+  std::vector<Vector3> _emptyPositions;
   // Morph
   MorphTargetManager* _morphTargetManager;
   std::vector<VertexBuffer*> _delayInfo;
