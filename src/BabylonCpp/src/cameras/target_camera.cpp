@@ -291,7 +291,7 @@ Matrix TargetCamera::_getViewMatrix()
     _currentTarget.copyFrom(*_getLockedTargetPosition());
   }
 
-  if (getScene()->useRightHandedSystem) {
+  if (getScene()->useRightHandedSystem()) {
     Matrix::LookAtRHToRef(position, _currentTarget, upVector, _viewMatrix);
   }
   else {

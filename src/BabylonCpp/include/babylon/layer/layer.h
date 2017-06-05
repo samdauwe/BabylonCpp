@@ -49,6 +49,7 @@ public:
   Vector2 offset;
   int alphaBlendingMode;
   bool alphaTest;
+  unsigned int layerMask;
 
 private:
   // Events

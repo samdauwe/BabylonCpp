@@ -37,7 +37,7 @@ Material::Material(const std::string& iName, Scene* scene, bool /*doNotAdd*/)
     , _scene{scene}
     , _fillMode{Material::TriangleFillMode}
 {
-  if (_scene->useRightHandedSystem) {
+  if (_scene->useRightHandedSystem()) {
     sideOrientation = Material::ClockWiseSideOrientation;
   }
   else {

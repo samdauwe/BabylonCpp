@@ -74,7 +74,7 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
         float offsetX = static_cast<float>(evt.clientX - _previousPosition.x);
         float offsetY = static_cast<float>(evt.clientY - _previousPosition.y);
 
-        if (camera->getScene()->useRightHandedSystem) {
+        if (camera->getScene()->useRightHandedSystem()) {
           camera->cameraRotation->y -= offsetX / angularSensibility;
         }
         else {
@@ -102,7 +102,7 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
     float offsetX = static_cast<float>(evt.movementX);
     float offsetY = static_cast<float>(evt.movementY);
 
-    if (camera->getScene()->useRightHandedSystem) {
+    if (camera->getScene()->useRightHandedSystem()) {
       camera->cameraRotation->y -= offsetX / angularSensibility;
     }
     else {

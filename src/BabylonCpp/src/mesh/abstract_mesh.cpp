@@ -2082,7 +2082,7 @@ void AbstractMesh::createNormals(bool updatable)
   }
 
   FacetParameters options;
-  options.useRightHandedSystem = getScene()->useRightHandedSystem;
+  options.useRightHandedSystem = getScene()->useRightHandedSystem();
   VertexData::ComputeNormals(positions, indices, normals, options);
   setVerticesData(VertexBuffer::NormalKind, normals, updatable);
 }

@@ -57,6 +57,9 @@ public:
   std::string textureFormatInUse() const;
   float webGLVersion() const;
 
+  // Empty texture
+  GL::IGLTexture* emptyTexture();
+
   /**
    * @brief Returns true if the stencil buffer has been enabled through the
    * creation option of the context.
@@ -293,6 +296,7 @@ public:
   bool getDepthWrite() const;
   void setDepthWrite(bool enable);
   void setColorWrite(bool enable);
+  void setAlphaConstants(float r, float g, float b, float a);
   void setAlphaMode(int mode, bool noDepthWriteChange = false);
   int getAlphaMode() const;
   void setAlphaTesting(bool enable);
@@ -360,6 +364,9 @@ public:
                             = EngineConstants::TEXTUREFORMAT_RGBA);
   GL::IGLTexture*
   createRenderTargetTexture(ISize size, const IRenderTargetOptions& options);
+  std::vector<GL::IGLTexture*>
+  createMultipleRenderTarget(ISize size,
+                             const IMultiRenderTargetOptions& options);
   unsigned int updateRenderTargetTextureSampleCount(GL::IGLTexture* texture,
                                                     unsigned int samples);
   GL::IGLTexture*
@@ -493,6 +500,10 @@ public:
    * Observable event triggered each time the rendering canvas is resized.
    */
   Observable<Engine> onResizeObservable;
+  /**
+   * Observable event triggered each time the canvas lost focus
+   */
+  Observable<Engine> onCanvasBlurObservable;
   // WebVR
   // The new WebVR uses promises.
   // this promise resolves with the current devices available.
@@ -517,6 +528,7 @@ private:
 
   bool _badOS;
 
+  std::function<void()> _onCanvasBlur;
   std::function<void()> _onBlur;
   std::function<void()> _onFocus;
   std::function<void()> _onFullscreenChange;
@@ -576,6 +588,7 @@ private:
   Int32Array _textureUnits;
   bool _vaoRecordInProgress;
   bool _mustWipeVertexAttributes;
+  GL::IGLTexture* _emptyTexture;
   // Hardware supported Compressed Textures
   std::vector<std::string> _texturesSupported;
   std::string _textureFormatInUse;

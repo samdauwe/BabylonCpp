@@ -18,16 +18,23 @@ public:
   bool isDirty() const;
   bool alphaBlend() const;
   void setAlphaBlend(bool value);
-  void setAlphaBlendFunctionParameters(int value0, int value1, int value2,
-                                       int value3);
+  void setAlphaBlendConstants(float r, float g, float b, float a);
+  void setAlphaBlendFunctionParameters(unsigned int value0, unsigned int value1,
+                                       unsigned int value2,
+                                       unsigned int value3);
+  void setAlphaEquationParameters(unsigned int rgb, unsigned int alpha);
   void reset();
   void apply(GL::IGLRenderingContext& gl);
 
 private:
   bool _isAlphaBlendDirty;
   bool _isBlendFunctionParametersDirty;
+  bool _isBlendEquationParametersDirty;
+  bool _isBlendConstantsDirty;
   bool _alphaBlend;
-  std::array<int, 4> _blendFunctionParameters;
+  std::array<unsigned int, 4> _blendFunctionParameters;
+  std::array<unsigned int, 2> _blendEquationParameters;
+  std::array<float, 4> _blendConstants;
 
 }; // end of class _AlphaState
 

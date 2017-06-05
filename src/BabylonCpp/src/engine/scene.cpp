@@ -31,6 +31,7 @@
 #include <babylon/materials/material.h>
 #include <babylon/materials/multi_material.h>
 #include <babylon/materials/standard_material.h>
+#include <babylon/materials/textures/multi_render_target.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/uniform_buffer.h>
@@ -48,6 +49,7 @@
 #include <babylon/rendering/bounding_box_renderer.h>
 #include <babylon/rendering/depth_renderer.h>
 #include <babylon/rendering/edges_renderer.h>
+#include <babylon/rendering/geometry_buffer_renderer.h>
 #include <babylon/rendering/outline_renderer.h>
 #include <babylon/rendering/rendering_manager.h>
 #include <babylon/sprites/sprite_manager.h>
@@ -75,7 +77,6 @@ Scene::Scene(Engine* engine)
     , _clipPlane{nullptr}
     , animationsEnabled{true}
     , constantlyUpdateMeshUnderPointer{false}
-    , useRightHandedSystem{false}
     , hoverCursor{"pointer"}
     , cameraToUseForPointers(nullptr)
     , _mirroredCameraPosition{nullptr}
@@ -128,6 +129,7 @@ Scene::Scene(Engine* engine)
     , afterRender{nullptr}
     , _onKeyDown{nullptr}
     , _onKeyUp{nullptr}
+    , _useRightHandedSystem{false}
     , _forcePointsCloud{false}
     , _fogEnabled{true}
     , _fogMode{Scene::FOGMODE_NONE}
@@ -161,6 +163,7 @@ Scene::Scene(Engine* engine)
     , _pointerOverSprite{nullptr}
     , _debugLayer{nullptr}
     , _depthRenderer{nullptr}
+    , _geometryBufferRenderer{nullptr}
     , _uniqueIdCounter{0}
     , _pickedDownMesh{nullptr}
     , _pickedUpMesh{nullptr}
@@ -248,6 +251,21 @@ Vector2 Scene::unTranslatedPointer() const
 }
 
 // Properties
+
+bool Scene::useRightHandedSystem() const
+{
+  return _useRightHandedSystem;
+}
+
+void Scene::setUseRightHandedSystem(bool value)
+{
+  if (_useRightHandedSystem == value) {
+    return;
+  }
+  _useRightHandedSystem = value;
+  markAllMaterialsAsDirty(Material::MiscDirtyFlag);
+}
+
 bool Scene::forcePointsCloud() const
 {
   return _forcePointsCloud;
@@ -728,8 +746,8 @@ void Scene::_onPointerMoveEvent(PointerEvent&& evt)
   if (!pointerMovePredicate) {
     pointerMovePredicate = [this](AbstractMesh* mesh) {
       return mesh->isPickable && mesh->isVisible && mesh->isReady()
-             && (constantlyUpdateMeshUnderPointer
-                 || mesh->actionManager != nullptr);
+             && mesh->isEnabled() && (constantlyUpdateMeshUnderPointer
+                                      || mesh->actionManager != nullptr);
     };
   }
 
@@ -812,7 +830,8 @@ void Scene::_onPointerDownEvent(PointerEvent&& evt)
 
   if (!pointerDownPredicate) {
     pointerDownPredicate = [](AbstractMesh* mesh) {
-      return mesh->isPickable && mesh->isVisible && mesh->isReady();
+      return mesh->isPickable && mesh->isVisible && mesh->isReady()
+             && mesh->isEnabled();
     };
   }
 
@@ -952,7 +971,8 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
 
   if (!pointerUpPredicate) {
     pointerUpPredicate = [](AbstractMesh* mesh) {
-      return mesh->isPickable && mesh->isVisible && mesh->isReady();
+      return mesh->isPickable && mesh->isVisible && mesh->isReady()
+             && mesh->isEnabled();
     };
   }
 
@@ -2200,7 +2220,8 @@ void Scene::_renderForCamera(Camera* camera)
   if (!layers.empty()) {
     engine->setDepthBuffer(false);
     for (auto& layer : layers) {
-      if (layer->isBackground) {
+      if (layer->isBackground
+          && ((layer->layerMask & activeCamera->layerMask) != 0)) {
         layer->render();
       }
     }
@@ -2249,7 +2270,8 @@ void Scene::_renderForCamera(Camera* camera)
   if (!layers.empty()) {
     engine->setDepthBuffer(false);
     for (auto& layer : layers) {
-      if (!layer->isBackground) {
+      if (!layer->isBackground
+          && ((layer->layerMask & activeCamera->layerMask) != 0)) {
         layer->render();
       }
     }
@@ -2459,6 +2481,11 @@ void Scene::render()
     _renderTargets.emplace_back(_depthRenderer->getDepthMap());
   }
 
+  // Geometry renderer
+  if (_geometryBufferRenderer) {
+    _renderTargets.emplace_back(_geometryBufferRenderer->getGBuffer());
+  }
+
   // RenderPipeline
   if (_postProcessRenderPipelineManager) {
     _postProcessRenderPipelineManager->update();
@@ -2597,6 +2624,31 @@ void Scene::disableDepthRenderer()
 
   _depthRenderer->dispose();
   _depthRenderer.reset(nullptr);
+}
+
+GeometryBufferRenderer* Scene::enableGeometryBufferRenderer(float ratio)
+{
+  if (_geometryBufferRenderer) {
+    return _geometryBufferRenderer.get();
+  }
+
+  _geometryBufferRenderer
+    = std::make_unique<GeometryBufferRenderer>(this, ratio);
+  if (!_geometryBufferRenderer->isSupported()) {
+    _geometryBufferRenderer.reset(nullptr);
+  }
+
+  return _geometryBufferRenderer.get();
+}
+
+void Scene::disableGeometryBufferRenderer()
+{
+  if (!_geometryBufferRenderer) {
+    return;
+  }
+
+  _geometryBufferRenderer->dispose();
+  _geometryBufferRenderer.reset(nullptr);
 }
 
 void Scene::freezeMaterials()
@@ -3013,7 +3065,7 @@ void Scene::createDefaultCameraOrLight(bool createArcRotateCamera)
     else {
       auto freeCamera = FreeCamera::New(
         "default camera", Vector3(worldCenter.x, worldCenter.y,
-                                  useRightHandedSystem ? -radius : radius),
+                                  useRightHandedSystem() ? -radius : radius),
         this);
       freeCamera->setTarget(worldCenter);
       camera = freeCamera;

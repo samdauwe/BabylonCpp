@@ -423,7 +423,7 @@ Matrix& Camera::getProjectionMatrix(bool force)
       minZ = 0.1f;
     }
 
-    if (scene->useRightHandedSystem) {
+    if (scene->useRightHandedSystem()) {
       Matrix::PerspectiveFovRHToRef(fov, engine->getAspectRatio(this), minZ,
                                     maxZ, _projectionMatrix,
                                     fovMode == Camera::FOVMODE_VERTICAL_FIXED);
@@ -438,7 +438,7 @@ Matrix& Camera::getProjectionMatrix(bool force)
 
   float halfWidth  = static_cast<float>(engine->getRenderWidth()) / 2.f;
   float halfHeight = static_cast<float>(engine->getRenderHeight()) / 2.f;
-  if (scene->useRightHandedSystem) {
+  if (scene->useRightHandedSystem()) {
     Matrix::OrthoOffCenterRHToRef(
       !stl_util::almost_equal(orthoLeft, 0.f) ? orthoLeft : -halfWidth,
       !stl_util::almost_equal(orthoRight, 0.f) ? orthoRight : halfWidth,

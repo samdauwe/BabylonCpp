@@ -156,7 +156,7 @@ void ArcRotateCamera::_checkInputs()
       || !stl_util::almost_equal(inertialBetaOffset, 0.f)
       || !stl_util::almost_equal(inertialRadiusOffset, 0.f)) {
 
-    if (getScene()->useRightHandedSystem) {
+    if (getScene()->useRightHandedSystem()) {
       alpha -= beta <= 0.f ? -inertialAlphaOffset : inertialAlphaOffset;
     }
     else {
@@ -373,7 +373,7 @@ Matrix ArcRotateCamera::_getViewMatrix()
       up = up.negate();
     }
 
-    if (getScene()->useRightHandedSystem) {
+    if (getScene()->useRightHandedSystem()) {
       Matrix::LookAtRHToRef(position, _target, up, _viewMatrix);
     }
     else {

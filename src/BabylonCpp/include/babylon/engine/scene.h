@@ -60,6 +60,8 @@ public:
   Vector2 unTranslatedPointer() const;
 
   /** Properties **/
+  bool useRightHandedSystem() const;
+  void setUseRightHandedSystem(bool value);
   bool forcePointsCloud() const;
   void setForcePointsCloud(bool value);
   bool fogEnabled() const;
@@ -431,6 +433,8 @@ public:
   /** Rendering **/
   DepthRenderer* enableDepthRenderer();
   void disableDepthRenderer();
+  GeometryBufferRenderer* enableGeometryBufferRenderer(float ratio);
+  void disableGeometryBufferRenderer();
   void freezeMaterials();
   void unfreezeMaterials();
   void dispose(bool doNotRecurse = false) override;
@@ -728,7 +732,6 @@ public:
   std::unique_ptr<Plane> _clipPlane;
   bool animationsEnabled;
   bool constantlyUpdateMeshUnderPointer;
-  bool useRightHandedSystem;
 
   std::string hoverCursor;
 
@@ -897,6 +900,8 @@ private:
   // Keyboard
   std::function<void(Event&& evt)> _onKeyDown;
   std::function<void(Event&& evt)> _onKeyUp;
+  // Coordinate system
+  bool _useRightHandedSystem;
   // Members
   bool _forcePointsCloud;
   // Fog
@@ -978,6 +983,7 @@ private:
   Sprite* _pointerOverSprite;
   std::unique_ptr<DebugLayer> _debugLayer;
   std::unique_ptr<DepthRenderer> _depthRenderer;
+  std::unique_ptr<GeometryBufferRenderer> _geometryBufferRenderer;
   unsigned int _uniqueIdCounter;
   AbstractMesh* _pickedDownMesh;
   AbstractMesh* _pickedUpMesh;

@@ -17,6 +17,7 @@ Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene,
     , scale{Vector2(1.f, 1.f)}
     , offset{Vector2(0.f, 0.f)}
     , alphaBlendingMode{EngineConstants::ALPHA_COMBINE}
+    , layerMask{0x0FFFFFFF}
     , _onDisposeObserver{nullptr}
     , _onBeforeRenderObserver{nullptr}
     , _onAfterRenderObserver{nullptr}
@@ -159,10 +160,7 @@ void Layer::dispose(bool /*doNotRecurse*/)
 
   // Remove from scene
   auto& layers = _scene->layers;
-  auto it      = std::remove(layers.begin(), layers.end(), this);
-  if (it != layers.end()) {
-    layers.erase(it);
-  }
+  layers.erase(std::remove(layers.begin(), layers.end(), this), layers.end());
 
   // Callback
   onDisposeObservable.notifyObservers(this);

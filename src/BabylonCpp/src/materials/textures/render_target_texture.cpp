@@ -27,10 +27,10 @@ RenderTargetTexture::RenderTargetTexture(
     , coordinatesMode{TextureConstants::PROJECTION_MODE}
     , _generateMipMaps{generateMipMaps}
     , _size{size}
+    , _samples{1}
     , _doNotChangeAspectRatio{doNotChangeAspectRatio}
     , _currentRefreshId{-1}
     , _refreshRate{1}
-    , _samples{1}
 {
   name           = iName;
   isRenderTarget = true;

@@ -355,6 +355,7 @@ enum GLEnums : GLenum {
   FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL         = 0x8CD2,
   FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE = 0x8CD3,
   COLOR_ATTACHMENT0                            = 0x8CE0,
+  COLOR_ATTACHMENT1                            = 0x8CE1,
   DEPTH_ATTACHMENT                             = 0x8D00,
   STENCIL_ATTACHMENT                           = 0x8D20,
   DEPTH_STENCIL_ATTACHMENT                     = 0x821A,
@@ -1068,6 +1069,15 @@ public:
   virtual void drawArraysInstanced(GLenum mode, GLint first, GLsizei count,
                                    GLsizei instanceCount)
     = 0;
+
+  /**
+   * @brief Defines draw buffers to which fragment colors are written into. The
+   * draw buffer settings are part of the state of the currently bound
+   * framebuffer or the drawingbuffer if no framebuffer is bound.
+   * @param buffers An Array of GLenum specifying the buffers into which
+   * fragment colors will be written.
+   */
+  virtual void drawBuffers(const std::vector<GLenum>& buffers) = 0;
 
   /**
    * @brief Renders primitives from array data.

@@ -13,6 +13,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/textures/imulti_render_target_options.h>
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/color3.h>
@@ -66,6 +67,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _currentRenderTarget{nullptr}
     , _vaoRecordInProgress{false}
     , _mustWipeVertexAttributes{false}
+    , _emptyTexture{nullptr}
 {
   Engine::Instances.emplace_back(this);
 
@@ -97,6 +99,8 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
   _onBlur = [this]() { _windowIsBackground = true; };
 
   _onFocus = [this]() { _windowIsBackground = false; };
+
+  _onCanvasBlur = [this]() { onCanvasBlurObservable.notifyObservers(this); };
 
   // Viewport
   _hardwareScalingLevel = options.adaptToDeviceRatio ? 1.f : 1.f;
@@ -233,6 +237,17 @@ std::string Engine::textureFormatInUse() const
 float Engine::webGLVersion() const
 {
   return _webGLVersion;
+}
+
+GL::IGLTexture* Engine::emptyTexture()
+{
+  if (!_emptyTexture) {
+    _emptyTexture = createRawTexture(
+      Uint8Array(4), 1, 1, EngineConstants::TEXTUREFORMAT_RGBA, false, false,
+      TextureConstants::NEAREST_SAMPLINGMODE);
+  }
+
+  return _emptyTexture;
 }
 
 bool Engine::isStencilEnable() const
@@ -1770,6 +1785,11 @@ void Engine::setColorWrite(bool enable)
   _gl->colorMask(enable, enable, enable, enable);
 }
 
+void Engine::setAlphaConstants(float r, float g, float b, float a)
+{
+  _alphaState->setAlphaBlendConstants(r, g, b, a);
+}
+
 void Engine::setAlphaMode(int mode, bool noDepthWriteChange)
 {
   if (_alphaMode == mode) {
@@ -1783,6 +1803,11 @@ void Engine::setAlphaMode(int mode, bool noDepthWriteChange)
     case EngineConstants::ALPHA_PREMULTIPLIED:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::ONE, GL::ONE_MINUS_SRC_ALPHA, GL::ONE, GL::ONE);
+      _alphaState->setAlphaBlend(true);
+      break;
+    case EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF:
+      _alphaState->setAlphaBlendFunctionParameters(
+        GL::ONE, GL::ONE_MINUS_SRC_ALPHA, GL::ONE, GL::ONE_MINUS_SRC_ALPHA);
       _alphaState->setAlphaBlend(true);
       break;
     case EngineConstants::ALPHA_COMBINE:
@@ -1813,6 +1838,12 @@ void Engine::setAlphaMode(int mode, bool noDepthWriteChange)
     case EngineConstants::ALPHA_MAXIMIZED:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::SRC_ALPHA, GL::ONE_MINUS_SRC_COLOR, GL::ONE, GL::ONE);
+      _alphaState->setAlphaBlend(true);
+      break;
+    case EngineConstants::ALPHA_INTERPOLATE:
+      _alphaState->setAlphaBlendFunctionParameters(
+        GL::CONSTANT_COLOR, GL::ONE_MINUS_CONSTANT_COLOR, GL::CONSTANT_ALPHA,
+        GL::ONE_MINUS_CONSTANT_ALPHA);
       _alphaState->setAlphaBlend(true);
       break;
     default:
@@ -2266,6 +2297,160 @@ Engine::createRenderTargetTexture(ISize size,
   return _texture;
 }
 
+std::vector<GL::IGLTexture*>
+Engine::createMultipleRenderTarget(ISize size,
+                                   const IMultiRenderTargetOptions& options)
+{
+  auto generateMipMaps       = options.generateMipMaps;
+  auto generateDepthBuffer   = options.generateDepthBuffer;
+  auto generateStencilBuffer = options.generateStencilBuffer;
+  auto generateDepthTexture  = options.generateDepthTexture;
+  auto textureCount          = options.textureCount;
+
+  auto defaultType         = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+  auto defaultSamplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE;
+
+  const auto& types         = options.types;
+  const auto& samplingModes = options.samplingModes;
+
+  auto width  = size.width;
+  auto height = size.height;
+
+  // Create the framebuffer
+  auto framebuffer = _gl->createFramebuffer();
+  bindUnboundFramebuffer(framebuffer.get());
+
+  auto colorRenderbuffer = _gl->createRenderbuffer();
+  _gl->bindRenderbuffer(GL::RENDERBUFFER, colorRenderbuffer);
+  _gl->renderbufferStorageMultisample(GL::RENDERBUFFER, 4, GL::RGBA8, width,
+                                      height);
+  _gl->bindFramebuffer(GL::FRAMEBUFFER, framebuffer.get());
+  _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
+                               GL::RENDERBUFFER, colorRenderbuffer);
+  _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT1,
+                               GL::RENDERBUFFER, colorRenderbuffer);
+  _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::DEPTH_ATTACHMENT,
+                               GL::RENDERBUFFER, colorRenderbuffer);
+
+  std::vector<GL::IGLTexture*> textures;
+  std::vector<GL::GLenum> attachments;
+
+  auto depthStencilBuffer = _setupFramebufferDepthAttachments(
+    generateStencilBuffer, generateDepthBuffer, width, height);
+
+  for (unsigned int i = 0; i < textureCount; ++i) {
+    const auto iStr = std::to_string(i);
+    auto samplingMode
+      = (i < samplingModes.size()) ? samplingModes[i] : defaultSamplingMode;
+    auto type = (i < types.size()) ? types[i] : defaultType;
+
+    if (type == EngineConstants::TEXTURETYPE_FLOAT
+        && !_caps.textureFloatLinearFiltering) {
+      // if floating point linear (gl.FLOAT) then force to NEAREST_SAMPLINGMODE
+      samplingMode = TextureConstants::NEAREST_SAMPLINGMODE;
+    }
+    else if (type == EngineConstants::TEXTURETYPE_HALF_FLOAT
+             && !_caps.textureHalfFloatLinearFiltering) {
+      // if floating point linear (HALF_FLOAT) then force to
+      // NEAREST_SAMPLINGMODE
+      samplingMode = TextureConstants::NEAREST_SAMPLINGMODE;
+    }
+
+    auto filters = GetSamplingParameters(samplingMode, generateMipMaps);
+    if (type == EngineConstants::TEXTURETYPE_FLOAT && !_caps.textureFloat) {
+      type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+      BABYLON_LOG_WARN("Engine",
+                       "Float textures are not supported. Render target forced "
+                       "to TEXTURETYPE_UNSIGNED_BYTE type");
+    }
+
+    auto texture    = _gl->createTexture();
+    auto attachment = (*_gl)["COLOR_ATTACHMENT" + iStr];
+    textures.emplace_back(texture.get());
+    attachments.emplace_back(attachment);
+
+    _gl->activeTexture((*_gl)["TEXTURE" + iStr]);
+    _gl->bindTexture(GL::TEXTURE_2D, texture.get());
+
+    _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, filters.mag);
+    _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, filters.min);
+    _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE);
+    _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T, GL::CLAMP_TO_EDGE);
+
+    _gl->texImage2D(GL::TEXTURE_2D, 0, _getRGBABufferInternalSizedFormat(type),
+                    width, height, 0, GL::RGBA, _getWebGLTextureType(type),
+                    nullptr);
+
+    _gl->framebufferTexture2D(GL::DRAW_FRAMEBUFFER, attachment, GL::TEXTURE_2D,
+                              texture.get(), 0);
+
+    if (generateMipMaps) {
+      _gl->generateMipmap(GL::TEXTURE_2D);
+    }
+
+    // Unbind
+    _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
+
+    texture->_framebuffer           = std::move(framebuffer);        // FIXME
+    texture->_depthStencilBuffer    = std::move(depthStencilBuffer); // FIXME
+    texture->_baseWidth             = width;
+    texture->_baseHeight            = height;
+    texture->_width                 = width;
+    texture->_height                = height;
+    texture->isReady                = true;
+    texture->samples                = 1;
+    texture->generateMipMaps        = generateMipMaps;
+    texture->references             = 1;
+    texture->samplingMode           = samplingMode;
+    texture->type                   = type;
+    texture->_generateDepthBuffer   = generateDepthBuffer;
+    texture->_generateStencilBuffer = generateStencilBuffer;
+
+    _loadedTexturesCache.emplace_back(texture.get());
+  }
+
+  if (generateDepthTexture) {
+    // Depth texture
+    auto depthTexture = _gl->createTexture();
+
+    _gl->activeTexture(GL::TEXTURE0);
+    _gl->bindTexture(GL::TEXTURE_2D, depthTexture.get());
+    _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, GL::NEAREST);
+    _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, GL::NEAREST);
+    _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE);
+    _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T, GL::CLAMP_TO_EDGE);
+    _gl->texImage2D(GL::TEXTURE_2D, 0, GL::DEPTH_COMPONENT16, width, height, 0,
+                    GL::DEPTH_COMPONENT, GL::UNSIGNED_SHORT, nullptr);
+
+    _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_ATTACHMENT,
+                              GL::TEXTURE_2D, depthTexture.get(), 0);
+
+    depthTexture->_framebuffer           = std::move(framebuffer); // FIXME
+    depthTexture->_baseWidth             = width;
+    depthTexture->_baseHeight            = height;
+    depthTexture->_width                 = width;
+    depthTexture->_height                = height;
+    depthTexture->isReady                = true;
+    depthTexture->samples                = 1;
+    depthTexture->generateMipMaps        = generateMipMaps;
+    depthTexture->references             = 1;
+    depthTexture->samplingMode           = GL::NEAREST;
+    depthTexture->_generateDepthBuffer   = generateDepthBuffer;
+    depthTexture->_generateStencilBuffer = generateStencilBuffer;
+
+    textures.emplace_back(depthTexture.get());
+    _loadedTexturesCache.emplace_back(std::move(depthTexture));
+  }
+
+  _gl->drawBuffers(attachments);
+  _gl->bindRenderbuffer(GL::RENDERBUFFER, nullptr);
+  bindUnboundFramebuffer(nullptr);
+
+  resetTextureCache();
+
+  return textures;
+}
+
 std::unique_ptr<GL::IGLRenderbuffer>
 Engine::_setupFramebufferDepthAttachments(bool generateStencilBuffer,
                                           bool generateDepthBuffer, int width,
@@ -2607,7 +2792,7 @@ void Engine::setTexture(int channel, GL::IGLUniformLocation* uniform,
 void Engine::_setTexture(unsigned int channel, BaseTexture* texture)
 {
   // Not ready?
-  if (!texture || !texture->isReady()) {
+  if (!texture) {
     if ((_activeTexturesCache.find(channel) != _activeTexturesCache.end())
         && (_activeTexturesCache[channel] != nullptr)) {
       activateTexture((*_gl)["TEXTURE" + std::to_string(channel)]);
@@ -2625,7 +2810,8 @@ void Engine::_setTexture(unsigned int channel, BaseTexture* texture)
     return;
   }
 
-  auto internalTexture = texture->getInternalTexture();
+  auto internalTexture
+    = texture->isReady() ? texture->getInternalTexture() : emptyTexture();
 
   if (_activeTexturesCache[channel] == internalTexture) {
     return;
@@ -2816,6 +3002,12 @@ void Engine::dispose(bool /*doNotRecurse*/)
 {
   hideLoadingUI();
   stopRenderLoop();
+
+  // Empty texture
+  if (_emptyTexture) {
+    _releaseTexture(_emptyTexture);
+    _emptyTexture = nullptr;
+  }
 
   // Release scenes
   for (auto& scene : scenes) {

@@ -135,6 +135,8 @@ public:
 
 protected:
   IRenderTargetOptions _renderTargetOptions;
+  ISize _size;
+  unsigned int _samples;
 
 private:
   // Events
@@ -143,13 +145,11 @@ private:
   Observer<int>::Ptr _onAfterRenderObserver;
   Observer<Engine>::Ptr _onClearObserver;
   // Properties
-  ISize _size;
   std::unique_ptr<RenderingManager> _renderingManager;
   bool _doNotChangeAspectRatio;
   int _currentRefreshId;
   int _refreshRate;
   std::unique_ptr<Matrix> _textureMatrix;
-  unsigned int _samples;
   int _faceIndex;
 
 }; // end of class RenderTargetTexture

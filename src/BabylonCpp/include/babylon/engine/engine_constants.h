@@ -8,14 +8,16 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT EngineConstants {
 
   // Const statics
-  static constexpr unsigned int ALPHA_DISABLE       = 0;
-  static constexpr unsigned int ALPHA_ADD           = 1;
-  static constexpr unsigned int ALPHA_COMBINE       = 2;
-  static constexpr unsigned int ALPHA_SUBTRACT      = 3;
-  static constexpr unsigned int ALPHA_MULTIPLY      = 4;
-  static constexpr unsigned int ALPHA_MAXIMIZED     = 5;
-  static constexpr unsigned int ALPHA_ONEONE        = 6;
-  static constexpr unsigned int ALPHA_PREMULTIPLIED = 7;
+  static constexpr unsigned int ALPHA_DISABLE                  = 0;
+  static constexpr unsigned int ALPHA_ADD                      = 1;
+  static constexpr unsigned int ALPHA_COMBINE                  = 2;
+  static constexpr unsigned int ALPHA_SUBTRACT                 = 3;
+  static constexpr unsigned int ALPHA_MULTIPLY                 = 4;
+  static constexpr unsigned int ALPHA_MAXIMIZED                = 5;
+  static constexpr unsigned int ALPHA_ONEONE                   = 6;
+  static constexpr unsigned int ALPHA_PREMULTIPLIED            = 7;
+  static constexpr unsigned int ALPHA_PREMULTIPLIED_PORTERDUFF = 8;
+  static constexpr unsigned int ALPHA_INTERPOLATE              = 9;
 
   static constexpr unsigned int DELAYLOADSTATE_NONE      = 0;
   static constexpr unsigned int DELAYLOADSTATE_LOADED    = 1;

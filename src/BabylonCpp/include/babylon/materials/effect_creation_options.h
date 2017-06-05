@@ -2,6 +2,7 @@
 #define BABYLON_MATERIALS_EFFECT_CREATE_OPTIONS_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/materials/effect_fallbacks.h>
 
 namespace BABYLON {
 

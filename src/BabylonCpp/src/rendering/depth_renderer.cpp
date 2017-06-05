@@ -119,7 +119,7 @@ DepthRenderer::~DepthRenderer()
 bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
 {
   auto material = subMesh->getMaterial();
-  if (material->disableDepthWrite) {
+  if (material && material->disableDepthWrite) {
     return false;
   }
 
