@@ -301,8 +301,6 @@ TEST(TestEntities, New_entity_no_components_added)
 
   EXPECT_EQ(countNonNull(e.getComponents()), 0);
   EXPECT_FALSE(e.hasComponent<PositionComponent>());
-  EXPECT_DEATH(e.getComponent<PositionComponent>(),
-               "Entity is not valid or does not contain component");
 }
 
 TEST(TestEntities, Adding_components)
@@ -327,8 +325,6 @@ TEST(TestEntities, Removing_components)
 
   EXPECT_FALSE(e.hasComponent<PositionComponent>());
   EXPECT_EQ(countNonNull(e.getComponents()), 0);
-  EXPECT_DEATH(e.getComponent<PositionComponent>(),
-               "Entity is not valid or does not contain component");
 }
 
 TEST(TestEntities, Removing_all_components)
@@ -349,10 +345,6 @@ TEST(TestEntities, Removing_all_components)
   EXPECT_EQ(countNonNull(e.getComponents()), 0);
   EXPECT_FALSE(e.hasComponent<PositionComponent>());
   EXPECT_FALSE(e.hasComponent<VelocityComponent>());
-  EXPECT_DEATH(e.getComponent<PositionComponent>(),
-               "Entity is not valid or does not contain component");
-  EXPECT_DEATH(e.getComponent<VelocityComponent>(),
-               "Entity is not valid or does not contain component");
 }
 
 TEST(TestEntities, Retrieving_an_Entity_via_ID_index_VALID_index)

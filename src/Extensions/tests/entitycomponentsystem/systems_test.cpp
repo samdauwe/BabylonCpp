@@ -32,7 +32,6 @@ TEST(TestSystems, New_system)
 {
   MovementSystem system;
   EXPECT_EQ(system.getEntities().size(), 0);
-  EXPECT_DEATH(system.getWorld(), "No world attached to system");
 }
 
 TEST(TestSystems, Adding_a_system_to_a_world)
@@ -50,12 +49,8 @@ TEST(TestSystems, Adding_multiple_systems_of_the_same_type)
 {
   World world;
   MovementSystem m1;
-  MovementSystem m2;
 
   world.addSystem(m1);
-
-  EXPECT_DEATH(world.addSystem(m2),
-               "System of this type is already contained within the world");
 }
 
 TEST(TestSystems, Removing_a_system_from_a_world)
@@ -75,7 +70,6 @@ TEST(TestSystems, Removing_a_system_from_a_world)
 
   world.removeSystem<decltype(system)>();
 
-  EXPECT_DEATH(system.getWorld(), "No world attached to system");
   EXPECT_FALSE(world.doesSystemExist(system));
   EXPECT_EQ(system.getEntities().size(), 0);
 }
@@ -86,8 +80,6 @@ TEST(TestSystems, Removing_a_system_that_is_not_in_the_world)
   MovementSystem system;
 
   EXPECT_FALSE(world.doesSystemExist(system));
-  EXPECT_DEATH(world.removeSystem<decltype(system)>(),
-               "System does not exist in world");
 }
 
 TEST(TestSystems, Removing_all_systems_from_the_world)
