@@ -162,6 +162,8 @@ target_include_directories(${TARGET}
 # Libraries
 target_link_libraries(${TARGET}
     PUBLIC
+    PRIVATE
+    BabylonCpp
 )
 
 # Compile definitions
