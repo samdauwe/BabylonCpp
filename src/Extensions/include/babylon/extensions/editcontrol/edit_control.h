@@ -13,7 +13,7 @@ namespace Extensions {
 class EditControl {
 
 public:
-  EditControl(Mesh* mesh, Camera* camera, ICanvas* canvas, float scale);
+  EditControl(Mesh* mesh, Camera* camera, ICanvas* canvas, float scale = 1.f);
   ~EditControl();
 
   void switchTo(Mesh* mesh);
@@ -23,19 +23,19 @@ public:
   void detach();
   void disposeAll();
   bool isEditing() const;
-  bool isPointerOver();
-  bool isTranslationEnabled();
+  bool isPointerOver() const;
+  bool isTranslationEnabled() const;
   void enableTranslation();
   void disableTranslation();
-  bool isRotationEnabled();
+  bool isRotationEnabled() const;
   void returnEuler(bool euler);
   void enableRotation();
   void disableRotation();
-  bool isScalingEnabled();
+  bool isScalingEnabled() const;
   void enableScaling();
   void disableScaling();
   void setLocal(bool l);
-  bool isLocal();
+  bool isLocal() const;
   void setTransSnap(bool s);
   void setRotSnap(bool s);
   void setScaleSnap(bool s);
@@ -45,7 +45,7 @@ public:
 
 private:
   void renderLoopProcess();
-  void onPointerDown(const Event& event);
+  void onPointerDown(PointerEvent& event);
   void detachControl(Camera* cam, ICanvas* can);
   void onPointerOver();
   void restoreColor(Mesh* mesh);
@@ -62,11 +62,11 @@ private:
   void createGuideAxes();
   void createPickPlanes();
   void createTransAxes();
-  void createTriangle(const std::string& name, float w, Scene* scene);
+  Mesh* createTriangle(const std::string& name, float w, Scene* scene) const;
   void createRotAxes();
-  Mesh* extrudeBox(float w, float l);
-  LinesMesh* createCircle(float r, float t);
-  Mesh* createTube();
+  Mesh* extrudeBox(float w, float l) const;
+  LinesMesh* createCircle(float r, int t = 360) const;
+  Mesh* createTube(float r, int t = 360) const;
   void createScaleAxes();
   void setLocalAxes(Mesh* mesh);
   void setAxesScale();
@@ -86,10 +86,10 @@ private:
   bool local;
   bool snapT;
   bool snapR;
-  int transSnap;
+  float transSnap;
   float rotSnap;
   float axesLen;
-  int axesScale;
+  float axesScale;
   StandardMaterial* redMat;
   StandardMaterial* greenMat;
   StandardMaterial* blueMat;
@@ -97,9 +97,9 @@ private:
   StandardMaterial* yellowMat;
   ActHist actHist;
   std::function<void()> renderer;
-  EventListener* pointerdown;
-  EventListener* pointerup;
-  EventListener* pointermove;
+  // EventListener* pointerdown;
+  // EventListener* pointerup;
+  // EventListener* pointermove;
   // Axes visibility
   float visibility;
   // Picking
