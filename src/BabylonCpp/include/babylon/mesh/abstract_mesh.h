@@ -177,6 +177,11 @@ public:
   bool rotationQuaternionSet() const override;
 
   /**
+   * @brief Nullifies the rotation Quaternion property.
+   */
+  void nullifyRotationQuaternion();
+
+  /**
    * @brief Sets the rotation Quaternion property.
    */
   void setRotationQuaternion(const Quaternion& quaternion) override;

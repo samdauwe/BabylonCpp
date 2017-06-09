@@ -498,6 +498,11 @@ bool AbstractMesh::rotationQuaternionSet() const
   return _rotationQuaternionSet;
 }
 
+void AbstractMesh::nullifyRotationQuaternion()
+{
+  _rotationQuaternionSet = false;
+}
+
 void AbstractMesh::setRotationQuaternion(const Quaternion& quaternion)
 {
   _rotationQuaternion    = quaternion;

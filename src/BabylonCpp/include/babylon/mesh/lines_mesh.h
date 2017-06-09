@@ -60,8 +60,8 @@ public:
   /**
    * @brief Returns a new LineMesh object cloned from the current one.
    */
-  LinesMesh* clone(const std::string& name, Node* newParent,
-                   bool doNotCloneChildren);
+  LinesMesh* clone(const std::string& name, Node* newParent = nullptr,
+                   bool doNotCloneChildren = false);
 
 protected:
   LinesMesh(const std::string& name, Scene* scene, Node* parent = nullptr,
