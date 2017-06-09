@@ -81,9 +81,6 @@ install:
   - if [[ "${CXX_VERSION}" != "" ]]; then export CXX=${CXX_VERSION}; fi
 
 before_script:
-  # enable core dumps
-  - ulimit -c unlimited -S
-
   ####################################################################
   # Go back to the root of the project and setup the build directory #
   ####################################################################
@@ -94,10 +91,14 @@ before_script:
 script:
   - make all
 
-after_failure:
+after_script:
+  # enable core dumps
+  - ulimit -c unlimited -S
   - cd ${TRAVIS_BUILD_DIR}/build/build/bin
+  - ls -al
+  - ./ExtensionsTests
   - COREFILE=$(find . -maxdepth 1 -name "core*" | head -n 1) # find core file
-  - if [[ -f "$COREFILE" ]]; then gdb -c "$COREFILE" $(pwd)/ExtensionsTests -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
+  - if [[ -f "$COREFILE" ]]; then gdb -c "$COREFILE" $(pwd)/ExtensionsTests -ex "thread apply all bt" -ex "set pagination 0" -batch; fi  
 
 # Notifications settings
 notifications:
