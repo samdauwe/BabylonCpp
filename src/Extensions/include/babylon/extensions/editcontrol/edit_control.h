@@ -59,6 +59,10 @@ private:
   void doRotation(Mesh* mesh, Mesh* axis, const Vector3& newPos);
   std::tuple<Vector3, bool> getPosOnPickPlane();
   void hideBaxis();
+  /**
+   * @brief Create axeses which will be shown in all three modes, translate,
+   * rotate and scale.
+   */
   void createGuideAxes();
   void createPickPlanes();
   void createTransAxes();
@@ -68,6 +72,15 @@ private:
   LinesMesh* createCircle(float r, int t = 360) const;
   Mesh* createTube(float r, int t = 360) const;
   void createScaleAxes();
+  /**
+   * @brief this would be call during rotation as the local axes direction owuld
+   * have changed
+   * need to set the local axis.
+   * These are used in all three modes to figure out direction of mouse move wrt
+   * the axes
+   * TODO should use world pivotmatrix instead of worldmatrix - incase pivot
+   * axes were rotated?
+   */
   void setLocalAxes(Mesh* mesh);
   void setAxesScale();
   static float getAngle(const Vector3& p1, const Vector3& p2, const Vector3& p,

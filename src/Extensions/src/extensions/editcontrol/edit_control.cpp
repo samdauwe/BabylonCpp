@@ -174,6 +174,13 @@ void EditControl::undo()
   setLocalAxes(mesh);
 }
 
+void EditControl::redo()
+{
+  actHist.redo();
+  mesh->computeWorldMatrix(true);
+  setLocalAxes(mesh);
+}
+
 void EditControl::detach()
 {
   // canvas->removeEventListener("pointerdown", pointerdown, false);
@@ -546,28 +553,34 @@ void EditControl::transWithSnap(Mesh* mesh, Vector3& trans, bool local)
     bool snapit = false;
     snapTV.addInPlace(trans);
     if (std::abs(snapTV.x) > (tSnap.x / mesh->scaling().x)) {
-      if (snapTV.x > 0)
+      if (snapTV.x > 0) {
         trans.x = tSnap.x;
-      else
+      }
+      else {
         trans.x = -tSnap.x;
-      trans.x   = trans.x / mesh->scaling().x;
-      snapit    = true;
+      }
+      trans.x = trans.x / mesh->scaling().x;
+      snapit  = true;
     }
     if (std::abs(snapTV.y) > (tSnap.y / mesh->scaling().y)) {
-      if (snapTV.y > 0)
+      if (snapTV.y > 0) {
         trans.y = tSnap.y;
-      else
+      }
+      else {
         trans.y = -tSnap.y;
-      trans.y   = trans.y / mesh->scaling().y;
-      snapit    = true;
+      }
+      trans.y = trans.y / mesh->scaling().y;
+      snapit  = true;
     }
     if (std::abs(snapTV.z) > (tSnap.z / mesh->scaling().z)) {
-      if (snapTV.z > 0)
+      if (snapTV.z > 0) {
         trans.z = tSnap.z;
-      else
+      }
+      else {
         trans.z = -tSnap.z;
-      trans.z   = trans.z / mesh->scaling().z;
-      snapit    = true;
+      }
+      trans.z = trans.z / mesh->scaling().z;
+      snapit  = true;
     }
     if (!snapit) {
       return;
@@ -1008,10 +1021,10 @@ void EditControl::createPickPlanes()
 
 void EditControl::createTransAxes()
 {
-  float r = 0.04f * axesScale;
+  const float r = 0.04f * axesScale;
 
-  float l = axesLen * axesScale;
-  tCtl    = Mesh::New("tarnsCtl", scene);
+  const float l = axesLen * axesScale;
+  tCtl          = Mesh::New("tarnsCtl", scene);
 
   // pickable invisible boxes around axes lines
   tX       = extrudeBox(r / 2.f, l);
@@ -1065,7 +1078,7 @@ void EditControl::createTransAxes()
   tYX->renderingGroupId  = 1;
   tAll->renderingGroupId = 1;
 
-  // do not want clients picking this
+  // Do not want clients picking this
   // we will pick using mesh filter in scene.pick function
   tX->isPickable   = false;
   tY->isPickable   = false;
@@ -1075,17 +1088,17 @@ void EditControl::createTransAxes()
   tYX->isPickable  = false;
   tAll->isPickable = false;
 
-  // non pickable but visible cones at end of axes lines
+  // Non pickable but visible cones at end of axes lines
   // cyl len
-  float cl = l / 5.f;
+  const float cl = l / 5.f;
   // cyl radius
-  float cr = r;
-  tEndX    = Mesh::CreateCylinder("tEndX", cl, 0, cr, 6, 1, scene);
-  tEndY    = tEndX->clone("tEndY");
-  tEndZ    = tEndX->clone("tEndZ");
-  tEndXZ   = createTriangle("XZ", cr * 1.75f, scene);
-  tEndZY   = tEndXZ->clone("ZY");
-  tEndYX   = tEndXZ->clone("YX");
+  const float cr = r;
+  tEndX          = Mesh::CreateCylinder("tEndX", cl, 0, cr, 6, 1, scene);
+  tEndY          = tEndX->clone("tEndY");
+  tEndZ          = tEndX->clone("tEndZ");
+  tEndXZ         = createTriangle("XZ", cr * 1.75f, scene);
+  tEndZY         = tEndXZ->clone("ZY");
+  tEndYX         = tEndXZ->clone("YX");
   PolyhedronOptions polyhedronOptions(cr / 2.f);
   polyhedronOptions.type = 1;
   tEndAll = MeshBuilder::CreatePolyhedron("tEndAll", polyhedronOptions, scene);
@@ -1148,9 +1161,9 @@ Mesh* EditControl::createTriangle(const std::string& name, float w,
 
 void EditControl::createRotAxes()
 {
-  float d = axesLen * axesScale * 2;
-  rCtl    = Mesh::New("rotCtl", scene);
-  // pickable invisible torus around the rotation circles
+  const float d = axesLen * axesScale * 2.f;
+  rCtl          = Mesh::New("rotCtl", scene);
+  // Pickable invisible torus around the rotation circles
   rX         = createTube(d / 2.f, 90.f);
   rX->name   = "X";
   rY         = rX->clone("Y");
@@ -1184,11 +1197,11 @@ void EditControl::createRotAxes()
   rAll->isPickable = false;
 
   // Non pickable but visible circles
-  float cl = d;
-  rEndX    = createCircle(cl / 2.f, 90.f);
-  rEndY    = rEndX->clone("");
-  rEndZ    = rEndX->clone("");
-  rEndAll  = createCircle(cl / 1.75f, 360.f);
+  const float cl = d;
+  rEndX          = createCircle(cl / 2.f, 90.f);
+  rEndY          = rEndX->clone("");
+  rEndZ          = rEndX->clone("");
+  rEndAll        = createCircle(cl / 1.75f, 360.f);
 
   rEndX->setParent(rX);
   rEndY->setParent(rY);
@@ -1274,7 +1287,7 @@ void EditControl::createScaleAxes()
   float l = axesLen * axesScale;
   sCtl    = Mesh::New("sCtl", scene);
 
-  sX       = extrudeBox(r / 2, l);
+  sX       = extrudeBox(r / 2.f, l);
   sX->name = "X";
   sY       = sX->clone("Y");
   sZ       = sX->clone("Z");
@@ -1456,9 +1469,9 @@ void EditControl::setAxesScale()
                           cameraNormal);
   // Get distance of axes from the camera plane - project camera to axes vector
   // on the camera normal
-  float parentOnNormal
+  const float parentOnNormal
     = Vector3::Dot(toParent, cameraNormal) / cameraNormal.length();
-  float s = parentOnNormal / distFromCamera;
+  const float s = parentOnNormal / distFromCamera;
   Vector3::FromFloatsToRef(s, s, s, theParent->scaling());
   Vector3::FromFloatsToRef(s, s, s, pALL->scaling());
 }
