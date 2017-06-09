@@ -804,10 +804,10 @@ std::tuple<Vector3, bool> EditControl::getPosOnPickPlane()
                   [this](AbstractMesh* mesh) { return mesh == pickPlane; },
                   false, mainCamera);
   if ((pickinfo->hit)) {
-    return {pickinfo->pickedPoint, true};
+    return std::make_tuple(pickinfo->pickedPoint, true);
   }
   else {
-    return {Vector3::Zero(), false};
+    return std::make_tuple(Vector3::Zero(), false);
   }
 }
 
