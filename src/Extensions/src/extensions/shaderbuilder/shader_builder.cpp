@@ -37,76 +37,83 @@ void ShaderBuilder::PrepareBeforeMaterialBuild()
     Attributes.emplace_back(ShaderMaterialHelperStatics::AttrUv2);
   }
 
-  stl_util::concat(Uniforms,
-                   {ShaderMaterialHelperStatics::uniformView,
-                    ShaderMaterialHelperStatics::uniformWorld,
-                    ShaderMaterialHelperStatics::uniformWorldView,
-                    ShaderMaterialHelperStatics::uniformViewProjection,
-                    ShaderMaterialHelperStatics::uniformWorldViewProjection});
+  stl_util::concat(
+    Uniforms,
+    {std::string(ShaderMaterialHelperStatics::uniformView),
+     std::string(ShaderMaterialHelperStatics::uniformWorld),
+     std::string(ShaderMaterialHelperStatics::uniformWorldView),
+     std::string(ShaderMaterialHelperStatics::uniformViewProjection),
+     std::string(ShaderMaterialHelperStatics::uniformWorldViewProjection)});
 
   /** Start Build Vertex Frame **/
   Vertex.emplace_back("precision " + Setting.PrecisionMode + " float;");
-  Vertex.emplace_back("attribute "
-                      + ShaderMaterialHelperStatics::AttrTypeForPosition + " "
-                      + ShaderMaterialHelperStatics::AttrPosition + ";");
-  Vertex.emplace_back("attribute "
-                      + ShaderMaterialHelperStatics::AttrTypeForNormal + " "
-                      + ShaderMaterialHelperStatics::AttrNormal + ";");
+  Vertex.emplace_back(
+    "attribute " + std::string(ShaderMaterialHelperStatics::AttrTypeForPosition)
+    + " " + std::string(ShaderMaterialHelperStatics::AttrPosition) + ";");
+  Vertex.emplace_back(
+    "attribute " + std::string(ShaderMaterialHelperStatics::AttrTypeForNormal)
+    + " " + std::string(ShaderMaterialHelperStatics::AttrNormal) + ";");
 
   if (Setting.Uv) {
-    Vertex.emplace_back("attribute "
-                        + ShaderMaterialHelperStatics::AttrTypeForUv + " "
-                        + ShaderMaterialHelperStatics::AttrUv + ";");
+    Vertex.emplace_back(
+      "attribute " + std::string(ShaderMaterialHelperStatics::AttrTypeForUv)
+      + " " + std::string(ShaderMaterialHelperStatics::AttrUv) + ";");
 
-    Vertex.emplace_back("varying vec2 " + ShaderMaterialHelperStatics::Uv
-                        + ";");
+    Vertex.emplace_back("varying vec2 "
+                        + std::string(ShaderMaterialHelperStatics::Uv) + ";");
   }
   if (Setting.Uv2) {
-    Vertex.emplace_back("attribute "
-                        + ShaderMaterialHelperStatics::AttrTypeForUv2 + " "
-                        + ShaderMaterialHelperStatics::AttrUv2 + ";");
+    Vertex.emplace_back(
+      "attribute " + std::string(ShaderMaterialHelperStatics::AttrTypeForUv2)
+      + " " + std::string(ShaderMaterialHelperStatics::AttrUv2) + ";");
 
-    Vertex.emplace_back("varying vec2 " + ShaderMaterialHelperStatics::Uv2
-                        + ";");
+    Vertex.emplace_back("varying vec2 "
+                        + std::string(ShaderMaterialHelperStatics::Uv2) + ";");
   }
 
-  Vertex.emplace_back("varying vec3 " + ShaderMaterialHelperStatics::Position
-                      + ";");
-  Vertex.emplace_back("varying vec3 " + ShaderMaterialHelperStatics::Normal
-                      + ";");
+  Vertex.emplace_back(
+    "varying vec3 " + std::string(ShaderMaterialHelperStatics::Position) + ";");
+  Vertex.emplace_back("varying vec3 "
+                      + std::string(ShaderMaterialHelperStatics::Normal) + ";");
 
   Vertex.emplace_back(
-    "uniform   " + ShaderMaterialHelperStatics::uniformStandardType + " "
-    + ShaderMaterialHelperStatics::uniformWorldViewProjection + ";");
+    "uniform   " + std::string(ShaderMaterialHelperStatics::uniformStandardType)
+    + " " + std::string(ShaderMaterialHelperStatics::uniformWorldViewProjection)
+    + ";");
   if (Setting.VertexView) {
-    Vertex.emplace_back("uniform   "
-                        + ShaderMaterialHelperStatics::uniformStandardType + " "
-                        + ShaderMaterialHelperStatics::uniformView + ";");
+    Vertex.emplace_back(
+      "uniform   "
+      + std::string(ShaderMaterialHelperStatics::uniformStandardType) + " "
+      + std::string(ShaderMaterialHelperStatics::uniformView) + ";");
   }
 
   if (Setting.VertexWorld) {
-    Vertex.emplace_back("uniform   "
-                        + ShaderMaterialHelperStatics::uniformStandardType + " "
-                        + ShaderMaterialHelperStatics::uniformWorld + ";");
+    Vertex.emplace_back(
+      "uniform   "
+      + std::string(ShaderMaterialHelperStatics::uniformStandardType) + " "
+      + std::string(ShaderMaterialHelperStatics::uniformWorld) + ";");
   }
 
   if (Setting.VertexViewProjection) {
     Vertex.emplace_back(
-      "uniform   " + ShaderMaterialHelperStatics::uniformStandardType + " "
-      + ShaderMaterialHelperStatics::uniformViewProjection + ";");
+      "uniform   "
+      + std::string(ShaderMaterialHelperStatics::uniformStandardType) + " "
+      + std::string(ShaderMaterialHelperStatics::uniformViewProjection) + ";");
   }
 
   if (Setting.Flags) {
     Uniforms.emplace_back(ShaderMaterialHelperStatics::uniformFlags);
 
     Vertex.emplace_back("uniform  float "
-                        + ShaderMaterialHelperStatics::uniformFlags + ";");
+                        + std::string(ShaderMaterialHelperStatics::uniformFlags)
+                        + ";");
   }
 
   if (Setting.VertexWorldView) {
-    Vertex.emplace_back("uniform   "
-                        + ShaderMaterialHelperStatics::uniformStandardType + " "
-                        + ShaderMaterialHelperStatics::uniformWorldView + ";");
+    Vertex.emplace_back(
+      "uniform   "
+      + std::string(ShaderMaterialHelperStatics::uniformStandardType) + " "
+      + std::string(ShaderMaterialHelperStatics::uniformWorldView) + ";");
   }
 
   if (!VertexUniforms.empty()) {
@@ -119,61 +126,70 @@ void ShaderBuilder::PrepareBeforeMaterialBuild()
     + " float;\n#extension GL_OES_standard_derivatives : enable\n\n\n");
 
   if (Setting.Uv) {
-    Fragment.emplace_back("varying vec2 " + ShaderMaterialHelperStatics::Uv
-                          + ";");
+    Fragment.emplace_back("varying vec2 "
+                          + std::string(ShaderMaterialHelperStatics::Uv) + ";");
   }
   if (Setting.Uv2) {
-    Fragment.emplace_back("varying vec2 " + ShaderMaterialHelperStatics::Uv2
-                          + ";");
+    Fragment.emplace_back(
+      "varying vec2 " + std::string(ShaderMaterialHelperStatics::Uv2) + ";");
   }
 
   if (Setting.FragmentView) {
     Fragment.emplace_back(
-      "uniform   " + ShaderMaterialHelperStatics::uniformStandardType + " "
-      + ShaderMaterialHelperStatics::uniformView + ";");
+      "uniform   "
+      + std::string(ShaderMaterialHelperStatics::uniformStandardType) + " "
+      + std::string(ShaderMaterialHelperStatics::uniformView) + ";");
   }
 
   if (Setting.FragmentWorld) {
     Fragment.emplace_back(
-      "uniform   " + ShaderMaterialHelperStatics::uniformStandardType + " "
-      + ShaderMaterialHelperStatics::uniformWorld + ";");
+      "uniform   "
+      + std::string(ShaderMaterialHelperStatics::uniformStandardType) + " "
+      + std::string(ShaderMaterialHelperStatics::uniformWorld) + ";");
   }
 
   if (Setting.FragmentViewProjection) {
     Fragment.emplace_back(
-      "uniform   " + ShaderMaterialHelperStatics::uniformStandardType + " "
-      + ShaderMaterialHelperStatics::uniformViewProjection + ";");
+      "uniform   "
+      + std::string(ShaderMaterialHelperStatics::uniformStandardType) + " "
+      + std::string(ShaderMaterialHelperStatics::uniformViewProjection) + ";");
   }
 
   if (Setting.FragmentWorldView) {
     Fragment.emplace_back(
-      "uniform   " + ShaderMaterialHelperStatics::uniformStandardType + " "
-      + ShaderMaterialHelperStatics::uniformWorldView + ";");
+      "uniform   "
+      + std::string(ShaderMaterialHelperStatics::uniformStandardType) + " "
+      + std::string(ShaderMaterialHelperStatics::uniformWorldView) + ";");
   }
 
   if (Setting.Flags) {
-    Fragment.emplace_back("uniform  float "
-                          + ShaderMaterialHelperStatics::uniformFlags + ";");
+    Fragment.emplace_back(
+      "uniform  float " + std::string(ShaderMaterialHelperStatics::uniformFlags)
+      + ";");
   }
 
   if (!FragmentUniforms.empty()) {
     Fragment.emplace_back(FragmentUniforms);
   }
-  Fragment.emplace_back("varying vec3 " + ShaderMaterialHelperStatics::Position
-                        + ";");
-  Fragment.emplace_back("varying vec3 " + ShaderMaterialHelperStatics::Normal
-                        + ";");
+  Fragment.emplace_back(
+    "varying vec3 " + std::string(ShaderMaterialHelperStatics::Position) + ";");
+  Fragment.emplace_back(
+    "varying vec3 " + std::string(ShaderMaterialHelperStatics::Normal) + ";");
 
   if (Setting.WorldPosition) {
+    Vertex.emplace_back(
+      "varying vec3 " + std::string(ShaderMaterialHelperStatics::WorldPosition)
+      + ";");
     Vertex.emplace_back("varying vec3 "
-                        + ShaderMaterialHelperStatics::WorldPosition + ";");
-    Vertex.emplace_back("varying vec3 "
-                        + ShaderMaterialHelperStatics::WorldNormal + ";");
+                        + std::string(ShaderMaterialHelperStatics::WorldNormal)
+                        + ";");
 
-    Fragment.emplace_back("varying vec3 "
-                          + ShaderMaterialHelperStatics::WorldPosition + ";");
-    Fragment.emplace_back("varying vec3 "
-                          + ShaderMaterialHelperStatics::WorldNormal + ";");
+    Fragment.emplace_back(
+      "varying vec3 " + std::string(ShaderMaterialHelperStatics::WorldPosition)
+      + ";");
+    Fragment.emplace_back(
+      "varying vec3 " + std::string(ShaderMaterialHelperStatics::WorldNormal)
+      + ";");
   }
 
   if (!Setting.Texture2Ds.empty()) {
@@ -181,13 +197,14 @@ void ShaderBuilder::PrepareBeforeMaterialBuild()
     for (auto& texture2D : Setting.Texture2Ds) {
       std::string s = std::to_string(cnt);
       if (texture2D.inVertex) {
-        Vertex.emplace_back("uniform  sampler2D "
-                            + ShaderMaterialHelperStatics::Texture2D + s + ";");
+        Vertex.emplace_back(
+          "uniform  sampler2D "
+          + std::string(ShaderMaterialHelperStatics::Texture2D) + s + ";");
       }
       if (texture2D.inFragment) {
-        Fragment.emplace_back("uniform  sampler2D  "
-                              + ShaderMaterialHelperStatics::Texture2D + s
-                              + ";");
+        Fragment.emplace_back(
+          "uniform  sampler2D  "
+          + std::string(ShaderMaterialHelperStatics::Texture2D) + s + ";");
       }
       ++cnt;
     }
@@ -202,66 +219,76 @@ void ShaderBuilder::PrepareBeforeMaterialBuild()
     for (auto& textureCube : Setting.TextureCubes) {
       std::string s = std::to_string(cnt);
       if (textureCube.inVertex) {
-        Vertex.emplace_back("uniform  samplerCube  "
-                            + ShaderMaterialHelperStatics::TextureCube + s
-                            + ";");
+        Vertex.emplace_back(
+          "uniform  samplerCube  "
+          + std::string(ShaderMaterialHelperStatics::TextureCube) + s + ";");
       }
       if (textureCube.inFragment) {
-        Fragment.emplace_back("uniform  samplerCube   "
-                              + ShaderMaterialHelperStatics::TextureCube + s
-                              + ";");
+        Fragment.emplace_back(
+          "uniform  samplerCube   "
+          + std::string(ShaderMaterialHelperStatics::TextureCube) + s + ";");
       }
       ++cnt;
     }
   }
 
   if (Setting.Center) {
-    Vertex.emplace_back("uniform  vec3 " + ShaderMaterialHelperStatics::Center
+    Vertex.emplace_back("uniform  vec3 "
+                        + std::string(ShaderMaterialHelperStatics::Center)
                         + ";");
-    Fragment.emplace_back("uniform  vec3 " + ShaderMaterialHelperStatics::Center
+    Fragment.emplace_back("uniform  vec3 "
+                          + std::string(ShaderMaterialHelperStatics::Center)
                           + ";");
   }
   if (Setting.Mouse) {
-    Vertex.emplace_back("uniform  vec2 " + ShaderMaterialHelperStatics::Mouse
-                        + ";");
-    Fragment.emplace_back("uniform  vec2 " + ShaderMaterialHelperStatics::Mouse
-                          + ";");
+    Vertex.emplace_back(
+      "uniform  vec2 " + std::string(ShaderMaterialHelperStatics::Mouse) + ";");
+    Fragment.emplace_back(
+      "uniform  vec2 " + std::string(ShaderMaterialHelperStatics::Mouse) + ";");
   }
   if (Setting.Screen) {
-    Vertex.emplace_back("uniform  vec2 " + ShaderMaterialHelperStatics::Screen
+    Vertex.emplace_back("uniform  vec2 "
+                        + std::string(ShaderMaterialHelperStatics::Screen)
                         + ";");
-    Fragment.emplace_back("uniform  vec2 " + ShaderMaterialHelperStatics::Screen
+    Fragment.emplace_back("uniform  vec2 "
+                          + std::string(ShaderMaterialHelperStatics::Screen)
                           + ";");
   }
   if (Setting.Camera) {
-    Vertex.emplace_back("uniform  vec3 " + ShaderMaterialHelperStatics::Camera
+    Vertex.emplace_back("uniform  vec3 "
+                        + std::string(ShaderMaterialHelperStatics::Camera)
                         + ";");
-    Fragment.emplace_back("uniform  vec3 " + ShaderMaterialHelperStatics::Camera
+    Fragment.emplace_back("uniform  vec3 "
+                          + std::string(ShaderMaterialHelperStatics::Camera)
                           + ";");
   }
   if (Setting.Look) {
-    Vertex.emplace_back("uniform  vec3 " + ShaderMaterialHelperStatics::Look
-                        + ";");
-    Fragment.emplace_back("uniform  vec3 " + ShaderMaterialHelperStatics::Look
-                          + ";");
+    Vertex.emplace_back("uniform  vec3 "
+                        + std::string(ShaderMaterialHelperStatics::Look) + ";");
+    Fragment.emplace_back(
+      "uniform  vec3 " + std::string(ShaderMaterialHelperStatics::Look) + ";");
   }
   if (Setting.Time) {
-    Vertex.emplace_back("uniform  float " + ShaderMaterialHelperStatics::Time
-                        + ";");
-    Fragment.emplace_back("uniform  float " + ShaderMaterialHelperStatics::Time
-                          + ";");
+    Vertex.emplace_back("uniform  float "
+                        + std::string(ShaderMaterialHelperStatics::Time) + ";");
+    Fragment.emplace_back(
+      "uniform  float " + std::string(ShaderMaterialHelperStatics::Time) + ";");
   }
   if (Setting.GlobalTime) {
     Vertex.emplace_back("uniform  vec4 "
-                        + ShaderMaterialHelperStatics::GlobalTime + ";");
+                        + std::string(ShaderMaterialHelperStatics::GlobalTime)
+                        + ";");
     Fragment.emplace_back("uniform  vec4 "
-                          + ShaderMaterialHelperStatics::GlobalTime + ";");
+                          + std::string(ShaderMaterialHelperStatics::GlobalTime)
+                          + ";");
   }
   if (Setting.ReflectMatrix) {
-    Vertex.emplace_back("uniform  mat4 "
-                        + ShaderMaterialHelperStatics::ReflectMatrix + ";");
-    Fragment.emplace_back("uniform  mat4 "
-                          + ShaderMaterialHelperStatics::ReflectMatrix + ";");
+    Vertex.emplace_back(
+      "uniform  mat4 " + std::string(ShaderMaterialHelperStatics::ReflectMatrix)
+      + ";");
+    Fragment.emplace_back(
+      "uniform  mat4 " + std::string(ShaderMaterialHelperStatics::ReflectMatrix)
+      + ";");
   }
   if (Setting.Helpers) {
     constexpr const char* helpers
@@ -358,7 +385,7 @@ void ShaderBuilder::PrepareBeforeMaterialBuild()
   oss << ShaderMaterialHelperStatics::Normal << " = ";
   oss << ShaderMaterialHelperStatics::AttrNormal << ";\n";
   oss << "vec4 result = vec4(";
-  oss << ShaderMaterialHelperStatics::Position + ",1.);\n";
+  oss << std::string(ShaderMaterialHelperStatics::Position) + ",1.);\n";
   oss << "vuv = uv;\n";
   oss << "#[Source]\n";
   oss << "gl_Position = worldViewProjection * result;\n";
@@ -412,8 +439,9 @@ void ShaderBuilder::PrepareBeforePostProcessBuild()
   }
 
   if (Setting.Flags) {
-    Fragment.emplace_back("uniform float "
-                          + ShaderMaterialHelperStatics::uniformFlags + ";");
+    Fragment.emplace_back(
+      "uniform float " + std::string(ShaderMaterialHelperStatics::uniformFlags)
+      + ";");
   }
 
   if (!Setting.Texture2Ds.empty()) {
@@ -421,9 +449,9 @@ void ShaderBuilder::PrepareBeforePostProcessBuild()
     for (auto& texture2D : Setting.Texture2Ds) {
       std::string s = std::to_string(cnt);
       if (texture2D.inFragment) {
-        Fragment.emplace_back("uniform sampler2D "
-                              + ShaderMaterialHelperStatics::Texture2D + s
-                              + ";");
+        Fragment.emplace_back(
+          "uniform sampler2D "
+          + std::string(ShaderMaterialHelperStatics::Texture2D) + s + ";");
       }
       ++cnt;
     }
@@ -442,28 +470,29 @@ void ShaderBuilder::PrepareBeforePostProcessBuild()
   }
 
   if (Setting.Mouse) {
-    Fragment.emplace_back("uniform vec2 " + ShaderMaterialHelperStatics::Mouse
-                          + ";");
+    Fragment.emplace_back(
+      "uniform vec2 " + std::string(ShaderMaterialHelperStatics::Mouse) + ";");
   }
   if (Setting.Screen) {
-    Fragment.emplace_back("uniform vec2 " + ShaderMaterialHelperStatics::Screen
-                          + ";");
+    Fragment.emplace_back(
+      "uniform vec2 " + std::string(ShaderMaterialHelperStatics::Screen) + ";");
   }
   if (Setting.Camera) {
-    Fragment.emplace_back("uniform vec3 " + ShaderMaterialHelperStatics::Camera
-                          + ";");
+    Fragment.emplace_back(
+      "uniform vec3 " + std::string(ShaderMaterialHelperStatics::Camera) + ";");
   }
   if (Setting.Look) {
-    Fragment.emplace_back("uniform vec3 " + ShaderMaterialHelperStatics::Look
-                          + ";");
+    Fragment.emplace_back(
+      "uniform vec3 " + std::string(ShaderMaterialHelperStatics::Look) + ";");
   }
   if (Setting.Time) {
-    Fragment.emplace_back("uniform float " + ShaderMaterialHelperStatics::Time
-                          + ";");
+    Fragment.emplace_back(
+      "uniform float " + std::string(ShaderMaterialHelperStatics::Time) + ";");
   }
   if (Setting.GlobalTime) {
     Fragment.emplace_back("uniform vec4 "
-                          + ShaderMaterialHelperStatics::GlobalTime + ";");
+                          + std::string(ShaderMaterialHelperStatics::GlobalTime)
+                          + ";");
   }
 
   if (Setting.Helpers) {
@@ -1300,25 +1329,25 @@ ShaderBuilder& ShaderBuilder::ReflectCube(IReflectMap& option)
         << ShaderMaterialHelperStatics::Center << ");";
     oss << "\n";
     oss << "  viewDir#[Ind] =r_y(viewDir#[Ind] ,"
-        << Shader::Print(option.rotation.y)
-        << "," + ShaderMaterialHelperStatics::Center << ");";
+        << Shader::Print(option.rotation.y) << ","
+        << ShaderMaterialHelperStatics::Center << ");";
     oss << "\n";
     oss << "  viewDir#[Ind] =r_z(viewDir#[Ind] ,"
         << Shader::Print(option.rotation.z)
-        << "," + ShaderMaterialHelperStatics::Center << ");";
+        << "," + std::string(ShaderMaterialHelperStatics::Center) << ");";
     oss << "\n";
     oss << "vec3 coords#[Ind] = " << (option.refract ? "refract" : "reflect")
         << "(viewDir#[Ind]" << (option.revers ? "*vec3(1.0)" : "*vec3(-1.0)")
         << ", " + option.normal << " "
         << (option.refract ? ",(" + Shader::Print(option.refractMap) + ")" : "")
-        << " )+" + ShaderMaterialHelperStatics::Position + "; ";
+        << " )+" + std::string(ShaderMaterialHelperStatics::Position) + "; ";
     oss << "\n";
     oss << "vec3 vReflectionUVW#[Ind] = vec3( "
-        << ShaderMaterialHelperStatics::ReflectMatrix
+        << std::string(ShaderMaterialHelperStatics::ReflectMatrix)
         << " *  vec4(coords#[Ind], 0)); ";
     oss << "\n";
     oss << "vec3 rc#[Ind]= textureCube("
-        << ShaderMaterialHelperStatics::TextureCube << s
+        << std::string(ShaderMaterialHelperStatics::TextureCube) << s
         << ", vReflectionUVW#[Ind] "
              + (option.bias.empty() || Shader::Print(option.bias) == "0." ?
                   "" :
@@ -1391,13 +1420,13 @@ ShaderBuilder& ShaderBuilder::Light(const ILight& option)
       << ShaderMaterialHelperStatics::Camera << ");"
       << "\n"
       << "  dir#[Ind] =r_x(dir#[Ind] ," << Shader::Print(option.rotation.x)
-      << ",vec3(" + ShaderMaterialHelperStatics::Center << "));"
+      << ",vec3(" << ShaderMaterialHelperStatics::Center << "));"
       << "\n"
       << "  dir#[Ind] =r_y(dir#[Ind] ," << Shader::Print(option.rotation.y)
-      << ",vec3(" + ShaderMaterialHelperStatics::Center << "));"
+      << ",vec3(" << ShaderMaterialHelperStatics::Center << "));"
       << "\n"
       << "  dir#[Ind] =r_z(dir#[Ind] ," << Shader::Print(option.rotation.z)
-      << ",vec3(" + ShaderMaterialHelperStatics::Center << "));";
+      << ",vec3(" << ShaderMaterialHelperStatics::Center << "));";
   oss << "\n";
   oss << "  vec3 vnrm#[Ind] = normalize(vec3(world * vec4(" << option.normal
       << ", 0.0)));"
@@ -1405,8 +1434,8 @@ ShaderBuilder& ShaderBuilder::Light(const ILight& option)
   oss << "\n";
   oss << "  vec3 l#[Ind]= normalize(p1#[Ind].xyz "
       << (!option.parallel ?
-            "- vec3(world * vec4(" + ShaderMaterialHelperStatics::Position
-              + ",1.))  " :
+            "- vec3(world * vec4("
+              + std::string(ShaderMaterialHelperStatics::Position) + ",1.))  " :
             "")
       << ");"
       << "\n";
