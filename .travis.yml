@@ -37,7 +37,6 @@ matrix:
             - libxrandr-dev
             - g++-5
             - gcc-5
-            - gdb
       env: CC_VERSION=gcc-5 CXX_VERSION=g++-5
 
     # GCC 6
@@ -53,7 +52,6 @@ matrix:
             - libxrandr-dev
             - g++-6
             - gcc-6
-            - gdb
       env: CC_VERSION=gcc-6 CXX_VERSION=g++-6
 
 install:
@@ -85,20 +83,11 @@ before_script:
   # Go back to the root of the project and setup the build directory #
   ####################################################################
   - cd ${TRAVIS_BUILD_DIR}
-  - mkdir build && cd build && cmake ../ -DCMAKE_BUILD_TYPE=Debug
+  - mkdir build && cd build && cmake ../
 
 # Build steps
 script:
   - make all
-
-after_script:
-  # enable core dumps
-  - ulimit -c unlimited -S
-  - cd ${TRAVIS_BUILD_DIR}/build/build/bin
-  - ls -al
-  - ./ExtensionsTests
-  - COREFILE=$(find . -maxdepth 1 -name "core*" | head -n 1) # find core file
-  - if [[ -f "$COREFILE" ]]; then gdb -c "$COREFILE" $(pwd)/ExtensionsTests -ex "thread apply all bt" -ex "set pagination 0" -batch; fi  
 
 # Notifications settings
 notifications:
