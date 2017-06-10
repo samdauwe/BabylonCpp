@@ -3,7 +3,7 @@
 
 #include <babylon/extensions/pathfinding/rectangular_maze.h>
 
-TEST(TestAny, PathFindingWithoutCosts)
+TEST(TestPathFinding, WithoutCosts)
 {
   using namespace BABYLON::Extensions;
   using L = RectangularMaze::Location;
@@ -30,7 +30,7 @@ TEST(TestAny, PathFindingWithoutCosts)
   }
 }
 
-TEST(TestAny, PathFindingWithCosts)
+TEST(TestPathFinding, WithCosts)
 {
   using namespace BABYLON::Extensions;
   using L = RectangularMaze::Location;

@@ -68,7 +68,7 @@ get_target_property(TEST_EXCLUDE_FROM_DEFAULT_BUILD
     BabylonCppTests EXCLUDE_FROM_DEFAULT_BUILD
 )
 
-if(TEST_EXCLUDE_FROM_DEFAULT_BUILD)
+if(NOT TEST_EXCLUDE_FROM_DEFAULT_BUILD)
     add_custom_command (
       TARGET ${TARGET} POST_BUILD
       COMMAND ${TARGET} --gtest_output=xml:${TARGET}.xml
