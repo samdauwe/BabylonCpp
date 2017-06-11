@@ -345,6 +345,7 @@ void Effect::_processShaderConversion(
 
   // Already converted
   if (String::contains(preparedSourceCode, "#version 3")) {
+    String::replaceInPlace(preparedSourceCode, "#version 300 es", "");
     callback(preparedSourceCode);
     return;
   }

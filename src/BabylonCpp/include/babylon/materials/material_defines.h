@@ -56,6 +56,8 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   std::vector<bool> lightmapexcluded;
   std::vector<bool> lightmapnospecular;
 
+  bool USERIGHTHANDEDSYSTEM;
+
   bool _isDirty;
   int _renderId;
 

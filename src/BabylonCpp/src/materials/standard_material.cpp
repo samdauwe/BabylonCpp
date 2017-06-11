@@ -94,11 +94,13 @@ StandardMaterial::StandardMaterial(const std::string& iName, Scene* scene)
   getRenderTargetTextures = [this]() {
     _renderTargets.clear();
 
-    if (_reflectionTexture && _reflectionTexture->isRenderTarget) {
+    if (StandardMaterial::ReflectionTextureEnabled()
+        && _reflectionTexture->isRenderTarget) {
       _renderTargets.emplace_back(_reflectionTexture);
     }
 
-    if (_refractionTexture && _refractionTexture->isRenderTarget) {
+    if (StandardMaterial::RefractionTextureEnabled()
+        && _refractionTexture->isRenderTarget) {
       _renderTargets.emplace_back(_refractionTexture);
     }
 

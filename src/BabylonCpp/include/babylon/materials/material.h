@@ -19,11 +19,11 @@ public:
   static constexpr unsigned int ClockWiseSideOrientation        = 0;
   static constexpr unsigned int CounterClockWiseSideOrientation = 1;
 
-  static constexpr unsigned int TextureDirtyFlag    = 0;
-  static constexpr unsigned int LightDirtyFlag      = 1;
-  static constexpr unsigned int FresnelDirtyFlag    = 2;
-  static constexpr unsigned int AttributesDirtyFlag = 4;
-  static constexpr unsigned int MiscDirtyFlag       = 8;
+  static constexpr unsigned int TextureDirtyFlag    = 1;
+  static constexpr unsigned int LightDirtyFlag      = 2;
+  static constexpr unsigned int FresnelDirtyFlag    = 4;
+  static constexpr unsigned int AttributesDirtyFlag = 8;
+  static constexpr unsigned int MiscDirtyFlag       = 16;
 
   virtual ~Material();
 

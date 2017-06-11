@@ -69,6 +69,7 @@ struct BABYLON_SHARED_EXPORT StandardMaterialDefines : public MaterialDefines {
   static constexpr unsigned int MORPHTARGETS         = 57;
   static constexpr unsigned int MORPHTARGETS_NORMAL  = 58;
   static constexpr unsigned int MORPHTARGETS_TANGENT = 59;
+  static constexpr unsigned int USERIGHTHANDEDSYSTEM = 60;
 
   StandardMaterialDefines();
   ~StandardMaterialDefines();

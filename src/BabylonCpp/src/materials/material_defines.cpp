@@ -9,6 +9,7 @@ MaterialDefines::MaterialDefines()
     , TANGENT{false}
     , SHADOWS{false}
     , LIGHTMAPEXCLUDED{false}
+    , USERIGHTHANDEDSYSTEM{false}
     , _isDirty{true}
     , _renderId{-1}
     , _areLightsDirty{true}
@@ -209,6 +210,7 @@ void MaterialDefines::rebuild()
   TANGENT               = false;
   SHADOWS               = false;
   LIGHTMAPEXCLUDED      = false;
+  USERIGHTHANDEDSYSTEM  = false;
 }
 
 bool MaterialDefines::isEqual(const MaterialDefines& other) const
@@ -231,6 +233,7 @@ bool MaterialDefines::isEqual(const MaterialDefines& other) const
       || (NUM_MORPH_INFLUENCERS != other.NUM_MORPH_INFLUENCERS)
       || (TANGENT != other.TANGENT) || (SHADOWS != other.SHADOWS)
       || (LIGHTMAPEXCLUDED != other.LIGHTMAPEXCLUDED)
+      || (USERIGHTHANDEDSYSTEM != other.USERIGHTHANDEDSYSTEM)
       || (_isDirty != other._isDirty) || (_renderId != other._renderId)
       || (_areLightsDirty != other._areLightsDirty)
       || (_areAttributesDirty != other._areAttributesDirty)
@@ -316,6 +319,7 @@ void MaterialDefines::cloneTo(MaterialDefines& other)
   other.TANGENT               = TANGENT;
   other.SHADOWS               = SHADOWS;
   other.LIGHTMAPEXCLUDED      = LIGHTMAPEXCLUDED;
+  other.USERIGHTHANDEDSYSTEM  = USERIGHTHANDEDSYSTEM;
   other._isDirty              = _isDirty;
   other._renderId             = _renderId;
   other._areLightsDirty       = _areLightsDirty;
@@ -350,6 +354,7 @@ void MaterialDefines::reset()
   TANGENT               = false;
   SHADOWS               = false;
   LIGHTMAPEXCLUDED      = false;
+  USERIGHTHANDEDSYSTEM  = false;
   _isDirty              = true;
   _renderId             = -1;
   _areLightsDirty       = true;
