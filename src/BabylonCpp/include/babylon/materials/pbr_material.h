@@ -119,20 +119,6 @@ public:
   bool disableBumpMap;
 
   /**
-   * Debug Control helping enforcing or dropping the darkness of shadows.
-   * 1.0 means the shadows have their normal darkness, 0.0 means the shadows are
-   * not visible.
-   */
-  float overloadedShadowIntensity;
-
-  /**
-   * Debug Control helping dropping the shading effect coming from the diffuse
-   * lighting.
-   * 1.0 means the shade have their normal impact, 0.0 means no shading at all.
-   */
-  float overloadedShadeIntensity;
-
-  /**
    * The camera exposure used on this material.
    * This property is here and not in the camera to allow controlling exposure
    * without full screen post process.
@@ -168,78 +154,6 @@ public:
    * respectively.
    */
   ColorCurves* cameraColorCurves;
-
-  /**
-   * Debug Control allowing to overload the ambient color.
-   * This as to be use with the overloadedAmbientIntensity parameter.
-   */
-  Color3 overloadedAmbient;
-
-  /**
-   * Debug Control indicating how much the overloaded ambient color is used
-   * against the default one.
-   */
-  float overloadedAmbientIntensity;
-
-  /**
-   * Debug Control allowing to overload the albedo color.
-   * This as to be use with the overloadedAlbedoIntensity parameter.
-   */
-  Color3 overloadedAlbedo;
-
-  /**
-   * Debug Control indicating how much the overloaded albedo color is used
-   * against the default one.
-   */
-  float overloadedAlbedoIntensity;
-
-  /**
-   * Debug Control allowing to overload the reflectivity color.
-   * This as to be use with the overloadedReflectivityIntensity parameter.
-   */
-  Color3 overloadedReflectivity;
-
-  /**
-   * Debug Control indicating how much the overloaded reflectivity color is used
-   * against the default one.
-   */
-  float overloadedReflectivityIntensity;
-
-  /**
-   * Debug Control allowing to overload the emissive color.
-   * This as to be use with the overloadedEmissiveIntensity parameter.
-   */
-  Color3 overloadedEmissive;
-
-  /**
-   * Debug Control indicating how much the overloaded emissive color is used
-   * against the default one.
-   */
-  float overloadedEmissiveIntensity;
-
-  /**
-   * Debug Control allowing to overload the reflection color.
-   * This as to be use with the overloadedReflectionIntensity parameter.
-   */
-  Color3 overloadedReflection;
-
-  /**
-   * Debug Control indicating how much the overloaded reflection color is used
-   * against the default one.
-   */
-  float overloadedReflectionIntensity;
-
-  /**
-   * Debug Control allowing to overload the microsurface.
-   * This as to be use with the overloadedMicroSurfaceIntensity parameter.
-   */
-  float overloadedMicroSurface;
-
-  /**
-   * Debug Control indicating how much the overloaded microsurface is used
-   * against the default one.
-   */
-  float overloadedMicroSurfaceIntensity;
 
   /**
    * AKA Diffuse Texture in standard nomenclature.

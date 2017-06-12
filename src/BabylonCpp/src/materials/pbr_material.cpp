@@ -40,24 +40,10 @@ PBRMaterial::PBRMaterial(const std::string& _name, Scene* scene)
     , environmentIntensity{1.f}
     , specularIntensity{1.f}
     , disableBumpMap{false}
-    , overloadedShadowIntensity{1.f}
-    , overloadedShadeIntensity{1.f}
     , cameraExposure{1.f}
     , cameraContrast{1.f}
     , cameraColorGradingTexture{nullptr}
     , cameraColorCurves{nullptr}
-    , overloadedAmbient{Color3::White()}
-    , overloadedAmbientIntensity{0.f}
-    , overloadedAlbedo{Color3::White()}
-    , overloadedAlbedoIntensity{0.f}
-    , overloadedReflectivity{Color3(0.f, 0.f, 0.f)}
-    , overloadedReflectivityIntensity{0.f}
-    , overloadedEmissive{Color3::White()}
-    , overloadedEmissiveIntensity{0.f}
-    , overloadedReflection{Color3::White()}
-    , overloadedReflectionIntensity{0.f}
-    , overloadedMicroSurface{0.f}
-    , overloadedMicroSurfaceIntensity{0.f}
     , albedoTexture{nullptr}
     , ambientTexture{nullptr}
     , ambientTextureStrength{1.f}
@@ -108,16 +94,8 @@ PBRMaterial::PBRMaterial(const std::string& _name, Scene* scene)
     , twoSidedLighting{false}
     , _lightingInfos{Vector4(directIntensity, emissiveIntensity,
                              environmentIntensity, specularIntensity)}
-    , _overloadedShadowInfos{Vector4(overloadedShadowIntensity,
-                                     overloadedShadeIntensity, 0.f, 0.f)}
     , _cameraInfos{Vector4(1.f, 1.f, 0.f, 0.f)}
     , _microsurfaceTextureLods{Vector2(0.f, 0.f)}
-    , _overloadedIntensity{Vector4(
-        overloadedAmbientIntensity, overloadedAlbedoIntensity,
-        overloadedReflectivityIntensity, overloadedEmissiveIntensity)}
-    , _overloadedMicroSurface{Vector3(overloadedMicroSurface,
-                                      overloadedMicroSurfaceIntensity,
-                                      overloadedReflectionIntensity)}
     , _worldViewProjectionMatrix{Matrix::Zero()}
     , _globalAmbientColor{Color3(0.f, 0.f, 0.f)}
     , _tempColor{Color3(0.f, 0.f, 0.f)}
@@ -133,11 +111,13 @@ PBRMaterial::PBRMaterial(const std::string& _name, Scene* scene)
   getRenderTargetTextures = [&]() {
     _renderTargets.clear();
 
-    if (reflectionTexture && reflectionTexture->isRenderTarget) {
+    if (StandardMaterial::ReflectionTextureEnabled() && reflectionTexture
+        && reflectionTexture->isRenderTarget) {
       _renderTargets.emplace_back(reflectionTexture);
     }
 
-    if (refractionTexture && refractionTexture->isRenderTarget) {
+    if (StandardMaterial::RefractionTextureEnabled() && refractionTexture
+        && refractionTexture->isRenderTarget) {
       _renderTargets.emplace_back(refractionTexture);
     }
 
@@ -503,6 +483,10 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
         _defines.defines[PMD::INVERTNORMALMAPY]
           = !_defines.defines[PMD::INVERTNORMALMAPY];
       }
+
+      if (scene->useRightHandedSystem()) {
+        _defines.USERIGHTHANDEDSYSTEM = true;
+      }
     }
 
     if (refractionTexture && StandardMaterial::RefractionTextureEnabled()) {
@@ -577,17 +561,6 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 
   if (cameraColorCurves) {
     _defines.defines[PMD::CAMERACOLORCURVES] = true;
-  }
-
-  if ((!stl_util::almost_equal(overloadedShadeIntensity, 1.f))
-      || (!stl_util::almost_equal(overloadedShadowIntensity, 1.f))) {
-    _defines.defines[PMD::OVERLOADEDSHADOWVALUES] = true;
-  }
-
-  if (overloadedMicroSurfaceIntensity > 0 || overloadedEmissiveIntensity > 0
-      || overloadedReflectivityIntensity > 0 || overloadedAlbedoIntensity > 0
-      || overloadedAmbientIntensity > 0 || overloadedReflectionIntensity > 0) {
-    _defines.defines[PMD::OVERLOADEDVALUES] = true;
   }
 
   // Point size
@@ -838,13 +811,6 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
                                       "emissiveLeftColor",
                                       "emissiveRightColor",
                                       "vLightingIntensity",
-                                      "vOverloadedShadowIntensity",
-                                      "vOverloadedIntensity",
-                                      "vOverloadedAlbedo",
-                                      "vOverloadedReflection",
-                                      "vOverloadedReflectivity",
-                                      "vOverloadedEmissive",
-                                      "vOverloadedMicroSurface",
                                       "logarithmicDepthConstant",
                                       "vSphericalX",
                                       "vSphericalY",
@@ -947,15 +913,6 @@ void PBRMaterial::buildUniformLayout()
   _uniformBuffer->addUniform("opacityParts", 4);
   _uniformBuffer->addUniform("emissiveLeftColor", 4);
   _uniformBuffer->addUniform("emissiveRightColor", 4);
-
-  _uniformBuffer->addUniform("vOverloadedIntensity", 4);
-  _uniformBuffer->addUniform("vOverloadedAmbient", 3);
-  _uniformBuffer->addUniform("vOverloadedAlbedo", 3);
-  _uniformBuffer->addUniform("vOverloadedReflectivity", 3);
-  _uniformBuffer->addUniform("vOverloadedEmissive", 3);
-  _uniformBuffer->addUniform("vOverloadedReflection", 3);
-  _uniformBuffer->addUniform("vOverloadedMicroSurface", 3);
-  _uniformBuffer->addUniform("vOverloadedShadowIntensity", 4);
 
   _uniformBuffer->addUniform("pointSize", 1);
   _uniformBuffer->create();
@@ -1222,36 +1179,6 @@ void PBRMaterial::bind(Matrix* world, Mesh* mesh)
       _lightingInfos.w = specularIntensity;
 
       _uniformBuffer->updateVector4("vLightingIntensity", _lightingInfos);
-
-      // Overloaded params
-
-      _overloadedShadowInfos.x = overloadedShadowIntensity;
-      _overloadedShadowInfos.y = overloadedShadeIntensity;
-      _uniformBuffer->updateVector4("vOverloadedShadowIntensity",
-                                    _overloadedShadowInfos);
-
-      _overloadedIntensity.x = overloadedAmbientIntensity;
-      _overloadedIntensity.y = overloadedAlbedoIntensity;
-      _overloadedIntensity.z = overloadedReflectivityIntensity;
-      _overloadedIntensity.w = overloadedEmissiveIntensity;
-      _uniformBuffer->updateVector4("vOverloadedIntensity",
-                                    _overloadedIntensity);
-
-      _uniformBuffer->updateColor3("vOverloadedAmbient", overloadedAmbient, "");
-      convertColorToLinearSpaceToRef(overloadedAlbedo, _tempColor);
-      _uniformBuffer->updateColor3("vOverloadedAlbedo", _tempColor, "");
-      convertColorToLinearSpaceToRef(overloadedReflectivity, _tempColor);
-      _uniformBuffer->updateColor3("vOverloadedReflectivity", _tempColor, "");
-      convertColorToLinearSpaceToRef(overloadedEmissive, _tempColor);
-      _uniformBuffer->updateColor3("vOverloadedEmissive", _tempColor, "");
-      convertColorToLinearSpaceToRef(overloadedReflection, _tempColor);
-      _uniformBuffer->updateColor3("vOverloadedReflection", _tempColor, "");
-
-      _overloadedMicroSurface.x = overloadedMicroSurface;
-      _overloadedMicroSurface.y = overloadedMicroSurfaceIntensity;
-      _overloadedMicroSurface.z = overloadedReflectionIntensity;
-      _uniformBuffer->updateVector3("vOverloadedMicroSurface",
-                                    _overloadedMicroSurface);
     }
 
     // Textures

@@ -54,8 +54,6 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
            "CAMERACONTRAST",
            "CAMERACOLORGRADING",
            "CAMERACOLORCURVES",
-           "OVERLOADEDVALUES",
-           "OVERLOADEDSHADOWVALUES",
            "USESPHERICALFROMREFLECTIONMAP",
            "REFRACTION",
            "REFRACTIONMAP_3D",
