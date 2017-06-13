@@ -14,19 +14,19 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT GlowBlurPostProcess : public PostProcess {
 
   GlowBlurPostProcess(const std::string& name, const Vector2& direction,
-                      float blurWidth, float options, Camera* camera,
+                      float kernel, float options, Camera* camera,
                       unsigned int samplingMode
                       = TextureConstants::BILINEAR_SAMPLINGMODE,
                       Engine* engine = nullptr, bool reusable = false);
   GlowBlurPostProcess(const std::string& name, const Vector2& direction,
-                      float blurWidth, const PostProcessOptions& options,
+                      float kernel, const PostProcessOptions& options,
                       Camera* camera, unsigned int samplingMode
                                       = TextureConstants::BILINEAR_SAMPLINGMODE,
                       Engine* engine = nullptr, bool reusable = false);
   ~GlowBlurPostProcess();
 
   Vector2 direction;
-  float blurWidth;
+  float kernel;
 
 }; // end of struct GlowBlurPostProcess
 

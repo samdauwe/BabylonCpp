@@ -104,22 +104,22 @@ HighlightLayer::~HighlightLayer()
 
 void HighlightLayer::setBlurHorizontalSize(float value)
 {
-  _horizontalBlurPostprocess->blurWidth = value;
+  _horizontalBlurPostprocess->kernel = value;
 }
 
 void HighlightLayer::setBlurVerticalSize(float value)
 {
-  _verticalBlurPostprocess->blurWidth = value;
+  _verticalBlurPostprocess->kernel = value;
 }
 
 float HighlightLayer::blurHorizontalSize() const
 {
-  return _horizontalBlurPostprocess->blurWidth;
+  return _horizontalBlurPostprocess->kernel;
 }
 
 float HighlightLayer::blurVerticalSize() const
 {
-  return _verticalBlurPostprocess->blurWidth;
+  return _verticalBlurPostprocess->kernel;
 }
 
 Camera* HighlightLayer::camera() const

@@ -19,7 +19,7 @@ RenderTargetTexture::RenderTargetTexture(
   const std::string& iName, const ISize& size, Scene* scene,
   bool generateMipMaps, bool doNotChangeAspectRatio, unsigned int type,
   bool iIsCube, unsigned int samplingMode, bool generateDepthBuffer,
-  bool generateStencilBuffer)
+  bool generateStencilBuffer, bool isMulti)
 
     : Texture{"", scene, !generateMipMaps}
     , renderParticles{true}
@@ -27,14 +27,21 @@ RenderTargetTexture::RenderTargetTexture(
     , coordinatesMode{TextureConstants::PROJECTION_MODE}
     , _generateMipMaps{generateMipMaps}
     , _size{size}
-    , _samples{1}
     , _doNotChangeAspectRatio{doNotChangeAspectRatio}
     , _currentRefreshId{-1}
     , _refreshRate{1}
+    , _samples{1}
 {
   name           = iName;
   isRenderTarget = true;
   isCube         = iIsCube;
+
+  // Rendering groups
+  _renderingManager = std::make_unique<RenderingManager>(scene);
+
+  if (isMulti) {
+    return;
+  }
 
   _renderTargetOptions.generateMipMaps       = generateMipMaps;
   _renderTargetOptions.type                  = type;
@@ -57,9 +64,6 @@ RenderTargetTexture::RenderTargetTexture(
     _texture = scene->getEngine()->createRenderTargetTexture(
       size, _renderTargetOptions);
   }
-
-  // Rendering groups
-  _renderingManager = std::make_unique<RenderingManager>(scene);
 }
 
 RenderTargetTexture::~RenderTargetTexture()
@@ -426,6 +430,11 @@ std::unique_ptr<RenderTargetTexture> RenderTargetTexture::clone() const
 Json::object RenderTargetTexture::serialize() const
 {
   return Json::object();
+}
+
+void RenderTargetTexture::dispose(bool doNotRecurse)
+{
+  Texture::dispose(doNotRecurse);
 }
 
 } // end of namespace BABYLON

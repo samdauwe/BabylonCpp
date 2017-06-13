@@ -24,7 +24,8 @@ public:
     unsigned int type         = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
     bool isCube               = false,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-    bool generateDepthBuffer = true, bool generateStencilBuffer = false);
+    bool generateDepthBuffer = true, bool generateStencilBuffer = false,
+    bool isMulti = false);
   ~RenderTargetTexture();
 
   /** Events **/
@@ -85,6 +86,7 @@ public:
                                          bool autoClearDepthStencil);
   std::unique_ptr<RenderTargetTexture> clone() const;
   Json::object serialize() const;
+  void dispose(bool doNotRecurse = false) override;
 
 public:
   /**
@@ -136,6 +138,11 @@ public:
 protected:
   IRenderTargetOptions _renderTargetOptions;
   ISize _size;
+  std::unique_ptr<RenderingManager> _renderingManager;
+  bool _doNotChangeAspectRatio;
+  int _currentRefreshId;
+  int _refreshRate;
+  std::unique_ptr<Matrix> _textureMatrix;
   unsigned int _samples;
 
 private:
@@ -145,11 +152,6 @@ private:
   Observer<int>::Ptr _onAfterRenderObserver;
   Observer<Engine>::Ptr _onClearObserver;
   // Properties
-  std::unique_ptr<RenderingManager> _renderingManager;
-  bool _doNotChangeAspectRatio;
-  int _currentRefreshId;
-  int _refreshRate;
-  std::unique_ptr<Matrix> _textureMatrix;
   int _faceIndex;
 
 }; // end of class RenderTargetTexture

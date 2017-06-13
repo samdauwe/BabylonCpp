@@ -6,7 +6,7 @@ namespace BABYLON {
 
 GlowBlurPostProcess::GlowBlurPostProcess(const std::string& name,
                                          const Vector2& iDirection,
-                                         float iBlurWidth, float options,
+                                         float iKernel, float options,
                                          Camera* camera,
                                          unsigned int samplingMode,
                                          Engine* engine, bool reusable)
@@ -14,29 +14,29 @@ GlowBlurPostProcess::GlowBlurPostProcess(const std::string& name,
                   {"screenSize", "direction", "blurWidth"}, {}, options, camera,
                   samplingMode, engine, reusable)
     , direction{iDirection}
-    , blurWidth{iBlurWidth}
+    , kernel{iKernel}
 {
   onApplyObservable.add([this](Effect* effect) {
     effect->setFloat2("screenSize", width, height);
     effect->setVector2("direction", direction);
-    effect->setFloat("blurWidth", blurWidth);
+    effect->setFloat("blurWidth", kernel);
   });
 }
 
 GlowBlurPostProcess::GlowBlurPostProcess(
-  const std::string& name, const Vector2& iDirection, float iBlurWidth,
+  const std::string& name, const Vector2& iDirection, float iKernel,
   const PostProcessOptions& options, Camera* camera, unsigned int samplingMode,
   Engine* engine, bool reusable)
     : PostProcess(name, "glowBlurPostProcess",
                   {"screenSize", "direction", "blurWidth"}, {}, options, camera,
                   samplingMode, engine, reusable)
     , direction{iDirection}
-    , blurWidth{iBlurWidth}
+    , kernel{iKernel}
 {
   onApplyObservable.add([this](Effect* effect) {
     effect->setFloat2("screenSize", width, height);
     effect->setVector2("direction", direction);
-    effect->setFloat("blurWidth", blurWidth);
+    effect->setFloat("blurWidth", kernel);
   });
 }
 
