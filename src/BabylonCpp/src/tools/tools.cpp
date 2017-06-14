@@ -22,6 +22,11 @@
 
 namespace BABYLON {
 
+float Tools::Mix(float a, float b, float alpha)
+{
+  return a * (1 - alpha) + b * alpha;
+}
+
 bool Tools::IsExponentOfTwo(int value)
 {
   int count = 1;

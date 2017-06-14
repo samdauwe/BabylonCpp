@@ -12,6 +12,15 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT Tools {
 
   /** Statics **/
+
+  /**
+   * @brief Interpolates between a and b via alpha.
+   * @param a The lower value (returned when alpha = 0)
+   * @param b The upper value (returned when alpha = 1)
+   * @param alpha The interpolation-factor
+   * @return The mixed value
+   */
+  static float Mix(float a, float b, float alpha);
   static bool IsExponentOfTwo(int value);
   static int GetExponentOfTwo(int value, int max);
   static float ToDegrees(float angle);
