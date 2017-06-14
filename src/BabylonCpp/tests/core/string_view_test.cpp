@@ -23,7 +23,7 @@ limitations under the License.
 #include <sstream>
 #include <unordered_map>
 
-TEST(StringViewTest, DefaultCtor)
+TEST(TestStringView, DefaultCtor)
 {
   using namespace BABYLON;
 
@@ -35,7 +35,7 @@ TEST(StringViewTest, DefaultCtor)
   EXPECT_EQ("", str);
 }
 
-TEST(StringViewTest, CstrCtor)
+TEST(TestStringView, CstrCtor)
 {
   using namespace BABYLON;
 
@@ -49,7 +49,7 @@ TEST(StringViewTest, CstrCtor)
   EXPECT_EQ("abc", str);
 }
 
-TEST(StringViewTest, CstrLenCtor)
+TEST(TestStringView, CstrLenCtor)
 {
   using namespace BABYLON;
 
@@ -63,7 +63,7 @@ TEST(StringViewTest, CstrLenCtor)
   EXPECT_EQ("Hello", str);
 }
 
-TEST(StringViewTest, StringCtor)
+TEST(TestStringView, StringCtor)
 {
   using namespace BABYLON;
 
@@ -77,7 +77,7 @@ TEST(StringViewTest, StringCtor)
   EXPECT_EQ("Blah", str);
 }
 
-TEST(StringViewTest, Iteration)
+TEST(TestStringView, Iteration)
 {
   using namespace BABYLON;
 
@@ -88,7 +88,7 @@ TEST(StringViewTest, Iteration)
   EXPECT_EQ("Thing", out);
 }
 
-TEST(StringViewTest, ToString)
+TEST(TestStringView, ToString)
 {
   using namespace BABYLON;
 
@@ -100,7 +100,7 @@ TEST(StringViewTest, ToString)
   EXPECT_EQ(std::string("abc"), string);
 }
 
-TEST(StringViewTest, SubStr)
+TEST(TestStringView, SubStr)
 {
   using namespace BABYLON;
 
@@ -112,7 +112,7 @@ TEST(StringViewTest, SubStr)
   EXPECT_EQ("cake", str.substr(4));
 }
 
-TEST(StringViewTest, Compare)
+TEST(TestStringView, Compare)
 {
   using namespace BABYLON;
 
@@ -136,7 +136,7 @@ TEST(StringViewTest, Compare)
   EXPECT_FALSE(str >= "ghi");
 }
 
-TEST(StringViewTest, Ostream)
+TEST(TestStringView, Ostream)
 {
   using namespace BABYLON;
 
@@ -146,7 +146,7 @@ TEST(StringViewTest, Ostream)
   EXPECT_EQ("bumble jumble", o.str());
 }
 
-TEST(StringViewTest, Hash)
+TEST(TestStringView, Hash)
 {
   using namespace BABYLON;
 
