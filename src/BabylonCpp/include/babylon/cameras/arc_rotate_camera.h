@@ -84,6 +84,7 @@ public:
   float upperRadiusLimit;
   float inertialPanningX;
   float inertialPanningY;
+  float panningInertia;
   float zoomOnFactor;
   float wheelPrecision;
   Vector2 targetScreenOffset;

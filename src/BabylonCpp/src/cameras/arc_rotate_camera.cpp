@@ -34,6 +34,7 @@ ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha,
     , upperRadiusLimit{0.f}
     , inertialPanningX{0.f}
     , inertialPanningY{0.f}
+    , panningInertia{0.9f}
     , zoomOnFactor{1.f}
     , targetScreenOffset{Vector2::Zero()}
     , allowUpsideDown{true}
@@ -203,8 +204,8 @@ void ArcRotateCamera::_checkInputs()
       _target.addInPlace(_transformedDirection);
     }
 
-    inertialPanningX *= inertia;
-    inertialPanningY *= inertia;
+    inertialPanningX *= panningInertia;
+    inertialPanningY *= panningInertia;
 
     if (std::abs(inertialPanningX) < speed * MathTools::Epsilon) {
       inertialPanningX = 0.f;
