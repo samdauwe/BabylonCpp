@@ -121,6 +121,11 @@ void PostProcess::setOnAfterRender(
   _onAfterRenderObserver = onAfterRenderObservable.add(callback);
 }
 
+Engine* PostProcess::getEngine()
+{
+  return _engine;
+}
+
 void PostProcess::updateEffect(const std::string& defines)
 {
   std::unordered_map<std::string, std::string> baseName{

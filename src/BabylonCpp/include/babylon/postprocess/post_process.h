@@ -48,6 +48,7 @@ public:
   void setOnBeforeRender(const std::function<void(Effect* effect)>& callback);
   void setOnAfterRender(const std::function<void(Effect* effect)>& callback);
 
+  Engine* getEngine();
   void updateEffect(const std::string& defines = "");
   bool isReusable() const;
   /**
