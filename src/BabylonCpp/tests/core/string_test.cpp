@@ -1,6 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <babylon/babylon_constants.h>
 #include <babylon/core/string.h>
 
 TEST(TestString, concat)
@@ -257,6 +258,21 @@ TEST(TestString, regexReplace)
       s, "void\\s+?main\\(", "out vec4 glFragColor;\nvoid main(")};
     const std::string e{"out vec4 glFragColor;\nvoid main(void)"};
     EXPECT_EQ(r, e);
+  }
+
+  {
+    const auto _glslFloat = [](float x, unsigned int decimalFigures) {
+      std::ostringstream oss;
+      oss.precision(decimalFigures);
+      oss << std::fixed << x;
+      return String::regexReplace(oss.str(), "0+", "");
+    };
+    const std::string r1{_glslFloat(Math::PI, 6)};
+    const std::string e1{"3.141593"};
+    EXPECT_EQ(r1, e1);
+    const std::string r2{_glslFloat(3.1400000f, 6)};
+    const std::string e2{"3.14"};
+    EXPECT_EQ(r2, e2);
   }
 }
 
