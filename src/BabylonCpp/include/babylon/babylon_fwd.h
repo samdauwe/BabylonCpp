@@ -390,6 +390,7 @@ class PassPostProcess;
 class PostProcess;
 class PostProcessManager;
 class RefractionPostProcess;
+class SSAO2RenderingPipeline;
 class SSAORenderingPipeline;
 class StandardRenderingPipeline;
 class StereoscopicInterlacePostProcess;
