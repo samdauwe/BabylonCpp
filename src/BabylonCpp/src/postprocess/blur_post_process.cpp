@@ -11,10 +11,21 @@ BlurPostProcess::BlurPostProcess(const std::string& iName,
                                  const Vector2& direction, float kernel,
                                  float ratio, Camera* camera,
                                  unsigned int samplingMode, Engine* engine,
-                                 bool reusable, unsigned int /*textureType*/)
-    : PostProcess{iName,        "kernelBlur", {"delta", "direction"},
-                  {},           ratio,        camera,
-                  samplingMode, engine,       reusable}
+                                 bool reusable, unsigned int textureType)
+    : PostProcess{iName,
+                  "kernelBlur",
+                  {"delta", "direction"},
+                  {},
+                  ratio,
+                  camera,
+                  samplingMode,
+                  engine,
+                  reusable,
+                  "",
+                  textureType,
+                  "kernelBlur",
+                  {{"varyingCount", 0}, {"depCount", 0}},
+                  true}
 {
   setKernel(kernel);
 
@@ -179,7 +190,7 @@ std::string BlurPostProcess::_glslFloat(float x,
 {
   std::ostringstream oss;
   oss.precision(decimalFigures);
-  oss << x;
+  oss << std::fixed << x;
   return String::regexReplace(oss.str(), "0+", "");
 }
 

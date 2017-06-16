@@ -136,9 +136,10 @@ void PostProcessManager::_finalizeFrame(
     }
   }
 
-  // Restore depth buffer
+  // Restore states
   engine->setDepthBuffer(true);
   engine->setDepthWrite(true);
+  engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
 }
 
 void PostProcessManager::dispose(bool /*doNotRecurse*/)

@@ -16,7 +16,9 @@ public:
   FxaaPostProcess(const std::string& _name, float ratio, Camera* camera,
                   unsigned int samplingMode
                   = TextureConstants::BILINEAR_SAMPLINGMODE,
-                  Engine* engine = nullptr, bool reusable = false);
+                  Engine* engine = nullptr, bool reusable = false,
+                  unsigned int textureType
+                  = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   ~FxaaPostProcess();
 
 public:

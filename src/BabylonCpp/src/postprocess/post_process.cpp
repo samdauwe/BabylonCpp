@@ -19,10 +19,12 @@ PostProcess::PostProcess(const std::string& iName,
                          float renderRatio, Camera* camera,
                          unsigned int samplingMode, Engine* engine,
                          bool reusable, const std::string& defines,
-                         unsigned int textureType, const std::string& vertexUrl)
+                         unsigned int textureType, const std::string& vertexUrl,
+                         const std::unordered_map<std::string, unsigned int>& indexParameters,
+                         bool blockCompilation)
     : PostProcess(iName, fragmentUrl, parameters, samplers, {-1, -1}, camera,
                   samplingMode, engine, reusable, defines, textureType,
-                  vertexUrl)
+                  vertexUrl, indexParameters, blockCompilation)
 {
   _renderRatio = renderRatio;
 }
@@ -34,10 +36,14 @@ PostProcess::PostProcess(const std::string& iName,
                          const PostProcessOptions& options, Camera* camera,
                          unsigned int samplingMode, Engine* engine,
                          bool reusable, const std::string& defines,
-                         unsigned int textureType, const std::string& vertexUrl)
+                         unsigned int textureType, const std::string& vertexUrl,
+                         const std::unordered_map<std::string, unsigned int>& indexParameters,
+                         bool blockCompilation)
     : name{iName}
     , width{-1}
     , height{-1}
+    , autoClear{true}
+    , alphaMode{EngineConstants::ALPHA_DISABLE}
     , enablePixelPerfectMode{false}
     , samples{1}
     , _currentRenderTextureInd{0}
@@ -48,6 +54,7 @@ PostProcess::PostProcess(const std::string& iName,
     , _vertexUrl{vertexUrl}
     , _parameters{parameters}
     , _scaleRatio{Vector2(1.f, 1.f)}
+    , _shareOutputWithPostProcess{nullptr}
 {
   if (camera) {
     _camera = camera;
@@ -69,7 +76,11 @@ PostProcess::PostProcess(const std::string& iName,
   _parameters.insert(_parameters.end(), _parameters.begin(), _parameters.end());
   _parameters.emplace_back("scale");
 
-  updateEffect(defines);
+  _indexParameters = indexParameters;
+
+  if (!blockCompilation) {
+    updateEffect(defines);
+  }
 }
 
 PostProcess::~PostProcess()
@@ -121,21 +132,44 @@ void PostProcess::setOnAfterRender(
   _onAfterRenderObserver = onAfterRenderObservable.add(callback);
 }
 
+GL::IGLTexture* PostProcess::outputTexture()
+{
+  return _textures[_currentRenderTextureInd];
+}
+
+Camera* PostProcess::getCamera()
+{
+  return _camera;
+}
+
 Engine* PostProcess::getEngine()
 {
   return _engine;
 }
 
-void PostProcess::updateEffect(const std::string& defines)
+PostProcess& PostProcess::shareOutputWith(PostProcess* postProcess)
+{
+  _disposeTextures();
+  _shareOutputWithPostProcess = postProcess;
+
+  return *this;
+}
+
+void PostProcess::updateEffect(
+  const std::string& defines, const std::vector<std::string>& uniforms,
+  const std::vector<std::string>& samplers,
+  const std::unordered_map<std::string, unsigned int>& indexParameters)
 {
   std::unordered_map<std::string, std::string> baseName{
     {"vertex", _vertexUrl}, {"fragment", _fragmentUrl}};
 
   EffectCreationOptions options;
   options.attributes    = {"position"};
-  options.uniformsNames = _parameters;
-  options.samplers      = _samplers;
+  options.uniformsNames = !uniforms.empty() ? uniforms : _parameters;
+  options.samplers      = !samplers.empty() ? samplers : _samplers;
   options.defines       = defines;
+  options.indexParameters
+    = !indexParameters.empty() ? indexParameters : _indexParameters;
 
   _effect = _engine->createEffect(baseName, options, _scene->getEngine());
 }
@@ -152,81 +186,85 @@ void PostProcess::markTextureDirty()
 
 void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture)
 {
-  auto pCamera = camera ? camera : _camera;
+  if (!_shareOutputWithPostProcess) {
+    auto pCamera = camera ? camera : _camera;
 
-  auto scene        = pCamera->getScene();
-  const int maxSize = pCamera->getEngine()->getCaps().maxTextureSize;
+    auto scene        = pCamera->getScene();
+    const int maxSize = pCamera->getEngine()->getCaps().maxTextureSize;
 
-  const int requiredWidth = static_cast<int>(
-    static_cast<float>(sourceTexture ? sourceTexture->_width :
-                                       _engine->getRenderingCanvas()->width)
-    * _renderRatio);
-  const int requiredHeight = static_cast<int>(
-    static_cast<float>(sourceTexture ? sourceTexture->_height :
-                                       _engine->getRenderingCanvas()->height)
-    * _renderRatio);
+    const int requiredWidth = static_cast<int>(
+      static_cast<float>(sourceTexture ? sourceTexture->_width :
+                                         _engine->getRenderingCanvas()->width)
+      * _renderRatio);
+    const int requiredHeight = static_cast<int>(
+      static_cast<float>(sourceTexture ? sourceTexture->_height :
+                                         _engine->getRenderingCanvas()->height)
+      * _renderRatio);
 
-  int desiredWidth  = _options.width == -1 ? requiredWidth : _options.width;
-  int desiredHeight = _options.height == -1 ? requiredHeight : _options.height;
+    int desiredWidth = _options.width == -1 ? requiredWidth : _options.width;
+    int desiredHeight
+      = _options.height == -1 ? requiredHeight : _options.height;
 
-  if (renderTargetSamplingMode != TextureConstants::NEAREST_SAMPLINGMODE) {
-    if (_options.width <= 0) {
-      desiredWidth = Tools::GetExponentOfTwo(desiredWidth, maxSize);
-    }
-
-    if (_options.height <= 0) {
-      desiredHeight = Tools::GetExponentOfTwo(desiredHeight, maxSize);
-    }
-  }
-
-  if (width != desiredWidth || height != desiredHeight) {
-    if (!_textures.empty()) {
-      for (auto& texture : _textures) {
-        _engine->_releaseTexture(texture);
+    if (renderTargetSamplingMode != TextureConstants::NEAREST_SAMPLINGMODE) {
+      if (_options.width <= 0) {
+        desiredWidth = Tools::GetExponentOfTwo(desiredWidth, maxSize);
       }
-      _textures.clear();
+
+      if (_options.height <= 0) {
+        desiredHeight = Tools::GetExponentOfTwo(desiredHeight, maxSize);
+      }
     }
-    width  = desiredWidth;
-    height = desiredHeight;
 
-    auto textureSize = ISize(width, height);
-    IRenderTargetOptions textureOptions;
-    textureOptions.generateMipMaps = false;
-    textureOptions.generateDepthBuffer
-      = stl_util::index_of(pCamera->_postProcesses, this) == 0;
-    textureOptions.generateStencilBuffer
-      = (stl_util::index_of(pCamera->_postProcesses, this) == 0)
-        && _engine->isStencilEnable();
-    textureOptions.samplingMode = renderTargetSamplingMode;
-    textureOptions.type         = _textureType;
+    if (width != desiredWidth || height != desiredHeight) {
+      if (!_textures.empty()) {
+        for (auto& texture : _textures) {
+          _engine->_releaseTexture(texture);
+        }
+        _textures.clear();
+      }
+      width  = desiredWidth;
+      height = desiredHeight;
 
-    _textures.emplace_back(
-      _engine->createRenderTargetTexture(textureSize, textureOptions));
+      auto textureSize = ISize(width, height);
+      IRenderTargetOptions textureOptions;
+      textureOptions.generateMipMaps = false;
+      textureOptions.generateDepthBuffer
+        = stl_util::index_of(pCamera->_postProcesses, this) == 0;
+      textureOptions.generateStencilBuffer
+        = (stl_util::index_of(pCamera->_postProcesses, this) == 0)
+          && _engine->isStencilEnable();
+      textureOptions.samplingMode = renderTargetSamplingMode;
+      textureOptions.type         = _textureType;
 
-    if (_reusable) {
       _textures.emplace_back(
         _engine->createRenderTargetTexture(textureSize, textureOptions));
+
+      if (_reusable) {
+        _textures.emplace_back(
+          _engine->createRenderTargetTexture(textureSize, textureOptions));
+      }
+
+      onSizeChangedObservable.notifyObservers(this);
     }
 
-    onSizeChangedObservable.notifyObservers(this);
-  }
-
-  for (auto& texture : _textures) {
-    if (texture->samples != samples) {
-      _engine->updateRenderTargetTextureSampleCount(texture, samples);
+    for (auto& texture : _textures) {
+      if (texture->samples != samples) {
+        _engine->updateRenderTargetTextureSampleCount(texture, samples);
+      }
     }
-  }
+
+    auto target = _shareOutputWithPostProcess ? _shareOutputWithPostProcess->outputTexture() : outputTexture();
 
   if (enablePixelPerfectMode) {
     _scaleRatio.copyFromFloats(
       static_cast<float>(requiredWidth) / static_cast<float>(desiredWidth),
       static_cast<float>(requiredHeight) / static_cast<float>(desiredHeight));
-    _engine->bindFramebuffer(_textures[_currentRenderTextureInd], 0,
+    _engine->bindFramebuffer(target, 0,
                              requiredWidth, requiredHeight);
   }
   else {
     _scaleRatio.copyFromFloats(1.f, 1.f);
-    _engine->bindFramebuffer(_textures[_currentRenderTextureInd]);
+    _engine->bindFramebuffer(target);
   }
 
   onActivateObservable.notifyObservers(camera);
@@ -243,6 +281,16 @@ void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture)
   if (_reusable) {
     _currentRenderTextureInd = (_currentRenderTextureInd + 1) % 2;
   }
+
+  // Alpha
+  _engine->setAlphaMode(static_cast<int>(alphaMode));
+  if (alphaConstants) {
+    const auto& _alphaConstants = alphaConstants.value;
+    getEngine()->setAlphaConstants(_alphaConstants.r, _alphaConstants.g,
+                                   _alphaConstants.b, _alphaConstants.a);
+  }
+
+  }
 }
 
 bool PostProcess::isSupported() const
@@ -253,19 +301,21 @@ bool PostProcess::isSupported() const
 Effect* PostProcess::apply()
 {
   // Check
-  if (!_effect->isReady()) {
+  if (!_effect || !_effect->isReady()) {
     return nullptr;
   }
 
   // States
   _engine->enableEffect(_effect);
   _engine->setState(false);
-  _engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
   _engine->setDepthBuffer(false);
   _engine->setDepthWrite(false);
 
   // Texture
-  _effect->_bindTexture("textureSampler", _textures[_currentRenderTextureInd]);
+  auto source = _shareOutputWithPostProcess ?
+                  _shareOutputWithPostProcess->outputTexture() :
+                  outputTexture();
+  _effect->_bindTexture("textureSampler", source);
 
   // Parameters
   _effect->setVector2("scale", _scaleRatio);
@@ -274,9 +324,11 @@ Effect* PostProcess::apply()
   return _effect;
 }
 
-void PostProcess::dispose(Camera* camera)
+void PostProcess::_disposeTextures()
 {
-  auto pCamera = camera ? camera : _camera;
+  if (_shareOutputWithPostProcess) {
+    return;
+  }
 
   if (!_textures.empty()) {
     for (auto& texture : _textures) {
@@ -285,6 +337,13 @@ void PostProcess::dispose(Camera* camera)
   }
 
   _textures.clear();
+}
+
+void PostProcess::dispose(Camera* camera)
+{
+  auto pCamera = camera ? camera : _camera;
+
+  _disposeTextures();
 
   if (!pCamera) {
     return;
