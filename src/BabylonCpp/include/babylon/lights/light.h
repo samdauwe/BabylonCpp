@@ -20,6 +20,7 @@ public:
    * after every other light calculations.
    */
   static constexpr unsigned int LIGHTMAP_DEFAULT = 0;
+
   /**
    * If every light affecting the material is in this lightmapMode,
    * material.lightmapTexture adds or multiplies
@@ -27,12 +28,62 @@ public:
    * after every other light calculations.
    */
   static constexpr unsigned int LIGHTMAP_SPECULAR = 1;
+
   /**
    * material.lightmapTexture as only diffuse lighting from this light
    * adds pnly specular lighting from this light
    * adds dynamic shadows
    */
   static constexpr unsigned int LIGHTMAP_SHADOWSONLY = 2;
+
+  // Intensity Mode Consts
+  /**
+   * Each light type uses the default quantity according to its type:
+   *      point/spot lights use luminous intensity
+   *      directional lights use illuminance
+   */
+  static constexpr unsigned int INTENSITYMODE_AUTOMATIC = 0;
+
+  /**
+   * lumen (lm)
+   */
+  static constexpr unsigned int INTENSITYMODE_LUMINOUSPOWER = 1;
+
+  /**
+   * candela (lm/sr)
+   */
+  static constexpr unsigned int INTENSITYMODE_LUMINOUSINTENSITY = 2;
+
+  /**
+   * lux (lm/m^2)
+   */
+  static constexpr unsigned int INTENSITYMODE_ILLUMINANCE = 3;
+
+  /**
+   * nit (cd/m^2)
+   */
+  static constexpr unsigned int INTENSITYMODE_LUMINANCE = 4;
+
+  // Light types ids const.
+  /**
+   * Light type const id of the point light.
+   */
+  static constexpr unsigned int LIGHTTYPEID_POINTLIGHT = 0;
+
+  /**
+   * Light type const id of the directional light.
+   */
+  static constexpr unsigned int LIGHTTYPEID_DIRECTIONALLIGHT = 1;
+
+  /**
+   * Light type const id of the spot light.
+   */
+  static constexpr unsigned int LIGHTTYPEID_SPOTLIGHT = 2;
+
+  /**
+   * Light type const id of the hemispheric light.
+   */
+  static constexpr unsigned int LIGHTTYPEID_HEMISPHERICLIGHT = 3;
 
 public:
   ~Light();
@@ -59,6 +110,33 @@ public:
   void setEnabled(bool value);
 
   //** Getters / Setters **/
+  /**
+   * @brief Gets the photometric scale used to interpret the intensity.
+   * This is only relevant with PBR Materials where the light intensity can be
+   * defined in a physical way.
+   */
+  unsigned int intensityMode() const;
+
+  /**
+   * @brief Sets the photometric scale used to interpret the intensity.
+   * This is only relevant with PBR Materials where the light intensity can be
+   * defined in a physical way.
+   */
+  void setIntensityMode(unsigned int value);
+
+  /**
+   * @brief Gets the light radius used by PBR Materials to simulate soft area
+   * lights.
+   */
+  float radius() const;
+
+  /**
+   * @brief Sets the light radius used by PBR Materials to simulate soft area
+   * lights.
+   */
+  void setRadius(float value);
+
+  int renderPriority() const;
   std::vector<AbstractMesh*>& includedOnlyMeshes();
   void setIncludedOnlyMeshes(const std::vector<AbstractMesh*>& value);
   std::vector<AbstractMesh*>& excludedMeshes();
@@ -111,6 +189,12 @@ public:
   virtual unsigned int getTypeID() const;
 
   /**
+   * @brief Returns the intensity scaled by the Photometric Scale according to
+   * the light type and intensity mode.
+   */
+  float getScaledIntensity() const;
+
+  /**
    * @brief Returns a new Light object, named "name", from the current one.
    */
   std::unique_ptr<Light> clone(const std::string& name);
@@ -122,6 +206,15 @@ public:
   Json::object serialize() const;
 
   // Statics
+
+  /**
+   * @brief Sort function to order lights for rendering.
+   * @param a First Light object to compare to second.
+   * @param b Second Light object to compare first.
+   * @return -1 to reduce's a's index relative to be, 0 for no change, 1 to
+   * increase a's index relative to b.
+   */
+  static int compareLightsPriority(Light* a, Light* b);
 
   /**
    * @brief Creates a new typed light from the passed type (integer) : point
@@ -151,12 +244,32 @@ private:
   void _hookArrayForIncludedOnly(const std::vector<AbstractMesh*>& array);
   void _resyncMeshes();
 
+  /**
+   * @brief Recomputes the cached photometric scale if needed.
+   */
+  void _computePhotometricScale();
+
+  /**
+   * @brief Returns the Photometric Scale according to the light type and
+   * intensity mode.
+   */
+  float _getPhotometricScale();
+
+  /**
+   * @brief Reorders the lights in the scene.
+   */
+  void _reorderLightsInScene();
+
 public:
   Color3 diffuse;
   Color3 specular;
   float intensity;
   float range;
-  float radius;
+  /**
+   * Defines wether or not the shadows are enabled for this light. This can help
+   * turning off/on shadow without detaching the current shadow generator.
+   */
+  bool shadowEnabled;
   ShadowGenerator* _shadowGenerator;
   std::vector<std::string> _excludedMeshesIds;
   std::vector<std::string> _includedOnlyMeshesIds;
@@ -164,6 +277,19 @@ public:
   std::unique_ptr<UniformBuffer> _uniformBuffer;
 
 private:
+  /**
+   * Cached photometric scale default to 1.0 as the automatic intensity mode
+   * defaults to 1.0 for every type
+   * of light.
+   */
+  float _photometricScale;
+  unsigned int _intensityMode;
+  float _radius;
+  /**
+   * Defines the rendering priority of the lights. It can help in case of
+   * fallback or number of lights exceeding the number allowed of the materials.
+   */
+  int _renderPriority;
   std::vector<AbstractMesh*> _includedOnlyMeshes;
   std::vector<AbstractMesh*> _excludedMeshes;
   unsigned int _includeOnlyWithLayerMask;

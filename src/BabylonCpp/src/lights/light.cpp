@@ -20,9 +20,13 @@ Light::Light(const std::string& iName, Scene* scene)
     , specular{Color3(1.f, 1.f, 1.f)}
     , intensity{1.f}
     , range{std::numeric_limits<float>::max()}
-    , radius{0.00001f}
+    , shadowEnabled{true}
     , _shadowGenerator{nullptr}
     , _uniformBuffer{std::make_unique<UniformBuffer>(scene->getEngine())}
+    , _photometricScale{1.f}
+    , _intensityMode{Light::INTENSITYMODE_AUTOMATIC}
+    , _radius{0.00001f}
+    , _renderPriority{0}
     , _includedOnlyMeshes{}
     , _excludedMeshes{}
     , _includeOnlyWithLayerMask{0}
@@ -80,6 +84,33 @@ void Light::setEnabled(bool value)
 {
   Node::setEnabled(value);
   _resyncMeshes();
+}
+
+unsigned int Light::intensityMode() const
+{
+  return _intensityMode;
+}
+
+void Light::setIntensityMode(unsigned int value)
+{
+  _intensityMode = value;
+  _computePhotometricScale();
+}
+
+float Light::radius() const
+{
+  return _radius;
+}
+
+void Light::setRadius(float value)
+{
+  _radius = value;
+  _computePhotometricScale();
+}
+
+int Light::renderPriority() const
+{
+  return _renderPriority;
 }
 
 std::vector<AbstractMesh*>& Light::includedOnlyMeshes()
@@ -219,6 +250,16 @@ Matrix* Light::getWorldMatrix()
   return worldMatrix;
 }
 
+int Light::compareLightsPriority(Light* a, Light* b)
+{
+  // shadow-casting lights have priority over non-shadow-casting lights
+  // the renderPrioirty is a secondary sort criterion
+  if (a->shadowEnabled != b->shadowEnabled) {
+    return (b->shadowEnabled ? 1 : 0) - (a->shadowEnabled ? 1 : 0);
+  }
+  return b->renderPriority() - a->renderPriority();
+}
+
 void Light::dispose(bool /*doNotRecurse*/)
 {
   if (_shadowGenerator) {
@@ -245,6 +286,11 @@ void Light::dispose(bool /*doNotRecurse*/)
 unsigned int Light::getTypeID() const
 {
   return 0;
+}
+
+float Light::getScaledIntensity() const
+{
+  return _photometricScale * intensity;
 }
 
 std::unique_ptr<Light> Light::clone(const std::string& /*name*/)
@@ -343,6 +389,83 @@ void Light::_markMeshesAsLightDirty()
       mesh->_markSubMeshesAsLightDirty();
     }
   }
+}
+
+void Light::_computePhotometricScale()
+{
+  _photometricScale = _getPhotometricScale();
+  getScene()->resetCachedMaterial();
+}
+
+float Light::_getPhotometricScale()
+{
+  float photometricScale = 0.f;
+  auto lightTypeID       = getTypeID();
+
+  // get photometric mode
+  auto photometricMode = intensityMode();
+  if (photometricMode == Light::INTENSITYMODE_AUTOMATIC) {
+    if (lightTypeID == Light::LIGHTTYPEID_DIRECTIONALLIGHT) {
+      photometricMode = Light::INTENSITYMODE_ILLUMINANCE;
+    }
+    else {
+      photometricMode = Light::INTENSITYMODE_LUMINOUSINTENSITY;
+    }
+  }
+
+  // compute photometric scale
+  switch (lightTypeID) {
+    case Light::LIGHTTYPEID_POINTLIGHT:
+    case Light::LIGHTTYPEID_SPOTLIGHT:
+      switch (photometricMode) {
+        case Light::INTENSITYMODE_LUMINOUSPOWER:
+          photometricScale = 1.f / (4.f * Math::PI);
+          break;
+        case Light::INTENSITYMODE_LUMINOUSINTENSITY:
+          photometricScale = 1.f;
+          break;
+        case Light::INTENSITYMODE_LUMINANCE:
+          photometricScale = radius() * radius();
+          break;
+      }
+      break;
+
+    case Light::LIGHTTYPEID_DIRECTIONALLIGHT:
+      switch (photometricMode) {
+        case Light::INTENSITYMODE_ILLUMINANCE:
+          photometricScale = 1.f;
+          break;
+        case Light::INTENSITYMODE_LUMINANCE:
+          // When radius (and therefore solid angle) is non-zero a directional
+          // lights brightness can be specified via central (peak) luminance.
+          // For a directional light the 'radius' defines the angular radius (in
+          // radians) rather than world-space radius (e.g. in metres).
+          auto apexAngleRadians = radius();
+          // Impose a minimum light angular size to avoid the light becoming an
+          // infinitely small angular light source (i.e. a dirac delta
+          // function).
+          apexAngleRadians = std::max(apexAngleRadians, 0.001f);
+          auto solidAngle = 2.f * Math::PI * (1.f - std::cos(apexAngleRadians));
+          photometricScale = solidAngle;
+          break;
+      }
+      break;
+
+    case Light::LIGHTTYPEID_HEMISPHERICLIGHT:
+      // No fall off in hemisperic light.
+      photometricScale = 1.f;
+      break;
+  }
+  return photometricScale;
+}
+
+void Light::_reorderLightsInScene()
+{
+  auto scene = getScene();
+  if (renderPriority() != 0) {
+    scene->requireLightSorting = true;
+  }
+  scene->sortLightsByPriority();
 }
 
 } // end of namespace BABYLON
