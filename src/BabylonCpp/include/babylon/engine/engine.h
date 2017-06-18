@@ -24,6 +24,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT Engine : public IDisposable {
 
 public:
+  using ArrayBufferViewArray   = std::vector<ArrayBufferView>;
   using GLBufferPtr            = std::unique_ptr<GL::IGLBuffer>;
   using GLFrameBufferPtr       = std::unique_ptr<GL::IGLFramebuffer>;
   using GLFrameProgramPtr      = std::unique_ptr<GL::IGLProgram>;
@@ -59,6 +60,7 @@ public:
 
   // Empty texture
   GL::IGLTexture* emptyTexture();
+  GL::IGLTexture* emptyCubeTexture();
 
   /**
    * @brief Returns true if the stencil buffer has been enabled through the
@@ -303,7 +305,7 @@ public:
   bool getAlphaTesting() const;
 
   /** Textures **/
-  void wipeCaches();
+  void wipeCaches(bool bruteForce = false);
 
   /**
    * @brief Set the compressed texture format to use, based on the formats you
@@ -379,6 +381,28 @@ public:
                     const std::function<void()>& onError = nullptr,
                     unsigned int format                  = 0);
   void updateTextureSize(GL::IGLTexture* texture, int width, int height);
+  void updateRawCubeTexture(GL::IGLTexture* texture,
+                            const std::vector<Uint8Array>& data,
+                            unsigned int format, unsigned int type,
+                            bool invertY                   = true,
+                            const std::string& compression = "",
+                            unsigned int level             = 0);
+  GL::IGLTexture* createRawCubeTexture(const std::vector<Uint8Array> data,
+                                       int size, unsigned int format,
+                                       unsigned int type, bool generateMipMaps,
+                                       bool invertY, unsigned int samplingMode,
+                                       const std::string& compression = "");
+  GL::IGLTexture* createRawCubeTextureFromUrl(
+    const std::string& url, Scene* scene, int size, unsigned int format,
+    unsigned int type, bool noMipmap,
+    const std::function<ArrayBufferViewArray(const Uint8Array& arrayBuffer)>&
+      callback,
+    const std::function<std::vector<ArrayBufferViewArray>(
+      const ArrayBufferViewArray& faces)>& mipmmapGenerator,
+    const std::function<void()>& onLoad  = nullptr,
+    const std::function<void()>& onError = nullptr,
+    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
+    bool invertY              = false);
   void _releaseTexture(GL::IGLTexture* texture);
   void bindSamplers(Effect* effect);
   void _bindTextureDirectly(unsigned int target, GL::IGLTexture* texture);
@@ -589,6 +613,7 @@ private:
   bool _vaoRecordInProgress;
   bool _mustWipeVertexAttributes;
   GL::IGLTexture* _emptyTexture;
+  GL::IGLTexture* _emptyCubeTexture;
   // Hardware supported Compressed Textures
   std::vector<std::string> _texturesSupported;
   std::string _textureFormatInUse;

@@ -18,6 +18,7 @@ struct BABYLON_SHARED_EXPORT EngineConstants {
   static constexpr unsigned int ALPHA_PREMULTIPLIED            = 7;
   static constexpr unsigned int ALPHA_PREMULTIPLIED_PORTERDUFF = 8;
   static constexpr unsigned int ALPHA_INTERPOLATE              = 9;
+  static constexpr unsigned int ALPHA_SCREENMODE               = 10;
 
   static constexpr unsigned int DELAYLOADSTATE_NONE      = 0;
   static constexpr unsigned int DELAYLOADSTATE_LOADED    = 1;
@@ -64,7 +65,7 @@ struct BABYLON_SHARED_EXPORT EngineConstants {
   static constexpr unsigned int NOTEQUAL = 0x0205;
 
   // Half floating-point type (16-bit).
-  static constexpr unsigned int HALF_FLOAT_OES = 0x8D61;
+  static unsigned int HALF_FLOAT_OES;
   // RGBA 16-bit floating-point color-renderable internal sized format.
   static constexpr unsigned int RGBA16F = 0x881A;
   // RGBA 32-bit floating-point color-renderable internal sized format.
@@ -78,6 +79,11 @@ struct BABYLON_SHARED_EXPORT EngineConstants {
   static constexpr unsigned int INVERT    = 0x150A;
   static constexpr unsigned int INCR_WRAP = 0x8507;
   static constexpr unsigned int DECR_WRAP = 0x8508;
+
+  // Texture rescaling mode
+  static constexpr unsigned int SCALEMODE_FLOOR   = 1;
+  static constexpr unsigned int SCALEMODE_NEAREST = 2;
+  static constexpr unsigned int SCALEMODE_CEILING = 3;
 
 }; // end of struct EngineConstants
 

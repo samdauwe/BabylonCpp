@@ -68,6 +68,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _vaoRecordInProgress{false}
     , _mustWipeVertexAttributes{false}
     , _emptyTexture{nullptr}
+    , _emptyCubeTexture{nullptr}
 {
   Engine::Instances.emplace_back(this);
 
@@ -165,6 +166,10 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     = _gl->getShaderPrecisionFormat(GL::FRAGMENT_SHADER, GL::HIGH_FLOAT);
   _caps.highPrecisionShaderSupported = highp ? highp->precision != 0 : false;
 
+  if (_webGLVersion > 1.f) {
+    EngineConstants::HALF_FLOAT_OES = 0x140B;
+  }
+
   // Depth buffer
   setDepthBuffer(true);
   setDepthFunctionToLessOrEqual();
@@ -248,6 +253,21 @@ GL::IGLTexture* Engine::emptyTexture()
   }
 
   return _emptyTexture;
+}
+
+GL::IGLTexture* Engine::emptyCubeTexture()
+{
+  if (!_emptyCubeTexture) {
+    Uint8Array faceData(4);
+    std::vector<Uint8Array> cubeData
+      = {faceData, faceData, faceData, faceData, faceData, faceData};
+    _emptyCubeTexture
+      = createRawCubeTexture(cubeData, 1, EngineConstants::TEXTUREFORMAT_RGBA,
+                             EngineConstants::TEXTURETYPE_UNSIGNED_INT, false,
+                             false, TextureConstants::NEAREST_SAMPLINGMODE);
+  }
+
+  return _emptyCubeTexture;
 }
 
 bool Engine::isStencilEnable() const
@@ -1846,6 +1866,11 @@ void Engine::setAlphaMode(int mode, bool noDepthWriteChange)
         GL::ONE_MINUS_CONSTANT_ALPHA);
       _alphaState->setAlphaBlend(true);
       break;
+    case EngineConstants::ALPHA_SCREENMODE:
+      _alphaState->setAlphaBlendFunctionParameters(
+        GL::ONE, GL::ONE_MINUS_SRC_COLOR, GL::ONE, GL::ONE_MINUS_SRC_ALPHA);
+      _alphaState->setAlphaBlend(true);
+      break;
     default:
       break;
   }
@@ -1871,7 +1896,7 @@ bool Engine::getAlphaTesting() const
 }
 
 // Textures
-void Engine::wipeCaches()
+void Engine::wipeCaches(bool bruteForce)
 {
   if (preventCacheWipeBetweenFrames) {
     return;
@@ -1879,10 +1904,12 @@ void Engine::wipeCaches()
   resetTextureCache();
   _currentEffect = nullptr;
 
-  _stencilState->reset();
-  _depthCullingState->reset();
-  setDepthFunctionToLessOrEqual();
-  _alphaState->reset();
+  if (bruteForce) {
+    _stencilState->reset();
+    _depthCullingState->reset();
+    setDepthFunctionToLessOrEqual();
+    _alphaState->reset();
+  }
 
   _cachedVertexBuffers          = nullptr;
   _cachedIndexBuffer            = nullptr;
@@ -2641,6 +2668,156 @@ void Engine::updateTextureSize(GL::IGLTexture* texture, int width, int height)
   texture->_baseHeight = height;
 }
 
+void Engine::updateRawCubeTexture(GL::IGLTexture* texture,
+                                  const std::vector<Uint8Array>& /*data*/,
+                                  unsigned int format, unsigned int /*type*/,
+                                  bool invertY, const std::string& compression,
+                                  unsigned int level)
+{
+  // auto textureType        = _getWebGLTextureType(type);
+  auto internalFormat = _getInternalFormat(format);
+  // auto internalSizedFomat = _getRGBABufferInternalSizedFormat(type);
+
+  bool needConversion = false;
+  if (internalFormat == GL::RGB) {
+    internalFormat = GL::RGBA;
+    needConversion = true;
+  }
+
+  _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture);
+  _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL, invertY ? 1 : 0);
+
+  if (texture->_width % 4 != 0) {
+    _gl->pixelStorei(GL::UNPACK_ALIGNMENT, 1);
+  }
+
+  const std::vector<unsigned int> facesIndex
+    = {GL::TEXTURE_CUBE_MAP_POSITIVE_X, GL::TEXTURE_CUBE_MAP_POSITIVE_Y,
+       GL::TEXTURE_CUBE_MAP_POSITIVE_Z, GL::TEXTURE_CUBE_MAP_NEGATIVE_X,
+       GL::TEXTURE_CUBE_MAP_NEGATIVE_Y, GL::TEXTURE_CUBE_MAP_NEGATIVE_Z};
+
+  // Data are known to be in +X +Y +Z -X -Y -Z
+  for (std::size_t index = 0; index < facesIndex.size(); ++index) {
+    // const auto& faceData = data[index];
+
+    if (!compression.empty()) {
+      // _gl->compressedTexImage2D(facesIndex[index], level,
+      // getCaps().s3tc[compression], texture->_width, texture->_height, 0,
+      // faceData);
+    }
+    else {
+      if (needConversion) {
+        // faceData = _convertRGBtoRGBATextureData(faceData, texture->_width,
+        // texture->_height, type);
+      }
+      // _gl->texImage2D(facesIndex[index], level, internalSizedFomat,
+      // texture->_width, texture->_height, 0, internalFormat, textureType,
+      // faceData);
+    }
+  }
+
+  auto isPot = (Tools::IsExponentOfTwo(texture->_width)
+                && Tools::IsExponentOfTwo(texture->_height));
+  if (isPot && texture->generateMipMaps && level == 0) {
+    _gl->generateMipmap(GL::TEXTURE_CUBE_MAP);
+  }
+  _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
+
+  resetTextureCache();
+  texture->isReady = true;
+}
+
+GL::IGLTexture* Engine::createRawCubeTexture(const std::vector<Uint8Array> data,
+                                             int size, unsigned int format,
+                                             unsigned int type,
+                                             bool generateMipMaps, bool invertY,
+                                             unsigned int samplingMode,
+                                             const std::string& compression)
+{
+  auto texture        = _gl->createTexture();
+  texture->isCube     = true;
+  texture->references = 1;
+
+  auto textureType    = _getWebGLTextureType(type);
+  auto internalFormat = _getInternalFormat(format);
+
+  if (internalFormat == GL::RGB) {
+    internalFormat = GL::RGBA;
+  }
+
+  int width  = size;
+  int height = width;
+
+  texture->_width  = width;
+  texture->_height = height;
+
+  // Double check on POT to generate Mips.
+  auto isPot = (Tools::IsExponentOfTwo(texture->_width)
+                && Tools::IsExponentOfTwo(texture->_height));
+  if (!isPot) {
+    generateMipMaps = false;
+  }
+  texture->generateMipMaps = generateMipMaps;
+
+  // Upload data if needed. The texture won t be ready until then.
+  if (!data.empty()) {
+    updateRawCubeTexture(texture.get(), data, format, type, invertY,
+                         compression);
+  }
+
+  _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture.get());
+
+  // Filters
+  if (!data.empty() && generateMipMaps) {
+    _gl->generateMipmap(GL::TEXTURE_CUBE_MAP);
+  }
+
+  if (textureType == GL::FLOAT && !_caps.textureFloatLinearFiltering) {
+    _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER,
+                       GL::NEAREST);
+    _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MIN_FILTER,
+                       GL::NEAREST);
+  }
+  else if (textureType == EngineConstants::HALF_FLOAT_OES
+           && !_caps.textureHalfFloatLinearFiltering) {
+    _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER,
+                       GL::NEAREST);
+    _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MIN_FILTER,
+                       GL::NEAREST);
+  }
+  else {
+    auto filters = GetSamplingParameters(samplingMode, generateMipMaps);
+    _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER,
+                       filters.mag);
+    _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MIN_FILTER,
+                       filters.min);
+  }
+
+  _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_S,
+                     GL::CLAMP_TO_EDGE);
+  _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_T,
+                     GL::CLAMP_TO_EDGE);
+  _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
+
+  _loadedTexturesCache.emplace_back(std::move(texture));
+
+  return _loadedTexturesCache.back().get();
+}
+
+GL::IGLTexture* Engine::createRawCubeTextureFromUrl(
+  const std::string& /*url*/, Scene* /*scene*/, int /*size*/,
+  unsigned int /*format*/, unsigned int /*type*/, bool /*noMipmap*/,
+  const std::function<ArrayBufferViewArray(const Uint8Array& arrayBuffer)>&
+  /*callback*/,
+  const std::function<std::vector<ArrayBufferViewArray>(
+    const ArrayBufferViewArray& faces)>& /*mipmmapGenerator*/,
+  const std::function<void()>& /*onLoad*/,
+  const std::function<void()>& /*onError*/, unsigned int /*samplingMode*/,
+  bool /*invertY*/)
+{
+  return nullptr;
+}
+
 ArrayBufferView
 Engine::_convertRGBtoRGBATextureData(const ArrayBufferView& rgbData, int width,
                                      int height, unsigned int textureType)
@@ -2811,7 +2988,9 @@ void Engine::_setTexture(unsigned int channel, BaseTexture* texture)
   }
 
   auto internalTexture
-    = texture->isReady() ? texture->getInternalTexture() : emptyTexture();
+    = texture->isReady() ?
+        texture->getInternalTexture() :
+        (texture->isCube ? emptyCubeTexture() : emptyTexture());
 
   if (_activeTexturesCache[channel] == internalTexture) {
     return;
@@ -3007,6 +3186,11 @@ void Engine::dispose(bool /*doNotRecurse*/)
   if (_emptyTexture) {
     _releaseTexture(_emptyTexture);
     _emptyTexture = nullptr;
+  }
+
+  if (_emptyCubeTexture) {
+    _releaseTexture(_emptyCubeTexture);
+    _emptyCubeTexture = nullptr;
   }
 
   // Release scenes
