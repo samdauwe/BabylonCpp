@@ -30,7 +30,9 @@
 #include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/multi_material.h>
+#include <babylon/materials/pbr_material.h>
 #include <babylon/materials/standard_material.h>
+#include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/multi_render_target.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
@@ -67,6 +69,7 @@ bool Scene::ExclusiveDoubleClickMode      = false;
 
 Scene::Scene(Engine* engine)
     : autoClear{true}
+    , autoClearDepthAndStencil{true}
     , clearColor{Color4(0.2f, 0.2f, 0.3f, 1.f)}
     , ambientColor{Color3(0.f, 0.f, 0.f)}
     , pointerDownPredicate{nullptr}
@@ -103,7 +106,9 @@ Scene::Scene(Engine* engine)
     , _cachedMaterial{nullptr}
     , _cachedEffect{nullptr}
     , _cachedVisibility{0.f}
+    , requireLightSorting{false}
     , offscreenRenderTarget{nullptr}
+    , _environmentTexture{nullptr}
     , _onDisposeObserver{nullptr}
     , _onBeforeRenderObserver{nullptr}
     , _onAfterRenderObserver{nullptr}
@@ -251,6 +256,17 @@ Vector2 Scene::unTranslatedPointer() const
 }
 
 // Properties
+
+BaseTexture* Scene::environmentTexture()
+{
+  return _environmentTexture;
+}
+
+void Scene::setEnvironmentTexture(BaseTexture* value)
+{
+  _environmentTexture = value;
+  markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+}
 
 bool Scene::useRightHandedSystem() const
 {
@@ -1180,6 +1196,10 @@ Animatable* Scene::beginAnimation(IAnimatable* target, float from, float to,
                                   const std::function<void()>& onAnimationEnd,
                                   Animatable* animatable)
 {
+  if (from > to && speedRatio > 0.f) {
+    speedRatio *= -1;
+  }
+
   stopAnimation(target);
 
   if (!animatable) {
@@ -1409,6 +1429,7 @@ int Scene::removeLight(Light* toRemove)
   if (it != lights.end()) {
     // Remove from the scene if mesh found
     lights.erase(it);
+    sortLightsByPriority();
   }
 
   onLightRemovedObservable.notifyObservers(toRemove);
@@ -1453,7 +1474,15 @@ void Scene::addLight(std::unique_ptr<Light>&& newLight)
   newLight->uniqueId = getUniqueId();
   auto _newLight     = newLight.get();
   lights.emplace_back(std::move(newLight));
+  sortLightsByPriority();
   onNewLightAddedObservable.notifyObservers(_newLight);
+}
+
+void Scene::sortLightsByPriority()
+{
+  if (requireLightSorting) {
+    // lights.sort(Light::compareLightsPriority);
+  }
 }
 
 void Scene::addCamera(std::unique_ptr<Camera>&& newCamera)
@@ -1964,7 +1993,6 @@ void Scene::_evaluateActiveMeshes()
   if (_boundingBoxRenderer) {
     _boundingBoxRenderer->reset();
   }
-  _edgesRenderers.clear();
 
   if (!_frustumPlanesSet) {
     _frustumPlanes    = Frustum::GetPlanes(_transformMatrix);
@@ -2075,10 +2103,6 @@ void Scene::_activeMesh(AbstractMesh* mesh)
   if (mesh->showBoundingBox || forceShowBoundingBoxes) {
     getBoundingBoxRenderer()->renderList.emplace_back(
       mesh->getBoundingInfo()->boundingBox);
-  }
-
-  if (mesh->_edgesRenderer) {
-    _edgesRenderers.emplace_back(mesh->_edgesRenderer.get());
   }
 
   if (mesh && !mesh->subMeshes.empty()) {
@@ -2248,11 +2272,6 @@ void Scene::_renderForCamera(Camera* camera)
   // Bounding boxes
   if (_boundingBoxRenderer) {
     _boundingBoxRenderer->render();
-  }
-
-  // Edges
-  for (auto& _edgesRenderer : _edgesRenderers) {
-    _edgesRenderer->render();
   }
 
   // Lens flares
@@ -2452,16 +2471,18 @@ void Scene::render()
                           clearColor);
   }
   else {
-    _engine->clear(clearColor,
-                   autoClear || forceWireframe || forcePointsCloud(), true,
-                   true);
+    if (autoClearDepthAndStencil || autoClear) {
+      _engine->clear(clearColor,
+                     autoClear || forceWireframe || forcePointsCloud(),
+                     autoClearDepthAndStencil, autoClearDepthAndStencil);
+    }
   }
 
   // Shadows
   if (shadowsEnabled()) {
     for (auto& light : lights) {
       auto shadowGenerator = light->getShadowGenerator();
-      if (light->isEnabled() && shadowGenerator) {
+      if (light->isEnabled() && light->shadowEnabled && shadowGenerator) {
         auto shadowMap  = shadowGenerator->getShadowMap();
         auto& _textures = shadowGenerator->getShadowMap()->getScene()->textures;
         auto it         = std::find_if(
@@ -2693,7 +2714,6 @@ void Scene::dispose(bool /*doNotRecurse*/)
   if (_boundingBoxRenderer) {
     _boundingBoxRenderer->dispose();
   }
-  _edgesRenderers.clear();
   _meshesForIntersections.clear();
   _toBeDisposed.clear();
 
@@ -3076,6 +3096,55 @@ void Scene::createDefaultCameraOrLight(bool createArcRotateCamera)
     activeCamera  = camera;
   }
 }
+
+Mesh* Scene::createDefaultSkybox(BaseTexture* iEnvironmentTexture, bool pbr)
+{
+  if (environmentTexture()) {
+    setEnvironmentTexture(iEnvironmentTexture);
+  }
+
+  if (!environmentTexture()) {
+    BABYLON_LOG_WARN(
+      "Scene", "Can not create default skybox without environment texture.");
+    return nullptr;
+  }
+
+  if (!environmentTexture()) {
+    BABYLON_LOG_WARN(
+      "Scene", "Can not create default skybox without environment texture.");
+    return nullptr;
+  }
+
+  // Skybox
+  auto hdrSkybox = Mesh::CreateBox("hdrSkyBox", 1000.f, this);
+  if (pbr) {
+    auto hdrSkyboxMaterial = PBRMaterial::New("skyBox", this);
+    hdrSkyboxMaterial->setBackFaceCulling(false);
+    // hdrSkyboxMaterial->reflectionTexture = environmentTexture();
+    hdrSkyboxMaterial->reflectionTexture->coordinatesMode
+      = TextureConstants::SKYBOX_MODE;
+    hdrSkyboxMaterial->microSurface    = 1.f;
+    hdrSkyboxMaterial->disableLighting = true;
+    hdrSkybox->infiniteDistance        = true;
+    hdrSkybox->setMaterial(hdrSkyboxMaterial);
+  }
+  else {
+    auto skyboxMaterial = StandardMaterial::New("skyBox", this);
+    skyboxMaterial->setBackFaceCulling(false);
+    // skyboxMaterial->reflectionTexture = environmentTexture();
+    // skyboxMaterial->reflectionTexture->coordinatesMode
+    //   = TextureConstants::SKYBOX_MODE;
+    skyboxMaterial->diffuseColor  = Color3(0.f, 0.f, 0.f);
+    skyboxMaterial->specularColor = Color3(0.f, 0.f, 0.f);
+    skyboxMaterial->setDisableLighting(true);
+    hdrSkybox->infiniteDistance = true;
+    hdrSkybox->setMaterial(skyboxMaterial);
+  }
+
+  return hdrSkybox;
+}
+
+// Tags
 
 std::vector<std::string> Scene::_getByTags()
 {

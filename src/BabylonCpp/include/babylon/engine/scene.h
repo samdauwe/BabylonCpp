@@ -60,6 +60,23 @@ public:
   Vector2 unTranslatedPointer() const;
 
   /** Properties **/
+
+  /**
+   * @brief Returns the texture used in all pbr material as the reflection
+   * texture.
+   * As in the majority of the scene they are the same (exception for multi room
+   * and so on), this is easier to reference from here than from all the
+   * materials.
+   */
+  BaseTexture* environmentTexture();
+
+  /**
+   * @brief Sets the texture used in all pbr material as the reflection texture.
+   * As in the majority of the scene they are the same (exception for multi room
+   * and so on), this is easier to set here than in all the materials.
+   */
+  void setEnvironmentTexture(BaseTexture* value);
+
   bool useRightHandedSystem() const;
   void setUseRightHandedSystem(bool value);
   bool forcePointsCloud() const;
@@ -232,6 +249,7 @@ public:
   int removeLight(Light* toRemove);
   int removeCamera(Camera* toRemove);
   void addLight(std::unique_ptr<Light>&& newLight);
+  void sortLightsByPriority();
   void addCamera(std::unique_ptr<Camera>&& newCamera);
 
   /**
@@ -539,6 +557,8 @@ public:
 
   /** Misc. **/
   void createDefaultCameraOrLight(bool createArcRotateCamera = false);
+  Mesh* createDefaultSkybox(BaseTexture* environmentTexture = nullptr,
+                            bool pbr                        = false);
 
   /** Tags **/
   std::vector<Mesh*> getMeshesByTags();
@@ -642,6 +662,7 @@ private:
 public:
   // Members
   bool autoClear;
+  bool autoClearDepthAndStencil;
   Color4 clearColor;
   Color3 ambientColor;
   // Events
@@ -851,7 +872,11 @@ public:
   std::vector<IDisposable*> _toBeDisposed;
   std::vector<ParticleSystem*> _activeParticleSystems;
   std::vector<Animatable*> _activeAnimatables;
+  bool requireLightSorting;
   RenderTargetTexture* offscreenRenderTarget;
+
+protected:
+  BaseTexture* _environmentTexture;
 
 private:
   // Events
@@ -971,7 +996,6 @@ private:
   Matrix _transformMatrix;
   std::unique_ptr<UniformBuffer> _sceneUbo;
   Matrix _pickWithRayInverseMatrix;
-  std::vector<EdgesRenderer*> _edgesRenderers;
   std::unique_ptr<BoundingBoxRenderer> _boundingBoxRenderer;
   std::unique_ptr<OutlineRenderer> _outlineRenderer;
   Matrix _viewMatrix;
