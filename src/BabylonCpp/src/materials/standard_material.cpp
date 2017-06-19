@@ -272,14 +272,14 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
   // Lights
   defines._needNormals = MaterialHelper::PrepareDefinesForLights(
     scene, mesh, defines, true, _maxSimultaneousLights, _disableLighting,
-    SMD::SPECULARTERM, SMD::SHADOWFULLFLOAT);
+    SMD::SPECULARTERM, SMD::SHADOWFLOAT);
 
   // Textures
   if (defines._areTexturesDirty) {
     defines._needUVs = false;
     if (scene->texturesEnabled()) {
       if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
-        if (!_diffuseTexture->isReady()) {
+        if (!_diffuseTexture->isReadyOrNotBlocking()) {
           return false;
         }
         else {
@@ -292,7 +292,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
       }
 
       if (_ambientTexture && StandardMaterial::AmbientTextureEnabled()) {
-        if (!_ambientTexture->isReady()) {
+        if (!_ambientTexture->isReadyOrNotBlocking()) {
           return false;
         }
         else {
@@ -305,7 +305,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
       }
 
       if (_opacityTexture && StandardMaterial::OpacityTextureEnabled()) {
-        if (!_opacityTexture->isReady()) {
+        if (!_opacityTexture->isReadyOrNotBlocking()) {
           return false;
         }
         else {
@@ -319,7 +319,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
       }
 
       if (_reflectionTexture && StandardMaterial::ReflectionTextureEnabled()) {
-        if (!_reflectionTexture->isReady()) {
+        if (!_reflectionTexture->isReadyOrNotBlocking()) {
           return false;
         }
         else {
@@ -372,7 +372,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
       }
 
       if (_emissiveTexture && StandardMaterial::EmissiveTextureEnabled()) {
-        if (!_emissiveTexture->isReady()) {
+        if (!_emissiveTexture->isReadyOrNotBlocking()) {
           return false;
         }
         else {
@@ -385,7 +385,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
       }
 
       if (_lightmapTexture && StandardMaterial::LightmapTextureEnabled()) {
-        if (!_lightmapTexture->isReady()) {
+        if (!_lightmapTexture->isReadyOrNotBlocking()) {
           return false;
         }
         else {
@@ -400,7 +400,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
       }
 
       if (_specularTexture && StandardMaterial::SpecularTextureEnabled()) {
-        if (!_specularTexture->isReady()) {
+        if (!_specularTexture->isReadyOrNotBlocking()) {
           return false;
         }
         else {
@@ -415,6 +415,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
 
       if (scene->getEngine()->getCaps().standardDerivatives && _bumpTexture
           && StandardMaterial::BumpTextureEnabled()) {
+        // Bump texure can not be none blocking.
         if (!_bumpTexture->isReady()) {
           return false;
         }
@@ -434,7 +435,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
       }
 
       if (_refractionTexture && StandardMaterial::RefractionTextureEnabled()) {
-        if (!_refractionTexture->isReady()) {
+        if (!_refractionTexture->isReadyOrNotBlocking()) {
           return false;
         }
         else {
@@ -450,6 +451,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
 
       if (_cameraColorGradingTexture
           && StandardMaterial::ColorGradingTextureEnabled()) {
+        // Camera Color Grading can not be none blocking.
         if (!_cameraColorGradingTexture->isReady()) {
           return false;
         }
