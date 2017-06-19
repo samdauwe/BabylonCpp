@@ -59,6 +59,8 @@ public:
    */
   bool isReady(SubMesh* subMesh, bool useInstances) override;
 
+  void recreateShadowMap() override;
+
   /**
    * @brief Returns a RenderTargetTexture object : the shadow map texture.
    */
@@ -106,7 +108,21 @@ public:
   /**
    * @brief Serializes the ShadowGenerator and returns a serializationObject.
    */
-  Json::object serialize() const;
+  Json::object serialize() const override;
+
+  /**
+   * @brief This creates the defines related to the standard BJS materials.
+   */
+  void prepareDefines(MaterialDefines& defines,
+                      unsigned int lightIndex) override;
+
+  /**
+   * @brief This binds shadow lights related to the standard BJS materials.
+   * It implies the unifroms available on the materials are the standard BJS
+   * ones.
+   */
+  bool bindShadowLight(const std::string& lightIndex, Effect* effect,
+                       bool depthValuesAlreadySet) override;
 
   // Statics
 
@@ -118,7 +134,10 @@ public:
                                 Scene* scene);
 
 private:
+  void _initializeGenerator(int boxBlurOffset);
+  void _applyFilterValues();
   Vector2 _packHalf(float depth);
+  void _disposeRTTandPostProcesses();
 
 public:
   float blurScale;
@@ -153,6 +172,7 @@ private:
   unsigned int _currentFaceIndexCache;
   bool _useFullFloat;
   unsigned int _textureType;
+  bool _isCube;
 
 }; // end of class ShadowGenerator
 
