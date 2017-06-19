@@ -94,6 +94,11 @@ void BaseTexture::setOnDispose(const std::function<void()>& callback)
   _onDisposeObserver = onDisposeObservable.add(callback);
 }
 
+bool BaseTexture::isBlocking() const
+{
+  return true;
+}
+
 Scene* BaseTexture::getScene() const
 {
   return _scene;
@@ -112,6 +117,11 @@ Matrix* BaseTexture::getReflectionTextureMatrix()
 GL::IGLTexture* BaseTexture::getInternalTexture()
 {
   return _texture;
+}
+
+bool BaseTexture::isReadyOrNotBlocking()
+{
+  return !isBlocking() || isReady();
 }
 
 bool BaseTexture::isReady()

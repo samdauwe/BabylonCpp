@@ -31,10 +31,12 @@ public:
   std::string uid();
   virtual std::string toString() const;
   void setOnDispose(const std::function<void()>& callback);
+  virtual bool isBlocking() const;
   Scene* getScene() const;
   virtual Matrix* getTextureMatrix();
   virtual Matrix* getReflectionTextureMatrix();
   GL::IGLTexture* getInternalTexture();
+  virtual bool isReadyOrNotBlocking();
   virtual bool isReady();
   ISize getSize() const;
   ISize getBaseSize();
