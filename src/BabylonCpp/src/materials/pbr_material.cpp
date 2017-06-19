@@ -236,7 +236,7 @@ void PBRMaterial::BindLights(Scene* scene, AbstractMesh* mesh, Effect* effect,
     light->_uniformBuffer->updateColor4(
       useUbo ? "vLightDiffuse" : "vLightDiffuse" + lightIndexStr,
       PBRMaterial::_scaledAlbedo,
-      usePhysicalLightFalloff ? light->radius : light->range, "");
+      usePhysicalLightFalloff ? light->radius() : light->range, "");
 
     if (defines[PMD::SPECULARTERM]) {
       ConvertColorToLinearSpaceToRef(light->specular,

@@ -300,7 +300,10 @@ void ColorCurves::setShadowsExposure(float value)
   _dirty           = true;
 }
 
-void ColorCurves::Bind(ColorCurves& colorCurves, Effect* effect)
+void ColorCurves::Bind(ColorCurves& colorCurves, Effect* effect,
+                       const std::string& positiveUniform,
+                       const std::string& neutralUniform,
+                       const std::string& negativeUniform)
 {
   if (colorCurves._dirty) {
     colorCurves._dirty = false;
@@ -342,13 +345,13 @@ void ColorCurves::Bind(ColorCurves& colorCurves, Effect* effect)
                                              colorCurves._negativeCurve);
   }
 
-  effect->setFloat4("vCameraColorCurvePositive", colorCurves._positiveCurve.r,
+  effect->setFloat4(positiveUniform, colorCurves._positiveCurve.r,
                     colorCurves._positiveCurve.g, colorCurves._positiveCurve.b,
                     colorCurves._positiveCurve.a);
-  effect->setFloat4("vCameraColorCurveNeutral", colorCurves._midtonesCurve.r,
+  effect->setFloat4(neutralUniform, colorCurves._midtonesCurve.r,
                     colorCurves._midtonesCurve.g, colorCurves._midtonesCurve.b,
                     colorCurves._midtonesCurve.a);
-  effect->setFloat4("vCameraColorCurveNegative", colorCurves._negativeCurve.r,
+  effect->setFloat4(negativeUniform, colorCurves._negativeCurve.r,
                     colorCurves._negativeCurve.g, colorCurves._negativeCurve.b,
                     colorCurves._negativeCurve.a);
 }
