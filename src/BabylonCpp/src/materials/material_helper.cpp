@@ -137,7 +137,7 @@ void MaterialHelper::PrepareDefinesForAttributes(
 bool MaterialHelper::PrepareDefinesForLights(
   Scene* scene, AbstractMesh* mesh, MaterialDefines& defines,
   bool specularSupported, unsigned int maxSimultaneousLights,
-  bool disableLighting, unsigned int SPECULARTERM, unsigned int SHADOWFULLFLOAT)
+  bool disableLighting, unsigned int SPECULARTERM, unsigned int SHADOWFLOAT)
 {
   if (!defines._areLightsDirty) {
     return defines._needNormals;
@@ -162,13 +162,13 @@ bool MaterialHelper::PrepareDefinesForLights(
       defines.pointlights[lightIndex] = false;
       defines.dirlights[lightIndex]   = false;
 
-      if (light->getTypeID() == 2) {
+      if (light->getTypeID() == Light::LIGHTTYPEID_SPOTLIGHT) {
         defines.spotlights[lightIndex] = true;
       }
-      else if (light->getTypeID() == 3) {
+      else if (light->getTypeID() == Light::LIGHTTYPEID_HEMISPHERICLIGHT) {
         defines.hemilights[lightIndex] = true;
       }
-      else if (light->getTypeID() == 0) {
+      else if (light->getTypeID() == Light::LIGHTTYPEID_POINTLIGHT) {
         defines.pointlights[lightIndex] = true;
       }
       else {
@@ -181,24 +181,17 @@ bool MaterialHelper::PrepareDefinesForLights(
       }
 
       // Shadows
-      defines.shadows[lightIndex] = false;
-      if (scene->shadowsEnabled()) {
+      defines.shadows[lightIndex]     = false;
+      defines.shadowpcfs[lightIndex]  = false;
+      defines.shadowesms[lightIndex]  = false;
+      defines.shadowcubes[lightIndex] = false;
+
+      if (mesh && mesh->receiveShadows() && scene->shadowsEnabled()
+          && light->shadowEnabled) {
         auto shadowGenerator = light->getShadowGenerator();
-        if (mesh && mesh->receiveShadows() && shadowGenerator) {
-          defines.shadows[lightIndex] = true;
-
+        if (shadowGenerator) {
           shadowEnabled = true;
-
-          defines.shadowpcfs[lightIndex] = false;
-          defines.shadowesms[lightIndex] = false;
-
-          if (shadowGenerator->usePoissonSampling()) {
-            defines.shadowpcfs[lightIndex] = true;
-          }
-          else if (shadowGenerator->useExponentialShadowMap()
-                   || shadowGenerator->useBlurExponentialShadowMap()) {
-            defines.shadowesms[lightIndex] = true;
-          }
+          shadowGenerator->prepareDefines(defines, lightIndex);
         }
       }
 
@@ -231,7 +224,7 @@ bool MaterialHelper::PrepareDefinesForLights(
 
   auto caps = scene->getEngine()->getCaps();
 
-  defines.defines[SHADOWFULLFLOAT]
+  defines.defines[SHADOWFLOAT]
     = (shadowEnabled && caps.textureFloat && caps.textureFloatLinearFiltering
        && caps.textureFloatRender);
   defines.LIGHTMAPEXCLUDED = lightmapMode;
@@ -401,34 +394,17 @@ void MaterialHelper::PrepareAttributesForInstances(
   }
 }
 
-bool MaterialHelper::BindLightShadow(Light* light, Scene* scene,
+bool MaterialHelper::BindLightShadow(Light* light, Scene* /*scene*/,
                                      AbstractMesh* mesh,
                                      unsigned int lightIndex, Effect* effect,
                                      bool depthValuesAlreadySet)
 {
-  auto shadowGenerator     = light->getShadowGenerator();
-  const auto lightIndexStr = std::to_string(lightIndex);
-
-  if (mesh->receiveShadows() && shadowGenerator) {
-    auto shadowLight = static_cast<IShadowLight*>(light);
-    if (shadowLight && !shadowLight->needCube()) {
-      effect->setMatrix("lightMatrix" + lightIndexStr,
-                        shadowGenerator->getTransformMatrix());
+  if (light->shadowEnabled && mesh->receiveShadows()) {
+    auto shadowGenerator = light->getShadowGenerator();
+    if (shadowGenerator) {
+      depthValuesAlreadySet = shadowGenerator->bindShadowLight(
+        std::to_string(lightIndex), effect, depthValuesAlreadySet);
     }
-    else {
-      if (!depthValuesAlreadySet) {
-        depthValuesAlreadySet = true;
-        effect->setFloat2("depthValues", scene->activeCamera->minZ,
-                          scene->activeCamera->maxZ);
-      }
-    }
-    effect->setTexture("shadowSampler" + lightIndexStr,
-                       shadowGenerator->getShadowMapForRendering());
-    light->_uniformBuffer->updateFloat3(
-      "shadowsInfo", shadowGenerator->getDarkness(),
-      shadowGenerator->blurScale
-        / static_cast<float>(shadowGenerator->getShadowMap()->getSize().width),
-      shadowGenerator->depthScale(), lightIndexStr);
   }
 
   return depthValuesAlreadySet;

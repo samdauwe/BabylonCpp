@@ -21,13 +21,10 @@ public:
     bool useBones, bool useMorphTargets, unsigned int NORMAL, unsigned int UV1,
     unsigned int UV2, unsigned int VERTEXCOLOR, unsigned int VERTEXALPHA,
     unsigned int MORPHTARGETS_NORMAL = 0, unsigned int MORPHTARGETS = 0);
-  static bool PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
-                                      MaterialDefines& defines,
-                                      bool specularSupported,
-                                      unsigned int maxSimultaneousLights,
-                                      bool disableLighting,
-                                      unsigned int SPECULARTERM,
-                                      unsigned int SHADOWFULLFLOAT);
+  static bool PrepareDefinesForLights(
+    Scene* scene, AbstractMesh* mesh, MaterialDefines& defines,
+    bool specularSupported, unsigned int maxSimultaneousLights,
+    bool disableLighting, unsigned int SPECULARTERM, unsigned int SHADOWFLOAT);
   static void
   PrepareUniformsAndSamplersList(std::vector<std::string>& uniformsList,
                                  std::vector<std::string>& samplersList,

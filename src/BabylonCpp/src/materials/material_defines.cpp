@@ -55,6 +55,7 @@ void MaterialDefines::resizeLights(unsigned int lightIndex)
       shadows.emplace_back(false);
       shadowesms.emplace_back(false);
       shadowpcfs.emplace_back(false);
+      shadowcubes.emplace_back(false);
       lightmapexcluded.emplace_back(false);
       lightmapnospecular.emplace_back(false);
     }
@@ -131,6 +132,12 @@ std::ostream& operator<<(std::ostream& os,
   for (size_t i = 0; i < materialDefines.shadowpcfs.size(); ++i) {
     if (materialDefines.shadowpcfs[i]) {
       os << "#define SHADOWPCF" << i << "\n";
+    }
+  }
+
+  for (size_t i = 0; i < materialDefines.shadowcubes.size(); ++i) {
+    if (materialDefines.shadowcubes[i]) {
+      os << "#define SHADOWCUBE" << i << "\n";
     }
   }
 
@@ -224,7 +231,8 @@ bool MaterialDefines::isEqual(const MaterialDefines& other) const
       || (spotlights.size() != other.spotlights.size())
       || (shadows.size() != other.shadows.size())
       || (shadowesms.size() != other.shadowesms.size())
-      || (shadowpcfs.size() != other.shadowpcfs.size())) {
+      || (shadowpcfs.size() != other.shadowpcfs.size())
+      || (shadowcubes.size() != other.shadowcubes.size())) {
     return false;
   }
 
@@ -305,6 +313,12 @@ bool MaterialDefines::isEqual(const MaterialDefines& other) const
     }
   }
 
+  for (size_t i = 0; i < shadowcubes.size(); ++i) {
+    if (shadowcubes[i] != other.shadowcubes[i]) {
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -340,6 +354,7 @@ void MaterialDefines::cloneTo(MaterialDefines& other)
   other.shadows     = shadows;
   other.shadowesms  = shadowesms;
   other.shadowpcfs  = shadowpcfs;
+  other.shadowcubes = shadowcubes;
 }
 
 void MaterialDefines::reset()
@@ -375,6 +390,7 @@ void MaterialDefines::reset()
   shadows.clear();
   shadowesms.clear();
   shadowpcfs.clear();
+  shadowcubes.clear();
 }
 
 std::string MaterialDefines::toString() const
