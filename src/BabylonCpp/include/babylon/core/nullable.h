@@ -58,6 +58,11 @@ public:
     return !_hasValue;
   }
 
+  const T& operator*() const
+  {
+    return value;
+  }
+
   operator bool() const
   {
     return _hasValue;
