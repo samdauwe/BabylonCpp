@@ -3,12 +3,11 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/core/nullable.h>
-#include <babylon/lights/ishadow_light.h>
-#include <babylon/lights/light.h>
+#include <babylon/lights/shadow_light.h>
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT SpotLight : public IShadowLight {
+class BABYLON_SHARED_EXPORT SpotLight : public ShadowLight {
 
 public:
   template <typename... Ts>
@@ -21,80 +20,36 @@ public:
   }
   ~SpotLight();
 
+  IReflect::Type type() const override;
+
   /**
    * @brief Returns the string "SpotLight".
    */
   const char* getClassName() const override;
-
-  IReflect::Type type() const override;
-  Scene* getScene() override;
-
-  /**
-   * @brief Returns the SpotLight absolute position in the World (Vector3).
-   */
-  Vector3 getAbsolutePosition() override;
-
-  /**
-   * @brief Return the depth scale used for the shadow map.
-   */
-  float getDepthScale() const override;
-
-  /**
-   * @brief Sets the passed matrix "matrix" as perspective projection matrix for
-   * the shadows and the passed view matrix with the fov equal to the SpotLight
-   * angle and and aspect ratio of 1.0.
-   */
-  void setShadowProjectionMatrix(
-    Matrix& matrix, const Matrix& viewMatrix,
-    const std::vector<AbstractMesh*>& renderList) override;
-
-  /**
-   * @returns False by default.
-   */
-  bool needCube() const override;
-
-  /**
-   * @returns False by default.
-   */
-  bool needRefreshPerFrame() const override;
-
-  /**
-   * @brief Returns the SpotLight direction (Vector3) for any passed face index.
-   */
-  Vector3 getShadowDirection(unsigned int faceIndex = 0) override;
-
-  /**
-   * @brief Updates the SpotLight direction towards the passed target (Vector3).
-   * @returns The updated direction.
-   */
-  Vector3& setDirectionToTarget(Vector3& target);
-
-  /**
-   * @brief Computes the SpotLight transformed position if parented.
-   * @returns True if parented, else false.
-   */
-  bool computeTransformedPosition() override;
-
-  /**
-   * @brief Sets the passed Effect object with the SpotLight transfomed position
-   * (or position if not parented) and normalized direction.
-   */
-  void transferToEffect(Effect* effect, const std::string& lightIndex) override;
-
-  /**
-   * @brief Returns the light World matrix.
-   */
-  Matrix* _getWorldMatrix() override;
 
   /**
    * @brief Returns the integer 2.
    */
   unsigned int getTypeID() const override;
 
+  float angle() const;
+  void setAngle(float value);
+
   /**
-   * @brief Returns the SpotLight rotation (Vector3).
+   * @brief Allows scaling the angle of the light for shadow generation only.
    */
-  Vector3 getRotation();
+  float shadowAngleScale() const;
+
+  /**
+   * @brief Allows scaling the angle of the light for shadow generation only.
+   */
+  void setShadowAngleScale(float value);
+
+  /**
+   * @brief Sets the passed Effect object with the SpotLight transfomed position
+   * (or position if not parented) and normalized direction.
+   */
+  void transferToEffect(Effect* effect, const std::string& lightIndex) override;
 
 protected:
   /**
@@ -112,22 +67,26 @@ protected:
             const Vector3& direction, float angle, float exponent,
             Scene* scene);
 
+  /**
+   * @brief Sets the passed matrix "matrix" as perspective projection matrix for
+   * the shadows and the passed view matrix with the fov equal to the SpotLight
+   * angle and and aspect ratio of 1.0.
+   * @returns the SpotLight.
+   */
+  void _setDefaultShadowProjectionMatrix(
+    Matrix& matrix, const Matrix& viewMatrix,
+    const std::vector<AbstractMesh*>& renderList) override;
+
   void _buildUniformLayout() override;
 
 public:
-  std::unique_ptr<Vector3> transformedPosition;
-  Vector3 position;
-  Vector3 direction;
-  float angle;
   float exponent;
-  Nullable<float> shadowMinZ;
-  Nullable<float> shadowMaxZ;
 
 private:
-  std::unique_ptr<Vector3> _transformedDirection;
-  std::unique_ptr<Matrix> _worldMatrix;
+  float _angle;
+  Nullable<float> _shadowAngleScale;
 
-}; // end of class PointLight
+}; // end of class SpotLight
 
 } // end of namespace BABYLON
 

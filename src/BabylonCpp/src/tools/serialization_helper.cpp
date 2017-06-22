@@ -198,13 +198,13 @@ Light* SerializationHelper::Parse(Light* light, const Json::value& parsedLight,
       }
       // direction
       if (parsedLight.contains("direction")) {
-        directionalLight->direction
-          = Vector3::FromArray(Json::ToArray<float>(parsedLight, "direction"));
+        directionalLight->setDirection(
+          Vector3::FromArray(Json::ToArray<float>(parsedLight, "direction")));
       }
       // shadowOrthoScale
       if (parsedLight.contains("shadowOrthoScale")) {
-        directionalLight->shadowOrthoScale
-          = Json::GetNumber(parsedLight, "shadowOrthoScale", 0.5f);
+        directionalLight->setShadowOrthoScale(
+          Json::GetNumber(parsedLight, "shadowOrthoScale", 0.5f));
       }
       // autoUpdateExtends
       if (parsedLight.contains("autoUpdateExtends")) {
@@ -222,12 +222,12 @@ Light* SerializationHelper::Parse(Light* light, const Json::value& parsedLight,
       }
       // direction
       if (parsedLight.contains("direction")) {
-        spotLight->direction
-          = Vector3::FromArray(Json::ToArray<float>(parsedLight, "direction"));
+        spotLight->setDirection(
+          Vector3::FromArray(Json::ToArray<float>(parsedLight, "direction")));
       }
       // angle
       if (parsedLight.contains("angle")) {
-        spotLight->angle = Json::GetNumber(parsedLight, "angle", 0.f);
+        spotLight->setAngle(Json::GetNumber(parsedLight, "angle", 0.f));
       }
       // exponent
       if (parsedLight.contains("exponent")) {

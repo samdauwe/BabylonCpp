@@ -88,13 +88,13 @@ public:
 public:
   ~Light();
 
+  virtual IReflect::Type type() const override;
+  void addToScene(std::unique_ptr<Light>&& newLight);
+
   /**
    * @brief Returns the string "Light".
    */
   const char* getClassName() const override;
-
-  virtual IReflect::Type type() const override;
-  void addToScene(std::unique_ptr<Light>&& newLight);
 
   /**
    * @param {boolean} fullDetails - support for multiple levels of logging

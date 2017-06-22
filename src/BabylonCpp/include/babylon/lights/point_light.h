@@ -2,13 +2,11 @@
 #define BABYLON_LIGHTS_POINT_LIGHT_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
-#include <babylon/lights/ishadow_light.h>
-#include <babylon/lights/light.h>
+#include <babylon/lights/shadow_light.h>
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT PointLight : public IShadowLight {
+class BABYLON_SHARED_EXPORT PointLight : public ShadowLight {
 
 public:
   template <typename... Ts>
@@ -21,30 +19,45 @@ public:
   }
   ~PointLight();
 
+  IReflect::Type type() const override;
+
+  /**
+   * @brief Getter: In case of direction provided, the shadow will not use a
+   * cube texture but simulate a spot shadow as a fallback
+   * This specifies what angle the shadow will use to be created.
+   *
+   * It default to 90 degrees to work nicely with the cube texture generation
+   * for point lights shadow maps.
+   */
+  float shadowAngle() const;
+
+  /**
+   * @brief Setter: In case of direction provided, the shadow will not use a
+   * cube texture but simulate a spot shadow as a fallback
+   * This specifies what angle the shadow will use to be created.
+   *
+   * It default to 90 degrees to work nicely with the cube texture generation
+   * for point lights shadow maps.
+   */
+  void setShadowAngle(float value);
+
+  const Vector3& direction() const;
+
+  /**
+   * @brief In case of direction provided, the shadow will not use a cube
+   * texture but simulate a spot shadow as a fallback
+   */
+  void setDirection(const Vector3& value);
+
   /**
    * @brief Returns the string "PointLight".
    */
   const char* getClassName() const override;
 
-  IReflect::Type type() const override;
-  Scene* getScene() override;
-
   /**
-   * @brief Returns a Vector3, the PointLight absolute position in the World.
+   * @brief Returns the integer 0.
    */
-  Vector3 getAbsolutePosition() override;
-
-  /**
-   * @brief Computes the PointLight transformed position if parented
-   * @returns True if ok, false if not parented.
-   */
-  bool computeTransformedPosition() override;
-
-  /**
-   * @brief Sets the passed Effect "effect" with the PointLight transformed
-   * position (or position, if none) and passed name (string).
-   */
-  void transferToEffect(Effect* effect, const std::string& lightIndex) override;
+  unsigned int getTypeID() const override;
 
   /**
    * @returns True by default.
@@ -52,43 +65,17 @@ public:
   bool needCube() const override;
 
   /**
-   * @returns False by default.
-   */
-  bool needRefreshPerFrame() const override;
-
-  /**
    * @brief Returns a new Vector3 aligned with the PointLight cube system
    * according to the passed cube face index (integer).
    */
-  Vector3 getShadowDirection(unsigned int faceIndex = 0) override;
+  Vector3 getShadowDirection(unsigned int faceIndex) override;
 
   /**
-   * @brief Return the depth scale used for the shadow map.
+   * @brief Sets the passed Effect "effect" with the PointLight transformed
+   * position (or position, if none) and passed name (string).
+   * Returns the PointLight.
    */
-  float getDepthScale() const override;
-
-  ShadowGenerator* getShadowGenerator() override;
-
-  /**
-   * @brief Sets the passed matrix "matrix" as a left-handed perspective
-   * projection matrix with the following settings :
-   * - fov = PI / 2
-   * - aspect ratio : 1.0
-   * - z-near and far equal to the active camera minZ and maxZ.
-   */
-  void setShadowProjectionMatrix(
-    Matrix& matrix, const Matrix& viewMatrix,
-    const std::vector<AbstractMesh*>& renderList) override;
-
-  /**
-   * @brief Returns the light world matrix.
-   */
-  Matrix* _getWorldMatrix() override;
-
-  /**
-   * @brief Returns the integer 0.
-   */
-  unsigned int getTypeID() const override;
+  void transferToEffect(Effect* effect, const std::string& lightIndex) override;
 
 protected:
   /**
@@ -100,16 +87,22 @@ protected:
    */
   PointLight(const std::string& name, const Vector3& position, Scene* scene);
 
+  /**
+   * @brief Sets the passed matrix "matrix" as a left-handed perspective
+   * projection matrix with the following settings:
+   * - fov = PI / 2
+   * - aspect ratio : 1.0
+   * - z-near and far equal to the active camera minZ and maxZ.
+   * Returns the PointLight.
+   */
+  void _setDefaultShadowProjectionMatrix(
+    Matrix& matrix, const Matrix& viewMatrix,
+    const std::vector<AbstractMesh*>& renderList) override;
+
   void _buildUniformLayout() override;
 
-public:
-  std::unique_ptr<Vector3> transformedPosition;
-  Vector3 position;
-  Nullable<float> shadowMinZ;
-  Nullable<float> shadowMaxZ;
-
 private:
-  std::unique_ptr<Matrix> _worldMatrix;
+  float _shadowAngle;
 
 }; // end of class PointLight
 

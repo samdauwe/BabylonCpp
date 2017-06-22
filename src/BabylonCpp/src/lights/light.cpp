@@ -43,11 +43,6 @@ Light::~Light()
 {
 }
 
-const char* Light::getClassName() const
-{
-  return "Light";
-}
-
 IReflect::Type Light::type() const
 {
   return IReflect::Type::LIGHT;
@@ -56,6 +51,11 @@ IReflect::Type Light::type() const
 void Light::addToScene(std::unique_ptr<Light>&& newLight)
 {
   getScene()->addLight(std::move(newLight));
+}
+
+const char* Light::getClassName() const
+{
+  return "Light";
 }
 
 std::string Light::toString(bool fullDetails) const
@@ -307,14 +307,14 @@ Light* Light::GetConstructorFromName(unsigned int type, const std::string& name,
                                      Scene* scene)
 {
   switch (type) {
-    case 0:
+    case Light::LIGHTTYPEID_POINTLIGHT:
       return PointLight::New(name, Vector3::Zero(), scene);
-    case 1:
+    case Light::LIGHTTYPEID_DIRECTIONALLIGHT:
       return DirectionalLight::New(name, Vector3::Zero(), scene);
-    case 2:
+    case Light::LIGHTTYPEID_SPOTLIGHT:
       return SpotLight::New(name, Vector3::Zero(), Vector3::Zero(), 0.f, 0.f,
                             scene);
-    case 3:
+    case Light::LIGHTTYPEID_HEMISPHERICLIGHT:
       return HemisphericLight::New(name, Vector3::Zero(), scene);
   }
 

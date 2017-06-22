@@ -8,20 +8,68 @@
 namespace BABYLON {
 
 SpotLight::SpotLight(const std::string& iName, const Vector3& iPosition,
-                     const Vector3& iDirection, float iAngle, float iExponent,
+                     const Vector3& direction, float iAngle, float iExponent,
                      Scene* scene)
-    : IShadowLight{iName, scene}
-    , position{iPosition}
-    , direction{iDirection}
-    , angle{iAngle}
-    , exponent{iExponent}
-    , _transformedDirection{nullptr}
-    , _worldMatrix{nullptr}
+    : ShadowLight{iName, scene}, exponent{iExponent}
 {
+  position = iPosition;
+  setDirection(direction);
+  setAngle(iAngle);
 }
 
 SpotLight::~SpotLight()
 {
+}
+
+IReflect::Type SpotLight::type() const
+{
+  return IReflect::Type::SPOTLIGHT;
+}
+
+const char* SpotLight::getClassName() const
+{
+  return "SpotLight";
+}
+
+unsigned int SpotLight::getTypeID() const
+{
+  return Light::LIGHTTYPEID_SPOTLIGHT;
+}
+
+float SpotLight::angle() const
+{
+  return _angle;
+}
+
+void SpotLight::setAngle(float value)
+{
+  _angle = value;
+  forceProjectionMatrixCompute();
+}
+
+float SpotLight::shadowAngleScale() const
+{
+  return _shadowAngleScale;
+}
+
+void SpotLight::setShadowAngleScale(float value)
+{
+  _shadowAngleScale = value;
+  forceProjectionMatrixCompute();
+}
+
+void SpotLight::_setDefaultShadowProjectionMatrix(
+  Matrix& matrix, const Matrix& /*viewMatrix*/,
+  const std::vector<AbstractMesh*>& /*renderList*/)
+{
+  auto activeCamera = getScene()->activeCamera;
+
+  _shadowAngleScale = _shadowAngleScale ? *_shadowAngleScale : 1;
+  auto angle        = _shadowAngleScale * _angle;
+
+  Matrix::PerspectiveFovLHToRef(
+    angle, 1.f, shadowMinZ() ? *shadowMinZ() : activeCamera->minZ,
+    shadowMaxZ() ? *shadowMaxZ() : activeCamera->maxZ, matrix);
 }
 
 void SpotLight::_buildUniformLayout()
@@ -34,105 +82,20 @@ void SpotLight::_buildUniformLayout()
   _uniformBuffer->create();
 }
 
-const char* SpotLight::getClassName() const
-{
-  return "SpotLight";
-}
-
-IReflect::Type SpotLight::type() const
-{
-  return IReflect::Type::SPOTLIGHT;
-}
-
-Scene* SpotLight::getScene()
-{
-  return Node::getScene();
-}
-
-Vector3 SpotLight::getAbsolutePosition()
-{
-  return transformedPosition ? *transformedPosition : position;
-}
-
-float SpotLight::getDepthScale() const
-{
-  return 30.f;
-}
-
-void SpotLight::setShadowProjectionMatrix(
-  Matrix& matrix, const Matrix& viewMatrix,
-  const std::vector<AbstractMesh*>& renderList)
-{
-  if (customProjectionMatrixBuilder) {
-    customProjectionMatrixBuilder(viewMatrix, renderList, matrix);
-  }
-  else {
-    auto activeCamera = getScene()->activeCamera;
-    Matrix::PerspectiveFovLHToRef(
-      angle, 1.f, shadowMinZ.hasValue() ? shadowMinZ.value : activeCamera->minZ,
-      shadowMaxZ.hasValue() ? shadowMaxZ.value : activeCamera->maxZ, matrix);
-  }
-}
-
-bool SpotLight::needCube() const
-{
-  return false;
-}
-
-bool SpotLight::needRefreshPerFrame() const
-{
-  return false;
-}
-
-Vector3 SpotLight::getShadowDirection(unsigned int /*faceIndex*/)
-{
-  return direction;
-}
-
-Vector3& SpotLight::setDirectionToTarget(Vector3& target)
-{
-  direction = Vector3::Normalize(target.subtract(position));
-  return direction;
-}
-
-bool SpotLight::computeTransformedPosition()
-{
-  if (parent() && parent()->getWorldMatrix()) {
-    if (!transformedPosition) {
-      transformedPosition = std::make_unique<Vector3>(Vector3::Zero());
-    }
-
-    Vector3::TransformCoordinatesToRef(position, *parent()->getWorldMatrix(),
-                                       *transformedPosition);
-    return true;
-  }
-
-  return false;
-}
-
 void SpotLight::transferToEffect(Effect* /*effect*/,
                                  const std::string& lightIndex)
 {
   auto normalizeDirection = Vector3::Zero();
 
-  if (parent() && parent()->getWorldMatrix()) {
-    if (!_transformedDirection) {
-      transformedPosition = std::make_unique<Vector3>(Vector3::Zero());
-    }
+  if (computeTransformedInformation()) {
+    _uniformBuffer->updateFloat4("vLightData",             // Name
+                                 (*transformedPosition).x, // X
+                                 (*transformedPosition).y, // Y
+                                 (*transformedPosition).z, // Z
+                                 exponent,                 // Value
+                                 lightIndex);              // Index
 
-    computeTransformedPosition();
-
-    Vector3::TransformNormalToRef(direction, *parent()->getWorldMatrix(),
-                                  *_transformedDirection);
-
-    _uniformBuffer->updateFloat4("vLightData",           // Name
-                                 transformedPosition->x, // X
-                                 transformedPosition->y, // Y
-                                 transformedPosition->z, // Z
-                                 exponent,               // Value
-                                 lightIndex);            // Index
-
-    normalizeDirection = Vector3::Normalize(*_transformedDirection);
+    normalizeDirection = Vector3::Normalize(*transformedDirection);
   }
   else {
     _uniformBuffer->updateFloat4("vLightData", // Name
@@ -141,42 +104,16 @@ void SpotLight::transferToEffect(Effect* /*effect*/,
                                  position.z,   // Z
                                  exponent,     // Value
                                  lightIndex);  // Index
-    normalizeDirection = Vector3::Normalize(direction);
+
+    normalizeDirection = Vector3::Normalize(direction());
   }
 
-  _uniformBuffer->updateFloat4("vLightDirection",      // Name
-                               normalizeDirection.x,   // X
-                               normalizeDirection.y,   // Y
-                               normalizeDirection.z,   // Z
-                               std::cos(angle * 0.5f), // Value
-                               lightIndex);            // Index
-}
-
-Matrix* SpotLight::_getWorldMatrix()
-{
-  if (!_worldMatrix) {
-    _worldMatrix = std::make_unique<Matrix>(Matrix::Identity());
-  }
-
-  Matrix::TranslationToRef(position.x, position.y, position.z, *_worldMatrix);
-
-  return _worldMatrix.get();
-}
-
-unsigned int SpotLight::getTypeID() const
-{
-  return 2;
-}
-
-Vector3 SpotLight::getRotation()
-{
-
-  direction.normalize();
-
-  auto xaxis = Vector3::Cross(direction, Axis::Y);
-  auto yaxis = Vector3::Cross(xaxis, direction);
-
-  return Vector3::RotationFromAxis(xaxis, yaxis, direction);
+  _uniformBuffer->updateFloat4("vLightDirection",        // Name
+                               normalizeDirection.x,     // X
+                               normalizeDirection.y,     // Y
+                               normalizeDirection.z,     // Z
+                               std::cos(angle() * 0.5f), // Value
+                               lightIndex);              // Index
 }
 
 } // end of namespace BABYLON

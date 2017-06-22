@@ -3,12 +3,12 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/core/nullable.h>
-#include <babylon/lights/ishadow_light.h>
 #include <babylon/lights/light.h>
+#include <babylon/lights/shadow_light.h>
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT DirectionalLight : public IShadowLight {
+class BABYLON_SHARED_EXPORT DirectionalLight : public ShadowLight {
 
 public:
   template <typename... Ts>
@@ -21,76 +21,38 @@ public:
   }
   ~DirectionalLight();
 
+  IReflect::Type type() const override;
+
   /**
    * @brief Returns the string "DirectionalLight".
    */
   const char* getClassName() const override;
 
-  IReflect::Type type() const override;
-  Scene* getScene() override;
+  /**
+   * @brief Returns the integer 1.
+   */
+  unsigned int getTypeID() const override;
 
   /**
-   * @brief Returns the DirectionalLight absolute position in the World.
+   * @brief Fix frustum size for the shadow generation. This is disabled if the
+   * value is 0.
    */
-  Vector3 getAbsolutePosition() override;
+  float shadowFrustumSize() const;
 
   /**
-   * @brief Sets the DirectionalLight direction toward the passed target
-   * (Vector3).
-   * @returns The updated DirectionalLight direction (Vector3).
+   * @brief Specifies a fix frustum size for the shadow generation.
    */
-  Vector3& setDirectionToTarget(Vector3& target);
+  void setShadowFrustumSize(float value);
 
-  /**
-   * @brief Returns the depth scale used for the shadow map.
-   */
-  float getDepthScale() const override;
+  float shadowOrthoScale() const;
 
-  /**
-   * @brief Sets the passed matrix "matrix" as projection matrix for the shadows
-   * cast by the light according to the passed view matrix.
-   * @returns The DirectionalLight.
-   */
-  void setShadowProjectionMatrix(
-    Matrix& matrix, const Matrix& viewMatrix,
-    const std::vector<AbstractMesh*>& renderList) override;
-
-  /**
-   * @brief Returns true by default.
-   */
-  bool needRefreshPerFrame() const override;
-
-  /**
-   * @brief Returns false by default.
-   */
-  bool needCube() const override;
-
-  /**
-   * @brief Returns the light direction (Vector3) for any passed face index.
-   */
-  Vector3 getShadowDirection(unsigned int faceIndex) override;
-
-  /**
-   * @brief Computes the light transformed position in case the light is
-   * parented. Returns true if parented, else false.
-   */
-  bool computeTransformedPosition() override;
+  void setShadowOrthoScale(float value);
 
   /**
    * @brief Sets the passed Effect object with the DirectionalLight transformed
    * position (or position if not parented) and the passed name.
    */
   void transferToEffect(Effect* effect, const std::string& lightIndex) override;
-
-  /**
-   * @brief Returns the light world matrix.
-   */
-  Matrix* _getWorldMatrix() override;
-
-  /**
-   * @brief Returns the integer 1.
-   */
-  unsigned int getTypeID() const override;
 
 protected:
   /**
@@ -103,20 +65,40 @@ protected:
   DirectionalLight(const std::string& name, const Vector3& direction,
                    Scene* scene);
 
+  /**
+   * @brief Sets the passed matrix "matrix" as projection matrix for the shadows
+   * cast by the light according to the passed view matrix.
+   * @returns The DirectionalLight Shadow projection matrix.
+   */
+  void _setDefaultShadowProjectionMatrix(
+    Matrix& matrix, const Matrix& viewMatrix,
+    const std::vector<AbstractMesh*>& renderList);
+
+  /**
+   * @brief Sets the passed matrix "matrix" as fixed frustum projection matrix
+   * for the shadows cast by the light according to the passed view matrix.
+   * @returns The DirectionalLight Shadow projection matrix.
+   */
+  void _setDefaultFixedFrustumShadowProjectionMatrix(Matrix& matrix,
+                                                     const Matrix& viewMatrix);
+
+  /**
+   * @brief Sets the passed matrix "matrix" as auto extend projection matrix for
+   * the shadows cast by the light according to the passed view matrix.
+   * @returns The DirectionalLight Shadow projection matrix.
+   */
+  void _setDefaultAutoExtendShadowProjectionMatrix(
+    Matrix& matrix, const Matrix& viewMatrix,
+    const std::vector<AbstractMesh*>& renderList);
+
   void _buildUniformLayout() override;
 
 public:
-  Vector3 position;
-  Vector3 direction;
-  std::unique_ptr<Vector3> transformedPosition;
-  float shadowOrthoScale;
   bool autoUpdateExtends;
-  Nullable<float> shadowMinZ;
-  Nullable<float> shadowMaxZ;
 
 private:
-  std::unique_ptr<Vector3> _transformedDirection;
-  std::unique_ptr<Matrix> _worldMatrix;
+  float _shadowFrustumSize;
+  float _shadowOrthoScale;
   // Cache
   float _orthoLeft;
   float _orthoRight;
