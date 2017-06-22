@@ -183,6 +183,7 @@ class HemisphericLight;
 class IShadowLight;
 class Light;
 class PointLight;
+class ShadowLight;
 class SpotLight;
 // - Shadows
 class ShadowGenerator;
