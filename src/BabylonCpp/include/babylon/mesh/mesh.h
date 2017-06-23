@@ -420,6 +420,13 @@ public:
     bool computeNormals = true);
 
   /**
+   * @brief This method will force the computation of normals for the mesh.
+   * Please note that the mesh must have normals vertex data already.
+   * @returns The Mesh.
+   */
+  Mesh* recomputeNormals();
+
+  /**
    * @brief Creates a un-shared specific occurence of the geometry for the mesh.
    * @returns The Mesh.
    */

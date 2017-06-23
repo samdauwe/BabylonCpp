@@ -10,6 +10,7 @@
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/particles/particle_system.h>
+#include <babylon/rendering/edges_renderer.h>
 #include <babylon/sprites/sprite_manager.h>
 
 namespace BABYLON {
@@ -26,6 +27,8 @@ RenderingGroup::RenderingGroup(
   _alphaTestSubMeshes.reserve(256);
   _particleSystems.reserve(256);
   _spriteManagers.reserve(256);
+
+  _edgesRenderers.reserve(16);
 
   setOpaqueSortCompareFn(opaqueSortCompareFn);
   setAlphaTestSortCompareFn(alphaTestSortCompareFn);
@@ -136,6 +139,11 @@ void RenderingGroup::render(
   }
 
   engine->setStencilBuffer(stencilState);
+
+  // Edges
+  for (auto& edgesRenderer : _edgesRenderers) {
+    edgesRenderer->render();
+  }
 }
 
 void RenderingGroup::renderOpaqueSorted(const std::vector<SubMesh*>& subMeshes)
@@ -242,6 +250,7 @@ void RenderingGroup::prepare()
   _alphaTestSubMeshes.clear();
   _particleSystems.clear();
   _spriteManagers.clear();
+  _edgesRenderers.clear();
 }
 
 void RenderingGroup::dispose()
@@ -251,6 +260,7 @@ void RenderingGroup::dispose()
   _alphaTestSubMeshes.clear();
   _particleSystems.clear();
   _spriteManagers.clear();
+  _edgesRenderers.clear();
 }
 
 void RenderingGroup::dispatch(SubMesh* subMesh)
@@ -267,6 +277,10 @@ void RenderingGroup::dispatch(SubMesh* subMesh)
   }
   else {
     _opaqueSubMeshes.emplace_back(subMesh); // Opaque
+  }
+
+  if (mesh->_edgesRenderer) {
+    _edgesRenderers.emplace_back(mesh->_edgesRenderer.get());
   }
 }
 

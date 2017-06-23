@@ -613,6 +613,24 @@ Mesh& Mesh::updateMeshPositions(
   return *this;
 }
 
+Mesh* Mesh::recomputeNormals()
+{
+  auto positions = getVerticesData(VertexBuffer::PositionKind);
+  auto indices   = getIndices();
+  Float32Array normals;
+
+  if (isVerticesDataPresent(VertexBuffer::NormalKind)) {
+    normals = getVerticesData(VertexBuffer::NormalKind);
+  }
+  else {
+    normals = {};
+  }
+  VertexData::ComputeNormals(positions, indices, normals);
+  updateVerticesData(VertexBuffer::NormalKind, normals, false, false);
+
+  return this;
+}
+
 Mesh& Mesh::makeGeometryUnique()
 {
   if (!_geometry) {
@@ -957,6 +975,11 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
     return *this;
   }
 
+  // Alpha mode
+  if (enableAlphaMode) {
+    engine->setAlphaMode(effectiveMaterial->alphaMode);
+  }
+
   // Outline - step 1
   auto savedDepthWrite = engine->getDepthWrite();
   if (renderOutline) {
@@ -989,11 +1012,6 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
   }
   else {
     effectiveMaterial->bind(_world, this);
-  }
-
-  // Alpha mode
-  if (enableAlphaMode) {
-    engine->setAlphaMode(effectiveMaterial->alphaMode);
   }
 
   // Draw

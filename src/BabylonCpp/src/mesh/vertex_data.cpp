@@ -1641,14 +1641,58 @@ std::unique_ptr<VertexData> VertexData::CreateDisc(DiscOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData>
-VertexData::CreatePolygon(Mesh* polygon, unsigned int sideOrientation,
-                          Vector4& frontUVs, Vector4& backUVs)
+std::unique_ptr<VertexData> VertexData::CreatePolygon(
+  Mesh* polygon, unsigned int sideOrientation, const std::vector<Vector4>& fUV,
+  const std::vector<Color4>& fColors, Vector4& frontUVs, Vector4& backUVs)
 {
+  auto faceUV     = fUV;
+  auto faceColors = fColors;
+  Float32Array colors;
+
+  faceUV.resize(3);
+  faceColors.resize(3);
+
+  // default face colors and UV if undefined
+  for (unsigned int f = 0; f < 3; ++f) {
+    if (f >= fUV.size()) {
+      faceUV[f] = Vector4(0, 0, 1, 1);
+    }
+    if (f >= fColors.size()) {
+      faceColors[f] = Color4(1, 1, 1, 1);
+    }
+  }
+
   auto positions = polygon->getVerticesData(VertexBuffer::PositionKind);
   auto normals   = polygon->getVerticesData(VertexBuffer::NormalKind);
   auto uvs       = polygon->getVerticesData(VertexBuffer::UVKind);
   auto indices   = polygon->getIndices();
+
+  // set face colours and textures
+  unsigned int idx  = 0;
+  unsigned int face = 0;
+  for (unsigned int index = 0; index < normals.size(); index += 3) {
+    // Edge Face  no. 1
+    if (stl_util::almost_equal(std::abs(normals[index + 1]), 0.f)) {
+      face = 1;
+    }
+    // Top Face  no. 0
+    if (stl_util::almost_equal(normals[index + 1], 1.f)) {
+      face = 0;
+    }
+    // Bottom Face  no. 2
+    if (stl_util::almost_equal(normals[index + 1], -1.f)) {
+      face = 2;
+    }
+    idx = index / 3;
+    uvs[2 * idx]
+      = (1 - uvs[2 * idx]) * faceUV[face].x + uvs[2 * idx] * faceUV[face].z;
+    uvs[2 * idx + 1] = (1.f - uvs[2 * idx + 1]) * faceUV[face].y
+                       + uvs[2 * idx + 1] * faceUV[face].w;
+    if (!faceColors.empty()) {
+      stl_util::concat(colors, {faceColors[face].r, faceColors[face].g,
+                                faceColors[face].b, faceColors[face].a});
+    }
+  }
 
   // sides
   VertexData::_ComputeSides(sideOrientation, positions, indices, normals, uvs,
@@ -1660,6 +1704,13 @@ VertexData::CreatePolygon(Mesh* polygon, unsigned int sideOrientation,
   vertexData->positions = std::move(positions);
   vertexData->normals   = std::move(normals);
   vertexData->uvs       = std::move(uvs);
+
+  if (!faceColors.empty()) {
+    auto totalColors = (sideOrientation == Mesh::DOUBLESIDE) ?
+                         stl_util::concat(colors, colors) :
+                         colors;
+    vertexData->colors = std::move(totalColors);
+  }
 
   return vertexData;
 }

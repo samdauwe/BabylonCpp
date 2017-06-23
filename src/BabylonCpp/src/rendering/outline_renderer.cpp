@@ -45,7 +45,7 @@ void OutlineRenderer::render(SubMesh* subMesh, _InstancesBatch* batch,
   _effect->setFloat("offset", useOverlay ? 0 : mesh->outlineWidth);
   _effect->setColor4("color",
                      useOverlay ? mesh->overlayColor : mesh->outlineColor,
-                     useOverlay ? mesh->overlayAlpha : 1.f);
+                     useOverlay ? mesh->overlayAlpha : material->alpha);
   _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
 
   // Bones

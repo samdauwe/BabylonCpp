@@ -177,6 +177,8 @@ private:
   std::function<void(const std::vector<SubMesh*>& subMeshes)>
     _renderTransparent;
 
+  std::vector<EdgesRenderer*> _edgesRenderers;
+
 }; // end of class RenderingGroup
 
 } // end of namespace BABYLON

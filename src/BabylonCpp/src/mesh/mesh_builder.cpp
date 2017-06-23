@@ -584,7 +584,8 @@ Mesh* MeshBuilder::CreatePolygon(const std::string& name,
   auto polygon = polygonTriangulation.build(options.updatable, depth);
   polygon->setSideOrientation(options.sideOrientation);
   auto vertexData = VertexData::CreatePolygon(
-    polygon, options.sideOrientation, options.frontUVs, options.backUVs);
+    polygon, options.sideOrientation, options.faceUV, options.faceColors,
+    options.frontUVs, options.backUVs);
   vertexData->applyToMesh(polygon, options.updatable);
 
   return polygon;

@@ -450,6 +450,8 @@ public:
   std::vector<Vector3> shape;
   std::vector<std::vector<Vector3>> holes;
   float depth;
+  std::vector<Vector4> faceUV;
+  std::vector<Color4> faceColors;
   bool updatable;
   unsigned int sideOrientation;
   Vector4 frontUVs;

@@ -1080,8 +1080,6 @@ Matrix AbstractMesh::computeWorldMatrix(bool force)
 
   // Parent
   if (parent() && parent()->getWorldMatrix()) {
-    _markSyncedWithParent();
-
     if (billboardMode != AbstractMesh::BILLBOARDMODE_NONE) {
       if (_meshToBoneReferal) {
         parent()->getWorldMatrix()->multiplyToRef(
@@ -1109,6 +1107,7 @@ Matrix AbstractMesh::computeWorldMatrix(bool force)
         _localWorld.multiplyToRef(*parent()->getWorldMatrix(), *_worldMatrix);
       }
     }
+    _markSyncedWithParent();
   }
   else {
     _worldMatrix->copyFrom(_localWorld);
@@ -1609,8 +1608,9 @@ void AbstractMesh::dispose(bool doNotRecurse)
     // Shadow generators
     auto generator = light->getShadowGenerator();
     if (generator) {
-      std::remove(generator->getShadowMap()->renderList.begin(),
-                  generator->getShadowMap()->renderList.end(), this);
+      auto shadowMap = generator->getShadowMap();
+      std::remove(shadowMap->renderList.begin(), shadowMap->renderList.end(),
+                  this);
     }
   }
 

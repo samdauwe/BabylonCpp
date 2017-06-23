@@ -642,6 +642,11 @@ public:
 
   /**
    * @brief Creates an extruded polygon mesh, with depth in the Y direction.
+   * You can set different colors and different images to the top, bottom and
+   * extruded side by using the parameters `faceColors` (an array of 3 Color3
+   * elements) and `faceUV` (an array of 3 Vector4 elements).
+   * Please read this tutorial :
+   * http://doc.babylonjs.com/tutorials/CreateBox_Per_Face_Textures_And_Colors
    */
   static Mesh* ExtrudePolygon(const std::string& name, PolygonOptions& options,
                               Scene* scene);

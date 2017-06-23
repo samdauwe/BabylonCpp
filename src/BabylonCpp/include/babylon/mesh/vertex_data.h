@@ -148,10 +148,11 @@ public:
   /**
    * @brief Re-creates the VertexData of the Polygon for sideOrientation.
    */
-  static std::unique_ptr<VertexData> CreatePolygon(Mesh* polygon,
-                                                   unsigned int sideOrientation,
-                                                   Vector4& frontUVs,
-                                                   Vector4& backUVs);
+  static std::unique_ptr<VertexData>
+  CreatePolygon(Mesh* polygon, unsigned int sideOrientation,
+                const std::vector<Vector4>& fUV,
+                const std::vector<Color4>& fColors, Vector4& frontUVs,
+                Vector4& backUVs);
 
   /**
    * @brief Creates the VertexData of the IcoSphere.
