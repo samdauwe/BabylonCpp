@@ -151,14 +151,18 @@ void ActionManager::processTrigger(unsigned int trigger,
           || trigger == ActionManager::OnKeyDownTrigger) {
         const std::string parameter = action->getTriggerParameter();
         if (!parameter.empty() && parameter != evt.sourceEvent.keyCode) {
-          // Actual key
-          const char* unicode = evt.sourceEvent.charCode ?
-                                  evt.sourceEvent.charCode :
-                                  evt.sourceEvent.keyCode;
-          const std::string actualkey(unicode);
-          if (String::toLowerCase(actualkey)
-              != String::toLowerCase(parameter)) {
+          auto lowerCase = String::toLowerCase(parameter);
+          if (lowerCase.empty()) {
             continue;
+          }
+
+          if (lowerCase != evt.sourceEvent.keyCode) {
+            auto unicode = evt.sourceEvent.charCode ? evt.sourceEvent.charCode :
+                                                      evt.sourceEvent.keyCode;
+            auto actualkey = String::toLowerCase(std::string(unicode));
+            if (actualkey != lowerCase) {
+              continue;
+            }
           }
         }
       }

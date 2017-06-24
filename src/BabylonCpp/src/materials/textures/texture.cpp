@@ -26,6 +26,7 @@ Texture::Texture(const std::string& _url, Scene* scene, bool noMipmap,
     , _invertY{invertY}
     , _samplingMode{samplingMode}
     , _format{format}
+    , _isBlocking{true}
     , _noMipmap{noMipmap}
     , _rowGenerationMatrix{nullptr}
     , _cachedTextureMatrix{nullptr}
@@ -48,6 +49,10 @@ Texture::Texture(const std::string& _url, Scene* scene, bool noMipmap,
     }
     if (_onLoad) {
       _onLoad();
+    }
+
+    if (!isBlocking()) {
+      getScene()->resetCachedMaterial();
     }
   };
 
@@ -84,6 +89,16 @@ Texture::~Texture()
 IReflect::Type Texture::type() const
 {
   return IReflect::Type::TEXTURE;
+}
+
+void Texture::setIsBlocking(bool value)
+{
+  _isBlocking = value;
+}
+
+bool Texture::isBlocking() const
+{
+  return _isBlocking;
 }
 
 bool Texture::noMipmap() const

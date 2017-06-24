@@ -303,6 +303,7 @@ public:
   int getAlphaMode() const;
   void setAlphaTesting(bool enable);
   bool getAlphaTesting() const;
+  Internals::_StencilState* stencilState();
 
   /** Textures **/
   void wipeCaches(bool bruteForce = false);

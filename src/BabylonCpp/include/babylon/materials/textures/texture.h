@@ -25,6 +25,9 @@ public:
 
   virtual IReflect::Type type() const override;
 
+  void setIsBlocking(bool value);
+  bool isBlocking() const override;
+
   bool noMipmap() const;
   void delayLoad() override;
   void updateSamplingMode(unsigned int samplingMode);
@@ -77,6 +80,7 @@ public:
 
 protected:
   unsigned int _format;
+  bool _isBlocking;
 
 private:
   bool _noMipmap;

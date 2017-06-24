@@ -624,7 +624,7 @@ bool Animation::animate(millisecond_t delay, float from, float to, bool loop,
       / 1000.f;
   AnimationValue highLimitValue;
 
-  if (ratio > range && !loop) {
+  if (((to > from && ratio > range) || (from > to && ratio < range)) && !loop) {
     // If we are out of range and not looping get back to caller
     returnValue    = false;
     highLimitValue = _getKeyValue(_keys.back().value);

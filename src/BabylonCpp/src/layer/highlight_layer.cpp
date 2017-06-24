@@ -22,6 +22,7 @@
 #include <babylon/postprocess/blur_post_process.h>
 #include <babylon/postprocess/pass_post_process.h>
 #include <babylon/postprocess/post_process_manager.h>
+#include <babylon/states/_stencil_state.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -444,10 +445,14 @@ void HighlightLayer::render()
   engine->setState(false);
 
   // Cache
-  auto previousStencilBuffer   = engine->getStencilBuffer();
-  auto previousStencilFunction = engine->getStencilFunction();
-  auto previousStencilMask     = engine->getStencilMask();
-  auto previousAlphaMode       = engine->getAlphaMode();
+  auto previousStencilBuffer        = engine->getStencilBuffer();
+  auto previousStencilFunction      = engine->getStencilFunction();
+  auto previousStencilMask          = engine->getStencilMask();
+  auto previousStencilOperationPass = engine->getStencilOperationPass();
+  auto previousStencilOperationFail = engine->getStencilOperationFail();
+  auto previousStencilOperationDepthFail
+    = engine->getStencilOperationDepthFail();
+  auto previousAlphaMode = engine->getAlphaMode();
 
   // Texture
   currentEffect->setTexture("textureSampler", _blurTexture.get());
@@ -458,6 +463,11 @@ void HighlightLayer::render()
     _vertexBuffersTmp[item.first] = item.second.get();
   }
   engine->bindBuffers(_vertexBuffersTmp, _indexBuffer.get(), currentEffect);
+
+  // Stencil operations
+  engine->setStencilOperationPass(EngineConstants::REPLACE);
+  engine->setStencilOperationFail(EngineConstants::KEEP);
+  engine->setStencilOperationDepthFail(EngineConstants::KEEP);
 
   // Draw order
   engine->setAlphaMode(_options.alphaBlendingMode);
@@ -481,6 +491,11 @@ void HighlightLayer::render()
   engine->setStencilMask(previousStencilMask);
   engine->setAlphaMode(previousAlphaMode);
   engine->setStencilBuffer(previousStencilBuffer);
+  engine->setStencilOperationPass(previousStencilOperationPass);
+  engine->setStencilOperationFail(previousStencilOperationFail);
+  engine->setStencilOperationDepthFail(previousStencilOperationDepthFail);
+
+  engine->stencilState()->reset();
 
   onAfterComposeObservable.notifyObservers(this);
 

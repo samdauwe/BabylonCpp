@@ -1895,6 +1895,11 @@ bool Engine::getAlphaTesting() const
   return _alphaTest;
 }
 
+Internals::_StencilState* Engine::stencilState()
+{
+  return _stencilState.get();
+}
+
 // Textures
 void Engine::wipeCaches(bool bruteForce)
 {
