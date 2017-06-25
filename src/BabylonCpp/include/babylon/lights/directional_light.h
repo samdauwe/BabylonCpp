@@ -72,7 +72,7 @@ protected:
    */
   void _setDefaultShadowProjectionMatrix(
     Matrix& matrix, const Matrix& viewMatrix,
-    const std::vector<AbstractMesh*>& renderList);
+    const std::vector<AbstractMesh*>& renderList) override;
 
   /**
    * @brief Sets the passed matrix "matrix" as fixed frustum projection matrix

@@ -42,11 +42,11 @@ public:
   int refreshRate() const;
   void setRefreshRate(int value);
   bool _shouldRender();
-  bool isReady();
+  bool isReady() override;
   ISize& getRenderSize();
   bool canRescale() const;
-  void scale(float ratio);
-  Matrix* getReflectionTextureMatrix();
+  void scale(float ratio) override;
+  Matrix* getReflectionTextureMatrix() override;
   void resize(const ISize& size);
   void render(bool useCameraPostProcess = false, bool dumpForDebug = false);
   void renderToTarget(unsigned int faceIndex,
