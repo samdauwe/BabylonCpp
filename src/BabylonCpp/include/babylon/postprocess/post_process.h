@@ -52,7 +52,9 @@ public:
   void setOnAfterRender(const std::function<void(Effect* effect)>& callback);
 
   GL::IGLTexture* outputTexture();
+  void setOutputTexture(GL::IGLTexture* value);
   Camera* getCamera();
+  Vector2 texelSize();
   Engine* getEngine();
   PostProcess& shareOutputWith(PostProcess* postProcess);
   void updateEffect(
@@ -65,8 +67,10 @@ public:
    * Invalidate frameBuffer to hint the postprocess to create a depth buffer
    */
   void markTextureDirty();
-  void activate(Camera* camera, GL::IGLTexture* sourceTexture = nullptr);
+  void activate(Camera* camera, GL::IGLTexture* sourceTexture = nullptr,
+                bool forceDepthStencil = false);
   bool isSupported() const;
+  float aspectRatio() const;
   Effect* apply();
   void _disposeTextures();
   virtual void dispose(Camera* camera = nullptr);
@@ -83,6 +87,8 @@ public:
   // Enable Pixel Perfect mode where texture is not scaled to be power of 2.
   // Can only be used on a single postprocess or on the last one of a chain.
   bool enablePixelPerfectMode;
+  unsigned int scaleMode;
+  bool alwaysForcePOT;
   unsigned int samples;
   std::vector<GL::IGLTexture*> _textures;
   unsigned int _currentRenderTextureInd;
@@ -126,6 +132,8 @@ private:
   std::vector<std::string> _parameters;
   Vector2 _scaleRatio;
   PostProcess* _shareOutputWithPostProcess;
+  Vector2 _texelSize;
+  GL::IGLTexture* _forcedOutputTexture;
   // Events
   Observer<Camera>::Ptr _onActivateObserver;
   Observer<PostProcess>::Ptr _onSizeChangedObserver;

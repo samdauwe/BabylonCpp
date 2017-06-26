@@ -9,6 +9,7 @@
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/particles/particle_system.h>
+#include <babylon/postprocess/post_process.h>
 #include <babylon/postprocess/post_process_manager.h>
 #include <babylon/rendering/rendering_manager.h>
 #include <babylon/tools/tools.h>
@@ -31,6 +32,7 @@ RenderTargetTexture::RenderTargetTexture(
     , _currentRefreshId{-1}
     , _refreshRate{1}
     , _samples{1}
+    , _postProcessManager{nullptr}
 {
   name           = iName;
   isRenderTarget = true;
@@ -147,6 +149,53 @@ void RenderTargetTexture::setRefreshRate(int value)
   resetRefreshCounter();
 }
 
+void RenderTargetTexture::addPostProcess(PostProcess* postProcess)
+{
+  if (!_postProcessManager) {
+    _postProcessManager = std::make_unique<PostProcessManager>(getScene());
+    _postProcesses.clear();
+  }
+
+  _postProcesses.emplace_back(postProcess);
+  _postProcesses[0]->autoClear = false;
+}
+
+void RenderTargetTexture::clearPostProcesses(bool dispose)
+{
+  if (_postProcesses.empty()) {
+    return;
+  }
+
+  if (dispose) {
+    for (auto& postProcess : _postProcesses) {
+      postProcess->dispose();
+      postProcess = nullptr;
+    }
+  }
+
+  _postProcesses.clear();
+}
+
+void RenderTargetTexture::removePostProcess(PostProcess* postProcess)
+{
+  if (_postProcesses.empty()) {
+    return;
+  }
+
+  auto it
+    = std::find(_postProcesses.begin(), _postProcesses.end(), postProcess);
+
+  if (it == _postProcesses.end()) {
+    return;
+  }
+
+  _postProcesses.erase(it);
+
+  if (!_postProcesses.empty()) {
+    _postProcesses[0]->autoClear = false;
+  }
+}
+
 bool RenderTargetTexture::_shouldRender()
 {
   if (_currentRefreshId == -1) { // At least render once
@@ -242,7 +291,9 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
 
   // Set custom projection.
   // Needs to be before binding to prevent changing the aspect ratio.
+  Camera* camera = nullptr;
   if (activeCamera) {
+    camera = activeCamera;
     engine->setViewport(activeCamera->viewport);
 
     if (activeCamera != scene->activeCamera) {
@@ -251,6 +302,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
     }
   }
   else {
+    camera = scene->activeCamera;
     engine->setViewport(scene->activeCamera->viewport);
   }
 
@@ -273,8 +325,17 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
         resetRefreshCounter();
         continue;
       }
+
+      bool isMasked;
+      if (renderList.empty()) {
+        isMasked = ((mesh->layerMask & camera->layerMask) == 0);
+      }
+      else {
+        isMasked = false;
+      }
+
       if (mesh->isEnabled() && mesh->isVisible && (!mesh->subMeshes.empty())
-          && ((mesh->layerMask & scene->activeCamera->layerMask) != 0)) {
+          && !isMasked) {
         mesh->_activate(scene->getRenderId());
         for (auto& subMesh : mesh->subMeshes) {
           scene->_activeIndices.addCount(subMesh->indexCount, false);
@@ -329,8 +390,11 @@ void RenderTargetTexture::renderToTarget(
   auto engine = scene->getEngine();
 
   // Bind
-  if (!useCameraPostProcess
-      || !scene->postProcessManager->_prepareFrame(_texture)) {
+  if (_postProcessManager) {
+    _postProcessManager->_prepareFrame(_texture, _postProcesses);
+  }
+  else if (!useCameraPostProcess
+           || !scene->postProcessManager->_prepareFrame(_texture)) {
     if (isCube) {
       engine->bindFramebuffer(_texture, faceIndex);
     }
@@ -358,7 +422,11 @@ void RenderTargetTexture::renderToTarget(
   _renderingManager->render(customRenderFunction, currentRenderList,
                             renderParticles, renderSprites);
 
-  if (useCameraPostProcess) {
+  if (_postProcessManager) {
+    _postProcessManager->_finalizeFrame(false, _texture, faceIndex,
+                                        _postProcesses);
+  }
+  else if (useCameraPostProcess) {
     scene->postProcessManager->_finalizeFrame(
       false, _texture, static_cast<unsigned>(_faceIndex));
   }
@@ -434,6 +502,13 @@ Json::object RenderTargetTexture::serialize() const
 
 void RenderTargetTexture::dispose(bool doNotRecurse)
 {
+  if (_postProcessManager) {
+    _postProcessManager->dispose();
+    _postProcessManager.reset(nullptr);
+  }
+
+  clearPostProcesses(true);
+
   Texture::dispose(doNotRecurse);
 }
 

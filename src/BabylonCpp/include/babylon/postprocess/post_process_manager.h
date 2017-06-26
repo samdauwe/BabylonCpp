@@ -16,7 +16,8 @@ public:
   virtual ~PostProcessManager();
 
   /** Methods **/
-  bool _prepareFrame(GL::IGLTexture* sourceTexture);
+  bool _prepareFrame(GL::IGLTexture* sourceTexture,
+                     const std::vector<PostProcess*>& postProcesses = {});
   void directRender(const std::vector<PostProcess*>& postProcesses,
                     GL::IGLTexture* targetTexture);
   void _finalizeFrame(bool doNotPresent,

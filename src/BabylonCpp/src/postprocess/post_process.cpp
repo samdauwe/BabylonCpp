@@ -12,16 +12,15 @@
 
 namespace BABYLON {
 
-PostProcess::PostProcess(const std::string& iName,
-                         const std::string& fragmentUrl,
-                         const std::vector<std::string>& parameters,
-                         const std::vector<std::string>& samplers,
-                         float renderRatio, Camera* camera,
-                         unsigned int samplingMode, Engine* engine,
-                         bool reusable, const std::string& defines,
-                         unsigned int textureType, const std::string& vertexUrl,
-                         const std::unordered_map<std::string, unsigned int>& indexParameters,
-                         bool blockCompilation)
+PostProcess::PostProcess(
+  const std::string& iName, const std::string& fragmentUrl,
+  const std::vector<std::string>& parameters,
+  const std::vector<std::string>& samplers, float renderRatio, Camera* camera,
+  unsigned int samplingMode, Engine* engine, bool reusable,
+  const std::string& defines, unsigned int textureType,
+  const std::string& vertexUrl,
+  const std::unordered_map<std::string, unsigned int>& indexParameters,
+  bool blockCompilation)
     : PostProcess(iName, fragmentUrl, parameters, samplers, {-1, -1}, camera,
                   samplingMode, engine, reusable, defines, textureType,
                   vertexUrl, indexParameters, blockCompilation)
@@ -29,22 +28,23 @@ PostProcess::PostProcess(const std::string& iName,
   _renderRatio = renderRatio;
 }
 
-PostProcess::PostProcess(const std::string& iName,
-                         const std::string& fragmentUrl,
-                         const std::vector<std::string>& parameters,
-                         const std::vector<std::string>& samplers,
-                         const PostProcessOptions& options, Camera* camera,
-                         unsigned int samplingMode, Engine* engine,
-                         bool reusable, const std::string& defines,
-                         unsigned int textureType, const std::string& vertexUrl,
-                         const std::unordered_map<std::string, unsigned int>& indexParameters,
-                         bool blockCompilation)
+PostProcess::PostProcess(
+  const std::string& iName, const std::string& fragmentUrl,
+  const std::vector<std::string>& parameters,
+  const std::vector<std::string>& samplers, const PostProcessOptions& options,
+  Camera* camera, unsigned int samplingMode, Engine* engine, bool reusable,
+  const std::string& defines, unsigned int textureType,
+  const std::string& vertexUrl,
+  const std::unordered_map<std::string, unsigned int>& indexParameters,
+  bool blockCompilation)
     : name{iName}
     , width{-1}
     , height{-1}
     , autoClear{true}
     , alphaMode{EngineConstants::ALPHA_DISABLE}
     , enablePixelPerfectMode{false}
+    , scaleMode{EngineConstants::SCALEMODE_FLOOR}
+    , alwaysForcePOT{false}
     , samples{1}
     , _currentRenderTextureInd{0}
     , _renderRatio{1.f}
@@ -55,6 +55,8 @@ PostProcess::PostProcess(const std::string& iName,
     , _parameters{parameters}
     , _scaleRatio{Vector2(1.f, 1.f)}
     , _shareOutputWithPostProcess{nullptr}
+    , _texelSize{Vector2::Zero()}
+    , _forcedOutputTexture{nullptr}
 {
   if (camera) {
     _camera = camera;
@@ -137,9 +139,28 @@ GL::IGLTexture* PostProcess::outputTexture()
   return _textures[_currentRenderTextureInd];
 }
 
+void PostProcess::setOutputTexture(GL::IGLTexture* value)
+{
+  _forcedOutputTexture = value;
+}
+
 Camera* PostProcess::getCamera()
 {
   return _camera;
+}
+
+Vector2 PostProcess::texelSize()
+{
+  if (_shareOutputWithPostProcess) {
+    return _shareOutputWithPostProcess->texelSize();
+  }
+
+  if (_forcedOutputTexture) {
+    _texelSize.copyFromFloats(1.f / _forcedOutputTexture->_width,
+                              1.f / _forcedOutputTexture->_height);
+  }
+
+  return _texelSize;
 }
 
 Engine* PostProcess::getEngine()
@@ -184,9 +205,10 @@ void PostProcess::markTextureDirty()
   width = -1;
 }
 
-void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture)
+void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture,
+                           bool forceDepthStencil)
 {
-  if (!_shareOutputWithPostProcess) {
+  if (!_shareOutputWithPostProcess && !_forcedOutputTexture) {
     auto pCamera = camera ? camera : _camera;
 
     auto scene        = pCamera->getScene();
@@ -205,13 +227,16 @@ void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture)
     int desiredHeight
       = _options.height == -1 ? requiredHeight : _options.height;
 
-    if (renderTargetSamplingMode != TextureConstants::NEAREST_SAMPLINGMODE) {
+    if (renderTargetSamplingMode != TextureConstants::TRILINEAR_SAMPLINGMODE
+        || alwaysForcePOT) {
       if (_options.width <= 0) {
-        desiredWidth = Tools::GetExponentOfTwo(desiredWidth, maxSize);
+        desiredWidth
+          = Tools::GetExponentOfTwo(desiredWidth, maxSize, scaleMode);
       }
 
       if (_options.height <= 0) {
-        desiredHeight = Tools::GetExponentOfTwo(desiredHeight, maxSize);
+        desiredHeight
+          = Tools::GetExponentOfTwo(desiredHeight, maxSize, scaleMode);
       }
     }
 
@@ -229,9 +254,11 @@ void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture)
       IRenderTargetOptions textureOptions;
       textureOptions.generateMipMaps = false;
       textureOptions.generateDepthBuffer
-        = stl_util::index_of(pCamera->_postProcesses, this) == 0;
+        = forceDepthStencil
+          || (stl_util::index_of(pCamera->_postProcesses, this) == 0);
       textureOptions.generateStencilBuffer
-        = (stl_util::index_of(pCamera->_postProcesses, this) == 0)
+        = (forceDepthStencil
+           || (stl_util::index_of(pCamera->_postProcesses, this) == 0))
           && _engine->isStencilEnable();
       textureOptions.samplingMode = renderTargetSamplingMode;
       textureOptions.type         = _textureType;
@@ -244,6 +271,8 @@ void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture)
           _engine->createRenderTargetTexture(textureSize, textureOptions));
       }
 
+      _texelSize.copyFromFloats(1.f / width, 1.f / height);
+
       onSizeChangedObservable.notifyObservers(this);
     }
 
@@ -253,49 +282,60 @@ void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture)
       }
     }
 
-    auto target = _shareOutputWithPostProcess ? _shareOutputWithPostProcess->outputTexture() : outputTexture();
+    GL::IGLTexture* target = nullptr;
+    if (_shareOutputWithPostProcess) {
+      target = _shareOutputWithPostProcess->outputTexture();
+    }
+    else if (_forcedOutputTexture) {
+      target = _forcedOutputTexture;
+    }
+    else {
+      target = outputTexture();
+    }
 
-  if (enablePixelPerfectMode) {
-    _scaleRatio.copyFromFloats(
-      static_cast<float>(requiredWidth) / static_cast<float>(desiredWidth),
-      static_cast<float>(requiredHeight) / static_cast<float>(desiredHeight));
-    _engine->bindFramebuffer(target, 0,
-                             requiredWidth, requiredHeight);
-  }
-  else {
-    _scaleRatio.copyFromFloats(1.f, 1.f);
-    _engine->bindFramebuffer(target);
-  }
+    if (enablePixelPerfectMode) {
+      _scaleRatio.copyFromFloats(
+        static_cast<float>(requiredWidth) / static_cast<float>(desiredWidth),
+        static_cast<float>(requiredHeight) / static_cast<float>(desiredHeight));
+      _engine->bindFramebuffer(target, 0, requiredWidth, requiredHeight);
+    }
+    else {
+      _scaleRatio.copyFromFloats(1.f, 1.f);
+      _engine->bindFramebuffer(target);
+    }
 
-  onActivateObservable.notifyObservers(camera);
+    onActivateObservable.notifyObservers(camera);
 
-  // Clear
-  if (clearColor) {
-    _engine->clear(*clearColor, true, true, true);
-  }
-  else {
-    _engine->clear(scene->clearColor, scene->autoClear || scene->forceWireframe,
-                   true, true);
-  }
+    // Clear
+    if (autoClear && alphaMode == EngineConstants::ALPHA_DISABLE) {
+      _engine->clear(clearColor ? *clearColor : scene->clearColor, true, true,
+                     true);
+    }
 
-  if (_reusable) {
-    _currentRenderTextureInd = (_currentRenderTextureInd + 1) % 2;
-  }
-
-  // Alpha
-  _engine->setAlphaMode(static_cast<int>(alphaMode));
-  if (alphaConstants) {
-    const auto& _alphaConstants = alphaConstants.value;
-    getEngine()->setAlphaConstants(_alphaConstants.r, _alphaConstants.g,
-                                   _alphaConstants.b, _alphaConstants.a);
-  }
-
+    if (_reusable) {
+      _currentRenderTextureInd = (_currentRenderTextureInd + 1) % 2;
+    }
   }
 }
 
 bool PostProcess::isSupported() const
 {
   return _effect->isSupported();
+}
+
+float PostProcess::aspectRatio() const
+{
+  if (_shareOutputWithPostProcess) {
+    return _shareOutputWithPostProcess->aspectRatio();
+  }
+
+  if (_forcedOutputTexture) {
+    auto size = static_cast<float>(_forcedOutputTexture->_width)
+                / static_cast<float>(_forcedOutputTexture->_height);
+    return size;
+  }
+
+  return static_cast<float>(width) / static_cast<float>(height);
 }
 
 Effect* PostProcess::apply()
@@ -311,10 +351,25 @@ Effect* PostProcess::apply()
   _engine->setDepthBuffer(false);
   _engine->setDepthWrite(false);
 
+  // Alpha
+  _engine->setAlphaMode(static_cast<int>(alphaMode));
+  if (alphaConstants) {
+    const auto& _alphaConstants = *alphaConstants;
+    getEngine()->setAlphaConstants(_alphaConstants.r, _alphaConstants.g,
+                                   _alphaConstants.b, _alphaConstants.a);
+  }
+
   // Texture
-  auto source = _shareOutputWithPostProcess ?
-                  _shareOutputWithPostProcess->outputTexture() :
-                  outputTexture();
+  GL::IGLTexture* source = nullptr;
+  if (_shareOutputWithPostProcess) {
+    source = _shareOutputWithPostProcess->outputTexture();
+  }
+  else if (_forcedOutputTexture) {
+    source = _forcedOutputTexture;
+  }
+  else {
+    source = outputTexture();
+  }
   _effect->_bindTexture("textureSampler", source);
 
   // Parameters
@@ -326,7 +381,7 @@ Effect* PostProcess::apply()
 
 void PostProcess::_disposeTextures()
 {
-  if (_shareOutputWithPostProcess) {
+  if (_shareOutputWithPostProcess || _forcedOutputTexture) {
     return;
   }
 

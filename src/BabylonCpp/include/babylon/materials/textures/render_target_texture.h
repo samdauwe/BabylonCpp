@@ -41,6 +41,9 @@ public:
   void resetRefreshCounter();
   int refreshRate() const;
   void setRefreshRate(int value);
+  void addPostProcess(PostProcess* postProcess);
+  void clearPostProcesses(bool dispose = false);
+  void removePostProcess(PostProcess* postProcess);
   bool _shouldRender();
   bool isReady() override;
   ISize& getRenderSize();
@@ -146,6 +149,8 @@ protected:
   unsigned int _samples;
 
 private:
+  std::unique_ptr<PostProcessManager> _postProcessManager;
+  std::vector<PostProcess*> _postProcesses;
   // Events
   Observer<RenderTargetTexture>::Ptr _onAfterUnbindObserver;
   Observer<int>::Ptr _onBeforeRenderObserver;

@@ -26,6 +26,7 @@ MapTexture::MapTexture(const std::string& iName, Scene* scene,
   options.generateMipMaps = !noMipmap();
   options.type            = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
 
+  // Create the texture that will store the content
   _texture = scene->getEngine()->createRenderTargetTexture(size, options);
 }
 
@@ -40,7 +41,9 @@ PackedRect* MapTexture::allocateRect(const Size& size)
 
 void MapTexture::freeRect(PackedRect* rectInfo)
 {
-  rectInfo->freeContent();
+  if (rectInfo) {
+    rectInfo->freeContent();
+  }
 }
 
 float MapTexture::freeSpace() const

@@ -1,10 +1,12 @@
 #include <babylon/materials/textures/mirror_texture.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
 #include <babylon/core/structs.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/postprocess/blur_post_process.h>
 
 namespace BABYLON {
 
@@ -19,6 +21,10 @@ MirrorTexture::MirrorTexture(const std::string& iName, const ISize& size,
     , _transformMatrix{Matrix::Zero()}
     , _mirrorMatrix{Matrix::Zero()}
     , _savedViewMatrix{Matrix::Zero()}
+    , _blurX{nullptr}
+    , _blurY{nullptr}
+    , _blurKernel{0.f}
+    , _blurRatio{0.6f}
 
 {
   onBeforeRender = [this]() {
@@ -44,6 +50,64 @@ MirrorTexture::MirrorTexture(const std::string& iName, const ISize& size,
 
 MirrorTexture::~MirrorTexture()
 {
+}
+
+void MirrorTexture::setBlurRatio(float value)
+{
+  if (stl_util::almost_equal(_blurRatio, value)) {
+    return;
+  }
+
+  _blurRatio = value;
+  _preparePostProcesses();
+}
+
+float MirrorTexture::blurRatio() const
+{
+  return _blurRatio;
+}
+
+void MirrorTexture::setBlurKernel(float value)
+{
+  if (stl_util::almost_equal(_blurKernel, value)) {
+    return;
+  }
+
+  _blurKernel = value;
+  _preparePostProcesses();
+}
+
+float MirrorTexture::blurKernel() const
+{
+  return _blurKernel;
+}
+
+void MirrorTexture::_preparePostProcesses()
+{
+  clearPostProcesses(true);
+
+  if (_blurKernel != 0.f) {
+    auto engine = getScene()->getEngine();
+
+    auto textureType = engine->getCaps().textureFloatRender ?
+                         EngineConstants::TEXTURETYPE_FLOAT :
+                         EngineConstants::TEXTURETYPE_HALF_FLOAT;
+
+    _blurX = std::make_unique<BlurPostProcess>(
+      "horizontal blur", Vector2(1.f, 0.f), _blurKernel, _blurRatio, nullptr,
+      TextureConstants::BILINEAR_SAMPLINGMODE, engine, false, textureType);
+    _blurX->autoClear      = false;
+    _blurX->alwaysForcePOT = false;
+
+    _blurY = std::make_unique<BlurPostProcess>(
+      "vertical blur", Vector2(0.f, 1.f), _blurKernel, _blurRatio, nullptr,
+      TextureConstants::BILINEAR_SAMPLINGMODE, engine, false, textureType);
+    _blurY->autoClear      = false;
+    _blurY->alwaysForcePOT = true;
+
+    addPostProcess(_blurX.get());
+    addPostProcess(_blurY.get());
+  }
 }
 
 std::unique_ptr<MirrorTexture> MirrorTexture::clone() const

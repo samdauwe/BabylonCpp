@@ -34,13 +34,17 @@ void PostProcessManager::_prepareBuffers()
     = _vertexBuffers[VertexBuffer::PositionKindChars].get();
 
   // Indices
-  Uint32Array indices{0, 1, 2, 0, 2, 3};
+  IndicesArray indices{0, 1, 2, 0, 2, 3};
   _indexBuffer = _scene->getEngine()->createIndexBuffer(indices);
 }
 
-bool PostProcessManager::_prepareFrame(GL::IGLTexture* sourceTexture)
+bool PostProcessManager::_prepareFrame(
+  GL::IGLTexture* sourceTexture,
+  const std::vector<PostProcess*>& iPostProcesses)
 {
-  const auto& postProcesses = _scene->activeCamera->_postProcesses;
+  const auto& postProcesses = !iPostProcesses.empty() ?
+                                iPostProcesses :
+                                _scene->activeCamera->_postProcesses;
 
   if (postProcesses.empty() || !_scene->postProcessesEnabled) {
     return false;

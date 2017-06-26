@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/core/structs.h>
+#include <babylon/engine/engine_constants.h>
 
 namespace BABYLON {
 
@@ -22,7 +23,31 @@ struct BABYLON_SHARED_EXPORT Tools {
    */
   static float Mix(float a, float b, float alpha);
   static bool IsExponentOfTwo(int value);
-  static int GetExponentOfTwo(int value, int max);
+
+  /**
+   * @brief Find the next highest power of two.
+   * @param x Number to start search from.
+   * @return Next highest power of two.
+   */
+  static int CeilingPOT(int x);
+
+  /**
+   * @brief Find the next lowest power of two.
+   * @param x Number to start search from.
+   * @return Next lowest power of two.
+   */
+  static int FloorPOT(int x);
+
+  /**
+   * Find the nearest power of two.
+   * @param x Number to start search from.
+   * @return Next nearest power of two.
+   */
+  static int NearestPOT(int x);
+
+  static int GetExponentOfTwo(int value, int max,
+                              unsigned int mode
+                              = EngineConstants::SCALEMODE_NEAREST);
   static float ToDegrees(float angle);
   static float ToRadians(float angle);
   static MinMax ExtractMinAndMaxIndexed(const Float32Array& positions,

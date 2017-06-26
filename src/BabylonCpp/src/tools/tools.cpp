@@ -38,19 +38,52 @@ bool Tools::IsExponentOfTwo(int value)
   return count == value;
 }
 
-int Tools::GetExponentOfTwo(int value, int max)
+int Tools::CeilingPOT(int x)
 {
-  int count = 1;
+  x--;
+  x |= x >> 1;
+  x |= x >> 2;
+  x |= x >> 4;
+  x |= x >> 8;
+  x |= x >> 16;
+  x++;
+  return x;
+}
 
-  do {
-    count *= 2;
-  } while (count < value);
+int Tools::FloorPOT(int x)
+{
+  x = x | (x >> 1);
+  x = x | (x >> 2);
+  x = x | (x >> 4);
+  x = x | (x >> 8);
+  x = x | (x >> 16);
+  return x - (x >> 1);
+}
 
-  if (count > max) {
-    count = max;
+int Tools::NearestPOT(int x)
+{
+  auto c = Tools::CeilingPOT(x);
+  auto f = Tools::FloorPOT(x);
+  return (c - x) > (x - f) ? f : c;
+}
+
+int Tools::GetExponentOfTwo(int value, int max, unsigned int mode)
+{
+  int pot;
+
+  switch (mode) {
+    case EngineConstants::SCALEMODE_FLOOR:
+      pot = Tools::FloorPOT(value);
+      break;
+    case EngineConstants::SCALEMODE_NEAREST:
+      pot = Tools::NearestPOT(value);
+      break;
+    case EngineConstants::SCALEMODE_CEILING:
+      pot = Tools::CeilingPOT(value);
+      break;
   }
 
-  return count;
+  return std::min(pot, max);
 }
 
 float Tools::ToDegrees(float angle)
