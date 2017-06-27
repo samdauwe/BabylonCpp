@@ -1,4 +1,4 @@
-#include <babylon/postprocess/ssao_rendering_pipeline.h>
+#include <babylon/postprocess/renderpipeline/pipelines/ssao_rendering_pipeline.h>
 
 #include <babylon/core/random.h>
 #include <babylon/engine/scene.h>

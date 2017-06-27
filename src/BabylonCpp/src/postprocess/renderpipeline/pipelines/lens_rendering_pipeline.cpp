@@ -1,4 +1,4 @@
-#include <babylon/postprocess/lens_rendering_pipeline.h>
+#include <babylon/postprocess/renderpipeline/pipelines/lens_rendering_pipeline.h>
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>

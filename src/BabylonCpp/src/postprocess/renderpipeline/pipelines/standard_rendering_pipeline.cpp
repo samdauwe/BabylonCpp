@@ -1,4 +1,4 @@
-#include <babylon/postprocess/standard_rendering_pipeline.h>
+#include <babylon/postprocess/renderpipeline/pipelines/standard_rendering_pipeline.h>
 
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/engine.h>

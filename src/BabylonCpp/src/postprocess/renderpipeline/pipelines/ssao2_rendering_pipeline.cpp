@@ -1,4 +1,4 @@
-#include <babylon/postprocess/ssao2_rendering_pipeline.h>
+#include <babylon/postprocess/renderpipeline/pipelines/ssao2_rendering_pipeline.h>
 
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
