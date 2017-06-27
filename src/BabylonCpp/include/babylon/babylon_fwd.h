@@ -385,15 +385,12 @@ class ConvolutionPostProcess;
 class DisplayPassPostProcess;
 class FilterPostProcess;
 class FxaaPostProcess;
-class HDRRenderingPipeline;
-class LensRenderingPipeline;
+class HighlightsPostProcess;
+class ImageProcessingPostProcess;
 class PassPostProcess;
 class PostProcess;
 class PostProcessManager;
 class RefractionPostProcess;
-class SSAO2RenderingPipeline;
-class SSAORenderingPipeline;
-class StandardRenderingPipeline;
 class StereoscopicInterlacePostProcess;
 class TonemapPostProcess;
 class VolumetricLightScatteringPostProcess;
@@ -403,6 +400,12 @@ class PostProcessRenderEffect;
 class PostProcessRenderPass;
 class PostProcessRenderPipeline;
 class PostProcessRenderPipelineManager;
+// -- Pipelines
+class DefaultRenderingPipeline;
+class LensRenderingPipeline;
+class SSAO2RenderingPipeline;
+class SSAORenderingPipeline;
+class StandardRenderingPipeline;
 // --- Probes ---
 class ReflectionProbe;
 // --- Rendering ---

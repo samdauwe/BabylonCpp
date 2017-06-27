@@ -38,11 +38,13 @@ public:
   std::string _name;
   Engine* _engine;
 
+protected:
+  std::unordered_map<std::string, Camera*> _cameras;
+
 private:
   std::unordered_map<std::string, PostProcessRenderEffect*> _renderEffects;
   std::unordered_map<std::string, PostProcessRenderEffect*>
     _renderEffectsForIsolatedPass;
-  std::unordered_map<std::string, Camera*> _cameras;
 
 }; // end of class PostProcessRenderPipeline
 
