@@ -19,6 +19,7 @@ public:
   PostProcessRenderPipeline(Engine* engine, const std::string& name);
   virtual ~PostProcessRenderPipeline();
 
+  std::vector<Camera*> getCameras() const;
   bool isSupported() const;
   void addEffect(PostProcessRenderEffect* renderEffect);
   void _enableEffect(const std::string& renderEffectName,
@@ -32,6 +33,7 @@ public:
   void _disableDisplayOnlyPass(const std::string& passName,
                                const std::vector<Camera*>& cameras);
   void _update();
+  void _reset();
   virtual void dispose(bool doNotRecurse = false) override;
 
 public:

@@ -15,6 +15,16 @@ PostProcessRenderPipeline::PostProcessRenderPipeline(Engine* engine,
 {
 }
 
+std::vector<Camera*> PostProcessRenderPipeline::getCameras() const
+{
+  std::vector<Camera*> cameras;
+  cameras.reserve(_cameras.size());
+  for (auto& item : _cameras) {
+    cameras.emplace_back(item.second);
+  }
+  return cameras;
+}
+
 bool PostProcessRenderPipeline::isSupported() const
 {
   for (auto& item : _renderEffects) {
@@ -81,7 +91,7 @@ void PostProcessRenderPipeline::_attachCameras(
       _cameras.erase(it);
   }
 
-  for (auto item : _renderEffects) {
+  for (auto& item : _renderEffects) {
     item.second->_attachCameras(_cam);
   }
 }
@@ -179,8 +189,15 @@ void PostProcessRenderPipeline::_update()
   }
 }
 
+void PostProcessRenderPipeline::_reset()
+{
+  _renderEffects.clear();
+  _renderEffectsForIsolatedPass.clear();
+}
+
 void PostProcessRenderPipeline::dispose(bool /*doNotRecurse*/)
 {
+  // Must be implemented by children
 }
 
 } // end of namespace BABYLON

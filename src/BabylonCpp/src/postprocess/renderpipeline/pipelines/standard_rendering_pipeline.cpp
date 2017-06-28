@@ -60,6 +60,7 @@ StandardRenderingPipeline::StandardRenderingPipeline(
     , _currentHDRSource{nullptr}
     , _hdrCurrentLuminance{1.f}
     , _motionBlurSamples{64}
+    , _bloomEnabled{true}
     , _depthOfFieldEnabled{true}
     , _lensFlareEnabled{true}
     , _hdrEnabled{true}
@@ -163,6 +164,53 @@ StandardRenderingPipeline::StandardRenderingPipeline(
 
 StandardRenderingPipeline::~StandardRenderingPipeline()
 {
+}
+
+void StandardRenderingPipeline::setBloomEnabled(bool enabled)
+{
+  const auto cameras = getCameras();
+
+  if (enabled && !_bloomEnabled) {
+    _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
+      _name, "HDRDownSampleX4", cameras);
+    _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
+      _name, "HDRBrightPass", cameras);
+
+    for (std::size_t i = 0; i < gaussianBlurHPostProcesses.size() - 1; ++i) {
+      const std::string istr = std::to_string(i);
+      _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
+        _name, "HDRGaussianBlurH" + istr, cameras);
+      _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
+        _name, "HDRGaussianBlurV" + istr, cameras);
+    }
+
+    _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
+      _name, "HDRTextureAdder", cameras);
+  }
+  else if (!enabled && _bloomEnabled) {
+    _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
+      _name, "HDRDownSampleX4", cameras);
+    _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
+      _name, "HDRBrightPass", cameras);
+
+    for (std::size_t i = 0; i < gaussianBlurHPostProcesses.size() - 1; ++i) {
+      const std::string istr = std::to_string(i);
+      _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
+        _name, "HDRGaussianBlurH" + istr, cameras);
+      _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
+        _name, "HDRGaussianBlurV" + istr, cameras);
+    }
+
+    _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
+      _name, "HDRTextureAdder", cameras);
+  }
+
+  _bloomEnabled = enabled;
+}
+
+bool StandardRenderingPipeline::bloomEnabled() const
+{
+  return _bloomEnabled;
 }
 
 void StandardRenderingPipeline::setDepthOfFieldEnabled(bool enabled)
@@ -569,7 +617,10 @@ void StandardRenderingPipeline::_createHdrPostProcess(Scene* scene, float ratio)
   float lastTime        = 0.f;
 
   hdrPostProcess->setOnApply([&](Effect* effect) {
-    effect->setTextureFromPostProcess("textureAdderSampler", _currentHDRSource);
+
+    effect->setTextureFromPostProcess("textureAdderSampler",
+                                      _bloomEnabled ? _currentHDRSource :
+                                                      originalPostProcess);
 
     time += Time::fpMillisecondsDuration<float>(
       scene->getEngine()->getDeltaTime());
@@ -631,8 +682,9 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
 
   // Lens flare
   lensFlarePostProcess->setOnApply([&](Effect* effect) {
-    effect->setTextureFromPostProcess("textureSampler",
-                                      gaussianBlurHPostProcesses[0]);
+    effect->setTextureFromPostProcess(
+      "textureSampler",
+      _bloomEnabled ? gaussianBlurHPostProcesses[0] : originalPostProcess);
     effect->setTexture("lensColorSampler", lensColorTexture);
     effect->setFloat("strength", lensFlareStrength);
     effect->setFloat("ghostDispersal", lensFlareGhostDispersal);

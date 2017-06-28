@@ -136,9 +136,9 @@ bool SSAO2RenderingPipeline::expensiveBlur()
   return _expensiveBlur;
 }
 
-bool SSAO2RenderingPipeline::isSupported() const
+bool SSAO2RenderingPipeline::IsSupported()
 {
-  auto engine = _scene->getEngine();
+  auto engine = Engine::LastCreatedEngine();
   return engine->webGLVersion() > 1.f;
 }
 

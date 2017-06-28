@@ -4,11 +4,13 @@
 #include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/interfaces/icanvas.h>
 #include <babylon/postprocess/blur_post_process.h>
 #include <babylon/postprocess/fxaa_post_process.h>
 #include <babylon/postprocess/highlights_post_process.h>
 #include <babylon/postprocess/image_processing_post_process.h>
 #include <babylon/postprocess/pass_post_process.h>
+#include <babylon/postprocess/renderpipeline/post_process_render_effect.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_pipeline_manager.h>
 
 namespace BABYLON {
@@ -148,6 +150,135 @@ bool DefaultRenderingPipeline::imageProcessingEnabled() const
 
 void DefaultRenderingPipeline::_buildPipeline()
 {
+  auto engine = _scene->getEngine();
+
+  _disposePostProcesses();
+  _reset();
+
+  if (bloomEnabled()) {
+    pass = new PassPostProcess("sceneRenderTarget", 1.0, nullptr,
+                               TextureConstants::BILINEAR_SAMPLINGMODE, engine,
+                               false, _defaultPipelineTextureType);
+    addEffect(new PostProcessRenderEffect(engine, PassPostProcessId,
+                                          [this]() { return pass; }, true));
+
+    if (!_hdr) { // Need to enhance highlights if not using float rendering
+      highlights
+        = new HighlightsPostProcess("highlights", bloomScale(), nullptr,
+                                    TextureConstants::BILINEAR_SAMPLINGMODE,
+                                    engine, false, _defaultPipelineTextureType);
+      addEffect(new PostProcessRenderEffect(engine, HighLightsPostProcessId,
+                                            [this]() { return highlights; },
+                                            true));
+      highlights->autoClear      = false;
+      highlights->alwaysForcePOT = true;
+    }
+
+    blurX = new BlurPostProcess("horizontal blur", Vector2(1.f, 0.f), 10.f,
+                                bloomScale(), nullptr,
+                                TextureConstants::BILINEAR_SAMPLINGMODE, engine,
+                                false, _defaultPipelineTextureType);
+    addEffect(new PostProcessRenderEffect(engine, BlurXPostProcessId,
+                                          [this]() { return blurX; }, true));
+    blurX->alwaysForcePOT = true;
+    blurX->autoClear      = false;
+    blurX->onActivateObservable.add([this]() {
+      const auto dw = static_cast<float>(blurX->width)
+                      / static_cast<float>(
+                          _scene->getEngine()->getRenderingCanvas()->width);
+      blurX->setKernel(bloomKernel * dw);
+    });
+
+    blurY = new BlurPostProcess("vertical blur", Vector2(0.f, 1.f), 10.f,
+                                bloomScale(), nullptr,
+                                TextureConstants::BILINEAR_SAMPLINGMODE, engine,
+                                false, _defaultPipelineTextureType);
+    addEffect(new PostProcessRenderEffect(engine, BlurYPostProcessId,
+                                          [this]() { return blurY; }, true));
+    blurY->alwaysForcePOT = true;
+    blurY->autoClear      = false;
+    blurY->onActivateObservable.add([this]() {
+      const auto dh = static_cast<float>(blurY->height)
+                      / static_cast<float>(
+                          _scene->getEngine()->getRenderingCanvas()->height);
+      blurY->setKernel(bloomKernel * dh);
+    });
+
+    copyBack = new PassPostProcess("bloomBlendBlit", bloomScale(), nullptr,
+                                   TextureConstants::BILINEAR_SAMPLINGMODE,
+                                   engine, false, _defaultPipelineTextureType);
+    addEffect(new PostProcessRenderEffect(engine, CopyBackPostProcessId,
+                                          [this]() { return copyBack; }, true));
+    copyBack->alwaysForcePOT = true;
+    if (_hdr) {
+      copyBack->alphaMode      = EngineConstants::ALPHA_INTERPOLATE;
+      const auto w             = bloomWeight();
+      copyBack->alphaConstants = Color4(w, w, w, w);
+    }
+    else {
+      copyBack->alphaMode = EngineConstants::ALPHA_SCREENMODE;
+    }
+    copyBack->autoClear = false;
+  }
+
+  if (_imageProcessingEnabled) {
+    imageProcessing = new ImageProcessingPostProcess(
+      "imageProcessing", 1.0, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
+      engine, false, _defaultPipelineTextureType);
+    if (_hdr) {
+      addEffect(new PostProcessRenderEffect(
+        engine, ImageProcessingPostProcessId,
+        [this]() { return imageProcessing; }, true));
+    }
+  }
+
+  if (fxaaEnabled()) {
+    fxaa = new FxaaPostProcess("fxaa", 1.f, nullptr,
+                               TextureConstants::BILINEAR_SAMPLINGMODE, engine,
+                               false, _defaultPipelineTextureType);
+    addEffect(new PostProcessRenderEffect(engine, FxaaPostProcessId,
+                                          [this]() { return fxaa; }, true));
+
+    fxaa->autoClear = !bloomEnabled() && !imageProcessing;
+  }
+  else {
+    finalMerge = new PassPostProcess(
+      "finalMerge", 1.0, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
+      engine, false, _defaultPipelineTextureType);
+    addEffect(new PostProcessRenderEffect(
+      engine, FinalMergePostProcessId, [this]() { return finalMerge; }, true));
+
+    finalMerge->autoClear = !bloomEnabled() && !imageProcessing;
+  }
+
+  if (bloomEnabled()) {
+    if (_hdr) { // Share render targets to save memory
+      copyBack->shareOutputWith(blurX);
+      if (imageProcessing) {
+        imageProcessing->shareOutputWith(pass);
+        imageProcessing->autoClear = false;
+      }
+      else if (fxaa) {
+        fxaa->shareOutputWith(pass);
+      }
+      else {
+        finalMerge->shareOutputWith(pass);
+      }
+    }
+    else {
+      if (fxaa) {
+        fxaa->shareOutputWith(pass);
+      }
+      else {
+        finalMerge->shareOutputWith(pass);
+      }
+    }
+  }
+
+  if (!_cameras.empty()) {
+    _scene->postProcessRenderPipelineManager()->attachCamerasToRenderPipeline(
+      _name, getCameras());
+  }
 }
 
 void DefaultRenderingPipeline::_disposePostProcesses()
@@ -201,12 +332,8 @@ void DefaultRenderingPipeline::dispose(bool doNotRecurse)
 {
   _disposePostProcesses();
 
-  std::vector<Camera*> cameras;
-  for (auto& item : _cameras) {
-    cameras.emplace_back(item.second);
-  }
   _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(
-    _name, cameras);
+    _name, getCameras());
 
   PostProcessRenderPipeline::dispose(doNotRecurse);
 }

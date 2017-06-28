@@ -35,6 +35,8 @@ public:
                             = std::vector<Camera*>());
   virtual ~StandardRenderingPipeline();
 
+  void setBloomEnabled(bool enabled);
+  bool bloomEnabled() const;
   void setDepthOfFieldEnabled(bool enabled);
   bool depthOfFieldEnabled() const;
   void setLensFlareEnabled(bool enabled);
@@ -118,6 +120,7 @@ private:
   PostProcess* _currentHDRSource;
   float _hdrCurrentLuminance;
   unsigned int _motionBlurSamples;
+  bool _bloomEnabled;
   bool _depthOfFieldEnabled;
   bool _lensFlareEnabled;
   bool _hdrEnabled;

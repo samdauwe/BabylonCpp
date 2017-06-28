@@ -64,7 +64,7 @@ public:
   unsigned int samples() const;
   void setExpensiveBlur(bool b);
   bool expensiveBlur();
-  bool isSupported() const;
+  static bool IsSupported();
 
   /**
    * Removes the internal pipeline assets and detatches the pipeline from the
