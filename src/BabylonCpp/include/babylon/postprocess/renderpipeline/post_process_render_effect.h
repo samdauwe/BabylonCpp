@@ -43,7 +43,7 @@ private:
   std::function<PostProcess*()> _getPostProcess;
   bool _singleInstance;
   std::unordered_map<std::string, Camera*> _cameras;
-  std::unordered_map<std::string, Uint32Array> _indicesForCamera;
+  std::unordered_map<std::string, IndicesArray> _indicesForCamera;
   std::unordered_map<std::string, PostProcessRenderPass*> _renderPasses;
   std::unordered_map<std::string, PostProcessRenderEffect*>
     _renderEffectAsPasses;

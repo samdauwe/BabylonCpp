@@ -17,6 +17,9 @@ public:
                            bool reusable = false);
   ~BlackAndWhitePostProcess();
 
+public:
+  float degree;
+
 }; // end of class BlackAndWhitePostProcess
 
 } // end of namespace BABYLON

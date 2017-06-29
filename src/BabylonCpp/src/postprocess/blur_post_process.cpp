@@ -41,6 +41,10 @@ BlurPostProcess::~BlurPostProcess()
 
 void BlurPostProcess::setKernel(float v)
 {
+  if (stl_util::almost_equal(_idealKernel, v)) {
+    return;
+  }
+
   v            = std::max(v, 1.f);
   _idealKernel = v;
   _kernel      = _nearestBestKernel(v);
@@ -147,10 +151,9 @@ void BlurPostProcess::_updateParameters()
     ++depCount;
   }
 
-  // _indexParameters.varyingCount = varyingCount;
-  // _indexParameters.depCount = depCount;
-
-  updateEffect(defines.str());
+  updateEffect(defines.str(), {}, {},
+               {{"varyingCount", static_cast<unsigned>(varyingCount)},
+                {"depCount", depCount}});
 }
 
 float BlurPostProcess::_nearestBestKernel(float idealKernel) const

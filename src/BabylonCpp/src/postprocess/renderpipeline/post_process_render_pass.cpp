@@ -18,8 +18,7 @@ PostProcessRenderPass::PostProcessRenderPass(
     , _scene{scene}
     , _refCount{0}
 {
-  _renderTexture
-    = std::make_unique<RenderTargetTexture>(name, size, scene);
+  _renderTexture = std::make_unique<RenderTargetTexture>(name, size, scene);
   setRenderList(renderList);
 
   _renderTexture->onBeforeRenderObservable.add(beforeRender);
@@ -61,11 +60,10 @@ void PostProcessRenderPass::_update()
 
 void PostProcessRenderPass::setRenderList(const std::vector<Mesh*>& renderList)
 {
-  std::vector<AbstractMesh*> tmp;
-  for (auto& mesh : renderList) {
-    tmp.emplace_back(mesh);
-  }
-  _renderTexture->renderList = tmp;
+  _renderTexture->renderList.clear();
+  _renderTexture->renderList.reserve(renderList.size());
+  std::copy(renderList.begin(), renderList.end(),
+            std::back_inserter(_renderTexture->renderList));
 }
 
 RenderTargetTexture* PostProcessRenderPass::getRenderTexture()
