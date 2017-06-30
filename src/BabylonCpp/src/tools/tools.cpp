@@ -204,7 +204,7 @@ MinMaxVector2 Tools::ExtractMinAndMaxVector2(
   const std::function<Nullable<Vector2>(std::size_t index)>& feeder,
   const Vector2& bias)
 {
-  auto minMax = Tools::ExtractMinAndMaxVector2(feeder, bias);
+  auto minMax = Tools::ExtractMinAndMaxVector2(feeder);
 
   auto& minimum = minMax.min;
   auto& maximum = minMax.max;
