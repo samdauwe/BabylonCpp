@@ -180,6 +180,43 @@ MinMax Tools::ExtractMinAndMax(const Float32Array& positions, size_t start,
   return {minimum, maximum};
 }
 
+MinMaxVector2 Tools::ExtractMinAndMaxVector2(
+  const std::function<Nullable<Vector2>(std::size_t index)>& feeder)
+{
+  Vector2 minimum(std::numeric_limits<float>::max(),
+                  std::numeric_limits<float>::max());
+  Vector2 maximum(-std::numeric_limits<float>::max(),
+                  -std::numeric_limits<float>::max());
+
+  std::size_t i = 0;
+  auto cur      = feeder(i++);
+  while (cur) {
+    minimum = Vector2::Minimize(*cur, minimum);
+    maximum = Vector2::Maximize(*cur, maximum);
+
+    cur = feeder(i++);
+  }
+
+  return {minimum, maximum};
+}
+
+MinMaxVector2 Tools::ExtractMinAndMaxVector2(
+  const std::function<Nullable<Vector2>(std::size_t index)>& feeder,
+  const Vector2& bias)
+{
+  auto minMax = Tools::ExtractMinAndMaxVector2(feeder, bias);
+
+  auto& minimum = minMax.min;
+  auto& maximum = minMax.max;
+
+  minimum.x -= minimum.x * bias.x + bias.y;
+  minimum.y -= minimum.y * bias.x + bias.y;
+  maximum.x += maximum.x * bias.x + bias.y;
+  maximum.y += maximum.y * bias.x + bias.y;
+
+  return {minimum, maximum};
+}
+
 void Tools::LoadImage(
   const std::string& url, const std::function<void(const Image& img)>& onLoad,
   const std::function<void(const std::string& msg)>& onError,

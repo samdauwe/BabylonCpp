@@ -2,6 +2,7 @@
 #define BABYLON_TOOLS_TOOLS_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/nullable.h>
 #include <babylon/core/structs.h>
 #include <babylon/engine/engine_constants.h>
 
@@ -62,6 +63,11 @@ struct BABYLON_SHARED_EXPORT Tools {
   static MinMax ExtractMinAndMax(const Float32Array& positions, size_t start,
                                  size_t count, const Vector2& bias,
                                  unsigned int stride = 3);
+  static MinMaxVector2 ExtractMinAndMaxVector2(
+    const std::function<Nullable<Vector2>(std::size_t index)>& feeder);
+  static MinMaxVector2 ExtractMinAndMaxVector2(
+    const std::function<Nullable<Vector2>(std::size_t index)>& feeder,
+    const Vector2& bias);
   static void
   LoadImage(const std::string& url,
             const std::function<void(const Image& img)>& onLoad,

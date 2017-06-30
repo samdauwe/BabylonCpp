@@ -154,6 +154,11 @@ struct MinMaxDistance {
   float distance;
 }; // end of struct MinMaxDistance
 
+struct MinMaxVector2 {
+  Vector2 min;
+  Vector2 max;
+}; // end of struct MinMaxVector2
+
 struct MouseEvent {
   int clientX;
   int clientY;
