@@ -29,6 +29,31 @@ inline tm localtime(const std::time_t& time)
 }
 
 /**
+ * Meaures the duration of the function call.
+ */
+template <typename Duration, typename Functor, typename... Args>
+auto measureFunctionCall(Duration& duration, Functor f, Args&&... args)
+  -> decltype(f(std::forward<Args>(args)...))
+{
+  struct scoped_timer {
+    scoped_timer(Duration& duration)
+        : _now{std::chrono::high_resolution_clock::now()}, _d{duration}
+    {
+    }
+    ~scoped_timer()
+    {
+      _d = std::chrono::high_resolution_clock::now() - _now;
+    }
+
+  private:
+    std::chrono::high_resolution_clock::time_point const _now;
+    Duration& _d;
+  } scoped_timer(duration);
+
+  return f(std::forward<Args>(args)...);
+}
+
+/**
  * @brief Returns the fractional duration since high_res_timepoint.
  * @param high_res_timepoint
  * @return fractional duration since high_res_timepoint
