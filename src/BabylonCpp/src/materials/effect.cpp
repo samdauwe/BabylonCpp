@@ -229,6 +229,20 @@ std::string Effect::getFragmentShaderSource()
     _engine->getFragmentShaderSource(_program.get()));
 }
 
+void Effect::executeWhenCompiled(
+  const std::function<void(Effect* effect)>& func)
+{
+  if (isReady()) {
+    func(this);
+    return;
+  }
+
+  _onCompileObserver = onCompileObservable.add([&](Effect* effect) {
+    onCompileObservable.remove(_onCompileObserver);
+    func(effect);
+  });
+}
+
 void Effect::_loadVertexShader(
   const std::string& vertex,
   std::function<void(const std::string& data)> callback)
@@ -558,6 +572,7 @@ void Effect::_prepareEffect(const std::string& vertexSourceCode,
     if (onCompiled) {
       onCompiled(this);
     }
+    onCompileObservable.notifyObservers(this);
   }
   catch (const std::exception& e) {
     _compilationError = e.what();
@@ -582,6 +597,7 @@ void Effect::_prepareEffect(const std::string& vertexSourceCode,
       if (onError) {
         onError(this, _compilationError);
       }
+      onErrorObservable.notifyObservers(this);
     }
   }
 }

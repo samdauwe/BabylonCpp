@@ -217,6 +217,11 @@ bool VertexBuffer::getIsInstanced() const
   return _getBuffer()->getIsInstanced();
 }
 
+unsigned int VertexBuffer::getInstanceDivisor() const
+{
+  return _getBuffer()->instanceDivisor();
+}
+
 // Methods
 GL::IGLBuffer* VertexBuffer::create()
 {

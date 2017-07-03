@@ -236,7 +236,9 @@ public:
   /** Shaders **/
   void _releaseEffect(Effect* effect);
   Effect* createEffect(const std::string& baseName,
-                       EffectCreationOptions& options, Engine* engine);
+                       EffectCreationOptions& options, Engine* engine,
+                       const std::function<void(Effect* effect)>& onCompiled
+                       = nullptr);
   Effect* createEffect(std::unordered_map<std::string, std::string>& baseName,
                        EffectCreationOptions& options, Engine* engine);
   Effect* createEffectForParticles(
@@ -294,6 +296,8 @@ public:
   /** States **/
   void setState(bool culling, float zOffset = 0.f, bool force = false,
                 bool reverseSide = false);
+  void setZOffset(float value);
+  float getZOffset() const;
   void setDepthBuffer(bool enable);
   bool getDepthWrite() const;
   void setDepthWrite(bool enable);
@@ -404,6 +408,7 @@ public:
     const std::function<void()>& onError = nullptr,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     bool invertY              = false);
+  void _releaseFramebufferObjects(GL::IGLTexture* texture);
   void _releaseTexture(GL::IGLTexture* texture);
   void bindSamplers(Effect* effect);
   void _bindTextureDirectly(unsigned int target, GL::IGLTexture* texture);
@@ -432,6 +437,7 @@ public:
   void loadingUIBackgroundColor(const std::string& color);
   std::string getVertexShaderSource(GL::IGLProgram* program);
   std::string getFragmentShaderSource(GL::IGLProgram* program);
+  unsigned int getError() const;
 
   /** FPS **/
   float getFps() const;
@@ -504,8 +510,10 @@ private:
   /** FPS **/
   void _measureFps();
 
-  bool _canRenderToFloatTexture();
-  bool _canRenderToHalfFloatTexture();
+  Uint8Array _readTexturePixels(GL::IGLTexture* texture, int width, int height,
+                                int faceIndex = -1);
+  bool _canRenderToFloatFramebuffer();
+  bool _canRenderToHalfFloatFramebuffer();
   bool _canRenderToFramebuffer(unsigned int type);
   GL::GLenum _getWebGLTextureType(unsigned int type) const;
   GL::GLenum _getRGBABufferInternalSizedFormat(unsigned int type) const;
@@ -611,6 +619,7 @@ private:
   Int32Array _currentInstanceLocations;
   std::vector<GL::IGLBuffer*> _currentInstanceBuffers;
   Int32Array _textureUnits;
+  std::unique_ptr<GL::IGLFramebuffer> _dummyFramebuffer;
   bool _vaoRecordInProgress;
   bool _mustWipeVertexAttributes;
   GL::IGLTexture* _emptyTexture;

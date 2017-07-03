@@ -2,6 +2,8 @@
 #define BABYLON_MATERIALS_EFFECT_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/tools/observable.h>
+#include <babylon/tools/observer.h>
 
 namespace BABYLON {
 
@@ -40,6 +42,7 @@ public:
   std::string getFragmentShaderSource();
 
   /** Methods **/
+  void executeWhenCompiled(const std::function<void(Effect* effect)>& func);
   void _loadVertexShader(const std::string& vertex,
                          std::function<void(const std::string& data)> callback);
   void
@@ -119,9 +122,13 @@ public:
   std::function<void(Effect* effect, const std::string& errors)> onError;
   std::function<void(Effect* effect)> onBind;
   std::size_t uniqueId;
+  Observable<Effect> onCompileObservable;
+  Observable<Effect> onErrorObservable;
+  Observable<Effect> onBindObservable;
   std::string _key;
 
 private:
+  Observer<Effect>::Ptr _onCompileObserver;
   static std::size_t _uniqueIdSeed;
   Engine* _engine;
   std::unordered_map<std::string, unsigned int> _uniformBuffersNames;

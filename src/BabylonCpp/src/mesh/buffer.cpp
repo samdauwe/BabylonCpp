@@ -16,6 +16,7 @@ Buffer::Buffer(Engine* engine, const Float32Array& data, bool updatable,
     , _updatable{updatable}
     , _strideSize{stride}
     , _instanced{instanced}
+    , _instanceDivisor{instanced ? 1u : 0u}
 {
   if (!postponeInternalCreation) { // by default
     create();
@@ -83,50 +84,45 @@ bool Buffer::getIsInstanced() const
   return _instanced;
 }
 
-// Methods
-GL::IGLBuffer* Buffer::create()
+unsigned int Buffer::instanceDivisor() const
 {
-  if (_buffer) {
-    return nullptr; // nothing to do
-  }
-
-  if (!_buffer) { // create buffer
-    if (_updatable) {
-      _buffer = _engine->createDynamicVertexBuffer(_data);
-    }
-    else {
-      _buffer = _engine->createVertexBuffer(_data);
-    }
-  }
-  else if (_updatable) { // update buffer
-    _engine->updateDynamicVertexBuffer(_buffer, _data);
-  }
-
-  return _buffer ? _buffer.get() : nullptr;
+  return _instanceDivisor;
 }
 
-GL::IGLBuffer* Buffer::create(const Float32Array& data)
+void Buffer::setInstanceDivisor(unsigned int value)
+{
+  _instanceDivisor = value;
+  if (value == 0) {
+    _instanced = false;
+  }
+  else {
+    _instanced = true;
+  }
+}
+
+// Methods
+GL::IGLBuffer* Buffer::create(Float32Array data)
 {
   if (data.empty() && _buffer) {
     return nullptr; // nothing to do
   }
 
+  if (data.empty()) {
+    data = _data;
+  }
+
   if (!_buffer) { // create buffer
     if (_updatable) {
-      _buffer = _engine->createDynamicVertexBuffer(data.empty() ? _data : data);
-      if (!data.empty()) {
-        _data = data;
-      }
+      _buffer = _engine->createDynamicVertexBuffer(data);
+      _data   = std::move(data);
     }
     else {
-      _buffer = _engine->createVertexBuffer(data.empty() ? _data : data);
+      _buffer = _engine->createVertexBuffer(data);
     }
   }
   else if (_updatable) { // update buffer
-    _engine->updateDynamicVertexBuffer(_buffer, data.empty() ? _data : data);
-    if (!data.empty()) {
-      _data = data;
-    }
+    _engine->updateDynamicVertexBuffer(_buffer, data);
+    _data = std::move(data);
   }
 
   return _buffer ? _buffer.get() : nullptr;

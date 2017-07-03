@@ -113,6 +113,11 @@ public:
    */
   bool getIsInstanced() const;
 
+  /**
+   * @brief Returns the instancing divisor, zero for non-instanced (integer).
+   */
+  unsigned int getInstanceDivisor() const;
+
   /** Methods **/
 
   /**

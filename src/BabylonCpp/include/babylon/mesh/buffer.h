@@ -29,10 +29,11 @@ public:
   GL::IGLBuffer* getBuffer();
   int getStrideSize() const;
   bool getIsInstanced() const;
+  unsigned int instanceDivisor() const;
+  void setInstanceDivisor(unsigned int value);
 
   // Methods
-  GL::IGLBuffer* create();
-  GL::IGLBuffer* create(const Float32Array& data);
+  GL::IGLBuffer* create(Float32Array data = {});
   GL::IGLBuffer* update(const Float32Array& data);
   GL::IGLBuffer* updateDirectly(const Float32Array& data, int offset);
   GL::IGLBuffer* updateDirectly(const Float32Array& data, int offset,
@@ -46,6 +47,7 @@ private:
   bool _updatable;
   int _strideSize;
   bool _instanced;
+  unsigned int _instanceDivisor;
 
 }; // end of class Buffer
 

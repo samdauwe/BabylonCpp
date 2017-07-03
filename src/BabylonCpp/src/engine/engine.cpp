@@ -65,6 +65,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _cachedIndexBuffer{nullptr}
     , _cachedEffectForVertexBuffers{nullptr}
     , _currentRenderTarget{nullptr}
+    , _dummyFramebuffer{nullptr}
     , _vaoRecordInProgress{false}
     , _mustWipeVertexAttributes{false}
     , _emptyTexture{nullptr}
@@ -74,8 +75,8 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
 
   // Checks if some of the format renders first to allow the use of webgl
   // inspector.
-  auto renderToFullFloat = _canRenderToFloatTexture();
-  auto renderToHalfFloat = _canRenderToHalfFloatTexture();
+  // auto renderToFullFloat = _canRenderToFloatTexture();
+  // auto renderToHalfFloat = _canRenderToHalfFloatTexture();
 
   // GL
   if (!_gl) {
@@ -154,13 +155,13 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
   _caps.textureFloatLinearFiltering = true;
   _caps.textureLOD
     = stl_util::contains(extensions, "GL_ARB_shader_texture_lod");
-  _caps.textureFloatRender = renderToFullFloat;
+  // _caps.textureFloatRender = renderToFullFloat;
 
   _caps.textureHalfFloat
     = stl_util::contains(extensions, "OES_texture_half_float");
   _caps.textureHalfFloatLinearFiltering
     = stl_util::contains(extensions, "OES_texture_half_float_linear");
-  _caps.textureHalfFloatRender = renderToHalfFloat;
+  // _caps.textureHalfFloatRender = renderToHalfFloat;
 
   GL::IGLShaderPrecisionFormat* highp
     = _gl->getShaderPrecisionFormat(GL::FRAGMENT_SHADER, GL::HIGH_FLOAT);
@@ -812,7 +813,9 @@ void Engine::restoreDefaultFramebuffer()
   _currentRenderTarget = nullptr;
   bindUnboundFramebuffer(nullptr);
 
-  setViewport(*_cachedViewport);
+  if (_cachedViewport) {
+    setViewport(*_cachedViewport);
+  }
 
   wipeCaches();
 }
@@ -1101,7 +1104,7 @@ void Engine::_bindVertexBuffersAttributes(
                           static_cast<int>(vertexBuffer->getOffset() * 4));
 
       if (vertexBuffer->getIsInstanced()) {
-        _gl->vertexAttribDivisor(_order, 1);
+        _gl->vertexAttribDivisor(_order, vertexBuffer->getInstanceDivisor());
         if (!_vaoRecordInProgress) {
           _currentInstanceLocations.emplace_back(order);
           _currentInstanceBuffers.emplace_back(buffer);
@@ -1392,12 +1395,18 @@ void Engine::_releaseEffect(Effect* effect)
   }
 }
 
-Effect* Engine::createEffect(const std::string& baseName,
-                             EffectCreationOptions& options, Engine* engine)
+Effect*
+Engine::createEffect(const std::string& baseName,
+                     EffectCreationOptions& options, Engine* engine,
+                     const std::function<void(Effect* effect)>& onCompiled)
 {
   std::string name = baseName + "+" + baseName + "@" + options.defines;
   if (stl_util::contains(_compiledEffects, name)) {
-    return _compiledEffects[name].get();
+    auto compiledEffect = _compiledEffects[name].get();
+    if (onCompiled && compiledEffect->isReady()) {
+      onCompiled(compiledEffect);
+    }
+    return compiledEffect;
   }
 
   auto effect            = std::make_unique<Effect>(baseName, options, engine);
@@ -1535,6 +1544,7 @@ void Engine::enableEffect(Effect* effect)
   if (effect->onBind) {
     effect->onBind(effect);
   }
+  effect->onBindObservable.notifyObservers(effect);
 }
 
 void Engine::setIntArray(GL::IGLUniformLocation* uniform,
@@ -1782,7 +1792,17 @@ void Engine::setState(bool culling, float zOffset, bool force, bool reverseSide)
   }
 
   // Z offset
-  _depthCullingState->setZOffset(zOffset);
+  setZOffset(zOffset);
+}
+
+void Engine::setZOffset(float value)
+{
+  _depthCullingState->setZOffset(value);
+}
+
+float Engine::getZOffset() const
+{
+  return _depthCullingState->zOffset();
 }
 
 void Engine::setDepthBuffer(bool enable)
@@ -2352,18 +2372,6 @@ Engine::createMultipleRenderTarget(ISize size,
   auto framebuffer = _gl->createFramebuffer();
   bindUnboundFramebuffer(framebuffer.get());
 
-  auto colorRenderbuffer = _gl->createRenderbuffer();
-  _gl->bindRenderbuffer(GL::RENDERBUFFER, colorRenderbuffer);
-  _gl->renderbufferStorageMultisample(GL::RENDERBUFFER, 4, GL::RGBA8, width,
-                                      height);
-  _gl->bindFramebuffer(GL::FRAMEBUFFER, framebuffer.get());
-  _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
-                               GL::RENDERBUFFER, colorRenderbuffer);
-  _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT1,
-                               GL::RENDERBUFFER, colorRenderbuffer);
-  _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::DEPTH_ATTACHMENT,
-                               GL::RENDERBUFFER, colorRenderbuffer);
-
   std::vector<GL::IGLTexture*> textures;
   std::vector<GL::GLenum> attachments;
 
@@ -2868,23 +2876,32 @@ Engine::_convertRGBtoRGBATextureData(const ArrayBufferView& rgbData, int width,
   }
 }
 
-void Engine::_releaseTexture(GL::IGLTexture* texture)
+void Engine::_releaseFramebufferObjects(GL::IGLTexture* texture)
 {
   if (texture->_framebuffer) {
     _gl->deleteFramebuffer(texture->_framebuffer);
+    texture->_framebuffer.reset(nullptr);
   }
 
   if (texture->_depthStencilBuffer) {
     _gl->deleteRenderbuffer(texture->_depthStencilBuffer);
+    texture->_depthStencilBuffer.reset(nullptr);
   }
 
   if (texture->_MSAAFramebuffer) {
     _gl->deleteFramebuffer(texture->_MSAAFramebuffer);
+    texture->_MSAAFramebuffer.reset(nullptr);
   }
 
   if (texture->_MSAARenderBuffer) {
     _gl->deleteRenderbuffer(texture->_MSAARenderBuffer);
+    texture->_MSAARenderBuffer.reset(nullptr);
   }
+}
+
+void Engine::_releaseTexture(GL::IGLTexture* texture)
+{
+  _releaseFramebufferObjects(texture);
 
   _gl->deleteTexture(texture);
 
@@ -3215,6 +3232,10 @@ void Engine::dispose(bool /*doNotRecurse*/)
   // Unbind
   unbindAllAttributes();
 
+  if (_dummyFramebuffer) {
+    _gl->deleteFramebuffer(_dummyFramebuffer);
+  }
+
   _gl = nullptr;
 
   // WebVR
@@ -3285,6 +3306,11 @@ std::string Engine::getFragmentShaderSource(GL::IGLProgram* program)
   return _gl->getShaderSource(shaders[1]);
 }
 
+unsigned int Engine::getError() const
+{
+  return _gl->getError();
+}
+
 // FPS
 float Engine::getFps() const
 {
@@ -3323,7 +3349,36 @@ void Engine::_measureFps()
   }
 }
 
-bool Engine::_canRenderToFloatTexture()
+Uint8Array Engine::_readTexturePixels(GL::IGLTexture* texture, int width,
+                                      int height, int faceIndex)
+{
+  if (!_dummyFramebuffer) {
+    _dummyFramebuffer = _gl->createFramebuffer();
+  }
+  _gl->bindFramebuffer(GL::FRAMEBUFFER, _dummyFramebuffer.get());
+
+  if (faceIndex > -1) {
+    auto _faceIndex = static_cast<unsigned>(faceIndex);
+    _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
+                              GL::TEXTURE_CUBE_MAP_POSITIVE_X + _faceIndex,
+                              texture, 0);
+  }
+  else {
+    _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
+                              GL::TEXTURE_2D, texture, 0);
+  }
+
+  auto readFormat = GL::RGBA;
+  auto readType   = GL::UNSIGNED_BYTE;
+  Uint8Array buffer(4 * width * height);
+  _gl->readPixels(0, 0, width, height, readFormat, readType, buffer);
+
+  _gl->bindFramebuffer(GL::FRAMEBUFFER, nullptr);
+
+  return buffer;
+}
+
+bool Engine::_canRenderToFloatFramebuffer()
 {
   if (_webGLVersion > 1.f) {
     return _caps.colorBufferFloat;
@@ -3331,7 +3386,7 @@ bool Engine::_canRenderToFloatTexture()
   return _canRenderToFramebuffer(EngineConstants::TEXTURETYPE_FLOAT);
 }
 
-bool Engine::_canRenderToHalfFloatTexture()
+bool Engine::_canRenderToHalfFloatFramebuffer()
 {
   if (_webGLVersion > 1.f) {
     return _caps.colorBufferFloat;
