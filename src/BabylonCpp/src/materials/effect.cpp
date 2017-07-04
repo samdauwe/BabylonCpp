@@ -152,6 +152,11 @@ Effect::~Effect()
 {
 }
 
+Engine* Effect::getEngine() const
+{
+  return _engine;
+}
+
 std::string Effect::key() const
 {
   return _key;

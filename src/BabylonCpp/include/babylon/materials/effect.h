@@ -27,6 +27,7 @@ public:
   ~Effect();
 
   /** Properties **/
+  Engine* getEngine() const;
   std::string key() const;
   bool isReady() const;
   GL::IGLProgram* getProgram();

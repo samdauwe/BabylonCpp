@@ -79,6 +79,19 @@ public:
 
   bool useRightHandedSystem() const;
   void setUseRightHandedSystem(bool value);
+
+  /**
+   * @brief Default image processing configuration used either in the rendering
+   * Forward main pass or through the imageProcessingPostProcess if present.
+   * As in the majority of the scene they are the same (exception for multi
+   * camera), this is easier to reference from here than from all the materials
+   * and post process.
+   *
+   * No setter as we it is a shared configuration, you can set the values
+   * instead.
+   */
+  ImageProcessingConfiguration* imageProcessingConfiguration();
+
   bool forcePointsCloud() const;
   void setForcePointsCloud(bool value);
   bool fogEnabled() const;
@@ -873,10 +886,10 @@ public:
   std::vector<ParticleSystem*> _activeParticleSystems;
   std::vector<Animatable*> _activeAnimatables;
   bool requireLightSorting;
-  RenderTargetTexture* offscreenRenderTarget;
 
 protected:
   BaseTexture* _environmentTexture;
+  std::unique_ptr<ImageProcessingConfiguration> _imageProcessingConfiguration;
 
 private:
   // Events

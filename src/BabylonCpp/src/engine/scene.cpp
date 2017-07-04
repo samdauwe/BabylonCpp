@@ -28,6 +28,7 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/lights/light.h>
 #include <babylon/lights/shadows/shadow_generator.h>
+#include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/multi_material.h>
 #include <babylon/materials/pbr_material.h>
@@ -107,7 +108,6 @@ Scene::Scene(Engine* engine)
     , _cachedEffect{nullptr}
     , _cachedVisibility{0.f}
     , requireLightSorting{false}
-    , offscreenRenderTarget{nullptr}
     , _environmentTexture{nullptr}
     , _onDisposeObserver{nullptr}
     , _onBeforeRenderObserver{nullptr}
@@ -195,6 +195,10 @@ Scene::Scene(Engine* engine)
 
   // Uniform Buffer
   _createUbo();
+
+  // Default Image processing definition.
+  _imageProcessingConfiguration
+    = std::make_unique<ImageProcessingConfiguration>();
 }
 
 Scene::~Scene()
@@ -280,6 +284,11 @@ void Scene::setUseRightHandedSystem(bool value)
   }
   _useRightHandedSystem = value;
   markAllMaterialsAsDirty(Material::MiscDirtyFlag);
+}
+
+ImageProcessingConfiguration* Scene::imageProcessingConfiguration()
+{
+  return _imageProcessingConfiguration.get();
 }
 
 bool Scene::forcePointsCloud() const
@@ -2170,6 +2179,10 @@ void Scene::_renderForCamera(Camera* camera)
   _renderTargetsDuration.beginMonitoring();
   bool needsRestoreFrameBuffer = false;
 
+  // if (camera->customRenderTargets && !camera.customRenderTargets.empty) {
+  //  _renderTargets.concatWithNoDuplicate(camera->customRenderTargets);
+  // }
+
   if (renderTargetsEnabled && !_renderTargets.empty()) {
     _intermediateRendering = true;
     Tools::StartPerformanceCounter("Render targets", !_renderTargets.empty());
@@ -2225,12 +2238,7 @@ void Scene::_renderForCamera(Camera* camera)
   }
 
   if (needsRestoreFrameBuffer) {
-    if (offscreenRenderTarget) {
-      engine->bindFramebuffer(offscreenRenderTarget->_texture);
-    }
-    else {
-      engine->restoreDefaultFramebuffer(); // Restore back buffer
-    }
+    engine->restoreDefaultFramebuffer(); // Restore back buffer
   }
 
   _renderTargetsDuration.endMonitoring(false);
@@ -2438,14 +2446,9 @@ void Scene::render()
     engine->restoreDefaultFramebuffer();
   }
 
-  if (offscreenRenderTarget) {
-    engine->bindFramebuffer(offscreenRenderTarget->_texture);
-  }
-  else {
-    // Restore back buffer
-    if (!customRenderTargets.empty()) {
-      engine->restoreDefaultFramebuffer();
-    }
+  // Restore back buffer
+  if (!customRenderTargets.empty()) {
+    engine->restoreDefaultFramebuffer();
   }
 
   _renderTargetsDuration.endMonitoring();
