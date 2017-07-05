@@ -23,15 +23,14 @@ SubMesh::SubMesh(unsigned int iMaterialIndex, unsigned int iVerticesStart,
                  size_t iVerticesCount, unsigned int iIndexStart,
                  size_t iIndexCount, AbstractMesh* mesh, Mesh* renderingMesh,
                  bool iCreateBoundingBox)
-    : materialIndex{iMaterialIndex}
+    : BaseSubMesh{}
+    , materialIndex{iMaterialIndex}
     , verticesStart{iVerticesStart}
     , verticesCount{iVerticesCount}
     , indexStart{iIndexStart}
     , indexCount{iIndexCount}
     , createBoundingBox{iCreateBoundingBox}
     , _renderId{0}
-    , _materialDefines{nullptr}
-    , _materialEffect{nullptr}
     , _mesh{mesh}
     , _renderingMesh{renderingMesh}
     , _boundingInfo{nullptr}
@@ -57,29 +56,6 @@ SubMesh::~SubMesh()
 void SubMesh::addToMesh(std::unique_ptr<SubMesh>&& newSubMesh)
 {
   _mesh->subMeshes.emplace_back(std::move(newSubMesh));
-}
-
-Effect* SubMesh::effect()
-{
-  return _materialEffect;
-}
-
-void SubMesh::setEffect(Effect* effect)
-{
-  if (_materialEffect == effect) {
-    return;
-  }
-  _materialDefines = nullptr;
-  _materialEffect  = effect;
-}
-
-void SubMesh::setEffect(Effect* effect, const MaterialDefines& defines)
-{
-  if (_materialEffect == effect) {
-    return;
-  }
-  _materialDefines = std::make_unique<MaterialDefines>(defines);
-  _materialEffect  = effect;
 }
 
 bool SubMesh::isGlobal() const

@@ -136,7 +136,7 @@ DashedLinesOptions::~DashedLinesOptions()
 DecalOptions::DecalOptions()
     : position{Vector3::Zero()}
     , normal{Vector3::Up()}
-    , size{Vector3(1.f, 1.f, 1.f)}
+    , size{Vector3::One()}
     , angle{0.f}
     , calculateNormal{false}
 {

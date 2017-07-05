@@ -6,6 +6,7 @@
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/plane.h>
+#include <babylon/mesh/base_sub_mesh.h>
 #include <babylon/mesh/mesh.h>
 
 namespace BABYLON {
@@ -13,7 +14,9 @@ namespace BABYLON {
 /**
  * @brief
  */
-class BABYLON_SHARED_EXPORT SubMesh : public ICullable, public IDisposable {
+class BABYLON_SHARED_EXPORT SubMesh : public BaseSubMesh,
+                                      public ICullable,
+                                      public IDisposable {
 
 public:
   template <typename... Ts>
@@ -27,10 +30,7 @@ public:
   virtual ~SubMesh();
 
   void addToMesh(std::unique_ptr<SubMesh>&& newSubMesh);
-  void setEffect(Effect* effect);
-  void setEffect(Effect* effect, const MaterialDefines& defines);
   bool isGlobal() const;
-  Effect* effect();
 
   /**
    * @brief Returns the submesh BoudingInfo object.
@@ -165,8 +165,6 @@ public:
   int _alphaIndex;
   float _distanceToCamera;
   size_t _id;
-  std::unique_ptr<MaterialDefines> _materialDefines;
-  Effect* _materialEffect;
 
 private:
   AbstractMesh* _mesh;
