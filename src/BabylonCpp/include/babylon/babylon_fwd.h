@@ -272,6 +272,7 @@ struct SIMDVector3;
 class _InstancesBatch;
 class _VisibleInstances;
 class AbstractMesh;
+class BaseSubMesh;
 class Buffer;
 struct BufferPointer;
 class FacetParameters;
