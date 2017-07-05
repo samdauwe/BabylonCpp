@@ -251,6 +251,11 @@ public:
   static Vector2 Zero();
 
   /**
+   * @brief Returns a new Vector2(1, 1)
+   */
+  static Vector2 One();
+
+  /**
    * @brief Returns a new Vector2 set from the passed index element of the
    * passed array or Float32Array.
    */

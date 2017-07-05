@@ -314,6 +314,11 @@ public:
   static Vector3 Zero();
 
   /**
+   * @brief Returns a new Vector3 set to (1.0, 1.0, 1.0).
+   */
+  static Vector3 One();
+
+  /**
    * @brief Returns a new Vector3 set to (0.0, 1.0, 0.0).
    */
   static Vector3 Up();

@@ -294,6 +294,11 @@ public:
   static Vector4 Zero();
 
   /**
+   * Returns a new Vector4 set to (1.0, 1.0, 1.0, 1.0)
+   */
+  static Vector4 One();
+
+  /**
    * @brief Returns a new normalized Vector4 from the passed one.
    */
   static Vector4 Normalize(const Vector4& vector);

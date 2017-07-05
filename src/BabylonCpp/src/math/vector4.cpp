@@ -462,6 +462,11 @@ Vector4 Vector4::Zero()
   return Vector4(0.f, 0.f, 0.f, 0.f);
 }
 
+Vector4 Vector4::One()
+{
+  return Vector4(1.f, 1.f, 1.f, 1.f);
+}
+
 Vector4 Vector4::Normalize(const Vector4& vector)
 {
   Vector4 result = Vector4::Zero();

@@ -407,6 +407,11 @@ Vector2 Vector2::Zero()
   return Vector2(0.f, 0.f);
 }
 
+Vector2 Vector2::One()
+{
+  return Vector2(1.f, 1.f);
+}
+
 Vector2 Vector2::FromArray(const Float32Array& array, unsigned int offset)
 {
   return Vector2(array[offset], array[offset + 1]);
