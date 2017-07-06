@@ -299,6 +299,23 @@ inline void pushFront(std::string& s1, const std::string& s2)
   s1.insert(0, s2);
 }
 
+namespace {
+const std::string defaultChars
+  = "abcdefghijklmnaoqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+}
+
+inline std::string randomString(size_t len                      = 64,
+                                const std::string& allowedChars = defaultChars)
+{
+  std::mt19937_64 gen{static_cast<std::mt19937_64>(std::random_device()())};
+  std::uniform_int_distribution<size_t> dist{0, allowedChars.length() - 1};
+  std::string ret;
+  ret.reserve(len);
+  std::generate_n(std::back_inserter(ret), len,
+                  [&] { return allowedChars[dist(gen)]; });
+  return ret;
+}
+
 /**
  * @brief Removes a substring from a string.
  * @param s. The input string.

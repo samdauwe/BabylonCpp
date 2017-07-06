@@ -162,6 +162,17 @@ TEST(TestString, pushFront)
   EXPECT_EQ(s, "Hello World");
 }
 
+TEST(TestString, randomString)
+{
+  using namespace BABYLON;
+
+  const std::string r1 = String::randomString(10);
+  EXPECT_EQ(r1.size(), 10);
+
+  const std::string r2 = String::randomString(5, "a");
+  EXPECT_EQ(r2, "aaaaa");
+}
+
 std::string my_callback(const std::smatch& m)
 {
   int int_m = atoi(m.str(0).c_str());
