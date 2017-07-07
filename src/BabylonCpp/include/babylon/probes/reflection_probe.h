@@ -33,6 +33,17 @@ public:
   RenderTargetTexture* cubeTexture();
   std::vector<AbstractMesh*>& renderList();
   void attachToMesh(AbstractMesh* mesh);
+
+  /**
+   * @brief Specifies whether or not the stencil and depth buffer are cleared
+   * between two rendering groups.
+   * @param renderingGroupId The rendering group id corresponding to its index
+   * @param autoClearDepthStencil Automatically clears depth and stencil between
+   * groups if true.
+   */
+  void setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
+                                         bool autoClearDepthStencil);
+
   void dispose(bool doNotRecurse = false) override;
 
 protected:

@@ -613,24 +613,6 @@ Mesh& Mesh::updateMeshPositions(
   return *this;
 }
 
-Mesh* Mesh::recomputeNormals()
-{
-  auto positions = getVerticesData(VertexBuffer::PositionKind);
-  auto indices   = getIndices();
-  Float32Array normals;
-
-  if (isVerticesDataPresent(VertexBuffer::NormalKind)) {
-    normals = getVerticesData(VertexBuffer::NormalKind);
-  }
-  else {
-    normals = {};
-  }
-  VertexData::ComputeNormals(positions, indices, normals);
-  updateVerticesData(VertexBuffer::NormalKind, normals, false, false);
-
-  return this;
-}
-
 Mesh& Mesh::makeGeometryUnique()
 {
   if (!_geometry) {

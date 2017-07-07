@@ -454,7 +454,9 @@ int SolidParticleSystem::addShape(
         sp->rotationQuaternion->copyFrom(*currentCopy->rotationQuaternion);
       }
       if (currentCopy->color) {
-        sp->color->copyFrom(*currentCopy->color);
+        auto color = *sp->color;
+        color.copyFrom(*currentCopy->color);
+        sp->color = std::move(color);
       }
       sp->scaling.copyFrom(currentCopy->scaling);
       sp->uvs.copyFrom(currentCopy->uvs);
@@ -745,10 +747,11 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
         }
 
         if (_computeParticleColor) {
-          _colors32[colidx]     = _particle->color->r;
-          _colors32[colidx + 1] = _particle->color->g;
-          _colors32[colidx + 2] = _particle->color->b;
-          _colors32[colidx + 3] = _particle->color->a;
+          const auto& particleColor = *_particle->color;
+          _colors32[colidx]         = particleColor.r;
+          _colors32[colidx + 1]     = particleColor.g;
+          _colors32[colidx + 2]     = particleColor.b;
+          _colors32[colidx + 3]     = particleColor.a;
         }
 
         if (_computeParticleTexture) {
@@ -775,10 +778,11 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
         _normals32[idx + 1]   = 0.f;
         _normals32[idx + 2]   = 0.f;
         if (_computeParticleColor) {
-          _colors32[colidx]     = _particle->color->r;
-          _colors32[colidx + 1] = _particle->color->g;
-          _colors32[colidx + 2] = _particle->color->b;
-          _colors32[colidx + 3] = _particle->color->a;
+          const auto& particleColor = *_particle->color;
+          _colors32[colidx]         = particleColor.r;
+          _colors32[colidx + 1]     = particleColor.g;
+          _colors32[colidx + 2]     = particleColor.b;
+          _colors32[colidx + 3]     = particleColor.a;
         }
         if (_computeParticleTexture) {
           _uvs32[uvidx]

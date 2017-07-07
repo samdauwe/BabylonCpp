@@ -114,6 +114,13 @@ void ReflectionProbe::attachToMesh(AbstractMesh* mesh)
   _attachedMesh = mesh;
 }
 
+void ReflectionProbe::setRenderingAutoClearDepthStencil(
+  unsigned int renderingGroupId, bool autoClearDepthStencil)
+{
+  _renderTargetTexture->setRenderingAutoClearDepthStencil(
+    renderingGroupId, autoClearDepthStencil);
+}
+
 void ReflectionProbe::dispose(bool /*doNotRecurse*/)
 {
   // Remove from the scene if found

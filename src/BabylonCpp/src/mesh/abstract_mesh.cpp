@@ -80,10 +80,10 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , _subDiv{1, 1, 1, 1}
     , _onCollideObserver{nullptr}
     , _onCollisionPositionChangeObserver{nullptr}
-    , _position{Vector3(0.f, 0.f, 0.f)}
-    , _rotation{Vector3(0.f, 0.f, 0.f)}
+    , _position{Vector3::Zero()}
+    , _rotation{Vector3::Zero()}
     , _rotationQuaternionSet{false}
-    , _scaling{Vector3(1.f, 1.f, 1.f)}
+    , _scaling{Vector3::One()}
     , _material{nullptr}
     , _receiveShadows{false}
     , _hasVertexAlpha{false}
@@ -735,6 +735,33 @@ AbstractMesh& AbstractMesh::rotate(Vector3& axis, float amount,
     rotationQuaternionTmp.multiplyToRef(rotationQuaternion(),
                                         rotationQuaternion());
   }
+  return *this;
+}
+
+AbstractMesh& AbstractMesh::rotateAround(const Vector3& point, Vector3& axis,
+                                         float amount)
+{
+  axis.normalize();
+  if (!rotationQuaternionSet()) {
+    const auto rotationValue = rotation();
+    setRotationQuaternion(Quaternion::RotationYawPitchRoll(
+      rotationValue.y, rotationValue.x, rotationValue.z));
+    rotation().copyFromFloats(0.f, 0.f, 0.f);
+  }
+  point.subtractToRef(position(), Tmp::Vector3Array[0]);
+  Matrix::TranslationToRef(Tmp::Vector3Array[0].x, Tmp::Vector3Array[0].y,
+                           Tmp::Vector3Array[0].z, Tmp::MatrixArray[0]);
+  Tmp::MatrixArray[0].invertToRef(Tmp::MatrixArray[2]);
+  Matrix::RotationAxisToRef(axis, amount, Tmp::MatrixArray[1]);
+  Tmp::MatrixArray[2].multiplyToRef(Tmp::MatrixArray[1], Tmp::MatrixArray[2]);
+  Tmp::MatrixArray[2].multiplyToRef(Tmp::MatrixArray[0], Tmp::MatrixArray[2]);
+
+  Tmp::MatrixArray[2].decompose(Tmp::Vector3Array[0], Tmp::QuaternionArray[0],
+                                Tmp::Vector3Array[1]);
+
+  position().addInPlace(Tmp::Vector3Array[1]);
+  rotationQuaternion().multiplyInPlace(Tmp::QuaternionArray[0]);
+
   return *this;
 }
 

@@ -409,7 +409,20 @@ public:
                        const Space& space = Space::LOCAL);
 
   /**
-   * @brief Translates the mesh along the axis vector for the passed distance in
+   * @brief Rotates the mesh around the axis vector for the passed angle
+   * (amount) expressed in radians, in world space.
+   * Note that the property `rotationQuaternion` is then automatically updated
+   * and the property `rotation` is set to (0,0,0) and no longer used.
+   * The passed axis is also normalized.
+   * @returns The AbstractMesh.
+   * Method is based on
+   * http://www.euclideanspace.com/maths/geometry/affine/aroundPoint/index.htm
+   */
+  AbstractMesh& rotateAround(const Vector3& point, Vector3& axis, float amount);
+
+  /**
+   * @brief Translates the mesh along the axis vector for the passed distance
+   * in
    * the given space.
    * space (default LOCAL) can be either BABYLON.Space.LOCAL, either
    * BABYLON.Space.WORLD.

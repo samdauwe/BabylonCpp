@@ -2,11 +2,12 @@
 #define BABYLON_PARTICLES_SOLID_PARTICLE_H
 
 #include <babylon/babylon_global.h>
-
 #include <babylon/math/color4.h>
 #include <babylon/math/quaternion.h>
 #include <babylon/math/vector3.h>
 #include <babylon/math/vector4.h>
+
+#include <babylon/core/nullable.h>
 
 namespace BABYLON {
 
@@ -53,7 +54,7 @@ public:
   // particle global index
   unsigned int idx;
   // color
-  Color4* color;
+  Nullable<Color4> color;
   // position
   Vector3 position;
   // rotation
