@@ -28,6 +28,25 @@ inline tm localtime(const std::time_t& time)
   return tm_snapshot;
 }
 
+inline system_time_point_t makeTimePoint(int year, int mon, int day, int hour,
+                                         int min, int sec)
+{
+  struct std::tm t;
+  t.tm_sec       = sec;  // second of minute (0 .. 59 and 60 for leap seconds)
+  t.tm_min       = min;  // minute of hour (0 .. 59)
+  t.tm_hour      = hour; // hour of day (0 .. 23)
+  t.tm_mday      = day;  // day of month (0 .. 31)
+  t.tm_mon       = mon - 1;     // month of year (0 .. 11)
+  t.tm_year      = year - 1900; // year since 1900
+  t.tm_isdst     = -1;          // determine whether daylight saving time
+  std::time_t tt = std::mktime(&t);
+  if (tt == -1) {
+    // No valid system time
+    return system_time_point_t();
+  }
+  return std::chrono::system_clock::from_time_t(tt);
+}
+
 /**
  * Meaures the duration of the function call.
  */

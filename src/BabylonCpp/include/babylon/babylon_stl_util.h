@@ -468,6 +468,12 @@ inline void remove(std::vector<T>& vec, size_t pos)
   vec.erase(vec.begin() + pos);
 }
 
+template <typename C, typename P>
+inline void remove_if(C& c, const P& p)
+{
+  c.erase(std::remove_if(std::begin(c), std::end(c), p), std::end(c));
+}
+
 template <typename C, typename T>
 inline bool push_unique(C& c, T&& elem)
 {
