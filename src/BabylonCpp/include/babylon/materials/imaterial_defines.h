@@ -10,6 +10,7 @@ struct BABYLON_SHARED_EXPORT IMaterialDefines {
   virtual void markAsProcessed()                           = 0;
   virtual void markAsUnprocessed()                         = 0;
   virtual void markAllAsDirty()                            = 0;
+  virtual void markAsImageProcessingDirty()                = 0;
   virtual void markAsLightDirty()                          = 0;
   virtual void markAsAttributesDirty()                     = 0;
   virtual void markAsTexturesDirty()                       = 0;

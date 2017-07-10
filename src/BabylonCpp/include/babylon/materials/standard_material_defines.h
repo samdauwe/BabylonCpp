@@ -2,11 +2,14 @@
 #define BABYLON_MATERIALS_STANDARD_MATERIAL_DEFINES_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/materials/iimage_processing_configuration_defines.h>
 #include <babylon/materials/material_defines.h>
 
 namespace BABYLON {
 
-struct BABYLON_SHARED_EXPORT StandardMaterialDefines : public MaterialDefines {
+struct BABYLON_SHARED_EXPORT StandardMaterialDefines
+  : public MaterialDefines,
+    public IImageProcessingConfigurationDefines {
 
   static constexpr unsigned int DIFFUSE                             = 0;
   static constexpr unsigned int AMBIENT                             = 1;
@@ -64,11 +67,22 @@ struct BABYLON_SHARED_EXPORT StandardMaterialDefines : public MaterialDefines {
   static constexpr unsigned int INVERTNORMALMAPY     = 52;
   static constexpr unsigned int TWOSIDEDLIGHTING     = 53;
   static constexpr unsigned int SHADOWFLOAT          = 54;
-  static constexpr unsigned int CAMERACOLORGRADING   = 55;
-  static constexpr unsigned int CAMERACOLORCURVES    = 56;
-  static constexpr unsigned int MORPHTARGETS         = 57;
-  static constexpr unsigned int MORPHTARGETS_NORMAL  = 58;
-  static constexpr unsigned int MORPHTARGETS_TANGENT = 59;
+  static constexpr unsigned int MORPHTARGETS         = 55;
+  static constexpr unsigned int MORPHTARGETS_NORMAL  = 56;
+  static constexpr unsigned int MORPHTARGETS_TANGENT = 57;
+
+  static constexpr unsigned int IMAGEPROCESSING            = 58;
+  static constexpr unsigned int VIGNETTE                   = 59;
+  static constexpr unsigned int VIGNETTEBLENDMODEMULTIPLY  = 60;
+  static constexpr unsigned int VIGNETTEBLENDMODEOPAQUE    = 61;
+  static constexpr unsigned int TONEMAPPING                = 62;
+  static constexpr unsigned int CONTRAST                   = 63;
+  static constexpr unsigned int COLORCURVES                = 64;
+  static constexpr unsigned int COLORGRADING               = 65;
+  static constexpr unsigned int SAMPLER3DGREENDEPTH        = 66;
+  static constexpr unsigned int SAMPLER3DBGRMAP            = 67;
+  static constexpr unsigned int IMAGEPROCESSINGPOSTPROCESS = 68;
+  static constexpr unsigned int EXPOSURE                   = 69;
 
   StandardMaterialDefines();
   ~StandardMaterialDefines();

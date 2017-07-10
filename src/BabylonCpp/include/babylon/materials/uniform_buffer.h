@@ -205,8 +205,10 @@ private:
                                   const Float32Array& matrix);
   void _updateFloatForEffect(const std::string& name, float x);
   void _updateFloatForUniform(const std::string& name, float x);
-  void _updateFloat2ForEffect(const std::string& name, float x, float y);
-  void _updateFloat2ForUniform(const std::string& name, float x, float y);
+  void _updateFloat2ForEffect(const std::string& name, float x, float y,
+                              const std::string& suffix = "");
+  void _updateFloat2ForUniform(const std::string& name, float x, float y,
+                               const std::string& suffix = "");
   void _updateFloat3ForEffect(const std::string& name, float x, float y,
                               float z, const std::string& suffix = "");
   void _updateFloat3ForUniform(const std::string& name, float x, float y,
@@ -236,8 +238,7 @@ public:
    * @brief Wrapper for updateUniform.
    * @method updateMatrix3x3
    * @param {string} name Name of the uniform, as used in the uniform block in
-   * the
-   * shader.
+   * the shader.
    * @param {Float32Array} matrix
    */
   std::function<void(const std::string& name, const Float32Array& matrix)>
@@ -262,13 +263,15 @@ public:
 
   /**
    * @brief Wrapper for updateUniform.
-   * @param {string} name Name of the uniform, as used in the uniform block
-   * in
+   * @param {string} name Name of the uniform, as used in the uniform block in
    * the shader.
    * @param {number} x
    * @param {number} y
+   * @param {string} [suffix] Suffix to add to the uniform name.
    */
-  std::function<void(const std::string& name, float x, float y)> updateFloat2;
+  std::function<void(const std::string& name, float x, float y,
+                     const std::string& suffix)>
+    updateFloat2;
 
   /**
    * @brief Wrapper for updateUniform.

@@ -17,6 +17,7 @@
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/fresnel_parameters.h>
+#include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/standard_material_defines.h>
 #include <babylon/materials/textures/base_texture.h>
@@ -58,6 +59,7 @@ StandardMaterial::StandardMaterial(const std::string& iName, Scene* scene)
     , _worldViewProjectionMatrix{Matrix::Zero()}
     , _globalAmbientColor{Color3(0.f, 0.f, 0.f)}
     , _useLogarithmicDepth{false}
+    , _imageProcessingConfiguration{nullptr}
     , _diffuseTexture{nullptr}
     , _ambientTexture{nullptr}
     , _opacityTexture{nullptr}
@@ -88,9 +90,10 @@ StandardMaterial::StandardMaterial(const std::string& iName, Scene* scene)
     , _invertNormalMapX{false}
     , _invertNormalMapY{false}
     , _twoSidedLighting{false}
-    , _cameraColorGradingTexture{nullptr}
-    , _cameraColorCurves{nullptr}
 {
+  // Setup the default processing configuration to the scene.
+  _attachImageProcessingConfiguration(nullptr);
+
   getRenderTargetTextures = [this]() {
     _renderTargets.clear();
 
@@ -172,8 +175,6 @@ StandardMaterial::StandardMaterial(const StandardMaterial& other)
   _invertNormalMapX                  = other._invertNormalMapX;
   _invertNormalMapY                  = other._invertNormalMapY;
   _twoSidedLighting                  = other._twoSidedLighting;
-  _cameraColorGradingTexture         = other._cameraColorGradingTexture;
-  _cameraColorCurves                 = other._cameraColorCurves;
 }
 
 StandardMaterial::~StandardMaterial()
@@ -245,7 +246,8 @@ BaseTexture* StandardMaterial::getAlphaTestTexture()
   return _diffuseTexture;
 }
 
-bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
+                                         BaseSubMesh* subMesh,
                                          bool useInstances)
 {
   if (isFrozen()) {
@@ -415,7 +417,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
 
       if (scene->getEngine()->getCaps().standardDerivatives && _bumpTexture
           && StandardMaterial::BumpTextureEnabled()) {
-        // Bump texure can not be none blocking.
+        // Bump texure can not be not blocking.
         if (!_bumpTexture->isReady()) {
           return false;
         }
@@ -449,37 +451,19 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
         defines.defines[SMD::REFRACTION] = false;
       }
 
-      if (_cameraColorGradingTexture
-          && StandardMaterial::ColorGradingTextureEnabled()) {
-        // Camera Color Grading can not be none blocking.
-        if (!_cameraColorGradingTexture->isReady()) {
-          return false;
-        }
-        else {
-          defines.defines[SMD::CAMERACOLORGRADING] = true;
-        }
-      }
-      else {
-        defines.defines[SMD::CAMERACOLORGRADING] = false;
-      }
-
       defines.defines[SMD::TWOSIDEDLIGHTING]
         = !_backFaceCulling && _twoSidedLighting;
     }
     else {
-      defines.defines[SMD::DIFFUSE]            = false;
-      defines.defines[SMD::AMBIENT]            = false;
-      defines.defines[SMD::OPACITY]            = false;
-      defines.defines[SMD::REFLECTION]         = false;
-      defines.defines[SMD::EMISSIVE]           = false;
-      defines.defines[SMD::LIGHTMAP]           = false;
-      defines.defines[SMD::BUMP]               = false;
-      defines.defines[SMD::REFRACTION]         = false;
-      defines.defines[SMD::CAMERACOLORGRADING] = false;
+      defines.defines[SMD::DIFFUSE]    = false;
+      defines.defines[SMD::AMBIENT]    = false;
+      defines.defines[SMD::OPACITY]    = false;
+      defines.defines[SMD::REFLECTION] = false;
+      defines.defines[SMD::EMISSIVE]   = false;
+      defines.defines[SMD::LIGHTMAP]   = false;
+      defines.defines[SMD::BUMP]       = false;
+      defines.defines[SMD::REFRACTION] = false;
     }
-
-    defines.defines[SMD::CAMERACOLORCURVES]
-      = (_cameraColorCurves != nullptr && _cameraColorCurves != nullptr);
 
     defines.defines[SMD::ALPHAFROMDIFFUSE]
       = _shouldUseAlphaFromDiffuseTexture();
@@ -491,18 +475,20 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
     defines.defines[SMD::SPECULAROVERALPHA] = _useSpecularOverAlpha;
   }
 
+  if (defines._areImageProcessingDirty) {
+    if (!_imageProcessingConfiguration->isReady()) {
+      return false;
+    }
+
+    _imageProcessingConfiguration->prepareDefines(defines);
+  }
+
   if (defines._areFresnelDirty) {
     if (StandardMaterial::FresnelEnabled()) {
       // Fresnel
-      if ((_diffuseFresnelParameters && _diffuseFresnelParameters->isEnabled())
-          || (_opacityFresnelParameters
-              && _opacityFresnelParameters->isEnabled())
-          || (_emissiveFresnelParameters
-              && _emissiveFresnelParameters->isEnabled())
-          || (_refractionFresnelParameters
-              && _refractionFresnelParameters->isEnabled())
-          || (_reflectionFresnelParameters
-              && _reflectionFresnelParameters->isEnabled())) {
+      if (_diffuseFresnelParameters || _opacityFresnelParameters
+          || _emissiveFresnelParameters || _refractionFresnelParameters
+          || _reflectionFresnelParameters) {
 
         defines.defines[SMD::DIFFUSEFRESNEL]
           = (_diffuseFresnelParameters
@@ -688,7 +674,6 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
                                       "bumpMatrix",
                                       "lightmapMatrix",
                                       "refractionMatrix",
-                                      "depthValues",
                                       "diffuseLeftColor",
                                       "diffuseRightColor",
                                       "opacityParts",
@@ -707,12 +692,8 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
       "refractionCubeSampler", "refraction2DSampler"};
     std::vector<std::string> uniformBuffers{"Material", "Scene"};
 
-    if (defines[SMD::CAMERACOLORCURVES]) {
-      ColorCurves::PrepareUniforms(uniforms);
-    }
-    if (defines[SMD::CAMERACOLORGRADING]) {
-      ColorGradingTexture::PrepareUniformsAndSamplers(uniforms, samplers);
-    }
+    ImageProcessingConfiguration::PrepareUniforms(uniforms, defines);
+    ImageProcessingConfiguration::PrepareSamplers(samplers, defines);
 
     std::unordered_map<std::string, unsigned int> indexParameters{
       {"maxSimultaneousLights", _maxSimultaneousLights},
@@ -893,7 +874,7 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
         if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
           _uniformBuffer->updateFloat2("vDiffuseInfos",
                                        _diffuseTexture->coordinatesIndex,
-                                       _diffuseTexture->level);
+                                       _diffuseTexture->level, "");
           _uniformBuffer->updateMatrix("diffuseMatrix",
                                        *_diffuseTexture->getTextureMatrix());
         }
@@ -901,7 +882,7 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
         if (_ambientTexture && StandardMaterial::AmbientTextureEnabled()) {
           _uniformBuffer->updateFloat2("vAmbientInfos",
                                        _ambientTexture->coordinatesIndex,
-                                       _ambientTexture->level);
+                                       _ambientTexture->level, "");
           _uniformBuffer->updateMatrix("ambientMatrix",
                                        *_ambientTexture->getTextureMatrix());
         }
@@ -909,15 +890,15 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
         if (_opacityTexture && StandardMaterial::OpacityTextureEnabled()) {
           _uniformBuffer->updateFloat2("vOpacityInfos",
                                        _opacityTexture->coordinatesIndex,
-                                       _opacityTexture->level);
+                                       _opacityTexture->level, "");
           _uniformBuffer->updateMatrix("opacityMatrix",
                                        *_opacityTexture->getTextureMatrix());
         }
 
         if (_reflectionTexture
             && StandardMaterial::ReflectionTextureEnabled()) {
-          _uniformBuffer->updateFloat2("vReflectionInfos",
-                                       _reflectionTexture->level, _roughness);
+          _uniformBuffer->updateFloat2(
+            "vReflectionInfos", _reflectionTexture->level, _roughness, "");
           _uniformBuffer->updateMatrix(
             "reflectionMatrix",
             *_reflectionTexture->getReflectionTextureMatrix());
@@ -926,7 +907,7 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
         if (_emissiveTexture && StandardMaterial::EmissiveTextureEnabled()) {
           _uniformBuffer->updateFloat2("vEmissiveInfos",
                                        _emissiveTexture->coordinatesIndex,
-                                       _emissiveTexture->level);
+                                       _emissiveTexture->level, "");
           _uniformBuffer->updateMatrix("emissiveMatrix",
                                        *_emissiveTexture->getTextureMatrix());
         }
@@ -934,7 +915,7 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
         if (_lightmapTexture && StandardMaterial::LightmapTextureEnabled()) {
           _uniformBuffer->updateFloat2("vLightmapInfos",
                                        _lightmapTexture->coordinatesIndex,
-                                       _lightmapTexture->level);
+                                       _lightmapTexture->level, "");
           _uniformBuffer->updateMatrix("lightmapMatrix",
                                        *_lightmapTexture->getTextureMatrix());
         }
@@ -942,7 +923,7 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
         if (_specularTexture && StandardMaterial::SpecularTextureEnabled()) {
           _uniformBuffer->updateFloat2("vSpecularInfos",
                                        _specularTexture->coordinatesIndex,
-                                       _specularTexture->level);
+                                       _specularTexture->level, "");
           _uniformBuffer->updateMatrix("specularMatrix",
                                        *_specularTexture->getTextureMatrix());
         }
@@ -1038,11 +1019,6 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
           effect->setTexture("refraction2DSampler", _refractionTexture);
         }
       }
-
-      if (_cameraColorGradingTexture
-          && StandardMaterial::ColorGradingTextureEnabled()) {
-        ColorGradingTexture::Bind(_cameraColorGradingTexture, effect);
-      }
     }
 
     // Clip plane
@@ -1082,10 +1058,8 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     // Log. depth
     MaterialHelper::BindLogDepth(defines, effect, scene, SMD::LOGARITHMICDEPTH);
 
-    // Color Curves
-    if (_cameraColorCurves) {
-      ColorCurves::Bind(*_cameraColorCurves, effect);
-    }
+    // Image processing
+    _imageProcessingConfiguration->bind(_activeEffect);
   }
 
   _uniformBuffer->update();
@@ -1132,12 +1106,50 @@ std::vector<IAnimatable*> StandardMaterial::getAnimatables()
     results.emplace_back(_refractionTexture);
   }
 
-  if (_cameraColorGradingTexture
-      && _cameraColorGradingTexture->animations.size() > 0) {
-    results.emplace_back(_cameraColorGradingTexture);
+  return results;
+}
+
+std::vector<BaseTexture*> StandardMaterial::getActiveTextures() const
+{
+  auto activeTextures = Material::getActiveTextures();
+
+  if (_diffuseTexture) {
+    activeTextures.emplace_back(_diffuseTexture);
   }
 
-  return results;
+  if (_ambientTexture) {
+    activeTextures.emplace_back(_ambientTexture);
+  }
+
+  if (_opacityTexture) {
+    activeTextures.emplace_back(_opacityTexture);
+  }
+
+  if (_reflectionTexture) {
+    activeTextures.emplace_back(_reflectionTexture);
+  }
+
+  if (_emissiveTexture) {
+    activeTextures.emplace_back(_emissiveTexture);
+  }
+
+  if (_specularTexture) {
+    activeTextures.emplace_back(_specularTexture);
+  }
+
+  if (_bumpTexture) {
+    activeTextures.emplace_back(_bumpTexture);
+  }
+
+  if (_lightmapTexture) {
+    activeTextures.emplace_back(_lightmapTexture);
+  }
+
+  if (_refractionTexture) {
+    activeTextures.emplace_back(_refractionTexture);
+  }
+
+  return activeTextures;
 }
 
 void StandardMaterial::dispose(bool forceDisposeEffect,
@@ -1179,10 +1191,11 @@ void StandardMaterial::dispose(bool forceDisposeEffect,
     if (_refractionTexture) {
       _refractionTexture->dispose();
     }
+  }
 
-    if (_cameraColorGradingTexture) {
-      _cameraColorGradingTexture->dispose();
-    }
+  if (_imageProcessingConfiguration && _imageProcessingObserver) {
+    _imageProcessingConfiguration->onUpdateParameters.remove(
+      _imageProcessingObserver);
   }
 
   Material::dispose(forceDisposeEffect, forceDisposeTextures);
@@ -1329,6 +1342,14 @@ float StandardMaterial::roughness() const
   return _roughness;
 }
 
+void StandardMaterial::setRoughness(float value)
+{
+  if (stl_util::almost_equal(_roughness, value)) {
+    return;
+  }
+  _roughness = value;
+}
+
 bool StandardMaterial::useLightmapAsShadowmap() const
 {
   return _useLightmapAsShadowmap;
@@ -1394,12 +1415,106 @@ void StandardMaterial::setInvertNormalMapY(bool value)
   _invertNormalMapY = value;
 }
 
-void StandardMaterial::setRoughness(float value)
+ImageProcessingConfiguration*
+StandardMaterial::imageProcessingConfiguration() const
 {
-  if (stl_util::almost_equal(_roughness, value)) {
+  return _imageProcessingConfiguration;
+}
+
+void StandardMaterial::setImageProcessingConfiguration(
+  ImageProcessingConfiguration* value)
+{
+  _attachImageProcessingConfiguration(value);
+
+  // Ensure the effect will be rebuilt.
+  _markAllSubMeshesAsTexturesDirty();
+}
+
+void StandardMaterial::_attachImageProcessingConfiguration(
+  ImageProcessingConfiguration* configuration)
+{
+  if (configuration == _imageProcessingConfiguration) {
     return;
   }
-  _roughness = value;
+
+  // Detaches observer.
+  if (_imageProcessingConfiguration && _imageProcessingObserver) {
+    _imageProcessingConfiguration->onUpdateParameters.remove(
+      _imageProcessingObserver);
+  }
+
+  // Pick the scene configuration if needed.
+  if (!configuration) {
+    _imageProcessingConfiguration = getScene()->imageProcessingConfiguration();
+  }
+  else {
+    _imageProcessingConfiguration = configuration;
+  }
+
+  // Attaches observer.
+  _imageProcessingObserver
+    = _imageProcessingConfiguration->onUpdateParameters.add(
+      [this]() { _markAllSubMeshesAsImageProcessingDirty(); });
+}
+
+bool StandardMaterial::cameraColorCurvesEnabled() const
+{
+  return imageProcessingConfiguration()->colorCurvesEnabled();
+}
+
+void StandardMaterial::setCameraColorCurvesEnabled(bool value)
+{
+  imageProcessingConfiguration()->setColorCurvesEnabled(value);
+}
+
+bool StandardMaterial::cameraColorGradingEnabled() const
+{
+  return imageProcessingConfiguration()->colorGradingEnabled();
+}
+
+void StandardMaterial::setCameraColorGradingEnabled(bool value)
+{
+  imageProcessingConfiguration()->setColorGradingEnabled(value);
+}
+
+bool StandardMaterial::cameraToneMappingEnabled() const
+{
+  return _imageProcessingConfiguration->toneMappingEnabled();
+}
+
+void StandardMaterial::setCameraToneMappingEnabled(bool value)
+{
+  _imageProcessingConfiguration->setToneMappingEnabled(value);
+}
+
+float StandardMaterial::cameraExposure() const
+{
+  return _imageProcessingConfiguration->exposure();
+}
+
+void StandardMaterial::setCameraExposure(float value)
+{
+  _imageProcessingConfiguration->setExposure(value);
+}
+
+float StandardMaterial::cameraContrast() const
+{
+  return _imageProcessingConfiguration->contrast();
+}
+
+void StandardMaterial::setCameraContrast(float value)
+{
+  _imageProcessingConfiguration->setContrast(value);
+}
+
+BaseTexture* StandardMaterial::cameraColorGradingTexture() const
+{
+  return _imageProcessingConfiguration->colorGradingTexture;
+}
+
+void StandardMaterial::setCameraColorGradingTexture(BaseTexture* value)
+{
+  _imageProcessingConfiguration->colorGradingTexture = value;
 }
 
 StandardMaterial* StandardMaterial::Parse(const Json::value& source,

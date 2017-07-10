@@ -76,7 +76,7 @@ public:
   void freeze();
   void unfreeze();
   virtual bool isReady(AbstractMesh* mesh = nullptr, bool useInstances = false);
-  virtual bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+  virtual bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                                  bool useInstances = false);
   Effect* getEffect();
   Scene* getScene() const;
@@ -96,9 +96,20 @@ public:
   void bindView(Effect* effect);
   void bindViewProjection(Effect* effect);
   virtual void unbind();
+  virtual std::vector<BaseTexture*> getActiveTextures() const;
   virtual Material* clone(const std::string& name,
                           bool cloneChildren = false) const;
   std::vector<AbstractMesh*> getBindedMeshes();
+  /**
+   * Force shader compilation including textures ready check<
+   */
+  void
+  forceCompilation(AbstractMesh* mesh,
+                   const std::function<void(Material* material)>& onCompiled);
+  void
+  forceCompilation(AbstractMesh* mesh,
+                   const std::function<void(Material* material)>& onCompiled,
+                   bool alphaTest);
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false);
   void copyTo(Material* other) const;
@@ -114,6 +125,14 @@ protected:
   Material(const std::string& name, Scene* scene, bool doNotAdd = false);
 
   void _afterBind(Mesh* mesh);
+  void _markAllSubMeshesAsDirty(
+    const std::function<void(MaterialDefines& defines)>& func);
+  void _markAllSubMeshesAsImageProcessingDirty();
+  void _markAllSubMeshesAsTexturesDirty();
+  void _markAllSubMeshesAsFresnelDirty();
+  void _markAllSubMeshesAsLightsDirty();
+  void _markAllSubMeshesAsAttributesDirty();
+  void _markAllSubMeshesAsMiscDirty();
 
 public:
   // Events
@@ -157,6 +176,8 @@ private:
   // Events
   Observer<Material>::Ptr _onDisposeObserver;
   Observer<AbstractMesh>::Ptr _onBindObserver;
+  // Callbacks
+  std::function<void()> _beforeRenderCallback;
   // Properties
   bool _fogEnabled;
   bool _useUBO;

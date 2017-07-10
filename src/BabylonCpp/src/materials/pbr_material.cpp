@@ -981,7 +981,7 @@ void PBRMaterial::bind(Matrix* world, Mesh* mesh)
         if (albedoTexture && StandardMaterial::DiffuseTextureEnabled()) {
           _uniformBuffer->updateFloat2("vAlbedoInfos",
                                        albedoTexture->coordinatesIndex,
-                                       albedoTexture->level);
+                                       albedoTexture->level, "");
           _uniformBuffer->updateMatrix("albedoMatrix",
                                        *albedoTexture->getTextureMatrix());
         }
@@ -997,7 +997,7 @@ void PBRMaterial::bind(Matrix* world, Mesh* mesh)
         if (opacityTexture && StandardMaterial::OpacityTextureEnabled()) {
           _uniformBuffer->updateFloat2("vOpacityInfos",
                                        opacityTexture->coordinatesIndex,
-                                       opacityTexture->level);
+                                       opacityTexture->level, "");
           _uniformBuffer->updateMatrix("opacityMatrix",
                                        *opacityTexture->getTextureMatrix());
         }
@@ -1010,7 +1010,7 @@ void PBRMaterial::bind(Matrix* world, Mesh* mesh)
             "reflectionMatrix",
             *reflectionTexture->getReflectionTextureMatrix());
           _uniformBuffer->updateFloat2("vReflectionInfos",
-                                       reflectionTexture->level, 0.f);
+                                       reflectionTexture->level, 0.f, "");
 
           if (_defines[PMD::USESPHERICALFROMREFLECTIONMAP]) {
             auto hdrCubeTexture
@@ -1057,7 +1057,7 @@ void PBRMaterial::bind(Matrix* world, Mesh* mesh)
         if (emissiveTexture && StandardMaterial::EmissiveTextureEnabled()) {
           _uniformBuffer->updateFloat2("vEmissiveInfos",
                                        emissiveTexture->coordinatesIndex,
-                                       emissiveTexture->level);
+                                       emissiveTexture->level, "");
           _uniformBuffer->updateMatrix("emissiveMatrix",
                                        *emissiveTexture->getTextureMatrix());
         }
@@ -1065,7 +1065,7 @@ void PBRMaterial::bind(Matrix* world, Mesh* mesh)
         if (lightmapTexture && StandardMaterial::LightmapTextureEnabled()) {
           _uniformBuffer->updateFloat2("vLightmapInfos",
                                        lightmapTexture->coordinatesIndex,
-                                       lightmapTexture->level);
+                                       lightmapTexture->level, "");
           _uniformBuffer->updateMatrix("lightmapMatrix",
                                        *lightmapTexture->getTextureMatrix());
         }
@@ -1089,7 +1089,7 @@ void PBRMaterial::bind(Matrix* world, Mesh* mesh)
           if (microSurfaceTexture) {
             _uniformBuffer->updateFloat2("vMicroSurfaceSamplerInfos",
                                          microSurfaceTexture->coordinatesIndex,
-                                         microSurfaceTexture->level);
+                                         microSurfaceTexture->level, "");
             _uniformBuffer->updateMatrix(
               "microSurfaceSamplerMatrix",
               *microSurfaceTexture->getTextureMatrix());
@@ -1130,7 +1130,7 @@ void PBRMaterial::bind(Matrix* world, Mesh* mesh)
         if ((reflectionTexture || refractionTexture)) {
           _uniformBuffer->updateFloat2("vMicrosurfaceTextureLods",
                                        _microsurfaceTextureLods.x,
-                                       _microsurfaceTextureLods.y);
+                                       _microsurfaceTextureLods.y, "");
         }
       }
 

@@ -3,6 +3,7 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/material_defines.h>
 #include <babylon/materials/multi_material.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/uniform_buffer.h>
@@ -48,10 +49,6 @@ Material::Material(const std::string& iName, Scene* scene, bool /*doNotAdd*/)
 }
 
 Material::~Material()
-{
-}
-
-void Material::markAsDirty(unsigned int /*flag*/)
 {
 }
 
@@ -207,7 +204,8 @@ bool Material::isReady(AbstractMesh* /*mesh*/, bool /*useInstances*/)
   return true;
 }
 
-bool Material::isReadyForSubMesh(AbstractMesh* /*mesh*/, SubMesh* /*subMesh*/,
+bool Material::isReadyForSubMesh(AbstractMesh* /*mesh*/,
+                                 BaseSubMesh* /*subMesh*/,
                                  bool /*useInstances*/)
 {
   return false;
@@ -322,6 +320,11 @@ void Material::unbind()
   }
 }
 
+std::vector<BaseTexture*> Material::getActiveTextures() const
+{
+  return {};
+}
+
 Material* Material::clone(const std::string& /*name*/,
                           bool /*cloneChildren*/) const
 {
@@ -339,6 +342,119 @@ std::vector<AbstractMesh*> Material::getBindedMeshes()
   }
 
   return result;
+}
+
+void Material::forceCompilation(
+  AbstractMesh* mesh, const std::function<void(Material* material)>& onCompiled)
+{
+  forceCompilation(mesh, onCompiled, needAlphaTesting());
+}
+
+void Material::forceCompilation(
+  AbstractMesh* mesh, const std::function<void(Material* material)>& onCompiled,
+  bool alphaTest)
+{
+
+  _beforeRenderCallback = [this, mesh, alphaTest, onCompiled]() {
+    auto subMesh = std::make_unique<BaseSubMesh>();
+    auto scene   = getScene();
+    auto engine  = scene->getEngine();
+
+    if (subMesh->_materialDefines) {
+      subMesh->_materialDefines->_renderId = -1;
+    }
+
+    auto alphaTestState = engine->getAlphaTesting();
+    engine->setAlphaTesting(alphaTest);
+
+    if (isReadyForSubMesh(mesh, subMesh.get())) {
+      scene->unregisterBeforeRender(_beforeRenderCallback);
+
+      if (onCompiled) {
+        onCompiled(this);
+      }
+    }
+
+    engine->setAlphaTesting(alphaTestState);
+  };
+
+  getScene()->registerBeforeRender(_beforeRenderCallback);
+}
+
+void Material::markAsDirty(unsigned int flag)
+{
+  if (flag & Material::TextureDirtyFlag) {
+    _markAllSubMeshesAsTexturesDirty();
+  }
+
+  if (flag & Material::LightDirtyFlag) {
+    _markAllSubMeshesAsLightsDirty();
+  }
+
+  if (flag & Material::FresnelDirtyFlag) {
+    _markAllSubMeshesAsFresnelDirty();
+  }
+
+  if (flag & Material::AttributesDirtyFlag) {
+    _markAllSubMeshesAsAttributesDirty();
+  }
+
+  if (flag & Material::MiscDirtyFlag) {
+    _markAllSubMeshesAsMiscDirty();
+  }
+
+  getScene()->resetCachedMaterial();
+}
+
+void Material::_markAllSubMeshesAsDirty(
+  const std::function<void(MaterialDefines& defines)>& func)
+{
+  for (auto& mesh : getScene()->meshes) {
+    if (mesh->subMeshes.empty()) {
+      continue;
+    }
+    for (auto& subMesh : mesh->subMeshes) {
+      if (subMesh->getMaterial() != this) {
+        continue;
+      }
+
+      if (!subMesh->_materialDefines) {
+        return;
+      }
+
+      func(*subMesh->_materialDefines);
+    }
+  }
+}
+
+void Material::_markAllSubMeshesAsImageProcessingDirty()
+{
+  // _markAllSubMeshesAsDirty(defines => defines.markAsImageProcessingDirty());
+}
+
+void Material::_markAllSubMeshesAsTexturesDirty()
+{
+  // _markAllSubMeshesAsDirty(defines => defines.markAsTexturesDirty());
+}
+
+void Material::_markAllSubMeshesAsFresnelDirty()
+{
+  // _markAllSubMeshesAsDirty(defines => defines.markAsFresnelDirty());
+}
+
+void Material::_markAllSubMeshesAsLightsDirty()
+{
+  // _markAllSubMeshesAsDirty(defines => defines.markAsLightDirty());
+}
+
+void Material::_markAllSubMeshesAsAttributesDirty()
+{
+  // _markAllSubMeshesAsDirty(defines => defines.markAsAttributesDirty());
+}
+
+void Material::_markAllSubMeshesAsMiscDirty()
+{
+  // _markAllSubMeshesAsDirty(defines => defines.markAsMiscDirty());
 }
 
 void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)

@@ -59,11 +59,21 @@ StandardMaterialDefines::StandardMaterialDefines() : MaterialDefines{}
            "INVERTNORMALMAPY",
            "TWOSIDEDLIGHTING",
            "SHADOWFLOAT",
-           "CAMERACOLORGRADING",
-           "CAMERACOLORCURVES",
            "MORPHTARGETS",
            "MORPHTARGETS_NORMAL",
-           "MORPHTARGETS_TANGENT"};
+           "MORPHTARGETS_TANGENT",
+           "IMAGEPROCESSING",
+           "VIGNETTE",
+           "VIGNETTEBLENDMODEMULTIPLY",
+           "VIGNETTEBLENDMODEOPAQUE",
+           "TONEMAPPING",
+           "CONTRAST",
+           "COLORCURVES",
+           "COLORGRADING",
+           "SAMPLER3DGREENDEPTH",
+           "SAMPLER3DBGRMAP",
+           "IMAGEPROCESSINGPOSTPROCESS",
+           "EXPOSURE"};
   rebuild();
 }
 

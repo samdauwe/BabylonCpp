@@ -4,6 +4,7 @@
 #include <babylon/babylon_global.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/math/color3.h>
+#include <babylon/tools/observer.h>
 
 namespace BABYLON {
 
@@ -60,12 +61,13 @@ public:
   /**
    * Child classes can use it to update shaders
    */
-  bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
   void buildUniformLayout();
   void unbind() override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatable*> getAnimatables();
+  std::vector<BaseTexture*> getActiveTextures() const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
   Material* clone(const std::string& name,
@@ -105,6 +107,86 @@ public:
   bool invertNormalMapY() const;
   void setInvertNormalMapY(bool value);
 
+  /**
+   * @brief Gets the image processing configuration used either in this
+   * material.
+   */
+  ImageProcessingConfiguration* imageProcessingConfiguration() const;
+
+  /**
+   * @brief Sets the Default image processing configuration used either in the
+   * this material.
+   *
+   * If sets to null, the scene one is in use.
+   */
+  void setImageProcessingConfiguration(ImageProcessingConfiguration* value);
+
+  /**
+   * @brief Gets whether the color curves effect is enabled.
+   */
+  bool cameraColorCurvesEnabled() const;
+
+  /**
+   * @brief Sets whether the color curves effect is enabled.
+   */
+  void setCameraColorCurvesEnabled(bool value);
+
+  /**
+   * @brief Gets wether the color grading effect is enabled.
+   */
+  bool cameraColorGradingEnabled() const;
+
+  /**
+   * @brief Gets wether the color grading effect is enabled.
+   */
+  void setCameraColorGradingEnabled(bool value);
+
+  /**
+   * @brief Gets wether tonemapping is enabled or not.
+   */
+  bool cameraToneMappingEnabled() const;
+
+  /**
+   * @brief Sets wether tonemapping is enabled or not
+   */
+  void setCameraToneMappingEnabled(bool value);
+
+  /**
+   * @brief The camera exposure used on this material.
+   * This property is here and not in the camera to allow controlling exposure
+   * without full screen post process.
+   * This corresponds to a photographic exposure.
+   */
+  float cameraExposure() const;
+
+  /**
+   * @brief The camera exposure used on this material.
+   * This property is here and not in the camera to allow controlling exposure
+   * without full screen post process.
+   * This corresponds to a photographic exposure.
+   */
+  void setCameraExposure(float value);
+
+  /**
+   * @brief Gets The camera contrast used on this material.
+   */
+  float cameraContrast() const;
+
+  /**
+   * @brief Sets The camera contrast used on this material.
+   */
+  void setCameraContrast(float value);
+
+  /**
+   * @brief Gets the Color Grading 2D Lookup Texture.
+   */
+  BaseTexture* cameraColorGradingTexture() const;
+
+  /**
+   * @brief Sets the Color Grading 2D Lookup Texture.
+   */
+  void setCameraColorGradingTexture(BaseTexture* value);
+
   // Statics
   static StandardMaterial* Parse(const Json::value& source, Scene* scene,
                                  const std::string& rootUrl);
@@ -136,6 +218,13 @@ protected:
   StandardMaterial(const StandardMaterial& other);
 
 protected:
+  /**
+   * Attaches a new image processing configuration to the Standard Material.
+   * @param configuration
+   */
+  void _attachImageProcessingConfiguration(
+    ImageProcessingConfiguration* configuration);
+
   bool _shouldUseAlphaFromDiffuseTexture();
   bool _checkCache(Scene* scene, AbstractMesh* mesh, bool useInstances = false);
 
@@ -159,6 +248,11 @@ protected:
   Matrix _worldViewProjectionMatrix;
   Color3 _globalAmbientColor;
   bool _useLogarithmicDepth;
+
+  /**
+   * Keep track of the image processing observer to allow dispose and replace.
+   */
+  ImageProcessingConfiguration* _imageProcessingConfiguration;
 
 private:
   BaseTexture* _diffuseTexture;
@@ -206,26 +300,9 @@ private:
   bool _twoSidedLighting;
 
   /**
-   * Color Grading 2D Lookup Texture.
-   * This allows special effects like sepia, black and white to sixties
-   * rendering style.
+   * Keep track of the image processing observer to allow dispose and replace.
    */
-  BaseTexture* _cameraColorGradingTexture;
-
-  /**
-   * The color grading curves provide additional color adjustmnent that is
-   * applied after any color grading transform (3D LUT).
-   * They allow basic adjustment of saturation and small exposure adjustments,
-   * along with color filter tinting to provide white balance adjustment or more
-   * stylistic effects.
-   * These are similar to controls found in many professional imaging or
-   * colorist software. The global controls are applied to the entire image. For
-   * advanced tuning, extra controls are provided to adjust the shadow, midtone
-   * and highlight areas of the image;
-   * corresponding to low luminance, medium luminance, and high luminance areas
-   * respectively.
-   */
-  ColorCurves* _cameraColorCurves;
+  Observer<ImageProcessingConfiguration>::Ptr _imageProcessingObserver;
 
 }; // end of class StandardMaterial
 

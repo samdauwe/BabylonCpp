@@ -17,6 +17,7 @@ MaterialDefines::MaterialDefines()
     , _areTexturesDirty{true}
     , _areFresnelDirty{true}
     , _areMiscDirty{true}
+    , _areImageProcessingDirty{true}
     , _normals{false}
     , _uvs{false}
     , _needNormals{false}
@@ -151,12 +152,13 @@ bool MaterialDefines::isDirty() const
 
 void MaterialDefines::markAsProcessed()
 {
-  _isDirty            = false;
-  _areAttributesDirty = false;
-  _areTexturesDirty   = false;
-  _areFresnelDirty    = false;
-  _areLightsDirty     = false;
-  _areMiscDirty       = false;
+  _isDirty                 = false;
+  _areAttributesDirty      = false;
+  _areTexturesDirty        = false;
+  _areFresnelDirty         = false;
+  _areLightsDirty          = false;
+  _areMiscDirty            = false;
+  _areImageProcessingDirty = false;
 }
 
 void MaterialDefines::markAsUnprocessed()
@@ -166,12 +168,19 @@ void MaterialDefines::markAsUnprocessed()
 
 void MaterialDefines::markAllAsDirty()
 {
-  _areTexturesDirty   = true;
-  _areAttributesDirty = true;
-  _areLightsDirty     = true;
-  _areFresnelDirty    = true;
-  _areMiscDirty       = true;
-  _isDirty            = true;
+  _areTexturesDirty        = true;
+  _areAttributesDirty      = true;
+  _areLightsDirty          = true;
+  _areFresnelDirty         = true;
+  _areMiscDirty            = true;
+  _areImageProcessingDirty = true;
+  _isDirty                 = true;
+}
+
+void MaterialDefines::markAsImageProcessingDirty()
+{
+  _areImageProcessingDirty = true;
+  _isDirty                 = true;
 }
 
 void MaterialDefines::markAsLightDirty()

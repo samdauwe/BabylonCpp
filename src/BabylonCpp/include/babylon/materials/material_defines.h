@@ -22,6 +22,7 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   void markAsProcessed() override;
   void markAsUnprocessed() override;
   void markAllAsDirty() override;
+  void markAsImageProcessingDirty() override;
   void markAsLightDirty() override;
   void markAsAttributesDirty() override;
   void markAsTexturesDirty() override;
@@ -67,6 +68,7 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   bool _areTexturesDirty;
   bool _areFresnelDirty;
   bool _areMiscDirty;
+  bool _areImageProcessingDirty;
 
   bool _normals;
   bool _uvs;

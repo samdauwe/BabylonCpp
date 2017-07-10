@@ -32,8 +32,9 @@ UniformBuffer::UniformBuffer(Engine* engine, const Float32Array& data,
     updateFloat = [this](const std::string& name, float x) {
       _updateFloatForEffect(name, x);
     };
-    updateFloat2 = [this](const std::string& name, float x, float y) {
-      _updateFloat2ForEffect(name, x, y);
+    updateFloat2 = [this](const std::string& name, float x, float y,
+                          const std::string& suffix) {
+      _updateFloat2ForEffect(name, x, y, suffix);
     };
     updateFloat3 = [this](const std::string& name, float x, float y, float z,
                           const std::string& suffix = "") {
@@ -73,8 +74,9 @@ UniformBuffer::UniformBuffer(Engine* engine, const Float32Array& data,
     updateFloat = [this](const std::string& name, float x) {
       _updateFloatForUniform(name, x);
     };
-    updateFloat2 = [this](const std::string& name, float x, float y) {
-      _updateFloat2ForUniform(name, x, y);
+    updateFloat2 = [this](const std::string& name, float x, float y,
+                          const std::string& suffix = "") {
+      _updateFloat2ForUniform(name, x, y, suffix);
     };
     updateFloat3 = [this](const std::string& name, float x, float y, float z,
                           const std::string& suffix = "") {
@@ -393,17 +395,17 @@ void UniformBuffer::_updateFloatForUniform(const std::string& name, float x)
 }
 
 void UniformBuffer::_updateFloat2ForEffect(const std::string& name, float x,
-                                           float y)
+                                           float y, const std::string& suffix)
 {
-  _currentEffect->setFloat2(name, x, y);
+  _currentEffect->setFloat2(name + suffix, x, y);
 }
 
 void UniformBuffer::_updateFloat2ForUniform(const std::string& name, float x,
-                                            float y)
+                                            float y, const std::string& suffix)
 {
   UniformBuffer::_tempBuffer[0] = x;
   UniformBuffer::_tempBuffer[1] = y;
-  updateUniform(name, UniformBuffer::_tempBuffer, 2);
+  updateUniform(name + suffix, UniformBuffer::_tempBuffer, 2);
 }
 
 void UniformBuffer::_updateFloat3ForEffect(const std::string& name, float x,
