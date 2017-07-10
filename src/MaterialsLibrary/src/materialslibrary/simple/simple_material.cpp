@@ -48,7 +48,7 @@ BaseTexture* SimpleMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool SimpleMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+bool SimpleMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                                        bool useInstances)
 {
   if (isFrozen()) {

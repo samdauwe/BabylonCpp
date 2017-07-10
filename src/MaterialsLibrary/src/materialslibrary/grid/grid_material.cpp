@@ -37,7 +37,7 @@ bool GridMaterial::needAlphaBlending()
   return (alpha < 1.f);
 }
 
-bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                                      bool /*useInstances*/)
 {
   if (isFrozen()) {

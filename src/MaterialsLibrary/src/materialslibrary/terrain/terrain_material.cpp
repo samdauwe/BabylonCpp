@@ -56,8 +56,8 @@ BaseTexture* TerrainMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
-                                        bool useInstances)
+bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh,
+                                        BaseSubMesh* subMesh, bool useInstances)
 {
   if (isFrozen()) {
     if (_wasPreviouslyReady && subMesh->effect()) {

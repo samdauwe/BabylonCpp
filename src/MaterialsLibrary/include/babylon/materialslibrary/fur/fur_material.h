@@ -26,7 +26,7 @@ public:
   bool needAlphaTesting() override;
   BaseTexture* getAlphaTestTexture() override;
   void updateFur();
-  bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances) override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatable*> getAnimatables();

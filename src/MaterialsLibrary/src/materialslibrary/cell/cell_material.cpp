@@ -49,7 +49,7 @@ BaseTexture* CellMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool CellMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+bool CellMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                                      bool useInstances)
 {
   if (isFrozen()) {

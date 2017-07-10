@@ -123,7 +123,7 @@ BaseTexture* WaterMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                                       bool useInstances)
 {
   if (isFrozen()) {

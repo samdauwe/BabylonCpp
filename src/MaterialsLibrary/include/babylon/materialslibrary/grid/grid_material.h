@@ -33,7 +33,7 @@ public:
    * Returns whether or not the grid requires alpha blending.
    */
   bool needAlphaBlending() override;
-  bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
   virtual void dispose(bool forceDisposeEffect   = false,

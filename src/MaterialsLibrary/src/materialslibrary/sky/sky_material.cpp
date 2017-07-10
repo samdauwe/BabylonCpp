@@ -52,7 +52,7 @@ BaseTexture* SkyMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                                     bool /*useInstances*/)
 {
   if (isFrozen()) {

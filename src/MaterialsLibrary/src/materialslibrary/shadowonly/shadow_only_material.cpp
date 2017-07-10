@@ -39,7 +39,8 @@ BaseTexture* ShadowOnlyMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh,
+                                           BaseSubMesh* subMesh,
                                            bool useInstances)
 {
   if (isFrozen()) {

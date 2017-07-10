@@ -51,7 +51,7 @@ BaseTexture* FireMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                                      bool useInstances)
 {
   if (isFrozen()) {

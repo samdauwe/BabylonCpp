@@ -50,7 +50,8 @@ BaseTexture* GradientMaterial::getAlphaTestTexture()
   return nullptr;
 }
 
-bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
+bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh,
+                                         BaseSubMesh* subMesh,
                                          bool useInstances)
 {
   if (isFrozen()) {
