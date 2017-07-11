@@ -34,6 +34,8 @@ public:
   using GLUniformLocationPtr   = std::unique_ptr<GL::IGLUniformLocation>;
   using GLVertexArrayObjectPtr = std::unique_ptr<GL::IGLVertexArrayObject>;
 
+  friend class BaseTexture;
+
 public:
   static std::string Version();
 

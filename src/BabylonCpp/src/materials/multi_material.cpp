@@ -1,5 +1,6 @@
 #include <babylon/materials/multi_material.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/json.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/standard_material.h>
@@ -26,19 +27,43 @@ IReflect::Type MultiMaterial::type() const
 }
 
 // Properties
+std::vector<Material*>& MultiMaterial::subMaterials()
+{
+  return _subMaterials;
+}
+
+void MultiMaterial::setSubMaterials(const std::vector<Material*>& value)
+{
+  _subMaterials = value;
+  _hookArray(value);
+}
+
 Material* MultiMaterial::getSubMaterial(unsigned int index)
 {
-  if (index >= subMaterials.size()) {
+  if (index >= _subMaterials.size()) {
     return getScene()->defaultMaterial();
   }
 
-  return subMaterials[index];
+  return _subMaterials[index];
+}
+
+std::vector<BaseTexture*> MultiMaterial::getActiveTextures() const
+{
+  auto activeTextures = Material::getActiveTextures();
+  for (auto& subMaterial : _subMaterials) {
+    stl_util::concat(activeTextures, subMaterial->getActiveTextures());
+  }
+  return activeTextures;
 }
 
 // Methods
+void MultiMaterial::_hookArray(const std::vector<Material*>& /*array*/)
+{
+}
+
 bool MultiMaterial::isReady(AbstractMesh* mesh, bool /*useInstances*/)
 {
-  for (auto& subMaterial : subMaterials) {
+  for (auto& subMaterial : _subMaterials) {
     if (subMaterial) {
       if (!subMaterial->isReady(mesh)) {
         return false;
@@ -54,7 +79,7 @@ Material* MultiMaterial::clone(const std::string& iName,
 {
   auto newMultiMaterial = MultiMaterial::New(iName, getScene());
 
-  for (auto& subMaterial : subMaterials) {
+  for (auto& subMaterial : _subMaterials) {
     Material* newSubMaterial = nullptr;
     if (cloneChildren) {
       newSubMaterial = subMaterial->clone(name + "-" + subMaterial->name);
@@ -62,7 +87,7 @@ Material* MultiMaterial::clone(const std::string& iName,
     else {
       newSubMaterial = subMaterial;
     }
-    newMultiMaterial->subMaterials.emplace_back(newSubMaterial);
+    newMultiMaterial->_subMaterials.emplace_back(newSubMaterial);
   }
 
   return newMultiMaterial;

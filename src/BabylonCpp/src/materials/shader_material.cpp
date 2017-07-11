@@ -73,7 +73,7 @@ ShaderMaterial& ShaderMaterial::setTexture(const std::string& iName,
   if (!stl_util::contains(_options.samplers, iName)) {
     _options.samplers.emplace_back(iName);
   }
-  _textures[name] = texture;
+  _textures[iName] = texture;
 
   return *this;
 }
@@ -86,9 +86,9 @@ ShaderMaterial::setTextureArray(const std::string& iName,
     _options.samplers.emplace_back(iName);
   }
 
-  _checkUniform(name);
+  _checkUniform(iName);
 
-  _textureArrays[name] = textures;
+  _textureArrays[iName] = textures;
 
   return *this;
 }
@@ -254,6 +254,10 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
     defines.emplace_back("#define BonesPerMesh "
                          + std::to_string(mesh->skeleton()->bones.size() + 1));
     fallbacks->addCPUSkinningFallback(0, mesh);
+
+    if (!stl_util::contains(_options.uniforms, "mBones")) {
+      _options.uniforms.emplace_back("mBones");
+    }
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
@@ -407,6 +411,24 @@ void ShaderMaterial::bind(Matrix* world, Mesh* mesh)
   }
 
   _afterBind(mesh);
+}
+
+std::vector<BaseTexture*> ShaderMaterial::getActiveTextures() const
+{
+  auto activeTextures = Material::getActiveTextures();
+
+  for (auto& textureItem : _textures) {
+    activeTextures.emplace_back(textureItem.second);
+  }
+
+  for (auto& textureArrayItem : _textureArrays) {
+    const auto& array = textureArrayItem.second;
+    for (std::size_t index = 0; index < array.size(); ++index) {
+      activeTextures.emplace_back(array[index]);
+    }
+  }
+
+  return activeTextures;
 }
 
 Material* ShaderMaterial::clone(const std::string& iName,

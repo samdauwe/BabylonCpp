@@ -5,6 +5,7 @@
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/materials/material.h>
+#include <babylon/materials/textures/texture.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -220,6 +221,23 @@ std::unique_ptr<BaseTexture> BaseTexture::clone() const
   return nullptr;
 }
 
+Uint8Array BaseTexture::readPixels(unsigned int faceIndex)
+{
+  if (!_texture) {
+    return {};
+  }
+
+  auto size   = getSize();
+  auto engine = getScene()->getEngine();
+
+  if (_texture->isCube) {
+    return engine->_readTexturePixels(_texture, size.width, size.height,
+                                      faceIndex);
+  }
+
+  return engine->_readTexturePixels(_texture, size.width, size.height);
+}
+
 void BaseTexture::releaseInternalTexture()
 {
   if (_texture) {
@@ -256,6 +274,31 @@ void BaseTexture::dispose(bool /*doNotRecurse*/)
 Json::object BaseTexture::serialize() const
 {
   return Json::object();
+}
+
+void BaseTexture::WhenAllReady(const std::vector<BaseTexture*>& textures,
+                               const std::function<void()>& onLoad)
+{
+  static std::size_t numReady = 0;
+
+  for (auto& texture : textures) {
+    if (texture->isReady()) {
+      if (++numReady == textures.size()) {
+        onLoad();
+      }
+    }
+    else {
+      const std::function<void()> callback = [&]() {
+        static_cast<Texture*>(texture)->onLoadObservable().removeCallback(
+          callback);
+        if (++numReady == textures.size()) {
+          onLoad();
+        }
+      };
+
+      static_cast<Texture*>(texture)->onLoadObservable().add(callback);
+    }
+  }
 }
 
 } // end of namespace BABYLON

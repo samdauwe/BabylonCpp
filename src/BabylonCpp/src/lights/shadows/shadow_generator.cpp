@@ -688,33 +688,25 @@ void ShadowGenerator::prepareDefines(MaterialDefines& defines,
   }
 }
 
-bool ShadowGenerator::bindShadowLight(const std::string& lightIndex,
-                                      Effect* effect,
-                                      bool depthValuesAlreadySet)
+void ShadowGenerator::bindShadowLight(const std::string& lightIndex,
+                                      Effect* effect)
 {
   auto scene = _scene;
   auto light = _light;
 
   if (!scene->shadowsEnabled() || !light->shadowEnabled) {
-    return false;
+    return;
   }
 
   if (!light->needCube()) {
     effect->setMatrix("lightMatrix" + lightIndex, getTransformMatrix());
   }
-  else {
-    if (!depthValuesAlreadySet) {
-      depthValuesAlreadySet = true;
-      effect->setFloat2("depthValues", scene->activeCamera->minZ,
-                        scene->activeCamera->maxZ);
-    }
-  }
   effect->setTexture("shadowSampler" + lightIndex, getShadowMapForRendering());
   light->_uniformBuffer->updateFloat3(
     "shadowsInfo", getDarkness(), blurScale / getShadowMap()->getSize().width,
     depthScale(), lightIndex);
-
-  return depthValuesAlreadySet;
+  effect->setFloat2("depthValues", scene->activeCamera->minZ,
+                    scene->activeCamera->maxZ);
 }
 
 } // end of namespace BABYLON

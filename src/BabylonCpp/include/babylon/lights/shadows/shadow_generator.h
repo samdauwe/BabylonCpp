@@ -121,8 +121,7 @@ public:
    * It implies the unifroms available on the materials are the standard BJS
    * ones.
    */
-  bool bindShadowLight(const std::string& lightIndex, Effect* effect,
-                       bool depthValuesAlreadySet) override;
+  void bindShadowLight(const std::string& lightIndex, Effect* effect) override;
 
   // Statics
 

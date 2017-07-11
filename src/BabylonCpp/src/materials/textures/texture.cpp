@@ -37,15 +37,9 @@ Texture::Texture(const std::string& _url, Scene* scene, bool noMipmap,
 {
   name = _url;
 
-  if (url.empty()) {
-    return;
-  }
-
-  _texture = _getFromCache(url, noMipmap, samplingMode);
-
   _load = [this]() {
     if (_onLoadObservable.hasObservers()) {
-      _onLoadObservable.notifyObservers();
+      _onLoadObservable.notifyObservers(this);
     }
     if (_onLoad) {
       _onLoad();
@@ -55,6 +49,14 @@ Texture::Texture(const std::string& _url, Scene* scene, bool noMipmap,
       getScene()->resetCachedMaterial();
     }
   };
+
+  if (url.empty()) {
+    _delayedOnLoad  = _load;
+    _delayedOnError = onError;
+    return;
+  }
+
+  _texture = _getFromCache(url, noMipmap, samplingMode);
 
   if (!_texture) {
     if (!scene->useDelayedTextureLoading) {
@@ -106,6 +108,13 @@ bool Texture::noMipmap() const
   return _noMipmap;
 }
 
+void Texture::updateURL(const std::string& iUrl)
+{
+  url            = iUrl;
+  delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
+  delayLoad();
+}
+
 void Texture::delayLoad()
 {
   if (delayLoadState != EngineConstants::DELAYLOADSTATE_NOTLOADED) {
@@ -121,6 +130,14 @@ void Texture::delayLoad()
       _delayedOnError, _buffer, nullptr, _format);
     if (_deleteBuffer) {
       delete _buffer;
+    }
+  }
+  else {
+    if (_texture->isReady) {
+      _delayedOnLoad();
+    }
+    else {
+      _texture->onLoadedCallbacks.emplace_back(_delayedOnLoad);
     }
   }
 }
@@ -275,6 +292,11 @@ Texture* Texture::clone() const
   newTexture->wAng    = wAng;
 
   return newTexture;
+}
+
+Observable<Texture>& Texture::onLoadObservable()
+{
+  return _onLoadObservable;
 }
 
 Texture* Texture::CreateFromBase64String(const std::string& /*data*/,

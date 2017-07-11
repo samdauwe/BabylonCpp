@@ -552,11 +552,11 @@ Material::ParseMultiMaterial(const Json::value& parsedMultiMaterial,
   for (auto& subMatId : Json::GetArray(parsedMultiMaterial, "materials")) {
     auto _subMatId = subMatId.get<std::string>();
     if (!_subMatId.empty()) {
-      multiMaterial->subMaterials.emplace_back(
+      multiMaterial->subMaterials().emplace_back(
         scene->getMaterialByID(_subMatId));
     }
     else {
-      multiMaterial->subMaterials.emplace_back(nullptr);
+      multiMaterial->subMaterials().emplace_back(nullptr);
     }
   }
 

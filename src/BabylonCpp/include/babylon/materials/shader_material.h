@@ -58,6 +58,7 @@ public:
                bool useInstances  = false) override;
   void bindOnlyWorldMatrix(Matrix& world) override;
   void bind(Matrix* world, Mesh* mesh = nullptr) override;
+  std::vector<BaseTexture*> getActiveTextures() const override;
   Material* clone(const std::string& name,
                   bool cloneChildren = false) const override;
   virtual void dispose(bool forceDisposeEffect   = false,

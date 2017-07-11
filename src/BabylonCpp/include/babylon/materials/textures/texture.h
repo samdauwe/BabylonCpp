@@ -29,11 +29,13 @@ public:
   bool isBlocking() const override;
 
   bool noMipmap() const;
+  void updateURL(const std::string& iUrl);
   void delayLoad() override;
   void updateSamplingMode(unsigned int samplingMode);
   Matrix* getTextureMatrix() override;
   Matrix* getReflectionTextureMatrix() override;
   Texture* clone() const;
+  Observable<Texture>& onLoadObservable();
 
   /** Statics **/
   static Texture* CreateFromBase64String(
@@ -103,7 +105,7 @@ private:
   bool _deleteBuffer;
   std::function<void()> _delayedOnLoad;
   std::function<void()> _delayedOnError;
-  Observable<bool> _onLoadObservable;
+  Observable<Texture> _onLoadObservable;
 
   std::function<void()> _onLoad;
   std::function<void()> _load;

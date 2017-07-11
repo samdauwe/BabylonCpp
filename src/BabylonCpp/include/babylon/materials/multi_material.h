@@ -28,7 +28,10 @@ public:
   IReflect::Type type() const override;
 
   /** Properties **/
+  std::vector<Material*>& subMaterials();
+  void setSubMaterials(const std::vector<Material*>& value);
   Material* getSubMaterial(unsigned int index);
+  std::vector<BaseTexture*> getActiveTextures() const override;
 
   /** Methods **/
   bool isReady(AbstractMesh* mesh = nullptr,
@@ -40,8 +43,11 @@ public:
 protected:
   MultiMaterial(const std::string name, Scene* scene);
 
-public:
-  std::vector<Material*> subMaterials;
+private:
+  void _hookArray(const std::vector<Material*>& array);
+
+private:
+  std::vector<Material*> _subMaterials;
 
 }; // end of class MultiMaterial
 

@@ -217,8 +217,7 @@ void PBRMaterial::BindLights(Scene* scene, AbstractMesh* mesh, Effect* effect,
                              unsigned int maxSimultaneousLights,
                              bool usePhysicalLightFalloff)
 {
-  unsigned int lightIndex    = 0;
-  bool depthValuesAlreadySet = false;
+  unsigned int lightIndex = 0;
   for (auto light : mesh->_lightSources) {
     bool useUbo = light->_uniformBuffer->useUbo();
 
@@ -252,8 +251,7 @@ void PBRMaterial::BindLights(Scene* scene, AbstractMesh* mesh, Effect* effect,
 
     // Shadows
     if (scene->shadowsEnabled()) {
-      depthValuesAlreadySet = MaterialHelper::BindLightShadow(
-        light, scene, mesh, lightIndex, effect, depthValuesAlreadySet);
+      MaterialHelper::BindLightShadow(light, scene, mesh, lightIndex, effect);
     }
 
     light->_uniformBuffer->update();

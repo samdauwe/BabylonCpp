@@ -48,9 +48,13 @@ public:
   virtual void delayLoad();
   std::vector<Animation*> getAnimations() override;
   std::unique_ptr<BaseTexture> clone() const;
+  Uint8Array readPixels(unsigned int faceIndex = 0);
   void releaseInternalTexture();
   virtual void dispose(bool doNotRecurse = false) override;
   Json::object serialize() const;
+
+  static void WhenAllReady(const std::vector<BaseTexture*>& textures,
+                           const std::function<void()>& onLoad);
 
 protected:
   BaseTexture(Scene* scene);

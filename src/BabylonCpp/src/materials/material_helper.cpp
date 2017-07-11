@@ -41,7 +41,8 @@ void MaterialHelper::PrepareDefinesForMisc(
 
 void MaterialHelper::PrepareDefinesForFrameBoundValues(
   Scene* scene, Engine* engine, MaterialDefines& defines, bool useInstances,
-  unsigned int CLIPPLANE, unsigned int ALPHATEST, unsigned int INSTANCES)
+  unsigned int CLIPPLANE, unsigned int ALPHATEST, unsigned int INSTANCES,
+  bool forceAlphaTest)
 {
   bool changed = false;
 
@@ -50,7 +51,7 @@ void MaterialHelper::PrepareDefinesForFrameBoundValues(
     changed                    = true;
   }
 
-  if (defines[ALPHATEST] != engine->getAlphaTesting()) {
+  if (defines[ALPHATEST] != (engine->getAlphaTesting() || forceAlphaTest)) {
     defines.defines[ALPHATEST] = !defines[ALPHATEST];
     changed                    = true;
   }
@@ -65,7 +66,7 @@ void MaterialHelper::PrepareDefinesForFrameBoundValues(
   }
 }
 
-void MaterialHelper::PrepareDefinesForAttributes(
+bool MaterialHelper::PrepareDefinesForAttributes(
   AbstractMesh* mesh, MaterialDefines& defines, bool useVertexColor,
   bool useBones, bool useMorphTargets, unsigned int NORMAL, unsigned int UV1,
   unsigned int UV2, unsigned int VERTEXCOLOR, unsigned int VERTEXALPHA,
@@ -73,7 +74,7 @@ void MaterialHelper::PrepareDefinesForAttributes(
 {
   if (!defines._areAttributesDirty && defines._needNormals == defines._normals
       && defines._needUVs == defines._uvs) {
-    return;
+    return false;
   }
 
   defines._normals = defines._needNormals;
@@ -132,6 +133,8 @@ void MaterialHelper::PrepareDefinesForAttributes(
       defines.NUM_MORPH_INFLUENCERS        = 0;
     }
   }
+
+  return true;
 }
 
 bool MaterialHelper::PrepareDefinesForLights(
@@ -219,7 +222,12 @@ bool MaterialHelper::PrepareDefinesForLights(
   // Resetting all other lights if any
   for (unsigned int index = lightIndex; index < maxSimultaneousLights;
        ++index) {
-    defines.lights[lightIndex] = false;
+    defines.lights[lightIndex]      = false;
+    defines.hemilights[lightIndex]  = false;
+    defines.pointlights[lightIndex] = false;
+    defines.dirlights[lightIndex]   = false;
+    defines.spotlights[lightIndex]  = false;
+    defines.shadows[lightIndex]     = false;
   }
 
   auto caps = scene->getEngine()->getCaps();
@@ -255,7 +263,8 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
                                      "vLightDirection" + lightIndexStr, //
                                      "vLightGround" + lightIndexStr,    //
                                      "lightMatrix" + lightIndexStr,     //
-                                     "shadowsInfo" + lightIndexStr      //
+                                     "shadowsInfo" + lightIndexStr,     //
+                                     "depthValues" + lightIndexStr      //
                                    });
 
     samplersList.emplace_back("shadowSampler" + lightIndexStr);
@@ -394,20 +403,16 @@ void MaterialHelper::PrepareAttributesForInstances(
   }
 }
 
-bool MaterialHelper::BindLightShadow(Light* light, Scene* /*scene*/,
+void MaterialHelper::BindLightShadow(Light* light, Scene* /*scene*/,
                                      AbstractMesh* mesh,
-                                     unsigned int lightIndex, Effect* effect,
-                                     bool depthValuesAlreadySet)
+                                     unsigned int lightIndex, Effect* effect)
 {
   if (light->shadowEnabled && mesh->receiveShadows()) {
     auto shadowGenerator = light->getShadowGenerator();
     if (shadowGenerator) {
-      depthValuesAlreadySet = shadowGenerator->bindShadowLight(
-        std::to_string(lightIndex), effect, depthValuesAlreadySet);
+      shadowGenerator->bindShadowLight(std::to_string(lightIndex), effect);
     }
   }
-
-  return depthValuesAlreadySet;
 }
 
 void MaterialHelper::BindLightProperties(Light* light, Effect* effect,
@@ -419,30 +424,31 @@ void MaterialHelper::BindLightProperties(Light* light, Effect* effect,
 void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
                                 Effect* effect, MaterialDefines& defines,
                                 unsigned int maxSimultaneousLights,
-                                unsigned int SPECULARTERM)
+                                unsigned int SPECULARTERM,
+                                bool usePhysicalLightFalloff)
 {
-  unsigned int lightIndex    = 0;
-  bool depthValuesAlreadySet = false;
+  unsigned int lightIndex = 0;
 
   for (auto& light : mesh->_lightSources) {
     const std::string lightIndexStr = std::to_string(lightIndex);
+    const auto scaledIntensity      = light->getScaledIntensity();
     light->_uniformBuffer->bindToEffect(effect, "Light" + lightIndexStr);
 
     MaterialHelper::BindLightProperties(light, effect, lightIndex);
 
-    light->diffuse.scaleToRef(light->intensity, Tmp::Color3Array[0]);
-    light->_uniformBuffer->updateColor4("vLightDiffuse", Tmp::Color3Array[0],
-                                        light->range, lightIndexStr);
+    light->diffuse.scaleToRef(scaledIntensity, Tmp::Color3Array[0]);
+    light->_uniformBuffer->updateColor4(
+      "vLightDiffuse", Tmp::Color3Array[0],
+      usePhysicalLightFalloff ? light->radius() : light->range, lightIndexStr);
     if (defines[SPECULARTERM]) {
-      light->specular.scaleToRef(light->intensity, Tmp::Color3Array[1]);
+      light->specular.scaleToRef(scaledIntensity, Tmp::Color3Array[1]);
       light->_uniformBuffer->updateColor3("vLightSpecular", Tmp::Color3Array[1],
                                           lightIndexStr);
     }
 
     // Shadows
     if (scene->shadowsEnabled()) {
-      depthValuesAlreadySet = BindLightShadow(light, scene, mesh, lightIndex,
-                                              effect, depthValuesAlreadySet);
+      BindLightShadow(light, scene, mesh, lightIndex, effect);
     }
     light->_uniformBuffer->update();
     ++lightIndex;
