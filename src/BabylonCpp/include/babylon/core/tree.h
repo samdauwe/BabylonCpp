@@ -229,6 +229,14 @@ public:
   }
 
   /**
+   * @brief constructor.
+   */
+  Tree(T data)
+  {
+    root = std::make_unique<TreeNode<T>>(std::move(data));
+  }
+
+  /**
    * @brief Destructor.
    */
   ~Tree()
@@ -238,23 +246,50 @@ public:
   }
 
   /**
+   * @brief Returns an interator to the top level node.
+   * @return An interator to the root node.
+   */
+  iterator begin() const
+  {
+    const auto& rootOfTree = root.get();
+    return iterator(rootOfTree, rootOfTree);
+  }
+
+  /**
+   * @brief Returns an interator to the end of the tree.
+   * @return An interator to end of the tree (= nullptr node).
+   */
+  iterator end() const
+  {
+    const auto& rootOfTree = root.get();
+    return iterator(nullptr, rootOfTree);
+  }
+
+  /**
    * @brief Returns a const interator to the top level node.
    * @return A const interator to the root node.
    */
-  const_iterator begin() const
+  const_iterator cbegin() const
   {
-    const auto& rootOfTree = root.get();
-    return const_iterator(rootOfTree, rootOfTree);
+    return begin();
   }
 
   /**
    * @brief Returns a const interator to the end of the tree.
    * @return A const interator to end of the tree (= nullptr node).
    */
-  const_iterator end() const
+  const_iterator cend() const
   {
-    const auto& rootOfTree = root.get();
-    return const_iterator(nullptr, rootOfTree);
+    return end();
+  }
+
+  /**
+   * @brief Returns the number of nodes (including the root node) in the tree.
+   * @return Number of nodes (including the root node) in the tree.
+   */
+  long size() const
+  {
+    return std::distance(begin(), end());
   }
 
   /**
