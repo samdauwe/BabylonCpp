@@ -155,6 +155,7 @@ void DirectionalLight::_buildUniformLayout()
   _uniformBuffer->addUniform("vLightDiffuse", 4);
   _uniformBuffer->addUniform("vLightSpecular", 3);
   _uniformBuffer->addUniform("shadowsInfo", 3);
+  _uniformBuffer->addUniform("depthValues", 2);
   _uniformBuffer->create();
 }
 
@@ -162,15 +163,45 @@ void DirectionalLight::transferToEffect(Effect* /*effect*/,
                                         const std::string& lightIndex)
 {
   if (computeTransformedInformation()) {
-    _uniformBuffer->updateFloat4("vLightData", transformedDirection->x,
-                                 transformedDirection->y,
-                                 transformedDirection->z, 1, lightIndex);
+    _uniformBuffer->updateFloat4("vLightData", transformedDirection().x,
+                                 transformedDirection().y,
+                                 transformedDirection().z, 1, lightIndex);
     return;
   }
 
   const auto& _direction = direction();
   _uniformBuffer->updateFloat4("vLightData", _direction.x, _direction.y,
                                _direction.z, 1, lightIndex);
+}
+
+/**
+ * @brief Gets the minZ used for shadow according to both the scene and the
+ * light.
+ *
+ * Values are fixed on directional lights as it relies on an ortho projection
+ * hence the need to convert being
+ * -1 and 1 to 0 and 1 doing (depth + min) / (min + max) -> (depth + 1) / (1 +
+ * 1) -> (depth * 0.5) + 0.5.
+ * @param activeCamera
+ */
+float DirectionalLight::getDepthMinZ(Camera* /*activeCamera*/) const
+{
+  return 1.f;
+}
+
+/**
+ * @brief Gets the maxZ used for shadow according to both the scene and the
+ * light.
+ *
+ * Values are fixed on directional lights as it relies on an ortho projection
+ * hence the need to convert being
+ * -1 and 1 to 0 and 1 doing (depth + min) / (min + max) -> (depth + 1) / (1 +
+ * 1) -> (depth * 0.5) + 0.5.
+ * @param activeCamera
+ */
+float DirectionalLight::getDepthMaxZ(Camera* /*activeCamera*/) const
+{
+  return 1.f;
 }
 
 } // end of namespace BABYLON

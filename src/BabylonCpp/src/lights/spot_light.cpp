@@ -67,9 +67,8 @@ void SpotLight::_setDefaultShadowProjectionMatrix(
   _shadowAngleScale = _shadowAngleScale ? *_shadowAngleScale : 1;
   auto angle        = _shadowAngleScale * _angle;
 
-  Matrix::PerspectiveFovLHToRef(
-    angle, 1.f, shadowMinZ() ? *shadowMinZ() : activeCamera->minZ,
-    shadowMaxZ() ? *shadowMaxZ() : activeCamera->maxZ, matrix);
+  Matrix::PerspectiveFovLHToRef(angle, 1.f, getDepthMinZ(activeCamera),
+                                getDepthMaxZ(activeCamera), matrix);
 }
 
 void SpotLight::_buildUniformLayout()
@@ -79,6 +78,7 @@ void SpotLight::_buildUniformLayout()
   _uniformBuffer->addUniform("vLightSpecular", 3);
   _uniformBuffer->addUniform("vLightDirection", 3);
   _uniformBuffer->addUniform("shadowsInfo", 3);
+  _uniformBuffer->addUniform("depthValues", 2);
   _uniformBuffer->create();
 }
 
@@ -88,14 +88,14 @@ void SpotLight::transferToEffect(Effect* /*effect*/,
   auto normalizeDirection = Vector3::Zero();
 
   if (computeTransformedInformation()) {
-    _uniformBuffer->updateFloat4("vLightData",             // Name
-                                 (*transformedPosition).x, // X
-                                 (*transformedPosition).y, // Y
-                                 (*transformedPosition).z, // Z
-                                 exponent,                 // Value
-                                 lightIndex);              // Index
+    _uniformBuffer->updateFloat4("vLightData",            // Name
+                                 transformedPosition().x, // X
+                                 transformedPosition().y, // Y
+                                 transformedPosition().z, // Z
+                                 exponent,                // Value
+                                 lightIndex);             // Index
 
-    normalizeDirection = Vector3::Normalize(*transformedDirection);
+    normalizeDirection = Vector3::Normalize(transformedDirection());
   }
   else {
     _uniformBuffer->updateFloat4("vLightData", // Name

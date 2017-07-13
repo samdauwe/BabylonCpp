@@ -56,12 +56,17 @@ public:
   Camera* getCamera();
   Vector2 texelSize();
   Engine* getEngine();
+  Effect* getEffect();
   PostProcess& shareOutputWith(PostProcess* postProcess);
   void updateEffect(
     const std::string& defines               = "",
     const std::vector<std::string>& uniforms = {},
     const std::vector<std::string>& samplers = {},
-    const std::unordered_map<std::string, unsigned int>& indexParameters = {});
+    const std::unordered_map<std::string, unsigned int>& indexParameters = {},
+    const std::function<void(Effect* effect)>& onCompiled = nullptr,
+    const std::function<void(Effect* effect, const std::string& errors)>&
+      onError
+    = nullptr);
   bool isReusable() const;
   /**
    * Invalidate frameBuffer to hint the postprocess to create a depth buffer

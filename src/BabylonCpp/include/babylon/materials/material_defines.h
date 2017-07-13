@@ -49,6 +49,7 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   std::vector<bool> spotlights;
   std::vector<bool> shadows;
   std::vector<bool> shadowesms;
+  std::vector<bool> shadowcloseesms;
   std::vector<bool> shadowpcfs;
   std::vector<bool> shadowcubes;
 

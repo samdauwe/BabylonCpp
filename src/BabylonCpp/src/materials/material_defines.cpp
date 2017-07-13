@@ -55,6 +55,7 @@ void MaterialDefines::resizeLights(unsigned int lightIndex)
       spotlights.emplace_back(false);
       shadows.emplace_back(false);
       shadowesms.emplace_back(false);
+      shadowcloseesms.emplace_back(false);
       shadowpcfs.emplace_back(false);
       shadowcubes.emplace_back(false);
       lightmapexcluded.emplace_back(false);
@@ -127,6 +128,12 @@ std::ostream& operator<<(std::ostream& os,
   for (size_t i = 0; i < materialDefines.shadowesms.size(); ++i) {
     if (materialDefines.shadowesms[i]) {
       os << "#define SHADOWESM" << i << "\n";
+    }
+  }
+
+  for (size_t i = 0; i < materialDefines.shadowcloseesms.size(); ++i) {
+    if (materialDefines.shadowcloseesms[i]) {
+      os << "#define SHADOWCLOSEESM" << i << "\n";
     }
   }
 
@@ -240,6 +247,7 @@ bool MaterialDefines::isEqual(const MaterialDefines& other) const
       || (spotlights.size() != other.spotlights.size())
       || (shadows.size() != other.shadows.size())
       || (shadowesms.size() != other.shadowesms.size())
+      || (shadowcloseesms.size() != other.shadowcloseesms.size())
       || (shadowpcfs.size() != other.shadowpcfs.size())
       || (shadowcubes.size() != other.shadowcubes.size())) {
     return false;
@@ -316,6 +324,12 @@ bool MaterialDefines::isEqual(const MaterialDefines& other) const
     }
   }
 
+  for (size_t i = 0; i < shadowcloseesms.size(); ++i) {
+    if (shadowcloseesms[i] != other.shadowcloseesms[i]) {
+      return false;
+    }
+  }
+
   for (size_t i = 0; i < shadowpcfs.size(); ++i) {
     if (shadowpcfs[i] != other.shadowpcfs[i]) {
       return false;
@@ -355,15 +369,16 @@ void MaterialDefines::cloneTo(MaterialDefines& other)
   other._needNormals          = _needNormals;
   other._needUVs              = _needUVs;
 
-  other.lights      = lights;
-  other.pointlights = pointlights;
-  other.dirlights   = dirlights;
-  other.hemilights  = hemilights;
-  other.spotlights  = spotlights;
-  other.shadows     = shadows;
-  other.shadowesms  = shadowesms;
-  other.shadowpcfs  = shadowpcfs;
-  other.shadowcubes = shadowcubes;
+  other.lights          = lights;
+  other.pointlights     = pointlights;
+  other.dirlights       = dirlights;
+  other.hemilights      = hemilights;
+  other.spotlights      = spotlights;
+  other.shadows         = shadows;
+  other.shadowesms      = shadowesms;
+  other.shadowcloseesms = shadowcloseesms;
+  other.shadowpcfs      = shadowpcfs;
+  other.shadowcubes     = shadowcubes;
 }
 
 void MaterialDefines::reset()
@@ -398,6 +413,7 @@ void MaterialDefines::reset()
   spotlights.clear();
   shadows.clear();
   shadowesms.clear();
+  shadowcloseesms.clear();
   shadowpcfs.clear();
   shadowcubes.clear();
 }

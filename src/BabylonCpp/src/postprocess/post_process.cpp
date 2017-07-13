@@ -168,6 +168,11 @@ Engine* PostProcess::getEngine()
   return _engine;
 }
 
+Effect* PostProcess::getEffect()
+{
+  return _effect;
+}
+
 PostProcess& PostProcess::shareOutputWith(PostProcess* postProcess)
 {
   _disposeTextures();
@@ -179,7 +184,9 @@ PostProcess& PostProcess::shareOutputWith(PostProcess* postProcess)
 void PostProcess::updateEffect(
   const std::string& defines, const std::vector<std::string>& uniforms,
   const std::vector<std::string>& samplers,
-  const std::unordered_map<std::string, unsigned int>& indexParameters)
+  const std::unordered_map<std::string, unsigned int>& indexParameters,
+  const std::function<void(Effect* effect)>& onCompiled,
+  const std::function<void(Effect* effect, const std::string& errors)>& onError)
 {
   std::unordered_map<std::string, std::string> baseName{
     {"vertex", _vertexUrl}, {"fragment", _fragmentUrl}};
@@ -189,6 +196,8 @@ void PostProcess::updateEffect(
   options.uniformsNames = !uniforms.empty() ? uniforms : _parameters;
   options.samplers      = !samplers.empty() ? samplers : _samplers;
   options.defines       = defines;
+  options.onCompiled    = onCompiled;
+  options.onError       = onError;
   options.indexParameters
     = !indexParameters.empty() ? indexParameters : _indexParameters;
 
@@ -288,6 +297,8 @@ void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture,
     }
     else if (_forcedOutputTexture) {
       target = _forcedOutputTexture;
+      width  = _forcedOutputTexture->_width;
+      height = _forcedOutputTexture->_height;
     }
     else {
       target = outputTexture();

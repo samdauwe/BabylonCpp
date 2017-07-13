@@ -13,6 +13,10 @@ public:
   IShadowLight(const std::string& name, Scene* scene);
   virtual ~IShadowLight();
 
+  virtual Vector3& direction()            = 0;
+  virtual Vector3& transformedPosition()  = 0;
+  virtual Vector3& transformedDirection() = 0;
+
   virtual bool computeTransformedInformation() = 0;
   virtual Scene* getScene()                    = 0;
 
@@ -27,6 +31,20 @@ public:
   virtual void forceProjectionMatrixCompute() = 0;
 
   virtual Vector3 getShadowDirection(unsigned int faceIndex = 0) = 0;
+
+  /**
+   * @brief Gets the minZ used for shadow according to both the scene and the
+   * light.
+   * @param activeCamera
+   */
+  virtual float getDepthMinZ(Camera* activeCamera) const = 0;
+
+  /**
+   * @brief Gets the minZ used for shadow according to both the scene and the
+   * light.
+   * @param activeCamera
+   */
+  virtual float getDepthMaxZ(Camera* activeCamera) const = 0;
 
 public:
   Vector3 position;

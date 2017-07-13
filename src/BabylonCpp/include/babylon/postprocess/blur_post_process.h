@@ -33,6 +33,16 @@ public:
    */
   float kernel() const;
 
+  /**
+   * @brief Sets whether or not the blur needs to unpack/repack floats.
+   */
+  void setPackedFloat(bool v);
+
+  /**
+   * @brief Gets whether or not the blur is unpacking/repacking floats.
+   */
+  bool packedFloat() const;
+
 protected:
   void _updateParameters();
 
@@ -73,6 +83,7 @@ protected:
 protected:
   float _kernel;
   float _idealKernel;
+  bool _packedFloat;
 
 }; // end of class BlurPostProcess
 

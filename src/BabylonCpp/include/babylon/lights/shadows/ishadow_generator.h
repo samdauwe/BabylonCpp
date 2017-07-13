@@ -10,12 +10,14 @@ namespace BABYLON {
  * BJS.
  */
 struct BABYLON_SHARED_EXPORT IShadowGenerator {
-  virtual RenderTargetTexture* getShadowMap() = 0;
+  virtual RenderTargetTexture* getShadowMap()             = 0;
+  virtual RenderTargetTexture* getShadowMapForRendering() = 0;
   virtual bool isReady(SubMesh* subMesh, bool useInstances = false) = 0;
   virtual void prepareDefines(MaterialDefines& defines, unsigned int lightIndex)
     = 0;
   virtual void bindShadowLight(const std::string& lightIndex, Effect* effect)
     = 0;
+  virtual Matrix getTransformMatrix()    = 0;
   virtual void recreateShadowMap()       = 0;
   virtual Json::object serialize() const = 0;
   virtual void dispose()                 = 0;

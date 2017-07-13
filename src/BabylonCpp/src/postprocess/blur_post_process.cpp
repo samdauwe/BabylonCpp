@@ -26,6 +26,7 @@ BlurPostProcess::BlurPostProcess(const std::string& iName,
                   "kernelBlur",
                   {{"varyingCount", 0}, {"depCount", 0}},
                   true}
+    , _packedFloat{false}
 {
   setKernel(kernel);
 
@@ -54,6 +55,20 @@ void BlurPostProcess::setKernel(float v)
 float BlurPostProcess::kernel() const
 {
   return _idealKernel;
+}
+
+void BlurPostProcess::setPackedFloat(bool v)
+{
+  if (_packedFloat == v) {
+    return;
+  }
+  _packedFloat = v;
+  _updateParameters();
+}
+
+bool BlurPostProcess::packedFloat() const
+{
+  return _packedFloat;
 }
 
 void BlurPostProcess::_updateParameters()
@@ -149,6 +164,10 @@ void BlurPostProcess::_updateParameters()
     defines << "#define KERNEL_DEP_WEIGHT" << depCount << " "
             << _glslFloat(weights[i]) << "\r\n";
     ++depCount;
+  }
+
+  if (packedFloat()) {
+    defines << "#define PACKEDFLOAT 1";
   }
 
   updateEffect(defines.str(), {}, {},

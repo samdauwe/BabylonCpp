@@ -41,7 +41,7 @@ public:
    */
   void setShadowAngle(float value);
 
-  const Vector3& direction() const;
+  Vector3& direction() override;
 
   /**
    * @brief In case of direction provided, the shadow will not use a cube

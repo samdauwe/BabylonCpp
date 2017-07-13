@@ -14,8 +14,10 @@ public:
   ShadowLight(const std::string& name, Scene* scene);
   ~ShadowLight();
 
-  Vector3& direction();
+  Vector3& direction() override;
   void setDirection(const Vector3& value);
+  Vector3& transformedPosition() override;
+  Vector3& transformedDirection() override;
   const Nullable<float>& shadowMinZ() const;
   void setShadowMinZ(float value);
   const Nullable<float>& shadowMaxZ() const;
@@ -79,6 +81,20 @@ public:
   Matrix* _getWorldMatrix() override;
 
   /**
+   * @brief Gets the minZ used for shadow according to both the scene and the
+   * light.
+   * @param activeCamera
+   */
+  float getDepthMinZ(Camera* activeCamera) const override;
+
+  /**
+   * @brief Gets the maxZ used for shadow according to both the scene and the
+   * light.
+   * @param activeCamera
+   */
+  float getDepthMaxZ(Camera* activeCamera) const override;
+
+  /**
    * @brief Sets the projection matrix according to the type of light and custom
    * projection matrix definition.
    * Returns the light.
@@ -98,11 +114,11 @@ public:
                      const std::vector<AbstractMesh*>& renderList,
                      Matrix& result)>
     customProjectionMatrixBuilder;
-  std::unique_ptr<Vector3> transformedPosition;
-  std::unique_ptr<Vector3> transformedDirection;
 
 protected:
   std::unique_ptr<Vector3> _direction;
+  std::unique_ptr<Vector3> _transformedPosition;
+  std::unique_ptr<Vector3> _transformedDirection;
 
 private:
   Nullable<float> _shadowMinZ;

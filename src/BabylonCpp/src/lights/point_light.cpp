@@ -35,7 +35,7 @@ void PointLight::setShadowAngle(float value)
   forceProjectionMatrixCompute();
 }
 
-const Vector3& PointLight::direction() const
+Vector3& PointLight::direction()
 {
   return *_direction;
 }
@@ -96,9 +96,8 @@ void PointLight::_setDefaultShadowProjectionMatrix(
   const std::vector<AbstractMesh*>& /*renderList*/)
 {
   auto activeCamera = getScene()->activeCamera;
-  Matrix::PerspectiveFovLHToRef(
-    shadowAngle(), 1.f, shadowMinZ() ? *shadowMinZ() : activeCamera->minZ,
-    shadowMaxZ() ? *shadowMaxZ() : activeCamera->maxZ, matrix);
+  Matrix::PerspectiveFovLHToRef(shadowAngle(), 1.f, getDepthMinZ(activeCamera),
+                                getDepthMaxZ(activeCamera), matrix);
 }
 
 void PointLight::_buildUniformLayout()
@@ -107,6 +106,7 @@ void PointLight::_buildUniformLayout()
   _uniformBuffer->addUniform("vLightDiffuse", 4);
   _uniformBuffer->addUniform("vLightSpecular", 3);
   _uniformBuffer->addUniform("shadowsInfo", 3);
+  _uniformBuffer->addUniform("depthValues", 2);
   _uniformBuffer->create();
 }
 
@@ -114,11 +114,11 @@ void PointLight::transferToEffect(Effect* /*effect*/,
                                   const std::string& lightIndex)
 {
   if (computeTransformedInformation()) {
-    _uniformBuffer->updateFloat4("vLightData",             //
-                                 (*transformedPosition).x, //
-                                 (*transformedPosition).y, //
-                                 (*transformedPosition).z, //
-                                 0.f,                      //
+    _uniformBuffer->updateFloat4("vLightData",            //
+                                 transformedPosition().x, //
+                                 transformedPosition().y, //
+                                 transformedPosition().z, //
+                                 0.f,                     //
                                  lightIndex);
     return;
   }
