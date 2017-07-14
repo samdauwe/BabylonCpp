@@ -215,25 +215,26 @@ private:
 template <typename T>
 class Tree {
 
+private:
+  std::unique_ptr<TreeNode<T>> _root;
+
 public:
   class iterator;
   using const_iterator = iterator;
   using value_type     = T;
-  std::unique_ptr<TreeNode<T>> root;
 
   /**
    * @brief Default constructor.
    */
-  Tree()
+  Tree() : _root{std::make_unique<TreeNode<T>>()}
   {
   }
 
   /**
    * @brief constructor.
    */
-  Tree(T data)
+  Tree(T data) : _root{std::make_unique<TreeNode<T>>(std::move(data))}
   {
-    root = std::make_unique<TreeNode<T>>(std::move(data));
   }
 
   /**
@@ -241,8 +242,44 @@ public:
    */
   ~Tree()
   {
-    releaseSubtree(root);
-    root.reset(nullptr);
+    releaseSubtree(_root);
+    _root.reset(nullptr);
+  }
+
+  /**
+   * @brief Returns a reference to the root node.
+   * @return A reference to the root node.
+   */
+  TreeNode<T>& root()
+  {
+    return *_root;
+  }
+
+  /**
+   * @brief Returns a const reference to the root node.
+   * @return A const reference to the root node.
+   */
+  const TreeNode<T>& root() const
+  {
+    return *_root;
+  }
+
+  /**
+   * @brief Returns the root pointer.
+   * @return The root pointer.
+   */
+  std::unique_ptr<TreeNode<T>>& rootPtr()
+  {
+    return _root;
+  }
+
+  /**
+   * @brief Returns the root const pointer.
+   * @return The root const pointer.
+   */
+  const std::unique_ptr<TreeNode<T>>& rootPtr() const
+  {
+    return _root;
   }
 
   /**
@@ -251,7 +288,7 @@ public:
    */
   iterator begin() const
   {
-    const auto& rootOfTree = root.get();
+    const auto& rootOfTree = _root.get();
     return iterator(rootOfTree, rootOfTree);
   }
 
@@ -261,7 +298,7 @@ public:
    */
   iterator end() const
   {
-    const auto& rootOfTree = root.get();
+    const auto& rootOfTree = _root.get();
     return iterator(nullptr, rootOfTree);
   }
 
@@ -477,7 +514,7 @@ operator<<(std::basic_iostream<char>::basic_ostream& out, const Tree<T>& tree)
         }
       };
 
-  print(tree.root);
+  print(tree.rootPtr());
 
   return out;
 }
