@@ -23,8 +23,9 @@ MirrorTexture::MirrorTexture(const std::string& iName, const ISize& size,
     , _savedViewMatrix{Matrix::Zero()}
     , _blurX{nullptr}
     , _blurY{nullptr}
-    , _blurKernel{0.f}
-    , _blurRatio{0.6f}
+    , _blurKernelX{0.f}
+    , _blurKernelY{0.f}
+    , _blurRatio{1.f}
 
 {
   onBeforeRender = [this]() {
@@ -69,24 +70,45 @@ float MirrorTexture::blurRatio() const
 
 void MirrorTexture::setBlurKernel(float value)
 {
-  if (stl_util::almost_equal(_blurKernel, value)) {
+  setBlurKernelX(value);
+  setBlurKernelY(value);
+}
+
+void MirrorTexture::setBlurKernelX(float value)
+{
+  if (stl_util::almost_equal(_blurKernelX, value)) {
     return;
   }
 
-  _blurKernel = value;
+  _blurKernelX = value;
   _preparePostProcesses();
 }
 
-float MirrorTexture::blurKernel() const
+float MirrorTexture::blurKernelX() const
 {
-  return _blurKernel;
+  return _blurKernelX;
+}
+
+void MirrorTexture::setBlurKernelY(float value)
+{
+  if (stl_util::almost_equal(_blurKernelY, value)) {
+    return;
+  }
+
+  _blurKernelY = value;
+  _preparePostProcesses();
+}
+
+float MirrorTexture::blurKernelY() const
+{
+  return _blurKernelY;
 }
 
 void MirrorTexture::_preparePostProcesses()
 {
   clearPostProcesses(true);
 
-  if (_blurKernel != 0.f) {
+  if (_blurKernelX != 0.f && _blurKernelY != 0.f) {
     auto engine = getScene()->getEngine();
 
     auto textureType = engine->getCaps().textureFloatRender ?
@@ -94,16 +116,22 @@ void MirrorTexture::_preparePostProcesses()
                          EngineConstants::TEXTURETYPE_HALF_FLOAT;
 
     _blurX = std::make_unique<BlurPostProcess>(
-      "horizontal blur", Vector2(1.f, 0.f), _blurKernel, _blurRatio, nullptr,
+      "horizontal blur", Vector2(1.f, 0.f), _blurKernelX, _blurRatio, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, engine, false, textureType);
-    _blurX->autoClear      = false;
-    _blurX->alwaysForcePOT = false;
+    _blurX->autoClear = false;
+
+    if (_blurRatio == 1.f && samples() < 2) {
+      _blurX->setOutputTexture(_texture);
+    }
+    else {
+      _blurX->alwaysForcePOT = true;
+    }
 
     _blurY = std::make_unique<BlurPostProcess>(
-      "vertical blur", Vector2(0.f, 1.f), _blurKernel, _blurRatio, nullptr,
+      "vertical blur", Vector2(0.f, 1.f), _blurKernelY, _blurRatio, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, engine, false, textureType);
     _blurY->autoClear      = false;
-    _blurY->alwaysForcePOT = true;
+    _blurY->alwaysForcePOT = _blurRatio != 1.f;
 
     addPostProcess(_blurX.get());
     addPostProcess(_blurY.get());
@@ -114,10 +142,14 @@ std::unique_ptr<MirrorTexture> MirrorTexture::clone() const
 {
   auto textureSize = getSize();
   auto newTexture  = std::make_unique<MirrorTexture>(
-    name, Size(textureSize.width, textureSize.height), getScene(),
-    _renderTargetOptions.generateMipMaps, _renderTargetOptions.type,
-    _renderTargetOptions.samplingMode,
-    _renderTargetOptions.generateDepthBuffer);
+    name,                                        //
+    Size(textureSize.width, textureSize.height), //
+    getScene(),                                  //
+    _renderTargetOptions.generateMipMaps,        //
+    _renderTargetOptions.type,                   //
+    _renderTargetOptions.samplingMode,           //
+    _renderTargetOptions.generateDepthBuffer     //
+    );
 
   // Base texture
   newTexture->setHasAlpha(hasAlpha());

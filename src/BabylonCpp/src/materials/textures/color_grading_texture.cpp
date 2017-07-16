@@ -99,7 +99,6 @@ GL::IGLTexture* ColorGradingTexture::load3dlTexture()
         tempData[pixelStorageIndex + 0] = static_cast<float>(r);
         tempData[pixelStorageIndex + 1] = static_cast<float>(g);
         tempData[pixelStorageIndex + 2] = static_cast<float>(b);
-        tempData[pixelStorageIndex + 3] = 0.f;
 
         ++pixelIndexSlice;
         if (pixelIndexSlice % size == 0) {
@@ -114,8 +113,14 @@ GL::IGLTexture* ColorGradingTexture::load3dlTexture()
     }
 
     for (size_t i = 0; i < tempData.size(); ++i) {
-      data[i] = static_cast<std::uint8_t>(tempData[i]
-                                          / static_cast<float>(maxColor * 255));
+      if (i > 0 && (i + 1) % 4 == 0) {
+        data[i] = 255;
+      }
+      else {
+        float value = tempData[i];
+        value /= static_cast<float>(maxColor * 255);
+        data[i] = static_cast<std::uint8_t>(value);
+      }
     }
 
     getScene()->getEngine()->updateTextureSize(
@@ -157,46 +162,6 @@ void ColorGradingTexture::delayLoad()
   if (!_texture) {
     loadTexture();
   }
-}
-
-void ColorGradingTexture::Bind(BaseTexture* colorGrading, Effect* effect)
-{
-  effect->setTexture("cameraColorGrading2DSampler", colorGrading);
-
-  float x = colorGrading->level;            // Texture Level
-  float y = colorGrading->getSize().height; // Texture Size example with 8
-  float z = y - 1.f;                        // SizeMinusOne 8 - 1
-  float w = 1.f / y;                        // Space of 1 slice 1 / 8
-
-  effect->setFloat4("vCameraColorGradingInfos", x, y, z, w);
-
-  float slicePixelSizeU = w / y; // Space of 1 pixel in U direction, e.g. 1/64
-  float slicePixelSizeV = w;     // Space of 1 pixel in V direction, e.g. 1/8
-
-  // Extent of lookup range in U for a single slice so that range corresponds to
-  // (size-1) texels, for example 7/64
-  float x2 = z * slicePixelSizeU;
-  // Extent of lookup range in V for a single slice so that range corresponds to
-  // (size-1) texels, for example 7/8
-  float y2 = z / y;
-  // Offset of lookup range in U to align sample position with texel centre, for
-  // example 0.5/64
-  float z2 = 0.5f * slicePixelSizeU;
-  // Offset of lookup range in V to align sample position with texel centre, for
-  // example 0.5/8
-  float w2 = 0.5f * slicePixelSizeV;
-
-  effect->setFloat4("vCameraColorGradingScaleOffset", x2, y2, z2, w2);
-}
-
-void ColorGradingTexture::PrepareUniformsAndSamplers(
-  std::vector<std::string>& uniformsList,
-  std::vector<std::string>& samplersList)
-{
-  uniformsList.emplace_back("vCameraColorGradingInfos");
-  uniformsList.emplace_back("vCameraColorGradingScaleOffset");
-
-  samplersList.emplace_back("cameraColorGrading2DSampler");
 }
 
 std::unique_ptr<ColorGradingTexture>

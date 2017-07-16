@@ -6,7 +6,7 @@
 namespace BABYLON {
 
 Collider::Collider()
-    : radius{Vector3(1.f, 1.f, 1.f)}
+    : radius{Vector3::One()}
     , retry{0}
     , basePointWorld{Vector3::Zero()}
     , velocityWorld{Vector3::Zero()}

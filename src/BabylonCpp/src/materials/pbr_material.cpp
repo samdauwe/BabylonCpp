@@ -832,9 +832,9 @@ bool PBRMaterial::isReady(AbstractMesh* mesh, bool useInstances)
     if (_defines[PMD::CAMERACOLORCURVES]) {
       ColorCurves::PrepareUniforms(uniforms);
     }
-    if (_defines[PMD::CAMERACOLORGRADING]) {
-      ColorGradingTexture::PrepareUniformsAndSamplers(uniforms, samplers);
-    }
+    // if (_defines[PMD::CAMERACOLORGRADING]) {
+    //  ColorGradingTexture::PrepareUniformsAndSamplers(uniforms, samplers);
+    // }
 
     const auto _onCompiled = [this](Effect* effect) {
       if (onCompiled) {
@@ -1241,10 +1241,10 @@ void PBRMaterial::bind(Matrix* world, Mesh* mesh)
         }
       }
 
-      if (cameraColorGradingTexture
-          && StandardMaterial::ColorGradingTextureEnabled()) {
-        ColorGradingTexture::Bind(cameraColorGradingTexture, _effect);
-      }
+      // if (cameraColorGradingTexture
+      //     && StandardMaterial::ColorGradingTextureEnabled()) {
+      //   ColorGradingTexture::Bind(cameraColorGradingTexture, _effect);
+      // }
     }
 
     // Clip plane

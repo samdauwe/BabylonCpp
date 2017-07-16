@@ -15,7 +15,7 @@
 
 namespace BABYLON {
 
-const Vector3 PhysicsImpostor::DEFAULT_OBJECT_SIZE = Vector3(1.f, 1.f, 1.f);
+const Vector3 PhysicsImpostor::DEFAULT_OBJECT_SIZE = Vector3::One();
 
 PhysicsImpostor::PhysicsImpostor(IPhysicsEnabledObject* _object,
                                  unsigned int _type,

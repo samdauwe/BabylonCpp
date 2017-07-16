@@ -24,7 +24,10 @@ public:
   void setBlurRatio(float value);
   float blurRatio() const;
   void setBlurKernel(float value);
-  float blurKernel() const;
+  void setBlurKernelX(float value);
+  float blurKernelX() const;
+  void setBlurKernelY(float value);
+  float blurKernelY() const;
 
   std::unique_ptr<MirrorTexture> clone() const;
   Json::object serialize() const;
@@ -42,7 +45,8 @@ private:
 
   std::unique_ptr<BlurPostProcess> _blurX;
   std::unique_ptr<BlurPostProcess> _blurY;
-  float _blurKernel;
+  float _blurKernelX;
+  float _blurKernelY;
   float _blurRatio;
 
 }; // end of class MirrorTexture

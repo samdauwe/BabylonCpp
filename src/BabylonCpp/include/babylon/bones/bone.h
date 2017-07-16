@@ -27,7 +27,9 @@ public:
   Matrix& _matrix();
   const Matrix& _matrix() const;
   void setMatrix(const Matrix& val);
+  Skeleton* getSkeleton() const;
   Bone* getParent();
+  void setParent(Bone* parent, bool updateDifferenceMatrix = true);
   Matrix& getLocalMatrix();
   const Matrix& getLocalMatrix() const;
   Matrix& getBaseMatrix();
@@ -351,6 +353,7 @@ public:
                                          Vector3& result) const;
 
 protected:
+  Bone(const std::string& name, Skeleton* skeleton);
   Bone(const std::string& name, Skeleton* skeleton, Bone* parentBone,
        const Matrix& matrix);
   Bone(const std::string& name, Skeleton* skeleton, Bone* parentBone,

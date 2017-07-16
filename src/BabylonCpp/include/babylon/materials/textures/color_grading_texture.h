@@ -47,22 +47,6 @@ public:
   void delayLoad() override;
 
   /**
-   * Binds the color grading to the shader.
-   * @param colorGrading The texture to bind
-   * @param effect The effect to bind to
-   */
-  static void Bind(BaseTexture* colorGrading, Effect* effect);
-
-  /**
-   * Prepare the list of uniforms associated with the ColorGrading effects.
-   * @param uniformsList The list of uniforms used in the effect
-   * @param samplersList The list of samplers used in the effect
-   */
-  static void
-  PrepareUniformsAndSamplers(std::vector<std::string>& uniformsList,
-                             std::vector<std::string>& samplersList);
-
-  /**
    * Parses a color grading texture serialized by Babylon.
    * @param parsedTexture The texture information being parsedTexture
    * @param scene The scene to load the texture in

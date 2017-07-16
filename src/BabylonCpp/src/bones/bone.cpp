@@ -13,15 +13,20 @@ std::array<Matrix, 5> Bone::_tmpMats{{Matrix::Identity(), Matrix::Identity(),
                                       Matrix::Identity(), Matrix::Identity(),
                                       Matrix::Identity()}};
 
-Bone::Bone(const std::string& _name, Skeleton* skeleton, Bone* parentBone,
-           const Matrix& matrix)
-    : Bone(_name, skeleton, parentBone, matrix, matrix)
+Bone::Bone(const std::string& iName, Skeleton* skeleton)
+    : Bone(iName, skeleton, nullptr, Matrix::Identity(), Matrix::Identity())
 {
 }
 
-Bone::Bone(const std::string& _name, Skeleton* skeleton, Bone* parentBone,
+Bone::Bone(const std::string& iName, Skeleton* skeleton, Bone* parentBone,
+           const Matrix& matrix)
+    : Bone(iName, skeleton, parentBone, matrix, matrix)
+{
+}
+
+Bone::Bone(const std::string& iName, Skeleton* skeleton, Bone* parentBone,
            const Matrix& matrix, const Matrix& restPose)
-    : Node{_name, skeleton->getScene()}
+    : Node{iName, skeleton->getScene()}
     , length{-1}
     , _skeleton{skeleton}
     , _localMatrix{matrix}
@@ -30,23 +35,13 @@ Bone::Bone(const std::string& _name, Skeleton* skeleton, Bone* parentBone,
     , _worldTransform{std::make_unique<Matrix>()}
     , _invertedAbsoluteTransform{std::make_unique<Matrix>()}
     , _scaleMatrix{Matrix::Identity()}
-    , _scaleVector{Vector3(1.f, 1.f, 1.f)}
-    , _negateScaleChildren{Vector3(1.f, 1.f, 1.f)}
+    , _scaleVector{Vector3::One()}
+    , _negateScaleChildren{Vector3::One()}
     , _scalingDeterminant{1.f}
 {
-  if (parentBone) {
-    _parent = parentBone;
-    parentBone->children.emplace_back(this);
-  }
-  else {
-    _parent = nullptr;
-  }
+  setParent(parentBone, false);
 
   _updateDifferenceMatrix();
-
-  if (getAbsoluteTransform().determinant() < 0.f) {
-    _scalingDeterminant *= -1.f;
-  }
 }
 
 Bone::~Bone()
@@ -79,9 +74,35 @@ void Bone::setMatrix(const Matrix& val)
   _localMatrix = val;
 }
 
+Skeleton* Bone::getSkeleton() const
+{
+  return _skeleton;
+}
+
 Bone* Bone::getParent()
 {
   return _parent;
+}
+
+void Bone::setParent(Bone* parent, bool updateDifferenceMatrix)
+{
+  if (_parent == parent) {
+    return;
+  }
+
+  if (_parent) {
+    stl_util::erase(parent->children, this);
+  }
+
+  _parent = parent;
+
+  if (_parent) {
+    _parent->children.emplace_back(this);
+  }
+
+  if (updateDifferenceMatrix) {
+    _updateDifferenceMatrix();
+  }
 }
 
 Matrix& Bone::getLocalMatrix()
@@ -193,6 +214,8 @@ void Bone::_updateDifferenceMatrix(Matrix& rootMatrix)
   for (auto& child : children) {
     child->_updateDifferenceMatrix();
   }
+
+  _scalingDeterminant = (_absoluteTransform.determinant() < 0.f ? -1.f : 1.f);
 }
 
 void Bone::markAsDirty(unsigned int /*property*/)

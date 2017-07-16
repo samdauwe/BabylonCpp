@@ -479,10 +479,16 @@ std::unique_ptr<RenderTargetTexture> RenderTargetTexture::clone() const
 {
   auto textureSize = getSize();
   auto newTexture  = std::make_unique<RenderTargetTexture>(
-    name, textureSize, getScene(), _renderTargetOptions.generateMipMaps,
-    _doNotChangeAspectRatio, _renderTargetOptions.type, isCube,
-    _renderTargetOptions.samplingMode, _renderTargetOptions.generateDepthBuffer,
-    _renderTargetOptions.generateStencilBuffer);
+    name,                                      //
+    textureSize, getScene(),                   //
+    _renderTargetOptions.generateMipMaps,      //
+    _doNotChangeAspectRatio,                   //
+    _renderTargetOptions.type,                 //
+    isCube,                                    //
+    _renderTargetOptions.samplingMode,         //
+    _renderTargetOptions.generateDepthBuffer,  //
+    _renderTargetOptions.generateStencilBuffer //
+    );
 
   // Base texture
   newTexture->setHasAlpha(hasAlpha());
@@ -500,6 +506,11 @@ Json::object RenderTargetTexture::serialize() const
   return Json::object();
 }
 
+void RenderTargetTexture::disposeFramebufferObjects()
+{
+  getScene()->getEngine()->_releaseFramebufferObjects(getInternalTexture());
+}
+
 void RenderTargetTexture::dispose(bool doNotRecurse)
 {
   if (_postProcessManager) {
@@ -508,6 +519,15 @@ void RenderTargetTexture::dispose(bool doNotRecurse)
   }
 
   clearPostProcesses(true);
+
+  // Remove from custom render targets
+  auto scene = getScene();
+
+  stl_util::erase(scene->customRenderTargets, this);
+
+  for (auto& camera : scene->cameras) {
+    stl_util::erase(camera->customRenderTargets, this);
+  }
 
   Texture::dispose(doNotRecurse);
 }

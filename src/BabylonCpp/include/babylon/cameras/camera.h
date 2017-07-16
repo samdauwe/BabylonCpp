@@ -148,6 +148,7 @@ public:
   CameraRigParams _cameraRigParams;
   std::vector<Camera*> _rigCameras;
   PostProcess* _rigPostProcess;
+  std::vector<RenderTargetTexture*> customRenderTargets;
 
   /** Cache **/
   Matrix _projectionMatrix;

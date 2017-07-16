@@ -52,10 +52,7 @@ public:
   Matrix* getReflectionTextureMatrix() override;
   void resize(const ISize& size);
   void render(bool useCameraPostProcess = false, bool dumpForDebug = false);
-  void renderToTarget(unsigned int faceIndex,
-                      const std::vector<AbstractMesh*>& currentRenderList,
-                      size_t currentRenderListLength, bool useCameraPostProcess,
-                      bool dumpForDebug);
+
   /**
    * @brief Overrides the default sort function applied in the renderging group
    * to prepare the meshes.
@@ -89,7 +86,20 @@ public:
                                          bool autoClearDepthStencil);
   std::unique_ptr<RenderTargetTexture> clone() const;
   Json::object serialize() const;
+
+  /**
+   * @brief This will remove the attached framebuffer objects. The texture will
+   * not be able to be used as render target anymore.
+   */
+  void disposeFramebufferObjects();
+
   void dispose(bool doNotRecurse = false) override;
+
+private:
+  void renderToTarget(unsigned int faceIndex,
+                      const std::vector<AbstractMesh*>& currentRenderList,
+                      size_t currentRenderListLength, bool useCameraPostProcess,
+                      bool dumpForDebug);
 
 public:
   /**
