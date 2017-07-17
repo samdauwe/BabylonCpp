@@ -101,6 +101,12 @@ Vector3 ArcRotateCamera::_getTargetPosition()
     }
   }
 
+  auto lockedTargetPosition = _getLockedTargetPosition();
+
+  if (lockedTargetPosition) {
+    return *lockedTargetPosition;
+  }
+
   return _target;
 }
 
@@ -110,7 +116,7 @@ bool ArcRotateCamera::_isSynchronizedViewMatrix()
     return false;
   }
 
-  return _cache._target.equals(_target)
+  return _cache._target.equals(_getTargetPosition())
          && stl_util::almost_equal(_cache.alpha, alpha)
          && stl_util::almost_equal(_cache.beta, beta)
          && stl_util::almost_equal(_cache.radius, radius)
