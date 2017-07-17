@@ -16,22 +16,27 @@ public:
 
   void setRenderList(const std::vector<Mesh*>& meshes);
   bool isSupported() const;
+  bool enablePosition() const;
+  void setEnablePosition(bool enable);
   bool isReady(SubMesh* subMesh, bool useInstances);
   MultiRenderTarget* getGBuffer();
   void dispose(bool doNotRecurse = false) override;
 
 private:
   void renderSubMesh(SubMesh* subMesh);
+  void _createRenderTargets();
 
 private:
   Scene* _scene;
   std::unique_ptr<MultiRenderTarget> _multiRenderTarget;
   Effect* _effect;
+  float _ratio;
   Matrix _viewMatrix;
   Matrix _projectionMatrix;
   Matrix _transformMatrix;
   Matrix _worldViewProjection;
   std::string _cachedDefines;
+  bool _enablePosition;
 
 }; // end of class GeometryBufferRenderer
 

@@ -15,6 +15,9 @@ public:
               bool useOverlay = false);
   bool isReady(SubMesh* subMesh, bool useInstances);
 
+public:
+  float zOffset;
+
 private:
   Scene* _scene;
   Effect* _effect;

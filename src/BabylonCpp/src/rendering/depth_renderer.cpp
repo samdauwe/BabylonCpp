@@ -62,7 +62,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type)
     }
 
     bool hardwareInstancedRendering
-      = (engine->getCaps().instancedArrays != false)
+      = engine->getCaps().instancedArrays
         && (batch->visibleInstances.find(subMesh->_id)
             != batch->visibleInstances.end());
 
@@ -73,7 +73,9 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type)
 
       _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
 
-      _effect->setFloat("far", _scene->activeCamera->maxZ);
+      _effect->setFloat2("depthValues", _scene->activeCamera->minZ,
+                         _scene->activeCamera->minZ
+                           + _scene->activeCamera->maxZ);
 
       // Alpha test
       if (material && material->needAlphaTesting()) {
@@ -176,7 +178,7 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
     EffectCreationOptions options;
     options.attributes = std::move(attribs);
     options.uniformsNames
-      = {"world", "mBones", "viewProjection", "diffuseMatrix", "far"};
+      = {"world", "mBones", "viewProjection", "diffuseMatrix", "depthValues"};
     options.samplers = {"diffuseSampler"};
     options.defines  = std::move(join);
 

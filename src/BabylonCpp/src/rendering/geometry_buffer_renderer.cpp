@@ -20,51 +20,16 @@ GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
     : _scene{scene}
     , _multiRenderTarget{nullptr}
     , _effect{nullptr}
+    , _ratio{ratio}
     , _viewMatrix{Matrix::Zero()}
     , _projectionMatrix{Matrix::Zero()}
     , _transformMatrix{Matrix::Zero()}
     , _worldViewProjection{Matrix::Zero()}
     , _cachedDefines{""}
+    , _enablePosition{false}
 {
-  auto engine = scene->getEngine();
-
   // Render target
-  IMultiRenderTargetOptions options;
-  options.generateMipMaps      = false;
-  options.generateDepthTexture = true;
-  _multiRenderTarget           = std::make_unique<MultiRenderTarget>(
-    "gBuffer", Size{static_cast<int>(engine->getRenderWidth() * ratio),
-                    static_cast<int>(engine->getRenderHeight() * ratio)},
-    2, _scene, options);
-  if (!isSupported()) {
-    return;
-  }
-
-  _multiRenderTarget->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
-  _multiRenderTarget->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
-  _multiRenderTarget->setRefreshRate(1);
-  _multiRenderTarget->renderParticles = false;
-  _multiRenderTarget->renderList      = {};
-
-  // set default depth value to 1.0 (far away)
-  _multiRenderTarget->onClearObservable.add([](Engine* engine) {
-    engine->clear(Color4(0.f, 0.f, 0.f, 1.f), true, true, true);
-  });
-
-  // Custom render function
-  _multiRenderTarget->customRenderFunction
-    = [this](const std::vector<SubMesh*>& opaqueSubMeshes,
-             const std::vector<SubMesh*>& /*transparentSubMeshes*/,
-             const std::vector<SubMesh*>& alphaTestSubMeshes) {
-
-        for (auto& opaqueSubMesh : opaqueSubMeshes) {
-          renderSubMesh(opaqueSubMesh);
-        }
-
-        for (auto& alphaTestSubMesh : alphaTestSubMeshes) {
-          renderSubMesh(alphaTestSubMesh);
-        }
-      };
+  _createRenderTargets();
 }
 
 GeometryBufferRenderer::~GeometryBufferRenderer()
@@ -137,6 +102,18 @@ bool GeometryBufferRenderer::isSupported() const
   return _multiRenderTarget->isSupported();
 }
 
+bool GeometryBufferRenderer::enablePosition() const
+{
+  return _enablePosition;
+}
+
+void GeometryBufferRenderer::setEnablePosition(bool enable)
+{
+  _enablePosition = enable;
+  dispose();
+  _createRenderTargets();
+}
+
 bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
 {
   auto material = subMesh->getMaterial();
@@ -162,6 +139,11 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
       attribs.emplace_back(VertexBuffer::UV2KindChars);
       defines.emplace_back("#define UV2");
     }
+  }
+
+  // Buffers
+  if (_enablePosition) {
+    defines.emplace_back("#define POSITION");
   }
 
   // Bones
@@ -217,6 +199,50 @@ MultiRenderTarget* GeometryBufferRenderer::getGBuffer()
 void GeometryBufferRenderer::dispose(bool doNotRecurse)
 {
   getGBuffer()->dispose(doNotRecurse);
+}
+
+void GeometryBufferRenderer::_createRenderTargets()
+{
+  auto engine = _scene->getEngine();
+  auto count  = _enablePosition ? 3 : 2;
+
+  // Render target
+  IMultiRenderTargetOptions options;
+  options.generateMipMaps      = false;
+  options.generateDepthTexture = true;
+  _multiRenderTarget           = std::make_unique<MultiRenderTarget>(
+    "gBuffer", Size{static_cast<int>(engine->getRenderWidth() * _ratio),
+                    static_cast<int>(engine->getRenderHeight() * _ratio)},
+    count, _scene, options);
+  if (!isSupported()) {
+    return;
+  }
+
+  _multiRenderTarget->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
+  _multiRenderTarget->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
+  _multiRenderTarget->setRefreshRate(1);
+  _multiRenderTarget->renderParticles = false;
+  _multiRenderTarget->renderList      = {};
+
+  // set default depth value to 1.0 (far away)
+  _multiRenderTarget->onClearObservable.add([](Engine* engine) {
+    engine->clear(Color4(0.f, 0.f, 0.f, 1.f), true, true, true);
+  });
+
+  // Custom render function
+  _multiRenderTarget->customRenderFunction
+    = [this](const std::vector<SubMesh*>& opaqueSubMeshes,
+             const std::vector<SubMesh*>& /*transparentSubMeshes*/,
+             const std::vector<SubMesh*>& alphaTestSubMeshes) {
+
+        for (auto& opaqueSubMesh : opaqueSubMeshes) {
+          renderSubMesh(opaqueSubMesh);
+        }
+
+        for (auto& alphaTestSubMesh : alphaTestSubMeshes) {
+          renderSubMesh(alphaTestSubMesh);
+        }
+      };
 }
 
 } // end of namespace BABYLON

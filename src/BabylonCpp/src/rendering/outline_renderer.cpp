@@ -15,7 +15,7 @@
 
 namespace BABYLON {
 
-OutlineRenderer::OutlineRenderer(Scene* scene) : _scene{scene}
+OutlineRenderer::OutlineRenderer(Scene* scene) : zOffset{1.f}, _scene{scene}
 {
 }
 
@@ -29,7 +29,7 @@ void OutlineRenderer::render(SubMesh* subMesh, _InstancesBatch* batch,
   auto engine = _scene->getEngine();
 
   bool hardwareInstancedRendering
-    = (engine->getCaps().instancedArrays != false)
+    = engine->getCaps().instancedArrays
       && (batch->visibleInstances.find(subMesh->_id)
           != batch->visibleInstances.end())
       && (!batch->visibleInstances[subMesh->_id].empty());
@@ -63,11 +63,15 @@ void OutlineRenderer::render(SubMesh* subMesh, _InstancesBatch* batch,
     _effect->setMatrix("diffuseMatrix", *alphaTexture->getTextureMatrix());
   }
 
+  engine->setZOffset(-zOffset);
+
   mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode, batch,
                           hardwareInstancedRendering,
                           [this](bool, Matrix world, Material*) {
                             _effect->setMatrix("world", world);
                           });
+
+  engine->setZOffset(0.f);
 }
 
 bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
