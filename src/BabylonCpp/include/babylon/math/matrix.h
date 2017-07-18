@@ -49,7 +49,7 @@ public:
   /**
    * @brief Returns if the matrix is the identity matrix.
    */
-  bool isIdentity() const;
+  bool isIdentity(bool considerAsTextureMatrix = false);
 
   /**
    * @brief Returns the matrix determinant (float).
@@ -634,6 +634,8 @@ private:
   static Vector3 _yAxis;
   static Vector3 _zAxis;
   static int _updateFlagSeed;
+  bool _isIdentity;
+  bool _isIdentityDirty;
 
 }; // end of class Matrix
 

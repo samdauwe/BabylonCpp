@@ -21,6 +21,11 @@ public:
   void addLight(const Vector3& direction, const Color3& color,
                 float deltaSolidAngle);
   void scale(float scale);
+  void convertIncidentRadianceToIrradiance();
+  void convertIrradianceToLambertianRadiance();
+
+  static SphericalHarmonics
+  getsphericalHarmonicsFromPolynomial(const SphericalPolynomial& polynomial);
 
 public:
   Vector3 L00;

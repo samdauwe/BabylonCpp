@@ -19,7 +19,7 @@ Vector3 Matrix::_yAxis             = Vector3::Zero();
 Vector3 Matrix::_zAxis             = Vector3::Zero();
 int Matrix::_updateFlagSeed        = 0;
 
-Matrix::Matrix()
+Matrix::Matrix() : _isIdentity{false}, _isIdentityDirty{true}
 {
   std::fill(m.begin(), m.end(), 0.f);
   _markAsUpdated();
@@ -84,32 +84,32 @@ void Matrix::_markAsUpdated()
   updateFlag = (Matrix::_updateFlagSeed < std::numeric_limits<int>::max()) ?
                  Matrix::_updateFlagSeed++ :
                  0;
+  _isIdentityDirty = true;
 }
 
 /** Properties **/
-bool Matrix::isIdentity() const
+bool Matrix::isIdentity(bool considerAsTextureMatrix)
 {
-  if (!stl_util::almost_equal(m[0], 1.f) || !stl_util::almost_equal(m[5], 1.f)
-      || !stl_util::almost_equal(m[10], 1.f)
-      || !stl_util::almost_equal(m[15], 1.f)) {
-    return false;
+  if (_isIdentityDirty) {
+    _isIdentityDirty = false;
+    if (m[0] != 1.f || m[5] != 1.f || m[15] != 1.f) {
+      _isIdentity = false;
+    }
+    else if (m[1] != 0.f || m[2] != 0.f || m[3] != 0.f || m[4] != 0.f
+             || m[6] != 0.f || m[7] != 0.f || m[8] != 0.f || m[9] != 0.f
+             || m[11] != 0.f || m[12] != 0.f || m[13] != 0.f || m[14] != 0.f) {
+      _isIdentity = false;
+    }
+    else {
+      _isIdentity = true;
+    }
+
+    if (!considerAsTextureMatrix && m[10] != 1.f) {
+      _isIdentity = false;
+    }
   }
 
-  if (!stl_util::almost_equal(m[1], 0.f) || !stl_util::almost_equal(m[2], 0.f)
-      || !stl_util::almost_equal(m[3], 0.f)
-      || !stl_util::almost_equal(m[4], 0.f)
-      || !stl_util::almost_equal(m[6], 0.f)
-      || !stl_util::almost_equal(m[7], 0.f)
-      || !stl_util::almost_equal(m[8], 0.f)
-      || !stl_util::almost_equal(m[9], 0.f)
-      || !stl_util::almost_equal(m[11], 0.f)
-      || !stl_util::almost_equal(m[12], 0.f)
-      || !stl_util::almost_equal(m[13], 0.f)
-      || !stl_util::almost_equal(m[14], 0.f)) {
-    return false;
-  }
-
-  return true;
+  return _isIdentity;
 }
 
 float Matrix::determinant() const
@@ -485,14 +485,13 @@ bool Matrix::decompose(Vector3& scale, Quaternion& rotation,
   translation.y = m[13];
   translation.z = m[14];
 
-  const float xs = MathTools::Sign(m[0] * m[1] * m[2] * m[3]) < 0 ? -1.f : 1.f;
-  const float ys = MathTools::Sign(m[4] * m[5] * m[6] * m[7]) < 0 ? -1.f : 1.f;
-  const float zs
-    = MathTools::Sign(m[8] * m[9] * m[10] * m[11]) < 0 ? -1.f : 1.f;
+  scale.x = std::sqrt(m[0] * m[0] + m[1] * m[1] + m[2] * m[2]);
+  scale.y = std::sqrt(m[4] * m[4] + m[5] * m[5] + m[6] * m[6]);
+  scale.z = std::sqrt(m[8] * m[8] + m[9] * m[9] + m[10] * m[10]);
 
-  scale.x = xs * std::sqrt(m[0] * m[0] + m[1] * m[1] + m[2] * m[2]);
-  scale.y = ys * std::sqrt(m[4] * m[4] + m[5] * m[5] + m[6] * m[6]);
-  scale.z = zs * std::sqrt(m[8] * m[8] + m[9] * m[9] + m[10] * m[10]);
+  if (determinant() <= 0.f) {
+    scale.y *= -1.f;
+  }
 
   if (stl_util::almost_equal(scale.x, 0.f)
       || stl_util::almost_equal(scale.y, 0.f)

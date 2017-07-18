@@ -126,4 +126,17 @@ SphericalPolynomial SphericalPolynomial::getSphericalPolynomialFromHarmonics(
   return result;
 }
 
+void SphericalPolynomial::scale(float iScale)
+{
+  x  = x.scale(iScale);
+  y  = y.scale(iScale);
+  z  = z.scale(iScale);
+  xx = xx.scale(iScale);
+  yy = yy.scale(iScale);
+  zz = zz.scale(iScale);
+  yz = yz.scale(iScale);
+  zx = zx.scale(iScale);
+  xy = xy.scale(iScale);
+}
+
 } // end of namespace BABYLON

@@ -61,6 +61,15 @@ constexpr T Clamp(T value, T min, T max)
   return std::min(max, std::max(min, value));
 }
 
+/**
+ * @brief Returns the log2 of value.
+ */
+template <typename T>
+constexpr T Log2(T value)
+{
+  return std::log(value) * Math::LOG2E;
+}
+
 constexpr int IMul(int a, int b)
 {
   // the shift by 0 fixes the sign on the high part

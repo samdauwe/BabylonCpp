@@ -19,6 +19,7 @@ public:
   std::unique_ptr<SphericalPolynomial> clone() const;
 
   void addAmbient(const Color3& color);
+  void scale(float iScale);
 
   /** Statics **/
   static SphericalPolynomial
