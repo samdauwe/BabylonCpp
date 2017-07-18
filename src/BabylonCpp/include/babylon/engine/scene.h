@@ -569,9 +569,12 @@ public:
   bool isPhysicsEnabled();
 
   /** Misc. **/
-  void createDefaultCameraOrLight(bool createArcRotateCamera = false);
+  void createDefaultCameraOrLight(bool createArcRotateCamera = false,
+                                  bool replace               = false,
+                                  bool attachCameraControls  = false);
   Mesh* createDefaultSkybox(BaseTexture* environmentTexture = nullptr,
-                            bool pbr                        = false);
+                            bool pbr = false, float scale = 1000.f,
+                            float blur = 0.f);
 
   /** Tags **/
   std::vector<Mesh*> getMeshesByTags();
@@ -678,6 +681,7 @@ public:
   bool autoClearDepthAndStencil;
   Color4 clearColor;
   Color3 ambientColor;
+  BaseTexture* _environmentBRDFTexture;
   // Events
   /**
    * An event triggered when the scene is disposed.

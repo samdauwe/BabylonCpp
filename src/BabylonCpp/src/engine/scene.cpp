@@ -73,6 +73,7 @@ Scene::Scene(Engine* engine)
     , autoClearDepthAndStencil{true}
     , clearColor{Color4(0.2f, 0.2f, 0.3f, 1.f)}
     , ambientColor{Color3(0.f, 0.f, 0.f)}
+    , _environmentBRDFTexture{nullptr}
     , pointerDownPredicate{nullptr}
     , pointerUpPredicate{nullptr}
     , pointerMovePredicate{nullptr}
@@ -3063,8 +3064,23 @@ bool Scene::isPhysicsEnabled()
   return _physicsEngine != nullptr;
 }
 
-void Scene::createDefaultCameraOrLight(bool createArcRotateCamera)
+void Scene::createDefaultCameraOrLight(bool createArcRotateCamera, bool replace,
+                                       bool attachCameraControls)
 {
+  // Dispose existing camera or light in replace mode.
+  if (replace) {
+    if (activeCamera) {
+      activeCamera->dispose();
+      activeCamera = nullptr;
+    }
+
+    if (!lights.empty()) {
+      for (auto& light : lights) {
+        light->dispose();
+      }
+    }
+  }
+
   // Light
   if (lights.empty()) {
     HemisphericLight::New("default light", Vector3::Up(), this);
@@ -3097,10 +3113,15 @@ void Scene::createDefaultCameraOrLight(bool createArcRotateCamera)
     camera->maxZ  = radius * 100.f;
     camera->speed = radius * 0.2f;
     activeCamera  = camera;
+
+    if (attachCameraControls) {
+      camera->attachControl(getEngine()->getRenderingCanvas());
+    }
   }
 }
 
-Mesh* Scene::createDefaultSkybox(BaseTexture* iEnvironmentTexture, bool pbr)
+Mesh* Scene::createDefaultSkybox(BaseTexture* iEnvironmentTexture, bool pbr,
+                                 float scale, float blur)
 {
   if (environmentTexture()) {
     setEnvironmentTexture(iEnvironmentTexture);
@@ -3112,23 +3133,18 @@ Mesh* Scene::createDefaultSkybox(BaseTexture* iEnvironmentTexture, bool pbr)
     return nullptr;
   }
 
-  if (!environmentTexture()) {
-    BABYLON_LOG_WARN(
-      "Scene", "Can not create default skybox without environment texture.");
-    return nullptr;
-  }
-
   // Skybox
-  auto hdrSkybox = Mesh::CreateBox("hdrSkyBox", 1000.f, this);
+  auto hdrSkybox = Mesh::CreateBox("hdrSkyBox", scale, this);
   if (pbr) {
     auto hdrSkyboxMaterial = PBRMaterial::New("skyBox", this);
     hdrSkyboxMaterial->setBackFaceCulling(false);
     // hdrSkyboxMaterial->reflectionTexture = environmentTexture();
     hdrSkyboxMaterial->reflectionTexture->coordinatesMode
       = TextureConstants::SKYBOX_MODE;
-    hdrSkyboxMaterial->microSurface    = 1.f;
-    hdrSkyboxMaterial->disableLighting = true;
-    hdrSkybox->infiniteDistance        = true;
+    hdrSkyboxMaterial->microSurface     = 1.f - blur;
+    hdrSkyboxMaterial->disableLighting  = true;
+    hdrSkyboxMaterial->twoSidedLighting = true;
+    hdrSkybox->infiniteDistance         = true;
     hdrSkybox->setMaterial(hdrSkyboxMaterial);
   }
   else {
@@ -3137,8 +3153,6 @@ Mesh* Scene::createDefaultSkybox(BaseTexture* iEnvironmentTexture, bool pbr)
     // skyboxMaterial->reflectionTexture = environmentTexture();
     // skyboxMaterial->reflectionTexture->coordinatesMode
     //   = TextureConstants::SKYBOX_MODE;
-    skyboxMaterial->diffuseColor  = Color3(0.f, 0.f, 0.f);
-    skyboxMaterial->specularColor = Color3(0.f, 0.f, 0.f);
     skyboxMaterial->setDisableLighting(true);
     hdrSkybox->infiniteDistance = true;
     hdrSkybox->setMaterial(skyboxMaterial);
