@@ -3,7 +3,6 @@
 #include <babylon/animations/easing/ieasing_function.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json.h>
-#include <babylon/core/json.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/scene.h>
 #include <babylon/math/color3.h>
@@ -718,7 +717,13 @@ bool Animation::animate(millisecond_t delay, float from, float to, bool loop,
   setValue(currentValue);
   // Check events
   for (unsigned int index = 0; index < _events.size(); ++index) {
-    if (currentFrame >= _events[index].frame) {
+    // Make sure current frame has passed event frame and that event frame is
+    // within the current range
+    // Also, handle both forward and reverse animations
+    if ((range > 0 && currentFrame >= _events[index].frame
+         && _events[index].frame >= from)
+        || (range < 0 && currentFrame <= _events[index].frame
+            && _events[index].frame <= from)) {
       AnimationEvent& event = _events[index];
       if (!event.isDone) {
         // If event should be done only once, remove it.
