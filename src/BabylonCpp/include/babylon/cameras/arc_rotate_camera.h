@@ -63,7 +63,6 @@ protected:
   ArcRotateCamera(const std::string& name, float alpha, float beta,
                   float radius, const Vector3& target, Scene* scene);
 
-private:
   Vector3 _getTargetPosition();
   void _checkLimits();
   void _onCollisionPositionChange(int collisionId, Vector3& newPosition,
@@ -101,13 +100,12 @@ public:
   bool checkCollisions;
   std::unique_ptr<Vector3> collisionRadius;
 
-private:
+protected:
   Vector3 _target;
   AbstractMesh* _targetHost;
   // Panning
   std::unique_ptr<Vector3> _localDirection;
   Vector3 _transformedDirection;
-
   // Collisions
   std::unique_ptr<Collider> _collider;
   Vector3 _previousPosition;
