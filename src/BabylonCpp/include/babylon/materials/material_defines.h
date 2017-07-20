@@ -74,6 +74,8 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   bool _normals;
   bool _uvs;
 
+  Uint32Array directuvs;
+
   bool _needNormals;
   bool _needUVs;
 

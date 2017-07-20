@@ -24,6 +24,39 @@
 
 namespace BABYLON {
 
+void MaterialHelper::PrepareDefinesForMergedUV(BaseTexture* texture,
+                                               MaterialDefines& defines,
+                                               unsigned int key,
+                                               unsigned int MAINUV1,
+                                               unsigned int MAINUV2)
+{
+  defines._needUVs     = true;
+  defines.defines[key] = true;
+  if (texture->getTextureMatrix()->isIdentity(true)) {
+    defines.directuvs[key] = texture->coordinatesIndex + 1;
+    if (texture->coordinatesIndex == 0) {
+      defines.directuvs[MAINUV1] = true;
+    }
+    else {
+      defines.directuvs[MAINUV2] = true;
+    }
+  }
+  else {
+    defines.directuvs[key] = 0;
+  }
+}
+
+void MaterialHelper::BindTextureMatrix(BaseTexture& texture,
+                                       UniformBuffer& uniformBuffer,
+                                       const std::string& key)
+{
+  auto matrix = *texture.getTextureMatrix();
+
+  if (!matrix.isIdentity(true)) {
+    uniformBuffer.updateMatrix(key + "Matrix", matrix);
+  }
+}
+
 void MaterialHelper::PrepareDefinesForMisc(
   AbstractMesh* mesh, Scene* scene, bool useLogarithmicDepth, bool pointsCloud,
   bool fogEnabled, MaterialDefines& defines, unsigned int LOGARITHMICDEPTH,
@@ -256,16 +289,17 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
     }
 
     const std::string lightIndexStr = std::to_string(lightIndex);
-    stl_util::concat(uniformsList, {
-                                     "vLightData" + lightIndexStr,      //
-                                     "vLightDiffuse" + lightIndexStr,   //
-                                     "vLightSpecular" + lightIndexStr,  //
-                                     "vLightDirection" + lightIndexStr, //
-                                     "vLightGround" + lightIndexStr,    //
-                                     "lightMatrix" + lightIndexStr,     //
-                                     "shadowsInfo" + lightIndexStr,     //
-                                     "depthValues" + lightIndexStr      //
-                                   });
+    stl_util::concat(uniformsList,
+                     {
+                       "vLightData" + lightIndexStr,      //
+                       "vLightDiffuse" + lightIndexStr,   //
+                       "vLightSpecular" + lightIndexStr,  //
+                       "vLightDirection" + lightIndexStr, //
+                       "vLightGround" + lightIndexStr,    //
+                       "lightMatrix" + lightIndexStr,     //
+                       "shadowsInfo" + lightIndexStr,     //
+                       "depthValues" + lightIndexStr      //
+                     });
 
     samplersList.emplace_back("shadowSampler" + lightIndexStr);
   }

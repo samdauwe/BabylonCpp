@@ -431,6 +431,34 @@ std::vector<BaseTexture*> ShaderMaterial::getActiveTextures() const
   return activeTextures;
 }
 
+bool ShaderMaterial::hasTexture(BaseTexture* texture) const
+{
+  if (Material::hasTexture(texture)) {
+    return true;
+  }
+
+  auto it1
+    = std::find_if(_textures.begin(), _textures.end(),
+                   [&texture](const std::pair<std::string, Texture*>& tex) {
+                     return tex.second == texture;
+                   });
+  if (it1 != _textures.end()) {
+    return true;
+  }
+
+  auto it2 = std::find_if(
+    _textureArrays.begin(), _textureArrays.end(),
+    [&texture](
+      const std::pair<std::string, std::vector<BaseTexture*>>& textures) {
+      return stl_util::contains(textures.second, texture);
+    });
+  if (it2 != _textureArrays.end()) {
+    return true;
+  }
+
+  return false;
+}
+
 Material* ShaderMaterial::clone(const std::string& iName,
                                 bool /*cloneChildren*/) const
 {

@@ -271,6 +271,7 @@ template <typename K, typename V>
 inline std::vector<K> extract_keys(std::unordered_map<K, V> const& inputMap)
 {
   std::vector<K> keys;
+  keys.reserve(inputMap.size());
   for (auto const& element : inputMap) {
     keys.emplace_back(element.first);
   }
@@ -281,6 +282,7 @@ template <typename K, typename V>
 inline std::vector<V> extract_values(std::unordered_map<K, V> const& inputMap)
 {
   std::vector<V> values;
+  values.reserve(inputMap.size());
   for (auto const& element : inputMap) {
     values.emplace_back(element.second);
   }

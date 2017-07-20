@@ -8,6 +8,13 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT MaterialHelper {
 
 public:
+  static void PrepareDefinesForMergedUV(BaseTexture* texture,
+                                        MaterialDefines& defines,
+                                        unsigned int key, unsigned int MAINUV1,
+                                        unsigned int MAINUV2);
+  static void BindTextureMatrix(BaseTexture& texture,
+                                UniformBuffer& uniformBuffer,
+                                const std::string& key);
   static void PrepareDefinesForMisc(AbstractMesh* mesh, Scene* scene,
                                     bool useLogarithmicDepth, bool pointsCloud,
                                     bool fogEnabled, MaterialDefines& defines,

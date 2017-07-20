@@ -325,6 +325,11 @@ std::vector<BaseTexture*> Material::getActiveTextures() const
   return {};
 }
 
+bool Material::hasTexture(BaseTexture* /*texture*/) const
+{
+  return false;
+}
+
 Material* Material::clone(const std::string& /*name*/,
                           bool /*cloneChildren*/) const
 {
