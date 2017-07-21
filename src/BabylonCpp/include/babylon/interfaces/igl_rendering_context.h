@@ -2,6 +2,7 @@
 #define BABYLON_INTERFACES_IGL_RENDERING_CONTEXT_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/nullable.h>
 
 namespace BABYLON {
 namespace GL {
@@ -472,7 +473,6 @@ public:
       , isReady{false}
       , generateMipMaps{false}
       , noMipmap{false}
-      , type{0}
       , _cachedWrapU{0}
       , _cachedWrapV{0}
       , _cachedCoordinatesMode{0}
@@ -498,18 +498,23 @@ public:
   bool isReady;
   bool generateMipMaps;
   bool noMipmap;
-  unsigned int type;
+  Nullable<unsigned int> type;
+  Nullable<unsigned int> format;
   unsigned int _cachedWrapU;
   unsigned int _cachedWrapV;
   unsigned int _cachedCoordinatesMode;
   bool _generateDepthBuffer;
   bool _generateStencilBuffer;
+  BaseTexture* _lodTextureHigh;
+  BaseTexture* _lodTextureMid;
+  BaseTexture* _lodTextureLow;
   std::string url;
   std::unique_ptr<IGLFramebuffer> _framebuffer;
   std::unique_ptr<IGLFramebuffer> _MSAAFramebuffer;
   std::unique_ptr<IGLRenderbuffer> _depthBuffer;
   std::unique_ptr<IGLRenderbuffer> _depthStencilBuffer;
   std::unique_ptr<IGLRenderbuffer> _MSAARenderBuffer;
+  // std::unique_ptr<SphericalPolynomial> _sphericalPolynomial;
   std::vector<std::function<void()>> onLoadedCallbacks;
 }; // end of class IGLTexture
 
