@@ -4,7 +4,9 @@ namespace BABYLON {
 
 StandardMaterialDefines::StandardMaterialDefines() : MaterialDefines{}
 {
-  _keys = {"DIFFUSE",
+  _keys = {"MAINUV1",
+           "MAINUV2",
+           "DIFFUSE",
            "AMBIENT",
            "OPACITY",
            "OPACITYRGB",

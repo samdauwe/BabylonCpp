@@ -97,7 +97,7 @@ public:
   void bindViewProjection(Effect* effect);
   virtual void unbind();
   virtual std::vector<BaseTexture*> getActiveTextures() const;
-  bool hasTexture(BaseTexture* texture) const;
+  virtual bool hasTexture(BaseTexture* texture) const;
   virtual Material* clone(const std::string& name,
                           bool cloneChildren = false) const;
   std::vector<AbstractMesh*> getBindedMeshes();

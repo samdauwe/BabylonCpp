@@ -42,6 +42,14 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   unsigned int BonesPerMesh;
   unsigned int NUM_MORPH_INFLUENCERS;
 
+  unsigned int DIFFUSEDIRECTUV;
+  unsigned int AMBIENTDIRECTUV;
+  unsigned int OPACITYDIRECTUV;
+  unsigned int EMISSIVEDIRECTUV;
+  unsigned int SPECULARDIRECTUV;
+  unsigned int BUMPDIRECTUV;
+  unsigned int LIGHTMAPDIRECTUV;
+
   std::vector<bool> lights;
   std::vector<bool> pointlights;
   std::vector<bool> dirlights;
@@ -73,8 +81,6 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
 
   bool _normals;
   bool _uvs;
-
-  Uint32Array directuvs;
 
   bool _needNormals;
   bool _needUVs;

@@ -6,6 +6,13 @@ MaterialDefines::MaterialDefines()
     : NUM_BONE_INFLUENCERS{0}
     , BonesPerMesh{0}
     , NUM_MORPH_INFLUENCERS{0}
+    , DIFFUSEDIRECTUV{0}
+    , AMBIENTDIRECTUV{0}
+    , OPACITYDIRECTUV{0}
+    , EMISSIVEDIRECTUV{0}
+    , SPECULARDIRECTUV{0}
+    , BUMPDIRECTUV{0}
+    , LIGHTMAPDIRECTUV{0}
     , TANGENT{false}
     , SHADOWS{false}
     , LIGHTMAPEXCLUDED{false}
@@ -230,6 +237,13 @@ void MaterialDefines::rebuild()
   NUM_BONE_INFLUENCERS  = 0;
   BonesPerMesh          = 0;
   NUM_MORPH_INFLUENCERS = 0;
+  DIFFUSEDIRECTUV       = 0;
+  AMBIENTDIRECTUV       = 0;
+  OPACITYDIRECTUV       = 0;
+  EMISSIVEDIRECTUV      = 0;
+  SPECULARDIRECTUV      = 0;
+  BUMPDIRECTUV          = 0;
+  LIGHTMAPDIRECTUV      = 0;
   TANGENT               = false;
   SHADOWS               = false;
   LIGHTMAPEXCLUDED      = false;
@@ -256,6 +270,13 @@ bool MaterialDefines::isEqual(const MaterialDefines& other) const
   if ((NUM_BONE_INFLUENCERS != other.NUM_BONE_INFLUENCERS)
       || (BonesPerMesh != other.BonesPerMesh)
       || (NUM_MORPH_INFLUENCERS != other.NUM_MORPH_INFLUENCERS)
+      || (DIFFUSEDIRECTUV != other.DIFFUSEDIRECTUV)
+      || (AMBIENTDIRECTUV != other.AMBIENTDIRECTUV)
+      || (OPACITYDIRECTUV != other.OPACITYDIRECTUV)
+      || (EMISSIVEDIRECTUV != other.EMISSIVEDIRECTUV)
+      || (SPECULARDIRECTUV != other.SPECULARDIRECTUV)
+      || (BUMPDIRECTUV != other.BUMPDIRECTUV)
+      || (LIGHTMAPDIRECTUV != other.LIGHTMAPDIRECTUV)
       || (TANGENT != other.TANGENT) || (SHADOWS != other.SHADOWS)
       || (LIGHTMAPEXCLUDED != other.LIGHTMAPEXCLUDED)
       || (USERIGHTHANDEDSYSTEM != other.USERIGHTHANDEDSYSTEM)
@@ -353,6 +374,13 @@ void MaterialDefines::cloneTo(MaterialDefines& other)
   other.NUM_BONE_INFLUENCERS  = NUM_BONE_INFLUENCERS;
   other.BonesPerMesh          = BonesPerMesh;
   other.NUM_MORPH_INFLUENCERS = NUM_MORPH_INFLUENCERS;
+  other.DIFFUSEDIRECTUV       = DIFFUSEDIRECTUV;
+  other.AMBIENTDIRECTUV       = AMBIENTDIRECTUV;
+  other.OPACITYDIRECTUV       = OPACITYDIRECTUV;
+  other.EMISSIVEDIRECTUV      = EMISSIVEDIRECTUV;
+  other.SPECULARDIRECTUV      = SPECULARDIRECTUV;
+  other.BUMPDIRECTUV          = BUMPDIRECTUV;
+  other.LIGHTMAPDIRECTUV      = LIGHTMAPDIRECTUV;
   other.TANGENT               = TANGENT;
   other.SHADOWS               = SHADOWS;
   other.LIGHTMAPEXCLUDED      = LIGHTMAPEXCLUDED;
@@ -390,6 +418,13 @@ void MaterialDefines::reset()
   NUM_BONE_INFLUENCERS  = 0;
   BonesPerMesh          = 0;
   NUM_MORPH_INFLUENCERS = 0;
+  DIFFUSEDIRECTUV       = 0;
+  AMBIENTDIRECTUV       = 0;
+  OPACITYDIRECTUV       = 0;
+  EMISSIVEDIRECTUV      = 0;
+  SPECULARDIRECTUV      = 0;
+  BUMPDIRECTUV          = 0;
+  LIGHTMAPDIRECTUV      = 0;
   TANGENT               = false;
   SHADOWS               = false;
   LIGHTMAPEXCLUDED      = false;

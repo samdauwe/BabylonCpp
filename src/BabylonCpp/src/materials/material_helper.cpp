@@ -24,25 +24,47 @@
 
 namespace BABYLON {
 
-void MaterialHelper::PrepareDefinesForMergedUV(BaseTexture* texture,
-                                               MaterialDefines& defines,
-                                               unsigned int key,
-                                               unsigned int MAINUV1,
-                                               unsigned int MAINUV2)
+void MaterialHelper::PrepareDefinesForMergedUV(
+  BaseTexture* texture, MaterialDefines& defines, unsigned int key,
+  const std::string& keyString, unsigned int MAINUV1, unsigned int MAINUV2)
 {
+  const auto updateDirectUV = [&defines, &keyString](unsigned int value) {
+    if (keyString == "DIFFUSE") {
+      defines.DIFFUSEDIRECTUV = value;
+    }
+    else if (keyString == "AMBIENT") {
+      defines.AMBIENTDIRECTUV = value;
+    }
+    else if (keyString == "OPACITY") {
+      defines.OPACITYDIRECTUV = value;
+    }
+    else if (keyString == "EMISSIVE") {
+      defines.EMISSIVEDIRECTUV = value;
+    }
+    else if (keyString == "SPECULAR") {
+      defines.SPECULARDIRECTUV = value;
+    }
+    else if (keyString == "BUMP") {
+      defines.BUMPDIRECTUV = value;
+    }
+    else if (keyString == "LIGHTMAP") {
+      defines.LIGHTMAPDIRECTUV = value;
+    }
+  };
+
   defines._needUVs     = true;
   defines.defines[key] = true;
   if (texture->getTextureMatrix()->isIdentity(true)) {
-    defines.directuvs[key] = texture->coordinatesIndex + 1;
+    updateDirectUV(texture->coordinatesIndex + 1);
     if (texture->coordinatesIndex == 0) {
-      defines.directuvs[MAINUV1] = true;
+      defines.defines[MAINUV1] = true;
     }
     else {
-      defines.directuvs[MAINUV2] = true;
+      defines.defines[MAINUV2] = true;
     }
   }
   else {
-    defines.directuvs[key] = 0;
+    updateDirectUV(0);
   }
 }
 

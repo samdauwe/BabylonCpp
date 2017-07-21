@@ -278,15 +278,18 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
   // Textures
   if (defines._areTexturesDirty) {
-    defines._needUVs = false;
+    defines._needUVs              = false;
+    defines.defines[SMD::MAINUV1] = false;
+    defines.defines[SMD::MAINUV2] = false;
     if (scene->texturesEnabled()) {
       if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
         if (!_diffuseTexture->isReadyOrNotBlocking()) {
           return false;
         }
         else {
-          defines._needUVs              = true;
-          defines.defines[SMD::DIFFUSE] = true;
+          MaterialHelper::PrepareDefinesForMergedUV(_diffuseTexture, defines,
+                                                    SMD::DIFFUSE, "DIFFUSE",
+                                                    SMD::MAINUV1, SMD::MAINUV2);
         }
       }
       else {
@@ -298,8 +301,9 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           return false;
         }
         else {
-          defines._needUVs              = true;
-          defines.defines[SMD::AMBIENT] = true;
+          MaterialHelper::PrepareDefinesForMergedUV(_ambientTexture, defines,
+                                                    SMD::AMBIENT, "AMBIENT",
+                                                    SMD::MAINUV1, SMD::MAINUV2);
         }
       }
       else {
@@ -311,8 +315,9 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           return false;
         }
         else {
-          defines._needUVs                 = true;
-          defines.defines[SMD::OPACITY]    = true;
+          MaterialHelper::PrepareDefinesForMergedUV(_opacityTexture, defines,
+                                                    SMD::OPACITY, "OPACITY",
+                                                    SMD::MAINUV1, SMD::MAINUV2);
           defines.defines[SMD::OPACITYRGB] = _opacityTexture->getAlphaFromRGB;
         }
       }
@@ -378,8 +383,9 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           return false;
         }
         else {
-          defines._needUVs               = true;
-          defines.defines[SMD::EMISSIVE] = true;
+          MaterialHelper::PrepareDefinesForMergedUV(_emissiveTexture, defines,
+                                                    SMD::EMISSIVE, "EMISSIVE",
+                                                    SMD::MAINUV1, SMD::MAINUV2);
         }
       }
       else {
@@ -391,8 +397,9 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           return false;
         }
         else {
-          defines._needUVs               = true;
-          defines.defines[SMD::LIGHTMAP] = true;
+          MaterialHelper::PrepareDefinesForMergedUV(_lightmapTexture, defines,
+                                                    SMD::LIGHTMAP, "LIGHTMAP",
+                                                    SMD::MAINUV1, SMD::MAINUV2);
           defines.defines[SMD::USELIGHTMAPASSHADOWMAP]
             = _useLightmapAsShadowmap;
         }
@@ -406,8 +413,9 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           return false;
         }
         else {
-          defines._needUVs                 = true;
-          defines.defines[SMD::SPECULAR]   = true;
+          MaterialHelper::PrepareDefinesForMergedUV(_specularTexture, defines,
+                                                    SMD::SPECULAR, "SPECULAR",
+                                                    SMD::MAINUV1, SMD::MAINUV2);
           defines.defines[SMD::GLOSSINESS] = _useGlossinessFromSpecularMapAlpha;
         }
       }
@@ -422,8 +430,9 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           return false;
         }
         else {
-          defines._needUVs           = true;
-          defines.defines[SMD::BUMP] = true;
+          MaterialHelper::PrepareDefinesForMergedUV(_bumpTexture, defines,
+                                                    SMD::BUMP, "BUMP",
+                                                    SMD::MAINUV1, SMD::MAINUV2);
 
           defines.defines[SMD::INVERTNORMALMAPX] = _invertNormalMapX;
           defines.defines[SMD::INVERTNORMALMAPY] = _invertNormalMapY;
@@ -875,24 +884,24 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
           _uniformBuffer->updateFloat2("vDiffuseInfos",
                                        _diffuseTexture->coordinatesIndex,
                                        _diffuseTexture->level, "");
-          _uniformBuffer->updateMatrix("diffuseMatrix",
-                                       *_diffuseTexture->getTextureMatrix());
+          MaterialHelper::BindTextureMatrix(*_diffuseTexture, *_uniformBuffer,
+                                            "diffuse");
         }
 
         if (_ambientTexture && StandardMaterial::AmbientTextureEnabled()) {
           _uniformBuffer->updateFloat2("vAmbientInfos",
                                        _ambientTexture->coordinatesIndex,
                                        _ambientTexture->level, "");
-          _uniformBuffer->updateMatrix("ambientMatrix",
-                                       *_ambientTexture->getTextureMatrix());
+          MaterialHelper::BindTextureMatrix(*_ambientTexture, *_uniformBuffer,
+                                            "ambient");
         }
 
         if (_opacityTexture && StandardMaterial::OpacityTextureEnabled()) {
           _uniformBuffer->updateFloat2("vOpacityInfos",
                                        _opacityTexture->coordinatesIndex,
                                        _opacityTexture->level, "");
-          _uniformBuffer->updateMatrix("opacityMatrix",
-                                       *_opacityTexture->getTextureMatrix());
+          MaterialHelper::BindTextureMatrix(*_opacityTexture, *_uniformBuffer,
+                                            "opacity");
         }
 
         if (_reflectionTexture
@@ -908,24 +917,24 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
           _uniformBuffer->updateFloat2("vEmissiveInfos",
                                        _emissiveTexture->coordinatesIndex,
                                        _emissiveTexture->level, "");
-          _uniformBuffer->updateMatrix("emissiveMatrix",
-                                       *_emissiveTexture->getTextureMatrix());
+          MaterialHelper::BindTextureMatrix(*_emissiveTexture, *_uniformBuffer,
+                                            "emissive");
         }
 
         if (_lightmapTexture && StandardMaterial::LightmapTextureEnabled()) {
           _uniformBuffer->updateFloat2("vLightmapInfos",
                                        _lightmapTexture->coordinatesIndex,
                                        _lightmapTexture->level, "");
-          _uniformBuffer->updateMatrix("lightmapMatrix",
-                                       *_lightmapTexture->getTextureMatrix());
+          MaterialHelper::BindTextureMatrix(*_lightmapTexture, *_uniformBuffer,
+                                            "lightmap");
         }
 
         if (_specularTexture && StandardMaterial::SpecularTextureEnabled()) {
           _uniformBuffer->updateFloat2("vSpecularInfos",
                                        _specularTexture->coordinatesIndex,
                                        _specularTexture->level, "");
-          _uniformBuffer->updateMatrix("specularMatrix",
-                                       *_specularTexture->getTextureMatrix());
+          MaterialHelper::BindTextureMatrix(*_specularTexture, *_uniformBuffer,
+                                            "specular");
         }
 
         if (_bumpTexture && scene->getEngine()->getCaps().standardDerivatives
@@ -933,8 +942,8 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
           _uniformBuffer->updateFloat3(
             "vBumpInfos", static_cast<float>(_bumpTexture->coordinatesIndex),
             1.f / _bumpTexture->level, parallaxScaleBias, "");
-          _uniformBuffer->updateMatrix("bumpMatrix",
-                                       *_bumpTexture->getTextureMatrix());
+          MaterialHelper::BindTextureMatrix(*_bumpTexture, *_uniformBuffer,
+                                            "bump");
         }
 
         if (_refractionTexture
@@ -1027,9 +1036,10 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     // Colors
     scene->ambientColor.multiplyToRef(ambientColor, _globalAmbientColor);
 
-    effect->setVector3("vEyePosition", scene->_mirroredCameraPosition ?
-                                         *scene->_mirroredCameraPosition :
-                                         scene->activeCamera->position);
+    effect->setVector3("vEyePosition",
+                       scene->_mirroredCameraPosition ?
+                         *scene->_mirroredCameraPosition :
+                         scene->activeCamera->position);
     effect->setColor3("vAmbientColor", _globalAmbientColor);
   }
 
@@ -1150,6 +1160,51 @@ std::vector<BaseTexture*> StandardMaterial::getActiveTextures() const
   }
 
   return activeTextures;
+}
+
+bool StandardMaterial::hasTexture(BaseTexture* texture) const
+{
+  if (PushMaterial::hasTexture(texture)) {
+    return true;
+  }
+
+  if (_diffuseTexture == texture) {
+    return true;
+  }
+
+  if (_ambientTexture == texture) {
+    return true;
+  }
+
+  if (_opacityTexture == texture) {
+    return true;
+  }
+
+  if (_reflectionTexture == texture) {
+    return true;
+  }
+
+  if (_emissiveTexture == texture) {
+    return true;
+  }
+
+  if (_specularTexture == texture) {
+    return true;
+  }
+
+  if (_bumpTexture == texture) {
+    return true;
+  }
+
+  if (_lightmapTexture == texture) {
+    return true;
+  }
+
+  if (_refractionTexture == texture) {
+    return true;
+  }
+
+  return false;
 }
 
 void StandardMaterial::dispose(bool forceDisposeEffect,
