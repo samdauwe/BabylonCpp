@@ -48,8 +48,15 @@ public:
   virtual void delayLoad();
   std::vector<Animation*> getAnimations() override;
   std::unique_ptr<BaseTexture> clone() const;
+  unsigned int textureType() const;
+  unsigned int textureFormat() const;
   Uint8Array readPixels(unsigned int faceIndex = 0);
   void releaseInternalTexture();
+  SphericalPolynomial* sphericalPolynomial();
+  void setSphericalPolynomial(const SphericalPolynomial& value);
+  BaseTexture* _lodTextureHigh() const;
+  BaseTexture* _lodTextureMid() const;
+  BaseTexture* _lodTextureLow() const;
   virtual void dispose(bool doNotRecurse = false) override;
   Json::object serialize() const;
 
@@ -68,6 +75,11 @@ public:
   unsigned int wrapV;
   unsigned int anisotropicFilteringLevel;
   bool isCube;
+  bool gammaSpace;
+  bool invertZ;
+  bool lodLevelInAlpha;
+  float lodGenerationOffset;
+  float lodGenerationScale;
   bool isRenderTarget;
   std::vector<Animation*> animations;
   /**

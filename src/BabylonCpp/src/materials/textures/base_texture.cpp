@@ -6,6 +6,7 @@
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/texture.h>
+#include <babylon/tools/hdr/cube_map_to_spherical_polynomial_tools.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -21,6 +22,11 @@ BaseTexture::BaseTexture(Scene* scene)
     , anisotropicFilteringLevel{BaseTexture::
                                   DEFAULT_ANISOTROPIC_FILTERING_LEVEL}
     , isCube{false}
+    , gammaSpace{true}
+    , invertZ{false}
+    , lodLevelInAlpha{false}
+    , lodGenerationOffset{0.f}
+    , lodGenerationScale{0.8f}
     , isRenderTarget{false}
     , delayLoadState{EngineConstants::DELAYLOADSTATE_NONE}
     , _cachedAnisotropicFilteringLevel{0}
@@ -221,6 +227,26 @@ std::unique_ptr<BaseTexture> BaseTexture::clone() const
   return nullptr;
 }
 
+unsigned int BaseTexture::textureType() const
+{
+  if (!_texture) {
+    return EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+  }
+
+  return _texture->type ? *_texture->type :
+                          EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+}
+
+unsigned int BaseTexture::textureFormat() const
+{
+  if (!_texture) {
+    return EngineConstants::TEXTUREFORMAT_RGBA;
+  }
+
+  return _texture->format ? *_texture->format :
+                            EngineConstants::TEXTUREFORMAT_RGBA;
+}
+
 Uint8Array BaseTexture::readPixels(unsigned int faceIndex)
 {
   if (!_texture) {
@@ -232,10 +258,10 @@ Uint8Array BaseTexture::readPixels(unsigned int faceIndex)
 
   if (_texture->isCube) {
     return engine->_readTexturePixels(_texture, size.width, size.height,
-                                      faceIndex);
+                                      static_cast<int>(faceIndex));
   }
 
-  return engine->_readTexturePixels(_texture, size.width, size.height);
+  return engine->_readTexturePixels(_texture, size.width, size.height, -1);
 }
 
 void BaseTexture::releaseInternalTexture()
@@ -244,6 +270,59 @@ void BaseTexture::releaseInternalTexture()
     _scene->getEngine()->releaseInternalTexture(_texture);
     _texture = nullptr;
   }
+}
+
+SphericalPolynomial* BaseTexture::sphericalPolynomial()
+{
+#if 0
+  if (!_texture || !isReady()) {
+    return nullptr;
+  }
+
+  if (!_texture->_sphericalPolynomial) {
+    _texture->_sphericalPolynomial
+      = Internals::CubeMapToSphericalPolynomialTools::
+        ConvertCubeMapTextureToSphericalPolynomial(this);
+  }
+
+  return _texture->_sphericalPolynomial.get();
+#else
+  return nullptr;
+#endif
+}
+
+void BaseTexture::setSphericalPolynomial(const SphericalPolynomial& /*value*/)
+{
+#if 0
+  if (_texture) {
+    _texture->_sphericalPolynomial
+      = std::make_unique<SphericalPolynomial>(value);
+  }
+#endif
+}
+
+BaseTexture* BaseTexture::_lodTextureHigh() const
+{
+  if (_texture) {
+    return _texture->_lodTextureHigh;
+  }
+  return nullptr;
+}
+
+BaseTexture* BaseTexture::_lodTextureMid() const
+{
+  if (_texture) {
+    return _texture->_lodTextureMid;
+  }
+  return nullptr;
+}
+
+BaseTexture* BaseTexture::_lodTextureLow() const
+{
+  if (_texture) {
+    return _texture->_lodTextureLow;
+  }
+  return nullptr;
 }
 
 void BaseTexture::dispose(bool /*doNotRecurse*/)

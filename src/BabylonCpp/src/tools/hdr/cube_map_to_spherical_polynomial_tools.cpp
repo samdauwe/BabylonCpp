@@ -1,5 +1,7 @@
 #include <babylon/tools/hdr/cube_map_to_spherical_polynomial_tools.h>
 
+#include <babylon/engine/engine_constants.h>
+#include <babylon/materials/textures/base_texture.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/spherical_harmonics.h>
 #include <babylon/math/spherical_polynomial.h>
@@ -24,7 +26,52 @@ std::array<FileFaceOrientation, 6> CubeMapToSphericalPolynomialTools::FileFaces
                         Vector3(0, -1, 0)) // -Z bottom
   }};
 
-SphericalPolynomial
+std::unique_ptr<SphericalPolynomial>
+CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(
+  BaseTexture* texture)
+{
+  if (!texture->isCube) {
+    // Only supports cube Textures currently.
+    return nullptr;
+  }
+
+#if 0
+  auto size  = texture->getSize().width;
+  auto right = texture->readPixels(0);
+  auto left  = texture->readPixels(1);
+  auto up    = texture->readPixels(2);
+  auto down  = texture->readPixels(3);
+  auto front = texture->readPixels(4);
+  auto back  = texture->readPixels(5);
+
+  auto gammaSpace = texture->gammaSpace;
+  // Always read as RGBA.
+  auto format = EngineConstants::TEXTUREFORMAT_RGBA;
+  auto type   = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+  if (texture->textureType() != EngineConstants::TEXTURETYPE_UNSIGNED_INT) {
+    type = EngineConstants::TEXTURETYPE_FLOAT;
+  }
+
+  CubeMapInfo cubeInfo{
+    size,       //
+    right,      //
+    left,       //
+    up,         //
+    down,       //
+    front,      //
+    back,       //
+    format,     //
+    type,       //
+    gammaSpace, //
+  };
+#else
+  CubeMapInfo cubeInfo;
+#endif
+
+  return ConvertCubeMapToSphericalPolynomial(cubeInfo);
+}
+
+std::unique_ptr<SphericalPolynomial>
 CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
   const CubeMapInfo& cubeInfo)
 {
@@ -145,8 +192,11 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
   // Additionally scale by pi -- audit needed
   sphericalHarmonics.scale(1.f / Math::PI);
 
+#if 0
   return SphericalPolynomial::getSphericalPolynomialFromHarmonics(
     sphericalHarmonics);
+#endif
+  return nullptr;
 }
 
 } // end of namespace Internals
