@@ -10,11 +10,22 @@
 
 namespace BABYLON {
 
-CubeTexture*
+std::unique_ptr<CubeTexture>
 CubeTexture::CreateFromImages(const std::vector<std::string>& iFiles,
                               Scene* scene, bool noMipmap)
 {
-  return new CubeTexture("", scene, {}, noMipmap, iFiles);
+  const std::vector<std::string> emptyStringList;
+  return std::make_unique<CubeTexture>("", scene, emptyStringList, noMipmap,
+                                       iFiles);
+}
+
+std::unique_ptr<CubeTexture> CreateFromPrefilteredData(const std::string& url,
+                                                       Scene* scene)
+{
+  const std::vector<std::string> emptyStringList;
+  return std::make_unique<CubeTexture>(
+    url, scene, emptyStringList, false, emptyStringList, nullptr, nullptr,
+    EngineConstants::TEXTUREFORMAT_RGBA, true);
 }
 
 CubeTexture::CubeTexture(const std::string& rootUrl, Scene* scene,
@@ -22,13 +33,14 @@ CubeTexture::CubeTexture(const std::string& rootUrl, Scene* scene,
                          bool noMipmap, const std::vector<std::string>& iFiles,
                          const std::function<void()>& onLoad,
                          const std::function<void()>& onError,
-                         unsigned int format)
+                         unsigned int format, bool prefiltered)
     : BaseTexture{scene}
     , url{rootUrl}
     , coordinatesMode{TextureConstants::CUBIC_MODE}
     , _noMipmap{noMipmap}
     , _textureMatrix{std::make_unique<Matrix>(Matrix::Identity())}
     , _format{format}
+    , _prefiltered{prefiltered}
 {
   name = rootUrl;
   setHasAlpha(false);
@@ -56,8 +68,15 @@ CubeTexture::CubeTexture(const std::string& rootUrl, Scene* scene,
 
   if (!_texture) {
     if (!scene->useDelayedTextureLoading) {
-      _texture = scene->getEngine()->createCubeTexture(
-        rootUrl, scene, extensions, noMipmap, onLoad, onError, _format);
+      if (prefiltered) {
+        _texture = scene->getEngine()->createPrefilteredCubeTexture(
+          rootUrl, scene, lodGenerationScale, lodGenerationOffset, onLoad,
+          onError, format);
+      }
+      else {
+        _texture = scene->getEngine()->createCubeTexture(
+          rootUrl, scene, extensions, noMipmap, onLoad, onError, _format);
+      }
     }
     else {
       delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
@@ -73,6 +92,10 @@ CubeTexture::CubeTexture(const std::string& rootUrl, Scene* scene,
   }
 
   isCube = true;
+
+  if (prefiltered) {
+    gammaSpace = false;
+  }
 }
 
 CubeTexture::~CubeTexture()
@@ -90,8 +113,16 @@ void CubeTexture::delayLoad()
   _texture       = _getFromCache(url, _noMipmap);
 
   if (!_texture) {
-    _texture = getScene()->getEngine()->createCubeTexture(
-      url, getScene(), _files, _noMipmap, nullptr, nullptr, _format);
+    if (_prefiltered) {
+      _texture = getScene()->getEngine()->createPrefilteredCubeTexture(
+        url, getScene(), lodGenerationScale, lodGenerationOffset, nullptr,
+        nullptr, _format);
+    }
+    else {
+
+      _texture = getScene()->getEngine()->createCubeTexture(
+        url, getScene(), _files, _noMipmap, nullptr, nullptr, _format);
+    }
   }
 }
 
@@ -100,16 +131,20 @@ Matrix* CubeTexture::getReflectionTextureMatrix()
   return _textureMatrix.get();
 }
 
-CubeTexture* CubeTexture::Parse(const Json::value& parsedTexture, Scene* scene,
-                                const std::string& /*rootUrl*/)
+void CubeTexture::setReflectionTextureMatrix(const Matrix& value)
 {
-#if 0
-  auto cubeTexture
-    = new CubeTexture(rootUrl + Json::GetString(parsedTexture, "name"), scene,
-                      Json::ToStringVector(parsedTexture, "extensions"));
-#endif
-  CubeTexture* cubeTexture = nullptr;
-  SerializationHelper::Parse(cubeTexture, parsedTexture, scene);
+  _textureMatrix = std::make_unique<Matrix>(value);
+}
+
+std::unique_ptr<CubeTexture>
+CubeTexture::Parse(const Json::value& parsedTexture, Scene* scene,
+                   const std::string& rootUrl)
+{
+
+  auto cubeTexture = std::make_unique<CubeTexture>(
+    rootUrl + Json::GetString(parsedTexture, "name"), scene,
+    Json::ToStringVector(parsedTexture, "extensions"));
+  SerializationHelper::Parse(cubeTexture.get(), parsedTexture, scene);
 
   // Animations
   if (parsedTexture.contains("animations")) {

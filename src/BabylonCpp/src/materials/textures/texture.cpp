@@ -4,6 +4,7 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/igl_rendering_context.h>
+#include <babylon/materials/material.h>
 #include <babylon/mesh/buffer.h>
 #include <babylon/tools/tools.h>
 
@@ -134,7 +135,7 @@ void Texture::delayLoad()
   }
   else {
     if (_texture->isReady) {
-      _delayedOnLoad();
+      Tools::SetImmediate([this]() { _delayedOnLoad(); });
     }
     else {
       _texture->onLoadedCallbacks.emplace_back(_delayedOnLoad);
@@ -220,6 +221,10 @@ Matrix* Texture::getTextureMatrix()
   _cachedTextureMatrix->m[9]  = _t0.y;
   _cachedTextureMatrix->m[10] = _t0.z;
 
+  getScene()->markAllMaterialsAsDirty(
+    Material::TextureDirtyFlag,
+    [this](Material* mat) { return mat->hasTexture(this); });
+
   return _cachedTextureMatrix.get();
 }
 
@@ -266,6 +271,12 @@ Matrix* Texture::getReflectionTextureMatrix()
       Matrix::IdentityToRef(*_cachedTextureMatrix);
       break;
   }
+
+  getScene()->markAllMaterialsAsDirty(
+    Material::TextureDirtyFlag, [this](Material* mat) {
+      return stl_util::contains(mat->getActiveTextures(), this);
+    });
+
   return _cachedTextureMatrix.get();
 }
 
