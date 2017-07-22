@@ -503,6 +503,28 @@ SubMesh* Mesh::_createGlobalSubMesh()
     return nullptr;
   }
 
+  // Check if we need to recreate the submeshes
+  if (!subMeshes.empty()) {
+    auto totalIndices   = getIndices().size();
+    bool needToRecreate = false;
+
+    for (auto& submesh : subMeshes) {
+      if (submesh->indexStart + submesh->indexCount >= totalIndices) {
+        needToRecreate = true;
+        break;
+      }
+
+      if (submesh->verticesStart + submesh->verticesCount >= totalVertices) {
+        needToRecreate = true;
+        break;
+      }
+    }
+
+    if (!needToRecreate) {
+      return nullptr;
+    }
+  }
+
   releaseSubMeshes();
   return SubMesh::New(0, 0, totalVertices, 0, getTotalIndices(),
                       dynamic_cast<AbstractMesh*>(this));
