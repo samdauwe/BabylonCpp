@@ -341,6 +341,7 @@ enum GLEnums : GLenum {
   STENCIL_INDEX                                = 0x1901,
   STENCIL_INDEX8                               = 0x8D48,
   DEPTH_STENCIL                                = 0x84F9,
+  DEPTH24_STENCIL8                             = 0x88F0,
   RENDERBUFFER_WIDTH                           = 0x8D42,
   RENDERBUFFER_HEIGHT                          = 0x8D43,
   RENDERBUFFER_INTERNAL_FORMAT                 = 0x8D44,
@@ -534,6 +535,15 @@ public:
 * @brief
 */
 class BABYLON_SHARED_EXPORT IGLRenderingContext {
+
+public:
+  // Half floating-point type (16-bit).
+  unsigned int HALF_FLOAT_OES;
+  // RGBA 16-bit floating-point color-renderable internal sized format.
+  unsigned int RGBA16F;
+  // RGBA 32-bit floating-point color-renderable internal sized format.
+  unsigned int RGBA32F;
+  unsigned int DEPTH24_STENCIL8;
 
 public:
   virtual bool initialize()     = 0;

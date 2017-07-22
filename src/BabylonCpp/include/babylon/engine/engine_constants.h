@@ -64,13 +64,6 @@ struct BABYLON_SHARED_EXPORT EngineConstants {
   // tests will pass if the new depth value is not equal to the stored value.
   static constexpr unsigned int NOTEQUAL = 0x0205;
 
-  // Half floating-point type (16-bit).
-  static unsigned int HALF_FLOAT_OES;
-  // RGBA 16-bit floating-point color-renderable internal sized format.
-  static constexpr unsigned int RGBA16F = 0x881A;
-  // RGBA 32-bit floating-point color-renderable internal sized format.
-  static constexpr unsigned int RGBA32F = 0x8814;
-
   // Stencil Actions Constants.
   static constexpr unsigned int KEEP      = 0x1E00;
   static constexpr unsigned int REPLACE   = 0x1E01;

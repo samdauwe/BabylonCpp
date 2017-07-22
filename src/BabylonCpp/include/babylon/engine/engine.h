@@ -347,14 +347,13 @@ public:
                                 const std::function<void()>& onLoad  = nullptr,
                                 const std::function<void()>& onError = nullptr,
                                 Buffer* buffer                       = nullptr);
-  GL::IGLTexture*
-  createTexture(const std::string& urlArg, bool noMipmap, bool invertY,
-                Scene* scene, unsigned int samplingMode
-                              = TextureConstants::TRILINEAR_SAMPLINGMODE,
-                const std::function<void()>& onLoad  = nullptr,
-                const std::function<void()>& onError = nullptr,
-                Buffer* buffer = nullptr, GL::IGLTexture* fallBack = nullptr,
-                unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
+  GL::IGLTexture* createTexture(
+    const std::string& urlArg, bool noMipmap, bool invertY, Scene* scene,
+    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
+    const std::function<void()>& onLoad  = nullptr,
+    const std::function<void()>& onError = nullptr, Buffer* buffer = nullptr,
+    GL::IGLTexture* fallBack = nullptr,
+    unsigned int format      = EngineConstants::TEXTUREFORMAT_RGBA);
   void updateRawTexture(GL::IGLTexture* texture, const Uint8Array& data,
                         unsigned int format, bool invertY = true,
                         const std::string& compression = "");
@@ -378,9 +377,19 @@ public:
                              const IMultiRenderTargetOptions& options);
   unsigned int updateRenderTargetTextureSampleCount(GL::IGLTexture* texture,
                                                     unsigned int samples);
+  void _uploadDataToTexture(unsigned int target, int lod, int internalFormat,
+                            int width, int height, unsigned int format,
+                            unsigned int type, const Uint8Array& data);
+  void _uploadCompressedDataToTexture(unsigned int target, int lod,
+                                      unsigned int internalFormat, int width,
+                                      int height, const Uint8Array& data);
   GL::IGLTexture*
   createRenderTargetCubeTexture(const ISize& size,
                                 const IRenderTargetOptions& options);
+  GL::IGLTexture* createPrefilteredCubeTexture(
+    const std::string& rootUrl, Scene* scene, float scale, float offset,
+    const std::function<void()>& onLoad  = nullptr,
+    const std::function<void()>& onError = nullptr, unsigned int format = 0);
   GL::IGLTexture*
   createCubeTexture(const std::string& rootUrl, Scene* scene,
                     const std::vector<std::string>& extensions, bool noMipmap,
@@ -445,8 +454,13 @@ public:
   float getFps() const;
   microseconds_t getDeltaTime() const;
 
-  /** Statics **/
+  /** Texture helper functions **/
+  Uint8Array _readTexturePixels(GL::IGLTexture* texture, int width, int height,
+                                int faceIndex = -1);
+  GL::GLenum _getWebGLTextureType(unsigned int type) const;
+  GL::GLenum _getRGBABufferInternalSizedFormat(unsigned int type) const;
 
+  /** Statics **/
   static Engine* LastCreatedEngine();
   static Scene* LastCreatedScene();
 
@@ -512,13 +526,9 @@ private:
   /** FPS **/
   void _measureFps();
 
-  Uint8Array _readTexturePixels(GL::IGLTexture* texture, int width, int height,
-                                int faceIndex = -1);
   bool _canRenderToFloatFramebuffer();
   bool _canRenderToHalfFloatFramebuffer();
   bool _canRenderToFramebuffer(unsigned int type);
-  GL::GLenum _getWebGLTextureType(unsigned int type) const;
-  GL::GLenum _getRGBABufferInternalSizedFormat(unsigned int type) const;
 
 public:
   // Public members

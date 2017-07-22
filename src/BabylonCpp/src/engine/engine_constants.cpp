@@ -12,6 +12,4 @@ constexpr unsigned int EngineConstants::TEXTURETYPE_UNSIGNED_INT;
 constexpr unsigned int EngineConstants::TEXTURETYPE_FLOAT;
 constexpr unsigned int EngineConstants::TEXTURETYPE_HALF_FLOAT;
 
-unsigned int EngineConstants::HALF_FLOAT_OES = 0x8D61;
-
 } // end of namespace BABYLON
