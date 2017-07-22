@@ -91,14 +91,23 @@ using system_time_point_t   = std::chrono::time_point<system_clock_t>;
 // byte type
 using byte = unsigned char;
 
-// 32 bit (4 byte) floating point number array
+// -- Array types -- //
+// 8-bit twos complement signed integer
+using Int8Array = std::vector<std::int8_t>;
+// 8-bit unsigned integer
+using Uint8Array = std::vector<std::uint8_t>;
+// 16-bit twos complement signed integer
+using Int16Array = std::vector<std::int16_t>;
+// 16-bit unsigned integer
+using Uint16Array = std::vector<std::uint16_t>;
+// 32-bit twos complement signed integer
+using Int32Array = std::vector<std::int32_t>;
+// 32-bit unsigned integer
+using Uint32Array = std::vector<std::uint32_t>;
+// 32-bit IEEE floating point number
 using Float32Array = std::vector<std::float_t>;
-using Int8Array    = std::vector<std::int8_t>;
-using Int16Array   = std::vector<std::int16_t>;
-using Int32Array   = std::vector<std::int32_t>;
-using Uint8Array   = std::vector<std::uint8_t>;
-using Uint16Array  = std::vector<std::uint16_t>;
-using Uint32Array  = std::vector<std::uint32_t>;
+// 64-bit IEEE floating point number
+using Float64Array = std::vector<std::double_t>;
 
 // Indices array alias
 using IndicesArray = Uint32Array;
