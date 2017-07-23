@@ -280,6 +280,30 @@ std::vector<IAnimatable*> NormalMaterial::getAnimatables()
   return results;
 }
 
+std::vector<BaseTexture*> NormalMaterial::getActiveTextures() const
+{
+  auto activeTextures = Material::getActiveTextures();
+
+  if (_diffuseTexture) {
+    activeTextures.emplace_back(_diffuseTexture);
+  }
+
+  return activeTextures;
+}
+
+bool NormalMaterial::hasTexture(BaseTexture* texture) const
+{
+  if (Material::hasTexture(texture)) {
+    return true;
+  }
+
+  if (_diffuseTexture == texture) {
+    return true;
+  }
+
+  return false;
+}
+
 void NormalMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
 {
   if (_diffuseTexture) {

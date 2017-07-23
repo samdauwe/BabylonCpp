@@ -39,6 +39,8 @@ public:
                          bool useInstances = false) override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatable*> getAnimatables();
+  std::vector<BaseTexture*> getActiveTextures() const override;
+  bool hasTexture(BaseTexture* texture) const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
   Material* clone(const std::string& name,

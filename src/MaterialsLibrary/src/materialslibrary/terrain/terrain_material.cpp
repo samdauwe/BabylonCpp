@@ -318,6 +318,78 @@ std::vector<IAnimatable*> TerrainMaterial::getAnimatables()
   return results;
 }
 
+std::vector<BaseTexture*> TerrainMaterial::getActiveTextures() const
+{
+  auto activeTextures = Material::getActiveTextures();
+
+  if (_mixTexture) {
+    activeTextures.emplace_back(_mixTexture);
+  }
+
+  if (_diffuseTexture1) {
+    activeTextures.emplace_back(_diffuseTexture1);
+  }
+
+  if (_diffuseTexture2) {
+    activeTextures.emplace_back(_diffuseTexture2);
+  }
+
+  if (_diffuseTexture3) {
+    activeTextures.emplace_back(_diffuseTexture3);
+  }
+
+  if (_bumpTexture1) {
+    activeTextures.emplace_back(_bumpTexture1);
+  }
+
+  if (_bumpTexture2) {
+    activeTextures.emplace_back(_bumpTexture2);
+  }
+
+  if (_bumpTexture3) {
+    activeTextures.emplace_back(_bumpTexture3);
+  }
+
+  return activeTextures;
+}
+
+bool TerrainMaterial::hasTexture(BaseTexture* texture) const
+{
+  if (Material::hasTexture(texture)) {
+    return true;
+  }
+
+  if (_mixTexture == texture) {
+    return true;
+  }
+
+  if (_diffuseTexture1 == texture) {
+    return true;
+  }
+
+  if (_diffuseTexture2 == texture) {
+    return true;
+  }
+
+  if (_diffuseTexture3 == texture) {
+    return true;
+  }
+
+  if (_bumpTexture1 == texture) {
+    return true;
+  }
+
+  if (_bumpTexture2 == texture) {
+    return true;
+  }
+
+  if (_bumpTexture3 == texture) {
+    return true;
+  }
+
+  return false;
+}
+
 void TerrainMaterial::dispose(bool forceDisposeEffect,
                               bool forceDisposeTextures)
 {

@@ -116,7 +116,6 @@ bool CellMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   // Get correct effect
   if (defines.isDirty()) {
     defines.markAsProcessed();
-
     scene->resetCachedMaterial();
 
     // Fallbacks
@@ -271,6 +270,26 @@ std::vector<IAnimatable*> CellMaterial::getAnimatables()
   }
 
   return results;
+}
+
+std::vector<BaseTexture*> CellMaterial::getActiveTextures() const
+{
+  auto activeTextures = Material::getActiveTextures();
+
+  if (_diffuseTexture) {
+    activeTextures.emplace_back(_diffuseTexture);
+  }
+
+  return activeTextures;
+}
+
+bool CellMaterial::hasTexture(BaseTexture* texture) const
+{
+  if (Material::hasTexture(texture)) {
+    return true;
+  }
+
+  return (_diffuseTexture == texture);
 }
 
 void CellMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)

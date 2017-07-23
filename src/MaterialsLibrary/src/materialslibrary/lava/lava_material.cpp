@@ -270,8 +270,8 @@ void LavaMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   MaterialHelper::BindFogParameters(scene, mesh, _activeEffect);
 
   _lastTime += scene->getEngine()->getDeltaTime();
-  _effect->setFloat("time", Time::fpMillisecondsDuration<float>(_lastTime)
-                              * speed / 1000.f);
+  _effect->setFloat(
+    "time", Time::fpMillisecondsDuration<float>(_lastTime) * speed / 1000.f);
 
   if (!fogColor) {
     fogColor = std::make_unique<Color3>(Color3::Black());
@@ -298,6 +298,29 @@ std::vector<IAnimatable*> LavaMaterial::getAnimatables()
   }
 
   return results;
+}
+
+std::vector<BaseTexture*> LavaMaterial::getActiveTextures() const
+{
+  auto activeTextures = Material::getActiveTextures();
+  if (_diffuseTexture) {
+    activeTextures.emplace_back(_diffuseTexture);
+  }
+
+  return activeTextures;
+}
+
+bool LavaMaterial::hasTexture(BaseTexture* texture) const
+{
+  if (Material::hasTexture(texture)) {
+    return true;
+  }
+
+  if (_diffuseTexture == texture) {
+    return true;
+  }
+
+  return false;
 }
 
 void LavaMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)

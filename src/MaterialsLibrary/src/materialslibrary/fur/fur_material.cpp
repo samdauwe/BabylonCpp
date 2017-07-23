@@ -354,6 +354,38 @@ std::vector<IAnimatable*> FurMaterial::getAnimatables()
   return results;
 }
 
+std::vector<BaseTexture*> FurMaterial::getActiveTextures() const
+{
+  auto activeTextures = Material::getActiveTextures();
+
+  if (_diffuseTexture) {
+    activeTextures.emplace_back(_diffuseTexture);
+  }
+
+  if (_heightTexture) {
+    activeTextures.emplace_back(_heightTexture);
+  }
+
+  return activeTextures;
+}
+
+bool FurMaterial::hasTexture(BaseTexture* texture) const
+{
+  if (Material::hasTexture(texture)) {
+    return true;
+  }
+
+  if (_diffuseTexture == texture) {
+    return true;
+  }
+
+  if (_heightTexture == texture) {
+    return true;
+  }
+
+  return false;
+}
+
 void FurMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
 {
   if (_diffuseTexture) {

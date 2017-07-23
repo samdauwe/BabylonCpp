@@ -381,8 +381,8 @@ void WaterMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   _activeEffect->setMatrix("worldReflectionViewProjection", wrvp);
   _activeEffect->setVector2("windDirection", windDirection);
   _activeEffect->setFloat("waveLength", waveLength);
-  _activeEffect->setFloat("time", Time::fpMillisecondsDuration<float>(_lastTime)
-                                    / 100000.f);
+  _activeEffect->setFloat(
+    "time", Time::fpMillisecondsDuration<float>(_lastTime) / 100000.f);
   _activeEffect->setFloat("windForce", windForce);
   _activeEffect->setFloat("waveHeight", waveHeight);
   _activeEffect->setFloat("bumpHeight", bumpHeight);
@@ -499,6 +499,30 @@ std::vector<IAnimatable*> WaterMaterial::getAnimatables()
   }
 
   return results;
+}
+
+std::vector<BaseTexture*> WaterMaterial::getActiveTextures() const
+{
+  auto activeTextures = Material::getActiveTextures();
+
+  if (_bumpTexture) {
+    activeTextures.emplace_back(_bumpTexture);
+  }
+
+  return activeTextures;
+}
+
+bool WaterMaterial::hasTexture(BaseTexture* texture) const
+{
+  if (Material::hasTexture(texture)) {
+    return true;
+  }
+
+  if (_bumpTexture == texture) {
+    return true;
+  }
+
+  return false;
 }
 
 void WaterMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)

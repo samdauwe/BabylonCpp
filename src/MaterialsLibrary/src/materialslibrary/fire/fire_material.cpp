@@ -270,6 +270,46 @@ std::vector<IAnimatable*> FireMaterial::getAnimatables()
   return results;
 }
 
+std::vector<BaseTexture*> FireMaterial::getActiveTextures() const
+{
+  auto activeTextures = Material::getActiveTextures();
+
+  if (_diffuseTexture) {
+    activeTextures.emplace_back(_diffuseTexture);
+  }
+
+  if (_distortionTexture) {
+    activeTextures.emplace_back(_distortionTexture);
+  }
+
+  if (_opacityTexture) {
+    activeTextures.emplace_back(_opacityTexture);
+  }
+
+  return activeTextures;
+}
+
+bool FireMaterial::hasTexture(BaseTexture* texture) const
+{
+  if (Material::hasTexture(texture)) {
+    return true;
+  }
+
+  if (_diffuseTexture == texture) {
+    return true;
+  }
+
+  if (_distortionTexture == texture) {
+    return true;
+  }
+
+  if (_opacityTexture == texture) {
+    return true;
+  }
+
+  return false;
+}
+
 void FireMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
 {
   if (_diffuseTexture) {

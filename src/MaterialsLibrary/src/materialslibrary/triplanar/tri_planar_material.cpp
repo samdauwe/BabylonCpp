@@ -312,6 +312,69 @@ std::vector<IAnimatable*> TriPlanarMaterial::getAnimatables()
   return results;
 }
 
+std::vector<BaseTexture*> TriPlanarMaterial::getActiveTextures() const
+{
+  auto activeTextures = Material::getActiveTextures();
+
+  if (_diffuseTextureX) {
+    activeTextures.emplace_back(_diffuseTextureX);
+  }
+
+  if (_diffuseTextureY) {
+    activeTextures.emplace_back(_diffuseTextureY);
+  }
+
+  if (_diffuseTextureZ) {
+    activeTextures.emplace_back(_diffuseTextureZ);
+  }
+
+  if (_normalTextureX) {
+    activeTextures.emplace_back(_normalTextureX);
+  }
+
+  if (_normalTextureY) {
+    activeTextures.emplace_back(_normalTextureY);
+  }
+
+  if (_normalTextureZ) {
+    activeTextures.emplace_back(_normalTextureZ);
+  }
+
+  return activeTextures;
+}
+
+bool TriPlanarMaterial::hasTexture(BaseTexture* texture) const
+{
+  if (Material::hasTexture(texture)) {
+    return true;
+  }
+
+  if (_diffuseTextureX == texture) {
+    return true;
+  }
+
+  if (_diffuseTextureY == texture) {
+    return true;
+  }
+
+  if (_diffuseTextureZ == texture) {
+    return true;
+  }
+
+  if (_normalTextureX == texture) {
+    return true;
+  }
+
+  if (_normalTextureY == texture) {
+    return true;
+  }
+
+  if (_normalTextureZ == texture) {
+    return true;
+  }
+  return false;
+}
+
 void TriPlanarMaterial::dispose(bool forceDisposeEffect,
                                 bool forceDisposeTextures)
 {

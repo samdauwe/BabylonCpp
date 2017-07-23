@@ -268,6 +268,30 @@ std::vector<IAnimatable*> SimpleMaterial::getAnimatables()
   return results;
 }
 
+std::vector<BaseTexture*> SimpleMaterial::getActiveTextures() const
+{
+  auto activeTextures = Material::getActiveTextures();
+
+  if (_diffuseTexture) {
+    activeTextures.emplace_back(_diffuseTexture);
+  }
+
+  return activeTextures;
+}
+
+bool SimpleMaterial::hasTexture(BaseTexture* texture) const
+{
+  if (Material::hasTexture(texture)) {
+    return true;
+  }
+
+  if (_diffuseTexture == texture) {
+    return true;
+  }
+
+  return false;
+}
+
 void SimpleMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
 {
   if (_diffuseTexture) {
