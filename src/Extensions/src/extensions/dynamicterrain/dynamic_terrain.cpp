@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/core/logging.h>
 #include <babylon/engine/scene.h>
 #include <babylon/extensions/dynamicterrain/dynamic_terrain_options.h>
 #include <babylon/mesh/mesh.h>
@@ -9,9 +10,20 @@
 #include <babylon/mesh/vertex_buffer.h>
 #include <babylon/mesh/vertex_data.h>
 #include <babylon/mesh/vertex_data_options.h>
+#include <babylon/tools/tools.h>
 
 namespace BABYLON {
 namespace Extensions {
+
+Vector3 DynamicTerrain::_v1    = Vector3::Zero();
+Vector3 DynamicTerrain::_v2    = Vector3::Zero();
+Vector3 DynamicTerrain::_v3    = Vector3::Zero();
+Vector3 DynamicTerrain::_v4    = Vector3::Zero();
+Vector3 DynamicTerrain::_vAvB  = Vector3::Zero();
+Vector3 DynamicTerrain::_vAvC  = Vector3::Zero();
+Vector3 DynamicTerrain::_norm  = Vector3::Zero();
+Vector3 DynamicTerrain::_bbMin = Vector3::Zero();
+Vector3 DynamicTerrain::_bbMax = Vector3::Zero();
 
 DynamicTerrain::DynamicTerrain(const std::string& iName,
                                DynamicTerrainOptions& options, Scene* scene)
@@ -58,15 +70,8 @@ DynamicTerrain::DynamicTerrain(const std::string& iName,
     , _centerLocal{Vector3::Zero()}
     , _mapSizeX{0.f}
     , _mapSizeZ{0.f}
-    , _v1{Vector3::Zero()}
-    , _v2{Vector3::Zero()}
-    , _v3{Vector3::Zero()}
-    , _v4{Vector3::Zero()}
-    , _vAvB{Vector3::Zero()}
-    , _vAvC{Vector3::Zero()}
-    , _norm{Vector3::Zero()}
-    , _bbMin{Vector3::Zero()}
-    , _bbMax{Vector3::Zero()}
+    , _isAlwaysVisible{false}
+    , _precomputeNormalsFromMap{false}
 {
   _terrainSub
     = (options.terrainSub > 0) ? static_cast<unsigned>(options.terrainSub) : 60;
@@ -79,7 +84,6 @@ DynamicTerrain::DynamicTerrain(const std::string& iName,
   // if not defined, it will be still populated by default values
   _mapUVs        = options.mapUVs;
   _mapColors     = options.mapColors;
-  _mapNormals    = options.mapNormals;
   _scene         = scene;
   _terrainCamera = options.camera ? options.camera : scene->activeCamera;
 
@@ -89,6 +93,14 @@ DynamicTerrain::DynamicTerrain(const std::string& iName,
   _colormap = !_mapColors.empty() ? true : false;
   _mapData  = _datamap ? _mapData : Float32Array(_terrainIdx * _terrainIdx * 3);
   _mapUVs   = _uvmap ? _mapUVs : Float32Array(_terrainIdx * _terrainIdx * 2);
+  if (_datamap) {
+    _mapNormals = !options.mapNormals.empty() ?
+                    options.mapNormals :
+                    Float32Array(_mapSubX * _mapSubZ * 3);
+  }
+  else {
+    _mapNormals = Float32Array(_terrainIdx * _terrainIdx * 3);
+  }
 
   // Ribbon creation
   std::size_t index    = 0; // current vertex index in the map array
@@ -170,6 +182,7 @@ DynamicTerrain::DynamicTerrain(const std::string& iName,
   _normals   = _terrain->getVerticesData(VertexBuffer::NormalKind);
   _uvs       = _terrain->getVerticesData(VertexBuffer::UVKind);
   _colors    = _terrain->getVerticesData(VertexBuffer::ColorKind);
+  computeNormalsFromMap();
 
   // update it immediatly and register the update callback function in the
   // render loop
@@ -199,7 +212,7 @@ DynamicTerrain::~DynamicTerrain()
 {
 }
 
-void DynamicTerrain::update(bool force)
+DynamicTerrain& DynamicTerrain::update(bool force)
 {
   _needsUpdate  = false;
   _updateLOD    = false;
@@ -254,6 +267,7 @@ void DynamicTerrain::update(bool force)
   _centerWorld.x = _terrain->position().x + _terrainHalfSizeX;
   _centerWorld.y = _terrain->position().y;
   _centerWorld.z = _terrain->position().z + _terrainHalfSizeZ;
+  return *this;
 }
 
 void DynamicTerrain::_updateTerrain()
@@ -358,7 +372,7 @@ void DynamicTerrain::_updateTerrain()
       _positions[ribbonPosInd2] = _mapData[posIndex + 1];
       _positions[ribbonPosInd3] = _averageSubSizeZ * stepJ;
 
-      if (!_mapNormals.empty()) {
+      if (!_computeNormals) {
         _normals[ribbonPosInd1] = _mapNormals[posIndex];
         _normals[ribbonPosInd2] = _mapNormals[posIndex + 1];
         _normals[ribbonPosInd3] = _mapNormals[posIndex + 2];
@@ -432,7 +446,7 @@ void DynamicTerrain::_updateTerrain()
   // ribbon update
   _terrain->updateVerticesData(VertexBuffer::PositionKind, _positions, false,
                                false);
-  if (_computeNormals && !_mapNormals.empty()) {
+  if (_computeNormals) {
     VertexData::ComputeNormals(_positions, _indices, _normals);
   }
   _terrain->updateVerticesData(VertexBuffer::NormalKind, _normals, false,
@@ -443,7 +457,7 @@ void DynamicTerrain::_updateTerrain()
   _terrain->_boundingInfo->update(*_terrain->_worldMatrix);
 }
 
-void DynamicTerrain::updateTerrainSize()
+DynamicTerrain& DynamicTerrain::updateTerrainSize()
 {
   unsigned int remainder
     = _terrainSub;       // the remaining cells at the general current LOD value
@@ -467,83 +481,267 @@ void DynamicTerrain::updateTerrainSize()
   _terrainSizeZ     = tsz;
   _terrainHalfSizeX = tsx * 0.5f;
   _terrainHalfSizeZ = tsz * 0.5f;
+  return *this;
 }
 
-float DynamicTerrain::getHeightFromMap(float x, float z, const Vector3& normal)
+float DynamicTerrain::getHeightFromMap(float x, float z,
+                                       const Vector3& normal) const
 {
-  const float x0 = _mapData[0];
-  const float z0 = _mapData[2];
+  return DynamicTerrain::_GetHeightFromMap(x, z, _mapData, _mapSubX, _mapSubZ,
+                                           _mapSizeX, _mapSizeZ, normal);
+}
+
+float DynamicTerrain::GetHeightFromMap(float x, float z,
+                                       const Float32Array& mapData,
+                                       unsigned int mapSubX,
+                                       unsigned int mapSubZ,
+                                       const Vector3& normal)
+{
+  const float mapSizeX = std::abs(mapData[(mapSubX - 1) * 3] - mapData[0]);
+  const float mapSizeZ
+    = std::abs(mapData[(mapSubZ - 1) * mapSubX * 3 + 2] - mapData[2]);
+  return DynamicTerrain::_GetHeightFromMap(x, z, mapData, mapSubX, mapSubZ,
+                                           mapSizeX, mapSizeZ, normal);
+}
+
+float DynamicTerrain::_GetHeightFromMap(float x, float z,
+                                        const Float32Array& mapData,
+                                        unsigned int mapSubX,
+                                        unsigned int mapSubZ, float mapSizeX,
+                                        float mapSizeZ, const Vector3& normal)
+{
+  const float x0 = mapData[0];
+  const float z0 = mapData[2];
 
   // reset x and z in the map space so they are between 0 and the axis map size
-  x = x - std::floor((x - x0) / _mapSizeX) * _mapSizeX;
-  z = z - std::floor((z - z0) / _mapSizeZ) * _mapSizeZ;
+  x = x - std::floor((x - x0) / mapSizeX) * mapSizeX;
+  z = z - std::floor((z - z0) / mapSizeZ) * mapSizeZ;
 
   const unsigned int col1
-    = static_cast<unsigned>(std::floor((x - x0) * _mapSubX / _mapSizeX));
+    = static_cast<unsigned>(std::floor((x - x0) * mapSubX / mapSizeX));
   const unsigned int row1
-    = static_cast<unsigned>(std::floor((z - z0) * _mapSubZ / _mapSizeZ));
-  const unsigned int col2 = (col1 + 1) % _mapSubX;
-  const unsigned int row2 = (row1 + 1) % _mapSubZ;
+    = static_cast<unsigned>(std::floor((z - z0) * mapSubZ / mapSizeZ));
+  const unsigned int col2 = (col1 + 1) % mapSubX;
+  const unsigned int row2 = (row1 + 1) % mapSubZ;
   // starting indexes of the positions of 4 vertices defining a quad on the map
-  const unsigned int idx1 = 3 * (row1 * _mapSubX + col1);
-  const unsigned int idx2 = 3 * (row1 * _mapSubX + col2);
-  const unsigned int idx3 = 3 * ((row2)*_mapSubX + col1);
-  const unsigned int idx4 = 3 * ((row2)*_mapSubX + col2);
+  const unsigned int idx1 = 3 * (row1 * mapSubX + col1);
+  const unsigned int idx2 = 3 * (row1 * mapSubX + col2);
+  const unsigned int idx3 = 3 * ((row2)*mapSubX + col1);
+  const unsigned int idx4 = 3 * ((row2)*mapSubX + col2);
 
-  _v1.copyFromFloats(_mapData[idx1], _mapData[idx1 + 1], _mapData[idx1 + 2]);
-  _v2.copyFromFloats(_mapData[idx2], _mapData[idx2 + 1], _mapData[idx2 + 2]);
-  _v3.copyFromFloats(_mapData[idx3], _mapData[idx3 + 1], _mapData[idx3 + 2]);
-  _v4.copyFromFloats(_mapData[idx4], _mapData[idx4 + 1], _mapData[idx4 + 2]);
+  DynamicTerrain::_v1.copyFromFloats(mapData[idx1], mapData[idx1 + 1],
+                                     mapData[idx1 + 2]);
+  DynamicTerrain::_v2.copyFromFloats(mapData[idx2], mapData[idx2 + 1],
+                                     mapData[idx2 + 2]);
+  DynamicTerrain::_v3.copyFromFloats(mapData[idx3], mapData[idx3 + 1],
+                                     mapData[idx3 + 2]);
+  DynamicTerrain::_v4.copyFromFloats(mapData[idx4], mapData[idx4 + 1],
+                                     mapData[idx4 + 2]);
 
-  Vector3 vA = _v1;
+  Vector3 vA = DynamicTerrain::_v1;
   Vector3 vB;
   Vector3 vC;
   Vector3 v;
 
-  const float xv4v1 = _v4.x - _v1.x;
-  const float zv4v1 = _v4.z - _v1.z;
+  const float xv4v1 = DynamicTerrain::_v4.x - DynamicTerrain::_v1.x;
+  const float zv4v1 = DynamicTerrain::_v4.z - DynamicTerrain::_v1.z;
   if (stl_util::almost_equal(xv4v1, 0.f)
       || stl_util::almost_equal(zv4v1, 0.f)) {
-    return _v1.y;
+    return DynamicTerrain::_v1.y;
   }
   const float cd = zv4v1 / xv4v1;
-  const float h  = _v1.z - cd * _v1.x;
+  const float h  = DynamicTerrain::_v1.z - cd * DynamicTerrain::_v1.x;
   if (z < cd * x + h) {
-    vB = _v4;
-    vC = _v2;
+    vB = DynamicTerrain::_v4;
+    vC = DynamicTerrain::_v2;
     v  = vA;
   }
   else {
-    vB = _v3;
-    vC = _v4;
+    vB = DynamicTerrain::_v3;
+    vC = DynamicTerrain::_v4;
     v  = vB;
   }
-  vB.subtractToRef(vA, _vAvB);
-  vC.subtractToRef(vA, _vAvC);
-  Vector3::CrossToRef(_vAvB, _vAvC, _norm);
-  _norm.normalize();
+  vB.subtractToRef(vA, DynamicTerrain::_vAvB);
+  vC.subtractToRef(vA, DynamicTerrain::_vAvC);
+  Vector3::CrossToRef(DynamicTerrain::_vAvB, DynamicTerrain::_vAvC,
+                      DynamicTerrain::_norm);
+  DynamicTerrain::_norm.normalize();
   if (normal != Vector3::Zero()) {
     auto tmpVector = normal;
-    tmpVector.copyFrom(_norm);
+    tmpVector.copyFrom(DynamicTerrain::_norm);
   }
-  const float d = -(_norm.x * v.x + _norm.y * v.y + _norm.z * v.z);
-  float y       = v.y;
-  if (!stl_util::almost_equal(_norm.y, 0.f)) {
-    y = -(_norm.x * x + _norm.z * z + d) / _norm.y;
+  const float d
+    = -(DynamicTerrain::_norm.x * v.x + DynamicTerrain::_norm.y * v.y
+        + DynamicTerrain::_norm.z * v.z);
+  float y = v.y;
+  if (!stl_util::almost_equal(DynamicTerrain::_norm.y, 0.f)) {
+    y = -(DynamicTerrain::_norm.x * x + DynamicTerrain::_norm.z * z + d)
+        / DynamicTerrain::_norm.y;
   }
 
   return y;
 }
 
+void DynamicTerrain::ComputeNormalsFromMapToRef(const Float32Array& mapData,
+                                                unsigned int mapSubX,
+                                                unsigned int mapSubZ,
+                                                Float32Array& normals)
+{
+  Uint32Array mapIndices;
+  auto tmp1Normal = Vector3::Zero();
+  auto tmp2Normal = Vector3::Zero();
+  unsigned int l  = mapSubX * (mapSubZ - 1);
+  for (unsigned int i = 0; i < l; i++) {
+    stl_util::concat(mapIndices, {i + 1, i + mapSubX, i});
+    stl_util::concat(mapIndices, {i + mapSubX, i + 1, i + mapSubX + 1});
+  }
+  VertexData::ComputeNormals(mapData, mapIndices, normals);
+  // seam process
+
+  unsigned int lastIdx  = (mapSubX - 1) * 3;
+  unsigned int colStart = 0;
+  unsigned int colEnd   = 0;
+  for (unsigned int i = 0; i < mapSubZ; ++i) {
+    colStart = i * mapSubX * 3;
+    colEnd   = colStart + lastIdx;
+    DynamicTerrain::GetHeightFromMap(mapData[colStart], mapData[colStart + 2],
+                                     mapData, mapSubX, mapSubZ, tmp1Normal);
+    DynamicTerrain::GetHeightFromMap(mapData[colEnd], mapData[colEnd + 2],
+                                     mapData, mapSubX, mapSubZ, tmp2Normal);
+    tmp1Normal.addInPlace(tmp2Normal).scaleInPlace(0.5f);
+    normals[colStart]     = tmp1Normal.x;
+    normals[colStart + 1] = tmp1Normal.y;
+    normals[colStart + 2] = tmp1Normal.z;
+    normals[colEnd]       = tmp1Normal.x;
+    normals[colEnd + 1]   = tmp1Normal.y;
+    normals[colEnd + 2]   = tmp1Normal.z;
+  }
+}
+
+DynamicTerrain& DynamicTerrain::computeNormalsFromMap()
+{
+  DynamicTerrain::ComputeNormalsFromMapToRef(_mapData, _mapSubX, _mapSubZ,
+                                             _mapNormals);
+  return *this;
+}
+
 bool DynamicTerrain::contains(float x, float z) const
 {
-  if (x < _positions[0] || x > _positions[3 * _terrainIdx]) {
+  if (x < _positions[0] + mesh()->position().x
+      || x > _positions[3 * _terrainIdx] + mesh()->position().x) {
     return false;
   }
-  if (z < _positions[2] || z > _positions[3 * _terrainIdx * _terrainIdx + 2]) {
+  if (z < _positions[2] + mesh()->position().z
+      || z > _positions[3 * _terrainIdx * _terrainIdx + 2]
+               + mesh()->position().z) {
     return false;
   }
   return true;
+}
+
+Float32Array
+DynamicTerrain::CreateMapFromHeightMap(const std::string& heightmapURL,
+                                       const HeightMapOptions& options,
+                                       Scene* scene)
+{
+  const auto subX = options.subX;
+  const auto subZ = options.subZ;
+  Float32Array data(subX * subZ * 3);
+  DynamicTerrain::CreateMapFromHeightMapToRef(heightmapURL, options, data,
+                                              scene);
+  return data;
+}
+
+void DynamicTerrain::CreateMapFromHeightMapToRef(
+  const std::string& heightmapURL, const HeightMapOptions& options,
+  Float32Array& data, Scene* /*scene*/)
+{
+  const auto& width     = options.width;
+  const auto& height    = options.height;
+  const auto& subX      = options.subX;
+  const auto& subZ      = options.subZ;
+  const auto& minHeight = options.minHeight;
+  const auto& maxHeight = options.maxHeight;
+  const auto& offsetX   = options.offsetX;
+  const auto& offsetZ   = options.offsetZ;
+  const auto& filter    = options.colorFilter;
+  const auto& onReady   = options.onReady;
+
+  const auto onload = [&](const Image& img) {
+    // Getting height map data
+    // var canvas = document.createElement("canvas");
+    // var context = canvas.getContext("2d");
+    int bufferWidth  = img.width;
+    int bufferHeight = img.height;
+    // canvas.width = bufferWidth;
+    // canvas.height = bufferHeight;
+    // context.drawImage(img, 0, 0);
+    // Cast is due to wrong definition in lib.d.ts from ts 1.3 -
+    // https://github.com/Microsoft/TypeScript/issues/949
+    // var buffer = <Uint8Array>(<any>context.getImageData(0, 0, bufferWidth,
+    // bufferHeight).data);
+    const Uint8Array& buffer = img.data;
+    float x                  = 0.0;
+    float y                  = 0.0;
+    float z                  = 0.0;
+    for (unsigned int row = 0; row < subZ; row++) {
+      for (unsigned int col = 0; col < subX; col++) {
+        x                = col * width / subX - width * 0.5f;
+        z                = row * height / subZ - height * 0.5f;
+        float heightmapX = ((x + width * 0.5f) / width * (bufferWidth - 1));
+        float heightmapY = (bufferHeight - 1) - ((z + height * 0.5f) / height
+                                                 * (bufferHeight - 1));
+        unsigned int pos
+          = static_cast<unsigned>(heightmapX + heightmapY * bufferWidth) * 4;
+        float gradient = (buffer[pos] * filter.r + buffer[pos + 1] * filter.g
+                          + buffer[pos + 2] * filter.b)
+                         / 255.f;
+        y                = minHeight + (maxHeight - minHeight) * gradient;
+        unsigned int idx = (row * subX + col) * 3;
+        data[idx]        = x + offsetX;
+        data[idx + 1]    = y;
+        data[idx + 2]    = z + offsetZ;
+      }
+    }
+
+    // callback function if any
+    if (onReady) {
+      onReady(data, subX, subZ);
+    }
+  };
+
+  const auto onError
+    = [](const std::string& msg) { BABYLON_LOG_ERROR("Tools", msg); };
+
+  Tools::LoadImage(heightmapURL, onload, onError);
+}
+
+void DynamicTerrain::CreateUVMapToRef(float subX, float subZ,
+                                      Float32Array& mapUVs)
+{
+  for (float h = 0; h < subZ; h++) {
+    for (float w = 0; w < subX; w++) {
+      mapUVs[static_cast<std::size_t>(h * subX + w) * 2]     = w / subX;
+      mapUVs[static_cast<std::size_t>(h * subX + w) * 2 + 1] = h / subZ;
+    }
+  }
+}
+
+Float32Array DynamicTerrain::CreateUVMap(float subX, float subZ)
+{
+  Float32Array mapUVs(static_cast<std::size_t>(subX * subZ * 2));
+  DynamicTerrain::CreateUVMapToRef(subX, subZ, mapUVs);
+  return mapUVs;
+}
+
+/**
+ * Computes and sets the terrain UV map with values to fit the whole map.
+ * Returns the terrain.
+ */
+DynamicTerrain& DynamicTerrain::createUVMap()
+{
+  setMapUVs(DynamicTerrain::CreateUVMap(_mapSubX, _mapSubZ));
+  return *this;
 }
 
 bool DynamicTerrain::refreshEveryFrame() const
@@ -675,11 +873,15 @@ const Float32Array& DynamicTerrain::mapData() const
 void DynamicTerrain::setMapData(const Float32Array& val)
 {
   _mapData  = val;
+  _datamap  = true;
   _mapSizeX = std::abs(_mapData[(_mapSubX - 1) * 3] - _mapData[0]);
   _mapSizeZ
     = std::abs(_mapData[(_mapSubZ - 1) * _mapSubX * 3 + 2] - _mapData[2]);
   _averageSubSizeX = _mapSizeX / _mapSubX;
   _averageSubSizeZ = _mapSizeZ / _mapSubZ;
+  if (_precomputeNormalsFromMap) {
+    computeNormalsFromMap();
+  }
   update(true);
 }
 
@@ -710,6 +912,7 @@ const Float32Array& DynamicTerrain::mapColors() const
 
 void DynamicTerrain::setMapColors(const Float32Array& val)
 {
+  _colormap  = true;
   _mapColors = val;
 }
 
@@ -720,6 +923,7 @@ const Float32Array& DynamicTerrain::mapUVs() const
 
 void DynamicTerrain::setMapUVs(const Float32Array& val)
 {
+  _uvmap  = true;
   _mapUVs = val;
 }
 
@@ -751,6 +955,27 @@ bool DynamicTerrain::useCustomVertexFunction() const
 void DynamicTerrain::useCustomVertexFunction(bool val)
 {
   _useCustomVertexFunction = val;
+}
+
+bool DynamicTerrain::isAlwaysVisible() const
+{
+  return _isAlwaysVisible;
+}
+
+void DynamicTerrain::setIsAlwaysVisible(bool val)
+{
+  mesh()->alwaysSelectAsActiveMesh = val;
+  _isAlwaysVisible                 = val;
+}
+
+bool DynamicTerrain::precomputeNormalsFromMap() const
+{
+  return _precomputeNormalsFromMap;
+}
+
+void DynamicTerrain::setPrecomputeNormalsFromMap(bool val)
+{
+  _precomputeNormalsFromMap = val;
 }
 
 void DynamicTerrain::updateVertex(DynamicTerrainVertex& /*vertex*/,

@@ -2,6 +2,7 @@
 #define BABYLON_EXTENSIONS_DYNAMIC_TERRAIN_DYNAMIC_TERRAIN_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/math/color3.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector3.h>
@@ -26,7 +27,34 @@ struct DynamicTerrainVertex {
   Vector3 worldPosition = Vector3::Zero();
   // current map index
   unsigned int mapIndex;
-}; // end of struct
+}; // end of struct DynamicTerrainVertex
+
+struct HeightMapOptions {
+  // Map width
+  float width = 300.f;
+  // Map height
+  float height = 300.f;
+  // The wanted number of points along the map width (default 100)
+  unsigned int subX = 100;
+  // The wanted number of points along the map height (default 100)
+  unsigned int subZ = 100;
+  // Minimum altitude of the map (default 0)
+  float minHeight = 0.f;
+  // Maximum altitude of the map (default 10)
+  float maxHeight = 10.f;
+  // The filter to apply to the image pixel colors to compute the height
+  // (default Color3(0.3, 0.59, 0.11))
+  Color3 colorFilter = Color3(0.3f, 0.59f, 0.11f);
+  // Offset in the X direction
+  float offsetX = 0.f;
+  // Offset in the Z direction
+  float offsetZ = 0.f;
+  // An optional callback function, called once the map is computed. It's passed
+  // the computed map.
+  std::function<void(const Float32Array& map, unsigned int subX,
+                     unsigned int subZ)>
+    onReady = nullptr;
+}; // end of struct HeightMapOptions
 
 /**
  * @brief The DynamicTerrain class provides a way to display a terrain
@@ -56,24 +84,70 @@ public:
    * @brief Updates the terrain position and shape according to the camera
    * position.
    * @param force Forces the terrain update even if no camera position change.
+   * @returns The terrain.
    */
-  void update(bool force);
+  DynamicTerrain& update(bool force);
 
   /**
    * @brief Updates the mesh terrain size according to the LOD limits and the
    * camera position.
+   * Returns The terrain.
    */
-  void updateTerrainSize();
+  DynamicTerrain& updateTerrainSize();
 
   /**
-   * @brief Returns the altitude at the coordinates (x, z) of the map.
+   * @brief Returns the altitude (float) at the coordinates (x, z) of the map.
    * @param x
    * @param z
-   * @param normal
-   * @return The altitude at the coordinates (x, z) of the map.
+   * @param {normal: Vector3} (optional)
+   * If the optional object {normal: Vector3} is passed, then its property
+   * "normal" is updated with the normal vector value at the coordinates (x, z).
+   * @returns The altitude (float) at the coordinates (x, z) of the passed map.
    */
-  float getHeightFromMap(float x, float z,
-                         const Vector3& normal = Vector3::Zero());
+  float getHeightFromMap(float x, float z, const Vector3& normal) const;
+
+  /**
+   * @brief Returns the altitude (float) at the coordinates (x, z) of the passed
+   * map.
+   * @param x
+   * @param z
+   * @param mapSubX the number of points along the map width
+   * @param mapSubX the number of points along the map height
+   * @param {normal: Vector3} (optional)
+   * If the optional object {normal: Vector3} is passed, then its property
+   * "normal" is updated with the normal vector value at the coordinates (x, z).
+   * @returns The altitude (float) at the coordinates (x, z) of the passed map.
+   */
+  static float GetHeightFromMap(float x, float z, const Float32Array& mapData,
+                                unsigned int mapSubX, unsigned int mapSubZ,
+                                const Vector3& normal = Vector3::Zero());
+
+  /**
+   * @brief Computes the height and optionnally the normal at the coordinates
+   * (x,z) from the passed map.
+   * @returns The altitude at the coordinates (x, z) of the map.
+   */
+  static float _GetHeightFromMap(float x, float z, const Float32Array& mapData,
+                                 unsigned int mapSubX, unsigned int mapSubZ,
+                                 float mapSizeX, float mapSizeZ,
+                                 const Vector3& normal = Vector3::Zero());
+
+  /**
+   * @brief Computes all the normals from the terrain data map  and stores them
+   * in the passed Float32Array reference.
+   * This passed array must have the same size than the mapData array.
+   */
+  static void ComputeNormalsFromMapToRef(const Float32Array& mapData,
+                                         unsigned int mapSubX,
+                                         unsigned int mapSubZ,
+                                         Float32Array& normals);
+
+  /**
+   * @brief Computes all the map normals from the current terrain data map and
+   * sets them to the terrain.
+   * @returns The terrain.
+   */
+  DynamicTerrain& computeNormalsFromMap();
 
   /**
    * @brief Returns true if the World coordinates (x, z) are in the current
@@ -83,6 +157,71 @@ public:
    * @return
    */
   bool contains(float x, float z) const;
+
+  /**
+   * @brief Returns a new data map from the passed heightmap image file.
+   * @param width map width size (positive float, default 300)
+   * @param height map height size (positive float, default 300)
+   * @param subX is the wanted number of points along the map width (default
+   * 100).
+   * @param subZ is the wanted number of points along the map height (default
+   * 100).
+   * @param minHeight is the minimum altitude of the map (float, default 0).
+   * @param maxHeight is the maximum altitude of the map (float, default 10).
+   * @param colorFilter is the filter to apply to the image pixel colors to
+   * compute the height (optional Color3, default (0.3, 0.59, 0.11) ).
+   * @param onReady is an optional callback function, called once the map is
+   * computed. It's passed the computed map.
+   * @param scene is the Scene object whose database will store the downloaded
+   * image.
+   */
+  static Float32Array CreateMapFromHeightMap(const std::string& heightmapURL,
+                                             const HeightMapOptions& options,
+                                             Scene* scene);
+
+  /**
+   * @brief Updates the passed array or Float32Array with a data map computed
+   * from the passed heightmap image file.
+   * @param width map width size (positive float, default 300)
+   * @param height map height size (positive float, default 300)
+   * @param subX is the wanted number of points along the map width (default
+   * 100).
+   * @param subZ is the wanted number of points along the map height (default
+   * 100).
+   * @param minHeight is the minimum altitude of the map (float, default 0).
+   * @param maxHeight is the maximum altitude of the map (float, default 10).
+   * @param colorFilter is the filter to apply to the image pixel colors to
+   * compute the height (optional Color3, default (0.3, 0.59, 0.11) ).
+   * @param onReady is an optional callback function, called once the map is
+   * computed. It's passed the computed map.
+   * @param data Float32Array must be the right size : 3 x subX x subZ.
+   * @param scene is the Scene object whose database will store the downloaded
+   * image.
+   */
+  static void CreateMapFromHeightMapToRef(const std::string& heightmapURL,
+                                          const HeightMapOptions& options,
+                                          Float32Array& data, Scene* scene);
+
+  /**
+   * @brief Updates the passed arrays with UVs values to fit the whole map
+   * with
+   * subX points along its width and subZ points along its height.
+   * The passed array must be the right size : subX x subZ x 2.
+   */
+  static void CreateUVMapToRef(float subX, float subZ, Float32Array& mapUVs);
+
+  /**
+   * @brief Returns a new UV array with values to fit the whole map with subX
+   * points along its width and subZ points along its height.
+   */
+  static Float32Array CreateUVMap(float subX, float subZ);
+
+  /**
+   * @brief Computes and sets the terrain UV map with values to fit the whole
+   * map.
+   * @returns The terrain.
+   */
+  DynamicTerrain& createUVMap();
 
   // Getters / Setters
 
@@ -248,17 +387,34 @@ public:
   void setMapNormals(const Float32Array& val);
 
   /**
-   * Must the normals be recomputed on each terrain update (default : true)
+   * @brief Must the normals be recomputed on each terrain update (default :
+   * false).
+   * By default, all the map normals are pre-computed on terrain creation.
    */
   bool computeNormals() const;
   void setComputeNormals(bool val);
 
   /**
-   * Will the custom function updateVertex() be called on each terrain update ?
+   * @brief Will the custom function updateVertex() be called on each terrain
+   * update ?
    * Default false.
    */
   bool useCustomVertexFunction() const;
   void useCustomVertexFunction(bool val);
+
+  /**
+   * @brief Is the terrain always directly selected for rendering ?
+   */
+  bool isAlwaysVisible() const;
+  void setIsAlwaysVisible(bool val);
+
+  /**
+   * @brief When assigning a new data map to the existing, shall the normals be
+   * automatically precomputed once ?
+   * Default false.
+   */
+  bool precomputeNormalsFromMap() const;
+  void setPrecomputeNormalsFromMap(bool val);
 
   // User custom functions.
   // These following can be overwritten bu the user to fit his needs.
@@ -412,16 +568,18 @@ private:
   float _mapSizeZ;
   // reference to the ribbon
   Mesh* _terrain;
+  bool _isAlwaysVisible;
+  bool _precomputeNormalsFromMap;
   // tmp vectors
-  Vector3 _v1;
-  Vector3 _v2;
-  Vector3 _v3;
-  Vector3 _v4;
-  Vector3 _vAvB;
-  Vector3 _vAvC;
-  Vector3 _norm;
-  Vector3 _bbMin;
-  Vector3 _bbMax;
+  static Vector3 _v1;
+  static Vector3 _v2;
+  static Vector3 _v3;
+  static Vector3 _v4;
+  static Vector3 _vAvB;
+  static Vector3 _vAvC;
+  static Vector3 _norm;
+  static Vector3 _bbMin;
+  static Vector3 _bbMax;
 
 }; // end of class DynamicTerrain
 
