@@ -217,6 +217,69 @@ MinMaxVector2 Tools::ExtractMinAndMaxVector2(
   return {minimum, maximum};
 }
 
+Image Tools::CreateCheckerboardImage(unsigned int size)
+{
+  const int width         = static_cast<int>(size);
+  const int height        = static_cast<int>(size);
+  const int depth         = 4;
+  const unsigned int mode = GL::RGBA;
+
+  Uint8Array imageData(static_cast<std::size_t>(width * height * depth));
+
+  std::uint8_t r = 0;
+  std::uint8_t g = 0;
+  std::uint8_t b = 0;
+
+  for (unsigned int x = 0; x < size; ++x) {
+    float xf = static_cast<float>(x);
+    for (unsigned int y = 0; y < size; ++y) {
+      float yf              = static_cast<float>(y);
+      unsigned int position = (x + size * y) * 4;
+      auto floorX = static_cast<std::uint8_t>(std::floor(xf / (size / 8.f)));
+      auto floorY = static_cast<std::uint8_t>(std::floor(yf / (size / 8.f)));
+
+      if ((floorX + floorY) % 2 == 0) {
+        r = g = b = 255;
+      }
+      else {
+        r = 255;
+        g = b = 0;
+      }
+
+      imageData[position + 0] = r;
+      imageData[position + 1] = g;
+      imageData[position + 2] = b;
+      imageData[position + 3] = 255;
+    }
+  }
+
+  return Image(imageData, width, height, depth, mode);
+}
+
+Image Tools::CreateNoiseImage(unsigned int size)
+{
+  const int width         = static_cast<int>(size);
+  const int height        = static_cast<int>(size);
+  const int depth         = 4;
+  const unsigned int mode = GL::RGBA;
+
+  const std::size_t totalPixelsCount = size * size * 4;
+  Uint8Array imageData(totalPixelsCount);
+  const auto randomNumbers = Math::randomList(0.f, 1.f, totalPixelsCount);
+
+  std::uint8_t value = 0;
+  for (std::size_t i = 0; i < totalPixelsCount; i += 4) {
+    value = static_cast<std::uint8_t>(
+      std::floor((randomNumbers[i] * (0.02f - 0.95f) + 0.95f) * 255.f));
+    imageData[i]     = value;
+    imageData[i + 1] = value;
+    imageData[i + 2] = value;
+    imageData[i + 3] = 255;
+  }
+
+  return Image(imageData, width, height, depth, mode);
+}
+
 void Tools::LoadImage(
   const std::string& url, const std::function<void(const Image& img)>& onLoad,
   const std::function<void(const std::string& msg)>& onError,
@@ -283,8 +346,7 @@ std::string Tools::RandomId()
     {8, 9, 10, 11, 8, 9, 10, 11, 8, 9, 10, 11, 8, 9, 10, 11}};
   const std::array<char, 16> hex{{'0', '1', '2', '3', '4', '5', '6', '7', '8',
                                   '9', 'a', 'b', 'c', 'd', 'e', 'f'}};
-  const std::vector<float> randomFloats
-    = Math::randomList(0.f, 1.f, randomId.size());
+  const auto randomFloats = Math::randomList(0.f, 1.f, randomId.size());
   for (unsigned int i = 0; i < randomId.size(); ++i) {
     const char c = randomId[i];
     if (c == 'x' || c == 'y') {

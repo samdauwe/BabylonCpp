@@ -68,6 +68,8 @@ struct BABYLON_SHARED_EXPORT Tools {
   static MinMaxVector2 ExtractMinAndMaxVector2(
     const std::function<Nullable<Vector2>(std::size_t index)>& feeder,
     const Vector2& bias);
+  static Image CreateCheckerboardImage(unsigned int size = 256);
+  static Image CreateNoiseImage(unsigned int size = 8);
   static void
   LoadImage(const std::string& url,
             const std::function<void(const Image& img)>& onLoad,
