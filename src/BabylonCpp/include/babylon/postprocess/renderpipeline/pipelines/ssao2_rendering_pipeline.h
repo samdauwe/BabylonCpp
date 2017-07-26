@@ -43,7 +43,7 @@ public:
 
 public:
   /**
-   * Constructor
+   * @brief Constructor
    * @param {string} name - The rendering pipeline name
    * @param {BABYLON.Scene} scene - The scene linked to this pipeline
    * @param {any} ratio - The size of the postprocesses. Can be a number shared
@@ -67,8 +67,8 @@ public:
   static bool IsSupported();
 
   /**
-   * Removes the internal pipeline assets and detatches the pipeline from the
-   * scene cameras
+   * @brief Removes the internal pipeline assets and detatches the pipeline from
+   * the scene cameras.
    */
   void dispose(bool disableGeometryBufferRenderer = false) override;
 

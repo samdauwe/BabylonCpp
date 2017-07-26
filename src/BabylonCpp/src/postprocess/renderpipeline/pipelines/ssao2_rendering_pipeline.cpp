@@ -159,9 +159,8 @@ void SSAO2RenderingPipeline::dispose(bool disableGeometryBufferRenderer)
     _scene->disableGeometryBufferRenderer();
   }
 
-  // TODO FIXME
-  //_scene->postProcessRenderPipelineManager->detachCamerasFromRenderPipeline(
-  //  _name, _scene->cameras);
+  _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(
+    _name, stl_util::to_raw_ptr_vector(_scene->cameras));
 }
 
 void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio,
@@ -272,10 +271,9 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
     effect->setFloat("far", _scene->activeCamera->maxZ);
     effect->setFloat(
       "xViewport",
-      std::tan(_scene->activeCamera->fov / 2.f) * _scene->activeCamera->minZ
+      std::tan(_scene->activeCamera->fov / 2.f)
         * _scene->getEngine()->getAspectRatio(_scene->activeCamera, true));
-    effect->setFloat("yViewport", std::tan(_scene->activeCamera->fov / 2.f)
-                                    * _scene->activeCamera->minZ);
+    effect->setFloat("yViewport", std::tan(_scene->activeCamera->fov / 2.f));
     effect->setMatrix("projection", _scene->getProjectionMatrix());
 
     effect->setTexture("textureSampler", _depthTexture);
