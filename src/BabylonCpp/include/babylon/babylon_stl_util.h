@@ -209,6 +209,17 @@ inline std::vector<T> to_vector(const T& t0, const Ts&... ts)
   return std::vector<T>{t0, ts...};
 }
 
+template <typename T>
+inline std::vector<T*>
+to_raw_ptr_vector(const std::vector<std::unique_ptr<T>>& c)
+{
+  std::vector<T*> result;
+  result.reserve(c.size());
+  std::transform(c.begin(), c.end(), std::back_inserter(result),
+                 [](const std::unique_ptr<T>& ci) { return ci.get(); });
+  return result;
+}
+
 /**
  * The concat() method is used to join two or more arrays.
  * Note: This method does not change the existing arrays, but returns a new
