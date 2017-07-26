@@ -8,7 +8,10 @@
 #include <babylon/mesh/vertex_buffer.h>
 #ifdef __GNUC__
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion" // conversion from int to char
+// Conversion from int to char
+#pragma GCC diagnostic ignored "-Wconversion"
+// Use of GNU statement expression extension
+#pragma GCC diagnostic ignored "-Wgnu"
 #endif
 #include <earcut.hpp>
 #ifdef __GNUC__
@@ -77,8 +80,9 @@ Mesh* PolygonMeshBuilder::build(bool updatable, float depth)
   for (auto& p : pointElements) {
     stl_util::concat(normals, {0.f, 1.f, 0.f});
     stl_util::concat(positions, {p.x, 0.f, p.y});
-    stl_util::concat(uvs, {(p.x - bounds.min.x) / bounds.width,
-                           (p.y - bounds.min.y) / bounds.height});
+    stl_util::concat(uvs,
+                     {(p.x - bounds.min.x) / bounds.width,
+                      (p.y - bounds.min.y) / bounds.height});
   }
 
   auto addHoles
@@ -129,8 +133,9 @@ Mesh* PolygonMeshBuilder::build(bool updatable, float depth)
     for (auto& p : pointElements) { // add the elements at the depth
       stl_util::concat(normals, {0.f, -1.f, 0.f});
       stl_util::concat(positions, {p.x, -depth, p.y});
-      stl_util::concat(uvs, {1.f - (p.x - bounds.min.x) / bounds.width,
-                             1.f - (p.y - bounds.min.y) / bounds.height});
+      stl_util::concat(uvs,
+                       {1.f - (p.x - bounds.min.x) / bounds.width,
+                        1.f - (p.y - bounds.min.y) / bounds.height});
     }
 
     size_t totalCount = indices.size();
