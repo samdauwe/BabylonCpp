@@ -12,7 +12,6 @@
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material.h>
-#include <babylon/materials/pbr_material.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture_constants.h>

@@ -31,7 +31,6 @@
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/multi_material.h>
-#include <babylon/materials/pbr_material.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/multi_render_target.h>
@@ -3121,7 +3120,7 @@ void Scene::createDefaultCameraOrLight(bool createArcRotateCamera, bool replace,
 }
 
 Mesh* Scene::createDefaultSkybox(BaseTexture* iEnvironmentTexture, bool pbr,
-                                 float scale, float blur)
+                                 float scale, float /*blur*/)
 {
   if (environmentTexture()) {
     setEnvironmentTexture(iEnvironmentTexture);
@@ -3136,6 +3135,7 @@ Mesh* Scene::createDefaultSkybox(BaseTexture* iEnvironmentTexture, bool pbr,
   // Skybox
   auto hdrSkybox = Mesh::CreateBox("hdrSkyBox", scale, this);
   if (pbr) {
+#if 0
     auto hdrSkyboxMaterial = PBRMaterial::New("skyBox", this);
     hdrSkyboxMaterial->setBackFaceCulling(false);
     // hdrSkyboxMaterial->reflectionTexture = environmentTexture();
@@ -3146,6 +3146,7 @@ Mesh* Scene::createDefaultSkybox(BaseTexture* iEnvironmentTexture, bool pbr,
     hdrSkyboxMaterial->twoSidedLighting = true;
     hdrSkybox->infiniteDistance         = true;
     hdrSkybox->setMaterial(hdrSkyboxMaterial);
+#endif
   }
   else {
     auto skyboxMaterial = StandardMaterial::New("skyBox", this);
