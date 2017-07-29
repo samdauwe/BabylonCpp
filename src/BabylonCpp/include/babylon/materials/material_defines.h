@@ -50,6 +50,12 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   unsigned int BUMPDIRECTUV;
   unsigned int LIGHTMAPDIRECTUV;
 
+  // PBR Material
+  unsigned int ALBEDODIRECTUV;
+  unsigned int REFLECTIVITYDIRECTUV;
+  unsigned int MICROSURFACEMAPDIRECTUV;
+  float ALPHATESTVALUE;
+
   std::vector<bool> lights;
   std::vector<bool> pointlights;
   std::vector<bool> dirlights;
