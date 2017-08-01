@@ -106,7 +106,7 @@ void PBRMaterialDefines::reset()
 {
   MaterialDefines::reset();
   ALPHATESTVALUE = 0.5f;
-  PBR            = true;
+  defines[PBR]   = true;
 }
 
 } // end of namespace BABYLON
