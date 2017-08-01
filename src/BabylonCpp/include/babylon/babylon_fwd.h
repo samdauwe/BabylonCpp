@@ -216,6 +216,13 @@ struct ShaderMaterialOptions;
 class StandardMaterial;
 struct StandardMaterialDefines;
 class UniformBuffer;
+// - PBR
+class PBRBaseMaterial;
+class PBRBaseSimpleMaterial;
+class PBRMaterial;
+struct PBRMaterialDefines;
+class PBRMetallicRoughnessMaterial;
+class PBRSpecularGlossinessMaterial;
 // - Textures
 class BaseTexture;
 class ColorGradingTexture;

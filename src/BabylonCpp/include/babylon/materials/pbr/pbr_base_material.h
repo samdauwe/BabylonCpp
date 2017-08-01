@@ -2,7 +2,9 @@
 #define BABYLON_MATERIALS_PBR_PBR_BASE_MATERIAL_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/push_material.h>
+#include <babylon/math/vector4.h>
 
 namespace BABYLON {
 
@@ -14,6 +16,9 @@ namespace BABYLON {
  * http://doc.babylonjs.com/extensions/Physically_Based_Rendering
  */
 class BABYLON_SHARED_EXPORT PBRBaseMaterial : public PushMaterial {
+
+public:
+  using PMD = PBRMaterialDefines;
 
 public:
   /**
@@ -29,19 +34,21 @@ public:
 
   bool useLogarithmicDepth() const;
   void setUseLogarithmicDepth(bool value);
-  bool needAlphaBlending() const;
-  bool needAlphaTesting() const;
-  BaseTexture* getAlphaTestTexture() const;
-  bool isReadyForSubMesh(AbstractMesh* mesh, SubMesh* subMesh,
-                         bool useInstances = false) const;
+  bool needAlphaBlending() override;
+  bool needAlphaTesting() override;
+  BaseTexture* getAlphaTestTexture() override;
+  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
+                         bool useInstances = false) override;
   void buildUniformLayout();
-  void unbind();
-  void bindOnlyWorldMatrix(const Matrix& world);
-  void bindForSubMesh(const Matrix& world, Mesh* mesh, SubMesh* subMesh);
+  void unbind() override;
+  void bindOnlyWorldMatrix(Matrix& world) override;
+  void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatable*> getAnimatables() const;
-  void dispose(bool forceDisposeEffect = false, bool forceDisposeTextures);
+  void dispose(bool forceDisposeEffect   = false,
+               bool forceDisposeTextures = false) override;
 
 protected:
+  void _attachImageProcessingConfiguration();
   /**
    * @brief Attaches a new image processing configuration to the PBR Material.
    * @param configuration
@@ -87,7 +94,7 @@ protected:
   /**
    * Debug Control allowing disabling the bump map on this material.
    */
-  float _disableBumpMap;
+  bool _disableBumpMap;
 
   /**
    * AKA Diffuse Texture in standard nomenclature.
