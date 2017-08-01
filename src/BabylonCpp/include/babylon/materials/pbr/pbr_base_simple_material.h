@@ -2,7 +2,7 @@
 #define BABYLON_MATERIALS_PBR_PBR_BASE_SIMPLE_MATERIAL_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/materials/push_material.h>
+#include <babylon/materials/pbr/pbr_base_material.h>
 
 namespace BABYLON {
 namespace Internals {

@@ -2,6 +2,7 @@
 #define BABYLON_MATERIALS_PBR_PBR_METALLIC_ROUGHNESS_MATERIAL_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/materials/pbr/pbr_base_simple_material.h>
 
 namespace BABYLON {
 
