@@ -18,8 +18,114 @@ namespace Internals {
 class BABYLON_SHARED_EXPORT PBRBaseSimpleMaterial : public PBRBaseMaterial {
 
 public:
-  PBRBaseSimpleMaterial();
+  /**
+   * @brief Instantiates a new PBRMaterial instance.
+   *
+   * @param name The material name
+   * @param scene The scene the material will be use in.
+   */
+  PBRBaseSimpleMaterial(const std::string& name, Scene* scene);
   ~PBRBaseSimpleMaterial();
+
+  /**
+   * @brief Gets the current transparency mode.
+   */
+  unsigned int transparencyMode() const;
+
+  /**
+   * @brief Sets the transparency mode of the material.
+   */
+  void setTransparencyMode(unsigned int value);
+
+  /**
+   * @brief Gets the current double sided mode.
+   */
+  bool doubleSided() const;
+
+  /**
+   * @brief If sets to true and backfaceCulling is false, normals will be
+   * flipped on the backside.
+   */
+  void setDoubleSided(bool value);
+
+  /**
+   * @brief Specifies wether or not the meshes using this material should be
+   * rendered in alpha blend mode.
+   */
+  bool needAlphaBlending() override;
+
+  /**
+   * @brief Specifies wether or not the meshes using this material should be
+   * rendered in alpha test mode.
+   */
+  bool needAlphaTesting() override;
+
+protected:
+  /**
+   * Specifies wether or not the alpha value of the albedo texture should be
+   * used.
+   */
+  bool _shouldUseAlphaFromAlbedoTexture() const;
+
+public:
+  /**
+   * Number of Simultaneous lights allowed on the material.
+   */
+  unsigned int maxSimultaneousLights;
+
+  /**
+   * If sets to true, disables all the lights affecting the material.
+   */
+  bool disableLighting;
+
+  /**
+   * Environment Texture used in the material (this is use for both reflection
+   * and environment lighting).
+   */
+  BaseTexture* environmentTexture;
+
+  /**
+   * If sets to true, x component of normal map value will invert (x = 1.0 - x).
+   */
+  bool invertNormalMapX;
+
+  /**
+   * If sets to true, y component of normal map value will invert (y = 1.0 - y).
+   */
+  bool invertNormalMapY;
+
+  /**
+   * Normal map used in the model.
+   */
+  BaseTexture* normalTexture;
+
+  /**
+   * Emissivie color used to self-illuminate the model.
+   */
+  Color3 emissiveColor;
+
+  /**
+   * Emissivie texture used to self-illuminate the model.
+   */
+  BaseTexture* emissiveTexture;
+
+  /**
+   * Occlusion Channel Strenght.
+   */
+  float occlusionStrength;
+
+  /**
+   * Occlusion Texture of the material (adding extra occlusion effects).
+   */
+  BaseTexture* occlusionTexture;
+
+  /**
+   * Defines the alpha limits in alpha test mode.
+   */
+  float alphaCutOff;
+
+protected:
+  unsigned int _transparencyMode;
 
 }; // end of class PBRBaseSimpleMaterial
 
