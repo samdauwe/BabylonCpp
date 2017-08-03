@@ -69,6 +69,7 @@ public:
    * material.
    */
   ImageProcessingConfiguration& imageProcessingConfiguration();
+  const ImageProcessingConfiguration& imageProcessingConfiguration() const;
 
   /**
    * @brief Sets the Default image processing configuration used either in the
@@ -76,8 +77,7 @@ public:
    *
    * If sets to null, the scene one is in use.
    */
-  void setImageProcessingConfiguration(
-    ImageProcessingConfiguration& ImageProcessingConfiguration);
+  void setImageProcessingConfiguration(ImageProcessingConfiguration& value);
 
   /**
    * @brief Gets wether the color curves effect is enabled.
