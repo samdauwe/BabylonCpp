@@ -37,7 +37,7 @@ public:
 
   bool hasTexture(BaseTexture* texture) const;
 
-  PBRMetallicRoughnessMaterial* clone(const std::string& name);
+  PBRSpecularGlossinessMaterial* clone(const std::string& name);
 
   /**
    * @brief Serialize the material to a parsable JSON object.
@@ -52,37 +52,33 @@ public:
 
 public:
   /**
-   * The base color has two different interpretations depending on the value of
-   * metalness.
-   * When the material is a metal, the base color is the specific measured
-   * reflectance value at normal incidence (F0). For a non-metal the base color
-   * represents the reflected diffuse color of the material.
+   * Specifies the diffuse color of the material.
    */
-  Color3 baseColor;
+  Color3 diffuseColor;
 
   /**
-   * Base texture of the metallic workflow. It contains both the baseColor
-   * information in RGB as well as opacity information in the alpha channel.
+   * Specifies the diffuse texture of the material. This can also contains the
+   * opcity value in its alpha channel.
    */
-  BaseTexture* baseTexture;
+  BaseTexture* diffuseTexture;
 
   /**
-   * Specifies the metallic scalar value of the material.
-   * Can also be used to scale the metalness values of the metallic texture.
+   * Specifies the specular color of the material. This indicates how reflective
+   * is the material (none to mirror).
    */
-  float metallic;
+  Color3 specularColor;
 
   /**
-   * Specifies the roughness scalar value of the material.
-   * Can also be used to scale the roughness values of the metallic texture.
+   * Specifies the glossiness of the material. This indicates "how sharp is the
+   * reflection".
    */
-  float roughness;
+  float glossiness;
 
   /**
-   * Texture containing both the metallic value in the B channel and the
-   * roughness value in the G channel to keep better precision.
+   * Specifies both the specular color RGB and the glossiness A of the material
+   * per pixels.
    */
-  BaseTexture* metallicRoughnessTexture;
+  BaseTexture* specularGlossinessTexture;
 
 }; // end of class PBRSpecularGlossinessMaterial
 
