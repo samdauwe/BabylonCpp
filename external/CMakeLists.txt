@@ -12,12 +12,6 @@ set(EARCUT_HPP_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/earcut.hpp/include/mapbox
     CACHE INTERNAL "Include directories of Earcut hpp")
 
-# GLEW (The OpenGL Extension Wrangler Library).
-add_subdirectory(glxw)
-set(GLEW_INCLUDE_DIRS
-    ${CMAKE_BINARY_DIR}/external/glew/include
-    CACHE INTERNAL "Include directories of GLEW")
-
 # GLFW (Free, open source, portable framework for OpenGL application development).
 SET(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries" FORCE)
 SET(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "Build the GLFW example programs" FORCE)
