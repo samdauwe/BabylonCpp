@@ -61,10 +61,10 @@ This code results in the following scene:
 ![Basic scene](assets/screenshots/basic_scene.png?raw=true "Basic scene")
 
 ### Dependencies ###
-* `CMake`
+* `CMake` (>= 3.5)
 * `Earcut` polygon triangulation library
 * `Google Test` for unit tests (Optional)
-* `GLFW`, `GLXW` and `dear imgui` for the examples
+* `GLFW` and `GLEW` for the examples
 
 ### Supported Compilers ###
 * GCC >= 5.0.0
