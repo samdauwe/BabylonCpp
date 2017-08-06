@@ -2,7 +2,6 @@
 #define BABYLON_MATERIALS_PBR_PBR_BASE_MATERIAL_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/math/vector4.h>
 
@@ -48,13 +47,12 @@ public:
                bool forceDisposeTextures = false) override;
 
 protected:
-  void _attachImageProcessingConfiguration();
   /**
    * @brief Attaches a new image processing configuration to the PBR Material.
    * @param configuration
    */
   void _attachImageProcessingConfiguration(
-    const ImageProcessingConfiguration& configuration);
+    ImageProcessingConfiguration* configuration);
 
   bool _shouldUseAlphaFromAlbedoTexture() const;
 
@@ -346,7 +344,7 @@ protected:
    * Default configuration related to image processing available in the PBR
    * Material.
    */
-  ImageProcessingConfiguration _imageProcessingConfiguration;
+  ImageProcessingConfiguration* _imageProcessingConfiguration;
 
 private:
   static Color3 _scaledReflectivity;
@@ -354,7 +352,7 @@ private:
   /**
    * Keep track of the image processing observer to allow dispose and replace.
    */
-  Observer<ImageProcessingConfiguration> _imageProcessingObserver;
+  Observer<ImageProcessingConfiguration>::Ptr _imageProcessingObserver;
   std::vector<RenderTargetTexture*> _renderTargets;
   Matrix _worldViewProjectionMatrix;
   Color3 _globalAmbientColor;

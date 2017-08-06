@@ -7,7 +7,9 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/material_helper.h>
+#include <babylon/materials/pbr/pbr_material.h>
 #include <babylon/materials/pbr/pbr_material_defines.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/base_texture.h>
@@ -21,6 +23,8 @@
 #include <babylon/tools/texture_tools.h>
 
 namespace BABYLON {
+
+Color3 PBRBaseMaterial::_scaledReflectivity = Color3();
 
 PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
@@ -81,21 +85,24 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
                              _environmentIntensity, _specularIntensity)}
     , _worldViewProjectionMatrix{Matrix::Zero()}
     , _globalAmbientColor{Color3(0, 0, 0)}
+    , _renderId{-1}
 {
   // Setup the default processing configuration to the scene.
-  _attachImageProcessingConfiguration();
+  _attachImageProcessingConfiguration(nullptr);
 
   getRenderTargetTextures = [this]() {
     _renderTargets.clear();
 
     if (StandardMaterial::ReflectionTextureEnabled() && _reflectionTexture
         && _reflectionTexture->isRenderTarget) {
-      _renderTargets.emplace_back(_reflectionTexture);
+      _renderTargets.emplace_back(
+        static_cast<RenderTargetTexture*>(_reflectionTexture));
     }
 
     if (StandardMaterial::RefractionTextureEnabled() && _refractionTexture
         && _refractionTexture->isRenderTarget) {
-      _renderTargets.emplace_back(_refractionTexture);
+      _renderTargets.emplace_back(
+        static_cast<RenderTargetTexture*>(_refractionTexture));
     }
 
     return _renderTargets;
@@ -106,6 +113,35 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
 
 PBRBaseMaterial::~PBRBaseMaterial()
 {
+}
+
+void PBRBaseMaterial::_attachImageProcessingConfiguration(
+  ImageProcessingConfiguration* configuration)
+{
+  if (configuration == _imageProcessingConfiguration) {
+    return;
+  }
+
+  // Detaches observer.
+  if (_imageProcessingConfiguration && _imageProcessingObserver) {
+    _imageProcessingConfiguration->onUpdateParameters.remove(
+      _imageProcessingObserver);
+  }
+
+  // Pick the scene configuration if needed.
+  if (!configuration) {
+    _imageProcessingConfiguration = getScene()->imageProcessingConfiguration();
+  }
+  else {
+    _imageProcessingConfiguration = configuration;
+  }
+
+  // Attaches observer.
+  _imageProcessingObserver
+    = _imageProcessingConfiguration->onUpdateParameters.add(
+      [this](ImageProcessingConfiguration* /*conf*/) {
+        _markAllSubMeshesAsImageProcessingDirty();
+      });
 }
 
 bool PBRBaseMaterial::useLogarithmicDepth() const
@@ -447,11 +483,11 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   }
 
   if (defines._areImageProcessingDirty) {
-    if (!_imageProcessingConfiguration.isReady()) {
+    if (!_imageProcessingConfiguration->isReady()) {
       return false;
     }
 
-    _imageProcessingConfiguration.prepareDefines(defines);
+    _imageProcessingConfiguration->prepareDefines(defines);
   }
 
   // Misc.
@@ -547,23 +583,23 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
 
     if (defines[PMD::NORMAL]) {
-      attribs.emplace_back(VertexBuffer::NormalKind);
+      attribs.emplace_back(VertexBuffer::NormalKindChars);
     }
 
     if (defines[PMD::TANGENT]) {
-      attribs.emplace_back(VertexBuffer::TangentKind);
+      attribs.emplace_back(VertexBuffer::TangentKindChars);
     }
 
     if (defines[PMD::UV1]) {
-      attribs.emplace_back(VertexBuffer::UVKind);
+      attribs.emplace_back(VertexBuffer::UVKindChars);
     }
 
     if (defines[PMD::UV2]) {
-      attribs.emplace_back(VertexBuffer::UV2Kind);
+      attribs.emplace_back(VertexBuffer::UV2KindChars);
     }
 
     if (defines[PMD::VERTEXCOLOR]) {
-      attribs.emplace_back(VertexBuffer::ColorKind);
+      attribs.emplace_back(VertexBuffer::ColorKindChars);
     }
 
     MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
@@ -905,7 +941,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
         PBRMaterial::_scaledReflectivity.g
           = (_roughness == 0.f || _roughness == 0.f) ? 1 : _roughness;
         _uniformBuffer->updateColor4("vReflectivityColor",
-                                     PBRMaterial::_scaledReflectivity, 0);
+                                     PBRMaterial::_scaledReflectivity, 0, "");
       }
       else {
         _uniformBuffer->updateColor4("vReflectivityColor", _reflectivityColor,
@@ -1051,7 +1087,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     }
 
     // image processing
-    _imageProcessingConfiguration.bind(_activeEffect);
+    _imageProcessingConfiguration->bind(_activeEffect);
 
     // Log. depth
     MaterialHelper::BindLogDepth(defines, _activeEffect, scene,
@@ -1185,9 +1221,10 @@ void PBRBaseMaterial::dispose(bool forceDisposeEffect,
 
   _renderTargets.clear();
 
-  // if (_imageProcessingConfiguration && _imageProcessingObserver) {
-  //    _imageProcessingConfiguration.onUpdateParameters.remove(_imageProcessingObserver);
-  //}
+  if (_imageProcessingConfiguration && _imageProcessingObserver) {
+    _imageProcessingConfiguration->onUpdateParameters.remove(
+      _imageProcessingObserver);
+  }
 
   PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);
 }

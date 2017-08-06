@@ -28,16 +28,17 @@ public:
   /**
    * @brief Return the currrent class name of the material.
    */
-  const char* getClassName() const;
+  const char* getClassName() const override;
 
   /**
    * @brief Return the active textures of the material.
    */
-  std::vector<BaseTexture*> getActiveTextures() const;
+  std::vector<BaseTexture*> getActiveTextures() const override;
 
-  bool hasTexture(BaseTexture* texture) const;
+  bool hasTexture(BaseTexture* texture) const override;
 
-  PBRMetallicRoughnessMaterial* clone(const std::string& name);
+  PBRMetallicRoughnessMaterial*
+  clone(const std::string& name, bool cloneChildren = false) const override;
 
   /**
    * @brief Serialize the material to a parsable JSON object.

@@ -1,6 +1,8 @@
 #include <babylon/materials/pbr/pbr_material.h>
 
+#include <babylon/core/json.h>
 #include <babylon/materials/color_curves.h>
+#include <babylon/materials/image_processing_configuration.h>
 #include <babylon/tools/texture_tools.h>
 
 namespace BABYLON {
@@ -66,19 +68,19 @@ PBRMaterial::~PBRMaterial()
 {
 }
 
-ImageProcessingConfiguration& PBRMaterial::imageProcessingConfiguration()
+ImageProcessingConfiguration* PBRMaterial::imageProcessingConfiguration()
 {
   return _imageProcessingConfiguration;
 }
 
-const ImageProcessingConfiguration&
+const ImageProcessingConfiguration*
 PBRMaterial::imageProcessingConfiguration() const
 {
   return _imageProcessingConfiguration;
 }
 
 void PBRMaterial::setImageProcessingConfiguration(
-  ImageProcessingConfiguration& value)
+  ImageProcessingConfiguration* value)
 {
   _attachImageProcessingConfiguration(value);
 
@@ -88,67 +90,67 @@ void PBRMaterial::setImageProcessingConfiguration(
 
 bool PBRMaterial::cameraColorCurvesEnabled() const
 {
-  return imageProcessingConfiguration().colorCurvesEnabled();
+  return imageProcessingConfiguration()->colorCurvesEnabled();
 }
 
 void PBRMaterial::setCameraColorCurvesEnabled(bool value)
 {
-  imageProcessingConfiguration().setColorCurvesEnabled(value);
+  imageProcessingConfiguration()->setColorCurvesEnabled(value);
 }
 
 bool PBRMaterial::cameraColorGradingEnabled() const
 {
-  return imageProcessingConfiguration().colorGradingEnabled();
+  return imageProcessingConfiguration()->colorGradingEnabled();
 }
 
 void PBRMaterial::setCameraColorGradingEnabled(bool value)
 {
-  imageProcessingConfiguration().setColorGradingEnabled(value);
+  imageProcessingConfiguration()->setColorGradingEnabled(value);
 }
 
 bool PBRMaterial::cameraToneMappingEnabled() const
 {
-  return _imageProcessingConfiguration.toneMappingEnabled();
+  return _imageProcessingConfiguration->toneMappingEnabled();
 }
 
 void PBRMaterial::setCameraToneMappingEnabled(bool value)
 {
-  _imageProcessingConfiguration.setToneMappingEnabled(value);
+  _imageProcessingConfiguration->setToneMappingEnabled(value);
 }
 
 float PBRMaterial::cameraExposure() const
 {
-  return _imageProcessingConfiguration.exposure();
+  return _imageProcessingConfiguration->exposure();
 }
 
 void PBRMaterial::setCameraExposure(float value)
 {
-  _imageProcessingConfiguration.setExposure(value);
+  _imageProcessingConfiguration->setExposure(value);
 }
 
 float PBRMaterial::cameraContrast() const
 {
-  return _imageProcessingConfiguration.contrast();
+  return _imageProcessingConfiguration->contrast();
 }
 
 void PBRMaterial::setCameraContrast(float value)
 {
-  _imageProcessingConfiguration.setContrast(value);
+  _imageProcessingConfiguration->setContrast(value);
 }
 
 BaseTexture* PBRMaterial::cameraColorGradingTexture() const
 {
-  return _imageProcessingConfiguration.colorGradingTexture;
+  return _imageProcessingConfiguration->colorGradingTexture;
 }
 
 void PBRMaterial::setCameraColorGradingTexture(BaseTexture* value)
 {
-  _imageProcessingConfiguration.colorGradingTexture = value;
+  _imageProcessingConfiguration->colorGradingTexture = value;
 }
 
 ColorCurves* PBRMaterial::cameraColorCurves()
 {
-  return _imageProcessingConfiguration.colorCurves.get();
+  return _imageProcessingConfiguration->colorCurves.get();
 }
 
 void PBRMaterial::setCameraColorCurves(ColorCurves* /*value*/)
@@ -257,7 +259,8 @@ bool PBRMaterial::hasTexture(BaseTexture* texture) const
   return false;
 }
 
-PBRMaterial* PBRMaterial::clone(const std::string& /*name*/)
+PBRMaterial* PBRMaterial::clone(const std::string& /*name*/,
+                                bool /*cloneChildren*/) const
 {
   return nullptr;
 }

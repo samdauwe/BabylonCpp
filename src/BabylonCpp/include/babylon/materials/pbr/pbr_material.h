@@ -55,7 +55,8 @@ public:
   const char* getClassName() const override;
   std::vector<BaseTexture*> getActiveTextures() const override;
   bool hasTexture(BaseTexture* texture) const override;
-  PBRMaterial* clone(const std::string& name);
+  PBRMaterial* clone(const std::string& name,
+                     bool cloneChildren = false) const override;
   Json::object serialize() const;
 
   // Statics
@@ -68,8 +69,8 @@ public:
    * @brief Gets the image processing configuration used either in this
    * material.
    */
-  ImageProcessingConfiguration& imageProcessingConfiguration();
-  const ImageProcessingConfiguration& imageProcessingConfiguration() const;
+  ImageProcessingConfiguration* imageProcessingConfiguration();
+  const ImageProcessingConfiguration* imageProcessingConfiguration() const;
 
   /**
    * @brief Sets the Default image processing configuration used either in the
@@ -77,7 +78,7 @@ public:
    *
    * If sets to null, the scene one is in use.
    */
-  void setImageProcessingConfiguration(ImageProcessingConfiguration& value);
+  void setImageProcessingConfiguration(ImageProcessingConfiguration* value);
 
   /**
    * @brief Gets wether the color curves effect is enabled.

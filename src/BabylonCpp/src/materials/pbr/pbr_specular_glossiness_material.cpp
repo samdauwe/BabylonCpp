@@ -1,5 +1,7 @@
 #include <babylon/materials/pbr/pbr_specular_glossiness_material.h>
 
+#include <babylon/core/json.h>
+
 namespace BABYLON {
 
 PBRSpecularGlossinessMaterial::PBRSpecularGlossinessMaterial(
@@ -55,7 +57,8 @@ bool PBRSpecularGlossinessMaterial::hasTexture(BaseTexture* texture) const
 }
 
 PBRSpecularGlossinessMaterial*
-PBRSpecularGlossinessMaterial::clone(const std::string& /*name*/)
+PBRSpecularGlossinessMaterial::clone(const std::string& /*name*/,
+                                     bool /*cloneChildren*/) const
 {
   return nullptr;
 }

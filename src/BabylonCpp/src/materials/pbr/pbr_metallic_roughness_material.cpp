@@ -1,5 +1,7 @@
 #include <babylon/materials/pbr/pbr_metallic_roughness_material.h>
 
+#include <babylon/core/json.h>
+
 namespace BABYLON {
 
 PBRMetallicRoughnessMaterial::PBRMetallicRoughnessMaterial(
@@ -58,7 +60,8 @@ bool PBRMetallicRoughnessMaterial::hasTexture(BaseTexture* texture) const
 }
 
 PBRMetallicRoughnessMaterial*
-PBRMetallicRoughnessMaterial::clone(const std::string& /*name*/)
+PBRMetallicRoughnessMaterial::clone(const std::string& /*name*/,
+                                    bool /*cloneChildren*/) const
 {
   return nullptr;
 }

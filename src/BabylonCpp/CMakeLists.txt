@@ -102,6 +102,7 @@ file(GLOB LIGHTS_HDR_FILES          ${INCLUDE_PATH}/lights/*.h
 file(GLOB LOADING_HDR_FILES         ${INCLUDE_PATH}/loading/*.h
                                     ${INCLUDE_PATH}/loading/plugins/babylon/*.h)
 file(GLOB MATERIALS_HDR_FILES       ${INCLUDE_PATH}/materials/*.h
+                                    ${INCLUDE_PATH}/materials/pbr/*.h
                                     ${INCLUDE_PATH}/materials/textures/*.h
                                     ${INCLUDE_PATH}/materials/textures/procedurals/*.h)
 file(GLOB MATH_HDR_FILES            ${INCLUDE_PATH}/math/*.h
@@ -201,6 +202,7 @@ file(GLOB LIGHTS_SRC_FILES          ${SOURCE_PATH}/lights/*.cpp
 file(GLOB LOADING_SRC_FILES         ${SOURCE_PATH}/loading/*.cpp
                                     ${SOURCE_PATH}/loading/plugins/babylon/*.cpp)
 file(GLOB MATERIALS_SRC_FILES       ${SOURCE_PATH}/materials/*.cpp
+                                    ${SOURCE_PATH}/materials/pbr/*.cpp
                                     ${SOURCE_PATH}/materials/textures/*.cpp
                                     ${SOURCE_PATH}/materials/textures/procedurals/*.cpp)
 file(GLOB MATH_SRC_FILES            ${SOURCE_PATH}/math/*.cpp

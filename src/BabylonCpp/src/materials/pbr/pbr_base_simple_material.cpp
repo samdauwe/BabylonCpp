@@ -55,12 +55,6 @@ bool PBRBaseSimpleMaterial::doubleSided() const
   return _twoSidedLighting;
 }
 
-bool PBRBaseSimpleMaterial::_shouldUseAlphaFromAlbedoTexture() const
-{
-  return _albedoTexture && _albedoTexture->hasAlpha()
-         && _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE;
-}
-
 void PBRBaseSimpleMaterial::setDoubleSided(bool value)
 {
   if (_twoSidedLighting == value) {
@@ -69,6 +63,12 @@ void PBRBaseSimpleMaterial::setDoubleSided(bool value)
   _twoSidedLighting = value;
   setBackFaceCulling(!value);
   _markAllSubMeshesAsTexturesDirty();
+}
+
+bool PBRBaseSimpleMaterial::_shouldUseAlphaFromAlbedoTexture() const
+{
+  return _albedoTexture && _albedoTexture->hasAlpha()
+         && _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE;
 }
 
 bool PBRBaseSimpleMaterial::needAlphaBlending()
