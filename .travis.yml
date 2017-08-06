@@ -32,6 +32,7 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
+            - libxi-dev
             - libxcursor-dev
             - libxinerama-dev
             - libxrandr-dev
@@ -49,6 +50,7 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
+            - libxi-dev
             - libxcursor-dev
             - libxinerama-dev
             - libxrandr-dev
