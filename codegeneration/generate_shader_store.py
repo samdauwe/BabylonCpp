@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 
 def rreplace(s, old, new, occurrence = 1):
@@ -47,16 +49,24 @@ def processShaderFile(shaderPath, outputDir, definePath="BABYLON_SHADERS",
     """
     import codecs
     # name case fixes in output path
+    # Procedural Textures Library
     if "normalMap" in outputDir:
         outputDir = outputDir.replace("normalMap", "normalmap")
+    if "perlinNoise" in outputDir:
+        outputDir = outputDir.replace("perlinNoise", "perlinnoise")
+    # - Materials library
     if "triPlanar" in outputDir:
         outputDir = outputDir.replace("triPlanar", "triplanar")
     if "shadowOnly" in outputDir:
         outputDir = outputDir.replace("shadowOnly", "shadowonly")
     # read shader file contents
     shaderVarName = os.path.basename(shaderPath)
+    # Procedural Textures Library
     if "normalmap" in outputDir:
         shaderVarName = shaderVarName.replace("normalmap", "normalMap")
+    if "perlinnoise" in outputDir:
+        shaderVarName = shaderVarName.replace("perlinnoise", "perlinNoise")
+    # - Materials library
     if "triplanar" in outputDir:
         shaderVarName = shaderVarName.replace("triplanar", "triPlanar")
     if "shadowonly" in outputDir:
@@ -345,11 +355,12 @@ def generateMaterialsLibraryShaderHeaders(inputDir, outputDir):
     indent = ' ' * 6
     tic = time.time()
     for shaderFileName, shaderInputPath in shaderInputFiles.items():
-        definePath = "%s_%s" % (definePathPrefix, os.path.basename(
+        if not shaderOutputFiles[shaderFileName].endswith("legacyPBR"):
+            definePath = "%s_%s" % (definePathPrefix, os.path.basename(
                                 shaderOutputFiles[shaderFileName]).upper())
-        processShaderFile(shaderInputPath, shaderOutputFiles[shaderFileName],
-                          definePath)
-        print "%s|-Processed shader file: %s" % (indent, shaderFileName)
+            processShaderFile(shaderInputPath,
+                              shaderOutputFiles[shaderFileName], definePath)
+            print "%s|-Processed shader file: %s" % (indent, shaderFileName)
     toc = time.time()
     print "Processed %d shader files in %ss" % (mlc, (toc - tic))
 
@@ -368,7 +379,7 @@ if __name__ == "__main__":
     # set default values when input is missing
     if not options.inputDir:
         options.inputDir = os.path.join(os.getcwd(), "..", "..", "..",
-                                        "Projects", "Babylon.js-3.0.0_alpha_25_05_2017")
+                                        "Projects", "Babylon.js-3.0.0")
         args += [options.inputDir]
     if not options.outputDir:
         options.outputDir = os.path.join(os.getcwd(), "..", "src", "BabylonCpp")
