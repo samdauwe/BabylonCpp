@@ -43,7 +43,9 @@ release_build
 /install
 
 # Not yet finished code
-src/Examples
+src/Editor
+src/SampleLauncher
+src/Samples
 
 # Executables
 *.exe
