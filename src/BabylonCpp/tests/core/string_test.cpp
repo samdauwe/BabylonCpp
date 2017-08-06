@@ -183,7 +183,8 @@ TEST(TestString, regexMatch)
 {
   using namespace BABYLON;
 
-  const std::regex re("#include<(.+)>(\\((.*)\\))*(\\[(.*)\\])*");
+  const std::regex re("#include<(.+)>(\\((.*)\\))*(\\[(.*)\\])*",
+                      std::regex::optimize);
 
   {
     const std::string s{"#include<helperFunctions>"};
@@ -294,8 +295,8 @@ TEST(TestString, regexReplaceWithCallback)
   // Using free function
   {
     const std::string s{"1, 9, 19"};
-    const std::string r{
-      String::regexReplace(s, std::regex("\\d+"), my_callback)};
+    const std::string r{String::regexReplace(
+      s, std::regex("\\d+", std::regex::optimize), my_callback)};
     const std::string e{"2, 10, 20"};
     EXPECT_EQ(r, e);
   }
@@ -307,7 +308,8 @@ TEST(TestString, regexReplaceWithCallback)
       return std::to_string(int_m + 1);
     };
     const std::string s{"1, 9, 19"};
-    const std::string r{String::regexReplace(s, std::regex("\\d+"), callback)};
+    const std::string r{String::regexReplace(
+      s, std::regex(R"(\d+)", std::regex::optimize), callback)};
     const std::string e{"2, 10, 20"};
     EXPECT_EQ(r, e);
   }
@@ -322,7 +324,7 @@ TEST(TestString, regexReplaceWithCallback)
     const std::string s{
       "notShadowLevel = computeShadowWithESMCube(light{X}.vLightData.xyz, "
       "shadowSampler{X}, light{X}.shadowsInfo.x, light{X}.shadowsInfo.z);"};
-    const std::regex regex{"light\\{X\\}.(\\w*)"};
+    const std::regex regex{"light\\{X\\}.(\\w*)", std::regex::optimize};
     const std::string r{String::regexReplace(s, regex, callback)};
     const std::string e{
       "notShadowLevel = computeShadowWithESMCube(vLightData{X}.xyz, "
@@ -339,7 +341,8 @@ TEST(TestString, regexReplaceWithCallback)
         const int cval = static_cast<int>((fval - 32) * 5.f / 9.f);
         return std::to_string(cval) + 'C';
       };
-      return String::regexReplace(x, std::regex("(\\d+)F"), convert);
+      return String::regexReplace(
+        x, std::regex("(\\d+)F", std::regex::optimize), convert);
     };
     EXPECT_EQ(f2c("212F"), "100C");
   }
@@ -351,8 +354,9 @@ TEST(TestString, regexReplaceWithCallback)
     const auto callback = [&i](const std::smatch& /*m*/) {
       return "\n" + std::to_string(i++) + "\t";
     };
-    const std::string r{"1\t"
-                        + String::regexReplace(s, std::regex("\n"), callback)};
+    const std::string r{
+      "1\t" + String::regexReplace(s, std::regex("\n", std::regex::optimize),
+                                   callback)};
     const std::string e{"1\tline1\n2\tline2\n3\tline3"};
     EXPECT_EQ(r, e);
   }

@@ -330,7 +330,7 @@ void Effect::_dumpShadersSource(std::string vertexCode,
 
   // Number lines of shaders source code
   unsigned int i = 2;
-  const std::regex regex("\n");
+  const std::regex regex("\n", std::regex::optimize);
   auto formattedVertexCode
     = "\n1\t"
       + String::regexReplace(vertexCode, regex, [&i](const std::smatch& /*m*/) {
@@ -408,7 +408,8 @@ void Effect::_processIncludes(
   const std::string& sourceCode,
   const std::function<void(const std::string& data)>& callback)
 {
-  const std::regex regex("#include<(.+)>(\\((.*)\\))*(\\[(.*)\\])*");
+  const std::regex regex("#include<(.+)>(\\((.*)\\))*(\\[(.*)\\])*",
+                         std::regex::optimize);
   auto lines = String::split(sourceCode, '\n');
 
   std::ostringstream returnValue;
@@ -477,7 +478,8 @@ void Effect::_processIncludes(
                     }
                     return m.str(0);
                   };
-                  const std::regex regex{"light\\{X\\}.(\\w*)"};
+                  const std::regex regex{"light\\{X\\}.(\\w*)",
+                                         std::regex::optimize};
                   sourceIncludeContent = String::regexReplace(
                     sourceIncludeContent, regex, callback);
                 }
@@ -497,7 +499,7 @@ void Effect::_processIncludes(
               }
               return m.str(0);
             };
-            const std::regex regex{"light\\{X\\}.(\\w*)"};
+            const std::regex regex{"light\\{X\\}.(\\w*)", std::regex::optimize};
             includeContent
               = String::regexReplace(includeContent, regex, callback);
           }

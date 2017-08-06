@@ -194,7 +194,7 @@ template <typename T>
 inline bool isDigit(T x)
 {
   std::string s;
-  std::regex e("^-?\\d+");
+  std::regex e("^-?\\d+", std::regex::optimize);
   std::stringstream ss;
   ss << x;
   ss >> s;
@@ -400,7 +400,7 @@ inline std::string regexReplace(const std::string& source,
                                 const std::string& replace)
 {
   std::string result;
-  std::regex regex(reSearch);
+  std::regex regex(reSearch, std::regex::optimize);
   std::regex_replace(std::back_inserter(result), source.begin(), source.end(),
                      regex, replace);
   return result;

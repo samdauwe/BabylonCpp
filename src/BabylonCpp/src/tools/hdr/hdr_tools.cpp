@@ -93,7 +93,7 @@ HDRInfo HDRTools::RGBE_ReadHeader(const Uint8Array& uint8array)
   lineIndex += (line.size() + 1);
   line = readStringLine(uint8array, lineIndex);
 
-  std::regex sizeRegexp("-Y (.*) +X (.*)$/g");
+  const std::regex sizeRegexp("-Y (.*) +X (.*)$/g", std::regex::optimize);
   std::smatch match;
 
   if (std::regex_search(line, match, sizeRegexp) && (match.size() == 3)) {
