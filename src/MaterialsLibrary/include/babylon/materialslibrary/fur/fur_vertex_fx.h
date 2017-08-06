@@ -72,7 +72,7 @@ const char* furVertexShader
     "\n"
     "#include<clipPlaneVertexDeclaration>\n"
     "#include<fogVertexDeclaration>\n"
-    "#include<shadowsVertexDeclaration>[0..maxSimultaneousLights]\n"
+    "#include<__decl__lightFragment>[0..maxSimultaneousLights]\n"
     "\n"
     "float Rand(vec3 rv) {\n"
     "  float x = dot(rv, vec3(12.9898,78.233, 24.65487));\n"

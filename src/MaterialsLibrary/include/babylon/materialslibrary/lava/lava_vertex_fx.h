@@ -62,7 +62,7 @@ const char* lavaVertexShader
     "#include<clipPlaneVertexDeclaration>\n"
     "\n"
     "#include<fogVertexDeclaration>\n"
-    "#include<shadowsVertexDeclaration>[0..maxSimultaneousLights]\n"
+    "#include<__decl__lightFragment>[0..maxSimultaneousLights]\n"
     "\n"
     "/* NOISE FUNCTIONS */\n"
     "////// ASHIMA webgl noise\n"

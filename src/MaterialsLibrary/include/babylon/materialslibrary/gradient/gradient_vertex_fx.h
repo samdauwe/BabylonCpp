@@ -56,7 +56,7 @@ const char* gradientVertexShader
     "#include<clipPlaneVertexDeclaration>\n"
     "\n"
     "#include<fogVertexDeclaration>\n"
-    "#include<shadowsVertexDeclaration>[0..maxSimultaneousLights]\n"
+    "#include<__decl__lightFragment>[0..maxSimultaneousLights]\n"
     "\n"
     "void main(void) {\n"
     "#include<instancesVertex>\n"
