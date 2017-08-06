@@ -11,7 +11,7 @@ const char* depthPixelShader
     "uniform sampler2D diffuseSampler;\n"
     "#endif\n"
     "\n"
-    "uniform float far;\n"
+    "varying float vDepthMetric;\n"
     "\n"
     "void main(void)\n"
     "{\n"
@@ -20,8 +20,7 @@ const char* depthPixelShader
     "  discard;\n"
     "#endif\n"
     "\n"
-    "  float depth = (gl_FragCoord.z / gl_FragCoord.w) / far;\n"
-    "  gl_FragColor = vec4(depth, depth * depth, 0.0, 1.0);\n"
+    "  gl_FragColor = vec4(vDepthMetric, vDepthMetric * vDepthMetric, 0.0, 1.0);\n"
     "}\n";
 
 } // end of namespace BABYLON

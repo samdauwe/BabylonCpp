@@ -9,11 +9,14 @@ const char* blackAndWhitePixelShader
   = "// Samplers\n"
     "varying vec2 vUV;\n"
     "uniform sampler2D textureSampler;\n"
+    "uniform float degree;\n"
     "\n"
     "void main(void) \n"
     "{\n"
-    "  float luminance = dot(texture2D(textureSampler, vUV).rgb, vec3(0.3, 0.59, 0.11));\n"
-    "  gl_FragColor = vec4(luminance, luminance, luminance, 1.0);\n"
+    "  vec3 color = texture2D(textureSampler, vUV).rgb;\n"
+    "  float luminance = dot(color, vec3(0.3, 0.59, 0.11));    \n"
+    "  vec3 blackAndWhite = vec3(luminance, luminance, luminance);\n"
+    "  gl_FragColor = vec4(color - ((color - blackAndWhite) * degree), 1.0);\n"
     "}\n";
 
 } // end of namespace BABYLON

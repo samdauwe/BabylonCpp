@@ -26,9 +26,9 @@ const char* vrDistortionCorrectionPixelShader
     "{\n"
     "  vec2 tc = HmdWarp(vUV);\n"
     "  if (tc.x <0.0 || tc.x>1.0 || tc.y<0.0 || tc.y>1.0)\n"
-    "  gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);\n"
+    "  gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);\n"
     "  else{\n"
-    "  gl_FragColor = vec4(texture2D(textureSampler, tc).rgb, 1.0);\n"
+    "  gl_FragColor = texture2D(textureSampler, tc);\n"
     "  }\n"
     "}\n";
 

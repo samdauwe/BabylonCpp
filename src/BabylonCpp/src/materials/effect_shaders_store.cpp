@@ -17,12 +17,18 @@
 #include <babylon/shaders/display_pass_fragment_fx.h>
 #include <babylon/shaders/filter_fragment_fx.h>
 #include <babylon/shaders/fxaa_fragment_fx.h>
+#include <babylon/shaders/fxaa_vertex_fx.h>
+#include <babylon/shaders/geometry_fragment_fx.h>
+#include <babylon/shaders/geometry_vertex_fx.h>
 #include <babylon/shaders/glow_blur_post_process_fragment_fx.h>
 #include <babylon/shaders/glow_map_generation_fragment_fx.h>
 #include <babylon/shaders/glow_map_generation_vertex_fx.h>
 #include <babylon/shaders/glow_map_merge_fragment_fx.h>
 #include <babylon/shaders/glow_map_merge_vertex_fx.h>
-#include <babylon/shaders/hdr_fragment_fx.h>
+#include <babylon/shaders/highlights_fragment_fx.h>
+#include <babylon/shaders/image_processing_fragment_fx.h>
+#include <babylon/shaders/kernel_blur_fragment_fx.h>
+#include <babylon/shaders/kernel_blur_vertex_fx.h>
 #include <babylon/shaders/layer_fragment_fx.h>
 #include <babylon/shaders/layer_vertex_fx.h>
 #include <babylon/shaders/lens_flare_fragment_fx.h>
@@ -45,6 +51,7 @@
 #include <babylon/shaders/sprites_fragment_fx.h>
 #include <babylon/shaders/sprites_vertex_fx.h>
 #include <babylon/shaders/ssao_fragment_fx.h>
+#include <babylon/shaders/ssao2_fragment_fx.h>
 #include <babylon/shaders/ssao_combine_fragment_fx.h>
 #include <babylon/shaders/standard_fragment_fx.h>
 #include <babylon/shaders/stereoscopic_interlace_fragment_fx.h>
@@ -73,12 +80,18 @@ std::unordered_map<std::string, const char*> EffectShadersStore::Shaders = {
   {"displayPassPixelShader", displayPassPixelShader},
   {"filterPixelShader", filterPixelShader},
   {"fxaaPixelShader", fxaaPixelShader},
+  {"fxaaVertexShader", fxaaVertexShader},
+  {"geometryPixelShader", geometryPixelShader},
+  {"geometryVertexShader", geometryVertexShader},
   {"glowBlurPostProcessPixelShader", glowBlurPostProcessPixelShader},
   {"glowMapGenerationPixelShader", glowMapGenerationPixelShader},
   {"glowMapGenerationVertexShader", glowMapGenerationVertexShader},
   {"glowMapMergePixelShader", glowMapMergePixelShader},
   {"glowMapMergeVertexShader", glowMapMergeVertexShader},
-  {"hdrPixelShader", hdrPixelShader},
+  {"highlightsPixelShader", highlightsPixelShader},
+  {"imageProcessingPixelShader", imageProcessingPixelShader},
+  {"kernelBlurPixelShader", kernelBlurPixelShader},
+  {"kernelBlurVertexShader", kernelBlurVertexShader},
   {"layerPixelShader", layerPixelShader},
   {"layerVertexShader", layerVertexShader},
   {"lensFlarePixelShader", lensFlarePixelShader},
@@ -101,6 +114,7 @@ std::unordered_map<std::string, const char*> EffectShadersStore::Shaders = {
   {"spritesPixelShader", spritesPixelShader},
   {"spritesVertexShader", spritesVertexShader},
   {"ssaoPixelShader", ssaoPixelShader},
+  {"ssao2PixelShader", ssao2PixelShader},
   {"ssaoCombinePixelShader", ssaoCombinePixelShader},
   {"standardPixelShader", standardPixelShader},
   {"stereoscopicInterlacePixelShader", stereoscopicInterlacePixelShader},

@@ -1,0 +1,72 @@
+﻿#ifndef BABYLON_SHADERS_GEOMETRY_VERTEX_FX_H
+#define BABYLON_SHADERS_GEOMETRY_VERTEX_FX_H
+
+namespace BABYLON {
+
+extern const char* geometryVertexShader;
+
+const char* geometryVertexShader
+  = "#version 300 es\n"
+    "\n"
+    "#ifdef GL_ES\n"
+    "precision highp float;\n"
+    "#endif\n"
+    "precision highp int;\n"
+    "\n"
+    "#include<bones300Declaration>\n"
+    "#include<instances300Declaration>\n"
+    "\n"
+    "in vec3 position;\n"
+    "in vec3 normal;\n"
+    "\n"
+    "#if defined(ALPHATEST) || defined(NEED_UV)\n"
+    "out vec2 vUV;\n"
+    "uniform mat4 diffuseMatrix;\n"
+    "#ifdef UV1\n"
+    "in vec2 uv;\n"
+    "#endif\n"
+    "#ifdef UV2\n"
+    "in vec2 uv2;\n"
+    "#endif\n"
+    "#endif\n"
+    "\n"
+    "// Uniform\n"
+    "uniform mat4 viewProjection;\n"
+    "uniform mat4 view;\n"
+    "\n"
+    "out vec3 vNormalV;\n"
+    "out vec4 vViewPos;\n"
+    "\n"
+    "#ifdef POSITION\n"
+    "out vec3 vPosition;\n"
+    "#endif\n"
+    "\n"
+    "void main(void)\n"
+    "{\n"
+    "#include<instancesVertex>\n"
+    "\n"
+    "#include<bonesVertex>\n"
+    "  vec4 pos = vec4(finalWorld * vec4(position, 1.0));\n"
+    "\n"
+    "  vNormalV = normalize(vec3((view * finalWorld) * vec4(normal, 0.0)));\n"
+    "  vViewPos = view * pos;\n"
+    "\n"
+    "  #ifdef POSITION\n"
+    "  vPosition = pos.xyz / pos.w;\n"
+    "  #endif\n"
+    "\n"
+    "  gl_Position = viewProjection * finalWorld * vec4(position, 1.0);\n"
+    "\n"
+    "#if defined(ALPHATEST) || defined(BASIC_RENDER)\n"
+    "#ifdef UV1\n"
+    "  vUV = vec2(diffuseMatrix * vec4(uv, 1.0, 0.0));\n"
+    "#endif\n"
+    "#ifdef UV2\n"
+    "  vUV = vec2(diffuseMatrix * vec4(uv2, 1.0, 0.0));\n"
+    "#endif\n"
+    "#endif\n"
+    "}\n";
+
+} // end of namespace BABYLON
+
+#endif // end of BABYLON_SHADERS_GEOMETRY_VERTEX_FX_H

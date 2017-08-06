@@ -1,5 +1,6 @@
 ﻿#include <babylon/materials/effect_includes_shaders_store.h>
 
+#include <babylon/shaders/shadersinclude/bones300_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/bones_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/bones_vertex_fx.h>
 #include <babylon/shaders/shadersinclude/bump_fragment_fx.h>
@@ -10,10 +11,6 @@
 #include <babylon/shaders/shadersinclude/clip_plane_fragment_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/clip_plane_vertex_fx.h>
 #include <babylon/shaders/shadersinclude/clip_plane_vertex_declaration_fx.h>
-#include <babylon/shaders/shadersinclude/color_curves_fx.h>
-#include <babylon/shaders/shadersinclude/color_curves_definition_fx.h>
-#include <babylon/shaders/shadersinclude/color_grading_fx.h>
-#include <babylon/shaders/shadersinclude/color_grading_definition_fx.h>
 #include <babylon/shaders/shadersinclude/default_fragment_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/default_ubo_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/default_vertex_declaration_fx.h>
@@ -24,8 +21,15 @@
 #include <babylon/shaders/shadersinclude/fresnel_function_fx.h>
 #include <babylon/shaders/shadersinclude/harmonics_functions_fx.h>
 #include <babylon/shaders/shadersinclude/helper_functions_fx.h>
+#include <babylon/shaders/shadersinclude/image_processing_declaration_fx.h>
+#include <babylon/shaders/shadersinclude/image_processing_functions_fx.h>
+#include <babylon/shaders/shadersinclude/instances300_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/instances_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/instances_vertex_fx.h>
+#include <babylon/shaders/shadersinclude/kernel_blur_fragment_fx.h>
+#include <babylon/shaders/shadersinclude/kernel_blur_fragment2_fx.h>
+#include <babylon/shaders/shadersinclude/kernel_blur_varying_declaration_fx.h>
+#include <babylon/shaders/shadersinclude/kernel_blur_vertex_fx.h>
 #include <babylon/shaders/shadersinclude/light_fragment_fx.h>
 #include <babylon/shaders/shadersinclude/light_fragment_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/light_ubo_declaration_fx.h>
@@ -39,7 +43,6 @@
 #include <babylon/shaders/shadersinclude/pbr_fragment_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_functions_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_light_functions_fx.h>
-#include <babylon/shaders/shadersinclude/pbr_light_functions_call_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_ubo_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_vertex_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/point_cloud_vertex_fx.h>
@@ -47,12 +50,12 @@
 #include <babylon/shaders/shadersinclude/reflection_function_fx.h>
 #include <babylon/shaders/shadersinclude/shadows_fragment_functions_fx.h>
 #include <babylon/shaders/shadersinclude/shadows_vertex_fx.h>
-#include <babylon/shaders/shadersinclude/shadows_vertex_declaration_fx.h>
 
 namespace BABYLON {
 
 std::unordered_map<std::string, const char*> EffectIncludesShadersStore::Shaders  
- = {{"bonesDeclaration", bonesDeclaration},
+ = {{"bones300Declaration", bones300Declaration},
+   {"bonesDeclaration", bonesDeclaration},
    {"bonesVertex", bonesVertex},
    {"bumpFragment", bumpFragment},
    {"bumpFragmentFunctions", bumpFragmentFunctions},
@@ -62,10 +65,6 @@ std::unordered_map<std::string, const char*> EffectIncludesShadersStore::Shaders
    {"clipPlaneFragmentDeclaration", clipPlaneFragmentDeclaration},
    {"clipPlaneVertex", clipPlaneVertex},
    {"clipPlaneVertexDeclaration", clipPlaneVertexDeclaration},
-   {"colorCurves", colorCurves},
-   {"colorCurvesDefinition", colorCurvesDefinition},
-   {"colorGrading", colorGrading},
-   {"colorGradingDefinition", colorGradingDefinition},
    {"defaultFragmentDeclaration", defaultFragmentDeclaration},
    {"defaultUboDeclaration", defaultUboDeclaration},
    {"defaultVertexDeclaration", defaultVertexDeclaration},
@@ -76,8 +75,15 @@ std::unordered_map<std::string, const char*> EffectIncludesShadersStore::Shaders
    {"fresnelFunction", fresnelFunction},
    {"harmonicsFunctions", harmonicsFunctions},
    {"helperFunctions", helperFunctions},
+   {"imageProcessingDeclaration", imageProcessingDeclaration},
+   {"imageProcessingFunctions", imageProcessingFunctions},
+   {"instances300Declaration", instances300Declaration},
    {"instancesDeclaration", instancesDeclaration},
    {"instancesVertex", instancesVertex},
+   {"kernelBlurFragment", kernelBlurFragment},
+   {"kernelBlurFragment2", kernelBlurFragment2},
+   {"kernelBlurVaryingDeclaration", kernelBlurVaryingDeclaration},
+   {"kernelBlurVertex", kernelBlurVertex},
    {"lightFragment", lightFragment},
    {"lightFragmentDeclaration", lightFragmentDeclaration},
    {"lightUboDeclaration", lightUboDeclaration},
@@ -91,15 +97,13 @@ std::unordered_map<std::string, const char*> EffectIncludesShadersStore::Shaders
    {"pbrFragmentDeclaration", pbrFragmentDeclaration},
    {"pbrFunctions", pbrFunctions},
    {"pbrLightFunctions", pbrLightFunctions},
-   {"pbrLightFunctionsCall", pbrLightFunctionsCall},
    {"pbrUboDeclaration", pbrUboDeclaration},
    {"pbrVertexDeclaration", pbrVertexDeclaration},
    {"pointCloudVertex", pointCloudVertex},
    {"pointCloudVertexDeclaration", pointCloudVertexDeclaration},
    {"reflectionFunction", reflectionFunction},
    {"shadowsFragmentFunctions", shadowsFragmentFunctions},
-   {"shadowsVertex", shadowsVertex},
-   {"shadowsVertexDeclaration", shadowsVertexDeclaration}
+   {"shadowsVertex", shadowsVertex}
 };
 
 } // end of namespace BABYLON
