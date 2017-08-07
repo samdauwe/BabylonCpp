@@ -97,12 +97,12 @@ StandardMaterial::StandardMaterial(const std::string& iName, Scene* scene)
   getRenderTargetTextures = [this]() {
     _renderTargets.clear();
 
-    if (StandardMaterial::ReflectionTextureEnabled()
+    if (StandardMaterial::ReflectionTextureEnabled() && _reflectionTexture
         && _reflectionTexture->isRenderTarget) {
       _renderTargets.emplace_back(_reflectionTexture);
     }
 
-    if (StandardMaterial::RefractionTextureEnabled()
+    if (StandardMaterial::RefractionTextureEnabled() && _refractionTexture
         && _refractionTexture->isRenderTarget) {
       _renderTargets.emplace_back(_refractionTexture);
     }
@@ -1488,7 +1488,7 @@ void StandardMaterial::setImageProcessingConfiguration(
 void StandardMaterial::_attachImageProcessingConfiguration(
   ImageProcessingConfiguration* configuration)
 {
-  if (configuration == _imageProcessingConfiguration) {
+  if (configuration && (configuration == _imageProcessingConfiguration)) {
     return;
   }
 
