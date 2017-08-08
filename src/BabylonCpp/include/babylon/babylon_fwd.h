@@ -438,8 +438,10 @@ class _StencilState;
 // --- Tools ---
 class EventState;
 class PackedRect;
-struct SerializationHelper;
+class PerformanceMonitor;
 struct RectPackingMap;
+class RollingAverage;
+struct SerializationHelper;
 // - Optimization
 class HardwareScalingOptimization;
 class LensFlaresOptimization;
