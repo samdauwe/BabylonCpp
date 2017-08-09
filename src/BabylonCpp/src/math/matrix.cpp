@@ -81,10 +81,12 @@ int Matrix::getHashCode() const
 
 void Matrix::_markAsUpdated()
 {
+#if 0
   updateFlag = (Matrix::_updateFlagSeed < std::numeric_limits<int>::max()) ?
                  Matrix::_updateFlagSeed++ :
                  0;
   _isIdentityDirty = true;
+#endif
 }
 
 /** Properties **/
@@ -248,22 +250,22 @@ Matrix& Matrix::invertToRef(Matrix& other)
   const float l38 = (l5 * l11) - (l7 * l9);
   const float l39 = (l5 * l10) - (l6 * l9);
 
-  other.m[0]  = l23 * l27;
-  other.m[4]  = l24 * l27;
-  other.m[8]  = l25 * l27;
-  other.m[12] = l26 * l27;
-  other.m[1]  = -(((l2 * l17) - (l3 * l18)) + (l4 * l19)) * l27;
-  other.m[5]  = (((l1 * l17) - (l3 * l20)) + (l4 * l21)) * l27;
-  other.m[9]  = -(((l1 * l18) - (l2 * l20)) + (l4 * l22)) * l27;
-  other.m[13] = (((l1 * l19) - (l2 * l21)) + (l3 * l22)) * l27;
-  other.m[2]  = (((l2 * l28) - (l3 * l29)) + (l4 * l30)) * l27;
-  other.m[6]  = -(((l1 * l28) - (l3 * l31)) + (l4 * l32)) * l27;
-  other.m[10] = (((l1 * l29) - (l2 * l31)) + (l4 * l33)) * l27;
-  other.m[14] = -(((l1 * l30) - (l2 * l32)) + (l3 * l33)) * l27;
-  other.m[3]  = -(((l2 * l34) - (l3 * l35)) + (l4 * l36)) * l27;
-  other.m[7]  = (((l1 * l34) - (l3 * l37)) + (l4 * l38)) * l27;
-  other.m[11] = -(((l1 * l35) - (l2 * l37)) + (l4 * l39)) * l27;
-  other.m[15] = (((l1 * l36) - (l2 * l38)) + (l3 * l39)) * l27;
+  other.m[0]       = l23 * l27;
+  other.m[4]       = l24 * l27;
+  other.m[8]       = l25 * l27;
+  other.m[12]      = l26 * l27;
+  other.m[1]       = -(((l2 * l17) - (l3 * l18)) + (l4 * l19)) * l27;
+  other.m[5]       = (((l1 * l17) - (l3 * l20)) + (l4 * l21)) * l27;
+  other.m[9]       = -(((l1 * l18) - (l2 * l20)) + (l4 * l22)) * l27;
+  other.m[13]      = (((l1 * l19) - (l2 * l21)) + (l3 * l22)) * l27;
+  other.m[2]       = (((l2 * l28) - (l3 * l29)) + (l4 * l30)) * l27;
+  other.m[6]       = -(((l1 * l28) - (l3 * l31)) + (l4 * l32)) * l27;
+  other.m[10]      = (((l1 * l29) - (l2 * l31)) + (l4 * l33)) * l27;
+  other.m[14]      = -(((l1 * l30) - (l2 * l32)) + (l3 * l33)) * l27;
+  other.m[3]       = -(((l2 * l34) - (l3 * l35)) + (l4 * l36)) * l27;
+  other.m[7]       = (((l1 * l34) - (l3 * l37)) + (l4 * l38)) * l27;
+  other.m[11]      = -(((l1 * l35) - (l2 * l37)) + (l4 * l39)) * l27;
+  other.m[15]      = (((l1 * l36) - (l2 * l38)) + (l3 * l39)) * l27;
 #endif
 
   _markAsUpdated();
