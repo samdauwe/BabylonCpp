@@ -264,7 +264,7 @@ constexpr float Hermite(float value1, float tangent1, float value2,
 /**
  * @brief Returns a random float number between and min and max values
  */
-constexpr float RandomRange(float min, float max)
+inline float RandomRange(float min, float max)
 {
   if (stl_util::almost_equal(min, max)) {
     return min;
