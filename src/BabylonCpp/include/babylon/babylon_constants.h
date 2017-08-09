@@ -19,6 +19,11 @@ constexpr float PI_4    = 0.785398163397448309616f; // pi/4
 constexpr float SQRT2   = 1.41421356237309504880f;  // sqrt(2)
 constexpr float SQRT2_2 = 0.707106781186547524401f; // sqrt(2)/2
 
+// Used by Babylon Math
+constexpr float ToGammaSpace  = 1.f / 2.2f;
+constexpr float ToLinearSpace = 2.2f;
+constexpr float Epsilon       = 0.001f;
+
 } // end of namespace Math
 
 } // end of namespace BABYLON
