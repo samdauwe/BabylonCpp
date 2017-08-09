@@ -2,7 +2,6 @@
 #define BABYLON_MATH_VECTOR3_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/math/math_tools.h>
 
 namespace BABYLON {
 
@@ -158,7 +157,7 @@ public:
    * distant less than epsilon.
    */
   bool equalsWithEpsilon(const Vector3& otherVector,
-                         float epsilon = MathTools::Epsilon) const;
+                         float epsilon = Math::Epsilon) const;
 
   /**
    * @brief Returns if the current Vector3 coordinate equal the passed floats.

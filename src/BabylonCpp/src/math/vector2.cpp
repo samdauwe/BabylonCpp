@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/math/matrix.h>
+#include <babylon/math/scalar.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
@@ -235,8 +236,8 @@ bool Vector2::equals(const Vector2& otherVector) const
 
 bool Vector2::equalsWithEpsilon(const Vector2& otherVector, float epsilon) const
 {
-  return MathTools::WithinEpsilon(x, otherVector.x, epsilon)
-         && MathTools::WithinEpsilon(y, otherVector.y, epsilon);
+  return Scalar::WithinEpsilon(x, otherVector.x, epsilon)
+         && Scalar::WithinEpsilon(y, otherVector.y, epsilon);
 }
 
 /** Operator overloading **/

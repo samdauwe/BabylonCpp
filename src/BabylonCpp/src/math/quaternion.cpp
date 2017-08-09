@@ -1,8 +1,8 @@
 #include <babylon/math/quaternion.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/math/math_tmp.h>
 #include <babylon/math/matrix.h>
-#include <babylon/math/tmp.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
@@ -499,7 +499,7 @@ void Quaternion::RotationQuaternionFromAxisToRef(Vector3& axis1, Vector3& axis2,
                                                  Vector3& axis3,
                                                  Quaternion& ref)
 {
-  auto& rotMat = Tmp::MatrixArray[0];
+  auto& rotMat = MathTmp::MatrixArray[0];
   Matrix::FromXYZAxesToRef(axis1.normalize(), axis2.normalize(),
                            axis3.normalize(), rotMat);
   Quaternion::FromRotationMatrixToRef(rotMat, ref);

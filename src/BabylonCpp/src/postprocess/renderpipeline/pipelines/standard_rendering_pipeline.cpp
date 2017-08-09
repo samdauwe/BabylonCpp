@@ -6,6 +6,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture.h>
+#include <babylon/math/scalar.h>
 #include <babylon/math/vector3.h>
 #include <babylon/math/vector4.h>
 #include <babylon/postprocess/post_process.h>
@@ -643,7 +644,7 @@ void StandardRenderingPipeline::_createHdrPostProcess(Scene* scene, float ratio)
     }
 
     outputLiminance
-      = MathTools::Clamp(outputLiminance, hdrMinimumLuminance, 1e20f);
+      = Scalar::Clamp(outputLiminance, hdrMinimumLuminance, 1e20f);
 
     effect->setFloat("averageLuminance", outputLiminance);
 
@@ -660,8 +661,9 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
                                                             float ratio)
 {
   lensFlarePostProcess = new PostProcess(
-    "HDRLensFlare", "standard", {"strength", "ghostDispersal", "haloWidth",
-                                 "resolution", "distortionStrength"},
+    "HDRLensFlare", "standard",
+    {"strength", "ghostDispersal", "haloWidth", "resolution",
+     "distortionStrength"},
     {"lensColorSampler"}, ratio / 2.f, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), true,
     "#define LENS_FLARE", EngineConstants::TEXTURETYPE_UNSIGNED_INT);

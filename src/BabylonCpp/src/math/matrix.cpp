@@ -3,10 +3,10 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/cameras/vr/vr_fov.h>
-#include <babylon/math/math_tools.h>
+#include <babylon/math/math_tmp.h>
 #include <babylon/math/plane.h>
 #include <babylon/math/quaternion.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/scalar.h>
 #include <babylon/math/vector3.h>
 #include <babylon/math/vector4.h>
 #include <babylon/math/viewport.h>
@@ -507,9 +507,9 @@ bool Matrix::decompose(Vector3& scale, Quaternion& rotation,
     m[0] / scale.x, m[1] / scale.x, m[2] / scale.x, 0.f,  //
     m[4] / scale.y, m[5] / scale.y, m[6] / scale.y, 0.f,  //
     m[8] / scale.z, m[9] / scale.z, m[10] / scale.z, 0.f, //
-    0.f, 0.f, 0.f, 1.f, Tmp::MatrixArray[0]);
+    0.f, 0.f, 0.f, 1.f, MathTmp::MatrixArray[0]);
 
-  Quaternion::FromRotationMatrixToRef(Tmp::MatrixArray[0], rotation);
+  Quaternion::FromRotationMatrixToRef(MathTmp::MatrixArray[0], rotation);
 
   return true;
 }
@@ -738,11 +738,11 @@ void Matrix::ComposeToRef(const Vector3& scale, Quaternion& rotation,
   Matrix::FromValuesToRef(scale.x, 0.f, 0.f, 0.f, //
                           0.f, scale.y, 0.f, 0.f, //
                           0.f, 0.f, scale.z, 0.f, //
-                          0.f, 0.f, 0.f, 1.f, Tmp::MatrixArray[1]);
+                          0.f, 0.f, 0.f, 1.f, MathTmp::MatrixArray[1]);
 
-  rotation.toRotationMatrix(Tmp::MatrixArray[0]);
+  rotation.toRotationMatrix(MathTmp::MatrixArray[0]);
 
-  Tmp::MatrixArray[1].multiplyToRef(Tmp::MatrixArray[0], result);
+  MathTmp::MatrixArray[1].multiplyToRef(MathTmp::MatrixArray[0], result);
 
   result.setTranslation(translation);
 }

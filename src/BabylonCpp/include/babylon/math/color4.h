@@ -16,7 +16,7 @@ public:
    * red, green, blue, alpha.
    */
   Color4(float red = 0.f, float green = 0.f, float blue = 0.f,
-         float alpha = 0.f);
+         float alpha = 1.f);
   Color4(const Color4& otherColor);
   Color4(Color4&& otherColor);
   Color4& operator=(const Color4& otherColor);
@@ -143,6 +143,30 @@ public:
    * @brief Returns a string containing the hexadecimal Color4 code.
    */
   std::string toHexString() const;
+
+  /**
+   * @brief Returns a new Color4 converted to linear space.
+   */
+  Color4 toLinearSpace() const;
+
+  /**
+   * @brief Converts the Color4 values to linear space and stores the result in
+   * "convertedColor".
+   * @returns The unmodified Color4.
+   */
+  const Color4& toLinearSpaceToRef(Color4& convertedColor) const;
+
+  /**
+   * @brief Returns a new Color4 converted to gamma space.
+   */
+  Color4 toGammaSpace() const;
+
+  /**
+   * @brief Converts the Color4 values to gamma space and stores the result in
+   * "convertedColor".
+   * @returns The unmodified Color4.
+   */
+  const Color4& toGammaSpaceToRef(Color4& convertedColor) const;
 
   /** Operator overloading **/
   friend std::ostream& operator<<(std::ostream& os, const Color4& color);

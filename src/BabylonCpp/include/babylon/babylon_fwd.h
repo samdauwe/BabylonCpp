@@ -259,7 +259,6 @@ class Plane;
 class PositionNormalTextureVertex;
 class PositionNormalVertex;
 class Quaternion;
-struct Scalar;
 class Size;
 class SphericalHarmonics;
 class SphericalPolynomial;

@@ -16,7 +16,6 @@
 #include <babylon/materials/material_defines.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/math/frustum.h>
-#include <babylon/math/math_tools.h>
 #include <babylon/math/tmp.h>
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
@@ -1884,15 +1883,15 @@ AbstractMesh& AbstractMesh::updateFacetData()
   auto indices   = getIndices();
   auto normals   = getVerticesData(VertexBuffer::NormalKind);
   auto bInfo     = getBoundingInfo();
-  _bbSize.x      = (bInfo->maximum.x - bInfo->minimum.x > MathTools::Epsilon) ?
+  _bbSize.x      = (bInfo->maximum.x - bInfo->minimum.x > Math::Epsilon) ?
                 bInfo->maximum.x - bInfo->minimum.x :
-                MathTools::Epsilon;
-  _bbSize.y = (bInfo->maximum.y - bInfo->minimum.y > MathTools::Epsilon) ?
+                Math::Epsilon;
+  _bbSize.y = (bInfo->maximum.y - bInfo->minimum.y > Math::Epsilon) ?
                 bInfo->maximum.y - bInfo->minimum.y :
-                MathTools::Epsilon;
-  _bbSize.z = (bInfo->maximum.z - bInfo->minimum.z > MathTools::Epsilon) ?
+                Math::Epsilon;
+  _bbSize.z = (bInfo->maximum.z - bInfo->minimum.z > Math::Epsilon) ?
                 bInfo->maximum.z - bInfo->minimum.z :
-                MathTools::Epsilon;
+                Math::Epsilon;
   auto bbSizeMax = (_bbSize.x > _bbSize.y) ? _bbSize.x : _bbSize.y;
   bbSizeMax      = (bbSizeMax > _bbSize.z) ? bbSizeMax : _bbSize.z;
   _subDiv.max    = _partitioningSubdivisions;
@@ -1915,7 +1914,7 @@ AbstractMesh& AbstractMesh::updateFacetData()
   _facetParameters.bbSize            = _bbSize;
   _facetParameters.subDiv            = _subDiv;
   _facetParameters.ratio             = partitioningBBoxRatio();
-  // VertexData::ComputeNormals(positions, indices, normals, _facetParameters);
+  VertexData::ComputeNormals(positions, indices, normals, _facetParameters);
   return *this;
 }
 

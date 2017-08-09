@@ -1,6 +1,5 @@
 #include <babylon/culling/bounding_sphere.h>
 
-#include <babylon/math/math_tools.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/plane.h>
 
@@ -63,7 +62,7 @@ bool BoundingSphere::intersectsPoint(const Vector3& point)
 
   float distance = std::sqrt((x * x) + (y * y) + (z * z));
 
-  if (std::abs(radiusWorld - distance) < MathTools::Epsilon) {
+  if (std::abs(radiusWorld - distance) < Math::Epsilon) {
     return false;
   }
 

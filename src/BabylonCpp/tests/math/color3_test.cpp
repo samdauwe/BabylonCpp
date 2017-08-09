@@ -4,19 +4,21 @@
 
 TEST(TestColor3, Constructor)
 {
+  using namespace BABYLON;
+
   // Constructor
-  BABYLON::Color3 color3;
+  Color3 color3;
   EXPECT_FLOAT_EQ(0.f, color3.r);
   EXPECT_FLOAT_EQ(0.f, color3.g);
   EXPECT_FLOAT_EQ(0.f, color3.b);
 
-  color3 = BABYLON::Color3{1.f, 1.f, 1.f};
+  color3 = Color3{1.f, 1.f, 1.f};
   EXPECT_FLOAT_EQ(1.f, color3.r);
   EXPECT_FLOAT_EQ(1.f, color3.g);
   EXPECT_FLOAT_EQ(1.f, color3.b);
 
   // Copy constructor
-  color3 = BABYLON::Color3{color3};
+  color3 = Color3{color3};
   EXPECT_FLOAT_EQ(1.f, color3.r);
   EXPECT_FLOAT_EQ(1.f, color3.g);
   EXPECT_FLOAT_EQ(1.f, color3.b);
@@ -24,23 +26,25 @@ TEST(TestColor3, Constructor)
 
 TEST(TestColor3, FromHexString)
 {
+  using namespace BABYLON;
+
   // Red
   std::string hex{"#FF0000"};
-  BABYLON::Color3 color3 = BABYLON::Color3::FromHexString(hex);
+  Color3 color3 = Color3::FromHexString(hex);
   EXPECT_FLOAT_EQ(1.f, color3.r);
   EXPECT_FLOAT_EQ(0.f, color3.g);
   EXPECT_FLOAT_EQ(0.f, color3.b);
 
   // Green
   hex    = std::string{"#00FF00"};
-  color3 = BABYLON::Color3::FromHexString(hex);
+  color3 = Color3::FromHexString(hex);
   EXPECT_FLOAT_EQ(0.f, color3.r);
   EXPECT_FLOAT_EQ(1.f, color3.g);
   EXPECT_FLOAT_EQ(0.f, color3.b);
 
   // Blue
   hex    = std::string{"#0000FF"};
-  color3 = BABYLON::Color3::FromHexString(hex);
+  color3 = Color3::FromHexString(hex);
   EXPECT_FLOAT_EQ(0.f, color3.r);
   EXPECT_FLOAT_EQ(0.f, color3.g);
   EXPECT_FLOAT_EQ(1.f, color3.b);
@@ -48,9 +52,11 @@ TEST(TestColor3, FromHexString)
 
 TEST(TestColor3, Lerp)
 {
-  BABYLON::Color3 c1;
-  BABYLON::Color3 c2{1.f, 1.f, 1.f};
-  BABYLON::Color3 color3 = BABYLON::Color3::Lerp(c1, c2, 0.3f);
+  using namespace BABYLON;
+
+  Color3 c1;
+  Color3 c2{1.f, 1.f, 1.f};
+  Color3 color3 = Color3::Lerp(c1, c2, 0.3f);
   EXPECT_FLOAT_EQ(0.3f, color3.r);
   EXPECT_FLOAT_EQ(0.3f, color3.g);
   EXPECT_FLOAT_EQ(0.3f, color3.b);
@@ -58,9 +64,11 @@ TEST(TestColor3, Lerp)
 
 TEST(TestColor3, Operators)
 {
+  using namespace BABYLON;
+
   // To array
-  BABYLON::Color3 color3{0.1f, 0.2f, 0.3f};
-  BABYLON::Float32Array result;
+  Color3 color3{0.1f, 0.2f, 0.3f};
+  Float32Array result;
   color3.toArray(result);
   EXPECT_FLOAT_EQ(0.1f, result[0]);
   EXPECT_FLOAT_EQ(0.2f, result[1]);
@@ -73,21 +81,21 @@ TEST(TestColor3, Operators)
   EXPECT_FLOAT_EQ(0.3f, result[2]);
 
   // Add
-  BABYLON::Color3 otherColor{0.3f, 0.4f, 0.5f};
-  BABYLON::Color3 c = color3.add(otherColor);
+  Color3 otherColor{0.3f, 0.4f, 0.5f};
+  Color3 c = color3.add(otherColor);
   EXPECT_FLOAT_EQ(0.4f, c.r);
   EXPECT_FLOAT_EQ(0.6f, c.g);
   EXPECT_FLOAT_EQ(0.8f, c.b);
 
   // Subtract
-  otherColor = BABYLON::Color3{0.1f, 0.2f, 0.3f};
+  otherColor = Color3{0.1f, 0.2f, 0.3f};
   c          = color3.subtract(otherColor);
   EXPECT_FLOAT_EQ(0.f, c.r);
   EXPECT_FLOAT_EQ(0.f, c.g);
   EXPECT_FLOAT_EQ(0.f, c.b);
 
   // Multiply
-  otherColor = BABYLON::Color3{4.f, 3.f, 2.f};
+  otherColor = Color3{4.f, 3.f, 2.f};
   c          = color3.multiply(otherColor);
   EXPECT_FLOAT_EQ(0.4f, c.r);
   EXPECT_FLOAT_EQ(0.6f, c.g);
@@ -102,20 +110,22 @@ TEST(TestColor3, Operators)
 
 TEST(TestColor3, RGB)
 {
+  using namespace BABYLON;
+
   // Red
-  BABYLON::Color3 color3 = BABYLON::Color3::Red();
+  Color3 color3 = Color3::Red();
   EXPECT_FLOAT_EQ(1.f, color3.r);
   EXPECT_FLOAT_EQ(0.f, color3.g);
   EXPECT_FLOAT_EQ(0.f, color3.b);
 
   // Green
-  color3 = BABYLON::Color3::Green();
+  color3 = Color3::Green();
   EXPECT_FLOAT_EQ(0.f, color3.r);
   EXPECT_FLOAT_EQ(1.f, color3.g);
   EXPECT_FLOAT_EQ(0.f, color3.b);
 
   // Blue
-  color3 = BABYLON::Color3::Blue();
+  color3 = Color3::Blue();
   EXPECT_FLOAT_EQ(0.f, color3.r);
   EXPECT_FLOAT_EQ(0.f, color3.g);
   EXPECT_FLOAT_EQ(1.f, color3.b);
@@ -123,15 +133,17 @@ TEST(TestColor3, RGB)
 
 TEST(TestColor3, ToHexString)
 {
+  using namespace BABYLON;
+
   // Red
-  BABYLON::Color3 color3 = BABYLON::Color3::Red();
+  Color3 color3 = Color3::Red();
   EXPECT_EQ(color3.toHexString(), "#FF0000");
 
   // Green
-  color3 = BABYLON::Color3::Green();
+  color3 = Color3::Green();
   EXPECT_EQ(color3.toHexString(), "#00FF00");
 
   // Blue
-  color3 = BABYLON::Color3::Blue();
+  color3 = Color3::Blue();
   EXPECT_EQ(color3.toHexString(), "#0000FF");
 }

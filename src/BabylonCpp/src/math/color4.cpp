@@ -1,8 +1,7 @@
 #include <babylon/math/color4.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/string.h>
-#include <babylon/math/math_tools.h>
+#include <babylon/math/scalar.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -219,11 +218,41 @@ std::string Color4::toHexString() const
   const int intA = static_cast<int>(a * 255) | 0;
 
   std::ostringstream ostream;
-  ostream << "#" << String::toUpperCase(MathTools::ToHex(intR))
-          << String::toUpperCase(MathTools::ToHex(intG))
-          << String::toUpperCase(MathTools::ToHex(intB))
-          << String::toUpperCase(MathTools::ToHex(intA));
+  ostream << "#" << Scalar::ToHex(intR) << Scalar::ToHex(intG)
+          << Scalar::ToHex(intB) << Scalar::ToHex(intA);
   return ostream.str();
+}
+
+Color4 Color4::toLinearSpace() const
+{
+  Color4 convertedColor;
+  toLinearSpaceToRef(convertedColor);
+  return convertedColor;
+}
+
+const Color4& Color4::toLinearSpaceToRef(Color4& convertedColor) const
+{
+  convertedColor.r = std::pow(r, Math::ToLinearSpace);
+  convertedColor.g = std::pow(g, Math::ToLinearSpace);
+  convertedColor.b = std::pow(b, Math::ToLinearSpace);
+  convertedColor.a = a;
+  return *this;
+}
+
+Color4 Color4::toGammaSpace() const
+{
+  Color4 convertedColor;
+  toGammaSpaceToRef(convertedColor);
+  return convertedColor;
+}
+
+const Color4& Color4::toGammaSpaceToRef(Color4& convertedColor) const
+{
+  convertedColor.r = std::pow(r, Math::ToGammaSpace);
+  convertedColor.g = std::pow(g, Math::ToGammaSpace);
+  convertedColor.b = std::pow(b, Math::ToGammaSpace);
+  convertedColor.a = a;
+  return *this;
 }
 
 /** Operator overloading **/

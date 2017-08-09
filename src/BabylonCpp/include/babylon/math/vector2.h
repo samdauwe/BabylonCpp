@@ -2,7 +2,6 @@
 #define BABYLON_MATH_VECTOR2_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/math/math_tools.h>
 
 namespace BABYLON {
 
@@ -195,7 +194,7 @@ public:
    * ones by a distance of epsilon.
    */
   bool equalsWithEpsilon(const Vector2& otherVector,
-                         float epsilon = MathTools::Epsilon) const;
+                         float epsilon = Math::Epsilon) const;
 
   /** Operator overloading **/
   friend std::ostream& operator<<(std::ostream& os, const Vector2& vector);

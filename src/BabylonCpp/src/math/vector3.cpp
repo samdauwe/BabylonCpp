@@ -2,9 +2,10 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/math/axis.h>
+#include <babylon/math/math_tmp.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/quaternion.h>
-#include <babylon/math/tmp.h>
+#include <babylon/math/scalar.h>
 #include <babylon/math/vector3.h>
 #include <babylon/math/viewport.h>
 
@@ -229,9 +230,9 @@ bool Vector3::equals(const Vector3& otherVector) const
 
 bool Vector3::equalsWithEpsilon(const Vector3& otherVector, float epsilon) const
 {
-  return MathTools::WithinEpsilon(x, otherVector.x, epsilon)
-         && MathTools::WithinEpsilon(y, otherVector.y, epsilon)
-         && MathTools::WithinEpsilon(z, otherVector.z, epsilon);
+  return Scalar::WithinEpsilon(x, otherVector.x, epsilon)
+         && Scalar::WithinEpsilon(y, otherVector.y, epsilon)
+         && Scalar::WithinEpsilon(z, otherVector.z, epsilon);
 }
 
 bool Vector3::equalsToFloats(float ix, float iy, float iz) const
@@ -740,9 +741,10 @@ Vector3 Vector3::Cross(const Vector3& left, const Vector3& right)
 void Vector3::CrossToRef(const Vector3& left, const Vector3& right,
                          Vector3& result)
 {
-  result.x = left.y * right.z - left.z * right.y;
-  result.y = left.z * right.x - left.x * right.z;
-  result.z = left.x * right.y - left.y * right.x;
+  MathTmp::Vector3Array[0].x = left.y * right.z - left.z * right.y;
+  MathTmp::Vector3Array[0].y = left.z * right.x - left.x * right.z;
+  MathTmp::Vector3Array[0].z = left.x * right.y - left.y * right.x;
+  result.copyFrom(MathTmp::Vector3Array[0]);
 }
 
 Vector3 Vector3::Normalize(const Vector3& vector)
@@ -766,30 +768,35 @@ Vector3 Vector3::Project(const Vector3& vector, Matrix& world,
   const float cx = static_cast<float>(viewport.x);
   const float cy = static_cast<float>(viewport.y);
 
-  Matrix viewportMatrix
-    = Matrix::FromValues(cw / 2.f, 0.f, 0.f, 0.f,  //
-                         0.f, -ch / 2.f, 0.f, 0.f, //
-                         0.f, 0.f, 0.5f, 0.f,      //
-                         cx + cw / 2.f, ch / 2.f + cy, 0.5f, 1.f);
+  static Matrix viewportMatrix;
 
-  const auto finalMatrix = world.multiply(transform).multiply(viewportMatrix);
+  Matrix::FromValuesToRef(cw / 2.f, 0.f, 0.f, 0.f,  //
+                          0.f, -ch / 2.f, 0.f, 0.f, //
+                          0.f, 0.f, 0.5f, 0.f,      //
+                          cx + cw / 2.f, ch / 2.f + cy, 0.5f, 1.f,
+                          viewportMatrix);
 
-  return Vector3::TransformCoordinates(vector, finalMatrix);
+  auto& matrix = MathTmp::MatrixArray[0];
+  world.multiplyToRef(transform, matrix);
+  matrix.multiplyToRef(viewportMatrix, matrix);
+
+  return Vector3::TransformCoordinates(vector, matrix);
 }
 
 Vector3 Vector3::UnprojectFromTransform(Vector3& source, float viewportWidth,
                                         float viewportHeight, Matrix& world,
                                         Matrix& transform)
 {
-  Matrix matrix = world.multiply(transform);
+  auto& matrix = MathTmp::MatrixArray[0];
+  world.multiplyToRef(transform, matrix);
   matrix.invert();
-  source.x        = source.x / viewportWidth * 2 - 1;
-  source.y        = -(source.y / viewportHeight * 2 - 1);
-  Vector3 vector  = Vector3::TransformCoordinates(source, matrix);
-  const float num = source.x * matrix.m[3] + source.y * matrix.m[7]
-                    + source.z * matrix.m[11] + matrix.m[15];
+  source.x       = source.x / viewportWidth * 2.f - 1.f;
+  source.y       = -(source.y / viewportHeight * 2.f - 1.f);
+  auto vector    = Vector3::TransformCoordinates(source, matrix);
+  const auto num = source.x * matrix.m[3] + source.y * matrix.m[7]
+                   + source.z * matrix.m[11] + matrix.m[15];
 
-  if (MathTools::WithinEpsilon(num, 1.f)) {
+  if (Scalar::WithinEpsilon(num, 1.f)) {
     vector = vector.scale(1.f / num);
   }
 
@@ -800,16 +807,18 @@ Vector3 Vector3::Unproject(const Vector3& source, float viewportWidth,
                            float viewportHeight, Matrix& world, Matrix& view,
                            Matrix& projection)
 {
-  Matrix matrix = world.multiply(view).multiply(projection);
+  auto& matrix = MathTmp::MatrixArray[0];
+  world.multiplyToRef(view, matrix);
+  matrix.multiplyToRef(projection, matrix);
   matrix.invert();
-  Vector3 screenSource(source.x / viewportWidth * 2.f - 1,
-                       -(source.y / viewportHeight * 2.f - 1),
+  Vector3 screenSource(source.x / viewportWidth * 2.f - 1.f,
+                       -(source.y / viewportHeight * 2.f - 1.f),
                        2.f * source.z - 1.f);
-  auto vector     = Vector3::TransformCoordinates(screenSource, matrix);
-  const float num = screenSource.x * matrix.m[3] + screenSource.y * matrix.m[7]
-                    + screenSource.z * matrix.m[11] + matrix.m[15];
+  auto vector    = Vector3::TransformCoordinates(screenSource, matrix);
+  const auto num = screenSource.x * matrix.m[3] + screenSource.y * matrix.m[7]
+                   + screenSource.z * matrix.m[11] + matrix.m[15];
 
-  if (MathTools::WithinEpsilon(num, 1.f)) {
+  if (Scalar::WithinEpsilon(num, 1.f)) {
     vector = vector.scale(1.f / num);
   }
 
@@ -862,7 +871,7 @@ Vector3 Vector3::RotationFromAxis(Vector3& axis1, Vector3& axis2,
 void Vector3::RotationFromAxisToRef(Vector3& axis1, Vector3& axis2,
                                     Vector3& axis3, Vector3& ref)
 {
-  auto& quat = Tmp::QuaternionArray[0];
+  auto& quat = MathTmp::QuaternionArray[0];
   Quaternion::RotationQuaternionFromAxisToRef(axis1, axis2, axis3, quat);
   quat.toEulerAnglesToRef(ref);
 }

@@ -217,6 +217,7 @@ public:
   static Color3 Yellow();
   static Color3 Cyan();
   static Color3 Gray();
+  static Color3 Teal();
   static Color3 Random();
 
 public:

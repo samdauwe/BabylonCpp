@@ -3,9 +3,9 @@
 #include <babylon/culling/bounding_sphere.h>
 #include <babylon/culling/ray.h>
 #include <babylon/math/color4.h>
-#include <babylon/math/math_tools.h>
 #include <babylon/math/plane.h>
 #include <babylon/math/quaternion.h>
+#include <babylon/math/scalar.h>
 #include <babylon/math/vector3.h>
 #include <babylon/tools/tools.h>
 
@@ -50,7 +50,7 @@ float Tools::angleBetween(const Vector3& v1, const Vector3& v2)
   }
 
   auto f = Vector3::Dot(v1, v2) / lenProduct;
-  f      = MathTools::Clamp(f, -1.f, 1.f);
+  f      = Scalar::Clamp(f, -1.f, 1.f);
   return std::acos(f);
 }
 

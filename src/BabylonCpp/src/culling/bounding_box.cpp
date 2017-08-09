@@ -2,7 +2,6 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/culling/bounding_sphere.h>
-#include <babylon/math/math_tools.h>
 #include <babylon/math/plane.h>
 
 namespace BABYLON {
@@ -145,7 +144,7 @@ bool BoundingBox::isCompletelyInFrustum(
 
 bool BoundingBox::intersectsPoint(const Vector3& point)
 {
-  float delta = -MathTools::Epsilon;
+  float delta = -Math::Epsilon;
 
   if (maximumWorld.x - point.x < delta || delta > point.x - minimumWorld.x) {
     return false;

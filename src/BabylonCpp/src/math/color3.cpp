@@ -2,9 +2,8 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/random.h>
-#include <babylon/core/string.h>
 #include <babylon/math/color4.h>
-#include <babylon/math/math_tools.h>
+#include <babylon/math/scalar.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -212,9 +211,8 @@ std::string Color3::toHexString() const
   const int intB = static_cast<int>(b * 255) | 0;
 
   std::ostringstream ostream;
-  ostream << "#" << String::toUpperCase(MathTools::ToHex(intR))
-          << String::toUpperCase(MathTools::ToHex(intG))
-          << String::toUpperCase(MathTools::ToHex(intB));
+  ostream << "#" << Scalar::ToHex(intR) << Scalar::ToHex(intG)
+          << Scalar::ToHex(intB);
   return ostream.str();
 }
 
@@ -227,9 +225,9 @@ Color3 Color3::toLinearSpace()
 
 Color3& Color3::toLinearSpaceToRef(Color3& convertedColor)
 {
-  convertedColor.r = std::pow(r, MathTools::ToLinearSpace);
-  convertedColor.g = std::pow(g, MathTools::ToLinearSpace);
-  convertedColor.b = std::pow(b, MathTools::ToLinearSpace);
+  convertedColor.r = std::pow(r, Math::ToLinearSpace);
+  convertedColor.g = std::pow(g, Math::ToLinearSpace);
+  convertedColor.b = std::pow(b, Math::ToLinearSpace);
 
   return *this;
 }
@@ -243,9 +241,9 @@ Color3 Color3::toGammaSpace()
 
 Color3& Color3::toGammaSpaceToRef(Color3& convertedColor)
 {
-  convertedColor.r = std::pow(r, MathTools::ToGammaSpace);
-  convertedColor.g = std::pow(g, MathTools::ToGammaSpace);
-  convertedColor.b = std::pow(b, MathTools::ToGammaSpace);
+  convertedColor.r = std::pow(r, Math::ToGammaSpace);
+  convertedColor.g = std::pow(g, Math::ToGammaSpace);
+  convertedColor.b = std::pow(b, Math::ToGammaSpace);
 
   return *this;
 }
@@ -369,6 +367,11 @@ Color3 Color3::Cyan()
 Color3 Color3::Gray()
 {
   return Color3(0.5f, 0.5f, 0.5f);
+}
+
+Color3 Color3::Teal()
+{
+  return Color3(0.f, 1.f, 1.f);
 }
 
 Color3 Color3::Random()

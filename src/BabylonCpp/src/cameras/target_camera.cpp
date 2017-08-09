@@ -4,7 +4,6 @@
 #include <babylon/core/string.h>
 #include <babylon/core/time.h>
 #include <babylon/engine/engine.h>
-#include <babylon/math/math_tools.h>
 #include <babylon/math/tmp.h>
 
 namespace BABYLON {
@@ -234,25 +233,25 @@ void TargetCamera::_checkInputs()
 
   // Inertia
   if (needToMove) {
-    if (std::abs(cameraDirection->x) < speed * MathTools::Epsilon) {
+    if (std::abs(cameraDirection->x) < speed * Math::Epsilon) {
       cameraDirection->x = 0.f;
     }
 
-    if (std::abs(cameraDirection->y) < speed * MathTools::Epsilon) {
+    if (std::abs(cameraDirection->y) < speed * Math::Epsilon) {
       cameraDirection->y = 0.f;
     }
 
-    if (std::abs(cameraDirection->z) < speed * MathTools::Epsilon) {
+    if (std::abs(cameraDirection->z) < speed * Math::Epsilon) {
       cameraDirection->z = 0.f;
     }
     cameraDirection->scaleInPlace(inertia);
   }
   if (needToRotate) {
-    if (std::abs(cameraRotation->x) < speed * MathTools::Epsilon) {
+    if (std::abs(cameraRotation->x) < speed * Math::Epsilon) {
       cameraRotation->x = 0.f;
     }
 
-    if (std::abs(cameraRotation->y) < speed * MathTools::Epsilon) {
+    if (std::abs(cameraRotation->y) < speed * Math::Epsilon) {
       cameraRotation->y = 0.f;
     }
     cameraRotation->scaleInPlace(inertia);

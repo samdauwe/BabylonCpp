@@ -2,7 +2,6 @@
 #define BABYLON_MATH_VECTOR4_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/math/math_tools.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
@@ -149,7 +148,7 @@ public:
    * distance "epsilon" from the passed vector ones.
    */
   bool equalsWithEpsilon(const Vector4& otherVector,
-                         float epsilon = MathTools::Epsilon) const;
+                         float epsilon = Math::Epsilon) const;
 
   /**
    * @brief Returns if the passed floats are strictly equal to the current

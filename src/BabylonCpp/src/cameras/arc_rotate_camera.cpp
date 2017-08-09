@@ -5,7 +5,6 @@
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
 #include <babylon/interfaces/icanvas.h>
-#include <babylon/math/math_tools.h>
 #include <babylon/mesh/mesh.h>
 
 namespace BABYLON {
@@ -176,13 +175,13 @@ void ArcRotateCamera::_checkInputs()
     inertialAlphaOffset *= inertia;
     inertialBetaOffset *= inertia;
     inertialRadiusOffset *= inertia;
-    if (std::abs(inertialAlphaOffset) < speed * MathTools::Epsilon) {
+    if (std::abs(inertialAlphaOffset) < speed * Math::Epsilon) {
       inertialAlphaOffset = 0.f;
     }
-    if (std::abs(inertialBetaOffset) < speed * MathTools::Epsilon) {
+    if (std::abs(inertialBetaOffset) < speed * Math::Epsilon) {
       inertialBetaOffset = 0.f;
     }
-    if (std::abs(inertialRadiusOffset) < speed * MathTools::Epsilon) {
+    if (std::abs(inertialRadiusOffset) < speed * Math::Epsilon) {
       inertialRadiusOffset = 0.f;
     }
   }
@@ -213,10 +212,10 @@ void ArcRotateCamera::_checkInputs()
     inertialPanningX *= panningInertia;
     inertialPanningY *= panningInertia;
 
-    if (std::abs(inertialPanningX) < speed * MathTools::Epsilon) {
+    if (std::abs(inertialPanningX) < speed * Math::Epsilon) {
       inertialPanningX = 0.f;
     }
-    if (std::abs(inertialPanningY) < speed * MathTools::Epsilon) {
+    if (std::abs(inertialPanningY) < speed * Math::Epsilon) {
       inertialPanningY = 0.f;
     }
   }

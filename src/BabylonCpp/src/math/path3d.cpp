@@ -1,6 +1,7 @@
 #include <babylon/math/path3d.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/math/scalar.h>
 #include <babylon/math/vector3.h>
 #include <babylon/tools/tools.h>
 
@@ -279,17 +280,15 @@ Vector3 Path3D::_normalVector(const Vector3& /*v0*/, const Vector3& vt,
 
   if (va == nullptr) {
     Vector3 point;
-    if (!MathTools::WithinEpsilon(
+    if (!Scalar::WithinEpsilon(
           std::abs(vt.y) / tgl, 1.f,
-          MathTools::Epsilon)) { // search for a point in the plane
+          Math::Epsilon)) { // search for a point in the plane
       point = Vector3(0.f, -1.f, 0.f);
     }
-    else if (!MathTools::WithinEpsilon(std::abs(vt.x) / tgl, 1.f,
-                                       MathTools::Epsilon)) {
+    else if (!Scalar::WithinEpsilon(std::abs(vt.x) / tgl, 1.f, Math::Epsilon)) {
       point = Vector3(1.f, 0.f, 0.f);
     }
-    else if (!MathTools::WithinEpsilon(std::abs(vt.z) / tgl, 1.f,
-                                       MathTools::Epsilon)) {
+    else if (!Scalar::WithinEpsilon(std::abs(vt.z) / tgl, 1.f, Math::Epsilon)) {
       point = Vector3(0.f, 0.f, 1.f);
     }
     normal0 = Vector3::Cross(vt, point);
