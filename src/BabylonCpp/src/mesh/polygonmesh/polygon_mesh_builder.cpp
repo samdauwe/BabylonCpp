@@ -166,6 +166,16 @@ Mesh* PolygonMeshBuilder::build(bool updatable, float depth)
   return result;
 }
 
+PolygonPoints& PolygonMeshBuilder::points()
+{
+  return _points;
+}
+
+const PolygonPoints& PolygonMeshBuilder::points() const
+{
+  return _points;
+}
+
 void PolygonMeshBuilder::addSide(Float32Array& positions, Float32Array& normals,
                                  Float32Array& uvs, Uint32Array& indices,
                                  const Bounds& bounds,

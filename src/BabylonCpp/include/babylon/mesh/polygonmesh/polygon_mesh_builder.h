@@ -25,6 +25,9 @@ public:
   PolygonMeshBuilder& addHole(const std::vector<Vector2>& hole);
   Mesh* build(bool updatable = false, float depth = 0);
 
+  PolygonPoints& points();
+  const PolygonPoints& points() const;
+
 private:
   void _addToepoint(const std::vector<Vector2>& points);
   void addSide(Float32Array& positions, Float32Array& normals,
