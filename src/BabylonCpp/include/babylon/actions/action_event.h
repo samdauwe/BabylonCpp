@@ -13,7 +13,7 @@ class BABYLON_SHARED_EXPORT ActionEvent {
 
 public:
   /**
-   * Constructor
+   * @brief Constructor
    * @param source The mesh that triggered the action.
    * @param pointerX the X mouse cursor position at the time of the event
    * @param pointerY the Y mouse cursor position at the time of the event
@@ -30,14 +30,14 @@ public:
   ~ActionEvent();
 
   /**
-   * Helper function to auto-create an ActionEvent from a source mesh.
+   * @brief Helper function to auto-create an ActionEvent from a source mesh.
    * @param source the source mesh that triggered the event
    * @param evt {Event} The original (browser) event
    */
   static ActionEvent CreateNew(AbstractMesh* source, const Event& evt);
 
   /**
-   * Helper function to auto-create an ActionEvent from a source mesh.
+   * @brief Helper function to auto-create an ActionEvent from a source mesh.
    * @param source The source sprite that triggered the event
    * @param scene Scene associated with the sprite
    * @param evt {Event} The original (browser) event
@@ -46,8 +46,8 @@ public:
                                          const Event& evt);
 
   /**
-   * Helper function to auto-create an ActionEvent from a scene. If triggered by
-   * a mesh use ActionEvent.CreateNew
+   * @brief Helper function to auto-create an ActionEvent from a scene. If
+   * triggered by a mesh use ActionEvent.CreateNew
    * @param scene the scene where the event occurred
    * @param evt {Event} The original (browser) event
    */
