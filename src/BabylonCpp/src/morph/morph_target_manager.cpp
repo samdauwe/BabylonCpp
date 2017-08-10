@@ -2,6 +2,7 @@
 
 #include <babylon/core/json.h>
 #include <babylon/core/logging.h>
+#include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
@@ -10,7 +11,7 @@
 namespace BABYLON {
 
 MorphTargetManager::MorphTargetManager(Scene* scene)
-    : _scene{scene}
+    : _scene{scene ? scene : Engine::LastCreatedScene()}
     , _supportsNormals{false}
     , _supportsTangents{false}
     , _vertexCount{0}
@@ -128,14 +129,17 @@ void MorphTargetManager::_onInfluenceChanged(bool needUpdate)
 
 void MorphTargetManager::_syncActiveTargets(bool needUpdate)
 {
+  std::size_t influenceCount = 0;
   _activeTargets.clear();
+  _tempInfluences.clear();
   _influences.clear();
   _supportsNormals  = true;
   _supportsTangents = true;
   for (auto& target : _targets) {
     if (target->influence() > 0.f) {
       _activeTargets.emplace_back(target.get());
-      _influences.emplace_back(target->influence());
+      _tempInfluences.emplace_back(target->influence());
+      ++influenceCount;
 
       _supportsNormals  = _supportsNormals && target->hasNormals();
       _supportsTangents = _supportsTangents && target->hasTangents();
@@ -146,14 +150,16 @@ void MorphTargetManager::_syncActiveTargets(bool needUpdate)
     }
   }
 
+  if (_influences.size() != influenceCount) {
+    _influences = _tempInfluences;
+  }
+
   if (needUpdate) {
     // Flag meshes as dirty to resync with the active targets
     for (auto& abstractMesh : _scene->meshes) {
       auto mesh = static_cast<Mesh*>(abstractMesh.get());
-      if (mesh) {
-        if (mesh->morphTargetManager() == this) {
-          mesh->_syncGeometryWithMorphTargetManager();
-        }
+      if (mesh && (mesh->morphTargetManager() == this)) {
+        mesh->_syncGeometryWithMorphTargetManager();
       }
     }
   }

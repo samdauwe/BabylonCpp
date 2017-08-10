@@ -58,8 +58,9 @@ private:
   Float32Array _influences;
   bool _supportsNormals;
   bool _supportsTangents;
-  size_t _vertexCount;
+  std::size_t _vertexCount;
   unsigned int _uniqueId;
+  Float32Array _tempInfluences;
 
 }; // end of class MorphTargetManager
 
