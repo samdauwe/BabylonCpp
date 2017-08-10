@@ -191,6 +191,12 @@ public:
   static void ImportVertexData(const Json::value& parsedVertexData,
                                Geometry* geometry);
 
+  static void
+  _ComputeSides(unsigned int sideOrientation, Float32Array& positions,
+                Uint32Array& indices, Float32Array& normals, Float32Array& uvs,
+                const Vector4& frontUVs = Vector4(0.f, 0.f, 1.f, 1.f),
+                const Vector4& backUVs  = Vector4(0.f, 0.f, 1.f, 1.f));
+
 private:
   VertexData& _applyTo(IGetSetVerticesData* meshOrGeometry,
                        bool updatable = false);
@@ -199,11 +205,6 @@ private:
   static std::unique_ptr<VertexData>
   _ExtractFrom(IGetSetVerticesData* meshOrGeometry, bool copyWhenShared = false,
                bool forceCopy = false);
-  static void
-  _ComputeSides(unsigned int sideOrientation, Float32Array& positions,
-                Uint32Array& indices, Float32Array& normals, Float32Array& uvs,
-                const Vector4& frontUVs = Vector4(0.f, 0.f, 1.f, 1.f),
-                const Vector4& backUVs  = Vector4(0.f, 0.f, 1.f, 1.f));
 
 public:
   Float32Array positions;
