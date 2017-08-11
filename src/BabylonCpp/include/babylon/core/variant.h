@@ -69,7 +69,7 @@ struct variant_helper<> {
 }; // end of struct variant_helper<>
 
 template <typename... Ts>
-struct variant {
+struct Variant {
 private:
   static const size_t data_size  = static_max<sizeof(Ts)...>::value;
   static const size_t data_align = static_max<alignof(Ts)...>::value;
@@ -87,22 +87,22 @@ private:
   data_t data;
 
 public:
-  variant() : type_id(invalid_type())
+  Variant() : type_id(invalid_type())
   {
   }
 
-  variant(const variant<Ts...>& old) : type_id(old.type_id)
+  Variant(const Variant<Ts...>& old) : type_id(old.type_id)
   {
     helper_t::copy(old.type_id, &old.data, &data);
   }
 
-  variant(variant<Ts...>&& old) : type_id(old.type_id)
+  Variant(Variant<Ts...>&& old) : type_id(old.type_id)
   {
     helper_t::move(old.type_id, &old.data, &data);
   }
 
   // Serves as both the move and the copy asignment operator.
-  variant<Ts...>& operator=(variant<Ts...> old)
+  Variant<Ts...>& operator=(Variant<Ts...> old)
   {
     std::swap(type_id, old.type_id);
     std::swap(data, old.data);
@@ -140,7 +140,7 @@ public:
       throw std::bad_cast();
   }
 
-  ~variant()
+  ~Variant()
   {
     helper_t::destroy(type_id, &data);
   }
