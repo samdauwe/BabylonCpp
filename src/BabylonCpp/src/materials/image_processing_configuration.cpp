@@ -192,6 +192,11 @@ void ImageProcessingConfiguration::_updateParameters()
   onUpdateParameters.notifyObservers(this);
 }
 
+const char* ImageProcessingConfiguration::getClassName() const
+{
+  return "ImageProcessingConfiguration";
+}
+
 void ImageProcessingConfiguration::PrepareUniforms(
   std::vector<std::string>& uniforms,
   const IImageProcessingConfigurationDefines& defines)

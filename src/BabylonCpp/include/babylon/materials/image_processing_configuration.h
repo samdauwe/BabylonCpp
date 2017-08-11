@@ -24,6 +24,11 @@ public:
   ~ImageProcessingConfiguration();
 
   /**
+   * @brief Returns the string "ImageProcessingConfiguration".
+   */
+  const char* getClassName() const;
+
+  /**
    * @brief Gets wether the color curves effect is enabled.
    */
   bool colorCurvesEnabled() const;

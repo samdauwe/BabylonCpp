@@ -43,6 +43,8 @@ public:
   ShaderMaterial& setFloats(const std::string& name,
                             const std::vector<float>& value);
   ShaderMaterial& setColor3(const std::string& name, const Color3& value);
+  ShaderMaterial& setColor3Array(const std::string& iName,
+                                 const std::vector<Color3>& value);
   ShaderMaterial& setColor4(const std::string& name, const Color4& value);
   ShaderMaterial& setVector2(const std::string& name, const Vector2& value);
   ShaderMaterial& setVector3(const std::string& name, const Vector3& value);
@@ -87,6 +89,7 @@ private:
   std::unordered_map<std::string, float> _floats;
   std::unordered_map<std::string, std::vector<float>> _floatsArrays;
   std::unordered_map<std::string, Color3> _colors3;
+  std::unordered_map<std::string, Float32Array> _colors3Arrays;
   std::unordered_map<std::string, Color4> _colors4;
   std::unordered_map<std::string, Vector2> _vectors2;
   std::unordered_map<std::string, Vector3> _vectors3;

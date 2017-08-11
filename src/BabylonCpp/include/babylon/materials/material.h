@@ -3,6 +3,7 @@
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_global.h>
+#include <babylon/core/nullable.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
@@ -106,11 +107,9 @@ public:
    */
   void
   forceCompilation(AbstractMesh* mesh,
-                   const std::function<void(Material* material)>& onCompiled);
-  void
-  forceCompilation(AbstractMesh* mesh,
                    const std::function<void(Material* material)>& onCompiled,
-                   bool alphaTest);
+                   Nullable<bool> alphaTest = nullptr,
+                   Nullable<bool> clipPlane = nullptr);
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false);
   void copyTo(Material* other) const;

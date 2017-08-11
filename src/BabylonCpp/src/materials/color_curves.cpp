@@ -300,6 +300,11 @@ void ColorCurves::setShadowsExposure(float value)
   _dirty           = true;
 }
 
+const char* ColorCurves::getClassName() const
+{
+  return "ColorCurves";
+}
+
 void ColorCurves::Bind(ColorCurves& colorCurves, Effect* effect,
                        const std::string& positiveUniform,
                        const std::string& neutralUniform,
@@ -345,24 +350,30 @@ void ColorCurves::Bind(ColorCurves& colorCurves, Effect* effect,
                                              colorCurves._negativeCurve);
   }
 
-  effect->setFloat4(positiveUniform, colorCurves._positiveCurve.r,
-                    colorCurves._positiveCurve.g, colorCurves._positiveCurve.b,
-                    colorCurves._positiveCurve.a);
-  effect->setFloat4(neutralUniform, colorCurves._midtonesCurve.r,
-                    colorCurves._midtonesCurve.g, colorCurves._midtonesCurve.b,
-                    colorCurves._midtonesCurve.a);
-  effect->setFloat4(negativeUniform, colorCurves._negativeCurve.r,
-                    colorCurves._negativeCurve.g, colorCurves._negativeCurve.b,
-                    colorCurves._negativeCurve.a);
+  if (effect) {
+    effect->setFloat4(positiveUniform, colorCurves._positiveCurve.r,
+                      colorCurves._positiveCurve.g,
+                      colorCurves._positiveCurve.b,
+                      colorCurves._positiveCurve.a);
+    effect->setFloat4(neutralUniform, colorCurves._midtonesCurve.r,
+                      colorCurves._midtonesCurve.g,
+                      colorCurves._midtonesCurve.b,
+                      colorCurves._midtonesCurve.a);
+    effect->setFloat4(negativeUniform, colorCurves._negativeCurve.r,
+                      colorCurves._negativeCurve.g,
+                      colorCurves._negativeCurve.b,
+                      colorCurves._negativeCurve.a);
+  }
 }
 
 void ColorCurves::PrepareUniforms(std::vector<std::string>& uniformsList)
 {
-  stl_util::concat(uniformsList, {
-                                   "vCameraColorCurveNeutral",  //
-                                   "vCameraColorCurvePositive", //
-                                   "vCameraColorCurveNegative"  //
-                                 });
+  stl_util::concat(uniformsList,
+                   {
+                     "vCameraColorCurveNeutral",  //
+                     "vCameraColorCurvePositive", //
+                     "vCameraColorCurveNegative"  //
+                   });
 }
 
 void ColorCurves::getColorGradingDataToRef(float iHue, float iDensity,
@@ -392,9 +403,9 @@ void ColorCurves::getColorGradingDataToRef(float iHue, float iDensity,
   result.a = 1.f + 0.01f * saturation;
 }
 
-float ColorCurves::applyColorGradingSliderNonlinear(float _value)
+float ColorCurves::applyColorGradingSliderNonlinear(float value)
 {
-  float value = _value / 100.f;
+  value /= 100.f;
 
   float x = std::abs(value);
   x       = std::pow(x, 2.f);

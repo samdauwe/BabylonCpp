@@ -34,8 +34,8 @@ public:
   std::vector<BaseTexture*> getActiveTextures() const override;
 
   /** Methods **/
-  bool isReady(AbstractMesh* mesh = nullptr,
-               bool useInstances  = false) override;
+  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
+                         bool useInstances = false) override;
   Material* clone(const std::string& _name,
                   bool cloneChildren = false) const override;
   Json::object serialize() const;

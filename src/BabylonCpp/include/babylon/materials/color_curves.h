@@ -28,6 +28,11 @@ public:
   ~ColorCurves();
 
   /**
+   * @brief Returns the string "ColorCurves".
+   */
+  const char* getClassName() const;
+
+  /**
    * @brief Clones the current color curve instance.
    * @return The cloned curves
    */

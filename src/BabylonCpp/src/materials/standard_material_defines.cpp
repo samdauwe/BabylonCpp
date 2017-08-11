@@ -57,8 +57,6 @@ StandardMaterialDefines::StandardMaterialDefines() : MaterialDefines{}
            "REFRACTION",
            "REFRACTIONMAP_3D",
            "REFLECTIONOVERALPHA",
-           "INVERTNORMALMAPX",
-           "INVERTNORMALMAPY",
            "TWOSIDEDLIGHTING",
            "SHADOWFLOAT",
            "MORPHTARGETS",

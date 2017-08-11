@@ -11,11 +11,12 @@
 #include <babylon/mesh/geometry.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/sub_mesh.h>
+#include <babylon/tools/tools.h>
 
 namespace BABYLON {
 
 Material::Material(const std::string& iName, Scene* scene, bool /*doNotAdd*/)
-    : id{iName}
+    : id{!iName.empty() ? iName : Tools::RandomId()}
     , name{iName}
     , checkReadyOnEveryCall{false}
     , checkReadyOnlyOnce{false}
@@ -255,7 +256,6 @@ void Material::_preBind(Effect* effect)
   const bool reverse = sideOrientation == Material::ClockWiseSideOrientation;
 
   engine->enableEffect(effect ? effect : _effect);
-
   engine->setState(backFaceCulling(), zOffset, false, reverse);
 }
 
@@ -350,40 +350,61 @@ std::vector<AbstractMesh*> Material::getBindedMeshes()
 }
 
 void Material::forceCompilation(
-  AbstractMesh* mesh, const std::function<void(Material* material)>& onCompiled)
-{
-  forceCompilation(mesh, onCompiled, needAlphaTesting());
-}
-
-void Material::forceCompilation(
   AbstractMesh* mesh, const std::function<void(Material* material)>& onCompiled,
-  bool alphaTest)
+  Nullable<bool> alphaTest, Nullable<bool> clipPlane)
 {
+  auto subMesh = std::make_unique<BaseSubMesh>();
+  auto scene   = getScene();
+  auto engine  = scene->getEngine();
 
-  _beforeRenderCallback = [this, mesh, alphaTest, onCompiled]() {
-    auto subMesh = std::make_unique<BaseSubMesh>();
-    auto scene   = getScene();
-    auto engine  = scene->getEngine();
+  const auto checkReady = [&]() {
+    if (!_scene || !_scene->getEngine()) {
+      return;
+    }
 
     if (subMesh->_materialDefines) {
       subMesh->_materialDefines->_renderId = -1;
     }
 
     auto alphaTestState = engine->getAlphaTesting();
-    engine->setAlphaTesting(alphaTest);
+    auto clipPlaneState = *scene->clipPlane();
 
-    if (isReadyForSubMesh(mesh, subMesh.get())) {
-      scene->unregisterBeforeRender(_beforeRenderCallback);
+    engine->setAlphaTesting(!alphaTest.isNull() ? *alphaTest :
+                                                  needAlphaTesting());
 
-      if (onCompiled) {
-        onCompiled(this);
+    if (!clipPlane.isNull() && (*clipPlane)) {
+      scene->setClipPlane(Plane(0, 0, 0, 1));
+    }
+
+    if (storeEffectOnSubMeshes) {
+      if (isReadyForSubMesh(mesh, subMesh.get())) {
+        if (onCompiled) {
+          onCompiled(this);
+        }
+      }
+      else {
+        // setTimeout(checkReady, 16);
+      }
+    }
+    else {
+      if (isReady(mesh)) {
+        if (onCompiled) {
+          onCompiled(this);
+        }
+      }
+      else {
+        // setTimeout(checkReady, 16);
       }
     }
 
     engine->setAlphaTesting(alphaTestState);
+
+    if (!clipPlane.isNull() && (*clipPlane)) {
+      scene->setClipPlane(clipPlaneState);
+    }
   };
 
-  getScene()->registerBeforeRender(_beforeRenderCallback);
+  checkReady();
 }
 
 void Material::markAsDirty(unsigned int flag)
@@ -424,7 +445,7 @@ void Material::_markAllSubMeshesAsDirty(
       }
 
       if (!subMesh->_materialDefines) {
-        return;
+        continue;
       }
 
       func(*subMesh->_materialDefines);

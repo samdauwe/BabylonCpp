@@ -119,6 +119,20 @@ ShaderMaterial& ShaderMaterial::setColor3(const std::string& iName,
   return *this;
 }
 
+ShaderMaterial& ShaderMaterial::setColor3Array(const std::string& iName,
+                                               const std::vector<Color3>& value)
+{
+  _checkUniform(iName);
+  _colors3Arrays[name].clear();
+  for (const auto& color : value) {
+    Float32Array arr(3);
+    color.toArray(arr, 0);
+    stl_util::concat(_colors3Arrays[name], arr);
+  }
+
+  return *this;
+}
+
 ShaderMaterial& ShaderMaterial::setColor4(const std::string& iName,
                                           const Color4& value)
 {
@@ -366,6 +380,11 @@ void ShaderMaterial::bind(Matrix* world, Mesh* mesh)
     // Color3
     for (auto& kv : _colors3) {
       _effect->setColor3(kv.first, kv.second);
+    }
+
+    // Color3 array
+    for (auto& kv : _colors3Arrays) {
+      _effect->setArray3(kv.first, kv.second);
     }
 
     // Color4

@@ -10,6 +10,8 @@ namespace BABYLON {
 MultiMaterial::MultiMaterial(const std::string iName, Scene* scene)
     : Material{iName, scene, true}
 {
+  // multimaterial is considered like a push material
+  storeEffectOnSubMeshes = true;
 }
 
 MultiMaterial::~MultiMaterial()
@@ -61,10 +63,18 @@ void MultiMaterial::_hookArray(const std::vector<Material*>& /*array*/)
 {
 }
 
-bool MultiMaterial::isReady(AbstractMesh* mesh, bool /*useInstances*/)
+bool MultiMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
+                                      bool useInstances)
 {
   for (auto& subMaterial : _subMaterials) {
     if (subMaterial) {
+      if (subMaterial->storeEffectOnSubMeshes) {
+        if (!subMaterial->isReadyForSubMesh(mesh, subMesh, useInstances)) {
+          return false;
+        }
+        continue;
+      }
+
       if (!subMaterial->isReady(mesh)) {
         return false;
       }

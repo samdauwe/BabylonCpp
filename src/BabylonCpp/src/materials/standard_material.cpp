@@ -434,9 +434,6 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                                     SMD::BUMP, "BUMP",
                                                     SMD::MAINUV1, SMD::MAINUV2);
 
-          defines.defines[SMD::INVERTNORMALMAPX] = _invertNormalMapX;
-          defines.defines[SMD::INVERTNORMALMAPY] = _invertNormalMapY;
-
           defines.defines[SMD::PARALLAX]          = _useParallax;
           defines.defines[SMD::PARALLAXOCCLUSION] = _useParallaxOcclusion;
         }
@@ -546,12 +543,6 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   MaterialHelper::PrepareDefinesForFrameBoundValues(
     scene, engine, defines, useInstances, SMD::CLIPPLANE, SMD::ALPHATEST,
     SMD::INSTANCES);
-
-  if (scene->_mirroredCameraPosition && defines[SMD::BUMP]) {
-    defines.defines[SMD::INVERTNORMALMAPX] = !_invertNormalMapX;
-    defines.defines[SMD::INVERTNORMALMAPY] = !_invertNormalMapY;
-    defines.markAsUnprocessed();
-  }
 
   // Get correct effect
   if (defines.isDirty()) {
@@ -692,7 +683,8 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                       "emissiveRightColor",
                                       "refractionLeftColor",
                                       "refractionRightColor",
-                                      "logarithmicDepthConstant"};
+                                      "logarithmicDepthConstant",
+                                      "vNormalReoderParams"};
 
     std::vector<std::string> samplers{
       "diffuseSampler",        "ambientSampler",      "opacitySampler",
@@ -774,6 +766,7 @@ void StandardMaterial::buildUniformLayout()
   _uniformBuffer->addUniform("lightmapMatrix", 16);
   _uniformBuffer->addUniform("specularMatrix", 16);
   _uniformBuffer->addUniform("bumpMatrix", 16);
+  _uniformBuffer->addUniform("vNormalReoderParams", 4);
   _uniformBuffer->addUniform("refractionMatrix", 16);
   _uniformBuffer->addUniform("vRefractionInfos", 4);
   _uniformBuffer->addUniform("vSpecularColor", 4);
@@ -944,6 +937,18 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
             1.f / _bumpTexture->level, parallaxScaleBias, "");
           MaterialHelper::BindTextureMatrix(*_bumpTexture, *_uniformBuffer,
                                             "bump");
+          if (scene->_mirroredCameraPosition) {
+            _uniformBuffer->updateFloat4(
+              "vNormalReoderParams", _invertNormalMapX ? 0.f : 1.f,
+              _invertNormalMapX ? 1.f : -1.f, _invertNormalMapY ? 0.f : 1.f,
+              _invertNormalMapY ? 1.f : -1.f, "");
+          }
+          else {
+            _uniformBuffer->updateFloat4(
+              "vNormalReoderParams", _invertNormalMapX ? 1.f : 0.f,
+              _invertNormalMapX ? -1.f : 1.0, _invertNormalMapY ? 1.f : 0.f,
+              _invertNormalMapY ? -1.f : 1.f, "");
+          }
         }
 
         if (_refractionTexture
@@ -1039,7 +1044,7 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     effect->setVector3("vEyePosition",
                        scene->_mirroredCameraPosition ?
                          *scene->_mirroredCameraPosition :
-                         scene->activeCamera->position);
+                         scene->activeCamera->globalPosition());
     effect->setColor3("vAmbientColor", _globalAmbientColor);
   }
 
