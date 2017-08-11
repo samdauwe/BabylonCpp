@@ -2076,7 +2076,8 @@ void Scene::_evaluateActiveMeshes()
         continue;
       }
 
-      if (particleSystem->emitter && particleSystem->emitter->isEnabled()) {
+      if (particleSystem->emitter.is<AbstractMesh*>()
+          && particleSystem->emitter.get<AbstractMesh*>()->isEnabled()) {
         _activeParticleSystems.emplace_back(particleSystem.get());
         particleSystem->animate();
         _renderingManager->dispatchParticles(particleSystem.get());

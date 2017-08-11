@@ -7,13 +7,15 @@
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/vector3.h>
+#include <babylon/particles/iparticle_system.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT ParticleSystem : public IDisposable,
-                                             public IAnimatable {
+                                             public IAnimatable,
+                                             public IParticleSystem {
 
 public:
   /** Statics **/
@@ -27,20 +29,22 @@ public:
 
   virtual IReflect::Type type() const override;
 
+  bool hasEmitter();
   void setOnDispose(const FastFunc<void()>& callback);
   void recycleParticle(Particle* particle);
   size_t getCapacity() const;
   bool isAlive() const;
-  bool isStarted() const;
+  bool isStarted() const override;
   void start();
   void stop();
   void _appendParticleVertex(unsigned int index, Particle* particle,
                              int offsetX, int offsetY);
-  void animate();
-  size_t render();
+  void animate() override;
+  size_t render() override;
   void dispose(bool doNotRecurse = false) override;
   std::vector<Animation*> getAnimations() override;
-  ParticleSystem* clone(const std::string& name, Mesh* newEmitter);
+  IParticleSystem* clone(const std::string& name, Mesh* newEmitter) override;
+  Json::object serialize() const override;
 
   // Statics
   static ParticleSystem* Parse(const Json::value& parsedParticleSystem,
@@ -53,11 +57,6 @@ private:
 public:
   // Members
   std::vector<Animation*> animations;
-  std::string id;
-  std::string name;
-  unsigned int renderingGroupId;
-  AbstractMesh* emitter;
-  Vector3 emitterVec;
   int emitRate;
   int manualEmitCount;
   float updateSpeed;
@@ -72,11 +71,11 @@ public:
   float minAngularSpeed;
   float maxAngularSpeed;
   Texture* particleTexture;
-  unsigned int layerMask;
   std::string customShader;
   bool preventAutoStart;
   Observable<ParticleSystem> onDisposeObservable;
   std::function<void(std::vector<Particle*>& particles)> updateFunction;
+  std::function<void()> onAnimationEnd;
   int blendMode;
   bool forceDepthWrite;
   Vector3 gravity;

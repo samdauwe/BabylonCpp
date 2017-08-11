@@ -109,7 +109,9 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
 
     // Particles
     for (auto& system : scene->particleSystems) {
-      if (system->emitter == source) {
+      auto& emitter = system->emitter;
+      if (emitter.is<AbstractMesh*>()
+          && (emitter.get<AbstractMesh*>() == source)) {
         system->clone(system->name, this);
       }
     }
@@ -1063,7 +1065,8 @@ std::vector<ParticleSystem*> Mesh::getEmittedParticleSystems()
 {
   std::vector<ParticleSystem*> results;
   for (auto& particleSystem : getScene()->particleSystems) {
-    if (particleSystem->emitter == this) {
+    auto& emitter = particleSystem->emitter;
+    if (emitter.is<AbstractMesh*>() && (emitter.get<AbstractMesh*>() == this)) {
       results.emplace_back(particleSystem.get());
     }
   }
@@ -1078,10 +1081,12 @@ std::vector<ParticleSystem*> Mesh::getHierarchyEmittedParticleSystems()
   descendants.emplace_back(this);
 
   for (auto& particleSystem : getScene()->particleSystems) {
-    if (std::find(std::begin(descendants), std::end(descendants),
-                  particleSystem->emitter)
-        != std::end(descendants)) {
-      results.emplace_back(particleSystem.get());
+    if (particleSystem->emitter.is<AbstractMesh*>()) {
+      if (std::find(descendants.begin(), descendants.end(),
+                    particleSystem->emitter.get<AbstractMesh*>())
+          != descendants.end()) {
+        results.emplace_back(particleSystem.get());
+      }
     }
   }
 

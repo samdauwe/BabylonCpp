@@ -356,6 +356,7 @@ class SimplificationSettings;
 class MorphTarget;
 class MorphTargetManager;
 // --- Particles ---
+struct IParticleSystem;
 class ModelShape;
 class Particle;
 class ParticleSystem;

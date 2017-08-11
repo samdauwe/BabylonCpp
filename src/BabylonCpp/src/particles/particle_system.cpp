@@ -1,5 +1,6 @@
 #include <babylon/particles/particle_system.h>
 
+#include <babylon/core/json.h>
 #include <babylon/core/random.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
@@ -18,11 +19,7 @@ namespace BABYLON {
 
 ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
                                Scene* scene, Effect* customEffect)
-    : id{iName}
-    , name{iName}
-    , renderingGroupId{0}
-    , emitter{nullptr}
-    , emitRate{10}
+    : emitRate{10}
     , manualEmitCount{-1}
     , updateSpeed{0.01f}
     , targetStopDuration{0}
@@ -35,8 +32,9 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
     , maxSize{1.f}
     , minAngularSpeed{0.f}
     , maxAngularSpeed{0.f}
-    , layerMask{0x0FFFFFFF}
     , preventAutoStart{false}
+    , updateFunction{nullptr}
+    , onAnimationEnd{nullptr}
     , blendMode{ParticleSystem::BLENDMODE_ONEONE}
     , forceDepthWrite{false}
     , gravity{Vector3::Zero()}
@@ -62,6 +60,11 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
     , _actualFrame{0}
 {
   _scene->particleSystems.emplace_back(this);
+
+  id               = iName;
+  name             = iName;
+  renderingGroupId = 0;
+  layerMask        = 0x0FFFFFFF;
 
   Uint32Array indices;
   int index = 0;
@@ -159,6 +162,11 @@ IReflect::Type ParticleSystem::type() const
   return IReflect::Type::PARTICLESYSTEM;
 }
 
+bool ParticleSystem::hasEmitter()
+{
+  return emitter.is<AbstractMesh*>() || emitter.is<Vector3>();
+}
+
 void ParticleSystem::setOnDispose(const FastFunc<void()>& callback)
 {
   if (_onDisposeObserver) {
@@ -231,7 +239,16 @@ void ParticleSystem::_update(int newParticles)
   updateFunction(particles);
 
   // Add new ones
-  auto worldMatrix = *emitter->getWorldMatrix();
+  Matrix worldMatrix;
+  if (emitter.is<AbstractMesh*>()) {
+    auto emitterMesh = emitter.get<AbstractMesh*>();
+    worldMatrix      = *emitterMesh->getWorldMatrix();
+  }
+  else {
+    auto emitterPosition = emitter.get<Vector3>();
+    worldMatrix = Matrix::Translation(emitterPosition.x, emitterPosition.y,
+                                      emitterPosition.z);
+  }
 
   for (int index = 0; index < newParticles; ++index) {
     if (particles.size() == _capacity) {
@@ -312,7 +329,7 @@ void ParticleSystem::animate()
   auto effect = _getEffect();
 
   // Check
-  if (!emitter || !effect->isReady() || !particleTexture
+  if (!hasEmitter() || !effect->isReady() || !particleTexture
       || !particleTexture->isReady())
     return;
 
@@ -361,6 +378,9 @@ void ParticleSystem::animate()
   if (_stopped) {
     if (!_alive) {
       _started = false;
+      if (onAnimationEnd) {
+        onAnimationEnd();
+      }
       if (disposeOnStop) {
         _scene->_toBeDisposed.emplace_back(this);
       }
@@ -370,10 +390,10 @@ void ParticleSystem::animate()
   // Update VBO
   unsigned int offset = 0;
   for (auto& particle : particles) {
-    _appendParticleVertex(++offset, particle, 0, 0);
-    _appendParticleVertex(++offset, particle, 1, 0);
-    _appendParticleVertex(++offset, particle, 1, 1);
-    _appendParticleVertex(++offset, particle, 0, 1);
+    _appendParticleVertex(offset++, particle, 0, 0);
+    _appendParticleVertex(offset++, particle, 1, 0);
+    _appendParticleVertex(offset++, particle, 1, 1);
+    _appendParticleVertex(offset++, particle, 0, 1);
   }
 
   _vertexBuffer->update(_vertexData);
@@ -384,7 +404,7 @@ size_t ParticleSystem::render()
   auto effect = _getEffect();
 
   // Check
-  if (!emitter || !effect->isReady() || !particleTexture
+  if (!hasEmitter() || !effect->isReady() || !particleTexture
       || !particleTexture->isReady() || !particles.size()) {
     return 0;
   }
@@ -472,8 +492,8 @@ std::vector<Animation*> ParticleSystem::getAnimations()
   return animations;
 }
 
-ParticleSystem* ParticleSystem::clone(const std::string& /*iName*/,
-                                      Mesh* /*newEmitter*/)
+IParticleSystem* ParticleSystem::clone(const std::string& /*iName*/,
+                                       Mesh* /*newEmitter*/)
 {
   // ParticleSystem* result = new ParticleSystem(_name, _capacity, _scene);
 
@@ -494,6 +514,11 @@ ParticleSystem* ParticleSystem::clone(const std::string& /*iName*/,
 
   return result;*/
   return nullptr;
+}
+
+Json::object ParticleSystem::serialize() const
+{
+  return Json::object();
 }
 
 ParticleSystem* ParticleSystem::Parse(const Json::value& parsedParticleSystem,
@@ -523,12 +548,12 @@ ParticleSystem* ParticleSystem::Parse(const Json::value& parsedParticleSystem,
 
   // Emitter
   if (parsedParticleSystem.contains("emitterId")) {
-    particleSystem->emitter = scene->getLastMeshByID(
-      Json::GetString(parsedParticleSystem, "emitterId"));
+    particleSystem->emitter.set<AbstractMesh*>(scene->getLastMeshByID(
+      Json::GetString(parsedParticleSystem, "emitterId")));
   }
   else {
-    particleSystem->emitterVec = Vector3::FromArray(
-      Json::ToArray<float>(parsedParticleSystem, "emitter"));
+    particleSystem->emitter.set<Vector3>(Vector3::FromArray(
+      Json::ToArray<float>(parsedParticleSystem, "emitter")));
   }
 
   // Animations

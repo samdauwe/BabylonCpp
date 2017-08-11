@@ -309,7 +309,10 @@ void RenderingGroup::_renderParticles(
       continue;
     }
     if (!activeMeshes.empty()
-        || stl_util::index_of(activeMeshes, particleSystem->emitter) != -1) {
+        || (particleSystem->emitter.is<AbstractMesh*>()
+            && stl_util::index_of(activeMeshes,
+                                  particleSystem->emitter.get<AbstractMesh*>())
+                 != -1)) {
       _scene->_activeParticles.addCount(particleSystem->render(), false);
     }
   }

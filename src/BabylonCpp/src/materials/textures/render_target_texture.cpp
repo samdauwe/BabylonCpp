@@ -346,11 +346,14 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
   }
 
   for (auto& particleSystem : scene->particleSystems) {
-    if (!particleSystem->isStarted() || !particleSystem->emitter
-        || !particleSystem->emitter->isEnabled()) {
+    if (!particleSystem->isStarted() || !particleSystem->hasEmitter()
+        || !(particleSystem->emitter.is<AbstractMesh*>()
+             && particleSystem->emitter.get<AbstractMesh*>()->isEnabled())) {
       continue;
     }
-    if (stl_util::index_of(currentRenderList, particleSystem->emitter) >= 0) {
+    if (stl_util::index_of(currentRenderList,
+                           particleSystem->emitter.get<AbstractMesh*>())
+        >= 0) {
       _renderingManager->dispatchParticles(particleSystem.get());
     }
   }

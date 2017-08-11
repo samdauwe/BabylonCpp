@@ -1670,7 +1670,9 @@ void AbstractMesh::dispose(bool doNotRecurse)
     // Particles
     for (size_t index = 0; index < getScene()->particleSystems.size();
          ++index) {
-      if (getScene()->particleSystems[index]->emitter == this) {
+      auto& emitter = getScene()->particleSystems[index]->emitter;
+      if (emitter.is<AbstractMesh*>()
+          && (emitter.get<AbstractMesh*>() == this)) {
         getScene()->particleSystems[index]->dispose();
         --index;
       }
