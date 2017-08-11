@@ -27,7 +27,21 @@ TEST(TestVariant, Basic)
 {
   using namespace BABYLON;
 
+  int i   = 5;
+  float f = 7.f;
+  Variant<int*, float*> t;
+  EXPECT_FALSE(t.is<int*>());
+  EXPECT_FALSE(t.is<float*>());
+  t.set<int*>(&i);
+  EXPECT_TRUE(t.is<int*>());
+  EXPECT_FALSE(t.is<float*>());
+  t.set<float*>(&f);
+  EXPECT_FALSE(t.is<int*>());
+  EXPECT_TRUE(t.is<float*>());
+
   Variant<std::string, test> d;
+  EXPECT_FALSE(d.is<std::string>());
+  EXPECT_FALSE(d.is<test>());
   d.set<std::string>("First string");
   EXPECT_TRUE(d.is<std::string>());
   EXPECT_FALSE(d.is<test>());
