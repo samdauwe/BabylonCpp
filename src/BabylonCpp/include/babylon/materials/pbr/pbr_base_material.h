@@ -29,7 +29,10 @@ public:
   PBRBaseMaterial(const std::string& name, Scene* scene);
   ~PBRBaseMaterial();
 
-  virtual const char* getClassName() const = 0;
+  /**
+   * @brief Returns the string "PBRBaseMaterial".
+   */
+  virtual const char* getClassName() const;
 
   bool useLogarithmicDepth() const;
   void setUseLogarithmicDepth(bool value);
@@ -292,12 +295,14 @@ protected:
   unsigned int _maxSimultaneousLights;
 
   /**
-   * If sets to true, x component of normal map value will invert (x = 1.0 - x).
+   * If sets to true, x component of normal map value will be inverted
+   * (x = 1.0 - x).
    */
   bool _invertNormalMapX;
 
   /**
-   * If sets to true, y component of normal map value will invert (y = 1.0 - y).
+   * If sets to true, y component of normal map value will be inverted
+   * (y = 1.0 - y).
    */
   bool _invertNormalMapY;
 
@@ -323,7 +328,7 @@ protected:
    * premultiplied blending).
    * in your scene composition.
    */
-  bool _premultiplyAlpha;
+  bool _preMultiplyAlpha;
 
   /**
    * A fresnel is applied to the alpha of the model to ensure grazing angles
@@ -339,6 +344,18 @@ protected:
    * http://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf
    */
   BaseTexture* _environmentBRDFTexture;
+
+  /**
+   * Force the shader to compute irradiance in the fragment shader in order to
+   * take bump in account.
+   */
+  bool _forceIrradianceInFragment;
+
+  /**
+   * Force normal to face away from face.
+   * (Temporary internal fix to remove before 3.1)
+   */
+  bool _forceNormalForward;
 
   /**
    * Default configuration related to image processing available in the PBR

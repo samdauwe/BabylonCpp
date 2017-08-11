@@ -317,6 +317,17 @@ public:
   bool useAlphaFromAlbedoTexture;
 
   /**
+   * Enforces alpha test in opaque or blend mode in order to improve the
+   * performances of some situations.
+   */
+  bool forceAlphaTest;
+
+  /**
+   * Defines the alpha limits in alpha test mode.
+   */
+  float alphaCutOff;
+
+  /**
    * Specifies that the material will keeps the specular highlights over a
    * transparent surface (only the most limunous ones).
    * A car glass is a good exemple of that. When sun reflects on it you can not
@@ -405,6 +416,12 @@ public:
   bool disableLighting;
 
   /**
+   * Force the shader to compute irradiance in the fragment shader in order to
+   * take bump in account.
+   */
+  bool forceIrradianceInFragment;
+
+  /**
    * Number of Simultaneous lights allowed on the material.
    */
   unsigned int maxSimultaneousLights;
@@ -430,7 +447,7 @@ public:
    * premultiplied blending).
    * in your scene composition.
    */
-  bool premultiplyAlpha;
+  bool preMultiplyAlpha;
 
   /**
    * A fresnel is applied to the alpha of the model to ensure grazing angles
@@ -445,6 +462,12 @@ public:
    * And/Or occlude the blended part.
    */
   BaseTexture* environmentBRDFTexture;
+
+  /**
+   * Force normal to face away from face.
+   * (Temporary internal fix to remove before 3.1)
+   */
+  bool forceNormalForward;
 
 }; // end of class PBRMaterial
 

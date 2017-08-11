@@ -29,6 +29,11 @@ PBRBaseSimpleMaterial::~PBRBaseSimpleMaterial()
 {
 }
 
+const char* PBRBaseSimpleMaterial::getClassName() const
+{
+  return "PBRBaseSimpleMaterial";
+}
+
 unsigned int PBRBaseSimpleMaterial::transparencyMode() const
 {
   return _transparencyMode;
@@ -92,6 +97,29 @@ bool PBRBaseSimpleMaterial::needAlphaTesting()
 
   return _shouldUseAlphaFromAlbedoTexture()
          && _transparencyMode == PBRMaterial::PBRMATERIAL_ALPHATEST;
+}
+
+std::vector<BaseTexture*> PBRBaseSimpleMaterial::getActiveTextures() const
+{
+  auto activeTextures = PBRBaseMaterial::getActiveTextures();
+
+  if (environmentTexture) {
+    activeTextures.emplace_back(environmentTexture);
+  }
+
+  if (normalTexture) {
+    activeTextures.emplace_back(normalTexture);
+  }
+
+  if (emissiveTexture) {
+    activeTextures.emplace_back(emissiveTexture);
+  }
+
+  if (occlusionTexture) {
+    activeTextures.emplace_back(occlusionTexture);
+  }
+
+  return activeTextures;
 }
 
 } // end of namespace Internals

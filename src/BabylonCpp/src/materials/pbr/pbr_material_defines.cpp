@@ -42,8 +42,6 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
     "BUMP",
     "PARALLAX",
     "PARALLAXOCCLUSION",
-    "INVERTNORMALMAPX",
-    "INVERTNORMALMAPY",
     "NORMALXYSCALE",
     "LIGHTMAP",
     "USELIGHTMAPASSHADOWMAP",
@@ -94,6 +92,7 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
     "POINTSIZE",
     "FOG",
     "LOGARITHMICDEPTH",
+    "FORCENORMALFORWARD",
   };
   rebuild();
 }

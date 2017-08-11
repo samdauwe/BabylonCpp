@@ -57,57 +57,55 @@ struct BABYLON_SHARED_EXPORT PBRMaterialDefines
   static constexpr unsigned int BUMP              = 34;
   static constexpr unsigned int PARALLAX          = 35;
   static constexpr unsigned int PARALLAXOCCLUSION = 36;
-  static constexpr unsigned int INVERTNORMALMAPX  = 37;
-  static constexpr unsigned int INVERTNORMALMAPY  = 38;
-  static constexpr unsigned int NORMALXYSCALE     = 39;
+  static constexpr unsigned int NORMALXYSCALE     = 37;
 
-  static constexpr unsigned int LIGHTMAP               = 40;
-  static constexpr unsigned int USELIGHTMAPASSHADOWMAP = 41;
+  static constexpr unsigned int LIGHTMAP               = 38;
+  static constexpr unsigned int USELIGHTMAPASSHADOWMAP = 39;
 
-  static constexpr unsigned int REFLECTION                          = 42;
-  static constexpr unsigned int REFLECTIONMAP_3D                    = 43;
-  static constexpr unsigned int REFLECTIONMAP_SPHERICAL             = 44;
-  static constexpr unsigned int REFLECTIONMAP_PLANAR                = 45;
-  static constexpr unsigned int REFLECTIONMAP_CUBIC                 = 46;
-  static constexpr unsigned int REFLECTIONMAP_PROJECTION            = 47;
-  static constexpr unsigned int REFLECTIONMAP_SKYBOX                = 48;
-  static constexpr unsigned int REFLECTIONMAP_EXPLICIT              = 49;
-  static constexpr unsigned int REFLECTIONMAP_EQUIRECTANGULAR       = 50;
-  static constexpr unsigned int REFLECTIONMAP_EQUIRECTANGULAR_FIXED = 51;
+  static constexpr unsigned int REFLECTION                          = 40;
+  static constexpr unsigned int REFLECTIONMAP_3D                    = 41;
+  static constexpr unsigned int REFLECTIONMAP_SPHERICAL             = 42;
+  static constexpr unsigned int REFLECTIONMAP_PLANAR                = 43;
+  static constexpr unsigned int REFLECTIONMAP_CUBIC                 = 44;
+  static constexpr unsigned int REFLECTIONMAP_PROJECTION            = 45;
+  static constexpr unsigned int REFLECTIONMAP_SKYBOX                = 46;
+  static constexpr unsigned int REFLECTIONMAP_EXPLICIT              = 47;
+  static constexpr unsigned int REFLECTIONMAP_EQUIRECTANGULAR       = 48;
+  static constexpr unsigned int REFLECTIONMAP_EQUIRECTANGULAR_FIXED = 49;
   static constexpr unsigned int REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED
-    = 52;
-  static constexpr unsigned int INVERTCUBICMAP                = 53;
-  static constexpr unsigned int USESPHERICALFROMREFLECTIONMAP = 54;
-  static constexpr unsigned int USESPHERICALINFRAGMENT        = 55;
-  static constexpr unsigned int REFLECTIONMAP_OPPOSITEZ       = 56;
-  static constexpr unsigned int LODINREFLECTIONALPHA          = 57;
-  static constexpr unsigned int GAMMAREFLECTION               = 58;
+    = 50;
+  static constexpr unsigned int INVERTCUBICMAP                = 51;
+  static constexpr unsigned int USESPHERICALFROMREFLECTIONMAP = 52;
+  static constexpr unsigned int USESPHERICALINFRAGMENT        = 53;
+  static constexpr unsigned int REFLECTIONMAP_OPPOSITEZ       = 54;
+  static constexpr unsigned int LODINREFLECTIONALPHA          = 55;
+  static constexpr unsigned int GAMMAREFLECTION               = 56;
 
-  static constexpr unsigned int REFRACTION                   = 59;
-  static constexpr unsigned int REFRACTIONMAP_3D             = 60;
-  static constexpr unsigned int REFRACTIONMAP_OPPOSITEZ      = 61;
-  static constexpr unsigned int LODINREFRACTIONALPHA         = 62;
-  static constexpr unsigned int GAMMAREFRACTION              = 63;
-  static constexpr unsigned int LINKREFRACTIONTOTRANSPARENCY = 64;
+  static constexpr unsigned int REFRACTION                   = 57;
+  static constexpr unsigned int REFRACTIONMAP_3D             = 58;
+  static constexpr unsigned int REFRACTIONMAP_OPPOSITEZ      = 59;
+  static constexpr unsigned int LODINREFRACTIONALPHA         = 60;
+  static constexpr unsigned int GAMMAREFRACTION              = 61;
+  static constexpr unsigned int LINKREFRACTIONTOTRANSPARENCY = 62;
 
-  static constexpr unsigned int INSTANCES = 65;
+  static constexpr unsigned int INSTANCES = 63;
 
-  static constexpr unsigned int MORPHTARGETS         = 66;
-  static constexpr unsigned int MORPHTARGETS_NORMAL  = 67;
-  static constexpr unsigned int MORPHTARGETS_TANGENT = 68;
+  static constexpr unsigned int MORPHTARGETS         = 64;
+  static constexpr unsigned int MORPHTARGETS_NORMAL  = 65;
+  static constexpr unsigned int MORPHTARGETS_TANGENT = 66;
 
-  static constexpr unsigned int IMAGEPROCESSING            = 69;
-  static constexpr unsigned int VIGNETTE                   = 70;
-  static constexpr unsigned int VIGNETTEBLENDMODEMULTIPLY  = 71;
-  static constexpr unsigned int VIGNETTEBLENDMODEOPAQUE    = 72;
-  static constexpr unsigned int TONEMAPPING                = 73;
-  static constexpr unsigned int CONTRAST                   = 74;
-  static constexpr unsigned int COLORCURVES                = 75;
-  static constexpr unsigned int COLORGRADING               = 76;
-  static constexpr unsigned int SAMPLER3DGREENDEPTH        = 77;
-  static constexpr unsigned int SAMPLER3DBGRMAP            = 78;
-  static constexpr unsigned int IMAGEPROCESSINGPOSTPROCESS = 79;
-  static constexpr unsigned int EXPOSURE                   = 80;
+  static constexpr unsigned int IMAGEPROCESSING            = 67;
+  static constexpr unsigned int VIGNETTE                   = 68;
+  static constexpr unsigned int VIGNETTEBLENDMODEMULTIPLY  = 69;
+  static constexpr unsigned int VIGNETTEBLENDMODEOPAQUE    = 70;
+  static constexpr unsigned int TONEMAPPING                = 71;
+  static constexpr unsigned int CONTRAST                   = 72;
+  static constexpr unsigned int COLORCURVES                = 73;
+  static constexpr unsigned int COLORGRADING               = 74;
+  static constexpr unsigned int SAMPLER3DGREENDEPTH        = 75;
+  static constexpr unsigned int SAMPLER3DBGRMAP            = 76;
+  static constexpr unsigned int IMAGEPROCESSINGPOSTPROCESS = 77;
+  static constexpr unsigned int EXPOSURE                   = 78;
 
   static constexpr unsigned int USEPHYSICALLIGHTFALLOFF = 81;
   static constexpr unsigned int TWOSIDEDLIGHTING        = 82;
@@ -117,6 +115,8 @@ struct BABYLON_SHARED_EXPORT PBRMaterialDefines
   static constexpr unsigned int POINTSIZE               = 86;
   static constexpr unsigned int FOG                     = 87;
   static constexpr unsigned int LOGARITHMICDEPTH        = 88;
+
+  static constexpr unsigned int FORCENORMALFORWARD = 89;
 
   PBRMaterialDefines();
   ~PBRMaterialDefines();

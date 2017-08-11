@@ -33,12 +33,14 @@ PBRMaterial::PBRMaterial(const std::string& iName, Scene* scene)
     , reflectivityColor{Color3(1.f, 1.f, 1.f)}
     , reflectionColor{Color3(1.f, 1.f, 1.f)}
     , emissiveColor{Color3(0.f, 0.f, 0.f)}
-    , microSurface{0.9f}
+    , microSurface{1.f}
     , indexOfRefraction{0.66f}
     , invertRefractionY{false}
     , linkRefractionWithTransparency{false}
     , useLightmapAsShadowmap{false}
     , useAlphaFromAlbedoTexture{false}
+    , forceAlphaTest{false}
+    , alphaCutOff{0.4f}
     , useSpecularOverAlpha{true}
     , useMicroSurfaceFromReflectivityMapAlpha{false}
     , useRoughnessFromMetallicTextureAlpha{true}
@@ -53,13 +55,15 @@ PBRMaterial::PBRMaterial(const std::string& iName, Scene* scene)
     , useParallaxOcclusion{false}
     , parallaxScaleBias{0.05f}
     , disableLighting{false}
+    , forceIrradianceInFragment{false}
     , maxSimultaneousLights{4}
     , invertNormalMapX{false}
     , invertNormalMapY{false}
     , twoSidedLighting{false}
-    , premultiplyAlpha{false}
+    , preMultiplyAlpha{false}
     , useAlphaFresnel{false}
     , environmentBRDFTexture{nullptr}
+    , forceNormalForward{false}
 {
   _environmentBRDFTexture = TextureTools::GetEnvironmentBRDFTexture(scene);
 }
@@ -187,8 +191,8 @@ std::vector<BaseTexture*> PBRMaterial::getActiveTextures() const
     activeTextures.emplace_back(_emissiveTexture);
   }
 
-  if (_reflectionTexture) {
-    activeTextures.emplace_back(_reflectionTexture);
+  if (_reflectivityTexture) {
+    activeTextures.emplace_back(_reflectivityTexture);
   }
 
   if (_metallicTexture) {
@@ -233,6 +237,10 @@ bool PBRMaterial::hasTexture(BaseTexture* texture) const
   }
 
   if (_reflectionTexture == texture) {
+    return true;
+  }
+
+  if (_reflectivityTexture == texture) {
     return true;
   }
 

@@ -28,6 +28,11 @@ public:
   ~PBRBaseSimpleMaterial();
 
   /**
+   * @brief Returns the string "PBRBaseSimpleMaterial".
+   */
+  const char* getClassName() const override;
+
+  /**
    * @brief Gets the current transparency mode.
    */
   unsigned int transparencyMode() const;
@@ -59,6 +64,11 @@ public:
    * rendered in alpha test mode.
    */
   bool needAlphaTesting() override;
+
+  /**
+   * @brief Return the active textures of the material.
+   */
+  std::vector<BaseTexture*> getActiveTextures() const override;
 
 protected:
   /**
