@@ -24,8 +24,6 @@ Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData,
     , _engine{scene->getEngine()}
     , _totalVertices{0}
     , _isDisposed{false}
-    , _extendSet{false}
-    , _hasBoundingBias{false}
     , _indexBuffer{nullptr}
 {
   _meshes.clear();
@@ -51,7 +49,6 @@ Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData,
     if (mesh->type() == IReflect::Type::LINESMESH) {
       auto linesMesh = static_cast<LinesMesh*>(mesh);
       setBoundingBias(Vector2(0, linesMesh->intersectionThreshold()));
-      _hasBoundingBias = true;
       updateExtend(Float32Array());
     }
 
@@ -69,14 +66,14 @@ void Geometry::addToScene(std::unique_ptr<Geometry>&& newGeometry)
   _scene->pushGeometry(std::move(newGeometry), true);
 }
 
-Vector2& Geometry::boundingBias()
+const Vector2& Geometry::boundingBias() const
 {
-  return _boundingBias;
+  return *_boundingBias;
 }
 
 void Geometry::setBoundingBias(const Vector2& value)
 {
-  if (_hasBoundingBias && _boundingBias.equals(value)) {
+  if (_boundingBias && boundingBias().equals(value)) {
     return;
   }
 
@@ -85,9 +82,9 @@ void Geometry::setBoundingBias(const Vector2& value)
   updateBoundingInfo(true, Float32Array());
 }
 
-MinMax Geometry::extend() const
+const MinMax& Geometry::extend() const
 {
-  return _extend;
+  return *_extend;
 }
 
 Scene* Geometry::getScene()
@@ -163,7 +160,7 @@ void Geometry::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
 
     for (auto& mesh : _meshes) {
       mesh->_boundingInfo
-        = std::make_unique<BoundingInfo>(_extend.min, _extend.max);
+        = std::make_unique<BoundingInfo>(extend().min, extend().max);
       mesh->_createGlobalSubMesh();
       mesh->computeWorldMatrix(true);
     }
@@ -225,7 +222,7 @@ void Geometry::updateBoundingInfo(bool updateExtends, const Float32Array& data)
   for (auto& mesh : _meshes) {
     if (updateExtends) {
       mesh->_boundingInfo
-        = std::make_unique<BoundingInfo>(_extend.min, _extend.max);
+        = std::make_unique<BoundingInfo>(extend().min, extend().max);
 
       for (auto& subMesh : mesh->subMeshes) {
         subMesh->refreshBoundingInfo();
@@ -487,13 +484,12 @@ void Geometry::_applyToMesh(Mesh* mesh)
     if (kind == VertexBuffer::PositionKind) {
       mesh->_resetPointsArrayCache();
 
-      if (!_extendSet) {
+      if (!_extend) {
         _extend = Tools::ExtractMinAndMax(_vertexBuffers[kind]->getData(), 0,
                                           _totalVertices);
-        _extendSet = true;
       }
       mesh->_boundingInfo
-        = std::make_unique<BoundingInfo>(_extend.min, _extend.max);
+        = std::make_unique<BoundingInfo>(extend().min, extend().max);
 
       mesh->_createGlobalSubMesh();
 
@@ -686,7 +682,7 @@ Geometry* Geometry::copy(const std::string& iId)
 
   // Bounding info
   geometry->_boundingInfo
-    = std::make_unique<BoundingInfo>(_extend.min, _extend.max);
+    = std::make_unique<BoundingInfo>(extend().min, extend().max);
 
   return geometry;
 }

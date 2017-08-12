@@ -20,7 +20,15 @@ RenderingGroup::RenderingGroup(
   const std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn,
   const std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn,
   const std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn)
-    : index{iIndex}, onBeforeTransparentRendering{nullptr}, _scene{scene}
+    : index{iIndex}
+    , onBeforeTransparentRendering{nullptr}
+    , _scene{scene}
+    , _opaqueSortCompareFn{nullptr}
+    , _alphaTestSortCompareFn{nullptr}
+    , _transparentSortCompareFn{nullptr}
+    , _renderOpaque{nullptr}
+    , _renderAlphaTest{nullptr}
+    , _renderTransparent{nullptr}
 {
   _opaqueSubMeshes.reserve(256);
   _transparentSubMeshes.reserve(256);
@@ -133,7 +141,7 @@ void RenderingGroup::render(
   }
 
   // Transparent
-  if (_transparentSubMeshes.empty()) {
+  if (!_transparentSubMeshes.empty()) {
     _renderTransparent(_transparentSubMeshes);
     engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
   }
@@ -188,8 +196,6 @@ void RenderingGroup::renderSorted(
   std::sort(
     sortedArray.begin(), sortedArray.end(),
     [&sortCompareFn](SubMesh* a, SubMesh* b) { return sortCompareFn(a, b); });
-
-  // std::sort(sortedArray.begin(), sortedArray.end(), sortCompareFn);
 
   for (auto& subMesh : sortedArray) {
     subMesh->render(transparent);

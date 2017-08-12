@@ -2,6 +2,7 @@
 #define BABYLON_MESH_GEOMETRY_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/nullable.h>
 #include <babylon/core/structs.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/mesh/iget_set_vertices_data.h>
@@ -40,11 +41,11 @@ public:
    * v -= * v * bias.x + bias.y
    * @returns The Bias Vector
    */
-  Vector2& boundingBias();
+  const Vector2& boundingBias() const;
 
   void setBoundingBias(const Vector2& value);
 
-  MinMax extend() const;
+  const MinMax& extend() const;
   Scene* getScene();
   Engine* getEngine();
   bool isReady() const;
@@ -137,10 +138,8 @@ private:
   std::unordered_map<unsigned int, std::unique_ptr<VertexBuffer>>
     _vertexBuffers;
   bool _isDisposed;
-  bool _extendSet;
-  MinMax _extend;
-  bool _hasBoundingBias;
-  Vector2 _boundingBias;
+  Nullable<MinMax> _extend;
+  Nullable<Vector2> _boundingBias;
   Uint32Array _delayInfo;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
 
