@@ -152,11 +152,6 @@ Effect::~Effect()
 {
 }
 
-Engine* Effect::getEngine() const
-{
-  return _engine;
-}
-
 std::string Effect::key() const
 {
   return _key;
@@ -165,6 +160,11 @@ std::string Effect::key() const
 bool Effect::isReady() const
 {
   return _isReady;
+}
+
+Engine* Effect::getEngine() const
+{
+  return _engine;
 }
 
 GL::IGLProgram* Effect::getProgram()
@@ -522,7 +522,8 @@ void Effect::_processIncludes(
 
 std::string Effect::_processPrecision(std::string source)
 {
-  if (String::contains(source, "precision highp float")) {
+  if (!String::contains(source, "precision highp float")
+      && !String::contains(source, "precision mediump float")) {
     if (!_engine->getCaps().highPrecisionShaderSupported) {
       source = "precision mediump float;\n" + source;
     }
@@ -536,6 +537,21 @@ std::string Effect::_processPrecision(std::string source)
       String::replaceInPlace(source, "precision highp float",
                              "precision mediump float");
     }
+  }
+
+  // Add GL_ES define
+  // -- precision mediump float
+  const std::string mediump{"#ifdef GL_ES\nprecision mediump float;\n#endif\n"};
+  if (String::contains(source, "precision mediump float;")
+      && !String::contains(source, mediump)) {
+    String::replaceInPlace(source, "precision mediump float;", mediump);
+  }
+
+  // -- precision highp float
+  const std::string highp{"#ifdef GL_ES\nprecision highp float;\n#endif\n"};
+  if (String::contains(source, "precision highp float;")
+      && !String::contains(source, highp)) {
+    String::replaceInPlace(source, "precision highp float;", highp);
   }
 
   return source;

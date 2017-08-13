@@ -27,9 +27,9 @@ public:
   ~Effect();
 
   /** Properties **/
-  Engine* getEngine() const;
   std::string key() const;
   bool isReady() const;
+  Engine* getEngine() const;
   GL::IGLProgram* getProgram();
   std::vector<std::string>& getAttributesNames();
   int getAttributeLocation(unsigned int index);
