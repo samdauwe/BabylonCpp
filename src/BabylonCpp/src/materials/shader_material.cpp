@@ -321,16 +321,16 @@ void ShaderMaterial::bindOnlyWorldMatrix(Matrix& world)
 {
   auto scene = getScene();
 
-  if (!stl_util::contains(_options.uniforms, "world")) {
+  if (stl_util::contains(_options.uniforms, "world")) {
     _effect->setMatrix("world", world);
   }
 
-  if (!stl_util::contains(_options.uniforms, "worldView")) {
+  if (stl_util::contains(_options.uniforms, "worldView")) {
     world.multiplyToRef(scene->getViewMatrix(), _cachedWorldViewMatrix);
     _effect->setMatrix("worldView", _cachedWorldViewMatrix);
   }
 
-  if (!stl_util::contains(_options.uniforms, "worldViewProjection")) {
+  if (stl_util::contains(_options.uniforms, "worldViewProjection")) {
     auto transformMatrix = scene->getTransformMatrix();
     _effect->setMatrix("worldViewProjection", world.multiply(transformMatrix));
   }
@@ -342,15 +342,15 @@ void ShaderMaterial::bind(Matrix* world, Mesh* mesh)
   bindOnlyWorldMatrix(*world);
 
   if (getScene()->getCachedMaterial() != this) {
-    if (!stl_util::contains(_options.uniforms, "view")) {
+    if (stl_util::contains(_options.uniforms, "view")) {
       _effect->setMatrix("view", getScene()->getViewMatrix());
     }
 
-    if (!stl_util::contains(_options.uniforms, "projection")) {
+    if (stl_util::contains(_options.uniforms, "projection")) {
       _effect->setMatrix("projection", getScene()->getProjectionMatrix());
     }
 
-    if (!stl_util::contains(_options.uniforms, "viewProjection")) {
+    if (stl_util::contains(_options.uniforms, "viewProjection")) {
       _effect->setMatrix("viewProjection", getScene()->getTransformMatrix());
     }
 
