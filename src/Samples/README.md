@@ -1,0 +1,30 @@
+## Working examples ##
+
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/animations_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/basic_elements_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/basic_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/cuboid_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/extrusion_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/ico_sphere_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/infinite_loader_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lathe_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lights_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lorenz_attractor_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/mandelbrot_fractal_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/perlin_noise_waves_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_bird_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_monkey_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_puzzle_piece_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_stars_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_stars_with_holes_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polyhedra_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polyhedron_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/rotation_and_scaling_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_box_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_boxes_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_cylinders_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_skybox_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/super_ellipsoid_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/tube_scene.png">
+<img src="https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/waves_scene.png">
