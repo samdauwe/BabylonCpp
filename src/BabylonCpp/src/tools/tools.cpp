@@ -6,9 +6,12 @@
 #pragma GCC diagnostic ignored "-Wcast-qual"
 #pragma GCC diagnostic ignored "-Wconversion"
 #if __GNUC__ > 5
-#pragma GCC diagnostic ignored "-Wgnu"
 #pragma GCC diagnostic ignored "-Wmisleading-indentation"
 #pragma GCC diagnostic ignored "-Wshift-negative-value"
+#endif
+#if __GNUC__ > 6
+// Use of GNU statement expression extension
+#pragma GCC diagnostic ignored "-Wgnu"
 #endif
 #pragma GCC diagnostic ignored "-Wswitch-default"
 #endif

@@ -597,6 +597,8 @@ void Engine::clear(bool depth, bool stencil)
 void Engine::clear(const Color4& color, bool backBuffer, bool depth,
                    bool stencil)
 {
+  applyStates();
+
   unsigned int mode = 0;
   if (backBuffer) {
     _gl->clearColor(color.r, color.g, color.b, color.a);
@@ -3224,8 +3226,12 @@ void Engine::unbindAllAttributes()
   if (_mustWipeVertexAttributes) {
     _mustWipeVertexAttributes = false;
 
-    for (unsigned int i = 0, ul = static_cast<unsigned>(_caps.maxVertexAttribs);
-         i < ul; ++i) {
+    const unsigned int ul = static_cast<unsigned>(_caps.maxVertexAttribs);
+    if (_vertexAttribArraysEnabled.size() < ul) {
+      _vertexAttribArraysEnabled.resize(ul);
+    }
+
+    for (unsigned int i = 0; i < ul; ++i) {
       _gl->disableVertexAttribArray(i);
       _vertexAttribArraysEnabled[i] = false;
     }

@@ -232,7 +232,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         defines.defines[PMD::LODBASEDMICROSFURACE] = true;
       }
 
-      if (_albedoTexture && &StandardMaterial::DiffuseTextureEnabled) {
+      if (_albedoTexture && StandardMaterial::DiffuseTextureEnabled()) {
         if (!_albedoTexture->isReadyOrNotBlocking()) {
           return false;
         }
@@ -259,7 +259,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         defines.defines[PMD::AMBIENT] = false;
       }
 
-      if (_opacityTexture && &StandardMaterial::OpacityTextureEnabled) {
+      if (_opacityTexture && StandardMaterial::OpacityTextureEnabled()) {
         if (!_opacityTexture->isReadyOrNotBlocking()) {
           return false;
         }
@@ -372,7 +372,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         defines.defines[PMD::LIGHTMAP] = false;
       }
 
-      if (_emissiveTexture && &StandardMaterial::EmissiveTextureEnabled) {
+      if (_emissiveTexture && StandardMaterial::EmissiveTextureEnabled()) {
         if (!_emissiveTexture->isReadyOrNotBlocking()) {
           return false;
         }
