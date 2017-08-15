@@ -85,7 +85,7 @@ int main(int argc, char** argv)
     printf("Usage: %s", progname);
     arg_print_syntax(stdout, argtable, "\n");
     printf(
-      "This program acts as a the sample launcher for demonstrates the use of "
+      "This program acts as a sample launcher for demonstrating the usage of "
       "the BabylonCpp library\n");
     arg_print_glossary(stdout, argtable, "  %-25s %s\n");
     exitcode = 0;
