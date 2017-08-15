@@ -44,7 +44,6 @@ release_build
 
 # Not yet finished code
 src/Editor
-src/SampleLauncher
 
 # Executables
 *.exe
