@@ -14,7 +14,7 @@ struct BABYLON_SHARED_EXPORT RenderingManageAutoClearOptions {
   bool autoClear;
   bool depth;
   bool stencil;
-}; // end of class RenderingManageAutoClearOptions
+}; // end of struct RenderingManageAutoClearOptions
 
 class BABYLON_SHARED_EXPORT RenderingManager {
 
@@ -48,7 +48,7 @@ public:
   void reset();
   void dispose();
   void dispatchSprites(SpriteManager* spriteManager);
-  void dispatchParticles(ParticleSystem* particleSystem);
+  void dispatchParticles(IParticleSystem* particleSystem);
   void dispatch(SubMesh* subMesh);
 
   /**

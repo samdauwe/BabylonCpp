@@ -401,11 +401,6 @@ bool Mesh::isReady() const
   return AbstractMesh::isReady();
 }
 
-bool Mesh::isDisposed() const
-{
-  return _isDisposed;
-}
-
 unsigned int Mesh::sideOrientation() const
 {
   return _sideOrientation;
@@ -498,27 +493,32 @@ Mesh& Mesh::refreshBoundingInfo()
   return *this;
 }
 
-SubMesh* Mesh::_createGlobalSubMesh()
+SubMesh* Mesh::_createGlobalSubMesh(bool force)
 {
-  size_t totalVertices = getTotalVertices();
+  auto totalVertices = getTotalVertices();
   if (!totalVertices) {
     return nullptr;
   }
 
   // Check if we need to recreate the submeshes
   if (!subMeshes.empty()) {
-    auto totalIndices   = getIndices().size();
-    bool needToRecreate = false;
+    const auto totalIndices = getIndices().size();
+    bool needToRecreate     = false;
 
-    for (auto& submesh : subMeshes) {
-      if (submesh->indexStart + submesh->indexCount >= totalIndices) {
-        needToRecreate = true;
-        break;
-      }
+    if (force) {
+      needToRecreate = true;
+    }
+    else {
+      for (auto& submesh : subMeshes) {
+        if (submesh->indexStart + submesh->indexCount >= totalIndices) {
+          needToRecreate = true;
+          break;
+        }
 
-      if (submesh->verticesStart + submesh->verticesCount >= totalVertices) {
-        needToRecreate = true;
-        break;
+        if (submesh->verticesStart + submesh->verticesCount >= totalVertices) {
+          needToRecreate = true;
+          break;
+        }
       }
     }
 
@@ -1061,9 +1061,9 @@ Mesh& Mesh::_onBeforeDraw(bool isInstance, Matrix& world,
   return *this;
 }
 
-std::vector<ParticleSystem*> Mesh::getEmittedParticleSystems()
+std::vector<IParticleSystem*> Mesh::getEmittedParticleSystems()
 {
-  std::vector<ParticleSystem*> results;
+  std::vector<IParticleSystem*> results;
   for (auto& particleSystem : getScene()->particleSystems) {
     auto& emitter = particleSystem->emitter;
     if (emitter.is<AbstractMesh*>() && (emitter.get<AbstractMesh*>() == this)) {
@@ -1074,9 +1074,9 @@ std::vector<ParticleSystem*> Mesh::getEmittedParticleSystems()
   return results;
 }
 
-std::vector<ParticleSystem*> Mesh::getHierarchyEmittedParticleSystems()
+std::vector<IParticleSystem*> Mesh::getHierarchyEmittedParticleSystems()
 {
-  std::vector<ParticleSystem*> results;
+  std::vector<IParticleSystem*> results;
   std::vector<Node*> descendants = getDescendants();
   descendants.emplace_back(this);
 

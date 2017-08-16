@@ -20,6 +20,9 @@ Effect* BaseSubMesh::effect()
 void BaseSubMesh::setEffect(Effect* effect)
 {
   if (_materialEffect == effect) {
+    if (!effect) {
+      _materialDefines = nullptr;
+    }
     return;
   }
   _materialDefines = nullptr;
@@ -29,6 +32,9 @@ void BaseSubMesh::setEffect(Effect* effect)
 void BaseSubMesh::setEffect(Effect* effect, const MaterialDefines& defines)
 {
   if (_materialEffect == effect) {
+    if (!effect) {
+      _materialDefines = nullptr;
+    }
     return;
   }
   _materialDefines = std::make_unique<MaterialDefines>(defines);

@@ -97,9 +97,7 @@ Material* SubMesh::getMaterial()
     auto effectiveMaterial = multiMaterial->getSubMaterial(materialIndex);
     if (_currentMaterial != effectiveMaterial) {
       _currentMaterial = effectiveMaterial;
-      if (_materialDefines) {
-        _materialDefines->markAllAsDirty();
-      }
+      _materialDefines.reset(nullptr);
     }
 
     return effectiveMaterial;
@@ -188,9 +186,10 @@ GL::IGLBuffer* SubMesh::getLinesIndexBuffer(const Uint32Array& indices,
 
     for (size_t index = indexStart; index < indexStart + indexCount;
          index += 3) {
-      stl_util::concat(linesIndices, {indices[index + 0], indices[index + 1],
-                                      indices[index + 1], indices[index + 2],
-                                      indices[index + 2], indices[index + 0]});
+      stl_util::concat(linesIndices,
+                       {indices[index + 0], indices[index + 1],
+                        indices[index + 1], indices[index + 2],
+                        indices[index + 2], indices[index + 0]});
     }
 
     _linesIndexBuffer = engine->createIndexBuffer(linesIndices);

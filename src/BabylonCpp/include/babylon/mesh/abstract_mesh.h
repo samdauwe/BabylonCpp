@@ -117,6 +117,11 @@ public:
   const char* getClassName() const override;
 
   /**
+   * @brief Returns true if the mesh has been disposed.
+   */
+  bool isDisposed() const;
+
+  /**
    * @brief Returns the string representatin of the AbstractMesh Object.
    * @param {boolean} fullDetails - support for multiple levels of logging
    * within scene loading
@@ -948,6 +953,10 @@ public:
    * An event triggered after the world matrix is updated
    */
   Observable<AbstractMesh> onAfterWorldMatrixUpdateObservable;
+  /**
+   * An event triggered when material is changed
+   */
+  Observable<AbstractMesh> onMaterialChangedObservable;
   // Properties
   bool definedFacingForward;
   unsigned int billboardMode;
@@ -959,6 +968,7 @@ public:
   bool showBoundingBox;
   bool showSubMeshesBoundingBox;
   bool isBlocker;
+  bool enablePointerMoveEvents;
   unsigned int renderingGroupId;
   bool renderOutline;
   Color3 outlineColor;

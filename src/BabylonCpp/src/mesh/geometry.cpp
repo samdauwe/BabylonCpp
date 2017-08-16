@@ -20,6 +20,7 @@ Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData,
                    bool updatable, Mesh* mesh)
     : id{iId}
     , delayLoadState{EngineConstants::DELAYLOADSTATE_NONE}
+    , _updatable{updatable}
     , _scene{scene}
     , _engine{scene->getEngine()}
     , _totalVertices{0}
@@ -141,7 +142,7 @@ void Geometry::removeVerticesData(unsigned int kind)
 
 void Geometry::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
 {
-  unsigned int kind = buffer->getKind();
+  auto kind = buffer->getKind();
   if (stl_util::contains(_vertexBuffers, kind)) {
     _vertexBuffers[kind]->dispose();
   }
@@ -161,7 +162,7 @@ void Geometry::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
     for (auto& mesh : _meshes) {
       mesh->_boundingInfo
         = std::make_unique<BoundingInfo>(extend().min, extend().max);
-      mesh->_createGlobalSubMesh();
+      mesh->_createGlobalSubMesh(false);
       mesh->computeWorldMatrix(true);
     }
   }
@@ -357,7 +358,7 @@ Mesh* Geometry::setIndices(const IndicesArray& indices, size_t totalVertices)
   }
 
   for (auto& mesh : _meshes) {
-    mesh->_createGlobalSubMesh();
+    mesh->_createGlobalSubMesh(true);
   }
 
   notifyUpdate();
@@ -491,7 +492,7 @@ void Geometry::_applyToMesh(Mesh* mesh)
       mesh->_boundingInfo
         = std::make_unique<BoundingInfo>(extend().min, extend().max);
 
-      mesh->_createGlobalSubMesh();
+      mesh->_createGlobalSubMesh(false);
 
       // bounding info was just created again, world matrix should be applied
       // again.
@@ -782,15 +783,23 @@ void Geometry::ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh)
     }
 
     if (parsedGeometry.contains("matricesWeights")) {
-      mesh->setVerticesData(
-        VertexBuffer::MatricesWeightsKind,
-        Json::ToArray<float>(parsedGeometry, "matricesWeights"), false);
+      auto matricesWeights
+        = Json::ToArray<float>(parsedGeometry, "matricesWeights");
+      auto numBoneInfluencers
+        = Json::GetNumber(parsedGeometry, "numBoneInfluencers", 0u);
+      Geometry::_CleanMatricesWeights(matricesWeights, numBoneInfluencers);
+      mesh->setVerticesData(VertexBuffer::MatricesWeightsKind, matricesWeights,
+                            false);
     }
 
     if (parsedGeometry.contains("matricesWeightsExtra")) {
-      mesh->setVerticesData(
-        VertexBuffer::MatricesWeightsExtraKind,
-        Json::ToArray<float>(parsedGeometry, "matricesWeightsExtra"), false);
+      auto matricesWeightsExtra
+        = Json::ToArray<float>(parsedGeometry, "matricesWeightsExtra");
+      auto numBoneInfluencers
+        = Json::GetNumber(parsedGeometry, "numBoneInfluencers", 0u);
+      Geometry::_CleanMatricesWeights(matricesWeightsExtra, numBoneInfluencers);
+      mesh->setVerticesData(VertexBuffer::MatricesWeightsExtraKind,
+                            matricesWeightsExtra, false);
     }
 
     if (parsedGeometry.contains("indices")) {
@@ -824,6 +833,27 @@ void Geometry::ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh)
   // TODO
 }
 
+void Geometry::_CleanMatricesWeights(Float32Array& matricesWeights,
+                                     unsigned int influencers)
+{
+  const auto size = matricesWeights.size();
+  for (std::size_t i = 0; i < size; i += influencers) {
+    float weight            = 0;
+    std::size_t biggerIndex = i;
+    float biggerWeight      = 0;
+    for (std::size_t j = 0; j < influencers - 1; ++j) {
+      weight += matricesWeights[i + j];
+
+      if (matricesWeights[i + j] > biggerWeight) {
+        biggerWeight = matricesWeights[i + j];
+        biggerIndex  = i + j;
+      }
+    }
+
+    matricesWeights[biggerIndex] += std::max(0.f, 1.f - weight);
+  }
+}
+
 Geometry* Geometry::Parse(const Json::value& parsedVertexData, Scene* scene,
                           const std::string& rootUrl)
 {
@@ -834,7 +864,8 @@ Geometry* Geometry::Parse(const Json::value& parsedVertexData, Scene* scene,
                     // box...
   }
 
-  auto geometry = Geometry::New(parsedVertexDataId, scene);
+  auto geometry = Geometry::New(parsedVertexDataId, scene, nullptr,
+                                Json::GetBool(parsedVertexData, "updatable"));
 
   // Tags.AddTagsTo(geometry, parsedVertexData.tags);
 

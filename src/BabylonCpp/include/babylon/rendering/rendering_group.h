@@ -110,7 +110,7 @@ public:
 
   void dispatchSprites(SpriteManager* spriteManager);
 
-  void dispatchParticles(ParticleSystem* particleSystem);
+  void dispatchParticles(IParticleSystem* particleSystem);
 
 private:
   /**
@@ -164,7 +164,7 @@ private:
   std::vector<SubMesh*> _opaqueSubMeshes;
   std::vector<SubMesh*> _transparentSubMeshes;
   std::vector<SubMesh*> _alphaTestSubMeshes;
-  std::vector<ParticleSystem*> _particleSystems;
+  std::vector<IParticleSystem*> _particleSystems;
   std::vector<SpriteManager*> _spriteManagers;
   size_t _activeVertices;
 

@@ -98,6 +98,8 @@ public:
   static Geometry* ExtractFromMesh(Mesh* mesh, const std::string& id);
   static std::string RandomId();
   static void ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh);
+  static void _CleanMatricesWeights(Float32Array& matricesWeights,
+                                    unsigned int influencers);
   static Geometry* Parse(const Json::value& parsedVertexData, Scene* scene,
                          const std::string& rootUrl);
 
@@ -127,6 +129,7 @@ public:
   std::vector<Vector3> _positions; // Cache
   std::unordered_map<std::string, std::unique_ptr<GL::IGLVertexArrayObject>>
     _vertexArrayObjects;
+  bool _updatable;
   std::vector<Vector3> centroids;
 
 private:

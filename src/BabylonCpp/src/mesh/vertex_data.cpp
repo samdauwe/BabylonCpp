@@ -735,8 +735,9 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
     stl_util::concat(normals, {normal.x, normal.y, normal.z});
     stl_util::concat(uvs, {faceUV[index].z, faceUV[index].w});
     if (!faceColors.empty()) {
-      stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
-                                faceColors[index].b, faceColors[index].a});
+      stl_util::concat(colors,
+                       {faceColors[index].r, faceColors[index].g,
+                        faceColors[index].b, faceColors[index].a});
     }
 
     vertex = normal.subtract(side1).add(side2).multiply(scaleVector);
@@ -744,8 +745,9 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
     stl_util::concat(normals, {normal.x, normal.y, normal.z});
     stl_util::concat(uvs, {faceUV[index].x, faceUV[index].w});
     if (!faceColors.empty()) {
-      stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
-                                faceColors[index].b, faceColors[index].a});
+      stl_util::concat(colors,
+                       {faceColors[index].r, faceColors[index].g,
+                        faceColors[index].b, faceColors[index].a});
     }
 
     vertex = normal.add(side1).add(side2).multiply(scaleVector);
@@ -753,8 +755,9 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
     stl_util::concat(normals, {normal.x, normal.y, normal.z});
     stl_util::concat(uvs, {faceUV[index].x, faceUV[index].y});
     if (!faceColors.empty()) {
-      stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
-                                faceColors[index].b, faceColors[index].a});
+      stl_util::concat(colors,
+                       {faceColors[index].r, faceColors[index].g,
+                        faceColors[index].b, faceColors[index].a});
     }
 
     vertex = normal.add(side1).subtract(side2).multiply(scaleVector);
@@ -762,8 +765,9 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
     stl_util::concat(normals, {normal.x, normal.y, normal.z});
     stl_util::concat(uvs, {faceUV[index].z, faceUV[index].y});
     if (!faceColors.empty()) {
-      stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
-                                faceColors[index].b, faceColors[index].a});
+      stl_util::concat(colors,
+                       {faceColors[index].r, faceColors[index].g,
+                        faceColors[index].b, faceColors[index].a});
     }
   }
 
@@ -974,14 +978,16 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
         else {
           v = faceUV[s].y + (faceUV[s].w - faceUV[s].y) * h;
         }
-        stl_util::concat(uvs, {faceUV[s].x
-                                 + (faceUV[s].z - faceUV[s].x)
-                                     * static_cast<float>(j)
-                                     / static_cast<float>(tessellation),
-                               v});
+        stl_util::concat(uvs,
+                         {faceUV[s].x
+                            + (faceUV[s].z - faceUV[s].x)
+                                * static_cast<float>(j)
+                                / static_cast<float>(tessellation),
+                          v});
         if (!faceColors.empty()) {
-          stl_util::concat(colors, {faceColors[s].r, faceColors[s].g,
-                                    faceColors[s].b, faceColors[s].a});
+          stl_util::concat(colors,
+                           {faceColors[s].r, faceColors[s].g, faceColors[s].b,
+                            faceColors[s].a});
         }
       }
 
@@ -994,12 +1000,14 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
           positions, {ringFirstVertex.x, ringFirstVertex.y, ringFirstVertex.z});
         Vector3::CrossToRef(Y, ringNormal, quadNormal);
         quadNormal.normalize();
-        stl_util::concat(normals, {quadNormal.x, quadNormal.y, quadNormal.z,
-                                   quadNormal.x, quadNormal.y, quadNormal.z});
+        stl_util::concat(normals,
+                         {quadNormal.x, quadNormal.y, quadNormal.z,
+                          quadNormal.x, quadNormal.y, quadNormal.z});
         Vector3::CrossToRef(ringFirstNormal, Y, quadNormal);
         quadNormal.normalize();
-        stl_util::concat(normals, {quadNormal.x, quadNormal.y, quadNormal.z,
-                                   quadNormal.x, quadNormal.y, quadNormal.z});
+        stl_util::concat(normals,
+                         {quadNormal.x, quadNormal.y, quadNormal.z,
+                          quadNormal.x, quadNormal.y, quadNormal.z});
         if (hasRings) {
           v = (cs != s) ? faceUV[s + 1].y : faceUV[s + 1].w;
         }
@@ -1017,14 +1025,18 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
         stl_util::concat(uvs, {faceUV[s + 2].x, v});
         stl_util::concat(uvs, {faceUV[s + 2].z, v});
         if (!faceColors.empty()) {
-          stl_util::concat(colors, {faceColors[s + 1].r, faceColors[s + 1].g,
-                                    faceColors[s + 1].b, faceColors[s + 1].a});
-          stl_util::concat(colors, {faceColors[s + 1].r, faceColors[s + 1].g,
-                                    faceColors[s + 1].b, faceColors[s + 1].a});
-          stl_util::concat(colors, {faceColors[s + 2].r, faceColors[s + 2].g,
-                                    faceColors[s + 2].b, faceColors[s + 2].a});
-          stl_util::concat(colors, {faceColors[s + 2].r, faceColors[s + 2].g,
-                                    faceColors[s + 2].b, faceColors[s + 2].a});
+          stl_util::concat(colors,
+                           {faceColors[s + 1].r, faceColors[s + 1].g,
+                            faceColors[s + 1].b, faceColors[s + 1].a});
+          stl_util::concat(colors,
+                           {faceColors[s + 1].r, faceColors[s + 1].g,
+                            faceColors[s + 1].b, faceColors[s + 1].a});
+          stl_util::concat(colors,
+                           {faceColors[s + 2].r, faceColors[s + 2].g,
+                            faceColors[s + 2].b, faceColors[s + 2].a});
+          stl_util::concat(colors,
+                           {faceColors[s + 2].r, faceColors[s + 2].g,
+                            faceColors[s + 2].b, faceColors[s + 2].a});
         }
       }
       if (cs != s) {
@@ -1098,8 +1110,9 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
       stl_util::concat(positions,
                        {circleVector.x, circleVector.y, circleVector.z});
       stl_util::concat(normals, {0.f, isTop ? 1.f : -1.f, 0.f});
-      stl_util::concat(uvs, {u.x + (u.z - u.x) * textureCoordinate.x,
-                             u.y + (u.w - u.y) * textureCoordinate.y});
+      stl_util::concat(uvs,
+                       {u.x + (u.z - u.x) * textureCoordinate.x,
+                        u.y + (u.w - u.y) * textureCoordinate.y});
       if (!faceColors.empty()) {
         stl_util::concat(colors, {c.r, c.g, c.b, c.a});
       }
@@ -1276,9 +1289,10 @@ VertexData::CreateDashedLines(DashedLinesOptions& options)
     curvect.normalize();
     for (float j = 0.f; j < nb; ++j) {
       curshft = shft * j;
-      stl_util::concat(positions, {points[i].x + curshft * curvect.x,
-                                   points[i].y + curshft * curvect.y,
-                                   points[i].z + curshft * curvect.z});
+      stl_util::concat(positions,
+                       {points[i].x + curshft * curvect.x,
+                        points[i].y + curshft * curvect.y,
+                        points[i].z + curshft * curvect.z});
       stl_util::concat(positions,
                        {points[i].x + (curshft + dashshft) * curvect.x,
                         points[i].y + (curshft + dashshft) * curvect.y,
@@ -1426,8 +1440,9 @@ VertexData::CreateTiledGround(TiledGroundOptions& options)
 
             stl_util::concat(positions, {position.x, position.y, position.z});
             stl_util::concat(normals, {normal.x, normal.y, normal.z});
-            stl_util::concat(uvs, {colf / static_cast<float>(precision_w),
-                                   rowf / static_cast<float>(precision_h)});
+            stl_util::concat(uvs,
+                             {colf / static_cast<float>(precision_w),
+                              rowf / static_cast<float>(precision_h)});
           }
         }
       };
@@ -1672,15 +1687,15 @@ std::unique_ptr<VertexData> VertexData::CreatePolygon(
   unsigned int face = 0;
   for (unsigned int index = 0; index < normals.size(); index += 3) {
     // Edge Face  no. 1
-    if (stl_util::almost_equal(std::abs(normals[index + 1]), 0.f)) {
+    if (std::abs(normals[index + 1]) < 0.001f) {
       face = 1;
     }
     // Top Face  no. 0
-    if (stl_util::almost_equal(normals[index + 1], 1.f)) {
+    if (std::abs(normals[index + 1] - 1) < 0.001f) {
       face = 0;
     }
     // Bottom Face  no. 2
-    if (stl_util::almost_equal(normals[index + 1], -1.f)) {
+    if (std::abs(normals[index + 1] + 1) < 0.001f) {
       face = 2;
     }
     idx = index / 3;
@@ -1689,8 +1704,9 @@ std::unique_ptr<VertexData> VertexData::CreatePolygon(
     uvs[2 * idx + 1] = (1.f - uvs[2 * idx + 1]) * faceUV[face].y
                        + uvs[2 * idx + 1] * faceUV[face].w;
     if (!faceColors.empty()) {
-      stl_util::concat(colors, {faceColors[face].r, faceColors[face].g,
-                                faceColors[face].b, faceColors[face].a});
+      stl_util::concat(colors,
+                       {faceColors[face].r, faceColors[face].g,
+                        faceColors[face].b, faceColors[face].a});
     }
   }
 
@@ -1727,17 +1743,17 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
   const auto& radiusY         = options.radiusY;
   const auto& radiusZ         = options.radiusZ;
 
-  float t = (1.f + std::sqrt(5.f)) / 2.f;
+  const float t = (1.f + std::sqrt(5.f)) / 2.f;
 
   // 12 vertex x,y,z
-  std::array<float, 36> ico_vertices = {{
+  const std::array<float, 36> ico_vertices = {{
     -1.f, t,    -0.f, 1.f, t,   0.f,  -1.f, -t,   0.f, 1.f, -t,  0.f, // v0-3
     0.f,  -1.f, -t,   0.f, 1.f, -t,   0.f,  -1.f, t,   0.f, 1.f, t,   // v4-7
     t,    0.f,  1.f,  t,   0.f, -1.f, -t,   0.f,  1.f, -t,  0.f, -1.f // v8-11
   }};
 
   // index of 3 vertex makes a face of icopshere
-  std::array<unsigned int, 60> ico_indices = {{
+  const std::array<unsigned int, 60> ico_indices = {{
     0,  11, 5,  0,  5,  1,  0,  1,  7,  0,  7,  10, 12, 22, 23, //
     1,  5,  20, 5,  11, 4,  23, 22, 13, 22, 18, 6,  7,  1,  8,  //
     14, 21, 4,  14, 4,  2,  16, 13, 6,  15, 6,  19, 3,  8,  9,  //
@@ -1745,7 +1761,7 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
   }};
 
   // vertex for uv have aliased position, not for UV
-  std::array<unsigned int, 24> vertices_unalias_id = {{
+  const std::array<unsigned int, 24> vertices_unalias_id = {{
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
     // vertex alias
     0,  // 12: 0 + 12
@@ -1763,7 +1779,7 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
   }};
 
   // uv as integer step (not pixels !)
-  std::array<float, 48> ico_vertexuv = {{
+  const std::array<float, 48> ico_vertexuv = {{
     5, 1, 3, 1, 6, 4, 0, 0, // v0-3
     5, 3, 4, 2, 2, 2, 4, 0, // v4-7
     2, 0, 1, 1, 6, 0, 6, 2, // v8-11
@@ -1823,14 +1839,14 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
    */
 
   // uv step is u:1 or 0.5, v:cos(30)=sqrt(3)/2, ratio approx is 84/97
-  float ustep   = 138.f / 1024.f;
-  float vstep   = 239.f / 1024.f;
-  float uoffset = 60.f / 1024.f;
-  float voffset = 26.f / 1024.f;
+  const float ustep   = 138.f / 1024.f;
+  const float vstep   = 239.f / 1024.f;
+  const float uoffset = 60.f / 1024.f;
+  const float voffset = 26.f / 1024.f;
   // Second island should have margin, not to touch the first island
   // avoid any borderline artefact in pixel rounding
-  float island_u_offset = -40.f / 1024.f;
-  float island_v_offset = +20.f / 1024.f;
+  const float island_u_offset = -40.f / 1024.f;
+  const float island_v_offset = +20.f / 1024.f;
   // face is either island 0 or 1 :
   // second island is for faces : [4, 7, 8, 12, 13, 16, 17, 18]
   std::array<float, 20> island = {{
@@ -1860,7 +1876,7 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
     // 3 vertex per face
     for (v012 = 0; v012 < 3; ++v012) {
       // look up vertex 0,1,2 to its index in 0 to 11 (or 23 including alias)
-      unsigned int v_id = ico_indices[3 * face + v012];
+      const unsigned int v_id = ico_indices[3 * face + v012];
       // vertex have 3D position (x,y,z)
       face_vertex_pos[v012].copyFromFloats(
         ico_vertices[3 * vertices_unalias_id[v_id]],
@@ -1918,64 +1934,70 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
      *  (c1,c2) are used for centroid location
      */
 
-    auto interp_vertex = [&](float i1, unsigned int i2, float c1, float c2) {
-      // vertex is interpolated from
-      //   - face_vertex_pos[0..2]
-      //   - face_vertex_uv[0..2]
-      auto _div   = static_cast<float>(i2) / subdivisionsf;
-      auto pos_x0 = Vector3::Lerp(face_vertex_pos[0], face_vertex_pos[2], _div);
-      auto pos_x1 = Vector3::Lerp(face_vertex_pos[1], face_vertex_pos[2], _div);
-      auto pos_interp
-        = (subdivisions == i2) ?
-            face_vertex_pos[2] :
-            Vector3::Lerp(pos_x0, pos_x1,
-                          i1 / static_cast<float>(subdivisions - i2));
-      pos_interp.normalize();
+    const auto interp_vertex
+      = [&](float i1, unsigned int i2, float c1, float c2) {
+          // vertex is interpolated from
+          //   - face_vertex_pos[0..2]
+          //   - face_vertex_uv[0..2]
+          const auto _div = static_cast<float>(i2) / subdivisionsf;
+          const auto pos_x0
+            = Vector3::Lerp(face_vertex_pos[0], face_vertex_pos[2], _div);
+          const auto pos_x1
+            = Vector3::Lerp(face_vertex_pos[1], face_vertex_pos[2], _div);
+          auto pos_interp
+            = (subdivisions == i2) ?
+                face_vertex_pos[2] :
+                Vector3::Lerp(pos_x0, pos_x1,
+                              i1 / static_cast<float>(subdivisions - i2));
+          pos_interp.normalize();
 
-      Vector3 vertex_normal;
-      if (flat) {
-        // in flat mode, recalculate normal as face centroid normal
-        auto centroid_x0 = Vector3::Lerp(face_vertex_pos[0], face_vertex_pos[2],
-                                         c2 / subdivisionsf);
-        auto centroid_x1 = Vector3::Lerp(face_vertex_pos[1], face_vertex_pos[2],
-                                         c2 / subdivisionsf);
-        vertex_normal
-          = Vector3::Lerp(centroid_x0, centroid_x1, c1 / (subdivisionsf - c2));
-      }
-      else {
-        // in smooth mode, recalculate normal from each single vertex position
-        vertex_normal = Vector3(pos_interp.x, pos_interp.y, pos_interp.z);
-      }
-      // Vertex normal need correction due to X,Y,Z radius scaling
-      vertex_normal.x /= radiusX;
-      vertex_normal.y /= radiusY;
-      vertex_normal.z /= radiusZ;
-      vertex_normal.normalize();
+          Vector3 vertex_normal;
+          if (flat) {
+            // in flat mode, recalculate normal as face centroid normal
+            const auto centroid_x0 = Vector3::Lerp(
+              face_vertex_pos[0], face_vertex_pos[2], c2 / subdivisionsf);
+            const auto centroid_x1 = Vector3::Lerp(
+              face_vertex_pos[1], face_vertex_pos[2], c2 / subdivisionsf);
+            vertex_normal = Vector3::Lerp(centroid_x0, centroid_x1,
+                                          c1 / (subdivisionsf - c2));
+          }
+          else {
+            // in smooth mode, recalculate normal from each single vertex
+            // position
+            vertex_normal = Vector3(pos_interp.x, pos_interp.y, pos_interp.z);
+          }
+          // Vertex normal need correction due to X,Y,Z radius scaling
+          vertex_normal.x /= radiusX;
+          vertex_normal.y /= radiusY;
+          vertex_normal.z /= radiusZ;
+          vertex_normal.normalize();
 
-      auto uv_x0 = Vector2::Lerp(face_vertex_uv[0], face_vertex_uv[2], _div);
-      auto uv_x1 = Vector2::Lerp(face_vertex_uv[1], face_vertex_uv[2], _div);
-      auto uv_interp
-        = (subdivisions == i2) ?
-            face_vertex_uv[2] :
-            Vector2::Lerp(uv_x0, uv_x1,
-                          i1 / (subdivisionsf - static_cast<float>(i2)));
-      stl_util::concat(positions,
-                       {pos_interp.x * radiusX, pos_interp.y * radiusY,
-                        pos_interp.z * radiusZ});
-      stl_util::concat(normals,
-                       {vertex_normal.x, vertex_normal.y, vertex_normal.z});
-      stl_util::concat(uvs, {uv_interp.x, uv_interp.y});
-      // push each vertex has member of a face
-      // Same vertex can bleong to multiple face, it is pushed multiple time
-      // (duplicate vertex are present)
-      indices.emplace_back(current_indice);
-      ++current_indice;
-    };
+          const auto uv_x0
+            = Vector2::Lerp(face_vertex_uv[0], face_vertex_uv[2], _div);
+          const auto uv_x1
+            = Vector2::Lerp(face_vertex_uv[1], face_vertex_uv[2], _div);
+          const auto uv_interp
+            = (subdivisions == i2) ?
+                face_vertex_uv[2] :
+                Vector2::Lerp(uv_x0, uv_x1,
+                              i1 / (subdivisionsf - static_cast<float>(i2)));
+          stl_util::concat(positions,
+                           {pos_interp.x * radiusX, pos_interp.y * radiusY,
+                            pos_interp.z * radiusZ});
+          stl_util::concat(normals,
+                           {vertex_normal.x, vertex_normal.y, vertex_normal.z});
+          stl_util::concat(uvs, {uv_interp.x, uv_interp.y});
+          // push each vertex has member of a face
+          // Same vertex can bleong to multiple face, it is pushed multiple time
+          // (duplicate vertex are present)
+          indices.emplace_back(current_indice);
+          ++current_indice;
+        };
 
     for (unsigned int i2 = 0; i2 < subdivisions; ++i2) {
-      auto i2f = static_cast<float>(i2);
+      const auto i2f = static_cast<float>(i2);
       for (unsigned int i1 = 0; i1 + i2 < subdivisions; ++i1) {
-        auto i1f = static_cast<float>(i1);
+        const auto i1f = static_cast<float>(i1);
         // face : (i1,i2)  for /\  :
         // interp for : (i1,i2),(i1+1,i2),(i1,i2+1)
         interp_vertex(i1f, i2, i1f + 1.f / 3.f, i2f + 1.f / 3.f);
@@ -2372,9 +2394,10 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
       // positions, uvs, colors
       for (i = 0; i < fl; ++i) {
         // positions
-        stl_util::concat(positions, {dataVertices[dataFaces[f][i]][0] * sizeX,
-                                     dataVertices[dataFaces[f][i]][1] * sizeY,
-                                     dataVertices[dataFaces[f][i]][2] * sizeZ});
+        stl_util::concat(positions,
+                         {dataVertices[dataFaces[f][i]][0] * sizeX,
+                          dataVertices[dataFaces[f][i]][1] * sizeY,
+                          dataVertices[dataFaces[f][i]][2] * sizeZ});
         indexes.emplace_back(index);
         ++index;
         // uvs
@@ -2386,8 +2409,9 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
         x   = tmp;
         // colors
         if (!faceColors.empty()) {
-          stl_util::concat(colors, {faceColors[f].r, faceColors[f].g,
-                                    faceColors[f].b, faceColors[f].a});
+          stl_util::concat(colors,
+                           {faceColors[f].r, faceColors[f].g, faceColors[f].b,
+                            faceColors[f].a});
         }
       }
 

@@ -43,6 +43,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , showBoundingBox{false}
     , showSubMeshesBoundingBox{false}
     , isBlocker{false}
+    , enablePointerMoveEvents{false}
     , renderingGroupId{0}
     , renderOutline{false}
     , outlineColor{Color3::Red()}
@@ -185,6 +186,11 @@ void AbstractMesh::setMaterial(Material* value)
   }
 
   _material = value;
+
+  if (onMaterialChangedObservable.hasObservers()) {
+    onMaterialChangedObservable.notifyObservers(this);
+  }
+
   if (subMeshes.empty()) {
     return;
   }
@@ -307,6 +313,11 @@ void AbstractMesh::setCollisionGroup(int mask)
 const char* AbstractMesh::getClassName() const
 {
   return "AbstractMesh";
+}
+
+bool AbstractMesh::isDisposed() const
+{
+  return _isDisposed;
 }
 
 std::string AbstractMesh::toString(bool fullDetails) const

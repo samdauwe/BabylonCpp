@@ -270,11 +270,6 @@ public:
    */
   bool isReady() const;
 
-  /**
-   * @brief Returns true if the mesh has been disposed.
-   */
-  bool isDisposed() const;
-
   unsigned int sideOrientation() const;
 
   /**
@@ -330,7 +325,7 @@ public:
    */
   Mesh& refreshBoundingInfo();
 
-  SubMesh* _createGlobalSubMesh();
+  SubMesh* _createGlobalSubMesh(bool force);
   void subdivide(size_t count);
 
   /**
@@ -505,13 +500,13 @@ public:
    * @brief Returns an array populated with ParticleSystem objects whose the
    * mesh is the emitter.
    */
-  std::vector<ParticleSystem*> getEmittedParticleSystems();
+  std::vector<IParticleSystem*> getEmittedParticleSystems();
 
   /**
    * @brief Returns an array populated with ParticleSystem objects whose the
    * mesh or its children are the emitter.
    */
-  std::vector<ParticleSystem*> getHierarchyEmittedParticleSystems();
+  std::vector<IParticleSystem*> getHierarchyEmittedParticleSystems();
 
   std::vector<Node*> getChildren();
   Mesh& _checkDelayState();
