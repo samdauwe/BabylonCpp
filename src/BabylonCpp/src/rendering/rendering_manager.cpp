@@ -183,7 +183,7 @@ void RenderingManager::dispatchSprites(SpriteManager* spriteManager)
   _renderingGroups[renderingGroupId]->dispatchSprites(spriteManager);
 }
 
-void RenderingManager::dispatchParticles(ParticleSystem* particleSystem)
+void RenderingManager::dispatchParticles(IParticleSystem* particleSystem)
 {
   const auto& renderingGroupId = particleSystem->renderingGroupId;
 

@@ -146,12 +146,16 @@ void RenderingGroup::render(
     engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
   }
 
-  engine->setStencilBuffer(stencilState);
+  // Set back stencil to false in case it changes before the edge renderer.
+  engine->setStencilBuffer(false);
 
   // Edges
   for (auto& edgesRenderer : _edgesRenderers) {
     edgesRenderer->render();
   }
+
+  // Restore Stencil state.
+  engine->setStencilBuffer(stencilState);
 }
 
 void RenderingGroup::renderOpaqueSorted(const std::vector<SubMesh*>& subMeshes)
@@ -295,7 +299,7 @@ void RenderingGroup::dispatchSprites(SpriteManager* spriteManager)
   _spriteManagers.emplace_back(spriteManager);
 }
 
-void RenderingGroup::dispatchParticles(ParticleSystem* particleSystem)
+void RenderingGroup::dispatchParticles(IParticleSystem* particleSystem)
 {
   _particleSystems.emplace_back(particleSystem);
 }
