@@ -19,6 +19,11 @@ public:
   PostProcessRenderPipeline(Engine* engine, const std::string& name);
   virtual ~PostProcessRenderPipeline();
 
+  /**
+   * Returns the string "PostProcessRenderPipeline"
+   */
+  const char* getClassName() const;
+
   std::vector<Camera*> getCameras() const;
   bool isSupported() const;
   void addEffect(PostProcessRenderEffect* renderEffect);

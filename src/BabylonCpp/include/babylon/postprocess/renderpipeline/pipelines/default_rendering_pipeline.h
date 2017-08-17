@@ -30,11 +30,19 @@ public:
    * canvas.height 0.5)
    * @param {BABYLON.Camera[]} cameras - The array of cameras that the rendering
    * pipeline will be attached to
+   * @param {boolean} automaticBuild - if false, you will have to manually call
+   * prepare() to update the pipeline
    */
   DefaultRenderingPipeline(
     const std::string& name, bool hdr, Scene* scene,
-    const std::unordered_map<std::string, Camera*>& cameras = {});
+    const std::unordered_map<std::string, Camera*>& cameras = {},
+    bool automaticBuild = true);
   ~DefaultRenderingPipeline();
+
+  /**
+   * @brief Force the compilation of the entire pipeline.
+   */
+  void prepare();
 
   void setBloomWeight(float value);
   float bloomWeight() const;
@@ -87,6 +95,7 @@ private:
   bool _imageProcessingEnabled;
   unsigned int _defaultPipelineTextureType;
   float _bloomScale;
+  bool _buildAllowed;
 
   /**
    * Specifies the weight of the bloom in the final rendering

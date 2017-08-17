@@ -39,6 +39,11 @@ PostProcessRenderPipeline::~PostProcessRenderPipeline()
 {
 }
 
+const char* PostProcessRenderPipeline::getClassName() const
+{
+  return "PostProcessRenderPipeline";
+}
+
 void PostProcessRenderPipeline::addEffect(PostProcessRenderEffect* renderEffect)
 {
   _renderEffects[renderEffect->_name] = renderEffect;

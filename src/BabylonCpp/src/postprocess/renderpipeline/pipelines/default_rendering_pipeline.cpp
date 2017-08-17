@@ -34,7 +34,7 @@ std::string DefaultRenderingPipeline::FinalMergePostProcessId
 
 DefaultRenderingPipeline::DefaultRenderingPipeline(
   const std::string& iName, bool hdr, Scene* scene,
-  const std::unordered_map<std::string, Camera*>& cameras)
+  const std::unordered_map<std::string, Camera*>& cameras, bool automaticBuild)
     : PostProcessRenderPipeline(scene->getEngine(), iName)
     , pass{nullptr}
     , highlights{nullptr}
@@ -49,6 +49,7 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
     , _fxaaEnabled{false}
     , _imageProcessingEnabled{true}
     , _bloomScale{0.6f}
+    , _buildAllowed{automaticBuild}
     , _bloomWeight{0.15f}
     , _hdr{hdr}
     , _scene{scene}
@@ -69,6 +70,14 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
 
 DefaultRenderingPipeline::~DefaultRenderingPipeline()
 {
+}
+
+void DefaultRenderingPipeline::prepare()
+{
+  auto previousState = _buildAllowed;
+  _buildAllowed      = true;
+  _buildPipeline();
+  _buildAllowed = previousState;
 }
 
 void DefaultRenderingPipeline::setBloomWeight(float value)
@@ -150,6 +159,10 @@ bool DefaultRenderingPipeline::imageProcessingEnabled() const
 
 void DefaultRenderingPipeline::_buildPipeline()
 {
+  if (!_buildAllowed) {
+    return;
+  }
+
   auto engine = _scene->getEngine();
 
   _disposePostProcesses();
