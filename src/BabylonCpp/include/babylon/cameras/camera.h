@@ -8,6 +8,7 @@
 #include <babylon/math/matrix.h>
 #include <babylon/math/vector3.h>
 #include <babylon/math/viewport.h>
+#include <babylon/tools/observable.h>
 
 namespace BABYLON {
 
@@ -74,7 +75,6 @@ public:
   Matrix* getWorldMatrix() override;
   virtual Matrix _getViewMatrix();
   Matrix& getViewMatrix(bool force = false);
-  Matrix& _computeViewMatrix(bool force);
   void freezeProjectionMatrix();
   void freezeProjectionMatrix(const Matrix& projection);
   void unfreezeProjectionMatrix();
@@ -149,6 +149,10 @@ public:
   std::vector<Camera*> _rigCameras;
   PostProcess* _rigPostProcess;
   std::vector<RenderTargetTexture*> customRenderTargets;
+
+  /** Observables **/
+  Observable<Camera> onViewMatrixChangedObservable;
+  Observable<Camera> onProjectionMatrixChangedObservable;
 
   /** Cache **/
   Matrix _projectionMatrix;

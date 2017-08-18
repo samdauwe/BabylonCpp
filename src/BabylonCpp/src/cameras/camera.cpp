@@ -340,11 +340,12 @@ Matrix Camera::_getViewMatrix()
 
 Matrix& Camera::getViewMatrix(bool force)
 {
-  _computedViewMatrix = _computeViewMatrix(force);
-
   if (!force && _isSynchronizedViewMatrix()) {
     return _computedViewMatrix;
   }
+
+  _computedViewMatrix = _getViewMatrix();
+  _currentRenderId    = getScene()->getRenderId();
 
   _refreshFrustumPlanes = true;
 
@@ -374,19 +375,7 @@ Matrix& Camera::getViewMatrix(bool force)
                                       _computedViewMatrix);
   }
 
-  _currentRenderId = getScene()->getRenderId();
-
-  return _computedViewMatrix;
-}
-
-Matrix& Camera::_computeViewMatrix(bool force)
-{
-  if (!force && _isSynchronizedViewMatrix()) {
-    return _computedViewMatrix;
-  }
-
-  _computedViewMatrix = _getViewMatrix();
-  _currentRenderId    = getScene()->getRenderId();
+  onViewMatrixChangedObservable.notifyObservers(this);
 
   return _computedViewMatrix;
 }
@@ -433,27 +422,30 @@ Matrix& Camera::getProjectionMatrix(bool force)
                                     maxZ, _projectionMatrix,
                                     fovMode == Camera::FOVMODE_VERTICAL_FIXED);
     }
-    return _projectionMatrix;
-  }
-
-  float halfWidth  = static_cast<float>(engine->getRenderWidth()) / 2.f;
-  float halfHeight = static_cast<float>(engine->getRenderHeight()) / 2.f;
-  if (scene->useRightHandedSystem()) {
-    Matrix::OrthoOffCenterRHToRef(
-      !stl_util::almost_equal(orthoLeft, 0.f) ? orthoLeft : -halfWidth,
-      !stl_util::almost_equal(orthoRight, 0.f) ? orthoRight : halfWidth,
-      !stl_util::almost_equal(orthoBottom, 0.f) ? orthoBottom : -halfHeight,
-      !stl_util::almost_equal(orthoTop, 0.f) ? orthoTop : halfHeight, minZ,
-      maxZ, _projectionMatrix);
   }
   else {
-    Matrix::OrthoOffCenterLHToRef(
-      !stl_util::almost_equal(orthoLeft, 0.f) ? orthoLeft : -halfWidth,
-      !stl_util::almost_equal(orthoRight, 0.f) ? orthoRight : halfWidth,
-      !stl_util::almost_equal(orthoBottom, 0.f) ? orthoBottom : -halfHeight,
-      !stl_util::almost_equal(orthoTop, 0.f) ? orthoTop : halfHeight, minZ,
-      maxZ, _projectionMatrix);
+    float halfWidth  = static_cast<float>(engine->getRenderWidth()) / 2.f;
+    float halfHeight = static_cast<float>(engine->getRenderHeight()) / 2.f;
+    if (scene->useRightHandedSystem()) {
+      Matrix::OrthoOffCenterRHToRef(
+        !stl_util::almost_equal(orthoLeft, 0.f) ? orthoLeft : -halfWidth,
+        !stl_util::almost_equal(orthoRight, 0.f) ? orthoRight : halfWidth,
+        !stl_util::almost_equal(orthoBottom, 0.f) ? orthoBottom : -halfHeight,
+        !stl_util::almost_equal(orthoTop, 0.f) ? orthoTop : halfHeight, minZ,
+        maxZ, _projectionMatrix);
+    }
+    else {
+      Matrix::OrthoOffCenterLHToRef(
+        !stl_util::almost_equal(orthoLeft, 0.f) ? orthoLeft : -halfWidth,
+        !stl_util::almost_equal(orthoRight, 0.f) ? orthoRight : halfWidth,
+        !stl_util::almost_equal(orthoBottom, 0.f) ? orthoBottom : -halfHeight,
+        !stl_util::almost_equal(orthoTop, 0.f) ? orthoTop : halfHeight, minZ,
+        maxZ, _projectionMatrix);
+    }
   }
+
+  onProjectionMatrixChangedObservable.notifyObservers(this);
+
   return _projectionMatrix;
 }
 
@@ -518,6 +510,10 @@ Ray Camera::getForwardRay(float length, const Matrix& transform,
 
 void Camera::dispose(bool /*doNotRecurse*/)
 {
+  // Observables
+  onViewMatrixChangedObservable.clear();
+  onProjectionMatrixChangedObservable.clear();
+
   // Animations
   getScene()->stopAnimation(this);
 

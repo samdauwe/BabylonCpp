@@ -175,10 +175,10 @@ void ArcRotateCamera::_checkInputs()
     inertialAlphaOffset *= inertia;
     inertialBetaOffset *= inertia;
     inertialRadiusOffset *= inertia;
-    if (std::abs(inertialAlphaOffset) < speed * Math::Epsilon) {
+    if (std::abs(inertialAlphaOffset) < Math::Epsilon) {
       inertialAlphaOffset = 0.f;
     }
-    if (std::abs(inertialBetaOffset) < speed * Math::Epsilon) {
+    if (std::abs(inertialBetaOffset) < Math::Epsilon) {
       inertialBetaOffset = 0.f;
     }
     if (std::abs(inertialRadiusOffset) < speed * Math::Epsilon) {
