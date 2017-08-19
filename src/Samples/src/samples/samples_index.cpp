@@ -6,6 +6,7 @@
 #include <babylon/samples/animations/pump_jack_scene.h>
 #include <babylon/samples/animations/tube_animation_scene.h>
 #include <babylon/samples/effects/fog_scene.h>
+#include <babylon/samples/extensions/hexplanetgeneration/hex_ico_sphere_scene.h>
 #include <babylon/samples/extensions/noisegeneration/perlin_noise_waves_scene.h>
 #include <babylon/samples/extensions/polyhedron/polyhedra_scene.h>
 #include <babylon/samples/generic/infinite_loader_scene.h>
@@ -80,6 +81,12 @@ std::unordered_map<std::string, Sample> SamplesIndex::Samples
                              [](ICanvas* iCanvas) {                        //
                                return std::make_unique<FogScene>(iCanvas); //
                              }};                                           //
+      // Hex Icosphere Scene
+      samples["HexIcosphereScene"]
+        = {true,
+           [](ICanvas* iCanvas) {                                 //
+             return std::make_unique<HexIcosphereScene>(iCanvas); //
+           }};                                                    //
       // Icosphere Scene
       samples["IcoSphereScene"]
         = {true,
