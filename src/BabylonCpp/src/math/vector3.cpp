@@ -382,6 +382,11 @@ Vector3 Vector3::operator/(const Vector3& otherVector) const
   return divide(otherVector);
 }
 
+Vector3& Vector3::operator/=(float scaleVal)
+{
+  return scaleInPlace(1.f / scaleVal);
+}
+
 Vector3& Vector3::operator/=(const Vector3& otherVector)
 {
   return divideInPlace(otherVector);

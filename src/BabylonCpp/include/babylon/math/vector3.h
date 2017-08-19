@@ -235,6 +235,7 @@ public:
   Vector3 operator*(const Vector3& otherVector) const;
   Vector3& operator*=(const Vector3& otherVector);
   Vector3 operator/(const Vector3& otherVector) const;
+  Vector3& operator/=(float scaleVal);
   Vector3& operator/=(const Vector3& otherVector);
   bool operator==(const Vector3& otherVector) const;
   bool operator!=(const Vector3& otherVector) const;

@@ -203,27 +203,60 @@ TEST(TestVector3, Divide)
 {
   using namespace BABYLON;
 
-  Vector3 a{x, y, z};
-  Vector3 b{-x, -y, -z};
-  Vector3 c;
+  {
+    Vector3 a{x, y, z};
+    Vector3 b{-x, -y, -z};
+    Vector3 c;
 
-  // c = a / b
-  c = a.divide(b);
-  EXPECT_FLOAT_EQ(c.x, -1.f);
-  EXPECT_FLOAT_EQ(c.y, -1.f);
-  EXPECT_FLOAT_EQ(c.z, -1.f);
+    // c = a / b
+    c = a.divide(b);
+    EXPECT_FLOAT_EQ(c.x, -1.f);
+    EXPECT_FLOAT_EQ(c.y, -1.f);
+    EXPECT_FLOAT_EQ(c.z, -1.f);
 
-  // c = b / b
-  b.divideToRef(b, c);
-  EXPECT_FLOAT_EQ(c.x, 1.f);
-  EXPECT_FLOAT_EQ(c.y, 1.f);
-  EXPECT_FLOAT_EQ(c.z, 1.f);
+    // c = b / b
+    b.divideToRef(b, c);
+    EXPECT_FLOAT_EQ(c.x, 1.f);
+    EXPECT_FLOAT_EQ(c.y, 1.f);
+    EXPECT_FLOAT_EQ(c.z, 1.f);
 
-  // c = c / c
-  c.divideInPlace(c);
-  EXPECT_FLOAT_EQ(c.x, 1.f);
-  EXPECT_FLOAT_EQ(c.y, 1.f);
-  EXPECT_FLOAT_EQ(c.z, 1.f);
+    // c = c / c
+    c.divideInPlace(c);
+    EXPECT_FLOAT_EQ(c.x, 1.f);
+    EXPECT_FLOAT_EQ(c.y, 1.f);
+    EXPECT_FLOAT_EQ(c.z, 1.f);
+  }
+
+  {
+    Vector3 a{x, y, z};
+    Vector3 b{-x, -y, -z};
+    Vector3 c;
+
+    c = a / b;
+    EXPECT_FLOAT_EQ(c.x, -1.f);
+    EXPECT_FLOAT_EQ(c.y, -1.f);
+    EXPECT_FLOAT_EQ(c.z, -1.f);
+
+    c = b / b;
+    EXPECT_FLOAT_EQ(c.x, 1.f);
+    EXPECT_FLOAT_EQ(c.y, 1.f);
+    EXPECT_FLOAT_EQ(c.z, 1.f);
+
+    c /= c;
+    EXPECT_FLOAT_EQ(c.x, 1.f);
+    EXPECT_FLOAT_EQ(c.y, 1.f);
+    EXPECT_FLOAT_EQ(c.z, 1.f);
+  }
+
+  {
+    Vector3 a{x, 2 * x, 3 * x};
+    float b{x};
+
+    a /= b;
+    EXPECT_FLOAT_EQ(a.x, 1.f);
+    EXPECT_FLOAT_EQ(a.y, 2.f);
+    EXPECT_FLOAT_EQ(a.z, 3.f);
+  }
 }
 
 TEST(TestVector3, Negate)
