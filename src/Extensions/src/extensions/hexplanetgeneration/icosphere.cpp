@@ -19,12 +19,83 @@ IcoNode::IcoNode(const Vector3& _p, const std::vector<size_t>& _e)
 {
 }
 
+IcoNode::IcoNode(const IcoNode& other) : p{other.p}, e{other.e}, f{other.f}
+{
+}
+
+IcoNode::IcoNode(IcoNode&& other)
+    : p{std::move(other.p)}, e{std::move(other.e)}, f{std::move(other.f)}
+{
+}
+
+IcoNode& IcoNode::operator=(const IcoNode& other)
+{
+  if (&other != this) {
+    p = other.p;
+    e = other.e;
+    f = other.f;
+  }
+
+  return *this;
+}
+
+IcoNode& IcoNode::operator=(IcoNode&& other)
+{
+  if (&other != this) {
+    p = std::move(other.p);
+    e = std::move(other.e);
+    f = std::move(other.f);
+  }
+
+  return *this;
+}
+
 // -----------------------------------------------------------------------------
 // IcoEdge
 // -----------------------------------------------------------------------------
 
 IcoEdge::IcoEdge(const std::vector<size_t>& _n) : n{_n}
 {
+}
+
+IcoEdge::IcoEdge(const IcoEdge& other)
+    : n{other.n}
+    , f{other.f}
+    , subdivided_n{other.subdivided_n}
+    , subdivided_e{other.subdivided_e}
+{
+}
+
+IcoEdge::IcoEdge(IcoEdge&& other)
+    : n{std::move(other.n)}
+    , f{std::move(other.f)}
+    , subdivided_n{std::move(other.subdivided_n)}
+    , subdivided_e{std::move(other.subdivided_e)}
+{
+}
+
+IcoEdge& IcoEdge::operator=(const IcoEdge& other)
+{
+  if (&other != this) {
+    n            = other.n;
+    f            = other.f;
+    subdivided_n = other.subdivided_n;
+    subdivided_e = other.subdivided_e;
+  }
+
+  return *this;
+}
+
+IcoEdge& IcoEdge::operator=(IcoEdge&& other)
+{
+  if (&other != this) {
+    n            = std::move(other.n);
+    f            = std::move(other.f);
+    subdivided_n = std::move(other.subdivided_n);
+    subdivided_e = std::move(other.subdivided_e);
+  }
+
+  return *this;
 }
 
 // -----------------------------------------------------------------------------
@@ -34,6 +105,92 @@ IcoEdge::IcoEdge(const std::vector<size_t>& _n) : n{_n}
 IcoFace::IcoFace(const std::vector<size_t>& _n, const std::vector<size_t>& _e)
     : n{_n}, e{_e}, boundingSphere{Vector3::Zero(), Vector3::Zero()}
 {
+}
+
+IcoFace::IcoFace(const IcoFace& other)
+    : n{other.n}
+    , e{other.e}
+    , centroid{other.centroid}
+    , boundingSphere{other.boundingSphere}
+    , children{other.children}
+{
+}
+
+IcoFace::IcoFace(IcoFace&& other)
+    : n{std::move(other.n)}
+    , e{std::move(other.e)}
+    , centroid{std::move(other.centroid)}
+    , boundingSphere{std::move(other.boundingSphere)}
+    , children{std::move(other.children)}
+{
+}
+
+IcoFace& IcoFace::operator=(const IcoFace& other)
+{
+  if (&other != this) {
+    n              = other.n;
+    e              = other.e;
+    centroid       = other.centroid;
+    boundingSphere = other.boundingSphere;
+    children       = other.children;
+  }
+
+  return *this;
+}
+
+IcoFace& IcoFace::operator=(IcoFace&& other)
+{
+  if (&other != this) {
+    n              = std::move(other.n);
+    e              = std::move(other.e);
+    centroid       = std::move(other.centroid);
+    boundingSphere = std::move(other.boundingSphere);
+    children       = std::move(other.children);
+  }
+
+  return *this;
+}
+
+// -----------------------------------------------------------------------------
+// IcosahedronMesh
+// -----------------------------------------------------------------------------
+
+IcosahedronMesh::IcosahedronMesh()
+{
+}
+
+IcosahedronMesh::IcosahedronMesh(const IcosahedronMesh& other)
+    : nodes{other.nodes}, edges{other.edges}, faces{other.faces}
+{
+}
+
+IcosahedronMesh::IcosahedronMesh(IcosahedronMesh&& other)
+    : nodes{std::move(other.nodes)}
+    , edges{std::move(other.edges)}
+    , faces{std::move(other.faces)}
+{
+}
+
+IcosahedronMesh& IcosahedronMesh::operator=(const IcosahedronMesh& other)
+{
+  if (&other != this) {
+    nodes = other.nodes;
+    edges = other.edges;
+    faces = other.faces;
+  }
+
+  return *this;
+}
+
+IcosahedronMesh& IcosahedronMesh::operator=(IcosahedronMesh&& other)
+{
+  if (&other != this) {
+    nodes = std::move(other.nodes);
+    edges = std::move(other.edges);
+    faces = std::move(other.faces);
+  }
+
+  return *this;
 }
 
 // -----------------------------------------------------------------------------
@@ -64,7 +221,7 @@ Icosphere::generateIcosahedronMesh(size_t icosahedronSubdivision,
   float minShiftDelta     = averageNodeRadius / 50000 * mesh.nodes.size();
 
   float priorShift = relaxMesh(mesh, 0.5f);
-  for (int i = 0; i < 300; i++) {
+  for (int i = 0; i < 300; ++i) {
     float currentShift = relaxMesh(mesh, 0.5f);
     float shiftDelta   = std::abs(currentShift - priorShift);
     if (shiftDelta < minShiftDelta) {
@@ -74,7 +231,7 @@ Icosphere::generateIcosahedronMesh(size_t icosahedronSubdivision,
   }
 
   // Calculating Triangle Centroids
-  for (auto face : mesh.faces) {
+  for (auto& face : mesh.faces) {
     auto& p0      = mesh.nodes[face.n[0]].p;
     auto& p1      = mesh.nodes[face.n[1]].p;
     auto& p2      = mesh.nodes[face.n[2]].p;
@@ -88,7 +245,7 @@ Icosphere::generateIcosahedronMesh(size_t icosahedronSubdivision,
     auto faceIndex = node.f[0];
     for (size_t j = 1; j < node.f.size() - 1; ++j) {
       faceIndex = findNextFaceIndex(mesh, i, faceIndex);
-      size_t k;
+      size_t k  = 0;
       if (findIndex(node.f, faceIndex, k)) {
         node.f[k] = node.f[j];
         node.f[j] = faceIndex;
@@ -168,22 +325,24 @@ void Icosphere::generateSubdividedIcosahedron(size_t degree,
   generateIcosahedron(icosahedron);
 
   // Ico nodes
-  nodes.reserve(mesh.nodes.size() + mesh.edges.size() * (degree - 1)
-                + mesh.faces.size() * (degree - 1) * (degree - 1) / 2);
-  for (auto& node : mesh.nodes) {
+  nodes.reserve(icosahedron.nodes.size()
+                + icosahedron.edges.size() * (degree - 1)
+                + icosahedron.faces.size() * (degree - 1) * (degree - 1) / 2);
+  for (auto& node : icosahedron.nodes) {
     nodes.emplace_back(IcoNode(node.p));
   }
 
   // Ico edges
-  edges.reserve(mesh.edges.size() + mesh.edges.size() * (degree - 1)
-                + 3 * mesh.faces.size() * (degree - 1) * (degree - 1) / 2);
-  for (auto& edge : mesh.edges) {
+  edges.reserve(
+    icosahedron.edges.size() + icosahedron.edges.size() * (degree - 1)
+    + 3 * icosahedron.faces.size() * (degree - 1) * (degree - 1) / 2);
+  for (auto& edge : icosahedron.edges) {
     edge.subdivided_n.clear();
     edge.subdivided_e.clear();
-    auto& n0 = mesh.nodes[edge.n[0]];
-    auto& n1 = mesh.nodes[edge.n[1]];
-    auto p0  = n0.p;
-    auto p1  = n1.p;
+    auto& n0 = icosahedron.nodes[edge.n[0]];
+    auto& n1 = icosahedron.nodes[edge.n[1]];
+    auto& p0 = n0.p;
+    auto& p1 = n1.p;
     nodes[edge.n[0]].e.emplace_back(edges.size());
     size_t priorNodeIndex = edge.n[0];
     for (unsigned int s = 1; s < degree; ++s) {
@@ -194,8 +353,8 @@ void Icosphere::generateSubdividedIcosahedron(size_t degree,
       edges.emplace_back(IcoEdge({priorNodeIndex, nodeIndex}));
       priorNodeIndex = nodeIndex;
       nodes.emplace_back(
-        IcoNode(Vector3::Lerp(p0, p1, static_cast<float>(s)
-                                        / static_cast<float>(degree)),
+        IcoNode(Vector3::Lerp(
+                  p0, p1, static_cast<float>(s) / static_cast<float>(degree)),
                 {edgeIndex, edgeIndex + 1}));
     }
     edge.subdivided_e.emplace_back(edges.size());
@@ -204,11 +363,11 @@ void Icosphere::generateSubdividedIcosahedron(size_t degree,
   }
 
   // Ico faces
-  faces.reserve(2 * mesh.faces.size() * (degree - 1) * (degree - 1) / 2);
-  for (auto& face : mesh.faces) {
-    auto& edge0 = mesh.edges[face.e[0]];
-    auto& edge1 = mesh.edges[face.e[1]];
-    auto& edge2 = mesh.edges[face.e[2]];
+  faces.reserve(2 * icosahedron.faces.size() * (degree - 1) * (degree - 1) / 2);
+  for (auto& face : icosahedron.faces) {
+    auto& edge0 = icosahedron.edges[face.e[0]];
+    auto& edge1 = icosahedron.edges[face.e[1]];
+    auto& edge2 = icosahedron.edges[face.e[2]];
 
     auto getEdgeNode0 = [&face, &edge0, &degree](size_t k) {
       if (face.n[0] == edge0.n[0]) {

@@ -13,6 +13,10 @@ struct Tile;
 struct BABYLON_SHARED_EXPORT IcoNode {
   IcoNode(const Vector3& p);
   IcoNode(const Vector3& p, const std::vector<size_t>& e);
+  IcoNode(const IcoNode& other);
+  IcoNode(IcoNode&& other);
+  IcoNode& operator=(const IcoNode& other);
+  IcoNode& operator=(IcoNode&& other);
   Vector3 p;
   std::vector<size_t> e;
   std::vector<size_t> f;
@@ -20,6 +24,10 @@ struct BABYLON_SHARED_EXPORT IcoNode {
 
 struct BABYLON_SHARED_EXPORT IcoEdge {
   IcoEdge(const std::vector<size_t>& n);
+  IcoEdge(const IcoEdge& other);
+  IcoEdge(IcoEdge&& other);
+  IcoEdge& operator=(const IcoEdge& other);
+  IcoEdge& operator=(IcoEdge&& other);
   std::vector<size_t> n;
   std::vector<size_t> f;
   std::vector<size_t> subdivided_n;
@@ -28,6 +36,10 @@ struct BABYLON_SHARED_EXPORT IcoEdge {
 
 struct BABYLON_SHARED_EXPORT IcoFace {
   IcoFace(const std::vector<size_t>& n, const std::vector<size_t>& e);
+  IcoFace(const IcoFace& other);
+  IcoFace(IcoFace&& other);
+  IcoFace& operator=(const IcoFace& other);
+  IcoFace& operator=(IcoFace&& other);
   std::vector<size_t> n;
   std::vector<size_t> e;
   Vector3 centroid;
@@ -39,6 +51,11 @@ struct BABYLON_SHARED_EXPORT IcosahedronMesh {
   std::vector<IcoNode> nodes;
   std::vector<IcoEdge> edges;
   std::vector<IcoFace> faces;
+  IcosahedronMesh();
+  IcosahedronMesh(const IcosahedronMesh& other);
+  IcosahedronMesh(IcosahedronMesh&& other);
+  IcosahedronMesh& operator=(const IcosahedronMesh& other);
+  IcosahedronMesh& operator=(IcosahedronMesh&& other);
 }; // end of struct IcosahedronMesh
 
 struct IRandomFunction;
