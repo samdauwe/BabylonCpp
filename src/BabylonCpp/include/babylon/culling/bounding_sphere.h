@@ -12,6 +12,9 @@ class BABYLON_SHARED_EXPORT BoundingSphere {
 public:
   BoundingSphere(const Vector3& minimum, const Vector3& maximum);
   BoundingSphere(const BoundingSphere& other);
+  BoundingSphere(BoundingSphere&& other);
+  BoundingSphere& operator=(const BoundingSphere& other);
+  BoundingSphere& operator=(BoundingSphere&& other);
   ~BoundingSphere();
 
   /** Methods **/

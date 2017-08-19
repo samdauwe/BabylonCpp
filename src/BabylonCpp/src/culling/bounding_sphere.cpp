@@ -24,6 +24,41 @@ BoundingSphere::BoundingSphere(const BoundingSphere& other)
 {
 }
 
+BoundingSphere::BoundingSphere(BoundingSphere&& other)
+    : center{std::move(other.center)}
+    , radius{std::move(other.radius)}
+    , centerWorld{std::move(other.centerWorld)}
+    , radiusWorld{std::move(other.radiusWorld)}
+    , _tempRadiusVector{std::move(other._tempRadiusVector)}
+{
+}
+
+BoundingSphere& BoundingSphere::operator=(const BoundingSphere& other)
+{
+  if (&other != this) {
+    center            = other.center;
+    radius            = other.radius;
+    centerWorld       = other.centerWorld;
+    radiusWorld       = other.radiusWorld;
+    _tempRadiusVector = other._tempRadiusVector;
+  }
+
+  return *this;
+}
+
+BoundingSphere& BoundingSphere::operator=(BoundingSphere&& other)
+{
+  if (&other != this) {
+    center            = std::move(other.center);
+    radius            = std::move(other.radius);
+    centerWorld       = std::move(other.centerWorld);
+    radiusWorld       = std::move(other.radiusWorld);
+    _tempRadiusVector = std::move(other._tempRadiusVector);
+  }
+
+  return *this;
+}
+
 BoundingSphere::~BoundingSphere()
 {
 }
