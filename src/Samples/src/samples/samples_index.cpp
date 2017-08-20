@@ -21,6 +21,7 @@
 #include <babylon/samples/materials/shader_material_scene.h>
 #include <babylon/samples/materials/shader_material_skybox_clouds_scene.h>
 #include <babylon/samples/materials/shader_material_skybox_scene.h>
+#include <babylon/samples/materials/shader_material_wolfenstein_3d_scene.h>
 #include <babylon/samples/mesh/basic_elements_scene.h>
 #include <babylon/samples/mesh/basic_scene.h>
 #include <babylon/samples/mesh/cuboid_scene.h>
@@ -226,6 +227,12 @@ std::unordered_map<std::string, Sample> SamplesIndex::Samples
            [](ICanvas* iCanvas) {                                         //
              return std::make_unique<ShaderMaterialSkyboxScene>(iCanvas); //
            }};                                                            //
+      // Shader Material Wolfenstein 3D Scene
+      samples["ShaderMaterialWolfenstein3DScene"] = {
+        true,
+        [](ICanvas* iCanvas) {                                                //
+          return std::make_unique<ShaderMaterialWolfenstein3DScene>(iCanvas); //
+        }};                                                                   //
       // Super Ellipsoid Scene
       samples["SuperEllipsoidScene"]
         = {true,
