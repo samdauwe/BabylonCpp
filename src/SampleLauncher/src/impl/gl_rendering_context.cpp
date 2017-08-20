@@ -12,6 +12,9 @@
 #include <GLFW/glfw3native.h>
 #endif
 
+// Logging
+#include <babylon/core/logging.h>
+
 namespace BABYLON {
 namespace GL {
 
@@ -66,7 +69,9 @@ bool GLRenderingContext::initialize()
     return false;
   }
 
-  printf("%s\n", glGetString(GL_VERSION));
+  // Log the GL version
+  BABYLON_LOGF_INFO("GLRenderingContext", "Using GL version: %s",
+                    glGetString(GL_VERSION));
 
   // Setup OpenGL options
   glEnable(GL_MULTISAMPLE);
@@ -157,7 +162,7 @@ void GLRenderingContext::attachShader(
   const std::unique_ptr<IGLProgram>& program,
   const std::unique_ptr<IGLShader>& shader)
 {
-  glAttachShader(program->value, shader->value);
+  glAttachShader(program->value, shader ? shader->value : 0);
 }
 
 void GLRenderingContext::bindAttribLocation(IGLProgram* program, GLuint index,
@@ -441,7 +446,7 @@ void GLRenderingContext::deleteRenderbuffer(
 
 void GLRenderingContext::deleteShader(const std::unique_ptr<IGLShader>& shader)
 {
-  glDeleteShader(shader->value);
+  glDeleteShader(shader ? shader->value : 0);
 }
 
 void GLRenderingContext::deleteTexture(IGLTexture* texture)
