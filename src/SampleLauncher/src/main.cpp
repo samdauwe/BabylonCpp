@@ -1,7 +1,44 @@
 #include <argtable3/argtable3.h>
 #include <babylon/babylon_version.h>
+#include <babylon/core/delegate.h>
+#include <babylon/core/logging.h>
 #include <babylon/samples/sample_launcher.h>
 #include <babylon/samples/samples_index.h>
+
+static void onLogMessage(const BABYLON::LogMessage& logMessage)
+{
+  printf("%s\n", logMessage.toString().c_str());
+}
+static auto logListenerDelegate
+  = BABYLON::delegate<void(const BABYLON::LogMessage&)>{onLogMessage};
+
+/**
+ * @brief Initializes the logging.
+ */
+void initializeLogging()
+{
+  static_assert(
+    std::is_same<BABYLON::delegate<void(const BABYLON::LogMessage&)>,
+                 decltype(logListenerDelegate)>::value,
+    "!");
+  // Intialize log levels
+  std::vector<std::pair<unsigned int, std::string>> _logLevels;
+  for (auto& logLevel : BABYLON::LogLevels::Levels) {
+    unsigned int logType = logLevel.first;
+    if ((logType != BABYLON::LogLevels::LEVEL_QUIET)
+        && (logType != BABYLON::LogLevels::LEVEL_TRACE)) {
+      _logLevels.emplace_back(logLevel);
+    }
+  }
+  // Subscribe to channels
+  for (auto& logLevel : _logLevels) {
+    unsigned int logType = logLevel.first;
+    if (logType != BABYLON::LogLevels::LEVEL_QUIET) {
+      BABYLON::Logger::Instance().registerLogMessageListener(
+        logType, logListenerDelegate);
+    }
+  }
+}
 
 /**
  * @brief The sample launcher.
@@ -23,7 +60,8 @@ int sampleLauncherMain(int l, int v, const char* sample)
   }
   else {
     if (v > 0) {
-      printf("verbose is enabled (-v)\n");
+      // Enable console logging
+      initializeLogging();
     }
     // Check if sample exists and is enabled
     const std::string sampleName{sample};
