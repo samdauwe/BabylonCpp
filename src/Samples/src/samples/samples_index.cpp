@@ -19,6 +19,7 @@
 #include <babylon/samples/materials/shader_material_boxes_scene.h>
 #include <babylon/samples/materials/shader_material_cylinders_scene.h>
 #include <babylon/samples/materials/shader_material_scene.h>
+#include <babylon/samples/materials/shader_material_skybox_clouds_scene.h>
 #include <babylon/samples/materials/shader_material_skybox_scene.h>
 #include <babylon/samples/mesh/basic_elements_scene.h>
 #include <babylon/samples/mesh/basic_scene.h>
@@ -213,6 +214,12 @@ std::unordered_map<std::string, Sample> SamplesIndex::Samples
            [](ICanvas* iCanvas) {                                   //
              return std::make_unique<ShaderMaterialScene>(iCanvas); //
            }};                                                      //
+      // Shader Material Skybox Clouds Scene
+      samples["ShaderMaterialSkyboxCloudsScene"] = {
+        true,
+        [](ICanvas* iCanvas) {                                               //
+          return std::make_unique<ShaderMaterialSkyboxCloudsScene>(iCanvas); //
+        }};                                                                  //
       // Shader Material Skybox Scene
       samples["ShaderMaterialSkyboxScene"]
         = {true,
