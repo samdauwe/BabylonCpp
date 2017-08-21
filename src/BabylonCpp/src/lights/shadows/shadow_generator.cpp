@@ -38,7 +38,8 @@ ShadowGenerator::ShadowGenerator(int mapSize, IShadowLight* light,
 
 ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light,
                                  bool useFullFloatFirst)
-    : forceBackFacesOnly{false}
+    : frustumEdgeFalloff{0.f}
+    , forceBackFacesOnly{false}
     , _bias{0.00005f}
     , _blurBoxOffset{1}
     , _blurScale{2.f}
@@ -570,6 +571,42 @@ void ShadowGenerator::_applyFilterValues()
   }
 }
 
+void ShadowGenerator::forceCompilation(
+  const std::function<void(ShadowGenerator* generator)>& onCompiled,
+  const ShadowGeneratorCompileOptions& options)
+{
+  std::vector<SubMesh*> subMeshes;
+  std::size_t currentIndex = 0;
+
+  for (auto& mesh : getShadowMap()->renderList) {
+    for (auto& subMesh : mesh->subMeshes) {
+      subMeshes.emplace_back(subMesh.get());
+    }
+  }
+
+  const auto checkReady = [&]() {
+    if (!_scene || !_scene->getEngine()) {
+      return;
+    }
+
+    const auto& subMesh = subMeshes[currentIndex];
+
+    if (isReady(subMesh, options.useInstances)) {
+      ++currentIndex;
+      if (currentIndex >= subMeshes.size()) {
+        if (onCompiled) {
+          onCompiled(this);
+        }
+        return;
+      }
+    }
+  };
+
+  if (!subMeshes.empty()) {
+    checkReady();
+  }
+}
+
 bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
 {
   std::vector<std::string> defines;
@@ -694,9 +731,9 @@ void ShadowGenerator::bindShadowLight(const std::string& lightIndex,
     effect->setMatrix("lightMatrix" + lightIndex, getTransformMatrix());
   }
   effect->setTexture("shadowSampler" + lightIndex, getShadowMapForRendering());
-  light->_uniformBuffer->updateFloat3(
+  light->_uniformBuffer->updateFloat4(
     "shadowsInfo", getDarkness(), blurScale() / getShadowMap()->getSize().width,
-    depthScale(), lightIndex);
+    depthScale(), frustumEdgeFalloff, lightIndex);
   light->_uniformBuffer->updateFloat2(
     "depthValues", getLight()->getDepthMinZ(scene->activeCamera),
     getLight()->getDepthMinZ(scene->activeCamera)

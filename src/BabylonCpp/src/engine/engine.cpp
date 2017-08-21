@@ -44,6 +44,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , renderEvenInBackground{true}
     , preventCacheWipeBetweenFrames{false}
     , enableOfflineSupport{true}
+    , _vrDisplayEnabled{false}
     , _gl{nullptr}
     , _renderingCanvas{canvas}
     , _windowIsBackground{false}
@@ -60,11 +61,16 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _alphaState{std::make_unique<Internals::_AlphaState>()}
     , _alphaMode{EngineConstants::ALPHA_DISABLE}
     , _maxTextureChannels{16}
+    , _currentEffect{nullptr}
     , _currentProgram{nullptr}
+    , _cachedViewport{nullptr}
+    , _cachedVertexArrayObject{nullptr}
     , _cachedVertexBuffers{nullptr}
     , _cachedIndexBuffer{nullptr}
     , _cachedEffectForVertexBuffers{nullptr}
     , _currentRenderTarget{nullptr}
+    , _uintIndicesCurrentlySet{false}
+    , _currentFramebuffer{nullptr}
     , _dummyFramebuffer{nullptr}
     , _vaoRecordInProgress{false}
     , _mustWipeVertexAttributes{false}

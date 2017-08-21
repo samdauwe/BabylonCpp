@@ -38,7 +38,7 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   GL::any astc;  // WEBGL_compressed_texture_astc;
   GL::any atc;   // WEBGL_compressed_texture_atc;
   bool textureFloat;
-  bool vertexArrayObject;
+  bool vertexArrayObject = false;
   bool textureAnisotropicFilterExtension;
   unsigned int maxAnisotropy;
   bool instancedArrays;

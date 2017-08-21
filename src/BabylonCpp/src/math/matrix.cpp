@@ -19,7 +19,7 @@ Vector3 Matrix::_yAxis             = Vector3::Zero();
 Vector3 Matrix::_zAxis             = Vector3::Zero();
 int Matrix::_updateFlagSeed        = 0;
 
-Matrix::Matrix() : _isIdentity{false}, _isIdentityDirty{true}
+Matrix::Matrix() : updateFlag{0}, _isIdentity{false}, _isIdentityDirty{true}
 {
   std::fill(m.begin(), m.end(), 0.f);
   _markAsUpdated();
