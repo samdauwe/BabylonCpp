@@ -106,6 +106,13 @@ public:
   /** Methods **/
 
   /**
+   * @brief Force shader compilation including textures ready check
+   */
+  void forceCompilation(
+    const std::function<void(ShadowGenerator* generator)>& onCompiled,
+    const ShadowGeneratorCompileOptions& options) override;
+
+  /**
    * @brief Returns true when the ShadowGenerator is finally computed.
    */
   bool isReady(SubMesh* subMesh, bool useInstances) override;
@@ -163,6 +170,12 @@ private:
   void _disposeRTTandPostProcesses();
 
 public:
+  /**
+   * Controls the extent to which the shadows fade out at the edge of the
+   * frustum
+   * Used only by directionals and spots
+   */
+  float frustumEdgeFalloff;
   bool forceBackFacesOnly;
 
 private:

@@ -5,6 +5,10 @@
 
 namespace BABYLON {
 
+struct ShadowGeneratorCompileOptions {
+  bool useInstances = false;
+}; // end of struct ShadowGeneratorCompileOptions
+
 /**
  * @brief Interface to implement to create a shadow generator compatible with
  * BJS.
@@ -20,7 +24,10 @@ struct BABYLON_SHARED_EXPORT IShadowGenerator {
   virtual Matrix getTransformMatrix()    = 0;
   virtual void recreateShadowMap()       = 0;
   virtual Json::object serialize() const = 0;
-  virtual void dispose()                 = 0;
+  virtual void forceCompilation(
+    const std::function<void(ShadowGenerator* generator)>& onCompiled,
+    const ShadowGeneratorCompileOptions& options) = 0;
+  virtual void dispose() = 0;
 }; // end of class IShadowGenerator
 
 } // end of namespace BABYLON
