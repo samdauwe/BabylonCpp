@@ -29,7 +29,7 @@ LavaMaterial::LavaMaterial(const std::string& iName, Scene* scene)
     , fogDensity{0.15f}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
     , _diffuseTexture{nullptr}
-    , _lastTime{std::chrono::milliseconds(0)}
+    , _lastTime{0.f}
     , _disableLighting{false}
     , _maxSimultaneousLights{4}
     , _worldViewProjectionMatrix{Matrix::Zero()}
@@ -270,8 +270,7 @@ void LavaMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   MaterialHelper::BindFogParameters(scene, mesh, _activeEffect);
 
   _lastTime += scene->getEngine()->getDeltaTime();
-  _effect->setFloat(
-    "time", Time::fpMillisecondsDuration<float>(_lastTime) * speed / 1000.f);
+  _effect->setFloat("time", _lastTime * speed / 1000.f);
 
   if (!fogColor) {
     fogColor = std::make_unique<Color3>(Color3::Black());

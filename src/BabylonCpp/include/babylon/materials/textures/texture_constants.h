@@ -7,9 +7,24 @@ namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT TextureConstants {
 
-  static constexpr unsigned int NEAREST_SAMPLINGMODE   = 1;
-  static constexpr unsigned int BILINEAR_SAMPLINGMODE  = 2;
-  static constexpr unsigned int TRILINEAR_SAMPLINGMODE = 3;
+  static constexpr unsigned int NEAREST_SAMPLINGMODE      = 1;
+  static constexpr unsigned int NEAREST_NEAREST_MIPLINEAR = 1;
+
+  static constexpr unsigned int BILINEAR_SAMPLINGMODE    = 2;
+  static constexpr unsigned int LINEAR_LINEAR_MIPNEAREST = 2;
+
+  static constexpr unsigned int TRILINEAR_SAMPLINGMODE  = 3;
+  static constexpr unsigned int LINEAR_LINEAR_MIPLINEAR = 3;
+
+  static constexpr unsigned int NEAREST_NEAREST_MIPNEAREST = 4;
+  static constexpr unsigned int NEAREST_LINEAR_MIPNEAREST  = 5;
+  static constexpr unsigned int NEAREST_LINEAR_MIPLINEAR   = 6;
+  static constexpr unsigned int NEAREST_LINEAR             = 7;
+  static constexpr unsigned int NEAREST_NEAREST            = 8;
+  static constexpr unsigned int LINEAR_NEAREST_MIPNEAREST  = 9;
+  static constexpr unsigned int LINEAR_NEAREST_MIPLINEAR   = 10;
+  static constexpr unsigned int LINEAR_LINEAR              = 11;
+  static constexpr unsigned int LINEAR_NEAREST             = 12;
 
   static constexpr unsigned int EXPLICIT_MODE                       = 0;
   static constexpr unsigned int SPHERICAL_MODE                      = 1;

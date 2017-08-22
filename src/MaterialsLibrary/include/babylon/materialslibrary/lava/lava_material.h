@@ -49,7 +49,7 @@ public:
 
 private:
   BaseTexture* _diffuseTexture;
-  microseconds_t _lastTime;
+  float _lastTime;
   bool _disableLighting;
   unsigned int _maxSimultaneousLights;
   Matrix _worldViewProjectionMatrix;

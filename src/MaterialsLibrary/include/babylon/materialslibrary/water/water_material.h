@@ -127,7 +127,7 @@ private:
   std::unique_ptr<RenderTargetTexture> _reflectionRTT;
   ShaderMaterial* _material;
   Matrix _reflectionTransform;
-  microseconds_t _lastTime;
+  float _lastTime;
   int _renderId;
   // Needed for callbacks
   bool _isVisible;

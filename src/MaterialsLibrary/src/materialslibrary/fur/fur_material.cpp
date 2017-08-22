@@ -328,9 +328,7 @@ void FurMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
     _activeEffect->setFloat("furSpacing", furSpacing);
     _activeEffect->setFloat("furDensity", furDensity);
 
-    _furTime += Time::fpMillisecondsDuration<float>(
-                  getScene()->getEngine()->getDeltaTime())
-                / furSpeed;
+    _furTime += getScene()->getEngine()->getDeltaTime() / furSpeed;
     _activeEffect->setFloat("furTime", _furTime);
 
     _activeEffect->setTexture("furTexture", furTexture);

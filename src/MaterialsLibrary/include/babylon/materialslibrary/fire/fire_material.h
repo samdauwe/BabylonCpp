@@ -51,7 +51,7 @@ private:
   Color3 _scaledDiffuse;
   int _renderId;
   FireMaterialDefines _defines;
-  microseconds_t _lastTime;
+  float _lastTime;
 
 }; // end of class FireMaterial
 

@@ -31,8 +31,7 @@ void PerlinNoiseProceduralTexture::updateShaderUniforms()
 {
   setFloat("size", getRenderSize().width);
 
-  auto deltaTime = Time::fpMillisecondsDuration<float>(
-    getScene()->getEngine()->getDeltaTime());
+  auto deltaTime = getScene()->getEngine()->getDeltaTime();
 
   time += deltaTime;
   setFloat("time", time * speed / 1000.f);

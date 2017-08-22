@@ -50,7 +50,7 @@ void Sprite::setSize(int value)
   height = value;
 }
 
-void Sprite::playAnimation(int from, int to, bool loop, millisecond_t delay,
+void Sprite::playAnimation(int from, int to, bool loop, float delay,
                            const std::function<void()>& onAnimationEnd)
 {
   _fromIndex        = from;
@@ -62,7 +62,7 @@ void Sprite::playAnimation(int from, int to, bool loop, millisecond_t delay,
   _direction = from < to ? 1 : -1;
 
   cellIndex = from;
-  _time     = std::chrono::milliseconds(0);
+  _time     = 0.f;
 
   _onAnimationEnd = onAnimationEnd;
 }
@@ -72,14 +72,14 @@ void Sprite::stopAnimation()
   _animationStarted = false;
 }
 
-void Sprite::_animate(const millisecond_t& deltaTime)
+void Sprite::_animate(float deltaTime)
 {
   if (!_animationStarted)
     return;
 
   _time += deltaTime;
   if (_time > _delay) {
-    _time = _time % _delay;
+    _time = std::fmod(_time, _delay);
     cellIndex += _direction;
     if (cellIndex == _toIndex) {
       if (_loopAnimation) {

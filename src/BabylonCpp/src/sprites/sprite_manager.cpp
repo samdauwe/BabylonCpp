@@ -264,9 +264,9 @@ void SpriteManager::render()
   auto baseSize = _spriteTexture->getBaseSize();
 
   // Sprites
-  microseconds_t deltaTime = engine->getDeltaTime();
-  size_t max               = std::min(_capacity, sprites.size());
-  int rowSize              = baseSize.width / cellWidth;
+  auto deltaTime = engine->getDeltaTime();
+  size_t max     = std::min(_capacity, sprites.size());
+  int rowSize    = baseSize.width / cellWidth;
 
   unsigned int offset = 0;
   for (auto& sprite : sprites) {
@@ -274,7 +274,7 @@ void SpriteManager::render()
       continue;
     }
 
-    sprite->_animate(std::chrono::duration_cast<milliseconds_t>(deltaTime));
+    sprite->_animate(deltaTime);
 
     _appendSpriteVertex(offset++, sprite.get(), 0, 0, rowSize);
     _appendSpriteVertex(offset++, sprite.get(), 1, 0, rowSize);

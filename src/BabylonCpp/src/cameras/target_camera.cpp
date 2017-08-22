@@ -116,9 +116,8 @@ float TargetCamera::_computeLocalCameraSpeed()
 {
   auto engine = getEngine();
 
-  return speed * std::sqrt(
-                   (Time::fpMillisecondsDuration<float>(engine->getDeltaTime())
-                    / (engine->getFps() * 100.f)));
+  return speed
+         * std::sqrt((engine->getDeltaTime() / (engine->getFps() * 100.f)));
 }
 
 void TargetCamera::setRotation(const Vector3& newRotation)

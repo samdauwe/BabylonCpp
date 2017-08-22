@@ -27,10 +27,10 @@ public:
 
   int size() const;
   void setSize(int value);
-  void playAnimation(int from, int to, bool loop, millisecond_t delay,
+  void playAnimation(int from, int to, bool loop, float delay,
                      const std::function<void()>& onAnimationEnd);
   void stopAnimation();
-  void _animate(const millisecond_t& deltaTime);
+  void _animate(float deltaTime);
   void dispose(bool doNotRecurse = false) override;
 
 protected:
@@ -56,11 +56,11 @@ private:
   bool _loopAnimation;
   int _fromIndex;
   int _toIndex;
-  millisecond_t _delay;
+  float _delay;
   int _direction;
   int _frameCount;
   SpriteManager* _manager;
-  millisecond_t _time;
+  float _time;
   std::function<void()> _onAnimationEnd;
 
 }; // end of class Sprite

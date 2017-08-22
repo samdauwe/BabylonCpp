@@ -2390,18 +2390,17 @@ void Scene::render()
   }
 
   // Animations
-  const microseconds_t deltaTime
-    = std::max(Scene::MinDeltaTime,
-               std::min(_engine->getDeltaTime(), Scene::MaxDeltaTime));
-  _animationRatio
-    = Time::fpMillisecondsDuration<float>(deltaTime) * (60.f / 1000.f);
+  const float deltaTime = std::max(
+    Time::fpMillisecondsDuration<float>(Scene::MinDeltaTime),
+    std::min(_engine->getDeltaTime(),
+             Time::fpMillisecondsDuration<float>(Scene::MaxDeltaTime)));
+  _animationRatio = deltaTime * (60.f / 1000.f);
   _animate();
 
   // Physics
   if (_physicsEngine) {
     Tools::StartPerformanceCounter("Physics");
-    _physicsEngine->_step(Time::fpMillisecondsDuration<float>(deltaTime)
-                          / 1000.f);
+    _physicsEngine->_step(deltaTime / 1000.f);
     Tools::EndPerformanceCounter("Physics");
   }
 

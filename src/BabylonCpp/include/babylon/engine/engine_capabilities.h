@@ -22,7 +22,10 @@ struct BABYLON_SHARED_EXPORT InstancedArrays {
 }; // end of struct InstancedArrays
 
 struct BABYLON_SHARED_EXPORT EngineCapabilities {
+  /** The maximum textures image */
   int maxTexturesImageUnits;
+  int maxVertexTextureImageUnits;
+  /** The maximum texture size */
   int maxTextureSize;
   int maxCubemapTextureSize;
   int maxRenderTextureSize;
@@ -45,7 +48,6 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   bool uintIndices;
   bool highPrecisionShaderSupported;
   bool fragmentDepthSupported;
-  bool maxVertexTextureImageUnits;
   bool textureFloatLinearFiltering;
   bool textureFloatRender;
   bool textureHalfFloat;

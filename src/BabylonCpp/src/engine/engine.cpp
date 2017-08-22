@@ -38,12 +38,13 @@ std::string Engine::ShadersRepository = "src/shaders/";
 std::vector<Engine*> Engine::Instances{};
 
 Engine::Engine(ICanvas* canvas, const EngineOptions& options)
-    : isFullscreen{false}
+    : forcePOTTextures{false}
+    , isFullscreen{false}
     , isPointerLock{false}
     , cullBackFaces{true}
     , renderEvenInBackground{true}
     , preventCacheWipeBetweenFrames{false}
-    , enableOfflineSupport{true}
+    , enableOfflineSupport{false}
     , _vrDisplayEnabled{false}
     , _gl{nullptr}
     , _renderingCanvas{canvas}
@@ -53,9 +54,9 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _alphaTest{false}
     , _videoTextureSupported{false}
     , _renderingQueueLaunched{false}
-    , fpsRange{60}
-    , fps{60.f}
-    , deltaTime{std::chrono::microseconds(0)}
+    , _performanceMonitor{std::make_unique<PerformanceMonitor>()}
+    , _fps{60.f}
+    , _deltaTime{0.f}
     , _depthCullingState{std::make_unique<Internals::_DepthCullingState>()}
     , _stencilState{std::make_unique<Internals::_StencilState>()}
     , _alphaState{std::make_unique<Internals::_AlphaState>()}
@@ -257,6 +258,26 @@ std::string Engine::textureFormatInUse() const
 float Engine::webGLVersion() const
 {
   return _webGLVersion;
+}
+
+bool Engine::needPOTTextures() const
+{
+  return _webGLVersion < 2.f || forcePOTTextures;
+}
+
+bool Engine::badOS() const
+{
+  return _badOS;
+}
+
+bool Engine::badDesktopOS() const
+{
+  return _badDesktopOS;
+}
+
+PerformanceMonitor* Engine::performanceMonitor() const
+{
+  return _performanceMonitor.get();
 }
 
 GL::IGLTexture* Engine::emptyTexture()
@@ -3381,39 +3402,19 @@ unsigned int Engine::getError() const
 // FPS
 float Engine::getFps() const
 {
-  return fps;
+  return _fps;
 }
 
-microseconds_t Engine::getDeltaTime() const
+float Engine::getDeltaTime() const
 {
-  return deltaTime;
+  return _deltaTime;
 }
 
 void Engine::_measureFps()
 {
-  previousFramesDuration.emplace_back(Time::highresTimepointNow());
-  auto length = previousFramesDuration.size();
-
-  if (length >= 2) {
-    deltaTime = std::chrono::duration_cast<microseconds_t>(
-      previousFramesDuration[length - 1] - previousFramesDuration[length - 2]);
-  }
-
-  if (length >= fpsRange) {
-    if (length > fpsRange) {
-      // Remove the first element (oldest one)
-      previousFramesDuration.erase(previousFramesDuration.begin());
-      length -= 1;
-    }
-
-    // fractional duration -> no duration_cast needed
-    std::chrono::duration<float, std::milli> sumMillis{0.f};
-    for (unsigned int id = 0; id < length - 1; ++id) {
-      sumMillis += previousFramesDuration[id + 1] - previousFramesDuration[id];
-    }
-
-    fps = 1000.f / (sumMillis.count() / static_cast<float>(length - 1));
-  }
+  _performanceMonitor->sampleFrame();
+  _fps       = _performanceMonitor->averageFPS();
+  _deltaTime = _performanceMonitor->instantaneousFrameTime();
 }
 
 Uint8Array Engine::_readTexturePixels(GL::IGLTexture* texture, int width,
@@ -3581,32 +3582,96 @@ SamplingParameters Engine::GetSamplingParameters(unsigned int samplingMode,
 {
   GL::GLenum magFilter = GL::NEAREST;
   GL::GLenum minFilter = GL::NEAREST;
-  if (samplingMode == TextureConstants::BILINEAR_SAMPLINGMODE) {
-    magFilter = GL::LINEAR;
-    if (generateMipMaps) {
-      minFilter = GL::LINEAR_MIPMAP_NEAREST;
-    }
-    else {
+
+  switch (samplingMode) {
+    case TextureConstants::BILINEAR_SAMPLINGMODE:
+      magFilter = GL::LINEAR;
+      if (generateMipMaps) {
+        minFilter = GL::LINEAR_MIPMAP_NEAREST;
+      }
+      else {
+        minFilter = GL::LINEAR;
+      }
+      break;
+    case TextureConstants::TRILINEAR_SAMPLINGMODE:
+      magFilter = GL::LINEAR;
+      if (generateMipMaps) {
+        minFilter = GL::LINEAR_MIPMAP_LINEAR;
+      }
+      else {
+        minFilter = GL::LINEAR;
+      }
+      break;
+    case TextureConstants::NEAREST_SAMPLINGMODE:
+      magFilter = GL::NEAREST;
+      if (generateMipMaps) {
+        minFilter = GL::NEAREST_MIPMAP_LINEAR;
+      }
+      else {
+        minFilter = GL::NEAREST;
+      }
+      break;
+    case TextureConstants::NEAREST_NEAREST_MIPNEAREST:
+      magFilter = GL::NEAREST;
+      if (generateMipMaps) {
+        minFilter = GL::NEAREST_MIPMAP_NEAREST;
+      }
+      else {
+        minFilter = GL::NEAREST;
+      }
+      break;
+    case TextureConstants::NEAREST_LINEAR_MIPNEAREST:
+      magFilter = GL::NEAREST;
+      if (generateMipMaps) {
+        minFilter = GL::LINEAR_MIPMAP_NEAREST;
+      }
+      else {
+        minFilter = GL::LINEAR;
+      }
+      break;
+    case TextureConstants::NEAREST_LINEAR_MIPLINEAR:
+      magFilter = GL::NEAREST;
+      if (generateMipMaps) {
+        minFilter = GL::LINEAR_MIPMAP_LINEAR;
+      }
+      else {
+        minFilter = GL::LINEAR;
+      }
+      break;
+    case TextureConstants::NEAREST_LINEAR:
+      magFilter = GL::NEAREST;
       minFilter = GL::LINEAR;
-    }
-  }
-  else if (samplingMode == TextureConstants::TRILINEAR_SAMPLINGMODE) {
-    magFilter = GL::LINEAR;
-    if (generateMipMaps) {
-      minFilter = GL::LINEAR_MIPMAP_LINEAR;
-    }
-    else {
-      minFilter = GL::LINEAR;
-    }
-  }
-  else if (samplingMode == TextureConstants::NEAREST_SAMPLINGMODE) {
-    magFilter = GL::NEAREST;
-    if (generateMipMaps) {
-      minFilter = GL::NEAREST_MIPMAP_LINEAR;
-    }
-    else {
+      break;
+    case TextureConstants::NEAREST_NEAREST:
+      magFilter = GL::NEAREST;
       minFilter = GL::NEAREST;
-    }
+      break;
+    case TextureConstants::LINEAR_NEAREST_MIPNEAREST:
+      magFilter = GL::LINEAR;
+      if (generateMipMaps) {
+        minFilter = GL::NEAREST_MIPMAP_NEAREST;
+      }
+      else {
+        minFilter = GL::NEAREST;
+      }
+      break;
+    case TextureConstants::LINEAR_NEAREST_MIPLINEAR:
+      magFilter = GL::LINEAR;
+      if (generateMipMaps) {
+        minFilter = GL::NEAREST_MIPMAP_LINEAR;
+      }
+      else {
+        minFilter = GL::NEAREST;
+      }
+      break;
+    case TextureConstants::LINEAR_LINEAR:
+      magFilter = GL::LINEAR;
+      minFilter = GL::LINEAR;
+      break;
+    case TextureConstants::LINEAR_NEAREST:
+      magFilter = GL::LINEAR;
+      minFilter = GL::NEAREST;
+      break;
   }
 
   return {static_cast<int>(minFilter), static_cast<int>(magFilter)};

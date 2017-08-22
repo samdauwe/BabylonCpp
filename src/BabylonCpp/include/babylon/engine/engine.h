@@ -14,6 +14,7 @@
 #include <babylon/mesh/buffer_pointer.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/perf_counter.h>
+#include <babylon/tools/performance_monitor.h>
 
 namespace BABYLON {
 
@@ -59,6 +60,11 @@ public:
   std::vector<std::string>& texturesSupported();
   std::string textureFormatInUse() const;
   float webGLVersion() const;
+
+  bool needPOTTextures() const;
+  bool badOS() const;
+  bool badDesktopOS() const;
+  PerformanceMonitor* performanceMonitor() const;
 
   // Empty texture
   GL::IGLTexture* emptyTexture();
@@ -452,7 +458,7 @@ public:
 
   /** FPS **/
   float getFps() const;
-  microseconds_t getDeltaTime() const;
+  float getDeltaTime() const;
 
   /** Texture helper functions **/
   Uint8Array _readTexturePixels(GL::IGLTexture* texture, int width, int height,
@@ -532,6 +538,7 @@ private:
 
 public:
   // Public members
+  bool forcePOTTextures;
   bool isFullscreen;
   bool isPointerLock;
   bool cullBackFaces;
@@ -572,6 +579,7 @@ private:
   float _webGLVersion;
 
   bool _badOS;
+  bool _badDesktopOS;
 
   std::function<void()> _onCanvasBlur;
   std::function<void()> _onBlur;
@@ -597,10 +605,9 @@ private:
   std::vector<FastFunc<void()>> _activeRenderLoops;
 
   // FPS
-  unsigned int fpsRange;
-  std::vector<high_res_time_point_t> previousFramesDuration;
-  float fps;
-  microseconds_t deltaTime;
+  std::unique_ptr<PerformanceMonitor> _performanceMonitor;
+  float _fps;
+  float _deltaTime;
 
   // States
   std::unique_ptr<Internals::_DepthCullingState> _depthCullingState;

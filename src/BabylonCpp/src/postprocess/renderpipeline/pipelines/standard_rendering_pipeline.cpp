@@ -623,8 +623,7 @@ void StandardRenderingPipeline::_createHdrPostProcess(Scene* scene, float ratio)
                                       _bloomEnabled ? _currentHDRSource :
                                                       originalPostProcess);
 
-    time += Time::fpMillisecondsDuration<float>(
-      scene->getEngine()->getDeltaTime());
+    time += scene->getEngine()->getDeltaTime();
 
     if (outputLiminance < 0) {
       outputLiminance = _hdrCurrentLuminance;

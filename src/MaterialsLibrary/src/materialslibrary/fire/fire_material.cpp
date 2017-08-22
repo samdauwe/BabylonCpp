@@ -28,7 +28,7 @@ FireMaterial::FireMaterial(const std::string& iName, Scene* scene)
     , _distortionTexture{nullptr}
     , _opacityTexture{nullptr}
     , _renderId{-1}
-    , _lastTime{std::chrono::microseconds(0)}
+    , _lastTime{0.f}
 {
 }
 
@@ -242,8 +242,7 @@ void FireMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
 
   // Time
   _lastTime += scene->getEngine()->getDeltaTime();
-  _activeEffect->setFloat("time",
-                          Time::fpMillisecondsDuration<float>(_lastTime));
+  _activeEffect->setFloat("time", _lastTime);
 
   // Speed
   _activeEffect->setFloat("speed", speed);

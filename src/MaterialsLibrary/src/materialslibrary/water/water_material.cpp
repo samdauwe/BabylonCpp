@@ -46,7 +46,7 @@ WaterMaterial::WaterMaterial(const std::string& iName, Scene* scene,
     , _reflectionRTT{nullptr}
     , _material{nullptr}
     , _reflectionTransform{Matrix::Zero()}
-    , _lastTime{std::chrono::microseconds(0)}
+    , _lastTime{0.f}
     , _renderId{-1}
     , _isVisible{false}
     , _clipPlane{nullptr}
@@ -381,8 +381,7 @@ void WaterMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   _activeEffect->setMatrix("worldReflectionViewProjection", wrvp);
   _activeEffect->setVector2("windDirection", windDirection);
   _activeEffect->setFloat("waveLength", waveLength);
-  _activeEffect->setFloat(
-    "time", Time::fpMillisecondsDuration<float>(_lastTime) / 100000.f);
+  _activeEffect->setFloat("time", _lastTime / 100000.f);
   _activeEffect->setFloat("windForce", windForce);
   _activeEffect->setFloat("waveHeight", waveHeight);
   _activeEffect->setFloat("bumpHeight", bumpHeight);
