@@ -86,6 +86,7 @@ public:
   int getHardwareScalingLevel() const;
   std::vector<GLTexturePtr>& getLoadedTexturesCache();
   EngineCapabilities& getCaps();
+  /** The number of draw calls submitted last frame */
   size_t drawCalls() const;
   PerfCounter& drawCallsPerfCounter();
 
@@ -243,6 +244,12 @@ public:
 
   /** Shaders **/
   void _releaseEffect(Effect* effect);
+
+  /**
+   * @param baseName The base name of the effect (The name of file without
+   * .fragment.fx or .vertex.fx)
+   * @param samplers An array of string used to represent textures
+   */
   Effect* createEffect(const std::string& baseName,
                        EffectCreationOptions& options, Engine* engine,
                        const std::function<void(Effect* effect)>& onCompiled
@@ -515,7 +522,7 @@ private:
   void _bindVertexBuffersAttributes(
     const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
     Effect* effect);
-  void _unBindVertexArrayObject();
+  void _unbindVertexArrayObject();
   void setProgram(GL::IGLProgram* program);
   void activateTexture(unsigned int texture);
   GL::GLenum _getInternalFormat(unsigned int format) const;

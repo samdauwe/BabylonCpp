@@ -70,10 +70,12 @@ void ICanvas::removeKeyEventListener(
 
 void ICanvas::setFrameSize(int w, int h)
 {
-  width                      = w;
-  height                     = h;
-  clientWidth                = w;
-  clientHeight               = h;
+  _renderingContext->drawingBufferWidth = width = w;
+  _renderingContext->drawingBufferHeight = height = h;
+
+  clientWidth  = w;
+  clientHeight = h;
+
   _boundingClientRect.bottom = clientHeight;
   _boundingClientRect.height = clientHeight;
   _boundingClientRect.left   = 0;

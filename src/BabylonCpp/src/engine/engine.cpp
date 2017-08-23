@@ -336,7 +336,7 @@ int Engine::getRenderWidth(bool useScreen)
     return _currentRenderTarget->_width;
   }
 
-  return _renderingCanvas->width;
+  return _gl->drawingBufferWidth;
 }
 
 int Engine::getRenderHeight(bool useScreen)
@@ -345,7 +345,7 @@ int Engine::getRenderHeight(bool useScreen)
     return _currentRenderTarget->_height;
   }
 
-  return _renderingCanvas->height;
+  return _gl->drawingBufferHeight;
 }
 
 ICanvas* Engine::getRenderingCanvas()
@@ -816,7 +816,7 @@ void Engine::unBindFramebuffer(GL::IGLTexture* texture,
                          GL::COLOR_BUFFER_BIT, GL::NEAREST);
   }
 
-  if (texture->generateMipMaps && !disableGenerateMipMaps) {
+  if (texture->generateMipMaps && !disableGenerateMipMaps && !texture->isCube) {
     _bindTextureDirectly(GL::TEXTURE_2D, texture);
     _gl->generateMipmap(GL::TEXTURE_2D);
     _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
@@ -1008,7 +1008,7 @@ Engine::GLBufferPtr Engine::createIndexBuffer(const IndicesArray& indices)
 void Engine::bindArrayBuffer(GL::IGLBuffer* buffer)
 {
   if (!_vaoRecordInProgress) {
-    _unBindVertexArrayObject();
+    _unbindVertexArrayObject();
   }
   bindBuffer(buffer, GL::ARRAY_BUFFER);
 }
@@ -1033,7 +1033,7 @@ void Engine::bindUniformBlock(GL::IGLProgram* shaderProgram,
 void Engine::bindIndexBuffer(GL::IGLBuffer* buffer)
 {
   if (!_vaoRecordInProgress) {
-    _unBindVertexArrayObject();
+    _unbindVertexArrayObject();
   }
   bindBuffer(buffer, GL::ELEMENT_ARRAY_BUFFER);
 }
@@ -1059,9 +1059,9 @@ void Engine::vertexAttribPointer(GL::IGLBuffer* buffer, unsigned int indx,
 {
   bool changed = false;
   if (_currentBufferPointers.find(indx) == _currentBufferPointers.end()) {
-    changed = true;
-    _currentBufferPointers[indx]
-      = BufferPointer(indx, size, type, normalized, stride, offset, buffer);
+    changed                      = true;
+    _currentBufferPointers[indx] = BufferPointer(
+      true, indx, size, type, normalized, stride, offset, buffer);
   }
   else {
     auto& pointer = _currentBufferPointers[indx];
@@ -1116,7 +1116,7 @@ void Engine::_bindVertexBuffersAttributes(
   auto attributes = effect->getAttributesNames();
 
   if (!_vaoRecordInProgress) {
-    _unBindVertexArrayObject();
+    _unbindVertexArrayObject();
   }
 
   unbindAllAttributes();
@@ -1205,7 +1205,7 @@ void Engine::bindBuffersDirectly(GL::IGLBuffer* vertexBuffer,
 
     auto attributesCount = effect->getAttributesCount();
 
-    _unBindVertexArrayObject();
+    _unbindVertexArrayObject();
     unbindAllAttributes();
 
     int offset = 0;
@@ -1233,7 +1233,7 @@ void Engine::bindBuffersDirectly(GL::IGLBuffer* vertexBuffer,
   _bindIndexBufferWithCache(indexBuffer);
 }
 
-void Engine::_unBindVertexArrayObject()
+void Engine::_unbindVertexArrayObject()
 {
   if (!_cachedVertexArrayObject) {
     return;
@@ -1974,6 +1974,7 @@ void Engine::wipeCaches(bool bruteForce)
   _currentEffect = nullptr;
 
   if (bruteForce) {
+    _currentProgram = nullptr;
     _stencilState->reset();
     _depthCullingState->reset();
     setDepthFunctionToLessOrEqual();
@@ -1983,7 +1984,7 @@ void Engine::wipeCaches(bool bruteForce)
   _cachedVertexBuffers          = nullptr;
   _cachedIndexBuffer            = nullptr;
   _cachedEffectForVertexBuffers = nullptr;
-  _unBindVertexArrayObject();
+  _unbindVertexArrayObject();
   bindIndexBuffer(nullptr);
   bindArrayBuffer(nullptr);
 }
@@ -2070,10 +2071,10 @@ GL::IGLTexture* Engine::createTexture(const std::string& urlArg, bool noMipmap,
   bool isTGA = (extension == ".tga");
 
   scene->_addPendingData(_texture);
-  _texture->url          = url;
-  _texture->noMipmap     = noMipmap;
-  _texture->references   = 1;
-  _texture->samplingMode = samplingMode;
+  _texture->url            = url;
+  texture->generateMipMaps = !noMipmap;
+  _texture->references     = 1;
+  _texture->samplingMode   = samplingMode;
   texture->onLoadedCallbacks.clear();
   if (onLoad) {
     texture->onLoadedCallbacks.emplace_back(onLoad);
@@ -2233,8 +2234,12 @@ GL::IGLTexture* Engine::createDynamicTexture(int width, int height,
   texture->_baseHeight = height;
 
   if (generateMipMaps) {
-    width  = Tools::GetExponentOfTwo(width, _caps.maxTextureSize);
-    height = Tools::GetExponentOfTwo(height, _caps.maxTextureSize);
+    width = needPOTTextures() ?
+              Tools::GetExponentOfTwo(width, _caps.maxTextureSize) :
+              width;
+    height = needPOTTextures() ?
+               Tools::GetExponentOfTwo(height, _caps.maxTextureSize) :
+               height;
   }
 
   resetTextureCache();
@@ -2799,8 +2804,9 @@ void Engine::updateRawCubeTexture(GL::IGLTexture* texture,
     }
   }
 
-  auto isPot = (Tools::IsExponentOfTwo(texture->_width)
-                && Tools::IsExponentOfTwo(texture->_height));
+  auto isPot
+    = !needPOTTextures() || (Tools::IsExponentOfTwo(texture->_width)
+                             && Tools::IsExponentOfTwo(texture->_height));
   if (isPot && texture->generateMipMaps && level == 0) {
     _gl->generateMipmap(GL::TEXTURE_CUBE_MAP);
   }
@@ -2817,12 +2823,12 @@ GL::IGLTexture* Engine::createRawCubeTexture(const std::vector<Uint8Array> data,
                                              unsigned int samplingMode,
                                              const std::string& compression)
 {
-  auto texture        = _gl->createTexture();
-  texture->isCube     = true;
-  texture->references = 1;
-  texture->noMipmap   = !generateMipMaps;
-  texture->format     = format;
-  texture->type       = type;
+  auto texture             = _gl->createTexture();
+  texture->isCube          = true;
+  texture->references      = 1;
+  texture->generateMipMaps = generateMipMaps;
+  texture->format          = format;
+  texture->type            = type;
 
   auto textureType    = _getWebGLTextureType(type);
   auto internalFormat = _getInternalFormat(format);
@@ -2838,8 +2844,9 @@ GL::IGLTexture* Engine::createRawCubeTexture(const std::vector<Uint8Array> data,
   texture->_height = height;
 
   // Double check on POT to generate Mips.
-  auto isPot = (Tools::IsExponentOfTwo(texture->_width)
-                && Tools::IsExponentOfTwo(texture->_height));
+  auto isPot
+    = !needPOTTextures() || (Tools::IsExponentOfTwo(texture->_width)
+                             && Tools::IsExponentOfTwo(texture->_height));
   if (!isPot) {
     generateMipMaps = false;
   }
@@ -3200,11 +3207,16 @@ void Engine::setTextureArray(int channel, GL::IGLUniformLocation* uniform,
 
 void Engine::_setAnisotropicLevel(unsigned int key, BaseTexture* texture)
 {
+  auto internalTexture = texture->getInternalTexture();
+
+  if (!internalTexture) {
+    return;
+  }
+
   auto anisotropicFilterExtension = _caps.textureAnisotropicFilterExtension;
   auto value                      = texture->anisotropicFilteringLevel;
 
-  if (texture->getInternalTexture()->samplingMode
-      == TextureConstants::NEAREST_SAMPLINGMODE) {
+  if (internalTexture->samplingMode == TextureConstants::NEAREST_SAMPLINGMODE) {
     value = 1;
   }
 
@@ -3260,7 +3272,8 @@ void Engine::unbindAllAttributes()
 
     for (unsigned int i = 0; i < ul; ++i) {
       _gl->disableVertexAttribArray(i);
-      _vertexAttribArraysEnabled[i] = false;
+      _vertexAttribArraysEnabled[i]    = false;
+      _currentBufferPointers[i].active = false;
     }
     _currentBufferPointers.clear();
     return;
@@ -3272,7 +3285,8 @@ void Engine::unbindAllAttributes()
       continue;
     }
     _gl->disableVertexAttribArray(i);
-    _vertexAttribArraysEnabled[i] = false;
+    _vertexAttribArraysEnabled[i]    = false;
+    _currentBufferPointers[i].active = false;
   }
   _currentBufferPointers.clear();
 }
@@ -3440,8 +3454,7 @@ Uint8Array Engine::_readTexturePixels(GL::IGLTexture* texture, int width,
   auto readType   = GL::UNSIGNED_BYTE;
   Uint8Array buffer(static_cast<std::size_t>(4 * width * height));
   _gl->readPixels(0, 0, width, height, readFormat, readType, buffer);
-
-  _gl->bindFramebuffer(GL::FRAMEBUFFER, nullptr);
+  _gl->bindFramebuffer(GL::FRAMEBUFFER, _currentFramebuffer);
 
   return buffer;
 }
@@ -3687,10 +3700,15 @@ void Engine::PrepareGLTexture(
   if (!engine) {
     return;
   }
+
   auto potWidth
-    = Tools::GetExponentOfTwo(width, engine->getCaps().maxTextureSize);
+    = engine->needPOTTextures() ?
+        Tools::GetExponentOfTwo(width, engine->getCaps().maxTextureSize) :
+        width;
   auto potHeight
-    = Tools::GetExponentOfTwo(height, engine->getCaps().maxTextureSize);
+    = engine->needPOTTextures() ?
+        Tools::GetExponentOfTwo(height, engine->getCaps().maxTextureSize) :
+        height;
 
   engine->_bindTextureDirectly(GL::TEXTURE_2D, texture);
   gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL, invertY ? 1 : 0);

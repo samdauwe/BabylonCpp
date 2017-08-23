@@ -544,6 +544,9 @@ public:
   // RGBA 32-bit floating-point color-renderable internal sized format.
   unsigned int RGBA32F;
   unsigned int DEPTH24_STENCIL8;
+  // Drawing buffer width and height
+  int drawingBufferWidth;
+  int drawingBufferHeight;
 
 public:
   virtual bool initialize()     = 0;

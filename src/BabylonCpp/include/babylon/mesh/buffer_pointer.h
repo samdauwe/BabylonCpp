@@ -10,11 +10,12 @@ namespace BABYLON {
 */
 struct BABYLON_SHARED_EXPORT BufferPointer {
   BufferPointer();
-  BufferPointer(unsigned int indx, int size, unsigned int type, bool normalized,
-                int stride, int offset, GL::IGLBuffer* buffer);
+  BufferPointer(bool active, unsigned int indx, int size, unsigned int type,
+                bool normalized, int stride, int offset, GL::IGLBuffer* buffer);
   ~BufferPointer();
 
-  unsigned int indx;
+  bool active;
+  unsigned int index;
   int size;
   unsigned int type;
   bool normalized;
