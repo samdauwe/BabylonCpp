@@ -93,6 +93,11 @@ std::string BaseTexture::toString() const
   return name;
 }
 
+const char* BaseTexture::getClassName() const
+{
+  return "BaseTexture";
+}
+
 void BaseTexture::setOnDispose(const std::function<void()>& callback)
 {
   if (_onDisposeObserver) {
@@ -185,7 +190,7 @@ void BaseTexture::_removeFromCache(const std::string& url, bool noMipmap)
   auto& texturesCache = _scene->getEngine()->getLoadedTexturesCache();
   for (auto& texturesCacheEntry : texturesCache) {
     if ((texturesCacheEntry->url.compare(url) == 0)
-        && texturesCacheEntry->noMipmap == noMipmap) {
+        && texturesCacheEntry->generateMipMaps != noMipmap) {
       auto it = std::find(texturesCache.begin(), texturesCache.end(),
                           texturesCacheEntry);
       if (it != texturesCache.end()) {
@@ -202,7 +207,7 @@ GL::IGLTexture* BaseTexture::_getFromCache(const std::string& url,
   auto& texturesCache = _scene->getEngine()->getLoadedTexturesCache();
   for (auto& texturesCacheEntry : texturesCache) {
     if ((texturesCacheEntry->url.compare(url) == 0)
-        && texturesCacheEntry->noMipmap == noMipmap) {
+        && texturesCacheEntry->generateMipMaps != noMipmap) {
       if (!sampling || sampling == texturesCacheEntry->samplingMode) {
         ++texturesCacheEntry->references;
         return texturesCacheEntry.get();
@@ -356,26 +361,32 @@ Json::object BaseTexture::serialize() const
 }
 
 void BaseTexture::WhenAllReady(const std::vector<BaseTexture*>& textures,
-                               const std::function<void()>& onLoad)
+                               const std::function<void()>& callback)
 {
-  static std::size_t numReady = 0;
+  auto numRemaining = textures.size();
+  if (numRemaining == 0) {
+    callback();
+    return;
+  }
 
   for (auto& texture : textures) {
     if (texture->isReady()) {
-      if (++numReady == textures.size()) {
-        onLoad();
+      if (--numRemaining == 0) {
+        callback();
       }
     }
     else {
-      const std::function<void()> callback = [&]() {
-        static_cast<Texture*>(texture)->onLoadObservable().removeCallback(
-          callback);
-        if (++numReady == textures.size()) {
-          onLoad();
+      auto onLoadObservable
+        = (static_cast<Texture*>(texture))->onLoadObservable();
+
+      const std::function<void()> onLoadCallback = [&]() {
+        onLoadObservable.removeCallback(onLoadCallback);
+        if (--numRemaining == 0) {
+          callback();
         }
       };
 
-      static_cast<Texture*>(texture)->onLoadObservable().add(callback);
+      onLoadObservable.add(onLoadCallback);
     }
   }
 }

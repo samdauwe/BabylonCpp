@@ -16,7 +16,8 @@ public:
               const std::function<void()>& onLoad  = nullptr,
               const std::function<void()>& onError = nullptr,
               unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA,
-              bool prefiltered    = false);
+              bool prefiltered    = false,
+              const std::string& forcedExtension = "");
   ~CubeTexture();
 
   /** Methods **/
@@ -30,7 +31,8 @@ public:
   CreateFromImages(const std::vector<std::string>& files, Scene* scene,
                    bool noMipmap = false);
   static std::unique_ptr<CubeTexture>
-  CreateFromPrefilteredData(const std::string& url, Scene* scene);
+  CreateFromPrefilteredData(const std::string& url, Scene* scene,
+                            const std::string& forcedExtension = "");
   static std::unique_ptr<CubeTexture> Parse(const Json::value& parsedTexture,
                                             Scene* scene,
                                             const std::string& rootUrl);

@@ -25,8 +25,14 @@ public:
 
   virtual IReflect::Type type() const override;
 
+  /**
+   * @brief Returns the string "Texture".
+   */
+  const char* getClassName() const;
+
   void setIsBlocking(bool value);
   bool isBlocking() const override;
+  unsigned int samplingMode() const;
 
   bool noMipmap() const;
   void updateURL(const std::string& iUrl);
@@ -36,6 +42,7 @@ public:
   Matrix* getReflectionTextureMatrix() override;
   Texture* clone() const;
   Observable<Texture>& onLoadObservable();
+  Json::object serialize() const;
 
   /** Statics **/
   static Texture* CreateFromBase64String(

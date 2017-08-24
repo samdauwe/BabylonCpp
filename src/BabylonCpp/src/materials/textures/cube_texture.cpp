@@ -19,13 +19,14 @@ CubeTexture::CreateFromImages(const std::vector<std::string>& iFiles,
                                        iFiles);
 }
 
-std::unique_ptr<CubeTexture> CreateFromPrefilteredData(const std::string& url,
-                                                       Scene* scene)
+std::unique_ptr<CubeTexture>
+CreateFromPrefilteredData(const std::string& url, Scene* scene,
+                          const std::string& forcedExtension)
 {
   const std::vector<std::string> emptyStringList;
   return std::make_unique<CubeTexture>(
     url, scene, emptyStringList, false, emptyStringList, nullptr, nullptr,
-    EngineConstants::TEXTUREFORMAT_RGBA, true);
+    EngineConstants::TEXTUREFORMAT_RGBA, true, forcedExtension);
 }
 
 CubeTexture::CubeTexture(const std::string& rootUrl, Scene* scene,
@@ -33,7 +34,8 @@ CubeTexture::CubeTexture(const std::string& rootUrl, Scene* scene,
                          bool noMipmap, const std::vector<std::string>& iFiles,
                          const std::function<void()>& onLoad,
                          const std::function<void()>& onError,
-                         unsigned int format, bool prefiltered)
+                         unsigned int format, bool prefiltered,
+                         const std::string& forcedExtension)
     : BaseTexture{scene}
     , url{rootUrl}
     , coordinatesMode{TextureConstants::CUBIC_MODE}
@@ -42,6 +44,11 @@ CubeTexture::CubeTexture(const std::string& rootUrl, Scene* scene,
     , _format{format}
     , _prefiltered{prefiltered}
 {
+  isCube = true;
+  if (prefiltered) {
+    gammaSpace = false;
+  }
+
   name = rootUrl;
   setHasAlpha(false);
 
@@ -71,11 +78,12 @@ CubeTexture::CubeTexture(const std::string& rootUrl, Scene* scene,
       if (prefiltered) {
         _texture = scene->getEngine()->createPrefilteredCubeTexture(
           rootUrl, scene, lodGenerationScale, lodGenerationOffset, onLoad,
-          onError, format);
+          onError, format, forcedExtension);
       }
       else {
         _texture = scene->getEngine()->createCubeTexture(
-          rootUrl, scene, extensions, noMipmap, onLoad, onError, _format);
+          rootUrl, scene, extensions, noMipmap, onLoad, onError, _format,
+          forcedExtension);
       }
     }
     else {
@@ -89,12 +97,6 @@ CubeTexture::CubeTexture(const std::string& rootUrl, Scene* scene,
     else {
       _texture->onLoadedCallbacks.emplace_back(onLoad);
     }
-  }
-
-  isCube = true;
-
-  if (prefiltered) {
-    gammaSpace = false;
   }
 }
 

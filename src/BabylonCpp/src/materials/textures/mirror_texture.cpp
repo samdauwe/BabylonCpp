@@ -37,7 +37,7 @@ MirrorTexture::MirrorTexture(const std::string& iName, const ISize& size,
     scene->setClipPlane(mirrorPlane);
     scene->getEngine()->cullBackFaces = false;
     scene->setMirroredCameraPosition(Vector3::TransformCoordinates(
-      scene->activeCamera->position, _mirrorMatrix));
+      scene->activeCamera->globalPosition(), _mirrorMatrix));
   };
 
   onAfterRender = [this]() {

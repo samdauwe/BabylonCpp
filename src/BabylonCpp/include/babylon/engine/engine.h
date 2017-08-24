@@ -402,13 +402,15 @@ public:
   GL::IGLTexture* createPrefilteredCubeTexture(
     const std::string& rootUrl, Scene* scene, float scale, float offset,
     const std::function<void()>& onLoad  = nullptr,
-    const std::function<void()>& onError = nullptr, unsigned int format = 0);
+    const std::function<void()>& onError = nullptr, unsigned int format = 0,
+    const std::string& forcedExtension = "");
   GL::IGLTexture*
   createCubeTexture(const std::string& rootUrl, Scene* scene,
                     const std::vector<std::string>& extensions, bool noMipmap,
                     const std::function<void()>& onLoad  = nullptr,
                     const std::function<void()>& onError = nullptr,
-                    unsigned int format                  = 0);
+                    unsigned int format                  = 0,
+                    const std::string& forcedExtension   = "");
   void updateTextureSize(GL::IGLTexture* texture, int width, int height);
   void updateRawCubeTexture(GL::IGLTexture* texture,
                             const std::vector<Uint8Array>& data,

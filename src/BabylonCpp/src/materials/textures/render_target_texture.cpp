@@ -289,12 +289,14 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
     return;
   }
 
+  onBeforeBindObservable.notifyObservers(this);
+
   // Set custom projection.
   // Needs to be before binding to prevent changing the aspect ratio.
   Camera* camera = nullptr;
   if (activeCamera) {
     camera = activeCamera;
-    engine->setViewport(activeCamera->viewport);
+    engine->setViewport(activeCamera->viewport, _size.width, _size.height);
 
     if (activeCamera != scene->activeCamera) {
       scene->setTransformMatrix(activeCamera->getViewMatrix(),
@@ -303,7 +305,8 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
   }
   else {
     camera = scene->activeCamera;
-    engine->setViewport(scene->activeCamera->viewport);
+    engine->setViewport(scene->activeCamera->viewport, _size.width,
+                        _size.height);
   }
 
   // Prepare renderingManager
@@ -522,6 +525,8 @@ void RenderTargetTexture::dispose(bool doNotRecurse)
   }
 
   clearPostProcesses(true);
+
+  renderList.clear();
 
   // Remove from custom render targets
   auto scene = getScene();

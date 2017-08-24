@@ -128,6 +128,12 @@ public:
   std::function<void()> onBeforeRender;
 
   // Events
+
+  /**
+   * An event triggered when the texture is unbind.
+   */
+  Observable<RenderTargetTexture> onBeforeBindObservable;
+
   /**
    * An event triggered when the texture is unbind.
    */

@@ -2733,7 +2733,8 @@ Engine::createRenderTargetCubeTexture(const ISize& size,
 GL::IGLTexture* Engine::createPrefilteredCubeTexture(
   const std::string& /*rootUrl*/, Scene* /*scene*/, float /*scale*/,
   float /*offset*/, const std::function<void()>& /*onLoad*/,
-  const std::function<void()>& /*onError*/, unsigned int /*format*/)
+  const std::function<void()>& /*onError*/, unsigned int /*format*/,
+  const std::string& /*forcedExtension*/)
 {
   return nullptr;
 }
@@ -2742,7 +2743,8 @@ GL::IGLTexture* Engine::createCubeTexture(
   const std::string& /*rootUrl*/, Scene* /*scene*/,
   const std::vector<std::string>& /*extensions*/, bool /*noMipmap*/,
   const std::function<void()>& /*onLoad*/,
-  const std::function<void()>& /*onError*/, unsigned int /*format*/)
+  const std::function<void()>& /*onError*/, unsigned int /*format*/,
+  const std::string& /*forcedExtension*/)
 {
   return nullptr;
 }

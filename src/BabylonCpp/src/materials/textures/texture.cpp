@@ -1,6 +1,7 @@
 #include <babylon/materials/textures/texture.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/igl_rendering_context.h>
@@ -94,6 +95,11 @@ IReflect::Type Texture::type() const
   return IReflect::Type::TEXTURE;
 }
 
+const char* Texture::getClassName() const
+{
+  return "Texture";
+}
+
 void Texture::setIsBlocking(bool value)
 {
   _isBlocking = value;
@@ -102,6 +108,11 @@ void Texture::setIsBlocking(bool value)
 bool Texture::isBlocking() const
 {
   return _isBlocking;
+}
+
+unsigned int Texture::samplingMode() const
+{
+  return _samplingMode;
 }
 
 bool Texture::noMipmap() const
@@ -243,6 +254,10 @@ Matrix* Texture::getReflectionTextureMatrix()
     _projectionModeMatrix = std::make_unique<Matrix>(Matrix::Zero());
   }
 
+  _cachedUOffset         = uOffset;
+  _cachedVOffset         = vOffset;
+  _cachedUScale          = uScale;
+  _cachedVScale          = vScale;
   _cachedCoordinatesMode = coordinatesMode();
 
   switch (coordinatesMode()) {
@@ -308,6 +323,11 @@ Texture* Texture::clone() const
 Observable<Texture>& Texture::onLoadObservable()
 {
   return _onLoadObservable;
+}
+
+Json::object Texture::serialize() const
+{
+  return Json::object();
 }
 
 Texture* Texture::CreateFromBase64String(const std::string& /*data*/,
