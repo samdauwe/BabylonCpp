@@ -99,6 +99,11 @@ ImageProcessingPostProcess::~ImageProcessingPostProcess()
 {
 }
 
+const char* ImageProcessingPostProcess::getClassName() const
+{
+  return "ImageProcessingPostProcess";
+}
+
 BaseTexture* ImageProcessingPostProcess::colorGradingTexture()
 {
   return _colorGradingTexture;

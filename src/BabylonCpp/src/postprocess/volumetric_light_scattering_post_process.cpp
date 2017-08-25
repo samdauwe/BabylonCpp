@@ -79,6 +79,11 @@ VolumetricLightScatteringPostProcess::~VolumetricLightScatteringPostProcess()
 {
 }
 
+const char* VolumetricLightScatteringPostProcess::getClassName() const
+{
+   return "VolumetricLightScatteringPostProcess";
+}
+
 bool VolumetricLightScatteringPostProcess::isReady(SubMesh* subMesh,
                                                    bool useInstances)
 {

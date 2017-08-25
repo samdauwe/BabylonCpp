@@ -20,6 +20,11 @@ public:
                              = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   ~ImageProcessingPostProcess();
 
+  /**
+   * @brief Returns the string "ImageProcessingPostProcess"
+   */
+  const char* getClassName() const;
+
   BaseTexture* colorGradingTexture();
   void setColorGradingTexture(BaseTexture* value);
   unsigned int vignetteBlendMode() const;

@@ -220,8 +220,10 @@ void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture,
   if (!_shareOutputWithPostProcess && !_forcedOutputTexture) {
     auto pCamera = camera ? camera : _camera;
 
-    auto scene        = pCamera->getScene();
-    const int maxSize = pCamera->getEngine()->getCaps().maxTextureSize;
+    auto scene  = pCamera->getScene();
+    auto engine = scene->getEngine();
+
+    const int maxSize = engine->getCaps().maxTextureSize;
 
     const int requiredWidth = static_cast<int>(
       static_cast<float>(sourceTexture ? sourceTexture->_width :
@@ -240,12 +242,16 @@ void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture,
         || alwaysForcePOT) {
       if (_options.width <= 0) {
         desiredWidth
-          = Tools::GetExponentOfTwo(desiredWidth, maxSize, scaleMode);
+          = engine->needPOTTextures() ?
+              Tools::GetExponentOfTwo(desiredWidth, maxSize, scaleMode) :
+              desiredWidth;
       }
 
       if (_options.height <= 0) {
         desiredHeight
-          = Tools::GetExponentOfTwo(desiredHeight, maxSize, scaleMode);
+          = engine->needPOTTextures() ?
+              Tools::GetExponentOfTwo(desiredHeight, maxSize, scaleMode) :
+              desiredHeight;
       }
     }
 

@@ -17,7 +17,7 @@ class BABYLON_SHARED_EXPORT VolumetricLightScatteringPostProcess
 
 public:
   /**
-   * @constructor
+   * @brief Constructor
    * @param {string} name - The post-process name
    * @param {any} ratio - The size of the post-process and/or internal pass (0.5
    * means that your postprocess will have a width = canvas.width 0.5 and a
@@ -39,6 +39,11 @@ public:
     unsigned int samplingMode = TextureConstants::BILINEAR_SAMPLINGMODE,
     Engine* engine = nullptr, bool reusable = false, Scene* scene = nullptr);
   ~VolumetricLightScatteringPostProcess();
+
+  /**
+   * @brief Returns the string "VolumetricLightScatteringPostProcess"
+   */
+  const char* getClassName() const;
 
   bool isReady(SubMesh* subMesh, bool useInstances);
 
