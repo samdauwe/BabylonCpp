@@ -17,7 +17,7 @@ struct BABYLON_SHARED_EXPORT IHighlightLayerOptions {
    * size
    * used to generated the glowing objects (the smaller the faster).
    */
-  float mainTextureRatio = 0.25f;
+  float mainTextureRatio = 0.5f;
 
   /**
    * Enforces a fixed size texture to ensure resize independant blur.

@@ -140,8 +140,12 @@ void HighlightLayer::createTextureAndPostProcesses()
   int blurTextureHeight
     = static_cast<int>(static_cast<float>(_mainTextureDesiredSize.height)
                        * _options.blurTextureSizeRatio);
-  blurTextureWidth  = Tools::GetExponentOfTwo(blurTextureWidth, _maxSize);
-  blurTextureHeight = Tools::GetExponentOfTwo(blurTextureHeight, _maxSize);
+  blurTextureWidth = _engine->needPOTTextures() ?
+                       Tools::GetExponentOfTwo(blurTextureWidth, _maxSize) :
+                       blurTextureWidth;
+  blurTextureHeight = _engine->needPOTTextures() ?
+                        Tools::GetExponentOfTwo(blurTextureHeight, _maxSize) :
+                        blurTextureHeight;
 
   _mainTexture = std::make_unique<RenderTargetTexture>(
     "HighlightLayerMainRTT",
@@ -593,9 +597,13 @@ void HighlightLayer::setMainTextureSize()
       _engine->getRenderingCanvas()->height * _options.mainTextureRatio);
 
     _mainTextureDesiredSize.width
-      = Tools::GetExponentOfTwo(_mainTextureDesiredSize.width, _maxSize);
+      = _engine->needPOTTextures() ?
+          Tools::GetExponentOfTwo(_mainTextureDesiredSize.width, _maxSize) :
+          _mainTextureDesiredSize.width;
     _mainTextureDesiredSize.height
-      = Tools::GetExponentOfTwo(_mainTextureDesiredSize.height, _maxSize);
+      = _engine->needPOTTextures() ?
+          Tools::GetExponentOfTwo(_mainTextureDesiredSize.height, _maxSize) :
+          _mainTextureDesiredSize.height;
   }
 }
 
