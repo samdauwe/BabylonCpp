@@ -24,6 +24,7 @@
 ![shader_material_box_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_box_scene.png?raw=true "Shader Material Box Scene")
 ![shader_material_boxes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_boxes_scene.png?raw=true "Shader Material Boxes Scene")
 ![shader_material_cylinders_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_cylinders_scene.png?raw=true "Shader Material Cylinders Scene")
+![shader_material_menger_sponge_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_menger_sponge_scene.png?raw=true "Shader Material Menger Sponge Scene")
 ![shader_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_scene.png?raw=true "Shader Material Scene")
 ![shader_material_skybox_clouds_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_skybox_clouds_scene.png?raw=true "Shader Material Skybox Clouds Scene")
 ![shader_material_skybox_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_skybox_scene.png?raw=true "Shader Material Skybox Scene")
