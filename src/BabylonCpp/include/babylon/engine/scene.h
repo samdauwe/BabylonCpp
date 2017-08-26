@@ -24,20 +24,46 @@ class BABYLON_SHARED_EXPORT Scene : public IAnimatable, public IDisposable {
 
 public:
   // Statics
-  static constexpr unsigned int FOGMODE_NONE   = 0;
-  static constexpr unsigned int FOGMODE_EXP    = 1;
-  static constexpr unsigned int FOGMODE_EXP2   = 2;
+  /**
+   * The fog is deactivated
+   */
+  static constexpr unsigned int FOGMODE_NONE = 0;
+  /**
+   * The fog density is following an exponential function
+   */
+  static constexpr unsigned int FOGMODE_EXP = 1;
+  /**
+   * The fog density is following an exponential function faster than
+   * FOGMODE_EXP
+   */
+  static constexpr unsigned int FOGMODE_EXP2 = 2;
+  /**
+   * The fog density is following a linear function.
+   */
   static constexpr unsigned int FOGMODE_LINEAR = 3;
 
   static microseconds_t MinDeltaTime;
   static microseconds_t MaxDeltaTime;
 
-  static unsigned int DragMovementThreshold; // in pixels
-  static milliseconds_t LongPressDelay;      // in milliseconds
-  static milliseconds_t DoubleClickDelay;    // in milliseconds
-  static bool ExclusiveDoubleClickMode; // If you need to check double click
-                                        // without raising a single click at
-                                        // first click, enable this flag
+  /**
+   * The distance in pixel that you have to move to prevent some events.
+   */
+  static unsigned int DragMovementThreshold;
+  /**
+   * Time in milliseconds to wait to raise long press events if button is still
+   * pressed.
+   */
+  static milliseconds_t LongPressDelay;
+  /**
+   * Time in milliseconds with two consecutive clicks will be considered as a
+   * double click.
+   */
+  static milliseconds_t DoubleClickDelay;
+  /**
+   * If you need to check double click without raising a single click at first
+   * click, enable this flag.
+   */
+  static bool ExclusiveDoubleClickMode;
 
   template <typename... Ts>
   static std::unique_ptr<Scene> New(Ts&&... args)
@@ -50,9 +76,21 @@ public:
   IReflect::Type type() const override;
 
   // Events
+  /**
+   * @brief A function to be executed when this scene is disposed.
+   */
   void setOnDispose(const std::function<void()>& callback);
+
+  /**
+   * @brief A function to be executed before rendering this scene.
+   */
   void setBeforeRender(const std::function<void()>& callback);
+
+  /**
+   * @brief A function to be executed after rendering this scene.
+   */
   void setAfterRender(const std::function<void()>& callback);
+
   void setBeforeCameraRender(const std::function<void()>& callback);
   void setAfterCameraRender(const std::function<void()>& callback);
 
@@ -111,8 +149,19 @@ public:
   void setClipPlane(const Plane& plane);
   void resetClipPlane();
   void setMirroredCameraPosition(const Vector3& newPosition);
+
+  /**
+   * @brief Returns the default material used on meshes when no material is
+   * affected.
+   */
   Material* defaultMaterial();
+
+  /**
+   * @brief Sets the default material used on meshes when no material is
+   * affected.
+   */
   void setDefaultMaterial(Material* value);
+
   std::array<Plane, 6>& frustumPlanes();
   const std::array<Plane, 6>& frustumPlanes() const;
   DebugLayer* debugLayer();
@@ -220,7 +269,9 @@ public:
    * provided a new one will be created from the given params.
    * @return {BABYLON.Animatable} the animatable object created for this
    * animation
-   * @see BABYLON.Animatable
+   * @returns {BABYLON.Animatable} the animatable object created for this
+   * animation
+   * See BABYLON.Animatable
    * @see http://doc.babylonjs.com/page.php?p=22081
    */
   Animatable* beginAnimation(IAnimatable* target, float from, float to,
@@ -354,10 +405,10 @@ public:
   /**
    * @brief Get a particle system by id.
    * @param id {number} the particle system id
-   * @return {BABYLON.ParticleSystem|null} the corresponding system or null if
+   * @return {BABYLON.IParticleSystem|null} the corresponding system or null if
    * none found.
    */
-  ParticleSystem* getParticleSystemByID(const std::string& id);
+  IParticleSystem* getParticleSystemByID(const std::string& id);
 
   /**
    * @brief Get a geometry using its ID.
@@ -503,7 +554,7 @@ public:
                     bool fastCheck = false, Camera* camera = nullptr);
 
   /**
-   * @brief Launch a ray to try to pick a mesh in the scene
+   * @brief Launch a ray to try to pick a sprite in the scene
    * @param x X position on screen
    * @param y Y position on screen
    * @param predicate Predicate function used to determine eligible sprites. Can
@@ -516,6 +567,15 @@ public:
   PickingInfo* pickSprite(int x, int y,
                           const std::function<bool(Sprite* sprite)>& predicate,
                           bool fastCheck = false, Camera* camera = nullptr);
+
+  /**
+   * @brief Use the given ray to pick a mesh in the scene
+   * @param ray The ray to use to pick meshes
+   * @param predicate Predicate function used to determine eligible sprites. Can
+   * be set to null. In this case, a sprite must have isPickable set to true
+   * @param fastCheck Launch a fast check only using the bounding boxes. Can be
+   * set to null.
+   */
   PickingInfo* pickWithRay(const Ray& ray,
                            const std::function<bool(Mesh* mesh)>& predicate,
                            bool fastCheck = false);
@@ -547,6 +607,7 @@ public:
   std::vector<PickingInfo*>
   multiPickWithRay(const Ray& ray,
                    const std::function<bool(Mesh* mesh)>& predicate);
+
   AbstractMesh* getPointerOverMesh();
   void setPointerOverMesh(AbstractMesh* mesh);
   void setPointerOverSprite(Sprite* sprite);
@@ -775,6 +836,7 @@ public:
 
   // Metadata
   Json::object metadata;
+  std::string loadingPluginName;
 
   // Pointers
 
@@ -794,7 +856,12 @@ public:
    */
   Observable<PointerInfo> onPointerObservable;
 
+  /**
+   * Define this parameter if you are using multiple cameras and you want to
+   * specify which one should be used for pointer position.
+   */
   Camera* cameraToUseForPointers;
+
   // Mirror
   std::unique_ptr<Vector3> _mirroredCameraPosition;
   Color3 fogColor;
@@ -810,11 +877,19 @@ public:
   // Cameras
   /**
    * All of the cameras added to this scene.
-   * @see BABYLON.Camera
    */
+
   std::vector<std::unique_ptr<Camera>> cameras;
+  /**
+   * All of the active cameras added to this scene.
+   */
   std::vector<Camera*> activeCameras;
+
+  /**
+   * The current active camera
+   */
   Camera* activeCamera;
+
   // Meshes
   /**
    * All of the (abstract) meshes added to this scene.
@@ -828,7 +903,7 @@ public:
   std::vector<std::unique_ptr<BaseTexture>> textures;
   // Particles
   bool particlesEnabled;
-  std::vector<std::unique_ptr<ParticleSystem>> particleSystems;
+  std::vector<std::unique_ptr<IParticleSystem>> particleSystems;
   // Sprites
   bool spritesEnabled;
   std::vector<std::unique_ptr<SpriteManager>> spriteManagers;
@@ -846,6 +921,7 @@ public:
   // Collisions
   bool collisionsEnabled;
   std::unique_ptr<ICollisionCoordinator> collisionCoordinator;
+  /** Defines the gravity applied to this scene */
   Vector3 gravity;
   // Postprocesses
   bool postProcessesEnabled;
@@ -887,7 +963,7 @@ public:
   Effect* _cachedEffect;
   float _cachedVisibility;
   std::vector<IDisposable*> _toBeDisposed;
-  std::vector<ParticleSystem*> _activeParticleSystems;
+  std::vector<IParticleSystem*> _activeParticleSystems;
   std::vector<Animatable*> _activeAnimatables;
   bool requireLightSorting;
 

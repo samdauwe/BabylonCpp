@@ -1490,7 +1490,11 @@ void Scene::addLight(std::unique_ptr<Light>&& newLight)
 void Scene::sortLightsByPriority()
 {
   if (requireLightSorting) {
-    // lights.sort(Light::compareLightsPriority);
+    std::sort(
+      lights.begin(), lights.end(),
+      [](const std::unique_ptr<Light>& a, const std::unique_ptr<Light>& b) {
+        return Light::compareLightsPriority(a.get(), b.get());
+      });
   }
 }
 
@@ -1674,11 +1678,11 @@ Light* Scene::getLightByUniqueID(unsigned int uniqueId)
   return (it == lights.end()) ? nullptr : (*it).get();
 }
 
-ParticleSystem* Scene::getParticleSystemByID(const std::string& id)
+IParticleSystem* Scene::getParticleSystemByID(const std::string& id)
 {
   auto it = std::find_if(
     particleSystems.begin(), particleSystems.end(),
-    [&id](const std::unique_ptr<ParticleSystem>& particleSystem) {
+    [&id](const std::unique_ptr<IParticleSystem>& particleSystem) {
       return particleSystem->id == id;
     });
 
@@ -2699,6 +2703,8 @@ void Scene::dispose(bool /*doNotRecurse*/)
 
   importedMeshesFiles.clear();
 
+  resetCachedMaterial();
+
   if (_depthRenderer) {
     _depthRenderer->dispose();
   }
@@ -3095,16 +3101,14 @@ void Scene::createDefaultCameraOrLight(bool createArcRotateCamera, bool replace,
     auto radius          = worldSize.length() * 1.5f;
     if (createArcRotateCamera) {
       auto arcRotateCamera = ArcRotateCamera::New(
-        "default camera", 4.712f, 1.571f, radius, worldCenter, this);
+        "default camera", -Math::PI_2, Math::PI_2, radius, worldCenter, this);
       arcRotateCamera->lowerRadiusLimit = radius * 0.01f;
       arcRotateCamera->wheelPrecision   = 100.f / radius;
       camera                            = arcRotateCamera;
     }
     else {
       auto freeCamera = FreeCamera::New(
-        "default camera", Vector3(worldCenter.x, worldCenter.y,
-                                  useRightHandedSystem() ? -radius : radius),
-        this);
+        "default camera", Vector3(worldCenter.x, worldCenter.y, -radius), this);
       freeCamera->setTarget(worldCenter);
       camera = freeCamera;
     }
