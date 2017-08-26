@@ -162,11 +162,6 @@ IReflect::Type ParticleSystem::type() const
   return IReflect::Type::PARTICLESYSTEM;
 }
 
-bool ParticleSystem::hasEmitter()
-{
-  return emitter.is<AbstractMesh*>() || emitter.is<Vector3>();
-}
-
 void ParticleSystem::setOnDispose(const FastFunc<void()>& callback)
 {
   if (_onDisposeObserver) {
@@ -477,7 +472,7 @@ void ParticleSystem::dispose(bool /*doNotRecurse*/)
   _scene->particleSystems.erase(
     std::remove_if(
       _scene->particleSystems.begin(), _scene->particleSystems.end(),
-      [this](const std::unique_ptr<ParticleSystem>& particleSystem) {
+      [this](const std::unique_ptr<IParticleSystem>& particleSystem) {
         return particleSystem.get() == this;
       }),
     _scene->particleSystems.end());

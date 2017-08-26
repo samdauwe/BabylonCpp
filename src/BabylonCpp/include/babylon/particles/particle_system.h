@@ -4,7 +4,6 @@
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_global.h>
 #include <babylon/core/fast_func.h>
-#include <babylon/interfaces/idisposable.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/vector3.h>
 #include <babylon/particles/iparticle_system.h>
@@ -13,8 +12,7 @@
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT ParticleSystem : public IDisposable,
-                                             public IAnimatable,
+class BABYLON_SHARED_EXPORT ParticleSystem : public IAnimatable,
                                              public IParticleSystem {
 
 public:
@@ -29,7 +27,6 @@ public:
 
   virtual IReflect::Type type() const override;
 
-  bool hasEmitter();
   void setOnDispose(const FastFunc<void()>& callback);
   void recycleParticle(Particle* particle);
   size_t getCapacity() const;

@@ -3,15 +3,18 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/core/variant.h>
+#include <babylon/interfaces/idisposable.h>
+#include <babylon/math/vector3.h>
 
 namespace BABYLON {
 
-struct IParticleSystem {
+struct IParticleSystem : public IDisposable {
   std::string id;
   std::string name;
   Variant<AbstractMesh*, Vector3> emitter;
   unsigned int renderingGroupId;
   unsigned int layerMask;
+  bool hasEmitter();
   virtual bool isStarted() const = 0;
   virtual void animate()         = 0;
   virtual size_t render()        = 0;
