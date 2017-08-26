@@ -7,7 +7,6 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas.h>
-#include <babylon/layer/glow_blur_post_process.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
@@ -19,6 +18,7 @@
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
 #include <babylon/postprocess/blur_post_process.h>
+#include <babylon/postprocess/glow_blur_post_process.h>
 #include <babylon/postprocess/pass_post_process.h>
 #include <babylon/postprocess/post_process_manager.h>
 #include <babylon/states/_stencil_state.h>
