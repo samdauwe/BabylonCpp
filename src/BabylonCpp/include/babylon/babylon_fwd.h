@@ -168,7 +168,6 @@ class IGLVertexArrayObject;
 class ILoadingScreen;
 class IRenderableScene;
 // --- Layer ---
-struct GlowBlurPostProcess;
 class HighlightLayer;
 struct IHighlightLayerExcludedMesh;
 struct IHighlightLayerMesh;
@@ -356,6 +355,7 @@ class SimplificationSettings;
 class MorphTarget;
 class MorphTargetManager;
 // --- Particles ---
+class GPUParticleSystem;
 struct IParticleSystem;
 class ModelShape;
 class Particle;
@@ -393,6 +393,7 @@ class ConvolutionPostProcess;
 class DisplayPassPostProcess;
 class FilterPostProcess;
 class FxaaPostProcess;
+class GlowBlurPostProcess;
 class HighlightsPostProcess;
 class ImageProcessingPostProcess;
 class PassPostProcess;

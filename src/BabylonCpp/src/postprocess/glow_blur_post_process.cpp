@@ -1,4 +1,4 @@
-#include <babylon/layer/glow_blur_post_process.h>
+#include <babylon/postprocess/glow_blur_post_process.h>
 
 #include <babylon/materials/effect.h>
 
