@@ -3,6 +3,7 @@
 #include <babylon/engine/engine_constants.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/math/color3.h>
+#include <babylon/math/scalar.h>
 #include <babylon/math/spherical_harmonics.h>
 #include <babylon/math/spherical_polynomial.h>
 #include <babylon/math/vector3.h>
@@ -35,12 +36,21 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(
     return nullptr;
   }
 
-#if 0
-  auto size  = texture->getSize().width;
+  auto size  = static_cast<std::size_t>(texture->getSize().width);
   auto right = texture->readPixels(0);
   auto left  = texture->readPixels(1);
-  auto up    = texture->readPixels(2);
-  auto down  = texture->readPixels(3);
+
+  ArrayBufferView up;
+  ArrayBufferView down;
+  if (texture->isRenderTarget) {
+    up   = texture->readPixels(3);
+    down = texture->readPixels(2);
+  }
+  else {
+    up   = texture->readPixels(2);
+    down = texture->readPixels(3);
+  }
+
   auto front = texture->readPixels(4);
   auto back  = texture->readPixels(5);
 
@@ -53,20 +63,17 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(
   }
 
   CubeMapInfo cubeInfo{
-    size,       //
-    right,      //
-    left,       //
-    up,         //
-    down,       //
     front,      //
     back,       //
+    left,       //
+    right,      //
+    up,         //
+    down,       //
+    size,       //
     format,     //
     type,       //
     gammaSpace, //
   };
-#else
-  CubeMapInfo cubeInfo;
-#endif
 
   return ConvertCubeMapToSphericalPolynomial(cubeInfo);
 }
@@ -89,22 +96,22 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
     const FileFaceOrientation& fileFace = FileFaces[faceIndex];
     Float32Array dataArray;
     if (fileFace.name == "right") {
-      dataArray = cubeInfo.right;
+      dataArray = cubeInfo.right.float32Array;
     }
     else if (fileFace.name == "left") {
-      dataArray = cubeInfo.left;
+      dataArray = cubeInfo.left.float32Array;
     }
     else if (fileFace.name == "up") {
-      dataArray = cubeInfo.up;
+      dataArray = cubeInfo.up.float32Array;
     }
     else if (fileFace.name == "down") {
-      dataArray = cubeInfo.down;
+      dataArray = cubeInfo.down.float32Array;
     }
     else if (fileFace.name == "front") {
-      dataArray = cubeInfo.front;
+      dataArray = cubeInfo.front.float32Array;
     }
     else if (fileFace.name == "back") {
-      dataArray = cubeInfo.back;
+      dataArray = cubeInfo.back.float32Array;
     }
     float v = minUV;
 
@@ -113,7 +120,8 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
     // This is possible because during the summation we do not need the
     // SH-specific properties, e.g. orthogonality.
     // Because SP is still linear, so summation is fine in that basis.
-
+    const unsigned int stride
+      = cubeInfo.format == EngineConstants::TEXTUREFORMAT_RGBA ? 4 : 3;
     for (size_t y = 0; y < cubeInfo.size; ++y) {
       float u = minUV;
 
@@ -126,53 +134,27 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
 
         float deltaSolidAngle = std::pow(1.f + u * u + v * v, -3.f / 2.f);
 
-        if (/* DISABLES CODE */ (true)) {
-          float r = dataArray[(y * cubeInfo.size * 3) + (x * 3) + 0];
-          float g = dataArray[(y * cubeInfo.size * 3) + (x * 3) + 1];
-          float b = dataArray[(y * cubeInfo.size * 3) + (x * 3) + 2];
+        float r = dataArray[(y * cubeInfo.size * stride) + (x * stride) + 0];
+        float g = dataArray[(y * cubeInfo.size * stride) + (x * stride) + 1];
+        float b = dataArray[(y * cubeInfo.size * stride) + (x * stride) + 2];
 
-          Color3 color(r, g, b);
-
-          sphericalHarmonics.addLight(worldDirection, color, deltaSolidAngle);
+        // Handle Integer types.
+        if (cubeInfo.type == EngineConstants::TEXTURETYPE_UNSIGNED_INT) {
+          r /= 255.f;
+          g /= 255.f;
+          b /= 255.f;
         }
-        else {
-          if (faceIndex == 0) {
-            dataArray[(y * cubeInfo.size * 3) + (x * 3) + 0] = 1;
-            dataArray[(y * cubeInfo.size * 3) + (x * 3) + 1] = 0;
-            dataArray[(y * cubeInfo.size * 3) + (x * 3) + 2] = 0;
-          }
-          else if (faceIndex == 1) {
-            dataArray[(y * cubeInfo.size * 3) + (x * 3) + 0] = 0;
-            dataArray[(y * cubeInfo.size * 3) + (x * 3) + 1] = 1;
-            dataArray[(y * cubeInfo.size * 3) + (x * 3) + 2] = 0;
-          }
-          else if (faceIndex == 2) {
-            dataArray[(y * cubeInfo.size * 3) + (x * 3) + 0] = 0;
-            dataArray[(y * cubeInfo.size * 3) + (x * 3) + 1] = 0;
-            dataArray[(y * cubeInfo.size * 3) + (x * 3) + 2] = 1;
-          }
-          else if (faceIndex == 3) {
-            dataArray[(y * cubeInfo.size * 3) + (x * 3) + 0] = 1;
-            dataArray[(y * cubeInfo.size * 3) + (x * 3) + 1] = 1;
-            dataArray[(y * cubeInfo.size * 3) + (x * 3) + 2] = 0;
-          }
-          else if (faceIndex == 4) {
-            dataArray[(y * cubeInfo.size * 3) + (x * 3) + 0] = 1;
-            dataArray[(y * cubeInfo.size * 3) + (x * 3) + 1] = 0;
-            dataArray[(y * cubeInfo.size * 3) + (x * 3) + 2] = 1;
-          }
-          else if (faceIndex == 5) {
-            dataArray[(y * cubeInfo.size * 3) + (x * 3) + 0] = 0;
-            dataArray[(y * cubeInfo.size * 3) + (x * 3) + 1] = 1;
-            dataArray[(y * cubeInfo.size * 3) + (x * 3) + 2] = 1;
-          }
 
-          Color3 color(dataArray[(y * cubeInfo.size * 3) + (x * 3) + 0],
-                       dataArray[(y * cubeInfo.size * 3) + (x * 3) + 1],
-                       dataArray[(y * cubeInfo.size * 3) + (x * 3) + 2]);
-
-          sphericalHarmonics.addLight(worldDirection, color, deltaSolidAngle);
+        // Handle Gamma space textures.
+        if (cubeInfo.gammaSpace) {
+          r = std::pow(Scalar::Clamp(r), Math::ToLinearSpace);
+          g = std::pow(Scalar::Clamp(g), Math::ToLinearSpace);
+          b = std::pow(Scalar::Clamp(b), Math::ToLinearSpace);
         }
+
+        Color3 color(r, g, b);
+
+        sphericalHarmonics.addLight(worldDirection, color, deltaSolidAngle);
 
         totalSolidAngle += deltaSolidAngle;
 
@@ -183,14 +165,23 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
     }
   }
 
-  float correctSolidAngle
-    = 4.f * Math::PI; // Solid angle for entire sphere is 4*pi
-  float correction = correctSolidAngle / totalSolidAngle;
+  // Solid angle for entire sphere is 4*pi
+  float sphereSolidAngle = 4.f * Math::PI;
 
-  sphericalHarmonics.scale(correction);
+  // Adjust the solid angle to allow for how many faces we processed.
+  float facesProcessed     = 6.f;
+  float expectedSolidAngle = sphereSolidAngle * facesProcessed / 6.f;
 
-  // Additionally scale by pi -- audit needed
-  sphericalHarmonics.scale(1.f / Math::PI);
+  // Adjust the harmonics so that the accumulated solid angle matches the
+  // expected solid angle. This is needed because the numerical integration over
+  // the cube uses a small angle approximation of solid angle for each texel
+  // (see deltaSolidAngle), and also to compensate for accumulative error due to
+  // float precision in the summation.
+  float correctionFactor = expectedSolidAngle / totalSolidAngle;
+  sphericalHarmonics.scale(correctionFactor);
+
+  sphericalHarmonics.convertIncidentRadianceToIrradiance();
+  sphericalHarmonics.convertIrradianceToLambertianRadiance();
 
 #if 0
   return SphericalPolynomial::getSphericalPolynomialFromHarmonics(

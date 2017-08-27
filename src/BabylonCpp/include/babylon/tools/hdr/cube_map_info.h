@@ -2,6 +2,7 @@
 #define BABYLON_TOOLS_HDR_CUBE_MAP_INFO_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/structs.h>
 
 namespace BABYLON {
 namespace Internals {
@@ -15,44 +16,63 @@ struct BABYLON_SHARED_EXPORT CubeMapInfo {
    * The pixel array for the front face.
    * This is stored in RGB, left to right, up to down format.
    */
-  Float32Array front;
+  ArrayBufferView front;
 
   /**
    * The pixel array for the back face.
    * This is stored in RGB, left to right, up to down format.
    */
-  Float32Array back;
+  ArrayBufferView back;
 
   /**
    * The pixel array for the left face.
    * This is stored in RGB, left to right, up to down format.
    */
-  Float32Array left;
+  ArrayBufferView left;
 
   /**
    * The pixel array for the right face.
    * This is stored in RGB, left to right, up to down format.
    */
-  Float32Array right;
+  ArrayBufferView right;
 
   /**
    * The pixel array for the up face.
    * This is stored in RGB, left to right, up to down format.
    */
-  Float32Array up;
+  ArrayBufferView up;
 
   /**
    * The pixel array for the down face.
    * This is stored in RGB, left to right, up to down format.
    */
-  Float32Array down;
+  ArrayBufferView down;
 
   /**
    * The size of the cubemap stored.
    *
    * Each faces will be size * size pixels.
    */
-  size_t size;
+  std::size_t size;
+
+  /**
+   * The format of the texture.
+   *
+   * RGBA, RGB.
+   */
+  unsigned int format;
+
+  /**
+   * The type of the texture data.
+   *
+   * UNSIGNED_INT, FLOAT.
+   */
+  unsigned int type;
+
+  /**
+   * Specifies whether the texture is in gamma space.
+   */
+  bool gammaSpace;
 }; // end of struct CubeMapInfo
 
 } // end of namespace Internals
