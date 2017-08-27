@@ -16,6 +16,9 @@ struct ArrayBufferView {
     UINT32ARRAY_TYPE  = 2
   }; // end of enum class Type
 
+  ArrayBufferView() : type{Type::UINT8ARRAY_TYPE}
+  {
+  }
   ArrayBufferView(Float32Array iFloat32Array)
       : type{Type::FLOAT32ARRAY_TYPE}, float32Array{iFloat32Array}
   {
@@ -28,6 +31,46 @@ struct ArrayBufferView {
       : type{Type::UINT32ARRAY_TYPE}, uint32Array{iUint32Array}
   {
   }
+  ArrayBufferView(const ArrayBufferView& other)
+      : type{other.type}
+      , float32Array{other.float32Array}
+      , uint8Array{other.uint8Array}
+      , uint32Array{other.uint32Array}
+  {
+  }
+  ArrayBufferView(ArrayBufferView&& other)
+      : type{std::move(other.type)}
+      , float32Array{std::move(other.float32Array)}
+      , uint8Array{std::move(other.uint8Array)}
+      , uint32Array{std::move(other.uint32Array)}
+  {
+  }
+  ArrayBufferView& operator=(const ArrayBufferView& other)
+  {
+    if (&other != this) {
+      type         = other.type;
+      float32Array = other.float32Array;
+      uint8Array   = other.uint8Array;
+      uint32Array  = other.uint32Array;
+    }
+
+    return *this;
+  }
+  ArrayBufferView& operator=(ArrayBufferView&& other)
+  {
+    if (&other != this) {
+      type         = std::move(other.type);
+      float32Array = std::move(other.float32Array);
+      uint8Array   = std::move(other.uint8Array);
+      uint32Array  = std::move(other.uint32Array);
+    }
+
+    return *this;
+  }
+  ~ArrayBufferView()
+  {
+  }
+
   Type type;
   Float32Array float32Array;
   Uint8Array uint8Array;
