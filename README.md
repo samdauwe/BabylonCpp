@@ -1,8 +1,6 @@
 BabylonCpp
 ===========
 
-[![Build Status](https://travis-ci.org/samdauwe/BabylonCpp.svg?branch=master)](https://travis-ci.org/samdauwe/BabylonCpp)
-
 #### A port of Babylon.js to C++ #####
 
 [Babylon.js](http://www.babylonjs.com) is a complete JavaScript framework for building 3D games with HTML 5 and WebGL.
@@ -10,10 +8,29 @@ BabylonCpp
 The goal with BabylonCpp is to fully implement the relevant portions of the excellent Babylon.js 3D framework/engine in C++14, facilitating the creation of lightweight, cross-platform 3D games and applications with native performance.
 
 ### Get the Sources ###
-* `git clone --recursive https://github.com/samdauwe/BabylonCpp.git`
-* `cd BabylonCpp`
+
+This repository contains submodules for some of the external dependencies, so when doing a fresh clone you need to clone recursively:
+
+```
+git clone --recursive https://github.com/samdauwe/BabylonCpp.git
+```
+
+Existing repositories can be updated manually:
+
+```
+git submodule init
+git submodule update
+```
 
 ### Build BabylonCpp from Source ###
+
+#### <img src="./assets/images/linuxlogo.png" alt="" height="32px"> Linux ####
+
+[![Build Status](https://travis-ci.org/samdauwe/BabylonCpp.svg?branch=master)](https://travis-ci.org/samdauwe/BabylonCpp)
+
+Use the provided CMakeLists.txt with [CMake](https://cmake.org) to generate a build configuration for your favorite IDE or compiler:
+
+* `cd BabylonCpp`
 * `mkdir build`
 * `cd build`
 * `cmake ../`
