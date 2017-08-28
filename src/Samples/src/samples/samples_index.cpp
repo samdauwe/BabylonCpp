@@ -26,6 +26,7 @@
 #include <babylon/samples/mesh/basic_elements_scene.h>
 #include <babylon/samples/mesh/basic_scene.h>
 #include <babylon/samples/mesh/cuboid_scene.h>
+#include <babylon/samples/mesh/extruded_polygon_scene.h>
 #include <babylon/samples/mesh/extrusion_scene.h>
 #include <babylon/samples/mesh/ico_sphere_scene.h>
 #include <babylon/samples/mesh/lathe_scene.h>
@@ -71,6 +72,12 @@ std::unordered_map<std::string, Sample>
       = {false,
          [](ICanvas* iCanvas) {                                    //
            return std::make_unique<EasingFunctionsScene>(iCanvas); //
+         }};                                                       //
+    // Extruded Polygon Scene
+    samples["ExtrudedPolygonScene"]
+      = {true,
+         [](ICanvas* iCanvas) {                                    //
+           return std::make_unique<ExtrudedPolygonScene>(iCanvas); //
          }};                                                       //
     // Extrusion Scene
     samples["ExtrusionScene"]
