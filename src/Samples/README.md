@@ -4,6 +4,7 @@
 ![basic_elements_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/basic_elements_scene.png?raw=true "Basic Elements Scene")
 ![basic_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/basic_scene.png?raw=true "Basic Scene")
 ![cuboid_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/cuboid_scene.png?raw=true "Cuboid Scene")
+![curved_helix_meshes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/curved_helix_meshes_scene.png?raw=true "Curved Helix Meshes Scene")
 ![extruded_polygon_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/extruded_polygon_scene.png?raw=true "Extruded Polygon Scene")
 ![extrusion_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/extrusion_scene.png?raw=true "Extrusion Scene")
 ![hex_ico_sphere_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/hex_ico_sphere_scene.png?raw=true "Hex Icosphere Scene")
