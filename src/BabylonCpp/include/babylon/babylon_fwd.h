@@ -59,6 +59,13 @@ class Analyser;
 class AudioEngine;
 class Sound;
 class SoundTrack;
+// --- Behaviors ---
+template <class TNode>
+struct Behavior;
+// - Cameras
+class AutoRotationBehavior;
+class BouncingBehavior;
+class FramingBehavior;
 // --- Bones ---
 class Bone;
 class BoneIKController;
