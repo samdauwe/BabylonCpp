@@ -11,9 +11,50 @@
 
 namespace BABYLON {
 
-bool SceneLoader::ForceFullSceneLoadingForIncremental = false;
-bool SceneLoader::ShowLoadingScreen                   = true;
-unsigned int SceneLoader::LoggingLevel                = SceneLoader::NO_LOGGING;
+bool SceneLoader::_ForceFullSceneLoadingForIncremental = false;
+bool SceneLoader::_ShowLoadingScreen                   = true;
+bool SceneLoader::_CleanBoneMatrixWeights              = false;
+unsigned int SceneLoader::_loggingLevel = SceneLoader::NO_LOGGING;
+
+bool SceneLoader::ForceFullSceneLoadingForIncremental()
+{
+  return SceneLoader::_ForceFullSceneLoadingForIncremental;
+}
+
+void SceneLoader::setForceFullSceneLoadingForIncremental(bool value)
+{
+  SceneLoader::_ForceFullSceneLoadingForIncremental = value;
+}
+
+bool SceneLoader::ShowLoadingScreen()
+{
+  return SceneLoader::_ShowLoadingScreen;
+}
+
+void SceneLoader::setShowLoadingScreen(bool value)
+{
+  SceneLoader::_ShowLoadingScreen = value;
+}
+
+unsigned int SceneLoader::LoggingLevel()
+{
+  return SceneLoader::_loggingLevel;
+}
+
+void SceneLoader::setLoggingLevel(unsigned int value)
+{
+  SceneLoader::_loggingLevel = value;
+}
+
+bool SceneLoader::CleanBoneMatrixWeights()
+{
+  return SceneLoader::_CleanBoneMatrixWeights;
+}
+
+void SceneLoader::setCleanBoneMatrixWeights(bool value)
+{
+  SceneLoader::_CleanBoneMatrixWeights = value;
+}
 
 std::unordered_map<std::string, IRegisteredPlugin>
   SceneLoader::_registeredPlugins{};
@@ -163,7 +204,7 @@ void SceneLoader::Append(const std::string& rootUrl,
   auto& plugin         = registeredPlugin.plugin;
   auto& useArrayBuffer = registeredPlugin.isBinary;
 
-  if (SceneLoader::ShowLoadingScreen) {
+  if (SceneLoader::ShowLoadingScreen()) {
     scene->getEngine()->displayLoadingUI();
   }
 
@@ -180,7 +221,7 @@ void SceneLoader::Append(const std::string& rootUrl,
       onsuccess(scene);
     }
 
-    if (SceneLoader::ShowLoadingScreen) {
+    if (SceneLoader::ShowLoadingScreen()) {
       scene->executeWhenReady([&]() { scene->getEngine()->hideLoadingUI(); });
     }
   };

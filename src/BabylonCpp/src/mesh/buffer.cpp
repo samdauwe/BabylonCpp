@@ -128,6 +128,12 @@ GL::IGLBuffer* Buffer::create(Float32Array data)
   return _buffer ? _buffer.get() : nullptr;
 }
 
+void Buffer::_rebuild()
+{
+  _buffer = nullptr;
+  create(_data);
+}
+
 GL::IGLBuffer* Buffer::update(const Float32Array& data)
 {
   return create(data);

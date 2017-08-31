@@ -71,6 +71,9 @@ public:
   static std::string KindAsString(unsigned int kind);
   static int KindToStride(unsigned int kind);
 
+  /** Rebuild **/
+  void _rebuild();
+
   /** Properties **/
 
   /**

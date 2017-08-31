@@ -50,6 +50,7 @@ public:
   Engine* getEngine();
   bool isReady() const;
   bool doNotSerialize() const;
+  void _rebuild();
   void setAllVerticesData(VertexData* vertexData, bool updatable = false);
   Mesh* setVerticesData(unsigned int kind, const Float32Array& data,
                         bool updatable = false, int stride = -1) override;

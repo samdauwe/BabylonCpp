@@ -92,7 +92,8 @@ bool BabylonFileLoader::importMesh(
   }
   std::ostringstream log;
 
-  bool fullDetails = SceneLoader::LoggingLevel == SceneLoader::DETAILED_LOGGING;
+  bool fullDetails
+    = SceneLoader::LoggingLevel() == SceneLoader::DETAILED_LOGGING;
 
   std::vector<std::string> loadedSkeletonsIds;
   std::vector<std::string> loadedMaterialsIds;
@@ -283,12 +284,12 @@ bool BabylonFileLoader::importMesh(
   }
 
   const auto _log = log.str();
-  if (!_log.empty() && SceneLoader::LoggingLevel != SceneLoader::NO_LOGGING) {
+  if (!_log.empty() && SceneLoader::LoggingLevel() != SceneLoader::NO_LOGGING) {
     std::string msg = parsedData.contains("producer") ?
                         logOperation("importMesh", parsedData.get("producer")) :
                         logOperation("importMesh");
     std::string logStr
-      = SceneLoader::LoggingLevel != SceneLoader::MINIMAL_LOGGING ? _log : "";
+      = SceneLoader::LoggingLevel() != SceneLoader::MINIMAL_LOGGING ? _log : "";
     BABYLON_LOGF_INFO("BabylonFileLoader", "%s%s", msg.c_str(), logStr.c_str());
   }
 
@@ -306,12 +307,13 @@ bool BabylonFileLoader::load(Scene* scene, const std::string& data,
     return false;
   }
   std::ostringstream log;
-  bool fullDetails = SceneLoader::LoggingLevel == SceneLoader::DETAILED_LOGGING;
+  bool fullDetails
+    = SceneLoader::LoggingLevel() == SceneLoader::DETAILED_LOGGING;
 
   // Scene
   scene->useDelayedTextureLoading
     = Json::GetBool(parsedData, "useDelayedTextureLoading")
-      && !SceneLoader::ForceFullSceneLoadingForIncremental;
+      && !SceneLoader::ForceFullSceneLoadingForIncremental();
   scene->autoClear = Json::GetBool(parsedData, "autoClear", true);
   scene->clearColor
     = Color4::FromArray(Json::ToArray<float>(parsedData, "clearColor"));
@@ -549,13 +551,13 @@ bool BabylonFileLoader::load(Scene* scene, const std::string& data,
   }
 
   const auto _log = log.str();
-  if (!_log.empty() && SceneLoader::LoggingLevel != SceneLoader::NO_LOGGING) {
+  if (!_log.empty() && SceneLoader::LoggingLevel() != SceneLoader::NO_LOGGING) {
     std::string msg
       = parsedData.contains("producer") ?
           logOperation("importScene", parsedData.get("producer")) :
           logOperation("importScene");
     std::string logStr
-      = SceneLoader::LoggingLevel != SceneLoader::MINIMAL_LOGGING ? _log : "";
+      = SceneLoader::LoggingLevel() != SceneLoader::MINIMAL_LOGGING ? _log : "";
     BABYLON_LOGF_INFO("BabylonFileLoader", "%s%s", msg.c_str(), logStr.c_str());
   }
 

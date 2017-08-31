@@ -1830,7 +1830,7 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
 
     mesh->_delayLoadingFunction = Geometry::ImportGeometry;
 
-    if (SceneLoader::ForceFullSceneLoadingForIncremental) {
+    if (SceneLoader::ForceFullSceneLoadingForIncremental()) {
       mesh->_checkDelayState();
     }
   }

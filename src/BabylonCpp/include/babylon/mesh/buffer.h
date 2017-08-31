@@ -33,6 +33,7 @@ public:
   void setInstanceDivisor(unsigned int value);
 
   // Methods
+  void _rebuild();
   GL::IGLBuffer* create(Float32Array data = {});
   GL::IGLBuffer* update(const Float32Array& data);
   GL::IGLBuffer* updateDirectly(const Float32Array& data, int offset);

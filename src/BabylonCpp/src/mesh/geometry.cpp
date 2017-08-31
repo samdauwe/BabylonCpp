@@ -6,6 +6,7 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/igl_rendering_context.h>
+#include <babylon/loading/scene_loader.h>
 #include <babylon/materials/effect.h>
 #include <babylon/mesh/lines_mesh.h>
 #include <babylon/mesh/mesh.h>
@@ -113,6 +114,23 @@ bool Geometry::doNotSerialize() const
   }
 
   return true;
+}
+
+void Geometry::_rebuild()
+{
+  if (!_vertexArrayObjects.empty()) {
+    _vertexArrayObjects.clear();
+  }
+
+  // Index buffer
+  if (!_meshes.empty() && !_indices.empty()) {
+    _indexBuffer = _engine->createIndexBuffer(_indices);
+  }
+
+  // Vertex buffers
+  for (auto& item : _vertexBuffers) {
+    item.second->_rebuild();
+  }
 }
 
 void Geometry::setAllVerticesData(VertexData* vertexData, bool updatable)
@@ -836,6 +854,9 @@ void Geometry::ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh)
 void Geometry::_CleanMatricesWeights(Float32Array& matricesWeights,
                                      unsigned int influencers)
 {
+  if (!SceneLoader::CleanBoneMatrixWeights()) {
+    return;
+  }
   const auto size = matricesWeights.size();
   for (std::size_t i = 0; i < size; i += influencers) {
     float weight            = 0;

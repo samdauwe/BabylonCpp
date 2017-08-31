@@ -53,7 +53,7 @@ void BouncingBehavior::setAutoTransitionRange(bool value)
           }
 
           mesh->computeWorldMatrix(true);
-          auto diagonal = mesh->getBoundingInfo()->diagonalLength;
+          auto diagonal = mesh->getBoundingInfo()->diagonalLength();
 
           lowerRadiusTransitionRange = diagonal * 0.05f;
           upperRadiusTransitionRange = diagonal * 0.05f;

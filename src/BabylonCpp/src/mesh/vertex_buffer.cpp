@@ -167,6 +167,15 @@ int VertexBuffer::KindToStride(unsigned int kind)
   return stride;
 }
 
+void VertexBuffer::_rebuild()
+{
+  if (!_buffer) {
+    return;
+  }
+
+  _buffer->_rebuild();
+}
+
 unsigned int VertexBuffer::getKind() const
 {
   return _kind;

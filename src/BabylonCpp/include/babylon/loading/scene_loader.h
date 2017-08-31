@@ -14,10 +14,23 @@ public:
   static constexpr unsigned int MINIMAL_LOGGING  = 1;
   static constexpr unsigned int SUMMARY_LOGGING  = 2;
   static constexpr unsigned int DETAILED_LOGGING = 3;
+
+  // static flag functions
+  static bool ForceFullSceneLoadingForIncremental();
+  static void setForceFullSceneLoadingForIncremental(bool value);
+  static bool ShowLoadingScreen();
+  static void setShowLoadingScreen(bool value);
+  static unsigned int LoggingLevel();
+  static void setLoggingLevel(unsigned int value);
+  static bool CleanBoneMatrixWeights();
+  static void setCleanBoneMatrixWeights(bool value);
+
+public:
   // Flags
-  static bool ForceFullSceneLoadingForIncremental;
-  static bool ShowLoadingScreen;
-  static unsigned int LoggingLevel;
+  static bool _ForceFullSceneLoadingForIncremental;
+  static bool _ShowLoadingScreen;
+  static bool _CleanBoneMatrixWeights;
+  static unsigned int _loggingLevel;
 
 private:
   // Members
