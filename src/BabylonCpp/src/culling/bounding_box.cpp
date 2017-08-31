@@ -64,6 +64,56 @@ BoundingBox::BoundingBox(const BoundingBox& other)
 {
 }
 
+BoundingBox::BoundingBox(BoundingBox&& other)
+    : vectors{std::move(other.vectors)}
+    , center{std::move(other.center)}
+    , extendSize{std::move(other.extendSize)}
+    , directions{std::move(other.directions)}
+    , vectorsWorld{std::move(other.vectorsWorld)}
+    , minimumWorld{std::move(other.minimumWorld)}
+    , maximumWorld{std::move(other.maximumWorld)}
+    , minimum{std::move(other.minimum)}
+    , maximum{std::move(other.maximum)}
+    , _worldMatrix{std::move(other._worldMatrix)}
+{
+}
+
+BoundingBox& BoundingBox::operator=(const BoundingBox& other)
+{
+  if (&other != this) {
+    vectors      = other.vectors;
+    center       = other.center;
+    extendSize   = other.extendSize;
+    directions   = other.directions;
+    vectorsWorld = other.vectorsWorld;
+    minimumWorld = other.minimumWorld;
+    maximumWorld = other.maximumWorld;
+    minimum      = other.minimum;
+    maximum      = other.maximum;
+    _worldMatrix = other._worldMatrix;
+  }
+
+  return *this;
+}
+
+BoundingBox& BoundingBox::operator=(BoundingBox&& other)
+{
+  if (&other != this) {
+    vectors      = std::move(other.vectors);
+    center       = std::move(other.center);
+    extendSize   = std::move(other.extendSize);
+    directions   = std::move(other.directions);
+    vectorsWorld = std::move(other.vectorsWorld);
+    minimumWorld = std::move(other.minimumWorld);
+    maximumWorld = std::move(other.maximumWorld);
+    minimum      = std::move(other.minimum);
+    maximum      = std::move(other.maximum);
+    _worldMatrix = std::move(other._worldMatrix);
+  }
+
+  return *this;
+}
+
 BoundingBox::~BoundingBox()
 {
 }

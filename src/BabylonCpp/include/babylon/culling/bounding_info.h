@@ -14,6 +14,9 @@ class BABYLON_SHARED_EXPORT BoundingInfo : public ICullable {
 public:
   BoundingInfo(const Vector3& minimum, const Vector3& maximum);
   BoundingInfo(const BoundingInfo& boundingInfo);
+  BoundingInfo(BoundingInfo&& other);
+  BoundingInfo& operator=(const BoundingInfo& other);
+  BoundingInfo& operator=(BoundingInfo&& other);
   virtual ~BoundingInfo();
 
   /** Methods **/
@@ -21,6 +24,13 @@ public:
   void setIsLocked(bool value);
   void update(const Matrix& world);
   bool isInFrustum(const std::array<Plane, 6>& frustumPlanes) override;
+
+  /**
+   * @brief Gets the world distance between the min and max points of the
+   * bounding box.
+   */
+  float diagonalLength() const;
+
   bool isCompletelyInFrustum(
     const std::array<Plane, 6>& frustumPlanes) const override;
   bool _checkCollision(const Collider& collider) const;

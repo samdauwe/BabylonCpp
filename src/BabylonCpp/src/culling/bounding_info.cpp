@@ -24,6 +24,41 @@ BoundingInfo::BoundingInfo(const BoundingInfo& boundingInfo)
 {
 }
 
+BoundingInfo::BoundingInfo(BoundingInfo&& other)
+    : minimum{std::move(other.minimum)}
+    , maximum{std::move(other.maximum)}
+    , boundingBox{BoundingBox(std::move(other.boundingBox))}
+    , boundingSphere{BoundingSphere(std::move(other.boundingSphere))}
+    , _isLocked{std::move(other._isLocked)}
+{
+}
+
+BoundingInfo& BoundingInfo::operator=(const BoundingInfo& other)
+{
+  if (&other != this) {
+    minimum        = other.minimum;
+    maximum        = other.maximum;
+    boundingBox    = other.boundingBox;
+    boundingSphere = other.boundingSphere;
+    _isLocked      = other._isLocked;
+  }
+
+  return *this;
+}
+
+BoundingInfo& BoundingInfo::operator=(BoundingInfo&& other)
+{
+  if (&other != this) {
+    minimum        = std::move(other.minimum);
+    maximum        = std::move(other.maximum);
+    boundingBox    = std::move(other.boundingBox);
+    boundingSphere = std::move(other.boundingSphere);
+    _isLocked      = std::move(other._isLocked);
+  }
+
+  return *this;
+}
+
 BoundingInfo::~BoundingInfo()
 {
 }
@@ -55,6 +90,12 @@ bool BoundingInfo::isInFrustum(const std::array<Plane, 6>& frustumPlanes)
   }
 
   return boundingBox.isInFrustum(frustumPlanes);
+}
+
+float BoundingInfo::diagonalLength() const
+{
+  auto size = boundingBox.maximumWorld.subtract(boundingBox.minimumWorld);
+  return size.length();
 }
 
 bool BoundingInfo::isCompletelyInFrustum(

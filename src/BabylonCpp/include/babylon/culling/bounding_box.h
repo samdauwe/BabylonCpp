@@ -13,6 +13,9 @@ class BABYLON_SHARED_EXPORT BoundingBox : public ICullable {
 public:
   BoundingBox(const Vector3& minimum, const Vector3& maximum);
   BoundingBox(const BoundingBox& other);
+  BoundingBox(BoundingBox&& other);
+  BoundingBox& operator=(const BoundingBox& other);
+  BoundingBox& operator=(BoundingBox&& other);
   virtual ~BoundingBox();
 
   /** Methods **/
