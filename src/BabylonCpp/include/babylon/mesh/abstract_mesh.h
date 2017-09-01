@@ -19,6 +19,10 @@
 
 namespace BABYLON {
 
+namespace GL {
+class IGLQuery;
+} // end of namespace GL
+
 /**
  * @brief This class represents a mesh which can't be instantiated.
  */
@@ -28,6 +32,7 @@ class BABYLON_SHARED_EXPORT AbstractMesh : public Node,
                                            public IGetSetVerticesData {
 
 public:
+  // Statics
   // The billboard Mode None, the object is normal by default
   static constexpr unsigned int BILLBOARDMODE_NONE = 0;
   // The billboard Mode X
@@ -38,6 +43,12 @@ public:
   static constexpr unsigned int BILLBOARDMODE_Z = 4;
   // The billboard Mode All
   static constexpr unsigned int BILLBOARDMODE_ALL = 7;
+
+  static constexpr unsigned int OCCLUSION_TYPE_NONE                   = 0;
+  static constexpr unsigned int OCCLUSION_TYPE_OPTIMISITC             = 1;
+  static constexpr unsigned int OCCLUSION_TYPE_STRICT                 = 2;
+  static constexpr unsigned int OCCLUSION_ALGORITHM_TYPE_ACCURATE     = 0;
+  static constexpr unsigned int OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE = 1;
 
   static Quaternion _rotationAxisCache;
   static Vector3 _lookAtVectorCache;
@@ -104,6 +115,26 @@ public:
   void setNumBoneInfluencers(unsigned int value);
   bool applyFog() const;
   void setApplyFog(bool value);
+  unsigned int layerMask() const;
+  void setLayerMask(unsigned int value);
+
+  // Occlusion
+  /**
+   * @brief Gets whether the mesh is occluded or not, it is used also to set the
+   * intial state of the mesh to be occluded or not.
+   */
+  bool isOccluded() const;
+
+  /**
+   * @brief Sets whether the mesh is occluded or not, it is used also to set the
+   * intial state of the mesh to be occluded or not.
+   */
+  void isOccluded(bool value);
+
+  /**
+   * @brief Flag to check the progress status of the query
+   */
+  bool isOcclusionQueryInProgress() const;
 
   // Collisions
   int collisionMask() const;
@@ -926,6 +957,8 @@ protected:
    */
   AbstractMesh(const std::string& name, Scene* scene);
 
+  void checkOcclusionQuery();
+
 private:
   void _markSubMeshesAsDirty(
     const std::function<void(const MaterialDefines& defines)>& func);
@@ -959,6 +992,46 @@ public:
   Observable<AbstractMesh> onMaterialChangedObservable;
   // Properties
   bool definedFacingForward;
+
+  /**
+   * This property determines the type of occlusion query algorithm to run in
+   * WebGl, you can use:
+   * AbstractMesh.OCCLUSION_ALGORITHM_TYPE_ACCURATE which is mapped to
+   * GL_ANY_SAMPLES_PASSED.
+   * or
+   * AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE (Default Value) which is
+   * mapped to GL_ANY_SAMPLES_PASSED_CONSERVATIVE which is a false positive
+   * algorithm that is faster than GL_ANY_SAMPLES_PASSED but less accurate.
+   * for more info check WebGl documentations
+   */
+  unsigned int occlusionQueryAlgorithmType;
+
+  /**
+   * This property is responsible for starting the occlusion query within the
+   * Mesh or not, this property is also used     to determine what should happen
+   * when the occlusionRetryCount is reached. It has supports 3 values:
+   * OCCLUSION_TYPE_NONE (Default Value): this option means no occlusion query
+   * whith the Mesh.
+   * OCCLUSION_TYPE_OPTIMISITC: this option is means use occlusion query and if
+   * occlusionRetryCount is reached and the query is broken show the mesh.
+   * OCCLUSION_TYPE_STRICT: this option is means use occlusion query and if
+   * occlusionRetryCount is reached and the query is broken restore the last
+   * state of the mesh occlusion if the mesh was visible then show the mesh if
+   * was hidden then hide don't show.
+   */
+  unsigned int occlusionType;
+
+  /**
+   * This number indicates the number of allowed retries before stop the
+   * occlusion query, this is useful if the        occlusion query is taking
+   * long time before to the query result is retireved, the query result
+   * indicates if the object is visible within the scene or not and based on
+   * that Babylon.Js engine decideds to show or hide the object.
+   * The default value is -1 which means don't break the query and wait till the
+   * result.
+   */
+  int occlusionRetryCount;
+
   unsigned int billboardMode;
   float visibility;
   int alphaIndex;
@@ -980,7 +1053,6 @@ public:
   bool useOctreeForRenderingSelection;
   bool useOctreeForPicking;
   bool useOctreeForCollisions;
-  unsigned int layerMask;
   /**
    * True if the mesh must be rendered in any case.
    */
@@ -1015,6 +1087,9 @@ public:
   // Skeleton
   Float32Array _bonesTransformMatrices;
 
+protected:
+  bool _isOccluded;
+
 private:
   // FacetData private properties
   // Facet local positions
@@ -1042,6 +1117,9 @@ private:
   Observer<Vector3>::Ptr _onCollisionPositionChangeObserver;
   // Properties
   Vector3 _position;
+  int _occlusionInternalRetryCounter;
+  bool _isOcclusionQueryInProgress;
+  std::unique_ptr<GL::IGLQuery> _occlusionQuery;
   Vector3 _rotation;
   bool _rotationQuaternionSet;
   Quaternion _rotationQuaternion;
@@ -1053,6 +1131,7 @@ private:
   bool _computeBonesUsingShaders;
   unsigned int _numBoneInfluencers;
   bool _applyFog;
+  unsigned int _layerMask;
   // Collisions
   bool _checkCollisions;
   int _collisionMask;

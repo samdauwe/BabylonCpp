@@ -331,7 +331,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
 
       bool isMasked;
       if (renderList.empty()) {
-        isMasked = ((mesh->layerMask & camera->layerMask) == 0);
+        isMasked = ((mesh->layerMask() & camera->layerMask) == 0);
       }
       else {
         isMasked = false;

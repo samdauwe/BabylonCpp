@@ -29,6 +29,7 @@ public:
   using GLBufferPtr            = std::unique_ptr<GL::IGLBuffer>;
   using GLFrameBufferPtr       = std::unique_ptr<GL::IGLFramebuffer>;
   using GLFrameProgramPtr      = std::unique_ptr<GL::IGLProgram>;
+  using GLQueryPtr             = std::unique_ptr<GL::IGLQuery>;
   using GLRenderBufferPtr      = std::unique_ptr<GL::IGLRenderbuffer>;
   using GLShaderPtr            = std::unique_ptr<GL::IGLShader>;
   using GLTexturePtr           = std::unique_ptr<GL::IGLTexture>;
@@ -474,6 +475,14 @@ public:
                                 int faceIndex = -1);
   GL::GLenum _getWebGLTextureType(unsigned int type) const;
   GL::GLenum _getRGBABufferInternalSizedFormat(unsigned int type) const;
+
+  /** Occlusion Queries **/
+  GLQueryPtr createQuery();
+  Engine& deleteQuery(const GLQueryPtr& query);
+  bool isQueryResultAvailable(const GLQueryPtr& query);
+  int getQueryResult(const GLQueryPtr& query);
+  void beginQuery(unsigned int algorithmType, const GLQueryPtr& query);
+  Engine& endQuery(unsigned int algorithmType);
 
   /** Statics **/
   static Engine* LastCreatedEngine();

@@ -715,37 +715,36 @@ void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount)
   }
 
   onBeforeDrawObservable.notifyObservers(this);
+  int _instancesCount = static_cast<int>(instancesCount);
 
   auto engine               = getScene()->getEngine();
   auto subMeshVerticesStart = static_cast<int>(subMesh->verticesStart);
-  auto subMeshVerticesCount = static_cast<size_t>(subMesh->verticesCount);
+  auto subMeshVerticesCount = static_cast<int>(subMesh->verticesCount);
 
   // Draw order
   switch (fillMode) {
     case Material::PointFillMode:
       engine->drawPointClouds(subMeshVerticesStart, subMeshVerticesCount,
-                              instancesCount);
+                              _instancesCount);
       break;
     case Material::WireFrameFillMode:
       if (_unIndexed) {
         engine->drawUnIndexed(false, subMeshVerticesStart, subMeshVerticesCount,
-                              instancesCount);
+                              _instancesCount);
       }
       else {
-        engine->draw(false, 0,
-                     instancesCount > 0 ? subMesh->linesIndexCount / 2 :
-                                          subMesh->linesIndexCount,
-                     instancesCount);
+        engine->draw(false, 0, static_cast<int>(subMesh->linesIndexCount),
+                     _instancesCount);
       }
       break;
     default:
       if (_unIndexed) {
         engine->drawUnIndexed(true, subMeshVerticesStart, subMeshVerticesCount,
-                              instancesCount);
+                              _instancesCount);
       }
       else {
         engine->draw(true, static_cast<unsigned>(subMesh->indexStart),
-                     subMesh->indexCount, instancesCount);
+                     static_cast<int>(subMesh->indexCount), _instancesCount);
       }
   }
 }
@@ -888,7 +887,7 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, int fillMode,
     _instancesBuffer->updateDirectly(_instancesData, 0, instancesCount);
   }
 
-  geometry()->_bind(effect);
+  _bind(subMesh, effect, fillMode);
 
   _draw(subMesh, fillMode, instancesCount);
 
@@ -940,6 +939,11 @@ Mesh& Mesh::_processRendering(SubMesh* subMesh, Effect* effect, int fillMode,
 
 Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
 {
+  checkOcclusionQuery();
+  if (_isOccluded) {
+    return *this;
+  }
+
   auto scene = getScene();
 
   // Managing instances
@@ -1009,7 +1013,11 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
                     Material::PointFillMode :
                     (scene->forceWireframe ? Material::WireFrameFillMode :
                                              effectiveMaterial->fillMode());
-  _bind(subMesh, effect, fillMode);
+
+  // Binding will be done later because we need to add more info to the VB
+  if (!hardwareInstancedRendering) {
+    _bind(subMesh, effect, fillMode);
+  }
 
   auto _world = getWorldMatrix();
 
@@ -1886,12 +1894,12 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
   if (parsedMesh.contains("layerMask")) {
     auto layerMask = Json::GetString(parsedMesh, "layerMask");
     if (!layerMask.empty()) {
-      mesh->layerMask = static_cast<unsigned>(std::stoi(layerMask));
+      mesh->setLayerMask(static_cast<unsigned>(std::stoi(layerMask)));
     }
   }
   else {
-    mesh->layerMask = static_cast<unsigned>(
-      Json::GetNumber(parsedMesh, "layerMask", 0x0FFFFFFF));
+    mesh->setLayerMask(static_cast<unsigned>(
+      Json::GetNumber(parsedMesh, "layerMask", 0x0FFFFFFF)));
   }
 
   // Instances

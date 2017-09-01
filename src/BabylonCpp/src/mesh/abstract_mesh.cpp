@@ -24,6 +24,7 @@
 #include <babylon/physics/joint/physics_joint.h>
 #include <babylon/physics/physics_engine.h>
 #include <babylon/physics/physics_impostor.h>
+#include <babylon/rendering/bounding_box_renderer.h>
 #include <babylon/rendering/edges_renderer.h>
 
 namespace BABYLON {
@@ -34,6 +35,10 @@ Vector3 AbstractMesh::_lookAtVectorCache = Vector3(0.f, 0.f, 0.f);
 AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     : Node(iName, scene)
     , definedFacingForward{true} // orientation for POV movement & rotation
+    , occlusionQueryAlgorithmType{AbstractMesh::
+                                    OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE}
+    , occlusionType{AbstractMesh::OCCLUSION_TYPE_NONE}
+    , occlusionRetryCount{-1}
     , billboardMode{AbstractMesh::BILLBOARDMODE_NONE}
     , visibility{1.f}
     , alphaIndex{std::numeric_limits<int>::max()}
@@ -55,7 +60,6 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , useOctreeForRenderingSelection{true}
     , useOctreeForPicking{true}
     , useOctreeForCollisions{true}
-    , layerMask{0x0FFFFFFF}
     , alwaysSelectAsActiveMesh{false}
     , actionManager{nullptr}
     , physicsImpostor{nullptr}
@@ -72,6 +76,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , _renderId{0}
     , _submeshesOctree{nullptr}
     , _unIndexed{false}
+    , _isOccluded{false}
     , _facetNb{0}
     , _partitioningSubdivisions{10}
     , _partitioningBBoxRatio{1.01f}
@@ -81,6 +86,8 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , _onCollideObserver{nullptr}
     , _onCollisionPositionChangeObserver{nullptr}
     , _position{Vector3::Zero()}
+    , _occlusionInternalRetryCounter{0}
+    , _isOcclusionQueryInProgress{false}
     , _rotation{Vector3::Zero()}
     , _rotationQuaternionSet{false}
     , _scaling{Vector3::One()}
@@ -91,6 +98,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , _computeBonesUsingShaders{true}
     , _numBoneInfluencers{4}
     , _applyFog{true}
+    , _layerMask{0x0FFFFFFF}
     , _checkCollisions{false}
     , _collisionMask{-1}
     , _collisionGroup{-1}
@@ -288,6 +296,36 @@ void AbstractMesh::setApplyFog(bool value)
 
   _applyFog = value;
   _markSubMeshesAsMiscDirty();
+}
+
+unsigned int AbstractMesh::layerMask() const
+{
+  return _layerMask;
+}
+
+void AbstractMesh::setLayerMask(unsigned int value)
+{
+  if (value == _layerMask) {
+    return;
+  }
+
+  _layerMask = value;
+  _resyncLightSources();
+}
+
+bool AbstractMesh::isOccluded() const
+{
+  return _isOccluded;
+}
+
+void AbstractMesh::isOccluded(bool value)
+{
+  _isOccluded = value;
+}
+
+bool AbstractMesh::isOcclusionQueryInProgress() const
+{
+  return _isOcclusionQueryInProgress;
 }
 
 int AbstractMesh::collisionMask() const
@@ -770,7 +808,8 @@ AbstractMesh& AbstractMesh::rotateAround(const Vector3& point, Vector3& axis,
                                 Tmp::Vector3Array[1]);
 
   position().addInPlace(Tmp::Vector3Array[1]);
-  rotationQuaternion().multiplyInPlace(Tmp::QuaternionArray[0]);
+  Tmp::QuaternionArray[0].multiplyToRef(rotationQuaternion(),
+                                        rotationQuaternion());
 
   return *this;
 }
@@ -1671,8 +1710,15 @@ void AbstractMesh::dispose(bool doNotRecurse)
       sceneOctree->dynamicContent.end());
   }
 
+  // Query
+  auto engine = getScene()->getEngine();
+  if (_occlusionQuery) {
+    engine->deleteQuery(_occlusionQuery);
+    _occlusionQuery = nullptr;
+  }
+
   // Engine
-  getScene()->getEngine()->wipeCaches();
+  engine->wipeCaches();
 
   // Remove from scene
   getScene()->removeMesh(this);
@@ -2129,6 +2175,60 @@ void AbstractMesh::createNormals(bool updatable)
   options.useRightHandedSystem = getScene()->useRightHandedSystem();
   VertexData::ComputeNormals(positions, indices, normals, options);
   setVerticesData(VertexBuffer::NormalKind, normals, updatable);
+}
+
+void AbstractMesh::checkOcclusionQuery()
+{
+  Engine* engine = getEngine();
+
+  if (engine->webGLVersion() < 2.f
+      || occlusionType == AbstractMesh::OCCLUSION_TYPE_NONE) {
+    _isOccluded = false;
+    return;
+  }
+
+  if (isOcclusionQueryInProgress()) {
+    auto isOcclusionQueryAvailable
+      = engine->isQueryResultAvailable(_occlusionQuery);
+    if (isOcclusionQueryAvailable) {
+      auto occlusionQueryResult = engine->getQueryResult(_occlusionQuery);
+
+      _isOcclusionQueryInProgress    = false;
+      _occlusionInternalRetryCounter = 0;
+      _isOccluded                    = occlusionQueryResult == 1 ? false : true;
+    }
+    else {
+      ++_occlusionInternalRetryCounter;
+
+      if (occlusionRetryCount != -1
+          && _occlusionInternalRetryCounter > occlusionRetryCount) {
+        _isOcclusionQueryInProgress    = false;
+        _occlusionInternalRetryCounter = 0;
+
+        // if optimistic set isOccluded to false regardless of the status of
+        // isOccluded. (Render in the current render loop)
+        // if strict continue the last state of the object.
+        _isOccluded = occlusionType == AbstractMesh::OCCLUSION_TYPE_OPTIMISITC ?
+                        false :
+                        _isOccluded;
+      }
+      else {
+        return;
+      }
+    }
+  }
+
+  auto scene                        = getScene();
+  auto occlusionBoundingBoxRenderer = scene->getBoundingBoxRenderer();
+
+  if (!_occlusionQuery) {
+    _occlusionQuery = engine->createQuery();
+  }
+
+  engine->beginQuery(occlusionQueryAlgorithmType, _occlusionQuery);
+  occlusionBoundingBoxRenderer->renderOcclusionBoundingBox(this);
+  engine->endQuery(occlusionQueryAlgorithmType);
+  _isOcclusionQueryInProgress = true;
 }
 
 } // end of namespace BABYLON

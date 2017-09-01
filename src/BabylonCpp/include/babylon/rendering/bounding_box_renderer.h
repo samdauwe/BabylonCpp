@@ -15,6 +15,7 @@ public:
 
   void reset();
   void render();
+  void renderOcclusionBoundingBox(AbstractMesh* mesh);
   void dispose(bool doNotRecurse = false) override;
 
 private:

@@ -113,6 +113,45 @@ void BoundingBoxRenderer::render()
   engine->setDepthWrite(true);
 }
 
+void BoundingBoxRenderer::renderOcclusionBoundingBox(AbstractMesh* mesh)
+{
+  _prepareResources();
+
+  if (!_colorShader->isReady()) {
+    return;
+  }
+
+  auto engine = _scene->getEngine();
+  engine->setDepthWrite(false);
+  engine->setColorWrite(false);
+  _colorShader->_preBind();
+
+  auto& boundingBox = mesh->_boundingInfo->boundingBox;
+  auto min          = boundingBox.minimum;
+  auto max          = boundingBox.maximum;
+  auto diff         = max.subtract(min);
+  auto median       = min.add(diff.scale(0.5f));
+
+  auto worldMatrix
+    = Matrix::Scaling(diff.x, diff.y, diff.z)
+        .multiply(Matrix::Translation(median.x, median.y, median.z))
+        .multiply(boundingBox.getWorldMatrix());
+
+  engine->bindBuffers(_vertexBuffersMap, _indexBuffer.get(),
+                      _colorShader->getEffect());
+
+  engine->setDepthFunctionToLess();
+  _scene->resetCachedMaterial();
+  _colorShader->bind(&worldMatrix);
+
+  engine->draw(false, 0, 24);
+
+  _colorShader->unbind();
+  engine->setDepthFunctionToLessOrEqual();
+  engine->setDepthWrite(true);
+  engine->setColorWrite(true);
+}
+
 void BoundingBoxRenderer::dispose(bool /*doNotRecurse*/)
 {
   if (!_colorShader) {

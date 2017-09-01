@@ -2061,7 +2061,7 @@ void Scene::_evaluateActiveMeshes()
 
     if (mesh->alwaysSelectAsActiveMesh
         || ((mesh->isVisible && mesh->visibility > 0)
-            && ((mesh->layerMask & activeCamera->layerMask) != 0)
+            && ((mesh->layerMask() & activeCamera->layerMask) != 0)
             && mesh->isInFrustum(_frustumPlanes))) {
       _activeMeshes.emplace_back(dynamic_cast<Mesh*>(mesh.get()));
       activeCamera->_activeMeshes.emplace_back(_activeMeshes.back());

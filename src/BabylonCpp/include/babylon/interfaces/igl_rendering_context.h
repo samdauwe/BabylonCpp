@@ -424,6 +424,9 @@ public:
 
 }; // end of class IGLProgram
 
+class BABYLON_SHARED_EXPORT IGLQuery {
+}; // end of class IGLQuery
+
 class BABYLON_SHARED_EXPORT IGLRenderbuffer {
 
 public:

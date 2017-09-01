@@ -3567,6 +3567,36 @@ GL::GLenum Engine::_getRGBABufferInternalSizedFormat(unsigned int type) const
   return GL::RGBA;
 }
 
+Engine::GLQueryPtr Engine::createQuery()
+{
+  return nullptr;
+}
+
+Engine& Engine::deleteQuery(const GLQueryPtr& /*query*/)
+{
+  return *this;
+}
+
+bool Engine::isQueryResultAvailable(const GLQueryPtr& /*query*/)
+{
+  return false;
+}
+
+int Engine::getQueryResult(const GLQueryPtr& /*query*/)
+{
+  return 0;
+}
+
+void Engine::beginQuery(unsigned int /*algorithmType*/,
+                        const GLQueryPtr& /*query*/)
+{
+}
+
+Engine& Engine::endQuery(unsigned int /*algorithmType*/)
+{
+  return *this;
+}
+
 // Statics
 bool Engine::isSupported()
 {

@@ -217,11 +217,11 @@ bool Light::canAffectMesh(AbstractMesh* mesh)
   }
 
   if (_includeOnlyWithLayerMask != 0
-      && (_includeOnlyWithLayerMask & mesh->layerMask) == 0) {
+      && (_includeOnlyWithLayerMask & mesh->layerMask()) == 0) {
     return false;
   }
 
-  if (_excludeWithLayerMask != 0 && _excludeWithLayerMask & mesh->layerMask) {
+  if (_excludeWithLayerMask != 0 && _excludeWithLayerMask & mesh->layerMask()) {
     return false;
   }
 
