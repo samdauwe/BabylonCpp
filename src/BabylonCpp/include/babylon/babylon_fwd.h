@@ -236,6 +236,7 @@ class CubeTexture;
 class DynamicTexture;
 class HDRCubeTexture;
 struct IMultiRenderTargetOptions;
+class InternalTexture;
 struct IRenderTargetOptions;
 class MapTexture;
 class MirrorTexture;
