@@ -81,6 +81,8 @@ file(GLOB ACTIONS_HDR_FILES         ${INCLUDE_PATH}/actions/*.h
 file(GLOB ANIMATIONS_HDR_FILES      ${INCLUDE_PATH}/animations/*.h
                                     ${INCLUDE_PATH}/animations/easing/*.h)
 file(GLOB AUDIO_HDR_FILES           ${INCLUDE_PATH}/audio/*.h)
+file(GLOB BEHAVIORS_HDR_FILES       ${INCLUDE_PATH}/behaviors/*.h
+                                    ${INCLUDE_PATH}/behaviors/cameras/*.h)
 file(GLOB BONES_HDR_FILES           ${INCLUDE_PATH}/bones/*.h)
 file(GLOB CAMERAS_HDR_FILES         ${INCLUDE_PATH}/cameras/*.h
                                     ${INCLUDE_PATH}/cameras/inputs/*.h
@@ -145,6 +147,7 @@ set(BABYLON_HEADERS
     ${ACTIONS_HDR_FILES}
     ${ANIMATIONS_HDR_FILES}
     ${AUDIO_HDR_FILES}
+    #${BEHAVIORS_HDR_FILES}
     ${BONES_HDR_FILES}
     ${CAMERAS_HDR_FILES}
     ${COLLISIONS_HDR_FILES}
@@ -182,6 +185,8 @@ file(GLOB ACTIONS_SRC_FILES         ${SOURCE_PATH}/actions/*.cpp
 file(GLOB ANIMATIONS_SRC_FILES      ${SOURCE_PATH}/animations/*.cpp
                                     ${SOURCE_PATH}/animations/easing/*.cpp)
 file(GLOB AUDIO_SRC_FILES           ${SOURCE_PATH}/audio/*.cpp)
+file(GLOB BEHAVIORS_SRC_FILES       ${SOURCE_PATH}/behaviors/*.cpp
+                                    ${SOURCE_PATH}/behaviors/cameras/*.cpp)
 file(GLOB BONES_SRC_FILES           ${SOURCE_PATH}/bones/*.cpp)
 file(GLOB CAMERAS_SRC_FILES         ${SOURCE_PATH}/cameras/*.cpp
                                     ${SOURCE_PATH}/cameras/inputs/*.cpp
@@ -241,6 +246,7 @@ set(BABYLON_SOURCES
     ${ACTIONS_SRC_FILES}
     ${ANIMATIONS_SRC_FILES}
     ${AUDIO_SRC_FILES}
+    #${BEHAVIORS_SRC_FILES}
     ${BONES_SRC_FILES}
     ${CAMERAS_SRC_FILES}
     ${COLLISIONS_SRC_FILES}
