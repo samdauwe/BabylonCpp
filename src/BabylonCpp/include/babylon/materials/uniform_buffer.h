@@ -138,6 +138,8 @@ public:
    */
   void create();
 
+  void _rebuild();
+
   /**
    * @brief Updates the WebGL Uniform Buffer on the GPU.
    * If the `dynamic` flag is set to true, no cache comparison is done.

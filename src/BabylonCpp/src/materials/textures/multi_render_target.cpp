@@ -2,6 +2,7 @@
 
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/materials/textures/internal_texture.h>
 
 namespace BABYLON {
 
@@ -64,7 +65,7 @@ MultiRenderTarget::MultiRenderTarget(const std::string& name, Size size,
     count                   // textureCount
   };
 
-  _webGLTextures = scene->getEngine()->createMultipleRenderTarget(
+  _internalTextures = scene->getEngine()->createMultipleRenderTarget(
     size, _multiRenderTargetOptions);
 
   _createInternalTextures();
@@ -94,14 +95,14 @@ Texture* MultiRenderTarget::depthTexture()
 void MultiRenderTarget::_createInternalTextures()
 {
   _textures.clear();
-  for (std::size_t i = 0; i < _webGLTextures.size(); ++i) {
+  for (std::size_t i = 0; i < _internalTextures.size(); ++i) {
     auto texture      = Texture::New("", getScene());
-    texture->_texture = _webGLTextures[i];
+    texture->_texture = _internalTextures[i];
     _textures.emplace_back(texture);
   }
 
   // Keeps references to frame buffer and stencil/depth buffer
-  _texture = (!_webGLTextures.empty()) ? _webGLTextures[0] : nullptr;
+  _texture = (!_internalTextures.empty()) ? _internalTextures[0] : nullptr;
 }
 
 unsigned int MultiRenderTarget::samples() const
@@ -115,7 +116,7 @@ void MultiRenderTarget::setSamples(unsigned int value)
     return;
   }
 
-  for (auto& _webGLTexture : _webGLTextures) {
+  for (auto& _webGLTexture : _internalTextures) {
     _samples = getScene()->getEngine()->updateRenderTargetTextureSampleCount(
       _webGLTexture, value);
   }
@@ -124,7 +125,7 @@ void MultiRenderTarget::setSamples(unsigned int value)
 void MultiRenderTarget::resize(Size size)
 {
   releaseInternalTextures();
-  _webGLTextures = getScene()->getEngine()->createMultipleRenderTarget(
+  _internalTextures = getScene()->getEngine()->createMultipleRenderTarget(
     size, _multiRenderTargetOptions);
   _createInternalTextures();
 }
@@ -138,16 +139,16 @@ void MultiRenderTarget::dispose(bool doNotRecurse)
 
 void MultiRenderTarget::releaseInternalTextures()
 {
-  if (_webGLTextures.empty()) {
+  if (_internalTextures.empty()) {
     return;
   }
 
-  for (std::size_t i = _webGLTextures.size(); i-- > 0;) {
-    if (_webGLTextures[i] != nullptr) {
-      getScene()->getEngine()->releaseInternalTexture(_webGLTextures[i]);
+  for (std::size_t i = _internalTextures.size(); i-- > 0;) {
+    if (_internalTextures[i] != nullptr) {
+      _internalTextures[i]->dispose();
     }
   }
-  _webGLTextures.clear();
+  _internalTextures.clear();
 }
 
 } // end of namespace BABYLON

@@ -108,4 +108,22 @@ Json::object MultiMaterial::serialize() const
   return Json::object();
 }
 
+void MultiMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
+{
+  auto scene = getScene();
+  if (!scene) {
+    return;
+  }
+
+  // Remove from scene
+  scene->multiMaterials.erase(
+    std::remove_if(scene->multiMaterials.begin(), scene->multiMaterials.end(),
+                   [this](const std::unique_ptr<MultiMaterial>& multiMaterial) {
+                     return multiMaterial.get() == this;
+                   }),
+    scene->multiMaterials.end());
+
+  Material::dispose(forceDisposeEffect, forceDisposeTextures);
+}
+
 } // end of namespace BABYLON

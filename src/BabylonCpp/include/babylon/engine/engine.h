@@ -60,16 +60,16 @@ public:
 
   std::vector<std::string>& texturesSupported();
   std::string textureFormatInUse() const;
-  float webGLVersion() const;
 
+  // Empty texture
+  InternalTexture* emptyTexture();
+  InternalTexture* emptyCubeTexture();
+
+  float webGLVersion() const;
   bool needPOTTextures() const;
   bool badOS() const;
   bool badDesktopOS() const;
   PerformanceMonitor* performanceMonitor() const;
-
-  // Empty texture
-  GL::IGLTexture* emptyTexture();
-  GL::IGLTexture* emptyCubeTexture();
 
   /**
    * @brief Returns true if the stencil buffer has been enabled through the
@@ -77,6 +77,8 @@ public:
    */
   bool isStencilEnable() const;
   void resetTextureCache();
+  bool isDeterministicLockStep() const;
+  unsigned int getLockstepMaxSteps() const;
   GL::GLInfo getGlInfo();
   float getAspectRatio(Camera* camera, bool useScreen = false);
   int getRenderWidth(bool useScreen = false);
@@ -85,7 +87,7 @@ public:
   ClientRect getRenderingCanvasClientRect();
   void setHardwareScalingLevel(int level);
   int getHardwareScalingLevel() const;
-  std::vector<GLTexturePtr>& getLoadedTexturesCache();
+  std::vector<std::unique_ptr<InternalTexture>>& getLoadedTexturesCache();
   EngineCapabilities& getCaps();
   /** The number of draw calls submitted last frame */
   size_t drawCalls() const;
@@ -183,12 +185,13 @@ public:
   // void enableVR(VRDevice vrDevice);
   // void disableVR();
 
-  void bindFramebuffer(GL::IGLTexture* texture, unsigned int faceIndex = 0,
-                       int requiredWidth = 0, int requiredHeight = 0);
-  void unBindFramebuffer(GL::IGLTexture* texture,
+  void bindFramebuffer(InternalTexture* texture, unsigned int faceIndex = 0,
+                       int requiredWidth = 0, int requiredHeight = 0,
+                       bool forceFullscreenViewport = true);
+  void unBindFramebuffer(InternalTexture* texture,
                          bool disableGenerateMipMaps                 = false,
                          const std::function<void()>& onBeforeUnbind = nullptr);
-  void generateMipMapsForCubemap(GL::IGLTexture* texture);
+  void generateMipMapsForCubemap(InternalTexture* texture);
   void flushFramebuffer();
   void restoreDefaultFramebuffer();
 
@@ -354,42 +357,44 @@ public:
    */
   std::string&
   setTextureFormatToUse(const std::vector<std::string>& formatsAvailable);
-  GL::IGLTexture* createTexture(const std::vector<std::string>& list,
-                                bool noMipmap, bool invertY, Scene* scene,
-                                unsigned int samplingMode
-                                = TextureConstants::TRILINEAR_SAMPLINGMODE,
-                                const std::function<void()>& onLoad  = nullptr,
-                                const std::function<void()>& onError = nullptr,
-                                Buffer* buffer                       = nullptr);
-  GL::IGLTexture* createTexture(
+  std::unique_ptr<GL::IGLTexture> _createTexture();
+  InternalTexture* createTexture(const std::vector<std::string>& list,
+                                 bool noMipmap, bool invertY, Scene* scene,
+                                 unsigned int samplingMode
+                                 = TextureConstants::TRILINEAR_SAMPLINGMODE,
+                                 const std::function<void()>& onLoad  = nullptr,
+                                 const std::function<void()>& onError = nullptr,
+                                 Buffer* buffer = nullptr);
+  InternalTexture* createTexture(
     const std::string& urlArg, bool noMipmap, bool invertY, Scene* scene,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const std::function<void()>& onLoad  = nullptr,
     const std::function<void()>& onError = nullptr, Buffer* buffer = nullptr,
-    GL::IGLTexture* fallBack = nullptr,
-    unsigned int format      = EngineConstants::TEXTUREFORMAT_RGBA);
-  void updateRawTexture(GL::IGLTexture* texture, const Uint8Array& data,
+    InternalTexture* fallBack = nullptr,
+    unsigned int format       = EngineConstants::TEXTUREFORMAT_RGBA);
+  void updateRawTexture(InternalTexture* texture, const Uint8Array& data,
                         unsigned int format, bool invertY = true,
                         const std::string& compression = "");
-  GL::IGLTexture* createRawTexture(const Uint8Array& data, int width,
-                                   int height, int format, bool generateMipMaps,
-                                   bool invertY, unsigned int samplingMode,
-                                   const std::string& compression = "");
-  GL::IGLTexture* createDynamicTexture(int width, int height,
-                                       bool generateMipMaps,
-                                       unsigned int samplingMode);
+  InternalTexture* createRawTexture(const Uint8Array& data, int width,
+                                    int height, unsigned int format,
+                                    bool generateMipMaps, bool invertY,
+                                    unsigned int samplingMode,
+                                    const std::string& compression = "");
+  InternalTexture* createDynamicTexture(int width, int height,
+                                        bool generateMipMaps,
+                                        unsigned int samplingMode);
   void updateTextureSamplingMode(unsigned int samplingMode,
-                                 GL::IGLTexture* texture);
-  void updateDynamicTexture(GL::IGLTexture* texture, ICanvas* canvas,
+                                 InternalTexture* texture);
+  void updateDynamicTexture(InternalTexture* texture, ICanvas* canvas,
                             bool invertY, bool premulAlpha = false,
                             unsigned int format
                             = EngineConstants::TEXTUREFORMAT_RGBA);
-  GL::IGLTexture*
+  InternalTexture*
   createRenderTargetTexture(ISize size, const IRenderTargetOptions& options);
-  std::vector<GL::IGLTexture*>
+  std::vector<InternalTexture*>
   createMultipleRenderTarget(ISize size,
                              const IMultiRenderTargetOptions& options);
-  unsigned int updateRenderTargetTextureSampleCount(GL::IGLTexture* texture,
+  unsigned int updateRenderTargetTextureSampleCount(InternalTexture* texture,
                                                     unsigned int samples);
   void _uploadDataToTexture(unsigned int target, int lod, int internalFormat,
                             int width, int height, unsigned int format,
@@ -397,34 +402,32 @@ public:
   void _uploadCompressedDataToTexture(unsigned int target, int lod,
                                       unsigned int internalFormat, int width,
                                       int height, const Uint8Array& data);
-  GL::IGLTexture*
+  InternalTexture*
   createRenderTargetCubeTexture(const ISize& size,
                                 const IRenderTargetOptions& options);
-  GL::IGLTexture* createPrefilteredCubeTexture(
+  InternalTexture* createPrefilteredCubeTexture(
     const std::string& rootUrl, Scene* scene, float scale, float offset,
     const std::function<void()>& onLoad  = nullptr,
     const std::function<void()>& onError = nullptr, unsigned int format = 0,
     const std::string& forcedExtension = "");
-  GL::IGLTexture*
+  InternalTexture*
   createCubeTexture(const std::string& rootUrl, Scene* scene,
                     const std::vector<std::string>& extensions, bool noMipmap,
                     const std::function<void()>& onLoad  = nullptr,
                     const std::function<void()>& onError = nullptr,
                     unsigned int format                  = 0,
                     const std::string& forcedExtension   = "");
-  void updateTextureSize(GL::IGLTexture* texture, int width, int height);
-  void updateRawCubeTexture(GL::IGLTexture* texture,
+  void updateRawCubeTexture(InternalTexture* texture,
                             const std::vector<Uint8Array>& data,
                             unsigned int format, unsigned int type,
                             bool invertY                   = true,
                             const std::string& compression = "",
                             unsigned int level             = 0);
-  GL::IGLTexture* createRawCubeTexture(const std::vector<Uint8Array> data,
-                                       int size, unsigned int format,
-                                       unsigned int type, bool generateMipMaps,
-                                       bool invertY, unsigned int samplingMode,
-                                       const std::string& compression = "");
-  GL::IGLTexture* createRawCubeTextureFromUrl(
+  std::unique_ptr<InternalTexture> createRawCubeTexture(
+    const std::vector<Uint8Array> data, int size, unsigned int format,
+    unsigned int type, bool generateMipMaps, bool invertY,
+    unsigned int samplingMode, const std::string& compression = "");
+  InternalTexture* createRawCubeTextureFromUrl(
     const std::string& url, Scene* scene, int size, unsigned int format,
     unsigned int type, bool noMipmap,
     const std::function<ArrayBufferViewArray(const Uint8Array& arrayBuffer)>&
@@ -435,11 +438,11 @@ public:
     const std::function<void()>& onError = nullptr,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     bool invertY              = false);
-  void _releaseFramebufferObjects(GL::IGLTexture* texture);
-  void _releaseTexture(GL::IGLTexture* texture);
+  void _releaseFramebufferObjects(InternalTexture* texture);
+  void _releaseTexture(InternalTexture* texture);
   void bindSamplers(Effect* effect);
-  void _bindTextureDirectly(unsigned int target, GL::IGLTexture* texture);
-  void _bindTexture(int channel, GL::IGLTexture* texture);
+  void _bindTextureDirectly(unsigned int target, InternalTexture* texture);
+  void _bindTexture(int channel, InternalTexture* texture);
   void setTextureFromPostProcess(int channel, PostProcess* postProcess);
   void unbindAllTextures();
   void setTexture(int channel, GL::IGLUniformLocation* uniform,
@@ -448,7 +451,6 @@ public:
                        const std::vector<BaseTexture*>& textures);
   void _setAnisotropicLevel(unsigned int key, BaseTexture* texture);
   Uint8Array readPixels(int x, int y, int width, int height);
-  void releaseInternalTexture(GL::IGLTexture* texture);
   void unbindAllAttributes();
   void releaseEffects();
 
@@ -471,7 +473,7 @@ public:
   float getDeltaTime() const;
 
   /** Texture helper functions **/
-  Uint8Array _readTexturePixels(GL::IGLTexture* texture, int width, int height,
+  Uint8Array _readTexturePixels(InternalTexture* texture, int width, int height,
                                 int faceIndex = -1);
   GL::GLenum _getWebGLTextureType(unsigned int type) const;
   GL::GLenum _getRGBABufferInternalSizedFormat(unsigned int type) const;
@@ -480,7 +482,7 @@ public:
   GLQueryPtr createQuery();
   Engine& deleteQuery(const GLQueryPtr& query);
   bool isQueryResultAvailable(const GLQueryPtr& query);
-  int getQueryResult(const GLQueryPtr& query);
+  unsigned int getQueryResult(const GLQueryPtr& query);
   void beginQuery(unsigned int algorithmType, const GLQueryPtr& query);
   Engine& endQuery(unsigned int algorithmType);
 
@@ -504,12 +506,6 @@ public:
                                    const std::string& shaderVersion);
   static SamplingParameters GetSamplingParameters(unsigned int samplingMode,
                                                   bool generateMipMaps);
-  static void PrepareGLTexture(
-    GL::IGLTexture* texture, GL::IGLRenderingContext* gl, Scene* scene,
-    int width, int height, bool noMipmap, bool isCompressed,
-    const std::function<void(int width, int height)>& processFunction,
-    bool invertY              = true,
-    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
 protected:
   /**
@@ -520,6 +516,10 @@ protected:
   Engine(ICanvas* canvas, const EngineOptions& options = EngineOptions());
 
 private:
+  void _rebuildInternalTextures();
+  void _rebuildEffects();
+  void _rebuildBuffers();
+  void _initGLContext();
   void _onVRFullScreenTriggered();
   void _getVRDisplays();
   void _setTexture(unsigned int channel, BaseTexture* texture);
@@ -536,11 +536,24 @@ private:
   void _unbindVertexArrayObject();
   void setProgram(GL::IGLProgram* program);
   void activateTexture(unsigned int texture);
+  void _rescaleTexture(InternalTexture* source, InternalTexture* destination,
+                       Scene* scene, unsigned int internalFormat,
+                       const std::function<void()>& onComplete);
   GL::GLenum _getInternalFormat(unsigned int format) const;
   GLRenderBufferPtr
   _setupFramebufferDepthAttachments(bool generateStencilBuffer,
                                     bool generateDepthBuffer, int width,
                                     int height, int samples = 1);
+  void _prepareWebGLTextureContinuation(InternalTexture* texture, Scene* scene,
+                                        bool noMipmap, bool isCompressed,
+                                        unsigned int samplingMode);
+  void _prepareWebGLTexture(
+    InternalTexture* texture, Scene* scene, int width, int height,
+    Nullable<bool> invertY, bool noMipmap, bool isCompressed,
+    const std::function<bool(
+      int width, int height,
+      const std::function<void()>& continuationCallback)>& processFunction,
+    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE);
   ArrayBufferView _convertRGBtoRGBATextureData(const ArrayBufferView& rgbData,
                                                int width, int height,
                                                unsigned int textureType);
@@ -553,6 +566,9 @@ private:
   bool _canRenderToFloatFramebuffer();
   bool _canRenderToHalfFloatFramebuffer();
   bool _canRenderToFramebuffer(unsigned int type);
+
+  /** Occlusion Queries **/
+  unsigned int getGlAlgorithmType(unsigned int algorithmType) const;
 
 public:
   // Public members
@@ -583,15 +599,20 @@ public:
   Size _oldSize;
   int _oldHardwareScaleFactor;
   int _vrAnimationFrameHandler;
-  // OpenGL context
-  GL::IGLRenderingContext* _gl;
+  // Uniform buffers list
+  std::vector<UniformBuffer*> _uniformBuffers;
 
   static AudioEngine* audioEngine;
-
   PerfCounter _drawCalls;
+
+  /**
+   * Turn this value on if you want to pause FPS computation when in background
+   */
+  bool disablePerformanceMonitorInBackground;
 
 private:
   // Private Members
+  GL::IGLRenderingContext* _gl;
   ICanvas* _renderingCanvas;
   bool _windowIsBackground;
   float _webGLVersion;
@@ -622,6 +643,15 @@ private:
   bool _renderingQueueLaunched;
   std::vector<FastFunc<void()>> _activeRenderLoops;
 
+  // Deterministic lockstepMaxSteps
+  bool _deterministicLockstep;
+  unsigned int _lockstepMaxSteps;
+
+  // Lost context
+  std::function<void(Event&& evt)> _onContextLost;
+  std::function<void(Event&& evt)> _onContextRestored;
+  bool _contextWasLost;
+
   // FPS
   std::unique_ptr<PerformanceMonitor> _performanceMonitor;
   float _fps;
@@ -634,10 +664,10 @@ private:
   int _alphaMode;
 
   // Cache
-  std::vector<GLTexturePtr> _loadedTexturesCache;
+  std::vector<std::unique_ptr<InternalTexture>> _internalTexturesCache;
   unsigned int _maxTextureChannels;
   unsigned int _activeTexture;
-  std::unordered_map<unsigned int, GL::IGLTexture*> _activeTexturesCache;
+  std::unordered_map<unsigned int, InternalTexture*> _activeTexturesCache;
   Effect* _currentEffect;
   GL::IGLProgram* _currentProgram;
   std::unordered_map<std::string, std::unique_ptr<Effect>> _compiledEffects;
@@ -648,7 +678,7 @@ private:
   GL::IGLBuffer* _cachedVertexBuffers;
   GL::IGLBuffer* _cachedIndexBuffer;
   Effect* _cachedEffectForVertexBuffers;
-  GL::IGLTexture* _currentRenderTarget;
+  InternalTexture* _currentRenderTarget;
   bool _uintIndicesCurrentlySet;
   std::unordered_map<int, GL::IGLBuffer*> _currentBoundBuffer;
   GL::IGLFramebuffer* _currentFramebuffer;
@@ -656,11 +686,14 @@ private:
   Int32Array _currentInstanceLocations;
   std::vector<GL::IGLBuffer*> _currentInstanceBuffers;
   Int32Array _textureUnits;
+  ICanvas* _workingCanvas;
+  ICanvasRenderingContext2D* _workingContext;
+  std::unique_ptr<PassPostProcess> _rescalePostProcess;
   std::unique_ptr<GL::IGLFramebuffer> _dummyFramebuffer;
   bool _vaoRecordInProgress;
   bool _mustWipeVertexAttributes;
-  GL::IGLTexture* _emptyTexture;
-  GL::IGLTexture* _emptyCubeTexture;
+  InternalTexture* _emptyTexture;
+  std::unique_ptr<InternalTexture> _emptyCubeTexture;
   // Hardware supported Compressed Textures
   std::vector<std::string> _texturesSupported;
   std::string _textureFormatInUse;

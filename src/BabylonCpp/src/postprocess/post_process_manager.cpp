@@ -39,7 +39,7 @@ void PostProcessManager::_prepareBuffers()
 }
 
 bool PostProcessManager::_prepareFrame(
-  GL::IGLTexture* sourceTexture,
+  InternalTexture* sourceTexture,
   const std::vector<PostProcess*>& iPostProcesses)
 {
   const auto& postProcesses = !iPostProcesses.empty() ?
@@ -55,7 +55,8 @@ bool PostProcessManager::_prepareFrame(
 }
 
 void PostProcessManager::directRender(
-  const std::vector<PostProcess*>& postProcesses, GL::IGLTexture* targetTexture)
+  const std::vector<PostProcess*>& postProcesses,
+  InternalTexture* targetTexture, bool forceFullscreenViewport)
 {
   auto engine = _scene->getEngine();
 
@@ -65,7 +66,8 @@ void PostProcessManager::directRender(
     }
     else {
       if (targetTexture) {
-        engine->bindFramebuffer(targetTexture);
+        engine->bindFramebuffer(targetTexture, 0, 0, 0,
+                                forceFullscreenViewport);
       }
       else {
         engine->restoreDefaultFramebuffer();
@@ -95,7 +97,7 @@ void PostProcessManager::directRender(
 }
 
 void PostProcessManager::_finalizeFrame(
-  bool doNotPresent, GL::IGLTexture* targetTexture, unsigned int faceIndex,
+  bool doNotPresent, InternalTexture* targetTexture, unsigned int faceIndex,
   const std::vector<PostProcess*>& _postProcesses)
 {
   const auto& postProcesses = _postProcesses.empty() ?

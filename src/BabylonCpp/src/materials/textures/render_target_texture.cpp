@@ -26,6 +26,8 @@ RenderTargetTexture::RenderTargetTexture(
     , renderParticles{true}
     , renderSprites{false}
     , coordinatesMode{TextureConstants::PROJECTION_MODE}
+    , activeCamera{nullptr}
+    , ignoreCameraViewport{false}
     , _generateMipMaps{generateMipMaps}
     , _size{size}
     , _doNotChangeAspectRatio{doNotChangeAspectRatio}
@@ -401,12 +403,8 @@ void RenderTargetTexture::renderToTarget(
   }
   else if (!useCameraPostProcess
            || !scene->postProcessManager->_prepareFrame(_texture)) {
-    if (isCube) {
-      engine->bindFramebuffer(_texture, faceIndex);
-    }
-    else {
-      engine->bindFramebuffer(_texture);
-    }
+    engine->bindFramebuffer(_texture, isCube ? faceIndex : 0, 0, 0,
+                            ignoreCameraViewport);
   }
 
   _faceIndex = static_cast<int>(faceIndex);
@@ -417,7 +415,8 @@ void RenderTargetTexture::renderToTarget(
     onClearObservable.notifyObservers(engine);
   }
   else {
-    engine->clear(scene->clearColor, true, true, true);
+    engine->clear(!clearColor.isNull() ? *clearColor : scene->clearColor, true,
+                  true, true);
   }
 
   if (!_doNotChangeAspectRatio) {
@@ -538,6 +537,13 @@ void RenderTargetTexture::dispose(bool doNotRecurse)
   }
 
   Texture::dispose(doNotRecurse);
+}
+
+void RenderTargetTexture::_rebuild()
+{
+  if (refreshRate() == RenderTargetTexture::REFRESHRATE_RENDER_ONCE) {
+    setRefreshRate(RenderTargetTexture::REFRESHRATE_RENDER_ONCE);
+  }
 }
 
 } // end of namespace BABYLON

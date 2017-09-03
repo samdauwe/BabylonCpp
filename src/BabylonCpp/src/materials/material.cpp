@@ -300,6 +300,12 @@ void Material::bindViewProjection(Effect* effect)
 void Material::_afterBind(Mesh* mesh)
 {
   _scene->_cachedMaterial = this;
+  if (mesh) {
+    _scene->_cachedVisibility = mesh->visibility;
+  }
+  else {
+    _scene->_cachedVisibility = 1.f;
+  }
 
   onBindObservable.notifyObservers(mesh);
 

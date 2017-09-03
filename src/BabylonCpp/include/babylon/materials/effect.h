@@ -9,15 +9,7 @@ namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT Effect {
 
-public:
-  using ChildShaderNode = std::pair<std::size_t, std::string>;
-  struct ShaderNode {
-    std::string condition;
-    std::string define;
-    bool ndef;
-    std::vector<ChildShaderNode> children;
-    std::size_t parent;
-  }; // end of struct ShaderNode
+  friend class Engine;
 
 public:
   Effect(const std::string& baseName, EffectCreationOptions& options,
@@ -39,8 +31,6 @@ public:
   GL::IGLUniformLocation* getUniform(const std::string& uniformName);
   std::vector<std::string>& getSamplers();
   std::string getCompilationError();
-  std::string getVertexShaderSource();
-  std::string getFragmentShaderSource();
 
   /** Methods **/
   void executeWhenCompiled(const std::function<void(Effect* effect)>& func);
@@ -50,7 +40,7 @@ public:
   _loadFragmentShader(const std::string& fragment,
                       std::function<void(const std::string& data)> callback);
   bool isSupported() const;
-  void _bindTexture(const std::string& channel, GL::IGLTexture* texture);
+  void _bindTexture(const std::string& channel, InternalTexture* texture);
   void setTexture(const std::string& channel, BaseTexture* texture);
   void setTextureArray(const std::string& channel,
                        const std::vector<BaseTexture*>& textures);
@@ -98,6 +88,9 @@ public:
   Effect& setColor4(const std::string& uniformName, const Color3& color3,
                     float alpha);
 
+  // Statics
+  static void ResetCache();
+
 private:
   void _dumpShadersSource(std::string vertexCode, std::string fragmentCode,
                           std::string defines);
@@ -108,13 +101,7 @@ private:
     const std::string& sourceCode,
     const std::function<void(const std::string& data)>& callback);
   std::string _processPrecision(std::string source);
-  void _prepareEffect(const std::string& vertexSourceCode,
-                      const std::string& fragmentSourceCode,
-                      const std::vector<std::string>& attributesNames,
-                      const std::string& defines, EffectFallbacks* fallbacks);
-  std::string _recombineShader(const std::vector<ShaderNode>& shaderNodes,
-                               std::size_t rootNodeId = 0);
-  std::string _evaluateDefinesOnString(const std::string& shaderString);
+  void _prepareEffect();
 
 public:
   std::string name;
@@ -143,6 +130,8 @@ private:
     _uniforms;
   std::unordered_map<std::string, unsigned int> _indexParameters;
   std::unique_ptr<EffectFallbacks> _fallbacks;
+  std::string _vertexSourceCode;
+  std::string _fragmentSourceCode;
   std::unique_ptr<GL::IGLProgram> _program;
   std::unordered_map<std::string, Float32Array> _valueCache;
   static std::unordered_map<unsigned int, GL::IGLBuffer*> _baseCache;

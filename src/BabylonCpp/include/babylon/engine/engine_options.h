@@ -6,14 +6,16 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT EngineOptions {
-  bool adaptToDeviceRatio    = false;
-  bool antialias             = true;
-  int limitDeviceRatio       = false;
-  bool autoEnableWebVR       = false;
-  bool preserveDrawingBuffer = false;
-  bool stencil               = true;
-  bool disableWebGL2Support  = true;
-  bool audioEngine           = false;
+  bool adaptToDeviceRatio       = false;
+  bool antialias                = true;
+  int limitDeviceRatio          = false;
+  bool autoEnableWebVR          = false;
+  bool preserveDrawingBuffer    = false;
+  bool stencil                  = true;
+  bool disableWebGL2Support     = true;
+  bool audioEngine              = false;
+  bool deterministicLockstep    = false;
+  unsigned int lockstepMaxSteps = 4;
 }; // end of struct EngineOptions
 
 } // end of namespace BABYLON

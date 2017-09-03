@@ -39,6 +39,8 @@ public:
   Material* clone(const std::string& _name,
                   bool cloneChildren = false) const override;
   Json::object serialize() const;
+  void dispose(bool forceDisposeEffect   = false,
+               bool forceDisposeTextures = false) override;
 
 protected:
   MultiMaterial(const std::string name, Scene* scene);

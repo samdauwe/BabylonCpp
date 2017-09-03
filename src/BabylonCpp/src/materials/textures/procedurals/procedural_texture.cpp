@@ -6,6 +6,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/mesh/vertex_buffer.h>
 
@@ -156,7 +157,7 @@ bool ProceduralTexture::isReady()
 
         if (_fallbackTexture) {
           _texture = _fallbackTexture->_texture;
-          ++_texture->references;
+          _texture->incrementReferences();
         }
 
         _fallbackTextureUsed = true;
@@ -384,7 +385,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
 
   if (isCube) {
     for (unsigned int face = 0; face < 6; ++face) {
-      engine->bindFramebuffer(_texture, face);
+      engine->bindFramebuffer(_texture, face, 0, 0, true);
 
       // VBOs
       engine->bindBuffers(vertexBuffersTmp, _indexBuffer.get(), _effect);
@@ -404,7 +405,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
     }
   }
   else {
-    engine->bindFramebuffer(_texture);
+    engine->bindFramebuffer(_texture, 0, 0, 0, true);
 
     // VBOs
     engine->bindBuffers(vertexBuffersTmp, _indexBuffer.get(), _effect);

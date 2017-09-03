@@ -2,6 +2,7 @@
 #define BABYLON_MATERIALS_TEXTURES_RENDER_TARGET_TEXTURE_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/nullable.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/texture.h>
@@ -94,6 +95,7 @@ public:
   void disposeFramebufferObjects();
 
   void dispose(bool doNotRecurse = false) override;
+  void _rebuild() override;
 
 private:
   void renderToTarget(unsigned int faceIndex,
@@ -122,6 +124,9 @@ public:
                      const std::vector<SubMesh*>& transparentSubMeshes,
                      const std::vector<SubMesh*>& alphaTestSubMeshes)>
     customRenderFunction;
+  bool useCameraPostProcesses;
+  bool ignoreCameraViewport;
+  Nullable<Color4> clearColor;
   bool _generateMipMaps;
   std::vector<std::string> _waitingRenderList;
   std::function<void()> onAfterRender;

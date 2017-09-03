@@ -46,26 +46,37 @@ Effect::Effect(const std::string& baseName, EffectCreationOptions& options,
   const std::string vertexSource   = baseName;
   const std::string fragmentSource = baseName;
 
-  _loadVertexShader(vertexSource, [this, &fragmentSource](
-                                    const std::string& vertexCode) {
-    _processIncludes(vertexCode, [this, &fragmentSource](
+  _loadVertexShader(vertexSource, [this, &fragmentSource,
+                                   &baseName](const std::string& vertexCode) {
+    _processIncludes(vertexCode, [this, &fragmentSource, &baseName](
                                    const std::string& vertexCodeWithIncludes) {
       _processShaderConversion(
         vertexCodeWithIncludes, false,
-        [this, &fragmentSource](const std::string& migratedVertexCode) {
+        [this, &fragmentSource,
+         &baseName](const std::string& migratedVertexCode) {
           _loadFragmentShader(
-            fragmentSource,
-            [this, &migratedVertexCode](const std::string& fragmentCode) {
+            fragmentSource, [this, &migratedVertexCode,
+                             &baseName](const std::string& fragmentCode) {
               _processIncludes(
-                fragmentCode, [this, &migratedVertexCode](
+                fragmentCode, [this, &migratedVertexCode, &baseName](
                                 const std::string& fragmentCodeWithIncludes) {
                   _processShaderConversion(
                     fragmentCodeWithIncludes, true,
-                    [this, &migratedVertexCode](
-                      const std::string& migratedFragmentCode) {
-                      _prepareEffect(migratedVertexCode, migratedFragmentCode,
-                                     _attributesNames, defines,
-                                     _fallbacks.get());
+                    [this, &migratedVertexCode,
+                     &baseName](const std::string& migratedFragmentCode) {
+                      if (!baseName.empty()) {
+                        _vertexSourceCode
+                          = "#define SHADER_NAME vertex:" + baseName + "\n"
+                            + migratedVertexCode;
+                        _fragmentSourceCode
+                          = "#define SHADER_NAME fragment:" + baseName + "\n"
+                            + migratedFragmentCode;
+                      }
+                      else {
+                        _vertexSourceCode   = migratedVertexCode;
+                        _fragmentSourceCode = migratedFragmentCode;
+                      }
+                      _prepareEffect();
                     });
                 });
             });
@@ -120,26 +131,38 @@ Effect::Effect(const std::unordered_map<std::string, std::string>& baseName,
 
   name = fragmentSource;
 
-  _loadVertexShader(vertexSource, [this, &fragmentSource](
+  _loadVertexShader(vertexSource, [this, &fragmentSource, &vertexSource](
                                     const std::string& vertexCode) {
-    _processIncludes(vertexCode, [this, &fragmentSource](
+    _processIncludes(vertexCode, [this, &fragmentSource, &vertexSource](
                                    const std::string& vertexCodeWithIncludes) {
       _processShaderConversion(
         vertexCodeWithIncludes, false,
-        [this, &fragmentSource](const std::string& migratedVertexCode) {
+        [this, &fragmentSource,
+         &vertexSource](const std::string& migratedVertexCode) {
           _loadFragmentShader(
-            fragmentSource,
-            [this, &migratedVertexCode](const std::string& fragmentCode) {
+            fragmentSource, [this, &migratedVertexCode, &fragmentSource,
+                             &vertexSource](const std::string& fragmentCode) {
               _processIncludes(
-                fragmentCode, [this, &migratedVertexCode](
-                                const std::string& fragmentCodeWithIncludes) {
+                fragmentCode,
+                [this, &migratedVertexCode, &fragmentSource,
+                 &vertexSource](const std::string& fragmentCodeWithIncludes) {
                   _processShaderConversion(
                     fragmentCodeWithIncludes, true,
-                    [this, &migratedVertexCode](
-                      const std::string& migratedFragmentCode) {
-                      _prepareEffect(migratedVertexCode, migratedFragmentCode,
-                                     _attributesNames, defines,
-                                     _fallbacks.get());
+                    [this, &migratedVertexCode, &fragmentSource,
+                     &vertexSource](const std::string& migratedFragmentCode) {
+                      if (!vertexSource.empty()) {
+                        _vertexSourceCode
+                          = "#define SHADER_NAME vertex:" + vertexSource + "\n"
+                            + migratedVertexCode;
+                        _fragmentSourceCode
+                          = "#define SHADER_NAME fragment:" + fragmentSource
+                            + "\n" + migratedFragmentCode;
+                      }
+                      else {
+                        _vertexSourceCode   = migratedVertexCode;
+                        _fragmentSourceCode = migratedFragmentCode;
+                      }
+                      _prepareEffect();
                     });
                 });
             });
@@ -222,18 +245,6 @@ std::string Effect::getCompilationError()
   return _compilationError;
 }
 
-std::string Effect::getVertexShaderSource()
-{
-  return _evaluateDefinesOnString(
-    _engine->getVertexShaderSource(_program.get()));
-}
-
-std::string Effect::getFragmentShaderSource()
-{
-  return _evaluateDefinesOnString(
-    _engine->getFragmentShaderSource(_program.get()));
-}
-
 void Effect::executeWhenCompiled(
   const std::function<void(Effect* effect)>& func)
 {
@@ -242,10 +253,7 @@ void Effect::executeWhenCompiled(
     return;
   }
 
-  _onCompileObserver = onCompileObservable.add([&](Effect* effect) {
-    onCompileObservable.remove(_onCompileObserver);
-    func(effect);
-  });
+  onCompileObservable.add([&](Effect* effect) { func(effect); });
 }
 
 void Effect::_loadVertexShader(
@@ -557,18 +565,18 @@ std::string Effect::_processPrecision(std::string source)
   return source;
 }
 
-void Effect::_prepareEffect(const std::string& vertexSourceCode,
-                            const std::string& fragmentSourceCode,
-                            const std::vector<std::string>& attributesNames,
-                            const std::string& iDefines,
-                            EffectFallbacks* fallbacks)
+void Effect::_prepareEffect()
 {
+  auto attributesNames = _attributesNames;
+  auto& _defines       = defines;
+  auto& fallbacks      = _fallbacks;
+  _valueCache.clear();
 
   auto engine = _engine;
 
   try {
-    _program = engine->createShaderProgram(vertexSourceCode, fragmentSourceCode,
-                                           iDefines);
+    _program = engine->createShaderProgram(_vertexSourceCode,
+                                           _fragmentSourceCode, _defines);
 
     if (engine->webGLVersion() > 1.f) {
       for (auto& item : _uniformBuffersNames) {
@@ -596,6 +604,7 @@ void Effect::_prepareEffect(const std::string& vertexSourceCode,
       onCompiled(this);
     }
     onCompileObservable.notifyObservers(this);
+    onCompileObservable.clear();
   }
   catch (const std::exception& e) {
     _compilationError = e.what();
@@ -603,7 +612,7 @@ void Effect::_prepareEffect(const std::string& vertexSourceCode,
     // Let's go through fallbacks then
     BABYLON_LOG_ERROR("Effect", "Unable to compile effect: ");
     BABYLON_LOGF_ERROR("Effect", "Defines: %s", defines.c_str());
-    _dumpShadersSource(vertexSourceCode, fragmentSourceCode, defines);
+    _dumpShadersSource(_vertexSourceCode, _fragmentSourceCode, defines);
     BABYLON_LOGF_ERROR("Effect", "Uniforms: %s",
                        String::join(_uniformsNames, ' ').c_str());
     BABYLON_LOGF_ERROR("Effect", "Attributes: %s",
@@ -613,14 +622,14 @@ void Effect::_prepareEffect(const std::string& vertexSourceCode,
     if (!fallbacks && fallbacks->isMoreFallbacks()) {
       BABYLON_LOG_ERROR("Effect", "Trying next fallback.");
       defines = fallbacks->reduce(defines);
-      _prepareEffect(vertexSourceCode, fragmentSourceCode, attributesNames,
-                     defines, fallbacks);
+      _prepareEffect();
     }
     else { // Sorry we did everything we can
       if (onError) {
         onError(this, _compilationError);
       }
       onErrorObservable.notifyObservers(this);
+      onErrorObservable.clear();
     }
   }
 }
@@ -630,7 +639,7 @@ bool Effect::isSupported() const
   return _compilationError.empty();
 }
 
-void Effect::_bindTexture(const std::string& channel, GL::IGLTexture* texture)
+void Effect::_bindTexture(const std::string& channel, InternalTexture* texture)
 {
   _engine->_bindTexture(stl_util::index_of(_samplers, channel), texture);
 }
@@ -1032,163 +1041,9 @@ Effect& Effect::setColor4(const std::string& uniformName, const Color3& color3,
   return *this;
 }
 
-std::string Effect::_recombineShader(const std::vector<ShaderNode>& shaderNodes,
-                                     std::size_t rootNodeId)
+void Effect::ResetCache()
 {
-  const auto& node = shaderNodes[rootNodeId];
-  if (!node.define.empty()) {
-    if (!node.condition.empty()) {
-      auto defineIndex = String::indexOf(defines, "#define " + node.define);
-      if (defineIndex == -1) {
-        return "";
-      }
-
-      auto _defineIndex = static_cast<std::size_t>(defineIndex);
-      auto nextComma    = String::indexOf(defines, "\n", _defineIndex);
-      if (nextComma == -1) {
-        return "";
-      }
-
-      auto _nextComma = static_cast<std::size_t>(nextComma);
-      auto defineValue
-        = defines.substr(_defineIndex + 7, _nextComma - _defineIndex - 7);
-      String::replaceInPlace(defineValue, node.define, "");
-      String::trim(defineValue);
-      auto condition  = defineValue + node.condition;
-      const auto eval = [](const std::string&) { return false; };
-      if (!eval(condition)) {
-        return "";
-      }
-    }
-    else if (node.ndef) {
-      if (String::indexOf(defines, "#define " + node.define) != -1) {
-        return "";
-      }
-    }
-    else if (String::indexOf(defines, "#define " + node.define) == -1) {
-      return "";
-    }
-  }
-
-  std::string result = "";
-  for (std::size_t index = 0; index < node.children.size(); ++index) {
-    auto childNode = node.children[index];
-
-    auto childNodeId = childNode.first;
-    if (childNodeId != 0 && !shaderNodes[childNodeId].children.empty()) {
-      auto combined = _recombineShader(shaderNodes, index);
-      if (!combined.empty()) {
-        result += combined + "\r\n";
-      }
-
-      continue;
-    }
-
-    const auto& line = childNode.second;
-    if (!line.empty()) {
-      result += line + "\r\n";
-    }
-  }
-
-  return result;
-}
-
-std::string Effect::_evaluateDefinesOnString(const std::string& shaderString)
-{
-  std::vector<ShaderNode> shaderNodes;
-  shaderNodes.emplace_back(ShaderNode{
-    "",    // condition
-    "",    // define
-    false, // ndef
-    {},    // children
-    0      // parent
-  });
-
-  auto currentNodeId = shaderNodes.size() - 1;
-  auto lines         = String::split(shaderString, '\n');
-
-  for (auto& line : lines) {
-    String::trim(line);
-
-    // #ifdef
-    auto pos = String::indexOf(line, "#ifdef ");
-    if (pos != -1) {
-      auto define = line.substr(static_cast<std::size_t>(pos) + 7);
-
-      shaderNodes.emplace_back(ShaderNode{
-        "",           // condition
-        define,       // define
-        false,        // ndef
-        {},           // children
-        currentNodeId // parent
-      });
-
-      auto newNodeId = shaderNodes.size() - 1;
-      auto childNode = std::make_pair(newNodeId, "");
-      shaderNodes[currentNodeId].children.emplace_back(childNode);
-      currentNodeId = newNodeId;
-      continue;
-    }
-
-    // #ifndef
-    pos = String::indexOf(line, "#ifndef ");
-    if (pos != -1) {
-      auto define = line.substr(static_cast<std::size_t>(pos) + 8);
-
-      shaderNodes.emplace_back(ShaderNode{
-        "",           // condition
-        define,       // define
-        true,         // ndef
-        {},           // children
-        currentNodeId // parent
-      });
-
-      auto newNodeId = shaderNodes.size() - 1;
-      auto childNode = std::make_pair(newNodeId, "");
-      shaderNodes[currentNodeId].children.emplace_back(childNode);
-      currentNodeId = newNodeId;
-      continue;
-    }
-
-    // #if
-    pos = String::indexOf(line, "#if ");
-    if (pos != -1) {
-      auto define = line.substr(static_cast<std::size_t>(pos) + 4);
-      String::trim(define);
-      int conditionPos = String::indexOf(define, " ");
-      if (pos == -1) {
-        continue;
-      }
-
-      auto _conditionPos = static_cast<std::size_t>(conditionPos);
-
-      shaderNodes.emplace_back(ShaderNode{
-        define.substr(_conditionPos + 1), // condition
-        define.substr(0, _conditionPos),  // define
-        false,                            // ndef
-        {},                               // children
-        currentNodeId                     // parent
-      });
-
-      auto newNodeId = shaderNodes.size() - 1;
-      auto childNode = std::make_pair(newNodeId, "");
-      shaderNodes[currentNodeId].children.emplace_back(childNode);
-      currentNodeId = newNodeId;
-      continue;
-    }
-
-    // #endif
-    pos = String::indexOf(line, "#endif");
-    if (pos != -1) {
-      currentNodeId = shaderNodes[currentNodeId].parent;
-      continue;
-    }
-
-    shaderNodes[currentNodeId].children.emplace_back(std::make_pair(0, line));
-  }
-
-  // Recombine
-  return _recombineShader(shaderNodes);
+  Effect::_baseCache.clear();
 }
 
 } // end of namespace BABYLON

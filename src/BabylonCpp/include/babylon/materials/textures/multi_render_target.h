@@ -30,7 +30,7 @@ private:
   void _createInternalTextures();
 
 private:
-  std::vector<GL::IGLTexture*> _webGLTextures;
+  std::vector<InternalTexture*> _internalTextures;
   std::vector<Texture*> _textures;
   std::size_t _count;
   IMultiRenderTargetOptions _multiRenderTargetOptions;

@@ -63,6 +63,8 @@ UniformBuffer::UniformBuffer(Engine* engine, const Float32Array& data,
     };
   }
   else {
+    _engine->_uniformBuffers.emplace_back(this);
+
     updateMatrix3x3
       = [this](const std::string& name, const Float32Array& matrix) {
           _updateMatrix3x3ForUniform(name, matrix);
@@ -277,6 +279,17 @@ void UniformBuffer::create()
   // See spec, alignment must be filled as a vec4
   _fillAlignment(4);
   _bufferData = Float32Array(_data);
+
+  _rebuild();
+
+  _needSync = true;
+}
+
+void UniformBuffer::_rebuild()
+{
+  if (_noUBO) {
+    return;
+  }
 
   if (_dynamic) {
     _buffer = _engine->createDynamicUniformBuffer(_bufferData);
@@ -537,6 +550,18 @@ void UniformBuffer::bindToEffect(Effect* effect, const std::string& name)
 
 void UniformBuffer::dispose()
 {
+  if (_noUBO) {
+    return;
+  }
+
+  _engine->_uniformBuffers.erase(
+    std::remove_if(_engine->_uniformBuffers.begin(),
+                   _engine->_uniformBuffers.end(),
+                   [this](const UniformBuffer* uniformBuffer) {
+                     return uniformBuffer == this;
+                   }),
+    _engine->_uniformBuffers.end());
+
   if (!_buffer) {
     return;
   }

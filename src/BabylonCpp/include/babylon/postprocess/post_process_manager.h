@@ -16,13 +16,14 @@ public:
   virtual ~PostProcessManager();
 
   /** Methods **/
-  bool _prepareFrame(GL::IGLTexture* sourceTexture,
+  bool _prepareFrame(InternalTexture* sourceTexture,
                      const std::vector<PostProcess*>& postProcesses = {});
   void directRender(const std::vector<PostProcess*>& postProcesses,
-                    GL::IGLTexture* targetTexture);
+                    InternalTexture* targetTexture,
+                    bool forceFullscreenViewport = false);
   void _finalizeFrame(bool doNotPresent,
-                      GL::IGLTexture* targetTexture = nullptr,
-                      unsigned int faceIndex        = 0,
+                      InternalTexture* targetTexture = nullptr,
+                      unsigned int faceIndex         = 0,
                       const std::vector<PostProcess*>& postProcesses
                       = std::vector<PostProcess*>());
   void dispose(bool doNotRecurse = false) override;

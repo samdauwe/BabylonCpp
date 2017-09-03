@@ -3,6 +3,7 @@
 #include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/matrix.h>
 #include <babylon/tools/serialization_helper.h>
@@ -95,7 +96,7 @@ CubeTexture::CubeTexture(const std::string& rootUrl, Scene* scene,
       Tools::SetImmediate([&onLoad]() { onLoad(); });
     }
     else {
-      _texture->onLoadedCallbacks.emplace_back(onLoad);
+      _texture->onLoadedObservable.add(onLoad);
     }
   }
 }

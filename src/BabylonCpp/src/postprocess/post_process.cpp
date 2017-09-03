@@ -7,6 +7,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/tools/tools.h>
 
@@ -134,12 +135,12 @@ void PostProcess::setOnAfterRender(
   _onAfterRenderObserver = onAfterRenderObservable.add(callback);
 }
 
-GL::IGLTexture* PostProcess::outputTexture()
+InternalTexture* PostProcess::outputTexture()
 {
   return _textures[_currentRenderTextureInd];
 }
 
-void PostProcess::setOutputTexture(GL::IGLTexture* value)
+void PostProcess::setOutputTexture(InternalTexture* value)
 {
   _forcedOutputTexture = value;
 }
@@ -156,8 +157,8 @@ Vector2 PostProcess::texelSize()
   }
 
   if (_forcedOutputTexture) {
-    _texelSize.copyFromFloats(1.f / _forcedOutputTexture->_width,
-                              1.f / _forcedOutputTexture->_height);
+    _texelSize.copyFromFloats(1.f / _forcedOutputTexture->width,
+                              1.f / _forcedOutputTexture->height);
   }
 
   return _texelSize;
@@ -214,7 +215,7 @@ void PostProcess::markTextureDirty()
   width = -1;
 }
 
-void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture,
+void PostProcess::activate(Camera* camera, InternalTexture* sourceTexture,
                            bool forceDepthStencil)
 {
   if (!_shareOutputWithPostProcess && !_forcedOutputTexture) {
@@ -226,11 +227,11 @@ void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture,
     const int maxSize = engine->getCaps().maxTextureSize;
 
     const int requiredWidth = static_cast<int>(
-      static_cast<float>(sourceTexture ? sourceTexture->_width :
+      static_cast<float>(sourceTexture ? sourceTexture->width :
                                          _engine->getRenderingCanvas()->width)
       * _renderRatio);
     const int requiredHeight = static_cast<int>(
-      static_cast<float>(sourceTexture ? sourceTexture->_height :
+      static_cast<float>(sourceTexture ? sourceTexture->height :
                                          _engine->getRenderingCanvas()->height)
       * _renderRatio);
 
@@ -297,14 +298,14 @@ void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture,
       }
     }
 
-    GL::IGLTexture* target = nullptr;
+    InternalTexture* target = nullptr;
     if (_shareOutputWithPostProcess) {
       target = _shareOutputWithPostProcess->outputTexture();
     }
     else if (_forcedOutputTexture) {
       target = _forcedOutputTexture;
-      width  = _forcedOutputTexture->_width;
-      height = _forcedOutputTexture->_height;
+      width  = _forcedOutputTexture->width;
+      height = _forcedOutputTexture->height;
     }
     else {
       target = outputTexture();
@@ -314,7 +315,7 @@ void PostProcess::activate(Camera* camera, GL::IGLTexture* sourceTexture,
       _scaleRatio.copyFromFloats(
         static_cast<float>(requiredWidth) / static_cast<float>(desiredWidth),
         static_cast<float>(requiredHeight) / static_cast<float>(desiredHeight));
-      _engine->bindFramebuffer(target, 0, requiredWidth, requiredHeight);
+      _engine->bindFramebuffer(target, 0, requiredWidth, requiredHeight, true);
     }
     else {
       _scaleRatio.copyFromFloats(1.f, 1.f);
@@ -347,8 +348,8 @@ float PostProcess::aspectRatio() const
   }
 
   if (_forcedOutputTexture) {
-    auto size = static_cast<float>(_forcedOutputTexture->_width)
-                / static_cast<float>(_forcedOutputTexture->_height);
+    auto size = static_cast<float>(_forcedOutputTexture->width)
+                / static_cast<float>(_forcedOutputTexture->height);
     return size;
   }
 
@@ -377,7 +378,7 @@ Effect* PostProcess::apply()
   }
 
   // Texture
-  GL::IGLTexture* source = nullptr;
+  InternalTexture* source = nullptr;
   if (_shareOutputWithPostProcess) {
     source = _shareOutputWithPostProcess->outputTexture();
   }

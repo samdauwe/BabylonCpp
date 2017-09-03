@@ -59,8 +59,10 @@ void OutlineRenderer::render(SubMesh* subMesh, _InstancesBatch* batch,
   // Alpha test
   if (material && material->needAlphaTesting()) {
     auto alphaTexture = material->getAlphaTestTexture();
-    _effect->setTexture("diffuseSampler", alphaTexture);
-    _effect->setMatrix("diffuseMatrix", *alphaTexture->getTextureMatrix());
+    if (alphaTexture) {
+      _effect->setTexture("diffuseSampler", alphaTexture);
+      _effect->setMatrix("diffuseMatrix", *alphaTexture->getTextureMatrix());
+    }
   }
 
   engine->setZOffset(-zOffset);

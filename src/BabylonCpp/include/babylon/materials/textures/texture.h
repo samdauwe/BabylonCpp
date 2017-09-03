@@ -2,6 +2,7 @@
 #define BABYLON_MATERIALS_TEXTURES_TEXTURE_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/nullable.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
@@ -41,8 +42,9 @@ public:
   Matrix* getTextureMatrix() override;
   Matrix* getReflectionTextureMatrix() override;
   Texture* clone() const;
-  Observable<Texture>& onLoadObservable();
+  Nullable<Observable<Texture>>& onLoadObservable();
   Json::object serialize() const;
+  void dispose(bool doNotRecurse = false) override;
 
   /** Statics **/
   static Texture* CreateFromBase64String(
@@ -107,12 +109,13 @@ private:
   float _cachedUAng;
   float _cachedVAng;
   float _cachedWAng;
+  int _cachedProjectionMatrixId;
   unsigned int _cachedCoordinatesMode;
   Buffer* _buffer;
   bool _deleteBuffer;
   std::function<void()> _delayedOnLoad;
   std::function<void()> _delayedOnError;
-  Observable<Texture> _onLoadObservable;
+  Nullable<Observable<Texture>> _onLoadObservable;
 
   std::function<void()> _onLoad;
   std::function<void()> _load;

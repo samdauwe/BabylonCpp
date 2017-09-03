@@ -2,8 +2,8 @@
 
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
-#include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/postprocess/pass_post_process.h>

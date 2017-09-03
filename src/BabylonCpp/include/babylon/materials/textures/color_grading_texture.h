@@ -66,7 +66,7 @@ private:
   /**
    * Occurs when the file being loaded is a .3dl LUT file.
    */
-  GL::IGLTexture* load3dlTexture();
+  InternalTexture* load3dlTexture();
 
   /**
    * Starts the loading process of the texture.

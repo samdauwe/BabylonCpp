@@ -4,8 +4,8 @@
 #include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
-#include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/materials/material.h>
+#include <babylon/materials/textures/internal_texture.h>
 #include <babylon/mesh/buffer.h>
 #include <babylon/tools/tools.h>
 
@@ -40,8 +40,9 @@ Texture::Texture(const std::string& _url, Scene* scene, bool noMipmap,
   name = _url;
 
   _load = [this]() {
-    if (_onLoadObservable.hasObservers()) {
-      _onLoadObservable.notifyObservers(this);
+    auto onLoadObservable = *_onLoadObservable;
+    if (onLoadObservable.hasObservers()) {
+      onLoadObservable.notifyObservers(this);
     }
     if (_onLoad) {
       _onLoad();
@@ -81,7 +82,7 @@ Texture::Texture(const std::string& _url, Scene* scene, bool noMipmap,
       Tools::SetImmediate([this]() { _load(); });
     }
     else {
-      _texture->onLoadedCallbacks.emplace_back(_load);
+      _texture->onLoadedObservable.add(_load);
     }
   }
 }
@@ -149,7 +150,7 @@ void Texture::delayLoad()
       Tools::SetImmediate([this]() { _delayedOnLoad(); });
     }
     else {
-      _texture->onLoadedCallbacks.emplace_back(_delayedOnLoad);
+      _texture->onLoadedObservable.add(_delayedOnLoad);
     }
   }
 }
@@ -241,12 +242,21 @@ Matrix* Texture::getTextureMatrix()
 
 Matrix* Texture::getReflectionTextureMatrix()
 {
+  auto scene = getScene();
   if (stl_util::almost_equal(uOffset, _cachedUOffset)
       && stl_util::almost_equal(vOffset, _cachedVOffset)
       && stl_util::almost_equal(uScale, _cachedUScale)
       && stl_util::almost_equal(vScale, _cachedVScale)
       && (coordinatesMode() == _cachedCoordinatesMode)) {
-    return _cachedTextureMatrix.get();
+    if (coordinatesMode() == TextureConstants::PROJECTION_MODE) {
+      if (_cachedProjectionMatrixId
+          == scene->getProjectionMatrix().updateFlag) {
+        return _cachedTextureMatrix.get();
+      }
+    }
+    else {
+      return _cachedTextureMatrix.get();
+    }
   }
 
   if (!_cachedTextureMatrix) {
@@ -268,7 +278,7 @@ Matrix* Texture::getReflectionTextureMatrix()
       _cachedTextureMatrix->m[12] = uOffset;
       _cachedTextureMatrix->m[13] = vOffset;
       break;
-    case TextureConstants::PROJECTION_MODE:
+    case TextureConstants::PROJECTION_MODE: {
       Matrix::IdentityToRef(*_projectionModeMatrix);
 
       _projectionModeMatrix->m[0]  = 0.5f;
@@ -279,15 +289,17 @@ Matrix* Texture::getReflectionTextureMatrix()
       _projectionModeMatrix->m[14] = 1.f;
       _projectionModeMatrix->m[15] = 1.f;
 
-      getScene()->getProjectionMatrix().multiplyToRef(*_projectionModeMatrix,
-                                                      *_cachedTextureMatrix);
-      break;
+      auto projectionMatrix     = scene->getProjectionMatrix();
+      _cachedProjectionMatrixId = projectionMatrix.updateFlag;
+      projectionMatrix.multiplyToRef(*_projectionModeMatrix,
+                                     *_cachedTextureMatrix);
+    } break;
     default:
       Matrix::IdentityToRef(*_cachedTextureMatrix);
       break;
   }
 
-  getScene()->markAllMaterialsAsDirty(
+  scene->markAllMaterialsAsDirty(
     Material::TextureDirtyFlag, [this](Material* mat) {
       return stl_util::contains(mat->getActiveTextures(), this);
     });
@@ -320,7 +332,7 @@ Texture* Texture::clone() const
   return newTexture;
 }
 
-Observable<Texture>& Texture::onLoadObservable()
+Nullable<Observable<Texture>>& Texture::onLoadObservable()
 {
   return _onLoadObservable;
 }
@@ -328,6 +340,20 @@ Observable<Texture>& Texture::onLoadObservable()
 Json::object Texture::serialize() const
 {
   return Json::object();
+}
+
+void Texture::dispose(bool /*doNotRecurse*/)
+{
+  BaseTexture::dispose();
+
+  if (_onLoadObservable) {
+    auto observable = *_onLoadObservable;
+    observable.clear();
+    _onLoadObservable.resetValue();
+  }
+
+  _delayedOnLoad  = nullptr;
+  _delayedOnError = nullptr;
 }
 
 Texture* Texture::CreateFromBase64String(const std::string& /*data*/,

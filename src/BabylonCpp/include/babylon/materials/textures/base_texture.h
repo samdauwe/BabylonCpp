@@ -41,16 +41,16 @@ public:
   Scene* getScene() const;
   virtual Matrix* getTextureMatrix();
   virtual Matrix* getReflectionTextureMatrix();
-  GL::IGLTexture* getInternalTexture();
+  InternalTexture* getInternalTexture();
   virtual bool isReadyOrNotBlocking();
   virtual bool isReady();
   ISize getSize() const;
   ISize getBaseSize();
   virtual void scale(float ratio);
   bool canRescale();
-  void _removeFromCache(const std::string& url, bool noMipmap);
-  GL::IGLTexture* _getFromCache(const std::string& url, bool noMipmap,
-                                unsigned int sampling = 0);
+  InternalTexture* _getFromCache(const std::string& url, bool noMipmap,
+                                 unsigned int sampling = 0);
+  virtual void _rebuild();
   virtual void delayLoad();
   std::vector<Animation*> getAnimations() override;
   std::unique_ptr<BaseTexture> clone() const;
@@ -94,7 +94,7 @@ public:
   Observable<BaseTexture> onDisposeObservable;
   unsigned int delayLoadState;
   unsigned int _cachedAnisotropicFilteringLevel;
-  GL::IGLTexture* _texture;
+  InternalTexture* _texture;
 
 private:
   bool _hasAlpha;

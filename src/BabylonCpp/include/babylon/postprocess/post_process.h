@@ -51,8 +51,8 @@ public:
   void setOnBeforeRender(const std::function<void(Effect* effect)>& callback);
   void setOnAfterRender(const std::function<void(Effect* effect)>& callback);
 
-  GL::IGLTexture* outputTexture();
-  void setOutputTexture(GL::IGLTexture* value);
+  InternalTexture* outputTexture();
+  void setOutputTexture(InternalTexture* value);
   Camera* getCamera();
   Vector2 texelSize();
   Engine* getEngine();
@@ -72,7 +72,7 @@ public:
    * Invalidate frameBuffer to hint the postprocess to create a depth buffer
    */
   void markTextureDirty();
-  void activate(Camera* camera, GL::IGLTexture* sourceTexture = nullptr,
+  void activate(Camera* camera, InternalTexture* sourceTexture = nullptr,
                 bool forceDepthStencil = false);
   bool isSupported() const;
   float aspectRatio() const;
@@ -95,7 +95,7 @@ public:
   unsigned int scaleMode;
   bool alwaysForcePOT;
   unsigned int samples;
-  std::vector<GL::IGLTexture*> _textures;
+  std::vector<InternalTexture*> _textures;
   unsigned int _currentRenderTextureInd;
   // Events
   /**
@@ -138,7 +138,7 @@ private:
   Vector2 _scaleRatio;
   PostProcess* _shareOutputWithPostProcess;
   Vector2 _texelSize;
-  GL::IGLTexture* _forcedOutputTexture;
+  InternalTexture* _forcedOutputTexture;
   // Events
   Observer<Camera>::Ptr _onActivateObserver;
   Observer<PostProcess>::Ptr _onSizeChangedObserver;

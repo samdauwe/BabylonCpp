@@ -1163,11 +1163,11 @@ void Scene::_addPendingData(Mesh* /*mesh*/)
 {
 }
 
-void Scene::_addPendingData(GL::IGLTexture* /*texure*/)
+void Scene::_addPendingData(InternalTexture* /*texure*/)
 {
 }
 
-void Scene::_removePendingData(GL::IGLTexture* /*texture*/)
+void Scene::_removePendingData(InternalTexture* /*texture*/)
 {
 }
 
@@ -3067,6 +3067,19 @@ void Scene::disablePhysicsEngine()
 bool Scene::isPhysicsEnabled()
 {
   return _physicsEngine != nullptr;
+}
+
+void Scene::_rebuildGeometries()
+{
+  for (auto& geometry : _geometries) {
+    geometry->_rebuild();
+  }
+}
+void Scene::_rebuildTextures()
+{
+  for (auto& texture : textures) {
+    texture->_rebuild();
+  }
 }
 
 void Scene::createDefaultCameraOrLight(bool createArcRotateCamera, bool replace,

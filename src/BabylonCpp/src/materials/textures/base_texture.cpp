@@ -3,8 +3,8 @@
 #include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
-#include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/materials/material.h>
+#include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/tools/hdr/cube_map_to_spherical_polynomial_tools.h>
 #include <babylon/tools/tools.h>
@@ -126,7 +126,7 @@ Matrix* BaseTexture::getReflectionTextureMatrix()
   return nullptr;
 }
 
-GL::IGLTexture* BaseTexture::getInternalTexture()
+InternalTexture* BaseTexture::getInternalTexture()
 {
   return _texture;
 }
@@ -152,8 +152,8 @@ bool BaseTexture::isReady()
 
 ISize BaseTexture::getSize() const
 {
-  if (_texture->_width) {
-    return Size(_texture->_width, _texture->_height);
+  if (_texture->width) {
+    return Size(_texture->width, _texture->height);
   }
 
   if (_texture->_size) {
@@ -173,7 +173,7 @@ ISize BaseTexture::getBaseSize()
     return Size(_texture->_size, _texture->_size);
   }
 
-  return Size(_texture->_baseWidth, _texture->_baseHeight);
+  return Size(_texture->baseWidth, _texture->baseHeight);
 }
 
 void BaseTexture::scale(float /*ratio*/)
@@ -185,37 +185,26 @@ bool BaseTexture::canRescale()
   return false;
 }
 
-void BaseTexture::_removeFromCache(const std::string& url, bool noMipmap)
-{
-  auto& texturesCache = _scene->getEngine()->getLoadedTexturesCache();
-  for (auto& texturesCacheEntry : texturesCache) {
-    if ((texturesCacheEntry->url.compare(url) == 0)
-        && texturesCacheEntry->generateMipMaps != noMipmap) {
-      auto it = std::find(texturesCache.begin(), texturesCache.end(),
-                          texturesCacheEntry);
-      if (it != texturesCache.end()) {
-        texturesCache.erase(it);
-        return;
-      }
-    }
-  }
-}
-
-GL::IGLTexture* BaseTexture::_getFromCache(const std::string& url,
-                                           bool noMipmap, unsigned int sampling)
+InternalTexture* BaseTexture::_getFromCache(const std::string& url,
+                                            bool noMipmap,
+                                            unsigned int sampling)
 {
   auto& texturesCache = _scene->getEngine()->getLoadedTexturesCache();
   for (auto& texturesCacheEntry : texturesCache) {
     if ((texturesCacheEntry->url.compare(url) == 0)
         && texturesCacheEntry->generateMipMaps != noMipmap) {
       if (!sampling || sampling == texturesCacheEntry->samplingMode) {
-        ++texturesCacheEntry->references;
+        texturesCacheEntry->incrementReferences();
         return texturesCacheEntry.get();
       }
     }
   }
 
   return nullptr;
+}
+
+void BaseTexture::_rebuild()
+{
 }
 
 void BaseTexture::delayLoad()
@@ -238,7 +227,7 @@ unsigned int BaseTexture::textureType() const
     return EngineConstants::TEXTURETYPE_UNSIGNED_INT;
   }
 
-  return _texture->type ? *_texture->type :
+  return _texture->type ? _texture->type :
                           EngineConstants::TEXTURETYPE_UNSIGNED_INT;
 }
 
@@ -248,7 +237,7 @@ unsigned int BaseTexture::textureFormat() const
     return EngineConstants::TEXTUREFORMAT_RGBA;
   }
 
-  return _texture->format ? *_texture->format :
+  return _texture->format ? _texture->format :
                             EngineConstants::TEXTUREFORMAT_RGBA;
 }
 
@@ -272,7 +261,7 @@ Uint8Array BaseTexture::readPixels(unsigned int faceIndex)
 void BaseTexture::releaseInternalTexture()
 {
   if (_texture) {
-    _scene->getEngine()->releaseInternalTexture(_texture);
+    _texture->dispose();
     _texture = nullptr;
   }
 }
@@ -377,7 +366,7 @@ void BaseTexture::WhenAllReady(const std::vector<BaseTexture*>& textures,
     }
     else {
       auto onLoadObservable
-        = (static_cast<Texture*>(texture))->onLoadObservable();
+        = *(static_cast<Texture*>(texture))->onLoadObservable();
 
       const std::function<void()> onLoadCallback = [&]() {
         onLoadObservable.removeCallback(onLoadCallback);

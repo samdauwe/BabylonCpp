@@ -5,6 +5,7 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/tools/tools.h>
 
@@ -47,7 +48,7 @@ Matrix* ColorGradingTexture::getTextureMatrix()
   return _textureMatrix.get();
 }
 
-GL::IGLTexture* ColorGradingTexture::load3dlTexture()
+InternalTexture* ColorGradingTexture::load3dlTexture()
 {
   _texture = getScene()->getEngine()->createRawTexture(
     Uint8Array(), 1, 1, EngineConstants::TEXTUREFORMAT_RGBA, false, false,
@@ -123,8 +124,8 @@ GL::IGLTexture* ColorGradingTexture::load3dlTexture()
       }
     }
 
-    getScene()->getEngine()->updateTextureSize(
-      _texture, static_cast<int>(size * size), static_cast<int>(size));
+    const auto _size = static_cast<int>(size);
+    _texture->updateSize(_size * _size, _size);
     getScene()->getEngine()->updateRawTexture(
       _texture, data, EngineConstants::TEXTUREFORMAT_RGBA, false);
   };

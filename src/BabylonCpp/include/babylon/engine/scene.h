@@ -242,8 +242,8 @@ public:
   void registerAfterRender(const std::function<void()>& func);
   void unregisterAfterRender(const std::function<void()>& func);
   void _addPendingData(Mesh* mesh);
-  void _addPendingData(GL::IGLTexture* texure);
-  void _removePendingData(GL::IGLTexture* texture);
+  void _addPendingData(InternalTexture* texure);
+  void _removePendingData(InternalTexture* texture);
   void getWaitingItemsCount();
 
   /**
@@ -630,6 +630,8 @@ public:
   bool isPhysicsEnabled();
 
   /** Misc. **/
+  void _rebuildGeometries();
+  void _rebuildTextures();
   void createDefaultCameraOrLight(bool createArcRotateCamera = false,
                                   bool replace               = false,
                                   bool attachCameraControls  = false);
