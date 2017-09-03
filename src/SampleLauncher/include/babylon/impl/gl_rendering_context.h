@@ -19,6 +19,8 @@ public:
   void activeTexture(GLenum texture) override;
   void attachShader(const std::unique_ptr<IGLProgram>& program,
                     const std::unique_ptr<IGLShader>& shader) override;
+  void beginQuery(GLenum target,
+                  const std::unique_ptr<IGLQuery>& query) override;
   void bindAttribLocation(IGLProgram* program, GLuint index,
                           const std::string& name) override;
   void bindBuffer(GLenum target, IGLBuffer* buffer) override;
@@ -74,6 +76,7 @@ public:
   std::unique_ptr<IGLBuffer> createBuffer() override;
   std::unique_ptr<IGLFramebuffer> createFramebuffer() override;
   std::unique_ptr<IGLProgram> createProgram() override;
+  std::unique_ptr<IGLQuery> createQuery() override;
   std::unique_ptr<IGLRenderbuffer> createRenderbuffer() override;
   std::unique_ptr<IGLShader> createShader(GLenum type) override;
   std::unique_ptr<IGLTexture> createTexture() override;
@@ -83,6 +86,7 @@ public:
   void deleteFramebuffer(
     const std::unique_ptr<IGLFramebuffer>& framebuffer) override;
   void deleteProgram(IGLProgram* program) override;
+  void deleteQuery(const std::unique_ptr<IGLQuery>& query) override;
   void deleteRenderbuffer(
     const std::unique_ptr<IGLRenderbuffer>& renderbuffer) override;
   void deleteShader(const std::unique_ptr<IGLShader>& shader) override;
@@ -104,6 +108,7 @@ public:
                              GLintptr offset, GLsizei instanceCount) override;
   void enable(GLenum cap) override;
   void enableVertexAttribArray(GLuint index) override;
+  void endQuery(GLenum target) override;
   void finish() override;
   void flush() override;
   void framebufferRenderbuffer(
@@ -120,6 +125,10 @@ public:
   std::array<int, 3> getScissorBoxParameter() override; // GL::SCISSOR_BOX
   GLint getParameteri(GLenum pname) override;
   GLfloat getParameterf(GLenum pname) override;
+  GLboolean getQueryParameterb(const std::unique_ptr<IGLQuery>& query,
+                               GLenum pname) override;
+  GLuint getQueryParameteri(const std::unique_ptr<IGLQuery>& query,
+                            GLenum pname) override;
   std::string getString(GLenum pname) override;
   GLint getTexParameteri(GLenum pname) override;
   GLfloat getTexParameterf(GLenum pname) override;

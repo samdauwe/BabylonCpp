@@ -90,7 +90,8 @@ enum GLEnums : GLenum {
   DYNAMIC_DRAW                 = 0x88E8,
   BUFFER_SIZE                  = 0x8764,
   BUFFER_USAGE                 = 0x8765,
-  CURRENT_VERTEX_ATTRIB        = 0x8626,
+  QUERY_RESULT                 = 0x8866,
+  QUERY_RESULT_AVAILABLE       = 0x8867,
   /* CullFaceMode */
   FRONT          = 0x0404,
   BACK           = 0x0405,
@@ -212,6 +213,9 @@ enum GLEnums : GLenum {
   ACTIVE_ATTRIBUTES                = 0x8B89,
   SHADING_LANGUAGE_VERSION         = 0x8B8C,
   CURRENT_PROGRAM                  = 0x8B8D,
+  /* Algorithm types */
+  ANY_SAMPLES_PASSED              = 0x8C2F,
+  ANY_SAMPLES_PASSED_CONSERVATIVE = 0x8D6A,
   /* StencilFunction */
   NEVER    = 0x0200,
   LESS     = 0x0201,
@@ -318,6 +322,7 @@ enum GLEnums : GLenum {
   VERTEX_ATTRIB_ARRAY_SIZE           = 0x8623,
   VERTEX_ATTRIB_ARRAY_STRIDE         = 0x8624,
   VERTEX_ATTRIB_ARRAY_TYPE           = 0x8625,
+  CURRENT_VERTEX_ATTRIB              = 0x8626,
   VERTEX_ATTRIB_ARRAY_NORMALIZED     = 0x886A,
   VERTEX_ATTRIB_ARRAY_POINTER        = 0x8645,
   VERTEX_ATTRIB_ARRAY_BUFFER_BINDING = 0x889F,
@@ -425,6 +430,15 @@ public:
 }; // end of class IGLProgram
 
 class BABYLON_SHARED_EXPORT IGLQuery {
+
+public:
+  IGLQuery(GLuint _value) : value{_value}
+  {
+  }
+
+public:
+  GLuint value;
+
 }; // end of class IGLQuery
 
 class BABYLON_SHARED_EXPORT IGLRenderbuffer {
@@ -566,6 +580,22 @@ public:
   virtual void activeTexture(GLenum texture)         = 0;
   virtual void attachShader(const std::unique_ptr<IGLProgram>& program,
                             const std::unique_ptr<IGLShader>& shader)
+    = 0;
+
+  /**
+   * @brief Starts an asynchronous query. The target parameter indicates which
+   * kind of query to begin.
+   * @param target A GLenum specifying the target of the query. Possible values:
+   *  - ANY_SAMPLES_PASSED: Specifies an occlusion query: these queries detect
+   * whether an object is visible (whether the scoped drawing commands pass the
+   * depth test and if so, how many samples pass).
+   *  - ANY_SAMPLES_PASSED_CONSERVATIVE: Same as above above, but less accurate
+   * and faster version.
+   *  - TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN: Number of primitives that are
+   * written to transform feedback buffers.
+   * @param query An IGLQuery object for which to start the querying.
+   */
+  virtual void beginQuery(GLenum target, const std::unique_ptr<IGLQuery>& query)
     = 0;
 
   /**
@@ -795,8 +825,8 @@ public:
 
   /**
    * @brief Apecifies the clear value for the stencil buffer.
-   * @param stencil A GLint specifying the index used when the stencil buffer is
-   * cleared.
+   * @param stencil A GLint specifying the index used when the stencil buffer
+   * is cleared.
    */
   virtual void clearStencil(GLint stencil) = 0;
 
@@ -932,6 +962,13 @@ public:
   virtual std::unique_ptr<IGLProgram> createProgram() = 0;
 
   /**
+   * @brief Creates and initializes IGLQuery objects, which provide ways to
+   * asynchronously query for information.
+   * @return An IGLQuery object.
+   */
+  virtual std::unique_ptr<IGLQuery> createQuery() = 0;
+
+  /**
    * @brief Creates and initializes a IGLRenderbuffer object.
    * @return A IGLRenderbuffer object that stores data such an image, or can be
    * source or target of an rendering operation.
@@ -991,6 +1028,12 @@ public:
    * @param program An IGLProgram object to delete.
    */
   virtual void deleteProgram(IGLProgram* program) = 0;
+
+  /**
+   * @brief Celetes a given IGLQuery object.
+   * @param query An IGLQuery object to delete.
+   */
+  virtual void deleteQuery(const std::unique_ptr<IGLQuery>& query) = 0;
 
   /**
    * @brief Deletes a given IGLRenderbuffer object. This method has no effect if
@@ -1143,6 +1186,19 @@ public:
   virtual void enableVertexAttribArray(GLuint index) = 0;
 
   /**
+   * @brief Marks the end of a given query target.
+   * @param target A GLenum specifying the target of the query. Possible values:
+   *  - ANY_SAMPLES_PASSED: Specifies an occlusion query: these queries detect
+   * whether an object is visible (whether the scoped drawing commands pass the
+   * depth test and if so, how many samples pass).
+   *  - ANY_SAMPLES_PASSED_CONSERVATIVE: Same as above above, but less accurate
+   * and faster version.
+   *  - TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN: Number of primitives that are
+   * written to transform feedback buffers.
+   */
+  virtual void endQuery(GLenum target) = 0;
+
+  /**
    * @brief Blocks execution until all previously called commands are finished.
    */
   virtual void finish() = 0;
@@ -1241,6 +1297,28 @@ public:
    * @return A GLenum representing the value for the passed parameter name.
    */
   virtual GLfloat getParameterf(GLenum pname) = 0;
+
+  /**
+   * @brief Returns parameter information of a IGLQuery object.
+   * @param query A IGLQuery object
+   * @param pname A GLenum specifying which information to return, should be
+   * QUERY_RESULT_AVAILABLE.
+   * @return A GLboolean representing the information of a IGLQuery object.
+   */
+  virtual GLboolean getQueryParameterb(const std::unique_ptr<IGLQuery>& query,
+                                       GLenum pname)
+    = 0;
+
+  /**
+   * @brief Returns parameter information of a IGLQuery object.
+   * @param query A IGLQuery object
+   * @param pname A GLenum specifying which information to return, should be
+   * QUERY_RESULT.
+   * @return A GLuint representing the information of a IGLQuery object.
+   */
+  virtual GLuint getQueryParameteri(const std::unique_ptr<IGLQuery>& query,
+                                    GLenum pname)
+    = 0;
 
   virtual std::string getString(GLenum pname) = 0;
 

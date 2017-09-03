@@ -165,6 +165,12 @@ void GLRenderingContext::attachShader(
   glAttachShader(program->value, shader ? shader->value : 0);
 }
 
+void GLRenderingContext::beginQuery(GLenum target,
+                                    const std::unique_ptr<IGLQuery>& query)
+{
+  glBeginQuery(target, query ? query->value : 0);
+}
+
 void GLRenderingContext::bindAttribLocation(IGLProgram* program, GLuint index,
                                             const std::string& name)
 {
@@ -388,6 +394,11 @@ std::unique_ptr<IGLProgram> GLRenderingContext::createProgram()
   return std::make_unique<IGLProgram>(glCreateProgram());
 }
 
+std::unique_ptr<IGLQuery> GLRenderingContext::createQuery()
+{
+  return std::make_unique<IGLQuery>(0);
+}
+
 std::unique_ptr<IGLRenderbuffer> GLRenderingContext::createRenderbuffer()
 {
   GLuint buffer;
@@ -435,6 +446,10 @@ void GLRenderingContext::deleteFramebuffer(
 void GLRenderingContext::deleteProgram(IGLProgram* program)
 {
   glDeleteProgram(program->value);
+}
+
+void GLRenderingContext::deleteQuery(const std::unique_ptr<IGLQuery>& /*query*/)
+{
 }
 
 void GLRenderingContext::deleteRenderbuffer(
@@ -533,6 +548,11 @@ void GLRenderingContext::enableVertexAttribArray(GLuint index)
   glEnableVertexAttribArray(index);
 }
 
+void GLRenderingContext::endQuery(GLenum target)
+{
+  glEndQuery(target);
+}
+
 void GLRenderingContext::finish()
 {
   glFinish();
@@ -602,6 +622,24 @@ GLfloat GLRenderingContext::getParameterf(GLenum pname)
 {
   GLfloat parameter = 0;
   glGetFloatv(pname, &parameter);
+  return parameter;
+}
+
+GLboolean
+GLRenderingContext::getQueryParameterb(const std::unique_ptr<IGLQuery>& query,
+                                       GLenum pname)
+{
+  int parameter = 0;
+  glGetQueryObjectiv(query->value, pname, &parameter);
+  return parameter == GL_TRUE;
+}
+
+GLuint
+GLRenderingContext::getQueryParameteri(const std::unique_ptr<IGLQuery>& query,
+                                       GLenum pname)
+{
+  unsigned int parameter = 0;
+  glGetQueryObjectuiv(query->value, pname, &parameter);
   return parameter;
 }
 
