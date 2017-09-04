@@ -13,25 +13,17 @@ std::array<Matrix, 5> Bone::_tmpMats{{Matrix::Identity(), Matrix::Identity(),
                                       Matrix::Identity(), Matrix::Identity(),
                                       Matrix::Identity()}};
 
-Bone::Bone(const std::string& iName, Skeleton* skeleton)
-    : Bone(iName, skeleton, nullptr, Matrix::Identity(), Matrix::Identity())
-{
-}
-
 Bone::Bone(const std::string& iName, Skeleton* skeleton, Bone* parentBone,
-           const Matrix& matrix)
-    : Bone(iName, skeleton, parentBone, matrix, matrix)
-{
-}
-
-Bone::Bone(const std::string& iName, Skeleton* skeleton, Bone* parentBone,
-           const Matrix& matrix, const Matrix& restPose)
+           const Nullable<Matrix>& localMatrix,
+           const Nullable<Matrix>& restPose, const Nullable<Matrix>& baseMatrix,
+           Nullable<int> index)
     : Node{iName, skeleton->getScene()}
     , length{-1}
+    , _index{index}
     , _skeleton{skeleton}
-    , _localMatrix{matrix}
-    , _restPose{restPose}
-    , _baseMatrix{matrix}
+    , _localMatrix{localMatrix ? *localMatrix : Matrix::Identity()}
+    , _restPose{restPose ? *restPose : Matrix::Identity()}
+    , _baseMatrix{baseMatrix ? *baseMatrix : _localMatrix}
     , _worldTransform{std::make_unique<Matrix>()}
     , _invertedAbsoluteTransform{std::make_unique<Matrix>()}
     , _scaleMatrix{Matrix::Identity()}

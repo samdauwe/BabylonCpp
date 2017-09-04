@@ -83,9 +83,12 @@ public:
 
   void computeAbsoluteTransforms(bool forceUpdate = false);
   Matrix* getPoseMatrix() const;
+  void sortBones();
 
 private:
   int _getHighestAnimationFrame();
+  void _sortBones(unsigned int index, std::vector<Bone*>& bones,
+                  std::vector<bool>& visited);
 
 public:
   std::vector<std::unique_ptr<Bone>> bones;

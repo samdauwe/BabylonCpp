@@ -272,8 +272,13 @@ void Skeleton::_computeTransformMatrices(Float32Array& targetMatrix,
       }
     }
 
-    bone->getInvertedAbsoluteTransform().multiplyToArray(
-      *bone->getWorldMatrix(), targetMatrix, index * 16);
+    if (*bone->_index != -1) {
+      auto mappedIndex = bone->_index.isNull() ?
+                           index :
+                           static_cast<unsigned int>(*bone->_index);
+      bone->getInvertedAbsoluteTransform().multiplyToArray(
+        *bone->getWorldMatrix(), targetMatrix, mappedIndex * 16);
+    }
     ++index;
   }
 
@@ -471,6 +476,53 @@ Matrix* Skeleton::getPoseMatrix() const
   }
 
   return poseMatrix;
+}
+
+void Skeleton::sortBones()
+{
+  std::vector<Bone*> bones;
+  std::vector<bool> visited(bones.size());
+  for (unsigned int index = 0; index < bones.size(); ++index) {
+    _sortBones(index, bones, visited);
+  }
+
+  bones = bones;
+}
+
+void Skeleton::_sortBones(unsigned int index, std::vector<Bone*>& iBones,
+                          std::vector<bool>& visited)
+{
+  if (visited[index]) {
+    return;
+  }
+
+  visited[index] = true;
+
+  auto& bone = bones[index];
+  if (bone->_index.isNull()) {
+    bone->_index = static_cast<int>(index);
+  }
+
+  const auto boneIndexOf = [this](Bone* iBone) {
+    auto it = std::find_if(bones.begin(), bones.end(),
+                           [&iBone](const std::unique_ptr<Bone>& bone) {
+                             return bone.get() == iBone;
+                           });
+    if (it != bones.end()) {
+      return static_cast<int>(it - bones.begin());
+    }
+    return -1;
+  };
+
+  const auto& parentBone = bone->getParent();
+  if (parentBone) {
+    auto index = boneIndexOf(parentBone);
+    if (index >= 0) {
+      _sortBones(static_cast<unsigned int>(index), iBones, visited);
+    }
+  }
+
+  iBones.emplace_back(bone.get());
 }
 
 } // end of namespace BABYLON

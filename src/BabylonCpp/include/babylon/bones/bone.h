@@ -4,6 +4,7 @@
 #include <babylon/babylon_global.h>
 
 #include <babylon/animations/ianimatable.h>
+#include <babylon/core/nullable.h>
 #include <babylon/engine/node.h>
 
 namespace BABYLON {
@@ -353,11 +354,11 @@ public:
                                          Vector3& result) const;
 
 protected:
-  Bone(const std::string& name, Skeleton* skeleton);
-  Bone(const std::string& name, Skeleton* skeleton, Bone* parentBone,
-       const Matrix& matrix);
-  Bone(const std::string& name, Skeleton* skeleton, Bone* parentBone,
-       const Matrix& matrix, const Matrix& restPose);
+  Bone(const std::string& name, Skeleton* skeleton, Bone* parentBone = nullptr,
+       const Nullable<Matrix>& localMatrix = nullptr,
+       const Nullable<Matrix>& restPose    = nullptr,
+       const Nullable<Matrix>& baseMatrix  = nullptr,
+       Nullable<int> index                 = nullptr);
 
 private:
   void _rotateWithMatrix(const Matrix& rmat, Space space = Space::LOCAL,
@@ -370,6 +371,11 @@ public:
   std::vector<Bone*> children;
   std::vector<Animation*> animations;
   int length;
+
+  // Set this value to map this bone to a different index in the transform
+  // matrices.
+  // Set this value to -1 to exclude the bone from the transform matrices.
+  Nullable<int> _index;
 
 private:
   static std::array<Vector3, 2> _tmpVecs;
