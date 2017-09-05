@@ -22,6 +22,7 @@
 #include <babylon/samples/materials/shader_material_scene.h>
 #include <babylon/samples/materials/shader_material_skybox_clouds_scene.h>
 #include <babylon/samples/materials/shader_material_skybox_scene.h>
+#include <babylon/samples/materials/shader_material_with_fog_scene.h>
 #include <babylon/samples/materials/shader_material_wolfenstein_3d_scene.h>
 #include <babylon/samples/mesh/basic_elements_scene.h>
 #include <babylon/samples/mesh/basic_scene.h>
@@ -246,6 +247,12 @@ std::unordered_map<std::string, Sample>
          [](ICanvas* iCanvas) {                                         //
            return std::make_unique<ShaderMaterialSkyboxScene>(iCanvas); //
          }};                                                            //
+    // Shader Material With Fog Scene
+    samples["ShaderMaterialWithFogScene"]
+      = {true,
+         [](ICanvas* iCanvas) {                                          //
+           return std::make_unique<ShaderMaterialWithFogScene>(iCanvas); //
+         }};                                                             //
     // Shader Material Wolfenstein 3D Scene
     samples["ShaderMaterialWolfenstein3DScene"] = {
       true,

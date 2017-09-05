@@ -30,6 +30,7 @@
 ![shader_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_scene.png?raw=true "Shader Material Scene")
 ![shader_material_skybox_clouds_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_skybox_clouds_scene.png?raw=true "Shader Material Skybox Clouds Scene")
 ![shader_material_skybox_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_skybox_scene.png?raw=true "Shader Material Skybox Scene")
+![shader_material_with_fog_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_with_fog_scene.png?raw=true "Shader Material With Fog Scene")
 ![shader_material_wolfenstein_3d_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_wolfenstein_3d_scene.png?raw=true "Shader Material Wolfenstein 3D Scene")
 ![super_ellipsoid_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/super_ellipsoid_scene.png?raw=true "Super Ellipsoid Scene")
 ![tube_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/tube_scene.png?raw=true "Tube Scene")
