@@ -22,6 +22,7 @@
 ![polygon_mesh_stars_with_holes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_stars_with_holes_scene.png?raw=true "Polygon Mesh Stars With Holes Scene")
 ![polyhedra_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polyhedra_scene.png?raw=true "Polyhedra Scene")
 ![polyhedron_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polyhedron_scene.png?raw=true "Polyhedron Scene")
+![ribbon_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/ribbon_scene.png?raw=true "Ribbon Scene")
 ![rotation_and_scaling_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/rotation_and_scaling_scene.png?raw=true "Rotation And Scaling Scene")
 ![shader_material_box_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_box_scene.png?raw=true "Shader Material Box Scene")
 ![shader_material_boxes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_boxes_scene.png?raw=true "Shader Material Boxes Scene")

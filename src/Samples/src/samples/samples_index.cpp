@@ -39,6 +39,7 @@
 #include <babylon/samples/mesh/polygonmesh/polygon_mesh_stars_scene.h>
 #include <babylon/samples/mesh/polygonmesh/polygon_mesh_stars_with_holes_scene.h>
 #include <babylon/samples/mesh/polyhedron_scene.h>
+#include <babylon/samples/mesh/ribbon_scene.h>
 #include <babylon/samples/mesh/rotation_and_scaling_scene.h>
 #include <babylon/samples/mesh/tiled_ground_scene.h>
 #include <babylon/samples/mesh/tube_scene.h>
@@ -199,6 +200,12 @@ std::unordered_map<std::string, Sample>
          [](ICanvas* iCanvas) {                             //
            return std::make_unique<PumpJackScene>(iCanvas); //
          }};                                                //
+    // Ribbon Scene
+    samples["RibbonScene"]
+      = {true,
+         [](ICanvas* iCanvas) {                           //
+           return std::make_unique<RibbonScene>(iCanvas); //
+         }};                                              //
     // Rotation and Scaling Scene
     samples["RotationAndScalingScene"]
       = {true,
