@@ -821,7 +821,7 @@ _InstancesBatch* Mesh::_getInstancesRenderList(size_t subMeshId)
   return _batchCache.get();
 }
 
-Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, int fillMode,
+Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
                                  _InstancesBatch* batch, Effect* effect,
                                  Engine* engine)
 {
@@ -2465,7 +2465,7 @@ Mesh* Mesh::MergeMeshes(std::vector<Mesh*>& meshes, bool disposeSource,
                         bool allow32BitsIndices, Mesh* meshSubclass,
                         bool subdivideWithSubMeshes)
 {
-  unsigned int index;
+  unsigned int index = 0;
   if (!allow32BitsIndices) {
     size_t totalVertices = 0;
 

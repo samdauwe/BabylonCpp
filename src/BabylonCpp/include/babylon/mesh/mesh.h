@@ -477,7 +477,7 @@ public:
   unregisterAfterRender(const std::function<void(AbstractMesh* mesh)>& func);
 
   _InstancesBatch* _getInstancesRenderList(size_t subMeshId);
-  Mesh& _renderWithInstances(SubMesh* subMesh, int fillMode,
+  Mesh& _renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
                              _InstancesBatch* batch, Effect* effect,
                              Engine* engine);
   Mesh& _processRendering(SubMesh* subMesh, Effect* effect, int fillMode,

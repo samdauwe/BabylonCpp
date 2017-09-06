@@ -191,7 +191,6 @@ void EdgesRenderer::_generateEdgesLines()
   // First let's find adjacencies
   std::vector<FaceAdjacencies> adjacencies;
   std::vector<Vector3> faceNormals;
-  FaceAdjacencies faceAdjacencies;
 
   // Prepare faces
   for (unsigned int index = 0; index < indices.size(); index += 3) {
@@ -199,6 +198,8 @@ void EdgesRenderer::_generateEdgesLines()
     unsigned int p0Index = indices[index + 0];
     unsigned int p1Index = indices[index + 1];
     unsigned int p2Index = indices[index + 2];
+
+    _faceAdjacencies.edges = {0, 0, 0};
 
     _faceAdjacencies.p0
       = Vector3(positions[p0Index * 3 + 0], positions[p0Index * 3 + 1],
@@ -221,7 +222,7 @@ void EdgesRenderer::_generateEdgesLines()
 
   // Scan
   for (unsigned int index = 0; index < adjacencies.size(); ++index) {
-    faceAdjacencies = adjacencies[index];
+    auto& faceAdjacencies = adjacencies[index];
 
     for (unsigned int otherIndex = index + 1; otherIndex < adjacencies.size();
          ++otherIndex) {
@@ -235,9 +236,9 @@ void EdgesRenderer::_generateEdgesLines()
         continue;
       }
 
-      auto otherP0 = indices[otherIndex * 3 + 0];
-      auto otherP1 = indices[otherIndex * 3 + 1];
-      auto otherP2 = indices[otherIndex * 3 + 2];
+      const auto& otherP0 = indices[otherIndex * 3 + 0];
+      const auto& otherP1 = indices[otherIndex * 3 + 1];
+      const auto& otherP2 = indices[otherIndex * 3 + 2];
 
       for (unsigned int edgeIndex = 0; edgeIndex < 3; ++edgeIndex) {
         int otherEdgeIndex = 0;
@@ -348,8 +349,8 @@ void EdgesRenderer::render()
   _lineShader->setColor4("color", _source->edgesColor);
 
   if (scene->activeCamera->mode == Camera::ORTHOGRAPHIC_CAMERA) {
-    _lineShader->setFloat("width", _source->edgesWidth
-                                     / edgesWidthScalerForOrthographic);
+    _lineShader->setFloat(
+      "width", _source->edgesWidth / edgesWidthScalerForOrthographic);
   }
   else {
     _lineShader->setFloat("width",

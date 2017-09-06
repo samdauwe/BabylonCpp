@@ -1720,9 +1720,6 @@ void AbstractMesh::dispose(bool doNotRecurse)
   // Engine
   engine->wipeCaches();
 
-  // Remove from scene
-  getScene()->removeMesh(this);
-
   if (!doNotRecurse) {
     // Particles
     for (size_t index = 0; index < getScene()->particleSystems.size();
@@ -1759,6 +1756,9 @@ void AbstractMesh::dispose(bool doNotRecurse)
   _isDisposed = true;
 
   Node::dispose();
+
+  // Remove from scene
+  getScene()->removeMesh(this);
 }
 
 Vector3 AbstractMesh::getDirection(const Vector3& localAxis)
