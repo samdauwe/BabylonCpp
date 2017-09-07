@@ -32,6 +32,7 @@
 #include <babylon/samples/mesh/extrusion_scene.h>
 #include <babylon/samples/mesh/ico_sphere_scene.h>
 #include <babylon/samples/mesh/lathe_scene.h>
+#include <babylon/samples/mesh/merged_meshes_scene.h>
 #include <babylon/samples/mesh/mesh_normals_scene.h>
 #include <babylon/samples/mesh/polygonmesh/polygon_mesh_bird_scene.h>
 #include <babylon/samples/mesh/polygonmesh/polygon_mesh_monkey_scene.h>
@@ -146,6 +147,12 @@ std::unordered_map<std::string, Sample>
          [](ICanvas* iCanvas) {                                //
            return std::make_unique<MeshNormalsScene>(iCanvas); //
          }};                                                   //
+    // Merged Meshes Scene
+    samples["MergedMeshesScene"]
+      = {true,
+         [](ICanvas* iCanvas) {                                 //
+           return std::make_unique<MergedMeshesScene>(iCanvas); //
+         }};                                                    //
     // Perlin Noise Waves Scene
     samples["PerlinNoiseWavesScene"]
       = {true,

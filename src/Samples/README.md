@@ -14,6 +14,7 @@
 ![lights_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lights_scene.png?raw=true "Lights Scene")
 ![lorenz_attractor_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lorenz_attractor_scene.png?raw=true "Lorenz Attractor Scene")
 ![mandelbrot_fractal_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/mandelbrot_fractal_scene.png?raw=true "Mandelbrot Fractal Scene")
+![merged_meshes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/merged_meshes_scene.png?raw=true "Merged Meshes Scene")
 ![perlin_noise_waves_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/perlin_noise_waves_scene.png?raw=true "Perlin Noise Waves Scene")
 ![polygon_mesh_bird_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_bird_scene.png?raw=true "Polygon Mesh Bird Scene")
 ![polygon_mesh_monkey_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_monkey_scene.png?raw=true "Polygon Mesh Monkey Scene")
