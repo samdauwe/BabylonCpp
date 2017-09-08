@@ -158,6 +158,7 @@ void HighlightLayer::createTextureAndPostProcesses()
   _mainTexture->updateSamplingMode(TextureConstants::BILINEAR_SAMPLINGMODE);
   _mainTexture->renderParticles = false;
   _mainTexture->renderList.clear();
+  _mainTexture->ignoreCameraViewport = true;
 
   _blurTexture = std::make_unique<RenderTargetTexture>(
     "HighlightLayerBlurRTT", ISize{blurTextureWidth, blurTextureHeight}, _scene,
@@ -166,7 +167,8 @@ void HighlightLayer::createTextureAndPostProcesses()
   _blurTexture->wrapV                     = TextureConstants::CLAMP_ADDRESSMODE;
   _blurTexture->anisotropicFilteringLevel = 16;
   _blurTexture->updateSamplingMode(TextureConstants::TRILINEAR_SAMPLINGMODE);
-  _blurTexture->renderParticles = false;
+  _blurTexture->renderParticles      = false;
+  _blurTexture->ignoreCameraViewport = true;
 
   _downSamplePostprocess = std::make_unique<PassPostProcess>(
     "HighlightLayerPPP", _options.blurTextureSizeRatio, nullptr,
@@ -212,7 +214,7 @@ void HighlightLayer::createTextureAndPostProcesses()
     _scene->postProcessManager->directRender(
       {_downSamplePostprocess.get(), _horizontalBlurPostprocess.get(),
        _verticalBlurPostprocess.get()},
-      _blurTexture->getInternalTexture());
+      _blurTexture->getInternalTexture(), true);
 
     onAfterBlurObservable.notifyObservers(this);
   });
@@ -298,9 +300,11 @@ void HighlightLayer::renderSubMesh(SubMesh* subMesh)
     // Alpha test
     if (material && material->needAlphaTesting()) {
       auto alphaTexture = material->getAlphaTestTexture();
-      _glowMapGenerationEffect->setTexture("diffuseSampler", alphaTexture);
-      _glowMapGenerationEffect->setMatrix("diffuseMatrix",
-                                          *alphaTexture->getTextureMatrix());
+      if (alphaTexture) {
+        _glowMapGenerationEffect->setTexture("diffuseSampler", alphaTexture);
+        _glowMapGenerationEffect->setMatrix("diffuseMatrix",
+                                            *alphaTexture->getTextureMatrix());
+      }
     }
 
     // Glow emissive only
@@ -591,10 +595,10 @@ void HighlightLayer::setMainTextureSize()
     _mainTextureDesiredSize.height = _options.mainTextureFixedSize;
   }
   else {
-    _mainTextureDesiredSize.width = static_cast<int>(
-      _engine->getRenderingCanvas()->width * _options.mainTextureRatio);
+    _mainTextureDesiredSize.width
+      = static_cast<int>(_engine->getRenderWidth() * _options.mainTextureRatio);
     _mainTextureDesiredSize.height = static_cast<int>(
-      _engine->getRenderingCanvas()->height * _options.mainTextureRatio);
+      _engine->getRenderHeight() * _options.mainTextureRatio);
 
     _mainTextureDesiredSize.width
       = _engine->needPOTTextures() ?
