@@ -522,8 +522,8 @@ float Scene::getCachedVisibility()
   return _cachedVisibility;
 }
 
-bool Scene::isCachedMaterialValid(Material* material, Effect* effect,
-                                  float visibility)
+bool Scene::isCachedMaterialInvalid(Material* material, Effect* effect,
+                                    float visibility)
 {
   return _cachedEffect != effect || _cachedMaterial != material
          || !stl_util::almost_equal(_cachedVisibility, visibility);

@@ -192,8 +192,8 @@ public:
   Material* getCachedMaterial();
   Effect* getCachedEffect();
   float getCachedVisibility();
-  bool isCachedMaterialValid(Material* material, Effect* effect,
-                             float visibility = 0.f);
+  bool isCachedMaterialInvalid(Material* material, Effect* effect,
+                               float visibility = 1.f);
   BoundingBoxRenderer* getBoundingBoxRenderer();
   OutlineRenderer* getOutlineRenderer();
   Engine* getEngine();

@@ -3,6 +3,7 @@
 #include <babylon/animations/animation.h>
 #include <babylon/animations/animation_range.h>
 #include <babylon/babylon_stl_util.h>
+#include <babylon/behaviors/behavior.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
@@ -86,6 +87,54 @@ Scene* Node::getScene()
 Engine* Node::getEngine()
 {
   return _scene->getEngine();
+}
+
+Node& Node::addBehavior(Behavior<Node>* behavior)
+{
+  auto it = std::find(_behaviors.begin(), _behaviors.end(), behavior);
+
+  if (it != _behaviors.end()) {
+    return *this;
+  }
+
+  behavior->attach(this);
+  _behaviors.emplace_back(behavior);
+
+  return *this;
+}
+
+Node& Node::removeBehavior(Behavior<Node>* behavior)
+{
+  auto it = std::find(_behaviors.begin(), _behaviors.end(), behavior);
+
+  if (it == _behaviors.end()) {
+    return *this;
+  }
+
+  (*it)->detach();
+  _behaviors.erase(it);
+
+  return *this;
+}
+
+std::vector<Behavior<Node>*>& Node::behaviors()
+{
+  return _behaviors;
+}
+
+const std::vector<Behavior<Node>*>& Node::behaviors() const
+{
+  return _behaviors;
+}
+
+Behavior<Node>* Node::getBehaviorByName(const std::string& iName)
+{
+  auto it = std::find_if(_behaviors.begin(), _behaviors.end(),
+                         [&iName](const Behavior<Node>* behavior) {
+                           return behavior->name == iName;
+                         });
+
+  return (it != _behaviors.end() ? *it : nullptr);
 }
 
 Matrix* Node::getWorldMatrix()

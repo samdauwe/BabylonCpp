@@ -33,6 +33,14 @@ public:
   void setOnDispose(const std::function<void()>& callback);
   virtual Scene* getScene();
   Engine* getEngine();
+
+  // Behaviors
+  Node& addBehavior(Behavior<Node>* behavior);
+  Node& removeBehavior(Behavior<Node>* behavior);
+  std::vector<Behavior<Node>*>& behaviors();
+  const std::vector<Behavior<Node>*>& behaviors() const;
+  Behavior<Node>* getBehaviorByName(const std::string& name);
+
   virtual Matrix* getWorldMatrix() override;
   virtual void _initCache();
   virtual void updateCache(bool force = false);
@@ -159,6 +167,9 @@ private:
   std::vector<Node*> _children;
   std::unique_ptr<Matrix> _worldMatrix;
   Observer<Node>::Ptr _onDisposeObserver;
+
+  // Behaviors
+  std::vector<Behavior<Node>*> _behaviors;
 
 }; // end of class Node
 
