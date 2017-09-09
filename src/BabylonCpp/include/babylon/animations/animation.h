@@ -34,6 +34,19 @@ public:
                     const AnimationValue& from, const AnimationValue& to,
                     unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE,
                     IEasingFunction* easingFunction = nullptr);
+
+  /**
+   * @brief Sets up an animation.
+   * @param property the property to animate
+   * @param animationType the animation type to apply
+   * @param easingFunction the easing function used in the animation
+   * @returns The created animation
+   */
+  static Animation* CreateAnimation(const std::string& property,
+                                    int animationType,
+                                    std::size_t framePerSecond,
+                                    IEasingFunction* easingFunction = nullptr);
+
   static Animatable* CreateAndStartAnimation(
     const std::string& name, Node* node, const std::string& targetProperty,
     size_t framePerSecond, int totalFrame, const AnimationValue& from,
@@ -41,6 +54,7 @@ public:
     unsigned int loopMode           = Animation::ANIMATIONLOOPMODE_CYCLE,
     IEasingFunction* easingFunction = nullptr,
     const std::function<void()>& onAnimationEnd = nullptr);
+
   static Animatable* CreateMergeAndStartAnimation(
     const std::string& name, Node* node, const std::string& targetProperty,
     size_t framePerSecond, int totalFrame, const AnimationValue& from,
@@ -48,6 +62,23 @@ public:
     unsigned int loopMode           = Animation::ANIMATIONLOOPMODE_CYCLE,
     IEasingFunction* easingFunction = nullptr,
     const std::function<void()>& onAnimationEnd = nullptr);
+
+  /**
+   * @brief Transition property of the Camera to the target Value.
+   * @param property The property to transition
+   * @param targetValue The target Value of the property
+   * @param host The object where the property to animate belongs
+   * @param scene Scene used to run the animation
+   * @param frameRate Framerate (in frame/s) to use
+   * @param transition The transition type we want to use
+   * @param duration The duration of the animation, in milliseconds
+   * @param onAnimationEnd Call back trigger at the end of the animation.
+   */
+  static Animatable*
+  TransitionTo(const std::string& property, const AnimationValue& targetValue,
+               const AnimationValue& host, Scene* scene, float frameRate,
+               Animation* transition, float duration,
+               const std::function<void()>& onAnimationEnd = nullptr);
 
   Animation(const std::string& name, const std::string& targetProperty,
             size_t framePerSecond, int dataType,

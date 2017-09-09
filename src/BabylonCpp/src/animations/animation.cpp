@@ -46,6 +46,20 @@ Animation* Animation::_PrepareAnimation(const std::string& name,
   return animation;
 }
 
+Animation* Animation::CreateAnimation(const std::string& property,
+                                      int animationType,
+                                      std::size_t framePerSecond,
+                                      IEasingFunction* easingFunction)
+{
+  auto animation
+    = new Animation(property + "Animation", property, framePerSecond,
+                    animationType, Animation::ANIMATIONLOOPMODE_CONSTANT);
+
+  animation->setEasingFunction(easingFunction);
+
+  return animation;
+}
+
 Animatable* Animation::CreateAndStartAnimation(
   const std::string& name, Node* node, const std::string& targetProperty,
   size_t framePerSecond, int totalFrame, const AnimationValue& from,
@@ -76,6 +90,15 @@ Animatable* Animation::CreateMergeAndStartAnimation(
 
   return node->getScene()->beginAnimation(
     node, 0, totalFrame, (animation->loopMode == 1), 1.f, onAnimationEnd);
+}
+
+Animatable* Animation::TransitionTo(
+  const std::string& /*property*/, const AnimationValue& /*targetValue*/,
+  const AnimationValue& /*host*/, Scene* /*scene*/, float /*frameRate*/,
+  Animation* /*transition*/, float /*duration*/,
+  const std::function<void()>& /*onAnimationEnd*/)
+{
+  return nullptr;
 }
 
 Animation::Animation(const std::string& iName,
