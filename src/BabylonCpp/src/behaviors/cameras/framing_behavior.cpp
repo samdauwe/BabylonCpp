@@ -184,7 +184,7 @@ void FramingBehavior::zoomOnMesh(AbstractMesh* mesh, bool focusOnOriginXZ)
 
 void FramingBehavior::zoomOnBoundingInfo(const Vector3& minimumWorld,
                                          const Vector3& maximumWorld,
-                                         bool focusOnOriginXZ = false)
+                                         bool focusOnOriginXZ)
 {
   Vector3 zoomTarget;
 
@@ -206,7 +206,7 @@ void FramingBehavior::zoomOnBoundingInfo(const Vector3& minimumWorld,
   if (!_vectorTransition) {
     _vectorTransition
       = Animation::CreateAnimation("target", Animation::ANIMATIONTYPE_VECTOR3,
-                                   60, FramingBehavior::_EasingFunction);
+                                   60, &FramingBehavior::_EasingFunction);
   }
 
   _betaIsAnimating = true;
@@ -236,7 +236,7 @@ void FramingBehavior::zoomOnBoundingInfo(const Vector3& minimumWorld,
   if (!_radiusTransition) {
     _radiusTransition
       = Animation::CreateAnimation("radius", Animation::ANIMATIONTYPE_FLOAT, 60,
-                                   FramingBehavior::_EasingFunction);
+                                   &FramingBehavior::_EasingFunction);
   }
 
   _animatables.emplace_back(Animation::TransitionTo(
@@ -301,7 +301,7 @@ void FramingBehavior::_maintainCameraAboveGround()
     if (!_betaTransition) {
       _betaTransition
         = Animation::CreateAnimation("beta", Animation::ANIMATIONTYPE_FLOAT, 60,
-                                     FramingBehavior::_EasingFunction);
+                                     &FramingBehavior::_EasingFunction);
     }
 
     _animatables.emplace_back(Animation::TransitionTo(

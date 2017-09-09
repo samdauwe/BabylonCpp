@@ -96,8 +96,8 @@ private:
   float _idleRotationSpinupTime;
 
   // Default behavior functions
-  Observer<PointerInfoPre> _onPrePointerObservableObserver;
-  Observer<Camera> _onAfterCheckInputsObserver;
+  Observer<PointerInfoPre>::Ptr _onPrePointerObservableObserver;
+  Observer<Camera>::Ptr _onAfterCheckInputsObserver;
   ArcRotateCamera* _attachedCamera;
   bool _isPointerDown = false;
   Nullable<high_res_time_point_t> _lastFrameTime;

@@ -7,7 +7,7 @@ namespace BABYLON {
 
 template <class TNode>
 struct BABYLON_SHARED_EXPORT Behavior {
-  std::string node;
+  std::string name;
 
   virtual void attach(TNode* node) = 0;
   virtual void detach()            = 0;

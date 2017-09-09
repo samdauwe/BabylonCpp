@@ -103,8 +103,8 @@ private:
 
   // Connection
   ArcRotateCamera* _attachedCamera;
-  Observer<Camera> _onAfterCheckInputsObserver;
-  Observer<AbstractMesh> _onMeshTargetChangedObserver;
+  Observer<Camera>::Ptr _onAfterCheckInputsObserver;
+  Observer<AbstractMesh>::Ptr _onMeshTargetChangedObserver;
 
   // Animations
   bool _radiusIsAnimating;

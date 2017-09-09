@@ -79,10 +79,10 @@ void AutoRotationBehavior::attach(ArcRotateCamera* camera)
   auto scene      = _attachedCamera->getScene();
 
   _onPrePointerObservableObserver
-    = scene.onPrePointerObservable.add([this](PointerInfoPre* pointerInfoPre) {
+    = scene->onPrePointerObservable.add([this](PointerInfoPre* pointerInfoPre) {
         if (pointerInfoPre->type == PointerEventTypes::POINTERDOWN) {
           _isPointerDown = true;
-          return
+          return;
         }
 
         if (pointerInfoPre->type == PointerEventTypes::POINTERUP) {
@@ -119,7 +119,7 @@ void AutoRotationBehavior::detach()
 {
   auto scene = _attachedCamera->getScene();
 
-  scene.onPrePointerObservable.remove(_onPrePointerObservableObserver);
+  scene->onPrePointerObservable.remove(_onPrePointerObservableObserver);
   _attachedCamera->onAfterCheckInputsObservable.remove(
     _onAfterCheckInputsObserver);
   _attachedCamera = nullptr;
