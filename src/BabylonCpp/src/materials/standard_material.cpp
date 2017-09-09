@@ -810,9 +810,11 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   // Matrices
   bindOnlyWorldMatrix(*world);
 
+  const auto mustRebind = _mustRebind(scene, effect, mesh->visibility);
+
   // Bones
   MaterialHelper::BindBonesParameters(mesh, effect);
-  if (_mustRebind(scene, effect, mesh->visibility)) {
+  if (mustRebind) {
     _uniformBuffer->bindToEffect(effect, "Material");
 
     bindViewProjection(effect);
@@ -1048,7 +1050,7 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     effect->setColor3("vAmbientColor", _globalAmbientColor);
   }
 
-  if (_mustRebind(scene, effect) || !isFrozen()) {
+  if (mustRebind || !isFrozen()) {
     // Lights
     if (scene->lightsEnabled() && !_disableLighting) {
       MaterialHelper::BindLights(scene, mesh, effect, defines,

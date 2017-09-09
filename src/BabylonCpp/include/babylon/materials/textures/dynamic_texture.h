@@ -24,7 +24,7 @@ public:
   ~DynamicTexture();
 
   bool canRescale();
-  void scale(float ratio);
+  void scale(float ratio) override;
   void scaleTo(int width, int height);
   ICanvasRenderingContext2D* getContext();
   void clear();
@@ -33,6 +33,7 @@ public:
                 const std::string& color, const std::string& clearColor,
                 bool invertY = true, bool update = true);
   std::unique_ptr<DynamicTexture> clone() const;
+  void _rebuild() override;
 
 private:
   void _recreate(const ISize& textureSize);

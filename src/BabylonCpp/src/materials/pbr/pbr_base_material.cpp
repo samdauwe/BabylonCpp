@@ -410,6 +410,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
             return false;
           }
 
+          defines.defines[PMD::METALLICWORKFLOW] = false;
           MaterialHelper::PrepareDefinesForMergedUV(
             _reflectivityTexture, defines, PMD::REFLECTIVITY, "REFLECTIVITY",
             PMD::MAINUV1, PMD::MAINUV2);
@@ -419,7 +420,8 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
             = _useAutoMicroSurfaceFromReflectivityMap;
         }
         else {
-          defines.defines[PMD::REFLECTIVITY] = false;
+          defines.defines[PMD::METALLICWORKFLOW] = false;
+          defines.defines[PMD::REFLECTIVITY]     = false;
         }
 
         if (_microSurfaceTexture) {
@@ -829,10 +831,12 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   // Matrices
   bindOnlyWorldMatrix(*world);
 
+  const auto mustRebind = _mustRebind(scene, effect, mesh->visibility);
+
   // Bones
   MaterialHelper::BindBonesParameters(mesh, effect);
 
-  if (_mustRebind(scene, effect, mesh->visibility)) {
+  if (mustRebind) {
     _uniformBuffer->bindToEffect(effect, "Material");
 
     bindViewProjection(effect);
@@ -997,7 +1001,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
       }
 
       // Colors
-      if (defines.METALLICWORKFLOW) {
+      if (defines.defines[PMD::METALLICWORKFLOW]) {
         PBRMaterial::_scaledReflectivity.r
           = (_metallic == 0.f || _metallic == 0.f) ? 1 : _metallic;
         PBRMaterial::_scaledReflectivity.g
@@ -1127,7 +1131,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     effect->setColor3("vAmbientColor", _globalAmbientColor);
   }
 
-  if (_mustRebind(scene, effect) || !isFrozen()) {
+  if (mustRebind || !isFrozen()) {
     // Lights
     if (scene->lightsEnabled() && !_disableLighting) {
       MaterialHelper::BindLights(scene, mesh, _activeEffect, defines,

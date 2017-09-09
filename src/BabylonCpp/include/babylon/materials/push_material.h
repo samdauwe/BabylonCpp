@@ -36,7 +36,7 @@ protected:
   PushMaterial(const std::string& name, Scene* scene);
 
   void _afterBind(Mesh* mesh, Effect* effect);
-  bool _mustRebind(Scene* scene, Effect* effect, float visibility = 0.f);
+  bool _mustRebind(Scene* scene, Effect* effect, float visibility = 1.f);
 
 protected:
   Effect* _activeEffect;

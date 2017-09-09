@@ -153,4 +153,9 @@ std::unique_ptr<DynamicTexture> DynamicTexture::clone() const
   return newTexture;
 }
 
+void DynamicTexture::_rebuild()
+{
+  update();
+}
+
 } // end of namespace BABYLON

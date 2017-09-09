@@ -67,7 +67,7 @@ void PushMaterial::_afterBind(Mesh* mesh, Effect* effect)
 
 bool PushMaterial::_mustRebind(Scene* scene, Effect* effect, float visibility)
 {
-  return scene->isCachedMaterialValid(this, effect, visibility);
+  return scene->isCachedMaterialInvalid(this, effect, visibility);
 }
 
 } // end of namespace BABYLON
