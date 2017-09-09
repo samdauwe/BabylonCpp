@@ -153,6 +153,7 @@ public:
   /** Observables **/
   Observable<Camera> onViewMatrixChangedObservable;
   Observable<Camera> onProjectionMatrixChangedObservable;
+  Observable<Camera> onAfterCheckInputsObservable;
 
   /** Cache **/
   Matrix _projectionMatrix;

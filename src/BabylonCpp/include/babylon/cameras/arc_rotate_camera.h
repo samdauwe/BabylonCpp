@@ -95,6 +95,8 @@ public:
   std::function<void()> _reset;
   // Panning
   std::unique_ptr<Vector3> panningAxis;
+  // Behaviors
+  Observable<AbstractMesh> onMeshTargetChangedObservable;
   // Collisions
   std::function<void(AbstractMesh* collidedMesh)> onCollide;
   bool checkCollisions;
