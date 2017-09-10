@@ -92,6 +92,9 @@ class ArcRotateCameraPointersInput;
 class FreeCameraKeyboardMoveInput;
 class FreeCameraMouseInput;
 // - VR
+struct DevicePose;
+struct PoseControlled;
+class VRCameraMetrics;
 struct VRFov;
 // --- Collisions ---
 struct BabylonMessage;
@@ -154,7 +157,25 @@ class PointerInfoBase;
 class PointerInfoPre;
 struct RenderingGroupInfo;
 class Scene;
+// --- Gamepad ---
+class Gamepad;
+struct GamepadButtonChanges;
+class GamepadManager;
+struct GamepadPose;
+class GenericPad;
+struct StickValues;
+class Xbox360Pad;
+// - Controllers
+class ExtendedGamepadButton;
+class GenericController;
+class MutableGamepadButton;
+class OculusTouchController;
+class PoseEnabledController;
+struct PoseEnabledControllerHelper;
+class ViveController;
+class WebVRController;
 // --- Interfaces ---
+class IBrowserGamepad;
 class ICanvas;
 class ICanvasRenderingContext2D;
 class IDisposable;
