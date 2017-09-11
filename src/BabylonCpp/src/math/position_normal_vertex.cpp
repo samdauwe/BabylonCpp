@@ -19,7 +19,7 @@ PositionNormalVertex::PositionNormalVertex(const PositionNormalVertex& other)
 }
 
 PositionNormalVertex::PositionNormalVertex(PositionNormalVertex&& other)
-    : position{std::move(other.position)}, normal{std::move(other.normal)}
+    : position{::std::move(other.position)}, normal{::std::move(other.normal)}
 {
 }
 
@@ -38,8 +38,8 @@ PositionNormalVertex& PositionNormalVertex::
 operator=(PositionNormalVertex&& other)
 {
   if (&other != this) {
-    position = std::move(other.position);
-    normal   = std::move(other.normal);
+    position = ::std::move(other.position);
+    normal   = ::std::move(other.normal);
   }
 
   return *this;
@@ -56,7 +56,7 @@ PositionNormalVertex PositionNormalVertex::copy() const
 
 std::unique_ptr<PositionNormalVertex> PositionNormalVertex::clone() const
 {
-  return std::make_unique<PositionNormalVertex>(*this);
+  return ::std::make_unique<PositionNormalVertex>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os,

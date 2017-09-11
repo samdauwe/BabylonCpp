@@ -26,9 +26,9 @@ Vector3::Vector3(const Vector3& otherVector)
 }
 
 Vector3::Vector3(Vector3&& otherVector)
-    : x{std::move(otherVector.x)}
-    , y{std::move(otherVector.y)}
-    , z{std::move(otherVector.z)}
+    : x{::std::move(otherVector.x)}
+    , y{::std::move(otherVector.y)}
+    , z{::std::move(otherVector.z)}
 {
 }
 
@@ -50,9 +50,9 @@ Vector3& Vector3::operator=(const Vector3& otherVector)
 Vector3& Vector3::operator=(Vector3&& otherVector)
 {
   if (&otherVector != this) {
-    x = std::move(otherVector.x);
-    y = std::move(otherVector.y);
-    z = std::move(otherVector.z);
+    x = ::std::move(otherVector.x);
+    y = ::std::move(otherVector.y);
+    z = ::std::move(otherVector.z);
   }
 
   return *this;
@@ -65,7 +65,7 @@ Vector3 Vector3::copy() const
 
 std::unique_ptr<Vector3> Vector3::clone() const
 {
-  return std::make_unique<Vector3>(*this);
+  return ::std::make_unique<Vector3>(*this);
 }
 
 std::string Vector3::toString() const
@@ -106,12 +106,12 @@ Quaternion Vector3::toQuaternion() const
 {
   Quaternion result(0.f, 0.f, 0.f, 1.f);
 
-  const float cosxPlusz  = std::cos((x + z) * 0.5f);
-  const float sinxPlusz  = std::sin((x + z) * 0.5f);
-  const float coszMinusx = std::cos((z - x) * 0.5f);
-  const float sinzMinusx = std::sin((z - x) * 0.5f);
-  const float cosy       = std::cos(y * 0.5f);
-  const float siny       = std::sin(y * 0.5f);
+  const float cosxPlusz  = ::std::cos((x + z) * 0.5f);
+  const float sinxPlusz  = ::std::sin((x + z) * 0.5f);
+  const float coszMinusx = ::std::cos((z - x) * 0.5f);
+  const float sinzMinusx = ::std::sin((z - x) * 0.5f);
+  const float cosy       = ::std::cos(y * 0.5f);
+  const float siny       = ::std::sin(y * 0.5f);
 
   result.x = coszMinusx * siny;
   result.y = -sinzMinusx * siny;
@@ -419,7 +419,7 @@ const float& Vector3::operator[](const unsigned int index) const
 /** Properties **/
 float Vector3::length() const
 {
-  return std::sqrt(x * x + y * y + z * z);
+  return ::std::sqrt(x * x + y * y + z * z);
 }
 
 float Vector3::lengthSquared() const
@@ -846,7 +846,7 @@ Vector3 Vector3::Maximize(const Vector3& left, const Vector3& right)
 
 float Vector3::Distance(const Vector3& value1, const Vector3& value2)
 {
-  return std::sqrt(Vector3::DistanceSquared(value1, value2));
+  return ::std::sqrt(Vector3::DistanceSquared(value1, value2));
 }
 
 float Vector3::DistanceSquared(const Vector3& value1, const Vector3& value2)

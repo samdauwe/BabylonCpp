@@ -16,9 +16,9 @@ PositionNormalTextureVertex::PositionNormalTextureVertex(
 
 PositionNormalTextureVertex::PositionNormalTextureVertex(
   PositionNormalTextureVertex&& other)
-    : position{std::move(other.position)}
-    , normal{std::move(other.normal)}
-    , uv{std::move(other.uv)}
+    : position{::std::move(other.position)}
+    , normal{::std::move(other.normal)}
+    , uv{::std::move(other.uv)}
 {
 }
 
@@ -38,9 +38,9 @@ PositionNormalTextureVertex& PositionNormalTextureVertex::
 operator=(PositionNormalTextureVertex&& other)
 {
   if (&other != this) {
-    position = std::move(other.position);
-    normal   = std::move(other.normal);
-    uv       = std::move(other.uv);
+    position = ::std::move(other.position);
+    normal   = ::std::move(other.normal);
+    uv       = ::std::move(other.uv);
   }
 
   return *this;
@@ -58,7 +58,7 @@ PositionNormalTextureVertex PositionNormalTextureVertex::copy() const
 std::unique_ptr<PositionNormalTextureVertex>
 PositionNormalTextureVertex::clone() const
 {
-  return std::make_unique<PositionNormalTextureVertex>(*this);
+  return ::std::make_unique<PositionNormalTextureVertex>(*this);
 }
 
 std::ostream&

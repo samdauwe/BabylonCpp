@@ -1,12 +1,12 @@
 #ifndef BABYLON_CORE_FAST_FUNC_H
 #define BABYLON_CORE_FAST_FUNC_H
 
-#include <cstring>
-#include <type_traits>
 #include <cassert>
 #include <cstddef>
+#include <cstring>
 #include <memory>
 #include <new>
+#include <type_traits>
 #include <utility>
 
 /**
@@ -25,12 +25,12 @@ namespace Internal {
 class __single_inheritance AnyClass;
 class AnyClass {
 };
-using AnyPtrThis           = AnyClass*;
-using AnyPtrFunc           = void (AnyClass::*)();
+using AnyPtrThis = AnyClass*;
+using AnyPtrFunc = void (AnyClass::*)();
 template <typename TReturn = void, typename... TArgs>
-using AnyPtrFuncT          = TReturn (AnyClass::*)(TArgs...);
+using AnyPtrFuncT = TReturn (AnyClass::*)(TArgs...);
 template <typename TReturn = void, typename... TArgs>
-using AnyPtrStaticFuncT    = TReturn (*)(TArgs...);
+using AnyPtrStaticFuncT = TReturn (*)(TArgs...);
 
 constexpr std::size_t SingleMemFuncPtrSize{sizeof(void (AnyClass::*)())};
 
@@ -223,7 +223,7 @@ public:
     ptrThis = horrible_cast<AnyPtrThis>(mFunc);
   }
 
-  inline bool operator==(std::nullptr_t) const noexcept
+  inline bool operator==(::std::nullptr_t) const noexcept
   {
     return ptrThis == nullptr && ptrFunction == nullptr;
   }
@@ -237,7 +237,7 @@ public:
              *this == nullptr :
              mPtr == reinterpret_cast<PtrStaticFuncT>(getStaticFunc());
   }
-  inline bool operator!=(std::nullptr_t) const noexcept
+  inline bool operator!=(::std::nullptr_t) const noexcept
   {
     return !operator==(nullptr);
   }
@@ -306,7 +306,7 @@ protected:
 
 public:
   inline FastFuncImpl() noexcept = default;
-  inline FastFuncImpl(std::nullptr_t) noexcept
+  inline FastFuncImpl(::std::nullptr_t) noexcept
   {
   }
   inline FastFuncImpl(PtrStaticFuncT mFunc) noexcept
@@ -329,7 +329,7 @@ public:
       std::forward<TArgs>(mArgs)...);
   }
 
-  inline bool operator==(std::nullptr_t) const noexcept
+  inline bool operator==(::std::nullptr_t) const noexcept
   {
     return closure == nullptr;
   }
@@ -341,7 +341,7 @@ public:
   {
     return closure == mFuncPtr;
   }
-  inline bool operator!=(std::nullptr_t) const noexcept
+  inline bool operator!=(::std::nullptr_t) const noexcept
   {
     return !operator==(nullptr);
   }
@@ -362,7 +362,7 @@ public:
     return !operator<(mImpl);
   }
 };
-}
+} // namespace Internal
 
 template <typename T>
 struct MemFuncToFunc;
@@ -372,22 +372,24 @@ struct MemFuncToFunc<TReturn (TThis::*)(TArgs...) const> {
 };
 
 #define ENABLE_IF_CONV_TO_FUN_PTR(x)                                           \
-  typename std::enable_if<std::is_constructible<                               \
-    typename MemFuncToFunc<decltype(&std::decay<x>::type::operator())>::Type,  \
-    x>::value>::type* = nullptr
+  typename ::std::enable_if<                                                   \
+    ::std::is_constructible<typename MemFuncToFunc<decltype(                   \
+                              &::std::decay<x>::type::operator())>::Type,      \
+                            x>::value>::type* = nullptr
 #define ENABLE_IF_NOT_CONV_TO_FUN_PTR(x)                                       \
-  typename std::enable_if<!std::is_constructible<                              \
-    typename MemFuncToFunc<decltype(&std::decay<x>::type::operator())>::Type,  \
-    x>::value>::type* = nullptr
+  typename ::std::enable_if<                                                   \
+    !::std::is_constructible<typename MemFuncToFunc<decltype(                  \
+                               &::std::decay<x>::type::operator())>::Type,     \
+                             x>::value>::type* = nullptr
 #define ENABLE_IF_SAME_TYPE(x, y)                                              \
-  typename = typename std::                                                    \
-    enable_if<!std::is_same<x, typename std::decay<y>::type>{}>::type
+  typename = typename ::std::enable_if<                                        \
+    !::std::is_same<x, typename ::std::decay<y>::type>{}>::type
 
 template <typename T>
 class FastFunc;
 template <typename TReturn, typename... TArgs>
 class FastFunc<TReturn(TArgs...)>
-  : public Internal::FastFuncImpl<TReturn, TArgs...> {
+    : public Internal::FastFuncImpl<TReturn, TArgs...> {
 private:
   using BaseType = Internal::FastFuncImpl<TReturn, TArgs...>;
   std::shared_ptr<void> storage;
@@ -400,7 +402,7 @@ private:
 
 public:
   //        using BaseType::BaseType;
-  inline FastFunc(std::nullptr_t) noexcept
+  inline FastFunc(::std::nullptr_t) noexcept
   {
   }
   inline FastFunc(PtrStaticFuncT mFunc) noexcept : BaseType(mFunc)
@@ -416,7 +418,7 @@ public:
   template <typename TFunc, ENABLE_IF_SAME_TYPE(FastFunc, TFunc)>
   inline FastFunc(TFunc&& mFunc, ENABLE_IF_CONV_TO_FUN_PTR(TFunc))
   {
-    using FuncType = typename std::decay<TFunc>::type;
+    using FuncType = typename ::std::decay<TFunc>::type;
     this->bind(&mFunc, &FuncType::operator());
   }
   template <typename TFunc, ENABLE_IF_SAME_TYPE(FastFunc, TFunc)>
@@ -433,19 +435,19 @@ public:
 #undef ENABLE_IF_CONV_TO_FUN_PTR
 #undef ENABLE_IF_NOT_CONV_TO_FUN_PTR
 #undef ENABLE_IF_SAME_TYPE
-}
+} // namespace BABYLON
 
 #else
 
 namespace BABYLON {
 namespace Internal {
 class AnyClass;
-using AnyPtrThis           = AnyClass*;
-using AnyPtrFunc           = void (AnyClass::*)();
+using AnyPtrThis = AnyClass*;
+using AnyPtrFunc = void (AnyClass::*)();
 template <typename TReturn = void, typename... TArgs>
-using AnyPtrFuncT          = TReturn (AnyClass::*)(TArgs...);
+using AnyPtrFuncT = TReturn (AnyClass::*)(TArgs...);
 template <typename TReturn = void, typename... TArgs>
-using AnyPtrStaticFuncT    = TReturn (*)(TArgs...);
+using AnyPtrStaticFuncT = TReturn (*)(TArgs...);
 
 constexpr std::size_t SingleMemFuncPtrSize{sizeof(void (AnyClass::*)())};
 
@@ -518,7 +520,7 @@ public:
     ptrThis = horrible_cast<AnyPtrThis>(mFunc);
   }
 
-  inline bool operator==(std::nullptr_t) const noexcept
+  inline bool operator==(::std::nullptr_t) const noexcept
   {
     return ptrThis == nullptr && ptrFunction == nullptr;
   }
@@ -532,7 +534,7 @@ public:
              *this == nullptr :
              mPtr == reinterpret_cast<PtrStaticFuncT>(getStaticFunc());
   }
-  inline bool operator!=(std::nullptr_t) const noexcept
+  inline bool operator!=(::std::nullptr_t) const noexcept
   {
     return !operator==(nullptr);
   }
@@ -599,7 +601,7 @@ protected:
 
 public:
   inline FastFuncImpl() noexcept = default;
-  inline FastFuncImpl(std::nullptr_t) noexcept
+  inline FastFuncImpl(::std::nullptr_t) noexcept
   {
   }
   inline FastFuncImpl(PtrStaticFuncT mFunc) noexcept
@@ -622,7 +624,7 @@ public:
       std::forward<TArgs>(mArgs)...);
   }
 
-  inline bool operator==(std::nullptr_t) const noexcept
+  inline bool operator==(::std::nullptr_t) const noexcept
   {
     return closure == nullptr;
   }
@@ -634,7 +636,7 @@ public:
   {
     return closure == mFuncPtr;
   }
-  inline bool operator!=(std::nullptr_t) const noexcept
+  inline bool operator!=(::std::nullptr_t) const noexcept
   {
     return !operator==(nullptr);
   }
@@ -655,7 +657,7 @@ public:
     return !operator<(mImpl);
   }
 };
-}
+} // namespace Internal
 
 template <typename T>
 struct MemFuncToFunc;
@@ -673,14 +675,14 @@ struct MemFuncToFunc<TReturn (TThis::*)(TArgs...) const> {
     typename MemFuncToFunc<decltype(&std::decay<x>::type::operator())>::Type,  \
     x>::value>::type* = nullptr
 #define ENABLE_IF_SAME_TYPE(x, y)                                              \
-  typename = typename std::                                                    \
-    enable_if<!std::is_same<x, typename std::decay<y>::type>{}>::type
+  typename = typename std::enable_if<                                          \
+    !std::is_same<x, typename std::decay<y>::type>{}>::type
 
 template <typename T>
 class FastFunc;
 template <typename TReturn, typename... TArgs>
 class FastFunc<TReturn(TArgs...)>
-  : public Internal::FastFuncImpl<TReturn, TArgs...> {
+    : public Internal::FastFuncImpl<TReturn, TArgs...> {
 private:
   using BaseType = Internal::FastFuncImpl<TReturn, TArgs...>;
   std::shared_ptr<void> storage;
@@ -716,7 +718,7 @@ public:
 #undef ENABLE_IF_CONV_TO_FUN_PTR
 #undef ENABLE_IF_NOT_CONV_TO_FUN_PTR
 #undef ENABLE_IF_SAME_TYPE
-}
+} // namespace BABYLON
 
 #endif
 

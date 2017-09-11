@@ -16,7 +16,7 @@ inline high_res_time_point_t highresTimepointNow()
   return std::chrono::high_resolution_clock::now();
 }
 
-inline tm localtime(const std::time_t& time)
+inline tm localtime(const ::std::time_t& time)
 {
   struct tm tm_snapshot;
 #if (defined(WIN32) || defined(_WIN32)                                         \
@@ -31,15 +31,15 @@ inline tm localtime(const std::time_t& time)
 inline system_time_point_t makeTimePoint(int year, int mon, int day, int hour,
                                          int min, int sec)
 {
-  struct std::tm t;
-  t.tm_sec       = sec;  // second of minute (0 .. 59 and 60 for leap seconds)
-  t.tm_min       = min;  // minute of hour (0 .. 59)
-  t.tm_hour      = hour; // hour of day (0 .. 23)
-  t.tm_mday      = day;  // day of month (0 .. 31)
-  t.tm_mon       = mon - 1;     // month of year (0 .. 11)
-  t.tm_year      = year - 1900; // year since 1900
-  t.tm_isdst     = -1;          // determine whether daylight saving time
-  std::time_t tt = std::mktime(&t);
+  struct ::std::tm t;
+  t.tm_sec         = sec;  // second of minute (0 .. 59 and 60 for leap seconds)
+  t.tm_min         = min;  // minute of hour (0 .. 59)
+  t.tm_hour        = hour; // hour of day (0 .. 23)
+  t.tm_mday        = day;  // day of month (0 .. 31)
+  t.tm_mon         = mon - 1;     // month of year (0 .. 11)
+  t.tm_year        = year - 1900; // year since 1900
+  t.tm_isdst       = -1;          // determine whether daylight saving time
+  ::std::time_t tt = ::std::mktime(&t);
   if (tt == -1) {
     // No valid system time
     return system_time_point_t();
@@ -107,20 +107,20 @@ inline T fpMillisecondsDuration(const microsecond_t& d)
  *
  * @return a string representing the timestamp in UTC
  */
-inline std::string toIso8601(std::time_t timestamp,
+inline std::string toIso8601(::std::time_t timestamp,
                              const bool& include_timezone = false)
 {
-  std::tm exploded_time(*std::gmtime(&timestamp));
+  ::std::tm exploded_time(*::std::gmtime(&timestamp));
   std::string ret;
 
   if (include_timezone) {
     char buf[sizeof("1970-01-01T00:00:00Z")];
-    std::strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%SZ", &exploded_time);
+    ::std::strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%SZ", &exploded_time);
     ret = buf;
   }
   else {
     char buf[sizeof("1970-01-01T00:00:00")];
-    std::strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%S", &exploded_time);
+    ::std::strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%S", &exploded_time);
     ret = buf;
   }
 
@@ -129,19 +129,19 @@ inline std::string toIso8601(std::time_t timestamp,
 
 inline std::string toIso8601Ms(const system_time_point_t& system_time_point)
 {
-  std::time_t timestamp
+  ::std::time_t timestamp
     = std::chrono::system_clock::to_time_t(system_time_point);
-  auto ms = std::chrono::duration_cast<milliseconds_t>(
+  auto ms = ::std::chrono::duration_cast<milliseconds_t>(
               system_time_point.time_since_epoch())
               .count();
   std::size_t _ms = static_cast<std::size_t>(ms % 1000);
   // Format timestamp to 'YYYY-MM-DD HH:MM:SS'
-  std::tm* ptm = std::localtime(&timestamp);
+  ::std::tm* ptm = ::std::localtime(&timestamp);
   char buffer[32];
-  std::strftime(buffer, 32, "%Y-%m-%d %H:%M:%S", ptm);
+  ::std::strftime(buffer, 32, "%Y-%m-%d %H:%M:%S", ptm);
   // Append microseonds
   std::ostringstream oss;
-  oss << buffer << "." << std::setfill('0') << std::setw(3) << _ms;
+  oss << buffer << "." << ::std::setfill('0') << ::std::setw(3) << _ms;
   return oss.str();
 }
 
@@ -150,15 +150,15 @@ inline std::string toIso8601Ms(const system_time_point_t& system_time_point)
  *
  * @return the UTC time stamp
  */
-inline std::time_t utcTime()
+inline ::std::time_t utcTime()
 {
-  std::time_t now = std::time(NULL);
+  ::std::time_t now = ::std::time(NULL);
 
-  std::tm tm_local(*std::localtime(&now));
-  std::time_t t_local = std::mktime(&tm_local);
+  ::std::tm tm_local(*::std::localtime(&now));
+  ::std::time_t t_local = ::std::mktime(&tm_local);
 
-  std::tm tm_utc(*std::gmtime(&t_local));
-  std::time_t t_utc = std::mktime(&tm_utc);
+  ::std::tm tm_utc(*::std::gmtime(&t_local));
+  ::std::time_t t_utc = ::std::mktime(&tm_utc);
 
   return now - (t_utc - t_local);
 }

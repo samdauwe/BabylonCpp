@@ -15,18 +15,18 @@ inline T randomNumber(T min, T max)
     return min;
   }
 
-  std::random_device rd;
-  std::mt19937 gen(static_cast<int>(rd()));
-  std::uniform_real_distribution<T> dis(min, max);
+  ::std::random_device rd;
+  ::std::mt19937 gen(static_cast<int>(rd()));
+  ::std::uniform_real_distribution<T> dis(min, max);
   return dis(gen);
 }
 
 template <typename T>
 inline std::vector<T> randomList(T min, T max, size_t nbrOfElements = 1)
 {
-  std::random_device rd;
-  std::mt19937 gen(static_cast<int>(rd()));
-  std::uniform_real_distribution<T> dis(min, max);
+  ::std::random_device rd;
+  ::std::mt19937 gen(static_cast<int>(rd()));
+  ::std::uniform_real_distribution<T> dis(min, max);
   std::vector<T> result;
   const size_t cnt = (nbrOfElements < 1) ? 1 : nbrOfElements;
   for (size_t n = 0; n < cnt; ++n) {

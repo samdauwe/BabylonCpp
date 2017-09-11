@@ -33,8 +33,8 @@ Size& Size::operator=(const Size& otherSize)
 Size& Size::operator=(Size&& otherSize)
 {
   if (&otherSize != this) {
-    width  = std::move(otherSize.width);
-    height = std::move(otherSize.height);
+    width  = ::std::move(otherSize.width);
+    height = ::std::move(otherSize.height);
   }
 
   return *this;
@@ -47,7 +47,7 @@ Size Size::copy() const
 
 std::unique_ptr<Size> Size::clone() const
 {
-  return std::make_unique<Size>(*this);
+  return ::std::make_unique<Size>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Size& size)

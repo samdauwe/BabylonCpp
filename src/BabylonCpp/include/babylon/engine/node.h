@@ -30,7 +30,7 @@ public:
   void setParent(Node* parent);
   virtual const char* getClassName() const;
   Node* parent() const override;
-  void setOnDispose(const std::function<void()>& callback);
+  void setOnDispose(const ::std::function<void()>& callback);
   virtual Scene* getScene();
   Engine* getEngine();
 
@@ -92,11 +92,11 @@ public:
    */
   void _getDescendants(std::vector<Node*>& results,
                        bool directDescendantsOnly = false,
-                       const std::function<bool(Node* node)>& predicate
+                       const ::std::function<bool(Node* node)>& predicate
                        = nullptr);
   void _getDescendants(std::vector<AbstractMesh*>& results,
                        bool directDescendantsOnly = false,
-                       const std::function<bool(Node* node)>& predicate
+                       const ::std::function<bool(Node* node)>& predicate
                        = nullptr);
   /**
    * Will return all nodes that have this node as ascendant.
@@ -110,15 +110,15 @@ public:
    * @return {BABYLON.Node[]} all children nodes of all types.
    */
   std::vector<Node*>
-  getDescendants(bool directDescendantsOnly                       = false,
-                 const std::function<bool(Node* node)>& predicate = nullptr);
+  getDescendants(bool directDescendantsOnly                         = false,
+                 const ::std::function<bool(Node* node)>& predicate = nullptr);
 
   /**
    * Get all child-meshes of this node.
    */
   virtual std::vector<AbstractMesh*>
   getChildMeshes(bool directDecendantsOnly,
-                 const std::function<bool(Node* node)>& predicate);
+                 const ::std::function<bool(Node* node)>& predicate);
   void _setReady(bool state);
   virtual std::vector<Animation*> getAnimations() override;
   Animation* getAnimationByName(const std::string& name);
@@ -126,8 +126,8 @@ public:
   void deleteAnimationRange(const std::string& name, bool deleteFrames = true);
   AnimationRange* getAnimationRange(const std::string& name);
   Animatable* beginAnimation(const std::string& name, bool loop = false,
-                             float speedRatio                     = 1.f,
-                             std::function<void()> onAnimationEnd = nullptr);
+                             float speedRatio                       = 1.f,
+                             ::std::function<void()> onAnimationEnd = nullptr);
   std::vector<AnimationRange> serializeAnimationRanges();
   virtual void dispose(bool doNotRecurse = false) override;
   static void ParseAnimationRanges(Node* node, const Json::value& parsedNode,
@@ -144,7 +144,7 @@ public:
 
   std::vector<Animation*> animations;
 
-  std::function<void(Node* node)> onReady;
+  ::std::function<void(Node* node)> onReady;
 
   int _currentRenderId;
   std::string parentId;

@@ -18,9 +18,9 @@ Color3::Color3(const Color3& otherColor)
 }
 
 Color3::Color3(Color3&& otherColor)
-    : r{std::move(otherColor.r)}
-    , g{std::move(otherColor.g)}
-    , b{std::move(otherColor.b)}
+    : r{::std::move(otherColor.r)}
+    , g{::std::move(otherColor.g)}
+    , b{::std::move(otherColor.b)}
 {
 }
 
@@ -38,9 +38,9 @@ Color3& Color3::operator=(const Color3& otherColor)
 Color3& Color3::operator=(Color3&& otherColor)
 {
   if (&otherColor != this) {
-    r = std::move(otherColor.r);
-    g = std::move(otherColor.g);
-    b = std::move(otherColor.b);
+    r = ::std::move(otherColor.r);
+    g = ::std::move(otherColor.g);
+    b = ::std::move(otherColor.b);
   }
 
   return *this;
@@ -57,7 +57,7 @@ Color3 Color3::copy() const
 
 std::unique_ptr<Color3> Color3::clone() const
 {
-  return std::make_unique<Color3>(*this);
+  return ::std::make_unique<Color3>(*this);
 }
 
 std::string Color3::toString() const
@@ -76,8 +76,8 @@ const char* Color3::getClassName() const
 int Color3::getHashCode() const
 {
   float hash = r;
-  hash       = std::pow((hash * 397), g);
-  hash       = std::pow((hash * 397), b);
+  hash       = ::std::pow((hash * 397), g);
+  hash       = ::std::pow((hash * 397), b);
   return static_cast<int>(hash);
 }
 
@@ -225,9 +225,9 @@ Color3 Color3::toLinearSpace()
 
 Color3& Color3::toLinearSpaceToRef(Color3& convertedColor)
 {
-  convertedColor.r = std::pow(r, Math::ToLinearSpace);
-  convertedColor.g = std::pow(g, Math::ToLinearSpace);
-  convertedColor.b = std::pow(b, Math::ToLinearSpace);
+  convertedColor.r = ::std::pow(r, Math::ToLinearSpace);
+  convertedColor.g = ::std::pow(g, Math::ToLinearSpace);
+  convertedColor.b = ::std::pow(b, Math::ToLinearSpace);
 
   return *this;
 }
@@ -241,9 +241,9 @@ Color3 Color3::toGammaSpace()
 
 Color3& Color3::toGammaSpaceToRef(Color3& convertedColor)
 {
-  convertedColor.r = std::pow(r, Math::ToGammaSpace);
-  convertedColor.g = std::pow(g, Math::ToGammaSpace);
-  convertedColor.b = std::pow(b, Math::ToGammaSpace);
+  convertedColor.r = ::std::pow(r, Math::ToGammaSpace);
+  convertedColor.g = ::std::pow(g, Math::ToGammaSpace);
+  convertedColor.b = ::std::pow(b, Math::ToGammaSpace);
 
   return *this;
 }

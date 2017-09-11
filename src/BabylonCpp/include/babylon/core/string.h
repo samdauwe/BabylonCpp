@@ -105,7 +105,7 @@ inline std::string escape(char character)
 inline std::string escape(const std::string& s)
 {
   std::ostringstream ostream;
-  std::for_each(s.begin(), s.end(), [&ostream](const char character) {
+  ::std::for_each(s.begin(), s.end(), [&ostream](const char character) {
     ostream << escape(character);
   });
   return ostream.str();
@@ -133,7 +133,7 @@ inline bool startsWith(const std::string& s, const std::string& prefix)
   if (prefix.size() > s.size()) {
     return false;
   }
-  return std::equal(prefix.begin(), prefix.end(), s.begin());
+  return ::std::equal(prefix.begin(), prefix.end(), s.begin());
 }
 
 /**
@@ -148,7 +148,7 @@ inline bool endsWith(const std::string& s, const std::string& postfix)
   if (postfix.size() > s.size()) {
     return false;
   }
-  return std::equal(postfix.rbegin(), postfix.rend(), s.rbegin());
+  return ::std::equal(postfix.rbegin(), postfix.rend(), s.rbegin());
 }
 
 /**
@@ -304,15 +304,17 @@ const std::string defaultChars
   = "abcdefghijklmnaoqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 }
 
-inline std::string randomString(size_t len                      = 64,
+inline std::string randomString(std::size_t len                 = 64,
                                 const std::string& allowedChars = defaultChars)
 {
-  std::mt19937_64 gen{static_cast<std::mt19937_64>(std::random_device()())};
-  std::uniform_int_distribution<size_t> dist{0, allowedChars.length() - 1};
+  ::std::mt19937_64 gen{
+    static_cast<::std::mt19937_64>(::std::random_device()())};
+  ::std::uniform_int_distribution<std::size_t> dist{0,
+                                                    allowedChars.length() - 1};
   std::string ret;
   ret.reserve(len);
-  std::generate_n(std::back_inserter(ret), len,
-                  [&] { return allowedChars[dist(gen)]; });
+  ::std::generate_n(::std::back_inserter(ret), len,
+                    [&] { return allowedChars[dist(gen)]; });
   return ret;
 }
 
@@ -339,7 +341,7 @@ inline std::string& removeSubstring(std::string& s, const std::string& subStr)
  * @return List with matches.
  */
 template <typename T>
-inline std::vector<T> regexMatch(const T& s, const std::regex& re)
+inline std::vector<T> regexMatch(const T& s, const ::std::regex& re)
 {
   std::vector<T> result;
   std::smatch smatch;
@@ -352,12 +354,13 @@ inline std::vector<T> regexMatch(const T& s, const std::regex& re)
 
 template <class BidirIt, class Traits, class CharT, class UnaryFunction>
 std::basic_string<CharT> inline regexReplace(
-  BidirIt first, BidirIt last, const std::basic_regex<CharT, Traits>& re,
+  BidirIt first, BidirIt last, const ::std::basic_regex<CharT, Traits>& re,
   UnaryFunction f)
 {
   std::basic_string<CharT> s;
 
-  typename std::match_results<BidirIt>::difference_type positionOfLastMatch = 0;
+  typename ::std::match_results<BidirIt>::difference_type positionOfLastMatch
+    = 0;
   auto endOfLastMatch = first;
 
   auto callback = [&](const std::match_results<BidirIt>& match) {
@@ -400,9 +403,9 @@ inline std::string regexReplace(const std::string& source,
                                 const std::string& replace)
 {
   std::string result;
-  std::regex regex(reSearch, std::regex::optimize);
-  std::regex_replace(std::back_inserter(result), source.begin(), source.end(),
-                     regex, replace);
+  ::std::regex regex(reSearch, ::std::regex::optimize);
+  ::std::regex_replace(::std::back_inserter(result), source.begin(),
+                       source.end(), regex, replace);
   return result;
 }
 
@@ -416,9 +419,9 @@ inline std::string regexReplace(const std::string& source,
  * @return Result of the replacement.
  */
 template <class Traits, class CharT, class UnaryFunction>
-inline std::string regexReplace(const std::string& source,
-                                const std::basic_regex<CharT, Traits>& reSearch,
-                                UnaryFunction f)
+inline std::string
+regexReplace(const std::string& source,
+             const ::std::basic_regex<CharT, Traits>& reSearch, UnaryFunction f)
 {
   return regexReplace(source.cbegin(), source.cend(), reSearch, f);
 }
@@ -492,7 +495,7 @@ inline std::vector<std::string> split(const std::string& value, char separator)
 inline std::string toLowerCase(const std::string& source)
 {
   std::string lcs = source;
-  std::transform(lcs.begin(), lcs.end(), lcs.begin(), ::tolower);
+  ::std::transform(lcs.begin(), lcs.end(), lcs.begin(), ::tolower);
   return lcs;
 }
 
@@ -504,7 +507,7 @@ inline std::string toLowerCase(const std::string& source)
 inline std::string toUpperCase(const std::string& source)
 {
   std::string ucs = source;
-  std::transform(ucs.begin(), ucs.end(), ucs.begin(), ::toupper);
+  ::std::transform(ucs.begin(), ucs.end(), ucs.begin(), ::toupper);
   return ucs;
 }
 
@@ -558,8 +561,8 @@ inline std::string& toTitleCase(std::string& str)
  */
 inline std::string& trimLeft(std::string& str)
 {
-  auto it2 = std::find_if(str.begin(), str.end(), [](char ch) {
-    return !std::isspace<char>(ch, std::locale::classic());
+  auto it2 = ::std::find_if(str.begin(), str.end(), [](char ch) {
+    return !::std::isspace<char>(ch, ::std::locale::classic());
   });
   str.erase(str.begin(), it2);
   return str;
@@ -572,8 +575,8 @@ inline std::string& trimLeft(std::string& str)
  */
 inline std::string& trimRight(std::string& str)
 {
-  auto it1 = std::find_if(str.rbegin(), str.rend(), [](char ch) {
-    return !std::isspace<char>(ch, std::locale::classic());
+  auto it1 = ::std::find_if(str.rbegin(), str.rend(), [](char ch) {
+    return !::std::isspace<char>(ch, ::std::locale::classic());
   });
   str.erase(it1.base(), str.end());
   return str;

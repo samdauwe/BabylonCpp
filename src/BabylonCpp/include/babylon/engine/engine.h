@@ -140,7 +140,7 @@ public:
    * })
    */
   void runRenderLoop(const FastFunc<void()>& renderFunction);
-  void renderFunction(const std::function<void()>& renderFunction);
+  void renderFunction(const ::std::function<void()>& renderFunction);
 
   /**
    * @brief Toggle full screen mode.
@@ -189,8 +189,9 @@ public:
                        int requiredWidth = 0, int requiredHeight = 0,
                        bool forceFullscreenViewport = true);
   void unBindFramebuffer(InternalTexture* texture,
-                         bool disableGenerateMipMaps                 = false,
-                         const std::function<void()>& onBeforeUnbind = nullptr);
+                         bool disableGenerateMipMaps = false,
+                         const ::std::function<void()>& onBeforeUnbind
+                         = nullptr);
   void generateMipMapsForCubemap(InternalTexture* texture);
   void flushFramebuffer();
   void restoreDefaultFramebuffer();
@@ -256,7 +257,7 @@ public:
    */
   Effect* createEffect(const std::string& baseName,
                        EffectCreationOptions& options, Engine* engine,
-                       const std::function<void(Effect* effect)>& onCompiled
+                       const ::std::function<void(Effect* effect)>& onCompiled
                        = nullptr);
   Effect* createEffect(std::unordered_map<std::string, std::string>& baseName,
                        EffectCreationOptions& options, Engine* engine);
@@ -264,10 +265,10 @@ public:
     const std::string& fragmentName,
     const std::vector<std::string>& uniformsNames,
     const std::vector<std::string>& samplers, const std::string& defines = "",
-    EffectFallbacks* fallbacks                                  = nullptr,
-    const std::function<void(const Effect* effect)>& onCompiled = nullptr,
-    const std::function<void(const Effect* effect, const std::string& errors)>&
-      onError
+    EffectFallbacks* fallbacks                                    = nullptr,
+    const ::std::function<void(const Effect* effect)>& onCompiled = nullptr,
+    const ::std::function<void(const Effect* effect,
+                               const std::string& errors)>& onError
     = nullptr);
   GLFrameProgramPtr createShaderProgram(const std::string& vertexCode,
                                         const std::string& fragmentCode,
@@ -358,18 +359,17 @@ public:
   std::string&
   setTextureFormatToUse(const std::vector<std::string>& formatsAvailable);
   std::unique_ptr<GL::IGLTexture> _createTexture();
-  InternalTexture* createTexture(const std::vector<std::string>& list,
-                                 bool noMipmap, bool invertY, Scene* scene,
-                                 unsigned int samplingMode
-                                 = TextureConstants::TRILINEAR_SAMPLINGMODE,
-                                 const std::function<void()>& onLoad  = nullptr,
-                                 const std::function<void()>& onError = nullptr,
-                                 Buffer* buffer = nullptr);
+  InternalTexture* createTexture(
+    const std::vector<std::string>& list, bool noMipmap, bool invertY,
+    Scene* scene,
+    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
+    const ::std::function<void()>& onLoad  = nullptr,
+    const ::std::function<void()>& onError = nullptr, Buffer* buffer = nullptr);
   InternalTexture* createTexture(
     const std::string& urlArg, bool noMipmap, bool invertY, Scene* scene,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-    const std::function<void()>& onLoad  = nullptr,
-    const std::function<void()>& onError = nullptr, Buffer* buffer = nullptr,
+    const ::std::function<void()>& onLoad  = nullptr,
+    const ::std::function<void()>& onError = nullptr, Buffer* buffer = nullptr,
     InternalTexture* fallBack = nullptr,
     unsigned int format       = EngineConstants::TEXTUREFORMAT_RGBA);
   void updateRawTexture(InternalTexture* texture, const Uint8Array& data,
@@ -407,16 +407,16 @@ public:
                                 const IRenderTargetOptions& options);
   InternalTexture* createPrefilteredCubeTexture(
     const std::string& rootUrl, Scene* scene, float scale, float offset,
-    const std::function<void()>& onLoad  = nullptr,
-    const std::function<void()>& onError = nullptr, unsigned int format = 0,
+    const ::std::function<void()>& onLoad  = nullptr,
+    const ::std::function<void()>& onError = nullptr, unsigned int format = 0,
     const std::string& forcedExtension = "");
   InternalTexture*
   createCubeTexture(const std::string& rootUrl, Scene* scene,
                     const std::vector<std::string>& extensions, bool noMipmap,
-                    const std::function<void()>& onLoad  = nullptr,
-                    const std::function<void()>& onError = nullptr,
-                    unsigned int format                  = 0,
-                    const std::string& forcedExtension   = "");
+                    const ::std::function<void()>& onLoad  = nullptr,
+                    const ::std::function<void()>& onError = nullptr,
+                    unsigned int format                    = 0,
+                    const std::string& forcedExtension     = "");
   void updateRawCubeTexture(InternalTexture* texture,
                             const std::vector<Uint8Array>& data,
                             unsigned int format, unsigned int type,
@@ -430,12 +430,12 @@ public:
   InternalTexture* createRawCubeTextureFromUrl(
     const std::string& url, Scene* scene, int size, unsigned int format,
     unsigned int type, bool noMipmap,
-    const std::function<ArrayBufferViewArray(const Uint8Array& arrayBuffer)>&
+    const ::std::function<ArrayBufferViewArray(const Uint8Array& arrayBuffer)>&
       callback,
-    const std::function<std::vector<ArrayBufferViewArray>(
+    const ::std::function<std::vector<ArrayBufferViewArray>(
       const ArrayBufferViewArray& faces)>& mipmmapGenerator,
-    const std::function<void()>& onLoad  = nullptr,
-    const std::function<void()>& onError = nullptr,
+    const ::std::function<void()>& onLoad  = nullptr,
+    const ::std::function<void()>& onError = nullptr,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     bool invertY              = false);
   void _releaseFramebufferObjects(InternalTexture* texture);
@@ -496,7 +496,7 @@ public:
    */
   static void
   MarkAllMaterialsAsDirty(unsigned int flag,
-                          const std::function<bool(Material* mat)>& predicate
+                          const ::std::function<bool(Material* mat)>& predicate
                           = nullptr);
   static bool isSupported();
   static GLShaderPtr CompileShader(GL::IGLRenderingContext* gl,
@@ -538,7 +538,7 @@ private:
   void activateTexture(unsigned int texture);
   void _rescaleTexture(InternalTexture* source, InternalTexture* destination,
                        Scene* scene, unsigned int internalFormat,
-                       const std::function<void()>& onComplete);
+                       const ::std::function<void()>& onComplete);
   GL::GLenum _getInternalFormat(unsigned int format) const;
   GLRenderBufferPtr
   _setupFramebufferDepthAttachments(bool generateStencilBuffer,
@@ -550,9 +550,9 @@ private:
   void _prepareWebGLTexture(
     InternalTexture* texture, Scene* scene, int width, int height,
     Nullable<bool> invertY, bool noMipmap, bool isCompressed,
-    const std::function<bool(
+    const ::std::function<bool(
       int width, int height,
-      const std::function<void()>& continuationCallback)>& processFunction,
+      const ::std::function<void()>& continuationCallback)>& processFunction,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE);
   ArrayBufferView _convertRGBtoRGBATextureData(const ArrayBufferView& rgbData,
                                                int width, int height,
@@ -620,11 +620,11 @@ private:
   bool _badOS;
   bool _badDesktopOS;
 
-  std::function<void()> _onCanvasBlur;
-  std::function<void()> _onBlur;
-  std::function<void()> _onFocus;
-  std::function<void()> _onFullscreenChange;
-  std::function<void()> _onPointerLockChange;
+  ::std::function<void()> _onCanvasBlur;
+  ::std::function<void()> _onBlur;
+  ::std::function<void()> _onFocus;
+  ::std::function<void()> _onFullscreenChange;
+  ::std::function<void()> _onPointerLockChange;
 
   int _hardwareScalingLevel;
   EngineCapabilities _caps;
@@ -648,8 +648,8 @@ private:
   unsigned int _lockstepMaxSteps;
 
   // Lost context
-  std::function<void(Event&& evt)> _onContextLost;
-  std::function<void(Event&& evt)> _onContextRestored;
+  ::std::function<void(Event&& evt)> _onContextLost;
+  ::std::function<void(Event&& evt)> _onContextRestored;
   bool _contextWasLost;
 
   // FPS

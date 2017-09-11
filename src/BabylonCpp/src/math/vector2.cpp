@@ -17,7 +17,7 @@ Vector2::Vector2(const Vector2& otherVector)
 }
 
 Vector2::Vector2(Vector2&& otherVector)
-    : x{std::move(otherVector.x)}, y{std::move(otherVector.y)}
+    : x{::std::move(otherVector.x)}, y{::std::move(otherVector.y)}
 {
 }
 
@@ -34,8 +34,8 @@ Vector2& Vector2::operator=(const Vector2& otherVector)
 Vector2& Vector2::operator=(Vector2&& otherVector)
 {
   if (&otherVector != this) {
-    x = std::move(otherVector.x);
-    y = std::move(otherVector.y);
+    x = ::std::move(otherVector.x);
+    y = ::std::move(otherVector.y);
   }
 
   return *this;
@@ -52,7 +52,7 @@ Vector2 Vector2::copy() const
 
 std::unique_ptr<Vector2> Vector2::clone() const
 {
-  return std::make_unique<Vector2>(*this);
+  return ::std::make_unique<Vector2>(*this);
 }
 
 std::string Vector2::toString() const
@@ -377,7 +377,7 @@ bool Vector2::operator>=(const Vector2& otherVector) const
 /** Properties **/
 float Vector2::length() const
 {
-  return std::sqrt(x * x + y * y);
+  return ::std::sqrt(x * x + y * y);
 }
 
 float Vector2::lengthSquared() const
@@ -547,8 +547,9 @@ void Vector2::TransformToRef(const Vector2& vector,
 bool Vector2::PointInTriangle(const Vector2& p, const Vector2& p0,
                               const Vector2& p1, const Vector2& p2)
 {
-  const float a = 1.f / 2.f * (-p1.y * p2.x + p0.y * (-p1.x + p2.x)
-                               + p0.x * (p1.y - p2.y) + p1.x * p2.y);
+  const float a = 1.f / 2.f
+                  * (-p1.y * p2.x + p0.y * (-p1.x + p2.x) + p0.x * (p1.y - p2.y)
+                     + p1.x * p2.y);
   const float sign = a < 0.f ? -1.f : 1.f;
   const float s
     = (p0.y * p2.x - p0.x * p2.y + (p2.y - p0.y) * p.x + (p0.x - p2.x) * p.y)
@@ -562,7 +563,7 @@ bool Vector2::PointInTriangle(const Vector2& p, const Vector2& p0,
 
 float Vector2::Distance(const Vector2& value1, const Vector2& value2)
 {
-  return std::sqrt(Vector2::DistanceSquared(value1, value2));
+  return ::std::sqrt(Vector2::DistanceSquared(value1, value2));
 }
 
 float Vector2::DistanceSquared(const Vector2& value1, const Vector2& value2)
@@ -589,7 +590,7 @@ float Vector2::DistanceOfPointFromSegment(const Vector2& p, const Vector2& segA,
   }
   const Vector2 v = segB.subtract(segA);
   const float t
-    = std::max(0.f, std::min(1.f, Vector2::Dot(p.subtract(segA), v) / l2));
+    = ::std::max(0.f, ::std::min(1.f, Vector2::Dot(p.subtract(segA), v) / l2));
   const Vector2 proj = segA.add(v.multiplyByFloats(t, t));
   return Vector2::Distance(p, proj);
 }

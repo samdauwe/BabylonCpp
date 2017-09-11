@@ -9,7 +9,7 @@ namespace SIMD {
 
 SIMDMatrix::SIMDMatrix()
 {
-  std::fill(m.begin(), m.end(), 0.f);
+  ::std::fill(m.begin(), m.end(), 0.f);
 }
 
 SIMDMatrix::SIMDMatrix(const SIMDMatrix& otherMatrix) : m{otherMatrix.m}
@@ -20,11 +20,11 @@ SIMDMatrix::SIMDMatrix(const Matrix& otherMatrix) : m{otherMatrix.m}
 {
 }
 
-SIMDMatrix::SIMDMatrix(SIMDMatrix&& otherMatrix) : m{std::move(otherMatrix.m)}
+SIMDMatrix::SIMDMatrix(SIMDMatrix&& otherMatrix) : m{::std::move(otherMatrix.m)}
 {
 }
 
-SIMDMatrix::SIMDMatrix(Matrix&& otherMatrix) : m{std::move(otherMatrix.m)}
+SIMDMatrix::SIMDMatrix(Matrix&& otherMatrix) : m{::std::move(otherMatrix.m)}
 {
 }
 
@@ -47,7 +47,7 @@ SIMDMatrix& SIMDMatrix::operator=(const Matrix& otherMatrix)
 SIMDMatrix& SIMDMatrix::operator=(SIMDMatrix&& otherMatrix)
 {
   if (&otherMatrix != this) {
-    m = std::move(otherMatrix.m);
+    m = ::std::move(otherMatrix.m);
   }
 
   return *this;
@@ -55,7 +55,7 @@ SIMDMatrix& SIMDMatrix::operator=(SIMDMatrix&& otherMatrix)
 
 SIMDMatrix& SIMDMatrix::operator=(Matrix&& otherMatrix)
 {
-  m = std::move(otherMatrix.m);
+  m = ::std::move(otherMatrix.m);
 
   return *this;
 }
@@ -135,8 +135,8 @@ SIMDMatrix& SIMDMatrix::invertToRefSIMD(Matrix& other)
   minor3      = SIMD::Float32x4::swizzle(minor3, 2, 3, 0, 1); // 0x4E = 01001110
 
   // ----
-  tmp1 = SIMD::Float32x4::mul(SIMD::Float32x4::swizzle(row1, 2, 3, 0, 1),
-                              row3);                        // 0x4E = 01001110
+  tmp1        = SIMD::Float32x4::mul(SIMD::Float32x4::swizzle(row1, 2, 3, 0, 1),
+                              row3);                 // 0x4E = 01001110
   tmp1        = SIMD::Float32x4::swizzle(tmp1, 1, 0, 3, 2); // 0xB1 = 10110001
   row2        = SIMD::Float32x4::swizzle(row2, 2, 3, 0, 1); // 0x4E = 01001110
   minor0      = SIMD::Float32x4::add(SIMD::Float32x4::mul(row2, tmp1), minor0);
@@ -177,10 +177,10 @@ SIMDMatrix& SIMDMatrix::invertToRefSIMD(Matrix& other)
   auto det = SIMD::Float32x4::mul(row0, minor0);
   det      = SIMD::Float32x4::add(SIMD::Float32x4::swizzle(det, 2, 3, 0, 1),
                              det); // 0x4E = 01001110
-  det = SIMD::Float32x4::add(SIMD::Float32x4::swizzle(det, 1, 0, 3, 2),
+  det      = SIMD::Float32x4::add(SIMD::Float32x4::swizzle(det, 1, 0, 3, 2),
                              det); // 0xB1 = 10110001
-  tmp1 = SIMD::Float32x4::reciprocalApproximation(det);
-  det  = SIMD::Float32x4::sub(
+  tmp1     = SIMD::Float32x4::reciprocalApproximation(det);
+  det      = SIMD::Float32x4::sub(
     SIMD::Float32x4::add(tmp1, tmp1),
     SIMD::Float32x4::mul(det, SIMD::Float32x4::mul(tmp1, tmp1)));
   det = SIMD::Float32x4::swizzle(det, 0, 0, 0, 0);
@@ -217,7 +217,7 @@ void SIMDMatrix::LookAtLHToRefSIMD(const Vector3& eyeRef,
   tmp = SIMD::Float32x4::add(
     tmp, SIMD::Float32x4::add(SIMD::Float32x4::swizzle(tmp, 1, 2, 0, 3),
                               SIMD::Float32x4::swizzle(tmp, 2, 0, 1, 3)));
-  up = SIMD::Float32x4::mul(up,
+  up     = SIMD::Float32x4::mul(up,
                             SIMD::Float32x4::reciprocalSqrtApproximation(tmp));
   auto s = SIMD::Float32x4::sub(
     SIMD::Float32x4::mul(SIMD::Float32x4::swizzle(f, 1, 2, 0, 3),
@@ -228,7 +228,7 @@ void SIMDMatrix::LookAtLHToRefSIMD(const Vector3& eyeRef,
   tmp = SIMD::Float32x4::add(
     tmp, SIMD::Float32x4::add(SIMD::Float32x4::swizzle(tmp, 1, 2, 0, 3),
                               SIMD::Float32x4::swizzle(tmp, 2, 0, 1, 3)));
-  s = SIMD::Float32x4::mul(s,
+  s      = SIMD::Float32x4::mul(s,
                            SIMD::Float32x4::reciprocalSqrtApproximation(tmp));
   auto u = SIMD::Float32x4::sub(
     SIMD::Float32x4::mul(SIMD::Float32x4::swizzle(s, 1, 2, 0, 3),
@@ -300,4 +300,4 @@ void SIMDMatrix::LookAtLHToRefSIMD(const Vector3& eyeRef,
 }
 
 } // end of namespace SIMD
-} // end of namespace BABY
+} // namespace BABYLON

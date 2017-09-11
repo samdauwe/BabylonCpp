@@ -103,10 +103,10 @@ class some : A {
   //----------------------------------------------------------------------------
 
   template <typename T>
-  using decay = typename std::decay<T>::type;
+  using decay = typename ::std::decay<T>::type;
 
   template <typename T>
-  using none = typename std::enable_if<!std::is_same<some, T>::value>::type;
+  using none = typename ::std::enable_if<!::std::is_same<some, T>::value>::type;
 
   //----------------------------------------------------------------------------
 
@@ -123,8 +123,8 @@ class some : A {
   //----------------------------------------------------------------------------
 
   template <typename T>
-  struct data : base, std::tuple<T> {
-    using std::tuple<T>::tuple;
+  struct data : base, ::std::tuple<T> {
+    using ::std::tuple<T>::tuple;
 
     T& get() &
     {

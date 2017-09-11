@@ -79,20 +79,20 @@ public:
   /**
    * @brief A function to be executed when this scene is disposed.
    */
-  void setOnDispose(const std::function<void()>& callback);
+  void setOnDispose(const ::std::function<void()>& callback);
 
   /**
    * @brief A function to be executed before rendering this scene.
    */
-  void setBeforeRender(const std::function<void()>& callback);
+  void setBeforeRender(const ::std::function<void()>& callback);
 
   /**
    * @brief A function to be executed after rendering this scene.
    */
-  void setAfterRender(const std::function<void()>& callback);
+  void setAfterRender(const ::std::function<void()>& callback);
 
-  void setBeforeCameraRender(const std::function<void()>& callback);
-  void setAfterCameraRender(const std::function<void()>& callback);
+  void setBeforeCameraRender(const ::std::function<void()>& callback);
+  void setAfterCameraRender(const ::std::function<void()>& callback);
 
   // Pointers
   Vector2 unTranslatedPointer() const;
@@ -237,10 +237,10 @@ public:
   /** Ready **/
   bool isReady();
   void resetCachedMaterial();
-  void registerBeforeRender(const std::function<void()>& func);
-  void unregisterBeforeRender(const std::function<void()>& func);
-  void registerAfterRender(const std::function<void()>& func);
-  void unregisterAfterRender(const std::function<void()>& func);
+  void registerBeforeRender(const ::std::function<void()>& func);
+  void unregisterBeforeRender(const ::std::function<void()>& func);
+  void registerAfterRender(const ::std::function<void()>& func);
+  void unregisterAfterRender(const ::std::function<void()>& func);
   void _addPendingData(Mesh* mesh);
   void _addPendingData(InternalTexture* texure);
   void _removePendingData(InternalTexture* texture);
@@ -250,7 +250,7 @@ public:
    * @brief Registers a function to be executed when the scene is ready.
    * @param {Function} func - the function to be executed.
    */
-  void executeWhenReady(const std::function<void()>& func);
+  void executeWhenReady(const ::std::function<void()>& func);
   void _checkIsReady();
 
   /** Animations **/
@@ -276,14 +276,14 @@ public:
    */
   Animatable* beginAnimation(IAnimatable* target, float from, float to,
                              bool loop = false, float speedRatio = 1.f,
-                             const std::function<void()>& onAnimationEnd
+                             const ::std::function<void()>& onAnimationEnd
                              = nullptr,
                              Animatable* animatable = nullptr);
   Animatable*
   beginDirectAnimation(IAnimatable* target,
                        const std::vector<Animation*>& animations, int from,
                        int to, bool loop = false, float speedRatio = 1.f,
-                       const std::function<void()>& onAnimationEnd = nullptr);
+                       const ::std::function<void()>& onAnimationEnd = nullptr);
   Animatable* getAnimatableByTarget(IAnimatable* target);
   std::vector<Animatable*>& animatables();
 
@@ -550,7 +550,7 @@ public:
    * @return picking info object
    */
   PickingInfo* pick(int x, int y,
-                    const std::function<bool(AbstractMesh* mesh)>& predicate,
+                    const ::std::function<bool(AbstractMesh* mesh)>& predicate,
                     bool fastCheck = false, Camera* camera = nullptr);
 
   /**
@@ -564,9 +564,10 @@ public:
    * null. In this case, the scene.activeCamera will be used
    * @return picking info object
    */
-  PickingInfo* pickSprite(int x, int y,
-                          const std::function<bool(Sprite* sprite)>& predicate,
-                          bool fastCheck = false, Camera* camera = nullptr);
+  PickingInfo*
+  pickSprite(int x, int y,
+             const ::std::function<bool(Sprite* sprite)>& predicate,
+             bool fastCheck = false, Camera* camera = nullptr);
 
   /**
    * @brief Use the given ray to pick a mesh in the scene
@@ -577,7 +578,7 @@ public:
    * set to null.
    */
   PickingInfo* pickWithRay(const Ray& ray,
-                           const std::function<bool(Mesh* mesh)>& predicate,
+                           const ::std::function<bool(Mesh* mesh)>& predicate,
                            bool fastCheck = false);
 
   /**
@@ -593,7 +594,7 @@ public:
    */
   std::vector<PickingInfo*>
   multiPick(int x, int y,
-            const std::function<bool(AbstractMesh* mesh)>& predicate,
+            const ::std::function<bool(AbstractMesh* mesh)>& predicate,
             Camera* camera);
 
   /**
@@ -606,7 +607,7 @@ public:
    */
   std::vector<PickingInfo*>
   multiPickWithRay(const Ray& ray,
-                   const std::function<bool(Mesh* mesh)>& predicate);
+                   const ::std::function<bool(Mesh* mesh)>& predicate);
 
   AbstractMesh* getPointerOverMesh();
   void setPointerOverMesh(AbstractMesh* mesh);
@@ -660,11 +661,11 @@ public:
    */
   void setRenderingOrder(
     unsigned int renderingGroupId,
-    const std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn
+    const ::std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn
     = nullptr,
-    const std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn
+    const ::std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn
     = nullptr,
-    const std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn
+    const ::std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn
     = nullptr);
 
   /**
@@ -690,7 +691,7 @@ public:
    */
   void
   markAllMaterialsAsDirty(unsigned int flag,
-                          const std::function<bool(Material* mat)>& predicate
+                          const ::std::function<bool(Material* mat)>& predicate
                           = nullptr);
 
 protected:
@@ -725,15 +726,15 @@ private:
   // void _switchAudioModeForNormalSpeakers();
   /** Picking **/
   PickingInfo*
-  _internalPick(const std::function<Ray(const Matrix& world)>& rayFunction,
-                const std::function<bool(AbstractMesh* mesh)>& predicate,
+  _internalPick(const ::std::function<Ray(const Matrix& world)>& rayFunction,
+                const ::std::function<bool(AbstractMesh* mesh)>& predicate,
                 bool fastCheck);
-  std::vector<PickingInfo*>
-  _internalMultiPick(const std::function<Ray(const Matrix& world)>& rayFunction,
-                     const std::function<bool(AbstractMesh* mesh)>& predicate);
+  std::vector<PickingInfo*> _internalMultiPick(
+    const ::std::function<Ray(const Matrix& world)>& rayFunction,
+    const ::std::function<bool(AbstractMesh* mesh)>& predicate);
   PickingInfo*
   _internalPickSprites(const Ray& ray,
-                       const std::function<bool(Sprite* sprite)>& predicate,
+                       const ::std::function<bool(Sprite* sprite)>& predicate,
                        bool fastCheck, Camera* camera);
   /** Tags **/
   std::vector<std::string> _getByTags();
@@ -824,9 +825,9 @@ public:
   std::vector<Animation*> animations;
 
   // Pointers
-  std::function<bool(AbstractMesh* Mesh)> pointerDownPredicate;
-  std::function<bool(AbstractMesh* Mesh)> pointerUpPredicate;
-  std::function<bool(AbstractMesh* Mesh)> pointerMovePredicate;
+  ::std::function<bool(AbstractMesh* Mesh)> pointerDownPredicate;
+  ::std::function<bool(AbstractMesh* Mesh)> pointerUpPredicate;
+  ::std::function<bool(AbstractMesh* Mesh)> pointerMovePredicate;
 
   bool forceWireframe;
   bool forceShowBoundingBoxes;
@@ -909,7 +910,7 @@ public:
   // Sprites
   bool spritesEnabled;
   std::vector<std::unique_ptr<SpriteManager>> spriteManagers;
-  std::function<bool(Sprite* sprite)> spritePredicate;
+  ::std::function<bool(Sprite* sprite)> spritePredicate;
   // Layers
   std::vector<Layer*> layers;
   std::vector<std::unique_ptr<HighlightLayer>> highlightLayers;
@@ -981,21 +982,22 @@ private:
   Observer<Camera>::Ptr _onBeforeCameraRenderObserver;
   Observer<Camera>::Ptr _onAfterCameraRenderObserver;
   // Pointers
-  std::function<void(PointerEvent&& evt)> _onPointerMove;
-  std::function<void(PointerEvent&& evt)> _onPointerDown;
-  std::function<void(PointerEvent&& evt)> _onPointerUp;
-  std::function<void(
+  ::std::function<void(PointerEvent&& evt)> _onPointerMove;
+  ::std::function<void(PointerEvent&& evt)> _onPointerDown;
+  ::std::function<void(PointerEvent&& evt)> _onPointerUp;
+  ::std::function<void(
     Observable<PointerInfoPre>& obs1, Observable<PointerInfo>& obs2,
     PointerEvent&& evt,
-    const std::function<void(const ClickInfo& clickInfo,
-                             const PointerInfo& pickResult)>& cb)>
+    const ::std::function<void(const ClickInfo& clickInfo,
+                               const PointerInfo& pickResult)>& cb)>
     _initClickEvent;
-  std::function<ActionManager*(ActionManager* act, const ClickInfo& clickInfo)>
+  ::std::function<ActionManager*(ActionManager* act,
+                                 const ClickInfo& clickInfo)>
     _initActionManager;
-  std::function<void(
+  ::std::function<void(
     unsigned int btn, const ClickInfo& clickInfo,
-    const std::function<void(const ClickInfo& clickInfo,
-                             const PointerInfo& pickResult)>& cb)>
+    const ::std::function<void(const ClickInfo& clickInfo,
+                               const PointerInfo& pickResult)>& cb)>
     _delayedSimpleClick;
   milliseconds_t _delayedSimpleClickTimeout;
   milliseconds_t _previousDelayedSimpleClickTimeout;
@@ -1015,11 +1017,11 @@ private:
   high_res_time_point_t _startingPointerTime;
   high_res_time_point_t _previousStartingPointerTime;
   // AbstractMesh* _meshUnderPointer;
-  std::function<void()> beforeRender;
-  std::function<void()> afterRender;
+  ::std::function<void()> beforeRender;
+  ::std::function<void()> afterRender;
   // Keyboard
-  std::function<void(Event&& evt)> _onKeyDown;
-  std::function<void(Event&& evt)> _onKeyUp;
+  ::std::function<void(Event&& evt)> _onKeyDown;
+  ::std::function<void(Event&& evt)> _onKeyUp;
   // Coordinate system
   bool _useRightHandedSystem;
   // Members

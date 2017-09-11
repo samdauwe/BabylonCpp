@@ -20,7 +20,7 @@ Angle::Angle(const Angle& otherAngle) : _radians{otherAngle._radians}
 {
 }
 
-Angle::Angle(Angle&& otherAngle) : _radians{std::move(otherAngle._radians)}
+Angle::Angle(Angle&& otherAngle) : _radians{::std::move(otherAngle._radians)}
 {
 }
 
@@ -36,7 +36,7 @@ Angle& Angle::operator=(const Angle& otherAngle)
 Angle& Angle::operator=(Angle&& otherAngle)
 {
   if (&otherAngle != this) {
-    _radians = std::move(otherAngle._radians);
+    _radians = ::std::move(otherAngle._radians);
   }
 
   return *this;
@@ -53,7 +53,7 @@ Angle Angle::copy() const
 
 std::unique_ptr<Angle> Angle::clone() const
 {
-  return std::make_unique<Angle>(*this);
+  return ::std::make_unique<Angle>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Angle& angle)
@@ -85,7 +85,7 @@ float Angle::radians() const
 Angle Angle::BetweenTwoPoints(const Vector2& a, const Vector2& b)
 {
   const auto delta = b.subtract(a);
-  const auto theta = std::atan2(delta.y, delta.x);
+  const auto theta = ::std::atan2(delta.y, delta.x);
   return Angle(theta);
 }
 

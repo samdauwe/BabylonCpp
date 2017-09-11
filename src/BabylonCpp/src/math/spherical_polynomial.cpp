@@ -32,15 +32,15 @@ SphericalPolynomial::SphericalPolynomial(const SphericalPolynomial& other)
 }
 
 SphericalPolynomial::SphericalPolynomial(SphericalPolynomial&& other)
-    : x{std::move(other.x)}
-    , y{std::move(other.y)}
-    , z{std::move(other.z)}
-    , xx{std::move(other.xx)}
-    , yy{std::move(other.yy)}
-    , zz{std::move(other.zz)}
-    , xy{std::move(other.xy)}
-    , yz{std::move(other.yz)}
-    , zx{std::move(other.zx)}
+    : x{::std::move(other.x)}
+    , y{::std::move(other.y)}
+    , z{::std::move(other.z)}
+    , xx{::std::move(other.xx)}
+    , yy{::std::move(other.yy)}
+    , zz{::std::move(other.zz)}
+    , xy{::std::move(other.xy)}
+    , yz{::std::move(other.yz)}
+    , zx{::std::move(other.zx)}
 {
 }
 
@@ -65,15 +65,15 @@ operator=(const SphericalPolynomial& other)
 SphericalPolynomial& SphericalPolynomial::operator=(SphericalPolynomial&& other)
 {
   if (&other != this) {
-    x  = std::move(other.x);
-    y  = std::move(other.y);
-    z  = std::move(other.z);
-    xx = std::move(other.xx);
-    yy = std::move(other.yy);
-    zz = std::move(other.zz);
-    xy = std::move(other.xy);
-    yz = std::move(other.yz);
-    zx = std::move(other.zx);
+    x  = ::std::move(other.x);
+    y  = ::std::move(other.y);
+    z  = ::std::move(other.z);
+    xx = ::std::move(other.xx);
+    yy = ::std::move(other.yy);
+    zz = ::std::move(other.zz);
+    xy = ::std::move(other.xy);
+    yz = ::std::move(other.yz);
+    zx = ::std::move(other.zx);
   }
 
   return *this;
@@ -90,7 +90,7 @@ SphericalPolynomial SphericalPolynomial::copy() const
 
 std::unique_ptr<SphericalPolynomial> SphericalPolynomial::clone() const
 {
-  return std::make_unique<SphericalPolynomial>(*this);
+  return ::std::make_unique<SphericalPolynomial>(*this);
 }
 
 void SphericalPolynomial::addAmbient(const Color3& color)

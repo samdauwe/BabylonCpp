@@ -36,4 +36,4 @@ void SIMDVector3::TransformCoordinatesFromFloatsToRefSIMD(
 }
 
 } // end of namespace SIMD
-} // end of namespace BABY
+} // namespace BABYLON

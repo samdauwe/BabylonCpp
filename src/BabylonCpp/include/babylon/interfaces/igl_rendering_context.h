@@ -533,7 +533,7 @@ public:
   std::unique_ptr<IGLRenderbuffer> _depthStencilBuffer;
   std::unique_ptr<IGLRenderbuffer> _MSAARenderBuffer;
   // std::unique_ptr<SphericalPolynomial> _sphericalPolynomial;
-  std::vector<std::function<void()>> onLoadedCallbacks;
+  std::vector<::std::function<void()>> onLoadedCallbacks;
 }; // end of class IGLTexture
 
 class BABYLON_SHARED_EXPORT IGLUniformLocation {
@@ -549,8 +549,8 @@ public:
 }; // end of class IGLUniformLocation
 
 /**
-* @brief
-*/
+ * @brief
+ */
 class BABYLON_SHARED_EXPORT IGLRenderingContext {
 
 public:

@@ -39,10 +39,10 @@ struct ArrayBufferView {
   {
   }
   ArrayBufferView(ArrayBufferView&& other)
-      : type{std::move(other.type)}
-      , float32Array{std::move(other.float32Array)}
-      , uint8Array{std::move(other.uint8Array)}
-      , uint32Array{std::move(other.uint32Array)}
+      : type{::std::move(other.type)}
+      , float32Array{::std::move(other.float32Array)}
+      , uint8Array{::std::move(other.uint8Array)}
+      , uint32Array{::std::move(other.uint32Array)}
   {
   }
   ArrayBufferView& operator=(const ArrayBufferView& other)
@@ -59,10 +59,10 @@ struct ArrayBufferView {
   ArrayBufferView& operator=(ArrayBufferView&& other)
   {
     if (&other != this) {
-      type         = std::move(other.type);
-      float32Array = std::move(other.float32Array);
-      uint8Array   = std::move(other.uint8Array);
-      uint32Array  = std::move(other.uint32Array);
+      type         = ::std::move(other.type);
+      float32Array = ::std::move(other.float32Array);
+      uint8Array   = ::std::move(other.uint8Array);
+      uint32Array  = ::std::move(other.uint32Array);
     }
 
     return *this;
@@ -151,7 +151,7 @@ struct Image {
   }
   Image(Uint8Array iData, int iWidth, int iHeight, int iDepth,
         unsigned int iMode)
-      : data(std::move(iData))
+      : data(::std::move(iData))
       , width{iWidth}
       , height{iHeight}
       , depth{iDepth}

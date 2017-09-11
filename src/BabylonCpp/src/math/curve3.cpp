@@ -21,8 +21,8 @@ Curve3::Curve3(const Curve3& otherCurve)
 }
 
 Curve3::Curve3(Curve3&& otherCurve)
-    : _points{std::move(otherCurve._points)}
-    , _length{std::move(otherCurve._length)}
+    : _points{::std::move(otherCurve._points)}
+    , _length{::std::move(otherCurve._length)}
 {
 }
 
@@ -39,8 +39,8 @@ Curve3& Curve3::operator=(const Curve3& otherCurve)
 Curve3& Curve3::operator=(Curve3&& otherCurve)
 {
   if (&otherCurve != this) {
-    _points = std::move(otherCurve._points);
-    _length = std::move(otherCurve._length);
+    _points = ::std::move(otherCurve._points);
+    _length = ::std::move(otherCurve._length);
   }
 
   return *this;
@@ -57,7 +57,7 @@ Curve3 Curve3::copy() const
 
 std::unique_ptr<Curve3> Curve3::clone() const
 {
-  return std::make_unique<Curve3>(*this);
+  return ::std::make_unique<Curve3>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Curve3& curve)

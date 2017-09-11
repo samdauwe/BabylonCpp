@@ -150,7 +150,7 @@ public:
   /**
    * @brief Clone the current observable.
    */
-  Observable<T>::SPtr clone() const
+  std::shared_ptr<Observable<T>> clone() const
   {
     Observable<T>::SPtr result = std::make_shared<Observable<T>>();
 

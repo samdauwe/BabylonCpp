@@ -6,28 +6,30 @@
 namespace BABYLON {
 namespace stl_util {
 
-// -- Implementation of std::make_unique function in C++11 --
+// -- Implementation of ::std::make_unique function in C++11 --
 template <typename T, typename... Args>
-inline std::unique_ptr<T> make_unique_helper(std::false_type, Args&&... args)
+inline ::std::unique_ptr<T> make_unique_helper(::std::false_type,
+                                               Args&&... args)
 {
-  return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+  return ::std::unique_ptr<T>(new T(::std::forward<Args>(args)...));
 }
 
 template <typename T, typename... Args>
-inline std::unique_ptr<T> make_unique_helper(std::true_type, Args&&... args)
+inline ::std::unique_ptr<T> make_unique_helper(::std::true_type, Args&&... args)
 {
   static_assert(
-    std::extent<T>::value == 0,
+    ::std::extent<T>::value == 0,
     "make_unique<T[N]>() is forbidden, please use make_unique<T[]>(),");
-  typedef typename std::remove_extent<T>::type U;
-  return std::unique_ptr<T>(
-    new U[sizeof...(Args)]{std::forward<Args>(args)...});
+  typedef typename ::std::remove_extent<T>::type U;
+  return ::std::unique_ptr<T>(
+    new U[sizeof...(Args)]{::std::forward<Args>(args)...});
 }
 
 template <typename T, typename... Args>
-inline std::unique_ptr<T> make_unique(Args&&... args)
+inline ::std::unique_ptr<T> make_unique(Args&&... args)
 {
-  return make_unique_helper<T>(std::is_array<T>(), std::forward<Args>(args)...);
+  return make_unique_helper<T>(::std::is_array<T>(),
+                               ::std::forward<Args>(args)...);
 }
 
 // Bitsets
@@ -40,16 +42,16 @@ inline std::unique_ptr<T> make_unique(Args&&... args)
  * |     |- Exponent (8 bits)
  * |- Sign (1 bit)
  */
-inline std::bitset<32> to_bitset(float number)
+inline ::std::bitset<32> to_bitset(float number)
 {
-  std::bitset<32> result;
+  ::std::bitset<32> result;
   if (sizeof(number) != 4) {
     return result;
   }
 
   char* bits = reinterpret_cast<char*>(&number);
-  for (std::size_t n = 0; n < sizeof(number); ++n) {
-    std::bitset<8> octet(static_cast<size_t>(bits[n]));
+  for (::std::size_t n = 0; n < sizeof(number); ++n) {
+    ::std::bitset<8> octet(static_cast<size_t>(bits[n]));
     for (unsigned int i = 0; i < 8; ++i) {
       result[n * 8 + i] = octet[i];
     }
@@ -57,21 +59,21 @@ inline std::bitset<32> to_bitset(float number)
   return result;
 }
 
-inline std::string to_hex_string(const std::string& bit_string)
+inline ::std::string to_hex_string(const ::std::string& bit_string)
 {
-  std::ostringstream oss;
-  oss << "0x" << std::hex;
+  ::std::ostringstream oss;
+  oss << "0x" << ::std::hex;
   for (size_t i = 0, idx = 0, ul = bit_string.size() / 4; i < ul;
        ++i, idx += 4) {
-    std::bitset<4> nibble(bit_string.substr(idx, idx + 4));
+    ::std::bitset<4> nibble(bit_string.substr(idx, idx + 4));
     oss << nibble.to_ulong();
   }
   return oss.str();
 }
 
-inline unsigned int hex_string_to_uint(const std::string& hex_string)
+inline unsigned int hex_string_to_uint(const ::std::string& hex_string)
 {
-  return static_cast<unsigned int>(std::stoul(hex_string, nullptr, 16));
+  return static_cast<unsigned int>(::std::stoul(hex_string, nullptr, 16));
 }
 
 inline float hex_to_float(unsigned int hex_value)
@@ -85,7 +87,7 @@ inline float hex_to_float(unsigned int hex_value)
   return val.f;
 }
 
-inline float hex_to_float(const std::string& hex_string)
+inline float hex_to_float(const ::std::string& hex_string)
 {
   return hex_to_float(hex_string_to_uint(hex_string));
 }
@@ -93,26 +95,26 @@ inline float hex_to_float(const std::string& hex_string)
 // byte conversion
 
 template <typename T>
-std::array<byte, sizeof(T)> to_bytes(const T& object)
+::std::array<byte, sizeof(T)> to_bytes(const T& object)
 {
-  std::array<byte, sizeof(T)> bytes;
+  ::std::array<byte, sizeof(T)> bytes;
 
-  const byte* begin = reinterpret_cast<const byte*>(std::addressof(object));
+  const byte* begin = reinterpret_cast<const byte*>(::std::addressof(object));
   const byte* end   = begin + sizeof(T);
-  std::copy(begin, end, std::begin(bytes));
+  ::std::copy(begin, end, ::std::begin(bytes));
 
   return bytes;
 }
 
 template <typename T>
-T& from_bytes(const std::array<byte, sizeof(T)>& bytes, T& object)
+T& from_bytes(const ::std::array<byte, sizeof(T)>& bytes, T& object)
 {
   // http://en.cppreference.com/w/cpp/types/is_trivially_copyable
-  static_assert(std::is_trivially_copyable<T>::value,
+  static_assert(::std::is_trivially_copyable<T>::value,
                 "not a TriviallyCopyable type");
 
-  byte* begin_object = reinterpret_cast<byte*>(std::addressof(object));
-  std::copy(std::begin(bytes), std::end(bytes), begin_object);
+  byte* begin_object = reinterpret_cast<byte*>(::std::addressof(object));
+  ::std::copy(::std::begin(bytes), ::std::end(bytes), begin_object);
 
   return object;
 }
@@ -133,21 +135,21 @@ constexpr int c_strcmp(char const* lhs, char const* rhs)
 
 template <class T>
 constexpr
-  typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type
+  typename ::std::enable_if<!::std::numeric_limits<T>::is_integer, bool>::type
   almost_equal(T x, T y, int ulp = 4)
 {
   // the machine epsilon has to be scaled to the magnitude of the values used
   // and multiplied by the desired precision in ULPs (units in the last place)
-  return std::abs(x - y) < std::numeric_limits<T>::epsilon() * std::abs(x + y)
-                             * static_cast<T>(ulp)
+  return ::std::abs(x - y) < ::std::numeric_limits<T>::epsilon()
+                               * ::std::abs(x + y) * static_cast<T>(ulp)
          // unless the result is subnormal
-         || std::abs(x - y) < std::numeric_limits<T>::min();
+         || ::std::abs(x - y) < ::std::numeric_limits<T>::min();
 }
 
 // Used for lambda comparison
 
 template <typename T, typename... U>
-size_t get_address(std::function<T(U...)> f)
+size_t get_address(::std::function<T(U...)> f)
 {
   typedef T(fnType)(U...);
   fnType** fnPointer = f.template target<fnType*>();
@@ -157,15 +159,17 @@ size_t get_address(std::function<T(U...)> f)
 // Finding of a minimum and maximum with variadic templates and C++11
 
 template <typename... Ts>
-auto min(Ts... ts) -> typename std::common_type<Ts...>::type
+auto min(Ts... ts) -> typename ::std::common_type<Ts...>::type
 {
-  return std::min({static_cast<typename std::common_type<Ts...>::type>(ts)...});
+  return ::std::min(
+    {static_cast<typename ::std::common_type<Ts...>::type>(ts)...});
 }
 
 template <typename... Ts>
-auto max(Ts... ts) -> typename std::common_type<Ts...>::type
+auto max(Ts... ts) -> typename ::std::common_type<Ts...>::type
 {
-  return std::max({static_cast<typename std::common_type<Ts...>::type>(ts)...});
+  return ::std::max(
+    {static_cast<typename ::std::common_type<Ts...>::type>(ts)...});
 }
 
 // Three-way comparison
@@ -186,16 +190,16 @@ auto max(Ts... ts) -> typename std::common_type<Ts...>::type
  */
 template <typename T,
           typename
-          = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+          = typename ::std::enable_if<::std::is_arithmetic<T>::value, T>::type>
 constexpr int spaceship(const T& lhs, const T& rhs)
 {
   return (lhs < rhs) ? -1 : (rhs < lhs) ? 1 : 0;
 }
 
 /**
- * @brief Combined Comparison (Spaceship) Operator for std::string.
+ * @brief Combined Comparison (Spaceship) Operator for ::std::string.
  */
-inline int spaceship(const std::string& lhs, const std::string& rhs)
+inline int spaceship(const ::std::string& lhs, const ::std::string& rhs)
 {
   const int comparison = lhs.compare(rhs);
   return (comparison < 0) ? -1 : (comparison > 0) ? 1 : 0;
@@ -204,19 +208,19 @@ inline int spaceship(const std::string& lhs, const std::string& rhs)
 // Container functions
 
 template <typename T, typename... Ts>
-inline std::vector<T> to_vector(const T& t0, const Ts&... ts)
+inline ::std::vector<T> to_vector(const T& t0, const Ts&... ts)
 {
-  return std::vector<T>{t0, ts...};
+  return ::std::vector<T>{t0, ts...};
 }
 
 template <typename T>
-inline std::vector<T*>
-to_raw_ptr_vector(const std::vector<std::unique_ptr<T>>& c)
+inline ::std::vector<T*>
+to_raw_ptr_vector(const ::std::vector<::std::unique_ptr<T>>& c)
 {
-  std::vector<T*> result;
+  ::std::vector<T*> result;
   result.reserve(c.size());
-  std::transform(c.begin(), c.end(), std::back_inserter(result),
-                 [](const std::unique_ptr<T>& ci) { return ci.get(); });
+  ::std::transform(c.begin(), c.end(), ::std::back_inserter(result),
+                   [](const ::std::unique_ptr<T>& ci) { return ci.get(); });
   return result;
 }
 
@@ -242,30 +246,30 @@ inline C& concat_with_no_duplicates(C& a, const C& b)
   concat(a, b);
 
   // Remove duplicates
-  std::sort(a.begin(), a.end());
-  a.erase(std::unique(a.begin(), a.end()), a.end());
+  ::std::sort(a.begin(), a.end());
+  a.erase(::std::unique(a.begin(), a.end()), a.end());
 
   return a;
 }
 
-// Sequence (i.e. std::vector or std::list)
+// Sequence (i.e. ::std::vector or ::std::list)
 template <template <typename, typename> class C, template <typename> class A,
           typename T, typename V>
 constexpr bool contains(const C<T, A<T>>& c, const V& elem)
 {
-  return std::find(c.begin(), c.end(), T(elem)) != c.end();
+  return ::std::find(c.begin(), c.end(), T(elem)) != c.end();
 }
 
 // Set
 template <typename C, typename A>
-constexpr bool contains(const std::set<C>& c, const A& elem)
+constexpr bool contains(const ::std::set<C>& c, const A& elem)
 {
   return c.find(C(elem)) != c.end();
 }
 
 // Unordered Map
 template <typename C, typename A, typename T>
-constexpr bool contains(const std::unordered_map<C, T>& c, const A& elem)
+constexpr bool contains(const ::std::unordered_map<C, T>& c, const A& elem)
 {
   return c.find(C(elem)) != c.end();
 }
@@ -279,9 +283,9 @@ inline C& insert_at(C& c, size_t pIndex, const T& elem)
 }
 
 template <typename K, typename V>
-inline std::vector<K> extract_keys(std::unordered_map<K, V> const& inputMap)
+inline ::std::vector<K> extract_keys(::std::unordered_map<K, V> const& inputMap)
 {
-  std::vector<K> keys;
+  ::std::vector<K> keys;
   keys.reserve(inputMap.size());
   for (auto const& element : inputMap) {
     keys.emplace_back(element.first);
@@ -290,9 +294,10 @@ inline std::vector<K> extract_keys(std::unordered_map<K, V> const& inputMap)
 }
 
 template <typename K, typename V>
-inline std::vector<V> extract_values(std::unordered_map<K, V> const& inputMap)
+inline ::std::vector<V>
+extract_values(::std::unordered_map<K, V> const& inputMap)
 {
-  std::vector<V> values;
+  ::std::vector<V> values;
   values.reserve(inputMap.size());
   for (auto const& element : inputMap) {
     values.emplace_back(element.second);
@@ -303,7 +308,7 @@ inline std::vector<V> extract_values(std::unordered_map<K, V> const& inputMap)
 template <typename C, typename T>
 inline bool erase(C& c, const T& elem)
 {
-  auto i = std::find(c.begin(), c.end(), elem);
+  auto i = ::std::find(c.begin(), c.end(), elem);
   if (i != c.end()) {
     c.erase(i);
     return true;
@@ -343,7 +348,7 @@ void erase_if(C& container, P predicate)
 template <typename C, typename T>
 inline int index_of(C& c, const T& elem)
 {
-  auto i = std::find(c.begin(), c.end(), elem);
+  auto i = ::std::find(c.begin(), c.end(), elem);
   if (i != c.end()) {
     return static_cast<int>(i - c.begin());
   }
@@ -357,12 +362,12 @@ inline int index_of(C& c, const T& elem)
  * @return A vector, containing the filtered values.
  */
 template <typename T, class UnaryPredicate>
-inline std::vector<T> filter(const std::vector<T>& original,
-                             UnaryPredicate pred)
+inline ::std::vector<T> filter(const ::std::vector<T>& original,
+                               UnaryPredicate pred)
 {
-  std::vector<T> filtered;
-  std::copy_if(original.begin(), original.end(), std::back_inserter(filtered),
-               pred);
+  ::std::vector<T> filtered;
+  ::std::copy_if(original.begin(), original.end(),
+                 ::std::back_inserter(filtered), pred);
   return filtered;
 }
 
@@ -374,12 +379,12 @@ inline std::vector<T> filter(const std::vector<T>& original,
  * @return A vector, containing the mapped values.
  */
 template <typename T, class UnaryOperation>
-inline std::vector<T> map(const std::vector<T>& original,
-                          UnaryOperation mappingFunction)
+inline ::std::vector<T> map(const ::std::vector<T>& original,
+                            UnaryOperation mappingFunction)
 {
-  std::vector<T> mapped;
-  std::transform(original.begin(), original.end(), std::back_inserter(mapped),
-                 mappingFunction);
+  ::std::vector<T> mapped;
+  ::std::transform(original.begin(), original.end(),
+                   ::std::back_inserter(mapped), mappingFunction);
   return mapped;
 }
 
@@ -398,18 +403,18 @@ inline std::vector<T> map(const std::vector<T>& original,
  * @return A new Array, containing the selected elements.
  */
 template <typename T>
-inline std::vector<T> slice(const std::vector<T>& v, int start = 0,
-                            int end = -1)
+inline ::std::vector<T> slice(const ::std::vector<T>& v, int start = 0,
+                              int end = -1)
 {
   if (end < 0) {
-    return std::vector<T>(v.begin() + start, v.end());
+    return ::std::vector<T>(v.begin() + start, v.end());
   }
 
   if (start > end) {
-    return std::vector<T>(v.begin() + end, v.begin() + start);
+    return ::std::vector<T>(v.begin() + end, v.begin() + start);
   }
 
-  return std::vector<T>(v.begin() + (start < 0 ? 0 : start), v.begin() + end);
+  return ::std::vector<T>(v.begin() + (start < 0 ? 0 : start), v.begin() + end);
 }
 
 /**
@@ -426,16 +431,16 @@ inline std::vector<T> slice(const std::vector<T>& v, int start = 0,
  * @return Nothing.
  */
 template <typename T>
-inline void slice_in_place(std::vector<T>& v, int start = 0, int end = -1)
+inline void slice_in_place(::std::vector<T>& v, int start = 0, int end = -1)
 {
   if (end < 0) {
-    std::vector<T>(v.begin() + start, v.end()).swap(v);
+    ::std::vector<T>(v.begin() + start, v.end()).swap(v);
   }
   else if (start > end) {
-    std::vector<T>(v.begin() + end, v.begin() + start).swap(v);
+    ::std::vector<T>(v.begin() + end, v.begin() + start).swap(v);
   }
   else {
-    std::vector<T>(v.begin() + (start < 0 ? 0 : start), v.begin() + end)
+    ::std::vector<T>(v.begin() + (start < 0 ? 0 : start), v.begin() + end)
       .swap(v);
   }
 }
@@ -451,23 +456,23 @@ inline void slice_in_place(std::vector<T>& v, int start = 0, int end = -1)
  * @return A new Array, containing the removed items (if any)
  */
 template <typename T>
-inline std::vector<T> splice(std::vector<T>& v, int index = 0, int howmany = 0,
-                             const std::vector<T>& itemsToAdd
-                             = std::vector<T>())
+inline ::std::vector<T>
+splice(::std::vector<T>& v, int index = 0, int howmany = 0,
+       const ::std::vector<T>& itemsToAdd = ::std::vector<T>())
 {
   if (index < 0) {
-    const auto start = std::max(v.begin(), v.end() + index);
-    const auto end   = std::min(v.end(), start + howmany);
-    std::vector<T> removedItems(start, end);
+    const auto start = ::std::max(v.begin(), v.end() + index);
+    const auto end   = ::std::min(v.end(), start + howmany);
+    ::std::vector<T> removedItems(start, end);
     v.erase(start, end);
     v.insert(end - static_cast<int>(removedItems.size()), itemsToAdd.begin(),
              itemsToAdd.end());
     return removedItems;
   }
   else {
-    const auto start = std::min(v.end(), v.begin() + index);
-    const auto end   = std::min(v.end(), start + howmany);
-    std::vector<T> removedItems(start, end);
+    const auto start = ::std::min(v.end(), v.begin() + index);
+    const auto end   = ::std::min(v.end(), start + howmany);
+    ::std::vector<T> removedItems(start, end);
     v.erase(start, end);
     v.insert(end - static_cast<int>(removedItems.size()), itemsToAdd.begin(),
              itemsToAdd.end());
@@ -476,7 +481,7 @@ inline std::vector<T> splice(std::vector<T>& v, int index = 0, int howmany = 0,
 }
 
 template <typename T>
-inline void remove(std::vector<T>& vec, size_t pos)
+inline void remove(::std::vector<T>& vec, size_t pos)
 {
   vec.erase(vec.begin() + pos);
 }
@@ -484,14 +489,14 @@ inline void remove(std::vector<T>& vec, size_t pos)
 template <typename C, typename P>
 inline void remove_if(C& c, const P& p)
 {
-  c.erase(std::remove_if(std::begin(c), std::end(c), p), std::end(c));
+  c.erase(::std::remove_if(::std::begin(c), ::std::end(c), p), ::std::end(c));
 }
 
 template <typename C, typename T>
 inline bool push_unique(C& c, T&& elem)
 {
   if (!contains(c, elem)) {
-    c.push_back(std::move(elem));
+    c.push_back(::std::move(elem));
     return true;
   }
   return false;
@@ -503,7 +508,7 @@ public:
     friend class range;
 
   public:
-    std::size_t operator*() const
+    ::std::size_t operator*() const
     {
       return i_;
     }
@@ -529,12 +534,12 @@ public:
     }
 
   protected:
-    iterator(std::size_t start) : i_(start)
+    iterator(::std::size_t start) : i_(start)
     {
     }
 
   private:
-    std::size_t i_;
+    ::std::size_t i_;
   };
 
   iterator begin() const
@@ -545,7 +550,7 @@ public:
   {
     return end_;
   }
-  range(std::size_t begin, std::size_t end) : begin_(begin), end_(end)
+  range(::std::size_t begin, ::std::size_t end) : begin_(begin), end_(end)
   {
   }
 
@@ -555,87 +560,6 @@ private:
 };
 
 } // end of namespace stl_util
-
-// Bugfix for Visual Studio 2013 which does not handle well
-// std::packaged_task<void()>.
-// Ref: workarounds at
-// http://connect.microsoft.com/VisualStudio/feedback/details/791185/std-packaged-task-t-where-t-is-void-or-a-reference-class-are-not-movable
-
-#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))                  \
-  && !defined(__MINGW32__)
-namespace std {
-
-template <class... _ArgTypes>
-class packaged_task<void(_ArgTypes...)> {
-  promise<void> _my_promise;
-  function<void(_ArgTypes...)> _my_func;
-
-public:
-  packaged_task()
-  {
-  }
-
-  template <class _Fty2>
-  explicit packaged_task(_Fty2&& _Fnarg) : _my_func(_Fnarg)
-  {
-  }
-
-  packaged_task(packaged_task&& _Other)
-      : _my_promise(move(_Other._my_promise)), _my_func(move(_Other._my_func))
-  {
-  }
-
-  packaged_task& operator=(packaged_task&& _Other)
-  {
-    _my_promise = move(_Other._my_promise);
-    _my_func    = move(_Other._my_func);
-    return (*this);
-  }
-
-  packaged_task(const packaged_task&) = delete;
-  packaged_task& operator=(const packaged_task&) = delete;
-
-  ~packaged_task()
-  {
-  }
-
-  void swap(packaged_task& _Other)
-  {
-    swap(_my_promise, _Other._my_promise);
-    swap(_my_func, _Other._my_func);
-  }
-
-  explicit operator bool() const
-  {
-    return _my_func != false;
-  }
-
-  bool valid() const
-  {
-    return _my_func != false;
-  }
-
-  future<void> get_future()
-  {
-    return _my_promise.get_future();
-  }
-
-  void operator()(_ArgTypes... _Args)
-  {
-    _my_func(forward<_ArgTypes>(_Args)...);
-    _my_promise.set_value();
-  }
-
-  void reset()
-  {
-    _my_promise.swap(promise<void>());
-    _my_func.swap(function<void(_ArgTypes...)>());
-  }
-};
-
-};     // namespace std
-#endif // defined(WIN32) ...
-
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_STL_UTIL_H

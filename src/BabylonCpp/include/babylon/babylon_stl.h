@@ -76,13 +76,19 @@
 // Utilities library
 #include <utility>
 
+// Fix for namespace uses when using stl
+#if _MSC_VER && !__INTEL_COMPILER
+#include <babylon/babylon_stl_mscv.h>
+#endif
+
 namespace BABYLON {
 
 // Common types
-using millisecond_t  = std::chrono::duration<uint64_t, std::ratio<1, 1000>>;
+using millisecond_t = std::chrono::duration<std::uint64_t, std::ratio<1, 1000>>;
 using milliseconds_t = std::chrono::milliseconds;
-using microsecond_t  = std::chrono::duration<uint64_t, std::ratio<1, 1000000>>;
-using microseconds_t = std::chrono::microseconds;
+using microsecond_t
+  = std::chrono::duration<std::uint64_t, std::ratio<1, 1000000>>;
+using microseconds_t        = std::chrono::microseconds;
 using high_res_clock_t      = std::chrono::high_resolution_clock;
 using high_res_time_point_t = std::chrono::time_point<high_res_clock_t>;
 using system_clock_t        = std::chrono::system_clock;
@@ -110,7 +116,7 @@ using Float32Array = std::vector<std::float_t>;
 using Float64Array = std::vector<std::double_t>;
 
 // Indices array alias
-using IndicesArray = Uint32Array;
+using IndicesArray = std::vector<std::uint32_t>;
 
 } // end of namespace BABYLON
 

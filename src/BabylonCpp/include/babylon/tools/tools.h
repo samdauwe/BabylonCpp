@@ -64,25 +64,25 @@ struct BABYLON_SHARED_EXPORT Tools {
                                  size_t count, const Vector2& bias,
                                  unsigned int stride = 3);
   static MinMaxVector2 ExtractMinAndMaxVector2(
-    const std::function<Nullable<Vector2>(std::size_t index)>& feeder);
+    const ::std::function<Nullable<Vector2>(std::size_t index)>& feeder);
   static MinMaxVector2 ExtractMinAndMaxVector2(
-    const std::function<Nullable<Vector2>(std::size_t index)>& feeder,
+    const ::std::function<Nullable<Vector2>(std::size_t index)>& feeder,
     const Vector2& bias);
   static Image CreateCheckerboardImage(unsigned int size = 256);
   static Image CreateNoiseImage(unsigned int size = 8);
   static void
   LoadImage(const std::string& url,
-            const std::function<void(const Image& img)>& onLoad,
-            const std::function<void(const std::string& msg)>& onError,
+            const ::std::function<void(const Image& img)>& onLoad,
+            const ::std::function<void(const std::string& msg)>& onError,
             bool flipVertically = true);
   static void
   LoadFile(const std::string& url,
-           const std::function<void(const std::string& text)>& callback,
-           const std::function<void()>& progressCallBack = nullptr,
-           bool useArrayBuffer                           = false);
+           const ::std::function<void(const std::string& text)>& callback,
+           const ::std::function<void()>& progressCallBack = nullptr,
+           bool useArrayBuffer                             = false);
   static void CheckExtends(Vector3& v, Vector3& min, Vector3& max);
   static std::string RandomId();
-  static void SetImmediate(const std::function<void()>& immediate);
+  static void SetImmediate(const ::std::function<void()>& immediate);
   static void DumpFramebuffer(int width, int height, Engine* engine);
   static void StartPerformanceCounter(const std::string&)
   {

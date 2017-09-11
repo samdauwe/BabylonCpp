@@ -32,15 +32,15 @@ SphericalHarmonics::SphericalHarmonics(const SphericalHarmonics& other)
 }
 
 SphericalHarmonics::SphericalHarmonics(SphericalHarmonics&& other)
-    : L00{std::move(other.L00)}
-    , L1_1{std::move(other.L1_1)}
-    , L10{std::move(other.L10)}
-    , L11{std::move(other.L11)}
-    , L2_2{std::move(other.L2_2)}
-    , L2_1{std::move(other.L2_1)}
-    , L20{std::move(other.L20)}
-    , L21{std::move(other.L21)}
-    , L22{std::move(other.L22)}
+    : L00{::std::move(other.L00)}
+    , L1_1{::std::move(other.L1_1)}
+    , L10{::std::move(other.L10)}
+    , L11{::std::move(other.L11)}
+    , L2_2{::std::move(other.L2_2)}
+    , L2_1{::std::move(other.L2_1)}
+    , L20{::std::move(other.L20)}
+    , L21{::std::move(other.L21)}
+    , L22{::std::move(other.L22)}
 {
 }
 
@@ -65,15 +65,15 @@ operator=(const SphericalHarmonics& other)
 SphericalHarmonics& SphericalHarmonics::operator=(SphericalHarmonics&& other)
 {
   if (&other != this) {
-    L00  = std::move(other.L00);
-    L1_1 = std::move(other.L1_1);
-    L10  = std::move(other.L10);
-    L11  = std::move(other.L11);
-    L2_2 = std::move(other.L2_2);
-    L2_1 = std::move(other.L2_1);
-    L20  = std::move(other.L20);
-    L21  = std::move(other.L21);
-    L22  = std::move(other.L22);
+    L00  = ::std::move(other.L00);
+    L1_1 = ::std::move(other.L1_1);
+    L10  = ::std::move(other.L10);
+    L11  = ::std::move(other.L11);
+    L2_2 = ::std::move(other.L2_2);
+    L2_1 = ::std::move(other.L2_1);
+    L20  = ::std::move(other.L20);
+    L21  = ::std::move(other.L21);
+    L22  = ::std::move(other.L22);
   }
 
   return *this;
@@ -90,7 +90,7 @@ SphericalHarmonics SphericalHarmonics::copy() const
 
 std::unique_ptr<SphericalHarmonics> SphericalHarmonics::clone() const
 {
-  return std::make_unique<SphericalHarmonics>(*this);
+  return ::std::make_unique<SphericalHarmonics>(*this);
 }
 
 void SphericalHarmonics::addLight(const Vector3& direction, const Color3& color,

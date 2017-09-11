@@ -12,8 +12,8 @@ class BABYLON_SHARED_EXPORT Octree : public IOctreeContainer<T> {
 public:
   Octree();
   Octree(
-    const std::function<void(T& entry, OctreeBlock<T>& block)>& creationFunc,
-    size_t maxBlockCapacity = 64, size_t maxDepth = 2);
+    const ::std::function<void(T& entry, OctreeBlock<T>& block)>& creationFunc,
+    std::size_t maxBlockCapacity = 64, std::size_t maxDepth = 2);
   ~Octree();
 
   /** Methods **/
@@ -29,9 +29,9 @@ public:
   /** Statics **/
   static void _CreateBlocks(
     const Vector3& worldMin, const Vector3& worldMax, std::vector<T>& entries,
-    size_t maxBlockCapacity, size_t currentDepth, size_t maxDepth,
-    IOctreeContainer<T>& target,
-    std::function<void(T& entry, OctreeBlock<T>& block)>& creationFunc);
+    std::size_t maxBlockCapacity, std::size_t currentDepth,
+    std::size_t maxDepth, IOctreeContainer<T>& target,
+    ::std::function<void(T& entry, OctreeBlock<T>& block)>& creationFunc);
   static void CreationFuncForMeshes(AbstractMesh* entry,
                                     OctreeBlock<AbstractMesh*>& block);
   static void CreationFuncForSubMeshes(SubMesh* entry,
@@ -41,10 +41,10 @@ public:
   std::vector<T> dynamicContent;
 
 private:
-  size_t _maxBlockCapacity;
-  size_t _maxDepth;
+  std::size_t _maxBlockCapacity;
+  std::size_t _maxDepth;
   std::vector<T> _selectionContent;
-  std::function<void(T&, OctreeBlock<T>&)> _creationFunc;
+  ::std::function<void(T&, OctreeBlock<T>&)> _creationFunc;
 
 }; // end of class Octree
 

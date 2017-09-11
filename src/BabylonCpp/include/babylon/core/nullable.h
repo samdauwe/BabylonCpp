@@ -30,14 +30,14 @@ public:
   {
   }
 
-  Nullable(std::nullptr_t /*nullpointer*/)
+  Nullable(::std::nullptr_t /*nullpointer*/)
       : _hasValue(false), _value(T()), value(_value)
   {
   }
 
   Nullable(Nullable&& rhs)
-      : _hasValue(std::move(rhs._hasValue))
-      , _value(std::move(rhs._value))
+      : _hasValue(::std::move(rhs._hasValue))
+      , _value(::std::move(rhs._value))
       , value(_value)
   {
     rhs._hasValue = false;
@@ -70,7 +70,7 @@ public:
 
   friend void swap(Nullable& n0, Nullable& n1)
   {
-    std::swap(n0, n1);
+    ::std::swap(n0, n1);
   }
 
   const Nullable<T>& operator=(const Nullable<T>& value)
@@ -87,7 +87,7 @@ public:
     return *this;
   }
 
-  const Nullable<T>& operator=(std::nullptr_t /*nullpointer*/)
+  const Nullable<T>& operator=(::std::nullptr_t /*nullpointer*/)
   {
     _hasValue = false;
     _value    = T();
@@ -104,10 +104,10 @@ public:
   friend bool operator==(const T2& value, const Nullable<T2>& op);
 
   template <typename T2>
-  friend bool operator==(const Nullable<T2>& op, std::nullptr_t nullpointer);
+  friend bool operator==(const Nullable<T2>& op, ::std::nullptr_t nullpointer);
 
   template <typename T2>
-  friend bool operator==(std::nullptr_t nullpointer, const Nullable<T2>& op);
+  friend bool operator==(::std::nullptr_t nullpointer, const Nullable<T2>& op);
 
 }; // end of class Nullable
 
@@ -147,7 +147,7 @@ bool operator==(const T& value, const Nullable<T>& op)
 }
 
 template <typename T>
-bool operator==(const Nullable<T>& op, std::nullptr_t /*nullpointer*/)
+bool operator==(const Nullable<T>& op, ::std::nullptr_t /*nullpointer*/)
 {
   if (op._hasValue) {
     return false;
@@ -158,7 +158,7 @@ bool operator==(const Nullable<T>& op, std::nullptr_t /*nullpointer*/)
 }
 
 template <typename T>
-bool operator==(std::nullptr_t /*nullpointer*/, const Nullable<T>& op)
+bool operator==(::std::nullptr_t /*nullpointer*/, const Nullable<T>& op)
 {
   if (op._hasValue) {
     return false;

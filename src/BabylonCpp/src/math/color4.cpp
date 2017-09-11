@@ -17,10 +17,10 @@ Color4::Color4(const Color4& otherColor)
 }
 
 Color4::Color4(Color4&& otherColor)
-    : r{std::move(otherColor.r)}
-    , g{std::move(otherColor.g)}
-    , b{std::move(otherColor.b)}
-    , a{std::move(otherColor.a)}
+    : r{::std::move(otherColor.r)}
+    , g{::std::move(otherColor.g)}
+    , b{::std::move(otherColor.b)}
+    , a{::std::move(otherColor.a)}
 {
 }
 
@@ -39,10 +39,10 @@ Color4& Color4::operator=(const Color4& otherColor)
 Color4& Color4::operator=(Color4&& otherColor)
 {
   if (&otherColor != this) {
-    r = std::move(otherColor.r);
-    g = std::move(otherColor.g);
-    b = std::move(otherColor.b);
-    a = std::move(otherColor.a);
+    r = ::std::move(otherColor.r);
+    g = ::std::move(otherColor.g);
+    b = ::std::move(otherColor.b);
+    a = ::std::move(otherColor.a);
   }
 
   return *this;
@@ -59,7 +59,7 @@ Color4 Color4::copy() const
 
 std::unique_ptr<Color4> Color4::clone() const
 {
-  return std::make_unique<Color4>(*this);
+  return ::std::make_unique<Color4>(*this);
 }
 
 const char* Color4::getClassName() const
@@ -70,9 +70,9 @@ const char* Color4::getClassName() const
 int Color4::getHashCode() const
 {
   float hash = r;
-  hash       = std::pow((hash * 397), g);
-  hash       = std::pow((hash * 397), b);
-  hash       = std::pow((hash * 397), a);
+  hash       = ::std::pow((hash * 397), g);
+  hash       = ::std::pow((hash * 397), b);
+  hash       = ::std::pow((hash * 397), a);
   return static_cast<int>(hash);
 }
 
@@ -232,9 +232,9 @@ Color4 Color4::toLinearSpace() const
 
 const Color4& Color4::toLinearSpaceToRef(Color4& convertedColor) const
 {
-  convertedColor.r = std::pow(r, Math::ToLinearSpace);
-  convertedColor.g = std::pow(g, Math::ToLinearSpace);
-  convertedColor.b = std::pow(b, Math::ToLinearSpace);
+  convertedColor.r = ::std::pow(r, Math::ToLinearSpace);
+  convertedColor.g = ::std::pow(g, Math::ToLinearSpace);
+  convertedColor.b = ::std::pow(b, Math::ToLinearSpace);
   convertedColor.a = a;
   return *this;
 }
@@ -248,9 +248,9 @@ Color4 Color4::toGammaSpace() const
 
 const Color4& Color4::toGammaSpaceToRef(Color4& convertedColor) const
 {
-  convertedColor.r = std::pow(r, Math::ToGammaSpace);
-  convertedColor.g = std::pow(g, Math::ToGammaSpace);
-  convertedColor.b = std::pow(b, Math::ToGammaSpace);
+  convertedColor.r = ::std::pow(r, Math::ToGammaSpace);
+  convertedColor.g = ::std::pow(g, Math::ToGammaSpace);
+  convertedColor.b = ::std::pow(b, Math::ToGammaSpace);
   convertedColor.a = a;
   return *this;
 }

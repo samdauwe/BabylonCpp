@@ -17,10 +17,10 @@ Vector4::Vector4(const Vector4& otherVector)
 }
 
 Vector4::Vector4(Vector4&& otherVector)
-    : x{std::move(otherVector.x)}
-    , y{std::move(otherVector.y)}
-    , z{std::move(otherVector.z)}
-    , w{std::move(otherVector.w)}
+    : x{::std::move(otherVector.x)}
+    , y{::std::move(otherVector.y)}
+    , z{::std::move(otherVector.z)}
+    , w{::std::move(otherVector.w)}
 {
 }
 
@@ -39,10 +39,10 @@ Vector4& Vector4::operator=(const Vector4& otherVector)
 Vector4& Vector4::operator=(Vector4&& otherVector)
 {
   if (&otherVector != this) {
-    x = std::move(otherVector.x);
-    y = std::move(otherVector.y);
-    z = std::move(otherVector.z);
-    w = std::move(otherVector.w);
+    x = ::std::move(otherVector.x);
+    y = ::std::move(otherVector.y);
+    z = ::std::move(otherVector.z);
+    w = ::std::move(otherVector.w);
   }
 
   return *this;
@@ -59,7 +59,7 @@ Vector4 Vector4::copy() const
 
 std::unique_ptr<Vector4> Vector4::clone() const
 {
-  return std::make_unique<Vector4>(*this);
+  return ::std::make_unique<Vector4>(*this);
 }
 
 std::string Vector4::toString() const
@@ -376,7 +376,7 @@ bool Vector4::operator!=(const Vector4& otherVector) const
 /** Properties **/
 float Vector4::length() const
 {
-  return std::sqrt(x * x + y * y + z * z + w * w);
+  return ::std::sqrt(x * x + y * y + z * z + w * w);
 }
 
 float Vector4::lengthSquared() const
@@ -497,7 +497,7 @@ Vector4 Vector4::Maximize(const Vector4& left, const Vector4& right)
 
 float Vector4::Distance(const Vector4& value1, const Vector4& value2)
 {
-  return std::sqrt(Vector4::DistanceSquared(value1, value2));
+  return ::std::sqrt(Vector4::DistanceSquared(value1, value2));
 }
 
 float Vector4::DistanceSquared(const Vector4& value1, const Vector4& value2)

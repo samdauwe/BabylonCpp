@@ -42,6 +42,11 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.4)
         message(FATAL_ERROR "Clang version must be at least 3.4!")
     endif()
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    # c++14 require at least Microsoft Visual Studio 2017
+    if (MSVC_VERSION VERSION_LESS 1910)
+        message(FATAL_ERROR "MSVC version must be at Visual Studio 2017!")
+    endif()
 else()
     message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}")
 endif()
@@ -72,11 +77,13 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
         /MP           # -> build with multiple processes
         /W4           # -> warning level 4
         # /WX         # -> treat warnings as errors
-
         /wd4251       # -> disable warning: 'identifier': class 'type' needs to have dll-interface to be used by clients of class 'type2'
         /wd4592       # -> disable warning: 'identifier': symbol will be dynamically initialized (implementation limitation)
         # /wd4201     # -> disable warning: nonstandard extension used: nameless struct/union (caused by GLM)
-        # /wd4127     # -> disable warning: conditional expression is constant (caused by Qt)
+        /wd4127       # -> disable warning: conditional expression is constant (caused by Qt)
+
+        # /Zm114      # -> Memory size for precompiled headers (insufficient for msvc 2013)
+        /Zm200        # -> Memory size for precompiled headers
         
         #$<$<CONFIG:Debug>:
         #/RTCc         # -> value is assigned to a smaller data type and results in a data loss

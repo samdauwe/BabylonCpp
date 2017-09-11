@@ -16,7 +16,7 @@ namespace Scalar {
 template <typename T>
 constexpr bool WithinEpsilon(T a, T b, T epsilon = 1.401298E-45f)
 {
-  return std::abs(a - b) <= epsilon;
+  return ::std::abs(a - b) <= epsilon;
 }
 
 /**
@@ -25,7 +25,7 @@ constexpr bool WithinEpsilon(T a, T b, T epsilon = 1.401298E-45f)
 inline std::string ToHex(int i)
 {
   std::ostringstream stream;
-  stream << std::setfill('0') << std::setw(2) << std::hex << i;
+  stream << ::std::setfill('0') << ::std::setw(2) << ::std::hex << i;
   return String::toUpperCase(stream.str());
 }
 
@@ -66,7 +66,7 @@ constexpr T Clamp(T value, T min, T max)
 template <typename T>
 constexpr T Clamp(T value)
 {
-  return std::min(static_cast<T>(1), std::max(static_cast<T>(0), value));
+  return ::std::min(static_cast<T>(1), ::std::max(static_cast<T>(0), value));
 }
 
 /**
@@ -82,12 +82,12 @@ constexpr int IMul(int a, int b)
 {
   // the shift by 0 fixes the sign on the high part
   // the final |0 converts the unsigned value into a signed value
-  return (
-    (((a & 0xffff) * (b & 0xffff)) + (((((a >> 16) & 0xffff) * (b & 0xffff)
-                                        + (a & 0xffff) * ((b >> 16) & 0xffff))
-                                       << 16)
-                                      >> 0))
-    | 0);
+  return ((((a & 0xffff) * (b & 0xffff))
+           + (((((a >> 16) & 0xffff) * (b & 0xffff)
+                + (a & 0xffff) * ((b >> 16) & 0xffff))
+               << 16)
+              >> 0))
+          | 0);
 }
 
 /**
@@ -101,9 +101,9 @@ constexpr int IMul(int a, int b)
  * Note, however, that the behaviour is not defined for negative numbers as it
  * is for the modulo operator
  */
-constexpr float Repeat(float value, float length)
+inline float Repeat(float value, float length)
 {
-  return value - std::floor(value / length) * length;
+  return value - ::std::floor(value / length) * length;
 }
 
 /**
@@ -126,7 +126,7 @@ constexpr float Denormalize(float normalized, float min, float max)
  * @brief Calculates the shortest difference between two given angles given in
  * degrees.
  */
-constexpr float DeltaAngle(float current, float target)
+inline float DeltaAngle(float current, float target)
 {
   auto num = Scalar::Repeat(target - current, 360.f);
   if (num > 180.f) {
@@ -141,10 +141,10 @@ constexpr float DeltaAngle(float current, float target)
  *
  * The returned value will move back and forth between 0 and length
  */
-constexpr float PingPong(float tx, float length)
+inline float PingPong(float tx, float length)
 {
   const auto t = Scalar::Repeat(tx, length * 2.f);
-  return length - std::abs(t - length);
+  return length - ::std::abs(t - length);
 }
 
 /**
@@ -169,10 +169,10 @@ constexpr float SmoothStep(float from, float to, float tx)
  * ensure that the speed never exceeds maxDelta.
  * Negative values of maxDelta pushes the value away from target.
  */
-constexpr float MoveTowards(float current, float target, float maxDelta)
+inline float MoveTowards(float current, float target, float maxDelta)
 {
   auto result = 0.f;
-  if (std::abs(target - current) <= maxDelta) {
+  if (::std::abs(target - current) <= maxDelta) {
     result = target;
   }
   else {
@@ -190,7 +190,7 @@ constexpr float MoveTowards(float current, float target, float maxDelta)
  *  are not supported and may cause oscillation. To push current away from a
  * target angle, add 180 to that angle instead.
  */
-constexpr float MoveTowardsAngle(float current, float target, float maxDelta)
+inline float MoveTowardsAngle(float current, float target, float maxDelta)
 {
   const auto num = Scalar::DeltaAngle(current, target);
   auto result    = 0.f;
@@ -215,10 +215,10 @@ constexpr T Lerp(T start, T end, T amount)
 }
 
 /**
-* @brief Same as Lerp but makes sure the values interpolate correctly when they
-* wrap around 360 degrees.
-*/
-constexpr float LerpAngle(float start, float end, float amount)
+ * @brief Same as Lerp but makes sure the values interpolate correctly when they
+ * wrap around 360 degrees.
+ */
+inline float LerpAngle(float start, float end, float amount)
 {
   auto num = Scalar::Repeat(end - start, 360.f);
   if (num > 180.f) {

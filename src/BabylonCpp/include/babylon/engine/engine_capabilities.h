@@ -11,13 +11,13 @@ struct BABYLON_SHARED_EXPORT AnisotropicFilterExtension {
 }; // end of struct TextureAnisotropicFilterExtension
 
 struct BABYLON_SHARED_EXPORT InstancedArrays {
-  std::function<void(unsigned int, int)> vertexAttribDivisorANGLE;
-  std::function<void(unsigned int mode, int indexCount,
-                     unsigned int indexFormat, unsigned int start,
-                     int instancesCount)>
+  ::std::function<void(unsigned int, int)> vertexAttribDivisorANGLE;
+  ::std::function<void(unsigned int mode, int indexCount,
+                       unsigned int indexFormat, unsigned int start,
+                       int instancesCount)>
     drawElementsInstancedANGLE;
-  std::function<void(unsigned int mode, int verticesStart, int verticesCount,
-                     int instancesCount)>
+  ::std::function<void(unsigned int mode, int verticesStart, int verticesCount,
+                       int instancesCount)>
     drawArraysInstancedANGLE;
 }; // end of struct InstancedArrays
 
