@@ -1,6 +1,7 @@
 #ifndef OIMO_UTILS_H
 #define OIMO_UTILS_H
 
+#include <algorithm>
 #include <cmath>
 #include <ctime>
 #include <limits>

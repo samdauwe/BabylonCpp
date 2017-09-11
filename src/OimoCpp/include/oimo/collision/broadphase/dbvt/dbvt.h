@@ -1,6 +1,7 @@
 #ifndef OIMO_COLLISION_BROADPHASE_DBVT_DBVT_H
 #define OIMO_COLLISION_BROADPHASE_DBVT_DBVT_H
 
+#include <array>
 #include <vector>
 
 #include <oimo/oimo_utils.h>
