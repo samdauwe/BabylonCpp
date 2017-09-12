@@ -5,7 +5,7 @@ import sys
 
 def getPlatformKey():
     """
-    Return the platform key (type of operating system and 32bit/64bit).
+    Returns the platform key (type of operating system and 32bit/64bit).
     """
     import platform
     osPrecision = '64' if platform.architecture()[0] == '64bit' else '32'  
@@ -20,7 +20,7 @@ def getPlatformKey():
 
 def getCPUCount():
     """
-    Return the number of CPUs in the system.
+    Returns the number of CPUs in the system.
     """
     import multiprocessing
     return multiprocessing.cpu_count()
@@ -43,7 +43,7 @@ def isSubirectory(directory, subDirectory):
 
 def removeDir(path):
     """
-    Deleting the folders in path recursively.
+    Deletes the folders in the given path recursively.
     """
     import shutil
     if os.path.isdir(path) and isSubirectory(os.getcwd(), path):
