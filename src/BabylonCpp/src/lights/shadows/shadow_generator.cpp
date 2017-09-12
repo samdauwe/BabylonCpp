@@ -761,7 +761,7 @@ Matrix ShadowGenerator::getTransformMatrix()
                           _lightDirection);
 
   if (stl_util::almost_equal(
-        std::abs(Vector3::Dot(_lightDirection, Vector3::Up())), 1.f)) {
+        ::std::abs(Vector3::Dot(_lightDirection, Vector3::Up())), 1.f)) {
     // Required to avoid perfectly perpendicular light
     _lightDirection.z = 0.0000000000001f;
   }

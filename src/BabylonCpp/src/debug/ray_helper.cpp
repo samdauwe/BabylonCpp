@@ -57,7 +57,7 @@ void RayHelper::hide()
 void RayHelper::_render()
 {
   auto& point = _renderPoints[1];
-  float len   = std::min(ray.length, 1000000.f);
+  float len   = ::std::min(ray.length, 1000000.f);
 
   point.copyFrom(ray.direction);
   point.scaleInPlace(len);

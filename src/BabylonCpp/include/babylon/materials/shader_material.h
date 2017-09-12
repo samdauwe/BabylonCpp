@@ -19,7 +19,7 @@ public:
   template <typename... Ts>
   static ShaderMaterial* New(Ts&&... args)
   {
-    auto material = new ShaderMaterial(std::forward<Ts>(args)...);
+    auto material = new ShaderMaterial(::std::forward<Ts>(args)...);
     material->addMaterialToScene(
       static_cast<std::unique_ptr<Material>>(material));
 

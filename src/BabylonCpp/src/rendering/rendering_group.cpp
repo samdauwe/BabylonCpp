@@ -197,7 +197,7 @@ void RenderingGroup::renderSorted(
   auto sortedArray = subMeshes;
 
   // sort using a custom function object
-  std::sort(
+  ::std::sort(
     sortedArray.begin(), sortedArray.end(),
     [&sortCompareFn](SubMesh* a, SubMesh* b) { return sortCompareFn(a, b); });
 

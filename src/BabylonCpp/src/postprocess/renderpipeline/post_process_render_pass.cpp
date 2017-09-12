@@ -62,8 +62,8 @@ void PostProcessRenderPass::setRenderList(const std::vector<Mesh*>& renderList)
 {
   _renderTexture->renderList.clear();
   _renderTexture->renderList.reserve(renderList.size());
-  std::copy(renderList.begin(), renderList.end(),
-            std::back_inserter(_renderTexture->renderList));
+  ::std::copy(renderList.begin(), renderList.end(),
+              ::std::back_inserter(_renderTexture->renderList));
 }
 
 RenderTargetTexture* PostProcessRenderPass::getRenderTexture()

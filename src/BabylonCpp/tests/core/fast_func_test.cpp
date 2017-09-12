@@ -11,14 +11,14 @@ using EventType = int;
 
 class IEvent {
 public:
-  IEvent(void) = default;
-  IEvent(const IEvent& p_rIEvent) = delete;
+  IEvent(void)                     = default;
+  IEvent(const IEvent& p_rIEvent)  = delete;
   IEvent(const IEvent&& p_rIEvent) = delete;
   IEvent& operator=(const IEvent& p_rIEvent) = delete;
   IEvent& operator=(const IEvent&& p_rrIEvent) = delete;
-  virtual ~IEvent(void) = default;
+  virtual ~IEvent(void)                        = default;
 
-  virtual EventType getType(void) const = 0;
+  virtual EventType getType(void) const   = 0;
   virtual std::string getName(void) const = 0;
 
 }; // IEvent class
@@ -33,7 +33,7 @@ private:
   int m_Data = 100;
 
 public:
-  TestEvent(void) = default;
+  TestEvent(void)          = default;
   virtual ~TestEvent(void) = default;
 
   virtual EventType getType(void) const final
@@ -168,7 +168,7 @@ TEST(TestFastFunc, Lambda)
   using namespace BABYLON;
   FastFunc<void(void)> lambda_1([](void) { return; });
   FastFunc<void(void)> lambda_2([](void) { return; });
-  auto lambda_3 = FastFunc<void(void)>([](void) { return; });
+  auto lambda_3                 = FastFunc<void(void)>([](void) { return; });
   FastFunc<void(void)> lambda_4 = [](void) { return; };
   EXPECT_TRUE(lambda_1 != lambda_2);
   EXPECT_TRUE(lambda_1 != lambda_3);

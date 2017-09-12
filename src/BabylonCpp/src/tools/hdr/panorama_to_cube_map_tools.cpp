@@ -60,9 +60,9 @@ CubeMapInfo PanoramaToCubeMapTools::ConvertPanoramaToCubemap(
 
   cubeMapInfo.front = CreateCubemapTexture(size, FACE_FRONT, float32Array,
                                            inputWidth, inputHeight);
-  cubeMapInfo.back = CreateCubemapTexture(size, FACE_BACK, float32Array,
+  cubeMapInfo.back  = CreateCubemapTexture(size, FACE_BACK, float32Array,
                                           inputWidth, inputHeight);
-  cubeMapInfo.left = CreateCubemapTexture(size, FACE_LEFT, float32Array,
+  cubeMapInfo.left  = CreateCubemapTexture(size, FACE_LEFT, float32Array,
                                           inputWidth, inputHeight);
   cubeMapInfo.right = CreateCubemapTexture(size, FACE_RIGHT, float32Array,
                                            inputWidth, inputHeight);
@@ -118,8 +118,8 @@ Color3 PanoramaToCubeMapTools::CalcProjectionSpherical(
   const Vector3& vDir, const Float32Array& float32Array, size_t inputWidth,
   size_t inputHeight)
 {
-  float theta = std::atan2(vDir.z, vDir.x);
-  float phi   = std::acos(vDir.y);
+  float theta = ::std::atan2(vDir.z, vDir.x);
+  float phi   = ::std::acos(vDir.y);
 
   while (theta < -Math::PI) {
     theta += 2.f * Math::PI;
@@ -134,7 +134,7 @@ Color3 PanoramaToCubeMapTools::CalcProjectionSpherical(
   // recenter.
   dx = dx * 0.5f + 0.5f;
 
-  int px = static_cast<int>(std::round(dx * static_cast<float>(inputWidth)));
+  int px = static_cast<int>(::std::round(dx * static_cast<float>(inputWidth)));
   if (px < 0) {
     px = 0;
   }
@@ -142,7 +142,7 @@ Color3 PanoramaToCubeMapTools::CalcProjectionSpherical(
     px = static_cast<int>(inputWidth) - 1;
   }
 
-  int py = static_cast<int>(std::round(dy * static_cast<float>(inputHeight)));
+  int py = static_cast<int>(::std::round(dy * static_cast<float>(inputHeight)));
   if (py < 0) {
     py = 0;
   }

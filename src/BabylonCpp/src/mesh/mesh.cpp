@@ -203,18 +203,18 @@ bool Mesh::hasLODLevels() const
 
 void Mesh::_sortLODLevels()
 {
-  std::sort(_LODLevels.begin(), _LODLevels.end(),
-            [](const std::unique_ptr<MeshLODLevel>& a,
-               const std::unique_ptr<MeshLODLevel>& b) {
-              if (a->distance < b->distance) {
-                return 1;
-              }
-              if (a->distance > b->distance) {
-                return -1;
-              }
+  ::std::sort(_LODLevels.begin(), _LODLevels.end(),
+              [](const std::unique_ptr<MeshLODLevel>& a,
+                 const std::unique_ptr<MeshLODLevel>& b) {
+                if (a->distance < b->distance) {
+                  return 1;
+                }
+                if (a->distance > b->distance) {
+                  return -1;
+                }
 
-              return 0;
-            });
+                return 0;
+              });
 }
 
 Mesh& Mesh::addLODLevel(float distance, Mesh* mesh)
@@ -553,9 +553,9 @@ void Mesh::subdivide(size_t count)
       break;
     }
 
-    SubMesh::CreateFromIndices(0, static_cast<unsigned>(offset),
-                               std::min(subdivisionSize, totalIndices - offset),
-                               this);
+    SubMesh::CreateFromIndices(
+      0, static_cast<unsigned>(offset),
+      ::std::min(subdivisionSize, totalIndices - offset), this);
 
     offset += subdivisionSize;
   }
@@ -798,9 +798,9 @@ _InstancesBatch* Mesh::_getInstancesRenderList(size_t subMeshId)
         && defaultRenderId) {
       _batchCache->visibleInstances[subMeshId]
         = _visibleInstances->meshes[defaultRenderId];
-      currentRenderId_ = std::max(defaultRenderId, currentRenderId_);
+      currentRenderId_ = ::std::max(defaultRenderId, currentRenderId_);
       selfRenderId
-        = std::max(_visibleInstances->selfDefaultRenderId, currentRenderId_);
+        = ::std::max(_visibleInstances->selfDefaultRenderId, currentRenderId_);
     }
 
     if ((_batchCache->visibleInstances.find(subMeshId)
@@ -1090,8 +1090,8 @@ std::vector<IParticleSystem*> Mesh::getHierarchyEmittedParticleSystems()
 
   for (auto& particleSystem : getScene()->particleSystems) {
     if (particleSystem->emitter.is<AbstractMesh*>()) {
-      if (std::find(descendants.begin(), descendants.end(),
-                    particleSystem->emitter.get<AbstractMesh*>())
+      if (::std::find(descendants.begin(), descendants.end(),
+                      particleSystem->emitter.get<AbstractMesh*>())
           != descendants.end()) {
         results.emplace_back(particleSystem.get());
       }
@@ -1334,7 +1334,7 @@ void Mesh::applyDisplacementMap(
   const std::string& url, int minHeight, int maxHeight,
   const ::std::function<void(Mesh* mesh)> onSuccess)
 {
-  std::cout << url << minHeight << maxHeight;
+  ::std::cout << url << minHeight << maxHeight;
   onSuccess(nullptr);
 }
 
@@ -1365,9 +1365,9 @@ void Mesh::applyDisplacementMapFromBuffer(const Uint8Array& buffer,
     Vector2::FromArrayToRef(uvs, (index / 3) * 2, uv);
 
     // Compute height
-    auto u = (static_cast<unsigned int>(std::abs(uv.x)) * heightMapWidth)
+    auto u = (static_cast<unsigned int>(::std::abs(uv.x)) * heightMapWidth)
              % heightMapWidth;
-    auto v = (static_cast<unsigned int>(std::abs(uv.y)) * heightMapHeight)
+    auto v = (static_cast<unsigned int>(::std::abs(uv.y)) * heightMapHeight)
              % heightMapHeight;
 
     auto pos = (u + v * heightMapWidth) * 4;
@@ -1419,10 +1419,11 @@ Mesh& Mesh::convertToFlatShadedMesh()
 
   // Save previous submeshes
   std::vector<SubMesh*> previousSubmeshes;
-  std::for_each(subMeshes.begin(), subMeshes.end(),
-                [&previousSubmeshes](const std::unique_ptr<SubMesh>& subMesh) {
-                  previousSubmeshes.emplace_back(subMesh.get());
-                });
+  ::std::for_each(
+    subMeshes.begin(), subMeshes.end(),
+    [&previousSubmeshes](const std::unique_ptr<SubMesh>& subMesh) {
+      previousSubmeshes.emplace_back(subMesh.get());
+    });
 
   auto indices      = getIndices();
   auto totalIndices = getTotalIndices();
@@ -1507,10 +1508,11 @@ Mesh& Mesh::convertToUnIndexedMesh()
 
   // Save previous submeshes
   std::vector<SubMesh*> previousSubmeshes(subMeshes.size());
-  std::for_each(subMeshes.begin(), subMeshes.end(),
-                [&previousSubmeshes](const std::unique_ptr<SubMesh>& subMesh) {
-                  previousSubmeshes.emplace_back(subMesh.get());
-                });
+  ::std::for_each(
+    subMeshes.begin(), subMeshes.end(),
+    [&previousSubmeshes](const std::unique_ptr<SubMesh>& subMesh) {
+      previousSubmeshes.emplace_back(subMesh.get());
+    });
 
   auto indices      = getIndices();
   auto totalIndices = getTotalIndices();
@@ -1579,7 +1581,7 @@ Mesh& Mesh::flipFaces(bool flipNormals)
 
   for (i = 0; i < vertex_data->indices.size(); i += 3) {
     // reassign indices
-    std::swap(vertex_data->indices[i + 1], vertex_data->indices[i + 2]);
+    ::std::swap(vertex_data->indices[i + 1], vertex_data->indices[i + 2]);
   }
 
   vertex_data->applyToMesh(this);
@@ -1894,7 +1896,7 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
   if (parsedMesh.contains("layerMask")) {
     auto layerMask = Json::GetString(parsedMesh, "layerMask");
     if (!layerMask.empty()) {
-      mesh->setLayerMask(static_cast<unsigned>(std::stoi(layerMask)));
+      mesh->setLayerMask(static_cast<unsigned>(::std::stoi(layerMask)));
     }
   }
   else {

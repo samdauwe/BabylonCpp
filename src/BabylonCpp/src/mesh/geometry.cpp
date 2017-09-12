@@ -293,7 +293,7 @@ Float32Array Geometry::getVerticesData(unsigned int kind, bool copyWhenShared,
   }
   else {
     Float32Array _copy(orig.size());
-    std::copy(orig.begin(), orig.end(), _copy.begin());
+    ::std::copy(orig.begin(), orig.end(), _copy.begin());
     return _copy;
   }
 }
@@ -332,7 +332,7 @@ bool Geometry::isVerticesDataPresent(unsigned int kind)
 {
   if (_vertexBuffers.empty()) {
     if (!_delayInfo.empty()) {
-      return (std::find(_delayInfo.begin(), _delayInfo.end(), kind)
+      return (::std::find(_delayInfo.begin(), _delayInfo.end(), kind)
               != _delayInfo.end());
     }
     return false;
@@ -402,7 +402,7 @@ IndicesArray Geometry::getIndices(bool copyWhenShared)
   }
   else {
     IndicesArray _copy(_indices.size());
-    std::copy(_indices.begin(), _indices.end(), _copy.begin());
+    ::std::copy(_indices.begin(), _indices.end(), _copy.begin());
     return _copy;
   }
 }
@@ -429,7 +429,7 @@ void Geometry::_releaseVertexArrayObject(Effect* effect)
 
 void Geometry::releaseForMesh(Mesh* mesh, bool shouldDispose)
 {
-  auto it = std::find(_meshes.begin(), _meshes.end(), mesh);
+  auto it = ::std::find(_meshes.begin(), _meshes.end(), mesh);
   if (it == _meshes.end()) {
     return;
   }
@@ -568,7 +568,7 @@ void Geometry::toLeftHanded()
   auto tIndices = getIndices(false);
   if (!tIndices.empty()) {
     for (unsigned int i = 0; i < tIndices.size(); i += 3) {
-      std::swap(tIndices[i + 0], tIndices[i + 2]);
+      ::std::swap(tIndices[i + 0], tIndices[i + 2]);
     }
     setIndices(tIndices);
   }
@@ -871,7 +871,7 @@ void Geometry::_CleanMatricesWeights(Float32Array& matricesWeights,
       }
     }
 
-    matricesWeights[biggerIndex] += std::max(0.f, 1.f - weight);
+    matricesWeights[biggerIndex] += ::std::max(0.f, 1.f - weight);
   }
 }
 

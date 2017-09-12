@@ -117,7 +117,7 @@ float TargetCamera::_computeLocalCameraSpeed()
   auto engine = getEngine();
 
   return speed
-         * std::sqrt((engine->getDeltaTime() / (engine->getFps() * 100.f)));
+         * ::std::sqrt((engine->getDeltaTime() / (engine->getFps() * 100.f)));
 }
 
 void TargetCamera::setRotation(const Vector3& newRotation)
@@ -138,28 +138,28 @@ void TargetCamera::setTarget(const Vector3& target)
   Matrix::LookAtLHToRef(position, target, *_defaultUpVector, _camMatrix);
   _camMatrix.invert();
 
-  rotation->x = std::atan(_camMatrix.m[6] / _camMatrix.m[10]);
+  rotation->x = ::std::atan(_camMatrix.m[6] / _camMatrix.m[10]);
 
   auto vDir = target.subtract(position);
 
   if (vDir.x >= 0.f) {
-    rotation->y = (-std::atan(vDir.z / vDir.x) + Math::PI / 2.f);
+    rotation->y = (-::std::atan(vDir.z / vDir.x) + Math::PI / 2.f);
   }
   else {
-    rotation->y = (-std::atan(vDir.z / vDir.x) - Math::PI / 2.f);
+    rotation->y = (-::std::atan(vDir.z / vDir.x) - Math::PI / 2.f);
   }
 
   rotation->z = 0.f;
 
-  if (std::isnan(rotation->x)) {
+  if (::std::isnan(rotation->x)) {
     rotation->x = 0.f;
   }
 
-  if (std::isnan(rotation->y)) {
+  if (::std::isnan(rotation->y)) {
     rotation->y = 0.f;
   }
 
-  if (std::isnan(rotation->z)) {
+  if (::std::isnan(rotation->z)) {
     rotation->z = 0.f;
   }
 
@@ -176,9 +176,9 @@ Vector3& TargetCamera::getTarget()
 
 bool TargetCamera::_decideIfNeedsToMove()
 {
-  return std::abs(cameraDirection->x) > 0.f
-         || std::abs(cameraDirection->y) > 0.f
-         || std::abs(cameraDirection->z) > 0.f;
+  return ::std::abs(cameraDirection->x) > 0.f
+         || ::std::abs(cameraDirection->y) > 0.f
+         || ::std::abs(cameraDirection->z) > 0.f;
 }
 
 void TargetCamera::_updatePosition()
@@ -195,9 +195,9 @@ void TargetCamera::_updatePosition()
 
 void TargetCamera::_checkInputs()
 {
-  bool needToMove = _decideIfNeedsToMove();
-  bool needToRotate
-    = std::abs(cameraRotation->x) > 0.f || std::abs(cameraRotation->y) > 0.f;
+  bool needToMove   = _decideIfNeedsToMove();
+  bool needToRotate = ::std::abs(cameraRotation->x) > 0.f
+                      || ::std::abs(cameraRotation->y) > 0.f;
 
   // Move
   if (needToMove) {
@@ -232,25 +232,25 @@ void TargetCamera::_checkInputs()
 
   // Inertia
   if (needToMove) {
-    if (std::abs(cameraDirection->x) < speed * Math::Epsilon) {
+    if (::std::abs(cameraDirection->x) < speed * Math::Epsilon) {
       cameraDirection->x = 0.f;
     }
 
-    if (std::abs(cameraDirection->y) < speed * Math::Epsilon) {
+    if (::std::abs(cameraDirection->y) < speed * Math::Epsilon) {
       cameraDirection->y = 0.f;
     }
 
-    if (std::abs(cameraDirection->z) < speed * Math::Epsilon) {
+    if (::std::abs(cameraDirection->z) < speed * Math::Epsilon) {
       cameraDirection->z = 0.f;
     }
     cameraDirection->scaleInPlace(inertia);
   }
   if (needToRotate) {
-    if (std::abs(cameraRotation->x) < speed * Math::Epsilon) {
+    if (::std::abs(cameraRotation->x) < speed * Math::Epsilon) {
       cameraRotation->x = 0.f;
     }
 
-    if (std::abs(cameraRotation->y) < speed * Math::Epsilon) {
+    if (::std::abs(cameraRotation->y) < speed * Math::Epsilon) {
       cameraRotation->y = 0.f;
     }
     cameraRotation->scaleInPlace(inertia);

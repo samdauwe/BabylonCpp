@@ -12,7 +12,7 @@ public:
   template <typename... Ts>
   static MultiMaterial* New(Ts&&... args)
   {
-    auto material = new MultiMaterial(std::forward<Ts>(args)...);
+    auto material = new MultiMaterial(::std::forward<Ts>(args)...);
     material->addMultiMaterialToScene(
       static_cast<std::unique_ptr<MultiMaterial>>(material));
 

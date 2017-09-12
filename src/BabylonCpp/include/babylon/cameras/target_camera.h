@@ -13,7 +13,7 @@ public:
   template <typename... Ts>
   static TargetCamera* New(Ts&&... args)
   {
-    auto camera = new TargetCamera(std::forward<Ts>(args)...);
+    auto camera = new TargetCamera(::std::forward<Ts>(args)...);
     camera->addToScene(static_cast<std::unique_ptr<Camera>>(camera));
 
     return camera;

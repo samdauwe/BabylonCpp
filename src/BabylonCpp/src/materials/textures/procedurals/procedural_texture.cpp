@@ -245,7 +245,7 @@ void ProceduralTexture::resize(const Size& size, bool generateMipMaps)
 
 void ProceduralTexture::_checkUniform(const std::string& uniformName)
 {
-  auto it = std::find(_uniforms.begin(), _uniforms.end(), uniformName);
+  auto it = ::std::find(_uniforms.begin(), _uniforms.end(), uniformName);
   if (it == _uniforms.end()) {
     _uniforms.emplace_back(uniformName);
   }
@@ -254,7 +254,7 @@ void ProceduralTexture::_checkUniform(const std::string& uniformName)
 ProceduralTexture& ProceduralTexture::setTexture(const std::string& iName,
                                                  Texture* texture)
 {
-  auto it = std::find(_samplers.begin(), _samplers.end(), iName);
+  auto it = ::std::find(_samplers.begin(), _samplers.end(), iName);
   if (it == _samplers.end()) {
     _samplers.emplace_back(iName);
   }

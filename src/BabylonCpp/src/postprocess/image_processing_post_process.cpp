@@ -55,11 +55,11 @@ ImageProcessingPostProcess::ImageProcessingPostProcess(
 
     if (_vignetteEnabled) {
       // Vignette
-      float vignetteScaleY = std::tan(cameraFov * 0.5f);
+      float vignetteScaleY = ::std::tan(cameraFov * 0.5f);
       float vignetteScaleX = vignetteScaleY * aspectRatio();
 
       float vignetteScaleGeometricMean
-        = std::sqrt(vignetteScaleX * vignetteScaleY);
+        = ::std::sqrt(vignetteScaleX * vignetteScaleY);
       vignetteScaleX = Tools::Mix(vignetteScaleX, vignetteScaleGeometricMean,
                                   vignetteStretch);
       vignetteScaleY = Tools::Mix(vignetteScaleY, vignetteScaleGeometricMean,
@@ -77,7 +77,7 @@ ImageProcessingPostProcess::ImageProcessingPostProcess(
     // Contrast and exposure
     effect->setFloat("contrast", cameraContrast);
     effect->setFloat("cameraExposureLinear",
-                     std::pow(2.f, -cameraExposure) * Math::PI);
+                     ::std::pow(2.f, -cameraExposure) * Math::PI);
 
     // Color transform settings
     if (_colorGradingTexture) {
@@ -90,7 +90,7 @@ ImageProcessingPostProcess::ImageProcessingPostProcess(
                         0.5f / textureSize,                // textureOffset
                         textureSize,                       // textureSize
                         colorGradingWeight                 // weight
-                        );
+      );
     }
   });
 }

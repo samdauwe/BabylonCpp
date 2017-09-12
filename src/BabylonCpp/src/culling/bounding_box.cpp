@@ -41,7 +41,7 @@ BoundingBox::BoundingBox(const Vector3& _minimum, const Vector3& _maximum)
   // World
   vectorsWorld.clear();
   vectorsWorld.reserve(vectors.size());
-  std::fill(vectorsWorld.begin(), vectorsWorld.end(), Vector3::Zero());
+  ::std::fill(vectorsWorld.begin(), vectorsWorld.end(), Vector3::Zero());
   minimumWorld    = Vector3::Zero();
   maximumWorld    = Vector3::Zero();
   centerWorld     = Vector3::Zero();

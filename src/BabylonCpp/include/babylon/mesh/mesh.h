@@ -81,7 +81,7 @@ public:
   template <typename... Ts>
   static Mesh* New(Ts&&... args)
   {
-    auto mesh = new Mesh(std::forward<Ts>(args)...);
+    auto mesh = new Mesh(::std::forward<Ts>(args)...);
     mesh->addToScene(static_cast<std::unique_ptr<AbstractMesh>>(mesh));
 
     return mesh;

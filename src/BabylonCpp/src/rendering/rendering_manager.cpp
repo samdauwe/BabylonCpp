@@ -88,7 +88,7 @@ void RenderingManager::render(
 
     // Fire PRECLEAR stage
     if (hasObservable) {
-      renderingGroupMask     = static_cast<int>(std::pow(2, index));
+      renderingGroupMask     = static_cast<int>(::std::pow(2, index));
       info->renderStage      = RenderingGroupInfo::STAGE_PRECLEAR;
       info->renderingGroupId = index;
       _scene->onRenderingGroupObservable.notifyObservers(info,

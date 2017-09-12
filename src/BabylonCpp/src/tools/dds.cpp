@@ -14,7 +14,7 @@ DDSInfo DDSTools::GetDDSInfo(const Uint8Array& arrayBuffer)
 
   int mipmapCount = 1;
   if (header[off_flags] & DDSD_MIPMAPCOUNT) {
-    mipmapCount = std::max(1, header[off_mipmapCount]);
+    mipmapCount = ::std::max(1, header[off_mipmapCount]);
   }
 
   return {// width
@@ -133,15 +133,15 @@ void DDSTools::UploadDDSLevels(GL::IGLRenderingContext* gl,
         internalFormat = RGBA_S3TC_DXT5_Format;
         break;
       default:
-        BABYLON_LOG_ERROR("DDSTools", "Unsupported FourCC code: ",
-                          Int32ToFourCC(fourCC));
+        BABYLON_LOG_ERROR("DDSTools",
+                          "Unsupported FourCC code: ", Int32ToFourCC(fourCC));
         return;
     }
   }
 
   int mipmapCount = 1;
   if (header[off_flags] & DDSD_MIPMAPCOUNT && loadMipmaps) {
-    mipmapCount = std::max(1, header[off_mipmapCount]);
+    mipmapCount = ::std::max(1, header[off_mipmapCount]);
   }
 
   auto bpp = header[off_RGBbpp];
@@ -177,7 +177,7 @@ void DDSTools::UploadDDSLevels(GL::IGLRenderingContext* gl,
         int unpackAlignment   = gl->getParameteri(GL::UNPACK_ALIGNMENT);
         float unpaddedRowSize = width;
         float paddedRowSize
-          = std::floor((width + unpackAlignment - 1) / unpackAlignment)
+          = ::std::floor((width + unpackAlignment - 1) / unpackAlignment)
             * unpackAlignment;
         dataLength
           = static_cast<size_t>(paddedRowSize * (height - 1) + unpaddedRowSize);
@@ -189,8 +189,9 @@ void DDSTools::UploadDDSLevels(GL::IGLRenderingContext* gl,
                        GL::UNSIGNED_BYTE, byteArray);
       }
       else {
-        dataLength = static_cast<size_t>(
-          std::max(4.f, width) / 4 * std::max(4.f, height) / 4 * blockBytes);
+        dataLength
+          = static_cast<size_t>(::std::max(4.f, width) / 4
+                                * ::std::max(4.f, height) / 4 * blockBytes);
         byteArray = Uint8Array(
           reinterpret_cast<const int*>(arrayBuffer.data() + dataOffset),
           reinterpret_cast<const int*>(arrayBuffer.data() + dataLength));
@@ -202,8 +203,8 @@ void DDSTools::UploadDDSLevels(GL::IGLRenderingContext* gl,
       width *= 0.5f;
       height *= 0.5f;
 
-      width  = std::max(1.f, width);
-      height = std::max(1.f, height);
+      width  = ::std::max(1.f, width);
+      height = ::std::max(1.f, height);
     }
   }
 }

@@ -586,9 +586,9 @@ void Engine::stopRenderLoop(const FastFunc<void()>& renderFunction)
     return;
   }
 
-  _activeRenderLoops.erase(std::remove(_activeRenderLoops.begin(),
-                                       _activeRenderLoops.end(),
-                                       renderFunction),
+  _activeRenderLoops.erase(::std::remove(_activeRenderLoops.begin(),
+                                         _activeRenderLoops.end(),
+                                         renderFunction),
                            _activeRenderLoops.end());
 }
 
@@ -625,8 +625,8 @@ void Engine::_renderLoop()
 
 void Engine::runRenderLoop(const FastFunc<void()>& renderFunction)
 {
-  if (std::find(_activeRenderLoops.begin(), _activeRenderLoops.end(),
-                renderFunction)
+  if (::std::find(_activeRenderLoops.begin(), _activeRenderLoops.end(),
+                  renderFunction)
       != _activeRenderLoops.end()) {
     return;
   }
@@ -976,8 +976,8 @@ void Engine::updateUniformBuffer(GL::IGLBuffer* uniformBuffer,
   }
   else {
     Float32Array subvector;
-    std::copy(elements.begin() + offset, elements.begin() + offset + count,
-              std::back_inserter(subvector));
+    ::std::copy(elements.begin() + offset, elements.begin() + offset + count,
+                ::std::back_inserter(subvector));
     _gl->bufferSubData(GL::UNIFORM_BUFFER, 0, subvector);
   }
 
@@ -1027,8 +1027,8 @@ void Engine::updateDynamicVertexBuffer(const Engine::GLBufferPtr& vertexBuffer,
   }
   else {
     Float32Array subvector;
-    std::copy(vertices.begin() + offset, vertices.begin() + offset + count,
-              std::back_inserter(subvector));
+    ::std::copy(vertices.begin() + offset, vertices.begin() + offset + count,
+                ::std::back_inserter(subvector));
     _gl->bufferSubData(GL::ARRAY_BUFFER, 0, subvector);
   }
 
@@ -1051,7 +1051,7 @@ Engine::GLBufferPtr Engine::createIndexBuffer(const IndicesArray& indices)
 
   if (_caps.uintIndices) {
     auto it = ::std::find_if(indices.begin(), indices.end(),
-                             std::bind2nd(std::greater<float>(), 65535.f));
+                             ::std::bind2nd(::std::greater<float>(), 65535.f));
     if (it != indices.end()) {
       need32Bits = true;
     }
@@ -2726,7 +2726,7 @@ Engine::updateRenderTargetTextureSampleCount(InternalTexture* texture,
     return samples;
   }
 
-  samples = std::min(
+  samples = ::std::min(
     samples, static_cast<unsigned int>(_gl->getParameteri(GL::MAX_SAMPLES)));
 
   // Dispose previous render buffers
@@ -3412,7 +3412,7 @@ void Engine::_setAnisotropicLevel(unsigned int key, BaseTexture* texture)
       && texture->_cachedAnisotropicFilteringLevel != value) {
     _gl->texParameterf(
       key, AnisotropicFilterExtension::TEXTURE_MAX_ANISOTROPY_EXT,
-      static_cast<float>(std::min(value, _caps.maxAnisotropy)));
+      static_cast<float>(::std::min(value, _caps.maxAnisotropy)));
     texture->_cachedAnisotropicFilteringLevel = value;
   }
 }
@@ -3514,7 +3514,7 @@ void Engine::dispose(bool /*doNotRecurse*/)
 
   // Remove from Instances
   Engine::Instances.erase(
-    std::remove(Engine::Instances.begin(), Engine::Instances.end(), this),
+    ::std::remove(Engine::Instances.begin(), Engine::Instances.end(), this),
     Engine::Instances.end());
 
   _workingCanvas  = nullptr;

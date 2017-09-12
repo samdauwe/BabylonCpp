@@ -22,7 +22,7 @@ public:
   template <typename... Ts>
   static SubMesh* New(Ts&&... args)
   {
-    auto subMesh = new SubMesh(std::forward<Ts>(args)...);
+    auto subMesh = new SubMesh(::std::forward<Ts>(args)...);
     subMesh->addToMesh(static_cast<std::unique_ptr<SubMesh>>(subMesh));
 
     return subMesh;

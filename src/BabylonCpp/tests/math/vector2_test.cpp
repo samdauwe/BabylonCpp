@@ -5,7 +5,7 @@
 namespace {
 float x = 1.2f;
 float y = 3.4f;
-}
+} // namespace
 
 TEST(TestVector2, Constructor)
 {
@@ -59,7 +59,7 @@ TEST(TestVector2, GetHashCode)
 {
   using namespace BABYLON;
 
-  std::array<Vector2, 4> vects{{
+  ::std::array<Vector2, 4> vects{{
     Vector2{x, y},  // 00
     Vector2{x, -y}, // 01
     Vector2{-x, y}, // 10
@@ -209,7 +209,7 @@ TEST(TestVector2, Length)
   EXPECT_FLOAT_EQ(c.length(), 0.f);
 
   a.copyFromFloats(x, y);
-  EXPECT_FLOAT_EQ(a.length(), std::sqrt(x * x + y * y));
+  EXPECT_FLOAT_EQ(a.length(), ::std::sqrt(x * x + y * y));
 }
 
 TEST(TestVector2, LengthSquared)

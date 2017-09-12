@@ -90,11 +90,11 @@ inline T joinPath(const T& path0, const T& path1, Args... args)
 inline std::string readFileContents(const char* filename)
 {
   std::string contents;
-  std::ifstream in(filename, std::ios::in | std::ios::binary);
+  ::std::ifstream in(filename, ::std::ios::in | ::std::ios::binary);
   if (in) {
-    in.seekg(0, std::ios::end);
+    in.seekg(0, ::std::ios::end);
     contents.resize(static_cast<size_t>(in.tellg()));
-    in.seekg(0, std::ios::beg);
+    in.seekg(0, ::std::ios::beg);
     in.read(&contents[0], static_cast<long>(contents.size()));
     in.close();
   }
@@ -110,9 +110,9 @@ inline std::string readFileContents(const char* filename)
 inline std::vector<std::string> readFileLines(const char* filename)
 {
   std::vector<std::string> lines;
-  std::ifstream in(filename, std::ios::in | std::ios::binary);
+  ::std::ifstream in(filename, ::std::ios::in | ::std::ios::binary);
   if (in) {
-    for (std::string line; std::getline(in, line);) {
+    for (std::string line; ::std::getline(in, line);) {
       lines.emplace_back(line);
     }
   }
@@ -138,7 +138,7 @@ inline std::string removeExtension(const std::string& filename)
 inline std::string standardizePath(const std::string& path)
 {
   std::string _path = path;
-  std::replace(_path.begin(), _path.end(), '\\', '/');
+  ::std::replace(_path.begin(), _path.end(), '\\', '/');
   if (_path.back() != '/') {
     _path += '/';
   }
@@ -155,7 +155,7 @@ inline std::string standardizePath(const std::string& path)
 inline bool writeFileContents(const char* filename, const std::string& contents)
 {
   bool writtentoFile = false;
-  std::ofstream out(filename, std::ios::out);
+  ::std::ofstream out(filename, ::std::ios::out);
   if (out) {
     out.write(contents.c_str(), static_cast<long>(contents.size()));
     out.close();
@@ -174,7 +174,7 @@ inline bool writeFileLines(const char* filename,
                            const std::vector<std::string>& lines)
 {
   bool writtentoFile = false;
-  std::ofstream out(filename, std::ios::out);
+  ::std::ofstream out(filename, ::std::ios::out);
   if (out) {
     for (auto& line : lines) {
       out.write(line.c_str(), static_cast<long>(line.size()));

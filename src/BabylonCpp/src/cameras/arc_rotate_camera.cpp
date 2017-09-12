@@ -175,13 +175,13 @@ void ArcRotateCamera::_checkInputs()
     inertialAlphaOffset *= inertia;
     inertialBetaOffset *= inertia;
     inertialRadiusOffset *= inertia;
-    if (std::abs(inertialAlphaOffset) < Math::Epsilon) {
+    if (::std::abs(inertialAlphaOffset) < Math::Epsilon) {
       inertialAlphaOffset = 0.f;
     }
-    if (std::abs(inertialBetaOffset) < Math::Epsilon) {
+    if (::std::abs(inertialBetaOffset) < Math::Epsilon) {
       inertialBetaOffset = 0.f;
     }
-    if (std::abs(inertialRadiusOffset) < speed * Math::Epsilon) {
+    if (::std::abs(inertialRadiusOffset) < speed * Math::Epsilon) {
       inertialRadiusOffset = 0.f;
     }
   }
@@ -212,10 +212,10 @@ void ArcRotateCamera::_checkInputs()
     inertialPanningX *= panningInertia;
     inertialPanningY *= panningInertia;
 
-    if (std::abs(inertialPanningX) < speed * Math::Epsilon) {
+    if (::std::abs(inertialPanningX) < speed * Math::Epsilon) {
       inertialPanningX = 0.f;
     }
-    if (std::abs(inertialPanningY) < speed * Math::Epsilon) {
+    if (::std::abs(inertialPanningY) < speed * Math::Epsilon) {
       inertialPanningY = 0.f;
     }
   }
@@ -275,16 +275,16 @@ void ArcRotateCamera::rebuildAnglesAndRadius()
   radius        = radiusv3.length();
 
   // Alpha
-  alpha = std::acos(
+  alpha = ::std::acos(
     radiusv3.x
-    / std::sqrt(std::pow(radiusv3.x, 2.f) + std::pow(radiusv3.z, 2.f)));
+    / ::std::sqrt(::std::pow(radiusv3.x, 2.f) + ::std::pow(radiusv3.z, 2.f)));
 
   if (radiusv3.z < 0.f) {
     alpha = Math::PI2 - alpha;
   }
 
   // Beta
-  beta = std::acos(radiusv3.y / radius);
+  beta = ::std::acos(radiusv3.y / radius);
 
   _checkLimits();
 }
@@ -345,10 +345,10 @@ void ArcRotateCamera::setTarget(const Vector3& iTarget,
 Matrix ArcRotateCamera::_getViewMatrix()
 {
   // Compute
-  const float cosa = std::cos(alpha);
-  const float sina = std::sin(alpha);
-  const float cosb = std::cos(beta);
-  float sinb       = std::sin(beta);
+  const float cosa = ::std::cos(alpha);
+  const float sina = ::std::sin(alpha);
+  const float cosb = ::std::cos(beta);
+  float sinb       = ::std::sin(beta);
 
   if (stl_util::almost_equal(sinb, 0.f)) {
     sinb = 0.0001f;
@@ -414,10 +414,10 @@ void ArcRotateCamera::_onCollisionPositionChange(int /*collisionId*/,
   }
 
   // Recompute because of constraints
-  const float cosa = std::cos(alpha);
-  const float sina = std::sin(alpha);
-  const float cosb = std::cos(beta);
-  float sinb       = std::sin(beta);
+  const float cosa = ::std::cos(alpha);
+  const float sina = ::std::sin(alpha);
+  const float cosb = ::std::cos(beta);
+  float sinb       = ::std::sin(beta);
 
   if (stl_util::almost_equal(sinb, 0.f)) {
     sinb = 0.0001f;

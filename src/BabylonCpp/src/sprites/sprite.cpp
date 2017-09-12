@@ -36,7 +36,7 @@ Sprite::~Sprite()
 
 void Sprite::addToSpriteManager(std::unique_ptr<Sprite>&& newSprite)
 {
-  _manager->sprites.emplace_back(std::move(newSprite));
+  _manager->sprites.emplace_back(::std::move(newSprite));
 }
 
 int Sprite::size() const
@@ -79,7 +79,7 @@ void Sprite::_animate(float deltaTime)
 
   _time += deltaTime;
   if (_time > _delay) {
-    _time = std::fmod(_time, _delay);
+    _time = ::std::fmod(_time, _delay);
     cellIndex += _direction;
     if (cellIndex == _toIndex) {
       if (_loopAnimation) {

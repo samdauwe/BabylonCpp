@@ -338,17 +338,18 @@ void Effect::_dumpShadersSource(std::string vertexCode,
 
   // Number lines of shaders source code
   unsigned int i = 2;
-  const std::regex regex("\n", std::regex::optimize);
+  const ::std::regex regex("\n", ::std::regex::optimize);
   auto formattedVertexCode
     = "\n1\t"
-      + String::regexReplace(vertexCode, regex, [&i](const std::smatch& /*m*/) {
-          return "\n" + ::std::to_string(i++) + "\t";
-        });
+      + String::regexReplace(vertexCode, regex,
+                             [&i](const ::std::smatch& /*m*/) {
+                               return "\n" + ::std::to_string(i++) + "\t";
+                             });
   i = 2;
   auto formattedFragmentCode
     = "\n1\t"
       + String::regexReplace(fragmentCode, regex,
-                             [&i](const std::smatch& /*m*/) {
+                             [&i](const ::std::smatch& /*m*/) {
                                return "\n" + ::std::to_string(i++) + "\t";
                              });
 
@@ -395,14 +396,14 @@ void Effect::_processShaderConversion(
 
   if (isFragment) {
     const std::vector<std::pair<std::string, std::string>> fragMappings{
-      std::make_pair("texture2DLodEXT\\(", "textureLod("),   //
-      std::make_pair("textureCubeLodEXT\\(", "textureLod("), //
-      std::make_pair("texture2D\\(", "texture("),            //
-      std::make_pair("textureCube\\(", "texture("),          //
-      std::make_pair("gl_FragDepthEXT", "gl_FragDepth"),     //
-      std::make_pair("gl_FragColor", "glFragColor"),         //
-      std::make_pair("void\\s+?main\\(",                     //
-                     "out vec4 glFragColor;\nvoid main("),   //
+      ::std::make_pair("texture2DLodEXT\\(", "textureLod("),   //
+      ::std::make_pair("textureCubeLodEXT\\(", "textureLod("), //
+      ::std::make_pair("texture2D\\(", "texture("),            //
+      ::std::make_pair("textureCube\\(", "texture("),          //
+      ::std::make_pair("gl_FragDepthEXT", "gl_FragDepth"),     //
+      ::std::make_pair("gl_FragColor", "glFragColor"),         //
+      ::std::make_pair("void\\s+?main\\(",                     //
+                       "out vec4 glFragColor;\nvoid main("),   //
     };
     for (const auto& fragMapping : fragMappings) {
       result = String::regexReplace(preparedSourceCode, fragMapping.first,
@@ -417,8 +418,8 @@ void Effect::_processIncludes(
   const std::string& sourceCode,
   const ::std::function<void(const std::string& data)>& callback)
 {
-  const std::regex regex("#include<(.+)>(\\((.*)\\))*(\\[(.*)\\])*",
-                         std::regex::optimize);
+  const ::std::regex regex("#include<(.+)>(\\((.*)\\))*(\\[(.*)\\])*",
+                           ::std::regex::optimize);
   auto lines = String::split(sourceCode, '\n');
 
   std::ostringstream returnValue;
@@ -426,7 +427,7 @@ void Effect::_processIncludes(
   for (auto& line : lines) {
     auto match = String::regexMatch(line, regex);
     if (match.size() != 6) {
-      returnValue << line << std::endl;
+      returnValue << line << ::std::endl;
       continue;
     }
 
@@ -475,20 +476,20 @@ void Effect::_processIncludes(
             }
 
             if (String::isDigit(minIndex) && String::isDigit(maxIndex)) {
-              const size_t _minIndex = std::stoul(minIndex, nullptr, 0);
-              const size_t _maxIndex = std::stoul(maxIndex, nullptr, 0);
+              const size_t _minIndex = ::std::stoul(minIndex, nullptr, 0);
+              const size_t _maxIndex = ::std::stoul(maxIndex, nullptr, 0);
               for (size_t i = _minIndex; i < _maxIndex; ++i) {
                 const auto istr = ::std::to_string(i);
                 if (_engine->webGLVersion() == 1.f) {
                   // Ubo replacement
-                  const auto callback = [](const std::smatch& m) {
+                  const auto callback = [](const ::std::smatch& m) {
                     if (m.size() == 2) {
                       return m.str(1) + "{X}";
                     }
                     return m.str(0);
                   };
-                  const std::regex regex{"light\\{X\\}.(\\w*)",
-                                         std::regex::optimize};
+                  const ::std::regex regex{"light\\{X\\}.(\\w*)",
+                                           ::std::regex::optimize};
                   sourceIncludeContent = String::regexReplace(
                     sourceIncludeContent, regex, callback);
                 }
@@ -502,13 +503,14 @@ void Effect::_processIncludes(
         else {
           if (_engine->webGLVersion() == 1.f) {
             // Ubo replacement
-            const auto callback = [](const std::smatch& m) {
+            const auto callback = [](const ::std::smatch& m) {
               if (m.size() == 2) {
                 return m.str(1) + "{X}";
               }
               return m.str(0);
             };
-            const std::regex regex{"light\\{X\\}.(\\w*)", std::regex::optimize};
+            const ::std::regex regex{"light\\{X\\}.(\\w*)",
+                                     ::std::regex::optimize};
             includeContent
               = String::regexReplace(includeContent, regex, callback);
           }
@@ -519,7 +521,7 @@ void Effect::_processIncludes(
 
       // Replace
       String::replaceInPlace(line, match[0], includeContent);
-      returnValue << line << std::endl;
+      returnValue << line << ::std::endl;
     }
     else {
       // Load from file
@@ -607,7 +609,7 @@ void Effect::_prepareEffect()
     onCompileObservable.notifyObservers(this);
     onCompileObservable.clear();
   }
-  catch (const std::exception& e) {
+  catch (const ::std::exception& e) {
     _compilationError = e.what();
 
     // Let's go through fallbacks then

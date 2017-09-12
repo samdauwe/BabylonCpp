@@ -7,8 +7,10 @@
 #include <babylon/core/logging/log_levels.h>
 #include <babylon/core/logging/log_message.h>
 
+#if _MSC_VER && !__INTEL_COMPILER
 #ifndef __PRETTY_FUNCTION__
 #define __PRETTY_FUNCTION__ __FUNCDNAME__
+#endif
 #endif
 
 // thread_local doesn't exist before VS2013

@@ -132,7 +132,7 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
                                    .add(fileFace.worldAxisForNormal);
         worldDirection.normalize();
 
-        float deltaSolidAngle = std::pow(1.f + u * u + v * v, -3.f / 2.f);
+        float deltaSolidAngle = ::std::pow(1.f + u * u + v * v, -3.f / 2.f);
 
         float r = dataArray[(y * cubeInfo.size * stride) + (x * stride) + 0];
         float g = dataArray[(y * cubeInfo.size * stride) + (x * stride) + 1];
@@ -147,9 +147,9 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
 
         // Handle Gamma space textures.
         if (cubeInfo.gammaSpace) {
-          r = std::pow(Scalar::Clamp(r), Math::ToLinearSpace);
-          g = std::pow(Scalar::Clamp(g), Math::ToLinearSpace);
-          b = std::pow(Scalar::Clamp(b), Math::ToLinearSpace);
+          r = ::std::pow(Scalar::Clamp(r), Math::ToLinearSpace);
+          g = ::std::pow(Scalar::Clamp(g), Math::ToLinearSpace);
+          b = ::std::pow(Scalar::Clamp(b), Math::ToLinearSpace);
         }
 
         Color3 color(r, g, b);

@@ -81,7 +81,7 @@ void PhysicsEngine::addJoint(PhysicsImpostor* mainImpostor,
                              PhysicsImpostor* connectedImpostor,
                              const std::shared_ptr<PhysicsJoint>& joint)
 {
-  auto impostorJoint               = std::make_shared<PhysicsImpostorJoint>();
+  auto impostorJoint               = ::std::make_shared<PhysicsImpostorJoint>();
   impostorJoint->mainImpostor      = mainImpostor;
   impostorJoint->connectedImpostor = connectedImpostor;
   impostorJoint->joint             = joint;
@@ -98,7 +98,7 @@ void PhysicsEngine::removeJoint(PhysicsImpostor* mainImpostor,
   std::vector<std::shared_ptr<PhysicsImpostorJoint>> matchingJoints(
     _joints.size());
 
-  auto it = std::copy_if(
+  auto it = ::std::copy_if(
     _joints.begin(), _joints.end(), matchingJoints.begin(),
     [&connectedImpostor, &joint, &mainImpostor](
       const std::shared_ptr<PhysicsImpostorJoint>& impostorJoint) {
@@ -109,7 +109,7 @@ void PhysicsEngine::removeJoint(PhysicsImpostor* mainImpostor,
 
   // shrink container to new size
   matchingJoints.resize(
-    static_cast<size_t>(std::distance(matchingJoints.begin(), it)));
+    static_cast<size_t>(::std::distance(matchingJoints.begin(), it)));
 
   if (!matchingJoints.empty()) {
     _physicsPlugin->removeJoint(matchingJoints[0].get());

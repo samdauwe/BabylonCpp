@@ -63,7 +63,7 @@ IRegisteredPlugin SceneLoader::_getDefaultPlugin()
 {
   // Add default plugin
   if (SceneLoader::_registeredPlugins.empty()) {
-    SceneLoader::RegisterPlugin(std::make_shared<BabylonFileLoader>());
+    SceneLoader::RegisterPlugin(::std::make_shared<BabylonFileLoader>());
   }
 
   return SceneLoader::_registeredPlugins[".babylon"];

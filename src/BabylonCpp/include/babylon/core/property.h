@@ -59,11 +59,11 @@ value_<Type, Value> value_c;
 // only call in class scope!
 #define PROPERTY_WITH_STORAGE(type, name, host, getter, setter)                \
   struct PROPERTY__TAG_NAME(name);                                             \
-  ::Property::                                                                 \
-    rw_property<::Meta::type_<host::PROPERTY__TAG_NAME(name)>, host,           \
-                ::Meta::value_<decltype(&host::getter), &host::getter>,        \
-                ::Meta::value_<decltype(&host::setter), &host::setter>, type>  \
-      name;                                                                    \
+  ::Property::rw_property<                                                     \
+    ::Meta::type_<host::PROPERTY__TAG_NAME(name)>, host,                       \
+    ::Meta::value_<decltype(&host::getter), &host::getter>,                    \
+    ::Meta::value_<decltype(&host::setter), &host::setter>, type>              \
+    name;                                                                      \
   auto static constexpr PROPERTY__FUNC_NAME(                                   \
     decltype(::Property::Impl::type_tag(name)))                                \
   {                                                                            \

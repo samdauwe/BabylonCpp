@@ -556,7 +556,7 @@ void MaterialHelper::BindLogDepth(MaterialDefines& defines, Effect* effect,
   if (defines[LOGARITHMICDEPTH]) {
     effect->setFloat(
       "logarithmicDepthConstant",
-      2.f / (std::log(scene->activeCamera->maxZ + 1.f) / Math::LN2));
+      2.f / (::std::log(scene->activeCamera->maxZ + 1.f) / Math::LN2));
   }
 }
 

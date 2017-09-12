@@ -13,7 +13,7 @@ public:
   template <typename... Ts>
   static SpotLight* New(Ts&&... args)
   {
-    auto light = new SpotLight(std::forward<Ts>(args)...);
+    auto light = new SpotLight(::std::forward<Ts>(args)...);
     light->addToScene(static_cast<std::unique_ptr<Light>>(light));
 
     return light;

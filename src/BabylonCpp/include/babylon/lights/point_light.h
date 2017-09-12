@@ -12,7 +12,7 @@ public:
   template <typename... Ts>
   static PointLight* New(Ts&&... args)
   {
-    auto light = new PointLight(std::forward<Ts>(args)...);
+    auto light = new PointLight(::std::forward<Ts>(args)...);
     light->addToScene(static_cast<std::unique_ptr<Light>>(light));
 
     return light;

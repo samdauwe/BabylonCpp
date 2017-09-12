@@ -29,21 +29,21 @@ TEST(TestColor3, FromHexString)
   using namespace BABYLON;
 
   // Red
-  std::string hex{"#FF0000"};
+  ::std::string hex{"#FF0000"};
   Color3 color3 = Color3::FromHexString(hex);
   EXPECT_FLOAT_EQ(1.f, color3.r);
   EXPECT_FLOAT_EQ(0.f, color3.g);
   EXPECT_FLOAT_EQ(0.f, color3.b);
 
   // Green
-  hex    = std::string{"#00FF00"};
+  hex    = ::std::string{"#00FF00"};
   color3 = Color3::FromHexString(hex);
   EXPECT_FLOAT_EQ(0.f, color3.r);
   EXPECT_FLOAT_EQ(1.f, color3.g);
   EXPECT_FLOAT_EQ(0.f, color3.b);
 
   // Blue
-  hex    = std::string{"#0000FF"};
+  hex    = ::std::string{"#0000FF"};
   color3 = Color3::FromHexString(hex);
   EXPECT_FLOAT_EQ(0.f, color3.r);
   EXPECT_FLOAT_EQ(0.f, color3.g);

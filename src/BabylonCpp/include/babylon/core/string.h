@@ -193,12 +193,12 @@ inline int indexOf(const std::string& src, const std::string& searchvalue,
 template <typename T>
 inline bool isDigit(T x)
 {
-  std::string s;
-  std::regex e("^-?\\d+", std::regex::optimize);
-  std::stringstream ss;
+  ::std::string s;
+  ::std::regex e("^-?\\d+", ::std::regex::optimize);
+  ::std::stringstream ss;
   ss << x;
   ss >> s;
-  if (std::regex_match(s, e)) {
+  if (::std::regex_match(s, e)) {
     return true;
   }
   else {
@@ -344,9 +344,9 @@ template <typename T>
 inline std::vector<T> regexMatch(const T& s, const ::std::regex& re)
 {
   std::vector<T> result;
-  std::smatch smatch;
+  ::std::smatch smatch;
   if (regex_search(s, smatch, re)) {
-    std::copy(smatch.begin(), smatch.end(), std::back_inserter(result));
+    ::std::copy(smatch.begin(), smatch.end(), ::std::back_inserter(result));
   }
 
   return result;
@@ -363,12 +363,12 @@ std::basic_string<CharT> inline regexReplace(
     = 0;
   auto endOfLastMatch = first;
 
-  auto callback = [&](const std::match_results<BidirIt>& match) {
+  auto callback = [&](const ::std::match_results<BidirIt>& match) {
     auto positionOfThisMatch = match.position(0);
     auto diff                = positionOfThisMatch - positionOfLastMatch;
 
     auto startOfThisMatch = endOfLastMatch;
-    std::advance(startOfThisMatch, diff);
+    ::std::advance(startOfThisMatch, diff);
 
     s.append(endOfLastMatch, startOfThisMatch);
     s.append(f(match));
@@ -378,11 +378,11 @@ std::basic_string<CharT> inline regexReplace(
     positionOfLastMatch = positionOfThisMatch + lengthOfMatch;
 
     endOfLastMatch = startOfThisMatch;
-    std::advance(endOfLastMatch, lengthOfMatch);
+    ::std::advance(endOfLastMatch, lengthOfMatch);
   };
 
-  std::sregex_iterator begin(first, last, re), end;
-  std::for_each(begin, end, callback);
+  ::std::sregex_iterator begin(first, last, re), end;
+  ::std::for_each(begin, end, callback);
 
   s.append(endOfLastMatch, last);
 
@@ -520,7 +520,7 @@ template <typename T>
 inline T toNumber(const std::string& str)
 {
   T value;
-  std::stringstream ss(str);
+  ::std::stringstream ss(str);
   ss >> value;
   return value;
 }
@@ -533,7 +533,7 @@ inline T toNumber(const std::string& str)
 template <typename T>
 inline std::string toString(const T& number)
 {
-  std::stringstream ss;
+  ::std::stringstream ss;
   ss << number;
   return ss.str();
 }

@@ -57,7 +57,7 @@ constexpr float Signf(T x)
 template <typename T>
 constexpr T Clamp(T value, T min, T max)
 {
-  return std::min(max, std::max(min, value));
+  return ::std::min(max, ::std::max(min, value));
 }
 
 /**

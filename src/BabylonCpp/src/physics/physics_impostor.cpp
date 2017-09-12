@@ -212,8 +212,8 @@ void PhysicsImpostor::unregisterBeforePhysicsStep(
   const FastFunc<void(PhysicsImpostor* impostor)>& func)
 {
   _onBeforePhysicsStepCallbacks.erase(
-    std::remove(_onBeforePhysicsStepCallbacks.begin(),
-                _onBeforePhysicsStepCallbacks.end(), func),
+    ::std::remove(_onBeforePhysicsStepCallbacks.begin(),
+                  _onBeforePhysicsStepCallbacks.end(), func),
     _onBeforePhysicsStepCallbacks.end());
 }
 
@@ -227,8 +227,8 @@ void PhysicsImpostor::unregisterAfterPhysicsStep(
   const FastFunc<void(PhysicsImpostor* impostor)>& func)
 {
   _onAfterPhysicsStepCallbacks.erase(
-    std::remove(_onAfterPhysicsStepCallbacks.begin(),
-                _onAfterPhysicsStepCallbacks.end(), func),
+    ::std::remove(_onAfterPhysicsStepCallbacks.begin(),
+                  _onAfterPhysicsStepCallbacks.end(), func),
     _onAfterPhysicsStepCallbacks.end());
 }
 
@@ -294,7 +294,8 @@ void PhysicsImpostor::createJoint(PhysicsImpostor* otherImpostor,
                                   unsigned int jointType,
                                   const PhysicsJointData& jointData)
 {
-  addJoint(otherImpostor, std::make_shared<PhysicsJoint>(jointType, jointData));
+  addJoint(otherImpostor,
+           ::std::make_shared<PhysicsJoint>(jointType, jointData));
 }
 
 void PhysicsImpostor::addJoint(PhysicsImpostor* otherImpostor,

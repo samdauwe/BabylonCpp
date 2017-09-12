@@ -71,9 +71,9 @@ void BoundingSphere::_update(const Matrix& world)
                                           _tempRadiusVector);
 
   radiusWorld
-    = static_cast<float>(std::max(std::max(std::abs(_tempRadiusVector.x),
-                                           std::abs(_tempRadiusVector.y)),
-                                  std::abs(_tempRadiusVector.z))
+    = static_cast<float>(::std::max(::std::max(::std::abs(_tempRadiusVector.x),
+                                               ::std::abs(_tempRadiusVector.y)),
+                                    ::std::abs(_tempRadiusVector.z))
                          * radius);
 }
 
@@ -95,9 +95,9 @@ bool BoundingSphere::intersectsPoint(const Vector3& point)
   float y = centerWorld.y - point.y;
   float z = centerWorld.z - point.z;
 
-  float distance = std::sqrt((x * x) + (y * y) + (z * z));
+  float distance = ::std::sqrt((x * x) + (y * y) + (z * z));
 
-  if (std::abs(radiusWorld - distance) < Math::Epsilon) {
+  if (::std::abs(radiusWorld - distance) < Math::Epsilon) {
     return false;
   }
 
@@ -111,7 +111,7 @@ bool BoundingSphere::Intersects(const BoundingSphere& sphere0,
   float y = sphere0.centerWorld.y - sphere1.centerWorld.y;
   float z = sphere0.centerWorld.z - sphere1.centerWorld.z;
 
-  float distance = std::sqrt((x * x) + (y * y) + (z * z));
+  float distance = ::std::sqrt((x * x) + (y * y) + (z * z));
 
   if (sphere0.radiusWorld + sphere1.radiusWorld < distance) {
     return false;

@@ -19,7 +19,7 @@ public:
   template <typename... Ts>
   static Ribbon* New(Ts&&... args)
   {
-    auto ribbon = new Ribbon(std::forward<Ts>(args)...);
+    auto ribbon = new Ribbon(::std::forward<Ts>(args)...);
     ribbon->addToScene(static_cast<std::unique_ptr<Geometry>>(ribbon));
 
     return ribbon;

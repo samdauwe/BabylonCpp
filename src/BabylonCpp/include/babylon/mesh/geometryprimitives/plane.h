@@ -18,7 +18,7 @@ public:
   template <typename... Ts>
   static Plane* New(Ts&&... args)
   {
-    auto plane = new Plane(std::forward<Ts>(args)...);
+    auto plane = new Plane(::std::forward<Ts>(args)...);
     plane->addToScene(static_cast<std::unique_ptr<Geometry>>(plane));
 
     return plane;

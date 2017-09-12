@@ -9,7 +9,7 @@ class BABYLON_SHARED_EXPORT ILoadingScreen {
 
 public:
   virtual void displayLoadingUI() = 0;
-  virtual void hideLoadingUI() = 0;
+  virtual void hideLoadingUI()    = 0;
 
 public:
   std::string loadingUIBackgroundColor;

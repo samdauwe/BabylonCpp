@@ -20,8 +20,8 @@ TEST(TestMatrix, FromValues)
 {
   using namespace BABYLON;
 
-  std::array<float, 16> m{{0.f, 1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f,
-                           10.f, 11.f, 12.f, 13.f, 14.f, 15.f}};
+  ::std::array<float, 16> m{{0.f, 1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f,
+                             10.f, 11.f, 12.f, 13.f, 14.f, 15.f}};
   Matrix matrix = Matrix::FromValues(m[0], m[1], m[2], m[3],   //
                                      m[4], m[5], m[6], m[7],   //
                                      m[8], m[9], m[10], m[11], //
@@ -54,8 +54,8 @@ TEST(TestMatrix, Determinant)
 
   // calculated via
   // http://www.euclideanspace.com/maths/algebra/matrix/functions/determinant/fourD/index.htm
-  std::array<float, 16> m{{2.f, 3.f, 4.f, 5.f, -1.f, -21.f, -3.f, -4.f, 6.f,
-                           7.f, 8.f, 10.f, -8.f, -9.f, -10.f, -12.f}};
+  ::std::array<float, 16> m{{2.f, 3.f, 4.f, 5.f, -1.f, -21.f, -3.f, -4.f, 6.f,
+                             7.f, 8.f, 10.f, -8.f, -9.f, -10.f, -12.f}};
   Matrix::FromValuesToRef(m[0], m[1], m[2], m[3],   //
                           m[4], m[5], m[6], m[7],   //
                           m[8], m[9], m[10], m[11], //
@@ -71,8 +71,8 @@ TEST(TestMatrix, Transpose)
   Matrix b = Matrix::Transpose(a);
   EXPECT_THAT(a.m, ::testing::ContainerEq(b.m));
 
-  std::array<float, 16> m{{0.f, 1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f,
-                           10.f, 11.f, 12.f, 13.f, 14.f, 15.f}};
+  ::std::array<float, 16> m{{0.f, 1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f,
+                             10.f, 11.f, 12.f, 13.f, 14.f, 15.f}};
   Matrix::FromValuesToRef(m[0], m[1], m[2], m[3],   //
                           m[4], m[5], m[6], m[7],   //
                           m[8], m[9], m[10], m[11], //
@@ -87,8 +87,8 @@ TEST(TestMatrix, Clone)
 {
   using namespace BABYLON;
 
-  std::array<float, 16> m{{0.f, 1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f,
-                           10.f, 11.f, 12.f, 13.f, 14.f, 15.f}};
+  ::std::array<float, 16> m{{0.f, 1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f,
+                             10.f, 11.f, 12.f, 13.f, 14.f, 15.f}};
   Matrix a = Matrix::FromValues(m[0], m[1], m[2], m[3],   //
                                 m[4], m[5], m[6], m[7],   //
                                 m[8], m[9], m[10], m[11], //

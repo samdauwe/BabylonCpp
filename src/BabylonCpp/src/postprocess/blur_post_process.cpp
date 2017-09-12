@@ -46,7 +46,7 @@ void BlurPostProcess::setKernel(float v)
     return;
   }
 
-  v            = std::max(v, 1.f);
+  v            = ::std::max(v, 1.f);
   _idealKernel = v;
   _kernel      = _nearestBestKernel(v);
   _updateParameters();
@@ -103,12 +103,13 @@ void BlurPostProcess::_updateParameters()
   std::vector<std::pair<std::int32_t, float>> linearSamplingMap;
 
   for (unsigned int i = 0; i <= centerIndex; i += 2) {
-    auto j = std::min(i + 1, static_cast<unsigned>(std::floor(centerIndex)));
+    auto j
+      = ::std::min(i + 1, static_cast<unsigned>(::std::floor(centerIndex)));
 
     auto singleCenterSample = (i == j);
 
     if (singleCenterSample) {
-      linearSamplingMap.emplace_back(std::make_pair(offsets[i], weights[i]));
+      linearSamplingMap.emplace_back(::std::make_pair(offsets[i], weights[i]));
     }
     else {
       auto sharedCell = (j == centerIndex);
@@ -118,15 +119,16 @@ void BlurPostProcess::_updateParameters()
         offsets[i] + 1 / (1 + weights[i] / weights[j]));
 
       if (offsetLinear == 0) {
-        linearSamplingMap.emplace_back(std::make_pair(offsets[i], weights[i]));
         linearSamplingMap.emplace_back(
-          std::make_pair(offsets[i + 1], weights[i + 1]));
+          ::std::make_pair(offsets[i], weights[i]));
+        linearSamplingMap.emplace_back(
+          ::std::make_pair(offsets[i + 1], weights[i + 1]));
       }
       else {
         linearSamplingMap.emplace_back(
-          std::make_pair(offsetLinear, weightLinear));
+          ::std::make_pair(offsetLinear, weightLinear));
         linearSamplingMap.emplace_back(
-          std::make_pair(-offsetLinear, weightLinear));
+          ::std::make_pair(-offsetLinear, weightLinear));
       }
     }
   }
@@ -143,10 +145,10 @@ void BlurPostProcess::_updateParameters()
   // Generate shaders
   int maxVaryingRows = getEngine()->getCaps().maxVaryingVectors;
   int freeVaryingVec2
-    = std::max(maxVaryingRows, 0) - 1; // Because of sampleCenter
+    = ::std::max(maxVaryingRows, 0) - 1; // Because of sampleCenter
 
   int varyingCount
-    = std::min(static_cast<int>(offsets.size()), freeVaryingVec2);
+    = ::std::min(static_cast<int>(offsets.size()), freeVaryingVec2);
 
   std::ostringstream defines;
   for (unsigned int i = 0; i < static_cast<unsigned>(varyingCount); ++i) {
@@ -177,16 +179,17 @@ void BlurPostProcess::_updateParameters()
 
 float BlurPostProcess::_nearestBestKernel(float idealKernel) const
 {
-  float v = std::round(idealKernel);
+  float v = ::std::round(idealKernel);
   Float32Array vec{v, v - 1, v + 1, v - 2, v + 2};
   for (auto k : vec) {
-    if (!stl_util::almost_equal(std::fmod(k, 2.f), 0.f)
-        && (stl_util::almost_equal(std::fmod(std::floor(k / 2.f), 2.f), 0.f))
+    if (!stl_util::almost_equal(::std::fmod(k, 2.f), 0.f)
+        && (stl_util::almost_equal(::std::fmod(::std::floor(k / 2.f), 2.f),
+                                   0.f))
         && k > 0.f) {
-      return std::max(k, 3.f);
+      return ::std::max(k, 3.f);
     }
   }
-  return std::max(v, 3.f);
+  return ::std::max(v, 3.f);
 }
 
 float BlurPostProcess::_gaussianWeight(float x) const
@@ -201,9 +204,9 @@ float BlurPostProcess::_gaussianWeight(float x) const
   // the distribution is scaled to account for the difference between the actual
   // kernel size and the requested kernel size
   float sigma       = (1.f / 3.f);
-  float denominator = std::sqrt(2.f * Math::PI) * sigma;
+  float denominator = ::std::sqrt(2.f * Math::PI) * sigma;
   float exponent    = -((x * x) / (2.f * sigma * sigma));
-  float weight      = (1.f / denominator) * std::exp(exponent);
+  float weight      = (1.f / denominator) * ::std::exp(exponent);
   return weight;
 }
 
@@ -212,7 +215,7 @@ std::string BlurPostProcess::_glslFloat(float x,
 {
   std::ostringstream oss;
   oss.precision(decimalFigures);
-  oss << std::fixed << x;
+  oss << ::std::fixed << x;
   return String::regexReplace(oss.str(), "0+", "");
 }
 

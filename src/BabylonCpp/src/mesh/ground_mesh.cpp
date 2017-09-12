@@ -31,7 +31,7 @@ IReflect::Type GroundMesh::type() const
 
 size_t GroundMesh::subdivisions() const
 {
-  return std::min(_subdivisionsX, _subdivisionsY);
+  return ::std::min(_subdivisionsX, _subdivisionsY);
 }
 
 size_t GroundMesh::subdivisionsX() const
@@ -122,9 +122,9 @@ Vector4 GroundMesh::_getFacetAt(float x, float z)
   auto subdivisionsXf = static_cast<float>(_subdivisionsX);
   auto subdivisionsYf = static_cast<float>(_subdivisionsY);
   auto col
-    = static_cast<size_t>(std::floor((x + _maxX) * subdivisionsXf / _width));
+    = static_cast<size_t>(::std::floor((x + _maxX) * subdivisionsXf / _width));
   auto row = static_cast<size_t>(
-    std::floor(-(z + _maxZ) * subdivisionsYf / _height + subdivisionsYf));
+    ::std::floor(-(z + _maxZ) * subdivisionsYf / _height + subdivisionsYf));
   auto& quad = _heightQuads[row * _subdivisionsX + col];
   Vector4 facet;
   if (z < quad.slope.x * x + quad.slope.y) {
@@ -145,7 +145,7 @@ GroundMesh& GroundMesh::_initHeightQuads()
       quad.facet1 = Vector4(0.f, 0.f, 0.f, 0.f);
       quad.facet2 = Vector4(0.f, 0.f, 0.f, 0.f);
 
-      _heightQuads[row * _subdivisionsX + col] = std::move(quad);
+      _heightQuads[row * _subdivisionsX + col] = ::std::move(quad);
     }
   }
   return *this;

@@ -25,7 +25,7 @@ void PerformanceMonitor::sampleFrame(high_res_time_point_t timeMs)
   }
 
   if (!_lastFrameTimeMs.isNull()) {
-    auto dt = Time::fpTimeDiff<float, std::milli>(*_lastFrameTimeMs, timeMs);
+    auto dt = Time::fpTimeDiff<float, ::std::milli>(*_lastFrameTimeMs, timeMs);
     _rollingFrameTime.add(dt);
   }
 

@@ -103,7 +103,7 @@ constexpr auto distribution(Gen& g, T min, T max)
   return (r % range) + min;
 }
 
-} // end of namespace Random
+} // end of namespace Math
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_CORE_RANDOM_H

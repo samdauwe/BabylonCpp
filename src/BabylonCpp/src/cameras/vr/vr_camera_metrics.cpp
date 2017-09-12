@@ -110,8 +110,8 @@ float VRCameraMetrics::aspectRatio() const
 float VRCameraMetrics::aspectRatioFov() const
 {
   return (2.f
-          * std::atan((postProcessScaleFactor * vScreenSize)
-                      / (2.f * eyeToScreenDistance)));
+          * ::std::atan((postProcessScaleFactor * vScreenSize)
+                        / (2.f * eyeToScreenDistance)));
 }
 
 Matrix VRCameraMetrics::leftHMatrix() const

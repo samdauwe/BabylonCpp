@@ -98,7 +98,7 @@ std::vector<Mesh*>& Camera::getActiveMeshes()
 
 bool Camera::isActiveMesh(Mesh* mesh)
 {
-  return std::find(_activeMeshes.begin(), _activeMeshes.end(), mesh)
+  return ::std::find(_activeMeshes.begin(), _activeMeshes.end(), mesh)
          != _activeMeshes.end();
 }
 
@@ -302,7 +302,7 @@ Int32Array Camera::detachPostProcess(PostProcess* postProcess,
   int index;
   if (!atIndices.empty()) {
     _postProcesses.erase(
-      std::remove(_postProcesses.begin(), _postProcesses.end(), postProcess),
+      ::std::remove(_postProcesses.begin(), _postProcesses.end(), postProcess),
       _postProcesses.end());
   }
   else {

@@ -12,7 +12,7 @@ LogMessage::LogMessage(unsigned int lvl, const std::string& ctx)
   _timestamp = Time::systemTimepointNow();
   // Set thread id
   std::ostringstream ss;
-  ss << std::hex << std::this_thread::get_id();
+  ss << ::std::hex << ::std::this_thread::get_id();
   _threadId = ss.str();
 }
 
@@ -78,7 +78,7 @@ LogMessage::~LogMessage()
 std::ostream& operator<<(std::ostream& os, const LogMessage& logMessage)
 {
   os << '[' << Time::toIso8601Ms(logMessage.timestamp()) << "] "
-     << "[" << std::setw(5) << LogLevels::ToReadableLevel(logMessage.level())
+     << "[" << ::std::setw(5) << LogLevels::ToReadableLevel(logMessage.level())
      << "] "
      << "[" << logMessage.context() << "::" << logMessage.function() << "] "
      << "| " << logMessage.message();
@@ -204,7 +204,7 @@ void LogMessage::writef(const char* printf_like_message, ...)
   if (nbrcharacters <= 0) {
     _oss << "\n\tERROR LOG MSG NOTIFICATION: Failure to parse successfully "
             "the message";
-    _oss << '"' << printf_like_message << '"' << std::endl;
+    _oss << '"' << printf_like_message << '"' << ::std::endl;
   }
   else if (nbrcharacters > kMaxMessageSize) {
     _oss << finished_message << kTruncatedWarningText;

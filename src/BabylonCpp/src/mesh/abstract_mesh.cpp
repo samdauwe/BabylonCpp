@@ -335,7 +335,7 @@ int AbstractMesh::collisionMask() const
 
 void AbstractMesh::setCollisionMask(int mask)
 {
-  _collisionMask = !std::isnan(mask) ? mask : -1;
+  _collisionMask = !::std::isnan(mask) ? mask : -1;
 }
 
 int AbstractMesh::collisionGroup() const
@@ -345,7 +345,7 @@ int AbstractMesh::collisionGroup() const
 
 void AbstractMesh::setCollisionGroup(int mask)
 {
-  _collisionGroup = !std::isnan(mask) ? mask : -1;
+  _collisionGroup = !::std::isnan(mask) ? mask : -1;
 }
 
 const char* AbstractMesh::getClassName() const
@@ -404,7 +404,7 @@ void AbstractMesh::_resyncLighSource(Light* light)
 {
   bool isIn = light->isEnabled() && light->canAffectMesh(this);
 
-  auto index = std::find(_lightSources.begin(), _lightSources.end(), light);
+  auto index = ::std::find(_lightSources.begin(), _lightSources.end(), light);
 
   if (index != _lightSources.end()) {
     if (!isIn) {
@@ -424,7 +424,7 @@ void AbstractMesh::_resyncLighSource(Light* light)
 
 void AbstractMesh::_removeLightSource(Light* light)
 {
-  auto index = std::find(_lightSources.begin(), _lightSources.end(), light);
+  auto index = ::std::find(_lightSources.begin(), _lightSources.end(), light);
 
   if (index == _lightSources.end()) {
     return;
@@ -1125,17 +1125,17 @@ Matrix AbstractMesh::computeWorldMatrix(bool force)
       auto finalEuler = Tmp::Vector3Array[4].copyFromFloats(0.f, 0.f, 0.f);
       if ((billboardMode & AbstractMesh::BILLBOARDMODE_X)
           == AbstractMesh::BILLBOARDMODE_X) {
-        finalEuler.x = std::atan2(-currentPosition.y, currentPosition.z);
+        finalEuler.x = ::std::atan2(-currentPosition.y, currentPosition.z);
       }
 
       if ((billboardMode & AbstractMesh::BILLBOARDMODE_Y)
           == AbstractMesh::BILLBOARDMODE_Y) {
-        finalEuler.y = std::atan2(currentPosition.x, currentPosition.z);
+        finalEuler.y = ::std::atan2(currentPosition.x, currentPosition.z);
       }
 
       if ((billboardMode & AbstractMesh::BILLBOARDMODE_Z)
           == AbstractMesh::BILLBOARDMODE_Z) {
-        finalEuler.z = std::atan2(currentPosition.y, currentPosition.x);
+        finalEuler.z = ::std::atan2(currentPosition.y, currentPosition.x);
       }
 
       Matrix::RotationYawPitchRollToRef(finalEuler.y, finalEuler.x,
@@ -1254,9 +1254,9 @@ AbstractMesh& AbstractMesh::lookAt(const Vector3& targetPoint, float yawCor,
   Vector3& dv = AbstractMesh::_lookAtVectorCache;
   Vector3 pos = (space == Space::LOCAL) ? _position : *getAbsolutePosition();
   targetPoint.subtractToRef(pos, dv);
-  float yaw   = -std::atan2(dv.z, dv.x) - Math::PI_2;
-  float len   = std::sqrt(dv.x * dv.x + dv.z * dv.z);
-  float pitch = std::atan2(dv.y, len);
+  float yaw   = -::std::atan2(dv.z, dv.x) - Math::PI_2;
+  float len   = ::std::sqrt(dv.x * dv.x + dv.z * dv.z);
+  float pitch = ::std::atan2(dv.y, len);
   if (!_rotationQuaternionSet) {
     _rotationQuaternion    = Quaternion();
     _rotationQuaternionSet = true;
@@ -1666,8 +1666,8 @@ void AbstractMesh::dispose(bool doNotRecurse)
 
   // Intersections in progress
   for (auto& other : _intersectionsInProgress) {
-    std::remove(other->_intersectionsInProgress.begin(),
-                other->_intersectionsInProgress.end(), this);
+    ::std::remove(other->_intersectionsInProgress.begin(),
+                  other->_intersectionsInProgress.end(), this);
   }
 
   _intersectionsInProgress.clear();
@@ -1675,19 +1675,19 @@ void AbstractMesh::dispose(bool doNotRecurse)
   // Lights
   for (auto& light : getScene()->lights) {
     // Included meshes
-    std::remove(light->includedOnlyMeshes().begin(),
-                light->includedOnlyMeshes().end(), this);
+    ::std::remove(light->includedOnlyMeshes().begin(),
+                  light->includedOnlyMeshes().end(), this);
 
     // Excluded meshes
-    std::remove(light->excludedMeshes().begin(), light->excludedMeshes().end(),
-                this);
+    ::std::remove(light->excludedMeshes().begin(),
+                  light->excludedMeshes().end(), this);
 
     // Shadow generators
     auto generator = light->getShadowGenerator();
     if (generator) {
       auto shadowMap = generator->getShadowMap();
-      std::remove(shadowMap->renderList.begin(), shadowMap->renderList.end(),
-                  this);
+      ::std::remove(shadowMap->renderList.begin(), shadowMap->renderList.end(),
+                    this);
     }
   }
 
@@ -1706,8 +1706,8 @@ void AbstractMesh::dispose(bool doNotRecurse)
   auto sceneOctree = getScene()->selectionOctree();
   if (sceneOctree) {
     sceneOctree->dynamicContent.erase(
-      std::remove(sceneOctree->dynamicContent.begin(),
-                  sceneOctree->dynamicContent.end(), this),
+      ::std::remove(sceneOctree->dynamicContent.begin(),
+                    sceneOctree->dynamicContent.end(), this),
       sceneOctree->dynamicContent.end());
   }
 
@@ -1924,10 +1924,10 @@ AbstractMesh& AbstractMesh::_initFacetData()
   _facetNb = getIndices().size() / 3;
 
   _facetNormals.resize(_facetNb);
-  std::fill(_facetNormals.begin(), _facetNormals.end(), Vector3::Zero());
+  ::std::fill(_facetNormals.begin(), _facetNormals.end(), Vector3::Zero());
 
   _facetPositions.resize(_facetNb);
-  std::fill(_facetPositions.begin(), _facetPositions.end(), Vector3::Zero());
+  ::std::fill(_facetPositions.begin(), _facetPositions.end(), Vector3::Zero());
 
   _facetDataEnabled = true;
 
@@ -1957,12 +1957,12 @@ AbstractMesh& AbstractMesh::updateFacetData()
   _subDiv.max    = _partitioningSubdivisions;
   // adjust the number of subdivisions per axis
   _subDiv.X
-    = static_cast<unsigned>(std::floor(_subDiv.max * _bbSize.x / bbSizeMax));
+    = static_cast<unsigned>(::std::floor(_subDiv.max * _bbSize.x / bbSizeMax));
   // according to each bbox size per axis
   _subDiv.Y
-    = static_cast<unsigned>(std::floor(_subDiv.max * _bbSize.y / bbSizeMax));
+    = static_cast<unsigned>(::std::floor(_subDiv.max * _bbSize.y / bbSizeMax));
   _subDiv.Z
-    = static_cast<unsigned>(std::floor(_subDiv.max * _bbSize.z / bbSizeMax));
+    = static_cast<unsigned>(::std::floor(_subDiv.max * _bbSize.z / bbSizeMax));
   _subDiv.X = _subDiv.X < 1 ? 1 : _subDiv.X; // at least one subdivision
   _subDiv.Y = _subDiv.Y < 1 ? 1 : _subDiv.Y;
   _subDiv.Z = _subDiv.Z < 1 ? 1 : _subDiv.Z;
@@ -2035,14 +2035,14 @@ Uint32Array AbstractMesh::getFacetsAtLocalCoordinates(float x, float y, float z)
 {
   auto bInfo = getBoundingInfo();
   int ox     = static_cast<int>(
-    std::floor((x - bInfo->minimum.x * _partitioningBBoxRatio) * _subDiv.X
-               * _partitioningBBoxRatio / _bbSize.x));
+    ::std::floor((x - bInfo->minimum.x * _partitioningBBoxRatio) * _subDiv.X
+                 * _partitioningBBoxRatio / _bbSize.x));
   int oy = static_cast<int>(
-    std::floor((y - bInfo->minimum.y * _partitioningBBoxRatio) * _subDiv.Y
-               * _partitioningBBoxRatio / _bbSize.y));
+    ::std::floor((y - bInfo->minimum.y * _partitioningBBoxRatio) * _subDiv.Y
+                 * _partitioningBBoxRatio / _bbSize.y));
   int oz = static_cast<int>(
-    std::floor((z - bInfo->minimum.z * _partitioningBBoxRatio) * _subDiv.Z
-               * _partitioningBBoxRatio / _bbSize.z));
+    ::std::floor((z - bInfo->minimum.z * _partitioningBBoxRatio) * _subDiv.Z
+                 * _partitioningBBoxRatio / _bbSize.z));
 
   if (ox < 0 || oy < 0 || oz < 0) {
     return Uint32Array();

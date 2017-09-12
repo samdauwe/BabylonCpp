@@ -265,8 +265,8 @@ std::array<unsigned int, 3> RandomColor::HSVToRGB(float hue, float saturation,
   unsigned int iR = 0, iG = 0, iB = 0;
 
   float fC      = value * saturation; // Chroma
-  float fHPrime = std::fmod(hue / 60.f, 6.f);
-  float fX      = fC * (1.f - std::abs(std::fmod(fHPrime, 2.f) - 1.f));
+  float fHPrime = ::std::fmod(hue / 60.f, 6.f);
+  float fX      = fC * (1.f - ::std::abs(::std::fmod(fHPrime, 2.f) - 1.f));
   float fM      = value - fC;
 
   if (0 <= fHPrime && fHPrime < 1) {
@@ -309,9 +309,9 @@ std::array<unsigned int, 3> RandomColor::HSVToRGB(float hue, float saturation,
   fG += fM;
   fB += fM;
 
-  iR = static_cast<unsigned char>(std::ceil(fR * 255.f));
-  iG = static_cast<unsigned char>(std::ceil(fG * 255.f));
-  iB = static_cast<unsigned char>(std::ceil(fB * 255.f));
+  iR = static_cast<unsigned char>(::std::ceil(fR * 255.f));
+  iG = static_cast<unsigned char>(::std::ceil(fG * 255.f));
+  iB = static_cast<unsigned char>(::std::ceil(fB * 255.f));
 
   return {{iR, iG, iB}};
 }
@@ -595,9 +595,9 @@ ColorInfo RandomColor::getColorInfo(float hue)
 
 float RandomColor::randomWithin(const Range& range)
 {
-  return std::floor(range.start()
-                    + Math::randomNumber(0.f, 1.f)
-                        * (range.end() + 1.f - (range.start())));
+  return ::std::floor(range.start()
+                      + Math::randomNumber(0.f, 1.f)
+                          * (range.end() + 1.f - (range.start())));
 }
 
 void RandomColor::defineColor(const std::string& name,

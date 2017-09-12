@@ -18,7 +18,7 @@ public:
   template <typename... Ts>
   static TiledGround* New(Ts&&... args)
   {
-    auto tiledGround = new TiledGround(std::forward<Ts>(args)...);
+    auto tiledGround = new TiledGround(::std::forward<Ts>(args)...);
     tiledGround->addToScene(
       static_cast<std::unique_ptr<Geometry>>(tiledGround));
 

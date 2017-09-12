@@ -407,8 +407,8 @@ float ColorCurves::applyColorGradingSliderNonlinear(float value)
 {
   value /= 100.f;
 
-  float x = std::abs(value);
-  x       = std::pow(x, 2.f);
+  float x = ::std::abs(value);
+  x       = ::std::pow(x, 2.f);
 
   if (value < 0.f) {
     x *= -1.f;
@@ -434,7 +434,7 @@ void ColorCurves::fromHSBToRef(float hue, float saturation, float brightness,
   else {
     // sector 0 to 5
     h /= 60.f;
-    float i = std::floor(h);
+    float i = ::std::floor(h);
 
     // fractional part of h
     float f = h - i;
@@ -481,7 +481,7 @@ void ColorCurves::fromHSBToRef(float hue, float saturation, float brightness,
 
 float ColorCurves::clamp(float value, float min, float max)
 {
-  return std::min(std::max(value, min), max);
+  return ::std::min(::std::max(value, min), max);
 }
 
 std::unique_ptr<ColorCurves> ColorCurves::clone() const

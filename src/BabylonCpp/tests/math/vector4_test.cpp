@@ -7,7 +7,7 @@ float x = 1.2f;
 float y = 3.4f;
 float z = 5.6f;
 float w = 7.8f;
-}
+} // namespace
 
 TEST(TestVector4, Constructor)
 {
@@ -77,7 +77,7 @@ TEST(TestVector4, GetHashCode)
 {
   using namespace BABYLON;
 
-  std::array<Vector4, 16> vects{{
+  ::std::array<Vector4, 16> vects{{
     Vector4{x, y, z, w},    // 0000
     Vector4{x, y, z, -w},   // 0001
     Vector4{x, y, -z, w},   // 0010
@@ -252,7 +252,7 @@ TEST(TestVector4, Length)
   EXPECT_FLOAT_EQ(e.length(), 0.f);
 
   a.copyFromFloats(x, y, z, w);
-  EXPECT_FLOAT_EQ(a.length(), std::sqrt(x * x + y * y + z * z + w * w));
+  EXPECT_FLOAT_EQ(a.length(), ::std::sqrt(x * x + y * y + z * z + w * w));
 }
 
 TEST(TestVector4, LengthSquared)

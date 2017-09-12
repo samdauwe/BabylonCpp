@@ -18,7 +18,7 @@ public:
   template <typename... Ts>
   static Ground* New(Ts&&... args)
   {
-    auto ground = new Ground(std::forward<Ts>(args)...);
+    auto ground = new Ground(::std::forward<Ts>(args)...);
     ground->addToScene(static_cast<std::unique_ptr<Geometry>>(ground));
 
     return ground;

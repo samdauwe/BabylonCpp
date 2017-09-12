@@ -48,9 +48,9 @@ void Node::setParent(Node* parent)
   }
 
   if (_parentNode) {
-    _parentNode->_children.erase(std::remove(_parentNode->_children.begin(),
-                                             _parentNode->_children.end(),
-                                             this),
+    _parentNode->_children.erase(::std::remove(_parentNode->_children.begin(),
+                                               _parentNode->_children.end(),
+                                               this),
                                  _parentNode->_children.end());
   }
 
@@ -91,7 +91,7 @@ Engine* Node::getEngine()
 
 Node& Node::addBehavior(Behavior<Node>* behavior)
 {
-  auto it = std::find(_behaviors.begin(), _behaviors.end(), behavior);
+  auto it = ::std::find(_behaviors.begin(), _behaviors.end(), behavior);
 
   if (it != _behaviors.end()) {
     return *this;
@@ -105,7 +105,7 @@ Node& Node::addBehavior(Behavior<Node>* behavior)
 
 Node& Node::removeBehavior(Behavior<Node>* behavior)
 {
-  auto it = std::find(_behaviors.begin(), _behaviors.end(), behavior);
+  auto it = ::std::find(_behaviors.begin(), _behaviors.end(), behavior);
 
   if (it == _behaviors.end()) {
     return *this;

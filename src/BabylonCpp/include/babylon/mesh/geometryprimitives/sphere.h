@@ -18,7 +18,7 @@ public:
   template <typename... Ts>
   static Sphere* New(Ts&&... args)
   {
-    auto sphere = new Sphere(std::forward<Ts>(args)...);
+    auto sphere = new Sphere(::std::forward<Ts>(args)...);
     sphere->addToScene(static_cast<std::unique_ptr<Geometry>>(sphere));
 
     return sphere;

@@ -50,7 +50,7 @@ IReflect::Type Light::type() const
 
 void Light::addToScene(std::unique_ptr<Light>&& newLight)
 {
-  getScene()->addLight(std::move(newLight));
+  getScene()->addLight(::std::move(newLight));
 }
 
 const char* Light::getClassName() const
@@ -206,12 +206,12 @@ bool Light::canAffectMesh(AbstractMesh* mesh)
   }
 
   auto it1
-    = std::find(_includedOnlyMeshes.begin(), _includedOnlyMeshes.end(), mesh);
+    = ::std::find(_includedOnlyMeshes.begin(), _includedOnlyMeshes.end(), mesh);
   if (_includedOnlyMeshes.size() > 0 && it1 == _includedOnlyMeshes.end()) {
     return false;
   }
 
-  auto it2 = std::find(_excludedMeshes.begin(), _excludedMeshes.end(), mesh);
+  auto it2 = ::std::find(_excludedMeshes.begin(), _excludedMeshes.end(), mesh);
   if (_excludedMeshes.size() > 0 && it2 != _excludedMeshes.end()) {
     return false;
   }
@@ -444,8 +444,9 @@ float Light::_getPhotometricScale()
           // Impose a minimum light angular size to avoid the light becoming an
           // infinitely small angular light source (i.e. a dirac delta
           // function).
-          apexAngleRadians = std::max(apexAngleRadians, 0.001f);
-          auto solidAngle = 2.f * Math::PI * (1.f - std::cos(apexAngleRadians));
+          apexAngleRadians = ::std::max(apexAngleRadians, 0.001f);
+          auto solidAngle
+            = 2.f * Math::PI * (1.f - ::std::cos(apexAngleRadians));
           photometricScale = solidAngle;
           break;
       }

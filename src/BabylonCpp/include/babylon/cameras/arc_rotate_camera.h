@@ -17,7 +17,7 @@ public:
   template <typename... Ts>
   static ArcRotateCamera* New(Ts&&... args)
   {
-    auto camera = new ArcRotateCamera(std::forward<Ts>(args)...);
+    auto camera = new ArcRotateCamera(::std::forward<Ts>(args)...);
     camera->addToScene(static_cast<std::unique_ptr<Camera>>(camera));
 
     return camera;

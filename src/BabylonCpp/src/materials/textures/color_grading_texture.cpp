@@ -85,13 +85,13 @@ InternalTexture* ColorGradingTexture::load3dlTexture()
       }
 
       if (size != 0) {
-        int r = std::max(std::stoi(words[0]), 0);
-        int g = std::max(std::stoi(words[1]), 0);
-        int b = std::max(std::stoi(words[2]), 0);
+        int r = ::std::max(::std::stoi(words[0]), 0);
+        int g = ::std::max(::std::stoi(words[1]), 0);
+        int b = ::std::max(::std::stoi(words[2]), 0);
 
-        maxColor = std::max(r, maxColor);
-        maxColor = std::max(g, maxColor);
-        maxColor = std::max(b, maxColor);
+        maxColor = ::std::max(r, maxColor);
+        maxColor = ::std::max(g, maxColor);
+        maxColor = ::std::max(b, maxColor);
 
         size_t pixelStorageIndex
           = (pixelIndexW + pixelIndexSlice * size + pixelIndexH * size * size)

@@ -18,7 +18,7 @@ public:
   template <typename... Ts>
   static Torus* New(Ts&&... args)
   {
-    auto torus = new Torus(std::forward<Ts>(args)...);
+    auto torus = new Torus(::std::forward<Ts>(args)...);
     torus->addToScene(static_cast<std::unique_ptr<Geometry>>(torus));
 
     return torus;

@@ -91,6 +91,8 @@ using string = ::std::basic_string<char>;
 template <std::size_t N>
 using bitset = ::std::bitset<N>;
 
+using nullptr_t = ::std::nullptr_t;
+
 template <class T1, class T2>
 using pair = ::std::pair<T1, T2>;
 

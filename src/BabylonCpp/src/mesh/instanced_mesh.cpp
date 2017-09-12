@@ -219,8 +219,9 @@ InstancedMesh* InstancedMesh::clone(const std::string& /*iNname*/,
 void InstancedMesh::dispose(bool doNotRecurse)
 {
   // Remove from mesh
-  _sourceMesh->instances.erase(std::remove(_sourceMesh->instances.begin(),
-                                           _sourceMesh->instances.end(), this),
+  _sourceMesh->instances.erase(::std::remove(_sourceMesh->instances.begin(),
+                                             _sourceMesh->instances.end(),
+                                             this),
                                _sourceMesh->instances.end());
 
   AbstractMesh::dispose(doNotRecurse);

@@ -53,7 +53,7 @@ public:
   template <typename... Ts>
   static std::unique_ptr<Engine> New(Ts&&... args)
   {
-    std::unique_ptr<Engine> engine(new Engine(std::forward<Ts>(args)...));
+    std::unique_ptr<Engine> engine(new Engine(::std::forward<Ts>(args)...));
     return engine;
   }
   virtual ~Engine();

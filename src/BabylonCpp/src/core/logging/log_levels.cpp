@@ -10,12 +10,12 @@ constexpr unsigned int LogLevels::LEVEL_DEBUG = 4;
 constexpr unsigned int LogLevels::LEVEL_TRACE = 5;
 
 const std::vector<std::pair<unsigned int, std::string>> LogLevels::Levels
-  = {std::make_pair(LogLevels::LEVEL_QUIET, "QUIET"),
-     std::make_pair(LogLevels::LEVEL_ERROR, "ERROR"),
-     std::make_pair(LogLevels::LEVEL_WARN, "WARN"),
-     std::make_pair(LogLevels::LEVEL_INFO, "INFO"),
-     std::make_pair(LogLevels::LEVEL_DEBUG, "DEBUG"),
-     std::make_pair(LogLevels::LEVEL_TRACE, "TRACE")};
+  = {::std::make_pair(LogLevels::LEVEL_QUIET, "QUIET"),
+     ::std::make_pair(LogLevels::LEVEL_ERROR, "ERROR"),
+     ::std::make_pair(LogLevels::LEVEL_WARN, "WARN"),
+     ::std::make_pair(LogLevels::LEVEL_INFO, "INFO"),
+     ::std::make_pair(LogLevels::LEVEL_DEBUG, "DEBUG"),
+     ::std::make_pair(LogLevels::LEVEL_TRACE, "TRACE")};
 
 std::string LogLevels::ToReadableLevel(unsigned int level)
 {

@@ -735,15 +735,12 @@ Vector4 PMREMGenerator<ArrayBufferView>::processFilterExtents(
 
         for (float u = uStart; u <= uEnd; u++) {
           // pointer to direction in cube map associated with texel
-          float texelVectX
-            = _normCubeMap[iFaceIdx]
-                          [startIndexNormCubeMap + normCubeRowWalk + 0];
-          float texelVectY
-            = _normCubeMap[iFaceIdx]
-                          [startIndexNormCubeMap + normCubeRowWalk + 1];
-          float texelVectZ
-            = _normCubeMap[iFaceIdx]
-                          [startIndexNormCubeMap + normCubeRowWalk + 2];
+          float texelVectX = _normCubeMap[iFaceIdx][startIndexNormCubeMap
+                                                    + normCubeRowWalk + 0];
+          float texelVectY = _normCubeMap[iFaceIdx][startIndexNormCubeMap
+                                                    + normCubeRowWalk + 1];
+          float texelVectZ = _normCubeMap[iFaceIdx][startIndexNormCubeMap
+                                                    + normCubeRowWalk + 2];
 
           // check dot product to see if texel is within cone
           float tapDotProd = texelVectX * centerTapDir.x
@@ -753,9 +750,8 @@ Vector4 PMREMGenerator<ArrayBufferView>::processFilterExtents(
           if (tapDotProd >= dotProdThresh && tapDotProd > 0.f) {
             // solid angle stored in 4th channel of normalizer/solid angle cube
             // map
-            float weight
-              = _normCubeMap[iFaceIdx]
-                            [startIndexNormCubeMap + normCubeRowWalk + 3];
+            float weight = _normCubeMap[iFaceIdx][startIndexNormCubeMap
+                                                  + normCubeRowWalk + 3];
 
             // Here we decide if we use a Phong/Blinn or a Phong/Blinn BRDF.
             // Phong/Blinn BRDF is just the Phong/Blinn model multiply by the
@@ -767,9 +763,9 @@ Vector4 PMREMGenerator<ArrayBufferView>::processFilterExtents(
             for (size_t k = 0; k < nSrcChannels;
                  k++) //(aSrcCubeMap[iFaceIdx].m_NumChannels) //up to 4 channels
             {
-              dstAccum[k]
-                += weight * srcCubeMap[iFaceIdx]
-                                      [startIndexSrcCubeMap + srcCubeRowWalk];
+              dstAccum[k] += weight
+                             * srcCubeMap[iFaceIdx][startIndexSrcCubeMap
+                                                    + srcCubeRowWalk];
               srcCubeRowWalk++;
             }
 

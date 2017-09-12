@@ -941,9 +941,9 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
         angle = static_cast<float>(j) * angle_step;
 
         // position
-        ringVertex.x = std::cos(-angle) * radius;
+        ringVertex.x = ::std::cos(-angle) * radius;
         ringVertex.y = -height / 2.f + h * height;
-        ringVertex.z = std::sin(-angle) * radius;
+        ringVertex.z = ::std::sin(-angle) * radius;
 
         if (stl_util::almost_equal(diameterTop, 0.f) && i == subdivisions) {
           // if no top cap, reuse former normals
@@ -954,8 +954,8 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
         else {
           ringNormal.x = ringVertex.x;
           ringNormal.z = ringVertex.z;
-          ringNormal.y = std::sqrt(ringNormal.x * ringNormal.x
-                                   + ringNormal.z * ringNormal.z)
+          ringNormal.y = ::std::sqrt(ringNormal.x * ringNormal.x
+                                     + ringNormal.z * ringNormal.z)
                          * _tan;
           ringNormal.normalize();
         }
@@ -1090,8 +1090,8 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
     for (i = 0; i <= tessellation; ++i) {
       _angle = Math::PI * 2.f * static_cast<float>(i) * arc
                / static_cast<float>(tessellation);
-      float _cos   = std::cos(-_angle);
-      float _sin   = std::sin(-_angle);
+      float _cos   = ::std::cos(-_angle);
+      float _sin   = ::std::sin(-_angle);
       circleVector = Vector3(_cos * _radius, offset, _sin * _radius);
       textureCoordinate
         = Vector2(_cos * textureScale.x + 0.5f, _sin * textureScale.y + 0.5f);
@@ -1171,8 +1171,8 @@ std::unique_ptr<VertexData> VertexData::CreateTorus(TorusOptions& options)
 
       float innerAngle
         = static_cast<float>(j) * Math::PI * 2.f / tessellationf + Math::PI;
-      float dx = std::cos(innerAngle);
-      float dy = std::sin(innerAngle);
+      float dx = ::std::cos(innerAngle);
+      float dy = ::std::sin(innerAngle);
 
       // Create a vertex.
       Vector3 normal(dx, dy, 0.f);
@@ -1272,7 +1272,7 @@ VertexData::CreateDashedLines(DashedLinesOptions& options)
   dashshft = dashSize * shft / (dashSize + gapSize);
   for (i = 0; i < points.size() - 1; ++i) {
     points[i + 1].subtractToRef(points[i], curvect);
-    nb = std::floor(curvect.length() / shft);
+    nb = ::std::floor(curvect.length() / shft);
     curvect.normalize();
     for (float j = 0.f; j < nb; ++j) {
       curshft = shft * j;
@@ -1606,8 +1606,8 @@ std::unique_ptr<VertexData> VertexData::CreateDisc(DiscOptions& options)
   float theta = Math::PI2 * arc;
   float step  = theta / static_cast<float>(tessellation);
   for (float a = 0.f; a < theta; a += step) {
-    float x = std::cos(a);
-    float y = std::sin(a);
+    float x = ::std::cos(a);
+    float y = ::std::sin(a);
     float u = (x + 1.f) / 2.f;
     float v = (1.f - y) / 2.f;
     stl_util::concat(positions, {radius * x, radius * y, 0.f});
@@ -1672,15 +1672,15 @@ std::unique_ptr<VertexData> VertexData::CreatePolygon(
   unsigned int face = 0;
   for (unsigned int index = 0; index < normals.size(); index += 3) {
     // Edge Face  no. 1
-    if (std::abs(normals[index + 1]) < 0.001f) {
+    if (::std::abs(normals[index + 1]) < 0.001f) {
       face = 1;
     }
     // Top Face  no. 0
-    if (std::abs(normals[index + 1] - 1) < 0.001f) {
+    if (::std::abs(normals[index + 1] - 1) < 0.001f) {
       face = 0;
     }
     // Bottom Face  no. 2
-    if (std::abs(normals[index + 1] + 1) < 0.001f) {
+    if (::std::abs(normals[index + 1] + 1) < 0.001f) {
       face = 2;
     }
     idx = index / 3;
@@ -1727,7 +1727,7 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
   const auto& radiusY         = options.radiusY;
   const auto& radiusZ         = options.radiusZ;
 
-  const float t = (1.f + std::sqrt(5.f)) / 2.f;
+  const float t = (1.f + ::std::sqrt(5.f)) / 2.f;
 
   // 12 vertex x,y,z
   const std::array<float, 36> ico_vertices = {{
@@ -2372,7 +2372,7 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
     for (f = 0; f < nbfaces; ++f) {
       size_t fl = dataFaces[f].size(); // number of vertices of the current face
       ang       = Math::PI2 / static_cast<float>(fl);
-      x         = 0.5f * std::tan(ang / 2.f);
+      x         = 0.5f * ::std::tan(ang / 2.f);
       y         = 0.5f;
 
       // positions, uvs, colors
@@ -2387,8 +2387,8 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
         u = faceUV[f].x + (faceUV[f].z - faceUV[f].x) * (0.5f + x);
         v = faceUV[f].y + (faceUV[f].w - faceUV[f].y) * (y - 0.5f);
         stl_util::concat(uvs, {u, v});
-        tmp = x * std::cos(ang) - y * std::sin(ang);
-        y   = x * std::sin(ang) + y * std::cos(ang);
+        tmp = x * ::std::cos(ang) - y * ::std::sin(ang);
+        y   = x * ::std::sin(ang) + y * ::std::cos(ang);
         x   = tmp;
         // colors
         if (!faceColors.empty()) {
@@ -2442,14 +2442,14 @@ VertexData::CreateTorusKnot(TorusKnotOptions& options)
 
   // Helper
   auto getPos = [&](float angle) {
-    auto cu      = std::cos(angle);
-    auto su      = std::sin(angle);
+    auto cu      = ::std::cos(angle);
+    auto su      = ::std::sin(angle);
     auto quOverP = q / p * angle;
-    auto cs      = std::cos(quOverP);
+    auto cs      = ::std::cos(quOverP);
 
     auto tx = radius * (2.f + cs) * 0.5f * cu;
     auto ty = radius * (2.f + cs) * su * 0.5f;
-    auto tz = radius * std::sin(quOverP) * 0.5f;
+    auto tz = radius * ::std::sin(quOverP) * 0.5f;
 
     return Vector3(tx, ty, tz);
   };
@@ -2478,8 +2478,8 @@ VertexData::CreateTorusKnot(TorusKnotOptions& options)
       modJ = j % tubularSegments;
 
       v  = static_cast<float>(modJ) / tubularSegmentsf * 2.f * Math::PI;
-      cx = -tube * std::cos(v);
-      cy = tube * std::sin(v);
+      cx = -tube * ::std::cos(v);
+      cy = tube * ::std::sin(v);
 
       positions.emplace_back(p1.x + cx * n.x + cy * bitan.x);
       positions.emplace_back(p1.y + cx * n.y + cy * bitan.y);
@@ -2655,7 +2655,7 @@ void VertexData::ComputeNormals(const Float32Array& positions,
 
   // reset the normals
   normals.resize(positions.size());
-  std::fill(normals.begin(), normals.end(), 0.f);
+  ::std::fill(normals.begin(), normals.end(), 0.f);
 
   // Loop : 1 indice triplet = 1 facet
   size_t nbFaces = indices.size() / 3;
@@ -2687,8 +2687,8 @@ void VertexData::ComputeNormals(const Float32Array& positions,
     faceNormalz = faceNormalSign * (p1p2x * p3p2y - p1p2y * p3p2x);
 
     // normalize this normal and store it in the array facetData
-    length = std::sqrt(faceNormalx * faceNormalx + faceNormaly * faceNormaly
-                       + faceNormalz * faceNormalz);
+    length = ::std::sqrt(faceNormalx * faceNormalx + faceNormaly * faceNormaly
+                         + faceNormalz * faceNormalz);
     length = stl_util::almost_equal(length, 0.f) ? 1.f : length;
     faceNormalx /= length;
     faceNormaly /= length;
@@ -2716,44 +2716,44 @@ void VertexData::ComputeNormals(const Float32Array& positions,
       // compute each facet vertex (+ facet barycenter) index in the partiniong
       // array
       ox = static_cast<unsigned>(
-        std::floor((options.facetPositions[index].x
-                    - options.bInfo.minimum.x * options.ratio)
-                   * xSubRatio));
+        ::std::floor((options.facetPositions[index].x
+                      - options.bInfo.minimum.x * options.ratio)
+                     * xSubRatio));
       oy = static_cast<unsigned>(
-        std::floor((options.facetPositions[index].y
-                    - options.bInfo.minimum.y * options.ratio)
-                   * ySubRatio));
+        ::std::floor((options.facetPositions[index].y
+                      - options.bInfo.minimum.y * options.ratio)
+                     * ySubRatio));
       oz = static_cast<unsigned>(
-        std::floor((options.facetPositions[index].z
-                    - options.bInfo.minimum.z * options.ratio)
-                   * zSubRatio));
+        ::std::floor((options.facetPositions[index].z
+                      - options.bInfo.minimum.z * options.ratio)
+                     * zSubRatio));
       b1x = static_cast<unsigned>(
-        std::floor((positions[v1x] - options.bInfo.minimum.x * options.ratio)
-                   * xSubRatio));
+        ::std::floor((positions[v1x] - options.bInfo.minimum.x * options.ratio)
+                     * xSubRatio));
       b1y = static_cast<unsigned>(
-        std::floor((positions[v1y] - options.bInfo.minimum.y * options.ratio)
-                   * ySubRatio));
+        ::std::floor((positions[v1y] - options.bInfo.minimum.y * options.ratio)
+                     * ySubRatio));
       b1z = static_cast<unsigned>(
-        std::floor((positions[v1z] - options.bInfo.minimum.z * options.ratio)
-                   * zSubRatio));
+        ::std::floor((positions[v1z] - options.bInfo.minimum.z * options.ratio)
+                     * zSubRatio));
       b2x = static_cast<unsigned>(
-        std::floor((positions[v2x] - options.bInfo.minimum.x * options.ratio)
-                   * xSubRatio));
+        ::std::floor((positions[v2x] - options.bInfo.minimum.x * options.ratio)
+                     * xSubRatio));
       b2y = static_cast<unsigned>(
-        std::floor((positions[v2y] - options.bInfo.minimum.y * options.ratio)
-                   * ySubRatio));
+        ::std::floor((positions[v2y] - options.bInfo.minimum.y * options.ratio)
+                     * ySubRatio));
       b2z = static_cast<unsigned>(
-        std::floor((positions[v2z] - options.bInfo.minimum.z * options.ratio)
-                   * zSubRatio));
+        ::std::floor((positions[v2z] - options.bInfo.minimum.z * options.ratio)
+                     * zSubRatio));
       b3x = static_cast<unsigned>(
-        std::floor((positions[v3x] - options.bInfo.minimum.x * options.ratio)
-                   * xSubRatio));
+        ::std::floor((positions[v3x] - options.bInfo.minimum.x * options.ratio)
+                     * xSubRatio));
       b3y = static_cast<unsigned>(
-        std::floor((positions[v3y] - options.bInfo.minimum.y * options.ratio)
-                   * ySubRatio));
+        ::std::floor((positions[v3y] - options.bInfo.minimum.y * options.ratio)
+                     * ySubRatio));
       b3z = static_cast<unsigned>(
-        std::floor((positions[v3z] - options.bInfo.minimum.z * options.ratio)
-                   * zSubRatio));
+        ::std::floor((positions[v3z] - options.bInfo.minimum.z * options.ratio)
+                     * zSubRatio));
 
       block_idx_v1 = b1x + options.subDiv.max * b1y + subSq * b1z;
       block_idx_v2 = b2x + options.subDiv.max * b2y + subSq * b2z;
@@ -2800,8 +2800,8 @@ void VertexData::ComputeNormals(const Float32Array& positions,
     faceNormaly = normals[index * 3 + 1];
     faceNormalz = normals[index * 3 + 2];
 
-    length = std::sqrt(faceNormalx * faceNormalx + faceNormaly * faceNormaly
-                       + faceNormalz * faceNormalz);
+    length = ::std::sqrt(faceNormalx * faceNormalx + faceNormaly * faceNormaly
+                         + faceNormalz * faceNormalz);
     length = stl_util::almost_equal(length, 0.f) ? 1.f : length;
     faceNormalx /= length;
     faceNormaly /= length;

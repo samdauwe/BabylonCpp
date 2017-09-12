@@ -326,7 +326,7 @@ public:
   inline TReturn operator()(TArgs... mArgs) const
   {
     return (closure.getPtrThis()->*(closure.getPtrFunction()))(
-      std::forward<TArgs>(mArgs)...);
+      ::std::forward<TArgs>(mArgs)...);
   }
 
   inline bool operator==(::std::nullptr_t) const noexcept

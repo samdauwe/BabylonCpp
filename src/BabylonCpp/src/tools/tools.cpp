@@ -87,7 +87,7 @@ int Tools::GetExponentOfTwo(int value, int max, unsigned int mode)
       break;
   }
 
-  return std::min(pot, max);
+  return ::std::min(pot, max);
 }
 
 float Tools::ToDegrees(float angle)
@@ -239,8 +239,8 @@ Image Tools::CreateCheckerboardImage(unsigned int size)
     for (unsigned int y = 0; y < size; ++y) {
       float yf              = static_cast<float>(y);
       unsigned int position = (x + size * y) * 4;
-      auto floorX = static_cast<std::uint8_t>(std::floor(xf / (size / 8.f)));
-      auto floorY = static_cast<std::uint8_t>(std::floor(yf / (size / 8.f)));
+      auto floorX = static_cast<std::uint8_t>(::std::floor(xf / (size / 8.f)));
+      auto floorY = static_cast<std::uint8_t>(::std::floor(yf / (size / 8.f)));
 
       if ((floorX + floorY) % 2 == 0) {
         r = g = b = 255;
@@ -274,7 +274,7 @@ Image Tools::CreateNoiseImage(unsigned int size)
   std::uint8_t value = 0;
   for (std::size_t i = 0; i < totalPixelsCount; i += 4) {
     value = static_cast<std::uint8_t>(
-      std::floor((randomNumbers[i] * (0.02f - 0.95f) + 0.95f) * 255.f));
+      ::std::floor((randomNumbers[i] * (0.02f - 0.95f) + 0.95f) * 255.f));
     imageData[i]     = value;
     imageData[i + 1] = value;
     imageData[i + 2] = value;

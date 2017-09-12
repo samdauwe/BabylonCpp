@@ -270,11 +270,11 @@ void ImageProcessingConfiguration::bind(Effect* effect, float aspectRatio)
     auto inverseHeight = 1.f / effect->getEngine()->getRenderHeight();
     effect->setFloat2("vInverseScreenSize", inverseWidth, inverseHeight);
 
-    auto vignetteScaleY = std::tan(vignetteCameraFov * 0.5f);
+    auto vignetteScaleY = ::std::tan(vignetteCameraFov * 0.5f);
     auto vignetteScaleX = vignetteScaleY * aspectRatio;
 
     auto vignetteScaleGeometricMean
-      = std::sqrt(vignetteScaleX * vignetteScaleY);
+      = ::std::sqrt(vignetteScaleX * vignetteScaleY);
     vignetteScaleX
       = Tools::Mix(vignetteScaleX, vignetteScaleGeometricMean, vignetteStretch);
     vignetteScaleY

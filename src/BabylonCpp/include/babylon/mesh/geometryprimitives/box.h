@@ -18,7 +18,7 @@ public:
   template <typename... Ts>
   static Box* New(Ts&&... args)
   {
-    auto box = new Box(std::forward<Ts>(args)...);
+    auto box = new Box(::std::forward<Ts>(args)...);
     box->addToScene(static_cast<std::unique_ptr<Geometry>>(box));
 
     return box;

@@ -51,14 +51,13 @@ using entropy = std::integral_constant<T, static_cast<T>(__cplusplus ^ __LINE__
                                                          )>;
 
 template <typename T, T EntropySeed, T Seed>
-using mix
-  = std::integral_constant<T, Seed ^ entropy<T>::value ^ __LINE__
-                                ^ hash<T, date_entropy, EntropySeed,
-                                       static_cast<T>(Seed ^ __LINE__)>::value
-                                ^ hash<T, time_entropy, EntropySeed,
-                                       static_cast<T>(Seed ^ __LINE__)>::value
-                                ^ hash<T, file_entropy, EntropySeed,
-                                       static_cast<T>(Seed ^ __LINE__)>::value>;
+using mix = std::integral_constant<
+  T,
+  Seed ^ entropy<T>::value ^ __LINE__
+    ^ hash<T, date_entropy, EntropySeed, static_cast<T>(Seed ^ __LINE__)>::value
+    ^ hash<T, time_entropy, EntropySeed, static_cast<T>(Seed ^ __LINE__)>::value
+    ^ hash<T, file_entropy, EntropySeed,
+           static_cast<T>(Seed ^ __LINE__)>::value>;
 
 } // end of namespace compile_time_rng_impl
 } // end of namespace detail
@@ -180,9 +179,9 @@ struct compile_time_rng {
      * @author: Marcelo Juchem <marcelo at fb.com>
      */
     template <std::size_t Iteration = 0>
-    using get                       = detail::compile_time_rng_impl::
-      mix<T, EntropySeed,
-          static_cast<T>((PreSeed ^ Seed ^ __LINE__) * (Iteration + 1))>;
+    using get = detail::compile_time_rng_impl::mix<
+      T, EntropySeed,
+      static_cast<T>((PreSeed ^ Seed ^ __LINE__) * (Iteration + 1))>;
   };
 
   /**
@@ -191,7 +190,7 @@ struct compile_time_rng {
    * @author: Marcelo Juchem <marcelo at fb.com>
    */
   template <std::size_t Iteration = 0>
-  using get                       = typename seed<>::template get<Iteration>;
+  using get = typename seed<>::template get<Iteration>;
 };
 
 //////////////////////////////
@@ -204,7 +203,7 @@ namespace compile_time_rng_impl {
 template <std::size_t Line>
 struct helper {
   template <typename T = std::size_t>
-  using bind           = compile_time_rng<T, static_cast<T>(Line)>;
+  using bind = compile_time_rng<T, static_cast<T>(Line)>;
 };
 
 } // end of namespace compile_time_rng_impl

@@ -15,17 +15,17 @@ public:
   std::string font;
   void fillRect(int x, int y, int width, int height)
   {
-    std::cout << x << ", " << y << ", ";
-    std::cout << width << ", " << height << ", " << '\n';
+    ::std::cout << x << ", " << y << ", ";
+    ::std::cout << width << ", " << height << ", " << '\n';
   }
   void fillText(const std::string& text, int x, int y)
   {
-    std::cout << x << ", " << y << ", ";
-    std::cout << text << ", " << '\n';
+    ::std::cout << x << ", " << y << ", ";
+    ::std::cout << text << ", " << '\n';
   }
   ISize measureText(const std::string& text)
   {
-    std::cout << text << ", " << '\n';
+    ::std::cout << text << ", " << '\n';
     return ISize(0, 0);
   }
 

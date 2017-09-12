@@ -431,10 +431,10 @@ void StandardRenderingPipeline::_createGaussianBlurPostProcesses(
         x = (i - 4.f) / 4.f;
         blurWeights[i]
           = gaussianCoefficient
-            * (1.f / std::sqrt(2.f * Math::PI * gaussianStandardDeviation))
-            * std::exp((-((x - gaussianMean) * (x - gaussianMean)))
-                       / (2.f * gaussianStandardDeviation
-                          * gaussianStandardDeviation));
+            * (1.f / ::std::sqrt(2.f * Math::PI * gaussianStandardDeviation))
+            * ::std::exp((-((x - gaussianMean) * (x - gaussianMean)))
+                         / (2.f * gaussianStandardDeviation
+                            * gaussianStandardDeviation));
       }
 
       ISize lastOutputDimensions(scene->getEngine()->getRenderWidth(),
@@ -513,7 +513,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
 {
   // Create luminance
   float size = static_cast<float>(
-    std::pow(3, StandardRenderingPipeline::LuminanceSteps));
+    ::std::pow(3, StandardRenderingPipeline::LuminanceSteps));
   luminancePostProcess = new PostProcess(
     "HDRLuminance", "standard", {"lumOffsets"}, {}, size, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
@@ -544,7 +544,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
   // Create down sample luminance
   for (unsigned int i = StandardRenderingPipeline::LuminanceSteps; i-- > 0;) {
     const std::string iStr = ::std::to_string(i);
-    float size             = static_cast<float>(std::pow(3, i));
+    float size             = static_cast<float>(::std::pow(3, i));
 
     std::string defines = "#define LUMINANCE_DOWN_SAMPLE\n";
     if (i == 0) {
@@ -729,10 +729,10 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
     );
 
     auto starRotation = Matrix::FromValues(
-      std::cos(camRot) * 0.5f, -std::sin(camRot), 0.f, 0.f, //
-      std::sin(camRot), std::cos(camRot) * 0.5f, 0.f, 0.f,  //
-      0.f, 0.f, 1.f, 0.f,                                   //
-      0.f, 0.f, 0.f, 1.f                                    //
+      ::std::cos(camRot) * 0.5f, -::std::sin(camRot), 0.f, 0.f, //
+      ::std::sin(camRot), ::std::cos(camRot) * 0.5f, 0.f, 0.f,  //
+      0.f, 0.f, 1.f, 0.f,                                       //
+      0.f, 0.f, 0.f, 1.f                                        //
     );
 
     auto lensStarMatrix

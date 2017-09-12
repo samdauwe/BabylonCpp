@@ -135,7 +135,7 @@ void SpriteManager::texture(Texture* value)
   _spriteTexture = value;
 }
 
-void SpriteManager::setOnDispose(const std::function<void()>& callback)
+void SpriteManager::setOnDispose(const ::std::function<void()>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);
@@ -189,10 +189,10 @@ void SpriteManager::_appendSpriteVertex(size_t index, Sprite* sprite,
 
 PickingInfo*
 SpriteManager::intersects(const Ray ray, Camera* camera,
-                          std::function<bool(Sprite* sprite)> predicate,
+                          ::std::function<bool(Sprite* sprite)> predicate,
                           bool fastCheck)
 {
-  auto count               = std::min(_capacity, sprites.size());
+  auto count               = ::std::min(_capacity, sprites.size());
   auto min                 = Vector3::Zero();
   auto max                 = Vector3::Zero();
   auto distance            = std::numeric_limits<float>::max();
@@ -266,7 +266,7 @@ void SpriteManager::render()
 
   // Sprites
   auto deltaTime = engine->getDeltaTime();
-  size_t max     = std::min(_capacity, sprites.size());
+  size_t max     = ::std::min(_capacity, sprites.size());
   int rowSize    = baseSize.width / cellWidth;
 
   unsigned int offset = 0;

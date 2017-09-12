@@ -58,7 +58,7 @@ int FreeCamera::collisionMask()
 
 void FreeCamera::setCollisionMask(int mask)
 {
-  _collisionMask = !std::isnan(mask) ? mask : -1;
+  _collisionMask = !::std::isnan(mask) ? mask : -1;
 }
 
 void FreeCamera::_collideWithWorld(Vector3& velocity)
@@ -138,9 +138,9 @@ void FreeCamera::_checkInputs()
 
 bool FreeCamera::_decideIfNeedsToMove()
 {
-  return _needMoveForGravity || std::abs(cameraDirection->x) > 0.f
-         || std::abs(cameraDirection->y) > 0.f
-         || std::abs(cameraDirection->z) > 0.f;
+  return _needMoveForGravity || ::std::abs(cameraDirection->x) > 0.f
+         || ::std::abs(cameraDirection->y) > 0.f
+         || ::std::abs(cameraDirection->z) > 0.f;
 }
 
 void FreeCamera::_updatePosition()

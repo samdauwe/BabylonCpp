@@ -174,9 +174,9 @@ Vector3& VolumetricLightScatteringPostProcess::getCustomMeshPosition()
 void VolumetricLightScatteringPostProcess::dispose(Camera* camera)
 {
   camera->getScene()->customRenderTargets.erase(
-    std::remove(camera->getScene()->customRenderTargets.begin(),
-                camera->getScene()->customRenderTargets.end(),
-                _volumetricLightScatteringRTT),
+    ::std::remove(camera->getScene()->customRenderTargets.begin(),
+                  camera->getScene()->customRenderTargets.end(),
+                  _volumetricLightScatteringRTT),
     camera->getScene()->customRenderTargets.end());
 
   _volumetricLightScatteringRTT->dispose();
@@ -331,26 +331,26 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
           auto sortedArray
             = stl_util::slice(transparentSubMeshes, 0,
                               static_cast<int>(transparentSubMeshes.size()));
-          std::sort(sortedArray.begin(), sortedArray.end(),
-                    [](const SubMesh* a, const SubMesh* b) {
-                      // Alpha index first
-                      if (a->_alphaIndex > b->_alphaIndex) {
-                        return 1;
-                      }
-                      if (a->_alphaIndex < b->_alphaIndex) {
-                        return -1;
-                      }
+          ::std::sort(sortedArray.begin(), sortedArray.end(),
+                      [](const SubMesh* a, const SubMesh* b) {
+                        // Alpha index first
+                        if (a->_alphaIndex > b->_alphaIndex) {
+                          return 1;
+                        }
+                        if (a->_alphaIndex < b->_alphaIndex) {
+                          return -1;
+                        }
 
-                      // Then distance to camera
-                      if (a->_distanceToCamera < b->_distanceToCamera) {
-                        return 1;
-                      }
-                      if (a->_distanceToCamera > b->_distanceToCamera) {
-                        return -1;
-                      }
+                        // Then distance to camera
+                        if (a->_distanceToCamera < b->_distanceToCamera) {
+                          return 1;
+                        }
+                        if (a->_distanceToCamera > b->_distanceToCamera) {
+                          return -1;
+                        }
 
-                      return 0;
-                    });
+                        return 0;
+                      });
 
           // Render sub meshes
           pEngine->setAlphaMode(EngineConstants::ALPHA_COMBINE);

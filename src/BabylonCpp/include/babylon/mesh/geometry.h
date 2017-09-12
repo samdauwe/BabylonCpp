@@ -22,7 +22,7 @@ public:
   template <typename... Ts>
   static Geometry* New(Ts&&... args)
   {
-    auto geometry = new Geometry(std::forward<Ts>(args)...);
+    auto geometry = new Geometry(::std::forward<Ts>(args)...);
     geometry->addToScene(static_cast<std::unique_ptr<Geometry>>(geometry));
 
     return geometry;

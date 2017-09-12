@@ -33,23 +33,23 @@ struct FibonacciCalculator {
 TEST(TestFuture, BasicWorker)
 {
   using namespace BABYLON;
-  const std::string str("Hello from struct");
+  const ::std::string str("Hello from struct");
   MsgType type(str);
-  std::unique_ptr<Active> bgWorker(Active::createActive());
-  std::future<std::string> fstring
-    = spawn_task(std::bind(&MsgType::msg, type), bgWorker.get());
+  ::std::unique_ptr<Active> bgWorker(Active::createActive());
+  ::std::future<::std::string> fstring
+    = spawn_task(::std::bind(&MsgType::msg, type), bgWorker.get());
   EXPECT_STREQ(str.c_str(), fstring.get().c_str());
 }
 
 TEST(TestFuture, FibonacciCalculationWorker)
 {
   using namespace BABYLON;
-  std::unique_ptr<Active> bgWorker(Active::createActive());
-  std::future<unsigned int> fibNumber12 = spawn_task(
-    std::bind(&FibonacciCalculator::calculate, FibonacciCalculator(12)),
+  ::std::unique_ptr<Active> bgWorker(Active::createActive());
+  ::std::future<unsigned int> fibNumber12 = spawn_task(
+    ::std::bind(&FibonacciCalculator::calculate, FibonacciCalculator(12)),
     bgWorker.get());
-  std::future<unsigned int> fibNumber20 = spawn_task(
-    std::bind(&FibonacciCalculator::calculate, FibonacciCalculator(20)),
+  ::std::future<unsigned int> fibNumber20 = spawn_task(
+    ::std::bind(&FibonacciCalculator::calculate, FibonacciCalculator(20)),
     bgWorker.get());
   EXPECT_EQ(144 + 6765, fibNumber12.get() + fibNumber20.get());
 }
@@ -57,12 +57,12 @@ TEST(TestFuture, FibonacciCalculationWorker)
 TEST(TestFuture, CopyableLambdaCall)
 {
   using namespace BABYLON;
-  std::unique_ptr<Active> bgWorker(Active::createActive());
+  ::std::unique_ptr<Active> bgWorker(Active::createActive());
 
   // lambda task
-  const std::string str_standalone("Hello from standalone");
+  const ::std::string str_standalone("Hello from standalone");
   auto msg_lambda = [=]() { return (str_standalone + str_standalone); };
-  std::string expected(str_standalone + str_standalone);
+  ::std::string expected(str_standalone + str_standalone);
 
   auto fstring_standalone = spawn_task(msg_lambda, bgWorker.get());
   EXPECT_STREQ(expected.c_str(), fstring_standalone.get().c_str());
@@ -71,7 +71,7 @@ TEST(TestFuture, CopyableLambdaCall)
 TEST(TestFuture, CannotCallSpawnTaskOnNullptrWorker)
 {
   using namespace BABYLON;
-  auto FailedHelloWorld = [] { std::cout << "Hello World" << std::endl; };
+  auto FailedHelloWorld = [] { ::std::cout << "Hello World" << ::std::endl; };
   Active* active        = nullptr;
   auto failed           = spawn_task(FailedHelloWorld, active);
   EXPECT_ANY_THROW(failed.get());

@@ -29,26 +29,26 @@ void CMGBoundinBox::clear()
 
 void CMGBoundinBox::augment(float x, float y, float z)
 {
-  min.x = std::min(min.x, x);
-  min.y = std::min(min.y, y);
-  min.z = std::min(min.z, z);
-  max.x = std::max(max.x, x);
-  max.y = std::max(max.y, y);
-  max.z = std::max(max.z, z);
+  min.x = ::std::min(min.x, x);
+  min.y = ::std::min(min.y, y);
+  min.z = ::std::min(min.z, z);
+  max.x = ::std::max(max.x, x);
+  max.y = ::std::max(max.y, y);
+  max.z = ::std::max(max.z, z);
 }
 
 void CMGBoundinBox::clampMin(float x, float y, float z)
 {
-  min.x = std::max(min.x, x);
-  min.y = std::max(min.y, y);
-  min.z = std::max(min.z, z);
+  min.x = ::std::max(min.x, x);
+  min.y = ::std::max(min.y, y);
+  min.z = ::std::max(min.z, z);
 }
 
 void CMGBoundinBox::clampMax(float x, float y, float z)
 {
-  max.x = std::min(max.x, x);
-  max.y = std::min(max.y, y);
-  max.z = std::min(max.z, z);
+  max.x = ::std::min(max.x, x);
+  max.y = ::std::min(max.y, y);
+  max.z = ::std::min(max.z, z);
 }
 
 bool CMGBoundinBox::empty() const

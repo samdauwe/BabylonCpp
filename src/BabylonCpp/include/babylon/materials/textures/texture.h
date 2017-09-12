@@ -17,7 +17,7 @@ public:
   template <typename... Ts>
   static Texture* New(Ts&&... args)
   {
-    auto texture = new Texture(std::forward<Ts>(args)...);
+    auto texture = new Texture(::std::forward<Ts>(args)...);
     texture->addToScene(static_cast<std::unique_ptr<BaseTexture>>(texture));
 
     return texture;

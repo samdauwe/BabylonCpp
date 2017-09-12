@@ -153,9 +153,9 @@ SolidParticleSystem::digest(Mesh* _mesh,
   // compute size from number
   if (number) {
     number = (number > totalFacets) ? totalFacets : number;
-    size   = static_cast<size_t>(
-      std::round(static_cast<float>(totalFacets) / static_cast<float>(number)));
-    delta = 0;
+    size   = static_cast<size_t>(::std::round(static_cast<float>(totalFacets)
+                                            / static_cast<float>(number)));
+    delta  = 0;
   }
   else {
     size = (size > totalFacets) ? totalFacets : size;
@@ -170,8 +170,8 @@ SolidParticleSystem::digest(Mesh* _mesh,
 
   while (f < totalFacets) {
     size = sizeO
-           + static_cast<size_t>(
-               std::floor((1.f + static_cast<float>(delta)) * Math::random()));
+           + static_cast<size_t>(::std::floor((1.f + static_cast<float>(delta))
+                                              * Math::random()));
     if (f > totalFacets - size) {
       size = totalFacets - f;
     }
@@ -859,9 +859,10 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
         = _particle->position.z + (_minBbox.z + _maxBbox.z) * 0.5f;
       bSphere.radius
         = _bSphereRadiusFactor * 0.5f
-          * std::sqrt((_maxBbox.x - _minBbox.x) * (_maxBbox.x - _minBbox.x)
-                      + (_maxBbox.y - _minBbox.y) * (_maxBbox.y - _minBbox.y)
-                      + (_maxBbox.z - _minBbox.z) * (_maxBbox.z - _minBbox.z));
+          * ::std::sqrt((_maxBbox.x - _minBbox.x) * (_maxBbox.x - _minBbox.x)
+                        + (_maxBbox.y - _minBbox.y) * (_maxBbox.y - _minBbox.y)
+                        + (_maxBbox.z - _minBbox.z)
+                            * (_maxBbox.z - _minBbox.z));
       bSphere._update(*mesh->_worldMatrix);
     }
 
@@ -918,12 +919,12 @@ void SolidParticleSystem::_quaternionRotationYPR()
   _halfroll  = _roll * 0.5f;
   _halfpitch = _pitch * 0.5f;
   _halfyaw   = _yaw * 0.5f;
-  _sinRoll   = std::sin(_halfroll);
-  _cosRoll   = std::cos(_halfroll);
-  _sinPitch  = std::sin(_halfpitch);
-  _cosPitch  = std::cos(_halfpitch);
-  _sinYaw    = std::sin(_halfyaw);
-  _cosYaw    = std::cos(_halfyaw);
+  _sinRoll   = ::std::sin(_halfroll);
+  _cosRoll   = ::std::cos(_halfroll);
+  _sinPitch  = ::std::sin(_halfpitch);
+  _cosPitch  = ::std::cos(_halfpitch);
+  _sinYaw    = ::std::sin(_halfyaw);
+  _cosYaw    = ::std::cos(_halfyaw);
   _quaternion.x
     = (_cosYaw * _sinPitch * _cosRoll) + (_sinYaw * _cosPitch * _sinRoll);
   _quaternion.y

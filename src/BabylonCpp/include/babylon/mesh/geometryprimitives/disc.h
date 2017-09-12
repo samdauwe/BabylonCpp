@@ -18,7 +18,7 @@ public:
   template <typename... Ts>
   static Disc* New(Ts&&... args)
   {
-    auto disc = new Disc(std::forward<Ts>(args)...);
+    auto disc = new Disc(::std::forward<Ts>(args)...);
     disc->addToScene(static_cast<std::unique_ptr<Geometry>>(disc));
 
     return disc;

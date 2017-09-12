@@ -479,10 +479,10 @@ std::vector<AbstractMesh*> Scene::getMeshes() const
   std::vector<AbstractMesh*> _meshes;
   _meshes.reserve(meshes.size());
 
-  std::for_each(meshes.begin(), meshes.end(),
-                [&_meshes](const std::unique_ptr<AbstractMesh>& mesh) {
-                  _meshes.emplace_back(mesh.get());
-                });
+  ::std::for_each(meshes.begin(), meshes.end(),
+                  [&_meshes](const std::unique_ptr<AbstractMesh>& mesh) {
+                    _meshes.emplace_back(mesh.get());
+                  });
 
   return _meshes;
 }
@@ -912,11 +912,12 @@ void Scene::_onPointerDownEvent(PointerEvent&& evt)
         if (pickResult->hit && pickResult->pickedMesh) {
           if (pickResult->pickedMesh->actionManager) {
             if (_startingPointerTime != high_res_time_point_t()
-                && ((Time::fpTimeSince<float, std::milli>(_startingPointerTime)
+                && ((Time::fpTimeSince<float, ::std::milli>(
+                       _startingPointerTime)
                      > ActionManager::LongPressDelay)
-                    && (std::abs(_startingPointerPosition.x - _pointerX)
+                    && (::std::abs(_startingPointerPosition.x - _pointerX)
                           < ActionManager::DragMovementThreshold
-                        && std::abs(_startingPointerPosition.y - _pointerY)
+                        && ::std::abs(_startingPointerPosition.y - _pointerY)
                              < ActionManager::DragMovementThreshold))) {
               _startingPointerTime = high_res_time_point_t();
               pickResult->pickedMesh->actionManager->processTrigger(
@@ -1020,9 +1021,9 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
         ActionManager::OnPickUpTrigger,
         ActionEvent::CreateNew(pickResult->pickedMesh, evt));
       if (pickResult->pickedMesh->actionManager) {
-        if (std::abs(_startingPointerPosition.x - _pointerX)
+        if (::std::abs(_startingPointerPosition.x - _pointerX)
               < ActionManager::DragMovementThreshold
-            && std::abs(_startingPointerPosition.y - _pointerY)
+            && ::std::abs(_startingPointerPosition.y - _pointerY)
                  < ActionManager::DragMovementThreshold) {
           pickResult->pickedMesh->actionManager->processTrigger(
             ActionManager::OnPickTrigger,
@@ -1058,9 +1059,9 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
           ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, this,
                                            evt));
         if (pickResult->pickedSprite->actionManager) {
-          if (std::abs(_startingPointerPosition.x - _pointerX)
+          if (::std::abs(_startingPointerPosition.x - _pointerX)
                 < ActionManager::DragMovementThreshold
-              && std::abs(_startingPointerPosition.y - _pointerY)
+              && ::std::abs(_startingPointerPosition.y - _pointerY)
                    < ActionManager::DragMovementThreshold) {
             pickResult->pickedSprite->actionManager->processTrigger(
               ActionManager::OnPickTrigger,
@@ -1294,7 +1295,7 @@ void Scene::_animate()
     _animationTimeLast    = now;
     _animationTimeLastSet = true;
   }
-  auto deltaTime = Time::fpTimeSince<size_t, std::milli>(_animationTimeLast)
+  auto deltaTime = Time::fpTimeSince<size_t, ::std::milli>(_animationTimeLast)
                    * animationTimeScale;
   _animationTime += deltaTime;
   _animationTimeLast = now;
@@ -1459,7 +1460,7 @@ int Scene::removeCamera(Camera* toRemove)
     cameras.erase(it1);
   }
   // Remove from activeCameras
-  auto it2 = std::find(activeCameras.begin(), activeCameras.end(), toRemove);
+  auto it2 = ::std::find(activeCameras.begin(), activeCameras.end(), toRemove);
   if (it2 != activeCameras.end()) {
     // Remove from the scene if camera found
     activeCameras.erase(it2);
@@ -1491,7 +1492,7 @@ void Scene::addLight(std::unique_ptr<Light>&& newLight)
 void Scene::sortLightsByPriority()
 {
   if (requireLightSorting) {
-    std::sort(
+    ::std::sort(
       lights.begin(), lights.end(),
       [](const std::unique_ptr<Light>& a, const std::unique_ptr<Light>& b) {
         return Light::compareLightsPriority(a.get(), b.get());
@@ -1587,10 +1588,10 @@ std::vector<Camera*> Scene::getCameras() const
 {
   std::vector<Camera*> _cameras;
   _cameras.reserve(cameras.size());
-  std::for_each(cameras.begin(), cameras.end(),
-                [&_cameras](const std::unique_ptr<Camera>& camera) {
-                  return _cameras.emplace_back(camera.get());
-                });
+  ::std::for_each(cameras.begin(), cameras.end(),
+                  [&_cameras](const std::unique_ptr<Camera>& camera) {
+                    return _cameras.emplace_back(camera.get());
+                  });
 
   return _cameras;
 }
@@ -1759,7 +1760,7 @@ AbstractMesh* Scene::getMeshByID(const std::string& id)
 std::vector<AbstractMesh*> Scene::getMeshesByID(const std::string& id)
 {
   std::vector<AbstractMesh*> filteredMeshes;
-  std::for_each(
+  ::std::for_each(
     meshes.begin(), meshes.end(),
     [&filteredMeshes, &id](const std::unique_ptr<AbstractMesh>& mesh) {
       if (mesh->id == id) {
@@ -1932,7 +1933,7 @@ MorphTargetManager* Scene::getMorphTargetManagerById(unsigned int id)
 
 bool Scene::isActiveMesh(Mesh* mesh)
 {
-  return std::find(_activeMeshes.begin(), _activeMeshes.end(), mesh)
+  return ::std::find(_activeMeshes.begin(), _activeMeshes.end(), mesh)
          != _activeMeshes.end();
 }
 
@@ -1969,13 +1970,13 @@ void Scene::_evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh)
     if (material) {
       // Render targets
       if (material->getRenderTargetTextures) {
-        if (std::find(_processedMaterials.begin(), _processedMaterials.end(),
-                      material)
+        if (::std::find(_processedMaterials.begin(), _processedMaterials.end(),
+                        material)
             == _processedMaterials.end()) {
           _processedMaterials.emplace_back(material);
           for (auto& renderTarget : material->getRenderTargetTextures()) {
-            if (std::find(_renderTargets.begin(), _renderTargets.end(),
-                          renderTarget)
+            if (::std::find(_renderTargets.begin(), _renderTargets.end(),
+                            renderTarget)
                 == _renderTargets.end()) {
               _renderTargets.emplace_back(renderTarget);
             }
@@ -2044,8 +2045,8 @@ void Scene::_evaluateActiveMeshes()
         && mesh->actionManager->hasSpecificTriggers(
              {ActionManager::OnIntersectionEnterTrigger,
               ActionManager::OnIntersectionExitTrigger})) {
-      if (std::find(_meshesForIntersections.begin(),
-                    _meshesForIntersections.end(), mesh.get())
+      if (::std::find(_meshesForIntersections.begin(),
+                      _meshesForIntersections.end(), mesh.get())
           == _meshesForIntersections.end()) {
         _meshesForIntersections.emplace_back(mesh.get());
       }
@@ -2096,8 +2097,8 @@ void Scene::_evaluateActiveMeshes()
 void Scene::_activeMesh(AbstractMesh* mesh)
 {
   if (mesh->skeleton() && skeletonsEnabled()) {
-    if (std::find(_activeSkeletons.begin(), _activeSkeletons.end(),
-                  mesh->skeleton())
+    if (::std::find(_activeSkeletons.begin(), _activeSkeletons.end(),
+                    mesh->skeleton())
         == _activeSkeletons.end()) {
       _activeSkeletons.emplace_back(mesh->skeleton());
       mesh->skeleton()->prepare();
@@ -2106,8 +2107,8 @@ void Scene::_activeMesh(AbstractMesh* mesh)
     if (!mesh->computeBonesUsingShaders()) {
       auto _mesh = dynamic_cast<Mesh*>(mesh);
       if (_mesh) {
-        if (std::find(_softwareSkinnedMeshes.begin(),
-                      _softwareSkinnedMeshes.end(), _mesh)
+        if (::std::find(_softwareSkinnedMeshes.begin(),
+                        _softwareSkinnedMeshes.end(), _mesh)
             == _softwareSkinnedMeshes.end()) {
           _softwareSkinnedMeshes.emplace_back(_mesh);
         }
@@ -2223,9 +2224,9 @@ void Scene::_renderForCamera(Camera* camera)
                   && camera == highlightLayer->camera())
               || (highlightLayer->camera()->cameraRigMode
                     != Camera::RIG_MODE_NONE
-                  && (std::find(highlightLayer->camera()->_rigCameras.begin(),
-                                highlightLayer->camera()->_rigCameras.end(),
-                                camera)
+                  && (::std::find(highlightLayer->camera()->_rigCameras.begin(),
+                                  highlightLayer->camera()->_rigCameras.end(),
+                                  camera)
                       != highlightLayer->camera()->_rigCameras.end())))) {
 
         renderhighlights = true;
@@ -2395,10 +2396,10 @@ void Scene::render()
   }
 
   // Animations
-  const float deltaTime = std::max(
+  const float deltaTime = ::std::max(
     Time::fpMillisecondsDuration<float>(Scene::MinDeltaTime),
-    std::min(_engine->getDeltaTime(),
-             Time::fpMillisecondsDuration<float>(Scene::MaxDeltaTime)));
+    ::std::min(_engine->getDeltaTime(),
+               Time::fpMillisecondsDuration<float>(Scene::MaxDeltaTime)));
   _animationRatio = deltaTime * (60.f / 1000.f);
   _animate();
 
@@ -2809,7 +2810,7 @@ void Scene::dispose(bool /*doNotRecurse*/)
 
   // Remove from engine
   _engine->scenes.erase(
-    std::remove(_engine->scenes.begin(), _engine->scenes.end(), this),
+    ::std::remove(_engine->scenes.begin(), _engine->scenes.end(), this),
     _engine->scenes.end());
 
   _engine->wipeCaches();

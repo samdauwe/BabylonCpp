@@ -18,7 +18,7 @@ public:
   template <typename... Ts>
   static Cylinder* New(Ts&&... args)
   {
-    auto cylinder = new Cylinder(std::forward<Ts>(args)...);
+    auto cylinder = new Cylinder(::std::forward<Ts>(args)...);
     cylinder->addToScene(static_cast<std::unique_ptr<Geometry>>(cylinder));
 
     return cylinder;

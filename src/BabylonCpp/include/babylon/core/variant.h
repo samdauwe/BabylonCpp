@@ -74,7 +74,7 @@ private:
   static const size_t data_size  = static_max<sizeof(Ts)...>::value;
   static const size_t data_align = static_max<alignof(Ts)...>::value;
 
-  using data_t = typename std::aligned_storage<data_size, data_align>::type;
+  using data_t = typename ::std::aligned_storage<data_size, data_align>::type;
 
   using helper_t = variant_helper<Ts...>;
 
@@ -83,7 +83,7 @@ private:
     return typeid(void).hash_code();
   }
 
-  size_t type_id;
+  ::size_t type_id;
   data_t data;
 
 public:
@@ -137,7 +137,7 @@ public:
     if (type_id == typeid(T).hash_code())
       return *reinterpret_cast<T*>(&data);
     else
-      throw std::bad_cast();
+      throw ::std::bad_cast();
   }
 
   ~Variant()

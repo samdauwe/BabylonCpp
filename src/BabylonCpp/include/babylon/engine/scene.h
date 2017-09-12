@@ -68,7 +68,7 @@ public:
   template <typename... Ts>
   static std::unique_ptr<Scene> New(Ts&&... args)
   {
-    std::unique_ptr<Scene> scene(new Scene(std::forward<Ts>(args)...));
+    std::unique_ptr<Scene> scene(new Scene(::std::forward<Ts>(args)...));
     return scene;
   }
   virtual ~Scene();

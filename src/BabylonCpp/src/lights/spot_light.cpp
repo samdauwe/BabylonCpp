@@ -108,12 +108,12 @@ void SpotLight::transferToEffect(Effect* /*effect*/,
     normalizeDirection = Vector3::Normalize(direction());
   }
 
-  _uniformBuffer->updateFloat4("vLightDirection",        // Name
-                               normalizeDirection.x,     // X
-                               normalizeDirection.y,     // Y
-                               normalizeDirection.z,     // Z
-                               std::cos(angle() * 0.5f), // Value
-                               lightIndex);              // Index
+  _uniformBuffer->updateFloat4("vLightDirection",          // Name
+                               normalizeDirection.x,       // X
+                               normalizeDirection.y,       // Y
+                               normalizeDirection.z,       // Z
+                               ::std::cos(angle() * 0.5f), // Value
+                               lightIndex);                // Index
 }
 
 } // end of namespace BABYLON

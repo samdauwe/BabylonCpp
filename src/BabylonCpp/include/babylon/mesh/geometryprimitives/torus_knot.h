@@ -18,7 +18,7 @@ public:
   template <typename... Ts>
   static TorusKnot* New(Ts&&... args)
   {
-    auto torusKnot = new TorusKnot(std::forward<Ts>(args)...);
+    auto torusKnot = new TorusKnot(::std::forward<Ts>(args)...);
     torusKnot->addToScene(static_cast<std::unique_ptr<Geometry>>(torusKnot));
 
     return torusKnot;

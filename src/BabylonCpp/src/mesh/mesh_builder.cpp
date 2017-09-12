@@ -336,7 +336,7 @@ LinesMesh* MeshBuilder::CreateDashedLines(const std::string& name,
       std::size_t i = 0;
       for (i = 0; i < points.size() - 1; ++i) {
         points[i + 1].subtractToRef(points[i], curvect);
-        nb = static_cast<unsigned int>(std::floor(curvect.length() / shft));
+        nb = static_cast<unsigned int>(::std::floor(curvect.length() / shft));
         curvect.normalize();
         j = 0;
         while (j < nb && p < positions.size()) {
@@ -420,20 +420,20 @@ Mesh* MeshBuilder::CreateLathe(const std::string& name, LatheOptions& options,
     std::vector<Vector3> path;
     if (cap == Mesh::CAP_START || cap == Mesh::CAP_ALL) {
       path.emplace_back(Vector3(0.f, shape[0].y, 0.f));
-      path.emplace_back(Vector3(std::cos(i * step) * shape[0].x * radius,
+      path.emplace_back(Vector3(::std::cos(i * step) * shape[0].x * radius,
                                 shape[0].y,
-                                std::sin(i * step) * shape[0].x * radius));
+                                ::std::sin(i * step) * shape[0].x * radius));
     }
     for (std::size_t p = 0; p < shape.size(); ++p) {
-      rotated = Vector3(std::cos(i * step) * shape[p].x * radius, shape[p].y,
-                        std::sin(i * step) * shape[p].x * radius);
+      rotated = Vector3(::std::cos(i * step) * shape[p].x * radius, shape[p].y,
+                        ::std::sin(i * step) * shape[p].x * radius);
       path.emplace_back(rotated);
     }
     if (cap == Mesh::CAP_END || cap == Mesh::CAP_ALL) {
       path.emplace_back(
-        Vector3(std::cos(i * step) * shape[shape.size() - 1].x * radius,
+        Vector3(::std::cos(i * step) * shape[shape.size() - 1].x * radius,
                 shape[shape.size() - 1].y,
-                std::sin(i * step) * shape[shape.size() - 1].x * radius));
+                ::std::sin(i * step) * shape[shape.size() - 1].x * radius));
       path.emplace_back(Vector3(0.f, shape[shape.size() - 1].y, 0.f));
     }
     paths.emplace_back(path);
@@ -466,7 +466,7 @@ Mesh* MeshBuilder::CreatePlane(const std::string& name, PlaneOptions& options,
     plane->translate(options.sourcePlane->normal, options.sourcePlane->d);
 
     auto product
-      = std::acos(Vector3::Dot(options.sourcePlane->normal, Axis::Z));
+      = ::std::acos(Vector3::Dot(options.sourcePlane->normal, Axis::Z));
     auto vectorProduct = Vector3::Cross(Axis::Z, options.sourcePlane->normal);
 
     plane->rotate(vectorProduct, product);
@@ -758,9 +758,9 @@ Mesh* MeshBuilder::CreateDecal(const std::string& name,
     normal = camera->globalPosition().subtract(cameraWorldTarget);
   }
 
-  auto yaw   = -std::atan2(normal.z, normal.x) - Math::PI_2;
-  auto len   = std::sqrt(normal.x * normal.x + normal.z * normal.z);
-  auto pitch = std::atan2(normal.y, len);
+  auto yaw   = -::std::atan2(normal.z, normal.x) - Math::PI_2;
+  auto len   = ::std::sqrt(normal.x * normal.x + normal.z * normal.z);
+  auto pitch = ::std::atan2(normal.y, len);
 
   // Matrix
   auto decalWorldMatrix
@@ -803,7 +803,7 @@ Mesh* MeshBuilder::CreateDecal(const std::string& name,
       return vertices;
     }
 
-    auto clipSize = 0.5f * std::abs(Vector3::Dot(size, axis));
+    auto clipSize = 0.5f * ::std::abs(Vector3::Dot(size, axis));
 
     const auto clipVertices
       = [&](const PositionNormalVertex& v0, const PositionNormalVertex& v1) {
