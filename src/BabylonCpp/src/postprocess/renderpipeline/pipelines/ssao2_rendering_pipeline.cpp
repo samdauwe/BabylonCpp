@@ -103,7 +103,7 @@ SSAO2RenderingPipeline::~SSAO2RenderingPipeline()
 
 void SSAO2RenderingPipeline::setSamples(unsigned int n)
 {
-  _ssaoPostProcess->updateEffect("#define SAMPLES " + std::to_string(n)
+  _ssaoPostProcess->updateEffect("#define SAMPLES " + ::std::to_string(n)
                                  + "\n#define SSAO");
   _samples      = n;
   _sampleSphere = _generateHemisphere();
@@ -250,7 +250,7 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
      "xViewport", "yViewport", "maxZ", "minZAspect"},
     {"randomSampler", "normalSampler"}, ratio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
-    "#define SAMPLES " + std::to_string(numSamples) + "\n#define SSAO");
+    "#define SAMPLES " + ::std::to_string(numSamples) + "\n#define SSAO");
 
   _ssaoPostProcess->setOnApply([&](Effect* effect) {
     if (_firstUpdate) {
@@ -269,10 +269,9 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
     effect->setFloat("base", base);
     effect->setFloat("near", _scene->activeCamera->minZ);
     effect->setFloat("far", _scene->activeCamera->maxZ);
-    effect->setFloat(
-      "xViewport",
-      std::tan(_scene->activeCamera->fov / 2.f)
-        * _scene->getEngine()->getAspectRatio(_scene->activeCamera, true));
+    effect->setFloat("xViewport", std::tan(_scene->activeCamera->fov / 2.f)
+                                    * _scene->getEngine()->getAspectRatio(
+                                        _scene->activeCamera, true));
     effect->setFloat("yViewport", std::tan(_scene->activeCamera->fov / 2.f));
     effect->setMatrix("projection", _scene->getProjectionMatrix());
 
@@ -326,9 +325,9 @@ void SSAO2RenderingPipeline::_createRandomTexture()
       randVector.x = std::floor(randVector.x);
       randVector.y = std::floor(randVector.y);
 
-      context->fillStyle = "rgb(" + std::to_string(randVector.x) + ", "
-                           + std::to_string(randVector.y) + ", "
-                           + std::to_string(randVector.z) + ")";
+      context->fillStyle = "rgb(" + ::std::to_string(randVector.x) + ", "
+                           + ::std::to_string(randVector.y) + ", "
+                           + ::std::to_string(randVector.z) + ")";
       context->fillRect(static_cast<int>(x), static_cast<int>(y), 1, 1);
     }
   }

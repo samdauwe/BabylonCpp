@@ -45,6 +45,7 @@
 
 // Numerics library
 #include <cmath>
+#include <numeric>
 
 // Strings library
 #include <string>

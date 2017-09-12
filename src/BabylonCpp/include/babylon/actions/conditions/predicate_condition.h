@@ -10,7 +10,7 @@ class BABYLON_SHARED_EXPORT PredicateCondition : public Condition {
 
 public:
   PredicateCondition(ActionManager* actionManager,
-                     const std::function<bool()>& predicate);
+                     const ::std::function<bool()>& predicate);
   ~PredicateCondition();
 
   /** Methods **/
@@ -18,7 +18,7 @@ public:
 
 private:
   /** Members **/
-  std::function<bool()> _predicate;
+  ::std::function<bool()> _predicate;
 
 }; // end of class PredicateCondition
 

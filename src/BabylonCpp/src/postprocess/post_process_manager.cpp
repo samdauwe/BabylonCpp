@@ -27,9 +27,9 @@ void PostProcessManager::_prepareBuffers()
   // VBO
   Float32Array vertices{1.f, 1.f, -1.f, 1.f, -1.f, -1.f, 1.f, -1.f};
   _vertexBuffers[VertexBuffer::PositionKindChars]
-    = std::make_unique<VertexBuffer>(_scene->getEngine(), vertices,
-                                     VertexBuffer::PositionKind, false, false,
-                                     2);
+    = ::std::make_unique<VertexBuffer>(_scene->getEngine(), vertices,
+                                       VertexBuffer::PositionKind, false, false,
+                                       2);
   _vertexBufferPtrs[VertexBuffer::PositionKindChars]
     = _vertexBuffers[VertexBuffer::PositionKindChars].get();
 

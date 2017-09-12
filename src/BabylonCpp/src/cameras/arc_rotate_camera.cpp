@@ -37,9 +37,9 @@ ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha,
     , zoomOnFactor{1.f}
     , targetScreenOffset{Vector2::Zero()}
     , allowUpsideDown{true}
-    , panningAxis{std::make_unique<Vector3>(1.f, 1.f, 0.f)}
+    , panningAxis{::std::make_unique<Vector3>(1.f, 1.f, 0.f)}
     , checkCollisions{false}
-    , collisionRadius{std::make_unique<Vector3>(0.5f, 0.5f, 0.5f)}
+    , collisionRadius{::std::make_unique<Vector3>(0.5f, 0.5f, 0.5f)}
     , _targetHost{nullptr}
     , _collider{nullptr}
     , _previousPosition{Vector3::Zero()}
@@ -49,7 +49,7 @@ ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha,
 {
   setTarget(iTarget);
   getViewMatrix();
-  inputs = std::make_unique<ArcRotateCameraInputsManager>(this);
+  inputs = ::std::make_unique<ArcRotateCameraInputsManager>(this);
   inputs->addKeyboard().addMouseWheel().addPointers();
 }
 
@@ -66,7 +66,7 @@ void ArcRotateCamera::_initCache()
 {
   TargetCamera::_initCache();
 
-  _cache._target = Vector3(std::numeric_limits<float>::max(),
+  _cache._target            = Vector3(std::numeric_limits<float>::max(),
                            std::numeric_limits<float>::max(),
                            std::numeric_limits<float>::max());
   _cache.alpha              = 0.f;
@@ -190,7 +190,7 @@ void ArcRotateCamera::_checkInputs()
   if (!stl_util::almost_equal(inertialPanningX, 0.f)
       || !stl_util::almost_equal(inertialPanningY, 0.f)) {
     if (!_localDirection) {
-      _localDirection       = std::make_unique<Vector3>(Vector3::Zero());
+      _localDirection       = ::std::make_unique<Vector3>(Vector3::Zero());
       _transformedDirection = Vector3::Zero();
     }
 
@@ -275,8 +275,9 @@ void ArcRotateCamera::rebuildAnglesAndRadius()
   radius        = radiusv3.length();
 
   // Alpha
-  alpha = std::acos(radiusv3.x / std::sqrt(std::pow(radiusv3.x, 2.f)
-                                           + std::pow(radiusv3.z, 2.f)));
+  alpha = std::acos(
+    radiusv3.x
+    / std::sqrt(std::pow(radiusv3.x, 2.f) + std::pow(radiusv3.z, 2.f)));
 
   if (radiusv3.z < 0.f) {
     alpha = Math::PI2 - alpha;
@@ -359,7 +360,7 @@ Matrix ArcRotateCamera::_getViewMatrix()
     _newPosition);
   if (getScene()->collisionsEnabled && checkCollisions) {
     if (!_collider) {
-      _collider = std::make_unique<Collider>();
+      _collider = ::std::make_unique<Collider>();
     }
     _collider->radius = *collisionRadius;
     _newPosition.subtractToRef(position, _collisionVelocity);

@@ -101,8 +101,8 @@ CollisionCoordinatorWorker::SerializeGeometry(Geometry* geometry)
 void CollisionCoordinatorWorker::getNewPosition(
   Vector3& position, Vector3& velocity, Collider* collider,
   unsigned int maximumRetry, AbstractMesh* excludedMesh,
-  const std::function<void(unsigned int collisionIndex, Vector3& newPosition,
-                           AbstractMesh* AbstractMesh)>& onNewPosition,
+  const ::std::function<void(unsigned int collisionIndex, Vector3& newPosition,
+                             AbstractMesh* AbstractMesh)>& onNewPosition,
   unsigned int collisionIndex)
 {
   if (!_init) {
@@ -180,8 +180,10 @@ void CollisionCoordinatorWorker::onMeshRemoved(AbstractMesh* mesh)
 
 void CollisionCoordinatorWorker::onGeometryAdded(Geometry* geometry)
 {
-  geometry->onGeometryUpdated = [this](
-    Geometry* geometry, unsigned int /*kind*/) { onGeometryUpdated(geometry); };
+  geometry->onGeometryUpdated
+    = [this](Geometry* geometry, unsigned int /*kind*/) {
+        onGeometryUpdated(geometry);
+      };
   onGeometryUpdated(geometry);
 }
 

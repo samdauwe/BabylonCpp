@@ -13,8 +13,8 @@ public:
   CubeTexture(const std::string& rootUrl, Scene* scene,
               const std::vector<std::string>& extensions = {},
               bool noMipmap = false, const std::vector<std::string>& files = {},
-              const std::function<void()>& onLoad  = nullptr,
-              const std::function<void()>& onError = nullptr,
+              const ::std::function<void()>& onLoad  = nullptr,
+              const ::std::function<void()>& onError = nullptr,
               unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA,
               bool prefiltered    = false,
               const std::string& forcedExtension = "");

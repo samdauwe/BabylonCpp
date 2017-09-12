@@ -204,7 +204,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_unique<PBRMaterialDefines>();
+    subMesh->_materialDefines = ::std::make_unique<PBRMaterialDefines>();
   }
 
   auto scene = getScene();
@@ -573,7 +573,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     scene->resetCachedMaterial();
 
     // Fallbacks
-    auto fallbacks = std::make_unique<EffectFallbacks>();
+    auto fallbacks = ::std::make_unique<EffectFallbacks>();
     if (defines[PMD::ENVIRONMENTBRDF]) {
       fallbacks->addFallback(0, "ENVIRONMENTBRDF");
     }
@@ -727,16 +727,16 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     auto join = defines.toString();
 
     EffectCreationOptions options;
-    options.attributes            = std::move(attribs);
-    options.uniformsNames         = std::move(uniforms);
-    options.uniformBuffersNames   = std::move(uniformBuffers);
-    options.samplers              = std::move(samplers);
+    options.attributes            = ::std::move(attribs);
+    options.uniformsNames         = ::std::move(uniforms);
+    options.uniformBuffersNames   = ::std::move(uniformBuffers);
+    options.samplers              = ::std::move(samplers);
     options.materialDefines       = &defines;
-    options.defines               = std::move(join);
-    options.fallbacks             = std::move(fallbacks);
+    options.defines               = ::std::move(join);
+    options.fallbacks             = ::std::move(fallbacks);
     options.onCompiled            = onCompiled;
     options.onError               = onError;
-    options.indexParameters       = std::move(indexParameters);
+    options.indexParameters       = ::std::move(indexParameters);
     options.maxSimultaneousLights = _maxSimultaneousLights;
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);

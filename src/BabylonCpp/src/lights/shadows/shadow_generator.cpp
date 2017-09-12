@@ -357,7 +357,7 @@ void ShadowGenerator::_initializeGenerator()
 void ShadowGenerator::_initializeShadowMap()
 {
   // Render target
-  _shadowMap = std::make_unique<RenderTargetTexture>(
+  _shadowMap = ::std::make_unique<RenderTargetTexture>(
     _light->name + "_shadowMap", _mapSize, _scene, false, true, _textureType,
     _light->needCube());
   _shadowMap->wrapU                     = TextureConstants::CLAMP_ADDRESSMODE;
@@ -410,7 +410,7 @@ void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
   int targetSize = static_cast<int>(_mapSize.width / blurScale());
 
   if (!useKernelBlur() || blurScale() != 1.f) {
-    _shadowMap2 = std::make_unique<RenderTargetTexture>(
+    _shadowMap2 = ::std::make_unique<RenderTargetTexture>(
       _light->name + "_shadowMap2", ISize{targetSize, targetSize}, _scene,
       false, true, _textureType);
     _shadowMap2->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
@@ -419,7 +419,7 @@ void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
   }
 
   if (useKernelBlur()) {
-    _kernelBlurXPostprocess = std::make_unique<BlurPostProcess>(
+    _kernelBlurXPostprocess = ::std::make_unique<BlurPostProcess>(
       _light->name + "KernelBlurX", Vector2(1.f, 0.f), blurKernel(), 1.f,
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, engine, false,
       _textureType);
@@ -429,7 +429,7 @@ void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
       effect->setTexture("textureSampler", _shadowMap.get());
     });
 
-    _kernelBlurYPostprocess = std::make_unique<BlurPostProcess>(
+    _kernelBlurYPostprocess = ::std::make_unique<BlurPostProcess>(
       _light->name + "KernelBlurY", Vector2(0.f, 1.f), blurKernel(), 1.f,
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, engine, false,
       _textureType);
@@ -449,11 +449,11 @@ void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
   }
   else {
 #if 0
-    _boxBlurPostprocess = std::make_unique<PostProcess>(
+    _boxBlurPostprocess = ::std::make_unique<PostProcess>(
       _light->name + "DepthBoxBlur", "depthBoxBlur",
       {"screenSize", "boxOffset"}, {}, 1.f, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, engine, false,
-      "#define OFFSET " + std::to_string(_blurBoxOffset), _textureType);
+      "#define OFFSET " + ::std::to_string(_blurBoxOffset), _textureType);
     _boxBlurPostprocess->onApplyObservable.add([this](Effect* effect) {
       int targetSize = static_cast<int>(_mapSize.width / blurScale());
       effect->setFloat2("screenSize", targetSize, targetSize);
@@ -572,7 +572,7 @@ void ShadowGenerator::_applyFilterValues()
 }
 
 void ShadowGenerator::forceCompilation(
-  const std::function<void(ShadowGenerator* generator)>& onCompiled,
+  const ::std::function<void(ShadowGenerator* generator)>& onCompiled,
   const ShadowGeneratorCompileOptions& options)
 {
   std::vector<SubMesh*> subMeshes;
@@ -651,10 +651,10 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
       attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKindChars);
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
-                         + std::to_string(mesh->numBoneInfluencers()));
+                         + ::std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back(
       String::concat("#define BonesPerMesh "
-                     + std::to_string(mesh->skeleton()->bones.size() + 1)));
+                     + ::std::to_string(mesh->skeleton()->bones.size() + 1)));
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
@@ -675,12 +675,12 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
     _cachedDefines = join;
 
     EffectCreationOptions options;
-    options.attributes = std::move(attribs);
+    options.attributes = ::std::move(attribs);
     options.uniformsNames
       = {"world",         "mBones",      "viewProjection", "diffuseMatrix",
          "lightPosition", "depthValues", "biasAndScale"};
     options.samplers = {"diffuseSampler"};
-    options.defines  = std::move(join);
+    options.defines  = ::std::move(join);
 
     _effect = _scene->getEngine()->createEffect("shadowMap", options,
                                                 _scene->getEngine());

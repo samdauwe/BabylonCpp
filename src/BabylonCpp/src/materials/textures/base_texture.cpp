@@ -49,7 +49,7 @@ IReflect::Type BaseTexture::type() const
 
 void BaseTexture::addToScene(std::unique_ptr<BaseTexture>&& newTexture)
 {
-  _scene->textures.emplace_back(std::move(newTexture));
+  _scene->textures.emplace_back(::std::move(newTexture));
 }
 
 bool BaseTexture::hasAlpha() const
@@ -98,7 +98,7 @@ const char* BaseTexture::getClassName() const
   return "BaseTexture";
 }
 
-void BaseTexture::setOnDispose(const std::function<void()>& callback)
+void BaseTexture::setOnDispose(const ::std::function<void()>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);
@@ -290,7 +290,7 @@ void BaseTexture::setSphericalPolynomial(const SphericalPolynomial& /*value*/)
 #if 0
   if (_texture) {
     _texture->_sphericalPolynomial
-      = std::make_unique<SphericalPolynomial>(value);
+      = ::std::make_unique<SphericalPolynomial>(value);
   }
 #endif
 }
@@ -326,10 +326,10 @@ void BaseTexture::dispose(bool /*doNotRecurse*/)
 
   // Remove from scene
   _scene->textures.erase(
-    std::remove_if(_scene->textures.begin(), _scene->textures.end(),
-                   [this](const std::unique_ptr<BaseTexture>& baseTexture) {
-                     return baseTexture.get() == this;
-                   }),
+    ::std::remove_if(_scene->textures.begin(), _scene->textures.end(),
+                     [this](const std::unique_ptr<BaseTexture>& baseTexture) {
+                       return baseTexture.get() == this;
+                     }),
     _scene->textures.end());
 
   if (_texture == nullptr) {
@@ -350,7 +350,7 @@ Json::object BaseTexture::serialize() const
 }
 
 void BaseTexture::WhenAllReady(const std::vector<BaseTexture*>& textures,
-                               const std::function<void()>& callback)
+                               const ::std::function<void()>& callback)
 {
   auto numRemaining = textures.size();
   if (numRemaining == 0) {
@@ -368,7 +368,7 @@ void BaseTexture::WhenAllReady(const std::vector<BaseTexture*>& textures,
       auto onLoadObservable
         = *(static_cast<Texture*>(texture))->onLoadObservable();
 
-      const std::function<void()> onLoadCallback = [&]() {
+      const ::std::function<void()> onLoadCallback = [&]() {
         onLoadObservable.removeCallback(onLoadCallback);
         if (--numRemaining == 0) {
           callback();

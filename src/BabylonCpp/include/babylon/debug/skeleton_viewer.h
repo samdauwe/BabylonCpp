@@ -42,7 +42,7 @@ private:
   std::vector<std::vector<Vector3>> _debugLines;
   LinesMesh* _debugMesh;
   bool _isEnabled;
-  std::function<void()> _renderFunction;
+  ::std::function<void()> _renderFunction;
 
 }; // end of class SkeletonViewer
 

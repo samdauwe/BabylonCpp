@@ -13,7 +13,7 @@ struct BABYLON_SHARED_EXPORT ISimplificationTask {
   std::vector<ISimplificationSettings> settings;
   SimplificationType simplificationType;
   Mesh* mesh;
-  std::function<void()> successCallback;
+  ::std::function<void()> successCallback;
   bool parallelProcessing;
 }; // end of class ISimplificationTask
 

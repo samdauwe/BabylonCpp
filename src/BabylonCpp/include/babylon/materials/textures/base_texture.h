@@ -36,7 +36,7 @@ public:
    */
   const char* getClassName() const;
 
-  void setOnDispose(const std::function<void()>& callback);
+  void setOnDispose(const ::std::function<void()>& callback);
   virtual bool isBlocking() const;
   Scene* getScene() const;
   virtual Matrix* getTextureMatrix();
@@ -67,7 +67,7 @@ public:
   Json::object serialize() const;
 
   static void WhenAllReady(const std::vector<BaseTexture*>& textures,
-                           const std::function<void()>& callback);
+                           const ::std::function<void()>& callback);
 
 protected:
   BaseTexture(Scene* scene);

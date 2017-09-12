@@ -12,7 +12,7 @@ class BABYLON_SHARED_EXPORT PostProcessRenderEffect {
 
 public:
   PostProcessRenderEffect(Engine* engine, const std::string& name,
-                          const std::function<PostProcess*()>& getPostProcess,
+                          const ::std::function<PostProcess*()>& getPostProcess,
                           bool singleInstance = true);
   ~PostProcessRenderEffect();
 
@@ -35,12 +35,12 @@ private:
 
 public:
   std::string _name;
-  std::function<void(PostProcess* postProcess)> applyParameters;
+  ::std::function<void(PostProcess* postProcess)> applyParameters;
   Engine* _engine;
 
 private:
   std::unordered_map<std::string, PostProcess*> _postProcesses;
-  std::function<PostProcess*()> _getPostProcess;
+  ::std::function<PostProcess*()> _getPostProcess;
   bool _singleInstance;
   std::unordered_map<std::string, Camera*> _cameras;
   std::unordered_map<std::string, IndicesArray> _indicesForCamera;

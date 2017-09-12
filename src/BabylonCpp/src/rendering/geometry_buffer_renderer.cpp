@@ -155,9 +155,10 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
       attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKindChars);
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
-                         + std::to_string(mesh->numBoneInfluencers()));
-    defines.emplace_back("#define BonesPerMesh "
-                         + std::to_string(mesh->skeleton()->bones.size() + 1));
+                         + ::std::to_string(mesh->numBoneInfluencers()));
+    defines.emplace_back(
+      "#define BonesPerMesh "
+      + ::std::to_string(mesh->skeleton()->bones.size() + 1));
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
@@ -178,11 +179,11 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
     _cachedDefines = join;
 
     EffectCreationOptions options;
-    options.attributes = std::move(attribs);
+    options.attributes = ::std::move(attribs);
     options.uniformsNames
       = {"world", "mBones", "viewProjection", "diffuseMatrix", "view"};
     options.samplers = {"diffuseSampler"};
-    options.defines  = std::move(join);
+    options.defines  = ::std::move(join);
 
     _effect = _scene->getEngine()->createEffect("geometry", options,
                                                 _scene->getEngine());
@@ -210,9 +211,10 @@ void GeometryBufferRenderer::_createRenderTargets()
   IMultiRenderTargetOptions options;
   options.generateMipMaps      = false;
   options.generateDepthTexture = true;
-  _multiRenderTarget           = std::make_unique<MultiRenderTarget>(
-    "gBuffer", Size{static_cast<int>(engine->getRenderWidth() * _ratio),
-                    static_cast<int>(engine->getRenderHeight() * _ratio)},
+  _multiRenderTarget           = ::std::make_unique<MultiRenderTarget>(
+    "gBuffer",
+    Size{static_cast<int>(engine->getRenderWidth() * _ratio),
+         static_cast<int>(engine->getRenderHeight() * _ratio)},
     count, _scene, options);
   if (!isSupported()) {
     return;

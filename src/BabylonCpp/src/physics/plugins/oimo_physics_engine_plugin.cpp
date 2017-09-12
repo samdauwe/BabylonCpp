@@ -20,9 +20,10 @@ namespace BABYLON {
 OimoPhysicsEnginePlugin::OimoPhysicsEnginePlugin(unsigned int iterations)
     : world{nullptr}, _tmpPositionVector{Vector3::Zero()}
 {
-  world->create(1.f / 60.f, static_cast<unsigned int>(
-                              OIMO::BroadPhase::Type::BR_BOUNDING_VOLUME_TREE),
-                iterations, true);
+  world->create(
+    1.f / 60.f,
+    static_cast<unsigned int>(OIMO::BroadPhase::Type::BR_BOUNDING_VOLUME_TREE),
+    iterations, true);
   world->clear();
   // making sure no stats are calculated
   world->setNoStat(true);
@@ -54,7 +55,7 @@ void OimoPhysicsEnginePlugin::executeStep(
   for (auto& impostor : impostors) {
     impostor->afterStep();
     // update the ordered impostors array
-    _tmpImpostorsArray[std::to_string(impostor->uniqueId)] = impostor;
+    _tmpImpostorsArray[::std::to_string(impostor->uniqueId)] = impostor;
   }
 #if 0
   // check for collisions

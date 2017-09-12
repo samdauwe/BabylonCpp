@@ -125,7 +125,7 @@ void BoneIKController::_setMaxAngle(float ang)
   const float a = _bone1Length;
   const float b = _bone2Length;
 
-  _maxReach = std::sqrt(a * a + b * b - 2 * a * b * std::cos(ang));
+  _maxReach = ::std::sqrt(a * a + b * b - 2 * a * b * ::std::cos(ang));
 }
 
 void BoneIKController::update()
@@ -188,7 +188,7 @@ void BoneIKController::update()
   float c = Vector3::Distance(bonePos, target);
 
   if (_maxReach > 0.f) {
-    c = std::min(_maxReach, c);
+    c = ::std::min(_maxReach, c);
   }
 
   float acosa = (b * b + c * c - a * a) / (2.f * b * c);
@@ -210,8 +210,8 @@ void BoneIKController::update()
     acosb = -1.f;
   }
 
-  const float angA = std::acos(acosa);
-  const float angB = std::acos(acosb);
+  const float angA = ::std::acos(acosa);
+  const float angB = ::std::acos(acosb);
 
   float angC = -angA - angB;
 

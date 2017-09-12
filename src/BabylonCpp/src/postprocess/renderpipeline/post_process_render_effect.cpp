@@ -11,7 +11,7 @@ namespace BABYLON {
 
 PostProcessRenderEffect::PostProcessRenderEffect(
   Engine* engine, const std::string& name,
-  const std::function<PostProcess*()>& getPostProcess, bool singleInstance)
+  const ::std::function<PostProcess*()>& getPostProcess, bool singleInstance)
     : _name{name}
     , _engine{engine}
     , _getPostProcess{getPostProcess}

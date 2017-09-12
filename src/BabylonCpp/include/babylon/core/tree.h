@@ -28,7 +28,7 @@ public:
    * @brief Convenience constructor to create a Node<T> with an instance of T.
    * @param data an instance of T.
    */
-  TreeNode(T data) : _id{uid++}, _data{std::move(data)}, _parent{nullptr}
+  TreeNode(T data) : _id{uid++}, _data{::std::move(data)}, _parent{nullptr}
   {
   }
 
@@ -165,9 +165,9 @@ public:
    */
   TreeNode<T>& addChild(T data)
   {
-    auto node     = std::make_unique<TreeNode<T>>(data);
+    auto node     = ::std::make_unique<TreeNode<T>>(data);
     node->_parent = this;
-    _children.emplace_back(std::move(node));
+    _children.emplace_back(::std::move(node));
     return *_children.back();
   }
 
@@ -226,14 +226,14 @@ public:
   /**
    * @brief Default constructor.
    */
-  Tree() : _root{std::make_unique<TreeNode<T>>()}
+  Tree() : _root{::std::make_unique<TreeNode<T>>()}
   {
   }
 
   /**
    * @brief constructor.
    */
-  Tree(T data) : _root{std::make_unique<TreeNode<T>>(std::move(data))}
+  Tree(T data) : _root{::std::make_unique<TreeNode<T>>(::std::move(data))}
   {
   }
 
@@ -360,7 +360,7 @@ public:
  */
 template <typename T>
 class Tree<T>::iterator
-  : public std::iterator<std::bidirectional_iterator_tag, T> {
+    : public std::iterator<std::bidirectional_iterator_tag, T> {
 
 public:
   /**
@@ -501,7 +501,7 @@ operator<<(std::basic_iostream<char>::basic_ostream& out, const Tree<T>& tree)
 
   const auto pop = [&]() { depth[di -= 4] = 0; };
 
-  const std::function<void(const node_t& tree)> print
+  const ::std::function<void(const node_t& tree)> print
     = [&](const node_t& tree) {
         out << "(" << tree->data() << ")\n";
         const auto& children = tree->children();

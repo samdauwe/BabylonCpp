@@ -176,7 +176,7 @@ TEST(TestString, randomString)
 std::string my_callback(const std::smatch& m)
 {
   int int_m = atoi(m.str(0).c_str());
-  return std::to_string(int_m + 1);
+  return ::std::to_string(int_m + 1);
 }
 
 TEST(TestString, regexMatch)
@@ -305,7 +305,7 @@ TEST(TestString, regexReplaceWithCallback)
   {
     const auto callback = [](const std::smatch& m) {
       int int_m = std::atoi(m.str(0).c_str());
-      return std::to_string(int_m + 1);
+      return ::std::to_string(int_m + 1);
     };
     const std::string s{"1, 9, 19"};
     const std::string r{String::regexReplace(
@@ -339,7 +339,7 @@ TEST(TestString, regexReplaceWithCallback)
       const auto convert = [](const std::smatch& m) {
         const int fval = std::atoi(m.str(0).c_str());
         const int cval = static_cast<int>((fval - 32) * 5.f / 9.f);
-        return std::to_string(cval) + 'C';
+        return ::std::to_string(cval) + 'C';
       };
       return String::regexReplace(
         x, std::regex("(\\d+)F", std::regex::optimize), convert);
@@ -352,11 +352,12 @@ TEST(TestString, regexReplaceWithCallback)
     const std::string s{"line1\nline2\nline3"};
     int i               = 2;
     const auto callback = [&i](const std::smatch& /*m*/) {
-      return "\n" + std::to_string(i++) + "\t";
+      return "\n" + ::std::to_string(i++) + "\t";
     };
     const std::string r{
-      "1\t" + String::regexReplace(s, std::regex("\n", std::regex::optimize),
-                                   callback)};
+      "1\t"
+      + String::regexReplace(s, std::regex("\n", std::regex::optimize),
+                             callback)};
     const std::string e{"1\tline1\n2\tline2\n3\tline3"};
     EXPECT_EQ(r, e);
   }

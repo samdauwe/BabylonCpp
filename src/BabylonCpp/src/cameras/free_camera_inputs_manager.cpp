@@ -16,13 +16,13 @@ FreeCameraInputsManager::~FreeCameraInputsManager()
 
 FreeCameraInputsManager& FreeCameraInputsManager::addKeyboard()
 {
-  add(std::make_unique<FreeCameraKeyboardMoveInput>());
+  add(::std::make_unique<FreeCameraKeyboardMoveInput>());
   return *this;
 }
 
 FreeCameraInputsManager& FreeCameraInputsManager::addMouse(bool touchEnabled)
 {
-  add(std::make_unique<FreeCameraMouseInput>(touchEnabled));
+  add(::std::make_unique<FreeCameraMouseInput>(touchEnabled));
   if (touchEnabled) {
     return *this;
   }

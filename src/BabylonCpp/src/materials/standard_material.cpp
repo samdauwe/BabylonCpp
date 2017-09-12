@@ -257,7 +257,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_unique<StandardMaterialDefines>();
+    subMesh->_materialDefines = ::std::make_unique<StandardMaterialDefines>();
   }
 
   auto scene = getScene();
@@ -550,7 +550,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     scene->resetCachedMaterial();
 
     // Fallbacks
-    auto fallbacks = std::make_unique<EffectFallbacks>();
+    auto fallbacks = ::std::make_unique<EffectFallbacks>();
     if (defines[SMD::REFLECTION]) {
       fallbacks->addFallback(0, "REFLECTION");
     }
@@ -701,16 +701,16 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
       {"maxSimultaneousMorphTargets", defines.NUM_MORPH_INFLUENCERS}};
 
     EffectCreationOptions options;
-    options.attributes            = std::move(attribs);
-    options.uniformsNames         = std::move(uniforms);
-    options.uniformBuffersNames   = std::move(uniformBuffers);
-    options.samplers              = std::move(samplers);
+    options.attributes            = ::std::move(attribs);
+    options.uniformsNames         = ::std::move(uniforms);
+    options.uniformBuffersNames   = ::std::move(uniformBuffers);
+    options.samplers              = ::std::move(samplers);
     options.materialDefines       = &defines;
-    options.defines               = std::move(join);
-    options.fallbacks             = std::move(fallbacks);
+    options.defines               = ::std::move(join);
+    options.fallbacks             = ::std::move(fallbacks);
     options.onCompiled            = onCompiled;
     options.onError               = onError;
-    options.indexParameters       = std::move(indexParameters);
+    options.indexParameters       = ::std::move(indexParameters);
     options.maxSimultaneousLights = _maxSimultaneousLights;
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
@@ -1043,10 +1043,9 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     // Colors
     scene->ambientColor.multiplyToRef(ambientColor, _globalAmbientColor);
 
-    effect->setVector3("vEyePosition",
-                       scene->_mirroredCameraPosition ?
-                         *scene->_mirroredCameraPosition :
-                         scene->activeCamera->globalPosition());
+    effect->setVector3("vEyePosition", scene->_mirroredCameraPosition ?
+                                         *scene->_mirroredCameraPosition :
+                                         scene->activeCamera->globalPosition());
     effect->setColor3("vAmbientColor", _globalAmbientColor);
   }
 

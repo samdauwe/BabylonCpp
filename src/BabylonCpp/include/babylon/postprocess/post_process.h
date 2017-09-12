@@ -44,12 +44,12 @@ public:
   virtual ~PostProcess();
 
   // Events
-  void setOnActivate(const std::function<void(Camera* camera)>& callback);
+  void setOnActivate(const ::std::function<void(Camera* camera)>& callback);
   void setOnSizeChanged(
-    const std::function<void(PostProcess* postProcess)>& callback);
-  void setOnApply(const std::function<void(Effect* effect)>& callback);
-  void setOnBeforeRender(const std::function<void(Effect* effect)>& callback);
-  void setOnAfterRender(const std::function<void(Effect* effect)>& callback);
+    const ::std::function<void(PostProcess* postProcess)>& callback);
+  void setOnApply(const ::std::function<void(Effect* effect)>& callback);
+  void setOnBeforeRender(const ::std::function<void(Effect* effect)>& callback);
+  void setOnAfterRender(const ::std::function<void(Effect* effect)>& callback);
 
   InternalTexture* outputTexture();
   void setOutputTexture(InternalTexture* value);
@@ -59,12 +59,12 @@ public:
   Effect* getEffect();
   PostProcess& shareOutputWith(PostProcess* postProcess);
   void updateEffect(
-    const std::string& defines               = "",
-    const std::vector<std::string>& uniforms = {},
-    const std::vector<std::string>& samplers = {},
+    const std::string& defines                                           = "",
+    const std::vector<std::string>& uniforms                             = {},
+    const std::vector<std::string>& samplers                             = {},
     const std::unordered_map<std::string, unsigned int>& indexParameters = {},
-    const std::function<void(Effect* effect)>& onCompiled = nullptr,
-    const std::function<void(Effect* effect, const std::string& errors)>&
+    const ::std::function<void(Effect* effect)>& onCompiled = nullptr,
+    const ::std::function<void(Effect* effect, const std::string& errors)>&
       onError
     = nullptr);
   bool isReusable() const;

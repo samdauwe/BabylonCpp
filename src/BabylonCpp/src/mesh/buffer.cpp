@@ -46,16 +46,17 @@ std::unique_ptr<VertexBuffer> Buffer::createVertexBuffer(unsigned int kind,
                                                          int offset, int size)
 {
   // a lot of these parameters are ignored as they are overriden by the buffer
-  return std::make_unique<VertexBuffer>(_engine, this, kind, _updatable, true,
-                                        _strideSize, _instanced, offset, size);
+  return ::std::make_unique<VertexBuffer>(_engine, this, kind, _updatable, true,
+                                          _strideSize, _instanced, offset,
+                                          size);
 }
 
 std::unique_ptr<VertexBuffer>
 Buffer::createVertexBuffer(unsigned int kind, int offset, int size, int stride)
 {
   // a lot of these parameters are ignored as they are overriden by the buffer
-  return std::make_unique<VertexBuffer>(_engine, this, kind, _updatable, true,
-                                        stride, _instanced, offset, size);
+  return ::std::make_unique<VertexBuffer>(_engine, this, kind, _updatable, true,
+                                          stride, _instanced, offset, size);
 }
 
 // Properties
@@ -114,7 +115,7 @@ GL::IGLBuffer* Buffer::create(Float32Array data)
   if (!_buffer) { // create buffer
     if (_updatable) {
       _buffer = _engine->createDynamicVertexBuffer(data);
-      _data   = std::move(data);
+      _data   = ::std::move(data);
     }
     else {
       _buffer = _engine->createVertexBuffer(data);
@@ -122,7 +123,7 @@ GL::IGLBuffer* Buffer::create(Float32Array data)
   }
   else if (_updatable) { // update buffer
     _engine->updateDynamicVertexBuffer(_buffer, data);
-    _data = std::move(data);
+    _data = ::std::move(data);
   }
 
   return _buffer ? _buffer.get() : nullptr;

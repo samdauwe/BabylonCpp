@@ -2,7 +2,8 @@
 
 namespace BABYLON {
 
-AnimationEvent::AnimationEvent(int iFrame, const std::function<void()>& iAction,
+AnimationEvent::AnimationEvent(int iFrame,
+                               const ::std::function<void()>& iAction,
                                bool iOnlyOnce)
     : frame{iFrame}, action{iAction}, onlyOnce{iOnlyOnce}, isDone{false}
 {

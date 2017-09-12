@@ -28,7 +28,7 @@ public:
   int size() const;
   void setSize(int value);
   void playAnimation(int from, int to, bool loop, float delay,
-                     const std::function<void()>& onAnimationEnd);
+                     const ::std::function<void()>& onAnimationEnd);
   void stopAnimation();
   void _animate(float deltaTime);
   void dispose(bool doNotRecurse = false) override;
@@ -61,7 +61,7 @@ private:
   int _frameCount;
   SpriteManager* _manager;
   float _time;
-  std::function<void()> _onAnimationEnd;
+  ::std::function<void()> _onAnimationEnd;
 
 }; // end of class Sprite
 

@@ -178,7 +178,7 @@ void StandardRenderingPipeline::setBloomEnabled(bool enabled)
       _name, "HDRBrightPass", cameras);
 
     for (std::size_t i = 0; i < gaussianBlurHPostProcesses.size() - 1; ++i) {
-      const std::string istr = std::to_string(i);
+      const std::string istr = ::std::to_string(i);
       _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
         _name, "HDRGaussianBlurH" + istr, cameras);
       _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
@@ -195,7 +195,7 @@ void StandardRenderingPipeline::setBloomEnabled(bool enabled)
       _name, "HDRBrightPass", cameras);
 
     for (std::size_t i = 0; i < gaussianBlurHPostProcesses.size() - 1; ++i) {
-      const std::string istr = std::to_string(i);
+      const std::string istr = ::std::to_string(i);
       _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
         _name, "HDRGaussianBlurH" + istr, cameras);
       _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
@@ -216,7 +216,7 @@ bool StandardRenderingPipeline::bloomEnabled() const
 
 void StandardRenderingPipeline::setDepthOfFieldEnabled(bool enabled)
 {
-  auto blurIndexStr = std::to_string(gaussianBlurHPostProcesses.size() - 1);
+  auto blurIndexStr = ::std::to_string(gaussianBlurHPostProcesses.size() - 1);
 
   if (enabled && !_depthOfFieldEnabled) {
     _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
@@ -246,7 +246,7 @@ bool StandardRenderingPipeline::depthOfFieldEnabled() const
 
 void StandardRenderingPipeline::setLensFlareEnabled(bool enabled)
 {
-  auto blurIndexStr = std::to_string(gaussianBlurHPostProcesses.size() - 1);
+  auto blurIndexStr = ::std::to_string(gaussianBlurHPostProcesses.size() - 1);
 
   if (enabled && !_lensFlareEnabled) {
     _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
@@ -292,7 +292,7 @@ void StandardRenderingPipeline::setHDREnabled(bool enabled)
       _name, "HDRLuminance", _scene->getCameras());
     for (std::size_t i = 0; i < luminanceDownSamplePostProcesses.size(); ++i) {
       _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
-        _name, "HDRLuminanceDownSample" + std::to_string(i),
+        _name, "HDRLuminanceDownSample" + ::std::to_string(i),
         _scene->getCameras());
     }
     _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
@@ -305,7 +305,7 @@ void StandardRenderingPipeline::setHDREnabled(bool enabled)
       _name, "HDRLuminance", _scene->getCameras());
     for (std::size_t i = 0; i < luminanceDownSamplePostProcesses.size(); ++i) {
       _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
-        _name, "HDRLuminanceDownSample" + std::to_string(i),
+        _name, "HDRLuminanceDownSample" + ::std::to_string(i),
         _scene->getCameras());
     }
     _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
@@ -351,7 +351,7 @@ void StandardRenderingPipeline::setMotionBlurSamples(unsigned int samples)
 {
   motionBlurPostProcess->updateEffect(
     "#define MOTION_BLUR\n#define MAX_MOTION_SAMPLES "
-    + std::to_string(samples));
+    + ::std::to_string(samples));
   _motionBlurSamples = samples;
 }
 
@@ -441,8 +441,10 @@ void StandardRenderingPipeline::_createGaussianBlurPostProcesses(
                                  scene->getEngine()->getRenderHeight());
 
       for (unsigned int i = 0; i < 9; i++) {
-        float value = (i - 4.f) * (1.f / (height ? lastOutputDimensions.height :
-                                                   lastOutputDimensions.width));
+        float value = (i - 4.f)
+                      * (1.f
+                         / (height ? lastOutputDimensions.height :
+                                     lastOutputDimensions.width));
         blurOffsets[i] = value;
       }
 
@@ -453,7 +455,7 @@ void StandardRenderingPipeline::_createGaussianBlurPostProcesses(
   };
 
   // Create horizontal gaussian blur post-processes
-  auto ratioStr                 = std::to_string(ratio);
+  auto ratioStr                 = ::std::to_string(ratio);
   auto gaussianBlurHPostProcess = new PostProcess(
     "HDRGaussianBlurH" + ratioStr, "standard", uniforms, {}, ratio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
@@ -470,7 +472,7 @@ void StandardRenderingPipeline::_createGaussianBlurPostProcesses(
     [&](Effect* /*effect*/) { callback(true); });
 
   // Add to pipeline
-  auto indiceStr = std::to_string(indice);
+  auto indiceStr = ::std::to_string(indice);
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), "HDRGaussianBlurH" + indiceStr,
     [&]() { return gaussianBlurHPostProcess; }, true));
@@ -541,7 +543,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
 
   // Create down sample luminance
   for (unsigned int i = StandardRenderingPipeline::LuminanceSteps; i-- > 0;) {
-    const std::string iStr = std::to_string(i);
+    const std::string iStr = ::std::to_string(i);
     float size             = static_cast<float>(std::pow(3, i));
 
     std::string defines = "#define LUMINANCE_DOWN_SAMPLE\n";
@@ -562,7 +564,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
 
   std::size_t index = 0;
   for (auto& pp : luminanceDownSamplePostProcesses) {
-    const std::string indexStr = std::to_string(index);
+    const std::string indexStr = ::std::to_string(index);
     Float32Array downSampleOffsets(18);
 
     pp->setOnApply([&](Effect* effect) {
@@ -718,20 +720,20 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
                                          0.f, 2.f, -1.f, 0.f, //
                                          0.f, 0.f, 1.f, 0.f,  //
                                          0.f, 0.f, 0.f, 1.f   //
-                                         );
+    );
 
     auto scaleBias2 = Matrix::FromValues(0.5f, 0.f, 0.5f, 0.f, //
                                          0.f, 0.5f, 0.5f, 0.f, //
                                          0.f, 0.f, 1.f, 0.f,   //
                                          0.f, 0.f, 0.f, 1.f    //
-                                         );
+    );
 
     auto starRotation = Matrix::FromValues(
       std::cos(camRot) * 0.5f, -std::sin(camRot), 0.f, 0.f, //
       std::sin(camRot), std::cos(camRot) * 0.5f, 0.f, 0.f,  //
       0.f, 0.f, 1.f, 0.f,                                   //
       0.f, 0.f, 0.f, 1.f                                    //
-      );
+    );
 
     auto lensStarMatrix
       = scaleBias2.multiply(starRotation).multiply(scaleBias1);
@@ -775,7 +777,7 @@ void StandardRenderingPipeline::_createMotionBlurPostProcess(Scene* scene,
     {"depthSampler"}, ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
     scene->getEngine(), false,
     "#define MOTION_BLUR\n#define MAX_MOTION_SAMPLES "
-      + std::to_string(motionBlurSamples()),
+      + ::std::to_string(motionBlurSamples()),
     EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
   auto motionScale        = 0.f;

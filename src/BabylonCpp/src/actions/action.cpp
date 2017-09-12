@@ -148,9 +148,9 @@ std::string Action::_SerializeValueAsString(const AnimationValue& value)
 {
   switch (value.dataType) {
     case Animation::ANIMATIONTYPE_INT:
-      return std::to_string(value.intData);
+      return ::std::to_string(value.intData);
     case Animation::ANIMATIONTYPE_FLOAT:
-      return std::to_string(value.floatData);
+      return ::std::to_string(value.floatData);
     case Animation::ANIMATIONTYPE_BOOL:
       return value.boolData ? "true" : "false";
     case Animation::ANIMATIONTYPE_STRING:

@@ -40,7 +40,7 @@ struct variant_helper<F, Ts...> {
   inline static void move(size_t old_t, void* old_v, void* new_v)
   {
     if (old_t == typeid(F).hash_code())
-      new (new_v) F(std::move(*reinterpret_cast<F*>(old_v)));
+      new (new_v) F(::std::move(*reinterpret_cast<F*>(old_v)));
     else
       variant_helper<Ts...>::move(old_t, old_v, new_v);
   }

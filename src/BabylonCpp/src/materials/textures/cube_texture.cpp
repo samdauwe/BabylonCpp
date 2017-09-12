@@ -16,8 +16,8 @@ CubeTexture::CreateFromImages(const std::vector<std::string>& iFiles,
                               Scene* scene, bool noMipmap)
 {
   const std::vector<std::string> emptyStringList;
-  return std::make_unique<CubeTexture>("", scene, emptyStringList, noMipmap,
-                                       iFiles);
+  return ::std::make_unique<CubeTexture>("", scene, emptyStringList, noMipmap,
+                                         iFiles);
 }
 
 std::unique_ptr<CubeTexture>
@@ -25,7 +25,7 @@ CreateFromPrefilteredData(const std::string& url, Scene* scene,
                           const std::string& forcedExtension)
 {
   const std::vector<std::string> emptyStringList;
-  return std::make_unique<CubeTexture>(
+  return ::std::make_unique<CubeTexture>(
     url, scene, emptyStringList, false, emptyStringList, nullptr, nullptr,
     EngineConstants::TEXTUREFORMAT_RGBA, true, forcedExtension);
 }
@@ -33,15 +33,15 @@ CreateFromPrefilteredData(const std::string& url, Scene* scene,
 CubeTexture::CubeTexture(const std::string& rootUrl, Scene* scene,
                          const std::vector<std::string>& extensions,
                          bool noMipmap, const std::vector<std::string>& iFiles,
-                         const std::function<void()>& onLoad,
-                         const std::function<void()>& onError,
+                         const ::std::function<void()>& onLoad,
+                         const ::std::function<void()>& onError,
                          unsigned int format, bool prefiltered,
                          const std::string& forcedExtension)
     : BaseTexture{scene}
     , url{rootUrl}
     , coordinatesMode{TextureConstants::CUBIC_MODE}
     , _noMipmap{noMipmap}
-    , _textureMatrix{std::make_unique<Matrix>(Matrix::Identity())}
+    , _textureMatrix{::std::make_unique<Matrix>(Matrix::Identity())}
     , _format{format}
     , _prefiltered{prefiltered}
 {
@@ -136,7 +136,7 @@ Matrix* CubeTexture::getReflectionTextureMatrix()
 
 void CubeTexture::setReflectionTextureMatrix(const Matrix& value)
 {
-  _textureMatrix = std::make_unique<Matrix>(value);
+  _textureMatrix = ::std::make_unique<Matrix>(value);
 }
 
 std::unique_ptr<CubeTexture>
@@ -144,7 +144,7 @@ CubeTexture::Parse(const Json::value& parsedTexture, Scene* scene,
                    const std::string& rootUrl)
 {
 
-  auto cubeTexture = std::make_unique<CubeTexture>(
+  auto cubeTexture = ::std::make_unique<CubeTexture>(
     rootUrl + Json::GetString(parsedTexture, "name"), scene,
     Json::ToStringVector(parsedTexture, "extensions"));
   SerializationHelper::Parse(cubeTexture.get(), parsedTexture, scene);
@@ -161,8 +161,8 @@ CubeTexture::Parse(const Json::value& parsedTexture, Scene* scene,
 
 std::unique_ptr<CubeTexture> CubeTexture::clone() const
 {
-  auto newTexture = std::make_unique<CubeTexture>(url, getScene(), _extensions,
-                                                  _noMipmap, _files);
+  auto newTexture = ::std::make_unique<CubeTexture>(
+    url, getScene(), _extensions, _noMipmap, _files);
 
   return newTexture;
 }

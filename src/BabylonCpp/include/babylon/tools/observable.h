@@ -79,10 +79,11 @@ public:
    */
   bool remove(typename Observer<T>::Ptr observer)
   {
-    auto it = std::remove_if(_observers.begin(), _observers.end(),
-                             [observer](const typename Observer<T>::Ptr& obs) {
-                               return obs == observer;
-                             });
+    auto it
+      = ::std::remove_if(_observers.begin(), _observers.end(),
+                         [observer](const typename Observer<T>::Ptr& obs) {
+                           return obs == observer;
+                         });
     if (it != _observers.end()) {
       _observers.erase(it);
       return true;
@@ -97,10 +98,11 @@ public:
    */
   bool removeCallback(const CallbackFunc& callback)
   {
-    auto it = std::remove_if(_observers.begin(), _observers.end(),
-                             [callback](const typename Observer<T>::Ptr& obs) {
-                               return obs->callback == callback;
-                             });
+    auto it
+      = ::std::remove_if(_observers.begin(), _observers.end(),
+                         [callback](const typename Observer<T>::Ptr& obs) {
+                           return obs->callback == callback;
+                         });
     if (it != _observers.end()) {
       _observers.erase(it);
       return true;
@@ -181,7 +183,7 @@ private:
 }; // end of class Observable
 
 template <class T>
-EventState::UPtr Observable<T>::_eventState = std::make_unique<EventState>(0);
+EventState::UPtr Observable<T>::_eventState = ::std::make_unique<EventState>(0);
 
 } // end of namespace BABYLON
 

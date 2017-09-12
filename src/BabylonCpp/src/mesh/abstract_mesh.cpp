@@ -68,7 +68,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , edgesWidth{1.f}
     , edgesColor{Color4(1.f, 0.f, 0.f, 1.f)}
     , _edgesRenderer{nullptr}
-    , _worldMatrix{std::make_unique<Matrix>(Matrix::Zero())}
+    , _worldMatrix{::std::make_unique<Matrix>(Matrix::Zero())}
     , _masterMesh{nullptr}
     , _materialDefines{nullptr}
     , _boundingInfo{nullptr}
@@ -108,7 +108,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , _newPositionForCollisions{Vector3(0.f, 0.f, 0.f)}
     , _meshToBoneReferal{nullptr}
     , _localWorld{Matrix::Zero()}
-    , _absolutePosition{std::make_unique<Vector3>(Vector3::Zero())}
+    , _absolutePosition{::std::make_unique<Vector3>(Vector3::Zero())}
     , _collisionsTransformMatrix{Matrix::Zero()}
     , _collisionsScalingMatrix{Matrix::Zero()}
     , _isDirty{false}
@@ -130,7 +130,7 @@ IReflect::Type AbstractMesh::type() const
 
 void AbstractMesh::addToScene(std::unique_ptr<AbstractMesh>&& newMesh)
 {
-  getScene()->addMesh(std::move(newMesh));
+  getScene()->addMesh(::std::move(newMesh));
 }
 
 size_t AbstractMesh::facetNb() const
@@ -163,7 +163,7 @@ bool AbstractMesh::isFacetDataEnabled() const
   return _facetDataEnabled;
 }
 
-void AbstractMesh::setOnCollide(const std::function<void()>& callback)
+void AbstractMesh::setOnCollide(const ::std::function<void()>& callback)
 {
   if (_onCollideObserver) {
     onCollideObservable.remove(_onCollideObserver);
@@ -172,7 +172,7 @@ void AbstractMesh::setOnCollide(const std::function<void()>& callback)
 }
 
 void AbstractMesh::setOnCollisionPositionChange(
-  const std::function<void()>& callback)
+  const ::std::function<void()>& callback)
 {
   if (_onCollisionPositionChangeObserver) {
     onCollisionPositionChangeObservable.remove(
@@ -434,7 +434,7 @@ void AbstractMesh::_removeLightSource(Light* light)
 }
 
 void AbstractMesh::_markSubMeshesAsDirty(
-  const std::function<void(const MaterialDefines& defines)>& func)
+  const ::std::function<void(const MaterialDefines& defines)>& func)
 {
   if (subMeshes.empty()) {
     return;
@@ -582,7 +582,7 @@ Material* AbstractMesh::getMaterial()
 
 std::vector<AbstractMesh*>
 AbstractMesh::getChildMeshes(bool directDecendantsOnly,
-                             const std::function<bool(Node* node)>& predicate)
+                             const ::std::function<bool(Node* node)>& predicate)
 {
   return Node::getChildMeshes(directDecendantsOnly, predicate);
 }
@@ -613,7 +613,7 @@ AbstractMesh::enableEdgesRendering(float epsilon,
 {
   disableEdgesRendering();
 
-  _edgesRenderer = std::make_unique<EdgesRenderer>(
+  _edgesRenderer = ::std::make_unique<EdgesRenderer>(
     this, epsilon, checkVerticesInsteadOfIndices);
 
   return *this;
@@ -687,7 +687,7 @@ BoundingInfo* AbstractMesh::getBoundingInfo()
 
 AbstractMesh& AbstractMesh::setBoundingInfo(const BoundingInfo& boundingInfo)
 {
-  _boundingInfo = std::make_unique<BoundingInfo>(boundingInfo);
+  _boundingInfo = ::std::make_unique<BoundingInfo>(boundingInfo);
   return *this;
 }
 
@@ -999,7 +999,8 @@ AbstractMesh& AbstractMesh::_updateBoundingInfo()
 {
   if (!_boundingInfo) {
     auto absolutePos = absolutePosition();
-    _boundingInfo = std::make_unique<BoundingInfo>(*absolutePos, *absolutePos);
+    _boundingInfo
+      = ::std::make_unique<BoundingInfo>(*absolutePos, *absolutePos);
   }
 
   _boundingInfo->update(worldMatrixFromCache());
@@ -1200,21 +1201,21 @@ Matrix AbstractMesh::computeWorldMatrix(bool force)
   onAfterWorldMatrixUpdateObservable.notifyObservers(this);
 
   if (!_poseMatrix) {
-    _poseMatrix = std::make_unique<Matrix>(Matrix::Invert(*_worldMatrix));
+    _poseMatrix = ::std::make_unique<Matrix>(Matrix::Invert(*_worldMatrix));
   }
 
   return *_worldMatrix;
 }
 
 AbstractMesh& AbstractMesh::registerAfterWorldMatrixUpdate(
-  const std::function<void(AbstractMesh* mesh)>& func)
+  const ::std::function<void(AbstractMesh* mesh)>& func)
 {
   onAfterWorldMatrixUpdateObservable.add(func);
   return *this;
 }
 
 AbstractMesh& AbstractMesh::unregisterAfterWorldMatrixUpdate(
-  const std::function<void(AbstractMesh* mesh)>& func)
+  const ::std::function<void(AbstractMesh* mesh)>& func)
 {
   onAfterWorldMatrixUpdateObservable.removeCallback(func);
   return *this;
@@ -1398,7 +1399,7 @@ AbstractMesh& AbstractMesh::moveWithCollisions(const Vector3& /*velocity*/)
   _oldPositionForCollisions.addInPlace(ellipsoidOffset);
 
   if (!_collider) {
-    _collider = std::make_unique<Collider>();
+    _collider = ::std::make_unique<Collider>();
   }
 
   _collider->radius = ellipsoid;

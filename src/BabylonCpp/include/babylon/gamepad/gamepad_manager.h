@@ -35,8 +35,8 @@ private:
   bool _isMonitoring;
   bool _gamepadEventSupported;
 
-  std::function<void(Event&& evt)> _onGamepadConnectedEvent;
-  std::function<void(Event&& evt)> _onGamepadDisconnectedEvent;
+  ::std::function<void(Event&& evt)> _onGamepadConnectedEvent;
+  ::std::function<void(Event&& evt)> _onGamepadDisconnectedEvent;
 
 }; // end of class GamepadManager
 

@@ -110,9 +110,9 @@ protected:
     = 0;
 
 public:
-  std::function<void(const Matrix& viewMatrix,
-                     const std::vector<AbstractMesh*>& renderList,
-                     Matrix& result)>
+  ::std::function<void(const Matrix& viewMatrix,
+                       const std::vector<AbstractMesh*>& renderList,
+                       Matrix& result)>
     customProjectionMatrixBuilder;
 
 protected:

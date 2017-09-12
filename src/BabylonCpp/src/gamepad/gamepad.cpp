@@ -33,13 +33,13 @@ Gamepad::~Gamepad()
 }
 
 void Gamepad::setOnleftstickchanged(
-  const std::function<void(const StickValues& values)>& callback)
+  const ::std::function<void(const StickValues& values)>& callback)
 {
   _onleftstickchanged = callback;
 }
 
 void Gamepad::setOnrightstickchanged(
-  const std::function<void(const StickValues& values)>& callback)
+  const ::std::function<void(const StickValues& values)>& callback)
 {
   _onrightstickchanged = callback;
 }

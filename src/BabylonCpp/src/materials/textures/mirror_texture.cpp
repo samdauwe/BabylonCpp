@@ -115,7 +115,7 @@ void MirrorTexture::_preparePostProcesses()
                          EngineConstants::TEXTURETYPE_FLOAT :
                          EngineConstants::TEXTURETYPE_HALF_FLOAT;
 
-    _blurX = std::make_unique<BlurPostProcess>(
+    _blurX = ::std::make_unique<BlurPostProcess>(
       "horizontal blur", Vector2(1.f, 0.f), _blurKernelX, _blurRatio, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, engine, false, textureType);
     _blurX->autoClear = false;
@@ -127,7 +127,7 @@ void MirrorTexture::_preparePostProcesses()
       _blurX->alwaysForcePOT = true;
     }
 
-    _blurY = std::make_unique<BlurPostProcess>(
+    _blurY = ::std::make_unique<BlurPostProcess>(
       "vertical blur", Vector2(0.f, 1.f), _blurKernelY, _blurRatio, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, engine, false, textureType);
     _blurY->autoClear      = false;
@@ -141,7 +141,7 @@ void MirrorTexture::_preparePostProcesses()
 std::unique_ptr<MirrorTexture> MirrorTexture::clone() const
 {
   auto textureSize = getSize();
-  auto newTexture  = std::make_unique<MirrorTexture>(
+  auto newTexture  = ::std::make_unique<MirrorTexture>(
     name,                                        //
     Size(textureSize.width, textureSize.height), //
     getScene(),                                  //
@@ -149,7 +149,7 @@ std::unique_ptr<MirrorTexture> MirrorTexture::clone() const
     _renderTargetOptions.type,                   //
     _renderTargetOptions.samplingMode,           //
     _renderTargetOptions.generateDepthBuffer     //
-    );
+  );
 
   // Base texture
   newTexture->setHasAlpha(hasAlpha());

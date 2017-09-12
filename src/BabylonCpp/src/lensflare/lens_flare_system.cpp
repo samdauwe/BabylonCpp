@@ -42,7 +42,7 @@ LensFlareSystem::LensFlareSystem(const std::string iName, Mesh* emitter,
                            1.f,  -1.f};
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
-    = std::make_unique<VertexBuffer>(
+    = ::std::make_unique<VertexBuffer>(
       engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   // Indices
@@ -66,7 +66,7 @@ LensFlareSystem::~LensFlareSystem()
 void LensFlareSystem::addToScene(
   std::unique_ptr<LensFlareSystem>&& lensFlareSystem)
 {
-  _scene->lensFlareSystems.emplace_back(std::move(lensFlareSystem));
+  _scene->lensFlareSystems.emplace_back(::std::move(lensFlareSystem));
 }
 
 bool LensFlareSystem::isEnabled() const
@@ -316,7 +316,7 @@ void LensFlareSystem::dispose(bool /*doNotRecurse*/)
 
   // Remove from scene
   _scene->lensFlareSystems.erase(
-    std::remove_if(
+    ::std::remove_if(
       _scene->lensFlareSystems.begin(), _scene->lensFlareSystems.end(),
       [this](const std::unique_ptr<LensFlareSystem>& lensFlareSystem) {
         return lensFlareSystem.get() == this;

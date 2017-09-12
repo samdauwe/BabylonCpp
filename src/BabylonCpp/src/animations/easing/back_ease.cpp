@@ -12,9 +12,9 @@ BackEase::~BackEase()
 
 float BackEase::easeInCore(float gradient) const
 {
-  float num = std::max(0.f, amplitude);
-  return (std::pow(gradient, 3.f)
-          - ((gradient * num) * std::sin(Math::PI * gradient)));
+  float num = ::std::max(0.f, amplitude);
+  return (::std::pow(gradient, 3.f)
+          - ((gradient * num) * ::std::sin(Math::PI * gradient)));
 }
 
 } // end of namespace BABYLON

@@ -22,7 +22,7 @@ Vector3& ShadowLight::direction()
 
 void ShadowLight::setDirection(const Vector3& value)
 {
-  _direction = std::make_unique<Vector3>(value);
+  _direction = ::std::make_unique<Vector3>(value);
 }
 
 Vector3& ShadowLight::transformedPosition()
@@ -61,7 +61,7 @@ bool ShadowLight::computeTransformedInformation()
 {
   if (parent() && parent()->getWorldMatrix()) {
     if (!_transformedPosition) {
-      _transformedPosition = std::make_unique<Vector3>(Vector3::Zero());
+      _transformedPosition = ::std::make_unique<Vector3>(Vector3::Zero());
     }
     Vector3::TransformCoordinatesToRef(position, *parent()->getWorldMatrix(),
                                        *_transformedPosition);
@@ -69,7 +69,7 @@ bool ShadowLight::computeTransformedInformation()
     // In case the direction is present.
     if (_direction) {
       if (!_transformedDirection) {
-        _transformedDirection = std::make_unique<Vector3>(Vector3::Zero());
+        _transformedDirection = ::std::make_unique<Vector3>(Vector3::Zero());
       }
       Vector3::TransformNormalToRef(direction(), *parent()->getWorldMatrix(),
                                     *_transformedDirection);
@@ -131,7 +131,7 @@ void ShadowLight::forceProjectionMatrixCompute()
 Matrix* ShadowLight::_getWorldMatrix()
 {
   if (!_worldMatrix) {
-    _worldMatrix = std::make_unique<Matrix>(Matrix::Identity());
+    _worldMatrix = ::std::make_unique<Matrix>(Matrix::Identity());
   }
 
   Matrix::TranslationToRef(position.x, position.y, position.z, *_worldMatrix);

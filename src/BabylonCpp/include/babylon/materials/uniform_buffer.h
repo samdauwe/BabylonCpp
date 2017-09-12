@@ -20,7 +20,7 @@ public:
    * https://www.khronos.org/opengl/wiki/Uniform_Buffer_Object
    */
   UniformBuffer(Engine* engine, const Float32Array& data = Float32Array(),
-                bool dynamic          = false);
+                bool dynamic = false);
   UniformBuffer(UniformBuffer& other) = delete;
   ~UniformBuffer();
 
@@ -243,7 +243,7 @@ public:
    * the shader.
    * @param {Float32Array} matrix
    */
-  std::function<void(const std::string& name, const Float32Array& matrix)>
+  ::std::function<void(const std::string& name, const Float32Array& matrix)>
     updateMatrix3x3;
 
   /**
@@ -252,7 +252,7 @@ public:
    * the shader.
    * @param {Float32Array} matrix
    */
-  std::function<void(const std::string& name, const Float32Array& matrix)>
+  ::std::function<void(const std::string& name, const Float32Array& matrix)>
     updateMatrix2x2;
 
   /**
@@ -261,7 +261,7 @@ public:
    * the shader.
    * @param {number} x
    */
-  std::function<void(const std::string& name, float x)> updateFloat;
+  ::std::function<void(const std::string& name, float x)> updateFloat;
 
   /**
    * @brief Wrapper for updateUniform.
@@ -271,8 +271,8 @@ public:
    * @param {number} y
    * @param {string} [suffix] Suffix to add to the uniform name.
    */
-  std::function<void(const std::string& name, float x, float y,
-                     const std::string& suffix)>
+  ::std::function<void(const std::string& name, float x, float y,
+                       const std::string& suffix)>
     updateFloat2;
 
   /**
@@ -284,8 +284,8 @@ public:
    * @param {number} z
    * @param {string} [suffix] Suffix to add to the uniform name.
    */
-  std::function<void(const std::string& name, float x, float y, float z,
-                     const std::string& suffix)>
+  ::std::function<void(const std::string& name, float x, float y, float z,
+                       const std::string& suffix)>
     updateFloat3;
 
   /**
@@ -298,8 +298,8 @@ public:
    * @param {number} w
    * @param {string} [suffix] Suffix to add to the uniform name.
    */
-  std::function<void(const std::string& name, float x, float y, float z,
-                     float w, const std::string& suffix)>
+  ::std::function<void(const std::string& name, float x, float y, float z,
+                       float w, const std::string& suffix)>
     updateFloat4;
 
   /**
@@ -308,7 +308,8 @@ public:
    * the shader.
    * @param {Matrix} A 4x4 matrix.
    */
-  std::function<void(const std::string& name, const Matrix& mat)> updateMatrix;
+  ::std::function<void(const std::string& name, const Matrix& mat)>
+    updateMatrix;
 
   /**
    * @brief Wrapper for updateUniform.
@@ -316,7 +317,7 @@ public:
    * the shader.
    * @param {Vector3} vector
    */
-  std::function<void(const std::string& name, const Vector3& vector)>
+  ::std::function<void(const std::string& name, const Vector3& vector)>
     updateVector3;
 
   /**
@@ -325,7 +326,7 @@ public:
    * the shader.
    * @param {Vector4} vector
    */
-  std::function<void(const std::string& name, const Vector4& vector)>
+  ::std::function<void(const std::string& name, const Vector4& vector)>
     updateVector4;
 
   /**
@@ -335,8 +336,8 @@ public:
    * @param {Color3} color
    * @param {string} [suffix] Suffix to add to the uniform name.
    */
-  std::function<void(const std::string& name, const Color3& color,
-                     const std::string& suffix)>
+  ::std::function<void(const std::string& name, const Color3& color,
+                       const std::string& suffix)>
     updateColor3;
 
   /**
@@ -347,8 +348,8 @@ public:
    * @param {number} alpha
    * @param {string} [suffix] Suffix to add to the uniform name.
    */
-  std::function<void(const std::string& name, const Color3& color, float alpha,
-                     const std::string& suffix)>
+  ::std::function<void(const std::string& name, const Color3& color,
+                       float alpha, const std::string& suffix)>
     updateColor4;
 
 private:

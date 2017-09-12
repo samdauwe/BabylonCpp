@@ -33,12 +33,13 @@ public:
   std::string getCompilationError();
 
   /** Methods **/
-  void executeWhenCompiled(const std::function<void(Effect* effect)>& func);
-  void _loadVertexShader(const std::string& vertex,
-                         std::function<void(const std::string& data)> callback);
+  void executeWhenCompiled(const ::std::function<void(Effect* effect)>& func);
+  void
+  _loadVertexShader(const std::string& vertex,
+                    ::std::function<void(const std::string& data)> callback);
   void
   _loadFragmentShader(const std::string& fragment,
-                      std::function<void(const std::string& data)> callback);
+                      ::std::function<void(const std::string& data)> callback);
   bool isSupported() const;
   void _bindTexture(const std::string& channel, InternalTexture* texture);
   void setTexture(const std::string& channel, BaseTexture* texture);
@@ -96,19 +97,19 @@ private:
                           std::string defines);
   void _processShaderConversion(
     const std::string& sourceCode, bool isFragment,
-    const std::function<void(const std::string& data)>& callback);
+    const ::std::function<void(const std::string& data)>& callback);
   void _processIncludes(
     const std::string& sourceCode,
-    const std::function<void(const std::string& data)>& callback);
+    const ::std::function<void(const std::string& data)>& callback);
   std::string _processPrecision(std::string source);
   void _prepareEffect();
 
 public:
   std::string name;
   std::string defines;
-  std::function<void(Effect* effect)> onCompiled;
-  std::function<void(Effect* effect, const std::string& errors)> onError;
-  std::function<void(Effect* effect)> onBind;
+  ::std::function<void(Effect* effect)> onCompiled;
+  ::std::function<void(Effect* effect, const std::string& errors)> onError;
+  ::std::function<void(Effect* effect)> onBind;
   std::size_t uniqueId;
   Observable<Effect> onCompileObservable;
   Observable<Effect> onErrorObservable;

@@ -324,7 +324,7 @@ PhysicsImpostor::clone(IPhysicsEnabledObject* newObject)
   if (!newObject) {
     return nullptr;
   }
-  return std::make_unique<PhysicsImpostor>(newObject, type, _options, _scene);
+  return ::std::make_unique<PhysicsImpostor>(newObject, type, _options, _scene);
 }
 
 void PhysicsImpostor::dispose(bool /*doNotRecurse*/)
@@ -353,7 +353,7 @@ void PhysicsImpostor::setDeltaPosition(const Vector3& position)
 void PhysicsImpostor::setDeltaRotation(const Quaternion& rotation)
 {
   if (!_deltaRotation) {
-    _deltaRotation = std::make_unique<Quaternion>();
+    _deltaRotation = ::std::make_unique<Quaternion>();
   }
   _deltaRotation->copyFrom(rotation);
   _deltaRotationConjugated->copyFrom(_deltaRotation->conjugate());

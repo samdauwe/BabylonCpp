@@ -36,7 +36,8 @@ Animation* Animation::_PrepareAnimation(const std::string& name,
     = new Animation(name, targetProperty, framePerSecond, dataType, loopMode);
 
   animation->setKeys({
-    AnimationKey(0, from), AnimationKey(totalFrame, to),
+    AnimationKey(0, from),
+    AnimationKey(totalFrame, to),
   });
 
   if (easingFunction != nullptr) {
@@ -64,7 +65,8 @@ Animatable* Animation::CreateAndStartAnimation(
   const std::string& name, Node* node, const std::string& targetProperty,
   size_t framePerSecond, int totalFrame, const AnimationValue& from,
   const AnimationValue& to, unsigned int loopMode,
-  IEasingFunction* easingFunction, const std::function<void()>& onAnimationEnd)
+  IEasingFunction* easingFunction,
+  const ::std::function<void()>& onAnimationEnd)
 {
 
   auto animation = Animation::_PrepareAnimation(
@@ -80,7 +82,8 @@ Animatable* Animation::CreateMergeAndStartAnimation(
   const std::string& name, Node* node, const std::string& targetProperty,
   size_t framePerSecond, int totalFrame, const AnimationValue& from,
   const AnimationValue& to, unsigned int loopMode,
-  IEasingFunction* easingFunction, const std::function<void()>& onAnimationEnd)
+  IEasingFunction* easingFunction,
+  const ::std::function<void()>& onAnimationEnd)
 {
   auto animation = Animation::_PrepareAnimation(
     name, targetProperty, framePerSecond, totalFrame, from, to, loopMode,
@@ -96,7 +99,7 @@ Animatable* Animation::TransitionTo(
   const std::string& /*property*/, const AnimationValue& /*targetValue*/,
   const AnimationValue& /*host*/, Scene* /*scene*/, float /*frameRate*/,
   Animation* /*transition*/, float /*duration*/,
-  const std::function<void()>& /*onAnimationEnd*/)
+  const ::std::function<void()>& /*onAnimationEnd*/)
 {
   return nullptr;
 }
@@ -137,9 +140,9 @@ std::string Animation::toString(bool fullDetails) const
                                     "Size",   "Boolean"}[_dataType];
   }
   oss << ", nKeys: "
-      << (!_keys.empty() ? std::to_string(_keys.size()) : "none");
+      << (!_keys.empty() ? ::std::to_string(_keys.size()) : "none");
   oss << ", nRanges: "
-      << (!_ranges.empty() ? std::to_string(_ranges.size()) : "none");
+      << (!_ranges.empty() ? ::std::to_string(_ranges.size()) : "none");
   if (fullDetails) {
     oss << ", Ranges: {";
     bool first = true;
@@ -162,10 +165,10 @@ void Animation::addEvent(const AnimationEvent& event)
 
 void Animation::removeEvents(int frame)
 {
-  _events.erase(std::remove_if(_events.begin(), _events.end(),
-                               [frame](const AnimationEvent& event) {
-                                 return event.frame == frame;
-                               }),
+  _events.erase(::std::remove_if(_events.begin(), _events.end(),
+                                 [frame](const AnimationEvent& event) {
+                                   return event.frame == frame;
+                                 }),
                 _events.end());
 }
 
@@ -184,10 +187,11 @@ void Animation::deleteRange(const std::string& iName, bool deleteFrames)
       auto from = _ranges[iName].from;
       auto to   = _ranges[iName].to;
 
-      _keys.erase(std::remove_if(_keys.begin(), _keys.end(),
-                                 [from, to](const AnimationKey& key) {
-                                   return key.frame >= from && key.frame <= to;
-                                 }),
+      _keys.erase(::std::remove_if(_keys.begin(), _keys.end(),
+                                   [from, to](const AnimationKey& key) {
+                                     return key.frame >= from
+                                            && key.frame <= to;
+                                   }),
                   _keys.end());
     }
     _ranges.erase(iName);
@@ -325,8 +329,8 @@ Matrix Animation::matrixInterpolateFunction(const Matrix& startValue,
 std::unique_ptr<Animation> Animation::clone() const
 {
   auto clonedAnimation
-    = std::make_unique<Animation>(name, String::join(targetPropertyPath, '.'),
-                                  framePerSecond, dataType, loopMode);
+    = ::std::make_unique<Animation>(name, String::join(targetPropertyPath, '.'),
+                                    framePerSecond, dataType, loopMode);
 
   clonedAnimation->enableBlending = enableBlending;
   clonedAnimation->blendingSpeed  = blendingSpeed;
@@ -370,12 +374,12 @@ AnimationValue Animation::_interpolate(int iCurrentFrame, int repeatCount,
 
   // Try to get a hash to find the right key
   int _keysLength = static_cast<int>(_keys.size());
-  int startKey    = std::max(
-    0, std::min(_keysLength - 1,
-                static_cast<int>(
-                  std::floor(_keysLength * (currentFrame - _keys[0].frame)
-                             / (_keys.back().frame - _keys[0].frame))
-                  - 1)));
+  int startKey    = ::std::max(
+    0, ::std::min(_keysLength - 1,
+                  static_cast<int>(
+                    ::std::floor(_keysLength * (currentFrame - _keys[0].frame)
+                                 / (_keys.back().frame - _keys[0].frame))
+                    - 1)));
 
   if (_keys[static_cast<unsigned int>(startKey)].frame >= currentFrame) {
     while (startKey - 1 >= 0
@@ -654,7 +658,7 @@ bool Animation::animate(millisecond_t delay, float from, float to, bool loop,
   else {
     // Get max value if required
     if (loopMode != Animation::ANIMATIONLOOPMODE_CYCLE) {
-      std::string keyOffset = std::to_string(to) + std::to_string(from);
+      std::string keyOffset = ::std::to_string(to) + ::std::to_string(from);
       if (!_offsetsCache.count(keyOffset)) {
         AnimationValue fromValue = _interpolate(
           static_cast<int>(from), 0, Animation::ANIMATIONLOOPMODE_CYCLE);

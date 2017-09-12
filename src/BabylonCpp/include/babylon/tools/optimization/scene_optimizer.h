@@ -11,15 +11,15 @@ struct BABYLON_SHARED_EXPORT SceneOptimizer {
   static void
   _CheckCurrentState(Scene* scene, SceneOptimizerOptions& options,
                      int currentPriorityLevel,
-                     const std::function<void()>& onSuccess = nullptr,
-                     const std::function<void()>& onFailure = nullptr);
+                     const ::std::function<void()>& onSuccess = nullptr,
+                     const ::std::function<void()>& onFailure = nullptr);
 
   static void
   OptimizeAsync(Scene* scene,
                 const SceneOptimizerOptions& options
                 = SceneOptimizerOptions::ModerateDegradationAllowed(),
-                const std::function<void()>& onSuccess = nullptr,
-                const std::function<void()>& onFailure = nullptr);
+                const ::std::function<void()>& onSuccess = nullptr,
+                const ::std::function<void()>& onFailure = nullptr);
 
 }; // end of struct SceneOptimizer
 

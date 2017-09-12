@@ -77,7 +77,7 @@ public:
   void _releaseVertexArrayObject(Effect* effect);
   void releaseForMesh(Mesh* mesh, bool shouldDispose = true);
   void applyToMesh(Mesh* mesh);
-  void load(Scene* scene, const std::function<void()>& onLoaded = nullptr);
+  void load(Scene* scene, const ::std::function<void()>& onLoaded = nullptr);
 
   /**
    * Invert the geometry to move from a right handed system to a left handed
@@ -114,17 +114,18 @@ private:
   void updateExtend(const Float32Array& data, int stride = 3);
   void _applyToMesh(Mesh* mesh);
   void notifyUpdate(unsigned int kind = 1);
-  void _queueLoad(Scene* scene, const std::function<void()>& onLoaded);
+  void _queueLoad(Scene* scene, const ::std::function<void()>& onLoaded);
   void _disposeVertexArrayObjects();
 
 public:
   std::string id;
   int delayLoadState;
   std::string delayLoadingFile;
-  std::function<void(Geometry* geometry, unsigned int kind)> onGeometryUpdated;
+  ::std::function<void(Geometry* geometry, unsigned int kind)>
+    onGeometryUpdated;
   Uint32Array _delayInfoKinds;
   std::unique_ptr<BoundingInfo> _boundingInfo;
-  std::function<void(const Json::value& parsedVertexData, Geometry* geometry)>
+  ::std::function<void(const Json::value& parsedVertexData, Geometry* geometry)>
     _delayLoadingFunction;
   int _softwareSkinningRenderId;
   std::vector<Vector3> _positions; // Cache

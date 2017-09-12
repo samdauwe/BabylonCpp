@@ -31,7 +31,7 @@ Material::Material(const std::string& iName, Scene* scene, bool /*doNotAdd*/)
     , _effect{nullptr}
     , _wasPreviouslyReady{false}
     , _backFaceCulling{true}
-    , _uniformBuffer{std::make_unique<UniformBuffer>(scene->getEngine())}
+    , _uniformBuffer{::std::make_unique<UniformBuffer>(scene->getEngine())}
     , _onDisposeObserver{nullptr}
     , _onBindObserver{nullptr}
     , _fogEnabled{true}
@@ -65,13 +65,13 @@ IReflect::Type Material::type() const
 
 void Material::addMaterialToScene(std::unique_ptr<Material>&& newMaterial)
 {
-  _scene->materials.emplace_back(std::move(newMaterial));
+  _scene->materials.emplace_back(::std::move(newMaterial));
 }
 
 void Material::addMultiMaterialToScene(
   std::unique_ptr<MultiMaterial>&& newMultiMaterial)
 {
-  _scene->multiMaterials.emplace_back(std::move(newMultiMaterial));
+  _scene->multiMaterials.emplace_back(::std::move(newMultiMaterial));
 }
 
 bool Material::backFaceCulling() const
@@ -124,7 +124,7 @@ std::vector<Animation*> Material::getAnimations()
 }
 
 // Events
-void Material::setOnDispose(const std::function<void()>& callback)
+void Material::setOnDispose(const ::std::function<void()>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);
@@ -132,7 +132,7 @@ void Material::setOnDispose(const std::function<void()>& callback)
   _onDisposeObserver = onDisposeObservable.add(callback);
 }
 
-void Material::setOnBind(const std::function<void()>& callback)
+void Material::setOnBind(const ::std::function<void()>& callback)
 {
   if (_onBindObserver) {
     onBindObservable.remove(_onBindObserver);
@@ -238,8 +238,8 @@ BaseTexture* Material::getAlphaTestTexture()
 }
 
 void Material::trackCreation(
-  const std::function<void(const Effect* effect)>& /*onCompiled*/,
-  const std::function<void(const Effect* effect, const std::string& errors)>&
+  const ::std::function<void(const Effect* effect)>& /*onCompiled*/,
+  const ::std::function<void(const Effect* effect, const std::string& errors)>&
   /*onError*/)
 {
 }
@@ -356,10 +356,11 @@ std::vector<AbstractMesh*> Material::getBindedMeshes()
 }
 
 void Material::forceCompilation(
-  AbstractMesh* mesh, const std::function<void(Material* material)>& onCompiled,
+  AbstractMesh* mesh,
+  const ::std::function<void(Material* material)>& onCompiled,
   Nullable<bool> alphaTest, Nullable<bool> clipPlane)
 {
-  auto subMesh = std::make_unique<BaseSubMesh>();
+  auto subMesh = ::std::make_unique<BaseSubMesh>();
   auto scene   = getScene();
   auto engine  = scene->getEngine();
 
@@ -439,7 +440,7 @@ void Material::markAsDirty(unsigned int flag)
 }
 
 void Material::_markAllSubMeshesAsDirty(
-  const std::function<void(MaterialDefines& defines)>& func)
+  const ::std::function<void(MaterialDefines& defines)>& func)
 {
   for (auto& mesh : getScene()->meshes) {
     if (mesh->subMeshes.empty()) {
@@ -496,10 +497,10 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)
 
   // Remove from scene
   _scene->materials.erase(
-    std::remove_if(_scene->materials.begin(), _scene->materials.end(),
-                   [this](const std::unique_ptr<Material>& material) {
-                     return material.get() == this;
-                   }),
+    ::std::remove_if(_scene->materials.begin(), _scene->materials.end(),
+                     [this](const std::unique_ptr<Material>& material) {
+                       return material.get() == this;
+                     }),
     _scene->materials.end());
 
   // Remove from meshes

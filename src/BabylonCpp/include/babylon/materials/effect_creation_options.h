@@ -14,8 +14,8 @@ struct BABYLON_SHARED_EXPORT EffectCreationOptions {
   MaterialDefines* materialDefines{nullptr};
   std::string defines{""};
   std::unique_ptr<EffectFallbacks> fallbacks{nullptr};
-  std::function<void(Effect* effect)> onCompiled{nullptr};
-  std::function<void(Effect* effect, const std::string& errors)> onError{
+  ::std::function<void(Effect* effect)> onCompiled{nullptr};
+  ::std::function<void(Effect* effect, const std::string& errors)> onError{
     nullptr};
   std::unordered_map<std::string, unsigned int> indexParameters{};
   unsigned int number{0};

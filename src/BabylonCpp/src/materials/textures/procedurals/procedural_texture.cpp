@@ -26,7 +26,7 @@ ProceduralTexture::ProceduralTexture(
     , _fallbackTextureUsed{false}
 {
   // scene->_proceduralTextures.emplace_back(
-  //  std::make_unique<ProceduralTexture>(this));
+  //  ::std::make_unique<ProceduralTexture>(this));
 
   name           = _name;
   isRenderTarget = true;
@@ -54,7 +54,7 @@ ProceduralTexture::ProceduralTexture(
                         1.f,  -1.f};
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
-    = std::make_unique<VertexBuffer>(
+    = ::std::make_unique<VertexBuffer>(
       engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   // Indices
@@ -104,7 +104,7 @@ ProceduralTexture::ProceduralTexture(const std::string& _name, const Size& size,
                         1.f,  -1.f};
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
-    = std::make_unique<VertexBuffer>(
+    = ::std::make_unique<VertexBuffer>(
       engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   // Indices
@@ -428,7 +428,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
 std::unique_ptr<ProceduralTexture> ProceduralTexture::clone() const
 {
   ISize textureSize = getSize();
-  auto newTexture   = std::make_unique<ProceduralTexture>(
+  auto newTexture   = ::std::make_unique<ProceduralTexture>(
     name, textureSize.width, _fragment, getScene(), _fallbackTexture,
     _generateMipMaps);
 
@@ -445,7 +445,7 @@ std::unique_ptr<ProceduralTexture> ProceduralTexture::clone() const
 void ProceduralTexture::dispose(bool /*doNotRecurse*/)
 {
   getScene()->_proceduralTextures.erase(
-    std::remove_if(
+    ::std::remove_if(
       getScene()->_proceduralTextures.begin(),
       getScene()->_proceduralTextures.end(),
       [this](const std::unique_ptr<ProceduralTexture>& proceduralTexture) {
@@ -468,4 +468,4 @@ void ProceduralTexture::dispose(bool /*doNotRecurse*/)
   Texture::dispose();
 }
 
-} // end of _namespace BABYLON
+} // namespace BABYLON

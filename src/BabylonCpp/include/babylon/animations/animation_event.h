@@ -11,13 +11,13 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT AnimationEvent {
 
 public:
-  AnimationEvent(int frame, const std::function<void()>& action,
+  AnimationEvent(int frame, const ::std::function<void()>& action,
                  bool onlyOnce = false);
   ~AnimationEvent();
 
 public:
   int frame;
-  std::function<void()> action;
+  ::std::function<void()> action;
   bool onlyOnce;
   bool isDone;
 

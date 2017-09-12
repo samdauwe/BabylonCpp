@@ -86,7 +86,7 @@ public:
 
     template <class T>
     GetParameter(const std::string& name, T t)
-        : value(std::move(StringValueAdapter<T>{name, t}()))
+        : value(::std::move(StringValueAdapter<T>{name, t}()))
     {
     }
 
@@ -420,7 +420,7 @@ public:
    ss<<"&";
    }
    }
-   _body=std::move(ss.str());
+   _body=::std::move(ss.str());
    return *this;
    }*/
 
@@ -446,13 +446,13 @@ public:
   template <class Method>
   UrlRequest& method(Method method)
   {
-    _method = std::move(method);
+    _method = ::std::move(method);
     return *this;
   }
 
   /*UrlRequest& bodyJson(JsonValueAdapter::Object_t jsonArguments)
   {
-    _body = JsonValueAdapter(std::move(jsonArguments)).toString();
+    _body = JsonValueAdapter(::std::move(jsonArguments)).toString();
     return *this;
   }*/
 
@@ -462,7 +462,7 @@ public:
     return *this;
   }
 
-  UrlRequest& bodyMultipart(std::function<void(MultipartAdapter&)> f)
+  UrlRequest& bodyMultipart(::std::function<void(MultipartAdapter&)> f)
   {
     MultipartAdapter multipartAdapter;
     f(multipartAdapter);
@@ -476,7 +476,7 @@ public:
   template <class Header>
   UrlRequest& addHeader(Header header)
   {
-    _headers.emplace_back(std::move(header));
+    _headers.emplace_back(::std::move(header));
     return *this;
   }
 
@@ -589,7 +589,7 @@ public:
         auto bufferIt              = buffers.begin();
         auto charIt                = bufferIt->begin();
         auto iterateResponseLambda = [&bufferIt, &charIt, &buffers, &prevByte](
-          std::function<void(char, bool&)> f) {
+                                       ::std::function<void(char, bool&)> f) {
           auto stop = false;
           for (; bufferIt != buffers.end(); ++bufferIt) {
             //                cout<<"buffer index =
@@ -637,7 +637,7 @@ public:
           });
           ++charIt;
           if (line.length()) {
-            headers.emplace_back(std::move(line));
+            headers.emplace_back(::std::move(line));
             line.clear();
           }
           else {
@@ -732,7 +732,7 @@ public:
             }
           }
         }
-        return Response(startLine, std::move(headers), std::move(body));
+        return Response(startLine, ::std::move(headers), ::std::move(body));
       }
       else {
         return Response(
@@ -762,14 +762,14 @@ inline UrlRequest::HostEntry operator"" _host(const char* s, size_t l)
 template <class Uri>
 UrlRequest& UrlRequest::uri(Uri uri)
 {
-  _uri = std::move(uri);
+  _uri = ::std::move(uri);
   return *this;
 }
 
 template <class Host>
 UrlRequest& UrlRequest::host(Host host)
 {
-  _host = std::move(host);
+  _host = ::std::move(host);
   return *this;
 }
 

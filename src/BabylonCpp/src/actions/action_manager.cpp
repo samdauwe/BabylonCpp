@@ -18,7 +18,7 @@ size_t ActionManager::LongPressDelay        = 500; // in milliseconds
 template <typename... Ts>
 ActionManager* ActionManager::New(Ts&&... args)
 {
-  auto actionManager = std::make_unique<Action>(std::forward<Ts>(args)...);
+  auto actionManager = ::std::make_unique<Action>(std::forward<Ts>(args)...);
   actionManager->_scene->_actionManagers.emplace_back(actionManager);
   return actionManager.get();
 }
@@ -41,11 +41,11 @@ void ActionManager::dispose(bool /*doNotRecurse*/)
   }
 
   _scene->_actionManagers.erase(
-    std::remove_if(_scene->_actionManagers.begin(),
-                   _scene->_actionManagers.end(),
-                   [this](const std::unique_ptr<ActionManager>& actionManager) {
-                     return actionManager.get() == this;
-                   }),
+    ::std::remove_if(
+      _scene->_actionManagers.begin(), _scene->_actionManagers.end(),
+      [this](const std::unique_ptr<ActionManager>& actionManager) {
+        return actionManager.get() == this;
+      }),
     _scene->_actionManagers.end());
 }
 
@@ -56,18 +56,18 @@ Scene* ActionManager::getScene() const
 
 bool ActionManager::hasSpecificTriggers(const Uint32Array& triggers) const
 {
-  return std::find_if(actions.begin(), actions.end(),
-                      [&triggers](Action* action) {
-                        return std::find(triggers.begin(), triggers.end(),
-                                         action->trigger)
-                               != triggers.end();
-                      })
+  return ::std::find_if(actions.begin(), actions.end(),
+                        [&triggers](Action* action) {
+                          return ::std::find(triggers.begin(), triggers.end(),
+                                             action->trigger)
+                                 != triggers.end();
+                        })
          != actions.end();
 }
 
 bool ActionManager::hasSpecificTrigger(unsigned int trigger) const
 {
-  return std::find_if(
+  return ::std::find_if(
            actions.begin(), actions.end(),
            [&trigger](Action* action) { return action->trigger == trigger; })
          != actions.end();
@@ -76,30 +76,30 @@ bool ActionManager::hasSpecificTrigger(unsigned int trigger) const
 bool ActionManager::hasPointerTriggers() const
 {
 
-  return std::find_if(actions.begin(), actions.end(),
-                      [](Action* action) {
-                        return action->trigger >= ActionManager::OnPickTrigger
-                               && action->trigger
-                                    <= ActionManager::OnPointerOutTrigger;
-                      })
+  return ::std::find_if(actions.begin(), actions.end(),
+                        [](Action* action) {
+                          return action->trigger >= ActionManager::OnPickTrigger
+                                 && action->trigger
+                                      <= ActionManager::OnPointerOutTrigger;
+                        })
          != actions.end();
 }
 
 bool ActionManager::hasPickTriggers() const
 {
-  return std::find_if(actions.begin(), actions.end(),
-                      [](Action* action) {
-                        return action->trigger >= ActionManager::OnPickTrigger
-                               && action->trigger
-                                    <= ActionManager::OnPickUpTrigger;
-                      })
+  return ::std::find_if(actions.begin(), actions.end(),
+                        [](Action* action) {
+                          return action->trigger >= ActionManager::OnPickTrigger
+                                 && action->trigger
+                                      <= ActionManager::OnPickUpTrigger;
+                        })
          != actions.end();
 }
 
 bool ActionManager::HasTriggers()
 {
-  return std::accumulate(ActionManager::Triggers.begin(),
-                         ActionManager::Triggers.end(), 0)
+  return ::std::accumulate(ActionManager::Triggers.begin(),
+                           ActionManager::Triggers.end(), 0)
          != 0;
 }
 
@@ -108,8 +108,8 @@ bool ActionManager::HasPickTriggers()
   const auto start = ActionManager::OnPickTrigger;
   const auto end   = ActionManager::OnPickUpTrigger + 1;
 
-  return std::accumulate(ActionManager::Triggers.begin() + start,
-                         ActionManager::Triggers.begin() + end, 0)
+  return ::std::accumulate(ActionManager::Triggers.begin() + start,
+                           ActionManager::Triggers.begin() + end, 0)
          != 0;
 }
 

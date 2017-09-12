@@ -15,7 +15,7 @@ CSG::Vertex::Vertex(const BABYLON::CSG::Vertex& otherVertex)
 
 CSG::Vertex::Vertex(BABYLON::CSG::Vertex&& otherVertex)
 {
-  *this = std::move(otherVertex);
+  *this = ::std::move(otherVertex);
 }
 
 CSG::Vertex& CSG::Vertex::operator=(const BABYLON::CSG::Vertex& otherVertex)
@@ -32,9 +32,9 @@ CSG::Vertex& CSG::Vertex::operator=(const BABYLON::CSG::Vertex& otherVertex)
 CSG::Vertex& CSG::Vertex::operator=(BABYLON::CSG::Vertex&& otherVertex)
 {
   if (&otherVertex != this) {
-    pos    = std::move(otherVertex.pos);
-    normal = std::move(otherVertex.normal);
-    uv     = std::move(otherVertex.uv);
+    pos    = ::std::move(otherVertex.pos);
+    normal = ::std::move(otherVertex.normal);
+    uv     = ::std::move(otherVertex.uv);
   }
 
   return *this;
@@ -61,7 +61,7 @@ std::ostream& operator<<(std::ostream& os, const BABYLON::CSG::Vertex& vertex)
      << ",\"UV\":" << vertex.uv << "}";
   return os;
 }
-}
+} // namespace CSG
 
 std::string CSG::Vertex::toString() const
 {

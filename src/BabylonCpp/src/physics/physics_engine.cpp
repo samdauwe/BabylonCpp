@@ -65,7 +65,7 @@ void PhysicsEngine::addImpostor(PhysicsImpostor* impostor)
 
 void PhysicsEngine::removeImpostor(PhysicsImpostor* impostor)
 {
-  auto it = std::find_if(
+  auto it = ::std::find_if(
     _impostors.begin(), _impostors.end(),
     [&impostor](const std::unique_ptr<PhysicsImpostor>& _imposter) {
       return _imposter.get() == impostor;
@@ -143,21 +143,21 @@ IPhysicsEnginePlugin* PhysicsEngine::getPhysicsPlugin()
 PhysicsImpostor*
 PhysicsEngine::getImpostorForPhysicsObject(IPhysicsEnabledObject* object)
 {
-  auto it
-    = std::find_if(_impostors.begin(), _impostors.end(),
-                   [&object](const std::unique_ptr<PhysicsImpostor>& impostor) {
-                     return impostor->object == object;
-                   });
+  auto it = ::std::find_if(
+    _impostors.begin(), _impostors.end(),
+    [&object](const std::unique_ptr<PhysicsImpostor>& impostor) {
+      return impostor->object == object;
+    });
   return (it == _impostors.end()) ? nullptr : (*it).get();
 }
 
 PhysicsImpostor* PhysicsEngine::getImpostorWithPhysicsBody(IPhysicsBody* body)
 {
   auto it
-    = std::find_if(_impostors.begin(), _impostors.end(),
-                   [&body](const std::unique_ptr<PhysicsImpostor>& impostor) {
-                     return impostor->physicsBody() == body;
-                   });
+    = ::std::find_if(_impostors.begin(), _impostors.end(),
+                     [&body](const std::unique_ptr<PhysicsImpostor>& impostor) {
+                       return impostor->physicsBody() == body;
+                     });
   return (it == _impostors.end()) ? nullptr : (*it).get();
 }
 

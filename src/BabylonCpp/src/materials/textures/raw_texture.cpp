@@ -30,7 +30,7 @@ std::unique_ptr<RawTexture> RawTexture::CreateLuminanceTexture(
   const Uint8Array& data, int width, int height, Scene* scene,
   bool generateMipMaps, bool invertY, unsigned int samplingMode)
 {
-  return std::make_unique<RawTexture>(
+  return ::std::make_unique<RawTexture>(
     data, width, height, EngineConstants::TEXTUREFORMAT_LUMINANCE, scene,
     generateMipMaps, invertY, samplingMode);
 }
@@ -39,7 +39,7 @@ std::unique_ptr<RawTexture> RawTexture::CreateLuminanceAlphaTexture(
   const Uint8Array& data, int width, int height, Scene* scene,
   bool generateMipMaps, bool invertY, unsigned int samplingMode)
 {
-  return std::make_unique<RawTexture>(
+  return ::std::make_unique<RawTexture>(
     data, width, height, EngineConstants::TEXTUREFORMAT_LUMINANCE_ALPHA, scene,
     generateMipMaps, invertY, samplingMode);
 }
@@ -49,7 +49,7 @@ RawTexture::CreateAlphaTexture(const Uint8Array& data, int width, int height,
                                Scene* scene, bool generateMipMaps, bool invertY,
                                unsigned int samplingMode)
 {
-  return std::make_unique<RawTexture>(
+  return ::std::make_unique<RawTexture>(
     data, width, height, EngineConstants::TEXTUREFORMAT_ALPHA, scene,
     generateMipMaps, invertY, samplingMode);
 }
@@ -59,9 +59,9 @@ RawTexture::CreateRGBTexture(const Uint8Array& data, int width, int height,
                              Scene* scene, bool generateMipMaps, bool invertY,
                              unsigned int samplingMode)
 {
-  return std::make_unique<RawTexture>(data, width, height,
-                                      EngineConstants::TEXTUREFORMAT_RGB, scene,
-                                      generateMipMaps, invertY, samplingMode);
+  return ::std::make_unique<RawTexture>(
+    data, width, height, EngineConstants::TEXTUREFORMAT_RGB, scene,
+    generateMipMaps, invertY, samplingMode);
 }
 
 std::unique_ptr<RawTexture>
@@ -69,7 +69,7 @@ RawTexture::CreateRGBATexture(const Uint8Array& data, int width, int height,
                               Scene* scene, bool generateMipMaps, bool invertY,
                               unsigned int samplingMode)
 {
-  return std::make_unique<RawTexture>(
+  return ::std::make_unique<RawTexture>(
     data, width, height, EngineConstants::TEXTUREFORMAT_RGBA, scene,
     generateMipMaps, invertY, samplingMode);
 }

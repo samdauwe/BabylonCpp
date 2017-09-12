@@ -238,7 +238,7 @@ public:
   float parallaxScaleBias;
   float indexOfRefraction;
   bool invertRefractionY;
-  std::function<std::string(
+  ::std::function<std::string(
     const std::string& shaderName, std::vector<std::string>& uniforms,
     std::vector<std::string>& uniformBuffers,
     std::vector<std::string>& samplers, StandardMaterialDefines& defines)>

@@ -555,11 +555,11 @@ void UniformBuffer::dispose()
   }
 
   _engine->_uniformBuffers.erase(
-    std::remove_if(_engine->_uniformBuffers.begin(),
-                   _engine->_uniformBuffers.end(),
-                   [this](const UniformBuffer* uniformBuffer) {
-                     return uniformBuffer == this;
-                   }),
+    ::std::remove_if(_engine->_uniformBuffers.begin(),
+                     _engine->_uniformBuffers.end(),
+                     [this](const UniformBuffer* uniformBuffer) {
+                       return uniformBuffer == this;
+                     }),
     _engine->_uniformBuffers.end());
 
   if (!_buffer) {

@@ -17,9 +17,9 @@ namespace BABYLON {
 
 RenderingGroup::RenderingGroup(
   unsigned int iIndex, Scene* scene,
-  const std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn,
-  const std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn,
-  const std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn)
+  const ::std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn,
+  const ::std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn,
+  const ::std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn)
     : index{iIndex}
     , onBeforeTransparentRendering{nullptr}
     , _scene{scene}
@@ -48,7 +48,7 @@ RenderingGroup::~RenderingGroup()
 }
 
 void RenderingGroup::setOpaqueSortCompareFn(
-  const std::function<int(SubMesh* a, SubMesh* b)>& value)
+  const ::std::function<int(SubMesh* a, SubMesh* b)>& value)
 {
   _opaqueSortCompareFn = value;
   if (value) {
@@ -64,7 +64,7 @@ void RenderingGroup::setOpaqueSortCompareFn(
 }
 
 void RenderingGroup::setAlphaTestSortCompareFn(
-  const std::function<int(SubMesh* a, SubMesh* b)>& value)
+  const ::std::function<int(SubMesh* a, SubMesh* b)>& value)
 {
   _alphaTestSortCompareFn = value;
   if (value) {
@@ -80,7 +80,7 @@ void RenderingGroup::setAlphaTestSortCompareFn(
 }
 
 void RenderingGroup::setTransparentSortCompareFn(
-  const std::function<int(SubMesh* a, SubMesh* b)>& value)
+  const ::std::function<int(SubMesh* a, SubMesh* b)>& value)
 {
   if (value) {
     _transparentSortCompareFn = value;
@@ -96,9 +96,9 @@ void RenderingGroup::setTransparentSortCompareFn(
 }
 
 void RenderingGroup::render(
-  std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
-                     const std::vector<SubMesh*>& transparentSubMeshes,
-                     const std::vector<SubMesh*>& alphaTestSubMeshes)>&
+  ::std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
+                       const std::vector<SubMesh*>& transparentSubMeshes,
+                       const std::vector<SubMesh*>& alphaTestSubMeshes)>&
     customRenderFunction,
   bool renderSprites, bool renderParticles,
   const std::vector<AbstractMesh*> activeMeshes)
@@ -183,7 +183,7 @@ void RenderingGroup::renderTransparentSorted(
 
 void RenderingGroup::renderSorted(
   const std::vector<SubMesh*>& subMeshes,
-  const std::function<int(SubMesh* a, SubMesh* b)>& sortCompareFn,
+  const ::std::function<int(SubMesh* a, SubMesh* b)>& sortCompareFn,
   const Vector3& cameraPosition, bool transparent)
 {
   for (auto& subMesh : subMeshes) {

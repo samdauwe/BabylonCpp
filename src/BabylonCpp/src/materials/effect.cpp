@@ -33,7 +33,7 @@ Effect::Effect(const std::string& baseName, EffectCreationOptions& options,
     , _compilationError{""}
     , _attributesNames{options.attributes}
     , _indexParameters{options.indexParameters}
-    , _fallbacks{std::move(options.fallbacks)}
+    , _fallbacks{::std::move(options.fallbacks)}
 {
   stl_util::concat(_uniformsNames, options.samplers);
 
@@ -98,7 +98,7 @@ Effect::Effect(const std::unordered_map<std::string, std::string>& baseName,
     , _compilationError{""}
     , _attributesNames{options.attributes}
     , _indexParameters{options.indexParameters}
-    , _fallbacks{std::move(options.fallbacks)}
+    , _fallbacks{::std::move(options.fallbacks)}
 {
   stl_util::concat(_uniformsNames, options.samplers);
 
@@ -246,7 +246,7 @@ std::string Effect::getCompilationError()
 }
 
 void Effect::executeWhenCompiled(
-  const std::function<void(Effect* effect)>& func)
+  const ::std::function<void(Effect* effect)>& func)
 {
   if (isReady()) {
     func(this);
@@ -258,7 +258,7 @@ void Effect::executeWhenCompiled(
 
 void Effect::_loadVertexShader(
   const std::string& vertex,
-  std::function<void(const std::string& data)> callback)
+  ::std::function<void(const std::string& data)> callback)
 {
   // Base64 encoded ?
   if (vertex.substr(0, 7) == "base64:") {
@@ -290,7 +290,7 @@ void Effect::_loadVertexShader(
 
 void Effect::_loadFragmentShader(
   const std::string& fragment,
-  std::function<void(const std::string& data)> callback)
+  ::std::function<void(const std::string& data)> callback)
 {
   // Base64 encoded ?
   if (fragment.substr(0, 7) == "base64:") {
@@ -342,14 +342,15 @@ void Effect::_dumpShadersSource(std::string vertexCode,
   auto formattedVertexCode
     = "\n1\t"
       + String::regexReplace(vertexCode, regex, [&i](const std::smatch& /*m*/) {
-          return "\n" + std::to_string(i++) + "\t";
+          return "\n" + ::std::to_string(i++) + "\t";
         });
   i = 2;
   auto formattedFragmentCode
-    = "\n1\t" + String::regexReplace(fragmentCode, regex,
-                                     [&i](const std::smatch& /*m*/) {
-                                       return "\n" + std::to_string(i++) + "\t";
-                                     });
+    = "\n1\t"
+      + String::regexReplace(fragmentCode, regex,
+                             [&i](const std::smatch& /*m*/) {
+                               return "\n" + ::std::to_string(i++) + "\t";
+                             });
 
   // Dump shaders name and formatted source code
   BABYLON_LOGF_ERROR("Effect", "Vertex shader: %s%s", name.c_str(),
@@ -360,7 +361,7 @@ void Effect::_dumpShadersSource(std::string vertexCode,
 
 void Effect::_processShaderConversion(
   const std::string& sourceCode, bool isFragment,
-  const std::function<void(const std::string& data)>& callback)
+  const ::std::function<void(const std::string& data)>& callback)
 {
 
   auto preparedSourceCode = _processPrecision(sourceCode);
@@ -414,7 +415,7 @@ void Effect::_processShaderConversion(
 
 void Effect::_processIncludes(
   const std::string& sourceCode,
-  const std::function<void(const std::string& data)>& callback)
+  const ::std::function<void(const std::string& data)>& callback)
 {
   const std::regex regex("#include<(.+)>(\\((.*)\\))*(\\[(.*)\\])*",
                          std::regex::optimize);
@@ -470,14 +471,14 @@ void Effect::_processIncludes(
 
             if ((!String::isDigit(maxIndex))
                 && stl_util::contains(_indexParameters, maxIndex)) {
-              maxIndex = std::to_string(_indexParameters[maxIndex]);
+              maxIndex = ::std::to_string(_indexParameters[maxIndex]);
             }
 
             if (String::isDigit(minIndex) && String::isDigit(maxIndex)) {
               const size_t _minIndex = std::stoul(minIndex, nullptr, 0);
               const size_t _maxIndex = std::stoul(maxIndex, nullptr, 0);
               for (size_t i = _minIndex; i < _maxIndex; ++i) {
-                const auto istr = std::to_string(i);
+                const auto istr = ::std::to_string(i);
                 if (_engine->webGLVersion() == 1.f) {
                   // Ubo replacement
                   const auto callback = [](const std::smatch& m) {

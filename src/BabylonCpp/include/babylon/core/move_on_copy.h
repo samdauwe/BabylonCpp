@@ -9,25 +9,25 @@ template <typename Moveable>
 struct MoveOnCopy {
   mutable Moveable _moveOnly;
 
-  explicit MoveOnCopy(Moveable&& m) : _moveOnly(std::move(m))
+  explicit MoveOnCopy(Moveable&& m) : _moveOnly(::std::move(m))
   {
   }
-  MoveOnCopy(MoveOnCopy const& t) : _moveOnly(std::move(t._moveOnly))
+  MoveOnCopy(MoveOnCopy const& t) : _moveOnly(::std::move(t._moveOnly))
   {
   }
-  MoveOnCopy(MoveOnCopy&& t) : _moveOnly(std::move(t._moveOnly))
+  MoveOnCopy(MoveOnCopy&& t) : _moveOnly(::std::move(t._moveOnly))
   {
   }
 
   MoveOnCopy& operator=(MoveOnCopy const& other)
   {
-    _moveOnly = std::move(other._moveOnly);
+    _moveOnly = ::std::move(other._moveOnly);
     return *this;
   }
 
   MoveOnCopy& operator=(MoveOnCopy&& other)
   {
-    _moveOnly = std::move(other._moveOnly);
+    _moveOnly = ::std::move(other._moveOnly);
     return *this;
   }
 
@@ -43,7 +43,7 @@ struct MoveOnCopy {
 
   Moveable release()
   {
-    return std::move(_moveOnly);
+    return ::std::move(_moveOnly);
   }
 }; // end of struct MoveOnCopy
 

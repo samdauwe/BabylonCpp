@@ -9,9 +9,8 @@ public:
   GenericController(const VRGamepad& vrGamepad);
   ~GenericController();
 
-  void
-  initControllerMesh(Scene* scene,
-                     const std::function<void(AbstractMesh* mesh)>& meshLoaded);
+  void initControllerMesh(
+    Scene* scene, const ::std::function<void(AbstractMesh* mesh)>& meshLoaded);
 
 protected:
   void handleButtonChange(int buttonIdx, const ExtendedGamepadButton& state,

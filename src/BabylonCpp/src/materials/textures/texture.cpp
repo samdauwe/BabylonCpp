@@ -13,8 +13,8 @@ namespace BABYLON {
 
 Texture::Texture(const std::string& _url, Scene* scene, bool noMipmap,
                  bool invertY, unsigned int samplingMode,
-                 const std::function<void()>& onLoad,
-                 const std::function<void()>& onError, Buffer* buffer,
+                 const ::std::function<void()>& onLoad,
+                 const ::std::function<void()>& onError, Buffer* buffer,
                  bool deleteBuffer, unsigned int format)
     : BaseTexture{scene}
     , url{_url}
@@ -204,8 +204,8 @@ Matrix* Texture::getTextureMatrix()
   _cachedWAng    = wAng;
 
   if (!_cachedTextureMatrix) {
-    _cachedTextureMatrix = std::make_unique<Matrix>(Matrix::Zero());
-    _rowGenerationMatrix = std::make_unique<Matrix>();
+    _cachedTextureMatrix = ::std::make_unique<Matrix>(Matrix::Zero());
+    _rowGenerationMatrix = ::std::make_unique<Matrix>();
     _t0                  = Vector3::Zero();
     _t1                  = Vector3::Zero();
     _t2                  = Vector3::Zero();
@@ -260,8 +260,8 @@ Matrix* Texture::getReflectionTextureMatrix()
   }
 
   if (!_cachedTextureMatrix) {
-    _cachedTextureMatrix  = std::make_unique<Matrix>(Matrix::Zero());
-    _projectionModeMatrix = std::make_unique<Matrix>(Matrix::Zero());
+    _cachedTextureMatrix  = ::std::make_unique<Matrix>(Matrix::Zero());
+    _projectionModeMatrix = ::std::make_unique<Matrix>(Matrix::Zero());
   }
 
   _cachedUOffset         = uOffset;
@@ -360,8 +360,8 @@ Texture* Texture::CreateFromBase64String(const std::string& /*data*/,
                                          const std::string& name, Scene* scene,
                                          bool noMipmap, bool invertY,
                                          unsigned int samplingMode,
-                                         const std::function<void()>& onLoad,
-                                         const std::function<void()>& onError,
+                                         const ::std::function<void()>& onLoad,
+                                         const ::std::function<void()>& onError,
                                          unsigned int format)
 {
   return Texture::New("data:" + name, scene, noMipmap, invertY, samplingMode,
@@ -379,8 +379,8 @@ Texture* Texture::LoadFromDataString(const std::string& name, Buffer* buffer,
                                      Scene* scene, bool deleteBuffer,
                                      bool noMipmap, bool invertY,
                                      unsigned int samplingMode,
-                                     const std::function<void()>& onLoad,
-                                     const std::function<void()>& onError,
+                                     const ::std::function<void()>& onLoad,
+                                     const ::std::function<void()>& onError,
                                      unsigned int format)
 {
   std::string _name = name;

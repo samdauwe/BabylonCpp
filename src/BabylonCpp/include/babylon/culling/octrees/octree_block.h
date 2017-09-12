@@ -13,7 +13,7 @@ class BABYLON_SHARED_EXPORT OctreeBlock : public IOctreeContainer<T> {
 public:
   OctreeBlock(const Vector3& minPoint, const Vector3& maxPoint, size_t capacity,
               size_t depth, size_t maxDepth,
-              const std::function<void(T&, OctreeBlock<T>&)>& creationFunc);
+              const ::std::function<void(T&, OctreeBlock<T>&)>& creationFunc);
   ~OctreeBlock();
 
   /** Properties **/
@@ -41,7 +41,7 @@ private:
   Vector3 _minPoint;
   Vector3 _maxPoint;
   std::vector<Vector3> _boundingVectors;
-  std::function<void(T&, OctreeBlock<T>&)> _creationFunc;
+  ::std::function<void(T&, OctreeBlock<T>&)> _creationFunc;
 
 }; // end of class OctreeBlock
 

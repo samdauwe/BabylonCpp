@@ -25,11 +25,11 @@ BoundingSphere::BoundingSphere(const BoundingSphere& other)
 }
 
 BoundingSphere::BoundingSphere(BoundingSphere&& other)
-    : center{std::move(other.center)}
-    , radius{std::move(other.radius)}
-    , centerWorld{std::move(other.centerWorld)}
-    , radiusWorld{std::move(other.radiusWorld)}
-    , _tempRadiusVector{std::move(other._tempRadiusVector)}
+    : center{::std::move(other.center)}
+    , radius{::std::move(other.radius)}
+    , centerWorld{::std::move(other.centerWorld)}
+    , radiusWorld{::std::move(other.radiusWorld)}
+    , _tempRadiusVector{::std::move(other._tempRadiusVector)}
 {
 }
 
@@ -49,11 +49,11 @@ BoundingSphere& BoundingSphere::operator=(const BoundingSphere& other)
 BoundingSphere& BoundingSphere::operator=(BoundingSphere&& other)
 {
   if (&other != this) {
-    center            = std::move(other.center);
-    radius            = std::move(other.radius);
-    centerWorld       = std::move(other.centerWorld);
-    radiusWorld       = std::move(other.radiusWorld);
-    _tempRadiusVector = std::move(other._tempRadiusVector);
+    center            = ::std::move(other.center);
+    radius            = ::std::move(other.radius);
+    centerWorld       = ::std::move(other.centerWorld);
+    radiusWorld       = ::std::move(other.radiusWorld);
+    _tempRadiusVector = ::std::move(other._tempRadiusVector);
   }
 
   return *this;

@@ -38,7 +38,7 @@ Ray::Ray(const Ray& otherRay)
 
 Ray::Ray(Ray&& otherRay)
 {
-  *this = std::move(otherRay);
+  *this = ::std::move(otherRay);
 }
 
 Ray& Ray::operator=(const Ray& otherRay)
@@ -61,15 +61,15 @@ Ray& Ray::operator=(const Ray& otherRay)
 Ray& Ray::operator=(Ray&& otherRay)
 {
   if (&otherRay != this) {
-    origin      = std::move(otherRay.origin);
-    direction   = std::move(otherRay.direction);
-    length      = std::move(otherRay.length);
-    _vectorsSet = std::move(otherRay._vectorsSet);
-    _edge1      = std::move(otherRay._edge1);
-    _edge2      = std::move(otherRay._edge2);
-    _pvec       = std::move(otherRay._pvec);
-    _tvec       = std::move(otherRay._tvec);
-    _qvec       = std::move(otherRay._qvec);
+    origin      = ::std::move(otherRay.origin);
+    direction   = ::std::move(otherRay.direction);
+    length      = ::std::move(otherRay.length);
+    _vectorsSet = ::std::move(otherRay._vectorsSet);
+    _edge1      = ::std::move(otherRay._edge1);
+    _edge2      = ::std::move(otherRay._edge2);
+    _pvec       = ::std::move(otherRay._pvec);
+    _tvec       = ::std::move(otherRay._tvec);
+    _qvec       = ::std::move(otherRay._qvec);
   }
 
   return *this;
@@ -81,7 +81,7 @@ Ray::~Ray()
 
 std::unique_ptr<Ray> Ray::clone() const
 {
-  return std::make_unique<Ray>(*this);
+  return ::std::make_unique<Ray>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Ray& ray)
@@ -252,7 +252,7 @@ Ray::intersectsTriangle(const Vector3& vertex0, const Vector3& vertex1,
     return nullptr;
   }
 
-  return std::make_unique<IntersectionInfo>(bu, bv, distance);
+  return ::std::make_unique<IntersectionInfo>(bu, bv, distance);
 }
 
 std::unique_ptr<float> Ray::intersectsPlane(const Plane& plane)
@@ -270,11 +270,11 @@ std::unique_ptr<float> Ray::intersectsPlane(const Plane& plane)
         return nullptr;
       }
       else {
-        return std::make_unique<float>(0.f);
+        return ::std::make_unique<float>(0.f);
       }
     }
 
-    return std::make_unique<float>(distance);
+    return ::std::make_unique<float>(distance);
   }
 }
 
@@ -288,7 +288,7 @@ PickingInfo Ray::intersectsMesh(AbstractMesh* mesh, bool fastCheck)
     Ray::TransformToRef(*this, tm, *_tmpRay);
   }
   else {
-    _tmpRay = std::make_unique<Ray>(Ray::Transform(*this, tm));
+    _tmpRay = ::std::make_unique<Ray>(Ray::Transform(*this, tm));
   }
 
   return mesh->intersects(*_tmpRay, fastCheck);
@@ -417,7 +417,7 @@ Ray Ray::CreateNew(float x, float y, float viewportWidth, float viewportHeight,
 {
   Vector3 start = Vector3::Unproject(Vector3(x, y, 0.f), viewportWidth,
                                      viewportHeight, world, view, projection);
-  Vector3 end = Vector3::Unproject(Vector3(x, y, 1.f), viewportWidth,
+  Vector3 end   = Vector3::Unproject(Vector3(x, y, 1.f), viewportWidth,
                                    viewportHeight, world, view, projection);
 
   Vector3 direction = end.subtract(start);

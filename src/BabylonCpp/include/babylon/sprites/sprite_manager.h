@@ -28,9 +28,9 @@ public:
 
   Texture* texture() const;
   void texture(Texture* value);
-  void setOnDispose(const std::function<void()>& callback);
+  void setOnDispose(const ::std::function<void()>& callback);
   PickingInfo* intersects(const Ray ray, Camera* camera,
-                          std::function<bool(Sprite* sprite)> predicate,
+                          ::std::function<bool(Sprite* sprite)> predicate,
                           bool fastCheck);
   void render();
   void dispose(bool doNotRecurse = false) override;

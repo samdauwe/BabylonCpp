@@ -14,7 +14,7 @@ EventState::EventState(const EventState& other)
 
 EventState::EventState(EventState&& other)
 {
-  *this = std::move(other);
+  *this = ::std::move(other);
 }
 
 EventState& EventState::operator=(const EventState& other)
@@ -30,8 +30,8 @@ EventState& EventState::operator=(const EventState& other)
 EventState& EventState::operator=(EventState&& other)
 {
   if (&other != this) {
-    skipNextObservers = std::move(other.skipNextObservers);
-    mask              = std::move(other.mask);
+    skipNextObservers = ::std::move(other.skipNextObservers);
+    mask              = ::std::move(other.mask);
   }
 
   return *this;

@@ -39,9 +39,9 @@ public:
   ~RenderingManager();
 
   void
-  render(std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
-                            const std::vector<SubMesh*>& transparentSubMeshes,
-                            const std::vector<SubMesh*>& alphaTestSubMeshes)>
+  render(::std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
+                              const std::vector<SubMesh*>& transparentSubMeshes,
+                              const std::vector<SubMesh*>& alphaTestSubMeshes)>
            customRenderFunction,
          const std::vector<AbstractMesh*>& activeMeshes, bool renderParticles,
          bool renderSprites);
@@ -67,11 +67,11 @@ public:
    */
   void setRenderingOrder(
     unsigned int renderingGroupId,
-    const std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn
+    const ::std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn
     = nullptr,
-    const std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn
+    const ::std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn
     = nullptr,
-    const std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn
+    const ::std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn
     = nullptr);
 
   /**
@@ -103,11 +103,11 @@ private:
   unsigned int _currentIndex;
 
   std::vector<RenderingManageAutoClearOptions> _autoClearDepthStencil;
-  std::vector<std::function<int(SubMesh* a, SubMesh* b)>>
+  std::vector<::std::function<int(SubMesh* a, SubMesh* b)>>
     _customOpaqueSortCompareFn;
-  std::vector<std::function<int(SubMesh* a, SubMesh* b)>>
+  std::vector<::std::function<int(SubMesh* a, SubMesh* b)>>
     _customAlphaTestSortCompareFn;
-  std::vector<std::function<int(SubMesh* a, SubMesh* b)>>
+  std::vector<::std::function<int(SubMesh* a, SubMesh* b)>>
     _customTransparentSortCompareFn;
   std::unique_ptr<RenderingGroupInfo> _renderinGroupInfo;
 

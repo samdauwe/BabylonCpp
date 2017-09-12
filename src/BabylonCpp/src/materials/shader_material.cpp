@@ -237,7 +237,7 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   // Instances
   std::vector<std::string> defines;
   std::vector<std::string> attribs;
-  auto fallbacks = std::make_unique<EffectFallbacks>();
+  auto fallbacks = ::std::make_unique<EffectFallbacks>();
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
   }
@@ -264,9 +264,10 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
       attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKindChars);
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
-                         + std::to_string(mesh->numBoneInfluencers()));
-    defines.emplace_back("#define BonesPerMesh "
-                         + std::to_string(mesh->skeleton()->bones.size() + 1));
+                         + ::std::to_string(mesh->numBoneInfluencers()));
+    defines.emplace_back(
+      "#define BonesPerMesh "
+      + ::std::to_string(mesh->skeleton()->bones.size() + 1));
     fallbacks->addCPUSkinningFallback(0, mesh);
 
     if (!stl_util::contains(_options.uniforms, "mBones")) {
@@ -293,12 +294,12 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   auto join           = String::join(defines, '\n');
 
   EffectCreationOptions options;
-  options.attributes          = std::move(attribs);
+  options.attributes          = ::std::move(attribs);
   options.uniformsNames       = _options.uniforms;
   options.uniformBuffersNames = _options.uniformBuffers;
   options.samplers            = _options.samplers;
-  options.defines             = std::move(join);
-  options.fallbacks           = std::move(fallbacks);
+  options.defines             = ::std::move(join);
+  options.fallbacks           = ::std::move(fallbacks);
   options.onCompiled          = onCompiled;
   options.onError             = onError;
 
@@ -457,15 +458,15 @@ bool ShaderMaterial::hasTexture(BaseTexture* texture) const
   }
 
   auto it1
-    = std::find_if(_textures.begin(), _textures.end(),
-                   [&texture](const std::pair<std::string, Texture*>& tex) {
-                     return tex.second == texture;
-                   });
+    = ::std::find_if(_textures.begin(), _textures.end(),
+                     [&texture](const std::pair<std::string, Texture*>& tex) {
+                       return tex.second == texture;
+                     });
   if (it1 != _textures.end()) {
     return true;
   }
 
-  auto it2 = std::find_if(
+  auto it2 = ::std::find_if(
     _textureArrays.begin(), _textureArrays.end(),
     [&texture](
       const std::pair<std::string, std::vector<BaseTexture*>>& textures) {

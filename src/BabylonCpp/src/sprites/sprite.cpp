@@ -9,7 +9,7 @@ namespace BABYLON {
 Sprite::Sprite(const std::string& iName, SpriteManager* manager)
     : name{iName}
     , position{Vector3::Zero()}
-    , color{std::make_unique<Color4>(1.f, 1.f, 1.f, 1.f)}
+    , color{::std::make_unique<Color4>(1.f, 1.f, 1.f, 1.f)}
     , width{1}
     , height{1}
     , angle{0}
@@ -51,7 +51,7 @@ void Sprite::setSize(int value)
 }
 
 void Sprite::playAnimation(int from, int to, bool loop, float delay,
-                           const std::function<void()>& onAnimationEnd)
+                           const ::std::function<void()>& onAnimationEnd)
 {
   _fromIndex        = from;
   _toIndex          = to;
@@ -102,10 +102,10 @@ void Sprite::dispose(bool /*doNotRecurse*/)
 {
   // Remove from scene
   _manager->sprites.erase(
-    std::remove_if(_manager->sprites.begin(), _manager->sprites.end(),
-                   [this](const std::unique_ptr<Sprite>& sprite) {
-                     return sprite.get() == this;
-                   }),
+    ::std::remove_if(_manager->sprites.begin(), _manager->sprites.end(),
+                     [this](const std::unique_ptr<Sprite>& sprite) {
+                       return sprite.get() == this;
+                     }),
     _manager->sprites.end());
 }
 

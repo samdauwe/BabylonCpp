@@ -13,7 +13,7 @@ public:
                          const std::string& propertyPath, AnimationValue* value,
                          int duration = 1000, Condition* condition = nullptr,
                          bool stopOtherAnimations = false,
-                         const std::function<void()>& onInterpolationDone
+                         const ::std::function<void()>& onInterpolationDone
                          = nullptr);
   ~InterpolateValueAction();
 
@@ -26,7 +26,7 @@ public:
   AnimationValue* value;
   int duration;
   bool stopOtherAnimations;
-  std::function<void()> onInterpolationDone;
+  ::std::function<void()> onInterpolationDone;
 
 private:
   IAnimatable* _target;

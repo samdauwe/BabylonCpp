@@ -168,7 +168,7 @@ TEST(TestStdUtil, contains)
     // Create vector of unique pointers
     auto numbers = std::vector<std::unique_ptr<int>>(10);
     for (unsigned int i = 0; i < numbers.size(); ++i) {
-      numbers[i] = std::make_unique<int>(i);
+      numbers[i] = ::std::make_unique<int>(i);
     }
 
     // Filter vector

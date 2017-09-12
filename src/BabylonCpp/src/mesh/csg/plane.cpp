@@ -23,7 +23,7 @@ BABYLON::CSG::Plane::Plane(const BABYLON::CSG::Plane& otherPlane)
 
 BABYLON::CSG::Plane::Plane(BABYLON::CSG::Plane&& otherPlane)
 {
-  *this = std::move(otherPlane);
+  *this = ::std::move(otherPlane);
 }
 
 BABYLON::CSG::Plane& BABYLON::CSG::Plane::
@@ -41,8 +41,8 @@ BABYLON::CSG::Plane& BABYLON::CSG::Plane::
 operator=(BABYLON::CSG::Plane&& otherPlane)
 {
   if (&otherPlane != this) {
-    normal = std::move(otherPlane.normal);
-    w      = std::move(otherPlane.w);
+    normal = ::std::move(otherPlane.normal);
+    w      = ::std::move(otherPlane.w);
   }
 
   return *this;
@@ -68,7 +68,7 @@ std::ostream& operator<<(std::ostream& os, const BABYLON::CSG::Plane& plane)
   os << "{\"Normal\":" << plane.normal << ",\"W\":" << plane.w << "}";
   return os;
 }
-}
+} // namespace CSG
 
 std::string CSG::Plane::toString() const
 {
@@ -117,7 +117,7 @@ void BABYLON::CSG::Plane::splitPolygon(
       back.emplace_back(polygon);
       break;
     case SPANNING:
-      std::vector<BABYLON::CSG::Vertex *> f, b;
+      std::vector<BABYLON::CSG::Vertex*> f, b;
       for (size_t i = 0; i < polygon->vertices.size(); ++i) {
         size_t j = (i + 1) % polygon->vertices.size();
         int ti = types[i], tj = types[j];

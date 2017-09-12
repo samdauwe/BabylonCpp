@@ -125,7 +125,7 @@ void EdgesRenderer::_checkEdge(unsigned int faceIndex, int edge,
     needToCreateLine = true;
   }
   else {
-    auto dotProduct = Vector3::Dot(faceNormals[faceIndex],
+    auto dotProduct  = Vector3::Dot(faceNormals[faceIndex],
                                    faceNormals[static_cast<size_t>(edge)]);
     needToCreateLine = dotProduct < _epsilon;
   }
@@ -318,9 +318,9 @@ void EdgesRenderer::_generateEdgesLines()
   // Merge into a single mesh
   auto engine = _source->getScene()->getEngine();
 
-  _buffers[VertexBuffer::PositionKind] = std::make_unique<VertexBuffer>(
+  _buffers[VertexBuffer::PositionKind] = ::std::make_unique<VertexBuffer>(
     engine, _linesPositions, VertexBuffer::PositionKind, false);
-  _buffers[VertexBuffer::NormalKind] = std::make_unique<VertexBuffer>(
+  _buffers[VertexBuffer::NormalKind] = ::std::make_unique<VertexBuffer>(
     engine, _linesNormals, VertexBuffer::NormalKind, false, false, 4);
   _bufferPtrs[VertexBuffer::PositionKindChars]
     = _buffers[VertexBuffer::PositionKind].get();
@@ -349,8 +349,8 @@ void EdgesRenderer::render()
   _lineShader->setColor4("color", _source->edgesColor);
 
   if (scene->activeCamera->mode == Camera::ORTHOGRAPHIC_CAMERA) {
-    _lineShader->setFloat(
-      "width", _source->edgesWidth / edgesWidthScalerForOrthographic);
+    _lineShader->setFloat("width", _source->edgesWidth
+                                     / edgesWidthScalerForOrthographic);
   }
   else {
     _lineShader->setFloat("width",

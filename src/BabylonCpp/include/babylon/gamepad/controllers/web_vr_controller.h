@@ -16,13 +16,12 @@ public:
   ~WebVRController();
 
   void setOnButtonStateChange(
-    const std::function<void(int controlledIndex, unsigned int buttonIndex,
-                             const ExtendedGamepadButton& state)>& callback);
+    const ::std::function<void(int controlledIndex, unsigned int buttonIndex,
+                               const ExtendedGamepadButton& state)>& callback);
   void update() override;
 
-  virtual void
-  initControllerMesh(Scene* scene,
-                     const std::function<void(AbstractMesh* mesh)>& meshLoaded)
+  virtual void initControllerMesh(
+    Scene* scene, const ::std::function<void(AbstractMesh* mesh)>& meshLoaded)
     = 0;
 
 protected:
@@ -58,8 +57,8 @@ protected:
   std::vector<ExtendedGamepadButton> _buttons;
 
 private:
-  std::function<void(int controlledIndex, unsigned int buttonIndex,
-                     const ExtendedGamepadButton& state)>
+  ::std::function<void(int controlledIndex, unsigned int buttonIndex,
+                       const ExtendedGamepadButton& state)>
     _onButtonStateChange;
   GamepadButtonChanges _changes;
 

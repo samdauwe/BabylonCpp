@@ -20,11 +20,11 @@ public:
    */
   RenderingGroup(
     unsigned int index, Scene* scene,
-    const std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn
+    const ::std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn
     = nullptr,
-    const std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn
+    const ::std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn
     = nullptr,
-    const std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn
+    const ::std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn
     = nullptr);
   ~RenderingGroup();
 
@@ -33,21 +33,21 @@ public:
    * If null the sub meshes will be render in the order they were created
    */
   void setOpaqueSortCompareFn(
-    const std::function<int(SubMesh* a, SubMesh* b)>& value);
+    const ::std::function<int(SubMesh* a, SubMesh* b)>& value);
 
   /**
    * Set the alpha test sort comparison function.
    * If null the sub meshes will be render in the order they were created
    */
   void setAlphaTestSortCompareFn(
-    const std::function<int(SubMesh* a, SubMesh* b)>& value);
+    const ::std::function<int(SubMesh* a, SubMesh* b)>& value);
 
   /**
    * Set the transparent sort comparison function.
    * If null the sub meshes will be render in the order they were created
    */
   void setTransparentSortCompareFn(
-    const std::function<int(SubMesh* a, SubMesh* b)>& value);
+    const ::std::function<int(SubMesh* a, SubMesh* b)>& value);
 
   /**
    * Render all the sub meshes contained in the group.
@@ -55,9 +55,9 @@ public:
    * of the group.
    */
   void
-  render(std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
-                            const std::vector<SubMesh*>& transparentSubMeshes,
-                            const std::vector<SubMesh*>& alphaTestSubMeshes)>&
+  render(::std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
+                              const std::vector<SubMesh*>& transparentSubMeshes,
+                              const std::vector<SubMesh*>& alphaTestSubMeshes)>&
            customRenderFunction,
          bool renderSprites, bool renderParticles,
          const std::vector<AbstractMesh*> activeMeshes);
@@ -144,10 +144,10 @@ private:
    * to help sorting
    * @param transparent Specifies to activate blending if true
    */
-  static void
-  renderSorted(const std::vector<SubMesh*>& subMeshes,
-               const std::function<int(SubMesh* a, SubMesh* b)>& sortCompareFn,
-               const Vector3& cameraPosition, bool transparent);
+  static void renderSorted(
+    const std::vector<SubMesh*>& subMeshes,
+    const ::std::function<int(SubMesh* a, SubMesh* b)>& sortCompareFn,
+    const Vector3& cameraPosition, bool transparent);
 
   /**
    * Renders the submeshes in the order they were dispatched (no sort applied).
@@ -157,7 +157,7 @@ private:
 
 public:
   unsigned int index;
-  std::function<void()> onBeforeTransparentRendering;
+  ::std::function<void()> onBeforeTransparentRendering;
 
 private:
   Scene* _scene;
@@ -168,13 +168,14 @@ private:
   std::vector<SpriteManager*> _spriteManagers;
   size_t _activeVertices;
 
-  std::function<int(SubMesh* a, SubMesh* b)> _opaqueSortCompareFn;
-  std::function<int(SubMesh* a, SubMesh* b)> _alphaTestSortCompareFn;
-  std::function<int(SubMesh* a, SubMesh* b)> _transparentSortCompareFn;
+  ::std::function<int(SubMesh* a, SubMesh* b)> _opaqueSortCompareFn;
+  ::std::function<int(SubMesh* a, SubMesh* b)> _alphaTestSortCompareFn;
+  ::std::function<int(SubMesh* a, SubMesh* b)> _transparentSortCompareFn;
 
-  std::function<void(const std::vector<SubMesh*>& subMeshes)> _renderOpaque;
-  std::function<void(const std::vector<SubMesh*>& subMeshes)> _renderAlphaTest;
-  std::function<void(const std::vector<SubMesh*>& subMeshes)>
+  ::std::function<void(const std::vector<SubMesh*>& subMeshes)> _renderOpaque;
+  ::std::function<void(const std::vector<SubMesh*>& subMeshes)>
+    _renderAlphaTest;
+  ::std::function<void(const std::vector<SubMesh*>& subMeshes)>
     _renderTransparent;
 
   std::vector<EdgesRenderer*> _edgesRenderers;

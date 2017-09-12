@@ -41,7 +41,7 @@ RenderTargetTexture::RenderTargetTexture(
   isCube         = iIsCube;
 
   // Rendering groups
-  _renderingManager = std::make_unique<RenderingManager>(scene);
+  _renderingManager = ::std::make_unique<RenderingManager>(scene);
 
   if (isMulti) {
     return;
@@ -62,7 +62,7 @@ RenderTargetTexture::RenderTargetTexture(
     _texture = scene->getEngine()->createRenderTargetCubeTexture(
       size, _renderTargetOptions);
     coordinatesMode = TextureConstants::INVCUBIC_MODE;
-    _textureMatrix  = std::make_unique<Matrix>(Matrix::Identity());
+    _textureMatrix  = ::std::make_unique<Matrix>(Matrix::Identity());
   }
   else {
     _texture = scene->getEngine()->createRenderTargetTexture(
@@ -75,7 +75,7 @@ RenderTargetTexture::~RenderTargetTexture()
 }
 
 void RenderTargetTexture::setOnAfterUnbind(
-  const std::function<void()>& callback)
+  const ::std::function<void()>& callback)
 {
   if (_onAfterUnbindObserver) {
     onAfterUnbindObservable.remove(_onAfterUnbindObserver);
@@ -84,7 +84,7 @@ void RenderTargetTexture::setOnAfterUnbind(
 }
 
 void RenderTargetTexture::setOnBeforeRender(
-  const std::function<void(int faceIndex)>& callback)
+  const ::std::function<void(int faceIndex)>& callback)
 {
   if (_onBeforeRenderObserver) {
     onBeforeRenderObservable.remove(_onBeforeRenderObserver);
@@ -93,7 +93,7 @@ void RenderTargetTexture::setOnBeforeRender(
 }
 
 void RenderTargetTexture::setOnAfterRender(
-  const std::function<void(int faceIndex)>& callback)
+  const ::std::function<void(int faceIndex)>& callback)
 {
   if (_onAfterRenderObserver) {
     onAfterRenderObservable.remove(_onAfterRenderObserver);
@@ -102,7 +102,7 @@ void RenderTargetTexture::setOnAfterRender(
 }
 
 void RenderTargetTexture::setOnClear(
-  const std::function<void(Engine* engine)>& callback)
+  const ::std::function<void(Engine* engine)>& callback)
 {
   if (_onClearObserver) {
     onClearObservable.remove(_onClearObserver);
@@ -154,7 +154,7 @@ void RenderTargetTexture::setRefreshRate(int value)
 void RenderTargetTexture::addPostProcess(PostProcess* postProcess)
 {
   if (!_postProcessManager) {
-    _postProcessManager = std::make_unique<PostProcessManager>(getScene());
+    _postProcessManager = ::std::make_unique<PostProcessManager>(getScene());
     _postProcesses.clear();
   }
 
@@ -464,9 +464,9 @@ void RenderTargetTexture::renderToTarget(
 
 void RenderTargetTexture::setRenderingOrder(
   unsigned int renderingGroupId,
-  const std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn,
-  const std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn,
-  const std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn)
+  const ::std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn,
+  const ::std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn,
+  const ::std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn)
 {
   _renderingManager->setRenderingOrder(renderingGroupId, opaqueSortCompareFn,
                                        alphaTestSortCompareFn,
@@ -483,7 +483,7 @@ void RenderTargetTexture::setRenderingAutoClearDepthStencil(
 std::unique_ptr<RenderTargetTexture> RenderTargetTexture::clone() const
 {
   auto textureSize = getSize();
-  auto newTexture  = std::make_unique<RenderTargetTexture>(
+  auto newTexture  = ::std::make_unique<RenderTargetTexture>(
     name,                                      //
     textureSize, getScene(),                   //
     _renderTargetOptions.generateMipMaps,      //
@@ -493,7 +493,7 @@ std::unique_ptr<RenderTargetTexture> RenderTargetTexture::clone() const
     _renderTargetOptions.samplingMode,         //
     _renderTargetOptions.generateDepthBuffer,  //
     _renderTargetOptions.generateStencilBuffer //
-    );
+  );
 
   // Base texture
   newTexture->setHasAlpha(hasAlpha());

@@ -31,7 +31,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type)
   auto engine = scene->getEngine();
 
   // Render target
-  _depthMap = std::make_unique<RenderTargetTexture>(
+  _depthMap = ::std::make_unique<RenderTargetTexture>(
     "depthMap", ISize{engine->getRenderWidth(), engine->getRenderHeight()},
     _scene, false, true, type);
   _depthMap->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
@@ -153,9 +153,10 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
       attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKindChars);
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
-                         + std::to_string(mesh->numBoneInfluencers()));
-    defines.emplace_back("#define BonesPerMesh "
-                         + std::to_string(mesh->skeleton()->bones.size() + 1));
+                         + ::std::to_string(mesh->numBoneInfluencers()));
+    defines.emplace_back(
+      "#define BonesPerMesh "
+      + ::std::to_string(mesh->skeleton()->bones.size() + 1));
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
@@ -176,11 +177,11 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
     _cachedDefines = join;
 
     EffectCreationOptions options;
-    options.attributes = std::move(attribs);
+    options.attributes = ::std::move(attribs);
     options.uniformsNames
       = {"world", "mBones", "viewProjection", "diffuseMatrix", "depthValues"};
     options.samplers = {"diffuseSampler"};
-    options.defines  = std::move(join);
+    options.defines  = ::std::move(join);
 
     _effect = _scene->getEngine()->createEffect("depth", options,
                                                 _scene->getEngine());

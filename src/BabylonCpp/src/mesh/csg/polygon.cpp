@@ -21,7 +21,7 @@ CSG::Polygon::Polygon(const BABYLON::CSG::Polygon& otherPolygon)
 
 CSG::Polygon::Polygon(BABYLON::CSG::Polygon&& otherPolygon)
 {
-  *this = std::move(otherPolygon);
+  *this = ::std::move(otherPolygon);
 }
 
 CSG::Polygon& CSG::Polygon::operator=(const BABYLON::CSG::Polygon& otherPolygon)
@@ -38,9 +38,9 @@ CSG::Polygon& CSG::Polygon::operator=(const BABYLON::CSG::Polygon& otherPolygon)
 CSG::Polygon& CSG::Polygon::operator=(BABYLON::CSG::Polygon&& otherPolygon)
 {
   if (&otherPolygon != this) {
-    vertices = std::move(otherPolygon.vertices);
-    shared   = std::move(otherPolygon.shared);
-    plane    = std::move(otherPolygon.plane);
+    vertices = ::std::move(otherPolygon.vertices);
+    shared   = ::std::move(otherPolygon.shared);
+    plane    = ::std::move(otherPolygon.plane);
   }
 
   return *this;
@@ -74,7 +74,7 @@ std::ostream& operator<<(std::ostream& os, const Polygon& polygon)
   //   << "}";
   return os;
 }
-}
+} // namespace CSG
 
 std::string CSG::Polygon::toString() const
 {

@@ -9,7 +9,7 @@ namespace BABYLON {
 
 Animatable::Animatable(Scene* scene, IAnimatable* iTarget, int iFromFrame,
                        int iToFrame, bool iLoopAnimation, float iSpeedRatio,
-                       const std::function<void()>& iOnAnimationEnd,
+                       const ::std::function<void()>& iOnAnimationEnd,
                        const std::vector<Animation*>& animations)
     : target{iTarget}
     , animationStarted{false}
@@ -52,10 +52,10 @@ void Animatable::appendAnimations(IAnimatable* iTarget,
 Animation*
 Animatable::getAnimationByTargetProperty(const std::string& property) const
 {
-  auto it = std::find_if(_animations.begin(), _animations.end(),
-                         [&property](Animation* animation) {
-                           return animation->targetProperty == property;
-                         });
+  auto it = ::std::find_if(_animations.begin(), _animations.end(),
+                           [&property](Animation* animation) {
+                             return animation->targetProperty == property;
+                           });
 
   return (it == _animations.end()) ? nullptr : *it;
 }
@@ -172,7 +172,7 @@ bool Animatable::_animate(const millisecond_t& delay)
   for (auto& animation : _animations) {
     bool isRunning = animation->animate(delay - _localDelayOffset, fromFrame,
                                         toFrame, loopAnimation, speedRatio);
-    running = running || isRunning;
+    running        = running || isRunning;
   }
 
   animationStarted = running;
@@ -180,7 +180,7 @@ bool Animatable::_animate(const millisecond_t& delay)
   if (!running) {
     // Remove from active animatables
     _scene->_activeAnimatables.erase(
-      std::remove_if(
+      ::std::remove_if(
         _scene->_activeAnimatables.begin(), _scene->_activeAnimatables.end(),
         [this](const Animatable* animatable) { return animatable == this; }),
       _scene->_activeAnimatables.end());

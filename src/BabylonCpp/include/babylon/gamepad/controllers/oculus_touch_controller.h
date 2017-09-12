@@ -9,9 +9,8 @@ public:
   OculusTouchController(const VRGamepad& vrGamepad);
   ~OculusTouchController();
 
-  void
-  initControllerMesh(Scene* scene,
-                     const std::function<void(AbstractMesh* mesh)>& meshLoaded);
+  void initControllerMesh(
+    Scene* scene, const ::std::function<void(AbstractMesh* mesh)>& meshLoaded);
 
   // helper getters for left and right hand.
   Observable<ExtendedGamepadButton>& onAButtonStateChangedObservable();

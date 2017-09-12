@@ -47,6 +47,17 @@ using array = ::std::array<T, N>;
 template <class T, class Allocator = ::std::allocator<T>>
 using vector = ::std::vector<T, Allocator>;
 
+template <class Key,                        // map::key_type
+          class T,                          // map::mapped_type
+          class Compare = ::std::less<Key>, // map::key_compare
+          class Alloc
+          = ::std::allocator<::std::pair<const Key, T>> // map::allocator_type
+          >
+using map = ::std::map<Key, T, Compare, Alloc>;
+
+template <class T, class Container = ::std::deque<T>>
+using queue = ::std::queue<T, Container>;
+
 template <class Key,                          // unordered_map::key_type
           class T,                            // unordered_map::mapped_type
           class Hash  = ::std::hash<Key>,     // unordered_map::hasher
@@ -79,6 +90,14 @@ using string = ::std::basic_string<char>;
 /**  Utilities library **/
 template <std::size_t N>
 using bitset = ::std::bitset<N>;
+
+template <class T1, class T2>
+using pair = ::std::pair<T1, T2>;
+
+/**  Thread support library **/
+using condition_variable = ::std::condition_variable;
+using mutex              = ::std::mutex;
+using thread             = ::std::thread;
 
 } // end of namespace std
 } // end of namespace BABYLON

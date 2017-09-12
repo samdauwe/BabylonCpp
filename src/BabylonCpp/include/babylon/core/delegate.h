@@ -21,8 +21,8 @@ template <class R, class... A>
 class delegate<R(A...)> {
   using stub_ptr_type = R (*)(void*, A&&...);
 
-  delegate(void* const o, stub_ptr_type const m) noexcept : object_ptr_(o),
-                                                            stub_ptr_(m)
+  delegate(void* const o, stub_ptr_type const m) noexcept
+      : object_ptr_(o), stub_ptr_(m)
   {
   }
 
@@ -73,11 +73,8 @@ public:
     *this = from(object, method_ptr);
   }
 
-  template <
-    typename T,
-    typename = typename ::std::
-      enable_if<!::std::is_same<delegate,
-                                typename ::std::decay<T>::type>{}>::type>
+  template <typename T, typename = typename ::std::enable_if<!::std::is_same<
+                          delegate, typename ::std::decay<T>::type>{}>::type>
   delegate(T&& f)
       : store_(operator new(sizeof(typename ::std::decay<T>::type)),
                functor_deleter<typename ::std::decay<T>::type>)
@@ -110,11 +107,8 @@ public:
     return *this = from(static_cast<C const*>(object_ptr_), rhs);
   }
 
-  template <
-    typename T,
-    typename = typename ::std::
-      enable_if<!::std::is_same<delegate,
-                                typename ::std::decay<T>::type>{}>::type>
+  template <typename T, typename = typename ::std::enable_if<!::std::is_same<
+                          delegate, typename ::std::decay<T>::type>{}>::type>
   delegate& operator=(T&& f)
   {
     using functor_type = typename ::std::decay<T>::type;
@@ -267,7 +261,7 @@ public:
   }
 
 private:
-  friend struct std::hash<delegate>;
+  friend struct ::std::hash<delegate>;
 
   using deleter_type = void (*)(void*);
 
@@ -314,28 +308,26 @@ private:
   }
 
   template <typename>
-  struct is_member_pair : std::false_type {
+  struct is_member_pair : ::std::false_type {
   };
 
   template <class C>
   struct is_member_pair<::std::pair<C* const, R (C::*const)(A...)>>
-    : std::true_type {
+      : ::std::true_type {
   };
 
   template <typename>
-  struct is_const_member_pair : std::false_type {
+  struct is_const_member_pair : ::std::false_type {
   };
 
   template <class C>
-  struct is_const_member_pair<::std::pair<C const* const,
-                                          R (C::*const)(A...) const>>
-    : std::true_type {
+  struct is_const_member_pair<
+    ::std::pair<C const* const, R (C::*const)(A...) const>> : ::std::true_type {
   };
 
   template <typename T>
-  static typename ::std::enable_if<!(is_member_pair<T>{}
-                                     || is_const_member_pair<T>{}),
-                                   R>::type
+  static typename ::std::enable_if<
+    !(is_member_pair<T>{} || is_const_member_pair<T>{}), R>::type
   functor_stub(void* const object_ptr, A&&... args)
   {
     return (*static_cast<T*>(object_ptr))(::std::forward<A>(args)...);

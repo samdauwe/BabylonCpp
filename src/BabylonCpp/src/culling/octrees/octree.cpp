@@ -17,7 +17,7 @@ Octree<T>::Octree()
 
 template <class T>
 Octree<T>::Octree(
-  const std::function<void(T& entry, OctreeBlock<T>& block)>& creationFunc,
+  const ::std::function<void(T& entry, OctreeBlock<T>& block)>& creationFunc,
   size_t maxBlockCapacity, size_t maxDepth)
     : _maxBlockCapacity{maxBlockCapacity}
     , _maxDepth{maxDepth}
@@ -107,7 +107,7 @@ void Octree<T>::_CreateBlocks(
   const Vector3& worldMin, const Vector3& worldMax, std::vector<T>& entries,
   size_t maxBlockCapacity, size_t currentDepth, size_t maxDepth,
   IOctreeContainer<T>& target,
-  std::function<void(T& entry, OctreeBlock<T>& block)>& creationFunc)
+  ::std::function<void(T& entry, OctreeBlock<T>& block)>& creationFunc)
 {
   target.blocks.clear();
   Vector3 blockSize((worldMax.x - worldMin.x) / 2.f,

@@ -51,9 +51,9 @@ public:
     const std::string& data, const std::string& name, Scene* scene,
     bool noMipmap = false, bool invertY = false,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-    const std::function<void()>& onLoad  = nullptr,
-    const std::function<void()>& onError = nullptr,
-    unsigned int format                  = EngineConstants::TEXTUREFORMAT_RGBA);
+    const ::std::function<void()>& onLoad  = nullptr,
+    const ::std::function<void()>& onError = nullptr,
+    unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
   static std::unique_ptr<BaseTexture> Parse(const Json::value& parsedTexture,
                                             Scene* scene,
                                             const std::string& rootUrl);
@@ -61,16 +61,16 @@ public:
     const std::string& name, Buffer* buffer, Scene* scene,
     bool deleteBuffer = false, bool noMipmap = false, bool invertY = true,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-    const std::function<void()>& onLoad  = nullptr,
-    const std::function<void()>& onError = nullptr,
-    unsigned int format                  = EngineConstants::TEXTUREFORMAT_RGBA);
+    const ::std::function<void()>& onLoad  = nullptr,
+    const ::std::function<void()>& onError = nullptr,
+    unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
 
 protected:
   Texture(const std::string& url, Scene* scene, bool noMipmap = false,
           bool invertY              = true,
           unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-          const std::function<void()>& onLoad  = nullptr,
-          const std::function<void()>& onError = nullptr,
+          const ::std::function<void()>& onLoad  = nullptr,
+          const ::std::function<void()>& onError = nullptr,
           Buffer* buffer = nullptr, bool deleteBuffer = false,
           unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
 
@@ -113,12 +113,12 @@ private:
   unsigned int _cachedCoordinatesMode;
   Buffer* _buffer;
   bool _deleteBuffer;
-  std::function<void()> _delayedOnLoad;
-  std::function<void()> _delayedOnError;
+  ::std::function<void()> _delayedOnLoad;
+  ::std::function<void()> _delayedOnError;
   Nullable<Observable<Texture>> _onLoadObservable;
 
-  std::function<void()> _onLoad;
-  std::function<void()> _load;
+  ::std::function<void()> _onLoad;
+  ::std::function<void()> _load;
 
 }; // end of class Texture
 

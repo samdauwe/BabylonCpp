@@ -36,8 +36,8 @@ SolidParticleSystem::SolidParticleSystem(
     , _isVisibilityBoxLocked{false}
     , _alwaysVisible{false}
     , _shapeCounter{0}
-    , _copy{std::make_unique<SolidParticle>(0, 0, nullptr, 0, 0, nullptr)}
-    , _color{std::make_unique<Color4>(0.f, 0.f, 0.f, 0.f)}
+    , _copy{::std::make_unique<SolidParticle>(0, 0, nullptr, 0, 0, nullptr)}
+    , _color{::std::make_unique<Color4>(0.f, 0.f, 0.f, 0.f)}
     , _computeParticleColor{true}
     , _computeParticleTexture{true}
     , _computeParticleRotation{true}
@@ -106,7 +106,7 @@ Mesh* SolidParticleSystem::buildMesh()
   if (_mustUnrotateFixedNormals) {
     _unrotateFixedNormals();
   }
-  auto vertexData = std::make_unique<VertexData>();
+  auto vertexData = ::std::make_unique<VertexData>();
   vertexData->set(_positions32, VertexBuffer::PositionKind);
   vertexData->indices = _indices;
   vertexData->set(_normals32, VertexBuffer::NormalKind);
@@ -169,8 +169,9 @@ SolidParticleSystem::digest(Mesh* _mesh,
   size_t sizeO        = size;
 
   while (f < totalFacets) {
-    size = sizeO + static_cast<size_t>(std::floor(
-                     (1.f + static_cast<float>(delta)) * Math::random()));
+    size = sizeO
+           + static_cast<size_t>(
+               std::floor((1.f + static_cast<float>(delta)) * Math::random()));
     if (f > totalFacets - size) {
       size = totalFacets - f;
     }
@@ -216,15 +217,15 @@ SolidParticleSystem::digest(Mesh* _mesh,
     if (_particlesIntersect) {
       bInfo = BoundingInfo(barycenter, barycenter);
     }
-    auto modelShape = std::make_unique<ModelShape>(_shapeCounter, shape,
-                                                   shapeUV, nullptr, nullptr);
+    auto modelShape = ::std::make_unique<ModelShape>(_shapeCounter, shape,
+                                                     shapeUV, nullptr, nullptr);
 
     // add the particle in the SPS
     auto currentPos = static_cast<unsigned int>(_positions.size());
     _meshBuilder(_index, shape, _positions, facetInd, _indices, facetUV, _uvs,
                  facetCol, _colors, meshNor, _normals, idx, 0,
                  {nullptr, nullptr});
-    _addParticle(idx, currentPos, std::move(modelShape), _shapeCounter, 0,
+    _addParticle(idx, currentPos, ::std::move(modelShape), _shapeCounter, 0,
                  bInfo);
     // initialize the particle position
     particles[nbParticles]->position.addInPlace(barycenter);
@@ -343,7 +344,7 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
     }
 
     if (_copy->color) {
-      _color = std::make_unique<Color4>(*_copy->color);
+      _color = ::std::make_unique<Color4>(*_copy->color);
     }
     else if (!meshCol.empty() && (c + 3 < meshCol.size())) {
       _color->r = meshCol[c];
@@ -410,7 +411,7 @@ SolidParticle* SolidParticleSystem::_addParticle(
   unsigned int idx, unsigned int idxpos, std::unique_ptr<ModelShape>&& model,
   int shapeId, unsigned int idxInShape, const BoundingInfo& bInfo)
 {
-  particles.emplace_back(std::make_unique<SolidParticle>(
+  particles.emplace_back(::std::make_unique<SolidParticle>(
     idx, idxpos, model.get(), shapeId, idxInShape, this, bInfo));
   return particles.back().get();
 }
@@ -434,8 +435,8 @@ int SolidParticleSystem::addShape(
   auto& posfunc = options.positionFunction;
   auto& vtxfunc = options.vertexFunction;
 
-  auto modelShape = std::make_unique<ModelShape>(_shapeCounter, shape, shapeUV,
-                                                 posfunc, vtxfunc);
+  auto modelShape = ::std::make_unique<ModelShape>(_shapeCounter, shape,
+                                                   shapeUV, posfunc, vtxfunc);
 
   // particles
   SolidParticle* sp;
@@ -446,7 +447,7 @@ int SolidParticleSystem::addShape(
       = _meshBuilder(_index, shape, _positions, meshInd, _indices, meshUV, _uvs,
                      meshCol, _colors, meshNor, _normals, idx, i, options);
     if (_updatable) {
-      sp = _addParticle(idx, currentPos, std::move(modelShape), _shapeCounter,
+      sp = _addParticle(idx, currentPos, ::std::move(modelShape), _shapeCounter,
                         i, bbInfo);
       sp->position.copyFrom(currentCopy->position);
       sp->rotation.copyFrom(currentCopy->rotation);
@@ -456,7 +457,7 @@ int SolidParticleSystem::addShape(
       if (currentCopy->color) {
         auto color = *sp->color;
         color.copyFrom(*currentCopy->color);
-        sp->color = std::move(color);
+        sp->color = ::std::move(color);
       }
       sp->scaling.copyFrom(currentCopy->scaling);
       sp->uvs.copyFrom(currentCopy->uvs);

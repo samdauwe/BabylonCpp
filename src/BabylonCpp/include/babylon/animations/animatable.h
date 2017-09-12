@@ -10,8 +10,8 @@ class BABYLON_SHARED_EXPORT Animatable {
 public:
   Animatable(Scene* scene, IAnimatable* target, int fromFrame = 0,
              int toFrame = 100, bool loopAnimation = false,
-             float speedRatio                            = 1.f,
-             const std::function<void()>& onAnimationEnd = nullptr,
+             float speedRatio                              = 1.f,
+             const ::std::function<void()>& onAnimationEnd = nullptr,
              const std::vector<Animation*>& animations
              = std::vector<Animation*>());
   ~Animatable();
@@ -37,7 +37,7 @@ public:
   int toFrame;
   bool loopAnimation;
   float speedRatio;
-  std::function<void()> onAnimationEnd;
+  ::std::function<void()> onAnimationEnd;
 
 private:
   millisecond_t _localDelayOffset;

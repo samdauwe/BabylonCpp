@@ -213,7 +213,7 @@ int Skeleton::_getHighestAnimationFrame()
 Animatable*
 Skeleton::beginAnimation(const std::string& _name, bool /*loop*/,
                          float /*speedRatio*/,
-                         const std::function<void()>& /*onAnimationEnd*/)
+                         const ::std::function<void()>& /*onAnimationEnd*/)
 {
   AnimationRange* range = getAnimationRange(_name);
 
@@ -404,7 +404,7 @@ Skeleton* Skeleton::Parse(const Json::value& parsedSkeleton, Scene* scene)
                                Json::GetString(parsedSkeleton, "id"), scene);
 
   if (parsedSkeleton.contains("dimensionsAtRest")) {
-    skeleton->dimensionsAtRest = std::make_unique<Vector3>(Vector3::FromArray(
+    skeleton->dimensionsAtRest = ::std::make_unique<Vector3>(Vector3::FromArray(
       Json::ToArray<float>(parsedSkeleton, "dimensionsAtRest")));
   }
 
@@ -504,10 +504,10 @@ void Skeleton::_sortBones(unsigned int index, std::vector<Bone*>& iBones,
   }
 
   const auto boneIndexOf = [this](Bone* iBone) {
-    auto it = std::find_if(bones.begin(), bones.end(),
-                           [&iBone](const std::unique_ptr<Bone>& bone) {
-                             return bone.get() == iBone;
-                           });
+    auto it = ::std::find_if(bones.begin(), bones.end(),
+                             [&iBone](const std::unique_ptr<Bone>& bone) {
+                               return bone.get() == iBone;
+                             });
     if (it != bones.end()) {
       return static_cast<int>(it - bones.begin());
     }

@@ -115,8 +115,8 @@ void SceneLoader::RegisterPlugin(std::shared_ptr<ISceneLoaderPlugin>&& plugin)
   auto& extensions = plugin->extensions.mapping;
   for (auto& item : extensions) {
     SceneLoader::_registeredPlugins[String::toLowerCase(item.first)] = {
-      std::move(plugin), // plugin
-      item.second        // isBinary
+      ::std::move(plugin), // plugin
+      item.second          // isBinary
     };
   }
 }
@@ -124,12 +124,12 @@ void SceneLoader::RegisterPlugin(std::shared_ptr<ISceneLoaderPlugin>&& plugin)
 void SceneLoader::ImportMesh(
   const std::vector<std::string>& meshesNames, const std::string& rootUrl,
   const std::string& sceneFilename, Scene* scene,
-  const std::function<void(std::vector<AbstractMesh*>& meshes,
-                           std::vector<ParticleSystem*>& particleSystems,
-                           std::vector<Skeleton*>& skeletons)>& onsuccess,
-  const std::function<void()>& progressCallBack,
-  const std::function<void(Scene* scene, const std::string& message,
-                           const std::string& exception)>& onerror)
+  const ::std::function<void(std::vector<AbstractMesh*>& meshes,
+                             std::vector<ParticleSystem*>& particleSystems,
+                             std::vector<Skeleton*>& skeletons)>& onsuccess,
+  const ::std::function<void()>& progressCallBack,
+  const ::std::function<void(Scene* scene, const std::string& message,
+                             const std::string& exception)>& onerror)
 {
   if (String::startsWith(sceneFilename, "/")) {
     BABYLON_LOG_ERROR("SceneLoader", "Wrong sceneFilename parameter");
@@ -176,9 +176,9 @@ void SceneLoader::ImportMesh(
 std::unique_ptr<Scene>
 SceneLoader::Load(const std::string& rootUrl, const std::string& sceneFilename,
                   Engine* engine,
-                  const std::function<void(Scene* scene)>& onsuccess,
-                  const std::function<void()>& progressCallBack,
-                  const std::function<void(Scene* scene)>& onerror)
+                  const ::std::function<void(Scene* scene)>& onsuccess,
+                  const ::std::function<void()>& progressCallBack,
+                  const ::std::function<void(Scene* scene)>& onerror)
 {
   auto scene = Scene::New(engine);
   SceneLoader::Append(rootUrl, sceneFilename, scene.get(), onsuccess,
@@ -188,9 +188,9 @@ SceneLoader::Load(const std::string& rootUrl, const std::string& sceneFilename,
 
 void SceneLoader::Append(const std::string& rootUrl,
                          const std::string& sceneFilename, Scene* scene,
-                         const std::function<void(Scene* scene)>& onsuccess,
-                         const std::function<void()>& progressCallBack,
-                         const std::function<void(Scene* scene)>& onerror)
+                         const ::std::function<void(Scene* scene)>& onsuccess,
+                         const ::std::function<void()>& progressCallBack,
+                         const ::std::function<void(Scene* scene)>& onerror)
 {
   if (String::startsWith(sceneFilename, "/")) {
     BABYLON_LOG_ERROR("SceneLoader", "Wrong sceneFilename parameter");

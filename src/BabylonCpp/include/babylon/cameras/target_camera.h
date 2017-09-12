@@ -85,7 +85,7 @@ public:
   Matrix _lookAtTemp;
   Matrix _tempMatrix;
 
-  std::function<void()> _reset;
+  ::std::function<void()> _reset;
   std::string _waitingLockedTargetId;
 
 private:

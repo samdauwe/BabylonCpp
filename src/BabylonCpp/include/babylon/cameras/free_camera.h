@@ -52,7 +52,7 @@ public:
   bool applyGravity;
   std::unique_ptr<FreeCameraInputsManager> inputs;
   // Collisions
-  std::function<void(AbstractMesh* collidedMesh)> onCollide;
+  ::std::function<void(AbstractMesh* collidedMesh)> onCollide;
   // Direction
   std::unique_ptr<Vector3> _localDirection;
   Vector3 _transformedDirection;

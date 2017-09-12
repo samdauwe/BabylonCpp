@@ -18,7 +18,7 @@ ReflectionProbe::ReflectionProbe(const std::string& name, const ISize& size,
     , _add{Vector3::Zero()}
     , _attachedMesh{nullptr}
 {
-  _renderTargetTexture = std::make_unique<RenderTargetTexture>(
+  _renderTargetTexture = ::std::make_unique<RenderTargetTexture>(
     name, size, scene, generateMipMaps, true,
     EngineConstants::TEXTURETYPE_UNSIGNED_INT, true);
 
@@ -71,7 +71,7 @@ ReflectionProbe::~ReflectionProbe()
 void ReflectionProbe::addToScene(
   std::unique_ptr<ReflectionProbe>&& newReflectionProbe)
 {
-  _scene->reflectionProbes.emplace_back(std::move(newReflectionProbe));
+  _scene->reflectionProbes.emplace_back(::std::move(newReflectionProbe));
 }
 
 unsigned int ReflectionProbe::samples() const
@@ -125,7 +125,7 @@ void ReflectionProbe::dispose(bool /*doNotRecurse*/)
 {
   // Remove from the scene if found
   _scene->reflectionProbes.erase(
-    std::remove_if(
+    ::std::remove_if(
       _scene->reflectionProbes.begin(), _scene->reflectionProbes.end(),
       [this](const std::unique_ptr<ReflectionProbe>& reflectionProbe) {
         return reflectionProbe.get() == this;

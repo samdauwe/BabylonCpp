@@ -97,8 +97,8 @@ public:
   bool isFacetDataEnabled() const;
 
   // Events
-  void setOnCollide(const std::function<void()>& callback);
-  void setOnCollisionPositionChange(const std::function<void()>& callback);
+  void setOnCollide(const ::std::function<void()>& callback);
+  void setOnCollisionPositionChange(const ::std::function<void()>& callback);
 
   // Properties
   Material* material();
@@ -228,7 +228,7 @@ public:
   virtual Material* getMaterial();
   std::vector<AbstractMesh*>
   getChildMeshes(bool directDecendantsOnly,
-                 const std::function<bool(Node* node)>& predicate
+                 const ::std::function<bool(Node* node)>& predicate
                  = nullptr) override;
 
   /**
@@ -601,14 +601,14 @@ public:
    * @returns The AbstractMesh.
    */
   AbstractMesh& registerAfterWorldMatrixUpdate(
-    const std::function<void(AbstractMesh* mesh)>& func);
+    const ::std::function<void(AbstractMesh* mesh)>& func);
 
   /**
    * @brief Removes a registered callback function.
    * @returns The AbstractMesh.
    */
   AbstractMesh& unregisterAfterWorldMatrixUpdate(
-    const std::function<void(AbstractMesh* mesh)>& func);
+    const ::std::function<void(AbstractMesh* mesh)>& func);
 
   /**
    * @brief Sets the mesh position in its local space.
@@ -961,7 +961,7 @@ protected:
 
 private:
   void _markSubMeshesAsDirty(
-    const std::function<void(const MaterialDefines& defines)>& func);
+    const ::std::function<void(const MaterialDefines& defines)>& func);
   void _onCollisionPositionChange(int collisionId, const Vector3& newPosition,
                                   AbstractMesh* collidedMesh = nullptr);
   // Facet data

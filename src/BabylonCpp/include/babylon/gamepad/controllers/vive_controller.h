@@ -9,9 +9,8 @@ public:
   ViveController(const VRGamepad& vrGamepad);
   ~ViveController();
 
-  void
-  initControllerMesh(Scene* scene,
-                     const std::function<void(AbstractMesh* mesh)>& meshLoaded);
+  void initControllerMesh(
+    Scene* scene, const ::std::function<void(AbstractMesh* mesh)>& meshLoaded);
 
   Observable<ExtendedGamepadButton>& onLeftButtonStateChangedObservable();
   Observable<ExtendedGamepadButton>& onRightButtonStateChangedObservable();

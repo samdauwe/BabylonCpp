@@ -19,7 +19,7 @@ public:
   void terminate();
 
 public:
-  std::function<void(const WorkerReply& e)> callbackHandler;
+  ::std::function<void(const WorkerReply& e)> callbackHandler;
 
 private:
   CollisionDetectorTransferable collisionDetector;

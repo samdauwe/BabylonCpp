@@ -11,15 +11,15 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPluginAsync {
   virtual bool importMeshAsync(
     const std::vector<std::string>& meshesNames, Scene* scene,
     const std::string& data, const std::string& rootUrl,
-    const std::function<void(std::vector<AbstractMesh*>& meshes,
-                             std::vector<ParticleSystem*>& particleSystems,
-                             std::vector<Skeleton*>& skeletons)>& onSuccess,
-    const std::function<void()>& onError)
+    const ::std::function<void(std::vector<AbstractMesh*>& meshes,
+                               std::vector<ParticleSystem*>& particleSystems,
+                               std::vector<Skeleton*>& skeletons)>& onSuccess,
+    const ::std::function<void()>& onError)
     = 0;
   virtual bool loadAsync(Scene* scene, const std::string& data,
                          const std::string& rootUrl,
-                         const std::function<void()>& onsuccess,
-                         const std::function<void()>& onerror)
+                         const ::std::function<void()>& onsuccess,
+                         const ::std::function<void()>& onerror)
     = 0;
 }; // end of struct ISceneLoaderPluginAsync
 

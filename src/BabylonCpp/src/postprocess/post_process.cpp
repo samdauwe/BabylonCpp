@@ -91,7 +91,7 @@ PostProcess::~PostProcess()
 }
 
 void PostProcess::setOnActivate(
-  const std::function<void(Camera* camera)>& callback)
+  const ::std::function<void(Camera* camera)>& callback)
 {
   if (_onActivateObserver) {
     onActivateObservable.remove(_onActivateObserver);
@@ -100,7 +100,7 @@ void PostProcess::setOnActivate(
 }
 
 void PostProcess::setOnSizeChanged(
-  const std::function<void(PostProcess* postProcess)>& callback)
+  const ::std::function<void(PostProcess* postProcess)>& callback)
 {
   if (_onSizeChangedObserver) {
     onSizeChangedObservable.remove(_onSizeChangedObserver);
@@ -109,7 +109,7 @@ void PostProcess::setOnSizeChanged(
 }
 
 void PostProcess::setOnApply(
-  const std::function<void(Effect* effect)>& callback)
+  const ::std::function<void(Effect* effect)>& callback)
 {
   if (_onApplyObserver) {
     onApplyObservable.remove(_onApplyObserver);
@@ -118,7 +118,7 @@ void PostProcess::setOnApply(
 }
 
 void PostProcess::setOnBeforeRender(
-  const std::function<void(Effect* effect)>& callback)
+  const ::std::function<void(Effect* effect)>& callback)
 {
   if (_onBeforeRenderObserver) {
     onBeforeRenderObservable.remove(_onBeforeRenderObserver);
@@ -127,7 +127,7 @@ void PostProcess::setOnBeforeRender(
 }
 
 void PostProcess::setOnAfterRender(
-  const std::function<void(Effect* effect)>& callback)
+  const ::std::function<void(Effect* effect)>& callback)
 {
   if (_onAfterRenderObserver) {
     onAfterRenderObservable.remove(_onAfterRenderObserver);
@@ -186,8 +186,9 @@ void PostProcess::updateEffect(
   const std::string& defines, const std::vector<std::string>& uniforms,
   const std::vector<std::string>& samplers,
   const std::unordered_map<std::string, unsigned int>& indexParameters,
-  const std::function<void(Effect* effect)>& onCompiled,
-  const std::function<void(Effect* effect, const std::string& errors)>& onError)
+  const ::std::function<void(Effect* effect)>& onCompiled,
+  const ::std::function<void(Effect* effect, const std::string& errors)>&
+    onError)
 {
   std::unordered_map<std::string, std::string> baseName{
     {"vertex", _vertexUrl}, {"fragment", _fragmentUrl}};

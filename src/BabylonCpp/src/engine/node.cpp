@@ -27,7 +27,7 @@ Node::Node(const std::string& iName, Scene* scene)
     , _parentRenderId{-1}
     , _scene{scene}
     , _parentNode{nullptr}
-    , _worldMatrix{std::make_unique<Matrix>(Matrix::Identity())}
+    , _worldMatrix{::std::make_unique<Matrix>(Matrix::Identity())}
 {
   _initCache();
 }
@@ -71,7 +71,7 @@ const char* Node::getClassName() const
   return "Node";
 }
 
-void Node::setOnDispose(const std::function<void()>& callback)
+void Node::setOnDispose(const ::std::function<void()>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);
@@ -129,10 +129,10 @@ const std::vector<Behavior<Node>*>& Node::behaviors() const
 
 Behavior<Node>* Node::getBehaviorByName(const std::string& iName)
 {
-  auto it = std::find_if(_behaviors.begin(), _behaviors.end(),
-                         [&iName](const Behavior<Node>* behavior) {
-                           return behavior->name == iName;
-                         });
+  auto it = ::std::find_if(_behaviors.begin(), _behaviors.end(),
+                           [&iName](const Behavior<Node>* behavior) {
+                             return behavior->name == iName;
+                           });
 
   return (it != _behaviors.end() ? *it : nullptr);
 }
@@ -250,7 +250,7 @@ bool Node::isDescendantOf(const Node* ancestor)
 
 void Node::_getDescendants(std::vector<Node*>& results,
                            bool directDescendantsOnly,
-                           const std::function<bool(Node* node)>& predicate)
+                           const ::std::function<bool(Node* node)>& predicate)
 {
   if (_children.empty()) {
     return;
@@ -269,7 +269,7 @@ void Node::_getDescendants(std::vector<Node*>& results,
 
 void Node::_getDescendants(std::vector<AbstractMesh*>& results,
                            bool directDescendantsOnly,
-                           const std::function<bool(Node* node)>& predicate)
+                           const ::std::function<bool(Node* node)>& predicate)
 {
   if (_children.empty()) {
     return;
@@ -290,7 +290,7 @@ void Node::_getDescendants(std::vector<AbstractMesh*>& results,
 
 std::vector<Node*>
 Node::getDescendants(bool directDescendantsOnly,
-                     const std::function<bool(Node* node)>& predicate)
+                     const ::std::function<bool(Node* node)>& predicate)
 {
   std::vector<Node*> results;
   _getDescendants(results, directDescendantsOnly, predicate);
@@ -300,7 +300,7 @@ Node::getDescendants(bool directDescendantsOnly,
 
 std::vector<AbstractMesh*>
 Node::getChildMeshes(bool directDecendantsOnly,
-                     const std::function<bool(Node* node)>& predicate)
+                     const ::std::function<bool(Node* node)>& predicate)
 {
   std::vector<AbstractMesh*> results;
   _getDescendants(results, directDecendantsOnly, [&predicate](Node* node) {
@@ -334,7 +334,7 @@ std::vector<Animation*> Node::getAnimations()
 
 Animation* Node::getAnimationByName(const std::string& iName)
 {
-  auto it = std::find_if(
+  auto it = ::std::find_if(
     animations.begin(), animations.end(),
     [&iName](Animation* animation) { return animation->name == iName; });
 
@@ -345,7 +345,7 @@ void Node::createAnimationRange(const std::string& iName, int from, int to)
 {
   // check name not already in use
   if (!stl_util::contains(_ranges, iName)) {
-    _ranges[iName] = std::make_unique<AnimationRange>(iName, from, to);
+    _ranges[iName] = ::std::make_unique<AnimationRange>(iName, from, to);
     for (auto& animation : animations) {
       if (animation) {
         animation->createRange(iName, from, to);
@@ -376,7 +376,7 @@ AnimationRange* Node::getAnimationRange(const std::string& iName)
 
 Animatable* Node::beginAnimation(const std::string& iName, bool loop,
                                  float speedRatio,
-                                 std::function<void()> onAnimationEnd)
+                                 ::std::function<void()> onAnimationEnd)
 {
   AnimationRange* range = getAnimationRange(iName);
 

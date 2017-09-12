@@ -11,9 +11,9 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT Skeleton
-  : public std::enable_shared_from_this<Skeleton>,
-    public IAnimatable,
-    public IDisposable {
+    : public ::std::enable_shared_from_this<Skeleton>,
+      public IAnimatable,
+      public IDisposable {
 
 public:
   Skeleton(const std::string& name, const std::string& id, Scene* scene);
@@ -59,7 +59,7 @@ public:
   void returnToRest();
   Animatable* beginAnimation(const std::string& name, bool loop = false,
                              float speedRatio = 1.f,
-                             const std::function<void()>& onAnimationEnd
+                             const ::std::function<void()>& onAnimationEnd
                              = nullptr);
 
   void _markAsDirty();

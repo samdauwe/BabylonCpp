@@ -14,10 +14,10 @@ struct BABYLON_SHARED_EXPORT IPhysicsEnabledObject {
   virtual Vector3& rotation()                                      = 0;
   virtual AbstractMesh* getParent()                                = 0;
   virtual BoundingInfo* getBoundingInfo()                          = 0;
-  virtual Matrix computeWorldMatrix(bool force = false) = 0;
+  virtual Matrix computeWorldMatrix(bool force = false)            = 0;
   virtual std::vector<AbstractMesh*>
   getChildMeshes(bool directDecendantsOnly,
-                 const std::function<bool(Node* node)>& predicate)
+                 const ::std::function<bool(Node* node)>& predicate)
     = 0;
   virtual Float32Array getVerticesData(unsigned int kind,
                                        bool copyWhenShared = false,

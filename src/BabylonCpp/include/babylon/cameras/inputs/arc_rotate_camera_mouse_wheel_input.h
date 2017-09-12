@@ -11,7 +11,7 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT ArcRotateCameraMouseWheelInput
-  : public ICameraInput<ArcRotateCamera> {
+    : public ICameraInput<ArcRotateCamera> {
 
 public:
   ArcRotateCameraMouseWheelInput();
@@ -29,7 +29,7 @@ public:
 private:
   ICanvas* _canvas;
   bool _noPreventDefault;
-  std::function<void(const PointerInfo& p, const EventState& s)> _wheel;
+  ::std::function<void(const PointerInfo& p, const EventState& s)> _wheel;
   Observer<PointerInfo>::Ptr _observer;
 
 }; // end of class ArcRotateCameraMouseWheelInput

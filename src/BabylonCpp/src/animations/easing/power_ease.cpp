@@ -12,7 +12,7 @@ PowerEase::~PowerEase()
 
 float PowerEase::easeInCore(float gradient) const
 {
-  return std::pow(gradient, std::max(0.f, power));
+  return ::std::pow(gradient, ::std::max(0.f, power));
 }
 
 } // end of namespace BABYLON

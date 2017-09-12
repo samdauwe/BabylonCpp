@@ -26,7 +26,7 @@ public:
   {
     {
       std::lock_guard<std::mutex> lock(_mutex);
-      _queue.push(std::move(item));
+      _queue.push(::std::move(item));
     }
     _data_cond.notify_one();
   }
@@ -38,7 +38,7 @@ public:
     if (_queue.empty()) {
       return false;
     }
-    poppedItem = std::move(_queue.front());
+    poppedItem = ::std::move(_queue.front());
     _queue.pop();
     return true;
   }
@@ -52,7 +52,7 @@ public:
       //  This 'while' loop is equal to
       //  _data_cond.wait(lock, [](bool result){return !_queue.empty();});
     }
-    poppedItem = std::move(_queue.front());
+    poppedItem = ::std::move(_queue.front());
     _queue.pop();
   }
 

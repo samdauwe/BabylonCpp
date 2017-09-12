@@ -614,16 +614,17 @@ std::unique_ptr<Texture> TextureTools::CreateResizedCopy(Texture* texture,
   auto scene  = texture->getScene();
   auto engine = scene->getEngine();
 
-  auto rtt = std::make_unique<RenderTargetTexture>("resized" + texture->name, //
-                                                   ISize{width, height},      //
-                                                   scene,                     //
-                                                   !texture->noMipmap(),      //
-                                                   true,                      //
-                                                   texture->_texture->type,   //
-                                                   false,                     //
-                                                   texture->_samplingMode,    //
-                                                   false                      //
-                                                   );
+  auto rtt
+    = ::std::make_unique<RenderTargetTexture>("resized" + texture->name, //
+                                              ISize{width, height},      //
+                                              scene,                     //
+                                              !texture->noMipmap(),      //
+                                              true,                      //
+                                              texture->_texture->type,   //
+                                              false,                     //
+                                              texture->_samplingMode,    //
+                                              false                      //
+    );
 
   rtt->wrapU                     = texture->wrapU;
   rtt->wrapV                     = texture->wrapV;
@@ -642,7 +643,7 @@ std::unique_ptr<Texture> TextureTools::CreateResizedCopy(Texture* texture,
   texture->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
   texture->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
 
-  auto passPostProcess = std::make_unique<PassPostProcess>(
+  auto passPostProcess = ::std::make_unique<PassPostProcess>(
     "pass", 1, nullptr,
     useBilinearMode ? TextureConstants::BILINEAR_SAMPLINGMODE :
                       TextureConstants::NEAREST_SAMPLINGMODE,

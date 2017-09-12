@@ -69,7 +69,8 @@ SpriteManager::SpriteManager(const std::string& iName,
   // invertU, invertV, cellIndexX, cellIndexY, color r, color g, color b, color
   // a)
   _vertexData.resize(capacity * 16 * 4);
-  _buffer = std::make_unique<Buffer>(scene->getEngine(), _vertexData, true, 16);
+  _buffer
+    = ::std::make_unique<Buffer>(scene->getEngine(), _vertexData, true, 16);
 
   auto positions
     = _buffer->createVertexBuffer(VertexBuffer::PositionKind, 0, 4);
@@ -82,16 +83,16 @@ SpriteManager::SpriteManager(const std::string& iName,
   _vertexBufferPtrs[VertexBuffer::CellInfoKindChars] = cellInfo.get();
   _vertexBufferPtrs[VertexBuffer::ColorKindChars]    = colors.get();
 
-  _vertexBuffers[VertexBuffer::PositionKindChars] = std::move(positions);
-  _vertexBuffers[VertexBuffer::OptionsKindChars]  = std::move(options);
-  _vertexBuffers[VertexBuffer::CellInfoKindChars] = std::move(cellInfo);
-  _vertexBuffers[VertexBuffer::ColorKindChars]    = std::move(colors);
+  _vertexBuffers[VertexBuffer::PositionKindChars] = ::std::move(positions);
+  _vertexBuffers[VertexBuffer::OptionsKindChars]  = ::std::move(options);
+  _vertexBuffers[VertexBuffer::CellInfoKindChars] = ::std::move(cellInfo);
+  _vertexBuffers[VertexBuffer::ColorKindChars]    = ::std::move(colors);
 
   // Effects
 
   {
     EffectCreationOptions options;
-    options.attributes = {VertexBuffer::PositionKindChars, "options",
+    options.attributes    = {VertexBuffer::PositionKindChars, "options",
                           "cellInfo", VertexBuffer::ColorKindChars};
     options.uniformsNames = {"view", "projection", "textureInfos", "alphaTest"};
     options.samplers      = {"diffuseSampler"};
@@ -102,12 +103,12 @@ SpriteManager::SpriteManager(const std::string& iName,
 
   {
     EffectCreationOptions options;
-    options.attributes = {VertexBuffer::PositionKindChars, "options",
+    options.attributes    = {VertexBuffer::PositionKindChars, "options",
                           "cellInfo", VertexBuffer::ColorKindChars};
     options.uniformsNames = {"view",      "projection", "textureInfos",
                              "alphaTest", "vFogInfos",  "vFogColor"};
-    options.samplers = {"diffuseSampler"};
-    options.defines  = "#define FOG";
+    options.samplers      = {"diffuseSampler"};
+    options.defines       = "#define FOG";
 
     _effectFog = _scene->getEngine()->createEffect("sprites", options,
                                                    _scene->getEngine());
@@ -121,7 +122,7 @@ SpriteManager::~SpriteManager()
 void SpriteManager::addToScene(
   std::unique_ptr<SpriteManager>&& newSpriteManager)
 {
-  _scene->spriteManagers.emplace_back(std::move(newSpriteManager));
+  _scene->spriteManagers.emplace_back(::std::move(newSpriteManager));
 }
 
 Texture* SpriteManager::texture() const
@@ -345,10 +346,11 @@ void SpriteManager::dispose(bool /*doNotRecurse*/)
 
   // Remove from scene
   _scene->spriteManagers.erase(
-    std::remove_if(_scene->spriteManagers.begin(), _scene->spriteManagers.end(),
-                   [this](const std::unique_ptr<SpriteManager>& spriteManager) {
-                     return spriteManager.get() == this;
-                   }),
+    ::std::remove_if(
+      _scene->spriteManagers.begin(), _scene->spriteManagers.end(),
+      [this](const std::unique_ptr<SpriteManager>& spriteManager) {
+        return spriteManager.get() == this;
+      }),
     _scene->spriteManagers.end());
 
   // Callback

@@ -101,7 +101,7 @@ public:
   virtual IReflect::Type type() const override;
 
   /** Methods **/
-  void setOnBeforeDraw(const std::function<void()>& callback);
+  void setOnBeforeDraw(const ::std::function<void()>& callback);
 
   /**
    * @brief Returns a string.
@@ -411,7 +411,7 @@ public:
    * @returns The Mesh.
    */
   Mesh& updateMeshPositions(
-    std::function<void(Float32Array& positions)> positionFunction,
+    ::std::function<void(Float32Array& positions)> positionFunction,
     bool computeNormals = true);
 
   /**
@@ -447,7 +447,7 @@ public:
    * @returns The Mesh.
    */
   Mesh&
-  registerBeforeRender(const std::function<void(AbstractMesh* mesh)>& func);
+  registerBeforeRender(const ::std::function<void(AbstractMesh* mesh)>& func);
 
   /**
    * @brief Disposes a previously registered javascript function called before
@@ -456,7 +456,7 @@ public:
    * @returns The Mesh.
    */
   Mesh&
-  unregisterBeforeRender(const std::function<void(AbstractMesh* mesh)>& func);
+  unregisterBeforeRender(const ::std::function<void(AbstractMesh* mesh)>& func);
 
   /**
    * @brief Registers for this mesh a javascript function called just after the
@@ -465,7 +465,7 @@ public:
    * @returns The Mesh.
    */
   Mesh&
-  registerAfterRender(const std::function<void(AbstractMesh* mesh)>& func);
+  registerAfterRender(const ::std::function<void(AbstractMesh* mesh)>& func);
 
   /**
    * @brief Disposes a previously registered javascript function called after
@@ -474,7 +474,7 @@ public:
    * @returns The Mesh.
    */
   Mesh&
-  unregisterAfterRender(const std::function<void(AbstractMesh* mesh)>& func);
+  unregisterAfterRender(const ::std::function<void(AbstractMesh* mesh)>& func);
 
   _InstancesBatch* _getInstancesRenderList(size_t subMeshId);
   Mesh& _renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
@@ -483,8 +483,8 @@ public:
   Mesh& _processRendering(SubMesh* subMesh, Effect* effect, int fillMode,
                           _InstancesBatch* batch,
                           bool hardwareInstancedRendering,
-                          std::function<void(bool isInstance, Matrix world,
-                                             Material* effectiveMaterial)>
+                          ::std::function<void(bool isInstance, Matrix world,
+                                               Material* effectiveMaterial)>
                             onBeforeDraw,
                           Material* effectiveMaterial = nullptr);
 
@@ -610,7 +610,7 @@ public:
    */
   void applyDisplacementMap(const std::string& url, int minHeight,
                             int maxHeight,
-                            const std::function<void(Mesh* mesh)> onSuccess);
+                            const ::std::function<void(Mesh* mesh)> onSuccess);
 
   /**
    * @brief Modifies the mesh geometry according to a displacementMap buffer.
@@ -702,7 +702,7 @@ public:
    */
   /*void
   simplify(const std::vector<ISimplificationSettings*>& settings,
-           std::function<void(Mesh* mesh, int submeshIndex)>& successCallback,
+           ::std::function<void(Mesh* mesh, int submeshIndex)>& successCallback,
            bool parallelProcessing = true, SimplificationType simplificationType
                                            = SimplificationType::QUADRATIC);*/
 
@@ -715,7 +715,8 @@ public:
    * @param successCallback an optional success callback to be called after the
    * optimization finished.
    */
-  void optimizeIndices(const std::function<void(Mesh* mesh)>& successCallback);
+  void
+  optimizeIndices(const ::std::function<void(Mesh* mesh)>& successCallback);
 
   void _syncGeometryWithMorphTargetManager();
 
@@ -1109,8 +1110,8 @@ public:
   static Mesh* ExtrudeShapeCustom(
     const std::string& name, const std::vector<Vector3>& shape,
     const std::vector<Vector3>& path,
-    const std::function<float(float i, float distance)>& scaleFunction,
-    const std::function<float(float i, float distance)>& rotationFunction,
+    const ::std::function<float(float i, float distance)>& scaleFunction,
+    const ::std::function<float(float i, float distance)>& rotationFunction,
     bool ribbonCloseArray, bool ribbonClosePath, unsigned int cap, Scene*,
     bool updatable = false, unsigned int sideOrientation = Mesh::DEFAULTSIDE,
     Mesh* instance = nullptr);
@@ -1232,7 +1233,7 @@ public:
     const std::string& name, const std::string& url, unsigned int width,
     unsigned int height, unsigned int subdivisions, unsigned int minHeight,
     unsigned int maxHeight, Scene*, bool updatable = false,
-    const std::function<void(GroundMesh* mesh)>& onReady = nullptr);
+    const ::std::function<void(GroundMesh* mesh)>& onReady = nullptr);
 
   /**
    * @brief Creates a tube mesh.
@@ -1277,7 +1278,7 @@ public:
   static Mesh* CreateTube(
     const std::string& name, const std::vector<Vector3>& path,
     float radius = 1.f, unsigned int tessellation = 64,
-    const std::function<float(unsigned int i, unsigned int distance)>&
+    const ::std::function<float(unsigned int i, unsigned int distance)>&
       radiusFunction
     = nullptr,
     unsigned int cap = Mesh::NO_CAP, Scene* = nullptr, bool updatable = false,
@@ -1453,11 +1454,11 @@ public:
   std::vector<InstancedMesh*> instances;
   std::string delayLoadingFile;
   std::string _binaryInfo;
-  std::function<void(float distance, Mesh* mesh, Mesh* selectedLevel)>
+  ::std::function<void(float distance, Mesh* mesh, Mesh* selectedLevel)>
     onLODLevelSelection;
   Geometry* _geometry;
   Uint32Array _delayInfoKinds;
-  std::function<void(const Json::value& parsedGeometry, Mesh* mesh)>
+  ::std::function<void(const Json::value& parsedGeometry, Mesh* mesh)>
     _delayLoadingFunction;
   std::unique_ptr<_VisibleInstances> _visibleInstances;
   bool _shouldGenerateFlatShading;

@@ -16,7 +16,7 @@ InterpolateValueAction::InterpolateValueAction(
   unsigned int triggerOptions, IAnimatable* target,
   const std::string& iPropertyPath, AnimationValue* iValue, int iDuration,
   Condition* condition, bool iStopOtherAnimations,
-  const std::function<void()>& iOnInterpolationDone)
+  const ::std::function<void()>& iOnInterpolationDone)
     : Action(triggerOptions, condition)
     , propertyPath{iPropertyPath}
     , value{iValue}

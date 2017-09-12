@@ -44,7 +44,7 @@ class store {
   template <typename T>
   static constexpr bool fits()
   {
-    return sizeof(typename std::decay<T>::type) <= N;
+    return sizeof(typename ::std::decay<T>::type) <= N;
   }
 
 public:
@@ -57,8 +57,8 @@ public:
 #pragma GCC diagnostic ignored "-Wplacement-new="
 #endif
 #endif
-    return fits<D>() ? new (space) D{std::forward<V>(v)} :
-                       new D{std::forward<V>(v)};
+    return fits<D>() ? new (space) D{::std::forward<V>(v)} :
+                       new D{::std::forward<V>(v)};
 #if !defined(__clang__)
 #if __GNUC__ > 5
 #pragma GCC diagnostic pop
@@ -69,7 +69,7 @@ public:
   template <typename D, typename V, typename B>
   B* move(V&& v, B*& p)
   {
-    B* q = fits<D>() ? copy<D>(std::forward<V>(v)) : p;
+    B* q = fits<D>() ? copy<D>(::std::forward<V>(v)) : p;
     p    = nullptr;
     return q;
   }
@@ -114,10 +114,10 @@ class some : A {
     virtual ~base()
     {
     }
-    virtual bool is(id) const    = 0;
-    virtual base* copy(A&) const = 0;
+    virtual bool is(id) const      = 0;
+    virtual base* copy(A&) const   = 0;
     virtual base* move(A&, base*&) = 0;
-    virtual void free(A&) = 0;
+    virtual void free(A&)          = 0;
   }* p = nullptr;
 
   //----------------------------------------------------------------------------
@@ -128,11 +128,11 @@ class some : A {
 
     T& get() &
     {
-      return std::get<0>(*this);
+      return ::std::get<0>(*this);
     }
     T const& get() const&
     {
-      return std::get<0>(*this);
+      return ::std::get<0>(*this);
     }
 
     bool is(id i) const override
@@ -147,7 +147,7 @@ class some : A {
 
     base* move(A& a, base*& p) override
     {
-      return a.template move<data>(std::move(get()), p);
+      return a.template move<data>(::std::move(get()), p);
     }
 
     void free(A& a) override
@@ -205,7 +205,7 @@ class some : A {
   template <typename V, typename U = decay<V>, typename = none<U>>
   base* read(V&& v)
   {
-    return A::template copy<data<U>>(std::forward<V>(v));
+    return A::template copy<data<U>>(::std::forward<V>(v));
   }
 
   //----------------------------------------------------------------------------
@@ -214,11 +214,11 @@ class some : A {
   some& assign(X&& x)
   {
     if (!p)
-      p = read(std::forward<X>(x));
+      p = read(::std::forward<X>(x));
     else {
-      some t{std::move(*this)};
+      some t{::std::move(*this)};
       try {
-        p = read(std::forward<X>(x));
+        p = read(::std::forward<X>(x));
       }
       catch (...) {
         p = move(t);
@@ -231,11 +231,11 @@ class some : A {
   void swap(some& s)
   {
     if (!p)
-      p = read(std::move(s));
+      p = read(::std::move(s));
     else if (!s.p)
       s.p = move(*this);
     else {
-      some t{std::move(*this)};
+      some t{::std::move(*this)};
       try {
         p = move(s);
       }
@@ -259,7 +259,7 @@ public:
       p->free(*this);
   }
 
-  some(some&& s) : p{read(std::move(s))}
+  some(some&& s) : p{read(::std::move(s))}
   {
   }
   some(some const& s) : p{read(s)}
@@ -267,13 +267,13 @@ public:
   }
 
   template <typename V, typename = none<decay<V>>>
-  some(V&& v) : p{read(std::forward<V>(v))}
+  some(V&& v) : p{read(::std::forward<V>(v))}
   {
   }
 
   some& operator=(some&& s)
   {
-    return assign(std::move(s));
+    return assign(::std::move(s));
   }
   some& operator=(some const& s)
   {
@@ -283,7 +283,7 @@ public:
   template <typename V, typename = none<decay<V>>>
   some& operator=(V&& v)
   {
-    return assign(std::forward<V>(v));
+    return assign(::std::forward<V>(v));
   }
 
   friend void swap(some& s, some& r)
@@ -313,7 +313,7 @@ public:
   template <typename T>
   T&& _() &&
   {
-    return std::move(stat<T>());
+    return ::std::move(stat<T>());
   }
   template <typename T>
   T& _() &
@@ -329,7 +329,7 @@ public:
   template <typename T>
   T&& cast() &&
   {
-    return std::move(dyn<T>());
+    return ::std::move(dyn<T>());
   }
   template <typename T>
   T& cast() &
@@ -345,7 +345,7 @@ public:
   template <typename T>
   operator T &&() &&
   {
-    return std::move(_<T>());
+    return ::std::move(_<T>());
   }
   template <typename T>
   operator T&() &

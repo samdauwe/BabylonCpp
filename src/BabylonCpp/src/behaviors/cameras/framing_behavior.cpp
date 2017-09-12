@@ -259,11 +259,11 @@ float FramingBehavior::_calculateLowerRadiusFromModelBoundingSphere(
   // Horizon distance
   auto radius = radiusWithoutFraming * _radiusScale;
   auto distanceForHorizontalFrustum
-    = radius * std::sqrt(1.f + 1.f / (frustumSlope.x * frustumSlope.x));
+    = radius * ::std::sqrt(1.f + 1.f / (frustumSlope.x * frustumSlope.x));
   auto distanceForVerticalFrustum
-    = radius * std::sqrt(1.f + 1.f / (frustumSlope.y * frustumSlope.y));
+    = radius * ::std::sqrt(1.f + 1.f / (frustumSlope.y * frustumSlope.y));
   auto distance
-    = std::max(distanceForHorizontalFrustum, distanceForVerticalFrustum);
+    = ::std::max(distanceForHorizontalFrustum, distanceForVerticalFrustum);
   auto camera = _attachedCamera;
 
   if (camera->lowerRadiusLimit != 0.f
@@ -286,7 +286,7 @@ void FramingBehavior::_maintainCameraAboveGround()
 {
   auto now = Time::highresTimepointNow();
   auto timeSinceInteraction
-    = Time::fpTimeDiff<float, std::milli>(now, _lastInteractionTime);
+    = Time::fpTimeDiff<float, ::std::milli>(now, _lastInteractionTime);
   auto defaultBeta = Math::PI * 0.5f - _defaultElevation;
   auto limitBeta   = Math::PI * 0.5f;
 
@@ -324,7 +324,7 @@ Vector2 FramingBehavior::_getFrustumSlope() const
   // Camera FOV is the vertical field of view (top-bottom) in radians.
   // Slope of the frustum top/bottom planes in view space, relative to the
   // forward vector.
-  auto frustumSlopeY = std::tan(camera->fov / 2);
+  auto frustumSlopeY = ::std::tan(camera->fov / 2);
 
   // Slope of the frustum left/right planes in view space, relative to the
   // forward vector. Provides the amount that one side (e.g. left) of the

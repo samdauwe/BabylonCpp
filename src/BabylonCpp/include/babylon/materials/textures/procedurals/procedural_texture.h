@@ -47,7 +47,7 @@ public:
 public:
   bool _generateMipMaps;
   bool isEnabled;
-  std::function<void()> onGenerated;
+  ::std::function<void()> onGenerated;
 
 private:
   Size _size;

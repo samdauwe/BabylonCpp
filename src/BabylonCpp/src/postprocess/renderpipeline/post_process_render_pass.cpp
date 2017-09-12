@@ -10,15 +10,15 @@ namespace BABYLON {
 PostProcessRenderPass::PostProcessRenderPass(
   Scene* scene, const std::string& name, ISize size,
   const std::vector<Mesh*>& renderList,
-  const std::function<void(int faceIndex)>& beforeRender,
-  const std::function<void(int faceIndex)>& afterRender)
+  const ::std::function<void(int faceIndex)>& beforeRender,
+  const ::std::function<void(int faceIndex)>& afterRender)
     : _name{name}
     , _enabled{true}
     , _renderList{renderList}
     , _scene{scene}
     , _refCount{0}
 {
-  _renderTexture = std::make_unique<RenderTargetTexture>(name, size, scene);
+  _renderTexture = ::std::make_unique<RenderTargetTexture>(name, size, scene);
   setRenderList(renderList);
 
   _renderTexture->onBeforeRenderObservable.add(beforeRender);
@@ -43,7 +43,7 @@ int PostProcessRenderPass::_decRefCount()
   --_refCount;
 
   if (_refCount <= 0) {
-    _scene->customRenderTargets.erase(std::remove_if(
+    _scene->customRenderTargets.erase(::std::remove_if(
       _scene->customRenderTargets.begin(), _scene->customRenderTargets.end(),
       [this](const RenderTargetTexture* renderTargetTexture) {
         return _renderTexture.get() == renderTargetTexture;

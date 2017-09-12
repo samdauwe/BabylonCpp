@@ -12,7 +12,7 @@
 namespace BABYLON {
 
 ImageProcessingConfiguration::ImageProcessingConfiguration()
-    : colorCurves{std::make_unique<ColorCurves>()}
+    : colorCurves{::std::make_unique<ColorCurves>()}
     , colorGradingTexture{nullptr}
     , _exposure{1.f}
     , vignetteStretch{0}
@@ -305,7 +305,7 @@ void ImageProcessingConfiguration::bind(Effect* effect, float aspectRatio)
                       0.5f / textureSize,              // textureOffset
                       textureSize,                     // textureSize
                       colorGradingTexture->level       // weight
-                      );
+    );
   }
 }
 

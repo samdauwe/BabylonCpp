@@ -302,7 +302,7 @@ void LensRenderingPipeline::_createGrainTexture()
   std::string value;
   for (size_t x = 0; x < size; ++x) {
     for (size_t y = 0; y < size; ++y) {
-      value = std::to_string(
+      value = ::std::to_string(
         static_cast<int>(std::floor(rand(0.42f, 0.58f) * 255.f)));
       context->fillStyle = "rgb(" + value + ", " + value + ", " + value + ")";
       context->fillRect(static_cast<int>(x), static_cast<int>(y), 1, 1);

@@ -21,7 +21,7 @@ Range::Range(const Range& otherRange)
 
 Range::Range(Range&& otherRange)
 {
-  *this = std::move(otherRange);
+  *this = ::std::move(otherRange);
 }
 
 Range& Range::operator=(const Range& otherRange)
@@ -37,8 +37,8 @@ Range& Range::operator=(const Range& otherRange)
 Range& Range::operator=(Range&& otherRange)
 {
   if (&otherRange != this) {
-    _start = std::move(otherRange._start);
-    _end   = std::move(otherRange._end);
+    _start = ::std::move(otherRange._start);
+    _end   = ::std::move(otherRange._end);
   }
 
   return *this;
@@ -99,7 +99,7 @@ ColorInfo::ColorInfo(const ColorInfo& other)
 
 ColorInfo::ColorInfo(ColorInfo&& other)
 {
-  *this = std::move(other);
+  *this = ::std::move(other);
 }
 
 ColorInfo& ColorInfo::operator=(const ColorInfo& other)
@@ -119,12 +119,12 @@ ColorInfo& ColorInfo::operator=(const ColorInfo& other)
 ColorInfo& ColorInfo::operator=(ColorInfo&& other)
 {
   if (&other != this) {
-    _hueRange        = std::move(other._hueRange);
-    _hasHueRange     = std::move(other._hasHueRange);
-    _saturationRange = std::move(other._saturationRange);
-    _brightnessRange = std::move(other._brightnessRange);
-    _lowerBounds     = std::move(other._lowerBounds);
-    _isValid         = std::move(other._isValid);
+    _hueRange        = ::std::move(other._hueRange);
+    _hasHueRange     = ::std::move(other._hasHueRange);
+    _saturationRange = ::std::move(other._saturationRange);
+    _brightnessRange = ::std::move(other._brightnessRange);
+    _lowerBounds     = ::std::move(other._lowerBounds);
+    _isValid         = ::std::move(other._isValid);
   }
 
   return *this;

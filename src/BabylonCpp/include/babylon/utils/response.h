@@ -52,7 +52,7 @@ protected:
 public:
   Response(const std::string& startLine, decltype(_headers)&& headers,
            decltype(_body)&& body) noexcept(false)
-      : _body(std::move(body)), _headers(std::move(headers))
+      : _body(::std::move(body)), _headers(::std::move(headers))
   {
     parseStartLine(startLine, _httpVersion, _statusCode, _statusDescription);
   }
@@ -60,9 +60,9 @@ public:
   Response(decltype(_statusCode) statusCode_,
            decltype(_statusDescription)&& statusDescription_,
            decltype(_body)&& body_)
-      : _body(std::move(body_))
+      : _body(::std::move(body_))
       , _statusCode(statusCode_)
-      , _statusDescription(std::move(statusDescription_))
+      , _statusDescription(::std::move(statusDescription_))
   {
   }
 

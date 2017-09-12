@@ -22,7 +22,7 @@ Light::Light(const std::string& iName, Scene* scene)
     , range{std::numeric_limits<float>::max()}
     , shadowEnabled{true}
     , _shadowGenerator{nullptr}
-    , _uniformBuffer{std::make_unique<UniformBuffer>(scene->getEngine())}
+    , _uniformBuffer{::std::make_unique<UniformBuffer>(scene->getEngine())}
     , _photometricScale{1.f}
     , _intensityMode{Light::INTENSITYMODE_AUTOMATIC}
     , _radius{0.00001f}
@@ -33,7 +33,7 @@ Light::Light(const std::string& iName, Scene* scene)
     , _excludeWithLayerMask{0}
     , _lightmapMode{0}
     , _parentedWorldMatrix{nullptr}
-    , _worldMatrix{std::make_unique<Matrix>(Matrix::Identity())}
+    , _worldMatrix{::std::make_unique<Matrix>(Matrix::Identity())}
 {
   _buildUniformLayout();
   _resyncMeshes();
@@ -236,7 +236,7 @@ Matrix* Light::getWorldMatrix()
 
   if (parent() && parent()->getWorldMatrix()) {
     if (!_parentedWorldMatrix) {
-      _parentedWorldMatrix = std::make_unique<Matrix>(Matrix::Identity());
+      _parentedWorldMatrix = ::std::make_unique<Matrix>(Matrix::Identity());
     }
 
     worldMatrix->multiplyToRef(*parent()->getWorldMatrix(),

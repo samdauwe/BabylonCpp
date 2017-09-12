@@ -3,7 +3,7 @@
 namespace BABYLON {
 
 PredicateCondition::PredicateCondition(ActionManager* actionManager,
-                                       const std::function<bool()>& predicate)
+                                       const ::std::function<bool()>& predicate)
     : Condition{actionManager}, _predicate{predicate}
 {
 }

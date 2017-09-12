@@ -47,7 +47,7 @@ public:
    * physics joint.
    */
   void executeNativeFunction(
-    const std::function<void(Mesh* world, PhysicsJoint* physicsJoint)>& func);
+    const ::std::function<void(Mesh* world, PhysicsJoint* physicsJoint)>& func);
 
 public:
   unsigned int _jointType;

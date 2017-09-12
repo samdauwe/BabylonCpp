@@ -16,7 +16,7 @@ MeshLODLevel::MeshLODLevel(const MeshLODLevel& other)
 }
 
 MeshLODLevel::MeshLODLevel(MeshLODLevel&& other)
-    : distance{std::move(other.distance)}, mesh{std::move(other.mesh)}
+    : distance{::std::move(other.distance)}, mesh{::std::move(other.mesh)}
 {
 }
 
@@ -33,8 +33,8 @@ MeshLODLevel& MeshLODLevel::operator=(const MeshLODLevel& other)
 MeshLODLevel& MeshLODLevel::operator=(MeshLODLevel&& other)
 {
   if (&other != this) {
-    distance = std::move(other.distance);
-    mesh     = std::move(other.mesh);
+    distance = ::std::move(other.distance);
+    mesh     = ::std::move(other.mesh);
   }
 
   return *this;

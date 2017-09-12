@@ -56,8 +56,8 @@ public:
   virtual std::vector<Animation*> getAnimations() override;
 
   // Events
-  void setOnDispose(const std::function<void()>& callback);
-  void setOnBind(const std::function<void()>& callback);
+  void setOnDispose(const ::std::function<void()>& callback);
+  void setOnBind(const ::std::function<void()>& callback);
 
   bool wireframe() const;
   void setWireframe(bool value);
@@ -85,9 +85,9 @@ public:
   virtual bool needAlphaTesting();
   virtual BaseTexture* getAlphaTestTexture();
   virtual void trackCreation(
-    const std::function<void(const Effect* effect)>& onCompiled,
-    const std::function<void(const Effect* effect, const std::string& errors)>&
-      onError);
+    const ::std::function<void(const Effect* effect)>& onCompiled,
+    const ::std::function<void(const Effect* effect,
+                               const std::string& errors)>& onError);
   void markDirty();
   void _preBind(Effect* effect = nullptr);
   virtual void bind(Matrix* world, Mesh* mesh);
@@ -107,7 +107,7 @@ public:
    */
   void
   forceCompilation(AbstractMesh* mesh,
-                   const std::function<void(Material* material)>& onCompiled,
+                   const ::std::function<void(Material* material)>& onCompiled,
                    Nullable<bool> alphaTest = nullptr,
                    Nullable<bool> clipPlane = nullptr);
   virtual void dispose(bool forceDisposeEffect   = false,
@@ -126,7 +126,7 @@ protected:
 
   void _afterBind(Mesh* mesh);
   void _markAllSubMeshesAsDirty(
-    const std::function<void(MaterialDefines& defines)>& func);
+    const ::std::function<void(MaterialDefines& defines)>& func);
   void _markAllSubMeshesAsImageProcessingDirty();
   void _markAllSubMeshesAsTexturesDirty();
   void _markAllSubMeshesAsFresnelDirty();
@@ -156,9 +156,10 @@ public:
   std::string state;
   float alpha;
   int sideOrientation;
-  std::function<void(const Effect* effect)> onCompiled;
-  std::function<void(const Effect* effect, const std::string& errors)> onError;
-  std::function<std::vector<RenderTargetTexture*>()> getRenderTargetTextures;
+  ::std::function<void(const Effect* effect)> onCompiled;
+  ::std::function<void(const Effect* effect, const std::string& errors)>
+    onError;
+  ::std::function<std::vector<RenderTargetTexture*>()> getRenderTargetTextures;
   bool doNotSerialize;
   bool storeEffectOnSubMeshes;
   int alphaMode;
@@ -177,7 +178,7 @@ private:
   Observer<Material>::Ptr _onDisposeObserver;
   Observer<AbstractMesh>::Ptr _onBindObserver;
   // Callbacks
-  std::function<void()> _beforeRenderCallback;
+  ::std::function<void()> _beforeRenderCallback;
   // Properties
   bool _fogEnabled;
   bool _useUBO;

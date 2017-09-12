@@ -43,7 +43,7 @@ Vector3& PointLight::direction()
 void PointLight::setDirection(const Vector3& value)
 {
   auto previousNeedCube = needCube();
-  _direction            = std::make_unique<Vector3>(value);
+  _direction            = ::std::make_unique<Vector3>(value);
   if (needCube() != previousNeedCube && _shadowGenerator) {
     _shadowGenerator->recreateShadowMap();
   }

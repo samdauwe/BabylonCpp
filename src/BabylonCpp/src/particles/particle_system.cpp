@@ -84,7 +84,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
   // + 1 filler
   _vertexData.resize(capacity * 11 * 4);
   _vertexBuffer
-    = std::make_unique<Buffer>(scene->getEngine(), _vertexData, true, 11);
+    = ::std::make_unique<Buffer>(scene->getEngine(), _vertexData, true, 11);
 
   auto positions
     = _vertexBuffer->createVertexBuffer(VertexBuffer::PositionKind, 0, 3);
@@ -93,9 +93,9 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
   auto options
     = _vertexBuffer->createVertexBuffer(VertexBuffer::OptionsKind, 7, 4);
 
-  _vertexBuffers[VertexBuffer::PositionKindChars] = std::move(positions);
-  _vertexBuffers[VertexBuffer::ColorKindChars]    = std::move(colors);
-  _vertexBuffers["options"]                       = std::move(options);
+  _vertexBuffers[VertexBuffer::PositionKindChars] = ::std::move(positions);
+  _vertexBuffers[VertexBuffer::ColorKindChars]    = ::std::move(colors);
+  _vertexBuffers["options"]                       = ::std::move(options);
 
   // Default behaviors
   startDirectionFunction
@@ -306,7 +306,7 @@ Effect* ParticleSystem::_getEffect()
     options.uniformsNames
       = {"invView", "view", "projection", "vClipPlane", "textureMask"};
     options.samplers = {"diffuseSampler"};
-    options.defines  = std::move(joined);
+    options.defines  = ::std::move(joined);
 
     _effect = _scene->getEngine()->createEffect("particles", options,
                                                 _scene->getEngine());
@@ -470,7 +470,7 @@ void ParticleSystem::dispose(bool /*doNotRecurse*/)
 
   // Remove from scene
   _scene->particleSystems.erase(
-    std::remove_if(
+    ::std::remove_if(
       _scene->particleSystems.begin(), _scene->particleSystems.end(),
       [this](const std::unique_ptr<IParticleSystem>& particleSystem) {
         return particleSystem.get() == this;

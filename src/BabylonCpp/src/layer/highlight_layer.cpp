@@ -34,7 +34,7 @@ template <typename... Ts>
 HighlightLayer* HighlightLayer::New(Ts&&... args)
 {
   auto highlightLayer
-    = std::make_unique<HighlightLayer>(std::forward<Ts>(args)...);
+    = ::std::make_unique<HighlightLayer>(std::forward<Ts>(args)...);
   highlightLayer->_scene->highlightLayers.emplace_back(highlightLayer);
   return highlightLayer.get();
 }
@@ -74,7 +74,7 @@ HighlightLayer::HighlightLayer(const std::string& iName, Scene* scene,
   Float32Array vertices{1, 1, -1, 1, -1, -1, 1, -1};
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
-    = std::make_unique<VertexBuffer>(
+    = ::std::make_unique<VertexBuffer>(
       _engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   // Indices
@@ -147,7 +147,7 @@ void HighlightLayer::createTextureAndPostProcesses()
                         Tools::GetExponentOfTwo(blurTextureHeight, _maxSize) :
                         blurTextureHeight;
 
-  _mainTexture = std::make_unique<RenderTargetTexture>(
+  _mainTexture = ::std::make_unique<RenderTargetTexture>(
     "HighlightLayerMainRTT",
     ISize{_mainTextureDesiredSize.width, _mainTextureDesiredSize.height},
     _scene, false, true, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
@@ -160,7 +160,7 @@ void HighlightLayer::createTextureAndPostProcesses()
   _mainTexture->renderList.clear();
   _mainTexture->ignoreCameraViewport = true;
 
-  _blurTexture = std::make_unique<RenderTargetTexture>(
+  _blurTexture = ::std::make_unique<RenderTargetTexture>(
     "HighlightLayerBlurRTT", ISize{blurTextureWidth, blurTextureHeight}, _scene,
     false, true, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   _blurTexture->wrapU                     = TextureConstants::CLAMP_ADDRESSMODE;
@@ -170,7 +170,7 @@ void HighlightLayer::createTextureAndPostProcesses()
   _blurTexture->renderParticles      = false;
   _blurTexture->ignoreCameraViewport = true;
 
-  _downSamplePostprocess = std::make_unique<PassPostProcess>(
+  _downSamplePostprocess = ::std::make_unique<PassPostProcess>(
     "HighlightLayerPPP", _options.blurTextureSizeRatio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
   _downSamplePostprocess->onApplyObservable.add([&](Effect* effect) {
@@ -178,14 +178,14 @@ void HighlightLayer::createTextureAndPostProcesses()
   });
 
   if (_options.alphaBlendingMode == EngineConstants::ALPHA_COMBINE) {
-    _horizontalBlurPostprocess = std::make_unique<GlowBlurPostProcess>(
+    _horizontalBlurPostprocess = ::std::make_unique<GlowBlurPostProcess>(
       "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize, 1,
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _horizontalBlurPostprocess->onApplyObservable.add([&](Effect* effect) {
       effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
     });
 
-    _verticalBlurPostprocess = std::make_unique<GlowBlurPostProcess>(
+    _verticalBlurPostprocess = ::std::make_unique<GlowBlurPostProcess>(
       "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize, 1,
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _verticalBlurPostprocess->onApplyObservable.add([&](Effect* effect) {
@@ -193,14 +193,14 @@ void HighlightLayer::createTextureAndPostProcesses()
     });
   }
   else {
-    _horizontalBlurPostprocess = std::make_unique<GlowBlurPostProcess>(
+    _horizontalBlurPostprocess = ::std::make_unique<GlowBlurPostProcess>(
       "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize, 1,
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _horizontalBlurPostprocess->onApplyObservable.add([&](Effect* effect) {
       effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
     });
 
-    _verticalBlurPostprocess = std::make_unique<GlowBlurPostProcess>(
+    _verticalBlurPostprocess = ::std::make_unique<GlowBlurPostProcess>(
       "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize, 1,
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _verticalBlurPostprocess->onApplyObservable.add([&](Effect* effect) {
@@ -398,9 +398,10 @@ bool HighlightLayer::isReady(SubMesh* subMesh, bool useInstances,
       attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKindChars);
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
-                         + std::to_string(mesh->numBoneInfluencers()));
-    defines.emplace_back("#define BonesPerMesh "
-                         + std::to_string(mesh->skeleton()->bones.size() + 1));
+                         + ::std::to_string(mesh->numBoneInfluencers()));
+    defines.emplace_back(
+      "#define BonesPerMesh "
+      + ::std::to_string(mesh->skeleton()->bones.size() + 1));
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
@@ -424,8 +425,8 @@ bool HighlightLayer::isReady(SubMesh* subMesh, bool useInstances,
     options.attributes    = attribs;
     options.uniformsNames = {"world",         "mBones", "viewProjection",
                              "diffuseMatrix", "color",  "emissiveMatrix"};
-    options.samplers = {"diffuseSampler", "emissiveSampler"};
-    options.defines  = join;
+    options.samplers      = {"diffuseSampler", "emissiveSampler"};
+    options.defines       = join;
 
     _glowMapGenerationEffect = _scene->getEngine()->createEffect(
       "glowMapGeneration", options, _scene->getEngine());
@@ -665,7 +666,7 @@ void HighlightLayer::dispose()
 
   // Remove from scene
   _scene->highlightLayers.erase(
-    std::remove_if(
+    ::std::remove_if(
       _scene->highlightLayers.begin(), _scene->highlightLayers.end(),
       [this](const std::unique_ptr<HighlightLayer>& highlightLayer) {
         return highlightLayer.get() == this;

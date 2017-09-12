@@ -185,7 +185,7 @@ MinMax Tools::ExtractMinAndMax(const Float32Array& positions, size_t start,
 }
 
 MinMaxVector2 Tools::ExtractMinAndMaxVector2(
-  const std::function<Nullable<Vector2>(std::size_t index)>& feeder)
+  const ::std::function<Nullable<Vector2>(std::size_t index)>& feeder)
 {
   Vector2 minimum(std::numeric_limits<float>::max(),
                   std::numeric_limits<float>::max());
@@ -205,7 +205,7 @@ MinMaxVector2 Tools::ExtractMinAndMaxVector2(
 }
 
 MinMaxVector2 Tools::ExtractMinAndMaxVector2(
-  const std::function<Nullable<Vector2>(std::size_t index)>& feeder,
+  const ::std::function<Nullable<Vector2>(std::size_t index)>& feeder,
   const Vector2& bias)
 {
   auto minMax = Tools::ExtractMinAndMaxVector2(feeder);
@@ -285,11 +285,11 @@ Image Tools::CreateNoiseImage(unsigned int size)
 }
 
 void Tools::LoadImage(
-  const std::string& url, const std::function<void(const Image& img)>& onLoad,
-  const std::function<void(const std::string& msg)>& onError,
+  const std::string& url, const ::std::function<void(const Image& img)>& onLoad,
+  const ::std::function<void(const std::string& msg)>& onError,
   bool flipVertically)
 {
-  typedef std::unique_ptr<unsigned char, std::function<void(unsigned char*)>>
+  typedef std::unique_ptr<unsigned char, ::std::function<void(unsigned char*)>>
     stbi_ptr;
 
   int w, h, n;
@@ -313,8 +313,8 @@ void Tools::LoadImage(
 
 void Tools::LoadFile(
   const std::string& /*url*/,
-  const std::function<void(const std::string& text)>& /*callback*/,
-  const std::function<void()>& /*progressCallBack*/, bool /*useArrayBuffer*/)
+  const ::std::function<void(const std::string& text)>& /*callback*/,
+  const ::std::function<void()>& /*progressCallBack*/, bool /*useArrayBuffer*/)
 {
 }
 
@@ -361,7 +361,7 @@ std::string Tools::RandomId()
   return randomId;
 }
 
-void Tools::SetImmediate(const std::function<void()>& /*immediate*/)
+void Tools::SetImmediate(const ::std::function<void()>& /*immediate*/)
 {
 }
 

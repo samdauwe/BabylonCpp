@@ -44,9 +44,9 @@ void RenderingManager::_clearDepthStencilBuffer(bool depth, bool stencil)
 }
 
 void RenderingManager::render(
-  std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
-                     const std::vector<SubMesh*>& transparentSubMeshes,
-                     const std::vector<SubMesh*>& alphaTestSubMeshes)>
+  ::std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
+                       const std::vector<SubMesh*>& transparentSubMeshes,
+                       const std::vector<SubMesh*>& alphaTestSubMeshes)>
     customRenderFunction,
   const std::vector<AbstractMesh*>& activeMeshes, bool renderParticles,
   bool renderSprites)
@@ -56,7 +56,7 @@ void RenderingManager::render(
   bool hasObservable = _scene->onRenderingGroupObservable.hasObservers();
   if (hasObservable) {
     if (!_renderinGroupInfo) {
-      _renderinGroupInfo = std::make_unique<RenderingGroupInfo>();
+      _renderinGroupInfo = ::std::make_unique<RenderingGroupInfo>();
     }
     _renderinGroupInfo->scene  = _scene;
     _renderinGroupInfo->camera = _scene->activeCamera;
@@ -167,7 +167,7 @@ void RenderingManager::_prepareRenderingGroup(unsigned int renderingGroupId)
   }
 
   if (!_renderingGroups[renderingGroupId]) {
-    _renderingGroups[renderingGroupId] = std::make_unique<RenderingGroup>(
+    _renderingGroups[renderingGroupId] = ::std::make_unique<RenderingGroup>(
       renderingGroupId, _scene, _customOpaqueSortCompareFn[renderingGroupId],
       _customAlphaTestSortCompareFn[renderingGroupId],
       _customTransparentSortCompareFn[renderingGroupId]);
@@ -204,9 +204,9 @@ void RenderingManager::dispatch(SubMesh* subMesh)
 
 void RenderingManager::setRenderingOrder(
   unsigned int renderingGroupId,
-  const std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn,
-  const std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn,
-  const std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn)
+  const ::std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn,
+  const ::std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn,
+  const ::std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn)
 {
   _customOpaqueSortCompareFn[renderingGroupId]      = opaqueSortCompareFn;
   _customAlphaTestSortCompareFn[renderingGroupId]   = alphaTestSortCompareFn;

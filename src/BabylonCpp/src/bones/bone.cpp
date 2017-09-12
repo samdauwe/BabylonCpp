@@ -24,8 +24,8 @@ Bone::Bone(const std::string& iName, Skeleton* skeleton, Bone* parentBone,
     , _localMatrix{localMatrix ? *localMatrix : Matrix::Identity()}
     , _restPose{restPose ? *restPose : Matrix::Identity()}
     , _baseMatrix{baseMatrix ? *baseMatrix : _localMatrix}
-    , _worldTransform{std::make_unique<Matrix>()}
-    , _invertedAbsoluteTransform{std::make_unique<Matrix>()}
+    , _worldTransform{::std::make_unique<Matrix>()}
+    , _invertedAbsoluteTransform{::std::make_unique<Matrix>()}
     , _scaleMatrix{Matrix::Identity()}
     , _scaleVector{Vector3::One()}
     , _negateScaleChildren{Vector3::One()}
@@ -47,7 +47,7 @@ IReflect::Type Bone::type() const
 
 void Bone::addToSkeleton(std::unique_ptr<Bone>&& newBone)
 {
-  _skeleton->bones.emplace_back(std::move(newBone));
+  _skeleton->bones.emplace_back(::std::move(newBone));
 }
 
 // Members
@@ -739,9 +739,9 @@ void Bone::_syncScaleVector()
   const float ys = lm.m[4] * lm.m[5] * lm.m[6] * lm.m[7] < 0 ? -1 : 1;
   const float zs = lm.m[8] * lm.m[9] * lm.m[10] * lm.m[11] < 0 ? -1 : 1;
 
-  _scaleVector.x = xs * std::sqrt(xsq);
-  _scaleVector.y = ys * std::sqrt(ysq);
-  _scaleVector.z = zs * std::sqrt(zsq);
+  _scaleVector.x = xs * ::std::sqrt(xsq);
+  _scaleVector.y = ys * ::std::sqrt(ysq);
+  _scaleVector.z = zs * ::std::sqrt(zsq);
 
   if (_parent) {
     _scaleVector.x /= _parent->_negateScaleChildren.x;

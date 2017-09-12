@@ -27,7 +27,7 @@ MorphTargetManager::~MorphTargetManager()
 void MorphTargetManager::addToScene(
   std::unique_ptr<MorphTargetManager>&& newMorphTargetManager)
 {
-  _scene->morphTargetManagers.emplace_back(std::move(newMorphTargetManager));
+  _scene->morphTargetManagers.emplace_back(::std::move(newMorphTargetManager));
 }
 
 unsigned int MorphTargetManager::uniqueId() const
@@ -94,7 +94,7 @@ void MorphTargetManager::addTarget(std::unique_ptr<MorphTarget>&& target)
     }
   }
 
-  _targets.emplace_back(std::move(target));
+  _targets.emplace_back(::std::move(target));
   _targetObservable.emplace_back(_targets.back()->onInfluenceChanged.add(
     [this](bool needUpdate) { _syncActiveTargets(needUpdate); }));
   _syncActiveTargets(true);
@@ -103,10 +103,10 @@ void MorphTargetManager::addTarget(std::unique_ptr<MorphTarget>&& target)
 void MorphTargetManager::removeTarget(MorphTarget* target)
 {
   auto it
-    = std::find_if(_targets.begin(), _targets.end(),
-                   [target](const std::unique_ptr<MorphTarget>& morphTarget) {
-                     return target == morphTarget.get();
-                   });
+    = ::std::find_if(_targets.begin(), _targets.end(),
+                     [target](const std::unique_ptr<MorphTarget>& morphTarget) {
+                       return target == morphTarget.get();
+                     });
   if (it != _targets.end()) {
     _targets.erase(it);
 

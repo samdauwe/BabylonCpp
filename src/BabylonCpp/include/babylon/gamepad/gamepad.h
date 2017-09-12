@@ -22,9 +22,9 @@ public:
   virtual ~Gamepad();
 
   void setOnleftstickchanged(
-    const std::function<void(const StickValues& values)>& callback);
+    const ::std::function<void(const StickValues& values)>& callback);
   void setOnrightstickchanged(
-    const std::function<void(const StickValues& values)>& callback);
+    const ::std::function<void(const StickValues& values)>& callback);
   StickValues& leftStick();
   const StickValues& leftStick() const;
   void setLeftStick(const StickValues& newValues);
@@ -51,8 +51,8 @@ private:
   unsigned int _rightStickAxisX;
   unsigned int _rightStickAxisY;
 
-  std::function<void(const StickValues& values)> _onleftstickchanged;
-  std::function<void(const StickValues& values)> _onrightstickchanged;
+  ::std::function<void(const StickValues& values)> _onleftstickchanged;
+  ::std::function<void(const StickValues& values)> _onrightstickchanged;
 
 }; // end of class Gamepad
 

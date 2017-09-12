@@ -15,20 +15,20 @@ public:
    */
   ModelShape(
     int id, const std::vector<Vector3>& shape, const Float32Array& shapeUV,
-    const std::function<void(SolidParticle* particle, unsigned int i,
-                             unsigned int s)>& posFunction,
-    const std::function<void(SolidParticle* particle, const Vector3& vertex,
-                             unsigned int i)>& vtxFunction);
+    const ::std::function<void(SolidParticle* particle, unsigned int i,
+                               unsigned int s)>& posFunction,
+    const ::std::function<void(SolidParticle* particle, const Vector3& vertex,
+                               unsigned int i)>& vtxFunction);
   ~ModelShape();
 
 public:
   int shapeID;
   std::vector<Vector3> _shape;
   Float32Array _shapeUV;
-  std::function<void(SolidParticle* particle, unsigned int i, unsigned int s)>
+  ::std::function<void(SolidParticle* particle, unsigned int i, unsigned int s)>
     _positionFunction;
-  std::function<void(SolidParticle* particle, const Vector3& vertex,
-                     unsigned int i)>
+  ::std::function<void(SolidParticle* particle, const Vector3& vertex,
+                       unsigned int i)>
     _vertexFunction;
 
 }; // end of class ModelShape

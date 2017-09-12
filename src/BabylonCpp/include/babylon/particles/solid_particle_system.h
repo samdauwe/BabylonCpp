@@ -24,10 +24,10 @@ struct SolidParticleSystemDigestOptions {
 }; // end of struct SolidParticleSystemOptions
 
 struct SolidParticleSystemMeshBuilderOptions {
-  std::function<void(SolidParticle* particle, unsigned int i, unsigned int s)>
+  ::std::function<void(SolidParticle* particle, unsigned int i, unsigned int s)>
     positionFunction = nullptr;
-  std::function<void(SolidParticle* particle, const Vector3& vertex,
-                     unsigned int i)>
+  ::std::function<void(SolidParticle* particle, const Vector3& vertex,
+                       unsigned int i)>
     vertexFunction = nullptr;
 }; // end of struct SolidParticleSystemMeshBuilderOptions
 

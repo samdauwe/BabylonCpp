@@ -71,8 +71,8 @@ public:
   std::string customShader;
   bool preventAutoStart;
   Observable<ParticleSystem> onDisposeObservable;
-  std::function<void(std::vector<Particle*>& particles)> updateFunction;
-  std::function<void()> onAnimationEnd;
+  ::std::function<void(std::vector<Particle*>& particles)> updateFunction;
+  ::std::function<void()> onAnimationEnd;
   int blendMode;
   bool forceDepthWrite;
   Vector3 gravity;
@@ -84,11 +84,11 @@ public:
   Color4 color2;
   Color4 colorDead;
   Color4 textureMask;
-  std::function<void(float emitPower, const Matrix& worldMatrix,
-                     Vector3& directionToUpdate, Particle* particle)>
+  ::std::function<void(float emitPower, const Matrix& worldMatrix,
+                       Vector3& directionToUpdate, Particle* particle)>
     startDirectionFunction;
-  std::function<void(const Matrix& worldMatrix, Vector3& positionToUpdate,
-                     Particle* particle)>
+  ::std::function<void(const Matrix& worldMatrix, Vector3& positionToUpdate,
+                       Particle* particle)>
     startPositionFunction;
 
 private:

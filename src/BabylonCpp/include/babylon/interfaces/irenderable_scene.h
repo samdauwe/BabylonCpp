@@ -14,14 +14,14 @@ public:
   void initialize();
 
   virtual void render();
-  virtual const char* getName() = 0;
+  virtual const char* getName()                               = 0;
   virtual void initializeScene(ICanvas* canvas, Scene* scene) = 0;
 
   Scene* getScene() const;
   Engine* getEngine() const;
 
 protected:
-  std::function<void()> _renderFunction;
+  ::std::function<void()> _renderFunction;
 
 protected:
   bool _initialized;

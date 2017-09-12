@@ -19,10 +19,10 @@ ClickInfo::ClickInfo(const ClickInfo& otherClickInfo)
 }
 
 ClickInfo::ClickInfo(ClickInfo&& otherClickInfo)
-    : _singleClick{std::move(otherClickInfo._singleClick)}
-    , _doubleClick{std::move(otherClickInfo._doubleClick)}
-    , _hasSwiped{std::move(otherClickInfo._hasSwiped)}
-    , _ignore{std::move(otherClickInfo._ignore)}
+    : _singleClick{::std::move(otherClickInfo._singleClick)}
+    , _doubleClick{::std::move(otherClickInfo._doubleClick)}
+    , _hasSwiped{::std::move(otherClickInfo._hasSwiped)}
+    , _ignore{::std::move(otherClickInfo._ignore)}
 {
 }
 
@@ -41,10 +41,10 @@ ClickInfo& ClickInfo::operator=(const ClickInfo& otherClickInfo)
 ClickInfo& ClickInfo::operator=(ClickInfo&& otherClickInfo)
 {
   if (&otherClickInfo != this) {
-    _singleClick = std::move(otherClickInfo._singleClick);
-    _doubleClick = std::move(otherClickInfo._doubleClick);
-    _hasSwiped   = std::move(otherClickInfo._hasSwiped);
-    _ignore      = std::move(otherClickInfo._ignore);
+    _singleClick = ::std::move(otherClickInfo._singleClick);
+    _doubleClick = ::std::move(otherClickInfo._doubleClick);
+    _hasSwiped   = ::std::move(otherClickInfo._hasSwiped);
+    _ignore      = ::std::move(otherClickInfo._ignore);
   }
 
   return *this;

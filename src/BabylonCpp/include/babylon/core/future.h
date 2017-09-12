@@ -28,11 +28,11 @@ std::future<typename std::result_of<Func()>::type> spawn_task(Func func,
     return future_result;
   }
 
-  task_type task(std::move(func));
+  task_type task(::std::move(func));
 
   std::future<result_type> result = task.get_future();
-  worker->send(MoveOnCopy<task_type>(std::move(task)));
-  return std::move(result);
+  worker->send(MoveOnCopy<task_type>(::std::move(task)));
+  return ::std::move(result);
 }
 
 } // end of namespace BABYLON

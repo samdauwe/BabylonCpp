@@ -49,13 +49,13 @@ public:
   static void ImportMesh(
     const std::vector<std::string>& meshesNames, const std::string& rootUrl,
     const std::string& sceneFilename, Scene* scene,
-    const std::function<void(std::vector<AbstractMesh*>& meshes,
-                             std::vector<ParticleSystem*>& particleSystems,
-                             std::vector<Skeleton*>& skeletons)>& onsuccess
+    const ::std::function<void(std::vector<AbstractMesh*>& meshes,
+                               std::vector<ParticleSystem*>& particleSystems,
+                               std::vector<Skeleton*>& skeletons)>& onsuccess
     = nullptr,
-    const std::function<void()>& progressCallBack = nullptr,
-    const std::function<void(Scene* scene, const std::string& message,
-                             const std::string& exception)>& onerror
+    const ::std::function<void()>& progressCallBack = nullptr,
+    const ::std::function<void(Scene* scene, const std::string& message,
+                               const std::string& exception)>& onerror
     = nullptr);
 
   /**
@@ -71,9 +71,9 @@ public:
   std::unique_ptr<Scene>
   Load(const std::string& rootUrl, const std::string& sceneFilename,
        Engine* engine,
-       const std::function<void(Scene* scene)>& onsuccess = nullptr,
-       const std::function<void()>& progressCallBack      = nullptr,
-       const std::function<void(Scene* scene)>& onerror   = nullptr);
+       const ::std::function<void(Scene* scene)>& onsuccess = nullptr,
+       const ::std::function<void()>& progressCallBack      = nullptr,
+       const ::std::function<void(Scene* scene)>& onerror   = nullptr);
 
   /**
    * Append a scene
@@ -85,9 +85,9 @@ public:
   static void
   Append(const std::string& rootUrl, const std::string& sceneFilename,
          Scene* scene,
-         const std::function<void(Scene* scene)>& onsuccess = nullptr,
-         const std::function<void()>& progressCallBack      = nullptr,
-         const std::function<void(Scene* scene)>& onerror   = nullptr);
+         const ::std::function<void(Scene* scene)>& onsuccess = nullptr,
+         const ::std::function<void()>& progressCallBack      = nullptr,
+         const ::std::function<void(Scene* scene)>& onerror   = nullptr);
 
 }; // end of struct SceneLoader
 

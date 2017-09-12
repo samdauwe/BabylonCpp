@@ -310,7 +310,7 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
       break;
     }
 
-    const std::string lightIndexStr = std::to_string(lightIndex);
+    const std::string lightIndexStr = ::std::to_string(lightIndex);
     stl_util::concat(uniformsList,
                      {
                        "vLightData" + lightIndexStr,      //
@@ -342,7 +342,7 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
       break;
     }
 
-    const std::string lightIndexStr = std::to_string(lightIndex);
+    const std::string lightIndexStr = ::std::to_string(lightIndex);
     stl_util::concat(options.uniformsNames,
                      {
                        "vLightData" + lightIndexStr,      //
@@ -377,7 +377,7 @@ void MaterialHelper::HandleFallbacksForShadows(
       break;
     }
 
-    const std::string lightIndexStr = std::to_string(lightIndex);
+    const std::string lightIndexStr = ::std::to_string(lightIndex);
 
     if (lightIndex > 0) {
       fallbacks.addFallback(lightIndex, "LIGHT" + lightIndexStr);
@@ -412,7 +412,7 @@ void MaterialHelper::PrepareAttributesForMorphTargets(
       auto manager = _mesh->morphTargetManager();
       auto normal  = manager->supportsNormals() && defines[NORMAL];
       for (unsigned int index = 0; index < influencers; index++) {
-        const std::string indexStr = std::to_string(index);
+        const std::string indexStr = ::std::to_string(index);
         attribs.emplace_back(std::string(VertexBuffer::PositionKindChars)
                              + indexStr);
 
@@ -466,7 +466,7 @@ void MaterialHelper::BindLightShadow(Light* light, Scene* /*scene*/,
   if (light->shadowEnabled && mesh->receiveShadows()) {
     auto shadowGenerator = light->getShadowGenerator();
     if (shadowGenerator) {
-      shadowGenerator->bindShadowLight(std::to_string(lightIndex), effect);
+      shadowGenerator->bindShadowLight(::std::to_string(lightIndex), effect);
     }
   }
 }
@@ -474,7 +474,7 @@ void MaterialHelper::BindLightShadow(Light* light, Scene* /*scene*/,
 void MaterialHelper::BindLightProperties(Light* light, Effect* effect,
                                          unsigned int lightIndex)
 {
-  light->transferToEffect(effect, std::to_string(lightIndex));
+  light->transferToEffect(effect, ::std::to_string(lightIndex));
 }
 
 void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
@@ -486,7 +486,7 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
   unsigned int lightIndex = 0;
 
   for (auto& light : mesh->_lightSources) {
-    const std::string lightIndexStr = std::to_string(lightIndex);
+    const std::string lightIndexStr = ::std::to_string(lightIndex);
     const auto scaledIntensity      = light->getScaledIntensity();
     light->_uniformBuffer->bindToEffect(effect, "Light" + lightIndexStr);
 

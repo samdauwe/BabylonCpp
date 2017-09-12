@@ -11,7 +11,7 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT CollisionCoordinatorWorker
-  : public ICollisionCoordinator {
+    : public ICollisionCoordinator {
 
 public:
   CollisionCoordinatorWorker();
@@ -22,12 +22,12 @@ public:
   static SerializedGeometry SerializeGeometry(Geometry* geometry);
 
   /** Methods **/
-  void getNewPosition(
-    Vector3& position, Vector3& velocity, Collider* collider,
-    unsigned int maximumRetry, AbstractMesh* excludedMesh,
-    const std::function<void(unsigned int collisionIndex, Vector3& newPosition,
+  void getNewPosition(Vector3& position, Vector3& velocity, Collider* collider,
+                      unsigned int maximumRetry, AbstractMesh* excludedMesh,
+                      const ::std::function<
+                        void(unsigned int collisionIndex, Vector3& newPosition,
                              AbstractMesh* AbstractMesh)>& onNewPosition,
-    unsigned int collisionIndex) override;
+                      unsigned int collisionIndex) override;
   void init(Scene* scene) override;
   void destroy() override;
   void onMeshAdded(AbstractMesh* mesh) override;
@@ -45,9 +45,9 @@ private:
   Scene* _scene;
   Vector3 _scaledPosition;
   Vector3 _scaledVelocity;
-  std::vector<std::function<void(unsigned int collisionIndex,
-                                 Vector3& newPosition,
-                                 AbstractMesh* collidedMesh)>>
+  std::vector<
+    ::std::function<void(unsigned int collisionIndex, Vector3& newPosition,
+                         AbstractMesh* collidedMesh)>>
     _collisionsCallbackArray;
   bool _init;
   int _runningUpdated;

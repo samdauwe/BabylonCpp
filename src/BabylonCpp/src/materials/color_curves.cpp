@@ -64,7 +64,7 @@ ColorCurves::ColorCurves(const ColorCurves& other)
 
 ColorCurves::ColorCurves(ColorCurves&& other)
 {
-  *this = std::move(other);
+  *this = ::std::move(other);
 }
 
 ColorCurves& ColorCurves::operator=(const ColorCurves& other)
@@ -102,30 +102,30 @@ ColorCurves& ColorCurves::operator=(const ColorCurves& other)
 ColorCurves& ColorCurves::operator=(ColorCurves&& other)
 {
   if (&other != this) {
-    _dirty                = std::move(other._dirty);
-    _tempColor            = std::move(other._tempColor);
-    _globalCurve          = std::move(other._globalCurve);
-    _highlightsCurve      = std::move(other._highlightsCurve);
-    _midtonesCurve        = std::move(other._midtonesCurve);
-    _shadowsCurve         = std::move(other._shadowsCurve);
-    _positiveCurve        = std::move(other._positiveCurve);
-    _negativeCurve        = std::move(other._negativeCurve);
-    _globalHue            = std::move(other._globalHue);
-    _globalDensity        = std::move(other._globalDensity);
-    _globalSaturation     = std::move(other._globalSaturation);
-    _globalExposure       = std::move(other._globalExposure);
-    _highlightsHue        = std::move(other._highlightsHue);
-    _highlightsDensity    = std::move(other._highlightsDensity);
-    _highlightsSaturation = std::move(other._highlightsSaturation);
-    _highlightsExposure   = std::move(other._highlightsExposure);
-    _midtonesHue          = std::move(other._midtonesHue);
-    _midtonesDensity      = std::move(other._midtonesDensity);
-    _midtonesSaturation   = std::move(other._midtonesSaturation);
-    _midtonesExposure     = std::move(other._midtonesExposure);
-    _shadowsHue           = std::move(other._shadowsHue);
-    _shadowsDensity       = std::move(other._shadowsDensity);
-    _shadowsSaturation    = std::move(other._shadowsSaturation);
-    _shadowsExposure      = std::move(other._shadowsExposure);
+    _dirty                = ::std::move(other._dirty);
+    _tempColor            = ::std::move(other._tempColor);
+    _globalCurve          = ::std::move(other._globalCurve);
+    _highlightsCurve      = ::std::move(other._highlightsCurve);
+    _midtonesCurve        = ::std::move(other._midtonesCurve);
+    _shadowsCurve         = ::std::move(other._shadowsCurve);
+    _positiveCurve        = ::std::move(other._positiveCurve);
+    _negativeCurve        = ::std::move(other._negativeCurve);
+    _globalHue            = ::std::move(other._globalHue);
+    _globalDensity        = ::std::move(other._globalDensity);
+    _globalSaturation     = ::std::move(other._globalSaturation);
+    _globalExposure       = ::std::move(other._globalExposure);
+    _highlightsHue        = ::std::move(other._highlightsHue);
+    _highlightsDensity    = ::std::move(other._highlightsDensity);
+    _highlightsSaturation = ::std::move(other._highlightsSaturation);
+    _highlightsExposure   = ::std::move(other._highlightsExposure);
+    _midtonesHue          = ::std::move(other._midtonesHue);
+    _midtonesDensity      = ::std::move(other._midtonesDensity);
+    _midtonesSaturation   = ::std::move(other._midtonesSaturation);
+    _midtonesExposure     = ::std::move(other._midtonesExposure);
+    _shadowsHue           = ::std::move(other._shadowsHue);
+    _shadowsDensity       = ::std::move(other._shadowsDensity);
+    _shadowsSaturation    = ::std::move(other._shadowsSaturation);
+    _shadowsExposure      = ::std::move(other._shadowsExposure);
   }
 
   return *this;

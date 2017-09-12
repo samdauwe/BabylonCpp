@@ -13,7 +13,7 @@ namespace BABYLON {
 
 ColorGradingTexture::ColorGradingTexture(const std::string& iUrl, Scene* scene)
     : BaseTexture{scene}
-    , _textureMatrix{std::make_unique<Matrix>(Matrix::Identity())}
+    , _textureMatrix{::std::make_unique<Matrix>(Matrix::Identity())}
 {
   if (iUrl.empty()) {
     return;
@@ -143,7 +143,7 @@ void ColorGradingTexture::loadTexture()
 
 std::unique_ptr<ColorGradingTexture> ColorGradingTexture::clone() const
 {
-  auto newTexture = std::make_unique<ColorGradingTexture>(url, getScene());
+  auto newTexture = ::std::make_unique<ColorGradingTexture>(url, getScene());
 
   // Base texture
   newTexture->level = level;
@@ -173,7 +173,7 @@ ColorGradingTexture::Parse(const Json::value& parsedTexture, Scene* scene,
   if (parsedTexture.contains("name")
       && !Json::GetBool(parsedTexture, "isRenderTarget")) {
     auto parsedTextureName = Json::GetString(parsedTexture, "name");
-    texture = std::make_unique<ColorGradingTexture>(parsedTextureName, scene);
+    texture = ::std::make_unique<ColorGradingTexture>(parsedTextureName, scene);
     texture->name  = parsedTextureName;
     texture->level = Json::GetNumber<float>(parsedTexture, "level", 0.f);
   }

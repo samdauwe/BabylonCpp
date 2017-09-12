@@ -109,7 +109,7 @@ public:
    * @brief Force shader compilation including textures ready check
    */
   void forceCompilation(
-    const std::function<void(ShadowGenerator* generator)>& onCompiled,
+    const ::std::function<void(ShadowGenerator* generator)>& onCompiled,
     const ShadowGeneratorCompileOptions& options) override;
 
   /**

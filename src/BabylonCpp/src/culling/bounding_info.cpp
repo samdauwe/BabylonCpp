@@ -25,11 +25,11 @@ BoundingInfo::BoundingInfo(const BoundingInfo& boundingInfo)
 }
 
 BoundingInfo::BoundingInfo(BoundingInfo&& other)
-    : minimum{std::move(other.minimum)}
-    , maximum{std::move(other.maximum)}
-    , boundingBox{BoundingBox(std::move(other.boundingBox))}
-    , boundingSphere{BoundingSphere(std::move(other.boundingSphere))}
-    , _isLocked{std::move(other._isLocked)}
+    : minimum{::std::move(other.minimum)}
+    , maximum{::std::move(other.maximum)}
+    , boundingBox{BoundingBox(::std::move(other.boundingBox))}
+    , boundingSphere{BoundingSphere(::std::move(other.boundingSphere))}
+    , _isLocked{::std::move(other._isLocked)}
 {
 }
 
@@ -49,11 +49,11 @@ BoundingInfo& BoundingInfo::operator=(const BoundingInfo& other)
 BoundingInfo& BoundingInfo::operator=(BoundingInfo&& other)
 {
   if (&other != this) {
-    minimum        = std::move(other.minimum);
-    maximum        = std::move(other.maximum);
-    boundingBox    = std::move(other.boundingBox);
-    boundingSphere = std::move(other.boundingSphere);
-    _isLocked      = std::move(other._isLocked);
+    minimum        = ::std::move(other.minimum);
+    maximum        = ::std::move(other.maximum);
+    boundingBox    = ::std::move(other.boundingBox);
+    boundingSphere = ::std::move(other.boundingSphere);
+    _isLocked      = ::std::move(other._isLocked);
   }
 
   return *this;

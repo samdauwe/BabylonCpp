@@ -55,7 +55,7 @@ SubMesh::~SubMesh()
 
 void SubMesh::addToMesh(std::unique_ptr<SubMesh>&& newSubMesh)
 {
-  _mesh->subMeshes.emplace_back(std::move(newSubMesh));
+  _mesh->subMeshes.emplace_back(::std::move(newSubMesh));
 }
 
 bool SubMesh::isGlobal() const
@@ -74,7 +74,7 @@ BoundingInfo* SubMesh::getBoundingInfo() const
 
 SubMesh& SubMesh::setBoundingInfo(const BoundingInfo& boundingInfo)
 {
-  _boundingInfo = std::make_unique<BoundingInfo>(boundingInfo);
+  _boundingInfo = ::std::make_unique<BoundingInfo>(boundingInfo);
   return *this;
 }
 
@@ -122,7 +122,7 @@ SubMesh& SubMesh::refreshBoundingInfo()
   auto data = _renderingMesh->getVerticesData(VertexBuffer::PositionKind);
 
   if (data.empty()) {
-    _boundingInfo = std::make_unique<BoundingInfo>(*_mesh->_boundingInfo);
+    _boundingInfo = ::std::make_unique<BoundingInfo>(*_mesh->_boundingInfo);
     return *this;
   }
 
@@ -141,7 +141,7 @@ SubMesh& SubMesh::refreshBoundingInfo()
       data, indices, indexStart, indexCount,
       _renderingMesh->geometry()->boundingBias());
   }
-  _boundingInfo = std::make_unique<BoundingInfo>(extend.min, extend.max);
+  _boundingInfo = ::std::make_unique<BoundingInfo>(extend.min, extend.max);
 
   return *this;
 }
@@ -186,10 +186,9 @@ GL::IGLBuffer* SubMesh::getLinesIndexBuffer(const Uint32Array& indices,
 
     for (size_t index = indexStart; index < indexStart + indexCount;
          index += 3) {
-      stl_util::concat(linesIndices,
-                       {indices[index + 0], indices[index + 1],
-                        indices[index + 1], indices[index + 2],
-                        indices[index + 2], indices[index + 0]});
+      stl_util::concat(linesIndices, {indices[index + 0], indices[index + 1],
+                                      indices[index + 1], indices[index + 2],
+                                      indices[index + 2], indices[index + 0]});
     }
 
     _linesIndexBuffer = engine->createIndexBuffer(linesIndices);
@@ -228,7 +227,7 @@ SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions,
       }
 
       if (fastCheck || !intersectInfo || length < intersectInfo->distance) {
-        intersectInfo = std::make_unique<IntersectionInfo>(length);
+        intersectInfo = ::std::make_unique<IntersectionInfo>(length);
 
         if (fastCheck) {
           break;
@@ -253,7 +252,7 @@ SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions,
 
         if (fastCheck || !intersectInfo
             || currentIntersectInfo->distance < intersectInfo->distance) {
-          intersectInfo         = std::move(currentIntersectInfo);
+          intersectInfo         = ::std::move(currentIntersectInfo);
           intersectInfo->faceId = index / 3;
 
           if (fastCheck) {
@@ -275,7 +274,7 @@ SubMesh* SubMesh::clone(AbstractMesh* newMesh, Mesh* newRenderingMesh) const
                    indexCount, newMesh, newRenderingMesh, false);
 
   if (!isGlobal()) {
-    result->_boundingInfo = std::make_unique<BoundingInfo>(
+    result->_boundingInfo = ::std::make_unique<BoundingInfo>(
       getBoundingInfo()->minimum, getBoundingInfo()->maximum);
   }
 
@@ -292,10 +291,10 @@ void SubMesh::dispose(bool /*doNotRecurse*/)
 
   // Remove from mesh
   _mesh->subMeshes.erase(
-    std::remove_if(_mesh->subMeshes.begin(), _mesh->subMeshes.end(),
-                   [this](const std::unique_ptr<SubMesh>& subMesh) {
-                     return subMesh.get() == this;
-                   }),
+    ::std::remove_if(_mesh->subMeshes.begin(), _mesh->subMeshes.end(),
+                     [this](const std::unique_ptr<SubMesh>& subMesh) {
+                       return subMesh.get() == this;
+                     }),
     _mesh->subMeshes.end());
 }
 

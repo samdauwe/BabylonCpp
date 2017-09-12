@@ -23,8 +23,8 @@ CollisionCoordinatorLegacy::~CollisionCoordinatorLegacy()
 void CollisionCoordinatorLegacy::getNewPosition(
   Vector3& position, Vector3& velocity, Collider* collider,
   unsigned int maximumRetry, AbstractMesh* excludedMesh,
-  const std::function<void(unsigned int collisionIndex, Vector3& newPosition,
-                           AbstractMesh* AbstractMesh)>& onNewPosition,
+  const ::std::function<void(unsigned int collisionIndex, Vector3& newPosition,
+                             AbstractMesh* AbstractMesh)>& onNewPosition,
   unsigned int collisionIndex)
 {
   position.divideToRef(collider->radius, _scaledPosition);

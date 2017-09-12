@@ -107,10 +107,10 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
       attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKindChars);
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
-                         + std::to_string(mesh->numBoneInfluencers()));
+                         + ::std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back(
       "#define BonesPerMesh "
-      + std::to_string((mesh->skeleton()->bones.size() + 1)));
+      + ::std::to_string((mesh->skeleton()->bones.size() + 1)));
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
@@ -131,11 +131,11 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
     _cachedDefines = join;
 
     EffectCreationOptions options;
-    options.attributes    = std::move(attribs);
+    options.attributes    = ::std::move(attribs);
     options.uniformsNames = {"world",         "mBones", "viewProjection",
                              "diffuseMatrix", "offset", "color"};
-    options.samplers = {"diffuseSampler"};
-    options.defines  = std::move(join);
+    options.samplers      = {"diffuseSampler"};
+    options.defines       = ::std::move(join);
 
     _effect = _scene->getEngine()->createEffect("outline", options,
                                                 _scene->getEngine());

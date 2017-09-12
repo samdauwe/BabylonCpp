@@ -7,7 +7,7 @@
 #include <babylon/core/logging/log_levels.h>
 #include <babylon/core/logging/log_message.h>
 
-#ifdef __PRETTY_FUNCTION__
+#ifndef __PRETTY_FUNCTION__
 #define __PRETTY_FUNCTION__ __FUNCDNAME__
 #endif
 
@@ -92,7 +92,7 @@ private:
       = BABYLON::Logger::CreateMessage(level, _ctx.str(), __FILE__, __LINE__,  \
                                        __FUNCTION__, __PRETTY_FUNCTION__);     \
     _logMessage.write(__VA_ARGS__);                                            \
-    BABYLON::Logger::Instance().log(std::move(_logMessage));                   \
+    BABYLON::Logger::Instance().log(::std::move(_logMessage));                 \
   }
 
 #define BABYLON_LOGF_MSG(level, context, printf_like_message, ...)             \
@@ -103,7 +103,7 @@ private:
       = BABYLON::Logger::CreateMessage(level, _ctx.str(), __FILE__, __LINE__,  \
                                        __FUNCTION__, __PRETTY_FUNCTION__);     \
     _logMessage.writef(printf_like_message, __VA_ARGS__);                      \
-    BABYLON::Logger::Instance().log(std::move(_logMessage));                   \
+    BABYLON::Logger::Instance().log(::std::move(_logMessage));                 \
   }
 
 // -- Default API syntax with variadic input parameters --

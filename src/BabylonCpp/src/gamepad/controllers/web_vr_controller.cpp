@@ -29,8 +29,8 @@ WebVRController::~WebVRController()
 }
 
 void WebVRController::setOnButtonStateChange(
-  const std::function<void(int controlledIndex, unsigned int buttonIndex,
-                           const ExtendedGamepadButton& state)>& callback)
+  const ::std::function<void(int controlledIndex, unsigned int buttonIndex,
+                             const ExtendedGamepadButton& state)>& callback)
 {
   _onButtonStateChange = callback;
 }

@@ -53,7 +53,7 @@ public:
     const AnimationValue& to,
     unsigned int loopMode           = Animation::ANIMATIONLOOPMODE_CYCLE,
     IEasingFunction* easingFunction = nullptr,
-    const std::function<void()>& onAnimationEnd = nullptr);
+    const ::std::function<void()>& onAnimationEnd = nullptr);
 
   static Animatable* CreateMergeAndStartAnimation(
     const std::string& name, Node* node, const std::string& targetProperty,
@@ -61,7 +61,7 @@ public:
     const AnimationValue& to,
     unsigned int loopMode           = Animation::ANIMATIONLOOPMODE_CYCLE,
     IEasingFunction* easingFunction = nullptr,
-    const std::function<void()>& onAnimationEnd = nullptr);
+    const ::std::function<void()>& onAnimationEnd = nullptr);
 
   /**
    * @brief Transition property of the Camera to the target Value.
@@ -78,7 +78,7 @@ public:
   TransitionTo(const std::string& property, const AnimationValue& targetValue,
                const AnimationValue& host, Scene* scene, float frameRate,
                Animation* transition, float duration,
-               const std::function<void()>& onAnimationEnd = nullptr);
+               const ::std::function<void()>& onAnimationEnd = nullptr);
 
   Animation(const std::string& name, const std::string& targetProperty,
             size_t framePerSecond, int dataType,
@@ -185,7 +185,7 @@ private:
   IEasingFunction* _easingFunction;
   // The set of event that will be linked to this animation
   std::vector<AnimationEvent> _events;
-  std::unordered_map<std::string, AnimationRange> _ranges;
+  ::std::unordered_map<std::string, AnimationRange> _ranges;
 
 }; // end of class Animation
 

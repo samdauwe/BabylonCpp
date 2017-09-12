@@ -160,7 +160,7 @@ void SSAORenderingPipeline::_createSSAOPostProcess(float ratio)
      "radius", "area", "fallOff", "base", "range", "viewport"},
     {"randomSampler"}, ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
     _scene->getEngine(), false,
-    "#define SAMPLES " + std::to_string(numSamples) + "\n#define SSAO");
+    "#define SAMPLES " + ::std::to_string(numSamples) + "\n#define SSAO");
 
   _ssaoPostProcess->setOnApply([&](Effect* effect) {
     if (_firstUpdate) {
@@ -219,9 +219,9 @@ void SSAORenderingPipeline::_createRandomTexture()
       randVector.y = std::floor(rand(-1.f, 1.f) * 255.f);
       randVector.z = std::floor(rand(-1.f, 1.f) * 255.f);
 
-      context->fillStyle = "rgb(" + std::to_string(randVector.x) + ", "
-                           + std::to_string(randVector.y) + ", "
-                           + std::to_string(randVector.z) + ")";
+      context->fillStyle = "rgb(" + ::std::to_string(randVector.x) + ", "
+                           + ::std::to_string(randVector.y) + ", "
+                           + ::std::to_string(randVector.z) + ")";
       context->fillRect(static_cast<int>(x), static_cast<int>(y), 1, 1);
     }
   }

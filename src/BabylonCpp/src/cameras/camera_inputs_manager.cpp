@@ -31,7 +31,7 @@ void CameraInputsManager<TCamera>::add(
     return;
   }
 
-  attached[type]                  = std::move(input);
+  attached[type]                  = ::std::move(input);
   ICameraInput<TCamera>* inputPtr = attached[type].get();
 
   inputPtr->camera = camera;
@@ -74,8 +74,8 @@ void CameraInputsManager<TCamera>::removeByType(const std::string& inputType)
 }
 
 template <class TCamera>
-std::function<void()> CameraInputsManager<TCamera>::_addCheckInputs(
-  const std::function<void()>& /*fn*/)
+::std::function<void()> CameraInputsManager<TCamera>::_addCheckInputs(
+  const ::std::function<void()>& /*fn*/)
 {
   return [&]() {
     // checkInputs();

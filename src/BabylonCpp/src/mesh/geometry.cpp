@@ -65,7 +65,7 @@ Geometry::~Geometry()
 
 void Geometry::addToScene(std::unique_ptr<Geometry>&& newGeometry)
 {
-  _scene->pushGeometry(std::move(newGeometry), true);
+  _scene->pushGeometry(::std::move(newGeometry), true);
 }
 
 const Vector2& Geometry::boundingBias() const
@@ -142,10 +142,10 @@ void Geometry::setAllVerticesData(VertexData* vertexData, bool updatable)
 Mesh* Geometry::setVerticesData(unsigned int kind, const Float32Array& data,
                                 bool updatable, int stride)
 {
-  auto buffer = std::make_unique<VertexBuffer>(_engine, data, kind, updatable,
-                                               _meshes.empty(), stride);
+  auto buffer = ::std::make_unique<VertexBuffer>(_engine, data, kind, updatable,
+                                                 _meshes.empty(), stride);
 
-  setVerticesBuffer(std::move(buffer));
+  setVerticesBuffer(::std::move(buffer));
 
   return nullptr;
 }
@@ -165,7 +165,7 @@ void Geometry::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
     _vertexBuffers[kind]->dispose();
   }
 
-  _vertexBuffers[kind] = std::move(buffer);
+  _vertexBuffers[kind] = ::std::move(buffer);
   auto _buffer         = _vertexBuffers[kind].get();
 
   if (kind == VertexBuffer::PositionKind) {
@@ -179,7 +179,7 @@ void Geometry::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
 
     for (auto& mesh : _meshes) {
       mesh->_boundingInfo
-        = std::make_unique<BoundingInfo>(extend().min, extend().max);
+        = ::std::make_unique<BoundingInfo>(extend().min, extend().max);
       mesh->_createGlobalSubMesh(false);
       mesh->computeWorldMatrix(true);
     }
@@ -241,7 +241,7 @@ void Geometry::updateBoundingInfo(bool updateExtends, const Float32Array& data)
   for (auto& mesh : _meshes) {
     if (updateExtends) {
       mesh->_boundingInfo
-        = std::make_unique<BoundingInfo>(extend().min, extend().max);
+        = ::std::make_unique<BoundingInfo>(extend().min, extend().max);
 
       for (auto& subMesh : mesh->subMeshes) {
         subMesh->refreshBoundingInfo();
@@ -508,7 +508,7 @@ void Geometry::_applyToMesh(Mesh* mesh)
                                           _totalVertices);
       }
       mesh->_boundingInfo
-        = std::make_unique<BoundingInfo>(extend().min, extend().max);
+        = ::std::make_unique<BoundingInfo>(extend().min, extend().max);
 
       mesh->_createGlobalSubMesh(false);
 
@@ -539,7 +539,7 @@ void Geometry::notifyUpdate(unsigned int kind)
   }
 }
 
-void Geometry::load(Scene* scene, const std::function<void()>& onLoaded)
+void Geometry::load(Scene* scene, const ::std::function<void()>& onLoaded)
 {
   if (delayLoadState == EngineConstants::DELAYLOADSTATE_LOADING) {
     return;
@@ -558,7 +558,7 @@ void Geometry::load(Scene* scene, const std::function<void()>& onLoaded)
 }
 
 void Geometry::_queueLoad(Scene* /*scene*/,
-                          const std::function<void()>& /*onLoaded*/)
+                          const ::std::function<void()>& /*onLoaded*/)
 {
 }
 
@@ -668,7 +668,7 @@ void Geometry::dispose(bool /*doNotRecurse*/)
 
 Geometry* Geometry::copy(const std::string& iId)
 {
-  auto vertexData = std::make_unique<VertexData>();
+  auto vertexData = ::std::make_unique<VertexData>();
 
   vertexData->indices.clear();
 
@@ -701,7 +701,7 @@ Geometry* Geometry::copy(const std::string& iId)
 
   // Bounding info
   geometry->_boundingInfo
-    = std::make_unique<BoundingInfo>(extend().min, extend().max);
+    = ::std::make_unique<BoundingInfo>(extend().min, extend().max);
 
   return geometry;
 }
@@ -894,7 +894,7 @@ Geometry* Geometry::Parse(const Json::value& parsedVertexData, Scene* scene,
     geometry->delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
     geometry->delayLoadingFile
       = rootUrl + Json::GetString(parsedVertexData, "delayLoadingFile", "");
-    geometry->_boundingInfo = std::make_unique<BoundingInfo>(
+    geometry->_boundingInfo = ::std::make_unique<BoundingInfo>(
       Vector3::FromArray(
         Json::ToArray<float>(parsedVertexData, "boundingBoxMinimum")),
       Vector3::FromArray(

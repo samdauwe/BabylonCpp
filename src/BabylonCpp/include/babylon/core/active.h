@@ -18,7 +18,7 @@ namespace BABYLON {
 class Active {
 
 public:
-  using Callback = std::function<void()>;
+  using Callback = ::std::function<void()>;
 
 public:
   virtual ~Active()
@@ -36,7 +36,7 @@ public:
   static std::unique_ptr<Active> createActive()
   {
     std::unique_ptr<Active> aPtr(new Active());
-    aPtr->_thread = std::thread(&Active::run, aPtr.get());
+    aPtr->_thread = ::std::thread(&Active::run, aPtr.get());
     return aPtr;
   }
 
@@ -58,7 +58,7 @@ private:
   }
 
   SharedQueue<Callback> _messageQueue;
-  std::thread _thread;
+  ::std::thread _thread;
   bool _done;
 
 }; // end of class Active

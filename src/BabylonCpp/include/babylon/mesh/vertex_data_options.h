@@ -222,8 +222,8 @@ public:
 public:
   std::vector<Vector3> shape;
   std::vector<Vector3> path;
-  std::function<float(float i, float distance)> scaleFunction;
-  std::function<float(float i, float distance)> rotationFunction;
+  ::std::function<float(float i, float distance)> scaleFunction;
+  ::std::function<float(float i, float distance)> rotationFunction;
   bool ribbonCloseArray;
   bool ribbonClosePath;
   unsigned int cap;
@@ -260,7 +260,7 @@ public:
   unsigned int bufferHeight;
   Color3 colorFilter;
   bool updatable;
-  std::function<void(GroundMesh* mesh)> onReady;
+  ::std::function<void(GroundMesh* mesh)> onReady;
 
 }; // end of class GroundFromHeightMapOptions
 
@@ -684,7 +684,7 @@ public:
   std::vector<Vector3> path;
   float radius;
   unsigned int tessellation;
-  std::function<float(unsigned int i, unsigned int distance)> radiusFunction;
+  ::std::function<float(unsigned int i, unsigned int distance)> radiusFunction;
   unsigned int cap;
   unsigned int sideOrientation;
   Vector4 frontUVs;

@@ -67,7 +67,7 @@ void Camera::addToScene(std::unique_ptr<Camera>&& newCamera)
     getScene()->activeCamera = newCamera.get();
   }
 
-  getScene()->addCamera(std::move(newCamera));
+  getScene()->addCamera(::std::move(newCamera));
 }
 
 std::string Camera::toString(bool fullDetails) const
@@ -323,7 +323,7 @@ Int32Array Camera::detachPostProcess(PostProcess* postProcess,
 Matrix* Camera::getWorldMatrix()
 {
   if (!_worldMatrix) {
-    _worldMatrix = std::make_unique<Matrix>(Matrix::Identity());
+    _worldMatrix = ::std::make_unique<Matrix>(Matrix::Identity());
   }
 
   auto viewMatrix = getViewMatrix();
@@ -354,7 +354,7 @@ Matrix& Camera::getViewMatrix(bool force)
   }
   else {
     if (!_worldMatrix) {
-      _worldMatrix = std::make_unique<Matrix>(Matrix::Identity());
+      _worldMatrix = ::std::make_unique<Matrix>(Matrix::Identity());
     }
 
     _computedViewMatrix.invertToRef(*_worldMatrix);

@@ -9,7 +9,7 @@ namespace BABYLON {
 template <typename... Ts>
 LensFlare* LensFlare::New(Ts&&... args)
 {
-  auto lensFlare = std::make_unique<LensFlare>(std::forward<Ts>(args)...);
+  auto lensFlare = ::std::make_unique<LensFlare>(std::forward<Ts>(args)...);
   lensFlare->_system->lensFlares.emplace_back(lensFlare);
   return lensFlare.get();
 }
@@ -40,10 +40,10 @@ void LensFlare::dispose(bool /*doNotRecurse*/)
 
   // Remove from scene
   _system->lensFlares.erase(
-    std::remove_if(_system->lensFlares.begin(), _system->lensFlares.end(),
-                   [this](const std::unique_ptr<LensFlare>& lensFlare) {
-                     return lensFlare.get() == this;
-                   }),
+    ::std::remove_if(_system->lensFlares.begin(), _system->lensFlares.end(),
+                     [this](const std::unique_ptr<LensFlare>& lensFlare) {
+                       return lensFlare.get() == this;
+                     }),
     _system->lensFlares.end());
 }
 

@@ -12,10 +12,11 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT PostProcessRenderPass {
 
 public:
-  PostProcessRenderPass(Scene* scene, const std::string& name, ISize size,
-                        const std::vector<Mesh*>& renderList,
-                        const std::function<void(int faceIndex)>& beforeRender,
-                        const std::function<void(int faceIndex)>& afterRender);
+  PostProcessRenderPass(
+    Scene* scene, const std::string& name, ISize size,
+    const std::vector<Mesh*>& renderList,
+    const ::std::function<void(int faceIndex)>& beforeRender,
+    const ::std::function<void(int faceIndex)>& afterRender);
   ~PostProcessRenderPass();
 
   int _incRefCount();

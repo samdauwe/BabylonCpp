@@ -30,10 +30,10 @@ public:
   ~RenderTargetTexture();
 
   /** Events **/
-  void setOnAfterUnbind(const std::function<void()>& callback);
-  void setOnBeforeRender(const std::function<void(int faceIndex)>& callback);
-  void setOnAfterRender(const std::function<void(int faceIndex)>& callback);
-  void setOnClear(const std::function<void(Engine* engine)>& callback);
+  void setOnAfterUnbind(const ::std::function<void()>& callback);
+  void setOnBeforeRender(const ::std::function<void(int faceIndex)>& callback);
+  void setOnAfterRender(const ::std::function<void(int faceIndex)>& callback);
+  void setOnClear(const ::std::function<void(Engine* engine)>& callback);
 
   IRenderTargetOptions& renderTargetOptions();
   const IRenderTargetOptions& renderTargetOptions() const;
@@ -69,11 +69,11 @@ public:
    */
   void setRenderingOrder(
     unsigned int renderingGroupId,
-    const std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn
+    const ::std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn
     = nullptr,
-    const std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn
+    const ::std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn
     = nullptr,
-    const std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn
+    const ::std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn
     = nullptr);
 
   /**
@@ -109,7 +109,7 @@ public:
    * render.
    * If set, the renderList property will be overwritten.
    */
-  std::function<bool(AbstractMesh*)> renderListPredicate;
+  ::std::function<bool(AbstractMesh*)> renderListPredicate;
 
   /**
    * Use this list to define the list of mesh you want to render.
@@ -120,17 +120,17 @@ public:
   bool renderSprites;
   unsigned int coordinatesMode;
   Camera* activeCamera;
-  std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
-                     const std::vector<SubMesh*>& transparentSubMeshes,
-                     const std::vector<SubMesh*>& alphaTestSubMeshes)>
+  ::std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
+                       const std::vector<SubMesh*>& transparentSubMeshes,
+                       const std::vector<SubMesh*>& alphaTestSubMeshes)>
     customRenderFunction;
   bool useCameraPostProcesses;
   bool ignoreCameraViewport;
   Nullable<Color4> clearColor;
   bool _generateMipMaps;
   std::vector<std::string> _waitingRenderList;
-  std::function<void()> onAfterRender;
-  std::function<void()> onBeforeRender;
+  ::std::function<void()> onAfterRender;
+  ::std::function<void()> onBeforeRender;
 
   // Events
 

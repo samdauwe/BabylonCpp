@@ -36,19 +36,21 @@ public:
   ~Xbox360Pad();
 
   void setOnlefttriggerchanged(
-    const std::function<void(unsigned int value)>& callback);
+    const ::std::function<void(unsigned int value)>& callback);
   void onrighttriggerchanged(
-    const std::function<void(unsigned int value)>& callback);
+    const ::std::function<void(unsigned int value)>& callback);
   float leftTrigger() const;
   void setLeftTrigger(float newValue);
   float rightTrigger() const;
   void setRightTrigger(float newValue);
   void onbuttondown(
-    const std::function<void(Xbox360Button buttonPressed)>& callback);
+    const ::std::function<void(Xbox360Button buttonPressed)>& callback);
+  void onbuttonup(
+    const ::std::function<void(Xbox360Button buttonReleased)>& callback);
   void
-  onbuttonup(const std::function<void(Xbox360Button buttonReleased)>& callback);
-  void ondpaddown(const std::function<void(Xbox360Dpad dPadPressed)>& callback);
-  void ondpadup(const std::function<void(Xbox360Dpad dPadReleased)>& callback);
+  ondpaddown(const ::std::function<void(Xbox360Dpad dPadPressed)>& callback);
+  void
+  ondpadup(const ::std::function<void(Xbox360Dpad dPadReleased)>& callback);
   unsigned int buttonA() const;
   void setButtonA(unsigned int value);
   unsigned int buttonB() const;
@@ -89,13 +91,13 @@ private:
   float _leftTrigger;
   float _rightTrigger;
 
-  std::function<void(float value)> _onlefttriggerchanged;
-  std::function<void(float value)> _onrighttriggerchanged;
+  ::std::function<void(float value)> _onlefttriggerchanged;
+  ::std::function<void(float value)> _onrighttriggerchanged;
 
-  std::function<void(Xbox360Button buttonPressed)> _onbuttondown;
-  std::function<void(Xbox360Button buttonReleased)> _onbuttonup;
-  std::function<void(Xbox360Dpad dPadPressed)> _ondpaddown;
-  std::function<void(Xbox360Dpad dPadReleased)> _ondpadup;
+  ::std::function<void(Xbox360Button buttonPressed)> _onbuttondown;
+  ::std::function<void(Xbox360Button buttonReleased)> _onbuttonup;
+  ::std::function<void(Xbox360Dpad dPadPressed)> _ondpaddown;
+  ::std::function<void(Xbox360Dpad dPadReleased)> _ondpadup;
 
   unsigned int _buttonA;
   unsigned int _buttonB;

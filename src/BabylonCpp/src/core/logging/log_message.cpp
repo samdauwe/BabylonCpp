@@ -31,7 +31,7 @@ LogMessage::LogMessage(const LogMessage& otherLogMessage)
 
 LogMessage::LogMessage(LogMessage&& otherLogMessage)
 {
-  *this = std::move(otherLogMessage);
+  *this = ::std::move(otherLogMessage);
 }
 
 LogMessage& LogMessage::operator=(const LogMessage& otherLogMessage)
@@ -55,14 +55,14 @@ LogMessage& LogMessage::operator=(const LogMessage& otherLogMessage)
 LogMessage& LogMessage::operator=(LogMessage&& otherLogMessage)
 {
   if (&otherLogMessage != this) {
-    _level          = std::move(otherLogMessage._level);
-    _timestamp      = std::move(otherLogMessage._timestamp);
-    _file           = std::move(otherLogMessage._file);
-    _lineNumber     = std::move(otherLogMessage._lineNumber);
-    _threadId       = std::move(otherLogMessage._threadId);
-    _context        = std::move(otherLogMessage._context);
-    _function       = std::move(otherLogMessage._function);
-    _prettyFunction = std::move(otherLogMessage._prettyFunction);
+    _level          = ::std::move(otherLogMessage._level);
+    _timestamp      = ::std::move(otherLogMessage._timestamp);
+    _file           = ::std::move(otherLogMessage._file);
+    _lineNumber     = ::std::move(otherLogMessage._lineNumber);
+    _threadId       = ::std::move(otherLogMessage._threadId);
+    _context        = ::std::move(otherLogMessage._context);
+    _function       = ::std::move(otherLogMessage._function);
+    _prettyFunction = ::std::move(otherLogMessage._prettyFunction);
     _oss.clear();
     _oss << otherLogMessage._oss.str();
     otherLogMessage._oss.clear();
@@ -178,10 +178,10 @@ std::string LogMessage::message() const
 }
 
 /**
-* capturef, used for "printf" like API in CHECKF, LOGF, LOGF_IF
-* See also for the attribute formatting ref:
-* http://www.codemaestro.com/reviews/18
-*/
+ * capturef, used for "printf" like API in CHECKF, LOGF, LOGF_IF
+ * See also for the attribute formatting ref:
+ * http://www.codemaestro.com/reviews/18
+ */
 void LogMessage::writef(const char* printf_like_message, ...)
 {
   static const int kMaxMessageSize               = 2048;

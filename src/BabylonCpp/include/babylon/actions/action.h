@@ -11,7 +11,7 @@ namespace BABYLON {
  * is launched when its trigger is fired.
  */
 class BABYLON_SHARED_EXPORT Action
-  : public std::enable_shared_from_this<Action> {
+    : public ::std::enable_shared_from_this<Action> {
 
 public:
   template <typename... Ts>
