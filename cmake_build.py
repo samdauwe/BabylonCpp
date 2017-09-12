@@ -3,20 +3,31 @@
 import os
 import sys
 
+# Microsoft Visual Studio 2017 Community Version
+MSVC2017 = {
+    "productName": "Visual Studio 2017",
+    "versionNumber": "15.0",
+    "cmakeGeneratorPlatform": "Visual Studio 15 2017 Win64",
+    "path": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017" \
+              "\\Community\\Common7\\Tools\\VsDevCmd.bat"
+}
+# Microsoft Visual Studio to be used
+MSVC = MSVC2017
+
 def getPlatformKey():
     """
     Returns the platform key (type of operating system and 32bit/64bit).
     """
     import platform
-    osPrecision = '64' if platform.architecture()[0] == '64bit' else '32'  
+    osPrecision = "64" if platform.architecture()[0] == "64bit" else "32"  
     if sys.platform == "linux" or sys.platform == "linux2":
         # linux
-        return 'Linux_x86_%s' % osPrecision
+        return "Linux_x86_%s" % osPrecision
     elif sys.platform == "win32":
         # Windows...
-        return 'Win32_%s' % osPrecision
+        return "Win32_%s" % osPrecision
     else:
-        return 'Unknown'
+        return "Unknown"
 
 def getCPUCount():
     """
@@ -78,7 +89,7 @@ def runCommand(command = []):
     returnCode = 0
     errorMessage = ""
     try:
-        call(command)
+        call(command, shell=True)
     except OSError as exception:
         returnCode = exception.errno
         errorMessage = str(exception)
@@ -91,7 +102,7 @@ def getCMakeOptions(releaseBuild = True):
     cmakeOptions = ["-DCMAKE_BUILD_TYPE=%s" % \
                     ["Debug", "Release"][releaseBuild]]
     if getPlatformKey() == "Win32_64":
-        cmakeOptions += ["-G", "Visual Studio 15 2017 Win64"]
+        cmakeOptions += ["-G", MSVC["cmakeGeneratorPlatform"]]
     return cmakeOptions
 
 def runCmakeConfigure(buildDirectory, cmakeOptions=[]):
@@ -124,7 +135,8 @@ def startBuild(buildDirectory, cmakeOptions=[], verbose=False):
             cwd = os.getcwd()
             os.chdir(buildDirectory)
             buildCommand = []
-            if getPlatformKey() == "Linux_x86_64":
+            platformKey = getPlatformKey()
+            if platformKey == "Linux_x86_64":
                 # Create the make command
                 buildCommand = ["make"]
                 if verbose:
@@ -132,8 +144,20 @@ def startBuild(buildDirectory, cmakeOptions=[], verbose=False):
                     buildCommand += ["--debug=v"]
                 # - Specifies the number of jobs to run simultaneously
                 buildCommand += ["--jobs=%d" % getCPUCount()]
+                # Run the build command
+                print "Running build command: %s" % " ".join(buildCommand)
+                res = runCommand(buildCommand)
+            elif platformKey == "Win32_64":
+                # Create batch file for running the build
+                batchFileName = "runMSVCBuild.bat"
+                with open(batchFileName, "w") as f:
+                    # Run the Visual Studio developer command prompt
+                    f.write('call "%s"\n' % MSVC["path"])
+                    f.write("msbuild BabylonCpp.sln\n")
+                buildCommand = [batchFileName]
+                print "Running build command: %s" % " ".join(buildCommand)
+                res = runCommand(buildCommand)
             # run build command
-            print "Running build command: %s" % " ".join(buildCommand)
             res = runCommand(buildCommand)
             os.chdir(cwd)
     return res
@@ -201,7 +225,7 @@ def main():
             # - Remove the release build directory
             removeDir(getBuildDirectory(releaseBuild=True))
             # - Remove the debug build directory
-            removeDir(getBuildDirectory(releaseBuild=False))  
+            removeDir(getBuildDirectory(releaseBuild=False))
 
 if __name__ == '__main__':
     main()
