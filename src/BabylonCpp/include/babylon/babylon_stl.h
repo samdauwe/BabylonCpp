@@ -119,6 +119,10 @@ using Float64Array = std::vector<std::double_t>;
 // Indices array alias
 using IndicesArray = std::vector<std::uint32_t>;
 
+// -- Containers library -- //
+template <class T, class Allocator = ::std::allocator<T>>
+using vector_t = ::std::vector<T, Allocator>;
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_STL_H
