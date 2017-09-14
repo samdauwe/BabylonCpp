@@ -126,6 +126,15 @@ using array_t = ::std::array<T, N>;
 template <class T, class Allocator = ::std::allocator<T>>
 using vector_t = ::std::vector<T, Allocator>;
 
+/** Strings library **/
+template <class charT,
+          class traits = ::std::char_traits<charT>, // basic_string::traits_type
+          class Alloc  = ::std::allocator<charT> // basic_string::allocator_type
+          >
+using basic_string_t = ::std::basic_string<charT, traits, Alloc>;
+
+using string_t = ::std::basic_string<char>;
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_STL_H
