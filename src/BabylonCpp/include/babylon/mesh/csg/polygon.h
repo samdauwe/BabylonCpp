@@ -24,7 +24,7 @@ struct BABYLON_SHARED_EXPORT PolygonOptions {
 class BABYLON_SHARED_EXPORT Polygon {
 
 public:
-  Polygon(const std::vector<Vertex*>& vertices, const PolygonOptions& shared);
+  Polygon(const vector_t<Vertex*>& vertices, const PolygonOptions& shared);
   Polygon(const Polygon& otherPolygon);
   Polygon(Polygon&& otherPolygon);
   Polygon& operator=(const Polygon& otherPolygon);
@@ -33,13 +33,13 @@ public:
   Polygon clone() const;
   Polygon* cloneToNewObject() const;
   friend std::ostream& operator<<(std::ostream& os, const Polygon& polygon);
-  std::string toString() const;
+  string_t toString() const;
 
   void flip();
   bool hasPlane() const;
 
 public:
-  std::vector<Vertex*> vertices;
+  vector_t<Vertex*> vertices;
   PolygonOptions shared;
   Plane plane;
 

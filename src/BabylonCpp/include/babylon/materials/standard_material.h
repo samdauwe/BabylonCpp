@@ -66,12 +66,12 @@ public:
   void buildUniformLayout();
   void unbind() override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
-  std::vector<IAnimatable*> getAnimatables();
-  std::vector<BaseTexture*> getActiveTextures() const override;
+  vector_t<IAnimatable*> getAnimatables();
+  vector_t<BaseTexture*> getActiveTextures() const override;
   bool hasTexture(BaseTexture* texture) const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
-  Material* clone(const std::string& name,
+  Material* clone(const string_t& name,
                   bool cloneChildren = false) const override;
   Json::object serialize() const;
 
@@ -190,7 +190,7 @@ public:
 
   // Statics
   static StandardMaterial* Parse(const Json::value& source, Scene* scene,
-                                 const std::string& rootUrl);
+                                 const string_t& rootUrl);
   static bool DiffuseTextureEnabled();
   static void SetDiffuseTextureEnabled(bool value);
   static bool AmbientTextureEnabled();
@@ -215,7 +215,7 @@ public:
   static void SetFresnelEnabled(bool value);
 
 protected:
-  StandardMaterial(const std::string& name, Scene* scene);
+  StandardMaterial(const string_t& name, Scene* scene);
   StandardMaterial(const StandardMaterial& other);
 
 protected:
@@ -238,14 +238,14 @@ public:
   float parallaxScaleBias;
   float indexOfRefraction;
   bool invertRefractionY;
-  ::std::function<std::string(
-    const std::string& shaderName, std::vector<std::string>& uniforms,
-    std::vector<std::string>& uniformBuffers,
-    std::vector<std::string>& samplers, StandardMaterialDefines& defines)>
+  ::std::function<string_t(
+    const string_t& shaderName, vector_t<string_t>& uniforms,
+    vector_t<string_t>& uniformBuffers, vector_t<string_t>& samplers,
+    StandardMaterialDefines& defines)>
     customShaderNameResolve;
 
 protected:
-  std::vector<RenderTargetTexture*> _renderTargets;
+  vector_t<RenderTargetTexture*> _renderTargets;
   Matrix _worldViewProjectionMatrix;
   Color3 _globalAmbientColor;
   bool _useLogarithmicDepth;

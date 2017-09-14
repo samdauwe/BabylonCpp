@@ -23,7 +23,7 @@ struct BABYLON_SHARED_EXPORT TextureTools {
 
   static BaseTexture* GetEnvironmentBRDFTexture(Scene* scene);
 
-  static std::string _environmentBRDFBase64Texture;
+  static string_t _environmentBRDFBase64Texture;
 
 }; // end of struct TextureTools
 

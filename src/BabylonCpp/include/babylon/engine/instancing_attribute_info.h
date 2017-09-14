@@ -38,7 +38,7 @@ struct InstancingAttributeInfo {
   /**
    * Name of the GLSL attribute, for debugging purpose only
    */
-  std::string attributeName;
+  string_t attributeName;
 }; // end of struct InstancingAttributeInfo
 
 } // end of namespace BABYLON

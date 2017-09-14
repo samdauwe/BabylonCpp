@@ -19,7 +19,7 @@ public:
 
   /** Methods **/
   void _update(const Matrix& world);
-  bool isInFrustum(const std::array<Plane, 6>& frustumPlanes) const;
+  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes) const;
   bool intersectsPoint(const Vector3& point);
 
   /** Statics **/

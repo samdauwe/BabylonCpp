@@ -22,7 +22,7 @@ constexpr bool WithinEpsilon(T a, T b, T epsilon = 1.401298E-45f)
 /**
  * @brief Returns the upper case translation of the number i to hexadecimal.
  */
-inline std::string ToHex(int i)
+inline string_t ToHex(int i)
 {
   std::ostringstream stream;
   stream << ::std::setfill('0') << ::std::setw(2) << ::std::hex << i;

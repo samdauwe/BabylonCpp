@@ -15,7 +15,7 @@
 
 namespace BABYLON {
 
-Node::Node(const std::string& iName, Scene* scene)
+Node::Node(const string_t& iName, Scene* scene)
     : name{iName}
     , id{iName}
     , state{""}
@@ -117,17 +117,17 @@ Node& Node::removeBehavior(Behavior<Node>* behavior)
   return *this;
 }
 
-std::vector<Behavior<Node>*>& Node::behaviors()
+vector_t<Behavior<Node>*>& Node::behaviors()
 {
   return _behaviors;
 }
 
-const std::vector<Behavior<Node>*>& Node::behaviors() const
+const vector_t<Behavior<Node>*>& Node::behaviors() const
 {
   return _behaviors;
 }
 
-Behavior<Node>* Node::getBehaviorByName(const std::string& iName)
+Behavior<Node>* Node::getBehaviorByName(const string_t& iName)
 {
   auto it = ::std::find_if(_behaviors.begin(), _behaviors.end(),
                            [&iName](const Behavior<Node>* behavior) {
@@ -248,8 +248,7 @@ bool Node::isDescendantOf(const Node* ancestor)
   return false;
 }
 
-void Node::_getDescendants(std::vector<Node*>& results,
-                           bool directDescendantsOnly,
+void Node::_getDescendants(vector_t<Node*>& results, bool directDescendantsOnly,
                            const ::std::function<bool(Node* node)>& predicate)
 {
   if (_children.empty()) {
@@ -267,7 +266,7 @@ void Node::_getDescendants(std::vector<Node*>& results,
   }
 }
 
-void Node::_getDescendants(std::vector<AbstractMesh*>& results,
+void Node::_getDescendants(vector_t<AbstractMesh*>& results,
                            bool directDescendantsOnly,
                            const ::std::function<bool(Node* node)>& predicate)
 {
@@ -288,21 +287,21 @@ void Node::_getDescendants(std::vector<AbstractMesh*>& results,
   }
 }
 
-std::vector<Node*>
+vector_t<Node*>
 Node::getDescendants(bool directDescendantsOnly,
                      const ::std::function<bool(Node* node)>& predicate)
 {
-  std::vector<Node*> results;
+  vector_t<Node*> results;
   _getDescendants(results, directDescendantsOnly, predicate);
 
   return results;
 }
 
-std::vector<AbstractMesh*>
+vector_t<AbstractMesh*>
 Node::getChildMeshes(bool directDecendantsOnly,
                      const ::std::function<bool(Node* node)>& predicate)
 {
-  std::vector<AbstractMesh*> results;
+  vector_t<AbstractMesh*> results;
   _getDescendants(results, directDecendantsOnly, [&predicate](Node* node) {
     return ((!predicate || predicate(node))
             && (dynamic_cast<AbstractMesh*>(node)));
@@ -327,12 +326,12 @@ void Node::_setReady(bool iState)
   }
 }
 
-std::vector<Animation*> Node::getAnimations()
+vector_t<Animation*> Node::getAnimations()
 {
   return animations;
 }
 
-Animation* Node::getAnimationByName(const std::string& iName)
+Animation* Node::getAnimationByName(const string_t& iName)
 {
   auto it = ::std::find_if(
     animations.begin(), animations.end(),
@@ -341,7 +340,7 @@ Animation* Node::getAnimationByName(const std::string& iName)
   return (it != animations.end() ? *it : nullptr);
 }
 
-void Node::createAnimationRange(const std::string& iName, int from, int to)
+void Node::createAnimationRange(const string_t& iName, int from, int to)
 {
   // check name not already in use
   if (!stl_util::contains(_ranges, iName)) {
@@ -354,7 +353,7 @@ void Node::createAnimationRange(const std::string& iName, int from, int to)
   }
 }
 
-void Node::deleteAnimationRange(const std::string& iName, bool deleteFrames)
+void Node::deleteAnimationRange(const string_t& iName, bool deleteFrames)
 {
   for (auto& animation : animations) {
     if (animation) {
@@ -365,7 +364,7 @@ void Node::deleteAnimationRange(const std::string& iName, bool deleteFrames)
   _ranges.erase(iName);
 }
 
-AnimationRange* Node::getAnimationRange(const std::string& iName)
+AnimationRange* Node::getAnimationRange(const string_t& iName)
 {
   if (stl_util::contains(_ranges, iName)) {
     return _ranges[iName].get();
@@ -374,7 +373,7 @@ AnimationRange* Node::getAnimationRange(const std::string& iName)
   return nullptr;
 }
 
-Animatable* Node::beginAnimation(const std::string& iName, bool loop,
+Animatable* Node::beginAnimation(const string_t& iName, bool loop,
                                  float speedRatio,
                                  ::std::function<void()> onAnimationEnd)
 {
@@ -388,9 +387,9 @@ Animatable* Node::beginAnimation(const std::string& iName, bool loop,
                                 onAnimationEnd);
 }
 
-std::vector<AnimationRange> Node::serializeAnimationRanges()
+vector_t<AnimationRange> Node::serializeAnimationRanges()
 {
-  std::vector<AnimationRange> serializationRanges;
+  vector_t<AnimationRange> serializationRanges;
   for (auto& item : _ranges) {
     serializationRanges.emplace_back(
       AnimationRange(item.first, item.second->from, item.second->to));

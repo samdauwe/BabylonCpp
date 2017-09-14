@@ -60,7 +60,7 @@ std::unique_ptr<Color3> Color3::clone() const
   return ::std::make_unique<Color3>(*this);
 }
 
-std::string Color3::toString() const
+string_t Color3::toString() const
 {
   std::ostringstream oss;
   oss << *this;
@@ -204,7 +204,7 @@ Color3& Color3::set(float red, float green, float blue)
   return copyFromFloats(red, green, blue);
 }
 
-std::string Color3::toHexString() const
+string_t Color3::toHexString() const
 {
   const int intR = static_cast<int>(r * 255) | 0;
   const int intG = static_cast<int>(g * 255) | 0;
@@ -287,7 +287,7 @@ Color3 Color3::operator*(const Color3& otherColor) const
 }
 
 /** Statics **/
-Color3 Color3::FromHexString(const std::string& hex)
+Color3 Color3::FromHexString(const string_t& hex)
 {
   if (hex.substr(0, 1) != "#" || hex.size() != 7) {
     return Color3(0.f, 0.f, 0.f);

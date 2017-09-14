@@ -9,15 +9,13 @@ namespace BABYLON {
  * @brief Temporary pre-allocated objects for engine internal use.
  */
 struct BABYLON_SHARED_EXPORT Tmp {
-
-  static std::array<Color3, 3> Color3Array;
-  static std::array<Vector2, 3> Vector2Array;
-  static std::array<Vector3, 9> Vector3Array;
-  static std::array<Vector4, 3> Vector4Array;
-  static std::array<Quaternion, 2> QuaternionArray;
-  static std::array<Matrix, 6> MatrixArray;
-
-}; // end of class Tmp
+  static array_t<Color3, 3> Color3Array;
+  static array_t<Vector2, 3> Vector2Array;
+  static array_t<Vector3, 9> Vector3Array;
+  static array_t<Vector4, 3> Vector4Array;
+  static array_t<Quaternion, 2> QuaternionArray;
+  static array_t<Matrix, 6> MatrixArray;
+}; // end of struct Tmp
 
 } // end of namespace BABYLON
 

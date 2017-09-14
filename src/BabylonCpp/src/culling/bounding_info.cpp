@@ -83,7 +83,7 @@ void BoundingInfo::update(const Matrix& world)
   boundingSphere._update(world);
 }
 
-bool BoundingInfo::isInFrustum(const std::array<Plane, 6>& frustumPlanes)
+bool BoundingInfo::isInFrustum(const array_t<Plane, 6>& frustumPlanes)
 {
   if (!boundingSphere.isInFrustum(frustumPlanes)) {
     return false;
@@ -99,7 +99,7 @@ float BoundingInfo::diagonalLength() const
 }
 
 bool BoundingInfo::isCompletelyInFrustum(
-  const std::array<Plane, 6>& frustumPlanes) const
+  const array_t<Plane, 6>& frustumPlanes) const
 {
   return boundingBox.isCompletelyInFrustum(frustumPlanes);
 }

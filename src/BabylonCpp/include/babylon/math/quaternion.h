@@ -30,7 +30,7 @@ public:
   /**
    * @brief Returns a string with the Quaternion coordinates.
    */
-  std::string toString() const;
+  string_t toString() const;
 
   /**
    * @brief Returns the string "Quaternion".
@@ -154,7 +154,7 @@ public:
    * @returns The current Quaternion.
    */
   const Quaternion& toEulerAnglesToRef(Vector3& result,
-                                       const std::string& order = "YZX") const;
+                                       const string_t& order = "YZX") const;
 
   /**
    * @brief Updates the passed rotation matrix with the current Quaternion

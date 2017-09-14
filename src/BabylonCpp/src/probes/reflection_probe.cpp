@@ -8,7 +8,7 @@
 
 namespace BABYLON {
 
-ReflectionProbe::ReflectionProbe(const std::string& name, const ISize& size,
+ReflectionProbe::ReflectionProbe(const string_t& name, const ISize& size,
                                  Scene* scene, bool generateMipMaps)
     : invertYAxis{false}
     , position{Vector3::Zero()}
@@ -104,7 +104,7 @@ RenderTargetTexture* ReflectionProbe::cubeTexture()
   return _renderTargetTexture.get();
 }
 
-std::vector<AbstractMesh*>& ReflectionProbe::renderList()
+vector_t<AbstractMesh*>& ReflectionProbe::renderList()
 {
   return _renderTargetTexture->renderList;
 }

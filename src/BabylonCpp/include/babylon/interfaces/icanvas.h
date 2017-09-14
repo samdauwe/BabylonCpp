@@ -62,9 +62,8 @@ public:
 
 protected:
   std::unique_ptr<GL::IGLRenderingContext> _renderingContext;
-  std::vector<std::vector<FastFunc<void(PointerEvent&& evt)>>>
-    mouseEventListeners;
-  std::vector<std::vector<FastFunc<void(Event&& evt)>>> keyEventListeners;
+  vector_t<vector_t<FastFunc<void(PointerEvent&& evt)>>> mouseEventListeners;
+  vector_t<vector_t<FastFunc<void(Event&& evt)>>> keyEventListeners;
 
 protected:
   bool _initialized;

@@ -26,13 +26,13 @@ public:
   ~Plane();
 
   std::unique_ptr<VertexData> _regenerateVertexData() override;
-  Geometry* copy(const std::string& id) override;
+  Geometry* copy(const string_t& id) override;
 
   // Statics
   static Plane* Parse(const Json::value& parsedPlane, Scene* scene);
 
 protected:
-  Plane(const std::string& id, Scene* scene, float size, bool canBeRegenerated,
+  Plane(const string_t& id, Scene* scene, float size, bool canBeRegenerated,
         Mesh* mesh, unsigned int side = Mesh::DEFAULTSIDE);
 
 public:

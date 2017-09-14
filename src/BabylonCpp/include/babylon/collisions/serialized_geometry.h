@@ -6,11 +6,11 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT SerializedGeometry {
-  std::string id;
+  string_t id;
   Float32Array positions;
   Uint32Array indices;
   Float32Array normals;
-  std::vector<Vector3> positionsArray;
+  vector_t<Vector3> positionsArray;
 }; // end of struct SerializedGeometry
 
 } // end of namespace BABYLON

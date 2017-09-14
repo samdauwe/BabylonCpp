@@ -157,7 +157,7 @@ public:
    * @param {boolean} fullDetails - support for multiple levels of logging
    * within scene loading
    */
-  std::string toString(bool fullDetails = false) const;
+  string_t toString(bool fullDetails = false) const;
   void _resyncLightSources();
   void _resyncLighSource(Light* light);
   void _removeLightSource(Light* light);
@@ -167,7 +167,7 @@ public:
   Scene* getScene() override;
   void setSkeleton(Skeleton* value);
   virtual Skeleton* skeleton();
-  virtual std::vector<Vector3>& _positions();
+  virtual vector_t<Vector3>& _positions();
   Vector3& position() override;
   void setPosition(const Vector3& newPosition);
 
@@ -226,7 +226,7 @@ public:
 
   /** Methods **/
   virtual Material* getMaterial();
-  std::vector<AbstractMesh*>
+  vector_t<AbstractMesh*>
   getChildMeshes(bool directDecendantsOnly,
                  const ::std::function<bool(Node* node)>& predicate
                  = nullptr) override;
@@ -641,7 +641,7 @@ public:
    * A mesh is in the frustum if its bounding box intersects the frustum.
    * @returns A Boolean.
    */
-  bool isInFrustum(const std::array<Plane, 6>& frustumPlanes) override;
+  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes) override;
 
   /**
    * @brief Returns if the mesh is completely in the frustum defined be the
@@ -650,8 +650,8 @@ public:
    * inside the frustum.
    * @returns A Boolean.
    */
-  bool isCompletelyInFrustum(
-    const std::array<Plane, 6>& frustumPlanes) const override;
+  bool
+  isCompletelyInFrustum(const array_t<Plane, 6>& frustumPlanes) const override;
 
   /**
    * @brief Returns if the mesh intersects another mesh object.
@@ -743,7 +743,7 @@ public:
    * @brief Clones the mesh, used by the class Mesh.
    * @returns Just returns `null` for an AbstractMesh.
    */
-  AbstractMesh* clone(const std::string& name, Node* newParent,
+  AbstractMesh* clone(const string_t& name, Node* newParent,
                       bool doNotCloneChildren = true);
 
   /**
@@ -848,18 +848,18 @@ public:
    * @brief Returns the facetLocalNormals array.
    * The normals are expressed in the mesh local space.
    */
-  std::vector<Vector3>& getFacetLocalNormals();
+  vector_t<Vector3>& getFacetLocalNormals();
 
   /**
    * @brief Returns the facetLocalPositions array.
    * The facet positions are expressed in the mesh local space.
    */
-  std::vector<Vector3>& getFacetLocalPositions();
+  vector_t<Vector3>& getFacetLocalPositions();
 
   /**
    * @brief Returns the facetLocalPartioning array.
    */
-  std::vector<Uint32Array>& getFacetLocalPartitioning();
+  vector_t<Uint32Array>& getFacetLocalPartitioning();
 
   /**
    * @brief Returns the i-th facet position in the world system.
@@ -955,7 +955,7 @@ protected:
    * @param name The new name.
    * @param scene The scene where the mesh is.
    */
-  AbstractMesh(const std::string& name, Scene* scene);
+  AbstractMesh(const string_t& name, Scene* scene);
 
   void checkOcclusionQuery();
 
@@ -1075,14 +1075,14 @@ public:
   std::unique_ptr<BoundingInfo> _boundingInfo;
   bool _isDisposed;
   int _renderId;
-  std::vector<std::unique_ptr<SubMesh>> subMeshes;
+  vector_t<std::unique_ptr<SubMesh>> subMeshes;
   Octree<SubMesh*>* _submeshesOctree;
-  std::vector<AbstractMesh*> _intersectionsInProgress;
+  vector_t<AbstractMesh*> _intersectionsInProgress;
   bool _unIndexed;
   std::unique_ptr<Matrix> _poseMatrix;
-  std::vector<Light*> _lightSources;
+  vector_t<Light*> _lightSources;
   // Loading properties
-  std::vector<Json::value> _waitingActions;
+  vector_t<Json::value> _waitingActions;
   bool _waitingFreezeWorldMatrix;
   // Skeleton
   Float32Array _bonesTransformMatrices;
@@ -1093,11 +1093,11 @@ protected:
 private:
   // FacetData private properties
   // Facet local positions
-  std::vector<Vector3> _facetPositions;
+  vector_t<Vector3> _facetPositions;
   // Facet local normals
-  std::vector<Vector3> _facetNormals;
+  vector_t<Vector3> _facetNormals;
   // Partitioning array of facet index arrays
-  std::vector<Uint32Array> _facetPartitioning;
+  vector_t<Uint32Array> _facetPartitioning;
   // facet number
   size_t _facetNb;
   // Number of subdivisions per axis in the partioning space
@@ -1150,7 +1150,7 @@ private:
   bool _isDirty;
   Matrix _pivotMatrix;
   bool _isWorldMatrixFrozen;
-  std::vector<Vector3> _emptyPositions;
+  vector_t<Vector3> _emptyPositions;
   // Skeleton
   Skeleton* _skeleton;
 

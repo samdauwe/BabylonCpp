@@ -23,7 +23,7 @@ template <class TCamera>
 void CameraInputsManager<TCamera>::add(
   std::unique_ptr<ICameraInput<TCamera>>&& input)
 {
-  const std::string type = input->getSimpleName();
+  const string_t type = input->getSimpleName();
   if (stl_util::contains(attached, type)) {
     BABYLON_LOGF_WARN("CameraInputsManager",
                       "camera input of type %s already exists on camera",
@@ -61,7 +61,7 @@ void CameraInputsManager<TCamera>::remove(ICameraInput<TCamera>* inputToRemove)
 }
 
 template <class TCamera>
-void CameraInputsManager<TCamera>::removeByType(const std::string& inputType)
+void CameraInputsManager<TCamera>::removeByType(const string_t& inputType)
 {
   for (auto& item : attached) {
     auto& input = item.second;

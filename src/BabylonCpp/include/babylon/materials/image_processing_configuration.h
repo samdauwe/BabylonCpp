@@ -139,7 +139,7 @@ public:
    * @param defines the list of defines currently in use
    */
   static void
-  PrepareUniforms(std::vector<std::string>& uniforms,
+  PrepareUniforms(vector_t<string_t>& uniforms,
                   const IImageProcessingConfigurationDefines& defines);
 
   /**
@@ -149,7 +149,7 @@ public:
    * @param defines the list of defines currently in use
    */
   static void
-  PrepareSamplers(std::vector<std::string>& samplersList,
+  PrepareSamplers(vector_t<string_t>& samplersList,
                   const IImageProcessingConfigurationDefines& defines);
 
   /**

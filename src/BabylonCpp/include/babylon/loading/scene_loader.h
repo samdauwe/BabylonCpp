@@ -34,28 +34,26 @@ public:
 
 private:
   // Members
-  static std::unordered_map<std::string, IRegisteredPlugin> _registeredPlugins;
+  static std::unordered_map<string_t, IRegisteredPlugin> _registeredPlugins;
   // Functions
   static IRegisteredPlugin _getDefaultPlugin();
-  static IRegisteredPlugin _getPluginForExtension(const std::string& extension);
-  static IRegisteredPlugin
-  _getPluginForFilename(const std::string& sceneFilename);
-  static std::string _getDirectLoad(const std::string& sceneFilename);
+  static IRegisteredPlugin _getPluginForExtension(const string_t& extension);
+  static IRegisteredPlugin _getPluginForFilename(const string_t& sceneFilename);
+  static string_t _getDirectLoad(const string_t& sceneFilename);
 
 public:
-  static ISceneLoaderPlugin*
-  GetPluginForExtension(const std::string& extension);
+  static ISceneLoaderPlugin* GetPluginForExtension(const string_t& extension);
   static void RegisterPlugin(std::shared_ptr<ISceneLoaderPlugin>&& plugin);
   static void ImportMesh(
-    const std::vector<std::string>& meshesNames, const std::string& rootUrl,
-    const std::string& sceneFilename, Scene* scene,
-    const ::std::function<void(std::vector<AbstractMesh*>& meshes,
-                               std::vector<ParticleSystem*>& particleSystems,
-                               std::vector<Skeleton*>& skeletons)>& onsuccess
+    const vector_t<string_t>& meshesNames, const string_t& rootUrl,
+    const string_t& sceneFilename, Scene* scene,
+    const ::std::function<void(vector_t<AbstractMesh*>& meshes,
+                               vector_t<ParticleSystem*>& particleSystems,
+                               vector_t<Skeleton*>& skeletons)>& onsuccess
     = nullptr,
     const ::std::function<void()>& progressCallBack = nullptr,
-    const ::std::function<void(Scene* scene, const std::string& message,
-                               const std::string& exception)>& onerror
+    const ::std::function<void(Scene* scene, const string_t& message,
+                               const string_t& exception)>& onerror
     = nullptr);
 
   /**
@@ -69,8 +67,7 @@ public:
    * scene
    */
   std::unique_ptr<Scene>
-  Load(const std::string& rootUrl, const std::string& sceneFilename,
-       Engine* engine,
+  Load(const string_t& rootUrl, const string_t& sceneFilename, Engine* engine,
        const ::std::function<void(Scene* scene)>& onsuccess = nullptr,
        const ::std::function<void()>& progressCallBack      = nullptr,
        const ::std::function<void(Scene* scene)>& onerror   = nullptr);
@@ -83,8 +80,7 @@ public:
    * @param scene is the instance of BABYLON.Scene to append to
    */
   static void
-  Append(const std::string& rootUrl, const std::string& sceneFilename,
-         Scene* scene,
+  Append(const string_t& rootUrl, const string_t& sceneFilename, Scene* scene,
          const ::std::function<void(Scene* scene)>& onsuccess = nullptr,
          const ::std::function<void()>& progressCallBack      = nullptr,
          const ::std::function<void(Scene* scene)>& onerror   = nullptr);

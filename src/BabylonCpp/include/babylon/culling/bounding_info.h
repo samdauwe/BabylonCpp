@@ -23,7 +23,7 @@ public:
   bool isLocked() const;
   void setIsLocked(bool value);
   void update(const Matrix& world);
-  bool isInFrustum(const std::array<Plane, 6>& frustumPlanes) override;
+  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes) override;
 
   /**
    * @brief Gets the world distance between the min and max points of the
@@ -31,8 +31,8 @@ public:
    */
   float diagonalLength() const;
 
-  bool isCompletelyInFrustum(
-    const std::array<Plane, 6>& frustumPlanes) const override;
+  bool
+  isCompletelyInFrustum(const array_t<Plane, 6>& frustumPlanes) const override;
   bool _checkCollision(const Collider& collider) const;
   bool intersectsPoint(const Vector3& point);
   bool intersects(const BoundingInfo& boundingInfo, bool precise);

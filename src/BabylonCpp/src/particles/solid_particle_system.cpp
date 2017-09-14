@@ -19,7 +19,7 @@
 namespace BABYLON {
 
 SolidParticleSystem::SolidParticleSystem(
-  const std::string& iName, Scene* scene,
+  const string_t& iName, Scene* scene,
   const SolidParticleSystemOptions& options)
     : nbParticles{0}
     , billboard{false}
@@ -291,7 +291,7 @@ void SolidParticleSystem::_resetCopy()
 }
 
 SolidParticle* SolidParticleSystem::_meshBuilder(
-  unsigned int p, const std::vector<Vector3>& shape, Float32Array& positions,
+  unsigned int p, const vector_t<Vector3>& shape, Float32Array& positions,
   Uint32Array& meshInd, Uint32Array& indices, const Float32Array& meshUV,
   Float32Array& uvs, const Float32Array& meshCol, Float32Array& colors,
   const Float32Array& meshNor, Float32Array& normals, unsigned int idx,
@@ -385,10 +385,10 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
   return _copy.get();
 }
 
-std::vector<Vector3>
+vector_t<Vector3>
 SolidParticleSystem::_posToShape(const Float32Array& positions)
 {
-  std::vector<Vector3> shape;
+  vector_t<Vector3> shape;
   for (size_t i = 0; i < positions.size(); i += 3) {
     shape.emplace_back(
       Vector3(positions[i], positions[i + 1], positions[i + 2]));

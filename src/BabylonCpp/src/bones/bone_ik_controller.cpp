@@ -6,11 +6,11 @@
 
 namespace BABYLON {
 
-std::array<Vector3, 6> BoneIKController::_tmpVecs{
+array_t<Vector3, 6> BoneIKController::_tmpVecs{
   {Vector3::Zero(), Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
    Vector3::Zero(), Vector3::Zero()}};
 Quaternion BoneIKController::_tmpQuat{Quaternion::Identity()};
-std::array<Matrix, 2> BoneIKController::_tmpMats{
+array_t<Matrix, 2> BoneIKController::_tmpMats{
   {Matrix::Identity(), Matrix::Identity()}};
 
 BoneIKController::BoneIKController(AbstractMesh* iMesh, Bone* bone,

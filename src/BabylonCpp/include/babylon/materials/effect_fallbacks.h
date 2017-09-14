@@ -18,13 +18,13 @@ public:
   bool operator==(const EffectFallbacks& other) const;
   bool operator!=(const EffectFallbacks& other) const;
 
-  void addFallback(unsigned int rank, const std::string& define);
+  void addFallback(unsigned int rank, const string_t& define);
   void addCPUSkinningFallback(unsigned int rank, AbstractMesh* mesh);
   bool isMoreFallbacks() const;
-  std::string reduce(const std::string& currentDefines);
+  string_t reduce(const string_t& currentDefines);
 
 private:
-  std::unordered_map<unsigned int, std::vector<std::string>> _defines;
+  std::unordered_map<unsigned int, vector_t<string_t>> _defines;
   unsigned int _currentRank;
   unsigned int _maxRank;
 

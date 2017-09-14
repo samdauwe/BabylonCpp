@@ -486,8 +486,8 @@ class ShadowsOptimization;
 class TextureOptimization;
 namespace picojson {
 class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
+typedef vector_t<value> array;
+typedef std::map<string_t, value> object;
 } // end of namespace picojson
 
 namespace BABYLON {
@@ -495,7 +495,7 @@ namespace Json {
 typedef picojson::value value;
 typedef picojson::array array;
 typedef picojson::object object;
-} // end of namespace picojson
+} // namespace Json
 } // end of namespace BABYLON
 
 #endif // BABYLON_FWD_H

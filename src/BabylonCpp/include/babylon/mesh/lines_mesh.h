@@ -50,7 +50,7 @@ public:
 
   Material* getMaterial() override;
   bool checkCollisions();
-  InstancedMesh* createInstance(const std::string& name);
+  InstancedMesh* createInstance(const string_t& name);
   void _bind(SubMesh* subMesh, Effect* effect, unsigned int fillMode) override;
   void _draw(SubMesh* subMesh, int fillMode,
              size_t instancesCount = 0) override;
@@ -60,11 +60,11 @@ public:
   /**
    * @brief Returns a new LineMesh object cloned from the current one.
    */
-  LinesMesh* clone(const std::string& name, Node* newParent = nullptr,
+  LinesMesh* clone(const string_t& name, Node* newParent = nullptr,
                    bool doNotCloneChildren = false);
 
 protected:
-  LinesMesh(const std::string& name, Scene* scene, Node* parent = nullptr,
+  LinesMesh(const string_t& name, Scene* scene, Node* parent = nullptr,
             LinesMesh* source = nullptr, bool doNotCloneChildren = true,
             bool useVertexColor = false);
 

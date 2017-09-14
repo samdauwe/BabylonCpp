@@ -32,7 +32,7 @@ namespace BABYLON {
 Quaternion AbstractMesh::_rotationAxisCache;
 Vector3 AbstractMesh::_lookAtVectorCache = Vector3(0.f, 0.f, 0.f);
 
-AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
+AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
     : Node(iName, scene)
     , definedFacingForward{true} // orientation for POV movement & rotation
     , occlusionQueryAlgorithmType{AbstractMesh::
@@ -358,7 +358,7 @@ bool AbstractMesh::isDisposed() const
   return _isDisposed;
 }
 
-std::string AbstractMesh::toString(bool fullDetails) const
+string_t AbstractMesh::toString(bool fullDetails) const
 {
   std::ostringstream oss;
   oss << "Name: " << name << ", isInstance: ";
@@ -369,8 +369,8 @@ std::string AbstractMesh::toString(bool fullDetails) const
   }
   if (fullDetails) {
     oss << ", billboard mode: ";
-    std::vector<std::string> billboardModes{"NONE", "X",    "Y",    "null",
-                                            "Z",    "null", "null", "ALL"};
+    vector_t<string_t> billboardModes{"NONE", "X",    "Y",    "null",
+                                      "Z",    "null", "null", "ALL"};
     if (billboardMode < billboardModes.size()) {
       oss << billboardModes[billboardMode];
     }
@@ -498,7 +498,7 @@ Skeleton* AbstractMesh::skeleton()
   return _skeleton;
 }
 
-std::vector<Vector3>& AbstractMesh::_positions()
+vector_t<Vector3>& AbstractMesh::_positions()
 {
   return _emptyPositions;
 }
@@ -580,7 +580,7 @@ Material* AbstractMesh::getMaterial()
   return material();
 }
 
-std::vector<AbstractMesh*>
+vector_t<AbstractMesh*>
 AbstractMesh::getChildMeshes(bool directDecendantsOnly,
                              const ::std::function<bool(Node* node)>& predicate)
 {
@@ -1290,13 +1290,13 @@ AbstractMesh& AbstractMesh::detachFromBone()
   return *this;
 }
 
-bool AbstractMesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes)
+bool AbstractMesh::isInFrustum(const array_t<Plane, 6>& frustumPlanes)
 {
   return _boundingInfo->isInFrustum(frustumPlanes);
 }
 
 bool AbstractMesh::isCompletelyInFrustum(
-  const std::array<Plane, 6>& frustumPlanes) const
+  const array_t<Plane, 6>& frustumPlanes) const
 {
   return _boundingInfo->isCompletelyInFrustum(frustumPlanes);
 }
@@ -1622,8 +1622,7 @@ PickingInfo AbstractMesh::intersects(const Ray& /*ray*/, bool /*fastCheck*/)
   return PickingInfo();
 }
 
-AbstractMesh* AbstractMesh::clone(const std::string& /*name*/,
-                                  Node* /*newParent*/,
+AbstractMesh* AbstractMesh::clone(const string_t& /*name*/, Node* /*newParent*/,
                                   bool /*doNotCloneChildren*/)
 {
   return nullptr;
@@ -1978,7 +1977,7 @@ AbstractMesh& AbstractMesh::updateFacetData()
   return *this;
 }
 
-std::vector<Vector3>& AbstractMesh::getFacetLocalNormals()
+vector_t<Vector3>& AbstractMesh::getFacetLocalNormals()
 {
   if (_facetNormals.empty()) {
     updateFacetData();
@@ -1986,7 +1985,7 @@ std::vector<Vector3>& AbstractMesh::getFacetLocalNormals()
   return _facetNormals;
 }
 
-std::vector<Vector3>& AbstractMesh::getFacetLocalPositions()
+vector_t<Vector3>& AbstractMesh::getFacetLocalPositions()
 {
   if (_facetPositions.empty()) {
     updateFacetData();
@@ -1994,7 +1993,7 @@ std::vector<Vector3>& AbstractMesh::getFacetLocalPositions()
   return _facetPositions;
 }
 
-std::vector<Uint32Array>& AbstractMesh::getFacetLocalPartitioning()
+vector_t<Uint32Array>& AbstractMesh::getFacetLocalPartitioning()
 {
   if (_facetPartitioning.empty()) {
     updateFacetData();

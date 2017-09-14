@@ -9,7 +9,7 @@ constexpr unsigned int LogLevels::LEVEL_INFO  = 3;
 constexpr unsigned int LogLevels::LEVEL_DEBUG = 4;
 constexpr unsigned int LogLevels::LEVEL_TRACE = 5;
 
-const std::vector<std::pair<unsigned int, std::string>> LogLevels::Levels
+const vector_t<std::pair<unsigned int, string_t>> LogLevels::Levels
   = {::std::make_pair(LogLevels::LEVEL_QUIET, "QUIET"),
      ::std::make_pair(LogLevels::LEVEL_ERROR, "ERROR"),
      ::std::make_pair(LogLevels::LEVEL_WARN, "WARN"),
@@ -17,7 +17,7 @@ const std::vector<std::pair<unsigned int, std::string>> LogLevels::Levels
      ::std::make_pair(LogLevels::LEVEL_DEBUG, "DEBUG"),
      ::std::make_pair(LogLevels::LEVEL_TRACE, "TRACE")};
 
-std::string LogLevels::ToReadableLevel(unsigned int level)
+string_t LogLevels::ToReadableLevel(unsigned int level)
 {
   switch (level) {
     case LogLevels::LEVEL_QUIET:

@@ -17,9 +17,9 @@
 namespace BABYLON {
 
 RenderTargetTexture::RenderTargetTexture(
-  const std::string& iName, const ISize& size, Scene* scene,
-  bool generateMipMaps, bool doNotChangeAspectRatio, unsigned int type,
-  bool iIsCube, unsigned int samplingMode, bool generateDepthBuffer,
+  const string_t& iName, const ISize& size, Scene* scene, bool generateMipMaps,
+  bool doNotChangeAspectRatio, unsigned int type, bool iIsCube,
+  unsigned int samplingMode, bool generateDepthBuffer,
   bool generateStencilBuffer, bool isMulti)
 
     : Texture{"", scene, !generateMipMaps}
@@ -389,7 +389,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
 }
 
 void RenderTargetTexture::renderToTarget(
-  unsigned int faceIndex, const std::vector<AbstractMesh*>& currentRenderList,
+  unsigned int faceIndex, const vector_t<AbstractMesh*>& currentRenderList,
   size_t /*currentRenderListLength*/, bool useCameraPostProcess,
   bool dumpForDebug)
 

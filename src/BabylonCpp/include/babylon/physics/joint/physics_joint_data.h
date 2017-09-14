@@ -14,7 +14,7 @@ struct BABYLON_SHARED_EXPORT PhysicsJointData {
   Vector3 connectedAxis;
   bool collision;
   // Native Oimo/Cannon/Energy data
-  std::string nativeParams;
+  string_t nativeParams;
 }; // end of struct PhysicsJointData
 
 } // end of namespace BABYLON

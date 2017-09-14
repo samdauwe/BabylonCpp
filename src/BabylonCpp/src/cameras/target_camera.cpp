@@ -8,7 +8,7 @@
 
 namespace BABYLON {
 
-TargetCamera::TargetCamera(const std::string& iName, const Vector3& iPosition,
+TargetCamera::TargetCamera(const string_t& iName, const Vector3& iPosition,
                            Scene* scene)
     : Camera(iName, iPosition, scene)
     , cameraDirection{::std::make_unique<Vector3>(0.f, 0.f, 0.f)}
@@ -300,7 +300,7 @@ Matrix TargetCamera::_getViewMatrix()
 }
 
 /** Camera rigs section **/
-Camera* TargetCamera::createRigCamera(const std::string& iName,
+Camera* TargetCamera::createRigCamera(const string_t& iName,
                                       int /*cameraIndex*/)
 {
   if (cameraRigMode != Camera::RIG_MODE_NONE) {

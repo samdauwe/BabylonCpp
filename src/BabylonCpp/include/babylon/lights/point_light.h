@@ -75,7 +75,7 @@ public:
    * position (or position, if none) and passed name (string).
    * Returns the PointLight.
    */
-  void transferToEffect(Effect* effect, const std::string& lightIndex) override;
+  void transferToEffect(Effect* effect, const string_t& lightIndex) override;
 
 protected:
   /**
@@ -85,7 +85,7 @@ protected:
    * It can cast shadows.
    * Documentation : http://doc.babylonjs.com/tutorials/lights
    */
-  PointLight(const std::string& name, const Vector3& position, Scene* scene);
+  PointLight(const string_t& name, const Vector3& position, Scene* scene);
 
   /**
    * @brief Sets the passed matrix "matrix" as a left-handed perspective
@@ -97,7 +97,7 @@ protected:
    */
   void _setDefaultShadowProjectionMatrix(
     Matrix& matrix, const Matrix& viewMatrix,
-    const std::vector<AbstractMesh*>& renderList) override;
+    const vector_t<AbstractMesh*>& renderList) override;
 
   void _buildUniformLayout() override;
 

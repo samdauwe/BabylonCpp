@@ -41,12 +41,6 @@ using system_clock          = ::std::chrono::system_clock;
 } // end of namespace chrono
 
 /** Containers library **/
-template <class T, std::size_t N>
-using array = ::std::array<T, N>;
-
-template <class T, class Allocator = ::std::allocator<T>>
-using vector = ::std::vector<T, Allocator>;
-
 template <class Key,                        // map::key_type
           class T,                          // map::mapped_type
           class Compare = ::std::less<Key>, // map::key_compare
@@ -77,15 +71,6 @@ using shared_ptr = ::std::shared_ptr<T>;
 /** Input/output library **/
 using ostream       = ::std::basic_ostream<char>;
 using ostringstream = ::std::basic_ostringstream<char>;
-
-/** Strings library **/
-template <class charT,
-          class traits = ::std::char_traits<charT>, // basic_string::traits_type
-          class Alloc  = ::std::allocator<charT> // basic_string::allocator_type
-          >
-using basic_string = ::std::basic_string<charT, traits, Alloc>;
-
-using string = ::std::basic_string<char>;
 
 /**  Utilities library **/
 template <std::size_t N>

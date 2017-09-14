@@ -14,8 +14,8 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT BlurPostProcess : public PostProcess {
 
 public:
-  BlurPostProcess(const std::string& name, const Vector2& direction,
-                  float kernel, float ratio, Camera* camera,
+  BlurPostProcess(const string_t& name, const Vector2& direction, float kernel,
+                  float ratio, Camera* camera,
                   unsigned int samplingMode
                   = TextureConstants::BILINEAR_SAMPLINGMODE,
                   Engine* engine = nullptr, bool reusable = false,
@@ -78,7 +78,7 @@ protected:
    * (excluding trailing 0s).
    * @return GLSL float string.
    */
-  std::string _glslFloat(float x, unsigned int decimalFigures = 8) const;
+  string_t _glslFloat(float x, unsigned int decimalFigures = 8) const;
 
 protected:
   float _kernel;

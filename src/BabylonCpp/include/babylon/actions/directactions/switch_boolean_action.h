@@ -10,7 +10,7 @@ class BABYLON_SHARED_EXPORT SwitchBooleanAction : public Action {
 
 public:
   SwitchBooleanAction(unsigned int triggerOptions, IAnimatable* target,
-                      const std::string& propertyPath,
+                      const string_t& propertyPath,
                       Condition* condition = nullptr);
   ~SwitchBooleanAction();
 
@@ -21,8 +21,8 @@ public:
 private:
   IAnimatable* _target;
   IAnimatable* _effectiveTarget;
-  std::string _property;
-  std::string _propertyPath;
+  string_t _property;
+  string_t _propertyPath;
 
 }; // end of class SwitchBooleanAction
 

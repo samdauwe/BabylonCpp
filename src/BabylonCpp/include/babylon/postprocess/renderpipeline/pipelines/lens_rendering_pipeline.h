@@ -40,7 +40,7 @@ struct LensRenderingPipelineParameters {
  * - grain texture
  */
 class BABYLON_SHARED_EXPORT LensRenderingPipeline
-  : public PostProcessRenderPipeline {
+    : public PostProcessRenderPipeline {
 
 public:
   /**
@@ -102,11 +102,10 @@ public:
    * @param {BABYLON.Camera[]} cameras - The array of cameras that the rendering
    * pipeline will be attached to
    */
-  LensRenderingPipeline(const std::string& name,
+  LensRenderingPipeline(const string_t& name,
                         const LensRenderingPipelineParameters& parameters,
                         Scene* scene, float ratio = 1.f,
-                        const std::vector<Camera*>& cameras
-                        = std::vector<Camera*>());
+                        const vector_t<Camera*>& cameras = vector_t<Camera*>());
   virtual ~LensRenderingPipeline();
 
   /** Methods **/

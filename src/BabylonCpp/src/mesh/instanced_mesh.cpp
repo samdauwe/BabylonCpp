@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-InstancedMesh::InstancedMesh(const std::string& _name, Mesh* source)
+InstancedMesh::InstancedMesh(const string_t& _name, Mesh* source)
     : AbstractMesh(_name, source->getScene())
 {
   source->instances.emplace_back(this);
@@ -124,7 +124,7 @@ IndicesArray InstancedMesh::getIndices(bool /*copyWhenShared*/)
   return _sourceMesh->getIndices();
 }
 
-std::vector<Vector3>& InstancedMesh::_positions()
+vector_t<Vector3>& InstancedMesh::_positions()
 {
   return _sourceMesh->_positions();
 }
@@ -186,8 +186,8 @@ bool InstancedMesh::_generatePointsArray()
   return _sourceMesh->_generatePointsArray();
 }
 
-InstancedMesh* InstancedMesh::clone(const std::string& /*iNname*/,
-                                    Node* newParent, bool doNotCloneChildren)
+InstancedMesh* InstancedMesh::clone(const string_t& /*iNname*/, Node* newParent,
+                                    bool doNotCloneChildren)
 {
   auto result = _sourceMesh->createInstance(name);
 

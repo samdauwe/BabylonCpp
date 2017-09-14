@@ -44,11 +44,11 @@ void RenderingManager::_clearDepthStencilBuffer(bool depth, bool stencil)
 }
 
 void RenderingManager::render(
-  ::std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
-                       const std::vector<SubMesh*>& transparentSubMeshes,
-                       const std::vector<SubMesh*>& alphaTestSubMeshes)>
+  ::std::function<void(const vector_t<SubMesh*>& opaqueSubMeshes,
+                       const vector_t<SubMesh*>& transparentSubMeshes,
+                       const vector_t<SubMesh*>& alphaTestSubMeshes)>
     customRenderFunction,
-  const std::vector<AbstractMesh*>& activeMeshes, bool renderParticles,
+  const vector_t<AbstractMesh*>& activeMeshes, bool renderParticles,
   bool renderSprites)
 {
   // Check if there's at least on observer on the onRenderingGroupObservable and

@@ -18,13 +18,10 @@
 
 namespace BABYLON {
 
-Animation* Animation::_PrepareAnimation(const std::string& name,
-                                        const std::string& targetProperty,
-                                        size_t framePerSecond, int totalFrame,
-                                        const AnimationValue& from,
-                                        const AnimationValue& to,
-                                        unsigned int loopMode,
-                                        IEasingFunction* easingFunction)
+Animation* Animation::_PrepareAnimation(
+  const string_t& name, const string_t& targetProperty, size_t framePerSecond,
+  int totalFrame, const AnimationValue& from, const AnimationValue& to,
+  unsigned int loopMode, IEasingFunction* easingFunction)
 {
   auto dataType = from.dataType;
 
@@ -47,7 +44,7 @@ Animation* Animation::_PrepareAnimation(const std::string& name,
   return animation;
 }
 
-Animation* Animation::CreateAnimation(const std::string& property,
+Animation* Animation::CreateAnimation(const string_t& property,
                                       int animationType,
                                       std::size_t framePerSecond,
                                       IEasingFunction* easingFunction)
@@ -62,7 +59,7 @@ Animation* Animation::CreateAnimation(const std::string& property,
 }
 
 Animatable* Animation::CreateAndStartAnimation(
-  const std::string& name, Node* node, const std::string& targetProperty,
+  const string_t& name, Node* node, const string_t& targetProperty,
   size_t framePerSecond, int totalFrame, const AnimationValue& from,
   const AnimationValue& to, unsigned int loopMode,
   IEasingFunction* easingFunction,
@@ -79,7 +76,7 @@ Animatable* Animation::CreateAndStartAnimation(
 }
 
 Animatable* Animation::CreateMergeAndStartAnimation(
-  const std::string& name, Node* node, const std::string& targetProperty,
+  const string_t& name, Node* node, const string_t& targetProperty,
   size_t framePerSecond, int totalFrame, const AnimationValue& from,
   const AnimationValue& to, unsigned int loopMode,
   IEasingFunction* easingFunction,
@@ -96,7 +93,7 @@ Animatable* Animation::CreateMergeAndStartAnimation(
 }
 
 Animatable* Animation::TransitionTo(
-  const std::string& /*property*/, const AnimationValue& /*targetValue*/,
+  const string_t& /*property*/, const AnimationValue& /*targetValue*/,
   const AnimationValue& /*host*/, Scene* /*scene*/, float /*frameRate*/,
   Animation* /*transition*/, float /*duration*/,
   const ::std::function<void()>& /*onAnimationEnd*/)
@@ -104,9 +101,9 @@ Animatable* Animation::TransitionTo(
   return nullptr;
 }
 
-Animation::Animation(const std::string& iName,
-                     const std::string& iTargetProperty, size_t iFramePerSecond,
-                     int iDataType, unsigned int iLoopMode)
+Animation::Animation(const string_t& iName, const string_t& iTargetProperty,
+                     size_t iFramePerSecond, int iDataType,
+                     unsigned int iLoopMode)
 
     : name{iName}
     , targetProperty{iTargetProperty}
@@ -127,7 +124,7 @@ Animation::~Animation()
 {
 }
 
-std::string Animation::toString(bool fullDetails) const
+string_t Animation::toString(bool fullDetails) const
 {
   std::ostringstream oss;
   oss << "Name: " << name << ", property: " << targetProperty;
@@ -135,9 +132,9 @@ std::string Animation::toString(bool fullDetails) const
       && static_cast<unsigned int>(dataType) <= ANIMATIONTYPE_BOOL) {
     size_t _dataType = static_cast<size_t>(dataType);
     oss << ", datatype: "
-        << std::vector<std::string>{"Float",  "Vector3", "Quaternion",
-                                    "Matrix", "Color3",  "Vector2",
-                                    "Size",   "Boolean"}[_dataType];
+        << vector_t<string_t>{
+             "Float",  "Vector3", "Quaternion", "Matrix",
+             "Color3", "Vector2", "Size",       "Boolean"}[_dataType];
   }
   oss << ", nKeys: "
       << (!_keys.empty() ? ::std::to_string(_keys.size()) : "none");
@@ -172,7 +169,7 @@ void Animation::removeEvents(int frame)
                 _events.end());
 }
 
-void Animation::createRange(const std::string& _name, float from, float to)
+void Animation::createRange(const string_t& _name, float from, float to)
 {
   // check name not already in use; could happen for bones after serialized
   if (!stl_util::contains(_ranges, _name)) {
@@ -180,7 +177,7 @@ void Animation::createRange(const std::string& _name, float from, float to)
   }
 }
 
-void Animation::deleteRange(const std::string& iName, bool deleteFrames)
+void Animation::deleteRange(const string_t& iName, bool deleteFrames)
 {
   if (stl_util::contains(_ranges, iName)) {
     if (deleteFrames) {
@@ -198,7 +195,7 @@ void Animation::deleteRange(const std::string& iName, bool deleteFrames)
   }
 }
 
-AnimationRange& Animation::getRange(const std::string& iName)
+AnimationRange& Animation::getRange(const string_t& iName)
 {
   return _ranges[iName];
 }
@@ -217,7 +214,7 @@ bool Animation::isStopped() const
   return _stopped;
 }
 
-std::vector<AnimationKey>& Animation::getKeys()
+vector_t<AnimationKey>& Animation::getKeys()
 {
   return _keys;
 }
@@ -348,7 +345,7 @@ std::unique_ptr<Animation> Animation::clone() const
   return clonedAnimation;
 }
 
-void Animation::setKeys(const std::vector<AnimationKey>& values)
+void Animation::setKeys(const vector_t<AnimationKey>& values)
 {
   _keys = values;
   _offsetsCache.clear();
@@ -575,7 +572,7 @@ AnimationValue Animation::_interpolate(int iCurrentFrame, int repeatCount,
 void Animation::setValue(const AnimationValue& currentValue, bool /*blend*/)
 {
   // Set value
-  std::string path;
+  string_t path;
   any destination;
 
   if (targetPropertyPath.size() > 1) {
@@ -658,7 +655,7 @@ bool Animation::animate(millisecond_t delay, float from, float to, bool loop,
   else {
     // Get max value if required
     if (loopMode != Animation::ANIMATIONLOOPMODE_CYCLE) {
-      std::string keyOffset = ::std::to_string(to) + ::std::to_string(from);
+      string_t keyOffset = ::std::to_string(to) + ::std::to_string(from);
       if (!_offsetsCache.count(keyOffset)) {
         AnimationValue fromValue = _interpolate(
           static_cast<int>(from), 0, Animation::ANIMATIONLOOPMODE_CYCLE);
@@ -784,7 +781,7 @@ Json::object Animation::serialize() const
                     Json::Pair<unsigned>("loopBehavior", loopMode)});
 
   // Animation keys
-  std::vector<Json::value> keys;
+  vector_t<Json::value> keys;
   for (auto& animationKey : _keys) {
     const AnimationValue& value = animationKey.value;
     Float32Array keyValues;
@@ -813,7 +810,7 @@ Json::object Animation::serialize() const
   serializationObject["keys"] = Json::value(keys);
 
   // Animation ranges
-  std::vector<Json::value> ranges;
+  vector_t<Json::value> ranges;
   for (auto& range : _ranges) {
     ranges.emplace_back(Json::value(Json::object(
       {Json::Pair("name", range.first),                              //
@@ -836,7 +833,7 @@ Animation* Animation::Parse(const Json::value& parsedAnimation)
                                     Animation::ANIMATIONLOOPMODE_CYCLE));
 
   auto dataType = Json::GetNumber(parsedAnimation, "dataType", 0);
-  std::vector<AnimationKey> keys;
+  vector_t<AnimationKey> keys;
 
   if (parsedAnimation.contains("enableBlending")) {
     animation->enableBlending

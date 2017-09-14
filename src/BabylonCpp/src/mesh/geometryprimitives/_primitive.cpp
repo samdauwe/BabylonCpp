@@ -5,8 +5,8 @@
 namespace BABYLON {
 namespace GeometryPrimitives {
 
-_Primitive::_Primitive(const std::string& _id, Scene* scene,
-                       bool canBeRegenerated, Mesh* mesh)
+_Primitive::_Primitive(const string_t& _id, Scene* scene, bool canBeRegenerated,
+                       Mesh* mesh)
     : Geometry(_id, scene, nullptr, false, mesh)
     , _canBeRegenerated{canBeRegenerated}
 {
@@ -35,7 +35,7 @@ void _Primitive::regenerate()
   _beingRegenerated = false;
 }
 
-Geometry* _Primitive::asNewGeometry(const std::string& iId)
+Geometry* _Primitive::asNewGeometry(const string_t& iId)
 {
   return Geometry::copy(iId);
 }

@@ -177,7 +177,7 @@ bool Color4::equals(const Color4& otherColor) const
          && stl_util::almost_equal(a, otherColor.a);
 }
 
-std::string Color4::toString() const
+string_t Color4::toString() const
 {
   std::ostringstream oss;
   oss << *this;
@@ -210,7 +210,7 @@ Color4& Color4::set(float red, float green, float blue, float alpha)
   return copyFromFloats(red, green, blue, alpha);
 }
 
-std::string Color4::toHexString() const
+string_t Color4::toHexString() const
 {
   const int intR = static_cast<int>(r * 255) | 0;
   const int intG = static_cast<int>(g * 255) | 0;
@@ -294,7 +294,7 @@ Color4 Color4::operator*(float iscale) const
 }
 
 /** Statics **/
-Color4 Color4::FromHexString(const std::string& hex)
+Color4 Color4::FromHexString(const string_t& hex)
 {
   if (hex.substr(0, 1) != "#" || hex.size() != 9) {
     return Color4(0, 0, 0, 0);

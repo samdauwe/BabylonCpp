@@ -155,9 +155,9 @@ public:
   float slerpAmount;
 
 private:
-  static std::array<Vector3, 10> _tmpVecs;
+  static array_t<Vector3, 10> _tmpVecs;
   static Quaternion _tmpQuat;
-  static std::array<Matrix, 5> _tmpMats;
+  static array_t<Matrix, 5> _tmpMats;
 
 private:
   bool _minYawSet;

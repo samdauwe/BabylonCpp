@@ -6,7 +6,7 @@
 
 namespace BABYLON {
 
-MultiRenderTarget::MultiRenderTarget(const std::string& name, Size size,
+MultiRenderTarget::MultiRenderTarget(const string_t& name, Size size,
                                      std::size_t count, Scene* scene)
     : MultiRenderTarget{
         name, size, count, scene,
@@ -14,7 +14,7 @@ MultiRenderTarget::MultiRenderTarget(const std::string& name, Size size,
 {
 }
 
-MultiRenderTarget::MultiRenderTarget(const std::string& name, Size size,
+MultiRenderTarget::MultiRenderTarget(const string_t& name, Size size,
                                      std::size_t count, Scene* scene,
                                      const IMultiRenderTargetOptions& options)
     : RenderTargetTexture{name, size, scene, options.generateMipMaps,
@@ -29,8 +29,8 @@ MultiRenderTarget::MultiRenderTarget(const std::string& name, Size size,
     return;
   }
 
-  std::vector<unsigned int> types;
-  std::vector<unsigned int> samplingModes;
+  vector_t<unsigned int> types;
+  vector_t<unsigned int> samplingModes;
 
   for (std::size_t i = 0; i < count; ++i) {
     if (i < options.types.size()) {
@@ -82,7 +82,7 @@ bool MultiRenderTarget::isSupported() const
          || (engine->getCaps().drawBuffersExtension);
 }
 
-std::vector<Texture*>& MultiRenderTarget::textures()
+vector_t<Texture*>& MultiRenderTarget::textures()
 {
   return _textures;
 }

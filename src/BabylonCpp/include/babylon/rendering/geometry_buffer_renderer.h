@@ -14,7 +14,7 @@ public:
   GeometryBufferRenderer(Scene* scene, float ratio = 1.f);
   virtual ~GeometryBufferRenderer();
 
-  void setRenderList(const std::vector<Mesh*>& meshes);
+  void setRenderList(const vector_t<Mesh*>& meshes);
   bool isSupported() const;
   bool enablePosition() const;
   void setEnablePosition(bool enable);
@@ -35,7 +35,7 @@ private:
   Matrix _projectionMatrix;
   Matrix _transformMatrix;
   Matrix _worldViewProjection;
-  std::string _cachedDefines;
+  string_t _cachedDefines;
   bool _enablePosition;
 
 }; // end of class GeometryBufferRenderer

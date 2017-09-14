@@ -20,7 +20,7 @@ struct BABYLON_SHARED_EXPORT IMaterialDefines {
   virtual bool isEqual(const MaterialDefines& other) const = 0;
   virtual void cloneTo(MaterialDefines& other)             = 0;
   virtual void reset()                                     = 0;
-  virtual std::string toString() const                     = 0;
+  virtual string_t toString() const                        = 0;
 }; // end of struct IMaterialDefines
 
 } // end of namespace BABYLON

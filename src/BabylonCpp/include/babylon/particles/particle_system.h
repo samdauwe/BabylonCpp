@@ -21,7 +21,7 @@ public:
   static constexpr int BLENDMODE_STANDARD = 1;
 
 public:
-  ParticleSystem(const std::string& name, size_t capacity, Scene* scene,
+  ParticleSystem(const string_t& name, size_t capacity, Scene* scene,
                  Effect* customEffect = nullptr);
   virtual ~ParticleSystem();
 
@@ -39,13 +39,13 @@ public:
   void animate() override;
   size_t render() override;
   void dispose(bool doNotRecurse = false) override;
-  std::vector<Animation*> getAnimations() override;
-  IParticleSystem* clone(const std::string& name, Mesh* newEmitter) override;
+  vector_t<Animation*> getAnimations() override;
+  IParticleSystem* clone(const string_t& name, Mesh* newEmitter) override;
   Json::object serialize() const override;
 
   // Statics
   static ParticleSystem* Parse(const Json::value& parsedParticleSystem,
-                               Scene* scene, const std::string& url);
+                               Scene* scene, const string_t& url);
 
 private:
   void _update(int newParticles);
@@ -53,7 +53,7 @@ private:
 
 public:
   // Members
-  std::vector<Animation*> animations;
+  vector_t<Animation*> animations;
   int emitRate;
   int manualEmitCount;
   float updateSpeed;
@@ -68,10 +68,10 @@ public:
   float minAngularSpeed;
   float maxAngularSpeed;
   Texture* particleTexture;
-  std::string customShader;
+  string_t customShader;
   bool preventAutoStart;
   Observable<ParticleSystem> onDisposeObservable;
-  ::std::function<void(std::vector<Particle*>& particles)> updateFunction;
+  ::std::function<void(vector_t<Particle*>& particles)> updateFunction;
   ::std::function<void()> onAnimationEnd;
   int blendMode;
   bool forceDepthWrite;
@@ -93,18 +93,18 @@ public:
 
 private:
   Observer<ParticleSystem>::Ptr _onDisposeObserver;
-  std::vector<Particle*> particles;
+  vector_t<Particle*> particles;
   size_t _capacity;
   Scene* _scene;
-  std::vector<Particle*> _stockParticles;
+  vector_t<Particle*> _stockParticles;
   int _newPartsExcess;
   Float32Array _vertexData;
   std::unique_ptr<Buffer> _vertexBuffer;
-  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
+  std::unordered_map<string_t, std::unique_ptr<VertexBuffer>> _vertexBuffers;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   Effect* _effect;
   Effect* _customEffect;
-  std::string _cachedDefines;
+  string_t _cachedDefines;
 
   Color4 _scaledColorStep;
   Color4 _colorDiff;

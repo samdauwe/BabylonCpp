@@ -17,9 +17,9 @@
 
 namespace BABYLON {
 
-SpriteManager::SpriteManager(const std::string& iName,
-                             const std::string& imgUrl, unsigned int capacity,
-                             const ISize& cellSize, Scene* scene, float epsilon,
+SpriteManager::SpriteManager(const string_t& iName, const string_t& imgUrl,
+                             unsigned int capacity, const ISize& cellSize,
+                             Scene* scene, float epsilon,
                              unsigned int samplingMode)
     : name{iName}
     , renderingGroupId{0}

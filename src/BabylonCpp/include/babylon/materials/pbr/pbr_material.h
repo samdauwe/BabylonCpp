@@ -49,19 +49,19 @@ public:
    * @param name The material name
    * @param scene The scene the material will be use in.
    */
-  PBRMaterial(const std::string& name, Scene* scene);
+  PBRMaterial(const string_t& name, Scene* scene);
   ~PBRMaterial();
 
   const char* getClassName() const override;
-  std::vector<BaseTexture*> getActiveTextures() const override;
+  vector_t<BaseTexture*> getActiveTextures() const override;
   bool hasTexture(BaseTexture* texture) const override;
-  PBRMaterial* clone(const std::string& name,
+  PBRMaterial* clone(const string_t& name,
                      bool cloneChildren = false) const override;
   Json::object serialize() const;
 
   // Statics
   static PBRMaterial* Parse(const Json::value& source, Scene* scene,
-                            const std::string& rootUrl);
+                            const string_t& rootUrl);
 
   // Getters / Setters
 

@@ -13,7 +13,7 @@ namespace BABYLON {
  * Inspired by http://http.developer.nvidia.com/GPUGems3/gpugems3_ch13.html
  */
 class BABYLON_SHARED_EXPORT VolumetricLightScatteringPostProcess
-  : public PostProcess {
+    : public PostProcess {
 
 public:
   /**
@@ -34,7 +34,7 @@ public:
    * "scene" must be provided
    */
   VolumetricLightScatteringPostProcess(
-    const std::string& name, float ratio, Camera* camera, Mesh* mesh,
+    const string_t& name, float ratio, Camera* camera, Mesh* mesh,
     unsigned int samples      = 100,
     unsigned int samplingMode = TextureConstants::BILINEAR_SAMPLINGMODE,
     Engine* engine = nullptr, bool reusable = false, Scene* scene = nullptr);
@@ -78,7 +78,7 @@ public:
    * @param {BABYLON.Scene} The scene where to create the mesh
    * @return {BABYLON.Mesh} the default mesh
    */
-  static Mesh* CreateDefaultMesh(const std::string& name, Scene* scene);
+  static Mesh* CreateDefaultMesh(const string_t& name, Scene* scene);
 
 private:
   bool _meshExcluded(AbstractMesh* mesh);
@@ -116,7 +116,7 @@ public:
   /**
    * Array containing the excluded meshes not rendered in the internal pass
    */
-  std::vector<AbstractMesh*> excludedMeshes;
+  vector_t<AbstractMesh*> excludedMeshes;
   /**
    * Controls the overall intensity of the post-process
    */
@@ -139,7 +139,7 @@ private:
   RenderTargetTexture* _volumetricLightScatteringRTT;
   Viewport _viewPort;
   Vector2 _screenCoordinates;
-  std::string _cachedDefines;
+  string_t _cachedDefines;
   Vector3 _customMeshPosition;
 
 }; // end of class VolumetricLightScatteringPostProcess

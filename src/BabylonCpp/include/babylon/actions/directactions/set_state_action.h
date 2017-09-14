@@ -10,7 +10,7 @@ class BABYLON_SHARED_EXPORT SetStateAction : public Action {
 
 public:
   SetStateAction(unsigned int triggerOptions, IAnimatable* target,
-                 const std::string& value, Condition* condition = nullptr);
+                 const string_t& value, Condition* condition = nullptr);
   ~SetStateAction();
 
   void execute(const ActionEvent& evt) override;
@@ -18,7 +18,7 @@ public:
 
 private:
   IAnimatable* _target;
-  std::string _value;
+  string_t _value;
 
 }; // end of class SetStateAction
 

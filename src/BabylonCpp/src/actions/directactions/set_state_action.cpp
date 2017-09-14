@@ -6,7 +6,7 @@
 namespace BABYLON {
 
 SetStateAction::SetStateAction(unsigned int triggerOptions, IAnimatable* target,
-                               const std::string& value, Condition* condition)
+                               const string_t& value, Condition* condition)
     : Action(triggerOptions, condition), _target{target}, _value{value}
 {
 }

@@ -26,13 +26,13 @@ public:
   ~Torus();
 
   std::unique_ptr<VertexData> _regenerateVertexData() override;
-  Geometry* copy(const std::string& id) override;
+  Geometry* copy(const string_t& id) override;
 
   // Statics
   static Torus* Parse(const Json::value& parsedTorus, Scene* scene);
 
 protected:
-  Torus(const std::string& id, Scene* scene, float diameter, float thickness,
+  Torus(const string_t& id, Scene* scene, float diameter, float thickness,
         unsigned int tessellation, bool canBeRegenerated, Mesh* mesh,
         unsigned int side = Mesh::DEFAULTSIDE);
 

@@ -14,7 +14,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT Layer : public IDisposable {
 
 public:
-  Layer(const std::string& name, const std::string& imgUrl, Scene* scene,
+  Layer(const string_t& name, const string_t& imgUrl, Scene* scene,
         bool isBackground   = true,
         const Color4& color = Color4(1.f, 1.f, 1.f, 1.f));
   virtual ~Layer();
@@ -57,9 +57,9 @@ private:
   Observer<Layer>::Ptr _onBeforeRenderObserver;
   Observer<Layer>::Ptr _onAfterRenderObserver;
   // Properties
-  std::string _name;
+  string_t _name;
   Scene* _scene;
-  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
+  std::unordered_map<string_t, std::unique_ptr<VertexBuffer>> _vertexBuffers;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   Effect* _effect;
   Effect* _alphaTestEffect;

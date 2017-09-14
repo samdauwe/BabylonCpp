@@ -162,8 +162,8 @@ public:
    */
   void setDefaultMaterial(Material* value);
 
-  std::array<Plane, 6>& frustumPlanes();
-  const std::array<Plane, 6>& frustumPlanes() const;
+  array_t<Plane, 6>& frustumPlanes();
+  const array_t<Plane, 6>& frustumPlanes() const;
   DebugLayer* debugLayer();
   void setWorkerCollisions(bool enabled);
   bool workerCollisions() const;
@@ -210,7 +210,7 @@ public:
   PerfCounter& lastFramePerfCounter();
   microsecond_t getEvaluateActiveMeshesDuration() const;
   PerfCounter& evaluateActiveMeshesDurationPerfCounter();
-  std::vector<Mesh*>& getActiveMeshes();
+  vector_t<Mesh*>& getActiveMeshes();
   microsecond_t getRenderTargetsDuration() const;
   microsecond_t getRenderDuration() const;
   PerfCounter& renderDurationPerfCounter();
@@ -254,7 +254,7 @@ public:
   void _checkIsReady();
 
   /** Animations **/
-  std::vector<Animation*> getAnimations() override;
+  vector_t<Animation*> getAnimations() override;
 
   /**
    * @brief Will start the animation sequence of a given target.
@@ -281,11 +281,11 @@ public:
                              Animatable* animatable = nullptr);
   Animatable*
   beginDirectAnimation(IAnimatable* target,
-                       const std::vector<Animation*>& animations, int from,
-                       int to, bool loop = false, float speedRatio = 1.f,
+                       const vector_t<Animation*>& animations, int from, int to,
+                       bool loop = false, float speedRatio = 1.f,
                        const ::std::function<void()>& onAnimationEnd = nullptr);
   Animatable* getAnimatableByTarget(IAnimatable* target);
-  std::vector<Animatable*>& animatables();
+  vector_t<Animatable*>& animatables();
 
   /**
    * @brief Will stop the animation of the given target.
@@ -293,8 +293,7 @@ public:
    * @param animationName - the name of the animation to stop (all animations
    * will be stopped is empty)
    */
-  void stopAnimation(IAnimatable* target,
-                     const std::string& animationName = "");
+  void stopAnimation(IAnimatable* target, const string_t& animationName = "");
 
   /** Matrix **/
   Matrix getViewMatrix();
@@ -330,7 +329,7 @@ public:
    * @return {BABYLON.Camera|null} the new active camera or null if none found.
    * @see activeCamera
    */
-  Camera* setActiveCameraByID(const std::string& id);
+  Camera* setActiveCameraByID(const string_t& id);
 
   /**
    * @brief Sets the active camera of the scene using its name.
@@ -338,26 +337,26 @@ public:
    * @return {BABYLON.Camera|null} the new active camera or null if none found.
    * @see activeCamera
    */
-  Camera* setActiveCameraByName(const std::string& name);
+  Camera* setActiveCameraByName(const string_t& name);
 
   /**
    * @brief Get a material using its id.
    * @param {string} the material's ID
    * @return {BABYLON.Material|null} the material or null if none found.
    */
-  Material* getMaterialByID(const std::string& id);
+  Material* getMaterialByID(const string_t& id);
 
   /**
    * @brief Get a material using its name.
    * @param {string} the material's name
    * @return {BABYLON.Material|null} the material or null if none found.
    */
-  Material* getMaterialByName(const std::string& name);
+  Material* getMaterialByName(const string_t& name);
 
-  LensFlareSystem* getLensFlareSystemByName(const std::string& name);
-  LensFlareSystem* getLensFlareSystemByID(const std::string& id);
-  std::vector<Camera*> getCameras() const;
-  Camera* getCameraByID(const std::string& id);
+  LensFlareSystem* getLensFlareSystemByName(const string_t& name);
+  LensFlareSystem* getLensFlareSystemByID(const string_t& id);
+  vector_t<Camera*> getCameras() const;
+  Camera* getCameraByID(const string_t& id);
   Camera* getCameraByUniqueID(unsigned int uniqueId);
 
   /**
@@ -365,35 +364,35 @@ public:
    * @param {string} the camera's name
    * @return {BABYLON.Camera|null} the camera or null if none found.
    */
-  Camera* getCameraByName(const std::string& name);
+  Camera* getCameraByName(const string_t& name);
 
   /**
    * @brief Get a bone using its id.
    * @param {string} the bone's id
    * @return {BABYLON.Bone|null} the bone or null if not found
    */
-  Bone* getBoneByID(const std::string& id);
+  Bone* getBoneByID(const string_t& id);
 
   /**
    * @brief Get a bone using its id.
    * @param {string} the bone's name
    * @return {BABYLON.Bone|null} the bone or null if not found
    */
-  Bone* getBoneByName(const std::string& name);
+  Bone* getBoneByName(const string_t& name);
 
   /**
    * @brief Get a light node using its name.
    * @param {string} the light's name
    * @return {BABYLON.Light|null} the light or null if none found.
    */
-  Light* getLightByName(const std::string& name);
+  Light* getLightByName(const string_t& name);
 
   /**
    * @brief Get a light node using its ID.
    * @param {string} the light's id
    * @return {BABYLON.Light|null} the light or null if none found.
    */
-  Light* getLightByID(const std::string& id);
+  Light* getLightByID(const string_t& id);
 
   /**
    * @brief Get a light node using its scene-generated unique ID.
@@ -408,14 +407,14 @@ public:
    * @return {BABYLON.IParticleSystem|null} the corresponding system or null if
    * none found.
    */
-  IParticleSystem* getParticleSystemByID(const std::string& id);
+  IParticleSystem* getParticleSystemByID(const string_t& id);
 
   /**
    * @brief Get a geometry using its ID.
    * @param {string} the geometry's id
    * @return {BABYLON.Geometry|null} the geometry or null if none found.
    */
-  Geometry* getGeometryByID(const std::string& id);
+  Geometry* getGeometryByID(const string_t& id);
 
   /**
    * @brief Add a new geometry to this scene.
@@ -434,7 +433,7 @@ public:
    */
   bool removeGeometry(Geometry* geometry);
 
-  std::vector<std::unique_ptr<Geometry>>& getGeometries();
+  vector_t<std::unique_ptr<Geometry>>& getGeometries();
 
   /**
    * @brief Get the first added mesh found of a given ID.
@@ -442,7 +441,7 @@ public:
    * @return {BABYLON.AbstractMesh|null} the mesh found or null if not found at
    * all.
    */
-  AbstractMesh* getMeshByID(const std::string& id);
+  AbstractMesh* getMeshByID(const string_t& id);
 
   /**
    * @brief Get the all added meshes found of a given ID.
@@ -450,7 +449,7 @@ public:
    * @return {BABYLON.AbstractMesh[]|[]]} the meshes found or an empty list if
    * not found at all.
    */
-  std::vector<AbstractMesh*> getMeshesByID(const std::string& id);
+  vector_t<AbstractMesh*> getMeshesByID(const string_t& id);
 
   /**
    * @brief Get a mesh with its auto-generated unique id.
@@ -466,24 +465,24 @@ public:
    * @return {BABYLON.AbstractMesh|null} the mesh found or null if not found at
    * all.
    */
-  AbstractMesh* getLastMeshByID(const std::string& id);
+  AbstractMesh* getLastMeshByID(const string_t& id);
 
-  std::vector<AbstractMesh*> getMeshes() const;
+  vector_t<AbstractMesh*> getMeshes() const;
 
   /**
    * @brief Get a the last added node (Mesh, Camera, Light) found of a given ID.
    * @param {string} id - the id to search for
    * @return {BABYLON.Node|null} the node found or null if not found at all.
    */
-  Node* getLastEntryByID(const std::string& id);
+  Node* getLastEntryByID(const string_t& id);
 
-  Node* getNodeByID(const std::string& id);
-  Node* getNodeByName(const std::string& name);
-  AbstractMesh* getMeshByName(const std::string& name);
-  Sound* getSoundByName(const std::string& name);
-  Skeleton* getLastSkeletonByID(const std::string& id);
-  Skeleton* getSkeletonById(const std::string& id);
-  Skeleton* getSkeletonByName(const std::string& name);
+  Node* getNodeByID(const string_t& id);
+  Node* getNodeByName(const string_t& name);
+  AbstractMesh* getMeshByName(const string_t& name);
+  Sound* getSoundByName(const string_t& name);
+  Skeleton* getLastSkeletonByID(const string_t& id);
+  Skeleton* getSkeletonById(const string_t& id);
+  Skeleton* getSkeletonByName(const string_t& name);
   MorphTargetManager* getMorphTargetManagerById(unsigned int id);
   bool isActiveMesh(Mesh* mesh);
 
@@ -492,13 +491,13 @@ public:
    * @param name The name of the highlight layer to look for.
    * @return The highlight layer if found otherwise null.
    */
-  HighlightLayer* getHighlightLayerByName(const std::string& name);
+  HighlightLayer* getHighlightLayerByName(const string_t& name);
 
   /**
    * @brief Return a unique id as a string which can serve as an identifier for
    * the scene.
    */
-  std::string uid();
+  string_t uid();
 
   bool _isInIntermediateRendering() const;
   void updateTransformMatrix(bool force = false);
@@ -592,7 +591,7 @@ public:
    * null. In this case, the scene.activeCamera will be used
    * @return list with picking info objects
    */
-  std::vector<PickingInfo*>
+  vector_t<PickingInfo*>
   multiPick(int x, int y,
             const ::std::function<bool(AbstractMesh* mesh)>& predicate,
             Camera* camera);
@@ -605,7 +604,7 @@ public:
    * isPickable set to true
    * @return list with picking info objects
    */
-  std::vector<PickingInfo*>
+  vector_t<PickingInfo*>
   multiPickWithRay(const Ray& ray,
                    const ::std::function<bool(Mesh* mesh)>& predicate);
 
@@ -641,10 +640,10 @@ public:
                             float blur = 0.f);
 
   /** Tags **/
-  std::vector<Mesh*> getMeshesByTags();
-  std::vector<Camera*> getCamerasByTags();
-  std::vector<Light*> getLightsByTags();
-  std::vector<Material*> getMaterialByTags();
+  vector_t<Mesh*> getMeshesByTags();
+  vector_t<Camera*> getCamerasByTags();
+  vector_t<Light*> getLightsByTags();
+  vector_t<Material*> getMaterialByTags();
 
   /**
    * @brief Overrides the default sort function applied in the renderging group
@@ -729,7 +728,7 @@ private:
   _internalPick(const ::std::function<Ray(const Matrix& world)>& rayFunction,
                 const ::std::function<bool(AbstractMesh* mesh)>& predicate,
                 bool fastCheck);
-  std::vector<PickingInfo*> _internalMultiPick(
+  vector_t<PickingInfo*> _internalMultiPick(
     const ::std::function<Ray(const Matrix& world)>& rayFunction,
     const ::std::function<bool(AbstractMesh* mesh)>& predicate);
   PickingInfo*
@@ -737,7 +736,7 @@ private:
                        const ::std::function<bool(Sprite* sprite)>& predicate,
                        bool fastCheck, Camera* camera);
   /** Tags **/
-  std::vector<std::string> _getByTags();
+  vector_t<string_t> _getByTags();
 
 public:
   // Members
@@ -822,7 +821,7 @@ public:
   Observable<RenderingGroupInfo> onRenderingGroupObservable;
 
   // Animations
-  std::vector<Animation*> animations;
+  vector_t<Animation*> animations;
 
   // Pointers
   ::std::function<bool(AbstractMesh* Mesh)> pointerDownPredicate;
@@ -835,11 +834,11 @@ public:
   bool animationsEnabled;
   bool constantlyUpdateMeshUnderPointer;
 
-  std::string hoverCursor;
+  string_t hoverCursor;
 
   // Metadata
   Json::object metadata;
-  std::string loadingPluginName;
+  string_t loadingPluginName;
 
   // Pointers
 
@@ -876,17 +875,17 @@ public:
    * All of the lights added to this scene.
    * @see BABYLON.Light
    */
-  std::vector<std::unique_ptr<Light>> lights;
+  vector_t<std::unique_ptr<Light>> lights;
   // Cameras
   /**
    * All of the cameras added to this scene.
    */
 
-  std::vector<std::unique_ptr<Camera>> cameras;
+  vector_t<std::unique_ptr<Camera>> cameras;
   /**
    * All of the active cameras added to this scene.
    */
-  std::vector<Camera*> activeCameras;
+  vector_t<Camera*> activeCameras;
 
   /**
    * The current active camera
@@ -898,29 +897,29 @@ public:
    * All of the (abstract) meshes added to this scene.
    * @see BABYLON.AbstractMesh
    */
-  std::vector<std::unique_ptr<AbstractMesh>> meshes;
+  vector_t<std::unique_ptr<AbstractMesh>> meshes;
   // Geometries
-  std::vector<std::unique_ptr<Material>> materials;
-  std::vector<std::unique_ptr<MultiMaterial>> multiMaterials;
+  vector_t<std::unique_ptr<Material>> materials;
+  vector_t<std::unique_ptr<MultiMaterial>> multiMaterials;
   // Textures
-  std::vector<std::unique_ptr<BaseTexture>> textures;
+  vector_t<std::unique_ptr<BaseTexture>> textures;
   // Particles
   bool particlesEnabled;
-  std::vector<std::unique_ptr<IParticleSystem>> particleSystems;
+  vector_t<std::unique_ptr<IParticleSystem>> particleSystems;
   // Sprites
   bool spritesEnabled;
-  std::vector<std::unique_ptr<SpriteManager>> spriteManagers;
+  vector_t<std::unique_ptr<SpriteManager>> spriteManagers;
   ::std::function<bool(Sprite* sprite)> spritePredicate;
   // Layers
-  std::vector<Layer*> layers;
-  std::vector<std::unique_ptr<HighlightLayer>> highlightLayers;
+  vector_t<Layer*> layers;
+  vector_t<std::unique_ptr<HighlightLayer>> highlightLayers;
   // Skeletons
-  std::vector<std::unique_ptr<Skeleton>> skeletons;
+  vector_t<std::unique_ptr<Skeleton>> skeletons;
   // Morph targets
-  std::vector<std::unique_ptr<MorphTargetManager>> morphTargetManagers;
+  vector_t<std::unique_ptr<MorphTargetManager>> morphTargetManagers;
   // Lens flares
   bool lensFlaresEnabled;
-  std::vector<std::unique_ptr<LensFlareSystem>> lensFlareSystems;
+  vector_t<std::unique_ptr<LensFlareSystem>> lensFlareSystems;
   // Collisions
   bool collisionsEnabled;
   std::unique_ptr<ICollisionCoordinator> collisionCoordinator;
@@ -932,14 +931,14 @@ public:
   // Customs render targets
   bool renderTargetsEnabled;
   bool dumpNextRenderTargets;
-  std::vector<RenderTargetTexture*> customRenderTargets;
+  vector_t<RenderTargetTexture*> customRenderTargets;
   // Delay loading
   bool useDelayedTextureLoading;
   // Imported meshes
-  std::vector<std::string> importedMeshesFiles;
+  vector_t<string_t> importedMeshesFiles;
   // Probes
   bool probesEnabled;
-  std::vector<std::unique_ptr<ReflectionProbe>> reflectionProbes;
+  vector_t<std::unique_ptr<ReflectionProbe>> reflectionProbes;
   // Database
   // public database; //ANY
   // Actions
@@ -947,13 +946,13 @@ public:
    * This scene's action manager
    */
   ActionManager* actionManager;
-  std::vector<std::unique_ptr<ActionManager>> _actionManagers;
+  vector_t<std::unique_ptr<ActionManager>> _actionManagers;
   // Procedural textures
   bool proceduralTexturesEnabled;
-  std::vector<std::unique_ptr<ProceduralTexture>> _proceduralTextures;
+  vector_t<std::unique_ptr<ProceduralTexture>> _proceduralTextures;
   // Sound Tracks
   std::unique_ptr<SoundTrack> mainSoundTrack;
-  std::vector<SoundTrack*> soundTracks;
+  vector_t<SoundTrack*> soundTracks;
   // Simplification Queue
   std::unique_ptr<SimplificationQueue> simplificationQueue;
   // Performance counters
@@ -965,9 +964,9 @@ public:
   Material* _cachedMaterial;
   Effect* _cachedEffect;
   float _cachedVisibility;
-  std::vector<IDisposable*> _toBeDisposed;
-  std::vector<IParticleSystem*> _activeParticleSystems;
-  std::vector<Animatable*> _activeAnimatables;
+  vector_t<IDisposable*> _toBeDisposed;
+  vector_t<IParticleSystem*> _activeParticleSystems;
+  vector_t<Animatable*> _activeAnimatables;
   bool requireLightSorting;
 
 protected:
@@ -1042,7 +1041,7 @@ private:
    */
   bool _lightsEnabled;
   // Geometries
-  std::vector<std::unique_ptr<Geometry>> _geometries;
+  vector_t<std::unique_ptr<Geometry>> _geometries;
   // Materials
   Material* _defaultMaterial;
   // Textures
@@ -1055,7 +1054,7 @@ private:
   // Collisions
   bool _workerCollisions;
   // Actions
-  std::vector<AbstractMesh*> _meshesForIntersections;
+  vector_t<AbstractMesh*> _meshesForIntersections;
   // Sound Tracks
   bool _hasAudioEngine;
   bool _audioEnabled;
@@ -1082,12 +1081,12 @@ private:
   bool _intermediateRendering;
   int _viewUpdateFlag;
   int _projectionUpdateFlag;
-  std::vector<std::string> _pendingData;
-  std::vector<Mesh*> _activeMeshes;
-  std::vector<Material*> _processedMaterials;
-  std::vector<RenderTargetTexture*> _renderTargets;
-  std::vector<Skeleton*> _activeSkeletons;
-  std::vector<Mesh*> _softwareSkinnedMeshes;
+  vector_t<string_t> _pendingData;
+  vector_t<Mesh*> _activeMeshes;
+  vector_t<Material*> _processedMaterials;
+  vector_t<RenderTargetTexture*> _renderTargets;
+  vector_t<Skeleton*> _activeSkeletons;
+  vector_t<Mesh*> _softwareSkinnedMeshes;
   std::unique_ptr<RenderingManager> _renderingManager;
   std::unique_ptr<PhysicsEngine> _physicsEngine;
   Matrix _transformMatrix;
@@ -1098,7 +1097,7 @@ private:
   Matrix _viewMatrix;
   Matrix _projectionMatrix;
   bool _frustumPlanesSet;
-  std::array<Plane, 6> _frustumPlanes;
+  array_t<Plane, 6> _frustumPlanes;
   Octree<AbstractMesh*>* _selectionOctree;
   AbstractMesh* _pointerOverMesh;
   Sprite* _pointerOverSprite;
@@ -1109,7 +1108,7 @@ private:
   AbstractMesh* _pickedDownMesh;
   AbstractMesh* _pickedUpMesh;
   Sprite* _pickedDownSprite;
-  std::string _uid;
+  string_t _uid;
 
 }; // end of class Scene
 

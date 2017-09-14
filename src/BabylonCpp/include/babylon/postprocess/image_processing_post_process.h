@@ -13,7 +13,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT ImageProcessingPostProcess : public PostProcess {
 
 public:
-  ImageProcessingPostProcess(const std::string& name, float renderRatio,
+  ImageProcessingPostProcess(const string_t& name, float renderRatio,
                              Camera* camera, unsigned int samplingMode,
                              Engine* engine, bool reusable = false,
                              unsigned int textureType

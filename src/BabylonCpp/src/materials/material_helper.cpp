@@ -26,7 +26,7 @@ namespace BABYLON {
 
 void MaterialHelper::PrepareDefinesForMergedUV(
   BaseTexture* texture, MaterialDefines& defines, unsigned int key,
-  const std::string& keyString, unsigned int MAINUV1, unsigned int MAINUV2)
+  const string_t& keyString, unsigned int MAINUV1, unsigned int MAINUV2)
 {
   const auto updateDirectUV = [&defines, &keyString](unsigned int value) {
     if (keyString == "DIFFUSE") {
@@ -70,7 +70,7 @@ void MaterialHelper::PrepareDefinesForMergedUV(
 
 void MaterialHelper::BindTextureMatrix(BaseTexture& texture,
                                        UniformBuffer& uniformBuffer,
-                                       const std::string& key)
+                                       const string_t& key)
 {
   auto matrix = *texture.getTextureMatrix();
 
@@ -300,9 +300,8 @@ bool MaterialHelper::PrepareDefinesForLights(
 }
 
 void MaterialHelper::PrepareUniformsAndSamplersList(
-  std::vector<std::string>& uniformsList,
-  std::vector<std::string>& samplersList, MaterialDefines& defines,
-  unsigned int maxSimultaneousLights)
+  vector_t<string_t>& uniformsList, vector_t<string_t>& samplersList,
+  MaterialDefines& defines, unsigned int maxSimultaneousLights)
 {
   for (unsigned int lightIndex = 0; lightIndex < maxSimultaneousLights;
        ++lightIndex) {
@@ -310,7 +309,7 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
       break;
     }
 
-    const std::string lightIndexStr = ::std::to_string(lightIndex);
+    const string_t lightIndexStr = ::std::to_string(lightIndex);
     stl_util::concat(uniformsList,
                      {
                        "vLightData" + lightIndexStr,      //
@@ -342,7 +341,7 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
       break;
     }
 
-    const std::string lightIndexStr = ::std::to_string(lightIndex);
+    const string_t lightIndexStr = ::std::to_string(lightIndex);
     stl_util::concat(options.uniformsNames,
                      {
                        "vLightData" + lightIndexStr,      //
@@ -377,7 +376,7 @@ void MaterialHelper::HandleFallbacksForShadows(
       break;
     }
 
-    const std::string lightIndexStr = ::std::to_string(lightIndex);
+    const string_t lightIndexStr = ::std::to_string(lightIndex);
 
     if (lightIndex > 0) {
       fallbacks.addFallback(lightIndex, "LIGHT" + lightIndexStr);
@@ -398,8 +397,8 @@ void MaterialHelper::HandleFallbacksForShadows(
 }
 
 void MaterialHelper::PrepareAttributesForMorphTargets(
-  std::vector<std::string>& attribs, AbstractMesh* mesh,
-  MaterialDefines& defines, unsigned int NORMAL)
+  vector_t<string_t>& attribs, AbstractMesh* mesh, MaterialDefines& defines,
+  unsigned int NORMAL)
 {
   auto influencers = defines.NUM_MORPH_INFLUENCERS;
 
@@ -412,12 +411,12 @@ void MaterialHelper::PrepareAttributesForMorphTargets(
       auto manager = _mesh->morphTargetManager();
       auto normal  = manager->supportsNormals() && defines[NORMAL];
       for (unsigned int index = 0; index < influencers; index++) {
-        const std::string indexStr = ::std::to_string(index);
-        attribs.emplace_back(std::string(VertexBuffer::PositionKindChars)
+        const string_t indexStr = ::std::to_string(index);
+        attribs.emplace_back(string_t(VertexBuffer::PositionKindChars)
                              + indexStr);
 
         if (normal) {
-          attribs.emplace_back(std::string(VertexBuffer::NormalKindChars)
+          attribs.emplace_back(string_t(VertexBuffer::NormalKindChars)
                                + indexStr);
         }
 
@@ -431,9 +430,10 @@ void MaterialHelper::PrepareAttributesForMorphTargets(
   }
 }
 
-void MaterialHelper::PrepareAttributesForBones(
-  std::vector<std::string>& attribs, AbstractMesh* mesh,
-  MaterialDefines& defines, EffectFallbacks& fallbacks)
+void MaterialHelper::PrepareAttributesForBones(vector_t<string_t>& attribs,
+                                               AbstractMesh* mesh,
+                                               MaterialDefines& defines,
+                                               EffectFallbacks& fallbacks)
 {
   if (defines.NUM_BONE_INFLUENCERS > 0) {
     fallbacks.addCPUSkinningFallback(0, mesh);
@@ -447,9 +447,9 @@ void MaterialHelper::PrepareAttributesForBones(
   }
 }
 
-void MaterialHelper::PrepareAttributesForInstances(
-  std::vector<std::string>& attribs, MaterialDefines& defines,
-  unsigned int INSTANCES)
+void MaterialHelper::PrepareAttributesForInstances(vector_t<string_t>& attribs,
+                                                   MaterialDefines& defines,
+                                                   unsigned int INSTANCES)
 {
   if (defines[INSTANCES]) {
     attribs.emplace_back(VertexBuffer::World0KindChars);
@@ -486,8 +486,8 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
   unsigned int lightIndex = 0;
 
   for (auto& light : mesh->_lightSources) {
-    const std::string lightIndexStr = ::std::to_string(lightIndex);
-    const auto scaledIntensity      = light->getScaledIntensity();
+    const string_t lightIndexStr = ::std::to_string(lightIndex);
+    const auto scaledIntensity   = light->getScaledIntensity();
     light->_uniformBuffer->bindToEffect(effect, "Light" + lightIndexStr);
 
     MaterialHelper::BindLightProperties(light, effect, lightIndex);

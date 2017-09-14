@@ -5,41 +5,41 @@
 namespace BABYLON {
 namespace Internals {
 
-std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_FRONT{{
+array_t<Vector3, 4> PanoramaToCubeMapTools::FACE_FRONT{{
   Vector3(-1.f, -1.f, -1.f), //
   Vector3(1.f, -1.f, -1.f),  //
   Vector3(-1.f, 1.f, -1.f),  //
   Vector3(1.f, 1.f, -1.f)    //
 }};
 
-std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_BACK{{
+array_t<Vector3, 4> PanoramaToCubeMapTools::FACE_BACK{{
   Vector3(1.f, -1.f, 1.f),  //
   Vector3(-1.f, -1.f, 1.f), //
   Vector3(1.f, 1.f, 1.f),   //
   Vector3(-1.f, 1.f, 1.f)   //
 }};
 
-std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_RIGHT{{
+array_t<Vector3, 4> PanoramaToCubeMapTools::FACE_RIGHT{{
   Vector3(1.f, -1.f, -1.f), //
   Vector3(1.f, -1.f, 1.f),  //
   Vector3(1.f, 1.f, -1.f),  //
   Vector3(1.f, 1.f, 1.f)    //
 }};
 
-std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_LEFT{{
+array_t<Vector3, 4> PanoramaToCubeMapTools::FACE_LEFT{{
   Vector3(-1.f, -1.f, 1.f),  //
   Vector3(-1.f, -1.f, -1.f), //
   Vector3(-1.f, 1.f, 1.f),   //
   Vector3(-1.f, 1.f, -1.f)   //
 }};
 
-std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_DOWN{
+array_t<Vector3, 4> PanoramaToCubeMapTools::FACE_DOWN{
   {Vector3(-1.f, 1.f, -1.f), //
    Vector3(1.f, 1.f, -1.f),  //
    Vector3(-1.f, 1.f, 1.f),  //
    Vector3(1.f, 1.f, 1.f)}};
 
-std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_UP{{
+array_t<Vector3, 4> PanoramaToCubeMapTools::FACE_UP{{
   Vector3(-1.f, -1.f, 1.f),  //
   Vector3(1.f, -1.f, 1.f),   //
   Vector3(-1.f, -1.f, -1.f), //
@@ -76,7 +76,7 @@ CubeMapInfo PanoramaToCubeMapTools::ConvertPanoramaToCubemap(
 }
 
 Float32Array PanoramaToCubeMapTools::CreateCubemapTexture(
-  size_t texSize, const std::array<Vector3, 4>& faceData,
+  size_t texSize, const array_t<Vector3, 4>& faceData,
   const Float32Array& float32Array, size_t inputWidth, size_t inputHeight)
 {
   Float32Array textureArray(texSize * texSize * 4 * 3);

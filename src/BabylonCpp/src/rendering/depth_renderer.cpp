@@ -101,9 +101,9 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type)
   };
 
   _depthMap->customRenderFunction
-    = [renderSubMesh](const std::vector<SubMesh*>& opaqueSubMeshes,
-                      const std::vector<SubMesh*>& /*transparentSubMeshes*/,
-                      const std::vector<SubMesh*>& alphaTestSubMeshes) {
+    = [renderSubMesh](const vector_t<SubMesh*>& opaqueSubMeshes,
+                      const vector_t<SubMesh*>& /*transparentSubMeshes*/,
+                      const vector_t<SubMesh*>& alphaTestSubMeshes) {
         for (auto& opaqueSubMesh : opaqueSubMeshes) {
           renderSubMesh(opaqueSubMesh);
         }
@@ -125,9 +125,9 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
     return false;
   }
 
-  std::vector<std::string> defines;
+  vector_t<string_t> defines;
 
-  std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
+  vector_t<string_t> attribs{VertexBuffer::PositionKindChars};
 
   auto mesh = subMesh->getMesh();
 
@@ -172,7 +172,7 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
   }
 
   // Get correct effect
-  std::string join = String::join(defines, '\n');
+  string_t join = String::join(defines, '\n');
   if (_cachedDefines != join) {
     _cachedDefines = join;
 

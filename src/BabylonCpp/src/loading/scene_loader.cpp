@@ -56,7 +56,7 @@ void SceneLoader::setCleanBoneMatrixWeights(bool value)
   SceneLoader::_CleanBoneMatrixWeights = value;
 }
 
-std::unordered_map<std::string, IRegisteredPlugin>
+std::unordered_map<string_t, IRegisteredPlugin>
   SceneLoader::_registeredPlugins{};
 
 IRegisteredPlugin SceneLoader::_getDefaultPlugin()
@@ -69,8 +69,7 @@ IRegisteredPlugin SceneLoader::_getDefaultPlugin()
   return SceneLoader::_registeredPlugins[".babylon"];
 }
 
-IRegisteredPlugin
-SceneLoader::_getPluginForExtension(const std::string& extension)
+IRegisteredPlugin SceneLoader::_getPluginForExtension(const string_t& extension)
 {
   if (stl_util::contains(SceneLoader::_registeredPlugins, extension)) {
     return SceneLoader::_registeredPlugins[extension];
@@ -80,13 +79,13 @@ SceneLoader::_getPluginForExtension(const std::string& extension)
 }
 
 IRegisteredPlugin
-SceneLoader::_getPluginForFilename(const std::string& sceneFilename)
+SceneLoader::_getPluginForFilename(const string_t& sceneFilename)
 {
   auto dotPosition = sceneFilename.find_last_of(".");
 
   auto queryStringPosition = sceneFilename.find("?", 0);
 
-  if (queryStringPosition == std::string::npos) {
+  if (queryStringPosition == string_t::npos) {
     queryStringPosition = sceneFilename.size();
   }
 
@@ -95,7 +94,7 @@ SceneLoader::_getPluginForFilename(const std::string& sceneFilename)
   return SceneLoader::_getPluginForExtension(extension);
 }
 
-std::string SceneLoader::_getDirectLoad(const std::string& sceneFilename)
+string_t SceneLoader::_getDirectLoad(const string_t& sceneFilename)
 {
   if (String::startsWith(sceneFilename, "data:")) {
     return sceneFilename.substr(5);
@@ -105,7 +104,7 @@ std::string SceneLoader::_getDirectLoad(const std::string& sceneFilename)
 }
 
 ISceneLoaderPlugin*
-SceneLoader::GetPluginForExtension(const std::string& extension)
+SceneLoader::GetPluginForExtension(const string_t& extension)
 {
   return SceneLoader::_getPluginForExtension(extension).plugin.get();
 }
@@ -122,14 +121,14 @@ void SceneLoader::RegisterPlugin(std::shared_ptr<ISceneLoaderPlugin>&& plugin)
 }
 
 void SceneLoader::ImportMesh(
-  const std::vector<std::string>& meshesNames, const std::string& rootUrl,
-  const std::string& sceneFilename, Scene* scene,
-  const ::std::function<void(std::vector<AbstractMesh*>& meshes,
-                             std::vector<ParticleSystem*>& particleSystems,
-                             std::vector<Skeleton*>& skeletons)>& onsuccess,
+  const vector_t<string_t>& meshesNames, const string_t& rootUrl,
+  const string_t& sceneFilename, Scene* scene,
+  const ::std::function<void(vector_t<AbstractMesh*>& meshes,
+                             vector_t<ParticleSystem*>& particleSystems,
+                             vector_t<Skeleton*>& skeletons)>& onsuccess,
   const ::std::function<void()>& progressCallBack,
-  const ::std::function<void(Scene* scene, const std::string& message,
-                             const std::string& exception)>& onerror)
+  const ::std::function<void(Scene* scene, const string_t& message,
+                             const string_t& exception)>& onerror)
 {
   if (String::startsWith(sceneFilename, "/")) {
     BABYLON_LOG_ERROR("SceneLoader", "Wrong sceneFilename parameter");
@@ -143,10 +142,10 @@ void SceneLoader::ImportMesh(
   auto& plugin         = registeredPlugin.plugin;
   auto& useArrayBuffer = registeredPlugin.isBinary;
 
-  auto importMeshFromData = [&](const std::string& data) {
-    std::vector<AbstractMesh*> meshes;
-    std::vector<ParticleSystem*> particleSystems;
-    std::vector<Skeleton*> skeletons;
+  auto importMeshFromData = [&](const string_t& data) {
+    vector_t<AbstractMesh*> meshes;
+    vector_t<ParticleSystem*> particleSystems;
+    vector_t<Skeleton*> skeletons;
 
     if (!plugin->importMesh(meshesNames, scene, data, rootUrl, meshes,
                             particleSystems, skeletons)) {
@@ -169,12 +168,12 @@ void SceneLoader::ImportMesh(
   }
 
   Tools::LoadFile(rootUrl + sceneFilename,
-                  [&](const std::string& data) { importMeshFromData(data); },
+                  [&](const string_t& data) { importMeshFromData(data); },
                   progressCallBack, useArrayBuffer);
 }
 
 std::unique_ptr<Scene>
-SceneLoader::Load(const std::string& rootUrl, const std::string& sceneFilename,
+SceneLoader::Load(const string_t& rootUrl, const string_t& sceneFilename,
                   Engine* engine,
                   const ::std::function<void(Scene* scene)>& onsuccess,
                   const ::std::function<void()>& progressCallBack,
@@ -186,8 +185,8 @@ SceneLoader::Load(const std::string& rootUrl, const std::string& sceneFilename,
   return scene;
 }
 
-void SceneLoader::Append(const std::string& rootUrl,
-                         const std::string& sceneFilename, Scene* scene,
+void SceneLoader::Append(const string_t& rootUrl, const string_t& sceneFilename,
+                         Scene* scene,
                          const ::std::function<void(Scene* scene)>& onsuccess,
                          const ::std::function<void()>& progressCallBack,
                          const ::std::function<void(Scene* scene)>& onerror)
@@ -208,7 +207,7 @@ void SceneLoader::Append(const std::string& rootUrl,
     scene->getEngine()->displayLoadingUI();
   }
 
-  auto loadSceneFromData = [&](const std::string& data) {
+  auto loadSceneFromData = [&](const string_t& data) {
     if (!plugin->load(scene, data, rootUrl)) {
       if (onerror) {
         onerror(scene);

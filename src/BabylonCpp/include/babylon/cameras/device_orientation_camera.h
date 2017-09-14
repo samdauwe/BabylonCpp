@@ -27,7 +27,7 @@ public:
   void resetToCurrentRotation(const Vector3& axis = Axis::Y);
 
 protected:
-  DeviceOrientationCamera(const std::string& name, const Vector3& position,
+  DeviceOrientationCamera(const string_t& name, const Vector3& position,
                           Scene* scene);
 
 private:

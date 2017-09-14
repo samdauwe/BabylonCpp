@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-MultiMaterial::MultiMaterial(const std::string iName, Scene* scene)
+MultiMaterial::MultiMaterial(const string_t iName, Scene* scene)
     : Material{iName, scene, true}
 {
   // multimaterial is considered like a push material
@@ -29,12 +29,12 @@ IReflect::Type MultiMaterial::type() const
 }
 
 // Properties
-std::vector<Material*>& MultiMaterial::subMaterials()
+vector_t<Material*>& MultiMaterial::subMaterials()
 {
   return _subMaterials;
 }
 
-void MultiMaterial::setSubMaterials(const std::vector<Material*>& value)
+void MultiMaterial::setSubMaterials(const vector_t<Material*>& value)
 {
   _subMaterials = value;
   _hookArray(value);
@@ -49,7 +49,7 @@ Material* MultiMaterial::getSubMaterial(unsigned int index)
   return _subMaterials[index];
 }
 
-std::vector<BaseTexture*> MultiMaterial::getActiveTextures() const
+vector_t<BaseTexture*> MultiMaterial::getActiveTextures() const
 {
   auto activeTextures = Material::getActiveTextures();
   for (auto& subMaterial : _subMaterials) {
@@ -59,7 +59,7 @@ std::vector<BaseTexture*> MultiMaterial::getActiveTextures() const
 }
 
 // Methods
-void MultiMaterial::_hookArray(const std::vector<Material*>& /*array*/)
+void MultiMaterial::_hookArray(const vector_t<Material*>& /*array*/)
 {
 }
 
@@ -84,8 +84,7 @@ bool MultiMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   return true;
 }
 
-Material* MultiMaterial::clone(const std::string& iName,
-                               bool cloneChildren) const
+Material* MultiMaterial::clone(const string_t& iName, bool cloneChildren) const
 {
   auto newMultiMaterial = MultiMaterial::New(iName, getScene());
 

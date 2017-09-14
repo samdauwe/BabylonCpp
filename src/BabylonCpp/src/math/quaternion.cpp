@@ -66,7 +66,7 @@ std::unique_ptr<Quaternion> Quaternion::clone() const
   return ::std::make_unique<Quaternion>(*this);
 }
 
-std::string Quaternion::toString() const
+string_t Quaternion::toString() const
 {
   std::ostringstream oss;
   oss << *this;
@@ -215,8 +215,7 @@ Vector3 Quaternion::toEulerAngles() const
 }
 
 const Quaternion&
-Quaternion::toEulerAnglesToRef(Vector3& result,
-                               const std::string& /*order*/) const
+Quaternion::toEulerAnglesToRef(Vector3& result, const string_t& /*order*/) const
 {
   const float qz = z;
   const float qx = x;
@@ -345,7 +344,7 @@ Quaternion Quaternion::FromRotationMatrix(const Matrix& matrix)
 void Quaternion::FromRotationMatrixToRef(const Matrix& matrix,
                                          Quaternion& result)
 {
-  const std::array<float, 16>& data = matrix.m;
+  const array_t<float, 16>& data = matrix.m;
   const float m11 = data[0], m12 = data[4], m13 = data[8];
   const float m21 = data[1], m22 = data[5], m23 = data[9];
   const float m31 = data[2], m32 = data[6], m33 = data[10];

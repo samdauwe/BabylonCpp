@@ -34,10 +34,10 @@ public:
   void dispose(bool doNotRecurse = false) override;
 
 protected:
-  Sprite(const std::string& name, SpriteManager* manager);
+  Sprite(const string_t& name, SpriteManager* manager);
 
 public:
-  std::string name;
+  string_t name;
   Vector3 position;
   std::unique_ptr<Color4> color;
   int width;
@@ -47,7 +47,7 @@ public:
   int invertU;
   int invertV;
   bool disposeWhenFinishedAnimating;
-  std::vector<Animation*> animations;
+  vector_t<Animation*> animations;
   bool isPickable;
   ActionManager* actionManager;
 

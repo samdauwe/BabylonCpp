@@ -48,7 +48,7 @@ public:
    * @brief Returns the plane coordinates as a new array of 4 elements [a, b, c,
    * d].
    */
-  std::array<float, 4> asArray() const;
+  array_t<float, 4> asArray() const;
 
   /** Methods **/
 

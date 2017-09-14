@@ -70,7 +70,7 @@ bool MergeMeshesOptimization::_apply(Scene* scene, bool updateSelectionTree)
   auto globalLength = globalPool.size();
 
   for (size_t index = 0; index < globalLength; ++index) {
-    std::vector<Mesh*> currentPool;
+    vector_t<Mesh*> currentPool;
     auto current = globalPool[index];
 
     // Checks

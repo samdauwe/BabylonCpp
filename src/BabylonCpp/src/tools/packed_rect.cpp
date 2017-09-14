@@ -51,19 +51,19 @@ void PackedRect::getInnerSizeToRef(Size& res)
   res.height      = static_cast<int>(_contentSize->height - (m * 2.f));
 }
 
-std::vector<Vector2> PackedRect::UVs()
+vector_t<Vector2> PackedRect::UVs()
 {
   if (!_contentSize) {
     BABYLON_LOG_ERROR(
       "PackedRect",
       "Can't compute UVs for this object because it's nor allocated");
-    return std::vector<Vector2>();
+    return vector_t<Vector2>();
   }
 
   return getUVsForCustomSize(*_contentSize);
 }
 
-std::vector<Vector2> PackedRect::getUVsForCustomSize(const Size& customSize)
+vector_t<Vector2> PackedRect::getUVsForCustomSize(const Size& customSize)
 {
   const float mainWidth  = static_cast<float>(_root->_size.width);
   const float mainHeight = static_cast<float>(_root->_size.height);
@@ -76,7 +76,7 @@ std::vector<Vector2> PackedRect::getUVsForCustomSize(const Size& customSize)
     (_pos.x + static_cast<float>(customSize.width) + margin - 1.f) / mainWidth,
     (_pos.y + static_cast<float>(customSize.height) + margin - 1.f)
       / mainHeight);
-  std::vector<Vector2> uvs;
+  vector_t<Vector2> uvs;
   uvs.emplace_back(topLeft);
   uvs.emplace_back(Vector2(rightBottom.x, topLeft.y));
   uvs.emplace_back(rightBottom);

@@ -20,7 +20,7 @@ void PostProcessRenderPipelineManager::addPipeline(
 }
 
 void PostProcessRenderPipelineManager::attachCamerasToRenderPipeline(
-  const std::string& renderPipelineName, const std::vector<Camera*>& cameras,
+  const string_t& renderPipelineName, const vector_t<Camera*>& cameras,
   bool unique)
 {
   if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
@@ -31,7 +31,7 @@ void PostProcessRenderPipelineManager::attachCamerasToRenderPipeline(
 }
 
 void PostProcessRenderPipelineManager::detachCamerasFromRenderPipeline(
-  const std::string& renderPipelineName, const std::vector<Camera*>& cameras)
+  const string_t& renderPipelineName, const vector_t<Camera*>& cameras)
 {
   if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
     return;
@@ -41,8 +41,8 @@ void PostProcessRenderPipelineManager::detachCamerasFromRenderPipeline(
 }
 
 void PostProcessRenderPipelineManager::enableEffectInPipeline(
-  const std::string& renderPipelineName, const std::string& renderEffectName,
-  const std::vector<Camera*>& cameras)
+  const string_t& renderPipelineName, const string_t& renderEffectName,
+  const vector_t<Camera*>& cameras)
 {
   if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
     return;
@@ -53,8 +53,8 @@ void PostProcessRenderPipelineManager::enableEffectInPipeline(
 }
 
 void PostProcessRenderPipelineManager::disableEffectInPipeline(
-  const std::string& renderPipelineName, const std::string& renderEffectName,
-  const std::vector<Camera*>& cameras)
+  const string_t& renderPipelineName, const string_t& renderEffectName,
+  const vector_t<Camera*>& cameras)
 {
   if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
     return;
@@ -65,8 +65,8 @@ void PostProcessRenderPipelineManager::disableEffectInPipeline(
 }
 
 void PostProcessRenderPipelineManager::enableDisplayOnlyPassInPipeline(
-  const std::string& renderPipelineName, const std::string& passName,
-  const std::vector<Camera*>& cameras)
+  const string_t& renderPipelineName, const string_t& passName,
+  const vector_t<Camera*>& cameras)
 {
   if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
     return;
@@ -77,8 +77,8 @@ void PostProcessRenderPipelineManager::enableDisplayOnlyPassInPipeline(
 }
 
 void PostProcessRenderPipelineManager::disableDisplayOnlyPassInPipeline(
-  const std::string& renderPipelineName, const std::string& passName,
-  const std::vector<Camera*>& cameras)
+  const string_t& renderPipelineName, const string_t& passName,
+  const vector_t<Camera*>& cameras)
 {
   if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
     return;
@@ -90,7 +90,7 @@ void PostProcessRenderPipelineManager::disableDisplayOnlyPassInPipeline(
 
 void PostProcessRenderPipelineManager::update()
 {
-  std::vector<std::string> pipelinesToRemove;
+  vector_t<string_t> pipelinesToRemove;
   for (auto& item : _renderPipelines) {
     auto& pipeline = item.second;
     if (!pipeline->isSupported()) {

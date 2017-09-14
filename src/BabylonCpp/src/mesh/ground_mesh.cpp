@@ -10,7 +10,7 @@
 
 namespace BABYLON {
 
-GroundMesh::GroundMesh(const std::string& iName, Scene* scene)
+GroundMesh::GroundMesh(const string_t& iName, Scene* scene)
     : Mesh{iName, scene}, generateOctree{false}
 {
 }

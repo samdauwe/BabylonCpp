@@ -2,8 +2,8 @@
 #define BABYLON_POSTPROCESS_STEREOSCOPIC_INTERLACE_POST_PROCESS_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/postprocess/post_process.h>
 #include <babylon/math/vector2.h>
+#include <babylon/postprocess/post_process.h>
 
 namespace BABYLON {
 
@@ -11,11 +11,11 @@ namespace BABYLON {
  * @brief
  */
 class BABYLON_SHARED_EXPORT StereoscopicInterlacePostProcess
-  : public PostProcess {
+    : public PostProcess {
 
 public:
-  StereoscopicInterlacePostProcess(const std::string& name,
-                                   std::vector<Camera*> rigCameras,
+  StereoscopicInterlacePostProcess(const string_t& name,
+                                   vector_t<Camera*> rigCameras,
                                    bool isStereoscopicHoriz,
                                    unsigned int samplingMode, Engine* engine,
                                    bool reusable = false);

@@ -31,7 +31,7 @@ public:
   /**
    * @brief Returns the string with the Vector4 coordinates.
    */
-  std::string toString() const;
+  string_t toString() const;
 
   /**
    * @brief Returns the string "Vector4".

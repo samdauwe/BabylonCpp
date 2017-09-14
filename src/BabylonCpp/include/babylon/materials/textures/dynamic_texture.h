@@ -16,7 +16,7 @@ struct DynamicTextureOptions {
 class BABYLON_SHARED_EXPORT DynamicTexture : public Texture {
 
 public:
-  DynamicTexture(const std::string& name, const DynamicTextureOptions& options,
+  DynamicTexture(const string_t& name, const DynamicTextureOptions& options,
                  Scene* scene, bool generateMipMaps,
                  unsigned int samplingMode
                  = TextureConstants::TRILINEAR_SAMPLINGMODE,
@@ -29,8 +29,8 @@ public:
   ICanvasRenderingContext2D* getContext();
   void clear();
   void update(bool invertY = true);
-  void drawText(const std::string& text, int x, int y, const std::string& font,
-                const std::string& color, const std::string& clearColor,
+  void drawText(const string_t& text, int x, int y, const string_t& font,
+                const string_t& color, const string_t& clearColor,
                 bool invertY = true, bool update = true);
   std::unique_ptr<DynamicTexture> clone() const;
   void _rebuild() override;

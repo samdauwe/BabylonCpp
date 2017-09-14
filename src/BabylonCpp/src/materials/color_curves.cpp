@@ -306,9 +306,9 @@ const char* ColorCurves::getClassName() const
 }
 
 void ColorCurves::Bind(ColorCurves& colorCurves, Effect* effect,
-                       const std::string& positiveUniform,
-                       const std::string& neutralUniform,
-                       const std::string& negativeUniform)
+                       const string_t& positiveUniform,
+                       const string_t& neutralUniform,
+                       const string_t& negativeUniform)
 {
   if (colorCurves._dirty) {
     colorCurves._dirty = false;
@@ -366,7 +366,7 @@ void ColorCurves::Bind(ColorCurves& colorCurves, Effect* effect,
   }
 }
 
-void ColorCurves::PrepareUniforms(std::vector<std::string>& uniformsList)
+void ColorCurves::PrepareUniforms(vector_t<string_t>& uniformsList)
 {
   stl_util::concat(uniformsList,
                    {

@@ -82,51 +82,51 @@ VertexBuffer::~VertexBuffer()
 {
 }
 
-std::string VertexBuffer::KindAsString(unsigned int kind)
+string_t VertexBuffer::KindAsString(unsigned int kind)
 {
 
   switch (kind) {
     case VertexBuffer::PositionKind:
     default:
-      return std::string(VertexBuffer::PositionKindChars);
+      return string_t(VertexBuffer::PositionKindChars);
     case VertexBuffer::NormalKind:
-      return std::string(VertexBuffer::NormalKindChars);
+      return string_t(VertexBuffer::NormalKindChars);
     case VertexBuffer::TangentKind:
-      return std::string(VertexBuffer::TangentKindChars);
+      return string_t(VertexBuffer::TangentKindChars);
     case VertexBuffer::UVKind:
-      return std::string(VertexBuffer::UVKindChars);
+      return string_t(VertexBuffer::UVKindChars);
     case VertexBuffer::UV2Kind:
-      return std::string(VertexBuffer::UV2KindChars);
+      return string_t(VertexBuffer::UV2KindChars);
     case VertexBuffer::UV3Kind:
-      return std::string(VertexBuffer::UV3KindChars);
+      return string_t(VertexBuffer::UV3KindChars);
     case VertexBuffer::UV4Kind:
-      return std::string(VertexBuffer::UV4KindChars);
+      return string_t(VertexBuffer::UV4KindChars);
     case VertexBuffer::UV5Kind:
-      return std::string(VertexBuffer::UV5KindChars);
+      return string_t(VertexBuffer::UV5KindChars);
     case VertexBuffer::UV6Kind:
-      return std::string(VertexBuffer::UV6KindChars);
+      return string_t(VertexBuffer::UV6KindChars);
     case VertexBuffer::ColorKind:
-      return std::string(VertexBuffer::ColorKindChars);
+      return string_t(VertexBuffer::ColorKindChars);
     case VertexBuffer::MatricesIndicesKind:
-      return std::string(VertexBuffer::MatricesIndicesKindChars);
+      return string_t(VertexBuffer::MatricesIndicesKindChars);
     case VertexBuffer::MatricesWeightsKind:
-      return std::string(VertexBuffer::MatricesWeightsKindChars);
+      return string_t(VertexBuffer::MatricesWeightsKindChars);
     case VertexBuffer::MatricesIndicesExtraKind:
-      return std::string(VertexBuffer::MatricesIndicesExtraKindChars);
+      return string_t(VertexBuffer::MatricesIndicesExtraKindChars);
     case VertexBuffer::MatricesWeightsExtraKind:
-      return std::string(VertexBuffer::MatricesWeightsExtraKindChars);
+      return string_t(VertexBuffer::MatricesWeightsExtraKindChars);
     case VertexBuffer::World0Kind:
-      return std::string(VertexBuffer::World0KindChars);
+      return string_t(VertexBuffer::World0KindChars);
     case VertexBuffer::World1Kind:
-      return std::string(VertexBuffer::World1KindChars);
+      return string_t(VertexBuffer::World1KindChars);
     case VertexBuffer::World2Kind:
-      return std::string(VertexBuffer::World2KindChars);
+      return string_t(VertexBuffer::World2KindChars);
     case VertexBuffer::World3Kind:
-      return std::string(VertexBuffer::World3KindChars);
+      return string_t(VertexBuffer::World3KindChars);
     case VertexBuffer::CellInfoKind:
-      return std::string(VertexBuffer::CellInfoKindChars);
+      return string_t(VertexBuffer::CellInfoKindChars);
     case VertexBuffer::OptionsKind:
-      return std::string(VertexBuffer::OptionsKindChars);
+      return string_t(VertexBuffer::OptionsKindChars);
   }
 }
 

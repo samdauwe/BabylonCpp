@@ -25,13 +25,13 @@ public:
   Color3 frontColor;
   Color3 backColor;
   bool showBackLines;
-  std::vector<BoundingBox> renderList;
+  vector_t<BoundingBox> renderList;
 
 private:
   Scene* _scene;
   ShaderMaterial* _colorShader;
-  std::vector<std::unique_ptr<VertexBuffer>> _vertexBuffers;
-  std::unordered_map<std::string, VertexBuffer*> _vertexBuffersMap;
+  vector_t<std::unique_ptr<VertexBuffer>> _vertexBuffers;
+  std::unordered_map<string_t, VertexBuffer*> _vertexBuffersMap;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
 
 }; // end of class BoundingBoxRenderer

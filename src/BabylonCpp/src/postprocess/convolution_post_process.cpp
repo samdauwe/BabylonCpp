@@ -17,7 +17,7 @@ const Float32Array ConvolutionPostProcess::EmbossKernel
 const Float32Array ConvolutionPostProcess::GaussianKernel
   = {0, 1, 0, 1, 1, 1, 0, 1, 0};
 
-ConvolutionPostProcess::ConvolutionPostProcess(const std::string& iName,
+ConvolutionPostProcess::ConvolutionPostProcess(const string_t& iName,
                                                const Float32Array& iKernel,
                                                float ratio, Camera* camera,
                                                unsigned int samplingMode,

@@ -146,7 +146,7 @@ public:
    * It implies the unifroms available on the materials are the standard BJS
    * ones.
    */
-  void bindShadowLight(const std::string& lightIndex, Effect* effect) override;
+  void bindShadowLight(const string_t& lightIndex, Effect* effect) override;
 
   // Statics
 
@@ -161,9 +161,9 @@ private:
   void _initializeGenerator();
   void _initializeShadowMap();
   void _initializeBlurRTTAndPostProcesses();
-  void _renderForShadowMap(const std::vector<SubMesh*>& opaqueSubMeshes,
-                           const std::vector<SubMesh*>& alphaTestSubMeshes,
-                           const std::vector<SubMesh*>& transparentSubMeshes);
+  void _renderForShadowMap(const vector_t<SubMesh*>& opaqueSubMeshes,
+                           const vector_t<SubMesh*>& alphaTestSubMeshes,
+                           const vector_t<SubMesh*>& transparentSubMeshes);
   void _renderSubMeshForShadowMap(SubMesh* subMesh);
   void _applyFilterValues();
   void _disposeBlurPostProcesses();
@@ -201,13 +201,13 @@ private:
   bool _cacheInitialized;
   Vector3 _cachedPosition;
   Vector3 _cachedDirection;
-  std::string _cachedDefines;
+  string_t _cachedDefines;
   int _currentRenderID;
   std::unique_ptr<PassPostProcess> _downSamplePostprocess;
   std::unique_ptr<PostProcess> _boxBlurPostprocess;
   std::unique_ptr<PostProcess> _kernelBlurXPostprocess;
   std::unique_ptr<PostProcess> _kernelBlurYPostprocess;
-  std::vector<PostProcess*> _blurPostProcesses;
+  vector_t<PostProcess*> _blurPostProcesses;
   ISize _mapSize;
   unsigned int _currentFaceIndex;
   unsigned int _currentFaceIndexCache;

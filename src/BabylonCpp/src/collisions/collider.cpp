@@ -165,7 +165,7 @@ bool Collider::_canDoCollision(const Vector3& sphereCenter, float sphereRadius,
 }
 
 void Collider::_testTriangle(size_t faceIndex,
-                             std::vector<Plane>& trianglePlaneArray,
+                             vector_t<Plane>& trianglePlaneArray,
                              const Vector3& p1, const Vector3& p2,
                              const Vector3& p3, bool hasMaterial)
 {
@@ -366,8 +366,8 @@ void Collider::_testTriangle(size_t faceIndex,
   }
 }
 
-void Collider::_collide(std::vector<Plane>& trianglePlaneArray,
-                        const std::vector<Vector3> pts,
+void Collider::_collide(vector_t<Plane>& trianglePlaneArray,
+                        const vector_t<Vector3> pts,
                         const IndicesArray& indices, size_t indexStart,
                         size_t indexEnd, unsigned int decal, bool hasMaterial)
 {

@@ -72,7 +72,7 @@ bool EffectFallbacks::operator!=(const EffectFallbacks& other) const
   return !(operator==(other));
 }
 
-void EffectFallbacks::addFallback(unsigned int rank, const std::string& define)
+void EffectFallbacks::addFallback(unsigned int rank, const string_t& define)
 {
   if (_defines.find(rank) == _defines.end()) {
     if (rank < _currentRank) {
@@ -106,16 +106,15 @@ bool EffectFallbacks::isMoreFallbacks() const
   return _currentRank <= _maxRank;
 }
 
-std::string EffectFallbacks::reduce(const std::string& currentDefines)
+string_t EffectFallbacks::reduce(const string_t& currentDefines)
 {
   // First we try to switch to CPU skinning
-  std::string currentDefinesCpy(currentDefines);
+  string_t currentDefinesCpy(currentDefines);
   if (_mesh && _mesh->computeBonesUsingShaders()
       && _mesh->numBoneInfluencers() > 0) {
     _mesh->setComputeBonesUsingShaders(false);
-    const std::string toReplace
-      = std::string("#define NUM_BONE_INFLUENCERS ")
-        + ::std::to_string(_mesh->numBoneInfluencers());
+    const string_t toReplace = string_t("#define NUM_BONE_INFLUENCERS ")
+                               + ::std::to_string(_mesh->numBoneInfluencers());
     String::replaceInPlace(currentDefinesCpy, toReplace,
                            "#define NUM_BONE_INFLUENCERS 0");
     BABYLON_LOGF_DEBUG("EffectFallbacks", "Falling back to CPU skinning for %s",

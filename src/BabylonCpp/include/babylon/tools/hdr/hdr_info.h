@@ -33,7 +33,7 @@ struct BABYLON_SHARED_EXPORT HDRInfo {
   /**
    * Header parse error message.
    */
-  std::string errorMessage;
+  string_t errorMessage;
 }; // end of struct HDRInfo
 
 } // end of namespace Internals

@@ -9,37 +9,35 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT ProceduralTexture : public Texture {
 
 public:
-  ProceduralTexture(
-    const std::string& name, const Size& size,
-    const std::unordered_map<std::string, std::string>& fragment, Scene* scene,
-    Texture* fallbackTexture, bool generateMipMaps = true);
-  ProceduralTexture(const std::string& name, const Size& size,
-                    const std::string& fragment, Scene* scene,
+  ProceduralTexture(const string_t& name, const Size& size,
+                    const std::unordered_map<string_t, string_t>& fragment,
+                    Scene* scene, Texture* fallbackTexture,
+                    bool generateMipMaps = true);
+  ProceduralTexture(const string_t& name, const Size& size,
+                    const string_t& fragment, Scene* scene,
                     Texture* fallbackTexture, bool generateMipMaps = true);
   ~ProceduralTexture();
 
   void reset();
   bool isReady() override;
   void resetRefreshCounter();
-  void
-  setFragment(const std::unordered_map<std::string, std::string>& fragment);
-  void setFragment(const std::string& fragment);
+  void setFragment(const std::unordered_map<string_t, string_t>& fragment);
+  void setFragment(const string_t& fragment);
   int refreshRate() const;
   void setRefreshRate(int value);
   bool _shouldRender();
   Size& getRenderSize();
   const Size& getRenderSize() const;
   void resize(const Size& size, bool generateMipMaps);
-  void _checkUniform(const std::string& uniformName);
-  ProceduralTexture& setTexture(const std::string& name, Texture* texture);
-  ProceduralTexture& setFloat(const std::string& name, float value);
-  ProceduralTexture& setFloats(const std::string& name,
-                               std::vector<float> value);
-  ProceduralTexture& setColor3(const std::string& name, const Color3& value);
-  ProceduralTexture& setColor4(const std::string& name, const Color4& value);
-  ProceduralTexture& setVector2(const std::string& name, const Vector2& value);
-  ProceduralTexture& setVector3(const std::string& name, const Vector3& value);
-  ProceduralTexture& setMatrix(const std::string& name, const Matrix& value);
+  void _checkUniform(const string_t& uniformName);
+  ProceduralTexture& setTexture(const string_t& name, Texture* texture);
+  ProceduralTexture& setFloat(const string_t& name, float value);
+  ProceduralTexture& setFloats(const string_t& name, Float32Array value);
+  ProceduralTexture& setColor3(const string_t& name, const Color3& value);
+  ProceduralTexture& setColor4(const string_t& name, const Color4& value);
+  ProceduralTexture& setVector2(const string_t& name, const Vector2& value);
+  ProceduralTexture& setVector3(const string_t& name, const Vector3& value);
+  ProceduralTexture& setMatrix(const string_t& name, const Matrix& value);
   void render(bool useCameraPostProcess = false);
   std::unique_ptr<ProceduralTexture> clone() const;
   void dispose(bool doNotRecurse = false) override;
@@ -54,20 +52,20 @@ private:
   bool _doNotChangeAspectRatio;
   int _currentRefreshId;
   int _refreshRate;
-  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
+  std::unordered_map<string_t, std::unique_ptr<VertexBuffer>> _vertexBuffers;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   Effect* _effect;
-  std::vector<std::string> _uniforms;
-  std::vector<std::string> _samplers;
-  std::unordered_map<std::string, std::string> _fragment;
-  std::unordered_map<std::string, Texture*> _textures;
-  std::unordered_map<std::string, float> _floats;
-  std::unordered_map<std::string, Float32Array> _floatsArrays;
-  std::unordered_map<std::string, Color3> _colors3;
-  std::unordered_map<std::string, Color4> _colors4;
-  std::unordered_map<std::string, Vector2> _vectors2;
-  std::unordered_map<std::string, Vector3> _vectors3;
-  std::unordered_map<std::string, Matrix> _matrices;
+  vector_t<string_t> _uniforms;
+  vector_t<string_t> _samplers;
+  std::unordered_map<string_t, string_t> _fragment;
+  std::unordered_map<string_t, Texture*> _textures;
+  std::unordered_map<string_t, float> _floats;
+  std::unordered_map<string_t, Float32Array> _floatsArrays;
+  std::unordered_map<string_t, Color3> _colors3;
+  std::unordered_map<string_t, Color4> _colors4;
+  std::unordered_map<string_t, Vector2> _vectors2;
+  std::unordered_map<string_t, Vector3> _vectors3;
+  std::unordered_map<string_t, Matrix> _matrices;
   Texture* _fallbackTexture;
   bool _fallbackTextureUsed;
 

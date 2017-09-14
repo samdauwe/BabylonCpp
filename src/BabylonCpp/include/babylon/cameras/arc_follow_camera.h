@@ -26,8 +26,8 @@ public:
   const char* getClassName() const override;
 
 protected:
-  ArcFollowCamera(const std::string& name, float alpha, float beta,
-                  float radius, AbstractMesh* target, Scene* scene);
+  ArcFollowCamera(const string_t& name, float alpha, float beta, float radius,
+                  AbstractMesh* target, Scene* scene);
 
 private:
   void follow();

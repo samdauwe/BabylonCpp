@@ -68,7 +68,7 @@ public:
   virtual ~VertexBuffer();
 
   /** Statics **/
-  static std::string KindAsString(unsigned int kind);
+  static string_t KindAsString(unsigned int kind);
   static int KindToStride(unsigned int kind);
 
   /** Rebuild **/

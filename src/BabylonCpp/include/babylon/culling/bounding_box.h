@@ -22,9 +22,9 @@ public:
   Matrix& getWorldMatrix();
   BoundingBox& setWorldMatrix(const Matrix& matrix);
   void _update(const Matrix& world);
-  bool isInFrustum(const std::array<Plane, 6>& frustumPlanes) override;
-  bool isCompletelyInFrustum(
-    const std::array<Plane, 6>& frustumPlanes) const override;
+  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes) override;
+  bool
+  isCompletelyInFrustum(const array_t<Plane, 6>& frustumPlanes) const override;
   bool intersectsPoint(const Vector3& point);
   bool intersectsSphere(const BoundingSphere& sphere);
   bool intersectsMinMax(const Vector3& min, const Vector3& max) const;
@@ -33,19 +33,19 @@ public:
   static bool Intersects(const BoundingBox& box0, const BoundingBox& box1);
   static bool IntersectsSphere(const Vector3& minPoint, const Vector3& maxPoint,
                                const Vector3& sphereCenter, float sphereRadius);
-  static bool IsCompletelyInFrustum(const std::vector<Vector3>& boundingVectors,
-                                    const std::array<Plane, 6>& frustumPlanes);
-  static bool IsInFrustum(const std::vector<Vector3>& boundingVectors,
-                          const std::array<Plane, 6>& frustumPlanes);
+  static bool IsCompletelyInFrustum(const vector_t<Vector3>& boundingVectors,
+                                    const array_t<Plane, 6>& frustumPlanes);
+  static bool IsInFrustum(const vector_t<Vector3>& boundingVectors,
+                          const array_t<Plane, 6>& frustumPlanes);
 
 public:
-  std::vector<Vector3> vectors;
+  vector_t<Vector3> vectors;
   Vector3 center;
   Vector3 centerWorld;
   Vector3 extendSize;
   Vector3 extendSizeWorld;
-  std::vector<Vector3> directions;
-  std::vector<Vector3> vectorsWorld;
+  vector_t<Vector3> directions;
+  vector_t<Vector3> vectorsWorld;
   Vector3 minimumWorld;
   Vector3 maximumWorld;
   Vector3 minimum;

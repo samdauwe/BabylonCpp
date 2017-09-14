@@ -59,7 +59,7 @@ inline ::std::bitset<32> to_bitset(float number)
   return result;
 }
 
-inline ::std::string to_hex_string(const ::std::string& bit_string)
+inline string_t to_hex_string(const string_t& bit_string)
 {
   ::std::ostringstream oss;
   oss << "0x" << ::std::hex;
@@ -71,7 +71,7 @@ inline ::std::string to_hex_string(const ::std::string& bit_string)
   return oss.str();
 }
 
-inline unsigned int hex_string_to_uint(const ::std::string& hex_string)
+inline unsigned int hex_string_to_uint(const string_t& hex_string)
 {
   return static_cast<unsigned int>(::std::stoul(hex_string, nullptr, 16));
 }
@@ -87,7 +87,7 @@ inline float hex_to_float(unsigned int hex_value)
   return val.f;
 }
 
-inline float hex_to_float(const ::std::string& hex_string)
+inline float hex_to_float(const string_t& hex_string)
 {
   return hex_to_float(hex_string_to_uint(hex_string));
 }
@@ -95,9 +95,9 @@ inline float hex_to_float(const ::std::string& hex_string)
 // byte conversion
 
 template <typename T>
-::std::array<byte, sizeof(T)> to_bytes(const T& object)
+array_t<byte, sizeof(T)> to_bytes(const T& object)
 {
-  ::std::array<byte, sizeof(T)> bytes;
+  array_t<byte, sizeof(T)> bytes;
 
   const byte* begin = reinterpret_cast<const byte*>(::std::addressof(object));
   const byte* end   = begin + sizeof(T);
@@ -107,7 +107,7 @@ template <typename T>
 }
 
 template <typename T>
-T& from_bytes(const ::std::array<byte, sizeof(T)>& bytes, T& object)
+T& from_bytes(const array_t<byte, sizeof(T)>& bytes, T& object)
 {
   // http://en.cppreference.com/w/cpp/types/is_trivially_copyable
   static_assert(::std::is_trivially_copyable<T>::value,
@@ -197,9 +197,9 @@ constexpr int spaceship(const T& lhs, const T& rhs)
 }
 
 /**
- * @brief Combined Comparison (Spaceship) Operator for ::std::string.
+ * @brief Combined Comparison (Spaceship) Operator for string_t.
  */
-inline int spaceship(const ::std::string& lhs, const ::std::string& rhs)
+inline int spaceship(const string_t& lhs, const string_t& rhs)
 {
   const int comparison = lhs.compare(rhs);
   return (comparison < 0) ? -1 : (comparison > 0) ? 1 : 0;
@@ -208,16 +208,15 @@ inline int spaceship(const ::std::string& lhs, const ::std::string& rhs)
 // Container functions
 
 template <typename T, typename... Ts>
-inline ::std::vector<T> to_vector(const T& t0, const Ts&... ts)
+inline vector_t<T> to_vector(const T& t0, const Ts&... ts)
 {
-  return ::std::vector<T>{t0, ts...};
+  return vector_t<T>{t0, ts...};
 }
 
 template <typename T>
-inline ::std::vector<T*>
-to_raw_ptr_vector(const ::std::vector<::std::unique_ptr<T>>& c)
+inline vector_t<T*> to_raw_ptr_vector(const vector_t<::std::unique_ptr<T>>& c)
 {
-  ::std::vector<T*> result;
+  vector_t<T*> result;
   result.reserve(c.size());
   ::std::transform(c.begin(), c.end(), ::std::back_inserter(result),
                    [](const ::std::unique_ptr<T>& ci) { return ci.get(); });
@@ -252,7 +251,7 @@ inline C& concat_with_no_duplicates(C& a, const C& b)
   return a;
 }
 
-// Sequence (i.e. ::std::vector or ::std::list)
+// Sequence (i.e. vector_t or ::std::list)
 template <template <typename, typename> class C, template <typename> class A,
           typename T, typename V>
 constexpr bool contains(const C<T, A<T>>& c, const V& elem)
@@ -283,9 +282,9 @@ inline C& insert_at(C& c, size_t pIndex, const T& elem)
 }
 
 template <typename K, typename V>
-inline ::std::vector<K> extract_keys(::std::unordered_map<K, V> const& inputMap)
+inline vector_t<K> extract_keys(::std::unordered_map<K, V> const& inputMap)
 {
-  ::std::vector<K> keys;
+  vector_t<K> keys;
   keys.reserve(inputMap.size());
   for (auto const& element : inputMap) {
     keys.emplace_back(element.first);
@@ -294,10 +293,9 @@ inline ::std::vector<K> extract_keys(::std::unordered_map<K, V> const& inputMap)
 }
 
 template <typename K, typename V>
-inline ::std::vector<V>
-extract_values(::std::unordered_map<K, V> const& inputMap)
+inline vector_t<V> extract_values(::std::unordered_map<K, V> const& inputMap)
 {
-  ::std::vector<V> values;
+  vector_t<V> values;
   values.reserve(inputMap.size());
   for (auto const& element : inputMap) {
     values.emplace_back(element.second);
@@ -362,10 +360,9 @@ inline int index_of(C& c, const T& elem)
  * @return A vector, containing the filtered values.
  */
 template <typename T, class UnaryPredicate>
-inline ::std::vector<T> filter(const ::std::vector<T>& original,
-                               UnaryPredicate pred)
+inline vector_t<T> filter(const vector_t<T>& original, UnaryPredicate pred)
 {
-  ::std::vector<T> filtered;
+  vector_t<T> filtered;
   ::std::copy_if(original.begin(), original.end(),
                  ::std::back_inserter(filtered), pred);
   return filtered;
@@ -379,10 +376,10 @@ inline ::std::vector<T> filter(const ::std::vector<T>& original,
  * @return A vector, containing the mapped values.
  */
 template <typename T, class UnaryOperation>
-inline ::std::vector<T> map(const ::std::vector<T>& original,
-                            UnaryOperation mappingFunction)
+inline vector_t<T> map(const vector_t<T>& original,
+                       UnaryOperation mappingFunction)
 {
-  ::std::vector<T> mapped;
+  vector_t<T> mapped;
   ::std::transform(original.begin(), original.end(),
                    ::std::back_inserter(mapped), mappingFunction);
   return mapped;
@@ -403,18 +400,17 @@ inline ::std::vector<T> map(const ::std::vector<T>& original,
  * @return A new Array, containing the selected elements.
  */
 template <typename T>
-inline ::std::vector<T> slice(const ::std::vector<T>& v, int start = 0,
-                              int end = -1)
+inline vector_t<T> slice(const vector_t<T>& v, int start = 0, int end = -1)
 {
   if (end < 0) {
-    return ::std::vector<T>(v.begin() + start, v.end());
+    return vector_t<T>(v.begin() + start, v.end());
   }
 
   if (start > end) {
-    return ::std::vector<T>(v.begin() + end, v.begin() + start);
+    return vector_t<T>(v.begin() + end, v.begin() + start);
   }
 
-  return ::std::vector<T>(v.begin() + (start < 0 ? 0 : start), v.begin() + end);
+  return vector_t<T>(v.begin() + (start < 0 ? 0 : start), v.begin() + end);
 }
 
 /**
@@ -431,17 +427,16 @@ inline ::std::vector<T> slice(const ::std::vector<T>& v, int start = 0,
  * @return Nothing.
  */
 template <typename T>
-inline void slice_in_place(::std::vector<T>& v, int start = 0, int end = -1)
+inline void slice_in_place(vector_t<T>& v, int start = 0, int end = -1)
 {
   if (end < 0) {
-    ::std::vector<T>(v.begin() + start, v.end()).swap(v);
+    vector_t<T>(v.begin() + start, v.end()).swap(v);
   }
   else if (start > end) {
-    ::std::vector<T>(v.begin() + end, v.begin() + start).swap(v);
+    vector_t<T>(v.begin() + end, v.begin() + start).swap(v);
   }
   else {
-    ::std::vector<T>(v.begin() + (start < 0 ? 0 : start), v.begin() + end)
-      .swap(v);
+    vector_t<T>(v.begin() + (start < 0 ? 0 : start), v.begin() + end).swap(v);
   }
 }
 
@@ -456,14 +451,13 @@ inline void slice_in_place(::std::vector<T>& v, int start = 0, int end = -1)
  * @return A new Array, containing the removed items (if any)
  */
 template <typename T>
-inline ::std::vector<T>
-splice(::std::vector<T>& v, int index = 0, int howmany = 0,
-       const ::std::vector<T>& itemsToAdd = ::std::vector<T>())
+inline vector_t<T> splice(vector_t<T>& v, int index = 0, int howmany = 0,
+                          const vector_t<T>& itemsToAdd = vector_t<T>())
 {
   if (index < 0) {
     const auto start = ::std::max(v.begin(), v.end() + index);
     const auto end   = ::std::min(v.end(), start + howmany);
-    ::std::vector<T> removedItems(start, end);
+    vector_t<T> removedItems(start, end);
     v.erase(start, end);
     v.insert(end - static_cast<int>(removedItems.size()), itemsToAdd.begin(),
              itemsToAdd.end());
@@ -472,7 +466,7 @@ splice(::std::vector<T>& v, int index = 0, int howmany = 0,
   else {
     const auto start = ::std::min(v.end(), v.begin() + index);
     const auto end   = ::std::min(v.end(), start + howmany);
-    ::std::vector<T> removedItems(start, end);
+    vector_t<T> removedItems(start, end);
     v.erase(start, end);
     v.insert(end - static_cast<int>(removedItems.size()), itemsToAdd.begin(),
              itemsToAdd.end());
@@ -481,7 +475,7 @@ splice(::std::vector<T>& v, int index = 0, int howmany = 0,
 }
 
 template <typename T>
-inline void remove(::std::vector<T>& vec, size_t pos)
+inline void remove(vector_t<T>& vec, size_t pos)
 {
   vec.erase(vec.begin() + pos);
 }

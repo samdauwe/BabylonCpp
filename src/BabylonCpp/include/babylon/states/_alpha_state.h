@@ -32,9 +32,9 @@ private:
   bool _isBlendEquationParametersDirty;
   bool _isBlendConstantsDirty;
   bool _alphaBlend;
-  std::array<unsigned int, 4> _blendFunctionParameters;
-  std::array<unsigned int, 2> _blendEquationParameters;
-  std::array<float, 4> _blendConstants;
+  array_t<unsigned int, 4> _blendFunctionParameters;
+  array_t<unsigned int, 2> _blendEquationParameters;
+  array_t<float, 4> _blendConstants;
 
 }; // end of class _AlphaState
 

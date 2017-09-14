@@ -233,7 +233,7 @@ private:
   high_res_time_point_t _lastInteractionTime;
 
   // Framing control
-  std::vector<Animatable*> _animatables;
+  vector_t<Animatable*> _animatables;
   bool _betaIsAnimating;
   Animation* _betaTransition;
   Animation* _radiusTransition;

@@ -14,7 +14,7 @@ namespace BABYLON {
 
 InterpolateValueAction::InterpolateValueAction(
   unsigned int triggerOptions, IAnimatable* target,
-  const std::string& iPropertyPath, AnimationValue* iValue, int iDuration,
+  const string_t& iPropertyPath, AnimationValue* iValue, int iDuration,
   Condition* condition, bool iStopOtherAnimations,
   const ::std::function<void()>& iOnInterpolationDone)
     : Action(triggerOptions, condition)
@@ -41,7 +41,7 @@ void InterpolateValueAction::_prepare()
 void InterpolateValueAction::execute(const ActionEvent& /*evt*/)
 {
   auto scene = _actionManager->getScene();
-  std::vector<AnimationKey> keys{
+  vector_t<AnimationKey> keys{
     AnimationKey(0, (*_effectiveTarget)[_property]), //
     AnimationKey(100, *value)};
 

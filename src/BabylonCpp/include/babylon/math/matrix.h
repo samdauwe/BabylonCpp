@@ -161,7 +161,7 @@ public:
    * values.
    * @returns The Matrix.
    */
-  const Matrix& copyToArray(std::array<float, 16>& array,
+  const Matrix& copyToArray(array_t<float, 16>& array,
                             unsigned int offset = 0) const;
 
   /**
@@ -181,8 +181,7 @@ public:
    * @brief Sets the Float32Array "result" from the passed index "offset" with
    * the multiplication result of the current Matrix and the passed one.
    */
-  const Matrix& multiplyToArray(const Matrix& other,
-                                std::array<float, 16>& result,
+  const Matrix& multiplyToArray(const Matrix& other, array_t<float, 16>& result,
                                 unsigned int offset) const;
 
   /**
@@ -623,7 +622,7 @@ public:
 
 public:
   int updateFlag;
-  std::array<float, 16> m;
+  array_t<float, 16> m;
 #if BABYLONCPP_OPTION_ENABLE_SIMD == true
   SIMD::SIMDMatrix simdMatrix;
 #endif

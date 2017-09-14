@@ -26,7 +26,7 @@ public:
   Json::object serialize() const override;
 
 protected:
-  FollowCamera(const std::string& name, const Vector3& position, Scene* scene,
+  FollowCamera(const string_t& name, const Vector3& position, Scene* scene,
                AbstractMesh* iLockedTarget = nullptr);
 
 private:

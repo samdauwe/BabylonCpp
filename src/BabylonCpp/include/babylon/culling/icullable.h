@@ -6,9 +6,9 @@
 namespace BABYLON {
 
 struct ICullable {
-  virtual bool isInFrustum(const std::array<Plane, 6>& frustumPlanes) = 0;
+  virtual bool isInFrustum(const array_t<Plane, 6>& frustumPlanes) = 0;
   virtual bool
-  isCompletelyInFrustum(const std::array<Plane, 6>& frustumPlanes) const = 0;
+  isCompletelyInFrustum(const array_t<Plane, 6>& frustumPlanes) const = 0;
 }; // end of struct ICullable
 
 } // end of namespace BABYLON

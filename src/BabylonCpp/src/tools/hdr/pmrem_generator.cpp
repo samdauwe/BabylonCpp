@@ -4,7 +4,7 @@ namespace BABYLON {
 namespace Internals {
 
 template <typename ArrayBufferView>
-const std::vector<std::vector<Float32Array>>
+const vector_t<vector_t<Float32Array>>
   PMREMGenerator<ArrayBufferView>::_sgFace2DMapping = {
     // XPOS face
     {{0, 0, -1}, // u towards negative Z
@@ -33,7 +33,7 @@ const std::vector<std::vector<Float32Array>>
 };
 
 template <typename ArrayBufferView>
-const std::vector<std::vector<Uint32Array>>
+const vector_t<vector_t<Uint32Array>>
   PMREMGenerator<ArrayBufferView>::_sgCubeNgh = {
     // XPOS face
     {{PMREMGenerator::CP_FACE_Z_POS, PMREMGenerator::CP_EDGE_RIGHT},
@@ -67,7 +67,7 @@ const std::vector<std::vector<Uint32Array>>
      {PMREMGenerator::CP_FACE_Y_NEG, PMREMGenerator::CP_EDGE_BOTTOM}}};
 
 template <typename ArrayBufferView>
-const std::vector<Uint32Array> PMREMGenerator<ArrayBufferView>::_sgCubeEdgeList
+const vector_t<Uint32Array> PMREMGenerator<ArrayBufferView>::_sgCubeEdgeList
   = {{PMREMGenerator::CP_FACE_X_POS, PMREMGenerator::CP_EDGE_LEFT},
      {PMREMGenerator::CP_FACE_X_POS, PMREMGenerator::CP_EDGE_RIGHT},
      {PMREMGenerator::CP_FACE_X_POS, PMREMGenerator::CP_EDGE_TOP},
@@ -84,8 +84,8 @@ const std::vector<Uint32Array> PMREMGenerator<ArrayBufferView>::_sgCubeEdgeList
      {PMREMGenerator::CP_FACE_Z_NEG, PMREMGenerator::CP_EDGE_BOTTOM}};
 
 template <typename ArrayBufferView>
-const std::vector<Uint32Array>
-  PMREMGenerator<ArrayBufferView>::_sgCubeCornerList = {
+const vector_t<Uint32Array> PMREMGenerator<ArrayBufferView>::_sgCubeCornerList
+  = {
     // XPOS face
     {PMREMGenerator::CP_CORNER_PPP, PMREMGenerator::CP_CORNER_PPN,
      PMREMGenerator::CP_CORNER_PNP, PMREMGenerator::CP_CORNER_PNN},
@@ -107,7 +107,7 @@ const std::vector<Uint32Array>
 
 template <typename ArrayBufferView>
 PMREMGenerator<ArrayBufferView>::PMREMGenerator(
-  const std::vector<ArrayBufferView>& _input, int _inputSize, int _outputSize,
+  const vector_t<ArrayBufferView>& _input, int _inputSize, int _outputSize,
   size_t _maxNumMipLevels, size_t _numChannels, bool _isFloat,
   float _specularPower, float _cosinePowerDropPerMip, bool _excludeBase,
   bool _fixup)
@@ -130,7 +130,7 @@ PMREMGenerator<ArrayBufferView>::~PMREMGenerator()
 }
 
 template <typename ArrayBufferView>
-std::vector<std::vector<ArrayBufferView>>&
+vector_t<vector_t<ArrayBufferView>>&
 PMREMGenerator<ArrayBufferView>::filterCubeMap()
 {
   // Init cubemap processor
@@ -211,8 +211,8 @@ void PMREMGenerator<ArrayBufferView>::filterCubeMapMipChain()
 
     // Special case for cosine power mipmap chain. For quality requirement, we
     // always process the current mipmap from the top mipmap
-    std::vector<ArrayBufferView>& srcCubeImage = input;
-    std::vector<std::vector<ArrayBufferView>>& dstCubeImage
+    vector_t<ArrayBufferView>& srcCubeImage = input;
+    vector_t<vector_t<ArrayBufferView>>& dstCubeImage
       = _outputSurface[levelIndex];
     size_t dstSize = outputSize >> levelIndex;
 
@@ -455,12 +455,12 @@ float PMREMGenerator<ArrayBufferView>::texelCoordSolidAngle(
 
 template <typename ArrayBufferView>
 void PMREMGenerator<ArrayBufferView>::filterCubeSurfaces(
-  const std::vector<ArrayBufferView>& srcCubeMap, float srcSize,
-  std::vector<ArrayBufferView>& dstCubeMap, size_t dstSize,
-  float filterConeAngle, float _specularPower)
+  const vector_t<ArrayBufferView>& srcCubeMap, float srcSize,
+  vector_t<ArrayBufferView>& dstCubeMap, size_t dstSize, float filterConeAngle,
+  float _specularPower)
 {
   // bounding box per face to specify region to process
-  std::array<CMGBoundinBox, 6> filterExtents;
+  array_t<CMGBoundinBox, 6> filterExtents;
 
   // min angle a src texel can cover (in degrees)
   float srcTexelAngle = (180.f / (Math::PI)*std::atan2(1.f, srcSize));
@@ -524,7 +524,7 @@ void PMREMGenerator<ArrayBufferView>::filterCubeSurfaces(
 
 template <typename ArrayBufferView>
 void PMREMGenerator<ArrayBufferView>::clearFilterExtents(
-  std::array<CMGBoundinBox, 6>& filterExtents)
+  array_t<CMGBoundinBox, 6>& filterExtents)
 {
   for (auto& filterExtent : filterExtents) {
     filterExtent.clear();
@@ -534,13 +534,13 @@ void PMREMGenerator<ArrayBufferView>::clearFilterExtents(
 template <typename ArrayBufferView>
 void PMREMGenerator<ArrayBufferView>::determineFilterExtents(
   const Vector4& centerTapDir, size_t srcSize, size_t bboxSize,
-  std::array<CMGBoundinBox, 6>& filterExtents) const
+  array_t<CMGBoundinBox, 6>& filterExtents) const
 {
   // neighboring face and bleed over amount, and width of BBOX for
   // left, right, top, and bottom edges of this face
-  std::array<float, 4> bleedOverAmount{{0, 0, 0, 0}};
-  std::array<float, 4> bleedOverBBoxMin{{0, 0, 0, 0}};
-  std::array<float, 4> bleedOverBBoxMax{{0, 0, 0, 0}};
+  array_t<float, 4> bleedOverAmount{{0, 0, 0, 0}};
+  array_t<float, 4> bleedOverBBoxMin{{0, 0, 0, 0}};
+  array_t<float, 4> bleedOverBBoxMax{{0, 0, 0, 0}};
 
   unsigned int neighborFace    = 0;
   unsigned int neighborEdge    = 0;
@@ -686,15 +686,15 @@ void PMREMGenerator<ArrayBufferView>::determineFilterExtents(
 template <typename ArrayBufferView>
 Vector4 PMREMGenerator<ArrayBufferView>::processFilterExtents(
   const Vector4& centerTapDir, float dotProdThresh,
-  const std::array<CMGBoundinBox, 6>& filterExtents,
-  const std::vector<ArrayBufferView>& srcCubeMap, size_t srcSize,
+  const array_t<CMGBoundinBox, 6>& filterExtents,
+  const vector_t<ArrayBufferView>& srcCubeMap, size_t srcSize,
   size_t _specularPower) const
 {
   Vector4 _vectorTemp{0.f, 0.f, 0.f, 0.f};
 
   // accumulators are 64-bit floats in order to have the precision needed
   // over a summation of a large number of pixels
-  std::array<float, 4> dstAccum{{0, 0, 0, 0}};
+  array_t<float, 4> dstAccum{{0, 0, 0, 0}};
   float weightAccum   = 0.f;
   size_t nSrcChannels = numChannels;
 
@@ -818,17 +818,17 @@ Vector4 PMREMGenerator<ArrayBufferView>::processFilterExtents(
 
 template <typename ArrayBufferView>
 void PMREMGenerator<ArrayBufferView>::fixupCubeEdges(
-  std::vector<ArrayBufferView>& cubeMap, size_t cubeMapSize)
+  vector_t<ArrayBufferView>& cubeMap, size_t cubeMapSize)
 {
-  std::array<unsigned int, 8> cornerNumPtrs{
+  array_t<unsigned int, 8> cornerNumPtrs{
     {0, 0, 0, 0, 0, 0, 0, 0}}; // indexed by corner and face idx
-  std::array<Uint32Array, 4> faceCornerStartIndicies;
+  array_t<Uint32Array, 4> faceCornerStartIndicies;
 
   // note that if functionality to filter across the three texels for each
   // corner, then
   // indexed by corner and face idx. the array contains the face the start
   // points belongs to.
-  std::array<std::array<Uint32Array, 3>, 8> cornerPtr;
+  array_t<array_t<Uint32Array, 3>, 8> cornerPtr;
 
   // if there is no fixup, or fixup width = 0, do nothing
   if (cubeMapSize < 1) {

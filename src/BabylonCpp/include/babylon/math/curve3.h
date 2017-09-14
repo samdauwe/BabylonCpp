@@ -18,7 +18,7 @@ public:
    * A Curve3 is designed from a series of successive Vector3.
    * Tuto : http://doc.babylonjs.com/tutorials/How_to_use_Curve3#curve3-object
    */
-  Curve3(const std::vector<Vector3>& points);
+  Curve3(const vector_t<Vector3>& points);
   Curve3(const Curve3& otherCurve);
   Curve3(Curve3&& otherCurve);
   Curve3& operator=(const Curve3& otherCurve);
@@ -31,7 +31,7 @@ public:
   /**
    * @brief Returns the Curve3 stored array of successive Vector3
    */
-  std::vector<Vector3>& getPoints();
+  vector_t<Vector3>& getPoints();
 
   /**
    * @brief Returns the computed length (float) of the curve.
@@ -93,14 +93,14 @@ public:
    * @param nbPoints (integer) the wanted number of points between each curve
    * control points.
    */
-  static Curve3 CreateCatmullRomSpline(const std::vector<Vector3> points,
+  static Curve3 CreateCatmullRomSpline(const vector_t<Vector3> points,
                                        size_t nbPoints);
 
 private:
-  float computeLength(const std::vector<Vector3>& path);
+  float computeLength(const vector_t<Vector3>& path);
 
 private:
-  std::vector<Vector3> _points;
+  vector_t<Vector3> _points;
   float _length;
 
 }; // end of class Curve3

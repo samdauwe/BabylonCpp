@@ -77,8 +77,7 @@ void BoundingSphere::_update(const Matrix& world)
                          * radius);
 }
 
-bool BoundingSphere::isInFrustum(
-  const std::array<Plane, 6>& frustumPlanes) const
+bool BoundingSphere::isInFrustum(const array_t<Plane, 6>& frustumPlanes) const
 {
   for (unsigned int i = 0; i < 6; ++i) {
     if (frustumPlanes[i].dotCoordinate(centerWorld) <= -radiusWorld) {

@@ -7,17 +7,17 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT EffectCreationOptions {
-  std::vector<std::string> attributes{};
-  std::vector<std::string> uniformsNames{};
-  std::vector<std::string> uniformBuffersNames{};
-  std::vector<std::string> samplers{};
+  vector_t<string_t> attributes{};
+  vector_t<string_t> uniformsNames{};
+  vector_t<string_t> uniformBuffersNames{};
+  vector_t<string_t> samplers{};
   MaterialDefines* materialDefines{nullptr};
-  std::string defines{""};
+  string_t defines{""};
   std::unique_ptr<EffectFallbacks> fallbacks{nullptr};
   ::std::function<void(Effect* effect)> onCompiled{nullptr};
-  ::std::function<void(Effect* effect, const std::string& errors)> onError{
+  ::std::function<void(Effect* effect, const string_t& errors)> onError{
     nullptr};
-  std::unordered_map<std::string, unsigned int> indexParameters{};
+  std::unordered_map<string_t, unsigned int> indexParameters{};
   unsigned int number{0};
   unsigned int maxSimultaneousLights{4};
 }; // end of class EffectCreationOptions

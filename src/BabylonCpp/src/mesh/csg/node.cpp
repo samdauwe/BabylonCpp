@@ -9,7 +9,7 @@ CSG::Node::Node() : _plane{nullptr}, _front{nullptr}, _back{nullptr}
 {
 }
 
-CSG::Node::Node(const std::vector<BABYLON::CSG::Polygon*>& polygons)
+CSG::Node::Node(const vector_t<BABYLON::CSG::Polygon*>& polygons)
     : _plane{nullptr}, _front{nullptr}, _back{nullptr}
 {
   if (!polygons.empty()) {
@@ -48,13 +48,13 @@ void CSG::Node::invert()
   std::swap(_front, _back);
 }
 
-std::vector<CSG::Polygon*>
-CSG::Node::clipPolygons(const std::vector<BABYLON::CSG::Polygon*>& polygons)
+vector_t<CSG::Polygon*>
+CSG::Node::clipPolygons(const vector_t<BABYLON::CSG::Polygon*>& polygons)
 {
   if (!_plane) {
     return polygons;
   }
-  std::vector<Polygon *> front, back;
+  vector_t<Polygon*> front, back;
   for (auto& polygon : polygons) {
     _plane->splitPolygon(polygon, front, back, front, back);
   }
@@ -82,9 +82,9 @@ void BABYLON::CSG::Node::clipTo(BABYLON::CSG::Node* bsp)
   }
 }
 
-std::vector<BABYLON::CSG::Polygon*> BABYLON::CSG::Node::allPolygons()
+vector_t<BABYLON::CSG::Polygon*> BABYLON::CSG::Node::allPolygons()
 {
-  std::vector<Polygon*> polygons = _polygons;
+  vector_t<Polygon*> polygons = _polygons;
   if (_front) {
     polygons = stl_util::concat(polygons, _front->allPolygons());
   }
@@ -94,8 +94,7 @@ std::vector<BABYLON::CSG::Polygon*> BABYLON::CSG::Node::allPolygons()
   return polygons;
 }
 
-void BABYLON::CSG::Node::build(
-  const std::vector<BABYLON::CSG::Polygon*>& polygons)
+void BABYLON::CSG::Node::build(const vector_t<BABYLON::CSG::Polygon*>& polygons)
 {
   if (polygons.empty()) {
     return;
@@ -103,7 +102,7 @@ void BABYLON::CSG::Node::build(
   if (!_plane) {
     _plane = polygons[0]->plane.cloneToNewObject();
   }
-  std::vector<Polygon *> front, back;
+  vector_t<Polygon*> front, back;
   for (auto& polygon : polygons) {
     _plane->splitPolygon(polygon, _polygons, _polygons, front, back);
   }

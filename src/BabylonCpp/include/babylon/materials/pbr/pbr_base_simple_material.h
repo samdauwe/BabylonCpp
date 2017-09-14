@@ -24,7 +24,7 @@ public:
    * @param name The material name
    * @param scene The scene the material will be use in.
    */
-  PBRBaseSimpleMaterial(const std::string& name, Scene* scene);
+  PBRBaseSimpleMaterial(const string_t& name, Scene* scene);
   ~PBRBaseSimpleMaterial();
 
   /**
@@ -68,7 +68,7 @@ public:
   /**
    * @brief Return the active textures of the material.
    */
-  std::vector<BaseTexture*> getActiveTextures() const override;
+  vector_t<BaseTexture*> getActiveTextures() const override;
 
 protected:
   /**

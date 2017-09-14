@@ -10,15 +10,14 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT GPUParticleSystem : public IParticleSystem {
 
 public:
-  GPUParticleSystem(const std::string& name, std::size_t capacity,
-                    Scene* scene);
+  GPUParticleSystem(const string_t& name, std::size_t capacity, Scene* scene);
   virtual ~GPUParticleSystem();
 
   bool isStarted() const override;
   void animate() override;
   size_t render() override;
   void dispose(bool doNotRecurse = false) override;
-  IParticleSystem* clone(const std::string& name, Mesh* newEmitter) override;
+  IParticleSystem* clone(const string_t& name, Mesh* newEmitter) override;
   Json::object serialize() const override;
 
 public:

@@ -12,7 +12,7 @@
 
 namespace BABYLON {
 
-LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent,
+LinesMesh::LinesMesh(const string_t& iName, Scene* scene, Node* iParent,
                      LinesMesh* source, bool doNotCloneChildren,
                      bool useVertexColor)
     : Mesh(iName, scene, iParent, source, doNotCloneChildren)
@@ -82,7 +82,7 @@ bool LinesMesh::checkCollisions()
   return false;
 }
 
-InstancedMesh* LinesMesh::createInstance(const std::string& /*name*/)
+InstancedMesh* LinesMesh::createInstance(const string_t& /*name*/)
 {
   BABYLON_LOG_WARN("InstancedMesh",
                    "LinesMeshes do not support createInstance.");
@@ -127,7 +127,7 @@ void LinesMesh::dispose(bool /*doNotRecurse*/)
   Mesh::dispose();
 }
 
-LinesMesh* LinesMesh::clone(const std::string& iName, Node* newParent,
+LinesMesh* LinesMesh::clone(const string_t& iName, Node* newParent,
                             bool doNotCloneChildren)
 {
   return LinesMesh::New(iName, getScene(), newParent, this, doNotCloneChildren);

@@ -116,8 +116,8 @@ int EdgesRenderer::_processEdgeForAdjacenciesWithVertices(const Vector3& pa,
 }
 
 void EdgesRenderer::_checkEdge(unsigned int faceIndex, int edge,
-                               std::vector<Vector3> faceNormals,
-                               const Vector3& p0, const Vector3& p1)
+                               vector_t<Vector3> faceNormals, const Vector3& p0,
+                               const Vector3& p1)
 {
   auto needToCreateLine = false;
 
@@ -189,8 +189,8 @@ void EdgesRenderer::_generateEdgesLines()
   auto indices   = _source->getIndices();
 
   // First let's find adjacencies
-  std::vector<FaceAdjacencies> adjacencies;
-  std::vector<Vector3> faceNormals;
+  vector_t<FaceAdjacencies> adjacencies;
+  vector_t<Vector3> faceNormals;
 
   // Prepare faces
   for (unsigned int index = 0; index < indices.size(); index += 3) {

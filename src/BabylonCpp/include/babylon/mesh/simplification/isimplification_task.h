@@ -10,7 +10,7 @@ namespace BABYLON {
  * @brief
  */
 struct BABYLON_SHARED_EXPORT ISimplificationTask {
-  std::vector<ISimplificationSettings> settings;
+  vector_t<ISimplificationSettings> settings;
   SimplificationType simplificationType;
   Mesh* mesh;
   ::std::function<void()> successCallback;

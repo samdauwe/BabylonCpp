@@ -13,7 +13,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT HighlightsPostProcess : public PostProcess {
 
 public:
-  HighlightsPostProcess(const std::string& name, float ratio, Camera* camera,
+  HighlightsPostProcess(const string_t& name, float ratio, Camera* camera,
                         unsigned int samplingMode, Engine* engine,
                         bool reusable = false,
                         unsigned int textureType

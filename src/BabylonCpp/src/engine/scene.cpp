@@ -433,12 +433,12 @@ void Scene::setDefaultMaterial(Material* value)
   _defaultMaterial = value;
 }
 
-std::array<Plane, 6>& Scene::frustumPlanes()
+array_t<Plane, 6>& Scene::frustumPlanes()
 {
   return _frustumPlanes;
 }
 
-const std::array<Plane, 6>& Scene::frustumPlanes() const
+const array_t<Plane, 6>& Scene::frustumPlanes() const
 {
   return _frustumPlanes;
 }
@@ -474,9 +474,9 @@ bool Scene::workerCollisions() const
   return _workerCollisions;
 }
 
-std::vector<AbstractMesh*> Scene::getMeshes() const
+vector_t<AbstractMesh*> Scene::getMeshes() const
 {
-  std::vector<AbstractMesh*> _meshes;
+  vector_t<AbstractMesh*> _meshes;
   _meshes.reserve(meshes.size());
 
   ::std::for_each(meshes.begin(), meshes.end(),
@@ -608,7 +608,7 @@ PerfCounter& Scene::evaluateActiveMeshesDurationPerfCounter()
   return _evaluateActiveMeshesDuration;
 }
 
-std::vector<Mesh*>& Scene::getActiveMeshes()
+vector_t<Mesh*>& Scene::getActiveMeshes()
 {
   return _activeMeshes;
 }
@@ -1197,9 +1197,9 @@ void Scene::_checkIsReady()
   }
 }
 
-std::vector<Animation*> Scene::getAnimations()
+vector_t<Animation*> Scene::getAnimations()
 {
-  return std::vector<Animation*>();
+  return vector_t<Animation*>();
 }
 
 Animatable* Scene::beginAnimation(IAnimatable* target, float from, float to,
@@ -1226,7 +1226,7 @@ Animatable* Scene::beginAnimation(IAnimatable* target, float from, float to,
   }
 
   // Children animations
-  std::vector<IAnimatable*> animatables;
+  vector_t<IAnimatable*> animatables;
   if (Skeleton* s = dynamic_cast<Skeleton*>(target)) {
     animatables = s->getAnimatables();
   }
@@ -1249,8 +1249,8 @@ Animatable* Scene::beginAnimation(IAnimatable* target, float from, float to,
 
 Animatable*
 Scene::beginDirectAnimation(IAnimatable* target,
-                            const std::vector<Animation*>& _animations,
-                            int from, int to, bool loop, float speedRatio,
+                            const vector_t<Animation*>& _animations, int from,
+                            int to, bool loop, float speedRatio,
                             const ::std::function<void()>& onAnimationEnd)
 {
   return new Animatable(this, target, from, to, loop, speedRatio,
@@ -1266,12 +1266,12 @@ Animatable* Scene::getAnimatableByTarget(IAnimatable* target)
   return (it == _activeAnimatables.end()) ? nullptr : *it;
 }
 
-std::vector<Animatable*>& Scene::animatables()
+vector_t<Animatable*>& Scene::animatables()
 {
   return _activeAnimatables;
 }
 
-void Scene::stopAnimation(IAnimatable* target, const std::string& animationName)
+void Scene::stopAnimation(IAnimatable* target, const string_t& animationName)
 {
   auto animatable = getAnimatableByTarget(target);
 
@@ -1518,7 +1518,7 @@ void Scene::switchActiveCamera(Camera* newCamera, bool attachControl)
   }
 }
 
-Camera* Scene::setActiveCameraByID(const std::string& id)
+Camera* Scene::setActiveCameraByID(const string_t& id)
 {
   auto camera = getCameraByID(id);
 
@@ -1530,7 +1530,7 @@ Camera* Scene::setActiveCameraByID(const std::string& id)
   return nullptr;
 }
 
-Camera* Scene::setActiveCameraByName(const std::string& name)
+Camera* Scene::setActiveCameraByName(const string_t& name)
 {
   auto camera = getCameraByName(name);
 
@@ -1542,7 +1542,7 @@ Camera* Scene::setActiveCameraByName(const std::string& name)
   return nullptr;
 }
 
-Material* Scene::getMaterialByID(const std::string& id)
+Material* Scene::getMaterialByID(const string_t& id)
 {
   auto it = ::std::find_if(materials.begin(), materials.end(),
                            [&id](const std::unique_ptr<Material>& material) {
@@ -1552,7 +1552,7 @@ Material* Scene::getMaterialByID(const std::string& id)
   return (it == materials.end()) ? nullptr : (*it).get();
 }
 
-Material* Scene::getMaterialByName(const std::string& name)
+Material* Scene::getMaterialByName(const string_t& name)
 {
   auto it = ::std::find_if(materials.begin(), materials.end(),
                            [&name](const std::unique_ptr<Material>& material) {
@@ -1562,7 +1562,7 @@ Material* Scene::getMaterialByName(const std::string& name)
   return (it == materials.end()) ? nullptr : (*it).get();
 }
 
-LensFlareSystem* Scene::getLensFlareSystemByName(const std::string& name)
+LensFlareSystem* Scene::getLensFlareSystemByName(const string_t& name)
 {
   auto it = ::std::find_if(
     lensFlareSystems.begin(), lensFlareSystems.end(),
@@ -1573,7 +1573,7 @@ LensFlareSystem* Scene::getLensFlareSystemByName(const std::string& name)
   return (it == lensFlareSystems.end()) ? nullptr : (*it).get();
 }
 
-LensFlareSystem* Scene::getLensFlareSystemByID(const std::string& id)
+LensFlareSystem* Scene::getLensFlareSystemByID(const string_t& id)
 {
   auto it = ::std::find_if(
     lensFlareSystems.begin(), lensFlareSystems.end(),
@@ -1584,9 +1584,9 @@ LensFlareSystem* Scene::getLensFlareSystemByID(const std::string& id)
   return (it == lensFlareSystems.end()) ? nullptr : (*it).get();
 }
 
-std::vector<Camera*> Scene::getCameras() const
+vector_t<Camera*> Scene::getCameras() const
 {
-  std::vector<Camera*> _cameras;
+  vector_t<Camera*> _cameras;
   _cameras.reserve(cameras.size());
   ::std::for_each(cameras.begin(), cameras.end(),
                   [&_cameras](const std::unique_ptr<Camera>& camera) {
@@ -1596,7 +1596,7 @@ std::vector<Camera*> Scene::getCameras() const
   return _cameras;
 }
 
-Camera* Scene::getCameraByID(const std::string& id)
+Camera* Scene::getCameraByID(const string_t& id)
 {
   auto it = ::std::find_if(
     cameras.begin(), cameras.end(),
@@ -1615,7 +1615,7 @@ Camera* Scene::getCameraByUniqueID(unsigned int uniqueId)
   return (it == cameras.end()) ? nullptr : (*it).get();
 }
 
-Camera* Scene::getCameraByName(const std::string& name)
+Camera* Scene::getCameraByName(const string_t& name)
 {
   auto it = ::std::find_if(cameras.begin(), cameras.end(),
                            [&name](const std::unique_ptr<Camera>& camera) {
@@ -1625,7 +1625,7 @@ Camera* Scene::getCameraByName(const std::string& name)
   return (it == cameras.end()) ? nullptr : (*it).get();
 }
 
-Bone* Scene::getBoneByID(const std::string& id)
+Bone* Scene::getBoneByID(const string_t& id)
 {
   for (auto& skeleton : skeletons) {
     for (auto& bone : skeleton->bones) {
@@ -1638,7 +1638,7 @@ Bone* Scene::getBoneByID(const std::string& id)
   return nullptr;
 }
 
-Bone* Scene::getBoneByName(const std::string& name)
+Bone* Scene::getBoneByName(const string_t& name)
 {
   for (auto& skeleton : skeletons) {
     for (auto& bone : skeleton->bones) {
@@ -1651,7 +1651,7 @@ Bone* Scene::getBoneByName(const std::string& name)
   return nullptr;
 }
 
-Light* Scene::getLightByName(const std::string& name)
+Light* Scene::getLightByName(const string_t& name)
 {
   auto it = ::std::find_if(lights.begin(), lights.end(),
                            [&name](const std::unique_ptr<Light>& light) {
@@ -1661,7 +1661,7 @@ Light* Scene::getLightByName(const std::string& name)
   return (it == lights.end()) ? nullptr : (*it).get();
 }
 
-Light* Scene::getLightByID(const std::string& id)
+Light* Scene::getLightByID(const string_t& id)
 {
   auto it = ::std::find_if(
     lights.begin(), lights.end(),
@@ -1680,7 +1680,7 @@ Light* Scene::getLightByUniqueID(unsigned int uniqueId)
   return (it == lights.end()) ? nullptr : (*it).get();
 }
 
-IParticleSystem* Scene::getParticleSystemByID(const std::string& id)
+IParticleSystem* Scene::getParticleSystemByID(const string_t& id)
 {
   auto it = ::std::find_if(
     particleSystems.begin(), particleSystems.end(),
@@ -1691,7 +1691,7 @@ IParticleSystem* Scene::getParticleSystemByID(const std::string& id)
   return (it == particleSystems.end()) ? nullptr : (*it).get();
 }
 
-Geometry* Scene::getGeometryByID(const std::string& id)
+Geometry* Scene::getGeometryByID(const string_t& id)
 {
   auto it = ::std::find_if(_geometries.begin(), _geometries.end(),
                            [&id](const std::unique_ptr<Geometry>& geometry) {
@@ -1742,12 +1742,12 @@ bool Scene::removeGeometry(Geometry* geometry)
   return false;
 }
 
-std::vector<std::unique_ptr<Geometry>>& Scene::getGeometries()
+vector_t<std::unique_ptr<Geometry>>& Scene::getGeometries()
 {
   return _geometries;
 }
 
-AbstractMesh* Scene::getMeshByID(const std::string& id)
+AbstractMesh* Scene::getMeshByID(const string_t& id)
 {
   auto it = ::std::find_if(meshes.begin(), meshes.end(),
                            [&id](const std::unique_ptr<AbstractMesh>& mesh) {
@@ -1757,9 +1757,9 @@ AbstractMesh* Scene::getMeshByID(const std::string& id)
   return (it == meshes.end()) ? nullptr : (*it).get();
 }
 
-std::vector<AbstractMesh*> Scene::getMeshesByID(const std::string& id)
+vector_t<AbstractMesh*> Scene::getMeshesByID(const string_t& id)
 {
-  std::vector<AbstractMesh*> filteredMeshes;
+  vector_t<AbstractMesh*> filteredMeshes;
   ::std::for_each(
     meshes.begin(), meshes.end(),
     [&filteredMeshes, &id](const std::unique_ptr<AbstractMesh>& mesh) {
@@ -1781,7 +1781,7 @@ AbstractMesh* Scene::getMeshByUniqueID(unsigned int uniqueId)
   return (it == meshes.end()) ? nullptr : (*it).get();
 }
 
-AbstractMesh* Scene::getLastMeshByID(const std::string& id)
+AbstractMesh* Scene::getLastMeshByID(const string_t& id)
 {
   if (meshes.empty()) {
     return nullptr;
@@ -1796,7 +1796,7 @@ AbstractMesh* Scene::getLastMeshByID(const std::string& id)
   return nullptr;
 }
 
-Node* Scene::getLastEntryByID(const std::string& id)
+Node* Scene::getLastEntryByID(const string_t& id)
 {
   size_t index;
   for (index = meshes.size(); index > 0; --index) {
@@ -1820,7 +1820,7 @@ Node* Scene::getLastEntryByID(const std::string& id)
   return nullptr;
 }
 
-Node* Scene::getNodeByID(const std::string& id)
+Node* Scene::getNodeByID(const string_t& id)
 {
   auto mesh = getMeshByID(id);
 
@@ -1845,7 +1845,7 @@ Node* Scene::getNodeByID(const std::string& id)
   return bone;
 }
 
-Node* Scene::getNodeByName(const std::string& name)
+Node* Scene::getNodeByName(const string_t& name)
 {
   auto mesh = getMeshByName(name);
 
@@ -1870,7 +1870,7 @@ Node* Scene::getNodeByName(const std::string& name)
   return bone;
 }
 
-AbstractMesh* Scene::getMeshByName(const std::string& name)
+AbstractMesh* Scene::getMeshByName(const string_t& name)
 {
   auto it = ::std::find_if(meshes.begin(), meshes.end(),
                            [&name](const std::unique_ptr<AbstractMesh>& mesh) {
@@ -1880,12 +1880,12 @@ AbstractMesh* Scene::getMeshByName(const std::string& name)
   return (it == meshes.end()) ? nullptr : (*it).get();
 }
 
-Sound* Scene::getSoundByName(const std::string& /*name*/)
+Sound* Scene::getSoundByName(const string_t& /*name*/)
 {
   return nullptr;
 }
 
-Skeleton* Scene::getLastSkeletonByID(const std::string& id)
+Skeleton* Scene::getLastSkeletonByID(const string_t& id)
 {
   for (size_t index = skeletons.size() - 1;; --index) {
     if (skeletons[index]->id == id) {
@@ -1900,7 +1900,7 @@ Skeleton* Scene::getLastSkeletonByID(const std::string& id)
   return nullptr;
 }
 
-Skeleton* Scene::getSkeletonById(const std::string& id)
+Skeleton* Scene::getSkeletonById(const string_t& id)
 {
   auto it = ::std::find_if(skeletons.begin(), skeletons.end(),
                            [&id](const std::unique_ptr<Skeleton>& skeleton) {
@@ -1910,7 +1910,7 @@ Skeleton* Scene::getSkeletonById(const std::string& id)
   return (it == skeletons.end()) ? nullptr : (*it).get();
 }
 
-Skeleton* Scene::getSkeletonByName(const std::string& name)
+Skeleton* Scene::getSkeletonByName(const string_t& name)
 {
   auto it = ::std::find_if(skeletons.begin(), skeletons.end(),
                            [&name](const std::unique_ptr<Skeleton>& skeleton) {
@@ -1937,7 +1937,7 @@ bool Scene::isActiveMesh(Mesh* mesh)
          != _activeMeshes.end();
 }
 
-HighlightLayer* Scene::getHighlightLayerByName(const std::string& name)
+HighlightLayer* Scene::getHighlightLayerByName(const string_t& name)
 {
   auto it = ::std::find_if(
     highlightLayers.begin(), highlightLayers.end(),
@@ -1948,7 +1948,7 @@ HighlightLayer* Scene::getHighlightLayerByName(const std::string& name)
   return (it == highlightLayers.end()) ? nullptr : (*it).get();
 }
 
-std::string Scene::uid()
+string_t Scene::uid()
 {
   if (_uid.empty()) {
     _uid = Tools::RandomId();
@@ -2018,7 +2018,7 @@ void Scene::_evaluateActiveMeshes()
   }
 
   // Meshes
-  std::vector<AbstractMesh*> _meshes;
+  vector_t<AbstractMesh*> _meshes;
 
   if (_selectionOctree) { // Octree
     _meshes = _selectionOctree->select(_frustumPlanes);
@@ -2123,7 +2123,7 @@ void Scene::_activeMesh(AbstractMesh* mesh)
 
   if (mesh && !mesh->subMeshes.empty()) {
     // Submeshes Octrees
-    std::vector<SubMesh*> subMeshes;
+    vector_t<SubMesh*> subMeshes;
 
     if (mesh->_submeshesOctree && mesh->useOctreeForRenderingSelection) {
       subMeshes = mesh->_submeshesOctree->select(_frustumPlanes);
@@ -2946,11 +2946,11 @@ PickingInfo* Scene::_internalPick(
   return nullptr;
 }
 
-std::vector<PickingInfo*> Scene::_internalMultiPick(
+vector_t<PickingInfo*> Scene::_internalMultiPick(
   const ::std::function<Ray(const Matrix& world)>& /*rayFunction*/,
   const ::std::function<bool(AbstractMesh* mesh)>& /*predicate*/)
 {
-  return std::vector<PickingInfo*>();
+  return vector_t<PickingInfo*>();
 }
 
 PickingInfo* Scene::_internalPickSprites(
@@ -2985,19 +2985,19 @@ Scene::pickWithRay(const Ray& /*ray*/,
   return nullptr;
 }
 
-std::vector<PickingInfo*>
+vector_t<PickingInfo*>
 Scene::multiPick(int /*x*/, int /*y*/,
                  const ::std::function<bool(AbstractMesh* mesh)>& /*predicate*/,
                  Camera* /*camera*/)
 {
-  return std::vector<PickingInfo*>();
+  return vector_t<PickingInfo*>();
 }
 
-std::vector<PickingInfo*>
+vector_t<PickingInfo*>
 Scene::multiPickWithRay(const Ray& /*ray*/,
                         const ::std::function<bool(Mesh* mesh)>& /*predicate*/)
 {
-  return std::vector<PickingInfo*>();
+  return vector_t<PickingInfo*>();
 }
 
 void Scene::setPointerOverMesh(AbstractMesh* /*mesh*/)
@@ -3184,29 +3184,29 @@ Mesh* Scene::createDefaultSkybox(BaseTexture* iEnvironmentTexture, bool pbr,
 
 // Tags
 
-std::vector<std::string> Scene::_getByTags()
+vector_t<string_t> Scene::_getByTags()
 {
-  return std::vector<std::string>();
+  return vector_t<string_t>();
 }
 
-std::vector<Mesh*> Scene::getMeshesByTags()
+vector_t<Mesh*> Scene::getMeshesByTags()
 {
-  return std::vector<Mesh*>();
+  return vector_t<Mesh*>();
 }
 
-std::vector<Camera*> Scene::getCamerasByTags()
+vector_t<Camera*> Scene::getCamerasByTags()
 {
-  return std::vector<Camera*>();
+  return vector_t<Camera*>();
 }
 
-std::vector<Light*> Scene::getLightsByTags()
+vector_t<Light*> Scene::getLightsByTags()
 {
-  return std::vector<Light*>();
+  return vector_t<Light*>();
 }
 
-std::vector<Material*> Scene::getMaterialByTags()
+vector_t<Material*> Scene::getMaterialByTags()
 {
-  return std::vector<Material*>();
+  return vector_t<Material*>();
 }
 
 void Scene::setRenderingOrder(

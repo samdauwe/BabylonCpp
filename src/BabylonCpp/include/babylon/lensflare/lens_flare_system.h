@@ -38,15 +38,15 @@ public:
 
   // Statics
   static LensFlareSystem* Parse(const Json::value& parsedLensFlareSystem,
-                                Scene* scene, const std::string& rootUrl);
+                                Scene* scene, const string_t& rootUrl);
 
 protected:
-  LensFlareSystem(const std::string name, Mesh* emitter, Scene* scene);
+  LensFlareSystem(const string_t name, Mesh* emitter, Scene* scene);
 
 public:
-  std::string id;
-  std::string name;
-  std::vector<std::unique_ptr<LensFlare>> lensFlares;
+  string_t id;
+  string_t name;
+  vector_t<std::unique_ptr<LensFlare>> lensFlares;
   int borderLimit;
   float viewportBorder;
   ::std::function<bool(Mesh* mesh)> meshesSelectionPredicate;
@@ -57,7 +57,7 @@ private:
   Mesh* _emitter;
   // Float32Array _vertexDeclaration;
   // int _vertexStrideSize;
-  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
+  std::unordered_map<string_t, std::unique_ptr<VertexBuffer>> _vertexBuffers;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   Effect* _effect;
   float _positionX;

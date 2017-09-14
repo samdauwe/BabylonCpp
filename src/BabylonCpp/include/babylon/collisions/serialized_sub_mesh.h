@@ -18,10 +18,10 @@ struct BABYLON_SHARED_EXPORT SerializedSubMesh {
   float sphereRadius;
   Float32Array boxMinimum;
   Float32Array boxMaximum;
-  std::vector<Vector3> positionsArray;
-  std::vector<Vector3> _lastColliderWorldVertices;
+  vector_t<Vector3> positionsArray;
+  vector_t<Vector3> _lastColliderWorldVertices;
   Matrix _lastColliderTransformMatrix;
-  std::vector<Plane> _trianglePlanes;
+  vector_t<Plane> _trianglePlanes;
 
 }; // end of struct SerializedSubMesh
 

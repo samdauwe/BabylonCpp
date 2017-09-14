@@ -26,7 +26,7 @@ public:
   void setTimeStep(float newTimeStep = 1.f / 60.f);
 
   void dispose(bool doNotRecurse = false) override;
-  std::string getPhysicsPluginName() const;
+  string_t getPhysicsPluginName() const;
 
   /**
    * Adding a new impostor for the impostor tracking.
@@ -77,8 +77,8 @@ public:
 private:
   bool _initialized;
   IPhysicsEnginePlugin* _physicsPlugin;
-  std::vector<std::unique_ptr<PhysicsImpostor>> _impostors;
-  std::vector<std::shared_ptr<PhysicsImpostorJoint>> _joints;
+  vector_t<std::unique_ptr<PhysicsImpostor>> _impostors;
+  vector_t<std::shared_ptr<PhysicsImpostorJoint>> _joints;
 
 }; // end of class PhysicsEngine
 

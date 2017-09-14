@@ -15,26 +15,24 @@
 
 namespace BABYLON {
 
-std::string DefaultRenderingPipeline::PassPostProcessId
-  = "PassPostProcessEffect";
-std::string DefaultRenderingPipeline::HighLightsPostProcessId
+string_t DefaultRenderingPipeline::PassPostProcessId = "PassPostProcessEffect";
+string_t DefaultRenderingPipeline::HighLightsPostProcessId
   = "HighLightsPostProcessEffect";
-std::string DefaultRenderingPipeline::BlurXPostProcessId
+string_t DefaultRenderingPipeline::BlurXPostProcessId
   = "BlurXPostProcessEffect";
-std::string DefaultRenderingPipeline::BlurYPostProcessId
+string_t DefaultRenderingPipeline::BlurYPostProcessId
   = "BlurYPostProcessEffect";
-std::string DefaultRenderingPipeline::CopyBackPostProcessId
+string_t DefaultRenderingPipeline::CopyBackPostProcessId
   = "CopyBackPostProcessEffect";
-std::string DefaultRenderingPipeline::ImageProcessingPostProcessId
+string_t DefaultRenderingPipeline::ImageProcessingPostProcessId
   = "ImageProcessingPostProcessEffect";
-std::string DefaultRenderingPipeline::FxaaPostProcessId
-  = "FxaaPostProcessEffect";
-std::string DefaultRenderingPipeline::FinalMergePostProcessId
+string_t DefaultRenderingPipeline::FxaaPostProcessId = "FxaaPostProcessEffect";
+string_t DefaultRenderingPipeline::FinalMergePostProcessId
   = "FinalMergePostProcessEffect";
 
 DefaultRenderingPipeline::DefaultRenderingPipeline(
-  const std::string& iName, bool hdr, Scene* scene,
-  const std::unordered_map<std::string, Camera*>& cameras, bool automaticBuild)
+  const string_t& iName, bool hdr, Scene* scene,
+  const std::unordered_map<string_t, Camera*>& cameras, bool automaticBuild)
     : PostProcessRenderPipeline(scene->getEngine(), iName)
     , pass{nullptr}
     , highlights{nullptr}
@@ -358,7 +356,7 @@ Json::object DefaultRenderingPipeline::serialize() const
 
 std::unique_ptr<DefaultRenderingPipeline>
 DefaultRenderingPipeline::Parse(const Json::value& /*source*/, Scene* /*scene*/,
-                                const std::string& /*rootUrl*/)
+                                const string_t& /*rootUrl*/)
 {
   return nullptr;
 }

@@ -15,16 +15,16 @@
 
 namespace BABYLON {
 
-SSAORenderingPipeline::SSAORenderingPipeline(
-  const std::string& name, Scene* scene, float ratio,
-  const std::vector<Camera*>& cameras)
+SSAORenderingPipeline::SSAORenderingPipeline(const string_t& name, Scene* scene,
+                                             float ratio,
+                                             const vector_t<Camera*>& cameras)
     : SSAORenderingPipeline(name, scene, {ratio, ratio}, cameras)
 {
 }
 
-SSAORenderingPipeline::SSAORenderingPipeline(
-  const std::string& name, Scene* scene, const SSARatio& ratio,
-  const std::vector<Camera*>& cameras)
+SSAORenderingPipeline::SSAORenderingPipeline(const string_t& name, Scene* scene,
+                                             const SSARatio& ratio,
+                                             const vector_t<Camera*>& cameras)
     : PostProcessRenderPipeline(scene->getEngine(), name)
     , totalStrength{1.f}
     , radius{0.0001f}

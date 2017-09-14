@@ -27,7 +27,7 @@ private:
   Matrix _projectionMatrix;
   Matrix _transformMatrix;
   Matrix _worldViewProjection;
-  std::string _cachedDefines;
+  string_t _cachedDefines;
 
 }; // end of class DepthRenderer
 

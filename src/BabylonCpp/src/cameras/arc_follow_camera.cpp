@@ -4,7 +4,7 @@
 
 namespace BABYLON {
 
-ArcFollowCamera::ArcFollowCamera(const std::string& iName, float iAlpha,
+ArcFollowCamera::ArcFollowCamera(const string_t& iName, float iAlpha,
                                  float iBeta, float iRadius,
                                  AbstractMesh* iTarget, Scene* scene)
     : TargetCamera{iName, Vector3::Zero(), scene}

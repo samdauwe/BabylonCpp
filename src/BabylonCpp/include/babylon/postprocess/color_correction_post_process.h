@@ -22,8 +22,8 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT ColorCorrectionPostProcess : public PostProcess {
 
 public:
-  ColorCorrectionPostProcess(const std::string& name,
-                             const std::string& colorTableUrl, float ratio,
+  ColorCorrectionPostProcess(const string_t& name,
+                             const string_t& colorTableUrl, float ratio,
                              Camera* camera, unsigned int samplingMode,
                              Engine* engine, bool reusable = false);
   ~ColorCorrectionPostProcess();

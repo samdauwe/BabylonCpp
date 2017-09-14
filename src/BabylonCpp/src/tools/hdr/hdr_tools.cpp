@@ -39,11 +39,11 @@ void HDRTools::Rgbe2float(Float32Array& float32array, float red, float green,
   }
 }
 
-std::string HDRTools::readStringLine(const Uint8Array& uint8array,
-                                     size_t startIndex)
+string_t HDRTools::readStringLine(const Uint8Array& uint8array,
+                                  size_t startIndex)
 {
   std::ostringstream line;
-  std::string character;
+  string_t character;
 
   for (size_t i = startIndex; i < uint8array.size() - startIndex; ++i) {
     character = String::fromCharCode(uint8array[i]);
@@ -65,7 +65,7 @@ HDRInfo HDRTools::RGBE_ReadHeader(const Uint8Array& uint8array)
   size_t height = 0;
   size_t width  = 0;
 
-  std::string line = readStringLine(uint8array, 0);
+  string_t line = readStringLine(uint8array, 0);
   if (line.at(0) != '#' || line.at(1) != '?') {
     headerInfo.errorMessage = "Bad HDR Format.";
     return headerInfo;

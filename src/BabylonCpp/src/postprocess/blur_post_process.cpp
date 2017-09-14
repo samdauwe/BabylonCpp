@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-BlurPostProcess::BlurPostProcess(const std::string& iName,
+BlurPostProcess::BlurPostProcess(const string_t& iName,
                                  const Vector2& direction, float kernel,
                                  float ratio, Camera* camera,
                                  unsigned int samplingMode, Engine* engine,
@@ -100,7 +100,7 @@ void BlurPostProcess::_updateParameters()
   Float32Array linearSamplingWeights;
   Int32Array linearSamplingOffsets;
 
-  std::vector<std::pair<std::int32_t, float>> linearSamplingMap;
+  vector_t<std::pair<std::int32_t, float>> linearSamplingMap;
 
   for (unsigned int i = 0; i <= centerIndex; i += 2) {
     auto j
@@ -210,8 +210,7 @@ float BlurPostProcess::_gaussianWeight(float x) const
   return weight;
 }
 
-std::string BlurPostProcess::_glslFloat(float x,
-                                        unsigned int decimalFigures) const
+string_t BlurPostProcess::_glslFloat(float x, unsigned int decimalFigures) const
 {
   std::ostringstream oss;
   oss.precision(decimalFigures);

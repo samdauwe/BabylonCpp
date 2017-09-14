@@ -11,8 +11,8 @@ class BABYLON_SHARED_EXPORT LogMessage {
 public:
   /// Constructs a message with a certain level.
   /// @param level The level of the message.
-  LogMessage(unsigned int level         = LogLevels::LEVEL_QUIET,
-             const std::string& context = "");
+  LogMessage(unsigned int level      = LogLevels::LEVEL_QUIET,
+             const string_t& context = "");
   LogMessage(LogMessage const& otherLogMessage);
   LogMessage(LogMessage&& otherLogMessage);
   LogMessage& operator=(const LogMessage& otherLogMessage);
@@ -20,24 +20,24 @@ public:
   ~LogMessage();
 
   friend std::ostream& operator<<(std::ostream& os, const LogMessage& logMsg);
-  std::string toString() const;
+  string_t toString() const;
 
   void clear();
   bool empty();
   unsigned int level() const;
   system_time_point_t timestamp() const;
-  std::string getReadableTimestamp() const;
-  std::string const& file() const;
+  string_t getReadableTimestamp() const;
+  string_t const& file() const;
   void setFile(char const* file);
   int const& lineNumber() const;
   void setLineNumber(int lineNumber);
-  std::string const& threadId() const;
-  std::string const& context() const;
-  std::string const& function() const;
+  string_t const& threadId() const;
+  string_t const& context() const;
+  string_t const& function() const;
   void setFunction(char const* func);
-  std::string const& prettyFunction() const;
+  string_t const& prettyFunction() const;
   void setPrettyFunction(char const* prettyFunc);
-  std::string message() const;
+  string_t message() const;
 
   template <typename TF, typename... TR>
   inline void write(TF&& msg, TR&&... rest)
@@ -71,18 +71,18 @@ public:
     __attribute__((format(printf, 2, 3)));
 
 private:
-  std::string prettify(char const* pretty_func);
+  string_t prettify(char const* pretty_func);
 
 private:
   unsigned int _level;
   system_time_point_t _timestamp;
-  std::string _file;
+  string_t _file;
   int _lineNumber;
-  std::string _threadId;
-  std::string _context;
-  std::string _function;
-  std::string _prettyFunction;
-  std::string _expression;
+  string_t _threadId;
+  string_t _context;
+  string_t _function;
+  string_t _prettyFunction;
+  string_t _expression;
   std::ostringstream _oss;
 
 }; // end of class LogMessage

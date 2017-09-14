@@ -52,7 +52,7 @@ public:
    * @brief Sets the passed Effect object with the DirectionalLight transformed
    * position (or position if not parented) and the passed name.
    */
-  void transferToEffect(Effect* effect, const std::string& lightIndex) override;
+  void transferToEffect(Effect* effect, const string_t& lightIndex) override;
 
   /**
    * @brief Gets the minZ used for shadow according to both the scene and the
@@ -84,7 +84,7 @@ protected:
    * It can cast shawdows.
    * Documentation : http://doc.babylonjs.com/tutorials/lights
    */
-  DirectionalLight(const std::string& name, const Vector3& direction,
+  DirectionalLight(const string_t& name, const Vector3& direction,
                    Scene* scene);
 
   /**
@@ -94,7 +94,7 @@ protected:
    */
   void _setDefaultShadowProjectionMatrix(
     Matrix& matrix, const Matrix& viewMatrix,
-    const std::vector<AbstractMesh*>& renderList) override;
+    const vector_t<AbstractMesh*>& renderList) override;
 
   /**
    * @brief Sets the passed matrix "matrix" as fixed frustum projection matrix
@@ -111,7 +111,7 @@ protected:
    */
   void _setDefaultAutoExtendShadowProjectionMatrix(
     Matrix& matrix, const Matrix& viewMatrix,
-    const std::vector<AbstractMesh*>& renderList);
+    const vector_t<AbstractMesh*>& renderList);
 
   void _buildUniformLayout() override;
 

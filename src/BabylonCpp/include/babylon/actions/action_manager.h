@@ -37,7 +37,7 @@ public:
   static constexpr unsigned int OnKeyUpTrigger             = 15;
   static constexpr unsigned int OnPickOutTrigger           = 16;
 
-  static std::array<unsigned int, 17> Triggers;
+  static array_t<unsigned int, 17> Triggers;
   static size_t DragMovementThreshold; // in pixels
   static size_t LongPressDelay;        // in milliseconds
 
@@ -92,9 +92,9 @@ public:
   void processTrigger(unsigned int trigger) const;
 
   IAnimatable* _getEffectiveTarget(IAnimatable* target,
-                                   const std::string& propertyPath) const;
-  std::string _getProperty(const std::string& propertyPath) const;
-  Json::object serialize(const std::string& name) const;
+                                   const string_t& propertyPath) const;
+  string_t _getProperty(const string_t& propertyPath) const;
+  Json::object serialize(const string_t& name) const;
 
   // Statics
 
@@ -121,16 +121,16 @@ public:
    **/
   static bool HasSpecificTrigger(unsigned int trigger);
 
-  static void Parse(const std::vector<Json::value>& parsedActions,
+  static void Parse(const vector_t<Json::value>& parsedActions,
                     AbstractMesh* object, Scene* scene);
-  static std::string GetTriggerName(unsigned int trigger);
+  static string_t GetTriggerName(unsigned int trigger);
 
 protected:
   ActionManager(Scene* scene);
 
 private:
-  std::vector<Action*> actions;
-  std::string hoverCursor;
+  vector_t<Action*> actions;
+  string_t hoverCursor;
   Scene* _scene;
 
 }; // end of class ActionManager

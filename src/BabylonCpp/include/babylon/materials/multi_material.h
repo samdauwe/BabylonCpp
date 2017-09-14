@@ -28,28 +28,28 @@ public:
   IReflect::Type type() const override;
 
   /** Properties **/
-  std::vector<Material*>& subMaterials();
-  void setSubMaterials(const std::vector<Material*>& value);
+  vector_t<Material*>& subMaterials();
+  void setSubMaterials(const vector_t<Material*>& value);
   Material* getSubMaterial(unsigned int index);
-  std::vector<BaseTexture*> getActiveTextures() const override;
+  vector_t<BaseTexture*> getActiveTextures() const override;
 
   /** Methods **/
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
-  Material* clone(const std::string& _name,
+  Material* clone(const string_t& _name,
                   bool cloneChildren = false) const override;
   Json::object serialize() const;
   void dispose(bool forceDisposeEffect   = false,
                bool forceDisposeTextures = false) override;
 
 protected:
-  MultiMaterial(const std::string name, Scene* scene);
+  MultiMaterial(const string_t name, Scene* scene);
 
 private:
-  void _hookArray(const std::vector<Material*>& array);
+  void _hookArray(const vector_t<Material*>& array);
 
 private:
-  std::vector<Material*> _subMaterials;
+  vector_t<Material*> _subMaterials;
 
 }; // end of class MultiMaterial
 

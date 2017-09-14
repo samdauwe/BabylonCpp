@@ -6,10 +6,10 @@
 namespace BABYLON {
 namespace GeometryPrimitives {
 
-Ribbon::Ribbon(const std::string& _id, Scene* scene,
-               const std::vector<std::vector<Vector3>>& _pathArray,
-               bool _closeArray, bool _closePath, int _offset,
-               bool canBeRegenerated, Mesh* mesh, unsigned int _side)
+Ribbon::Ribbon(const string_t& _id, Scene* scene,
+               const vector_t<vector_t<Vector3>>& _pathArray, bool _closeArray,
+               bool _closePath, int _offset, bool canBeRegenerated, Mesh* mesh,
+               unsigned int _side)
     : _Primitive{_id, scene, canBeRegenerated, mesh}
     , pathArray{_pathArray}
     , closeArray{_closeArray}
@@ -33,7 +33,7 @@ std::unique_ptr<VertexData> Ribbon::_regenerateVertexData()
   return VertexData::CreateRibbon(options);
 }
 
-Geometry* Ribbon::copy(const std::string& _id)
+Geometry* Ribbon::copy(const string_t& _id)
 {
   return Ribbon::New(_id, getScene(), pathArray, closeArray, closePath, offset,
                      canBeRegenerated(), nullptr, side);

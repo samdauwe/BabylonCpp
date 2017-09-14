@@ -40,9 +40,9 @@ public:
   float slerpAmount;
 
 private:
-  static std::array<Vector3, 6> _tmpVecs;
+  static array_t<Vector3, 6> _tmpVecs;
   static Quaternion _tmpQuat;
-  static std::array<Matrix, 2> _tmpMats;
+  static array_t<Matrix, 2> _tmpMats;
 
 private:
   Quaternion _bone1Quat;

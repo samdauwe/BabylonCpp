@@ -4,7 +4,7 @@
 
 namespace BABYLON {
 
-BlackAndWhitePostProcess::BlackAndWhitePostProcess(const std::string& iName,
+BlackAndWhitePostProcess::BlackAndWhitePostProcess(const string_t& iName,
                                                    float ratio, Camera* camera,
                                                    unsigned int samplingMode,
                                                    Engine* engine,

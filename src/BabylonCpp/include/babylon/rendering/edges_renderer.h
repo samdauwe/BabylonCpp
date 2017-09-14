@@ -28,7 +28,7 @@ private:
                                              const Vector3& p1,
                                              const Vector3& p2);
   void _checkEdge(unsigned int faceIndex, int edge,
-                  std::vector<Vector3> faceNormals, const Vector3& p0,
+                  vector_t<Vector3> faceNormals, const Vector3& p0,
                   const Vector3& p1);
   void _generateEdgesLines();
 
@@ -46,7 +46,7 @@ private:
   ShaderMaterial* _lineShader;
   std::unique_ptr<GL::IGLBuffer> _ib;
   std::unordered_map<unsigned int, std::unique_ptr<VertexBuffer>> _buffers;
-  std::unordered_map<std::string, VertexBuffer*> _bufferPtrs;
+  std::unordered_map<string_t, VertexBuffer*> _bufferPtrs;
   bool _checkVerticesInsteadOfIndices;
 
 }; // end of class EdgesRenderer

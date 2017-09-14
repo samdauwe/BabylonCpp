@@ -37,9 +37,9 @@ public:
                                                        const Vector3& vertex2);
   std::unique_ptr<float> intersectsPlane(const Plane& plane);
   PickingInfo intersectsMesh(AbstractMesh* mesh, bool fastCheck);
-  std::vector<PickingInfo> intersectsMeshes(std::vector<AbstractMesh*>& meshes,
-                                            bool fastCheck,
-                                            std::vector<PickingInfo>& results);
+  vector_t<PickingInfo> intersectsMeshes(vector_t<AbstractMesh*>& meshes,
+                                         bool fastCheck,
+                                         vector_t<PickingInfo>& results);
 
   /**
    * Intersection test between the ray and a given segment whithin a given

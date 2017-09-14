@@ -19,11 +19,10 @@ struct BABYLON_SHARED_EXPORT IShadowGenerator {
   virtual bool isReady(SubMesh* subMesh, bool useInstances = false) = 0;
   virtual void prepareDefines(MaterialDefines& defines, unsigned int lightIndex)
     = 0;
-  virtual void bindShadowLight(const std::string& lightIndex, Effect* effect)
-    = 0;
-  virtual Matrix getTransformMatrix()    = 0;
-  virtual void recreateShadowMap()       = 0;
-  virtual Json::object serialize() const = 0;
+  virtual void bindShadowLight(const string_t& lightIndex, Effect* effect) = 0;
+  virtual Matrix getTransformMatrix()                                      = 0;
+  virtual void recreateShadowMap()                                         = 0;
+  virtual Json::object serialize() const                                   = 0;
   virtual void forceCompilation(
     const ::std::function<void(ShadowGenerator* generator)>& onCompiled,
     const ShadowGeneratorCompileOptions& options)

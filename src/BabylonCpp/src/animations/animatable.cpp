@@ -10,7 +10,7 @@ namespace BABYLON {
 Animatable::Animatable(Scene* scene, IAnimatable* iTarget, int iFromFrame,
                        int iToFrame, bool iLoopAnimation, float iSpeedRatio,
                        const ::std::function<void()>& iOnAnimationEnd,
-                       const std::vector<Animation*>& animations)
+                       const vector_t<Animation*>& animations)
     : target{iTarget}
     , animationStarted{false}
     , fromFrame{iFromFrame}
@@ -35,13 +35,13 @@ Animatable::~Animatable()
 }
 
 // Methods
-std::vector<Animation*>& Animatable::getAnimations()
+vector_t<Animation*>& Animatable::getAnimations()
 {
   return _animations;
 }
 
 void Animatable::appendAnimations(IAnimatable* iTarget,
-                                  const std::vector<Animation*>& animations)
+                                  const vector_t<Animation*>& animations)
 {
   for (auto& animation : animations) {
     animation->_target = iTarget;
@@ -50,7 +50,7 @@ void Animatable::appendAnimations(IAnimatable* iTarget,
 }
 
 Animation*
-Animatable::getAnimationByTargetProperty(const std::string& property) const
+Animatable::getAnimationByTargetProperty(const string_t& property) const
 {
   auto it = ::std::find_if(_animations.begin(), _animations.end(),
                            [&property](Animation* animation) {
@@ -114,7 +114,7 @@ void Animatable::restart()
   _paused = false;
 }
 
-void Animatable::stop(const std::string& animationName)
+void Animatable::stop(const string_t& animationName)
 {
   if (!animationName.empty()) {
     auto idx = stl_util::index_of(_scene->_activeAnimatables, this);

@@ -27,16 +27,16 @@ public:
   ~Ribbon();
 
   std::unique_ptr<VertexData> _regenerateVertexData();
-  Geometry* copy(const std::string& id);
+  Geometry* copy(const string_t& id);
 
 protected:
-  Ribbon(const std::string& id, Scene* scene,
-         const std::vector<std::vector<Vector3>>& pathArray, bool closeArray,
+  Ribbon(const string_t& id, Scene* scene,
+         const vector_t<vector_t<Vector3>>& pathArray, bool closeArray,
          bool closePath, int offset, bool canBeRegenerated, Mesh* mesh,
          unsigned int side = Mesh::DEFAULTSIDE);
 
 public:
-  std::vector<std::vector<Vector3>> pathArray;
+  vector_t<vector_t<Vector3>> pathArray;
   bool closeArray;
   bool closePath;
   int offset;

@@ -21,7 +21,7 @@ WebVRController::WebVRController(
         false,
       }}
 {
-  _buttons = std::vector<ExtendedGamepadButton>(vrGamepad->buttons.size());
+  _buttons = vector_t<ExtendedGamepadButton>(vrGamepad->buttons.size());
 }
 
 WebVRController::~WebVRController()

@@ -31,7 +31,7 @@ public:
   const char* getSimpleName() const override;
 
 public:
-  std::array<MouseButtonType, 3> buttons;
+  array_t<MouseButtonType, 3> buttons;
   float angularSensibilityX;
   float angularSensibilityY;
   float pinchPrecision;

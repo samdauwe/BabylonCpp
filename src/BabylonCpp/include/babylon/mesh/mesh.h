@@ -108,7 +108,7 @@ public:
    * @param {boolean} fullDetails - support for multiple levels of logging
    * within scene loading
    */
-  std::string toString(bool fullDetails = false);
+  string_t toString(bool fullDetails = false);
 
   void addSubMesh(SubMesh* subMesh);
 
@@ -500,22 +500,22 @@ public:
    * @brief Returns an array populated with ParticleSystem objects whose the
    * mesh is the emitter.
    */
-  std::vector<IParticleSystem*> getEmittedParticleSystems();
+  vector_t<IParticleSystem*> getEmittedParticleSystems();
 
   /**
    * @brief Returns an array populated with ParticleSystem objects whose the
    * mesh or its children are the emitter.
    */
-  std::vector<IParticleSystem*> getHierarchyEmittedParticleSystems();
+  vector_t<IParticleSystem*> getHierarchyEmittedParticleSystems();
 
-  std::vector<Node*> getChildren();
+  vector_t<Node*> getChildren();
   Mesh& _checkDelayState();
 
   /**
    * @brief Returns true if the mesh in the frustum defined by the Plane objects
    * from the `frustumPlanes` array parameter.
    */
-  bool isInFrustum(const std::array<Plane, 6>& frustumPlanes) override;
+  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes) override;
 
   /**
    * @brief Sets the mesh material by the material or multiMaterial `id`
@@ -524,13 +524,13 @@ public:
    * multiMaterial.
    * @returns the Mesh.
    */
-  Mesh& setMaterialByID(const std::string& id);
+  Mesh& setMaterialByID(const string_t& id);
 
   /**
    * @brief Returns as a new array populated with the mesh material and/or
    * skeleton, if any.
    */
-  std::vector<IAnimatable*> getAnimatables();
+  vector_t<IAnimatable*> getAnimatables();
 
   /**
    * @brief Modifies the mesh geometry according to the passed transformation
@@ -558,7 +558,7 @@ public:
   Mesh& bakeCurrentTransformIntoVertices();
 
   /** Cache **/
-  std::vector<Vector3>& _positions() override;
+  vector_t<Vector3>& _positions() override;
   Mesh& _resetPointsArrayCache();
   bool _generatePointsArray() override;
 
@@ -577,7 +577,7 @@ public:
    * cloning in the same time of the original mesh `body` used by the physics
    * engine, if any.
    */
-  Mesh* clone(const std::string& name, Node* newParent = nullptr,
+  Mesh* clone(const string_t& name, Node* newParent = nullptr,
               bool doNotCloneChildren   = false,
               bool clonePhysicsImpostor = true);
 
@@ -608,8 +608,7 @@ public:
    * just after the mesh is modified. It is passed the modified mesh and must
    * return nothing.
    */
-  void applyDisplacementMap(const std::string& url, int minHeight,
-                            int maxHeight,
+  void applyDisplacementMap(const string_t& url, int minHeight, int maxHeight,
                             const ::std::function<void(Mesh* mesh)> onSuccess);
 
   /**
@@ -679,7 +678,7 @@ public:
    * tuto : http://doc.babylonjs.com/tutorials/How_to_use_Instances
    * Warning : this method is not supported for Line mesh and LineSystem
    */
-  InstancedMesh* createInstance(const std::string& name);
+  InstancedMesh* createInstance(const string_t& name);
 
   /**
    * @brief Synchronises all the mesh instance submeshes to the current mesh
@@ -701,7 +700,7 @@ public:
    * simplification finished processing all settings.
    */
   /*void
-  simplify(const std::vector<ISimplificationSettings*>& settings,
+  simplify(const vector_t<ISimplificationSettings*>& settings,
            ::std::function<void(Mesh* mesh, int submeshIndex)>& successCallback,
            bool parallelProcessing = true, SimplificationType simplificationType
                                            = SimplificationType::QUADRATIC);*/
@@ -729,7 +728,7 @@ public:
    * `delayLoadingFile` property with
    */
   static Mesh* Parse(const Json::value& parsedMesh, Scene* scene,
-                     const std::string& rootUrl);
+                     const string_t& rootUrl);
 
   /**
    * @brief Creates a ribbon mesh.
@@ -764,8 +763,8 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateRibbon(const std::string& name,
-                            const std::vector<std::vector<Vector3>>& pathArray,
+  static Mesh* CreateRibbon(const string_t& name,
+                            const vector_t<vector_t<Vector3>>& pathArray,
                             bool closeArray = false, bool closePath = false,
                             int offset = -1, Scene* = nullptr,
                             bool updatable               = false,
@@ -789,7 +788,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateDisc(const std::string& name, float radius = 0.5f,
+  static Mesh* CreateDisc(const string_t& name, float radius = 0.5f,
                           unsigned int tessellation = 64, Scene* = nullptr,
                           bool updatable               = false,
                           unsigned int sideOrientation = Mesh::DEFAULTSIDE);
@@ -807,7 +806,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateBox(const std::string& name, float size = 1.f,
+  static Mesh* CreateBox(const string_t& name, float size = 1.f,
                          Scene* = nullptr, bool updatable = false,
                          unsigned int sideOrientation = Mesh::DEFAULTSIDE);
 
@@ -827,7 +826,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateSphere(const std::string& name, unsigned int segments = 32,
+  static Mesh* CreateSphere(const string_t& name, unsigned int segments = 32,
                             float diameter = 1.f, Scene* = nullptr,
                             bool updatable               = false,
                             unsigned int sideOrientation = Mesh::DEFAULTSIDE);
@@ -855,7 +854,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateCylinder(const std::string& name, float height = 2.f,
+  static Mesh* CreateCylinder(const string_t& name, float height = 2.f,
                               float diameterTop         = 1.f,
                               float diameterBottom      = 1.f,
                               unsigned int tessellation = 24,
@@ -882,7 +881,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateTorus(const std::string& name, float diameter = 1.f,
+  static Mesh* CreateTorus(const string_t& name, float diameter = 1.f,
                            float thickness           = 0.5f,
                            unsigned int tessellation = 16, Scene* = nullptr,
                            bool updatable               = false,
@@ -909,8 +908,8 @@ public:
    * created.
    */
   static Mesh*
-  CreateTorusKnot(const std::string& name, float radius = 2.f,
-                  float tube = 0.5f, unsigned int radialSegments = 32,
+  CreateTorusKnot(const string_t& name, float radius = 2.f, float tube = 0.5f,
+                  unsigned int radialSegments  = 32,
                   unsigned int tubularSegments = 32, float p = 2.f,
                   float q = 3.f, Scene* = nullptr, bool updatable = false,
                   unsigned int sideOrientation = Mesh::DEFAULTSIDE);
@@ -933,8 +932,8 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static LinesMesh* CreateLines(const std::string& name,
-                                const std::vector<Vector3>& points, Scene*,
+  static LinesMesh* CreateLines(const string_t& name,
+                                const vector_t<Vector3>& points, Scene*,
                                 bool updatable           = false,
                                 LinesMesh* linesInstance = nullptr);
 
@@ -962,8 +961,8 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static LinesMesh* CreateDashedLines(const std::string& name,
-                                      std::vector<Vector3>& points,
+  static LinesMesh* CreateDashedLines(const string_t& name,
+                                      vector_t<Vector3>& points,
                                       float dashSize = 3.f, float gapSize = 1.f,
                                       unsigned int dashNb = 200,
                                       Scene* = nullptr, bool updatable = false,
@@ -985,9 +984,9 @@ public:
    * Remember you can only change the shape positions, not their number when
    * updating a polygon.
    */
-  static Mesh* CreatePolygon(const std::string& name,
-                             const std::vector<Vector3>& shape, Scene* scene,
-                             const std::vector<std::vector<Vector3>>& holes,
+  static Mesh* CreatePolygon(const string_t& name,
+                             const vector_t<Vector3>& shape, Scene* scene,
+                             const vector_t<vector_t<Vector3>>& holes,
                              bool updatable               = false,
                              unsigned int sideOrientation = Mesh::DEFAULTSIDE);
 
@@ -995,10 +994,10 @@ public:
    * Creates an extruded polygon mesh, with depth in the Y direction.
    * Please consider using the same method from the MeshBuilder class instead.
    */
-  static Mesh* ExtrudePolygon(const std::string& name,
-                              const std::vector<Vector3>& shape, float depth,
+  static Mesh* ExtrudePolygon(const string_t& name,
+                              const vector_t<Vector3>& shape, float depth,
                               Scene* scene,
-                              const std::vector<std::vector<Vector3>>& holes,
+                              const vector_t<vector_t<Vector3>>& holes,
                               bool updatable               = false,
                               unsigned int sideOrientation = Mesh::DEFAULTSIDE);
 
@@ -1039,9 +1038,9 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* ExtrudeShape(const std::string& name,
-                            const std::vector<Vector3>& shape,
-                            const std::vector<Vector3>& path, float scale,
+  static Mesh* ExtrudeShape(const string_t& name,
+                            const vector_t<Vector3>& shape,
+                            const vector_t<Vector3>& path, float scale,
                             float rotation, unsigned int cap, Scene*,
                             bool updatable               = false,
                             unsigned int sideOrientation = Mesh::DEFAULTSIDE,
@@ -1108,8 +1107,8 @@ public:
    * created.
    */
   static Mesh* ExtrudeShapeCustom(
-    const std::string& name, const std::vector<Vector3>& shape,
-    const std::vector<Vector3>& path,
+    const string_t& name, const vector_t<Vector3>& shape,
+    const vector_t<Vector3>& path,
     const ::std::function<float(float i, float distance)>& scaleFunction,
     const ::std::function<float(float i, float distance)>& rotationFunction,
     bool ribbonCloseArray, bool ribbonClosePath, unsigned int cap, Scene*,
@@ -1140,10 +1139,9 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateLathe(const std::string& name,
-                           const std::vector<Vector3>& shape, float radius,
-                           unsigned int tessellation, Scene* = nullptr,
-                           bool updatable               = false,
+  static Mesh* CreateLathe(const string_t& name, const vector_t<Vector3>& shape,
+                           float radius, unsigned int tessellation,
+                           Scene* = nullptr, bool updatable = false,
                            unsigned int sideOrientation = Mesh::DEFAULTSIDE);
 
   /**
@@ -1160,8 +1158,8 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreatePlane(const std::string& name, float size,
-                           Scene* = nullptr, bool updatable = false,
+  static Mesh* CreatePlane(const string_t& name, float size, Scene* = nullptr,
+                           bool updatable               = false,
                            unsigned int sideOrientation = Mesh::DEFAULTSIDE);
 
   /**
@@ -1175,7 +1173,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateGround(const std::string& name, unsigned int width = 1,
+  static Mesh* CreateGround(const string_t& name, unsigned int width = 1,
                             unsigned int height       = 1,
                             unsigned int subdivisions = 1, Scene* = nullptr,
                             bool updatable = false);
@@ -1198,8 +1196,8 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateTiledGround(const std::string& name, float xmin,
-                                 float zmin, float xmax, float zmax,
+  static Mesh* CreateTiledGround(const string_t& name, float xmin, float zmin,
+                                 float xmax, float zmax,
                                  const ISize& subdivisions = ISize(1, 1),
                                  const ISize& precision    = ISize(1, 1),
                                  Scene* = nullptr, bool updatable = false);
@@ -1230,7 +1228,7 @@ public:
    * created.
    */
   static GroundMesh* CreateGroundFromHeightMap(
-    const std::string& name, const std::string& url, unsigned int width,
+    const string_t& name, const string_t& url, unsigned int width,
     unsigned int height, unsigned int subdivisions, unsigned int minHeight,
     unsigned int maxHeight, Scene*, bool updatable = false,
     const ::std::function<void(GroundMesh* mesh)>& onReady = nullptr);
@@ -1276,8 +1274,8 @@ public:
    * created.
    */
   static Mesh* CreateTube(
-    const std::string& name, const std::vector<Vector3>& path,
-    float radius = 1.f, unsigned int tessellation = 64,
+    const string_t& name, const vector_t<Vector3>& path, float radius = 1.f,
+    unsigned int tessellation = 64,
     const ::std::function<float(unsigned int i, unsigned int distance)>&
       radiusFunction
     = nullptr,
@@ -1320,7 +1318,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreatePolyhedron(const std::string& name,
+  static Mesh* CreatePolyhedron(const string_t& name,
                                 PolyhedronOptions& options, Scene*);
 
   /**
@@ -1347,8 +1345,8 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateIcoSphere(const std::string& name,
-                               IcoSphereOptions& options, Scene*);
+  static Mesh* CreateIcoSphere(const string_t& name, IcoSphereOptions& options,
+                               Scene*);
 
   /**
    * @brief Creates a decal mesh.
@@ -1363,7 +1361,7 @@ public:
    * The parameter `angle` (float in radian, default 0) sets the angle to rotate
    * the decal.
    */
-  static Mesh* CreateDecal(const std::string& name, AbstractMesh* sourceMesh,
+  static Mesh* CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
                            const Vector3& position, const Vector3& normal,
                            const Vector3& size, float angle = 0.f);
 
@@ -1394,7 +1392,7 @@ public:
    * This min and max Vector3 are the minimum and maximum vectors of each mesh
    * bounding box from the passed array, in the World system
    */
-  static MinMax GetMinMax(const std::vector<AbstractMesh*>& meshes);
+  static MinMax GetMinMax(const vector_t<AbstractMesh*>& meshes);
 
   /**
    * @brief Returns a Vector3, the center of the `{min:` Vector3`, max:`
@@ -1402,7 +1400,7 @@ public:
    */
   static Vector3 Center(const MinMaxDistance& MinMaxVectorAndDistance);
   static Vector3 Center(const MinMax& minMaxVector);
-  static Vector3 Center(const std::vector<AbstractMesh*>& meshes);
+  static Vector3 Center(const vector_t<AbstractMesh*>& meshes);
 
   /**
    * @brief Merge the array of meshes into a single mesh for performance
@@ -1418,8 +1416,7 @@ public:
    * @param {boolean} subdivideWithSubMeshes - When true (false default),
    * subdivide mesh to his subMesh array with meshes source.
    */
-  static Mesh* MergeMeshes(std::vector<Mesh*>& meshes,
-                           bool disposeSource          = true,
+  static Mesh* MergeMeshes(vector_t<Mesh*>& meshes, bool disposeSource = true,
                            bool allow32BitsIndices     = true,
                            Mesh* meshSubclass          = nullptr,
                            bool subdivideWithSubMeshes = false);
@@ -1439,7 +1436,7 @@ protected:
    *               clone(), also passing False. This will make creation of
    *               children, recursive.
    */
-  Mesh(const std::string& name, Scene* scene, Node* parent = nullptr,
+  Mesh(const string_t& name, Scene* scene, Node* parent = nullptr,
        Mesh* source = nullptr, bool doNotCloneChildren = true,
        bool clonePhysicsImpostor = true);
 
@@ -1451,9 +1448,9 @@ private:
 
 public:
   int delayLoadState;
-  std::vector<InstancedMesh*> instances;
-  std::string delayLoadingFile;
-  std::string _binaryInfo;
+  vector_t<InstancedMesh*> instances;
+  string_t delayLoadingFile;
+  string_t _binaryInfo;
   ::std::function<void(float distance, Mesh* mesh, Mesh* selectedLevel)>
     onLODLevelSelection;
   Geometry* _geometry;
@@ -1465,11 +1462,11 @@ public:
 
 private:
   Observer<Mesh>::Ptr _onBeforeDrawObserver;
-  std::vector<std::unique_ptr<MeshLODLevel>> _LODLevels;
-  std::vector<Vector3> _emptyPositions;
+  vector_t<std::unique_ptr<MeshLODLevel>> _LODLevels;
+  vector_t<Vector3> _emptyPositions;
   // Morph
   MorphTargetManager* _morphTargetManager;
-  std::vector<VertexBuffer*> _delayInfo;
+  vector_t<VertexBuffer*> _delayInfo;
   Int32Array _renderIdForInstances;
   std::unique_ptr<_InstancesBatch> _batchCache;
   unsigned int _instancesBufferSize;
@@ -1488,7 +1485,7 @@ private:
   Mesh* _source;
   // For extrusion and tube
   Path3D _path3D;
-  std::vector<std::vector<Vector3>> _pathArray;
+  vector_t<vector_t<Vector3>> _pathArray;
   unsigned int _tessellation;
   unsigned int _cap;
   float _arc;

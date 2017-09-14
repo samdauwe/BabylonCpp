@@ -13,8 +13,8 @@ class BABYLON_SHARED_EXPORT PostProcessRenderPass {
 
 public:
   PostProcessRenderPass(
-    Scene* scene, const std::string& name, ISize size,
-    const std::vector<Mesh*>& renderList,
+    Scene* scene, const string_t& name, ISize size,
+    const vector_t<Mesh*>& renderList,
     const ::std::function<void(int faceIndex)>& beforeRender,
     const ::std::function<void(int faceIndex)>& afterRender);
   ~PostProcessRenderPass();
@@ -22,15 +22,15 @@ public:
   int _incRefCount();
   int _decRefCount();
   void _update();
-  void setRenderList(const std::vector<Mesh*>& renderList);
+  void setRenderList(const vector_t<Mesh*>& renderList);
   RenderTargetTexture* getRenderTexture();
 
 public:
-  std::string _name;
+  string_t _name;
   bool _enabled;
 
 private:
-  std::vector<Mesh*> _renderList;
+  vector_t<Mesh*> _renderList;
   std::unique_ptr<RenderTargetTexture> _renderTexture;
   Scene* _scene;
   int _refCount;

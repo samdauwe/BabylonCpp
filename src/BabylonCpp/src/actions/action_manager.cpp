@@ -10,7 +10,7 @@
 
 namespace BABYLON {
 
-std::array<unsigned int, 17> ActionManager::Triggers{
+array_t<unsigned int, 17> ActionManager::Triggers{
   {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
 size_t ActionManager::DragMovementThreshold = 10;  // in pixels
 size_t ActionManager::LongPressDelay        = 500; // in milliseconds
@@ -149,7 +149,7 @@ void ActionManager::processTrigger(unsigned int trigger,
     if (action->trigger == trigger) {
       if (trigger == ActionManager::OnKeyUpTrigger
           || trigger == ActionManager::OnKeyDownTrigger) {
-        const std::string parameter = action->getTriggerParameter();
+        const string_t parameter = action->getTriggerParameter();
         if (!parameter.empty() && parameter != evt.sourceEvent.keyCode) {
           auto lowerCase = String::toLowerCase(parameter);
           if (lowerCase.empty()) {
@@ -159,7 +159,7 @@ void ActionManager::processTrigger(unsigned int trigger,
           if (lowerCase != evt.sourceEvent.keyCode) {
             auto unicode = evt.sourceEvent.charCode ? evt.sourceEvent.charCode :
                                                       evt.sourceEvent.keyCode;
-            auto actualkey = String::toLowerCase(std::string(unicode));
+            auto actualkey = String::toLowerCase(string_t(unicode));
             if (actualkey != lowerCase) {
               continue;
             }
@@ -177,9 +177,9 @@ void ActionManager::processTrigger(unsigned int /*trigger*/) const
 
 IAnimatable*
 ActionManager::_getEffectiveTarget(IAnimatable* target,
-                                   const std::string& propertyPath) const
+                                   const string_t& propertyPath) const
 {
-  std::vector<std::string> properties = String::split(propertyPath, '.');
+  vector_t<string_t> properties = String::split(propertyPath, '.');
 
   for (unsigned int index = 0; index < properties.size() - 1; ++index) {
     // target = (*target)[properties[index]];
@@ -188,25 +188,25 @@ ActionManager::_getEffectiveTarget(IAnimatable* target,
   return target;
 }
 
-std::string ActionManager::_getProperty(const std::string& propertyPath) const
+string_t ActionManager::_getProperty(const string_t& propertyPath) const
 {
-  std::vector<std::string> properties = String::split(propertyPath, '.');
+  vector_t<string_t> properties = String::split(propertyPath, '.');
 
   return properties.back();
 }
 
-Json::object ActionManager::serialize(const std::string& /*name*/) const
+Json::object ActionManager::serialize(const string_t& /*name*/) const
 {
   return Json::object();
 }
 
-void ActionManager::Parse(const std::vector<Json::value>& /*parsedActions*/,
+void ActionManager::Parse(const vector_t<Json::value>& /*parsedActions*/,
                           AbstractMesh* /*object*/, Scene* /*scene*/)
 {
   // TODO FIXME
 }
 
-std::string ActionManager::GetTriggerName(unsigned int trigger)
+string_t ActionManager::GetTriggerName(unsigned int trigger)
 {
   switch (trigger) {
     case ActionManager::NothingTrigger:

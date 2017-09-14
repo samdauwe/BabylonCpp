@@ -62,7 +62,7 @@ std::unique_ptr<Vector4> Vector4::clone() const
   return ::std::make_unique<Vector4>(*this);
 }
 
-std::string Vector4::toString() const
+string_t Vector4::toString() const
 {
   std::ostringstream oss;
   oss << *this;

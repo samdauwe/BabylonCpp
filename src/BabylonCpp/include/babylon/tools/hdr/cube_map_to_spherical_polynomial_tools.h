@@ -15,7 +15,7 @@ namespace Internals {
 class BABYLON_SHARED_EXPORT CubeMapToSphericalPolynomialTools {
 
 private:
-  static std::array<FileFaceOrientation, 6> FileFaces;
+  static array_t<FileFaceOrientation, 6> FileFaces;
 
 public:
   /**

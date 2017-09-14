@@ -18,16 +18,17 @@
 
 namespace BABYLON {
 
-SSAO2RenderingPipeline::SSAO2RenderingPipeline(
-  const std::string& name, Scene* scene, float ratio,
-  const std::vector<Camera*>& cameras)
+SSAO2RenderingPipeline::SSAO2RenderingPipeline(const string_t& name,
+                                               Scene* scene, float ratio,
+                                               const vector_t<Camera*>& cameras)
     : SSAO2RenderingPipeline(name, scene, {ratio, ratio}, cameras)
 {
 }
 
-SSAO2RenderingPipeline::SSAO2RenderingPipeline(
-  const std::string& name, Scene* scene, const SSAO2Ratio& ratio,
-  const std::vector<Camera*>& cameras)
+SSAO2RenderingPipeline::SSAO2RenderingPipeline(const string_t& name,
+                                               Scene* scene,
+                                               const SSAO2Ratio& ratio,
+                                               const vector_t<Camera*>& cameras)
     : PostProcessRenderPipeline(scene->getEngine(), name)
     , totalStrength{1.f}
     , maxZ{100.f}
@@ -121,11 +122,11 @@ void SSAO2RenderingPipeline::setExpensiveBlur(bool b)
   _blurHPostProcess->updateEffect(
     "#define BILATERAL_BLUR\n#define BILATERAL_BLUR_H\n#define SAMPLES "
     "16\n#define EXPENSIVE "
-      + std::string(b ? "1" : "0") + "\n",
+      + string_t(b ? "1" : "0") + "\n",
     {}, {"textureSampler", "depthSampler"});
   _blurVPostProcess->updateEffect(
     "#define BILATERAL_BLUR\n#define SAMPLES 16\n#define EXPENSIVE "
-      + std::string(b ? "1" : "0") + "\n",
+      + string_t(b ? "1" : "0") + "\n",
     {}, {"textureSampler", "depthSampler"});
   _expensiveBlur = b;
   _firstUpdate   = true;

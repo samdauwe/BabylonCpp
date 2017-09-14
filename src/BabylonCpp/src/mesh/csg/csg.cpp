@@ -27,7 +27,7 @@ CSG::CSG* CSG::CSG::FromMesh(Mesh* mesh)
   Vector3 normal;
   Vector2 uv;
   Vector3 position;
-  std::vector<Polygon*> polygons;
+  vector_t<Polygon*> polygons;
 
   Matrix matrix;
   Vector3 meshPosition;
@@ -54,7 +54,7 @@ CSG::CSG* CSG::CSG::FromMesh(Mesh* mesh)
     for (size_t i  = subMesh->indexStart,
                 il = subMesh->indexCount + subMesh->indexStart;
          i < il; i += 3) {
-      std::vector<Vertex*> vertices;
+      vector_t<Vertex*> vertices;
       for (unsigned int j = 0; j < 3; ++j) {
         Vector3 sourceNormal(normals[indices[i + j] * 3],
                              normals[indices[i + j] * 3 + 1],
@@ -98,7 +98,7 @@ CSG::CSG* CSG::CSG::FromMesh(Mesh* mesh)
 }
 
 BABYLON::CSG::CSG*
-CSG::CSG::FromPolygons(const std::vector<BABYLON::CSG::Polygon*>& _polygons)
+CSG::CSG::FromPolygons(const vector_t<BABYLON::CSG::Polygon*>& _polygons)
 {
   BABYLON::CSG::CSG* csg = new BABYLON::CSG::CSG();
   csg->_polygons         = _polygons;
@@ -115,7 +115,7 @@ CSG::CSG* CSG::CSG::clone()
   return csg;
 }
 
-std::vector<CSG::Polygon*>& CSG::CSG::toPolygons()
+vector_t<CSG::Polygon*>& CSG::CSG::toPolygons()
 {
   return _polygons;
 }
@@ -129,7 +129,7 @@ CSG::CSG* CSG::CSG::_union(BABYLON::CSG::CSG* csg)
   b->invert();
   b->clipTo(a);
   b->invert();
-  std::vector<BABYLON::CSG::Polygon*> allPolygonsB = b->allPolygons();
+  vector_t<BABYLON::CSG::Polygon*> allPolygonsB = b->allPolygons();
   a->build(allPolygonsB);
   return CSG::FromPolygons(a->allPolygons())->copyTransformAttributes(this);
 }
@@ -144,7 +144,7 @@ void CSG::CSG::unionInPlace(BABYLON::CSG::CSG* csg)
   b->invert();
   b->clipTo(a);
   b->invert();
-  std::vector<BABYLON::CSG::Polygon*> allPolygonsB = b->allPolygons();
+  vector_t<BABYLON::CSG::Polygon*> allPolygonsB = b->allPolygons();
   a->build(allPolygonsB);
 
   _polygons = a->allPolygons();
@@ -160,7 +160,7 @@ CSG::CSG* CSG::CSG::subtract(BABYLON::CSG::CSG* csg)
   b->invert();
   b->clipTo(a);
   b->invert();
-  std::vector<BABYLON::CSG::Polygon*> allPolygonsB = b->allPolygons();
+  vector_t<BABYLON::CSG::Polygon*> allPolygonsB = b->allPolygons();
   a->build(allPolygonsB);
   a->invert();
   return CSG::FromPolygons(a->allPolygons())->copyTransformAttributes(this);
@@ -177,7 +177,7 @@ void CSG::CSG::subtractInPlace(BABYLON::CSG::CSG* csg)
   b->invert();
   b->clipTo(a);
   b->invert();
-  std::vector<BABYLON::CSG::Polygon*> allPolygonsB = b->allPolygons();
+  vector_t<BABYLON::CSG::Polygon*> allPolygonsB = b->allPolygons();
   a->build(allPolygonsB);
   a->invert();
 
@@ -193,7 +193,7 @@ CSG::CSG* CSG::CSG::intersect(BABYLON::CSG::CSG* csg)
   b->invert();
   a->clipTo(b);
   b->clipTo(a);
-  std::vector<BABYLON::CSG::Polygon*> allPolygonsB = b->allPolygons();
+  vector_t<BABYLON::CSG::Polygon*> allPolygonsB = b->allPolygons();
   a->build(allPolygonsB);
   a->invert();
   return CSG::FromPolygons(a->allPolygons())->copyTransformAttributes(this);
@@ -209,7 +209,7 @@ void CSG::CSG::intersectInPlace(BABYLON::CSG::CSG* csg)
   b->invert();
   a->clipTo(b);
   b->clipTo(a);
-  std::vector<BABYLON::CSG::Polygon*> allPolygonsB = b->allPolygons();
+  vector_t<BABYLON::CSG::Polygon*> allPolygonsB = b->allPolygons();
   a->build(allPolygonsB);
   a->invert();
 
@@ -241,25 +241,25 @@ CSG::CSG* CSG::CSG::copyTransformAttributes(BABYLON::CSG::CSG* csg)
   return this;
 }
 
-Mesh* CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene,
+Mesh* CSG::CSG::buildMeshGeometry(const string_t& name, Scene* scene,
                                   bool keepSubMeshes)
 {
   Matrix _matrix = matrix;
   _matrix.invert();
 
-  using SubMeshObj = std::array<unsigned int, 3>;
+  using SubMeshObj = array_t<unsigned int, 3>;
 
   auto mesh = Mesh::New(name, scene);
   Float32Array vertices;
   Uint32Array indices;
   Float32Array normals;
   Float32Array uvs;
-  Vector3 vertex                 = Vector3::Zero();
-  Vector3 normal                 = Vector3::Zero();
-  Vector2 uv                     = Vector2::Zero();
-  std::vector<Polygon*> polygons = _polygons;
-  std::array<unsigned int, 3> polygonIndices{{0, 0, 0}};
-  std::unordered_map<std::string, size_t> vertice_dict;
+  Vector3 vertex              = Vector3::Zero();
+  Vector3 normal              = Vector3::Zero();
+  Vector2 uv                  = Vector2::Zero();
+  vector_t<Polygon*> polygons = _polygons;
+  array_t<unsigned int, 3> polygonIndices{{0, 0, 0}};
+  std::unordered_map<string_t, size_t> vertice_dict;
   bool vertexIdxDefined     = false;
   size_t vertex_idx         = 0;
   unsigned int currentIndex = 0;
@@ -314,8 +314,8 @@ Mesh* CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene,
         Vector3 localVertex = Vector3::TransformCoordinates(vertex, matrix);
         Vector3 localNormal = Vector3::TransformNormal(normal, matrix);
 
-        std::string vertexId = String::concat(localVertex.x, ",", localVertex.y,
-                                              ",", localVertex.z);
+        string_t vertexId = String::concat(localVertex.x, ",", localVertex.y,
+                                           ",", localVertex.z);
 
         if (stl_util::contains(vertice_dict, vertexId)) {
           vertex_idx       = vertice_dict[vertexId];
@@ -382,8 +382,8 @@ Mesh* CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene,
   return mesh;
 }
 
-Mesh* CSG::CSG::toMesh(const std::string& name, Material* material,
-                       Scene* scene, bool keepSubMeshes)
+Mesh* CSG::CSG::toMesh(const string_t& name, Material* material, Scene* scene,
+                       bool keepSubMeshes)
 {
   Mesh* mesh = buildMeshGeometry(name, scene, keepSubMeshes);
 

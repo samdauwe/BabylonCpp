@@ -19,8 +19,8 @@ public:
 
 protected:
   LensFlare(float size, const Vector3& position,
-            const Color3& color       = Color3(1.f, 1.f, 1.f),
-            const std::string& imgUrl = "", LensFlareSystem* system = nullptr);
+            const Color3& color    = Color3(1.f, 1.f, 1.f),
+            const string_t& imgUrl = "", LensFlareSystem* system = nullptr);
 
 public:
   float size;

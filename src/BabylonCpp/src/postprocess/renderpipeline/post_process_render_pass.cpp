@@ -8,8 +8,8 @@
 namespace BABYLON {
 
 PostProcessRenderPass::PostProcessRenderPass(
-  Scene* scene, const std::string& name, ISize size,
-  const std::vector<Mesh*>& renderList,
+  Scene* scene, const string_t& name, ISize size,
+  const vector_t<Mesh*>& renderList,
   const ::std::function<void(int faceIndex)>& beforeRender,
   const ::std::function<void(int faceIndex)>& afterRender)
     : _name{name}
@@ -58,7 +58,7 @@ void PostProcessRenderPass::_update()
   setRenderList(_renderList);
 }
 
-void PostProcessRenderPass::setRenderList(const std::vector<Mesh*>& renderList)
+void PostProcessRenderPass::setRenderList(const vector_t<Mesh*>& renderList)
 {
   _renderTexture->renderList.clear();
   _renderTexture->renderList.reserve(renderList.size());

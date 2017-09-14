@@ -16,7 +16,7 @@ struct BABYLON_SHARED_EXPORT IAnimatable : public IReflect {
     SCENE   = 4,
   }; // end of enum class Type
 
-  std::string state;
+  string_t state;
   virtual Node* parent() const
   {
     return nullptr;
@@ -25,9 +25,9 @@ struct BABYLON_SHARED_EXPORT IAnimatable : public IReflect {
   {
     return Type::UNKNOWN;
   }
-  virtual std::vector<Animation*> getAnimations()
+  virtual vector_t<Animation*> getAnimations()
   {
-    return std::vector<Animation*>();
+    return vector_t<Animation*>();
   }
   virtual bool markTargetAsDirty() const
   {
@@ -40,7 +40,7 @@ struct BABYLON_SHARED_EXPORT IAnimatable : public IReflect {
   {
     return nullptr;
   }
-  virtual AnimationValue operator[](const std::string& /*key*/)
+  virtual AnimationValue operator[](const string_t& /*key*/)
   {
     return AnimationValue(true);
   }

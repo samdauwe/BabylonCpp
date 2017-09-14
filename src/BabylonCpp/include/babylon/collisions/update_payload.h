@@ -9,9 +9,9 @@ namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT UpdatePayload {
   std::unordered_map<unsigned int, SerializedMesh> updatedMeshes;
-  std::unordered_map<std::string, SerializedGeometry> updatedGeometries;
+  std::unordered_map<string_t, SerializedGeometry> updatedGeometries;
   Uint32Array removedMeshes;
-  std::vector<std::string> removedGeometries;
+  vector_t<string_t> removedGeometries;
 }; // end of struct UpdatePayload
 
 } // end of namespace BABYLON

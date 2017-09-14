@@ -45,7 +45,7 @@ bool StandardMaterial::_LightmapTextureEnabled     = true;
 bool StandardMaterial::_RefractionTextureEnabled   = true;
 bool StandardMaterial::_ColorGradingTextureEnabled = true;
 
-StandardMaterial::StandardMaterial(const std::string& iName, Scene* scene)
+StandardMaterial::StandardMaterial(const string_t& iName, Scene* scene)
     : PushMaterial{iName, scene}
     , ambientColor{Color3(0.f, 0.f, 0.f)}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
@@ -615,7 +615,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     }
 
     // Attributes
-    std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
+    vector_t<string_t> attribs{VertexBuffer::PositionKindChars};
 
     if (defines[SMD::NORMAL]) {
       attribs.emplace_back(VertexBuffer::NormalKindChars);
@@ -640,63 +640,63 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh, defines,
                                                      SMD::NORMAL);
 
-    std::string shaderName{"default"};
+    string_t shaderName{"default"};
     const auto join = defines.toString();
-    std::vector<std::string> uniforms{"world",
-                                      "view",
-                                      "viewProjection",
-                                      "vEyePosition",
-                                      "vLightsType",
-                                      "vAmbientColor",
-                                      "vDiffuseColor",
-                                      "vSpecularColor",
-                                      "vEmissiveColor",
-                                      "vFogInfos",
-                                      "vFogColor",
-                                      "pointSize",
-                                      "vDiffuseInfos",
-                                      "vAmbientInfos",
-                                      "vOpacityInfos",
-                                      "vReflectionInfos",
-                                      "vEmissiveInfos",
-                                      "vSpecularInfos",
-                                      "vBumpInfos",
-                                      "vLightmapInfos",
-                                      "vRefractionInfos",
-                                      "mBones",
-                                      "vClipPlane",
-                                      "diffuseMatrix",
-                                      "ambientMatrix",
-                                      "opacityMatrix",
-                                      "reflectionMatrix",
-                                      "emissiveMatrix",
-                                      "specularMatrix",
-                                      "bumpMatrix",
-                                      "lightmapMatrix",
-                                      "refractionMatrix",
-                                      "diffuseLeftColor",
-                                      "diffuseRightColor",
-                                      "opacityParts",
-                                      "reflectionLeftColor",
-                                      "reflectionRightColor",
-                                      "emissiveLeftColor",
-                                      "emissiveRightColor",
-                                      "refractionLeftColor",
-                                      "refractionRightColor",
-                                      "logarithmicDepthConstant",
-                                      "vNormalReoderParams"};
+    vector_t<string_t> uniforms{"world",
+                                "view",
+                                "viewProjection",
+                                "vEyePosition",
+                                "vLightsType",
+                                "vAmbientColor",
+                                "vDiffuseColor",
+                                "vSpecularColor",
+                                "vEmissiveColor",
+                                "vFogInfos",
+                                "vFogColor",
+                                "pointSize",
+                                "vDiffuseInfos",
+                                "vAmbientInfos",
+                                "vOpacityInfos",
+                                "vReflectionInfos",
+                                "vEmissiveInfos",
+                                "vSpecularInfos",
+                                "vBumpInfos",
+                                "vLightmapInfos",
+                                "vRefractionInfos",
+                                "mBones",
+                                "vClipPlane",
+                                "diffuseMatrix",
+                                "ambientMatrix",
+                                "opacityMatrix",
+                                "reflectionMatrix",
+                                "emissiveMatrix",
+                                "specularMatrix",
+                                "bumpMatrix",
+                                "lightmapMatrix",
+                                "refractionMatrix",
+                                "diffuseLeftColor",
+                                "diffuseRightColor",
+                                "opacityParts",
+                                "reflectionLeftColor",
+                                "reflectionRightColor",
+                                "emissiveLeftColor",
+                                "emissiveRightColor",
+                                "refractionLeftColor",
+                                "refractionRightColor",
+                                "logarithmicDepthConstant",
+                                "vNormalReoderParams"};
 
-    std::vector<std::string> samplers{
+    vector_t<string_t> samplers{
       "diffuseSampler",        "ambientSampler",      "opacitySampler",
       "reflectionCubeSampler", "reflection2DSampler", "emissiveSampler",
       "specularSampler",       "bumpSampler",         "lightmapSampler",
       "refractionCubeSampler", "refraction2DSampler"};
-    std::vector<std::string> uniformBuffers{"Material", "Scene"};
+    vector_t<string_t> uniformBuffers{"Material", "Scene"};
 
     ImageProcessingConfiguration::PrepareUniforms(uniforms, defines);
     ImageProcessingConfiguration::PrepareSamplers(samplers, defines);
 
-    std::unordered_map<std::string, unsigned int> indexParameters{
+    std::unordered_map<string_t, unsigned int> indexParameters{
       {"maxSimultaneousLights", _maxSimultaneousLights},
       {"maxSimultaneousMorphTargets", defines.NUM_MORPH_INFLUENCERS}};
 
@@ -1082,9 +1082,9 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   _afterBind(mesh, _activeEffect);
 }
 
-std::vector<IAnimatable*> StandardMaterial::getAnimatables()
+vector_t<IAnimatable*> StandardMaterial::getAnimatables()
 {
-  std::vector<IAnimatable*> results;
+  vector_t<IAnimatable*> results;
 
   if (_diffuseTexture && _diffuseTexture->animations.size() > 0) {
     results.emplace_back(_diffuseTexture);
@@ -1125,7 +1125,7 @@ std::vector<IAnimatable*> StandardMaterial::getAnimatables()
   return results;
 }
 
-std::vector<BaseTexture*> StandardMaterial::getActiveTextures() const
+vector_t<BaseTexture*> StandardMaterial::getActiveTextures() const
 {
   auto activeTextures = Material::getActiveTextures();
 
@@ -1262,7 +1262,7 @@ void StandardMaterial::dispose(bool forceDisposeEffect,
   Material::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-Material* StandardMaterial::clone(const std::string& _name,
+Material* StandardMaterial::clone(const string_t& _name,
                                   bool /*cloneChildren*/) const
 {
   auto standardMaterial  = StandardMaterial::New(*this);
@@ -1579,8 +1579,7 @@ void StandardMaterial::setCameraColorGradingTexture(BaseTexture* value)
 }
 
 StandardMaterial* StandardMaterial::Parse(const Json::value& source,
-                                          Scene* scene,
-                                          const std::string& rootUrl)
+                                          Scene* scene, const string_t& rootUrl)
 {
   return SerializationHelper::Parse(
     StandardMaterial::New(Json::GetString(source, "name"), scene), source,

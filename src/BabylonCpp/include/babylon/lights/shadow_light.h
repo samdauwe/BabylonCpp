@@ -11,7 +11,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT ShadowLight : public IShadowLight {
 
 public:
-  ShadowLight(const std::string& name, Scene* scene);
+  ShadowLight(const string_t& name, Scene* scene);
   ~ShadowLight();
 
   Vector3& direction() override;
@@ -99,19 +99,19 @@ public:
    * projection matrix definition.
    * Returns the light.
    */
-  IShadowLight* setShadowProjectionMatrix(
-    Matrix& matrix, Matrix& viewMatrix,
-    const std::vector<AbstractMesh*>& renderList) override;
+  IShadowLight*
+  setShadowProjectionMatrix(Matrix& matrix, Matrix& viewMatrix,
+                            const vector_t<AbstractMesh*>& renderList) override;
 
 protected:
-  virtual void _setDefaultShadowProjectionMatrix(
-    Matrix& matrix, const Matrix& viewMatrix,
-    const std::vector<AbstractMesh*>& renderList)
+  virtual void
+  _setDefaultShadowProjectionMatrix(Matrix& matrix, const Matrix& viewMatrix,
+                                    const vector_t<AbstractMesh*>& renderList)
     = 0;
 
 public:
   ::std::function<void(const Matrix& viewMatrix,
-                       const std::vector<AbstractMesh*>& renderList,
+                       const vector_t<AbstractMesh*>& renderList,
                        Matrix& result)>
     customProjectionMatrixBuilder;
 

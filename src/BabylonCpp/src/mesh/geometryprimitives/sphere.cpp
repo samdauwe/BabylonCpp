@@ -8,7 +8,7 @@
 namespace BABYLON {
 namespace GeometryPrimitives {
 
-Sphere::Sphere(const std::string& _id, Scene* scene, unsigned int _segments,
+Sphere::Sphere(const string_t& _id, Scene* scene, unsigned int _segments,
                float _diameter, bool canBeRegenerated, Mesh* mesh,
                unsigned int _side)
     : _Primitive{_id, scene, canBeRegenerated, mesh}
@@ -31,7 +31,7 @@ std::unique_ptr<VertexData> Sphere::_regenerateVertexData()
   return VertexData::CreateSphere(options);
 }
 
-Geometry* Sphere::copy(const std::string& _id)
+Geometry* Sphere::copy(const string_t& _id)
 {
   return Sphere::New(_id, getScene(), segments, diameter, canBeRegenerated(),
                      nullptr, side);

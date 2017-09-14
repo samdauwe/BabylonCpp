@@ -453,7 +453,7 @@ void MaterialDefines::reset()
   shadowcubes.clear();
 }
 
-std::string MaterialDefines::toString() const
+string_t MaterialDefines::toString() const
 {
   std::ostringstream oss;
   oss << *this;

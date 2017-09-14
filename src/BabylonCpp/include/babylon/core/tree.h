@@ -17,11 +17,10 @@ class TreeNode {
 
 public:
   using node_iterator =
-    typename std::vector<std::unique_ptr<TreeNode<T>>>::iterator;
+    typename vector_t<std::unique_ptr<TreeNode<T>>>::iterator;
   using const_node_iterator =
-    typename std::vector<std::unique_ptr<TreeNode<T>>>::const_iterator;
-  using size_type =
-    typename std::vector<std::unique_ptr<TreeNode<T>>>::size_type;
+    typename vector_t<std::unique_ptr<TreeNode<T>>>::const_iterator;
+  using size_type = typename vector_t<std::unique_ptr<TreeNode<T>>>::size_type;
 
 public:
   /**
@@ -151,7 +150,7 @@ public:
     return _children.back().get();
   }
 
-  void addChildren(const std::vector<T>& dataItems)
+  void addChildren(const vector_t<T>& dataItems)
   {
     for (auto& dataItem : dataItems) {
       addChild(dataItem);
@@ -190,7 +189,7 @@ public:
    * @brief Returns the list containing the children nodes.
    * @return The list containing the children nodes.
    */
-  std::vector<std::unique_ptr<TreeNode<T>>>& children()
+  vector_t<std::unique_ptr<TreeNode<T>>>& children()
   {
     return _children;
   }
@@ -200,13 +199,13 @@ private:
   std::size_t _id;
   T _data;
   TreeNode* _parent;
-  std::vector<std::unique_ptr<TreeNode<T>>> _children;
+  vector_t<std::unique_ptr<TreeNode<T>>> _children;
 
 }; // end of class TreeNode
 
 /**
  * @brief Represents a Tree of Objects of generic type T. The Tree is
- * represented as a single root node which points to a std::vector<TreeNode<T>>
+ * represented as a single root node which points to a vector_t<TreeNode<T>>
  * of children. There is no restriction on the number of children that a
  * particular node may have. This Tree provides a method to serialize the Tree
  * into a List by doing a pre-order traversal. It has several methods to allow
@@ -486,7 +485,7 @@ std::basic_iostream<char>::basic_ostream&
 operator<<(std::basic_iostream<char>::basic_ostream& out, const Tree<T>& tree)
 {
   using node_t = std::unique_ptr<TreeNode<T>>;
-  std::vector<char> depth;
+  vector_t<char> depth;
   std::size_t di = 0;
 
   const auto push = [&](char c) {
@@ -506,7 +505,7 @@ operator<<(std::basic_iostream<char>::basic_ostream& out, const Tree<T>& tree)
         out << "(" << tree->data() << ")\n";
         const auto& children = tree->children();
         for (const auto& child : children) {
-          const std::string depthString(depth.begin(), depth.end());
+          const string_t depthString(depth.begin(), depth.end());
           out << depthString.c_str() << " └─-";
           push(' ');
           print(child);

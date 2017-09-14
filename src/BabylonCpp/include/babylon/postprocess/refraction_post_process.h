@@ -13,8 +13,8 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT RefractionPostProcess : public PostProcess {
 
 public:
-  RefractionPostProcess(const std::string& name,
-                        const std::string& refractionTextureUrl,
+  RefractionPostProcess(const string_t& name,
+                        const string_t& refractionTextureUrl,
                         const Color3& color, float depth, int colorLevel,
                         float ratio, Camera* camera, unsigned int samplingMode,
                         Engine* engine, bool reusable = false);

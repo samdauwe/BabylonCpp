@@ -20,9 +20,9 @@ public:
   float scaleLines;
 
 private:
-  std::vector<Vector3> _xline;
-  std::vector<Vector3> _yline;
-  std::vector<Vector3> _zline;
+  vector_t<Vector3> _xline;
+  vector_t<Vector3> _yline;
+  vector_t<Vector3> _zline;
 
   LinesMesh* _xmesh;
   LinesMesh* _ymesh;

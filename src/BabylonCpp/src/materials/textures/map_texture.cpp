@@ -8,9 +8,8 @@
 
 namespace BABYLON {
 
-MapTexture::MapTexture(const std::string& iName, Scene* scene,
-                       const ISize& size, unsigned int samplingMode,
-                       bool useMipMap, float margin)
+MapTexture::MapTexture(const string_t& iName, Scene* scene, const ISize& size,
+                       unsigned int samplingMode, bool useMipMap, float margin)
     : Texture{"", scene, !useMipMap, false, samplingMode}, _size{size}
 {
   name  = iName;

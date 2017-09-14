@@ -76,12 +76,12 @@ public:
   /**
    * Get a specific parametes from the options parameter.
    */
-  float getParam(const std::string& paramName) const;
+  float getParam(const string_t& paramName) const;
 
   /**
    * Sets a specific parameter in the options given to the physics plugin
    */
-  void setParam(const std::string& paramName, float value);
+  void setParam(const string_t& paramName, float value);
 
   /**
    * Specifically change the body's mass option. Won't recreate the physics body
@@ -206,16 +206,16 @@ private:
   // The native cannon/oimo/energy physics body object.
   IPhysicsBody* _physicsBody;
   bool _bodyUpdateRequired;
-  std::vector<FastFunc<void(PhysicsImpostor* impostor)>>
+  vector_t<FastFunc<void(PhysicsImpostor* impostor)>>
     _onBeforePhysicsStepCallbacks;
-  std::vector<FastFunc<void(PhysicsImpostor* imposter)>>
+  vector_t<FastFunc<void(PhysicsImpostor* imposter)>>
     _onAfterPhysicsStepCallbacks;
   Vector3 _deltaPosition;
   std::unique_ptr<Quaternion> _deltaRotation;
   std::unique_ptr<Quaternion> _deltaRotationConjugated;
   // If set, this is this impostor's parent
   PhysicsImpostor* _parent;
-  std::vector<Joint> _joints;
+  vector_t<Joint> _joints;
   Vector3 _tmpPositionWithDelta;
   Quaternion _tmpRotationWithDelta;
 

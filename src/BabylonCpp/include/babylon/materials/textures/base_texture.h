@@ -28,8 +28,8 @@ public:
   unsigned int coordinatesMode() const;
   void setCoordinatesMode(unsigned int value);
 
-  std::string uid();
-  virtual std::string toString() const;
+  string_t uid();
+  virtual string_t toString() const;
 
   /**
    * @brief Returns the string "BaseTexture".
@@ -48,11 +48,11 @@ public:
   ISize getBaseSize();
   virtual void scale(float ratio);
   bool canRescale();
-  InternalTexture* _getFromCache(const std::string& url, bool noMipmap,
+  InternalTexture* _getFromCache(const string_t& url, bool noMipmap,
                                  unsigned int sampling = 0);
   virtual void _rebuild();
   virtual void delayLoad();
-  std::vector<Animation*> getAnimations() override;
+  vector_t<Animation*> getAnimations() override;
   std::unique_ptr<BaseTexture> clone() const;
   unsigned int textureType() const;
   unsigned int textureFormat() const;
@@ -66,14 +66,14 @@ public:
   virtual void dispose(bool doNotRecurse = false) override;
   Json::object serialize() const;
 
-  static void WhenAllReady(const std::vector<BaseTexture*>& textures,
+  static void WhenAllReady(const vector_t<BaseTexture*>& textures,
                            const ::std::function<void()>& callback);
 
 protected:
   BaseTexture(Scene* scene);
 
 public:
-  std::string name;
+  string_t name;
   bool getAlphaFromRGB;
   float level;
   unsigned int coordinatesIndex;
@@ -87,7 +87,7 @@ public:
   float lodGenerationOffset;
   float lodGenerationScale;
   bool isRenderTarget;
-  std::vector<Animation*> animations;
+  vector_t<Animation*> animations;
   /**
    * An event triggered when the texture is disposed.
    */
@@ -100,7 +100,7 @@ private:
   bool _hasAlpha;
   unsigned int _coordinatesMode;
   Scene* _scene;
-  std::string _uid;
+  string_t _uid;
   Observer<BaseTexture>::Ptr _onDisposeObserver;
 
 }; // end of class BaseTexture

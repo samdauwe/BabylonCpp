@@ -12,10 +12,10 @@ PolygonPoints::~PolygonPoints()
 {
 }
 
-std::vector<IndexedVector2>
-PolygonPoints::add(const std::vector<Vector2>& originalPoints)
+vector_t<IndexedVector2>
+PolygonPoints::add(const vector_t<Vector2>& originalPoints)
 {
-  std::vector<IndexedVector2> result;
+  vector_t<IndexedVector2> result;
 
   for (auto& point : originalPoints) {
     if (result.empty() || !point.equalsWithEpsilon(result[0])) {

@@ -55,9 +55,9 @@ struct FourCCToInt32 {
   static const unsigned int value = (((((d << 8) | c) << 8) | b) << 8) | a;
 };
 
-inline std::string Int32ToFourCC(int value)
+inline string_t Int32ToFourCC(int value)
 {
-  std::string s;
+  string_t s;
   s += (static_cast<char>(value & 0xff));
   s += (static_cast<char>((value >> 8) & 0xff));
   s += (static_cast<char>((value >> 16) & 0xff));

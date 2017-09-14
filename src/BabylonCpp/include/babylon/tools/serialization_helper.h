@@ -15,7 +15,7 @@ struct BABYLON_SHARED_EXPORT SerializationHelper {
                       Scene* scene);
   static StandardMaterial* Parse(StandardMaterial* standardMaterial,
                                  const Json::value& parsedMaterial,
-                                 Scene* scene, const std::string& rootUrl);
+                                 Scene* scene, const string_t& rootUrl);
 
 }; // end of struct SerializationHelper
 

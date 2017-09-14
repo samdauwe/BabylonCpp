@@ -96,7 +96,7 @@ struct CameraRigParams {
   bool vrPreViewMatrixSet = false;
   Matrix vrPreViewMatrix;
   VRMetrics vrMetrics;
-  std::unordered_map<std::string, float> params;
+  std::unordered_map<string_t, float> params;
 }; // end of struct CameraRigParams
 
 struct ClientRect {
@@ -279,10 +279,10 @@ struct PointerEvent : public Event {
 }; // end of struct PointerEvent
 
 struct Polyhedron {
-  std::string name;
-  std::string category;
-  std::vector<Float32Array> vertices;
-  std::vector<Uint32Array> faces;
+  string_t name;
+  string_t category;
+  vector_t<Float32Array> vertices;
+  vector_t<Uint32Array> faces;
 }; // end of struct Polyhedron
 
 struct PositionCoord {
@@ -316,7 +316,7 @@ struct SolidParticleOptions {
 }; // end of struct SolidParticleOptions
 
 struct Style {
-  std::string cursor;
+  string_t cursor;
 }; // end of struct cursor
 
 struct SubdivisionsPerAxis {
@@ -327,7 +327,7 @@ struct SubdivisionsPerAxis {
 }; // end of struct SubdivisionsPerAxis
 
 struct TriggerOptions {
-  std::string parameter;
+  string_t parameter;
   unsigned int trigger;
 }; // end of struct TriggerOptions
 

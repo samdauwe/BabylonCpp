@@ -39,7 +39,7 @@ public:
    * @brief Sets the passed Effect object with the HemisphericLight normalized
    * direction and color and the passed name (string).
    */
-  void transferToEffect(Effect* effect, const std::string& lightIndex) override;
+  void transferToEffect(Effect* effect, const string_t& lightIndex) override;
 
   /**
    * @brief Returns the light world matrix.
@@ -60,8 +60,8 @@ protected:
    * The HemisphericLight can't cast shadows.
    * Documentation : http://doc.babylonjs.com/tutorials/lights
    */
-  HemisphericLight(const std::string& name, Scene* scene);
-  HemisphericLight(const std::string& name, const Vector3& direction,
+  HemisphericLight(const string_t& name, Scene* scene);
+  HemisphericLight(const string_t& name, const Vector3& direction,
                    Scene* scene);
 
   void _buildUniformLayout() override;

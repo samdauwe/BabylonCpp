@@ -284,16 +284,16 @@ public:
    */
   static void
   Bind(ColorCurves& colorCurves, Effect* effect,
-       const std::string& positiveUniform = "vCameraColorCurvePositive",
-       const std::string& neutralUniform  = "vCameraColorCurveNeutral",
-       const std::string& negativeUniform = "vCameraColorCurveNegative");
+       const string_t& positiveUniform = "vCameraColorCurvePositive",
+       const string_t& neutralUniform  = "vCameraColorCurveNeutral",
+       const string_t& negativeUniform = "vCameraColorCurveNegative");
 
   /**
    * @brief Prepare the list of uniforms associated with the ColorCurves
    * effects.
    * @param uniformsList The list of uniforms used in the effect
    */
-  static void PrepareUniforms(std::vector<std::string>& uniformsList);
+  static void PrepareUniforms(vector_t<string_t>& uniformsList);
 
   /**
    * @brief Returns color grading data based on a hue, density, saturation and

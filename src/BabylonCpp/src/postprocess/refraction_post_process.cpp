@@ -7,7 +7,7 @@
 namespace BABYLON {
 
 RefractionPostProcess::RefractionPostProcess(
-  const std::string& iName, const std::string& refractionTextureUrl,
+  const string_t& iName, const string_t& refractionTextureUrl,
   const Color3& iColor, float iDepth, int iColorLevel, float ratio,
   Camera* camera, unsigned int samplingMode, Engine* engine, bool reusable)
     : PostProcess{iName,
@@ -25,8 +25,9 @@ RefractionPostProcess::RefractionPostProcess(
     , _refRexture{nullptr}
 {
   onActivateObservable.add([&](Camera* cam) {
-    _refRexture = _refRexture ? _refRexture : Texture::New(refractionTextureUrl,
-                                                           cam->getScene());
+    _refRexture = _refRexture ?
+                    _refRexture :
+                    Texture::New(refractionTextureUrl, cam->getScene());
   });
 
   onApplyObservable.add([&](Effect* effect) {

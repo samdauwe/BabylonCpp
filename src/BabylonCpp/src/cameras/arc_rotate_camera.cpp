@@ -9,13 +9,13 @@
 
 namespace BABYLON {
 
-ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha,
+ArcRotateCamera::ArcRotateCamera(const string_t& iName, float iAlpha,
                                  float iBeta, float iRadius, Scene* scene)
     : ArcRotateCamera(iName, iAlpha, iBeta, iRadius, Vector3::Zero(), scene)
 {
 }
 
-ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha,
+ArcRotateCamera::ArcRotateCamera(const string_t& iName, float iAlpha,
                                  float iBeta, float iRadius,
                                  const Vector3& iTarget, Scene* scene)
     : TargetCamera{iName, Vector3::Zero(), scene}
@@ -441,7 +441,7 @@ void ArcRotateCamera::_onCollisionPositionChange(int /*collisionId*/,
   _collisionTriggered = false;
 }
 
-void ArcRotateCamera::zoomOn(const std::vector<AbstractMesh*> meshes,
+void ArcRotateCamera::zoomOn(const vector_t<AbstractMesh*> meshes,
                              bool doNotUpdateMaxZ)
 {
   auto _meshes = meshes.empty() ? getScene()->getMeshes() : meshes;
@@ -464,8 +464,7 @@ void ArcRotateCamera::focusOn(
   }
 }
 
-Camera* ArcRotateCamera::createRigCamera(const std::string& iName,
-                                         int cameraIndex)
+Camera* ArcRotateCamera::createRigCamera(const string_t& iName, int cameraIndex)
 {
   float alphaShift = 0.f;
 

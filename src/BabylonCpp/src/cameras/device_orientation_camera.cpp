@@ -2,7 +2,7 @@
 
 namespace BABYLON {
 
-DeviceOrientationCamera::DeviceOrientationCamera(const std::string& iName,
+DeviceOrientationCamera::DeviceOrientationCamera(const string_t& iName,
                                                  const Vector3& position,
                                                  Scene* scene)
     : FreeCamera{iName, position, scene}

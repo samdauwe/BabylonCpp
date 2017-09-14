@@ -27,10 +27,10 @@ public:
   ~TiledGround();
 
   std::unique_ptr<VertexData> _regenerateVertexData() override;
-  Geometry* copy(const std::string& id) override;
+  Geometry* copy(const string_t& id) override;
 
 protected:
-  TiledGround(const std::string& id, Scene* scene, float xmin, float zmin,
+  TiledGround(const string_t& id, Scene* scene, float xmin, float zmin,
               float xmax, float zmax, const ISize& subdivisions,
               const ISize& precision, bool canBeRegenerated, Mesh* mesh);
 

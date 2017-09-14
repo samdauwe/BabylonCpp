@@ -52,13 +52,13 @@ public:
   Matrix _getViewMatrix() override;
 
   /** Camera rigs section **/
-  Camera* createRigCamera(const std::string& name, int cameraIndex) override;
+  Camera* createRigCamera(const string_t& name, int cameraIndex) override;
   void _updateRigCameras() override;
   const char* getClassName() const override;
   virtual Json::object serialize() const override;
 
 protected:
-  TargetCamera(const std::string& name, const Vector3& position, Scene* scene);
+  TargetCamera(const string_t& name, const Vector3& position, Scene* scene);
 
 private:
   void _getRigCamPosition(float halfSpace, Vector3& result);
@@ -86,7 +86,7 @@ public:
   Matrix _tempMatrix;
 
   ::std::function<void()> _reset;
-  std::string _waitingLockedTargetId;
+  string_t _waitingLockedTargetId;
 
 private:
   Matrix _rigCamTransformMatrix;

@@ -80,7 +80,7 @@ size_t Plane::getHashCode() const
   return hash;
 }
 
-std::array<float, 4> Plane::asArray() const
+array_t<float, 4> Plane::asArray() const
 {
   return {{normal.x, normal.y, normal.z, d}};
 }

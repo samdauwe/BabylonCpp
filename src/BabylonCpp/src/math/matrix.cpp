@@ -343,7 +343,7 @@ Matrix& Matrix::copyFrom(const Matrix& other)
   return *this;
 }
 
-const Matrix& Matrix::copyToArray(std::array<float, 16>& array,
+const Matrix& Matrix::copyToArray(array_t<float, 16>& array,
                                   unsigned int offset) const
 {
   if (offset != 0) {
@@ -380,7 +380,7 @@ Matrix& Matrix::multiplyToRef(const Matrix& other, Matrix& result)
 }
 
 const Matrix& Matrix::multiplyToArray(const Matrix& other,
-                                      std::array<float, 16>& result,
+                                      array_t<float, 16>& result,
                                       unsigned int offset) const
 {
 #if BABYLONCPP_OPTION_ENABLE_SIMD == true
@@ -451,7 +451,7 @@ const Matrix& Matrix::multiplyToArray(const Matrix& other, Float32Array& result,
     return *this;
   }
 
-  std::array<float, 16> array;
+  array_t<float, 16> array;
   multiplyToArray(other, array, offset);
   for (unsigned int i = 0; i != 16; ++i) {
     result[i] = array[i];

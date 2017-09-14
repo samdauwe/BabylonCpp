@@ -10,11 +10,11 @@ namespace BABYLON {
  */
 struct BABYLON_SHARED_EXPORT Polygon {
 
-  static std::vector<Vector2> Rectangle(float xmin, float ymin, float xmax,
-                                        float ymax);
-  static std::vector<Vector2> Circle(float radius, float cx = 0.f,
-                                     float cy = 0.f, size_t numberOfSides = 32);
-  static std::vector<Vector2> Parse(const std::string& input);
+  static vector_t<Vector2> Rectangle(float xmin, float ymin, float xmax,
+                                     float ymax);
+  static vector_t<Vector2> Circle(float radius, float cx = 0.f, float cy = 0.f,
+                                  size_t numberOfSides = 32);
+  static vector_t<Vector2> Parse(const string_t& input);
   static Path2 StartingAt(float x, float y);
 
 }; // end of class Polygon

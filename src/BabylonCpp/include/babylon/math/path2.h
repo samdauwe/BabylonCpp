@@ -54,8 +54,8 @@ public:
   /**
    * @brief Returns the Path2 internal array of points.
    */
-  std::vector<Vector2>& getPoints();
-  const std::vector<Vector2>& getPoints() const;
+  vector_t<Vector2>& getPoints();
+  const vector_t<Vector2>& getPoints() const;
 
   /**
    * @brief Returns a new Vector2 located at a percentage of the Path2 total
@@ -74,7 +74,7 @@ public:
   bool closed;
 
 private:
-  std::vector<Vector2> _points;
+  vector_t<Vector2> _points;
   float _length;
 
 }; // end of class Path2

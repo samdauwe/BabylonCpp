@@ -5,8 +5,8 @@
 
 namespace BABYLON {
 
-AnaglyphPostProcess::AnaglyphPostProcess(const std::string& iName, float ratio,
-                                         std::vector<Camera*> rigCameras,
+AnaglyphPostProcess::AnaglyphPostProcess(const string_t& iName, float ratio,
+                                         vector_t<Camera*> rigCameras,
                                          unsigned int samplingMode,
                                          Engine* engine, bool reusable)
     : PostProcess{iName,         "anaglyph",   {},     {"leftSampler"}, ratio,

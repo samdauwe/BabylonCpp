@@ -12,10 +12,9 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT AnaglyphPostProcess : public PostProcess {
 
 public:
-  AnaglyphPostProcess(const std::string& name, float ratio,
-                      std::vector<Camera*> rigCameras,
-                      unsigned int samplingMode, Engine* engine,
-                      bool reusable = false);
+  AnaglyphPostProcess(const string_t& name, float ratio,
+                      vector_t<Camera*> rigCameras, unsigned int samplingMode,
+                      Engine* engine, bool reusable = false);
   ~AnaglyphPostProcess();
 
 private:

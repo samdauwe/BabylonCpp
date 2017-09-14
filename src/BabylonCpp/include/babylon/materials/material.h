@@ -53,7 +53,7 @@ public:
   virtual void setSpecularColor(const Color3& color);
   virtual void setEmissiveColor(const Color3& color);
 
-  virtual std::vector<Animation*> getAnimations() override;
+  virtual vector_t<Animation*> getAnimations() override;
 
   // Events
   void setOnDispose(const ::std::function<void()>& callback);
@@ -71,7 +71,7 @@ public:
    * within scene loading
    * subclasses should override adding information pertainent to themselves
    */
-  std::string toString(bool fullDetails = false) const;
+  string_t toString(bool fullDetails = false) const;
 
   bool isFrozen() const;
   void freeze();
@@ -86,8 +86,8 @@ public:
   virtual BaseTexture* getAlphaTestTexture();
   virtual void trackCreation(
     const ::std::function<void(const Effect* effect)>& onCompiled,
-    const ::std::function<void(const Effect* effect,
-                               const std::string& errors)>& onError);
+    const ::std::function<void(const Effect* effect, const string_t& errors)>&
+      onError);
   void markDirty();
   void _preBind(Effect* effect = nullptr);
   virtual void bind(Matrix* world, Mesh* mesh);
@@ -97,11 +97,11 @@ public:
   void bindView(Effect* effect);
   void bindViewProjection(Effect* effect);
   virtual void unbind();
-  virtual std::vector<BaseTexture*> getActiveTextures() const;
+  virtual vector_t<BaseTexture*> getActiveTextures() const;
   virtual bool hasTexture(BaseTexture* texture) const;
-  virtual Material* clone(const std::string& name,
+  virtual Material* clone(const string_t& name,
                           bool cloneChildren = false) const;
-  std::vector<AbstractMesh*> getBindedMeshes();
+  vector_t<AbstractMesh*> getBindedMeshes();
   /**
    * Force shader compilation including textures ready check<
    */
@@ -119,10 +119,10 @@ public:
   static MultiMaterial*
   ParseMultiMaterial(const Json::value& parsedMultiMaterial, Scene* scene);
   static Material* Parse(const Json::value& parsedMaterial, Scene* scene,
-                         const std::string& rootUrl);
+                         const string_t& rootUrl);
 
 protected:
-  Material(const std::string& name, Scene* scene, bool doNotAdd = false);
+  Material(const string_t& name, Scene* scene, bool doNotAdd = false);
 
   void _afterBind(Mesh* mesh);
   void _markAllSubMeshesAsDirty(
@@ -149,17 +149,16 @@ public:
    */
   Observable<Material> onUnBindObservable;
   // Properties
-  std::string id;
-  std::string name;
+  string_t id;
+  string_t name;
   bool checkReadyOnEveryCall;
   bool checkReadyOnlyOnce;
-  std::string state;
+  string_t state;
   float alpha;
   int sideOrientation;
   ::std::function<void(const Effect* effect)> onCompiled;
-  ::std::function<void(const Effect* effect, const std::string& errors)>
-    onError;
-  ::std::function<std::vector<RenderTargetTexture*>()> getRenderTargetTextures;
+  ::std::function<void(const Effect* effect, const string_t& errors)> onError;
+  ::std::function<vector_t<RenderTargetTexture*>()> getRenderTargetTextures;
   bool doNotSerialize;
   bool storeEffectOnSubMeshes;
   int alphaMode;

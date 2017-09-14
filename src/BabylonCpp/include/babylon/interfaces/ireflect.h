@@ -59,18 +59,18 @@ public:
   virtual ~IReflect();
 
   virtual Type type() const = 0;
-  static std::string TypeToString(Type type);
+  static string_t TypeToString(Type type);
 
-  any getProperty(const std::string& targetPropertyPath);
-  any getProperty(const any& property, const std::string& targetProperty);
-  void setProperty(const any& oldProperty, const std::string& targetProperty,
+  any getProperty(const string_t& targetPropertyPath);
+  any getProperty(const any& property, const string_t& targetProperty);
+  void setProperty(const any& oldProperty, const string_t& targetProperty,
                    const any& property);
 
 private:
   Vector3* _getVector3Property(AbstractMesh* target,
-                               const std::string& targetProperty);
+                               const string_t& targetProperty);
   Quaternion* _getQuaternionProperty(AbstractMesh* target,
-                                     const std::string& targetProperty);
+                                     const string_t& targetProperty);
 
 }; // end of class IReflect
 

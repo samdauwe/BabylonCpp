@@ -9,7 +9,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT MorphTarget {
 
 public:
-  MorphTarget(const std::string& name, float influence = 0.f);
+  MorphTarget(const string_t& name, float influence = 0.f);
   ~MorphTarget();
 
   float influence() const;
@@ -36,14 +36,14 @@ public:
   static std::unique_ptr<MorphTarget>
   Parse(const Json::value& serializationObject);
   static std::unique_ptr<MorphTarget>
-  FromMesh(AbstractMesh* mesh, const std::string& name, float influence = 0.f);
+  FromMesh(AbstractMesh* mesh, const string_t& name, float influence = 0.f);
 
 public:
   Observable<bool> onInfluenceChanged;
 
 private:
-  std::string _name;
-  std::vector<Animation*> animations;
+  string_t _name;
+  vector_t<Animation*> animations;
   Float32Array _positions;
   Float32Array _normals;
   Float32Array _tangents;

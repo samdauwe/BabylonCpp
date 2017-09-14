@@ -153,7 +153,7 @@ Vector3 PhysicsImpostor::getObjectCenter()
   }
 }
 
-float PhysicsImpostor::getParam(const std::string& paramName) const
+float PhysicsImpostor::getParam(const string_t& paramName) const
 {
   if (_options.contains(paramName)) {
     return _options[paramName];
@@ -162,7 +162,7 @@ float PhysicsImpostor::getParam(const std::string& paramName) const
   return 0.f;
 }
 
-void PhysicsImpostor::setParam(const std::string& paramName, float value)
+void PhysicsImpostor::setParam(const string_t& paramName, float value)
 {
   _options.setValue(paramName, value);
   _bodyUpdateRequired = true;

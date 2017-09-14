@@ -13,23 +13,22 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT PolygonMeshBuilder {
 
 public:
-  using Point2D = std::array<float, 2>;
+  using Point2D = array_t<float, 2>;
 
 public:
-  PolygonMeshBuilder(const std::string& name, const Path2& contours,
+  PolygonMeshBuilder(const string_t& name, const Path2& contours, Scene* scene);
+  PolygonMeshBuilder(const string_t& name, const vector_t<Vector2>& contours,
                      Scene* scene);
-  PolygonMeshBuilder(const std::string& name,
-                     const std::vector<Vector2>& contours, Scene* scene);
   ~PolygonMeshBuilder();
 
-  PolygonMeshBuilder& addHole(const std::vector<Vector2>& hole);
+  PolygonMeshBuilder& addHole(const vector_t<Vector2>& hole);
   Mesh* build(bool updatable = false, float depth = 0);
 
   PolygonPoints& points();
   const PolygonPoints& points() const;
 
 private:
-  void _addToepoint(const std::vector<Vector2>& points);
+  void _addToepoint(const vector_t<Vector2>& points);
   void addSide(Float32Array& positions, Float32Array& normals,
                Float32Array& uvs, Uint32Array& indices, const Bounds& bounds,
                const PolygonPoints& points, float depth, bool flip);
@@ -37,12 +36,12 @@ private:
 private:
   PolygonPoints _points;
   PolygonPoints _outlinepoints;
-  std::vector<PolygonPoints> _holes;
+  vector_t<PolygonPoints> _holes;
 
-  std::string _name;
+  string_t _name;
   Scene* _scene;
 
-  std::vector<Point2D> _epoints;
+  vector_t<Point2D> _epoints;
   Uint32Array _eholes;
 
 }; // end of class PolygonMeshBuilder

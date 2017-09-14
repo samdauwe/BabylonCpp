@@ -9,7 +9,7 @@
 
 namespace BABYLON {
 
-FreeCamera::FreeCamera(const std::string& iName, const Vector3& iPosition,
+FreeCamera::FreeCamera(const string_t& iName, const Vector3& iPosition,
                        Scene* scene)
     : TargetCamera{iName, iPosition, scene}
     , ellipsoid{Vector3(0.5f, 1.f, 0.5f)}

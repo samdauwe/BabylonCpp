@@ -12,8 +12,8 @@ public:
   virtual void hideLoadingUI()    = 0;
 
 public:
-  std::string loadingUIBackgroundColor;
-  std::string loadingUIText;
+  string_t loadingUIBackgroundColor;
+  string_t loadingUIText;
 }; // end of class ILoadingScreen
 
 } // end of namespace BABYLON

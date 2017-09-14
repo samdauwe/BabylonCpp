@@ -18,12 +18,12 @@ public:
 
 public:
   // Array of facet positions (vector3)
-  std::vector<Vector3> facetPositions;
+  vector_t<Vector3> facetPositions;
   // Array of facet normals (vector3)
-  std::vector<Vector3> facetNormals;
+  vector_t<Vector3> facetNormals;
   // Partitioning array, facetPositions is required for facetPartitioning
   // computation
-  std::vector<Uint32Array> facetPartitioning;
+  vector_t<Uint32Array> facetPartitioning;
   // Partitioning data about subdivsions on each axis (int), required for
   // facetPartitioning computation
   SubdivisionsPerAxis subDiv;

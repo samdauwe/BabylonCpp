@@ -10,11 +10,9 @@ namespace BABYLON {
  * avoid conflicts.
  */
 struct BABYLON_SHARED_EXPORT MathTmp {
-
-  static std::array<Vector3, 1> Vector3Array;
-  static std::array<Matrix, 2> MatrixArray;
-  static std::array<Quaternion, 1> QuaternionArray;
-
+  static array_t<Vector3, 1> Vector3Array;
+  static array_t<Matrix, 2> MatrixArray;
+  static array_t<Quaternion, 1> QuaternionArray;
 }; // end of class MathTmp
 
 } // end of namespace BABYLON

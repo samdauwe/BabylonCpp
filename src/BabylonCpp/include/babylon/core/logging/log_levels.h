@@ -21,10 +21,10 @@ public:
   /** Begin method X, end method X etc. **/
   static const unsigned int LEVEL_TRACE;
   /** Levels list **/
-  static const std::vector<std::pair<unsigned int, std::string>> Levels;
+  static const vector_t<std::pair<unsigned int, string_t>> Levels;
 
   // Functions
-  static std::string ToReadableLevel(unsigned int level);
+  static string_t ToReadableLevel(unsigned int level);
 
 }; // end of class LogChannel
 

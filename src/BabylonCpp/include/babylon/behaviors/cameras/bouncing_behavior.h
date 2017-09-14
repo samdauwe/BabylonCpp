@@ -14,7 +14,7 @@ namespace BABYLON {
  * minimum and maximum radius.
  */
 class BABYLON_SHARED_EXPORT BouncingBehavior
-  : public Behavior<ArcRotateCamera> {
+    : public Behavior<ArcRotateCamera> {
 
 public:
   /**
@@ -109,7 +109,7 @@ private:
   // Animations
   bool _radiusIsAnimating;
   Animation* _radiusBounceTransition;
-  std::vector<Animatable*> _animatables;
+  vector_t<Animatable*> _animatables;
   float _cachedWheelPrecision;
 
 }; // end of class BouncingBehavior

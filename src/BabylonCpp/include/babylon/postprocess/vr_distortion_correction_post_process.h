@@ -11,10 +11,10 @@ namespace BABYLON {
  * @brief
  */
 class BABYLON_SHARED_EXPORT VRDistortionCorrectionPostProcess
-  : public PostProcess {
+    : public PostProcess {
 
 public:
-  VRDistortionCorrectionPostProcess(const std::string& name, Camera* camera,
+  VRDistortionCorrectionPostProcess(const string_t& name, Camera* camera,
                                     bool isRightEye,
                                     const VRCameraMetrics& vrMetrics);
   ~VRDistortionCorrectionPostProcess();

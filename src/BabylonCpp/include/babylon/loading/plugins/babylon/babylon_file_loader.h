@@ -11,23 +11,21 @@ struct BABYLON_SHARED_EXPORT BabylonFileLoader : public ISceneLoaderPlugin {
   BabylonFileLoader();
   virtual ~BabylonFileLoader();
 
-  Material* parseMaterialById(const std::string& id,
-                              const Json::value& parsedData, Scene* scene,
-                              const std::string& rootUrl) const;
-  bool isDescendantOf(const Json::value& mesh,
-                      const std::vector<std::string>& names,
-                      std::vector<std::string>& hierarchyIds);
-  std::string logOperation(const std::string& operation) const;
-  std::string logOperation(const std::string& operation,
-                           const Json::value& producer) const;
+  Material* parseMaterialById(const string_t& id, const Json::value& parsedData,
+                              Scene* scene, const string_t& rootUrl) const;
+  bool isDescendantOf(const Json::value& mesh, const vector_t<string_t>& names,
+                      vector_t<string_t>& hierarchyIds);
+  string_t logOperation(const string_t& operation) const;
+  string_t logOperation(const string_t& operation,
+                        const Json::value& producer) const;
 
-  bool importMesh(const std::vector<std::string>& meshesNames, Scene* scene,
-                  const std::string& data, const std::string& rootUrl,
-                  std::vector<AbstractMesh*>& meshes,
-                  std::vector<ParticleSystem*>& particleSystems,
-                  std::vector<Skeleton*>& skeletons) override;
-  bool load(Scene* scene, const std::string& data,
-            const std::string& rootUrl) override;
+  bool importMesh(const vector_t<string_t>& meshesNames, Scene* scene,
+                  const string_t& data, const string_t& rootUrl,
+                  vector_t<AbstractMesh*>& meshes,
+                  vector_t<ParticleSystem*>& particleSystems,
+                  vector_t<Skeleton*>& skeletons) override;
+  bool load(Scene* scene, const string_t& data,
+            const string_t& rootUrl) override;
 
 }; // end of struct BabylonFileLoader
 

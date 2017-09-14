@@ -13,7 +13,7 @@ struct SSAO2Ratio {
 }; // end of struct SSAO2Ratio
 
 class BABYLON_SHARED_EXPORT SSAO2RenderingPipeline
-  : public PostProcessRenderPipeline {
+    : public PostProcessRenderPipeline {
 
 public:
   /**
@@ -52,11 +52,11 @@ public:
    * @param {BABYLON.Camera[]} cameras - The array of cameras that the rendering
    * pipeline will be attached to
    */
-  SSAO2RenderingPipeline(const std::string& name, Scene* scene, float ratio,
-                         const std::vector<Camera*>& cameras);
-  SSAO2RenderingPipeline(const std::string& name, Scene* scene,
+  SSAO2RenderingPipeline(const string_t& name, Scene* scene, float ratio,
+                         const vector_t<Camera*>& cameras);
+  SSAO2RenderingPipeline(const string_t& name, Scene* scene,
                          const SSAO2Ratio& ratio,
-                         const std::vector<Camera*>& cameras);
+                         const vector_t<Camera*>& cameras);
   virtual ~SSAO2RenderingPipeline();
 
   /** Methods */

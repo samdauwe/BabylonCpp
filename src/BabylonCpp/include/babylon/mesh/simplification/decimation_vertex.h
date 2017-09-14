@@ -2,7 +2,6 @@
 #define BABYLON_MESH_SIMPLIFICATION_DECIMATION_VERTEX_H
 
 #include <babylon/babylon_global.h>
-
 #include <babylon/math/vector3.h>
 #include <babylon/mesh/simplification/quadratic_matrix.h>
 
@@ -26,7 +25,7 @@ public:
   bool isBorder;
   int triangleStart;
   int triangleCount;
-  std::vector<float> originalOffsets;
+  Float32Array originalOffsets;
 
 }; // end of class DecimationVertex
 

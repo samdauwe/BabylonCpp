@@ -7,11 +7,11 @@ namespace BABYLON {
 
 template <class T>
 struct BABYLON_SHARED_EXPORT IOctreeContainer {
-  static std::vector<OctreeBlock<T>> blocks;
+  static vector_t<OctreeBlock<T>> blocks;
 }; // end of struct IOctreeContainer
 
 template <class T>
-std::vector<OctreeBlock<T>> IOctreeContainer<T>::blocks;
+vector_t<OctreeBlock<T>> IOctreeContainer<T>::blocks;
 
 } // end of namespace BABYLON
 

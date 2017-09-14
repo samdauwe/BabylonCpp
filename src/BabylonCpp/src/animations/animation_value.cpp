@@ -56,7 +56,7 @@ AnimationValue::AnimationValue(int value)
 {
 }
 
-AnimationValue::AnimationValue(const std::string& value)
+AnimationValue::AnimationValue(const string_t& value)
     : dataType{Animation::ANIMATIONTYPE_STRING}, stringData{value}
 {
 }
@@ -105,7 +105,7 @@ AnimationValue AnimationValue::operator!()
   return *this;
 }
 
-AnimationValue AnimationValue::operator[](const std::string& /*property*/)
+AnimationValue AnimationValue::operator[](const string_t& /*property*/)
 {
   return AnimationValue(false);
 }

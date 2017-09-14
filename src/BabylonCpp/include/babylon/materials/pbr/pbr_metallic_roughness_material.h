@@ -13,7 +13,7 @@ namespace BABYLON {
  * https://github.com/KhronosGroup/glTF/tree/2.0/specification/2.0
  */
 class BABYLON_SHARED_EXPORT PBRMetallicRoughnessMaterial
-  : public Internals::PBRBaseSimpleMaterial {
+    : public Internals::PBRBaseSimpleMaterial {
 
 public:
   /**
@@ -22,7 +22,7 @@ public:
    * @param name The material name
    * @param scene The scene the material will be use in.
    */
-  PBRMetallicRoughnessMaterial(const std::string& name, Scene* scene);
+  PBRMetallicRoughnessMaterial(const string_t& name, Scene* scene);
   ~PBRMetallicRoughnessMaterial();
 
   /**
@@ -33,12 +33,12 @@ public:
   /**
    * @brief Return the active textures of the material.
    */
-  std::vector<BaseTexture*> getActiveTextures() const override;
+  vector_t<BaseTexture*> getActiveTextures() const override;
 
   bool hasTexture(BaseTexture* texture) const override;
 
   PBRMetallicRoughnessMaterial*
-  clone(const std::string& name, bool cloneChildren = false) const override;
+  clone(const string_t& name, bool cloneChildren = false) const override;
 
   /**
    * @brief Serialize the material to a parsable JSON object.
@@ -49,7 +49,7 @@ public:
    * @brief Parses a JSON object correponding to the serialize function.
    */
   static PBRMetallicRoughnessMaterial*
-  Parse(const Json::value& source, Scene* scene, const std::string& rootUrl);
+  Parse(const Json::value& source, Scene* scene, const string_t& rootUrl);
 
 public:
   /**

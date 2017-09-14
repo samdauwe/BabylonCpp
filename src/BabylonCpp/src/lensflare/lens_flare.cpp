@@ -15,7 +15,7 @@ LensFlare* LensFlare::New(Ts&&... args)
 }
 
 LensFlare::LensFlare(float iSize, const Vector3& iPosition,
-                     const Color3& iColor, const std::string& imgUrl,
+                     const Color3& iColor, const string_t& imgUrl,
                      LensFlareSystem* system)
     : size{iSize}
     , position{iPosition}

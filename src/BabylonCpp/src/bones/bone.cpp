@@ -7,13 +7,13 @@
 
 namespace BABYLON {
 
-std::array<Vector3, 2> Bone::_tmpVecs{{Vector3::Zero(), Vector3::Zero()}};
+array_t<Vector3, 2> Bone::_tmpVecs{{Vector3::Zero(), Vector3::Zero()}};
 Quaternion Bone::_tmpQuat{Quaternion::Identity()};
-std::array<Matrix, 5> Bone::_tmpMats{{Matrix::Identity(), Matrix::Identity(),
-                                      Matrix::Identity(), Matrix::Identity(),
-                                      Matrix::Identity()}};
+array_t<Matrix, 5> Bone::_tmpMats{{Matrix::Identity(), Matrix::Identity(),
+                                   Matrix::Identity(), Matrix::Identity(),
+                                   Matrix::Identity()}};
 
-Bone::Bone(const std::string& iName, Skeleton* skeleton, Bone* parentBone,
+Bone::Bone(const string_t& iName, Skeleton* skeleton, Bone* parentBone,
            const Nullable<Matrix>& localMatrix,
            const Nullable<Matrix>& restPose, const Nullable<Matrix>& baseMatrix,
            Nullable<int> index)
@@ -169,7 +169,7 @@ void Bone::setScaling(const Vector3& newScaling)
 }
 
 // Methods
-std::vector<Animation*> Bone::getAnimations()
+vector_t<Animation*> Bone::getAnimations()
 {
   return animations;
 }
@@ -216,7 +216,7 @@ void Bone::markAsDirty(unsigned int /*property*/)
   _skeleton->_markAsDirty();
 }
 
-bool Bone::copyAnimationRange(Bone* source, const std::string& rangeName,
+bool Bone::copyAnimationRange(Bone* source, const string_t& rangeName,
                               int frameOffset, bool rescaleAsRequired,
                               const Vector3& skelDimensionsRatio,
                               bool hasSkelDimensionsRatio)

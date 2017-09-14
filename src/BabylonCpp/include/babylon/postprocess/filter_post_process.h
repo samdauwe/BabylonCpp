@@ -13,7 +13,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT FilterPostProcess : public PostProcess {
 
 public:
-  FilterPostProcess(const std::string& name, const Matrix& kernelMatrix,
+  FilterPostProcess(const string_t& name, const Matrix& kernelMatrix,
                     float ratio, Camera* camera, unsigned int samplingMode,
                     Engine* engine, bool reusable = false);
   ~FilterPostProcess();

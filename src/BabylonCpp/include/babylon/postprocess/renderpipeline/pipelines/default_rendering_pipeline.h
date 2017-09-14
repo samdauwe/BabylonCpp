@@ -8,17 +8,17 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT DefaultRenderingPipeline
-  : public PostProcessRenderPipeline {
+    : public PostProcessRenderPipeline {
 
 public:
-  static std::string PassPostProcessId;
-  static std::string HighLightsPostProcessId;
-  static std::string BlurXPostProcessId;
-  static std::string BlurYPostProcessId;
-  static std::string CopyBackPostProcessId;
-  static std::string ImageProcessingPostProcessId;
-  static std::string FxaaPostProcessId;
-  static std::string FinalMergePostProcessId;
+  static string_t PassPostProcessId;
+  static string_t HighLightsPostProcessId;
+  static string_t BlurXPostProcessId;
+  static string_t BlurYPostProcessId;
+  static string_t CopyBackPostProcessId;
+  static string_t ImageProcessingPostProcessId;
+  static string_t FxaaPostProcessId;
+  static string_t FinalMergePostProcessId;
 
 public:
   /**
@@ -33,10 +33,10 @@ public:
    * @param {boolean} automaticBuild - if false, you will have to manually call
    * prepare() to update the pipeline
    */
-  DefaultRenderingPipeline(
-    const std::string& name, bool hdr, Scene* scene,
-    const std::unordered_map<std::string, Camera*>& cameras = {},
-    bool automaticBuild = true);
+  DefaultRenderingPipeline(const string_t& name, bool hdr, Scene* scene,
+                           const std::unordered_map<string_t, Camera*>& cameras
+                           = {},
+                           bool automaticBuild = true);
   ~DefaultRenderingPipeline();
 
   /**
@@ -63,7 +63,7 @@ public:
 
   // Parse serialized pipeline
   static std::unique_ptr<DefaultRenderingPipeline>
-  Parse(const Json::value& source, Scene* scene, const std::string& rootUrl);
+  Parse(const Json::value& source, Scene* scene, const string_t& rootUrl);
 
 private:
   void _buildPipeline();
@@ -81,7 +81,7 @@ public:
   PassPostProcess* finalMerge;
 
   // IAnimatable
-  std::vector<Animation*> animations;
+  vector_t<Animation*> animations;
 
   /**
    * Specifies the size of the bloom blur kernel, relative to the final output

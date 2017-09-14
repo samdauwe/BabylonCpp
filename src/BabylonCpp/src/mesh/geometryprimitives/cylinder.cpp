@@ -8,7 +8,7 @@
 namespace BABYLON {
 namespace GeometryPrimitives {
 
-Cylinder::Cylinder(const std::string& _id, Scene* scene, float _height,
+Cylinder::Cylinder(const string_t& _id, Scene* scene, float _height,
                    float _diameterTop, float _diameterBottom,
                    unsigned int _tessellation, unsigned int _subdivisions,
                    bool canBeRegenerated, Mesh* mesh, unsigned int _side)
@@ -39,7 +39,7 @@ std::unique_ptr<VertexData> Cylinder::_regenerateVertexData()
   return VertexData::CreateCylinder(options);
 }
 
-Geometry* Cylinder::copy(const std::string& _id)
+Geometry* Cylinder::copy(const string_t& _id)
 {
   return Cylinder::New(_id, getScene(), height, diameterTop, diameterBottom,
                        tessellation, subdivisions, canBeRegenerated(), nullptr,

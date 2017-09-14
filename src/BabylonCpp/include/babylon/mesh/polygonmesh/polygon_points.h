@@ -14,10 +14,10 @@ struct BABYLON_SHARED_EXPORT PolygonPoints {
   PolygonPoints();
   ~PolygonPoints();
 
-  std::vector<IndexedVector2> add(const std::vector<Vector2>& originalPoints);
+  vector_t<IndexedVector2> add(const vector_t<Vector2>& originalPoints);
   Bounds computeBounds();
 
-  std::vector<IndexedVector2> elements;
+  vector_t<IndexedVector2> elements;
 
 }; // end of struct PolygonPoints
 

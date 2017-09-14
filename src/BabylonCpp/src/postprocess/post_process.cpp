@@ -14,13 +14,12 @@
 namespace BABYLON {
 
 PostProcess::PostProcess(
-  const std::string& iName, const std::string& fragmentUrl,
-  const std::vector<std::string>& parameters,
-  const std::vector<std::string>& samplers, float renderRatio, Camera* camera,
-  unsigned int samplingMode, Engine* engine, bool reusable,
-  const std::string& defines, unsigned int textureType,
-  const std::string& vertexUrl,
-  const std::unordered_map<std::string, unsigned int>& indexParameters,
+  const string_t& iName, const string_t& fragmentUrl,
+  const vector_t<string_t>& parameters, const vector_t<string_t>& samplers,
+  float renderRatio, Camera* camera, unsigned int samplingMode, Engine* engine,
+  bool reusable, const string_t& defines, unsigned int textureType,
+  const string_t& vertexUrl,
+  const std::unordered_map<string_t, unsigned int>& indexParameters,
   bool blockCompilation)
     : PostProcess(iName, fragmentUrl, parameters, samplers, {-1, -1}, camera,
                   samplingMode, engine, reusable, defines, textureType,
@@ -30,13 +29,12 @@ PostProcess::PostProcess(
 }
 
 PostProcess::PostProcess(
-  const std::string& iName, const std::string& fragmentUrl,
-  const std::vector<std::string>& parameters,
-  const std::vector<std::string>& samplers, const PostProcessOptions& options,
-  Camera* camera, unsigned int samplingMode, Engine* engine, bool reusable,
-  const std::string& defines, unsigned int textureType,
-  const std::string& vertexUrl,
-  const std::unordered_map<std::string, unsigned int>& indexParameters,
+  const string_t& iName, const string_t& fragmentUrl,
+  const vector_t<string_t>& parameters, const vector_t<string_t>& samplers,
+  const PostProcessOptions& options, Camera* camera, unsigned int samplingMode,
+  Engine* engine, bool reusable, const string_t& defines,
+  unsigned int textureType, const string_t& vertexUrl,
+  const std::unordered_map<string_t, unsigned int>& indexParameters,
   bool blockCompilation)
     : name{iName}
     , width{-1}
@@ -183,15 +181,14 @@ PostProcess& PostProcess::shareOutputWith(PostProcess* postProcess)
 }
 
 void PostProcess::updateEffect(
-  const std::string& defines, const std::vector<std::string>& uniforms,
-  const std::vector<std::string>& samplers,
-  const std::unordered_map<std::string, unsigned int>& indexParameters,
+  const string_t& defines, const vector_t<string_t>& uniforms,
+  const vector_t<string_t>& samplers,
+  const std::unordered_map<string_t, unsigned int>& indexParameters,
   const ::std::function<void(Effect* effect)>& onCompiled,
-  const ::std::function<void(Effect* effect, const std::string& errors)>&
-    onError)
+  const ::std::function<void(Effect* effect, const string_t& errors)>& onError)
 {
-  std::unordered_map<std::string, std::string> baseName{
-    {"vertex", _vertexUrl}, {"fragment", _fragmentUrl}};
+  std::unordered_map<string_t, string_t> baseName{{"vertex", _vertexUrl},
+                                                  {"fragment", _fragmentUrl}};
 
   EffectCreationOptions options;
   options.attributes    = {"position"};

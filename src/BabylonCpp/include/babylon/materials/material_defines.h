@@ -32,11 +32,11 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   virtual bool isEqual(const MaterialDefines& other) const override;
   virtual void cloneTo(MaterialDefines& other) override;
   virtual void reset() override;
-  virtual std::string toString() const override;
+  virtual string_t toString() const override;
 
   // Properties
-  std::vector<bool> defines;
-  std::vector<std::string> _keys;
+  vector_t<bool> defines;
+  vector_t<string_t> _keys;
 
   unsigned int NUM_BONE_INFLUENCERS;
   unsigned int BonesPerMesh;
@@ -56,22 +56,22 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   unsigned int MICROSURFACEMAPDIRECTUV;
   float ALPHATESTVALUE;
 
-  std::vector<bool> lights;
-  std::vector<bool> pointlights;
-  std::vector<bool> dirlights;
-  std::vector<bool> hemilights;
-  std::vector<bool> spotlights;
-  std::vector<bool> shadows;
-  std::vector<bool> shadowesms;
-  std::vector<bool> shadowcloseesms;
-  std::vector<bool> shadowpcfs;
-  std::vector<bool> shadowcubes;
+  vector_t<bool> lights;
+  vector_t<bool> pointlights;
+  vector_t<bool> dirlights;
+  vector_t<bool> hemilights;
+  vector_t<bool> spotlights;
+  vector_t<bool> shadows;
+  vector_t<bool> shadowesms;
+  vector_t<bool> shadowcloseesms;
+  vector_t<bool> shadowpcfs;
+  vector_t<bool> shadowcubes;
 
   bool TANGENT;
   bool SHADOWS;
   bool LIGHTMAPEXCLUDED;
-  std::vector<bool> lightmapexcluded;
-  std::vector<bool> lightmapnospecular;
+  vector_t<bool> lightmapexcluded;
+  vector_t<bool> lightmapnospecular;
 
   bool USERIGHTHANDEDSYSTEM;
 

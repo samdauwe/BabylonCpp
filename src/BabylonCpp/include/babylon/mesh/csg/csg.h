@@ -43,18 +43,18 @@ public:
 
   // Build Raw mesh from CSG
   // Coordinates here are in world space
-  Mesh* buildMeshGeometry(const std::string& name, Scene* scene,
+  Mesh* buildMeshGeometry(const string_t& name, Scene* scene,
                           bool keepSubMeshes);
 
   // Build Mesh from CSG taking material and transforms into account
-  Mesh* toMesh(const std::string& name, Material* material, Scene* scene,
+  Mesh* toMesh(const string_t& name, Material* material, Scene* scene,
                bool keepSubMeshes = false);
 
 private:
   // Construct a BABYLON.CSG solid from a list of `BABYLON.CSG.Polygon`
   // instances.
-  static CSG* FromPolygons(const std::vector<Polygon*>& polygons);
-  std::vector<Polygon*>& toPolygons();
+  static CSG* FromPolygons(const vector_t<Polygon*>& polygons);
+  vector_t<Polygon*>& toPolygons();
 
 public:
   Matrix matrix;
@@ -65,7 +65,7 @@ public:
 
 private:
   static unsigned int currentCSGMeshId;
-  std::vector<Polygon*> _polygons;
+  vector_t<Polygon*> _polygons;
 
 }; // end of class CSG
 

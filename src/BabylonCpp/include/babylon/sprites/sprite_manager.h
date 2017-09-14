@@ -36,7 +36,7 @@ public:
   void dispose(bool doNotRecurse = false) override;
 
 protected:
-  SpriteManager(const std::string& name, const std::string& imgUrl,
+  SpriteManager(const string_t& name, const string_t& imgUrl,
                 unsigned int capacity, const ISize& cellSize, Scene* scene,
                 float epsilon = 0.01f,
                 unsigned int samplingMode
@@ -47,8 +47,8 @@ private:
                            int offsetY, int rowSize);
 
 public:
-  std::string name;
-  std::vector<std::unique_ptr<Sprite>> sprites;
+  string_t name;
+  vector_t<std::unique_ptr<Sprite>> sprites;
   unsigned int renderingGroupId;
   unsigned int layerMask;
   bool fogEnabled;
@@ -68,8 +68,8 @@ private:
   Scene* _scene;
   Float32Array _vertexData;
   std::unique_ptr<Buffer> _buffer;
-  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
-  std::unordered_map<std::string, VertexBuffer*> _vertexBufferPtrs;
+  std::unordered_map<string_t, std::unique_ptr<VertexBuffer>> _vertexBuffers;
+  std::unordered_map<string_t, VertexBuffer*> _vertexBufferPtrs;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   Effect* _effectBase;
   Effect* _effectFog;

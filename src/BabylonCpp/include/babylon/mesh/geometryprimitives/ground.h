@@ -26,13 +26,13 @@ public:
   ~Ground();
 
   std::unique_ptr<VertexData> _regenerateVertexData() override;
-  Geometry* copy(const std::string& id) override;
+  Geometry* copy(const string_t& id) override;
 
   // Statics
   static Ground* Parse(const Json::value& parsedGround, Scene* scene);
 
 protected:
-  Ground(const std::string& id, Scene* scene, unsigned int width,
+  Ground(const string_t& id, Scene* scene, unsigned int width,
          unsigned int height, unsigned int subdivisions, bool canBeRegenerated,
          Mesh* mesh);
 

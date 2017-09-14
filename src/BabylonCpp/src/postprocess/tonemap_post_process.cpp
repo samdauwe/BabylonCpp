@@ -4,7 +4,7 @@
 
 namespace BABYLON {
 
-TonemapPostProcess::TonemapPostProcess(const std::string& iName,
+TonemapPostProcess::TonemapPostProcess(const string_t& iName,
                                        const TonemappingOperator& operator_,
                                        float exposureAdjustment, Camera* camera,
                                        unsigned int samplingMode,

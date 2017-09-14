@@ -129,8 +129,8 @@ protected:
    * @param options Sets of none mandatory options to use with the layer (see
    * IHighlightLayerOptions for more information)
    */
-  HighlightLayer(const std::string& name, Scene* scene);
-  HighlightLayer(const std::string& name, Scene* scene,
+  HighlightLayer(const string_t& name, Scene* scene);
+  HighlightLayer(const string_t& name, Scene* scene,
                  const IHighlightLayerOptions& options);
 
 private:
@@ -214,7 +214,7 @@ public:
   Observable<HighlightLayer> onSizeChangedObservable;
 
 public:
-  std::string name;
+  string_t name;
 
   /**
    * Specifies whether or not the inner glow is ACTIVE in the layer.
@@ -235,12 +235,12 @@ private:
   Scene* _scene;
   Engine* _engine;
   IHighlightLayerOptions _options;
-  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
+  std::unordered_map<string_t, std::unique_ptr<VertexBuffer>> _vertexBuffers;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   std::unique_ptr<PassPostProcess> _downSamplePostprocess;
   std::unique_ptr<GlowBlurPostProcess> _horizontalBlurPostprocess;
   std::unique_ptr<GlowBlurPostProcess> _verticalBlurPostprocess;
-  std::string _cachedDefines;
+  string_t _cachedDefines;
   Effect* _glowMapGenerationEffect;
   Effect* _glowMapMergeEffect;
   std::unique_ptr<RenderTargetTexture> _blurTexture;

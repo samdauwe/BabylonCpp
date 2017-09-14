@@ -51,9 +51,9 @@ private:
   void _syncActiveTargets(bool needUpdate);
 
 private:
-  std::vector<std::unique_ptr<MorphTarget>> _targets;
-  std::vector<Observer<bool>::Ptr> _targetObservable;
-  std::vector<MorphTarget*> _activeTargets;
+  vector_t<std::unique_ptr<MorphTarget>> _targets;
+  vector_t<Observer<bool>::Ptr> _targetObservable;
+  vector_t<MorphTarget*> _activeTargets;
   Scene* _scene;
   Float32Array _influences;
   bool _supportsNormals;

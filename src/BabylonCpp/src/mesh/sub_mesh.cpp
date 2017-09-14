@@ -161,13 +161,13 @@ SubMesh& SubMesh::updateBoundingInfo(const Matrix& world)
   return *this;
 }
 
-bool SubMesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes)
+bool SubMesh::isInFrustum(const array_t<Plane, 6>& frustumPlanes)
 {
   return getBoundingInfo()->isInFrustum(frustumPlanes);
 }
 
 bool SubMesh::isCompletelyInFrustum(
-  const std::array<Plane, 6>& frustumPlanes) const
+  const array_t<Plane, 6>& frustumPlanes) const
 {
   return getBoundingInfo()->isCompletelyInFrustum(frustumPlanes);
 }
@@ -203,7 +203,7 @@ bool SubMesh::canIntersects(const Ray& ray) const
 }
 
 std::unique_ptr<IntersectionInfo>
-SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions,
+SubMesh::intersects(Ray& ray, const vector_t<Vector3>& positions,
                     const Uint32Array& indices, bool fastCheck)
 {
 

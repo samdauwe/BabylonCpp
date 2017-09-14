@@ -17,14 +17,14 @@ public:
    * @brief Returns a new array of 6 Frustum planes computed by the passed
    * transformation matrix.
    */
-  static std::array<Plane, 6> GetPlanes(const Matrix& transform);
+  static array_t<Plane, 6> GetPlanes(const Matrix& transform);
 
   /**
    * @brief Sets the passed array "frustumPlanes" with the 6 Frustum planes
    * computed by the passed transformation matrix.
    */
   static void GetPlanesToRef(const Matrix& transform,
-                             std::array<Plane, 6>& frustumPlanes);
+                             array_t<Plane, 6>& frustumPlanes);
 
 }; // end of class Frustum
 

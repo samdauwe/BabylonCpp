@@ -85,7 +85,7 @@ public:
   std::unique_ptr<BoundingInfo> _boundingInfo;
   // reference to the SPS what the particle belongs to
   SolidParticleSystem* _sps;
-  std::unordered_map<std::string, float> extraFields;
+  std::unordered_map<string_t, float> extraFields;
 
 }; // end of class SolidParticle
 

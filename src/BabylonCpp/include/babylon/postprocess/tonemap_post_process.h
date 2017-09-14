@@ -12,8 +12,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT TonemapPostProcess : public PostProcess {
 
 public:
-  TonemapPostProcess(const std::string& name,
-                     const TonemappingOperator& operator_,
+  TonemapPostProcess(const string_t& name, const TonemappingOperator& operator_,
                      float exposureAdjustment, Camera* camera,
                      unsigned int samplingMode
                      = TextureConstants::BILINEAR_SAMPLINGMODE,

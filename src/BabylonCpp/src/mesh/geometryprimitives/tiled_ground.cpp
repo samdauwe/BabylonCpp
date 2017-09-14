@@ -6,7 +6,7 @@
 namespace BABYLON {
 namespace GeometryPrimitives {
 
-TiledGround::TiledGround(const std::string& _id, Scene* scene, float _xmin,
+TiledGround::TiledGround(const string_t& _id, Scene* scene, float _xmin,
                          float _zmin, float _xmax, float _zmax,
                          const ISize& _subdivisions, const ISize& _precision,
                          bool canBeRegenerated, Mesh* mesh)
@@ -38,7 +38,7 @@ std::unique_ptr<VertexData> TiledGround::_regenerateVertexData()
   return VertexData::CreateTiledGround(options);
 }
 
-Geometry* TiledGround::copy(const std::string& _id)
+Geometry* TiledGround::copy(const string_t& _id)
 {
   return TiledGround::New(_id, getScene(), xmin, zmin, xmax, zmax, subdivisions,
                           precision, canBeRegenerated(), nullptr);

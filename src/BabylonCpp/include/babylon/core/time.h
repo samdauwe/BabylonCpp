@@ -107,11 +107,11 @@ inline T fpMillisecondsDuration(const microsecond_t& d)
  *
  * @return a string representing the timestamp in UTC
  */
-inline std::string toIso8601(::std::time_t timestamp,
-                             const bool& include_timezone = false)
+inline string_t toIso8601(::std::time_t timestamp,
+                          const bool& include_timezone = false)
 {
   ::std::tm exploded_time(*::std::gmtime(&timestamp));
-  std::string ret;
+  string_t ret;
 
   if (include_timezone) {
     char buf[sizeof("1970-01-01T00:00:00Z")];
@@ -127,7 +127,7 @@ inline std::string toIso8601(::std::time_t timestamp,
   return ret;
 }
 
-inline std::string toIso8601Ms(const system_time_point_t& system_time_point)
+inline string_t toIso8601Ms(const system_time_point_t& system_time_point)
 {
   ::std::time_t timestamp
     = std::chrono::system_clock::to_time_t(system_time_point);

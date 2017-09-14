@@ -14,7 +14,7 @@ public:
   int defaultRenderId;
   int selfDefaultRenderId;
   int intermediateDefaultRenderId;
-  std::unordered_map<int, std::vector<InstancedMesh*>> meshes;
+  std::unordered_map<int, vector_t<InstancedMesh*>> meshes;
 
 }; // end of class _VisibleInstances
 

@@ -10,14 +10,13 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT CubeTexture : public BaseTexture {
 
 public:
-  CubeTexture(const std::string& rootUrl, Scene* scene,
-              const std::vector<std::string>& extensions = {},
-              bool noMipmap = false, const std::vector<std::string>& files = {},
+  CubeTexture(const string_t& rootUrl, Scene* scene,
+              const vector_t<string_t>& extensions = {}, bool noMipmap = false,
+              const vector_t<string_t>& files        = {},
               const ::std::function<void()>& onLoad  = nullptr,
               const ::std::function<void()>& onError = nullptr,
               unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA,
-              bool prefiltered    = false,
-              const std::string& forcedExtension = "");
+              bool prefiltered = false, const string_t& forcedExtension = "");
   ~CubeTexture();
 
   /** Methods **/
@@ -28,23 +27,23 @@ public:
 
   /** Static methods **/
   static std::unique_ptr<CubeTexture>
-  CreateFromImages(const std::vector<std::string>& files, Scene* scene,
+  CreateFromImages(const vector_t<string_t>& files, Scene* scene,
                    bool noMipmap = false);
   static std::unique_ptr<CubeTexture>
-  CreateFromPrefilteredData(const std::string& url, Scene* scene,
-                            const std::string& forcedExtension = "");
+  CreateFromPrefilteredData(const string_t& url, Scene* scene,
+                            const string_t& forcedExtension = "");
   static std::unique_ptr<CubeTexture> Parse(const Json::value& parsedTexture,
                                             Scene* scene,
-                                            const std::string& rootUrl);
+                                            const string_t& rootUrl);
 
 public:
-  std::string url;
+  string_t url;
   unsigned int coordinatesMode;
 
 private:
   bool _noMipmap;
-  std::vector<std::string> _files;
-  std::vector<std::string> _extensions;
+  vector_t<string_t> _files;
+  vector_t<string_t> _extensions;
   std::unique_ptr<Matrix> _textureMatrix;
   unsigned int _format;
   bool _prefiltered;

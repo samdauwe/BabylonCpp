@@ -26,7 +26,7 @@ namespace BABYLON {
 
 Color3 PBRBaseMaterial::_scaledReflectivity = Color3();
 
-PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
+PBRBaseMaterial::PBRBaseMaterial(const string_t& iName, Scene* scene)
     : PushMaterial{iName, scene}
     , _directIntensity{1.f}
     , _emissiveIntensity{1.f}
@@ -630,7 +630,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     }
 
     // Attributes
-    std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
+    vector_t<string_t> attribs{VertexBuffer::PositionKindChars};
 
     if (defines[PMD::NORMAL]) {
       attribs.emplace_back(VertexBuffer::NormalKindChars);
@@ -659,68 +659,68 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh, defines,
                                                      PMD::NORMAL);
 
-    std::vector<std::string> uniforms{"world",
-                                      "view",
-                                      "viewProjection",
-                                      "vEyePosition",
-                                      "vLightsType",
-                                      "vAmbientColor",
-                                      "vAlbedoColor",
-                                      "vReflectivityColor",
-                                      "vEmissiveColor",
-                                      "vReflectionColor",
-                                      "vFogInfos",
-                                      "vFogColor",
-                                      "pointSize",
-                                      "vAlbedoInfos",
-                                      "vAmbientInfos",
-                                      "vOpacityInfos",
-                                      "vReflectionInfos",
-                                      "vEmissiveInfos",
-                                      "vReflectivityInfos",
-                                      "vMicroSurfaceSamplerInfos",
-                                      "vBumpInfos",
-                                      "vLightmapInfos",
-                                      "vRefractionInfos",
-                                      "mBones",
-                                      "vClipPlane",
-                                      "albedoMatrix",
-                                      "ambientMatrix",
-                                      "opacityMatrix",
-                                      "reflectionMatrix",
-                                      "emissiveMatrix",
-                                      "reflectivityMatrix",
-                                      "microSurfaceSamplerMatrix",
-                                      "bumpMatrix",
-                                      "lightmapMatrix",
-                                      "refractionMatrix",
-                                      "vLightingIntensity",
-                                      "logarithmicDepthConstant",
-                                      "vSphericalX",
-                                      "vSphericalY",
-                                      "vSphericalZ",
-                                      "vSphericalXX",
-                                      "vSphericalYY",
-                                      "vSphericalZZ",
-                                      "vSphericalXY",
-                                      "vSphericalYZ",
-                                      "vSphericalZX",
-                                      "vReflectionMicrosurfaceInfos",
-                                      "vRefractionMicrosurfaceInfos",
-                                      "vNormalReoderParams"};
+    vector_t<string_t> uniforms{"world",
+                                "view",
+                                "viewProjection",
+                                "vEyePosition",
+                                "vLightsType",
+                                "vAmbientColor",
+                                "vAlbedoColor",
+                                "vReflectivityColor",
+                                "vEmissiveColor",
+                                "vReflectionColor",
+                                "vFogInfos",
+                                "vFogColor",
+                                "pointSize",
+                                "vAlbedoInfos",
+                                "vAmbientInfos",
+                                "vOpacityInfos",
+                                "vReflectionInfos",
+                                "vEmissiveInfos",
+                                "vReflectivityInfos",
+                                "vMicroSurfaceSamplerInfos",
+                                "vBumpInfos",
+                                "vLightmapInfos",
+                                "vRefractionInfos",
+                                "mBones",
+                                "vClipPlane",
+                                "albedoMatrix",
+                                "ambientMatrix",
+                                "opacityMatrix",
+                                "reflectionMatrix",
+                                "emissiveMatrix",
+                                "reflectivityMatrix",
+                                "microSurfaceSamplerMatrix",
+                                "bumpMatrix",
+                                "lightmapMatrix",
+                                "refractionMatrix",
+                                "vLightingIntensity",
+                                "logarithmicDepthConstant",
+                                "vSphericalX",
+                                "vSphericalY",
+                                "vSphericalZ",
+                                "vSphericalXX",
+                                "vSphericalYY",
+                                "vSphericalZZ",
+                                "vSphericalXY",
+                                "vSphericalYZ",
+                                "vSphericalZX",
+                                "vReflectionMicrosurfaceInfos",
+                                "vRefractionMicrosurfaceInfos",
+                                "vNormalReoderParams"};
 
-    std::vector<std::string> samplers{
+    vector_t<string_t> samplers{
       "albedoSampler",         "reflectivitySampler", "ambientSampler",
       "emissiveSampler",       "bumpSampler",         "lightmapSampler",
       "opacitySampler",        "refractionSampler",   "refractionSamplerLow",
       "refractionSamplerHigh", "reflectionSampler",   "reflectionSamplerLow",
       "reflectionSamplerHigh", "microSurfaceSampler", "environmentBrdfSampler"};
-    std::vector<std::string> uniformBuffers{"Material", "Scene"};
+    vector_t<string_t> uniformBuffers{"Material", "Scene"};
 
     ImageProcessingConfiguration::PrepareUniforms(uniforms, defines);
     ImageProcessingConfiguration::PrepareSamplers(samplers, defines);
 
-    std::unordered_map<std::string, unsigned int> indexParameters{
+    std::unordered_map<string_t, unsigned int> indexParameters{
       {"maxSimultaneousLights", _maxSimultaneousLights},
       {"maxSimultaneousMorphTargets", defines.NUM_MORPH_INFLUENCERS}};
 
@@ -1169,9 +1169,9 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   scene = nullptr;
 }
 
-std::vector<IAnimatable*> PBRBaseMaterial::getAnimatables() const
+vector_t<IAnimatable*> PBRBaseMaterial::getAnimatables() const
 {
-  std::vector<IAnimatable*> results;
+  vector_t<IAnimatable*> results;
 
   if (_albedoTexture && _albedoTexture->animations.size() > 0) {
     results.emplace_back(_albedoTexture);

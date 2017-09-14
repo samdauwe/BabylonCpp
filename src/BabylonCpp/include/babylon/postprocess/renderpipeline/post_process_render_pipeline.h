@@ -16,7 +16,7 @@ public:
   static constexpr const char* PASS_SAMPLER_NAME = "passSampler";
 
 public:
-  PostProcessRenderPipeline(Engine* engine, const std::string& name);
+  PostProcessRenderPipeline(Engine* engine, const string_t& name);
   virtual ~PostProcessRenderPipeline();
 
   /**
@@ -24,33 +24,33 @@ public:
    */
   const char* getClassName() const;
 
-  std::vector<Camera*> getCameras() const;
+  vector_t<Camera*> getCameras() const;
   bool isSupported() const;
   void addEffect(PostProcessRenderEffect* renderEffect);
-  void _enableEffect(const std::string& renderEffectName,
-                     const std::vector<Camera*>& cameras);
-  void _disableEffect(const std::string& renderEffectName,
-                      const std::vector<Camera*>& cameras);
-  void _attachCameras(const std::vector<Camera*>& cameras, bool unique);
-  void _detachCameras(const std::vector<Camera*>& cameras);
-  void _enableDisplayOnlyPass(const std::string& passName,
-                              const std::vector<Camera*>& cameras);
-  void _disableDisplayOnlyPass(const std::string& passName,
-                               const std::vector<Camera*>& cameras);
+  void _enableEffect(const string_t& renderEffectName,
+                     const vector_t<Camera*>& cameras);
+  void _disableEffect(const string_t& renderEffectName,
+                      const vector_t<Camera*>& cameras);
+  void _attachCameras(const vector_t<Camera*>& cameras, bool unique);
+  void _detachCameras(const vector_t<Camera*>& cameras);
+  void _enableDisplayOnlyPass(const string_t& passName,
+                              const vector_t<Camera*>& cameras);
+  void _disableDisplayOnlyPass(const string_t& passName,
+                               const vector_t<Camera*>& cameras);
   void _update();
   void _reset();
   virtual void dispose(bool doNotRecurse = false) override;
 
 public:
-  std::string _name;
+  string_t _name;
   Engine* _engine;
 
 protected:
-  std::unordered_map<std::string, Camera*> _cameras;
+  std::unordered_map<string_t, Camera*> _cameras;
 
 private:
-  std::unordered_map<std::string, PostProcessRenderEffect*> _renderEffects;
-  std::unordered_map<std::string, PostProcessRenderEffect*>
+  std::unordered_map<string_t, PostProcessRenderEffect*> _renderEffects;
+  std::unordered_map<string_t, PostProcessRenderEffect*>
     _renderEffectsForIsolatedPass;
 
 }; // end of class PostProcessRenderPipeline

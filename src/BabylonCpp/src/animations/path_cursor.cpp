@@ -69,7 +69,7 @@ PathCursor PathCursor::ensureLimits()
 }
 
 // used by animation engine
-PathCursor& PathCursor::markAsDirty(const std::string& /*propertyName*/)
+PathCursor& PathCursor::markAsDirty(const string_t& /*propertyName*/)
 {
   ensureLimits();
   raiseOnChange();

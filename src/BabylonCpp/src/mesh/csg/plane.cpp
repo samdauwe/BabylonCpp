@@ -70,7 +70,7 @@ std::ostream& operator<<(std::ostream& os, const BABYLON::CSG::Plane& plane)
 }
 } // namespace CSG
 
-std::string CSG::Plane::toString() const
+string_t CSG::Plane::toString() const
 {
   std::ostringstream oss;
   oss << (*this);
@@ -85,10 +85,10 @@ void CSG::Plane::flip()
 
 void BABYLON::CSG::Plane::splitPolygon(
   BABYLON::CSG::Polygon* polygon,
-  std::vector<BABYLON::CSG::Polygon*>& coplanarFront,
-  std::vector<BABYLON::CSG::Polygon*>& coplanarBack,
-  std::vector<BABYLON::CSG::Polygon*>& front,
-  std::vector<BABYLON::CSG::Polygon*>& back)
+  vector_t<BABYLON::CSG::Polygon*>& coplanarFront,
+  vector_t<BABYLON::CSG::Polygon*>& coplanarBack,
+  vector_t<BABYLON::CSG::Polygon*>& front,
+  vector_t<BABYLON::CSG::Polygon*>& back)
 {
   // Classify each point as well as the entire polygon into one of the above
   // four classes.
@@ -117,7 +117,7 @@ void BABYLON::CSG::Plane::splitPolygon(
       back.emplace_back(polygon);
       break;
     case SPANNING:
-      std::vector<BABYLON::CSG::Vertex*> f, b;
+      vector_t<BABYLON::CSG::Vertex*> f, b;
       for (size_t i = 0; i < polygon->vertices.size(); ++i) {
         size_t j = (i + 1) % polygon->vertices.size();
         int ti = types[i], tj = types[j];

@@ -8,7 +8,7 @@
 namespace BABYLON {
 namespace GeometryPrimitives {
 
-Ground::Ground(const std::string& _id, Scene* scene, unsigned int _width,
+Ground::Ground(const string_t& _id, Scene* scene, unsigned int _width,
                unsigned int _height, unsigned int _subdivisions,
                bool canBeRegenerated, Mesh* mesh)
     : _Primitive{_id, scene, canBeRegenerated, mesh}
@@ -31,7 +31,7 @@ std::unique_ptr<VertexData> Ground::_regenerateVertexData()
   return VertexData::CreateGround(options);
 }
 
-Geometry* Ground::copy(const std::string& _id)
+Geometry* Ground::copy(const string_t& _id)
 {
   return Ground::New(_id, getScene(), width, height, subdivisions,
                      canBeRegenerated(), nullptr);

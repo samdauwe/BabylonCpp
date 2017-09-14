@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-MorphTarget::MorphTarget(const std::string& name, float influence)
+MorphTarget::MorphTarget(const string_t& name, float influence)
     : _name{name}, _influence{std::numeric_limits<float>::max()}
 {
   setInfluence(influence);
@@ -117,9 +117,8 @@ MorphTarget::Parse(const Json::value& serializationObject)
   return result;
 }
 
-std::unique_ptr<MorphTarget> MorphTarget::FromMesh(AbstractMesh* mesh,
-                                                   const std::string& name,
-                                                   float influence)
+std::unique_ptr<MorphTarget>
+MorphTarget::FromMesh(AbstractMesh* mesh, const string_t& name, float influence)
 {
   auto morphTargetName = name;
   if (morphTargetName.empty()) {

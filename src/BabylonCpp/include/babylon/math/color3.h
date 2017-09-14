@@ -31,7 +31,7 @@ public:
   /**
    * @brief Returns a string with the Color3 current values.
    */
-  std::string toString() const;
+  string_t toString() const;
 
   /**
    * @brief Returns the string "Color3".
@@ -148,7 +148,7 @@ public:
   /**
    * @brief Returns the Color3 hexadecimal code as a string.
    */
-  std::string toHexString() const;
+  string_t toHexString() const;
 
   /**
    * @brief Returns a new Color3 converted to linear space.
@@ -189,7 +189,7 @@ public:
    * @brief Creates a new Color3 from the string containing valid hexadecimal
    * values.
    */
-  static Color3 FromHexString(const std::string& hex);
+  static Color3 FromHexString(const string_t& hex);
 
   /**
    * @brief Creates a new Vector3 from the start index of the passed array.

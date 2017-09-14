@@ -20,7 +20,7 @@ public:
 
 public:
   RenderTargetTexture(
-    const std::string& name, const ISize& size, Scene* scene,
+    const string_t& name, const ISize& size, Scene* scene,
     bool generateMipMaps = false, bool doNotChangeAspectRatio = true,
     unsigned int type         = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
     bool isCube               = false,
@@ -99,7 +99,7 @@ public:
 
 private:
   void renderToTarget(unsigned int faceIndex,
-                      const std::vector<AbstractMesh*>& currentRenderList,
+                      const vector_t<AbstractMesh*>& currentRenderList,
                       size_t currentRenderListLength, bool useCameraPostProcess,
                       bool dumpForDebug);
 
@@ -114,21 +114,21 @@ public:
   /**
    * Use this list to define the list of mesh you want to render.
    */
-  std::vector<AbstractMesh*> renderList;
+  vector_t<AbstractMesh*> renderList;
 
   bool renderParticles;
   bool renderSprites;
   unsigned int coordinatesMode;
   Camera* activeCamera;
-  ::std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
-                       const std::vector<SubMesh*>& transparentSubMeshes,
-                       const std::vector<SubMesh*>& alphaTestSubMeshes)>
+  ::std::function<void(const vector_t<SubMesh*>& opaqueSubMeshes,
+                       const vector_t<SubMesh*>& transparentSubMeshes,
+                       const vector_t<SubMesh*>& alphaTestSubMeshes)>
     customRenderFunction;
   bool useCameraPostProcesses;
   bool ignoreCameraViewport;
   Nullable<Color4> clearColor;
   bool _generateMipMaps;
-  std::vector<std::string> _waitingRenderList;
+  vector_t<string_t> _waitingRenderList;
   ::std::function<void()> onAfterRender;
   ::std::function<void()> onBeforeRender;
 
@@ -171,7 +171,7 @@ protected:
 
 private:
   std::unique_ptr<PostProcessManager> _postProcessManager;
-  std::vector<PostProcess*> _postProcesses;
+  vector_t<PostProcess*> _postProcesses;
   // Events
   Observer<RenderTargetTexture>::Ptr _onAfterUnbindObserver;
   Observer<int>::Ptr _onBeforeRenderObserver;

@@ -10,36 +10,36 @@
 namespace BABYLON {
 namespace Filesystem {
 
-inline std::string absolutePath(const std::string& path)
+inline string_t absolutePath(const string_t& path)
 {
   char tmp[PATH_MAX];
   if (realpath(path.c_str(), tmp) == NULL) {
     return "";
   }
-  return std::string(tmp);
+  return string_t(tmp);
 }
 
-inline bool createDirectory(const std::string& path)
+inline bool createDirectory(const string_t& path)
 {
   return mkdir(path.c_str(), S_IRUSR | S_IWUSR | S_IXUSR) == 0;
 }
 
-inline std::string getcwd()
+inline string_t getcwd()
 {
   char path[PATH_MAX];
   if (::getcwd(path, PATH_MAX) == NULL) {
     return "";
   }
-  return std::string(path);
+  return string_t(path);
 }
 
-inline bool exists(const std::string& path)
+inline bool exists(const string_t& path)
 {
   struct stat buffer;
   return (stat(path.c_str(), &buffer) == 0);
 }
 
-inline size_t fileSize(const std::string& path)
+inline size_t fileSize(const string_t& path)
 {
   struct stat buffer;
   if (stat(path.c_str(), &buffer) != 0) {
@@ -48,7 +48,7 @@ inline size_t fileSize(const std::string& path)
   return static_cast<size_t>(buffer.st_size);
 }
 
-inline bool isDirectory(const std::string& path)
+inline bool isDirectory(const string_t& path)
 {
   struct stat buffer;
   if (stat(path.c_str(), &buffer)) {
@@ -57,7 +57,7 @@ inline bool isDirectory(const std::string& path)
   return S_ISDIR(buffer.st_mode);
 }
 
-inline bool isFile(const std::string& path)
+inline bool isFile(const string_t& path)
 {
   struct stat buffer;
   if (stat(path.c_str(), &buffer)) {
@@ -66,7 +66,7 @@ inline bool isFile(const std::string& path)
   return S_ISREG(buffer.st_mode);
 }
 
-inline bool removeFile(const std::string& path)
+inline bool removeFile(const string_t& path)
 {
   return std::remove(path.c_str()) == 0;
 }

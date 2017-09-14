@@ -44,7 +44,7 @@ void OimoPhysicsEnginePlugin::setTimeStep(float timeStep)
 }
 
 void OimoPhysicsEnginePlugin::executeStep(
-  float /*delta*/, const std::vector<PhysicsImpostor*>& impostors)
+  float /*delta*/, const vector_t<PhysicsImpostor*>& impostors)
 {
   for (auto& impostor : impostors) {
     impostor->beforeStep();

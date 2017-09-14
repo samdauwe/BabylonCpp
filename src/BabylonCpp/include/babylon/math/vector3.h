@@ -34,7 +34,7 @@ public:
   /**
    * @brief Returns a string with the Vector3 coordinates.
    */
-  std::string toString() const;
+  string_t toString() const;
 
   /**
    * @brief Returns the string "Vector3".
@@ -300,7 +300,7 @@ public:
    * @brief Sets the passed vector "result" with the element values from the
    * index "offset" of the passed array or float array.
    */
-  static void FromArrayToRef(const std::array<float, 16>& array,
+  static void FromArrayToRef(const array_t<float, 16>& array,
                              unsigned int offset, Vector3& result);
 
   /**

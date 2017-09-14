@@ -16,7 +16,7 @@ class BABYLON_SHARED_EXPORT Skeleton
       public IDisposable {
 
 public:
-  Skeleton(const std::string& name, const std::string& id, Scene* scene);
+  Skeleton(const string_t& name, const string_t& id, Scene* scene);
   virtual ~Skeleton();
 
   virtual IReflect::Type type() const override;
@@ -31,33 +31,33 @@ public:
    * @param {boolean} fullDetails - support for multiple levels of logging
    * within scene loading
    */
-  std::string toString(bool fullDetails = false);
+  string_t toString(bool fullDetails = false);
 
   /**
    * Get bone's index searching by name
    * @param {string} name is bone's name to search for
    * @return {number} Indice of the bone. Returns -1 if not found
    */
-  int getBoneIndexByName(const std::string& name);
+  int getBoneIndexByName(const string_t& name);
 
-  void createAnimationRange(const std::string& name, int from, int to);
-  void deleteAnimationRange(const std::string& name, bool deleteFrames = true);
-  AnimationRange* getAnimationRange(const std::string& name);
+  void createAnimationRange(const string_t& name, int from, int to);
+  void deleteAnimationRange(const string_t& name, bool deleteFrames = true);
+  AnimationRange* getAnimationRange(const string_t& name);
 
   /**
    *  Returns as an Array, all AnimationRanges defined on this skeleton
    */
-  std::vector<AnimationRange> getAnimationRanges();
+  vector_t<AnimationRange> getAnimationRanges();
 
   /**
    *  note: This is not for a complete retargeting, only between very similar
    * skeleton's with only possible bone length differences
    */
-  bool copyAnimationRange(Skeleton* source, const std::string& name,
+  bool copyAnimationRange(Skeleton* source, const string_t& name,
                           bool rescaleAsRequired = false);
 
   void returnToRest();
-  Animatable* beginAnimation(const std::string& name, bool loop = false,
+  Animatable* beginAnimation(const string_t& name, bool loop = false,
                              float speedRatio = 1.f,
                              const ::std::function<void()>& onAnimationEnd
                              = nullptr);
@@ -70,10 +70,10 @@ public:
                                  const Matrix& initialSkinMatrix,
                                  bool initialSkinMatrixSet = true);
   void prepare();
-  std::vector<IAnimatable*> getAnimatables();
-  std::vector<Animation*> getAnimations() override;
-  std::unique_ptr<Skeleton> clone(const std::string& name,
-                                  const std::string& id) const;
+  vector_t<IAnimatable*> getAnimatables();
+  vector_t<Animation*> getAnimations() override;
+  std::unique_ptr<Skeleton> clone(const string_t& name,
+                                  const string_t& id) const;
   void enableBlending(float blendingSpeed = 0.01f);
   void dispose(bool doNotRecurse = false) override;
   Json::object serialize() const;
@@ -87,15 +87,15 @@ public:
 
 private:
   int _getHighestAnimationFrame();
-  void _sortBones(unsigned int index, std::vector<Bone*>& bones,
-                  std::vector<bool>& visited);
+  void _sortBones(unsigned int index, vector_t<Bone*>& bones,
+                  vector_t<bool>& visited);
 
 public:
-  std::vector<std::unique_ptr<Bone>> bones;
+  vector_t<std::unique_ptr<Bone>> bones;
   std::unique_ptr<Vector3> dimensionsAtRest;
   bool needInitialSkinMatrix;
-  std::string name;
-  std::string id;
+  string_t name;
+  string_t id;
   // Events
   /**
    * An event triggered before computing the skeleton's matrices
@@ -106,11 +106,11 @@ private:
   Scene* _scene;
   bool _isDirty;
   Float32Array _transformMatrices;
-  std::vector<AbstractMesh*> _meshesWithPoseMatrix;
-  std::vector<IAnimatable*> _animatables;
+  vector_t<AbstractMesh*> _meshesWithPoseMatrix;
+  vector_t<IAnimatable*> _animatables;
   Matrix _identity;
   AbstractMesh* _synchronizedWithMesh;
-  std::unordered_map<std::string, AnimationRange> _ranges;
+  std::unordered_map<string_t, AnimationRange> _ranges;
   int _lastAbsoluteTransformsUpdateId;
 
 }; // end of class Bone

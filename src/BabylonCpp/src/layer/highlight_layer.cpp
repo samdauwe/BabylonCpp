@@ -39,12 +39,12 @@ HighlightLayer* HighlightLayer::New(Ts&&... args)
   return highlightLayer.get();
 }
 
-HighlightLayer::HighlightLayer(const std::string& name, Scene* scene)
+HighlightLayer::HighlightLayer(const string_t& name, Scene* scene)
     : HighlightLayer(name, scene, IHighlightLayerOptions())
 {
 }
 
-HighlightLayer::HighlightLayer(const std::string& iName, Scene* scene,
+HighlightLayer::HighlightLayer(const string_t& iName, Scene* scene,
                                const IHighlightLayerOptions& options)
     : name{iName}
     , innerGlow{true}
@@ -220,9 +220,9 @@ void HighlightLayer::createTextureAndPostProcesses()
   });
 
   _mainTexture->customRenderFunction
-    = [this](const std::vector<SubMesh*>& opaqueSubMeshes,
-             const std::vector<SubMesh*>& transparentSubMeshes,
-             const std::vector<SubMesh*>& alphaTestSubMeshes) {
+    = [this](const vector_t<SubMesh*>& opaqueSubMeshes,
+             const vector_t<SubMesh*>& transparentSubMeshes,
+             const vector_t<SubMesh*>& alphaTestSubMeshes) {
         onBeforeRenderMainTextureObservable.notifyObservers(this);
 
         for (auto& opaqueSubMesh : opaqueSubMeshes) {
@@ -341,8 +341,8 @@ bool HighlightLayer::isReady(SubMesh* subMesh, bool useInstances,
     return false;
   }
 
-  std::vector<std::string> defines;
-  std::vector<std::string> attribs = {VertexBuffer::PositionKindChars};
+  vector_t<string_t> defines;
+  vector_t<string_t> attribs = {VertexBuffer::PositionKindChars};
 
   auto mesh     = subMesh->getMesh();
   auto material = subMesh->getMaterial();
@@ -466,7 +466,7 @@ void HighlightLayer::render()
   currentEffect->setTexture("textureSampler", _blurTexture.get());
 
   // VBOs
-  std::unordered_map<std::string, VertexBuffer*> _vertexBuffersTmp;
+  std::unordered_map<string_t, VertexBuffer*> _vertexBuffersTmp;
   for (auto& item : _vertexBuffers) {
     _vertexBuffersTmp[item.first] = item.second.get();
   }

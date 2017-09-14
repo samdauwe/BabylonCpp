@@ -11,7 +11,7 @@ IReflect::~IReflect()
 {
 }
 
-std::string IReflect::TypeToString(Type type)
+string_t IReflect::TypeToString(Type type)
 {
   switch (type) {
     case Type::NODE:
@@ -79,15 +79,14 @@ std::string IReflect::TypeToString(Type type)
   }
 }
 
-any IReflect::getProperty(const std::string& targetProperty)
+any IReflect::getProperty(const string_t& targetProperty)
 {
   any property = dynamic_cast<IReflect*>(this);
 
   return getProperty(property, targetProperty);
 }
 
-any IReflect::getProperty(const any& property,
-                          const std::string& targetProperty)
+any IReflect::getProperty(const any& property, const string_t& targetProperty)
 {
   any _property = nullptr;
   if (property.is<std::nullptr_t>()) {
@@ -190,7 +189,7 @@ any IReflect::getProperty(const any& property,
 }
 
 void IReflect::setProperty(const any& oldProperty,
-                           const std::string& targetProperty,
+                           const string_t& targetProperty,
                            const any& newProperty)
 {
   if (oldProperty.is<std::nullptr_t>() || newProperty.is<std::nullptr_t>()) {
@@ -226,14 +225,13 @@ void IReflect::setProperty(const any& oldProperty,
     *_propertyToUpdate._<size_t*>() = *newProperty._<size_t const*>();
   }
   // Color3 property update
-  else if (_propertyToUpdate.is<Color3*>()
-           && newProperty.is<Color3 const*>()) {
+  else if (_propertyToUpdate.is<Color3*>() && newProperty.is<Color3 const*>()) {
     *_propertyToUpdate._<Color3*>() = *newProperty._<Color3 const*>();
   }
 }
 
 Vector3* IReflect::_getVector3Property(AbstractMesh* target,
-                                       const std::string& targetProperty)
+                                       const string_t& targetProperty)
 {
   Vector3* vector3Property = nullptr;
   if (targetProperty == "rotation") {
@@ -250,7 +248,7 @@ Vector3* IReflect::_getVector3Property(AbstractMesh* target,
 }
 
 Quaternion* IReflect::_getQuaternionProperty(AbstractMesh* target,
-                                             const std::string& targetProperty)
+                                             const string_t& targetProperty)
 {
   Quaternion* quaternionProperty = nullptr;
   if (targetProperty == "rotationQuaternion") {

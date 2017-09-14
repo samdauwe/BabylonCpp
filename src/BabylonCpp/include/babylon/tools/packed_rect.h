@@ -50,7 +50,7 @@ public:
    * @returns And array of 4 Vector2, containing UV coordinates for the four
    * corners of the Rectangle into the map
    */
-  std::vector<Vector2> UVs();
+  vector_t<Vector2> UVs();
 
   /**
    * @brief You may have allocated the PackedRect using over-provisioning (you
@@ -62,7 +62,7 @@ public:
    * @param customSize must be less/equal to the allocated size, UV will be
    * compute from this
    */
-  std::vector<Vector2> getUVsForCustomSize(const Size& customSize);
+  vector_t<Vector2> getUVsForCustomSize(const Size& customSize);
 
   /**
    * @brief Free this rectangle from the map.

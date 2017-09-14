@@ -22,8 +22,8 @@ class BABYLON_SHARED_EXPORT BoxOptions {
 
 public:
   /** Statics **/
-  static std::array<Vector4, 6> DefaultBoxFaceUV;
-  static std::array<Color4, 6> DefaultBoxFaceColors;
+  static array_t<Vector4, 6> DefaultBoxFaceUV;
+  static array_t<Color4, 6> DefaultBoxFaceColors;
   static Vector4 DefaultFrontUVs;
   static Vector4 DefaultBackUVs;
 
@@ -36,8 +36,8 @@ public:
   float width;
   float height;
   float depth;
-  std::array<Vector4, 6> faceUV;
-  std::array<Color4, 6> faceColors;
+  array_t<Vector4, 6> faceUV;
+  array_t<Color4, 6> faceColors;
   unsigned int sideOrientation;
   Vector4 frontUVs;
   Vector4 backUVs;
@@ -56,8 +56,8 @@ class BABYLON_SHARED_EXPORT CylinderOptions {
 
 public:
   /** Statics **/
-  static std::vector<Vector4> DefaultCylinderFaceUV;
-  static std::vector<Color4> DefaultCylinderFaceColors;
+  static vector_t<Vector4> DefaultCylinderFaceUV;
+  static vector_t<Color4> DefaultCylinderFaceColors;
   static Vector4 DefaultFrontUVs;
   static Vector4 DefaultBackUVs;
 
@@ -77,8 +77,8 @@ public:
   unsigned int subdivisions;
   bool hasRings;
   bool enclose;
-  std::vector<Vector4> faceUV;
-  std::vector<Color4> faceColors;
+  vector_t<Vector4> faceUV;
+  vector_t<Color4> faceColors;
   unsigned int sideOrientation;
   Vector4 frontUVs;
   Vector4 backUVs;
@@ -106,7 +106,7 @@ public:
   float dashSize;
   float gapSize;
   unsigned int dashNb;
-  std::vector<Vector3> points;
+  vector_t<Vector3> points;
   bool updatable;
   LinesMesh* instance;
 
@@ -187,8 +187,8 @@ public:
   ~ExtrudeShapeOptions();
 
 public:
-  std::vector<Vector3> shape;
-  std::vector<Vector3> path;
+  vector_t<Vector3> shape;
+  vector_t<Vector3> path;
   float rotation;
   float scale;
   unsigned int cap;
@@ -220,8 +220,8 @@ public:
   ~ExtrudeShapeCustomOptions();
 
 public:
-  std::vector<Vector3> shape;
-  std::vector<Vector3> path;
+  vector_t<Vector3> shape;
+  vector_t<Vector3> path;
   ::std::function<float(float i, float distance)> scaleFunction;
   ::std::function<float(float i, float distance)> rotationFunction;
   bool ribbonCloseArray;
@@ -341,7 +341,7 @@ public:
   void setArc(float value);
 
 public:
-  std::vector<Vector3> shape;
+  vector_t<Vector3> shape;
   float radius;
   unsigned int tessellation;
   bool closed;
@@ -371,7 +371,7 @@ public:
   ~LinesOptions();
 
 public:
-  std::vector<Vector3> points;
+  vector_t<Vector3> points;
   bool updatable;
   LinesMesh* instance;
 
@@ -392,7 +392,7 @@ public:
   ~LineSystemOptions();
 
 public:
-  std::vector<std::vector<Vector3>> lines;
+  vector_t<vector_t<Vector3>> lines;
   bool updatable;
   LinesMesh* instance;
 
@@ -447,11 +447,11 @@ public:
   ~PolygonOptions();
 
 public:
-  std::vector<Vector3> shape;
-  std::vector<std::vector<Vector3>> holes;
+  vector_t<Vector3> shape;
+  vector_t<vector_t<Vector3>> holes;
   float depth;
-  std::vector<Vector4> faceUV;
-  std::vector<Color4> faceColors;
+  vector_t<Vector4> faceUV;
+  vector_t<Color4> faceColors;
   bool updatable;
   unsigned int sideOrientation;
   Vector4 frontUVs;
@@ -484,8 +484,8 @@ public:
   float sizeX;
   float sizeY;
   float sizeZ;
-  std::vector<Color4> faceColors;
-  std::vector<Vector4> faceUV;
+  vector_t<Color4> faceColors;
+  vector_t<Vector4> faceUV;
   Polyhedron custom;
   bool flat;
   unsigned int sideOrientation;
@@ -510,12 +510,11 @@ public:
   static Vector4 DefaultBackUVs;
 
 public:
-  RibbonOptions(const std::vector<std::vector<Vector3>>& pathArray,
-                int offset = -1);
+  RibbonOptions(const vector_t<vector_t<Vector3>>& pathArray, int offset = -1);
   ~RibbonOptions();
 
-  std::vector<std::vector<Vector3>>& pathArray();
-  const std::vector<std::vector<Vector3>>& pathArray() const;
+  vector_t<vector_t<Vector3>>& pathArray();
+  const vector_t<vector_t<Vector3>>& pathArray() const;
   size_t offset() const;
 
 public:
@@ -527,11 +526,11 @@ public:
   Vector4 backUVs;
   bool updatable;
   Mesh* instance;
-  std::vector<Vector2> uvs;
-  std::vector<Color4> colors;
+  vector_t<Vector2> uvs;
+  vector_t<Color4> colors;
 
 private:
-  std::vector<std::vector<Vector3>> _pathArray;
+  vector_t<vector_t<Vector3>> _pathArray;
   size_t _offset;
 
 }; // end of class RibbonOptions
@@ -681,7 +680,7 @@ public:
   void setArc(float value);
 
 public:
-  std::vector<Vector3> path;
+  vector_t<Vector3> path;
   float radius;
   unsigned int tessellation;
   ::std::function<float(unsigned int i, unsigned int distance)> radiusFunction;

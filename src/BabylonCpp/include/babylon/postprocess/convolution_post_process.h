@@ -22,7 +22,7 @@ public:
   static const Float32Array GaussianKernel;
 
 public:
-  ConvolutionPostProcess(const std::string& name, const Float32Array& kernel,
+  ConvolutionPostProcess(const string_t& name, const Float32Array& kernel,
                          float ratio, Camera* camera, unsigned int samplingMode,
                          Engine* engine, bool reusable = false);
   ~ConvolutionPostProcess();

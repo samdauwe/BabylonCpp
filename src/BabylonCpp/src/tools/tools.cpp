@@ -284,10 +284,10 @@ Image Tools::CreateNoiseImage(unsigned int size)
   return Image(imageData, width, height, depth, mode);
 }
 
-void Tools::LoadImage(
-  const std::string& url, const ::std::function<void(const Image& img)>& onLoad,
-  const ::std::function<void(const std::string& msg)>& onError,
-  bool flipVertically)
+void Tools::LoadImage(const string_t& url,
+                      const ::std::function<void(const Image& img)>& onLoad,
+                      const ::std::function<void(const string_t& msg)>& onError,
+                      bool flipVertically)
 {
   typedef std::unique_ptr<unsigned char, ::std::function<void(unsigned char*)>>
     stbi_ptr;
@@ -312,8 +312,8 @@ void Tools::LoadImage(
 }
 
 void Tools::LoadFile(
-  const std::string& /*url*/,
-  const ::std::function<void(const std::string& text)>& /*callback*/,
+  const string_t& /*url*/,
+  const ::std::function<void(const string_t& text)>& /*callback*/,
   const ::std::function<void()>& /*progressCallBack*/, bool /*useArrayBuffer*/)
 {
 }
@@ -341,15 +341,15 @@ void Tools::CheckExtends(Vector3& v, Vector3& min, Vector3& max)
   }
 }
 
-std::string Tools::RandomId()
+string_t Tools::RandomId()
 {
   // from
   // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/2117523#answer-2117523
-  std::string randomId = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
-  const std::array<unsigned int, 16> yconv{
+  string_t randomId = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
+  const array_t<unsigned int, 16> yconv{
     {8, 9, 10, 11, 8, 9, 10, 11, 8, 9, 10, 11, 8, 9, 10, 11}};
-  const std::array<char, 16> hex{{'0', '1', '2', '3', '4', '5', '6', '7', '8',
-                                  '9', 'a', 'b', 'c', 'd', 'e', 'f'}};
+  const array_t<char, 16> hex{{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                               'a', 'b', 'c', 'd', 'e', 'f'}};
   const auto randomFloats = Math::randomList(0.f, 1.f, randomId.size());
   for (unsigned int i = 0; i < randomId.size(); ++i) {
     const char c = randomId[i];

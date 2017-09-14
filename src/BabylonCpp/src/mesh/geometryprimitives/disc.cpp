@@ -6,7 +6,7 @@
 namespace BABYLON {
 namespace GeometryPrimitives {
 
-Disc::Disc(const std::string& _id, Scene* scene, float _radius,
+Disc::Disc(const string_t& _id, Scene* scene, float _radius,
            unsigned int _tessellation, bool canBeRegenerated, Mesh* mesh,
            unsigned int _side)
     : _Primitive{_id, scene, canBeRegenerated, mesh}
@@ -30,7 +30,7 @@ std::unique_ptr<VertexData> Disc::_regenerateVertexData()
   return VertexData::CreateDisc(options);
 }
 
-Geometry* Disc::copy(const std::string& _id)
+Geometry* Disc::copy(const string_t& _id)
 {
   return Disc::New(_id, getScene(), radius, tessellation, canBeRegenerated(),
                    nullptr, side);

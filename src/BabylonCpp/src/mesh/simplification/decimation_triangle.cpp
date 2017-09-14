@@ -3,7 +3,7 @@
 namespace BABYLON {
 
 DecimationTriangle::DecimationTriangle(
-  const std::vector<DecimationVertex>& _vertices)
+  const vector_t<DecimationVertex>& _vertices)
     : vertices{_vertices}
 {
 }

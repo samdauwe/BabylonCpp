@@ -8,7 +8,7 @@
 namespace BABYLON {
 namespace GeometryPrimitives {
 
-Torus::Torus(const std::string& _id, Scene* scene, float _diameter,
+Torus::Torus(const string_t& _id, Scene* scene, float _diameter,
              float _thickness, unsigned int _tessellation,
              bool canBeRegenerated, Mesh* mesh, unsigned int _side)
     : _Primitive{_id, scene, canBeRegenerated, mesh}
@@ -34,7 +34,7 @@ std::unique_ptr<VertexData> Torus::_regenerateVertexData()
   return VertexData::CreateTorus(options);
 }
 
-Geometry* Torus::copy(const std::string& _id)
+Geometry* Torus::copy(const string_t& _id)
 {
   return Torus::New(_id, getScene(), diameter, thickness, tessellation,
                     canBeRegenerated(), nullptr, side);

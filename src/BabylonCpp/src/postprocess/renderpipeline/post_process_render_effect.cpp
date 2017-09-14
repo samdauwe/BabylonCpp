@@ -10,7 +10,7 @@
 namespace BABYLON {
 
 PostProcessRenderEffect::PostProcessRenderEffect(
-  Engine* engine, const std::string& name,
+  Engine* engine, const string_t& name,
   const ::std::function<PostProcess*()>& getPostProcess, bool singleInstance)
     : _name{name}
     , _engine{engine}
@@ -63,7 +63,7 @@ void PostProcessRenderEffect::addRenderEffectAsPass(
 }
 
 PostProcessRenderPass*
-PostProcessRenderEffect::getPass(const std::string& passName)
+PostProcessRenderEffect::getPass(const string_t& passName)
 {
   if (stl_util::contains(_renderPasses, passName)) {
     return _renderPasses[passName];
@@ -79,10 +79,9 @@ void PostProcessRenderEffect::emptyPasses()
   _linkParameters();
 }
 
-void PostProcessRenderEffect::_attachCameras(
-  const std::vector<Camera*>& cameras)
+void PostProcessRenderEffect::_attachCameras(const vector_t<Camera*>& cameras)
 {
-  std::string cameraKey;
+  string_t cameraKey;
 
   auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
@@ -123,8 +122,7 @@ void PostProcessRenderEffect::_attachCameras(
   _linkParameters();
 }
 
-void PostProcessRenderEffect::_detachCameras(
-  const std::vector<Camera*>& cameras)
+void PostProcessRenderEffect::_detachCameras(const vector_t<Camera*>& cameras)
 {
   auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
@@ -144,7 +142,7 @@ void PostProcessRenderEffect::_detachCameras(
   }
 }
 
-void PostProcessRenderEffect::_enable(const std::vector<Camera*> cameras)
+void PostProcessRenderEffect::_enable(const vector_t<Camera*> cameras)
 {
   auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
@@ -167,7 +165,7 @@ void PostProcessRenderEffect::_enable(const std::vector<Camera*> cameras)
   }
 }
 
-void PostProcessRenderEffect::_disable(std::vector<Camera*> cameras)
+void PostProcessRenderEffect::_disable(vector_t<Camera*> cameras)
 {
   auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 

@@ -63,7 +63,7 @@ std::ostream& operator<<(std::ostream& os, const BABYLON::CSG::Vertex& vertex)
 }
 } // namespace CSG
 
-std::string CSG::Vertex::toString() const
+string_t CSG::Vertex::toString() const
 {
   std::ostringstream oss;
   oss << (*this);

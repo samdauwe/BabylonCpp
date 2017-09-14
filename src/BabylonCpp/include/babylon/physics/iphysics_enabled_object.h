@@ -15,7 +15,7 @@ struct BABYLON_SHARED_EXPORT IPhysicsEnabledObject {
   virtual AbstractMesh* getParent()                                = 0;
   virtual BoundingInfo* getBoundingInfo()                          = 0;
   virtual Matrix computeWorldMatrix(bool force = false)            = 0;
-  virtual std::vector<AbstractMesh*>
+  virtual vector_t<AbstractMesh*>
   getChildMeshes(bool directDecendantsOnly,
                  const ::std::function<bool(Node* node)>& predicate)
     = 0;

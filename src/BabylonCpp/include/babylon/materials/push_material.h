@@ -33,7 +33,7 @@ public:
   void bind(Matrix* world, Mesh* mesh) override;
 
 protected:
-  PushMaterial(const std::string& name, Scene* scene);
+  PushMaterial(const string_t& name, Scene* scene);
 
   void _afterBind(Mesh* mesh, Effect* effect);
   bool _mustRebind(Scene* scene, Effect* effect, float visibility = 1.f);

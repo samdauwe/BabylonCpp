@@ -26,13 +26,13 @@ public:
   ~TorusKnot();
 
   std::unique_ptr<VertexData> _regenerateVertexData() override;
-  Geometry* copy(const std::string& id) override;
+  Geometry* copy(const string_t& id) override;
 
   // Statics
   static TorusKnot* Parse(const Json::value& parsedTorusKnot, Scene* scene);
 
 protected:
-  TorusKnot(const std::string& id, Scene* scene, float radius, float tube,
+  TorusKnot(const string_t& id, Scene* scene, float radius, float tube,
             unsigned int radialSegments, unsigned int tubularSegments, float p,
             float q, bool canBeRegenerated, Mesh* mesh,
             unsigned int side = Mesh::DEFAULTSIDE);

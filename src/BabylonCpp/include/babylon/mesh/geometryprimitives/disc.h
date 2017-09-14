@@ -26,10 +26,10 @@ public:
   ~Disc();
 
   std::unique_ptr<VertexData> _regenerateVertexData() override;
-  Geometry* copy(const std::string& id) override;
+  Geometry* copy(const string_t& id) override;
 
 protected:
-  Disc(const std::string& id, Scene* scene, float radius,
+  Disc(const string_t& id, Scene* scene, float radius,
        unsigned int tessellation, bool canBeRegenerated, Mesh* mesh,
        unsigned int side = Mesh::DEFAULTSIDE);
 

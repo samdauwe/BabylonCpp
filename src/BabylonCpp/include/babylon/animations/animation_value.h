@@ -26,13 +26,13 @@ public:
   AnimationValue(const Size& value);
   AnimationValue(bool value);
   AnimationValue(int value);
-  AnimationValue(const std::string& value);
+  AnimationValue(const string_t& value);
   AnimationValue(const Color4& value);
 
   AnimationValue subtract(const AnimationValue& fromValue);
   AnimationValue operator-(const AnimationValue& fromValue);
   AnimationValue operator!();
-  AnimationValue operator[](const std::string& property);
+  AnimationValue operator[](const string_t& property);
   AnimationValue copy() const;
 
   operator bool() const
@@ -53,7 +53,7 @@ public:
   Size sizeData;
   bool boolData;
   int intData;
-  std::string stringData;
+  string_t stringData;
   Color4 color4Data;
 
 }; // end of class AnimationValue

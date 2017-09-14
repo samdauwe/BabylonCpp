@@ -49,12 +49,12 @@ public:
   void setScaling(const Vector3& newScaling);
 
   /** Methods **/
-  std::vector<Animation*> getAnimations() override;
+  vector_t<Animation*> getAnimations() override;
   void updateMatrix(const Matrix& matrix, bool updateDifferenceMatrix = true);
   void _updateDifferenceMatrix();
   void _updateDifferenceMatrix(Matrix& rootMatrix);
   void markAsDirty(unsigned int property = 0) override;
-  bool copyAnimationRange(Bone* source, const std::string& rangeName,
+  bool copyAnimationRange(Bone* source, const string_t& rangeName,
                           int frameOffset, bool rescaleAsRequired = false,
                           const Vector3& skelDimensionsRatio = Vector3(),
                           bool hasSkelDimensionsRatio        = false);
@@ -354,7 +354,7 @@ public:
                                          Vector3& result) const;
 
 protected:
-  Bone(const std::string& name, Skeleton* skeleton, Bone* parentBone = nullptr,
+  Bone(const string_t& name, Skeleton* skeleton, Bone* parentBone = nullptr,
        const Nullable<Matrix>& localMatrix = nullptr,
        const Nullable<Matrix>& restPose    = nullptr,
        const Nullable<Matrix>& baseMatrix  = nullptr,
@@ -368,8 +368,8 @@ private:
   void _syncScaleVector();
 
 public:
-  std::vector<Bone*> children;
-  std::vector<Animation*> animations;
+  vector_t<Bone*> children;
+  vector_t<Animation*> animations;
   int length;
 
   // Set this value to map this bone to a different index in the transform
@@ -378,9 +378,9 @@ public:
   Nullable<int> _index;
 
 private:
-  static std::array<Vector3, 2> _tmpVecs;
+  static array_t<Vector3, 2> _tmpVecs;
   static Quaternion _tmpQuat;
-  static std::array<Matrix, 5> _tmpMats;
+  static array_t<Matrix, 5> _tmpMats;
 
 private:
   Skeleton* _skeleton;

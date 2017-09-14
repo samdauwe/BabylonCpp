@@ -5,7 +5,7 @@
 namespace BABYLON {
 
 CombineAction::CombineAction(unsigned int triggerOptions,
-                             const std::vector<Action*>& iChildren,
+                             const vector_t<Action*>& iChildren,
                              Condition* condition)
     : Action(triggerOptions, condition), children{iChildren}
 {

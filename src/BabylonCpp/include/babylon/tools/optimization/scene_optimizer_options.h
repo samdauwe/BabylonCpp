@@ -26,7 +26,7 @@ public:
                                                       = 60);
 
 public:
-  std::vector<SceneOptimization> optimizations;
+  vector_t<SceneOptimization> optimizations;
   float targetFrameRate;
   int trackerDuration;
 

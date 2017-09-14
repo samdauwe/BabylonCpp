@@ -30,7 +30,7 @@ Camera* SerializationHelper::Parse(Camera* camera,
     return nullptr;
   }
 
-  std::string cameraClassName{camera->getClassName()};
+  string_t cameraClassName{camera->getClassName()};
   if (cameraClassName == "ArcRotateCamera") {
     /** ArcRotateCamera **/
     auto arcRotateCamera = dynamic_cast<ArcRotateCamera*>(camera);
@@ -258,7 +258,7 @@ Light* SerializationHelper::Parse(Light* light, const Json::value& parsedLight,
 StandardMaterial* SerializationHelper::Parse(StandardMaterial* standardMaterial,
                                              const Json::value& parsedMaterial,
                                              Scene* /*scene*/,
-                                             const std::string& /*rootUrl*/)
+                                             const string_t& /*rootUrl*/)
 {
   if (!standardMaterial) {
     return nullptr;

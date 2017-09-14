@@ -26,13 +26,13 @@ public:
   ~Sphere();
 
   std::unique_ptr<VertexData> _regenerateVertexData() override;
-  Geometry* copy(const std::string& id) override;
+  Geometry* copy(const string_t& id) override;
 
   // Statics
   static Sphere* Parse(const Json::value& parsedSphere, Scene* scene);
 
 protected:
-  Sphere(const std::string& id, Scene* scene, unsigned int segments,
+  Sphere(const string_t& id, Scene* scene, unsigned int segments,
          float diameter, bool canBeRegenerated, Mesh* mesh,
          unsigned int side = Mesh::DEFAULTSIDE);
 

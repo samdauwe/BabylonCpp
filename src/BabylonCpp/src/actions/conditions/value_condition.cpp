@@ -7,7 +7,7 @@ namespace BABYLON {
 
 ValueCondition::ValueCondition(ActionManager* actionManager,
                                IAnimatable* target,
-                               const std::string& propertyPath,
+                               const string_t& propertyPath,
                                AnimationValue* value, unsigned int operatorType)
     : Condition{actionManager}
     , _propertyPath{propertyPath}
@@ -40,12 +40,12 @@ Json::object ValueCondition::serialize() const
            Json::NameValuePair("propertyPath", _propertyPath),
            Json::NameValuePair("value",
                                Action::_SerializeValueAsString(*_value)),
-           Json::NameValuePair<std::string>(
+           Json::NameValuePair<string_t>(
              "operator", ValueCondition::GetOperatorName(_operatorType))}}))});
   return _serialize(object);
 }
 
-std::string ValueCondition::GetOperatorName(unsigned int operatorType)
+string_t ValueCondition::GetOperatorName(unsigned int operatorType)
 {
   switch (operatorType) {
     case ValueCondition::IsEqual:

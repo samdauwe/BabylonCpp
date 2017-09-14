@@ -26,7 +26,7 @@ public:
    * @param name The material name
    * @param scene The scene the material will be use in.
    */
-  PBRBaseMaterial(const std::string& name, Scene* scene);
+  PBRBaseMaterial(const string_t& name, Scene* scene);
   ~PBRBaseMaterial();
 
   /**
@@ -45,7 +45,7 @@ public:
   void unbind() override;
   void bindOnlyWorldMatrix(Matrix& world) override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
-  std::vector<IAnimatable*> getAnimatables() const;
+  vector_t<IAnimatable*> getAnimatables() const;
   void dispose(bool forceDisposeEffect   = false,
                bool forceDisposeTextures = false) override;
 
@@ -370,7 +370,7 @@ private:
    * Keep track of the image processing observer to allow dispose and replace.
    */
   Observer<ImageProcessingConfiguration>::Ptr _imageProcessingObserver;
-  std::vector<RenderTargetTexture*> _renderTargets;
+  vector_t<RenderTargetTexture*> _renderTargets;
   Matrix _worldViewProjectionMatrix;
   Color3 _globalAmbientColor;
   Color3 _tempColor;

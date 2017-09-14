@@ -78,9 +78,9 @@ void OutlineRenderer::render(SubMesh* subMesh, _InstancesBatch* batch,
 
 bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
 {
-  std::vector<std::string> defines;
-  std::vector<std::string> attribs{VertexBuffer::PositionKindChars,
-                                   VertexBuffer::NormalKindChars};
+  vector_t<string_t> defines;
+  vector_t<string_t> attribs{VertexBuffer::PositionKindChars,
+                             VertexBuffer::NormalKindChars};
 
   auto mesh     = subMesh->getMesh();
   auto material = subMesh->getMaterial();
@@ -126,7 +126,7 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
   }
 
   // Get correct effect
-  std::string join = String::join(defines, '\n');
+  string_t join = String::join(defines, '\n');
   if (_cachedDefines != join) {
     _cachedDefines = join;
 

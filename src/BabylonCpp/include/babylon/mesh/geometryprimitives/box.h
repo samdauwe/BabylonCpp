@@ -26,13 +26,13 @@ public:
   ~Box();
 
   std::unique_ptr<VertexData> _regenerateVertexData() override;
-  Geometry* copy(const std::string& id) override;
+  Geometry* copy(const string_t& id) override;
 
   // Statics
   static Box* Parse(const Json::value& parsedBox, Scene* scene);
 
 protected:
-  Box(const std::string& id, Scene* scene, float size, bool canBeRegenerated,
+  Box(const string_t& id, Scene* scene, float size, bool canBeRegenerated,
       Mesh* mesh, unsigned int side = Mesh::DEFAULTSIDE);
 
 public:

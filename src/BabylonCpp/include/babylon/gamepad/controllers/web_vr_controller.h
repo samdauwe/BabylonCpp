@@ -51,10 +51,10 @@ public:
   StickValues pad;
   // 'left' or 'right', see
   // https://w3c.github.io/gamepad/extensions.html#gamepadhand-enum
-  std::string hand;
+  string_t hand;
 
 protected:
-  std::vector<ExtendedGamepadButton> _buttons;
+  vector_t<ExtendedGamepadButton> _buttons;
 
 private:
   ::std::function<void(int controlledIndex, unsigned int buttonIndex,

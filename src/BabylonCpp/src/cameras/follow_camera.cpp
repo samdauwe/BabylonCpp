@@ -4,7 +4,7 @@
 
 namespace BABYLON {
 
-FollowCamera::FollowCamera(const std::string& iName, const Vector3& iPosition,
+FollowCamera::FollowCamera(const string_t& iName, const Vector3& iPosition,
                            Scene* scene, AbstractMesh* iLockedTarget)
     : TargetCamera{iName, iPosition, scene}
     , radius{12.f}

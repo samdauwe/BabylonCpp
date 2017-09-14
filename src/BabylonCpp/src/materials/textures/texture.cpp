@@ -11,7 +11,7 @@
 
 namespace BABYLON {
 
-Texture::Texture(const std::string& _url, Scene* scene, bool noMipmap,
+Texture::Texture(const string_t& _url, Scene* scene, bool noMipmap,
                  bool invertY, unsigned int samplingMode,
                  const ::std::function<void()>& onLoad,
                  const ::std::function<void()>& onError, Buffer* buffer,
@@ -121,7 +121,7 @@ bool Texture::noMipmap() const
   return _noMipmap;
 }
 
-void Texture::updateURL(const std::string& iUrl)
+void Texture::updateURL(const string_t& iUrl)
 {
   url            = iUrl;
   delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
@@ -356,8 +356,8 @@ void Texture::dispose(bool /*doNotRecurse*/)
   _delayedOnError = nullptr;
 }
 
-Texture* Texture::CreateFromBase64String(const std::string& /*data*/,
-                                         const std::string& name, Scene* scene,
+Texture* Texture::CreateFromBase64String(const string_t& /*data*/,
+                                         const string_t& name, Scene* scene,
                                          bool noMipmap, bool invertY,
                                          unsigned int samplingMode,
                                          const ::std::function<void()>& onLoad,
@@ -370,12 +370,12 @@ Texture* Texture::CreateFromBase64String(const std::string& /*data*/,
 
 std::unique_ptr<BaseTexture>
 Texture::Parse(const Json::value& /*parsedTexture*/, Scene* /*scene*/,
-               const std::string& /*rootUrl*/)
+               const string_t& /*rootUrl*/)
 {
   return nullptr;
 }
 
-Texture* Texture::LoadFromDataString(const std::string& name, Buffer* buffer,
+Texture* Texture::LoadFromDataString(const string_t& name, Buffer* buffer,
                                      Scene* scene, bool deleteBuffer,
                                      bool noMipmap, bool invertY,
                                      unsigned int samplingMode,
@@ -383,7 +383,7 @@ Texture* Texture::LoadFromDataString(const std::string& name, Buffer* buffer,
                                      const ::std::function<void()>& onError,
                                      unsigned int format)
 {
-  std::string _name = name;
+  string_t _name = name;
   if (_name.substr(0, 5) != "data:") {
     _name = "data:" + name;
   }

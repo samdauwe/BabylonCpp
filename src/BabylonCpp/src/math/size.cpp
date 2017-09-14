@@ -56,7 +56,7 @@ std::ostream& operator<<(std::ostream& os, const Size& size)
   return os;
 }
 
-std::string Size::toString() const
+string_t Size::toString() const
 {
   std::ostringstream oss;
   oss << *this;

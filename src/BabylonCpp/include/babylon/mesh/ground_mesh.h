@@ -121,7 +121,7 @@ private:
   GroundMesh& _computeHeightQuads();
 
 protected:
-  GroundMesh(const std::string& name, Scene* scene);
+  GroundMesh(const string_t& name, Scene* scene);
 
 public:
   bool generateOctree;
@@ -136,7 +136,7 @@ public:
 
 private:
   Matrix _worldInverse;
-  std::vector<Quad> _heightQuads;
+  vector_t<Quad> _heightQuads;
 
 }; // end of class GroundMesh
 

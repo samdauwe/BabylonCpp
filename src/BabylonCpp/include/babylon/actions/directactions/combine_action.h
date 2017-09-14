@@ -9,8 +9,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT CombineAction : public Action {
 
 public:
-  CombineAction(unsigned int triggerOptions,
-                const std::vector<Action*>& children,
+  CombineAction(unsigned int triggerOptions, const vector_t<Action*>& children,
                 Condition* condition = nullptr);
   ~CombineAction();
 
@@ -19,7 +18,7 @@ public:
   Json::object serialize(Json::object& parent) const override;
 
 public:
-  std::vector<Action*> children;
+  vector_t<Action*> children;
 
 }; // end of class CombineAction
 

@@ -26,7 +26,7 @@ public:
    * supporting 3dl)
    * @param scene The scene the texture will be used in
    */
-  ColorGradingTexture(const std::string& url, Scene* scene);
+  ColorGradingTexture(const string_t& url, Scene* scene);
   ~ColorGradingTexture();
 
   /**
@@ -55,7 +55,7 @@ public:
    */
   static std::unique_ptr<ColorGradingTexture>
   Parse(const Json::value& parsedTexture, Scene* scene,
-        const std::string& rootUrl);
+        const string_t& rootUrl);
 
   /**
    * Serializes the LUT texture to json format.
@@ -74,7 +74,7 @@ private:
   void loadTexture();
 
 public:
-  std::string url;
+  string_t url;
 
 private:
   /**

@@ -9,20 +9,20 @@
 
 namespace BABYLON {
 
-std::array<Color3, 3> Tmp::Color3Array{
+array_t<Color3, 3> Tmp::Color3Array{
   {Color3::Black(), Color3::Black(), Color3::Black()}};
-std::array<Vector2, 3> Tmp::Vector2Array{
+array_t<Vector2, 3> Tmp::Vector2Array{
   {Vector2::Zero(), Vector2::Zero(), Vector2::Zero()}};
-std::array<Vector3, 9> Tmp::Vector3Array{
+array_t<Vector3, 9> Tmp::Vector3Array{
   {Vector3::Zero(), Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
    Vector3::Zero(), Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
    Vector3::Zero()}};
-std::array<Vector4, 3> Tmp::Vector4Array{
+array_t<Vector4, 3> Tmp::Vector4Array{
   {Vector4::Zero(), Vector4::Zero(), Vector4::Zero()}};
-std::array<Quaternion, 2> Tmp::QuaternionArray{
+array_t<Quaternion, 2> Tmp::QuaternionArray{
   {Quaternion::Zero(), Quaternion::Zero()}};
-std::array<Matrix, 6> Tmp::MatrixArray{{Matrix::Zero(), Matrix::Zero(),
-                                        Matrix::Zero(), Matrix::Zero(),
-                                        Matrix::Zero(), Matrix::Zero()}};
+array_t<Matrix, 6> Tmp::MatrixArray{{Matrix::Zero(), Matrix::Zero(),
+                                     Matrix::Zero(), Matrix::Zero(),
+                                     Matrix::Zero(), Matrix::Zero()}};
 
 } // end of namespace BABYLON

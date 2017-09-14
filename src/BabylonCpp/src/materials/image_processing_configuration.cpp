@@ -198,7 +198,7 @@ const char* ImageProcessingConfiguration::getClassName() const
 }
 
 void ImageProcessingConfiguration::PrepareUniforms(
-  std::vector<std::string>& uniforms,
+  vector_t<string_t>& uniforms,
   const IImageProcessingConfigurationDefines& defines)
 {
   if (defines.EXPOSURE) {
@@ -221,7 +221,7 @@ void ImageProcessingConfiguration::PrepareUniforms(
 }
 
 void ImageProcessingConfiguration::PrepareSamplers(
-  std::vector<std::string>& samplersList,
+  vector_t<string_t>& samplersList,
   const IImageProcessingConfigurationDefines& defines)
 {
   if (defines.COLORGRADING) {

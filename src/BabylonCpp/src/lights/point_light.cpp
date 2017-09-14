@@ -8,7 +8,7 @@
 
 namespace BABYLON {
 
-PointLight::PointLight(const std::string& iName, const Vector3& iPosition,
+PointLight::PointLight(const string_t& iName, const Vector3& iPosition,
                        Scene* scene)
     : ShadowLight{iName, scene}, _shadowAngle{Math::PI_2}
 {
@@ -93,7 +93,7 @@ Vector3 PointLight::getShadowDirection(unsigned int faceIndex)
 
 void PointLight::_setDefaultShadowProjectionMatrix(
   Matrix& matrix, const Matrix& /*viewMatrix*/,
-  const std::vector<AbstractMesh*>& /*renderList*/)
+  const vector_t<AbstractMesh*>& /*renderList*/)
 {
   auto activeCamera = getScene()->activeCamera;
   Matrix::PerspectiveFovLHToRef(shadowAngle(), 1.f, getDepthMinZ(activeCamera),
@@ -111,7 +111,7 @@ void PointLight::_buildUniformLayout()
 }
 
 void PointLight::transferToEffect(Effect* /*effect*/,
-                                  const std::string& lightIndex)
+                                  const string_t& lightIndex)
 {
   if (computeTransformedInformation()) {
     _uniformBuffer->updateFloat4("vLightData",            //

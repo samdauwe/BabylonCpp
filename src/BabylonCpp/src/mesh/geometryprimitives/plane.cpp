@@ -8,7 +8,7 @@
 namespace BABYLON {
 namespace GeometryPrimitives {
 
-Plane::Plane(const std::string& _id, Scene* scene, float _size,
+Plane::Plane(const string_t& _id, Scene* scene, float _size,
              bool canBeRegenerated, Mesh* mesh, unsigned int _side)
     : _Primitive{_id, scene, canBeRegenerated, mesh}, size{_size}, side{_side}
 {
@@ -26,7 +26,7 @@ std::unique_ptr<VertexData> Plane::_regenerateVertexData()
   return VertexData::CreatePlane(options);
 }
 
-Geometry* Plane::copy(const std::string& _id)
+Geometry* Plane::copy(const string_t& _id)
 {
   return Plane::New(_id, getScene(), size, canBeRegenerated(), nullptr, side);
 }

@@ -21,7 +21,7 @@ public:
 private:
   Scene* _scene;
   Effect* _effect;
-  std::string _cachedDefines;
+  string_t _cachedDefines;
 
 }; // end of class OutlineRenderer
 

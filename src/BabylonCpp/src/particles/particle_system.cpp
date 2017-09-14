@@ -17,7 +17,7 @@
 
 namespace BABYLON {
 
-ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
+ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
                                Scene* scene, Effect* customEffect)
     : emitRate{10}
     , manualEmitCount{-1}
@@ -121,7 +121,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
                                                  worldMatrix, positionToUpdate);
   };
 
-  updateFunction = [this](std::vector<Particle*>& _particles) {
+  updateFunction = [this](vector_t<Particle*>& _particles) {
     for (unsigned int pIndex = 0; pIndex < _particles.size(); ++pIndex) {
       auto particle = _particles[pIndex];
       particle->age += static_cast<float>(_scaledUpdateSpeed);
@@ -289,14 +289,14 @@ Effect* ParticleSystem::_getEffect()
     return _customEffect;
   };
 
-  std::vector<std::string> defines;
+  vector_t<string_t> defines;
 
   if (_scene->clipPlane()) {
     defines.emplace_back("#define CLIPPLANE");
   }
 
   // Effect
-  std::string joined = String::join(defines, '\n');
+  string_t joined = String::join(defines, '\n');
   if (_cachedDefines != joined) {
     _cachedDefines = joined;
 
@@ -427,7 +427,7 @@ size_t ParticleSystem::render()
   }
 
   // VBOs
-  std::unordered_map<std::string, VertexBuffer*> vertexBuffersTmp;
+  std::unordered_map<string_t, VertexBuffer*> vertexBuffersTmp;
   for (auto& item : _vertexBuffers) {
     vertexBuffersTmp[item.first] = item.second.get();
   }
@@ -482,12 +482,12 @@ void ParticleSystem::dispose(bool /*doNotRecurse*/)
   onDisposeObservable.clear();
 }
 
-std::vector<Animation*> ParticleSystem::getAnimations()
+vector_t<Animation*> ParticleSystem::getAnimations()
 {
   return animations;
 }
 
-IParticleSystem* ParticleSystem::clone(const std::string& /*iName*/,
+IParticleSystem* ParticleSystem::clone(const string_t& /*iName*/,
                                        Mesh* /*newEmitter*/)
 {
   // ParticleSystem* result = new ParticleSystem(_name, _capacity, _scene);
@@ -517,7 +517,7 @@ Json::object ParticleSystem::serialize() const
 }
 
 ParticleSystem* ParticleSystem::Parse(const Json::value& parsedParticleSystem,
-                                      Scene* scene, const std::string& rootUrl)
+                                      Scene* scene, const string_t& rootUrl)
 {
   auto name           = Json::GetString(parsedParticleSystem, "name");
   auto particleSystem = new ParticleSystem(

@@ -12,22 +12,21 @@ public:
              int toFrame = 100, bool loopAnimation = false,
              float speedRatio                              = 1.f,
              const ::std::function<void()>& onAnimationEnd = nullptr,
-             const std::vector<Animation*>& animations
-             = std::vector<Animation*>());
+             const vector_t<Animation*>& animations = vector_t<Animation*>());
   ~Animatable();
 
   /** Methods **/
-  std::vector<Animation*>& getAnimations();
+  vector_t<Animation*>& getAnimations();
   void appendAnimations(IAnimatable* target,
-                        const std::vector<Animation*>& animations);
-  Animation* getAnimationByTargetProperty(const std::string& property) const;
+                        const vector_t<Animation*>& animations);
+  Animation* getAnimationByTargetProperty(const string_t& property) const;
   void reset();
   void enableBlending(float blendingSpeed);
   void disableBlending();
   void goToFrame(int frame);
   void pause();
   void restart();
-  void stop(const std::string& animationName = "");
+  void stop(const string_t& animationName = "");
   bool _animate(const millisecond_t& delay);
 
 public:
@@ -42,7 +41,7 @@ public:
 private:
   millisecond_t _localDelayOffset;
   millisecond_t _pausedDelay;
-  std::vector<Animation*> _animations;
+  vector_t<Animation*> _animations;
   bool _paused;
   Scene* _scene;
 

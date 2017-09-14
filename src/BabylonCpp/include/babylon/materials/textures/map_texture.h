@@ -10,7 +10,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT MapTexture : public Texture {
 
 public:
-  MapTexture(const std::string& name, Scene* scene, const ISize& size,
+  MapTexture(const string_t& name, Scene* scene, const ISize& size,
              unsigned int samplingMode
              = TextureConstants::TRILINEAR_SAMPLINGMODE,
              bool useMipMap = false, float margin = 0.f);

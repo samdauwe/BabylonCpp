@@ -10,7 +10,7 @@
 
 namespace BABYLON {
 
-Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene,
+Layer::Layer(const string_t& name, const string_t& imgUrl, Scene* scene,
              bool iIsBackground, const Color4& iColor)
     : isBackground{iIsBackground}
     , color{iColor}
@@ -121,7 +121,7 @@ void Layer::render()
   currentEffect->setVector2("scale", scale);
 
   // VBOs
-  std::unordered_map<std::string, VertexBuffer*> vertexBuffersTmp;
+  std::unordered_map<string_t, VertexBuffer*> vertexBuffersTmp;
   for (auto& item : _vertexBuffers) {
     vertexBuffersTmp[item.first] = item.second.get();
   }

@@ -10,7 +10,7 @@
 
 namespace BABYLON {
 
-DirectionalLight::DirectionalLight(const std::string& iName,
+DirectionalLight::DirectionalLight(const string_t& iName,
                                    const Vector3& direction, Scene* scene)
     : ShadowLight{iName, scene}
     , autoUpdateExtends{true}
@@ -68,7 +68,7 @@ void DirectionalLight::setShadowOrthoScale(float value)
 
 void DirectionalLight::_setDefaultShadowProjectionMatrix(
   Matrix& matrix, const Matrix& viewMatrix,
-  const std::vector<AbstractMesh*>& renderList)
+  const vector_t<AbstractMesh*>& renderList)
 {
   if (shadowFrustumSize() > 0) {
     _setDefaultFixedFrustumShadowProjectionMatrix(matrix, viewMatrix);
@@ -90,13 +90,14 @@ void DirectionalLight::_setDefaultFixedFrustumShadowProjectionMatrix(
 
 void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
   Matrix& matrix, const Matrix& viewMatrix,
-  const std::vector<AbstractMesh*>& renderList)
+  const vector_t<AbstractMesh*>& renderList)
 {
   auto activeCamera = getScene()->activeCamera;
 
   // Check extends
-  if (autoUpdateExtends || stl_util::almost_equal(
-                             _orthoLeft, std::numeric_limits<float>::max())) {
+  if (autoUpdateExtends
+      || stl_util::almost_equal(_orthoLeft,
+                                std::numeric_limits<float>::max())) {
     auto tempVector3 = Vector3::Zero();
 
     _orthoLeft   = std::numeric_limits<float>::max();
@@ -160,7 +161,7 @@ void DirectionalLight::_buildUniformLayout()
 }
 
 void DirectionalLight::transferToEffect(Effect* /*effect*/,
-                                        const std::string& lightIndex)
+                                        const string_t& lightIndex)
 {
   if (computeTransformedInformation()) {
     _uniformBuffer->updateFloat4("vLightData", transformedDirection().x,

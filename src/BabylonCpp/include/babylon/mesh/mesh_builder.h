@@ -37,7 +37,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateBox(const std::string& name, BoxOptions& options,
+  static Mesh* CreateBox(const string_t& name, BoxOptions& options,
                          Scene* scene);
 
   /**
@@ -69,7 +69,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateSphere(const std::string& name, SphereOptions& options,
+  static Mesh* CreateSphere(const string_t& name, SphereOptions& options,
                             Scene* scene);
 
   /**
@@ -96,7 +96,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateDisc(const std::string& name, DiscOptions& options,
+  static Mesh* CreateDisc(const string_t& name, DiscOptions& options,
                           Scene* scene);
 
   /**
@@ -128,8 +128,8 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateIcoSphere(const std::string& name,
-                               IcoSphereOptions& options, Scene* scene);
+  static Mesh* CreateIcoSphere(const string_t& name, IcoSphereOptions& options,
+                               Scene* scene);
 
   /**
    * @brief Creates a ribbon mesh.
@@ -180,7 +180,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateRibbon(const std::string& name, RibbonOptions& options,
+  static Mesh* CreateRibbon(const string_t& name, RibbonOptions& options,
                             Scene* scene = nullptr);
 
   /**
@@ -234,7 +234,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateCylinder(const std::string& name, CylinderOptions& options,
+  static Mesh* CreateCylinder(const string_t& name, CylinderOptions& options,
                               Scene* scene);
 
   /**
@@ -259,7 +259,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateTorus(const std::string& name, TorusOptions& options,
+  static Mesh* CreateTorus(const string_t& name, TorusOptions& options,
                            Scene* scene);
 
   /**
@@ -286,8 +286,8 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateTorusKnot(const std::string& name,
-                               TorusKnotOptions& options, Scene* scene);
+  static Mesh* CreateTorusKnot(const string_t& name, TorusKnotOptions& options,
+                               Scene* scene);
 
   /**
    * @brief Creates a line system mesh.
@@ -313,7 +313,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static LinesMesh* CreateLineSystem(const std::string& name,
+  static LinesMesh* CreateLineSystem(const string_t& name,
                                      LineSystemOptions& options, Scene* scene);
 
   /**
@@ -335,7 +335,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static LinesMesh* CreateLines(const std::string& name, LinesOptions& options,
+  static LinesMesh* CreateLines(const string_t& name, LinesOptions& options,
                                 Scene* scene);
 
   /**
@@ -363,7 +363,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static LinesMesh* CreateDashedLines(const std::string& name,
+  static LinesMesh* CreateDashedLines(const string_t& name,
                                       DashedLinesOptions& options,
                                       Scene* scene);
 
@@ -410,8 +410,8 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* ExtrudeShape(const std::string& name,
-                            ExtrudeShapeOptions& options, Scene* scene);
+  static Mesh* ExtrudeShape(const string_t& name, ExtrudeShapeOptions& options,
+                            Scene* scene);
 
   /**
    * @brief Creates an custom extruded shape mesh.
@@ -479,7 +479,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* ExtrudeShapeCustom(const std::string& name,
+  static Mesh* ExtrudeShapeCustom(const string_t& name,
                                   ExtrudeShapeCustomOptions& options,
                                   Scene* scene);
 
@@ -521,7 +521,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateLathe(const std::string& name, LatheOptions& options,
+  static Mesh* CreateLathe(const string_t& name, LatheOptions& options,
                            Scene* scene);
 
   /**
@@ -546,7 +546,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreatePlane(const std::string& name, PlaneOptions& options,
+  static Mesh* CreatePlane(const string_t& name, PlaneOptions& options,
                            Scene* scene);
 
   /**
@@ -561,7 +561,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateGround(const std::string& name, GroundOptions& options,
+  static Mesh* CreateGround(const string_t& name, GroundOptions& options,
                             Scene* scene);
 
   /**
@@ -583,7 +583,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateTiledGround(const std::string& name,
+  static Mesh* CreateTiledGround(const string_t& name,
                                  TiledGroundOptions& options, Scene* scene);
 
   /**
@@ -615,7 +615,7 @@ public:
    * created.
    */
   static GroundMesh*
-  CreateGroundFromHeightMap(const std::string& name, const std::string& url,
+  CreateGroundFromHeightMap(const string_t& name, const string_t& url,
                             GroundFromHeightMapOptions& options, Scene* scene);
 
   /**
@@ -637,7 +637,7 @@ public:
    * Remember you can only change the shape positions, not their number when
    * updating a polygon.
    */
-  static Mesh* CreatePolygon(const std::string& name, PolygonOptions& options,
+  static Mesh* CreatePolygon(const string_t& name, PolygonOptions& options,
                              Scene* scene);
 
   /**
@@ -648,7 +648,7 @@ public:
    * Please read this tutorial :
    * http://doc.babylonjs.com/tutorials/CreateBox_Per_Face_Textures_And_Colors
    */
-  static Mesh* ExtrudePolygon(const std::string& name, PolygonOptions& options,
+  static Mesh* ExtrudePolygon(const string_t& name, PolygonOptions& options,
                               Scene* scene);
 
   /**
@@ -699,7 +699,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateTube(const std::string& name, TubeOptions& options,
+  static Mesh* CreateTube(const string_t& name, TubeOptions& options,
                           Scene* scene = nullptr);
 
   /**
@@ -742,7 +742,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreatePolyhedron(const std::string& name,
+  static Mesh* CreatePolyhedron(const string_t& name,
                                 PolyhedronOptions& options, Scene* scene);
   /**
    * @brief Creates a decal mesh.
@@ -758,12 +758,12 @@ public:
    * The parameter `angle` (float in radian, default 0) sets the angle to rotate
    * the decal.
    */
-  static Mesh* CreateDecal(const std::string& name, AbstractMesh* sourceMesh,
+  static Mesh* CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
                            DecalOptions& options);
 
   static Mesh* _ExtrudeShapeGeneric(
-    const std::string& name, const std::vector<Vector3>& shape,
-    const std::vector<Vector3>& curve, float scale, float rotation,
+    const string_t& name, const vector_t<Vector3>& shape,
+    const vector_t<Vector3>& curve, float scale, float rotation,
     const ::std::function<float(float i, float distance)>& scaleFunction,
     const ::std::function<float(float i, float distance)>& rotateFunction,
     bool rbCA, bool rbCP, unsigned int cap, bool custom, Scene* scene,

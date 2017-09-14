@@ -14,18 +14,18 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT DecimationTriangle {
 
 public:
-  DecimationTriangle(const std::vector<DecimationVertex>& vertices);
+  DecimationTriangle(const vector_t<DecimationVertex>& vertices);
   ~DecimationTriangle();
 
 public:
   Vector3 normal;
-  std::array<int, 4> error;
+  array_t<int, 4> error;
   bool deleted;
   bool isDirty;
   float borderFactor;
   bool deletePending;
   float originalOffset;
-  std::vector<DecimationVertex> vertices;
+  vector_t<DecimationVertex> vertices;
 
 }; // end of class DecimationTriangle
 

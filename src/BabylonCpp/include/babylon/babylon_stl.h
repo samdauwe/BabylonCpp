@@ -120,6 +120,9 @@ using Float64Array = std::vector<std::double_t>;
 using IndicesArray = std::vector<std::uint32_t>;
 
 // -- Containers library -- //
+template <class T, ::std::size_t N>
+using array_t = ::std::array<T, N>;
+
 template <class T, class Allocator = ::std::allocator<T>>
 using vector_t = ::std::vector<T, Allocator>;
 

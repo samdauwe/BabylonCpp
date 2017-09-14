@@ -9,15 +9,15 @@
 namespace BABYLON {
 
 PostProcessRenderPipeline::PostProcessRenderPipeline(Engine* engine,
-                                                     const std::string& name)
+                                                     const string_t& name)
 
     : _name{name}, _engine{engine}
 {
 }
 
-std::vector<Camera*> PostProcessRenderPipeline::getCameras() const
+vector_t<Camera*> PostProcessRenderPipeline::getCameras() const
 {
-  std::vector<Camera*> cameras;
+  vector_t<Camera*> cameras;
   cameras.reserve(_cameras.size());
   for (auto& item : _cameras) {
     cameras.emplace_back(item.second);
@@ -49,8 +49,8 @@ void PostProcessRenderPipeline::addEffect(PostProcessRenderEffect* renderEffect)
   _renderEffects[renderEffect->_name] = renderEffect;
 }
 
-void PostProcessRenderPipeline::_enableEffect(
-  const std::string& renderEffectName, const std::vector<Camera*>& cameras)
+void PostProcessRenderPipeline::_enableEffect(const string_t& renderEffectName,
+                                              const vector_t<Camera*>& cameras)
 {
   auto& renderEffects = _renderEffects[renderEffectName];
 
@@ -62,8 +62,8 @@ void PostProcessRenderPipeline::_enableEffect(
   renderEffects->_enable(_cam);
 }
 
-void PostProcessRenderPipeline::_disableEffect(
-  const std::string& renderEffectName, const std::vector<Camera*>& cameras)
+void PostProcessRenderPipeline::_disableEffect(const string_t& renderEffectName,
+                                               const vector_t<Camera*>& cameras)
 {
   if (!stl_util::contains(_renderEffects, renderEffectName)) {
     return;
@@ -73,12 +73,12 @@ void PostProcessRenderPipeline::_disableEffect(
   _renderEffects[renderEffectName]->_disable(_cam);
 }
 
-void PostProcessRenderPipeline::_attachCameras(
-  const std::vector<Camera*>& cameras, bool unique)
+void PostProcessRenderPipeline::_attachCameras(const vector_t<Camera*>& cameras,
+                                               bool unique)
 {
   auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
-  std::vector<Camera*> camerasToDelete;
+  vector_t<Camera*> camerasToDelete;
   for (auto& camera : _cam) {
     const auto& cameraName = camera->name;
 
@@ -101,8 +101,7 @@ void PostProcessRenderPipeline::_attachCameras(
   }
 }
 
-void PostProcessRenderPipeline::_detachCameras(
-  const std::vector<Camera*>& cameras)
+void PostProcessRenderPipeline::_detachCameras(const vector_t<Camera*>& cameras)
 {
   auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
@@ -118,7 +117,7 @@ void PostProcessRenderPipeline::_detachCameras(
 }
 
 void PostProcessRenderPipeline::_enableDisplayOnlyPass(
-  const std::string& passName, const std::vector<Camera*>& cameras)
+  const string_t& passName, const vector_t<Camera*>& cameras)
 {
   auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
@@ -139,7 +138,7 @@ void PostProcessRenderPipeline::_enableDisplayOnlyPass(
     renderEffect.second->_disable(_cam);
   }
 
-  pass->_name = std::string(PostProcessRenderPipeline::PASS_SAMPLER_NAME);
+  pass->_name = string_t(PostProcessRenderPipeline::PASS_SAMPLER_NAME);
 
   for (auto& camera : _cam) {
     const auto& cameraName = camera->name;
@@ -158,7 +157,7 @@ void PostProcessRenderPipeline::_enableDisplayOnlyPass(
 }
 
 void PostProcessRenderPipeline::_disableDisplayOnlyPass(
-  const std::string& /*passName*/, const std::vector<Camera*>& cameras)
+  const string_t& /*passName*/, const vector_t<Camera*>& cameras)
 {
   auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 

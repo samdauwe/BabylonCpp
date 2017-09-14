@@ -10,11 +10,11 @@ class BABYLON_SHARED_EXPORT MaterialHelper {
 public:
   static void
   PrepareDefinesForMergedUV(BaseTexture* texture, MaterialDefines& defines,
-                            unsigned int key, const std::string& keyString,
+                            unsigned int key, const string_t& keyString,
                             unsigned int MAINUV1, unsigned int MAINUV2);
   static void BindTextureMatrix(BaseTexture& texture,
                                 UniformBuffer& uniformBuffer,
-                                const std::string& key);
+                                const string_t& key);
   static void PrepareDefinesForMisc(AbstractMesh* mesh, Scene* scene,
                                     bool useLogarithmicDepth, bool pointsCloud,
                                     bool fogEnabled, MaterialDefines& defines,
@@ -33,24 +33,24 @@ public:
     Scene* scene, AbstractMesh* mesh, MaterialDefines& defines,
     bool specularSupported, unsigned int maxSimultaneousLights,
     bool disableLighting, unsigned int SPECULARTERM, unsigned int SHADOWFLOAT);
-  static void
-  PrepareUniformsAndSamplersList(std::vector<std::string>& uniformsList,
-                                 std::vector<std::string>& samplersList,
-                                 MaterialDefines& defines,
-                                 unsigned int maxSimultaneousLights = 4);
+  static void PrepareUniformsAndSamplersList(vector_t<string_t>& uniformsList,
+                                             vector_t<string_t>& samplersList,
+                                             MaterialDefines& defines,
+                                             unsigned int maxSimultaneousLights
+                                             = 4);
   static void PrepareUniformsAndSamplersList(EffectCreationOptions& options);
   static void HandleFallbacksForShadows(MaterialDefines& defines,
                                         EffectFallbacks& fallbacks,
                                         unsigned int maxSimultaneousLights);
-  static void
-  PrepareAttributesForMorphTargets(std::vector<std::string>& attribs,
-                                   AbstractMesh* mesh, MaterialDefines& defines,
-                                   unsigned int NORMAL);
-  static void PrepareAttributesForBones(std::vector<std::string>& attribs,
+  static void PrepareAttributesForMorphTargets(vector_t<string_t>& attribs,
+                                               AbstractMesh* mesh,
+                                               MaterialDefines& defines,
+                                               unsigned int NORMAL);
+  static void PrepareAttributesForBones(vector_t<string_t>& attribs,
                                         AbstractMesh* mesh,
                                         MaterialDefines& defines,
                                         EffectFallbacks& fallbacks);
-  static void PrepareAttributesForInstances(std::vector<std::string>& attribs,
+  static void PrepareAttributesForInstances(vector_t<string_t>& attribs,
                                             MaterialDefines& defines,
                                             unsigned int INSTANCES);
 

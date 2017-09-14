@@ -9,15 +9,15 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT ISceneLoaderPluginAsync {
   ISceneLoaderPluginExtensions extensions; // Extension name, isBinary
   virtual bool importMeshAsync(
-    const std::vector<std::string>& meshesNames, Scene* scene,
-    const std::string& data, const std::string& rootUrl,
-    const ::std::function<void(std::vector<AbstractMesh*>& meshes,
-                               std::vector<ParticleSystem*>& particleSystems,
-                               std::vector<Skeleton*>& skeletons)>& onSuccess,
+    const vector_t<string_t>& meshesNames, Scene* scene, const string_t& data,
+    const string_t& rootUrl,
+    const ::std::function<void(vector_t<AbstractMesh*>& meshes,
+                               vector_t<ParticleSystem*>& particleSystems,
+                               vector_t<Skeleton*>& skeletons)>& onSuccess,
     const ::std::function<void()>& onError)
     = 0;
-  virtual bool loadAsync(Scene* scene, const std::string& data,
-                         const std::string& rootUrl,
+  virtual bool loadAsync(Scene* scene, const string_t& data,
+                         const string_t& rootUrl,
                          const ::std::function<void()>& onsuccess,
                          const ::std::function<void()>& onerror)
     = 0;

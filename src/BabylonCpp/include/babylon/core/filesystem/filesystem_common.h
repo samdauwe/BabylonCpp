@@ -12,10 +12,10 @@ namespace Filesystem {
  * @return The extension of the file or an empty string when the filename has no
  * extension.
  */
-inline std::string extension(const std::string& filename)
+inline string_t extension(const string_t& filename)
 {
   auto pos = filename.find_last_of(".");
-  if (pos == std::string::npos) {
+  if (pos == string_t::npos) {
     return "";
   }
   return filename.substr(pos + 1);
@@ -26,10 +26,10 @@ inline std::string extension(const std::string& filename)
  * @param filepath The file path.
  * @return The base directory of a file of subdirectory.
  */
-inline std::string baseDir(const std::string& filepath)
+inline string_t baseDir(const string_t& filepath)
 {
   auto pos = filepath.find_last_of("/\\");
-  if (pos != std::string::npos) {
+  if (pos != string_t::npos) {
     return filepath.substr(0, pos);
   }
   return "";
@@ -40,10 +40,10 @@ inline std::string baseDir(const std::string& filepath)
  * @param filepath The file path.
  * @return The filename of a path.
  */
-inline std::string baseName(const std::string& filepath)
+inline string_t baseName(const string_t& filepath)
 {
   auto pos = filepath.find_last_of("/\\");
-  if (pos != std::string::npos) {
+  if (pos != string_t::npos) {
     return filepath.substr(pos + 1);
   }
   return "";
@@ -67,7 +67,7 @@ inline T joinPath(const T& path0, const T& path1)
     char lastChar0  = *path0.rbegin();
     char firstChar1 = path1.empty() ? '\0' : *path1.cbegin();
     if ((lastChar0 != '/') && (firstChar1 != '/')) {
-      return path0 + std::string("/") + path1;
+      return path0 + string_t("/") + path1;
     }
     else {
       return path0 + path1;
@@ -87,9 +87,9 @@ inline T joinPath(const T& path0, const T& path1, Args... args)
  * @return The contents of the file or an empty string in case the content could
  * not be read.
  */
-inline std::string readFileContents(const char* filename)
+inline string_t readFileContents(const char* filename)
 {
-  std::string contents;
+  string_t contents;
   ::std::ifstream in(filename, ::std::ios::in | ::std::ios::binary);
   if (in) {
     in.seekg(0, ::std::ios::end);
@@ -107,12 +107,12 @@ inline std::string readFileContents(const char* filename)
  * @return The contents of the file or an empty vector in case the content could
  * not be read.
  */
-inline std::vector<std::string> readFileLines(const char* filename)
+inline vector_t<string_t> readFileLines(const char* filename)
 {
-  std::vector<std::string> lines;
+  vector_t<string_t> lines;
   ::std::ifstream in(filename, ::std::ios::in | ::std::ios::binary);
   if (in) {
-    for (std::string line; ::std::getline(in, line);) {
+    for (string_t line; ::std::getline(in, line);) {
       lines.emplace_back(line);
     }
   }
@@ -124,10 +124,10 @@ inline std::vector<std::string> readFileLines(const char* filename)
  * @param filename. The filename.
  * @return The filename with the extension removes.
  */
-inline std::string removeExtension(const std::string& filename)
+inline string_t removeExtension(const string_t& filename)
 {
   auto p = filename.find_last_of('.');
-  return p > 0 && p != std::string::npos ? filename.substr(0, p) : filename;
+  return p > 0 && p != string_t::npos ? filename.substr(0, p) : filename;
 }
 
 /**
@@ -135,9 +135,9 @@ inline std::string removeExtension(const std::string& filename)
  * @param path The path to standardize.
  * @return The standardized path.
  */
-inline std::string standardizePath(const std::string& path)
+inline string_t standardizePath(const string_t& path)
 {
-  std::string _path = path;
+  string_t _path = path;
   ::std::replace(_path.begin(), _path.end(), '\\', '/');
   if (_path.back() != '/') {
     _path += '/';
@@ -152,7 +152,7 @@ inline std::string standardizePath(const std::string& path)
  * @param contents The contents to write to the file.
  * @return Whether or not the content was written to the file.
  */
-inline bool writeFileContents(const char* filename, const std::string& contents)
+inline bool writeFileContents(const char* filename, const string_t& contents)
 {
   bool writtentoFile = false;
   ::std::ofstream out(filename, ::std::ios::out);
@@ -171,7 +171,7 @@ inline bool writeFileContents(const char* filename, const std::string& contents)
  * @return Whether or not the content was written to the file.
  */
 inline bool writeFileLines(const char* filename,
-                           const std::vector<std::string>& lines)
+                           const vector_t<string_t>& lines)
 {
   bool writtentoFile = false;
   ::std::ofstream out(filename, ::std::ios::out);

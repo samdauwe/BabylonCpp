@@ -19,8 +19,8 @@ namespace BABYLON {
 unsigned int StandardRenderingPipeline::LuminanceSteps = 6;
 
 StandardRenderingPipeline::StandardRenderingPipeline(
-  const std::string& iName, Scene* scene, float ratio,
-  PostProcess* iOriginalPostProcess, const std::vector<Camera*>& cameras)
+  const string_t& iName, Scene* scene, float ratio,
+  PostProcess* iOriginalPostProcess, const vector_t<Camera*>& cameras)
     : PostProcessRenderPipeline{scene->getEngine(), iName}
     , originalPostProcess{nullptr}
     , downSampleX4PostProcess{nullptr}
@@ -178,7 +178,7 @@ void StandardRenderingPipeline::setBloomEnabled(bool enabled)
       _name, "HDRBrightPass", cameras);
 
     for (std::size_t i = 0; i < gaussianBlurHPostProcesses.size() - 1; ++i) {
-      const std::string istr = ::std::to_string(i);
+      const string_t istr = ::std::to_string(i);
       _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
         _name, "HDRGaussianBlurH" + istr, cameras);
       _scene->postProcessRenderPipelineManager()->enableEffectInPipeline(
@@ -195,7 +195,7 @@ void StandardRenderingPipeline::setBloomEnabled(bool enabled)
       _name, "HDRBrightPass", cameras);
 
     for (std::size_t i = 0; i < gaussianBlurHPostProcesses.size() - 1; ++i) {
-      const std::string istr = ::std::to_string(i);
+      const string_t istr = ::std::to_string(i);
       _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
         _name, "HDRGaussianBlurH" + istr, cameras);
       _scene->postProcessRenderPipelineManager()->disableEffectInPipeline(
@@ -419,7 +419,7 @@ void StandardRenderingPipeline::_createBrightPassPostProcess(Scene* scene,
 void StandardRenderingPipeline::_createGaussianBlurPostProcesses(
   Scene* scene, float ratio, unsigned int indice)
 {
-  std::vector<std::string> uniforms{"blurOffsets", "blurWeights", "blurWidth"};
+  vector_t<string_t> uniforms{"blurOffsets", "blurWeights", "blurWidth"};
 
   auto callback = [&](bool height) {
     return [&](Effect& effect) {
@@ -543,10 +543,10 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
 
   // Create down sample luminance
   for (unsigned int i = StandardRenderingPipeline::LuminanceSteps; i-- > 0;) {
-    const std::string iStr = ::std::to_string(i);
-    float size             = static_cast<float>(::std::pow(3, i));
+    const string_t iStr = ::std::to_string(i);
+    float size          = static_cast<float>(::std::pow(3, i));
 
-    std::string defines = "#define LUMINANCE_DOWN_SAMPLE\n";
+    string_t defines = "#define LUMINANCE_DOWN_SAMPLE\n";
     if (i == 0) {
       defines += "#define FINAL_DOWN_SAMPLER";
     }
@@ -564,7 +564,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
 
   std::size_t index = 0;
   for (auto& pp : luminanceDownSamplePostProcesses) {
-    const std::string indexStr = ::std::to_string(index);
+    const string_t indexStr = ::std::to_string(index);
     Float32Array downSampleOffsets(18);
 
     pp->setOnApply([&](Effect* effect) {

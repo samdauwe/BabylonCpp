@@ -35,7 +35,7 @@ public:
   Plane clone() const;
   Plane* cloneToNewObject() const;
   friend std::ostream& operator<<(std::ostream& os, const Plane& plane);
-  std::string toString() const;
+  string_t toString() const;
 
   void flip();
 
@@ -46,9 +46,9 @@ public:
    * `respect to this plane. Polygons in front or in back of this plane go into
    * `either `front` or `back`.
    */
-  void splitPolygon(Polygon* polygon, std::vector<Polygon*>& coplanarFront,
-                    std::vector<Polygon*>& coplanarBack,
-                    std::vector<Polygon*>& front, std::vector<Polygon*>& back);
+  void splitPolygon(Polygon* polygon, vector_t<Polygon*>& coplanarFront,
+                    vector_t<Polygon*>& coplanarBack, vector_t<Polygon*>& front,
+                    vector_t<Polygon*>& back);
 
   static Plane FromPoints(const Vector3& a, const Vector3& b, const Vector3& c,
                           bool& hasPlane);

@@ -17,7 +17,7 @@
 
 namespace BABYLON {
 
-Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData,
+Geometry::Geometry(const string_t& iId, Scene* scene, VertexData* vertexData,
                    bool updatable, Mesh* mesh)
     : id{iId}
     , delayLoadState{EngineConstants::DELAYLOADSTATE_NONE}
@@ -313,16 +313,16 @@ VertexBuffer* Geometry::getVertexBuffer(unsigned int kind) const
   }
 }
 
-std::unordered_map<std::string, VertexBuffer*> Geometry::getVertexBuffers()
+std::unordered_map<string_t, VertexBuffer*> Geometry::getVertexBuffers()
 {
   if (!isReady()) {
-    return std::unordered_map<std::string, VertexBuffer*>();
+    return std::unordered_map<string_t, VertexBuffer*>();
   }
 
-  std::unordered_map<std::string, VertexBuffer*> vertexBuffers;
+  std::unordered_map<string_t, VertexBuffer*> vertexBuffers;
   for (const auto& item : _vertexBuffers) {
-    const std::string kind = VertexBuffer::KindAsString(item.first);
-    vertexBuffers[kind]    = item.second.get();
+    const string_t kind = VertexBuffer::KindAsString(item.first);
+    vertexBuffers[kind] = item.second.get();
   }
 
   return vertexBuffers;
@@ -666,7 +666,7 @@ void Geometry::dispose(bool /*doNotRecurse*/)
   _isDisposed = true;
 }
 
-Geometry* Geometry::copy(const std::string& iId)
+Geometry* Geometry::copy(const string_t& iId)
 {
   auto vertexData = ::std::make_unique<VertexData>();
 
@@ -716,7 +716,7 @@ Json::object Geometry::serializeVerticeData() const
   return Json::object();
 }
 
-Geometry* Geometry::ExtractFromMesh(Mesh* mesh, const std::string& id)
+Geometry* Geometry::ExtractFromMesh(Mesh* mesh, const string_t& id)
 {
   auto geometry = mesh->geometry();
 
@@ -727,7 +727,7 @@ Geometry* Geometry::ExtractFromMesh(Mesh* mesh, const std::string& id)
   return geometry->copy(id);
 }
 
-std::string Geometry::RandomId()
+string_t Geometry::RandomId()
 {
   return Tools::RandomId();
 }
@@ -737,8 +737,8 @@ void Geometry::ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh)
   auto scene = mesh->getScene();
 
   if (parsedGeometry.contains("geometryId")) {
-    std::string geometryId = Json::GetString(parsedGeometry, "geometryId", "");
-    Geometry* geometry     = scene->getGeometryByID(geometryId);
+    string_t geometryId = Json::GetString(parsedGeometry, "geometryId", "");
+    Geometry* geometry  = scene->getGeometryByID(geometryId);
     if (geometry) {
       geometry->applyToMesh(mesh);
     }
@@ -876,7 +876,7 @@ void Geometry::_CleanMatricesWeights(Float32Array& matricesWeights,
 }
 
 Geometry* Geometry::Parse(const Json::value& parsedVertexData, Scene* scene,
-                          const std::string& rootUrl)
+                          const string_t& rootUrl)
 {
   const auto parsedVertexDataId = Json::GetString(parsedVertexData, "id");
   if (parsedVertexDataId.empty()

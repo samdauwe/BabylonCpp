@@ -47,21 +47,21 @@ public:
   void setTarget(const Vector3& target, bool toBoundingCenter = false,
                  bool allowSamePosition = false);
   Matrix _getViewMatrix() override;
-  void zoomOn(const std::vector<AbstractMesh*> meshes,
+  void zoomOn(const vector_t<AbstractMesh*> meshes,
               bool doNotUpdateMaxZ = false);
   void focusOn(const MinMaxDistance& meshesOrMinMaxVectorAndDistance,
                bool doNotUpdateMaxZ = false);
-  Camera* createRigCamera(const std::string& name, int cameraIndex) override;
+  Camera* createRigCamera(const string_t& name, int cameraIndex) override;
   void _updateRigCameras() override;
   void dispose(bool doNotRecurse = false) override;
   const char* getClassName() const override;
   Json::object serialize() const override;
 
 protected:
-  ArcRotateCamera(const std::string& name, float alpha, float beta,
-                  float radius, Scene* scene);
-  ArcRotateCamera(const std::string& name, float alpha, float beta,
-                  float radius, const Vector3& target, Scene* scene);
+  ArcRotateCamera(const string_t& name, float alpha, float beta, float radius,
+                  Scene* scene);
+  ArcRotateCamera(const string_t& name, float alpha, float beta, float radius,
+                  const Vector3& target, Scene* scene);
 
   Vector3 _getTargetPosition();
   void _checkLimits();

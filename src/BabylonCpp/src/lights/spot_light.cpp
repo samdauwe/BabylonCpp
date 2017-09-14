@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-SpotLight::SpotLight(const std::string& iName, const Vector3& iPosition,
+SpotLight::SpotLight(const string_t& iName, const Vector3& iPosition,
                      const Vector3& direction, float iAngle, float iExponent,
                      Scene* scene)
     : ShadowLight{iName, scene}, exponent{iExponent}
@@ -60,7 +60,7 @@ void SpotLight::setShadowAngleScale(float value)
 
 void SpotLight::_setDefaultShadowProjectionMatrix(
   Matrix& matrix, const Matrix& /*viewMatrix*/,
-  const std::vector<AbstractMesh*>& /*renderList*/)
+  const vector_t<AbstractMesh*>& /*renderList*/)
 {
   auto activeCamera = getScene()->activeCamera;
 
@@ -82,8 +82,7 @@ void SpotLight::_buildUniformLayout()
   _uniformBuffer->create();
 }
 
-void SpotLight::transferToEffect(Effect* /*effect*/,
-                                 const std::string& lightIndex)
+void SpotLight::transferToEffect(Effect* /*effect*/, const string_t& lightIndex)
 {
   auto normalizeDirection = Vector3::Zero();
 

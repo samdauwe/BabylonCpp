@@ -9,10 +9,10 @@ struct BABYLON_SHARED_EXPORT PhysicsImpostorParameters {
   float mass        = 0.f;
   float friction    = 0.2f;
   float restitution = 0.2f;
-  std::unordered_map<std::string, float> nativeOptions;
-  bool contains(const std::string& key) const;
-  float operator[](const std::string& key) const;
-  void setValue(const std::string& key, float value);
+  std::unordered_map<string_t, float> nativeOptions;
+  bool contains(const string_t& key) const;
+  float operator[](const string_t& key) const;
+  void setValue(const string_t& key, float value);
 }; // end of struct PhysicsImpostorParameters
 
 } // end of namespace BABYLON

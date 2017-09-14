@@ -8,11 +8,15 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT Sound {
 
 public:
-    void play(){}
-    void stop(){}
+  void play()
+  {
+  }
+  void stop()
+  {
+  }
 
 public:
-    std::string name;
+  string_t name;
 
 }; // end of class Sound
 

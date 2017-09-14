@@ -4,7 +4,7 @@
 
 namespace BABYLON {
 
-IShadowLight::IShadowLight(const std::string& iName, Scene* scene)
+IShadowLight::IShadowLight(const string_t& iName, Scene* scene)
     : Light{iName, scene}
 {
 }

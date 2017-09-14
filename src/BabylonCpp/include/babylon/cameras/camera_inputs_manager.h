@@ -15,7 +15,7 @@ public:
 
   void add(std::unique_ptr<ICameraInput<TCamera>>&& input);
   void remove(ICameraInput<TCamera>* inputToRemove);
-  void removeByType(const std::string& inputType);
+  void removeByType(const string_t& inputType);
   ::std::function<void()> _addCheckInputs(const ::std::function<void()>& fn);
   void attachInput(ICameraInput<TCamera>* input);
   void attachElement(ICanvas* canvas, bool _noPreventDefault);
@@ -32,8 +32,7 @@ public:
   ::std::function<void()> checkInputs;
 
 private:
-  std::unordered_map<std::string, std::unique_ptr<ICameraInput<TCamera>>>
-    attached;
+  std::unordered_map<string_t, std::unique_ptr<ICameraInput<TCamera>>> attached;
 
 }; // end of class CameraInputsManager<TCamera>
 

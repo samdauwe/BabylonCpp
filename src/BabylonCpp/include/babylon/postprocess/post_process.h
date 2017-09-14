@@ -19,28 +19,27 @@ class BABYLON_SHARED_EXPORT PostProcess {
 
 public:
   PostProcess(
-    const std::string& name, const std::string& fragmentUrl,
-    const std::vector<std::string>& parameters,
-    const std::vector<std::string>& samplers, float renderRatio, Camera* camera,
+    const string_t& name, const string_t& fragmentUrl,
+    const vector_t<string_t>& parameters, const vector_t<string_t>& samplers,
+    float renderRatio, Camera* camera,
     unsigned int samplingMode = TextureConstants::NEAREST_SAMPLINGMODE,
     Engine* engine = nullptr, bool reusable = false,
-    const std::string& defines   = "",
-    unsigned int textureType     = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
-    const std::string& vertexUrl = "postprocess",
-    const std::unordered_map<std::string, unsigned int>& indexParameters = {},
-    bool blockCompilation = false);
+    const string_t& defines   = "",
+    unsigned int textureType  = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+    const string_t& vertexUrl = "postprocess",
+    const std::unordered_map<string_t, unsigned int>& indexParameters = {},
+    bool blockCompilation                                             = false);
   PostProcess(
-    const std::string& name, const std::string& fragmentUrl,
-    const std::vector<std::string>& parameters,
-    const std::vector<std::string>& samplers, const PostProcessOptions& options,
-    Camera* camera,
+    const string_t& name, const string_t& fragmentUrl,
+    const vector_t<string_t>& parameters, const vector_t<string_t>& samplers,
+    const PostProcessOptions& options, Camera* camera,
     unsigned int samplingMode = TextureConstants::NEAREST_SAMPLINGMODE,
     Engine* engine = nullptr, bool reusable = false,
-    const std::string& defines   = "",
-    unsigned int textureType     = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
-    const std::string& vertexUrl = "postprocess",
-    const std::unordered_map<std::string, unsigned int>& indexParameters = {},
-    bool blockCompilation = false);
+    const string_t& defines   = "",
+    unsigned int textureType  = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+    const string_t& vertexUrl = "postprocess",
+    const std::unordered_map<string_t, unsigned int>& indexParameters = {},
+    bool blockCompilation                                             = false);
   virtual ~PostProcess();
 
   // Events
@@ -59,13 +58,11 @@ public:
   Effect* getEffect();
   PostProcess& shareOutputWith(PostProcess* postProcess);
   void updateEffect(
-    const std::string& defines                                           = "",
-    const std::vector<std::string>& uniforms                             = {},
-    const std::vector<std::string>& samplers                             = {},
-    const std::unordered_map<std::string, unsigned int>& indexParameters = {},
-    const ::std::function<void(Effect* effect)>& onCompiled = nullptr,
-    const ::std::function<void(Effect* effect, const std::string& errors)>&
-      onError
+    const string_t& defines = "", const vector_t<string_t>& uniforms = {},
+    const vector_t<string_t>& samplers                                = {},
+    const std::unordered_map<string_t, unsigned int>& indexParameters = {},
+    const ::std::function<void(Effect* effect)>& onCompiled           = nullptr,
+    const ::std::function<void(Effect* effect, const string_t& errors)>& onError
     = nullptr);
   bool isReusable() const;
   /**
@@ -81,7 +78,7 @@ public:
   virtual void dispose(Camera* camera = nullptr);
 
 public:
-  std::string name;
+  string_t name;
   int width;
   int height;
   unsigned int renderTargetSamplingMode;
@@ -95,7 +92,7 @@ public:
   unsigned int scaleMode;
   bool alwaysForcePOT;
   unsigned int samples;
-  std::vector<InternalTexture*> _textures;
+  vector_t<InternalTexture*> _textures;
   unsigned int _currentRenderTextureInd;
   // Events
   /**
@@ -120,7 +117,7 @@ public:
   Observable<Effect> onAfterRenderObservable;
 
 protected:
-  std::unordered_map<std::string, unsigned int> _indexParameters;
+  std::unordered_map<string_t, unsigned int> _indexParameters;
 
 private:
   Camera* _camera;
@@ -131,10 +128,10 @@ private:
   bool _reusable;
   unsigned int _textureType;
   Effect* _effect;
-  std::vector<std::string> _samplers;
-  std::string _fragmentUrl;
-  std::string _vertexUrl;
-  std::vector<std::string> _parameters;
+  vector_t<string_t> _samplers;
+  string_t _fragmentUrl;
+  string_t _vertexUrl;
+  vector_t<string_t> _parameters;
   Vector2 _scaleRatio;
   PostProcess* _shareOutputWithPostProcess;
   Vector2 _texelSize;

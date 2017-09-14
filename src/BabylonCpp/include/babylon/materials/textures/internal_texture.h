@@ -10,7 +10,7 @@ namespace GL {
 class IGLFramebuffer;
 class IGLRenderbuffer;
 class IGLTexture;
-}
+} // namespace GL
 
 class BABYLON_SHARED_EXPORT InternalTexture {
 
@@ -27,9 +27,8 @@ public:
   static constexpr unsigned int DATASOURCE_CUBERAW           = 9;
 
 public:
-  InternalTexture(Engine* engine,
-                  unsigned int dataSource
-                  = InternalTexture::DATASOURCE_UNKNOWN);
+  InternalTexture(Engine* engine, unsigned int dataSource
+                                  = InternalTexture::DATASOURCE_UNKNOWN);
   ~InternalTexture();
 
   unsigned int dataSource() const;
@@ -41,7 +40,7 @@ public:
 public:
   bool isReady;
   bool isCube;
-  std::string url;
+  string_t url;
   unsigned int samplingMode;
   bool generateMipMaps;
   unsigned int samples;

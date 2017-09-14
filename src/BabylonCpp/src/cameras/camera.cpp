@@ -22,7 +22,7 @@ namespace BABYLON {
 
 bool Camera::ForceAttachControlToAlwaysPreventDefault = false;
 
-Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene)
+Camera::Camera(const string_t& iName, const Vector3& iPosition, Scene* scene)
     : Node(iName, scene)
     , position{iPosition}
     , upVector{Vector3::Up()}
@@ -70,7 +70,7 @@ void Camera::addToScene(std::unique_ptr<Camera>&& newCamera)
   getScene()->addCamera(::std::move(newCamera));
 }
 
-std::string Camera::toString(bool fullDetails) const
+string_t Camera::toString(bool fullDetails) const
 {
   std::ostringstream oss;
   oss << "Name: " << name;
@@ -91,7 +91,7 @@ Vector3& Camera::globalPosition()
   return _globalPosition;
 }
 
-std::vector<Mesh*>& Camera::getActiveMeshes()
+vector_t<Mesh*>& Camera::getActiveMeshes()
 {
   return _activeMeshes;
 }
@@ -229,12 +229,12 @@ void Camera::_checkInputs()
 {
 }
 
-std::vector<Camera*>& Camera::rigCameras()
+vector_t<Camera*>& Camera::rigCameras()
 {
   return _rigCameras;
 }
 
-const std::vector<Camera*>& Camera::rigCameras() const
+const vector_t<Camera*>& Camera::rigCameras() const
 {
   return _rigCameras;
 }
@@ -567,7 +567,7 @@ Vector3* Camera::getRightTarget()
   return &static_cast<TargetCamera*>(_rigCameras[1])->getTarget();
 }
 
-void Camera::setCameraRigMode(int /*iMode*/, const std::string& /*rigParams*/)
+void Camera::setCameraRigMode(int /*iMode*/, const string_t& /*rigParams*/)
 {
 }
 
@@ -611,7 +611,7 @@ Matrix& Camera::_getWebVRViewMatrix()
   return _webvrViewMatrix;
 }
 
-void Camera::setCameraRigParameter(const std::string& _name, float value)
+void Camera::setCameraRigParameter(const string_t& _name, float value)
 {
   _cameraRigParams.params[_name] = value;
   // provisionnally:
@@ -624,8 +624,7 @@ void Camera::setCameraRigParameter(const std::string& _name, float value)
  * May needs to be overridden by children so sub has required properties
  * to be copied
  */
-Camera* Camera::createRigCamera(const std::string& /*name*/,
-                                int /*cameraIndex*/)
+Camera* Camera::createRigCamera(const string_t& /*name*/, int /*cameraIndex*/)
 {
   return nullptr;
 }
@@ -661,7 +660,7 @@ const char* Camera::getClassName() const
   return "Camera";
 }
 
-Camera* Camera::clone(const std::string& /*name*/)
+Camera* Camera::clone(const string_t& /*name*/)
 {
   return nullptr;
 }
@@ -680,8 +679,8 @@ void Camera::getDirectionToRef(const Vector3& localAxis, Vector3& result)
   Vector3::TransformNormalToRef(localAxis, *getWorldMatrix(), result);
 }
 
-Camera* Camera::GetConstructorFromName(const std::string& type,
-                                       const std::string& name, Scene* scene,
+Camera* Camera::GetConstructorFromName(const string_t& type,
+                                       const string_t& name, Scene* scene,
                                        float /*interaxial_distance*/,
                                        bool /*isStereoscopicSideBySide*/)
 {

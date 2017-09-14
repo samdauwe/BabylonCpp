@@ -3,7 +3,7 @@
 namespace BABYLON {
 namespace Internals {
 
-FileFaceOrientation::FileFaceOrientation(const std::string& iName,
+FileFaceOrientation::FileFaceOrientation(const string_t& iName,
                                          const Vector3& _worldAxisForNormal,
                                          const Vector3& _worldAxisForFileX,
                                          const Vector3& _worldAxisForFileY)

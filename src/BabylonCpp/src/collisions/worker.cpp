@@ -29,7 +29,7 @@ void Worker::postMessage(const BabylonMessage& message)
 }
 
 void Worker::postMessage(const BabylonMessage& /*message*/,
-                         const std::vector<ArrayBufferView>& /*serializable*/)
+                         const vector_t<ArrayBufferView>& /*serializable*/)
 {
 }
 

@@ -15,27 +15,27 @@ public:
   ~PostProcessRenderPipelineManager();
 
   void addPipeline(PostProcessRenderPipeline* renderPipeline);
-  void attachCamerasToRenderPipeline(const std::string& renderPipelineName,
-                                     const std::vector<Camera*>& cameras,
+  void attachCamerasToRenderPipeline(const string_t& renderPipelineName,
+                                     const vector_t<Camera*>& cameras,
                                      bool unique = false);
-  void detachCamerasFromRenderPipeline(const std::string& renderPipelineName,
-                                       const std::vector<Camera*>& cameras);
-  void enableEffectInPipeline(const std::string& renderPipelineName,
-                              const std::string& renderEffectName,
-                              const std::vector<Camera*>& cameras);
-  void disableEffectInPipeline(const std::string& renderPipelineName,
-                               const std::string& renderEffectName,
-                               const std::vector<Camera*>& cameras);
-  void enableDisplayOnlyPassInPipeline(const std::string& renderPipelineName,
-                                       const std::string& passName,
-                                       const std::vector<Camera*>& cameras);
-  void disableDisplayOnlyPassInPipeline(const std::string& renderPipelineName,
-                                        const std::string& passName,
-                                        const std::vector<Camera*>& cameras);
+  void detachCamerasFromRenderPipeline(const string_t& renderPipelineName,
+                                       const vector_t<Camera*>& cameras);
+  void enableEffectInPipeline(const string_t& renderPipelineName,
+                              const string_t& renderEffectName,
+                              const vector_t<Camera*>& cameras);
+  void disableEffectInPipeline(const string_t& renderPipelineName,
+                               const string_t& renderEffectName,
+                               const vector_t<Camera*>& cameras);
+  void enableDisplayOnlyPassInPipeline(const string_t& renderPipelineName,
+                                       const string_t& passName,
+                                       const vector_t<Camera*>& cameras);
+  void disableDisplayOnlyPassInPipeline(const string_t& renderPipelineName,
+                                        const string_t& passName,
+                                        const vector_t<Camera*>& cameras);
   void update();
 
 private:
-  std::unordered_map<std::string, PostProcessRenderPipeline*> _renderPipelines;
+  std::unordered_map<string_t, PostProcessRenderPipeline*> _renderPipelines;
 
 }; // end of class PostProcessRenderPipelineManager
 

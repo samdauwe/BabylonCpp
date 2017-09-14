@@ -138,7 +138,7 @@ public:
    */
   IndicesArray getIndices(bool copyWhenShared = false) override;
 
-  std::vector<Vector3>& _positions() override;
+  vector_t<Vector3>& _positions() override;
 
   /**
    * @brief Sets a new updated BoundingInfo to the mesh.
@@ -169,7 +169,7 @@ public:
    * the model children aren't cloned.
    * @returns The clone.
    */
-  InstancedMesh* clone(const std::string& name, Node* newParent,
+  InstancedMesh* clone(const string_t& name, Node* newParent,
                        bool doNotCloneChildren = false);
 
   /**
@@ -178,7 +178,7 @@ public:
   void dispose(bool doNotRecurse = false) override;
 
 protected:
-  InstancedMesh(const std::string& name, Mesh* source);
+  InstancedMesh(const string_t& name, Mesh* source);
 
 private:
   Mesh* _sourceMesh;

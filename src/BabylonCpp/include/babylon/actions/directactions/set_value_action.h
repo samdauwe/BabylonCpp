@@ -10,7 +10,7 @@ class BABYLON_SHARED_EXPORT SetValueAction : public Action {
 
 public:
   SetValueAction(unsigned int triggerOptions, IAnimatable* target,
-                 const std::string& propertyPath, AnimationValue* value,
+                 const string_t& propertyPath, AnimationValue* value,
                  Condition* condition = nullptr);
   ~SetValueAction();
 
@@ -21,8 +21,8 @@ public:
 private:
   IAnimatable* _target;
   IAnimatable* _effectiveTarget;
-  std::string _property;
-  std::string _propertyPath;
+  string_t _property;
+  string_t _propertyPath;
   AnimationValue* _value;
 
 }; // end of class SetValueAction

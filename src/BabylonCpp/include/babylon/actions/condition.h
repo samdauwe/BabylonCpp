@@ -16,9 +16,9 @@ public:
   virtual ~Condition();
 
   virtual bool isValid();
-  std::string _getProperty(const std::string& propertyPath);
+  string_t _getProperty(const string_t& propertyPath);
   IAnimatable* _getEffectiveTarget(IAnimatable* target,
-                                   const std::string& propertyPath);
+                                   const string_t& propertyPath);
   virtual Json::object serialize() const;
 
 protected:

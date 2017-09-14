@@ -5,7 +5,7 @@
 namespace BABYLON {
 
 PBRMetallicRoughnessMaterial::PBRMetallicRoughnessMaterial(
-  const std::string& iName, Scene* scene)
+  const string_t& iName, Scene* scene)
     : Internals::PBRBaseSimpleMaterial{iName, scene}
     , baseTexture{nullptr}
     , metallic{0.f}
@@ -26,8 +26,7 @@ const char* PBRMetallicRoughnessMaterial::getClassName() const
   return "PBRMetallicRoughnessMaterial";
 }
 
-std::vector<BaseTexture*>
-PBRMetallicRoughnessMaterial::getActiveTextures() const
+vector_t<BaseTexture*> PBRMetallicRoughnessMaterial::getActiveTextures() const
 {
   auto activeTextures = Internals::PBRBaseSimpleMaterial::getActiveTextures();
 
@@ -60,7 +59,7 @@ bool PBRMetallicRoughnessMaterial::hasTexture(BaseTexture* texture) const
 }
 
 PBRMetallicRoughnessMaterial*
-PBRMetallicRoughnessMaterial::clone(const std::string& /*name*/,
+PBRMetallicRoughnessMaterial::clone(const string_t& /*name*/,
                                     bool /*cloneChildren*/) const
 {
   return nullptr;
@@ -71,10 +70,8 @@ Json::object PBRMetallicRoughnessMaterial::serialize() const
   return Json::object();
 }
 
-PBRMetallicRoughnessMaterial*
-PBRMetallicRoughnessMaterial::Parse(const Json::value& /*source*/,
-                                    Scene* /*scene*/,
-                                    const std::string& /*rootUrl*/)
+PBRMetallicRoughnessMaterial* PBRMetallicRoughnessMaterial::Parse(
+  const Json::value& /*source*/, Scene* /*scene*/, const string_t& /*rootUrl*/)
 {
   return nullptr;
 }

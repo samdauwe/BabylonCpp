@@ -23,16 +23,16 @@ public:
 
   /** Methods **/
   void addEntry(T& entry);
-  void addEntries(std::vector<T>& entries);
-  void select(const std::array<Plane, 6>& frustumPlanes,
-              std::vector<T>& selection, bool allowDuplicate = true);
+  void addEntries(vector_t<T>& entries);
+  void select(const array_t<Plane, 6>& frustumPlanes, vector_t<T>& selection,
+              bool allowDuplicate = true);
   void intersects(const Vector3& sphereCenter, float sphereRadius,
-                  std::vector<T>& selection, bool allowDuplicate = true);
-  void intersectsRay(const Ray& ray, std::vector<T>& selection);
+                  vector_t<T>& selection, bool allowDuplicate = true);
+  void intersectsRay(const Ray& ray, vector_t<T>& selection);
   void createInnerBlocks();
 
 public:
-  std::vector<T> entries;
+  vector_t<T> entries;
 
 private:
   size_t _depth;
@@ -40,7 +40,7 @@ private:
   size_t _capacity;
   Vector3 _minPoint;
   Vector3 _maxPoint;
-  std::vector<Vector3> _boundingVectors;
+  vector_t<Vector3> _boundingVectors;
   ::std::function<void(T&, OctreeBlock<T>&)> _creationFunc;
 
 }; // end of class OctreeBlock

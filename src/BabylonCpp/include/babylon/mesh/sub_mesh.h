@@ -78,14 +78,14 @@ public:
    * @brief Returns if the submesh bounding box intersects the frustum defined
    * by the passed array of planes.
    */
-  bool isInFrustum(const std::array<Plane, 6>& frustumPlanes) override;
+  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes) override;
 
   /**
    * @brief Returns if the submesh bounding box is completely inside the frustum
    * defined by the passed array of planes.
    */
-  bool isCompletelyInFrustum(
-    const std::array<Plane, 6>& frustumPlanes) const override;
+  bool
+  isCompletelyInFrustum(const array_t<Plane, 6>& frustumPlanes) const override;
 
   /**
    * @brief Renders the submesh.
@@ -109,7 +109,7 @@ public:
    * @brief Returns an object IntersectionInfo.
    */
   std::unique_ptr<IntersectionInfo>
-  intersects(Ray& ray, const std::vector<Vector3>& positions,
+  intersects(Ray& ray, const vector_t<Vector3>& positions,
              const Uint32Array& indices, bool fastCheck);
 
   /** Clone **/
@@ -158,8 +158,8 @@ public:
   size_t indexCount;
   bool createBoundingBox;
   size_t linesIndexCount;
-  std::vector<Vector3> _lastColliderWorldVertices;
-  std::vector<Plane> _trianglePlanes;
+  vector_t<Vector3> _lastColliderWorldVertices;
+  vector_t<Plane> _trianglePlanes;
   Matrix _lastColliderTransformMatrix;
   int _renderId;
   int _alphaIndex;

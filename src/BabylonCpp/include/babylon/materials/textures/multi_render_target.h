@@ -10,14 +10,14 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT MultiRenderTarget : public RenderTargetTexture {
 
 public:
-  MultiRenderTarget(const std::string& name, Size size, std::size_t count,
+  MultiRenderTarget(const string_t& name, Size size, std::size_t count,
                     Scene* scene);
-  MultiRenderTarget(const std::string& name, Size size, std::size_t count,
+  MultiRenderTarget(const string_t& name, Size size, std::size_t count,
                     Scene* scene, const IMultiRenderTargetOptions& options);
   ~MultiRenderTarget();
 
   bool isSupported() const;
-  std::vector<Texture*>& textures();
+  vector_t<Texture*>& textures();
   Texture* depthTexture();
 
   unsigned int samples() const;
@@ -30,8 +30,8 @@ private:
   void _createInternalTextures();
 
 private:
-  std::vector<InternalTexture*> _internalTextures;
-  std::vector<Texture*> _textures;
+  vector_t<InternalTexture*> _internalTextures;
+  vector_t<Texture*> _textures;
   std::size_t _count;
   IMultiRenderTargetOptions _multiRenderTargetOptions;
 

@@ -129,12 +129,12 @@ float Path2::length() const
   return result;
 }
 
-std::vector<Vector2>& Path2::getPoints()
+vector_t<Vector2>& Path2::getPoints()
 {
   return _points;
 }
 
-const std::vector<Vector2>& Path2::getPoints() const
+const vector_t<Vector2>& Path2::getPoints() const
 {
   return _points;
 }

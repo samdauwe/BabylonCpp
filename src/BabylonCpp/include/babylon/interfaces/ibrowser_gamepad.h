@@ -18,11 +18,11 @@ struct IGamepadButton {
 class BABYLON_SHARED_EXPORT IBrowserGamepad {
 
 public:
-  std::string id;
-  std::string hand;
+  string_t id;
+  string_t hand;
   int index;
   Float32Array axes;
-  std::vector<IGamepadButton> buttons;
+  vector_t<IGamepadButton> buttons;
   Nullable<GamepadPose> pose;
 
 }; // end of class IBrowserGamepad

@@ -10,7 +10,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT IShadowLight : public Light {
 
 public:
-  IShadowLight(const std::string& name, Scene* scene);
+  IShadowLight(const string_t& name, Scene* scene);
   virtual ~IShadowLight();
 
   virtual Vector3& direction()            = 0;
@@ -22,7 +22,7 @@ public:
 
   virtual IShadowLight*
   setShadowProjectionMatrix(Matrix& matrix, Matrix& viewMatrix,
-                            const std::vector<AbstractMesh*>& renderList)
+                            const vector_t<AbstractMesh*>& renderList)
     = 0;
   virtual float getDepthScale() const = 0;
 

@@ -100,7 +100,7 @@ public:
    * @param {boolean} fullDetails - support for multiple levels of logging
    * within scene loading
    */
-  std::string toString(bool fullDetails = false) const;
+  string_t toString(bool fullDetails = false) const;
 
   /**
    * @brief Set the enabled state of this node.
@@ -137,10 +137,10 @@ public:
   void setRadius(float value);
 
   int renderPriority() const;
-  std::vector<AbstractMesh*>& includedOnlyMeshes();
-  void setIncludedOnlyMeshes(const std::vector<AbstractMesh*>& value);
-  std::vector<AbstractMesh*>& excludedMeshes();
-  void setExcludedMeshes(const std::vector<AbstractMesh*>& value);
+  vector_t<AbstractMesh*>& includedOnlyMeshes();
+  void setIncludedOnlyMeshes(const vector_t<AbstractMesh*>& value);
+  vector_t<AbstractMesh*>& excludedMeshes();
+  void setExcludedMeshes(const vector_t<AbstractMesh*>& value);
   unsigned int includeOnlyWithLayerMask() const;
   void setIncludeOnlyWithLayerMask(unsigned int value);
   unsigned int excludeWithLayerMask() const;
@@ -158,9 +158,9 @@ public:
    */
   virtual Vector3 getAbsolutePosition();
 
-  virtual void transferToEffect(Effect* effect, const std::string& lightIndex);
-  virtual void transferToEffect(Effect* effect, const std::string& uniformName0,
-                                const std::string& uniformName1);
+  virtual void transferToEffect(Effect* effect, const string_t& lightIndex);
+  virtual void transferToEffect(Effect* effect, const string_t& uniformName0,
+                                const string_t& uniformName1);
   virtual Matrix* _getWorldMatrix();
 
   /**
@@ -197,7 +197,7 @@ public:
   /**
    * @brief Returns a new Light object, named "name", from the current one.
    */
-  std::unique_ptr<Light> clone(const std::string& name);
+  std::unique_ptr<Light> clone(const string_t& name);
 
   /**
    * @brief Serializes the current light into a Serialization object.
@@ -221,8 +221,8 @@ public:
    * light = 0, directional light = 1, spot light = 2, hemispheric light = 3.
    * This new light is named "name" and added to the passed scene.
    */
-  static Light* GetConstructorFromName(unsigned int type,
-                                       const std::string& name, Scene* scene);
+  static Light* GetConstructorFromName(unsigned int type, const string_t& name,
+                                       Scene* scene);
 
   /**
    * @brief Parses the passed "parsedLight" and returns a new instanced Light
@@ -235,13 +235,13 @@ protected:
    * @brief Creates a Light object in the scene.
    * Documentation : http://doc.babylonjs.com/tutorials/lights
    */
-  Light(const std::string& name, Scene* scene);
+  Light(const string_t& name, Scene* scene);
 
   virtual void _buildUniformLayout();
 
 private:
-  void _hookArrayForExcluded(const std::vector<AbstractMesh*>& array);
-  void _hookArrayForIncludedOnly(const std::vector<AbstractMesh*>& array);
+  void _hookArrayForExcluded(const vector_t<AbstractMesh*>& array);
+  void _hookArrayForIncludedOnly(const vector_t<AbstractMesh*>& array);
   void _resyncMeshes();
 
   /**
@@ -271,8 +271,8 @@ public:
    */
   bool shadowEnabled;
   ShadowGenerator* _shadowGenerator;
-  std::vector<std::string> _excludedMeshesIds;
-  std::vector<std::string> _includedOnlyMeshesIds;
+  vector_t<string_t> _excludedMeshesIds;
+  vector_t<string_t> _includedOnlyMeshesIds;
   // Light uniform buffer
   std::unique_ptr<UniformBuffer> _uniformBuffer;
 
@@ -290,8 +290,8 @@ private:
    * fallback or number of lights exceeding the number allowed of the materials.
    */
   int _renderPriority;
-  std::vector<AbstractMesh*> _includedOnlyMeshes;
-  std::vector<AbstractMesh*> _excludedMeshes;
+  vector_t<AbstractMesh*> _includedOnlyMeshes;
+  vector_t<AbstractMesh*> _excludedMeshes;
   unsigned int _includeOnlyWithLayerMask;
   unsigned int _excludeWithLayerMask;
   unsigned int _lightmapMode;

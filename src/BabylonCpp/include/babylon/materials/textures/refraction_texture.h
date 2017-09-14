@@ -17,7 +17,7 @@ public:
    * @param size size of the underlying texture
    * @param scene root scene
    */
-  RefractionTexture(const std::string& name, ISize size, Scene* scene,
+  RefractionTexture(const string_t& name, ISize size, Scene* scene,
                     bool generateMipMaps = false);
   ~RefractionTexture();
 

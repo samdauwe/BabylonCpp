@@ -7,7 +7,7 @@
 namespace BABYLON {
 namespace Json {
 
-inline std::string Parse(Json::value parsedData, const char* data)
+inline string_t Parse(Json::value parsedData, const char* data)
 {
   return picojson::parse(parsedData, data, data + strlen(data));
 }
@@ -15,8 +15,8 @@ inline std::string Parse(Json::value parsedData, const char* data)
 template <class T,
           typename ::std::enable_if<::std::is_same<T, int>::value, int>::type
           = 0>
-inline std::pair<std::string, picojson::value> Pair(const std::string& name,
-                                                    int value)
+inline std::pair<string_t, picojson::value> Pair(const string_t& name,
+                                                 int value)
 {
   return ::std::make_pair(name, picojson::value(static_cast<double>(value)));
 }
@@ -24,8 +24,8 @@ inline std::pair<std::string, picojson::value> Pair(const std::string& name,
 template <class T, typename ::std::enable_if<
                      ::std::is_same<T, unsigned int>::value, unsigned int>::type
                    = 0>
-inline std::pair<std::string, picojson::value> Pair(const std::string& name,
-                                                    unsigned int value)
+inline std::pair<string_t, picojson::value> Pair(const string_t& name,
+                                                 unsigned int value)
 {
   return ::std::make_pair(name, picojson::value(static_cast<double>(value)));
 }
@@ -33,8 +33,8 @@ inline std::pair<std::string, picojson::value> Pair(const std::string& name,
 template <
   class T,
   typename ::std::enable_if<::std::is_same<T, size_t>::value, size_t>::type = 0>
-inline std::pair<std::string, picojson::value> Pair(const std::string& name,
-                                                    size_t value)
+inline std::pair<string_t, picojson::value> Pair(const string_t& name,
+                                                 size_t value)
 {
   return ::std::make_pair(name, picojson::value(static_cast<double>(value)));
 }
@@ -42,8 +42,8 @@ inline std::pair<std::string, picojson::value> Pair(const std::string& name,
 template <class T,
           typename ::std::enable_if<!::std::is_same<T, int>::value, int>::type
           = 0>
-inline std::pair<std::string, picojson::value> Pair(const std::string& name,
-                                                    const T& value)
+inline std::pair<string_t, picojson::value> Pair(const string_t& name,
+                                                 const T& value)
 {
   return ::std::make_pair(name, picojson::value(value));
 }
@@ -51,7 +51,7 @@ inline std::pair<std::string, picojson::value> Pair(const std::string& name,
 template <class T,
           typename ::std::enable_if<::std::is_same<T, int>::value, int>::type
           = 0>
-inline Json::value NameValuePair(const std::string& name, int value)
+inline Json::value NameValuePair(const string_t& name, int value)
 {
   return picojson::value(
     picojson::object{{"name", picojson::value(name)},
@@ -61,14 +61,14 @@ inline Json::value NameValuePair(const std::string& name, int value)
 template <class T,
           typename ::std::enable_if<!::std::is_same<T, int>::value, int>::type
           = 0>
-inline Json::value NameValuePair(const std::string& name, const T& value)
+inline Json::value NameValuePair(const string_t& name, const T& value)
 {
   return picojson::value(picojson::object{{"name", picojson::value(name)},
                                           {"value", picojson::value(value)}});
 }
 
 template <typename T>
-inline T GetNumber(const picojson::value& v, const std::string& key,
+inline T GetNumber(const picojson::value& v, const string_t& key,
                    T defaultValue)
 {
   if (v.contains(key)) {
@@ -79,7 +79,7 @@ inline T GetNumber(const picojson::value& v, const std::string& key,
   }
 }
 
-inline bool GetBool(const picojson::value& v, const std::string& key,
+inline bool GetBool(const picojson::value& v, const string_t& key,
                     bool defaultValue = false)
 {
   if (v.contains(key)) {
@@ -90,18 +90,18 @@ inline bool GetBool(const picojson::value& v, const std::string& key,
   }
 }
 
-inline std::string GetString(const picojson::value& v, const std::string& key,
-                             const std::string& defaultValue = "")
+inline string_t GetString(const picojson::value& v, const string_t& key,
+                          const string_t& defaultValue = "")
 {
   if (v.contains(key)) {
-    return v.get(key).get<std::string>();
+    return v.get(key).get<string_t>();
   }
   else {
     return defaultValue;
   }
 }
 
-inline Json::array GetArray(const picojson::value& v, const std::string& key)
+inline Json::array GetArray(const picojson::value& v, const string_t& key)
 {
   if (v.contains(key) && v.get(key).is<Json::array>()) {
     return v.get(key).get<Json::array>();
@@ -110,9 +110,9 @@ inline Json::array GetArray(const picojson::value& v, const std::string& key)
 }
 
 template <typename T>
-inline std::vector<T> ToArray(const picojson::value& v, const std::string& key)
+inline vector_t<T> ToArray(const picojson::value& v, const string_t& key)
 {
-  std::vector<T> array;
+  vector_t<T> array;
   if (v.contains(key) && (v.get(key).is<picojson::array>())) {
     array.reserve(v.get(key).get<picojson::array>().size());
     for (auto& element : v.get(key).get<picojson::array>()) {
@@ -122,14 +122,14 @@ inline std::vector<T> ToArray(const picojson::value& v, const std::string& key)
   return array;
 }
 
-inline std::vector<std::string> ToStringVector(const picojson::value& v,
-                                               const std::string& key)
+inline vector_t<string_t> ToStringVector(const picojson::value& v,
+                                         const string_t& key)
 {
-  std::vector<std::string> stringVector;
+  vector_t<string_t> stringVector;
   if (v.contains(key) && (v.get(key).is<picojson::array>())) {
     stringVector.reserve(v.get(key).get<picojson::array>().size());
     for (auto& element : v.get(key).get<picojson::array>()) {
-      stringVector.emplace_back(element.get<std::string>());
+      stringVector.emplace_back(element.get<string_t>());
     }
   }
   return stringVector;

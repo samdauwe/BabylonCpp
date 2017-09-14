@@ -11,7 +11,7 @@
 
 namespace BABYLON {
 
-ColorGradingTexture::ColorGradingTexture(const std::string& iUrl, Scene* scene)
+ColorGradingTexture::ColorGradingTexture(const string_t& iUrl, Scene* scene)
     : BaseTexture{scene}
     , _textureMatrix{::std::make_unique<Matrix>(Matrix::Identity())}
 {
@@ -54,11 +54,11 @@ InternalTexture* ColorGradingTexture::load3dlTexture()
     Uint8Array(), 1, 1, EngineConstants::TEXTUREFORMAT_RGBA, false, false,
     TextureConstants::BILINEAR_SAMPLINGMODE);
 
-  auto callback = [&](const std::string& text) {
+  auto callback = [&](const string_t& text) {
     Uint8Array data;
     Float32Array tempData;
 
-    std::vector<std::string> lines = String::split(text, '\n');
+    vector_t<string_t> lines = String::split(text, '\n');
     size_t size = 0, pixelIndexW = 0, pixelIndexH = 0, pixelIndexSlice = 0;
     int maxColor = 0;
 
@@ -72,7 +72,7 @@ InternalTexture* ColorGradingTexture::load3dlTexture()
         continue;
       }
 
-      std::vector<std::string> words = String::split(line, ' ');
+      vector_t<string_t> words = String::split(line, ' ');
       if (size == 0) {
         // Number of space + one
         size = words.size();
@@ -167,7 +167,7 @@ void ColorGradingTexture::delayLoad()
 
 std::unique_ptr<ColorGradingTexture>
 ColorGradingTexture::Parse(const Json::value& parsedTexture, Scene* scene,
-                           const std::string& /*rootUrl*/)
+                           const string_t& /*rootUrl*/)
 {
   std::unique_ptr<ColorGradingTexture> texture = nullptr;
   if (parsedTexture.contains("name")

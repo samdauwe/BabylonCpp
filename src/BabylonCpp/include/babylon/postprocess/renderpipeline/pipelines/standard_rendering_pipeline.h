@@ -9,8 +9,8 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT StandardRenderingPipeline
-  : public PostProcessRenderPipeline,
-    public IAnimatable {
+    : public PostProcessRenderPipeline,
+      public IAnimatable {
 
 public:
   // Luminance steps
@@ -29,10 +29,10 @@ public:
    * @param {BABYLON.Camera[]} cameras - The array of cameras that the rendering
    * pipeline will be attached to
    */
-  StandardRenderingPipeline(const std::string& name, Scene* scene, float ratio,
+  StandardRenderingPipeline(const string_t& name, Scene* scene, float ratio,
                             PostProcess* originalPostProcess = nullptr,
-                            const std::vector<Camera*>& cameras
-                            = std::vector<Camera*>());
+                            const vector_t<Camera*>& cameras
+                            = vector_t<Camera*>());
   virtual ~StandardRenderingPipeline();
 
   void setBloomEnabled(bool enabled);
@@ -76,13 +76,13 @@ public:
   PostProcess* originalPostProcess;
   PostProcess* downSampleX4PostProcess;
   PostProcess* brightPassPostProcess;
-  std::vector<PostProcess*> gaussianBlurHPostProcesses;
-  std::vector<PostProcess*> gaussianBlurVPostProcesses;
+  vector_t<PostProcess*> gaussianBlurHPostProcesses;
+  vector_t<PostProcess*> gaussianBlurVPostProcesses;
   PostProcess* textureAdderPostProcess;
   PostProcess* textureAdderFinalPostProcess;
   PostProcess* lensFlareFinalPostProcess;
   PostProcess* luminancePostProcess;
-  std::vector<PostProcess*> luminanceDownSamplePostProcesses;
+  vector_t<PostProcess*> luminanceDownSamplePostProcesses;
   PostProcess* hdrPostProcess;
   PostProcess* hdrFinalPostProcess;
   PostProcess* lensFlarePostProcess;
@@ -111,7 +111,7 @@ public:
   float depthOfFieldBlurWidth;
   float motionStrength;
   // IAnimatable
-  std::vector<Animation> animations;
+  vector_t<Animation> animations;
 
 private:
   Scene* _scene;

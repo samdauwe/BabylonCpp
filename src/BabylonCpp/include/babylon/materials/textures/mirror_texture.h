@@ -13,7 +13,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT MirrorTexture : public RenderTargetTexture {
 
 public:
-  MirrorTexture(const std::string& name, const ISize& size, Scene* scene,
+  MirrorTexture(const string_t& name, const ISize& size, Scene* scene,
                 bool generateMipMaps = false,
                 unsigned int type = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
                 unsigned int samplingMode

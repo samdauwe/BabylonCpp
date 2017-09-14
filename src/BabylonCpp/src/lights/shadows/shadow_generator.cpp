@@ -372,9 +372,9 @@ void ShadowGenerator::_initializeShadowMap()
 
   // Custom render function.
   _shadowMap->customRenderFunction
-    = [this](const std::vector<SubMesh*>& opaqueSubMeshes,
-             const std::vector<SubMesh*>& transparentSubMeshes,
-             const std::vector<SubMesh*>& alphaTestSubMeshes) {
+    = [this](const vector_t<SubMesh*>& opaqueSubMeshes,
+             const vector_t<SubMesh*>& transparentSubMeshes,
+             const vector_t<SubMesh*>& alphaTestSubMeshes) {
         _renderForShadowMap(opaqueSubMeshes, transparentSubMeshes,
                             alphaTestSubMeshes);
       };
@@ -468,9 +468,9 @@ void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
 }
 
 void ShadowGenerator::_renderForShadowMap(
-  const std::vector<SubMesh*>& opaqueSubMeshes,
-  const std::vector<SubMesh*>& alphaTestSubMeshes,
-  const std::vector<SubMesh*>& transparentSubMeshes)
+  const vector_t<SubMesh*>& opaqueSubMeshes,
+  const vector_t<SubMesh*>& alphaTestSubMeshes,
+  const vector_t<SubMesh*>& transparentSubMeshes)
 {
   for (const auto& opaqueSubMesh : opaqueSubMeshes) {
     _renderSubMeshForShadowMap(opaqueSubMesh);
@@ -575,7 +575,7 @@ void ShadowGenerator::forceCompilation(
   const ::std::function<void(ShadowGenerator* generator)>& onCompiled,
   const ShadowGeneratorCompileOptions& options)
 {
-  std::vector<SubMesh*> subMeshes;
+  vector_t<SubMesh*> subMeshes;
   std::size_t currentIndex = 0;
 
   for (auto& mesh : getShadowMap()->renderList) {
@@ -609,7 +609,7 @@ void ShadowGenerator::forceCompilation(
 
 bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
 {
-  std::vector<std::string> defines;
+  vector_t<string_t> defines;
 
   if (_textureType != EngineConstants::TEXTURETYPE_UNSIGNED_INT) {
     defines.emplace_back("#define FLOAT");
@@ -619,7 +619,7 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
     defines.emplace_back("#define ESM");
   }
 
-  std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
+  vector_t<string_t> attribs{VertexBuffer::PositionKindChars};
 
   auto mesh     = subMesh->getMesh();
   auto material = subMesh->getMaterial();
@@ -670,7 +670,7 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
   }
 
   // Get correct effect
-  std::string join = String::join(defines, '\n');
+  string_t join = String::join(defines, '\n');
   if (_cachedDefines != join) {
     _cachedDefines = join;
 
@@ -717,7 +717,7 @@ void ShadowGenerator::prepareDefines(MaterialDefines& defines,
   }
 }
 
-void ShadowGenerator::bindShadowLight(const std::string& lightIndex,
+void ShadowGenerator::bindShadowLight(const string_t& lightIndex,
                                       Effect* effect)
 {
   auto scene = _scene;
@@ -860,7 +860,7 @@ ShadowGenerator::Parse(const Json::value& parsedShadowGenerator, Scene* scene)
 {
   // Casting to point light, as light is missing the position attr and
   // typescript complains.
-  const std::string parsedShadowGeneratorLightId
+  const string_t parsedShadowGeneratorLightId
     = Json::GetString(parsedShadowGenerator, "lightId");
 
   if (parsedShadowGeneratorLightId.empty()) {
@@ -880,7 +880,7 @@ ShadowGenerator::Parse(const Json::value& parsedShadowGenerator, Scene* scene)
 
   for (const auto& renderItem :
        Json::GetArray(parsedShadowGenerator, "renderList")) {
-    auto meshes = scene->getMeshesByID(renderItem.get<std::string>());
+    auto meshes = scene->getMeshesByID(renderItem.get<string_t>());
     for (auto& mesh : meshes) {
       shadowMap->renderList.emplace_back(mesh);
     }

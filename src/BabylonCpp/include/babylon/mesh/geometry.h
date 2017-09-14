@@ -66,7 +66,7 @@ public:
   Float32Array getVerticesData(unsigned int kind, bool copyWhenShared = false,
                                bool forceCopy = false) override;
   VertexBuffer* getVertexBuffer(unsigned int kind) const;
-  std::unordered_map<std::string, VertexBuffer*> getVertexBuffers();
+  std::unordered_map<string_t, VertexBuffer*> getVertexBuffers();
   bool isVerticesDataPresent(unsigned int kind) override;
   Uint32Array getVerticesDataKinds();
   Mesh* setIndices(const IndicesArray& indices,
@@ -91,23 +91,22 @@ public:
 
   bool isDisposed() const;
   void dispose(bool doNotRecurse = false) override;
-  Geometry* copy(const std::string& id);
+  Geometry* copy(const string_t& id);
   Json::object serialize() const;
   Json::object serializeVerticeData() const;
 
   /** Statics **/
-  static Geometry* ExtractFromMesh(Mesh* mesh, const std::string& id);
-  static std::string RandomId();
+  static Geometry* ExtractFromMesh(Mesh* mesh, const string_t& id);
+  static string_t RandomId();
   static void ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh);
   static void _CleanMatricesWeights(Float32Array& matricesWeights,
                                     unsigned int influencers);
   static Geometry* Parse(const Json::value& parsedVertexData, Scene* scene,
-                         const std::string& rootUrl);
+                         const string_t& rootUrl);
 
 protected:
-  Geometry(const std::string& id, Scene* scene,
-           VertexData* vertexData = nullptr, bool updatable = false,
-           Mesh* mesh = nullptr);
+  Geometry(const string_t& id, Scene* scene, VertexData* vertexData = nullptr,
+           bool updatable = false, Mesh* mesh = nullptr);
 
 private:
   void updateBoundingInfo(bool updateExtends, const Float32Array& data);
@@ -118,9 +117,9 @@ private:
   void _disposeVertexArrayObjects();
 
 public:
-  std::string id;
+  string_t id;
   int delayLoadState;
-  std::string delayLoadingFile;
+  string_t delayLoadingFile;
   ::std::function<void(Geometry* geometry, unsigned int kind)>
     onGeometryUpdated;
   Uint32Array _delayInfoKinds;
@@ -128,16 +127,16 @@ public:
   ::std::function<void(const Json::value& parsedVertexData, Geometry* geometry)>
     _delayLoadingFunction;
   int _softwareSkinningRenderId;
-  std::vector<Vector3> _positions; // Cache
-  std::unordered_map<std::string, std::unique_ptr<GL::IGLVertexArrayObject>>
+  vector_t<Vector3> _positions; // Cache
+  std::unordered_map<string_t, std::unique_ptr<GL::IGLVertexArrayObject>>
     _vertexArrayObjects;
   bool _updatable;
-  std::vector<Vector3> centroids;
+  vector_t<Vector3> centroids;
 
 private:
   Scene* _scene;
   Engine* _engine;
-  std::vector<Mesh*> _meshes;
+  vector_t<Mesh*> _meshes;
   size_t _totalVertices;
   IndicesArray _indices;
   std::unordered_map<unsigned int, std::unique_ptr<VertexBuffer>>

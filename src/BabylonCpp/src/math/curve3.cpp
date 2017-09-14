@@ -9,7 +9,7 @@ Curve3::Curve3()
 {
 }
 
-Curve3::Curve3(const std::vector<Vector3>& points) : _length{0.f}
+Curve3::Curve3(const vector_t<Vector3>& points) : _length{0.f}
 {
   _points = points;
   _length = computeLength(points);
@@ -73,7 +73,7 @@ std::ostream& operator<<(std::ostream& os, const Curve3& curve)
   return os;
 }
 
-std::vector<Vector3>& Curve3::getPoints()
+vector_t<Vector3>& Curve3::getPoints()
 {
   return _points;
 }
@@ -85,9 +85,9 @@ float Curve3::length() const
 
 Curve3 Curve3::continueCurve3(Curve3& curve) const
 {
-  const Vector3 lastPoint              = _points[_points.size() - 1];
-  std::vector<Vector3> continuedPoints = _points;
-  std::vector<Vector3> curvePoints     = curve.getPoints();
+  const Vector3 lastPoint           = _points[_points.size() - 1];
+  vector_t<Vector3> continuedPoints = _points;
+  vector_t<Vector3> curvePoints     = curve.getPoints();
   for (unsigned int i = 1; i < curvePoints.size(); ++i) {
     continuedPoints.emplace_back(
       curvePoints[i].subtract(curvePoints[0]).add(lastPoint));
@@ -99,7 +99,7 @@ Curve3 Curve3::CreateQuadraticBezier(const Vector3& v0, const Vector3& v1,
                                      const Vector3& v2, int nbPoints)
 {
   const float nbPointsVal = nbPoints > 2 ? static_cast<float>(nbPoints) : 3.f;
-  std::vector<Vector3> bez;
+  vector_t<Vector3> bez;
   const auto equation
     = [](float t, float val0, float val1, float val2) -> float {
     return (1.f - t) * (1.f - t) * val0 + 2.f * t * (1.f - t) * val1
@@ -118,7 +118,7 @@ Curve3 Curve3::CreateCubicBezier(const Vector3& v0, const Vector3& v1,
                                  int nbPoints)
 {
   const float nbPointsVal = nbPoints > 3 ? static_cast<float>(nbPoints) : 4.f;
-  std::vector<Vector3> bez;
+  vector_t<Vector3> bez;
   const auto equation
     = [](float t, float val0, float val1, float val2, float val3) -> float {
     return (1.f - t) * (1.f - t) * (1.f - t) * val0
@@ -138,7 +138,7 @@ Curve3 Curve3::CreateHermiteSpline(const Vector3& p1, const Vector3& t1,
                                    const Vector3& p2, const Vector3& t2,
                                    int nbPoints)
 {
-  std::vector<Vector3> hermite;
+  vector_t<Vector3> hermite;
   const float nbPointsVal = static_cast<float>(nbPoints);
   const float step        = 1.f / nbPointsVal;
   for (float i = 0; i <= nbPointsVal; ++i) {
@@ -147,13 +147,13 @@ Curve3 Curve3::CreateHermiteSpline(const Vector3& p1, const Vector3& t1,
   return Curve3(hermite);
 }
 
-Curve3 Curve3::CreateCatmullRomSpline(const std::vector<Vector3> points,
+Curve3 Curve3::CreateCatmullRomSpline(const vector_t<Vector3> points,
                                       size_t nbPoints)
 {
-  std::vector<Vector3> totalPoints{points[0]};
+  vector_t<Vector3> totalPoints{points[0]};
   stl_util::concat(totalPoints, points);
   totalPoints.emplace_back(points.back());
-  std::vector<Vector3> catmullRom;
+  vector_t<Vector3> catmullRom;
   const float step = 1.f / static_cast<float>(nbPoints);
   size_t i         = 0;
   float amount     = 0.f;
@@ -173,7 +173,7 @@ Curve3 Curve3::CreateCatmullRomSpline(const std::vector<Vector3> points,
   return Curve3(catmullRom);
 }
 
-float Curve3::computeLength(const std::vector<Vector3>& path)
+float Curve3::computeLength(const vector_t<Vector3>& path)
 {
   float l = 0;
   for (unsigned int i = 1; i < path.size(); ++i) {

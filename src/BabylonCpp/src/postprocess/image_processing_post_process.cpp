@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 ImageProcessingPostProcess::ImageProcessingPostProcess(
-  const std::string& iName, float renderRatio, Camera* camera,
+  const string_t& iName, float renderRatio, Camera* camera,
   unsigned int samplingMode, Engine* engine, bool reusable,
   unsigned int textureType)
     : PostProcess{iName,
@@ -197,7 +197,7 @@ void ImageProcessingPostProcess::setCameraToneMappingEnabled(bool value)
 void ImageProcessingPostProcess::_updateParameters()
 {
   std::ostringstream defines;
-  std::vector<std::string> samplers = {"textureSampler"};
+  vector_t<string_t> samplers = {"textureSampler"};
 
   if (colorGradingTexture()) {
     defines << "#define COLORGRADING\r\n";

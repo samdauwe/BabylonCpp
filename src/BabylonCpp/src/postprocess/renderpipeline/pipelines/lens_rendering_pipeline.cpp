@@ -18,8 +18,8 @@
 namespace BABYLON {
 
 LensRenderingPipeline::LensRenderingPipeline(
-  const std::string& name, const LensRenderingPipelineParameters& parameters,
-  Scene* scene, float ratio, const std::vector<Camera*>& cameras)
+  const string_t& name, const LensRenderingPipelineParameters& parameters,
+  Scene* scene, float ratio, const vector_t<Camera*>& cameras)
     : PostProcessRenderPipeline(scene->getEngine(), name), _scene{scene}
 {
   // Fetch texture samplers
@@ -62,7 +62,7 @@ LensRenderingPipeline::LensRenderingPipeline(
     [&]() { return _depthOfFieldPostProcess; }, true));
 
   if (stl_util::almost_equal(_highlightsGain, -1.f)) {
-    _disableEffect(HighlightsEnhancingEffect, std::vector<Camera*>());
+    _disableEffect(HighlightsEnhancingEffect, vector_t<Camera*>());
   }
 
   // Finish
@@ -299,7 +299,7 @@ void LensRenderingPipeline::_createGrainTexture()
   auto rand
     = [](float min, float max) { return Math::random() * (max - min) + min; };
 
-  std::string value;
+  string_t value;
   for (size_t x = 0; x < size; ++x) {
     for (size_t y = 0; y < size; ++y) {
       value = ::std::to_string(

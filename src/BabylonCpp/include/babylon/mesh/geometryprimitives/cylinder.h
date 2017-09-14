@@ -26,13 +26,13 @@ public:
   ~Cylinder();
 
   std::unique_ptr<VertexData> _regenerateVertexData() override;
-  Geometry* copy(const std::string& id) override;
+  Geometry* copy(const string_t& id) override;
 
   // Statics
   static Cylinder* Parse(const Json::value& parsedCylinder, Scene* scene);
 
 protected:
-  Cylinder(const std::string& id, Scene* scene, float height, float diameterTop,
+  Cylinder(const string_t& id, Scene* scene, float height, float diameterTop,
            float diameterBottom, unsigned int tessellation,
            unsigned int subdivisions, bool canBeRegenerated, Mesh* mesh,
            unsigned int side = Mesh::DEFAULTSIDE);

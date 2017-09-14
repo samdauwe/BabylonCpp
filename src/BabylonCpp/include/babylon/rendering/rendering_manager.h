@@ -39,11 +39,11 @@ public:
   ~RenderingManager();
 
   void
-  render(::std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
-                              const std::vector<SubMesh*>& transparentSubMeshes,
-                              const std::vector<SubMesh*>& alphaTestSubMeshes)>
+  render(::std::function<void(const vector_t<SubMesh*>& opaqueSubMeshes,
+                              const vector_t<SubMesh*>& transparentSubMeshes,
+                              const vector_t<SubMesh*>& alphaTestSubMeshes)>
            customRenderFunction,
-         const std::vector<AbstractMesh*>& activeMeshes, bool renderParticles,
+         const vector_t<AbstractMesh*>& activeMeshes, bool renderParticles,
          bool renderSprites);
   void reset();
   void dispose();
@@ -97,17 +97,17 @@ private:
 
 private:
   Scene* _scene;
-  std::vector<std::unique_ptr<RenderingGroup>> _renderingGroups;
+  vector_t<std::unique_ptr<RenderingGroup>> _renderingGroups;
   bool _depthStencilBufferAlreadyCleaned;
 
   unsigned int _currentIndex;
 
-  std::vector<RenderingManageAutoClearOptions> _autoClearDepthStencil;
-  std::vector<::std::function<int(SubMesh* a, SubMesh* b)>>
+  vector_t<RenderingManageAutoClearOptions> _autoClearDepthStencil;
+  vector_t<::std::function<int(SubMesh* a, SubMesh* b)>>
     _customOpaqueSortCompareFn;
-  std::vector<::std::function<int(SubMesh* a, SubMesh* b)>>
+  vector_t<::std::function<int(SubMesh* a, SubMesh* b)>>
     _customAlphaTestSortCompareFn;
-  std::vector<::std::function<int(SubMesh* a, SubMesh* b)>>
+  vector_t<::std::function<int(SubMesh* a, SubMesh* b)>>
     _customTransparentSortCompareFn;
   std::unique_ptr<RenderingGroupInfo> _renderinGroupInfo;
 

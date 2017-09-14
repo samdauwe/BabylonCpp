@@ -7,16 +7,16 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT SerializedMesh {
-  std::string id;
-  std::string name;
+  string_t id;
+  string_t name;
   unsigned int uniqueId;
-  std::string geometryId;
+  string_t geometryId;
   Float32Array sphereCenter;
   float sphereRadius;
   Float32Array boxMinimum;
   Float32Array boxMaximum;
   Float32Array worldMatrixFromCache;
-  std::vector<SerializedSubMesh> subMeshes;
+  vector_t<SerializedSubMesh> subMeshes;
   bool checkCollisions;
 }; // end of struct SerializedMesh
 

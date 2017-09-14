@@ -31,7 +31,7 @@ public:
   void setRefreshRate(int value);
   Scene* getScene() const;
   RenderTargetTexture* cubeTexture();
-  std::vector<AbstractMesh*>& renderList();
+  vector_t<AbstractMesh*>& renderList();
   void attachToMesh(AbstractMesh* mesh);
 
   /**
@@ -47,7 +47,7 @@ public:
   void dispose(bool doNotRecurse = false) override;
 
 protected:
-  ReflectionProbe(const std::string& name, const ISize& size, Scene* scene,
+  ReflectionProbe(const string_t& name, const ISize& size, Scene* scene,
                   bool generateMipMaps = true);
 
 public:

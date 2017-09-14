@@ -32,7 +32,7 @@ public:
   Vertex clone() const;
   Vertex* cloneToNewObject() const;
   friend std::ostream& operator<<(std::ostream& os, const Vertex& vertex);
-  std::string toString() const;
+  string_t toString() const;
 
   // Invert all orientation-specific data (e.g. vertex normal). Called when the
   // orientation of a polygon is flipped.

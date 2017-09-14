@@ -11,7 +11,7 @@
 namespace BABYLON {
 namespace Internals {
 
-std::array<FileFaceOrientation, 6> CubeMapToSphericalPolynomialTools::FileFaces
+array_t<FileFaceOrientation, 6> CubeMapToSphericalPolynomialTools::FileFaces
   = {{
     FileFaceOrientation("right", Vector3(1, 0, 0), Vector3(0, 0, -1),
                         Vector3(0, -1, 0)), // +X east

@@ -33,7 +33,7 @@ Octree<T>::~Octree()
 
 template <class T>
 void Octree<T>::update(const Vector3& worldMin, const Vector3& worldMax,
-                       std::vector<T>& entries)
+                       vector_t<T>& entries)
 {
   Octree<T>::_CreateBlocks(worldMin, worldMax, entries, _maxBlockCapacity, 0,
                            _maxDepth, *this, _creationFunc);
@@ -48,8 +48,8 @@ void Octree<T>::addMesh(T& entry)
 }
 
 template <class T>
-std::vector<T>& Octree<T>::select(const std::array<Plane, 6>& frustumPlanes,
-                                  bool allowDuplicate)
+vector_t<T>& Octree<T>::select(const array_t<Plane, 6>& frustumPlanes,
+                               bool allowDuplicate)
 {
   _selectionContent.clear();
 
@@ -68,8 +68,8 @@ std::vector<T>& Octree<T>::select(const std::array<Plane, 6>& frustumPlanes,
 }
 
 template <class T>
-std::vector<T>& Octree<T>::intersects(const Vector3& sphereCenter,
-                                      float sphereRadius, bool allowDuplicate)
+vector_t<T>& Octree<T>::intersects(const Vector3& sphereCenter,
+                                   float sphereRadius, bool allowDuplicate)
 {
   _selectionContent.clear();
 
@@ -89,7 +89,7 @@ std::vector<T>& Octree<T>::intersects(const Vector3& sphereCenter,
 }
 
 template <class T>
-std::vector<T>& Octree<T>::intersectsRay(const Ray& ray)
+vector_t<T>& Octree<T>::intersectsRay(const Ray& ray)
 {
   _selectionContent.clear();
 
@@ -104,7 +104,7 @@ std::vector<T>& Octree<T>::intersectsRay(const Ray& ray)
 
 template <class T>
 void Octree<T>::_CreateBlocks(
-  const Vector3& worldMin, const Vector3& worldMax, std::vector<T>& entries,
+  const Vector3& worldMin, const Vector3& worldMax, vector_t<T>& entries,
   size_t maxBlockCapacity, size_t currentDepth, size_t maxDepth,
   IOctreeContainer<T>& target,
   ::std::function<void(T& entry, OctreeBlock<T>& block)>& creationFunc)

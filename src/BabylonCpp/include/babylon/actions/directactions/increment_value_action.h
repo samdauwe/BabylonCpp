@@ -10,7 +10,7 @@ class BABYLON_SHARED_EXPORT IncrementValueAction : public Action {
 
 public:
   IncrementValueAction(unsigned int triggerOptions, IAnimatable* target,
-                       const std::string& propertyPath, AnimationValue* value,
+                       const string_t& propertyPath, AnimationValue* value,
                        Condition* condition = nullptr);
   ~IncrementValueAction();
 
@@ -21,8 +21,8 @@ public:
 private:
   IAnimatable* _target;
   IAnimatable* _effectiveTarget;
-  std::string _property;
-  std::string _propertyPath;
+  string_t _property;
+  string_t _propertyPath;
   AnimationValue* _value;
 
 }; // end of class IncrementValueAction

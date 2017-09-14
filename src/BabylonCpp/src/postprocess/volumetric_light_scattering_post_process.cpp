@@ -20,7 +20,7 @@
 namespace BABYLON {
 
 VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
-  const std::string& iName, float ratio, Camera* camera, Mesh* iMesh,
+  const string_t& iName, float ratio, Camera* camera, Mesh* iMesh,
   unsigned int samples, unsigned int samplingMode, Engine* engine,
   bool reusable, Scene* scene)
     : PostProcess(
@@ -94,8 +94,8 @@ bool VolumetricLightScatteringPostProcess::isReady(SubMesh* subMesh,
     return _mesh->material()->isReady(mesh);
   }
 
-  std::vector<std::string> defines;
-  std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
+  vector_t<string_t> defines;
+  vector_t<string_t> attribs{VertexBuffer::PositionKindChars};
   auto material = subMesh->getMaterial();
 
   // Alpha test
@@ -138,10 +138,10 @@ bool VolumetricLightScatteringPostProcess::isReady(SubMesh* subMesh,
   }
 
   // Get correct effect
-  std::string join = String::join(defines, '\n');
+  string_t join = String::join(defines, '\n');
   if (_cachedDefines != join) {
     _cachedDefines = join;
-    std::unordered_map<std::string, std::string> baseName{
+    std::unordered_map<string_t, string_t> baseName{
       {"vertexElement", "depth"},
       {"fragmentElement", "volumetricLightScatteringPass"}};
 
@@ -302,9 +302,9 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
     [&]() { scene->clearColor = savedSceneClearColor; });
 
   _volumetricLightScatteringRTT->customRenderFunction
-    = [&](const std::vector<SubMesh*>& opaqueSubMeshes,
-          const std::vector<SubMesh*>& transparentSubMeshes,
-          const std::vector<SubMesh*>& alphaTestSubMeshes) {
+    = [&](const vector_t<SubMesh*>& opaqueSubMeshes,
+          const vector_t<SubMesh*>& transparentSubMeshes,
+          const vector_t<SubMesh*>& alphaTestSubMeshes) {
         auto pEngine = scene->getEngine();
 
         for (const auto& opaqueSubMesh : opaqueSubMeshes) {
@@ -392,7 +392,7 @@ void VolumetricLightScatteringPostProcess::_updateMeshScreenCoordinates(
 }
 
 Mesh* VolumetricLightScatteringPostProcess::CreateDefaultMesh(
-  const std::string& name, Scene* scene)
+  const string_t& name, Scene* scene)
 {
   auto mesh           = Mesh::CreatePlane(name, 1.f, scene);
   mesh->billboardMode = AbstractMesh::BILLBOARDMODE_ALL;

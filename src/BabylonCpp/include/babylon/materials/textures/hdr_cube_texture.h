@@ -33,7 +33,7 @@ public:
    * @param usePMREMGenerator Specifies wether or not to generate the CubeMap
    * through CubeMapGen to avoid seams issue at run time.
    */
-  HDRCubeTexture(const std::string& url, Scene* scene, size_t size,
+  HDRCubeTexture(const string_t& url, Scene* scene, size_t size,
                  bool noMipmap = false, bool generateHarmonics = true,
                  bool useInGammaSpace = false, bool usePMREMGenerator = false);
   ~HDRCubeTexture();
@@ -64,7 +64,7 @@ public:
   /**
    * The texture URL.
    */
-  std::string url;
+  string_t url;
 
   /**
    * The texture coordinates mode. As this texture is stored in a cube format,
@@ -85,11 +85,11 @@ public:
   bool isPMREM;
 
 public:
-  static std::vector<std::string> _facesMapping;
+  static vector_t<string_t> _facesMapping;
   bool _useInGammaSpace;
   bool _generateHarmonics;
   bool _noMipmap;
-  std::vector<std::string> _extensions;
+  vector_t<string_t> _extensions;
   Matrix _textureMatrix;
   size_t _size;
   bool _usePMREMGenerator;

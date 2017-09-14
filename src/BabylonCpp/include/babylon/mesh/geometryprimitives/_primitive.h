@@ -14,20 +14,20 @@ namespace GeometryPrimitives {
 class BABYLON_SHARED_EXPORT _Primitive : public Geometry {
 
 public:
-  _Primitive(const std::string& id, Scene* scene, bool canBeRegenerated,
+  _Primitive(const string_t& id, Scene* scene, bool canBeRegenerated,
              Mesh* mesh);
   ~_Primitive();
 
   bool canBeRegenerated() const;
   void regenerate();
-  Geometry* asNewGeometry(const std::string& id);
+  Geometry* asNewGeometry(const string_t& id);
 
   void setAllVerticesData(VertexData* vertexData, bool updatable);
   Mesh* setVerticesData(unsigned int kind, const Float32Array& data,
                         bool updatable = false, int stride = -1) override;
 
   virtual std::unique_ptr<VertexData> _regenerateVertexData() = 0;
-  virtual Geometry* copy(const std::string& id)               = 0;
+  virtual Geometry* copy(const string_t& id)                  = 0;
 
 private:
   bool _beingRegenerated;

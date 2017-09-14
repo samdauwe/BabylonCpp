@@ -32,7 +32,7 @@ struct LogMessageHandler {
   bool takes(unsigned int level);
   void handle(const LogMessage& msg);
 
-  std::unordered_map<unsigned int, std::vector<LogMessageListener*>>
+  std::unordered_map<unsigned int, vector_t<LogMessageListener*>>
     _logMessageListeners;
   std::unique_ptr<Active> _bg;
   unsigned int _minLevel, _maxLevel;
@@ -61,7 +61,7 @@ public:
   Logger& operator=(Logger const&) = delete; // Copy assignment
   Logger& operator=(Logger&&) = delete;      // Move assignment
 
-  static LogMessage CreateMessage(unsigned int level, std::string context,
+  static LogMessage CreateMessage(unsigned int level, string_t context,
                                   char const* file, int lineNumber,
                                   char const* func, char const* prettyFunc);
   void log(const LogMessage& logMessage);

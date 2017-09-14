@@ -21,8 +21,8 @@ public:
    *                                 normalized. Useful to depict path
    *                                 acceleration or speed.
    */
-  Path3D(const std::vector<Vector3>& path);
-  Path3D(const std::vector<Vector3>& path, const Vector3& firstNormal,
+  Path3D(const vector_t<Vector3>& path);
+  Path3D(const vector_t<Vector3>& path, const Vector3& firstNormal,
          bool raw = false);
   Path3D(const Path3D& otherPath);
   Path3D(Path3D&& otherPath);
@@ -36,38 +36,38 @@ public:
   /**
    * @brief Returns the Path3D array of successive Vector3 designing its curve.
    */
-  std::vector<Vector3>& getCurve();
+  vector_t<Vector3>& getCurve();
 
   /**
    * Returns an array populated with tangent vectors on each Path3D curve point.
    */
-  std::vector<Vector3>& getTangents();
+  vector_t<Vector3>& getTangents();
 
   /**
    * @brief Returns an array populated with normal vectors on each Path3D curve
    * point.
    */
-  std::vector<Vector3>& getNormals();
+  vector_t<Vector3>& getNormals();
 
   /**
    * @brief Returns an array populated with binormal vectors on each Path3D
    * curve point.
    */
-  std::vector<Vector3>& getBinormals();
+  vector_t<Vector3>& getBinormals();
 
   /**
    * @brief Returns an array populated with distances (float) of the i-th point
    * from the first curve point.
    */
-  std::vector<float>& getDistances();
+  Float32Array& getDistances();
 
   /**
    * @brief Forces the Path3D tangent, normal, binormal and distance
    * recomputation.
    * @returns The same object updated.
    */
-  Path3D& update(const std::vector<Vector3>& path);
-  Path3D& update(const std::vector<Vector3>& path, const Vector3& firstNormal);
+  Path3D& update(const vector_t<Vector3>& path);
+  Path3D& update(const vector_t<Vector3>& path, const Vector3& firstNormal);
 
 private:
   /**
@@ -96,11 +96,11 @@ private:
                         const Vector3* va);
 
 private:
-  std::vector<Vector3> _curve;
-  std::vector<float> _distances;
-  std::vector<Vector3> _tangents;
-  std::vector<Vector3> _normals;
-  std::vector<Vector3> _binormals;
+  vector_t<Vector3> _curve;
+  Float32Array _distances;
+  vector_t<Vector3> _tangents;
+  vector_t<Vector3> _normals;
+  vector_t<Vector3> _binormals;
   bool _raw;
 
 }; // end of class Path3D

@@ -7,12 +7,12 @@
 
 namespace BABYLON {
 
-HemisphericLight::HemisphericLight(const std::string& iName, Scene* scene)
+HemisphericLight::HemisphericLight(const string_t& iName, Scene* scene)
     : HemisphericLight(iName, Vector3::Up(), scene)
 {
 }
 
-HemisphericLight::HemisphericLight(const std::string& iName,
+HemisphericLight::HemisphericLight(const string_t& iName,
                                    const Vector3& iDirection, Scene* scene)
     : Light{iName, scene}
     , groundColor{Color3(0.f, 0.f, 0.f)}
@@ -58,7 +58,7 @@ ShadowGenerator* HemisphericLight::getShadowGenerator()
 }
 
 void HemisphericLight::transferToEffect(Effect* /*effect*/,
-                                        const std::string& lightIndex)
+                                        const string_t& lightIndex)
 {
   auto normalizeDirection = Vector3::Normalize(direction);
 

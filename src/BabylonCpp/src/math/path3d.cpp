@@ -11,7 +11,7 @@ Path3D::Path3D()
 {
 }
 
-Path3D::Path3D(const std::vector<Vector3>& path) : _raw{false}
+Path3D::Path3D(const vector_t<Vector3>& path) : _raw{false}
 {
   for (auto& vector : path) {
     _curve.emplace_back(vector);
@@ -19,7 +19,7 @@ Path3D::Path3D(const std::vector<Vector3>& path) : _raw{false}
   _compute(nullptr);
 }
 
-Path3D::Path3D(const std::vector<Vector3>& path, const Vector3& firstNormal,
+Path3D::Path3D(const vector_t<Vector3>& path, const Vector3& firstNormal,
                bool raw)
     : _raw{raw}
 {
@@ -133,32 +133,32 @@ std::ostream& operator<<(std::ostream& os, const Path3D& path)
   return os;
 }
 
-std::vector<Vector3>& Path3D::getCurve()
+vector_t<Vector3>& Path3D::getCurve()
 {
   return _curve;
 }
 
-std::vector<Vector3>& Path3D::getTangents()
+vector_t<Vector3>& Path3D::getTangents()
 {
   return _tangents;
 }
 
-std::vector<Vector3>& Path3D::getNormals()
+vector_t<Vector3>& Path3D::getNormals()
 {
   return _normals;
 }
 
-std::vector<Vector3>& Path3D::getBinormals()
+vector_t<Vector3>& Path3D::getBinormals()
 {
   return _binormals;
 }
 
-std::vector<float>& Path3D::getDistances()
+Float32Array& Path3D::getDistances()
 {
   return _distances;
 }
 
-Path3D& Path3D::update(const std::vector<Vector3>& path)
+Path3D& Path3D::update(const vector_t<Vector3>& path)
 {
   for (unsigned int p = 0; p < path.size(); ++p) {
     _curve[p].x = path[p].x;
@@ -169,7 +169,7 @@ Path3D& Path3D::update(const std::vector<Vector3>& path)
   return *this;
 }
 
-Path3D& Path3D::update(const std::vector<Vector3>& path,
+Path3D& Path3D::update(const vector_t<Vector3>& path,
                        const Vector3& firstNormal)
 {
   for (unsigned int p = 0; p < path.size(); ++p) {

@@ -52,7 +52,7 @@ public:
    *  Example : bSphereRadiusFactor = 1.0 / Math.sqrt(3.0) => the bounding
    * sphere exactly matches a spherical mesh.
    */
-  SolidParticleSystem(const std::string& name, Scene* scene,
+  SolidParticleSystem(const string_t& name, Scene* scene,
                       const SolidParticleSystemOptions& options);
   virtual ~SolidParticleSystem();
 
@@ -309,7 +309,7 @@ private:
    * @brief Inserts the shape model in the global SPS mesh.
    */
   SolidParticle*
-  _meshBuilder(unsigned int p, const std::vector<Vector3>& shape,
+  _meshBuilder(unsigned int p, const vector_t<Vector3>& shape,
                Float32Array& positions, Uint32Array& meshInd,
                Uint32Array& indices, const Float32Array& meshUV,
                Float32Array& uvs, const Float32Array& meshCol,
@@ -320,7 +320,7 @@ private:
   /**
    * @brief Returns a shape array from positions array.
    */
-  std::vector<Vector3> _posToShape(const Float32Array& positions);
+  vector_t<Vector3> _posToShape(const Float32Array& positions);
 
   /**
    * @brief Returns a shapeUV array from a Vector4 uvs.
@@ -350,7 +350,7 @@ public:
    * any classic array.
    * Example : var p = SPS.particles[i];
    */
-  std::vector<std::unique_ptr<SolidParticle>> particles;
+  vector_t<std::unique_ptr<SolidParticle>> particles;
 
   /**
    * The SPS total number of particles. Read only. Use SPS.counter instead if
@@ -378,7 +378,7 @@ public:
   /**
    * The SPS name. This name is also given to the underlying mesh.
    */
-  std::string name;
+  string_t name;
 
   /**
    * The SPS mesh. It's a standard BJS Mesh, so all the methods from the Mesh
@@ -396,7 +396,7 @@ public:
    * Please read :
    * http://doc.babylonjs.com/overviews/Solid_Particle_System#pickable-particles
    */
-  std::vector<PickedParticle> pickedParticles;
+  vector_t<PickedParticle> pickedParticles;
 
   bool _bSphereOnly;
   float _bSphereRadiusFactor;
@@ -421,7 +421,7 @@ private:
   bool _alwaysVisible;
   int _shapeCounter;
   std::unique_ptr<SolidParticle> _copy;
-  std::vector<Vector3> _shape;
+  vector_t<Vector3> _shape;
   Float32Array _shapeUV;
   std::unique_ptr<Color4> _color;
   bool _computeParticleColor;

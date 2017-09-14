@@ -15,7 +15,7 @@ public:
   static constexpr unsigned int POSE_ENABLED = 3;
 
 public:
-  Gamepad(const std::string& id, int index,
+  Gamepad(const string_t& id, int index,
           const std::shared_ptr<IBrowserGamepad>& browserGamepad,
           unsigned int leftStickX = 0, unsigned int leftStickY = 1,
           unsigned int rightStickX = 2, unsigned int rightStickY = 3);
@@ -35,7 +35,7 @@ public:
   virtual void dispose();
 
 public:
-  std::string id;
+  string_t id;
   int index;
   unsigned int type;
 

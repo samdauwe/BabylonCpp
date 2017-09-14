@@ -42,10 +42,10 @@ public:
    * @param {boolean} fullDetails - support for multiple levels of logging
    * within scene loading
    */
-  std::string toString(bool fullDetails = false) const;
+  string_t toString(bool fullDetails = false) const;
 
   Vector3& globalPosition();
-  std::vector<Mesh*>& getActiveMeshes();
+  vector_t<Mesh*>& getActiveMeshes();
   bool isActiveMesh(Mesh* mesh);
 
   /** Cache **/
@@ -66,8 +66,8 @@ public:
   virtual void detachControl(ICanvas* canvas);
   void _update();
   virtual void _checkInputs();
-  std::vector<Camera*>& rigCameras();
-  const std::vector<Camera*>& rigCameras() const;
+  vector_t<Camera*>& rigCameras();
+  const vector_t<Camera*>& rigCameras() const;
   PostProcess* rigPostProcess();
   int attachPostProcess(PostProcess* postProcess, int insertAt = -1);
   Int32Array detachPostProcess(PostProcess* postProcess,
@@ -93,26 +93,26 @@ public:
   FreeCamera* rightCamera();
   Vector3* getLeftTarget();
   Vector3* getRightTarget();
-  void setCameraRigMode(int mode, const std::string& rigParams);
-  void setCameraRigParameter(const std::string& name, float value);
-  virtual Camera* createRigCamera(const std::string& name, int cameraIndex);
+  void setCameraRigMode(int mode, const string_t& rigParams);
+  void setCameraRigParameter(const string_t& name, float value);
+  virtual Camera* createRigCamera(const string_t& name, int cameraIndex);
   virtual void _updateRigCameras();
   virtual void _setupInputs();
   virtual Json::object serialize() const;
   virtual const char* getClassName() const override;
-  Camera* clone(const std::string& name);
+  Camera* clone(const string_t& name);
   Vector3 getDirection(const Vector3& localAxis);
   void getDirectionToRef(const Vector3& localAxis, Vector3& result);
 
   // Statics
-  static Camera* GetConstructorFromName(const std::string& type,
-                                        const std::string& name, Scene* scene,
+  static Camera* GetConstructorFromName(const string_t& type,
+                                        const string_t& name, Scene* scene,
                                         float interaxial_distance     = 0.f,
                                         bool isStereoscopicSideBySide = true);
   static Camera* Parse(const Json::value& parsedCamera, Scene* scene);
 
 protected:
-  Camera(const std::string& name, const Vector3& position, Scene* scene);
+  Camera(const string_t& name, const Vector3& position, Scene* scene);
 
 private:
   void _cascadePostProcessesToRigCams();
@@ -146,9 +146,9 @@ public:
   float interaxialDistance;
   bool isStereoscopicSideBySide;
   CameraRigParams _cameraRigParams;
-  std::vector<Camera*> _rigCameras;
+  vector_t<Camera*> _rigCameras;
   PostProcess* _rigPostProcess;
-  std::vector<RenderTargetTexture*> customRenderTargets;
+  vector_t<RenderTargetTexture*> customRenderTargets;
 
   /** Observables **/
   Observable<Camera> onViewMatrixChangedObservable;
@@ -157,9 +157,9 @@ public:
 
   /** Cache **/
   Matrix _projectionMatrix;
-  std::vector<PostProcess*> _postProcesses;
+  vector_t<PostProcess*> _postProcesses;
   Uint32Array _postProcessesTakenIndices;
-  std::vector<Mesh*> _activeMeshes;
+  vector_t<Mesh*> _activeMeshes;
 
 private:
   Matrix _computedViewMatrix;
@@ -169,7 +169,7 @@ private:
   Matrix _webvrProjectionMatrix;
   Matrix _webvrViewMatrix;
   Vector3 _globalPosition;
-  std::array<Plane, 6> _frustumPlanes;
+  array_t<Plane, 6> _frustumPlanes;
   bool _refreshFrustumPlanes;
 
 }; // end of class Camera

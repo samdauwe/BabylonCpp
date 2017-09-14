@@ -63,8 +63,8 @@ public:
    * the shader.
    * @param {number|number[]} size Data size, or data directly.
    */
-  void addUniform(const std::string& name, size_t size);
-  void addUniform(const std::string& name, const Float32Array& size);
+  void addUniform(const string_t& name, size_t size);
+  void addUniform(const string_t& name, const Float32Array& size);
 
   /**
    * @brief Wrapper for addUniform.
@@ -72,7 +72,7 @@ public:
    * the shader.
    * @param {Matrix} mat A 4x4 matrix.
    */
-  void addMatrix(const std::string& name, const Matrix& mat);
+  void addMatrix(const string_t& name, const Matrix& mat);
 
   /**
    * @brief Wrapper for addUniform.
@@ -81,7 +81,7 @@ public:
    * @param {number} x
    * @param {number} y
    */
-  void addFloat2(const std::string& name, float x, float y);
+  void addFloat2(const string_t& name, float x, float y);
 
   /**
    * @brief Wrapper for addUniform.
@@ -91,7 +91,7 @@ public:
    * @param {number} y
    * @param {number} z
    */
-  void addFloat3(const std::string& name, float x, float y, float z);
+  void addFloat3(const string_t& name, float x, float y, float z);
 
   /**
    * @brief Wrapper for addUniform.
@@ -99,7 +99,7 @@ public:
    * the shader.
    * @param {Color3} color
    */
-  void addColor3(const std::string& name, const Color3& color);
+  void addColor3(const string_t& name, const Color3& color);
 
   /**
    * @brief Wrapper for addUniform.
@@ -108,7 +108,7 @@ public:
    * @param {Color3} color
    * @param {number} alpha
    */
-  void addColor4(const std::string& name, const Color3& color, float alpha);
+  void addColor4(const string_t& name, const Color3& color, float alpha);
 
   /**
    * @brief Wrapper for addUniform.
@@ -116,21 +116,21 @@ public:
    * the shader.
    * @param {Vector3} vector
    */
-  void addVector3(const std::string& name, const Vector3& vector);
+  void addVector3(const string_t& name, const Vector3& vector);
 
   /**
    * @brief Wrapper for addUniform.
    * @param {string} name Name of the uniform, as used in the uniform block in
    * the shader.
    */
-  void addMatrix3x3(const std::string& name);
+  void addMatrix3x3(const string_t& name);
 
   /**
    * @brief Wrapper for addUniform.
    * @param {string} name Name of the uniform, as used in the uniform block in
    * the shader.
    */
-  void addMatrix2x2(const std::string& name);
+  void addMatrix2x2(const string_t& name);
 
   /**
    * @brief Effectively creates the WebGL Uniform Buffer, once layout is
@@ -155,7 +155,7 @@ public:
    * @param {number[]|Float32Array} data Flattened data
    * @param {number} size Size of the data.
    */
-  void updateUniform(const std::string& uniformName, const Float32Array& data,
+  void updateUniform(const string_t& uniformName, const Float32Array& data,
                      size_t size);
 
   /**
@@ -163,7 +163,7 @@ public:
    * @param {string} name Name of the sampler.
    * @param {Texture} texture
    */
-  void setTexture(const std::string& name, BaseTexture* texture);
+  void setTexture(const string_t& name, BaseTexture* texture);
 
   /**
    * @brief Directly updates the value of the uniform in the cache AND on the
@@ -172,7 +172,7 @@ public:
    * block in the shader.
    * @param {number[]|Float32Array} data Flattened data
    */
-  void updateUniformDirectly(const std::string& uniformName,
+  void updateUniformDirectly(const string_t& uniformName,
                              const Float32Array& data);
 
   /**
@@ -180,7 +180,7 @@ public:
    * @param {Effect} effect
    * @param {string} name Name of the uniform block in the shader.
    */
-  void bindToEffect(Effect* effect, const std::string& name);
+  void bindToEffect(Effect* effect, const string_t& name);
 
   /**
    * @brief Disposes the uniform buffer.
@@ -197,43 +197,42 @@ private:
   void _fillAlignment(size_t size);
 
   // Update methods
-  void _updateMatrix3x3ForUniform(const std::string& name,
+  void _updateMatrix3x3ForUniform(const string_t& name,
                                   const Float32Array& matrix);
-  void _updateMatrix3x3ForEffect(const std::string& name,
+  void _updateMatrix3x3ForEffect(const string_t& name,
                                  const Float32Array& matrix);
-  void _updateMatrix2x2ForEffect(const std::string& name,
+  void _updateMatrix2x2ForEffect(const string_t& name,
                                  const Float32Array& matrix);
-  void _updateMatrix2x2ForUniform(const std::string& name,
+  void _updateMatrix2x2ForUniform(const string_t& name,
                                   const Float32Array& matrix);
-  void _updateFloatForEffect(const std::string& name, float x);
-  void _updateFloatForUniform(const std::string& name, float x);
-  void _updateFloat2ForEffect(const std::string& name, float x, float y,
-                              const std::string& suffix = "");
-  void _updateFloat2ForUniform(const std::string& name, float x, float y,
-                               const std::string& suffix = "");
-  void _updateFloat3ForEffect(const std::string& name, float x, float y,
-                              float z, const std::string& suffix = "");
-  void _updateFloat3ForUniform(const std::string& name, float x, float y,
-                               float z, const std::string& suffix = "");
-  void _updateFloat4ForEffect(const std::string& name, float x, float y,
-                              float z, float w, const std::string& suffix = "");
-  void _updateFloat4ForUniform(const std::string& name, float x, float y,
-                               float z, float w,
-                               const std::string& suffix = "");
-  void _updateMatrixForEffect(const std::string& name, const Matrix& mat);
-  void _updateMatrixForUniform(const std::string& name, const Matrix& mat);
-  void _updateVector3ForEffect(const std::string& name, const Vector3& vector);
-  void _updateVector3ForUniform(const std::string& name, const Vector3& vector);
-  void _updateVector4ForEffect(const std::string& name, const Vector4& vector);
-  void _updateVector4ForUniform(const std::string& name, const Vector4& vector);
-  void _updateColor3ForEffect(const std::string& name, const Color3& color,
-                              const std::string& suffix = "");
-  void _updateColor3ForUniform(const std::string& name, const Color3& color,
-                               const std::string& suffix = "");
-  void _updateColor4ForEffect(const std::string& name, const Color3& color,
-                              float alpha, const std::string& suffix = "");
-  void _updateColor4ForUniform(const std::string& name, const Color3& color,
-                               float alpha, const std::string& suffix = "");
+  void _updateFloatForEffect(const string_t& name, float x);
+  void _updateFloatForUniform(const string_t& name, float x);
+  void _updateFloat2ForEffect(const string_t& name, float x, float y,
+                              const string_t& suffix = "");
+  void _updateFloat2ForUniform(const string_t& name, float x, float y,
+                               const string_t& suffix = "");
+  void _updateFloat3ForEffect(const string_t& name, float x, float y, float z,
+                              const string_t& suffix = "");
+  void _updateFloat3ForUniform(const string_t& name, float x, float y, float z,
+                               const string_t& suffix = "");
+  void _updateFloat4ForEffect(const string_t& name, float x, float y, float z,
+                              float w, const string_t& suffix = "");
+  void _updateFloat4ForUniform(const string_t& name, float x, float y, float z,
+                               float w, const string_t& suffix = "");
+  void _updateMatrixForEffect(const string_t& name, const Matrix& mat);
+  void _updateMatrixForUniform(const string_t& name, const Matrix& mat);
+  void _updateVector3ForEffect(const string_t& name, const Vector3& vector);
+  void _updateVector3ForUniform(const string_t& name, const Vector3& vector);
+  void _updateVector4ForEffect(const string_t& name, const Vector4& vector);
+  void _updateVector4ForUniform(const string_t& name, const Vector4& vector);
+  void _updateColor3ForEffect(const string_t& name, const Color3& color,
+                              const string_t& suffix = "");
+  void _updateColor3ForUniform(const string_t& name, const Color3& color,
+                               const string_t& suffix = "");
+  void _updateColor4ForEffect(const string_t& name, const Color3& color,
+                              float alpha, const string_t& suffix = "");
+  void _updateColor4ForUniform(const string_t& name, const Color3& color,
+                               float alpha, const string_t& suffix = "");
 
 public:
   /**
@@ -243,7 +242,7 @@ public:
    * the shader.
    * @param {Float32Array} matrix
    */
-  ::std::function<void(const std::string& name, const Float32Array& matrix)>
+  ::std::function<void(const string_t& name, const Float32Array& matrix)>
     updateMatrix3x3;
 
   /**
@@ -252,7 +251,7 @@ public:
    * the shader.
    * @param {Float32Array} matrix
    */
-  ::std::function<void(const std::string& name, const Float32Array& matrix)>
+  ::std::function<void(const string_t& name, const Float32Array& matrix)>
     updateMatrix2x2;
 
   /**
@@ -261,7 +260,7 @@ public:
    * the shader.
    * @param {number} x
    */
-  ::std::function<void(const std::string& name, float x)> updateFloat;
+  ::std::function<void(const string_t& name, float x)> updateFloat;
 
   /**
    * @brief Wrapper for updateUniform.
@@ -271,8 +270,8 @@ public:
    * @param {number} y
    * @param {string} [suffix] Suffix to add to the uniform name.
    */
-  ::std::function<void(const std::string& name, float x, float y,
-                       const std::string& suffix)>
+  ::std::function<void(const string_t& name, float x, float y,
+                       const string_t& suffix)>
     updateFloat2;
 
   /**
@@ -284,8 +283,8 @@ public:
    * @param {number} z
    * @param {string} [suffix] Suffix to add to the uniform name.
    */
-  ::std::function<void(const std::string& name, float x, float y, float z,
-                       const std::string& suffix)>
+  ::std::function<void(const string_t& name, float x, float y, float z,
+                       const string_t& suffix)>
     updateFloat3;
 
   /**
@@ -298,8 +297,8 @@ public:
    * @param {number} w
    * @param {string} [suffix] Suffix to add to the uniform name.
    */
-  ::std::function<void(const std::string& name, float x, float y, float z,
-                       float w, const std::string& suffix)>
+  ::std::function<void(const string_t& name, float x, float y, float z, float w,
+                       const string_t& suffix)>
     updateFloat4;
 
   /**
@@ -308,8 +307,7 @@ public:
    * the shader.
    * @param {Matrix} A 4x4 matrix.
    */
-  ::std::function<void(const std::string& name, const Matrix& mat)>
-    updateMatrix;
+  ::std::function<void(const string_t& name, const Matrix& mat)> updateMatrix;
 
   /**
    * @brief Wrapper for updateUniform.
@@ -317,7 +315,7 @@ public:
    * the shader.
    * @param {Vector3} vector
    */
-  ::std::function<void(const std::string& name, const Vector3& vector)>
+  ::std::function<void(const string_t& name, const Vector3& vector)>
     updateVector3;
 
   /**
@@ -326,7 +324,7 @@ public:
    * the shader.
    * @param {Vector4} vector
    */
-  ::std::function<void(const std::string& name, const Vector4& vector)>
+  ::std::function<void(const string_t& name, const Vector4& vector)>
     updateVector4;
 
   /**
@@ -336,8 +334,8 @@ public:
    * @param {Color3} color
    * @param {string} [suffix] Suffix to add to the uniform name.
    */
-  ::std::function<void(const std::string& name, const Color3& color,
-                       const std::string& suffix)>
+  ::std::function<void(const string_t& name, const Color3& color,
+                       const string_t& suffix)>
     updateColor3;
 
   /**
@@ -348,8 +346,8 @@ public:
    * @param {number} alpha
    * @param {string} [suffix] Suffix to add to the uniform name.
    */
-  ::std::function<void(const std::string& name, const Color3& color,
-                       float alpha, const std::string& suffix)>
+  ::std::function<void(const string_t& name, const Color3& color, float alpha,
+                       const string_t& suffix)>
     updateColor4;
 
 private:
@@ -358,9 +356,9 @@ private:
   Float32Array _data;
   Float32Array _bufferData;
   bool _dynamic;
-  std::string _uniformName;
-  std::unordered_map<std::string, size_t> _uniformLocations;
-  std::unordered_map<std::string, size_t> _uniformSizes;
+  string_t _uniformName;
+  std::unordered_map<string_t, size_t> _uniformLocations;
+  std::unordered_map<string_t, size_t> _uniformSizes;
   size_t _uniformLocationPointer;
   bool _needSync;
   Float32Array _cache;

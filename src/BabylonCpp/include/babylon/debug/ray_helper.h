@@ -35,7 +35,7 @@ public:
   Ray ray;
 
 private:
-  std::vector<Vector3> _renderPoints;
+  vector_t<Vector3> _renderPoints;
   LinesMesh* _renderLine;
   ::std::function<void()> _renderFunction;
   Scene* _scene;

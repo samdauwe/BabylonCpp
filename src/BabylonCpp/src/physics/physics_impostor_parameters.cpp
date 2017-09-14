@@ -4,13 +4,13 @@
 
 namespace BABYLON {
 
-bool PhysicsImpostorParameters::contains(const std::string& key) const
+bool PhysicsImpostorParameters::contains(const string_t& key) const
 {
   return (key == "mass") || (key == "friction") || (key == "restitution")
          || stl_util::contains(nativeOptions, key);
 }
 
-float PhysicsImpostorParameters::operator[](const std::string& key) const
+float PhysicsImpostorParameters::operator[](const string_t& key) const
 {
   if (key == "mass") {
     return mass;
@@ -31,7 +31,7 @@ float PhysicsImpostorParameters::operator[](const std::string& key) const
   return 0.f;
 }
 
-void PhysicsImpostorParameters::setValue(const std::string& key, float value)
+void PhysicsImpostorParameters::setValue(const string_t& key, float value)
 {
   if (key == "mass") {
     mass = value;

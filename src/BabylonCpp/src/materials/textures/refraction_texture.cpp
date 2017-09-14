@@ -5,7 +5,7 @@
 
 namespace BABYLON {
 
-RefractionTexture::RefractionTexture(const std::string& iName, ISize size,
+RefractionTexture::RefractionTexture(const string_t& iName, ISize size,
                                      Scene* scene, bool generateMipMaps)
     : RenderTargetTexture(iName, size, scene, generateMipMaps, true)
     , refractionPlane{Plane(0.f, 1.f, 0.f, 1.f)}

@@ -10,7 +10,7 @@ class BABYLON_SHARED_EXPORT InterpolateValueAction : public Action {
 
 public:
   InterpolateValueAction(unsigned int triggerOptions, IAnimatable* target,
-                         const std::string& propertyPath, AnimationValue* value,
+                         const string_t& propertyPath, AnimationValue* value,
                          int duration = 1000, Condition* condition = nullptr,
                          bool stopOtherAnimations = false,
                          const ::std::function<void()>& onInterpolationDone
@@ -22,7 +22,7 @@ public:
   Json::object serialize(Json::object& parent) const override;
 
 public:
-  std::string propertyPath;
+  string_t propertyPath;
   AnimationValue* value;
   int duration;
   bool stopOtherAnimations;
@@ -31,7 +31,7 @@ public:
 private:
   IAnimatable* _target;
   IAnimatable* _effectiveTarget;
-  std::string _property;
+  string_t _property;
 
 }; // end of class InterpolateValueAction
 

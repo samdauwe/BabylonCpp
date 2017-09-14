@@ -6,7 +6,7 @@
 namespace BABYLON {
 namespace Internals {
 
-PBRBaseSimpleMaterial::PBRBaseSimpleMaterial(const std::string& iName,
+PBRBaseSimpleMaterial::PBRBaseSimpleMaterial(const string_t& iName,
                                              Scene* scene)
     : PBRBaseMaterial{iName, scene}
     , maxSimultaneousLights{4}
@@ -99,7 +99,7 @@ bool PBRBaseSimpleMaterial::needAlphaTesting()
          && _transparencyMode == PBRMaterial::PBRMATERIAL_ALPHATEST;
 }
 
-std::vector<BaseTexture*> PBRBaseSimpleMaterial::getActiveTextures() const
+vector_t<BaseTexture*> PBRBaseSimpleMaterial::getActiveTextures() const
 {
   auto activeTextures = PBRBaseMaterial::getActiveTextures();
 

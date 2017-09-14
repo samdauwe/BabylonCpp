@@ -5,7 +5,7 @@
 
 namespace BABYLON {
 
-LogMessage::LogMessage(unsigned int lvl, const std::string& ctx)
+LogMessage::LogMessage(unsigned int lvl, const string_t& ctx)
     : _level{lvl}, _context{ctx}
 {
   // Set timestamp
@@ -89,7 +89,7 @@ std::ostream& operator<<(std::ostream& os, const LogMessage& logMessage)
   return os;
 }
 
-std::string LogMessage::toString() const
+string_t LogMessage::toString() const
 {
   std::ostringstream oss;
   oss << *this;
@@ -117,19 +117,19 @@ system_time_point_t LogMessage::timestamp() const
   return _timestamp;
 }
 
-std::string LogMessage::getReadableTimestamp() const
+string_t LogMessage::getReadableTimestamp() const
 {
   return Time::toIso8601Ms(_timestamp);
 }
 
-std::string const& LogMessage::file() const
+string_t const& LogMessage::file() const
 {
   return _file;
 }
 
 void LogMessage::setFile(char const* file)
 {
-  _file = std::string(file);
+  _file = string_t(file);
 }
 
 int const& LogMessage::lineNumber() const
@@ -142,27 +142,27 @@ void LogMessage::setLineNumber(int lineNumber)
   _lineNumber = lineNumber;
 }
 
-std::string const& LogMessage::threadId() const
+string_t const& LogMessage::threadId() const
 {
   return _threadId;
 }
 
-std::string const& LogMessage::context() const
+string_t const& LogMessage::context() const
 {
   return _context;
 }
 
-std::string const& LogMessage::function() const
+string_t const& LogMessage::function() const
 {
   return _function;
 }
 
 void LogMessage::setFunction(char const* func)
 {
-  _function = std::string(func);
+  _function = string_t(func);
 }
 
-std::string const& LogMessage::prettyFunction() const
+string_t const& LogMessage::prettyFunction() const
 {
   return _prettyFunction;
 }
@@ -172,7 +172,7 @@ void LogMessage::setPrettyFunction(char const* prettyFunc)
   _prettyFunction = prettify(prettyFunc);
 }
 
-std::string LogMessage::message() const
+string_t LogMessage::message() const
 {
   return _oss.str();
 }
@@ -184,8 +184,8 @@ std::string LogMessage::message() const
  */
 void LogMessage::writef(const char* printf_like_message, ...)
 {
-  static const int kMaxMessageSize               = 2048;
-  static const std::string kTruncatedWarningText = "[...truncated...]";
+  static const int kMaxMessageSize            = 2048;
+  static const string_t kTruncatedWarningText = "[...truncated...]";
   char finished_message[kMaxMessageSize];
   va_list arglist;
   va_start(arglist, printf_like_message);
@@ -214,7 +214,7 @@ void LogMessage::writef(const char* printf_like_message, ...)
   }
 }
 
-std::string LogMessage::prettify(char const* pretty_func)
+string_t LogMessage::prettify(char const* pretty_func)
 {
   auto paren     = pretty_func;
   auto c         = pretty_func;

@@ -6,7 +6,7 @@
 
 namespace BABYLON {
 
-ShadowLight::ShadowLight(const std::string& name, Scene* scene)
+ShadowLight::ShadowLight(const string_t& name, Scene* scene)
     : IShadowLight{name, scene}, _needProjectionMatrixCompute{true}
 {
 }
@@ -150,8 +150,7 @@ float ShadowLight::getDepthMaxZ(Camera* activeCamera) const
 }
 
 IShadowLight* ShadowLight::setShadowProjectionMatrix(
-  Matrix& matrix, Matrix& viewMatrix,
-  const std::vector<AbstractMesh*>& renderList)
+  Matrix& matrix, Matrix& viewMatrix, const vector_t<AbstractMesh*>& renderList)
 {
   if (customProjectionMatrixBuilder) {
     customProjectionMatrixBuilder(viewMatrix, renderList, matrix);

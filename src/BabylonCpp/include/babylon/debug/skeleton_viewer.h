@@ -22,13 +22,11 @@ public:
 private:
   void _getBonePosition(Vector3& position, Bone* bone, const Matrix& meshMat,
                         float x = 0.f, float y = 0.f, float z = 0.f) const;
-  void
-  _getLinesForBonesWithLength(const std::vector<std::unique_ptr<Bone>>& bones,
-                              const Matrix& meshMat);
+  void _getLinesForBonesWithLength(const vector_t<std::unique_ptr<Bone>>& bones,
+                                   const Matrix& meshMat);
   void _resizeDebugLines(size_t bonesSize);
-  void
-  _getLinesForBonesNoLength(const std::vector<std::unique_ptr<Bone>>& bones,
-                            const Matrix& meshMat);
+  void _getLinesForBonesNoLength(const vector_t<std::unique_ptr<Bone>>& bones,
+                                 const Matrix& meshMat);
 
 public:
   Color3 color;
@@ -39,7 +37,7 @@ public:
 
 private:
   Scene* _scene;
-  std::vector<std::vector<Vector3>> _debugLines;
+  vector_t<vector_t<Vector3>> _debugLines;
   LinesMesh* _debugMesh;
   bool _isEnabled;
   ::std::function<void()> _renderFunction;

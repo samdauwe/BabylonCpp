@@ -49,7 +49,7 @@ public:
    * @brief Sets the passed Effect object with the SpotLight transfomed position
    * (or position if not parented) and normalized direction.
    */
-  void transferToEffect(Effect* effect, const std::string& lightIndex) override;
+  void transferToEffect(Effect* effect, const string_t& lightIndex) override;
 
 protected:
   /**
@@ -63,7 +63,7 @@ protected:
    * It can cast shadows.
    * Documentation : http://doc.babylonjs.com/tutorials/lights
    */
-  SpotLight(const std::string& name, const Vector3& position,
+  SpotLight(const string_t& name, const Vector3& position,
             const Vector3& direction, float angle, float exponent,
             Scene* scene);
 
@@ -75,7 +75,7 @@ protected:
    */
   void _setDefaultShadowProjectionMatrix(
     Matrix& matrix, const Matrix& viewMatrix,
-    const std::vector<AbstractMesh*>& renderList) override;
+    const vector_t<AbstractMesh*>& renderList) override;
 
   void _buildUniformLayout() override;
 

@@ -178,7 +178,7 @@ public:
   }
 
 private:
-  std::vector<typename Observer<T>::Ptr> _observers;
+  vector_t<typename Observer<T>::Ptr> _observers;
 
 }; // end of class Observable
 

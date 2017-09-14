@@ -2,7 +2,7 @@
 
 namespace BABYLON {
 
-HDRCubeTexture::HDRCubeTexture(const std::string& /*url*/, Scene* scene,
+HDRCubeTexture::HDRCubeTexture(const string_t& /*url*/, Scene* scene,
                                size_t /*size*/, bool /*noMipmap*/,
                                bool /*generateHarmonics*/,
                                bool /*useInGammaSpace*/,

@@ -58,8 +58,8 @@ private:
   static float Ldexp(float mantissa, float exponent);
   static void Rgbe2float(Float32Array& float32array, float red, float green,
                          float blue, float exponent, size_t index);
-  static std::string readStringLine(const Uint8Array& uint8array,
-                                    size_t startIndex);
+  static string_t readStringLine(const Uint8Array& uint8array,
+                                 size_t startIndex);
   static Float32Array RGBE_ReadPixels_RLE(const Uint8Array& uint8array,
                                           const HDRInfo& hdrInfo);
 

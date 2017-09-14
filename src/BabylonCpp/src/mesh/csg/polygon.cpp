@@ -4,7 +4,7 @@
 
 namespace BABYLON {
 
-CSG::Polygon::Polygon(const std::vector<Vertex*>& _vertices,
+CSG::Polygon::Polygon(const vector_t<Vertex*>& _vertices,
                       const PolygonOptions& _shared)
     : vertices{_vertices}, shared{_shared}, _hasPlane{true}
 {
@@ -76,7 +76,7 @@ std::ostream& operator<<(std::ostream& os, const Polygon& polygon)
 }
 } // namespace CSG
 
-std::string CSG::Polygon::toString() const
+string_t CSG::Polygon::toString() const
 {
   std::ostringstream oss;
   oss << (*this);

@@ -18,7 +18,7 @@
 
 namespace BABYLON {
 
-Mesh* MeshBuilder::CreateBox(const std::string& name, BoxOptions& options,
+Mesh* MeshBuilder::CreateBox(const string_t& name, BoxOptions& options,
                              Scene* scene)
 {
   auto box = Mesh::New(name, scene);
@@ -32,7 +32,7 @@ Mesh* MeshBuilder::CreateBox(const std::string& name, BoxOptions& options,
   return box;
 }
 
-Mesh* MeshBuilder::CreateSphere(const std::string& name, SphereOptions& options,
+Mesh* MeshBuilder::CreateSphere(const string_t& name, SphereOptions& options,
                                 Scene* scene)
 {
   auto sphere = Mesh::New(name, scene);
@@ -46,7 +46,7 @@ Mesh* MeshBuilder::CreateSphere(const std::string& name, SphereOptions& options,
   return sphere;
 }
 
-Mesh* MeshBuilder::CreateDisc(const std::string& name, DiscOptions& options,
+Mesh* MeshBuilder::CreateDisc(const string_t& name, DiscOptions& options,
                               Scene* scene)
 {
   auto disc = Mesh::New(name, scene);
@@ -60,7 +60,7 @@ Mesh* MeshBuilder::CreateDisc(const std::string& name, DiscOptions& options,
   return disc;
 }
 
-Mesh* MeshBuilder::CreateIcoSphere(const std::string& name,
+Mesh* MeshBuilder::CreateIcoSphere(const string_t& name,
                                    IcoSphereOptions& options, Scene* scene)
 {
   auto sphere = Mesh::New(name, scene);
@@ -74,7 +74,7 @@ Mesh* MeshBuilder::CreateIcoSphere(const std::string& name,
   return sphere;
 }
 
-Mesh* MeshBuilder::CreateRibbon(const std::string& name, RibbonOptions& options,
+Mesh* MeshBuilder::CreateRibbon(const string_t& name, RibbonOptions& options,
                                 Scene* scene)
 
 {
@@ -227,7 +227,7 @@ Mesh* MeshBuilder::CreateRibbon(const std::string& name, RibbonOptions& options,
   }
 }
 
-Mesh* MeshBuilder::CreateCylinder(const std::string& name,
+Mesh* MeshBuilder::CreateCylinder(const string_t& name,
                                   CylinderOptions& options, Scene* scene)
 {
   auto cylinder = Mesh::New(name, scene);
@@ -241,7 +241,7 @@ Mesh* MeshBuilder::CreateCylinder(const std::string& name,
   return cylinder;
 }
 
-Mesh* MeshBuilder::CreateTorus(const std::string& name, TorusOptions& options,
+Mesh* MeshBuilder::CreateTorus(const string_t& name, TorusOptions& options,
                                Scene* scene)
 {
   auto torus = Mesh::New(name, scene);
@@ -255,7 +255,7 @@ Mesh* MeshBuilder::CreateTorus(const std::string& name, TorusOptions& options,
   return torus;
 }
 
-Mesh* MeshBuilder::CreateTorusKnot(const std::string& name,
+Mesh* MeshBuilder::CreateTorusKnot(const string_t& name,
                                    TorusKnotOptions& options, Scene* scene)
 {
   auto torusKnot = Mesh::New(name, scene);
@@ -269,7 +269,7 @@ Mesh* MeshBuilder::CreateTorusKnot(const std::string& name,
   return torusKnot;
 }
 
-LinesMesh* MeshBuilder::CreateLineSystem(const std::string& name,
+LinesMesh* MeshBuilder::CreateLineSystem(const string_t& name,
                                          LineSystemOptions& options,
                                          Scene* scene)
 {
@@ -299,14 +299,14 @@ LinesMesh* MeshBuilder::CreateLineSystem(const std::string& name,
   return lineSystem;
 }
 
-LinesMesh* MeshBuilder::CreateLines(const std::string& name,
-                                    LinesOptions& options, Scene* scene)
+LinesMesh* MeshBuilder::CreateLines(const string_t& name, LinesOptions& options,
+                                    Scene* scene)
 {
   LineSystemOptions lineSystemOptions(options);
   return MeshBuilder::CreateLineSystem(name, lineSystemOptions, scene);
 }
 
-LinesMesh* MeshBuilder::CreateDashedLines(const std::string& name,
+LinesMesh* MeshBuilder::CreateDashedLines(const string_t& name,
                                           DashedLinesOptions& options,
                                           Scene* scene)
 {
@@ -370,7 +370,7 @@ LinesMesh* MeshBuilder::CreateDashedLines(const std::string& name,
   return dashedLines;
 }
 
-Mesh* MeshBuilder::ExtrudeShape(const std::string& name,
+Mesh* MeshBuilder::ExtrudeShape(const string_t& name,
                                 ExtrudeShapeOptions& options, Scene* scene)
 {
   options.sideOrientation
@@ -383,7 +383,7 @@ Mesh* MeshBuilder::ExtrudeShape(const std::string& name,
     options.frontUVs, options.backUVs);
 }
 
-Mesh* MeshBuilder::ExtrudeShapeCustom(const std::string& name,
+Mesh* MeshBuilder::ExtrudeShapeCustom(const string_t& name,
                                       ExtrudeShapeCustomOptions& options,
                                       Scene* scene)
 {
@@ -397,7 +397,7 @@ Mesh* MeshBuilder::ExtrudeShapeCustom(const std::string& name,
     options.instance, options.invertUV, options.frontUVs, options.backUVs);
 }
 
-Mesh* MeshBuilder::CreateLathe(const std::string& name, LatheOptions& options,
+Mesh* MeshBuilder::CreateLathe(const string_t& name, LatheOptions& options,
                                Scene* scene)
 {
   const auto arc           = options.arc();
@@ -411,13 +411,13 @@ Mesh* MeshBuilder::CreateLathe(const std::string& name, LatheOptions& options,
     = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
   const auto& cap = options.cap;
   const auto& pi2 = Math::PI2;
-  std::vector<std::vector<Vector3>> paths;
+  vector_t<vector_t<Vector3>> paths;
   const auto& invertUV = options.invertUV;
 
   const float step = pi2 / tessellation * arc;
   Vector3 rotated;
   for (float i = 0.f; i <= tessellation; ++i) {
-    std::vector<Vector3> path;
+    vector_t<Vector3> path;
     if (cap == Mesh::CAP_START || cap == Mesh::CAP_ALL) {
       path.emplace_back(Vector3(0.f, shape[0].y, 0.f));
       path.emplace_back(Vector3(::std::cos(i * step) * shape[0].x * radius,
@@ -449,7 +449,7 @@ Mesh* MeshBuilder::CreateLathe(const std::string& name, LatheOptions& options,
   return lathe;
 }
 
-Mesh* MeshBuilder::CreatePlane(const std::string& name, PlaneOptions& options,
+Mesh* MeshBuilder::CreatePlane(const string_t& name, PlaneOptions& options,
                                Scene* scene)
 {
   auto plane = Mesh::New(name, scene);
@@ -475,7 +475,7 @@ Mesh* MeshBuilder::CreatePlane(const std::string& name, PlaneOptions& options,
   return plane;
 }
 
-Mesh* MeshBuilder::CreateGround(const std::string& name, GroundOptions& options,
+Mesh* MeshBuilder::CreateGround(const string_t& name, GroundOptions& options,
                                 Scene* scene)
 {
   auto ground = GroundMesh::New(name, scene);
@@ -498,7 +498,7 @@ Mesh* MeshBuilder::CreateGround(const std::string& name, GroundOptions& options,
   return ground;
 }
 
-Mesh* MeshBuilder::CreateTiledGround(const std::string& name,
+Mesh* MeshBuilder::CreateTiledGround(const string_t& name,
                                      TiledGroundOptions& options, Scene* scene)
 {
   auto tiledGround = Mesh::New(name, scene);
@@ -511,7 +511,7 @@ Mesh* MeshBuilder::CreateTiledGround(const std::string& name,
 }
 
 GroundMesh* MeshBuilder::CreateGroundFromHeightMap(
-  const std::string& name, const std::string& url,
+  const string_t& name, const string_t& url,
   GroundFromHeightMapOptions& options, Scene* scene)
 {
   const auto& filter = options.colorFilter;
@@ -548,23 +548,23 @@ GroundMesh* MeshBuilder::CreateGroundFromHeightMap(
   };
 
   const auto onError
-    = [](const std::string& msg) { BABYLON_LOG_ERROR("Tools", msg); };
+    = [](const string_t& msg) { BABYLON_LOG_ERROR("Tools", msg); };
 
   Tools::LoadImage(url, onload, onError, false);
 
   return ground;
 }
 
-Mesh* MeshBuilder::CreatePolygon(const std::string& name,
-                                 PolygonOptions& options, Scene* scene)
+Mesh* MeshBuilder::CreatePolygon(const string_t& name, PolygonOptions& options,
+                                 Scene* scene)
 {
   options.sideOrientation
     = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
   const auto& shape = options.shape;
   const auto& holes = options.holes;
   const auto& depth = options.depth;
-  std::vector<Vector2> contours(shape.size());
-  std::vector<Vector2> hole;
+  vector_t<Vector2> contours(shape.size());
+  vector_t<Vector2> hole;
   for (std::size_t i = 0; i < shape.size(); ++i) {
     contours[i] = Vector2(shape[i].x, shape[i].z);
   }
@@ -591,13 +591,13 @@ Mesh* MeshBuilder::CreatePolygon(const std::string& name,
   return polygon;
 }
 
-Mesh* MeshBuilder::ExtrudePolygon(const std::string& name,
-                                  PolygonOptions& options, Scene* scene)
+Mesh* MeshBuilder::ExtrudePolygon(const string_t& name, PolygonOptions& options,
+                                  Scene* scene)
 {
   return MeshBuilder::CreatePolygon(name, options, scene);
 }
 
-Mesh* MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
+Mesh* MeshBuilder::CreateTube(const string_t& name, TubeOptions& options,
                               Scene* scene)
 {
   const auto& path           = options.path;
@@ -614,8 +614,8 @@ Mesh* MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
 
   // tube geometry
   const auto tubePathArray
-    = [](const std::vector<Vector3>& _path, Path3D& path3D,
-         std::vector<std::vector<Vector3>>& circlePaths, float _radius,
+    = [](const vector_t<Vector3>& _path, Path3D& path3D,
+         vector_t<vector_t<Vector3>>& circlePaths, float _radius,
          unsigned int _tessellation,
          const ::std::function<float(unsigned int i, float distance)>&
            _radiusFunction,
@@ -637,7 +637,7 @@ Mesh* MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
           rad = (_radiusFunction == nullptr) ?
                   _radius :
                   _radiusFunction(i, distances[i]); // current radius
-          std::vector<Vector3> circlePath;          // current circle array
+          vector_t<Vector3> circlePath;             // current circle array
           normal = normals[i];                      // current normal
           for (std::size_t t = 0; t < _tessellation; ++t) {
             Matrix::RotationAxisToRef(tangents[i], step * static_cast<float>(t),
@@ -654,7 +654,7 @@ Mesh* MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
         // cap
         const auto capPath
           = [_path](unsigned int nbPoints, unsigned int pathIndex) {
-              std::vector<Vector3> pointCap;
+              vector_t<Vector3> pointCap;
               for (std::size_t i = 0; i < nbPoints; ++i) {
                 pointCap.emplace_back(_path[pathIndex]);
               }
@@ -685,7 +685,7 @@ Mesh* MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
         return circlePaths;
       };
   Path3D path3D;
-  std::vector<std::vector<Vector3>> pathArray;
+  vector_t<vector_t<Vector3>> pathArray;
   if (instance) {
     // tube update
     path3D    = path3D.update(path);
@@ -702,7 +702,7 @@ Mesh* MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
   }
   // tube creation
   path3D = Path3D(path);
-  std::vector<std::vector<Vector3>> newPathArray;
+  vector_t<vector_t<Vector3>> newPathArray;
   cap       = (cap > 3) ? 0 : cap;
   pathArray = tubePathArray(path, path3D, newPathArray, radius, tessellation,
                             radiusFunction, cap, arc);
@@ -722,7 +722,7 @@ Mesh* MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
   return tube;
 }
 
-Mesh* MeshBuilder::CreatePolyhedron(const std::string& name,
+Mesh* MeshBuilder::CreatePolyhedron(const string_t& name,
                                     PolyhedronOptions& options, Scene* scene)
 {
   auto polyhedron = Mesh::New(name, scene);
@@ -736,8 +736,8 @@ Mesh* MeshBuilder::CreatePolyhedron(const std::string& name,
   return polyhedron;
 }
 
-Mesh* MeshBuilder::CreateDecal(const std::string& name,
-                               AbstractMesh* sourceMesh, DecalOptions& options)
+Mesh* MeshBuilder::CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
+                               DecalOptions& options)
 {
   const auto indices = sourceMesh->getIndices();
   const auto positions
@@ -797,7 +797,7 @@ Mesh* MeshBuilder::CreateDecal(const std::string& name,
 
   // Inspired by
   // https://github.com/mrdoob/three.js/blob/eee231960882f6f3b6113405f524956145148146/examples/js/geometries/DecalGeometry.js
-  const auto clip = [&size](const std::vector<PositionNormalVertex>& vertices,
+  const auto clip = [&size](const vector_t<PositionNormalVertex>& vertices,
                             const Vector3& axis) {
     if (vertices.empty()) {
       return vertices;
@@ -815,7 +815,7 @@ Mesh* MeshBuilder::CreateDecal(const std::string& name,
             Vector3::Lerp(v0.normal, v1.normal, clipFactor));
         };
 
-    std::vector<PositionNormalVertex> result;
+    vector_t<PositionNormalVertex> result;
 
     bool v1Out, v2Out, v3Out;
     unsigned int total;
@@ -916,7 +916,7 @@ Mesh* MeshBuilder::CreateDecal(const std::string& name,
   };
 
   for (std::size_t index = 0; index < indices.size(); index += 3) {
-    std::vector<PositionNormalVertex> faceVertices;
+    vector_t<PositionNormalVertex> faceVertices;
 
     faceVertices.emplace_back(extractDecalVector3(index));
     faceVertices.emplace_back(extractDecalVector3(index + 1));
@@ -960,8 +960,8 @@ Mesh* MeshBuilder::CreateDecal(const std::string& name,
 }
 
 Mesh* MeshBuilder::_ExtrudeShapeGeneric(
-  const std::string& name, const std::vector<Vector3>& shape,
-  const std::vector<Vector3>& curve, float scale, float rotation,
+  const string_t& name, const vector_t<Vector3>& shape,
+  const vector_t<Vector3>& curve, float scale, float rotation,
   const ::std::function<float(float i, float distance)>& scaleFunction,
   const ::std::function<float(float i, float distance)>& rotateFunction,
   bool rbCA, bool rbCP, unsigned int cap, bool custom, Scene* scene,
@@ -970,9 +970,9 @@ Mesh* MeshBuilder::_ExtrudeShapeGeneric(
 {
   // extrusion geometry
   const auto extrusionPathArray
-    = [](const std::vector<Vector3>& _shape, const std::vector<Vector3>& _curve,
-         Path3D& path3D, std::vector<std::vector<Vector3>> shapePaths,
-         float _scale, float _rotation,
+    = [](const vector_t<Vector3>& _shape, const vector_t<Vector3>& _curve,
+         Path3D& path3D, vector_t<vector_t<Vector3>> shapePaths, float _scale,
+         float _rotation,
          const ::std::function<float(float i, float distance)>& _scaleFunction,
          const ::std::function<float(float i, float distance)>& _rotateFunction,
          unsigned int _cap, bool _custom) {
@@ -994,7 +994,7 @@ Mesh* MeshBuilder::_ExtrudeShapeGeneric(
         shapePaths.resize(_curve.size());
 
         for (std::size_t i = 0; i < _curve.size(); ++i) {
-          std::vector<Vector3> shapePath;
+          vector_t<Vector3> shapePath;
           auto angleStep  = rotate(static_cast<float>(i), distances[i]);
           auto scaleRatio = scl(static_cast<float>(i), distances[i]);
           for (std::size_t p = 0; p < _shape.size(); ++p) {
@@ -1012,8 +1012,8 @@ Mesh* MeshBuilder::_ExtrudeShapeGeneric(
           ++index;
         }
         // cap
-        const auto capPath = [&](const std::vector<Vector3>& shapePath) {
-          std::vector<Vector3> pointCap;
+        const auto capPath = [&](const vector_t<Vector3>& shapePath) {
+          vector_t<Vector3> pointCap;
           auto barycenter = Vector3::Zero();
           for (std::size_t i = 0; i < shapePath.size(); ++i) {
             barycenter.addInPlace(shapePath[i]);
@@ -1048,7 +1048,7 @@ Mesh* MeshBuilder::_ExtrudeShapeGeneric(
       };
 
   Path3D path3D;
-  std::vector<std::vector<Vector3>> pathArray;
+  vector_t<vector_t<Vector3>> pathArray;
   if (instance) { // instance update
     path3D    = path3D.update(curve);
     pathArray = extrusionPathArray(
@@ -1061,7 +1061,7 @@ Mesh* MeshBuilder::_ExtrudeShapeGeneric(
   }
   // extruded shape creation
   path3D = Path3D(curve);
-  std::vector<std::vector<Vector3>> newShapePaths;
+  vector_t<vector_t<Vector3>> newShapePaths;
   unsigned int _cap = (cap > 3) ? 0 : cap;
   pathArray
     = extrusionPathArray(shape, curve, path3D, newShapePaths, scale, rotation,

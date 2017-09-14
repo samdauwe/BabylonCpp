@@ -30,7 +30,7 @@ public:
   }; // end of enum class Xbox360Dpad
 
 public:
-  Xbox360Pad(const std::string& id, int index,
+  Xbox360Pad(const string_t& id, int index,
              const std::shared_ptr<IBrowserGamepad>& gamepad,
              bool xboxOne = false);
   ~Xbox360Pad();

@@ -119,7 +119,7 @@ public:
   /**
    * @brief Returns a string with the Color4 values.
    */
-  std::string toString() const;
+  string_t toString() const;
 
   /**
    * @brief Copies the passed Color4 values into the current one.
@@ -142,7 +142,7 @@ public:
   /**
    * @brief Returns a string containing the hexadecimal Color4 code.
    */
-  std::string toHexString() const;
+  string_t toHexString() const;
 
   /**
    * @brief Returns a new Color4 converted to linear space.
@@ -183,7 +183,7 @@ public:
    * @brief Creates a new Color4 from the valid hexadecimal value contained in
    * the passed string.
    */
-  static Color4 FromHexString(const std::string& hex);
+  static Color4 FromHexString(const string_t& hex);
 
   /**
    * @brief Creates a new Color4 object set with the linearly interpolated

@@ -17,7 +17,7 @@ std::unordered_map<unsigned int, SerializedMesh>& CollisionCache::getMeshes()
   return _meshes;
 }
 
-std::unordered_map<std::string, SerializedGeometry>&
+std::unordered_map<string_t, SerializedGeometry>&
 CollisionCache::getGeometries()
 {
   return _geometries;
@@ -43,12 +43,12 @@ void CollisionCache::removeMesh(unsigned int uniqueId)
   _meshes.erase(uniqueId);
 }
 
-bool CollisionCache::containsGeometry(const std::string& id) const
+bool CollisionCache::containsGeometry(const string_t& id) const
 {
   return stl_util::contains(_geometries, id);
 }
 
-SerializedGeometry& CollisionCache::getGeometry(const std::string& id)
+SerializedGeometry& CollisionCache::getGeometry(const string_t& id)
 {
   return _geometries[id];
 }
@@ -58,7 +58,7 @@ void CollisionCache::addGeometry(const SerializedGeometry& geometry)
   _geometries[geometry.id] = geometry;
 }
 
-void CollisionCache::removeGeometry(const std::string& id)
+void CollisionCache::removeGeometry(const string_t& id)
 {
   _geometries.erase(id);
 }

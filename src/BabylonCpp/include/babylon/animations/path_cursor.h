@@ -19,7 +19,7 @@ public:
   PathCursor& move(float step);
 
   // used by animation engine
-  PathCursor& markAsDirty(const std::string& propertyName);
+  PathCursor& markAsDirty(const string_t& propertyName);
   PathCursor&
   onchange(const ::std::function<void(const PathCursor& cursor)>& f);
 
@@ -28,10 +28,10 @@ private:
   PathCursor& raiseOnChange();
 
 private:
-  std::vector<::std::function<void(const PathCursor& cursor)>> _onchange;
+  vector_t<::std::function<void(const PathCursor& cursor)>> _onchange;
   Path2 path;
   float value;
-  std::vector<Animation*> animations;
+  vector_t<Animation*> animations;
 
 }; // end of class PathCursor
 

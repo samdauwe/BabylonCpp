@@ -11,7 +11,7 @@ class BABYLON_SHARED_EXPORT AnimationRange {
 
 public:
   AnimationRange();
-  AnimationRange(const std::string& name, float from, float to);
+  AnimationRange(const string_t& name, float from, float to);
   AnimationRange(const AnimationRange& other);
   ~AnimationRange();
 
@@ -19,7 +19,7 @@ public:
   std::unique_ptr<AnimationRange> clone() const;
 
 public:
-  std::string name;
+  string_t name;
   float from;
   float to;
 

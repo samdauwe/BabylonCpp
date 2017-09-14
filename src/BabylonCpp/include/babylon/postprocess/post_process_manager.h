@@ -17,15 +17,15 @@ public:
 
   /** Methods **/
   bool _prepareFrame(InternalTexture* sourceTexture,
-                     const std::vector<PostProcess*>& postProcesses = {});
-  void directRender(const std::vector<PostProcess*>& postProcesses,
+                     const vector_t<PostProcess*>& postProcesses = {});
+  void directRender(const vector_t<PostProcess*>& postProcesses,
                     InternalTexture* targetTexture,
                     bool forceFullscreenViewport = false);
   void _finalizeFrame(bool doNotPresent,
                       InternalTexture* targetTexture = nullptr,
                       unsigned int faceIndex         = 0,
-                      const std::vector<PostProcess*>& postProcesses
-                      = std::vector<PostProcess*>());
+                      const vector_t<PostProcess*>& postProcesses
+                      = vector_t<PostProcess*>());
   void dispose(bool doNotRecurse = false) override;
 
 private:
@@ -35,8 +35,8 @@ private:
   Scene* _scene;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   Float32Array _vertexDeclaration;
-  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
-  std::unordered_map<std::string, VertexBuffer*> _vertexBufferPtrs;
+  std::unordered_map<string_t, std::unique_ptr<VertexBuffer>> _vertexBuffers;
+  std::unordered_map<string_t, VertexBuffer*> _vertexBufferPtrs;
 
 }; // end of class PostProcessManager
 

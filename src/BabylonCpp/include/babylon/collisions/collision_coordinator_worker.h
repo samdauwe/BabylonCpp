@@ -45,7 +45,7 @@ private:
   Scene* _scene;
   Vector3 _scaledPosition;
   Vector3 _scaledVelocity;
-  std::vector<
+  vector_t<
     ::std::function<void(unsigned int collisionIndex, Vector3& newPosition,
                          AbstractMesh* collidedMesh)>>
     _collisionsCallbackArray;
@@ -54,9 +54,9 @@ private:
   bool _runningCollisionTask;
   Worker _worker;
   std::unordered_map<unsigned int, SerializedMesh> _addUpdateMeshesList;
-  std::unordered_map<std::string, SerializedGeometry> _addUpdateGeometriesList;
+  std::unordered_map<string_t, SerializedGeometry> _addUpdateGeometriesList;
   Uint32Array _toRemoveMeshesArray;
-  std::vector<std::string> _toRemoveGeometryArray;
+  vector_t<string_t> _toRemoveGeometryArray;
 
 }; // end of class CollisionCoordinatorWorker
 

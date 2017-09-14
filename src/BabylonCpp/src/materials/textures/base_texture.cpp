@@ -80,7 +80,7 @@ void BaseTexture::setCoordinatesMode(unsigned int value)
   _scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag);
 }
 
-std::string BaseTexture::uid()
+string_t BaseTexture::uid()
 {
   if (_uid.empty()) {
     _uid = Tools::RandomId();
@@ -88,7 +88,7 @@ std::string BaseTexture::uid()
   return _uid;
 }
 
-std::string BaseTexture::toString() const
+string_t BaseTexture::toString() const
 {
   return name;
 }
@@ -185,8 +185,7 @@ bool BaseTexture::canRescale()
   return false;
 }
 
-InternalTexture* BaseTexture::_getFromCache(const std::string& url,
-                                            bool noMipmap,
+InternalTexture* BaseTexture::_getFromCache(const string_t& url, bool noMipmap,
                                             unsigned int sampling)
 {
   auto& texturesCache = _scene->getEngine()->getLoadedTexturesCache();
@@ -211,7 +210,7 @@ void BaseTexture::delayLoad()
 {
 }
 
-std::vector<Animation*> BaseTexture::getAnimations()
+vector_t<Animation*> BaseTexture::getAnimations()
 {
   return animations;
 }
@@ -349,7 +348,7 @@ Json::object BaseTexture::serialize() const
   return Json::object();
 }
 
-void BaseTexture::WhenAllReady(const std::vector<BaseTexture*>& textures,
+void BaseTexture::WhenAllReady(const vector_t<BaseTexture*>& textures,
                                const ::std::function<void()>& callback)
 {
   auto numRemaining = textures.size();

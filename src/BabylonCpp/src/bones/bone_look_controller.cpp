@@ -6,12 +6,12 @@
 
 namespace BABYLON {
 
-std::array<Vector3, 10> BoneLookController::_tmpVecs{
+array_t<Vector3, 10> BoneLookController::_tmpVecs{
   {Vector3::Zero(), Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
    Vector3::Zero(), Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
    Vector3::Zero(), Vector3::Zero()}};
 Quaternion BoneLookController::_tmpQuat{Quaternion::Identity()};
-std::array<Matrix, 5> BoneLookController::_tmpMats{
+array_t<Matrix, 5> BoneLookController::_tmpMats{
   {Matrix::Identity(), Matrix::Identity(), Matrix::Identity(),
    Matrix::Identity(), Matrix::Identity()}};
 

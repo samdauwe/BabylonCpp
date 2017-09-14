@@ -8,8 +8,8 @@
 namespace BABYLON {
 namespace GeometryPrimitives {
 
-Box::Box(const std::string& _id, Scene* scene, float _size,
-         bool canBeRegenerated, Mesh* mesh, unsigned int _side)
+Box::Box(const string_t& _id, Scene* scene, float _size, bool canBeRegenerated,
+         Mesh* mesh, unsigned int _side)
     : _Primitive{_id, scene, canBeRegenerated, mesh}, size{_size}, side{_side}
 {
 }
@@ -26,7 +26,7 @@ std::unique_ptr<VertexData> Box::_regenerateVertexData()
   return VertexData::CreateBox(options);
 }
 
-Geometry* Box::copy(const std::string& _id)
+Geometry* Box::copy(const string_t& _id)
 {
   return Box::New(_id, getScene(), size, canBeRegenerated(), nullptr, side);
 }

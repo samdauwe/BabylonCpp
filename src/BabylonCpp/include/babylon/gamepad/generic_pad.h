@@ -9,7 +9,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT GenericPad : public Gamepad {
 
 public:
-  GenericPad(const std::string& id, int index,
+  GenericPad(const string_t& id, int index,
              const std::shared_ptr<IBrowserGamepad>& browserGamepad);
   virtual ~GenericPad();
 

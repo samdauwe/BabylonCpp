@@ -15,7 +15,7 @@ public:
 
   void postMessage(const BabylonMessage& message);
   void postMessage(const BabylonMessage& message,
-                   const std::vector<ArrayBufferView>& serializable);
+                   const vector_t<ArrayBufferView>& serializable);
   void terminate();
 
 public:

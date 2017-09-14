@@ -8,7 +8,7 @@ namespace OIMO {
 class RigidBody;
 class Shape;
 class World;
-}
+} // namespace OIMO
 
 namespace BABYLON {
 
@@ -20,7 +20,7 @@ public:
 
   void setGravity(const Vector3& gravity);
   void setTimeStep(float timeStep);
-  void executeStep(float delta, const std::vector<PhysicsImpostor*>& impostors);
+  void executeStep(float delta, const vector_t<PhysicsImpostor*>& impostors);
   void applyImpulse(PhysicsImpostor* impostor, const Vector3& force,
                     const Vector3& contactPoint);
   void applyForce(PhysicsImpostor* impostor, const Vector3& force,
@@ -54,8 +54,8 @@ private:
 
 private:
   std::unique_ptr<IWorld> world;
-  std::string name;
-  std::unordered_map<std::string, PhysicsImpostor*> _tmpImpostorsArray;
+  string_t name;
+  std::unordered_map<string_t, PhysicsImpostor*> _tmpImpostorsArray;
   Vector3 _tmpPositionVector;
 
 }; // end of class OimoPhysicsEnginePlugin

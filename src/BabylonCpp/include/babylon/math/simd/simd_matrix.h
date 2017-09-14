@@ -20,13 +20,13 @@ struct BABYLON_SHARED_EXPORT SIMDMatrix {
   ~SIMDMatrix();
 
   SIMDMatrix& multiplyToArraySIMD(const Matrix& other,
-                                  std::array<float, 16>& result,
+                                  array_t<float, 16>& result,
                                   unsigned int offset);
   SIMDMatrix& invertToRefSIMD(Matrix& other);
   static void LookAtLHToRefSIMD(const Vector3& eyeRef, const Vector3& targetRef,
                                 const Vector3& upRef, Matrix& result);
 
-  std::array<float, 16> m;
+  array_t<float, 16> m;
 
 }; // end of struct SIMDMatrix
 

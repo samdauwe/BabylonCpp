@@ -65,7 +65,7 @@ SIMDMatrix::~SIMDMatrix()
 }
 
 SIMDMatrix& SIMDMatrix::multiplyToArraySIMD(const Matrix& other,
-                                            std::array<float, 16>& result,
+                                            array_t<float, 16>& result,
                                             unsigned int offset)
 {
   const auto& tm = m;

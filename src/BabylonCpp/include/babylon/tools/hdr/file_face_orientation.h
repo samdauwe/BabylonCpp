@@ -9,8 +9,7 @@ namespace Internals {
 
 struct BABYLON_SHARED_EXPORT FileFaceOrientation {
 
-  FileFaceOrientation(const std::string& name,
-                      const Vector3& worldAxisForNormal,
+  FileFaceOrientation(const string_t& name, const Vector3& worldAxisForNormal,
                       const Vector3& worldAxisForFileX,
                       const Vector3& worldAxisForFileY);
   FileFaceOrientation(const FileFaceOrientation& other);
@@ -19,7 +18,7 @@ struct BABYLON_SHARED_EXPORT FileFaceOrientation {
   FileFaceOrientation& operator=(FileFaceOrientation&& other);
   ~FileFaceOrientation();
 
-  std::string name;
+  string_t name;
   // The world axis corresponding to the normal to the face
   Vector3 worldAxisForNormal;
   // The world axis corresponding to texture right x-axis in file

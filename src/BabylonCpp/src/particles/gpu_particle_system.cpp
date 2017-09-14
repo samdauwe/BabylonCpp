@@ -6,7 +6,7 @@
 
 namespace BABYLON {
 
-GPUParticleSystem::GPUParticleSystem(const std::string& name,
+GPUParticleSystem::GPUParticleSystem(const string_t& name,
                                      std::size_t /*capacity*/, Scene* scene)
     : _scene{scene ? scene : Engine::LastCreatedScene()}
 {
@@ -51,7 +51,7 @@ void GPUParticleSystem::dispose(bool /*doNotRecurse*/)
   onDisposeObservable.clear();
 }
 
-IParticleSystem* GPUParticleSystem::clone(const std::string& /*name*/,
+IParticleSystem* GPUParticleSystem::clone(const string_t& /*name*/,
                                           Mesh* /*newEmitter*/)
 {
   return nullptr;

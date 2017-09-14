@@ -48,7 +48,7 @@ void PhysicsEngine::dispose(bool /*doNotRecurse*/)
   _physicsPlugin->dispose();
 }
 
-std::string PhysicsEngine::getPhysicsPluginName() const
+string_t PhysicsEngine::getPhysicsPluginName() const
 {
   return _physicsPlugin->name;
 }
@@ -95,7 +95,7 @@ void PhysicsEngine::removeJoint(PhysicsImpostor* mainImpostor,
                                 PhysicsImpostor* connectedImpostor,
                                 PhysicsJoint* joint)
 {
-  std::vector<std::shared_ptr<PhysicsImpostorJoint>> matchingJoints(
+  vector_t<std::shared_ptr<PhysicsImpostorJoint>> matchingJoints(
     _joints.size());
 
   auto it = ::std::copy_if(

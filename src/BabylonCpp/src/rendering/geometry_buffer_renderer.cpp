@@ -88,7 +88,7 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
   }
 }
 
-void GeometryBufferRenderer::setRenderList(const std::vector<Mesh*>& meshes)
+void GeometryBufferRenderer::setRenderList(const vector_t<Mesh*>& meshes)
 {
   _multiRenderTarget->renderList.clear();
   _multiRenderTarget->renderList.reserve(meshes.size());
@@ -121,10 +121,10 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
     return false;
   }
 
-  std::vector<std::string> defines;
+  vector_t<string_t> defines;
 
-  std::vector<std::string> attribs{VertexBuffer::PositionKindChars,
-                                   VertexBuffer::NormalKindChars};
+  vector_t<string_t> attribs{VertexBuffer::PositionKindChars,
+                             VertexBuffer::NormalKindChars};
 
   auto mesh = subMesh->getMesh();
 
@@ -174,7 +174,7 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
   }
 
   // Get correct effect
-  std::string join = String::join(defines, '\n');
+  string_t join = String::join(defines, '\n');
   if (_cachedDefines != join) {
     _cachedDefines = join;
 
@@ -233,9 +233,9 @@ void GeometryBufferRenderer::_createRenderTargets()
 
   // Custom render function
   _multiRenderTarget->customRenderFunction
-    = [this](const std::vector<SubMesh*>& opaqueSubMeshes,
-             const std::vector<SubMesh*>& /*transparentSubMeshes*/,
-             const std::vector<SubMesh*>& alphaTestSubMeshes) {
+    = [this](const vector_t<SubMesh*>& opaqueSubMeshes,
+             const vector_t<SubMesh*>& /*transparentSubMeshes*/,
+             const vector_t<SubMesh*>& alphaTestSubMeshes) {
 
         for (auto& opaqueSubMesh : opaqueSubMeshes) {
           renderSubMesh(opaqueSubMesh);

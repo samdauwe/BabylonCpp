@@ -17,7 +17,7 @@ public:
 
   /** Members **/
   ValueCondition(ActionManager* actionManager, IAnimatable* target,
-                 const std::string& propertyPath, AnimationValue* value,
+                 const string_t& propertyPath, AnimationValue* value,
                  unsigned int operatorType = ValueCondition::IsEqual);
   virtual ~ValueCondition();
 
@@ -26,14 +26,14 @@ public:
   Json::object serialize() const override;
 
   /** Statics **/
-  static std::string GetOperatorName(unsigned int operatorType);
+  static string_t GetOperatorName(unsigned int operatorType);
 
 private:
-  std::string _propertyPath;
+  string_t _propertyPath;
   unsigned int _operatorType;
   IAnimatable* _target;
   IAnimatable* _effectiveTarget;
-  std::string _property;
+  string_t _property;
   AnimationValue* _value;
 
 }; // end of class ValueCondition

@@ -13,8 +13,8 @@
 namespace BABYLON {
 
 ProceduralTexture::ProceduralTexture(
-  const std::string& _name, const Size& size,
-  const std::unordered_map<std::string, std::string>& fragment, Scene* scene,
+  const string_t& _name, const Size& size,
+  const std::unordered_map<string_t, string_t>& fragment, Scene* scene,
   Texture* fallbackTexture, bool generateMipMaps)
     : Texture("", scene, !generateMipMaps)
     , _generateMipMaps{generateMipMaps}
@@ -63,8 +63,8 @@ ProceduralTexture::ProceduralTexture(
   _indexBuffer = engine->createIndexBuffer(indices);
 }
 
-ProceduralTexture::ProceduralTexture(const std::string& _name, const Size& size,
-                                     const std::string& fragment, Scene* scene,
+ProceduralTexture::ProceduralTexture(const string_t& _name, const Size& size,
+                                     const string_t& fragment, Scene* scene,
                                      Texture* fallbackTexture,
                                      bool generateMipMaps)
     : Texture("", scene, !generateMipMaps)
@@ -129,7 +129,7 @@ void ProceduralTexture::reset()
 bool ProceduralTexture::isReady()
 {
   auto engine = getScene()->getEngine();
-  std::unordered_map<std::string, std::string> shaders;
+  std::unordered_map<string_t, string_t> shaders;
 
   if (_fragment.empty()) {
     return false;
@@ -152,7 +152,7 @@ bool ProceduralTexture::isReady()
   options.uniformsNames = _uniforms;
   options.samplers      = _samplers;
   options.onError
-    = [this](const Effect* /*effect*/, const std::string& /*errors*/) {
+    = [this](const Effect* /*effect*/, const string_t& /*errors*/) {
         releaseInternalTexture();
 
         if (_fallbackTexture) {
@@ -174,12 +174,12 @@ void ProceduralTexture::resetRefreshCounter()
 }
 
 void ProceduralTexture::setFragment(
-  const std::unordered_map<std::string, std::string>& fragment)
+  const std::unordered_map<string_t, string_t>& fragment)
 {
   _fragment = fragment;
 }
 
-void ProceduralTexture::setFragment(const std::string& fragment)
+void ProceduralTexture::setFragment(const string_t& fragment)
 {
   _fragment["fragmentElement"] = fragment;
 }
@@ -243,7 +243,7 @@ void ProceduralTexture::resize(const Size& size, bool generateMipMaps)
   _texture = getScene()->getEngine()->createRenderTargetTexture(size, options);
 }
 
-void ProceduralTexture::_checkUniform(const std::string& uniformName)
+void ProceduralTexture::_checkUniform(const string_t& uniformName)
 {
   auto it = ::std::find(_uniforms.begin(), _uniforms.end(), uniformName);
   if (it == _uniforms.end()) {
@@ -251,7 +251,7 @@ void ProceduralTexture::_checkUniform(const std::string& uniformName)
   }
 }
 
-ProceduralTexture& ProceduralTexture::setTexture(const std::string& iName,
+ProceduralTexture& ProceduralTexture::setTexture(const string_t& iName,
                                                  Texture* texture)
 {
   auto it = ::std::find(_samplers.begin(), _samplers.end(), iName);
@@ -263,7 +263,7 @@ ProceduralTexture& ProceduralTexture::setTexture(const std::string& iName,
   return *this;
 }
 
-ProceduralTexture& ProceduralTexture::setFloat(const std::string& _name,
+ProceduralTexture& ProceduralTexture::setFloat(const string_t& _name,
                                                float value)
 {
   _checkUniform(_name);
@@ -272,8 +272,8 @@ ProceduralTexture& ProceduralTexture::setFloat(const std::string& _name,
   return *this;
 }
 
-ProceduralTexture& ProceduralTexture::setFloats(const std::string& _name,
-                                                std::vector<float> value)
+ProceduralTexture& ProceduralTexture::setFloats(const string_t& _name,
+                                                Float32Array value)
 {
   _checkUniform(_name);
   _floatsArrays[_name] = value;
@@ -281,7 +281,7 @@ ProceduralTexture& ProceduralTexture::setFloats(const std::string& _name,
   return *this;
 }
 
-ProceduralTexture& ProceduralTexture::setColor3(const std::string& _name,
+ProceduralTexture& ProceduralTexture::setColor3(const string_t& _name,
                                                 const Color3& value)
 {
   _checkUniform(_name);
@@ -290,7 +290,7 @@ ProceduralTexture& ProceduralTexture::setColor3(const std::string& _name,
   return *this;
 }
 
-ProceduralTexture& ProceduralTexture::setColor4(const std::string& _name,
+ProceduralTexture& ProceduralTexture::setColor4(const string_t& _name,
                                                 const Color4& value)
 {
   _checkUniform(_name);
@@ -299,7 +299,7 @@ ProceduralTexture& ProceduralTexture::setColor4(const std::string& _name,
   return *this;
 }
 
-ProceduralTexture& ProceduralTexture::setVector2(const std::string& _name,
+ProceduralTexture& ProceduralTexture::setVector2(const string_t& _name,
                                                  const Vector2& value)
 {
   _checkUniform(_name);
@@ -308,7 +308,7 @@ ProceduralTexture& ProceduralTexture::setVector2(const std::string& _name,
   return *this;
 }
 
-ProceduralTexture& ProceduralTexture::setVector3(const std::string& _name,
+ProceduralTexture& ProceduralTexture::setVector3(const string_t& _name,
                                                  const Vector3& value)
 {
   _checkUniform(_name);
@@ -317,7 +317,7 @@ ProceduralTexture& ProceduralTexture::setVector3(const std::string& _name,
   return *this;
 }
 
-ProceduralTexture& ProceduralTexture::setMatrix(const std::string& _name,
+ProceduralTexture& ProceduralTexture::setMatrix(const string_t& _name,
                                                 const Matrix& value)
 {
   _checkUniform(_name);
@@ -377,7 +377,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
   }
 
   // VBOs
-  std::unordered_map<std::string, VertexBuffer*> vertexBuffersTmp;
+  std::unordered_map<string_t, VertexBuffer*> vertexBuffersTmp;
   vertexBuffersTmp.reserve(_vertexBuffers.size());
   for (const auto& item : _vertexBuffers) {
     vertexBuffersTmp[item.first] = item.second.get();

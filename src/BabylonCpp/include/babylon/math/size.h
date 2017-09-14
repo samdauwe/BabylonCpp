@@ -30,7 +30,7 @@ public:
   /**
    * @brief Returns a string with the Size width and height.
    */
-  std::string toString() const;
+  string_t toString() const;
 
   /**
    * @brief Returns the string "Size"

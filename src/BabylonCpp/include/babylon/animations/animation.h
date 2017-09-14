@@ -29,7 +29,7 @@ public:
   static constexpr unsigned int ANIMATIONLOOPMODE_CONSTANT = 2;
 
   static Animation*
-  _PrepareAnimation(const std::string& name, const std::string& targetProperty,
+  _PrepareAnimation(const string_t& name, const string_t& targetProperty,
                     size_t framePerSecond, int totalFrame,
                     const AnimationValue& from, const AnimationValue& to,
                     unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE,
@@ -42,13 +42,12 @@ public:
    * @param easingFunction the easing function used in the animation
    * @returns The created animation
    */
-  static Animation* CreateAnimation(const std::string& property,
-                                    int animationType,
+  static Animation* CreateAnimation(const string_t& property, int animationType,
                                     std::size_t framePerSecond,
                                     IEasingFunction* easingFunction = nullptr);
 
   static Animatable* CreateAndStartAnimation(
-    const std::string& name, Node* node, const std::string& targetProperty,
+    const string_t& name, Node* node, const string_t& targetProperty,
     size_t framePerSecond, int totalFrame, const AnimationValue& from,
     const AnimationValue& to,
     unsigned int loopMode           = Animation::ANIMATIONLOOPMODE_CYCLE,
@@ -56,7 +55,7 @@ public:
     const ::std::function<void()>& onAnimationEnd = nullptr);
 
   static Animatable* CreateMergeAndStartAnimation(
-    const std::string& name, Node* node, const std::string& targetProperty,
+    const string_t& name, Node* node, const string_t& targetProperty,
     size_t framePerSecond, int totalFrame, const AnimationValue& from,
     const AnimationValue& to,
     unsigned int loopMode           = Animation::ANIMATIONLOOPMODE_CYCLE,
@@ -75,12 +74,12 @@ public:
    * @param onAnimationEnd Call back trigger at the end of the animation.
    */
   static Animatable*
-  TransitionTo(const std::string& property, const AnimationValue& targetValue,
+  TransitionTo(const string_t& property, const AnimationValue& targetValue,
                const AnimationValue& host, Scene* scene, float frameRate,
                Animation* transition, float duration,
                const ::std::function<void()>& onAnimationEnd = nullptr);
 
-  Animation(const std::string& name, const std::string& targetProperty,
+  Animation(const string_t& name, const string_t& targetProperty,
             size_t framePerSecond, int dataType,
             unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE);
   ~Animation();
@@ -90,7 +89,7 @@ public:
    * @param {boolean} fullDetails - support for multiple levels of
    * logging within scene loading
    */
-  std::string toString(bool fullDetails = false) const;
+  string_t toString(bool fullDetails = false) const;
   /**
    * Add an event to this animation.
    */
@@ -101,12 +100,12 @@ public:
    * @param frame
    */
   void removeEvents(int frame);
-  void createRange(const std::string& name, float from, float to);
-  void deleteRange(const std::string& name, bool deleteFrames = true);
-  AnimationRange& getRange(const std::string& name);
+  void createRange(const string_t& name, float from, float to);
+  void deleteRange(const string_t& name, bool deleteFrames = true);
+  AnimationRange& getRange(const string_t& name);
   void reset();
   bool isStopped() const;
-  std::vector<AnimationKey>& getKeys();
+  vector_t<AnimationKey>& getKeys();
   int getHighestFrame() const;
   IEasingFunction* getEasingFunction();
   void setEasingFunction(IEasingFunction* easingFunction);
@@ -147,7 +146,7 @@ public:
                                    const Matrix& endValue,
                                    float gradient) const;
   std::unique_ptr<Animation> clone() const;
-  void setKeys(const std::vector<AnimationKey>& values);
+  void setKeys(const vector_t<AnimationKey>& values);
   void setValue(const AnimationValue& currentValue, bool blend = false);
   void goToFrame(int frame);
   bool animate(millisecond_t delay, float from, float to, bool loop,
@@ -164,9 +163,9 @@ private:
 
 public:
   IAnimatable* _target;
-  std::string name;
-  std::string targetProperty;
-  std::vector<std::string> targetPropertyPath;
+  string_t name;
+  string_t targetProperty;
+  vector_t<string_t> targetPropertyPath;
   size_t framePerSecond;
   int dataType;
   unsigned int loopMode;
@@ -177,15 +176,15 @@ public:
   bool enableBlending;
 
 private:
-  std::vector<AnimationKey> _keys;
-  std::map<std::string, AnimationValue> _offsetsCache;
-  std::map<std::string, AnimationValue> _highLimitsCache;
+  vector_t<AnimationKey> _keys;
+  std::map<string_t, AnimationValue> _offsetsCache;
+  std::map<string_t, AnimationValue> _highLimitsCache;
   bool _stopped;
   float _blendingFactor;
   IEasingFunction* _easingFunction;
   // The set of event that will be linked to this animation
-  std::vector<AnimationEvent> _events;
-  ::std::unordered_map<std::string, AnimationRange> _ranges;
+  vector_t<AnimationEvent> _events;
+  ::std::unordered_map<string_t, AnimationRange> _ranges;
 
 }; // end of class Animation
 

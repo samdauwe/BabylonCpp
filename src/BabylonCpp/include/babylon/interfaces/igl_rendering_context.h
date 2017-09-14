@@ -27,9 +27,9 @@ using any        = void*;
 
 // Structs
 struct BABYLON_SHARED_EXPORT GLInfo {
-  std::string vendor;
-  std::string renderer;
-  std::string version;
+  string_t vendor;
+  string_t renderer;
+  string_t version;
 };
 
 // Enums
@@ -526,14 +526,14 @@ public:
   BaseTexture* _lodTextureHigh;
   BaseTexture* _lodTextureMid;
   BaseTexture* _lodTextureLow;
-  std::string url;
+  string_t url;
   std::unique_ptr<IGLFramebuffer> _framebuffer;
   std::unique_ptr<IGLFramebuffer> _MSAAFramebuffer;
   std::unique_ptr<IGLRenderbuffer> _depthBuffer;
   std::unique_ptr<IGLRenderbuffer> _depthStencilBuffer;
   std::unique_ptr<IGLRenderbuffer> _MSAARenderBuffer;
   // std::unique_ptr<SphericalPolynomial> _sphericalPolynomial;
-  std::vector<::std::function<void()>> onLoadedCallbacks;
+  vector_t<::std::function<void()>> onLoadedCallbacks;
 }; // end of class IGLTexture
 
 class BABYLON_SHARED_EXPORT IGLUniformLocation {
@@ -574,10 +574,10 @@ public:
   // virtual GLsizei getDrawingBufferHeight() = 0;
   // virtual GLContextAttributes getContextAttributes() = 0;
   // virtual bool isContextLost() = 0;
-  // virtual std::vector<std::string> getSupportedExtensions() = 0;
-  // virtual any getExtension(const std::string& name) = 0;
-  virtual GLenum operator[](const std::string& name) = 0;
-  virtual void activeTexture(GLenum texture)         = 0;
+  // virtual vector_t<string_t> getSupportedExtensions() = 0;
+  // virtual any getExtension(const string_t& name) = 0;
+  virtual GLenum operator[](const string_t& name) = 0;
+  virtual void activeTexture(GLenum texture)      = 0;
   virtual void attachShader(const std::unique_ptr<IGLProgram>& program,
                             const std::unique_ptr<IGLShader>& shader)
     = 0;
@@ -606,7 +606,7 @@ public:
    * generic vertex index.
    */
   virtual void bindAttribLocation(IGLProgram* program, GLuint index,
-                                  const std::string& name)
+                                  const string_t& name)
     = 0;
 
   /**
@@ -1141,7 +1141,7 @@ public:
    * @param buffers An Array of GLenum specifying the buffers into which
    * fragment colors will be written.
    */
-  virtual void drawBuffers(const std::vector<GLenum>& buffers) = 0;
+  virtual void drawBuffers(const vector_t<GLenum>& buffers) = 0;
 
   /**
    * @brief Renders primitives from array data.
@@ -1259,7 +1259,7 @@ public:
    * @return An Array of IGLShader objects that are attached to the given
    * IGLProgram.
    */
-  virtual std::vector<IGLShader*> getAttachedShaders(IGLProgram* program) = 0;
+  virtual vector_t<IGLShader*> getAttachedShaders(IGLProgram* program) = 0;
 
   /**
    * @brief Returns the location of an attribute variable in a given IGLProgram.
@@ -1269,7 +1269,7 @@ public:
    * @return A GLint number indicating the location of the variable name if
    * found. Returns -1 otherwise.
    */
-  virtual GLint getAttribLocation(IGLProgram* program, const std::string& name)
+  virtual GLint getAttribLocation(IGLProgram* program, const string_t& name)
     = 0;
 
   /**
@@ -1278,9 +1278,9 @@ public:
    * @return A GLboolean indicating whether or not the GL extension is
    * supported.
    */
-  virtual GLboolean hasExtension(const std::string& extension) = 0;
+  virtual GLboolean hasExtension(const string_t& extension) = 0;
 
-  virtual std::array<int, 3> getScissorBoxParameter() = 0; // GL::SCISSOR_BOX
+  virtual array_t<int, 3> getScissorBoxParameter() = 0; // GL::SCISSOR_BOX
 
   /**
    * @brief Returns a value for the passed parameter name.
@@ -1320,7 +1320,7 @@ public:
                                     GLenum pname)
     = 0;
 
-  virtual std::string getString(GLenum pname) = 0;
+  virtual string_t getString(GLenum pname) = 0;
 
   /**
    * @brief Returns information about the given texture.
@@ -1363,8 +1363,7 @@ public:
    * IGLProgram object is initially created, its information log will be a
    * string of length 0.
    */
-  virtual std::string
-  getProgramInfoLog(const std::unique_ptr<IGLProgram>& program)
+  virtual string_t getProgramInfoLog(const std::unique_ptr<IGLProgram>& program)
     = 0;
 
   /**
@@ -1385,7 +1384,7 @@ public:
    * object is initially created, its information log will be a string of length
    * 0.
    */
-  virtual std::string getShaderInfoLog(const std::unique_ptr<IGLShader>& shader)
+  virtual string_t getShaderInfoLog(const std::unique_ptr<IGLShader>& shader)
     = 0;
 
   /**
@@ -1415,7 +1414,7 @@ public:
    * @param shader A IGLShader object to get the source code from.
    * @return A String containing the source code of the shader.
    */
-  virtual std::string getShaderSource(IGLShader* shader) = 0;
+  virtual string_t getShaderSource(IGLShader* shader) = 0;
 
   /**
    * @brief Retrieves the index of a uniform block within a IGLProgram.
@@ -1425,11 +1424,11 @@ public:
    * @return A GLuint indicating the uniform block index.
    */
   virtual GLuint getUniformBlockIndex(IGLProgram* program,
-                                      const std::string& uniformBlockName)
+                                      const string_t& uniformBlockName)
     = 0;
 
   virtual std::unique_ptr<IGLUniformLocation>
-  getUniformLocation(IGLProgram* program, const std::string& name) = 0;
+  getUniformLocation(IGLProgram* program, const string_t& name) = 0;
 
   /**
    * @brief Specifies hints for certain behaviors. The interpretation of these
@@ -1602,7 +1601,7 @@ public:
    * @param source A String containing the source code of the shader.
    */
   virtual void shaderSource(const std::unique_ptr<IGLShader>& shader,
-                            const std::string& source)
+                            const string_t& source)
     = 0;
 
   /**
@@ -1991,7 +1990,7 @@ public:
    */
   virtual void uniformMatrix4fv(IGLUniformLocation* location,
                                 GLboolean transpose,
-                                const std::array<float, 16>& value)
+                                const array_t<float, 16>& value)
     = 0;
 
   /**

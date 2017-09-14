@@ -26,18 +26,18 @@ public:
 
   /** Methods **/
   virtual void _prepare();
-  std::string getTriggerParameter();
+  string_t getTriggerParameter();
   void _executeCurrent(const ActionEvent& evt);
   virtual void execute(const ActionEvent& evt);
   void skipToNextActiveAction();
   Action* then(Action* action);
-  std::string _getProperty(const std::string& propertyPath);
+  string_t _getProperty(const string_t& propertyPath);
   IAnimatable* _getEffectiveTarget(IAnimatable* target,
-                                   const std::string& propertyPath);
+                                   const string_t& propertyPath);
   virtual Json::object serialize(Json::object& parent) const;
 
   /** Statics **/
-  static std::string _SerializeValueAsString(const AnimationValue& value);
+  static string_t _SerializeValueAsString(const AnimationValue& value);
   static Json::object _GetTargetProperty(IAnimatable* target);
 
 protected:
@@ -53,7 +53,7 @@ private:
   Action* _nextActiveAction;
   Action* _child;
   Condition* _condition;
-  std::string _triggerParameter;
+  string_t _triggerParameter;
 
 }; // end of class Action
 

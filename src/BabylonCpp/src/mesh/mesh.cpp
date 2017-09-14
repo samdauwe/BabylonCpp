@@ -40,7 +40,7 @@
 
 namespace BABYLON {
 
-Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
+Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
            bool doNotCloneChildren, bool clonePhysicsImpostor)
     : AbstractMesh{iName, scene}
     , delayLoadState{EngineConstants::DELAYLOADSTATE_NONE}
@@ -165,7 +165,7 @@ void Mesh::setOnBeforeDraw(const ::std::function<void()>& callback)
   _onBeforeDrawObserver = onBeforeDrawObservable.add(callback);
 }
 
-std::string Mesh::toString(bool fullDetails)
+string_t Mesh::toString(bool fullDetails)
 {
   std::ostringstream oss;
   oss << AbstractMesh::toString(fullDetails);
@@ -461,7 +461,7 @@ Mesh& Mesh::_registerInstanceForRenderId(InstancedMesh* instance, int renderId)
 
   if (_visibleInstances->meshes.find(renderId)
       == _visibleInstances->meshes.end()) {
-    _visibleInstances->meshes[renderId] = std::vector<InstancedMesh*>();
+    _visibleInstances->meshes[renderId] = vector_t<InstancedMesh*>();
   }
 
   _visibleInstances->meshes[renderId].emplace_back(instance);
@@ -782,7 +782,7 @@ _InstancesBatch* Mesh::_getInstancesRenderList(size_t subMeshId)
   auto scene                               = getScene();
   _batchCache->mustReturn                  = false;
   _batchCache->renderSelf[subMeshId]       = isEnabled() && isVisible;
-  _batchCache->visibleInstances[subMeshId] = std::vector<InstancedMesh*>();
+  _batchCache->visibleInstances[subMeshId] = vector_t<InstancedMesh*>();
 
   if (_visibleInstances) {
     auto currentRenderId_ = scene->getRenderId();
@@ -830,7 +830,7 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
     return *this;
   }
 
-  std::vector<InstancedMesh*> visibleInstances
+  vector_t<InstancedMesh*> visibleInstances
     = batch->visibleInstances[subMesh->_id];
   size_t matricesCount = visibleInstances.size() + 1;
   size_t bufferSize    = matricesCount * 16 * 4;
@@ -1069,9 +1069,9 @@ Mesh& Mesh::_onBeforeDraw(bool isInstance, Matrix& world,
   return *this;
 }
 
-std::vector<IParticleSystem*> Mesh::getEmittedParticleSystems()
+vector_t<IParticleSystem*> Mesh::getEmittedParticleSystems()
 {
-  std::vector<IParticleSystem*> results;
+  vector_t<IParticleSystem*> results;
   for (auto& particleSystem : getScene()->particleSystems) {
     auto& emitter = particleSystem->emitter;
     if (emitter.is<AbstractMesh*>() && (emitter.get<AbstractMesh*>() == this)) {
@@ -1082,10 +1082,10 @@ std::vector<IParticleSystem*> Mesh::getEmittedParticleSystems()
   return results;
 }
 
-std::vector<IParticleSystem*> Mesh::getHierarchyEmittedParticleSystems()
+vector_t<IParticleSystem*> Mesh::getHierarchyEmittedParticleSystems()
 {
-  std::vector<IParticleSystem*> results;
-  std::vector<Node*> descendants = getDescendants();
+  vector_t<IParticleSystem*> results;
+  vector_t<Node*> descendants = getDescendants();
   descendants.emplace_back(this);
 
   for (auto& particleSystem : getScene()->particleSystems) {
@@ -1101,9 +1101,9 @@ std::vector<IParticleSystem*> Mesh::getHierarchyEmittedParticleSystems()
   return results;
 }
 
-std::vector<BABYLON::Node*> Mesh::getChildren()
+vector_t<BABYLON::Node*> Mesh::getChildren()
 {
-  std::vector<Node*> results;
+  vector_t<Node*> results;
   for (auto& mesh : getScene()->meshes) {
     if (mesh->parent() == this) {
       results.emplace_back(mesh.get());
@@ -1135,7 +1135,7 @@ Mesh& Mesh::_queueLoad(Mesh* mesh, Scene* scene)
   return *this;
 }
 
-bool Mesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes)
+bool Mesh::isInFrustum(const array_t<Plane, 6>& frustumPlanes)
 {
   if (delayLoadState == EngineConstants::DELAYLOADSTATE_LOADING) {
     return false;
@@ -1150,7 +1150,7 @@ bool Mesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes)
   return true;
 }
 
-Mesh& Mesh::setMaterialByID(const std::string& iId)
+Mesh& Mesh::setMaterialByID(const string_t& iId)
 {
   const auto& materials = getScene()->materials;
   for (std::size_t index = materials.size(); index-- > 0;) {
@@ -1172,9 +1172,9 @@ Mesh& Mesh::setMaterialByID(const std::string& iId)
   return *this;
 }
 
-std::vector<IAnimatable*> Mesh::getAnimatables()
+vector_t<IAnimatable*> Mesh::getAnimatables()
 {
-  std::vector<IAnimatable*> results;
+  vector_t<IAnimatable*> results;
 
   if (material()) {
     results.emplace_back(material());
@@ -1252,7 +1252,7 @@ Mesh& Mesh::bakeCurrentTransformIntoVertices()
 }
 
 // Cache
-std::vector<Vector3>& Mesh::_positions()
+vector_t<Vector3>& Mesh::_positions()
 {
   if (_geometry) {
     return _geometry->_positions;
@@ -1277,7 +1277,7 @@ bool Mesh::_generatePointsArray()
   return false;
 }
 
-Mesh* Mesh::clone(const std::string& iName, Node* newParent,
+Mesh* Mesh::clone(const string_t& iName, Node* newParent,
                   bool doNotCloneChildren, bool clonePhysicsImpostor)
 {
   return Mesh::New(iName, getScene(), newParent, this, doNotCloneChildren,
@@ -1331,7 +1331,7 @@ void Mesh::dispose(bool /*doNotRecurse*/)
 }
 
 void Mesh::applyDisplacementMap(
-  const std::string& url, int minHeight, int maxHeight,
+  const string_t& url, int minHeight, int maxHeight,
   const ::std::function<void(Mesh* mesh)> onSuccess)
 {
   ::std::cout << url << minHeight << maxHeight;
@@ -1418,7 +1418,7 @@ Mesh& Mesh::convertToFlatShadedMesh()
   }
 
   // Save previous submeshes
-  std::vector<SubMesh*> previousSubmeshes;
+  vector_t<SubMesh*> previousSubmeshes;
   ::std::for_each(
     subMeshes.begin(), subMeshes.end(),
     [&previousSubmeshes](const std::unique_ptr<SubMesh>& subMesh) {
@@ -1507,7 +1507,7 @@ Mesh& Mesh::convertToUnIndexedMesh()
   }
 
   // Save previous submeshes
-  std::vector<SubMesh*> previousSubmeshes(subMeshes.size());
+  vector_t<SubMesh*> previousSubmeshes(subMeshes.size());
   ::std::for_each(
     subMeshes.begin(), subMeshes.end(),
     [&previousSubmeshes](const std::unique_ptr<SubMesh>& subMesh) {
@@ -1588,7 +1588,7 @@ Mesh& Mesh::flipFaces(bool flipNormals)
   return *this;
 }
 
-InstancedMesh* Mesh::createInstance(const std::string& iName)
+InstancedMesh* Mesh::createInstance(const string_t& iName)
 {
   return InstancedMesh::New(iName, this);
 }
@@ -1602,7 +1602,7 @@ Mesh& Mesh::synchronizeInstances()
 }
 
 /*void Mesh::simplify(
-  const std::vector<ISimplificationSettings*>& settings,
+  const vector_t<ISimplificationSettings*>& settings,
   bool parallelProcessing, SimplificationType simplificationType,
   ::std::function<void(Mesh* mesh, int submeshIndex)>& successCallback)
 {
@@ -1671,7 +1671,7 @@ void Mesh::_syncGeometryWithMorphTargetManager()
 }
 
 Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
-                  const std::string& rootUrl)
+                  const string_t& rootUrl)
 {
   Mesh* mesh = nullptr;
   if (Json::GetString(parsedMesh, "type") == "GroundMesh") {
@@ -1866,7 +1866,7 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
 
   // Skeleton
   if (parsedMesh.contains("skeletonId")) {
-    std::string parsedSkeletonId = Json::GetString(parsedMesh, "skeletonId");
+    string_t parsedSkeletonId = Json::GetString(parsedMesh, "skeletonId");
     if (!parsedSkeletonId.empty()) {
       mesh->setSkeleton(scene->getLastSkeletonByID(parsedSkeletonId));
       if (parsedMesh.contains("numBoneInfluencers")) {
@@ -1950,8 +1950,8 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
 }
 
 // Statics
-Mesh* Mesh::CreateRibbon(const std::string& name,
-                         const std::vector<std::vector<Vector3>>& pathArray,
+Mesh* Mesh::CreateRibbon(const string_t& name,
+                         const vector_t<vector_t<Vector3>>& pathArray,
                          bool closeArray, bool closePath, int offset,
                          Scene* scene, bool updatable,
                          unsigned int sideOrientation, Mesh* instance)
@@ -1966,7 +1966,7 @@ Mesh* Mesh::CreateRibbon(const std::string& name,
   return MeshBuilder::CreateRibbon(name, options, scene);
 }
 
-Mesh* Mesh::CreateDisc(const std::string& name, float radius,
+Mesh* Mesh::CreateDisc(const string_t& name, float radius,
                        unsigned int tessellation, Scene* scene, bool updatable,
                        unsigned int sideOrientation)
 {
@@ -1979,7 +1979,7 @@ Mesh* Mesh::CreateDisc(const std::string& name, float radius,
   return MeshBuilder::CreateDisc(name, options, scene);
 }
 
-Mesh* Mesh::CreateBox(const std::string& name, float size, Scene* scene,
+Mesh* Mesh::CreateBox(const string_t& name, float size, Scene* scene,
                       bool updatable, unsigned int sideOrientation)
 {
   BoxOptions options(size);
@@ -1989,7 +1989,7 @@ Mesh* Mesh::CreateBox(const std::string& name, float size, Scene* scene,
   return MeshBuilder::CreateBox(name, options, scene);
 }
 
-Mesh* Mesh::CreateSphere(const std::string& name, unsigned int segments,
+Mesh* Mesh::CreateSphere(const string_t& name, unsigned int segments,
                          float diameter, Scene* scene, bool updatable,
                          unsigned int sideOrientation)
 {
@@ -2005,7 +2005,7 @@ Mesh* Mesh::CreateSphere(const std::string& name, unsigned int segments,
 }
 
 // Cylinder and cone
-Mesh* Mesh::CreateCylinder(const std::string& name, float height,
+Mesh* Mesh::CreateCylinder(const string_t& name, float height,
                            float diameterTop, float diameterBottom,
                            unsigned int tessellation, unsigned int subdivisions,
                            Scene* scene, bool updatable,
@@ -2024,9 +2024,8 @@ Mesh* Mesh::CreateCylinder(const std::string& name, float height,
 }
 
 // Torus
-Mesh* Mesh::CreateTorus(const std::string& name, float diameter,
-                        float thickness, unsigned int tessellation,
-                        Scene* scene, bool updatable,
+Mesh* Mesh::CreateTorus(const string_t& name, float diameter, float thickness,
+                        unsigned int tessellation, Scene* scene, bool updatable,
                         unsigned int sideOrientation)
 {
   TorusOptions options;
@@ -2039,7 +2038,7 @@ Mesh* Mesh::CreateTorus(const std::string& name, float diameter,
   return MeshBuilder::CreateTorus(name, options, scene);
 }
 
-Mesh* Mesh::CreateTorusKnot(const std::string& name, float radius, float tube,
+Mesh* Mesh::CreateTorusKnot(const string_t& name, float radius, float tube,
                             unsigned int radialSegments,
                             unsigned int tubularSegments, float p, float q,
                             Scene* scene, bool updatable,
@@ -2058,8 +2057,8 @@ Mesh* Mesh::CreateTorusKnot(const std::string& name, float radius, float tube,
   return MeshBuilder::CreateTorusKnot(name, options, scene);
 }
 
-LinesMesh* Mesh::CreateLines(const std::string& name,
-                             const std::vector<Vector3>& points, Scene* scene,
+LinesMesh* Mesh::CreateLines(const string_t& name,
+                             const vector_t<Vector3>& points, Scene* scene,
                              bool updatable, LinesMesh* instance)
 {
   LinesOptions options;
@@ -2070,8 +2069,8 @@ LinesMesh* Mesh::CreateLines(const std::string& name,
   return MeshBuilder::CreateLines(name, options, scene);
 }
 
-LinesMesh* Mesh::CreateDashedLines(const std::string& name,
-                                   std::vector<Vector3>& points, float dashSize,
+LinesMesh* Mesh::CreateDashedLines(const string_t& name,
+                                   vector_t<Vector3>& points, float dashSize,
                                    float gapSize, unsigned int dashNb,
                                    Scene* scene, bool updatable,
                                    LinesMesh* instance)
@@ -2087,9 +2086,9 @@ LinesMesh* Mesh::CreateDashedLines(const std::string& name,
   return MeshBuilder::CreateDashedLines(name, options, scene);
 }
 
-Mesh* Mesh::CreatePolygon(const std::string& name,
-                          const std::vector<Vector3>& shape, Scene* scene,
-                          const std::vector<std::vector<Vector3>>& holes,
+Mesh* Mesh::CreatePolygon(const string_t& name, const vector_t<Vector3>& shape,
+                          Scene* scene,
+                          const vector_t<vector_t<Vector3>>& holes,
                           bool updatable, unsigned int sideOrientation)
 {
   PolygonOptions options;
@@ -2101,10 +2100,9 @@ Mesh* Mesh::CreatePolygon(const std::string& name,
   return MeshBuilder::CreatePolygon(name, options, scene);
 }
 
-Mesh* Mesh::ExtrudePolygon(const std::string& name,
-                           const std::vector<Vector3>& shape, float depth,
-                           Scene* scene,
-                           const std::vector<std::vector<Vector3>>& holes,
+Mesh* Mesh::ExtrudePolygon(const string_t& name, const vector_t<Vector3>& shape,
+                           float depth, Scene* scene,
+                           const vector_t<vector_t<Vector3>>& holes,
                            bool updatable, unsigned int sideOrientation)
 {
   PolygonOptions options;
@@ -2117,9 +2115,8 @@ Mesh* Mesh::ExtrudePolygon(const std::string& name,
   return MeshBuilder::ExtrudePolygon(name, options, scene);
 }
 
-Mesh* Mesh::ExtrudeShape(const std::string& name,
-                         const std::vector<Vector3>& shape,
-                         const std::vector<Vector3>& path, float scale,
+Mesh* Mesh::ExtrudeShape(const string_t& name, const vector_t<Vector3>& shape,
+                         const vector_t<Vector3>& path, float scale,
                          float rotation, unsigned int cap, Scene* scene,
                          bool updatable, unsigned int sideOrientation,
                          Mesh* instance)
@@ -2138,8 +2135,8 @@ Mesh* Mesh::ExtrudeShape(const std::string& name,
 }
 
 Mesh* Mesh::ExtrudeShapeCustom(
-  const std::string& name, const std::vector<Vector3>& shape,
-  const std::vector<Vector3>& path,
+  const string_t& name, const vector_t<Vector3>& shape,
+  const vector_t<Vector3>& path,
   const ::std::function<float(float i, float distance)>& scaleFunction,
   const ::std::function<float(float i, float distance)>& rotationFunction,
   bool ribbonCloseArray, bool ribbonClosePath, unsigned int cap, Scene* scene,
@@ -2160,10 +2157,9 @@ Mesh* Mesh::ExtrudeShapeCustom(
   return MeshBuilder::ExtrudeShapeCustom(name, options, scene);
 }
 
-Mesh* Mesh::CreateLathe(const std::string& name,
-                        const std::vector<Vector3>& shape, float radius,
-                        unsigned int tessellation, Scene* scene, bool updatable,
-                        unsigned int sideOrientation)
+Mesh* Mesh::CreateLathe(const string_t& name, const vector_t<Vector3>& shape,
+                        float radius, unsigned int tessellation, Scene* scene,
+                        bool updatable, unsigned int sideOrientation)
 {
   LatheOptions options;
   options.shape           = shape;
@@ -2175,7 +2171,7 @@ Mesh* Mesh::CreateLathe(const std::string& name,
   return MeshBuilder::CreateLathe(name, options, scene);
 }
 
-Mesh* Mesh::CreatePlane(const std::string& name, float size, Scene* scene,
+Mesh* Mesh::CreatePlane(const string_t& name, float size, Scene* scene,
                         bool updatable, unsigned int sideOrientation)
 {
   PlaneOptions options(size);
@@ -2185,7 +2181,7 @@ Mesh* Mesh::CreatePlane(const std::string& name, float size, Scene* scene,
   return MeshBuilder::CreatePlane(name, options, scene);
 }
 
-Mesh* Mesh::CreateGround(const std::string& name, unsigned int width,
+Mesh* Mesh::CreateGround(const string_t& name, unsigned int width,
                          unsigned int height, unsigned int subdivisions,
                          Scene* scene, bool updatable)
 {
@@ -2197,7 +2193,7 @@ Mesh* Mesh::CreateGround(const std::string& name, unsigned int width,
   return MeshBuilder::CreateGround(name, options, scene);
 }
 
-Mesh* Mesh::CreateTiledGround(const std::string& name, float xmin, float zmin,
+Mesh* Mesh::CreateTiledGround(const string_t& name, float xmin, float zmin,
                               float xmax, float zmax, const ISize& subdivisions,
                               const ISize& precision, Scene* scene,
                               bool updatable)
@@ -2215,7 +2211,7 @@ Mesh* Mesh::CreateTiledGround(const std::string& name, float xmin, float zmin,
 }
 
 GroundMesh* Mesh::CreateGroundFromHeightMap(
-  const std::string& name, const std::string& url, unsigned int width,
+  const string_t& name, const string_t& url, unsigned int width,
   unsigned int height, unsigned int subdivisions, unsigned int minHeight,
   unsigned int maxHeight, Scene* scene, bool updatable,
   const ::std::function<void(GroundMesh* mesh)>& onReady)
@@ -2233,7 +2229,7 @@ GroundMesh* Mesh::CreateGroundFromHeightMap(
 }
 
 Mesh* Mesh::CreateTube(
-  const std::string& name, const std::vector<Vector3>& path, float radius,
+  const string_t& name, const vector_t<Vector3>& path, float radius,
   unsigned int tessellation,
   const ::std::function<float(unsigned int i, unsigned int distance)>&
     radiusFunction,
@@ -2254,19 +2250,19 @@ Mesh* Mesh::CreateTube(
   return MeshBuilder::CreateTube(name, options, scene);
 }
 
-Mesh* Mesh::CreatePolyhedron(const std::string& name,
-                             PolyhedronOptions& options, Scene* scene)
+Mesh* Mesh::CreatePolyhedron(const string_t& name, PolyhedronOptions& options,
+                             Scene* scene)
 {
   return MeshBuilder::CreatePolyhedron(name, options, scene);
 }
 
-Mesh* Mesh::CreateIcoSphere(const std::string& name, IcoSphereOptions& options,
+Mesh* Mesh::CreateIcoSphere(const string_t& name, IcoSphereOptions& options,
                             Scene* scene)
 {
   return MeshBuilder::CreateIcoSphere(name, options, scene);
 }
 
-Mesh* Mesh::CreateDecal(const std::string& name, AbstractMesh* sourceMesh,
+Mesh* Mesh::CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
                         const Vector3& position, const Vector3& normal,
                         const Vector3& size, float angle)
 {
@@ -2421,7 +2417,7 @@ Mesh* Mesh::applySkeleton(Skeleton* skeleton)
   return this;
 }
 
-MinMax Mesh::GetMinMax(const std::vector<AbstractMesh*>& meshes)
+MinMax Mesh::GetMinMax(const vector_t<AbstractMesh*>& meshes)
 {
   bool minVectorSet = false;
   Vector3 minVector;
@@ -2457,13 +2453,13 @@ Vector3 Mesh::Center(const MinMax& minMaxVector)
   return Vector3::Center(minMaxVector.min, minMaxVector.max);
 }
 
-Vector3 Mesh::Center(const std::vector<AbstractMesh*>& meshes)
+Vector3 Mesh::Center(const vector_t<AbstractMesh*>& meshes)
 {
   MinMax minMaxVector = Mesh::GetMinMax(meshes);
   return Vector3::Center(minMaxVector.min, minMaxVector.max);
 }
 
-Mesh* Mesh::MergeMeshes(std::vector<Mesh*>& meshes, bool disposeSource,
+Mesh* Mesh::MergeMeshes(vector_t<Mesh*>& meshes, bool disposeSource,
                         bool allow32BitsIndices, Mesh* meshSubclass,
                         bool subdivideWithSubMeshes)
 {

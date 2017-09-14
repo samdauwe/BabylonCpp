@@ -23,7 +23,7 @@ public:
    * @param {string} name - the name and id to be given to this node
    * @param {BABYLON.Scene} the scene this node will be added to
    */
-  Node(const std::string& name, Scene* scene);
+  Node(const string_t& name, Scene* scene);
   virtual ~Node();
 
   virtual IReflect::Type type() const override;
@@ -37,9 +37,9 @@ public:
   // Behaviors
   Node& addBehavior(Behavior<Node>* behavior);
   Node& removeBehavior(Behavior<Node>* behavior);
-  std::vector<Behavior<Node>*>& behaviors();
-  const std::vector<Behavior<Node>*>& behaviors() const;
-  Behavior<Node>* getBehaviorByName(const std::string& name);
+  vector_t<Behavior<Node>*>& behaviors();
+  const vector_t<Behavior<Node>*>& behaviors() const;
+  Behavior<Node>* getBehaviorByName(const string_t& name);
 
   virtual Matrix* getWorldMatrix() override;
   virtual void _initCache();
@@ -90,11 +90,10 @@ public:
    * evaluated children, the predicate must return true for a given child to be
    * part of the result, otherwise it will be ignored.
    */
-  void _getDescendants(std::vector<Node*>& results,
-                       bool directDescendantsOnly = false,
-                       const ::std::function<bool(Node* node)>& predicate
-                       = nullptr);
-  void _getDescendants(std::vector<AbstractMesh*>& results,
+  void
+  _getDescendants(vector_t<Node*>& results, bool directDescendantsOnly = false,
+                  const ::std::function<bool(Node* node)>& predicate = nullptr);
+  void _getDescendants(vector_t<AbstractMesh*>& results,
                        bool directDescendantsOnly = false,
                        const ::std::function<bool(Node* node)>& predicate
                        = nullptr);
@@ -109,46 +108,46 @@ public:
    * part of the result, otherwise it will be ignored.
    * @return {BABYLON.Node[]} all children nodes of all types.
    */
-  std::vector<Node*>
+  vector_t<Node*>
   getDescendants(bool directDescendantsOnly                         = false,
                  const ::std::function<bool(Node* node)>& predicate = nullptr);
 
   /**
    * Get all child-meshes of this node.
    */
-  virtual std::vector<AbstractMesh*>
+  virtual vector_t<AbstractMesh*>
   getChildMeshes(bool directDecendantsOnly,
                  const ::std::function<bool(Node* node)>& predicate);
   void _setReady(bool state);
-  virtual std::vector<Animation*> getAnimations() override;
-  Animation* getAnimationByName(const std::string& name);
-  void createAnimationRange(const std::string& name, int from, int to);
-  void deleteAnimationRange(const std::string& name, bool deleteFrames = true);
-  AnimationRange* getAnimationRange(const std::string& name);
-  Animatable* beginAnimation(const std::string& name, bool loop = false,
+  virtual vector_t<Animation*> getAnimations() override;
+  Animation* getAnimationByName(const string_t& name);
+  void createAnimationRange(const string_t& name, int from, int to);
+  void deleteAnimationRange(const string_t& name, bool deleteFrames = true);
+  AnimationRange* getAnimationRange(const string_t& name);
+  Animatable* beginAnimation(const string_t& name, bool loop = false,
                              float speedRatio                       = 1.f,
                              ::std::function<void()> onAnimationEnd = nullptr);
-  std::vector<AnimationRange> serializeAnimationRanges();
+  vector_t<AnimationRange> serializeAnimationRanges();
   virtual void dispose(bool doNotRecurse = false) override;
   static void ParseAnimationRanges(Node* node, const Json::value& parsedNode,
                                    Scene* scene);
 
 public:
-  std::string name;
-  std::string id;
+  string_t name;
+  string_t id;
   unsigned int uniqueId;
-  std::string state;
+  string_t state;
 
   Json::object metadata;
   bool doNotSerialize;
 
-  std::vector<Animation*> animations;
+  vector_t<Animation*> animations;
 
   ::std::function<void(Node* node)> onReady;
 
   int _currentRenderId;
-  std::string parentId;
-  std::string _waitingParentId;
+  string_t parentId;
+  string_t _waitingParentId;
   NodeCache _cache;
 
   /**
@@ -157,19 +156,19 @@ public:
   Observable<Node> onDisposeObservable;
 
 private:
-  std::unordered_map<std::string, std::unique_ptr<AnimationRange>> _ranges;
+  std::unordered_map<string_t, std::unique_ptr<AnimationRange>> _ranges;
   int _childrenFlag;
   bool _isEnabled;
   bool _isReady;
   int _parentRenderId;
   Scene* _scene;
   Node* _parentNode;
-  std::vector<Node*> _children;
+  vector_t<Node*> _children;
   std::unique_ptr<Matrix> _worldMatrix;
   Observer<Node>::Ptr _onDisposeObserver;
 
   // Behaviors
-  std::vector<Behavior<Node>*> _behaviors;
+  vector_t<Behavior<Node>*> _behaviors;
 
 }; // end of class Node
 

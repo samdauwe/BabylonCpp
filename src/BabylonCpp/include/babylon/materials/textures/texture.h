@@ -36,7 +36,7 @@ public:
   unsigned int samplingMode() const;
 
   bool noMipmap() const;
-  void updateURL(const std::string& iUrl);
+  void updateURL(const string_t& iUrl);
   void delayLoad() override;
   void updateSamplingMode(unsigned int samplingMode);
   Matrix* getTextureMatrix() override;
@@ -48,7 +48,7 @@ public:
 
   /** Statics **/
   static Texture* CreateFromBase64String(
-    const std::string& data, const std::string& name, Scene* scene,
+    const string_t& data, const string_t& name, Scene* scene,
     bool noMipmap = false, bool invertY = false,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const ::std::function<void()>& onLoad  = nullptr,
@@ -56,9 +56,9 @@ public:
     unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
   static std::unique_ptr<BaseTexture> Parse(const Json::value& parsedTexture,
                                             Scene* scene,
-                                            const std::string& rootUrl);
+                                            const string_t& rootUrl);
   static Texture* LoadFromDataString(
-    const std::string& name, Buffer* buffer, Scene* scene,
+    const string_t& name, Buffer* buffer, Scene* scene,
     bool deleteBuffer = false, bool noMipmap = false, bool invertY = true,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const ::std::function<void()>& onLoad  = nullptr,
@@ -66,7 +66,7 @@ public:
     unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
 
 protected:
-  Texture(const std::string& url, Scene* scene, bool noMipmap = false,
+  Texture(const string_t& url, Scene* scene, bool noMipmap = false,
           bool invertY              = true,
           unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
           const ::std::function<void()>& onLoad  = nullptr,
@@ -78,7 +78,7 @@ private:
   void _prepareRowForTextureGeneration(float x, float y, float z, Vector3& t);
 
 public:
-  std::string url;
+  string_t url;
   float uOffset;
   float vOffset;
   float uScale;

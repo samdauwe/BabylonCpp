@@ -12,31 +12,31 @@
 namespace BABYLON {
 
 std::unique_ptr<CubeTexture>
-CubeTexture::CreateFromImages(const std::vector<std::string>& iFiles,
-                              Scene* scene, bool noMipmap)
+CubeTexture::CreateFromImages(const vector_t<string_t>& iFiles, Scene* scene,
+                              bool noMipmap)
 {
-  const std::vector<std::string> emptyStringList;
+  const vector_t<string_t> emptyStringList;
   return ::std::make_unique<CubeTexture>("", scene, emptyStringList, noMipmap,
                                          iFiles);
 }
 
 std::unique_ptr<CubeTexture>
-CreateFromPrefilteredData(const std::string& url, Scene* scene,
-                          const std::string& forcedExtension)
+CreateFromPrefilteredData(const string_t& url, Scene* scene,
+                          const string_t& forcedExtension)
 {
-  const std::vector<std::string> emptyStringList;
+  const vector_t<string_t> emptyStringList;
   return ::std::make_unique<CubeTexture>(
     url, scene, emptyStringList, false, emptyStringList, nullptr, nullptr,
     EngineConstants::TEXTUREFORMAT_RGBA, true, forcedExtension);
 }
 
-CubeTexture::CubeTexture(const std::string& rootUrl, Scene* scene,
-                         const std::vector<std::string>& extensions,
-                         bool noMipmap, const std::vector<std::string>& iFiles,
+CubeTexture::CubeTexture(const string_t& rootUrl, Scene* scene,
+                         const vector_t<string_t>& extensions, bool noMipmap,
+                         const vector_t<string_t>& iFiles,
                          const ::std::function<void()>& onLoad,
                          const ::std::function<void()>& onError,
                          unsigned int format, bool prefiltered,
-                         const std::string& forcedExtension)
+                         const string_t& forcedExtension)
     : BaseTexture{scene}
     , url{rootUrl}
     , coordinatesMode{TextureConstants::CUBIC_MODE}
@@ -141,7 +141,7 @@ void CubeTexture::setReflectionTextureMatrix(const Matrix& value)
 
 std::unique_ptr<CubeTexture>
 CubeTexture::Parse(const Json::value& parsedTexture, Scene* scene,
-                   const std::string& rootUrl)
+                   const string_t& rootUrl)
 {
 
   auto cubeTexture = ::std::make_unique<CubeTexture>(

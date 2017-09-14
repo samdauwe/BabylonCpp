@@ -294,9 +294,9 @@ PickingInfo Ray::intersectsMesh(AbstractMesh* mesh, bool fastCheck)
   return mesh->intersects(*_tmpRay, fastCheck);
 }
 
-std::vector<PickingInfo>
-Ray::intersectsMeshes(std::vector<AbstractMesh*>& meshes, bool fastCheck,
-                      std::vector<PickingInfo>& results)
+vector_t<PickingInfo> Ray::intersectsMeshes(vector_t<AbstractMesh*>& meshes,
+                                            bool fastCheck,
+                                            vector_t<PickingInfo>& results)
 {
   for (auto& mesh : meshes) {
     auto pickInfo = intersectsMesh(mesh, fastCheck);
