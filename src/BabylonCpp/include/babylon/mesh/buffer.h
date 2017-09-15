@@ -18,10 +18,10 @@ public:
          bool postponeInternalCreation = false, bool instanced = false);
   virtual ~Buffer();
 
-  std::unique_ptr<VertexBuffer> createVertexBuffer(unsigned int kind,
-                                                   int offset, int size);
-  std::unique_ptr<VertexBuffer>
-  createVertexBuffer(unsigned int kind, int offset, int size, int stride);
+  unique_ptr_t<VertexBuffer> createVertexBuffer(unsigned int kind, int offset,
+                                                int size);
+  unique_ptr_t<VertexBuffer> createVertexBuffer(unsigned int kind, int offset,
+                                                int size, int stride);
 
   // Properties
   bool isUpdatable() const;
@@ -43,7 +43,7 @@ public:
 
 private:
   Engine* _engine;
-  std::unique_ptr<GL::IGLBuffer> _buffer;
+  unique_ptr_t<GL::IGLBuffer> _buffer;
   Float32Array _data;
   bool _updatable;
   int _strideSize;

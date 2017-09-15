@@ -95,7 +95,7 @@ bool MapTexture::canRescale() const
   return false;
 }
 
-std::unique_ptr<MapTexture> MapTexture::clone() const
+unique_ptr_t<MapTexture> MapTexture::clone() const
 {
   return nullptr;
 }

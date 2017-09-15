@@ -18,7 +18,7 @@ Box::~Box()
 {
 }
 
-std::unique_ptr<VertexData> Box::_regenerateVertexData()
+unique_ptr_t<VertexData> Box::_regenerateVertexData()
 {
   BoxOptions options(size);
   options.sideOrientation = side;

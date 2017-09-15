@@ -36,7 +36,7 @@ public:
    * @brief Clones the current color curve instance.
    * @return The cloned curves
    */
-  std::unique_ptr<ColorCurves> clone() const;
+  unique_ptr_t<ColorCurves> clone() const;
 
   /**
    * @brief Serializes the current color curve instance to a json
@@ -339,7 +339,7 @@ public:
    * @param source the JSON source to parse
    * @return The parsed curves
    */
-  static std::unique_ptr<ColorCurves> Parse(const Json::value& source);
+  static unique_ptr_t<ColorCurves> Parse(const Json::value& source);
 
 private:
   bool _dirty;

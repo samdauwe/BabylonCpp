@@ -51,7 +51,7 @@ Angle Angle::copy() const
   return Angle(*this);
 }
 
-std::unique_ptr<Angle> Angle::clone() const
+unique_ptr_t<Angle> Angle::clone() const
 {
   return ::std::make_unique<Angle>(*this);
 }

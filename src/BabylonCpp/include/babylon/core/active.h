@@ -33,9 +33,9 @@ public:
   }
 
   /// Factory: safe construction of object before thread start
-  static std::unique_ptr<Active> createActive()
+  static unique_ptr_t<Active> createActive()
   {
-    std::unique_ptr<Active> aPtr(new Active());
+    unique_ptr_t<Active> aPtr(new Active());
     aPtr->_thread = ::std::thread(&Active::run, aPtr.get());
     return aPtr;
   }

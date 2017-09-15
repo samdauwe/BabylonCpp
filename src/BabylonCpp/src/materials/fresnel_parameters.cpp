@@ -78,7 +78,7 @@ void FresnelParameters::setIsEnabled(bool value)
   Engine::MarkAllMaterialsAsDirty(Material::FresnelDirtyFlag);
 }
 
-std::unique_ptr<FresnelParameters> FresnelParameters::clone() const
+unique_ptr_t<FresnelParameters> FresnelParameters::clone() const
 {
   return ::std::make_unique<FresnelParameters>(*this);
 }
@@ -88,7 +88,7 @@ Json::object FresnelParameters::serialize() const
   return Json::object();
 }
 
-std::unique_ptr<FresnelParameters>
+unique_ptr_t<FresnelParameters>
 FresnelParameters::Parse(const Json::value& parsedFresnelParameters)
 {
   auto fresnelParameters = ::std::make_unique<FresnelParameters>();

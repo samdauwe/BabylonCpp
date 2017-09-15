@@ -16,7 +16,7 @@ public:
   ~AnimationRange();
 
   AnimationRange copy() const;
-  std::unique_ptr<AnimationRange> clone() const;
+  unique_ptr_t<AnimationRange> clone() const;
 
 public:
   string_t name;

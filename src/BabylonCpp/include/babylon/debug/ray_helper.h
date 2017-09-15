@@ -11,8 +11,8 @@ class BABYLON_SHARED_EXPORT RayHelper {
 
 public:
   /** Statics **/
-  static std::unique_ptr<RayHelper> CreateAndShow(const Ray& ray, Scene* scene,
-                                                  const Color3& color);
+  static unique_ptr_t<RayHelper> CreateAndShow(const Ray& ray, Scene* scene,
+                                               const Color3& color);
 
 public:
   RayHelper(const Ray& ray);

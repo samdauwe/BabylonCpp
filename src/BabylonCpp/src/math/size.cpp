@@ -45,7 +45,7 @@ Size Size::copy() const
   return Size(*this);
 }
 
-std::unique_ptr<Size> Size::clone() const
+unique_ptr_t<Size> Size::clone() const
 {
   return ::std::make_unique<Size>(*this);
 }

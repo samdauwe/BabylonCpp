@@ -16,7 +16,7 @@ public:
   void setEffect(Effect* effect, const MaterialDefines& defines);
 
 public:
-  std::unique_ptr<MaterialDefines> _materialDefines;
+  unique_ptr_t<MaterialDefines> _materialDefines;
   Effect* _materialEffect;
 
 }; // end of class BaseSubMesh

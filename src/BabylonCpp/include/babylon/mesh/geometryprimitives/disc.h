@@ -19,13 +19,13 @@ public:
   static Disc* New(Ts&&... args)
   {
     auto disc = new Disc(::std::forward<Ts>(args)...);
-    disc->addToScene(static_cast<std::unique_ptr<Geometry>>(disc));
+    disc->addToScene(static_cast<unique_ptr_t<Geometry>>(disc));
 
     return disc;
   }
   ~Disc();
 
-  std::unique_ptr<VertexData> _regenerateVertexData() override;
+  unique_ptr_t<VertexData> _regenerateVertexData() override;
   Geometry* copy(const string_t& id) override;
 
 protected:

@@ -59,8 +59,8 @@ private:
   // Properties
   string_t _name;
   Scene* _scene;
-  std::unordered_map<string_t, std::unique_ptr<VertexBuffer>> _vertexBuffers;
-  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
+  unordered_map_t<string_t, unique_ptr_t<VertexBuffer>> _vertexBuffers;
+  unique_ptr_t<GL::IGLBuffer> _indexBuffer;
   Effect* _effect;
   Effect* _alphaTestEffect;
 

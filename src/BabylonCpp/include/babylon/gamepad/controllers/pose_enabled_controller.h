@@ -19,7 +19,7 @@ public:
   }; // end of enum class PoseEnabledControllerType
 
 public:
-  PoseEnabledController(const std::shared_ptr<IBrowserGamepad>& vrGamepad);
+  PoseEnabledController(const shared_ptr_t<IBrowserGamepad>& vrGamepad);
   ~PoseEnabledController();
 
   void update() override;

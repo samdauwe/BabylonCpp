@@ -24,7 +24,7 @@ public:
   PositionNormalTextureVertex& operator=(PositionNormalTextureVertex&& other);
   ~PositionNormalTextureVertex();
   PositionNormalTextureVertex copy() const;
-  std::unique_ptr<PositionNormalTextureVertex> clone() const;
+  unique_ptr_t<PositionNormalTextureVertex> clone() const;
   friend std::ostream&
   operator<<(std::ostream& os,
              const PositionNormalTextureVertex& positionNormalTextureVertex);

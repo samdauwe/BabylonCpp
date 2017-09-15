@@ -11,7 +11,7 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT CollisionCoordinatorWorker
-    : public ICollisionCoordinator {
+  : public ICollisionCoordinator {
 
 public:
   CollisionCoordinatorWorker();
@@ -24,9 +24,9 @@ public:
   /** Methods **/
   void getNewPosition(Vector3& position, Vector3& velocity, Collider* collider,
                       unsigned int maximumRetry, AbstractMesh* excludedMesh,
-                      const ::std::function<
-                        void(unsigned int collisionIndex, Vector3& newPosition,
-                             AbstractMesh* AbstractMesh)>& onNewPosition,
+                      const ::std::function<void(
+                        unsigned int collisionIndex, Vector3& newPosition,
+                        AbstractMesh* AbstractMesh)>& onNewPosition,
                       unsigned int collisionIndex) override;
   void init(Scene* scene) override;
   void destroy() override;
@@ -45,16 +45,16 @@ private:
   Scene* _scene;
   Vector3 _scaledPosition;
   Vector3 _scaledVelocity;
-  vector_t<
-    ::std::function<void(unsigned int collisionIndex, Vector3& newPosition,
-                         AbstractMesh* collidedMesh)>>
+  vector_t<::std::function<void(unsigned int collisionIndex,
+                                Vector3& newPosition,
+                                AbstractMesh* collidedMesh)>>
     _collisionsCallbackArray;
   bool _init;
   int _runningUpdated;
   bool _runningCollisionTask;
   Worker _worker;
-  std::unordered_map<unsigned int, SerializedMesh> _addUpdateMeshesList;
-  std::unordered_map<string_t, SerializedGeometry> _addUpdateGeometriesList;
+  unordered_map_t<unsigned int, SerializedMesh> _addUpdateMeshesList;
+  unordered_map_t<string_t, SerializedGeometry> _addUpdateGeometriesList;
   Uint32Array _toRemoveMeshesArray;
   vector_t<string_t> _toRemoveGeometryArray;
 

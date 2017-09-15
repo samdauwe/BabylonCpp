@@ -17,13 +17,13 @@ public:
   {
     auto reflectionProbe = new ReflectionProbe(std::forward<Ts>(args)...);
     reflectionProbe->addToScene(
-      static_cast<std::unique_ptr<ReflectionProbe>>(reflectionProbe));
+      static_cast<unique_ptr_t<ReflectionProbe>>(reflectionProbe));
 
     return reflectionProbe;
   }
   virtual ~ReflectionProbe();
 
-  void addToScene(std::unique_ptr<ReflectionProbe>&& newReflectionProbe);
+  void addToScene(unique_ptr_t<ReflectionProbe>&& newReflectionProbe);
 
   unsigned int samples() const;
   void setSamples(unsigned int value);
@@ -56,7 +56,7 @@ public:
 
 private:
   Scene* _scene;
-  std::unique_ptr<RenderTargetTexture> _renderTargetTexture;
+  unique_ptr_t<RenderTargetTexture> _renderTargetTexture;
   Matrix _projectionMatrix;
   Matrix _viewMatrix;
   Vector3 _target;

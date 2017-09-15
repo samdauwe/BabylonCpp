@@ -527,12 +527,12 @@ public:
   BaseTexture* _lodTextureMid;
   BaseTexture* _lodTextureLow;
   string_t url;
-  std::unique_ptr<IGLFramebuffer> _framebuffer;
-  std::unique_ptr<IGLFramebuffer> _MSAAFramebuffer;
-  std::unique_ptr<IGLRenderbuffer> _depthBuffer;
-  std::unique_ptr<IGLRenderbuffer> _depthStencilBuffer;
-  std::unique_ptr<IGLRenderbuffer> _MSAARenderBuffer;
-  // std::unique_ptr<SphericalPolynomial> _sphericalPolynomial;
+  unique_ptr_t<IGLFramebuffer> _framebuffer;
+  unique_ptr_t<IGLFramebuffer> _MSAAFramebuffer;
+  unique_ptr_t<IGLRenderbuffer> _depthBuffer;
+  unique_ptr_t<IGLRenderbuffer> _depthStencilBuffer;
+  unique_ptr_t<IGLRenderbuffer> _MSAARenderBuffer;
+  // unique_ptr_t<SphericalPolynomial> _sphericalPolynomial;
   vector_t<::std::function<void()>> onLoadedCallbacks;
 }; // end of class IGLTexture
 
@@ -578,8 +578,8 @@ public:
   // virtual any getExtension(const string_t& name) = 0;
   virtual GLenum operator[](const string_t& name) = 0;
   virtual void activeTexture(GLenum texture)      = 0;
-  virtual void attachShader(const std::unique_ptr<IGLProgram>& program,
-                            const std::unique_ptr<IGLShader>& shader)
+  virtual void attachShader(const unique_ptr_t<IGLProgram>& program,
+                            const unique_ptr_t<IGLShader>& shader)
     = 0;
 
   /**
@@ -595,7 +595,7 @@ public:
    * written to transform feedback buffers.
    * @param query An IGLQuery object for which to start the querying.
    */
-  virtual void beginQuery(GLenum target, const std::unique_ptr<IGLQuery>& query)
+  virtual void beginQuery(GLenum target, const unique_ptr_t<IGLQuery>& query)
     = 0;
 
   /**
@@ -639,7 +639,7 @@ public:
    */
   virtual void
   bindRenderbuffer(GLenum target,
-                   const std::unique_ptr<IGLRenderbuffer>& renderbuffer)
+                   const unique_ptr_t<IGLRenderbuffer>& renderbuffer)
     = 0;
 
   /**
@@ -851,7 +851,7 @@ public:
    * IGLProgram.
    * @param shader A fragment or vertex IGLShader.
    */
-  virtual void compileShader(const std::unique_ptr<IGLShader>& shader) = 0;
+  virtual void compileShader(const unique_ptr_t<IGLShader>& shader) = 0;
 
   /**
    * @brief Specifies a two-dimensional texture image in a compressed format.
@@ -945,13 +945,13 @@ public:
    * colors.
    * @return An IGLBuffer storing data such as vertices or colors.
    */
-  virtual std::unique_ptr<IGLBuffer> createBuffer() = 0;
+  virtual unique_ptr_t<IGLBuffer> createBuffer() = 0;
 
   /**
    * @brief Creates and initializes a IGLFramebuffer object.
    * @return An IGLFramebuffer object.
    */
-  virtual std::unique_ptr<IGLFramebuffer> createFramebuffer() = 0;
+  virtual unique_ptr_t<IGLFramebuffer> createFramebuffer() = 0;
 
   /**
    * @brief Creates and initializes a IGLProgram object.
@@ -959,21 +959,21 @@ public:
    * IGLShaders consisting of a vertex shader and a fragment shader (both
    * written in GLSL). These are then linked into a usable program.
    */
-  virtual std::unique_ptr<IGLProgram> createProgram() = 0;
+  virtual unique_ptr_t<IGLProgram> createProgram() = 0;
 
   /**
    * @brief Creates and initializes IGLQuery objects, which provide ways to
    * asynchronously query for information.
    * @return An IGLQuery object.
    */
-  virtual std::unique_ptr<IGLQuery> createQuery() = 0;
+  virtual unique_ptr_t<IGLQuery> createQuery() = 0;
 
   /**
    * @brief Creates and initializes a IGLRenderbuffer object.
    * @return A IGLRenderbuffer object that stores data such an image, or can be
    * source or target of an rendering operation.
    */
-  virtual std::unique_ptr<IGLRenderbuffer> createRenderbuffer() = 0;
+  virtual unique_ptr_t<IGLRenderbuffer> createRenderbuffer() = 0;
 
   /**
    * @brief Creates a IGLShader that can then be configured further using
@@ -981,13 +981,13 @@ public:
    * @param type Either VERTEX_SHADER or FRAGMENT_SHADER.
    * @return An IGLShader object.
    */
-  virtual std::unique_ptr<IGLShader> createShader(GLenum type) = 0;
+  virtual unique_ptr_t<IGLShader> createShader(GLenum type) = 0;
 
   /**
    * @brief Creates and initializes a IGLTexture object.
    * @return An IGLTexture object to which images can be bound to.
    */
-  virtual std::unique_ptr<IGLTexture> createTexture() = 0;
+  virtual unique_ptr_t<IGLTexture> createTexture() = 0;
 
   /**
    * @brief Creates and initializes a IGLVertexArrayObject object that
@@ -996,7 +996,7 @@ public:
    * @return An IGLVertexArrayObject representing a vertex array object (VAO)
    * which points to vertex array data.
    */
-  virtual std::unique_ptr<IGLVertexArrayObject> createVertexArray() = 0;
+  virtual unique_ptr_t<IGLVertexArrayObject> createVertexArray() = 0;
 
   /**
    * @brief Specifies whether or not front- and/or back-facing polygons can be
@@ -1019,7 +1019,7 @@ public:
    * @param framebuffer A IGLFramebuffer object to delete.
    */
   virtual void
-  deleteFramebuffer(const std::unique_ptr<IGLFramebuffer>& framebuffer)
+  deleteFramebuffer(const unique_ptr_t<IGLFramebuffer>& framebuffer)
     = 0;
 
   /**
@@ -1033,7 +1033,7 @@ public:
    * @brief Celetes a given IGLQuery object.
    * @param query An IGLQuery object to delete.
    */
-  virtual void deleteQuery(const std::unique_ptr<IGLQuery>& query) = 0;
+  virtual void deleteQuery(const unique_ptr_t<IGLQuery>& query) = 0;
 
   /**
    * @brief Deletes a given IGLRenderbuffer object. This method has no effect if
@@ -1041,7 +1041,7 @@ public:
    * @param renderbuffer An IGLRenderbuffer object to delete.
    */
   virtual void
-  deleteRenderbuffer(const std::unique_ptr<IGLRenderbuffer>& renderbuffer)
+  deleteRenderbuffer(const unique_ptr_t<IGLRenderbuffer>& renderbuffer)
     = 0;
 
   /**
@@ -1049,7 +1049,7 @@ public:
    * shader has already been deleted.
    * @param shader An IGLShader object to delete.
    */
-  virtual void deleteShader(const std::unique_ptr<IGLShader>& shader) = 0;
+  virtual void deleteShader(const unique_ptr_t<IGLShader>& shader) = 0;
 
   /**
    * @brief Deletes a given IGLTexture object. This method has no effect if the
@@ -1222,7 +1222,7 @@ public:
   virtual void
   framebufferRenderbuffer(GLenum target, GLenum attachment,
                           GLenum renderbuffertarget,
-                          const std::unique_ptr<IGLRenderbuffer>& renderbuffer)
+                          const unique_ptr_t<IGLRenderbuffer>& renderbuffer)
     = 0;
 
   /**
@@ -1305,7 +1305,7 @@ public:
    * QUERY_RESULT_AVAILABLE.
    * @return A GLboolean representing the information of a IGLQuery object.
    */
-  virtual GLboolean getQueryParameterb(const std::unique_ptr<IGLQuery>& query,
+  virtual GLboolean getQueryParameterb(const unique_ptr_t<IGLQuery>& query,
                                        GLenum pname)
     = 0;
 
@@ -1316,7 +1316,7 @@ public:
    * QUERY_RESULT.
    * @return A GLuint representing the information of a IGLQuery object.
    */
-  virtual GLuint getQueryParameteri(const std::unique_ptr<IGLQuery>& query,
+  virtual GLuint getQueryParameteri(const unique_ptr_t<IGLQuery>& query,
                                     GLenum pname)
     = 0;
 
@@ -1363,7 +1363,7 @@ public:
    * IGLProgram object is initially created, its information log will be a
    * string of length 0.
    */
-  virtual string_t getProgramInfoLog(const std::unique_ptr<IGLProgram>& program)
+  virtual string_t getProgramInfoLog(const unique_ptr_t<IGLProgram>& program)
     = 0;
 
   /**
@@ -1384,8 +1384,7 @@ public:
    * object is initially created, its information log will be a string of length
    * 0.
    */
-  virtual string_t getShaderInfoLog(const std::unique_ptr<IGLShader>& shader)
-    = 0;
+  virtual string_t getShaderInfoLog(const unique_ptr_t<IGLShader>& shader) = 0;
 
   /**
    * @brief Returns information about the given shader.
@@ -1393,7 +1392,7 @@ public:
    * @param pname A Glenum specifying the information to query.
    * @return Returns the requested shader information (as specified with pname).
    */
-  virtual GLint getShaderParameter(const std::unique_ptr<IGLShader>& shader,
+  virtual GLint getShaderParameter(const unique_ptr_t<IGLShader>& shader,
                                    GLenum pname)
     = 0;
 
@@ -1427,7 +1426,7 @@ public:
                                       const string_t& uniformBlockName)
     = 0;
 
-  virtual std::unique_ptr<IGLUniformLocation>
+  virtual unique_ptr_t<IGLUniformLocation>
   getUniformLocation(IGLProgram* program, const string_t& name) = 0;
 
   /**
@@ -1467,7 +1466,7 @@ public:
    * @param program A IGLProgram to check.
    * @return A GLboolean indicating whether or not the program is valid.
    */
-  virtual GLboolean isProgram(const std::unique_ptr<IGLProgram>& program) = 0;
+  virtual GLboolean isProgram(const unique_ptr_t<IGLProgram>& program) = 0;
 
   /**
    * @brief Returns true if the passed IGLRenderbuffer is valid and false
@@ -1503,7 +1502,7 @@ public:
    * @param program An IGLProgram to link.
    * @return Whether or not the linking succeeded.
    */
-  virtual bool linkProgram(const std::unique_ptr<IGLProgram>& program) = 0;
+  virtual bool linkProgram(const unique_ptr_t<IGLProgram>& program) = 0;
 
   /**
    * @brief Specifies the pixel storage modes.
@@ -1600,7 +1599,7 @@ public:
    * @param shader An IGLShader object to get the source code from.
    * @param source A String containing the source code of the shader.
    */
-  virtual void shaderSource(const std::unique_ptr<IGLShader>& shader,
+  virtual void shaderSource(const unique_ptr_t<IGLShader>& shader,
                             const string_t& source)
     = 0;
 

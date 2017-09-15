@@ -21,7 +21,7 @@ public:
                     bool generateMipMaps = false);
   ~RefractionTexture();
 
-  std::unique_ptr<RefractionTexture> clone() const;
+  unique_ptr_t<RefractionTexture> clone() const;
   Json::object serialize() const;
 
 public:

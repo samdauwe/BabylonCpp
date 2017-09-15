@@ -8,25 +8,23 @@ namespace stl_util {
 
 // -- Implementation of ::std::make_unique function in C++11 --
 template <typename T, typename... Args>
-inline ::std::unique_ptr<T> make_unique_helper(::std::false_type,
-                                               Args&&... args)
+inline unique_ptr_t<T> make_unique_helper(::std::false_type, Args&&... args)
 {
-  return ::std::unique_ptr<T>(new T(::std::forward<Args>(args)...));
+  return unique_ptr_t<T>(new T(::std::forward<Args>(args)...));
 }
 
 template <typename T, typename... Args>
-inline ::std::unique_ptr<T> make_unique_helper(::std::true_type, Args&&... args)
+inline unique_ptr_t<T> make_unique_helper(::std::true_type, Args&&... args)
 {
   static_assert(
     ::std::extent<T>::value == 0,
     "make_unique<T[N]>() is forbidden, please use make_unique<T[]>(),");
   typedef typename ::std::remove_extent<T>::type U;
-  return ::std::unique_ptr<T>(
-    new U[sizeof...(Args)]{::std::forward<Args>(args)...});
+  return unique_ptr_t<T>(new U[sizeof...(Args)]{::std::forward<Args>(args)...});
 }
 
 template <typename T, typename... Args>
-inline ::std::unique_ptr<T> make_unique(Args&&... args)
+inline unique_ptr_t<T> make_unique(Args&&... args)
 {
   return make_unique_helper<T>(::std::is_array<T>(),
                                ::std::forward<Args>(args)...);
@@ -214,12 +212,12 @@ inline vector_t<T> to_vector(const T& t0, const Ts&... ts)
 }
 
 template <typename T>
-inline vector_t<T*> to_raw_ptr_vector(const vector_t<::std::unique_ptr<T>>& c)
+inline vector_t<T*> to_raw_ptr_vector(const vector_t<unique_ptr_t<T>>& c)
 {
   vector_t<T*> result;
   result.reserve(c.size());
   ::std::transform(c.begin(), c.end(), ::std::back_inserter(result),
-                   [](const ::std::unique_ptr<T>& ci) { return ci.get(); });
+                   [](const unique_ptr_t<T>& ci) { return ci.get(); });
   return result;
 }
 
@@ -268,7 +266,7 @@ constexpr bool contains(const ::std::set<C>& c, const A& elem)
 
 // Unordered Map
 template <typename C, typename A, typename T>
-constexpr bool contains(const ::std::unordered_map<C, T>& c, const A& elem)
+constexpr bool contains(const unordered_map_t<C, T>& c, const A& elem)
 {
   return c.find(C(elem)) != c.end();
 }
@@ -282,7 +280,7 @@ inline C& insert_at(C& c, size_t pIndex, const T& elem)
 }
 
 template <typename K, typename V>
-inline vector_t<K> extract_keys(::std::unordered_map<K, V> const& inputMap)
+inline vector_t<K> extract_keys(unordered_map_t<K, V> const& inputMap)
 {
   vector_t<K> keys;
   keys.reserve(inputMap.size());
@@ -293,7 +291,7 @@ inline vector_t<K> extract_keys(::std::unordered_map<K, V> const& inputMap)
 }
 
 template <typename K, typename V>
-inline vector_t<V> extract_values(::std::unordered_map<K, V> const& inputMap)
+inline vector_t<V> extract_values(unordered_map_t<K, V> const& inputMap)
 {
   vector_t<V> values;
   values.reserve(inputMap.size());

@@ -23,18 +23,17 @@ public:
   void delayLoad();
   Matrix* getReflectionTextureMatrix();
   void setReflectionTextureMatrix(const Matrix& value);
-  std::unique_ptr<CubeTexture> clone() const;
+  unique_ptr_t<CubeTexture> clone() const;
 
   /** Static methods **/
-  static std::unique_ptr<CubeTexture>
+  static unique_ptr_t<CubeTexture>
   CreateFromImages(const vector_t<string_t>& files, Scene* scene,
                    bool noMipmap = false);
-  static std::unique_ptr<CubeTexture>
+  static unique_ptr_t<CubeTexture>
   CreateFromPrefilteredData(const string_t& url, Scene* scene,
                             const string_t& forcedExtension = "");
-  static std::unique_ptr<CubeTexture> Parse(const Json::value& parsedTexture,
-                                            Scene* scene,
-                                            const string_t& rootUrl);
+  static unique_ptr_t<CubeTexture> Parse(const Json::value& parsedTexture,
+                                         Scene* scene, const string_t& rootUrl);
 
 public:
   string_t url;
@@ -44,7 +43,7 @@ private:
   bool _noMipmap;
   vector_t<string_t> _files;
   vector_t<string_t> _extensions;
-  std::unique_ptr<Matrix> _textureMatrix;
+  unique_ptr_t<Matrix> _textureMatrix;
   unsigned int _format;
   bool _prefiltered;
 

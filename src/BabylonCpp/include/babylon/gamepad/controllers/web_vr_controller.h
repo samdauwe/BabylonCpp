@@ -12,7 +12,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT WebVRController : public PoseEnabledController {
 
 public:
-  WebVRController(const std::shared_ptr<IBrowserGamepad>& vrGamepad);
+  WebVRController(const shared_ptr_t<IBrowserGamepad>& vrGamepad);
   ~WebVRController();
 
   void setOnButtonStateChange(

@@ -14,7 +14,7 @@ namespace BABYLON {
 
 ProceduralTexture::ProceduralTexture(
   const string_t& _name, const Size& size,
-  const std::unordered_map<string_t, string_t>& fragment, Scene* scene,
+  const unordered_map_t<string_t, string_t>& fragment, Scene* scene,
   Texture* fallbackTexture, bool generateMipMaps)
     : Texture("", scene, !generateMipMaps)
     , _generateMipMaps{generateMipMaps}
@@ -129,7 +129,7 @@ void ProceduralTexture::reset()
 bool ProceduralTexture::isReady()
 {
   auto engine = getScene()->getEngine();
-  std::unordered_map<string_t, string_t> shaders;
+  unordered_map_t<string_t, string_t> shaders;
 
   if (_fragment.empty()) {
     return false;
@@ -174,7 +174,7 @@ void ProceduralTexture::resetRefreshCounter()
 }
 
 void ProceduralTexture::setFragment(
-  const std::unordered_map<string_t, string_t>& fragment)
+  const unordered_map_t<string_t, string_t>& fragment)
 {
   _fragment = fragment;
 }
@@ -377,7 +377,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
   }
 
   // VBOs
-  std::unordered_map<string_t, VertexBuffer*> vertexBuffersTmp;
+  unordered_map_t<string_t, VertexBuffer*> vertexBuffersTmp;
   vertexBuffersTmp.reserve(_vertexBuffers.size());
   for (const auto& item : _vertexBuffers) {
     vertexBuffersTmp[item.first] = item.second.get();
@@ -425,7 +425,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
   }
 }
 
-std::unique_ptr<ProceduralTexture> ProceduralTexture::clone() const
+unique_ptr_t<ProceduralTexture> ProceduralTexture::clone() const
 {
   ISize textureSize = getSize();
   auto newTexture   = ::std::make_unique<ProceduralTexture>(
@@ -448,7 +448,7 @@ void ProceduralTexture::dispose(bool /*doNotRecurse*/)
     ::std::remove_if(
       getScene()->_proceduralTextures.begin(),
       getScene()->_proceduralTextures.end(),
-      [this](const std::unique_ptr<ProceduralTexture>& proceduralTexture) {
+      [this](const unique_ptr_t<ProceduralTexture>& proceduralTexture) {
         return proceduralTexture.get() == this;
       }),
     getScene()->_proceduralTextures.end());

@@ -25,7 +25,7 @@ public:
   /**
    * @brief Returns a new Quaternion copied from the current one.
    */
-  std::unique_ptr<Quaternion> clone() const;
+  unique_ptr_t<Quaternion> clone() const;
 
   /**
    * @brief Returns a string with the Quaternion coordinates.

@@ -24,7 +24,7 @@ public:
   Ray& operator=(const Ray& otherRay);
   Ray& operator=(Ray&& otherRay);
   ~Ray();
-  std::unique_ptr<Ray> clone() const;
+  unique_ptr_t<Ray> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Ray& ray);
 
   /** Methods **/
@@ -32,10 +32,10 @@ public:
                            const Vector3& maximum) const;
   bool intersectsBox(const BoundingBox& box) const;
   bool intersectsSphere(const BoundingSphere& sphere) const;
-  std::unique_ptr<IntersectionInfo> intersectsTriangle(const Vector3& vertex0,
-                                                       const Vector3& vertex1,
-                                                       const Vector3& vertex2);
-  std::unique_ptr<float> intersectsPlane(const Plane& plane);
+  unique_ptr_t<IntersectionInfo> intersectsTriangle(const Vector3& vertex0,
+                                                    const Vector3& vertex1,
+                                                    const Vector3& vertex2);
+  unique_ptr_t<float> intersectsPlane(const Plane& plane);
   PickingInfo intersectsMesh(AbstractMesh* mesh, bool fastCheck);
   vector_t<PickingInfo> intersectsMeshes(vector_t<AbstractMesh*>& meshes,
                                          bool fastCheck,
@@ -95,7 +95,7 @@ private:
   Vector3 _tvec;
   Vector3 _qvec;
 
-  std::unique_ptr<Ray> _tmpRay;
+  unique_ptr_t<Ray> _tmpRay;
 
 }; // end of class Ray
 

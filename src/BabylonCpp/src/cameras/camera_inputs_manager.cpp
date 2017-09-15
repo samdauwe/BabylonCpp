@@ -21,7 +21,7 @@ CameraInputsManager<TCamera>::~CameraInputsManager()
 
 template <class TCamera>
 void CameraInputsManager<TCamera>::add(
-  std::unique_ptr<ICameraInput<TCamera>>&& input)
+  unique_ptr_t<ICameraInput<TCamera>>&& input)
 {
   const string_t type = input->getSimpleName();
   if (stl_util::contains(attached, type)) {

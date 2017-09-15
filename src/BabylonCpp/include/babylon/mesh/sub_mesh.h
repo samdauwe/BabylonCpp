@@ -23,13 +23,13 @@ public:
   static SubMesh* New(Ts&&... args)
   {
     auto subMesh = new SubMesh(::std::forward<Ts>(args)...);
-    subMesh->addToMesh(static_cast<std::unique_ptr<SubMesh>>(subMesh));
+    subMesh->addToMesh(static_cast<unique_ptr_t<SubMesh>>(subMesh));
 
     return subMesh;
   }
   virtual ~SubMesh();
 
-  void addToMesh(std::unique_ptr<SubMesh>&& newSubMesh);
+  void addToMesh(unique_ptr_t<SubMesh>&& newSubMesh);
   bool isGlobal() const;
 
   /**
@@ -108,9 +108,10 @@ public:
   /**
    * @brief Returns an object IntersectionInfo.
    */
-  std::unique_ptr<IntersectionInfo>
-  intersects(Ray& ray, const vector_t<Vector3>& positions,
-             const Uint32Array& indices, bool fastCheck);
+  unique_ptr_t<IntersectionInfo> intersects(Ray& ray,
+                                            const vector_t<Vector3>& positions,
+                                            const Uint32Array& indices,
+                                            bool fastCheck);
 
   /** Clone **/
 
@@ -169,8 +170,8 @@ public:
 private:
   AbstractMesh* _mesh;
   Mesh* _renderingMesh;
-  std::unique_ptr<BoundingInfo> _boundingInfo;
-  std::unique_ptr<GL::IGLBuffer> _linesIndexBuffer;
+  unique_ptr_t<BoundingInfo> _boundingInfo;
+  unique_ptr_t<GL::IGLBuffer> _linesIndexBuffer;
   Material* _currentMaterial;
 
 }; // end of class SubMesh

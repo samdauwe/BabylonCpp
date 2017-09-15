@@ -27,8 +27,9 @@ public:
   static constexpr unsigned int DATASOURCE_CUBERAW           = 9;
 
 public:
-  InternalTexture(Engine* engine, unsigned int dataSource
-                                  = InternalTexture::DATASOURCE_UNKNOWN);
+  InternalTexture(Engine* engine,
+                  unsigned int dataSource
+                  = InternalTexture::DATASOURCE_UNKNOWN);
   ~InternalTexture();
 
   unsigned int dataSource() const;
@@ -56,17 +57,17 @@ public:
   int _size;
   ICanvas* _workingCanvas;
   ICanvasRenderingContext2D* _workingContext;
-  std::unique_ptr<GL::IGLFramebuffer> _framebuffer;
-  std::unique_ptr<GL::IGLRenderbuffer> _depthStencilBuffer;
-  std::unique_ptr<GL::IGLFramebuffer> _MSAAFramebuffer;
-  std::unique_ptr<GL::IGLRenderbuffer> _MSAARenderBuffer;
+  unique_ptr_t<GL::IGLFramebuffer> _framebuffer;
+  unique_ptr_t<GL::IGLRenderbuffer> _depthStencilBuffer;
+  unique_ptr_t<GL::IGLFramebuffer> _MSAAFramebuffer;
+  unique_ptr_t<GL::IGLRenderbuffer> _MSAARenderBuffer;
   unsigned int _cachedCoordinatesMode;
   unsigned int _cachedWrapU;
   unsigned int _cachedWrapV;
   bool _isDisabled;
   bool _generateStencilBuffer;
   bool _generateDepthBuffer;
-  std::unique_ptr<SphericalPolynomial> _sphericalPolynomial;
+  unique_ptr_t<SphericalPolynomial> _sphericalPolynomial;
   // The following three fields helps sharing generated fixed LODs for texture
   // filtering
   // In environment not supporting the textureLOD extension like EDGE. They are
@@ -76,7 +77,7 @@ public:
   BaseTexture* _lodTextureMid;
   BaseTexture* _lodTextureLow;
 
-  std::unique_ptr<GL::IGLTexture> _webGLTexture;
+  unique_ptr_t<GL::IGLTexture> _webGLTexture;
   int _references;
 
 private:

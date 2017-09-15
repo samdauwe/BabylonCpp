@@ -484,7 +484,7 @@ float ColorCurves::clamp(float value, float min, float max)
   return ::std::min(::std::max(value, min), max);
 }
 
-std::unique_ptr<ColorCurves> ColorCurves::clone() const
+unique_ptr_t<ColorCurves> ColorCurves::clone() const
 {
   return nullptr;
 }
@@ -494,7 +494,7 @@ Json::object ColorCurves::serialize() const
   return Json::object();
 }
 
-std::unique_ptr<ColorCurves> Parse(const Json::value& /*source*/)
+unique_ptr_t<ColorCurves> Parse(const Json::value& /*source*/)
 {
   return nullptr;
 }

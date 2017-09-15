@@ -480,7 +480,7 @@ vector_t<AbstractMesh*> Scene::getMeshes() const
   _meshes.reserve(meshes.size());
 
   ::std::for_each(meshes.begin(), meshes.end(),
-                  [&_meshes](const std::unique_ptr<AbstractMesh>& mesh) {
+                  [&_meshes](const unique_ptr_t<AbstractMesh>& mesh) {
                     _meshes.emplace_back(mesh.get());
                   });
 
@@ -771,9 +771,8 @@ void Scene::_onPointerMoveEvent(PointerEvent&& evt)
   if (!pointerMovePredicate) {
     pointerMovePredicate = [this](AbstractMesh* mesh) {
       return mesh->isPickable && mesh->isVisible && mesh->isReady()
-             && mesh->isEnabled()
-             && (constantlyUpdateMeshUnderPointer
-                 || mesh->actionManager != nullptr);
+             && mesh->isEnabled() && (constantlyUpdateMeshUnderPointer
+                                      || mesh->actionManager != nullptr);
     };
   }
 
@@ -1363,7 +1362,7 @@ unsigned int Scene::getUniqueId()
   return _uniqueIdCounter++;
 }
 
-void Scene::addMesh(std::unique_ptr<AbstractMesh>&& newMesh)
+void Scene::addMesh(unique_ptr_t<AbstractMesh>&& newMesh)
 {
   newMesh->uniqueId = getUniqueId();
   auto _newMesh     = newMesh.get();
@@ -1379,11 +1378,10 @@ void Scene::addMesh(std::unique_ptr<AbstractMesh>&& newMesh)
 
 int Scene::removeMesh(AbstractMesh* toRemove)
 {
-  auto it
-    = ::std::find_if(meshes.begin(), meshes.end(),
-                     [&toRemove](const std::unique_ptr<AbstractMesh>& mesh) {
-                       return mesh.get() == toRemove;
-                     });
+  auto it = ::std::find_if(meshes.begin(), meshes.end(),
+                           [&toRemove](const unique_ptr_t<AbstractMesh>& mesh) {
+                             return mesh.get() == toRemove;
+                           });
   int index = static_cast<int>(it - meshes.begin());
   if (it != meshes.end()) {
     meshes.erase(it);
@@ -1400,11 +1398,10 @@ int Scene::removeMesh(AbstractMesh* toRemove)
 
 int Scene::removeSkeleton(Skeleton* toRemove)
 {
-  auto it
-    = ::std::find_if(skeletons.begin(), skeletons.end(),
-                     [&toRemove](const std::unique_ptr<Skeleton>& skeleton) {
-                       return skeleton.get() == toRemove;
-                     });
+  auto it = ::std::find_if(skeletons.begin(), skeletons.end(),
+                           [&toRemove](const unique_ptr_t<Skeleton>& skeleton) {
+                             return skeleton.get() == toRemove;
+                           });
   int index = static_cast<int>(it - skeletons.begin());
   if (it != skeletons.end()) {
     // Remove from the scene if found
@@ -1418,7 +1415,7 @@ int Scene::removeMorphTargetManager(MorphTargetManager* toRemove)
 {
   auto it = ::std::find_if(
     morphTargetManagers.begin(), morphTargetManagers.end(),
-    [&toRemove](const std::unique_ptr<MorphTargetManager>& morphTargetManager) {
+    [&toRemove](const unique_ptr_t<MorphTargetManager>& morphTargetManager) {
       return morphTargetManager.get() == toRemove;
     });
   int index = static_cast<int>(it - morphTargetManagers.begin());
@@ -1433,7 +1430,7 @@ int Scene::removeMorphTargetManager(MorphTargetManager* toRemove)
 int Scene::removeLight(Light* toRemove)
 {
   auto it = ::std::find_if(lights.begin(), lights.end(),
-                           [&toRemove](const std::unique_ptr<Light>& light) {
+                           [&toRemove](const unique_ptr_t<Light>& light) {
                              return light.get() == toRemove;
                            });
   int index = static_cast<int>(it - lights.begin());
@@ -1451,7 +1448,7 @@ int Scene::removeLight(Light* toRemove)
 int Scene::removeCamera(Camera* toRemove)
 {
   auto it1 = ::std::find_if(cameras.begin(), cameras.end(),
-                            [&toRemove](const std::unique_ptr<Camera>& camera) {
+                            [&toRemove](const unique_ptr_t<Camera>& camera) {
                               return camera.get() == toRemove;
                             });
   int index = static_cast<int>(it1 - cameras.begin());
@@ -1480,7 +1477,7 @@ int Scene::removeCamera(Camera* toRemove)
   return index;
 }
 
-void Scene::addLight(std::unique_ptr<Light>&& newLight)
+void Scene::addLight(unique_ptr_t<Light>&& newLight)
 {
   newLight->uniqueId = getUniqueId();
   auto _newLight     = newLight.get();
@@ -1492,15 +1489,14 @@ void Scene::addLight(std::unique_ptr<Light>&& newLight)
 void Scene::sortLightsByPriority()
 {
   if (requireLightSorting) {
-    ::std::sort(
-      lights.begin(), lights.end(),
-      [](const std::unique_ptr<Light>& a, const std::unique_ptr<Light>& b) {
-        return Light::compareLightsPriority(a.get(), b.get());
-      });
+    ::std::sort(lights.begin(), lights.end(),
+                [](const unique_ptr_t<Light>& a, const unique_ptr_t<Light>& b) {
+                  return Light::compareLightsPriority(a.get(), b.get());
+                });
   }
 }
 
-void Scene::addCamera(std::unique_ptr<Camera>&& newCamera)
+void Scene::addCamera(unique_ptr_t<Camera>&& newCamera)
 {
   newCamera->uniqueId = getUniqueId();
   auto _newCamera     = newCamera.get();
@@ -1545,7 +1541,7 @@ Camera* Scene::setActiveCameraByName(const string_t& name)
 Material* Scene::getMaterialByID(const string_t& id)
 {
   auto it = ::std::find_if(materials.begin(), materials.end(),
-                           [&id](const std::unique_ptr<Material>& material) {
+                           [&id](const unique_ptr_t<Material>& material) {
                              return material->id == id;
                            });
 
@@ -1555,7 +1551,7 @@ Material* Scene::getMaterialByID(const string_t& id)
 Material* Scene::getMaterialByName(const string_t& name)
 {
   auto it = ::std::find_if(materials.begin(), materials.end(),
-                           [&name](const std::unique_ptr<Material>& material) {
+                           [&name](const unique_ptr_t<Material>& material) {
                              return material->name == name;
                            });
 
@@ -1566,7 +1562,7 @@ LensFlareSystem* Scene::getLensFlareSystemByName(const string_t& name)
 {
   auto it = ::std::find_if(
     lensFlareSystems.begin(), lensFlareSystems.end(),
-    [&name](const std::unique_ptr<LensFlareSystem>& lensFlareSystem) {
+    [&name](const unique_ptr_t<LensFlareSystem>& lensFlareSystem) {
       return lensFlareSystem->name == name;
     });
 
@@ -1577,7 +1573,7 @@ LensFlareSystem* Scene::getLensFlareSystemByID(const string_t& id)
 {
   auto it = ::std::find_if(
     lensFlareSystems.begin(), lensFlareSystems.end(),
-    [&id](const std::unique_ptr<LensFlareSystem>& lensFlareSystem) {
+    [&id](const unique_ptr_t<LensFlareSystem>& lensFlareSystem) {
       return lensFlareSystem->id == id;
     });
 
@@ -1589,7 +1585,7 @@ vector_t<Camera*> Scene::getCameras() const
   vector_t<Camera*> _cameras;
   _cameras.reserve(cameras.size());
   ::std::for_each(cameras.begin(), cameras.end(),
-                  [&_cameras](const std::unique_ptr<Camera>& camera) {
+                  [&_cameras](const unique_ptr_t<Camera>& camera) {
                     return _cameras.emplace_back(camera.get());
                   });
 
@@ -1600,7 +1596,7 @@ Camera* Scene::getCameraByID(const string_t& id)
 {
   auto it = ::std::find_if(
     cameras.begin(), cameras.end(),
-    [&id](const std::unique_ptr<Camera>& camera) { return camera->id == id; });
+    [&id](const unique_ptr_t<Camera>& camera) { return camera->id == id; });
 
   return (it == cameras.end()) ? nullptr : (*it).get();
 }
@@ -1608,7 +1604,7 @@ Camera* Scene::getCameraByID(const string_t& id)
 Camera* Scene::getCameraByUniqueID(unsigned int uniqueId)
 {
   auto it = ::std::find_if(cameras.begin(), cameras.end(),
-                           [uniqueId](const std::unique_ptr<Camera>& camera) {
+                           [uniqueId](const unique_ptr_t<Camera>& camera) {
                              return camera->uniqueId == uniqueId;
                            });
 
@@ -1618,7 +1614,7 @@ Camera* Scene::getCameraByUniqueID(unsigned int uniqueId)
 Camera* Scene::getCameraByName(const string_t& name)
 {
   auto it = ::std::find_if(cameras.begin(), cameras.end(),
-                           [&name](const std::unique_ptr<Camera>& camera) {
+                           [&name](const unique_ptr_t<Camera>& camera) {
                              return camera->name == name;
                            });
 
@@ -1653,10 +1649,9 @@ Bone* Scene::getBoneByName(const string_t& name)
 
 Light* Scene::getLightByName(const string_t& name)
 {
-  auto it = ::std::find_if(lights.begin(), lights.end(),
-                           [&name](const std::unique_ptr<Light>& light) {
-                             return light->name == name;
-                           });
+  auto it = ::std::find_if(
+    lights.begin(), lights.end(),
+    [&name](const unique_ptr_t<Light>& light) { return light->name == name; });
 
   return (it == lights.end()) ? nullptr : (*it).get();
 }
@@ -1665,7 +1660,7 @@ Light* Scene::getLightByID(const string_t& id)
 {
   auto it = ::std::find_if(
     lights.begin(), lights.end(),
-    [&id](const std::unique_ptr<Light>& light) { return light->id == id; });
+    [&id](const unique_ptr_t<Light>& light) { return light->id == id; });
 
   return (it == lights.end()) ? nullptr : (*it).get();
 }
@@ -1673,7 +1668,7 @@ Light* Scene::getLightByID(const string_t& id)
 Light* Scene::getLightByUniqueID(unsigned int uniqueId)
 {
   auto it = ::std::find_if(lights.begin(), lights.end(),
-                           [uniqueId](const std::unique_ptr<Light>& light) {
+                           [uniqueId](const unique_ptr_t<Light>& light) {
                              return light->uniqueId == uniqueId;
                            });
 
@@ -1684,7 +1679,7 @@ IParticleSystem* Scene::getParticleSystemByID(const string_t& id)
 {
   auto it = ::std::find_if(
     particleSystems.begin(), particleSystems.end(),
-    [&id](const std::unique_ptr<IParticleSystem>& particleSystem) {
+    [&id](const unique_ptr_t<IParticleSystem>& particleSystem) {
       return particleSystem->id == id;
     });
 
@@ -1694,14 +1689,14 @@ IParticleSystem* Scene::getParticleSystemByID(const string_t& id)
 Geometry* Scene::getGeometryByID(const string_t& id)
 {
   auto it = ::std::find_if(_geometries.begin(), _geometries.end(),
-                           [&id](const std::unique_ptr<Geometry>& geometry) {
+                           [&id](const unique_ptr_t<Geometry>& geometry) {
                              return geometry->id == id;
                            });
 
   return (it == _geometries.end()) ? nullptr : (*it).get();
 }
 
-bool Scene::pushGeometry(std::unique_ptr<Geometry>&& geometry, bool force)
+bool Scene::pushGeometry(unique_ptr_t<Geometry>&& geometry, bool force)
 {
   if (!force && getGeometryByID(geometry->id)) {
     return false;
@@ -1724,7 +1719,7 @@ bool Scene::removeGeometry(Geometry* geometry)
 {
   auto it
     = ::std::find_if(_geometries.begin(), _geometries.end(),
-                     [&geometry](const std::unique_ptr<Geometry>& _geometry) {
+                     [&geometry](const unique_ptr_t<Geometry>& _geometry) {
                        return _geometry.get() == geometry;
                      });
   if (it != _geometries.end()) {
@@ -1742,17 +1737,16 @@ bool Scene::removeGeometry(Geometry* geometry)
   return false;
 }
 
-vector_t<std::unique_ptr<Geometry>>& Scene::getGeometries()
+vector_t<unique_ptr_t<Geometry>>& Scene::getGeometries()
 {
   return _geometries;
 }
 
 AbstractMesh* Scene::getMeshByID(const string_t& id)
 {
-  auto it = ::std::find_if(meshes.begin(), meshes.end(),
-                           [&id](const std::unique_ptr<AbstractMesh>& mesh) {
-                             return mesh->id == id;
-                           });
+  auto it = ::std::find_if(
+    meshes.begin(), meshes.end(),
+    [&id](const unique_ptr_t<AbstractMesh>& mesh) { return mesh->id == id; });
 
   return (it == meshes.end()) ? nullptr : (*it).get();
 }
@@ -1762,7 +1756,7 @@ vector_t<AbstractMesh*> Scene::getMeshesByID(const string_t& id)
   vector_t<AbstractMesh*> filteredMeshes;
   ::std::for_each(
     meshes.begin(), meshes.end(),
-    [&filteredMeshes, &id](const std::unique_ptr<AbstractMesh>& mesh) {
+    [&filteredMeshes, &id](const unique_ptr_t<AbstractMesh>& mesh) {
       if (mesh->id == id) {
         filteredMeshes.emplace_back(mesh.get());
       }
@@ -1772,11 +1766,10 @@ vector_t<AbstractMesh*> Scene::getMeshesByID(const string_t& id)
 
 AbstractMesh* Scene::getMeshByUniqueID(unsigned int uniqueId)
 {
-  auto it
-    = ::std::find_if(meshes.begin(), meshes.end(),
-                     [&uniqueId](const std::unique_ptr<AbstractMesh>& mesh) {
-                       return mesh->uniqueId == uniqueId;
-                     });
+  auto it = ::std::find_if(meshes.begin(), meshes.end(),
+                           [&uniqueId](const unique_ptr_t<AbstractMesh>& mesh) {
+                             return mesh->uniqueId == uniqueId;
+                           });
 
   return (it == meshes.end()) ? nullptr : (*it).get();
 }
@@ -1873,7 +1866,7 @@ Node* Scene::getNodeByName(const string_t& name)
 AbstractMesh* Scene::getMeshByName(const string_t& name)
 {
   auto it = ::std::find_if(meshes.begin(), meshes.end(),
-                           [&name](const std::unique_ptr<AbstractMesh>& mesh) {
+                           [&name](const unique_ptr_t<AbstractMesh>& mesh) {
                              return mesh->name == name;
                            });
 
@@ -1903,7 +1896,7 @@ Skeleton* Scene::getLastSkeletonByID(const string_t& id)
 Skeleton* Scene::getSkeletonById(const string_t& id)
 {
   auto it = ::std::find_if(skeletons.begin(), skeletons.end(),
-                           [&id](const std::unique_ptr<Skeleton>& skeleton) {
+                           [&id](const unique_ptr_t<Skeleton>& skeleton) {
                              return skeleton->id == id;
                            });
 
@@ -1913,7 +1906,7 @@ Skeleton* Scene::getSkeletonById(const string_t& id)
 Skeleton* Scene::getSkeletonByName(const string_t& name)
 {
   auto it = ::std::find_if(skeletons.begin(), skeletons.end(),
-                           [&name](const std::unique_ptr<Skeleton>& skeleton) {
+                           [&name](const unique_ptr_t<Skeleton>& skeleton) {
                              return skeleton->name == name;
                            });
 
@@ -1924,7 +1917,7 @@ MorphTargetManager* Scene::getMorphTargetManagerById(unsigned int id)
 {
   auto it = ::std::find_if(
     morphTargetManagers.begin(), morphTargetManagers.end(),
-    [&id](const std::unique_ptr<MorphTargetManager>& morphTargetManager) {
+    [&id](const unique_ptr_t<MorphTargetManager>& morphTargetManager) {
       return morphTargetManager->uniqueId() == id;
     });
 
@@ -1941,7 +1934,7 @@ HighlightLayer* Scene::getHighlightLayerByName(const string_t& name)
 {
   auto it = ::std::find_if(
     highlightLayers.begin(), highlightLayers.end(),
-    [&name](const std::unique_ptr<HighlightLayer>& highlightLayer) {
+    [&name](const unique_ptr_t<HighlightLayer>& highlightLayer) {
       return highlightLayer->name == name;
     });
 
@@ -2496,7 +2489,7 @@ void Scene::render()
         auto& _textures = shadowGenerator->getShadowMap()->getScene()->textures;
         auto it         = ::std::find_if(
           _textures.begin(), _textures.end(),
-          [&shadowMap](const std::unique_ptr<BaseTexture>& texture) {
+          [&shadowMap](const unique_ptr_t<BaseTexture>& texture) {
             return texture.get() == shadowMap;
           });
         if (it != _textures.end()) {
@@ -2869,9 +2862,9 @@ Octree<AbstractMesh*>* Scene::createOrUpdateSelectionOctree(size_t maxCapacity,
 }
 
 /** Picking **/
-std::unique_ptr<Ray> Scene::createPickingRay(int x, int y, Matrix* world,
-                                             Camera* camera,
-                                             bool /*cameraViewSpace*/)
+unique_ptr_t<Ray> Scene::createPickingRay(int x, int y, Matrix* world,
+                                          Camera* camera,
+                                          bool /*cameraViewSpace*/)
 {
   auto engine = _engine;
 
@@ -2906,8 +2899,8 @@ std::unique_ptr<Ray> Scene::createPickingRay(int x, int y, Matrix* world,
     .clone();
 }
 
-std::unique_ptr<Ray> Scene::createPickingRayInCameraSpace(int x, int y,
-                                                          Camera* camera)
+unique_ptr_t<Ray> Scene::createPickingRayInCameraSpace(int x, int y,
+                                                       Camera* camera)
 {
   auto engine = _engine;
 
@@ -2923,7 +2916,7 @@ std::unique_ptr<Ray> Scene::createPickingRayInCameraSpace(int x, int y,
   auto cameraViewport = camera->viewport;
   auto viewport       = cameraViewport.toGlobal(engine->getRenderWidth(),
                                           engine->getRenderHeight());
-  auto identity       = Matrix::Identity();
+  auto identity = Matrix::Identity();
 
   // Moving coordinates to local viewport world
   float _x = static_cast<float>(x);

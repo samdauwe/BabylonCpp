@@ -31,7 +31,7 @@ public:
 
 public:
   Xbox360Pad(const string_t& id, int index,
-             const std::shared_ptr<IBrowserGamepad>& gamepad,
+             const shared_ptr_t<IBrowserGamepad>& gamepad,
              bool xboxOne = false);
   ~Xbox360Pad();
 

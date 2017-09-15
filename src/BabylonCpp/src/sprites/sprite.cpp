@@ -34,7 +34,7 @@ Sprite::~Sprite()
 {
 }
 
-void Sprite::addToSpriteManager(std::unique_ptr<Sprite>&& newSprite)
+void Sprite::addToSpriteManager(unique_ptr_t<Sprite>&& newSprite)
 {
   _manager->sprites.emplace_back(::std::move(newSprite));
 }
@@ -103,7 +103,7 @@ void Sprite::dispose(bool /*doNotRecurse*/)
   // Remove from scene
   _manager->sprites.erase(
     ::std::remove_if(_manager->sprites.begin(), _manager->sprites.end(),
-                     [this](const std::unique_ptr<Sprite>& sprite) {
+                     [this](const unique_ptr_t<Sprite>& sprite) {
                        return sprite.get() == this;
                      }),
     _manager->sprites.end());

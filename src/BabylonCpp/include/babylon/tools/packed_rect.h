@@ -91,11 +91,11 @@ private:
   static Size TpsSize;
 
 private:
-  std::unique_ptr<Size> _contentSize;
-  std::unique_ptr<Size> _initialSize;
-  std::unique_ptr<PackedRect> _leftNode;
-  std::unique_ptr<PackedRect> _rightNode;
-  std::unique_ptr<PackedRect> _bottomNode;
+  unique_ptr_t<Size> _contentSize;
+  unique_ptr_t<Size> _initialSize;
+  unique_ptr_t<PackedRect> _leftNode;
+  unique_ptr_t<PackedRect> _rightNode;
+  unique_ptr_t<PackedRect> _bottomNode;
   Vector2 _pos;
 
 }; // end of class PackedRect

@@ -31,7 +31,7 @@ public:
 
 private:
   vector_t<Mesh*> _renderList;
-  std::unique_ptr<RenderTargetTexture> _renderTexture;
+  unique_ptr_t<RenderTargetTexture> _renderTexture;
   Scene* _scene;
   int _refCount;
 

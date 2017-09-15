@@ -11,11 +11,11 @@ namespace BABYLON {
  * is launched when its trigger is fired.
  */
 class BABYLON_SHARED_EXPORT Action
-    : public ::std::enable_shared_from_this<Action> {
+  : public ::std::enable_shared_from_this<Action> {
 
 public:
   template <typename... Ts>
-  static std::shared_ptr<Action> New(Ts&&... args)
+  static shared_ptr_t<Action> New(Ts&&... args)
   {
     return std::make_shared<Action>(std::forward<Ts>(args)...);
   }

@@ -11,9 +11,9 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT Skeleton
-    : public ::std::enable_shared_from_this<Skeleton>,
-      public IAnimatable,
-      public IDisposable {
+  : public ::std::enable_shared_from_this<Skeleton>,
+    public IAnimatable,
+    public IDisposable {
 
 public:
   Skeleton(const string_t& name, const string_t& id, Scene* scene);
@@ -72,8 +72,7 @@ public:
   void prepare();
   vector_t<IAnimatable*> getAnimatables();
   vector_t<Animation*> getAnimations() override;
-  std::unique_ptr<Skeleton> clone(const string_t& name,
-                                  const string_t& id) const;
+  unique_ptr_t<Skeleton> clone(const string_t& name, const string_t& id) const;
   void enableBlending(float blendingSpeed = 0.01f);
   void dispose(bool doNotRecurse = false) override;
   Json::object serialize() const;
@@ -91,8 +90,8 @@ private:
                   vector_t<bool>& visited);
 
 public:
-  vector_t<std::unique_ptr<Bone>> bones;
-  std::unique_ptr<Vector3> dimensionsAtRest;
+  vector_t<unique_ptr_t<Bone>> bones;
+  unique_ptr_t<Vector3> dimensionsAtRest;
   bool needInitialSkinMatrix;
   string_t name;
   string_t id;
@@ -110,7 +109,7 @@ private:
   vector_t<IAnimatable*> _animatables;
   Matrix _identity;
   AbstractMesh* _synchronizedWithMesh;
-  std::unordered_map<string_t, AnimationRange> _ranges;
+  unordered_map_t<string_t, AnimationRange> _ranges;
   int _lastAbsoluteTransformsUpdateId;
 
 }; // end of class Bone

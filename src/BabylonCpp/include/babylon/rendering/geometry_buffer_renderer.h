@@ -28,7 +28,7 @@ private:
 
 private:
   Scene* _scene;
-  std::unique_ptr<MultiRenderTarget> _multiRenderTarget;
+  unique_ptr_t<MultiRenderTarget> _multiRenderTarget;
   Effect* _effect;
   float _ratio;
   Matrix _viewMatrix;

@@ -188,8 +188,8 @@ private:
   unsigned int _filter;
   float _darkness;
   bool _transparencyShadow;
-  std::unique_ptr<RenderTargetTexture> _shadowMap;
-  std::unique_ptr<RenderTargetTexture> _shadowMap2;
+  unique_ptr_t<RenderTargetTexture> _shadowMap;
+  unique_ptr_t<RenderTargetTexture> _shadowMap2;
   IShadowLight* _light;
   Scene* _scene;
   Vector3 _lightDirection;
@@ -203,10 +203,10 @@ private:
   Vector3 _cachedDirection;
   string_t _cachedDefines;
   int _currentRenderID;
-  std::unique_ptr<PassPostProcess> _downSamplePostprocess;
-  std::unique_ptr<PostProcess> _boxBlurPostprocess;
-  std::unique_ptr<PostProcess> _kernelBlurXPostprocess;
-  std::unique_ptr<PostProcess> _kernelBlurYPostprocess;
+  unique_ptr_t<PassPostProcess> _downSamplePostprocess;
+  unique_ptr_t<PostProcess> _boxBlurPostprocess;
+  unique_ptr_t<PostProcess> _kernelBlurXPostprocess;
+  unique_ptr_t<PostProcess> _kernelBlurYPostprocess;
   vector_t<PostProcess*> _blurPostProcesses;
   ISize _mapSize;
   unsigned int _currentFaceIndex;

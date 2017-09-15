@@ -23,7 +23,7 @@ public:
   /**
    * @brief Returns a new Size copied from the passed one.
    */
-  std::unique_ptr<Size> clone() const;
+  unique_ptr_t<Size> clone() const;
 
   friend std::ostream& operator<<(std::ostream& os, const Size& size);
 

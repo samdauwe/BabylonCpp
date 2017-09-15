@@ -53,7 +53,7 @@ public:
    */
   void addJoint(PhysicsImpostor* mainImpostor,
                 PhysicsImpostor* connectedImpostor,
-                const std::shared_ptr<PhysicsJoint>& joint);
+                const shared_ptr_t<PhysicsJoint>& joint);
 
   void removeJoint(PhysicsImpostor* mainImpostor,
                    PhysicsImpostor* connectedImpostor, PhysicsJoint* joint);
@@ -77,8 +77,8 @@ public:
 private:
   bool _initialized;
   IPhysicsEnginePlugin* _physicsPlugin;
-  vector_t<std::unique_ptr<PhysicsImpostor>> _impostors;
-  vector_t<std::shared_ptr<PhysicsImpostorJoint>> _joints;
+  vector_t<unique_ptr_t<PhysicsImpostor>> _impostors;
+  vector_t<shared_ptr_t<PhysicsImpostorJoint>> _joints;
 
 }; // end of class PhysicsEngine
 

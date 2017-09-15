@@ -16,7 +16,7 @@ public:
 
 public:
   Gamepad(const string_t& id, int index,
-          const std::shared_ptr<IBrowserGamepad>& browserGamepad,
+          const shared_ptr_t<IBrowserGamepad>& browserGamepad,
           unsigned int leftStickX = 0, unsigned int leftStickY = 1,
           unsigned int rightStickX = 2, unsigned int rightStickY = 3);
   virtual ~Gamepad();
@@ -40,7 +40,7 @@ public:
   unsigned int type;
 
 protected:
-  std::shared_ptr<IBrowserGamepad> _browserGamepad;
+  shared_ptr_t<IBrowserGamepad> _browserGamepad;
 
 private:
   Nullable<StickValues> _leftStick;

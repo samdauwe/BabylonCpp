@@ -66,9 +66,9 @@ public:
   static bool ExclusiveDoubleClickMode;
 
   template <typename... Ts>
-  static std::unique_ptr<Scene> New(Ts&&... args)
+  static unique_ptr_t<Scene> New(Ts&&... args)
   {
-    std::unique_ptr<Scene> scene(new Scene(::std::forward<Ts>(args)...));
+    unique_ptr_t<Scene> scene(new Scene(::std::forward<Ts>(args)...));
     return scene;
   }
   virtual ~Scene();
@@ -305,15 +305,15 @@ public:
 
   /** Methods **/
   unsigned int getUniqueId();
-  void addMesh(std::unique_ptr<AbstractMesh>&& newMesh);
+  void addMesh(unique_ptr_t<AbstractMesh>&& newMesh);
   int removeMesh(AbstractMesh* toRemove);
   int removeSkeleton(Skeleton* toRemove);
   int removeMorphTargetManager(MorphTargetManager* toRemove);
   int removeLight(Light* toRemove);
   int removeCamera(Camera* toRemove);
-  void addLight(std::unique_ptr<Light>&& newLight);
+  void addLight(unique_ptr_t<Light>&& newLight);
   void sortLightsByPriority();
-  void addCamera(std::unique_ptr<Camera>&& newCamera);
+  void addCamera(unique_ptr_t<Camera>&& newCamera);
 
   /**
    * @brief Switch active camera.
@@ -423,7 +423,7 @@ public:
    * already exists
    * @return {boolean} was the geometry added or not
    */
-  bool pushGeometry(std::unique_ptr<Geometry>&& geometry, bool force = false);
+  bool pushGeometry(unique_ptr_t<Geometry>&& geometry, bool force = false);
 
   /**
    * @brief Removes an existing geometry.
@@ -433,7 +433,7 @@ public:
    */
   bool removeGeometry(Geometry* geometry);
 
-  vector_t<std::unique_ptr<Geometry>>& getGeometries();
+  vector_t<unique_ptr_t<Geometry>>& getGeometries();
 
   /**
    * @brief Get the first added mesh found of a given ID.
@@ -530,11 +530,10 @@ public:
                                                        size_t maxDepth    = 2);
 
   /** Picking **/
-  std::unique_ptr<Ray> createPickingRay(int x, int y, Matrix* world,
-                                        Camera* camera,
-                                        bool cameraViewSpace = false);
-  std::unique_ptr<Ray> createPickingRayInCameraSpace(int x, int y,
-                                                     Camera* camera);
+  unique_ptr_t<Ray> createPickingRay(int x, int y, Matrix* world,
+                                     Camera* camera,
+                                     bool cameraViewSpace = false);
+  unique_ptr_t<Ray> createPickingRayInCameraSpace(int x, int y, Camera* camera);
 
   /**
    * @brief Launch a ray to try to pick a mesh in the scene
@@ -830,7 +829,7 @@ public:
 
   bool forceWireframe;
   bool forceShowBoundingBoxes;
-  std::unique_ptr<Plane> _clipPlane;
+  unique_ptr_t<Plane> _clipPlane;
   bool animationsEnabled;
   bool constantlyUpdateMeshUnderPointer;
 
@@ -865,7 +864,7 @@ public:
   Camera* cameraToUseForPointers;
 
   // Mirror
-  std::unique_ptr<Vector3> _mirroredCameraPosition;
+  unique_ptr_t<Vector3> _mirroredCameraPosition;
   Color3 fogColor;
   float fogDensity;
   float fogStart;
@@ -875,13 +874,13 @@ public:
    * All of the lights added to this scene.
    * @see BABYLON.Light
    */
-  vector_t<std::unique_ptr<Light>> lights;
+  vector_t<unique_ptr_t<Light>> lights;
   // Cameras
   /**
    * All of the cameras added to this scene.
    */
 
-  vector_t<std::unique_ptr<Camera>> cameras;
+  vector_t<unique_ptr_t<Camera>> cameras;
   /**
    * All of the active cameras added to this scene.
    */
@@ -897,37 +896,37 @@ public:
    * All of the (abstract) meshes added to this scene.
    * @see BABYLON.AbstractMesh
    */
-  vector_t<std::unique_ptr<AbstractMesh>> meshes;
+  vector_t<unique_ptr_t<AbstractMesh>> meshes;
   // Geometries
-  vector_t<std::unique_ptr<Material>> materials;
-  vector_t<std::unique_ptr<MultiMaterial>> multiMaterials;
+  vector_t<unique_ptr_t<Material>> materials;
+  vector_t<unique_ptr_t<MultiMaterial>> multiMaterials;
   // Textures
-  vector_t<std::unique_ptr<BaseTexture>> textures;
+  vector_t<unique_ptr_t<BaseTexture>> textures;
   // Particles
   bool particlesEnabled;
-  vector_t<std::unique_ptr<IParticleSystem>> particleSystems;
+  vector_t<unique_ptr_t<IParticleSystem>> particleSystems;
   // Sprites
   bool spritesEnabled;
-  vector_t<std::unique_ptr<SpriteManager>> spriteManagers;
+  vector_t<unique_ptr_t<SpriteManager>> spriteManagers;
   ::std::function<bool(Sprite* sprite)> spritePredicate;
   // Layers
   vector_t<Layer*> layers;
-  vector_t<std::unique_ptr<HighlightLayer>> highlightLayers;
+  vector_t<unique_ptr_t<HighlightLayer>> highlightLayers;
   // Skeletons
-  vector_t<std::unique_ptr<Skeleton>> skeletons;
+  vector_t<unique_ptr_t<Skeleton>> skeletons;
   // Morph targets
-  vector_t<std::unique_ptr<MorphTargetManager>> morphTargetManagers;
+  vector_t<unique_ptr_t<MorphTargetManager>> morphTargetManagers;
   // Lens flares
   bool lensFlaresEnabled;
-  vector_t<std::unique_ptr<LensFlareSystem>> lensFlareSystems;
+  vector_t<unique_ptr_t<LensFlareSystem>> lensFlareSystems;
   // Collisions
   bool collisionsEnabled;
-  std::unique_ptr<ICollisionCoordinator> collisionCoordinator;
+  unique_ptr_t<ICollisionCoordinator> collisionCoordinator;
   /** Defines the gravity applied to this scene */
   Vector3 gravity;
   // Postprocesses
   bool postProcessesEnabled;
-  std::unique_ptr<PostProcessManager> postProcessManager;
+  unique_ptr_t<PostProcessManager> postProcessManager;
   // Customs render targets
   bool renderTargetsEnabled;
   bool dumpNextRenderTargets;
@@ -938,7 +937,7 @@ public:
   vector_t<string_t> importedMeshesFiles;
   // Probes
   bool probesEnabled;
-  vector_t<std::unique_ptr<ReflectionProbe>> reflectionProbes;
+  vector_t<unique_ptr_t<ReflectionProbe>> reflectionProbes;
   // Database
   // public database; //ANY
   // Actions
@@ -946,15 +945,15 @@ public:
    * This scene's action manager
    */
   ActionManager* actionManager;
-  vector_t<std::unique_ptr<ActionManager>> _actionManagers;
+  vector_t<unique_ptr_t<ActionManager>> _actionManagers;
   // Procedural textures
   bool proceduralTexturesEnabled;
-  vector_t<std::unique_ptr<ProceduralTexture>> _proceduralTextures;
+  vector_t<unique_ptr_t<ProceduralTexture>> _proceduralTextures;
   // Sound Tracks
-  std::unique_ptr<SoundTrack> mainSoundTrack;
+  unique_ptr_t<SoundTrack> mainSoundTrack;
   vector_t<SoundTrack*> soundTracks;
   // Simplification Queue
-  std::unique_ptr<SimplificationQueue> simplificationQueue;
+  unique_ptr_t<SimplificationQueue> simplificationQueue;
   // Performance counters
   PerfCounter _activeIndices;
   PerfCounter _activeParticles;
@@ -971,7 +970,7 @@ public:
 
 protected:
   BaseTexture* _environmentTexture;
-  std::unique_ptr<ImageProcessingConfiguration> _imageProcessingConfiguration;
+  unique_ptr_t<ImageProcessingConfiguration> _imageProcessingConfiguration;
 
 private:
   // Events
@@ -1003,8 +1002,8 @@ private:
   bool _meshPickProceed;
   bool _previousButtonPressed;
   bool _previousHasSwiped;
-  std::unique_ptr<PickingInfo> _currentPickResult;
-  std::unique_ptr<PickingInfo> _previousPickResult;
+  unique_ptr_t<PickingInfo> _currentPickResult;
+  unique_ptr_t<PickingInfo> _previousPickResult;
   bool _isButtonPressed;
   bool _doubleClickOccured;
   int _pointerX;
@@ -1041,7 +1040,7 @@ private:
    */
   bool _lightsEnabled;
   // Geometries
-  vector_t<std::unique_ptr<Geometry>> _geometries;
+  vector_t<unique_ptr_t<Geometry>> _geometries;
   // Materials
   Material* _defaultMaterial;
   // Textures
@@ -1049,7 +1048,7 @@ private:
   // Skeletons
   bool _skeletonsEnabled;
   // Postprocesses
-  std::unique_ptr<PostProcessRenderPipelineManager>
+  unique_ptr_t<PostProcessRenderPipelineManager>
     _postProcessRenderPipelineManager;
   // Collisions
   bool _workerCollisions;
@@ -1087,13 +1086,13 @@ private:
   vector_t<RenderTargetTexture*> _renderTargets;
   vector_t<Skeleton*> _activeSkeletons;
   vector_t<Mesh*> _softwareSkinnedMeshes;
-  std::unique_ptr<RenderingManager> _renderingManager;
-  std::unique_ptr<PhysicsEngine> _physicsEngine;
+  unique_ptr_t<RenderingManager> _renderingManager;
+  unique_ptr_t<PhysicsEngine> _physicsEngine;
   Matrix _transformMatrix;
-  std::unique_ptr<UniformBuffer> _sceneUbo;
+  unique_ptr_t<UniformBuffer> _sceneUbo;
   Matrix _pickWithRayInverseMatrix;
-  std::unique_ptr<BoundingBoxRenderer> _boundingBoxRenderer;
-  std::unique_ptr<OutlineRenderer> _outlineRenderer;
+  unique_ptr_t<BoundingBoxRenderer> _boundingBoxRenderer;
+  unique_ptr_t<OutlineRenderer> _outlineRenderer;
   Matrix _viewMatrix;
   Matrix _projectionMatrix;
   bool _frustumPlanesSet;
@@ -1101,9 +1100,9 @@ private:
   Octree<AbstractMesh*>* _selectionOctree;
   AbstractMesh* _pointerOverMesh;
   Sprite* _pointerOverSprite;
-  std::unique_ptr<DebugLayer> _debugLayer;
-  std::unique_ptr<DepthRenderer> _depthRenderer;
-  std::unique_ptr<GeometryBufferRenderer> _geometryBufferRenderer;
+  unique_ptr_t<DebugLayer> _debugLayer;
+  unique_ptr_t<DepthRenderer> _depthRenderer;
+  unique_ptr_t<GeometryBufferRenderer> _geometryBufferRenderer;
   unsigned int _uniqueIdCounter;
   AbstractMesh* _pickedDownMesh;
   AbstractMesh* _pickedUpMesh;

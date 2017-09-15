@@ -67,7 +67,7 @@ void PhysicsEngine::removeImpostor(PhysicsImpostor* impostor)
 {
   auto it = ::std::find_if(
     _impostors.begin(), _impostors.end(),
-    [&impostor](const std::unique_ptr<PhysicsImpostor>& _imposter) {
+    [&impostor](const unique_ptr_t<PhysicsImpostor>& _imposter) {
       return _imposter.get() == impostor;
     });
   if (it != _impostors.end()) {
@@ -79,7 +79,7 @@ void PhysicsEngine::removeImpostor(PhysicsImpostor* impostor)
 
 void PhysicsEngine::addJoint(PhysicsImpostor* mainImpostor,
                              PhysicsImpostor* connectedImpostor,
-                             const std::shared_ptr<PhysicsJoint>& joint)
+                             const shared_ptr_t<PhysicsJoint>& joint)
 {
   auto impostorJoint               = ::std::make_shared<PhysicsImpostorJoint>();
   impostorJoint->mainImpostor      = mainImpostor;
@@ -95,13 +95,12 @@ void PhysicsEngine::removeJoint(PhysicsImpostor* mainImpostor,
                                 PhysicsImpostor* connectedImpostor,
                                 PhysicsJoint* joint)
 {
-  vector_t<std::shared_ptr<PhysicsImpostorJoint>> matchingJoints(
-    _joints.size());
+  vector_t<shared_ptr_t<PhysicsImpostorJoint>> matchingJoints(_joints.size());
 
   auto it = ::std::copy_if(
     _joints.begin(), _joints.end(), matchingJoints.begin(),
-    [&connectedImpostor, &joint, &mainImpostor](
-      const std::shared_ptr<PhysicsImpostorJoint>& impostorJoint) {
+    [&connectedImpostor, &joint,
+     &mainImpostor](const shared_ptr_t<PhysicsImpostorJoint>& impostorJoint) {
       return (impostorJoint->connectedImpostor == connectedImpostor
               && impostorJoint->joint.get() == joint
               && impostorJoint->mainImpostor == mainImpostor);
@@ -143,11 +142,11 @@ IPhysicsEnginePlugin* PhysicsEngine::getPhysicsPlugin()
 PhysicsImpostor*
 PhysicsEngine::getImpostorForPhysicsObject(IPhysicsEnabledObject* object)
 {
-  auto it = ::std::find_if(
-    _impostors.begin(), _impostors.end(),
-    [&object](const std::unique_ptr<PhysicsImpostor>& impostor) {
-      return impostor->object == object;
-    });
+  auto it
+    = ::std::find_if(_impostors.begin(), _impostors.end(),
+                     [&object](const unique_ptr_t<PhysicsImpostor>& impostor) {
+                       return impostor->object == object;
+                     });
   return (it == _impostors.end()) ? nullptr : (*it).get();
 }
 
@@ -155,7 +154,7 @@ PhysicsImpostor* PhysicsEngine::getImpostorWithPhysicsBody(IPhysicsBody* body)
 {
   auto it
     = ::std::find_if(_impostors.begin(), _impostors.end(),
-                     [&body](const std::unique_ptr<PhysicsImpostor>& impostor) {
+                     [&body](const unique_ptr_t<PhysicsImpostor>& impostor) {
                        return impostor->physicsBody() == body;
                      });
   return (it == _impostors.end()) ? nullptr : (*it).get();

@@ -25,7 +25,7 @@ TiledGround::~TiledGround()
 {
 }
 
-std::unique_ptr<VertexData> TiledGround::_regenerateVertexData()
+unique_ptr_t<VertexData> TiledGround::_regenerateVertexData()
 {
   TiledGroundOptions options;
   options.xmin         = xmin;

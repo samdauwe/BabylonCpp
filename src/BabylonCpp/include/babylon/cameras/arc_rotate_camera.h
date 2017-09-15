@@ -18,7 +18,7 @@ public:
   static ArcRotateCamera* New(Ts&&... args)
   {
     auto camera = new ArcRotateCamera(::std::forward<Ts>(args)...);
-    camera->addToScene(static_cast<std::unique_ptr<Camera>>(camera));
+    camera->addToScene(static_cast<unique_ptr_t<Camera>>(camera));
 
     return camera;
   }
@@ -91,25 +91,25 @@ public:
   Matrix _viewMatrix;
   bool _useCtrlForPanning;
   MouseButtonType _panningMouseButton;
-  std::unique_ptr<ArcRotateCameraInputsManager> inputs;
+  unique_ptr_t<ArcRotateCameraInputsManager> inputs;
   ::std::function<void()> _reset;
   // Panning
-  std::unique_ptr<Vector3> panningAxis;
+  unique_ptr_t<Vector3> panningAxis;
   // Behaviors
   Observable<AbstractMesh> onMeshTargetChangedObservable;
   // Collisions
   ::std::function<void(AbstractMesh* collidedMesh)> onCollide;
   bool checkCollisions;
-  std::unique_ptr<Vector3> collisionRadius;
+  unique_ptr_t<Vector3> collisionRadius;
 
 protected:
   Vector3 _target;
   AbstractMesh* _targetHost;
   // Panning
-  std::unique_ptr<Vector3> _localDirection;
+  unique_ptr_t<Vector3> _localDirection;
   Vector3 _transformedDirection;
   // Collisions
-  std::unique_ptr<Collider> _collider;
+  unique_ptr_t<Collider> _collider;
   Vector3 _previousPosition;
   Vector3 _collisionVelocity;
   Vector3 _newPosition;
@@ -118,7 +118,7 @@ protected:
   float _previousRadius;
   // due to async collision inspection
   bool _collisionTriggered;
-  std::unique_ptr<Vector3> _targetBoundingCenter;
+  unique_ptr_t<Vector3> _targetBoundingCenter;
 
 }; // end of class ArcRotateCamera
 

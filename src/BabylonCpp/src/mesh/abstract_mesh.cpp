@@ -128,7 +128,7 @@ IReflect::Type AbstractMesh::type() const
   return IReflect::Type::ABSTRACTMESH;
 }
 
-void AbstractMesh::addToScene(std::unique_ptr<AbstractMesh>&& newMesh)
+void AbstractMesh::addToScene(unique_ptr_t<AbstractMesh>&& newMesh)
 {
   getScene()->addMesh(::std::move(newMesh));
 }

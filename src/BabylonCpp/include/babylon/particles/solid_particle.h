@@ -60,7 +60,7 @@ public:
   // rotation
   Vector3 rotation;
   // quaternion, will overwrite rotation
-  std::unique_ptr<Quaternion> rotationQuaternion;
+  unique_ptr_t<Quaternion> rotationQuaternion;
   // scale
   Vector3 scaling;
   // uvs
@@ -80,12 +80,12 @@ public:
   // index of the particle in its shape id
   unsigned int idxInShape;
   // reference to the shape model BoundingInfo object
-  std::unique_ptr<BoundingInfo> _modelBoundingInfo;
+  unique_ptr_t<BoundingInfo> _modelBoundingInfo;
   // particle BoundingInfo
-  std::unique_ptr<BoundingInfo> _boundingInfo;
+  unique_ptr_t<BoundingInfo> _boundingInfo;
   // reference to the SPS what the particle belongs to
   SolidParticleSystem* _sps;
-  std::unordered_map<string_t, float> extraFields;
+  unordered_map_t<string_t, float> extraFields;
 
 }; // end of class SolidParticle
 

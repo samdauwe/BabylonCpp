@@ -173,7 +173,7 @@ public:
    * @brief Clones the current image processing instance.
    * @return The cloned image processing
    */
-  std::unique_ptr<ImageProcessingConfiguration> clone();
+  unique_ptr_t<ImageProcessingConfiguration> clone();
 
   /**
    * @brief Serializes the current image processing instance to a json
@@ -200,7 +200,7 @@ public:
   /**
    * Color curves setup used in the effect if colorCurvesEnabled is set to true
    */
-  std::unique_ptr<ColorCurves> colorCurves;
+  unique_ptr_t<ColorCurves> colorCurves;
 
   /**
    * Color grading LUT texture used in the effect if colorGradingEnabled is set

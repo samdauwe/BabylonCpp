@@ -27,7 +27,7 @@ public:
   /**
    * @brief Returns a new Matrix from the current Matrix.
    */
-  std::unique_ptr<Matrix> clone() const;
+  unique_ptr_t<Matrix> clone() const;
 
   /**
    * @brief Returns the string "Matrix"

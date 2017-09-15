@@ -17,7 +17,7 @@
 namespace BABYLON {
 
 std::size_t Effect::_uniqueIdSeed = 0;
-std::unordered_map<unsigned int, GL::IGLBuffer*> Effect::_baseCache{};
+unordered_map_t<unsigned int, GL::IGLBuffer*> Effect::_baseCache{};
 
 Effect::Effect(const string_t& baseName, EffectCreationOptions& options,
                Engine* engine)
@@ -84,7 +84,7 @@ Effect::Effect(const string_t& baseName, EffectCreationOptions& options,
   });
 }
 
-Effect::Effect(const std::unordered_map<string_t, string_t>& baseName,
+Effect::Effect(const unordered_map_t<string_t, string_t>& baseName,
                EffectCreationOptions& options, Engine* engine)
     : defines{options.defines}
     , onCompiled{options.onCompiled}
@@ -135,9 +135,8 @@ Effect::Effect(const std::unordered_map<string_t, string_t>& baseName,
     _processIncludes(vertexCode, [this, &fragmentSource, &vertexSource](
                                    const string_t& vertexCodeWithIncludes) {
       _processShaderConversion(
-        vertexCodeWithIncludes, false,
-        [this, &fragmentSource,
-         &vertexSource](const string_t& migratedVertexCode) {
+        vertexCodeWithIncludes, false, [this, &fragmentSource, &vertexSource](
+                                         const string_t& migratedVertexCode) {
           _loadFragmentShader(
             fragmentSource, [this, &migratedVertexCode, &fragmentSource,
                              &vertexSource](const string_t& fragmentCode) {
@@ -338,18 +337,16 @@ void Effect::_dumpShadersSource(string_t vertexCode, string_t fragmentCode,
   unsigned int i = 2;
   const ::std::regex regex("\n", ::std::regex::optimize);
   auto formattedVertexCode
-    = "\n1\t"
-      + String::regexReplace(vertexCode, regex,
-                             [&i](const ::std::smatch& /*m*/) {
-                               return "\n" + ::std::to_string(i++) + "\t";
-                             });
+    = "\n1\t" + String::regexReplace(
+                  vertexCode, regex, [&i](const ::std::smatch& /*m*/) {
+                    return "\n" + ::std::to_string(i++) + "\t";
+                  });
   i = 2;
   auto formattedFragmentCode
-    = "\n1\t"
-      + String::regexReplace(fragmentCode, regex,
-                             [&i](const ::std::smatch& /*m*/) {
-                               return "\n" + ::std::to_string(i++) + "\t";
-                             });
+    = "\n1\t" + String::regexReplace(
+                  fragmentCode, regex, [&i](const ::std::smatch& /*m*/) {
+                    return "\n" + ::std::to_string(i++) + "\t";
+                  });
 
   // Dump shaders name and formatted source code
   BABYLON_LOGF_ERROR("Effect", "Vertex shader: %s%s", name.c_str(),
@@ -393,7 +390,7 @@ void Effect::_processShaderConversion(
   result = String::regexReplace(preparedSourceCode, "[ \t]attribute", " in");
 
   if (isFragment) {
-    const vector_t<std::pair<string_t, string_t>> fragMappings{
+    const vector_t<pair_t<string_t, string_t>> fragMappings{
       ::std::make_pair("texture2DLodEXT\\(", "textureLod("),   //
       ::std::make_pair("textureCubeLodEXT\\(", "textureLod("), //
       ::std::make_pair("texture2D\\(", "texture("),            //

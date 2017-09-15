@@ -13,8 +13,8 @@ public:
   CollisionCache();
   ~CollisionCache();
 
-  std::unordered_map<unsigned int, SerializedMesh>& getMeshes();
-  std::unordered_map<string_t, SerializedGeometry>& getGeometries();
+  unordered_map_t<unsigned int, SerializedMesh>& getMeshes();
+  unordered_map_t<string_t, SerializedGeometry>& getGeometries();
   bool containsMesh(unsigned int id) const;
   SerializedMesh& getMesh(unsigned int id);
   void addMesh(const SerializedMesh& mesh);
@@ -25,8 +25,8 @@ public:
   void removeGeometry(const string_t& id);
 
 private:
-  std::unordered_map<unsigned int, SerializedMesh> _meshes;
-  std::unordered_map<string_t, SerializedGeometry> _geometries;
+  unordered_map_t<unsigned int, SerializedMesh> _meshes;
+  unordered_map_t<string_t, SerializedGeometry> _geometries;
 
 }; // end of class CollisionCache
 

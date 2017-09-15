@@ -88,7 +88,7 @@ SphericalHarmonics SphericalHarmonics::copy() const
   return SphericalHarmonics(*this);
 }
 
-std::unique_ptr<SphericalHarmonics> SphericalHarmonics::clone() const
+unique_ptr_t<SphericalHarmonics> SphericalHarmonics::clone() const
 {
   return ::std::make_unique<SphericalHarmonics>(*this);
 }

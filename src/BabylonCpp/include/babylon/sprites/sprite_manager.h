@@ -18,13 +18,13 @@ public:
   {
     auto spriteManager = new SpriteManager(std::forward<Ts>(args)...);
     spriteManager->addToScene(
-      static_cast<std::unique_ptr<SpriteManager>>(spriteManager));
+      static_cast<unique_ptr_t<SpriteManager>>(spriteManager));
 
     return spriteManager;
   }
   virtual ~SpriteManager();
 
-  void addToScene(std::unique_ptr<SpriteManager>&& newSpriteManager);
+  void addToScene(unique_ptr_t<SpriteManager>&& newSpriteManager);
 
   Texture* texture() const;
   void texture(Texture* value);
@@ -48,7 +48,7 @@ private:
 
 public:
   string_t name;
-  vector_t<std::unique_ptr<Sprite>> sprites;
+  vector_t<unique_ptr_t<Sprite>> sprites;
   unsigned int renderingGroupId;
   unsigned int layerMask;
   bool fogEnabled;
@@ -67,10 +67,10 @@ private:
   Texture* _spriteTexture;
   Scene* _scene;
   Float32Array _vertexData;
-  std::unique_ptr<Buffer> _buffer;
-  std::unordered_map<string_t, std::unique_ptr<VertexBuffer>> _vertexBuffers;
-  std::unordered_map<string_t, VertexBuffer*> _vertexBufferPtrs;
-  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
+  unique_ptr_t<Buffer> _buffer;
+  unordered_map_t<string_t, unique_ptr_t<VertexBuffer>> _vertexBuffers;
+  unordered_map_t<string_t, VertexBuffer*> _vertexBufferPtrs;
+  unique_ptr_t<GL::IGLBuffer> _indexBuffer;
   Effect* _effectBase;
   Effect* _effectFog;
 

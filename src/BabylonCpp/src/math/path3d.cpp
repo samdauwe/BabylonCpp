@@ -86,7 +86,7 @@ Path3D Path3D::copy() const
   return Path3D(*this);
 }
 
-std::unique_ptr<Path3D> Path3D::clone() const
+unique_ptr_t<Path3D> Path3D::clone() const
 {
   return ::std::make_unique<Path3D>(*this);
 }

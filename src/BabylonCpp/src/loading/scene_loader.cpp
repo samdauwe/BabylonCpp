@@ -56,8 +56,7 @@ void SceneLoader::setCleanBoneMatrixWeights(bool value)
   SceneLoader::_CleanBoneMatrixWeights = value;
 }
 
-std::unordered_map<string_t, IRegisteredPlugin>
-  SceneLoader::_registeredPlugins{};
+unordered_map_t<string_t, IRegisteredPlugin> SceneLoader::_registeredPlugins{};
 
 IRegisteredPlugin SceneLoader::_getDefaultPlugin()
 {
@@ -109,7 +108,7 @@ SceneLoader::GetPluginForExtension(const string_t& extension)
   return SceneLoader::_getPluginForExtension(extension).plugin.get();
 }
 
-void SceneLoader::RegisterPlugin(std::shared_ptr<ISceneLoaderPlugin>&& plugin)
+void SceneLoader::RegisterPlugin(shared_ptr_t<ISceneLoaderPlugin>&& plugin)
 {
   auto& extensions = plugin->extensions.mapping;
   for (auto& item : extensions) {
@@ -172,7 +171,7 @@ void SceneLoader::ImportMesh(
                   progressCallBack, useArrayBuffer);
 }
 
-std::unique_ptr<Scene>
+unique_ptr_t<Scene>
 SceneLoader::Load(const string_t& rootUrl, const string_t& sceneFilename,
                   Engine* engine,
                   const ::std::function<void(Scene* scene)>& onsuccess,

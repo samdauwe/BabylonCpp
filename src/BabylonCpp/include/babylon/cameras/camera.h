@@ -36,7 +36,7 @@ public:
   virtual ~Camera();
 
   virtual IReflect::Type type() const override;
-  void addToScene(std::unique_ptr<Camera>&& newCamera);
+  void addToScene(unique_ptr_t<Camera>&& newCamera);
 
   /**
    * @param {boolean} fullDetails - support for multiple levels of logging
@@ -164,7 +164,7 @@ public:
 private:
   Matrix _computedViewMatrix;
   bool _doNotComputeProjectionMatrix;
-  std::unique_ptr<Matrix> _worldMatrix;
+  unique_ptr_t<Matrix> _worldMatrix;
   Matrix _transformMatrix;
   Matrix _webvrProjectionMatrix;
   Matrix _webvrViewMatrix;

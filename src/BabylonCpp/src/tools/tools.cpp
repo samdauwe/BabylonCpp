@@ -289,7 +289,7 @@ void Tools::LoadImage(const string_t& url,
                       const ::std::function<void(const string_t& msg)>& onError,
                       bool flipVertically)
 {
-  typedef std::unique_ptr<unsigned char, ::std::function<void(unsigned char*)>>
+  typedef unique_ptr_t<unsigned char, ::std::function<void(unsigned char*)>>
     stbi_ptr;
 
   int w, h, n;

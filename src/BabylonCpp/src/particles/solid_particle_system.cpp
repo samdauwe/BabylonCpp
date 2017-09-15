@@ -155,7 +155,7 @@ SolidParticleSystem::digest(Mesh* _mesh,
     number = (number > totalFacets) ? totalFacets : number;
     size   = static_cast<size_t>(::std::round(static_cast<float>(totalFacets)
                                             / static_cast<float>(number)));
-    delta  = 0;
+    delta = 0;
   }
   else {
     size = (size > totalFacets) ? totalFacets : size;
@@ -169,9 +169,8 @@ SolidParticleSystem::digest(Mesh* _mesh,
   size_t sizeO        = size;
 
   while (f < totalFacets) {
-    size = sizeO
-           + static_cast<size_t>(::std::floor((1.f + static_cast<float>(delta))
-                                              * Math::random()));
+    size = sizeO + static_cast<size_t>(::std::floor(
+                     (1.f + static_cast<float>(delta)) * Math::random()));
     if (f > totalFacets - size) {
       size = totalFacets - f;
     }
@@ -192,8 +191,9 @@ SolidParticleSystem::digest(Mesh* _mesh,
         stl_util::concat(facetUV, {meshUV[i * 2], meshUV[i * 2 + 1]});
       }
       if (!meshCol.empty()) {
-        stl_util::concat(facetCol, {meshCol[i * 4 + 0], meshCol[i * 4 + 1],
-                                    meshCol[i * 4 + 2], meshCol[i * 4 + 3]});
+        stl_util::concat(facetCol,
+                         {meshCol[i * 4 + 0], meshCol[i * 4 + 1],
+                          meshCol[i * 4 + 2], meshCol[i * 4 + 3]});
       }
       ++fi;
     }
@@ -333,13 +333,15 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
     _vertex.z *= _copy->scaling.z;
 
     Vector3::TransformCoordinatesToRef(_vertex, _rotMatrix, _rotated);
-    stl_util::concat(positions, {_copy->position.x + _rotated.x,
-                                 _copy->position.y + _rotated.y,
-                                 _copy->position.z + _rotated.z});
+    stl_util::concat(positions,
+                     {_copy->position.x + _rotated.x,
+                      _copy->position.y + _rotated.y,
+                      _copy->position.z + _rotated.z});
     if (!meshUV.empty()) {
       stl_util::concat(
-        uvs, {(_copy->uvs.z - _copy->uvs.x) * meshUV[u] + _copy->uvs.x,
-              (_copy->uvs.w - _copy->uvs.y) * meshUV[u + 1] + _copy->uvs.y});
+        uvs,
+        {(_copy->uvs.z - _copy->uvs.x) * meshUV[u] + _copy->uvs.x,
+         (_copy->uvs.w - _copy->uvs.y) * meshUV[u + 1] + _copy->uvs.y});
       u += 2;
     }
 
@@ -408,7 +410,7 @@ Float32Array SolidParticleSystem::_uvsToShapeUV(const Float32Array& uvs)
 }
 
 SolidParticle* SolidParticleSystem::_addParticle(
-  unsigned int idx, unsigned int idxpos, std::unique_ptr<ModelShape>&& model,
+  unsigned int idx, unsigned int idxpos, unique_ptr_t<ModelShape>&& model,
   int shapeId, unsigned int idxInShape, const BoundingInfo& bInfo)
 {
   particles.emplace_back(::std::make_unique<SolidParticle>(

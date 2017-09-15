@@ -23,7 +23,7 @@ Torus::~Torus()
 {
 }
 
-std::unique_ptr<VertexData> Torus::_regenerateVertexData()
+unique_ptr_t<VertexData> Torus::_regenerateVertexData()
 {
   TorusOptions options;
   options.diameter        = diameter;

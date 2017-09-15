@@ -457,18 +457,17 @@ bool ShaderMaterial::hasTexture(BaseTexture* texture) const
     return true;
   }
 
-  auto it1
-    = ::std::find_if(_textures.begin(), _textures.end(),
-                     [&texture](const std::pair<string_t, Texture*>& tex) {
-                       return tex.second == texture;
-                     });
+  auto it1 = ::std::find_if(_textures.begin(), _textures.end(),
+                            [&texture](const pair_t<string_t, Texture*>& tex) {
+                              return tex.second == texture;
+                            });
   if (it1 != _textures.end()) {
     return true;
   }
 
   auto it2 = ::std::find_if(
     _textureArrays.begin(), _textureArrays.end(),
-    [&texture](const std::pair<string_t, vector_t<BaseTexture*>>& textures) {
+    [&texture](const pair_t<string_t, vector_t<BaseTexture*>>& textures) {
       return stl_util::contains(textures.second, texture);
     });
   if (it2 != _textureArrays.end()) {
@@ -508,7 +507,7 @@ Json::object ShaderMaterial::serialize() const
   return Json::object();
 }
 
-std::unique_ptr<ShaderMaterial>
+unique_ptr_t<ShaderMaterial>
 ShaderMaterial::Parse(const Json::value& /*source*/, Scene* /*scene*/,
                       const string_t& /*url*/)
 {

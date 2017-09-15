@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT DefaultRenderingPipeline
-    : public PostProcessRenderPipeline {
+  : public PostProcessRenderPipeline {
 
 public:
   static string_t PassPostProcessId;
@@ -34,7 +34,7 @@ public:
    * prepare() to update the pipeline
    */
   DefaultRenderingPipeline(const string_t& name, bool hdr, Scene* scene,
-                           const std::unordered_map<string_t, Camera*>& cameras
+                           const unordered_map_t<string_t, Camera*>& cameras
                            = {},
                            bool automaticBuild = true);
   ~DefaultRenderingPipeline();
@@ -62,7 +62,7 @@ public:
   Json::object serialize() const;
 
   // Parse serialized pipeline
-  static std::unique_ptr<DefaultRenderingPipeline>
+  static unique_ptr_t<DefaultRenderingPipeline>
   Parse(const Json::value& source, Scene* scene, const string_t& rootUrl);
 
 private:

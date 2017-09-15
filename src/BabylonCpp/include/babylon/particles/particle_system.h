@@ -99,9 +99,9 @@ private:
   vector_t<Particle*> _stockParticles;
   int _newPartsExcess;
   Float32Array _vertexData;
-  std::unique_ptr<Buffer> _vertexBuffer;
-  std::unordered_map<string_t, std::unique_ptr<VertexBuffer>> _vertexBuffers;
-  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
+  unique_ptr_t<Buffer> _vertexBuffer;
+  unordered_map_t<string_t, unique_ptr_t<VertexBuffer>> _vertexBuffers;
+  unique_ptr_t<GL::IGLBuffer> _indexBuffer;
   Effect* _effect;
   Effect* _customEffect;
   string_t _cachedDefines;

@@ -79,7 +79,7 @@ Ray::~Ray()
 {
 }
 
-std::unique_ptr<Ray> Ray::clone() const
+unique_ptr_t<Ray> Ray::clone() const
 {
   return ::std::make_unique<Ray>(*this);
 }
@@ -206,9 +206,9 @@ bool Ray::intersectsSphere(const BoundingSphere& sphere) const
   return temp <= rr;
 }
 
-std::unique_ptr<IntersectionInfo>
-Ray::intersectsTriangle(const Vector3& vertex0, const Vector3& vertex1,
-                        const Vector3& vertex2)
+unique_ptr_t<IntersectionInfo> Ray::intersectsTriangle(const Vector3& vertex0,
+                                                       const Vector3& vertex1,
+                                                       const Vector3& vertex2)
 {
   if (!_vectorsSet) {
     _vectorsSet = true;
@@ -255,7 +255,7 @@ Ray::intersectsTriangle(const Vector3& vertex0, const Vector3& vertex1,
   return ::std::make_unique<IntersectionInfo>(bu, bv, distance);
 }
 
-std::unique_ptr<float> Ray::intersectsPlane(const Plane& plane)
+unique_ptr_t<float> Ray::intersectsPlane(const Plane& plane)
 {
   float distance;
   float result1 = Vector3::Dot(plane.normal, direction);
@@ -417,7 +417,7 @@ Ray Ray::CreateNew(float x, float y, float viewportWidth, float viewportHeight,
 {
   Vector3 start = Vector3::Unproject(Vector3(x, y, 0.f), viewportWidth,
                                      viewportHeight, world, view, projection);
-  Vector3 end   = Vector3::Unproject(Vector3(x, y, 1.f), viewportWidth,
+  Vector3 end = Vector3::Unproject(Vector3(x, y, 1.f), viewportWidth,
                                    viewportHeight, world, view, projection);
 
   Vector3 direction = end.subtract(start);

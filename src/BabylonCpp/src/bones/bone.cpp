@@ -45,7 +45,7 @@ IReflect::Type Bone::type() const
   return IReflect::Type::BONE;
 }
 
-void Bone::addToSkeleton(std::unique_ptr<Bone>&& newBone)
+void Bone::addToSkeleton(unique_ptr_t<Bone>&& newBone)
 {
   _skeleton->bones.emplace_back(::std::move(newBone));
 }

@@ -97,7 +97,7 @@ Json::object MorphTarget::serialize() const
   return Json::object();
 }
 
-std::unique_ptr<MorphTarget>
+unique_ptr_t<MorphTarget>
 MorphTarget::Parse(const Json::value& serializationObject)
 {
   auto result = ::std::make_unique<MorphTarget>(
@@ -117,7 +117,7 @@ MorphTarget::Parse(const Json::value& serializationObject)
   return result;
 }
 
-std::unique_ptr<MorphTarget>
+unique_ptr_t<MorphTarget>
 MorphTarget::FromMesh(AbstractMesh* mesh, const string_t& name, float influence)
 {
   auto morphTargetName = name;

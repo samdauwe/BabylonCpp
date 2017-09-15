@@ -26,7 +26,7 @@ Cylinder::~Cylinder()
 {
 }
 
-std::unique_ptr<VertexData> Cylinder::_regenerateVertexData()
+unique_ptr_t<VertexData> Cylinder::_regenerateVertexData()
 {
   CylinderOptions options;
   options.height          = height;

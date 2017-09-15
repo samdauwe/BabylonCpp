@@ -19,13 +19,13 @@ public:
   static Torus* New(Ts&&... args)
   {
     auto torus = new Torus(::std::forward<Ts>(args)...);
-    torus->addToScene(static_cast<std::unique_ptr<Geometry>>(torus));
+    torus->addToScene(static_cast<unique_ptr_t<Geometry>>(torus));
 
     return torus;
   }
   ~Torus();
 
-  std::unique_ptr<VertexData> _regenerateVertexData() override;
+  unique_ptr_t<VertexData> _regenerateVertexData() override;
   Geometry* copy(const string_t& id) override;
 
   // Statics

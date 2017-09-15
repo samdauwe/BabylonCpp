@@ -47,7 +47,7 @@ IReflect::Type BaseTexture::type() const
   return IReflect::Type::BASETEXTURE;
 }
 
-void BaseTexture::addToScene(std::unique_ptr<BaseTexture>&& newTexture)
+void BaseTexture::addToScene(unique_ptr_t<BaseTexture>&& newTexture)
 {
   _scene->textures.emplace_back(::std::move(newTexture));
 }
@@ -215,7 +215,7 @@ vector_t<Animation*> BaseTexture::getAnimations()
   return animations;
 }
 
-std::unique_ptr<BaseTexture> BaseTexture::clone() const
+unique_ptr_t<BaseTexture> BaseTexture::clone() const
 {
   return nullptr;
 }
@@ -326,7 +326,7 @@ void BaseTexture::dispose(bool /*doNotRecurse*/)
   // Remove from scene
   _scene->textures.erase(
     ::std::remove_if(_scene->textures.begin(), _scene->textures.end(),
-                     [this](const std::unique_ptr<BaseTexture>& baseTexture) {
+                     [this](const unique_ptr_t<BaseTexture>& baseTexture) {
                        return baseTexture.get() == this;
                      }),
     _scene->textures.end());

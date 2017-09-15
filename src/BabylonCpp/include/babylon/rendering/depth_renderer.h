@@ -21,7 +21,7 @@ public:
 
 private:
   Scene* _scene;
-  std::unique_ptr<RenderTargetTexture> _depthMap;
+  unique_ptr_t<RenderTargetTexture> _depthMap;
   Effect* _effect;
   Matrix _viewMatrix;
   Matrix _projectionMatrix;

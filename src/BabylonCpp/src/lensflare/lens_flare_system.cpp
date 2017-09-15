@@ -64,7 +64,7 @@ LensFlareSystem::~LensFlareSystem()
 }
 
 void LensFlareSystem::addToScene(
-  std::unique_ptr<LensFlareSystem>&& lensFlareSystem)
+  unique_ptr_t<LensFlareSystem>&& lensFlareSystem)
 {
   _scene->lensFlareSystems.emplace_back(::std::move(lensFlareSystem));
 }
@@ -248,7 +248,7 @@ bool LensFlareSystem::render()
   engine->setAlphaMode(EngineConstants::ALPHA_ONEONE);
 
   // VBOs
-  std::unordered_map<string_t, VertexBuffer*> vertexBuffersTmp;
+  unordered_map_t<string_t, VertexBuffer*> vertexBuffersTmp;
   vertexBuffersTmp.reserve(_vertexBuffers.size());
   for (const auto& item : _vertexBuffers) {
     vertexBuffersTmp[item.first] = item.second.get();
@@ -318,7 +318,7 @@ void LensFlareSystem::dispose(bool /*doNotRecurse*/)
   _scene->lensFlareSystems.erase(
     ::std::remove_if(
       _scene->lensFlareSystems.begin(), _scene->lensFlareSystems.end(),
-      [this](const std::unique_ptr<LensFlareSystem>& lensFlareSystem) {
+      [this](const unique_ptr_t<LensFlareSystem>& lensFlareSystem) {
         return lensFlareSystem.get() == this;
       }),
     _scene->lensFlareSystems.end());

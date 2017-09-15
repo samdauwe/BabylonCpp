@@ -85,7 +85,7 @@ public:
    */
   void setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
                                          bool autoClearDepthStencil);
-  std::unique_ptr<RenderTargetTexture> clone() const;
+  unique_ptr_t<RenderTargetTexture> clone() const;
   Json::object serialize() const;
 
   /**
@@ -162,15 +162,15 @@ public:
 protected:
   IRenderTargetOptions _renderTargetOptions;
   ISize _size;
-  std::unique_ptr<RenderingManager> _renderingManager;
+  unique_ptr_t<RenderingManager> _renderingManager;
   bool _doNotChangeAspectRatio;
   int _currentRefreshId;
   int _refreshRate;
-  std::unique_ptr<Matrix> _textureMatrix;
+  unique_ptr_t<Matrix> _textureMatrix;
   unsigned int _samples;
 
 private:
-  std::unique_ptr<PostProcessManager> _postProcessManager;
+  unique_ptr_t<PostProcessManager> _postProcessManager;
   vector_t<PostProcess*> _postProcesses;
   // Events
   Observer<RenderTargetTexture>::Ptr _onAfterUnbindObserver;

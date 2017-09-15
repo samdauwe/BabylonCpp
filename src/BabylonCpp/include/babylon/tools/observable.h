@@ -28,7 +28,7 @@ class BABYLON_SHARED_EXPORT Observable {
 
 public:
   using CallbackFunc = FastFunc<void(T* eventData, EventState eventState)>;
-  using SPtr         = std::shared_ptr<Observable<T>>;
+  using SPtr         = shared_ptr_t<Observable<T>>;
 
   static EventState::UPtr _eventState;
 
@@ -152,7 +152,7 @@ public:
   /**
    * @brief Clone the current observable.
    */
-  std::shared_ptr<Observable<T>> clone() const
+  shared_ptr_t<Observable<T>> clone() const
   {
     Observable<T>::SPtr result = std::make_shared<Observable<T>>();
 

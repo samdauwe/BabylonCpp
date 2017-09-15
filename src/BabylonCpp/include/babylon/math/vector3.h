@@ -29,7 +29,7 @@ public:
   /**
    * @brief Returns a new Vector3 copied from the current Vector3.
    */
-  std::unique_ptr<Vector3> clone() const;
+  unique_ptr_t<Vector3> clone() const;
 
   /**
    * @brief Returns a string with the Vector3 coordinates.

@@ -141,7 +141,7 @@ bool VolumetricLightScatteringPostProcess::isReady(SubMesh* subMesh,
   string_t join = String::join(defines, '\n');
   if (_cachedDefines != join) {
     _cachedDefines = join;
-    std::unordered_map<string_t, string_t> baseName{
+    unordered_map_t<string_t, string_t> baseName{
       {"vertexElement", "depth"},
       {"fragmentElement", "volumetricLightScatteringPass"}};
 
@@ -301,65 +301,63 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
   _volumetricLightScatteringRTT->onAfterRenderObservable.add(
     [&]() { scene->clearColor = savedSceneClearColor; });
 
-  _volumetricLightScatteringRTT->customRenderFunction
-    = [&](const vector_t<SubMesh*>& opaqueSubMeshes,
-          const vector_t<SubMesh*>& transparentSubMeshes,
-          const vector_t<SubMesh*>& alphaTestSubMeshes) {
-        auto pEngine = scene->getEngine();
+  _volumetricLightScatteringRTT->customRenderFunction = [&](
+    const vector_t<SubMesh*>& opaqueSubMeshes,
+    const vector_t<SubMesh*>& transparentSubMeshes,
+    const vector_t<SubMesh*>& alphaTestSubMeshes) {
+    auto pEngine = scene->getEngine();
 
-        for (const auto& opaqueSubMesh : opaqueSubMeshes) {
-          renderSubMesh(opaqueSubMesh);
-        }
+    for (const auto& opaqueSubMesh : opaqueSubMeshes) {
+      renderSubMesh(opaqueSubMesh);
+    }
 
-        pEngine->setAlphaTesting(true);
-        for (const auto& alphaTestSubMesh : alphaTestSubMeshes) {
-          renderSubMesh(alphaTestSubMesh);
-        }
-        pEngine->setAlphaTesting(false);
+    pEngine->setAlphaTesting(true);
+    for (const auto& alphaTestSubMesh : alphaTestSubMeshes) {
+      renderSubMesh(alphaTestSubMesh);
+    }
+    pEngine->setAlphaTesting(false);
 
-        if (!transparentSubMeshes.empty()) {
-          // Sort sub meshes
-          for (auto& submesh : transparentSubMeshes) {
-            submesh->_alphaIndex = submesh->getMesh()->alphaIndex;
-            submesh->_distanceToCamera
-              = submesh->getBoundingInfo()
-                  ->boundingSphere.centerWorld
-                  .subtract(scene->activeCamera->position)
-                  .length();
-          }
+    if (!transparentSubMeshes.empty()) {
+      // Sort sub meshes
+      for (auto& submesh : transparentSubMeshes) {
+        submesh->_alphaIndex       = submesh->getMesh()->alphaIndex;
+        submesh->_distanceToCamera = submesh->getBoundingInfo()
+                                       ->boundingSphere.centerWorld
+                                       .subtract(scene->activeCamera->position)
+                                       .length();
+      }
 
-          auto sortedArray
-            = stl_util::slice(transparentSubMeshes, 0,
-                              static_cast<int>(transparentSubMeshes.size()));
-          ::std::sort(sortedArray.begin(), sortedArray.end(),
-                      [](const SubMesh* a, const SubMesh* b) {
-                        // Alpha index first
-                        if (a->_alphaIndex > b->_alphaIndex) {
-                          return 1;
-                        }
-                        if (a->_alphaIndex < b->_alphaIndex) {
-                          return -1;
-                        }
+      auto sortedArray = stl_util::slice(
+        transparentSubMeshes, 0, static_cast<int>(transparentSubMeshes.size()));
+      ::std::sort(sortedArray.begin(), sortedArray.end(),
+                  [](const SubMesh* a, const SubMesh* b) {
+                    // Alpha index first
+                    if (a->_alphaIndex > b->_alphaIndex) {
+                      return 1;
+                    }
+                    if (a->_alphaIndex < b->_alphaIndex) {
+                      return -1;
+                    }
 
-                        // Then distance to camera
-                        if (a->_distanceToCamera < b->_distanceToCamera) {
-                          return 1;
-                        }
-                        if (a->_distanceToCamera > b->_distanceToCamera) {
-                          return -1;
-                        }
+                    // Then distance to camera
+                    if (a->_distanceToCamera < b->_distanceToCamera) {
+                      return 1;
+                    }
+                    if (a->_distanceToCamera > b->_distanceToCamera) {
+                      return -1;
+                    }
 
-                        return 0;
-                      });
+                    return 0;
+                  });
 
-          // Render sub meshes
-          pEngine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
-          for (const auto& subMesh : sortedArray) {
-            renderSubMesh(subMesh);
-          }
-          pEngine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
-        }
-      };
+      // Render sub meshes
+      pEngine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
+      for (const auto& subMesh : sortedArray) {
+        renderSubMesh(subMesh);
+      }
+      pEngine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
+    }
+  };
 }
 
 void VolumetricLightScatteringPostProcess::_updateMeshScreenCoordinates(

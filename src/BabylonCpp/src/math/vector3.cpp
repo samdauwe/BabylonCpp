@@ -63,7 +63,7 @@ Vector3 Vector3::copy() const
   return Vector3(*this);
 }
 
-std::unique_ptr<Vector3> Vector3::clone() const
+unique_ptr_t<Vector3> Vector3::clone() const
 {
   return ::std::make_unique<Vector3>(*this);
 }

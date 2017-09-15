@@ -235,22 +235,22 @@ private:
   Scene* _scene;
   Engine* _engine;
   IHighlightLayerOptions _options;
-  std::unordered_map<string_t, std::unique_ptr<VertexBuffer>> _vertexBuffers;
-  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
-  std::unique_ptr<PassPostProcess> _downSamplePostprocess;
-  std::unique_ptr<GlowBlurPostProcess> _horizontalBlurPostprocess;
-  std::unique_ptr<GlowBlurPostProcess> _verticalBlurPostprocess;
+  unordered_map_t<string_t, unique_ptr_t<VertexBuffer>> _vertexBuffers;
+  unique_ptr_t<GL::IGLBuffer> _indexBuffer;
+  unique_ptr_t<PassPostProcess> _downSamplePostprocess;
+  unique_ptr_t<GlowBlurPostProcess> _horizontalBlurPostprocess;
+  unique_ptr_t<GlowBlurPostProcess> _verticalBlurPostprocess;
   string_t _cachedDefines;
   Effect* _glowMapGenerationEffect;
   Effect* _glowMapMergeEffect;
-  std::unique_ptr<RenderTargetTexture> _blurTexture;
-  std::unique_ptr<RenderTargetTexture> _mainTexture;
+  unique_ptr_t<RenderTargetTexture> _blurTexture;
+  unique_ptr_t<RenderTargetTexture> _mainTexture;
   ISize _mainTextureDesiredSize;
-  std::unordered_map<unsigned int, IHighlightLayerMesh> _meshes;
+  unordered_map_t<unsigned int, IHighlightLayerMesh> _meshes;
   int _maxSize;
   bool _shouldRender;
   int _instanceGlowingMeshStencilReference;
-  std::unordered_map<unsigned int, IHighlightLayerExcludedMesh> _excludedMeshes;
+  unordered_map_t<unsigned int, IHighlightLayerExcludedMesh> _excludedMeshes;
 
 }; // end of struct HighlightLayer
 

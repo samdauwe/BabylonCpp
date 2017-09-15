@@ -21,7 +21,7 @@ public:
   WorkerReply onCollision(const CollidePayload& payload) override;
 
 private:
-  std::unique_ptr<CollisionCache> _collisionCache;
+  unique_ptr_t<CollisionCache> _collisionCache;
 
 }; // end of class ICollisionDetector
 

@@ -44,9 +44,9 @@ private:
   float _epsilon;
   size_t _indicesCount;
   ShaderMaterial* _lineShader;
-  std::unique_ptr<GL::IGLBuffer> _ib;
-  std::unordered_map<unsigned int, std::unique_ptr<VertexBuffer>> _buffers;
-  std::unordered_map<string_t, VertexBuffer*> _bufferPtrs;
+  unique_ptr_t<GL::IGLBuffer> _ib;
+  unordered_map_t<unsigned int, unique_ptr_t<VertexBuffer>> _buffers;
+  unordered_map_t<string_t, VertexBuffer*> _bufferPtrs;
   bool _checkVerticesInsteadOfIndices;
 
 }; // end of class EdgesRenderer

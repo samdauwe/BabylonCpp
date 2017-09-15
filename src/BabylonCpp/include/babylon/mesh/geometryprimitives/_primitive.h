@@ -26,8 +26,8 @@ public:
   Mesh* setVerticesData(unsigned int kind, const Float32Array& data,
                         bool updatable = false, int stride = -1) override;
 
-  virtual std::unique_ptr<VertexData> _regenerateVertexData() = 0;
-  virtual Geometry* copy(const string_t& id)                  = 0;
+  virtual unique_ptr_t<VertexData> _regenerateVertexData() = 0;
+  virtual Geometry* copy(const string_t& id)               = 0;
 
 private:
   bool _beingRegenerated;

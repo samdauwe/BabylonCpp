@@ -18,7 +18,7 @@ public:
   static Texture* New(Ts&&... args)
   {
     auto texture = new Texture(::std::forward<Ts>(args)...);
-    texture->addToScene(static_cast<std::unique_ptr<BaseTexture>>(texture));
+    texture->addToScene(static_cast<unique_ptr_t<BaseTexture>>(texture));
 
     return texture;
   }
@@ -54,9 +54,8 @@ public:
     const ::std::function<void()>& onLoad  = nullptr,
     const ::std::function<void()>& onError = nullptr,
     unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
-  static std::unique_ptr<BaseTexture> Parse(const Json::value& parsedTexture,
-                                            Scene* scene,
-                                            const string_t& rootUrl);
+  static unique_ptr_t<BaseTexture> Parse(const Json::value& parsedTexture,
+                                         Scene* scene, const string_t& rootUrl);
   static Texture* LoadFromDataString(
     const string_t& name, Buffer* buffer, Scene* scene,
     bool deleteBuffer = false, bool noMipmap = false, bool invertY = true,
@@ -95,9 +94,9 @@ protected:
 
 private:
   bool _noMipmap;
-  std::unique_ptr<Matrix> _rowGenerationMatrix;
-  std::unique_ptr<Matrix> _cachedTextureMatrix;
-  std::unique_ptr<Matrix> _projectionModeMatrix;
+  unique_ptr_t<Matrix> _rowGenerationMatrix;
+  unique_ptr_t<Matrix> _cachedTextureMatrix;
+  unique_ptr_t<Matrix> _projectionModeMatrix;
   Vector3 _t0;
   Vector3 _t1;
   Vector3 _t2;

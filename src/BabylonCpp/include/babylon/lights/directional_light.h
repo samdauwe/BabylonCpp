@@ -15,7 +15,7 @@ public:
   static DirectionalLight* New(Ts&&... args)
   {
     auto light = new DirectionalLight(::std::forward<Ts>(args)...);
-    light->addToScene(static_cast<std::unique_ptr<Light>>(light));
+    light->addToScene(static_cast<unique_ptr_t<Light>>(light));
 
     return light;
   }

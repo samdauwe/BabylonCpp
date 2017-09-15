@@ -33,8 +33,7 @@ public:
   static StandardMaterial* New(Ts&&... args)
   {
     auto material = new StandardMaterial(std::forward<Ts>(args)...);
-    material->addMaterialToScene(
-      static_cast<std::unique_ptr<Material>>(material));
+    material->addMaterialToScene(static_cast<unique_ptr_t<Material>>(material));
 
     return material;
   }
@@ -276,11 +275,11 @@ private:
   bool _useParallaxOcclusion;
   float _roughness;
   bool _useLightmapAsShadowmap;
-  std::unique_ptr<FresnelParameters> _diffuseFresnelParameters;
-  std::unique_ptr<FresnelParameters> _opacityFresnelParameters;
-  std::unique_ptr<FresnelParameters> _reflectionFresnelParameters;
-  std::unique_ptr<FresnelParameters> _refractionFresnelParameters;
-  std::unique_ptr<FresnelParameters> _emissiveFresnelParameters;
+  unique_ptr_t<FresnelParameters> _diffuseFresnelParameters;
+  unique_ptr_t<FresnelParameters> _opacityFresnelParameters;
+  unique_ptr_t<FresnelParameters> _reflectionFresnelParameters;
+  unique_ptr_t<FresnelParameters> _refractionFresnelParameters;
+  unique_ptr_t<FresnelParameters> _emissiveFresnelParameters;
   bool _useGlossinessFromSpecularMapAlpha;
   unsigned int _maxSimultaneousLights;
 

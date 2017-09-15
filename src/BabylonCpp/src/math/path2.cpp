@@ -52,7 +52,7 @@ Path2 Path2::copy() const
   return Path2(*this);
 }
 
-std::unique_ptr<Path2> Path2::clone() const
+unique_ptr_t<Path2> Path2::clone() const
 {
   return ::std::make_unique<Path2>(*this);
 }

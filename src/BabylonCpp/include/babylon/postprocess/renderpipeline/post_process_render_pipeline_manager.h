@@ -35,7 +35,7 @@ public:
   void update();
 
 private:
-  std::unordered_map<string_t, PostProcessRenderPipeline*> _renderPipelines;
+  unordered_map_t<string_t, PostProcessRenderPipeline*> _renderPipelines;
 
 }; // end of class PostProcessRenderPipelineManager
 

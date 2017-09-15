@@ -156,7 +156,7 @@ public:
   Observable<Node> onDisposeObservable;
 
 private:
-  std::unordered_map<string_t, std::unique_ptr<AnimationRange>> _ranges;
+  unordered_map_t<string_t, unique_ptr_t<AnimationRange>> _ranges;
   int _childrenFlag;
   bool _isEnabled;
   bool _isReady;
@@ -164,7 +164,7 @@ private:
   Scene* _scene;
   Node* _parentNode;
   vector_t<Node*> _children;
-  std::unique_ptr<Matrix> _worldMatrix;
+  unique_ptr_t<Matrix> _worldMatrix;
   Observer<Node>::Ptr _onDisposeObserver;
 
   // Behaviors

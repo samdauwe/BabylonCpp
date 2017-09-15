@@ -41,7 +41,7 @@ void LensFlare::dispose(bool /*doNotRecurse*/)
   // Remove from scene
   _system->lensFlares.erase(
     ::std::remove_if(_system->lensFlares.begin(), _system->lensFlares.end(),
-                     [this](const std::unique_ptr<LensFlare>& lensFlare) {
+                     [this](const unique_ptr_t<LensFlare>& lensFlare) {
                        return lensFlare.get() == this;
                      }),
     _system->lensFlares.end());

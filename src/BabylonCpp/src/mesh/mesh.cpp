@@ -204,8 +204,8 @@ bool Mesh::hasLODLevels() const
 void Mesh::_sortLODLevels()
 {
   ::std::sort(_LODLevels.begin(), _LODLevels.end(),
-              [](const std::unique_ptr<MeshLODLevel>& a,
-                 const std::unique_ptr<MeshLODLevel>& b) {
+              [](const unique_ptr_t<MeshLODLevel>& a,
+                 const unique_ptr_t<MeshLODLevel>& b) {
                 if (a->distance < b->distance) {
                   return 1;
                 }
@@ -591,7 +591,7 @@ void Mesh::markVerticesDataAsUpdatable(unsigned int kind, bool updatable)
   setVerticesData(kind, getVerticesData(kind), updatable);
 }
 
-Mesh& Mesh::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
+Mesh& Mesh::setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer)
 {
   if (!_geometry) {
     auto scene = getScene();
@@ -1419,11 +1419,10 @@ Mesh& Mesh::convertToFlatShadedMesh()
 
   // Save previous submeshes
   vector_t<SubMesh*> previousSubmeshes;
-  ::std::for_each(
-    subMeshes.begin(), subMeshes.end(),
-    [&previousSubmeshes](const std::unique_ptr<SubMesh>& subMesh) {
-      previousSubmeshes.emplace_back(subMesh.get());
-    });
+  ::std::for_each(subMeshes.begin(), subMeshes.end(),
+                  [&previousSubmeshes](const unique_ptr_t<SubMesh>& subMesh) {
+                    previousSubmeshes.emplace_back(subMesh.get());
+                  });
 
   auto indices      = getIndices();
   auto totalIndices = getTotalIndices();
@@ -1508,11 +1507,10 @@ Mesh& Mesh::convertToUnIndexedMesh()
 
   // Save previous submeshes
   vector_t<SubMesh*> previousSubmeshes(subMeshes.size());
-  ::std::for_each(
-    subMeshes.begin(), subMeshes.end(),
-    [&previousSubmeshes](const std::unique_ptr<SubMesh>& subMesh) {
-      previousSubmeshes.emplace_back(subMesh.get());
-    });
+  ::std::for_each(subMeshes.begin(), subMeshes.end(),
+                  [&previousSubmeshes](const unique_ptr_t<SubMesh>& subMesh) {
+                    previousSubmeshes.emplace_back(subMesh.get());
+                  });
 
   auto indices      = getIndices();
   auto totalIndices = getTotalIndices();
@@ -2484,8 +2482,8 @@ Mesh* Mesh::MergeMeshes(vector_t<Mesh*>& meshes, bool disposeSource,
   }
 
   // Merge
-  std::unique_ptr<VertexData> vertexData      = nullptr;
-  std::unique_ptr<VertexData> otherVertexData = nullptr;
+  unique_ptr_t<VertexData> vertexData      = nullptr;
+  unique_ptr_t<VertexData> otherVertexData = nullptr;
   IndicesArray indiceArray;
   Mesh* source = nullptr;
   for (auto& mesh : meshes) {

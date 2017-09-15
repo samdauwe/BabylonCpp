@@ -19,13 +19,13 @@ public:
   static Ground* New(Ts&&... args)
   {
     auto ground = new Ground(::std::forward<Ts>(args)...);
-    ground->addToScene(static_cast<std::unique_ptr<Geometry>>(ground));
+    ground->addToScene(static_cast<unique_ptr_t<Geometry>>(ground));
 
     return ground;
   }
   ~Ground();
 
-  std::unique_ptr<VertexData> _regenerateVertexData() override;
+  unique_ptr_t<VertexData> _regenerateVertexData() override;
   Geometry* copy(const string_t& id) override;
 
   // Statics

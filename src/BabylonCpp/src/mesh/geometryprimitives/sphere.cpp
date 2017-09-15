@@ -22,7 +22,7 @@ Sphere::~Sphere()
 {
 }
 
-std::unique_ptr<VertexData> Sphere::_regenerateVertexData()
+unique_ptr_t<VertexData> Sphere::_regenerateVertexData()
 {
   SphereOptions options(diameter);
   options.segments        = segments;

@@ -24,7 +24,7 @@ public:
   string_t reduce(const string_t& currentDefines);
 
 private:
-  std::unordered_map<unsigned int, vector_t<string_t>> _defines;
+  unordered_map_t<unsigned int, vector_t<string_t>> _defines;
   unsigned int _currentRank;
   unsigned int _maxRank;
 

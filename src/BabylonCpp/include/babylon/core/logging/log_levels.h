@@ -21,7 +21,7 @@ public:
   /** Begin method X, end method X etc. **/
   static const unsigned int LEVEL_TRACE;
   /** Levels list **/
-  static const vector_t<std::pair<unsigned int, string_t>> Levels;
+  static const vector_t<pair_t<unsigned int, string_t>> Levels;
 
   // Functions
   static string_t ToReadableLevel(unsigned int level);

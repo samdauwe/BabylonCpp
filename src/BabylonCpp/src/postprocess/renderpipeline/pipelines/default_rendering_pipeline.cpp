@@ -32,7 +32,7 @@ string_t DefaultRenderingPipeline::FinalMergePostProcessId
 
 DefaultRenderingPipeline::DefaultRenderingPipeline(
   const string_t& iName, bool hdr, Scene* scene,
-  const std::unordered_map<string_t, Camera*>& cameras, bool automaticBuild)
+  const unordered_map_t<string_t, Camera*>& cameras, bool automaticBuild)
     : PostProcessRenderPipeline(scene->getEngine(), iName)
     , pass{nullptr}
     , highlights{nullptr}
@@ -354,7 +354,7 @@ Json::object DefaultRenderingPipeline::serialize() const
   return Json::object();
 }
 
-std::unique_ptr<DefaultRenderingPipeline>
+unique_ptr_t<DefaultRenderingPipeline>
 DefaultRenderingPipeline::Parse(const Json::value& /*source*/, Scene* /*scene*/,
                                 const string_t& /*rootUrl*/)
 {

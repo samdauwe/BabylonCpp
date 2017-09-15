@@ -480,7 +480,7 @@ void RenderTargetTexture::setRenderingAutoClearDepthStencil(
                                                        autoClearDepthStencil);
 }
 
-std::unique_ptr<RenderTargetTexture> RenderTargetTexture::clone() const
+unique_ptr_t<RenderTargetTexture> RenderTargetTexture::clone() const
 {
   auto textureSize = getSize();
   auto newTexture  = ::std::make_unique<RenderTargetTexture>(
@@ -493,7 +493,7 @@ std::unique_ptr<RenderTargetTexture> RenderTargetTexture::clone() const
     _renderTargetOptions.samplingMode,         //
     _renderTargetOptions.generateDepthBuffer,  //
     _renderTargetOptions.generateStencilBuffer //
-  );
+    );
 
   // Base texture
   newTexture->setHasAlpha(hasAlpha());

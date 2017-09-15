@@ -53,7 +53,7 @@ SubMesh::~SubMesh()
 {
 }
 
-void SubMesh::addToMesh(std::unique_ptr<SubMesh>&& newSubMesh)
+void SubMesh::addToMesh(unique_ptr_t<SubMesh>&& newSubMesh)
 {
   _mesh->subMeshes.emplace_back(::std::move(newSubMesh));
 }
@@ -186,9 +186,10 @@ GL::IGLBuffer* SubMesh::getLinesIndexBuffer(const Uint32Array& indices,
 
     for (size_t index = indexStart; index < indexStart + indexCount;
          index += 3) {
-      stl_util::concat(linesIndices, {indices[index + 0], indices[index + 1],
-                                      indices[index + 1], indices[index + 2],
-                                      indices[index + 2], indices[index + 0]});
+      stl_util::concat(linesIndices,
+                       {indices[index + 0], indices[index + 1],
+                        indices[index + 1], indices[index + 2],
+                        indices[index + 2], indices[index + 0]});
     }
 
     _linesIndexBuffer = engine->createIndexBuffer(linesIndices);
@@ -202,12 +203,12 @@ bool SubMesh::canIntersects(const Ray& ray) const
   return ray.intersectsBox(getBoundingInfo()->boundingBox);
 }
 
-std::unique_ptr<IntersectionInfo>
+unique_ptr_t<IntersectionInfo>
 SubMesh::intersects(Ray& ray, const vector_t<Vector3>& positions,
                     const Uint32Array& indices, bool fastCheck)
 {
 
-  std::unique_ptr<IntersectionInfo> intersectInfo = nullptr;
+  unique_ptr_t<IntersectionInfo> intersectInfo = nullptr;
 
   // LineMesh first as it's also a Mesh...
   if (_mesh->type() == IReflect::Type::LINESMESH) {
@@ -292,7 +293,7 @@ void SubMesh::dispose(bool /*doNotRecurse*/)
   // Remove from mesh
   _mesh->subMeshes.erase(
     ::std::remove_if(_mesh->subMeshes.begin(), _mesh->subMeshes.end(),
-                     [this](const std::unique_ptr<SubMesh>& subMesh) {
+                     [this](const unique_ptr_t<SubMesh>& subMesh) {
                        return subMesh.get() == this;
                      }),
     _mesh->subMeshes.end());

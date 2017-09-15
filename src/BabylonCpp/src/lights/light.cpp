@@ -48,7 +48,7 @@ IReflect::Type Light::type() const
   return IReflect::Type::LIGHT;
 }
 
-void Light::addToScene(std::unique_ptr<Light>&& newLight)
+void Light::addToScene(unique_ptr_t<Light>&& newLight)
 {
   getScene()->addLight(::std::move(newLight));
 }
@@ -292,7 +292,7 @@ float Light::getScaledIntensity() const
   return _photometricScale * intensity;
 }
 
-std::unique_ptr<Light> Light::clone(const string_t& /*name*/)
+unique_ptr_t<Light> Light::clone(const string_t& /*name*/)
 {
   return nullptr;
 }

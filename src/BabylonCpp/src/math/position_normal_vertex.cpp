@@ -54,7 +54,7 @@ PositionNormalVertex PositionNormalVertex::copy() const
   return PositionNormalVertex(*this);
 }
 
-std::unique_ptr<PositionNormalVertex> PositionNormalVertex::clone() const
+unique_ptr_t<PositionNormalVertex> PositionNormalVertex::clone() const
 {
   return ::std::make_unique<PositionNormalVertex>(*this);
 }

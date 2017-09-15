@@ -13,8 +13,7 @@ public:
   static PushMaterial* New(Ts&&... args)
   {
     auto material = new PushMaterial(std::forward<Ts>(args)...);
-    material->addMaterialToScene(
-      static_cast<std::unique_ptr<Material>>(material));
+    material->addMaterialToScene(static_cast<unique_ptr_t<Material>>(material));
 
     return material;
   }

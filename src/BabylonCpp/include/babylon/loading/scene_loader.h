@@ -34,7 +34,7 @@ public:
 
 private:
   // Members
-  static std::unordered_map<string_t, IRegisteredPlugin> _registeredPlugins;
+  static unordered_map_t<string_t, IRegisteredPlugin> _registeredPlugins;
   // Functions
   static IRegisteredPlugin _getDefaultPlugin();
   static IRegisteredPlugin _getPluginForExtension(const string_t& extension);
@@ -43,7 +43,7 @@ private:
 
 public:
   static ISceneLoaderPlugin* GetPluginForExtension(const string_t& extension);
-  static void RegisterPlugin(std::shared_ptr<ISceneLoaderPlugin>&& plugin);
+  static void RegisterPlugin(shared_ptr_t<ISceneLoaderPlugin>&& plugin);
   static void ImportMesh(
     const vector_t<string_t>& meshesNames, const string_t& rootUrl,
     const string_t& sceneFilename, Scene* scene,
@@ -66,7 +66,7 @@ public:
    * @param engine is the instance of BABYLON.Engine to use to create the
    * scene
    */
-  std::unique_ptr<Scene>
+  unique_ptr_t<Scene>
   Load(const string_t& rootUrl, const string_t& sceneFilename, Engine* engine,
        const ::std::function<void(Scene* scene)>& onsuccess = nullptr,
        const ::std::function<void()>& progressCallBack      = nullptr,

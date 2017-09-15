@@ -6,7 +6,7 @@
 namespace BABYLON {
 
 Gamepad::Gamepad(const string_t& iId, int iIndex,
-                 const std::shared_ptr<IBrowserGamepad>& browserGamepad,
+                 const shared_ptr_t<IBrowserGamepad>& browserGamepad,
                  unsigned int leftStickX, unsigned int leftStickY,
                  unsigned int rightStickX, unsigned int rightStickY)
     : id{iId}

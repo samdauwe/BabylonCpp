@@ -27,7 +27,7 @@ public:
   /**
    * @brief Creates a new Color4 copied from the current one.
    */
-  std::unique_ptr<Color4> clone() const;
+  unique_ptr_t<Color4> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Color4& color);
 
   /**

@@ -13,7 +13,7 @@ public:
   static HemisphericLight* New(Ts&&... args)
   {
     auto light = new HemisphericLight(::std::forward<Ts>(args)...);
-    light->addToScene(static_cast<std::unique_ptr<Light>>(light));
+    light->addToScene(static_cast<unique_ptr_t<Light>>(light));
 
     return light;
   }
@@ -71,7 +71,7 @@ public:
   Vector3 direction;
 
 private:
-  std::unique_ptr<Matrix> _worldMatrix;
+  unique_ptr_t<Matrix> _worldMatrix;
 
 }; // end of class HemisphericLight
 

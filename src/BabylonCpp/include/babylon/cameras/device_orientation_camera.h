@@ -14,7 +14,7 @@ public:
   static DeviceOrientationCamera* New(Ts&&... args)
   {
     auto camera = new DeviceOrientationCamera(std::forward<Ts>(args)...);
-    camera->addToScene(static_cast<std::unique_ptr<Camera>>(camera));
+    camera->addToScene(static_cast<unique_ptr_t<Camera>>(camera));
 
     return camera;
   }
@@ -31,8 +31,8 @@ protected:
                           Scene* scene);
 
 private:
-  std::unique_ptr<Quaternion> _initialQuaternion;
-  std::unique_ptr<Quaternion> _quaternionCache;
+  unique_ptr_t<Quaternion> _initialQuaternion;
+  unique_ptr_t<Quaternion> _quaternionCache;
 
 }; // end of class ArcFollowCamera
 

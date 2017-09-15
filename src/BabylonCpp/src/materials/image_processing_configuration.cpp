@@ -305,12 +305,11 @@ void ImageProcessingConfiguration::bind(Effect* effect, float aspectRatio)
                       0.5f / textureSize,              // textureOffset
                       textureSize,                     // textureSize
                       colorGradingTexture->level       // weight
-    );
+                      );
   }
 }
 
-std::unique_ptr<ImageProcessingConfiguration>
-ImageProcessingConfiguration::clone()
+unique_ptr_t<ImageProcessingConfiguration> ImageProcessingConfiguration::clone()
 {
   return nullptr;
 }

@@ -32,9 +32,9 @@ struct LogMessageHandler {
   bool takes(unsigned int level);
   void handle(const LogMessage& msg);
 
-  std::unordered_map<unsigned int, vector_t<LogMessageListener*>>
+  unordered_map_t<unsigned int, vector_t<LogMessageListener*>>
     _logMessageListeners;
-  std::unique_ptr<Active> _bg;
+  unique_ptr_t<Active> _bg;
   unsigned int _minLevel, _maxLevel;
 };
 

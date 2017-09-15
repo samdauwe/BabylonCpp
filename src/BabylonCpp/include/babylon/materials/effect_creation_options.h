@@ -13,11 +13,11 @@ struct BABYLON_SHARED_EXPORT EffectCreationOptions {
   vector_t<string_t> samplers{};
   MaterialDefines* materialDefines{nullptr};
   string_t defines{""};
-  std::unique_ptr<EffectFallbacks> fallbacks{nullptr};
+  unique_ptr_t<EffectFallbacks> fallbacks{nullptr};
   ::std::function<void(Effect* effect)> onCompiled{nullptr};
   ::std::function<void(Effect* effect, const string_t& errors)> onError{
     nullptr};
-  std::unordered_map<string_t, unsigned int> indexParameters{};
+  unordered_map_t<string_t, unsigned int> indexParameters{};
   unsigned int number{0};
   unsigned int maxSimultaneousLights{4};
 }; // end of class EffectCreationOptions

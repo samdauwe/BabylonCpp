@@ -32,7 +32,7 @@ public:
   void drawText(const string_t& text, int x, int y, const string_t& font,
                 const string_t& color, const string_t& clearColor,
                 bool invertY = true, bool update = true);
-  std::unique_ptr<DynamicTexture> clone() const;
+  unique_ptr_t<DynamicTexture> clone() const;
   void _rebuild() override;
 
 private:

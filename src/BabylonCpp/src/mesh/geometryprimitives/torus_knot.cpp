@@ -27,7 +27,7 @@ TorusKnot::~TorusKnot()
 {
 }
 
-std::unique_ptr<VertexData> TorusKnot::_regenerateVertexData()
+unique_ptr_t<VertexData> TorusKnot::_regenerateVertexData()
 {
   TorusKnotOptions options;
   options.radius          = radius;

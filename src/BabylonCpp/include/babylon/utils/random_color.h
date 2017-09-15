@@ -192,7 +192,7 @@ private:
   void loadColorBounds();
 
 private:
-  std::unordered_map<string_t, ColorInfo> _colors;
+  unordered_map_t<string_t, ColorInfo> _colors;
 
 }; // end of class RandomColor
 

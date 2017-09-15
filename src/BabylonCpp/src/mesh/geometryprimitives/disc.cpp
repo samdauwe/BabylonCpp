@@ -20,7 +20,7 @@ Disc::~Disc()
 {
 }
 
-std::unique_ptr<VertexData> Disc::_regenerateVertexData()
+unique_ptr_t<VertexData> Disc::_regenerateVertexData()
 {
   DiscOptions options;
   options.radius          = radius;

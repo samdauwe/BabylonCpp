@@ -16,7 +16,7 @@ public:
   SphericalHarmonics& operator=(SphericalHarmonics&& other);
   ~SphericalHarmonics();
   SphericalHarmonics copy() const;
-  std::unique_ptr<SphericalHarmonics> clone() const;
+  unique_ptr_t<SphericalHarmonics> clone() const;
 
   void addLight(const Vector3& direction, const Color3& color,
                 float deltaSolidAngle);

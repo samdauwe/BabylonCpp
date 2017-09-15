@@ -21,7 +21,7 @@ RefractionTexture::~RefractionTexture()
 {
 }
 
-std::unique_ptr<RefractionTexture> RefractionTexture::clone() const
+unique_ptr_t<RefractionTexture> RefractionTexture::clone() const
 {
   auto textureSize = getSize();
   auto newTexture  = ::std::make_unique<RefractionTexture>(

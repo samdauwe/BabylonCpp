@@ -39,9 +39,8 @@ public:
   const char* getClassName() const;
 
   virtual IReflect::Type type() const override;
-  void addMaterialToScene(std::unique_ptr<Material>&& newMaterial);
-  void
-  addMultiMaterialToScene(std::unique_ptr<MultiMaterial>&& newMultiMaterial);
+  void addMaterialToScene(unique_ptr_t<Material>&& newMaterial);
+  void addMultiMaterialToScene(unique_ptr_t<MultiMaterial>&& newMultiMaterial);
 
   bool backFaceCulling() const;
   void setBackFaceCulling(bool value);
@@ -170,7 +169,7 @@ public:
 
 protected:
   bool _backFaceCulling;
-  std::unique_ptr<UniformBuffer> _uniformBuffer;
+  unique_ptr_t<UniformBuffer> _uniformBuffer;
 
 private:
   // Events

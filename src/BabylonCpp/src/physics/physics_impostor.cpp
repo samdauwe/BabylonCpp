@@ -299,7 +299,7 @@ void PhysicsImpostor::createJoint(PhysicsImpostor* otherImpostor,
 }
 
 void PhysicsImpostor::addJoint(PhysicsImpostor* otherImpostor,
-                               const std::shared_ptr<PhysicsJoint>& joint)
+                               const shared_ptr_t<PhysicsJoint>& joint)
 {
   Joint _joint;
   _joint.otherImpostor = otherImpostor;
@@ -319,7 +319,7 @@ void PhysicsImpostor::wakeUp()
   _physicsEngine->getPhysicsPlugin()->wakeUpBody(this);
 }
 
-std::unique_ptr<PhysicsImpostor>
+unique_ptr_t<PhysicsImpostor>
 PhysicsImpostor::clone(IPhysicsEnabledObject* newObject)
 {
   if (!newObject) {

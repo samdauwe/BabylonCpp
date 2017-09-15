@@ -21,7 +21,7 @@ public:
   virtual ~BaseTexture();
 
   virtual IReflect::Type type() const override;
-  void addToScene(std::unique_ptr<BaseTexture>&& newTexture);
+  void addToScene(unique_ptr_t<BaseTexture>&& newTexture);
 
   bool hasAlpha() const;
   void setHasAlpha(bool value);
@@ -53,7 +53,7 @@ public:
   virtual void _rebuild();
   virtual void delayLoad();
   vector_t<Animation*> getAnimations() override;
-  std::unique_ptr<BaseTexture> clone() const;
+  unique_ptr_t<BaseTexture> clone() const;
   unsigned int textureType() const;
   unsigned int textureFormat() const;
   Uint8Array readPixels(unsigned int faceIndex = 0);

@@ -16,13 +16,13 @@ public:
   static Bone* New(Ts&&... args)
   {
     auto bone = new Bone(std::forward<Ts>(args)...);
-    bone->addToSkeleton(static_cast<std::unique_ptr<Bone>>(bone));
+    bone->addToSkeleton(static_cast<unique_ptr_t<Bone>>(bone));
     return bone;
   }
   ~Bone();
 
   virtual IReflect::Type type() const override;
-  void addToSkeleton(std::unique_ptr<Bone>&& newBone);
+  void addToSkeleton(unique_ptr_t<Bone>&& newBone);
 
   /** Members **/
   Matrix& _matrix();
@@ -387,9 +387,9 @@ private:
   Matrix _localMatrix;
   Matrix _restPose;
   Matrix _baseMatrix;
-  std::unique_ptr<Matrix> _worldTransform;
+  unique_ptr_t<Matrix> _worldTransform;
   Matrix _absoluteTransform;
-  std::unique_ptr<Matrix> _invertedAbsoluteTransform;
+  unique_ptr_t<Matrix> _invertedAbsoluteTransform;
   Bone* _parent;
 
   Matrix _scaleMatrix;

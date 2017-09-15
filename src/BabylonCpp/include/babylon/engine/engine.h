@@ -26,15 +26,15 @@ class BABYLON_SHARED_EXPORT Engine : public IDisposable {
 
 public:
   using ArrayBufferViewArray   = vector_t<ArrayBufferView>;
-  using GLBufferPtr            = std::unique_ptr<GL::IGLBuffer>;
-  using GLFrameBufferPtr       = std::unique_ptr<GL::IGLFramebuffer>;
-  using GLFrameProgramPtr      = std::unique_ptr<GL::IGLProgram>;
-  using GLQueryPtr             = std::unique_ptr<GL::IGLQuery>;
-  using GLRenderBufferPtr      = std::unique_ptr<GL::IGLRenderbuffer>;
-  using GLShaderPtr            = std::unique_ptr<GL::IGLShader>;
-  using GLTexturePtr           = std::unique_ptr<GL::IGLTexture>;
-  using GLUniformLocationPtr   = std::unique_ptr<GL::IGLUniformLocation>;
-  using GLVertexArrayObjectPtr = std::unique_ptr<GL::IGLVertexArrayObject>;
+  using GLBufferPtr            = unique_ptr_t<GL::IGLBuffer>;
+  using GLFrameBufferPtr       = unique_ptr_t<GL::IGLFramebuffer>;
+  using GLFrameProgramPtr      = unique_ptr_t<GL::IGLProgram>;
+  using GLQueryPtr             = unique_ptr_t<GL::IGLQuery>;
+  using GLRenderBufferPtr      = unique_ptr_t<GL::IGLRenderbuffer>;
+  using GLShaderPtr            = unique_ptr_t<GL::IGLShader>;
+  using GLTexturePtr           = unique_ptr_t<GL::IGLTexture>;
+  using GLUniformLocationPtr   = unique_ptr_t<GL::IGLUniformLocation>;
+  using GLVertexArrayObjectPtr = unique_ptr_t<GL::IGLVertexArrayObject>;
 
   friend class BaseTexture;
 
@@ -51,9 +51,9 @@ public:
 
 public:
   template <typename... Ts>
-  static std::unique_ptr<Engine> New(Ts&&... args)
+  static unique_ptr_t<Engine> New(Ts&&... args)
   {
-    std::unique_ptr<Engine> engine(new Engine(::std::forward<Ts>(args)...));
+    unique_ptr_t<Engine> engine(new Engine(::std::forward<Ts>(args)...));
     return engine;
   }
   virtual ~Engine();
@@ -87,7 +87,7 @@ public:
   ClientRect getRenderingCanvasClientRect();
   void setHardwareScalingLevel(int level);
   int getHardwareScalingLevel() const;
-  vector_t<std::unique_ptr<InternalTexture>>& getLoadedTexturesCache();
+  vector_t<unique_ptr_t<InternalTexture>>& getLoadedTexturesCache();
   EngineCapabilities& getCaps();
   /** The number of draw calls submitted last frame */
   size_t drawCalls() const;
@@ -217,7 +217,7 @@ public:
                         unsigned int index);
   void updateArrayBuffer(const Float32Array& data);
   GLVertexArrayObjectPtr recordVertexArrayObject(
-    const std::unordered_map<string_t, VertexBuffer*>& vertexBuffers,
+    const unordered_map_t<string_t, VertexBuffer*>& vertexBuffers,
     GL::IGLBuffer* indexBuffer, Effect* effect);
   void bindVertexArrayObject(GL::IGLVertexArrayObject* vertexArrayObject,
                              GL::IGLBuffer* indexBuffer);
@@ -226,7 +226,7 @@ public:
                            const Float32Array& vertexDeclaration,
                            int vertexStrideSize = 3, Effect* effect = nullptr);
   void
-  bindBuffers(const std::unordered_map<string_t, VertexBuffer*>& vertexBuffers,
+  bindBuffers(const unordered_map_t<string_t, VertexBuffer*>& vertexBuffers,
               GL::IGLBuffer* indexBuffer, Effect* effect);
   void unbindInstanceAttributes();
   void releaseVertexArrayObject(GL::IGLVertexArrayObject* vao);
@@ -259,7 +259,7 @@ public:
                        Engine* engine,
                        const ::std::function<void(Effect* effect)>& onCompiled
                        = nullptr);
-  Effect* createEffect(std::unordered_map<string_t, string_t>& baseName,
+  Effect* createEffect(unordered_map_t<string_t, string_t>& baseName,
                        EffectCreationOptions& options, Engine* engine);
   Effect* createEffectForParticles(
     const string_t& fragmentName, const vector_t<string_t>& uniformsNames,
@@ -273,7 +273,7 @@ public:
                                         const string_t& fragmentCode,
                                         const string_t& defines,
                                         GL::IGLRenderingContext* gl = nullptr);
-  std::unordered_map<string_t, GLUniformLocationPtr>
+  unordered_map_t<string_t, GLUniformLocationPtr>
   getUniforms(GL::IGLProgram* shaderProgram,
               const vector_t<string_t>& uniformsNames);
   Int32Array getAttributes(GL::IGLProgram* shaderProgram,
@@ -356,7 +356,7 @@ public:
    * @returns The extension selected.
    */
   string_t& setTextureFormatToUse(const vector_t<string_t>& formatsAvailable);
-  std::unique_ptr<GL::IGLTexture> _createTexture();
+  unique_ptr_t<GL::IGLTexture> _createTexture();
   InternalTexture* createTexture(
     const vector_t<string_t>& list, bool noMipmap, bool invertY, Scene* scene,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
@@ -418,7 +418,7 @@ public:
                             bool invertY                = true,
                             const string_t& compression = "",
                             unsigned int level          = 0);
-  std::unique_ptr<InternalTexture> createRawCubeTexture(
+  unique_ptr_t<InternalTexture> createRawCubeTexture(
     const vector_t<Uint8Array> data, int size, unsigned int format,
     unsigned int type, bool generateMipMaps, bool invertY,
     unsigned int samplingMode, const string_t& compression = "");
@@ -525,7 +525,7 @@ private:
                            int offset);
   void _bindIndexBufferWithCache(GL::IGLBuffer* indexBuffer);
   void _bindVertexBuffersAttributes(
-    const std::unordered_map<string_t, VertexBuffer*>& vertexBuffers,
+    const unordered_map_t<string_t, VertexBuffer*>& vertexBuffers,
     Effect* effect);
   void _unbindVertexArrayObject();
   void setProgram(GL::IGLProgram* program);
@@ -647,47 +647,47 @@ private:
   bool _contextWasLost;
 
   // FPS
-  std::unique_ptr<PerformanceMonitor> _performanceMonitor;
+  unique_ptr_t<PerformanceMonitor> _performanceMonitor;
   float _fps;
   float _deltaTime;
 
   // States
-  std::unique_ptr<Internals::_DepthCullingState> _depthCullingState;
-  std::unique_ptr<Internals::_StencilState> _stencilState;
-  std::unique_ptr<Internals::_AlphaState> _alphaState;
+  unique_ptr_t<Internals::_DepthCullingState> _depthCullingState;
+  unique_ptr_t<Internals::_StencilState> _stencilState;
+  unique_ptr_t<Internals::_AlphaState> _alphaState;
   int _alphaMode;
 
   // Cache
-  vector_t<std::unique_ptr<InternalTexture>> _internalTexturesCache;
+  vector_t<unique_ptr_t<InternalTexture>> _internalTexturesCache;
   unsigned int _maxTextureChannels;
   unsigned int _activeTexture;
-  std::unordered_map<unsigned int, InternalTexture*> _activeTexturesCache;
+  unordered_map_t<unsigned int, InternalTexture*> _activeTexturesCache;
   Effect* _currentEffect;
   GL::IGLProgram* _currentProgram;
-  std::unordered_map<string_t, std::unique_ptr<Effect>> _compiledEffects;
+  unordered_map_t<string_t, unique_ptr_t<Effect>> _compiledEffects;
   vector_t<bool> _vertexAttribArraysEnabled;
   Viewport* _cachedViewport;
   GL::IGLVertexArrayObject* _cachedVertexArrayObject;
-  std::unordered_map<string_t, VertexBuffer*> _cachedVertexBuffersMap;
+  unordered_map_t<string_t, VertexBuffer*> _cachedVertexBuffersMap;
   GL::IGLBuffer* _cachedVertexBuffers;
   GL::IGLBuffer* _cachedIndexBuffer;
   Effect* _cachedEffectForVertexBuffers;
   InternalTexture* _currentRenderTarget;
   bool _uintIndicesCurrentlySet;
-  std::unordered_map<int, GL::IGLBuffer*> _currentBoundBuffer;
+  unordered_map_t<int, GL::IGLBuffer*> _currentBoundBuffer;
   GL::IGLFramebuffer* _currentFramebuffer;
-  std::unordered_map<unsigned int, BufferPointer> _currentBufferPointers;
+  unordered_map_t<unsigned int, BufferPointer> _currentBufferPointers;
   Int32Array _currentInstanceLocations;
   vector_t<GL::IGLBuffer*> _currentInstanceBuffers;
   Int32Array _textureUnits;
   ICanvas* _workingCanvas;
   ICanvasRenderingContext2D* _workingContext;
-  std::unique_ptr<PassPostProcess> _rescalePostProcess;
-  std::unique_ptr<GL::IGLFramebuffer> _dummyFramebuffer;
+  unique_ptr_t<PassPostProcess> _rescalePostProcess;
+  unique_ptr_t<GL::IGLFramebuffer> _dummyFramebuffer;
   bool _vaoRecordInProgress;
   bool _mustWipeVertexAttributes;
   InternalTexture* _emptyTexture;
-  std::unique_ptr<InternalTexture> _emptyCubeTexture;
+  unique_ptr_t<InternalTexture> _emptyCubeTexture;
   // Hardware supported Compressed Textures
   vector_t<string_t> _texturesSupported;
   string_t _textureFormatInUse;

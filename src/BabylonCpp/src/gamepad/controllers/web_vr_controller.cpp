@@ -5,8 +5,7 @@
 
 namespace BABYLON {
 
-WebVRController::WebVRController(
-  const std::shared_ptr<IBrowserGamepad>& vrGamepad)
+WebVRController::WebVRController(const shared_ptr_t<IBrowserGamepad>& vrGamepad)
     : PoseEnabledController(vrGamepad)
     , pad{StickValues(0.f, 0.f)}
     , hand{vrGamepad->hand}

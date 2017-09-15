@@ -12,13 +12,12 @@ CollisionCache::~CollisionCache()
 {
 }
 
-std::unordered_map<unsigned int, SerializedMesh>& CollisionCache::getMeshes()
+unordered_map_t<unsigned int, SerializedMesh>& CollisionCache::getMeshes()
 {
   return _meshes;
 }
 
-std::unordered_map<string_t, SerializedGeometry>&
-CollisionCache::getGeometries()
+unordered_map_t<string_t, SerializedGeometry>& CollisionCache::getGeometries()
 {
   return _geometries;
 }

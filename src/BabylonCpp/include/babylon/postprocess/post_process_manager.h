@@ -33,10 +33,10 @@ private:
 
 private:
   Scene* _scene;
-  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
+  unique_ptr_t<GL::IGLBuffer> _indexBuffer;
   Float32Array _vertexDeclaration;
-  std::unordered_map<string_t, std::unique_ptr<VertexBuffer>> _vertexBuffers;
-  std::unordered_map<string_t, VertexBuffer*> _vertexBufferPtrs;
+  unordered_map_t<string_t, unique_ptr_t<VertexBuffer>> _vertexBuffers;
+  unordered_map_t<string_t, VertexBuffer*> _vertexBufferPtrs;
 
 }; // end of class PostProcessManager
 

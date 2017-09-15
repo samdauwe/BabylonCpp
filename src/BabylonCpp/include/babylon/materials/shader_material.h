@@ -20,8 +20,7 @@ public:
   static ShaderMaterial* New(Ts&&... args)
   {
     auto material = new ShaderMaterial(::std::forward<Ts>(args)...);
-    material->addMaterialToScene(
-      static_cast<std::unique_ptr<Material>>(material));
+    material->addMaterialToScene(static_cast<unique_ptr_t<Material>>(material));
 
     return material;
   }
@@ -65,8 +64,8 @@ public:
   Json::object serialize() const;
 
   // Statics
-  static std::unique_ptr<ShaderMaterial>
-  Parse(const Json::value& source, Scene* scene, const string_t& url);
+  static unique_ptr_t<ShaderMaterial> Parse(const Json::value& source,
+                                            Scene* scene, const string_t& url);
 
 protected:
   ShaderMaterial(const string_t& name, Scene* scene, const string_t& shaderPath,
@@ -79,20 +78,20 @@ private:
 private:
   string_t _shaderPath;
   ShaderMaterialOptions _options;
-  std::unordered_map<string_t, Texture*> _textures;
-  std::unordered_map<string_t, vector_t<BaseTexture*>> _textureArrays;
-  std::unordered_map<string_t, float> _floats;
-  std::unordered_map<string_t, Float32Array> _floatsArrays;
-  std::unordered_map<string_t, Color3> _colors3;
-  std::unordered_map<string_t, Float32Array> _colors3Arrays;
-  std::unordered_map<string_t, Color4> _colors4;
-  std::unordered_map<string_t, Vector2> _vectors2;
-  std::unordered_map<string_t, Vector3> _vectors3;
-  std::unordered_map<string_t, Vector4> _vectors4;
-  std::unordered_map<string_t, Matrix> _matrices;
-  std::unordered_map<string_t, Float32Array> _matrices3x3;
-  std::unordered_map<string_t, Float32Array> _matrices2x2;
-  std::unordered_map<string_t, Float32Array> _vectors3Arrays;
+  unordered_map_t<string_t, Texture*> _textures;
+  unordered_map_t<string_t, vector_t<BaseTexture*>> _textureArrays;
+  unordered_map_t<string_t, float> _floats;
+  unordered_map_t<string_t, Float32Array> _floatsArrays;
+  unordered_map_t<string_t, Color3> _colors3;
+  unordered_map_t<string_t, Float32Array> _colors3Arrays;
+  unordered_map_t<string_t, Color4> _colors4;
+  unordered_map_t<string_t, Vector2> _vectors2;
+  unordered_map_t<string_t, Vector3> _vectors3;
+  unordered_map_t<string_t, Vector4> _vectors4;
+  unordered_map_t<string_t, Matrix> _matrices;
+  unordered_map_t<string_t, Float32Array> _matrices3x3;
+  unordered_map_t<string_t, Float32Array> _matrices2x2;
+  unordered_map_t<string_t, Float32Array> _vectors3Arrays;
   Matrix _cachedWorldViewMatrix;
   int _renderId;
 

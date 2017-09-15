@@ -63,13 +63,13 @@ IReflect::Type Material::type() const
   return IReflect::Type::MATERIAL;
 }
 
-void Material::addMaterialToScene(std::unique_ptr<Material>&& newMaterial)
+void Material::addMaterialToScene(unique_ptr_t<Material>&& newMaterial)
 {
   _scene->materials.emplace_back(::std::move(newMaterial));
 }
 
 void Material::addMultiMaterialToScene(
-  std::unique_ptr<MultiMaterial>&& newMultiMaterial)
+  unique_ptr_t<MultiMaterial>&& newMultiMaterial)
 {
   _scene->multiMaterials.emplace_back(::std::move(newMultiMaterial));
 }
@@ -498,7 +498,7 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)
   // Remove from scene
   _scene->materials.erase(
     ::std::remove_if(_scene->materials.begin(), _scene->materials.end(),
-                     [this](const std::unique_ptr<Material>& material) {
+                     [this](const unique_ptr_t<Material>& material) {
                        return material.get() == this;
                      }),
     _scene->materials.end());

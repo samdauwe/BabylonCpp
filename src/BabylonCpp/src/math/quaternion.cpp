@@ -61,7 +61,7 @@ Quaternion Quaternion::copy() const
   return Quaternion(*this);
 }
 
-std::unique_ptr<Quaternion> Quaternion::clone() const
+unique_ptr_t<Quaternion> Quaternion::clone() const
 {
   return ::std::make_unique<Quaternion>(*this);
 }

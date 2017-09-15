@@ -428,7 +428,7 @@ int Engine::getHardwareScalingLevel() const
   return _hardwareScalingLevel;
 }
 
-vector_t<std::unique_ptr<InternalTexture>>& Engine::getLoadedTexturesCache()
+vector_t<unique_ptr_t<InternalTexture>>& Engine::getLoadedTexturesCache()
 {
   return _internalTexturesCache;
 }
@@ -712,7 +712,7 @@ void Engine::scissorClear(int x, int y, int width, int height,
                           const Color4& clearColor)
 {
   // Save state
-  int curScissor                = _gl->getParameteri(GL::SCISSOR_TEST);
+  int curScissor = _gl->getParameteri(GL::SCISSOR_TEST);
   array_t<int, 3> curScissorBox = _gl->getScissorBoxParameter();
 
   // Change state
@@ -933,7 +933,7 @@ void Engine::restoreDefaultFramebuffer()
 }
 
 // UBOs
-std::unique_ptr<GL::IGLBuffer>
+unique_ptr_t<GL::IGLBuffer>
 Engine::createUniformBuffer(const Float32Array& elements)
 {
   auto ubo = _gl->createBuffer();
@@ -947,7 +947,7 @@ Engine::createUniformBuffer(const Float32Array& elements)
   return ubo;
 }
 
-std::unique_ptr<GL::IGLBuffer>
+unique_ptr_t<GL::IGLBuffer>
 Engine::createDynamicUniformBuffer(const Float32Array& elements)
 {
   auto ubo = _gl->createBuffer();
@@ -1179,8 +1179,7 @@ void Engine::_bindIndexBufferWithCache(GL::IGLBuffer* indexBuffer)
 }
 
 void Engine::_bindVertexBuffersAttributes(
-  const std::unordered_map<string_t, VertexBuffer*>& vertexBuffers,
-  Effect* effect)
+  const unordered_map_t<string_t, VertexBuffer*>& vertexBuffers, Effect* effect)
 {
   auto attributes = effect->getAttributesNames();
 
@@ -1226,8 +1225,8 @@ void Engine::_bindVertexBuffersAttributes(
   }
 }
 
-std::unique_ptr<GL::IGLVertexArrayObject> Engine::recordVertexArrayObject(
-  const std::unordered_map<string_t, VertexBuffer*>& vertexBuffers,
+unique_ptr_t<GL::IGLVertexArrayObject> Engine::recordVertexArrayObject(
+  const unordered_map_t<string_t, VertexBuffer*>& vertexBuffers,
   GL::IGLBuffer* indexBuffer, Effect* effect)
 {
   auto vao = _gl->createVertexArray();
@@ -1313,7 +1312,7 @@ void Engine::_unbindVertexArrayObject()
 }
 
 void Engine::bindBuffers(
-  const std::unordered_map<string_t, VertexBuffer*>& vertexBuffers,
+  const unordered_map_t<string_t, VertexBuffer*>& vertexBuffers,
   GL::IGLBuffer* indexBuffer, Effect* effect)
 {
   if (_cachedVertexBuffersMap != vertexBuffers
@@ -1528,7 +1527,7 @@ Engine::createEffect(const string_t& baseName, EffectCreationOptions& options,
   return _compiledEffects[name].get();
 }
 
-Effect* Engine::createEffect(std::unordered_map<string_t, string_t>& baseName,
+Effect* Engine::createEffect(unordered_map_t<string_t, string_t>& baseName,
                              EffectCreationOptions& options, Engine* engine)
 {
   string_t vertex
@@ -1561,7 +1560,7 @@ Effect* Engine::createEffectForParticles(
   const ::std::function<void(const Effect* effect, const string_t& errors)>&
     onError)
 {
-  std::unordered_map<string_t, string_t> baseName{
+  unordered_map_t<string_t, string_t> baseName{
     {"vertex", "particles"}, {"fragmentElement", fragmentName}};
   vector_t<string_t> attributesNames{"position", "color", "options"};
   vector_t<string_t> _uniformsNames = {"view", "projection"};
@@ -1581,7 +1580,7 @@ Effect* Engine::createEffectForParticles(
   return createEffect(baseName, options, this);
 }
 
-std::unique_ptr<GL::IGLProgram> Engine::createShaderProgram(
+unique_ptr_t<GL::IGLProgram> Engine::createShaderProgram(
   const string_t& vertexCode, const string_t& fragmentCode,
   const string_t& defines, GL::IGLRenderingContext* iGl)
 {
@@ -1589,7 +1588,7 @@ std::unique_ptr<GL::IGLProgram> Engine::createShaderProgram(
 
   const string_t shaderVersion
     = (_webGLVersion > 1.f) ? "#version 300 es\n" : "";
-  auto vertexShader   = Engine::CompileShader(context, vertexCode, "vertex",
+  auto vertexShader = Engine::CompileShader(context, vertexCode, "vertex",
                                             defines, shaderVersion);
   auto fragmentShader = Engine::CompileShader(context, fragmentCode, "fragment",
                                               defines, shaderVersion);
@@ -1615,11 +1614,11 @@ std::unique_ptr<GL::IGLProgram> Engine::createShaderProgram(
   return shaderProgram;
 }
 
-std::unordered_map<string_t, std::unique_ptr<GL::IGLUniformLocation>>
+unordered_map_t<string_t, unique_ptr_t<GL::IGLUniformLocation>>
 Engine::getUniforms(GL::IGLProgram* shaderProgram,
                     const vector_t<string_t>& uniformsNames)
 {
-  std::unordered_map<string_t, std::unique_ptr<GL::IGLUniformLocation>> results;
+  unordered_map_t<string_t, unique_ptr_t<GL::IGLUniformLocation>> results;
 
   for (auto& name : uniformsNames) {
     auto uniform = _gl->getUniformLocation(shaderProgram, name);
@@ -2071,7 +2070,7 @@ Engine::setTextureFormatToUse(const vector_t<string_t>& formatsAvailable)
   return _textureFormatInUse;
 }
 
-std::unique_ptr<GL::IGLTexture> Engine::_createTexture()
+unique_ptr_t<GL::IGLTexture> Engine::_createTexture()
 {
   return _gl->createTexture();
 }
@@ -2632,14 +2631,14 @@ Engine::createMultipleRenderTarget(ISize size,
                     GL::DEPTH_COMPONENT,   //
                     GL::UNSIGNED_SHORT,    //
                     nullptr                //
-    );
+                    );
 
     _gl->framebufferTexture2D(GL::FRAMEBUFFER,                   //
                               GL::DEPTH_ATTACHMENT,              //
                               GL::TEXTURE_2D,                    //
                               depthTexture->_webGLTexture.get(), //
                               0                                  //
-    );
+                              );
 
     depthTexture->_framebuffer           = ::std::move(framebuffer); // FIXME
     depthTexture->baseWidth              = width;
@@ -2666,7 +2665,7 @@ Engine::createMultipleRenderTarget(ISize size,
   return textures;
 }
 
-std::unique_ptr<GL::IGLRenderbuffer>
+unique_ptr_t<GL::IGLRenderbuffer>
 Engine::_setupFramebufferDepthAttachments(bool generateStencilBuffer,
                                           bool generateDepthBuffer, int width,
                                           int height, int samples)
@@ -2923,9 +2922,9 @@ void Engine::updateRawCubeTexture(InternalTexture* texture,
     }
   }
 
-  auto isPot = !needPOTTextures()
-               || (Tools::IsExponentOfTwo(texture->width)
-                   && Tools::IsExponentOfTwo(texture->height));
+  auto isPot
+    = !needPOTTextures() || (Tools::IsExponentOfTwo(texture->width)
+                             && Tools::IsExponentOfTwo(texture->height));
   if (isPot && texture->generateMipMaps && level == 0) {
     _gl->generateMipmap(GL::TEXTURE_CUBE_MAP);
   }
@@ -2935,7 +2934,7 @@ void Engine::updateRawCubeTexture(InternalTexture* texture,
   texture->isReady = true;
 }
 
-std::unique_ptr<InternalTexture> Engine::createRawCubeTexture(
+unique_ptr_t<InternalTexture> Engine::createRawCubeTexture(
   const vector_t<Uint8Array> data, int size, unsigned int format,
   unsigned int type, bool generateMipMaps, bool invertY,
   unsigned int samplingMode, const string_t& compression)
@@ -2961,9 +2960,9 @@ std::unique_ptr<InternalTexture> Engine::createRawCubeTexture(
   texture->height = height;
 
   // Double check on POT to generate Mips.
-  auto isPot = !needPOTTextures()
-               || (Tools::IsExponentOfTwo(texture->width)
-                   && Tools::IsExponentOfTwo(texture->height));
+  auto isPot
+    = !needPOTTextures() || (Tools::IsExponentOfTwo(texture->width)
+                             && Tools::IsExponentOfTwo(texture->height));
   if (!isPot) {
     generateMipMaps = false;
   }
@@ -3056,9 +3055,9 @@ void Engine::_prepareWebGLTextureContinuation(InternalTexture* texture,
 void Engine::_prepareWebGLTexture(
   InternalTexture* texture, Scene* scene, int width, int height,
   Nullable<bool> invertY, bool noMipmap, bool isCompressed,
-  const ::std::function<
-    bool(int width, int height,
-         const ::std::function<void()>& continuationCallback)>& processFunction,
+  const ::std::function<bool(
+    int width, int height,
+    const ::std::function<void()>& continuationCallback)>& processFunction,
   unsigned int samplingMode)
 {
   auto potWidth = needPOTTextures() ?
@@ -3172,11 +3171,11 @@ void Engine::_releaseTexture(InternalTexture* texture)
   unbindAllTextures();
 
   _internalTexturesCache.erase(
-    ::std::remove_if(
-      _internalTexturesCache.begin(), _internalTexturesCache.end(),
-      [&texture](const std::unique_ptr<InternalTexture>& _texture) {
-        return _texture.get() == texture;
-      }),
+    ::std::remove_if(_internalTexturesCache.begin(),
+                     _internalTexturesCache.end(),
+                     [&texture](const unique_ptr_t<InternalTexture>& _texture) {
+                       return _texture.get() == texture;
+                     }),
     _internalTexturesCache.end());
 
   // Integrated fixed lod samplers.
@@ -3790,16 +3789,17 @@ bool Engine::isSupported()
   return true;
 }
 
-std::unique_ptr<GL::IGLShader>
-Engine::CompileShader(GL::IGLRenderingContext* gl, const string_t& source,
-                      const string_t& type, const string_t& defines,
-                      const string_t& shaderVersion)
+unique_ptr_t<GL::IGLShader> Engine::CompileShader(GL::IGLRenderingContext* gl,
+                                                  const string_t& source,
+                                                  const string_t& type,
+                                                  const string_t& defines,
+                                                  const string_t& shaderVersion)
 {
   auto shader = gl->createShader(type == "vertex" ? GL::VERTEX_SHADER :
                                                     GL::FRAGMENT_SHADER);
-  gl->shaderSource(shader, shaderVersion
-                             + ((!defines.empty()) ? defines + "\n" : "")
-                             + source);
+  gl->shaderSource(shader,
+                   shaderVersion + ((!defines.empty()) ? defines + "\n" : "")
+                     + source);
   gl->compileShader(shader);
 
   if (!gl->getShaderParameter(shader, GL::COMPILE_STATUS)) {

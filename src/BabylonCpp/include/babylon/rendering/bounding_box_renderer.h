@@ -30,9 +30,9 @@ public:
 private:
   Scene* _scene;
   ShaderMaterial* _colorShader;
-  vector_t<std::unique_ptr<VertexBuffer>> _vertexBuffers;
-  std::unordered_map<string_t, VertexBuffer*> _vertexBuffersMap;
-  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
+  vector_t<unique_ptr_t<VertexBuffer>> _vertexBuffers;
+  unordered_map_t<string_t, VertexBuffer*> _vertexBuffersMap;
+  unique_ptr_t<GL::IGLBuffer> _indexBuffer;
 
 }; // end of class BoundingBoxRenderer
 

@@ -17,13 +17,13 @@ public:
   static Sprite* New(Ts&&... args)
   {
     auto sprite = new Sprite(std::forward<Ts>(args)...);
-    sprite->addToSpriteManager(static_cast<std::unique_ptr<Sprite>>(sprite));
+    sprite->addToSpriteManager(static_cast<unique_ptr_t<Sprite>>(sprite));
 
     return sprite;
   }
   virtual ~Sprite();
 
-  void addToSpriteManager(std::unique_ptr<Sprite>&& newSprite);
+  void addToSpriteManager(unique_ptr_t<Sprite>&& newSprite);
 
   int size() const;
   void setSize(int value);
@@ -39,7 +39,7 @@ protected:
 public:
   string_t name;
   Vector3 position;
-  std::unique_ptr<Color4> color;
+  unique_ptr_t<Color4> color;
   int width;
   int height;
   float angle;

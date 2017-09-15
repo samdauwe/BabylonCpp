@@ -27,7 +27,7 @@ array_t<FileFaceOrientation, 6> CubeMapToSphericalPolynomialTools::FileFaces
                         Vector3(0, -1, 0)) // -Z bottom
   }};
 
-std::unique_ptr<SphericalPolynomial>
+unique_ptr_t<SphericalPolynomial>
 CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(
   BaseTexture* texture)
 {
@@ -78,7 +78,7 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(
   return ConvertCubeMapToSphericalPolynomial(cubeInfo);
 }
 
-std::unique_ptr<SphericalPolynomial>
+unique_ptr_t<SphericalPolynomial>
 CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
   const CubeMapInfo& cubeInfo)
 {

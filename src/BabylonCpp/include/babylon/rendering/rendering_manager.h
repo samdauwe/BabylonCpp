@@ -97,7 +97,7 @@ private:
 
 private:
   Scene* _scene;
-  vector_t<std::unique_ptr<RenderingGroup>> _renderingGroups;
+  vector_t<unique_ptr_t<RenderingGroup>> _renderingGroups;
   bool _depthStencilBufferAlreadyCleaned;
 
   unsigned int _currentIndex;
@@ -109,7 +109,7 @@ private:
     _customAlphaTestSortCompareFn;
   vector_t<::std::function<int(SubMesh* a, SubMesh* b)>>
     _customTransparentSortCompareFn;
-  std::unique_ptr<RenderingGroupInfo> _renderinGroupInfo;
+  unique_ptr_t<RenderingGroupInfo> _renderinGroupInfo;
 
 }; // end of class RenderingManager
 

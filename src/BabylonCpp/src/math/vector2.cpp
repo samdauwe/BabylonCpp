@@ -50,7 +50,7 @@ Vector2 Vector2::copy() const
   return Vector2(*this);
 }
 
-std::unique_ptr<Vector2> Vector2::clone() const
+unique_ptr_t<Vector2> Vector2::clone() const
 {
   return ::std::make_unique<Vector2>(*this);
 }
@@ -547,9 +547,8 @@ void Vector2::TransformToRef(const Vector2& vector,
 bool Vector2::PointInTriangle(const Vector2& p, const Vector2& p0,
                               const Vector2& p1, const Vector2& p2)
 {
-  const float a = 1.f / 2.f
-                  * (-p1.y * p2.x + p0.y * (-p1.x + p2.x) + p0.x * (p1.y - p2.y)
-                     + p1.x * p2.y);
+  const float a = 1.f / 2.f * (-p1.y * p2.x + p0.y * (-p1.x + p2.x)
+                               + p0.x * (p1.y - p2.y) + p1.x * p2.y);
   const float sign = a < 0.f ? -1.f : 1.f;
   const float s
     = (p0.y * p2.x - p0.x * p2.y + (p2.y - p0.y) * p.x + (p0.x - p2.x) * p.y)

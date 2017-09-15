@@ -22,7 +22,7 @@ Ground::~Ground()
 {
 }
 
-std::unique_ptr<VertexData> Ground::_regenerateVertexData()
+unique_ptr_t<VertexData> Ground::_regenerateVertexData()
 {
   GroundOptions options(subdivisions);
   options.width  = width;

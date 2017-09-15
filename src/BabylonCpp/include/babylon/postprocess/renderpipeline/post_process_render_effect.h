@@ -39,13 +39,13 @@ public:
   Engine* _engine;
 
 private:
-  std::unordered_map<string_t, PostProcess*> _postProcesses;
+  unordered_map_t<string_t, PostProcess*> _postProcesses;
   ::std::function<PostProcess*()> _getPostProcess;
   bool _singleInstance;
-  std::unordered_map<string_t, Camera*> _cameras;
-  std::unordered_map<string_t, IndicesArray> _indicesForCamera;
-  std::unordered_map<string_t, PostProcessRenderPass*> _renderPasses;
-  std::unordered_map<string_t, PostProcessRenderEffect*> _renderEffectAsPasses;
+  unordered_map_t<string_t, Camera*> _cameras;
+  unordered_map_t<string_t, IndicesArray> _indicesForCamera;
+  unordered_map_t<string_t, PostProcessRenderPass*> _renderPasses;
+  unordered_map_t<string_t, PostProcessRenderEffect*> _renderEffectAsPasses;
 
 }; // end of class PostProcessRenderEffect
 

@@ -73,12 +73,12 @@ public:
 
   bool canRescale() const;
 
-  std::unique_ptr<MapTexture> clone() const;
+  unique_ptr_t<MapTexture> clone() const;
 
 private:
-  std::unique_ptr<RectPackingMap> _rectPackingMap;
+  unique_ptr_t<RectPackingMap> _rectPackingMap;
   ISize _size;
-  std::unique_ptr<Viewport> _replacedViewport;
+  unique_ptr_t<Viewport> _replacedViewport;
 
 }; // end of class MapTexture
 

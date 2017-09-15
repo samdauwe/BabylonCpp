@@ -14,7 +14,7 @@ public:
   static SpotLight* New(Ts&&... args)
   {
     auto light = new SpotLight(::std::forward<Ts>(args)...);
-    light->addToScene(static_cast<std::unique_ptr<Light>>(light));
+    light->addToScene(static_cast<unique_ptr_t<Light>>(light));
 
     return light;
   }

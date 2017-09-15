@@ -82,7 +82,7 @@ public:
   static Mesh* New(Ts&&... args)
   {
     auto mesh = new Mesh(::std::forward<Ts>(args)...);
-    mesh->addToScene(static_cast<std::unique_ptr<AbstractMesh>>(mesh));
+    mesh->addToScene(static_cast<unique_ptr_t<AbstractMesh>>(mesh));
 
     return mesh;
   }
@@ -365,7 +365,7 @@ public:
    * @brief Sets the mesh VertexBuffer.
    * @returns The Mesh.
    */
-  Mesh& setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer);
+  Mesh& setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer);
 
   /**
    * @brief Updates the existing vertex data of the mesh geometry for the
@@ -1457,20 +1457,20 @@ public:
   Uint32Array _delayInfoKinds;
   ::std::function<void(const Json::value& parsedGeometry, Mesh* mesh)>
     _delayLoadingFunction;
-  std::unique_ptr<_VisibleInstances> _visibleInstances;
+  unique_ptr_t<_VisibleInstances> _visibleInstances;
   bool _shouldGenerateFlatShading;
 
 private:
   Observer<Mesh>::Ptr _onBeforeDrawObserver;
-  vector_t<std::unique_ptr<MeshLODLevel>> _LODLevels;
+  vector_t<unique_ptr_t<MeshLODLevel>> _LODLevels;
   vector_t<Vector3> _emptyPositions;
   // Morph
   MorphTargetManager* _morphTargetManager;
   vector_t<VertexBuffer*> _delayInfo;
   Int32Array _renderIdForInstances;
-  std::unique_ptr<_InstancesBatch> _batchCache;
+  unique_ptr_t<_InstancesBatch> _batchCache;
   unsigned int _instancesBufferSize;
-  std::unique_ptr<Buffer> _instancesBuffer;
+  unique_ptr_t<Buffer> _instancesBuffer;
   Float32Array _instancesData;
   size_t _overridenInstanceCount;
   int _preActivateId;

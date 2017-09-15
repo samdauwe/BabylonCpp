@@ -41,7 +41,7 @@ void GPUParticleSystem::dispose(bool /*doNotRecurse*/)
   _scene->particleSystems.erase(
     ::std::remove_if(
       _scene->particleSystems.begin(), _scene->particleSystems.end(),
-      [this](const std::unique_ptr<IParticleSystem>& particleSystem) {
+      [this](const unique_ptr_t<IParticleSystem>& particleSystem) {
         return particleSystem.get() == this;
       }),
     _scene->particleSystems.end());

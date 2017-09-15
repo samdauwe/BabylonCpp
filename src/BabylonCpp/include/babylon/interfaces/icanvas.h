@@ -61,7 +61,7 @@ public:
   ClientRect _boundingClientRect;
 
 protected:
-  std::unique_ptr<GL::IGLRenderingContext> _renderingContext;
+  unique_ptr_t<GL::IGLRenderingContext> _renderingContext;
   vector_t<vector_t<FastFunc<void(PointerEvent&& evt)>>> mouseEventListeners;
   vector_t<vector_t<FastFunc<void(Event&& evt)>>> keyEventListeners;
 

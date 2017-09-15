@@ -116,14 +116,14 @@ public:
     customProjectionMatrixBuilder;
 
 protected:
-  std::unique_ptr<Vector3> _direction;
-  std::unique_ptr<Vector3> _transformedPosition;
-  std::unique_ptr<Vector3> _transformedDirection;
+  unique_ptr_t<Vector3> _direction;
+  unique_ptr_t<Vector3> _transformedPosition;
+  unique_ptr_t<Vector3> _transformedDirection;
 
 private:
   Nullable<float> _shadowMinZ;
   Nullable<float> _shadowMaxZ;
-  std::unique_ptr<Matrix> _worldMatrix;
+  unique_ptr_t<Matrix> _worldMatrix;
   bool _needProjectionMatrixCompute;
 
 }; // end of class ShadowLight

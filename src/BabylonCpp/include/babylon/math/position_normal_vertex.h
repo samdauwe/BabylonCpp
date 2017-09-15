@@ -21,7 +21,7 @@ public:
   PositionNormalVertex& operator=(PositionNormalVertex&& other);
   ~PositionNormalVertex();
   PositionNormalVertex copy() const;
-  std::unique_ptr<PositionNormalVertex> clone() const;
+  unique_ptr_t<PositionNormalVertex> clone() const;
   friend std::ostream&
   operator<<(std::ostream& os,
              const PositionNormalVertex& positionNormalVertex);

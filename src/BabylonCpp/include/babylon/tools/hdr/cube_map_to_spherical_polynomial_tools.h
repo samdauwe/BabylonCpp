@@ -26,7 +26,7 @@ public:
    * @param texture The texture to extract the information from.
    * @return The Spherical Polynomial data.
    */
-  static std::unique_ptr<SphericalPolynomial>
+  static unique_ptr_t<SphericalPolynomial>
   ConvertCubeMapTextureToSphericalPolynomial(BaseTexture* texture);
 
   /**
@@ -37,7 +37,7 @@ public:
    * @param cubeInfo The Cube map to extract the information from.
    * @return The Spherical Polynomial data.
    */
-  static std::unique_ptr<SphericalPolynomial>
+  static unique_ptr_t<SphericalPolynomial>
   ConvertCubeMapToSphericalPolynomial(const CubeMapInfo& cubeInfo);
 
 }; // end of class CubeMapToSphericalPolynomialTools

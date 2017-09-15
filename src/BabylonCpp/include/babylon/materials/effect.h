@@ -14,7 +14,7 @@ class BABYLON_SHARED_EXPORT Effect {
 public:
   Effect(const string_t& baseName, EffectCreationOptions& options,
          Engine* engine);
-  Effect(const std::unordered_map<string_t, string_t>& baseName,
+  Effect(const unordered_map_t<string_t, string_t>& baseName,
          EffectCreationOptions& options, Engine* engine);
   ~Effect();
 
@@ -116,22 +116,21 @@ private:
   Observer<Effect>::Ptr _onCompileObserver;
   static std::size_t _uniqueIdSeed;
   Engine* _engine;
-  std::unordered_map<string_t, unsigned int> _uniformBuffersNames;
+  unordered_map_t<string_t, unsigned int> _uniformBuffersNames;
   vector_t<string_t> _uniformsNames;
   vector_t<string_t> _samplers;
   bool _isReady;
   string_t _compilationError;
   vector_t<string_t> _attributesNames;
   Int32Array _attributes;
-  std::unordered_map<string_t, std::unique_ptr<GL::IGLUniformLocation>>
-    _uniforms;
-  std::unordered_map<string_t, unsigned int> _indexParameters;
-  std::unique_ptr<EffectFallbacks> _fallbacks;
+  unordered_map_t<string_t, unique_ptr_t<GL::IGLUniformLocation>> _uniforms;
+  unordered_map_t<string_t, unsigned int> _indexParameters;
+  unique_ptr_t<EffectFallbacks> _fallbacks;
   string_t _vertexSourceCode;
   string_t _fragmentSourceCode;
-  std::unique_ptr<GL::IGLProgram> _program;
-  std::unordered_map<string_t, Float32Array> _valueCache;
-  static std::unordered_map<unsigned int, GL::IGLBuffer*> _baseCache;
+  unique_ptr_t<GL::IGLProgram> _program;
+  unordered_map_t<string_t, Float32Array> _valueCache;
+  static unordered_map_t<unsigned int, GL::IGLBuffer*> _baseCache;
 
 }; // end of class Effect
 

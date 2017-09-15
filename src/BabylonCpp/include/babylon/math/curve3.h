@@ -25,7 +25,7 @@ public:
   Curve3& operator=(Curve3&& otherCurve);
   ~Curve3();
   Curve3 copy() const;
-  std::unique_ptr<Curve3> clone() const;
+  unique_ptr_t<Curve3> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Curve3& curve);
 
   /**

@@ -14,7 +14,7 @@ public:
   void initialize();
 
   virtual void render();
-  virtual const char* getName()                               = 0;
+  virtual const char* getName() = 0;
   virtual void initializeScene(ICanvas* canvas, Scene* scene) = 0;
 
   Scene* getScene() const;
@@ -26,8 +26,8 @@ protected:
 protected:
   bool _initialized;
   ICanvas* _canvas;
-  std::unique_ptr<Engine> _engine;
-  std::unique_ptr<Scene> _scene;
+  unique_ptr_t<Engine> _engine;
+  unique_ptr_t<Scene> _scene;
 
 }; // end of class IRenderableScene
 

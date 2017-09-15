@@ -55,7 +55,7 @@ PositionNormalTextureVertex PositionNormalTextureVertex::copy() const
   return PositionNormalTextureVertex(*this);
 }
 
-std::unique_ptr<PositionNormalTextureVertex>
+unique_ptr_t<PositionNormalTextureVertex>
 PositionNormalTextureVertex::clone() const
 {
   return ::std::make_unique<PositionNormalTextureVertex>(*this);

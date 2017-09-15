@@ -8,7 +8,7 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT PhysicsImpostorJoint {
   PhysicsImpostor* mainImpostor;
   PhysicsImpostor* connectedImpostor;
-  std::shared_ptr<PhysicsJoint> joint;
+  shared_ptr_t<PhysicsJoint> joint;
 }; // end of struct PhysicsImpostorJoint
 
 } // end of namespace BABYLON

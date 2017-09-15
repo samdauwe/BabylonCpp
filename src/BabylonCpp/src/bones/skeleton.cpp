@@ -144,7 +144,7 @@ bool Skeleton::copyAnimationRange(Skeleton* source, const string_t& _name,
 
   // make a dictionary of source skeleton's bones, so exact same order or
   // doublely nested loop is not required
-  std::unordered_map<string_t, Bone*> boneDict;
+  unordered_map_t<string_t, Bone*> boneDict;
   auto& sourceBones = source->bones;
   for (auto& bone : sourceBones) {
     boneDict[bone->name] = bone.get();
@@ -347,8 +347,8 @@ vector_t<Animation*> Skeleton::getAnimations()
   return vector_t<Animation*>();
 }
 
-std::unique_ptr<Skeleton> Skeleton::clone(const string_t& /*iName*/,
-                                          const string_t& /*iId*/) const
+unique_ptr_t<Skeleton> Skeleton::clone(const string_t& /*iName*/,
+                                       const string_t& /*iId*/) const
 {
   /*auto result = Skeleton::New(name, id, this->_scene);
 
@@ -503,10 +503,9 @@ void Skeleton::_sortBones(unsigned int index, vector_t<Bone*>& iBones,
   }
 
   const auto boneIndexOf = [this](Bone* iBone) {
-    auto it = ::std::find_if(bones.begin(), bones.end(),
-                             [&iBone](const std::unique_ptr<Bone>& bone) {
-                               return bone.get() == iBone;
-                             });
+    auto it = ::std::find_if(
+      bones.begin(), bones.end(),
+      [&iBone](const unique_ptr_t<Bone>& bone) { return bone.get() == iBone; });
     if (it != bones.end()) {
       return static_cast<int>(it - bones.begin());
     }

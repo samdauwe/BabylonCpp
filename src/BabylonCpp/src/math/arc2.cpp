@@ -103,7 +103,7 @@ Arc2 Arc2::copy() const
   return Arc2(*this);
 }
 
-std::unique_ptr<Arc2> Arc2::clone() const
+unique_ptr_t<Arc2> Arc2::clone() const
 {
   return ::std::make_unique<Arc2>(*this);
 }

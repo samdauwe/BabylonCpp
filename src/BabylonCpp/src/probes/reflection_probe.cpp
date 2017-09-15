@@ -69,7 +69,7 @@ ReflectionProbe::~ReflectionProbe()
 }
 
 void ReflectionProbe::addToScene(
-  std::unique_ptr<ReflectionProbe>&& newReflectionProbe)
+  unique_ptr_t<ReflectionProbe>&& newReflectionProbe)
 {
   _scene->reflectionProbes.emplace_back(::std::move(newReflectionProbe));
 }
@@ -127,7 +127,7 @@ void ReflectionProbe::dispose(bool /*doNotRecurse*/)
   _scene->reflectionProbes.erase(
     ::std::remove_if(
       _scene->reflectionProbes.begin(), _scene->reflectionProbes.end(),
-      [this](const std::unique_ptr<ReflectionProbe>& reflectionProbe) {
+      [this](const unique_ptr_t<ReflectionProbe>& reflectionProbe) {
         return reflectionProbe.get() == this;
       }),
     _scene->reflectionProbes.end());

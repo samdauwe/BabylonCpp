@@ -57,7 +57,7 @@ Color4 Color4::copy() const
   return Color4(*this);
 }
 
-std::unique_ptr<Color4> Color4::clone() const
+unique_ptr_t<Color4> Color4::clone() const
 {
   return ::std::make_unique<Color4>(*this);
 }

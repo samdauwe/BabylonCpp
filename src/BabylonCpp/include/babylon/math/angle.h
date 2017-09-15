@@ -22,7 +22,7 @@ public:
   Angle& operator=(Angle&& otherAngle);
   ~Angle();
   Angle copy() const;
-  std::unique_ptr<Angle> clone() const;
+  unique_ptr_t<Angle> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Angle& angle);
   friend bool operator==(const Angle& lhs, const Angle& rhs);
   friend bool operator!=(const Angle& lhs, const Angle& rhs);

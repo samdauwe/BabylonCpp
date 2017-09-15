@@ -41,11 +41,11 @@ void ActionManager::dispose(bool /*doNotRecurse*/)
   }
 
   _scene->_actionManagers.erase(
-    ::std::remove_if(
-      _scene->_actionManagers.begin(), _scene->_actionManagers.end(),
-      [this](const std::unique_ptr<ActionManager>& actionManager) {
-        return actionManager.get() == this;
-      }),
+    ::std::remove_if(_scene->_actionManagers.begin(),
+                     _scene->_actionManagers.end(),
+                     [this](const unique_ptr_t<ActionManager>& actionManager) {
+                       return actionManager.get() == this;
+                     }),
     _scene->_actionManagers.end());
 }
 

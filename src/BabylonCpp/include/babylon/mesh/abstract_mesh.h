@@ -56,7 +56,7 @@ public:
   ~AbstractMesh();
 
   virtual IReflect::Type type() const override;
-  void addToScene(std::unique_ptr<AbstractMesh>&& newMesh);
+  void addToScene(unique_ptr_t<AbstractMesh>&& newMesh);
 
   // FacetData private properties
 
@@ -1060,26 +1060,26 @@ public:
   // This scene's action manager
   ActionManager* actionManager;
   // Physics
-  std::unique_ptr<PhysicsImpostor> physicsImpostor;
+  unique_ptr_t<PhysicsImpostor> physicsImpostor;
   // Collisions
   Vector3 ellipsoid;
   Vector3 ellipsoidOffset;
   // Edges
   float edgesWidth;
   Color4 edgesColor;
-  std::unique_ptr<EdgesRenderer> _edgesRenderer;
+  unique_ptr_t<EdgesRenderer> _edgesRenderer;
   // Cache
-  std::unique_ptr<Matrix> _worldMatrix;
+  unique_ptr_t<Matrix> _worldMatrix;
   AbstractMesh* _masterMesh;
-  std::unique_ptr<MaterialDefines> _materialDefines;
-  std::unique_ptr<BoundingInfo> _boundingInfo;
+  unique_ptr_t<MaterialDefines> _materialDefines;
+  unique_ptr_t<BoundingInfo> _boundingInfo;
   bool _isDisposed;
   int _renderId;
-  vector_t<std::unique_ptr<SubMesh>> subMeshes;
+  vector_t<unique_ptr_t<SubMesh>> subMeshes;
   Octree<SubMesh*>* _submeshesOctree;
   vector_t<AbstractMesh*> _intersectionsInProgress;
   bool _unIndexed;
-  std::unique_ptr<Matrix> _poseMatrix;
+  unique_ptr_t<Matrix> _poseMatrix;
   vector_t<Light*> _lightSources;
   // Loading properties
   vector_t<Json::value> _waitingActions;
@@ -1119,7 +1119,7 @@ private:
   Vector3 _position;
   int _occlusionInternalRetryCounter;
   bool _isOcclusionQueryInProgress;
-  std::unique_ptr<GL::IGLQuery> _occlusionQuery;
+  unique_ptr_t<GL::IGLQuery> _occlusionQuery;
   Vector3 _rotation;
   bool _rotationQuaternionSet;
   Quaternion _rotationQuaternion;
@@ -1136,7 +1136,7 @@ private:
   bool _checkCollisions;
   int _collisionMask;
   int _collisionGroup;
-  std::unique_ptr<Collider> _collider;
+  unique_ptr_t<Collider> _collider;
   Vector3 _oldPositionForCollisions;
   Vector3 _diffPositionForCollisions;
   Vector3 _newPositionForCollisions;
@@ -1144,7 +1144,7 @@ private:
   AbstractMesh* _meshToBoneReferal;
   // Cache
   Matrix _localWorld;
-  std::unique_ptr<Vector3> _absolutePosition;
+  unique_ptr_t<Vector3> _absolutePosition;
   Matrix _collisionsTransformMatrix;
   Matrix _collisionsScalingMatrix;
   bool _isDirty;

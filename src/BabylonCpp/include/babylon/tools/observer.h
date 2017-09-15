@@ -15,7 +15,7 @@ class BABYLON_SHARED_EXPORT Observer {
 
 public:
   using CallbackFunc = FastFunc<void(T* eventData, EventState eventState)>;
-  using Ptr          = std::shared_ptr<Observer<T>>;
+  using Ptr          = shared_ptr_t<Observer<T>>;
 
 public:
   Observer() : callback{nullptr}, mask{-1}

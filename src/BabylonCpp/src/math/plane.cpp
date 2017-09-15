@@ -57,7 +57,7 @@ Plane Plane::copy() const
   return Plane(*this);
 }
 
-std::unique_ptr<Plane> Plane::clone() const
+unique_ptr_t<Plane> Plane::clone() const
 {
   return ::std::make_unique<Plane>(*this);
 }
@@ -90,7 +90,7 @@ Plane& Plane::normalize()
 {
   const float norm = sqrtf((normal.x * normal.x) + (normal.y * normal.y)
                            + (normal.z * normal.z));
-  float magnitude  = 0.f;
+  float magnitude = 0.f;
 
   if (!stl_util::almost_equal(norm, 0.f)) {
     magnitude = 1.f / norm;

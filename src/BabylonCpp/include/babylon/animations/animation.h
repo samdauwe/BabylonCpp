@@ -145,7 +145,7 @@ public:
   Matrix matrixInterpolateFunction(const Matrix& startValue,
                                    const Matrix& endValue,
                                    float gradient) const;
-  std::unique_ptr<Animation> clone() const;
+  unique_ptr_t<Animation> clone() const;
   void setKeys(const vector_t<AnimationKey>& values);
   void setValue(const AnimationValue& currentValue, bool blend = false);
   void goToFrame(int frame);
@@ -184,7 +184,7 @@ private:
   IEasingFunction* _easingFunction;
   // The set of event that will be linked to this animation
   vector_t<AnimationEvent> _events;
-  ::std::unordered_map<string_t, AnimationRange> _ranges;
+  unordered_map_t<string_t, AnimationRange> _ranges;
 
 }; // end of class Animation
 

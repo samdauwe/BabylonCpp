@@ -14,7 +14,7 @@ public:
   static ArcFollowCamera* New(Ts&&... args)
   {
     auto camera = new ArcFollowCamera(std::forward<Ts>(args)...);
-    camera->addToScene(static_cast<std::unique_ptr<Camera>>(camera));
+    camera->addToScene(static_cast<unique_ptr_t<Camera>>(camera));
 
     return camera;
   }

@@ -57,7 +57,7 @@ Vector4 Vector4::copy() const
   return Vector4(*this);
 }
 
-std::unique_ptr<Vector4> Vector4::clone() const
+unique_ptr_t<Vector4> Vector4::clone() const
 {
   return ::std::make_unique<Vector4>(*this);
 }

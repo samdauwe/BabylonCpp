@@ -720,7 +720,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     ImageProcessingConfiguration::PrepareUniforms(uniforms, defines);
     ImageProcessingConfiguration::PrepareSamplers(samplers, defines);
 
-    std::unordered_map<string_t, unsigned int> indexParameters{
+    unordered_map_t<string_t, unsigned int> indexParameters{
       {"maxSimultaneousLights", _maxSimultaneousLights},
       {"maxSimultaneousMorphTargets", defines.NUM_MORPH_INFLUENCERS}};
 

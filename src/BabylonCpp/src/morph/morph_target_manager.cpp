@@ -25,7 +25,7 @@ MorphTargetManager::~MorphTargetManager()
 }
 
 void MorphTargetManager::addToScene(
-  std::unique_ptr<MorphTargetManager>&& newMorphTargetManager)
+  unique_ptr_t<MorphTargetManager>&& newMorphTargetManager)
 {
   _scene->morphTargetManagers.emplace_back(::std::move(newMorphTargetManager));
 }
@@ -83,7 +83,7 @@ MorphTarget* MorphTargetManager::getTarget(std::size_t index)
   return nullptr;
 }
 
-void MorphTargetManager::addTarget(std::unique_ptr<MorphTarget>&& target)
+void MorphTargetManager::addTarget(unique_ptr_t<MorphTarget>&& target)
 {
   if (_vertexCount) {
     if (_vertexCount != target->getPositions().size() / 3) {
@@ -104,7 +104,7 @@ void MorphTargetManager::removeTarget(MorphTarget* target)
 {
   auto it
     = ::std::find_if(_targets.begin(), _targets.end(),
-                     [target](const std::unique_ptr<MorphTarget>& morphTarget) {
+                     [target](const unique_ptr_t<MorphTarget>& morphTarget) {
                        return target == morphTarget.get();
                      });
   if (it != _targets.end()) {

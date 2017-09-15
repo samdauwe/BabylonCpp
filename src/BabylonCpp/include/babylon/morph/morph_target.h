@@ -33,9 +33,9 @@ public:
   Json::object serialize() const;
 
   // Statics
-  static std::unique_ptr<MorphTarget>
+  static unique_ptr_t<MorphTarget>
   Parse(const Json::value& serializationObject);
-  static std::unique_ptr<MorphTarget>
+  static unique_ptr_t<MorphTarget>
   FromMesh(AbstractMesh* mesh, const string_t& name, float influence = 0.f);
 
 public:

@@ -16,7 +16,7 @@ public:
   SphericalPolynomial& operator=(SphericalPolynomial&& other);
   ~SphericalPolynomial();
   SphericalPolynomial copy() const;
-  std::unique_ptr<SphericalPolynomial> clone() const;
+  unique_ptr_t<SphericalPolynomial> clone() const;
 
   void addAmbient(const Color3& color);
   void scale(float iScale);

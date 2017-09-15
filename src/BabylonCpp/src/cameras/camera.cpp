@@ -61,7 +61,7 @@ IReflect::Type Camera::type() const
   return IReflect::Type::CAMERA;
 }
 
-void Camera::addToScene(std::unique_ptr<Camera>&& newCamera)
+void Camera::addToScene(unique_ptr_t<Camera>&& newCamera)
 {
   if (!getScene()->activeCamera) {
     getScene()->activeCamera = newCamera.get();

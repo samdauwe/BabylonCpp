@@ -160,7 +160,7 @@ private:
   Buffer* _getBuffer() const;
 
 private:
-  std::unique_ptr<Buffer> _ownedBuffer;
+  unique_ptr_t<Buffer> _ownedBuffer;
   Buffer* _buffer;
   unsigned int _kind;
   unsigned int _offset;

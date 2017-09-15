@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 PoseEnabledController::PoseEnabledController(
-  const std::shared_ptr<IBrowserGamepad>& vrGamepad)
+  const shared_ptr_t<IBrowserGamepad>& vrGamepad)
     : Gamepad(vrGamepad->id, vrGamepad->index, vrGamepad)
     , devicePosition{Vector3::Zero()}
     , deviceScaleFactor{1.f}

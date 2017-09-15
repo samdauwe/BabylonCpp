@@ -30,7 +30,7 @@ public:
   /**
    * @brief Returns a new plane copied from the current Plane.
    */
-  std::unique_ptr<Plane> clone() const;
+  unique_ptr_t<Plane> clone() const;
 
   friend std::ostream& operator<<(std::ostream& os, const Plane& plane);
 

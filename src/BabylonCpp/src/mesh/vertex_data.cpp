@@ -335,20 +335,20 @@ Json::object VertexData::serialize() const
   return Json::object();
 }
 
-std::unique_ptr<VertexData>
+unique_ptr_t<VertexData>
 VertexData::ExtractFromMesh(Mesh* mesh, bool copyWhenShared, bool forceCopy)
 {
   return VertexData::_ExtractFrom(mesh, copyWhenShared, forceCopy);
 }
 
-std::unique_ptr<VertexData> VertexData::ExtractFromGeometry(Geometry* geometry,
-                                                            bool copyWhenShared,
-                                                            bool forceCopy)
+unique_ptr_t<VertexData> VertexData::ExtractFromGeometry(Geometry* geometry,
+                                                         bool copyWhenShared,
+                                                         bool forceCopy)
 {
   return VertexData::_ExtractFrom(geometry, copyWhenShared, forceCopy);
 }
 
-std::unique_ptr<VertexData>
+unique_ptr_t<VertexData>
 VertexData::_ExtractFrom(IGetSetVerticesData* meshOrGeometry,
                          bool copyWhenShared, bool forceCopy)
 {
@@ -433,7 +433,7 @@ VertexData::_ExtractFrom(IGetSetVerticesData* meshOrGeometry,
   return result;
 }
 
-std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
+unique_ptr_t<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
 {
   auto& pathArray             = options.pathArray();
   const auto offset           = options.offset();
@@ -684,7 +684,7 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
+unique_ptr_t<VertexData> VertexData::CreateBox(BoxOptions& options)
 {
   vector_t<Vector3> normalsSource = {
     Vector3(0.f, 0.f, 1.f),  //
@@ -735,8 +735,9 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
     stl_util::concat(normals, {normal.x, normal.y, normal.z});
     stl_util::concat(uvs, {faceUV[index].z, faceUV[index].w});
     if (!faceColors.empty()) {
-      stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
-                                faceColors[index].b, faceColors[index].a});
+      stl_util::concat(colors,
+                       {faceColors[index].r, faceColors[index].g,
+                        faceColors[index].b, faceColors[index].a});
     }
 
     vertex = normal.subtract(side1).add(side2).multiply(scaleVector);
@@ -744,8 +745,9 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
     stl_util::concat(normals, {normal.x, normal.y, normal.z});
     stl_util::concat(uvs, {faceUV[index].x, faceUV[index].w});
     if (!faceColors.empty()) {
-      stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
-                                faceColors[index].b, faceColors[index].a});
+      stl_util::concat(colors,
+                       {faceColors[index].r, faceColors[index].g,
+                        faceColors[index].b, faceColors[index].a});
     }
 
     vertex = normal.add(side1).add(side2).multiply(scaleVector);
@@ -753,8 +755,9 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
     stl_util::concat(normals, {normal.x, normal.y, normal.z});
     stl_util::concat(uvs, {faceUV[index].x, faceUV[index].y});
     if (!faceColors.empty()) {
-      stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
-                                faceColors[index].b, faceColors[index].a});
+      stl_util::concat(colors,
+                       {faceColors[index].r, faceColors[index].g,
+                        faceColors[index].b, faceColors[index].a});
     }
 
     vertex = normal.add(side1).subtract(side2).multiply(scaleVector);
@@ -762,8 +765,9 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
     stl_util::concat(normals, {normal.x, normal.y, normal.z});
     stl_util::concat(uvs, {faceUV[index].z, faceUV[index].y});
     if (!faceColors.empty()) {
-      stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
-                                faceColors[index].b, faceColors[index].a});
+      stl_util::concat(colors,
+                       {faceColors[index].r, faceColors[index].g,
+                        faceColors[index].b, faceColors[index].a});
     }
   }
 
@@ -789,7 +793,7 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
+unique_ptr_t<VertexData> VertexData::CreateSphere(SphereOptions& options)
 {
   const auto& segments        = options.segments;
   const auto& diameterX       = options.diameterX;
@@ -869,7 +873,7 @@ std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
 }
 
 // Cylinder and cone
-std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
+unique_ptr_t<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
 {
   const auto& height          = options.height;
   const auto& diameterTop     = options.diameterTop;
@@ -974,14 +978,16 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
         else {
           v = faceUV[s].y + (faceUV[s].w - faceUV[s].y) * h;
         }
-        stl_util::concat(uvs, {faceUV[s].x
-                                 + (faceUV[s].z - faceUV[s].x)
-                                     * static_cast<float>(j)
-                                     / static_cast<float>(tessellation),
-                               v});
+        stl_util::concat(uvs,
+                         {faceUV[s].x
+                            + (faceUV[s].z - faceUV[s].x)
+                                * static_cast<float>(j)
+                                / static_cast<float>(tessellation),
+                          v});
         if (!faceColors.empty()) {
-          stl_util::concat(colors, {faceColors[s].r, faceColors[s].g,
-                                    faceColors[s].b, faceColors[s].a});
+          stl_util::concat(colors,
+                           {faceColors[s].r, faceColors[s].g, faceColors[s].b,
+                            faceColors[s].a});
         }
       }
 
@@ -994,12 +1000,14 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
           positions, {ringFirstVertex.x, ringFirstVertex.y, ringFirstVertex.z});
         Vector3::CrossToRef(Y, ringNormal, quadNormal);
         quadNormal.normalize();
-        stl_util::concat(normals, {quadNormal.x, quadNormal.y, quadNormal.z,
-                                   quadNormal.x, quadNormal.y, quadNormal.z});
+        stl_util::concat(normals,
+                         {quadNormal.x, quadNormal.y, quadNormal.z,
+                          quadNormal.x, quadNormal.y, quadNormal.z});
         Vector3::CrossToRef(ringFirstNormal, Y, quadNormal);
         quadNormal.normalize();
-        stl_util::concat(normals, {quadNormal.x, quadNormal.y, quadNormal.z,
-                                   quadNormal.x, quadNormal.y, quadNormal.z});
+        stl_util::concat(normals,
+                         {quadNormal.x, quadNormal.y, quadNormal.z,
+                          quadNormal.x, quadNormal.y, quadNormal.z});
         if (hasRings) {
           v = (cs != s) ? faceUV[s + 1].y : faceUV[s + 1].w;
         }
@@ -1017,14 +1025,18 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
         stl_util::concat(uvs, {faceUV[s + 2].x, v});
         stl_util::concat(uvs, {faceUV[s + 2].z, v});
         if (!faceColors.empty()) {
-          stl_util::concat(colors, {faceColors[s + 1].r, faceColors[s + 1].g,
-                                    faceColors[s + 1].b, faceColors[s + 1].a});
-          stl_util::concat(colors, {faceColors[s + 1].r, faceColors[s + 1].g,
-                                    faceColors[s + 1].b, faceColors[s + 1].a});
-          stl_util::concat(colors, {faceColors[s + 2].r, faceColors[s + 2].g,
-                                    faceColors[s + 2].b, faceColors[s + 2].a});
-          stl_util::concat(colors, {faceColors[s + 2].r, faceColors[s + 2].g,
-                                    faceColors[s + 2].b, faceColors[s + 2].a});
+          stl_util::concat(colors,
+                           {faceColors[s + 1].r, faceColors[s + 1].g,
+                            faceColors[s + 1].b, faceColors[s + 1].a});
+          stl_util::concat(colors,
+                           {faceColors[s + 1].r, faceColors[s + 1].g,
+                            faceColors[s + 1].b, faceColors[s + 1].a});
+          stl_util::concat(colors,
+                           {faceColors[s + 2].r, faceColors[s + 2].g,
+                            faceColors[s + 2].b, faceColors[s + 2].a});
+          stl_util::concat(colors,
+                           {faceColors[s + 2].r, faceColors[s + 2].g,
+                            faceColors[s + 2].b, faceColors[s + 2].a});
         }
       }
       if (cs != s) {
@@ -1098,8 +1110,9 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
       stl_util::concat(positions,
                        {circleVector.x, circleVector.y, circleVector.z});
       stl_util::concat(normals, {0.f, isTop ? 1.f : -1.f, 0.f});
-      stl_util::concat(uvs, {u.x + (u.z - u.x) * textureCoordinate.x,
-                             u.y + (u.w - u.y) * textureCoordinate.y});
+      stl_util::concat(uvs,
+                       {u.x + (u.z - u.x) * textureCoordinate.x,
+                        u.y + (u.w - u.y) * textureCoordinate.y});
       if (!faceColors.empty()) {
         stl_util::concat(colors, {c.r, c.g, c.b, c.a});
       }
@@ -1140,7 +1153,7 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData> VertexData::CreateTorus(TorusOptions& options)
+unique_ptr_t<VertexData> VertexData::CreateTorus(TorusOptions& options)
 {
   Uint32Array indices;
   Float32Array positions;
@@ -1215,7 +1228,7 @@ std::unique_ptr<VertexData> VertexData::CreateTorus(TorusOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData>
+unique_ptr_t<VertexData>
 VertexData::CreateLineSystem(LineSystemOptions& options)
 {
   Uint32Array indices;
@@ -1245,7 +1258,7 @@ VertexData::CreateLineSystem(LineSystemOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData>
+unique_ptr_t<VertexData>
 VertexData::CreateDashedLines(DashedLinesOptions& options)
 {
   const auto& dashSize = options.dashSize;
@@ -1276,9 +1289,10 @@ VertexData::CreateDashedLines(DashedLinesOptions& options)
     curvect.normalize();
     for (float j = 0.f; j < nb; ++j) {
       curshft = shft * j;
-      stl_util::concat(positions, {points[i].x + curshft * curvect.x,
-                                   points[i].y + curshft * curvect.y,
-                                   points[i].z + curshft * curvect.z});
+      stl_util::concat(positions,
+                       {points[i].x + curshft * curvect.x,
+                        points[i].y + curshft * curvect.y,
+                        points[i].z + curshft * curvect.z});
       stl_util::concat(positions,
                        {points[i].x + (curshft + dashshft) * curvect.x,
                         points[i].y + (curshft + dashshft) * curvect.y,
@@ -1296,7 +1310,7 @@ VertexData::CreateDashedLines(DashedLinesOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData> VertexData::CreateGround(GroundOptions& options)
+unique_ptr_t<VertexData> VertexData::CreateGround(GroundOptions& options)
 {
   Uint32Array indices;
   Float32Array positions;
@@ -1357,7 +1371,7 @@ std::unique_ptr<VertexData> VertexData::CreateGround(GroundOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData>
+unique_ptr_t<VertexData>
 VertexData::CreateTiledGround(TiledGroundOptions& options)
 {
   const auto& xmin = options.xmin;
@@ -1426,8 +1440,9 @@ VertexData::CreateTiledGround(TiledGroundOptions& options)
 
             stl_util::concat(positions, {position.x, position.y, position.z});
             stl_util::concat(normals, {normal.x, normal.y, normal.z});
-            stl_util::concat(uvs, {colf / static_cast<float>(precision_w),
-                                   rowf / static_cast<float>(precision_h)});
+            stl_util::concat(uvs,
+                             {colf / static_cast<float>(precision_w),
+                              rowf / static_cast<float>(precision_h)});
           }
         }
       };
@@ -1454,7 +1469,7 @@ VertexData::CreateTiledGround(TiledGroundOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData>
+unique_ptr_t<VertexData>
 VertexData::CreateGroundFromHeightMap(GroundFromHeightMapOptions& options)
 {
   Uint32Array indices;
@@ -1484,7 +1499,7 @@ VertexData::CreateGroundFromHeightMap(GroundFromHeightMapOptions& options)
         (colf * width) / subdivisionsf - (width / 2.f),                    // x
         0.f,                                                               // y
         ((subdivisionsf - rowf) * height) / subdivisionsf - (height / 2.f) // z
-      );
+        );
 
       // Compute height
       unsigned int heightMapX = static_cast<unsigned>(
@@ -1536,7 +1551,7 @@ VertexData::CreateGroundFromHeightMap(GroundFromHeightMapOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData> VertexData::CreatePlane(PlaneOptions& options)
+unique_ptr_t<VertexData> VertexData::CreatePlane(PlaneOptions& options)
 {
   Uint32Array indices;
   Float32Array positions;
@@ -1587,7 +1602,7 @@ std::unique_ptr<VertexData> VertexData::CreatePlane(PlaneOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData> VertexData::CreateDisc(DiscOptions& options)
+unique_ptr_t<VertexData> VertexData::CreateDisc(DiscOptions& options)
 {
   Float32Array positions;
   Uint32Array indices;
@@ -1641,7 +1656,7 @@ std::unique_ptr<VertexData> VertexData::CreateDisc(DiscOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData> VertexData::CreatePolygon(
+unique_ptr_t<VertexData> VertexData::CreatePolygon(
   Mesh* polygon, unsigned int sideOrientation, const vector_t<Vector4>& fUV,
   const vector_t<Color4>& fColors, Vector4& frontUVs, Vector4& backUVs)
 {
@@ -1689,8 +1704,9 @@ std::unique_ptr<VertexData> VertexData::CreatePolygon(
     uvs[2 * idx + 1] = (1.f - uvs[2 * idx + 1]) * faceUV[face].y
                        + uvs[2 * idx + 1] * faceUV[face].w;
     if (!faceColors.empty()) {
-      stl_util::concat(colors, {faceColors[face].r, faceColors[face].g,
-                                faceColors[face].b, faceColors[face].a});
+      stl_util::concat(colors,
+                       {faceColors[face].r, faceColors[face].g,
+                        faceColors[face].b, faceColors[face].a});
     }
   }
 
@@ -1715,8 +1731,7 @@ std::unique_ptr<VertexData> VertexData::CreatePolygon(
   return vertexData;
 }
 
-std::unique_ptr<VertexData>
-VertexData::CreateIcoSphere(IcoSphereOptions& options)
+unique_ptr_t<VertexData> VertexData::CreateIcoSphere(IcoSphereOptions& options)
 {
   const auto& sideOrientation = options.sideOrientation;
   const auto& radius          = options.radius;
@@ -2011,7 +2026,7 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData>
+unique_ptr_t<VertexData>
 VertexData::CreatePolyhedron(PolyhedronOptions& options)
 {
   // inspired from // http://stemkoski.github.io/Three.js/Polyhedra.html
@@ -2378,9 +2393,10 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
       // positions, uvs, colors
       for (i = 0; i < fl; ++i) {
         // positions
-        stl_util::concat(positions, {dataVertices[dataFaces[f][i]][0] * sizeX,
-                                     dataVertices[dataFaces[f][i]][1] * sizeY,
-                                     dataVertices[dataFaces[f][i]][2] * sizeZ});
+        stl_util::concat(positions,
+                         {dataVertices[dataFaces[f][i]][0] * sizeX,
+                          dataVertices[dataFaces[f][i]][1] * sizeY,
+                          dataVertices[dataFaces[f][i]][2] * sizeZ});
         indexes.emplace_back(index);
         ++index;
         // uvs
@@ -2392,8 +2408,9 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
         x   = tmp;
         // colors
         if (!faceColors.empty()) {
-          stl_util::concat(colors, {faceColors[f].r, faceColors[f].g,
-                                    faceColors[f].b, faceColors[f].a});
+          stl_util::concat(colors,
+                           {faceColors[f].r, faceColors[f].g, faceColors[f].b,
+                            faceColors[f].a});
         }
       }
 
@@ -2422,8 +2439,7 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData>
-VertexData::CreateTorusKnot(TorusKnotOptions& options)
+unique_ptr_t<VertexData> VertexData::CreateTorusKnot(TorusKnotOptions& options)
 {
   Uint32Array indices;
   Float32Array positions;

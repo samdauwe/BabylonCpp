@@ -19,7 +19,7 @@ PostProcess::PostProcess(
   float renderRatio, Camera* camera, unsigned int samplingMode, Engine* engine,
   bool reusable, const string_t& defines, unsigned int textureType,
   const string_t& vertexUrl,
-  const std::unordered_map<string_t, unsigned int>& indexParameters,
+  const unordered_map_t<string_t, unsigned int>& indexParameters,
   bool blockCompilation)
     : PostProcess(iName, fragmentUrl, parameters, samplers, {-1, -1}, camera,
                   samplingMode, engine, reusable, defines, textureType,
@@ -34,7 +34,7 @@ PostProcess::PostProcess(
   const PostProcessOptions& options, Camera* camera, unsigned int samplingMode,
   Engine* engine, bool reusable, const string_t& defines,
   unsigned int textureType, const string_t& vertexUrl,
-  const std::unordered_map<string_t, unsigned int>& indexParameters,
+  const unordered_map_t<string_t, unsigned int>& indexParameters,
   bool blockCompilation)
     : name{iName}
     , width{-1}
@@ -183,12 +183,12 @@ PostProcess& PostProcess::shareOutputWith(PostProcess* postProcess)
 void PostProcess::updateEffect(
   const string_t& defines, const vector_t<string_t>& uniforms,
   const vector_t<string_t>& samplers,
-  const std::unordered_map<string_t, unsigned int>& indexParameters,
+  const unordered_map_t<string_t, unsigned int>& indexParameters,
   const ::std::function<void(Effect* effect)>& onCompiled,
   const ::std::function<void(Effect* effect, const string_t& errors)>& onError)
 {
-  std::unordered_map<string_t, string_t> baseName{{"vertex", _vertexUrl},
-                                                  {"fragment", _fragmentUrl}};
+  unordered_map_t<string_t, string_t> baseName{{"vertex", _vertexUrl},
+                                               {"fragment", _fragmentUrl}};
 
   EffectCreationOptions options;
   options.attributes    = {"position"};

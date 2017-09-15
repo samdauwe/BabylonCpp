@@ -15,14 +15,14 @@ public:
 #if 0
     auto lensFlareSystem = new LensFlareSystem(std::forward<Ts>(args)...);
     lensFlareSystem->addToScene(
-      static_cast<std::unique_ptr<LensFlareSystem>>(lensFlareSystem));
+      static_cast<unique_ptr_t<LensFlareSystem>>(lensFlareSystem));
     return lensFlareSystem;
 #endif
     return nullptr;
   }
   virtual ~LensFlareSystem();
 
-  void addToScene(std::unique_ptr<LensFlareSystem>&& lensFlareSystem);
+  void addToScene(unique_ptr_t<LensFlareSystem>&& lensFlareSystem);
 
   bool isEnabled() const;
   void setIsEnabled(bool value);
@@ -46,7 +46,7 @@ protected:
 public:
   string_t id;
   string_t name;
-  vector_t<std::unique_ptr<LensFlare>> lensFlares;
+  vector_t<unique_ptr_t<LensFlare>> lensFlares;
   int borderLimit;
   float viewportBorder;
   ::std::function<bool(Mesh* mesh)> meshesSelectionPredicate;
@@ -57,8 +57,8 @@ private:
   Mesh* _emitter;
   // Float32Array _vertexDeclaration;
   // int _vertexStrideSize;
-  std::unordered_map<string_t, std::unique_ptr<VertexBuffer>> _vertexBuffers;
-  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
+  unordered_map_t<string_t, unique_ptr_t<VertexBuffer>> _vertexBuffers;
+  unique_ptr_t<GL::IGLBuffer> _indexBuffer;
   Effect* _effect;
   float _positionX;
   float _positionY;

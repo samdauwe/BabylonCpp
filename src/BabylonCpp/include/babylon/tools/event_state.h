@@ -11,7 +11,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT EventState {
 
 public:
-  using UPtr = std::unique_ptr<EventState>;
+  using UPtr = unique_ptr_t<EventState>;
 
 public:
   /**

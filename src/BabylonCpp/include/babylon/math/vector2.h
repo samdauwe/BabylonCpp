@@ -25,7 +25,7 @@ public:
   /**
    * @brief Returns a new Vector2 copied from the Vector2.
    */
-  std::unique_ptr<Vector2> clone() const;
+  unique_ptr_t<Vector2> clone() const;
 
   /**
    * @brief Returns a string with the Vector2 coordinates.

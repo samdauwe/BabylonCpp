@@ -23,7 +23,7 @@ Ribbon::~Ribbon()
 {
 }
 
-std::unique_ptr<VertexData> Ribbon::_regenerateVertexData()
+unique_ptr_t<VertexData> Ribbon::_regenerateVertexData()
 {
   RibbonOptions options(pathArray, offset);
   options.closeArray      = closeArray;

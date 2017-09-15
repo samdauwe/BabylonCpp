@@ -70,85 +70,84 @@ public:
   /**
    * @brief Returns the object VertexData associated to the passed mesh.
    */
-  static std::unique_ptr<VertexData>
-  ExtractFromMesh(Mesh* mesh, bool copyWhenShared = false,
-                  bool forceCopy = false);
+  static unique_ptr_t<VertexData> ExtractFromMesh(Mesh* mesh,
+                                                  bool copyWhenShared = false,
+                                                  bool forceCopy      = false);
 
   /**
    * @brief Returns the object VertexData associated to the passed geometry.
    */
-  static std::unique_ptr<VertexData>
-  ExtractFromGeometry(Geometry* geometry, bool copyWhenShared,
-                      bool forceCopy = false);
+  static unique_ptr_t<VertexData> ExtractFromGeometry(Geometry* geometry,
+                                                      bool copyWhenShared,
+                                                      bool forceCopy = false);
 
   /**
    * @brief Creates the vertexData of the Ribbon.
    */
-  static std::unique_ptr<VertexData> CreateRibbon(RibbonOptions& options);
+  static unique_ptr_t<VertexData> CreateRibbon(RibbonOptions& options);
 
   /**
    * @brief Creates the VertexData of the Box.
    */
-  static std::unique_ptr<VertexData> CreateBox(BoxOptions& options);
+  static unique_ptr_t<VertexData> CreateBox(BoxOptions& options);
 
   /**
    * @brief Creates the VertexData of the Sphere.
    */
-  static std::unique_ptr<VertexData> CreateSphere(SphereOptions& options);
+  static unique_ptr_t<VertexData> CreateSphere(SphereOptions& options);
 
   /**
    * @brief Creates the VertexData of the Cylinder or Cone.
    */
-  static std::unique_ptr<VertexData> CreateCylinder(CylinderOptions& options);
+  static unique_ptr_t<VertexData> CreateCylinder(CylinderOptions& options);
 
   /**
    * @brief Creates the VertexData of the Torus.
    */
-  static std::unique_ptr<VertexData> CreateTorus(TorusOptions& options);
+  static unique_ptr_t<VertexData> CreateTorus(TorusOptions& options);
 
   /**
    * @brief Creates the VertexData of the LineSystem.
    */
-  static std::unique_ptr<VertexData>
-  CreateLineSystem(LineSystemOptions& options);
+  static unique_ptr_t<VertexData> CreateLineSystem(LineSystemOptions& options);
 
   /**
    * @brief Create the VertexData of the DashedLines.
    */
-  static std::unique_ptr<VertexData>
+  static unique_ptr_t<VertexData>
   CreateDashedLines(DashedLinesOptions& options);
 
   /**
    * @brief Creates the VertexData of the Ground.
    */
-  static std::unique_ptr<VertexData> CreateGround(GroundOptions& options);
+  static unique_ptr_t<VertexData> CreateGround(GroundOptions& options);
 
   /**
    * @brief Creates the VertexData of the TiledGround.
    */
-  static std::unique_ptr<VertexData>
+  static unique_ptr_t<VertexData>
   CreateTiledGround(TiledGroundOptions& options);
 
   /**
    * @brief Creates the VertexData of the Ground designed from a heightmap.
    */
-  static std::unique_ptr<VertexData>
+  static unique_ptr_t<VertexData>
   CreateGroundFromHeightMap(GroundFromHeightMapOptions& options);
 
   /**
    * @brief Creates the VertexData of the Plane.
    */
-  static std::unique_ptr<VertexData> CreatePlane(PlaneOptions& options);
+  static unique_ptr_t<VertexData> CreatePlane(PlaneOptions& options);
 
   /**
    * @brief Creates the VertexData of the Disc or regular Polygon.
    */
-  static std::unique_ptr<VertexData> CreateDisc(DiscOptions& options);
+  static unique_ptr_t<VertexData> CreateDisc(DiscOptions& options);
 
   /**
    * @brief Re-creates the VertexData of the Polygon for sideOrientation.
    */
-  static std::unique_ptr<VertexData>
+  static unique_ptr_t<VertexData>
   CreatePolygon(Mesh* polygon, unsigned int sideOrientation,
                 const vector_t<Vector4>& fUV, const vector_t<Color4>& fColors,
                 Vector4& frontUVs, Vector4& backUVs);
@@ -156,18 +155,17 @@ public:
   /**
    * @brief Creates the VertexData of the IcoSphere.
    */
-  static std::unique_ptr<VertexData> CreateIcoSphere(IcoSphereOptions& options);
+  static unique_ptr_t<VertexData> CreateIcoSphere(IcoSphereOptions& options);
 
   /**
    * @brief Creates the VertexData of the Polyhedron.
    */
-  static std::unique_ptr<VertexData>
-  CreatePolyhedron(PolyhedronOptions& options);
+  static unique_ptr_t<VertexData> CreatePolyhedron(PolyhedronOptions& options);
 
   /**
    * @brief Creates the VertexData of the Torus Knot.
    */
-  static std::unique_ptr<VertexData> CreateTorusKnot(TorusKnotOptions& options);
+  static unique_ptr_t<VertexData> CreateTorusKnot(TorusKnotOptions& options);
 
   /** Tools **/
 
@@ -201,7 +199,7 @@ private:
                        bool updatable = false);
   VertexData& _update(IGetSetVerticesData* meshOrGeometry,
                       bool updateExtends = false, bool makeItUnique = false);
-  static std::unique_ptr<VertexData>
+  static unique_ptr_t<VertexData>
   _ExtractFrom(IGetSetVerticesData* meshOrGeometry, bool copyWhenShared = false,
                bool forceCopy = false);
 

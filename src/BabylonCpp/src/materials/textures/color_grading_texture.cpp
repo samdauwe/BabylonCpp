@@ -141,7 +141,7 @@ void ColorGradingTexture::loadTexture()
   }
 }
 
-std::unique_ptr<ColorGradingTexture> ColorGradingTexture::clone() const
+unique_ptr_t<ColorGradingTexture> ColorGradingTexture::clone() const
 {
   auto newTexture = ::std::make_unique<ColorGradingTexture>(url, getScene());
 
@@ -165,11 +165,11 @@ void ColorGradingTexture::delayLoad()
   }
 }
 
-std::unique_ptr<ColorGradingTexture>
+unique_ptr_t<ColorGradingTexture>
 ColorGradingTexture::Parse(const Json::value& parsedTexture, Scene* scene,
                            const string_t& /*rootUrl*/)
 {
-  std::unique_ptr<ColorGradingTexture> texture = nullptr;
+  unique_ptr_t<ColorGradingTexture> texture = nullptr;
   if (parsedTexture.contains("name")
       && !Json::GetBool(parsedTexture, "isRenderTarget")) {
     auto parsedTextureName = Json::GetString(parsedTexture, "name");

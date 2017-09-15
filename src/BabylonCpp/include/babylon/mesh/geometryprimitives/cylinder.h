@@ -19,13 +19,13 @@ public:
   static Cylinder* New(Ts&&... args)
   {
     auto cylinder = new Cylinder(::std::forward<Ts>(args)...);
-    cylinder->addToScene(static_cast<std::unique_ptr<Geometry>>(cylinder));
+    cylinder->addToScene(static_cast<unique_ptr_t<Geometry>>(cylinder));
 
     return cylinder;
   }
   ~Cylinder();
 
-  std::unique_ptr<VertexData> _regenerateVertexData() override;
+  unique_ptr_t<VertexData> _regenerateVertexData() override;
   Geometry* copy(const string_t& id) override;
 
   // Statics

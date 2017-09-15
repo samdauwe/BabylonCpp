@@ -88,7 +88,7 @@ SphericalPolynomial SphericalPolynomial::copy() const
   return SphericalPolynomial(*this);
 }
 
-std::unique_ptr<SphericalPolynomial> SphericalPolynomial::clone() const
+unique_ptr_t<SphericalPolynomial> SphericalPolynomial::clone() const
 {
   return ::std::make_unique<SphericalPolynomial>(*this);
 }

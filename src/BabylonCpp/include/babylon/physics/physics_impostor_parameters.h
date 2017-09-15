@@ -9,7 +9,7 @@ struct BABYLON_SHARED_EXPORT PhysicsImpostorParameters {
   float mass        = 0.f;
   float friction    = 0.2f;
   float restitution = 0.2f;
-  std::unordered_map<string_t, float> nativeOptions;
+  unordered_map_t<string_t, float> nativeOptions;
   bool contains(const string_t& key) const;
   float operator[](const string_t& key) const;
   void setValue(const string_t& key, float value);

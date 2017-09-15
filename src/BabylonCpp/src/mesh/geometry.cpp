@@ -63,7 +63,7 @@ Geometry::~Geometry()
 {
 }
 
-void Geometry::addToScene(std::unique_ptr<Geometry>&& newGeometry)
+void Geometry::addToScene(unique_ptr_t<Geometry>&& newGeometry)
 {
   _scene->pushGeometry(::std::move(newGeometry), true);
 }
@@ -158,7 +158,7 @@ void Geometry::removeVerticesData(unsigned int kind)
   }
 }
 
-void Geometry::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
+void Geometry::setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer)
 {
   auto kind = buffer->getKind();
   if (stl_util::contains(_vertexBuffers, kind)) {
@@ -313,13 +313,13 @@ VertexBuffer* Geometry::getVertexBuffer(unsigned int kind) const
   }
 }
 
-std::unordered_map<string_t, VertexBuffer*> Geometry::getVertexBuffers()
+unordered_map_t<string_t, VertexBuffer*> Geometry::getVertexBuffers()
 {
   if (!isReady()) {
-    return std::unordered_map<string_t, VertexBuffer*>();
+    return unordered_map_t<string_t, VertexBuffer*>();
   }
 
-  std::unordered_map<string_t, VertexBuffer*> vertexBuffers;
+  unordered_map_t<string_t, VertexBuffer*> vertexBuffers;
   for (const auto& item : _vertexBuffers) {
     const string_t kind = VertexBuffer::KindAsString(item.first);
     vertexBuffers[kind] = item.second.get();
@@ -368,7 +368,7 @@ Mesh* Geometry::setIndices(const IndicesArray& indices, size_t totalVertices)
   _indices = indices;
   if (!_meshes.empty() && !_indices.empty()) {
     _indexBuffer
-      = std::unique_ptr<GL::IGLBuffer>(_engine->createIndexBuffer(_indices));
+      = unique_ptr_t<GL::IGLBuffer>(_engine->createIndexBuffer(_indices));
   }
 
   if (totalVertices != 0) {
@@ -467,7 +467,7 @@ void Geometry::applyToMesh(Mesh* mesh)
     _applyToMesh(mesh);
   }
   else {
-    mesh->_boundingInfo = std::unique_ptr<BoundingInfo>(_boundingInfo.get());
+    mesh->_boundingInfo = unique_ptr_t<BoundingInfo>(_boundingInfo.get());
   }
 }
 
@@ -521,7 +521,7 @@ void Geometry::_applyToMesh(Mesh* mesh)
   // indexBuffer
   if (numOfMeshes == 1 && _indices.size() > 0) {
     _indexBuffer
-      = std::unique_ptr<GL::IGLBuffer>(_engine->createIndexBuffer(_indices));
+      = unique_ptr_t<GL::IGLBuffer>(_engine->createIndexBuffer(_indices));
   }
   if (_indexBuffer) {
     _indexBuffer->references = numOfMeshes;

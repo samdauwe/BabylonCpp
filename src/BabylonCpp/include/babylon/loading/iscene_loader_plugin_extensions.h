@@ -6,7 +6,7 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT ISceneLoaderPluginExtensions {
-  std::unordered_map<string_t, bool> mapping;
+  unordered_map_t<string_t, bool> mapping;
 }; // end of struct ISceneLoaderPlugin
 
 } // end of namespace BABYLON

@@ -62,7 +62,7 @@ Viewport Viewport::copy() const
   return Viewport(*this);
 }
 
-std::unique_ptr<Viewport> Viewport::clone() const
+unique_ptr_t<Viewport> Viewport::clone() const
 {
   return ::std::make_unique<Viewport>(*this);
 }

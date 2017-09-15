@@ -53,9 +53,9 @@ private:
   OIMO::Shape* getLastShape(OIMO::RigidBody* body);
 
 private:
-  std::unique_ptr<IWorld> world;
+  unique_ptr_t<IWorld> world;
   string_t name;
-  std::unordered_map<string_t, PhysicsImpostor*> _tmpImpostorsArray;
+  unordered_map_t<string_t, PhysicsImpostor*> _tmpImpostorsArray;
   Vector3 _tmpPositionVector;
 
 }; // end of class OimoPhysicsEnginePlugin

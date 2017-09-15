@@ -26,7 +26,7 @@ public:
   /**
    * @brief Returns a new Color3 copied the current one.
    */
-  std::unique_ptr<Color3> clone() const;
+  unique_ptr_t<Color3> clone() const;
 
   /**
    * @brief Returns a string with the Color3 current values.

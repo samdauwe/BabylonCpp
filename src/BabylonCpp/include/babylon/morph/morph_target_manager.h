@@ -13,13 +13,13 @@ public:
   static MorphTargetManager* New(Ts&&... args)
   {
     auto mtm = new MorphTargetManager(std::forward<Ts>(args)...);
-    mtm->addToScene(static_cast<std::unique_ptr<MorphTargetManager>>(mtm));
+    mtm->addToScene(static_cast<unique_ptr_t<MorphTargetManager>>(mtm));
 
     return mtm;
   }
   ~MorphTargetManager();
 
-  void addToScene(std::unique_ptr<MorphTargetManager>&& newMorphTargetManager);
+  void addToScene(unique_ptr_t<MorphTargetManager>&& newMorphTargetManager);
 
   unsigned int uniqueId() const;
   std::size_t vertexCount() const;
@@ -30,7 +30,7 @@ public:
   Float32Array& influences();
   MorphTarget* getActiveTarget(std::size_t index);
   MorphTarget* getTarget(std::size_t index);
-  void addTarget(std::unique_ptr<MorphTarget>&& target);
+  void addTarget(unique_ptr_t<MorphTarget>&& target);
   void removeTarget(MorphTarget* target);
 
   /**
@@ -51,7 +51,7 @@ private:
   void _syncActiveTargets(bool needUpdate);
 
 private:
-  vector_t<std::unique_ptr<MorphTarget>> _targets;
+  vector_t<unique_ptr_t<MorphTarget>> _targets;
   vector_t<Observer<bool>::Ptr> _targetObservable;
   vector_t<MorphTarget*> _activeTargets;
   Scene* _scene;

@@ -19,13 +19,13 @@ public:
   static Plane* New(Ts&&... args)
   {
     auto plane = new Plane(::std::forward<Ts>(args)...);
-    plane->addToScene(static_cast<std::unique_ptr<Geometry>>(plane));
+    plane->addToScene(static_cast<unique_ptr_t<Geometry>>(plane));
 
     return plane;
   }
   ~Plane();
 
-  std::unique_ptr<VertexData> _regenerateVertexData() override;
+  unique_ptr_t<VertexData> _regenerateVertexData() override;
   Geometry* copy(const string_t& id) override;
 
   // Statics

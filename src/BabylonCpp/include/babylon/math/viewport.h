@@ -27,7 +27,7 @@ public:
   /**
    * @brief Returns a new Viewport copied from the current one.
    */
-  std::unique_ptr<Viewport> clone() const;
+  unique_ptr_t<Viewport> clone() const;
 
   friend std::ostream& operator<<(std::ostream& os, const Viewport& viewport);
 

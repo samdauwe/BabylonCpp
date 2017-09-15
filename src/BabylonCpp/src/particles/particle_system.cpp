@@ -427,7 +427,7 @@ size_t ParticleSystem::render()
   }
 
   // VBOs
-  std::unordered_map<string_t, VertexBuffer*> vertexBuffersTmp;
+  unordered_map_t<string_t, VertexBuffer*> vertexBuffersTmp;
   for (auto& item : _vertexBuffers) {
     vertexBuffersTmp[item.first] = item.second.get();
   }
@@ -472,7 +472,7 @@ void ParticleSystem::dispose(bool /*doNotRecurse*/)
   _scene->particleSystems.erase(
     ::std::remove_if(
       _scene->particleSystems.begin(), _scene->particleSystems.end(),
-      [this](const std::unique_ptr<IParticleSystem>& particleSystem) {
+      [this](const unique_ptr_t<IParticleSystem>& particleSystem) {
         return particleSystem.get() == this;
       }),
     _scene->particleSystems.end());

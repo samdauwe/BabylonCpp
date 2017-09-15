@@ -19,13 +19,13 @@ public:
   static Sphere* New(Ts&&... args)
   {
     auto sphere = new Sphere(::std::forward<Ts>(args)...);
-    sphere->addToScene(static_cast<std::unique_ptr<Geometry>>(sphere));
+    sphere->addToScene(static_cast<unique_ptr_t<Geometry>>(sphere));
 
     return sphere;
   }
   ~Sphere();
 
-  std::unique_ptr<VertexData> _regenerateVertexData() override;
+  unique_ptr_t<VertexData> _regenerateVertexData() override;
   Geometry* copy(const string_t& id) override;
 
   // Statics

@@ -96,7 +96,7 @@ struct CameraRigParams {
   bool vrPreViewMatrixSet = false;
   Matrix vrPreViewMatrix;
   VRMetrics vrMetrics;
-  std::unordered_map<string_t, float> params;
+  unordered_map_t<string_t, float> params;
 }; // end of struct CameraRigParams
 
 struct ClientRect {
@@ -245,7 +245,7 @@ struct NodeCache {
   int renderWidth;
   int renderHeight;
   // TargetCamera
-  std::unique_ptr<Vector3> lockedTarget;
+  unique_ptr_t<Vector3> lockedTarget;
   // ArcRotateCamera
   Vector3 _target;
   float alpha;

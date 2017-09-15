@@ -19,10 +19,10 @@ public:
   bool isEnabled() const;
   void setIsEnabled(bool value);
 
-  std::unique_ptr<FresnelParameters> clone() const;
+  unique_ptr_t<FresnelParameters> clone() const;
   Json::object serialize() const;
 
-  static std::unique_ptr<FresnelParameters>
+  static unique_ptr_t<FresnelParameters>
   Parse(const Json::value& parsedFresnelParameters);
 
 public:

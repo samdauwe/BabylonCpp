@@ -368,9 +368,9 @@ Texture* Texture::CreateFromBase64String(const string_t& /*data*/,
                       onLoad, onError, nullptr, false, format);
 }
 
-std::unique_ptr<BaseTexture>
-Texture::Parse(const Json::value& /*parsedTexture*/, Scene* /*scene*/,
-               const string_t& /*rootUrl*/)
+unique_ptr_t<BaseTexture> Texture::Parse(const Json::value& /*parsedTexture*/,
+                                         Scene* /*scene*/,
+                                         const string_t& /*rootUrl*/)
 {
   return nullptr;
 }

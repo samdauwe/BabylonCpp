@@ -607,9 +607,9 @@ string_t TextureTools::_environmentBRDFBase64Texture
     "BLavolXEyAM6obnTMzHEqoMuc09HxKv2rbTPAVYZO/ydUbXfkKP4/"
     "BnecprBuissAAAAASUVORK5CYII=";
 
-std::unique_ptr<Texture> TextureTools::CreateResizedCopy(Texture* texture,
-                                                         int width, int height,
-                                                         bool useBilinearMode)
+unique_ptr_t<Texture> TextureTools::CreateResizedCopy(Texture* texture,
+                                                      int width, int height,
+                                                      bool useBilinearMode)
 {
   auto scene  = texture->getScene();
   auto engine = scene->getEngine();
@@ -624,7 +624,7 @@ std::unique_ptr<Texture> TextureTools::CreateResizedCopy(Texture* texture,
                                               false,                     //
                                               texture->_samplingMode,    //
                                               false                      //
-    );
+                                              );
 
   rtt->wrapU                     = texture->wrapU;
   rtt->wrapV                     = texture->wrapV;

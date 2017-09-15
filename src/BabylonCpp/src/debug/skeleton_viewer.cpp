@@ -82,7 +82,7 @@ void SkeletonViewer::_getBonePosition(Vector3& position, Bone* bone,
 }
 
 void SkeletonViewer::_getLinesForBonesWithLength(
-  const vector_t<std::unique_ptr<Bone>>& bones, const Matrix& meshMat)
+  const vector_t<unique_ptr_t<Bone>>& bones, const Matrix& meshMat)
 {
   _resizeDebugLines(bones.size());
 
@@ -99,7 +99,7 @@ void SkeletonViewer::_getLinesForBonesWithLength(
 }
 
 void SkeletonViewer::_getLinesForBonesNoLength(
-  const vector_t<std::unique_ptr<Bone>>& bones, const Matrix& /*meshMat*/)
+  const vector_t<unique_ptr_t<Bone>>& bones, const Matrix& /*meshMat*/)
 {
   _resizeDebugLines(bones.size());
 

@@ -20,7 +20,7 @@ public:
    * https://www.khronos.org/opengl/wiki/Uniform_Buffer_Object
    */
   UniformBuffer(Engine* engine, const Float32Array& data = Float32Array(),
-                bool dynamic = false);
+                bool dynamic          = false);
   UniformBuffer(UniformBuffer& other) = delete;
   ~UniformBuffer();
 
@@ -352,13 +352,13 @@ public:
 
 private:
   Engine* _engine;
-  std::unique_ptr<GL::IGLBuffer> _buffer;
+  unique_ptr_t<GL::IGLBuffer> _buffer;
   Float32Array _data;
   Float32Array _bufferData;
   bool _dynamic;
   string_t _uniformName;
-  std::unordered_map<string_t, size_t> _uniformLocations;
-  std::unordered_map<string_t, size_t> _uniformSizes;
+  unordered_map_t<string_t, size_t> _uniformLocations;
+  unordered_map_t<string_t, size_t> _uniformSizes;
   size_t _uniformLocationPointer;
   bool _needSync;
   Float32Array _cache;

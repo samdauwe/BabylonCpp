@@ -19,13 +19,13 @@ public:
   static Box* New(Ts&&... args)
   {
     auto box = new Box(::std::forward<Ts>(args)...);
-    box->addToScene(static_cast<std::unique_ptr<Geometry>>(box));
+    box->addToScene(static_cast<unique_ptr_t<Geometry>>(box));
 
     return box;
   }
   ~Box();
 
-  std::unique_ptr<VertexData> _regenerateVertexData() override;
+  unique_ptr_t<VertexData> _regenerateVertexData() override;
   Geometry* copy(const string_t& id) override;
 
   // Statics

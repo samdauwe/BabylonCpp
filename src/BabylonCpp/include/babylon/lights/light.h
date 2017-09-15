@@ -89,7 +89,7 @@ public:
   ~Light();
 
   virtual IReflect::Type type() const override;
-  void addToScene(std::unique_ptr<Light>&& newLight);
+  void addToScene(unique_ptr_t<Light>&& newLight);
 
   /**
    * @brief Returns the string "Light".
@@ -197,7 +197,7 @@ public:
   /**
    * @brief Returns a new Light object, named "name", from the current one.
    */
-  std::unique_ptr<Light> clone(const string_t& name);
+  unique_ptr_t<Light> clone(const string_t& name);
 
   /**
    * @brief Serializes the current light into a Serialization object.
@@ -274,7 +274,7 @@ public:
   vector_t<string_t> _excludedMeshesIds;
   vector_t<string_t> _includedOnlyMeshesIds;
   // Light uniform buffer
-  std::unique_ptr<UniformBuffer> _uniformBuffer;
+  unique_ptr_t<UniformBuffer> _uniformBuffer;
 
 private:
   /**
@@ -295,8 +295,8 @@ private:
   unsigned int _includeOnlyWithLayerMask;
   unsigned int _excludeWithLayerMask;
   unsigned int _lightmapMode;
-  std::unique_ptr<Matrix> _parentedWorldMatrix;
-  std::unique_ptr<Matrix> _worldMatrix;
+  unique_ptr_t<Matrix> _parentedWorldMatrix;
+  unique_ptr_t<Matrix> _worldMatrix;
 
 }; // end of class Light
 

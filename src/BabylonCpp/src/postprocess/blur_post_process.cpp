@@ -100,7 +100,7 @@ void BlurPostProcess::_updateParameters()
   Float32Array linearSamplingWeights;
   Int32Array linearSamplingOffsets;
 
-  vector_t<std::pair<std::int32_t, float>> linearSamplingMap;
+  vector_t<pair_t<std::int32_t, float>> linearSamplingMap;
 
   for (unsigned int i = 0; i <= centerIndex; i += 2) {
     auto j

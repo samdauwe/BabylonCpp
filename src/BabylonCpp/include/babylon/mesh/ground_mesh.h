@@ -25,7 +25,7 @@ public:
   static GroundMesh* New(Ts&&... args)
   {
     auto mesh = new GroundMesh(::std::forward<Ts>(args)...);
-    mesh->addToScene(static_cast<std::unique_ptr<AbstractMesh>>(mesh));
+    mesh->addToScene(static_cast<unique_ptr_t<AbstractMesh>>(mesh));
 
     return mesh;
   }

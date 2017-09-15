@@ -26,7 +26,7 @@ public:
   Arc2& operator=(Arc2&& otherArc);
   ~Arc2();
   Arc2 copy() const;
-  std::unique_ptr<Arc2> clone() const;
+  unique_ptr_t<Arc2> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Arc2& arc);
   friend bool operator==(const Arc2& lhs, const Arc2& rhs);
   friend bool operator!=(const Arc2& lhs, const Arc2& rhs);

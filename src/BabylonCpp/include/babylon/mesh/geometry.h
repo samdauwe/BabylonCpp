@@ -23,7 +23,7 @@ public:
   static Geometry* New(Ts&&... args)
   {
     auto geometry = new Geometry(::std::forward<Ts>(args)...);
-    geometry->addToScene(static_cast<std::unique_ptr<Geometry>>(geometry));
+    geometry->addToScene(static_cast<unique_ptr_t<Geometry>>(geometry));
 
     return geometry;
   }
@@ -33,7 +33,7 @@ public:
    * @brief Adds the geometry to the scene.
    * @param newGeometry
    */
-  void addToScene(std::unique_ptr<Geometry>&& newGeometry);
+  void addToScene(unique_ptr_t<Geometry>&& newGeometry);
 
   /**
    * @brief The Bias Vector to apply on the bounding elements (box/sphere), the
@@ -55,7 +55,7 @@ public:
   Mesh* setVerticesData(unsigned int kind, const Float32Array& data,
                         bool updatable = false, int stride = -1) override;
   void removeVerticesData(unsigned int kind);
-  void setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer);
+  void setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer);
   void updateVerticesDataDirectly(unsigned int kind, const Float32Array& data,
                                   int offset);
   Mesh* updateVerticesData(unsigned int kind, const Float32Array& data,
@@ -66,7 +66,7 @@ public:
   Float32Array getVerticesData(unsigned int kind, bool copyWhenShared = false,
                                bool forceCopy = false) override;
   VertexBuffer* getVertexBuffer(unsigned int kind) const;
-  std::unordered_map<string_t, VertexBuffer*> getVertexBuffers();
+  unordered_map_t<string_t, VertexBuffer*> getVertexBuffers();
   bool isVerticesDataPresent(unsigned int kind) override;
   Uint32Array getVerticesDataKinds();
   Mesh* setIndices(const IndicesArray& indices,
@@ -123,12 +123,12 @@ public:
   ::std::function<void(Geometry* geometry, unsigned int kind)>
     onGeometryUpdated;
   Uint32Array _delayInfoKinds;
-  std::unique_ptr<BoundingInfo> _boundingInfo;
+  unique_ptr_t<BoundingInfo> _boundingInfo;
   ::std::function<void(const Json::value& parsedVertexData, Geometry* geometry)>
     _delayLoadingFunction;
   int _softwareSkinningRenderId;
   vector_t<Vector3> _positions; // Cache
-  std::unordered_map<string_t, std::unique_ptr<GL::IGLVertexArrayObject>>
+  unordered_map_t<string_t, unique_ptr_t<GL::IGLVertexArrayObject>>
     _vertexArrayObjects;
   bool _updatable;
   vector_t<Vector3> centroids;
@@ -139,13 +139,12 @@ private:
   vector_t<Mesh*> _meshes;
   size_t _totalVertices;
   IndicesArray _indices;
-  std::unordered_map<unsigned int, std::unique_ptr<VertexBuffer>>
-    _vertexBuffers;
+  unordered_map_t<unsigned int, unique_ptr_t<VertexBuffer>> _vertexBuffers;
   bool _isDisposed;
   Nullable<MinMax> _extend;
   Nullable<Vector2> _boundingBias;
   Uint32Array _delayInfo;
-  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
+  unique_ptr_t<GL::IGLBuffer> _indexBuffer;
 
 }; // end of class Geometry
 

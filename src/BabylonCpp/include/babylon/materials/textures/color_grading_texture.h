@@ -39,7 +39,7 @@ public:
   /**
    * Clones the color gradind texture.
    */
-  std::unique_ptr<ColorGradingTexture> clone() const;
+  unique_ptr_t<ColorGradingTexture> clone() const;
 
   /**
    * Called during delayed load for textures.
@@ -53,7 +53,7 @@ public:
    * @param rootUrl The root url of the data assets to load
    * @return A color gradind texture
    */
-  static std::unique_ptr<ColorGradingTexture>
+  static unique_ptr_t<ColorGradingTexture>
   Parse(const Json::value& parsedTexture, Scene* scene,
         const string_t& rootUrl);
 
@@ -86,7 +86,7 @@ private:
    * The current texture matrix. (will always be identity in color grading
    * texture)
    */
-  std::unique_ptr<Matrix> _textureMatrix;
+  unique_ptr_t<Matrix> _textureMatrix;
 
 }; // end of class ColorGradingTexture
 

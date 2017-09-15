@@ -20,13 +20,13 @@ public:
   static Ribbon* New(Ts&&... args)
   {
     auto ribbon = new Ribbon(::std::forward<Ts>(args)...);
-    ribbon->addToScene(static_cast<std::unique_ptr<Geometry>>(ribbon));
+    ribbon->addToScene(static_cast<unique_ptr_t<Geometry>>(ribbon));
 
     return ribbon;
   }
   ~Ribbon();
 
-  std::unique_ptr<VertexData> _regenerateVertexData();
+  unique_ptr_t<VertexData> _regenerateVertexData();
   Geometry* copy(const string_t& id);
 
 protected:

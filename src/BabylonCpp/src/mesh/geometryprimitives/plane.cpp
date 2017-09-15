@@ -18,7 +18,7 @@ Plane::~Plane()
 {
 }
 
-std::unique_ptr<VertexData> Plane::_regenerateVertexData()
+unique_ptr_t<VertexData> Plane::_regenerateVertexData()
 {
   PlaneOptions options(size);
   options.sideOrientation = side;

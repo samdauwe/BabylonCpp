@@ -6,7 +6,7 @@
 namespace BABYLON {
 
 Xbox360Pad::Xbox360Pad(const string_t& id, int index,
-                       const std::shared_ptr<IBrowserGamepad>& gamepad,
+                       const shared_ptr_t<IBrowserGamepad>& gamepad,
                        bool xboxOne)
     : Gamepad(id, index, gamepad, 0, 1, (xboxOne ? 3 : 2), (xboxOne ? 4 : 3))
     , _leftTrigger{0}

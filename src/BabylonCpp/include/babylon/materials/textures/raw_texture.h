@@ -17,28 +17,28 @@ struct BABYLON_SHARED_EXPORT RawTexture : public Texture {
   void update(const Uint8Array& data);
 
   // Statics
-  static std::unique_ptr<RawTexture> CreateLuminanceTexture(
+  static unique_ptr_t<RawTexture> CreateLuminanceTexture(
     const Uint8Array& data, int width, int height, Scene* scene,
     bool generateMipMaps = true, bool invertY = false,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
-  static std::unique_ptr<RawTexture> CreateLuminanceAlphaTexture(
+  static unique_ptr_t<RawTexture> CreateLuminanceAlphaTexture(
     const Uint8Array& data, int width, int height, Scene* scene,
     bool generateMipMaps = true, bool invertY = false,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
-  static std::unique_ptr<RawTexture> CreateAlphaTexture(
+  static unique_ptr_t<RawTexture> CreateAlphaTexture(
     const Uint8Array& data, int width, int height, Scene* scene,
     bool generateMipMaps = true, bool invertY = false,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
-  static std::unique_ptr<RawTexture>
+  static unique_ptr_t<RawTexture>
   CreateRGBTexture(const Uint8Array& data, int width, int height, Scene* scene,
                    bool generateMipMaps = true, bool invertY = false,
                    unsigned int samplingMode
                    = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
-  static std::unique_ptr<RawTexture>
+  static unique_ptr_t<RawTexture>
   CreateRGBATexture(const Uint8Array& data, int width, int height, Scene* scene,
                     bool generateMipMaps = true, bool invertY = false,
                     unsigned int samplingMode

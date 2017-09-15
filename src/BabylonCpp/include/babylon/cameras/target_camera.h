@@ -14,7 +14,7 @@ public:
   static TargetCamera* New(Ts&&... args)
   {
     auto camera = new TargetCamera(::std::forward<Ts>(args)...);
-    camera->addToScene(static_cast<std::unique_ptr<Camera>>(camera));
+    camera->addToScene(static_cast<unique_ptr_t<Camera>>(camera));
 
     return camera;
   }
@@ -65,11 +65,11 @@ private:
   void _updateCameraRotationMatrix() override;
 
 public:
-  std::unique_ptr<Vector3> cameraDirection;
-  std::unique_ptr<Vector2> cameraRotation;
-  std::unique_ptr<Vector3> rotation;
+  unique_ptr_t<Vector3> cameraDirection;
+  unique_ptr_t<Vector2> cameraRotation;
+  unique_ptr_t<Vector3> rotation;
 
-  std::unique_ptr<Quaternion> rotationQuaternion;
+  unique_ptr_t<Quaternion> rotationQuaternion;
 
   float speed;
   bool noRotationConstraint;
@@ -80,7 +80,7 @@ public:
   Matrix _camMatrix;
   Matrix _cameraTransformMatrix;
   Matrix _cameraRotationMatrix;
-  std::unique_ptr<Vector3> _referencePoint;
+  unique_ptr_t<Vector3> _referencePoint;
   Vector3 _transformedReferencePoint;
   Matrix _lookAtTemp;
   Matrix _tempMatrix;
@@ -90,7 +90,7 @@ public:
 
 private:
   Matrix _rigCamTransformMatrix;
-  std::unique_ptr<Vector3> _defaultUpVector;
+  unique_ptr_t<Vector3> _defaultUpVector;
 
 }; // end of class TargetCamera
 

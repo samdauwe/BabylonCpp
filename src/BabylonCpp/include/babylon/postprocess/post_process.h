@@ -27,8 +27,8 @@ public:
     const string_t& defines   = "",
     unsigned int textureType  = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
     const string_t& vertexUrl = "postprocess",
-    const std::unordered_map<string_t, unsigned int>& indexParameters = {},
-    bool blockCompilation                                             = false);
+    const unordered_map_t<string_t, unsigned int>& indexParameters = {},
+    bool blockCompilation = false);
   PostProcess(
     const string_t& name, const string_t& fragmentUrl,
     const vector_t<string_t>& parameters, const vector_t<string_t>& samplers,
@@ -38,8 +38,8 @@ public:
     const string_t& defines   = "",
     unsigned int textureType  = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
     const string_t& vertexUrl = "postprocess",
-    const std::unordered_map<string_t, unsigned int>& indexParameters = {},
-    bool blockCompilation                                             = false);
+    const unordered_map_t<string_t, unsigned int>& indexParameters = {},
+    bool blockCompilation = false);
   virtual ~PostProcess();
 
   // Events
@@ -59,9 +59,9 @@ public:
   PostProcess& shareOutputWith(PostProcess* postProcess);
   void updateEffect(
     const string_t& defines = "", const vector_t<string_t>& uniforms = {},
-    const vector_t<string_t>& samplers                                = {},
-    const std::unordered_map<string_t, unsigned int>& indexParameters = {},
-    const ::std::function<void(Effect* effect)>& onCompiled           = nullptr,
+    const vector_t<string_t>& samplers = {},
+    const unordered_map_t<string_t, unsigned int>& indexParameters = {},
+    const ::std::function<void(Effect* effect)>& onCompiled = nullptr,
     const ::std::function<void(Effect* effect, const string_t& errors)>& onError
     = nullptr);
   bool isReusable() const;
@@ -82,7 +82,7 @@ public:
   int width;
   int height;
   unsigned int renderTargetSamplingMode;
-  std::unique_ptr<Color4> clearColor;
+  unique_ptr_t<Color4> clearColor;
   bool autoClear;
   unsigned int alphaMode;
   Nullable<Color4> alphaConstants;
@@ -117,7 +117,7 @@ public:
   Observable<Effect> onAfterRenderObservable;
 
 protected:
-  std::unordered_map<string_t, unsigned int> _indexParameters;
+  unordered_map_t<string_t, unsigned int> _indexParameters;
 
 private:
   Camera* _camera;

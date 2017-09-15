@@ -26,7 +26,7 @@ void RawTexture::update(const Uint8Array& data)
   getScene()->getEngine()->updateRawTexture(_texture, data, format, _invertY);
 }
 
-std::unique_ptr<RawTexture> RawTexture::CreateLuminanceTexture(
+unique_ptr_t<RawTexture> RawTexture::CreateLuminanceTexture(
   const Uint8Array& data, int width, int height, Scene* scene,
   bool generateMipMaps, bool invertY, unsigned int samplingMode)
 {
@@ -35,7 +35,7 @@ std::unique_ptr<RawTexture> RawTexture::CreateLuminanceTexture(
     generateMipMaps, invertY, samplingMode);
 }
 
-std::unique_ptr<RawTexture> RawTexture::CreateLuminanceAlphaTexture(
+unique_ptr_t<RawTexture> RawTexture::CreateLuminanceAlphaTexture(
   const Uint8Array& data, int width, int height, Scene* scene,
   bool generateMipMaps, bool invertY, unsigned int samplingMode)
 {
@@ -44,7 +44,7 @@ std::unique_ptr<RawTexture> RawTexture::CreateLuminanceAlphaTexture(
     generateMipMaps, invertY, samplingMode);
 }
 
-std::unique_ptr<RawTexture>
+unique_ptr_t<RawTexture>
 RawTexture::CreateAlphaTexture(const Uint8Array& data, int width, int height,
                                Scene* scene, bool generateMipMaps, bool invertY,
                                unsigned int samplingMode)
@@ -54,7 +54,7 @@ RawTexture::CreateAlphaTexture(const Uint8Array& data, int width, int height,
     generateMipMaps, invertY, samplingMode);
 }
 
-std::unique_ptr<RawTexture>
+unique_ptr_t<RawTexture>
 RawTexture::CreateRGBTexture(const Uint8Array& data, int width, int height,
                              Scene* scene, bool generateMipMaps, bool invertY,
                              unsigned int samplingMode)
@@ -64,7 +64,7 @@ RawTexture::CreateRGBTexture(const Uint8Array& data, int width, int height,
     generateMipMaps, invertY, samplingMode);
 }
 
-std::unique_ptr<RawTexture>
+unique_ptr_t<RawTexture>
 RawTexture::CreateRGBATexture(const Uint8Array& data, int width, int height,
                               Scene* scene, bool generateMipMaps, bool invertY,
                               unsigned int samplingMode)

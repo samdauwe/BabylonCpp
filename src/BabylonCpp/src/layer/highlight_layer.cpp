@@ -425,8 +425,8 @@ bool HighlightLayer::isReady(SubMesh* subMesh, bool useInstances,
     options.attributes    = attribs;
     options.uniformsNames = {"world",         "mBones", "viewProjection",
                              "diffuseMatrix", "color",  "emissiveMatrix"};
-    options.samplers      = {"diffuseSampler", "emissiveSampler"};
-    options.defines       = join;
+    options.samplers = {"diffuseSampler", "emissiveSampler"};
+    options.defines  = join;
 
     _glowMapGenerationEffect = _scene->getEngine()->createEffect(
       "glowMapGeneration", options, _scene->getEngine());
@@ -466,7 +466,7 @@ void HighlightLayer::render()
   currentEffect->setTexture("textureSampler", _blurTexture.get());
 
   // VBOs
-  std::unordered_map<string_t, VertexBuffer*> _vertexBuffersTmp;
+  unordered_map_t<string_t, VertexBuffer*> _vertexBuffersTmp;
   for (auto& item : _vertexBuffers) {
     _vertexBuffersTmp[item.first] = item.second.get();
   }
@@ -668,7 +668,7 @@ void HighlightLayer::dispose()
   _scene->highlightLayers.erase(
     ::std::remove_if(
       _scene->highlightLayers.begin(), _scene->highlightLayers.end(),
-      [this](const std::unique_ptr<HighlightLayer>& highlightLayer) {
+      [this](const unique_ptr_t<HighlightLayer>& highlightLayer) {
         return highlightLayer.get() == this;
       }),
     _scene->highlightLayers.end());

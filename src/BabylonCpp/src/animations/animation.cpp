@@ -33,8 +33,7 @@ Animation* Animation::_PrepareAnimation(
     = new Animation(name, targetProperty, framePerSecond, dataType, loopMode);
 
   animation->setKeys({
-    AnimationKey(0, from),
-    AnimationKey(totalFrame, to),
+    AnimationKey(0, from), AnimationKey(totalFrame, to),
   });
 
   if (easingFunction != nullptr) {
@@ -323,7 +322,7 @@ Matrix Animation::matrixInterpolateFunction(const Matrix& startValue,
   return Matrix::Lerp(startValue, endValue, gradient);
 }
 
-std::unique_ptr<Animation> Animation::clone() const
+unique_ptr_t<Animation> Animation::clone() const
 {
   auto clonedAnimation
     = ::std::make_unique<Animation>(name, String::join(targetPropertyPath, '.'),

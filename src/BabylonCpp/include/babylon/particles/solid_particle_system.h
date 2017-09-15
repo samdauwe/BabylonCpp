@@ -331,7 +331,7 @@ private:
    * @brief Adds a new particle object in the particles array.
    */
   SolidParticle* _addParticle(unsigned int idx, unsigned int idxpos,
-                              std::unique_ptr<ModelShape>&& model, int shapeId,
+                              unique_ptr_t<ModelShape>&& model, int shapeId,
                               unsigned int idxInShape,
                               const BoundingInfo& bInfo);
 
@@ -350,7 +350,7 @@ public:
    * any classic array.
    * Example : var p = SPS.particles[i];
    */
-  vector_t<std::unique_ptr<SolidParticle>> particles;
+  vector_t<unique_ptr_t<SolidParticle>> particles;
 
   /**
    * The SPS total number of particles. Read only. Use SPS.counter instead if
@@ -420,10 +420,10 @@ private:
   bool _isVisibilityBoxLocked;
   bool _alwaysVisible;
   int _shapeCounter;
-  std::unique_ptr<SolidParticle> _copy;
+  unique_ptr_t<SolidParticle> _copy;
   vector_t<Vector3> _shape;
   Float32Array _shapeUV;
-  std::unique_ptr<Color4> _color;
+  unique_ptr_t<Color4> _color;
   bool _computeParticleColor;
   bool _computeParticleTexture;
   bool _computeParticleRotation;

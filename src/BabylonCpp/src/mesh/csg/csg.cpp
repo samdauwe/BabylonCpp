@@ -259,11 +259,11 @@ Mesh* CSG::CSG::buildMeshGeometry(const string_t& name, Scene* scene,
   Vector2 uv                  = Vector2::Zero();
   vector_t<Polygon*> polygons = _polygons;
   array_t<unsigned int, 3> polygonIndices{{0, 0, 0}};
-  std::unordered_map<string_t, size_t> vertice_dict;
+  unordered_map_t<string_t, size_t> vertice_dict;
   bool vertexIdxDefined     = false;
   size_t vertex_idx         = 0;
   unsigned int currentIndex = 0;
-  std::unordered_map<unsigned int, std::unordered_map<unsigned int, SubMeshObj>>
+  unordered_map_t<unsigned int, unordered_map_t<unsigned int, SubMeshObj>>
     subMesh_dict;
   SubMeshObj subMesh_obj;
 
@@ -284,7 +284,7 @@ Mesh* CSG::CSG::buildMeshGeometry(const string_t& name, Scene* scene,
     // Building SubMeshes
     if (subMesh_dict.find(polygon->shared.meshId) == subMesh_dict.end()) {
       subMesh_dict[polygon->shared.meshId]
-        = std::unordered_map<unsigned int, SubMeshObj>();
+        = unordered_map_t<unsigned int, SubMeshObj>();
     }
     if (subMesh_dict[polygon->shared.meshId].find(polygon->shared.subMeshId)
         == subMesh_dict[polygon->shared.meshId].end()) {

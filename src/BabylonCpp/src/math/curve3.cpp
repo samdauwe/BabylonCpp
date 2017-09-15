@@ -55,7 +55,7 @@ Curve3 Curve3::copy() const
   return Curve3(*this);
 }
 
-std::unique_ptr<Curve3> Curve3::clone() const
+unique_ptr_t<Curve3> Curve3::clone() const
 {
   return ::std::make_unique<Curve3>(*this);
 }

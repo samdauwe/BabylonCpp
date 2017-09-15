@@ -92,7 +92,7 @@ SpriteManager::SpriteManager(const string_t& iName, const string_t& imgUrl,
 
   {
     EffectCreationOptions options;
-    options.attributes    = {VertexBuffer::PositionKindChars, "options",
+    options.attributes = {VertexBuffer::PositionKindChars, "options",
                           "cellInfo", VertexBuffer::ColorKindChars};
     options.uniformsNames = {"view", "projection", "textureInfos", "alphaTest"};
     options.samplers      = {"diffuseSampler"};
@@ -103,12 +103,12 @@ SpriteManager::SpriteManager(const string_t& iName, const string_t& imgUrl,
 
   {
     EffectCreationOptions options;
-    options.attributes    = {VertexBuffer::PositionKindChars, "options",
+    options.attributes = {VertexBuffer::PositionKindChars, "options",
                           "cellInfo", VertexBuffer::ColorKindChars};
     options.uniformsNames = {"view",      "projection", "textureInfos",
                              "alphaTest", "vFogInfos",  "vFogColor"};
-    options.samplers      = {"diffuseSampler"};
-    options.defines       = "#define FOG";
+    options.samplers = {"diffuseSampler"};
+    options.defines  = "#define FOG";
 
     _effectFog = _scene->getEngine()->createEffect("sprites", options,
                                                    _scene->getEngine());
@@ -119,8 +119,7 @@ SpriteManager::~SpriteManager()
 {
 }
 
-void SpriteManager::addToScene(
-  std::unique_ptr<SpriteManager>&& newSpriteManager)
+void SpriteManager::addToScene(unique_ptr_t<SpriteManager>&& newSpriteManager)
 {
   _scene->spriteManagers.emplace_back(::std::move(newSpriteManager));
 }
@@ -346,11 +345,11 @@ void SpriteManager::dispose(bool /*doNotRecurse*/)
 
   // Remove from scene
   _scene->spriteManagers.erase(
-    ::std::remove_if(
-      _scene->spriteManagers.begin(), _scene->spriteManagers.end(),
-      [this](const std::unique_ptr<SpriteManager>& spriteManager) {
-        return spriteManager.get() == this;
-      }),
+    ::std::remove_if(_scene->spriteManagers.begin(),
+                     _scene->spriteManagers.end(),
+                     [this](const unique_ptr_t<SpriteManager>& spriteManager) {
+                       return spriteManager.get() == this;
+                     }),
     _scene->spriteManagers.end());
 
   // Callback

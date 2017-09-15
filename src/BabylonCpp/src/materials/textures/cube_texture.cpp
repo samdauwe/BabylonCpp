@@ -11,7 +11,7 @@
 
 namespace BABYLON {
 
-std::unique_ptr<CubeTexture>
+unique_ptr_t<CubeTexture>
 CubeTexture::CreateFromImages(const vector_t<string_t>& iFiles, Scene* scene,
                               bool noMipmap)
 {
@@ -20,7 +20,7 @@ CubeTexture::CreateFromImages(const vector_t<string_t>& iFiles, Scene* scene,
                                          iFiles);
 }
 
-std::unique_ptr<CubeTexture>
+unique_ptr_t<CubeTexture>
 CreateFromPrefilteredData(const string_t& url, Scene* scene,
                           const string_t& forcedExtension)
 {
@@ -139,9 +139,9 @@ void CubeTexture::setReflectionTextureMatrix(const Matrix& value)
   _textureMatrix = ::std::make_unique<Matrix>(value);
 }
 
-std::unique_ptr<CubeTexture>
-CubeTexture::Parse(const Json::value& parsedTexture, Scene* scene,
-                   const string_t& rootUrl)
+unique_ptr_t<CubeTexture> CubeTexture::Parse(const Json::value& parsedTexture,
+                                             Scene* scene,
+                                             const string_t& rootUrl)
 {
 
   auto cubeTexture = ::std::make_unique<CubeTexture>(
@@ -159,7 +159,7 @@ CubeTexture::Parse(const Json::value& parsedTexture, Scene* scene,
   return cubeTexture;
 }
 
-std::unique_ptr<CubeTexture> CubeTexture::clone() const
+unique_ptr_t<CubeTexture> CubeTexture::clone() const
 {
   auto newTexture = ::std::make_unique<CubeTexture>(
     url, getScene(), _extensions, _noMipmap, _files);

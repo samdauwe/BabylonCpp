@@ -696,7 +696,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     ImageProcessingConfiguration::PrepareUniforms(uniforms, defines);
     ImageProcessingConfiguration::PrepareSamplers(samplers, defines);
 
-    std::unordered_map<string_t, unsigned int> indexParameters{
+    unordered_map_t<string_t, unsigned int> indexParameters{
       {"maxSimultaneousLights", _maxSimultaneousLights},
       {"maxSimultaneousMorphTargets", defines.NUM_MORPH_INFLUENCERS}};
 
@@ -1043,9 +1043,10 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     // Colors
     scene->ambientColor.multiplyToRef(ambientColor, _globalAmbientColor);
 
-    effect->setVector3("vEyePosition", scene->_mirroredCameraPosition ?
-                                         *scene->_mirroredCameraPosition :
-                                         scene->activeCamera->globalPosition());
+    effect->setVector3("vEyePosition",
+                       scene->_mirroredCameraPosition ?
+                         *scene->_mirroredCameraPosition :
+                         scene->activeCamera->globalPosition());
     effect->setColor3("vAmbientColor", _globalAmbientColor);
   }
 

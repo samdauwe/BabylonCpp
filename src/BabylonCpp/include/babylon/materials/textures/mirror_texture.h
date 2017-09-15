@@ -29,7 +29,7 @@ public:
   void setBlurKernelY(float value);
   float blurKernelY() const;
 
-  std::unique_ptr<MirrorTexture> clone() const;
+  unique_ptr_t<MirrorTexture> clone() const;
   Json::object serialize() const;
 
 private:
@@ -43,8 +43,8 @@ private:
   Matrix _mirrorMatrix;
   Matrix _savedViewMatrix;
 
-  std::unique_ptr<BlurPostProcess> _blurX;
-  std::unique_ptr<BlurPostProcess> _blurY;
+  unique_ptr_t<BlurPostProcess> _blurX;
+  unique_ptr_t<BlurPostProcess> _blurY;
   float _blurKernelX;
   float _blurKernelY;
   float _blurRatio;

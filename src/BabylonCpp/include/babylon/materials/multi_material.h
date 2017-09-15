@@ -14,7 +14,7 @@ public:
   {
     auto material = new MultiMaterial(::std::forward<Ts>(args)...);
     material->addMultiMaterialToScene(
-      static_cast<std::unique_ptr<MultiMaterial>>(material));
+      static_cast<unique_ptr_t<MultiMaterial>>(material));
 
     return material;
   }

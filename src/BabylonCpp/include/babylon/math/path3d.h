@@ -30,7 +30,7 @@ public:
   Path3D& operator=(Path3D&& otherPath);
   ~Path3D();
   Path3D copy() const;
-  std::unique_ptr<Path3D> clone() const;
+  unique_ptr_t<Path3D> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Path3D& path);
 
   /**

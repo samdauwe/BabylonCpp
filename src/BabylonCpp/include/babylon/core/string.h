@@ -84,7 +84,7 @@ inline void charCodeToString(std::ostream& o, const T& t0, const Ts&... ts)
  */
 inline string_t escape(char character)
 {
-  static const std::unordered_map<char, string_t> escapedSpecialCharacters
+  static const unordered_map_t<char, string_t> escapedSpecialCharacters
     = {{'.', "\\."}, {'|', "\\|"}, {'*', "\\*"}, {'?', "\\?"},  {'+', "\\+"},
        {'(', "\\("}, {')', "\\)"}, {'{', "\\{"}, {'}', "\\}"},  {'[', "\\["},
        {']', "\\]"}, {'^', "\\^"}, {'$', "\\$"}, {'\\', "\\\\"}};
@@ -193,9 +193,9 @@ inline int indexOf(const string_t& src, const string_t& searchvalue,
 template <typename T>
 inline bool isDigit(T x)
 {
-  ::string_t s;
+  string_t s;
   ::std::regex e("^-?\\d+", ::std::regex::optimize);
-  ::string_tstream ss;
+  ::std::stringstream ss;
   ss << x;
   ss >> s;
   if (::std::regex_match(s, e)) {
@@ -269,8 +269,7 @@ inline char nthChar(const char (&arr)[N], unsigned i)
  * width.
  */
 template <typename T>
-void pad(std::basic_string<T>& s, typename std::basic_string<T>::size_type n,
-         T c)
+void pad(basic_string_t<T>& s, typename basic_string_t<T>::size_type n, T c)
 {
   if (n > s.length()) {
     s.append(n - s.length(), c);
@@ -284,7 +283,7 @@ template <typename... Args>
 inline string_t printf(const string_t& format, Args... args)
 {
   size_t size = snprintf(nullptr, 0, format.c_str(), args...) + 1;
-  std::unique_ptr<char[]> buf(new char[size]);
+  unique_ptr_t<char[]> buf(new char[size]);
   snprintf(buf.get(), size, format.c_str(), args...);
   return string_t(buf.get(), buf.get() + size - 1);
 }
@@ -353,11 +352,11 @@ inline vector_t<T> regexMatch(const T& s, const ::std::regex& re)
 }
 
 template <class BidirIt, class Traits, class CharT, class UnaryFunction>
-std::basic_string<CharT> inline regexReplace(
+basic_string_t<CharT> inline regexReplace(
   BidirIt first, BidirIt last, const ::std::basic_regex<CharT, Traits>& re,
   UnaryFunction f)
 {
-  std::basic_string<CharT> s;
+  basic_string_t<CharT> s;
 
   typename ::std::match_results<BidirIt>::difference_type positionOfLastMatch
     = 0;
@@ -519,7 +518,7 @@ template <typename T>
 inline T toNumber(const string_t& str)
 {
   T value;
-  ::string_tstream ss(str);
+  ::std::stringstream ss(str);
   ss >> value;
   return value;
 }
@@ -532,7 +531,7 @@ inline T toNumber(const string_t& str)
 template <typename T>
 inline string_t toString(const T& number)
 {
-  ::string_tstream ss;
+  ::std::stringstream ss;
   ss << number;
   return ss.str();
 }

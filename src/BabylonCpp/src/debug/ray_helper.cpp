@@ -7,8 +7,8 @@
 
 namespace BABYLON {
 
-std::unique_ptr<RayHelper>
-RayHelper::CreateAndShow(const Ray& ray, Scene* scene, const Color3& color)
+unique_ptr_t<RayHelper> RayHelper::CreateAndShow(const Ray& ray, Scene* scene,
+                                                 const Color3& color)
 {
   auto helper = ::std::make_unique<RayHelper>(ray);
 

@@ -121,7 +121,7 @@ void Layer::render()
   currentEffect->setVector2("scale", scale);
 
   // VBOs
-  std::unordered_map<string_t, VertexBuffer*> vertexBuffersTmp;
+  unordered_map_t<string_t, VertexBuffer*> vertexBuffersTmp;
   for (auto& item : _vertexBuffers) {
     vertexBuffersTmp[item.first] = item.second.get();
   }

@@ -60,7 +60,7 @@ Matrix Matrix::copy() const
   return Matrix(*this);
 }
 
-std::unique_ptr<Matrix> Matrix::clone() const
+unique_ptr_t<Matrix> Matrix::clone() const
 {
   return ::std::make_unique<Matrix>(*this);
 }
