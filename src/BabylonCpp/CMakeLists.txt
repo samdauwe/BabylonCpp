@@ -90,6 +90,7 @@ file(GLOB CAMERAS_HDR_FILES         ${INCLUDE_PATH}/cameras/*.h
 file(GLOB COLLISIONS_HDR_FILES      ${INCLUDE_PATH}/collisions/*.h)
 file(GLOB COMMON_HDR_FILES          ${INCLUDE_PATH}/*.h)
 file(GLOB CORE_HDR_FILES            ${INCLUDE_PATH}/core/*.h
+                                    ${INCLUDE_PATH}/core/delegates/*.h
                                     ${INCLUDE_PATH}/core/filesystem/filesystem_common.h
                                     ${INCLUDE_PATH}/core/logging/*.h)
 file(GLOB CULLING_HDR_FILES         ${INCLUDE_PATH}/culling/*.h
@@ -423,13 +424,21 @@ target_link_libraries(gmock-dev
     gmock
 )
 
-# Target 'test'
+# Target 'tests'
 add_custom_target(BabylonCppUnitTests)
 set_target_properties(BabylonCppUnitTests
-    PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 0)
+    PROPERTIES TEST_EXCLUDE_FROM_DEFAULT_BUILD 0)
 
 # Tests
 add_test_without_ctest(tests)
+
+# Target 'benchmarks'
+add_custom_target(BabylonCppBenchmarks)
+set_target_properties(BabylonCppBenchmarks
+    PROPERTIES TEST_EXCLUDE_FROM_DEFAULT_BUILD 1)
+
+# Benchmarks
+add_test_without_ctest(benchmarks)
 
 endif(OPTION_BUILD_TESTS AND EXISTS ${TESTS_PATH})
 

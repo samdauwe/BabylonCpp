@@ -77,6 +77,9 @@
 // Utilities library
 #include <utility>
 
+// Function objects
+#include <babylon/core/delegates/delegate.h>
+
 namespace BABYLON {
 
 // -- Type support -- //
@@ -211,6 +214,12 @@ using nullptr_t = ::std::nullptr_t;
 
 template <class T1, class T2>
 using pair_t = ::std::pair<T1, T2>;
+
+// Function objects
+template <typename T>
+using delegate_t = SA::delegate<T>;
+template <typename T>
+using multicast_delegate_t = SA::multicast_delegate<T>;
 
 } // end of namespace BABYLON
 

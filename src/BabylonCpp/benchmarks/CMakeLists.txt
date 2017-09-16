@@ -3,8 +3,8 @@
 # ============================================================================ #
 
 # Target name
-set(TARGET BabylonCppTests)
-message(STATUS "Tests ${TARGET}")
+set(TARGET BabylonCppBenchmarks_)
+message(STATUS "Benchmarks ${TARGET}")
 
 # ============================================================================ #
 #                            Sources                                           #
@@ -67,7 +67,7 @@ get_target_property(TEST_EXCLUDE_FROM_DEFAULT_BUILD
     BabylonCppTests EXCLUDE_FROM_DEFAULT_BUILD
 )
 
-if(NOT TEST_EXCLUDE_FROM_DEFAULT_BUILD)
+if(EXCLUDE_FROM_DEFAULT_BUILD)
     add_custom_command (
       TARGET ${TARGET} POST_BUILD
       COMMAND ${TARGET} --gtest_output=xml:${TARGET}.xml

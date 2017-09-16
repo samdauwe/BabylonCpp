@@ -3,7 +3,6 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/core/active.h>
-#include <babylon/core/delegate.h>
 #include <babylon/core/logging/log_levels.h>
 #include <babylon/core/logging/log_message.h>
 
@@ -22,7 +21,7 @@
 namespace BABYLON {
 
 struct LogMessageHandler {
-  using LogMessageListener = delegate<void(const LogMessage&)>;
+  using LogMessageListener = delegate_t<void(const LogMessage&)>;
 
   LogMessageHandler();
   ~LogMessageHandler()                        = default;
@@ -41,7 +40,7 @@ struct LogMessageHandler {
 class BABYLON_SHARED_EXPORT Logger {
 
 public:
-  using LogMessageListener = delegate<void(const LogMessage&)>;
+  using LogMessageListener = delegate_t<void(const LogMessage&)>;
 
 public:
   static Logger& Instance()
