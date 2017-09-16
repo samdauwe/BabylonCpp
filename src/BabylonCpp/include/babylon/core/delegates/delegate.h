@@ -42,6 +42,10 @@ public:
   {
     return (ptr != nullptr) || (!this->isNull());
   } // operator !=
+  operator bool() const
+  {
+    return !this->isNull();
+  } // operator bool()
 
   delegate(const delegate& another)
   {
@@ -67,6 +71,12 @@ public:
     assign(const_cast<LAMBDA*>(&instance), lambda_stub<LAMBDA>);
     return *this;
   } // operator =
+
+  void reset()
+  {
+    invocation.object = nullptr;
+    invocation.stub   = nullptr;
+  } // reset
 
   bool operator==(const delegate& another) const
   {

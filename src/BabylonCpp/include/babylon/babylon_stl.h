@@ -221,6 +221,8 @@ using delegate_t = SA::delegate<T>;
 template <typename T>
 using multicast_delegate_t = SA::multicast_delegate<T>;
 
+const delegate_t<void()> nullptr_void_deletegate_t;
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_STL_H
