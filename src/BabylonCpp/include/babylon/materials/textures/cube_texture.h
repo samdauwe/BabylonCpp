@@ -10,13 +10,15 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT CubeTexture : public BaseTexture {
 
 public:
-  CubeTexture(const string_t& rootUrl, Scene* scene,
-              const vector_t<string_t>& extensions = {}, bool noMipmap = false,
-              const vector_t<string_t>& files        = {},
-              const ::std::function<void()>& onLoad  = nullptr,
-              const ::std::function<void()>& onError = nullptr,
-              unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA,
-              bool prefiltered = false, const string_t& forcedExtension = "");
+  CubeTexture(
+    const string_t& rootUrl, Scene* scene,
+    const vector_t<string_t>& extensions = {}, bool noMipmap = false,
+    const vector_t<string_t>& files = {},
+    const ::std::function<void(InternalTexture*, const EventState&)>& onLoad
+    = nullptr,
+    const ::std::function<void()>& onError = nullptr,
+    unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA,
+    bool prefiltered = false, const string_t& forcedExtension = "");
   ~CubeTexture();
 
   /** Methods **/

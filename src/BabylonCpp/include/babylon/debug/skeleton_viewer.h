@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/math/color3.h>
+#include <babylon/tools/event_state.h>
 
 namespace BABYLON {
 
@@ -40,7 +41,7 @@ private:
   vector_t<vector_t<Vector3>> _debugLines;
   LinesMesh* _debugMesh;
   bool _isEnabled;
-  ::std::function<void()> _renderFunction;
+  ::std::function<void(Scene*, const EventState&)> _renderFunction;
 
 }; // end of class SkeletonViewer
 

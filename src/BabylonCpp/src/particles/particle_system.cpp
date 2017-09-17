@@ -162,7 +162,8 @@ IReflect::Type ParticleSystem::type() const
   return IReflect::Type::PARTICLESYSTEM;
 }
 
-void ParticleSystem::setOnDispose(const FastFunc<void()>& callback)
+void ParticleSystem::setOnDispose(
+  const ::std::function<void(ParticleSystem*, const EventState&)>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);

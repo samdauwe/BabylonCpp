@@ -220,7 +220,9 @@ void SceneLoader::Append(const string_t& rootUrl, const string_t& sceneFilename,
     }
 
     if (SceneLoader::ShowLoadingScreen()) {
-      scene->executeWhenReady([&]() { scene->getEngine()->hideLoadingUI(); });
+      scene->executeWhenReady([&](Scene*, const EventState&) {
+        scene->getEngine()->hideLoadingUI();
+      });
     }
   };
 

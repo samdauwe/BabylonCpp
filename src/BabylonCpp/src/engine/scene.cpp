@@ -211,7 +211,8 @@ IReflect::Type Scene::type() const
 }
 
 // Events
-void Scene::setOnDispose(const ::std::function<void()>& callback)
+void Scene::setOnDispose(
+  const ::std::function<void(Scene* scene, const EventState& es)>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);
@@ -219,7 +220,8 @@ void Scene::setOnDispose(const ::std::function<void()>& callback)
   _onDisposeObserver = onDisposeObservable.add(callback);
 }
 
-void Scene::setBeforeRender(const ::std::function<void()>& callback)
+void Scene::setBeforeRender(
+  const ::std::function<void(Scene* scene, const EventState& es)>& callback)
 {
   if (_onBeforeRenderObserver) {
     onBeforeRenderObservable.remove(_onBeforeRenderObserver);
@@ -227,7 +229,8 @@ void Scene::setBeforeRender(const ::std::function<void()>& callback)
   _onBeforeRenderObserver = onBeforeRenderObservable.add(callback);
 }
 
-void Scene::setAfterRender(const ::std::function<void()>& callback)
+void Scene::setAfterRender(
+  const ::std::function<void(Scene* scene, const EventState& es)>& callback)
 {
   if (_onAfterRenderObserver) {
     onAfterRenderObservable.remove(_onAfterRenderObserver);
@@ -235,7 +238,8 @@ void Scene::setAfterRender(const ::std::function<void()>& callback)
   _onAfterRenderObserver = onAfterRenderObservable.add(callback);
 }
 
-void Scene::setBeforeCameraRender(const ::std::function<void()>& callback)
+void Scene::setBeforeCameraRender(
+  const ::std::function<void(Camera* camera, const EventState& es)>& callback)
 {
   if (_onBeforeCameraRenderObserver) {
     onBeforeCameraRenderObservable.remove(_onBeforeCameraRenderObserver);
@@ -244,7 +248,8 @@ void Scene::setBeforeCameraRender(const ::std::function<void()>& callback)
   _onBeforeCameraRenderObserver = onBeforeCameraRenderObservable.add(callback);
 }
 
-void Scene::setAfterCameraRender(const ::std::function<void()>& callback)
+void Scene::setAfterCameraRender(
+  const ::std::function<void(Camera* camera, const EventState& es)>& callback)
 {
   if (_onAfterCameraRenderObserver) {
     onAfterCameraRenderObservable.remove(_onAfterCameraRenderObserver);
@@ -1140,22 +1145,26 @@ void Scene::resetCachedMaterial()
   _cachedVisibility = 0.f;
 }
 
-void Scene::registerBeforeRender(const ::std::function<void()>& func)
+void Scene::registerBeforeRender(
+  const ::std::function<void(Scene* scene, const EventState& es)>& func)
 {
   onBeforeRenderObservable.add(func);
 }
 
-void Scene::unregisterBeforeRender(const ::std::function<void()>& func)
+void Scene::unregisterBeforeRender(
+  const ::std::function<void(Scene* scene, const EventState& es)>& func)
 {
   onBeforeRenderObservable.removeCallback(func);
 }
 
-void Scene::registerAfterRender(const ::std::function<void()>& func)
+void Scene::registerAfterRender(
+  const ::std::function<void(Scene* scene, const EventState& es)>& func)
 {
   onAfterRenderObservable.add(func);
 }
 
-void Scene::unregisterAfterRender(const ::std::function<void()>& func)
+void Scene::unregisterAfterRender(
+  const ::std::function<void(Scene* scene, const EventState& es)>& func)
 {
   onAfterRenderObservable.removeCallback(func);
 }
@@ -1176,7 +1185,8 @@ void Scene::getWaitingItemsCount()
 {
 }
 
-void Scene::executeWhenReady(const ::std::function<void()>& func)
+void Scene::executeWhenReady(
+  const ::std::function<void(Scene* scene, const EventState& es)>& func)
 {
   onReadyObservable.add(func);
 

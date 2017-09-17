@@ -2,7 +2,6 @@
 #define BABYLON_TOOLS_OBSERVABLE_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/fast_func.h>
 #include <babylon/tools/event_state.h>
 #include <babylon/tools/observer.h>
 
@@ -27,8 +26,9 @@ template <class T>
 class BABYLON_SHARED_EXPORT Observable {
 
 public:
-  using CallbackFunc = FastFunc<void(T* eventData, EventState eventState)>;
-  using SPtr         = shared_ptr_t<Observable<T>>;
+  using CallbackFunc
+    = ::std::function<void(T* eventData, const EventState& eventState)>;
+  using SPtr = shared_ptr_t<Observable<T>>;
 
   static EventState::UPtr _eventState;
 
@@ -73,6 +73,35 @@ public:
   }
 
   /**
+   * @brief Create a new Observer with the specified callback.
+   * @param callback the callback that will be executed for that
+   * Observer
+   * @param mask the mask used to filter observers
+   * @param insertFirst if true the callback will be inserted at the
+   * first position, hence executed before the others ones. If false (default
+   * behavior) the callback will be inserted at the last position, executed
+   * after all the others already present.
+   */
+  typename Observer<T>::Ptr add(CallbackFunc&& callback, int mask = -1,
+                                bool insertFirst = false)
+  {
+    if (callback == nullptr) {
+      return nullptr;
+    }
+
+    auto observer = std::make_shared<Observer<T>>(std::move(callback), mask);
+
+    if (insertFirst) {
+      _observers.insert(_observers.begin(), observer);
+    }
+    else {
+      _observers.emplace_back(observer);
+    }
+
+    return observer;
+  }
+
+  /**
    * @brief Remove an Observer from the Observable object.
    * @param observer the instance of the Observer to remove. If it doesn't
    * belong to this Observable, false will be returned.
@@ -101,7 +130,10 @@ public:
     auto it
       = ::std::remove_if(_observers.begin(), _observers.end(),
                          [callback](const typename Observer<T>::Ptr& obs) {
-                           return obs->callback == callback;
+                           auto ptr1
+                             = obs->callback.template target<CallbackFunc>();
+                           auto ptr2 = callback.template target<CallbackFunc>();
+                           return ptr1 < ptr2;
                          });
     if (it != _observers.end()) {
       _observers.erase(it);

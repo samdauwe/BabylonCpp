@@ -29,19 +29,19 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
   _noPreventDefault = noPreventDefault;
 
   if (!_pointerInput) {
-    _pointerInput = [this](const PointerInfo& p, const EventState& /*s*/) {
-      auto evt = p.pointerEvent;
+    _pointerInput = [this](PointerInfo* p, const EventState&) {
+      auto evt = p->pointerEvent;
 
       if (!touchEnabled && evt.pointerType == PointerType::TOUCH) {
         return;
       }
 
-      if (p.type != PointerEventTypes::POINTERMOVE
+      if (p->type != PointerEventTypes::POINTERMOVE
           && evt.button == MouseButtonType::UNDEFINED) {
         return;
       }
 
-      if (p.type == PointerEventTypes::POINTERDOWN) {
+      if (p->type == PointerEventTypes::POINTERDOWN) {
         if (evt.srcElement) {
           evt.srcElement->setPointerCapture(evt.pointerId);
         }
@@ -55,7 +55,7 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
           _canvas->focus();
         }
       }
-      else if (p.type == PointerEventTypes::POINTERUP) {
+      else if (p->type == PointerEventTypes::POINTERUP) {
         if (evt.srcElement) {
           evt.srcElement->releasePointerCapture(evt.pointerId);
         }
@@ -66,7 +66,7 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
         }
       }
 
-      else if (p.type == PointerEventTypes::POINTERMOVE) {
+      else if (p->type == PointerEventTypes::POINTERMOVE) {
         if (!_previousPositionDefined && !_engine->isPointerLock) {
           return;
         }
@@ -119,8 +119,9 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
   };
 
   _observer = camera->getScene()->onPointerObservable.add(
-    _pointerInput, PointerEventTypes::POINTERDOWN | PointerEventTypes::POINTERUP
-                     | PointerEventTypes::POINTERMOVE);
+    _pointerInput,
+    PointerEventTypes::POINTERDOWN | PointerEventTypes::POINTERUP
+      | PointerEventTypes::POINTERMOVE);
 }
 
 void FreeCameraMouseInput::detachControl(ICanvas* canvas)

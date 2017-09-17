@@ -649,8 +649,9 @@ unique_ptr_t<Texture> TextureTools::CreateResizedCopy(Texture* texture,
                       TextureConstants::NEAREST_SAMPLINGMODE,
     engine, false, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   passPostProcess->getEffect()->executeWhenCompiled([&](Effect* /*effect*/) {
-    passPostProcess->setOnApply(
-      [&](Effect* effect) { effect->setTexture("textureSampler", texture); });
+    passPostProcess->setOnApply([&](Effect* effect, const EventState&) {
+      effect->setTexture("textureSampler", texture);
+    });
 
     scene->postProcessManager->directRender({passPostProcess.get()},
                                             rtt->getInternalTexture());

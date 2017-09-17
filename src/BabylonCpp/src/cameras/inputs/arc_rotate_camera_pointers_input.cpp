@@ -37,15 +37,15 @@ void ArcRotateCameraPointersInput::attachControl(ICanvas* canvas,
   _noPreventDefault      = noPreventDefault;
   _previousPinchDistance = 0.f;
 
-  _pointerInput = [this](const PointerInfo& p, const EventState& /*s*/) {
-    auto evt = p.pointerEvent;
+  _pointerInput = [this](PointerInfo* p, const EventState&) {
+    auto evt = p->pointerEvent;
 
-    if (p.type != PointerEventTypes::POINTERMOVE
+    if (p->type != PointerEventTypes::POINTERMOVE
         && evt.button == MouseButtonType::UNDEFINED) {
       return;
     }
 
-    if (p.type == PointerEventTypes::POINTERDOWN) {
+    if (p->type == PointerEventTypes::POINTERDOWN) {
       if (evt.srcElement) {
         evt.srcElement->setPointerCapture(evt.pointerId);
       }
@@ -73,7 +73,7 @@ void ArcRotateCameraPointersInput::attachControl(ICanvas* canvas,
         _canvas->focus();
       }
     }
-    else if (p.type == PointerEventTypes::POINTERUP) {
+    else if (p->type == PointerEventTypes::POINTERUP) {
       if (evt.srcElement) {
         evt.srcElement->releasePointerCapture(evt.pointerId);
       }
@@ -95,7 +95,7 @@ void ArcRotateCameraPointersInput::attachControl(ICanvas* canvas,
         evt.preventDefault();
       }
     }
-    else if (p.type == PointerEventTypes::POINTERMOVE) {
+    else if (p->type == PointerEventTypes::POINTERMOVE) {
       if (!_noPreventDefault) {
         evt.preventDefault();
       }
@@ -159,7 +159,7 @@ void ArcRotateCameraPointersInput::attachControl(ICanvas* canvas,
     PointerEventTypes::POINTERDOWN | PointerEventTypes::POINTERUP
       | PointerEventTypes::POINTERMOVE);
 
-  _onContextMenu = [](PointerEvent& evt) { evt.preventDefault(); };
+  _onContextMenu = [](PointerEvent&& evt) { evt.preventDefault(); };
 
   if (!camera->_useCtrlForPanning) {
     canvas->addMouseEventListener(EventType::CONTEXT_MENU, _onContextMenu,

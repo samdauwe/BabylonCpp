@@ -2,7 +2,6 @@
 #define BABYLON_TOOLS_OBSERVER_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/fast_func.h>
 #include <babylon/tools/event_state.h>
 
 namespace BABYLON {
@@ -14,8 +13,9 @@ template <class T>
 class BABYLON_SHARED_EXPORT Observer {
 
 public:
-  using CallbackFunc = FastFunc<void(T* eventData, EventState eventState)>;
-  using Ptr          = shared_ptr_t<Observer<T>>;
+  using CallbackFunc
+    = ::std::function<void(T* eventData, const EventState& eventState)>;
+  using Ptr = shared_ptr_t<Observer<T>>;
 
 public:
   Observer() : callback{nullptr}, mask{-1}

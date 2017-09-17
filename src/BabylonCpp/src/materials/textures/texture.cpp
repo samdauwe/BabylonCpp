@@ -39,7 +39,7 @@ Texture::Texture(const string_t& _url, Scene* scene, bool noMipmap,
 {
   name = _url;
 
-  _load = [this]() {
+  _load = [this](InternalTexture*, const EventState&) {
     auto onLoadObservable = *_onLoadObservable;
     if (onLoadObservable.hasObservers()) {
       onLoadObservable.notifyObservers(this);
@@ -79,7 +79,7 @@ Texture::Texture(const string_t& _url, Scene* scene, bool noMipmap,
   }
   else {
     if (_texture->isReady) {
-      Tools::SetImmediate([this]() { _load(); });
+      Tools::SetImmediate([this]() { _load(nullptr, EventState(-1)); });
     }
     else {
       _texture->onLoadedObservable.add(_load);
@@ -147,7 +147,8 @@ void Texture::delayLoad()
   }
   else {
     if (_texture->isReady) {
-      Tools::SetImmediate([this]() { _delayedOnLoad(); });
+      Tools::SetImmediate(
+        [this]() { _delayedOnLoad(nullptr, EventState(-1)); });
     }
     else {
       _texture->onLoadedObservable.add(_delayedOnLoad);

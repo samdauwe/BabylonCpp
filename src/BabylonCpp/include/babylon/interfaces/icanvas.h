@@ -2,7 +2,6 @@
 #define BABYLON_INTERFACES_ICANVAS_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/fast_func.h>
 #include <babylon/core/structs.h>
 #include <babylon/engine/engine_options.h>
 #include <babylon/interfaces/igl_rendering_context.h>
@@ -21,17 +20,17 @@ public:
   virtual GL::IGLRenderingContext* getContext3d(const EngineOptions& options)
     = 0;
   // Event listeners
-  void addMouseEventListener(EventType type,
-                             const FastFunc<void(PointerEvent&& evt)>& listener,
-                             bool useCapture = false);
+  void addMouseEventListener(
+    EventType type, const ::std::function<void(PointerEvent&& evt)>& listener,
+    bool useCapture = false);
   void addKeyEventListener(EventType type,
-                           const FastFunc<void(Event&& evt)>& listener,
+                           const ::std::function<void(Event&& evt)>& listener,
                            bool useCapture = false);
+  void removeMouseEventListener(
+    EventType type, const ::std::function<void(PointerEvent&& evt)>& listener);
   void
-  removeMouseEventListener(EventType type,
-                           const FastFunc<void(PointerEvent&& evt)>& listener);
-  void removeKeyEventListener(EventType type,
-                              const FastFunc<void(Event&& evt)>& listener);
+  removeKeyEventListener(EventType type,
+                         const ::std::function<void(Event&& evt)>& listener);
 
   void setFrameSize(int width, int height);
   void onError(int errorId, const char* errorDesc);
@@ -62,8 +61,9 @@ public:
 
 protected:
   unique_ptr_t<GL::IGLRenderingContext> _renderingContext;
-  vector_t<vector_t<FastFunc<void(PointerEvent&& evt)>>> mouseEventListeners;
-  vector_t<vector_t<FastFunc<void(Event&& evt)>>> keyEventListeners;
+  vector_t<vector_t<::std::function<void(PointerEvent&& evt)>>>
+    mouseEventListeners;
+  vector_t<vector_t<::std::function<void(Event&& evt)>>> keyEventListeners;
 
 protected:
   bool _initialized;

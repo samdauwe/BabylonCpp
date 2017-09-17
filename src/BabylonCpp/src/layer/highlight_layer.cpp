@@ -173,51 +173,57 @@ void HighlightLayer::createTextureAndPostProcesses()
   _downSamplePostprocess = ::std::make_unique<PassPostProcess>(
     "HighlightLayerPPP", _options.blurTextureSizeRatio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
-  _downSamplePostprocess->onApplyObservable.add([&](Effect* effect) {
-    effect->setTexture("textureSampler", _mainTexture.get());
-  });
+  _downSamplePostprocess->onApplyObservable.add(
+    [&](Effect* effect, const EventState&) {
+      effect->setTexture("textureSampler", _mainTexture.get());
+    });
 
   if (_options.alphaBlendingMode == EngineConstants::ALPHA_COMBINE) {
     _horizontalBlurPostprocess = ::std::make_unique<GlowBlurPostProcess>(
       "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize, 1,
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
-    _horizontalBlurPostprocess->onApplyObservable.add([&](Effect* effect) {
-      effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
-    });
+    _horizontalBlurPostprocess->onApplyObservable.add(
+      [&](Effect* effect, const EventState&) {
+        effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
+      });
 
     _verticalBlurPostprocess = ::std::make_unique<GlowBlurPostProcess>(
       "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize, 1,
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
-    _verticalBlurPostprocess->onApplyObservable.add([&](Effect* effect) {
-      effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
-    });
+    _verticalBlurPostprocess->onApplyObservable.add(
+      [&](Effect* effect, const EventState&) {
+        effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
+      });
   }
   else {
     _horizontalBlurPostprocess = ::std::make_unique<GlowBlurPostProcess>(
       "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize, 1,
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
-    _horizontalBlurPostprocess->onApplyObservable.add([&](Effect* effect) {
-      effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
-    });
+    _horizontalBlurPostprocess->onApplyObservable.add(
+      [&](Effect* effect, const EventState&) {
+        effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
+      });
 
     _verticalBlurPostprocess = ::std::make_unique<GlowBlurPostProcess>(
       "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize, 1,
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
-    _verticalBlurPostprocess->onApplyObservable.add([&](Effect* effect) {
-      effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
-    });
+    _verticalBlurPostprocess->onApplyObservable.add(
+      [&](Effect* effect, const EventState&) {
+        effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
+      });
   }
 
-  _mainTexture->onAfterUnbindObservable.add([this]() {
-    onBeforeBlurObservable.notifyObservers(this);
+  _mainTexture->onAfterUnbindObservable.add(
+    [this](RenderTargetTexture*, const EventState&) {
+      onBeforeBlurObservable.notifyObservers(this);
 
-    _scene->postProcessManager->directRender(
-      {_downSamplePostprocess.get(), _horizontalBlurPostprocess.get(),
-       _verticalBlurPostprocess.get()},
-      _blurTexture->getInternalTexture(), true);
+      _scene->postProcessManager->directRender(
+        {_downSamplePostprocess.get(), _horizontalBlurPostprocess.get(),
+         _verticalBlurPostprocess.get()},
+        _blurTexture->getInternalTexture(), true);
 
-    onAfterBlurObservable.notifyObservers(this);
-  });
+      onAfterBlurObservable.notifyObservers(this);
+    });
 
   _mainTexture->customRenderFunction
     = [this](const vector_t<SubMesh*>& opaqueSubMeshes,
@@ -238,9 +244,10 @@ void HighlightLayer::createTextureAndPostProcesses()
         }
       };
 
-  _mainTexture->onClearObservable.add([this](Engine* engine) {
-    engine->clear(HighlightLayer::neutralColor, true, true, true);
-  });
+  _mainTexture->onClearObservable.add(
+    [this](Engine* engine, const EventState&) {
+      engine->clear(HighlightLayer::neutralColor, true, true, true);
+    });
 }
 
 void HighlightLayer::renderSubMesh(SubMesh* subMesh)
@@ -523,11 +530,15 @@ void HighlightLayer::addExcludedMesh(Mesh* mesh)
 {
   if (!stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
     IHighlightLayerExcludedMesh meshExcluded;
-    meshExcluded.mesh         = mesh;
-    meshExcluded.beforeRender = mesh->onBeforeRenderObservable.add(
-      [](Mesh* mesh) { mesh->getEngine()->setStencilBuffer(false); });
-    meshExcluded.afterRender = mesh->onAfterRenderObservable.add(
-      [](Mesh* mesh) { mesh->getEngine()->setStencilBuffer(true); });
+    meshExcluded.mesh = mesh;
+    meshExcluded.beforeRender
+      = mesh->onBeforeRenderObservable.add([](Mesh* mesh, const EventState&) {
+          mesh->getEngine()->setStencilBuffer(false);
+        });
+    meshExcluded.afterRender
+      = mesh->onAfterRenderObservable.add([](Mesh* mesh, const EventState&) {
+          mesh->getEngine()->setStencilBuffer(true);
+        });
     _excludedMeshes[mesh->uniqueId] = meshExcluded;
   }
 }
@@ -554,7 +565,7 @@ void HighlightLayer::addMesh(Mesh* mesh, const Color3& color,
     newMesh.color = color;
     // Lambda required for capture due to Observable this context
     newMesh.observerHighlight
-      = mesh->onBeforeRenderObservable.add([&](Mesh* mesh) {
+      = mesh->onBeforeRenderObservable.add([&](Mesh* mesh, const EventState&) {
           if (stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
             defaultStencilReference(mesh);
           }
@@ -564,7 +575,7 @@ void HighlightLayer::addMesh(Mesh* mesh, const Color3& color,
           }
         });
     newMesh.observerDefault = mesh->onAfterRenderObservable.add(
-      [&](Mesh* mesh) { defaultStencilReference(mesh); });
+      [&](Mesh* mesh, const EventState&) { defaultStencilReference(mesh); });
     newMesh.glowEmissiveOnly = glowEmissiveOnly;
     _meshes[mesh->uniqueId]  = newMesh;
   }

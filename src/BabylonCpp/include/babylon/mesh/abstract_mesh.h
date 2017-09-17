@@ -97,8 +97,10 @@ public:
   bool isFacetDataEnabled() const;
 
   // Events
-  void setOnCollide(const ::std::function<void()>& callback);
-  void setOnCollisionPositionChange(const ::std::function<void()>& callback);
+  void setOnCollide(
+    const ::std::function<void(AbstractMesh*, const EventState&)>& callback);
+  void setOnCollisionPositionChange(
+    const ::std::function<void(Vector3*, const EventState&)>& callback);
 
   // Properties
   Material* material();
@@ -601,14 +603,14 @@ public:
    * @returns The AbstractMesh.
    */
   AbstractMesh& registerAfterWorldMatrixUpdate(
-    const ::std::function<void(AbstractMesh* mesh)>& func);
+    const ::std::function<void(AbstractMesh* mesh, const EventState&)>& func);
 
   /**
    * @brief Removes a registered callback function.
    * @returns The AbstractMesh.
    */
   AbstractMesh& unregisterAfterWorldMatrixUpdate(
-    const ::std::function<void(AbstractMesh* mesh)>& func);
+    const ::std::function<void(AbstractMesh* mesh, const EventState&)>& func);
 
   /**
    * @brief Sets the mesh position in its local space.

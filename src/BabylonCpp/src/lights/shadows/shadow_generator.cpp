@@ -368,7 +368,9 @@ void ShadowGenerator::_initializeShadowMap()
 
   // Record Face Index before render.
   _shadowMap->onBeforeRenderObservable.add(
-    [this](unsigned int faceIndex) { _currentFaceIndex = faceIndex; });
+    [this](int* faceIndex, const EventState&) {
+      _currentFaceIndex = static_cast<unsigned int>(*faceIndex);
+    });
 
   // Custom render function.
   _shadowMap->customRenderFunction
@@ -380,7 +382,8 @@ void ShadowGenerator::_initializeShadowMap()
       };
 
   // Blur if required afer render.
-  _shadowMap->onAfterUnbindObservable.add([this]() {
+  _shadowMap->onAfterUnbindObservable.add([this](RenderTargetTexture*,
+                                                 const EventState&) {
     if (!useBlurExponentialShadowMap() && !useBlurCloseExponentialShadowMap()) {
       return;
     }
@@ -394,7 +397,7 @@ void ShadowGenerator::_initializeShadowMap()
   });
 
   // Clear according to the chosen filter.
-  _shadowMap->onClearObservable.add([this](Engine* engine) {
+  _shadowMap->onClearObservable.add([this](Engine* engine, const EventState&) {
     if (useExponentialShadowMap() || useBlurExponentialShadowMap()) {
       engine->clear(Color4(0.f, 0.f, 0.f, 0.f), true, true, true);
     }
@@ -425,9 +428,10 @@ void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
       _textureType);
     _kernelBlurXPostprocess->width  = targetSize;
     _kernelBlurXPostprocess->height = targetSize;
-    _kernelBlurXPostprocess->onApplyObservable.add([this](Effect* effect) {
-      effect->setTexture("textureSampler", _shadowMap.get());
-    });
+    _kernelBlurXPostprocess->onApplyObservable.add(
+      [this](Effect* effect, const EventState&) {
+        effect->setTexture("textureSampler", _shadowMap.get());
+      });
 
     _kernelBlurYPostprocess = ::std::make_unique<BlurPostProcess>(
       _light->name + "KernelBlurY", Vector2(0.f, 1.f), blurKernel(), 1.f,

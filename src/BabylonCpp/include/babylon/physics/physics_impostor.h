@@ -2,7 +2,6 @@
 #define BABYLON_PHYSICS_PHYSICS_IMPOSTER_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/fast_func.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/quaternion.h>
 #include <babylon/math/vector3.h>
@@ -109,26 +108,26 @@ public:
    * physics body object.
    */
   void executeNativeFunction(
-    const FastFunc<void(Mesh* world, IPhysicsBody* physicsBody)>& func);
+    const ::std::function<void(Mesh* world, IPhysicsBody* physicsBody)>& func);
 
   /**
    * Register a function that will be executed before the physics world is
    * stepping forward.
    */
   void registerBeforePhysicsStep(
-    const FastFunc<void(PhysicsImpostor* impostor)>& func);
+    const ::std::function<void(PhysicsImpostor* impostor)>& func);
 
   void unregisterBeforePhysicsStep(
-    const FastFunc<void(PhysicsImpostor* impostor)>& func);
+    const ::std::function<void(PhysicsImpostor* impostor)>& func);
 
   /**
    * Register a function that will be executed after the physics step
    */
   void registerAfterPhysicsStep(
-    const FastFunc<void(PhysicsImpostor* impostor)>& func);
+    const ::std::function<void(PhysicsImpostor* impostor)>& func);
 
   void unregisterAfterPhysicsStep(
-    const FastFunc<void(PhysicsImpostor* impostor)>& func);
+    const ::std::function<void(PhysicsImpostor* impostor)>& func);
 
   /**
    * register a function that will be executed when this impostor collides
@@ -206,9 +205,9 @@ private:
   // The native cannon/oimo/energy physics body object.
   IPhysicsBody* _physicsBody;
   bool _bodyUpdateRequired;
-  vector_t<FastFunc<void(PhysicsImpostor* impostor)>>
+  vector_t<::std::function<void(PhysicsImpostor* impostor)>>
     _onBeforePhysicsStepCallbacks;
-  vector_t<FastFunc<void(PhysicsImpostor* imposter)>>
+  vector_t<::std::function<void(PhysicsImpostor* imposter)>>
     _onAfterPhysicsStepCallbacks;
   Vector3 _deltaPosition;
   unique_ptr_t<Quaternion> _deltaRotation;

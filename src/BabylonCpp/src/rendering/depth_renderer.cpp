@@ -41,7 +41,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type)
   _depthMap->renderList.clear();
 
   // set default depth value to 1.0 (far away)
-  _depthMap->onClearObservable.add([](Engine* _engine) {
+  _depthMap->onClearObservable.add([](Engine* _engine, const EventState&) {
     _engine->clear(Color4(1.f, 1.f, 1.f, 1.f), true, true);
   });
 

@@ -79,20 +79,27 @@ public:
   /**
    * @brief A function to be executed when this scene is disposed.
    */
-  void setOnDispose(const ::std::function<void()>& callback);
+  void setOnDispose(
+    const ::std::function<void(Scene* scene, const EventState& es)>& callback);
 
   /**
    * @brief A function to be executed before rendering this scene.
    */
-  void setBeforeRender(const ::std::function<void()>& callback);
+  void setBeforeRender(
+    const ::std::function<void(Scene* scene, const EventState& es)>& callback);
 
   /**
    * @brief A function to be executed after rendering this scene.
    */
-  void setAfterRender(const ::std::function<void()>& callback);
+  void setAfterRender(
+    const ::std::function<void(Scene* scene, const EventState& es)>& callback);
 
-  void setBeforeCameraRender(const ::std::function<void()>& callback);
-  void setAfterCameraRender(const ::std::function<void()>& callback);
+  void setBeforeCameraRender(
+    const ::std::function<void(Camera* camera, const EventState& es)>&
+      callback);
+  void setAfterCameraRender(
+    const ::std::function<void(Camera* camera, const EventState& es)>&
+      callback);
 
   // Pointers
   Vector2 unTranslatedPointer() const;
@@ -237,10 +244,14 @@ public:
   /** Ready **/
   bool isReady();
   void resetCachedMaterial();
-  void registerBeforeRender(const ::std::function<void()>& func);
-  void unregisterBeforeRender(const ::std::function<void()>& func);
-  void registerAfterRender(const ::std::function<void()>& func);
-  void unregisterAfterRender(const ::std::function<void()>& func);
+  void registerBeforeRender(
+    const ::std::function<void(Scene* scene, const EventState& es)>& func);
+  void unregisterBeforeRender(
+    const ::std::function<void(Scene* scene, const EventState& es)>& func);
+  void registerAfterRender(
+    const ::std::function<void(Scene* scene, const EventState& es)>& func);
+  void unregisterAfterRender(
+    const ::std::function<void(Scene* scene, const EventState& es)>& func);
   void _addPendingData(Mesh* mesh);
   void _addPendingData(InternalTexture* texure);
   void _removePendingData(InternalTexture* texture);
@@ -250,7 +261,8 @@ public:
    * @brief Registers a function to be executed when the scene is ready.
    * @param {Function} func - the function to be executed.
    */
-  void executeWhenReady(const ::std::function<void()>& func);
+  void executeWhenReady(
+    const ::std::function<void(Scene* scene, const EventState& es)>& func);
   void _checkIsReady();
 
   /** Animations **/

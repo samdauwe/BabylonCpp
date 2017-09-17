@@ -197,38 +197,52 @@ void PhysicsImpostor::setAngularVelocity(const Vector3& velocity)
 }
 
 void PhysicsImpostor::executeNativeFunction(
-  const FastFunc<void(Mesh* world, IPhysicsBody* physicsBody)>& func)
+  const ::std::function<void(Mesh* world, IPhysicsBody* physicsBody)>& func)
 {
   func(_physicsEngine->getPhysicsPlugin()->world, physicsBody());
 }
 
 void PhysicsImpostor::registerBeforePhysicsStep(
-  const FastFunc<void(PhysicsImpostor* impostor)>& func)
+  const ::std::function<void(PhysicsImpostor* impostor)>& func)
 {
   _onBeforePhysicsStepCallbacks.emplace_back(func);
 }
 
 void PhysicsImpostor::unregisterBeforePhysicsStep(
-  const FastFunc<void(PhysicsImpostor* impostor)>& func)
+  const ::std::function<void(PhysicsImpostor* impostor)>& func)
 {
+  using Function = ::std::function<void(PhysicsImpostor * impostor)>;
+
   _onBeforePhysicsStepCallbacks.erase(
-    ::std::remove(_onBeforePhysicsStepCallbacks.begin(),
-                  _onBeforePhysicsStepCallbacks.end(), func),
+    ::std::remove_if(_onBeforePhysicsStepCallbacks.begin(),
+                     _onBeforePhysicsStepCallbacks.end(),
+                     [&func](const Function& f) {
+                       auto ptr1 = func.template target<Function>();
+                       auto ptr2 = f.template target<Function>();
+                       return ptr1 < ptr2;
+                     }),
     _onBeforePhysicsStepCallbacks.end());
 }
 
 void PhysicsImpostor::registerAfterPhysicsStep(
-  const FastFunc<void(PhysicsImpostor* impostor)>& func)
+  const ::std::function<void(PhysicsImpostor* impostor)>& func)
 {
   _onAfterPhysicsStepCallbacks.emplace_back(func);
 }
 
 void PhysicsImpostor::unregisterAfterPhysicsStep(
-  const FastFunc<void(PhysicsImpostor* impostor)>& func)
+  const ::std::function<void(PhysicsImpostor* impostor)>& func)
 {
+  using Function = ::std::function<void(PhysicsImpostor * impostor)>;
+
   _onAfterPhysicsStepCallbacks.erase(
-    ::std::remove(_onAfterPhysicsStepCallbacks.begin(),
-                  _onAfterPhysicsStepCallbacks.end(), func),
+    ::std::remove_if(_onAfterPhysicsStepCallbacks.begin(),
+                     _onAfterPhysicsStepCallbacks.end(),
+                     [&func](const Function& f) {
+                       auto ptr1 = func.template target<Function>();
+                       auto ptr2 = f.template target<Function>();
+                       return ptr1 < ptr2;
+                     }),
     _onAfterPhysicsStepCallbacks.end());
 }
 

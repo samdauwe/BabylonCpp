@@ -23,7 +23,8 @@ ICanvas::~ICanvas()
 }
 
 void ICanvas::addMouseEventListener(
-  EventType /*type*/, const FastFunc<void(PointerEvent&& evt)>& /*listener*/,
+  EventType /*type*/,
+  const ::std::function<void(PointerEvent&& evt)>& /*listener*/,
   bool /*useCapture*/)
 {
 #if 0
@@ -36,7 +37,7 @@ void ICanvas::addMouseEventListener(
 }
 
 void ICanvas::addKeyEventListener(
-  EventType /*type*/, const FastFunc<void(Event&& evt)>& /*listener*/,
+  EventType /*type*/, const ::std::function<void(Event&& evt)>& /*listener*/,
   bool /*useCapture*/)
 {
 #if 0
@@ -49,7 +50,8 @@ void ICanvas::addKeyEventListener(
 }
 
 void ICanvas::removeMouseEventListener(
-  EventType /*type*/, const FastFunc<void(PointerEvent&& evt)>& /*listener*/)
+  EventType /*type*/,
+  const ::std::function<void(PointerEvent&& evt)>& /*listener*/)
 {
 #if 0
   auto& listeners = mouseEventListeners[static_cast<unsigned>(type)];
@@ -59,7 +61,7 @@ void ICanvas::removeMouseEventListener(
 }
 
 void ICanvas::removeKeyEventListener(
-  EventType /*type*/, const FastFunc<void(Event&& evt)>& /*listener*/)
+  EventType /*type*/, const ::std::function<void(Event&& evt)>& /*listener*/)
 {
 #if 0
   auto& listeners = keyEventListeners[static_cast<unsigned>(type)];

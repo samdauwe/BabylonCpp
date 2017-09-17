@@ -28,7 +28,7 @@ RayHelper::~RayHelper()
 void RayHelper::show(Scene* scene, const Color3& color)
 {
   if (!_renderFunction) {
-    _renderFunction = [this]() { _render(); };
+    _renderFunction = [this](Scene*, const EventState&) { _render(); };
     _scene          = scene;
     _renderPoints
       = {ray.origin, ray.origin.add(ray.direction.scale(ray.length))};
@@ -80,7 +80,8 @@ void RayHelper::attachToMesh(AbstractMesh* mesh,
   _meshSpaceOrigin    = meshSpaceOrigin;
 
   if (!_updateToMeshFunction) {
-    _updateToMeshFunction = [this]() { _updateToMesh(); };
+    _updateToMeshFunction
+      = [this](Scene*, const EventState&) { _updateToMesh(); };
     _attachedToMesh->getScene()->registerBeforeRender(_updateToMeshFunction);
   }
 

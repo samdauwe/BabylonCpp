@@ -212,9 +212,8 @@ void GeometryBufferRenderer::_createRenderTargets()
   options.generateMipMaps      = false;
   options.generateDepthTexture = true;
   _multiRenderTarget           = ::std::make_unique<MultiRenderTarget>(
-    "gBuffer",
-    Size{static_cast<int>(engine->getRenderWidth() * _ratio),
-         static_cast<int>(engine->getRenderHeight() * _ratio)},
+    "gBuffer", Size{static_cast<int>(engine->getRenderWidth() * _ratio),
+                    static_cast<int>(engine->getRenderHeight() * _ratio)},
     count, _scene, options);
   if (!isSupported()) {
     return;
@@ -227,9 +226,10 @@ void GeometryBufferRenderer::_createRenderTargets()
   _multiRenderTarget->renderList      = {};
 
   // set default depth value to 1.0 (far away)
-  _multiRenderTarget->onClearObservable.add([](Engine* engine) {
-    engine->clear(Color4(0.f, 0.f, 0.f, 1.f), true, true, true);
-  });
+  _multiRenderTarget->onClearObservable.add(
+    [](Engine* engine, const EventState&) {
+      engine->clear(Color4(0.f, 0.f, 0.f, 1.f), true, true, true);
+    });
 
   // Custom render function
   _multiRenderTarget->customRenderFunction

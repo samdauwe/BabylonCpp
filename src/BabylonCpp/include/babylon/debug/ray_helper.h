@@ -4,6 +4,7 @@
 #include <babylon/babylon_global.h>
 #include <babylon/culling/ray.h>
 #include <babylon/math/vector3.h>
+#include <babylon/tools/event_state.h>
 
 namespace BABYLON {
 
@@ -37,10 +38,10 @@ public:
 private:
   vector_t<Vector3> _renderPoints;
   LinesMesh* _renderLine;
-  ::std::function<void()> _renderFunction;
+  ::std::function<void(Scene*, const EventState&)> _renderFunction;
   Scene* _scene;
 
-  ::std::function<void()> _updateToMeshFunction;
+  ::std::function<void(Scene*, const EventState&)> _updateToMeshFunction;
   AbstractMesh* _attachedToMesh;
   Vector3 _meshSpaceDirection;
   Vector3 _meshSpaceOrigin;

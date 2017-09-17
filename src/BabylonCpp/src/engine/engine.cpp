@@ -579,13 +579,13 @@ void Engine::setDitheringState(bool value)
   }
 }
 
-void Engine::stopRenderLoop(const FastFunc<void()>& renderFunction)
+void Engine::stopRenderLoop()
 {
-  if (renderFunction == nullptr) {
-    _activeRenderLoops.clear();
-    return;
-  }
+  _activeRenderLoops.clear();
+}
 
+void Engine::stopRenderLoop(const delegate_t<void()>& renderFunction)
+{
   _activeRenderLoops.erase(::std::remove(_activeRenderLoops.begin(),
                                          _activeRenderLoops.end(),
                                          renderFunction),
@@ -623,7 +623,7 @@ void Engine::_renderLoop()
   }
 }
 
-void Engine::runRenderLoop(const FastFunc<void()>& renderFunction)
+void Engine::runRenderLoop(const ::std::function<void()>& renderFunction)
 {
   if (::std::find(_activeRenderLoops.begin(), _activeRenderLoops.end(),
                   renderFunction)
@@ -2075,12 +2075,11 @@ unique_ptr_t<GL::IGLTexture> Engine::_createTexture()
   return _gl->createTexture();
 }
 
-InternalTexture* Engine::createTexture(const vector_t<string_t>& list,
-                                       bool noMipmap, bool invertY,
-                                       Scene* scene, unsigned int samplingMode,
-                                       const ::std::function<void()>& onLoad,
-                                       const ::std::function<void()>& onError,
-                                       Buffer* buffer)
+InternalTexture* Engine::createTexture(
+  const vector_t<string_t>& list, bool noMipmap, bool invertY, Scene* scene,
+  unsigned int samplingMode,
+  const ::std::function<void(InternalTexture*, const EventState&)>& onLoad,
+  const ::std::function<void()>& onError, Buffer* buffer)
 {
   if (list.empty()) {
     return nullptr;
@@ -2093,7 +2092,7 @@ InternalTexture* Engine::createTexture(const vector_t<string_t>& list,
 InternalTexture* Engine::createTexture(
   const string_t& /*urlArg*/, bool /*noMipmap*/, bool /*invertY*/,
   Scene* /*scene*/, unsigned int /*samplingMode*/,
-  const ::std::function<void()>& /*onLoad*/,
+  const ::std::function<void(InternalTexture*, const EventState&)>& /*onLoad*/,
   const ::std::function<void()>& /*onError*/, Buffer* /*buffer*/,
   InternalTexture* /*fallBack*/, unsigned int /*format*/)
 {
@@ -2226,7 +2225,7 @@ void Engine::_rescaleTexture(InternalTexture* source,
 
   _rescalePostProcess->getEffect()->executeWhenCompiled(
     [&](Effect* /*effect*/) {
-      _rescalePostProcess->setOnApply([&](Effect* effect) {
+      _rescalePostProcess->setOnApply([&](Effect* effect, const EventState&) {
         effect->_bindTexture("textureSampler", source);
       });
 
@@ -2857,7 +2856,8 @@ Engine::createRenderTargetCubeTexture(const ISize& size,
 
 InternalTexture* Engine::createPrefilteredCubeTexture(
   const string_t& /*rootUrl*/, Scene* /*scene*/, float /*scale*/,
-  float /*offset*/, const ::std::function<void()>& /*onLoad*/,
+  float /*offset*/,
+  const ::std::function<void(InternalTexture*, const EventState&)>& /*onLoad*/,
   const ::std::function<void()>& /*onError*/, unsigned int /*format*/,
   const string_t& /*forcedExtension*/)
 {
@@ -2867,7 +2867,7 @@ InternalTexture* Engine::createPrefilteredCubeTexture(
 InternalTexture* Engine::createCubeTexture(
   const string_t& /*rootUrl*/, Scene* /*scene*/,
   const vector_t<string_t>& /*extensions*/, bool /*noMipmap*/,
-  const ::std::function<void()>& /*onLoad*/,
+  const ::std::function<void(InternalTexture*, const EventState&)>& /*onLoad*/,
   const ::std::function<void()>& /*onError*/, unsigned int /*format*/,
   const string_t& /*forcedExtension*/)
 {

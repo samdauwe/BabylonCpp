@@ -143,7 +143,8 @@ void CollisionCoordinatorWorker::getNewPosition(
 void CollisionCoordinatorWorker::init(Scene* scene)
 {
   _scene = scene;
-  _scene->registerAfterRender([this]() { _afterRender(); });
+  _scene->registerAfterRender(
+    [this](Scene*, const EventState&) { _afterRender(); });
 
   _worker.callbackHandler
     = [this](const WorkerReply e) { _onMessageFromWorker(e); };
@@ -156,14 +157,15 @@ void CollisionCoordinatorWorker::init(Scene* scene)
 
 void CollisionCoordinatorWorker::destroy()
 {
-  _scene->unregisterAfterRender([this]() { _afterRender(); });
+  _scene->unregisterAfterRender(
+    [this](Scene*, const EventState&) { _afterRender(); });
   _worker.terminate();
 }
 
 void CollisionCoordinatorWorker::onMeshAdded(AbstractMesh* mesh)
 {
   mesh->registerAfterWorldMatrixUpdate(
-    [this](AbstractMesh* mesh) { onMeshUpdated(mesh); });
+    [this](AbstractMesh* mesh, const EventState&) { onMeshUpdated(mesh); });
   onMeshUpdated(mesh);
 }
 
@@ -180,10 +182,8 @@ void CollisionCoordinatorWorker::onMeshRemoved(AbstractMesh* mesh)
 
 void CollisionCoordinatorWorker::onGeometryAdded(Geometry* geometry)
 {
-  geometry->onGeometryUpdated
-    = [this](Geometry* geometry, unsigned int /*kind*/) {
-        onGeometryUpdated(geometry);
-      };
+  geometry->onGeometryUpdated = [this](
+    Geometry* geometry, unsigned int /*kind*/) { onGeometryUpdated(geometry); };
   onGeometryUpdated(geometry);
 }
 

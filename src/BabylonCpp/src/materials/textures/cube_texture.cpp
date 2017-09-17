@@ -30,13 +30,12 @@ CreateFromPrefilteredData(const string_t& url, Scene* scene,
     EngineConstants::TEXTUREFORMAT_RGBA, true, forcedExtension);
 }
 
-CubeTexture::CubeTexture(const string_t& rootUrl, Scene* scene,
-                         const vector_t<string_t>& extensions, bool noMipmap,
-                         const vector_t<string_t>& iFiles,
-                         const ::std::function<void()>& onLoad,
-                         const ::std::function<void()>& onError,
-                         unsigned int format, bool prefiltered,
-                         const string_t& forcedExtension)
+CubeTexture::CubeTexture(
+  const string_t& rootUrl, Scene* scene, const vector_t<string_t>& extensions,
+  bool noMipmap, const vector_t<string_t>& iFiles,
+  const ::std::function<void(InternalTexture*, const EventState&)>& onLoad,
+  const ::std::function<void()>& onError, unsigned int format, bool prefiltered,
+  const string_t& forcedExtension)
     : BaseTexture{scene}
     , url{rootUrl}
     , coordinatesMode{TextureConstants::CUBIC_MODE}
@@ -93,7 +92,7 @@ CubeTexture::CubeTexture(const string_t& rootUrl, Scene* scene,
   }
   else if (onLoad) {
     if (_texture->isReady) {
-      Tools::SetImmediate([&onLoad]() { onLoad(); });
+      Tools::SetImmediate([&onLoad]() { onLoad(nullptr, EventState(-1)); });
     }
     else {
       _texture->onLoadedObservable.add(onLoad);

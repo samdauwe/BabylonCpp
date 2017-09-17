@@ -18,7 +18,7 @@ struct ArcRotateCameraPointer {
 }; // end of struct ArcRotateCameraPointer
 
 class BABYLON_SHARED_EXPORT ArcRotateCameraPointersInput
-    : public ICameraInput<ArcRotateCamera> {
+  : public ICameraInput<ArcRotateCamera> {
 
 public:
   ArcRotateCameraPointersInput();
@@ -43,15 +43,14 @@ private:
   Engine* _engine;
   bool _noPreventDefault;
   bool _isPanClick;
-  ::std::function<void(const PointerInfo& p, const EventState& s)>
-    _pointerInput;
+  ::std::function<void(PointerInfo* p, const EventState& es)> _pointerInput;
   Observer<PointerInfo>::Ptr _observer;
   ::std::function<void(KeyboardEvent& e)> _onKeyDown;
   ::std::function<void(KeyboardEvent& e)> _onKeyUp;
   ::std::function<void(MouseEvent& e)> _onMouseMove;
   ::std::function<void(GestureEvent& e)> _onGesture;
   ::std::function<void(FocusEvent& e)> _onLostFocus;
-  ::std::function<void(PointerEvent& e)> _onContextMenu;
+  ::std::function<void(PointerEvent&& e)> _onContextMenu;
   // pointers
   ArcRotateCameraPointer _cacheSoloPointer;
   ArcRotateCameraPointer _pointA;

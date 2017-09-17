@@ -95,8 +95,8 @@ void MorphTargetManager::addTarget(unique_ptr_t<MorphTarget>&& target)
   }
 
   _targets.emplace_back(::std::move(target));
-  _targetObservable.emplace_back(_targets.back()->onInfluenceChanged.add(
-    [this](bool needUpdate) { _syncActiveTargets(needUpdate); }));
+  _targetObservable.emplace_back(_targets.back()->onInfluenceChanged.add([this](
+    bool needUpdate, const EventState&) { _syncActiveTargets(needUpdate); }));
   _syncActiveTargets(true);
 }
 

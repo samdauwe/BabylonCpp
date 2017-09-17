@@ -55,15 +55,15 @@ VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
   // Configure
   _createPass(scene, ratio);
 
-  setOnActivate([&](Camera* camera_) {
+  setOnActivate([&](Camera* iCamera, const EventState&) {
     if (!isSupported()) {
-      dispose(camera_);
+      dispose(iCamera);
     }
 
     setOnActivate(nullptr);
   });
 
-  onApplyObservable.add([&](Effect* effect) {
+  onApplyObservable.add([&](Effect* effect, const EventState&) {
     _updateMeshScreenCoordinates(scene);
 
     effect->setTexture("lightScatteringSampler", _volumetricLightScatteringRTT);
@@ -293,13 +293,14 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
   Color4 savedSceneClearColor;
   Color4 sceneClearColor(0.f, 0.f, 0.f, 1.f);
 
-  _volumetricLightScatteringRTT->onBeforeRenderObservable.add([&]() {
-    savedSceneClearColor = scene->clearColor;
-    scene->clearColor    = sceneClearColor;
-  });
+  _volumetricLightScatteringRTT->onBeforeRenderObservable.add(
+    [&](int*, const EventState&) {
+      savedSceneClearColor = scene->clearColor;
+      scene->clearColor    = sceneClearColor;
+    });
 
   _volumetricLightScatteringRTT->onAfterRenderObservable.add(
-    [&]() { scene->clearColor = savedSceneClearColor; });
+    [&](int*, const EventState&) { scene->clearColor = savedSceneClearColor; });
 
   _volumetricLightScatteringRTT->customRenderFunction = [&](
     const vector_t<SubMesh*>& opaqueSubMeshes,

@@ -200,7 +200,7 @@ void PostProcessRenderEffect::_linkParameters()
     }
 
     item.second->onBeforeRenderObservable.add(
-      [this](Effect* effect) { _linkTextures(effect); });
+      [this](Effect* effect, const EventState&) { _linkTextures(effect); });
   }
 }
 

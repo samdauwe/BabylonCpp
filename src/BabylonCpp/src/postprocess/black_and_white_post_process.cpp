@@ -13,8 +13,9 @@ BlackAndWhitePostProcess::BlackAndWhitePostProcess(const string_t& iName,
                   camera, samplingMode,    engine,     reusable}
     , degree{1.f}
 {
-  onApplyObservable.add(
-    [this](Effect* effect) { effect->setFloat("degree", degree); });
+  onApplyObservable.add([this](Effect* effect, const EventState&) {
+    effect->setFloat("degree", degree);
+  });
 }
 
 BlackAndWhitePostProcess::~BlackAndWhitePostProcess()

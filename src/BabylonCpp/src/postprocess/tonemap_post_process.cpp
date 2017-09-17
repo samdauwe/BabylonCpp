@@ -35,7 +35,7 @@ TonemapPostProcess::TonemapPostProcess(const string_t& iName,
   // Sadly a second call to create the effect.
   updateEffect(defines.str());
 
-  setOnApply([&](Effect* effect) {
+  setOnApply([&](Effect* effect, const EventState&) {
     effect->setFloat("_ExposureAdjustment", exposureAdjustment);
   });
 }

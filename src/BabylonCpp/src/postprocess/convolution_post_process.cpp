@@ -27,7 +27,7 @@ ConvolutionPostProcess::ConvolutionPostProcess(const string_t& iName,
                   samplingMode, engine,        reusable}
     , kernel{iKernel}
 {
-  setOnApply([&](Effect* effect) {
+  setOnApply([&](Effect* effect, const EventState&) {
     effect->setFloat2("screenSize", static_cast<float>(width),
                       static_cast<float>(height));
     effect->setArray("kernel", kernel);

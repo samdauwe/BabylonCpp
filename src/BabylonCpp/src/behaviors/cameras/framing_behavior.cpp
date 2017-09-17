@@ -128,36 +128,36 @@ void FramingBehavior::attach(ArcRotateCamera* camera)
 
   FramingBehavior::_EasingFunction.setEasingMode(FramingBehavior::EasingMode);
 
-  _onPrePointerObservableObserver
-    = scene->onPrePointerObservable.add([this](PointerInfoPre* pointerInfoPre) {
-        if (pointerInfoPre->type == PointerEventTypes::POINTERDOWN) {
-          _isPointerDown = true;
-          return;
-        }
+  _onPrePointerObservableObserver = scene->onPrePointerObservable.add(
+    [this](PointerInfoPre* pointerInfoPre, const EventState&) {
+      if (pointerInfoPre->type == PointerEventTypes::POINTERDOWN) {
+        _isPointerDown = true;
+        return;
+      }
 
-        if (pointerInfoPre->type == PointerEventTypes::POINTERUP) {
-          _isPointerDown = false;
-        }
-      });
+      if (pointerInfoPre->type == PointerEventTypes::POINTERUP) {
+        _isPointerDown = false;
+      }
+    });
 
-  _onMeshTargetChangedObserver
-    = camera->onMeshTargetChangedObservable.add([this](AbstractMesh* mesh) {
-        if (mesh) {
-          zoomOnMesh(mesh);
-        }
-      });
+  _onMeshTargetChangedObserver = camera->onMeshTargetChangedObservable.add(
+    [this](AbstractMesh* mesh, const EventState&) {
+      if (mesh) {
+        zoomOnMesh(mesh);
+      }
+    });
 
-  _onAfterCheckInputsObserver
-    = camera->onAfterCheckInputsObservable.add([this]() {
-        // Stop the animation if there is user interaction and the animation
-        // should stop for this interaction
-        _applyUserInteraction();
+  _onAfterCheckInputsObserver = camera->onAfterCheckInputsObservable.add(
+    [this](Camera*, const EventState&) {
+      // Stop the animation if there is user interaction and the animation
+      // should stop for this interaction
+      _applyUserInteraction();
 
-        // Maintain the camera above the ground. If the user pulls the camera
-        // beneath the ground plane, lift it back to the default position after
-        // a given timeout
-        _maintainCameraAboveGround();
-      });
+      // Maintain the camera above the ground. If the user pulls the camera
+      // beneath the ground plane, lift it back to the default position after
+      // a given timeout
+      _maintainCameraAboveGround();
+    });
 }
 
 void FramingBehavior::detach()

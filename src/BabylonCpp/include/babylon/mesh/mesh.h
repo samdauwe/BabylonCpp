@@ -101,7 +101,8 @@ public:
   virtual IReflect::Type type() const override;
 
   /** Methods **/
-  void setOnBeforeDraw(const ::std::function<void()>& callback);
+  void setOnBeforeDraw(
+    const ::std::function<void(Mesh*, const EventState&)>& callback);
 
   /**
    * @brief Returns a string.
@@ -446,8 +447,8 @@ public:
    * This function is passed the current mesh.
    * @returns The Mesh.
    */
-  Mesh&
-  registerBeforeRender(const ::std::function<void(AbstractMesh* mesh)>& func);
+  Mesh& registerBeforeRender(
+    const ::std::function<void(Mesh* mesh, const EventState& es)>& func);
 
   /**
    * @brief Disposes a previously registered javascript function called before
@@ -455,8 +456,8 @@ public:
    * This function is passed the current mesh.
    * @returns The Mesh.
    */
-  Mesh&
-  unregisterBeforeRender(const ::std::function<void(AbstractMesh* mesh)>& func);
+  Mesh& unregisterBeforeRender(
+    const ::std::function<void(Mesh* mesh, const EventState&)>& func);
 
   /**
    * @brief Registers for this mesh a javascript function called just after the
@@ -464,8 +465,8 @@ public:
    * This function is passed the current mesh.
    * @returns The Mesh.
    */
-  Mesh&
-  registerAfterRender(const ::std::function<void(AbstractMesh* mesh)>& func);
+  Mesh& registerAfterRender(
+    const ::std::function<void(Mesh* mesh, const EventState&)>& func);
 
   /**
    * @brief Disposes a previously registered javascript function called after
@@ -473,8 +474,8 @@ public:
    * This function is passed the current mesh.
    * @returns The Mesh.
    */
-  Mesh&
-  unregisterAfterRender(const ::std::function<void(AbstractMesh* mesh)>& func);
+  Mesh& unregisterAfterRender(
+    const ::std::function<void(Mesh* mesh, const EventState&)>& func);
 
   _InstancesBatch* _getInstancesRenderList(size_t subMeshId);
   Mesh& _renderWithInstances(SubMesh* subMesh, unsigned int fillMode,

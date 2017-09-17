@@ -71,7 +71,8 @@ const char* Node::getClassName() const
   return "Node";
 }
 
-void Node::setOnDispose(const ::std::function<void()>& callback)
+void Node::setOnDispose(
+  const ::std::function<void(Node* node, const EventState& es)>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);

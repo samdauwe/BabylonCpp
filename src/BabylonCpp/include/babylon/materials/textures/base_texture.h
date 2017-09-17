@@ -36,7 +36,8 @@ public:
    */
   const char* getClassName() const;
 
-  void setOnDispose(const ::std::function<void()>& callback);
+  void setOnDispose(
+    const ::std::function<void(BaseTexture*, const EventState&)>& callback);
   virtual bool isBlocking() const;
   Scene* getScene() const;
   virtual Matrix* getTextureMatrix();

@@ -11,7 +11,7 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT FreeCameraMouseInput
-    : public ICameraInput<FreeCamera> {
+  : public ICameraInput<FreeCamera> {
 
 public:
   FreeCameraMouseInput(bool touchEnabled = true);
@@ -31,8 +31,7 @@ public:
 private:
   ICanvas* _canvas;
   Engine* _engine;
-  ::std::function<void(const PointerInfo& p, const EventState& s)>
-    _pointerInput;
+  ::std::function<void(PointerInfo* p, const EventState& es)> _pointerInput;
   ::std::function<void(MouseEvent& e)> _onMouseMove;
   Observer<PointerInfo>::Ptr _observer;
   PositionCoord _previousPosition;

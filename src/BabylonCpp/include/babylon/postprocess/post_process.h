@@ -43,12 +43,17 @@ public:
   virtual ~PostProcess();
 
   // Events
-  void setOnActivate(const ::std::function<void(Camera* camera)>& callback);
+  void setOnActivate(
+    const ::std::function<void(Camera* camera, const EventState&)>& callback);
   void setOnSizeChanged(
-    const ::std::function<void(PostProcess* postProcess)>& callback);
-  void setOnApply(const ::std::function<void(Effect* effect)>& callback);
-  void setOnBeforeRender(const ::std::function<void(Effect* effect)>& callback);
-  void setOnAfterRender(const ::std::function<void(Effect* effect)>& callback);
+    const ::std::function<void(PostProcess* postProcess, const EventState&)>&
+      callback);
+  void setOnApply(
+    const ::std::function<void(Effect* effect, const EventState&)>& callback);
+  void setOnBeforeRender(
+    const ::std::function<void(Effect* effect, const EventState&)>& callback);
+  void setOnAfterRender(
+    const ::std::function<void(Effect* effect, const EventState&)>& callback);
 
   InternalTexture* outputTexture();
   void setOutputTexture(InternalTexture* value);

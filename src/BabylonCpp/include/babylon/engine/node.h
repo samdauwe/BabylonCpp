@@ -30,7 +30,8 @@ public:
   void setParent(Node* parent);
   virtual const char* getClassName() const;
   Node* parent() const override;
-  void setOnDispose(const ::std::function<void()>& callback);
+  void setOnDispose(
+    const ::std::function<void(Node* node, const EventState& es)>& callback);
   virtual Scene* getScene();
   Engine* getEngine();
 

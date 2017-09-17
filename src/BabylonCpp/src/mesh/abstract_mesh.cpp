@@ -163,7 +163,8 @@ bool AbstractMesh::isFacetDataEnabled() const
   return _facetDataEnabled;
 }
 
-void AbstractMesh::setOnCollide(const ::std::function<void()>& callback)
+void AbstractMesh::setOnCollide(
+  const ::std::function<void(AbstractMesh*, const EventState&)>& callback)
 {
   if (_onCollideObserver) {
     onCollideObservable.remove(_onCollideObserver);
@@ -172,7 +173,7 @@ void AbstractMesh::setOnCollide(const ::std::function<void()>& callback)
 }
 
 void AbstractMesh::setOnCollisionPositionChange(
-  const ::std::function<void()>& callback)
+  const ::std::function<void(Vector3*, const EventState&)>& callback)
 {
   if (_onCollisionPositionChangeObserver) {
     onCollisionPositionChangeObservable.remove(
@@ -1208,14 +1209,14 @@ Matrix AbstractMesh::computeWorldMatrix(bool force)
 }
 
 AbstractMesh& AbstractMesh::registerAfterWorldMatrixUpdate(
-  const ::std::function<void(AbstractMesh* mesh)>& func)
+  const ::std::function<void(AbstractMesh* mesh, const EventState&)>& func)
 {
   onAfterWorldMatrixUpdateObservable.add(func);
   return *this;
 }
 
 AbstractMesh& AbstractMesh::unregisterAfterWorldMatrixUpdate(
-  const ::std::function<void(AbstractMesh* mesh)>& func)
+  const ::std::function<void(AbstractMesh* mesh, const EventState&)>& func)
 {
   onAfterWorldMatrixUpdateObservable.removeCallback(func);
   return *this;

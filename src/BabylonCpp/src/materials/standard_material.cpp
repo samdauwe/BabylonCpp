@@ -1516,7 +1516,9 @@ void StandardMaterial::_attachImageProcessingConfiguration(
   // Attaches observer.
   _imageProcessingObserver
     = _imageProcessingConfiguration->onUpdateParameters.add(
-      [this]() { _markAllSubMeshesAsImageProcessingDirty(); });
+      [this](ImageProcessingConfiguration*, const EventState&) {
+        _markAllSubMeshesAsImageProcessingDirty();
+      });
 }
 
 bool StandardMaterial::cameraColorCurvesEnabled() const

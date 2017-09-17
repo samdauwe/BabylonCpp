@@ -10,8 +10,8 @@ namespace BABYLON {
 PostProcessRenderPass::PostProcessRenderPass(
   Scene* scene, const string_t& name, ISize size,
   const vector_t<Mesh*>& renderList,
-  const ::std::function<void(int faceIndex)>& beforeRender,
-  const ::std::function<void(int faceIndex)>& afterRender)
+  const ::std::function<void(int* faceIndex, const EventState&)>& beforeRender,
+  const ::std::function<void(int* faceIndex, const EventState&)>& afterRender)
     : _name{name}
     , _enabled{true}
     , _renderList{renderList}

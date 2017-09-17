@@ -3,7 +3,6 @@
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_global.h>
-#include <babylon/core/fast_func.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/vector3.h>
 #include <babylon/particles/iparticle_system.h>
@@ -27,7 +26,8 @@ public:
 
   virtual IReflect::Type type() const override;
 
-  void setOnDispose(const FastFunc<void()>& callback);
+  void setOnDispose(
+    const ::std::function<void(ParticleSystem*, const EventState&)>& callback);
   void recycleParticle(Particle* particle);
   size_t getCapacity() const;
   bool isAlive() const;

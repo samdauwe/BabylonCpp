@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/core/structs.h>
+#include <babylon/tools/event_state.h>
 
 namespace BABYLON {
 
@@ -15,8 +16,10 @@ public:
   PostProcessRenderPass(
     Scene* scene, const string_t& name, ISize size,
     const vector_t<Mesh*>& renderList,
-    const ::std::function<void(int faceIndex)>& beforeRender,
-    const ::std::function<void(int faceIndex)>& afterRender);
+    const ::std::function<void(int* faceIndex, const EventState&)>&
+      beforeRender,
+    const ::std::function<void(int* faceIndex, const EventState&)>&
+      afterRender);
   ~PostProcessRenderPass();
 
   int _incRefCount();

@@ -24,7 +24,7 @@ SkeletonViewer::SkeletonViewer(Skeleton* iSkeleton, AbstractMesh* iMesh,
     , _isEnabled{false}
 {
   update();
-  _renderFunction = [this]() { update(); };
+  _renderFunction = [this](Scene*, const EventState&) { update(); };
 }
 
 SkeletonViewer::~SkeletonViewer()

@@ -157,7 +157,8 @@ IReflect::Type Mesh::type() const
   return IReflect::Type::MESH;
 }
 
-void Mesh::setOnBeforeDraw(const ::std::function<void()>& callback)
+void Mesh::setOnBeforeDraw(
+  const ::std::function<void(Mesh*, const EventState&)>& callback)
 {
   if (_onBeforeDrawObserver) {
     onBeforeDrawObservable.remove(_onBeforeDrawObserver);
@@ -750,28 +751,28 @@ void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount)
 }
 
 Mesh& Mesh::registerBeforeRender(
-  const ::std::function<void(AbstractMesh* mesh)>& func)
+  const ::std::function<void(Mesh* mesh, const EventState&)>& func)
 {
   onBeforeRenderObservable.add(func);
   return *this;
 }
 
 Mesh& Mesh::unregisterBeforeRender(
-  const ::std::function<void(AbstractMesh* mesh)>& func)
+  const ::std::function<void(Mesh* mesh, const EventState&)>& func)
 {
   onBeforeRenderObservable.removeCallback(func);
   return *this;
 }
 
 Mesh& Mesh::registerAfterRender(
-  const ::std::function<void(AbstractMesh* mesh)>& func)
+  const ::std::function<void(Mesh* mesh, const EventState&)>& func)
 {
   onAfterRenderObservable.add(func);
   return *this;
 }
 
 Mesh& Mesh::unregisterAfterRender(
-  const ::std::function<void(AbstractMesh* mesh)>& func)
+  const ::std::function<void(Mesh* mesh, const EventState&)>& func)
 {
   onAfterRenderObservable.removeCallback(func);
   return *this;
@@ -889,7 +890,7 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
 
   _bind(subMesh, effect, fillMode);
 
-  _draw(subMesh, fillMode, instancesCount);
+  _draw(subMesh, static_cast<int>(fillMode), instancesCount);
 
   engine->unbindInstanceAttributes();
 

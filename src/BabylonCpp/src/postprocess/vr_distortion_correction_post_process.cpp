@@ -21,7 +21,7 @@ VRDistortionCorrectionPostProcess::VRDistortionCorrectionPostProcess(
     , _postProcessScaleFactor{vrMetrics.postProcessScaleFactor}
     , _lensCenterOffset{vrMetrics.lensCenterOffset}
 {
-  onSizeChangedObservable.add([&]() {
+  onSizeChangedObservable.add([&](PostProcess*, const EventState&) {
     aspectRatio = static_cast<float>(width) * 0.5f / static_cast<float>(height);
     _scaleIn    = Vector2(2.f, 2.f / aspectRatio);
     _scaleFactor
@@ -32,7 +32,7 @@ VRDistortionCorrectionPostProcess::VRDistortionCorrectionPostProcess(
                           0.5f);
   });
 
-  onApplyObservable.add([&](Effect* effect) {
+  onApplyObservable.add([&](Effect* effect, const EventState&) {
     effect->setFloat2("LensCenter", _lensCenter.x, _lensCenter.y);
     effect->setFloat2("Scale", _scaleFactor.x, _scaleFactor.y);
     effect->setFloat2("ScaleIn", _scaleIn.x, _scaleIn.y);

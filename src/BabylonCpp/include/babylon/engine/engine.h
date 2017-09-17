@@ -2,7 +2,6 @@
 #define BABYLON_ENGINE_ENGINE_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/fast_func.h>
 #include <babylon/core/structs.h>
 #include <babylon/engine/engine_capabilities.h>
 #include <babylon/engine/engine_constants.h>
@@ -126,7 +125,8 @@ public:
    * @param {Function} [renderFunction] the function to be removed. If not
    * provided all functions will be removed.
    */
-  void stopRenderLoop(const FastFunc<void()>& renderFunction = nullptr);
+  void stopRenderLoop();
+  void stopRenderLoop(const delegate_t<void()>& renderFunction);
   void _renderLoop();
 
   /**
@@ -139,7 +139,7 @@ public:
    *      scene.render()
    * })
    */
-  void runRenderLoop(const FastFunc<void()>& renderFunction);
+  void runRenderLoop(const ::std::function<void()>& renderFunction);
   void renderFunction(const ::std::function<void()>& renderFunction);
 
   /**
@@ -360,12 +360,14 @@ public:
   InternalTexture* createTexture(
     const vector_t<string_t>& list, bool noMipmap, bool invertY, Scene* scene,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-    const ::std::function<void()>& onLoad  = nullptr,
+    const ::std::function<void(InternalTexture*, const EventState&)>& onLoad
+    = nullptr,
     const ::std::function<void()>& onError = nullptr, Buffer* buffer = nullptr);
   InternalTexture* createTexture(
     const string_t& urlArg, bool noMipmap, bool invertY, Scene* scene,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-    const ::std::function<void()>& onLoad  = nullptr,
+    const ::std::function<void(InternalTexture*, const EventState&)>& onLoad
+    = nullptr,
     const ::std::function<void()>& onError = nullptr, Buffer* buffer = nullptr,
     InternalTexture* fallBack = nullptr,
     unsigned int format       = EngineConstants::TEXTUREFORMAT_RGBA);
@@ -404,12 +406,15 @@ public:
                                 const IRenderTargetOptions& options);
   InternalTexture* createPrefilteredCubeTexture(
     const string_t& rootUrl, Scene* scene, float scale, float offset,
-    const ::std::function<void()>& onLoad  = nullptr,
+    const ::std::function<void(InternalTexture*, const EventState&)>& onLoad
+    = nullptr,
     const ::std::function<void()>& onError = nullptr, unsigned int format = 0,
     const string_t& forcedExtension = "");
   InternalTexture* createCubeTexture(
     const string_t& rootUrl, Scene* scene, const vector_t<string_t>& extensions,
-    bool noMipmap, const ::std::function<void()>& onLoad = nullptr,
+    bool noMipmap,
+    const ::std::function<void(InternalTexture*, const EventState&)>& onLoad
+    = nullptr,
     const ::std::function<void()>& onError = nullptr, unsigned int format = 0,
     const string_t& forcedExtension = "");
   void updateRawCubeTexture(InternalTexture* texture,
@@ -635,7 +640,7 @@ private:
   bool _videoTextureSupported;
 
   bool _renderingQueueLaunched;
-  vector_t<FastFunc<void()>> _activeRenderLoops;
+  vector_t<delegate_t<void()>> _activeRenderLoops;
 
   // Deterministic lockstepMaxSteps
   bool _deterministicLockstep;

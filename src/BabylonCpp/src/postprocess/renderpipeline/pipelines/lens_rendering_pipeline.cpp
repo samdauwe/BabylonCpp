@@ -201,15 +201,16 @@ void LensRenderingPipeline::_createChromaticAberrationPostProcess(float ratio)
     ratio, nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE,
     _scene->getEngine(), false);
 
-  _chromaticAberrationPostProcess->setOnApply([&](Effect* effect) {
-    effect->setFloat("chromatic_aberration", _chromaticAberration);
-    effect->setFloat(
-      "screen_width",
-      static_cast<float>(_scene->getEngine()->getRenderingCanvas()->width));
-    effect->setFloat(
-      "screen_height",
-      static_cast<float>(_scene->getEngine()->getRenderingCanvas()->height));
-  });
+  _chromaticAberrationPostProcess->setOnApply(
+    [&](Effect* effect, const EventState&) {
+      effect->setFloat("chromatic_aberration", _chromaticAberration);
+      effect->setFloat(
+        "screen_width",
+        static_cast<float>(_scene->getEngine()->getRenderingCanvas()->width));
+      effect->setFloat(
+        "screen_height",
+        static_cast<float>(_scene->getEngine()->getRenderingCanvas()->height));
+    });
 }
 
 void LensRenderingPipeline::_createHighlightsPostProcess(float ratio)
@@ -221,7 +222,7 @@ void LensRenderingPipeline::_createHighlightsPostProcess(float ratio)
     ratio, nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE,
     _scene->getEngine(), false, _dofPentagon ? "#define PENTAGON\n" : "");
 
-  _highlightsPostProcess->setOnApply([&](Effect* effect) {
+  _highlightsPostProcess->setOnApply([&](Effect* effect, const EventState&) {
     effect->setFloat("gain", _highlightsGain);
     effect->setFloat("threshold", _highlightsThreshold);
     effect->setTextureFromPostProcess("textureSampler",
@@ -245,8 +246,7 @@ void LensRenderingPipeline::_createDepthOfFieldPostProcess(float ratio)
     {"depthSampler", "grainSampler", "highlightsSampler"}, ratio, nullptr,
     TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
 
-  _depthOfFieldPostProcess->setOnApply([&](Effect* effect) {
-
+  _depthOfFieldPostProcess->setOnApply([&](Effect* effect, const EventState&) {
     effect->setTexture("depthSampler", _depthTexture);
     effect->setTexture("grainSampler", _grainTexture);
     effect->setTextureFromPostProcess("textureSampler", _highlightsPostProcess);

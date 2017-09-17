@@ -46,18 +46,18 @@ void BouncingBehavior::setAutoTransitionRange(bool value)
   auto camera = _attachedCamera;
 
   if (value) {
-    _onMeshTargetChangedObserver
-      = camera->onMeshTargetChangedObservable.add([this](AbstractMesh* mesh) {
-          if (!mesh) {
-            return;
-          }
+    _onMeshTargetChangedObserver = camera->onMeshTargetChangedObservable.add(
+      [this](AbstractMesh* mesh, const EventState&) {
+        if (!mesh) {
+          return;
+        }
 
-          mesh->computeWorldMatrix(true);
-          auto diagonal = mesh->getBoundingInfo()->diagonalLength();
+        mesh->computeWorldMatrix(true);
+        auto diagonal = mesh->getBoundingInfo()->diagonalLength();
 
-          lowerRadiusTransitionRange = diagonal * 0.05f;
-          upperRadiusTransitionRange = diagonal * 0.05f;
-        });
+        lowerRadiusTransitionRange = diagonal * 0.05f;
+        upperRadiusTransitionRange = diagonal * 0.05f;
+      });
   }
   else if (_onMeshTargetChangedObserver) {
     camera->onMeshTargetChangedObservable.remove(_onMeshTargetChangedObserver);
@@ -66,19 +66,19 @@ void BouncingBehavior::setAutoTransitionRange(bool value)
 
 void BouncingBehavior::attach(ArcRotateCamera* camera)
 {
-  _attachedCamera = camera;
-  _onAfterCheckInputsObserver
-    = camera->onAfterCheckInputsObservable.add([this]() {
-        // Add the bounce animation to the lower radius limit
-        if (_isRadiusAtLimit(_attachedCamera->lowerRadiusLimit)) {
-          _applyBoundRadiusAnimation(lowerRadiusTransitionRange);
-        }
+  _attachedCamera             = camera;
+  _onAfterCheckInputsObserver = camera->onAfterCheckInputsObservable.add(
+    [this](Camera*, const EventState&) {
+      // Add the bounce animation to the lower radius limit
+      if (_isRadiusAtLimit(_attachedCamera->lowerRadiusLimit)) {
+        _applyBoundRadiusAnimation(lowerRadiusTransitionRange);
+      }
 
-        // Add the bounce animation to the upper radius limit
-        if (_isRadiusAtLimit(_attachedCamera->upperRadiusLimit)) {
-          _applyBoundRadiusAnimation(upperRadiusTransitionRange);
-        }
-      });
+      // Add the bounce animation to the upper radius limit
+      if (_isRadiusAtLimit(_attachedCamera->upperRadiusLimit)) {
+        _applyBoundRadiusAnimation(upperRadiusTransitionRange);
+      }
+    });
 }
 
 void BouncingBehavior::detach()

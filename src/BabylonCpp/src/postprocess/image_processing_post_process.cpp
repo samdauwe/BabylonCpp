@@ -47,7 +47,7 @@ ImageProcessingPostProcess::ImageProcessingPostProcess(
 {
   _updateParameters();
 
-  setOnApply([this](Effect* effect) {
+  setOnApply([this](Effect* effect, const EventState&) {
     // Color
     if (_colorCurvesEnabled) {
       ColorCurves::Bind(*colorCurves, effect);
@@ -90,7 +90,7 @@ ImageProcessingPostProcess::ImageProcessingPostProcess(
                         0.5f / textureSize,                // textureOffset
                         textureSize,                       // textureSize
                         colorGradingWeight                 // weight
-      );
+                        );
     }
   });
 }

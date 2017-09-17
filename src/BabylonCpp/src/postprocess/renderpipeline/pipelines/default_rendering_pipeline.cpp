@@ -193,7 +193,7 @@ void DefaultRenderingPipeline::_buildPipeline()
                                           [this]() { return blurX; }, true));
     blurX->alwaysForcePOT = true;
     blurX->autoClear      = false;
-    blurX->onActivateObservable.add([this]() {
+    blurX->onActivateObservable.add([this](Camera*, const EventState&) {
       const auto dw = static_cast<float>(blurX->width)
                       / static_cast<float>(
                           _scene->getEngine()->getRenderingCanvas()->width);
@@ -208,7 +208,7 @@ void DefaultRenderingPipeline::_buildPipeline()
                                           [this]() { return blurY; }, true));
     blurY->alwaysForcePOT = true;
     blurY->autoClear      = false;
-    blurY->onActivateObservable.add([this]() {
+    blurY->onActivateObservable.add([this](Camera*, const EventState&) {
       const auto dh = static_cast<float>(blurY->height)
                       / static_cast<float>(
                           _scene->getEngine()->getRenderingCanvas()->height);
