@@ -10,6 +10,15 @@ struct BABYLON_SHARED_EXPORT GamepadButtonChanges {
   bool pressChanged;
   bool touchChanged;
   bool valueChanged;
+
+  string_t toString() const
+  {
+    std::ostringstream oss;
+    oss << "{\"Changed\":" << changed << ",\"PressChanged\":" << pressChanged
+        << ",\"TouchChanged\":" << touchChanged
+        << ",\"ValueChanged\":" << valueChanged << "}";
+    return oss.str();
+  }
 }; // end of struct GamepadButtonChanges
 
 } // end of namespace BABYLON

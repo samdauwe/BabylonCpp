@@ -1,5 +1,6 @@
 #include <babylon/gamepad/controllers/web_vr_controller.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/gamepad/controllers/extended_gamepad_button.h>
 #include <babylon/interfaces/ibrowser_gamepad.h>
 
@@ -38,12 +39,13 @@ void WebVRController::update()
 {
   PoseEnabledController::update();
   for (unsigned int index = 0; index < _buttons.size(); ++index) {
-    _setButtonValue(_browserGamepad->buttons[index], _buttons[index], index);
+    // _setButtonValue(_browserGamepad->buttons[index], _buttons[index], index);
   };
-  if (leftStick().x != pad.x || leftStick().y != pad.y) {
+  if (!stl_util::almost_equal(leftStick().x, pad.x)
+      || !stl_util::almost_equal(leftStick().y, pad.y)) {
     pad.x = leftStick().x;
     pad.y = leftStick().y;
-    onPadValuesChangedObservable.notifyObservers(pad);
+    onPadValuesChangedObservable.notifyObservers(&pad);
   }
 }
 

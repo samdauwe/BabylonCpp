@@ -2,6 +2,10 @@
 
 namespace BABYLON {
 
+StickValues::StickValues() : x{0.f}, y{0.f}
+{
+}
+
 StickValues::StickValues(float iX, float iY) : x{iX}, y{iY}
 {
 }

@@ -2,6 +2,8 @@
 #define BABYLON_GAMEPAD_GAMEPAD_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/gamepad/stick_values.h>
+
 #include <babylon/core/nullable.h>
 
 namespace BABYLON {
@@ -25,10 +27,8 @@ public:
     const ::std::function<void(const StickValues& values)>& callback);
   void setOnrightstickchanged(
     const ::std::function<void(const StickValues& values)>& callback);
-  StickValues& leftStick();
   const StickValues& leftStick() const;
   void setLeftStick(const StickValues& newValues);
-  StickValues& rightStick();
   const StickValues& rightStick() const;
   void setRightStick(const StickValues& newValues);
   virtual void update();

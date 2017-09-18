@@ -53,6 +53,14 @@ MutableGamepadButton::~MutableGamepadButton()
 {
 }
 
+string_t MutableGamepadButton::toString() const
+{
+  std::ostringstream oss;
+  oss << *this;
+
+  return oss.str();
+}
+
 int MutableGamepadButton::value() const
 {
   return _value;
@@ -66,6 +74,28 @@ bool MutableGamepadButton::touched() const
 bool MutableGamepadButton::pressed() const
 {
   return _pressed;
+}
+
+std::ostream& operator<<(std::ostream& os,
+                         const MutableGamepadButton& mutableGamepadButton)
+{
+  os << "{\"Value\":" << mutableGamepadButton._value
+     << ",\"Touched\":" << mutableGamepadButton._touched
+     << ",\"Pressed\":" << mutableGamepadButton._pressed << "}";
+  return os;
+}
+
+bool operator==(const MutableGamepadButton& lhs,
+                const MutableGamepadButton& rhs)
+{
+  return (lhs._value == rhs._value) && (lhs._touched == rhs._touched)
+         && (lhs._pressed == rhs._pressed);
+}
+
+bool operator!=(const MutableGamepadButton& lhs,
+                const MutableGamepadButton& rhs)
+{
+  return !(lhs == rhs);
 }
 
 } // end of namespace BABYLON

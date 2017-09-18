@@ -1,6 +1,6 @@
 #include <babylon/gamepad/gamepad.h>
 
-#include <babylon/gamepad/stick_values.h>
+#include <babylon/babylon_stl_util.h>
 #include <babylon/interfaces/ibrowser_gamepad.h>
 
 namespace BABYLON {
@@ -44,39 +44,31 @@ void Gamepad::setOnrightstickchanged(
   _onrightstickchanged = callback;
 }
 
-StickValues& Gamepad::leftStick()
-{
-  return _leftStick;
-}
-
 const StickValues& Gamepad::leftStick() const
 {
-  return _leftStick;
+  return *_leftStick;
 }
 
 void Gamepad::setLeftStick(const StickValues& newValues)
 {
   if (_onleftstickchanged
-      && (_leftStick.x != newValues.x || _leftStick.y != newValues.y)) {
+      && (!stl_util::almost_equal((*_leftStick).x, newValues.x)
+          || !stl_util::almost_equal((*_leftStick).y, newValues.y))) {
     _onleftstickchanged(newValues);
   }
   _leftStick = newValues;
 }
 
-StickValues& Gamepad::rightStick()
-{
-  return _rightStick;
-}
-
 const StickValues& Gamepad::rightStick() const
 {
-  return _rightStick;
+  return *_rightStick;
 }
 
 void Gamepad::setRightStick(const StickValues& newValues)
 {
   if (_onrightstickchanged
-      && (_rightStick.x != newValues.x || _rightStick.y != newValues.y)) {
+      && (!stl_util::almost_equal((*_rightStick).x, newValues.x)
+          || !stl_util::almost_equal((*_rightStick).y, newValues.y))) {
     _onrightstickchanged(newValues);
   }
   _rightStick = newValues;

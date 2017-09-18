@@ -7,6 +7,7 @@ namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT StickValues {
 
+  StickValues();
   StickValues(float x, float y);
   StickValues(const StickValues& other);
   StickValues(StickValues&& other);
