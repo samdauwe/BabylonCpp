@@ -119,6 +119,13 @@ public:
   virtual vector_t<AbstractMesh*>
   getChildMeshes(bool directDecendantsOnly,
                  const ::std::function<bool(Node* node)>& predicate);
+
+  /**
+   * Get all direct children of this node.
+   */
+  vector_t<Node*> getChildren(const ::std::function<bool(Node* node)>& predicate
+                              = nullptr);
+
   void _setReady(bool state);
   virtual vector_t<Animation*> getAnimations() override;
   Animation* getAnimationByName(const string_t& name);
