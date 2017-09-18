@@ -1,231 +1,267 @@
 #!/usr/bin/env python
 
-import os
-import sys
+class Tools(object):
 
-# Microsoft Visual Studio 2017 Community Version
-MSVC2017 = {
-    "productName": "Visual Studio 2017",
-    "versionNumber": "15.0",
-    "cmakeGeneratorPlatform": "Visual Studio 15 2017 Win64",
-    "path": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017" \
-              "\\Community\\Common7\\Tools\\VsDevCmd.bat"
-}
-# Microsoft Visual Studio to be used
-MSVC = MSVC2017
+    def __init__(self):
+        pass
 
-def getPlatformKey():
-    """
-    Returns the platform key (type of operating system and 32bit/64bit).
-    """
-    import platform
-    osPrecision = "64" if platform.architecture()[0] == "64bit" else "32"  
-    if sys.platform == "linux" or sys.platform == "linux2":
-        # linux
-        return "Linux_x86_%s" % osPrecision
-    elif sys.platform == "win32":
-        # Windows...
-        return "Win32_%s" % osPrecision
-    else:
-        return "Unknown"
+    def createDir(self, path):
+        '''
+        Creates the specified directory if not exists.
+        '''
+        import errno, os
+        # create dir
+        try:
+            if not os.path.isdir(path):
+                os.makedirs(path)
+        except OSError as exception:
+            if exception.errno != errno.EEXIST:
+                raise
 
-def getCPUCount():
-    """
-    Returns the number of CPUs in the system.
-    """
-    import multiprocessing
-    return multiprocessing.cpu_count()
+    def isSubirectory(self, directory, subDirectory):
+        '''
+        Checks whether a directory is a sub directory of another directory.
+        '''
+        import os
+        # Make both paths absolute
+        directory = os.path.abspath(directory)
+        subDirectory = os.path.abspath(subDirectory)
+        # return true, if the common prefix of both is equal to directory
+        return os.path.commonprefix([directory, subDirectory]) == directory
 
-def getBuildDirectory(releaseBuild = True):
-    """
-    Returns the name of the build directory.
-    """
-    return ["debug_build", "release_build"][releaseBuild]
+    def getCPUCount(self):
+        '''
+        Returns the number of CPUs in the system.
+        '''
+        import multiprocessing
+        return multiprocessing.cpu_count()
 
-def isSubirectory(directory, subDirectory):
-    """
-    Checks whether a directory is a sub directory of another directory.
-    """
-    # Make both paths absolute
-    directory = os.path.abspath(directory)
-    subDirectory = os.path.abspath(subDirectory)
-    # return true, if the common prefix of both is equal to directory
-    return os.path.commonprefix([directory, subDirectory]) == directory
+    def removeDir(self, path):
+        '''
+        Deletes the folders in the given path recursively.
+        '''
+        import errno, os, shutil
+        if os.path.isdir(path):
+            try:
+                shutil.rmtree(path)
+            except OSError as error:
+                if error.errno != errno.ENOENT:
+                    raise
 
-def removeDir(path):
-    """
-    Deletes the folders in the given path recursively.
-    """
-    import shutil
-    if os.path.isdir(path) and isSubirectory(os.getcwd(), path):
-        shutil.rmtree(path)
+    def runCommand(self, directory, command, extraEnv=None):
+        '''
+        Executes the command in the specified directory.
+        '''
+        import os, subprocess
+        shell = isinstance(command, basestring)
+        env = os.environ.copy()
+        if extraEnv:
+            env.update(extraEnv)
+        print "Executing '%s' in '%s'" % (command, directory)
+        subprocess.check_call(command, shell=shell, env=env, cwd=directory)
 
-def createDir(path):
-    """
-    Creates the specified directory if not exists.
-    """
-    import errno
-    # create dir
-    try:
-        os.makedirs(path)
-    except OSError as exception:
-        if exception.errno != errno.EEXIST:
-            raise
+class Build(object):
 
-def createBuildDirectory(buildDirectory):
-    """
-    Creates the build directory.
-    """
-    if not os.path.isdir(buildDirectory):
-        createDir(buildDirectory)
-    return {"result": os.path.isdir(buildDirectory),
-            "buildDirectory": buildDirectory}
+    def __init__(self):
+        '''
+        Constructor
+        '''
+        import argparse, sys
+        progName = argparse.ArgumentParser().prog
+        parser = argparse.ArgumentParser(
+            description='%s' % progName,
+            usage='''%s <command> [<args>]
 
-def runCommand(command = []):
-    """
-    Executes a shell command and returns the return code.
-    """
-    from subprocess import call
-    returnCode = 0
-    errorMessage = ""
-    try:
-        call(command, shell=True)
-    except OSError as exception:
-        returnCode = exception.errno
-        errorMessage = str(exception)
-    return {"returnCode": returnCode, "errorMessage": errorMessage}
+The supported build commands are:
+    all [<options>]             builds all the targets
+        supported build options:
+            [--mode=<mode>]     the build mode, should we either 'release' or 'debug' mode
+    clean_all                   cleans all the build directories
+    configure [<options>]       configures the cmake project
+        supported configuration options:
+            [--mode=<mode>]     the build mode, should we either 'release' or 'debug' mode
+''' % progName)
+        parser.add_argument('command', help='Subcommand to run')
+        args = parser.parse_args(sys.argv[1:2])
+        if not hasattr(self, args.command):
+            print 'Unrecognized command'
+            parser.print_help()
+            exit(1)
+        # helper vars
+        self._tools = Tools()
+        # use dispatch pattern to invoke method with same name
+        getattr(self, args.command)()
 
-def getCMakeOptions(releaseBuild = True):
-    """
-    Returns the cmake options.
-    """
-    cmakeOptions = ["-DCMAKE_BUILD_TYPE=%s" % \
-                    ["Debug", "Release"][releaseBuild]]
-    if getPlatformKey() == "Win32_64":
-        cmakeOptions += ["-G", MSVC["cmakeGeneratorPlatform"]]
-    return cmakeOptions
+    def all(self):
+        '''
+        Builds all the targets.
+        '''
+        import argparse, sys
+        parser = argparse.ArgumentParser(description='build all')
+        parser.add_argument('--mode', type=str, dest='mode',
+                            choices = ['release', 'debug'], action='store',
+                            default='release', help="the build mode, ' \
+                            'should we either 'release' or 'debug' mode.")
+        args = parser.parse_args(sys.argv[2:])
+        self._cmakeConfigure(args)
+        self._doBuild(args)
 
-def runCmakeConfigure(buildDirectory, cmakeOptions=[]):
-    """
-    Runs the cmake command and returns the return code.
-    """
-    # Create the build directory
-    res = createBuildDirectory(buildDirectory)
-    # Configures the cmake project
-    cwd = os.getcwd()
-    os.chdir(buildDirectory)
-    cmakeCmd = ["cmake", "../"] + cmakeOptions
-    # run command
-    print "Running cmake command: %s" % " ".join(cmakeCmd)
-    res = runCommand(cmakeCmd)
-    os.chdir(cwd)
-    return res
+    def clean_all(self):
+        '''
+        Removes all the build directories.
+        '''
+        # - Remove the release build directory
+        self._tools.removeDir(self._getBuildDirectory(releaseBuild=True))
+        # - Remove the debug build directory
+        self._tools.removeDir(self._getBuildDirectory(releaseBuild=False))
 
-def startBuild(buildDirectory, cmakeOptions=[], verbose=False):
-    """
-    Starts the main cmake build.
-    """
-    # Create the build directory
-    res = createBuildDirectory(buildDirectory)
-    if res["result"]:
-        # Run cmake
-        res = runCmakeConfigure(buildDirectory, cmakeOptions)
-        if res["returnCode"] == 0:
-            # Create the build
-            cwd = os.getcwd()
-            os.chdir(buildDirectory)
-            buildCommand = []
-            platformKey = getPlatformKey()
-            if platformKey == "Linux_x86_64":
-                # Create the make command
-                buildCommand = ["make"]
-                if verbose:
-                    # - Enable verbose mode
-                    buildCommand += ["--debug=v"]
-                # - Specifies the number of jobs to run simultaneously
-                buildCommand += ["--jobs=%d" % getCPUCount()]
-                # Run the build command
-                print "Running build command: %s" % " ".join(buildCommand)
-                res = runCommand(buildCommand)
-            elif platformKey == "Win32_64":
-                # Create batch file for running the build
-                batchFileName = "runMSVCBuild.bat"
-                with open(batchFileName, "w") as f:
-                    # Run the Visual Studio developer command prompt
-                    f.write('call "%s"\n' % MSVC["path"])
-                    f.write("msbuild BabylonCpp.sln\n")
-                buildCommand = [batchFileName]
-                print "Running build command: %s" % " ".join(buildCommand)
-                res = runCommand(buildCommand)
-            # run build command
-            res = runCommand(buildCommand)
-            os.chdir(cwd)
-    return res
+    def configure(self):
+        '''
+        Parses the configure command and runs the cmake configure command.
+        '''
+        import argparse, sys
+        parser = argparse.ArgumentParser(description='configure')
+        parser.add_argument('--mode', type=str, dest='mode',
+                            choices = ['release', 'debug'], action='store',
+                            default='release', help="the build mode, ' \
+                            'should we either 'release' or 'debug' mode.")
+        args = parser.parse_args(sys.argv[2:])
+        self._cmakeConfigure(args)
 
-def getBuildTargets():
-    """
-    Returns a list with build targets.
-    """
-    return [("all", "builds all the targets"),
-            ("configure", "configures the cmake project"),
-            ("clean_all", "cleans all the build directories")]
+    def _getBuildDirectory(self, releaseBuild = True):
+        """
+        Returns the name of the build directory.
+        """
+        return ["debug_build", "release_build"][releaseBuild]
 
-def getTargetsHelpMessage():
-    """
-    Lists the supported targets for this build script.
-    """
-    msg = "The supported targets are the following:\n"
-    for buildTarget in getBuildTargets():
-        msg += "  %s : %s\n" % (buildTarget[0], buildTarget[1])
-    return msg[:-1]
+    def _cmakeConfigure(self, args):
+        '''
+        Runs the cmake configure command.
+        '''
+        # determine the build directory name
+        isReleaseBuild = (args.mode == 'release')
+        buildDir = self._getBuildDirectory(isReleaseBuild)
+        # create the build directory
+        self._tools.createDir(buildDir)
+        # get the cmake options
+        cmakeOptions = self._getCMakeOptions(
+                        releaseBuild = isReleaseBuild
+                       )
+        # Configures the cmake project
+        cmakeCmd = ["cmake", "../"] + cmakeOptions
+        self._tools.runCommand(buildDir, cmakeCmd)
+
+    def _getCMakeOptions(self, releaseBuild = True):
+        """
+        Returns the cmake options.
+        """
+        # build mode
+        cmakeOptions = ["-DCMAKE_BUILD_TYPE=%s" % \
+                       ["Debug", "Release"][releaseBuild]]
+        # cmake generator
+        cmakeOptions += ["-G", self.getCMakeGenerator()]
+        return cmakeOptions
+
+    def _doBuild(self, args):
+        """
+        Returns the build.
+        """
+        # determine the build directory name
+        isReleaseBuild = (args.mode == 'release')
+        buildDir = self._getBuildDirectory(isReleaseBuild)
+        # run the build
+        buildCommand = self.getBuildCommand()
+        self._tools.runCommand(buildDir, buildCommand)
+
+class LinuxBuild(Build):
+
+    def __init__(self):
+        Build.__init__(self)
+
+    def getCMakeGenerator(self):
+        '''
+        Returns the CMake generator.
+        '''
+        return 'Unix Makefiles'
+
+    def getPlatformKey(self):
+        '''
+        Returns the platform key.
+        '''
+        import platform, sys
+        bitness = '64' if platform.architecture()[0] == '64bit' else '32'
+        if sys.platform == 'linux' or sys.platform == 'linux2':
+            return 'linux_x86_%s' % bitness
+        return 'unknown'
+
+    def getBuildCommand(self, verbose=False):
+        '''
+        Returns the build command.
+        '''
+        # Create the make command
+        buildCommand = ["make"]
+        if verbose:
+            # - Enable verbose mode
+            buildCommand += ["--debug=v"]
+        # - Specifies the number of jobs to run simultaneously
+        buildCommand += ["--jobs=%d" % self._tools.getCPUCount()]
+        return buildCommand
+
+class WindowsBuild(Build):
+
+    def __init__(self):
+        Build.__init__(self, msvcVer='vs2017Community')
+        # Microsoft Visual Studio defintions
+        self.msvcDefs = {
+            # Microsoft Visual Studio 2017 Community Version
+            'vs2017Community': {
+                'productName': 'Visual Studio 2017',
+                'versionNumber': '15.0',
+                'cmakeGeneratorPlatform': 'Visual Studio 15 2017 Win64',
+                'path': 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\Tools\\VsDevCmd.bat'
+            }
+        }
+        self.msvcDef = self.msvcDefs[msvcVer]
+
+    def getCMakeGenerator(self):
+        '''
+        Returns the CMake generator for Microsoft Visual Studio.
+        '''
+        return self.msvcDef['cmakeGeneratorPlatform']
+
+    def getPlatformKey(self):
+        '''
+        Returns the platform key.
+        '''
+        import platform, sys
+        bitness = '64' if platform.architecture()[0] == '64bit' else '32'
+        if sys.platform == 'win32':
+            return 'win32_%s' % bitness
+        return 'unknown'
+
+    def getBuildCommand(self, buildDir, verbose=False):
+        '''
+        Returns the build command.
+        '''
+        # Create batch file for running the build
+        batchFileName = 'runMSVCBuild.bat'
+        batchFile = os.path.join(buildDir, batchFileName)
+        with open(batchFile, "w") as f:
+            # Run the Visual Studio developer command prompt
+            f.write('call "%s"\n' % self.msvcDef['path'])
+            f.write('msbuild %s\n' % 'BabylonCpp.sln')
+        buildCommand = [batchFileName]
+        return buildCommand
 
 def main():
-    from optparse import OptionParser
-    parser = OptionParser(usage="usage: %prog [options]",
-                          add_help_option=False,
-                          version="%prog 1.0")
-    parser.add_option("-h", "--help", dest="help", action="store_true",
-                      help="show this help message and exit")
-    parser.add_option("-d", "--debug", dest="debug", action="store_true",
-                      help="enabled a debug build")
-    parser.add_option("-t", "--target", type='choice', dest="target",
-                      choices = [t[0] for t in getBuildTargets()],
-                      action="store", default="all",
-                      help="the build target to use.")
-    (options, args) = parser.parse_args()
-
-    # Prints the help message and exits
-    if options.help:
-        parser.print_help()
-        print '\n%s' % getTargetsHelpMessage()
-        sys.exit()
-
-    # Check the type of build
-    releaseBuild = True
-    if options.debug:
-        releaseBuild = False
-
-    # Get the build directory
-    buildDirectory = getBuildDirectory(releaseBuild)
-
-    # Get the cmake options
-    cmakeOptions = getCMakeOptions(releaseBuild)
-
-    # Get the build target
-    if options.target:
-        buildTarget = options.target
-        if buildTarget == "all":
-            # Starts a full build
-            startBuild(buildDirectory, cmakeOptions)
-        elif buildTarget == "configure":
-            # Configure target
-            runCmakeConfigure(buildDirectory, cmakeOptions)
-        elif  buildTarget == "clean_all":
-            # Clean target
-            # - Remove the release build directory
-            removeDir(getBuildDirectory(releaseBuild=True))
-            # - Remove the debug build directory
-            removeDir(getBuildDirectory(releaseBuild=False))
+    # Platform dependent build
+    import sys
+    if sys.platform == 'linux' or sys.platform == 'linux2':
+        # linux OS
+        LinuxBuild()
+    elif sys.platform == 'win32':
+        # Windows OS
+        WindowsBuild()
 
 if __name__ == '__main__':
     main()
