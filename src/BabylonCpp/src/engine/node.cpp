@@ -310,12 +310,6 @@ Node::getChildMeshes(bool directDecendantsOnly,
   return results;
 }
 
-vector_t<Node*>
-Node::getChildren(const ::std::function<bool(Node* node)>& predicate)
-{
-  return getDescendants(true, predicate);
-}
-
 void Node::_setReady(bool iState)
 {
   if (iState == _isReady) {
