@@ -104,7 +104,7 @@ void LogMessage::clear()
 
 bool LogMessage::empty()
 {
-  return _oss.tellp() == 0;
+  return _oss.str().empty();
 }
 
 unsigned int LogMessage::level() const

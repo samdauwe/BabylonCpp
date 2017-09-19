@@ -58,7 +58,7 @@ int FreeCamera::collisionMask()
 
 void FreeCamera::setCollisionMask(int mask)
 {
-  _collisionMask = !::std::isnan(mask) ? mask : -1;
+  _collisionMask = !::std::isnan<float>(mask) ? mask : -1;
 }
 
 void FreeCamera::_collideWithWorld(Vector3& velocity)

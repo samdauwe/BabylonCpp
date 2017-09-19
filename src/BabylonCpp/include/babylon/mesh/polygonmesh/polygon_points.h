@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/core/structs.h>
+#include <babylon/mesh/polygonmesh/indexed_vector2.h>
 
 namespace BABYLON {
 

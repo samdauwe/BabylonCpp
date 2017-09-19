@@ -2,6 +2,7 @@
 #define BABYLON_GAMEPAD_CONTROLLERS_WEB_VR_CONTROLLER_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/gamepad/controllers/extended_gamepad_button.h>
 #include <babylon/gamepad/controllers/pose_enabled_controller.h>
 #include <babylon/gamepad/gamepad_button_changes.h>
 #include <babylon/gamepad/stick_values.h>

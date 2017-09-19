@@ -101,7 +101,7 @@ int Collider::collisionMask() const
 
 void Collider::setCollisionMask(int mask)
 {
-  _collisionMask = !::std::isnan(mask) ? mask : -1;
+  _collisionMask = !::std::isnan<float>(mask) ? mask : -1;
 }
 
 void Collider::_initialize(Vector3& source, Vector3& dir, float e)

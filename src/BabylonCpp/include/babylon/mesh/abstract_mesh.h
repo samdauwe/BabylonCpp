@@ -14,6 +14,7 @@
 #include <babylon/mesh/facet_parameters.h>
 #include <babylon/mesh/iget_set_vertices_data.h>
 #include <babylon/physics/iphysics_enabled_object.h>
+#include <babylon/physics/physics_impostor.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
 

@@ -110,8 +110,7 @@ file(GLOB MATERIALS_HDR_FILES       ${INCLUDE_PATH}/materials/*.h
                                     ${INCLUDE_PATH}/materials/pbr/*.h
                                     ${INCLUDE_PATH}/materials/textures/*.h
                                     ${INCLUDE_PATH}/materials/textures/procedurals/*.h)
-file(GLOB MATH_HDR_FILES            ${INCLUDE_PATH}/math/*.h
-                                    ${INCLUDE_PATH}/math/simd/*.h)
+file(GLOB MATH_HDR_FILES            ${INCLUDE_PATH}/math/*.h)
 file(GLOB MESH_HDR_FILES            ${INCLUDE_PATH}/mesh/*.h
                                     ${INCLUDE_PATH}/mesh/csg/*.h
                                     ${INCLUDE_PATH}/mesh/geometryprimitives/*.h
@@ -145,6 +144,10 @@ endif (UNIX)
 if (WIN32)
     set(CORE_HDR_FILES ${CORE_HDR_FILES} ${INCLUDE_PATH}/core/profiling/timer_win32.h)
 endif (WIN32)
+
+if (OPTION_ENABLE_SIMD)
+    set(MATH_HDR_FILES ${MATH_HDR_FILES} ${INCLUDE_PATH}/math/simd/*.h)
+endif (OPTION_ENABLE_SIMD)
 
 set(BABYLON_HEADERS
     ${ACTIONS_HDR_FILES}
@@ -216,8 +219,7 @@ file(GLOB MATERIALS_SRC_FILES       ${SOURCE_PATH}/materials/*.cpp
                                     ${SOURCE_PATH}/materials/pbr/*.cpp
                                     ${SOURCE_PATH}/materials/textures/*.cpp
                                     ${SOURCE_PATH}/materials/textures/procedurals/*.cpp)
-file(GLOB MATH_SRC_FILES            ${SOURCE_PATH}/math/*.cpp
-                                    ${SOURCE_PATH}/math/simd/*.cpp)
+file(GLOB MATH_SRC_FILES            ${SOURCE_PATH}/math/*.cpp)
 file(GLOB MESH_SRC_FILES            ${SOURCE_PATH}/mesh/*.cpp
                                     ${SOURCE_PATH}/mesh/csg/*.cpp
                                     ${SOURCE_PATH}/mesh/geometryprimitives/*.cpp
@@ -247,6 +249,10 @@ endif (UNIX)
 if (WIN32)
     set(CORE_SRC_FILES ${CORE_SRC_FILES} ${SOURCE_PATH}/core/profiling/timer_win32.cpp)
 endif (WIN32)
+
+if (OPTION_ENABLE_SIMD)
+    set(MATH_SRC_FILES ${MATH_SRC_FILES} ${SOURCE_PATH}/math/simd/*.cpp)
+endif (OPTION_ENABLE_SIMD)
 
 set(BABYLON_SOURCES
     ${ACTIONS_SRC_FILES}

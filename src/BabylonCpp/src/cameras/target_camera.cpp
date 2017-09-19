@@ -151,15 +151,15 @@ void TargetCamera::setTarget(const Vector3& target)
 
   rotation->z = 0.f;
 
-  if (::std::isnan(rotation->x)) {
+  if (::std::isnan<float>(rotation->x)) {
     rotation->x = 0.f;
   }
 
-  if (::std::isnan(rotation->y)) {
+  if (::std::isnan<float>(rotation->y)) {
     rotation->y = 0.f;
   }
 
-  if (::std::isnan(rotation->z)) {
+  if (::std::isnan<float>(rotation->z)) {
     rotation->z = 0.f;
   }
 

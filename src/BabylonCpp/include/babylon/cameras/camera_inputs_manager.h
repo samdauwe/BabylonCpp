@@ -13,7 +13,7 @@ public:
   CameraInputsManager(TCamera* camera);
   ~CameraInputsManager();
 
-  void add(unique_ptr_t<ICameraInput<TCamera>>&& input);
+  void add(shared_ptr_t<ICameraInput<TCamera>>&& input);
   void remove(ICameraInput<TCamera>* inputToRemove);
   void removeByType(const string_t& inputType);
   ::std::function<void()> _addCheckInputs(const ::std::function<void()>& fn);
@@ -32,7 +32,7 @@ public:
   ::std::function<void()> checkInputs;
 
 private:
-  unordered_map_t<string_t, unique_ptr_t<ICameraInput<TCamera>>> attached;
+  unordered_map_t<string_t, shared_ptr_t<ICameraInput<TCamera>>> attached;
 
 }; // end of class CameraInputsManager<TCamera>
 

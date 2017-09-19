@@ -35,10 +35,10 @@ public:
              bool xboxOne = false);
   ~Xbox360Pad();
 
-  void setOnlefttriggerchanged(
-    const ::std::function<void(unsigned int value)>& callback);
-  void onrighttriggerchanged(
-    const ::std::function<void(unsigned int value)>& callback);
+  void
+  setOnlefttriggerchanged(const ::std::function<void(float value)>& callback);
+  void
+  onrighttriggerchanged(const ::std::function<void(float value)>& callback);
   float leftTrigger() const;
   void setLeftTrigger(float newValue);
   float rightTrigger() const;

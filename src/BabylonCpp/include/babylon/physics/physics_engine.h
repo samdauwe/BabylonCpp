@@ -77,7 +77,7 @@ public:
 private:
   bool _initialized;
   IPhysicsEnginePlugin* _physicsPlugin;
-  vector_t<unique_ptr_t<PhysicsImpostor>> _impostors;
+  vector_t<shared_ptr_t<PhysicsImpostor>> _impostors;
   vector_t<shared_ptr_t<PhysicsImpostorJoint>> _joints;
 
 }; // end of class PhysicsEngine

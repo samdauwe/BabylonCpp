@@ -6,7 +6,6 @@
 #include <babylon/engine/scene.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
-#include <babylon/morph/morph_target.h>
 
 namespace BABYLON {
 
@@ -95,8 +94,10 @@ void MorphTargetManager::addTarget(unique_ptr_t<MorphTarget>&& target)
   }
 
   _targets.emplace_back(::std::move(target));
-  _targetObservable.emplace_back(_targets.back()->onInfluenceChanged.add([this](
-    bool needUpdate, const EventState&) { _syncActiveTargets(needUpdate); }));
+  _targetObservable.emplace_back(_targets.back()->onInfluenceChanged.add(
+    [this](bool needUpdate, const EventState&) {
+      _syncActiveTargets(needUpdate);
+    }));
   _syncActiveTargets(true);
 }
 
@@ -104,7 +105,7 @@ void MorphTargetManager::removeTarget(MorphTarget* target)
 {
   auto it
     = ::std::find_if(_targets.begin(), _targets.end(),
-                     [target](const unique_ptr_t<MorphTarget>& morphTarget) {
+                     [target](const shared_ptr_t<MorphTarget>& morphTarget) {
                        return target == morphTarget.get();
                      });
   if (it != _targets.end()) {

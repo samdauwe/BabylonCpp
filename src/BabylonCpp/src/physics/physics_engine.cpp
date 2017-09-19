@@ -67,7 +67,7 @@ void PhysicsEngine::removeImpostor(PhysicsImpostor* impostor)
 {
   auto it = ::std::find_if(
     _impostors.begin(), _impostors.end(),
-    [&impostor](const unique_ptr_t<PhysicsImpostor>& _imposter) {
+    [&impostor](const shared_ptr_t<PhysicsImpostor>& _imposter) {
       return _imposter.get() == impostor;
     });
   if (it != _impostors.end()) {
@@ -131,7 +131,8 @@ void PhysicsEngine::_step(float delta)
     delta = 1.f / 60.f;
   }
 
-  _physicsPlugin->executeStep(delta, _impostors);
+  // TODO FIXME
+  // _physicsPlugin->executeStep(delta, _impostors);
 }
 
 IPhysicsEnginePlugin* PhysicsEngine::getPhysicsPlugin()
@@ -144,7 +145,7 @@ PhysicsEngine::getImpostorForPhysicsObject(IPhysicsEnabledObject* object)
 {
   auto it
     = ::std::find_if(_impostors.begin(), _impostors.end(),
-                     [&object](const unique_ptr_t<PhysicsImpostor>& impostor) {
+                     [&object](const shared_ptr_t<PhysicsImpostor>& impostor) {
                        return impostor->object == object;
                      });
   return (it == _impostors.end()) ? nullptr : (*it).get();
@@ -154,7 +155,7 @@ PhysicsImpostor* PhysicsEngine::getImpostorWithPhysicsBody(IPhysicsBody* body)
 {
   auto it
     = ::std::find_if(_impostors.begin(), _impostors.end(),
-                     [&body](const unique_ptr_t<PhysicsImpostor>& impostor) {
+                     [&body](const shared_ptr_t<PhysicsImpostor>& impostor) {
                        return impostor->physicsBody() == body;
                      });
   return (it == _impostors.end()) ? nullptr : (*it).get();

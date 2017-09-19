@@ -2,6 +2,7 @@
 #define BABYLON_MORPH_MORPH_TARGET_MANAGER_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/morph/morph_target.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
@@ -51,7 +52,7 @@ private:
   void _syncActiveTargets(bool needUpdate);
 
 private:
-  vector_t<unique_ptr_t<MorphTarget>> _targets;
+  vector_t<shared_ptr_t<MorphTarget>> _targets;
   vector_t<Observer<bool>::Ptr> _targetObservable;
   vector_t<MorphTarget*> _activeTargets;
   Scene* _scene;

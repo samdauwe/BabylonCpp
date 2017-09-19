@@ -29,7 +29,7 @@ public:
   Observable<Gamepad> onGamepadDisconnectedObservable;
 
 private:
-  vector_t<unique_ptr_t<Gamepad>> _babylonGamepads;
+  vector_t<shared_ptr_t<Gamepad>> _babylonGamepads;
   bool _oneGamepadConnected;
 
   bool _isMonitoring;

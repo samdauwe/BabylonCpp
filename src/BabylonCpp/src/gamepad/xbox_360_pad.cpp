@@ -35,13 +35,13 @@ Xbox360Pad::~Xbox360Pad()
 }
 
 void Xbox360Pad::setOnlefttriggerchanged(
-  const ::std::function<void(unsigned int value)>& callback)
+  const ::std::function<void(float value)>& callback)
 {
   _onlefttriggerchanged = callback;
 }
 
 void Xbox360Pad::onrighttriggerchanged(
-  const ::std::function<void(unsigned int value)>& callback)
+  const ::std::function<void(float value)>& callback)
 {
   _onrighttriggerchanged = callback;
 }

@@ -10,7 +10,7 @@ AnimationValue::AnimationValue() : dataType{-1}
 
 AnimationValue::AnimationValue(float value)
 {
-  if (!::std::isnan(value) && ::std::isfinite(value)) {
+  if (!::std::isnan<float>(value) && ::std::isfinite(value)) {
     dataType  = Animation::ANIMATIONTYPE_FLOAT;
     floatData = value;
   }

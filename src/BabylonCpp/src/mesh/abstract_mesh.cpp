@@ -23,7 +23,6 @@
 #include <babylon/particles/particle_system.h>
 #include <babylon/physics/joint/physics_joint.h>
 #include <babylon/physics/physics_engine.h>
-#include <babylon/physics/physics_impostor.h>
 #include <babylon/rendering/bounding_box_renderer.h>
 #include <babylon/rendering/edges_renderer.h>
 
@@ -336,7 +335,7 @@ int AbstractMesh::collisionMask() const
 
 void AbstractMesh::setCollisionMask(int mask)
 {
-  _collisionMask = !::std::isnan(mask) ? mask : -1;
+  _collisionMask = !::std::isnan<float>(mask) ? mask : -1;
 }
 
 int AbstractMesh::collisionGroup() const
@@ -346,7 +345,7 @@ int AbstractMesh::collisionGroup() const
 
 void AbstractMesh::setCollisionGroup(int mask)
 {
-  _collisionGroup = !::std::isnan(mask) ? mask : -1;
+  _collisionGroup = !::std::isnan<float>(mask) ? mask : -1;
 }
 
 const char* AbstractMesh::getClassName() const

@@ -1,7 +1,5 @@
 #include <babylon/mesh/polygonmesh/polygon_points.h>
 
-#include <babylon/mesh/polygonmesh/indexed_vector2.h>
-
 namespace BABYLON {
 
 PolygonPoints::PolygonPoints()
