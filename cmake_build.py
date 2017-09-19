@@ -176,6 +176,9 @@ The supported build commands are:
 class LinuxBuild(Build):
 
     def __init__(self):
+        '''
+        Constructor.
+        '''
         Build.__init__(self)
 
     def getCMakeGenerator(self):
@@ -209,10 +212,12 @@ class LinuxBuild(Build):
 
 class WindowsBuild(Build):
 
-    def __init__(self):
-        Build.__init__(self, msvcVer='vs2017Community')
+    def __init__(self, msvcVer='vs2017Community'):
+        '''
+        Constructor.
+        '''
         # Microsoft Visual Studio defintions
-        self.msvcDefs = {
+        self._msvcDefs = {
             # Microsoft Visual Studio 2017 Community Version
             'vs2017Community': {
                 'productName': 'Visual Studio 2017',
@@ -221,13 +226,15 @@ class WindowsBuild(Build):
                 'path': 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\Tools\\VsDevCmd.bat'
             }
         }
-        self.msvcDef = self.msvcDefs[msvcVer]
+        self._msvcDef = self._msvcDefs[msvcVer]
+        # init superclass
+        Build.__init__(self)
 
     def getCMakeGenerator(self):
         '''
         Returns the CMake generator for Microsoft Visual Studio.
         '''
-        return self.msvcDef['cmakeGeneratorPlatform']
+        return self._msvcDef['cmakeGeneratorPlatform']
 
     def getPlatformKey(self):
         '''
@@ -248,7 +255,7 @@ class WindowsBuild(Build):
         batchFile = os.path.join(buildDir, batchFileName)
         with open(batchFile, "w") as f:
             # Run the Visual Studio developer command prompt
-            f.write('call "%s"\n' % self.msvcDef['path'])
+            f.write('call "%s"\n' % self._msvcDef['path'])
             f.write('msbuild %s\n' % 'BabylonCpp.sln')
         buildCommand = [batchFileName]
         return buildCommand
