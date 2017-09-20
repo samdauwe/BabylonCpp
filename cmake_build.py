@@ -57,7 +57,7 @@ class Tools(object):
         env = os.environ.copy()
         if extraEnv:
             env.update(extraEnv)
-        print "Executing '%s' in '%s'" % (command, directory)
+        print "Executing command '%s' in directory '%s'" % (command, directory)
         subprocess.check_call(command, shell=shell, env=env, cwd=directory)
 
 class Build(object):
@@ -79,6 +79,9 @@ The supported build commands are:
     clean_all                   cleans all the build directories
     configure [<options>]       configures the cmake project
         supported configuration options:
+            [--mode=<mode>]     the build mode, should we either 'release' or 'debug' mode
+    devenv                      starts the IDE (Visual Studio on Windows) and loads the project
+        supported build options:
             [--mode=<mode>]     the build mode, should we either 'release' or 'debug' mode
 ''' % progName)
         parser.add_argument('command', help='Subcommand to run')
@@ -128,6 +131,19 @@ The supported build commands are:
         args = parser.parse_args(sys.argv[2:])
         self._cmakeConfigure(args)
 
+    def devenv(self):
+        '''
+        Parses the devenv command and starts the IDE.
+        '''
+        import argparse, sys
+        parser = argparse.ArgumentParser(description='configure')
+        parser.add_argument('--mode', type=str, dest='mode',
+                            choices = ['release', 'debug'], action='store',
+                            default='release', help="the build mode, ' \
+                            'should we either 'release' or 'debug' mode.")
+        args = parser.parse_args(sys.argv[2:])
+        self._devenv(args)
+
     def _getBuildDirectory(self, releaseBuild = True):
         """
         Returns the name of the build directory.
@@ -150,6 +166,17 @@ The supported build commands are:
         # Configures the cmake project
         cmakeCmd = ["cmake", "../"] + cmakeOptions
         self._tools.runCommand(buildDir, cmakeCmd)
+
+    def _devenv(self, args):
+        '''
+        Starts the IDE (Visual Studio on Windows) and loads the project
+        '''
+        # determine the build directory name
+        isReleaseBuild = (args.mode == 'release')
+        buildDir = self._getBuildDirectory(isReleaseBuild)
+        # start the IDE
+        devenvCommand = self.getDevenvCommand()
+        self._tools.runCommand(buildDir, devenvCommand)
 
     def _getCMakeOptions(self, releaseBuild = True):
         """
@@ -186,6 +213,12 @@ class LinuxBuild(Build):
         Returns the CMake generator.
         '''
         return 'Unix Makefiles'
+
+    def getDevenvCommand(self):
+        '''
+        Returns command to start the IDE.
+        '''
+        return ''
 
     def getPlatformKey(self):
         '''
@@ -235,6 +268,12 @@ class WindowsBuild(Build):
         Returns the CMake generator for Microsoft Visual Studio.
         '''
         return self._msvcDef['cmakeGeneratorPlatform']
+
+    def getDevenvCommand(self):
+        '''
+        Returns command to start Visual Studio.
+        '''
+        return 'start BabylonCpp.sln'
 
     def getPlatformKey(self):
         '''
