@@ -1,6 +1,7 @@
 #include <babylon/mesh/abstract_mesh.h>
 
 #include <babylon/actions/action_manager.h>
+#include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
@@ -335,7 +336,7 @@ int AbstractMesh::collisionMask() const
 
 void AbstractMesh::setCollisionMask(int mask)
 {
-  _collisionMask = !::std::isnan<float>(mask) ? mask : -1;
+  _collisionMask = !isNan(mask) ? mask : -1;
 }
 
 int AbstractMesh::collisionGroup() const

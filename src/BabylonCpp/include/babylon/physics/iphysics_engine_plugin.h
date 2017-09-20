@@ -20,12 +20,12 @@ struct BABYLON_SHARED_EXPORT IPhysicsEnginePlugin {
   virtual void applyForce(PhysicsImpostor* impostor, const Vector3& force,
                           const Vector3& contactPoint)
     = 0;
-  virtual void generatePhysicsBody(PhysicsImpostor* impostor) = 0;
-  virtual void removePhysicsBody(PhysicsImpostor* impostor)   = 0;
-  virtual void generateJoint(PhysicsImpostorJoint* joint)     = 0;
-  virtual void removeJoint(PhysicsImpostorJoint* joint)       = 0;
-  virtual bool isSupported()                                  = 0;
-  virtual void setTransformationFromPhysicsBody(PhysicsImpostor* impostor);
+  virtual void generatePhysicsBody(PhysicsImpostor* impostor)              = 0;
+  virtual void removePhysicsBody(PhysicsImpostor* impostor)                = 0;
+  virtual void generateJoint(PhysicsImpostorJoint* joint)                  = 0;
+  virtual void removeJoint(PhysicsImpostorJoint* joint)                    = 0;
+  virtual bool isSupported()                                               = 0;
+  virtual void setTransformationFromPhysicsBody(PhysicsImpostor* impostor) = 0;
   virtual void setPhysicsBodyTransformation(PhysicsImpostor* impostor,
                                             const Vector3& newPosition,
                                             const Quaternion& newRotation)
@@ -36,11 +36,11 @@ struct BABYLON_SHARED_EXPORT IPhysicsEnginePlugin {
   virtual void setAngularVelocity(PhysicsImpostor* impostor,
                                   const Vector3& velocity)
     = 0;
-  virtual Vector3 getLinearVelocity(PhysicsImpostor* impostor)  = 0;
-  virtual Vector3 getAngularVelocity(PhysicsImpostor* impostor) = 0;
+  virtual Vector3 getLinearVelocity(PhysicsImpostor* impostor)    = 0;
+  virtual Vector3 getAngularVelocity(PhysicsImpostor* impostor)   = 0;
   virtual void setBodyMass(PhysicsImpostor* impostor, float mass) = 0;
-  virtual void sleepBody(PhysicsImpostor* impostor)  = 0;
-  virtual void wakeUpBody(PhysicsImpostor* impostor) = 0;
+  virtual void sleepBody(PhysicsImpostor* impostor)               = 0;
+  virtual void wakeUpBody(PhysicsImpostor* impostor)              = 0;
   // Joint Update
   virtual void updateDistanceJoint(DistanceJoint* joint, float maxDistance,
                                    float minDistance)

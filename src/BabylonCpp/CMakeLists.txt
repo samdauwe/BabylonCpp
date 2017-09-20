@@ -378,7 +378,7 @@ target_compile_options(${TARGET}
 
 # Set library ouput name
 set_target_properties(${TARGET}
-    PROPERTIES  PREFIX "lib"
+    PROPERTIES  PREFIX "${CMAKE_SHARED_LIBRARY_PREFIX}"
                 OUTPUT_NAME $<LOWER_CASE:${TARGET}>
                 VERSION ${META_VERSION}
                 SOVERSION ${META_VERSION}

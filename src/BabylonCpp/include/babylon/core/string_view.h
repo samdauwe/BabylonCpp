@@ -17,6 +17,8 @@ limitations under the License.
 #ifndef BABYLON_CORE_STRING_VIEW_H
 #define BABYLON_CORE_STRING_VIEW_H
 
+#include <babylon/babylon_api.h>
+
 #include <algorithm>
 #include <cstring>
 #include <ostream>
@@ -36,7 +38,7 @@ namespace BABYLON {
 
 // This class implements a strict subset of C++17's std::string_view, so that
 // once that class is standardized we can easily switch to it.
-class string_view {
+class BABYLON_SHARED_EXPORT string_view {
 public:
   static constexpr size_t npos = size_t(-1);
 

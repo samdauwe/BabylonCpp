@@ -1,5 +1,6 @@
 #include <babylon/cameras/free_camera.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/collisions/collider.h>
 #include <babylon/collisions/icollision_coordinator.h>
 #include <babylon/core/json.h>
@@ -58,7 +59,7 @@ int FreeCamera::collisionMask()
 
 void FreeCamera::setCollisionMask(int mask)
 {
-  _collisionMask = !::std::isnan<float>(mask) ? mask : -1;
+  _collisionMask = !isNan(mask) ? mask : -1;
 }
 
 void FreeCamera::_collideWithWorld(Vector3& velocity)

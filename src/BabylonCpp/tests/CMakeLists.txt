@@ -16,6 +16,11 @@ set(sources
     ${SRC_FILES}
 )
 
+if(NOT OPTION_ENABLE_SIMD)
+    list(REMOVE_ITEM sources ${CMAKE_CURRENT_SOURCE_DIR}/math/simd_test.cpp)
+endif(NOT OPTION_ENABLE_SIMD)
+
+
 # ============================================================================ #
 #                            Create executable                                 #
 # ============================================================================ #

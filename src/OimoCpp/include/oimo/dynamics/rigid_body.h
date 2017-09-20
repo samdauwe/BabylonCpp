@@ -7,6 +7,7 @@
 #include <oimo/math/mat44.h>
 #include <oimo/math/quat.h>
 #include <oimo/math/vec3.h>
+#include <oimo/oimo_api.h>
 
 namespace OIMO {
 
@@ -19,7 +20,7 @@ class World;
  * @brief The class of rigid body. Rigid body has the shape of a single or
  * multiple collision processing.
  */
-class RigidBody {
+class OIMO_SHARED_EXPORT RigidBody {
 
 public:
   // The maximum number of shapes that can be added to a one rigid.

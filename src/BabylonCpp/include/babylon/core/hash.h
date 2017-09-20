@@ -20,6 +20,7 @@ limitations under the License.
 #include <cstddef>
 #include <stdint.h>
 
+#include <babylon/babylon_api.h>
 #include <babylon/core/string_view.h>
 
 // String hashing function used by various parts of Lullaby.  It uses the
@@ -36,10 +37,11 @@ using HashValue = unsigned int;
 constexpr HashValue kHashOffsetBasis     = 0x84222325;
 constexpr HashValue kHashPrimeMultiplier = 0x000001b3;
 
-HashValue Hash(const char* str);
-HashValue Hash(const char* str, size_t len);
-HashValue Hash(string_view str);
-HashValue HashCaseInsensitive(const char* str, size_t len);
+BABYLON_SHARED_EXPORT HashValue Hash(const char* str);
+BABYLON_SHARED_EXPORT HashValue Hash(const char* str, size_t len);
+BABYLON_SHARED_EXPORT HashValue Hash(string_view str);
+BABYLON_SHARED_EXPORT HashValue HashCaseInsensitive(const char* str,
+                                                    size_t len);
 
 namespace detail {
 

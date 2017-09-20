@@ -1,5 +1,6 @@
 #include <babylon/cameras/target_camera.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/json.h>
 #include <babylon/core/string.h>
 #include <babylon/core/time.h>
@@ -151,15 +152,15 @@ void TargetCamera::setTarget(const Vector3& target)
 
   rotation->z = 0.f;
 
-  if (::std::isnan<float>(rotation->x)) {
+  if (isNan(rotation->x)) {
     rotation->x = 0.f;
   }
 
-  if (::std::isnan<float>(rotation->y)) {
+  if (isNan(rotation->y)) {
     rotation->y = 0.f;
   }
 
-  if (::std::isnan<float>(rotation->z)) {
+  if (isNan(rotation->z)) {
     rotation->z = 0.f;
   }
 

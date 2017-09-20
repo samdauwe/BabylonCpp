@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <oimo/collision/broadphase/pair.h>
+#include <oimo/oimo_api.h>
 
 namespace OIMO {
 
@@ -15,7 +16,7 @@ class Shape;
  * @brief The broad-phase is used for collecting all possible pairs for
  * collision.
  */
-class BroadPhase {
+class OIMO_SHARED_EXPORT BroadPhase {
 
 public:
   // BroadPhase type

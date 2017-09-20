@@ -23,7 +23,7 @@ namespace BABYLON {
  * never be for Turn Left/Right.
  */
 template <class T>
-class BABYLON_SHARED_EXPORT Observable {
+class Observable {
 
 public:
   using CallbackFunc

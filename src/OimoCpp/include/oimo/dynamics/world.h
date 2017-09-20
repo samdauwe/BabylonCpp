@@ -10,6 +10,7 @@
 #include <oimo/constraint/constraint.h>
 #include <oimo/dynamics/rigid_body.h>
 #include <oimo/math/vec3.h>
+#include <oimo/oimo_api.h>
 #include <oimo/oimo_utils.h>
 #include <oimo/util/performance.h>
 
@@ -23,7 +24,7 @@ class Shape;
 /**
  * @brief The class of physical computing world.
  */
-class World {
+class OIMO_SHARED_EXPORT World {
 
 public:
   // this world scale defaut is 0.1 to 10 meters max for dynamique body

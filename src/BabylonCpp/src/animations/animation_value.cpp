@@ -1,6 +1,7 @@
 #include <babylon/animations/animation_value.h>
 
 #include <babylon/animations/animation.h>
+#include <babylon/babylon_stl_util.h>
 
 namespace BABYLON {
 
@@ -10,7 +11,7 @@ AnimationValue::AnimationValue() : dataType{-1}
 
 AnimationValue::AnimationValue(float value)
 {
-  if (!::std::isnan<float>(value) && ::std::isfinite(value)) {
+  if (!isNan(value) && ::std::isfinite(value)) {
     dataType  = Animation::ANIMATIONTYPE_FLOAT;
     floatData = value;
   }

@@ -6,7 +6,11 @@
 namespace BABYLON {
 namespace stl_util {
 
-// -- Implementation of ::std::make_unique function in C++11 --
+// Determines if the given floating point number arg is a not-a-number (NaN)
+// value.
+#define isNan(a) (a != a)
+
+// -- Implementation of make_unique function in C++11 --
 template <typename T, typename... Args>
 inline unique_ptr_t<T> make_unique_helper(::std::false_type, Args&&... args)
 {

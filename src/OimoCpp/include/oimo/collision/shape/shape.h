@@ -6,6 +6,7 @@
 #include <oimo/collision/broadphase/proxy.h>
 #include <oimo/math/mat33.h>
 #include <oimo/math/vec3.h>
+#include <oimo/oimo_api.h>
 
 namespace OIMO {
 
@@ -19,7 +20,7 @@ struct ShapeConfig;
 /**
  * @brief A shape is used to detect collisions of rigid bodies.
  */
-class Shape {
+class OIMO_SHARED_EXPORT Shape {
 
 public:
   static unsigned int s_nextID;

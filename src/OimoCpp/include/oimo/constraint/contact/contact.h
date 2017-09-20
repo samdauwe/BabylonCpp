@@ -5,6 +5,7 @@
 
 #include <oimo/constraint/contact/impulse_data_buffer.h>
 #include <oimo/constraint/contact/manifold_point.h>
+#include <oimo/oimo_api.h>
 #include <oimo/oimo_utils.h>
 
 namespace OIMO {
@@ -21,7 +22,7 @@ class Shape;
  * @brief A contact is a pair of shapes whose axis-aligned bounding boxes are
  * overlapping.
  */
-class Contact {
+class OIMO_SHARED_EXPORT Contact {
 
 public:
   Contact();

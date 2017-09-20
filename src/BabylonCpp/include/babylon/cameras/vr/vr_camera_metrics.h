@@ -39,7 +39,7 @@ public:
   float lensCenterOffset;
   bool compensateDistortion;
 
-}; // end of class FreeCameraMouseInput
+}; // end of class VRCameraMetrics
 
 } // end of namespace BABYLON
 
