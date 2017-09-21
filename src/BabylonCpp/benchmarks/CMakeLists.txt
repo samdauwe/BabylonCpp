@@ -64,7 +64,7 @@ target_compile_options(${TARGET}
 
 # Check if unit tests should run at build time
 get_target_property(TEST_EXCLUDE_FROM_DEFAULT_BUILD
-    BabylonCppTests EXCLUDE_FROM_DEFAULT_BUILD
+    BabylonCppBenchmarks EXCLUDE_FROM_DEFAULT_BUILD
 )
 
 if(EXCLUDE_FROM_DEFAULT_BUILD)

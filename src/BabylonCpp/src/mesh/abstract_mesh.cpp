@@ -346,7 +346,7 @@ int AbstractMesh::collisionGroup() const
 
 void AbstractMesh::setCollisionGroup(int mask)
 {
-  _collisionGroup = !::std::isnan<float>(mask) ? mask : -1;
+  _collisionGroup = !isNan(mask) ? mask : -1;
 }
 
 const char* AbstractMesh::getClassName() const

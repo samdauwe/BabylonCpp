@@ -15,7 +15,7 @@ namespace BABYLON {
  * and inspired from Herb Sutter's C++11 Active Object
  * http://herbsutter.com/2010/07/12/effective-concurrency-prefer-using-active-objects-instead-of-naked-threads
  */
-class Active {
+class BABYLON_SHARED_EXPORT Active {
 
 public:
   using Callback = ::std::function<void()>;

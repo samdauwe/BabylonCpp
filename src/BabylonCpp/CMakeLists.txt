@@ -430,6 +430,7 @@ target_link_libraries(gmock-dev
     gmock
 )
 
+if(NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
 # Target 'tests'
 add_custom_target(BabylonCppUnitTests)
 set_target_properties(BabylonCppUnitTests
@@ -437,6 +438,7 @@ set_target_properties(BabylonCppUnitTests
 
 # Tests
 add_test_without_ctest(tests)
+endif()
 
 # Target 'benchmarks'
 add_custom_target(BabylonCppBenchmarks)
