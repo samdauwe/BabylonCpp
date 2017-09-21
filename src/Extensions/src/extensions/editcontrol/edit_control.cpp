@@ -138,7 +138,7 @@ EditControl::EditControl(Mesh* iMesh, Camera* camera, ICanvas* iCanvas,
   // canvas->addEventListener("pointerup", pointerup, false);
   // canvas->addEventListener("pointermove", pointermove, false);
   setLocalAxes(mesh);
-  renderer = [this]() { renderLoopProcess(); };
+  renderer = [this](Scene*, const EventState&) { renderLoopProcess(); };
   scene->registerBeforeRender(renderer);
 }
 
@@ -754,7 +754,7 @@ void EditControl::doRotation(Mesh* mesh, Mesh* axis, const Vector3& newPos)
           angle = rotSnap;
         else
           angle = -rotSnap;
-        snapRZ  = 0;
+        snapRZ = 0;
       }
     }
     if (!stl_util::almost_equal(angle, 0.f)) {

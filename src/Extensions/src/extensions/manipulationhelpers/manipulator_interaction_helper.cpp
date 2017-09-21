@@ -23,7 +23,7 @@ ManipulatorInteractionHelper::ManipulatorInteractionHelper(Scene* scene)
   _scene->onBeforeRenderObservable.add(
     [this](Scene* s, const EventState& e) { onBeforeRender(s, e); });
   _scene->onPointerObservable.add(
-    [this](const PointerInfo& e, EventState& s) { onPointer(e, s); }, -1, true);
+    [this](PointerInfo* e, const EventState& s) { onPointer(e, s); }, -1, true);
 }
 
 ManipulatorInteractionHelper::~ManipulatorInteractionHelper()
@@ -49,7 +49,7 @@ void ManipulatorInteractionHelper::onBeforeRender(Scene* /*scene*/,
 }
 
 void ManipulatorInteractionHelper::onPointer(const PointerInfo& e,
-                                             EventState& state)
+                                              EventState& state)
 {
   if (!_manipulatedNode) {
     return;
@@ -259,8 +259,9 @@ void ManipulatorInteractionHelper::doPos(const Vector2& rayPos)
     v = hit.subtract(_prevHit);
   }
 
-  else if ((_manipulatedMode & (RadixFeatures::ArrowX | RadixFeatures::ArrowY
-                                | RadixFeatures::ArrowZ))
+  else if ((_manipulatedMode
+            & (RadixFeatures::ArrowX | RadixFeatures::ArrowY
+               | RadixFeatures::ArrowZ))
            != RadixFeatures::None) {
     Plane pl0, pl1;
     Vector3 hit;

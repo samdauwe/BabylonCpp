@@ -109,7 +109,7 @@ private:
   StandardMaterial* whiteMat;
   StandardMaterial* yellowMat;
   ActHist actHist;
-  std::function<void()> renderer;
+  ::std::function<void(Scene* scene, const EventState& es)> renderer;
   // EventListener* pointerdown;
   // EventListener* pointerup;
   // EventListener* pointermove;
