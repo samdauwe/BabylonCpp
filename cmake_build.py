@@ -83,6 +83,7 @@ The supported build commands are:
     devenv                      starts the IDE (Visual Studio on Windows) and loads the project
         supported build options:
             [--mode=<mode>]     the build mode, should we either 'release' or 'debug' mode
+    update                      fetches sources from master and integrates then into the local branch
 ''' % progName)
         parser.add_argument('command', help='Subcommand to run')
         args = parser.parse_args(sys.argv[1:2])
@@ -143,6 +144,14 @@ The supported build commands are:
                             'should we either 'release' or 'debug' mode.")
         args = parser.parse_args(sys.argv[2:])
         self._devenv(args)
+
+    def update(self):
+        '''
+        Fetches sources from master and integrates then into the local branch.
+        '''
+        import os
+        gitPullCmd = ['git', 'pull', 'origin', 'master']
+        self._tools.runCommand(os.getcwd(), gitPullCmd)
 
     def _getBuildDirectory(self, releaseBuild = True):
         """
