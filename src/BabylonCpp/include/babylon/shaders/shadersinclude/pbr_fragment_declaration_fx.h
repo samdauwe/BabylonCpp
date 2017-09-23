@@ -26,6 +26,7 @@ const char* pbrFragmentDeclaration
     "\n"
     "#ifdef BUMP\n"
     "uniform vec3 vBumpInfos;\n"
+    "uniform vec2 vTangentSpaceParams;\n"
     "#endif\n"
     "\n"
     "#ifdef OPACITY  \n"

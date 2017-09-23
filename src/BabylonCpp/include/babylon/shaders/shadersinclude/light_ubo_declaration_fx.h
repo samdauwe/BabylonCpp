@@ -18,7 +18,7 @@ const char* lightUboDeclaration
     "  #ifdef HEMILIGHT{X}\n"
     "  vec3 vLightGround;\n"
     "  #endif\n"
-    "  vec3 shadowsInfo;\n"
+    "  vec4 shadowsInfo;\n"
     "  vec2 depthValues;\n"
     "  } light{X};\n"
     "\n"

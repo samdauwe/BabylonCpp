@@ -81,6 +81,8 @@ const char* firePixelShader
     "  if (opacityColor.r < 0.1)\n"
     "  discard;\n"
     "#endif\n"
+    "\n"
+    "#include<depthPrePass>\n"
     "  \n"
     "  baseColor = texture2D(diffuseSampler, perturbedBaseCoords.xy) * 2.0;\n"
     "  baseColor *= opacityColor;\n"

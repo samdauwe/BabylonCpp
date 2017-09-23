@@ -29,6 +29,7 @@ const char* outlineVertexShader
     "attribute vec2 uv2;\n"
     "#endif\n"
     "#endif\n"
+    "#include<logDepthDeclaration>\n"
     "\n"
     "void main(void)\n"
     "{\n"
@@ -47,6 +48,7 @@ const char* outlineVertexShader
     "  vUV = vec2(diffuseMatrix * vec4(uv2, 1.0, 0.0));\n"
     "#endif\n"
     "#endif\n"
+    "#include<logDepthVertex>\n"
     "}\n";
 
 } // end of namespace BABYLON

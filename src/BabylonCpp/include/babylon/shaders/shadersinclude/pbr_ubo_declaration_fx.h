@@ -28,6 +28,7 @@ const char* pbrUboDeclaration
     "  uniform mat4 reflectivityMatrix;\n"
     "  uniform mat4 microSurfaceSamplerMatrix;\n"
     "  uniform mat4 bumpMatrix;\n"
+    "  uniform vec2 vTangentSpaceParams;\n"
     "  uniform mat4 refractionMatrix;\n"
     "  uniform mat4 reflectionMatrix;\n"
     "\n"

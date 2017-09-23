@@ -24,7 +24,7 @@ const char* lightFragmentDeclaration
     "  uniform sampler2D shadowSampler{X};\n"
     "  uniform mat4 lightMatrix{X};\n"
     "  #endif\n"
-    "  uniform vec3 shadowsInfo{X};\n"
+    "  uniform vec4 shadowsInfo{X};\n"
     "  uniform vec2 depthValues{X};\n"
     "  #endif\n"
     "  #ifdef SPOTLIGHT{X}\n"

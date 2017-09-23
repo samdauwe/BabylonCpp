@@ -6,19 +6,23 @@ namespace BABYLON {
 extern const char* outlinePixelShader;
 
 const char* outlinePixelShader
-  = "uniform vec4 color;\n"
+  = "#ifdef LOGARITHMICDEPTH\n"
+    "#extension GL_EXT_frag_depth : enable\n"
+    "#endif\n"
+    "uniform vec4 color;\n"
     "\n"
     "#ifdef ALPHATEST\n"
     "varying vec2 vUV;\n"
     "uniform sampler2D diffuseSampler;\n"
     "#endif\n"
+    "#include<logDepthDeclaration>\n"
     "\n"
     "void main(void) {\n"
     "#ifdef ALPHATEST\n"
     "  if (texture2D(diffuseSampler, vUV).a < 0.4)\n"
     "  discard;\n"
     "#endif\n"
-    "\n"
+    "#include<logDepthFragment>\n"
     "  gl_FragColor = color;\n"
     "}\n";
 

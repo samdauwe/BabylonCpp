@@ -10,7 +10,6 @@ const char* bumpFragment
     "\n"
     "#if defined(BUMP) || defined(PARALLAX)\n"
     "  #ifdef NORMALXYSCALE\n"
-    "  normalW = normalize(normalW * vec3(vBumpInfos.y, vBumpInfos.y, 1.0));\n"
     "  float normalScale = 1.0;\n"
     "  #else    \n"
     "  float normalScale = vBumpInfos.y;\n"

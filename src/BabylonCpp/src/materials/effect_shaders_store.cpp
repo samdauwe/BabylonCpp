@@ -62,7 +62,7 @@
 
 namespace BABYLON {
 
-std::unordered_map<std::string, const char*> EffectShadersStore::Shaders = {
+unordered_map_t<string_t, const char*> EffectShadersStore::Shaders = {
   {"anaglyphPixelShader", anaglyphPixelShader},
   {"blackAndWhitePixelShader", blackAndWhitePixelShader},
   {"blurPixelShader", blurPixelShader},

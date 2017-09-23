@@ -133,7 +133,7 @@ def generateShadersStore(shaderFiles, outputDir,
     output += "#include <babylon/babylon_global.h>%s%s" % (eol, eol)
     output += "namespace BABYLON {%s%s" % (eol, eol)
     output += "struct BABYLON_SHARED_EXPORT EffectShadersStore {%s" % eol
-    output += "  static std::unordered_map<std::string, const char*> "
+    output += "  static unordered_map_t<string_t, const char*> "
     output += "Shaders;%s" % eol
     output += "}; // end of struct EffectShadersStore%s%s" % (eol, eol)
     output += "} // end of namespace BABYLON%s%s#endif " % (eol, eol)
@@ -154,7 +154,7 @@ def generateShadersStore(shaderFiles, outputDir,
         output += "#include <babylon/shaders/%s>%s" % ("%s.h" % \
                                         shaderFilename.replace(".", "_"), eol)
     output += "%snamespace BABYLON {%s%s" % (eol, eol, eol)
-    output += "std::unordered_map<std::string, const char*> "
+    output += "unordered_map_t<string_t, const char*> "
     output += "EffectShadersStore::Shaders = {%s" % eol
     for shaderName in shaderNames:
         output += "  {\"%s\", %s},%s" % (shaderName, shaderName, eol)
@@ -182,7 +182,7 @@ def generateIncludesShadersStore(shaderFiles, outputDir,
     output += "#include <babylon/babylon_global.h>%s%s" % (eol, eol)
     output += "namespace BABYLON {%s%s" % (eol, eol)
     output += "struct BABYLON_SHARED_EXPORT EffectIncludesShadersStore {%s"% eol
-    output += "  static std::unordered_map<std::string, const char*> "
+    output += "  static unordered_map_t<string_t, const char*> "
     output += "Shaders;%s" % eol
     output += "}; // end of struct EffectIncludesShadersStore%s%s" % (eol, eol)
     output += "} // end of namespace BABYLON%s%s#endif " % (eol, eol)
@@ -203,7 +203,7 @@ def generateIncludesShadersStore(shaderFiles, outputDir,
         output += "#include <babylon/shaders/shadersinclude/%s>%s" % ("%s.h" % \
                                         shaderFilename.replace(".", "_"), eol)
     output += "%snamespace BABYLON {%s%s" % (eol, eol, eol)
-    output += "std::unordered_map<std::string, const char*> "
+    output += "unordered_map_t<string_t, const char*> "
     output += "EffectIncludesShadersStore::Shaders  %s = {" % eol
     for shaderName in shaderNames:
         output += "{\"%s\", %s},%s   " % (shaderName, shaderName, eol)
@@ -379,7 +379,7 @@ if __name__ == "__main__":
     # set default values when input is missing
     if not options.inputDir:
         options.inputDir = os.path.join(os.getcwd(), "..", "..", "..",
-                                        "Projects", "Babylon.js-3.0.0")
+                                    "Projects", "Babylon.js-3.1.0_2017_09_23")
         args += [options.inputDir]
     if not options.outputDir:
         options.outputDir = os.path.join(os.getcwd(), "..", "src", "BabylonCpp")

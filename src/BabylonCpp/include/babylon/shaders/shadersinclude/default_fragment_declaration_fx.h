@@ -35,6 +35,7 @@ const char* defaultFragmentDeclaration
     "\n"
     "#ifdef BUMP\n"
     "uniform vec3 vBumpInfos;\n"
+    "uniform vec2 vTangentSpaceParams;\n"
     "#endif\n"
     "\n"
     "#if defined(REFLECTIONMAP_SPHERICAL) || defined(REFLECTIONMAP_PROJECTION) || defined(REFRACTION)\n"

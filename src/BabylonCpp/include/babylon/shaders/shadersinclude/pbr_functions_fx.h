@@ -145,6 +145,9 @@ const char* pbrFunctions
     "\n"
     "float environmentHorizonOcclusion(vec3 reflection, vec3 normal) {\n"
     "  // http://marmosetco.tumblr.com/post/81245981087\n"
+    "#ifdef REFLECTIONMAP_OPPOSITEZ\n"
+    "  reflection.z *= -1.0;\n"
+    "#endif\n"
     "  float temp = clamp( 1.0 + 1.1 * dot(reflection, normal), 0.0, 1.0);\n"
     "  return square(temp);\n"
     "}\n";

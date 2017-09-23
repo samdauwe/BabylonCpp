@@ -14,6 +14,7 @@
 #include <babylon/shaders/shadersinclude/default_fragment_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/default_ubo_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/default_vertex_declaration_fx.h>
+#include <babylon/shaders/shadersinclude/depth_pre_pass_fx.h>
 #include <babylon/shaders/shadersinclude/fog_fragment_fx.h>
 #include <babylon/shaders/shadersinclude/fog_fragment_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/fog_vertex_fx.h>
@@ -40,6 +41,7 @@
 #include <babylon/shaders/shadersinclude/morph_targets_vertex_fx.h>
 #include <babylon/shaders/shadersinclude/morph_targets_vertex_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/morph_targets_vertex_global_declaration_fx.h>
+#include <babylon/shaders/shadersinclude/mrt_fragment_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_fragment_declaration_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_functions_fx.h>
 #include <babylon/shaders/shadersinclude/pbr_light_functions_fx.h>
@@ -53,7 +55,7 @@
 
 namespace BABYLON {
 
-std::unordered_map<std::string, const char*> EffectIncludesShadersStore::Shaders  
+unordered_map_t<string_t, const char*> EffectIncludesShadersStore::Shaders  
  = {{"bones300Declaration", bones300Declaration},
    {"bonesDeclaration", bonesDeclaration},
    {"bonesVertex", bonesVertex},
@@ -68,6 +70,7 @@ std::unordered_map<std::string, const char*> EffectIncludesShadersStore::Shaders
    {"defaultFragmentDeclaration", defaultFragmentDeclaration},
    {"defaultUboDeclaration", defaultUboDeclaration},
    {"defaultVertexDeclaration", defaultVertexDeclaration},
+   {"depthPrePass", depthPrePass},
    {"fogFragment", fogFragment},
    {"fogFragmentDeclaration", fogFragmentDeclaration},
    {"fogVertex", fogVertex},
@@ -94,6 +97,7 @@ std::unordered_map<std::string, const char*> EffectIncludesShadersStore::Shaders
    {"morphTargetsVertex", morphTargetsVertex},
    {"morphTargetsVertexDeclaration", morphTargetsVertexDeclaration},
    {"morphTargetsVertexGlobalDeclaration", morphTargetsVertexGlobalDeclaration},
+   {"mrtFragmentDeclaration", mrtFragmentDeclaration},
    {"pbrFragmentDeclaration", pbrFragmentDeclaration},
    {"pbrFunctions", pbrFunctions},
    {"pbrLightFunctions", pbrLightFunctions},

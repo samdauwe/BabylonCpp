@@ -35,6 +35,7 @@ const char* defaultUboDeclaration
     "  mat4 lightmapMatrix;\n"
     "  mat4 specularMatrix;\n"
     "  mat4 bumpMatrix; \n"
+    "  vec4 vTangentSpaceParams;\n"
     "  mat4 refractionMatrix;\n"
     "  vec4 vRefractionInfos;\n"
     "  vec4 vSpecularColor;\n"
