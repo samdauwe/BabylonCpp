@@ -179,7 +179,7 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio,
     nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(),
     false,
     "#define BILATERAL_BLUR\n#define BILATERAL_BLUR_H\n#define SAMPLES 16");
-  _blurHPostProcess->setOnApply([&](Effect* effect, const EventState&) {
+  _blurHPostProcess->setOnApply([&](Effect* effect, EventState&) {
     effect->setFloat("outSize", _ssaoCombinePostProcess->width);
     effect->setFloat("near", _scene->activeCamera->minZ);
     effect->setFloat("far", _scene->activeCamera->maxZ);
@@ -195,7 +195,7 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio,
     "BlurV", "ssao", {"outSize", "samplerOffsets"}, {"depthSampler"}, blurRatio,
     nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(),
     false, "#define BILATERAL_BLUR\n#define SAMPLES 16");
-  _blurVPostProcess->setOnApply([&](Effect* effect, const EventState&) {
+  _blurVPostProcess->setOnApply([&](Effect* effect, EventState&) {
     effect->setFloat("outSize", _ssaoCombinePostProcess->height);
     effect->setFloat("near", _scene->activeCamera->minZ);
     effect->setFloat("far", _scene->activeCamera->maxZ);
@@ -253,7 +253,7 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
     "#define SAMPLES " + ::std::to_string(numSamples) + "\n#define SSAO");
 
-  _ssaoPostProcess->setOnApply([&](Effect* effect, const EventState&) {
+  _ssaoPostProcess->setOnApply([&](Effect* effect, EventState&) {
     if (_firstUpdate) {
       effect->setArray3("sampleSphere", sampleSphere);
       effect->setFloat("randTextureTiles", 4.f);
@@ -289,7 +289,7 @@ void SSAO2RenderingPipeline::_createSSAOCombinePostProcess(float ratio)
     "ssaoCombine", "ssaoCombine", {}, {"originalColor"}, ratio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
 
-  _ssaoCombinePostProcess->setOnApply([&](Effect* effect, const EventState&) {
+  _ssaoCombinePostProcess->setOnApply([&](Effect* effect, EventState&) {
     effect->setTextureFromPostProcess("originalColor",
                                       _originalColorPostProcess);
   });

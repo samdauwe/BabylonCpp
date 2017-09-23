@@ -67,7 +67,7 @@ void FogScene::initializeScene(ICanvas* canvas, Scene* scene)
   scene->fogDensity = 0.1f;
 
   // Animations
-  _scene->registerBeforeRender([this]() {
+  _scene->registerBeforeRender([this](Scene*, EventState&) {
     _sphere0->position().z = 4.f * std::cos(_alpha);
     _sphere1->position().z = 10.f * std::sin(_alpha);
     _sphere2->position().z = 4.f * std::cos(_alpha);

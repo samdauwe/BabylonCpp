@@ -67,7 +67,7 @@ void ShaderMaterialSkyboxCloudsScene::initializeScene(ICanvas* canvas,
   skybox->setMaterial(_shaderMaterial);
 
   // Animation
-  scene->onAfterCameraRenderObservable.add([this]() {
+  scene->onAfterCameraRenderObservable.add([this](Camera*, EventState&) {
     _shaderMaterial->setFloat("time", _time);
     _time += 0.01f;
   });

@@ -99,9 +99,9 @@ public:
 
   // Events
   void setOnCollide(
-    const ::std::function<void(AbstractMesh*, const EventState&)>& callback);
+    const ::std::function<void(AbstractMesh*, EventState&)>& callback);
   void setOnCollisionPositionChange(
-    const ::std::function<void(Vector3*, const EventState&)>& callback);
+    const ::std::function<void(Vector3*, EventState&)>& callback);
 
   // Properties
   Material* material();
@@ -604,14 +604,14 @@ public:
    * @returns The AbstractMesh.
    */
   AbstractMesh& registerAfterWorldMatrixUpdate(
-    const ::std::function<void(AbstractMesh* mesh, const EventState&)>& func);
+    const ::std::function<void(AbstractMesh* mesh, EventState&)>& func);
 
   /**
    * @brief Removes a registered callback function.
    * @returns The AbstractMesh.
    */
   AbstractMesh& unregisterAfterWorldMatrixUpdate(
-    const ::std::function<void(AbstractMesh* mesh, const EventState&)>& func);
+    const ::std::function<void(AbstractMesh* mesh, EventState&)>& func);
 
   /**
    * @brief Sets the mesh position in its local space.

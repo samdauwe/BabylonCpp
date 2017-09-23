@@ -20,7 +20,7 @@ void ArcRotateCameraMouseWheelInput::attachControl(ICanvas* canvas,
   _canvas           = canvas;
   _noPreventDefault = noPreventDefault;
 
-  _wheel = [this](PointerInfo* p, const EventState&) {
+  _wheel = [this](PointerInfo* p, EventState&) {
     // sanity check - this should be a PointerWheel event.
     if (p->type != PointerEventTypes::POINTERWHEEL) {
       return;

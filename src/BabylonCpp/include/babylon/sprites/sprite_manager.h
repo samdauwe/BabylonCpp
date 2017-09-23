@@ -29,7 +29,7 @@ public:
   Texture* texture() const;
   void texture(Texture* value);
   void setOnDispose(
-    const ::std::function<void(SpriteManager*, const EventState&)>& callback);
+    const ::std::function<void(SpriteManager*, EventState&)>& callback);
   PickingInfo* intersects(const Ray ray, Camera* camera,
                           ::std::function<bool(Sprite* sprite)> predicate,
                           bool fastCheck);

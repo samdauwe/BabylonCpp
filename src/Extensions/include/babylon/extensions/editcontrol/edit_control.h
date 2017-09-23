@@ -6,6 +6,7 @@
 #include <babylon/extensions/editcontrol/act_history.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/vector3.h>
+#include <babylon/tools/event_state.h>
 
 namespace BABYLON {
 namespace Extensions {
@@ -109,7 +110,7 @@ private:
   StandardMaterial* whiteMat;
   StandardMaterial* yellowMat;
   ActHist actHist;
-  ::std::function<void(Scene* scene, const EventState& es)> renderer;
+  ::std::function<void(Scene* scene, EventState& es)> renderer;
   // EventListener* pointerdown;
   // EventListener* pointerup;
   // EventListener* pointermove;

@@ -93,8 +93,8 @@ public:
   void detachManipulatedNode(Node* node);
 
 private:
-  void onBeforeRender(Scene* scene, const EventState& state);
-  void onPointer(const PointerInfo& e, const EventState& state);
+  void onBeforeRender(Scene* scene, EventState& state);
+  void onPointer(PointerInfo& e, EventState& state);
   void beginDrag(const Vector2& rayPos, const PointerEvent& event);
   void endDragMode();
   void doRot(const Vector2& rayPos);

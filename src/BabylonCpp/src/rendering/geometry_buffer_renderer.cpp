@@ -226,10 +226,9 @@ void GeometryBufferRenderer::_createRenderTargets()
   _multiRenderTarget->renderList      = {};
 
   // set default depth value to 1.0 (far away)
-  _multiRenderTarget->onClearObservable.add(
-    [](Engine* engine, const EventState&) {
-      engine->clear(Color4(0.f, 0.f, 0.f, 1.f), true, true, true);
-    });
+  _multiRenderTarget->onClearObservable.add([](Engine* engine, EventState&) {
+    engine->clear(Color4(0.f, 0.f, 0.f, 1.f), true, true, true);
+  });
 
   // Custom render function
   _multiRenderTarget->customRenderFunction

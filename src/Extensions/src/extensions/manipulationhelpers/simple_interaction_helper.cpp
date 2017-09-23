@@ -14,7 +14,7 @@ SimpleInteractionHelper::SimpleInteractionHelper(Scene* scene)
     : _actionStack{}, _scene{scene}, _manipulator{nullptr}
 {
   _pointerObserver = _scene->onPointerObservable.add(
-    [this](const PointerInfo& p, EventState& s) { pointerCallback(p, s); }, -1,
+    [this](PointerInfo* p, EventState& s) { pointerCallback(*p, s); }, -1,
     true);
 }
 
@@ -114,7 +114,7 @@ void SimpleInteractionHelper::doSelectorInteraction(const PointerInfo& p,
 }
 
 void SimpleInteractionHelper::detectActionChanged(const PointerInfo& p,
-                                                  const EventState& /*s*/)
+                                                  EventState& /*s*/)
 {
   // Detect switch from selection to camerator
   if (currentAction() == SIHCurrentAction::Selector) {

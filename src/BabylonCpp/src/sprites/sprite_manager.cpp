@@ -135,7 +135,7 @@ void SpriteManager::texture(Texture* value)
 }
 
 void SpriteManager::setOnDispose(
-  const ::std::function<void(SpriteManager*, const EventState&)>& callback)
+  const ::std::function<void(SpriteManager*, EventState&)>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);

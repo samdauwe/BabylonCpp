@@ -38,10 +38,10 @@ public:
 private:
   vector_t<Vector3> _renderPoints;
   LinesMesh* _renderLine;
-  ::std::function<void(Scene*, const EventState&)> _renderFunction;
+  ::std::function<void(Scene*, EventState&)> _renderFunction;
   Scene* _scene;
 
-  ::std::function<void(Scene*, const EventState&)> _updateToMeshFunction;
+  ::std::function<void(Scene*, EventState&)> _updateToMeshFunction;
   AbstractMesh* _attachedToMesh;
   Vector3 _meshSpaceDirection;
   Vector3 _meshSpaceOrigin;

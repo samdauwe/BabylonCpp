@@ -30,7 +30,7 @@ BlurPostProcess::BlurPostProcess(const string_t& iName,
 {
   setKernel(kernel);
 
-  onApplyObservable.add([&](Effect* effect, const EventState&) {
+  onApplyObservable.add([&](Effect* effect, EventState&) {
     effect->setFloat2("delta", (1.f / static_cast<float>(width)) * direction.x,
                       (1.f / static_cast<float>(height)) * direction.y);
   });

@@ -89,7 +89,7 @@ PostProcess::~PostProcess()
 }
 
 void PostProcess::setOnActivate(
-  const ::std::function<void(Camera* camera, const EventState&)>& callback)
+  const ::std::function<void(Camera* camera, EventState&)>& callback)
 {
   if (_onActivateObserver) {
     onActivateObservable.remove(_onActivateObserver);
@@ -98,8 +98,7 @@ void PostProcess::setOnActivate(
 }
 
 void PostProcess::setOnSizeChanged(
-  const ::std::function<void(PostProcess* postProcess, const EventState&)>&
-    callback)
+  const ::std::function<void(PostProcess* postProcess, EventState&)>& callback)
 {
   if (_onSizeChangedObserver) {
     onSizeChangedObservable.remove(_onSizeChangedObserver);
@@ -108,7 +107,7 @@ void PostProcess::setOnSizeChanged(
 }
 
 void PostProcess::setOnApply(
-  const ::std::function<void(Effect* effect, const EventState&)>& callback)
+  const ::std::function<void(Effect* effect, EventState&)>& callback)
 {
   if (_onApplyObserver) {
     onApplyObservable.remove(_onApplyObserver);
@@ -117,7 +116,7 @@ void PostProcess::setOnApply(
 }
 
 void PostProcess::setOnBeforeRender(
-  const ::std::function<void(Effect* effect, const EventState&)>& callback)
+  const ::std::function<void(Effect* effect, EventState&)>& callback)
 {
   if (_onBeforeRenderObserver) {
     onBeforeRenderObservable.remove(_onBeforeRenderObserver);
@@ -126,7 +125,7 @@ void PostProcess::setOnBeforeRender(
 }
 
 void PostProcess::setOnAfterRender(
-  const ::std::function<void(Effect* effect, const EventState&)>& callback)
+  const ::std::function<void(Effect* effect, EventState&)>& callback)
 {
   if (_onAfterRenderObserver) {
     onAfterRenderObservable.remove(_onAfterRenderObserver);

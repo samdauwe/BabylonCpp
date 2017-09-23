@@ -12,7 +12,7 @@ FilterPostProcess::FilterPostProcess(const string_t& iName,
                   camera, samplingMode, engine,           reusable}
     , kernelMatrix{_kernelMatrix}
 {
-  setOnApply([&](Effect* effect, const EventState&) {
+  setOnApply([&](Effect* effect, EventState&) {
     effect->setMatrix("kernelMatrix", kernelMatrix);
   });
 }

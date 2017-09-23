@@ -24,12 +24,12 @@ RefractionPostProcess::RefractionPostProcess(
     , colorLevel{iColorLevel}
     , _refRexture{nullptr}
 {
-  onActivateObservable.add([&](Camera* cam, const EventState&) {
+  onActivateObservable.add([&](Camera* cam, EventState&) {
     _refRexture = _refRexture ? _refRexture : Texture::New(refractionTextureUrl,
                                                            cam->getScene());
   });
 
-  onApplyObservable.add([&](Effect* effect, const EventState&) {
+  onApplyObservable.add([&](Effect* effect, EventState&) {
     effect->setColor3("baseColor", color);
     effect->setFloat("depth", depth);
     effect->setFloat("colorLevel", static_cast<float>(colorLevel));

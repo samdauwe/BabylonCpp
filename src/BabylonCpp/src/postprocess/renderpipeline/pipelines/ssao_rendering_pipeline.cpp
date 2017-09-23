@@ -115,7 +115,7 @@ void SSAORenderingPipeline::_createBlurPostProcess(float ratio)
     nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(),
     false,
     "#define BILATERAL_BLUR\n#define BILATERAL_BLUR_H\n#define SAMPLES 16");
-  _blurHPostProcess->setOnApply([&](Effect* effect, const EventState&) {
+  _blurHPostProcess->setOnApply([&](Effect* effect, EventState&) {
     effect->setFloat("outSize",
                      static_cast<float>(_ssaoCombinePostProcess->width));
     effect->setTexture("depthSampler", _depthTexture);
@@ -129,7 +129,7 @@ void SSAORenderingPipeline::_createBlurPostProcess(float ratio)
     "BlurV", "ssao", {"outSize", "samplerOffsets"}, {"depthSampler"}, ratio,
     nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(),
     false, "#define BILATERAL_BLUR\n#define SAMPLES 16");
-  _blurVPostProcess->setOnApply([&](Effect* effect, const EventState&) {
+  _blurVPostProcess->setOnApply([&](Effect* effect, EventState&) {
     effect->setFloat("outSize",
                      static_cast<float>(_ssaoCombinePostProcess->height));
     effect->setTexture("depthSampler", _depthTexture);
@@ -162,7 +162,7 @@ void SSAORenderingPipeline::_createSSAOPostProcess(float ratio)
     _scene->getEngine(), false,
     "#define SAMPLES " + ::std::to_string(numSamples) + "\n#define SSAO");
 
-  _ssaoPostProcess->setOnApply([&](Effect* effect, const EventState&) {
+  _ssaoPostProcess->setOnApply([&](Effect* effect, EventState&) {
     if (_firstUpdate) {
       effect->setArray3("sampleSphere", sampleSphere);
       effect->setFloat("samplesFactor", samplesFactor);
@@ -186,7 +186,7 @@ void SSAORenderingPipeline::_createSSAOCombinePostProcess(float ratio)
     "ssaoCombine", "ssaoCombine", {}, {"originalColor"}, ratio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
 
-  _ssaoCombinePostProcess->setOnApply([&](Effect* effect, const EventState&) {
+  _ssaoCombinePostProcess->setOnApply([&](Effect* effect, EventState&) {
     effect->setTextureFromPostProcess("originalColor",
                                       _originalColorPostProcess);
   });

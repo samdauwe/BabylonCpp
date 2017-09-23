@@ -11,7 +11,7 @@ FxaaPostProcess::FxaaPostProcess(const string_t& iName, float ratio,
     : PostProcess{iName,        "fxaa", {"texelSize"}, {}, ratio,       camera,
                   samplingMode, engine, reusable,      "", textureType, "fxaa"}
 {
-  onApplyObservable.add([this](Effect* effect, const EventState&) {
+  onApplyObservable.add([this](Effect* effect, EventState&) {
     auto _texelSize = texelSize();
     effect->setFloat2("texelSize", _texelSize.x, _texelSize.y);
   });

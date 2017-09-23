@@ -43,7 +43,7 @@ private:
   Engine* _engine;
   bool _noPreventDefault;
   bool _isPanClick;
-  ::std::function<void(PointerInfo* p, const EventState& es)> _pointerInput;
+  ::std::function<void(PointerInfo* p, EventState& es)> _pointerInput;
   Observer<PointerInfo>::Ptr _observer;
   ::std::function<void(KeyboardEvent& e)> _onKeyDown;
   ::std::function<void(KeyboardEvent& e)> _onKeyUp;

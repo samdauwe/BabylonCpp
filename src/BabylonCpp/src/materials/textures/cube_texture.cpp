@@ -33,7 +33,7 @@ CreateFromPrefilteredData(const string_t& url, Scene* scene,
 CubeTexture::CubeTexture(
   const string_t& rootUrl, Scene* scene, const vector_t<string_t>& extensions,
   bool noMipmap, const vector_t<string_t>& iFiles,
-  const ::std::function<void(InternalTexture*, const EventState&)>& onLoad,
+  const ::std::function<void(InternalTexture*, EventState&)>& onLoad,
   const ::std::function<void()>& onError, unsigned int format, bool prefiltered,
   const string_t& forcedExtension)
     : BaseTexture{scene}
@@ -92,7 +92,10 @@ CubeTexture::CubeTexture(
   }
   else if (onLoad) {
     if (_texture->isReady) {
-      Tools::SetImmediate([&onLoad]() { onLoad(nullptr, EventState(-1)); });
+      Tools::SetImmediate([&onLoad]() {
+        EventState es{-1};
+        onLoad(nullptr, es);
+      });
     }
     else {
       _texture->onLoadedObservable.add(onLoad);

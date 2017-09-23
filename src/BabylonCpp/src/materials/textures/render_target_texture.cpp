@@ -75,8 +75,7 @@ RenderTargetTexture::~RenderTargetTexture()
 }
 
 void RenderTargetTexture::setOnAfterUnbind(
-  const ::std::function<void(RenderTargetTexture*, const EventState&)>&
-    callback)
+  const ::std::function<void(RenderTargetTexture*, EventState&)>& callback)
 {
   if (_onAfterUnbindObserver) {
     onAfterUnbindObservable.remove(_onAfterUnbindObserver);
@@ -85,7 +84,7 @@ void RenderTargetTexture::setOnAfterUnbind(
 }
 
 void RenderTargetTexture::setOnBeforeRender(
-  const ::std::function<void(int* faceIndex, const EventState&)>& callback)
+  const ::std::function<void(int* faceIndex, EventState&)>& callback)
 {
   if (_onBeforeRenderObserver) {
     onBeforeRenderObservable.remove(_onBeforeRenderObserver);
@@ -94,7 +93,7 @@ void RenderTargetTexture::setOnBeforeRender(
 }
 
 void RenderTargetTexture::setOnAfterRender(
-  const ::std::function<void(int* faceIndex, const EventState&)>& callback)
+  const ::std::function<void(int* faceIndex, EventState&)>& callback)
 {
   if (_onAfterRenderObserver) {
     onAfterRenderObservable.remove(_onAfterRenderObserver);
@@ -103,7 +102,7 @@ void RenderTargetTexture::setOnAfterRender(
 }
 
 void RenderTargetTexture::setOnClear(
-  const ::std::function<void(Engine* engine, const EventState&)>& callback)
+  const ::std::function<void(Engine* engine, EventState&)>& callback)
 {
   if (_onClearObserver) {
     onClearObservable.remove(_onClearObserver);

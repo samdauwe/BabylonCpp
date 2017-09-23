@@ -27,7 +27,7 @@ class Observable {
 
 public:
   using CallbackFunc
-    = ::std::function<void(T* eventData, const EventState& eventState)>;
+    = ::std::function<void(T* eventData, EventState& eventState)>;
   using SPtr = shared_ptr_t<Observable<T>>;
 
   static EventState::UPtr _eventState;

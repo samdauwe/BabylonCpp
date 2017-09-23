@@ -19,7 +19,7 @@ ColorCorrectionPostProcess::ColorCorrectionPostProcess(
   _colorTableTexture->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
   _colorTableTexture->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
 
-  setOnApply([&](Effect* effect, const EventState&) {
+  setOnApply([&](Effect* effect, EventState&) {
     effect->setTexture("colorTable", _colorTableTexture);
   });
 }

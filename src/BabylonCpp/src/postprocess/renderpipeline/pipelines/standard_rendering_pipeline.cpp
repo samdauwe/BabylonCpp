@@ -363,7 +363,7 @@ void StandardRenderingPipeline::_createDownSampleX4PostProcess(Scene* scene,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
     "#define DOWN_SAMPLE_X4", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
-  downSampleX4PostProcess->setOnApply([&](Effect* effect, const EventState&) {
+  downSampleX4PostProcess->setOnApply([&](Effect* effect, EventState&) {
     Float32Array downSampleX4Offsets(32);
     unsigned int id = 0;
     for (int i = -2; i < 2; ++i) {
@@ -392,7 +392,7 @@ void StandardRenderingPipeline::_createBrightPassPostProcess(Scene* scene,
     nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
     "#define BRIGHT_PASS", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
-  brightPassPostProcess->setOnApply([&](Effect* effect, const EventState&) {
+  brightPassPostProcess->setOnApply([&](Effect* effect, EventState&) {
     float sU = (1.f / brightPassPostProcess->width);
     float sV = (1.f / brightPassPostProcess->height);
 
@@ -459,7 +459,7 @@ void StandardRenderingPipeline::_createGaussianBlurPostProcesses(
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
     "#define GAUSSIAN_BLUR_H", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   gaussianBlurHPostProcess->setOnApply(
-    [&](Effect*, const EventState&) { callback(false); });
+    [&](Effect*, EventState&) { callback(false); });
 
   // Create vertical gaussian blur post-process
   auto gaussianBlurVPostProcess = new PostProcess(
@@ -467,7 +467,7 @@ void StandardRenderingPipeline::_createGaussianBlurPostProcesses(
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
     "#define GAUSSIAN_BLUR_V", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   gaussianBlurVPostProcess->setOnApply(
-    [&](Effect*, const EventState&) { callback(true); });
+    [&](Effect*, EventState&) { callback(true); });
 
   // Add to pipeline
   auto indiceStr = ::std::to_string(indice);
@@ -491,7 +491,7 @@ void StandardRenderingPipeline::_createTextureAdderPostProcess(Scene* scene,
     {"otherSampler", "lensSampler"}, ratio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
     "#define TEXTURE_ADDER", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
-  textureAdderPostProcess->setOnApply([&](Effect* effect, const EventState&) {
+  textureAdderPostProcess->setOnApply([&](Effect* effect, EventState&) {
     effect->setTextureFromPostProcess("otherSampler", originalPostProcess);
     effect->setTexture("lensSampler", lensTexture);
     effect->setFloat("exposure", exposure);
@@ -517,7 +517,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
     "#define LUMINANCE", textureType);
 
-  luminancePostProcess->setOnApply([&](Effect* effect, const EventState&) {
+  luminancePostProcess->setOnApply([&](Effect* effect, EventState&) {
     float sU = (1.f / luminancePostProcess->width);
     float sV = (1.f / luminancePostProcess->height);
 
@@ -565,7 +565,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
     const string_t indexStr = ::std::to_string(index);
     Float32Array downSampleOffsets(18);
 
-    pp->setOnApply([&](Effect* effect, const EventState&) {
+    pp->setOnApply([&](Effect* effect, EventState&) {
       unsigned int id = 0;
       for (float x = -1; x < 2; ++x) {
         for (float y = -1; y < 2; ++y) {
@@ -587,7 +587,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
     });
 
     if (index == luminanceDownSamplePostProcesses.size() - 1) {
-      pp->setOnAfterRender([&](Effect*, const EventState&) {
+      pp->setOnAfterRender([&](Effect*, EventState&) {
         auto pixel = scene->getEngine()->readPixels(0, 0, 1, 1);
         Vector4 bit_shift(1.f / (255.f * 255.f * 255.f), 1.f / (255.f * 255.f),
                           1.f / 255.f, 1.f);
@@ -617,7 +617,7 @@ void StandardRenderingPipeline::_createHdrPostProcess(Scene* scene, float ratio)
   float time            = 0.f;
   float lastTime        = 0.f;
 
-  hdrPostProcess->setOnApply([&](Effect* effect, const EventState&) {
+  hdrPostProcess->setOnApply([&](Effect* effect, EventState&) {
 
     effect->setTextureFromPostProcess("textureAdderSampler",
                                       _bloomEnabled ? _currentHDRSource :
@@ -682,7 +682,7 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
     [&]() { return lensFlareComposePostProcess; }, false));
 
   // Lens flare
-  lensFlarePostProcess->setOnApply([&](Effect* effect, const EventState&) {
+  lensFlarePostProcess->setOnApply([&](Effect* effect, EventState&) {
     effect->setTextureFromPostProcess(
       "textureSampler",
       _bloomEnabled ? gaussianBlurHPostProcesses[0] : originalPostProcess);
@@ -701,47 +701,46 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
   });
 
   // Compose
-  lensFlareComposePostProcess->setOnApply(
-    [&](Effect* effect, const EventState&) {
-      effect->setTextureFromPostProcess("otherSampler",
-                                        textureAdderFinalPostProcess);
-      effect->setTexture("lensDirtSampler", lensFlareDirtTexture);
-      effect->setTexture("lensStarSampler", lensStarTexture);
+  lensFlareComposePostProcess->setOnApply([&](Effect* effect, EventState&) {
+    effect->setTextureFromPostProcess("otherSampler",
+                                      textureAdderFinalPostProcess);
+    effect->setTexture("lensDirtSampler", lensFlareDirtTexture);
+    effect->setTexture("lensStarSampler", lensStarTexture);
 
-      // Lens start rotation matrix
-      auto camerax = _scene->activeCamera->getViewMatrix().getRow(0);
-      auto cameraz = _scene->activeCamera->getViewMatrix().getRow(2);
-      auto camRot  = Vector3::Dot(camerax.toVector3(), Vector3(1.f, 0.f, 0.f))
-                    + Vector3::Dot(cameraz.toVector3(), Vector3(0.f, 0.f, 1.f));
-      camRot *= 4.f;
+    // Lens start rotation matrix
+    auto camerax = _scene->activeCamera->getViewMatrix().getRow(0);
+    auto cameraz = _scene->activeCamera->getViewMatrix().getRow(2);
+    auto camRot  = Vector3::Dot(camerax.toVector3(), Vector3(1.f, 0.f, 0.f))
+                  + Vector3::Dot(cameraz.toVector3(), Vector3(0.f, 0.f, 1.f));
+    camRot *= 4.f;
 
-      auto scaleBias1 = Matrix::FromValues(2.f, 0.f, -1.f, 0.f, //
-                                           0.f, 2.f, -1.f, 0.f, //
-                                           0.f, 0.f, 1.f, 0.f,  //
-                                           0.f, 0.f, 0.f, 1.f   //
-                                           );
+    auto scaleBias1 = Matrix::FromValues(2.f, 0.f, -1.f, 0.f, //
+                                         0.f, 2.f, -1.f, 0.f, //
+                                         0.f, 0.f, 1.f, 0.f,  //
+                                         0.f, 0.f, 0.f, 1.f   //
+                                         );
 
-      auto scaleBias2 = Matrix::FromValues(0.5f, 0.f, 0.5f, 0.f, //
-                                           0.f, 0.5f, 0.5f, 0.f, //
-                                           0.f, 0.f, 1.f, 0.f,   //
-                                           0.f, 0.f, 0.f, 1.f    //
-                                           );
+    auto scaleBias2 = Matrix::FromValues(0.5f, 0.f, 0.5f, 0.f, //
+                                         0.f, 0.5f, 0.5f, 0.f, //
+                                         0.f, 0.f, 1.f, 0.f,   //
+                                         0.f, 0.f, 0.f, 1.f    //
+                                         );
 
-      auto starRotation = Matrix::FromValues(
-        ::std::cos(camRot) * 0.5f, -::std::sin(camRot), 0.f, 0.f, //
-        ::std::sin(camRot), ::std::cos(camRot) * 0.5f, 0.f, 0.f,  //
-        0.f, 0.f, 1.f, 0.f,                                       //
-        0.f, 0.f, 0.f, 1.f                                        //
-        );
+    auto starRotation = Matrix::FromValues(
+      ::std::cos(camRot) * 0.5f, -::std::sin(camRot), 0.f, 0.f, //
+      ::std::sin(camRot), ::std::cos(camRot) * 0.5f, 0.f, 0.f,  //
+      0.f, 0.f, 1.f, 0.f,                                       //
+      0.f, 0.f, 0.f, 1.f                                        //
+      );
 
-      auto lensStarMatrix
-        = scaleBias2.multiply(starRotation).multiply(scaleBias1);
+    auto lensStarMatrix
+      = scaleBias2.multiply(starRotation).multiply(scaleBias1);
 
-      effect->setMatrix("lensStarMatrix", lensStarMatrix);
+    effect->setMatrix("lensStarMatrix", lensStarMatrix);
 
-      _currentDepthOfFieldSource = lensFlareFinalPostProcess;
-      _currentHDRSource          = lensFlareFinalPostProcess;
-    });
+    _currentDepthOfFieldSource = lensFlareFinalPostProcess;
+    _currentHDRSource          = lensFlareFinalPostProcess;
+  });
 }
 
 void StandardRenderingPipeline::_createDepthOfFieldPostProcess(Scene* scene,
@@ -752,7 +751,7 @@ void StandardRenderingPipeline::_createDepthOfFieldPostProcess(Scene* scene,
     {"otherSampler", "depthSampler"}, ratio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
     "#define DEPTH_OF_FIELD", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
-  depthOfFieldPostProcess->setOnApply([&](Effect* effect, const EventState&) {
+  depthOfFieldPostProcess->setOnApply([&](Effect* effect, EventState&) {
     effect->setTextureFromPostProcess("otherSampler",
                                       textureAdderFinalPostProcess);
     effect->setTexture("depthSampler", _depthRenderer->getDepthMap());
@@ -785,7 +784,7 @@ void StandardRenderingPipeline::_createMotionBlurPostProcess(Scene* scene,
   auto viewProjection     = Matrix::Identity();
   auto screenSize         = Vector2::Zero();
 
-  motionBlurPostProcess->setOnApply([&](Effect* effect, const EventState&) {
+  motionBlurPostProcess->setOnApply([&](Effect* effect, EventState&) {
     viewProjection
       = scene->getProjectionMatrix().multiply(scene->getViewMatrix());
 

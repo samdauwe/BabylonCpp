@@ -68,7 +68,7 @@ void ShaderMaterialWolfenstein3DScene::initializeScene(ICanvas* canvas,
   skybox->setMaterial(_shaderMaterial);
 
   // Animation
-  scene->onAfterCameraRenderObservable.add([this]() {
+  scene->onAfterCameraRenderObservable.add([this](Camera*, EventState&) {
     const float aspectRatio
       = static_cast<float>(getEngine()->getRenderWidth())
         / static_cast<float>(getEngine()->getRenderHeight());

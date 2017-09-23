@@ -29,7 +29,7 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
   _noPreventDefault = noPreventDefault;
 
   if (!_pointerInput) {
-    _pointerInput = [this](PointerInfo* p, const EventState&) {
+    _pointerInput = [this](PointerInfo* p, EventState&) {
       auto evt = p->pointerEvent;
 
       if (!touchEnabled && evt.pointerType == PointerType::TOUCH) {

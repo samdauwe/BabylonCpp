@@ -71,7 +71,7 @@ void LorenzAttractorScene::initializeScene(ICanvas* canvas, Scene* scene)
   lorenz        = Mesh::CreateLines("LorenzAttractor", points, scene);
   lorenz->color = Color3::Red();
 
-  scene->registerBeforeRender([this]() {
+  scene->registerBeforeRender([this](Scene*, EventState&) {
     lorenz->rotation().y += 0.008f * getScene()->getAnimationRatio();
   });
 }

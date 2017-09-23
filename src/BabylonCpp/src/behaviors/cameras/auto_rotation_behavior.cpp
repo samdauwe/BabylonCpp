@@ -79,7 +79,7 @@ void AutoRotationBehavior::attach(ArcRotateCamera* camera)
   auto scene      = _attachedCamera->getScene();
 
   _onPrePointerObservableObserver = scene->onPrePointerObservable.add(
-    [this](PointerInfoPre* pointerInfoPre, const EventState&) {
+    [this](PointerInfoPre* pointerInfoPre, EventState&) {
       if (pointerInfoPre->type == PointerEventTypes::POINTERDOWN) {
         _isPointerDown = true;
         return;
@@ -90,29 +90,29 @@ void AutoRotationBehavior::attach(ArcRotateCamera* camera)
       }
     });
 
-  _onAfterCheckInputsObserver = camera->onAfterCheckInputsObservable.add(
-    [this](Camera*, const EventState&) {
-      auto now = Time::highresTimepointNow();
-      auto dt  = 16.f;
-      if (!_lastFrameTime.isNull()) {
-        dt = Time::fpTimeDiff<float, ::std::milli>(now, *_lastFrameTime);
-      }
-      _lastFrameTime = now;
+  _onAfterCheckInputsObserver
+    = camera->onAfterCheckInputsObservable.add([this](Camera*, EventState&) {
+        auto now = Time::highresTimepointNow();
+        auto dt  = 16.f;
+        if (!_lastFrameTime.isNull()) {
+          dt = Time::fpTimeDiff<float, ::std::milli>(now, *_lastFrameTime);
+        }
+        _lastFrameTime = now;
 
-      // Stop the animation if there is user interaction and the animation
-      // should stop for this interaction
-      _applyUserInteraction();
+        // Stop the animation if there is user interaction and the animation
+        // should stop for this interaction
+        _applyUserInteraction();
 
-      float timeToRotation
-        = Time::fpTimeDiff<float, ::std::milli>(now, _lastInteractionTime)
-          - _idleRotationWaitTime;
-      float scale = ::std::max(
-        ::std::min(timeToRotation / (_idleRotationSpinupTime), 1.f), 0.f);
-      _cameraRotationSpeed = _idleRotationSpeed * scale;
+        float timeToRotation
+          = Time::fpTimeDiff<float, ::std::milli>(now, _lastInteractionTime)
+            - _idleRotationWaitTime;
+        float scale = ::std::max(
+          ::std::min(timeToRotation / (_idleRotationSpinupTime), 1.f), 0.f);
+        _cameraRotationSpeed = _idleRotationSpeed * scale;
 
-      // Step camera rotation by rotation speed
-      _attachedCamera->alpha -= _cameraRotationSpeed * (dt / 1000.f);
-    });
+        // Step camera rotation by rotation speed
+        _attachedCamera->alpha -= _cameraRotationSpeed * (dt / 1000.f);
+      });
 }
 
 void AutoRotationBehavior::detach()

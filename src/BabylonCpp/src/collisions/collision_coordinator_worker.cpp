@@ -143,8 +143,7 @@ void CollisionCoordinatorWorker::getNewPosition(
 void CollisionCoordinatorWorker::init(Scene* scene)
 {
   _scene = scene;
-  _scene->registerAfterRender(
-    [this](Scene*, const EventState&) { _afterRender(); });
+  _scene->registerAfterRender([this](Scene*, EventState&) { _afterRender(); });
 
   _worker.callbackHandler
     = [this](const WorkerReply e) { _onMessageFromWorker(e); };
@@ -158,14 +157,14 @@ void CollisionCoordinatorWorker::init(Scene* scene)
 void CollisionCoordinatorWorker::destroy()
 {
   _scene->unregisterAfterRender(
-    [this](Scene*, const EventState&) { _afterRender(); });
+    [this](Scene*, EventState&) { _afterRender(); });
   _worker.terminate();
 }
 
 void CollisionCoordinatorWorker::onMeshAdded(AbstractMesh* mesh)
 {
   mesh->registerAfterWorldMatrixUpdate(
-    [this](AbstractMesh* mesh, const EventState&) { onMeshUpdated(mesh); });
+    [this](AbstractMesh* mesh, EventState&) { onMeshUpdated(mesh); });
   onMeshUpdated(mesh);
 }
 

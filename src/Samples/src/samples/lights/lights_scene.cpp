@@ -121,7 +121,7 @@ void LightsScene::initializeScene(ICanvas* canvas, Scene* scene)
   sphere->setMaterial(material);
 
   // Animations
-  scene->onBeforeRenderObservable.add([this]() {
+  scene->onBeforeRenderObservable.add([this](Scene*, EventState&) {
     _lights[0]->position
       = Vector3(10.f * std::sin(_alpha), 0.f, 10.f * std::cos(_alpha));
     _lights[1]->position

@@ -68,7 +68,7 @@ void ShaderMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   box->setMaterial(_shaderMaterial);
 
   // Animation
-  scene->onAfterCameraRenderObservable.add([this]() {
+  scene->onAfterCameraRenderObservable.add([this](Camera*, EventState&) {
     _shaderMaterial->setFloat("time", 3.f / static_cast<float>(_j));
     if (_j == 2000) {
       _j = 0;

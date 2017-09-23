@@ -14,7 +14,7 @@ AnaglyphPostProcess::AnaglyphPostProcess(const string_t& iName, float ratio,
 {
   _passedProcess = rigCameras[0]->_rigPostProcess;
 
-  onApplyObservable.add([&](Effect* effect, const EventState&) {
+  onApplyObservable.add([&](Effect* effect, EventState&) {
     effect->setTextureFromPostProcess("leftSampler", _passedProcess);
   });
 }

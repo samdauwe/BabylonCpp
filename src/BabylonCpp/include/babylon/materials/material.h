@@ -55,10 +55,10 @@ public:
   virtual vector_t<Animation*> getAnimations() override;
 
   // Events
-  void setOnDispose(
-    const ::std::function<void(Material*, const EventState&)>& callback);
-  void setOnBind(
-    const ::std::function<void(AbstractMesh*, const EventState&)>& callback);
+  void
+  setOnDispose(const ::std::function<void(Material*, EventState&)>& callback);
+  void
+  setOnBind(const ::std::function<void(AbstractMesh*, EventState&)>& callback);
 
   bool wireframe() const;
   void setWireframe(bool value);

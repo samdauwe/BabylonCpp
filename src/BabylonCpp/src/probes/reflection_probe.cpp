@@ -23,7 +23,7 @@ ReflectionProbe::ReflectionProbe(const string_t& name, const ISize& size,
     EngineConstants::TEXTURETYPE_UNSIGNED_INT, true);
 
   _renderTargetTexture->onBeforeRenderObservable.add(
-    [this](int* faceIndex, const EventState&) {
+    [this](int* faceIndex, EventState&) {
       switch (*faceIndex) {
         case 0:
           _add.copyFromFloats(1.f, 0.f, 0.f);
@@ -59,7 +59,7 @@ ReflectionProbe::ReflectionProbe(const string_t& name, const ISize& size,
     });
 
   _renderTargetTexture->onAfterUnbindObservable.add(
-    [this](RenderTargetTexture*, const EventState&) {
+    [this](RenderTargetTexture*, EventState&) {
       _scene->updateTransformMatrix(true);
     });
 

@@ -125,7 +125,7 @@ vector_t<Animation*> Material::getAnimations()
 
 // Events
 void Material::setOnDispose(
-  const ::std::function<void(Material*, const EventState&)>& callback)
+  const ::std::function<void(Material*, EventState&)>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);
@@ -134,7 +134,7 @@ void Material::setOnDispose(
 }
 
 void Material::setOnBind(
-  const ::std::function<void(AbstractMesh*, const EventState&)>& callback)
+  const ::std::function<void(AbstractMesh*, EventState&)>& callback)
 {
   if (_onBindObserver) {
     onBindObservable.remove(_onBindObserver);

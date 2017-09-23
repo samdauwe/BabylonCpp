@@ -13,7 +13,7 @@ GlowBlurPostProcess::GlowBlurPostProcess(
     , direction{iDirection}
     , kernel{iKernel}
 {
-  onApplyObservable.add([this](Effect* effect, const EventState&) {
+  onApplyObservable.add([this](Effect* effect, EventState&) {
     effect->setFloat2("screenSize", width, height);
     effect->setVector2("direction", direction);
     effect->setFloat("blurWidth", kernel);
@@ -30,7 +30,7 @@ GlowBlurPostProcess::GlowBlurPostProcess(
     , direction{iDirection}
     , kernel{iKernel}
 {
-  onApplyObservable.add([this](Effect* effect, const EventState&) {
+  onApplyObservable.add([this](Effect* effect, EventState&) {
     effect->setFloat2("screenSize", width, height);
     effect->setVector2("direction", direction);
     effect->setFloat("blurWidth", kernel);

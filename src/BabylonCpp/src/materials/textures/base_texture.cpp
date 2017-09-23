@@ -99,7 +99,7 @@ const char* BaseTexture::getClassName() const
 }
 
 void BaseTexture::setOnDispose(
-  const ::std::function<void(BaseTexture*, const EventState&)>& callback)
+  const ::std::function<void(BaseTexture*, EventState&)>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);
@@ -368,8 +368,8 @@ void BaseTexture::WhenAllReady(const vector_t<BaseTexture*>& textures,
       auto onLoadObservable
         = *(static_cast<Texture*>(texture))->onLoadObservable();
 
-      const ::std::function<void(Texture*, const EventState&)> onLoadCallback
-        = [&](Texture*, const EventState&) {
+      const ::std::function<void(Texture*, EventState&)> onLoadCallback
+        = [&](Texture*, EventState&) {
             onLoadObservable.removeCallback(onLoadCallback);
             if (--numRemaining == 0) {
               callback();

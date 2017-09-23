@@ -57,7 +57,7 @@ void ShaderMaterialWithFogScene::initializeScene(ICanvas* canvas, Scene* scene)
     = ShaderMaterial::New("boxShader", scene, "custom", shaderMaterialOptions);
   box->setMaterial(_boxMaterial);
 
-  _boxMaterial->setOnBind([this]() {
+  _boxMaterial->setOnBind([this](AbstractMesh*, EventState&) {
     auto effect = _boxMaterial->getEffect();
     effect->setFloat4("vFogInfos", _scene->fogMode(), _scene->fogStart,
                       _scene->fogEnd, _scene->fogDensity);

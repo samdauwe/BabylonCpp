@@ -69,7 +69,7 @@ Layer::~Layer()
 
 // Events
 void Layer::setOnDispose(
-  const ::std::function<void(Layer*, const EventState&)>& callback)
+  const ::std::function<void(Layer*, EventState&)>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);
@@ -78,7 +78,7 @@ void Layer::setOnDispose(
 }
 
 void Layer::setOnBeforeRender(
-  const ::std::function<void(Layer*, const EventState&)>& callback)
+  const ::std::function<void(Layer*, EventState&)>& callback)
 {
   if (_onBeforeRenderObserver) {
     onBeforeRenderObservable.remove(_onBeforeRenderObserver);
@@ -87,7 +87,7 @@ void Layer::setOnBeforeRender(
 }
 
 void Layer::setOnAfterRender(
-  const ::std::function<void(Layer*, const EventState&)>& callback)
+  const ::std::function<void(Layer*, EventState&)>& callback)
 {
   if (_onAfterRenderObserver) {
     onAfterRenderObservable.remove(_onAfterRenderObserver);

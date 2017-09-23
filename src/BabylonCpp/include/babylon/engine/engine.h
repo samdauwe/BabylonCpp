@@ -360,13 +360,13 @@ public:
   InternalTexture* createTexture(
     const vector_t<string_t>& list, bool noMipmap, bool invertY, Scene* scene,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-    const ::std::function<void(InternalTexture*, const EventState&)>& onLoad
+    const ::std::function<void(InternalTexture*, EventState&)>& onLoad
     = nullptr,
     const ::std::function<void()>& onError = nullptr, Buffer* buffer = nullptr);
   InternalTexture* createTexture(
     const string_t& urlArg, bool noMipmap, bool invertY, Scene* scene,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-    const ::std::function<void(InternalTexture*, const EventState&)>& onLoad
+    const ::std::function<void(InternalTexture*, EventState&)>& onLoad
     = nullptr,
     const ::std::function<void()>& onError = nullptr, Buffer* buffer = nullptr,
     InternalTexture* fallBack = nullptr,
@@ -406,14 +406,14 @@ public:
                                 const IRenderTargetOptions& options);
   InternalTexture* createPrefilteredCubeTexture(
     const string_t& rootUrl, Scene* scene, float scale, float offset,
-    const ::std::function<void(InternalTexture*, const EventState&)>& onLoad
+    const ::std::function<void(InternalTexture*, EventState&)>& onLoad
     = nullptr,
     const ::std::function<void()>& onError = nullptr, unsigned int format = 0,
     const string_t& forcedExtension = "");
   InternalTexture* createCubeTexture(
     const string_t& rootUrl, Scene* scene, const vector_t<string_t>& extensions,
     bool noMipmap,
-    const ::std::function<void(InternalTexture*, const EventState&)>& onLoad
+    const ::std::function<void(InternalTexture*, EventState&)>& onLoad
     = nullptr,
     const ::std::function<void()>& onError = nullptr, unsigned int format = 0,
     const string_t& forcedExtension = "");

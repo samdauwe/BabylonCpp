@@ -16,10 +16,8 @@ public:
   PostProcessRenderPass(
     Scene* scene, const string_t& name, ISize size,
     const vector_t<Mesh*>& renderList,
-    const ::std::function<void(int* faceIndex, const EventState&)>&
-      beforeRender,
-    const ::std::function<void(int* faceIndex, const EventState&)>&
-      afterRender);
+    const ::std::function<void(int* faceIndex, EventState&)>& beforeRender,
+    const ::std::function<void(int* faceIndex, EventState&)>& afterRender);
   ~PostProcessRenderPass();
 
   int _incRefCount();

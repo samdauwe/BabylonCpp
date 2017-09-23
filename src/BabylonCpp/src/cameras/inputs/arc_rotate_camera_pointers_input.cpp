@@ -37,7 +37,7 @@ void ArcRotateCameraPointersInput::attachControl(ICanvas* canvas,
   _noPreventDefault      = noPreventDefault;
   _previousPinchDistance = 0.f;
 
-  _pointerInput = [this](PointerInfo* p, const EventState&) {
+  _pointerInput = [this](PointerInfo* p, EventState&) {
     auto evt = p->pointerEvent;
 
     if (p->type != PointerEventTypes::POINTERMOVE

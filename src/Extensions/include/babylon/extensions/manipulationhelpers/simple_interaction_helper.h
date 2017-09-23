@@ -33,7 +33,7 @@ public:
 private:
   void pointerCallback(const PointerInfo& p, EventState& s);
   void doSelectorInteraction(const PointerInfo& p, EventState& s);
-  void detectActionChanged(const PointerInfo& p, const EventState& s);
+  void detectActionChanged(const PointerInfo& p, EventState& s);
 
 private:
   static float CameratorSwitchThreshold;

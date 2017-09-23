@@ -1,16 +1,26 @@
 #include <argtable3/argtable3.h>
 #include <babylon/babylon_version.h>
-#include <babylon/core/delegate.h>
+#include <babylon/core/delegates/delegate.h>
 #include <babylon/core/logging.h>
 #include <babylon/samples/sample_launcher.h>
 #include <babylon/samples/samples_index.h>
 
-static void onLogMessage(const BABYLON::LogMessage& logMessage)
-{
-  printf("%s\n", logMessage.toString().c_str());
-}
-static auto logListenerDelegate
-  = BABYLON::delegate<void(const BABYLON::LogMessage&)>{onLogMessage};
+struct ConsoleLogger {
+
+  using log_message_t = BABYLON::delegate_t<void(const BABYLON::LogMessage&)>;
+
+  static void onLogMessage(const BABYLON::LogMessage& logMessage)
+  {
+    printf("%s\n", logMessage.toString().c_str());
+  }
+
+  static log_message_t logListenerDelegate;
+
+}; // end of struct ConsoleLogger
+
+ConsoleLogger::log_message_t ConsoleLogger::logListenerDelegate
+  = BABYLON::delegate_t<void(
+    const BABYLON::LogMessage&)>::create<&ConsoleLogger::onLogMessage>();
 
 /**
  * @brief Initializes the logging.
@@ -18,8 +28,8 @@ static auto logListenerDelegate
 void initializeLogging()
 {
   static_assert(
-    std::is_same<BABYLON::delegate<void(const BABYLON::LogMessage&)>,
-                 decltype(logListenerDelegate)>::value,
+    std::is_same<BABYLON::delegate_t<void(const BABYLON::LogMessage&)>,
+                 decltype(ConsoleLogger::logListenerDelegate)>::value,
     "!");
   // Intialize log levels
   std::vector<std::pair<unsigned int, std::string>> _logLevels;
@@ -35,7 +45,7 @@ void initializeLogging()
     unsigned int logType = logLevel.first;
     if (logType != BABYLON::LogLevels::LEVEL_QUIET) {
       BABYLON::Logger::Instance().registerLogMessageListener(
-        logType, logListenerDelegate);
+        logType, ConsoleLogger::logListenerDelegate);
     }
   }
 }

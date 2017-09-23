@@ -47,7 +47,7 @@ ImageProcessingPostProcess::ImageProcessingPostProcess(
 {
   _updateParameters();
 
-  setOnApply([this](Effect* effect, const EventState&) {
+  setOnApply([this](Effect* effect, EventState&) {
     // Color
     if (_colorCurvesEnabled) {
       ColorCurves::Bind(*colorCurves, effect);

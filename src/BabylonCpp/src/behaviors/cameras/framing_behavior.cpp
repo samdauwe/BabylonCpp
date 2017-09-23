@@ -129,7 +129,7 @@ void FramingBehavior::attach(ArcRotateCamera* camera)
   FramingBehavior::_EasingFunction.setEasingMode(FramingBehavior::EasingMode);
 
   _onPrePointerObservableObserver = scene->onPrePointerObservable.add(
-    [this](PointerInfoPre* pointerInfoPre, const EventState&) {
+    [this](PointerInfoPre* pointerInfoPre, EventState&) {
       if (pointerInfoPre->type == PointerEventTypes::POINTERDOWN) {
         _isPointerDown = true;
         return;
@@ -141,23 +141,23 @@ void FramingBehavior::attach(ArcRotateCamera* camera)
     });
 
   _onMeshTargetChangedObserver = camera->onMeshTargetChangedObservable.add(
-    [this](AbstractMesh* mesh, const EventState&) {
+    [this](AbstractMesh* mesh, EventState&) {
       if (mesh) {
         zoomOnMesh(mesh);
       }
     });
 
-  _onAfterCheckInputsObserver = camera->onAfterCheckInputsObservable.add(
-    [this](Camera*, const EventState&) {
-      // Stop the animation if there is user interaction and the animation
-      // should stop for this interaction
-      _applyUserInteraction();
+  _onAfterCheckInputsObserver
+    = camera->onAfterCheckInputsObservable.add([this](Camera*, EventState&) {
+        // Stop the animation if there is user interaction and the animation
+        // should stop for this interaction
+        _applyUserInteraction();
 
-      // Maintain the camera above the ground. If the user pulls the camera
-      // beneath the ground plane, lift it back to the default position after
-      // a given timeout
-      _maintainCameraAboveGround();
-    });
+        // Maintain the camera above the ground. If the user pulls the camera
+        // beneath the ground plane, lift it back to the default position after
+        // a given timeout
+        _maintainCameraAboveGround();
+      });
 }
 
 void FramingBehavior::detach()

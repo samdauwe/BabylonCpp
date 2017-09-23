@@ -174,7 +174,7 @@ void HighlightLayer::createTextureAndPostProcesses()
     "HighlightLayerPPP", _options.blurTextureSizeRatio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
   _downSamplePostprocess->onApplyObservable.add(
-    [&](Effect* effect, const EventState&) {
+    [&](Effect* effect, EventState&) {
       effect->setTexture("textureSampler", _mainTexture.get());
     });
 
@@ -183,7 +183,7 @@ void HighlightLayer::createTextureAndPostProcesses()
       "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize, 1,
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _horizontalBlurPostprocess->onApplyObservable.add(
-      [&](Effect* effect, const EventState&) {
+      [&](Effect* effect, EventState&) {
         effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
       });
 
@@ -191,7 +191,7 @@ void HighlightLayer::createTextureAndPostProcesses()
       "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize, 1,
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _verticalBlurPostprocess->onApplyObservable.add(
-      [&](Effect* effect, const EventState&) {
+      [&](Effect* effect, EventState&) {
         effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
       });
   }
@@ -200,7 +200,7 @@ void HighlightLayer::createTextureAndPostProcesses()
       "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize, 1,
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _horizontalBlurPostprocess->onApplyObservable.add(
-      [&](Effect* effect, const EventState&) {
+      [&](Effect* effect, EventState&) {
         effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
       });
 
@@ -208,13 +208,13 @@ void HighlightLayer::createTextureAndPostProcesses()
       "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize, 1,
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _verticalBlurPostprocess->onApplyObservable.add(
-      [&](Effect* effect, const EventState&) {
+      [&](Effect* effect, EventState&) {
         effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
       });
   }
 
   _mainTexture->onAfterUnbindObservable.add(
-    [this](RenderTargetTexture*, const EventState&) {
+    [this](RenderTargetTexture*, EventState&) {
       onBeforeBlurObservable.notifyObservers(this);
 
       _scene->postProcessManager->directRender(
@@ -244,10 +244,9 @@ void HighlightLayer::createTextureAndPostProcesses()
         }
       };
 
-  _mainTexture->onClearObservable.add(
-    [this](Engine* engine, const EventState&) {
-      engine->clear(HighlightLayer::neutralColor, true, true, true);
-    });
+  _mainTexture->onClearObservable.add([this](Engine* engine, EventState&) {
+    engine->clear(HighlightLayer::neutralColor, true, true, true);
+  });
 }
 
 void HighlightLayer::renderSubMesh(SubMesh* subMesh)
@@ -530,15 +529,11 @@ void HighlightLayer::addExcludedMesh(Mesh* mesh)
 {
   if (!stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
     IHighlightLayerExcludedMesh meshExcluded;
-    meshExcluded.mesh = mesh;
-    meshExcluded.beforeRender
-      = mesh->onBeforeRenderObservable.add([](Mesh* mesh, const EventState&) {
-          mesh->getEngine()->setStencilBuffer(false);
-        });
-    meshExcluded.afterRender
-      = mesh->onAfterRenderObservable.add([](Mesh* mesh, const EventState&) {
-          mesh->getEngine()->setStencilBuffer(true);
-        });
+    meshExcluded.mesh         = mesh;
+    meshExcluded.beforeRender = mesh->onBeforeRenderObservable.add([](
+      Mesh* mesh, EventState&) { mesh->getEngine()->setStencilBuffer(false); });
+    meshExcluded.afterRender = mesh->onAfterRenderObservable.add([](
+      Mesh* mesh, EventState&) { mesh->getEngine()->setStencilBuffer(true); });
     _excludedMeshes[mesh->uniqueId] = meshExcluded;
   }
 }
@@ -565,7 +560,7 @@ void HighlightLayer::addMesh(Mesh* mesh, const Color3& color,
     newMesh.color = color;
     // Lambda required for capture due to Observable this context
     newMesh.observerHighlight
-      = mesh->onBeforeRenderObservable.add([&](Mesh* mesh, const EventState&) {
+      = mesh->onBeforeRenderObservable.add([&](Mesh* mesh, EventState&) {
           if (stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
             defaultStencilReference(mesh);
           }
@@ -575,7 +570,7 @@ void HighlightLayer::addMesh(Mesh* mesh, const Color3& color,
           }
         });
     newMesh.observerDefault = mesh->onAfterRenderObservable.add(
-      [&](Mesh* mesh, const EventState&) { defaultStencilReference(mesh); });
+      [&](Mesh* mesh, EventState&) { defaultStencilReference(mesh); });
     newMesh.glowEmissiveOnly = glowEmissiveOnly;
     _meshes[mesh->uniqueId]  = newMesh;
   }

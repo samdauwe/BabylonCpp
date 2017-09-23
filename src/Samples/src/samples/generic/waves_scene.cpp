@@ -59,7 +59,7 @@ void WavesScene::initializeScene(ICanvas* canvas, Scene* scene)
   _indices   = _ground->getIndices();
 
   // Animations
-  _scene->registerBeforeRender([this]() {
+  _scene->registerBeforeRender([this](Scene*, EventState&) {
     float beta = _alpha;
     for (unsigned int index = 0; index < _positions.size(); index += 3) {
       _positions[index + 1] = std::sin(beta);

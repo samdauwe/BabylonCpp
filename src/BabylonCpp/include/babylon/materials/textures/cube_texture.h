@@ -14,7 +14,7 @@ public:
     const string_t& rootUrl, Scene* scene,
     const vector_t<string_t>& extensions = {}, bool noMipmap = false,
     const vector_t<string_t>& files = {},
-    const ::std::function<void(InternalTexture*, const EventState&)>& onLoad
+    const ::std::function<void(InternalTexture*, EventState&)>& onLoad
     = nullptr,
     const ::std::function<void()>& onError = nullptr,
     unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA,

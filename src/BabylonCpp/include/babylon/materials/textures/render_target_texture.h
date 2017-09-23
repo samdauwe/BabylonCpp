@@ -31,14 +31,13 @@ public:
 
   /** Events **/
   void setOnAfterUnbind(
-    const ::std::function<void(RenderTargetTexture*, const EventState&)>&
-      callback);
+    const ::std::function<void(RenderTargetTexture*, EventState&)>& callback);
   void setOnBeforeRender(
-    const ::std::function<void(int* faceIndex, const EventState&)>& callback);
+    const ::std::function<void(int* faceIndex, EventState&)>& callback);
   void setOnAfterRender(
-    const ::std::function<void(int* faceIndex, const EventState&)>& callback);
+    const ::std::function<void(int* faceIndex, EventState&)>& callback);
   void setOnClear(
-    const ::std::function<void(Engine* engine, const EventState&)>& callback);
+    const ::std::function<void(Engine* engine, EventState&)>& callback);
 
   IRenderTargetOptions& renderTargetOptions();
   const IRenderTargetOptions& renderTargetOptions() const;

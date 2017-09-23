@@ -112,12 +112,12 @@ private:
   unsigned int _cachedCoordinatesMode;
   Buffer* _buffer;
   bool _deleteBuffer;
-  ::std::function<void(InternalTexture*, const EventState&)> _delayedOnLoad;
+  ::std::function<void(InternalTexture*, EventState&)> _delayedOnLoad;
   ::std::function<void()> _delayedOnError;
   Nullable<Observable<Texture>> _onLoadObservable;
 
   ::std::function<void()> _onLoad;
-  ::std::function<void(InternalTexture*, const EventState&)> _load;
+  ::std::function<void(InternalTexture*, EventState&)> _load;
 
 }; // end of class Texture
 

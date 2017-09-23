@@ -54,7 +54,7 @@ TEST(TestObservables, MouseClickObserver)
   // Add an Observer
   EXPECT_FALSE(obervable.hasObservers());
   auto leftClickObserver = obervable.add(
-    [&leftClickCounter](Mouse*, const EventState&) { ++leftClickCounter; },
+    [&leftClickCounter](Mouse*, EventState&) { ++leftClickCounter; },
     int(Mouse::ClickType::LEFT));
   EXPECT_TRUE(obervable.hasObservers());
   // Remove the previously registered Observer
@@ -62,12 +62,12 @@ TEST(TestObservables, MouseClickObserver)
   EXPECT_FALSE(obervable.hasObservers());
   // Add the previously removed observer
   leftClickObserver = obervable.add(
-    [&leftClickCounter](Mouse*, const EventState&) { ++leftClickCounter; },
+    [&leftClickCounter](Mouse*, EventState&) { ++leftClickCounter; },
     int(Mouse::ClickType::LEFT));
   EXPECT_TRUE(obervable.hasObservers());
   // Add another observer
   obervable.add(
-    [&rightClickCounter](Mouse*, const EventState&) { ++rightClickCounter; },
+    [&rightClickCounter](Mouse*, EventState&) { ++rightClickCounter; },
     int(Mouse::ClickType::RIGHT));
   EXPECT_TRUE(obervable.hasObservers());
   // Raise events
@@ -99,14 +99,15 @@ TEST(TestObservables, MouseObserver)
   // Add an Observer
   EXPECT_FALSE(obervable.hasObservers());
   auto observer = obervable.add([&mousePosition](
-    Vector2* position, const EventState&) { mousePosition = *position; });
+    Vector2* position, EventState&) { mousePosition = *position; });
   EXPECT_TRUE(obervable.hasObservers());
   // Remove the previously registered Observer
   obervable.remove(observer);
   EXPECT_FALSE(obervable.hasObservers());
   // Add the previously removed observer
-  observer = obervable.add([&mousePosition](
-    Vector2* position, const EventState&) { mousePosition = *position; });
+  observer = obervable.add([&mousePosition](Vector2* position, EventState&) {
+    mousePosition = *position;
+  });
   EXPECT_TRUE(obervable.hasObservers());
   // Raise an event
   float x = 0.f, y = 0.f;

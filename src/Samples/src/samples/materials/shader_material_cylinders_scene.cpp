@@ -91,7 +91,7 @@ void ShaderMaterialCylindersScene::initializeScene(ICanvas* canvas,
   }
 
   // Animation
-  scene->onAfterCameraRenderObservable.add([this]() {
+  scene->onAfterCameraRenderObservable.add([this](Camera*, EventState&) {
     for (auto& shaderMaterial : _shaderMaterials) {
       shaderMaterial->setFloat("time", _time);
     }

@@ -141,7 +141,7 @@ void PBRBaseMaterial::_attachImageProcessingConfiguration(
   // Attaches observer.
   _imageProcessingObserver
     = _imageProcessingConfiguration->onUpdateParameters.add(
-      [this](ImageProcessingConfiguration*, const EventState&) {
+      [this](ImageProcessingConfiguration*, EventState&) {
         _markAllSubMeshesAsImageProcessingDirty();
       });
 }

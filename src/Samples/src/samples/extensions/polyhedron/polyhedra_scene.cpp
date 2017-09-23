@@ -71,7 +71,7 @@ void PolyhedraScene::initializeScene(ICanvas* canvas, Scene* scene)
     ++counter;
   }
 
-  _scene->registerBeforeRender([this]() {
+  _scene->registerBeforeRender([this](Scene*, EventState&) {
     for (unsigned int p = 0; p < _polygons.size(); ++p) {
       _polygons[p]->rotation().y += _rotations[p];
       _polygons[p]->rotation().x += _rotations[p] / 4.f;

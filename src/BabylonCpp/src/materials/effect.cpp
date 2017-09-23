@@ -251,8 +251,7 @@ void Effect::executeWhenCompiled(
     return;
   }
 
-  onCompileObservable.add(
-    [&](Effect* effect, const EventState&) { func(effect); });
+  onCompileObservable.add([&](Effect* effect, EventState&) { func(effect); });
 }
 
 void Effect::_loadVertexShader(

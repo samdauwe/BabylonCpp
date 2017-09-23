@@ -110,7 +110,7 @@ void InfiniteLoaderScene::initializeScene(ICanvas* canvas, Scene* scene)
     _rings.emplace_back(ring);
   }
 
-  _scene->registerBeforeRender([this]() {
+  _scene->registerBeforeRender([this](Scene*, EventState&) {
     for (auto& ring : _rings) {
       ring.center->rotation().y += ring.angle;
     }

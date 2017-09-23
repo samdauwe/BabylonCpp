@@ -163,7 +163,7 @@ IReflect::Type ParticleSystem::type() const
 }
 
 void ParticleSystem::setOnDispose(
-  const ::std::function<void(ParticleSystem*, const EventState&)>& callback)
+  const ::std::function<void(ParticleSystem*, EventState&)>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);

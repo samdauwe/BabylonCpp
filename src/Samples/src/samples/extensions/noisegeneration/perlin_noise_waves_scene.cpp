@@ -61,7 +61,7 @@ void PerlinNoiseWavesScene::initializeScene(ICanvas* canvas, Scene* scene)
   _indices   = _ground->getIndices();
 
   // Animations
-  _scene->registerBeforeRender([this]() {
+  _scene->registerBeforeRender([this](Scene*, EventState&) {
     _alpha += 0.016f;
     for (unsigned int i = 0; i < _positions.size(); i += 3) {
       _positions[i + 1]

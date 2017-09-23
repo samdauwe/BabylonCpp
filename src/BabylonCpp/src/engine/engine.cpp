@@ -2078,7 +2078,7 @@ unique_ptr_t<GL::IGLTexture> Engine::_createTexture()
 InternalTexture* Engine::createTexture(
   const vector_t<string_t>& list, bool noMipmap, bool invertY, Scene* scene,
   unsigned int samplingMode,
-  const ::std::function<void(InternalTexture*, const EventState&)>& onLoad,
+  const ::std::function<void(InternalTexture*, EventState&)>& onLoad,
   const ::std::function<void()>& onError, Buffer* buffer)
 {
   if (list.empty()) {
@@ -2092,7 +2092,7 @@ InternalTexture* Engine::createTexture(
 InternalTexture* Engine::createTexture(
   const string_t& /*urlArg*/, bool /*noMipmap*/, bool /*invertY*/,
   Scene* /*scene*/, unsigned int /*samplingMode*/,
-  const ::std::function<void(InternalTexture*, const EventState&)>& /*onLoad*/,
+  const ::std::function<void(InternalTexture*, EventState&)>& /*onLoad*/,
   const ::std::function<void()>& /*onError*/, Buffer* /*buffer*/,
   InternalTexture* /*fallBack*/, unsigned int /*format*/)
 {
@@ -2225,7 +2225,7 @@ void Engine::_rescaleTexture(InternalTexture* source,
 
   _rescalePostProcess->getEffect()->executeWhenCompiled(
     [&](Effect* /*effect*/) {
-      _rescalePostProcess->setOnApply([&](Effect* effect, const EventState&) {
+      _rescalePostProcess->setOnApply([&](Effect* effect, EventState&) {
         effect->_bindTexture("textureSampler", source);
       });
 
@@ -2857,7 +2857,7 @@ Engine::createRenderTargetCubeTexture(const ISize& size,
 InternalTexture* Engine::createPrefilteredCubeTexture(
   const string_t& /*rootUrl*/, Scene* /*scene*/, float /*scale*/,
   float /*offset*/,
-  const ::std::function<void(InternalTexture*, const EventState&)>& /*onLoad*/,
+  const ::std::function<void(InternalTexture*, EventState&)>& /*onLoad*/,
   const ::std::function<void()>& /*onError*/, unsigned int /*format*/,
   const string_t& /*forcedExtension*/)
 {
@@ -2867,7 +2867,7 @@ InternalTexture* Engine::createPrefilteredCubeTexture(
 InternalTexture* Engine::createCubeTexture(
   const string_t& /*rootUrl*/, Scene* /*scene*/,
   const vector_t<string_t>& /*extensions*/, bool /*noMipmap*/,
-  const ::std::function<void(InternalTexture*, const EventState&)>& /*onLoad*/,
+  const ::std::function<void(InternalTexture*, EventState&)>& /*onLoad*/,
   const ::std::function<void()>& /*onError*/, unsigned int /*format*/,
   const string_t& /*forcedExtension*/)
 {

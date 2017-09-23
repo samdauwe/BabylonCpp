@@ -41,7 +41,7 @@ private:
   vector_t<vector_t<Vector3>> _debugLines;
   LinesMesh* _debugMesh;
   bool _isEnabled;
-  ::std::function<void(Scene*, const EventState&)> _renderFunction;
+  ::std::function<void(Scene*, EventState&)> _renderFunction;
 
 }; // end of class SkeletonViewer
 

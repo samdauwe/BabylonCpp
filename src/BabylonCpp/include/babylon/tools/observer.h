@@ -14,7 +14,7 @@ class BABYLON_SHARED_EXPORT Observer {
 
 public:
   using CallbackFunc
-    = ::std::function<void(T* eventData, const EventState& eventState)>;
+    = ::std::function<void(T* eventData, EventState& eventState)>;
   using Ptr = shared_ptr_t<Observer<T>>;
 
 public:

@@ -44,16 +44,15 @@ public:
 
   // Events
   void setOnActivate(
-    const ::std::function<void(Camera* camera, const EventState&)>& callback);
-  void setOnSizeChanged(
-    const ::std::function<void(PostProcess* postProcess, const EventState&)>&
-      callback);
+    const ::std::function<void(Camera* camera, EventState&)>& callback);
+  void setOnSizeChanged(const ::std::function<void(PostProcess* postProcess,
+                                                   EventState&)>& callback);
   void setOnApply(
-    const ::std::function<void(Effect* effect, const EventState&)>& callback);
+    const ::std::function<void(Effect* effect, EventState&)>& callback);
   void setOnBeforeRender(
-    const ::std::function<void(Effect* effect, const EventState&)>& callback);
+    const ::std::function<void(Effect* effect, EventState&)>& callback);
   void setOnAfterRender(
-    const ::std::function<void(Effect* effect, const EventState&)>& callback);
+    const ::std::function<void(Effect* effect, EventState&)>& callback);
 
   InternalTexture* outputTexture();
   void setOutputTexture(InternalTexture* value);

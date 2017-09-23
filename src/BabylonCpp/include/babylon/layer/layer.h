@@ -20,12 +20,11 @@ public:
   virtual ~Layer();
 
   // Events
-  void setOnDispose(
-    const ::std::function<void(Layer*, const EventState&)>& callback);
-  void setOnBeforeRender(
-    const ::std::function<void(Layer*, const EventState&)>& callback);
-  void setOnAfterRender(
-    const ::std::function<void(Layer*, const EventState&)>& callback);
+  void setOnDispose(const ::std::function<void(Layer*, EventState&)>& callback);
+  void
+  setOnBeforeRender(const ::std::function<void(Layer*, EventState&)>& callback);
+  void
+  setOnAfterRender(const ::std::function<void(Layer*, EventState&)>& callback);
 
   void render();
   void dispose(bool doNotRecurse = false) override;

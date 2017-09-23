@@ -27,7 +27,7 @@ public:
   virtual IReflect::Type type() const override;
 
   void setOnDispose(
-    const ::std::function<void(ParticleSystem*, const EventState&)>& callback);
+    const ::std::function<void(ParticleSystem*, EventState&)>& callback);
   void recycleParticle(Particle* particle);
   size_t getCapacity() const;
   bool isAlive() const;

@@ -51,7 +51,7 @@ void HexIcosphereScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Create the icosphere
   _hexIcosphere = _createHexIcosphere(10, 20.f, scene);
 
-  _scene->registerBeforeRender([this]() {
+  _scene->registerBeforeRender([this](Scene*, EventState&) {
     _hexIcosphere->rotation().y += -0.0005f * _scene->getAnimationRatio();
     _hexIcosphere->rotation().x
       += (-0.0005f / 4.f) * _scene->getAnimationRatio();

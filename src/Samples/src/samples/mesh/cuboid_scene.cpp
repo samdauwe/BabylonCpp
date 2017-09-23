@@ -44,7 +44,7 @@ void CuboidScene::initializeScene(ICanvas* canvas, Scene* scene)
   _cuboid = CreateCuboid("rect3", 10, 20, 5, scene);
 
   // Animation
-  scene->registerBeforeRender([this]() {
+  scene->registerBeforeRender([this](Scene*, EventState&) {
     _cuboid->rotation().y += 0.008f * getScene()->getAnimationRatio();
   });
 }
