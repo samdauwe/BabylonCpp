@@ -151,12 +151,16 @@ struct EngineCapabilities;
 struct EngineOptions;
 struct InstancingAttributeInfo;
 class Node;
+class Scene;
+// --- Events ---
+struct KeyboardEventTypes;
+class KeyboardInfo;
+class KeyboardInfoPre;
 struct PointerEventTypes;
 class PointerInfo;
 class PointerInfoBase;
 class PointerInfoPre;
 struct RenderingGroupInfo;
-class Scene;
 // --- Gamepad ---
 class Gamepad;
 struct GamepadButtonChanges;

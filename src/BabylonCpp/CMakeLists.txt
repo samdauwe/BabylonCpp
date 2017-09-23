@@ -97,6 +97,7 @@ file(GLOB CULLING_HDR_FILES         ${INCLUDE_PATH}/culling/*.h
                                     ${INCLUDE_PATH}/culling/octrees/*.h)
 file(GLOB DEBUG_HDR_FILES           ${INCLUDE_PATH}/debug/*.h)
 file(GLOB ENGINE_HDR_FILES          ${INCLUDE_PATH}/engine/*.h)
+file(GLOB EVENTS_HDR_FILES          ${INCLUDE_PATH}/events/*.h)
 file(GLOB GAMEPAD_HDR_FILES         ${INCLUDE_PATH}/gamepad/*.h
                                     ${INCLUDE_PATH}/gamepad/controllers/*.h)
 file(GLOB INTERFACES_HDR_FILES      ${INCLUDE_PATH}/interfaces/.h)
@@ -162,6 +163,7 @@ set(BABYLON_HEADERS
     ${CULLING_HDR_FILES}
     ${DEBUG_HDR_FILES}
     ${ENGINE_HDR_FILES}
+    ${EVENTS_HDR_FILES}
     ${GAMEPAD_HDR_FILES}
     ${INTERFACES_HDR_FILES}
     ${LAYER_HDR_FILES}
@@ -206,6 +208,7 @@ file(GLOB CULLING_SRC_FILES         ${SOURCE_PATH}/culling/*.cpp
                                     ${SOURCE_PATH}/culling/octrees/*.cpp)
 file(GLOB DEBUG_SRC_FILES           ${SOURCE_PATH}/debug/*.cpp)
 file(GLOB ENGINE_SRC_FILES          ${SOURCE_PATH}/engine/*.cpp)
+file(GLOB EVENTS_SRC_FILES          ${SOURCE_PATH}/events/*.cpp)
 file(GLOB GAMEPAD_SRC_FILES         ${SOURCE_PATH}/gamepad/*.cpp
                                     ${SOURCE_PATH}/gamepad/controllers/*.cpp)
 file(GLOB INTERFACES_SRC_FILES      ${SOURCE_PATH}/interfaces/*.cpp)
@@ -267,6 +270,7 @@ set(BABYLON_SOURCES
     ${CULLING_SRC_FILES}
     ${DEBUG_SRC_FILES}
     ${ENGINE_SRC_FILES}
+    ${EVENTS_SRC_FILES}
     ${GAMEPAD_SRC_FILES}
     ${INTERFACES_SRC_FILES}
     ${LAYER_SRC_FILES}

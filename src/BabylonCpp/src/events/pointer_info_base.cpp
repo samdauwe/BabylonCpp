@@ -1,4 +1,4 @@
-#include <babylon/engine/pointer_info_base.h>
+#include <babylon/events/pointer_info_base.h>
 
 namespace BABYLON {
 

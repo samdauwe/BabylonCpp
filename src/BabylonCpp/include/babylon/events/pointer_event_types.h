@@ -1,5 +1,5 @@
-#ifndef BABYLON_ENGINE_POINTER_EVENT_TYPES_H
-#define BABYLON_ENGINE_POINTER_EVENT_TYPES_H
+#ifndef BABYLON_EVENTS_POINTER_EVENT_TYPES_H
+#define BABYLON_EVENTS_POINTER_EVENT_TYPES_H
 
 #include <babylon/babylon_global.h>
 
@@ -17,4 +17,4 @@ struct BABYLON_SHARED_EXPORT PointerEventTypes {
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_ENGINE_POINTER_EVENT_TYPES_H
+#endif // end of BABYLON_EVENTS_POINTER_EVENT_TYPES_H

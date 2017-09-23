@@ -6,7 +6,7 @@
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/time.h>
 #include <babylon/engine/engine.h>
-#include <babylon/engine/pointer_event_types.h>
+#include <babylon/events/pointer_event_types.h>
 #include <babylon/mesh/abstract_mesh.h>
 
 namespace BABYLON {

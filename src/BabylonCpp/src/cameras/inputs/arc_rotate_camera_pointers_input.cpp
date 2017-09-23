@@ -2,7 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/engine/engine.h>
-#include <babylon/engine/pointer_event_types.h>
+#include <babylon/events/pointer_event_types.h>
 #include <babylon/interfaces/icanvas.h>
 
 namespace BABYLON {

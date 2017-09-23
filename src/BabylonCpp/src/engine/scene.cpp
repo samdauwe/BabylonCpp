@@ -20,7 +20,7 @@
 #include <babylon/culling/ray.h>
 #include <babylon/debug/debug_layer.h>
 #include <babylon/engine/engine.h>
-#include <babylon/engine/pointer_event_types.h>
+#include <babylon/events/pointer_event_types.h>
 #include <babylon/gamepad/gamepad_manager.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/layer/highlight_layer.h>

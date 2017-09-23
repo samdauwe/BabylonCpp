@@ -1,5 +1,5 @@
-#ifndef BABYLON_ENGINE_POINTER_INFO_BASE_H
-#define BABYLON_ENGINE_POINTER_INFO_BASE_H
+#ifndef BABYLON_EVENTS_POINTER_INFO_BASE_H
+#define BABYLON_EVENTS_POINTER_INFO_BASE_H
 
 #include <babylon/babylon_global.h>
 #include <babylon/core/structs.h>
@@ -18,8 +18,8 @@ public:
   PointerEvent pointerEvent;
   MouseWheelEvent mouseWheelEvent;
 
-}; // end of struct PointerInfoBase
+}; // end of class PointerInfoBase
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_ENGINE_POINTER_INFO_BASE_H
+#endif // end of BABYLON_EVENTS_POINTER_INFO_BASE_H

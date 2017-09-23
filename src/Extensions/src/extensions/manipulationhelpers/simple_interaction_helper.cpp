@@ -1,7 +1,7 @@
 #include <babylon/extensions/manipulationhelpers/simple_interaction_helper.h>
 
-#include <babylon/engine/pointer_event_types.h>
 #include <babylon/engine/scene.h>
+#include <babylon/events/pointer_event_types.h>
 #include <babylon/extensions/manipulationhelpers/manipulator_interaction_helper.h>
 #include <babylon/mesh/abstract_mesh.h>
 

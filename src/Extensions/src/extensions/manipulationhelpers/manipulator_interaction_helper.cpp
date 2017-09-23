@@ -4,8 +4,8 @@
 #include <babylon/culling/ray.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/node.h>
-#include <babylon/engine/pointer_event_types.h>
 #include <babylon/engine/scene.h>
+#include <babylon/events/pointer_event_types.h>
 #include <babylon/math/vector4.h>
 #include <babylon/mesh/abstract_mesh.h>
 

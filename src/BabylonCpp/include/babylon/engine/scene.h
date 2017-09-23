@@ -5,8 +5,8 @@
 #include <babylon/babylon_global.h>
 #include <babylon/core/structs.h>
 #include <babylon/culling/octrees/octree.h>
-#include <babylon/engine/pointer_info.h>
-#include <babylon/engine/pointer_info_pre.h>
+#include <babylon/events/pointer_info.h>
+#include <babylon/events/pointer_info_pre.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/matrix.h>

@@ -1,8 +1,8 @@
-#ifndef BABYLON_ENGINE_POINTER_INFO_PRE_H
-#define BABYLON_ENGINE_POINTER_INFO_PRE_H
+#ifndef BABYLON_EVENTS_POINTER_INFO_PRE_H
+#define BABYLON_EVENTS_POINTER_INFO_PRE_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/engine/pointer_info_base.h>
+#include <babylon/events/pointer_info_base.h>
 
 namespace BABYLON {
 
@@ -26,8 +26,8 @@ public:
   Vector2 localPosition;
   bool skipOnPointerObservable;
 
-}; // end of struct PointerInfoPre
+}; // end of class PointerInfoPre
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_ENGINE_POINTER_INFO_PRE_H
+#endif // end of BABYLON_EVENTS_POINTER_INFO_PRE_H
