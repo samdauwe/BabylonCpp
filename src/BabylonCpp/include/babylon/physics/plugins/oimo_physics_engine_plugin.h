@@ -20,6 +20,7 @@ public:
 
   void setGravity(const Vector3& gravity);
   void setTimeStep(float timeStep);
+  float getTimeStep() const;
   void executeStep(float delta, const vector_t<PhysicsImpostor*>& impostors);
   void applyImpulse(PhysicsImpostor* impostor, const Vector3& force,
                     const Vector3& contactPoint);

@@ -12,6 +12,7 @@
 #include <babylon/culling/icullable.h>
 #include <babylon/culling/ray.h>
 #include <babylon/engine/engine.h>
+#include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/math/frustum.h>
 #include <babylon/postprocess/pass_post_process.h>
 #include <babylon/postprocess/post_process.h>
@@ -227,6 +228,7 @@ void Camera::_update()
 
 void Camera::_checkInputs()
 {
+  onAfterCheckInputsObservable.notifyObservers(this);
 }
 
 vector_t<Camera*>& Camera::rigCameras()
@@ -513,6 +515,7 @@ void Camera::dispose(bool /*doNotRecurse*/)
   // Observables
   onViewMatrixChangedObservable.clear();
   onProjectionMatrixChangedObservable.clear();
+  onAfterCheckInputsObservable.clear();
 
   // Animations
   getScene()->stopAnimation(this);
@@ -530,6 +533,16 @@ void Camera::dispose(bool /*doNotRecurse*/)
   }
 
   _postProcesses.clear();
+
+  // Render targets
+  auto i = customRenderTargets.size();
+  while (i-- > 0) {
+    customRenderTargets[i]->dispose();
+  }
+  customRenderTargets.clear();
+
+  // Active Meshes
+  _activeMeshes.clear();
 
   Node::dispose();
 }

@@ -46,6 +46,15 @@ public:
                  bool allowSamePosition = false);
   void setTarget(const Vector3& target, bool toBoundingCenter = false,
                  bool allowSamePosition = false);
+  BouncingBehavior* bouncingBehavior() const;
+  bool useBouncingBehavior() const;
+  void setUseBouncingBehavior(bool value);
+  FramingBehavior* framingBehavior() const;
+  bool useFramingBehavior() const;
+  void setUseFramingBehavior(bool value);
+  AutoRotationBehavior* autoRotationBehavior() const;
+  bool useAutoRotationBehavior() const;
+  void setUseAutoRotationBehavior(bool value);
   Matrix _getViewMatrix() override;
   void zoomOn(const vector_t<AbstractMesh*> meshes,
               bool doNotUpdateMaxZ = false);
@@ -119,6 +128,10 @@ protected:
   // due to async collision inspection
   bool _collisionTriggered;
   unique_ptr_t<Vector3> _targetBoundingCenter;
+  // Behaviors
+  unique_ptr_t<BouncingBehavior> _bouncingBehavior;
+  unique_ptr_t<FramingBehavior> _framingBehavior;
+  unique_ptr_t<AutoRotationBehavior> _autoRotationBehavior;
 
 }; // end of class ArcRotateCamera
 

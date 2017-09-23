@@ -21,6 +21,7 @@
 #include <babylon/debug/debug_layer.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/pointer_event_types.h>
+#include <babylon/gamepad/gamepad_manager.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/layer/highlight_layer.h>
 #include <babylon/layer/layer.h>
@@ -82,6 +83,7 @@ Scene::Scene(Engine* engine)
     , animationsEnabled{true}
     , constantlyUpdateMeshUnderPointer{false}
     , hoverCursor{"pointer"}
+    , defaultCursor{""}
     , cameraToUseForPointers(nullptr)
     , _mirroredCameraPosition{nullptr}
     , fogColor{Color3(0.2f, 0.2f, 0.3f)}
@@ -117,6 +119,7 @@ Scene::Scene(Engine* engine)
     , _onPointerMove{nullptr}
     , _onPointerDown{nullptr}
     , _onPointerUp{nullptr}
+    , _gamepadManager{nullptr}
     , _initClickEvent{nullptr}
     , _initActionManager{nullptr}
     , _delayedSimpleClick{nullptr}
@@ -132,6 +135,9 @@ Scene::Scene(Engine* engine)
     , _previousStartingPointerTime{high_res_time_point_t()}
     , beforeRender{nullptr}
     , afterRender{nullptr}
+    , _timeAccumulator{0}
+    , _currentStepId{0}
+    , _currentInternalStep{0}
     , _onKeyDown{nullptr}
     , _onKeyUp{nullptr}
     , _useRightHandedSystem{false}
@@ -257,6 +263,16 @@ void Scene::setAfterCameraRender(
   _onAfterCameraRenderObserver = onAfterCameraRenderObservable.add(callback);
 }
 
+// Gamepads
+GamepadManager& Scene::gamepadManager()
+{
+  if (!_gamepadManager) {
+    _gamepadManager = ::std::make_unique<GamepadManager>();
+  }
+
+  return *_gamepadManager.get();
+}
+
 // Pointers
 Vector2 Scene::unTranslatedPointer() const
 {
@@ -277,11 +293,6 @@ void Scene::setEnvironmentTexture(BaseTexture* value)
   markAllMaterialsAsDirty(Material::TextureDirtyFlag);
 }
 
-bool Scene::useRightHandedSystem() const
-{
-  return _useRightHandedSystem;
-}
-
 void Scene::setUseRightHandedSystem(bool value)
 {
   if (_useRightHandedSystem == value) {
@@ -289,6 +300,26 @@ void Scene::setUseRightHandedSystem(bool value)
   }
   _useRightHandedSystem = value;
   markAllMaterialsAsDirty(Material::MiscDirtyFlag);
+}
+
+bool Scene::useRightHandedSystem() const
+{
+  return _useRightHandedSystem;
+}
+
+void Scene::setStepId(unsigned int newStepId)
+{
+  _currentStepId = newStepId;
+}
+
+unsigned int Scene::getStepId() const
+{
+  return _currentStepId;
+}
+
+unsigned int Scene::getInternalStep() const
+{
+  return _currentInternalStep;
 }
 
 ImageProcessingConfiguration* Scene::imageProcessingConfiguration()
@@ -672,15 +703,6 @@ void Scene::_updatePointerPosition(const PointerEvent evt)
 
   _unTranslatedPointerX = _pointerX;
   _unTranslatedPointerY = _pointerY;
-
-  if (cameraToUseForPointers) {
-    _pointerX
-      = _pointerX
-        - cameraToUseForPointers->viewport.x * _engine->getRenderWidth();
-    _pointerY
-      = _pointerY
-        - cameraToUseForPointers->viewport.y * _engine->getRenderHeight();
-  }
 }
 
 void Scene::_createUbo()
@@ -800,7 +822,7 @@ void Scene::_onPointerMoveEvent(PointerEvent&& evt)
       }
     }
     else {
-      canvas->style.cursor.clear();
+      canvas->style.cursor = defaultCursor;
     }
   }
   else {
@@ -822,7 +844,7 @@ void Scene::_onPointerMoveEvent(PointerEvent&& evt)
     else {
       setPointerOverSprite(nullptr);
       // Restore pointer
-      canvas->style.cursor = "";
+      canvas->style.cursor = defaultCursor;
     }
   }
 
@@ -2070,7 +2092,11 @@ void Scene::_evaluateActiveMeshes()
             && mesh->isInFrustum(_frustumPlanes))) {
       _activeMeshes.emplace_back(dynamic_cast<Mesh*>(mesh.get()));
       activeCamera->_activeMeshes.emplace_back(_activeMeshes.back());
+
       mesh->_activate(_renderId);
+      if (meshLOD != mesh.get()) {
+        meshLOD->_activate(_renderId);
+      }
 
       _activeMesh(meshLOD);
     }
@@ -2398,19 +2424,74 @@ void Scene::render()
     simplificationQueue->executeNext();
   }
 
-  // Animations
-  const float deltaTime = ::std::max(
-    Time::fpMillisecondsDuration<float>(Scene::MinDeltaTime),
-    ::std::min(_engine->getDeltaTime(),
-               Time::fpMillisecondsDuration<float>(Scene::MaxDeltaTime)));
-  _animationRatio = deltaTime * (60.f / 1000.f);
-  _animate();
+  if (_engine->isDeterministicLockStep()) {
+    auto deltaTime
+      = ::std::max(static_cast<float>(Scene::MinDeltaTime.count()),
+                   ::std::min(_engine->getDeltaTime() * 1000.f,
+                              static_cast<float>(Scene::MaxDeltaTime.count())))
+        / 1000.f;
 
-  // Physics
-  if (_physicsEngine) {
-    Tools::StartPerformanceCounter("Physics");
-    _physicsEngine->_step(deltaTime / 1000.f);
-    Tools::EndPerformanceCounter("Physics");
+    auto defaultTimeStep = (60.f / 1000.f);
+    if (_physicsEngine) {
+      defaultTimeStep = _physicsEngine->getTimeStep();
+    }
+
+    auto maxSubSteps = _engine->getLockstepMaxSteps();
+
+    _timeAccumulator += deltaTime;
+
+    // compute the amount of fixed steps we should have taken since the last
+    // step
+    auto internalSteps = static_cast<unsigned int>(
+      ::std::floor(_timeAccumulator / defaultTimeStep));
+    internalSteps = ::std::min(internalSteps, maxSubSteps);
+
+    for (_currentInternalStep = 0; _currentInternalStep < internalSteps;
+         ++_currentInternalStep) {
+
+      onBeforeStepObservable.notifyObservers(this);
+
+      // Animations
+      _animationRatio = defaultTimeStep * (60.f / 1000.f);
+      _animate();
+
+      // Physics
+      if (_physicsEngine) {
+        Tools::StartPerformanceCounter("Physics");
+        _physicsEngine->_step(defaultTimeStep);
+        Tools::EndPerformanceCounter("Physics");
+      }
+      _timeAccumulator -= defaultTimeStep;
+
+      onAfterStepObservable.notifyObservers(this);
+      ++_currentStepId;
+
+      if ((internalSteps > 1) && (_currentInternalStep != internalSteps - 1)) {
+        // Q: can this be optimized by putting some code in the afterStep
+        // callback?
+        // I had to put this code here, otherwise mesh attached to bones of
+        // another mesh skeleton,
+        // would return incorrect positions for internal stepIds (non-rendered
+        // steps)
+        _evaluateActiveMeshes();
+      }
+    }
+  }
+  else {
+    // Animations
+    const float deltaTime = ::std::max(
+      Time::fpMillisecondsDuration<float>(Scene::MinDeltaTime),
+      ::std::min(_engine->getDeltaTime(),
+                 Time::fpMillisecondsDuration<float>(Scene::MaxDeltaTime)));
+    _animationRatio = deltaTime * (60.f / 1000.f);
+    _animate();
+
+    // Physics
+    if (_physicsEngine) {
+      Tools::StartPerformanceCounter("Physics");
+      _physicsEngine->_step(deltaTime / 1000.f);
+      Tools::EndPerformanceCounter("Physics");
+    }
   }
 
   // Before render
@@ -2423,6 +2504,7 @@ void Scene::render()
   if (renderTargetsEnabled) {
     Tools::StartPerformanceCounter("Custom render targets",
                                    !customRenderTargets.empty());
+    _intermediateRendering = true;
     for (auto& renderTarget : customRenderTargets) {
       if (renderTarget->_shouldRender()) {
         ++_renderId;
@@ -2448,6 +2530,7 @@ void Scene::render()
     Tools::EndPerformanceCounter("Custom render targets",
                                  !customRenderTargets.empty());
 
+    _intermediateRendering = false;
     ++_renderId;
   }
 
@@ -2714,6 +2797,11 @@ void Scene::dispose(bool /*doNotRecurse*/)
     _depthRenderer->dispose();
   }
 
+  if (_gamepadManager) {
+    _gamepadManager->dispose();
+    _gamepadManager = nullptr;
+  }
+
   // Smart arrays
   if (activeCamera) {
     activeCamera->_activeMeshes.clear();
@@ -2725,6 +2813,8 @@ void Scene::dispose(bool /*doNotRecurse*/)
   _activeParticleSystems.clear();
   _activeSkeletons.clear();
   _softwareSkinnedMeshes.clear();
+  _renderTargets.clear();
+
   if (_boundingBoxRenderer) {
     _boundingBoxRenderer->dispose();
   }
@@ -2772,6 +2862,12 @@ void Scene::dispose(bool /*doNotRecurse*/)
   }
 
   // Release materials
+  if (defaultMaterial()) {
+    defaultMaterial()->dispose();
+  }
+  for (auto& multiMaterial : multiMaterials) {
+    multiMaterial->dispose();
+  }
   for (auto& material : materials) {
     material->dispose();
   }
@@ -2818,6 +2914,10 @@ void Scene::dispose(bool /*doNotRecurse*/)
 
   _engine->wipeCaches();
   _engine = nullptr;
+
+  setDefaultMaterial(nullptr);
+  multiMaterials.clear();
+  materials.clear();
 }
 
 bool Scene::isDisposed() const

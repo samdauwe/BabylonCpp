@@ -99,6 +99,9 @@ public:
   void setAfterCameraRender(
     const ::std::function<void(Camera* camera, EventState& es)>& callback);
 
+  // Gamepads
+  GamepadManager& gamepadManager();
+
   // Pointers
   Vector2 unTranslatedPointer() const;
 
@@ -122,6 +125,9 @@ public:
 
   bool useRightHandedSystem() const;
   void setUseRightHandedSystem(bool value);
+  void setStepId(unsigned int newStepId);
+  unsigned int getStepId() const;
+  unsigned int getInternalStep() const;
 
   /**
    * @brief Default image processing configuration used either in the rendering
@@ -820,6 +826,16 @@ public:
   Observable<AbstractMesh> onMeshRemovedObservable;
 
   /**
+   * An event triggered before calculating deterministic simulation step
+   */
+  Observable<Scene> onBeforeStepObservable;
+
+  /**
+   * An event triggered after calculating deterministic simulation step
+   */
+  Observable<Scene> onAfterStepObservable;
+
+  /**
    * This Observable will be triggered for each stage of each renderingGroup of
    * each rendered camera. The RenderinGroupInfo class contains all the
    * information about the context in which the observable is called If you wish
@@ -844,6 +860,7 @@ public:
   bool constantlyUpdateMeshUnderPointer;
 
   string_t hoverCursor;
+  string_t defaultCursor;
 
   // Metadata
   Json::object metadata;
@@ -993,6 +1010,9 @@ private:
   ::std::function<void(PointerEvent&& evt)> _onPointerMove;
   ::std::function<void(PointerEvent&& evt)> _onPointerDown;
   ::std::function<void(PointerEvent&& evt)> _onPointerUp;
+  // Gamepads
+  unique_ptr_t<GamepadManager> _gamepadManager;
+  // Click events
   ::std::function<void(
     Observable<PointerInfoPre>& obs1, Observable<PointerInfo>& obs2,
     PointerEvent&& evt,
@@ -1027,6 +1047,10 @@ private:
   // AbstractMesh* _meshUnderPointer;
   ::std::function<void()> beforeRender;
   ::std::function<void()> afterRender;
+  // Deterministic lockstep
+  unsigned int _timeAccumulator;
+  unsigned int _currentStepId;
+  unsigned int _currentInternalStep;
   // Keyboard
   ::std::function<void(Event&& evt)> _onKeyDown;
   ::std::function<void(Event&& evt)> _onKeyUp;

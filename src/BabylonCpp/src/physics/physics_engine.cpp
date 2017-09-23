@@ -40,6 +40,11 @@ void PhysicsEngine::setTimeStep(float newTimeStep)
   _physicsPlugin->setTimeStep(newTimeStep);
 }
 
+float PhysicsEngine::getTimeStep() const
+{
+  return _physicsPlugin->getTimeStep();
+}
+
 void PhysicsEngine::dispose(bool /*doNotRecurse*/)
 {
   for (auto& impostor : _impostors) {

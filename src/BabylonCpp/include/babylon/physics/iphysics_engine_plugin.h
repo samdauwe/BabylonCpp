@@ -10,6 +10,7 @@ struct BABYLON_SHARED_EXPORT IPhysicsEnginePlugin {
   string_t name;
   virtual void setGravity(const Vector3& gravity) = 0;
   virtual void setTimeStep(float timeStep)        = 0;
+  virtual float getTimeStep() const               = 0;
   virtual void
   executeStep(float delta,
               const vector_t<unique_ptr_t<PhysicsImpostor>>& impostors)
@@ -36,11 +37,11 @@ struct BABYLON_SHARED_EXPORT IPhysicsEnginePlugin {
   virtual void setAngularVelocity(PhysicsImpostor* impostor,
                                   const Vector3& velocity)
     = 0;
-  virtual Vector3 getLinearVelocity(PhysicsImpostor* impostor)    = 0;
-  virtual Vector3 getAngularVelocity(PhysicsImpostor* impostor)   = 0;
+  virtual Vector3 getLinearVelocity(PhysicsImpostor* impostor)  = 0;
+  virtual Vector3 getAngularVelocity(PhysicsImpostor* impostor) = 0;
   virtual void setBodyMass(PhysicsImpostor* impostor, float mass) = 0;
-  virtual void sleepBody(PhysicsImpostor* impostor)               = 0;
-  virtual void wakeUpBody(PhysicsImpostor* impostor)              = 0;
+  virtual void sleepBody(PhysicsImpostor* impostor)  = 0;
+  virtual void wakeUpBody(PhysicsImpostor* impostor) = 0;
   // Joint Update
   virtual void updateDistanceJoint(DistanceJoint* joint, float maxDistance,
                                    float minDistance)

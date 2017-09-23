@@ -20,10 +20,9 @@ namespace BABYLON {
 OimoPhysicsEnginePlugin::OimoPhysicsEnginePlugin(unsigned int iterations)
     : world{nullptr}, _tmpPositionVector{Vector3::Zero()}
 {
-  world->create(
-    1.f / 60.f,
-    static_cast<unsigned int>(OIMO::BroadPhase::Type::BR_BOUNDING_VOLUME_TREE),
-    iterations, true);
+  world->create(1.f / 60.f, static_cast<unsigned int>(
+                              OIMO::BroadPhase::Type::BR_BOUNDING_VOLUME_TREE),
+                iterations, true);
   world->clear();
   // making sure no stats are calculated
   world->setNoStat(true);
@@ -41,6 +40,11 @@ void OimoPhysicsEnginePlugin::setGravity(const Vector3& gravity)
 void OimoPhysicsEnginePlugin::setTimeStep(float timeStep)
 {
   world->setTimeStep(timeStep);
+}
+
+float OimoPhysicsEnginePlugin::getTimeStep() const
+{
+  return world->timeStep();
 }
 
 void OimoPhysicsEnginePlugin::executeStep(

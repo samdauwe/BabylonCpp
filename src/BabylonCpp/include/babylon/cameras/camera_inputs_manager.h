@@ -19,7 +19,7 @@ public:
   ::std::function<void()> _addCheckInputs(const ::std::function<void()>& fn);
   void attachInput(ICameraInput<TCamera>* input);
   void attachElement(ICanvas* canvas, bool _noPreventDefault);
-  void detachElement(ICanvas* canvas);
+  void detachElement(ICanvas* canvas, bool disconnect = false);
   void rebuildInputCheck();
   void clear();
   Json::object serialize(Json::object& serializedCamera) const;

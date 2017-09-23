@@ -21,10 +21,14 @@
 #endif
 
 #include <babylon/core/random.h>
+#include <babylon/core/string.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+::std::function<string_t(const string_t& url)> Tools::PreprocessUrl
+  = [](const string_t& url) { return url; };
 
 float Tools::Mix(float a, float b, float alpha)
 {
@@ -282,6 +286,17 @@ Image Tools::CreateNoiseImage(unsigned int size)
   }
 
   return Image(imageData, width, height, depth, mode);
+}
+
+string_t Tools::CleanUrl(string_t url)
+{
+  String::replaceInPlace(url, "#", "%23");
+  return url;
+}
+
+string_t Tools::DecodeURIComponent(const string_t& s)
+{
+  return s;
 }
 
 void Tools::LoadImage(const string_t& url,

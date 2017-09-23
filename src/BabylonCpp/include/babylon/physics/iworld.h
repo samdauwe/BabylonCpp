@@ -14,6 +14,7 @@ struct BABYLON_SHARED_EXPORT IWorld {
   virtual void setNoStat(bool)                         = 0;
   virtual void setGravity(const Vector3& gravity)      = 0;
   virtual void setTimeStep(float timeStep)             = 0;
+  virtual float timeStep() const                       = 0;
   virtual void step()                                  = 0;
   virtual void removeJoint(PhysicsJoint* joint)        = 0;
   virtual void removeRigidBody(IPhysicsBody* impostor) = 0;

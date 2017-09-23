@@ -54,6 +54,7 @@ void CameraInputsManager<TCamera>::remove(ICameraInput<TCamera>* inputToRemove)
     auto& input = item.second;
     if (input.get() == inputToRemove) {
       input->detachControl(attachedElement);
+      input->camera = nullptr;
       attached.erase(item.first);
       rebuildInputCheck();
     }
@@ -67,6 +68,7 @@ void CameraInputsManager<TCamera>::removeByType(const string_t& inputType)
     auto& input = item.second;
     if (input->getClassName() == inputType) {
       input->detachControl(attachedElement);
+      input->camera = nullptr;
       attached.erase(item.first);
       rebuildInputCheck();
     }
@@ -109,7 +111,8 @@ void CameraInputsManager<TCamera>::attachElement(ICanvas* canvas,
 }
 
 template <class TCamera>
-void CameraInputsManager<TCamera>::detachElement(ICanvas* canvas)
+void CameraInputsManager<TCamera>::detachElement(ICanvas* canvas,
+                                                 bool disconnect)
 {
   if (attachedElement != canvas) {
     return;
@@ -117,6 +120,10 @@ void CameraInputsManager<TCamera>::detachElement(ICanvas* canvas)
 
   for (auto& item : attached) {
     item.second->detachControl(canvas);
+
+    if (disconnect) {
+      item.second->camera = nullptr;
+    }
   }
 
   attachedElement = nullptr;
@@ -139,7 +146,7 @@ template <class TCamera>
 void CameraInputsManager<TCamera>::clear()
 {
   if (attachedElement) {
-    detachElement(attachedElement);
+    detachElement(attachedElement, true);
   }
   attached.clear();
   attachedElement = nullptr;

@@ -70,6 +70,10 @@ struct BABYLON_SHARED_EXPORT Tools {
     const Vector2& bias);
   static Image CreateCheckerboardImage(unsigned int size = 256);
   static Image CreateNoiseImage(unsigned int size = 8);
+  // External files
+  static string_t CleanUrl(string_t url);
+  static string_t DecodeURIComponent(const string_t& s);
+  static ::std::function<string_t(const string_t& url)> PreprocessUrl;
   static void
   LoadImage(const string_t& url,
             const ::std::function<void(const Image& img)>& onLoad,

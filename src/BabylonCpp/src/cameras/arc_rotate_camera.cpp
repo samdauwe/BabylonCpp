@@ -1,6 +1,9 @@
 #include <babylon/cameras/arc_rotate_camera.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/behaviors/cameras/auto_rotation_behavior.h>
+#include <babylon/behaviors/cameras/bouncing_behavior.h>
+#include <babylon/behaviors/cameras/framing_behavior.h>
 #include <babylon/collisions/icollision_coordinator.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
@@ -46,6 +49,9 @@ ArcRotateCamera::ArcRotateCamera(const string_t& iName, float iAlpha,
     , _collisionVelocity{Vector3::Zero()}
     , _newPosition{Vector3::Zero()}
     , _collisionTriggered{false}
+    , _bouncingBehavior{nullptr}
+    , _framingBehavior{nullptr}
+    , _autoRotationBehavior{nullptr}
 {
   setTarget(iTarget);
   getViewMatrix();
@@ -66,7 +72,7 @@ void ArcRotateCamera::_initCache()
 {
   TargetCamera::_initCache();
 
-  _cache._target            = Vector3(std::numeric_limits<float>::max(),
+  _cache._target = Vector3(std::numeric_limits<float>::max(),
                            std::numeric_limits<float>::max(),
                            std::numeric_limits<float>::max());
   _cache.alpha              = 0.f;
@@ -275,9 +281,8 @@ void ArcRotateCamera::rebuildAnglesAndRadius()
   radius        = radiusv3.length();
 
   // Alpha
-  alpha = ::std::acos(
-    radiusv3.x
-    / ::std::sqrt(::std::pow(radiusv3.x, 2.f) + ::std::pow(radiusv3.z, 2.f)));
+  alpha = ::std::acos(radiusv3.x / ::std::sqrt(::std::pow(radiusv3.x, 2.f)
+                                               + ::std::pow(radiusv3.z, 2.f)));
 
   if (radiusv3.z < 0.f) {
     alpha = Math::PI2 - alpha;
@@ -340,6 +345,84 @@ void ArcRotateCamera::setTarget(const Vector3& iTarget,
   _targetBoundingCenter.reset(nullptr);
 
   rebuildAnglesAndRadius();
+}
+
+BouncingBehavior* ArcRotateCamera::bouncingBehavior() const
+{
+  return _bouncingBehavior.get();
+}
+
+bool ArcRotateCamera::useBouncingBehavior() const
+{
+  return _bouncingBehavior != nullptr;
+}
+
+void ArcRotateCamera::setUseBouncingBehavior(bool value)
+{
+  if (value == useBouncingBehavior()) {
+    return;
+  }
+
+  if (value) {
+    _bouncingBehavior = ::std::make_unique<BouncingBehavior>();
+    addBehavior(dynamic_cast<Behavior<Node>*>(_bouncingBehavior.get()));
+  }
+  else {
+    removeBehavior(dynamic_cast<Behavior<Node>*>(_bouncingBehavior.get()));
+    _bouncingBehavior = nullptr;
+  }
+}
+
+FramingBehavior* ArcRotateCamera::framingBehavior() const
+{
+  return _framingBehavior.get();
+}
+
+bool ArcRotateCamera::useFramingBehavior() const
+{
+  return _framingBehavior != nullptr;
+}
+
+void ArcRotateCamera::setUseFramingBehavior(bool value)
+{
+  if (value == useFramingBehavior()) {
+    return;
+  }
+
+  if (value) {
+    _framingBehavior = ::std::make_unique<FramingBehavior>();
+    addBehavior(dynamic_cast<Behavior<Node>*>(_framingBehavior.get()));
+  }
+  else {
+    removeBehavior(dynamic_cast<Behavior<Node>*>(_framingBehavior.get()));
+    _framingBehavior = nullptr;
+  }
+}
+
+AutoRotationBehavior* ArcRotateCamera::autoRotationBehavior() const
+{
+  return _autoRotationBehavior.get();
+}
+
+bool ArcRotateCamera::useAutoRotationBehavior() const
+{
+  return _autoRotationBehavior != nullptr;
+}
+
+void ArcRotateCamera::setUseAutoRotationBehavior(bool value)
+{
+  if (value == useAutoRotationBehavior()) {
+    return;
+  }
+
+  if (value) {
+    _autoRotationBehavior = ::std::make_unique<AutoRotationBehavior>();
+    addBehavior(dynamic_cast<Behavior<Node>*>(_autoRotationBehavior.get()));
+  }
+  else {
+    removeBehavior(dynamic_cast<Behavior<Node>*>(_autoRotationBehavior.get()));
+    _autoRotationBehavior = nullptr;
+  }
 }
 
 Matrix ArcRotateCamera::_getViewMatrix()
