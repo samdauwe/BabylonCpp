@@ -30,7 +30,7 @@ constexpr T grad(I hash, T x, T y, T z)
 /**
  * @brief Perlin noise generator class.
  */
-class PerlinNoise {
+class BABYLON_SHARED_EXPORT PerlinNoise {
 
 public:
   /**

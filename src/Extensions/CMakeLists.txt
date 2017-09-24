@@ -229,6 +229,7 @@ set(gtest_disable_pthreads      OFF CACHE BOOL "")
 set(gtest_force_shared_crt      ON  CACHE BOOL "")
 set(gtest_hide_internal_symbols OFF CACHE BOOL "")
 
+if(NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
 # Target 'test'
 add_custom_target(BabylonCppExtensionsUnitTests)
 set_target_properties(BabylonCppExtensionsUnitTests
@@ -236,6 +237,7 @@ set_target_properties(BabylonCppExtensionsUnitTests
 
 # Tests
 add_test_without_ctest(tests)
+endif()
 
 endif(OPTION_BUILD_TESTS AND EXISTS ${TESTS_PATH})
 

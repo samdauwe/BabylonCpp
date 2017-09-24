@@ -108,7 +108,7 @@ Vector3 ShadowLight::setDirectionToTarget(const Vector3& target)
 Vector3 ShadowLight::getRotation()
 {
   direction().normalize();
-  auto xaxis = Vector3::Cross(direction(), Axis::Y);
+  auto xaxis = Vector3::Cross(direction(), Axis::Y());
   auto yaxis = Vector3::Cross(xaxis, direction());
   return Vector3::RotationFromAxis(xaxis, yaxis, direction());
 }

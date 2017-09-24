@@ -90,8 +90,8 @@ BoneLookController::BoneLookController(
 
     if (options.yawAxis.hasValue() || options.pitchAxis.hasValue()) {
 
-      auto newYawAxis   = Axis::Y;
-      auto newPitchAxis = Axis::X;
+      auto newYawAxis   = Axis::Y();
+      auto newPitchAxis = Axis::X();
 
       if (options.yawAxis.hasValue()) {
         newYawAxis = options.yawAxis.value;
@@ -336,7 +336,7 @@ void BoneLookController::update()
       if (_slerping && _yawRange > Math::PI) {
         // are we going to be crossing into the min/max region?
         auto& boneFwd = BoneLookController::_tmpVecs[8];
-        boneFwd.copyFrom(Axis::Z);
+        boneFwd.copyFrom(Axis::Z());
         if (_transformYawPitch) {
           Vector3::TransformCoordinatesToRef(boneFwd, _transformYawPitchInv,
                                              boneFwd);

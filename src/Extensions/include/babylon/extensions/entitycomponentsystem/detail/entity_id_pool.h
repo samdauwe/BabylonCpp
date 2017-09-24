@@ -31,6 +31,8 @@
 
 #include <vector>
 
+#include <babylon/babylon_api.h>
+
 #include <babylon/extensions/entitycomponentsystem/entity.h>
 
 namespace BABYLON {
@@ -43,7 +45,7 @@ namespace detail {
 /// Used to pool entity IDs, so they can be re-used.
 ///
 /// \author Miguel Martin
-class EntityIdPool {
+class BABYLON_SHARED_EXPORT EntityIdPool {
 
 public:
   explicit EntityIdPool(std::size_t poolSize);

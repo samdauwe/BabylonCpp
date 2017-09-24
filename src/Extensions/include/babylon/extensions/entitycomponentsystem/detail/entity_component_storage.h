@@ -32,6 +32,8 @@
 #include <array>
 #include <memory>
 
+#include <babylon/babylon_api.h>
+
 #include <babylon/extensions/entitycomponentsystem/detail/class_type_id.h>
 #include <babylon/extensions/entitycomponentsystem/detail/component_type_list.h>
 
@@ -51,7 +53,7 @@ namespace detail {
 ///
 ///
 /// \author Miguel Martin
-class EntityComponentStorage {
+class BABYLON_SHARED_EXPORT EntityComponentStorage {
 
 public:
   explicit EntityComponentStorage(std::size_t entityAmount);

@@ -25,9 +25,9 @@ BoneAxesViewer::~BoneAxesViewer()
 void BoneAxesViewer::update()
 {
   bone->getAbsolutePositionToRef(mesh, pos);
-  bone->getDirectionToRef(Axis::X, xaxis, mesh);
-  bone->getDirectionToRef(Axis::Y, yaxis, mesh);
-  bone->getDirectionToRef(Axis::Z, zaxis, mesh);
+  bone->getDirectionToRef(Axis::X(), xaxis, mesh);
+  bone->getDirectionToRef(Axis::Y(), yaxis, mesh);
+  bone->getDirectionToRef(Axis::Z(), zaxis, mesh);
 
   AxesViewer::update(pos, xaxis, yaxis, zaxis);
 }

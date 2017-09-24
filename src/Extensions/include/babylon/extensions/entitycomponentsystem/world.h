@@ -32,6 +32,8 @@
 #include <utility>
 #include <vector>
 
+#include <babylon/babylon_api.h>
+
 #include <babylon/extensions/entitycomponentsystem/detail/entity_component_storage.h>
 #include <babylon/extensions/entitycomponentsystem/detail/entity_id_pool.h>
 
@@ -43,7 +45,7 @@ namespace BABYLON {
 namespace Extensions {
 namespace ECS {
 
-class World {
+class BABYLON_SHARED_EXPORT World {
 
 private:
   struct SystemDeleter {

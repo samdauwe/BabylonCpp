@@ -9,17 +9,17 @@ class BABYLON_SHARED_EXPORT LogLevels {
 
 public:
   /** No logging. **/
-  static const unsigned int LEVEL_QUIET;
+  static constexpr unsigned int LEVEL_QUIET = 0;
   /** Application crashes / exceptions. **/
-  static const unsigned int LEVEL_ERROR;
+  static constexpr unsigned int LEVEL_ERROR = 1;
   /** Incorrect behavior but the application can continue. **/
-  static const unsigned int LEVEL_WARN;
+  static constexpr unsigned int LEVEL_WARN = 2;
   /** Normal behavior. **/
-  static const unsigned int LEVEL_INFO;
+  static constexpr unsigned int LEVEL_INFO = 3;
   /** Detailed information **/
-  static const unsigned int LEVEL_DEBUG;
+  static constexpr unsigned int LEVEL_DEBUG = 4;
   /** Begin method X, end method X etc. **/
-  static const unsigned int LEVEL_TRACE;
+  static constexpr unsigned int LEVEL_TRACE = 5;
   /** Levels list **/
   static const vector_t<pair_t<unsigned int, string_t>> Levels;
 

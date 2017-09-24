@@ -24,7 +24,7 @@ public:
 
   const char* getClassName() const override;
   void _checkInputs() override;
-  void resetToCurrentRotation(const Vector3& axis = Axis::Y);
+  void resetToCurrentRotation(const Vector3& axis = Axis::Y());
 
 protected:
   DeviceOrientationCamera(const string_t& name, const Vector3& position,
