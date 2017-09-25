@@ -29,6 +29,8 @@
 #include <type_traits>
 #include <vector>
 
+#include <babylon/babylon_api.h>
+
 #include <babylon/extensions/entitycomponentsystem/config.h>
 #include <babylon/extensions/entitycomponentsystem/detail/class_type_id.h>
 
@@ -36,7 +38,7 @@ namespace BABYLON {
 namespace Extensions {
 namespace ECS {
 
-class Component {
+class BABYLON_SHARED_EXPORT Component {
 
 public:
   virtual ~Component()

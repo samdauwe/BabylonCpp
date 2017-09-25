@@ -26,6 +26,8 @@
 #ifndef BABYLON_EXTENSIONS_ENTITY_COMPONENT_SYSTEM_FILTER_OPTIONS_H
 #define BABYLON_EXTENSIONS_ENTITY_COMPONENT_SYSTEM_FILTER_OPTIONS_H
 
+#include <babylon/babylon_api.h>
+
 #include <babylon/extensions/entitycomponentsystem/detail/filter.h>
 
 namespace BABYLON {
@@ -34,12 +36,14 @@ namespace ECS {
 
 /// Requires a set of components
 template <class... Args>
-struct Requires : detail::TypeList<Args...>, detail::BaseRequires {
+struct BABYLON_SHARED_EXPORT Requires : detail::TypeList<Args...>,
+                                        detail::BaseRequires {
 };
 
 /// Excludes a set of components
 template <class... Args>
-struct Excludes : detail::TypeList<Args...>, detail::BaseExcludes {
+struct BABYLON_SHARED_EXPORT Excludes : detail::TypeList<Args...>,
+                                        detail::BaseExcludes {
 };
 
 } // end of namespace ECS

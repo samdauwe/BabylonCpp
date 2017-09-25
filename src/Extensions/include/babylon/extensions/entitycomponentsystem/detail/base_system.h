@@ -31,6 +31,8 @@
 
 #include <vector>
 
+#include <babylon/babylon_api.h>
+
 #include <babylon/extensions/entitycomponentsystem/detail/filter.h>
 #include <babylon/extensions/entitycomponentsystem/entity.h>
 
@@ -48,7 +50,7 @@ namespace detail {
 /// a specific amount of components.
 ///
 /// \author Miguel Martin
-class BaseSystem {
+class BABYLON_SHARED_EXPORT BaseSystem {
 
 public:
   BaseSystem(const Filter& filter);

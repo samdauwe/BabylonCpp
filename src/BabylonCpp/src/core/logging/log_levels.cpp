@@ -2,12 +2,12 @@
 
 namespace BABYLON {
 
-constexpr unsigned int LogLevels::LEVEL_QUIET = 0;
-constexpr unsigned int LogLevels::LEVEL_ERROR = 1;
-constexpr unsigned int LogLevels::LEVEL_WARN  = 2;
-constexpr unsigned int LogLevels::LEVEL_INFO  = 3;
-constexpr unsigned int LogLevels::LEVEL_DEBUG = 4;
-constexpr unsigned int LogLevels::LEVEL_TRACE = 5;
+constexpr unsigned int LogLevels::LEVEL_QUIET;
+constexpr unsigned int LogLevels::LEVEL_ERROR;
+constexpr unsigned int LogLevels::LEVEL_WARN;
+constexpr unsigned int LogLevels::LEVEL_INFO;
+constexpr unsigned int LogLevels::LEVEL_DEBUG;
+constexpr unsigned int LogLevels::LEVEL_TRACE;
 
 const vector_t<pair_t<unsigned int, string_t>> LogLevels::Levels
   = {::std::make_pair(LogLevels::LEVEL_QUIET, "QUIET"),

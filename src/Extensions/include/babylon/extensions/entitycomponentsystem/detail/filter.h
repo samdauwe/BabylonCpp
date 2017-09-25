@@ -28,6 +28,8 @@
 
 #include <type_traits>
 
+#include <babylon/babylon_api.h>
+
 #include <babylon/extensions/entitycomponentsystem/component.h>
 #include <babylon/extensions/entitycomponentsystem/config.h>
 
@@ -40,15 +42,15 @@ namespace ECS {
 namespace detail {
 
 template <class... Args>
-struct TypeList {
+struct BABYLON_SHARED_EXPORT TypeList {
 };
 
-struct BaseRequires {
+struct BABYLON_SHARED_EXPORT BaseRequires {
 };
-struct BaseExcludes {
+struct BABYLON_SHARED_EXPORT BaseExcludes {
 };
 
-struct Filter {
+struct BABYLON_SHARED_EXPORT Filter {
 public:
   Filter(ComponentTypeList requires, ComponentTypeList excludes)
       : m_requires(requires), m_excludes(excludes)

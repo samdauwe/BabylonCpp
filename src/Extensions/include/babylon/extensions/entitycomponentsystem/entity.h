@@ -30,6 +30,8 @@
 #include <type_traits>
 #include <utility>
 
+#include <babylon/babylon_api.h>
+
 #include <babylon/extensions/entitycomponentsystem/detail/class_type_id.h>
 #include <babylon/extensions/entitycomponentsystem/detail/component_type_list.h>
 
@@ -52,7 +54,7 @@ class World;
 /// the ID class)
 ///
 /// \author Miguel Martin
-class Entity {
+class BABYLON_SHARED_EXPORT Entity {
 
 public:
   /// \brief A class to describe an ID for an entity
@@ -67,7 +69,7 @@ public:
   ///
   /// \author Miguel Martin
   struct Id {
-    using  int_type = std::size_t;
+    using int_type = std::size_t;
 
     /// Default constructor
     /// \note

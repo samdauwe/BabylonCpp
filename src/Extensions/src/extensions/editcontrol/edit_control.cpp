@@ -685,7 +685,7 @@ void EditControl::scaleWithSnap(Mesh* mesh, Vector3& p)
 
 void EditControl::doRotation(Mesh* mesh, Mesh* axis, const Vector3& newPos)
 {
-  auto cN = Vector3::TransformNormal(Axis::Z, *mainCamera->getWorldMatrix());
+  auto cN = Vector3::TransformNormal(Axis::Z(), *mainCamera->getWorldMatrix());
   auto angle
     = EditControl::getAngle(prevPos, newPos, mesh->getAbsolutePivotPoint(), cN);
 
@@ -708,7 +708,7 @@ void EditControl::doRotation(Mesh* mesh, Mesh* axis, const Vector3& newPos)
         if (Vector3::Dot(localX, cN) < 0) {
           angle = -1.f * angle;
         }
-        auto axis = Axis::X;
+        auto axis = Axis::X();
         mesh->rotate(axis, angle, Space::LOCAL);
       }
       else {
@@ -736,7 +736,7 @@ void EditControl::doRotation(Mesh* mesh, Mesh* axis, const Vector3& newPos)
         if (Vector3::Dot(localY, cN) < 0) {
           angle = -1.f * angle;
         }
-        auto axis = Axis::Y;
+        auto axis = Axis::Y();
         mesh->rotate(axis, angle, Space::LOCAL);
       }
       else {
@@ -754,7 +754,7 @@ void EditControl::doRotation(Mesh* mesh, Mesh* axis, const Vector3& newPos)
           angle = rotSnap;
         else
           angle = -rotSnap;
-        snapRZ  = 0;
+        snapRZ = 0;
       }
     }
     if (!stl_util::almost_equal(angle, 0.f)) {
@@ -762,7 +762,7 @@ void EditControl::doRotation(Mesh* mesh, Mesh* axis, const Vector3& newPos)
         if (Vector3::Dot(localZ, cN) < 0) {
           angle = -1.f * angle;
         }
-        auto axis = Axis::Z;
+        auto axis = Axis::Z();
         mesh->rotate(axis, angle, Space::LOCAL);
       }
       else {
@@ -1007,9 +1007,9 @@ void EditControl::createPickPlanes()
   pYX->renderingGroupId  = 1;
 
   pALL->billboardMode = Mesh::BILLBOARDMODE_ALL;
-  auto axis           = Axis::X;
+  auto axis           = Axis::X();
   pXZ->rotate(axis, 1.57f);
-  axis = Axis::Y;
+  axis = Axis::Y();
   pZY->rotate(axis, 1.57f);
 
   pickPlanes = Mesh::New("pickPlanes", scene);

@@ -466,8 +466,8 @@ Mesh* MeshBuilder::CreatePlane(const string_t& name, PlaneOptions& options,
     plane->translate(options.sourcePlane->normal, options.sourcePlane->d);
 
     auto product
-      = ::std::acos(Vector3::Dot(options.sourcePlane->normal, Axis::Z));
-    auto vectorProduct = Vector3::Cross(Axis::Z, options.sourcePlane->normal);
+      = ::std::acos(Vector3::Dot(options.sourcePlane->normal, Axis::Z()));
+    auto vectorProduct = Vector3::Cross(Axis::Z(), options.sourcePlane->normal);
 
     plane->rotate(vectorProduct, product);
   }

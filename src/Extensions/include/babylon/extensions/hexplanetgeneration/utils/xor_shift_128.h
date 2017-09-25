@@ -8,7 +8,7 @@
 namespace BABYLON {
 namespace Extensions {
 
-struct XorShift128 : public IRandomFunction {
+struct BABYLON_SHARED_EXPORT XorShift128 : public IRandomFunction {
   XorShift128(size_t x = 0, size_t y = 0, size_t z = 0, size_t w = 0);
   virtual ~XorShift128();
 

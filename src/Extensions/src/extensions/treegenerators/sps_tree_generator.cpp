@@ -46,53 +46,55 @@ Mesh* SPSTreeGenerator::CreateTree(
   auto _leaves_SPS     = new SolidParticleSystem("leaveSPS", scene, spsOptions);
 
   // Function to position leaves on base tree
-  auto _set_leaves
-    = [&](SolidParticle* particle, const Vector3& /*i*/, unsigned int s) {
-        unsigned int _a
-          = static_cast<unsigned>(std::floor(s / (2.f * leavesOnBranch)));
-        if (boughs == 1) {
-          ++_a;
-        }
-        else {
-          _a = 2 + _a % forks
-               + static_cast<unsigned>(std::floor(_a / forks) * (forks + 1));
-        }
-        unsigned int _j = s % (2 * leavesOnBranch);
-        float _g = (_j * _leaf_gap + 3 * _leaf_gap / 2.f) / _branch_length;
+  auto _set_leaves = [&](SolidParticle* particle, const Vector3& /*i*/,
+                         unsigned int s) {
+    unsigned int _a
+      = static_cast<unsigned>(std::floor(s / (2.f * leavesOnBranch)));
+    if (boughs == 1) {
+      ++_a;
+    }
+    else {
+      _a = 2 + _a % forks
+           + static_cast<unsigned>(std::floor(_a / forks) * (forks + 1));
+    }
+    unsigned int _j = s % (2 * leavesOnBranch);
+    float _g        = (_j * _leaf_gap + 3 * _leaf_gap / 2.f) / _branch_length;
 
-        size_t _upper = static_cast<size_t>(std::ceil(trunkSlices * _g));
-        if (_upper > _base.paths[_a].size() - 1) {
-          _upper = _base.paths[_a].size() - 1;
-        }
-        size_t _lower = _upper - 1;
-        size_t _gl    = _lower / (trunkSlices - 1);
-        size_t _gu    = _upper / (trunkSlices - 1);
-        float _px     = _base.paths[_a][_lower].x
-                    + (_base.paths[_a][_upper].x - _base.paths[_a][_lower].x)
-                        * (_g - _gl) / (_gu - _gl);
-        float _py = _base.paths[_a][_lower].y
-                    + (_base.paths[_a][_upper].y - _base.paths[_a][_lower].y)
-                        * (_g - _gl) / (_gu - _gl);
-        float _pz = _base.paths[_a][_lower].z
-                    + (_base.paths[_a][_upper].z - _base.paths[_a][_lower].z)
-                        * (_g - _gl) / (_gu - _gl);
-        particle->position = Vector3(
-          _px, _py
-                 + (0.6f * _leaf_width / leafWHRatio + _base.radii[_a][_upper])
-                     * (2 * (s % 2) - 1),
-          _pz);
-        particle->rotation.z = Math::random() * Math::PI_4;
-        particle->rotation.y = Math::random() * Math::PI_2;
-        particle->rotation.z = Math::random() * Math::PI_4;
-        particle->scaling.y  = 1.f / leafWHRatio;
-      };
+    size_t _upper = static_cast<size_t>(std::ceil(trunkSlices * _g));
+    if (_upper > _base.paths[_a].size() - 1) {
+      _upper = _base.paths[_a].size() - 1;
+    }
+    size_t _lower = _upper - 1;
+    size_t _gl    = _lower / (trunkSlices - 1);
+    size_t _gu    = _upper / (trunkSlices - 1);
+    float _px     = _base.paths[_a][_lower].x
+                + (_base.paths[_a][_upper].x - _base.paths[_a][_lower].x)
+                    * (_g - _gl) / (_gu - _gl);
+    float _py = _base.paths[_a][_lower].y
+                + (_base.paths[_a][_upper].y - _base.paths[_a][_lower].y)
+                    * (_g - _gl) / (_gu - _gl);
+    float _pz = _base.paths[_a][_lower].z
+                + (_base.paths[_a][_upper].z - _base.paths[_a][_lower].z)
+                    * (_g - _gl) / (_gu - _gl);
+    particle->position
+      = Vector3(_px,
+                _py
+                  + (0.6f * _leaf_width / leafWHRatio + _base.radii[_a][_upper])
+                      * (2 * (s % 2) - 1),
+                _pz);
+    particle->rotation.z = Math::random() * Math::PI_4;
+    particle->rotation.y = Math::random() * Math::PI_2;
+    particle->rotation.z = Math::random() * Math::PI_4;
+    particle->scaling.y  = 1.f / leafWHRatio;
+  };
 
   // add leaf mesh _leaf enough for all the final forked branches
   SolidParticleSystemMeshBuilderOptions spsBuilderOptions;
   spsBuilderOptions.positionFunction = _set_leaves;
   _leaves_SPS->addShape(
-    _leaf, static_cast<size_t>(2.f * leavesOnBranch
-                               * std::pow(static_cast<float>(forks), _boughs)),
+    _leaf,
+    static_cast<size_t>(2.f * leavesOnBranch
+                        * std::pow(static_cast<float>(forks), _boughs)),
     spsBuilderOptions);
   auto _leaves = _leaves_SPS->buildMesh(); // mesh of leaves
   // _leaves->billboard=true;
@@ -143,8 +145,8 @@ Mesh* SPSTreeGenerator::CreateTree(
                                  * std::sin(turn)))
           .add(_mini_sys.z.scale(std::sin(randPct(forkAngle, 0.f))
                                  * std::cos(turn)));
-    Vector3 axis = Vector3::Cross(Axis::Y, _mini_direction);
-    float _theta = std::acos(Vector3::Dot(_mini_direction, Axis::Y)
+    Vector3 axis      = Vector3::Cross(Axis::Y(), _mini_direction);
+    float _theta      = std::acos(Vector3::Dot(_mini_direction, Axis::Y())
                              / _mini_direction.length());
     particle->scaling = Vector3(std::pow(trunkTaper, _boughs + 1.f),
                                 std::pow(trunkTaper, _boughs + 1.f),
@@ -190,8 +192,8 @@ Mesh* SPSTreeGenerator::CreateTree(
                                  * std::sin(_turn)))
           .add(_mini_sys.z.scale(std::sin(randPct(branchAngle, 0.f))
                                  * std::cos(_turn)));
-    Vector3 _axis = Vector3::Cross(Axis::Y, _mini_direction);
-    float _theta  = std::acos(Vector3::Dot(_mini_direction, Axis::Y)
+    Vector3 _axis     = Vector3::Cross(Axis::Y(), _mini_direction);
+    float _theta      = std::acos(Vector3::Dot(_mini_direction, Axis::Y())
                              / _mini_direction.length());
     particle->scaling = Vector3(std::pow(trunkTaper, _boughs + 1.f),
                                 std::pow(trunkTaper, _boughs + 1.f),

@@ -4,6 +4,8 @@
 #include <cstddef>
 #include <vector>
 
+#include <babylon/babylon_api.h>
+
 #include <babylon/extensions/entitycomponentsystem/filter_options.h>
 
 #include <babylon/extensions/entitycomponentsystem/detail/base_system.h>
@@ -25,7 +27,7 @@ namespace ECS {
 ///
 /// \author Miguel Martin
 template <class RequireList, class ExcludeList = Excludes<>>
-class System : public detail::BaseSystem {
+class BABYLON_SHARED_EXPORT System : public detail::BaseSystem {
 public:
   /// Default constructor
   System() : BaseSystem{detail::MakeFilter<RequireList, ExcludeList>()}
