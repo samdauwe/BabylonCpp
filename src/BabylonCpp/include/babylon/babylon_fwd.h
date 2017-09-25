@@ -178,6 +178,7 @@ class PoseEnabledController;
 struct PoseEnabledControllerHelper;
 class ViveController;
 class WebVRController;
+class WindowsMotionController;
 // --- Interfaces ---
 class IBrowserGamepad;
 class ICanvas;
