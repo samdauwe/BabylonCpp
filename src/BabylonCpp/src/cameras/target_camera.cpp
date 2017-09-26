@@ -63,11 +63,11 @@ void TargetCamera::_initCache()
 {
   Camera::_initCache();
   _cache.lockedTarget = ::std::make_unique<Vector3>(
-    std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
-    std::numeric_limits<float>::max());
-  _cache.rotation = Vector3(std::numeric_limits<float>::max(),
-                            std::numeric_limits<float>::max(),
-                            std::numeric_limits<float>::max());
+    numeric_limits_t<float>::max(), numeric_limits_t<float>::max(),
+    numeric_limits_t<float>::max());
+  _cache.rotation
+    = Vector3(numeric_limits_t<float>::max(), numeric_limits_t<float>::max(),
+              numeric_limits_t<float>::max());
 }
 
 void TargetCamera::_updateCache(bool ignoreParentClass)

@@ -72,9 +72,9 @@ void ArcRotateCamera::_initCache()
 {
   TargetCamera::_initCache();
 
-  _cache._target = Vector3(std::numeric_limits<float>::max(),
-                           std::numeric_limits<float>::max(),
-                           std::numeric_limits<float>::max());
+  _cache._target
+    = Vector3(numeric_limits_t<float>::max(), numeric_limits_t<float>::max(),
+              numeric_limits_t<float>::max());
   _cache.alpha              = 0.f;
   _cache.beta               = 0.f;
   _cache.radius             = 0.f;

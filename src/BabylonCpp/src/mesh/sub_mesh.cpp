@@ -267,6 +267,13 @@ SubMesh::intersects(Ray& ray, const vector_t<Vector3>& positions,
   return intersectInfo;
 }
 
+void SubMesh::_rebuild()
+{
+  if (_linesIndexBuffer) {
+    _linesIndexBuffer = nullptr;
+  }
+}
+
 // Clone
 SubMesh* SubMesh::clone(AbstractMesh* newMesh, Mesh* newRenderingMesh) const
 {
@@ -304,8 +311,8 @@ SubMesh* SubMesh::CreateFromIndices(unsigned int materialIndex,
                                     unsigned int startIndex, size_t indexCount,
                                     AbstractMesh* mesh, Mesh* renderingMesh)
 {
-  unsigned int minVertexIndex = std::numeric_limits<unsigned>::max();
-  unsigned int maxVertexIndex = std::numeric_limits<unsigned>::min();
+  unsigned int minVertexIndex = numeric_limits_t<unsigned>::max();
+  unsigned int maxVertexIndex = numeric_limits_t<unsigned>::min();
 
   auto _renderingMesh
     = renderingMesh ? renderingMesh : static_cast<Mesh*>(mesh);

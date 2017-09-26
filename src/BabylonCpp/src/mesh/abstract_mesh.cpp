@@ -26,6 +26,7 @@
 #include <babylon/physics/physics_engine.h>
 #include <babylon/rendering/bounding_box_renderer.h>
 #include <babylon/rendering/edges_renderer.h>
+#include <babylon/tools/tools.h>
 
 namespace BABYLON {
 
@@ -41,7 +42,7 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
     , occlusionRetryCount{-1}
     , billboardMode{AbstractMesh::BILLBOARDMODE_NONE}
     , visibility{1.f}
-    , alphaIndex{std::numeric_limits<int>::max()}
+    , alphaIndex{numeric_limits_t<int>::max()}
     , infiniteDistance{false}
     , isVisible{true}
     , isPickable{true}
@@ -399,6 +400,25 @@ void AbstractMesh::_resyncLightSources()
   }
 
   _markSubMeshesAsLightDirty();
+}
+
+void AbstractMesh::_rebuild()
+{
+  if (_occlusionQuery) {
+    _occlusionQuery = nullptr;
+  }
+
+  if (_edgesRenderer) {
+    _edgesRenderer->_rebuild();
+  }
+
+  if (subMeshes.empty()) {
+    return;
+  }
+
+  for (auto& subMesh : subMeshes) {
+    subMesh->_rebuild();
+  }
 }
 
 void AbstractMesh::_resyncLighSource(Light* light)
@@ -992,8 +1012,50 @@ void AbstractMesh::markAsDirty(unsigned int property)
   if (property == static_cast<unsigned>(PropertyType::ROTATION)) {
     resetRotationQuaternion();
   }
-  _currentRenderId = std::numeric_limits<int>::max();
+  _currentRenderId = numeric_limits_t<int>::max();
   _isDirty         = true;
+}
+
+MinMax AbstractMesh::getHierarchyBoundingVectors()
+{
+  computeWorldMatrix(true);
+
+  Vector3 min;
+  Vector3 max;
+
+  if (subMeshes.empty()) {
+    min
+      = Vector3(numeric_limits_t<float>::max(), numeric_limits_t<float>::max(),
+                numeric_limits_t<float>::max());
+    max = Vector3(-numeric_limits_t<float>::max(),
+                  -numeric_limits_t<float>::max(),
+                  -numeric_limits_t<float>::max());
+  }
+  else {
+    min = getBoundingInfo()->boundingBox.minimumWorld;
+    max = getBoundingInfo()->boundingBox.maximumWorld;
+  }
+
+  auto descendants = getDescendants(false);
+
+  for (auto& descendant : descendants) {
+    auto childMesh = static_cast<AbstractMesh*>(descendant);
+
+    childMesh->computeWorldMatrix(true);
+
+    if (childMesh->getTotalVertices() == 0) {
+      continue;
+    }
+    auto boundingBox = childMesh->getBoundingInfo()->boundingBox;
+
+    auto minBox = boundingBox.minimumWorld;
+    auto maxBox = boundingBox.maximumWorld;
+
+    Tools::CheckExtends(minBox, min, max);
+    Tools::CheckExtends(maxBox, min, max);
+  }
+
+  return {min, max};
 }
 
 AbstractMesh& AbstractMesh::_updateBoundingInfo()
@@ -1391,7 +1453,8 @@ void AbstractMesh::setCheckCollisions(bool collisionEnabled)
   }*/
 }
 
-AbstractMesh& AbstractMesh::moveWithCollisions(const Vector3& /*velocity*/)
+AbstractMesh&
+AbstractMesh::moveWithCollisions(const Vector3& /*moveWithCollisions*/)
 {
   auto globalPosition = getAbsolutePosition();
 
@@ -1406,7 +1469,7 @@ AbstractMesh& AbstractMesh::moveWithCollisions(const Vector3& /*velocity*/)
   _collider->radius = ellipsoid;
 
   // getScene()->collisionCoordinator->getNewPosition(
-  //  _oldPositionForCollisions, velocity, _collider.get(), 3, this,
+  //  _oldPositionForCollisions, moveWithCollisions, _collider.get(), 3, this,
   //  _onCollisionPositionChange(), uniqueId);
 
   return *this;
@@ -1714,6 +1777,7 @@ void AbstractMesh::dispose(bool doNotRecurse)
   // Query
   auto engine = getScene()->getEngine();
   if (_occlusionQuery) {
+    _isOcclusionQueryInProgress = false;
     engine->deleteQuery(_occlusionQuery);
     _occlusionQuery = nullptr;
   }
@@ -1856,39 +1920,13 @@ AbstractMesh& AbstractMesh::setParent(AbstractMesh* mesh)
     child->position().z = position.z;
   }
   else {
-    auto& rotation = Tmp::QuaternionArray[0];
     auto& position = Tmp::Vector3Array[0];
-    auto& scale    = Tmp::Vector3Array[1];
     auto& m1       = Tmp::MatrixArray[0];
-    auto& m2       = Tmp::MatrixArray[1];
 
-    parent->getWorldMatrix()->decompose(scale, rotation, position);
+    parent->getWorldMatrix()->invertToRef(m1);
+    Vector3::TransformCoordinatesToRef(child->position(), m1, position);
 
-    rotation.toRotationMatrix(m1);
-    m2.setTranslation(position);
-
-    m2.multiplyToRef(m1, m1);
-
-    auto invParentMatrix = Matrix::Invert(m1);
-
-    auto m = child->getWorldMatrix()->multiply(invParentMatrix);
-    m.decompose(scale, rotation, position);
-
-    if (child->_rotationQuaternionSet) {
-      child->rotationQuaternion().copyFrom(rotation);
-    }
-    else {
-      rotation.toEulerAnglesToRef(child->rotation());
-    }
-
-    invParentMatrix = Matrix::Invert(*parent->getWorldMatrix());
-
-    m = child->getWorldMatrix()->multiply(invParentMatrix);
-    m.decompose(scale, rotation, position);
-
-    child->position().x = position.x;
-    child->position().y = position.y;
-    child->position().z = position.z;
+    child->position().copyFrom(position);
   }
   static_cast<Node*>(child)->setParent(parent);
   return *this;
@@ -2103,7 +2141,7 @@ int AbstractMesh::getClosestFacetAtLocalCoordinates(float x, float y, float z,
     return closest;
   }
   // Get the closest facet to (x, y, z)
-  float shortest    = std::numeric_limits<float>::max(); // init distance vars
+  float shortest    = numeric_limits_t<float>::max(); // init distance vars
   float tmpDistance = shortest;
   size_t fib;   // current facet in the block
   Vector3 norm; // current facet normal
@@ -2209,7 +2247,7 @@ void AbstractMesh::checkOcclusionQuery()
         // if optimistic set isOccluded to false regardless of the status of
         // isOccluded. (Render in the current render loop)
         // if strict continue the last state of the object.
-        _isOccluded = occlusionType == AbstractMesh::OCCLUSION_TYPE_OPTIMISITC ?
+        _isOccluded = occlusionType == AbstractMesh::OCCLUSION_TYPE_OPTIMISTIC ?
                         false :
                         _isOccluded;
       }

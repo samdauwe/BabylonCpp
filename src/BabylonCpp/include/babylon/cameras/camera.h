@@ -148,6 +148,8 @@ public:
   CameraRigParams _cameraRigParams;
   vector_t<Camera*> _rigCameras;
   PostProcess* _rigPostProcess;
+  bool _skipRendering;
+  Camera* _alternateCamera;
   vector_t<RenderTargetTexture*> customRenderTargets;
 
   /** Observables **/
@@ -161,13 +163,15 @@ public:
   Uint32Array _postProcessesTakenIndices;
   vector_t<Mesh*> _activeMeshes;
 
+protected:
+  Matrix _webvrViewMatrix;
+
 private:
   Matrix _computedViewMatrix;
   bool _doNotComputeProjectionMatrix;
   unique_ptr_t<Matrix> _worldMatrix;
   Matrix _transformMatrix;
   Matrix _webvrProjectionMatrix;
-  Matrix _webvrViewMatrix;
   Vector3 _globalPosition;
   array_t<Plane, 6> _frustumPlanes;
   bool _refreshFrustumPlanes;

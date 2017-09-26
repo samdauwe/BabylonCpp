@@ -439,7 +439,8 @@ public:
   Mesh& toLeftHanded();
 
   virtual void _bind(SubMesh* subMesh, Effect* effect, unsigned int fillMode);
-  virtual void _draw(SubMesh* subMesh, int fillMode, size_t instancesCount = 0);
+  virtual void _draw(SubMesh* subMesh, int fillMode, size_t instancesCount = 0,
+                     bool alternate = false);
 
   /**
    * @brief Registers for this mesh a javascript function called just before the
@@ -1474,6 +1475,7 @@ private:
   unique_ptr_t<Buffer> _instancesBuffer;
   Float32Array _instancesData;
   size_t _overridenInstanceCount;
+  Material* _effectiveMaterial;
   int _preActivateId;
   unsigned int _sideOrientation;
   // Will be used by ribbons mainly

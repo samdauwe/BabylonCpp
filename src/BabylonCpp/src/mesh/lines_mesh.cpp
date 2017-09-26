@@ -102,7 +102,7 @@ void LinesMesh::_bind(SubMesh* /*subMesh*/, Effect* /*effect*/,
 }
 
 void LinesMesh::_draw(SubMesh* subMesh, int /*fillMode*/,
-                      size_t /*instancesCount*/)
+                      size_t /*instancesCount*/, bool /*alternate*/)
 {
   if (!_geometry || _geometry->getVertexBuffers().empty()
       || !_geometry->getIndexBuffer()) {

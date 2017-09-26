@@ -82,7 +82,7 @@ Radix::~Radix()
 RadixFeatures Radix::intersect(const Vector2& pos)
 {
   auto hit     = RadixFeatures::None;
-  auto closest = std::numeric_limits<float>::max();
+  auto closest = numeric_limits_t<float>::max();
 
   // Arrows
   if (hasFeature(RadixFeatures::ArrowX)) {

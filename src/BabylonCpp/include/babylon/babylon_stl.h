@@ -97,7 +97,7 @@ using double_t = ::std::double_t;
 using size_t   = ::std::size_t;
 
 template <class T>
-using numeric_limits = ::std::numeric_limits<T>;
+using numeric_limits_t = ::std::numeric_limits<T>;
 
 // Time types
 using millisecond_t

@@ -18,7 +18,7 @@ public:
 
 public:
   Ray(const Vector3& origin, const Vector3& direction,
-      float length = std::numeric_limits<float>::max());
+      float length = numeric_limits_t<float>::max());
   Ray(const Ray& otherRay);
   Ray(Ray&& otherRay);
   Ray& operator=(const Ray& otherRay);

@@ -1,5 +1,6 @@
 #include <babylon/rendering/edges_renderer.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -45,6 +46,23 @@ void EdgesRenderer::_prepareResources()
 
   _lineShader->disableDepthWrite = true;
   _lineShader->setBackFaceCulling(false);
+}
+
+void EdgesRenderer::_rebuild()
+{
+  for (auto bufferKind :
+       {VertexBuffer::PositionKind, VertexBuffer::NormalKind}) {
+    if (stl_util::contains(_buffers, bufferKind)) {
+      auto& buffer = _buffers[bufferKind];
+      if (buffer) {
+        buffer->_rebuild();
+      }
+    }
+  }
+
+  auto scene  = _source->getScene();
+  auto engine = scene->getEngine();
+  _ib         = engine->createIndexBuffer(_linesIndices);
 }
 
 void EdgesRenderer::dispose(bool /*doNotRecurse*/)
@@ -125,7 +143,7 @@ void EdgesRenderer::_checkEdge(unsigned int faceIndex, int edge,
     needToCreateLine = true;
   }
   else {
-    auto dotProduct  = Vector3::Dot(faceNormals[faceIndex],
+    auto dotProduct = Vector3::Dot(faceNormals[faceIndex],
                                    faceNormals[static_cast<size_t>(edge)]);
     needToCreateLine = dotProduct < _epsilon;
   }
@@ -349,8 +367,8 @@ void EdgesRenderer::render()
   _lineShader->setColor4("color", _source->edgesColor);
 
   if (scene->activeCamera->mode == Camera::ORTHOGRAPHIC_CAMERA) {
-    _lineShader->setFloat("width", _source->edgesWidth
-                                     / edgesWidthScalerForOrthographic);
+    _lineShader->setFloat(
+      "width", _source->edgesWidth / edgesWidthScalerForOrthographic);
   }
   else {
     _lineShader->setFloat("width",

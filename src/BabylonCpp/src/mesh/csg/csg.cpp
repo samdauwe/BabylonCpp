@@ -290,10 +290,10 @@ Mesh* CSG::CSG::buildMeshGeometry(const string_t& name, Scene* scene,
         == subMesh_dict[polygon->shared.meshId].end()) {
       // IndexStart
       subMesh_dict[polygon->shared.meshId][polygon->shared.subMeshId][0]
-        = std::numeric_limits<unsigned int>::max();
+        = numeric_limits_t<unsigned int>::max();
       // IndexEnd
       subMesh_dict[polygon->shared.meshId][polygon->shared.subMeshId][1]
-        = std::numeric_limits<unsigned int>::min();
+        = numeric_limits_t<unsigned int>::min();
       // materialIndex
       subMesh_dict[polygon->shared.meshId][polygon->shared.subMeshId][2]
         = polygon->shared.materialIndex;

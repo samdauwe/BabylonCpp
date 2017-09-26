@@ -236,7 +236,7 @@ GroundFromHeightMapOptions::GroundFromHeightMapOptions()
     , height{10.f}
     , subdivisions{1}
     , minHeight{0.f}
-    , maxHeight{10.f}
+    , maxHeight{1.f}
     , bufferWidth{1}
     , bufferHeight{1}
     , colorFilter{Color3(0.3f, 0.59f, 0.11f)}

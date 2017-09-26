@@ -168,6 +168,8 @@ Scene::Scene(Engine* engine)
     , _sceneUbo{nullptr}
     , _boundingBoxRenderer{nullptr}
     , _outlineRenderer{nullptr}
+    , _useAlternateCameraConfiguration{false}
+    , _alternateRendering{false}
     , _frustumPlanesSet{false}
     , _selectionOctree{nullptr}
     , _pointerOverMesh{nullptr}
@@ -467,6 +469,11 @@ Material* Scene::defaultMaterial()
 void Scene::setDefaultMaterial(Material* value)
 {
   _defaultMaterial = value;
+}
+
+bool Scene::_isAlternateRenderingEnabled() const
+{
+  return _alternateRendering;
 }
 
 array_t<Plane, 6>& Scene::frustumPlanes()
@@ -1335,24 +1342,32 @@ void Scene::_animate()
   }
 }
 
+void Scene::_switchToAlternateCameraConfiguration(bool active)
+{
+  _useAlternateCameraConfiguration = active;
+}
+
 Matrix Scene::getViewMatrix()
 {
-  return _viewMatrix;
+  return _useAlternateCameraConfiguration ? _alternateViewMatrix : _viewMatrix;
 }
 
 Matrix& Scene::getProjectionMatrix()
 {
-  return _projectionMatrix;
+  return _useAlternateCameraConfiguration ? _alternateProjectionMatrix :
+                                            _projectionMatrix;
 }
 
 const Matrix& Scene::getProjectionMatrix() const
 {
-  return _projectionMatrix;
+  return _useAlternateCameraConfiguration ? _alternateProjectionMatrix :
+                                            _projectionMatrix;
 }
 
 Matrix Scene::getTransformMatrix()
 {
-  return _transformMatrix;
+  return _useAlternateCameraConfiguration ? _alternateTransformMatrix :
+                                            _transformMatrix;
 }
 
 void Scene::setTransformMatrix(Matrix& view, Matrix& projection)
@@ -2933,12 +2948,10 @@ void Scene::disposeSounds()
 /** Octrees **/
 MinMax Scene::getWorldExtends()
 {
-  Vector3 min(std::numeric_limits<float>::max(),
-              std::numeric_limits<float>::max(),
-              std::numeric_limits<float>::max());
-  Vector3 max(-std::numeric_limits<float>::max(),
-              -std::numeric_limits<float>::max(),
-              -std::numeric_limits<float>::max());
+  Vector3 min(numeric_limits_t<float>::max(), numeric_limits_t<float>::max(),
+              numeric_limits_t<float>::max());
+  Vector3 max(-numeric_limits_t<float>::max(), -numeric_limits_t<float>::max(),
+              -numeric_limits_t<float>::max());
   for (auto& mesh : meshes) {
     mesh->computeWorldMatrix(true);
     auto minBox = mesh->getBoundingInfo()->boundingBox.minimumWorld;

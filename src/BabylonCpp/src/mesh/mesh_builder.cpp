@@ -90,13 +90,13 @@ Mesh* MeshBuilder::CreateRibbon(const string_t& name, RibbonOptions& options,
                   // positionFunction : ribbon case
     // only pathArray and sideOrientation parameters are taken into account for
     // positions update
-    Vector3::FromFloatsToRef(std::numeric_limits<float>::max(),
-                             std::numeric_limits<float>::max(),
-                             std::numeric_limits<float>::max(),
+    Vector3::FromFloatsToRef(numeric_limits_t<float>::max(),
+                             numeric_limits_t<float>::max(),
+                             numeric_limits_t<float>::max(),
                              Tmp::Vector3Array[0]); // minimum
     Vector3::FromFloatsToRef(
-      -std::numeric_limits<float>::max(), -std::numeric_limits<float>::max(),
-      -std::numeric_limits<float>::max(), Tmp::Vector3Array[1]);
+      -numeric_limits_t<float>::max(), -numeric_limits_t<float>::max(),
+      -numeric_limits_t<float>::max(), Tmp::Vector3Array[1]);
     const auto positionFunction = [&](Float32Array& positions) {
       auto minlg     = pathArray[0].size();
       unsigned int i = 0;
@@ -613,77 +613,77 @@ Mesh* MeshBuilder::CreateTube(const string_t& name, TubeOptions& options,
   const auto arc = options.arc();
 
   // tube geometry
-  const auto tubePathArray
-    = [](const vector_t<Vector3>& _path, Path3D& path3D,
-         vector_t<vector_t<Vector3>>& circlePaths, float _radius,
-         unsigned int _tessellation,
-         const ::std::function<float(unsigned int i, float distance)>&
-           _radiusFunction,
-         unsigned int _cap, float _arc) {
-        auto& tangents        = path3D.getTangents();
-        const auto& normals   = path3D.getNormals();
-        const auto& distances = path3D.getDistances();
-        const auto& pi2       = Math::PI2;
-        const auto step       = pi2 / static_cast<float>(_tessellation) * _arc;
+  const auto tubePathArray = [](
+    const vector_t<Vector3>& _path, Path3D& path3D,
+    vector_t<vector_t<Vector3>>& circlePaths, float _radius,
+    unsigned int _tessellation,
+    const ::std::function<float(unsigned int i, float distance)>&
+      _radiusFunction,
+    unsigned int _cap, float _arc) {
+    auto& tangents        = path3D.getTangents();
+    const auto& normals   = path3D.getNormals();
+    const auto& distances = path3D.getDistances();
+    const auto& pi2       = Math::PI2;
+    const auto step       = pi2 / static_cast<float>(_tessellation) * _arc;
 
-        auto rad = 0.f;
-        Vector3 normal;
-        Vector3 rotated;
-        Matrix rotationMatrix = Tmp::MatrixArray[0];
-        unsigned int index
-          = (_cap == Mesh::NO_CAP || _cap == Mesh::CAP_END) ? 0 : 2;
-        circlePaths.resize(_path.size() + index + 2);
-        for (unsigned int i = 0; i < _path.size(); ++i) {
-          rad = (_radiusFunction == nullptr) ?
-                  _radius :
-                  _radiusFunction(i, distances[i]); // current radius
-          vector_t<Vector3> circlePath;             // current circle array
-          normal = normals[i];                      // current normal
-          for (std::size_t t = 0; t < _tessellation; ++t) {
-            Matrix::RotationAxisToRef(tangents[i], step * static_cast<float>(t),
-                                      rotationMatrix);
-            rotated
-              = (t + 1 <= circlePath.size()) ? circlePath[t] : Vector3::Zero();
-            Vector3::TransformCoordinatesToRef(normal, rotationMatrix, rotated);
-            rotated.scaleInPlace(rad).addInPlace(_path[i]);
-            circlePath.emplace_back(rotated);
+    auto rad = 0.f;
+    Vector3 normal;
+    Vector3 rotated;
+    Matrix rotationMatrix = Tmp::MatrixArray[0];
+    unsigned int index
+      = (_cap == Mesh::NO_CAP || _cap == Mesh::CAP_END) ? 0 : 2;
+    circlePaths.resize(_path.size() + index + 2);
+    for (unsigned int i = 0; i < _path.size(); ++i) {
+      rad = (_radiusFunction == nullptr) ?
+              _radius :
+              _radiusFunction(i, distances[i]); // current radius
+      vector_t<Vector3> circlePath;             // current circle array
+      normal = normals[i];                      // current normal
+      for (std::size_t t = 0; t < _tessellation; ++t) {
+        Matrix::RotationAxisToRef(tangents[i], step * static_cast<float>(t),
+                                  rotationMatrix);
+        rotated
+          = (t + 1 <= circlePath.size()) ? circlePath[t] : Vector3::Zero();
+        Vector3::TransformCoordinatesToRef(normal, rotationMatrix, rotated);
+        rotated.scaleInPlace(rad).addInPlace(_path[i]);
+        circlePath.emplace_back(rotated);
+      }
+      circlePaths[index] = circlePath;
+      ++index;
+    }
+    // cap
+    const auto capPath
+      = [_path](unsigned int nbPoints, unsigned int pathIndex) {
+          vector_t<Vector3> pointCap;
+          for (std::size_t i = 0; i < nbPoints; ++i) {
+            pointCap.emplace_back(_path[pathIndex]);
           }
-          circlePaths[index] = circlePath;
-          ++index;
-        }
-        // cap
-        const auto capPath
-          = [_path](unsigned int nbPoints, unsigned int pathIndex) {
-              vector_t<Vector3> pointCap;
-              for (std::size_t i = 0; i < nbPoints; ++i) {
-                pointCap.emplace_back(_path[pathIndex]);
-              }
-              return pointCap;
-            };
-        switch (_cap) {
-          case Mesh::NO_CAP:
-            break;
-          case Mesh::CAP_START:
-            circlePaths[0] = capPath(_tessellation, 0);
-            circlePaths[1] = circlePaths[2];
-            break;
-          case Mesh::CAP_END:
-            circlePaths[index]     = circlePaths[index - 1];
-            circlePaths[index + 1] = capPath(
-              _tessellation, static_cast<unsigned int>(_path.size() - 1));
-            break;
-          case Mesh::CAP_ALL:
-            circlePaths[0]         = capPath(_tessellation, 0);
-            circlePaths[1]         = circlePaths[2];
-            circlePaths[index]     = circlePaths[index - 1];
-            circlePaths[index + 1] = capPath(
-              _tessellation, static_cast<unsigned int>(_path.size() - 1));
-            break;
-          default:
-            break;
-        }
-        return circlePaths;
-      };
+          return pointCap;
+        };
+    switch (_cap) {
+      case Mesh::NO_CAP:
+        break;
+      case Mesh::CAP_START:
+        circlePaths[0] = capPath(_tessellation, 0);
+        circlePaths[1] = circlePaths[2];
+        break;
+      case Mesh::CAP_END:
+        circlePaths[index] = circlePaths[index - 1];
+        circlePaths[index + 1]
+          = capPath(_tessellation, static_cast<unsigned int>(_path.size() - 1));
+        break;
+      case Mesh::CAP_ALL:
+        circlePaths[0]     = capPath(_tessellation, 0);
+        circlePaths[1]     = circlePaths[2];
+        circlePaths[index] = circlePaths[index - 1];
+        circlePaths[index + 1]
+          = capPath(_tessellation, static_cast<unsigned int>(_path.size() - 1));
+        break;
+      default:
+        break;
+    }
+    return circlePaths;
+  };
   Path3D path3D;
   vector_t<vector_t<Vector3>> pathArray;
   if (instance) {
@@ -999,7 +999,7 @@ Mesh* MeshBuilder::_ExtrudeShapeGeneric(
           auto scaleRatio = scl(static_cast<float>(i), distances[i]);
           for (std::size_t p = 0; p < _shape.size(); ++p) {
             Matrix::RotationAxisToRef(tangents[i], angle, rotationMatrix);
-            auto planed  = ((tangents[i].scale(_shape[p].z))
+            auto planed = ((tangents[i].scale(_shape[p].z))
                              .add(normals[i].scale(_shape[p].x))
                              .add(binormals[i].scale(_shape[p].y)));
             auto rotated = Vector3::Zero();

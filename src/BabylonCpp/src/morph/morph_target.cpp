@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 MorphTarget::MorphTarget(const string_t& name, float influence)
-    : _name{name}, _influence{std::numeric_limits<float>::max()}
+    : _name{name}, _influence{numeric_limits_t<float>::max()}
 {
   setInfluence(influence);
 }

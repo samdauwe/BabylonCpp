@@ -46,7 +46,7 @@ public:
   static constexpr unsigned int BILLBOARDMODE_ALL = 7;
 
   static constexpr unsigned int OCCLUSION_TYPE_NONE                   = 0;
-  static constexpr unsigned int OCCLUSION_TYPE_OPTIMISITC             = 1;
+  static constexpr unsigned int OCCLUSION_TYPE_OPTIMISTIC             = 1;
   static constexpr unsigned int OCCLUSION_TYPE_STRICT                 = 2;
   static constexpr unsigned int OCCLUSION_ALGORITHM_TYPE_ACCURATE     = 0;
   static constexpr unsigned int OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE = 1;
@@ -161,6 +161,7 @@ public:
    * within scene loading
    */
   string_t toString(bool fullDetails = false) const;
+  void _rebuild();
   void _resyncLightSources();
   void _resyncLighSource(Light* light);
   void _removeLightSource(Light* light);
@@ -574,6 +575,12 @@ public:
   void markAsDirty(unsigned int flag) override;
 
   /**
+   * @brief Return the minimum and maximum world vectors of the entire hierarchy
+   * under current mesh
+   */
+  MinMax getHierarchyBoundingVectors();
+
+  /**
    * @brief Updates the mesh BoundingInfo object and all its children
    * BoundingInfo objects also.
    * @returns The AbstractMesh.
@@ -711,7 +718,7 @@ public:
    */
   void setCheckCollisions(bool collisionEnabled);
 
-  AbstractMesh& moveWithCollisions(const Vector3& velocity);
+  AbstractMesh& moveWithCollisions(const Vector3& moveWithCollisions);
 
   /** Submeshes octree **/
 
@@ -1015,7 +1022,7 @@ public:
    * when the occlusionRetryCount is reached. It has supports 3 values:
    * OCCLUSION_TYPE_NONE (Default Value): this option means no occlusion query
    * whith the Mesh.
-   * OCCLUSION_TYPE_OPTIMISITC: this option is means use occlusion query and if
+   * OCCLUSION_TYPE_OPTIMISTIC: this option is means use occlusion query and if
    * occlusionRetryCount is reached and the query is broken show the mesh.
    * OCCLUSION_TYPE_STRICT: this option is means use occlusion query and if
    * occlusionRetryCount is reached and the query is broken restore the last

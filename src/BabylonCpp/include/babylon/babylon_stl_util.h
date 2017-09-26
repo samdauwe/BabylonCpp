@@ -137,15 +137,15 @@ constexpr int c_strcmp(char const* lhs, char const* rhs)
 
 template <class T>
 constexpr
-  typename ::std::enable_if<!::std::numeric_limits<T>::is_integer, bool>::type
+  typename ::std::enable_if<!numeric_limits_t<T>::is_integer, bool>::type
   almost_equal(T x, T y, int ulp = 4)
 {
   // the machine epsilon has to be scaled to the magnitude of the values used
   // and multiplied by the desired precision in ULPs (units in the last place)
-  return ::std::abs(x - y) < ::std::numeric_limits<T>::epsilon()
-                               * ::std::abs(x + y) * static_cast<T>(ulp)
+  return ::std::abs(x - y) < numeric_limits_t<T>::epsilon() * ::std::abs(x + y)
+                               * static_cast<T>(ulp)
          // unless the result is subnormal
-         || ::std::abs(x - y) < ::std::numeric_limits<T>::min();
+         || ::std::abs(x - y) < numeric_limits_t<T>::min();
 }
 
 // Used for lambda comparison

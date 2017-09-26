@@ -3,8 +3,8 @@
 namespace BABYLON {
 namespace Internals {
 
-float CMGBoundinBox::MAX = std::numeric_limits<float>::max();
-float CMGBoundinBox::MIN = std::numeric_limits<float>::max();
+float CMGBoundinBox::MAX = numeric_limits_t<float>::max();
+float CMGBoundinBox::MIN = numeric_limits_t<float>::max();
 
 CMGBoundinBox::CMGBoundinBox()
     : min{Vector3(0.f, 0.f, 0.f)}, max{Vector3(0.f, 0.f, 0.f)}

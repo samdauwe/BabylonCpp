@@ -19,7 +19,7 @@ Light::Light(const string_t& iName, Scene* scene)
     , diffuse{Color3(1.f, 1.f, 1.f)}
     , specular{Color3(1.f, 1.f, 1.f)}
     , intensity{1.f}
-    , range{std::numeric_limits<float>::max()}
+    , range{numeric_limits_t<float>::max()}
     , shadowEnabled{true}
     , _shadowGenerator{nullptr}
     , _uniformBuffer{::std::make_unique<UniformBuffer>(scene->getEngine())}

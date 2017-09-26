@@ -41,7 +41,7 @@ int Navigation::getGroup(const std::string& zone, const Vector3& position)
   }
 
   float measuredDistance = 0.f;
-  float distance         = std::numeric_limits<float>::infinity();
+  float distance         = numeric_limits_t<float>::infinity();
   for (size_t index = 0; index < _zoneNodes[zone].groups.size(); ++index) {
     for (auto& node : _zoneNodes[zone].groups[index]) {
       measuredDistance = Vector3::DistanceSquared(node.centroid, position);
@@ -64,7 +64,7 @@ std::vector<Vector3> Navigation::findPath(const Vector3& startPosition,
 
   const auto getNodeIndex = [&allNodes](const Vector3& position) {
     int nodeIndex          = -1;
-    float distance         = std::numeric_limits<float>::infinity();
+    float distance         = numeric_limits_t<float>::infinity();
     int index              = 0;
     float measuredDistance = 0.f;
     for (auto& node : allNodes) {

@@ -131,12 +131,12 @@ BoundingBox& BoundingBox::setWorldMatrix(const Matrix& matrix)
 
 void BoundingBox::_update(const Matrix& world)
 {
-  Vector3::FromFloatsToRef(std::numeric_limits<float>::max(),
-                           std::numeric_limits<float>::max(),
-                           std::numeric_limits<float>::max(), minimumWorld);
-  Vector3::FromFloatsToRef(-std::numeric_limits<float>::max(),
-                           -std::numeric_limits<float>::max(),
-                           -std::numeric_limits<float>::max(), maximumWorld);
+  Vector3::FromFloatsToRef(numeric_limits_t<float>::max(),
+                           numeric_limits_t<float>::max(),
+                           numeric_limits_t<float>::max(), minimumWorld);
+  Vector3::FromFloatsToRef(-numeric_limits_t<float>::max(),
+                           -numeric_limits_t<float>::max(),
+                           -numeric_limits_t<float>::max(), maximumWorld);
 
   unsigned int index = 0;
   for (auto& vector : vectors) {

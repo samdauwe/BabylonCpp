@@ -195,7 +195,7 @@ SpriteManager::intersects(const Ray ray, Camera* camera,
   auto count               = ::std::min(_capacity, sprites.size());
   auto min                 = Vector3::Zero();
   auto max                 = Vector3::Zero();
-  auto distance            = std::numeric_limits<float>::max();
+  auto distance            = numeric_limits_t<float>::max();
   Sprite* currentSprite    = nullptr;
   auto cameraSpacePosition = Vector3::Zero();
   auto cameraView          = camera->getViewMatrix();

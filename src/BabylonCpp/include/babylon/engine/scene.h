@@ -173,6 +173,7 @@ public:
    */
   void setDefaultMaterial(Material* value);
 
+  bool _isAlternateRenderingEnabled() const;
   array_t<Plane, 6>& frustumPlanes();
   const array_t<Plane, 6>& frustumPlanes() const;
   DebugLayer* debugLayer();
@@ -312,6 +313,7 @@ public:
   void stopAnimation(IAnimatable* target, const string_t& animationName = "");
 
   /** Matrix **/
+  void _switchToAlternateCameraConfiguration(bool active);
   Matrix getViewMatrix();
   Matrix& getProjectionMatrix();
   const Matrix& getProjectionMatrix() const;
@@ -1129,6 +1131,11 @@ private:
   unique_ptr_t<OutlineRenderer> _outlineRenderer;
   Matrix _viewMatrix;
   Matrix _projectionMatrix;
+  Matrix _alternateViewMatrix;
+  Matrix _alternateProjectionMatrix;
+  Matrix _alternateTransformMatrix;
+  bool _useAlternateCameraConfiguration;
+  bool _alternateRendering;
   bool _frustumPlanesSet;
   array_t<Plane, 6> _frustumPlanes;
   Octree<AbstractMesh*>* _selectionOctree;

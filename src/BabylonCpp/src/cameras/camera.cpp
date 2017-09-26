@@ -41,12 +41,14 @@ Camera::Camera(const string_t& iName, const Vector3& iPosition, Scene* scene)
     , layerMask{0x0FFFFFFF}
     , fovMode{Camera::FOVMODE_VERTICAL_FIXED}
     , cameraRigMode{Camera::RIG_MODE_NONE}
+    , _skipRendering{false}
+    , _alternateCamera{nullptr}
     , _projectionMatrix{Matrix()}
+    , _webvrViewMatrix{Matrix::Identity()}
     , _computedViewMatrix{Matrix::Identity()}
     , _doNotComputeProjectionMatrix{false}
     , _transformMatrix{Matrix::Zero()}
     , _webvrProjectionMatrix{Matrix::Identity()}
-    , _webvrViewMatrix{Matrix::Identity()}
     , _globalPosition{Vector3::Zero()}
     , _refreshFrustumPlanes{true}
 {
@@ -108,12 +110,12 @@ void Camera::_initCache()
 {
   Node::_initCache();
 
-  _cache.position = Vector3(std::numeric_limits<float>::max(),
-                            std::numeric_limits<float>::max(),
-                            std::numeric_limits<float>::max());
-  _cache.upVector = Vector3(std::numeric_limits<float>::max(),
-                            std::numeric_limits<float>::max(),
-                            std::numeric_limits<float>::max());
+  _cache.position
+    = Vector3(numeric_limits_t<float>::max(), numeric_limits_t<float>::max(),
+              numeric_limits_t<float>::max());
+  _cache.upVector
+    = Vector3(numeric_limits_t<float>::max(), numeric_limits_t<float>::max(),
+              numeric_limits_t<float>::max());
 
   _cache.mode = 0;
   _cache.minZ = 0.f;

@@ -113,6 +113,8 @@ public:
                                             const Uint32Array& indices,
                                             bool fastCheck);
 
+  void _rebuild();
+
   /** Clone **/
 
   /**

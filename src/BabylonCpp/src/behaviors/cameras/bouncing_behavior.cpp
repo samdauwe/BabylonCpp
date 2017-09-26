@@ -111,8 +111,8 @@ void BouncingBehavior::_applyBoundRadiusAnimation(float radiusDelta)
                                    &BouncingBehavior::_EasingFunction);
   }
   // Prevent zoom until bounce has completed
-  _cachedWheelPrecision           = _attachedCamera->wheelPrecision;
-  _attachedCamera->wheelPrecision = std::numeric_limits<float>::infinity();
+  _cachedWheelPrecision                 = _attachedCamera->wheelPrecision;
+  _attachedCamera->wheelPrecision       = numeric_limits_t<float>::infinity();
   _attachedCamera->inertialRadiusOffset = 0;
 
   // Animate to the radius limit

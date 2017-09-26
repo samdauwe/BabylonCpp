@@ -21,7 +21,7 @@
 namespace BABYLON {
 namespace Extensions {
 
-const size_t World::UdefIdx = std::numeric_limits<size_t>::max();
+const size_t World::UdefIdx = numeric_limits_t<size_t>::max();
 
 World::World()
 {
@@ -235,9 +235,9 @@ void World::generatePlanetPartition(std::vector<Tile>& tiles,
   std::vector<Tile*> unparentedTiles;
   float maxDistanceFromOrigin = 0.f;
   for (auto& tile : tiles) {
-    maxDistanceFromOrigin
-      = std::max(maxDistanceFromOrigin, tile.boundingSphere.center.length()
-                                          + tile.boundingSphere.radius);
+    maxDistanceFromOrigin = std::max(maxDistanceFromOrigin,
+                                     tile.boundingSphere.center.length()
+                                       + tile.boundingSphere.radius);
 
     bool parentFound = false;
     for (auto& face : icosahedron.faces) {
@@ -1015,9 +1015,10 @@ float World::processAirHeat(std::vector<Corner*>& activeCorners)
       continue;
     }
 
-    float heatChange = std::max(
-      0.f, std::min(corner.airHeat, corner.heatAbsorption
-                                      * (1.f - corner.heat / corner.maxHeat)));
+    float heatChange
+      = std::max(0.f, std::min(corner.airHeat,
+                               corner.heatAbsorption
+                                 * (1.f - corner.heat / corner.maxHeat)));
     corner.heat += heatChange;
     consumedHeat += heatChange;
     float heatLoss = corner.area * (corner.heat / corner.maxHeat) * 0.02f;

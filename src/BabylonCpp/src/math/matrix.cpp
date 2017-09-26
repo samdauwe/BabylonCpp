@@ -82,7 +82,7 @@ int Matrix::getHashCode() const
 void Matrix::_markAsUpdated()
 {
 #if 0
-  updateFlag = (Matrix::_updateFlagSeed < std::numeric_limits<int>::max()) ?
+  updateFlag = (Matrix::_updateFlagSeed < numeric_limits_t<int>::max()) ?
                  Matrix::_updateFlagSeed++ :
                  0;
   _isIdentityDirty = true;

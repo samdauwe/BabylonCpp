@@ -300,12 +300,12 @@ void DynamicTerrain::_updateTerrain()
   if (_updateLOD || _updateForced) {
     updateTerrainSize();
   }
-  Vector3::FromFloatsToRef(std::numeric_limits<float>::max(),
-                           std::numeric_limits<float>::max(),
-                           std::numeric_limits<float>::max(), _bbMin);
-  Vector3::FromFloatsToRef(-std::numeric_limits<float>::max(),
-                           -std::numeric_limits<float>::max(),
-                           -std::numeric_limits<float>::max(), _bbMax);
+  Vector3::FromFloatsToRef(numeric_limits_t<float>::max(),
+                           numeric_limits_t<float>::max(),
+                           numeric_limits_t<float>::max(), _bbMin);
+  Vector3::FromFloatsToRef(-numeric_limits_t<float>::max(),
+                           -numeric_limits_t<float>::max(),
+                           -numeric_limits_t<float>::max(), _bbMax);
 
   for (unsigned int j = 0; j <= _terrainSub; ++j) {
     // LOD Z

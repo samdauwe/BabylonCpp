@@ -14,6 +14,7 @@ public:
                 bool checkVerticesInsteadOfIndices = false);
   virtual ~EdgesRenderer();
 
+  void _rebuild();
   void dispose(bool doNotRecurse = false) override;
   void render();
 

@@ -16,10 +16,10 @@ DirectionalLight::DirectionalLight(const string_t& iName,
     , autoUpdateExtends{true}
     , _shadowFrustumSize{0.f}
     , _shadowOrthoScale{0.5f}
-    , _orthoLeft{std::numeric_limits<float>::max()}
-    , _orthoRight{std::numeric_limits<float>::min()}
-    , _orthoTop{std::numeric_limits<float>::min()}
-    , _orthoBottom{std::numeric_limits<float>::max()}
+    , _orthoLeft{numeric_limits_t<float>::max()}
+    , _orthoRight{numeric_limits_t<float>::min()}
+    , _orthoTop{numeric_limits_t<float>::min()}
+    , _orthoBottom{numeric_limits_t<float>::max()}
 {
   position = direction.scale(-1.f);
   setDirection(direction);
@@ -96,14 +96,13 @@ void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
 
   // Check extends
   if (autoUpdateExtends
-      || stl_util::almost_equal(_orthoLeft,
-                                std::numeric_limits<float>::max())) {
+      || stl_util::almost_equal(_orthoLeft, numeric_limits_t<float>::max())) {
     auto tempVector3 = Vector3::Zero();
 
-    _orthoLeft   = std::numeric_limits<float>::max();
-    _orthoRight  = std::numeric_limits<float>::min();
-    _orthoTop    = std::numeric_limits<float>::min();
-    _orthoBottom = std::numeric_limits<float>::max();
+    _orthoLeft   = numeric_limits_t<float>::max();
+    _orthoRight  = numeric_limits_t<float>::min();
+    _orthoTop    = numeric_limits_t<float>::min();
+    _orthoBottom = numeric_limits_t<float>::max();
 
     // Check extends
     for (const auto& mesh : renderList) {

@@ -15,8 +15,8 @@ struct ValueStats {
   T min, avg, max;
   void reset()
   {
-    min = std::numeric_limits<T>::max();
-    max = std::numeric_limits<T>::lowest();
+    min = numeric_limits_t<T>::max();
+    max = numeric_limits_t<T>::lowest();
     avg = 0;
   }
 };

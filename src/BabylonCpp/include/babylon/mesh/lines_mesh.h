@@ -52,8 +52,8 @@ public:
   bool checkCollisions();
   InstancedMesh* createInstance(const string_t& name);
   void _bind(SubMesh* subMesh, Effect* effect, unsigned int fillMode) override;
-  void _draw(SubMesh* subMesh, int fillMode,
-             size_t instancesCount = 0) override;
+  void _draw(SubMesh* subMesh, int fillMode, size_t instancesCount = 0,
+             bool alternate = false) override;
   PickingInfo intersects(const Ray& ray, bool fastCheck = true) override;
   void dispose(bool doNotRecurse = false) override;
 

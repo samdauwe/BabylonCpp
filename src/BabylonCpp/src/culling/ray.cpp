@@ -96,7 +96,7 @@ bool Ray::intersectsBoxMinMax(const Vector3& minimum,
                               const Vector3& maximum) const
 {
   float d        = 0.f;
-  float maxValue = std::numeric_limits<float>::max();
+  float maxValue = numeric_limits_t<float>::max();
   float inv      = 0.f;
   float min      = 0.f;
   float max      = 0.f;
@@ -109,8 +109,8 @@ bool Ray::intersectsBoxMinMax(const Vector3& minimum,
     inv = 1.f / direction.x;
     min = (minimum.x - origin.x) * inv;
     max = (maximum.x - origin.x) * inv;
-    if (stl_util::almost_equal(max, -std::numeric_limits<float>::infinity())) {
-      max = std::numeric_limits<float>::infinity();
+    if (stl_util::almost_equal(max, -numeric_limits_t<float>::infinity())) {
+      max = numeric_limits_t<float>::infinity();
     }
 
     if (min > max) {
@@ -135,8 +135,8 @@ bool Ray::intersectsBoxMinMax(const Vector3& minimum,
     min = (minimum.y - origin.y) * inv;
     max = (maximum.y - origin.y) * inv;
 
-    if (stl_util::almost_equal(max, -std::numeric_limits<float>::infinity())) {
-      max = std::numeric_limits<float>::infinity();
+    if (stl_util::almost_equal(max, -numeric_limits_t<float>::infinity())) {
+      max = numeric_limits_t<float>::infinity();
     }
 
     if (min > max) {
@@ -161,8 +161,8 @@ bool Ray::intersectsBoxMinMax(const Vector3& minimum,
     min = (minimum.z - origin.z) * inv;
     max = (maximum.z - origin.z) * inv;
 
-    if (stl_util::almost_equal(max, -std::numeric_limits<float>::infinity())) {
-      max = std::numeric_limits<float>::infinity();
+    if (stl_util::almost_equal(max, -numeric_limits_t<float>::infinity())) {
+      max = numeric_limits_t<float>::infinity();
     }
 
     if (min > max) {

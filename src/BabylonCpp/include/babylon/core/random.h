@@ -68,12 +68,12 @@ struct PCG {
 
   static result_type constexpr min()
   {
-    return std::numeric_limits<result_type>::min();
+    return numeric_limits_t<result_type>::min();
   }
 
   static result_type constexpr max()
   {
-    return std::numeric_limits<result_type>::min();
+    return numeric_limits_t<result_type>::min();
   }
 
 private:
@@ -93,8 +93,8 @@ template <typename T, typename Gen>
 constexpr auto distribution(Gen& g, T min, T max)
 {
   const auto range          = max - min + 1;
-  const auto bias_remainder = std::numeric_limits<T>::max() % range;
-  const auto unbiased_max = std::numeric_limits<T>::max() - bias_remainder - 1;
+  const auto bias_remainder = numeric_limits_t<T>::max() % range;
+  const auto unbiased_max   = numeric_limits_t<T>::max() - bias_remainder - 1;
 
   auto r = g();
   for (; r > unbiased_max; r = g())

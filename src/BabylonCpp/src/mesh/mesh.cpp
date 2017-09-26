@@ -53,6 +53,7 @@ Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
     , _batchCache{::std::make_unique<_InstancesBatch>()}
     , _instancesBufferSize{32 * 16 * 4} // maximum of 32 instances
     , _overridenInstanceCount{0}
+    , _effectiveMaterial{nullptr}
     , _preActivateId{-1}
     , _sideOrientation{Mesh::DEFAULTSIDE}
     , _areNormalsFrozen{false}
@@ -708,7 +709,8 @@ void Mesh::_bind(SubMesh* subMesh, Effect* effect, unsigned int fillMode)
   _geometry->_bind(effect, indexToBind);
 }
 
-void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount)
+void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount,
+                 bool alternate)
 {
   if (!_geometry || !_geometry->getVertexBuffers().size()
       || !_geometry->getIndexBuffer()) {
@@ -718,7 +720,8 @@ void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount)
   onBeforeDrawObservable.notifyObservers(this);
   int _instancesCount = static_cast<int>(instancesCount);
 
-  auto engine               = getScene()->getEngine();
+  auto scene                = getScene();
+  auto engine               = scene->getEngine();
   auto subMeshVerticesStart = static_cast<int>(subMesh->verticesStart);
   auto subMeshVerticesCount = static_cast<int>(subMesh->verticesCount);
 
@@ -747,6 +750,22 @@ void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount)
         engine->draw(true, static_cast<unsigned>(subMesh->indexStart),
                      static_cast<int>(subMesh->indexCount), _instancesCount);
       }
+  }
+
+  if (scene->_isAlternateRenderingEnabled() && !alternate) {
+    auto effect
+      = subMesh->effect() ? subMesh->effect() : _effectiveMaterial->getEffect();
+    scene->_switchToAlternateCameraConfiguration(true);
+    _effectiveMaterial->bindView(effect);
+    _effectiveMaterial->bindViewProjection(effect);
+
+    engine->setViewport(scene->activeCamera->_alternateCamera->viewport);
+    _draw(subMesh, fillMode, instancesCount, true);
+    engine->setViewport(scene->activeCamera->viewport);
+
+    scene->_switchToAlternateCameraConfiguration(false);
+    _effectiveMaterial->bindView(effect);
+    _effectiveMaterial->bindViewProjection(effect);
   }
 }
 
@@ -970,25 +989,25 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
       && (!batch->visibleInstances[subMesh->_id].empty());
 
   // Material
-  auto effectiveMaterial = subMesh->getMaterial();
+  _effectiveMaterial = subMesh->getMaterial();
 
-  if (!effectiveMaterial) {
+  if (!_effectiveMaterial) {
     return *this;
   }
 
-  if (effectiveMaterial->storeEffectOnSubMeshes) {
-    if (!effectiveMaterial->isReadyForSubMesh(this, subMesh,
-                                              hardwareInstancedRendering)) {
+  if (_effectiveMaterial->storeEffectOnSubMeshes) {
+    if (!_effectiveMaterial->isReadyForSubMesh(this, subMesh,
+                                               hardwareInstancedRendering)) {
       return *this;
     }
   }
-  else if (!effectiveMaterial->isReady(this, hardwareInstancedRendering)) {
+  else if (!_effectiveMaterial->isReady(this, hardwareInstancedRendering)) {
     return *this;
   }
 
   // Alpha mode
   if (enableAlphaMode) {
-    engine->setAlphaMode(effectiveMaterial->alphaMode);
+    engine->setAlphaMode(_effectiveMaterial->alphaMode);
   }
 
   // Outline - step 1
@@ -1000,20 +1019,20 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
   }
 
   Effect* effect = nullptr;
-  if (effectiveMaterial->storeEffectOnSubMeshes) {
+  if (_effectiveMaterial->storeEffectOnSubMeshes) {
     effect = subMesh->effect();
   }
   else {
-    effect = effectiveMaterial->getEffect();
+    effect = _effectiveMaterial->getEffect();
   }
 
-  effectiveMaterial->_preBind(effect);
+  _effectiveMaterial->_preBind(effect);
 
   // Bind
   auto fillMode = scene->forcePointsCloud() ?
                     Material::PointFillMode :
                     (scene->forceWireframe ? Material::WireFrameFillMode :
-                                             effectiveMaterial->fillMode());
+                                             _effectiveMaterial->fillMode());
 
   // Binding will be done later because we need to add more info to the VB
   if (!hardwareInstancedRendering) {
@@ -1022,11 +1041,11 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
 
   auto _world = getWorldMatrix();
 
-  if (effectiveMaterial->storeEffectOnSubMeshes) {
-    effectiveMaterial->bindForSubMesh(_world, this, subMesh);
+  if (_effectiveMaterial->storeEffectOnSubMeshes) {
+    _effectiveMaterial->bindForSubMesh(_world, this, subMesh);
   }
   else {
-    effectiveMaterial->bind(_world, this);
+    _effectiveMaterial->bind(_world, this);
   }
 
   // Draw
@@ -1038,7 +1057,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
     });
 
   // Unbind
-  effectiveMaterial->unbind();
+  _effectiveMaterial->unbind();
 
   // Outline - step 2
   if (renderOutline && savedDepthWrite) {
@@ -1732,8 +1751,8 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
   }
 
   if (parsedMesh.contains("alphaIndex")) {
-    mesh->alphaIndex = Json::GetNumber(parsedMesh, "alphaIndex",
-                                       std::numeric_limits<int>::max());
+    mesh->alphaIndex
+      = Json::GetNumber(parsedMesh, "alphaIndex", numeric_limits_t<int>::max());
   }
 
   mesh->setReceiveShadows(Json::GetBool(parsedMesh, "receiveShadows", false));
