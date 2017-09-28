@@ -9,8 +9,8 @@
 namespace BABYLON {
 
 PlayAnimationAction::PlayAnimationAction(unsigned int triggerOptions,
-                                         IAnimatable* target, int iFrom,
-                                         int iTo, bool iLoop,
+                                         IAnimatable* target, float iFrom,
+                                         float iTo, bool iLoop,
                                          Condition* condition)
     : Action(triggerOptions, condition)
     , from{iFrom}
@@ -43,7 +43,7 @@ Json::object PlayAnimationAction::serialize(Json::object& parent) const
          "properties",
          Json::array({{
            Json::value(Action::_GetTargetProperty(_target)),
-           //Json::NameValuePair("from", from), Json::NameValuePair("to", to),
+           // Json::NameValuePair("from", from), Json::NameValuePair("to", to),
            Json::NameValuePair(
              "value", Action::_SerializeValueAsString(AnimationValue(loop))),
          }}))}),

@@ -308,9 +308,9 @@ const Matrix& Matrix::getTranslationToRef(Vector3& result) const
 
 Matrix& Matrix::removeRotationAndScaling()
 {
-  setRowFromFloats(0.f, 1.f, 0.f, 0.f, 0.f);
-  setRowFromFloats(1.f, 0.f, 1.f, 0.f, 0.f);
-  setRowFromFloats(2.f, 0.f, 0.f, 1.f, 0.f);
+  setRowFromFloats(0, 1.f, 0.f, 0.f, 0.f);
+  setRowFromFloats(1, 0.f, 1.f, 0.f, 0.f);
+  setRowFromFloats(2, 0.f, 0.f, 1.f, 0.f);
 
   return *this;
 }
@@ -527,9 +527,9 @@ Matrix Matrix::getRotationMatrix() const
 
 const Matrix& Matrix::getRotationMatrixToRef(Matrix& result) const
 {
-  const float xs = m[0] * m[1] * m[2] * m[3] < 0 ? -1 : 1;
-  const float ys = m[4] * m[5] * m[6] * m[7] < 0 ? -1 : 1;
-  const float zs = m[8] * m[9] * m[10] * m[11] < 0 ? -1 : 1;
+  const float xs = m[0] * m[1] * m[2] * m[3] < 0 ? -1.f : 1.f;
+  const float ys = m[4] * m[5] * m[6] * m[7] < 0 ? -1.f : 1.f;
+  const float zs = m[8] * m[9] * m[10] * m[11] < 0 ? -1.f : 1.f;
 
   const float sx = xs * ::std::sqrt(m[0] * m[0] + m[1] * m[1] + m[2] * m[2]);
   const float sy = ys * ::std::sqrt(m[4] * m[4] + m[5] * m[5] + m[6] * m[6]);

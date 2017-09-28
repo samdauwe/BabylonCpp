@@ -110,7 +110,11 @@ inline T fpMillisecondsDuration(const microsecond_t& d)
 inline string_t toIso8601(::std::time_t timestamp,
                           const bool& include_timezone = false)
 {
+#pragma warning(push)
+#pragma warning(                                                               \
+  disable : 4996) // 'gmtime': This function or variable may be unsafe.
   ::std::tm exploded_time(*::std::gmtime(&timestamp));
+#pragma warning(pop)
   string_t ret;
 
   if (include_timezone) {
@@ -136,7 +140,11 @@ inline string_t toIso8601Ms(const system_time_point_t& system_time_point)
               .count();
   std::size_t _ms = static_cast<std::size_t>(ms % 1000);
   // Format timestamp to 'YYYY-MM-DD HH:MM:SS'
+#pragma warning(push)
+#pragma warning(                                                               \
+  disable : 4996) // 'localtime': This function or variable may be unsafe.
   ::std::tm* ptm = ::std::localtime(&timestamp);
+#pragma warning(pop)
   char buffer[32];
   ::std::strftime(buffer, 32, "%Y-%m-%d %H:%M:%S", ptm);
   // Append microseonds
@@ -152,6 +160,9 @@ inline string_t toIso8601Ms(const system_time_point_t& system_time_point)
  */
 inline ::std::time_t utcTime()
 {
+#pragma warning(push)
+#pragma warning(                                                               \
+  disable : 4996) // 'localtime': This function or variable may be unsafe.
   ::std::time_t now = ::std::time(NULL);
 
   ::std::tm tm_local(*::std::localtime(&now));
@@ -159,7 +170,7 @@ inline ::std::time_t utcTime()
 
   ::std::tm tm_utc(*::std::gmtime(&t_local));
   ::std::time_t t_utc = ::std::mktime(&tm_utc);
-
+#pragma warning(pop)
   return now - (t_utc - t_local);
 }
 

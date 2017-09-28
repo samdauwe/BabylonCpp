@@ -10,8 +10,10 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIRS})
 
 # GLEW dependency
-find_package(GLEW REQUIRED)
-include_directories(${GLEW_INCLUDE_DIRS})
+if(NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
+    find_package(GLEW REQUIRED)
+    include_directories(${GLEW_INCLUDE_DIRS})
+endif()
 
 # Target name
 set(TARGET SampleLauncher)
@@ -59,11 +61,13 @@ target_include_directories(${TARGET}
 )
 
 # Libraries
-target_link_libraries(${TARGET}
-    PUBLIC
-    glfw
-    ${OPENGL_LIBRARIES}
-    ${GLEW_LIBRARIES}
-    BabylonCpp
-    Samples
-)
+if(NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
+    target_link_libraries(${TARGET}
+        PUBLIC
+        glfw
+        ${OPENGL_LIBRARIES}
+        ${GLEW_LIBRARIES}
+        BabylonCpp
+        Samples
+    )
+endif()

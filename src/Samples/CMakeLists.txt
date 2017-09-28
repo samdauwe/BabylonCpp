@@ -73,8 +73,6 @@ set(BABYLON_SAMPLES_HEADERS
 # Source files
 file(GLOB_RECURSE SAMPLES_SRC_FILES   ${SOURCE_PATH}/samples/*.cpp)
 
-message(${SOURCE_PATH}/samples)
-
 set(BABYLON_SAMPLES_SOURCES
     ${SAMPLES_SRC_FILES}
 )

@@ -3,7 +3,7 @@
 # ============================================================================ #
 
 # Target name
-set(TARGET BabylonCppBenchmarks_)
+set(TARGET BabylonCppLibBenchmarks)
 message(STATUS "Benchmarks ${TARGET}")
 
 # ============================================================================ #
