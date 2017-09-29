@@ -356,8 +356,8 @@ Light* Light::Parse(const Json::value& parsedLight, Scene* scene)
 
   if (parsedLight.contains("autoAnimate")) {
     scene->beginAnimation(
-      light, Json::GetNumber(parsedLight, "autoAnimateFrom", 0.f),
-      Json::GetNumber(parsedLight, "autoAnimateTo", 0.f),
+      light, Json::GetNumber(parsedLight, "autoAnimateFrom", 0),
+      Json::GetNumber(parsedLight, "autoAnimateTo", 0),
       Json::GetBool(parsedLight, "autoAnimateLoop"),
       Json::GetNumber(parsedLight, "autoAnimateSpeed", 1.f));
   }

@@ -298,8 +298,8 @@ void Xbox360Pad::update()
     setButtonY(_browserGamepad->buttons[3].value);
     setButtonLB(_browserGamepad->buttons[4].value);
     setButtonRB(_browserGamepad->buttons[5].value);
-    setLeftTrigger(_browserGamepad->buttons[6].value);
-    setRightTrigger(_browserGamepad->buttons[7].value);
+    setLeftTrigger(_browserGamepad->buttons[6].value * 1.f);
+    setRightTrigger(_browserGamepad->buttons[7].value * 1.f);
     setButtonBack(_browserGamepad->buttons[8].value);
     setButtonStart(_browserGamepad->buttons[9].value);
     setButtonLeftStick(_browserGamepad->buttons[10].value);

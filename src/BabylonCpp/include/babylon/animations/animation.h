@@ -149,7 +149,7 @@ public:
   void setKeys(const vector_t<AnimationKey>& values);
   void setValue(const AnimationValue& currentValue, bool blend = false);
   void goToFrame(int frame);
-  bool animate(millisecond_t delay, float from, float to, bool loop,
+  bool animate(millisecond_t delay, int from, int to, bool loop,
                float speedRatio);
   Json::object serialize() const;
   static Animation* Parse(const Json::value& parsedAnimation);

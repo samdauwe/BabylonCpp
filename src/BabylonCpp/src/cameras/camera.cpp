@@ -37,7 +37,7 @@ Camera::Camera(const string_t& iName, const Vector3& iPosition, Scene* scene)
     , inertia{0.9f}
     , mode{Camera::PERSPECTIVE_CAMERA}
     , isIntermediate{false}
-    , viewport{Viewport(0, 0, 1.f, 1.f)}
+    , viewport{Viewport(0, 0, 1, 1)}
     , layerMask{0x0FFFFFFF}
     , fovMode{Camera::FOVMODE_VERTICAL_FIXED}
     , cameraRigMode{Camera::RIG_MODE_NONE}
@@ -700,7 +700,7 @@ Camera* Camera::GetConstructorFromName(const string_t& type,
                                        bool /*isStereoscopicSideBySide*/)
 {
   if (type == "ArcRotateCamera") {
-    return ArcRotateCamera::New(name, 0, 0, 1.0, Vector3::Zero(), scene);
+    return ArcRotateCamera::New(name, 0, 0, 1.f, Vector3::Zero(), scene);
   }
   else if (type == "FollowCamera") {
     return FollowCamera::New(name, Vector3::Zero(), scene);
@@ -743,8 +743,8 @@ Camera* Camera::Parse(const Json::value& parsedCamera, Scene* scene)
 
   if (parsedCamera.contains("autoAnimate")) {
     scene->beginAnimation(
-      camera, Json::GetNumber(parsedCamera, "autoAnimateFrom", 0.f),
-      Json::GetNumber(parsedCamera, "autoAnimateTo", 0.f),
+      camera, Json::GetNumber(parsedCamera, "autoAnimateFrom", 0),
+      Json::GetNumber(parsedCamera, "autoAnimateTo", 0),
       Json::GetBool(parsedCamera, "autoAnimateLoop"),
       Json::GetNumber(parsedCamera, "autoAnimateSpeed", 1.f));
   }

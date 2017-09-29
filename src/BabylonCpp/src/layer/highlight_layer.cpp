@@ -184,7 +184,8 @@ void HighlightLayer::createTextureAndPostProcesses()
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _horizontalBlurPostprocess->onApplyObservable.add(
       [&](Effect* effect, EventState&) {
-        effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
+        effect->setFloat2("screenSize", static_cast<float>(blurTextureWidth),
+                          static_cast<float>(blurTextureHeight));
       });
 
     _verticalBlurPostprocess = ::std::make_unique<GlowBlurPostProcess>(
@@ -192,7 +193,8 @@ void HighlightLayer::createTextureAndPostProcesses()
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _verticalBlurPostprocess->onApplyObservable.add(
       [&](Effect* effect, EventState&) {
-        effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
+        effect->setFloat2("screenSize", static_cast<float>(blurTextureWidth),
+                          static_cast<float>(blurTextureHeight));
       });
   }
   else {
@@ -201,7 +203,8 @@ void HighlightLayer::createTextureAndPostProcesses()
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _horizontalBlurPostprocess->onApplyObservable.add(
       [&](Effect* effect, EventState&) {
-        effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
+        effect->setFloat2("screenSize", static_cast<float>(blurTextureWidth),
+                          static_cast<float>(blurTextureHeight));
       });
 
     _verticalBlurPostprocess = ::std::make_unique<GlowBlurPostProcess>(
@@ -209,7 +212,8 @@ void HighlightLayer::createTextureAndPostProcesses()
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _verticalBlurPostprocess->onApplyObservable.add(
       [&](Effect* effect, EventState&) {
-        effect->setFloat2("screenSize", blurTextureWidth, blurTextureHeight);
+        effect->setFloat2("screenSize", static_cast<float>(blurTextureWidth),
+                          static_cast<float>(blurTextureHeight));
       });
   }
 
@@ -431,8 +435,8 @@ bool HighlightLayer::isReady(SubMesh* subMesh, bool useInstances,
     options.attributes    = attribs;
     options.uniformsNames = {"world",         "mBones", "viewProjection",
                              "diffuseMatrix", "color",  "emissiveMatrix"};
-    options.samplers = {"diffuseSampler", "emissiveSampler"};
-    options.defines  = join;
+    options.samplers      = {"diffuseSampler", "emissiveSampler"};
+    options.defines       = join;
 
     _glowMapGenerationEffect = _scene->getEngine()->createEffect(
       "glowMapGeneration", options, _scene->getEngine());
@@ -529,11 +533,15 @@ void HighlightLayer::addExcludedMesh(Mesh* mesh)
 {
   if (!stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
     IHighlightLayerExcludedMesh meshExcluded;
-    meshExcluded.mesh         = mesh;
-    meshExcluded.beforeRender = mesh->onBeforeRenderObservable.add([](
-      Mesh* mesh, EventState&) { mesh->getEngine()->setStencilBuffer(false); });
-    meshExcluded.afterRender = mesh->onAfterRenderObservable.add([](
-      Mesh* mesh, EventState&) { mesh->getEngine()->setStencilBuffer(true); });
+    meshExcluded.mesh = mesh;
+    meshExcluded.beforeRender
+      = mesh->onBeforeRenderObservable.add([](Mesh* mesh, EventState&) {
+          mesh->getEngine()->setStencilBuffer(false);
+        });
+    meshExcluded.afterRender
+      = mesh->onAfterRenderObservable.add([](Mesh* mesh, EventState&) {
+          mesh->getEngine()->setStencilBuffer(true);
+        });
     _excludedMeshes[mesh->uniqueId] = meshExcluded;
   }
 }

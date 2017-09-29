@@ -846,25 +846,29 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
       // Texture uniforms
       if (scene->texturesEnabled()) {
         if (_albedoTexture && StandardMaterial::DiffuseTextureEnabled()) {
-          _uniformBuffer->updateFloat2("vAlbedoInfos",
-                                       _albedoTexture->coordinatesIndex,
-                                       _albedoTexture->level, "");
+          _uniformBuffer->updateFloat2(
+            "vAlbedoInfos",
+            static_cast<float>(_albedoTexture->coordinatesIndex),
+            static_cast<float>(_albedoTexture->level), "");
           MaterialHelper::BindTextureMatrix(*_albedoTexture, *_uniformBuffer,
                                             "albedo");
         }
 
         if (_ambientTexture && StandardMaterial::AmbientTextureEnabled()) {
           _uniformBuffer->updateFloat3(
-            "vAmbientInfos", _ambientTexture->coordinatesIndex,
-            _ambientTexture->level, _ambientTextureStrength, "");
+            "vAmbientInfos",
+            static_cast<float>(_ambientTexture->coordinatesIndex),
+            static_cast<float>(_ambientTexture->level), _ambientTextureStrength,
+            "");
           MaterialHelper::BindTextureMatrix(*_ambientTexture, *_uniformBuffer,
                                             "ambient");
         }
 
         if (_opacityTexture && StandardMaterial::OpacityTextureEnabled()) {
-          _uniformBuffer->updateFloat2("vOpacityInfos",
-                                       _opacityTexture->coordinatesIndex,
-                                       _opacityTexture->level, "");
+          _uniformBuffer->updateFloat2(
+            "vOpacityInfos",
+            static_cast<float>(_opacityTexture->coordinatesIndex),
+            static_cast<float>(_opacityTexture->level), "");
           MaterialHelper::BindTextureMatrix(*_opacityTexture, *_uniformBuffer,
                                             "opacity");
         }
@@ -904,23 +908,26 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
           }
 
           _uniformBuffer->updateFloat3(
-            "vReflectionMicrosurfaceInfos", reflectionTexture->getSize().width,
+            "vReflectionMicrosurfaceInfos",
+            static_cast<float>(reflectionTexture->getSize().width),
             reflectionTexture->lodGenerationScale,
             reflectionTexture->lodGenerationOffset, "");
         }
 
         if (_emissiveTexture && StandardMaterial::EmissiveTextureEnabled()) {
-          _uniformBuffer->updateFloat2("vEmissiveInfos",
-                                       _emissiveTexture->coordinatesIndex,
-                                       _emissiveTexture->level, "");
+          _uniformBuffer->updateFloat2(
+            "vEmissiveInfos",
+            static_cast<float>(_emissiveTexture->coordinatesIndex),
+            static_cast<float>(_emissiveTexture->level), "");
           MaterialHelper::BindTextureMatrix(*_emissiveTexture, *_uniformBuffer,
                                             "emissive");
         }
 
         if (_lightmapTexture && StandardMaterial::LightmapTextureEnabled()) {
-          _uniformBuffer->updateFloat2("vLightmapInfos",
-                                       _lightmapTexture->coordinatesIndex,
-                                       _lightmapTexture->level, "");
+          _uniformBuffer->updateFloat2(
+            "vLightmapInfos",
+            static_cast<float>(_lightmapTexture->coordinatesIndex),
+            static_cast<float>(_lightmapTexture->level), "");
           MaterialHelper::BindTextureMatrix(*_lightmapTexture, *_uniformBuffer,
                                             "lightmap");
         }
@@ -928,23 +935,27 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
         if (StandardMaterial::SpecularTextureEnabled()) {
           if (_metallicTexture) {
             _uniformBuffer->updateFloat3(
-              "vReflectivityInfos", _metallicTexture->coordinatesIndex,
-              _metallicTexture->level, _ambientTextureStrength, "");
+              "vReflectivityInfos",
+              static_cast<float>(_metallicTexture->coordinatesIndex),
+              static_cast<float>(_metallicTexture->level),
+              _ambientTextureStrength, "");
             MaterialHelper::BindTextureMatrix(*_metallicTexture,
                                               *_uniformBuffer, "reflectivity");
           }
           else if (_reflectivityTexture) {
-            _uniformBuffer->updateFloat3("vReflectivityInfos",
-                                         _reflectivityTexture->coordinatesIndex,
-                                         _reflectivityTexture->level, 1.f, "");
+            _uniformBuffer->updateFloat3(
+              "vReflectivityInfos",
+              static_cast<float>(_reflectivityTexture->coordinatesIndex),
+              static_cast<float>(_reflectivityTexture->level), 1.f, "");
             MaterialHelper::BindTextureMatrix(*_reflectivityTexture,
                                               *_uniformBuffer, "reflectivity");
           }
 
           if (_microSurfaceTexture) {
-            _uniformBuffer->updateFloat2("vMicroSurfaceSamplerInfos",
-                                         _microSurfaceTexture->coordinatesIndex,
-                                         _microSurfaceTexture->level, "");
+            _uniformBuffer->updateFloat2(
+              "vMicroSurfaceSamplerInfos",
+              static_cast<float>(_microSurfaceTexture->coordinatesIndex),
+              static_cast<float>(_microSurfaceTexture->level), "");
             MaterialHelper::BindTextureMatrix(
               *_microSurfaceTexture, *_uniformBuffer, "microSurfaceSampler");
           }
@@ -953,8 +964,8 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
         if (_bumpTexture && scene->getEngine()->getCaps().standardDerivatives
             && StandardMaterial::BumpTextureEnabled() && !_disableBumpMap) {
           _uniformBuffer->updateFloat3(
-            "vBumpInfos", _bumpTexture->coordinatesIndex, _bumpTexture->level,
-            _parallaxScaleBias, "");
+            "vBumpInfos", static_cast<float>(_bumpTexture->coordinatesIndex),
+            static_cast<float>(_bumpTexture->level), _parallaxScaleBias, "");
           MaterialHelper::BindTextureMatrix(*_bumpTexture, *_uniformBuffer,
                                             "bump");
           if (scene->_mirroredCameraPosition) {
@@ -987,9 +998,10 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
           }
           _uniformBuffer->updateFloat4(
             "vRefractionInfos", refractionTexture->level, _indexOfRefraction,
-            depth, _invertRefractionY ? -1 : 1, "");
+            depth, _invertRefractionY ? -1.f : 1.f, "");
           _uniformBuffer->updateFloat3(
-            "vRefractionMicrosurfaceInfos", refractionTexture->getSize().width,
+            "vRefractionMicrosurfaceInfos",
+            static_cast<float>(refractionTexture->getSize().width),
             refractionTexture->lodGenerationScale,
             refractionTexture->lodGenerationOffset, "");
         }

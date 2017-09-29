@@ -91,7 +91,8 @@ void SkeletonViewer::_getLinesForBonesWithLength(
   for (auto& bone : bones) {
     auto& points = _debugLines[i];
     _getBonePosition(points[0], bone.get(), meshMat);
-    _getBonePosition(points[1], bone.get(), meshMat, 0, bones.size(), 0);
+    _getBonePosition(points[1], bone.get(), meshMat, 0.f,
+                     static_cast<float>(bones.size()), 0.f);
     points[0].subtractInPlace(meshPos);
     points[1].subtractInPlace(meshPos);
     ++i;

@@ -125,7 +125,7 @@ void WindowsMotionController::handleButtonChange(
     }
   }
 
-  lerpButtonTransform(buttonName, state.value());
+  lerpButtonTransform(buttonName, static_cast<float>(state.value()));
 }
 
 void WindowsMotionController::lerpButtonTransform(const string_t& buttonName,

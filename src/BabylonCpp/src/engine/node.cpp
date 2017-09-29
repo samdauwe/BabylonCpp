@@ -347,7 +347,7 @@ Animation* Node::getAnimationByName(const string_t& iName)
   return (it != animations.end() ? *it : nullptr);
 }
 
-void Node::createAnimationRange(const string_t& iName, int from, int to)
+void Node::createAnimationRange(const string_t& iName, float from, float to)
 {
   // check name not already in use
   if (!stl_util::contains(_ranges, iName)) {
@@ -390,7 +390,8 @@ Animatable* Node::beginAnimation(const string_t& iName, bool loop,
     return nullptr;
   }
 
-  return _scene->beginAnimation(this, range->from, range->to, loop, speedRatio,
+  return _scene->beginAnimation(this, static_cast<int>(range->from),
+                                static_cast<int>(range->to), loop, speedRatio,
                                 onAnimationEnd);
 }
 
@@ -420,8 +421,8 @@ void Node::ParseAnimationRanges(Node* node, const Json::value& parsedNode,
   if (parsedNode.contains("ranges")) {
     for (auto& range : Json::GetArray(parsedNode, "ranges")) {
       node->createAnimationRange(Json::GetString(range, "name"),
-                                 Json::GetNumber(range, "from", 0),
-                                 Json::GetNumber(range, "to", 0));
+                                 Json::GetNumber<float>(range, "from", 0),
+                                 Json::GetNumber<float>(range, "to", 0));
     }
   }
 }

@@ -92,7 +92,7 @@ int Skeleton::getBoneIndexByName(const string_t& _name)
   return -1;
 }
 
-void Skeleton::createAnimationRange(const string_t& _name, int from, int to)
+void Skeleton::createAnimationRange(const string_t& _name, float from, float to)
 {
   // check name not already in use
   if (!stl_util::contains(_ranges, _name)) {
@@ -449,8 +449,8 @@ Skeleton* Skeleton::Parse(const Json::value& parsedSkeleton, Scene* scene)
   // placed after bones, so createAnimationRange can cascade down
   for (auto& range : Json::GetArray(parsedSkeleton, "ranges")) {
     skeleton->createAnimationRange(Json::GetString(range, "name"),
-                                   Json::GetNumber(range, "from", 0),
-                                   Json::GetNumber(range, "to", 0));
+                                   Json::GetNumber<float>(range, "from", 0),
+                                   Json::GetNumber<float>(range, "to", 0));
   }
   return skeleton;
 }

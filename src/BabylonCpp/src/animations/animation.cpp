@@ -33,7 +33,8 @@ Animation* Animation::_PrepareAnimation(
     = new Animation(name, targetProperty, framePerSecond, dataType, loopMode);
 
   animation->setKeys({
-    AnimationKey(0, from), AnimationKey(totalFrame, to),
+    AnimationKey(0, from),
+    AnimationKey(totalFrame, to),
   });
 
   if (easingFunction != nullptr) {
@@ -395,8 +396,8 @@ AnimationValue Animation::_interpolate(int iCurrentFrame, int repeatCount,
       const auto startValue = _getKeyValue(startKey.value);
       const auto endValue   = _getKeyValue(endKey.value);
 
-      bool useTangent = startKey.outTangent && endKey.inTangent;
-      int frameDelta  = endKey.frame - startKey.frame;
+      bool useTangent  = startKey.outTangent && endKey.inTangent;
+      float frameDelta = static_cast<float>(endKey.frame - startKey.frame);
 
       // gradient : percent of currentFrame between the frame inf and the frame
       // sup
@@ -613,7 +614,7 @@ void Animation::goToFrame(int frame)
   setValue(currentValue);
 }
 
-bool Animation::animate(millisecond_t delay, float from, float to, bool loop,
+bool Animation::animate(millisecond_t delay, int from, int to, bool loop,
                         float speedRatio)
 {
   if (this->targetProperty.empty()) {
@@ -638,7 +639,7 @@ bool Animation::animate(millisecond_t delay, float from, float to, bool loop,
   }
 
   // Compute ratio
-  float range = to - from;
+  auto range = to - from;
   AnimationValue offsetValue;
   // ratio represents the frame delta between from and to
   float ratio
@@ -878,8 +879,8 @@ Animation* Animation::Parse(const Json::value& parsedAnimation)
   if (parsedAnimation.contains("ranges")) {
     for (auto& range : Json::GetArray(parsedAnimation, "ranges")) {
       animation->createRange(Json::GetString(range, "name"),
-                             Json::GetNumber(range, "from", 0),
-                             Json::GetNumber(range, "to", 0));
+                             Json::GetNumber<float>(range, "from", 0),
+                             Json::GetNumber<float>(range, "to", 0));
     }
   }
 

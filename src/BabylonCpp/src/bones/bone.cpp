@@ -735,9 +735,9 @@ void Bone::_syncScaleVector()
   const float zsq
     = (lm.m[8] * lm.m[8] + lm.m[9] * lm.m[9] + lm.m[10] * lm.m[10]);
 
-  const float xs = lm.m[0] * lm.m[1] * lm.m[2] * lm.m[3] < 0 ? -1 : 1;
-  const float ys = lm.m[4] * lm.m[5] * lm.m[6] * lm.m[7] < 0 ? -1 : 1;
-  const float zs = lm.m[8] * lm.m[9] * lm.m[10] * lm.m[11] < 0 ? -1 : 1;
+  const float xs = lm.m[0] * lm.m[1] * lm.m[2] * lm.m[3] < 0 ? -1.f : 1.f;
+  const float ys = lm.m[4] * lm.m[5] * lm.m[6] * lm.m[7] < 0 ? -1.f : 1.f;
+  const float zs = lm.m[8] * lm.m[9] * lm.m[10] * lm.m[11] < 0 ? -1.f : 1.f;
 
   _scaleVector.x = xs * ::std::sqrt(xsq);
   _scaleVector.y = ys * ::std::sqrt(ysq);

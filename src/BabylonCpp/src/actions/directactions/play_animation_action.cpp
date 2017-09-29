@@ -9,8 +9,8 @@
 namespace BABYLON {
 
 PlayAnimationAction::PlayAnimationAction(unsigned int triggerOptions,
-                                         IAnimatable* target, float iFrom,
-                                         float iTo, bool iLoop,
+                                         IAnimatable* target, int iFrom,
+                                         int iTo, bool iLoop,
                                          Condition* condition)
     : Action(triggerOptions, condition)
     , from{iFrom}

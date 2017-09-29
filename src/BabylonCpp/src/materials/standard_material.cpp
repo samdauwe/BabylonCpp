@@ -876,25 +876,28 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
       // Textures
       if (scene->texturesEnabled()) {
         if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
-          _uniformBuffer->updateFloat2("vDiffuseInfos",
-                                       _diffuseTexture->coordinatesIndex,
-                                       _diffuseTexture->level, "");
+          _uniformBuffer->updateFloat2(
+            "vDiffuseInfos",
+            static_cast<float>(_diffuseTexture->coordinatesIndex),
+            static_cast<float>(_diffuseTexture->level), "");
           MaterialHelper::BindTextureMatrix(*_diffuseTexture, *_uniformBuffer,
                                             "diffuse");
         }
 
         if (_ambientTexture && StandardMaterial::AmbientTextureEnabled()) {
-          _uniformBuffer->updateFloat2("vAmbientInfos",
-                                       _ambientTexture->coordinatesIndex,
-                                       _ambientTexture->level, "");
+          _uniformBuffer->updateFloat2(
+            "vAmbientInfos",
+            static_cast<float>(_ambientTexture->coordinatesIndex),
+            static_cast<float>(_ambientTexture->level), "");
           MaterialHelper::BindTextureMatrix(*_ambientTexture, *_uniformBuffer,
                                             "ambient");
         }
 
         if (_opacityTexture && StandardMaterial::OpacityTextureEnabled()) {
-          _uniformBuffer->updateFloat2("vOpacityInfos",
-                                       _opacityTexture->coordinatesIndex,
-                                       _opacityTexture->level, "");
+          _uniformBuffer->updateFloat2(
+            "vOpacityInfos",
+            static_cast<float>(_opacityTexture->coordinatesIndex),
+            static_cast<float>(_opacityTexture->level), "");
           MaterialHelper::BindTextureMatrix(*_opacityTexture, *_uniformBuffer,
                                             "opacity");
         }
@@ -909,25 +912,28 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
         }
 
         if (_emissiveTexture && StandardMaterial::EmissiveTextureEnabled()) {
-          _uniformBuffer->updateFloat2("vEmissiveInfos",
-                                       _emissiveTexture->coordinatesIndex,
-                                       _emissiveTexture->level, "");
+          _uniformBuffer->updateFloat2(
+            "vEmissiveInfos",
+            static_cast<float>(_emissiveTexture->coordinatesIndex),
+            static_cast<float>(_emissiveTexture->level), "");
           MaterialHelper::BindTextureMatrix(*_emissiveTexture, *_uniformBuffer,
                                             "emissive");
         }
 
         if (_lightmapTexture && StandardMaterial::LightmapTextureEnabled()) {
-          _uniformBuffer->updateFloat2("vLightmapInfos",
-                                       _lightmapTexture->coordinatesIndex,
-                                       _lightmapTexture->level, "");
+          _uniformBuffer->updateFloat2(
+            "vLightmapInfos",
+            static_cast<float>(_lightmapTexture->coordinatesIndex),
+            static_cast<float>(_lightmapTexture->level), "");
           MaterialHelper::BindTextureMatrix(*_lightmapTexture, *_uniformBuffer,
                                             "lightmap");
         }
 
         if (_specularTexture && StandardMaterial::SpecularTextureEnabled()) {
-          _uniformBuffer->updateFloat2("vSpecularInfos",
-                                       _specularTexture->coordinatesIndex,
-                                       _specularTexture->level, "");
+          _uniformBuffer->updateFloat2(
+            "vSpecularInfos",
+            static_cast<float>(_specularTexture->coordinatesIndex),
+            static_cast<float>(_specularTexture->level), "");
           MaterialHelper::BindTextureMatrix(*_specularTexture, *_uniformBuffer,
                                             "specular");
         }
@@ -948,7 +954,7 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
           else {
             _uniformBuffer->updateFloat4(
               "vNormalReoderParams", _invertNormalMapX ? 1.f : 0.f,
-              _invertNormalMapX ? -1.f : 1.0, _invertNormalMapY ? 1.f : 0.f,
+              _invertNormalMapX ? -1.f : 1.f, _invertNormalMapY ? 1.f : 0.f,
               _invertNormalMapY ? -1.f : 1.f, "");
           }
         }
@@ -1043,10 +1049,9 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     // Colors
     scene->ambientColor.multiplyToRef(ambientColor, _globalAmbientColor);
 
-    effect->setVector3("vEyePosition",
-                       scene->_mirroredCameraPosition ?
-                         *scene->_mirroredCameraPosition :
-                         scene->activeCamera->globalPosition());
+    effect->setVector3("vEyePosition", scene->_mirroredCameraPosition ?
+                                         *scene->_mirroredCameraPosition :
+                                         scene->activeCamera->globalPosition());
     effect->setColor3("vAmbientColor", _globalAmbientColor);
   }
 

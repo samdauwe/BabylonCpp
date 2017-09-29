@@ -362,7 +362,7 @@ bool Scene::fogMode() const
   return _fogMode;
 }
 
-void Scene::setFogMode(bool value)
+void Scene::setFogMode(unsigned int value)
 {
   if (_fogMode == value) {
     return;
@@ -789,7 +789,8 @@ void Scene::_onPointerMoveEvent(PointerEvent&& evt)
                   PointerEventTypes::POINTERWHEEL :
                   PointerEventTypes::POINTERMOVE;
     auto pi = ::std::make_unique<PointerInfoPre>(
-      type, evt, _unTranslatedPointerX, _unTranslatedPointerY);
+      type, evt, static_cast<float>(_unTranslatedPointerX),
+      static_cast<float>(_unTranslatedPointerY));
     onPrePointerObservable.notifyObservers(pi.get(), static_cast<int>(type));
     if (pi->skipOnPointerObservable) {
       return;
@@ -805,8 +806,9 @@ void Scene::_onPointerMoveEvent(PointerEvent&& evt)
   if (!pointerMovePredicate) {
     pointerMovePredicate = [this](AbstractMesh* mesh) {
       return mesh->isPickable && mesh->isVisible && mesh->isReady()
-             && mesh->isEnabled() && (constantlyUpdateMeshUnderPointer
-                                      || mesh->actionManager != nullptr);
+             && mesh->isEnabled()
+             && (constantlyUpdateMeshUnderPointer
+                 || mesh->actionManager != nullptr);
     };
   }
 
@@ -872,7 +874,8 @@ void Scene::_onPointerDownEvent(PointerEvent&& evt)
   if (onPrePointerObservable.hasObservers()) {
     auto type = PointerEventTypes::POINTERDOWN;
     auto pi   = ::std::make_unique<PointerInfoPre>(
-      type, evt, _unTranslatedPointerX, _unTranslatedPointerY);
+      type, evt, static_cast<float>(_unTranslatedPointerX),
+      static_cast<float>(_unTranslatedPointerY));
     onPrePointerObservable.notifyObservers(pi.get(), static_cast<int>(type));
     if (pi->skipOnPointerObservable) {
       return;
@@ -883,8 +886,8 @@ void Scene::_onPointerDownEvent(PointerEvent&& evt)
     return;
   }
 
-  _startingPointerPosition.x = _pointerX;
-  _startingPointerPosition.y = _pointerY;
+  _startingPointerPosition.x = static_cast<float>(_pointerX);
+  _startingPointerPosition.y = static_cast<float>(_pointerY);
   _startingPointerTime       = Time::highresTimepointNow();
 
   if (!pointerDownPredicate) {
@@ -1018,7 +1021,8 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
   if (onPrePointerObservable.hasObservers()) {
     auto type = PointerEventTypes::POINTERUP;
     auto pi   = ::std::make_unique<PointerInfoPre>(
-      type, evt, _unTranslatedPointerX, _unTranslatedPointerY);
+      type, evt, static_cast<float>(_unTranslatedPointerX),
+      static_cast<float>(_unTranslatedPointerY));
     onPrePointerObservable.notifyObservers(pi.get(), static_cast<int>(type));
     if (pi->skipOnPointerObservable) {
       return;
@@ -1240,7 +1244,7 @@ vector_t<Animation*> Scene::getAnimations()
   return vector_t<Animation*>();
 }
 
-Animatable* Scene::beginAnimation(IAnimatable* target, float from, float to,
+Animatable* Scene::beginAnimation(IAnimatable* target, int from, int to,
                                   bool loop, float speedRatio,
                                   const ::std::function<void()>& onAnimationEnd,
                                   Animatable* animatable)
@@ -1252,9 +1256,8 @@ Animatable* Scene::beginAnimation(IAnimatable* target, float from, float to,
   stopAnimation(target);
 
   if (!animatable) {
-    animatable
-      = new Animatable(this, target, static_cast<int>(from),
-                       static_cast<int>(to), loop, speedRatio, onAnimationEnd);
+    animatable = new Animatable(this, target, from, to, loop, speedRatio,
+                                onAnimationEnd);
   }
 
   // Local animations
@@ -1335,7 +1338,7 @@ void Scene::_animate()
   }
   auto deltaTime = Time::fpTimeSince<size_t, ::std::milli>(_animationTimeLast)
                    * animationTimeScale;
-  _animationTime += deltaTime;
+  _animationTime += static_cast<int>(deltaTime);
   _animationTimeLast = now;
   for (auto& activeAnimatable : _activeAnimatables) {
     activeAnimatable->_animate(std::chrono::milliseconds(_animationTime));
@@ -2453,7 +2456,7 @@ void Scene::render()
 
     auto maxSubSteps = _engine->getLockstepMaxSteps();
 
-    _timeAccumulator += deltaTime;
+    _timeAccumulator += static_cast<unsigned int>(deltaTime);
 
     // compute the amount of fixed steps we should have taken since the last
     // step
@@ -2476,7 +2479,7 @@ void Scene::render()
         _physicsEngine->_step(defaultTimeStep);
         Tools::EndPerformanceCounter("Physics");
       }
-      _timeAccumulator -= defaultTimeStep;
+      _timeAccumulator -= static_cast<unsigned int>(defaultTimeStep);
 
       onAfterStepObservable.notifyObservers(this);
       ++_currentStepId;
@@ -3039,7 +3042,7 @@ unique_ptr_t<Ray> Scene::createPickingRayInCameraSpace(int x, int y,
   auto cameraViewport = camera->viewport;
   auto viewport       = cameraViewport.toGlobal(engine->getRenderWidth(),
                                           engine->getRenderHeight());
-  auto identity = Matrix::Identity();
+  auto identity       = Matrix::Identity();
 
   // Moving coordinates to local viewport world
   float _x = static_cast<float>(x);

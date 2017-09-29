@@ -43,7 +43,7 @@ struct BABYLON_SHARED_EXPORT RectPackingMap : public PackedRect {
   /**
    * @brief Return the current space free normalized between [0;1]
    */
-  size_t freeSpace();
+  float freeSpace();
 
   float _margin;
 

@@ -10,7 +10,7 @@ class BABYLON_SHARED_EXPORT PlayAnimationAction : public Action {
 
 public:
   PlayAnimationAction(unsigned int triggerOptions, IAnimatable* target,
-                      float from, float to, bool loop = false,
+                      int from, int to, bool loop = false,
                       Condition* condition = nullptr);
   ~PlayAnimationAction();
 
@@ -19,8 +19,8 @@ public:
   Json::object serialize(Json::object& parent) const override;
 
 public:
-  float from;
-  float to;
+  int from;
+  int to;
   bool loop;
 
 private:

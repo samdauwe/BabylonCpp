@@ -8,7 +8,7 @@
 
 namespace BABYLON {
 
-struct IParticleSystem : public IDisposable {
+struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
   string_t id;
   string_t name;
   Variant<AbstractMesh*, Vector3> emitter;

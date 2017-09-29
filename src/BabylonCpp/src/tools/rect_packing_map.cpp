@@ -18,10 +18,10 @@ PackedRect* RectPackingMap::addRect(const Size& size)
   return findAndSplitNode(size);
 }
 
-size_t RectPackingMap::freeSpace()
+float RectPackingMap::freeSpace()
 {
   const size_t freeSize = evalFreeSize(freeSize);
-  return freeSize / static_cast<size_t>(_size.width * _size.height);
+  return freeSize / static_cast<float>(_size.width * _size.height);
 }
 
 } // end of namespace BABYLON

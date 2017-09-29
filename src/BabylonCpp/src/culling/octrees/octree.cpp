@@ -114,9 +114,9 @@ void Octree<T>::_CreateBlocks(
                     (worldMax.y - worldMin.y) / 2.f,
                     (worldMax.z - worldMin.z) / 2.f);
   // Segmenting space
-  for (unsigned int x = 0; x < 2; ++x) {
-    for (unsigned int y = 0; y < 2; ++y) {
-      for (unsigned int z = 0; z < 2; ++z) {
+  for (float x = 0; x < 2; ++x) {
+    for (float y = 0; y < 2; ++y) {
+      for (float z = 0; z < 2; ++z) {
         Vector3 localMin = worldMin.add(blockSize.multiplyByFloats(x, y, z));
         Vector3 localMax
           = worldMin.add(blockSize.multiplyByFloats(x + 1, y + 1, z + 1));

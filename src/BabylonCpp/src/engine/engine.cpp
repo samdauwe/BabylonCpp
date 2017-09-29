@@ -124,7 +124,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
   _onCanvasBlur = [this]() { onCanvasBlurObservable.notifyObservers(this); };
 
   // Viewport
-  _hardwareScalingLevel = options.adaptToDeviceRatio ? 1.f : 1.f;
+  _hardwareScalingLevel = options.adaptToDeviceRatio ? 1 : 1;
   resize();
 
   _isStencilEnable = options.stencil;
@@ -712,7 +712,7 @@ void Engine::scissorClear(int x, int y, int width, int height,
                           const Color4& clearColor)
 {
   // Save state
-  int curScissor = _gl->getParameteri(GL::SCISSOR_TEST);
+  int curScissor                = _gl->getParameteri(GL::SCISSOR_TEST);
   array_t<int, 3> curScissorBox = _gl->getScissorBoxParameter();
 
   // Change state
@@ -1051,7 +1051,7 @@ Engine::GLBufferPtr Engine::createIndexBuffer(const IndicesArray& indices)
 
   if (_caps.uintIndices) {
     auto it = ::std::find_if(indices.begin(), indices.end(),
-                             ::std::bind2nd(::std::greater<float>(), 65535.f));
+                             ::std::bind2nd(::std::greater<uint32_t>(), 65535));
     if (it != indices.end()) {
       need32Bits = true;
     }
@@ -1588,7 +1588,7 @@ unique_ptr_t<GL::IGLProgram> Engine::createShaderProgram(
 
   const string_t shaderVersion
     = (_webGLVersion > 1.f) ? "#version 300 es\n" : "";
-  auto vertexShader = Engine::CompileShader(context, vertexCode, "vertex",
+  auto vertexShader   = Engine::CompileShader(context, vertexCode, "vertex",
                                             defines, shaderVersion);
   auto fragmentShader = Engine::CompileShader(context, fragmentCode, "fragment",
                                               defines, shaderVersion);
@@ -2630,14 +2630,14 @@ Engine::createMultipleRenderTarget(ISize size,
                     GL::DEPTH_COMPONENT,   //
                     GL::UNSIGNED_SHORT,    //
                     nullptr                //
-                    );
+    );
 
     _gl->framebufferTexture2D(GL::FRAMEBUFFER,                   //
                               GL::DEPTH_ATTACHMENT,              //
                               GL::TEXTURE_2D,                    //
                               depthTexture->_webGLTexture.get(), //
                               0                                  //
-                              );
+    );
 
     depthTexture->_framebuffer           = ::std::move(framebuffer); // FIXME
     depthTexture->baseWidth              = width;
@@ -2922,9 +2922,9 @@ void Engine::updateRawCubeTexture(InternalTexture* texture,
     }
   }
 
-  auto isPot
-    = !needPOTTextures() || (Tools::IsExponentOfTwo(texture->width)
-                             && Tools::IsExponentOfTwo(texture->height));
+  auto isPot = !needPOTTextures()
+               || (Tools::IsExponentOfTwo(texture->width)
+                   && Tools::IsExponentOfTwo(texture->height));
   if (isPot && texture->generateMipMaps && level == 0) {
     _gl->generateMipmap(GL::TEXTURE_CUBE_MAP);
   }
@@ -2960,9 +2960,9 @@ unique_ptr_t<InternalTexture> Engine::createRawCubeTexture(
   texture->height = height;
 
   // Double check on POT to generate Mips.
-  auto isPot
-    = !needPOTTextures() || (Tools::IsExponentOfTwo(texture->width)
-                             && Tools::IsExponentOfTwo(texture->height));
+  auto isPot = !needPOTTextures()
+               || (Tools::IsExponentOfTwo(texture->width)
+                   && Tools::IsExponentOfTwo(texture->height));
   if (!isPot) {
     generateMipMaps = false;
   }
@@ -3055,9 +3055,9 @@ void Engine::_prepareWebGLTextureContinuation(InternalTexture* texture,
 void Engine::_prepareWebGLTexture(
   InternalTexture* texture, Scene* scene, int width, int height,
   Nullable<bool> invertY, bool noMipmap, bool isCompressed,
-  const ::std::function<bool(
-    int width, int height,
-    const ::std::function<void()>& continuationCallback)>& processFunction,
+  const ::std::function<
+    bool(int width, int height,
+         const ::std::function<void()>& continuationCallback)>& processFunction,
   unsigned int samplingMode)
 {
   auto potWidth = needPOTTextures() ?
@@ -3797,9 +3797,9 @@ unique_ptr_t<GL::IGLShader> Engine::CompileShader(GL::IGLRenderingContext* gl,
 {
   auto shader = gl->createShader(type == "vertex" ? GL::VERTEX_SHADER :
                                                     GL::FRAGMENT_SHADER);
-  gl->shaderSource(shader,
-                   shaderVersion + ((!defines.empty()) ? defines + "\n" : "")
-                     + source);
+  gl->shaderSource(shader, shaderVersion
+                             + ((!defines.empty()) ? defines + "\n" : "")
+                             + source);
   gl->compileShader(shader);
 
   if (!gl->getShaderParameter(shader, GL::COMPILE_STATUS)) {

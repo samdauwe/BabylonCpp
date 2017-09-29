@@ -129,7 +129,7 @@ public:
   void _setReady(bool state);
   virtual vector_t<Animation*> getAnimations() override;
   Animation* getAnimationByName(const string_t& name);
-  void createAnimationRange(const string_t& name, int from, int to);
+  void createAnimationRange(const string_t& name, float from, float to);
   void deleteAnimationRange(const string_t& name, bool deleteFrames = true);
   AnimationRange* getAnimationRange(const string_t& name);
   Animatable* beginAnimation(const string_t& name, bool loop = false,

@@ -146,7 +146,7 @@ public:
   bool fogEnabled() const;
   void setFogEnabled(bool value);
   bool fogMode() const;
-  void setFogMode(bool value);
+  void setFogMode(unsigned int value);
   bool shadowsEnabled() const;
   void setShadowsEnabled(bool value);
   bool lightsEnabled() const;
@@ -291,7 +291,7 @@ public:
    * See BABYLON.Animatable
    * @see http://doc.babylonjs.com/page.php?p=22081
    */
-  Animatable* beginAnimation(IAnimatable* target, float from, float to,
+  Animatable* beginAnimation(IAnimatable* target, int from, int to,
                              bool loop = false, float speedRatio = 1.f,
                              const ::std::function<void()>& onAnimationEnd
                              = nullptr,

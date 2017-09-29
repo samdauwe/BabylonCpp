@@ -115,10 +115,10 @@ bool LensFlareSystem::computeEffectivePosition(Viewport& globalViewport)
                                            _scene->getViewMatrix());
 
   if (viewportBorder > 0) {
-    globalViewport.x -= viewportBorder;
-    globalViewport.y -= viewportBorder;
-    globalViewport.width += viewportBorder * 2;
-    globalViewport.height += viewportBorder * 2;
+    globalViewport.x -= static_cast<int>(viewportBorder);
+    globalViewport.y -= static_cast<int>(viewportBorder);
+    globalViewport.width += static_cast<int>(viewportBorder) * 2;
+    globalViewport.height += static_cast<int>(viewportBorder) * 2;
     position.x += viewportBorder;
     position.y += viewportBorder;
     _positionX += viewportBorder;
