@@ -96,7 +96,7 @@ int SampleLauncher::run()
   _editorState = State::RUNNING;
   // Check if there is a renderable scene
   if (!_renderableScene) {
-    _editorState = State::ERROR;
+    // _editorState = SampleLauncher::State::ERROR;
     return 1;
   }
 

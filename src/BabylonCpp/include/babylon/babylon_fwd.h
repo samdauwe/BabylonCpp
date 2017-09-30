@@ -233,7 +233,7 @@ class Effect;
 struct EffectCreationOptions;
 class EffectFallbacks;
 struct EffectIncludesShadersStore;
-struct EffectShadersStore;
+class EffectShadersStore;
 class FresnelParameters;
 struct IImageProcessingConfigurationDefines;
 class ImageProcessingConfiguration;

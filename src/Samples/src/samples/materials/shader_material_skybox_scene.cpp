@@ -12,11 +12,14 @@ namespace Samples {
 ShaderMaterialSkyboxScene::ShaderMaterialSkyboxScene(ICanvas* iCanvas)
     : IRenderableScene(iCanvas), _shaderMaterial{nullptr}
 {
+  // Reference to the shaders contained in the shader store
+  auto& shaders = _effectShadersStore.shaders();
+
   // Vertex shader
-  EffectShadersStore::Shaders["gradientVertexShader"] = gradientVertexShader;
+  shaders["gradientVertexShader"] = gradientVertexShader;
 
   // Pixel (Fragment) Shader
-  EffectShadersStore::Shaders["gradientFragmentShader"] = gradientPixelShader;
+  shaders["gradientFragmentShader"] = gradientPixelShader;
 }
 
 ShaderMaterialSkyboxScene::~ShaderMaterialSkyboxScene()

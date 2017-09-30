@@ -66,9 +66,9 @@ SamplesIndex::SamplesIndex()
         return ::std::make_unique<BasicElementsScene>(iCanvas); //
       });                                                       //
   // Basic Scene
-  _samples["BasicScene"] = {true, [](ICanvas* iCanvas) {                      //
-                              return ::std::make_unique<BasicScene>(iCanvas); //
-                            }};                                               //
+  _samples["BasicScene"] = ::std::make_tuple(true, [](ICanvas* iCanvas) { //
+    return ::std::make_unique<BasicScene>(iCanvas);                       //
+  });                                                                     //
   // Cuboid Scene
   _samples["CuboidScene"]
     = ::std::make_tuple(true,
@@ -100,10 +100,11 @@ SamplesIndex::SamplesIndex()
                           return ::std::make_unique<ExtrusionScene>(iCanvas); //
                         });                                                   //
   // Fog Scene
-  _samples["FogScene"] = {false,
-                          [](ICanvas* iCanvas) {                          //
-                            return ::std::make_unique<FogScene>(iCanvas); //
-                          }};                                             //
+  _samples["FogScene"]
+    = ::std::make_tuple(false,
+                        [](ICanvas* iCanvas) {                          //
+                          return ::std::make_unique<FogScene>(iCanvas); //
+                        });                                             //
   // Hex Icosphere Scene
   _samples["HexIcosphereScene"] = ::std::make_tuple(
     true,

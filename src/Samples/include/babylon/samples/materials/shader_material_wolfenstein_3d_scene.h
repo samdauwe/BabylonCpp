@@ -2,6 +2,7 @@
 #define BABYLON_SAMPLES_MATERIALS_SHADER_MATERIAL_WOLFENSTEIN_3D_SCENE_H
 
 #include <babylon/interfaces/irenderable_scene.h>
+#include <babylon/materials/effect_shaders_store.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -386,8 +387,8 @@ public:
       "                onRect(uv, vec2(15., 32.5), vec2(21., 44.)));\n"
       "\n"
       "    fgcol = mix(fgcol, mix(COL(0., 0., 0.), COL(43., 43., 43.),\n"
-      "                (uv.y - 37.)),\n"
-      "                stepeq(uv.x, 15.) * step(37., uv.y) * step(uv.y, 38.));\n"
+      "               (uv.y - 37.)),\n"
+      "               stepeq(uv.x, 15.) * step(37., uv.y) * step(uv.y, 38.));\n"
       "    fgcol =\n"
       "        mix(fgcol, mix(COL(0., 0., 0.), COL(43., 43., 43.),\n"
       "            (uv.y - 37.) / 3.),\n"
@@ -734,6 +735,7 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
+  EffectShadersStore _effectShadersStore;
   float _time;
   ShaderMaterial* _shaderMaterial;
 

@@ -6,7 +6,7 @@
 namespace BABYLON {
 namespace Samples {
 
-class SamplesIndex {
+class BABYLON_SHARED_EXPORT SamplesIndex {
 
 public:
   using IRenderableScenePtr = ::std::unique_ptr<IRenderableScene>;

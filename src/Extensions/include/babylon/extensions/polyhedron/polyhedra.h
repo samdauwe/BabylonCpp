@@ -22,8 +22,15 @@ namespace Extensions {
  *
  * This file contains a list of 126 Polyhedron objects.
  */
-struct BABYLON_SHARED_EXPORT Polyhedra {
+class BABYLON_SHARED_EXPORT Polyhedra {
 
+public:
+  Polyhedra();
+  ~Polyhedra();
+
+  const std::array<Polyhedron, 126>& models() const;
+
+private:
   /* Platonic Solids */
   static const Polyhedron Tetrahedron;
   static const Polyhedron Cube;
@@ -162,7 +169,7 @@ struct BABYLON_SHARED_EXPORT Polyhedra {
   static const Polyhedron J92;
 
   /* List of 126 Polyhedron objects */
-  static const std::array<Polyhedron, 126> Models;
+  static const std::array<Polyhedron, 126> _models;
 
 }; // end of class Polyhedra
 

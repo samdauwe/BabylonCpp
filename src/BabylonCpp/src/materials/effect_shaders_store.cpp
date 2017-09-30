@@ -4,16 +4,16 @@
 #include <babylon/shaders/black_and_white_fragment_fx.h>
 #include <babylon/shaders/blur_fragment_fx.h>
 #include <babylon/shaders/chromatic_aberration_fragment_fx.h>
+#include <babylon/shaders/color_correction_fragment_fx.h>
 #include <babylon/shaders/color_fragment_fx.h>
 #include <babylon/shaders/color_vertex_fx.h>
-#include <babylon/shaders/color_correction_fragment_fx.h>
 #include <babylon/shaders/convolution_fragment_fx.h>
 #include <babylon/shaders/default_fragment_fx.h>
 #include <babylon/shaders/default_vertex_fx.h>
-#include <babylon/shaders/depth_fragment_fx.h>
-#include <babylon/shaders/depth_vertex_fx.h>
 #include <babylon/shaders/depth_box_blur_fragment_fx.h>
+#include <babylon/shaders/depth_fragment_fx.h>
 #include <babylon/shaders/depth_of_field_fragment_fx.h>
+#include <babylon/shaders/depth_vertex_fx.h>
 #include <babylon/shaders/display_pass_fragment_fx.h>
 #include <babylon/shaders/filter_fragment_fx.h>
 #include <babylon/shaders/fxaa_fragment_fx.h>
@@ -50,9 +50,9 @@
 #include <babylon/shaders/shadow_map_vertex_fx.h>
 #include <babylon/shaders/sprites_fragment_fx.h>
 #include <babylon/shaders/sprites_vertex_fx.h>
-#include <babylon/shaders/ssao_fragment_fx.h>
 #include <babylon/shaders/ssao2_fragment_fx.h>
 #include <babylon/shaders/ssao_combine_fragment_fx.h>
+#include <babylon/shaders/ssao_fragment_fx.h>
 #include <babylon/shaders/standard_fragment_fx.h>
 #include <babylon/shaders/stereoscopic_interlace_fragment_fx.h>
 #include <babylon/shaders/tonemap_fragment_fx.h>
@@ -62,66 +62,86 @@
 
 namespace BABYLON {
 
-unordered_map_t<string_t, const char*> EffectShadersStore::Shaders = {
-  {"anaglyphPixelShader", anaglyphPixelShader},
-  {"blackAndWhitePixelShader", blackAndWhitePixelShader},
-  {"blurPixelShader", blurPixelShader},
-  {"chromaticAberrationPixelShader", chromaticAberrationPixelShader},
-  {"colorPixelShader", colorPixelShader},
-  {"colorVertexShader", colorVertexShader},
-  {"colorCorrectionPixelShader", colorCorrectionPixelShader},
-  {"convolutionPixelShader", convolutionPixelShader},
-  {"defaultPixelShader", defaultPixelShader},
-  {"defaultVertexShader", defaultVertexShader},
-  {"depthPixelShader", depthPixelShader},
-  {"depthVertexShader", depthVertexShader},
-  {"depthBoxBlurPixelShader", depthBoxBlurPixelShader},
-  {"depthOfFieldPixelShader", depthOfFieldPixelShader},
-  {"displayPassPixelShader", displayPassPixelShader},
-  {"filterPixelShader", filterPixelShader},
-  {"fxaaPixelShader", fxaaPixelShader},
-  {"fxaaVertexShader", fxaaVertexShader},
-  {"geometryPixelShader", geometryPixelShader},
-  {"geometryVertexShader", geometryVertexShader},
-  {"glowBlurPostProcessPixelShader", glowBlurPostProcessPixelShader},
-  {"glowMapGenerationPixelShader", glowMapGenerationPixelShader},
-  {"glowMapGenerationVertexShader", glowMapGenerationVertexShader},
-  {"glowMapMergePixelShader", glowMapMergePixelShader},
-  {"glowMapMergeVertexShader", glowMapMergeVertexShader},
-  {"highlightsPixelShader", highlightsPixelShader},
-  {"imageProcessingPixelShader", imageProcessingPixelShader},
-  {"kernelBlurPixelShader", kernelBlurPixelShader},
-  {"kernelBlurVertexShader", kernelBlurVertexShader},
-  {"layerPixelShader", layerPixelShader},
-  {"layerVertexShader", layerVertexShader},
-  {"lensFlarePixelShader", lensFlarePixelShader},
-  {"lensFlareVertexShader", lensFlareVertexShader},
-  {"lensHighlightsPixelShader", lensHighlightsPixelShader},
-  {"linePixelShader", linePixelShader},
-  {"lineVertexShader", lineVertexShader},
-  {"outlinePixelShader", outlinePixelShader},
-  {"outlineVertexShader", outlineVertexShader},
-  {"particlesPixelShader", particlesPixelShader},
-  {"particlesVertexShader", particlesVertexShader},
-  {"passPixelShader", passPixelShader},
-  {"pbrPixelShader", pbrPixelShader},
-  {"pbrVertexShader", pbrVertexShader},
-  {"postprocessVertexShader", postprocessVertexShader},
-  {"proceduralVertexShader", proceduralVertexShader},
-  {"refractionPixelShader", refractionPixelShader},
-  {"shadowMapPixelShader", shadowMapPixelShader},
-  {"shadowMapVertexShader", shadowMapVertexShader},
-  {"spritesPixelShader", spritesPixelShader},
-  {"spritesVertexShader", spritesVertexShader},
-  {"ssaoPixelShader", ssaoPixelShader},
-  {"ssao2PixelShader", ssao2PixelShader},
-  {"ssaoCombinePixelShader", ssaoCombinePixelShader},
-  {"standardPixelShader", standardPixelShader},
-  {"stereoscopicInterlacePixelShader", stereoscopicInterlacePixelShader},
-  {"tonemapPixelShader", tonemapPixelShader},
-  {"volumetricLightScatteringPixelShader", volumetricLightScatteringPixelShader},
-  {"volumetricLightScatteringPassPixelShader", volumetricLightScatteringPassPixelShader},
-  {"vrDistortionCorrectionPixelShader", vrDistortionCorrectionPixelShader}
-};
+EffectShadersStore::EffectShadersStore()
+{
+}
+
+EffectShadersStore::~EffectShadersStore()
+{
+}
+
+unordered_map_t<string_t, const char*>& EffectShadersStore::shaders()
+{
+  return _shaders;
+}
+
+const unordered_map_t<string_t, const char*>&
+EffectShadersStore::shaders() const
+{
+  return _shaders;
+}
+
+unordered_map_t<string_t, const char*> EffectShadersStore::_shaders
+  = {{"anaglyphPixelShader", anaglyphPixelShader},
+     {"blackAndWhitePixelShader", blackAndWhitePixelShader},
+     {"blurPixelShader", blurPixelShader},
+     {"chromaticAberrationPixelShader", chromaticAberrationPixelShader},
+     {"colorPixelShader", colorPixelShader},
+     {"colorVertexShader", colorVertexShader},
+     {"colorCorrectionPixelShader", colorCorrectionPixelShader},
+     {"convolutionPixelShader", convolutionPixelShader},
+     {"defaultPixelShader", defaultPixelShader},
+     {"defaultVertexShader", defaultVertexShader},
+     {"depthPixelShader", depthPixelShader},
+     {"depthVertexShader", depthVertexShader},
+     {"depthBoxBlurPixelShader", depthBoxBlurPixelShader},
+     {"depthOfFieldPixelShader", depthOfFieldPixelShader},
+     {"displayPassPixelShader", displayPassPixelShader},
+     {"filterPixelShader", filterPixelShader},
+     {"fxaaPixelShader", fxaaPixelShader},
+     {"fxaaVertexShader", fxaaVertexShader},
+     {"geometryPixelShader", geometryPixelShader},
+     {"geometryVertexShader", geometryVertexShader},
+     {"glowBlurPostProcessPixelShader", glowBlurPostProcessPixelShader},
+     {"glowMapGenerationPixelShader", glowMapGenerationPixelShader},
+     {"glowMapGenerationVertexShader", glowMapGenerationVertexShader},
+     {"glowMapMergePixelShader", glowMapMergePixelShader},
+     {"glowMapMergeVertexShader", glowMapMergeVertexShader},
+     {"highlightsPixelShader", highlightsPixelShader},
+     {"imageProcessingPixelShader", imageProcessingPixelShader},
+     {"kernelBlurPixelShader", kernelBlurPixelShader},
+     {"kernelBlurVertexShader", kernelBlurVertexShader},
+     {"layerPixelShader", layerPixelShader},
+     {"layerVertexShader", layerVertexShader},
+     {"lensFlarePixelShader", lensFlarePixelShader},
+     {"lensFlareVertexShader", lensFlareVertexShader},
+     {"lensHighlightsPixelShader", lensHighlightsPixelShader},
+     {"linePixelShader", linePixelShader},
+     {"lineVertexShader", lineVertexShader},
+     {"outlinePixelShader", outlinePixelShader},
+     {"outlineVertexShader", outlineVertexShader},
+     {"particlesPixelShader", particlesPixelShader},
+     {"particlesVertexShader", particlesVertexShader},
+     {"passPixelShader", passPixelShader},
+     {"pbrPixelShader", pbrPixelShader},
+     {"pbrVertexShader", pbrVertexShader},
+     {"postprocessVertexShader", postprocessVertexShader},
+     {"proceduralVertexShader", proceduralVertexShader},
+     {"refractionPixelShader", refractionPixelShader},
+     {"shadowMapPixelShader", shadowMapPixelShader},
+     {"shadowMapVertexShader", shadowMapVertexShader},
+     {"spritesPixelShader", spritesPixelShader},
+     {"spritesVertexShader", spritesVertexShader},
+     {"ssaoPixelShader", ssaoPixelShader},
+     {"ssao2PixelShader", ssao2PixelShader},
+     {"ssaoCombinePixelShader", ssaoCombinePixelShader},
+     {"standardPixelShader", standardPixelShader},
+     {"stereoscopicInterlacePixelShader", stereoscopicInterlacePixelShader},
+     {"tonemapPixelShader", tonemapPixelShader},
+     {"volumetricLightScatteringPixelShader",
+      volumetricLightScatteringPixelShader},
+     {"volumetricLightScatteringPassPixelShader",
+      volumetricLightScatteringPassPixelShader},
+     {"vrDistortionCorrectionPixelShader", vrDistortionCorrectionPixelShader}};
 
 } // end of namespace BABYLON

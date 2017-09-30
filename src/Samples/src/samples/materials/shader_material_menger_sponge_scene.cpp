@@ -16,11 +16,14 @@ ShaderMaterialMengerSpongeScene::ShaderMaterialMengerSpongeScene(
   ICanvas* iCanvas)
     : IRenderableScene(iCanvas), _time{0.f}, _shaderMaterial{nullptr}
 {
+  // Reference to the shaders contained in the shader store
+  auto& shaders = _effectShadersStore.shaders();
+
   // Vertex shader
-  EffectShadersStore::Shaders["customVertexShader"] = customVertexShader;
+  shaders["customVertexShader"] = customVertexShader;
 
   // Fragment shader
-  EffectShadersStore::Shaders["customFragmentShader"] = customFragmentShader;
+  shaders["customFragmentShader"] = customFragmentShader;
 }
 
 ShaderMaterialMengerSpongeScene::~ShaderMaterialMengerSpongeScene()

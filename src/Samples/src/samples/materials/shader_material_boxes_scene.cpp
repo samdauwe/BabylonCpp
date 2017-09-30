@@ -14,27 +14,30 @@ namespace Samples {
 ShaderMaterialBoxesScene::ShaderMaterialBoxesScene(ICanvas* iCanvas)
     : IRenderableScene(iCanvas), _time{0.f}
 {
+  // Reference to the shaders contained in the shader store
+  auto& shaders = _effectShadersStore.shaders();
+
   // Vertex shaders
-  EffectShadersStore::Shaders["custom1VertexShader"] = customVertexShader;
-  EffectShadersStore::Shaders["custom2VertexShader"] = customVertexShader;
-  EffectShadersStore::Shaders["custom3VertexShader"] = customVertexShader;
-  EffectShadersStore::Shaders["custom4VertexShader"] = customVertexShader;
-  EffectShadersStore::Shaders["custom5VertexShader"] = customVertexShader;
-  EffectShadersStore::Shaders["custom6VertexShader"] = customVertexShader;
-  EffectShadersStore::Shaders["custom7VertexShader"] = customVertexShader;
-  EffectShadersStore::Shaders["custom8VertexShader"] = customVertexShader;
-  EffectShadersStore::Shaders["custom9VertexShader"] = customVertexShader;
+  shaders["custom1VertexShader"] = customVertexShader;
+  shaders["custom2VertexShader"] = customVertexShader;
+  shaders["custom3VertexShader"] = customVertexShader;
+  shaders["custom4VertexShader"] = customVertexShader;
+  shaders["custom5VertexShader"] = customVertexShader;
+  shaders["custom6VertexShader"] = customVertexShader;
+  shaders["custom7VertexShader"] = customVertexShader;
+  shaders["custom8VertexShader"] = customVertexShader;
+  shaders["custom9VertexShader"] = customVertexShader;
 
   // Fragment shaders
-  EffectShadersStore::Shaders["custom1FragmentShader"] = custom1FragmentShader;
-  EffectShadersStore::Shaders["custom2FragmentShader"] = custom2FragmentShader;
-  EffectShadersStore::Shaders["custom3FragmentShader"] = custom3FragmentShader;
-  EffectShadersStore::Shaders["custom4FragmentShader"] = custom4FragmentShader;
-  EffectShadersStore::Shaders["custom5FragmentShader"] = custom5FragmentShader;
-  EffectShadersStore::Shaders["custom6FragmentShader"] = custom6FragmentShader;
-  EffectShadersStore::Shaders["custom7FragmentShader"] = custom7FragmentShader;
-  EffectShadersStore::Shaders["custom8FragmentShader"] = custom8FragmentShader;
-  EffectShadersStore::Shaders["custom9FragmentShader"] = custom9FragmentShader;
+  shaders["custom1FragmentShader"] = custom1FragmentShader;
+  shaders["custom2FragmentShader"] = custom2FragmentShader;
+  shaders["custom3FragmentShader"] = custom3FragmentShader;
+  shaders["custom4FragmentShader"] = custom4FragmentShader;
+  shaders["custom5FragmentShader"] = custom5FragmentShader;
+  shaders["custom6FragmentShader"] = custom6FragmentShader;
+  shaders["custom7FragmentShader"] = custom7FragmentShader;
+  shaders["custom8FragmentShader"] = custom8FragmentShader;
+  shaders["custom9FragmentShader"] = custom9FragmentShader;
 }
 
 ShaderMaterialBoxesScene::~ShaderMaterialBoxesScene()

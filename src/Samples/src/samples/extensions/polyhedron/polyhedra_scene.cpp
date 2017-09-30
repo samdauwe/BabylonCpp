@@ -54,7 +54,7 @@ void PolyhedraScene::initializeScene(ICanvas* canvas, Scene* scene)
   mat->diffuseColor = Color3(0.73f, 0.04f, 0.12f); // Ruby red
 
   unsigned int col = 0, row = 0, counter = 0;
-  for (const auto& polyhedron : Extensions::Polyhedra::Models) {
+  for (const auto& polyhedron : Extensions::Polyhedra().models()) {
     PolyhedronOptions options(2.f);
     options.custom = polyhedron;
     auto polygon   = Mesh::CreatePolyhedron(polyhedron.name, options, scene);

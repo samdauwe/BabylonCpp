@@ -3,6 +3,19 @@
 namespace BABYLON {
 namespace Extensions {
 
+Polyhedra::Polyhedra()
+{
+}
+
+Polyhedra::~Polyhedra()
+{
+}
+
+const std::array<Polyhedron, 126>& Polyhedra::models() const
+{
+  return _models;
+}
+
 /* Platonic Solids */
 
 const Polyhedron Polyhedra::Tetrahedron{
@@ -5782,7 +5795,7 @@ const Polyhedron Polyhedra::J92{// name
 
 /* List of 126 Polyhedron objects */
 
-const std::array<Polyhedron, 126> Polyhedra::Models{
+const std::array<Polyhedron, 126> Polyhedra::_models{
   /* Platonic Solids */
   {Tetrahedron, Cube, Octahedron, Dodecahedron, Icosahedron,
    /* Archimedean Solids */

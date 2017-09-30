@@ -135,8 +135,9 @@ Effect::Effect(const unordered_map_t<string_t, string_t>& baseName,
     _processIncludes(vertexCode, [this, &fragmentSource, &vertexSource](
                                    const string_t& vertexCodeWithIncludes) {
       _processShaderConversion(
-        vertexCodeWithIncludes, false, [this, &fragmentSource, &vertexSource](
-                                         const string_t& migratedVertexCode) {
+        vertexCodeWithIncludes, false,
+        [this, &fragmentSource,
+         &vertexSource](const string_t& migratedVertexCode) {
           _loadFragmentShader(
             fragmentSource, [this, &migratedVertexCode, &fragmentSource,
                              &vertexSource](const string_t& fragmentCode) {
@@ -266,8 +267,9 @@ void Effect::_loadVertexShader(
 
   // Is in local store ?
   const string_t vertexShaderName = vertex + "VertexShader";
-  if (stl_util::contains(EffectShadersStore::Shaders, vertexShaderName)) {
-    callback(string_t(EffectShadersStore::Shaders[vertexShaderName]));
+  EffectShadersStore effectShadersStore;
+  if (stl_util::contains(effectShadersStore.shaders(), vertexShaderName)) {
+    callback(string_t(effectShadersStore.shaders()[vertexShaderName]));
     return;
   }
 
@@ -298,14 +300,15 @@ void Effect::_loadFragmentShader(
 
   // Is in local store ?
   string_t fragmentShaderName = fragment + "PixelShader";
-  if (stl_util::contains(EffectShadersStore::Shaders, fragmentShaderName)) {
-    callback(string_t(EffectShadersStore::Shaders[fragmentShaderName]));
+  EffectShadersStore effectShadersStore;
+  if (stl_util::contains(effectShadersStore.shaders(), fragmentShaderName)) {
+    callback(string_t(effectShadersStore.shaders()[fragmentShaderName]));
     return;
   }
 
   fragmentShaderName = fragment + "FragmentShader";
-  if (stl_util::contains(EffectShadersStore::Shaders, fragmentShaderName)) {
-    callback(string_t(EffectShadersStore::Shaders[fragmentShaderName]));
+  if (stl_util::contains(effectShadersStore.shaders(), fragmentShaderName)) {
+    callback(string_t(effectShadersStore.shaders()[fragmentShaderName]));
     return;
   }
 
@@ -337,16 +340,18 @@ void Effect::_dumpShadersSource(string_t vertexCode, string_t fragmentCode,
   unsigned int i = 2;
   const ::std::regex regex("\n", ::std::regex::optimize);
   auto formattedVertexCode
-    = "\n1\t" + String::regexReplace(
-                  vertexCode, regex, [&i](const ::std::smatch& /*m*/) {
-                    return "\n" + ::std::to_string(i++) + "\t";
-                  });
+    = "\n1\t"
+      + String::regexReplace(vertexCode, regex,
+                             [&i](const ::std::smatch& /*m*/) {
+                               return "\n" + ::std::to_string(i++) + "\t";
+                             });
   i = 2;
   auto formattedFragmentCode
-    = "\n1\t" + String::regexReplace(
-                  fragmentCode, regex, [&i](const ::std::smatch& /*m*/) {
-                    return "\n" + ::std::to_string(i++) + "\t";
-                  });
+    = "\n1\t"
+      + String::regexReplace(fragmentCode, regex,
+                             [&i](const ::std::smatch& /*m*/) {
+                               return "\n" + ::std::to_string(i++) + "\t";
+                             });
 
   // Dump shaders name and formatted source code
   BABYLON_LOGF_ERROR("Effect", "Vertex shader: %s%s", name.c_str(),
