@@ -48,7 +48,7 @@ const char* InfiniteLoaderScene::getName()
 void InfiniteLoaderScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // camera
-  auto* camera = ArcRotateCamera::New("camera1", -Math::PI_2, 0, 70,
+  auto* camera = ArcRotateCamera::New("camera1", -Math::PI_2, 0.f, 70.f,
                                       Vector3::Zero(), scene);
   camera->attachControl(canvas, true);
 

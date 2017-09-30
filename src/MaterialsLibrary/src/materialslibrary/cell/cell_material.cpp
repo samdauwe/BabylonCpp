@@ -219,9 +219,9 @@ void CellMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
     if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
       _activeEffect->setTexture("diffuseSampler", _diffuseTexture);
 
-      _activeEffect->setFloat2("vDiffuseInfos",
-                               _diffuseTexture->coordinatesIndex,
-                               _diffuseTexture->level);
+      _activeEffect->setFloat2(
+        "vDiffuseInfos", static_cast<float>(_diffuseTexture->coordinatesIndex),
+        _diffuseTexture->level);
       _activeEffect->setMatrix("diffuseMatrix",
                                *_diffuseTexture->getTextureMatrix());
     }
@@ -231,7 +231,7 @@ void CellMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
 
     // Point size
     if (pointsCloud()) {
-      _activeEffect->setFloat("pointSize", pointSize);
+      _activeEffect->setFloat("pointSize", static_cast<float>(pointSize));
     }
 
     _activeEffect->setVector3("vEyePosition",

@@ -29,7 +29,7 @@ const char* SuperEllipsoidScene::getName()
 void SuperEllipsoidScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Create a rotating camera
-  auto camera = ArcRotateCamera::New("Camera", 0, Math::PI_2, 12.f,
+  auto camera = ArcRotateCamera::New("Camera", 0.f, Math::PI_2, 12.f,
                                      Vector3::Zero(), scene);
   camera->setPosition(Vector3(-5.f, 5.f, 5.f));
 

@@ -2521,7 +2521,8 @@ Mesh* Mesh::MergeMeshes(vector_t<Mesh*>& meshes, bool disposeSource,
       }
 
       if (subdivideWithSubMeshes) {
-        indiceArray.emplace_back(meshes[index]->getTotalIndices());
+        indiceArray.emplace_back(
+          static_cast<uint32_t>(meshes[index]->getTotalIndices()));
       }
     }
   }

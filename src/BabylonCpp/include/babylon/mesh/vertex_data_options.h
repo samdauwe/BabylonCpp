@@ -683,7 +683,7 @@ public:
   vector_t<Vector3> path;
   float radius;
   unsigned int tessellation;
-  ::std::function<float(unsigned int i, unsigned int distance)> radiusFunction;
+  ::std::function<float(unsigned int i, float distance)> radiusFunction;
   unsigned int cap;
   unsigned int sideOrientation;
   Vector4 frontUVs;

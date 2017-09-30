@@ -441,8 +441,10 @@ void StandardRenderingPipeline::_createGaussianBlurPostProcesses(
                                  scene->getEngine()->getRenderHeight());
 
       for (unsigned int i = 0; i < 9; i++) {
-        float value = (i - 4.f) * (1.f / (height ? lastOutputDimensions.height :
-                                                   lastOutputDimensions.width));
+        float value = (i - 4.f)
+                      * (1.f
+                         / (height ? lastOutputDimensions.height :
+                                     lastOutputDimensions.width));
         blurOffsets[i] = value;
       }
 
@@ -693,8 +695,8 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
 
     // Shift
     Vector2 resolution(0.f, 0.f);
-    resolution.x = lensFlarePostProcess->width;
-    resolution.y = lensFlarePostProcess->height;
+    resolution.x = static_cast<float>(lensFlarePostProcess->width);
+    resolution.y = static_cast<float>(lensFlarePostProcess->height);
     effect->setVector2("resolution", resolution);
 
     effect->setFloat("distortionStrength", lensFlareDistortionStrength);
@@ -718,20 +720,20 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
                                          0.f, 2.f, -1.f, 0.f, //
                                          0.f, 0.f, 1.f, 0.f,  //
                                          0.f, 0.f, 0.f, 1.f   //
-                                         );
+    );
 
     auto scaleBias2 = Matrix::FromValues(0.5f, 0.f, 0.5f, 0.f, //
                                          0.f, 0.5f, 0.5f, 0.f, //
                                          0.f, 0.f, 1.f, 0.f,   //
                                          0.f, 0.f, 0.f, 1.f    //
-                                         );
+    );
 
     auto starRotation = Matrix::FromValues(
       ::std::cos(camRot) * 0.5f, -::std::sin(camRot), 0.f, 0.f, //
       ::std::sin(camRot), ::std::cos(camRot) * 0.5f, 0.f, 0.f,  //
       0.f, 0.f, 1.f, 0.f,                                       //
       0.f, 0.f, 0.f, 1.f                                        //
-      );
+    );
 
     auto lensStarMatrix
       = scaleBias2.multiply(starRotation).multiply(scaleBias1);
@@ -794,8 +796,8 @@ void StandardRenderingPipeline::_createMotionBlurPostProcess(Scene* scene,
     effect->setMatrix("prevViewProjection", prevViewProjection);
     prevViewProjection = viewProjection;
 
-    screenSize.x = motionBlurPostProcess->width;
-    screenSize.y = motionBlurPostProcess->height;
+    screenSize.x = static_cast<float>(motionBlurPostProcess->width);
+    screenSize.y = static_cast<float>(motionBlurPostProcess->height);
     effect->setVector2("screenSize", screenSize);
 
     motionScale = scene->getEngine()->getFps() / 60.f;

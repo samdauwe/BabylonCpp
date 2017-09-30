@@ -32,7 +32,7 @@ const char* ShaderMaterialWithFogScene::getName()
 void ShaderMaterialWithFogScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Create a camera
-  auto camera = ArcRotateCamera::New("camera1", Math::PI, Math::PI_2, 5,
+  auto camera = ArcRotateCamera::New("camera1", Math::PI, Math::PI_2, 5.f,
                                      Vector3(0, 0, 0), scene);
 
   // Target the camera to scene origin

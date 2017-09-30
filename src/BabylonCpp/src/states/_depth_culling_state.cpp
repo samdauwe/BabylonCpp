@@ -62,7 +62,7 @@ bool _DepthCullingState::cull() const
   return _cull;
 }
 
-void _DepthCullingState::setCull(int value)
+void _DepthCullingState::setCull(bool value)
 {
   if (_cull == value) {
     return;
@@ -92,7 +92,7 @@ bool _DepthCullingState::depthMask() const
   return _depthMask;
 }
 
-void _DepthCullingState::setDepthMask(int value)
+void _DepthCullingState::setDepthMask(bool value)
 {
   if (_depthMask == value) {
     return;
@@ -107,7 +107,7 @@ bool _DepthCullingState::depthTest() const
   return _depthTest;
 }
 
-void _DepthCullingState::setDepthTest(int value)
+void _DepthCullingState::setDepthTest(bool value)
 {
   if (_depthTest == value) {
     return;

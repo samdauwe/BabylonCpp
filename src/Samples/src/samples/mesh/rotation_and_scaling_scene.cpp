@@ -24,7 +24,7 @@ const char* RotationAndScalingScene::getName()
 void RotationAndScalingScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Create a camera
-  auto camera = ArcRotateCamera::New("Camera", Math::PI, Math::PI / 8, 150,
+  auto camera = ArcRotateCamera::New("Camera", Math::PI, Math::PI / 8.f, 150.f,
                                      Vector3::Zero(), scene);
 
   // Attach the camera to the canvas

@@ -180,7 +180,8 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio,
     false,
     "#define BILATERAL_BLUR\n#define BILATERAL_BLUR_H\n#define SAMPLES 16");
   _blurHPostProcess->setOnApply([&](Effect* effect, EventState&) {
-    effect->setFloat("outSize", _ssaoCombinePostProcess->width);
+    effect->setFloat("outSize",
+                     static_cast<float>(_ssaoCombinePostProcess->width));
     effect->setFloat("near", _scene->activeCamera->minZ);
     effect->setFloat("far", _scene->activeCamera->maxZ);
     effect->setFloat("radius", radius);
@@ -196,7 +197,8 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio,
     nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(),
     false, "#define BILATERAL_BLUR\n#define SAMPLES 16");
   _blurVPostProcess->setOnApply([&](Effect* effect, EventState&) {
-    effect->setFloat("outSize", _ssaoCombinePostProcess->height);
+    effect->setFloat("outSize",
+                     static_cast<float>(_ssaoCombinePostProcess->height));
     effect->setFloat("near", _scene->activeCamera->minZ);
     effect->setFloat("far", _scene->activeCamera->maxZ);
     effect->setFloat("radius", radius);
@@ -270,10 +272,9 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
     effect->setFloat("base", base);
     effect->setFloat("near", _scene->activeCamera->minZ);
     effect->setFloat("far", _scene->activeCamera->maxZ);
-    effect->setFloat(
-      "xViewport",
-      ::std::tan(_scene->activeCamera->fov / 2.f)
-        * _scene->getEngine()->getAspectRatio(_scene->activeCamera, true));
+    effect->setFloat("xViewport", ::std::tan(_scene->activeCamera->fov / 2.f)
+                                    * _scene->getEngine()->getAspectRatio(
+                                        _scene->activeCamera, true));
     effect->setFloat("yViewport", ::std::tan(_scene->activeCamera->fov / 2.f));
     effect->setMatrix("projection", _scene->getProjectionMatrix());
 

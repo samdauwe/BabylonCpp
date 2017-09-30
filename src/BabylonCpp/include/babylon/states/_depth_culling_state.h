@@ -21,13 +21,13 @@ public:
   int cullFace() const;
   void setCullFace(int value);
   bool cull() const;
-  void setCull(int value);
+  void setCull(bool value);
   int depthFunc() const;
   void setDepthFunc(int value);
   bool depthMask() const;
-  void setDepthMask(int value);
+  void setDepthMask(bool value);
   bool depthTest() const;
-  void setDepthTest(int value);
+  void setDepthTest(bool value);
   void reset();
   void apply(GL::IGLRenderingContext& _gl);
 

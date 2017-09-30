@@ -24,8 +24,8 @@ const char* BasicElementsScene::getName()
 void BasicElementsScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Create a camera
-  auto camera = ArcRotateCamera::New("Camera", 3 * Math::PI_2, Math::PI / 8, 50,
-                                     Vector3::Zero(), scene);
+  auto camera = ArcRotateCamera::New("Camera", 3.f * Math::PI_2, Math::PI / 8.f,
+                                     50.f, Vector3::Zero(), scene);
 
   // Attach the camera to the canvas
   camera->attachControl(canvas, true);
@@ -42,7 +42,7 @@ void BasicElementsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Creation of a sphere
   // (name of the sphere, segments, diameter, scene)
-  auto sphere = Mesh::CreateSphere("sphere", 10.f, 10.f, scene);
+  auto sphere = Mesh::CreateSphere("sphere", 10u, 10.f, scene);
 
   // Creation of a plane
   // (name of the plane, size, scene)

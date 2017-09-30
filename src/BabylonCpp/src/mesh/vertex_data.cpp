@@ -804,7 +804,7 @@ unique_ptr_t<VertexData> VertexData::CreateSphere(SphereOptions& options)
   const unsigned int totalZRotationSteps = 2 + segments;
   const unsigned int totalYRotationSteps = 2 * totalZRotationSteps;
 
-  Uint32Array indices;
+  IndicesArray indices;
   Float32Array positions;
   Float32Array normals;
   Float32Array uvs;
@@ -815,7 +815,7 @@ unique_ptr_t<VertexData> VertexData::CreateSphere(SphereOptions& options)
                         / static_cast<float>(totalZRotationSteps);
     float angleZ = normalizedZ * Math::PI * slice;
 
-    for (unsigned int yRotationStep = 0.f; yRotationStep <= totalYRotationSteps;
+    for (unsigned int yRotationStep = 0; yRotationStep <= totalYRotationSteps;
          ++yRotationStep) {
       float normalizedY = static_cast<float>(yRotationStep)
                           / static_cast<float>(totalYRotationSteps);
@@ -836,10 +836,9 @@ unique_ptr_t<VertexData> VertexData::CreateSphere(SphereOptions& options)
     }
 
     if (zRotationStep > 0) {
-      size_t verticesCount = positions.size() / 3;
-      unsigned int _totalYRotationSteps
-        = static_cast<unsigned>(totalYRotationSteps);
-      for (size_t firstIndex = verticesCount - 2 * (_totalYRotationSteps + 1);
+      auto verticesCount        = static_cast<uint32_t>(positions.size() / 3);
+      auto _totalYRotationSteps = static_cast<uint32_t>(totalYRotationSteps);
+      for (uint32_t firstIndex = verticesCount - 2 * (_totalYRotationSteps + 1);
            (firstIndex + _totalYRotationSteps + 2) < verticesCount;
            ++firstIndex) {
         indices.emplace_back((firstIndex));
@@ -1298,11 +1297,11 @@ VertexData::CreateDashedLines(DashedLinesOptions& options)
 
 unique_ptr_t<VertexData> VertexData::CreateGround(GroundOptions& options)
 {
-  Uint32Array indices;
+  IndicesArray indices;
   Float32Array positions;
   Float32Array normals;
   Float32Array uvs;
-  size_t row, col;
+  uint32_t row, col;
   float rowf, colf;
   float x, y, z;
 
@@ -2638,7 +2637,7 @@ void VertexData::ComputeNormals(const Float32Array& positions,
   float xSubRatio    = 0.f;
   float ySubRatio    = 0.f;
   float zSubRatio    = 0.f;
-  unsigned int subSq = 0.f;
+  unsigned int subSq = 0;
 
   if (computeFacetPartitioning) {
     float bbSizeMax = (options.bbSize.x > options.bbSize.y) ? options.bbSize.x :

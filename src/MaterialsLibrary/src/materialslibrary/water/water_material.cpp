@@ -323,8 +323,9 @@ void WaterMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
     if (_bumpTexture && StandardMaterial::BumpTextureEnabled()) {
       _activeEffect->setTexture("normalSampler", _bumpTexture);
 
-      _activeEffect->setFloat2("vNormalInfos", _bumpTexture->coordinatesIndex,
-                               _bumpTexture->level);
+      _activeEffect->setFloat2(
+        "vNormalInfos", static_cast<float>(_bumpTexture->coordinatesIndex),
+        _bumpTexture->level);
       _activeEffect->setMatrix("normalMatrix",
                                *_bumpTexture->getTextureMatrix());
     }

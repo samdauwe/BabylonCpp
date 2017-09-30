@@ -32,7 +32,7 @@ void WavesScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Create a camera
   auto camera
-    = ArcRotateCamera::New("Camera", 0, 0, 10, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("Camera", 0.f, 0.f, 10.f, Vector3::Zero(), scene);
 
   // Target the camera position
   camera->setPosition(Vector3(-10.f, 10.f, 0.f));

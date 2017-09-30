@@ -33,7 +33,7 @@ void CurvedHelixMeshesScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create a camera
   auto camera
-    = ArcRotateCamera::New("camera1", 0, 0, 0, Vector3(0, 0, -0), scene);
+    = ArcRotateCamera::New("camera1", 0.f, 0.f, 0.f, Vector3(0, 0, -0), scene);
   camera->setPosition(Vector3(5.f, 5.f, -12.f));
 
   // Attach the camera to the canvas
@@ -46,8 +46,8 @@ void CurvedHelixMeshesScene::initializeScene(ICanvas* canvas, Scene* scene)
   light->intensity = 0.7f;
 
   // Create a second light
-  auto spot = SpotLight::New("spot", Vector3(25.f, 15.f, -10.f),
-                             Vector3(-1.f, -0.8f, 1.f), 15, 1, scene);
+  auto spot       = SpotLight::New("spot", Vector3(25.f, 15.f, -10.f),
+                             Vector3(-1.f, -0.8f, 1.f), 15.f, 1.f, scene);
   spot->diffuse   = Color3(1.f, 1.f, 1.f);
   spot->specular  = Color3(0.f, 0.f, 0.f);
   spot->intensity = 0.8f;
@@ -87,7 +87,7 @@ void CurvedHelixMeshesScene::initializeScene(ICanvas* canvas, Scene* scene)
 void CurvedHelixMeshesScene::_showAxis(float size, Scene* scene)
 {
   // X-Axis
-  auto axisX = Mesh::CreateLines("axisX",
+  auto axisX   = Mesh::CreateLines("axisX",
                                  {Vector3::Zero(), Vector3(size, 0.f, 0.f),
                                   Vector3(size * 0.95f, 0.05f * size, 0.f),
                                   Vector3(size, 0.f, 0.f),
@@ -96,7 +96,7 @@ void CurvedHelixMeshesScene::_showAxis(float size, Scene* scene)
   axisX->color = Color3(1.f, 0.f, 0.f);
 
   // Y-Axis
-  auto axisY = Mesh::CreateLines("axisY",
+  auto axisY   = Mesh::CreateLines("axisY",
                                  {Vector3::Zero(), Vector3(0.f, size, 0.f),
                                   Vector3(-0.05f * size, size * 0.95f, 0.f),
                                   Vector3(0.f, size, 0.f),
@@ -104,7 +104,7 @@ void CurvedHelixMeshesScene::_showAxis(float size, Scene* scene)
                                  scene);
   axisY->color = Color3(0.f, 1.f, 0.f);
   // Z-Axis
-  auto axisZ = Mesh::CreateLines("axisZ",
+  auto axisZ   = Mesh::CreateLines("axisZ",
                                  {Vector3::Zero(), Vector3(0.f, 0.f, size),
                                   Vector3(0.f, -0.05f * size, size * 0.95f),
                                   Vector3(0.f, 0.f, size),

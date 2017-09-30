@@ -14,7 +14,8 @@ GlowBlurPostProcess::GlowBlurPostProcess(
     , kernel{iKernel}
 {
   onApplyObservable.add([this](Effect* effect, EventState&) {
-    effect->setFloat2("screenSize", width, height);
+    effect->setFloat2("screenSize", static_cast<float>(width),
+                      static_cast<float>(height));
     effect->setVector2("direction", direction);
     effect->setFloat("blurWidth", kernel);
   });
@@ -31,7 +32,8 @@ GlowBlurPostProcess::GlowBlurPostProcess(
     , kernel{iKernel}
 {
   onApplyObservable.add([this](Effect* effect, EventState&) {
-    effect->setFloat2("screenSize", width, height);
+    effect->setFloat2("screenSize", static_cast<float>(width),
+                      static_cast<float>(height));
     effect->setVector2("direction", direction);
     effect->setFloat("blurWidth", kernel);
   });

@@ -152,19 +152,19 @@ void BlurPostProcess::_updateParameters()
 
   std::ostringstream defines;
   for (unsigned int i = 0; i < static_cast<unsigned>(varyingCount); ++i) {
-    defines << "#define KERNEL_OFFSET" << i << " " << _glslFloat(offsets[i])
-            << "\r\n";
-    defines << "#define KERNEL_WEIGHT" << i << " " << _glslFloat(weights[i])
-            << "\r\n";
+    defines << "#define KERNEL_OFFSET" << i << " "
+            << _glslFloat(static_cast<float>(offsets[i])) << "\r\n";
+    defines << "#define KERNEL_WEIGHT" << i << " "
+            << _glslFloat(static_cast<float>(weights[i])) << "\r\n";
   }
 
   unsigned int depCount = 0;
   for (unsigned int i = static_cast<unsigned>(freeVaryingVec2);
        i < offsets.size(); ++i) {
     defines << "#define KERNEL_DEP_OFFSET" << depCount << " "
-            << _glslFloat(offsets[i]) << "\r\n";
+            << _glslFloat(static_cast<float>(offsets[i])) << "\r\n";
     defines << "#define KERNEL_DEP_WEIGHT" << depCount << " "
-            << _glslFloat(weights[i]) << "\r\n";
+            << _glslFloat(static_cast<float>(weights[i])) << "\r\n";
     ++depCount;
   }
 

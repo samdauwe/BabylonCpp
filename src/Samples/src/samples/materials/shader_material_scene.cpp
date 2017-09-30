@@ -38,8 +38,8 @@ void ShaderMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   scene->clearColor = Color4(0.f, 0.f, 0.f);
 
   // Create a Camera
-  _camera = ArcRotateCamera::New("ArcRotateCamera", 0.0, 1.5, 150,
-                                 Vector3(0.f, 0.f, 0.f), scene);
+  _camera = ArcRotateCamera::New("ArcRotateCamera", 0.f, 1.5f, 150.f,
+                                 Vector3(0, 0, 0), scene);
 
   // Target the camera to scene origin
   _camera->setTarget(Vector3::Zero());

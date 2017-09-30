@@ -51,7 +51,7 @@ void ShaderMaterialCylindersScene::initializeScene(ICanvas* canvas,
 {
 
   // Render camera
-  auto camera1 = ArcRotateCamera::New("ArcRotateCamera", 1, 0.8f, 6,
+  auto camera1 = ArcRotateCamera::New("ArcRotateCamera", 1.f, 0.8f, 6.f,
                                       Vector3::Zero(), scene);
   camera1->attachControl(canvas, false);
   camera1->lowerRadiusLimit = 1;

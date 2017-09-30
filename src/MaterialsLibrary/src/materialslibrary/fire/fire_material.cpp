@@ -152,7 +152,7 @@ bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
          "diffuseMatrix",
          // Fire
          "time", "speed"};
-    options.samplers = {"diffuseSampler",
+    options.samplers   = {"diffuseSampler",
                         // Fire
                         "distortionSampler", "opacitySampler"};
     options.defines    = std::move(join);
@@ -199,9 +199,9 @@ void FireMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
     if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
       _activeEffect->setTexture("diffuseSampler", _diffuseTexture);
 
-      _activeEffect->setFloat2("vDiffuseInfos",
-                               _diffuseTexture->coordinatesIndex,
-                               _diffuseTexture->level);
+      _activeEffect->setFloat2(
+        "vDiffuseInfos", static_cast<float>(_diffuseTexture->coordinatesIndex),
+        _diffuseTexture->level);
       _activeEffect->setMatrix("diffuseMatrix",
                                *_diffuseTexture->getTextureMatrix());
 

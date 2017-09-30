@@ -276,9 +276,9 @@ void FurMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
     if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
       _activeEffect->setTexture("diffuseSampler", _diffuseTexture);
 
-      _activeEffect->setFloat2("vDiffuseInfos",
-                               _diffuseTexture->coordinatesIndex,
-                               _diffuseTexture->level);
+      _activeEffect->setFloat2(
+        "vDiffuseInfos", static_cast<float>(_diffuseTexture->coordinatesIndex),
+        _diffuseTexture->level);
       _activeEffect->setMatrix("diffuseMatrix",
                                *_diffuseTexture->getTextureMatrix());
     }

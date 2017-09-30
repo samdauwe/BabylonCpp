@@ -64,7 +64,8 @@ void LatheScene::initializeScene(ICanvas* canvas, Scene* scene)
   }
 
   // Radius function for the tube
-  auto radius = [](unsigned int /*i*/, float /*distance*/) { return 0.025f; };
+  auto radius
+    = [](unsigned int /*i*/, unsigned int /*distance*/) { return 0.025f; };
 
   // Add a tube to visualize the spline
   auto tube = Mesh::CreateTube("tube", spline.getPoints(), 0.025f, 16, radius,

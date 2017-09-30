@@ -27,7 +27,7 @@ const char* ExtrusionScene::getName()
 void ExtrusionScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Create a ArcRotateCamera (non-mesh)
-  auto camera = ArcRotateCamera::New("Camera", 3 * Math::PI_2, 0.8f, 80,
+  auto camera = ArcRotateCamera::New("Camera", 3 * Math::PI_2, 0.8f, 80.f,
                                      Vector3::Zero(), scene);
 
   // Attach the camera to the canvas

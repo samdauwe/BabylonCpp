@@ -563,8 +563,8 @@ ParticleSystem* ParticleSystem::Parse(const Json::value& parsedParticleSystem,
   if (parsedParticleSystem.contains("autoAnimate")) {
     scene->beginAnimation(
       particleSystem,
-      Json::GetNumber(parsedParticleSystem, "autoAnimateFrom", 0.f),
-      Json::GetNumber(parsedParticleSystem, "autoAnimateTo", 0.f),
+      Json::GetNumber(parsedParticleSystem, "autoAnimateFrom", 0),
+      Json::GetNumber(parsedParticleSystem, "autoAnimateTo", 0),
       Json::GetBool(parsedParticleSystem, "autoAnimateLoop"),
       Json::GetNumber(parsedParticleSystem, "autoAnimateSpeed", 1.f));
   }

@@ -1,6 +1,11 @@
 #ifndef OIMO_DYNAMICS_RIGID_BODY_H
 #define OIMO_DYNAMICS_RIGID_BODY_H
 
+// -- Disable warnings -- //
+// 'identifier' : class 'type' needs to have dll-interface to be used by clients
+// of class 'type2'
+#pragma warning(disable : 4251)
+
 #include <oimo/collision/shape/mass_info.h>
 #include <oimo/math/euler.h>
 #include <oimo/math/mat33.h>

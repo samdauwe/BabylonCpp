@@ -1,6 +1,11 @@
 #ifndef OIMO_COLLISION_BROADPHASE_BROAD_PHASE_H
 #define OIMO_COLLISION_BROADPHASE_BROAD_PHASE_H
 
+// -- Disable warnings -- //
+// 'identifier' : class 'type' needs to have dll-interface to be used by clients
+// of class 'type2'
+#pragma warning(disable : 4251)
+
 #include <memory>
 #include <vector>
 

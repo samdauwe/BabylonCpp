@@ -132,19 +132,20 @@ DynamicTerrain::DynamicTerrain(const std::string& iName,
         y = _mapData[posIndex + 1];
       }
       else {
-        y                          = 0.0;
-        _mapData[3 * terIndex]     = i;
+        y                          = 0.f;
+        _mapData[3 * terIndex]     = static_cast<float>(i);
         _mapData[3 * terIndex + 1] = y;
-        _mapData[3 * terIndex + 2] = j;
+        _mapData[3 * terIndex + 2] = static_cast<float>(j);
       }
-      terrainPath.emplace_back(Vector3(i, y, j));
+      terrainPath.emplace_back(
+        Vector3(static_cast<float>(i), y, static_cast<float>(j)));
       // color
       if (_colormap) {
         color = Color4(_mapColors[colIndex], _mapColors[colIndex + 1],
                        _mapColors[colIndex + 2], 1.f);
       }
       else {
-        color = Color4(1.0, 1.0, 1.0, 1.0);
+        color = Color4(1.f, 1.f, 1.f, 1.f);
       }
       terrainColor.emplace_back(color);
       // uvs
@@ -689,8 +690,9 @@ void DynamicTerrain::CreateMapFromHeightMapToRef(
         x                = col * width / subX - width * 0.5f;
         z                = row * height / subZ - height * 0.5f;
         float heightmapX = ((x + width * 0.5f) / width * (bufferWidth - 1));
-        float heightmapY = (bufferHeight - 1) - ((z + height * 0.5f) / height
-                                                 * (bufferHeight - 1));
+        float heightmapY
+          = (bufferHeight - 1)
+            - ((z + height * 0.5f) / height * (bufferHeight - 1));
         unsigned int pos
           = static_cast<unsigned>(heightmapX + heightmapY * bufferWidth) * 4;
         float gradient = (buffer[pos] * filter.r + buffer[pos + 1] * filter.g
@@ -740,7 +742,8 @@ Float32Array DynamicTerrain::CreateUVMap(float subX, float subZ)
  */
 DynamicTerrain& DynamicTerrain::createUVMap()
 {
-  setMapUVs(DynamicTerrain::CreateUVMap(_mapSubX, _mapSubZ));
+  setMapUVs(DynamicTerrain::CreateUVMap(static_cast<float>(_mapSubX),
+                                        static_cast<float>(_mapSubZ)));
   return *this;
 }
 

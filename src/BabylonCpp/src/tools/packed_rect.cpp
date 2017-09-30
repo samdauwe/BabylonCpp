@@ -162,8 +162,8 @@ PackedRect* PackedRect::splitNode(const Size& contentSize)
   const auto root = static_cast<RectPackingMap*>(_root);
   float margin    = root->_margin * 2.f;
   cs.copyFrom(contentSize);
-  cs.width += margin;
-  cs.height += margin;
+  cs.width += static_cast<int>(margin);
+  cs.height += static_cast<int>(margin);
 
   // If there's no contentSize but an initialSize it means this node were
   // previously allocated, but freed, we need to create a _leftNode as subNode

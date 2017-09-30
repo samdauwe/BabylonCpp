@@ -33,7 +33,7 @@ const char* PerlinNoiseWavesScene::getName()
 void PerlinNoiseWavesScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Create a camera
-  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, 0.7, 600,
+  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, 0.7f, 600.f,
                                      Vector3::Zero(), scene);
 
   // Attach the camera to the canvas

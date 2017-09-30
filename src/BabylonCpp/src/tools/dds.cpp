@@ -150,8 +150,8 @@ void DDSTools::UploadDDSLevels(GL::IGLRenderingContext* gl,
     auto sampler = (faces == 1) ? GL::TEXTURE_2D :
                                   (GL::TEXTURE_CUBE_MAP_POSITIVE_X + face);
 
-    width      = header[off_width];
-    height     = header[off_height];
+    width      = static_cast<float>(header[off_width]);
+    height     = static_cast<float>(header[off_height]);
     dataOffset = static_cast<size_t>(header[off_size] + 4);
 
     for (int i = 0; i < mipmapCount; ++i) {

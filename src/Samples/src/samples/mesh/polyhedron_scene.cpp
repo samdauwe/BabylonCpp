@@ -32,7 +32,8 @@ const char* PolyhedronScene::getName()
 void PolyhedronScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Create a camera
-  _camera = ArcRotateCamera::New("Camera", 0, 0, 0, Vector3::Zero(), scene);
+  _camera
+    = ArcRotateCamera::New("Camera", 0.f, 0.f, 0.f, Vector3::Zero(), scene);
   _camera->setPosition(Vector3(10, 0, -40));
 
   // Attach the camera to the canvas

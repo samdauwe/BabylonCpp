@@ -29,8 +29,8 @@ void PolygonMeshStarsWithHolesScene::initializeScene(ICanvas* canvas,
                                                      Scene* scene)
 {
   // Create a ArcRotateCamera (non-mesh)
-  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI / 4.f, 25,
-                                     Vector3::Zero(), scene);
+  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI / 4.f,
+                                     25.f, Vector3::Zero(), scene);
 
   // Attach the camera to the canvas
   camera->attachControl(canvas, true);
@@ -54,10 +54,10 @@ void PolygonMeshStarsWithHolesScene::initializeScene(ICanvas* canvas,
   };
 
   const std::vector<Vector2> hole{
-    Vector2(1, -1),    //
-    Vector2(1.5, 0),   //
-    Vector2(1.4, 1),   //
-    Vector2(0.5, 1.5), //
+    Vector2(1.f, -1.f),  //
+    Vector2(1.5f, 0.f),  //
+    Vector2(1.4f, 1.f),  //
+    Vector2(0.5f, 1.5f), //
   };
 
   PolygonMeshBuilder polytri{"polytri", corners, scene};

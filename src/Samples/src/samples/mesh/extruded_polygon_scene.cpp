@@ -30,8 +30,8 @@ const char* ExtrudedPolygonScene::getName()
 void ExtrudedPolygonScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Camera
-  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI / 3.f, 12,
-                                     Vector3::Zero(), scene);
+  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI / 3.f,
+                                     12.f, Vector3::Zero(), scene);
   camera->alpha += 0.9f;
   camera->beta += -0.01f;
 

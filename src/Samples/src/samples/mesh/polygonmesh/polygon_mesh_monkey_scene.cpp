@@ -29,7 +29,7 @@ void PolygonMeshMonkeyScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Create a ArcRotateCamera (non-mesh)
   auto camera
-    = ArcRotateCamera::New("Camera", 0, 0, 50, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("Camera", 0.f, 0.f, 50.f, Vector3::Zero(), scene);
 
   // Attach the camera to the canvas
   camera->attachControl(canvas, true);

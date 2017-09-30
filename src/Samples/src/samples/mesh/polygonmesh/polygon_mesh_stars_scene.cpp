@@ -28,8 +28,8 @@ const char* PolygonMeshStarsScene::getName()
 void PolygonMeshStarsScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Create a ArcRotateCamera (non-mesh)
-  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI / 4.f, 25,
-                                     Vector3::Zero(), scene);
+  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI / 4.f,
+                                     25.f, Vector3::Zero(), scene);
 
   // Attach the camera to the canvas
   camera->attachControl(canvas, true);

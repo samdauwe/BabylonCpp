@@ -233,8 +233,9 @@ void TerrainMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     // Textures
     if (_mixTexture) {
       _activeEffect->setTexture("textureSampler", _mixTexture);
-      _activeEffect->setFloat2("vTextureInfos", _mixTexture->coordinatesIndex,
-                               _mixTexture->level);
+      _activeEffect->setFloat2(
+        "vTextureInfos", static_cast<float>(_mixTexture->coordinatesIndex),
+        _mixTexture->level);
       _activeEffect->setMatrix("textureMatrix",
                                *_mixTexture->getTextureMatrix());
 

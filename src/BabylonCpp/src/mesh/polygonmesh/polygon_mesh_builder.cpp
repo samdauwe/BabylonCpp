@@ -62,7 +62,7 @@ PolygonMeshBuilder& PolygonMeshBuilder::addHole(const vector_t<Vector2>& hole)
   PolygonPoints holepoints;
   holepoints.add(hole);
   _holes.emplace_back(holepoints);
-  _eholes.emplace_back(_epoints.size());
+  _eholes.emplace_back(static_cast<int32_t>(_epoints.size()));
   _addToepoint(hole);
 
   return *this;
@@ -128,7 +128,7 @@ Mesh* PolygonMeshBuilder::build(bool updatable, float depth)
 
   if (depth > 0.f) {
     // get the current pointcount
-    size_t positionscount = (positions.size() / 3);
+    auto positionscount = static_cast<uint32_t>(positions.size() / 3);
 
     for (auto& p : pointElements) { // add the elements at the depth
       stl_util::concat(normals, {0.f, -1.f, 0.f});
@@ -139,9 +139,9 @@ Mesh* PolygonMeshBuilder::build(bool updatable, float depth)
 
     size_t totalCount = indices.size();
     for (size_t i = 0; i < totalCount; i += 3) {
-      auto i0 = indices[i + 0];
-      auto i1 = indices[i + 1];
-      auto i2 = indices[i + 2];
+      const auto i0 = indices[i + 0];
+      const auto i1 = indices[i + 1];
+      const auto i2 = indices[i + 2];
 
       indices.emplace_back(i2 + positionscount);
       indices.emplace_back(i1 + positionscount);
@@ -181,8 +181,8 @@ void PolygonMeshBuilder::addSide(Float32Array& positions, Float32Array& normals,
                                  const PolygonPoints& points, float depth,
                                  bool flip)
 {
-  size_t startIndex = positions.size() / 3;
-  float ulength     = 0.f;
+  auto startIndex = static_cast<uint32_t>(positions.size() / 3);
+  float ulength   = 0.f;
   for (size_t i = 0; i < points.elements.size(); ++i) {
     const auto& p = points.elements[i];
     IndexedVector2 p1;

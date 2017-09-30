@@ -1164,11 +1164,11 @@ void EditControl::createRotAxes()
   const float d = axesLen * axesScale * 2.f;
   rCtl          = Mesh::New("rotCtl", scene);
   // Pickable invisible torus around the rotation circles
-  rX         = createTube(d / 2.f, 90.f);
+  rX         = createTube(d / 2.f, 90);
   rX->name   = "X";
   rY         = rX->clone("Y");
   rZ         = rX->clone("Z");
-  rAll       = createTube(d / 1.75f, 360.f);
+  rAll       = createTube(d / 1.75f, 360);
   rAll->name = "ALL";
 
   rX->setParent(rCtl);
@@ -1198,10 +1198,10 @@ void EditControl::createRotAxes()
 
   // Non pickable but visible circles
   const float cl = d;
-  rEndX          = createCircle(cl / 2.f, 90.f);
+  rEndX          = createCircle(cl / 2.f, 90);
   rEndY          = rEndX->clone("");
   rEndZ          = rEndX->clone("");
-  rEndAll        = createCircle(cl / 1.75f, 360.f);
+  rEndAll        = createCircle(cl / 1.75f, 360);
 
   rEndX->setParent(rX);
   rEndY->setParent(rY);

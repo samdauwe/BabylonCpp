@@ -125,9 +125,9 @@ private:
   Color3 savedCol;
   bool editing;
   Vector3 prevPos;
-  int snapRX;
-  int snapRY;
-  int snapRZ;
+  float snapRX;
+  float snapRY;
+  float snapRZ;
   Vector3 snapTV;
   Vector3 transBy;
   bool snapS;
@@ -139,7 +139,7 @@ private:
   float scaleSnap;
   Vector3 scale;
   bool eulerian;
-  int snapRA;
+  float snapRA;
   bool transEnabled;
   bool rotEnabled;
   bool scaleEnabled;

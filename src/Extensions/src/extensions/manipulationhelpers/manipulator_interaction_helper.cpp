@@ -467,8 +467,8 @@ Vector2 ManipulatorInteractionHelper::getRayPosition(const PointerEvent& event)
 {
   const auto canvasRect = _scene->getEngine()->getRenderingCanvasClientRect();
 
-  const auto x = event.clientX - canvasRect.left;
-  const auto y = event.clientY - canvasRect.top;
+  const auto x = static_cast<float>(event.clientX - canvasRect.left);
+  const auto y = static_cast<float>(event.clientY - canvasRect.top);
 
   return Vector2(x, y);
 }

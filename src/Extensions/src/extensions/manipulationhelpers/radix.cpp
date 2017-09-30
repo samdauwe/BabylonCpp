@@ -194,8 +194,9 @@ float Radix::intersectMeshes(const Vector2& pos, const std::string& startName,
     return String::startsWith(node->name, startName);
   });
   for (auto& mesh : meshes) {
-    auto ray = _scene->createPickingRay(pos.x, pos.y, mesh->getWorldMatrix(),
-                                        _scene->activeCamera);
+    auto ray = _scene->createPickingRay(
+      static_cast<int>(pos.x), static_cast<int>(pos.y), mesh->getWorldMatrix(),
+      _scene->activeCamera);
     auto pi = mesh->intersects(*ray, false);
     if (pi.hit && pi.distance < currentClosest) {
       currentClosest = pi.distance;

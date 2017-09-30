@@ -30,7 +30,7 @@ void RibbonScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create a Camera
   auto camera
-    = ArcRotateCamera::New("camera1", 0, 0, 0, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("camera1", 0.f, 0.f, 0.f, Vector3::Zero(), scene);
 
   // Change the position of the camera
   camera->setPosition(Vector3(0.f, 50.f, -300.f));

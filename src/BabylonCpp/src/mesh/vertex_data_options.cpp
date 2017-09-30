@@ -219,8 +219,8 @@ ExtrudeShapeCustomOptions::ExtrudeShapeCustomOptions()
     , backUVs{DefaultBackUVs}
     , updatable{false}
 {
-  scaleFunction    = [](float, float) { return 1; };
-  rotationFunction = [](float, float) { return 0; };
+  scaleFunction    = [](float, float) { return 1.f; };
+  rotationFunction = [](float, float) { return 0.f; };
 }
 
 ExtrudeShapeCustomOptions::~ExtrudeShapeCustomOptions()

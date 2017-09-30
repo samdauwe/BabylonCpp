@@ -30,8 +30,8 @@ const char* TiledGroundScene::getName()
 void TiledGroundScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Create a rotating camera
-  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI / 3.f, 12,
-                                     Vector3::Zero(), scene);
+  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI / 3.f,
+                                     12.f, Vector3::Zero(), scene);
 
   // Attach it to handle user inputs (keyboard, mouse, touch)
   camera->attachControl(canvas, false);
