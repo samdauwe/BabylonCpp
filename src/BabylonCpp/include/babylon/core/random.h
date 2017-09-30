@@ -86,11 +86,15 @@ private:
     std::uint32_t xorshifted
       = static_cast<std::uint32_t>(((oldstate >> 18u) ^ oldstate) >> 27u);
     std::uint32_t rot = oldstate >> 59u;
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4146) // unary minus operator applied to unsigned
                                 // type, result still unsigned
+#endif
     return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif
   }
 };
 

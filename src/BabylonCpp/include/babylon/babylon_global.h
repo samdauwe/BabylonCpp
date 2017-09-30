@@ -2,9 +2,11 @@
 #define BABYLON_GLOBAL_H
 
 // -- Disable warnings -- //
+#ifdef _MSC_VER
 // 'identifier' : class 'type' needs to have dll-interface to be used by clients
 // of class 'type2'
 #pragma warning(disable : 4251)
+#endif
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_constants.h>

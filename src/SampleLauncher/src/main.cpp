@@ -60,9 +60,10 @@ void initializeLogging()
 int sampleLauncherMain(int l, int v, const char* sample)
 {
   using namespace BABYLON::Samples;
+  SamplesIndex samples;
   int exitcode = 0;
   if (l > 0) {
-    const auto sampleNames = SamplesIndex::getSampleNames();
+    const auto sampleNames = samples.getSampleNames();
     printf("Found %ld sample(s):\n", sampleNames.size());
     for (const auto& sampleName : sampleNames) {
       printf(" - %s\n", sampleName.c_str());
@@ -75,11 +76,11 @@ int sampleLauncherMain(int l, int v, const char* sample)
     }
     // Check if sample exists and is enabled
     const std::string sampleName{sample};
-    if (!SamplesIndex::sampleExists(sampleName)) {
+    if (!samples.sampleExists(sampleName)) {
       printf("Sample with name \"%s\" does not exists.\n", sample);
       return 1;
     }
-    if (!SamplesIndex::isSampleEnabled(sampleName)) {
+    if (!samples.isSampleEnabled(sampleName)) {
       printf("Sample with name \"%s\" is not enabled.\n", sample);
       return 1;
     }
@@ -88,7 +89,7 @@ int sampleLauncherMain(int l, int v, const char* sample)
     if (sampleLauncher.intialize()) {
       // Create the renderable scene
       auto canvas = sampleLauncher.getRenderCanvas();
-      auto scene  = SamplesIndex::createRenderableScene(sampleName, canvas);
+      auto scene  = samples.createRenderableScene(sampleName, canvas);
       sampleLauncher.setRenderableScene(scene);
       // Run the example
       exitcode = sampleLauncher.run();

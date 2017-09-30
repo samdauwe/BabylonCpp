@@ -48,278 +48,290 @@
 namespace BABYLON {
 namespace Samples {
 
-std::unordered_map<std::string, Sample>
-  SamplesIndex::Samples = ([]() -> std::unordered_map<std::string, Sample> {
-    std::unordered_map<std::string, Sample> samples;
-    // Animations Scene
-    samples["AnimationsScene"]
-      = {true, [](ICanvas* iCanvas) {                         //
-           return std::make_unique<AnimationsScene>(iCanvas); //
-         }};                                                  //
-    // Basic Elements Scene
-    samples["BasicElementsScene"]
-      = {true, [](ICanvas* iCanvas) {                            //
-           return std::make_unique<BasicElementsScene>(iCanvas); //
-         }};                                                     //
-    // Basic Scene
-    samples["BasicScene"] = {true, [](ICanvas* iCanvas) {                    //
-                               return std::make_unique<BasicScene>(iCanvas); //
-                             }};                                             //
-    // Cuboid Scene
-    samples["CuboidScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                           //
-           return std::make_unique<CuboidScene>(iCanvas); //
-         }};                                              //
-    // Curved Helix Meshes Scene
-    samples["CurvedHelixMeshesScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                      //
-           return std::make_unique<CurvedHelixMeshesScene>(iCanvas); //
-         }};                                                         //
-    // Easing Functions Scene
-    samples["EasingFunctionsScene"]
-      = {false,
-         [](ICanvas* iCanvas) {                                    //
-           return std::make_unique<EasingFunctionsScene>(iCanvas); //
-         }};                                                       //
-    // Extruded Polygon Scene
-    samples["ExtrudedPolygonScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                    //
-           return std::make_unique<ExtrudedPolygonScene>(iCanvas); //
-         }};                                                       //
-    // Extrusion Scene
-    samples["ExtrusionScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                              //
-           return std::make_unique<ExtrusionScene>(iCanvas); //
-         }};                                                 //
-    // Fog Scene
-    samples["FogScene"] = {false,
-                           [](ICanvas* iCanvas) {                        //
-                             return std::make_unique<FogScene>(iCanvas); //
-                           }};                                           //
-    // Hex Icosphere Scene
-    samples["HexIcosphereScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                 //
-           return std::make_unique<HexIcosphereScene>(iCanvas); //
-         }};                                                    //
-    // Icosphere Scene
-    samples["IcoSphereScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                              //
-           return std::make_unique<IcoSphereScene>(iCanvas); //
-         }};                                                 //
-    // Infinite Loader Scene
-    samples["InfiniteLoaderScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                   //
-           return std::make_unique<InfiniteLoaderScene>(iCanvas); //
-         }};                                                      //
-    // Lathe Scene
-    samples["LatheScene"] = {true,
-                             [](ICanvas* iCanvas) {                          //
-                               return std::make_unique<LatheScene>(iCanvas); //
-                             }};                                             //
-    // Lights Scene
-    samples["LightsScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                           //
-           return std::make_unique<LightsScene>(iCanvas); //
-         }};                                              //
-    // Lorenz Attractor Scene
-    samples["LorenzAttractorScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                    //
-           return std::make_unique<LorenzAttractorScene>(iCanvas); //
-         }};                                                       //
-    // Mandelbrot Fractal Scene
-    samples["MandelbrotFractalScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                      //
-           return std::make_unique<MandelbrotFractalScene>(iCanvas); //
-         }};                                                         //
-    // Mesh Normals Scene
-    samples["MeshNormalsScene"]
-      = {false,
-         [](ICanvas* iCanvas) {                                //
-           return std::make_unique<MeshNormalsScene>(iCanvas); //
-         }};                                                   //
-    // Merged Meshes Scene
-    samples["MergedMeshesScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                 //
-           return std::make_unique<MergedMeshesScene>(iCanvas); //
-         }};                                                    //
-    // Perlin Noise Waves Scene
-    samples["PerlinNoiseWavesScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                     //
-           return std::make_unique<PerlinNoiseWavesScene>(iCanvas); //
-         }};                                                        //
-    // Polygon Mesh Bird Scene
-    samples["PolygonMeshBirdScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                    //
-           return std::make_unique<PolygonMeshBirdScene>(iCanvas); //
-         }};                                                       //
-    // Polygon Mesh Monkey Scene
-    samples["PolygonMeshMonkeyScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                      //
-           return std::make_unique<PolygonMeshMonkeyScene>(iCanvas); //
-         }};                                                         //
-    // Polygon Mesh Puzzle Piece Scene
-    samples["PolygonMeshPuzzlePieceScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                           //
-           return std::make_unique<PolygonMeshPuzzlePieceScene>(iCanvas); //
-         }};                                                              //
-    // Polygon Mesh Stars Scene
-    samples["PolygonMeshStarsScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                     //
-           return std::make_unique<PolygonMeshStarsScene>(iCanvas); //
-         }};                                                        //
-    // Polygon Mesh Stars With Holes Scene
-    samples["PolygonMeshStarsWithHolesScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                              //
-           return std::make_unique<PolygonMeshStarsWithHolesScene>(iCanvas); //
-         }};                                                                 //
-    // Polyhedra Scene
-    samples["PolyhedraScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                              //
-           return std::make_unique<PolyhedraScene>(iCanvas); //
-         }};                                                 //
-    // Polyhedron Scene
-    samples["PolyhedronScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                               //
-           return std::make_unique<PolyhedronScene>(iCanvas); //
-         }};                                                  //
-    // Pump Jack Scene
-    samples["PumpJackScene"]
-      = {false,
-         [](ICanvas* iCanvas) {                             //
-           return std::make_unique<PumpJackScene>(iCanvas); //
-         }};                                                //
-    // Ribbon Scene
-    samples["RibbonScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                           //
-           return std::make_unique<RibbonScene>(iCanvas); //
-         }};                                              //
-    // Rotation and Scaling Scene
-    samples["RotationAndScalingScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                       //
-           return std::make_unique<RotationAndScalingScene>(iCanvas); //
-         }};                                                          //
-    // Shader Material Box Scene
-    samples["ShaderMaterialBoxScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                      //
-           return std::make_unique<ShaderMaterialBoxScene>(iCanvas); //
-         }};                                                         //
-    // Shader Material Boxes Scene
-    samples["ShaderMaterialBoxesScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                        //
-           return std::make_unique<ShaderMaterialBoxesScene>(iCanvas); //
-         }};                                                           //
-    // Shader Material Cylinders Scene
-    samples["ShaderMaterialCylindersScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                            //
-           return std::make_unique<ShaderMaterialCylindersScene>(iCanvas); //
-         }};                                                               //
-    // Shader Material Menger Sponge Scene
-    samples["ShaderMaterialMengerSpongeScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                               //
-           return std::make_unique<ShaderMaterialMengerSpongeScene>(iCanvas); //
-         }};                                                                  //
-    // Shader Material Scene
-    samples["ShaderMaterialScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                   //
-           return std::make_unique<ShaderMaterialScene>(iCanvas); //
-         }};                                                      //
-    // Shader Material Skybox Clouds Scene
-    samples["ShaderMaterialSkyboxCloudsScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                               //
-           return std::make_unique<ShaderMaterialSkyboxCloudsScene>(iCanvas); //
-         }};                                                                  //
-    // Shader Material Skybox Scene
-    samples["ShaderMaterialSkyboxScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                         //
-           return std::make_unique<ShaderMaterialSkyboxScene>(iCanvas); //
-         }};                                                            //
-    // Shader Material With Fog Scene
-    samples["ShaderMaterialWithFogScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                          //
-           return std::make_unique<ShaderMaterialWithFogScene>(iCanvas); //
-         }};                                                             //
-    // Shader Material Wolfenstein 3D Scene
-    samples["ShaderMaterialWolfenstein3DScene"] = {
-      true,
-      [](ICanvas* iCanvas) {                                                //
-        return std::make_unique<ShaderMaterialWolfenstein3DScene>(iCanvas); //
-      }};                                                                   //
-    // Super Ellipsoid Scene
-    samples["SuperEllipsoidScene"]
-      = {true,
-         [](ICanvas* iCanvas) {                                   //
-           return std::make_unique<SuperEllipsoidScene>(iCanvas); //
-         }};                                                      //
-    // Tiled Ground Scene
-    samples["TiledGroundScene"]
-      = {false,
-         [](ICanvas* iCanvas) {                                //
-           return std::make_unique<TiledGroundScene>(iCanvas); //
-         }};                                                   //
-    // Tube Animation Scene
-    samples["TubeAnimationScene"]
-      = {false,
-         [](ICanvas* iCanvas) {                                  //
-           return std::make_unique<TubeAnimationScene>(iCanvas); //
-         }};                                                     //
-    // Tube Scene
-    samples["TubeScene"] = {true,
-                            [](ICanvas* iCanvas) {                         //
-                              return std::make_unique<TubeScene>(iCanvas); //
-                            }};                                            //
-    // Waves Scene
-    samples["WavesScene"] = {true,
-                             [](ICanvas* iCanvas) {                          //
-                               return std::make_unique<WavesScene>(iCanvas); //
-                             }};                                             //
-    return samples;
-  })();
-
-bool SamplesIndex::isSampleEnabled(const std::string& sampleName)
+SamplesIndex::SamplesIndex()
 {
-  return sampleExists(sampleName) && Samples[sampleName].enabled;
+  // Animations Scene
+  _samples["AnimationsScene"]
+    = ::std::make_tuple(true, [](ICanvas* iCanvas) {         //
+        return ::std::make_unique<AnimationsScene>(iCanvas); //
+      });
+  // Animations Scene
+  _samples["AnimationsScene"]
+    = ::std::make_tuple(true, [](ICanvas* iCanvas) {         //
+        return ::std::make_unique<AnimationsScene>(iCanvas); //
+      });                                                    //
+  // Basic Elements Scene
+  _samples["BasicElementsScene"]
+    = ::std::make_tuple(true, [](ICanvas* iCanvas) {            //
+        return ::std::make_unique<BasicElementsScene>(iCanvas); //
+      });                                                       //
+  // Basic Scene
+  _samples["BasicScene"] = {true, [](ICanvas* iCanvas) {                      //
+                              return ::std::make_unique<BasicScene>(iCanvas); //
+                            }};                                               //
+  // Cuboid Scene
+  _samples["CuboidScene"]
+    = ::std::make_tuple(true,
+                        [](ICanvas* iCanvas) {                             //
+                          return ::std::make_unique<CuboidScene>(iCanvas); //
+                        });                                                //
+  // Curved Helix Meshes Scene
+  _samples["CurvedHelixMeshesScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                        //
+      return ::std::make_unique<CurvedHelixMeshesScene>(iCanvas); //
+    });                                                           //
+  // Easing Functions Scene
+  _samples["EasingFunctionsScene"] = ::std::make_tuple(
+    false,
+    [](ICanvas* iCanvas) {                                      //
+      return ::std::make_unique<EasingFunctionsScene>(iCanvas); //
+    });                                                         //
+  // Extruded Polygon Scene
+  _samples["ExtrudedPolygonScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                      //
+      return ::std::make_unique<ExtrudedPolygonScene>(iCanvas); //
+    });                                                         //
+  // Extrusion Scene
+  _samples["ExtrusionScene"]
+    = ::std::make_tuple(true,
+                        [](ICanvas* iCanvas) {                                //
+                          return ::std::make_unique<ExtrusionScene>(iCanvas); //
+                        });                                                   //
+  // Fog Scene
+  _samples["FogScene"] = {false,
+                          [](ICanvas* iCanvas) {                          //
+                            return ::std::make_unique<FogScene>(iCanvas); //
+                          }};                                             //
+  // Hex Icosphere Scene
+  _samples["HexIcosphereScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                   //
+      return ::std::make_unique<HexIcosphereScene>(iCanvas); //
+    });                                                      //
+  // Icosphere Scene
+  _samples["IcoSphereScene"]
+    = ::std::make_tuple(true,
+                        [](ICanvas* iCanvas) {                                //
+                          return ::std::make_unique<IcoSphereScene>(iCanvas); //
+                        });                                                   //
+  // Infinite Loader Scene
+  _samples["InfiniteLoaderScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                     //
+      return ::std::make_unique<InfiniteLoaderScene>(iCanvas); //
+    });                                                        //
+  // Lathe Scene
+  _samples["LatheScene"]
+    = ::std::make_tuple(true,
+                        [](ICanvas* iCanvas) {                            //
+                          return ::std::make_unique<LatheScene>(iCanvas); //
+                        });                                               //
+  // Lights Scene
+  _samples["LightsScene"]
+    = ::std::make_tuple(true,
+                        [](ICanvas* iCanvas) {                             //
+                          return ::std::make_unique<LightsScene>(iCanvas); //
+                        });                                                //
+  // Lorenz Attractor Scene
+  _samples["LorenzAttractorScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                      //
+      return ::std::make_unique<LorenzAttractorScene>(iCanvas); //
+    });                                                         //
+  // Mandelbrot Fractal Scene
+  _samples["MandelbrotFractalScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                        //
+      return ::std::make_unique<MandelbrotFractalScene>(iCanvas); //
+    });                                                           //
+  // Mesh Normals Scene
+  _samples["MeshNormalsScene"] = ::std::make_tuple(
+    false,
+    [](ICanvas* iCanvas) {                                  //
+      return ::std::make_unique<MeshNormalsScene>(iCanvas); //
+    });                                                     //
+  // Merged Meshes Scene
+  _samples["MergedMeshesScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                   //
+      return ::std::make_unique<MergedMeshesScene>(iCanvas); //
+    });                                                      //
+  // Perlin Noise Waves Scene
+  _samples["PerlinNoiseWavesScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                       //
+      return ::std::make_unique<PerlinNoiseWavesScene>(iCanvas); //
+    });                                                          //
+  // Polygon Mesh Bird Scene
+  _samples["PolygonMeshBirdScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                      //
+      return ::std::make_unique<PolygonMeshBirdScene>(iCanvas); //
+    });                                                         //
+  // Polygon Mesh Monkey Scene
+  _samples["PolygonMeshMonkeyScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                        //
+      return ::std::make_unique<PolygonMeshMonkeyScene>(iCanvas); //
+    });                                                           //
+  // Polygon Mesh Puzzle Piece Scene
+  _samples["PolygonMeshPuzzlePieceScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                             //
+      return ::std::make_unique<PolygonMeshPuzzlePieceScene>(iCanvas); //
+    });                                                                //
+  // Polygon Mesh Stars Scene
+  _samples["PolygonMeshStarsScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                       //
+      return ::std::make_unique<PolygonMeshStarsScene>(iCanvas); //
+    });                                                          //
+  // Polygon Mesh Stars With Holes Scene
+  _samples["PolygonMeshStarsWithHolesScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                                //
+      return ::std::make_unique<PolygonMeshStarsWithHolesScene>(iCanvas); //
+    });                                                                   //
+  // Polyhedra Scene
+  _samples["PolyhedraScene"]
+    = ::std::make_tuple(true,
+                        [](ICanvas* iCanvas) {                                //
+                          return ::std::make_unique<PolyhedraScene>(iCanvas); //
+                        });                                                   //
+  // Polyhedron Scene
+  _samples["PolyhedronScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                 //
+      return ::std::make_unique<PolyhedronScene>(iCanvas); //
+    });                                                    //
+  // Pump Jack Scene
+  _samples["PumpJackScene"]
+    = ::std::make_tuple(false,
+                        [](ICanvas* iCanvas) {                               //
+                          return ::std::make_unique<PumpJackScene>(iCanvas); //
+                        });                                                  //
+  // Ribbon Scene
+  _samples["RibbonScene"]
+    = ::std::make_tuple(true,
+                        [](ICanvas* iCanvas) {                             //
+                          return ::std::make_unique<RibbonScene>(iCanvas); //
+                        });                                                //
+  // Rotation and Scaling Scene
+  _samples["RotationAndScalingScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                         //
+      return ::std::make_unique<RotationAndScalingScene>(iCanvas); //
+    });                                                            //
+  // Shader Material Box Scene
+  _samples["ShaderMaterialBoxScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                        //
+      return ::std::make_unique<ShaderMaterialBoxScene>(iCanvas); //
+    });                                                           //
+  // Shader Material Boxes Scene
+  _samples["ShaderMaterialBoxesScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                          //
+      return ::std::make_unique<ShaderMaterialBoxesScene>(iCanvas); //
+    });                                                             //
+  // Shader Material Cylinders Scene
+  _samples["ShaderMaterialCylindersScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                              //
+      return ::std::make_unique<ShaderMaterialCylindersScene>(iCanvas); //
+    });                                                                 //
+  // Shader Material Menger Sponge Scene
+  _samples["ShaderMaterialMengerSpongeScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                                 //
+      return ::std::make_unique<ShaderMaterialMengerSpongeScene>(iCanvas); //
+    });                                                                    //
+  // Shader Material Scene
+  _samples["ShaderMaterialScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                     //
+      return ::std::make_unique<ShaderMaterialScene>(iCanvas); //
+    });                                                        //
+  // Shader Material Skybox Clouds Scene
+  _samples["ShaderMaterialSkyboxCloudsScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                                 //
+      return ::std::make_unique<ShaderMaterialSkyboxCloudsScene>(iCanvas); //
+    });                                                                    //
+  // Shader Material Skybox Scene
+  _samples["ShaderMaterialSkyboxScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                           //
+      return ::std::make_unique<ShaderMaterialSkyboxScene>(iCanvas); //
+    });                                                              //
+  // Shader Material With Fog Scene
+  _samples["ShaderMaterialWithFogScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                            //
+      return ::std::make_unique<ShaderMaterialWithFogScene>(iCanvas); //
+    });                                                               //
+  // Shader Material Wolfenstein 3D Scene
+  _samples["ShaderMaterialWolfenstein3DScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                                  //
+      return ::std::make_unique<ShaderMaterialWolfenstein3DScene>(iCanvas); //
+    });                                                                     //
+  // Super Ellipsoid Scene
+  _samples["SuperEllipsoidScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                     //
+      return ::std::make_unique<SuperEllipsoidScene>(iCanvas); //
+    });                                                        //
+  // Tiled Ground Scene
+  _samples["TiledGroundScene"] = ::std::make_tuple(
+    false,
+    [](ICanvas* iCanvas) {                                  //
+      return ::std::make_unique<TiledGroundScene>(iCanvas); //
+    });                                                     //
+  // Tube Animation Scene
+  _samples["TubeAnimationScene"] = ::std::make_tuple(
+    false,
+    [](ICanvas* iCanvas) {                                    //
+      return ::std::make_unique<TubeAnimationScene>(iCanvas); //
+    });                                                       //
+  // Tube Scene
+  _samples["TubeScene"]
+    = ::std::make_tuple(true,
+                        [](ICanvas* iCanvas) {                           //
+                          return ::std::make_unique<TubeScene>(iCanvas); //
+                        });                                              //
+  // Waves Scene
+  _samples["WavesScene"]
+    = ::std::make_tuple(true,
+                        [](ICanvas* iCanvas) {                            //
+                          return ::std::make_unique<WavesScene>(iCanvas); //
+                        });                                               //
 }
 
-bool SamplesIndex::sampleExists(const std::string& sampleName)
+SamplesIndex::~SamplesIndex()
 {
-  return stl_util::contains(Samples, sampleName);
 }
 
-std::vector<std::string> SamplesIndex::getSampleNames()
+bool SamplesIndex::isSampleEnabled(const string_t& sampleName)
+{
+  // Sample exists and is enabled
+  return sampleExists(sampleName) && std::get<0>(_samples[sampleName]);
+}
+
+bool SamplesIndex::sampleExists(const string_t& sampleName)
+{
+  return stl_util::contains(_samples, sampleName);
+}
+
+std::vector<string_t> SamplesIndex::getSampleNames()
 {
   // Extract the enabled sample names from the map
-  std::vector<std::string> sampleNames;
-  for (auto const& element : Samples) {
-    if (element.second.enabled) {
+  std::vector<string_t> sampleNames;
+  for (auto const& element : _samples) {
+    // Check if enabled
+    if (std::get<0>(element.second)) {
       sampleNames.emplace_back(element.first);
     }
   }
@@ -331,14 +343,14 @@ std::vector<std::string> SamplesIndex::getSampleNames()
 }
 
 std::unique_ptr<IRenderableScene>
-SamplesIndex::createRenderableScene(const std::string& sampleName,
+SamplesIndex::createRenderableScene(const string_t& sampleName,
                                     ICanvas* iCanvas)
 {
   if (!isSampleEnabled(sampleName)) {
     return nullptr;
   }
 
-  return Samples[sampleName].factoryMethod(iCanvas);
+  return std::get<1>(_samples[sampleName])(iCanvas);
 }
 
 } // end of namespace Samples
