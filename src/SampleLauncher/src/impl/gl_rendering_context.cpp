@@ -1,7 +1,7 @@
 #include <babylon/impl/gl_rendering_context.h>
 
-// GLEW
-#include <GL/glew.h>
+// GLXW
+#include <GLXW/glxw.h>
 
 // GLFW
 #include <GLFW/glfw3.h>
@@ -63,9 +63,8 @@ GLRenderingContext::~GLRenderingContext()
 bool GLRenderingContext::initialize()
 {
   // Initialize GLEW
-  glewExperimental = GL_TRUE; // Needed in core profile
-  if (glewInit() != GLEW_OK) {
-    fprintf(stderr, "Failed to initialize GLEW\n");
+  if (glxwInit() != 0) {
+    fprintf(stderr, "Failed to initialize GLXW\n");
     return false;
   }
 

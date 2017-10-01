@@ -9,12 +9,6 @@ include(../../cmake/BuildEnvironment.cmake)
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIRS})
 
-# GLEW dependency
-if(NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
-    find_package(GLEW REQUIRED)
-    include_directories(${GLEW_INCLUDE_DIRS})
-endif()
-
 # Target name
 set(TARGET SampleLauncher)
 
@@ -30,8 +24,11 @@ message(STATUS "App ${TARGET}")
 # ============================================================================ #
 
 # Sources
-file(GLOB_RECURSE HEADER_FILES  ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
-file(GLOB_RECURSE SOURCE_FILES  ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c
+file(GLOB_RECURSE HEADER_FILES  ${GLXW_INCLUDE_DIRS}/GL/*.h
+                                ${GLXW_INCLUDE_DIRS}/GLXW/glxw.h
+                                ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
+file(GLOB_RECURSE SOURCE_FILES  ${GLXW_SOURCE_DIRS}/glxw.c
+                                ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c
                                 ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 
 set(BABYLON_SAMPLES_SOURCES
@@ -52,6 +49,7 @@ add_executable(${TARGET}
 target_include_directories(${TARGET}
     PRIVATE
     ${GLFW_INCLUDE_DIRS}
+    ${GLXW_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/../BabylonCpp/include
     ${CMAKE_CURRENT_BINARY_DIR}/../BabylonCpp/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../Extensions/include
@@ -61,13 +59,15 @@ target_include_directories(${TARGET}
 )
 
 # Libraries
+target_link_libraries(${TARGET}
+    PUBLIC
+    glfw
+    ${OPENGL_LIBRARIES}
+    BabylonCpp
+    Samples
+)
+
+# On Linux and other Unix platforms that use dlopen(), link with -ldl
 if(NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
-    target_link_libraries(${TARGET}
-        PUBLIC
-        glfw
-        ${OPENGL_LIBRARIES}
-        ${GLEW_LIBRARIES}
-        BabylonCpp
-        Samples
-    )
+    set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -ldl")
 endif()
