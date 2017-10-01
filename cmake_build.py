@@ -93,6 +93,8 @@ The supported build commands are:
             exit(1)
         # helper vars
         self._tools = Tools()
+        self._buildDir = None
+        self._buildMode = "release"
         # use dispatch pattern to invoke method with same name
         getattr(self, args.command)()
 
@@ -165,16 +167,17 @@ The supported build commands are:
         '''
         # determine the build directory name
         isReleaseBuild = (args.mode == 'release')
-        buildDir = self._getBuildDirectory(isReleaseBuild)
+        self._buildDir = self._getBuildDirectory(isReleaseBuild)
+        self._buildMode = args.mode
         # create the build directory
-        self._tools.createDir(buildDir)
+        self._tools.createDir(self._buildDir)
         # get the cmake options
         cmakeOptions = self._getCMakeOptions(
                         releaseBuild = isReleaseBuild
                        )
         # Configures the cmake project
         cmakeCmd = ["cmake", "../"] + cmakeOptions
-        self._tools.runCommand(buildDir, cmakeCmd)
+        self._tools.runCommand(self._buildDir, cmakeCmd)
 
     def _devenv(self, args):
         '''
@@ -182,10 +185,11 @@ The supported build commands are:
         '''
         # determine the build directory name
         isReleaseBuild = (args.mode == 'release')
-        buildDir = self._getBuildDirectory(isReleaseBuild)
+        self._buildDir = self._getBuildDirectory(isReleaseBuild)
+        self._buildMode = args.mode
         # start the IDE
         devenvCommand = self.getDevenvCommand()
-        self._tools.runCommand(buildDir, devenvCommand)
+        self._tools.runCommand(self._buildDir, devenvCommand)
 
     def _getCMakeOptions(self, releaseBuild = True):
         """
@@ -204,10 +208,11 @@ The supported build commands are:
         """
         # determine the build directory name
         isReleaseBuild = (args.mode == 'release')
-        buildDir = self._getBuildDirectory(isReleaseBuild)
+        self._buildDir = self._getBuildDirectory(isReleaseBuild)
+        self._buildMode = args.mode
         # run the build
         buildCommand = self.getBuildCommand()
-        self._tools.runCommand(buildDir, buildCommand)
+        self._tools.runCommand(self._buildDir, buildCommand)
 
 class LinuxBuild(Build):
 
@@ -265,7 +270,7 @@ class WindowsBuild(Build):
                 'productName': 'Visual Studio 2017',
                 'versionNumber': '15.0',
                 'cmakeGeneratorPlatform': 'Visual Studio 15 2017 Win64',
-                'path': 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\Tools\\VsDevCmd.bat'
+                'path': 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\Auxiliary\\Build\\vcvars64.bat'
             }
         }
         self._msvcDef = self._msvcDefs[msvcVer]
@@ -294,18 +299,30 @@ class WindowsBuild(Build):
             return 'win32_%s' % bitness
         return 'unknown'
 
-    def getBuildCommand(self, buildDir, verbose=False):
+    def getBuildCommand(self, verbose=False):
         '''
         Returns the build command.
         '''
+        import os
         # Create batch file for running the build
         batchFileName = 'runMSVCBuild.bat'
-        batchFile = os.path.join(buildDir, batchFileName)
+        batchFile = os.path.join(self._buildDir, batchFileName)
+        projectFile = 'BabylonCpp.sln'
+        # Build swicthes
+        switches = []
+        # - Build mode
+        buildMode = {'release': 'Release', 'debug': 'Debug'}[self._buildMode]
+        switches += ['/p:Configuration=%s' % buildMode]
+        # - Maximum number of concurrent processes to use when building
+        switches += ['/m']
+        # - Amount of information to display in the build log
+        switches += ['/v:minimal']
+        # Create build script
         with open(batchFile, "w") as f:
             # Run the Visual Studio developer command prompt
             f.write('call "%s"\n' % self._msvcDef['path'])
-            f.write('msbuild %s\n' % 'BabylonCpp.sln')
-        buildCommand = [batchFileName]
+            f.write('msbuild %s %s\n' % (projectFile, ' '.join(switches)))
+        buildCommand = batchFileName
         return buildCommand
 
 def main():
