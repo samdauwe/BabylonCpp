@@ -397,7 +397,7 @@ void Icosphere::generateSubdividedIcosahedron(size_t degree,
     };
 
     // Face nodes
-    Uint32Array faceNodes;
+    std::vector<size_t> faceNodes;
     faceNodes.reserve(1 + edge0.subdivided_n.size() + 1
                       + (degree - 1) * (degree - 1) / 2 + 1);
     faceNodes.emplace_back(face.n[0]);

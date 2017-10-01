@@ -26,6 +26,13 @@
 #ifndef BABYLON_EXTENSIONS_ENTITY_COMPONENT_SYSTEM_ENTITY_H
 #define BABYLON_EXTENSIONS_ENTITY_COMPONENT_SYSTEM_ENTITY_H
 
+// -- Disable warnings -- //
+#ifdef _MSC_VER
+// 'identifier' : class 'type' needs to have dll-interface to be used by clients
+// of class 'type2'
+#pragma warning(disable : 4251)
+#endif
+
 #include <cstdint>
 #include <type_traits>
 #include <utility>

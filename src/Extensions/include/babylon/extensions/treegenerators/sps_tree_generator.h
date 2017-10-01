@@ -71,8 +71,8 @@ struct BABYLON_SHARED_EXPORT SPSTreeGenerator {
    * @param leafMaterial - material used for all leaves.
    * @param scene - BABYLON scene.
    */
-  static Mesh* CreateTree(unsigned int trunkHeight, float trunkTaper,
-                          unsigned int trunkSlices, Material* trunkMaterial,
+  static Mesh* CreateTree(float trunkHeight, float trunkTaper,
+                          size_t trunkSlices, Material* trunkMaterial,
                           unsigned int boughs, unsigned int forks,
                           float forkAngle, float forkRatio,
                           unsigned int branches, float branchAngle,

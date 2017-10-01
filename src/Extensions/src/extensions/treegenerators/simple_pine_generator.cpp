@@ -14,7 +14,7 @@ Mesh* SimplePineGenerator::CreateTree(unsigned int canopies,
   auto curvePoints = [](unsigned int l, unsigned int t) {
     std::vector<Vector3> path;
     auto step = l / t;
-    for (unsigned int i = 0.f; i < l; i += step) {
+    for (float i = 0.f; i < l; i += step) {
       path.emplace_back(Vector3(0.f, i, 0.f));
       path.emplace_back(Vector3(0.f, i, 0.f));
     }
@@ -24,7 +24,7 @@ Mesh* SimplePineGenerator::CreateTree(unsigned int canopies,
   auto nbL            = canopies + 1;
   auto nbS            = height;
   auto curve          = curvePoints(nbS, nbL);
-  auto radiusFunction = [nbL](unsigned int i, unsigned int
+  auto radiusFunction = [nbL](unsigned int i, float
                               /*distance*/) {
     float fact = 1.f;
     if (i % 2 == 0) {
@@ -35,9 +35,9 @@ Mesh* SimplePineGenerator::CreateTree(unsigned int canopies,
 
   auto leaves
     = Mesh::CreateTube("tube", curve, 0, 10, radiusFunction, 1, scene);
-  auto trunk
-    = Mesh::CreateCylinder("trunk", nbS / nbL, nbL * 1.5f - nbL / 2.f - 1.f,
-                           nbL * 1.5f - nbL / 2.f - 1.f, 12, 1, scene);
+  auto trunk = Mesh::CreateCylinder("trunk", nbS / (nbL * 1.f),
+                                    nbL * 1.5f - nbL / 2.f - 1.f,
+                                    nbL * 1.5f - nbL / 2.f - 1.f, 12, 1, scene);
 
   leaves->setMaterial(leafMaterial);
   trunk->setMaterial(trunkMaterial);

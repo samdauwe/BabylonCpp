@@ -31,7 +31,7 @@ PerlinNoise::PerlinNoise()
 PerlinNoise::PerlinNoise(uint32_t seed)
 {
   if (!seed) {
-    seed = time(0);
+    seed = static_cast<uint32_t>(time(0));
   }
 
   auto mid_range = p.begin() + 256;

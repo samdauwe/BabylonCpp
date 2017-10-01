@@ -12,7 +12,7 @@ namespace BABYLON {
 namespace Extensions {
 
 Mesh* SPSTreeGenerator::CreateTree(
-  unsigned int trunkHeight, float trunkTaper, unsigned int trunkSlices,
+  float trunkHeight, float trunkTaper, size_t trunkSlices,
   Material* trunkMaterial, unsigned int iBoughs, unsigned int forks,
   float forkAngle, float forkRatio, unsigned int branches, float branchAngle,
   unsigned int bowFreq, float bowHeight, unsigned int leavesOnBranch,
@@ -46,7 +46,7 @@ Mesh* SPSTreeGenerator::CreateTree(
   auto _leaves_SPS     = new SolidParticleSystem("leaveSPS", scene, spsOptions);
 
   // Function to position leaves on base tree
-  auto _set_leaves = [&](SolidParticle* particle, const Vector3& /*i*/,
+  auto _set_leaves = [&](SolidParticle* particle, unsigned int /*i*/,
                          unsigned int s) {
     unsigned int _a
       = static_cast<unsigned>(std::floor(s / (2.f * leavesOnBranch)));
@@ -122,7 +122,7 @@ Mesh* SPSTreeGenerator::CreateTree(
 
   // The _set_mini_trees function positions mini base trees and leaves at the
   // end of base tree branches, one for each of the forks
-  auto _set_mini_trees = [&](SolidParticle* particle, const Vector3& /*i*/,
+  auto _set_mini_trees = [&](SolidParticle* particle, unsigned int /*i*/,
                              unsigned int s) {
     unsigned int _a = s % static_cast<unsigned>(std::pow(forks, boughs));
     if (boughs == 1) {
@@ -177,7 +177,7 @@ Mesh* SPSTreeGenerator::CreateTree(
 
   // The _set_branches function positions mini base trees and leaves at random
   // positions along random branches
-  auto _set_branches = [&](SolidParticle* particle, const Vector3& /*i*/,
+  auto _set_branches = [&](SolidParticle* particle, unsigned int /*i*/,
                            unsigned int s) {
     unsigned int _a        = _places[s][0];
     unsigned int _b        = _places[s][1];
@@ -284,7 +284,7 @@ SPSTreeBranch SPSTreeGenerator::createBranch(
   std::vector<std::vector<Vector3>> _cross_section_paths(_a_sides);
 
   for (size_t d = 0; d < branchSlices; d++) {
-    _d_slices_length = d / branchSlices;
+    _d_slices_length = d / static_cast<float>(branchSlices);
     // central point along core path
     _core_point = branchSys.y.scale(_d_slices_length * branchLength);
     // add damped wave along branch to give bows

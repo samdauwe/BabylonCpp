@@ -235,9 +235,9 @@ void World::generatePlanetPartition(std::vector<Tile>& tiles,
   std::vector<Tile*> unparentedTiles;
   float maxDistanceFromOrigin = 0.f;
   for (auto& tile : tiles) {
-    maxDistanceFromOrigin = std::max(maxDistanceFromOrigin,
-                                     tile.boundingSphere.center.length()
-                                       + tile.boundingSphere.radius);
+    maxDistanceFromOrigin
+      = std::max(maxDistanceFromOrigin, tile.boundingSphere.center.length()
+                                          + tile.boundingSphere.radius);
 
     bool parentFound = false;
     for (auto& face : icosahedron.faces) {
@@ -480,10 +480,10 @@ void World::calculatePlateBoundaryStress(
         = *corner.borders[(innerBorderIndex + 1) % corner.borders.size()];
       auto& outerBorder1
         = *corner.borders[(innerBorderIndex + 2) % corner.borders.size()];
-      auto& farCorner0 = outerBorder0.oppositeCorner(corner);
-      auto& farCorner1 = outerBorder1.oppositeCorner(corner);
-      auto& plate0     = *innerBorder->tiles[0]->plate;
-      auto& plate1     = *(outerBorder0.tiles[0]->plate != &plate0 ?
+      auto& farCorner0    = outerBorder0.oppositeCorner(corner);
+      auto& farCorner1    = outerBorder1.oppositeCorner(corner);
+      auto& plate0        = *innerBorder->tiles[0]->plate;
+      auto& plate1        = *(outerBorder0.tiles[0]->plate != &plate0 ?
                          outerBorder0.tiles[0]->plate :
                          outerBorder0.tiles[1]->plate);
       auto boundaryVector = farCorner0.vectorTo(farCorner1);
@@ -875,7 +875,7 @@ void World::generateAirCurrentWhorls(float planetRadius,
                                      IRandomFunction& random,
                                      std::vector<Whorl>& whorls)
 {
-  float direction       = random.integer(0, 1) ? 1 : -1;
+  float direction       = random.integer(0, 1) ? 1.f : -1.f;
   size_t layerCount     = random.integer(4, 7);
   float circumference   = Math::PI2 * planetRadius;
   float fullRevolution  = Math::PI2;
@@ -964,7 +964,7 @@ void World::calculateAirCurrents(std::vector<Corner>& corners,
         outflowSum += dot;
       }
       else {
-        corner.airCurrentOutflows.emplace_back(0);
+        corner.airCurrentOutflows.emplace_back(0.f);
       }
     }
 
@@ -1015,10 +1015,9 @@ float World::processAirHeat(std::vector<Corner*>& activeCorners)
       continue;
     }
 
-    float heatChange
-      = std::max(0.f, std::min(corner.airHeat,
-                               corner.heatAbsorption
-                                 * (1.f - corner.heat / corner.maxHeat)));
+    float heatChange = std::max(
+      0.f, std::min(corner.airHeat, corner.heatAbsorption
+                                      * (1.f - corner.heat / corner.maxHeat)));
     corner.heat += heatChange;
     consumedHeat += heatChange;
     float heatLoss = corner.area * (corner.heat / corner.maxHeat) * 0.02f;
@@ -1452,7 +1451,7 @@ void World::buildPlateBoundariesRenderObject(std::vector<Border>& borders,
                                                + border.corners[1]->pressure)
                                                 / 2.f,
                                               1.f));
-      auto shear = std::max(
+      auto shear    = std::max(
         0.f,
         std::min((border.corners[0]->shear + border.corners[1]->shear) / 2.f,
                  1.f));

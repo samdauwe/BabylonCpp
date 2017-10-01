@@ -404,7 +404,7 @@ size_t Navigation::_mergeVertices(Geometry* geometry)
   }
 
   for (size_t i = faceIndicesToRemove.size(); i-- > 0;) {
-    stl_util::splice(ind, faceIndicesToRemove[i], 3);
+    stl_util::splice(ind, static_cast<int>(faceIndicesToRemove[i]), 3);
   }
 
   // Use unique set of vertices
