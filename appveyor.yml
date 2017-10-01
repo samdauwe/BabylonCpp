@@ -54,10 +54,7 @@ install:
 # Perform git clone with submodules
 clone_script:
 - cmd: >-
-    git clone -q --branch=%APPVEYOR_REPO_BRANCH% https://github.com/%APPVEYOR_REPO_NAME%.git %APPVEYOR_BUILD_FOLDER%
-    cd %APPVEYOR_BUILD_FOLDER%
-    git checkout -q %APPVEYOR_REPO_COMMIT%
-    git submodule update --init --recursive
+    git clone --recursive -q --branch=%APPVEYOR_REPO_BRANCH% https://github.com/%APPVEYOR_REPO_NAME%.git %APPVEYOR_BUILD_FOLDER%
 
 #---------------------------------#
 #       Build configuration       #
