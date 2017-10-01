@@ -1,9 +1,6 @@
 [submodule "external/earcut.hpp"]
 	path = external/earcut.hpp
 	url = https://github.com/mapbox/earcut.hpp.git
-[submodule "external/glew"]
-	path = external/glew
-	url = https://github.com/Perlmint/glew-cmake
 [submodule "external/glfw"]
 	path = external/glfw
 	url = https://github.com/glfw/glfw
