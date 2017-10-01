@@ -64,7 +64,7 @@ int sampleLauncherMain(int l, int v, const char* sample)
   int exitcode = 0;
   if (l > 0) {
     const auto sampleNames = samples.getSampleNames();
-    printf("Found %ld sample(s):\n", sampleNames.size());
+    printf("Found %zd sample(s):\n", sampleNames.size());
     for (const auto& sampleName : sampleNames) {
       printf(" - %s\n", sampleName.c_str());
     }

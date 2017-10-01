@@ -61,7 +61,7 @@ void TubeScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   auto curve = curvePoints(40.f, 400.f);
 
-  auto radiusFunction = [](unsigned int i, unsigned int /*distance*/) {
+  const auto radiusFunction = [](unsigned int i, float /*distance*/) {
     float t = static_cast<float>(i) / Math::PI * 2.f / 8.f;
     return std::sin(t) + static_cast<float>(i) / 25.f;
   };
