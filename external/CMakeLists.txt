@@ -12,18 +12,15 @@ set(EARCUT_HPP_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/earcut.hpp/include/mapbox
     CACHE INTERNAL "Include directories of Earcut hpp")
 
-# GLEW (The OpenGL Extension Wrangler Library).
-SET(glew-cmake_BUILD_SHARED ON CACHE BOOL "Build the shared glew library" FORCE)
-SET(glew-cmake_BUILD_STATIC OFF CACHE BOOL "Build the static glew library" FORCE)
-SET(glew-cmake_BUILD_SINGLE_CONTEXT ON CACHE BOOL "Build the single context glew library" FORCE)
-SET(glew-cmake_BUILD_MULTI_CONTEXT OFF CACHE BOOL "Build the multi context glew library" FORCE)
-add_subdirectory(glew)
-set(GLEW_INCLUDE_DIRS
-    ${CMAKE_BINARY_DIR}/external/glew/include
-    CACHE INTERNAL "Include directories of GLEW")
-get_target_property(LIBRARY_OUTPUT_NAME
-    libglew_shared GLEW_LIBRARY_OUTPUT_NAME
-)
+# GLXW (OpenGL loader).
+# https://github.com/rikusalminen/glxw
+include_directories("glxw")
+set(GLXW_INCLUDE_DIRS
+    ${CMAKE_CURRENT_SOURCE_DIR}/glxw/include
+    CACHE INTERNAL "Include directories of GLXW")
+set(GLXW_SOURCE_DIRS
+    ${CMAKE_CURRENT_SOURCE_DIR}/glxw/src
+    CACHE INTERNAL "Source directories of GLXW")
 
 # GLFW (Free, open source, portable framework for OpenGL application development).
 SET(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries" FORCE)
