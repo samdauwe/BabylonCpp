@@ -1,7 +1,30 @@
+#---------------------------------#
+#      General configuration      #
+#---------------------------------#
+
+# Version format
 version: 3.1.{build}
 
+# Branches to build
+branches:
+  # whitelist
+  only:
+    - master
+
+# Do not build on tags (GitHub and BitBucket)
+skip_tags: true
+
+# Start builds on tags only (GitHub and BitBucket)
+skip_non_tags: true
+
+#---------------------------------#
+#    Environment configuration    #
+#---------------------------------#
+
+# Build worker image (VM template)
 image: Visual Studio 2017
 
+# Scripts that run after cloning repository
 install:
   ############################################################################
   # All external dependencies are installed in C:\projects\deps
@@ -27,6 +50,18 @@ install:
   - move C:\projects\deps\cmake-* C:\projects\deps\cmake # Move to a version-agnostic directory
   - set PATH=C:\projects\deps\cmake\bin;%PATH%
   - cmake --version
+
+# Perform git clone with submodules
+clone_script:
+- cmd: >-
+    git clone -q --branch=%APPVEYOR_REPO_BRANCH% https://github.com/%APPVEYOR_REPO_NAME%.git %APPVEYOR_BUILD_FOLDER%
+    cd %APPVEYOR_BUILD_FOLDER%
+    git checkout -qf %APPVEYOR_REPO_COMMIT%
+    git submodule update --init --recursive
+
+#---------------------------------#
+#       Build configuration       #
+#---------------------------------#
 
 before_build:
   - cd C:\projects\babyloncpp
