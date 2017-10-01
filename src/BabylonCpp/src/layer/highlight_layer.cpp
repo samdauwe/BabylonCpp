@@ -180,7 +180,7 @@ void HighlightLayer::createTextureAndPostProcesses()
 
   if (_options.alphaBlendingMode == EngineConstants::ALPHA_COMBINE) {
     _horizontalBlurPostprocess = ::std::make_unique<GlowBlurPostProcess>(
-      "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize, 1,
+      "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize, 1.f,
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _horizontalBlurPostprocess->onApplyObservable.add(
       [&](Effect* effect, EventState&) {
@@ -189,7 +189,7 @@ void HighlightLayer::createTextureAndPostProcesses()
       });
 
     _verticalBlurPostprocess = ::std::make_unique<GlowBlurPostProcess>(
-      "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize, 1,
+      "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize, 1.f,
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _verticalBlurPostprocess->onApplyObservable.add(
       [&](Effect* effect, EventState&) {
@@ -199,7 +199,7 @@ void HighlightLayer::createTextureAndPostProcesses()
   }
   else {
     _horizontalBlurPostprocess = ::std::make_unique<GlowBlurPostProcess>(
-      "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize, 1,
+      "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize, 1.f,
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _horizontalBlurPostprocess->onApplyObservable.add(
       [&](Effect* effect, EventState&) {
@@ -208,7 +208,7 @@ void HighlightLayer::createTextureAndPostProcesses()
       });
 
     _verticalBlurPostprocess = ::std::make_unique<GlowBlurPostProcess>(
-      "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize, 1,
+      "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize, 1.f,
       nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _verticalBlurPostprocess->onApplyObservable.add(
       [&](Effect* effect, EventState&) {

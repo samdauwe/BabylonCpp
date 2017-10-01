@@ -2219,7 +2219,7 @@ void Engine::_rescaleTexture(InternalTexture* source,
 
   if (!_rescalePostProcess) {
     _rescalePostProcess = ::std::make_unique<PassPostProcess>(
-      "rescale", 1, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, this,
+      "rescale", 1.f, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, this,
       false, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   }
 

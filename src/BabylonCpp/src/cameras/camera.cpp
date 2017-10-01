@@ -313,7 +313,7 @@ Int32Array Camera::detachPostProcess(PostProcess* postProcess,
     // iterate descending, so can just splice as we go
     for (i = atIndices.size(); i-- > 0;) {
       if (_postProcesses[atIndices[i]] != postProcess) {
-        result.emplace_back(i);
+        result.emplace_back(static_cast<int32_t>(i));
         continue;
       }
       index = static_cast<int>(atIndices[i]);
@@ -700,13 +700,13 @@ Camera* Camera::GetConstructorFromName(const string_t& type,
                                        bool /*isStereoscopicSideBySide*/)
 {
   if (type == "ArcRotateCamera") {
-    return ArcRotateCamera::New(name, 0, 0, 1.f, Vector3::Zero(), scene);
+    return ArcRotateCamera::New(name, 0.f, 0.f, 1.f, Vector3::Zero(), scene);
   }
   else if (type == "FollowCamera") {
     return FollowCamera::New(name, Vector3::Zero(), scene);
   }
   else if (type == "ArcFollowCamera") {
-    return ArcFollowCamera::New(name, 0, 0, 1.f, nullptr, scene);
+    return ArcFollowCamera::New(name, 0.f, 0.f, 1.f, nullptr, scene);
   }
   else if (type == "FreeCamera") {
     return FreeCamera::New(name, Vector3::Zero(), scene);

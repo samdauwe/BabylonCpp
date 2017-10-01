@@ -2249,8 +2249,7 @@ GroundMesh* Mesh::CreateGroundFromHeightMap(
 Mesh* Mesh::CreateTube(
   const string_t& name, const vector_t<Vector3>& path, float radius,
   unsigned int tessellation,
-  const ::std::function<float(unsigned int i, unsigned int distance)>&
-    radiusFunction,
+  const ::std::function<float(unsigned int i, float distance)>& radiusFunction,
   unsigned int cap, Scene* scene, bool updatable, unsigned int sideOrientation,
   Mesh* instance)
 {

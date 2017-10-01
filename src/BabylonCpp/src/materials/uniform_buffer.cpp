@@ -153,7 +153,7 @@ void UniformBuffer::_fillAlignment(size_t size)
     size_t diff = _uniformLocationPointer - oldPointer;
 
     for (size_t i = 0; i < diff; ++i) {
-      _data.emplace_back(0);
+      _data.emplace_back(0.f);
     }
   }
 }

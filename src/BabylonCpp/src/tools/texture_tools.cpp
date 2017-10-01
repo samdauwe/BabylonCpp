@@ -624,7 +624,7 @@ unique_ptr_t<Texture> TextureTools::CreateResizedCopy(Texture* texture,
                                               false,                     //
                                               texture->_samplingMode,    //
                                               false                      //
-                                              );
+    );
 
   rtt->wrapU                     = texture->wrapU;
   rtt->wrapV                     = texture->wrapV;
@@ -644,7 +644,7 @@ unique_ptr_t<Texture> TextureTools::CreateResizedCopy(Texture* texture,
   texture->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
 
   auto passPostProcess = ::std::make_unique<PassPostProcess>(
-    "pass", 1, nullptr,
+    "pass", 1.f, nullptr,
     useBilinearMode ? TextureConstants::BILINEAR_SAMPLINGMODE :
                       TextureConstants::NEAREST_SAMPLINGMODE,
     engine, false, EngineConstants::TEXTURETYPE_UNSIGNED_INT);

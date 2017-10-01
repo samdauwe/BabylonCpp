@@ -1278,8 +1278,7 @@ public:
   static Mesh* CreateTube(
     const string_t& name, const vector_t<Vector3>& path, float radius = 1.f,
     unsigned int tessellation = 64,
-    const ::std::function<float(unsigned int i, unsigned int distance)>&
-      radiusFunction
+    const ::std::function<float(unsigned int i, float distance)>& radiusFunction
     = nullptr,
     unsigned int cap = Mesh::NO_CAP, Scene* = nullptr, bool updatable = false,
     unsigned int sideOrientation = Mesh::DEFAULTSIDE, Mesh* instance = nullptr);

@@ -340,7 +340,7 @@ Mesh* CSG::CSG::buildMeshGeometry(const string_t& name, Scene* scene,
           vertexIdxDefined       = true;
         }
 
-        indices.emplace_back(vertex_idx);
+        indices.emplace_back(static_cast<unsigned int>(vertex_idx));
 
         // indexStart
         subMesh_obj[0] = std::min(currentIndex, subMesh_obj[0]);
