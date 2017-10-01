@@ -48,7 +48,8 @@ Vec3 RayCollisionDetector::_triangleIntersect(const Vec3& origin,
 {
   Vec3 diff, edge1, edge2, normal, result;
 
-  Vertex _a = face.a, _b = face.b, _c = face.c;
+  Vertex _a = static_cast<float>(face.a), _b = static_cast<float>(face.b),
+         _c = static_cast<float>(face.c);
   Vec3 a(_a.x, _a.y, _a.z);
   Vec3 b(_b.x, _b.y, _b.z);
   Vec3 c(_c.x, _c.y, _c.z);

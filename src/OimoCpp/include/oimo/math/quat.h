@@ -5,12 +5,14 @@
 #include <memory>
 #include <vector>
 
+#include <oimo/oimo_api.h>
+
 namespace OIMO {
 
 class Mat33;
 class Vec3;
 
-class Quat {
+class OIMO_SHARED_EXPORT Quat {
 
 public:
   Quat(float x = 0.f, float y = 0.f, float z = 0.f, float w = 1.f);

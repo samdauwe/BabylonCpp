@@ -1,6 +1,13 @@
 #ifndef OIMO_COLLISION_SHAPE_SHAPE_H
 #define OIMO_COLLISION_SHAPE_SHAPE_H
 
+// -- Disable warnings -- //
+#ifdef _MSC_VER
+// 'identifier' : class 'type' needs to have dll-interface to be used by clients
+// of class 'type2'
+#pragma warning(disable : 4251)
+#endif
+
 #include <memory>
 
 #include <oimo/collision/broadphase/proxy.h>

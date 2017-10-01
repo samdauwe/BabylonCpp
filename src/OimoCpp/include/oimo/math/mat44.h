@@ -3,9 +3,11 @@
 
 #include <array>
 
+#include <oimo/oimo_api.h>
+
 namespace OIMO {
 
-class Mat44 {
+class OIMO_SHARED_EXPORT Mat44 {
 
 public:
   Mat44(float e00 = 1.f, float e01 = 0.f, float e02 = 0.f, float e03 = 0.f, //

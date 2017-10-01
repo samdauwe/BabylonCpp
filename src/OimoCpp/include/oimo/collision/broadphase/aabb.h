@@ -4,6 +4,7 @@
 #include <array>
 #include <vector>
 
+#include <oimo/oimo_api.h>
 #include <oimo/shape/vertex.h>
 
 namespace OIMO {
@@ -13,7 +14,7 @@ class Vec3;
 /**
  * @brief An axis-aligned bounding box.
  */
-class AABB {
+class OIMO_SHARED_EXPORT AABB {
 
 public:
   // AABB aproximation

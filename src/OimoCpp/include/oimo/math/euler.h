@@ -1,15 +1,24 @@
 #ifndef OIMO_MATH_EULER_H
 #define OIMO_MATH_EULER_H
 
+// -- Disable warnings -- //
+#ifdef _MSC_VER
+// 'identifier' : class 'type' needs to have dll-interface to be used by clients
+// of class 'type2'
+#pragma warning(disable : 4251)
+#endif
+
 #include <functional>
 #include <memory>
+
+#include <oimo/oimo_api.h>
 
 namespace OIMO {
 
 class Mat33;
 class Quat;
 
-class Euler {
+class OIMO_SHARED_EXPORT Euler {
 
 public:
   enum class RotationOrder {

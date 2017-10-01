@@ -1,6 +1,8 @@
 #ifndef OIMO_COLLISION_BROADPHASE_PROXY_H
 #define OIMO_COLLISION_BROADPHASE_PROXY_H
 
+#include <oimo/oimo_api.h>
+
 namespace OIMO {
 
 class AABB;
@@ -10,7 +12,7 @@ class Shape;
  * @brief A proxy is used for broad-phase collecting pairs that can be
  * colliding.
  */
-class Proxy {
+class OIMO_SHARED_EXPORT Proxy {
 
 public:
   static unsigned int s_proxyID;

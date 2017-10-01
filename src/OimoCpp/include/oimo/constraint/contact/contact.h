@@ -1,6 +1,13 @@
 #ifndef OIMO_CONSTRAINT_JOINT_BASE_ANGULAR_CONSTRAINT_H
 #define OIMO_CONSTRAINT_JOINT_BASE_ANGULAR_CONSTRAINT_H
 
+// -- Disable warnings -- //
+#ifdef _MSC_VER
+// 'identifier' : class 'type' needs to have dll-interface to be used by clients
+// of class 'type2'
+#pragma warning(disable : 4251)
+#endif
+
 #include <array>
 
 #include <oimo/constraint/contact/impulse_data_buffer.h>

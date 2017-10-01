@@ -6,12 +6,14 @@
 #include <memory>
 #include <utility>
 
+#include <oimo/oimo_api.h>
+
 namespace OIMO {
 
 class Quat;
 class Vec3;
 
-class Mat33 {
+class OIMO_SHARED_EXPORT Mat33 {
 
 public:
   Mat33(float e00 = 1.f, float e01 = 0.f, float e02 = 0.f, //
