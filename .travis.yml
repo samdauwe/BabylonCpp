@@ -32,7 +32,6 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - libglew-dev
             - libxi-dev
             - libxcursor-dev
             - libxinerama-dev
@@ -51,7 +50,6 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - libglew-dev
             - libxi-dev
             - libxcursor-dev
             - libxinerama-dev
