@@ -28,6 +28,9 @@ install:
   - set PATH=C:\projects\deps\cmake\bin;%PATH%
   - cmake --version
 
+before_build:
+  - cd C:\projects\babyloncpp
+
 build_script:
   - python cmake_build.py all
   
