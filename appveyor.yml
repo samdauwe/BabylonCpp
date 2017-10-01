@@ -65,4 +65,16 @@ before_build:
 
 build_script:
   - python cmake_build.py all
+
+#---------------------------------#
+#       Build notifications       #
+#---------------------------------#
+notifications:
+- provider: Email
+  to:
+  - sam.dauwe@gmail.com
+  subject: BabylonCpp build {{buildVersion}} - {{status}}
+  on_build_success: false
+  on_build_failure: true
+  on_build_status_changed: true
   
