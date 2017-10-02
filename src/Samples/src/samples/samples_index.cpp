@@ -32,6 +32,7 @@
 #include <babylon/samples/mesh/extrusion_scene.h>
 #include <babylon/samples/mesh/ico_sphere_scene.h>
 #include <babylon/samples/mesh/lathe_scene.h>
+#include <babylon/samples/mesh/lines_mesh_spiral_scene.h>
 #include <babylon/samples/mesh/merged_meshes_scene.h>
 #include <babylon/samples/mesh/mesh_normals_scene.h>
 #include <babylon/samples/mesh/polygonmesh/polygon_mesh_bird_scene.h>
@@ -134,7 +135,13 @@ SamplesIndex::SamplesIndex()
     = ::std::make_tuple(true,
                         [](ICanvas* iCanvas) {                             //
                           return ::std::make_unique<LightsScene>(iCanvas); //
-                        });                                                //
+                        });
+  // Lines Mesh Spiral Scene
+  _samples["LinesMeshSpiralScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                      //
+      return ::std::make_unique<LinesMeshSpiralScene>(iCanvas); //
+    });                                                         //
   // Lorenz Attractor Scene
   _samples["LorenzAttractorScene"] = ::std::make_tuple(
     true,
