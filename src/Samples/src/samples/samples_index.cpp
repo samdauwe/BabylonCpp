@@ -26,6 +26,7 @@
 #include <babylon/samples/materials/shader_material_wolfenstein_3d_scene.h>
 #include <babylon/samples/mesh/basic_elements_scene.h>
 #include <babylon/samples/mesh/basic_scene.h>
+#include <babylon/samples/mesh/circle_curves_from_beziers.h>
 #include <babylon/samples/mesh/cuboid_scene.h>
 #include <babylon/samples/mesh/curved_helix_meshes_scene.h>
 #include <babylon/samples/mesh/extruded_polygon_scene.h>
@@ -69,7 +70,12 @@ SamplesIndex::SamplesIndex()
   // Basic Scene
   _samples["BasicScene"] = ::std::make_tuple(true, [](ICanvas* iCanvas) { //
     return ::std::make_unique<BasicScene>(iCanvas);                       //
-  });                                                                     //
+  });
+  // Circle Curves From Beziers Scene
+  _samples["CircleCurvesFromBeziersScene"]
+    = ::std::make_tuple(true, [](ICanvas* iCanvas) {                      //
+        return ::std::make_unique<CircleCurvesFromBeziersScene>(iCanvas); //
+      });                                                                 //
   // Cuboid Scene
   _samples["CuboidScene"]
     = ::std::make_tuple(true,
