@@ -26,8 +26,12 @@ public:
   void
   setOnAfterRender(const ::std::function<void(Layer*, EventState&)>& callback);
 
+  void _rebuild();
   void render();
   void dispose(bool doNotRecurse = false) override;
+
+private:
+  void _createIndexBuffer();
 
 public:
   // Events

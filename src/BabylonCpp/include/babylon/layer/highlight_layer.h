@@ -74,6 +74,8 @@ public:
    */
   RenderTargetTexture* mainTexture() const;
 
+  void _rebuild();
+
   /**
    * @brief Renders the glowing part of the scene by blending the blurred
    * glowing meshes on top of the rendered scene.
@@ -134,6 +136,8 @@ protected:
                  const IHighlightLayerOptions& options);
 
 private:
+  void _createIndexBuffer();
+
   /**
    * @brief Creates the render target textures and post processes used in the
    * highlight layer.

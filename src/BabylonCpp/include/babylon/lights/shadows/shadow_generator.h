@@ -163,7 +163,8 @@ private:
   void _initializeBlurRTTAndPostProcesses();
   void _renderForShadowMap(const vector_t<SubMesh*>& opaqueSubMeshes,
                            const vector_t<SubMesh*>& alphaTestSubMeshes,
-                           const vector_t<SubMesh*>& transparentSubMeshes);
+                           const vector_t<SubMesh*>& transparentSubMeshes,
+                           const vector_t<SubMesh*>& depthOnlySubMeshes);
   void _renderSubMeshForShadowMap(SubMesh* subMesh);
   void _applyFilterValues();
   void _disposeBlurPostProcesses();

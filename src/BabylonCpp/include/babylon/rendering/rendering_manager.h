@@ -38,13 +38,15 @@ public:
   RenderingManager(Scene* scene);
   ~RenderingManager();
 
-  void
-  render(::std::function<void(const vector_t<SubMesh*>& opaqueSubMeshes,
-                              const vector_t<SubMesh*>& transparentSubMeshes,
-                              const vector_t<SubMesh*>& alphaTestSubMeshes)>
-           customRenderFunction,
-         const vector_t<AbstractMesh*>& activeMeshes, bool renderParticles,
-         bool renderSprites);
+  void render(
+    ::std::function<void(const vector_t<SubMesh*>& opaqueSubMeshes,
+                         const vector_t<SubMesh*>& alphaTestSubMeshes,
+                         const vector_t<SubMesh*>& transparentSubMeshes,
+                         const vector_t<SubMesh*>& depthOnlySubMeshes,
+                         const ::std::function<void()>& beforeTransparents)>
+      customRenderFunction,
+    const vector_t<AbstractMesh*>& activeMeshes, bool renderParticles,
+    bool renderSprites);
   void reset();
   void dispose();
   void dispatchSprites(SpriteManager* spriteManager);

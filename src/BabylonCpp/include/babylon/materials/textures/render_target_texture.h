@@ -125,8 +125,10 @@ public:
   unsigned int coordinatesMode;
   Camera* activeCamera;
   ::std::function<void(const vector_t<SubMesh*>& opaqueSubMeshes,
+                       const vector_t<SubMesh*>& alphaTestSubMeshes,
                        const vector_t<SubMesh*>& transparentSubMeshes,
-                       const vector_t<SubMesh*>& alphaTestSubMeshes)>
+                       const vector_t<SubMesh*>& depthOnlySubMeshes,
+                       const ::std::function<void()>& beforeTransparents)>
     customRenderFunction;
   bool useCameraPostProcesses;
   bool ignoreCameraViewport;

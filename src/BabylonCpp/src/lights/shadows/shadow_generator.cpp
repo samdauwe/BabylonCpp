@@ -224,6 +224,10 @@ bool ShadowGenerator::usePoissonSampling() const
 
 void ShadowGenerator::setUsePoissonSampling(bool value)
 {
+  if (!value && filter() != ShadowGenerator::FILTER_POISSONSAMPLING) {
+    return;
+  }
+
   setFilter(value ? ShadowGenerator::FILTER_POISSONSAMPLING :
                     ShadowGenerator::FILTER_NONE);
 }
@@ -267,6 +271,10 @@ bool ShadowGenerator::useExponentialShadowMap() const
 
 void ShadowGenerator::setUseExponentialShadowMap(bool value)
 {
+  if (!value && filter() != ShadowGenerator::FILTER_EXPONENTIALSHADOWMAP) {
+    return;
+  }
+
   setFilter(value ? ShadowGenerator::FILTER_EXPONENTIALSHADOWMAP :
                     ShadowGenerator::FILTER_NONE);
 }
@@ -278,6 +286,10 @@ bool ShadowGenerator::useBlurExponentialShadowMap() const
 
 void ShadowGenerator::setUseBlurExponentialShadowMap(bool value)
 {
+  if (!value && filter() != ShadowGenerator::FILTER_BLUREXPONENTIALSHADOWMAP) {
+    return;
+  }
+
   setFilter(value ? ShadowGenerator::FILTER_BLUREXPONENTIALSHADOWMAP :
                     ShadowGenerator::FILTER_NONE);
 }
@@ -289,6 +301,10 @@ bool ShadowGenerator::useCloseExponentialShadowMap() const
 
 void ShadowGenerator::setUseCloseExponentialShadowMap(bool value)
 {
+  if (!value && filter() != ShadowGenerator::FILTER_CLOSEEXPONENTIALSHADOWMAP) {
+    return;
+  }
+
   setFilter(value ? ShadowGenerator::FILTER_CLOSEEXPONENTIALSHADOWMAP :
                     ShadowGenerator::FILTER_NONE);
 }
@@ -300,6 +316,11 @@ bool ShadowGenerator::useBlurCloseExponentialShadowMap() const
 
 void ShadowGenerator::setUseBlurCloseExponentialShadowMap(bool value)
 {
+  if (!value
+      && filter() != ShadowGenerator::FILTER_BLURCLOSEEXPONENTIALSHADOWMAP) {
+    return;
+  }
+
   setFilter(value ? ShadowGenerator::FILTER_BLURCLOSEEXPONENTIALSHADOWMAP :
                     ShadowGenerator::FILTER_NONE);
 }
@@ -364,7 +385,8 @@ void ShadowGenerator::_initializeShadowMap()
   _shadowMap->wrapV                     = TextureConstants::CLAMP_ADDRESSMODE;
   _shadowMap->anisotropicFilteringLevel = 1;
   _shadowMap->updateSamplingMode(TextureConstants::BILINEAR_SAMPLINGMODE);
-  _shadowMap->renderParticles = false;
+  _shadowMap->renderParticles      = false;
+  _shadowMap->ignoreCameraViewport = true;
 
   // Record Face Index before render.
   _shadowMap->onBeforeRenderObservable.add([this](int* faceIndex, EventState&) {
@@ -374,10 +396,12 @@ void ShadowGenerator::_initializeShadowMap()
   // Custom render function.
   _shadowMap->customRenderFunction
     = [this](const vector_t<SubMesh*>& opaqueSubMeshes,
+             const vector_t<SubMesh*>& alphaTestSubMeshes,
              const vector_t<SubMesh*>& transparentSubMeshes,
-             const vector_t<SubMesh*>& alphaTestSubMeshes) {
+             const vector_t<SubMesh*>& depthOnlySubMeshes,
+             const ::std::function<void()>& /*beforeTransparents*/) {
         _renderForShadowMap(opaqueSubMeshes, transparentSubMeshes,
-                            alphaTestSubMeshes);
+                            alphaTestSubMeshes, depthOnlySubMeshes);
       };
 
   // Blur if required afer render.
@@ -392,7 +416,8 @@ void ShadowGenerator::_initializeShadowMap()
     }
 
     _scene->postProcessManager->directRender(
-      _blurPostProcesses, getShadowMapForRendering()->getInternalTexture());
+      _blurPostProcesses, getShadowMapForRendering()->getInternalTexture(),
+      true);
   });
 
   // Clear according to the chosen filter.
@@ -473,8 +498,19 @@ void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
 void ShadowGenerator::_renderForShadowMap(
   const vector_t<SubMesh*>& opaqueSubMeshes,
   const vector_t<SubMesh*>& alphaTestSubMeshes,
-  const vector_t<SubMesh*>& transparentSubMeshes)
+  const vector_t<SubMesh*>& transparentSubMeshes,
+  const vector_t<SubMesh*>& depthOnlySubMeshes)
 {
+  auto engine = _scene->getEngine();
+
+  if (!depthOnlySubMeshes.empty()) {
+    engine->setColorWrite(false);
+    for (auto& depthOnlySubMesh : depthOnlySubMeshes) {
+      _renderSubMeshForShadowMap(depthOnlySubMesh);
+    }
+    engine->setColorWrite(true);
+  }
+
   for (const auto& opaqueSubMesh : opaqueSubMeshes) {
     _renderSubMeshForShadowMap(opaqueSubMesh);
   }

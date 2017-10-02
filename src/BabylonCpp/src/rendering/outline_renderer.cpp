@@ -1,6 +1,7 @@
 #include <babylon/rendering/outline_renderer.h>
 
 #include <babylon/bones/skeleton.h>
+#include <babylon/cameras/camera.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -42,6 +43,14 @@ void OutlineRenderer::render(SubMesh* subMesh, _InstancesBatch* batch,
   auto material = subMesh->getMaterial();
 
   engine->enableEffect(_effect);
+
+  // Logarithmic depth
+  if (material->useLogarithmicDepth()) {
+    _effect->setFloat(
+      "logarithmicDepthConstant",
+      2.f / (::std::log(_scene->activeCamera->maxZ + 1.f) / Math::LN2));
+  }
+
   _effect->setFloat("offset", useOverlay ? 0 : mesh->outlineWidth);
   _effect->setColor4("color",
                      useOverlay ? mesh->overlayColor : mesh->outlineColor,
@@ -85,16 +94,23 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
   auto mesh     = subMesh->getMesh();
   auto material = subMesh->getMaterial();
 
-  // Alpha test
-  if (material && material->needAlphaTesting()) {
-    defines.emplace_back("#define ALPHATEST");
-    if (mesh->isVerticesDataPresent(VertexBuffer::UVKind)) {
-      attribs.emplace_back(VertexBuffer::UVKindChars);
-      defines.emplace_back("#define UV1");
+  if (material) {
+    // Alpha test
+    if (material->needAlphaTesting()) {
+      defines.emplace_back("#define ALPHATEST");
+      if (mesh->isVerticesDataPresent(VertexBuffer::UVKind)) {
+        attribs.emplace_back(VertexBuffer::UVKindChars);
+        defines.emplace_back("#define UV1");
+      }
+      if (mesh->isVerticesDataPresent(VertexBuffer::UV2Kind)) {
+        attribs.emplace_back(VertexBuffer::UV2KindChars);
+        defines.emplace_back("#define UV2");
+      }
     }
-    if (mesh->isVerticesDataPresent(VertexBuffer::UV2Kind)) {
-      attribs.emplace_back(VertexBuffer::UV2KindChars);
-      defines.emplace_back("#define UV2");
+
+    // Logarithmic depth
+    if (material->useLogarithmicDepth()) {
+      defines.emplace_back("#define LOGARITHMICDEPTH");
     }
   }
 
@@ -131,11 +147,12 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
     _cachedDefines = join;
 
     EffectCreationOptions options;
-    options.attributes    = ::std::move(attribs);
-    options.uniformsNames = {"world",         "mBones", "viewProjection",
-                             "diffuseMatrix", "offset", "color"};
-    options.samplers      = {"diffuseSampler"};
-    options.defines       = ::std::move(join);
+    options.attributes = ::std::move(attribs);
+    options.uniformsNames
+      = {"world",  "mBones", "viewProjection",          "diffuseMatrix",
+         "offset", "color",  "logarithmicDepthConstant"};
+    options.samplers = {"diffuseSampler"};
+    options.defines  = ::std::move(join);
 
     _effect = _scene->getEngine()->createEffect("outline", options,
                                                 _scene->getEngine());

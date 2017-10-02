@@ -22,8 +22,8 @@ public:
   ~WaterMaterial();
 
   // Get / Set
-  bool useLogarithmicDepth() const;
-  void setUseLogarithmicDepth(bool value);
+  bool useLogarithmicDepth() const override;
+  void setUseLogarithmicDepth(bool value) override;
   RenderTargetTexture* refractionTexture();
   RenderTargetTexture* reflectionTexture();
 

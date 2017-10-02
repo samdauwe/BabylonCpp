@@ -13,6 +13,7 @@ public:
   BoundingBoxRenderer(Scene* scene);
   virtual ~BoundingBoxRenderer();
 
+  void _rebuild();
   void reset();
   void render();
   void renderOcclusionBoundingBox(AbstractMesh* mesh);
@@ -20,6 +21,7 @@ public:
 
 private:
   void _prepareResources();
+  void _createIndexBuffer();
 
 public:
   Color3 frontColor;

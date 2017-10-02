@@ -45,8 +45,10 @@ void RenderingManager::_clearDepthStencilBuffer(bool depth, bool stencil)
 
 void RenderingManager::render(
   ::std::function<void(const vector_t<SubMesh*>& opaqueSubMeshes,
+                       const vector_t<SubMesh*>& alphaTestSubMeshes,
                        const vector_t<SubMesh*>& transparentSubMeshes,
-                       const vector_t<SubMesh*>& alphaTestSubMeshes)>
+                       const vector_t<SubMesh*>& depthOnlySubMeshes,
+                       const ::std::function<void()>& beforeTransparents)>
     customRenderFunction,
   const vector_t<AbstractMesh*>& activeMeshes, bool renderParticles,
   bool renderSprites)

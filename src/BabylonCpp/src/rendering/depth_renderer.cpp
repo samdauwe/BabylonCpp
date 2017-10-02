@@ -100,18 +100,29 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type)
     }
   };
 
-  _depthMap->customRenderFunction
-    = [renderSubMesh](const vector_t<SubMesh*>& opaqueSubMeshes,
-                      const vector_t<SubMesh*>& /*transparentSubMeshes*/,
-                      const vector_t<SubMesh*>& alphaTestSubMeshes) {
-        for (auto& opaqueSubMesh : opaqueSubMeshes) {
-          renderSubMesh(opaqueSubMesh);
-        }
+  _depthMap->customRenderFunction = [engine, renderSubMesh](
+    const vector_t<SubMesh*>& opaqueSubMeshes,
+    const vector_t<SubMesh*>& alphaTestSubMeshes,
+    const vector_t<SubMesh*>& /*transparentSubMeshes*/,
+    const vector_t<SubMesh*>& depthOnlySubMeshes,
+    const ::std::function<void()>& /*beforeTransparents*/) {
 
-        for (auto& alphaTestSubMesh : alphaTestSubMeshes) {
-          renderSubMesh(alphaTestSubMesh);
-        }
-      };
+    if (!depthOnlySubMeshes.empty()) {
+      engine->setColorWrite(false);
+      for (auto& depthOnlySubMesh : depthOnlySubMeshes) {
+        renderSubMesh(depthOnlySubMesh);
+      }
+      engine->setColorWrite(true);
+    }
+
+    for (auto& opaqueSubMesh : opaqueSubMeshes) {
+      renderSubMesh(opaqueSubMesh);
+    }
+
+    for (auto& alphaTestSubMesh : alphaTestSubMeshes) {
+      renderSubMesh(alphaTestSubMesh);
+    }
+  };
 }
 
 DepthRenderer::~DepthRenderer()

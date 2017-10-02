@@ -44,8 +44,13 @@ public:
 
   bool backFaceCulling() const;
   void setBackFaceCulling(bool value);
+  bool needDepthPrePass() const;
+  void setNeedDepthPrePass(bool value);
   bool fogEnabled() const;
   void setFogEnabled(bool value);
+
+  virtual bool useLogarithmicDepth() const;
+  virtual void setUseLogarithmicDepth(bool value);
 
   virtual void setAmbientColor(const Color3& color);
   virtual void setDiffuseColor(const Color3& color);
@@ -180,6 +185,7 @@ private:
   // Callbacks
   ::std::function<void()> _beforeRenderCallback;
   // Properties
+  bool _needDepthPrePass;
   bool _fogEnabled;
   bool _useUBO;
   Scene* _scene;

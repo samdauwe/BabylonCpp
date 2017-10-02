@@ -34,8 +34,8 @@ public:
    */
   virtual const char* getClassName() const;
 
-  bool useLogarithmicDepth() const;
-  void setUseLogarithmicDepth(bool value);
+  bool useLogarithmicDepth() const override;
+  void setUseLogarithmicDepth(bool value) override;
   bool needAlphaBlending() override;
   bool needAlphaTesting() override;
   BaseTexture* getAlphaTestTexture() override;

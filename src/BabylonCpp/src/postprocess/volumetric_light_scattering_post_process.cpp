@@ -304,9 +304,19 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
 
   _volumetricLightScatteringRTT->customRenderFunction = [&](
     const vector_t<SubMesh*>& opaqueSubMeshes,
+    const vector_t<SubMesh*>& alphaTestSubMeshes,
     const vector_t<SubMesh*>& transparentSubMeshes,
-    const vector_t<SubMesh*>& alphaTestSubMeshes) {
+    const vector_t<SubMesh*>& depthOnlySubMeshes,
+    const ::std::function<void()>& /*beforeTransparents*/) {
     auto pEngine = scene->getEngine();
+
+    if (!depthOnlySubMeshes.empty()) {
+      engine->setColorWrite(false);
+      for (auto& depthOnlySubMesh : depthOnlySubMeshes) {
+        renderSubMesh(depthOnlySubMesh);
+      }
+      engine->setColorWrite(true);
+    }
 
     for (const auto& opaqueSubMesh : opaqueSubMeshes) {
       renderSubMesh(opaqueSubMesh);

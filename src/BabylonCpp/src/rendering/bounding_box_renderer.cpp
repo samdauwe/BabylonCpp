@@ -48,9 +48,21 @@ void BoundingBoxRenderer::_prepareResources()
     engine, boxdata->positions, VertexBuffer::PositionKind, false);
   _vertexBuffersMap[VertexBuffer::PositionKindChars]
     = _vertexBuffers[VertexBuffer::PositionKind].get();
+  _createIndexBuffer();
+}
+
+void BoundingBoxRenderer::_createIndexBuffer()
+{
+  auto engine = _scene->getEngine();
   const Uint32Array indices{0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6,
                             6, 7, 7, 4, 0, 7, 1, 6, 2, 5, 3, 4};
   _indexBuffer = engine->createIndexBuffer(indices);
+}
+
+void BoundingBoxRenderer::_rebuild()
+{
+  _vertexBuffers[VertexBuffer::PositionKind]->_rebuild();
+  _createIndexBuffer();
 }
 
 void BoundingBoxRenderer::reset()

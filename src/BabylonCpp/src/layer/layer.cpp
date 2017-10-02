@@ -37,9 +37,7 @@ Layer::Layer(const string_t& name, const string_t& imgUrl, Scene* scene,
     = ::std::make_unique<VertexBuffer>(
       engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
-  // Indices
-  Uint32Array indices{0, 1, 2, 0, 2, 3};
-  _indexBuffer = engine->createIndexBuffer(indices);
+  _createIndexBuffer();
 
   // Effects
   {
@@ -93,6 +91,21 @@ void Layer::setOnAfterRender(
     onAfterRenderObservable.remove(_onAfterRenderObserver);
   }
   _onAfterRenderObserver = onAfterRenderObservable.add(callback);
+}
+
+void Layer::_createIndexBuffer()
+{
+  auto engine = _scene->getEngine();
+
+  // Indices
+  Uint32Array indices{0, 1, 2, 0, 2, 3};
+  _indexBuffer = engine->createIndexBuffer(indices);
+}
+
+void Layer::_rebuild()
+{
+  _vertexBuffers[VertexBuffer::PositionKindChars]->_rebuild();
+  _createIndexBuffer();
 }
 
 void Layer::render()

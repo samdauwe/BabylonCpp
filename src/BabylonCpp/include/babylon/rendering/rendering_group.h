@@ -54,13 +54,15 @@ public:
    * @param customRenderFunction Used to override the default render behaviour
    * of the group.
    */
-  void
-  render(::std::function<void(const vector_t<SubMesh*>& opaqueSubMeshes,
-                              const vector_t<SubMesh*>& transparentSubMeshes,
-                              const vector_t<SubMesh*>& alphaTestSubMeshes)>&
-           customRenderFunction,
-         bool renderSprites, bool renderParticles,
-         const vector_t<AbstractMesh*> activeMeshes);
+  void render(
+    ::std::function<void(const vector_t<SubMesh*>& opaqueSubMeshes,
+                         const vector_t<SubMesh*>& alphaTestSubMeshes,
+                         const vector_t<SubMesh*>& transparentSubMeshes,
+                         const vector_t<SubMesh*>& depthOnlySubMeshes,
+                         const ::std::function<void()>& beforeTransparents)>&
+      customRenderFunction,
+    bool renderSprites, bool renderParticles,
+    const vector_t<AbstractMesh*> activeMeshes);
 
   /**
    * Build in function which can be applied to ensure meshes of a special queue
@@ -164,6 +166,7 @@ private:
   vector_t<SubMesh*> _opaqueSubMeshes;
   vector_t<SubMesh*> _transparentSubMeshes;
   vector_t<SubMesh*> _alphaTestSubMeshes;
+  vector_t<SubMesh*> _depthOnlySubMeshes;
   vector_t<IParticleSystem*> _particleSystems;
   vector_t<SpriteManager*> _spriteManagers;
   size_t _activeVertices;

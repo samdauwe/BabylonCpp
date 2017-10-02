@@ -34,6 +34,7 @@ Material::Material(const string_t& iName, Scene* scene, bool /*doNotAdd*/)
     , _uniformBuffer{::std::make_unique<UniformBuffer>(scene->getEngine())}
     , _onDisposeObserver{nullptr}
     , _onBindObserver{nullptr}
+    , _needDepthPrePass{false}
     , _fogEnabled{true}
     , _useUBO{false}
     , _scene{scene}
@@ -88,6 +89,22 @@ void Material::setBackFaceCulling(bool value)
   markAsDirty(Material::TextureDirtyFlag);
 }
 
+bool Material::needDepthPrePass() const
+{
+  return _needDepthPrePass;
+}
+
+void Material::setNeedDepthPrePass(bool value)
+{
+  if (_needDepthPrePass == value) {
+    return;
+  }
+  _needDepthPrePass = value;
+  if (_needDepthPrePass) {
+    checkReadyOnEveryCall = true;
+  }
+}
+
 bool Material::fogEnabled() const
 {
   return _fogEnabled;
@@ -100,6 +117,15 @@ void Material::setFogEnabled(bool value)
   }
   _fogEnabled = value;
   markAsDirty(Material::MiscDirtyFlag);
+}
+
+bool Material::useLogarithmicDepth() const
+{
+  return false;
+}
+
+void Material::setUseLogarithmicDepth(bool /*value*/)
+{
 }
 
 void Material::setAmbientColor(const Color3& /*color*/)

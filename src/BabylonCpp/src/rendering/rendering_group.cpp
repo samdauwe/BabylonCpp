@@ -33,6 +33,7 @@ RenderingGroup::RenderingGroup(
   _opaqueSubMeshes.reserve(256);
   _transparentSubMeshes.reserve(256);
   _alphaTestSubMeshes.reserve(256);
+  _depthOnlySubMeshes.reserve(256);
   _particleSystems.reserve(256);
   _spriteManagers.reserve(256);
 
@@ -97,19 +98,30 @@ void RenderingGroup::setTransparentSortCompareFn(
 
 void RenderingGroup::render(
   ::std::function<void(const vector_t<SubMesh*>& opaqueSubMeshes,
+                       const vector_t<SubMesh*>& alphaTestSubMeshes,
                        const vector_t<SubMesh*>& transparentSubMeshes,
-                       const vector_t<SubMesh*>& alphaTestSubMeshes)>&
+                       const vector_t<SubMesh*>& depthOnlySubMeshes,
+                       const ::std::function<void()>& beforeTransparents)>&
     customRenderFunction,
   bool renderSprites, bool renderParticles,
   const vector_t<AbstractMesh*> activeMeshes)
 {
   if (customRenderFunction) {
     customRenderFunction(_opaqueSubMeshes, _alphaTestSubMeshes,
-                         _transparentSubMeshes);
+                         _transparentSubMeshes, _depthOnlySubMeshes, nullptr);
     return;
   }
 
   auto engine = _scene->getEngine();
+
+  // Depth only
+  if (!_depthOnlySubMeshes.empty()) {
+    engine->setAlphaTesting(true);
+    engine->setColorWrite(false);
+    _renderAlphaTest(_depthOnlySubMeshes);
+    engine->setAlphaTesting(false);
+    engine->setColorWrite(true);
+  }
 
   // Opaque
   if (!_opaqueSubMeshes.empty()) {
@@ -201,6 +213,20 @@ void RenderingGroup::renderSorted(
     [&sortCompareFn](SubMesh* a, SubMesh* b) { return sortCompareFn(a, b); });
 
   for (auto& subMesh : sortedArray) {
+    if (transparent) {
+      auto material = subMesh->getMaterial();
+
+      if (material->needDepthPrePass()) {
+        auto engine = material->getScene()->getEngine();
+        engine->setColorWrite(false);
+        engine->setAlphaTesting(true);
+        engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
+        subMesh->render(false);
+        engine->setAlphaTesting(false);
+        engine->setColorWrite(true);
+      }
+    }
+
     subMesh->render(transparent);
   }
 }
@@ -257,6 +283,7 @@ void RenderingGroup::prepare()
   _opaqueSubMeshes.clear();
   _transparentSubMeshes.clear();
   _alphaTestSubMeshes.clear();
+  _depthOnlySubMeshes.clear();
   _particleSystems.clear();
   _spriteManagers.clear();
   _edgesRenderers.clear();
@@ -267,6 +294,7 @@ void RenderingGroup::dispose()
   _opaqueSubMeshes.clear();
   _transparentSubMeshes.clear();
   _alphaTestSubMeshes.clear();
+  _depthOnlySubMeshes.clear();
   _particleSystems.clear();
   _spriteManagers.clear();
   _edgesRenderers.clear();
@@ -282,9 +310,15 @@ void RenderingGroup::dispatch(SubMesh* subMesh)
     _transparentSubMeshes.emplace_back(subMesh);
   }
   else if (material->needAlphaTesting()) { // Alpha test
+    if (material->needDepthPrePass()) {
+      _depthOnlySubMeshes.emplace_back(subMesh);
+    }
     _alphaTestSubMeshes.emplace_back(subMesh);
   }
   else {
+    if (material->needDepthPrePass()) {
+      _depthOnlySubMeshes.emplace_back(subMesh);
+    }
     _opaqueSubMeshes.emplace_back(subMesh); // Opaque
   }
 

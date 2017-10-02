@@ -178,12 +178,16 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
   if (_cachedDefines != join) {
     _cachedDefines = join;
 
+    const unordered_map_t<string_t, unsigned int> indexParameters{
+      {"buffersCount", _enablePosition ? 3u : 2u}};
+
     EffectCreationOptions options;
     options.attributes = ::std::move(attribs);
     options.uniformsNames
       = {"world", "mBones", "viewProjection", "diffuseMatrix", "view"};
-    options.samplers = {"diffuseSampler"};
-    options.defines  = ::std::move(join);
+    options.samplers        = {"diffuseSampler"};
+    options.defines         = ::std::move(join);
+    options.indexParameters = ::std::move(indexParameters);
 
     _effect = _scene->getEngine()->createEffect("geometry", options,
                                                 _scene->getEngine());
@@ -232,9 +236,19 @@ void GeometryBufferRenderer::_createRenderTargets()
 
   // Custom render function
   _multiRenderTarget->customRenderFunction
-    = [this](const vector_t<SubMesh*>& opaqueSubMeshes,
-             const vector_t<SubMesh*>& /*transparentSubMeshes*/,
-             const vector_t<SubMesh*>& alphaTestSubMeshes) {
+    = [this, engine](const vector_t<SubMesh*>& opaqueSubMeshes,
+                     const vector_t<SubMesh*>& alphaTestSubMeshes,
+                     const vector_t<SubMesh*>& /*transparentSubMeshes*/,
+                     const vector_t<SubMesh*>& depthOnlySubMeshes,
+                     const ::std::function<void()>& /*beforeTransparents*/) {
+
+        if (!depthOnlySubMeshes.empty()) {
+          engine->setColorWrite(false);
+          for (auto& depthOnlySubMesh : depthOnlySubMeshes) {
+            renderSubMesh(depthOnlySubMesh);
+          }
+          engine->setColorWrite(true);
+        }
 
         for (auto& opaqueSubMesh : opaqueSubMeshes) {
           renderSubMesh(opaqueSubMesh);

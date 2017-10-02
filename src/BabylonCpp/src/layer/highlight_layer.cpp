@@ -77,10 +77,7 @@ HighlightLayer::HighlightLayer(const string_t& iName, Scene* scene,
     = ::std::make_unique<VertexBuffer>(
       _engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
-  // Indices
-  Uint32Array indices{0, 1, 2, 0, 2, 3};
-
-  _indexBuffer = _engine->createIndexBuffer(indices);
+  _createIndexBuffer();
 
   // Effect
   EffectCreationOptions effectCreationOptions;
@@ -231,9 +228,21 @@ void HighlightLayer::createTextureAndPostProcesses()
 
   _mainTexture->customRenderFunction
     = [this](const vector_t<SubMesh*>& opaqueSubMeshes,
+             const vector_t<SubMesh*>& alphaTestSubMeshes,
              const vector_t<SubMesh*>& transparentSubMeshes,
-             const vector_t<SubMesh*>& alphaTestSubMeshes) {
+             const vector_t<SubMesh*>& depthOnlySubMeshes,
+             const ::std::function<void()>& /*beforeTransparents*/) {
         onBeforeRenderMainTextureObservable.notifyObservers(this);
+
+        auto engine = _scene->getEngine();
+
+        if (!depthOnlySubMeshes.empty()) {
+          engine->setColorWrite(false);
+          for (auto& depthOnlySubMesh : depthOnlySubMeshes) {
+            renderSubMesh(depthOnlySubMesh);
+          }
+          engine->setColorWrite(true);
+        }
 
         for (auto& opaqueSubMesh : opaqueSubMeshes) {
           renderSubMesh(opaqueSubMesh);
@@ -344,6 +353,23 @@ void HighlightLayer::renderSubMesh(SubMesh* subMesh)
   }
 }
 
+void HighlightLayer::_createIndexBuffer()
+{
+  auto engine = _scene->getEngine();
+
+  // Indices
+  Uint32Array indices{0, 1, 2, 0, 2, 3};
+
+  _indexBuffer = engine->createIndexBuffer(indices);
+}
+
+void HighlightLayer::_rebuild()
+{
+  _vertexBuffers[VertexBuffer::PositionKindChars]->_rebuild();
+
+  _createIndexBuffer();
+}
+
 bool HighlightLayer::isReady(SubMesh* subMesh, bool useInstances,
                              BaseTexture* emissiveTexture)
 {
@@ -435,8 +461,8 @@ bool HighlightLayer::isReady(SubMesh* subMesh, bool useInstances,
     options.attributes    = attribs;
     options.uniformsNames = {"world",         "mBones", "viewProjection",
                              "diffuseMatrix", "color",  "emissiveMatrix"};
-    options.samplers      = {"diffuseSampler", "emissiveSampler"};
-    options.defines       = join;
+    options.samplers = {"diffuseSampler", "emissiveSampler"};
+    options.defines  = join;
 
     _glowMapGenerationEffect = _scene->getEngine()->createEffect(
       "glowMapGeneration", options, _scene->getEngine());
@@ -533,15 +559,11 @@ void HighlightLayer::addExcludedMesh(Mesh* mesh)
 {
   if (!stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
     IHighlightLayerExcludedMesh meshExcluded;
-    meshExcluded.mesh = mesh;
-    meshExcluded.beforeRender
-      = mesh->onBeforeRenderObservable.add([](Mesh* mesh, EventState&) {
-          mesh->getEngine()->setStencilBuffer(false);
-        });
-    meshExcluded.afterRender
-      = mesh->onAfterRenderObservable.add([](Mesh* mesh, EventState&) {
-          mesh->getEngine()->setStencilBuffer(true);
-        });
+    meshExcluded.mesh         = mesh;
+    meshExcluded.beforeRender = mesh->onBeforeRenderObservable.add([](
+      Mesh* mesh, EventState&) { mesh->getEngine()->setStencilBuffer(false); });
+    meshExcluded.afterRender = mesh->onAfterRenderObservable.add([](
+      Mesh* mesh, EventState&) { mesh->getEngine()->setStencilBuffer(true); });
     _excludedMeshes[mesh->uniqueId] = meshExcluded;
   }
 }
