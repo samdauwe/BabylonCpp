@@ -456,7 +456,6 @@ private:
   float _cosPitch;
   float _sinYaw;
   float _cosYaw;
-  float _w;
   bool _mustUnrotateFixedNormals;
   Vector3 _minimum;
   Vector3 _maximum;

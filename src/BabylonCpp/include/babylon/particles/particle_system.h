@@ -21,13 +21,15 @@ public:
 
 public:
   ParticleSystem(const string_t& name, size_t capacity, Scene* scene,
-                 Effect* customEffect = nullptr);
+                 Effect* customEffect         = nullptr,
+                 bool isAnimationSheetEnabled = false, float epsilon = 0.01f);
   virtual ~ParticleSystem();
 
   virtual IReflect::Type type() const override;
 
   void setOnDispose(
     const ::std::function<void(ParticleSystem*, EventState&)>& callback);
+  bool isAnimationSheetEnabled() const;
   void recycleParticle(Particle* particle);
   size_t getCapacity() const;
   bool isAlive() const;
@@ -36,8 +38,12 @@ public:
   void stop();
   void _appendParticleVertex(unsigned int index, Particle* particle,
                              int offsetX, int offsetY);
+  void _appendParticleVertexWithAnimation(unsigned int index,
+                                          Particle* particle, int offsetX,
+                                          int offsetY);
   void animate() override;
   size_t render() override;
+  void rebuild() override;
   void dispose(bool doNotRecurse = false) override;
   vector_t<Animation*> getAnimations() override;
   IParticleSystem* clone(const string_t& name, Mesh* newEmitter) override;
@@ -48,8 +54,12 @@ public:
                                Scene* scene, const string_t& url);
 
 private:
+  void _createIndexBuffer();
   void _update(int newParticles);
   Effect* _getEffect();
+  void appenedParticleVertexesWithSheet(unsigned int offset,
+                                        Particle* particle);
+  void appenedParticleVertexesNoSheet(unsigned int offset, Particle* particle);
 
 public:
   // Members
@@ -90,8 +100,21 @@ public:
   ::std::function<void(const Matrix& worldMatrix, Vector3& positionToUpdate,
                        Particle* particle)>
     startPositionFunction;
+  // sheet animation
+  unsigned int startSpriteCellID;
+  unsigned int endSpriteCellID;
+  bool spriteCellLoop;
+  float spriteCellChangeSpeed;
+
+  unsigned int spriteCellWidth;
+  unsigned int spriteCellHeight;
+  unsigned int _vertexBufferSize;
+
+  ::std::function<void(unsigned int offset, Particle* particle)>
+    appendParticleVertexes;
 
 private:
+  float _epsilon;
   Observer<ParticleSystem>::Ptr _onDisposeObserver;
   vector_t<Particle*> particles;
   size_t _capacity;
@@ -117,6 +140,8 @@ private:
   bool _stopped;
   int _actualFrame;
   int _scaledUpdateSpeed;
+
+  bool _isAnimationSheetEnabled;
 
 }; // end of class ParticleSystem
 

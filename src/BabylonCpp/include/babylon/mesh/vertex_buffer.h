@@ -31,7 +31,8 @@ public:
   static constexpr unsigned int World2Kind               = 17;
   static constexpr unsigned int World3Kind               = 18;
   static constexpr unsigned int CellInfoKind             = 19;
-  static constexpr unsigned int OptionsKind              = 20;
+  static constexpr unsigned int CellIndexKind            = 20;
+  static constexpr unsigned int OptionsKind              = 21;
 
   static constexpr const char* PositionKindChars        = "position";
   static constexpr const char* NormalKindChars          = "normal";
@@ -49,12 +50,13 @@ public:
     = "matricesIndicesExtra";
   static constexpr const char* MatricesWeightsExtraKindChars
     = "matricesWeightsExtra";
-  static constexpr const char* World0KindChars   = "world0";
-  static constexpr const char* World1KindChars   = "world1";
-  static constexpr const char* World2KindChars   = "world2";
-  static constexpr const char* World3KindChars   = "world3";
-  static constexpr const char* CellInfoKindChars = "cellInfo";
-  static constexpr const char* OptionsKindChars  = "options";
+  static constexpr const char* World0KindChars    = "world0";
+  static constexpr const char* World1KindChars    = "world1";
+  static constexpr const char* World2KindChars    = "world2";
+  static constexpr const char* World3KindChars    = "world3";
+  static constexpr const char* CellInfoKindChars  = "cellInfo";
+  static constexpr const char* CellIndexKindChars = "cellIndex";
+  static constexpr const char* OptionsKindChars   = "options";
 
 public:
   VertexBuffer(Engine* engine, const Float32Array& data, unsigned int kind,

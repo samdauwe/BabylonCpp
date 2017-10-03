@@ -15,11 +15,12 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
   unsigned int renderingGroupId;
   unsigned int layerMask;
   bool hasEmitter();
-  virtual bool isStarted() const                                         = 0;
-  virtual void animate()                                                 = 0;
-  virtual size_t render()                                                = 0;
+  virtual bool isStarted() const = 0;
+  virtual void animate()         = 0;
+  virtual size_t render()        = 0;
   virtual IParticleSystem* clone(const string_t& name, Mesh* newEmitter) = 0;
-  virtual Json::object serialize() const                                 = 0;
+  virtual Json::object serialize() const = 0;
+  virtual void rebuild()                 = 0;
 }; // end of struct IParticleSystem
 
 } // end of namespace BABYLON

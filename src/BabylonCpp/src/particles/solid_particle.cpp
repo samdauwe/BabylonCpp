@@ -24,6 +24,7 @@ SolidParticle::SolidParticle(unsigned int particleIndex,
     , shapeId{iShapeId}
     , idxInShape{iIdxInShape}
     , _sps{sps}
+    , _stillInvisible{false}
 {
 }
 

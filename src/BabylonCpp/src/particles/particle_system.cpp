@@ -18,7 +18,8 @@
 namespace BABYLON {
 
 ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
-                               Scene* scene, Effect* customEffect)
+                               Scene* scene, Effect* customEffect,
+                               bool isAnimationSheetEnabled, float epsilon)
     : emitRate{10}
     , manualEmitCount{-1}
     , updateSpeed{0.01f}
@@ -46,8 +47,17 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
     , color2{Color4(1.f, 1.f, 1.f, 1.f)}
     , colorDead{Color4(0.f, 0.f, 0.f, 1.f)}
     , textureMask{Color4(1.f, 1.f, 1.f, 1.f)}
+    , startSpriteCellID{0}
+    , endSpriteCellID{0}
+    , spriteCellLoop{true}
+    , spriteCellChangeSpeed{0.f}
+    , spriteCellWidth{0}
+    , spriteCellHeight{0}
+    , _vertexBufferSize{11}
+    , appendParticleVertexes{nullptr}
+    , _epsilon{epsilon}
     , _capacity{capacity}
-    , _scene{scene}
+    , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _newPartsExcess{0}
     , _customEffect{customEffect}
     , _scaledColorStep{Color4(0.f, 0.f, 0.f, 0.f)}
@@ -58,6 +68,7 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
     , _started{false}
     , _stopped{false}
     , _actualFrame{0}
+    , _isAnimationSheetEnabled{isAnimationSheetEnabled}
 {
   _scene->particleSystems.emplace_back(this);
 
@@ -66,25 +77,17 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
   renderingGroupId = 0;
   layerMask        = 0x0FFFFFFF;
 
-  Uint32Array indices;
-  int index = 0;
-  for (size_t count = 0; count < capacity; ++count) {
-    indices.emplace_back(index);
-    indices.emplace_back(index + 1);
-    indices.emplace_back(index + 2);
-    indices.emplace_back(index);
-    indices.emplace_back(index + 2);
-    indices.emplace_back(index + 3);
-    index += 4;
+  if (isAnimationSheetEnabled) {
+    _vertexBufferSize = 12;
   }
 
-  _indexBuffer = scene->getEngine()->createIndexBuffer(indices);
+  _createIndexBuffer();
 
   // 11 floats per particle (x, y, z, r, g, b, a, angle, size, offsetX, offsetY)
   // + 1 filler
-  _vertexData.resize(capacity * 11 * 4);
-  _vertexBuffer
-    = ::std::make_unique<Buffer>(scene->getEngine(), _vertexData, true, 11);
+  _vertexData.resize(capacity * _vertexBufferSize * 4);
+  _vertexBuffer = ::std::make_unique<Buffer>(scene->getEngine(), _vertexData,
+                                             true, _vertexBufferSize);
 
   auto positions
     = _vertexBuffer->createVertexBuffer(VertexBuffer::PositionKind, 0, 3);
@@ -92,6 +95,12 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
     = _vertexBuffer->createVertexBuffer(VertexBuffer::ColorKind, 3, 4);
   auto options
     = _vertexBuffer->createVertexBuffer(VertexBuffer::OptionsKind, 7, 4);
+
+  if (_isAnimationSheetEnabled) {
+    auto cellIndexBuffer
+      = _vertexBuffer->createVertexBuffer(VertexBuffer::CellIndexKind, 11, 1);
+    _vertexBuffers["cellIndex"] = ::std::move(cellIndexBuffer);
+  }
 
   _vertexBuffers[VertexBuffer::PositionKindChars] = ::std::move(positions);
   _vertexBuffers[VertexBuffer::ColorKindChars]    = ::std::move(colors);
@@ -148,6 +157,10 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
 
         gravity.scaleToRef(_scaledUpdateSpeed, _scaledGravity);
         particle->direction.addInPlace(_scaledGravity);
+
+        if (_isAnimationSheetEnabled) {
+          particle->updateCellIndex(_scaledUpdateSpeed);
+        }
       }
     }
   };
@@ -169,6 +182,28 @@ void ParticleSystem::setOnDispose(
     onDisposeObservable.remove(_onDisposeObserver);
   }
   _onDisposeObserver = onDisposeObservable.add(callback);
+}
+
+bool ParticleSystem::isAnimationSheetEnabled() const
+{
+  return _isAnimationSheetEnabled;
+}
+
+void ParticleSystem::_createIndexBuffer()
+{
+  Uint32Array indices;
+  int index = 0;
+  for (size_t count = 0; count < _capacity; ++count) {
+    indices.emplace_back(index);
+    indices.emplace_back(index + 1);
+    indices.emplace_back(index + 2);
+    indices.emplace_back(index);
+    indices.emplace_back(index + 2);
+    indices.emplace_back(index + 3);
+    index += 4;
+  }
+
+  _indexBuffer = _scene->getEngine()->createIndexBuffer(indices);
 }
 
 void ParticleSystem::recycleParticle(Particle* particle)
@@ -209,11 +244,13 @@ void ParticleSystem::stop()
   _stopped = true;
 }
 
+// animation sheet
+
 void ParticleSystem::_appendParticleVertex(unsigned int index,
                                            Particle* particle, int offsetX,
                                            int offsetY)
 {
-  unsigned int offset      = index * 11;
+  unsigned int offset      = index * _vertexBufferSize;
   _vertexData[offset]      = particle->position.x;
   _vertexData[offset + 1]  = particle->position.y;
   _vertexData[offset + 2]  = particle->position.z;
@@ -225,6 +262,42 @@ void ParticleSystem::_appendParticleVertex(unsigned int index,
   _vertexData[offset + 8]  = particle->size;
   _vertexData[offset + 9]  = static_cast<float>(offsetX);
   _vertexData[offset + 10] = static_cast<float>(offsetY);
+}
+
+void ParticleSystem::_appendParticleVertexWithAnimation(unsigned int index,
+                                                        Particle* particle,
+                                                        int offsetX,
+                                                        int offsetY)
+{
+  float _offsetX = static_cast<float>(offsetX);
+  float _offsetY = static_cast<float>(offsetY);
+  if (offsetX == 0) {
+    _offsetX = _epsilon;
+  }
+  else if (offsetX == 1) {
+    _offsetX = 1.f - _epsilon;
+  }
+
+  if (offsetY == 0) {
+    _offsetY = _epsilon;
+  }
+  else if (offsetY == 1) {
+    _offsetY = 1.f - _epsilon;
+  }
+
+  auto offset              = index * _vertexBufferSize;
+  _vertexData[offset]      = particle->position.x;
+  _vertexData[offset + 1]  = particle->position.y;
+  _vertexData[offset + 2]  = particle->position.z;
+  _vertexData[offset + 3]  = particle->color.r;
+  _vertexData[offset + 4]  = particle->color.g;
+  _vertexData[offset + 5]  = particle->color.b;
+  _vertexData[offset + 6]  = particle->color.a;
+  _vertexData[offset + 7]  = particle->angle;
+  _vertexData[offset + 8]  = particle->size;
+  _vertexData[offset + 9]  = _offsetX;
+  _vertexData[offset + 10] = _offsetY;
+  _vertexData[offset + 11] = particle->cellIndex;
 }
 
 void ParticleSystem::_update(int newParticles)
@@ -255,10 +328,11 @@ void ParticleSystem::_update(int newParticles)
     if (!_stockParticles.empty()) {
       particle = _stockParticles.back();
       _stockParticles.pop_back();
-      particle->age = 0;
+      particle->age       = 0;
+      particle->cellIndex = startSpriteCellID;
     }
     else {
-      particle = new Particle();
+      particle = new Particle(this);
     }
     particles.emplace_back(particle);
 
@@ -296,16 +370,30 @@ Effect* ParticleSystem::_getEffect()
     defines.emplace_back("#define CLIPPLANE");
   }
 
+  if (_isAnimationSheetEnabled) {
+    defines.emplace_back("#define ANIMATESHEET");
+  }
+
   // Effect
   string_t joined = String::join(defines, '\n');
   if (_cachedDefines != joined) {
     _cachedDefines = joined;
 
     EffectCreationOptions options;
-    options.attributes = {VertexBuffer::PositionKindChars,
-                          VertexBuffer::ColorKindChars, "options"};
-    options.uniformsNames
-      = {"invView", "view", "projection", "vClipPlane", "textureMask"};
+    if (_isAnimationSheetEnabled) {
+      options.attributes
+        = {VertexBuffer::PositionKindChars, VertexBuffer::ColorKindChars,
+           "options", "cellIndex"};
+      options.uniformsNames = {"invView",        "view",       "projection",
+                               "particlesInfos", "vClipPlane", "textureMask"};
+    }
+    else {
+      options.attributes = {VertexBuffer::PositionKindChars,
+                            VertexBuffer::ColorKindChars, "options"};
+      options.uniformsNames
+        = {"invView", "view", "projection", "vClipPlane", "textureMask"};
+    }
+
     options.samplers = {"diffuseSampler"};
     options.defines  = ::std::move(joined);
 
@@ -383,16 +471,51 @@ void ParticleSystem::animate()
     }
   }
 
+  // Animation sheet
+  if (_isAnimationSheetEnabled) {
+    appendParticleVertexes = [this](unsigned int offset, Particle* particle) {
+      appenedParticleVertexesWithSheet(offset, particle);
+    };
+  }
+  else {
+    appendParticleVertexes = [this](unsigned int offset, Particle* particle) {
+      appenedParticleVertexesWithSheet(offset, particle);
+    };
+  }
+
   // Update VBO
   unsigned int offset = 0;
   for (auto& particle : particles) {
-    _appendParticleVertex(offset++, particle, 0, 0);
-    _appendParticleVertex(offset++, particle, 1, 0);
-    _appendParticleVertex(offset++, particle, 1, 1);
-    _appendParticleVertex(offset++, particle, 0, 1);
+    appendParticleVertexes(offset, particle);
+    offset += 4;
   }
 
   _vertexBuffer->update(_vertexData);
+}
+
+void ParticleSystem::appenedParticleVertexesWithSheet(unsigned int offset,
+                                                      Particle* particle)
+{
+  _appendParticleVertexWithAnimation(offset++, particle, 0, 0);
+  _appendParticleVertexWithAnimation(offset++, particle, 1, 0);
+  _appendParticleVertexWithAnimation(offset++, particle, 1, 1);
+  _appendParticleVertexWithAnimation(offset++, particle, 0, 1);
+}
+
+void ParticleSystem::appenedParticleVertexesNoSheet(unsigned int offset,
+                                                    Particle* particle)
+{
+  _appendParticleVertex(offset++, particle, 0, 0);
+  _appendParticleVertex(offset++, particle, 1, 0);
+  _appendParticleVertex(offset++, particle, 1, 1);
+  _appendParticleVertex(offset++, particle, 0, 1);
+}
+
+void ParticleSystem::rebuild()
+{
+  _createIndexBuffer();
+
+  _vertexBuffer->_rebuild();
 }
 
 size_t ParticleSystem::render()
@@ -415,6 +538,15 @@ size_t ParticleSystem::render()
   effect->setTexture("diffuseSampler", particleTexture);
   effect->setMatrix("view", viewMatrix);
   effect->setMatrix("projection", _scene->getProjectionMatrix());
+
+  if (_isAnimationSheetEnabled) {
+    auto baseSize = particleTexture->getBaseSize();
+    effect->setFloat3("particlesInfos",
+                      spriteCellWidth / static_cast<float>(baseSize.width),
+                      spriteCellHeight / static_cast<float>(baseSize.height),
+                      static_cast<float>(baseSize.width) / spriteCellWidth);
+  }
+
   effect->setFloat4("textureMask", textureMask.r, textureMask.g, textureMask.b,
                     textureMask.a);
 

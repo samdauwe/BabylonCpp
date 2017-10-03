@@ -66,7 +66,6 @@ SolidParticleSystem::SolidParticleSystem(
     , _cosPitch{0.f}
     , _sinYaw{0.f}
     , _cosYaw{0.f}
-    , _w{0.f}
     , _mustUnrotateFixedNormals{false}
     , _minimum{Tmp::Vector3Array[0]}
     , _maximum{Tmp::Vector3Array[1]}
@@ -155,7 +154,7 @@ SolidParticleSystem::digest(Mesh* _mesh,
     number = (number > totalFacets) ? totalFacets : number;
     size   = static_cast<size_t>(::std::round(static_cast<float>(totalFacets)
                                             / static_cast<float>(number)));
-    delta  = 0;
+    delta = 0;
   }
   else {
     size = (size > totalFacets) ? totalFacets : size;
@@ -169,9 +168,8 @@ SolidParticleSystem::digest(Mesh* _mesh,
   size_t sizeO        = size;
 
   while (f < totalFacets) {
-    size = sizeO
-           + static_cast<size_t>(::std::floor((1.f + static_cast<float>(delta))
-                                              * Math::random()));
+    size = sizeO + static_cast<size_t>(::std::floor(
+                     (1.f + static_cast<float>(delta)) * Math::random()));
     if (f > totalFacets - size) {
       size = totalFacets - f;
     }
@@ -192,8 +190,9 @@ SolidParticleSystem::digest(Mesh* _mesh,
         stl_util::concat(facetUV, {meshUV[i * 2], meshUV[i * 2 + 1]});
       }
       if (!meshCol.empty()) {
-        stl_util::concat(facetCol, {meshCol[i * 4 + 0], meshCol[i * 4 + 1],
-                                    meshCol[i * 4 + 2], meshCol[i * 4 + 3]});
+        stl_util::concat(facetCol,
+                         {meshCol[i * 4 + 0], meshCol[i * 4 + 1],
+                          meshCol[i * 4 + 2], meshCol[i * 4 + 3]});
       }
       ++fi;
     }
@@ -333,13 +332,15 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
     _vertex.z *= _copy->scaling.z;
 
     Vector3::TransformCoordinatesToRef(_vertex, _rotMatrix, _rotated);
-    stl_util::concat(positions, {_copy->position.x + _rotated.x,
-                                 _copy->position.y + _rotated.y,
-                                 _copy->position.z + _rotated.z});
+    stl_util::concat(positions,
+                     {_copy->position.x + _rotated.x,
+                      _copy->position.y + _rotated.y,
+                      _copy->position.z + _rotated.z});
     if (!meshUV.empty()) {
       stl_util::concat(
-        uvs, {(_copy->uvs.z - _copy->uvs.x) * meshUV[u] + _copy->uvs.x,
-              (_copy->uvs.w - _copy->uvs.y) * meshUV[u + 1] + _copy->uvs.y});
+        uvs,
+        {(_copy->uvs.z - _copy->uvs.x) * meshUV[u] + _copy->uvs.x,
+         (_copy->uvs.w - _copy->uvs.y) * meshUV[u + 1] + _copy->uvs.y});
       u += 2;
     }
 
@@ -632,7 +633,19 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
     // call to custom user function to update the particle properties
     updateParticle(_particle);
 
+    // skip the computations for inactive or already invisible particles
+    if (!_particle->alive
+        || (_particle->_stillInvisible && !_particle->isVisible)) {
+      // increment indexes for the next particle
+      pt = static_cast<unsigned int>(_shape.size());
+      index += pt * 3;
+      colorIndex += pt * 4;
+      uvIndex += pt * 2;
+      continue;
+    }
+
     if (_particle->isVisible) {
+      _particle->_stillInvisible = false; // un-mark permanent invisibility
 
       // particle rotation matrix
       if (billboard) {
@@ -671,20 +684,12 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
         _vertex.y *= _particle->scaling.y;
         _vertex.z *= _particle->scaling.z;
 
-        _w = (_vertex.x * _rotMatrix.m[3]) + (_vertex.y * _rotMatrix.m[7])
-             + (_vertex.z * _rotMatrix.m[11]) + _rotMatrix.m[15];
-        _rotated.x
-          = ((_vertex.x * _rotMatrix.m[0]) + (_vertex.y * _rotMatrix.m[4])
-             + (_vertex.z * _rotMatrix.m[8]) + _rotMatrix.m[12])
-            / _w;
-        _rotated.y
-          = ((_vertex.x * _rotMatrix.m[1]) + (_vertex.y * _rotMatrix.m[5])
-             + (_vertex.z * _rotMatrix.m[9]) + _rotMatrix.m[13])
-            / _w;
-        _rotated.z
-          = ((_vertex.x * _rotMatrix.m[2]) + (_vertex.y * _rotMatrix.m[6])
-             + (_vertex.z * _rotMatrix.m[10]) + _rotMatrix.m[14])
-            / _w;
+        _rotated.x = _vertex.x * _rotMatrix.m[0] + _vertex.y * _rotMatrix.m[4]
+                     + _vertex.z * _rotMatrix.m[8];
+        _rotated.y = _vertex.x * _rotMatrix.m[1] + _vertex.y * _rotMatrix.m[5]
+                     + _vertex.z * _rotMatrix.m[9];
+        _rotated.z = _vertex.x * _rotMatrix.m[2] + _vertex.y * _rotMatrix.m[6]
+                     + _vertex.z * _rotMatrix.m[10];
 
         _positions32[idx] = _particle->position.x + _cam_axisX.x * _rotated.x
                             + _cam_axisY.x * _rotated.y
@@ -724,17 +729,12 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
           _normal.y = _fixedNormal32[idx + 1];
           _normal.z = _fixedNormal32[idx + 2];
 
-          _rotated.x
-            = ((_normal.x * _rotMatrix.m[0]) + (_normal.y * _rotMatrix.m[4])
-               + (_normal.z * _rotMatrix.m[8]) + _rotMatrix.m[12]);
-
-          _rotated.y
-            = ((_normal.x * _rotMatrix.m[1]) + (_normal.y * _rotMatrix.m[5])
-               + (_normal.z * _rotMatrix.m[9]) + _rotMatrix.m[13]);
-
-          _rotated.z
-            = ((_normal.x * _rotMatrix.m[2]) + (_normal.y * _rotMatrix.m[6])
-               + (_normal.z * _rotMatrix.m[10]) + _rotMatrix.m[14]);
+          _rotated.x = _normal.x * _rotMatrix.m[0] + _normal.y * _rotMatrix.m[4]
+                       + _normal.z * _rotMatrix.m[8];
+          _rotated.y = _normal.x * _rotMatrix.m[1] + _normal.y * _rotMatrix.m[5]
+                       + _normal.z * _rotMatrix.m[9];
+          _rotated.z = _normal.x * _rotMatrix.m[2] + _normal.y * _rotMatrix.m[6]
+                       + _normal.z * _rotMatrix.m[10];
 
           _normals32[idx] = _cam_axisX.x * _rotated.x
                             + _cam_axisY.x * _rotated.y
@@ -765,16 +765,16 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
         }
       }
     }
-    // particle not visible : scaled to zero and positioned to the camera
-    // position
+    // particle just set invisible : scaled to zero and positioned at the origin
     else {
+      _particle->_stillInvisible = true; // mark the particle as invisible
       for (pt = 0; pt < _shape.size(); ++pt) {
         idx                   = index + pt * 3;
         colidx                = colorIndex + pt * 4;
         uvidx                 = uvIndex + pt * 2;
-        _positions32[idx]     = _camera->position.x;
-        _positions32[idx + 1] = _camera->position.y;
-        _positions32[idx + 2] = _camera->position.z;
+        _positions32[idx]     = 0.f;
+        _positions32[idx + 1] = 0.f;
+        _positions32[idx + 2] = 0.f;
         _normals32[idx]       = 0.f;
         _normals32[idx + 1]   = 0.f;
         _normals32[idx + 2]   = 0.f;
@@ -811,20 +811,12 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
                       * _particle->scaling.y;
           _vertex.z = _particle->_modelBoundingInfo->boundingBox.vectors[b].z
                       * _particle->scaling.z;
-          _w = (_vertex.x * _rotMatrix.m[3]) + (_vertex.y * _rotMatrix.m[7])
-               + (_vertex.z * _rotMatrix.m[11]) + _rotMatrix.m[15];
-          _rotated.x
-            = ((_vertex.x * _rotMatrix.m[0]) + (_vertex.y * _rotMatrix.m[4])
-               + (_vertex.z * _rotMatrix.m[8]) + _rotMatrix.m[12])
-              / _w;
-          _rotated.y
-            = ((_vertex.x * _rotMatrix.m[1]) + (_vertex.y * _rotMatrix.m[5])
-               + (_vertex.z * _rotMatrix.m[9]) + _rotMatrix.m[13])
-              / _w;
-          _rotated.z
-            = ((_vertex.x * _rotMatrix.m[2]) + (_vertex.y * _rotMatrix.m[6])
-               + (_vertex.z * _rotMatrix.m[10]) + _rotMatrix.m[14])
-              / _w;
+          _rotated.x = _vertex.x * _rotMatrix.m[0] + _vertex.y * _rotMatrix.m[4]
+                       + _vertex.z * _rotMatrix.m[8];
+          _rotated.y = _vertex.x * _rotMatrix.m[1] + _vertex.y * _rotMatrix.m[5]
+                       + _vertex.z * _rotMatrix.m[9];
+          _rotated.z = _vertex.x * _rotMatrix.m[2] + _vertex.y * _rotMatrix.m[6]
+                       + _vertex.z * _rotMatrix.m[10];
           bBox.vectors[b].x = _particle->position.x + _cam_axisX.x * _rotated.x
                               + _cam_axisY.x * _rotated.y
                               + _cam_axisZ.x * _rotated.z;
@@ -926,13 +918,13 @@ void SolidParticleSystem::_quaternionRotationYPR()
   _sinYaw    = ::std::sin(_halfyaw);
   _cosYaw    = ::std::cos(_halfyaw);
   _quaternion.x
-    = (_cosYaw * _sinPitch * _cosRoll) + (_sinYaw * _cosPitch * _sinRoll);
+    = _cosYaw * _sinPitch * _cosRoll + _sinYaw * _cosPitch * _sinRoll;
   _quaternion.y
-    = (_sinYaw * _cosPitch * _cosRoll) - (_cosYaw * _sinPitch * _sinRoll);
+    = _sinYaw * _cosPitch * _cosRoll - _cosYaw * _sinPitch * _sinRoll;
   _quaternion.z
-    = (_cosYaw * _cosPitch * _sinRoll) - (_sinYaw * _sinPitch * _cosRoll);
+    = _cosYaw * _cosPitch * _sinRoll - _sinYaw * _sinPitch * _cosRoll;
   _quaternion.w
-    = (_cosYaw * _cosPitch * _cosRoll) + (_sinYaw * _sinPitch * _sinRoll);
+    = _cosYaw * _cosPitch * _cosRoll + _sinYaw * _sinPitch * _sinRoll;
 }
 
 void SolidParticleSystem::_quaternionToRotationMatrix()

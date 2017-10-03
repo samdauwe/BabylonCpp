@@ -16,6 +16,7 @@ public:
   bool isStarted() const override;
   void animate() override;
   size_t render() override;
+  void rebuild() override;
   void dispose(bool doNotRecurse = false) override;
   IParticleSystem* clone(const string_t& name, Mesh* newEmitter) override;
   Json::object serialize() const override;

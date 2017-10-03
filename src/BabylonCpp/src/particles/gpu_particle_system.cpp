@@ -35,6 +35,10 @@ size_t GPUParticleSystem::render()
   return 0;
 }
 
+void GPUParticleSystem::rebuild()
+{
+}
+
 void GPUParticleSystem::dispose(bool /*doNotRecurse*/)
 {
   // Remove from scene

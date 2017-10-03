@@ -85,6 +85,8 @@ public:
   unique_ptr_t<BoundingInfo> _boundingInfo;
   // reference to the SPS what the particle belongs to
   SolidParticleSystem* _sps;
+  // still set as invisible in order to skip useless computations
+  bool _stillInvisible;
   unordered_map_t<string_t, float> extraFields;
 
 }; // end of class SolidParticle

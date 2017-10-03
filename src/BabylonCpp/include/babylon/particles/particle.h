@@ -11,7 +11,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT Particle {
 
 public:
-  Particle();
+  Particle(ParticleSystem* particleSystem);
   Particle(const Particle& other);            // Copy constructor
   Particle(Particle&& other);                 // Move constructor
   Particle& operator=(const Particle& other); // Copy assignment operator
@@ -20,6 +20,10 @@ public:
   Particle* clone() const;
 
   void copyTo(Particle& other);
+
+private:
+  void updateCellIndexWithSpeedCalculated(float scaledUpdateSpeed);
+  void updateCellIndexWithCustomSpeed();
 
 public:
   Vector3 position;
@@ -31,6 +35,12 @@ public:
   float size;
   float angle;
   float angularSpeed;
+  unsigned int cellIndex;
+  ::std::function<void(float scaledUpdateSpeed)> updateCellIndex;
+
+private:
+  ParticleSystem* particleSystem;
+  unsigned int _currentFrameCounter;
 
 }; // end of class Particle
 
