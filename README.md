@@ -102,9 +102,9 @@ This code results in the following scene:
 
 ## Available as git submodules ##
 * [Earcut](https://github.com/mapbox/earcut.hpp.git): A C++ port of earcut.js, a fast, header-only polygon triangulation library.
-* [Google Test](https://github.com/google/googletest): Google's framework for writing C++ tests on a variety of platforms, used for the unit tests (Optional)
-* [GLFW](https://github.com/glfw/glfw): Framework for OpenGL application developmentm used for the examples (Optional)
-* [GLXW](https://github.com/rikusalminen/glxw): OpenGL loader, used for the examples (Optional)
+* [Google Test](https://github.com/google/googletest): Google's framework for writing C++ tests on a variety of platforms, used for the unit tests (Optional).
+* [GLFW](https://github.com/glfw/glfw): Framework for OpenGL application development, used for the examples (Optional).
+* [GLXW](https://github.com/rikusalminen/glxw): OpenGL loader, used for the examples (Optional).
 
 ## Supported Compilers ##
 * GCC >= 5.0.0
