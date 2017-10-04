@@ -3,6 +3,7 @@
 
 #include <babylon/actions/action.h>
 #include <babylon/babylon_global.h>
+#include <babylon/tools/observable.h>
 
 namespace BABYLON {
 
@@ -27,6 +28,8 @@ public:
   int duration;
   bool stopOtherAnimations;
   ::std::function<void()> onInterpolationDone;
+
+  Observable<InterpolateValueAction> onInterpolationDoneObservable;
 
 private:
   IAnimatable* _target;

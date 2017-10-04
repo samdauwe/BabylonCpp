@@ -56,12 +56,19 @@ void InterpolateValueAction::execute(const ActionEvent& /*evt*/)
     Animation::ANIMATIONLOOPMODE_CONSTANT);*/
   animation->setKeys(keys);
 
-  // if (stopOtherAnimations) {
-  //  scene->stopAnimation(_effectiveTarget);
-  //}
+  if (stopOtherAnimations) {
+    scene->stopAnimation(_effectiveTarget);
+  }
+
+  const auto wrapper = [this]() {
+    onInterpolationDoneObservable.notifyObservers(this);
+    if (onInterpolationDone) {
+      onInterpolationDone();
+    }
+  };
 
   scene->beginDirectAnimation(_effectiveTarget, {animation}, 0, 100, false, 1,
-                              onInterpolationDone);
+                              wrapper);
 }
 
 Json::object InterpolateValueAction::serialize(Json::object& parent) const
