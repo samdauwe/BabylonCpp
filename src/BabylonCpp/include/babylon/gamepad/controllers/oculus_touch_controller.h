@@ -8,6 +8,12 @@ namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT OculusTouchController : public WebVRController {
 
+private:
+  static constexpr const char* MODEL_BASE_URL
+    = "https://controllers.babylonjs.com/oculus/";
+  static constexpr const char* MODEL_LEFT_FILENAME  = "left.babylon";
+  static constexpr const char* MODEL_RIGHT_FILENAME = "right.babylon";
+
 public:
   OculusTouchController(const shared_ptr_t<IBrowserGamepad>& vrGamepad);
   ~OculusTouchController();

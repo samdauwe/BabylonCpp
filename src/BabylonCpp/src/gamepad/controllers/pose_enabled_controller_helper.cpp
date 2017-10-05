@@ -4,6 +4,7 @@
 #include <babylon/gamepad/controllers/generic_controller.h>
 #include <babylon/gamepad/controllers/oculus_touch_controller.h>
 #include <babylon/gamepad/controllers/vive_controller.h>
+#include <babylon/gamepad/controllers/windows_motion_controller.h>
 #include <babylon/interfaces/ibrowser_gamepad.h>
 
 namespace BABYLON {
@@ -16,9 +17,10 @@ WebVRController* PoseEnabledControllerHelper::InitiateController(
     return new OculusTouchController(vrGamepad);
   }
   // Windows Mixed Reality controllers
-  // else if (String::contains(vrGamepad->id, "Spatial Control")) {
-  //  return new WindowsMixedRealityController(vrGamepad);
-  // }
+  else if (String::contains(vrGamepad->id,
+                            WindowsMotionController::GAMEPAD_ID_PREFIX)) {
+    return new WindowsMotionController(vrGamepad);
+  }
   // HTC Vive
   else if (String::contains(String::toLowerCase(vrGamepad->id), "openvr")) {
     return new ViveController(vrGamepad);

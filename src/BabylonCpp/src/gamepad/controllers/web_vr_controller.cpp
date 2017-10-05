@@ -28,6 +28,11 @@ WebVRController::~WebVRController()
 {
 }
 
+AbstractMesh* WebVRController::defaultModel()
+{
+  return _defaultModel;
+}
+
 void WebVRController::setOnButtonStateChange(
   const ::std::function<void(int controlledIndex, unsigned int buttonIndex,
                              const ExtendedGamepadButton& state)>& callback)
@@ -86,6 +91,17 @@ WebVRController::_checkChanges(const ExtendedGamepadButton& newState,
   _changes.changed
     = _changes.pressChanged || _changes.touchChanged || _changes.valueChanged;
   return _changes;
+}
+
+void WebVRController::dispose()
+{
+  PoseEnabledController::dispose();
+
+  onTriggerStateChangedObservable.clear();
+  onMainButtonStateChangedObservable.clear();
+  onSecondaryButtonStateChangedObservable.clear();
+  onPadStateChangedObservable.clear();
+  onPadValuesChangedObservable.clear();
 }
 
 } // end of namespace BABYLON

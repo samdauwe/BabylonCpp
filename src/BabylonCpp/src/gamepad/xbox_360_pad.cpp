@@ -103,11 +103,20 @@ unsigned int Xbox360Pad::_setButtonValue(unsigned int newValue,
                                          Xbox360Button buttonType)
 {
   if (newValue != currentValue) {
-    if (_onbuttondown && newValue == 1) {
-      _onbuttondown(buttonType);
+    if (newValue == 1) {
+      if (_onbuttondown) {
+        _onbuttondown(buttonType);
+      }
+
+      onButtonDownObservable.notifyObservers(&buttonType);
     }
-    if (_onbuttonup && newValue == 0) {
-      _onbuttonup(buttonType);
+    if (newValue == 0) {
+
+      if (_onbuttonup) {
+        _onbuttonup(buttonType);
+      }
+
+      onButtonUpObservable.notifyObservers(&buttonType);
     }
   }
   return newValue;
@@ -118,11 +127,19 @@ unsigned int Xbox360Pad::_setDPadValue(unsigned int newValue,
                                        Xbox360Dpad buttonType)
 {
   if (newValue != currentValue) {
-    if (_ondpaddown && newValue == 1) {
-      _ondpaddown(buttonType);
+    if (newValue == 1) {
+      if (_ondpaddown) {
+        _ondpaddown(buttonType);
+      }
+
+      onPadDownObservable.notifyObservers(&buttonType);
     }
-    if (_ondpadup && newValue == 0) {
-      _ondpadup(buttonType);
+    if (newValue == 0) {
+      if (_ondpadup) {
+        _ondpadup(buttonType);
+      }
+
+      onPadUpObservable.notifyObservers(&buttonType);
     }
   }
   return newValue;

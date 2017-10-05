@@ -8,6 +8,11 @@ namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT GenericController : public WebVRController {
 
+private:
+  static constexpr const char* MODEL_BASE_URL
+    = "https://controllers.babylonjs.com/generic/";
+  static constexpr const char* MODEL_FILENAME = "generic.babylon";
+
 public:
   GenericController(const shared_ptr_t<IBrowserGamepad>& vrGamepad);
   ~GenericController();

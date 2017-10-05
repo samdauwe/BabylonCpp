@@ -19,14 +19,14 @@ public:
   }; // end of enum class PoseEnabledControllerType
 
 public:
-  PoseEnabledController(const shared_ptr_t<IBrowserGamepad>& vrGamepad);
+  PoseEnabledController(const shared_ptr_t<IBrowserGamepad>& browserGamepad);
   ~PoseEnabledController();
 
   void update() override;
   void updateFromDevice(const DevicePose& poseData) override;
   void attachToMesh(AbstractMesh* mesh);
   void attachToPoseControlledCamera(TargetCamera* camera);
-  void dispose() override;
+  virtual void dispose() override;
   AbstractMesh* mesh();
   Ray getForwardRay(float length);
 

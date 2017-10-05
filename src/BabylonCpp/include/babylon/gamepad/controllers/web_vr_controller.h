@@ -16,10 +16,13 @@ public:
   WebVRController(const shared_ptr_t<IBrowserGamepad>& vrGamepad);
   ~WebVRController();
 
+  AbstractMesh* defaultModel();
+
   void setOnButtonStateChange(
     const ::std::function<void(int controlledIndex, unsigned int buttonIndex,
                                const ExtendedGamepadButton& state)>& callback);
   void update() override;
+  void dispose() override;
 
   virtual void initControllerMesh(
     Scene* scene, const ::std::function<void(AbstractMesh* mesh)>& meshLoaded)
@@ -55,9 +58,11 @@ public:
   string_t hand;
 
 protected:
+  AbstractMesh* _defaultModel;
   vector_t<ExtendedGamepadButton> _buttons;
 
 private:
+  // Observables
   ::std::function<void(int controlledIndex, unsigned int buttonIndex,
                        const ExtendedGamepadButton& state)>
     _onButtonStateChange;

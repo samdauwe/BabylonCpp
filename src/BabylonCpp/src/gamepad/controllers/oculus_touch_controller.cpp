@@ -21,10 +21,18 @@ OculusTouchController::~OculusTouchController()
 void OculusTouchController::initControllerMesh(
   Scene* scene, const ::std::function<void(AbstractMesh* mesh)>& meshLoaded)
 {
-  auto meshName
-    = (hand == "right") ? "RightTouch.babylon" : "LeftTouch.babylon";
+  std::string meshName;
+
+  // Hand
+  if (hand == "left") {
+    meshName = OculusTouchController::MODEL_LEFT_FILENAME;
+  }
+  else { // Right is the default if no hand is specified
+    meshName = OculusTouchController::MODEL_RIGHT_FILENAME;
+  }
+
   SceneLoader::ImportMesh(
-    {}, "http://yoda.blob.core.windows.net/models/", meshName, scene,
+    {}, OculusTouchController::MODEL_BASE_URL, meshName, scene,
     [this, &meshLoaded](vector_t<AbstractMesh*>& newMeshes,
                         vector_t<ParticleSystem*>& /*particleSystems*/,
                         vector_t<Skeleton*>& /*skeletons*/) {

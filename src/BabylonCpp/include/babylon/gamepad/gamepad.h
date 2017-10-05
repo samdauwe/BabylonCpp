@@ -23,6 +23,7 @@ public:
           unsigned int rightStickX = 2, unsigned int rightStickY = 3);
   virtual ~Gamepad();
 
+  bool isConnected() const;
   void setOnleftstickchanged(
     const ::std::function<void(const StickValues& values)>& callback);
   void setOnrightstickchanged(
@@ -38,6 +39,7 @@ public:
   string_t id;
   int index;
   unsigned int type;
+  bool _isConnected;
 
 protected:
   shared_ptr_t<IBrowserGamepad> _browserGamepad;

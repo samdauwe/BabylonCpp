@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/gamepad/gamepad.h>
+#include <babylon/tools/observable.h>
 
 namespace BABYLON {
 
@@ -27,6 +28,9 @@ private:
   Uint32Array _buttons;
   ::std::function<void(unsigned int buttonPressed)> _onbuttondown;
   ::std::function<void(unsigned int buttonPressed)> _onbuttonup;
+
+  Observable<unsigned int> onButtonDownObservable;
+  Observable<unsigned int> onButtonUpObservable;
 
 }; // end of class GenericPad
 

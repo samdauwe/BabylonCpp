@@ -12,6 +12,7 @@ Gamepad::Gamepad(const string_t& iId, int iIndex,
     : id{iId}
     , index{iIndex}
     , type{Gamepad::GAMEPAD}
+    , _isConnected{true}
     , _browserGamepad{browserGamepad}
     , _leftStickAxisX{leftStickX}
     , _leftStickAxisY{leftStickY}
@@ -30,6 +31,11 @@ Gamepad::Gamepad(const string_t& iId, int iIndex,
 
 Gamepad::~Gamepad()
 {
+}
+
+bool Gamepad::isConnected() const
+{
+  return _isConnected;
 }
 
 void Gamepad::setOnleftstickchanged(

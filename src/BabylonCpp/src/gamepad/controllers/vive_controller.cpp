@@ -20,7 +20,7 @@ void ViveController::initControllerMesh(
   Scene* scene, const ::std::function<void(AbstractMesh* mesh)>& meshLoaded)
 {
   SceneLoader::ImportMesh(
-    {}, "http://yoda.blob.core.windows.net/models/", "ViveWand.babylon", scene,
+    {}, ViveController::MODEL_BASE_URL, ViveController::MODEL_FILENAME, scene,
     [this, &meshLoaded](vector_t<AbstractMesh*>& newMeshes,
                         vector_t<ParticleSystem*>& /*particleSystems*/,
                         vector_t<Skeleton*>& /*skeletons*/) {

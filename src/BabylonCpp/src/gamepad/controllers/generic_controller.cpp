@@ -20,11 +20,10 @@ void GenericController::initControllerMesh(
   Scene* scene, const ::std::function<void(AbstractMesh* mesh)>& meshLoaded)
 {
   SceneLoader::ImportMesh(
-    {}, "http://yoda.blob.core.windows.net/models/",
-    "genericvrcontroller.babylon", scene,
-    [this, &meshLoaded](vector_t<AbstractMesh*>& newMeshes,
-                        vector_t<ParticleSystem*>& /*particleSystems*/,
-                        vector_t<Skeleton*>& /*skeletons*/) {
+    {}, GenericController::MODEL_BASE_URL, GenericController::MODEL_FILENAME,
+    scene, [this, &meshLoaded](vector_t<AbstractMesh*>& newMeshes,
+                               vector_t<ParticleSystem*>& /*particleSystems*/,
+                               vector_t<Skeleton*>& /*skeletons*/) {
       _defaultModel = newMeshes[1];
       if (meshLoaded) {
         meshLoaded(_defaultModel);

@@ -8,6 +8,11 @@ namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT ViveController : public WebVRController {
 
+private:
+  static constexpr const char* MODEL_BASE_URL
+    = "https://controllers.babylonjs.com/vive/";
+  static constexpr const char* MODEL_FILENAME = "wand.babylon";
+
 public:
   ViveController(const shared_ptr_t<IBrowserGamepad>& vrGamepad);
   ~ViveController();

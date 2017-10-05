@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/gamepad/gamepad.h>
+#include <babylon/tools/observable.h>
 
 namespace BABYLON {
 
@@ -86,6 +87,12 @@ private:
                                Xbox360Button buttonType);
   unsigned int _setDPadValue(unsigned int newValue, unsigned int currentValue,
                              Xbox360Dpad buttonType);
+
+public:
+  Observable<Xbox360Button> onButtonDownObservable;
+  Observable<Xbox360Button> onButtonUpObservable;
+  Observable<Xbox360Dpad> onPadDownObservable;
+  Observable<Xbox360Dpad> onPadUpObservable;
 
 private:
   float _leftTrigger;

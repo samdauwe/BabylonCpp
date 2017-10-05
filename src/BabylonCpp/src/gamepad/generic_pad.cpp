@@ -33,11 +33,19 @@ unsigned int GenericPad::_setButtonValue(unsigned int newValue,
                                          unsigned int buttonIndex)
 {
   if (newValue != currentValue) {
-    if (_onbuttondown && newValue == 1) {
-      _onbuttondown(buttonIndex);
+    if (newValue == 1) {
+      if (_onbuttondown) {
+        _onbuttondown(buttonIndex);
+      }
+
+      onButtonDownObservable.notifyObservers(&buttonIndex);
     }
-    if (_onbuttonup && newValue == 0) {
-      _onbuttonup(buttonIndex);
+    if (newValue == 0) {
+      if (_onbuttonup) {
+        _onbuttonup(buttonIndex);
+      }
+
+      onButtonUpObservable.notifyObservers(&buttonIndex);
     }
   }
   return newValue;
