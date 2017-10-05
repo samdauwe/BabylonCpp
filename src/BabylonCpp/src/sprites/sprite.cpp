@@ -81,11 +81,12 @@ void Sprite::_animate(float deltaTime)
   if (_time > _delay) {
     _time = ::std::fmod(_time, _delay);
     cellIndex += _direction;
-    if (cellIndex == _toIndex) {
+    if (cellIndex > _toIndex) {
       if (_loopAnimation) {
         cellIndex = _fromIndex;
       }
       else {
+        cellIndex         = _toIndex;
         _animationStarted = false;
         if (_onAnimationEnd) {
           _onAnimationEnd();
