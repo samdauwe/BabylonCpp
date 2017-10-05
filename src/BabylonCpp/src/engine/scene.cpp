@@ -806,9 +806,8 @@ void Scene::_onPointerMoveEvent(PointerEvent&& evt)
   if (!pointerMovePredicate) {
     pointerMovePredicate = [this](AbstractMesh* mesh) {
       return mesh->isPickable && mesh->isVisible && mesh->isReady()
-             && mesh->isEnabled()
-             && (constantlyUpdateMeshUnderPointer
-                 || mesh->actionManager != nullptr);
+             && mesh->isEnabled() && (constantlyUpdateMeshUnderPointer
+                                      || mesh->actionManager != nullptr);
     };
   }
 
@@ -2375,9 +2374,6 @@ void Scene::_renderForCamera(Camera* camera)
   // Finalize frame
   postProcessManager->_finalizeFrame(camera->isIntermediate);
 
-  // Update camera
-  activeCamera->_updateFromScene();
-
   // Reset some special arrays
   _renderTargets.clear();
 
@@ -2401,9 +2397,6 @@ void Scene::_processSubCameras(Camera* camera)
   activeCamera = camera;
   setTransformMatrix(activeCamera->getViewMatrix(),
                      activeCamera->getProjectionMatrix());
-
-  // Update camera
-  activeCamera->_updateFromScene();
 }
 
 void Scene::_checkIntersections()
@@ -3042,7 +3035,7 @@ unique_ptr_t<Ray> Scene::createPickingRayInCameraSpace(int x, int y,
   auto cameraViewport = camera->viewport;
   auto viewport       = cameraViewport.toGlobal(engine->getRenderWidth(),
                                           engine->getRenderHeight());
-  auto identity       = Matrix::Identity();
+  auto identity = Matrix::Identity();
 
   // Moving coordinates to local viewport world
   float _x = static_cast<float>(x);

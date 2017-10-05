@@ -4,6 +4,7 @@
 #include <babylon/babylon_global.h>
 #include <babylon/cameras/arc_rotate_camera_inputs_manager.h>
 #include <babylon/cameras/target_camera.h>
+#include <babylon/core/nullable.h>
 #include <babylon/core/structs.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/vector2.h>
@@ -29,8 +30,18 @@ public:
   // Cache
   void _initCache() override;
   void _updateCache(bool ignoreParentClass) override;
+
+  // State
+  Camera& storeState() override;
+
+  /**
+   * Restored camera state. You must call storeState() first
+   */
+  bool _restoreStateValues() override;
+
   // Synchronized
   bool _isSynchronizedViewMatrix();
+
   // Methods
   void attachControl(ICanvas* canvas, bool noPreventDefault = false,
                      bool useCtrlForPanning = true,
@@ -92,6 +103,9 @@ public:
   float upperRadiusLimit;
   float inertialPanningX;
   float inertialPanningY;
+  float pinchToPanMaxDistance;
+  Nullable<float> panningDistanceLimit;
+  Vector3 panningOriginTarget;
   float panningInertia;
   float zoomOnFactor;
   float wheelPrecision;
@@ -132,6 +146,15 @@ protected:
   unique_ptr_t<BouncingBehavior> _bouncingBehavior;
   unique_ptr_t<FramingBehavior> _framingBehavior;
   unique_ptr_t<AutoRotationBehavior> _autoRotationBehavior;
+
+private:
+  /**
+   * Store current camera state (fov, position, etc..)
+   */
+  float _storedAlpha;
+  float _storedBeta;
+  float _storedRadius;
+  Vector3 _storedTarget;
 
 }; // end of class ArcRotateCamera
 

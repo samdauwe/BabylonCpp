@@ -31,7 +31,7 @@ public:
   void detachControl(ICanvas* canvas) override;
   int collisionMask();
   void setCollisionMask(int mask);
-  void _collideWithWorld(Vector3& velocity);
+  void _collideWithWorld(Vector3& displacement);
   void _checkInputs() override;
   bool _decideIfNeedsToMove() override;
   void _updatePosition() override;

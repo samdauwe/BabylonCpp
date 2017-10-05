@@ -25,6 +25,14 @@ public:
   Vector3 getFrontPosition(float distance);
   Vector3* _getLockedTargetPosition();
 
+  /** State */
+  Camera& storeState() override;
+
+  /**
+   * @brief Restored camera state. You must call storeState() first
+   */
+  bool _restoreStateValues() override;
+
   /** Cache */
   void _initCache() override;
   void _updateCache(bool ignoreParentClass) override;
@@ -91,6 +99,12 @@ public:
 private:
   Matrix _rigCamTransformMatrix;
   unique_ptr_t<Vector3> _defaultUpVector;
+  /**
+   * Store current camera state (fov, position, etc..)
+   */
+  Vector3 _storedPosition;
+  Vector3 _storedRotation;
+  Quaternion _storedRotationQuaternion;
 
 }; // end of class TargetCamera
 

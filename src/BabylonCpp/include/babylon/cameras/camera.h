@@ -31,12 +31,23 @@ public:
   static constexpr unsigned int RIG_MODE_WEBVR                             = 21;
 
   static bool ForceAttachControlToAlwaysPreventDefault;
+  static bool UseAlternateWebVRRendering;
 
 public:
   virtual ~Camera();
 
   virtual IReflect::Type type() const override;
   void addToScene(unique_ptr_t<Camera>&& newCamera);
+
+  /**
+   * @brief Store current camera state (fov, position, etc..).
+   */
+  virtual Camera& storeState();
+
+  /**
+   * @brief Restored camera state. You must call storeState() first.
+   */
+  bool restoreState();
 
   /**
    * @param {boolean} fullDetails - support for multiple levels of logging
@@ -50,8 +61,7 @@ public:
 
   /** Cache **/
   virtual void _initCache() override;
-  void _updateCache(bool ignoreParentClass) override;
-  void _updateFromScene();
+  void _updateCache(bool ignoreParentClass = false) override;
 
   /** Synchronized **/
   bool _isSynchronized() override;
@@ -64,7 +74,7 @@ public:
                              MouseButtonType panningMouseButton
                              = MouseButtonType::RIGHT);
   virtual void detachControl(ICanvas* canvas);
-  void _update();
+  void update();
   virtual void _checkInputs();
   vector_t<Camera*>& rigCameras();
   const vector_t<Camera*>& rigCameras() const;
@@ -114,6 +124,8 @@ public:
 protected:
   Camera(const string_t& name, const Vector3& position, Scene* scene);
 
+  virtual bool _restoreStateValues();
+
 private:
   void _cascadePostProcessesToRigCams();
   void updateFrustumPlanes();
@@ -156,6 +168,7 @@ public:
   Observable<Camera> onViewMatrixChangedObservable;
   Observable<Camera> onProjectionMatrixChangedObservable;
   Observable<Camera> onAfterCheckInputsObservable;
+  Observable<Camera> onRestoreStateObservable;
 
   /** Cache **/
   Matrix _projectionMatrix;
@@ -175,6 +188,8 @@ private:
   Vector3 _globalPosition;
   array_t<Plane, 6> _frustumPlanes;
   bool _refreshFrustumPlanes;
+  float _storedFov;
+  bool _stateStored;
 
 }; // end of class Camera
 

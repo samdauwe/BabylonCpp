@@ -22,6 +22,7 @@
 namespace BABYLON {
 
 bool Camera::ForceAttachControlToAlwaysPreventDefault = false;
+bool Camera::UseAlternateWebVRRendering               = false;
 
 Camera::Camera(const string_t& iName, const Vector3& iPosition, Scene* scene)
     : Node(iName, scene)
@@ -71,6 +72,35 @@ void Camera::addToScene(unique_ptr_t<Camera>&& newCamera)
   }
 
   getScene()->addCamera(::std::move(newCamera));
+}
+
+Camera& Camera::storeState()
+{
+  _stateStored = true;
+  _storedFov   = fov;
+
+  return *this;
+}
+
+bool Camera::_restoreStateValues()
+{
+  if (!_stateStored) {
+    return false;
+  }
+
+  fov = _storedFov;
+
+  return true;
+}
+
+bool Camera::restoreState()
+{
+  if (_restoreStateValues()) {
+    onRestoreStateObservable.notifyObservers(this);
+    return true;
+  }
+
+  return false;
 }
 
 string_t Camera::toString(bool fullDetails) const
@@ -139,31 +169,8 @@ void Camera::_updateCache(bool ignoreParentClass)
     Node::_updateCache();
   }
 
-  auto engine = getEngine();
-
   _cache.position.copyFrom(position);
   _cache.upVector.copyFrom(upVector);
-
-  _cache.mode = mode;
-  _cache.minZ = minZ;
-  _cache.maxZ = maxZ;
-
-  _cache.fov         = fov;
-  _cache.fovMode     = fovMode;
-  _cache.aspectRatio = engine->getAspectRatio(this);
-
-  _cache.orthoLeft    = orthoLeft;
-  _cache.orthoRight   = orthoRight;
-  _cache.orthoBottom  = orthoBottom;
-  _cache.orthoTop     = orthoTop;
-  _cache.renderWidth  = engine->getRenderWidth();
-  _cache.renderHeight = engine->getRenderHeight();
-}
-
-void Camera::_updateFromScene()
-{
-  updateCache();
-  _update();
 }
 
 // Synchronized
@@ -220,12 +227,12 @@ void Camera::detachControl(ICanvas* /*canvas*/)
 {
 }
 
-void Camera::_update()
+void Camera::update()
 {
+  _checkInputs();
   if (cameraRigMode != Camera::RIG_MODE_NONE) {
     _updateRigCameras();
   }
-  _checkInputs();
 }
 
 void Camera::_checkInputs()
@@ -348,6 +355,7 @@ Matrix& Camera::getViewMatrix(bool force)
     return _computedViewMatrix;
   }
 
+  _updateCache();
   _computedViewMatrix = _getViewMatrix();
   _currentRenderId    = getScene()->getRenderId();
 
@@ -407,11 +415,21 @@ Matrix& Camera::getProjectionMatrix(bool force)
     return _projectionMatrix;
   }
 
+  // Cache
+  _cache.mode = mode;
+  _cache.minZ = minZ;
+  _cache.maxZ = maxZ;
+
+  // Matrix
   _refreshFrustumPlanes = true;
 
   auto engine = getEngine();
   auto scene  = getScene();
   if (mode == Camera::PERSPECTIVE_CAMERA) {
+    _cache.fov         = fov;
+    _cache.fovMode     = fovMode;
+    _cache.aspectRatio = engine->getAspectRatio(this);
+
     if (minZ <= 0.f) {
       minZ = 0.1f;
     }
@@ -446,6 +464,13 @@ Matrix& Camera::getProjectionMatrix(bool force)
         !stl_util::almost_equal(orthoTop, 0.f) ? orthoTop : halfHeight, minZ,
         maxZ, _projectionMatrix);
     }
+
+    _cache.orthoLeft    = orthoLeft;
+    _cache.orthoRight   = orthoRight;
+    _cache.orthoBottom  = orthoBottom;
+    _cache.orthoTop     = orthoTop;
+    _cache.renderWidth  = engine->getRenderWidth();
+    _cache.renderHeight = engine->getRenderHeight();
   }
 
   onProjectionMatrixChangedObservable.notifyObservers(this);
@@ -518,6 +543,7 @@ void Camera::dispose(bool /*doNotRecurse*/)
   onViewMatrixChangedObservable.clear();
   onProjectionMatrixChangedObservable.clear();
   onAfterCheckInputsObservable.clear();
+  onRestoreStateObservable.clear();
 
   // Animations
   getScene()->stopAnimation(this);
@@ -530,11 +556,21 @@ void Camera::dispose(bool /*doNotRecurse*/)
   _rigCameras.clear();
 
   // Postprocesses
-  for (size_t i = _postProcesses.size(); i-- > 0;) {
-    _postProcesses[i]->dispose(this);
+  if (_rigPostProcess) {
+    _rigPostProcess->dispose(this);
+    _rigPostProcess = nullptr;
+    _postProcesses.clear();
   }
-
-  _postProcesses.clear();
+  else if (cameraRigMode != Camera::RIG_MODE_NONE) {
+    _rigPostProcess = nullptr;
+    _postProcesses.clear();
+  }
+  else {
+    for (size_t i = _postProcesses.size(); i-- > 0;) {
+      _postProcesses[i]->dispose(this);
+    }
+    _postProcesses.clear();
+  }
 
   // Render targets
   auto i = customRenderTargets.size();

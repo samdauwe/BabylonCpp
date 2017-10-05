@@ -36,6 +36,8 @@ ArcRotateCamera::ArcRotateCamera(const string_t& iName, float iAlpha,
     , upperRadiusLimit{0.f}
     , inertialPanningX{0.f}
     , inertialPanningY{0.f}
+    , pinchToPanMaxDistance{20.f}
+    , panningOriginTarget{Vector3::Zero()}
     , panningInertia{0.9f}
     , zoomOnFactor{1.f}
     , targetScreenOffset{Vector2::Zero()}
@@ -94,6 +96,36 @@ void ArcRotateCamera::_updateCache(bool ignoreParentClass)
   _cache.targetScreenOffset.copyFrom(targetScreenOffset);
 }
 
+Camera& ArcRotateCamera::storeState()
+{
+  _storedAlpha  = alpha;
+  _storedBeta   = beta;
+  _storedRadius = radius;
+  _storedTarget = _getTargetPosition().copy();
+
+  return Camera::storeState();
+}
+
+bool ArcRotateCamera::_restoreStateValues()
+{
+  if (!Camera::_restoreStateValues()) {
+    return false;
+  }
+
+  alpha  = _storedAlpha;
+  beta   = _storedBeta;
+  radius = _storedRadius;
+  setTarget(_storedTarget.copy());
+
+  inertialAlphaOffset  = 0.f;
+  inertialBetaOffset   = 0.f;
+  inertialRadiusOffset = 0.f;
+  inertialPanningX     = 0.f;
+  inertialPanningY     = 0.f;
+
+  return true;
+}
+
 Vector3 ArcRotateCamera::_getTargetPosition()
 {
   if (_targetHost && _targetHost->getAbsolutePosition()) {
@@ -141,6 +173,8 @@ void ArcRotateCamera::attachControl(ICanvas* canvas, bool noPreventDefault,
     inertialAlphaOffset  = 0.f;
     inertialBetaOffset   = 0.f;
     inertialRadiusOffset = 0.f;
+    inertialPanningX     = 0.f;
+    inertialPanningY     = 0.f;
   };
 }
 
@@ -212,7 +246,17 @@ void ArcRotateCamera::_checkInputs()
     }
 
     if (!_targetHost) {
-      _target.addInPlace(_transformedDirection);
+      if (panningDistanceLimit) {
+        _transformedDirection.addInPlace(_target);
+        auto distanceSquared = Vector3::DistanceSquared(_transformedDirection,
+                                                        panningOriginTarget);
+        if (distanceSquared <= (panningDistanceLimit * panningDistanceLimit)) {
+          _target.copyFrom(_transformedDirection);
+        }
+      }
+      else {
+        _target.addInPlace(_transformedDirection);
+      }
     }
 
     inertialPanningX *= panningInertia;

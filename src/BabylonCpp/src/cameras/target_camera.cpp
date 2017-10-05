@@ -58,6 +58,38 @@ Vector3* TargetCamera::_getLockedTargetPosition()
   return lockedTarget;
 }
 
+/** State */
+
+Camera& TargetCamera::storeState()
+{
+  _storedPosition = position.copy();
+  _storedRotation = rotation->copy();
+  if (rotationQuaternion) {
+    _storedRotationQuaternion = rotationQuaternion->copy();
+  }
+
+  return Camera::storeState();
+}
+
+bool TargetCamera::_restoreStateValues()
+{
+  if (!Camera::_restoreStateValues()) {
+    return false;
+  }
+
+  position = _storedPosition.copy();
+  rotation = std::make_unique<Vector3>(_storedRotation);
+
+  if (rotationQuaternion) {
+    rotationQuaternion = _storedRotationQuaternion.clone();
+  }
+
+  cameraDirection->copyFromFloats(0.f, 0.f, 0.f);
+  cameraRotation->copyFromFloats(0.f, 0.f);
+
+  return true;
+}
+
 /** Cache */
 void TargetCamera::_initCache()
 {

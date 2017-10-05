@@ -62,7 +62,7 @@ void FreeCamera::setCollisionMask(int mask)
   _collisionMask = !isNan(mask) ? mask : -1;
 }
 
-void FreeCamera::_collideWithWorld(Vector3& velocity)
+void FreeCamera::_collideWithWorld(Vector3& displacement)
 {
   Vector3 globalPosition_;
 
@@ -84,17 +84,17 @@ void FreeCamera::_collideWithWorld(Vector3& velocity)
   _collider->setCollisionMask(_collisionMask);
 
   // no need for clone, as long as gravity is not on.
-  auto actualVelocity = velocity;
+  auto actualDisplacement = displacement;
 
-  // add gravity to the velocity to prevent the dual-collision checking
+  // add gravity to the direction to prevent the dual-collision checking
   if (applyGravity) {
     // this prevents mending with cameraDirection, a global variable of the free
     // camera class.
-    actualVelocity = velocity.add(getScene()->gravity);
+    actualDisplacement = displacement.add(getScene()->gravity);
   }
 
   getScene()->collisionCoordinator->getNewPosition(
-    _oldPosition, actualVelocity, _collider.get(), 3, nullptr,
+    _oldPosition, actualDisplacement, _collider.get(), 3, nullptr,
     [&](int collisionId, Vector3& newPosition, AbstractMesh* collidedMesh) {
       _onCollisionPositionChange(collisionId, newPosition, collidedMesh);
     },
