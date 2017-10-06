@@ -22,6 +22,7 @@
 #include <babylon/samples/materials/shader_material_scene.h>
 #include <babylon/samples/materials/shader_material_skybox_clouds_scene.h>
 #include <babylon/samples/materials/shader_material_skybox_scene.h>
+#include <babylon/samples/materials/shader_material_the_road_to_hell.h>
 #include <babylon/samples/materials/shader_material_with_fog_scene.h>
 #include <babylon/samples/materials/shader_material_wolfenstein_3d_scene.h>
 #include <babylon/samples/mesh/basic_elements_scene.h>
@@ -280,6 +281,12 @@ SamplesIndex::SamplesIndex()
     [](ICanvas* iCanvas) {                                           //
       return ::std::make_unique<ShaderMaterialSkyboxScene>(iCanvas); //
     });                                                              //
+  // Shader Material The Road To Hell Scene
+  _samples["ShaderMaterialTheRoadToHellScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                                  //
+      return ::std::make_unique<ShaderMaterialTheRoadToHellScene>(iCanvas); //
+    });
   // Shader Material With Fog Scene
   _samples["ShaderMaterialWithFogScene"] = ::std::make_tuple(
     true,
