@@ -135,6 +135,9 @@ using Float64Array = ::std::vector<double_t>;
 // Indices array alias
 using IndicesArray = ::std::vector<std::uint32_t>;
 
+// ArrayBuffer
+using ArrayBuffer = ::std::vector<uint8_t>;
+
 // -- Compile time rational arithmetic -- //
 template <::std::intmax_t Num, ::std::intmax_t Denom = 1>
 using ratio_t = ::std::ratio<Num, Denom>;
@@ -188,6 +191,9 @@ using unique_ptr_t = ::std::unique_ptr<T, Deleter>;
 
 template <class T>
 using shared_ptr_t = ::std::shared_ptr<T>;
+
+template <class T>
+using sptr_t = ::std::shared_ptr<T>;
 
 // -- Input/output library -- //
 using ostream_t       = ::std::basic_ostream<char>;
