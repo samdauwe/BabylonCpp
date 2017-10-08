@@ -2,6 +2,8 @@
 #define BABYLON_MATERIALS_TEXTURES_INTERNAL_TEXTURE_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/structs.h>
+#include <babylon/core/variant.h>
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
@@ -79,6 +81,8 @@ public:
 
   unique_ptr_t<GL::IGLTexture> _webGLTexture;
   int _references;
+
+  Variant<ArrayBuffer, Image> _buffer;
 
 private:
   unsigned int _dataSource;

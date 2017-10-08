@@ -63,6 +63,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _deterministicLockstep{false}
     , _lockstepMaxSteps{4}
     , _contextWasLost{false}
+    , _doNotHandleContextLost{false}
     , _performanceMonitor{::std::make_unique<PerformanceMonitor>()}
     , _fps{60.f}
     , _deltaTime{0.f}
@@ -712,7 +713,7 @@ void Engine::scissorClear(int x, int y, int width, int height,
                           const Color4& clearColor)
 {
   // Save state
-  int curScissor                = _gl->getParameteri(GL::SCISSOR_TEST);
+  int curScissor = _gl->getParameteri(GL::SCISSOR_TEST);
   array_t<int, 3> curScissorBox = _gl->getScissorBoxParameter();
 
   // Change state
@@ -1588,7 +1589,7 @@ unique_ptr_t<GL::IGLProgram> Engine::createShaderProgram(
 
   const string_t shaderVersion
     = (_webGLVersion > 1.f) ? "#version 300 es\n" : "";
-  auto vertexShader   = Engine::CompileShader(context, vertexCode, "vertex",
+  auto vertexShader = Engine::CompileShader(context, vertexCode, "vertex",
                                             defines, shaderVersion);
   auto fragmentShader = Engine::CompileShader(context, fragmentCode, "fragment",
                                               defines, shaderVersion);
@@ -2079,7 +2080,8 @@ InternalTexture* Engine::createTexture(
   const vector_t<string_t>& list, bool noMipmap, bool invertY, Scene* scene,
   unsigned int samplingMode,
   const ::std::function<void(InternalTexture*, EventState&)>& onLoad,
-  const ::std::function<void()>& onError, Buffer* buffer)
+  const ::std::function<void()>& onError,
+  const Variant<ArrayBuffer, Image>& buffer)
 {
   if (list.empty()) {
     return nullptr;
@@ -2090,116 +2092,141 @@ InternalTexture* Engine::createTexture(
 }
 
 InternalTexture* Engine::createTexture(
-  const string_t& /*urlArg*/, bool /*noMipmap*/, bool /*invertY*/,
-  Scene* /*scene*/, unsigned int /*samplingMode*/,
-  const ::std::function<void(InternalTexture*, EventState&)>& /*onLoad*/,
-  const ::std::function<void()>& /*onError*/, Buffer* /*buffer*/,
-  InternalTexture* /*fallBack*/, unsigned int /*format*/)
+  const string_t& urlArg, bool noMipmap, bool invertY, Scene* scene,
+  unsigned int samplingMode,
+  const ::std::function<void(InternalTexture*, EventState&)>& onLoad,
+  const ::std::function<void()>& onError,
+  const Variant<ArrayBuffer, Image>& buffer, InternalTexture* fallBack,
+  unsigned int format)
 {
-#if 0
-  auto texture
-    = ::std::make_unique<InternalTexture>(this, InternalTexture::DATASOURCE_URL);
-  auto _texture = texture.get();
+  // assign a new string, so that the original is still available in case of
+  // fallback
+  auto url      = urlArg;
+  auto fromData = url.substr(0, 5) == "data:";
+  auto fromBlob = url.substr(0, 5) == "blob:";
+  auto isBase64 = fromData && String::contains(url, "base64");
 
-  string_t extension;
-  bool isKTX        = false;
-  bool fromDataBool = false;
-  vector_t<string_t> fromDataArray;
-  string_t url = urlArg;
+  auto texture = fallBack ?
+                   fallBack :
+                   new InternalTexture(this, InternalTexture::DATASOURCE_URL);
 
-  if ((url.size() >= 5) && (url.substr(0, 5) == "data:")) {
-    fromDataBool = true;
+  // establish the file extension, if possible
+  auto lastDotTmp = String::lastIndexOf(url, ".");
+  size_t lastDot  = lastDotTmp >= 0 ? static_cast<size_t>(lastDotTmp) : 0;
+  auto extension
+    = (lastDot > 0) ? String::toLowerCase(url.substr(lastDot, url.size())) : "";
+  auto isDDS = getCaps().s3tc && (extension == ".dds");
+  auto isTGA = (extension == ".tga");
+
+  // determine if a ktx file should be substituted
+  auto isKTX = false;
+  if (!_textureFormatInUse.empty() && !isBase64 && !fallBack) {
+    url   = url.substr(0, lastDot) + _textureFormatInUse;
+    isKTX = true;
   }
 
-  if (!fromDataBool) {
-    if (url.size() >= 4) {
-      auto lastDot = String::lastIndexOf(url, ".");
-      if (lastDot != -1) {
-        size_t _lastDot = static_cast<size_t>(lastDot);
-        extension       = String::toLowerCase(url.substr(_lastDot));
-
-        if (!_textureFormatInUse.empty() && !fromDataBool && !fallBack) {
-          extension = _textureFormatInUse;
-          url       = url.substr(0, _lastDot) + _textureFormatInUse;
-          isKTX     = true;
-        }
-      }
-    }
+  if (scene) {
+    scene->_addPendingData(texture);
   }
-  else {
-    string_t oldUrl = url;
-    fromDataArray      = String::split(oldUrl, ':');
-    url                = oldUrl;
-    if ((fromDataArray.size() >= 2) && (fromDataArray[1].size() >= 4)) {
-      extension = String::toLowerCase(
-        fromDataArray[1].substr(fromDataArray[1].size() - 4, 4));
-    }
+  texture->url             = url;
+  texture->generateMipMaps = !noMipmap;
+  texture->samplingMode    = samplingMode;
+  texture->invertY         = invertY;
+
+  if (!_doNotHandleContextLost) {
+    // Keep a link to the buffer only if we plan to handle context lost
+    texture->_buffer = buffer;
   }
-
-  bool isDDS = getCaps().s3tc && (extension == ".dds");
-  bool isTGA = (extension == ".tga");
-
-  scene->_addPendingData(_texture);
-  _texture->url             = url;
-  _texture->generateMipMaps = !noMipmap;
-  _texture->samplingMode    = samplingMode;
-  _texture->invertY         = invertY;
 
   if (onLoad) {
     texture->onLoadedObservable.add(onLoad);
   }
-  if (!fallBack) {
-    _internalTexturesCache.emplace_back(::std::move(texture));
-  }
+  if (!fallBack)
+    _internalTexturesCache.emplace_back(texture);
 
-  auto onerror = [&](const string_t& msg) {
-    scene->_removePendingData(_texture);
+  const auto _onerror = [&](const string_t& /*msg*/) {
+    if (scene) {
+      scene->_removePendingData(texture);
+    }
 
     // fallback for when compressed file not found to try again.  For instance,
     // etc1 does not have an alpha capable type
     if (isKTX) {
-      createTexture(urlArg, noMipmap, invertY, scene, samplingMode, onLoad,
-                    onError, buffer, texture.get());
+      createTexture(urlArg, noMipmap, invertY, scene, samplingMode, nullptr,
+                    onError, buffer, texture);
     }
     else if (onError) {
-      BABYLON_LOG_ERROR("Engine", msg);
       onError();
     }
   };
-  ::std::function<void(const Image& img)> onload = nullptr;
 
-  if (isTGA) {
-    // Not implemented yet
-  }
-  else if (isDDS) {
-    // Not implemented yet
-  }
-  else {
-    onload = [&](const Image& img) {
-      Engine::PrepareGLTexture(
-        _texture, _gl, scene, img.width, img.height, noMipmap, false,
-        [&](int potWidth, int potHeight) {
-          bool isPot = (img.width == potWidth && img.height == potHeight);
-          isPot      = true;
-          if (isPot) {
-            _gl->texImage2D(GL::TEXTURE_2D, 0, GL::RGBA, img.width, img.height,
-                            0, GL::RGBA, GL::UNSIGNED_BYTE, img.data);
-          }
-        },
-        invertY, samplingMode);
-    };
-  }
-
-  if (fromDataArray.empty()) {
-    Tools::LoadImage(url, onload, onerror);
-  }
-  else {
-    // Not implemented yet
-  }
-
-  return _texture;
+#if 0
+  ::std::function<void(ArrayBufferView & arrayBuffer)> callback;
 #endif
-  return nullptr;
+
+  // processing for non-image formats
+  if (isKTX || isTGA || isDDS) {
+    // Not implemented yet
+  }
+  else {
+    auto onload = [&](const Image& img) {
+      if (fromBlob && !_doNotHandleContextLost) {
+        // We need to store the image if we need to rebuild the texture
+        // in case of a webgl context lost
+        texture->_buffer.set<Image>(img);
+      }
+
+      const auto processFunction = [&](
+        int potWidth, int potHeight,
+        const ::std::function<void()>& continuationCallback) {
+        auto isPot = (img.width == potWidth && img.height == potHeight);
+        auto internalFormat = format ?
+                                _getInternalFormat(format) :
+                                ((extension == ".jpg") ? GL::RGB : GL::RGBA);
+
+        if (isPot) {
+          _gl->texImage2D(GL::TEXTURE_2D, 0, GL::RGBA, img.width, img.height, 0,
+                          GL::RGBA, GL::UNSIGNED_BYTE, img.data);
+          return false;
+        }
+
+        // Using shaders to rescale because canvas.drawImage is lossy
+        auto source
+          = new InternalTexture(this, InternalTexture::DATASOURCE_TEMP);
+        _bindTextureDirectly(GL::TEXTURE_2D, source);
+        _gl->texImage2D(GL::TEXTURE_2D, 0, GL::RGBA, img.width, img.height, 0,
+                        GL::RGBA, GL::UNSIGNED_BYTE, img.data);
+
+        _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, GL::LINEAR);
+        _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, GL::LINEAR);
+        _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S,
+                           GL::CLAMP_TO_EDGE);
+        _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T,
+                           GL::CLAMP_TO_EDGE);
+
+        _rescaleTexture(source, texture, scene, internalFormat, [&]() {
+          _releaseTexture(source);
+          _bindTextureDirectly(GL::TEXTURE_2D, texture);
+
+          continuationCallback();
+        });
+
+        return true;
+      };
+
+      _prepareWebGLTexture(texture, scene, img.width, img.height, invertY,
+                           noMipmap, false, processFunction, samplingMode);
+    };
+
+    if (!fromData || isBase64) {
+      // Not implemented yet
+    }
+    else {
+      Tools::LoadImage(url, onload, _onerror);
+    }
+  }
+
+  return texture;
 }
 
 void Engine::_rescaleTexture(InternalTexture* source,
@@ -2630,14 +2657,14 @@ Engine::createMultipleRenderTarget(ISize size,
                     GL::DEPTH_COMPONENT,   //
                     GL::UNSIGNED_SHORT,    //
                     nullptr                //
-    );
+                    );
 
     _gl->framebufferTexture2D(GL::FRAMEBUFFER,                   //
                               GL::DEPTH_ATTACHMENT,              //
                               GL::TEXTURE_2D,                    //
                               depthTexture->_webGLTexture.get(), //
                               0                                  //
-    );
+                              );
 
     depthTexture->_framebuffer           = ::std::move(framebuffer); // FIXME
     depthTexture->baseWidth              = width;
@@ -2922,9 +2949,9 @@ void Engine::updateRawCubeTexture(InternalTexture* texture,
     }
   }
 
-  auto isPot = !needPOTTextures()
-               || (Tools::IsExponentOfTwo(texture->width)
-                   && Tools::IsExponentOfTwo(texture->height));
+  auto isPot
+    = !needPOTTextures() || (Tools::IsExponentOfTwo(texture->width)
+                             && Tools::IsExponentOfTwo(texture->height));
   if (isPot && texture->generateMipMaps && level == 0) {
     _gl->generateMipmap(GL::TEXTURE_CUBE_MAP);
   }
@@ -2960,9 +2987,9 @@ unique_ptr_t<InternalTexture> Engine::createRawCubeTexture(
   texture->height = height;
 
   // Double check on POT to generate Mips.
-  auto isPot = !needPOTTextures()
-               || (Tools::IsExponentOfTwo(texture->width)
-                   && Tools::IsExponentOfTwo(texture->height));
+  auto isPot
+    = !needPOTTextures() || (Tools::IsExponentOfTwo(texture->width)
+                             && Tools::IsExponentOfTwo(texture->height));
   if (!isPot) {
     generateMipMaps = false;
   }
@@ -3055,9 +3082,9 @@ void Engine::_prepareWebGLTextureContinuation(InternalTexture* texture,
 void Engine::_prepareWebGLTexture(
   InternalTexture* texture, Scene* scene, int width, int height,
   Nullable<bool> invertY, bool noMipmap, bool isCompressed,
-  const ::std::function<
-    bool(int width, int height,
-         const ::std::function<void()>& continuationCallback)>& processFunction,
+  const ::std::function<bool(
+    int width, int height,
+    const ::std::function<void()>& continuationCallback)>& processFunction,
   unsigned int samplingMode)
 {
   auto potWidth = needPOTTextures() ?
@@ -3797,9 +3824,9 @@ unique_ptr_t<GL::IGLShader> Engine::CompileShader(GL::IGLRenderingContext* gl,
 {
   auto shader = gl->createShader(type == "vertex" ? GL::VERTEX_SHADER :
                                                     GL::FRAGMENT_SHADER);
-  gl->shaderSource(shader, shaderVersion
-                             + ((!defines.empty()) ? defines + "\n" : "")
-                             + source);
+  gl->shaderSource(shader,
+                   shaderVersion + ((!defines.empty()) ? defines + "\n" : "")
+                     + source);
   gl->compileShader(shader);
 
   if (!gl->getShaderParameter(shader, GL::COMPILE_STATUS)) {

@@ -149,7 +149,7 @@ struct Image {
       , mode{iMode}
   {
   }
-  Image(Uint8Array iData, int iWidth, int iHeight, int iDepth,
+  Image(ArrayBuffer iData, int iWidth, int iHeight, int iDepth,
         unsigned int iMode)
       : data(::std::move(iData))
       , width{iWidth}
@@ -162,7 +162,7 @@ struct Image {
   {
     return data.size() > 0 && width > 0 && height > 0 && depth > 0;
   }
-  Uint8Array data;
+  ArrayBuffer data;
   int width, height;
   int depth;
   unsigned int mode;

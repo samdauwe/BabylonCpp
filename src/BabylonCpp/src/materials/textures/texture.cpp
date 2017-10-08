@@ -63,12 +63,14 @@ Texture::Texture(const string_t& _url, Scene* scene, bool noMipmap,
 
   if (!_texture) {
     if (!scene->useDelayedTextureLoading) {
+#if 0
       _texture = scene->getEngine()->createTexture(
         url, noMipmap, invertY, scene, _samplingMode, _load, onError, _buffer,
         nullptr, _format);
       if (deleteBuffer) {
         delete _buffer;
       }
+#endif
     }
     else {
       delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
@@ -141,12 +143,14 @@ void Texture::delayLoad()
   _texture       = _getFromCache(url, _noMipmap, _samplingMode);
 
   if (!_texture) {
+#if 0
     _texture = getScene()->getEngine()->createTexture(
       url, _noMipmap, _invertY, getScene(), _samplingMode, _delayedOnLoad,
       _delayedOnError, _buffer, nullptr, _format);
     if (_deleteBuffer) {
       delete _buffer;
     }
+#endif
   }
   else {
     if (_texture->isReady) {

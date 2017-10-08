@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/core/structs.h>
+#include <babylon/core/variant.h>
 #include <babylon/engine/engine_capabilities.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/engine/engine_options.h>
@@ -362,13 +363,47 @@ public:
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const ::std::function<void(InternalTexture*, EventState&)>& onLoad
     = nullptr,
-    const ::std::function<void()>& onError = nullptr, Buffer* buffer = nullptr);
+    const ::std::function<void()>& onError = nullptr,
+    const Variant<ArrayBuffer, Image>& buffer = Variant<ArrayBuffer, Image>());
+
+  /**
+   * @brief Usually called from BABYLON.Texture.ts.  Passed information to
+   * create a WebGLTexture.
+   * @param {string} urlArg- This contains one of the following:
+   *  1. A conventional http URL, e.g. 'http://...' or 'file://...'
+   *  2. A base64 string of in-line texture data, e.g.
+   * 'data:image/jpg;base64,/...'
+   *  3. An indicator that data being passed using the buffer parameter, e.g.
+   * 'data:mytexture.jpg'
+   *
+   * @param {boolean} noMipmap- When true, no mipmaps shall be generated.
+   * Ignored for compressed textures.  They must be in the file.
+   * @param {boolean} invertY- When true, image is flipped when loaded.  You
+   * probably want true. Ignored for compressed textures.  Must be flipped in
+   * the file.
+   * @param {Scene} scene- Needed for loading to the correct scene.
+   * @param {number} samplingMode- Mode with should be used sample / access the
+   * texture. Default: TRILINEAR
+   * @param {callback} onLoad- Optional callback to be called upon successful
+   * completion.
+   * @param {callback} onError- Optional callback to be called upon failure.
+   * @param {ArrayBuffer | HTMLImageElement} buffer- A source of a file
+   * previously fetched as either an ArrayBuffer (compressed or image format) or
+   * HTMLImageElement (image format)
+   * @param {WebGLTexture} fallback- An internal argument in case the function
+   * must be called again, due to etc1 not having alpha capabilities.
+   * @param {number} format-  Internal format.  Default: RGB when extension is
+   * '.jpg' else RGBA.  Ignored for compressed textures.
+   *
+   * @returns {WebGLTexture} for assignment back into BABYLON.Texture
+   */
   InternalTexture* createTexture(
     const string_t& urlArg, bool noMipmap, bool invertY, Scene* scene,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const ::std::function<void(InternalTexture*, EventState&)>& onLoad
     = nullptr,
-    const ::std::function<void()>& onError = nullptr, Buffer* buffer = nullptr,
+    const ::std::function<void()>& onError = nullptr,
+    const Variant<ArrayBuffer, Image>& buffer = Variant<ArrayBuffer, Image>(),
     InternalTexture* fallBack = nullptr,
     unsigned int format       = EngineConstants::TEXTUREFORMAT_RGBA);
   void updateRawTexture(InternalTexture* texture, const Uint8Array& data,
@@ -650,6 +685,7 @@ private:
   ::std::function<void(Event&& evt)> _onContextLost;
   ::std::function<void(Event&& evt)> _onContextRestored;
   bool _contextWasLost;
+  bool _doNotHandleContextLost;
 
   // FPS
   unique_ptr_t<PerformanceMonitor> _performanceMonitor;
