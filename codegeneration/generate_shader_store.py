@@ -132,10 +132,17 @@ def generateShadersStore(shaderFiles, outputDir,
     output += "#define BABYLON_MATERIALS_EFFECT_SHADERS_STORE_H%s%s" % (eol,eol)
     output += "#include <babylon/babylon_global.h>%s%s" % (eol, eol)
     output += "namespace BABYLON {%s%s" % (eol, eol)
-    output += "struct BABYLON_SHARED_EXPORT EffectShadersStore {%s" % eol
-    output += "  static unordered_map_t<string_t, const char*> "
-    output += "Shaders;%s" % eol
-    output += "}; // end of struct EffectShadersStore%s%s" % (eol, eol)
+    output += "class BABYLON_SHARED_EXPORT EffectShadersStore {%s%s" % (eol,eol)
+    output += "public:%s" % eol
+    output += "  EffectShadersStore();%s" % eol
+    output += "  ~EffectShadersStore();%s%s" % (eol,eol)
+    output += "  unordered_map_t<string_t, const char*>& shaders();%s" % eol
+    output += "  const unordered_map_t<string_t, const char*>& shaders() const;"
+    output += "%s%s" % (eol, eol)
+    output += "private:%s" % eol
+    output += "  static unordered_map_t<string_t, const char*> _shaders;"
+    output += "%s%s" % (eol,eol)
+    output += "}; // end of class EffectShadersStore%s%s" % (eol, eol)
     output += "} // end of namespace BABYLON%s%s#endif " % (eol, eol)
     output += "// end of BABYLON_MATERIALS_EFFECT_SHADERS_STORE_H%s" % eol
     # write output to file
@@ -154,11 +161,28 @@ def generateShadersStore(shaderFiles, outputDir,
         output += "#include <babylon/shaders/%s>%s" % ("%s.h" % \
                                         shaderFilename.replace(".", "_"), eol)
     output += "%snamespace BABYLON {%s%s" % (eol, eol, eol)
+    output += "EffectShadersStore::EffectShadersStore()%s" % eol
+    output += "{%s}%s%s" % (eol, eol, eol)
+    output += "EffectShadersStore::~EffectShadersStore()%s" % eol
+    output += "{%s}%s%s" % (eol, eol, eol)
+    output += "unordered_map_t<string_t, const char*>& "
+    output += "EffectShadersStore::shaders()%s" % eol
+    output += "{%s  return _shaders;%s}%s%s" % (eol, eol, eol, eol)
+    output += "const unordered_map_t<string_t, const char*>&%s" % eol
+    output += "EffectShadersStore::shaders() const%s" % eol
+    output += "{%s  return _shaders;%s}%s%s" % (eol, eol, eol, eol)
+    # create shader name to shared source mapping
     output += "unordered_map_t<string_t, const char*> "
-    output += "EffectShadersStore::Shaders = {%s" % eol
+    output += "EffectShadersStore::_shaders%s" % eol
+    shaderMapping = ""
     for shaderName in shaderNames:
-        output += "  {\"%s\", %s},%s" % (shaderName, shaderName, eol)
-    output = "%s%s};%s%s" % (output[:-2], eol, eol, eol)
+        if len(shaderName) * 2 + 10 > 80:
+            shaderMapping += "     {\"%s\",%s" % (shaderName, eol)
+            shaderMapping += "      %s},%s" % (shaderName, eol)
+        else:
+            shaderMapping += "     {\"%s\", %s},%s" % \
+                                                (shaderName, shaderName, eol)
+    output += "  = {%s};%s%s" % (shaderMapping[5:-2], eol, eol)
     output += "} // end of namespace BABYLON%s" % eol
     # write output to file
     outputFileLocation = os.path.join(outputDir, outputFileName)
