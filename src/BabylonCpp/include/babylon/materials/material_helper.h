@@ -22,8 +22,8 @@ public:
                                     unsigned int POINTSIZE, unsigned int FOG);
   static void PrepareDefinesForFrameBoundValues(
     Scene* scene, Engine* engine, MaterialDefines& defines, bool useInstances,
-    unsigned int CLIPPLANE, unsigned int ALPHATEST, unsigned int INSTANCES,
-    bool forceAlphaTest = false);
+    unsigned int CLIPPLANE, unsigned int ALPHATEST, unsigned int DEPTHPREPASS,
+    unsigned int INSTANCES, bool forceAlphaTest = false);
   static bool PrepareDefinesForAttributes(
     AbstractMesh* mesh, MaterialDefines& defines, bool useVertexColor,
     bool useBones, bool useMorphTargets, unsigned int NORMAL, unsigned int UV1,

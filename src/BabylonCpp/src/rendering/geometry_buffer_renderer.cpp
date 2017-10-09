@@ -223,8 +223,8 @@ void GeometryBufferRenderer::_createRenderTargets()
     return;
   }
 
-  _multiRenderTarget->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
-  _multiRenderTarget->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
+  _multiRenderTarget->setWrapU(TextureConstants::CLAMP_ADDRESSMODE);
+  _multiRenderTarget->setWrapV(TextureConstants::CLAMP_ADDRESSMODE);
   _multiRenderTarget->setRefreshRate(1);
   _multiRenderTarget->renderParticles = false;
   _multiRenderTarget->renderList      = {};

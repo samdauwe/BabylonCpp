@@ -65,9 +65,7 @@ MultiRenderTarget::MultiRenderTarget(const string_t& name, Size size,
     count                   // textureCount
   };
 
-  _internalTextures = scene->getEngine()->createMultipleRenderTarget(
-    size, _multiRenderTargetOptions);
-
+  _createInternalTextures();
   _createInternalTextures();
 }
 
@@ -92,7 +90,45 @@ Texture* MultiRenderTarget::depthTexture()
   return (!_textures.empty()) ? _textures.back() : nullptr;
 }
 
+void MultiRenderTarget::setWrapU(unsigned int wrap)
+{
+  if (!_textures.empty()) {
+    for (auto& texture : _textures) {
+      texture->wrapU = wrap;
+    }
+  }
+}
+
+void MultiRenderTarget::setWrapV(unsigned int wrap)
+{
+  if (!_textures.empty()) {
+    for (auto& texture : _textures) {
+      texture->wrapV = wrap;
+    }
+  }
+}
+
+void MultiRenderTarget::_rebuild()
+{
+  releaseInternalTextures();
+  _createInternalTextures();
+
+  for (std::size_t i = 0; i < _internalTextures.size(); ++i) {
+    auto texture      = _textures[i];
+    texture->_texture = _internalTextures[i];
+  }
+
+  // Keeps references to frame buffer and stencil/depth buffer
+  _texture = (!_internalTextures.empty()) ? _internalTextures[0] : nullptr;
+}
+
 void MultiRenderTarget::_createInternalTextures()
+{
+  _internalTextures = getScene()->getEngine()->createMultipleRenderTarget(
+    _size, _multiRenderTargetOptions);
+}
+
+void MultiRenderTarget::_createTextures()
 {
   _textures.clear();
   for (std::size_t i = 0; i < _internalTextures.size(); ++i) {
@@ -143,7 +179,7 @@ void MultiRenderTarget::releaseInternalTextures()
     return;
   }
 
-  for (std::size_t i = _internalTextures.size(); i-- > 0;) {
+  for (auto i = _internalTextures.size(); i-- > 0;) {
     if (_internalTextures[i] != nullptr) {
       _internalTextures[i]->dispose();
     }

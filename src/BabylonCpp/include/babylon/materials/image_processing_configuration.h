@@ -156,7 +156,8 @@ public:
    * @brief Prepare the list of defines associated to the shader.
    * @param defines the list of defines to complete
    */
-  void prepareDefines(IImageProcessingConfigurationDefines& defines);
+  void prepareDefines(IImageProcessingConfigurationDefines& defines,
+                      bool forPostProcess = false);
 
   /**
    * @brief Returns true if all the image processing information are ready.

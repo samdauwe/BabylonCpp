@@ -8,6 +8,7 @@
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
+#include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/mesh/vertex_buffer.h>
 
 namespace BABYLON {
@@ -107,14 +108,31 @@ ProceduralTexture::ProceduralTexture(const string_t& _name, const Size& size,
     = ::std::make_unique<VertexBuffer>(
       engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
+  _createIndexBuffer();
+}
+
+ProceduralTexture::~ProceduralTexture()
+{
+}
+
+void ProceduralTexture::_createIndexBuffer()
+{
+  auto engine = getScene()->getEngine();
+
   // Indices
   Uint32Array indices{0, 1, 2, 0, 2, 3};
 
   _indexBuffer = engine->createIndexBuffer(indices);
 }
 
-ProceduralTexture::~ProceduralTexture()
+void ProceduralTexture::_rebuild()
 {
+  _vertexBuffers[VertexBuffer::PositionKindChars]->_rebuild();
+  _createIndexBuffer();
+
+  if (refreshRate() == RenderTargetTexture::REFRESHRATE_RENDER_ONCE) {
+    setRefreshRate(RenderTargetTexture::REFRESHRATE_RENDER_ONCE);
+  }
 }
 
 void ProceduralTexture::reset()

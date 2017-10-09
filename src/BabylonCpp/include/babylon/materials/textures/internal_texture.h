@@ -82,6 +82,8 @@ public:
   unique_ptr_t<GL::IGLTexture> _webGLTexture;
   int _references;
 
+  unsigned int _cachedAnisotropicFilteringLevel;
+
   Variant<ArrayBuffer, Image> _buffer;
 
 private:

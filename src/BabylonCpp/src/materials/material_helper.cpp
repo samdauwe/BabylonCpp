@@ -90,14 +90,13 @@ void MaterialHelper::PrepareDefinesForMisc(
     defines.defines[FOG]
       = (scene->fogEnabled() && mesh->applyFog()
          && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled);
-    defines.USERIGHTHANDEDSYSTEM = scene->useRightHandedSystem();
   }
 }
 
 void MaterialHelper::PrepareDefinesForFrameBoundValues(
   Scene* scene, Engine* engine, MaterialDefines& defines, bool useInstances,
-  unsigned int CLIPPLANE, unsigned int ALPHATEST, unsigned int INSTANCES,
-  bool forceAlphaTest)
+  unsigned int CLIPPLANE, unsigned int ALPHATEST, unsigned int DEPTHPREPASS,
+  unsigned int INSTANCES, bool forceAlphaTest)
 {
   bool changed = false;
 
@@ -109,6 +108,11 @@ void MaterialHelper::PrepareDefinesForFrameBoundValues(
   if (defines[ALPHATEST] != (engine->getAlphaTesting() || forceAlphaTest)) {
     defines.defines[ALPHATEST] = !defines[ALPHATEST];
     changed                    = true;
+  }
+
+  if (defines[DEPTHPREPASS] != !engine->getColorWrite()) {
+    defines.defines[DEPTHPREPASS] = !defines[DEPTHPREPASS];
+    changed                       = true;
   }
 
   if (defines[INSTANCES] != useInstances) {

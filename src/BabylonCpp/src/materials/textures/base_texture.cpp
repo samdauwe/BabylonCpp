@@ -29,7 +29,6 @@ BaseTexture::BaseTexture(Scene* scene)
     , lodGenerationScale{0.8f}
     , isRenderTarget{false}
     , delayLoadState{EngineConstants::DELAYLOADSTATE_NONE}
-    , _cachedAnisotropicFilteringLevel{0}
     , _texture{nullptr}
     , _hasAlpha{false}
     , _coordinatesMode{TextureConstants::EXPLICIT_MODE}

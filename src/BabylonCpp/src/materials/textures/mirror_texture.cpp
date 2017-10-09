@@ -28,7 +28,9 @@ MirrorTexture::MirrorTexture(const string_t& iName, const ISize& size,
     , _blurRatio{1.f}
 
 {
-  onBeforeRender = [this]() {
+  ignoreCameraViewport = true;
+
+  onBeforeRenderObservable.add([this](int*, EventState&) {
     auto scene = getScene();
     Matrix::ReflectionToRef(mirrorPlane, _mirrorMatrix);
     _savedViewMatrix = scene->getViewMatrix();
@@ -38,15 +40,14 @@ MirrorTexture::MirrorTexture(const string_t& iName, const ISize& size,
     scene->getEngine()->cullBackFaces = false;
     scene->setMirroredCameraPosition(Vector3::TransformCoordinates(
       scene->activeCamera->globalPosition(), _mirrorMatrix));
-  };
+  });
 
-  onAfterRender = [this]() {
+  onAfterRenderObservable.add([this](int*, EventState&) {
     auto scene = getScene();
     scene->setTransformMatrix(_savedViewMatrix, scene->getProjectionMatrix());
     scene->getEngine()->cullBackFaces = true;
     scene->_mirroredCameraPosition.reset(nullptr);
-    scene->resetClipPlane();
-  };
+  });
 }
 
 MirrorTexture::~MirrorTexture()

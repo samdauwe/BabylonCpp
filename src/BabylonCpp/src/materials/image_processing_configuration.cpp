@@ -230,8 +230,19 @@ void ImageProcessingConfiguration::PrepareSamplers(
 }
 
 void ImageProcessingConfiguration::prepareDefines(
-  IImageProcessingConfigurationDefines& defines)
+  IImageProcessingConfigurationDefines& defines, bool forPostProcess)
 {
+  if (forPostProcess != applyByPostProcess()) {
+    defines.VIGNETTE                   = false;
+    defines.TONEMAPPING                = false;
+    defines.CONTRAST                   = false;
+    defines.EXPOSURE                   = false;
+    defines.COLORCURVES                = false;
+    defines.COLORGRADING               = false;
+    defines.IMAGEPROCESSING            = false;
+    defines.IMAGEPROCESSINGPOSTPROCESS = applyByPostProcess();
+    return;
+  }
   defines.VIGNETTE = vignetteEnabled();
   defines.VIGNETTEBLENDMODEMULTIPLY
     = (vignetteBlendMode()
@@ -307,7 +318,7 @@ void ImageProcessingConfiguration::bind(Effect* effect, float aspectRatio)
                       0.5f / textureSize,              // textureOffset
                       textureSize,                     // textureSize
                       weight                           // weight
-    );
+                      );
   }
 }
 

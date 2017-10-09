@@ -66,6 +66,7 @@ public:
   InternalTexture* emptyCubeTexture();
 
   float webGLVersion() const;
+  bool supportsUniformBuffers() const;
   bool needPOTTextures() const;
   bool badOS() const;
   bool badDesktopOS() const;
@@ -322,6 +323,7 @@ public:
   bool getDepthWrite() const;
   void setDepthWrite(bool enable);
   void setColorWrite(bool enable);
+  bool getColorWrite() const;
   void setAlphaConstants(float r, float g, float b, float a);
   void setAlphaMode(int mode, bool noDepthWriteChange = false);
   int getAlphaMode() const;
@@ -634,6 +636,7 @@ public:
   int _oldHardwareScaleFactor;
   int _vrAnimationFrameHandler;
   // Uniform buffers list
+  bool disableUniformBuffers;
   vector_t<UniformBuffer*> _uniformBuffers;
 
   static AudioEngine* audioEngine;
@@ -665,6 +668,7 @@ private:
   bool _pointerLockRequested;
   bool _alphaTest;
   bool _isStencilEnable;
+  bool _colorWrite;
 
   ILoadingScreen* _loadingScreen;
 

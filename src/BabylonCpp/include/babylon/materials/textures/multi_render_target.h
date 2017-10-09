@@ -20,6 +20,9 @@ public:
   vector_t<Texture*>& textures();
   Texture* depthTexture();
 
+  void setWrapU(unsigned int wrap);
+  void setWrapV(unsigned int wrap);
+  void _rebuild() override;
   unsigned int samples() const;
   void setSamples(unsigned int value);
   void resize(Size size);
@@ -28,6 +31,7 @@ public:
 
 private:
   void _createInternalTextures();
+  void _createTextures();
 
 private:
   vector_t<InternalTexture*> _internalTextures;

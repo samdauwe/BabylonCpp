@@ -15,7 +15,7 @@
 
 namespace BABYLON {
 
-Material::Material(const string_t& iName, Scene* scene, bool /*doNotAdd*/)
+Material::Material(const string_t& iName, Scene* scene, bool doNotAdd)
     : id{!iName.empty() ? iName : Tools::RandomId()}
     , name{iName}
     , checkReadyOnEveryCall{false}
@@ -26,6 +26,8 @@ Material::Material(const string_t& iName, Scene* scene, bool /*doNotAdd*/)
     , storeEffectOnSubMeshes{false}
     , alphaMode{EngineConstants::ALPHA_COMBINE}
     , disableDepthWrite{false}
+    , forceDepthWrite{false}
+    , separateCullingPass{false}
     , pointSize{1.f}
     , zOffset{0.f}
     , _effect{nullptr}
@@ -37,7 +39,7 @@ Material::Material(const string_t& iName, Scene* scene, bool /*doNotAdd*/)
     , _needDepthPrePass{false}
     , _fogEnabled{true}
     , _useUBO{false}
-    , _scene{scene}
+    , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _fillMode{Material::TriangleFillMode}
 {
   if (_scene->useRightHandedSystem()) {
@@ -47,7 +49,11 @@ Material::Material(const string_t& iName, Scene* scene, bool /*doNotAdd*/)
     sideOrientation = Material::CounterClockWiseSideOrientation;
   }
 
-  _useUBO = getScene()->getEngine()->webGLVersion() > 1.f;
+  _useUBO = getScene()->getEngine()->supportsUniformBuffers();
+
+  if (!doNotAdd) {
+    // _scene->materials.emplace_back(this);
+  }
 }
 
 Material::~Material()

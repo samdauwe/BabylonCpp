@@ -51,6 +51,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , preventCacheWipeBetweenFrames{false}
     , enableOfflineSupport{false}
     , _vrDisplayEnabled{false}
+    , disableUniformBuffers{false}
     , disablePerformanceMonitorInBackground{false}
     , _gl{nullptr}
     , _renderingCanvas{canvas}
@@ -58,6 +59,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _webGLVersion{1.f}
     , _badOS{false}
     , _alphaTest{false}
+    , _colorWrite{true}
     , _videoTextureSupported{false}
     , _renderingQueueLaunched{false}
     , _deterministicLockstep{false}
@@ -334,6 +336,11 @@ void Engine::_initGLContext()
 float Engine::webGLVersion() const
 {
   return _webGLVersion;
+}
+
+bool Engine::supportsUniformBuffers() const
+{
+  return webGLVersion() > 1.f && !disableUniformBuffers;
 }
 
 bool Engine::needPOTTextures() const
@@ -1932,6 +1939,12 @@ void Engine::setDepthWrite(bool enable)
 void Engine::setColorWrite(bool enable)
 {
   _gl->colorMask(enable, enable, enable, enable);
+  _colorWrite = enable;
+}
+
+bool Engine::getColorWrite() const
+{
+  return _colorWrite;
 }
 
 void Engine::setAlphaConstants(float r, float g, float b, float a)
@@ -3431,11 +3444,11 @@ void Engine::_setAnisotropicLevel(unsigned int key, BaseTexture* texture)
   }
 
   if (anisotropicFilterExtension
-      && texture->_cachedAnisotropicFilteringLevel != value) {
+      && internalTexture->_cachedAnisotropicFilteringLevel != value) {
     _gl->texParameterf(
       key, AnisotropicFilterExtension::TEXTURE_MAX_ANISOTROPY_EXT,
       static_cast<float>(::std::min(value, _caps.maxAnisotropy)));
-    texture->_cachedAnisotropicFilteringLevel = value;
+    internalTexture->_cachedAnisotropicFilteringLevel = value;
   }
 }
 

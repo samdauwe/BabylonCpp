@@ -94,7 +94,6 @@ public:
    */
   Observable<BaseTexture> onDisposeObservable;
   unsigned int delayLoadState;
-  unsigned int _cachedAnisotropicFilteringLevel;
   InternalTexture* _texture;
 
 private:

@@ -18,7 +18,7 @@ UniformBuffer::UniformBuffer(Engine* engine, const Float32Array& data,
     , _dynamic{dynamic}
     , _uniformLocationPointer{0}
     , _needSync{false}
-    , _noUBO{engine->webGLVersion() == 1.f}
+    , _noUBO{!engine->supportsUniformBuffers()}
 {
   if (_noUBO) {
     updateMatrix3x3 = [this](const string_t& name, const Float32Array& matrix) {

@@ -18,6 +18,7 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
     "VERTEXALPHA",
     "OPACITYRGB",
     "ALPHATEST",
+    "DEPTHPREPASS"
     "ALPHABLEND",
     "ALPHAFROMALBEDO",
     "SPECULAROVERALPHA",

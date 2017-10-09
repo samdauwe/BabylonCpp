@@ -169,6 +169,8 @@ public:
   bool storeEffectOnSubMeshes;
   int alphaMode;
   bool disableDepthWrite;
+  bool forceDepthWrite;
+  bool separateCullingPass;
   float pointSize;
   float zOffset;
   Effect* _effect;

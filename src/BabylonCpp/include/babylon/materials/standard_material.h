@@ -75,7 +75,24 @@ public:
   Json::object serialize() const;
 
   // Getters / Setters
+  BaseTexture* diffuseTexture() const;
+  void setDiffuseTexture(BaseTexture* value);
+  BaseTexture* ambientTexture() const;
+  void setAmbientTexture(BaseTexture* value);
+  BaseTexture* opacityTexture() const;
+  void setOpacityTexture(BaseTexture* value);
+  BaseTexture* reflectionTexture() const;
+  void setReflectionTexture(RenderTargetTexture* value);
   BaseTexture* emissiveTexture() const;
+  void setEmissiveTexture(BaseTexture* value);
+  BaseTexture* specularTexture() const;
+  void setSpecularTexture(BaseTexture* value);
+  BaseTexture* bumpTexture() const;
+  void setBumpTexture(BaseTexture* value);
+  BaseTexture* lightmapTexture() const;
+  void setLightmapTexture(BaseTexture* value);
+  BaseTexture* refractionTexture() const;
+  void setRefractionTexture(RenderTargetTexture* value);
   bool useAlphaFromDiffuseTexture() const;
   void setUseAlphaFromDiffuseTexture(bool value);
   bool useEmissiveAsIllumination() const;
@@ -186,6 +203,36 @@ public:
    * @brief Sets the Color Grading 2D Lookup Texture.
    */
   void setCameraColorGradingTexture(BaseTexture* value);
+
+  /**
+   * @brief The color grading curves provide additional color adjustmnent that
+   * is applied after any color grading transform (3D LUT).
+   * They allow basic adjustment of saturation and small exposure adjustments,
+   * along with color filter tinting to provide white balance adjustment or more
+   * stylistic effects.
+   * These are similar to controls found in many professional imaging or
+   * colorist software. The global controls are applied to the entire image. For
+   * advanced tuning, extra controls are provided to adjust the shadow, midtone
+   * and highlight areas of the image;
+   * corresponding to low luminance, medium luminance, and high luminance areas
+   * respectively.
+   */
+  ColorCurves* cameraColorCurves() const;
+
+  /**
+   * @brief The color grading curves provide additional color adjustmnent that
+   * is applied after any color grading transform (3D LUT).
+   * They allow basic adjustment of saturation and small exposure adjustments,
+   * along with color filter tinting to provide white balance adjustment or more
+   * stylistic effects.
+   * These are similar to controls found in many professional imaging or
+   * colorist software. The global controls are applied to the entire image. For
+   * advanced tuning, extra controls are provided to adjust the shadow, midtone
+   * and highlight areas of the image;
+   * corresponding to low luminance, medium luminance, and high luminance areas
+   * respectively.
+   */
+  void setCameraColorCurves(ColorCurves* value);
 
   // Statics
   static StandardMaterial* Parse(const Json::value& source, Scene* scene,

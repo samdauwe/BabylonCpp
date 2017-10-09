@@ -542,7 +542,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   // Values that need to be evaluated on every frame
   MaterialHelper::PrepareDefinesForFrameBoundValues(
     scene, engine, defines, useInstances, SMD::CLIPPLANE, SMD::ALPHATEST,
-    SMD::INSTANCES);
+    SMD::DEPTHPREPASS, SMD::INSTANCES);
 
   // Get correct effect
   if (defines.isDirty()) {
@@ -684,8 +684,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                 "refractionLeftColor",
                                 "refractionRightColor",
                                 "logarithmicDepthConstant",
-                                "vNormalReoderParams"};
-
+                                "vTangentSpaceParams"};
     vector_t<string_t> samplers{
       "diffuseSampler",        "ambientSampler",      "opacitySampler",
       "reflectionCubeSampler", "reflection2DSampler", "emissiveSampler",
@@ -766,7 +765,7 @@ void StandardMaterial::buildUniformLayout()
   _uniformBuffer->addUniform("lightmapMatrix", 16);
   _uniformBuffer->addUniform("specularMatrix", 16);
   _uniformBuffer->addUniform("bumpMatrix", 16);
-  _uniformBuffer->addUniform("vNormalReoderParams", 4);
+  _uniformBuffer->addUniform("vTangentSpaceParams", 2);
   _uniformBuffer->addUniform("refractionMatrix", 16);
   _uniformBuffer->addUniform("vRefractionInfos", 4);
   _uniformBuffer->addUniform("vSpecularColor", 4);
@@ -946,16 +945,14 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
           MaterialHelper::BindTextureMatrix(*_bumpTexture, *_uniformBuffer,
                                             "bump");
           if (scene->_mirroredCameraPosition) {
-            _uniformBuffer->updateFloat4(
-              "vNormalReoderParams", _invertNormalMapX ? 0.f : 1.f,
-              _invertNormalMapX ? 1.f : -1.f, _invertNormalMapY ? 0.f : 1.f,
-              _invertNormalMapY ? 1.f : -1.f, "");
+            _uniformBuffer->updateFloat2("vTangentSpaceParams",
+                                         _invertNormalMapX ? 1.f : -1.f,
+                                         _invertNormalMapY ? 1.f : -1.f, "");
           }
           else {
-            _uniformBuffer->updateFloat4(
-              "vNormalReoderParams", _invertNormalMapX ? 1.f : 0.f,
-              _invertNormalMapX ? -1.f : 1.f, _invertNormalMapY ? 1.f : 0.f,
-              _invertNormalMapY ? -1.f : 1.f, "");
+            _uniformBuffer->updateFloat2("vTangentSpaceParams",
+                                         _invertNormalMapX ? -1.f : 1.f,
+                                         _invertNormalMapY ? -1.f : 1.f, "");
           }
         }
 
@@ -1049,9 +1046,10 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     // Colors
     scene->ambientColor.multiplyToRef(ambientColor, _globalAmbientColor);
 
-    effect->setVector3("vEyePosition", scene->_mirroredCameraPosition ?
-                                         *scene->_mirroredCameraPosition :
-                                         scene->activeCamera->globalPosition());
+    effect->setVector3("vEyePosition",
+                       scene->_mirroredCameraPosition ?
+                         *scene->_mirroredCameraPosition :
+                         scene->activeCamera->globalPosition());
     effect->setColor3("vAmbientColor", _globalAmbientColor);
   }
 
@@ -1282,9 +1280,94 @@ Json::object StandardMaterial::serialize() const
   return Json::object();
 }
 
+BaseTexture* StandardMaterial::diffuseTexture() const
+{
+  return _diffuseTexture;
+}
+
+void StandardMaterial::setDiffuseTexture(BaseTexture* value)
+{
+  _diffuseTexture = value;
+}
+
+BaseTexture* StandardMaterial::ambientTexture() const
+{
+  return _ambientTexture;
+}
+
+void StandardMaterial::setAmbientTexture(BaseTexture* value)
+{
+  _ambientTexture = value;
+}
+
+BaseTexture* StandardMaterial::opacityTexture() const
+{
+  return _opacityTexture;
+}
+
+void StandardMaterial::setOpacityTexture(BaseTexture* value)
+{
+  _opacityTexture = value;
+}
+
+BaseTexture* StandardMaterial::reflectionTexture() const
+{
+  return _reflectionTexture;
+}
+
+void StandardMaterial::setReflectionTexture(RenderTargetTexture* value)
+{
+  _reflectionTexture = value;
+}
+
 BaseTexture* StandardMaterial::emissiveTexture() const
 {
   return _emissiveTexture;
+}
+
+void StandardMaterial::setEmissiveTexture(BaseTexture* value)
+{
+  _emissiveTexture = value;
+}
+
+BaseTexture* StandardMaterial::specularTexture() const
+{
+  return _specularTexture;
+}
+
+void StandardMaterial::setSpecularTexture(BaseTexture* value)
+{
+  _specularTexture = value;
+}
+
+BaseTexture* StandardMaterial::bumpTexture() const
+{
+  return _bumpTexture;
+}
+
+void StandardMaterial::setBumpTexture(BaseTexture* value)
+{
+  _bumpTexture = value;
+}
+
+BaseTexture* StandardMaterial::lightmapTexture() const
+{
+  return _lightmapTexture;
+}
+
+void StandardMaterial::setLightmapTexture(BaseTexture* value)
+{
+  _lightmapTexture = value;
+}
+
+BaseTexture* StandardMaterial::refractionTexture() const
+{
+  return _refractionTexture;
+}
+
+void StandardMaterial::setRefractionTexture(RenderTargetTexture* value)
+{
+  _refractionTexture = value;
 }
 
 bool StandardMaterial::useAlphaFromDiffuseTexture() const
@@ -1584,6 +1667,16 @@ BaseTexture* StandardMaterial::cameraColorGradingTexture() const
 void StandardMaterial::setCameraColorGradingTexture(BaseTexture* value)
 {
   _imageProcessingConfiguration->colorGradingTexture = value;
+}
+
+ColorCurves* StandardMaterial::cameraColorCurves() const
+{
+  return _imageProcessingConfiguration->colorCurves.get();
+}
+
+void StandardMaterial::setCameraColorCurves(ColorCurves* value)
+{
+  *_imageProcessingConfiguration->colorCurves.get() = *value;
 }
 
 StandardMaterial* StandardMaterial::Parse(const Json::value& source,

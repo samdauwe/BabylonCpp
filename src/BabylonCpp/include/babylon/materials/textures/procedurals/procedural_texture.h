@@ -18,6 +18,7 @@ public:
                     Texture* fallbackTexture, bool generateMipMaps = true);
   ~ProceduralTexture();
 
+  void _rebuild() override;
   void reset();
   bool isReady() override;
   void resetRefreshCounter();
@@ -41,6 +42,9 @@ public:
   void render(bool useCameraPostProcess = false);
   unique_ptr_t<ProceduralTexture> clone() const;
   void dispose(bool doNotRecurse = false) override;
+
+private:
+  void _createIndexBuffer();
 
 public:
   bool _generateMipMaps;

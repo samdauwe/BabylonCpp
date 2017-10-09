@@ -460,9 +460,6 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         else {
           defines.defines[PMD::PARALLAX] = false;
         }
-
-        defines.defines[PMD::USERIGHTHANDEDSYSTEM]
-          = scene->useRightHandedSystem();
       }
       else {
         defines.defines[PMD::BUMP] = false;
@@ -707,7 +704,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                 "vSphericalZX",
                                 "vReflectionMicrosurfaceInfos",
                                 "vRefractionMicrosurfaceInfos",
-                                "vNormalReoderParams"};
+                                "vTangentSpaceParams"};
 
     vector_t<string_t> samplers{
       "albedoSampler",         "reflectivitySampler", "ambientSampler",
@@ -778,7 +775,7 @@ void PBRBaseMaterial::buildUniformLayout()
   _uniformBuffer->addUniform("reflectivityMatrix", 16);
   _uniformBuffer->addUniform("microSurfaceSamplerMatrix", 16);
   _uniformBuffer->addUniform("bumpMatrix", 16);
-  _uniformBuffer->addUniform("vNormalReoderParams", 4);
+  _uniformBuffer->addUniform("vTangentSpaceParams", 2);
   _uniformBuffer->addUniform("refractionMatrix", 16);
   _uniformBuffer->addUniform("reflectionMatrix", 16);
 
@@ -841,6 +838,9 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
 
     bindViewProjection(effect);
 
+    auto reflectionTexture = _getReflectionTexture();
+    auto refractionTexture = _getRefractionTexture();
+
     if (!_uniformBuffer->useUbo() || !isFrozen() || !_uniformBuffer->isSync()) {
 
       // Texture uniforms
@@ -873,7 +873,6 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
                                             "opacity");
         }
 
-        auto reflectionTexture = _getReflectionTexture();
         if (reflectionTexture && StandardMaterial::ReflectionTextureEnabled()) {
           _uniformBuffer->updateMatrix(
             "reflectionMatrix",
@@ -969,20 +968,17 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
           MaterialHelper::BindTextureMatrix(*_bumpTexture, *_uniformBuffer,
                                             "bump");
           if (scene->_mirroredCameraPosition) {
-            _uniformBuffer->updateFloat4(
-              "vNormalReoderParams", _invertNormalMapX ? 0.f : 1.f,
-              _invertNormalMapX ? 1.f : -1.f, _invertNormalMapY ? 0.f : 1.f,
-              _invertNormalMapY ? 1.f : -1.f, "");
+            _uniformBuffer->updateFloat2("vTangentSpaceParams",
+                                         _invertNormalMapX ? 1.f : -1.f,
+                                         _invertNormalMapY ? 1.f : -1.f, "");
           }
           else {
-            _uniformBuffer->updateFloat4(
-              "vNormalReoderParams", _invertNormalMapX ? 1.f : 0.f,
-              _invertNormalMapX ? -1.f : 1.f, _invertNormalMapY ? 1.f : 0.f,
-              _invertNormalMapY ? -1.f : 1.f, "");
+            _uniformBuffer->updateFloat2("vTangentSpaceParams",
+                                         _invertNormalMapX ? -1.f : 1.f,
+                                         _invertNormalMapY ? -1.f : 1.f, "");
           }
         }
 
-        auto refractionTexture = _getRefractionTexture();
         if (refractionTexture && StandardMaterial::RefractionTextureEnabled()) {
           _uniformBuffer->updateMatrix(
             "refractionMatrix",
@@ -1137,9 +1133,10 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     auto eyePosition = scene->_mirroredCameraPosition ?
                          *scene->_mirroredCameraPosition :
                          scene->activeCamera->globalPosition();
+    auto invertNormal = (scene->useRightHandedSystem()
+                         == (scene->_mirroredCameraPosition != nullptr));
     effect->setFloat4("vEyePosition", eyePosition.x, eyePosition.y,
-                      eyePosition.z,
-                      scene->_mirroredCameraPosition ? -1.f : 1.f);
+                      eyePosition.z, invertNormal ? -1.f : 1.f);
     effect->setColor3("vAmbientColor", _globalAmbientColor);
   }
 
