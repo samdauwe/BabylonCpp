@@ -25,7 +25,10 @@ void PostProcessManager::_prepareBuffers()
   }
 
   // VBO
-  Float32Array vertices{1.f, 1.f, -1.f, 1.f, -1.f, -1.f, 1.f, -1.f};
+  Float32Array vertices{1.f,  1.f,  //
+                        -1.f, 1.f,  //
+                        -1.f, -1.f, //
+                        1.f,  -1.f};
   _vertexBuffers[VertexBuffer::PositionKindChars]
     = ::std::make_unique<VertexBuffer>(_scene->getEngine(), vertices,
                                        VertexBuffer::PositionKind, false, false,
@@ -33,9 +36,25 @@ void PostProcessManager::_prepareBuffers()
   _vertexBufferPtrs[VertexBuffer::PositionKindChars]
     = _vertexBuffers[VertexBuffer::PositionKindChars].get();
 
+  _buildIndexBuffer();
+}
+
+void PostProcessManager::_buildIndexBuffer()
+{
   // Indices
   IndicesArray indices{0, 1, 2, 0, 2, 3};
+
   _indexBuffer = _scene->getEngine()->createIndexBuffer(indices);
+}
+
+void PostProcessManager::_rebuild()
+{
+  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)
+      && _vertexBuffers[VertexBuffer::PositionKindChars]) {
+    return;
+  }
+  _vertexBuffers[VertexBuffer::PositionKindChars]->_rebuild();
+  _buildIndexBuffer();
 }
 
 bool PostProcessManager::_prepareFrame(
@@ -97,7 +116,7 @@ void PostProcessManager::directRender(
 
 void PostProcessManager::_finalizeFrame(
   bool doNotPresent, InternalTexture* targetTexture, unsigned int faceIndex,
-  const vector_t<PostProcess*>& _postProcesses)
+  const vector_t<PostProcess*>& _postProcesses, bool forceFullscreenViewport)
 {
   const auto& postProcesses = _postProcesses.empty() ?
                                 _scene->activeCamera->_postProcesses :
@@ -113,7 +132,8 @@ void PostProcessManager::_finalizeFrame(
     }
     else {
       if (targetTexture) {
-        engine->bindFramebuffer(targetTexture, faceIndex);
+        engine->bindFramebuffer(targetTexture, faceIndex, 0, 0,
+                                forceFullscreenViewport);
       }
       else {
         engine->restoreDefaultFramebuffer();

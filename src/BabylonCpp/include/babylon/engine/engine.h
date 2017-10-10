@@ -60,6 +60,7 @@ public:
 
   vector_t<string_t>& texturesSupported();
   string_t textureFormatInUse() const;
+  Viewport* currentViewport() const;
 
   // Empty texture
   InternalTexture* emptyTexture();
@@ -617,6 +618,7 @@ public:
   // To enable/disable IDB support and avoid XHR on .manifest
   bool enableOfflineSupport;
   vector_t<Scene*> scenes;
+  vector_t<PostProcess*> postProcesses;
   // Observables
   /**
    * Observable event triggered each time the rendering canvas is resized.

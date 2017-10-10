@@ -954,6 +954,7 @@ public:
   /** Defines the gravity applied to this scene */
   Vector3 gravity;
   // Postprocesses
+  vector_t<PostProcess*> postProcesses;
   bool postProcessesEnabled;
   unique_ptr_t<PostProcessManager> postProcessManager;
   // Customs render targets

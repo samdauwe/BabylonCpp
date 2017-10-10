@@ -45,6 +45,7 @@ PostProcess::PostProcess(
     , scaleMode{EngineConstants::SCALEMODE_FLOOR}
     , alwaysForcePOT{false}
     , samples{1}
+    , adaptScaleToCurrentViewport{false}
     , _currentRenderTextureInd{0}
     , _renderRatio{1.f}
     , _options{options}
@@ -62,9 +63,11 @@ PostProcess::PostProcess(
     _scene  = camera->getScene();
     _camera->attachPostProcess(this);
     _engine = _scene->getEngine();
+    _scene->postProcesses.emplace_back(this);
   }
   else {
     _engine = engine;
+    _scene->postProcesses.emplace_back(this);
   }
 
   renderTargetSamplingMode = samplingMode;
@@ -236,6 +239,15 @@ void PostProcess::activate(Camera* camera, InternalTexture* sourceTexture,
     int desiredWidth = _options.width == -1 ? requiredWidth : _options.width;
     int desiredHeight
       = _options.height == -1 ? requiredHeight : _options.height;
+
+    if (adaptScaleToCurrentViewport) {
+      auto currentViewport = engine->currentViewport();
+
+      if (currentViewport) {
+        desiredWidth *= currentViewport->width;
+        desiredHeight *= currentViewport->height;
+      }
+    }
 
     if (renderTargetSamplingMode != TextureConstants::TRILINEAR_SAMPLINGMODE
         || alwaysForcePOT) {
@@ -415,6 +427,19 @@ void PostProcess::dispose(Camera* camera)
   auto pCamera = camera ? camera : _camera;
 
   _disposeTextures();
+
+  if (_scene) {
+    _scene->postProcesses.erase(::std::remove(_scene->postProcesses.begin(),
+                                              _scene->postProcesses.end(),
+                                              this),
+                                _scene->postProcesses.end());
+  }
+  else {
+    _engine->postProcesses.erase(::std::remove(_engine->postProcesses.begin(),
+                                               _engine->postProcesses.end(),
+                                               this),
+                                 _engine->postProcesses.end());
+  }
 
   if (!pCamera) {
     return;

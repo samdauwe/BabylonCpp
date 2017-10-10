@@ -197,6 +197,11 @@ string_t Engine::textureFormatInUse() const
   return _textureFormatInUse;
 }
 
+Viewport* Engine::currentViewport() const
+{
+  return _cachedViewport;
+}
+
 InternalTexture* Engine::emptyTexture()
 {
   if (!_emptyTexture) {

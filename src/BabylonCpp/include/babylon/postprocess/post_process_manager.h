@@ -16,6 +16,7 @@ public:
   virtual ~PostProcessManager();
 
   /** Methods **/
+  void _rebuild();
   bool _prepareFrame(InternalTexture* sourceTexture,
                      const vector_t<PostProcess*>& postProcesses = {});
   void directRender(const vector_t<PostProcess*>& postProcesses,
@@ -25,11 +26,13 @@ public:
                       InternalTexture* targetTexture = nullptr,
                       unsigned int faceIndex         = 0,
                       const vector_t<PostProcess*>& postProcesses
-                      = vector_t<PostProcess*>());
+                      = vector_t<PostProcess*>(),
+                      bool forceFullscreenViewport = false);
   void dispose(bool doNotRecurse = false) override;
 
 private:
   void _prepareBuffers();
+  void _buildIndexBuffer();
 
 private:
   Scene* _scene;

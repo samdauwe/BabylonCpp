@@ -21,6 +21,8 @@ VRDistortionCorrectionPostProcess::VRDistortionCorrectionPostProcess(
     , _postProcessScaleFactor{vrMetrics.postProcessScaleFactor}
     , _lensCenterOffset{vrMetrics.lensCenterOffset}
 {
+  adaptScaleToCurrentViewport = true;
+
   onSizeChangedObservable.add([&](PostProcess*, EventState&) {
     aspectRatio = static_cast<float>(width) * 0.5f / static_cast<float>(height);
     _scaleIn    = Vector2(2.f, 2.f / aspectRatio);

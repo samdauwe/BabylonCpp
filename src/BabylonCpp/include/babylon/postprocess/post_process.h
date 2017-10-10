@@ -96,6 +96,7 @@ public:
   unsigned int scaleMode;
   bool alwaysForcePOT;
   unsigned int samples;
+  bool adaptScaleToCurrentViewport;
   vector_t<InternalTexture*> _textures;
   unsigned int _currentRenderTextureInd;
   // Events
