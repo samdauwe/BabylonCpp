@@ -30,10 +30,14 @@ public:
     = ::std::function<void(T* eventData, EventState& eventState)>;
   using SPtr = shared_ptr_t<Observable<T>>;
 
-  static EventState::UPtr _eventState;
-
 public:
-  Observable()
+  Observable() : Observable{nullptr}
+  {
+  }
+
+  Observable(const ::std::function<void(typename Observer<T>::Ptr& observer)>&
+               onObserverAdded)
+      : _eventState{0}, _onObserverAdded{onObserverAdded}
   {
   }
 
@@ -56,7 +60,7 @@ public:
   typename Observer<T>::Ptr add(const CallbackFunc& callback, int mask = -1,
                                 bool insertFirst = false)
   {
-    if (callback == nullptr) {
+    if (!callback) {
       return nullptr;
     }
 
@@ -67,6 +71,10 @@ public:
     }
     else {
       _observers.emplace_back(observer);
+    }
+
+    if (_onObserverAdded) {
+      _onObserverAdded(observer);
     }
 
     return observer;
@@ -85,7 +93,7 @@ public:
   typename Observer<T>::Ptr add(CallbackFunc&& callback, int mask = -1,
                                 bool insertFirst = false)
   {
-    if (callback == nullptr) {
+    if (!callback) {
       return nullptr;
     }
 
@@ -106,7 +114,7 @@ public:
    * @param observer the instance of the Observer to remove. If it doesn't
    * belong to this Observable, false will be returned.
    */
-  bool remove(typename Observer<T>::Ptr observer)
+  bool remove(typename Observer<T>::Ptr& observer)
   {
     auto it
       = ::std::remove_if(_observers.begin(), _observers.end(),
@@ -122,7 +130,7 @@ public:
 
   /**
    * @brief Remove a callback from the Observable object.
-   * @param callback the callback to remove. If it doesn't belong to this.
+   * @param callback the callback to remove. If it doesn't belong to
    * Observable, false will be returned.
    */
   bool removeCallback(const CallbackFunc& callback)
@@ -150,19 +158,34 @@ public:
    */
   bool notifyObservers(T* eventData = nullptr, int mask = -1)
   {
-    auto& state              = _eventState;
-    state->mask              = mask;
-    state->skipNextObservers = false;
+    auto& state             = _eventState;
+    state.mask              = mask;
+    state.skipNextObservers = false;
 
     for (auto& obs : _observers) {
       if (obs->mask & mask) {
-        obs->callback(eventData, *state);
+        obs->callback(eventData, state);
       }
-      if (state->skipNextObservers) {
+      if (state.skipNextObservers) {
         return false;
       }
     }
     return true;
+  }
+
+  /**
+   * @brief Notify a specific observer
+   * @param eventData
+   * @param mask
+   */
+  void notifyObserver(typename Observer<T>::Ptr& observer,
+                      T* eventData = nullptr, int mask = -1)
+  {
+    auto& state             = _eventState;
+    state.mask              = mask;
+    state.skipNextObservers = false;
+
+    observer.callback(eventData, state);
   }
 
   /**
@@ -179,6 +202,7 @@ public:
   void clear()
   {
     _observers.clear();
+    _onObserverAdded = nullptr;
   }
 
   /**
@@ -202,7 +226,7 @@ public:
   bool hasSpecificMask(int mask = -1)
   {
     for (const auto& obs : _observers) {
-      if (obs.mask & mask && obs.mask == mask) {
+      if (obs.mask & mask || obs.mask == mask) {
         return true;
       }
     }
@@ -211,11 +235,10 @@ public:
 
 private:
   vector_t<typename Observer<T>::Ptr> _observers;
+  EventState _eventState;
+  ::std::function<void(typename Observer<T>::Ptr& observer)> _onObserverAdded;
 
 }; // end of class Observable
-
-template <class T>
-EventState::UPtr Observable<T>::_eventState = ::std::make_unique<EventState>(0);
 
 } // end of namespace BABYLON
 
