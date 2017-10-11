@@ -13,7 +13,7 @@ struct SSAO2Ratio {
 }; // end of struct SSAO2Ratio
 
 class BABYLON_SHARED_EXPORT SSAO2RenderingPipeline
-    : public PostProcessRenderPipeline {
+  : public PostProcessRenderPipeline {
 
 public:
   /**
@@ -65,6 +65,7 @@ public:
   void setExpensiveBlur(bool b);
   bool expensiveBlur();
   static bool IsSupported();
+  void _rebuild() override;
 
   /**
    * @brief Removes the internal pipeline assets and detatches the pipeline from

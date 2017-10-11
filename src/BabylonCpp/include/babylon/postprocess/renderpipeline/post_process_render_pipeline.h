@@ -27,6 +27,7 @@ public:
   vector_t<Camera*> getCameras() const;
   bool isSupported() const;
   void addEffect(PostProcessRenderEffect* renderEffect);
+  virtual void _rebuild();
   void _enableEffect(const string_t& renderEffectName,
                      const vector_t<Camera*>& cameras);
   void _disableEffect(const string_t& renderEffectName,

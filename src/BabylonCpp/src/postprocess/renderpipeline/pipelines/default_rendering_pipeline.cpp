@@ -5,6 +5,7 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas.h>
+#include <babylon/materials/image_processing_configuration.h>
 #include <babylon/postprocess/blur_post_process.h>
 #include <babylon/postprocess/fxaa_post_process.h>
 #include <babylon/postprocess/highlights_post_process.h>
@@ -240,6 +241,9 @@ void DefaultRenderingPipeline::_buildPipeline()
       addEffect(new PostProcessRenderEffect(
         engine, ImageProcessingPostProcessId,
         [this]() { return imageProcessing; }, true));
+    }
+    else {
+      _scene->imageProcessingConfiguration()->setApplyByPostProcess(false);
     }
   }
 

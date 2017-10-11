@@ -33,6 +33,8 @@ public:
                                         const string_t& passName,
                                         const vector_t<Camera*>& cameras);
   void update();
+  void _rebuild();
+  void dispose();
 
 private:
   unordered_map_t<string_t, PostProcessRenderPipeline*> _renderPipelines;

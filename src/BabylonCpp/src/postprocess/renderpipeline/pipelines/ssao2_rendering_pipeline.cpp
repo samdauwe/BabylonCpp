@@ -140,7 +140,7 @@ bool SSAO2RenderingPipeline::expensiveBlur()
 bool SSAO2RenderingPipeline::IsSupported()
 {
   auto engine = Engine::LastCreatedEngine();
-  return engine->webGLVersion() > 1.f;
+  return engine->getCaps().drawBuffersExtension;
 }
 
 void SSAO2RenderingPipeline::dispose(bool disableGeometryBufferRenderer)
@@ -211,6 +211,12 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio,
   });
 }
 
+void SSAO2RenderingPipeline::_rebuild()
+{
+  _firstUpdate = true;
+  PostProcessRenderPipeline::_rebuild();
+}
+
 Float32Array SSAO2RenderingPipeline::_generateHemisphere()
 {
   auto numSamples = samples();
@@ -272,9 +278,10 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
     effect->setFloat("base", base);
     effect->setFloat("near", _scene->activeCamera->minZ);
     effect->setFloat("far", _scene->activeCamera->maxZ);
-    effect->setFloat("xViewport", ::std::tan(_scene->activeCamera->fov / 2.f)
-                                    * _scene->getEngine()->getAspectRatio(
-                                        _scene->activeCamera, true));
+    effect->setFloat(
+      "xViewport",
+      ::std::tan(_scene->activeCamera->fov / 2.f)
+        * _scene->getEngine()->getAspectRatio(_scene->activeCamera, true));
     effect->setFloat("yViewport", ::std::tan(_scene->activeCamera->fov / 2.f));
     effect->setMatrix("projection", _scene->getProjectionMatrix());
 

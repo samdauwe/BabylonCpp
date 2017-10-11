@@ -99,6 +99,8 @@ void SSAORenderingPipeline::dispose(bool disableDepthRender)
   // TODO FIXME
   //_scene->postProcessRenderPipelineManager->detachCamerasFromRenderPipeline(
   //  _name, _scene->cameras);
+
+  PostProcessRenderPipeline::dispose(disableDepthRender);
 }
 
 void SSAORenderingPipeline::_createBlurPostProcess(float ratio)
@@ -139,6 +141,12 @@ void SSAORenderingPipeline::_createBlurPostProcess(float ratio)
       _firstUpdate = false;
     }
   });
+}
+
+void SSAORenderingPipeline::_rebuild()
+{
+  _firstUpdate = true;
+  PostProcessRenderPipeline::_rebuild();
 }
 
 void SSAORenderingPipeline::_createSSAOPostProcess(float ratio)

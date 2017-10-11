@@ -49,6 +49,10 @@ void PostProcessRenderPipeline::addEffect(PostProcessRenderEffect* renderEffect)
   _renderEffects[renderEffect->_name] = renderEffect;
 }
 
+void PostProcessRenderPipeline::_rebuild()
+{
+}
+
 void PostProcessRenderPipeline::_enableEffect(const string_t& renderEffectName,
                                               const vector_t<Camera*>& cameras)
 {

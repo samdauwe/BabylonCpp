@@ -13,7 +13,7 @@ struct SSARatio {
 }; // end of struct SSARatio
 
 class BABYLON_SHARED_EXPORT SSAORenderingPipeline
-    : public PostProcessRenderPipeline {
+  : public PostProcessRenderPipeline {
 
 public:
   /**
@@ -60,6 +60,8 @@ public:
   virtual ~SSAORenderingPipeline();
 
   /** Methods */
+
+  void _rebuild() override;
 
   /**
    * Removes the internal pipeline assets and detatches the pipeline from the

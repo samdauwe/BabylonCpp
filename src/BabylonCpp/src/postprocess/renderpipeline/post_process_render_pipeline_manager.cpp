@@ -107,4 +107,20 @@ void PostProcessRenderPipelineManager::update()
   }
 }
 
+void PostProcessRenderPipelineManager::_rebuild()
+{
+  for (auto& item : _renderPipelines) {
+    auto& pipeline = item.second;
+    pipeline->_rebuild();
+  }
+}
+
+void PostProcessRenderPipelineManager::dispose()
+{
+  for (auto& item : _renderPipelines) {
+    auto& pipeline = item.second;
+    pipeline->dispose();
+  }
+}
+
 } // end of namespace BABYLON
