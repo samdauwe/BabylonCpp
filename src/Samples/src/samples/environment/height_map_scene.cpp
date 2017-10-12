@@ -4,6 +4,7 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/standard_material.h>
+#include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/mesh/ground_mesh.h>
 #include <babylon/mesh/mesh.h>
@@ -43,9 +44,7 @@ void HeightMapScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Ground
   auto groundMaterial = StandardMaterial::New("ground", scene);
-#if 0
   groundMaterial->setDiffuseTexture(Texture::New("textures/earth.jpg", scene));
-#endif
 
   auto ground
     = Mesh::CreateGroundFromHeightMap("ground", "textures/worldHeightMap.jpg",
@@ -57,20 +56,18 @@ void HeightMapScene::initializeScene(ICanvas* canvas, Scene* scene)
   _sun->setMaterial(StandardMaterial::New("sun", scene));
   _sun->material()->setEmissiveColor(Color3(1.f, 1.f, 0.f));
 
-// Skybox
-#if 0
-  var skybox         = BABYLON.Mesh.CreateBox("skyBox", 800.0, scene);
-  var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
-  skyboxMaterial.backFaceCulling = false;
-  skyboxMaterial.reflectionTexture
-    = new BABYLON.CubeTexture("textures/skybox", scene);
-  skyboxMaterial.reflectionTexture.coordinatesMode
-    = BABYLON.Texture.SKYBOX_MODE;
-  skyboxMaterial.diffuseColor    = new BABYLON.Color3(0, 0, 0);
-  skyboxMaterial.specularColor   = new BABYLON.Color3(0, 0, 0);
-  skyboxMaterial.disableLighting = true;
-  skybox.material                = skyboxMaterial;
-#endif
+  // Skybox
+  auto skybox         = Mesh::CreateBox("skyBox", 800.f, scene);
+  auto skyboxMaterial = StandardMaterial::New("skyBox", scene);
+  skyboxMaterial->setBackFaceCulling(false);
+  skyboxMaterial->setReflectionTexture(
+    new CubeTexture("textures/skybox", scene));
+  skyboxMaterial->reflectionTexture()->setCoordinatesMode(
+    TextureConstants::SKYBOX_MODE);
+  skyboxMaterial->diffuseColor  = Color3(0.f, 0.f, 0.f);
+  skyboxMaterial->specularColor = Color3(0.f, 0.f, 0.f);
+  skyboxMaterial->setDisableLighting(true);
+  skybox->setMaterial(skyboxMaterial);
 
   // Sun animation
   scene->registerBeforeRender([&](Scene* /*scene*/, EventState& /*es*/) {

@@ -99,12 +99,14 @@ StandardMaterial::StandardMaterial(const string_t& iName, Scene* scene)
 
     if (StandardMaterial::ReflectionTextureEnabled() && _reflectionTexture
         && _reflectionTexture->isRenderTarget) {
-      _renderTargets.emplace_back(_reflectionTexture);
+      _renderTargets.emplace_back(
+        static_cast<RenderTargetTexture*>(_reflectionTexture));
     }
 
     if (StandardMaterial::RefractionTextureEnabled() && _refractionTexture
         && _refractionTexture->isRenderTarget) {
-      _renderTargets.emplace_back(_refractionTexture);
+      _renderTargets.emplace_back(
+        static_cast<RenderTargetTexture*>(_refractionTexture));
     }
 
     return _renderTargets;
@@ -336,11 +338,11 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           defines.defines[SMD::ROUGHNESS]           = (_roughness > 0);
           defines.defines[SMD::REFLECTIONOVERALPHA] = _useReflectionOverAlpha;
           defines.defines[SMD::INVERTCUBICMAP]
-            = (_reflectionTexture->coordinatesMode
+            = (_reflectionTexture->coordinatesMode()
                == TextureConstants::INVCUBIC_MODE);
           defines.defines[SMD::REFLECTIONMAP_3D] = _reflectionTexture->isCube;
 
-          switch (_reflectionTexture->coordinatesMode) {
+          switch (_reflectionTexture->coordinatesMode()) {
             case TextureConstants::CUBIC_MODE:
             case TextureConstants::INVCUBIC_MODE:
               defines.setReflectionMode(SMD::REFLECTIONMAP_CUBIC);
@@ -1315,7 +1317,7 @@ BaseTexture* StandardMaterial::reflectionTexture() const
   return _reflectionTexture;
 }
 
-void StandardMaterial::setReflectionTexture(RenderTargetTexture* value)
+void StandardMaterial::setReflectionTexture(BaseTexture* value)
 {
   _reflectionTexture = value;
 }
@@ -1365,7 +1367,7 @@ BaseTexture* StandardMaterial::refractionTexture() const
   return _refractionTexture;
 }
 
-void StandardMaterial::setRefractionTexture(RenderTargetTexture* value)
+void StandardMaterial::setRefractionTexture(BaseTexture* value)
 {
   _refractionTexture = value;
 }

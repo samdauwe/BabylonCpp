@@ -82,7 +82,7 @@ public:
   BaseTexture* opacityTexture() const;
   void setOpacityTexture(BaseTexture* value);
   BaseTexture* reflectionTexture() const;
-  void setReflectionTexture(RenderTargetTexture* value);
+  void setReflectionTexture(BaseTexture* value);
   BaseTexture* emissiveTexture() const;
   void setEmissiveTexture(BaseTexture* value);
   BaseTexture* specularTexture() const;
@@ -92,7 +92,7 @@ public:
   BaseTexture* lightmapTexture() const;
   void setLightmapTexture(BaseTexture* value);
   BaseTexture* refractionTexture() const;
-  void setRefractionTexture(RenderTargetTexture* value);
+  void setRefractionTexture(BaseTexture* value);
   bool useAlphaFromDiffuseTexture() const;
   void setUseAlphaFromDiffuseTexture(bool value);
   bool useEmissiveAsIllumination() const;
@@ -305,12 +305,12 @@ private:
   BaseTexture* _diffuseTexture;
   BaseTexture* _ambientTexture;
   BaseTexture* _opacityTexture;
-  RenderTargetTexture* _reflectionTexture;
+  BaseTexture* _reflectionTexture;
   BaseTexture* _emissiveTexture;
   BaseTexture* _specularTexture;
   BaseTexture* _bumpTexture;
   BaseTexture* _lightmapTexture;
-  RenderTargetTexture* _refractionTexture;
+  BaseTexture* _refractionTexture;
   bool _useAlphaFromDiffuseTexture;
   bool _useEmissiveAsIllumination;
   bool _linkEmissiveWithDiffuse;
