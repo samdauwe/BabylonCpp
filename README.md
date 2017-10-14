@@ -94,6 +94,10 @@ This code results in the following scene:
 
 ![Basic scene](assets/screenshots/basic_scene.png?raw=true "Basic scene")
 
+# Examples
+
+Example scenes can be found on the [samples](https://github.com/samdauwe/BabylonCpp/tree/master/src/Samples) page.
+
 # Dependencies
 
 ## System ##
