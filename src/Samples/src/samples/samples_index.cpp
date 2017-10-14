@@ -20,10 +20,12 @@
 #include <babylon/samples/materials/shader_material_boxes_scene.h>
 #include <babylon/samples/materials/shader_material_cylinders_scene.h>
 #include <babylon/samples/materials/shader_material_menger_sponge_scene.h>
+#include <babylon/samples/materials/shader_material_planet_shadertoy_scene.h>
 #include <babylon/samples/materials/shader_material_scene.h>
 #include <babylon/samples/materials/shader_material_skybox_clouds_scene.h>
 #include <babylon/samples/materials/shader_material_skybox_scene.h>
 #include <babylon/samples/materials/shader_material_the_road_to_hell.h>
+#include <babylon/samples/materials/shader_material_tiles_scene.h>
 #include <babylon/samples/materials/shader_material_with_fog_scene.h>
 #include <babylon/samples/materials/shader_material_wolfenstein_3d_scene.h>
 #include <babylon/samples/mesh/basic_elements_scene.h>
@@ -264,12 +266,24 @@ SamplesIndex::SamplesIndex()
     [](ICanvas* iCanvas) {                                              //
       return ::std::make_unique<ShaderMaterialCylindersScene>(iCanvas); //
     });                                                                 //
+  // Shader Material Cylinders Scene
+  _samples["ShaderMaterialCylindersScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                              //
+      return ::std::make_unique<ShaderMaterialCylindersScene>(iCanvas); //
+    });                                                                 //
   // Shader Material Menger Sponge Scene
   _samples["ShaderMaterialMengerSpongeScene"] = ::std::make_tuple(
     true,
     [](ICanvas* iCanvas) {                                                 //
       return ::std::make_unique<ShaderMaterialMengerSpongeScene>(iCanvas); //
     });                                                                    //
+  // Shader Material Planet Shadertoy Scene
+  _samples["ShaderMaterialPlanetShadertoyScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                                    //
+      return ::std::make_unique<ShaderMaterialPlanetShadertoyScene>(iCanvas); //
+    });                                                                       //
   // Shader Material Scene
   _samples["ShaderMaterialScene"] = ::std::make_tuple(
     true,
@@ -293,7 +307,13 @@ SamplesIndex::SamplesIndex()
     true,
     [](ICanvas* iCanvas) {                                                  //
       return ::std::make_unique<ShaderMaterialTheRoadToHellScene>(iCanvas); //
-    });
+    });                                                                     //
+  // Shader Material Tiles Scene
+  _samples["ShaderMaterialTilesScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                          //
+      return ::std::make_unique<ShaderMaterialTilesScene>(iCanvas); //
+    });                                                             //
   // Shader Material With Fog Scene
   _samples["ShaderMaterialWithFogScene"] = ::std::make_tuple(
     true,
