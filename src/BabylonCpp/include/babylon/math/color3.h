@@ -197,6 +197,11 @@ public:
   static Color3 FromArray(const Float32Array& array, unsigned int offset = 0);
 
   /**
+   * @brief Creates a new Color3 from an integer values.
+   */
+  static Color3 FromInt(int rgb);
+
+  /**
    * @brief Creates a new Color3 from integer values ( < 256).
    */
   static Color3 FromInts(int r, int g, int b);

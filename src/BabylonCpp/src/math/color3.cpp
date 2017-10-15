@@ -304,6 +304,11 @@ Color3 Color3::FromArray(const Float32Array& array, unsigned int offset)
   return Color3(array[offset], array[offset + 1], array[offset + 2]);
 }
 
+Color3 Color3::FromInt(int rgb)
+{
+  return Color3::FromInts((rgb >> 16) & 255, (rgb >> 8) & 255, rgb & 255);
+}
+
 Color3 Color3::FromInts(int r, int g, int b)
 {
   return Color3(static_cast<float>(r) / 255.0f, static_cast<float>(g) / 255.0f,
