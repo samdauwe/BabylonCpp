@@ -31,7 +31,9 @@ void RotationAndScalingScene::initializeScene(ICanvas* canvas, Scene* scene)
   camera->attachControl(canvas, true);
 
   // Create a basic light, aiming 0,1,0 - meaning, to the sky
-  HemisphericLight::New("Hemi", Vector3(0, 1, 0), scene);
+  auto light      = HemisphericLight::New("Hemi", Vector3(0, 1, 0), scene);
+  light->diffuse  = Color3::FromInt(0xf68712);
+  light->specular = Color3::FromInt(0xf1471d);
 
   // Creation of boxes
   auto box1 = Mesh::CreateBox("Box1", 6.f, scene);
