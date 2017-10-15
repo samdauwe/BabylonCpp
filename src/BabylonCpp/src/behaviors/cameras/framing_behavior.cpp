@@ -173,18 +173,19 @@ void FramingBehavior::detach()
   _attachedCamera = nullptr;
 }
 
-void FramingBehavior::zoomOnMesh(AbstractMesh* mesh, bool focusOnOriginXZ)
+void FramingBehavior::zoomOnMesh(AbstractMesh* mesh, bool focusOnOriginXZ,
+                                 const ::std::function<void()>& onAnimationEnd)
 {
   mesh->computeWorldMatrix(true);
 
   const auto& boundingBox = mesh->getBoundingInfo()->boundingBox;
   zoomOnBoundingInfo(boundingBox.minimumWorld, boundingBox.maximumWorld,
-                     focusOnOriginXZ);
+                     focusOnOriginXZ, onAnimationEnd);
 }
 
-void FramingBehavior::zoomOnBoundingInfo(const Vector3& minimumWorld,
-                                         const Vector3& maximumWorld,
-                                         bool focusOnOriginXZ)
+void FramingBehavior::zoomOnBoundingInfo(
+  const Vector3& minimumWorld, const Vector3& maximumWorld,
+  bool focusOnOriginXZ, const ::std::function<void()>& onAnimationEnd)
 {
   Vector3 zoomTarget;
 
@@ -232,6 +233,12 @@ void FramingBehavior::zoomOnBoundingInfo(const Vector3& minimumWorld,
     }
   }
 
+  // Set sensibilities
+  // auto extend = maximumWorld.subtract(minimumWorld).length();
+  // Set property for backward compatibility for inputs
+  // _attachedCamera->panningSensibility = 5000.f / extend;
+  _attachedCamera->wheelPrecision = 100.f / radius;
+
   // transition to new radius
   if (!_radiusTransition) {
     _radiusTransition
@@ -241,7 +248,12 @@ void FramingBehavior::zoomOnBoundingInfo(const Vector3& minimumWorld,
 
   _animatables.emplace_back(Animation::TransitionTo(
     "radius", radius, _attachedCamera, _attachedCamera->getScene(), 60,
-    _radiusTransition, _framingTime));
+    _radiusTransition, _framingTime, [this, &onAnimationEnd]() {
+      if (onAnimationEnd) {
+        onAnimationEnd();
+      }
+      _attachedCamera->storeState();
+    }));
 }
 
 float FramingBehavior::_calculateLowerRadiusFromModelBoundingSphere(
@@ -284,6 +296,10 @@ float FramingBehavior::_calculateLowerRadiusFromModelBoundingSphere(
 
 void FramingBehavior::_maintainCameraAboveGround()
 {
+  if (_elevationReturnTime < 0.f) {
+    return;
+  }
+
   auto now = Time::highresTimepointNow();
   auto timeSinceInteraction
     = Time::fpTimeDiff<float, ::std::milli>(now, _lastInteractionTime);

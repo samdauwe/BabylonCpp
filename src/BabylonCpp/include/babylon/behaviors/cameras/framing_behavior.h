@@ -144,8 +144,11 @@ public:
    * corresponds bottom of its bounding box and 1, the top
    * @param focusOnOriginXZ Determines if the camera should focus on 0 in the X
    * and Z axis instead of the mesh
+   * @param onAnimationEnd Callback triggered at the end of the framing
+   * animation
    */
-  void zoomOnMesh(AbstractMesh* mesh, bool focusOnOriginXZ = false);
+  void zoomOnMesh(AbstractMesh* mesh, bool focusOnOriginXZ = false,
+                  const ::std::function<void()>& onAnimationEnd = nullptr);
 
   /**
    * @brief Targets the given mesh and updates zoom level accordingly.
@@ -156,10 +159,13 @@ public:
    * corresponds bottom of its bounding box and 1, the top
    * @param focusOnOriginXZ Determines if the camera should focus on 0 in the X
    * and Z axis instead of the mesh
+   * @param onAnimationEnd Callback triggered at the end of the framing
+   * animation
    */
-  void zoomOnBoundingInfo(const Vector3& minimumWorld,
-                          const Vector3& maximumWorld,
-                          bool focusOnOriginXZ = false);
+  void
+  zoomOnBoundingInfo(const Vector3& minimumWorld, const Vector3& maximumWorld,
+                     bool focusOnOriginXZ                          = false,
+                     const ::std::function<void()>& onAnimationEnd = nullptr);
 
 protected:
   /**
