@@ -21,7 +21,7 @@ Mesh* QuickTreeGenerator::CreateTree(float sizeBranch, float sizeTrunk,
   auto leaves = Mesh::New("leaves", scene);
 
   SphereOptions options(sizeBranch);
-  options.segments = 2;
+  options.segments = 4;
   auto vertexData  = VertexData::CreateSphere(options);
 
   vertexData->applyToMesh(leaves, false);
@@ -59,7 +59,7 @@ Mesh* QuickTreeGenerator::CreateTree(float sizeBranch, float sizeTrunk,
     }
   }
 
-  auto randomNumber = [](float min, float max) {
+  const auto randomNumber = [](float min, float max) {
     if (stl_util::almost_equal(min, max)) {
       return min;
     }
@@ -68,7 +68,7 @@ Mesh* QuickTreeGenerator::CreateTree(float sizeBranch, float sizeTrunk,
   };
 
   for (size_t v = 0; v < vects.size(); ++v) {
-    auto _min = -sizeBranch / 10.f, _max = sizeBranch / 10.f;
+    auto _min = -sizeBranch / 20.f, _max = sizeBranch / 20.f;
     auto rx = randomNumber(_min, _max);
     auto ry = randomNumber(_min, _max);
     auto rz = randomNumber(_min, _max);

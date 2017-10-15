@@ -1,50 +1,71 @@
 #include <babylon/extensions/treegenerators/simple_pine_generator.h>
 
+#include <babylon/core/random.h>
 #include <babylon/math/vector3.h>
 #include <babylon/mesh/mesh.h>
 
 namespace BABYLON {
 namespace Extensions {
 
-Mesh* SimplePineGenerator::CreateTree(unsigned int canopies,
-                                      unsigned int height,
-                                      Material* trunkMaterial,
-                                      Material* leafMaterial, Scene* scene)
+Mesh* SimplePineGenerator::CreateTree(Scene* scene, Material* trunkMaterial,
+                                      Material* leafMaterial,
+                                      unsigned int canopies, float baseRadius,
+                                      float height, unsigned int tessellation,
+                                      float twist)
 {
-  auto curvePoints = [](unsigned int l, unsigned int t) {
+  if (twist < 0.f || twist > 1.f) {
+    twist = 0.f;
+  }
+
+  const auto curvePoints = [twist](float l, float t) {
     std::vector<Vector3> path;
     auto step = l / t;
     for (float i = 0.f; i < l; i += step) {
-      path.emplace_back(Vector3(0.f, i, 0.f));
-      path.emplace_back(Vector3(0.f, i, 0.f));
+      if (i == 0.f) {
+        path.emplace_back(Vector3(0.f, i, 0.f));
+        path.emplace_back(Vector3(0.f, i, 0.f));
+      }
+      else {
+        path.emplace_back(Vector3(Math::randomNumber(-twist, twist), i,
+                                  Math::randomNumber(-twist, twist)));
+        path.emplace_back(Vector3(Math::randomNumber(-twist, twist), i,
+                                  Math::randomNumber(-twist, twist)));
+      }
     }
     return path;
   };
 
-  auto nbL            = canopies + 1;
-  auto nbS            = height;
-  auto curve          = curvePoints(nbS, nbL);
-  auto radiusFunction = [nbL](unsigned int i, float
-                              /*distance*/) {
-    float fact = 1.f;
+  auto nbL   = canopies + 1;
+  auto nbS   = height;
+  auto curve = curvePoints(nbS, nbL);
+
+  const auto radiusFunction = [nbL, baseRadius](unsigned int i, float
+                                                /*distance*/) {
+    float fact = baseRadius;
     if (i % 2 == 0) {
-      fact = 0.5f;
+      fact /= 3;
     }
     return (nbL * 2.f - i - 1.f) * fact;
   };
 
-  auto leaves
-    = Mesh::CreateTube("tube", curve, 0, 10, radiusFunction, 1, scene);
-  auto trunk = Mesh::CreateCylinder("trunk", nbS / (nbL * 1.f),
-                                    nbL * 1.5f - nbL / 2.f - 1.f,
-                                    nbL * 1.5f - nbL / 2.f - 1.f, 12, 1, scene);
+  auto leaves = Mesh::CreateTube("leaves", curve, 0.f, tessellation,
+                                 radiusFunction, Mesh::CAP_START, scene);
+  // leaves->convertToFlatShadedMesh();
+
+  auto trunk
+    = Mesh::CreateCylinder("trunk", height / nbL, nbL * 1.5f - nbL / 2.f - 1.f,
+                           nbL * 1.5f - nbL / 2.f - 1.f, 12, 1, scene);
+  // trunk->convertToFlatShadedMesh();
 
   leaves->setMaterial(leafMaterial);
   trunk->setMaterial(trunkMaterial);
-  auto tree       = Mesh::CreateBox("", 1, scene);
+
+  auto tree       = Mesh::CreateBox("", 1.f, scene);
   tree->isVisible = false;
+
   leaves->setParent(tree);
   trunk->setParent(tree);
+
   return tree;
 }
 

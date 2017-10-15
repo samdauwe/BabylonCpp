@@ -12,17 +12,22 @@ namespace Extensions {
 struct BABYLON_SHARED_EXPORT SimplePineGenerator {
 
   /**
-   * Simple Pine Generator function.
+   * @brief Simple Pine Generator function.
    *
-   * @param canopies - number of leaf sections.
-   * @param height - height of tree.
+   * @param scene - BABYLON scene.
    * @param trunkMaterial - material used for trunk.
    * @param leafMaterial - material for canopies.
-   * @param scene - BABYLON scene.
+   * @param canopies - number of leaf sections.
+   * @param baseRadius
+   * @param height - height of tree.
+   * @param tessellation
+   * @param twist
+   * @return the mesh representing the tree
    */
-  static Mesh* CreateTree(unsigned int canopies, unsigned int height,
-                          Material* trunkMaterial, Material* leafMaterial,
-                          Scene* scene);
+  static Mesh* CreateTree(Scene* scene, Material* trunkMaterial,
+                          Material* leafMaterial, unsigned int canopies = 7,
+                          float baseRadius = 1.8f, float height = 75.f,
+                          unsigned int tessellation = 6, float twist = 0.6f);
 
 }; // end of class SimplePineGenerator
 
