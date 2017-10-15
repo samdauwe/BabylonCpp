@@ -99,7 +99,7 @@ CollisionCoordinatorWorker::SerializeGeometry(Geometry* geometry)
 }
 
 void CollisionCoordinatorWorker::getNewPosition(
-  Vector3& position, Vector3& velocity, Collider* collider,
+  Vector3& position, Vector3& displacement, Collider* collider,
   unsigned int maximumRetry, AbstractMesh* excludedMesh,
   const ::std::function<void(unsigned int collisionIndex, Vector3& newPosition,
                              AbstractMesh* AbstractMesh)>& onNewPosition,
@@ -113,7 +113,7 @@ void CollisionCoordinatorWorker::getNewPosition(
   }
 
   position.divideToRef(collider->radius, _scaledPosition);
-  velocity.divideToRef(collider->radius, _scaledVelocity);
+  displacement.divideToRef(collider->radius, _scaledVelocity);
 
   if (collisionIndex >= _collisionsCallbackArray.size()) {
     _collisionsCallbackArray.resize(collisionIndex + 1);

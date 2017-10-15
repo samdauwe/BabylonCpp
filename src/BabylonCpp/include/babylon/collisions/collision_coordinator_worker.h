@@ -22,8 +22,9 @@ public:
   static SerializedGeometry SerializeGeometry(Geometry* geometry);
 
   /** Methods **/
-  void getNewPosition(Vector3& position, Vector3& velocity, Collider* collider,
-                      unsigned int maximumRetry, AbstractMesh* excludedMesh,
+  void getNewPosition(Vector3& position, Vector3& displacement,
+                      Collider* collider, unsigned int maximumRetry,
+                      AbstractMesh* excludedMesh,
                       const ::std::function<void(
                         unsigned int collisionIndex, Vector3& newPosition,
                         AbstractMesh* AbstractMesh)>& onNewPosition,

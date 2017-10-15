@@ -7,7 +7,7 @@ namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT ICollisionCoordinator {
   virtual void getNewPosition(
-    Vector3& position, Vector3& velocity, Collider* collider,
+    Vector3& position, Vector3& displacement, Collider* collider,
     unsigned int maximumRetry, AbstractMesh* excludedMesh,
     const ::std::function<void(unsigned int collisionIndex,
                                Vector3& newPosition,

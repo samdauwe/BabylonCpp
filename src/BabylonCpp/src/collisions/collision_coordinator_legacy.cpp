@@ -21,14 +21,14 @@ CollisionCoordinatorLegacy::~CollisionCoordinatorLegacy()
 }
 
 void CollisionCoordinatorLegacy::getNewPosition(
-  Vector3& position, Vector3& velocity, Collider* collider,
+  Vector3& position, Vector3& displacement, Collider* collider,
   unsigned int maximumRetry, AbstractMesh* excludedMesh,
   const ::std::function<void(unsigned int collisionIndex, Vector3& newPosition,
                              AbstractMesh* AbstractMesh)>& onNewPosition,
   unsigned int collisionIndex)
 {
   position.divideToRef(collider->radius, _scaledPosition);
-  velocity.divideToRef(collider->radius, _scaledVelocity);
+  displacement.divideToRef(collider->radius, _scaledVelocity);
   collider->collidedMesh    = nullptr;
   collider->retry           = 0;
   collider->initialVelocity = _scaledVelocity;

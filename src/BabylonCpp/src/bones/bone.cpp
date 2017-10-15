@@ -395,7 +395,8 @@ void Bone::setAbsolutePosition(const Vector3& position, AbstractMesh* mesh)
 
 void Bone::setScale(float x, float y, float z, bool scaleChildren)
 {
-  if (!animations.empty() && animations[0] && !animations[0]->isStopped()) {
+  if (!animations.empty() && animations[0]
+      && !animations[0]->hasRunningRuntimeAnimations()) {
     if (!scaleChildren) {
       _negateScaleChildren.x = 1.f / x;
       _negateScaleChildren.y = 1.f / y;
