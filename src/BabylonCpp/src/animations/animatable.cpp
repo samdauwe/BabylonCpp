@@ -2,6 +2,7 @@
 
 #include <babylon/animations/animation.h>
 #include <babylon/animations/animation_value.h>
+#include <babylon/animations/runtime_animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/engine/scene.h>
 
@@ -16,12 +17,12 @@ Animatable::Animatable(Scene* scene, IAnimatable* iTarget, int iFromFrame,
     , fromFrame{iFromFrame}
     , toFrame{iToFrame}
     , loopAnimation{iLoopAnimation}
-    , speedRatio{iSpeedRatio}
     , onAnimationEnd{iOnAnimationEnd}
     , _localDelayOffset{-1}
     , _pausedDelay{-1}
     , _paused{false}
     , _scene{scene}
+    , _speedRatio{iSpeedRatio}
 {
   if (!animations.empty()) {
     appendAnimations(target, animations);
@@ -34,36 +35,61 @@ Animatable::~Animatable()
 {
 }
 
-// Methods
-vector_t<Animation*>& Animatable::getAnimations()
+float Animatable::speedRatio() const
 {
-  return _animations;
+  return _speedRatio;
 }
 
-void Animatable::appendAnimations(IAnimatable* iTarget,
+void Animatable::setSpeedRatio(float value)
+{
+  for (auto& animation : _runtimeAnimations) {
+    animation->_prepareForSpeedRatioChange(value);
+  }
+  _speedRatio = value;
+}
+
+// Methods
+vector_t<RuntimeAnimation*>& Animatable::getAnimations()
+{
+  return _runtimeAnimations;
+}
+
+void Animatable::appendAnimations(IAnimatable* /*iTarget*/,
                                   const vector_t<Animation*>& animations)
 {
   for (auto& animation : animations) {
-    animation->_target = iTarget;
-    _animations.emplace_back(animation);
+    _runtimeAnimations.emplace_back(new RuntimeAnimation(target, animation));
   }
 }
 
 Animation*
 Animatable::getAnimationByTargetProperty(const string_t& property) const
 {
-  auto it = ::std::find_if(_animations.begin(), _animations.end(),
-                           [&property](Animation* animation) {
-                             return animation->targetProperty == property;
-                           });
+  auto it = ::std::find_if(
+    _runtimeAnimations.begin(), _runtimeAnimations.end(),
+    [&property](RuntimeAnimation* runtimeAnimation) {
+      return runtimeAnimation->animation()->targetProperty == property;
+    });
 
-  return (it == _animations.end()) ? nullptr : *it;
+  return (it == _runtimeAnimations.end()) ? nullptr : (*it)->animation();
+}
+
+RuntimeAnimation*
+Animatable::getRuntimeAnimationByTargetProperty(const string_t& property) const
+{
+  auto it = ::std::find_if(
+    _runtimeAnimations.begin(), _runtimeAnimations.end(),
+    [&property](RuntimeAnimation* runtimeAnimation) {
+      return runtimeAnimation->animation()->targetProperty == property;
+    });
+
+  return (it == _runtimeAnimations.end()) ? nullptr : *it;
 }
 
 void Animatable::reset()
 {
-  for (auto& animation : _animations) {
-    animation->reset();
+  for (auto& runtimeAnimation : _runtimeAnimations) {
+    runtimeAnimation->reset();
   }
 
   _localDelayOffset = std::chrono::milliseconds(-1);
@@ -72,32 +98,32 @@ void Animatable::reset()
 
 void Animatable::enableBlending(float blendingSpeed)
 {
-  for (auto& animation : _animations) {
-    animation->enableBlending = true;
-    animation->blendingSpeed  = blendingSpeed;
+  for (auto& runtimeAnimation : _runtimeAnimations) {
+    runtimeAnimation->animation()->enableBlending = true;
+    runtimeAnimation->animation()->blendingSpeed  = blendingSpeed;
   }
 }
 
 void Animatable::disableBlending()
 {
-  for (auto& animation : _animations) {
-    animation->enableBlending = false;
+  for (auto& runtimeAnimation : _runtimeAnimations) {
+    runtimeAnimation->animation()->enableBlending = false;
   }
 }
 
 void Animatable::goToFrame(int frame)
 {
-  if (!_animations.empty() && _animations[0]) {
-    auto fps          = _animations[0]->framePerSecond;
-    auto currentFrame = _animations[0]->currentFrame;
+  if (!_runtimeAnimations.empty() && _runtimeAnimations[0]) {
+    auto fps          = _runtimeAnimations[0]->animation()->framePerSecond;
+    auto currentFrame = _runtimeAnimations[0]->currentFrame;
     auto adjustTime   = frame - currentFrame;
     auto delay
       = static_cast<float>(adjustTime) * 1000.f / static_cast<float>(fps);
     _localDelayOffset -= std::chrono::milliseconds(static_cast<long>(delay));
   }
 
-  for (auto& animation : _animations) {
-    animation->goToFrame(frame);
+  for (auto& runtimeAnimations : _runtimeAnimations) {
+    runtimeAnimations->goToFrame(frame);
   }
 }
 
@@ -119,14 +145,14 @@ void Animatable::stop(const string_t& animationName)
   if (!animationName.empty()) {
     auto idx = stl_util::index_of(_scene->_activeAnimatables, this);
     if (idx > -1) {
-      for (size_t index = _animations.size(); index-- > 0;) {
-        if (_animations[index]->name != animationName) {
+      for (size_t index = _runtimeAnimations.size(); index-- > 0;) {
+        if (_runtimeAnimations[index]->animation()->name != animationName) {
           continue;
         }
-        _animations[index]->reset();
-        stl_util::splice(_animations, static_cast<int>(index), 1);
+        _runtimeAnimations[index]->dispose();
+        stl_util::splice(_runtimeAnimations, static_cast<int>(index), 1);
       }
-      if (_animations.empty()) {
+      if (_runtimeAnimations.empty()) {
         stl_util::splice(_scene->_activeAnimatables, idx, 1);
         if (onAnimationEnd) {
           onAnimationEnd();
@@ -138,8 +164,8 @@ void Animatable::stop(const string_t& animationName)
     auto index = stl_util::index_of(_scene->_activeAnimatables, this);
     if (index > -1) {
       stl_util::splice(_scene->_activeAnimatables, index, 1);
-      for (auto& animation : _animations) {
-        animation->reset();
+      for (auto& runtimeAnimation : _runtimeAnimations) {
+        runtimeAnimation->dispose();
       }
       if (onAnimationEnd) {
         onAnimationEnd();
@@ -169,10 +195,10 @@ bool Animatable::_animate(const millisecond_t& delay)
   // Animating
   bool running = false;
 
-  for (auto& animation : _animations) {
+  for (auto& animation : _runtimeAnimations) {
     bool isRunning = animation->animate(delay - _localDelayOffset, fromFrame,
-                                        toFrame, loopAnimation, speedRatio);
-    running        = running || isRunning;
+                                        toFrame, loopAnimation, speedRatio());
+    running = running || isRunning;
   }
 
   animationStarted = running;
@@ -184,6 +210,11 @@ bool Animatable::_animate(const millisecond_t& delay)
         _scene->_activeAnimatables.begin(), _scene->_activeAnimatables.end(),
         [this](const Animatable* animatable) { return animatable == this; }),
       _scene->_activeAnimatables.end());
+
+    // Dispose all runtime animations
+    for (auto& runtimeAnimation : _runtimeAnimations) {
+      runtimeAnimation->dispose();
+    }
   }
 
   if (!running && onAnimationEnd) {

@@ -28,6 +28,8 @@ public:
   static constexpr unsigned int ANIMATIONLOOPMODE_CYCLE    = 1;
   static constexpr unsigned int ANIMATIONLOOPMODE_CONSTANT = 2;
 
+  static bool AllowMatricesInterpolation();
+
   static Animation*
   _PrepareAnimation(const string_t& name, const string_t& targetProperty,
                     size_t framePerSecond, int totalFrame,
@@ -79,6 +81,14 @@ public:
                Animation* transition, float duration,
                const ::std::function<void()>& onAnimationEnd = nullptr);
 
+  /**
+   * @brief Return the array of runtime animations currently using this
+   * animation.
+   */
+  vector_t<RuntimeAnimation*>& runtimeAnimations();
+
+  bool hasRunningRuntimeAnimations();
+
   Animation(const string_t& name, const string_t& targetProperty,
             size_t framePerSecond, int dataType,
             unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE);
@@ -100,6 +110,7 @@ public:
    * @param frame
    */
   void removeEvents(int frame);
+  vector_t<AnimationEvent>& getEvents();
   void createRange(const string_t& name, float from, float to);
   void deleteRange(const string_t& name, bool deleteFrames = true);
   AnimationRange& getRange(const string_t& name);
@@ -145,42 +156,29 @@ public:
   Matrix matrixInterpolateFunction(const Matrix& startValue,
                                    const Matrix& endValue,
                                    float gradient) const;
-  unique_ptr_t<Animation> clone() const;
   void setKeys(const vector_t<AnimationKey>& values);
-  void setValue(const AnimationValue& currentValue, bool blend = false);
-  void goToFrame(int frame);
-  bool animate(millisecond_t delay, int from, int to, bool loop,
-               float speedRatio);
+  unique_ptr_t<Animation> clone() const;
   Json::object serialize() const;
   static Animation* Parse(const Json::value& parsedAnimation);
+  static void AppendSerializedAnimations(IAnimatable* source,
+                                         picojson::object& destination);
 
 private:
-  AnimationValue _getKeyValue(const AnimationValue& value) const;
-  AnimationValue
-  _interpolate(int currentFrame, int repeatCount, unsigned int loopMode,
-               const AnimationValue& offsetValue    = AnimationValue(),
-               const AnimationValue& highLimitValue = AnimationValue());
+  static bool _AllowMatricesInterpolation;
 
 public:
-  IAnimatable* _target;
   string_t name;
   string_t targetProperty;
+  vector_t<RuntimeAnimation*> _runtimeAnimations;
   vector_t<string_t> targetPropertyPath;
   size_t framePerSecond;
   int dataType;
   unsigned int loopMode;
-  int currentFrame;
-  bool allowMatricesInterpolation;
   float blendingSpeed;
-  float _originalBlendValue;
   bool enableBlending;
 
 private:
   vector_t<AnimationKey> _keys;
-  std::map<string_t, AnimationValue> _offsetsCache;
-  std::map<string_t, AnimationValue> _highLimitsCache;
-  bool _stopped;
-  float _blendingFactor;
   IEasingFunction* _easingFunction;
   // The set of event that will be linked to this animation
   vector_t<AnimationEvent> _events;

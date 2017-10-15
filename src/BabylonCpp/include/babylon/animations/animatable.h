@@ -16,10 +16,14 @@ public:
   ~Animatable();
 
   /** Methods **/
-  vector_t<Animation*>& getAnimations();
+  float speedRatio() const;
+  void setSpeedRatio(float value);
+  vector_t<RuntimeAnimation*>& getAnimations();
   void appendAnimations(IAnimatable* target,
                         const vector_t<Animation*>& animations);
   Animation* getAnimationByTargetProperty(const string_t& property) const;
+  RuntimeAnimation*
+  getRuntimeAnimationByTargetProperty(const string_t& property) const;
   void reset();
   void enableBlending(float blendingSpeed);
   void disableBlending();
@@ -35,15 +39,15 @@ public:
   int fromFrame;
   int toFrame;
   bool loopAnimation;
-  float speedRatio;
   ::std::function<void()> onAnimationEnd;
 
 private:
   millisecond_t _localDelayOffset;
   millisecond_t _pausedDelay;
-  vector_t<Animation*> _animations;
+  vector_t<RuntimeAnimation*> _runtimeAnimations;
   bool _paused;
   Scene* _scene;
+  float _speedRatio;
 
 }; // end of class Animatable
 
