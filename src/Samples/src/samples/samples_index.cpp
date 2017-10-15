@@ -10,6 +10,8 @@
 #include <babylon/samples/extensions/hexplanetgeneration/hex_ico_sphere_scene.h>
 #include <babylon/samples/extensions/noisegeneration/perlin_noise_waves_scene.h>
 #include <babylon/samples/extensions/polyhedron/polyhedra_scene.h>
+#include <babylon/samples/extensions/treegenerators/simple_oak_tree_scene.h>
+#include <babylon/samples/extensions/treegenerators/simple_pine_scene.h>
 #include <babylon/samples/generic/infinite_loader_scene.h>
 #include <babylon/samples/generic/lorenz_attractor_scene.h>
 #include <babylon/samples/generic/mandelbrot_fractal_scene.h>
@@ -326,6 +328,18 @@ SamplesIndex::SamplesIndex()
     [](ICanvas* iCanvas) {                                                  //
       return ::std::make_unique<ShaderMaterialWolfenstein3DScene>(iCanvas); //
     });                                                                     //
+  // Simple Oak Tree Scene
+  _samples["SimpleOakTreeScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                    //
+      return ::std::make_unique<SimpleOakTreeScene>(iCanvas); //
+    });                                                       //
+  // Simple Pine Scene
+  _samples["SimplePineScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                 //
+      return ::std::make_unique<SimplePineScene>(iCanvas); //
+    });                                                    //
   // Super Ellipsoid Scene
   _samples["SuperEllipsoidScene"] = ::std::make_tuple(
     true,
