@@ -39,6 +39,7 @@ class AnimationRange;
 class AnimationValue;
 struct IAnimatable;
 class PathCursor;
+class RuntimeAnimation;
 // - Easing
 class BackEase;
 class BezierCurveEase;
