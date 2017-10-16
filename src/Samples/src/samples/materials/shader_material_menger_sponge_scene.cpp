@@ -77,7 +77,7 @@ void ShaderMaterialMengerSpongeScene::initializeScene(ICanvas* canvas,
         / static_cast<float>(getEngine()->getRenderHeight());
     _shaderMaterial->setFloat("aspectRatio", aspectRatio);
     _shaderMaterial->setFloat("iTime", _time);
-    _time += 0.01f;
+    _time += 0.01f * getScene()->getAnimationRatio();
   });
 }
 

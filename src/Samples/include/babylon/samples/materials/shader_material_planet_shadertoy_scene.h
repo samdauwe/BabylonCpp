@@ -32,7 +32,7 @@ public:
       "}\n";
 
   /** Pixel (Fragment) Shader **/
-  // 2D Clouds ( https://www.shadertoy.com/view/4tdSWr )
+  // Planet Shadertoy ( https://www.shadertoy.com/view/4tjGRh )
   static constexpr const char* customFragmentShader
     = "#ifdef GL_ES\n"
       "precision highp float;\n"

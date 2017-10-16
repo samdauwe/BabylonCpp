@@ -98,7 +98,7 @@ void ShaderMaterialCylindersScene::initializeScene(ICanvas* canvas,
     for (auto& shaderMaterial : _shaderMaterials) {
       shaderMaterial->setFloat("time", _time);
     }
-    _time += 0.01f;
+    _time += 0.01f * getScene()->getAnimationRatio();
   });
 }
 

@@ -105,7 +105,7 @@ void ShaderMaterialTilesScene::initializeScene(ICanvas* canvas, Scene* scene)
       shaderMaterial->setFloat("aspectRatio", _boxTopFaceAspectRatio);
       shaderMaterial->setVector2("resolution", _boxTopFaceResolution);
     }
-    _time += 0.01f;
+    _time += 0.01f * getScene()->getAnimationRatio();
   });
 }
 

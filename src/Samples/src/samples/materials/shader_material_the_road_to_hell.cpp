@@ -72,7 +72,7 @@ void ShaderMaterialTheRoadToHellScene::initializeScene(ICanvas* canvas,
   // Animation
   scene->onAfterCameraRenderObservable.add([this](Camera*, EventState&) {
     _shaderMaterial->setFloat("time", _time);
-    _time += 0.01f;
+    _time += 0.01f * getScene()->getAnimationRatio();
   });
 }
 
