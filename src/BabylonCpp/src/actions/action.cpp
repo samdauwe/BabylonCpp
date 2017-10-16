@@ -64,6 +64,7 @@ void Action::_executeCurrent(const ActionEvent& evt)
     }
   }
 
+  onBeforeExecuteObservable.notifyObservers(this);
   _nextActiveAction->execute(evt);
 
   skipToNextActiveAction();

@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/core/structs.h>
+#include <babylon/tools/observable.h>
 
 namespace BABYLON {
 
@@ -48,6 +49,7 @@ protected:
 public:
   unsigned int trigger;
   ActionManager* _actionManager;
+  Observable<Action> onBeforeExecuteObservable;
 
 private:
   Action* _nextActiveAction;
