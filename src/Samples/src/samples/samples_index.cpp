@@ -27,6 +27,7 @@
 #include <babylon/samples/materials/shader_material_seascape_scene.h>
 #include <babylon/samples/materials/shader_material_skybox_clouds_scene.h>
 #include <babylon/samples/materials/shader_material_skybox_scene.h>
+#include <babylon/samples/materials/shader_material_star_nest_scene.h>
 #include <babylon/samples/materials/shader_material_the_road_to_hell.h>
 #include <babylon/samples/materials/shader_material_tiles_scene.h>
 #include <babylon/samples/materials/shader_material_with_fog_scene.h>
@@ -311,6 +312,12 @@ SamplesIndex::SamplesIndex()
     [](ICanvas* iCanvas) {                                           //
       return ::std::make_unique<ShaderMaterialSkyboxScene>(iCanvas); //
     });                                                              //
+  // Shader Material Star Nest Scene
+  _samples["ShaderMaterialStarNestScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                             //
+      return ::std::make_unique<ShaderMaterialStarNestScene>(iCanvas); //
+    });                                                                //
   // Shader Material The Road To Hell Scene
   _samples["ShaderMaterialTheRoadToHellScene"] = ::std::make_tuple(
     true,
