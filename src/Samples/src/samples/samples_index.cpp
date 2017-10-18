@@ -21,6 +21,7 @@
 #include <babylon/samples/materials/shader_material_box_scene.h>
 #include <babylon/samples/materials/shader_material_boxes_scene.h>
 #include <babylon/samples/materials/shader_material_cylinders_scene.h>
+#include <babylon/samples/materials/shader_material_generators_scene.h>
 #include <babylon/samples/materials/shader_material_menger_sponge_scene.h>
 #include <babylon/samples/materials/shader_material_planet_shadertoy_scene.h>
 #include <babylon/samples/materials/shader_material_scene.h>
@@ -270,12 +271,12 @@ SamplesIndex::SamplesIndex()
     [](ICanvas* iCanvas) {                                              //
       return ::std::make_unique<ShaderMaterialCylindersScene>(iCanvas); //
     });                                                                 //
-  // Shader Material Cylinders Scene
-  _samples["ShaderMaterialCylindersScene"] = ::std::make_tuple(
+  // Shader Material Generators Scene
+  _samples["ShaderMaterialGeneratorsScene"] = ::std::make_tuple(
     true,
-    [](ICanvas* iCanvas) {                                              //
-      return ::std::make_unique<ShaderMaterialCylindersScene>(iCanvas); //
-    });                                                                 //
+    [](ICanvas* iCanvas) {                                               //
+      return ::std::make_unique<ShaderMaterialGeneratorsScene>(iCanvas); //
+    });                                                                  //
   // Shader Material Menger Sponge Scene
   _samples["ShaderMaterialMengerSpongeScene"] = ::std::make_tuple(
     true,

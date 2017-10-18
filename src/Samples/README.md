@@ -19,6 +19,7 @@
 ![shader_material_planet_shadertoy_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_planet_shadertoy_scene.png?raw=true "Shader Material Planet Shadertoy Scene")
 ![shader_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_scene.png?raw=true "Shader Material Scene")
 ![shader_material_star_nest_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_star_nest_scene.png?raw=true "Shader Material Star Nest Scene")
+![shader_material_generators_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_generators_scene.png?raw=true "Shader Material Generators Scene")
 ![shader_material_the_road_to_hell](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_the_road_to_hell.png?raw=true "Shader Material The Road To Hell Scene")
 ![shader_material_wolfenstein_3d_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_wolfenstein_3d_scene.png?raw=true "Shader Material Wolfenstein 3D Scene")
 
