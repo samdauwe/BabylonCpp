@@ -261,6 +261,12 @@ struct PickedParticle {
 }; // end of struct PickedParticle
 
 struct PointerEvent : public Event {
+  PointerEvent()
+  {
+  }
+  PointerEvent(const string_t& /*type*/)
+  {
+  }
   int clientX;
   int clientY;
   int movementX;

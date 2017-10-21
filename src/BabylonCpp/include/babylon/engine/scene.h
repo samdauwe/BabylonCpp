@@ -156,6 +156,7 @@ public:
   bool skeletonsEnabled() const;
   void setSkeletonsEnabled(bool value);
   PostProcessRenderPipelineManager* postProcessRenderPipelineManager();
+  SoundTrack* mainSoundTrack();
   Plane* clipPlane();
   void setClipPlane(const Plane& plane);
   void resetClipPlane();
@@ -218,6 +219,8 @@ public:
   size_t getActiveBones() const;
   PerfCounter& activeBonesPerfCounter();
   /** Stats **/
+  microsecond_t getInterFramePerfCounter() const;
+  PerfCounter& interFramePerfCounter();
   microsecond_t getLastFrameDuration() const;
   PerfCounter& lastFramePerfCounter();
   microsecond_t getEvaluateActiveMeshesDuration() const;
@@ -235,6 +238,26 @@ public:
   void incrementRenderId();
 
   /** Pointers handling **/
+
+  /**
+   * @brief Use this method to simulate a pointer move on a mesh
+   * The pickResult parameter can be obtained from a scene.pick or
+   * scene.pickWithRay
+   */
+  Scene& simulatePointerMove(const PickingInfo* pickResult);
+  /**
+   * @brief Use this method to simulate a pointer down on a mesh
+   * The pickResult parameter can be obtained from a scene.pick or
+   * scene.pickWithRay
+   */
+  Scene& simulatePointerDown(const PickingInfo* pickResult);
+
+  /**
+   * @brief Use this method to simulate a pointer up on a mesh
+   * The pickResult parameter can be obtained from a scene.pick or
+   * scene.pickWithRay
+   */
+  Scene& simulatePointerUp(const PickingInfo* pickResult);
 
   /**
    * @brief Attach events to the canvas (To handle actionManagers triggers and
@@ -319,6 +342,7 @@ public:
   const Matrix& getProjectionMatrix() const;
   Matrix getTransformMatrix();
   void setTransformMatrix(Matrix& view, Matrix& projection);
+  void _setAlternateTransformMatrix(Matrix& view, Matrix& projection);
   UniformBuffer* getSceneUniformBuffer();
 
   /** Methods **/
@@ -518,7 +542,20 @@ public:
   string_t uid();
 
   bool _isInIntermediateRendering() const;
+
+  /**
+   * @brief Use this function to stop evaluating active meshes. The current list
+   * will be keep alive between frames
+   */
+  Scene& freezeActiveMeshes();
+
+  /**
+   * @brief Use this function to restart evaluating active meshes on every frame
+   */
+  Scene& unfreezeActiveMeshes();
+
   void updateTransformMatrix(bool force = false);
+  void updateAlternateTransformMatrix(Camera* alternateCamera);
   void render();
 
   /** Audio **/
@@ -721,6 +758,13 @@ protected:
 private:
   void _updatePointerPosition(const PointerEvent evt);
   void _createUbo();
+  void _createAlternateUbo();
+  Scene& _processPointerMove(const PickingInfo* pickResult,
+                             const PointerEvent& evt);
+  Scene& _processPointerDown(const PickingInfo* pickResult,
+                             const PointerEvent& evt);
+  Scene& _processPointerUp(const PickingInfo* pickResult,
+                           const PointerEvent& evt, const ClickInfo& clickInfo);
   void _animate();
   void _evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh);
   void _evaluateActiveMeshes();
@@ -855,6 +899,19 @@ public:
   ::std::function<bool(AbstractMesh* Mesh)> pointerUpPredicate;
   ::std::function<bool(AbstractMesh* Mesh)> pointerMovePredicate;
 
+  /** Deprecated. Use onPointerObservable instead */
+  ::std::function<void(const PointerEvent& evt, const PickingInfo* pickInfo)>
+    onPointerMove;
+  /** Deprecated. Use onPointerObservable instead */
+  ::std::function<void(const PointerEvent& evt, const PickingInfo* pickInfo)>
+    onPointerDown;
+  /** Deprecated. Use onPointerObservable instead */
+  ::std::function<void(const PointerEvent& evt, const PickingInfo* pickInfo)>
+    onPointerUp;
+  /** Deprecated. Use onPointerObservable instead */
+  ::std::function<void(const PointerEvent& evt, const PickingInfo* pickInfo)>
+    onPointerPick;
+
   bool forceWireframe;
   bool forceShowBoundingBoxes;
   unique_ptr_t<Plane> _clipPlane;
@@ -871,11 +928,11 @@ public:
   // Pointers
 
   /**
-   * This observable event is triggered when any mouse event registered during
-   * Scene.attach() is called BEFORE the 3D engine to process anything
-   * (mesh/sprite picking for instance).
-   * You have the possibility to skip the 3D Engine process and the call to
-   * onPointerObservable by setting PointerInfoBase.skipOnPointerObservable to
+   * This observable event is triggered when any ponter event is triggered. It
+   * is registered during Scene.attachControl() and it is called BEFORE the 3D
+   * engine process anything (mesh/sprite picking for instance).
+   * You have the possibility to skip the process and the call to
+   * onPointerObservable by setting PointerInfoPre.skipOnPointerObservable to
    * true
    */
   Observable<PointerInfoPre> onPrePointerObservable;
@@ -894,6 +951,24 @@ public:
 
   // Mirror
   unique_ptr_t<Vector3> _mirroredCameraPosition;
+
+  // Keyboard
+
+  /**
+   * This observable event is triggered when any keyboard event si raised and
+   * registered during Scene.attachControl()
+   * You have the possibility to skip the process and the call to
+   * onKeyboardObservable by setting KeyboardInfoPre.skipOnPointerObservable to
+   * true
+   */
+  Observable<KeyboardInfoPre> onPreKeyboardObservable;
+
+  /**
+   * Observable event triggered each time an keyboard event is received from the
+   * hosting window
+   */
+  Observable<KeyboardInfo> onKeyboardObservable;
+
   Color3 fogColor;
   float fogDensity;
   float fogStart;
@@ -980,7 +1055,6 @@ public:
   bool proceduralTexturesEnabled;
   vector_t<unique_ptr_t<ProceduralTexture>> _proceduralTextures;
   // Sound Tracks
-  unique_ptr_t<SoundTrack> mainSoundTrack;
   vector_t<SoundTrack*> soundTracks;
   // Simplification Queue
   unique_ptr_t<SimplificationQueue> simplificationQueue;
@@ -1004,6 +1078,7 @@ protected:
 
 private:
   // Events
+  ::std::function<bool(Sprite* sprite)> _spritePredicate;
   Observer<Scene>::Ptr _onDisposeObserver;
   Observer<Scene>::Ptr _onBeforeRenderObserver;
   Observer<Scene>::Ptr _onAfterRenderObserver;
@@ -1057,6 +1132,8 @@ private:
   // Keyboard
   ::std::function<void(Event&& evt)> _onKeyDown;
   ::std::function<void(Event&& evt)> _onKeyUp;
+  Observer<Engine>::Ptr _onCanvasFocusObserver;
+  Observer<Engine>::Ptr _onCanvasBlurObserver;
   // Coordinate system
   bool _useRightHandedSystem;
   // Members
@@ -1093,6 +1170,7 @@ private:
   vector_t<AbstractMesh*> _meshesForIntersections;
   // Sound Tracks
   bool _hasAudioEngine;
+  unique_ptr_t<SoundTrack> _mainSoundTrack;
   bool _audioEnabled;
   bool _headphone;
   // Render engine
@@ -1103,6 +1181,7 @@ private:
   PerfCounter _totalMaterialsCounter;
   PerfCounter _totalTexturesCounter;
   PerfCounter _totalVertices;
+  PerfCounter _interFrameDuration;
   PerfCounter _lastFrameDuration;
   PerfCounter _evaluateActiveMeshesDuration;
   PerfCounter _renderTargetsDuration;
@@ -1117,8 +1196,11 @@ private:
   bool _intermediateRendering;
   int _viewUpdateFlag;
   int _projectionUpdateFlag;
+  int _alternateViewUpdateFlag;
+  int _alternateProjectionUpdateFlag;
   vector_t<string_t> _pendingData;
   vector_t<Mesh*> _activeMeshes;
+  bool _activeMeshesFrozen;
   vector_t<Material*> _processedMaterials;
   vector_t<RenderTargetTexture*> _renderTargets;
   vector_t<Skeleton*> _activeSkeletons;
@@ -1127,6 +1209,7 @@ private:
   unique_ptr_t<PhysicsEngine> _physicsEngine;
   Matrix _transformMatrix;
   unique_ptr_t<UniformBuffer> _sceneUbo;
+  unique_ptr_t<UniformBuffer> _alternateSceneUbo;
   Matrix _pickWithRayInverseMatrix;
   unique_ptr_t<BoundingBoxRenderer> _boundingBoxRenderer;
   unique_ptr_t<OutlineRenderer> _outlineRenderer;
@@ -1134,7 +1217,7 @@ private:
   Matrix _projectionMatrix;
   Matrix _alternateViewMatrix;
   Matrix _alternateProjectionMatrix;
-  Matrix _alternateTransformMatrix;
+  unique_ptr_t<Matrix> _alternateTransformMatrix;
   bool _useAlternateCameraConfiguration;
   bool _alternateRendering;
   bool _frustumPlanesSet;

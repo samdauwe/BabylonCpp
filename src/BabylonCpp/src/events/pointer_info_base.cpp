@@ -2,14 +2,14 @@
 
 namespace BABYLON {
 
-PointerInfoBase::PointerInfoBase(unsigned int _type, const PointerEvent& event)
-    : type{_type}, pointerEvent{event}
+PointerInfoBase::PointerInfoBase(unsigned int iType, const PointerEvent& event)
+    : type{iType}, pointerEvent{event}
 {
 }
 
-PointerInfoBase::PointerInfoBase(unsigned int _type,
+PointerInfoBase::PointerInfoBase(unsigned int iType,
                                  const MouseWheelEvent& event)
-    : type{_type}, mouseWheelEvent{event}
+    : type{iType}, mouseWheelEvent{event}
 {
 }
 

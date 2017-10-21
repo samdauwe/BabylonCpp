@@ -226,7 +226,7 @@ public:
   bool hasSpecificMask(int mask = -1)
   {
     for (const auto& obs : _observers) {
-      if (obs.mask & mask || obs.mask == mask) {
+      if (obs->mask & mask || obs->mask == mask) {
         return true;
       }
     }

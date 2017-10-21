@@ -619,15 +619,29 @@ public:
   bool enableOfflineSupport;
   vector_t<Scene*> scenes;
   vector_t<PostProcess*> postProcesses;
+
   // Observables
+
   /**
    * Observable event triggered each time the rendering canvas is resized.
    */
   Observable<Engine> onResizeObservable;
+
   /**
    * Observable event triggered each time the canvas lost focus
    */
   Observable<Engine> onCanvasBlurObservable;
+
+  /**
+   * Observable event triggered each time the canvas gains focus
+   */
+  Observable<Engine> onCanvasFocusObservable;
+
+  /**
+   * Observable event triggered each time the canvas receives pointerout event
+   */
+  Observable<Engine> onCanvasPointerOutObservable;
+
   // WebVR
   // The new WebVR uses promises.
   // this promise resolves with the current devices available.

@@ -21,9 +21,10 @@ enum class EventType {
   MOUSE_OUT         = 3,
   MOUSE_MOVE        = 4,
   MOUSE_WHEEL       = 5,
-  KEY_DOWN          = 6,
-  KEY_UP            = 7,
-  BLUR              = 8,
+  DOM_MOUSE_SCROLL  = 6,
+  KEY_DOWN          = 7,
+  KEY_UP            = 8,
+  BLUR              = 9,
 }; // end of enum class EventType
 
 /** Mouse button types **/

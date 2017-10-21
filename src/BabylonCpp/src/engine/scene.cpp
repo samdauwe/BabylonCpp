@@ -19,6 +19,7 @@
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/ray.h>
 #include <babylon/debug/debug_layer.h>
+#include <babylon/engine/click_info.h>
 #include <babylon/engine/engine.h>
 #include <babylon/events/pointer_event_types.h>
 #include <babylon/gamepad/gamepad_manager.h>
@@ -46,6 +47,7 @@
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/physics/physics_engine.h>
+#include <babylon/postprocess/post_process.h>
 #include <babylon/postprocess/post_process_manager.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_pipeline_manager.h>
 #include <babylon/probes/reflection_probe.h>
@@ -104,13 +106,13 @@ Scene::Scene(Engine* engine)
     , probesEnabled{true}
     , actionManager{nullptr}
     , proceduralTexturesEnabled{true}
-    , mainSoundTrack{nullptr}
     , simplificationQueue{nullptr}
     , _cachedMaterial{nullptr}
     , _cachedEffect{nullptr}
     , _cachedVisibility{0.f}
     , requireLightSorting{false}
     , _environmentTexture{nullptr}
+    , _spritePredicate{nullptr}
     , _onDisposeObserver{nullptr}
     , _onBeforeRenderObserver{nullptr}
     , _onAfterRenderObserver{nullptr}
@@ -151,9 +153,10 @@ Scene::Scene(Engine* engine)
     , _skeletonsEnabled{true}
     , _postProcessRenderPipelineManager{nullptr}
     , _hasAudioEngine{false}
+    , _mainSoundTrack{nullptr}
     , _audioEnabled{true}
     , _headphone{false}
-    , _engine{engine}
+    , _engine{engine ? engine : Engine::LastCreatedEngine()}
     , _animationRatio{0}
     , _animationTimeLastSet{false}
     , animationTimeScale{1}
@@ -162,12 +165,17 @@ Scene::Scene(Engine* engine)
     , _intermediateRendering{false}
     , _viewUpdateFlag{-1}
     , _projectionUpdateFlag{-1}
+    , _alternateViewUpdateFlag{-1}
+    , _alternateProjectionUpdateFlag{-1}
+    , _activeMeshesFrozen{false}
     , _renderingManager{nullptr}
     , _physicsEngine{nullptr}
     , _transformMatrix{Matrix::Zero()}
     , _sceneUbo{nullptr}
+    , _alternateSceneUbo{nullptr}
     , _boundingBoxRenderer{nullptr}
     , _outlineRenderer{nullptr}
+    , _alternateTransformMatrix{nullptr}
     , _useAlternateCameraConfiguration{false}
     , _alternateRendering{false}
     , _frustumPlanesSet{false}
@@ -192,8 +200,6 @@ Scene::Scene(Engine* engine)
   _outlineRenderer = ::std::make_unique<OutlineRenderer>(this);
 
   attachControl();
-
-  mainSoundTrack = ::std::make_unique<SoundTrack>(this, true);
 
   // simplification queue
   simplificationQueue = ::std::make_unique<SimplificationQueue>();
@@ -437,6 +443,15 @@ PostProcessRenderPipelineManager* Scene::postProcessRenderPipelineManager()
   return _postProcessRenderPipelineManager.get();
 }
 
+SoundTrack* Scene::mainSoundTrack()
+{
+  if (!_mainSoundTrack) {
+    _mainSoundTrack = ::std::make_unique<SoundTrack>(this, true);
+  }
+
+  return _mainSoundTrack.get();
+}
+
 Plane* Scene::clipPlane()
 {
   return _clipPlane ? _clipPlane.get() : nullptr;
@@ -631,6 +646,16 @@ PerfCounter& Scene::activeBonesPerfCounter()
   return _activeBones;
 }
 
+microsecond_t Scene::getInterFramePerfCounter() const
+{
+  return microsecond_t(_interFrameDuration.current());
+}
+
+PerfCounter& Scene::interFramePerfCounter()
+{
+  return _interFrameDuration;
+}
+
 microsecond_t Scene::getLastFrameDuration() const
 {
   return microsecond_t(_lastFrameDuration.current());
@@ -719,6 +744,258 @@ void Scene::_createUbo()
   _sceneUbo->addUniform("view", 16);
 }
 
+void Scene::_createAlternateUbo()
+{
+  _alternateSceneUbo
+    = ::std::make_unique<UniformBuffer>(_engine, Float32Array(), true);
+  _alternateSceneUbo->addUniform("viewProjection", 16);
+  _alternateSceneUbo->addUniform("view", 16);
+}
+
+Scene& Scene::simulatePointerMove(const PickingInfo* pickResult)
+{
+  PointerEvent evt("pointermove");
+  return _processPointerMove(pickResult, evt);
+}
+
+Scene& Scene::_processPointerMove(const PickingInfo* pickResult,
+                                  const PointerEvent& evt)
+{
+  auto canvas = _engine->getRenderingCanvas();
+
+  if (pickResult && pickResult->hit && pickResult->pickedMesh) {
+    setPointerOverSprite(nullptr);
+
+    setPointerOverMesh(pickResult->pickedMesh);
+
+    if (_pointerOverMesh->actionManager
+        && _pointerOverMesh->actionManager->hasPointerTriggers()) {
+      if (!_pointerOverMesh->actionManager->hoverCursor.empty()) {
+        canvas->style.cursor = _pointerOverMesh->actionManager->hoverCursor;
+      }
+      else {
+        canvas->style.cursor = hoverCursor;
+      }
+    }
+    else {
+      canvas->style.cursor = defaultCursor;
+    }
+  }
+  else {
+    setPointerOverMesh(nullptr);
+    // Sprites
+    pickResult = pickSprite(_unTranslatedPointerX, _unTranslatedPointerY,
+                            _spritePredicate, false, cameraToUseForPointers);
+
+    if (pickResult && pickResult->hit && pickResult->pickedSprite) {
+      setPointerOverSprite(pickResult->pickedSprite);
+      if (_pointerOverSprite->actionManager
+          && !_pointerOverSprite->actionManager->hoverCursor.empty()) {
+        canvas->style.cursor = _pointerOverSprite->actionManager->hoverCursor;
+      }
+      else {
+        canvas->style.cursor = hoverCursor;
+      }
+    }
+    else {
+      setPointerOverSprite(nullptr);
+      // Restore pointer
+      canvas->style.cursor = defaultCursor;
+    }
+  }
+
+  if (onPointerMove) {
+    onPointerMove(evt, pickResult);
+  }
+
+  if (onPointerObservable.hasObservers()) {
+    auto type = evt.type == EventType::MOUSE_WHEEL
+                    || evt.type == EventType::DOM_MOUSE_SCROLL ?
+                  PointerEventTypes::POINTERWHEEL :
+                  PointerEventTypes::POINTERMOVE;
+    auto pi = new PointerInfo(type, evt, *pickResult);
+    onPointerObservable.notifyObservers(pi, static_cast<int>(type));
+  }
+
+  return *this;
+}
+
+Scene& Scene::simulatePointerDown(const PickingInfo* pickResult)
+{
+  PointerEvent evt("pointerdown");
+  return _processPointerDown(pickResult, evt);
+}
+
+Scene& Scene::_processPointerDown(const PickingInfo* pickResult,
+                                  const PointerEvent& evt)
+{
+  if (pickResult && pickResult->hit && pickResult->pickedMesh) {
+    _pickedDownMesh    = pickResult->pickedMesh;
+    auto actionManager = pickResult->pickedMesh->actionManager;
+    if (actionManager) {
+      if (actionManager->hasPickTriggers()) {
+        actionManager->processTrigger(
+          ActionManager::OnPickDownTrigger,
+          ActionEvent::CreateNew(pickResult->pickedMesh, evt));
+        switch (evt.button) {
+          case MouseButtonType::LEFT:
+            actionManager->processTrigger(
+              ActionManager::OnLeftPickTrigger,
+              ActionEvent::CreateNew(pickResult->pickedMesh, evt));
+            break;
+          case MouseButtonType::MIDDLE:
+            actionManager->processTrigger(
+              ActionManager::OnCenterPickTrigger,
+              ActionEvent::CreateNew(pickResult->pickedMesh, evt));
+            break;
+          case MouseButtonType::RIGHT:
+            actionManager->processTrigger(
+              ActionManager::OnRightPickTrigger,
+              ActionEvent::CreateNew(pickResult->pickedMesh, evt));
+            break;
+          default:
+            break;
+        }
+      }
+
+      if (actionManager->hasSpecificTrigger(
+            ActionManager::OnLongPressTrigger)) {
+#if 0
+        window.setTimeout(
+          (function() {
+            var pickResult = pick(
+              _unTranslatedPointerX, _unTranslatedPointerY, (mesh
+                                                             : AbstractMesh)
+              : boolean = > mesh.isPickable && mesh.isVisible && mesh.isReady()
+                          && mesh.actionManager
+                          && mesh.actionManager.hasSpecificTrigger(
+                               ActionManager.OnLongPressTrigger)
+                          && mesh == _pickedDownMesh,
+                false, cameraToUseForPointers);
+
+            if (pickResult && pickResult.hit && pickResult.pickedMesh) {
+              if (_isButtonPressed
+                  && ((new Date().getTime() - _startingPointerTime)
+                      > Scene.LongPressDelay)
+                  && (Math.abs(_startingPointerPosition.x - _pointerX)
+                        < Scene.DragMovementThreshold
+                      && Math.abs(_startingPointerPosition.y - _pointerY)
+                           < Scene.DragMovementThreshold)) {
+                _startingPointerTime = 0;
+                actionManager.processTrigger(
+                  ActionManager.OnLongPressTrigger,
+                  ActionEvent.CreateNew(pickResult.pickedMesh, evt));
+              }
+            }
+          }).bind(this),
+          Scene.LongPressDelay);
+#endif
+      }
+    }
+  }
+
+  if (onPointerDown) {
+    onPointerDown(evt, pickResult);
+  }
+
+  if (onPointerObservable.hasObservers()) {
+    auto type = PointerEventTypes::POINTERDOWN;
+    auto pi   = new PointerInfo(type, evt, *pickResult);
+    onPointerObservable.notifyObservers(pi, static_cast<int>(type));
+  }
+
+  return *this;
+}
+
+Scene& Scene::simulatePointerUp(const PickingInfo* pickResult)
+{
+  PointerEvent evt("pointerup");
+  ClickInfo clickInfo;
+  clickInfo.setSingleClick(true);
+
+  return _processPointerUp(pickResult, evt, clickInfo);
+}
+
+Scene& Scene::_processPointerUp(const PickingInfo* pickResult,
+                                const PointerEvent& evt,
+                                const ClickInfo& clickInfo)
+{
+  if (pickResult && pickResult && pickResult->pickedMesh) {
+    _pickedUpMesh = pickResult->pickedMesh;
+    if (_pickedDownMesh == _pickedUpMesh) {
+      if (onPointerPick) {
+        onPointerPick(evt, pickResult);
+      }
+      if (clickInfo.singleClick() && !clickInfo.ignore()
+          && onPointerObservable.hasObservers()) {
+        auto type = PointerEventTypes::POINTERPICK;
+        auto pi   = new PointerInfo(type, evt, *pickResult);
+        onPointerObservable.notifyObservers(pi, static_cast<int>(type));
+      }
+    }
+    if (pickResult->pickedMesh->actionManager) {
+      if (clickInfo.ignore()) {
+        pickResult->pickedMesh->actionManager->processTrigger(
+          ActionManager::OnPickUpTrigger,
+          ActionEvent::CreateNew(pickResult->pickedMesh, evt));
+      }
+      if (!clickInfo.hasSwiped() && !clickInfo.ignore()
+          && clickInfo.singleClick()) {
+        pickResult->pickedMesh->actionManager->processTrigger(
+          ActionManager::OnPickTrigger,
+          ActionEvent::CreateNew(pickResult->pickedMesh, evt));
+      }
+      if (clickInfo.doubleClick() && !clickInfo.ignore()
+          && pickResult->pickedMesh->actionManager->hasSpecificTrigger(
+               ActionManager::OnDoublePickTrigger)) {
+        pickResult->pickedMesh->actionManager->processTrigger(
+          ActionManager::OnDoublePickTrigger,
+          ActionEvent::CreateNew(pickResult->pickedMesh, evt));
+      }
+    }
+  }
+  if (_pickedDownMesh && _pickedDownMesh->actionManager
+      && _pickedDownMesh->actionManager->hasSpecificTrigger(
+           ActionManager::OnPickOutTrigger)
+      && _pickedDownMesh != _pickedUpMesh) {
+    _pickedDownMesh->actionManager->processTrigger(
+      ActionManager::OnPickOutTrigger,
+      ActionEvent::CreateNew(_pickedDownMesh, evt));
+  }
+
+  if (onPointerUp) {
+    onPointerUp(evt, pickResult);
+  }
+
+  if (onPointerObservable.hasObservers()) {
+    if (!clickInfo.ignore()) {
+      if (!clickInfo.hasSwiped()) {
+        if (clickInfo.singleClick()
+            && onPointerObservable.hasSpecificMask(
+                 PointerEventTypes::POINTERTAP)) {
+          auto type = PointerEventTypes::POINTERTAP;
+          auto pi   = new PointerInfo(type, evt, *pickResult);
+          onPointerObservable.notifyObservers(pi, static_cast<int>(type));
+        }
+        if (clickInfo.doubleClick()
+            && onPointerObservable.hasSpecificMask(
+                 PointerEventTypes::POINTERDOUBLETAP)) {
+          auto type = PointerEventTypes::POINTERDOUBLETAP;
+          auto pi   = new PointerInfo(type, evt, *pickResult);
+          onPointerObservable.notifyObservers(pi, static_cast<int>(type));
+        }
+      }
+    }
+    else {
+      auto type = PointerEventTypes::POINTERUP;
+      auto pi   = new PointerInfo(type, evt, *pickResult);
+      onPointerObservable.notifyObservers(pi, static_cast<int>(type));
+    }
+  }
+
+  return *this;
+}
+
 void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
 {
   spritePredicate = [](Sprite* sprite) {
@@ -765,18 +1042,30 @@ void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
 
 void Scene::detachControl()
 {
-  auto canvas = _engine->getRenderingCanvas();
+  auto engine = getEngine();
+  auto canvas = engine->getRenderingCanvas();
 
   canvas->removeMouseEventListener(EventType::MOUSE_MOVE, _onPointerMove);
   canvas->removeMouseEventListener(EventType::MOUSE_BUTTON_DOWN,
                                    _onPointerDown);
   canvas->removeMouseEventListener(EventType::MOUSE_BUTTON_UP, _onPointerUp);
 
+  engine->onCanvasBlurObservable.remove(_onCanvasBlurObserver);
+  engine->onCanvasFocusObservable.remove(_onCanvasFocusObserver);
+
   // Wheel
   canvas->removeMouseEventListener(EventType::MOUSE_WHEEL, _onPointerMove);
+  canvas->removeMouseEventListener(EventType::DOM_MOUSE_SCROLL, _onPointerMove);
 
+  // Keyboard
   canvas->removeKeyEventListener(EventType::KEY_DOWN, _onKeyDown);
   canvas->removeKeyEventListener(EventType::KEY_UP, _onKeyUp);
+
+  // Observables
+  onKeyboardObservable.clear();
+  onPreKeyboardObservable.clear();
+  onPointerObservable.clear();
+  onPrePointerObservable.clear();
 }
 
 void Scene::_onPointerMoveEvent(PointerEvent&& evt)
@@ -1368,7 +1657,7 @@ const Matrix& Scene::getProjectionMatrix() const
 
 Matrix Scene::getTransformMatrix()
 {
-  return _useAlternateCameraConfiguration ? _alternateTransformMatrix :
+  return _useAlternateCameraConfiguration ? *_alternateTransformMatrix :
                                             _transformMatrix;
 }
 
@@ -1401,9 +1690,41 @@ void Scene::setTransformMatrix(Matrix& view, Matrix& projection)
   }
 }
 
+void Scene::_setAlternateTransformMatrix(Matrix& view, Matrix& projection)
+{
+  if (_alternateViewUpdateFlag == view.updateFlag
+      && _alternateProjectionUpdateFlag == projection.updateFlag) {
+    return;
+  }
+
+  _alternateViewUpdateFlag       = view.updateFlag;
+  _alternateProjectionUpdateFlag = projection.updateFlag;
+  _alternateViewMatrix           = view;
+  _alternateProjectionMatrix     = projection;
+
+  if (!_alternateTransformMatrix) {
+    _alternateTransformMatrix = ::std::make_unique<Matrix>(Matrix::Zero());
+  }
+
+  _alternateViewMatrix.multiplyToRef(_alternateProjectionMatrix,
+                                     *_alternateTransformMatrix);
+
+  if (!_alternateSceneUbo) {
+    _createAlternateUbo();
+  }
+
+  if (_alternateSceneUbo->useUbo()) {
+    _alternateSceneUbo->updateMatrix("viewProjection",
+                                     *_alternateTransformMatrix);
+    _alternateSceneUbo->updateMatrix("view", _alternateViewMatrix);
+    _alternateSceneUbo->update();
+  }
+}
+
 UniformBuffer* Scene::getSceneUniformBuffer()
 {
-  return _sceneUbo.get();
+  return _useAlternateCameraConfiguration ? _alternateSceneUbo.get() :
+                                            _sceneUbo.get();
 }
 
 unsigned int Scene::getUniqueId()
@@ -2038,8 +2359,24 @@ bool Scene::_isInIntermediateRendering() const
   return _intermediateRendering;
 }
 
+Scene& Scene::freezeActiveMeshes()
+{
+  _evaluateActiveMeshes();
+  _activeMeshesFrozen = true;
+  return *this;
+}
+
+Scene& Scene::unfreezeActiveMeshes()
+{
+  _activeMeshesFrozen = false;
+  return *this;
+}
+
 void Scene::_evaluateActiveMeshes()
 {
+  if (_activeMeshesFrozen && !_activeMeshes.empty()) {
+    return;
+  }
   activeCamera->_activeMeshes.clear();
   _activeMeshes.clear();
   _renderingManager->reset();
@@ -2193,8 +2530,18 @@ void Scene::updateTransformMatrix(bool force)
                      activeCamera->getProjectionMatrix(force));
 }
 
+void Scene::updateAlternateTransformMatrix(Camera* alternateCamera)
+{
+  _setAlternateTransformMatrix(alternateCamera->getViewMatrix(),
+                               alternateCamera->getProjectionMatrix());
+}
+
 void Scene::_renderForCamera(Camera* camera)
 {
+  if (camera && camera->_skipRendering) {
+    return;
+  }
+
   auto engine = _engine;
 
   activeCamera = camera;
@@ -2212,7 +2559,13 @@ void Scene::_renderForCamera(Camera* camera)
   // Camera
   resetCachedMaterial();
   ++_renderId;
+  activeCamera->update();
   updateTransformMatrix();
+
+  if (camera->_alternateCamera) {
+    updateAlternateTransformMatrix(camera->_alternateCamera);
+    _alternateRendering = true;
+  }
 
   onBeforeCameraRenderObservable.notifyObservers(activeCamera);
 
@@ -2377,6 +2730,8 @@ void Scene::_renderForCamera(Camera* camera)
   // Reset some special arrays
   _renderTargets.clear();
 
+  _alternateRendering = false;
+
   onAfterCameraRenderObservable.notifyObservers(activeCamera);
 
   Tools::EndPerformanceCounter("Rendering camera " + activeCamera->name);
@@ -2388,6 +2743,9 @@ void Scene::_processSubCameras(Camera* camera)
     _renderForCamera(camera);
     return;
   }
+
+  // Update camera
+  activeCamera->update();
 
   // rig cameras
   for (auto& rigCamera : camera->_rigCameras) {
@@ -2409,6 +2767,7 @@ void Scene::render()
     return;
   }
 
+  _interFrameDuration.endMonitoring();
   _lastFrameDuration.beginMonitoring();
   _particlesDuration.fetchNewFrame();
   _spritesDuration.fetchNewFrame();
@@ -2478,12 +2837,6 @@ void Scene::render()
       ++_currentStepId;
 
       if ((internalSteps > 1) && (_currentInternalStep != internalSteps - 1)) {
-        // Q: can this be optimized by putting some code in the afterStep
-        // callback?
-        // I had to put this code here, otherwise mesh attached to bones of
-        // another mesh skeleton,
-        // would return incorrect positions for internal stepIds (non-rendered
-        // steps)
         _evaluateActiveMeshes();
       }
     }
@@ -2666,6 +3019,7 @@ void Scene::render()
   }
 
   Tools::EndPerformanceCounter("Scene rendering");
+  _interFrameDuration.beginMonitoring();
   _lastFrameDuration.endMonitoring();
   _totalMeshesCounter.addCount(meshes.size(), true);
   _totalLightsCounter.addCount(lights.size(), true);
@@ -2893,6 +3247,11 @@ void Scene::dispose(bool /*doNotRecurse*/)
     spriteManager->dispose();
   }
 
+  // Release postProcesses
+  for (auto& postProcess : postProcesses) {
+    postProcess->dispose();
+  }
+
   // Release layers
   for (auto& layer : layers) {
     layer->dispose();
@@ -2910,8 +3269,16 @@ void Scene::dispose(bool /*doNotRecurse*/)
   // Release UBO
   _sceneUbo->dispose();
 
+  if (_alternateSceneUbo) {
+    _alternateSceneUbo->dispose();
+  }
+
   // Post-processes
   postProcessManager->dispose();
+
+  if (_postProcessRenderPipelineManager) {
+    _postProcessRenderPipelineManager->dispose();
+  }
 
   // Physics
   if (_physicsEngine) {
@@ -2949,6 +3316,9 @@ MinMax Scene::getWorldExtends()
   Vector3 max(-numeric_limits_t<float>::max(), -numeric_limits_t<float>::max(),
               -numeric_limits_t<float>::max());
   for (auto& mesh : meshes) {
+    if (mesh->subMeshes.empty()) {
+      continue;
+    }
     mesh->computeWorldMatrix(true);
     auto minBox = mesh->getBoundingInfo()->boundingBox.minimumWorld;
     auto maxBox = mesh->getBoundingInfo()->boundingBox.maximumWorld;
@@ -3189,12 +3559,42 @@ void Scene::_rebuildGeometries()
   for (auto& geometry : _geometries) {
     geometry->_rebuild();
   }
+
+  for (auto& mesh : meshes) {
+    mesh->_rebuild();
+  }
+
+  if (postProcessManager) {
+    postProcessManager->_rebuild();
+  }
+
+  for (auto& layer : layers) {
+    layer->_rebuild();
+  }
+
+  for (auto& highlightLayer : highlightLayers) {
+    highlightLayer->_rebuild();
+  }
+
+  if (_boundingBoxRenderer) {
+    _boundingBoxRenderer->_rebuild();
+  }
+
+  for (auto& system : particleSystems) {
+    system->rebuild();
+  }
+
+  if (_postProcessRenderPipelineManager) {
+    _postProcessRenderPipelineManager->_rebuild();
+  }
 }
 void Scene::_rebuildTextures()
 {
   for (auto& texture : textures) {
     texture->_rebuild();
   }
+
+  markAllMaterialsAsDirty(Material::TextureDirtyFlag);
 }
 
 void Scene::createDefaultCameraOrLight(bool createArcRotateCamera, bool replace,
