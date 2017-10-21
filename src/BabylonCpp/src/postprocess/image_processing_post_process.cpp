@@ -1,9 +1,10 @@
 #include <babylon/postprocess/image_processing_post_process.h>
 
+#include <babylon/cameras/camera.h>
+#include <babylon/engine/engine.h>
 #include <babylon/materials/color_curves.h>
-#include <babylon/materials/effect.h>
-#include <babylon/materials/textures/base_texture.h>
-#include <babylon/tools/tools.h>
+#include <babylon/materials/iimage_processing_configuration_defines.h>
+#include <babylon/materials/image_processing_configuration.h>
 
 namespace BABYLON {
 
@@ -11,87 +12,18 @@ ImageProcessingPostProcess::ImageProcessingPostProcess(
   const string_t& iName, float renderRatio, Camera* camera,
   unsigned int samplingMode, Engine* engine, bool reusable,
   unsigned int textureType)
-    : PostProcess{iName,
-                  "imageProcessing",
-                  {"contrast", "vignetteSettings1", "vignetteSettings2",
-                   "cameraExposureLinear", "vCameraColorCurveNegative",
-                   "vCameraColorCurveNeutral", "vCameraColorCurvePositive",
-                   "colorTransformSettings"},
-                  {"txColorTransform"},
-                  renderRatio,
-                  camera,
-                  samplingMode,
-                  engine,
-                  reusable,
-                  "",
-                  textureType,
-                  "postprocess",
-                  {},
-                  true}
-    , colorGradingWeight{1.f}
-    , colorCurves{new ColorCurves()}
-    , cameraFov{0.5f}
-    , vignetteStretch{0}
-    , vignetteCentreX{0}
-    , vignetteCentreY{0}
-    , vignetteWeight{1.5f}
-    , vignetteColor{Color4(0.f, 0.f, 0.f, 0.f)}
-    , cameraContrast{1.f}
-    , cameraExposure{1.68f}
-    , _colorGradingTexture{nullptr}
-    , _colorCurvesEnabled{true}
-    , _vignetteBlendMode{ImageProcessingPostProcess::VIGNETTEMODE_MULTIPLY}
-    , _vignetteEnabled{true}
-    , _cameraToneMappingEnabled{true}
+    : PostProcess{iName,       "imageProcessing", {},     {},       renderRatio,
+                  camera,      samplingMode,      engine, reusable, "",
+                  textureType, "postprocess",     {},     true}
     , _fromLinearSpace{false}
 {
-  _updateParameters();
+  // Setup the default processing configuration to the scene.
+  _attachImageProcessingConfiguration(nullptr, true);
 
-  setOnApply([this](Effect* effect, EventState&) {
-    // Color
-    if (_colorCurvesEnabled) {
-      ColorCurves::Bind(*colorCurves, effect);
-    }
+  _imageProcessingConfiguration->setApplyByPostProcess(true);
 
-    if (_vignetteEnabled) {
-      // Vignette
-      float vignetteScaleY = ::std::tan(cameraFov * 0.5f);
-      float vignetteScaleX = vignetteScaleY * aspectRatio();
-
-      float vignetteScaleGeometricMean
-        = ::std::sqrt(vignetteScaleX * vignetteScaleY);
-      vignetteScaleX = Tools::Mix(vignetteScaleX, vignetteScaleGeometricMean,
-                                  vignetteStretch);
-      vignetteScaleY = Tools::Mix(vignetteScaleY, vignetteScaleGeometricMean,
-                                  vignetteStretch);
-
-      effect->setFloat4("vignetteSettings1", vignetteScaleX, vignetteScaleY,
-                        -vignetteScaleX * vignetteCentreX,
-                        -vignetteScaleY * vignetteCentreY);
-
-      float vignettePower = -2.f * vignetteWeight;
-      effect->setFloat4("vignetteSettings2", vignetteColor.r, vignetteColor.g,
-                        vignetteColor.b, vignettePower);
-    }
-
-    // Contrast and exposure
-    effect->setFloat("contrast", cameraContrast);
-    effect->setFloat("cameraExposureLinear",
-                     ::std::pow(2.f, -cameraExposure) * Math::PI);
-
-    // Color transform settings
-    if (_colorGradingTexture) {
-      effect->setTexture("txColorTransform", colorGradingTexture());
-      float textureSize
-        = static_cast<float>(colorGradingTexture()->getSize().height);
-
-      effect->setFloat4("colorTransformSettings",
-                        (textureSize - 1.f) / textureSize, // textureScale
-                        0.5f / textureSize,                // textureOffset
-                        textureSize,                       // textureSize
-                        colorGradingWeight                 // weight
-                        );
-    }
+  setOnApply([&](Effect* effect, EventState& /*es*/) {
+    _imageProcessingConfiguration->bind(effect, aspectRatio());
   });
 }
 
@@ -104,64 +36,202 @@ const char* ImageProcessingPostProcess::getClassName() const
   return "ImageProcessingPostProcess";
 }
 
-BaseTexture* ImageProcessingPostProcess::colorGradingTexture()
+ImageProcessingConfiguration*
+ImageProcessingPostProcess::imageProcessingConfiguration()
 {
-  return _colorGradingTexture;
+  return _imageProcessingConfiguration;
 }
 
-void ImageProcessingPostProcess::setColorGradingTexture(BaseTexture* value)
+void ImageProcessingPostProcess::setImageProcessingConfiguration(
+  ImageProcessingConfiguration* value)
 {
-  if (_colorGradingTexture == value) {
+  _attachImageProcessingConfiguration(value);
+}
+
+void ImageProcessingPostProcess::_attachImageProcessingConfiguration(
+  ImageProcessingConfiguration* configuration, bool doNotBuild)
+{
+  if (configuration == _imageProcessingConfiguration) {
     return;
   }
 
-  _colorGradingTexture = value;
-  _updateParameters();
-}
-
-unsigned int ImageProcessingPostProcess::vignetteBlendMode() const
-{
-  return _vignetteBlendMode;
-}
-
-void ImageProcessingPostProcess::setVignetteBlendMode(unsigned int value)
-{
-  if (_vignetteBlendMode == value) {
-    return;
+  // Detaches observer.
+  if (_imageProcessingConfiguration && _imageProcessingObserver) {
+    _imageProcessingConfiguration->onUpdateParameters.remove(
+      _imageProcessingObserver);
   }
 
-  _vignetteBlendMode = value;
-  _updateParameters();
+  // Pick the scene configuration if needed.
+  if (!configuration) {
+    auto camera = getCamera();
+    auto scene  = camera ? camera->getScene() : Engine::LastCreatedScene();
+    _imageProcessingConfiguration = scene->imageProcessingConfiguration();
+  }
+  else {
+    _imageProcessingConfiguration = configuration;
+  }
+
+  // Attaches observer.
+  _imageProcessingObserver
+    = _imageProcessingConfiguration->onUpdateParameters.add(
+      [this](ImageProcessingConfiguration* /*conf*/, EventState& /*es*/) {
+        _updateParameters();
+      });
+
+  // Ensure the effect will be rebuilt.
+  if (!doNotBuild) {
+    _updateParameters();
+  }
+}
+
+ColorCurves* ImageProcessingPostProcess::colorCurves() const
+{
+  return _imageProcessingConfiguration->colorCurves.get();
+}
+
+void ImageProcessingPostProcess::setColorCurves(ColorCurves* value)
+{
+  _imageProcessingConfiguration->colorCurves.reset(value);
 }
 
 bool ImageProcessingPostProcess::colorCurvesEnabled() const
 {
-  return _colorCurvesEnabled;
+  return _imageProcessingConfiguration->colorCurvesEnabled();
 }
 
 void ImageProcessingPostProcess::setColorCurvesEnabled(bool value)
 {
-  if (_colorCurvesEnabled == value) {
-    return;
-  }
+  _imageProcessingConfiguration->setColorCurvesEnabled(value);
+}
 
-  _colorCurvesEnabled = value;
-  _updateParameters();
+BaseTexture* ImageProcessingPostProcess::colorGradingTexture() const
+{
+  return _imageProcessingConfiguration->colorGradingTexture;
+}
+
+void ImageProcessingPostProcess::setColorGradingTexture(BaseTexture* value)
+{
+  _imageProcessingConfiguration->colorGradingTexture = value;
+}
+
+bool ImageProcessingPostProcess::colorGradingEnabled() const
+{
+  return _imageProcessingConfiguration->colorGradingEnabled();
+}
+
+void ImageProcessingPostProcess::setColorGradingEnabled(bool value)
+{
+  _imageProcessingConfiguration->setColorGradingEnabled(value);
+}
+
+float ImageProcessingPostProcess::exposure() const
+{
+  return _imageProcessingConfiguration->exposure();
+}
+
+void ImageProcessingPostProcess::setExposure(float value)
+{
+  _imageProcessingConfiguration->setExposure(value);
+}
+
+bool ImageProcessingPostProcess::toneMappingEnabled() const
+{
+  return _imageProcessingConfiguration->toneMappingEnabled();
+}
+
+void ImageProcessingPostProcess::setToneMappingEnabled(bool value)
+{
+  _imageProcessingConfiguration->setToneMappingEnabled(value);
+}
+
+float ImageProcessingPostProcess::contrast() const
+{
+  return _imageProcessingConfiguration->contrast();
+}
+
+void ImageProcessingPostProcess::setContrast(float value)
+{
+  _imageProcessingConfiguration->setContrast(value);
+}
+
+float ImageProcessingPostProcess::vignetteStretch() const
+{
+  return _imageProcessingConfiguration->vignetteStretch;
+}
+
+void ImageProcessingPostProcess::setVignetteStretch(float value)
+{
+  _imageProcessingConfiguration->vignetteStretch = value;
+}
+
+float ImageProcessingPostProcess::vignetteCentreX() const
+{
+  return _imageProcessingConfiguration->vignetteCentreX;
+}
+
+void ImageProcessingPostProcess::setVignetteCentreX(float value)
+{
+  _imageProcessingConfiguration->vignetteCentreX = value;
+}
+
+float ImageProcessingPostProcess::vignetteCentreY() const
+{
+  return _imageProcessingConfiguration->vignetteCentreY;
+}
+
+void ImageProcessingPostProcess::setVignetteCentreY(float value)
+{
+  _imageProcessingConfiguration->vignetteCentreY = value;
+}
+
+float ImageProcessingPostProcess::vignetteWeight() const
+{
+  return _imageProcessingConfiguration->vignetteWeight;
+}
+
+void ImageProcessingPostProcess::setVignetteWeight(float value)
+{
+  _imageProcessingConfiguration->vignetteWeight = value;
+}
+
+Color4& ImageProcessingPostProcess::vignetteColor()
+{
+  return _imageProcessingConfiguration->vignetteColor;
+}
+
+void ImageProcessingPostProcess::setVignetteColor(const Color4& value)
+{
+  _imageProcessingConfiguration->vignetteColor = value;
+}
+
+float ImageProcessingPostProcess::vignetteCameraFov() const
+{
+  return _imageProcessingConfiguration->vignetteCameraFov;
+}
+
+void ImageProcessingPostProcess::setVignetteCameraFov(float value)
+{
+  _imageProcessingConfiguration->vignetteCameraFov = value;
+}
+
+unsigned int ImageProcessingPostProcess::vignetteBlendMode() const
+{
+  return _imageProcessingConfiguration->vignetteBlendMode();
+}
+
+void ImageProcessingPostProcess::setVignetteBlendMode(unsigned int value)
+{
+  _imageProcessingConfiguration->setVignetteBlendMode(value);
 }
 
 bool ImageProcessingPostProcess::vignetteEnabled() const
 {
-  return _vignetteEnabled;
+  return _imageProcessingConfiguration->vignetteEnabled();
 }
 
 void ImageProcessingPostProcess::setVignetteEnabled(bool value)
 {
-  if (_vignetteEnabled == value) {
-    return;
-  }
-
-  _vignetteEnabled = value;
-  _updateParameters();
+  _imageProcessingConfiguration->setVignetteEnabled(value);
 }
 
 bool ImageProcessingPostProcess::fromLinearSpace() const
@@ -179,56 +249,71 @@ void ImageProcessingPostProcess::setFromLinearSpace(bool value)
   _updateParameters();
 }
 
-bool ImageProcessingPostProcess::cameraToneMappingEnabled() const
-{
-  return _cameraToneMappingEnabled;
-}
-
-void ImageProcessingPostProcess::setCameraToneMappingEnabled(bool value)
-{
-  if (_cameraToneMappingEnabled == value) {
-    return;
-  }
-
-  _cameraToneMappingEnabled = value;
-  _updateParameters();
-}
-
 void ImageProcessingPostProcess::_updateParameters()
 {
-  std::ostringstream defines;
-  vector_t<string_t> samplers = {"textureSampler"};
+  _defines.FROMLINEARSPACE = _fromLinearSpace;
+  _imageProcessingConfiguration->prepareDefines(_defines, true);
 
-  if (colorGradingTexture()) {
-    defines << "#define COLORGRADING\r\n";
-    samplers.emplace_back("txColorTransform");
+  string_t defines = "";
+  if (_defines.IMAGEPROCESSING) {
+    defines += "#define IMAGEPROCESSING;\r\n";
+  }
+  else if (_defines.VIGNETTE) {
+    defines += "#define VIGNETTE;\r\n";
+  }
+  else if (_defines.VIGNETTEBLENDMODEMULTIPLY) {
+    defines += "#define VIGNETTEBLENDMODEMULTIPLY;\r\n";
+  }
+  else if (_defines.VIGNETTEBLENDMODEOPAQUE) {
+    defines += "#define VIGNETTEBLENDMODEOPAQUE;\r\n";
+  }
+  else if (_defines.TONEMAPPING) {
+    defines += "#define TONEMAPPING;\r\n";
+  }
+  else if (_defines.CONTRAST) {
+    defines += "#define CONTRAST;\r\n";
+  }
+  else if (_defines.EXPOSURE) {
+    defines += "#define EXPOSURE;\r\n";
+  }
+  else if (_defines.COLORCURVES) {
+    defines += "#define COLORCURVES;\r\n";
+  }
+  else if (_defines.COLORGRADING) {
+    defines += "#define COLORGRADING;\r\n";
+  }
+  else if (_defines.FROMLINEARSPACE) {
+    defines += "#define FROMLINEARSPACE;\r\n";
+  }
+  else if (_defines.SAMPLER3DGREENDEPTH) {
+    defines += "#define SAMPLER3DGREENDEPTH;\r\n";
+  }
+  else if (_defines.SAMPLER3DBGRMAP) {
+    defines += "#define SAMPLER3DBGRMAP;\r\n";
+  }
+  else if (_defines.IMAGEPROCESSINGPOSTPROCESS) {
+    defines += "#define IMAGEPROCESSINGPOSTPROCESS;\r\n";
   }
 
-  if (_vignetteEnabled) {
-    defines << "#define VIGNETTE\r\n";
+  vector_t<string_t> samplers{"textureSampler"};
+  ImageProcessingConfiguration::PrepareSamplers(samplers, _defines);
 
-    if (vignetteBlendMode()
-        == ImageProcessingPostProcess::VIGNETTEMODE_MULTIPLY) {
-      defines << "#define VIGNETTEBLENDMODEMULTIPLY\r\n";
-    }
-    else {
-      defines << "#define VIGNETTEBLENDMODEOPAQUE\r\n";
-    }
+  vector_t<string_t> uniforms{"scale"};
+  ImageProcessingConfiguration::PrepareUniforms(uniforms, _defines);
+
+  updateEffect(defines, uniforms, samplers);
+}
+
+void ImageProcessingPostProcess::dispose(Camera* camera)
+{
+  PostProcess::dispose(camera);
+
+  if (_imageProcessingConfiguration && _imageProcessingObserver) {
+    _imageProcessingConfiguration->onUpdateParameters.remove(
+      _imageProcessingObserver);
   }
 
-  if (cameraToneMappingEnabled()) {
-    defines << "#define TONEMAPPING\r\n";
-  }
-
-  if (_colorCurvesEnabled && colorCurves) {
-    defines << "#define COLORCURVES\r\n";
-  }
-
-  if (_fromLinearSpace) {
-    defines << "#define FROMLINEARSPACE\r\n";
-  }
-
-  updateEffect(defines.str(), {}, samplers);
+  _imageProcessingConfiguration->setApplyByPostProcess(false);
 }
 
 } // end of namespace BABYLON

@@ -569,7 +569,7 @@ public:
   /** Rendering **/
   DepthRenderer* enableDepthRenderer();
   void disableDepthRenderer();
-  GeometryBufferRenderer* enableGeometryBufferRenderer(float ratio);
+  GeometryBufferRenderer* enableGeometryBufferRenderer(float ratio = 1.f);
   void disableGeometryBufferRenderer();
   void freezeMaterials();
   void unfreezeMaterials();

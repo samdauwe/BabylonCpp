@@ -10,18 +10,19 @@ namespace BABYLON {
  * Image proccessing functions.
  */
 struct BABYLON_SHARED_EXPORT IImageProcessingConfigurationDefines {
-  bool IMAGEPROCESSING;
-  bool VIGNETTE;
-  bool VIGNETTEBLENDMODEMULTIPLY;
-  bool VIGNETTEBLENDMODEOPAQUE;
-  bool TONEMAPPING;
-  bool CONTRAST;
-  bool EXPOSURE;
-  bool COLORCURVES;
-  bool COLORGRADING;
-  bool SAMPLER3DGREENDEPTH;
-  bool SAMPLER3DBGRMAP;
-  bool IMAGEPROCESSINGPOSTPROCESS;
+  bool IMAGEPROCESSING            = false;
+  bool VIGNETTE                   = false;
+  bool VIGNETTEBLENDMODEMULTIPLY  = false;
+  bool VIGNETTEBLENDMODEOPAQUE    = false;
+  bool TONEMAPPING                = false;
+  bool CONTRAST                   = false;
+  bool EXPOSURE                   = false;
+  bool COLORCURVES                = false;
+  bool COLORGRADING               = false;
+  bool FROMLINEARSPACE            = false;
+  bool SAMPLER3DGREENDEPTH        = false;
+  bool SAMPLER3DBGRMAP            = false;
+  bool IMAGEPROCESSINGPOSTPROCESS = false;
 }; // end of struct IImageProcessingConfigurationDefines
 
 } // end of namespace BABYLON

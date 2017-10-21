@@ -9,8 +9,8 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT StandardRenderingPipeline
-    : public PostProcessRenderPipeline,
-      public IAnimatable {
+  : public PostProcessRenderPipeline,
+    public IAnimatable {
 
 public:
   // Luminance steps
@@ -35,29 +35,37 @@ public:
                             = vector_t<Camera*>());
   virtual ~StandardRenderingPipeline();
 
-  void setBloomEnabled(bool enabled);
+  float operator[](const string_t& key) const;
+
   bool bloomEnabled() const;
-  void setDepthOfFieldEnabled(bool enabled);
+  void setBloomEnabled(bool enabled);
   bool depthOfFieldEnabled() const;
-  void setLensFlareEnabled(bool enabled);
+  void setDepthOfFieldEnabled(bool enabled);
   bool lensFlareEnabled() const;
-  void setHDREnabled(bool enabled);
+  void setLensFlareEnabled(bool enabled);
   bool HDREnabled() const;
-  void setMotionBlurEnabled(bool enabled);
+  void setHDREnabled(bool enabled);
+  bool VLSEnabled() const;
+  void setVLSEnabled(bool enabled);
   bool motionBlurEnabled() const;
-  unsigned int motionBlurSamples() const;
-  void setMotionBlurSamples(unsigned int samples);
+  void setMotionBlurEnabled(bool enabled);
+  float volumetricLightStepsCount() const;
+  void setVolumetricLightStepsCount(float count);
+  float motionBlurSamples() const;
+  void setMotionBlurSamples(float samples);
 
 private:
+  void _buildPipeline();
   // Down Sample X4 Post-Processs
   void _createDownSampleX4PostProcess(Scene* scene, float ratio);
   // Brightpass Post-Process
   void _createBrightPassPostProcess(Scene* scene, float ratio);
-  // Create gaussian blur H&V post-processes
-  void _createGaussianBlurPostProcesses(Scene* scene, float ratio,
-                                        unsigned int indice);
+  // Create blur H&V post-processes
+  void _createBlurPostProcesses(Scene* scene, float ratio, unsigned int indice,
+                                const string_t& blurWidthKey = "blurWidth");
   // Create texture adder post-process
   void _createTextureAdderPostProcess(Scene* scene, float ratio);
+  void _createVolumetricLightPostProcess(Scene* scene, float ratio);
   // Create luminance
   void _createLuminancePostProcesses(Scene* scene, unsigned int textureType);
   // Create HDR post-process
@@ -66,24 +74,31 @@ private:
   void _createLensFlarePostProcess(Scene* scene, float ratio);
   // Create depth-of-field post-process
   void _createDepthOfFieldPostProcess(Scene* scene, float ratio);
-  // Dispose
-  void dispose(bool doNotRecurse = false) override;
   // Create motion blur post-process
   void _createMotionBlurPostProcess(Scene* scene, float ratio);
+  Texture* _getDepthTexture();
+  void _disposePostProcesses();
+  // Dispose
+  void dispose(bool doNotRecurse = false) override;
 
 public:
   // Post-processes
   PostProcess* originalPostProcess;
   PostProcess* downSampleX4PostProcess;
   PostProcess* brightPassPostProcess;
-  vector_t<PostProcess*> gaussianBlurHPostProcesses;
-  vector_t<PostProcess*> gaussianBlurVPostProcesses;
+  vector_t<PostProcess*> blurHPostProcesses;
+  vector_t<PostProcess*> blurVPostProcesses;
   PostProcess* textureAdderPostProcess;
-  PostProcess* textureAdderFinalPostProcess;
-  PostProcess* lensFlareFinalPostProcess;
+  PostProcess* volumetricLightPostProcess;
+  BlurPostProcess* volumetricLightSmoothXPostProcess;
+  BlurPostProcess* volumetricLightSmoothYPostProcess;
+  PostProcess* volumetricLightMergePostProces;
+  PostProcess* volumetricLightFinalPostProcess;
   PostProcess* luminancePostProcess;
   vector_t<PostProcess*> luminanceDownSamplePostProcesses;
   PostProcess* hdrPostProcess;
+  PostProcess* textureAdderFinalPostProcess;
+  PostProcess* lensFlareFinalPostProcess;
   PostProcess* hdrFinalPostProcess;
   PostProcess* lensFlarePostProcess;
   PostProcess* lensFlareComposePostProcess;
@@ -92,14 +107,16 @@ public:
   // Values
   float brightThreshold;
   float blurWidth;
-  float gaussianCoefficient;
-  float gaussianMean;
-  float gaussianStandardDeviation;
+  bool horizontalBlur;
   float exposure;
+  Texture* lensTexture;
+  float volumetricLightCoefficient;
+  float volumetricLightPower;
+  float volumetricLightBlurScale;
+  Light* sourceLight;
   float hdrMinimumLuminance;
   float hdrDecreaseRate;
   float hdrIncreaseRate;
-  Texture* lensTexture;
   Texture* lensColorTexture;
   float lensFlareStrength;
   float lensFlareGhostDispersal;
@@ -115,16 +132,20 @@ public:
 
 private:
   Scene* _scene;
-  DepthRenderer* _depthRenderer;
   PostProcess* _currentDepthOfFieldSource;
-  PostProcess* _currentHDRSource;
+  PostProcess* _basePostProcess;
   float _hdrCurrentLuminance;
-  unsigned int _motionBlurSamples;
+  unsigned int _floatTextureType;
+  float _ratio;
+  // Getters and setters
   bool _bloomEnabled;
   bool _depthOfFieldEnabled;
+  bool _vlsEnabled;
   bool _lensFlareEnabled;
   bool _hdrEnabled;
   bool _motionBlurEnabled;
+  float _motionBlurSamples;
+  float _volumetricLightStepsCount;
 
 }; // end of class StandardRenderingPipeline
 
