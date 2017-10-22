@@ -1,16 +1,24 @@
 #include <babylon/cameras/inputs/arc_rotate_camera_keyboard_move_input.h>
 
+#include <babylon/engine/engine.h>
+#include <babylon/events/keyboard_event_types.h>
+#include <babylon/events/keyboard_info.h>
 #include <babylon/interfaces/icanvas.h>
 
 namespace BABYLON {
 
 ArcRotateCameraKeyboardMoveInput::ArcRotateCameraKeyboardMoveInput()
-    : _canvas{nullptr}, _noPreventDefault{false}
+    : panningSensibility{50.f}
+    , zoomingSensibility{25.f}
+    , useAltToZoom{true}
+    , _canvas{nullptr}
+    , _noPreventDefault{false}
 {
   keysUp.emplace_back(38);
   keysDown.emplace_back(40);
   keysLeft.emplace_back(37);
   keysRight.emplace_back(39);
+  keysReset.emplace_back(220);
 }
 
 ArcRotateCameraKeyboardMoveInput::~ArcRotateCameraKeyboardMoveInput()
@@ -20,80 +28,131 @@ ArcRotateCameraKeyboardMoveInput::~ArcRotateCameraKeyboardMoveInput()
 void ArcRotateCameraKeyboardMoveInput::attachControl(ICanvas* canvas,
                                                      bool noPreventDefault)
 {
+  if (_onCanvasBlurObserver) {
+    return;
+  }
+
   _canvas           = canvas;
   _noPreventDefault = noPreventDefault;
 
-  canvas->tabIndex = 1;
+  _scene  = camera->getScene();
+  _engine = _scene->getEngine();
 
-  _onKeyDown = [this](const KeyboardEvent& evt) {
-    const int keyCode = evt.keyCode;
-    if ((::std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
-        || (::std::find(keysDown.begin(), keysDown.end(), keyCode)
-            != keysDown.end())
-        || (::std::find(keysLeft.begin(), keysLeft.end(), keyCode)
-            != keysLeft.end())
-        || (::std::find(keysRight.begin(), keysRight.end(), keyCode)
-            != keysRight.end())) {
+  _onCanvasBlurObserver = _engine->onCanvasBlurObservable.add(
+    [this](Engine*, EventState&) { _keys.clear(); });
 
-      if (::std::find(_keys.begin(), _keys.end(), keyCode) == _keys.end()) {
-        _keys.emplace_back(keyCode);
+  _onKeyboardObserver = _scene->onKeyboardObservable.add(
+    [this](KeyboardInfo* info, EventState&) {
+      const auto& evt = info->event;
+
+      if (info->type == KeyboardEventTypes::KEYDOWN) {
+        _ctrlPressed = evt.ctrlKey;
+        _altPressed  = evt.altKey;
+
+        const int keyCode = evt.keyCode;
+        if ((::std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
+            || (::std::find(keysDown.begin(), keysDown.end(), keyCode)
+                != keysDown.end())
+            || (::std::find(keysLeft.begin(), keysLeft.end(), keyCode)
+                != keysLeft.end())
+            || (::std::find(keysRight.begin(), keysRight.end(), keyCode)
+                != keysRight.end())
+            || (::std::find(keysReset.begin(), keysReset.end(), keyCode)
+                != keysReset.end())) {
+
+          if (::std::find(_keys.begin(), _keys.end(), keyCode) == _keys.end()) {
+            _keys.emplace_back(keyCode);
+          }
+
+          if (!_noPreventDefault) {
+            evt.preventDefault();
+          }
+        }
       }
+      else {
+        const int keyCode = evt.keyCode;
+        if ((::std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
+            || (::std::find(keysDown.begin(), keysDown.end(), keyCode)
+                != keysDown.end())
+            || (::std::find(keysLeft.begin(), keysLeft.end(), keyCode)
+                != keysLeft.end())
+            || (::std::find(keysRight.begin(), keysRight.end(), keyCode)
+                != keysRight.end())
+            || (::std::find(keysReset.begin(), keysReset.end(), keyCode)
+                != keysReset.end())) {
 
-      if (!_noPreventDefault) {
-        evt.preventDefault();
+          _keys.erase(::std::remove(_keys.begin(), _keys.end(), keyCode),
+                      _keys.end());
+
+          if (!_noPreventDefault) {
+            evt.preventDefault();
+          }
+        }
       }
-    }
-  };
-
-  _onKeyUp = [this](const KeyboardEvent& evt) {
-    const int keyCode = evt.keyCode;
-    if ((::std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
-        || (::std::find(keysDown.begin(), keysDown.end(), keyCode)
-            != keysDown.end())
-        || (::std::find(keysLeft.begin(), keysLeft.end(), keyCode)
-            != keysLeft.end())
-        || (::std::find(keysRight.begin(), keysRight.end(), keyCode)
-            != keysRight.end())) {
-
-      _keys.erase(::std::remove(_keys.begin(), _keys.end(), keyCode),
-                  _keys.end());
-
-      if (!_noPreventDefault) {
-        evt.preventDefault();
-      }
-    }
-  };
-
-  _onLostFocus = [&](const FocusEvent& /*e*/) { _keys.clear(); };
+    });
 }
 
 void ArcRotateCameraKeyboardMoveInput::detachControl(ICanvas* /*canvas*/)
 {
+  if (_scene) {
+    _scene->onKeyboardObservable.remove(_onKeyboardObserver);
+    _engine->onCanvasBlurObservable.remove(_onCanvasBlurObserver);
+    _onKeyboardObserver   = nullptr;
+    _onCanvasBlurObserver = nullptr;
+  }
+
   _keys.clear();
-  _onKeyDown   = nullptr;
-  _onKeyUp     = nullptr;
-  _onLostFocus = nullptr;
 }
 
 void ArcRotateCameraKeyboardMoveInput::checkInputs()
 {
-  if (_onKeyDown) {
+  if (_onKeyboardObserver) {
     for (const auto& keyCode : _keys) {
       if (::std::find(keysLeft.begin(), keysLeft.end(), keyCode)
           != keysLeft.end()) {
-        camera->inertialAlphaOffset -= 0.01f;
+        if (_ctrlPressed && camera->_useCtrlForPanning) {
+          camera->inertialPanningX -= 1.f / panningSensibility;
+        }
+        else {
+          camera->inertialAlphaOffset -= 0.01f;
+        }
       }
       else if (::std::find(keysUp.begin(), keysUp.end(), keyCode)
                != keysUp.end()) {
-        camera->inertialAlphaOffset -= 0.01f;
+        if (_ctrlPressed && camera->_useCtrlForPanning) {
+          camera->inertialPanningY += 1.f / panningSensibility;
+        }
+        else if (_altPressed && useAltToZoom) {
+          camera->inertialRadiusOffset += 1.f / zoomingSensibility;
+        }
+        else {
+          camera->inertialBetaOffset -= 0.01f;
+        }
       }
       else if (::std::find(keysRight.begin(), keysRight.end(), keyCode)
                != keysRight.end()) {
-        camera->inertialAlphaOffset += 0.01f;
+        if (_ctrlPressed && camera->_useCtrlForPanning) {
+          camera->inertialPanningX += 1.f / panningSensibility;
+        }
+        else {
+          camera->inertialAlphaOffset += 0.01f;
+        }
       }
       else if (::std::find(keysDown.begin(), keysDown.end(), keyCode)
                != keysDown.end()) {
-        camera->inertialBetaOffset += 0.01f;
+        if (_ctrlPressed && camera->_useCtrlForPanning) {
+          camera->inertialPanningY -= 1.f / panningSensibility;
+        }
+        else if (_altPressed && useAltToZoom) {
+          camera->inertialRadiusOffset -= 1.f / zoomingSensibility;
+        }
+        else {
+          camera->inertialBetaOffset += 0.01f;
+        }
+      }
+      else if (::std::find(keysReset.begin(), keysReset.end(), keyCode)
+               != keysReset.end()) {
+        camera->restoreState();
       }
     }
   }

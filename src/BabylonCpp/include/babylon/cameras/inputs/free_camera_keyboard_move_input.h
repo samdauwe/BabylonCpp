@@ -9,7 +9,7 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT FreeCameraKeyboardMoveInput
-    : public ICameraInput<FreeCamera> {
+  : public ICameraInput<FreeCamera> {
 
 public:
   FreeCameraKeyboardMoveInput();
@@ -20,6 +20,7 @@ public:
   void checkInputs() override;
   const char* getClassName() const override;
   const char* getSimpleName() const override;
+  void _onLostFocus(const FocusEvent& e);
 
 public:
   Int32Array keysUp;
@@ -31,9 +32,10 @@ private:
   Int32Array _keys;
   ICanvas* _canvas;
   bool _noPreventDefault;
-  ::std::function<void(const KeyboardEvent& e)> _onKeyDown;
-  ::std::function<void(const KeyboardEvent& e)> _onKeyUp;
-  ::std::function<void(const KeyboardEvent& e)> _onLostFocus;
+  Observer<Engine>::Ptr _onCanvasBlurObserver;
+  Observer<KeyboardInfo>::Ptr _onKeyboardObserver;
+  Engine* _engine;
+  Scene* _scene;
 
 }; // end of class FreeCameraKeyboardMoveInput
 

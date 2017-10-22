@@ -32,6 +32,10 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
     _pointerInput = [this](PointerInfo* p, EventState&) {
       auto evt = p->pointerEvent;
 
+      if (_engine->isInVRExclusivePointerMode()) {
+        return;
+      }
+
       if (!touchEnabled && evt.pointerType == PointerType::TOUCH) {
         return;
       }
@@ -96,6 +100,10 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
 
   _onMouseMove = [this](MouseEvent& evt) {
     if (!_engine->isPointerLock) {
+      return;
+    }
+
+    if (_engine->isInVRExclusivePointerMode()) {
       return;
     }
 

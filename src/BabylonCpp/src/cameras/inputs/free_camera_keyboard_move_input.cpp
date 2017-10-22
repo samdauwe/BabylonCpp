@@ -1,5 +1,8 @@
 #include <babylon/cameras/inputs/free_camera_keyboard_move_input.h>
 
+#include <babylon/engine/engine.h>
+#include <babylon/events/keyboard_event_types.h>
+#include <babylon/events/keyboard_info.h>
 #include <babylon/interfaces/icanvas.h>
 
 namespace BABYLON {
@@ -20,71 +23,81 @@ FreeCameraKeyboardMoveInput::~FreeCameraKeyboardMoveInput()
 void FreeCameraKeyboardMoveInput::attachControl(ICanvas* canvas,
                                                 bool noPreventDefault)
 {
+  if (_onCanvasBlurObserver) {
+    return;
+  }
+
   _canvas           = canvas;
   _noPreventDefault = noPreventDefault;
 
-  if (!_onKeyDown) {
-    _canvas->tabIndex = 1;
+  _scene  = camera->getScene();
+  _engine = _scene->getEngine();
 
-    _onKeyDown = [this](const KeyboardEvent& evt) {
-      const int keyCode = evt.keyCode;
-      if ((::std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
-          || (::std::find(keysDown.begin(), keysDown.end(), keyCode)
-              != keysDown.end())
-          || (::std::find(keysLeft.begin(), keysLeft.end(), keyCode)
-              != keysLeft.end())
-          || (::std::find(keysRight.begin(), keysRight.end(), keyCode)
-              != keysRight.end())) {
+  _onCanvasBlurObserver = _engine->onCanvasBlurObservable.add(
+    [this](Engine*, EventState&) { _keys.clear(); });
 
-        if (::std::find(_keys.begin(), _keys.end(), keyCode) == _keys.end()) {
-          _keys.emplace_back(keyCode);
-        }
+  _onKeyboardObserver = _scene->onKeyboardObservable.add(
+    [this](KeyboardInfo* info, EventState&) {
+      const auto& evt = info->event;
 
-        if (!_noPreventDefault) {
-          evt.preventDefault();
-        }
-      }
-    };
+      if (info->type == KeyboardEventTypes::KEYDOWN) {
+        const int keyCode = evt.keyCode;
+        if ((::std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
+            || (::std::find(keysDown.begin(), keysDown.end(), keyCode)
+                != keysDown.end())
+            || (::std::find(keysLeft.begin(), keysLeft.end(), keyCode)
+                != keysLeft.end())
+            || (::std::find(keysRight.begin(), keysRight.end(), keyCode)
+                != keysRight.end())) {
 
-    _onKeyUp = [this](const KeyboardEvent& evt) {
-      const int keyCode = evt.keyCode;
-      if ((::std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
-          || (::std::find(keysDown.begin(), keysDown.end(), keyCode)
-              != keysDown.end())
-          || (::std::find(keysLeft.begin(), keysLeft.end(), keyCode)
-              != keysLeft.end())
-          || (::std::find(keysRight.begin(), keysRight.end(), keyCode)
-              != keysRight.end())) {
+          if (::std::find(_keys.begin(), _keys.end(), keyCode) == _keys.end()) {
+            _keys.emplace_back(keyCode);
+          }
 
-        _keys.erase(::std::remove(_keys.begin(), _keys.end(), keyCode),
-                    _keys.end());
-
-        if (!_noPreventDefault) {
-          evt.preventDefault();
+          if (!_noPreventDefault) {
+            evt.preventDefault();
+          }
         }
       }
-    };
+      else {
+        const int keyCode = evt.keyCode;
+        if ((::std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
+            || (::std::find(keysDown.begin(), keysDown.end(), keyCode)
+                != keysDown.end())
+            || (::std::find(keysLeft.begin(), keysLeft.end(), keyCode)
+                != keysLeft.end())
+            || (::std::find(keysRight.begin(), keysRight.end(), keyCode)
+                != keysRight.end())) {
 
-    _onLostFocus = [&](const KeyboardEvent& /*e*/) { _keys.clear(); };
-  }
+          _keys.erase(::std::remove(_keys.begin(), _keys.end(), keyCode),
+                      _keys.end());
+
+          if (!_noPreventDefault) {
+            evt.preventDefault();
+          }
+        }
+      }
+    });
 }
 
 void FreeCameraKeyboardMoveInput::detachControl(ICanvas* /*canvas*/)
 {
-  if (_onKeyDown) {
-    _keys.clear();
-    _onKeyDown   = nullptr;
-    _onKeyUp     = nullptr;
-    _onLostFocus = nullptr;
+  if (_scene) {
+    _scene->onKeyboardObservable.remove(_onKeyboardObserver);
+    _engine->onCanvasBlurObservable.remove(_onCanvasBlurObserver);
+    _onKeyboardObserver   = nullptr;
+    _onCanvasBlurObserver = nullptr;
   }
+  _keys.clear();
 }
 
 void FreeCameraKeyboardMoveInput::checkInputs()
 {
-  if (_onKeyDown) {
+  if (_onKeyboardObserver) {
     // Keyboard
     for (const auto& keyCode : _keys) {
       const float speed = camera->_computeLocalCameraSpeed();
+
       if (::std::find(keysLeft.begin(), keysLeft.end(), keyCode)
           != keysLeft.end()) {
         camera->_localDirection->copyFromFloats(-speed, 0.f, 0.f);
@@ -100,6 +113,10 @@ void FreeCameraKeyboardMoveInput::checkInputs()
       else if (::std::find(keysDown.begin(), keysDown.end(), keyCode)
                != keysDown.end()) {
         camera->_localDirection->copyFromFloats(0.f, 0.f, -speed);
+      }
+
+      if (camera->getScene()->useRightHandedSystem()) {
+        camera->_localDirection->z *= -1.f;
       }
 
       camera->getViewMatrix().invertToRef(camera->_cameraTransformMatrix);
@@ -119,6 +136,11 @@ const char* FreeCameraKeyboardMoveInput::getClassName() const
 const char* FreeCameraKeyboardMoveInput::getSimpleName() const
 {
   return "keyboard";
+}
+
+void FreeCameraKeyboardMoveInput::_onLostFocus(const FocusEvent& /*e*/)
+{
+  _keys.clear();
 }
 
 } // end of namespace BABYLON

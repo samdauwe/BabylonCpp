@@ -170,6 +170,7 @@ struct Image {
 
 struct KeyboardEvent {
   bool ctrlKey;
+  bool altKey;
   int keyCode;
   void preventDefault() const
   {

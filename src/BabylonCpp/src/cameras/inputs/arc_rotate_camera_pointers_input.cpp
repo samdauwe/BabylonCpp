@@ -12,8 +12,10 @@ ArcRotateCameraPointersInput::ArcRotateCameraPointersInput()
                MouseButtonType::RIGHT}}
     , angularSensibilityX{1000.f}
     , angularSensibilityY{1000.f}
-    , pinchPrecision{6.f}
-    , panningSensibility{50.f}
+    , pinchPrecision{12.f}
+    , panningSensibility{1000.f}
+    , multiTouchPanning{true}
+    , multiTouchPanAndZoom{true}
     , pinchInwards{true}
     , _canvas{nullptr}
     , _engine{nullptr}
@@ -22,7 +24,10 @@ ArcRotateCameraPointersInput::ArcRotateCameraPointersInput()
     , _cacheSoloPointerDefined{false}
     , _pointADefined{false}
     , _pointBDefined{false}
-    , _previousPinchDistance{0.f}
+    , _previousPinchSquaredDistance{0.f}
+    , _initialDistance{0.f}
+    , _twoFingerActivityCount{0}
+    , _previousMultiTouchPanPosition{MultiTouchPanPosition{0, 0, false, false}}
 {
 }
 
@@ -33,15 +38,30 @@ ArcRotateCameraPointersInput::~ArcRotateCameraPointersInput()
 void ArcRotateCameraPointersInput::attachControl(ICanvas* canvas,
                                                  bool noPreventDefault)
 {
-  _canvas                = canvas;
-  _noPreventDefault      = noPreventDefault;
-  _previousPinchDistance = 0.f;
+  _canvas           = canvas;
+  _noPreventDefault = noPreventDefault;
+
+  _engine                        = camera->getEngine();
+  _previousPinchSquaredDistance  = 0.f;
+  _initialDistance               = 0.f;
+  _twoFingerActivityCount        = 0;
+  _previousMultiTouchPanPosition = MultiTouchPanPosition{
+    0,     // x
+    0,     // y
+    false, // isPaning
+    false  // isPinching
+  };
 
   _pointerInput = [this](PointerInfo* p, EventState&) {
     auto evt = p->pointerEvent;
 
+    if (_engine->isInVRExclusivePointerMode()) {
+      return;
+    }
+
     if (p->type != PointerEventTypes::POINTERMOVE
-        && evt.button == MouseButtonType::UNDEFINED) {
+        && (::std::find(buttons.begin(), buttons.end(), evt.button)
+            == buttons.end())) {
       return;
     }
 
@@ -73,13 +93,20 @@ void ArcRotateCameraPointersInput::attachControl(ICanvas* canvas,
         _canvas->focus();
       }
     }
+    else if (p->type == PointerEventTypes::POINTERDOUBLETAP) {
+      camera->restoreState();
+    }
     else if (p->type == PointerEventTypes::POINTERUP) {
       if (evt.srcElement) {
         evt.srcElement->releasePointerCapture(evt.pointerId);
       }
 
-      _cacheSoloPointerDefined = false;
-      _previousPinchDistance   = 0.f;
+      _cacheSoloPointerDefined                  = false;
+      _previousPinchSquaredDistance             = 0;
+      _previousMultiTouchPanPosition.isPaning   = false;
+      _previousMultiTouchPanPosition.isPinching = false;
+      _twoFingerActivityCount                   = 0;
+      _initialDistance                          = 0;
 
       // would be better to use pointers.remove(evt.pointerId) for multitouch
       // gestures,
@@ -89,7 +116,32 @@ void ArcRotateCameraPointersInput::attachControl(ICanvas* canvas,
       // pressed forever if we don't release all pointers
       // will be ok to put back pointers.remove(evt.pointerId); when iPhone bug
       // corrected
-      _pointADefined = _pointBDefined = false;
+      if (_engine->badOS()) {
+        _pointADefined = _pointBDefined = false;
+      }
+      else {
+        // only remove the impacted pointer in case of multitouch allowing on
+        // most platforms switching from rotate to zoom and pan seamlessly.
+        if (_pointBDefined && _pointADefined
+            && _pointA.pointerId == evt.pointerId) {
+          _pointA           = _pointB;
+          _pointADefined    = true;
+          _pointBDefined    = false;
+          _cacheSoloPointer = ArcRotateCameraPointer{
+            _pointA.x, _pointA.y, _pointA.pointerId, evt.pointerType};
+          _cacheSoloPointerDefined = true;
+        }
+        else if (_pointADefined && _pointBDefined
+                 && _pointB.pointerId == evt.pointerId) {
+          _pointBDefined    = false;
+          _cacheSoloPointer = ArcRotateCameraPointer{
+            _pointA.x, _pointA.y, _pointA.pointerId, evt.pointerType};
+          _cacheSoloPointerDefined = true;
+        }
+        else {
+          _pointADefined = _pointBDefined = false;
+        }
+      }
 
       if (!_noPreventDefault) {
         evt.preventDefault();
@@ -103,8 +155,7 @@ void ArcRotateCameraPointersInput::attachControl(ICanvas* canvas,
       // One button down
       if (_pointADefined && !_pointBDefined) {
         if (!stl_util::almost_equal(panningSensibility, 0.f)
-            && ((evt.ctrlKey && camera->_useCtrlForPanning)
-                || (!camera->_useCtrlForPanning && _isPanClick))) {
+            && ((evt.ctrlKey && camera->_useCtrlForPanning) || _isPanClick)) {
           camera->inertialPanningX
             += -static_cast<float>(evt.clientX - _cacheSoloPointer.x)
                / panningSensibility;
@@ -119,37 +170,100 @@ void ArcRotateCameraPointersInput::attachControl(ICanvas* canvas,
           camera->inertialBetaOffset -= offsetY / angularSensibilityY;
         }
 
-        _cacheSoloPointer.x = evt.clientX;
-        _cacheSoloPointer.y = evt.clientY;
+        _cacheSoloPointer.x      = evt.clientX;
+        _cacheSoloPointer.y      = evt.clientY;
+        _cacheSoloPointerDefined = true;
       }
 
-      // Two buttons down: pinch
+      // Two buttons down: pinch/pan
       else if (_pointADefined && _pointBDefined) {
         // if (noPreventDefault) { evt.preventDefault(); } //if pinch gesture,
         // could be useful to force preventDefault to avoid html page
         // scroll/zoom in some mobile browsers
-        // auto ed = (_pointA.pointerId == evt.pointerId) ? _pointA : _pointB;
-        // ed.x    = evt.clientX;
-        // ed.y    = evt.clientY;
+        auto ed = (_pointA.pointerId == evt.pointerId) ? _pointA : _pointB;
+        ed.x    = evt.clientX;
+        ed.y    = evt.clientY;
         int direction = pinchInwards ? 1 : -1;
         auto distX    = _pointA.x - _pointB.x;
         auto distY    = _pointA.y - _pointB.y;
         auto pinchSquaredDistance
           = static_cast<float>((distX * distX) + (distY * distY));
-        if (stl_util::almost_equal(_previousPinchDistance, 0.f)) {
-          _previousPinchDistance = pinchSquaredDistance;
+        auto pinchDistance = ::std::sqrt(pinchSquaredDistance);
+
+        if (stl_util::almost_equal(_previousPinchSquaredDistance, 0.f)) {
+          _initialDistance                 = pinchDistance;
+          _previousPinchSquaredDistance    = pinchSquaredDistance;
+          _previousMultiTouchPanPosition.x = (_pointA.x + _pointB.x) / 2;
+          _previousMultiTouchPanPosition.y = (_pointA.y + _pointB.y) / 2;
           return;
         }
 
-        if (!stl_util::almost_equal(pinchSquaredDistance,
-                                    _previousPinchDistance)) {
+        if (multiTouchPanAndZoom) {
           camera->inertialRadiusOffset
-            += (pinchSquaredDistance - _previousPinchDistance)
+            += (pinchSquaredDistance - _previousPinchSquaredDistance)
                / (pinchPrecision
-                  * ((angularSensibilityX + angularSensibilityY) / 2.f)
-                  * static_cast<float>(direction));
-          _previousPinchDistance = pinchSquaredDistance;
+                  * ((angularSensibilityX + angularSensibilityY) / 2)
+                  * direction);
+
+          if (panningSensibility != 0.f) {
+            auto pointersCenterX = (_pointA.x + _pointB.x) / 2;
+            auto pointersCenterY = (_pointA.y + _pointB.y) / 2;
+            auto pointersCenterDistX
+              = pointersCenterX - _previousMultiTouchPanPosition.x;
+            auto pointersCenterDistY
+              = pointersCenterY - _previousMultiTouchPanPosition.y;
+
+            _previousMultiTouchPanPosition.x = pointersCenterX;
+            _previousMultiTouchPanPosition.y = pointersCenterY;
+
+            camera->inertialPanningX
+              += -(pointersCenterDistX) / (panningSensibility);
+            camera->inertialPanningY
+              += (pointersCenterDistY) / (panningSensibility);
+          }
         }
+        else {
+          ++_twoFingerActivityCount;
+
+          if (_previousMultiTouchPanPosition.isPinching
+              || (_twoFingerActivityCount < 20
+                  && std::abs(pinchDistance - _initialDistance)
+                       > camera->pinchToPanMaxDistance)) {
+            camera->inertialRadiusOffset
+              += (pinchSquaredDistance - _previousPinchSquaredDistance)
+                 / (pinchPrecision
+                    * ((angularSensibilityX + angularSensibilityY) / 2)
+                    * direction);
+            _previousMultiTouchPanPosition.isPaning   = false;
+            _previousMultiTouchPanPosition.isPinching = true;
+          }
+          else {
+            if (_cacheSoloPointer.pointerId == ed.pointerId
+                && panningSensibility != 0.f && multiTouchPanning) {
+              if (!_previousMultiTouchPanPosition.isPaning) {
+                _previousMultiTouchPanPosition.isPaning   = true;
+                _previousMultiTouchPanPosition.isPinching = false;
+                _previousMultiTouchPanPosition.x          = ed.x;
+                _previousMultiTouchPanPosition.y          = ed.y;
+                return;
+              }
+
+              camera->inertialPanningX
+                += -(ed.x - _previousMultiTouchPanPosition.x)
+                   / (panningSensibility);
+              camera->inertialPanningY
+                += (ed.y - _previousMultiTouchPanPosition.y)
+                   / (panningSensibility);
+            }
+          }
+
+          if (_cacheSoloPointer.pointerId == evt.pointerId) {
+            _previousMultiTouchPanPosition.x = ed.x;
+            _previousMultiTouchPanPosition.y = ed.y;
+          }
+        }
+
+        _previousPinchSquaredDistance = pinchSquaredDistance;
       }
     }
   };
@@ -157,7 +271,7 @@ void ArcRotateCameraPointersInput::attachControl(ICanvas* canvas,
   _observer = camera->getScene()->onPointerObservable.add(
     _pointerInput,
     PointerEventTypes::POINTERDOWN | PointerEventTypes::POINTERUP
-      | PointerEventTypes::POINTERMOVE);
+      | PointerEventTypes::POINTERMOVE | PointerEventTypes::POINTERDOUBLETAP);
 
   _onContextMenu = [](PointerEvent&& evt) { evt.preventDefault(); };
 
@@ -167,9 +281,13 @@ void ArcRotateCameraPointersInput::attachControl(ICanvas* canvas,
   }
 
   _onLostFocus = [this](const FocusEvent&) {
-    _pointADefined = _pointBDefined = false;
-    _previousPinchDistance          = 0.f;
-    _cacheSoloPointerDefined        = false;
+    _pointADefined = _pointBDefined           = false;
+    _previousPinchSquaredDistance             = 0.f;
+    _previousMultiTouchPanPosition.isPaning   = false;
+    _previousMultiTouchPanPosition.isPinching = false;
+    _twoFingerActivityCount                   = 0;
+    _cacheSoloPointerDefined                  = false;
+    _initialDistance                          = 0.f;
   };
 
   _onMouseMove = [this](MouseEvent& evt) {

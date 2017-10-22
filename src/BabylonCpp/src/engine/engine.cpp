@@ -53,6 +53,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _vrDisplayEnabled{false}
     , disableUniformBuffers{false}
     , disablePerformanceMonitorInBackground{false}
+    , _vrExclusivePointerMode{false}
     , _gl{nullptr}
     , _renderingCanvas{canvas}
     , _windowIsBackground{false}
@@ -343,6 +344,11 @@ void Engine::_initGLContext()
 float Engine::webGLVersion() const
 {
   return _webGLVersion;
+}
+
+bool Engine::isInVRExclusivePointerMode() const
+{
+  return _vrExclusivePointerMode;
 }
 
 bool Engine::supportsUniformBuffers() const

@@ -17,6 +17,13 @@ struct ArcRotateCameraPointer {
   PointerType type;
 }; // end of struct ArcRotateCameraPointer
 
+struct MultiTouchPanPosition {
+  int x;
+  int y;
+  bool isPaning;
+  bool isPinching;
+}; // end of struct MultiTouchPanPosition
+
 class BABYLON_SHARED_EXPORT ArcRotateCameraPointersInput
   : public ICameraInput<ArcRotateCamera> {
 
@@ -36,6 +43,8 @@ public:
   float angularSensibilityY;
   float pinchPrecision;
   float panningSensibility;
+  bool multiTouchPanning;
+  bool multiTouchPanAndZoom;
   bool pinchInwards;
 
 private:
@@ -58,7 +67,10 @@ private:
   bool _cacheSoloPointerDefined;
   bool _pointADefined;
   bool _pointBDefined;
-  float _previousPinchDistance;
+  float _previousPinchSquaredDistance;
+  float _initialDistance;
+  unsigned int _twoFingerActivityCount;
+  MultiTouchPanPosition _previousMultiTouchPanPosition;
 
 }; // end of class ArcRotateCameraPointersInput
 

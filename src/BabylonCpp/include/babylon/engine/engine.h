@@ -67,6 +67,7 @@ public:
   InternalTexture* emptyCubeTexture();
 
   float webGLVersion() const;
+  bool isInVRExclusivePointerMode() const;
   bool supportsUniformBuffers() const;
   bool needPOTTextures() const;
   bool badOS() const;
@@ -665,6 +666,8 @@ public:
   bool disablePerformanceMonitorInBackground;
 
 private:
+  // WebVR
+  bool _vrExclusivePointerMode;
   // Private Members
   GL::IGLRenderingContext* _gl;
   ICanvas* _renderingCanvas;

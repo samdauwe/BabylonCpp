@@ -9,7 +9,7 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT ArcRotateCameraKeyboardMoveInput
-    : public ICameraInput<ArcRotateCamera> {
+  : public ICameraInput<ArcRotateCamera> {
 
 public:
   ArcRotateCameraKeyboardMoveInput();
@@ -26,14 +26,21 @@ public:
   Int32Array keysDown;
   Int32Array keysLeft;
   Int32Array keysRight;
+  Int32Array keysReset;
+  float panningSensibility;
+  float zoomingSensibility;
+  bool useAltToZoom;
 
 private:
   ICanvas* _canvas;
   bool _noPreventDefault;
   Int32Array _keys;
-  ::std::function<void(const KeyboardEvent& e)> _onKeyDown;
-  ::std::function<void(const KeyboardEvent& e)> _onKeyUp;
-  ::std::function<void(const FocusEvent& e)> _onLostFocus;
+  bool _ctrlPressed;
+  bool _altPressed;
+  Observer<Engine>::Ptr _onCanvasBlurObserver;
+  Observer<KeyboardInfo>::Ptr _onKeyboardObserver;
+  Engine* _engine;
+  Scene* _scene;
 
 }; // end of class ArcRotateCameraKeyboardMoveInput
 
