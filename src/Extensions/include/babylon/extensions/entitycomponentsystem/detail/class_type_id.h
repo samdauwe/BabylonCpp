@@ -29,6 +29,7 @@
 #ifndef BABYLON_EXTENSIONS_ENTITY_COMPONENT_SYSTEM_DETAIL_CLASS_TYPE_ID_H
 #define BABYLON_EXTENSIONS_ENTITY_COMPONENT_SYSTEM_DETAIL_CLASS_TYPE_ID_H
 
+#include <atomic>
 #include <cstddef>
 
 namespace BABYLON {
@@ -49,11 +50,11 @@ public:
   }
 
 private:
-  static TypeId m_nextTypeId;
+  static std::atomic<TypeId> m_nextTypeId;
 };
 
 template <typename TBase>
-TypeId ClassTypeId<TBase>::m_nextTypeId = 0;
+std::atomic<TypeId> ClassTypeId<TBase>::m_nextTypeId{0};
 
 } // end of namespace detail
 } // end of namespace ECS
