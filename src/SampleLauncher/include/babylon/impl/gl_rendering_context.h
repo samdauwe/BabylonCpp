@@ -83,12 +83,10 @@ public:
   std::unique_ptr<IGLVertexArrayObject> createVertexArray() override;
   void cullFace(GLenum mode) override;
   void deleteBuffer(IGLBuffer* buffer) override;
-  void deleteFramebuffer(
-    const std::unique_ptr<IGLFramebuffer>& framebuffer) override;
+  void deleteFramebuffer(IGLFramebuffer* framebuffer) override;
   void deleteProgram(IGLProgram* program) override;
   void deleteQuery(const std::unique_ptr<IGLQuery>& query) override;
-  void deleteRenderbuffer(
-    const std::unique_ptr<IGLRenderbuffer>& renderbuffer) override;
+  void deleteRenderbuffer(IGLRenderbuffer* renderbuffer) override;
   void deleteShader(const std::unique_ptr<IGLShader>& shader) override;
   void deleteTexture(IGLTexture* texture) override;
   void deleteVertexArray(IGLVertexArrayObject* vao) override;

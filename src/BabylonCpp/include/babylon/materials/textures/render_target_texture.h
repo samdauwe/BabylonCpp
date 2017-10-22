@@ -39,8 +39,8 @@ public:
   void setOnClear(
     const ::std::function<void(Engine* engine, EventState&)>& callback);
 
-  IRenderTargetOptions& renderTargetOptions();
-  const IRenderTargetOptions& renderTargetOptions() const;
+  RenderTargetCreationOptions& renderTargetOptions();
+  const RenderTargetCreationOptions& renderTargetOptions() const;
   unsigned int samples() const;
   void setSamples(unsigned int value);
   void resetRefreshCounter();
@@ -166,7 +166,7 @@ public:
   Observable<Engine> onClearObservable;
 
 protected:
-  IRenderTargetOptions _renderTargetOptions;
+  RenderTargetCreationOptions _renderTargetOptions;
   ISize _size;
   unique_ptr_t<RenderingManager> _renderingManager;
   bool _doNotChangeAspectRatio;

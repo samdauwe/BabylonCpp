@@ -216,6 +216,7 @@ InternalTexture* Engine::emptyTexture()
 InternalTexture* Engine::emptyCubeTexture()
 {
   if (!_emptyCubeTexture) {
+#if 0
     Uint8Array faceData(4);
     vector_t<Uint8Array> cubeData{faceData, faceData, faceData,
                                   faceData, faceData, faceData};
@@ -223,6 +224,7 @@ InternalTexture* Engine::emptyCubeTexture()
       = createRawCubeTexture(cubeData, 1, EngineConstants::TEXTUREFORMAT_RGBA,
                              EngineConstants::TEXTURETYPE_UNSIGNED_INT, false,
                              false, TextureConstants::NEAREST_SAMPLINGMODE);
+#endif
   }
 
   return _emptyCubeTexture.get();
@@ -2770,15 +2772,15 @@ Engine::updateRenderTargetTextureSampleCount(InternalTexture* texture,
 
   // Dispose previous render buffers
   if (texture->_depthStencilBuffer) {
-    _gl->deleteRenderbuffer(texture->_depthStencilBuffer);
+    _gl->deleteRenderbuffer(texture->_depthStencilBuffer.get());
   }
 
   if (texture->_MSAAFramebuffer) {
-    _gl->deleteFramebuffer(texture->_MSAAFramebuffer);
+    _gl->deleteFramebuffer(texture->_MSAAFramebuffer.get());
   }
 
   if (texture->_MSAARenderBuffer) {
-    _gl->deleteRenderbuffer(texture->_MSAARenderBuffer);
+    _gl->deleteRenderbuffer(texture->_MSAARenderBuffer.get());
   }
 
   if (samples > 1) {
@@ -2979,13 +2981,12 @@ void Engine::updateRawCubeTexture(InternalTexture* texture,
   texture->isReady = true;
 }
 
-unique_ptr_t<InternalTexture> Engine::createRawCubeTexture(
+InternalTexture* Engine::createRawCubeTexture(
   const vector_t<Uint8Array> data, int size, unsigned int format,
   unsigned int type, bool generateMipMaps, bool invertY,
   unsigned int samplingMode, const string_t& compression)
 {
-  auto texture = ::std::make_unique<InternalTexture>(
-    this, InternalTexture::DATASOURCE_CUBERAW);
+  auto texture = new InternalTexture(this, InternalTexture::DATASOURCE_CUBERAW);
   texture->isCube          = true;
   texture->generateMipMaps = generateMipMaps;
   texture->format          = format;
@@ -3015,11 +3016,10 @@ unique_ptr_t<InternalTexture> Engine::createRawCubeTexture(
 
   // Upload data if needed. The texture won t be ready until then.
   if (!data.empty()) {
-    updateRawCubeTexture(texture.get(), data, format, type, invertY,
-                         compression);
+    updateRawCubeTexture(texture, data, format, type, invertY, compression);
   }
 
-  _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture.get());
+  _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture);
 
   // Filters
   if (!data.empty() && generateMipMaps) {
@@ -3186,22 +3186,22 @@ Engine::_convertRGBtoRGBATextureData(const ArrayBufferView& rgbData, int width,
 void Engine::_releaseFramebufferObjects(InternalTexture* texture)
 {
   if (texture->_framebuffer) {
-    _gl->deleteFramebuffer(texture->_framebuffer);
-    texture->_framebuffer.reset(nullptr);
+    _gl->deleteFramebuffer(texture->_framebuffer.get());
+    texture->_framebuffer = nullptr;
   }
 
   if (texture->_depthStencilBuffer) {
-    _gl->deleteRenderbuffer(texture->_depthStencilBuffer);
-    texture->_depthStencilBuffer.reset(nullptr);
+    _gl->deleteRenderbuffer(texture->_depthStencilBuffer.get());
+    texture->_depthStencilBuffer = nullptr;
   }
 
   if (texture->_MSAAFramebuffer) {
-    _gl->deleteFramebuffer(texture->_MSAAFramebuffer);
+    _gl->deleteFramebuffer(texture->_MSAAFramebuffer.get());
     texture->_MSAAFramebuffer.reset(nullptr);
   }
 
   if (texture->_MSAARenderBuffer) {
-    _gl->deleteRenderbuffer(texture->_MSAARenderBuffer);
+    _gl->deleteRenderbuffer(texture->_MSAARenderBuffer.get());
     texture->_MSAARenderBuffer.reset(nullptr);
   }
 }
@@ -3544,7 +3544,7 @@ void Engine::dispose(bool /*doNotRecurse*/)
   unbindAllAttributes();
 
   if (_dummyFramebuffer) {
-    _gl->deleteFramebuffer(_dummyFramebuffer);
+    _gl->deleteFramebuffer(_dummyFramebuffer.get());
   }
 
   _gl = nullptr;
@@ -3744,7 +3744,7 @@ bool Engine::_canRenderToFramebuffer(unsigned int /*type*/)
 
   // clean up
   _gl->deleteTexture(texture.get());
-  _gl->deleteFramebuffer(fb);
+  _gl->deleteFramebuffer(fb.get());
   _gl->bindFramebuffer(GL::FRAMEBUFFER, nullptr);
 
   // clear accumulated errors

@@ -1018,9 +1018,7 @@ public:
    * the frame buffer has already been deleted.
    * @param framebuffer A IGLFramebuffer object to delete.
    */
-  virtual void
-  deleteFramebuffer(const unique_ptr_t<IGLFramebuffer>& framebuffer)
-    = 0;
+  virtual void deleteFramebuffer(IGLFramebuffer* framebuffer) = 0;
 
   /**
    * @brief Deletes a given IGLProgram object. This method has no effect if the
@@ -1040,9 +1038,7 @@ public:
    * the render buffer has already been deleted.
    * @param renderbuffer An IGLRenderbuffer object to delete.
    */
-  virtual void
-  deleteRenderbuffer(const unique_ptr_t<IGLRenderbuffer>& renderbuffer)
-    = 0;
+  virtual void deleteRenderbuffer(IGLRenderbuffer* renderbuffer) = 0;
 
   /**
    * @brief Deletes a given IGLShader object. This method has no effect if the

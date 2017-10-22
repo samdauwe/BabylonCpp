@@ -265,6 +265,7 @@ class HDRCubeTexture;
 struct IMultiRenderTargetOptions;
 class InternalTexture;
 struct IRenderTargetOptions;
+using RenderTargetCreationOptions = IRenderTargetOptions;
 class MapTexture;
 class MirrorTexture;
 class MultiRenderTarget;

@@ -18,6 +18,7 @@ public:
   bool operator==(const EffectFallbacks& other) const;
   bool operator!=(const EffectFallbacks& other) const;
 
+  void unBindMesh();
   void addFallback(unsigned int rank, const string_t& define);
   void addCPUSkinningFallback(unsigned int rank, AbstractMesh* mesh);
   bool isMoreFallbacks() const;

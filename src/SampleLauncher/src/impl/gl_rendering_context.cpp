@@ -435,8 +435,7 @@ void GLRenderingContext::deleteBuffer(IGLBuffer* buffer)
   buffer->value = 0;
 }
 
-void GLRenderingContext::deleteFramebuffer(
-  const std::unique_ptr<IGLFramebuffer>& framebuffer)
+void GLRenderingContext::deleteFramebuffer(IGLFramebuffer* framebuffer)
 {
   glDeleteFramebuffers(1, &framebuffer->value);
   framebuffer->value = 0;
@@ -451,8 +450,7 @@ void GLRenderingContext::deleteQuery(const std::unique_ptr<IGLQuery>& /*query*/)
 {
 }
 
-void GLRenderingContext::deleteRenderbuffer(
-  const std::unique_ptr<IGLRenderbuffer>& renderbuffer)
+void GLRenderingContext::deleteRenderbuffer(IGLRenderbuffer* renderbuffer)
 {
   glDeleteRenderbuffers(1, &renderbuffer->value);
   renderbuffer->value = 0;

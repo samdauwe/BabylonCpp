@@ -110,12 +110,13 @@ void RenderTargetTexture::setOnClear(
   _onClearObserver = onClearObservable.add(callback);
 }
 
-IRenderTargetOptions& RenderTargetTexture::renderTargetOptions()
+RenderTargetCreationOptions& RenderTargetTexture::renderTargetOptions()
 {
   return _renderTargetOptions;
 }
 
-const IRenderTargetOptions& RenderTargetTexture::renderTargetOptions() const
+const RenderTargetCreationOptions&
+RenderTargetTexture::renderTargetOptions() const
 {
   return _renderTargetOptions;
 }
@@ -322,7 +323,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
     }
   }
   auto currentRenderListLength = currentRenderList.size();
-
+  auto sceneRenderId           = scene->getRenderId();
   for (auto& mesh : currentRenderList) {
     if (mesh) {
       if (!mesh->isReady()) {
@@ -330,6 +331,8 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
         resetRefreshCounter();
         continue;
       }
+
+      mesh->_preActivateForIntermediateRendering(sceneRenderId);
 
       bool isMasked;
       if (renderList.empty()) {
@@ -429,7 +432,7 @@ void RenderTargetTexture::renderToTarget(
 
   if (_postProcessManager) {
     _postProcessManager->_finalizeFrame(false, _texture, faceIndex,
-                                        _postProcesses);
+                                        _postProcesses, ignoreCameraViewport);
   }
   else if (useCameraPostProcess) {
     scene->postProcessManager->_finalizeFrame(
@@ -543,6 +546,10 @@ void RenderTargetTexture::_rebuild()
 {
   if (refreshRate() == RenderTargetTexture::REFRESHRATE_RENDER_ONCE) {
     setRefreshRate(RenderTargetTexture::REFRESHRATE_RENDER_ONCE);
+  }
+
+  if (_postProcessManager) {
+    _postProcessManager->_rebuild();
   }
 }
 

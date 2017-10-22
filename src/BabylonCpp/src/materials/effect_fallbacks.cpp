@@ -72,6 +72,11 @@ bool EffectFallbacks::operator!=(const EffectFallbacks& other) const
   return !(operator==(other));
 }
 
+void EffectFallbacks::unBindMesh()
+{
+  _mesh = nullptr;
+}
+
 void EffectFallbacks::addFallback(unsigned int rank, const string_t& define)
 {
   if (_defines.find(rank) == _defines.end()) {

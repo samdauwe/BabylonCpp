@@ -461,10 +461,11 @@ public:
                             bool invertY                = true,
                             const string_t& compression = "",
                             unsigned int level          = 0);
-  unique_ptr_t<InternalTexture> createRawCubeTexture(
-    const vector_t<Uint8Array> data, int size, unsigned int format,
-    unsigned int type, bool generateMipMaps, bool invertY,
-    unsigned int samplingMode, const string_t& compression = "");
+  InternalTexture* createRawCubeTexture(const vector_t<Uint8Array> data,
+                                        int size, unsigned int format,
+                                        unsigned int type, bool generateMipMaps,
+                                        bool invertY, unsigned int samplingMode,
+                                        const string_t& compression = "");
   InternalTexture* createRawCubeTextureFromUrl(
     const string_t& url, Scene* scene, int size, unsigned int format,
     unsigned int type, bool noMipmap,
