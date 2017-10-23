@@ -54,7 +54,8 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   bool textureHalfFloatLinearFiltering;
   bool textureHalfFloatRender;
   bool textureLOD;
-  int drawBuffersExtension;
+  bool drawBuffersExtension;
+  bool depthTextureExtension;
   bool colorBufferFloat;
 }; // end of struct EngineCapabilities
 

@@ -240,10 +240,10 @@ unsigned int BaseTexture::textureFormat() const
                             EngineConstants::TEXTUREFORMAT_RGBA;
 }
 
-Uint8Array BaseTexture::readPixels(unsigned int faceIndex)
+ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex)
 {
   if (!_texture) {
-    return {};
+    return ArrayBufferView();
   }
 
   auto size   = getSize();

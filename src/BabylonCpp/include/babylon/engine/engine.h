@@ -442,7 +442,7 @@ public:
                                       int height, const Uint8Array& data);
   InternalTexture*
   createRenderTargetCubeTexture(const ISize& size,
-                                const IRenderTargetOptions& options);
+                                const RenderTargetCreationOptions& options);
   InternalTexture* createPrefilteredCubeTexture(
     const string_t& rootUrl, Scene* scene, float scale, float offset,
     const ::std::function<void(InternalTexture*, EventState&)>& onLoad
@@ -513,8 +513,8 @@ public:
   float getDeltaTime() const;
 
   /** Texture helper functions **/
-  Uint8Array _readTexturePixels(InternalTexture* texture, int width, int height,
-                                int faceIndex = -1);
+  ArrayBufferView _readTexturePixels(InternalTexture* texture, int width,
+                                     int height, int faceIndex = -1);
   GL::GLenum _getWebGLTextureType(unsigned int type) const;
   GL::GLenum _getRGBABufferInternalSizedFormat(unsigned int type) const;
 

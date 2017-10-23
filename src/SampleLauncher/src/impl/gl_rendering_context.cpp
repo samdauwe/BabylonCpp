@@ -839,6 +839,13 @@ void GLRenderingContext::polygonOffset(GLfloat factor, GLfloat units)
   glPolygonOffset(factor, units);
 }
 
+void GLRenderingContext::readPixels(GLint x, GLint y, GLsizei width,
+                                    GLsizei height, GLenum format, GLenum type,
+                                    Float32Array& pixels)
+{
+  glReadPixels(x, y, width, height, format, type, &pixels[0]);
+}
+
 void GLRenderingContext::readPixels(GLint x, GLint y, GLint width, GLint height,
                                     GLenum format, GLenum type,
                                     Uint8Array& pixels)

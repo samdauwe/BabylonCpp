@@ -16,6 +16,7 @@ struct BABYLON_SHARED_EXPORT EngineOptions {
   bool audioEngine              = false;
   bool deterministicLockstep    = false;
   unsigned int lockstepMaxSteps = 4;
+  bool doNotHandleContextLost   = false;
 }; // end of struct EngineOptions
 
 } // end of namespace BABYLON

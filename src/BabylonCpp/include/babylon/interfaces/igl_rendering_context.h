@@ -1530,6 +1530,23 @@ public:
    * @param height A GLsizei specifying the height of the rectangle.
    * @param format A GLenum specifying the format of the pixel data.
    * @param type A GLenum specifying the data type of the pixel data.
+   * @param pixels An Float32Array object to read data into.
+   */
+  virtual void readPixels(GLint x, GLint y, GLsizei width, GLsizei height,
+                          GLenum format, GLenum type, Float32Array& pixels)
+    = 0;
+
+  /**
+   * @brief Reads a block of pixels from a specified rectangle of the current
+   * color framebuffer into an Uint8Array object.
+   * @param x A GLint specifying the first horizontal pixel that is read from
+   * the lower left corner of a rectangular block of pixels.
+   * @param y A GLint specifying the first vertical pixel that is read from the
+   * lower left corner of a rectangular block of pixels.
+   * @param width A GLsizei specifying the width of the rectangle.
+   * @param height A GLsizei specifying the height of the rectangle.
+   * @param format A GLenum specifying the format of the pixel data.
+   * @param type A GLenum specifying the data type of the pixel data.
    * @param pixels An Uint8Array object to read data into.
    */
   virtual void readPixels(GLint x, GLint y, GLsizei width, GLsizei height,

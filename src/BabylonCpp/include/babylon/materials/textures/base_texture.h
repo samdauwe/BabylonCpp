@@ -57,7 +57,7 @@ public:
   unique_ptr_t<BaseTexture> clone() const;
   unsigned int textureType() const;
   unsigned int textureFormat() const;
-  Uint8Array readPixels(unsigned int faceIndex = 0);
+  ArrayBufferView readPixels(unsigned int faceIndex = 0);
   void releaseInternalTexture();
   SphericalPolynomial* sphericalPolynomial();
   void setSphericalPolynomial(const SphericalPolynomial& value);

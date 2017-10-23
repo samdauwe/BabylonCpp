@@ -2282,7 +2282,13 @@ void Engine::_rescaleTexture(InternalTexture* source,
         effect->_bindTexture("textureSampler", source);
       });
 
-      scene->postProcessManager->directRender({_rescalePostProcess.get()}, rtt);
+      auto hostingScene = scene;
+
+      if (!hostingScene) {
+        hostingScene = scenes.back();
+      }
+      hostingScene->postProcessManager->directRender(
+        {_rescalePostProcess.get()}, rtt);
 
       _bindTextureDirectly(GL::TEXTURE_2D, destination);
       _gl->copyTexImage2D(GL::TEXTURE_2D, 0, internalFormat, 0, 0,
@@ -2331,6 +2337,13 @@ void Engine::updateRawTexture(InternalTexture* texture, const Uint8Array& data,
   _bindTextureDirectly(GL::TEXTURE_2D, texture);
   _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL, invertY ? 1 : 0);
 
+  if (!_doNotHandleContextLost) {
+    texture->_bufferView  = data;
+    texture->format       = format;
+    texture->invertY      = invertY;
+    texture->_compression = compression;
+  }
+
   if (texture->width % 4 != 0) {
     _gl->pixelStorei(GL::UNPACK_ALIGNMENT, 1);
   }
@@ -2362,11 +2375,20 @@ InternalTexture* Engine::createRawTexture(const Uint8Array& data, int width,
 {
   auto texture = ::std::make_unique<InternalTexture>(
     this, InternalTexture::DATASOURCE_RAW);
-  auto _texture        = texture.get();
-  _texture->baseWidth  = width;
-  _texture->baseHeight = height;
-  _texture->width      = width;
-  _texture->height     = height;
+  auto _texture             = texture.get();
+  _texture->baseWidth       = width;
+  _texture->baseHeight      = height;
+  _texture->width           = width;
+  _texture->height          = height;
+  _texture->format          = format;
+  _texture->generateMipMaps = generateMipMaps;
+  _texture->samplingMode    = samplingMode;
+  _texture->invertY         = invertY;
+  _texture->_compression    = compression;
+
+  if (!_doNotHandleContextLost) {
+    _texture->_bufferView = data;
+  }
 
   updateRawTexture(_texture, data, format, invertY, compression);
   _bindTextureDirectly(GL::TEXTURE_2D, _texture);
@@ -2621,7 +2643,9 @@ Engine::createMultipleRenderTarget(ISize size,
 
     auto texture = ::std::make_unique<InternalTexture>(
       this, InternalTexture::DATASOURCE_MULTIRENDERTARGET);
-    auto attachment = (*_gl)["COLOR_ATTACHMENT" + iStr];
+    auto attachment
+      = (*_gl)[webGLVersion() > 1 ? "COLOR_ATTACHMENT" + iStr :
+                                    "COLOR_ATTACHMENT" + iStr + "_WEBGL"];
     textures.emplace_back(texture.get());
     attachments.emplace_back(attachment);
 
@@ -2664,7 +2688,7 @@ Engine::createMultipleRenderTarget(ISize size,
     _internalTexturesCache.emplace_back(texture.get());
   }
 
-  if (generateDepthTexture) {
+  if (generateDepthTexture && _caps.depthTextureExtension) {
     // Depth texture
     auto depthTexture = ::std::make_unique<InternalTexture>(
       this, InternalTexture::DATASOURCE_MULTIRENDERTARGET);
@@ -2675,14 +2699,15 @@ Engine::createMultipleRenderTarget(ISize size,
     _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, GL::NEAREST);
     _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE);
     _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T, GL::CLAMP_TO_EDGE);
-    _gl->texImage2D(GL::TEXTURE_2D,        //
-                    0,                     //
-                    GL::DEPTH_COMPONENT16, //
-                    width, height,         //
-                    0,                     //
-                    GL::DEPTH_COMPONENT,   //
-                    GL::UNSIGNED_SHORT,    //
-                    nullptr                //
+    _gl->texImage2D(GL::TEXTURE_2D, //
+                    0,              //
+                    webGLVersion() < 2.f ? GL::DEPTH_COMPONENT :
+                                           GL::DEPTH_COMPONENT16, //
+                    width, height,                                //
+                    0,                                            //
+                    GL::DEPTH_COMPONENT,                          //
+                    GL::UNSIGNED_SHORT,                           //
+                    nullptr                                       //
                     );
 
     _gl->framebufferTexture2D(GL::FRAMEBUFFER,                   //
@@ -2837,9 +2862,8 @@ void Engine::_uploadCompressedDataToTexture(unsigned int target, int lod,
                             data);
 }
 
-InternalTexture*
-Engine::createRenderTargetCubeTexture(const ISize& size,
-                                      const IRenderTargetOptions& options)
+InternalTexture* Engine::createRenderTargetCubeTexture(
+  const ISize& size, const RenderTargetCreationOptions& options)
 {
   auto texture = ::std::make_unique<InternalTexture>(
     this, InternalTexture::DATASOURCE_RENDERTARGET);
@@ -2928,11 +2952,17 @@ InternalTexture* Engine::createCubeTexture(
 }
 
 void Engine::updateRawCubeTexture(InternalTexture* texture,
-                                  const vector_t<Uint8Array>& /*data*/,
-                                  unsigned int format, unsigned int /*type*/,
+                                  const vector_t<Uint8Array>& data,
+                                  unsigned int format, unsigned int type,
                                   bool invertY, const string_t& compression,
                                   unsigned int level)
 {
+  texture->_bufferViewArray = data;
+  texture->format           = format;
+  texture->type             = type;
+  texture->invertY          = invertY;
+  texture->_compression     = compression;
+
   // auto textureType        = _getWebGLTextureType(type);
   auto internalFormat = _getInternalFormat(format);
   // auto internalSizedFomat = _getRGBABufferInternalSizedFormat(type);
@@ -2997,6 +3027,9 @@ InternalTexture* Engine::createRawCubeTexture(
   texture->generateMipMaps = generateMipMaps;
   texture->format          = format;
   texture->type            = type;
+  if (!_doNotHandleContextLost) {
+    texture->_bufferViewArray = data;
+  }
 
   auto textureType    = _getWebGLTextureType(type);
   auto internalFormat = _getInternalFormat(format);
@@ -3020,7 +3053,7 @@ InternalTexture* Engine::createRawCubeTexture(
   }
   texture->generateMipMaps = generateMipMaps;
 
-  // Upload data if needed. The texture won t be ready until then.
+  // Upload data if needed. The texture won't be ready until then.
   if (!data.empty()) {
     updateRawCubeTexture(texture, data, format, type, invertY, compression);
   }
@@ -3097,7 +3130,9 @@ void Engine::_prepareWebGLTextureContinuation(InternalTexture* texture,
   _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
 
   resetTextureCache();
-  scene->_removePendingData(texture);
+  if (scene) {
+    scene->_removePendingData(texture);
+  }
 
   texture->onLoadedObservable.notifyObservers(texture);
   texture->onLoadedObservable.clear();
@@ -3252,6 +3287,7 @@ void Engine::setProgram(GL::IGLProgram* program)
 void Engine::bindSamplers(Effect* effect)
 {
   setProgram(effect->getProgram());
+
   const auto& samplers = effect->getSamplers();
   for (size_t index = 0; index < samplers.size(); ++index) {
     auto uniform = effect->getUniform(samplers[index]);
@@ -3289,7 +3325,7 @@ void Engine::_bindTexture(int channel, InternalTexture* texture)
 
 void Engine::setTextureFromPostProcess(int channel, PostProcess* postProcess)
 {
-  size_t _ind = static_cast<size_t>(postProcess->_currentRenderTextureInd);
+  const auto _ind = static_cast<size_t>(postProcess->_currentRenderTextureInd);
   _bindTexture(channel, postProcess->_textures[_ind]);
 }
 
@@ -3450,8 +3486,13 @@ void Engine::_setAnisotropicLevel(unsigned int key, BaseTexture* texture)
   auto anisotropicFilterExtension = _caps.textureAnisotropicFilterExtension;
   auto value                      = texture->anisotropicFilteringLevel;
 
-  if (internalTexture->samplingMode == TextureConstants::NEAREST_SAMPLINGMODE) {
-    value = 1;
+  if (internalTexture->samplingMode
+        != TextureConstants::LINEAR_LINEAR_MIPNEAREST
+      && internalTexture->samplingMode
+           != TextureConstants::LINEAR_LINEAR_MIPLINEAR
+      && internalTexture->samplingMode != TextureConstants::LINEAR_LINEAR) {
+    value = 1; // Forcing the anisotropic to 1 because else webgl will force
+               // filters to linear
   }
 
   if (anisotropicFilterExtension
@@ -3516,6 +3557,11 @@ void Engine::dispose(bool /*doNotRecurse*/)
   hideLoadingUI();
   stopRenderLoop();
 
+  // Release postProcesses
+  for (auto& postProcess : postProcesses) {
+    postProcess->dispose();
+  }
+
   // Empty texture
   if (_emptyTexture) {
     _releaseTexture(_emptyTexture);
@@ -3571,6 +3617,8 @@ void Engine::dispose(bool /*doNotRecurse*/)
 
   onResizeObservable.clear();
   onCanvasBlurObservable.clear();
+  onCanvasFocusObservable.clear();
+  onCanvasPointerOutObservable.clear();
 
   Effect::ResetCache();
 }
@@ -3657,8 +3705,8 @@ void Engine::_measureFps()
   _deltaTime = _performanceMonitor->instantaneousFrameTime();
 }
 
-Uint8Array Engine::_readTexturePixels(InternalTexture* texture, int width,
-                                      int height, int faceIndex)
+ArrayBufferView Engine::_readTexturePixels(InternalTexture* texture, int width,
+                                           int height, int faceIndex)
 {
   if (!_dummyFramebuffer) {
     _dummyFramebuffer = _gl->createFramebuffer();
@@ -3676,11 +3724,28 @@ Uint8Array Engine::_readTexturePixels(InternalTexture* texture, int width,
                               GL::TEXTURE_2D, texture->_webGLTexture.get(), 0);
   }
 
-  auto readFormat = GL::RGBA;
-  auto readType   = GL::UNSIGNED_BYTE;
-  Uint8Array buffer(static_cast<std::size_t>(4 * width * height));
-  _gl->readPixels(0, 0, width, height, readFormat, readType, buffer);
-  _gl->bindFramebuffer(GL::FRAMEBUFFER, _currentFramebuffer);
+  auto readType = _getWebGLTextureType(texture->type);
+  ArrayBufferView buffer;
+
+  switch (readType) {
+    case GL::UNSIGNED_BYTE: {
+      buffer = ArrayBufferView(
+        Uint8Array(static_cast<std::size_t>(4 * width * height)));
+      readType = GL::UNSIGNED_BYTE;
+      _gl->readPixels(0, 0, width, height, GL::RGBA, readType,
+                      buffer.uint8Array);
+      _gl->bindFramebuffer(GL::FRAMEBUFFER, _currentFramebuffer);
+
+    } break;
+    default: {
+      buffer = ArrayBufferView(
+        Float32Array(static_cast<std::size_t>(4 * width * height)));
+      readType = GL::FLOAT;
+      _gl->readPixels(0, 0, width, height, GL::RGBA, readType,
+                      buffer.float32Array);
+      _gl->bindFramebuffer(GL::FRAMEBUFFER, _currentFramebuffer);
+    } break;
+  }
 
   return buffer;
 }
