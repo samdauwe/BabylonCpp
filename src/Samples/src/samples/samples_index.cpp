@@ -9,6 +9,8 @@
 #include <babylon/samples/environment/height_map_scene.h>
 #include <babylon/samples/extensions/hexplanetgeneration/hex_ico_sphere_scene.h>
 #include <babylon/samples/extensions/navigation/crowd_simulation_scene_1.h>
+#include <babylon/samples/extensions/navigation/crowd_simulation_scene_2.h>
+#include <babylon/samples/extensions/navigation/crowd_simulation_scene_3.h>
 #include <babylon/samples/extensions/noisegeneration/perlin_noise_waves_scene.h>
 #include <babylon/samples/extensions/polyhedron/polyhedra_scene.h>
 #include <babylon/samples/extensions/treegenerators/simple_oak_tree_scene.h>
@@ -92,6 +94,16 @@ SamplesIndex::SamplesIndex()
   _samples["CrowdSimulationScene1"]
     = ::std::make_tuple(true, [](ICanvas* iCanvas) {               //
         return ::std::make_unique<CrowdSimulationScene1>(iCanvas); //
+      });                                                          //
+  // Crowd Simulation Scene 2
+  _samples["CrowdSimulationScene2"]
+    = ::std::make_tuple(true, [](ICanvas* iCanvas) {               //
+        return ::std::make_unique<CrowdSimulationScene2>(iCanvas); //
+      });                                                          //
+  // Crowd Simulation Scene 3
+  _samples["CrowdSimulationScene3"]
+    = ::std::make_tuple(true, [](ICanvas* iCanvas) {               //
+        return ::std::make_unique<CrowdSimulationScene3>(iCanvas); //
       });                                                          //
   // Cuboid Scene
   _samples["CuboidScene"]

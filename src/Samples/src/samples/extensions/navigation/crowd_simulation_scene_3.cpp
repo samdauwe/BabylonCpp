@@ -1,4 +1,4 @@
-#include <babylon/samples/extensions/navigation/crowd_simulation_scene_1.h>
+#include <babylon/samples/extensions/navigation/crowd_simulation_scene_3.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/logging.h>
@@ -14,21 +14,21 @@
 namespace BABYLON {
 namespace Samples {
 
-CrowdSimulationScene1::CrowdSimulationScene1(ICanvas* iCanvas)
+CrowdSimulationScene3::CrowdSimulationScene3(ICanvas* iCanvas)
     : IRenderableScene(iCanvas), _crowdSimulation{nullptr}
 {
 }
 
-CrowdSimulationScene1::~CrowdSimulationScene1()
+CrowdSimulationScene3::~CrowdSimulationScene3()
 {
 }
 
-const char* CrowdSimulationScene1::getName()
+const char* CrowdSimulationScene3::getName()
 {
-  return "Crowd Simulation Scene 1";
+  return "Crowd Simulation Scene 3";
 }
 
-void CrowdSimulationScene1::initializeScene(ICanvas* canvas, Scene* scene)
+void CrowdSimulationScene3::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Change the clear color
   scene->clearColor = Color4(0.36f, 0.36f, 0.36f);
@@ -70,7 +70,7 @@ void CrowdSimulationScene1::initializeScene(ICanvas* canvas, Scene* scene)
     [this](Camera*, EventState&) { _crowdSimulation->update(); });
 }
 
-void CrowdSimulationScene1::setupScenario(Scene* scene)
+void CrowdSimulationScene3::setupScenario(Scene* scene)
 {
   // Create agent meshes
   _agentMeshes = CrowdSimulationUtils::createAgentMeshes(scene, 128);
@@ -86,6 +86,9 @@ void CrowdSimulationScene1::setupScenario(Scene* scene)
       agentId, Vector2(-agentMesh->position().x, -agentMesh->position().z));
     _crowdSimulation->setAgentMaxSpeed(agentId, 1.f);
   }
+
+  auto box = Mesh::CreateBox("", 60.f, scene);
+  _crowdSimulation->addObstacleByBoundingBox(box, Vector3(0.f, -3.f, 0.f));
 
   _crowdSimulation->processObstacles();
   _crowdSimulation->computeRoadMap();
