@@ -29,10 +29,15 @@ public:
   // Specify the global time step of the simulation.
   void setTimeStep(float timeStep);
 
+  /* Agent management functions */
   size_t addAgent(AbstractMesh* mesh);
   size_t addAgent(AbstractMesh* mesh, const BABYLON::Vector2& position);
   void setAgentGoal(size_t agentId, const BABYLON::Vector2& goal);
   void setAgentMaxSpeed(size_t agentId, float speed);
+
+  /* Obstacle management functions */
+  void addObstacleByBoundingBox(AbstractMesh* mesh, const Vector3& position,
+                                bool isVisible = true);
 
   /* Process the obstacles so that they are accounted for in the simulation. */
   void processObstacles();

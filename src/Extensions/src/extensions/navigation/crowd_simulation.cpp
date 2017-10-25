@@ -76,6 +76,30 @@ void CrowdSimulation::setAgentMaxSpeed(size_t agentId, float speed)
   _simulator->setAgentMaxSpeed(agentId, speed);
 }
 
+void CrowdSimulation::addObstacleByBoundingBox(AbstractMesh* mesh,
+                                               const Vector3& position,
+                                               bool isVisible)
+{
+  mesh->setPosition(position);
+  mesh->isVisible = isVisible;
+
+  mesh->getBoundingInfo()->update(*mesh->getWorldMatrix());
+  const auto bbox = mesh->getBoundingInfo()->boundingBox;
+  const auto min  = bbox.minimumWorld;
+  const auto max  = bbox.maximumWorld;
+
+  // Add (polygonal) obstacle, specifying the vertices in counterclockwise
+  // order.
+  const vector_t<RVO2::Vector2> obstacle{
+    RVO2::Vector2(max.x, max.z), //
+    RVO2::Vector2(min.x, max.z), //
+    RVO2::Vector2(min.x, min.z), //
+    RVO2::Vector2(max.x, min.z)  //
+  };
+
+  _simulator->addObstacle(obstacle);
+}
+
 void CrowdSimulation::processObstacles()
 {
   _simulator->processObstacles();
