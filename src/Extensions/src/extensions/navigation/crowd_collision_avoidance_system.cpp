@@ -27,7 +27,9 @@ void CrowdCollisionAvoidanceSystem::update()
 
 void CrowdCollisionAvoidanceSystem::setPreferredVelocities()
 {
-  auto entities = getEntities();
+  // Set the preferred velocity to be a vector of unit magnitude (speed) in the
+  // direction of the goal
+  const auto& entities = getEntities();
   for (auto& entity : entities) {
     auto agent      = entity.getComponent<CrowdAgent>();
     auto goalVector = agent.goal() - agent.position();

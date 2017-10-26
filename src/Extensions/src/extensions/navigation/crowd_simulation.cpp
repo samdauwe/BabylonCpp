@@ -105,8 +105,76 @@ void CrowdSimulation::processObstacles()
   _simulator->processObstacles();
 }
 
+void CrowdSimulation::addWayPoint(const BABYLON::Vector2& waypoint)
+{
+  RoadmapVertex v;
+  v.position = RVO2::Vector2(waypoint.x, waypoint.y);
+  _roadmap.emplace_back(v);
+}
+
 void CrowdSimulation::computeRoadMap()
 {
+  /* Connect the roadmap vertices by edges if mutually visible. */
+  for (size_t i = 0; i < _roadmap.size(); ++i) {
+    for (size_t j = 0; j < _roadmap.size(); ++j) {
+      if (_simulator->queryVisibility(_roadmap[i].position,
+                                      _roadmap[j].position,
+                                      _simulator->getAgentRadius(0))) {
+        _roadmap[i].neighbors.push_back(j);
+      }
+    }
+
+    // Initialize the distance to each of the four goal vertices at infinity
+    // (9e9f).
+    _roadmap[i].distToGoal.resize(4, 9e9f);
+  }
+
+  /*
+   * Compute the distance to each of the four goals (the first four vertices)
+   * for all vertices using Dijkstra's algorithm.
+   */
+  for (unsigned int i = 0; i < 4; ++i) {
+    std::multimap<float, unsigned int> Q;
+    std::vector<std::multimap<float, unsigned int>::iterator> posInQ(
+      _roadmap.size(), Q.end());
+
+    _roadmap[i].distToGoal[i] = 0.0f;
+    posInQ[i]                 = Q.insert(std::make_pair(0.0f, i));
+
+    while (!Q.empty()) {
+      const auto u = Q.begin()->second;
+      Q.erase(Q.begin());
+      posInQ[u] = Q.end();
+
+      for (size_t j = 0; j < _roadmap[u].neighbors.size(); ++j) {
+        const auto v = _roadmap[u].neighbors[j];
+        const float dist_uv
+          = RVO2::abs(_roadmap[v].position - _roadmap[u].position);
+
+        if (_roadmap[v].distToGoal[i] > _roadmap[u].distToGoal[i] + dist_uv) {
+          _roadmap[v].distToGoal[i] = _roadmap[u].distToGoal[i] + dist_uv;
+
+          if (posInQ[v] == Q.end()) {
+            posInQ[v] = Q.insert(std::make_pair(_roadmap[v].distToGoal[i], v));
+          }
+          else {
+            Q.erase(posInQ[v]);
+            posInQ[v] = Q.insert(std::make_pair(_roadmap[v].distToGoal[i], v));
+          }
+        }
+      }
+    }
+  }
+}
+
+bool CrowdSimulation::hasRoadMap() const
+{
+  return !_roadmap.empty();
+}
+
+const std::vector<RoadmapVertex>& CrowdSimulation::roadmap() const
+{
+  return _roadmap;
 }
 
 bool CrowdSimulation::isRunning() const

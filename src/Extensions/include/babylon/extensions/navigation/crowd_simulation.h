@@ -14,6 +14,12 @@ namespace RVO2 {
 class RVOSimulator;
 }
 
+struct RoadmapVertex {
+  RVO2::Vector2 position;
+  Uint32Array neighbors;
+  Float32Array distToGoal;
+}; // end of struct RoadmapVertex
+
 /**
  * @brief Represents a crowd simulation.
  */
@@ -41,7 +47,12 @@ public:
 
   /* Process the obstacles so that they are accounted for in the simulation. */
   void processObstacles();
+
+  /* Add a roadmap vertex. */
+  void addWayPoint(const BABYLON::Vector2& waypoint);
   void computeRoadMap();
+  bool hasRoadMap() const;
+  const std::vector<RoadmapVertex>& roadmap() const;
 
   // Return whether or not the simulation is running.
   bool isRunning() const;
@@ -60,6 +71,8 @@ private:
   CrowdMeshUpdaterSystem _crowdMeshUpdaterSystem;
   // The crowd agents
   std::vector<ECS::Entity> _agents;
+  // Holds the roadmap
+  std::vector<RoadmapVertex> _roadmap;
 
 }; // end of class CrowdSimulation
 
