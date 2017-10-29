@@ -10,6 +10,8 @@ struct CrowdSimulationUtils {
 
   static vector_t<AbstractMesh*> createAgentMeshes(Scene* scene,
                                                    size_t totalNoAgents);
+  static AbstractMesh* createWayPointMesh(Scene* scene,
+                                          const Vector2& position);
 
 }; // end of struct CrowdSimulationScene1
 
