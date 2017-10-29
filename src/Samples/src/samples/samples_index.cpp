@@ -8,9 +8,17 @@
 #include <babylon/samples/effects/fog_scene.h>
 #include <babylon/samples/environment/height_map_scene.h>
 #include <babylon/samples/extensions/hexplanetgeneration/hex_ico_sphere_scene.h>
-#include <babylon/samples/extensions/navigation/crowd_simulation_scene_1.h>
-#include <babylon/samples/extensions/navigation/crowd_simulation_scene_2.h>
-#include <babylon/samples/extensions/navigation/crowd_simulation_scene_3.h>
+#include <babylon/samples/extensions/navigation/crowd_simulation_scene_01.h>
+#include <babylon/samples/extensions/navigation/crowd_simulation_scene_02.h>
+#include <babylon/samples/extensions/navigation/crowd_simulation_scene_03.h>
+#include <babylon/samples/extensions/navigation/crowd_simulation_scene_04.h>
+#include <babylon/samples/extensions/navigation/crowd_simulation_scene_05.h>
+#include <babylon/samples/extensions/navigation/crowd_simulation_scene_06.h>
+#include <babylon/samples/extensions/navigation/crowd_simulation_scene_07.h>
+#include <babylon/samples/extensions/navigation/crowd_simulation_scene_08.h>
+#include <babylon/samples/extensions/navigation/crowd_simulation_scene_09.h>
+#include <babylon/samples/extensions/navigation/crowd_simulation_scene_10.h>
+#include <babylon/samples/extensions/navigation/crowd_simulation_scene_11.h>
 #include <babylon/samples/extensions/noisegeneration/perlin_noise_waves_scene.h>
 #include <babylon/samples/extensions/polyhedron/polyhedra_scene.h>
 #include <babylon/samples/extensions/treegenerators/simple_oak_tree_scene.h>
@@ -91,21 +99,61 @@ SamplesIndex::SamplesIndex()
     = ::std::make_tuple(true, [](ICanvas* iCanvas) {                      //
         return ::std::make_unique<CircleCurvesFromBeziersScene>(iCanvas); //
       });                                                                 //
-  // Crowd Simulation Scene 1
-  _samples["CrowdSimulationScene1"]
-    = ::std::make_tuple(true, [](ICanvas* iCanvas) {               //
-        return ::std::make_unique<CrowdSimulationScene1>(iCanvas); //
-      });                                                          //
-  // Crowd Simulation Scene 2
-  _samples["CrowdSimulationScene2"]
-    = ::std::make_tuple(true, [](ICanvas* iCanvas) {               //
-        return ::std::make_unique<CrowdSimulationScene2>(iCanvas); //
-      });                                                          //
-  // Crowd Simulation Scene 3
-  _samples["CrowdSimulationScene3"]
-    = ::std::make_tuple(true, [](ICanvas* iCanvas) {               //
-        return ::std::make_unique<CrowdSimulationScene3>(iCanvas); //
-      });                                                          //
+  // Crowd Simulation Scene 01
+  _samples["CrowdSimulationScene01"]
+    = ::std::make_tuple(true, [](ICanvas* iCanvas) {                //
+        return ::std::make_unique<CrowdSimulationScene01>(iCanvas); //
+      });                                                           //
+  // Crowd Simulation Scene 02
+  _samples["CrowdSimulationScene02"]
+    = ::std::make_tuple(true, [](ICanvas* iCanvas) {                //
+        return ::std::make_unique<CrowdSimulationScene02>(iCanvas); //
+      });                                                           //
+  // Crowd Simulation Scene 03
+  _samples["CrowdSimulationScene03"]
+    = ::std::make_tuple(true, [](ICanvas* iCanvas) {                //
+        return ::std::make_unique<CrowdSimulationScene03>(iCanvas); //
+      });                                                           //
+  // Crowd Simulation Scene 04
+  _samples["CrowdSimulationScene04"]
+    = ::std::make_tuple(true, [](ICanvas* iCanvas) {                //
+        return ::std::make_unique<CrowdSimulationScene04>(iCanvas); //
+      });                                                           //
+  // Crowd Simulation Scene 05
+  _samples["CrowdSimulationScene05"]
+    = ::std::make_tuple(true, [](ICanvas* iCanvas) {                //
+        return ::std::make_unique<CrowdSimulationScene05>(iCanvas); //
+      });                                                           //
+  // Crowd Simulation Scene 06
+  _samples["CrowdSimulationScene06"]
+    = ::std::make_tuple(true, [](ICanvas* iCanvas) {                //
+        return ::std::make_unique<CrowdSimulationScene06>(iCanvas); //
+      });                                                           //
+  // Crowd Simulation Scene 07
+  _samples["CrowdSimulationScene07"]
+    = ::std::make_tuple(true, [](ICanvas* iCanvas) {                //
+        return ::std::make_unique<CrowdSimulationScene07>(iCanvas); //
+      });                                                           //
+  // Crowd Simulation Scene 08
+  _samples["CrowdSimulationScene08"]
+    = ::std::make_tuple(true, [](ICanvas* iCanvas) {                //
+        return ::std::make_unique<CrowdSimulationScene08>(iCanvas); //
+      });                                                           //
+  // Crowd Simulation Scene 09
+  _samples["CrowdSimulationScene09"]
+    = ::std::make_tuple(true, [](ICanvas* iCanvas) {                //
+        return ::std::make_unique<CrowdSimulationScene09>(iCanvas); //
+      });                                                           //
+  // Crowd Simulation Scene 10
+  _samples["CrowdSimulationScene10"]
+    = ::std::make_tuple(true, [](ICanvas* iCanvas) {                //
+        return ::std::make_unique<CrowdSimulationScene10>(iCanvas); //
+      });                                                           //
+  // Crowd Simulation Scene 11
+  _samples["CrowdSimulationScene11"]
+    = ::std::make_tuple(true, [](ICanvas* iCanvas) {                //
+        return ::std::make_unique<CrowdSimulationScene11>(iCanvas); //
+      });                                                           //
   // Cuboid Scene
   _samples["CuboidScene"]
     = ::std::make_tuple(true,
