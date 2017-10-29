@@ -14,12 +14,6 @@ namespace RVO2 {
 class RVOSimulator;
 }
 
-struct RoadmapVertex {
-  RVO2::Vector2 position;
-  Uint32Array neighbors;
-  Float32Array distToGoal;
-}; // end of struct RoadmapVertex
-
 /**
  * @brief Represents a crowd simulation.
  */
@@ -29,15 +23,16 @@ public:
   CrowdSimulation();
   ~CrowdSimulation();
 
-  // Add the necessary systems to the world
+  /* Add the necessary systems to the world */
   void initializeWorld();
 
-  // Specify the global time step of the simulation.
+  /* Specify the global time step of the simulation. */
   void setTimeStep(float timeStep);
 
   /* Agent management functions */
   size_t addAgent(AbstractMesh* mesh);
   size_t addAgent(AbstractMesh* mesh, const BABYLON::Vector2& position);
+  size_t addAgent(AbstractMesh* mesh, const Vector3& position);
   void setAgentGoal(size_t agentId, const BABYLON::Vector2& goal);
   void setAgentMaxSpeed(size_t agentId, float speed);
 
@@ -51,13 +46,14 @@ public:
   /* Add a roadmap vertex. */
   void addWayPoint(const BABYLON::Vector2& waypoint);
   void computeRoadMap();
-  bool hasRoadMap() const;
-  const std::vector<RoadmapVertex>& roadmap() const;
 
-  // Return whether or not the simulation is running.
+  /* Set the simulation precision. */
+  void setPrecision(unsigned int precision);
+
+  /* Return whether or not the simulation is running. */
   bool isRunning() const;
 
-  // Updates the simulation
+  /* Updates the simulation */
   void update();
 
 private:
@@ -71,8 +67,6 @@ private:
   CrowdMeshUpdaterSystem _crowdMeshUpdaterSystem;
   // The crowd agents
   std::vector<ECS::Entity> _agents;
-  // Holds the roadmap
-  std::vector<RoadmapVertex> _roadmap;
 
 }; // end of class CrowdSimulation
 

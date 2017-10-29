@@ -2,6 +2,7 @@
 
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
+#include <babylon/extensions/navigation/crowd_roadmap_vertex.h>
 #include <babylon/extensions/navigation/rvo2/rvo_simulator.h>
 #include <babylon/mesh/abstract_mesh.h>
 
@@ -66,6 +67,11 @@ size_t CrowdSimulation::addAgent(AbstractMesh* mesh,
   return agentComp.id();
 }
 
+size_t CrowdSimulation::addAgent(AbstractMesh* mesh, const Vector3& position)
+{
+  return addAgent(mesh, BABYLON::Vector2(position.x, position.z));
+}
+
 void CrowdSimulation::setAgentGoal(size_t agentId, const BABYLON::Vector2& goal)
 {
   _agents[agentId].getComponent<CrowdAgent>().setGoal(goal);
@@ -107,59 +113,68 @@ void CrowdSimulation::processObstacles()
 
 void CrowdSimulation::addWayPoint(const BABYLON::Vector2& waypoint)
 {
-  RoadmapVertex v;
-  v.position = RVO2::Vector2(waypoint.x, waypoint.y);
-  _roadmap.emplace_back(v);
+  for (auto& agent : _agents) {
+    agent.getComponent<CrowdAgent>().addWayPoint(waypoint);
+  }
 }
 
 void CrowdSimulation::computeRoadMap()
 {
-  /* Connect the roadmap vertices by edges if mutually visible. */
-  for (size_t i = 0; i < _roadmap.size(); ++i) {
-    for (size_t j = 0; j < _roadmap.size(); ++j) {
-      if (_simulator->queryVisibility(_roadmap[i].position,
-                                      _roadmap[j].position,
-                                      _simulator->getAgentRadius(0))) {
-        _roadmap[i].neighbors.push_back(j);
-      }
+  for (auto& agent : _agents) {
+    // Check if there is a roadmap configured
+    if (!agent.getComponent<CrowdAgent>().hasRoadMap()) {
+      continue;
     }
 
-    // Initialize the distance to each of the four goal vertices at infinity
-    // (9e9f).
-    _roadmap[i].distToGoal.resize(4, 9e9f);
-  }
+    // Get the agent properties
+    auto& roadmap    = agent.getComponent<CrowdAgent>().roadmap();
+    auto agentRadius = agent.getComponent<CrowdAgent>().radius();
 
-  /*
-   * Compute the distance to each of the four goals (the first four vertices)
-   * for all vertices using Dijkstra's algorithm.
-   */
-  for (unsigned int i = 0; i < 4; ++i) {
-    std::multimap<float, unsigned int> Q;
-    std::vector<std::multimap<float, unsigned int>::iterator> posInQ(
-      _roadmap.size(), Q.end());
+    // Connect the roadmap vertices by edges if mutually visible.
+    for (size_t i = 0; i < roadmap.size(); ++i) {
+      for (size_t j = 0; j < roadmap.size(); ++j) {
+        if (_simulator->queryVisibility(roadmap[i].position,
+                                        roadmap[j].position, agentRadius)) {
+          roadmap[i].neighbors.push_back(j);
+        }
+      }
 
-    _roadmap[i].distToGoal[i] = 0.0f;
-    posInQ[i]                 = Q.insert(std::make_pair(0.0f, i));
+      // Initialize the distance to each of the four goal vertices at infinity
+      // (9e9f).
+      roadmap[i].distToGoal.resize(1, 9e9f);
+    }
 
-    while (!Q.empty()) {
-      const auto u = Q.begin()->second;
-      Q.erase(Q.begin());
-      posInQ[u] = Q.end();
+    // Compute the distance to each of the agent's goals (the first vertex)
+    // for all vertices using Dijkstra's algorithm.
+    const unsigned int i = 0;
+    {
+      std::multimap<float, unsigned int> Q;
+      std::vector<std::multimap<float, unsigned int>::iterator> posInQ(
+        roadmap.size(), Q.end());
 
-      for (size_t j = 0; j < _roadmap[u].neighbors.size(); ++j) {
-        const auto v = _roadmap[u].neighbors[j];
-        const float dist_uv
-          = RVO2::abs(_roadmap[v].position - _roadmap[u].position);
+      roadmap[i].distToGoal[i] = 0.0f;
+      posInQ[i]                = Q.insert(std::make_pair(0.0f, i));
 
-        if (_roadmap[v].distToGoal[i] > _roadmap[u].distToGoal[i] + dist_uv) {
-          _roadmap[v].distToGoal[i] = _roadmap[u].distToGoal[i] + dist_uv;
+      while (!Q.empty()) {
+        const auto u = Q.begin()->second;
+        Q.erase(Q.begin());
+        posInQ[u] = Q.end();
 
-          if (posInQ[v] == Q.end()) {
-            posInQ[v] = Q.insert(std::make_pair(_roadmap[v].distToGoal[i], v));
-          }
-          else {
-            Q.erase(posInQ[v]);
-            posInQ[v] = Q.insert(std::make_pair(_roadmap[v].distToGoal[i], v));
+        for (size_t j = 0; j < roadmap[u].neighbors.size(); ++j) {
+          const auto v = roadmap[u].neighbors[j];
+          const float dist_uv
+            = RVO2::abs(roadmap[v].position - roadmap[u].position);
+
+          if (roadmap[v].distToGoal[i] > roadmap[u].distToGoal[i] + dist_uv) {
+            roadmap[v].distToGoal[i] = roadmap[u].distToGoal[i] + dist_uv;
+
+            if (posInQ[v] == Q.end()) {
+              posInQ[v] = Q.insert(std::make_pair(roadmap[v].distToGoal[i], v));
+            }
+            else {
+              Q.erase(posInQ[v]);
+              posInQ[v] = Q.insert(std::make_pair(roadmap[v].distToGoal[i], v));
+            }
           }
         }
       }
@@ -167,14 +182,45 @@ void CrowdSimulation::computeRoadMap()
   }
 }
 
-bool CrowdSimulation::hasRoadMap() const
+void CrowdSimulation::setPrecision(unsigned int precision)
 {
-  return !_roadmap.empty();
-}
+  size_t neighborsMax   = 0;
+  float neighborDist    = 0.f;
+  float timeHorizon     = 0.f;
+  float timeHorizonObst = 0.f;
 
-const std::vector<RoadmapVertex>& CrowdSimulation::roadmap() const
-{
-  return _roadmap;
+  switch (precision) {
+    case 1:
+      // Low precision
+      neighborsMax    = 10;
+      neighborDist    = 15.f;
+      timeHorizon     = 10.f;
+      timeHorizonObst = 10.f;
+      break;
+    case 2:
+      // Medium precision
+      neighborsMax    = 100;
+      neighborDist    = 200.f;
+      timeHorizon     = 50.f;
+      timeHorizonObst = 30.f;
+      break;
+    case 3:
+      // High precision
+      neighborsMax    = 100;
+      neighborDist    = 100.f;
+      timeHorizon     = 100.f;
+      timeHorizonObst = 100.f;
+      break;
+  }
+
+  for (auto& agent : _agents) {
+    auto crowdAgent = agent.getComponent<CrowdAgent>();
+
+    crowdAgent.setAgentMaxNeighbors(neighborsMax);
+    crowdAgent.setAgentNeighborDist(neighborDist);
+    crowdAgent.setAgentTimeHorizon(timeHorizon);
+    crowdAgent.setAgentTimeHorizonObst(timeHorizonObst);
+  }
 }
 
 bool CrowdSimulation::isRunning() const
