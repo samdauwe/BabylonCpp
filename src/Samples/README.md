@@ -16,6 +16,7 @@
 ![shader_material_skybox_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_skybox_scene.png?raw=true "Shader Material Skybox Scene")
 ![shader_material_skybox_clouds_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_skybox_clouds_scene.png?raw=true "Shader Material Skybox Clouds Scene")
 ![shader_material_menger_sponge_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_menger_sponge_scene.png?raw=true "Shader Material Menger Sponge Scene")
+![shader_material_pegasus_galaxy_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_pegasus_galaxy_scene.png?raw=true "Shader Material Pegasus Galaxy Scene")
 ![shader_material_planet_shadertoy_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_planet_shadertoy_scene.png?raw=true "Shader Material Planet Shadertoy Scene")
 ![shader_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_scene.png?raw=true "Shader Material Scene")
 ![shader_material_star_nest_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_star_nest_scene.png?raw=true "Shader Material Star Nest Scene")
