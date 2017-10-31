@@ -296,8 +296,7 @@ void Engine::_initGLContext()
   _gl->DEPTH24_STENCIL8 = 35056;
 
   // Extensions
-  vector_t<string_t> extensionList
-    = String::split(_gl->getString(GL::EXTENSIONS), ' ');
+  auto extensionList = String::split(_gl->getString(GL::EXTENSIONS), ' ');
   std::set<string_t> extensions;
   for (auto& extension : extensionList) {
     extensions.insert(extension);
@@ -615,25 +614,23 @@ void Engine::stopRenderLoop(const delegate_t<void()>& renderFunction)
 
 void Engine::_renderLoop()
 {
-  if (_contextWasLost) {
-    return;
-  }
-
-  bool shouldRender = true;
-  if (!renderEvenInBackground && _windowIsBackground) {
-    shouldRender = false;
-  }
-
-  if (shouldRender) {
-    // Start new frame
-    beginFrame();
-
-    for (auto& renderFunction : _activeRenderLoops) {
-      renderFunction();
+  if (!_contextWasLost) {
+    auto shouldRender = true;
+    if (!renderEvenInBackground && _windowIsBackground) {
+      shouldRender = false;
     }
 
-    // Present
-    endFrame();
+    if (shouldRender) {
+      // Start new frame
+      beginFrame();
+
+      for (auto& renderFunction : _activeRenderLoops) {
+        renderFunction();
+      }
+
+      // Present
+      endFrame();
+    }
   }
 
   if (_activeRenderLoops.size() > 0) {

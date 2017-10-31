@@ -660,6 +660,10 @@ public:
   static AudioEngine* audioEngine;
   PerfCounter _drawCalls;
 
+  // Lost context
+  Observable<Engine> onContextLostObservable;
+  Observable<Engine> onContextRestoredObservable;
+
   /**
    * Turn this value on if you want to pause FPS computation when in background
    */
@@ -677,9 +681,14 @@ private:
   bool _badOS;
   bool _badDesktopOS;
 
-  ::std::function<void()> _onCanvasBlur;
-  ::std::function<void()> _onBlur;
+  // Focus
   ::std::function<void()> _onFocus;
+  ::std::function<void()> _onBlur;
+  ::std::function<void()> _onCanvasPointerOut;
+  ::std::function<void()> _onCanvasBlur;
+
+  ::std::function<void()> _onCanvasFocus;
+
   ::std::function<void()> _onFullscreenChange;
   ::std::function<void()> _onPointerLockChange;
 
@@ -753,6 +762,7 @@ private:
   bool _mustWipeVertexAttributes;
   InternalTexture* _emptyTexture;
   unique_ptr_t<InternalTexture> _emptyCubeTexture;
+  int _frameHandler;
   // Hardware supported Compressed Textures
   vector_t<string_t> _texturesSupported;
   string_t _textureFormatInUse;
