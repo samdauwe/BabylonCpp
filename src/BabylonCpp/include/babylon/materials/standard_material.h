@@ -99,8 +99,6 @@ public:
   void setUseEmissiveAsIllumination(bool value);
   bool linkEmissiveWithDiffuse() const;
   void setLinkEmissiveWithDiffuse(bool value);
-  bool useReflectionFresnelFromSpecular() const;
-  void setUseReflectionFresnelFromSpecular(bool value);
   bool useSpecularOverAlpha() const;
   void setUseSpecularOverAlpha(bool value);
   bool useReflectionOverAlpha() const;
@@ -115,6 +113,15 @@ public:
   void setRoughness(float value);
   bool useLightmapAsShadowmap() const;
   void setUseLightmapAsShadowmap(bool value);
+
+  // Fresnel
+  FresnelParameters* diffuseFresnelParameters();
+  FresnelParameters* opacityFresnelParameters();
+  FresnelParameters* reflectionFresnelParameters();
+  FresnelParameters* refractionFresnelParameters();
+  FresnelParameters* emissiveFresnelParameters();
+  bool useReflectionFresnelFromSpecular() const;
+  void setUseReflectionFresnelFromSpecular(bool value);
   bool useGlossinessFromSpecularMapAlpha() const;
   void setUseGlossinessFromSpecularMapAlpha(bool value);
   unsigned int maxSimultaneousLights() const;

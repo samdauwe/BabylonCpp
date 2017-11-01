@@ -1411,19 +1411,6 @@ void StandardMaterial::setLinkEmissiveWithDiffuse(bool value)
   _linkEmissiveWithDiffuse = value;
 }
 
-bool StandardMaterial::useReflectionFresnelFromSpecular() const
-{
-  return _useReflectionFresnelFromSpecular;
-}
-
-void StandardMaterial::setUseReflectionFresnelFromSpecular(bool value)
-{
-  if (_useReflectionFresnelFromSpecular == value) {
-    return;
-  }
-  _useReflectionFresnelFromSpecular = value;
-}
-
 bool StandardMaterial::useSpecularOverAlpha() const
 {
   return _useSpecularOverAlpha;
@@ -1513,6 +1500,64 @@ void StandardMaterial::setUseLightmapAsShadowmap(bool value)
     return;
   }
   _useLightmapAsShadowmap = value;
+}
+
+FresnelParameters* StandardMaterial::diffuseFresnelParameters()
+{
+  if (!_diffuseFresnelParameters) {
+    _diffuseFresnelParameters = ::std::make_unique<FresnelParameters>();
+  }
+
+  return _diffuseFresnelParameters.get();
+}
+
+FresnelParameters* StandardMaterial::opacityFresnelParameters()
+{
+  if (!_opacityFresnelParameters) {
+    _opacityFresnelParameters = ::std::make_unique<FresnelParameters>();
+  }
+
+  return _opacityFresnelParameters.get();
+}
+
+FresnelParameters* StandardMaterial::reflectionFresnelParameters()
+{
+  if (!_reflectionFresnelParameters) {
+    _reflectionFresnelParameters = ::std::make_unique<FresnelParameters>();
+  }
+
+  return _reflectionFresnelParameters.get();
+}
+
+FresnelParameters* StandardMaterial::refractionFresnelParameters()
+{
+  if (!_refractionFresnelParameters) {
+    _refractionFresnelParameters = ::std::make_unique<FresnelParameters>();
+  }
+
+  return _refractionFresnelParameters.get();
+}
+
+FresnelParameters* StandardMaterial::emissiveFresnelParameters()
+{
+  if (!_emissiveFresnelParameters) {
+    _emissiveFresnelParameters = ::std::make_unique<FresnelParameters>();
+  }
+
+  return _emissiveFresnelParameters.get();
+}
+
+bool StandardMaterial::useReflectionFresnelFromSpecular() const
+{
+  return _useReflectionFresnelFromSpecular;
+}
+
+void StandardMaterial::setUseReflectionFresnelFromSpecular(bool value)
+{
+  if (_useReflectionFresnelFromSpecular == value) {
+    return;
+  }
+  _useReflectionFresnelFromSpecular = value;
 }
 
 bool StandardMaterial::useGlossinessFromSpecularMapAlpha() const
