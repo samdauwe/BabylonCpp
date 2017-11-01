@@ -180,6 +180,10 @@ struct PoseEnabledControllerHelper;
 class ViveController;
 class WebVRController;
 class WindowsMotionController;
+// --- Instrumentation ---
+struct _TimeToken;
+class EngineInstrumentation;
+class SceneInstrumentation;
 // --- Interfaces ---
 class IBrowserGamepad;
 class ICanvas;
@@ -191,6 +195,7 @@ struct GLInfo;
 class IGLFramebuffer;
 class IGLBuffer;
 class IGLProgram;
+class IGLQuery;
 class IGLRenderBuffer;
 class IGLRenderingContext;
 class IGLShader;

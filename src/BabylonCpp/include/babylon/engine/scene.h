@@ -819,6 +819,32 @@ public:
    * An event triggered after rendering the scene
    */
   Observable<Scene> onAfterRenderObservable;
+
+  /**
+   * An event triggered before animating the scene
+   */
+  Observable<Scene> onBeforeAnimationsObservable;
+
+  /**
+   * An event triggered before draw calls are ready to be sent
+   */
+  Observable<Scene> onBeforeDrawPhaseObservable;
+
+  /**
+   * An event triggered after draw calls have been sent
+   */
+  Observable<Scene> onAfterDrawPhaseObservable;
+
+  /**
+   * An event triggered when physic simulation is about to be run
+   */
+  Observable<Scene> onBeforePhysicsObservable;
+
+  /**
+   * An event triggered when physic simulation has been done
+   */
+  Observable<Scene> onAfterPhysicsObservable;
+
   /**
    * An event triggered after rendering the scene
    */
@@ -831,6 +857,45 @@ public:
    * An event triggered after rendering a camera
    */
   Observable<Camera> onAfterCameraRenderObservable;
+
+  /**
+   * An event triggered when active meshes evaluation is about to start
+   */
+  Observable<Scene> onBeforeActiveMeshesEvaluationObservable;
+
+  /**
+   * An event triggered when active meshes evaluation is done
+   */
+  Observable<Scene> onAfterActiveMeshesEvaluationObservable;
+
+  /**
+   * An event triggered when particles rendering is about to start
+   * Note: This event can be trigger more than once per frame (because particles
+   * can be rendered by render target textures as well)
+   */
+  Observable<Scene> onBeforeParticlesRenderingObservable;
+
+  /**
+   * An event triggered when particles rendering is done
+   * Note: This event can be trigger more than once per frame (because particles
+   * can be rendered by render target textures as well)
+  */
+  Observable<Scene> onAfterParticlesRenderingObservable;
+
+  /**
+   * An event triggered when sprites rendering is about to start
+   * Note: This event can be trigger more than once per frame (because sprites
+   * can be rendered by render target textures as well)
+   */
+  Observable<Scene> onBeforeSpritesRenderingObservable;
+
+  /**
+   * An event triggered when sprites rendering is done
+   * Note: This event can be trigger more than once per frame (because sprites
+   * can be rendered by render target textures as well)
+   */
+  Observable<Scene> onAfterSpritesRenderingObservable;
+
   /**
    * An event triggered when a camera is created
    */
@@ -870,6 +935,18 @@ public:
    * An event triggered when a mesh is removed
    */
   Observable<AbstractMesh> onMeshRemovedObservable;
+
+  /**
+   * An event triggered when render targets are about to be rendered
+   * Can happen multiple times per frame.
+   */
+  Observable<Scene> OnBeforeRenderTargetsRenderObservable;
+
+  /**
+   * An event triggered when render targets were rendered.
+   * Can happen multiple times per frame.
+   */
+  Observable<Scene> OnAfterRenderTargetsRenderObservable;
 
   /**
    * An event triggered before calculating deterministic simulation step

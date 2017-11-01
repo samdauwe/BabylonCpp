@@ -526,6 +526,10 @@ public:
   void beginQuery(unsigned int algorithmType, const GLQueryPtr& query);
   Engine& endQuery(unsigned int algorithmType);
 
+  /** Time queries **/
+  Nullable<_TimeToken> startTimeQuery();
+  int endTimeQuery(Nullable<_TimeToken>& token);
+
   /** Statics **/
   static Engine* LastCreatedEngine();
   static Scene* LastCreatedScene();
@@ -643,6 +647,31 @@ public:
    * Observable event triggered each time the canvas receives pointerout event
    */
   Observable<Engine> onCanvasPointerOutObservable;
+
+  /**
+   * Observable event triggered before each texture is initialized
+   */
+  Observable<Texture> onBeforeTextureInitObservable;
+
+  /**
+   * Observable raised when the engine begins a new frame
+   */
+  Observable<Engine> onBeginFrameObservable;
+
+  /**
+   * Observable raised when the engine ends the current frame
+   */
+  Observable<Engine> onEndFrameObservable;
+
+  /**
+   * Observable raised when the engine is about to compile a shader
+   */
+  Observable<Engine> onBeforeShaderCompilationObservable;
+
+  /**
+   * Observable raised when the engine has jsut compiled a shader
+   */
+  Observable<Engine> onAfterShaderCompilationObservable;
 
   // WebVR
   // The new WebVR uses promises.

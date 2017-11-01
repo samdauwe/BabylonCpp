@@ -100,7 +100,8 @@ file(GLOB ENGINE_HDR_FILES          ${INCLUDE_PATH}/engine/*.h)
 file(GLOB EVENTS_HDR_FILES          ${INCLUDE_PATH}/events/*.h)
 file(GLOB GAMEPAD_HDR_FILES         ${INCLUDE_PATH}/gamepad/*.h
                                     ${INCLUDE_PATH}/gamepad/controllers/*.h)
-file(GLOB INTERFACES_HDR_FILES      ${INCLUDE_PATH}/interfaces/.h)
+file(GLOB INSTRUMENTATION_HDR_FILES ${INCLUDE_PATH}/instrumentation/*.h)
+file(GLOB INTERFACES_HDR_FILES      ${INCLUDE_PATH}/interfaces/*.h)
 file(GLOB LAYER_HDR_FILES           ${INCLUDE_PATH}/layer/*.h)
 file(GLOB LENSFLARE_HDR_FILES       ${INCLUDE_PATH}/lensflare/*.h)
 file(GLOB LIGHTS_HDR_FILES          ${INCLUDE_PATH}/lights/*.h
@@ -165,6 +166,7 @@ set(BABYLON_HEADERS
     ${ENGINE_HDR_FILES}
     ${EVENTS_HDR_FILES}
     ${GAMEPAD_HDR_FILES}
+    ${INSTRUMENTATION_HDR_FILES}
     ${INTERFACES_HDR_FILES}
     ${LAYER_HDR_FILES}
     ${LENSFLARE_HDR_FILES}
@@ -211,6 +213,7 @@ file(GLOB ENGINE_SRC_FILES          ${SOURCE_PATH}/engine/*.cpp)
 file(GLOB EVENTS_SRC_FILES          ${SOURCE_PATH}/events/*.cpp)
 file(GLOB GAMEPAD_SRC_FILES         ${SOURCE_PATH}/gamepad/*.cpp
                                     ${SOURCE_PATH}/gamepad/controllers/*.cpp)
+file(GLOB INSTRUMENTATION_SRC_FILES ${SOURCE_PATH}/instrumentation/*.cpp)
 file(GLOB INTERFACES_SRC_FILES      ${SOURCE_PATH}/interfaces/*.cpp)
 file(GLOB LAYER_SRC_FILES           ${SOURCE_PATH}/layer/*.cpp)
 file(GLOB LENSFLARE_SRC_FILES       ${SOURCE_PATH}/lensflare/*.cpp)
@@ -272,6 +275,7 @@ set(BABYLON_SOURCES
     ${ENGINE_SRC_FILES}
     ${EVENTS_SRC_FILES}
     ${GAMEPAD_SRC_FILES}
+    ${INSTRUMENTATION_SRC_FILES}
     ${INTERFACES_SRC_FILES}
     ${LAYER_SRC_FILES}
     ${LENSFLARE_SRC_FILES}

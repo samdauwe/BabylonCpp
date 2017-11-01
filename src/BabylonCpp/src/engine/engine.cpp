@@ -7,6 +7,7 @@
 #include <babylon/core/string.h>
 #include <babylon/core/time.h>
 #include <babylon/engine/instancing_attribute_info.h>
+#include <babylon/instrumentation/_time_token.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/interfaces/iloading_screen.h>
@@ -3887,6 +3888,16 @@ Engine& Engine::endQuery(unsigned int algorithmType)
   _gl->endQuery(glAlgorithm);
 
   return *this;
+}
+
+Nullable<_TimeToken> Engine::startTimeQuery()
+{
+  return nullptr;
+}
+
+int Engine::endTimeQuery(Nullable<_TimeToken>& /*token*/)
+{
+  return -1;
 }
 
 unsigned int Engine::getGlAlgorithmType(unsigned int algorithmType) const
