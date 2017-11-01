@@ -6,6 +6,9 @@
 ## [Lights](https://doc.babylonjs.com/tutorials/Lights) ##
 ![lights_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lights_scene.png?raw=true "Lights Scene")
 
+## [Use FresnelParameters](https://doc.babylonjs.com/how_to/how_to_use_fresnelparameters) ##
+![fresnel_parameters_torus_knot_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/fresnel_parameters_torus_knot_scene.png?raw=true "Fresnel Parameters TorusKnot Scene")
+
 ## [Understanding Shaders and ShaderMaterial](https://doc.babylonjs.com/tutorials/Understanding_Shaders_with_Babylon.js_and_ShaderMaterial) ##
 ![shader_material_tiles_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_tiles_scene.png?raw=true "Shader Material Tiles Scene")
 ![shader_material_boxes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_boxes_scene.png?raw=true "Shader Material Boxes Scene")

@@ -29,6 +29,7 @@
 #include <babylon/samples/generic/super_ellipsoid_scene.h>
 #include <babylon/samples/generic/waves_scene.h>
 #include <babylon/samples/lights/lights_scene.h>
+#include <babylon/samples/materials/fresnel_parameters_torus_knot_scene.h>
 #include <babylon/samples/materials/shader_material_box_scene.h>
 #include <babylon/samples/materials/shader_material_boxes_scene.h>
 #include <babylon/samples/materials/shader_material_carved_trees_scene.h>
@@ -191,6 +192,12 @@ SamplesIndex::SamplesIndex()
                         [](ICanvas* iCanvas) {                          //
                           return ::std::make_unique<FogScene>(iCanvas); //
                         });                                             //
+  // Fresnel Parameters TorusKnot Scene
+  _samples["FresnelParametersTorusKnotScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                                 //
+      return ::std::make_unique<FresnelParametersTorusKnotScene>(iCanvas); //
+    });                                                                    //
   // Height Map Scene
   _samples["HeightMapScene"]
     = ::std::make_tuple(false,
