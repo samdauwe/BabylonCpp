@@ -271,7 +271,6 @@ struct IMultiRenderTargetOptions;
 class InternalTexture;
 struct IRenderTargetOptions;
 using RenderTargetCreationOptions = IRenderTargetOptions;
-class MapTexture;
 class MirrorTexture;
 class MultiRenderTarget;
 struct RawTexture;
@@ -479,9 +478,7 @@ class _StencilState;
 } // end of namespace BABYLON
 // --- Tools ---
 class EventState;
-class PackedRect;
 class PerformanceMonitor;
-struct RectPackingMap;
 class RollingAverage;
 struct SerializationHelper;
 // - Optimization
