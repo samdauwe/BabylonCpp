@@ -2,6 +2,7 @@
 #define BABYLON_MATH_MATRIX_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/nullable.h>
 
 // SIMD
 #if BABYLONCPP_OPTION_ENABLE_SIMD == true
@@ -268,7 +269,7 @@ public:
   /**
    * @brief Returns the index-th row of the current matrix as a new Vector4.
    */
-  Vector4 getRow(unsigned int index) const;
+  Nullable<Vector4> getRow(unsigned int index) const;
 
   /**
    * @brief Sets the index-th row of the current matrix with the passed Vector4
@@ -278,12 +279,30 @@ public:
   Matrix& setRow(unsigned int index, const Vector4& row);
 
   /**
+   * @brief Compute the transpose of the matrix.
+   * @returns a new Matrix.
+   */
+  Matrix transpose() const;
+
+  /**
+   * @brief Compute the transpose of the matrix.
+   * @returns the current matrix.
+   */
+  Matrix& transposeToRef(Matrix& result);
+
+  /**
    * @brief Sets the index-th row of the current matrix with the passed 4 x
    * float values.
    * @returns The updated Matrix.
    */
   Matrix& setRowFromFloats(unsigned int index, float x, float y, float z,
                            float w);
+
+  /**
+   * @brief Static identity matrix to be used as readonly matrix
+   * Must not be updated.
+   */
+  static Matrix IdentityReadOnly();
 
   /**
    * @brief Returns a new Matrix set from the 16 passed floats.
@@ -596,6 +615,12 @@ public:
   static Matrix Transpose(const Matrix& matrix);
 
   /**
+   * @brief Compute the transpose of the passed Matrix and store it in the
+   * result matrix.
+   */
+  static void TransposeToRef(const Matrix& matrix, Matrix& result);
+
+  /**
    * @brief Returns a new Matrix as the reflection  matrix across the passed
    * plane.
    */
@@ -633,6 +658,7 @@ private:
   static Vector3 _yAxis;
   static Vector3 _zAxis;
   static int _updateFlagSeed;
+  static Matrix _identityReadOnly;
   bool _isIdentity;
   bool _isIdentityDirty;
 

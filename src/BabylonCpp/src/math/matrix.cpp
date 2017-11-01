@@ -18,6 +18,7 @@ Vector3 Matrix::_xAxis             = Vector3::Zero();
 Vector3 Matrix::_yAxis             = Vector3::Zero();
 Vector3 Matrix::_zAxis             = Vector3::Zero();
 int Matrix::_updateFlagSeed        = 0;
+Matrix Matrix::_identityReadOnly   = Matrix::Identity();
 
 Matrix::Matrix() : updateFlag{0}, _isIdentity{false}, _isIdentityDirty{true}
 {
@@ -652,10 +653,10 @@ void Matrix::FromValuesToRef(float initialM11, float initialM12,
   result._markAsUpdated();
 }
 
-Vector4 Matrix::getRow(unsigned int index) const
+Nullable<Vector4> Matrix::getRow(unsigned int index) const
 {
   if (index > 3) {
-    return Vector4(-1.f, -1.f, -1.f, -1.f);
+    return nullptr;
   }
 
   const unsigned int i = index * 4;
@@ -679,6 +680,18 @@ Matrix& Matrix::setRow(unsigned int index, const Vector4& row)
   return *this;
 }
 
+Matrix Matrix::transpose() const
+{
+  return Matrix::Transpose(*this);
+}
+
+Matrix& Matrix::transposeToRef(Matrix& result)
+{
+  Matrix::TransposeToRef(*this, result);
+
+  return *this;
+}
+
 Matrix& Matrix::setRowFromFloats(unsigned int index, float x, float y, float z,
                                  float w)
 {
@@ -695,6 +708,11 @@ Matrix& Matrix::setRowFromFloats(unsigned int index, float x, float y, float z,
   _markAsUpdated();
 
   return *this;
+}
+
+Matrix Matrix::IdentityReadOnly()
+{
+  return Matrix::_identityReadOnly;
 }
 
 Matrix Matrix::FromValues(float initialM11, float initialM12, float initialM13,
@@ -1351,6 +1369,13 @@ Matrix Matrix::Transpose(const Matrix& matrix)
 {
   Matrix result;
 
+  Matrix::TransposeToRef(matrix, result);
+
+  return result;
+}
+
+void Matrix::TransposeToRef(const Matrix& matrix, Matrix& result)
+{
   result.m[0] = matrix.m[0];
   result.m[1] = matrix.m[4];
   result.m[2] = matrix.m[8];
@@ -1370,8 +1395,6 @@ Matrix Matrix::Transpose(const Matrix& matrix)
   result.m[13] = matrix.m[7];
   result.m[14] = matrix.m[11];
   result.m[15] = matrix.m[15];
-
-  return result;
 }
 
 Matrix Matrix::Reflection(Plane& plane)

@@ -84,7 +84,10 @@ size_t Vector4::getHashCode() const
 /** Operators **/
 Float32Array Vector4::asArray() const
 {
-  return {x, y, z, w};
+  Float32Array result;
+  toArray(result, 0);
+
+  return result;
 }
 
 const Vector4& Vector4::toArray(Float32Array& array, unsigned int index) const

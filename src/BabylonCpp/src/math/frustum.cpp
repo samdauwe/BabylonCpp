@@ -17,50 +17,80 @@ array_t<Plane, 6> Frustum::GetPlanes(const Matrix& transform)
   return frustumPlanes;
 }
 
+void Frustum::GetNearPlaneToRef(const Matrix& transform, Plane& frustumPlane)
+{
+  frustumPlane.normal.x = transform.m[3] + transform.m[2];
+  frustumPlane.normal.y = transform.m[7] + transform.m[6];
+  frustumPlane.normal.z = transform.m[11] + transform.m[10];
+  frustumPlane.d        = transform.m[15] + transform.m[14];
+  frustumPlane.normalize();
+}
+
+void Frustum::GetFarPlaneToRef(const Matrix& transform, Plane& frustumPlane)
+{
+  frustumPlane.normal.x = transform.m[3] - transform.m[2];
+  frustumPlane.normal.y = transform.m[7] - transform.m[6];
+  frustumPlane.normal.z = transform.m[11] - transform.m[10];
+  frustumPlane.d        = transform.m[15] - transform.m[14];
+  frustumPlane.normalize();
+}
+
+void Frustum::GetLeftPlaneToRef(const Matrix& transform, Plane& frustumPlane)
+{
+  frustumPlane.normal.x = transform.m[3] + transform.m[0];
+  frustumPlane.normal.y = transform.m[7] + transform.m[4];
+  frustumPlane.normal.z = transform.m[11] + transform.m[8];
+  frustumPlane.d        = transform.m[15] + transform.m[12];
+  frustumPlane.normalize();
+}
+
+void Frustum::GetRightPlaneToRef(const Matrix& transform, Plane& frustumPlane)
+{
+  frustumPlane.normal.x = transform.m[3] - transform.m[0];
+  frustumPlane.normal.y = transform.m[7] - transform.m[4];
+  frustumPlane.normal.z = transform.m[11] - transform.m[8];
+  frustumPlane.d        = transform.m[15] - transform.m[12];
+  frustumPlane.normalize();
+}
+
+void Frustum::GetTopPlaneToRef(const Matrix& transform, Plane& frustumPlane)
+{
+  frustumPlane.normal.x = transform.m[3] - transform.m[1];
+  frustumPlane.normal.y = transform.m[7] - transform.m[5];
+  frustumPlane.normal.z = transform.m[11] - transform.m[9];
+  frustumPlane.d        = transform.m[15] - transform.m[13];
+  frustumPlane.normalize();
+}
+
+void Frustum::GetBottomPlaneToRef(const Matrix& transform, Plane& frustumPlane)
+{
+  frustumPlane.normal.x = transform.m[3] + transform.m[1];
+  frustumPlane.normal.y = transform.m[7] + transform.m[5];
+  frustumPlane.normal.z = transform.m[11] + transform.m[9];
+  frustumPlane.d        = transform.m[15] + transform.m[13];
+  frustumPlane.normalize();
+}
+
 void Frustum::GetPlanesToRef(const Matrix& transform,
                              array_t<Plane, 6>& frustumPlanes)
 {
   // Near
-  frustumPlanes[0].normal.x = transform.m[3] + transform.m[2];
-  frustumPlanes[0].normal.y = transform.m[7] + transform.m[6];
-  frustumPlanes[0].normal.z = transform.m[11] + transform.m[10];
-  frustumPlanes[0].d        = transform.m[15] + transform.m[14];
-  frustumPlanes[0].normalize();
+  Frustum::GetNearPlaneToRef(transform, frustumPlanes[0]);
 
   // Far
-  frustumPlanes[1].normal.x = transform.m[3] - transform.m[2];
-  frustumPlanes[1].normal.y = transform.m[7] - transform.m[6];
-  frustumPlanes[1].normal.z = transform.m[11] - transform.m[10];
-  frustumPlanes[1].d        = transform.m[15] - transform.m[14];
-  frustumPlanes[1].normalize();
+  Frustum::GetFarPlaneToRef(transform, frustumPlanes[1]);
 
   // Left
-  frustumPlanes[2].normal.x = transform.m[3] + transform.m[0];
-  frustumPlanes[2].normal.y = transform.m[7] + transform.m[4];
-  frustumPlanes[2].normal.z = transform.m[11] + transform.m[8];
-  frustumPlanes[2].d        = transform.m[15] + transform.m[12];
-  frustumPlanes[2].normalize();
+  Frustum::GetLeftPlaneToRef(transform, frustumPlanes[2]);
 
   // Right
-  frustumPlanes[3].normal.x = transform.m[3] - transform.m[0];
-  frustumPlanes[3].normal.y = transform.m[7] - transform.m[4];
-  frustumPlanes[3].normal.z = transform.m[11] - transform.m[8];
-  frustumPlanes[3].d        = transform.m[15] - transform.m[12];
-  frustumPlanes[3].normalize();
+  Frustum::GetRightPlaneToRef(transform, frustumPlanes[3]);
 
   // Top
-  frustumPlanes[4].normal.x = transform.m[3] - transform.m[1];
-  frustumPlanes[4].normal.y = transform.m[7] - transform.m[5];
-  frustumPlanes[4].normal.z = transform.m[11] - transform.m[9];
-  frustumPlanes[4].d        = transform.m[15] - transform.m[13];
-  frustumPlanes[4].normalize();
+  Frustum::GetTopPlaneToRef(transform, frustumPlanes[4]);
 
   // Bottom
-  frustumPlanes[5].normal.x = transform.m[3] + transform.m[1];
-  frustumPlanes[5].normal.y = transform.m[7] + transform.m[5];
-  frustumPlanes[5].normal.z = transform.m[11] + transform.m[9];
-  frustumPlanes[5].d        = transform.m[15] + transform.m[13];
-  frustumPlanes[5].normalize();
+  Frustum::GetBottomPlaneToRef(transform, frustumPlanes[5]);
 }
 
 } // end of namespace BABYLON

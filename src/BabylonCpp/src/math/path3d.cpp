@@ -2,7 +2,6 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/math/scalar.h>
-#include <babylon/math/vector3.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -11,22 +10,14 @@ Path3D::Path3D()
 {
 }
 
-Path3D::Path3D(const vector_t<Vector3>& path) : _raw{false}
-{
-  for (auto& vector : path) {
-    _curve.emplace_back(vector);
-  }
-  _compute(nullptr);
-}
-
-Path3D::Path3D(const vector_t<Vector3>& path, const Vector3& firstNormal,
-               bool raw)
+Path3D::Path3D(const vector_t<Vector3>& path,
+               const Nullable<Vector3>& firstNormal, bool raw)
     : _raw{raw}
 {
   for (auto& vector : path) {
     _curve.emplace_back(vector);
   }
-  _compute(&firstNormal);
+  _compute(firstNormal);
 }
 
 Path3D::Path3D(const Path3D& otherPath)
@@ -158,32 +149,21 @@ Float32Array& Path3D::getDistances()
   return _distances;
 }
 
-Path3D& Path3D::update(const vector_t<Vector3>& path)
-{
-  for (unsigned int p = 0; p < path.size(); ++p) {
-    _curve[p].x = path[p].x;
-    _curve[p].y = path[p].y;
-    _curve[p].z = path[p].z;
-  }
-  _compute(nullptr);
-  return *this;
-}
-
 Path3D& Path3D::update(const vector_t<Vector3>& path,
-                       const Vector3& firstNormal)
+                       const Nullable<Vector3>& firstNormal)
 {
   for (unsigned int p = 0; p < path.size(); ++p) {
     _curve[p].x = path[p].x;
     _curve[p].y = path[p].y;
     _curve[p].z = path[p].z;
   }
-  _compute(&firstNormal);
+  _compute(firstNormal);
   return *this;
 }
 
-void Path3D::_compute(const Vector3* firstNormal)
+void Path3D::_compute(const Nullable<Vector3>& firstNormal)
 {
-  const size_t l = _curve.size();
+  const auto l = _curve.size();
 
   _binormals.resize(l);
   _distances.resize(l);
@@ -203,7 +183,7 @@ void Path3D::_compute(const Vector3* firstNormal)
   // normals and binormals at first point : arbitrary vector with
   // _normalVector()
   const auto& tg0   = _tangents[0];
-  const Vector3 pp0 = _normalVector(_curve[0], tg0, firstNormal);
+  const Vector3 pp0 = _normalVector(_curve[0], tg0, *firstNormal);
   _normals[0]       = pp0;
   if (!_raw) {
     _normals[0].normalize();
@@ -270,7 +250,7 @@ Vector3 Path3D::_getLastNonNullVector(unsigned int index)
 }
 
 Vector3 Path3D::_normalVector(const Vector3& /*v0*/, const Vector3& vt,
-                              const Vector3* va)
+                              const Nullable<Vector3>& va)
 {
   Vector3 normal0;
   float tgl = vt.length();
@@ -292,6 +272,9 @@ Vector3 Path3D::_normalVector(const Vector3& /*v0*/, const Vector3& vt,
     else if (!Scalar::WithinEpsilon(::std::abs(vt.z) / tgl, 1.f,
                                     Math::Epsilon)) {
       point = Vector3(0.f, 0.f, 1.f);
+    }
+    else {
+      point = Vector3::Zero();
     }
     normal0 = Vector3::Cross(vt, point);
   }

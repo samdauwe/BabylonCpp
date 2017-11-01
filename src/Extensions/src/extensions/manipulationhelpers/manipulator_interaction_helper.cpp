@@ -130,9 +130,9 @@ void ManipulatorInteractionHelper::beginDrag(const Vector2& rayPos,
 
   auto mtx = *getManipulatedNodeWorldMatrix();
   _pos     = mtx.getTranslation();
-  _right   = mtx.getRow(0).toVector3();
-  _up      = mtx.getRow(1).toVector3();
-  _view    = mtx.getRow(2).toVector3();
+  _right   = (*mtx.getRow(0)).toVector3();
+  _up      = (*mtx.getRow(1)).toVector3();
+  _view    = (*mtx.getRow(2)).toVector3();
 
   _oldPos         = _pos;
   _firstTransform = mtx;

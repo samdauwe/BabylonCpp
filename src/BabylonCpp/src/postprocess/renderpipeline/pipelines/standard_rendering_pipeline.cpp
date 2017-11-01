@@ -802,8 +802,8 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
     effect->setTexture("lensStarSampler", lensStarTexture);
 
     // Lens start rotation matrix
-    auto camerax = _scene->activeCamera->getViewMatrix().getRow(0);
-    auto cameraz = _scene->activeCamera->getViewMatrix().getRow(2);
+    auto camerax = *(_scene->activeCamera->getViewMatrix().getRow(0));
+    auto cameraz = *(_scene->activeCamera->getViewMatrix().getRow(2));
     auto camRot  = Vector3::Dot(camerax.toVector3(), Vector3(1.f, 0.f, 0.f))
                   + Vector3::Dot(cameraz.toVector3(), Vector3(0.f, 0.f, 1.f));
     camRot *= 4.f;

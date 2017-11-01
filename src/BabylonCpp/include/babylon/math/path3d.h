@@ -2,6 +2,9 @@
 #define BABYLON_MATH_PATH3D_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/math/vector3.h>
+
+#include <babylon/core/nullable.h>
 
 namespace BABYLON {
 
@@ -21,9 +24,8 @@ public:
    *                                 normalized. Useful to depict path
    *                                 acceleration or speed.
    */
-  Path3D(const vector_t<Vector3>& path);
-  Path3D(const vector_t<Vector3>& path, const Vector3& firstNormal,
-         bool raw = false);
+  Path3D(const vector_t<Vector3>& path,
+         const Nullable<Vector3>& firstNormal = nullptr, bool raw = false);
   Path3D(const Path3D& otherPath);
   Path3D(Path3D&& otherPath);
   Path3D& operator=(const Path3D& otherPath);
@@ -66,14 +68,14 @@ public:
    * recomputation.
    * @returns The same object updated.
    */
-  Path3D& update(const vector_t<Vector3>& path);
-  Path3D& update(const vector_t<Vector3>& path, const Vector3& firstNormal);
+  Path3D& update(const vector_t<Vector3>& path,
+                 const Nullable<Vector3>& firstNormal = nullptr);
 
 private:
   /**
    * @brief Computes tangents, normals and binormals.
    */
-  void _compute(const Vector3* firstNormal);
+  void _compute(const Nullable<Vector3>& firstNormal);
 
   /**
    * @brief Returns the first non null vector from index : curve[index +
@@ -93,7 +95,7 @@ private:
    * projection on the plane orthogonal to vt at the point v0.
    */
   Vector3 _normalVector(const Vector3& v0, const Vector3& vt,
-                        const Vector3* va);
+                        const Nullable<Vector3>& va);
 
 private:
   vector_t<Vector3> _curve;

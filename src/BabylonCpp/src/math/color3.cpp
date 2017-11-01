@@ -102,7 +102,10 @@ Color4 Color3::toColor4(float alpha) const
 
 Float32Array Color3::asArray() const
 {
-  return {r, g, b};
+  Float32Array result;
+  toArray(result, 0);
+
+  return result;
 }
 
 float Color3::toLuminance() const

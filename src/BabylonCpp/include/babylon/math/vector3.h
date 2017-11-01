@@ -223,6 +223,12 @@ public:
    */
   Vector3& maximizeInPlace(const Vector3& other);
 
+  /**
+   * @brief Return true is the vector is non uniform meaning x, y or z are not
+   * all the same.
+   */
+  bool isNonUniform() const;
+
   /** Operator overloading **/
   friend std::ostream& operator<<(std::ostream& os, const Vector3& vector);
   Vector3 operator+(const Vector3& otherVector) const;

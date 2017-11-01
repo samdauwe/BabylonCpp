@@ -19,6 +19,13 @@ public:
    */
   static array_t<Plane, 6> GetPlanes(const Matrix& transform);
 
+  static void GetNearPlaneToRef(const Matrix& transform, Plane& frustumPlane);
+  static void GetFarPlaneToRef(const Matrix& transform, Plane& frustumPlane);
+  static void GetLeftPlaneToRef(const Matrix& transform, Plane& frustumPlane);
+  static void GetRightPlaneToRef(const Matrix& transform, Plane& frustumPlane);
+  static void GetTopPlaneToRef(const Matrix& transform, Plane& frustumPlane);
+  static void GetBottomPlaneToRef(const Matrix& transform, Plane& frustumPlane);
+
   /**
    * @brief Sets the passed array "frustumPlanes" with the 6 Frustum planes
    * computed by the passed transformation matrix.

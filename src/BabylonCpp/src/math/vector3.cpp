@@ -90,7 +90,10 @@ size_t Vector3::getHashCode() const
 /** Operators **/
 Float32Array Vector3::asArray() const
 {
-  return {x, y, z};
+  Float32Array result;
+  toArray(result, 0);
+
+  return result;
 }
 
 const Vector3& Vector3::toArray(Float32Array& array, unsigned int index) const
@@ -322,6 +325,26 @@ Vector3& Vector3::maximizeInPlace(const Vector3& other)
   }
 
   return *this;
+}
+
+bool Vector3::isNonUniform() const
+{
+  const auto absX = ::std::abs(x);
+  const auto absY = ::std::abs(y);
+  if (!stl_util::almost_equal(absX, absY)) {
+    return true;
+  }
+
+  const auto absZ = ::std::abs(z);
+  if (!stl_util::almost_equal(absX, absZ)) {
+    return true;
+  }
+
+  if (!stl_util::almost_equal(absY, absZ)) {
+    return true;
+  }
+
+  return false;
 }
 
 /** Operator overloading **/
