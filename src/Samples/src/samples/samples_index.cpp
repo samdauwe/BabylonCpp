@@ -36,6 +36,7 @@
 #include <babylon/samples/materials/shader_material_cylinders_scene.h>
 #include <babylon/samples/materials/shader_material_generators_scene.h>
 #include <babylon/samples/materials/shader_material_menger_sponge_scene.h>
+#include <babylon/samples/materials/shader_material_pbr_test_scene.h>
 #include <babylon/samples/materials/shader_material_pegasus_galaxy_scene.h>
 #include <babylon/samples/materials/shader_material_planet_shadertoy_scene.h>
 #include <babylon/samples/materials/shader_material_scene.h>
@@ -366,6 +367,12 @@ SamplesIndex::SamplesIndex()
     [](ICanvas* iCanvas) {                                                 //
       return ::std::make_unique<ShaderMaterialMengerSpongeScene>(iCanvas); //
     });                                                                    //
+  // Shader Material PBR Test Scene
+  _samples["ShaderMaterialPBRTestScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                            //
+      return ::std::make_unique<ShaderMaterialPBRTestScene>(iCanvas); //
+    });                                                               //
   // Shader Material Pegasus Galaxy Scene
   _samples["ShaderMaterialPegasusGalaxyScene"] = ::std::make_tuple(
     true,
