@@ -94,7 +94,7 @@ any IReflect::getProperty(const any& property, const string_t& targetProperty)
   }
 
   // IAnimatable
-  if (property.is<IReflect*>()) {
+  if (property.is<IReflect*>() || property.is<IAnimatable*>()) {
     switch (property._<IReflect*>()->type()) {
       // Meshes
       case Type::ABSTRACTMESH:

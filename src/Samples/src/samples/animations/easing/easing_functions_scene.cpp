@@ -32,7 +32,7 @@ void EasingFunctionsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create a camera
   auto camera
-    = ArcRotateCamera::New("Camera", 0.f, 0.8f, 150.f, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("Camera", 0.f, 0.8f, 100.f, Vector3::Zero(), scene);
 
   // Attach the camera to the canvas
   camera->attachControl(canvas, true);
@@ -42,8 +42,8 @@ void EasingFunctionsScene::initializeScene(ICanvas* canvas, Scene* scene)
   // ------------------------------------------------------------------
   // Torus
   auto torus          = Mesh::CreateTorus("torus", 8, 2, 32, scene, false);
-  torus->position().x = 25;
-  torus->position().z = 30;
+  torus->position().x = 25.f;
+  torus->position().z = 30.f;
 
   // Create a Vector3 animation at 30 FPS
   auto animationTorus = new Animation("torusEasingAnimation", "position", 30,
@@ -97,8 +97,8 @@ void EasingFunctionsScene::initializeScene(ICanvas* canvas, Scene* scene)
   // -------------------------------------------------------------------
   // Torus
   auto bezierTorus = Mesh::CreateTorus("torus", 8, 2, 32, scene, false);
-  bezierTorus->position().x = 25;
-  bezierTorus->position().z = 0;
+  bezierTorus->position().x = 25.f;
+  bezierTorus->position().z = 0.f;
 
   // Create the animation
   auto animationBezierTorus = new Animation(
@@ -109,7 +109,7 @@ void EasingFunctionsScene::initializeScene(ICanvas* canvas, Scene* scene)
     AnimationKey(
       120, AnimationValue(bezierTorus->position().add(Vector3(-80, 0, 0))))};
   animationBezierTorus->setKeys(keysBezierTorus);
-  EasingFunction* bezierEase = new BezierCurveEase(0.32f, -0.73f, 0.69f, 1.59f);
+  auto bezierEase = new BezierCurveEase(0.32f, -0.73f, 0.69f, 1.59f);
   animationBezierTorus->setEasingFunction(bezierEase);
   bezierTorus->animations.emplace_back(animationBezierTorus);
   scene->beginAnimation(bezierTorus, 0, 120, true);
@@ -118,8 +118,8 @@ void EasingFunctionsScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Create a simple animation without easing functions
   // ------------------------------------------
   auto torus0          = Mesh::CreateTorus("torus", 8, 2, 32, scene, false);
-  torus0->position().x = 25;
-  torus0->position().z = -30;
+  torus0->position().x = 25.f;
+  torus0->position().z = -30.f;
   torus0->setMaterial(StandardMaterial::New("texture1", scene));
   torus0->material()->setDiffuseColor(Color3(0.f, 1.f, 0.f)); // Green
 

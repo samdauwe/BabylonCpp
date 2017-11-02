@@ -172,7 +172,7 @@ SamplesIndex::SamplesIndex()
     });                                                           //
   // Easing Functions Scene
   _samples["EasingFunctionsScene"] = ::std::make_tuple(
-    false,
+    true,
     [](ICanvas* iCanvas) {                                      //
       return ::std::make_unique<EasingFunctionsScene>(iCanvas); //
     });                                                         //

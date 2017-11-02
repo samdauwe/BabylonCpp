@@ -36,6 +36,7 @@
 
 ### [Animations](https://doc.babylonjs.com/tutorials/Animations) ###
 ![animations_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/animations_scene.png?raw=true "Animations Scene")
+![easing_functions_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/easing_functions_scene.png?raw=true "Easing Functions Scene")
 
 ### [Discover Basic Elements](https://doc.babylonjs.com/tutorials/Discover_Basic_Elements) ###
 ![basic_elements_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/basic_elements_scene.png?raw=true "Basic Elements Scene")
