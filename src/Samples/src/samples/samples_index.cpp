@@ -28,6 +28,7 @@
 #include <babylon/samples/generic/infinite_loader_scene.h>
 #include <babylon/samples/generic/lorenz_attractor_scene.h>
 #include <babylon/samples/generic/mandelbrot_fractal_scene.h>
+#include <babylon/samples/generic/simple_car_following_path_scene.h>
 #include <babylon/samples/generic/super_ellipsoid_scene.h>
 #include <babylon/samples/generic/waves_scene.h>
 #include <babylon/samples/lights/lights_scene.h>
@@ -472,6 +473,12 @@ SamplesIndex::SamplesIndex()
     [](ICanvas* iCanvas) {                                   //
       return ::std::make_unique<ShapeEasingsScene>(iCanvas); //
     });                                                      //
+  // Simple Car Following Path Scene
+  _samples["SimpleCarFollowingPathScene"] = ::std::make_tuple(
+    false,
+    [](ICanvas* iCanvas) {                                             //
+      return ::std::make_unique<SimpleCarFollowingPathScene>(iCanvas); //
+    });                                                                //
   // Simple Oak Tree Scene
   _samples["SimpleOakTreeScene"] = ::std::make_tuple(
     true,
