@@ -2,7 +2,9 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/samples/animations/animations_scene.h>
+#include <babylon/samples/animations/cartoon_animations_scene.h>
 #include <babylon/samples/animations/easing/easing_functions_scene.h>
+#include <babylon/samples/animations/easing/shape_easings_scene.h>
 #include <babylon/samples/animations/pump_jack_scene.h>
 #include <babylon/samples/animations/tube_animation_scene.h>
 #include <babylon/samples/effects/fog_scene.h>
@@ -97,7 +99,12 @@ SamplesIndex::SamplesIndex()
   // Basic Scene
   _samples["BasicScene"] = ::std::make_tuple(true, [](ICanvas* iCanvas) { //
     return ::std::make_unique<BasicScene>(iCanvas);                       //
-  });
+  });                                                                     //
+  // Cartoon Animations Scene
+  _samples["CartoonAnimationsScene"]
+    = ::std::make_tuple(false, [](ICanvas* iCanvas) {               //
+        return ::std::make_unique<CartoonAnimationsScene>(iCanvas); //
+      });                                                           //
   // Circle Curves From Beziers Scene
   _samples["CircleCurvesFromBeziersScene"]
     = ::std::make_tuple(true, [](ICanvas* iCanvas) {                      //
@@ -459,6 +466,12 @@ SamplesIndex::SamplesIndex()
     [](ICanvas* iCanvas) {                                                  //
       return ::std::make_unique<ShaderMaterialWolfenstein3DScene>(iCanvas); //
     });                                                                     //
+  // Shape Easings Scene
+  _samples["ShapeEasingsScene"] = ::std::make_tuple(
+    false,
+    [](ICanvas* iCanvas) {                                   //
+      return ::std::make_unique<ShapeEasingsScene>(iCanvas); //
+    });                                                      //
   // Simple Oak Tree Scene
   _samples["SimpleOakTreeScene"] = ::std::make_tuple(
     true,
