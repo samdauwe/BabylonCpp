@@ -146,6 +146,7 @@ AnimationValue RuntimeAnimation::_interpolate(
             case Animation::ANIMATIONLOOPMODE_CYCLE:
             case Animation::ANIMATIONLOOPMODE_CONSTANT:
               newVale.quaternionData = quatValue;
+              return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE:
               newVale.quaternionData
                 = quatValue.add(offsetValue.quaternionData.scale(_repeatCount));
