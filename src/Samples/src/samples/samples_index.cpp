@@ -25,6 +25,7 @@
 #include <babylon/samples/extensions/polyhedron/polyhedra_scene.h>
 #include <babylon/samples/extensions/treegenerators/simple_oak_tree_scene.h>
 #include <babylon/samples/extensions/treegenerators/simple_pine_scene.h>
+#include <babylon/samples/generic/fireworks_with_shader_code_scene.h>
 #include <babylon/samples/generic/house_from_floorplan.h>
 #include <babylon/samples/generic/infinite_loader_scene.h>
 #include <babylon/samples/generic/lorenz_attractor_scene.h>
@@ -197,6 +198,12 @@ SamplesIndex::SamplesIndex()
                         [](ICanvas* iCanvas) {                                //
                           return ::std::make_unique<ExtrusionScene>(iCanvas); //
                         });                                                   //
+  // Fireworks with Shader Code Scene
+  _samples["FireworksWithShaderCodeScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                              //
+      return ::std::make_unique<FireworksWithShaderCodeScene>(iCanvas); //
+    });                                                                 //
   // Fog Scene
   _samples["FogScene"]
     = ::std::make_tuple(false,

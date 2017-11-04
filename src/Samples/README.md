@@ -95,6 +95,7 @@
 ![simple_pine_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/simple_pine_scene.png?raw=true "Simple Pine Scene")
 
 ## Interesting Playgrounds ##
+![fireworks_with_shader_code_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/fireworks_with_shader_code_scene.png?raw=true "Fireworks with Shader Code Scene")
 ![infinite_loader_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/infinite_loader_scene.png?raw=true "Infinite Loader Scene")
 ![house_from_floorplan](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/house_from_floorplan.png?raw=true "House from a Floorplan Scene")
 ![mandelbrot_fractal_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/mandelbrot_fractal_scene.png?raw=true "Mandelbrot Fractal Scene")
