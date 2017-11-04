@@ -23,6 +23,8 @@ public:
 
   PolygonMeshBuilder& addHole(const vector_t<Vector2>& hole);
   Mesh* build(bool updatable = false, float depth = 0);
+  ::std::pair<Float32Array, Uint32Array> buildWall(const Vector3& wall0Corner,
+                                                   const Vector3& wall1Corner);
 
   PolygonPoints& points();
   const PolygonPoints& points() const;
@@ -32,6 +34,9 @@ private:
   void addSide(Float32Array& positions, Float32Array& normals,
                Float32Array& uvs, Uint32Array& indices, const Bounds& bounds,
                const PolygonPoints& points, float depth, bool flip);
+  void addHoles(const vector_t<Point2D>& epoints,
+                const Uint32Array& holeIndices,
+                vector_t<vector_t<Point2D>>& polygon);
 
 private:
   PolygonPoints _points;
