@@ -1,4 +1,7 @@
 #include <babylon/interfaces/ireflect.h>
+
+#include <babylon/materials/material.h>
+#include <babylon/materials/standard_material.h>
 #include <babylon/mesh/abstract_mesh.h>
 
 namespace BABYLON {
@@ -103,12 +106,18 @@ any IReflect::getProperty(const any& property, const string_t& targetProperty)
       case Type::LINESMESH:
       case Type::MESH: {
         auto mesh = dynamic_cast<AbstractMesh*>(this);
+        // Vector3 property
         if (auto vector3Property = _getVector3Property(mesh, targetProperty)) {
           _property = vector3Property;
         }
+        // Quaternion property
         else if (auto quaternionProperty
                  = _getQuaternionProperty(mesh, targetProperty)) {
           _property = quaternionProperty;
+        }
+        // Material Property
+        else if (targetProperty == "material") {
+          _property = mesh->material();
         }
       } break;
       default:
@@ -183,6 +192,25 @@ any IReflect::getProperty(const any& property, const string_t& targetProperty)
       _property = &property._<Color3*>()->b;
     }
     return _property;
+  }
+
+  // Material
+  if (property.is<Material*>()) {
+    // Standard material
+    if (property._<StandardMaterial*>()) {
+      if (targetProperty == "ambientColor") {
+        _property = &property._<StandardMaterial*>()->ambientColor;
+      }
+      else if (targetProperty == "diffuseColor") {
+        _property = &property._<StandardMaterial*>()->diffuseColor;
+      }
+      else if (targetProperty == "specularColor") {
+        _property = &property._<StandardMaterial*>()->specularColor;
+      }
+      else if (targetProperty == "emissiveColor") {
+        _property = &property._<StandardMaterial*>()->emissiveColor;
+      }
+    }
   }
 
   return _property;

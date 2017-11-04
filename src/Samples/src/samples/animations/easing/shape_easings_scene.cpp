@@ -28,12 +28,10 @@ const char* ShapeEasingsScene::getName()
 
 void ShapeEasingsScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
-  scene->forceWireframe = true;
-
   // Create a camera
   _camera = ArcRotateCamera::New("camera1", -Math::PI_2, 1.2f, 25,
                                  Vector3(0, 1, 0), scene);
-  _camera->setPosition(Vector3(25.f, 25.f, 25.f));
+  _camera->setPosition(Vector3(0.f, 15.f, -30.f));
   _camera->attachControl(canvas, true);
 
   // Create a light
@@ -236,7 +234,7 @@ void ShapeEasingsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // create the camera animation
   scene->onBeforeCameraRenderObservable.add([this](Camera*, EventState&) {
-    _camera->alpha += 0.01f * getScene()->getAnimationRatio();
+    // _camera->alpha += 0.01f * getScene()->getAnimationRatio();
   });
 }
 

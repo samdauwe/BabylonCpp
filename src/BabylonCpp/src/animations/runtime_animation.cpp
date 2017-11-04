@@ -340,7 +340,6 @@ bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
 
   // Adding a start key at frame 0 if missing
   if (keys[0].frame != 0) {
-    keys.clear();
     keys.insert(keys.begin(), AnimationKey(0, keys[0].value));
   }
 
@@ -366,10 +365,10 @@ bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
   auto range = to - from;
   AnimationValue offsetValue;
   // ratio represents the frame delta between from and to
-  float ratio = (static_cast<float>(delay.count() * _animation->framePerSecond)
-                 * speedRatio)
-                / 1000.f;
-  AnimationValue highLimitValue;
+  float ratio = (static_cast<float>(delay.count())
+                 * (_animation->framePerSecond * speedRatio) / 1000.f)
+                + _ratioOffset;
+  AnimationValue highLimitValue(0.f);
 
   _previousDelay = delay;
   _previousRatio = ratio;
@@ -457,11 +456,10 @@ bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
   }
 
   // Compute value
-  int repeatCount = static_cast<int>(ratio / range);
-  int _currentFrame
-    = returnValue ? static_cast<int>(from + ratio) % static_cast<int>(range) :
-                    static_cast<int>(to);
-  AnimationValue currentValue
+  auto repeatCount = static_cast<int>(ratio / range);
+  auto _currentFrame
+    = returnValue ? from + static_cast<int>(ratio) % range : to;
+  auto currentValue
     = _interpolate(_currentFrame, repeatCount, _animation->loopMode,
                    offsetValue, highLimitValue);
 

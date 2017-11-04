@@ -476,7 +476,7 @@ SamplesIndex::SamplesIndex()
     });                                                                     //
   // Shape Easings Scene
   _samples["ShapeEasingsScene"] = ::std::make_tuple(
-    false,
+    true,
     [](ICanvas* iCanvas) {                                   //
       return ::std::make_unique<ShapeEasingsScene>(iCanvas); //
     });                                                      //
