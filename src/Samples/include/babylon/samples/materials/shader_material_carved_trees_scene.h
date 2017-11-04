@@ -118,7 +118,7 @@ private:
   float _time;
   ShaderMaterial* _shaderMaterial;
 
-}; // end of class       ShaderMaterialCarvedTreesScene
+}; // end of class ShaderMaterialCarvedTreesScene
 
 } // end of namespace Samples
 } // end of namespace BABYLON
