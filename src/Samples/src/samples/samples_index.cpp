@@ -25,6 +25,7 @@
 #include <babylon/samples/extensions/polyhedron/polyhedra_scene.h>
 #include <babylon/samples/extensions/treegenerators/simple_oak_tree_scene.h>
 #include <babylon/samples/extensions/treegenerators/simple_pine_scene.h>
+#include <babylon/samples/generic/house_from_floorplan.h>
 #include <babylon/samples/generic/infinite_loader_scene.h>
 #include <babylon/samples/generic/lorenz_attractor_scene.h>
 #include <babylon/samples/generic/mandelbrot_fractal_scene.h>
@@ -220,6 +221,12 @@ SamplesIndex::SamplesIndex()
     [](ICanvas* iCanvas) {                                   //
       return ::std::make_unique<HexIcosphereScene>(iCanvas); //
     });                                                      //
+  // House from a Floorplan Scene
+  _samples["HouseFromFloorplanScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                         //
+      return ::std::make_unique<HouseFromFloorplanScene>(iCanvas); //
+    });                                                            //
   // Icosphere Scene
   _samples["IcoSphereScene"]
     = ::std::make_tuple(true,

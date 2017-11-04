@@ -95,6 +95,7 @@
 
 ## Interesting Playgrounds ##
 ![infinite_loader_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/infinite_loader_scene.png?raw=true "Infinite Loader Scene")
+![house_from_floorplan](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/house_from_floorplan.png?raw=true "House from a Floorplan Scene")
 ![mandelbrot_fractal_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/mandelbrot_fractal_scene.png?raw=true "Mandelbrot Fractal Scene")
 ![super_ellipsoid_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/super_ellipsoid_scene.png?raw=true "Super Ellipsoid Scene")
 ![waves_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/waves_scene.png?raw=true "Waves Scene")
