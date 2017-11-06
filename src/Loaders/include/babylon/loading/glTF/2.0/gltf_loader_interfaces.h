@@ -1,5 +1,5 @@
-#ifndef BABYLON_LOADING_GLTF_2_0_H
-#define BABYLON_LOADING_GLTF_2_0_H
+#ifndef BABYLON_LOADING_GLTF_2_0_GLTF_LOADER_INTERFACES_H
+#define BABYLON_LOADING_GLTF_2_0_GLTF_LOADER_INTERFACES_H
 
 #include <babylon/babylon_global.h>
 #include <babylon/core/structs.h>
@@ -296,4 +296,4 @@ struct IGLTF : public IGLTFProperty {
 } // end of namespace GLTF2
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_LOADING_GLTF_2_0_H
+#endif // end of BABYLON_LOADING_GLTF_2_0_GLTF_LOADER_INTERFACES_H
