@@ -4,6 +4,16 @@
 #include <babylon/babylon_constants.h>
 #include <babylon/core/string.h>
 
+TEST(TestString, toCharCodes)
+{
+  using namespace BABYLON;
+
+  const ::std::string s("Babylon.js");
+  const vector_t<uint8_t> expected{66,  97,  98, 121, 108,
+                                   111, 110, 46, 106, 115};
+  EXPECT_THAT(String::toCharCodes(s), ::testing::ContainerEq(expected));
+}
+
 TEST(TestString, concat)
 {
   using namespace BABYLON;
@@ -357,9 +367,8 @@ TEST(TestString, regexReplaceWithCallback)
       return "\n" + ::std::to_string(i++) + "\t";
     };
     const ::std::string r{
-      "1\t"
-      + String::regexReplace(s, ::std::regex("\n", ::std::regex::optimize),
-                             callback)};
+      "1\t" + String::regexReplace(
+                s, ::std::regex("\n", ::std::regex::optimize), callback)};
     const ::std::string e{"1\tline1\n2\tline2\n3\tline3"};
     EXPECT_EQ(r, e);
   }

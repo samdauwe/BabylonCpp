@@ -166,6 +166,40 @@ inline string_t fromCharCode(const T&... t0)
 }
 
 /**
+ * @brief Returns the Unicode of the character at the specified index in a
+ * string.
+ * @param str The source string to select from.
+ * @param index A number representing the index of the character you want to
+ * return
+ * @return A Number, representing the unicode of the character at the specified
+ * index.
+ */
+inline uint8_t charCodeAt(const string_t& str, size_t index)
+{
+  if (index < str.size()) {
+    const string_t s = ::std::to_string(str[index]);
+    return static_cast<uint8_t>(::std::stoi(s));
+  }
+
+  return 0;
+}
+
+/**
+ * @brief Returns the unicode array of the characters of a string.
+ * @param str The source string to convert to the unicode array.
+ * @return The unicode array representing the characters of the string.
+ */
+inline vector_t<uint8_t> toCharCodes(const string_t& str)
+{
+  vector_t<uint8_t> charCodes(str.size());
+  for (size_t i = 0; i < str.size(); ++i) {
+    charCodes[i] = charCodeAt(str, i);
+  }
+
+  return charCodes;
+}
+
+/**
  * @brief Returns the position of the first occurrence of a specified value in a
  * string.
  * @param src The string to search in.
