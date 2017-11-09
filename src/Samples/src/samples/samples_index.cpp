@@ -53,6 +53,7 @@
 #include <babylon/samples/materials/shader_material_skybox_scene.h>
 #include <babylon/samples/materials/shader_material_sparse_grid_marching_scene.h>
 #include <babylon/samples/materials/shader_material_star_nest_scene.h>
+#include <babylon/samples/materials/shader_material_the_drive_home_scene.h>
 #include <babylon/samples/materials/shader_material_the_road_to_hell.h>
 #include <babylon/samples/materials/shader_material_tiles_scene.h>
 #include <babylon/samples/materials/shader_material_with_fog_scene.h>
@@ -470,6 +471,12 @@ SamplesIndex::SamplesIndex()
     [](ICanvas* iCanvas) {                                                  //
       return ::std::make_unique<ShaderMaterialTheRoadToHellScene>(iCanvas); //
     });                                                                     //
+  // Shader Material The Drive Home Scene
+  _samples["ShaderMaterialTheDriveHomeScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                                 //
+      return ::std::make_unique<ShaderMaterialTheDriveHomeScene>(iCanvas); //
+    });                                                                    //
   // Shader Material Tiles Scene
   _samples["ShaderMaterialTilesScene"] = ::std::make_tuple(
     true,
