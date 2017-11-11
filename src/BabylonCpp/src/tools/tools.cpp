@@ -328,8 +328,9 @@ void Tools::LoadImage(const string_t& url,
 
 void Tools::LoadFile(
   const string_t& /*url*/,
-  const ::std::function<void(const string_t& text)>& /*callback*/,
-  const ::std::function<void()>& /*progressCallBack*/, bool /*useArrayBuffer*/)
+  const ::std::function<void(const string_t& data)>& /*callback*/,
+  const ::std::function<void()>& /*progressCallBack*/, bool /*useArrayBuffer*/,
+  const ::std::function<void(const string_t& exception)>& /*onError*/)
 {
 }
 

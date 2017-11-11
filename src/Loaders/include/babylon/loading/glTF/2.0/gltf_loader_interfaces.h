@@ -172,34 +172,34 @@ struct IGLTFImage : public IGLTFChildRootProperty {
 }; // end of struct IGLTFImage
 
 struct IGLTFTextureInfo {
-  int index;
-  int texCoord;
+  unsigned int index;
+  unsigned int texCoord;
 }; // end of struct IGLTFTextureInfo
 
 struct IGLTFMaterialNormalTextureInfo : public IGLTFTextureInfo {
-  float scale;
+  Nullable<float> scale;
 }; // end of struct IGLTFMaterialNormalTextureInfo
 
 struct IGLTFMaterialOcclusionTextureInfo : public IGLTFTextureInfo {
-  float strength;
+  Nullable<float> strength;
 }; // end of struct IGLTFMaterialOcclusionTextureInfo
 
 struct IGLTFMaterialPbrMetallicRoughness {
   Float32Array baseColorFactor;
-  IGLTFTextureInfo baseColorTexture;
-  float metallicFactor;
-  float roughnessFactor;
-  IGLTFTextureInfo metallicRoughnessTexture;
+  Nullable<IGLTFTextureInfo> baseColorTexture;
+  Nullable<float> metallicFactor;
+  Nullable<float> roughnessFactor;
+  Nullable<IGLTFTextureInfo> metallicRoughnessTexture;
 }; // end of struct IGLTFMaterialPbrMetallicRoughness
 
 struct IGLTFMaterial : public IGLTFChildRootProperty {
-  IGLTFMaterialPbrMetallicRoughness pbrMetallicRoughness;
-  IGLTFMaterialNormalTextureInfo normalTexture;
-  IGLTFMaterialOcclusionTextureInfo occlusionTexture;
-  IGLTFTextureInfo emissiveTexture;
+  Nullable<IGLTFMaterialPbrMetallicRoughness> pbrMetallicRoughness;
+  Nullable<IGLTFMaterialNormalTextureInfo> normalTexture;
+  Nullable<IGLTFMaterialOcclusionTextureInfo> occlusionTexture;
+  Nullable<IGLTFTextureInfo> emissiveTexture;
   Float32Array emissiveFactor;
   string_t alphaMode;
-  float alphaCutoff;
+  Nullable<float> alphaCutoff;
   bool doubleSided;
   // Runtime values
   int index;

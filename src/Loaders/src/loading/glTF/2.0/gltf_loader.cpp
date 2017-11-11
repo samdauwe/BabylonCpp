@@ -1,7 +1,12 @@
 #include <babylon/loading/glTF/2.0/gltf_loader.h>
 
 #include <babylon/core/logging.h>
+#include <babylon/engine/scene.h>
+#include <babylon/loading/glTF/2.0/gltf_loader_utils.h>
+#include <babylon/materials/material.h>
+#include <babylon/materials/pbr/pbr_material.h>
 #include <babylon/materials/textures/texture.h>
+#include <babylon/tools/tools.h>
 
 namespace BABYLON {
 namespace GLTF2 {
@@ -240,37 +245,228 @@ void GLTFLoader::_whenAction(const ::std::function<void()>& action,
 
 Material* GLTFLoader::_getDefaultMaterial()
 {
+  if (!_defaultMaterial) {
+    const string_t id = "__gltf_default";
+    auto material
+      = static_cast<PBRMaterial*>(_babylonScene->getMaterialByName(id));
+    if (!material) {
+      material                  = PBRMaterial::New(id, _babylonScene);
+      material->sideOrientation = Material::CounterClockWiseSideOrientation;
+      material->metallic        = 1.f;
+      material->roughness       = 1.f;
+    }
+
+    _defaultMaterial = material;
+  }
+
+  return _defaultMaterial;
 }
 
 void GLTFLoader::_loadMaterialMetallicRoughnessProperties(
   const string_t& context, const IGLTFMaterial& material)
 {
+  auto babylonMaterial = static_cast<PBRMaterial*>(material.babylonMaterial);
+  if (!babylonMaterial) {
+    return;
+  }
+
+  // Ensure metallic workflow
+  babylonMaterial->metallic  = 1;
+  babylonMaterial->roughness = 1;
+
+  if (!material.pbrMetallicRoughness) {
+    return;
+  }
+  const auto& properties = *material.pbrMetallicRoughness;
+
+  babylonMaterial->albedoColor
+    = !properties.baseColorFactor.empty() ?
+        Color3::FromArray(properties.baseColorFactor) :
+        Color3(1.f, 1.f, 1.f);
+  babylonMaterial->metallic
+    = properties.metallicFactor.isNull() ? 1.f : *properties.metallicFactor;
+  babylonMaterial->roughness
+    = properties.roughnessFactor.isNull() ? 1.f : *properties.roughnessFactor;
+
+  if (properties.baseColorTexture) {
+    auto& baseColorTexture = *properties.baseColorTexture;
+    if (baseColorTexture.index >= _gltf->textures.size()) {
+      throw ::std::runtime_error(context
+                                 + ": Failed to find base color texture "
+                                 + ::std::to_string(baseColorTexture.index));
+    }
+
+    auto& texture = _gltf->textures[baseColorTexture.index];
+    babylonMaterial->albedoTexture
+      = _loadTexture("#/textures/" + ::std::to_string(texture.index), texture,
+                     baseColorTexture.texCoord);
+  }
+
+  if (properties.metallicRoughnessTexture) {
+    auto& metallicRoughnessTexture = *properties.metallicRoughnessTexture;
+    if (metallicRoughnessTexture.index >= _gltf->textures.size()) {
+      throw ::std::runtime_error(
+        context + ": Failed to find metallic roughness texture "
+        + ::std::to_string(metallicRoughnessTexture.index));
+    }
+
+    auto& texture = _gltf->textures[metallicRoughnessTexture.index];
+    babylonMaterial->metallicTexture
+      = _loadTexture("#/textures/" + ::std::to_string(texture.index), texture,
+                     metallicRoughnessTexture.texCoord);
+    babylonMaterial->useMetallnessFromMetallicTextureBlue = true;
+    babylonMaterial->useRoughnessFromMetallicTextureGreen = true;
+    babylonMaterial->useRoughnessFromMetallicTextureAlpha = false;
+  }
+
+  _loadMaterialAlphaProperties(context, material, properties.baseColorFactor);
 }
 
 void GLTFLoader::_loadMaterial(
   const string_t& context, IGLTFMaterial& material,
   const ::std::function<void(Material* babylonMaterial, bool isNew)>& assign)
 {
+  if (material.babylonMaterial) {
+    assign(material.babylonMaterial, false);
+    return;
+  }
+
+  if (GLTFLoaderExtension::LoadMaterial(this, context, material, assign)) {
+    return;
+  }
+
+  _createPbrMaterial(material);
+  _loadMaterialBaseProperties(context, material);
+  _loadMaterialMetallicRoughnessProperties(context, material);
+  assign(material.babylonMaterial, true);
 }
 
 void GLTFLoader::_createPbrMaterial(IGLTFMaterial& material)
 {
+  auto babylonMaterial = PBRMaterial::New(
+    !material.name.empty() ? material.name :
+                             "mat" + ::std::to_string(material.index),
+    _babylonScene);
+  babylonMaterial->sideOrientation = Material::CounterClockWiseSideOrientation;
+  material.babylonMaterial         = babylonMaterial;
 }
 
 void GLTFLoader::_loadMaterialBaseProperties(const string_t& context,
                                              const IGLTFMaterial& material)
 {
+  auto babylonMaterial = static_cast<PBRMaterial*>(material.babylonMaterial);
+  if (!babylonMaterial) {
+    return;
+  }
+
+  babylonMaterial->emissiveColor
+    = !material.emissiveFactor.empty() ?
+        Color3::FromArray(material.emissiveFactor) :
+        Color3(0.f, 0.f, 0.f);
+  if (material.doubleSided) {
+    babylonMaterial->setBackFaceCulling(false);
+    babylonMaterial->twoSidedLighting = true;
+  }
+
+  if (material.normalTexture) {
+    auto& normalTexture = *material.normalTexture;
+    if (normalTexture.index >= _gltf->textures.size()) {
+      throw ::std::runtime_error(context + ": Failed to find normal texture "
+                                 + ::std::to_string(normalTexture.index));
+    }
+
+    auto& texture = _gltf->textures[normalTexture.index];
+    babylonMaterial->bumpTexture
+      = _loadTexture("#/textures/" + ::std::to_string(texture.index), texture,
+                     normalTexture.texCoord);
+    babylonMaterial->invertNormalMapX = !_babylonScene->useRightHandedSystem();
+    babylonMaterial->invertNormalMapY = _babylonScene->useRightHandedSystem();
+    if (!normalTexture.scale.isNull()) {
+      babylonMaterial->bumpTexture->level = *normalTexture.scale;
+    }
+  }
+
+  if (material.occlusionTexture) {
+    auto& occlusionTexture = *material.occlusionTexture;
+    if (occlusionTexture.index >= _gltf->textures.size()) {
+      throw ::std::runtime_error(context + ": Failed to find occlusion texture "
+                                 + ::std::to_string(occlusionTexture.index));
+    }
+
+    auto& texture = _gltf->textures[occlusionTexture.index];
+    babylonMaterial->ambientTexture
+      = _loadTexture("#/textures/" + ::std::to_string(texture.index), texture,
+                     occlusionTexture.texCoord);
+    babylonMaterial->useAmbientInGrayScale = true;
+    if (!occlusionTexture.strength.isNull()) {
+      babylonMaterial->ambientTextureStrength = *occlusionTexture.strength;
+    }
+  }
+
+  if (material.emissiveTexture) {
+    auto& emissiveTexture = *material.emissiveTexture;
+    if (emissiveTexture.index >= _gltf->textures.size()) {
+      throw ::std::runtime_error(context + ": Failed to find emissive texture "
+                                 + ::std::to_string(emissiveTexture.index));
+    }
+
+    auto& texture = _gltf->textures[emissiveTexture.index];
+    babylonMaterial->emissiveTexture
+      = _loadTexture("#/textures/" + ::std::to_string(texture.index), texture,
+                     emissiveTexture.texCoord);
+  }
 }
 
 void GLTFLoader::_loadMaterialAlphaProperties(const string_t& context,
                                               const IGLTFMaterial& material,
                                               const Float32Array& colorFactor)
 {
+  auto babylonMaterial = static_cast<PBRMaterial*>(material.babylonMaterial);
+  if (!babylonMaterial) {
+    return;
+  }
+
+  const auto alphaMode
+    = !material.alphaMode.empty() ? material.alphaMode : "OPAQUE";
+  if (alphaMode == "OPAQUE") {
+    // default is opaque
+  }
+  else if (alphaMode == "MASK") {
+    babylonMaterial->alphaCutOff
+      = (material.alphaCutoff.isNull() ? 0.5f : *material.alphaCutoff);
+
+    if (colorFactor.size() >= 4) {
+      if (colorFactor[3] == 0.f) {
+        babylonMaterial->alphaCutOff = 1.f;
+      }
+      else {
+        babylonMaterial->alphaCutOff /= colorFactor[3];
+      }
+    }
+
+    if (babylonMaterial->albedoTexture) {
+      babylonMaterial->albedoTexture->setHasAlpha(true);
+    }
+  }
+  else if (alphaMode == "BLEND") {
+    if (colorFactor.size() >= 4) {
+      babylonMaterial->alpha = colorFactor[3];
+    }
+
+    if (babylonMaterial->albedoTexture) {
+      babylonMaterial->albedoTexture->setHasAlpha(true);
+      babylonMaterial->useAlphaFromAlbedoTexture = true;
+    }
+  }
+  else {
+    throw ::std::runtime_error(context + ": Invalid alpha mode "
+                               + material.alphaMode);
+  }
 }
 
 Texture* GLTFLoader::_loadTexture(const string_t& context,
                                   const IGLTFTexture& texture,
-                                  int coordinatesIndex)
+                                  unsigned int coordinatesIndex)
 {
 }
 
@@ -284,10 +480,29 @@ void GLTFLoader::_loadUri(
   const string_t& context, const string_t& uri,
   const ::std::function<void(ArrayBuffer& data)>& onSuccess)
 {
+  if (!GLTFUtils::ValidateUri(uri)) {
+    throw ::std::runtime_error(context + ": Uri '" + uri + "' is invalid");
+  }
 }
 
 void GLTFLoader::_tryCatchOnError(const ::std::function<void()>& handler)
 {
+  if (_disposed) {
+    return;
+  }
+
+  try {
+    handler();
+  }
+  catch (const ::std::exception& e) {
+    BABYLON_LOGF_ERROR("GLTFLoader", "glTF Loader:: %s", e.what());
+
+    if (_errorCallback) {
+      _errorCallback(string_t(e.what()));
+    }
+
+    dispose();
+  }
 }
 
 unsigned int

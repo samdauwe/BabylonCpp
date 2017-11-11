@@ -60,7 +60,7 @@ public:
                                     const IGLTFMaterial& material,
                                     const Float32Array& colorFactor);
   Texture* _loadTexture(const string_t& context, const IGLTFTexture& texture,
-                        int coordinatesIndex = 0);
+                        unsigned int coordinatesIndex = 0);
   void _loadUri(const string_t& context, const string_t& uri,
                 const ::std::function<void(ArrayBuffer& data)>& onSuccess);
   void _tryCatchOnError(const ::std::function<void()>& handler);
