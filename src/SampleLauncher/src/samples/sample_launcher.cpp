@@ -11,16 +11,12 @@
 #define GLFW_EXPOSE_NATIVE_WGL
 #include <GLFW/glfw3native.h>
 #endif
-#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 
 // Babylon
 #include <babylon/babylon_stl_util.h>
 #include <babylon/impl/canvas.h>
-
-// Sample Runner
-#include <babylon/interfaces/icanvas.h>
 
 // Samples
 #include <babylon/engine/engine.h>
@@ -41,34 +37,47 @@ const SampleLauncher::ResolutionSize SampleLauncher::LARGE_RESOLUTION_SIZE
 const SampleLauncher::ResolutionSize SampleLauncher::FULL_RESOLUTION_SIZE
   = std::make_pair(0, 0);
 
-static void error_callback(int /*error*/, const char* description)
+static Window _sceneWindow;
+
+static void GLFWErrorCallback(int error, const char* description)
 {
-  fputs(description, stderr);
+  fprintf(stderr, "GLFW Error occured, Error id: %i, Description: %s\n", error,
+          description);
 }
 
-static void key_callback(GLFWwindow* window, int key, int /*scancode*/,
-                         int action, int /*mods*/)
+static void GLFWKeyCallback(GLFWwindow* window, int key, int /*scancode*/,
+                            int action, int /*mods*/)
 {
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, GL_TRUE);
   }
 }
 
+static void GLFWWindowSizeCallback(GLFWwindow* window, int width, int height)
+{
+  if (_sceneWindow.glfwWindow == window) {
+    _sceneWindow.width  = width;
+    _sceneWindow.height = height;
+    // Update canvas size
+    if (_sceneWindow.renderCanvas) {
+      _sceneWindow.renderCanvas->setFrameSize(width, height);
+      _sceneWindow.renderableScene->getEngine()->resize();
+    }
+  }
+}
+
 SampleLauncher::SampleLauncher(const std::string& title,
                                const ResolutionSize& size)
-    : _editorState{State::UNINITIALIZED}
-    , _monitor{nullptr}
-    , _window{nullptr}
-    , _winResX{size.first}
-    , _winResY{size.second}
-    , _title{title}
-    , _fullscreen{false}
-    , _lastTime{glfwGetTime()}
-    , _frameCount{0}
-    , _sceneIntialized{false}
-    , _renderCanvas{std::make_unique<BABYLON::impl::Canvas>()}
-    , _renderableScene{nullptr}
+    : _sampleLauncherState{State::UNINITIALIZED}
+    , _defaultWinResX{size.first}
+    , _defaultWinResY{size.second}
 {
+  _sceneWindow                 = Window();
+  _sceneWindow.title           = title;
+  _sceneWindow.sceneIntialized = false;
+  _sceneWindow.renderCanvas    = std::make_unique<BABYLON::impl::Canvas>();
+  _sceneWindow.renderableScene = nullptr;
+  _sceneWindow.lastTime        = glfwGetTime();
 }
 
 SampleLauncher::~SampleLauncher()
@@ -78,50 +87,46 @@ SampleLauncher::~SampleLauncher()
 
 bool SampleLauncher::intialize()
 {
-  if (_editorState != State::UNINITIALIZED) {
+  if (_sampleLauncherState != State::UNINITIALIZED) {
     return false;
   }
 
   // Initialization
   initGLFW();
-  initGL();
+  initGL(_sceneWindow);
 
-  _editorState = State::INITIALIZED;
+  // Update sample launcher state
+  _sampleLauncherState = State::INITIALIZED;
 
   return true;
 }
 
 int SampleLauncher::run()
 {
-  _editorState = State::RUNNING;
+  _sampleLauncherState = State::RUNNING;
   // Check if there is a renderable scene
-  if (!_renderableScene) {
-    // _editorState = SampleLauncher::State::ERROR;
+  if (!_sceneWindow.renderableScene) {
+    _sampleLauncherState = SampleLauncher::State::ERROR;
     return 1;
   }
 
-  int width = 0, height = 0;
-  while (_editorState == State::RUNNING) {
-    // Create new frame
-    glfwGetFramebufferSize(_window, &_winResX, &_winResY);
+  while (_sampleLauncherState == State::RUNNING) {
+    // Make the window's context current
+    glfwMakeContextCurrent(_sceneWindow.glfwWindow);
     // FPS
-    updateWindowFPS();
-    // Update canvas size
-    glfwGetFramebufferSize(_window, &width, &height);
-    _renderCanvas->setFrameSize(width, height);
-    _renderableScene->getEngine()->resize();
+    updateWindowFPS(_sceneWindow);
     // Render Scene
-    _renderableScene->render();
+    _sceneWindow.renderableScene->render();
     // Swap front and back buffers
-    glfwSwapBuffers(_window);
+    glfwSwapBuffers(_sceneWindow.glfwWindow);
     // Swap front and back buffers
     // std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     glfwPollEvents();
     // Check if should close
-    _editorState
-      = (glfwWindowShouldClose(_window) || (_editorState == State::FINISHED)) ?
-          State::FINISHED :
-          _editorState;
+    _sampleLauncherState = (glfwWindowShouldClose(_sceneWindow.glfwWindow)
+                            || (_sampleLauncherState == State::FINISHED)) ?
+                             State::FINISHED :
+                             _sampleLauncherState;
   }
 
   return 0;
@@ -129,34 +134,35 @@ int SampleLauncher::run()
 
 void SampleLauncher::destroy()
 {
-  glfwDestroyWindow(_window);
+  glfwDestroyWindow(_sceneWindow.glfwWindow);
   glfwTerminate();
-  _editorState = State::DESTROYED;
+  _sampleLauncherState = State::DESTROYED;
 }
 
 ICanvas* SampleLauncher::getRenderCanvas()
 {
-  return _renderCanvas.get();
+  return _sceneWindow.renderCanvas.get();
 }
 
 void SampleLauncher::setRenderableScene(
   std::unique_ptr<IRenderableScene>& renderableScene)
 {
-  if (renderableScene && !_renderableScene) {
+  if (renderableScene && !_sceneWindow.renderableScene) {
     renderableScene->initialize();
-    _renderableScene = std::move(renderableScene);
+    _sceneWindow.renderableScene = std::move(renderableScene);
     // Update the title
     char title[256];
     title[255] = '\0';
-    snprintf(title, 255, "%s: %s", _title.c_str(), _renderableScene->getName());
-    glfwSetWindowTitle(_window, title);
+    snprintf(title, 255, "%s: %s", _sceneWindow.title.c_str(),
+             _sceneWindow.renderableScene->getName());
+    glfwSetWindowTitle(_sceneWindow.glfwWindow, title);
   }
 }
 
 int SampleLauncher::initGLFW()
 {
   // Initialize error handling
-  glfwSetErrorCallback(error_callback);
+  glfwSetErrorCallback(GLFWErrorCallback);
 
   // Initialize the library
   if (!glfwInit()) {
@@ -164,22 +170,6 @@ int SampleLauncher::initGLFW()
     fprintf(stderr, "Failed to initialize GLFW\n");
     fflush(stderr);
     exit(EXIT_FAILURE);
-  }
-
-  // Check if full screen mode is requested
-  if ((_winResX == FULL_RESOLUTION_SIZE.first)
-      && (_winResY == FULL_RESOLUTION_SIZE.second)) {
-    _monitor                     = glfwGetPrimaryMonitor();
-    const GLFWvidmode* videoMode = glfwGetVideoMode(_monitor);
-    _winResX                     = videoMode->width;
-    _winResY                     = videoMode->height;
-
-    glfwWindowHint(GLFW_REFRESH_RATE, videoMode->refreshRate);
-    glfwWindowHint(GLFW_RED_BITS, videoMode->redBits);
-    glfwWindowHint(GLFW_BLUE_BITS, videoMode->blueBits);
-    glfwWindowHint(GLFW_GREEN_BITS, videoMode->greenBits);
-    glfwWindowHint(GLFW_ALPHA_BITS, videoMode->redBits);
-    glfwWindowHint(GLFW_DEPTH_BITS, videoMode->redBits * 4);
   }
 
   // Draw smooth line with antialias
@@ -191,10 +181,52 @@ int SampleLauncher::initGLFW()
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-  // Create a windowed mode window and its OpenGL context
-  _window
-    = glfwCreateWindow(_winResX, _winResY, _title.c_str(), _monitor, nullptr);
-  if (!_window) {
+  // Create the scene window
+  CreateWindow(_sceneWindow, _defaultWinResX, _defaultWinResY,
+               _sceneWindow.title.c_str(), nullptr, nullptr);
+
+  return 0;
+}
+
+void SampleLauncher::CreateWindow(Window& window, int width, int height,
+                                  const string_t& title, GLFWmonitor* monitor,
+                                  Window* parentWindow)
+{
+  // Create new window
+  window.glfwWindow  = nullptr;
+  window.glfwMonitor = monitor;
+  window.width       = width;
+  window.height      = height;
+
+  // Check if full screen mode is requested
+  if ((width == FULL_RESOLUTION_SIZE.first)
+      && (height == FULL_RESOLUTION_SIZE.second)) {
+    window.glfwMonitor   = glfwGetPrimaryMonitor();
+    const auto videoMode = glfwGetVideoMode(window.glfwMonitor);
+    window.fullscreen    = true;
+    window.width         = videoMode->width;
+    window.height        = videoMode->height;
+
+    glfwWindowHint(GLFW_REFRESH_RATE, videoMode->refreshRate);
+    glfwWindowHint(GLFW_RED_BITS, videoMode->redBits);
+    glfwWindowHint(GLFW_BLUE_BITS, videoMode->blueBits);
+    glfwWindowHint(GLFW_GREEN_BITS, videoMode->greenBits);
+    glfwWindowHint(GLFW_ALPHA_BITS, videoMode->redBits);
+    glfwWindowHint(GLFW_DEPTH_BITS, videoMode->redBits * 4);
+  }
+
+  // Create GLFW window
+  if (parentWindow) {
+    window.glfwWindow = glfwCreateWindow(width, height, title.c_str(), monitor,
+                                         parentWindow->glfwWindow);
+  }
+  else {
+    window.glfwWindow
+      = glfwCreateWindow(width, height, title.c_str(), monitor, nullptr);
+  }
+
+  // Confirm that GLFW window was created successfully
+  if (!window.glfwWindow) {
     glfwTerminate();
     fprintf(stderr, "Failed to create window\n");
     fflush(stderr);
@@ -202,45 +234,52 @@ int SampleLauncher::initGLFW()
   }
 
   // Make the window's context current
-  glfwMakeContextCurrent(_window);
-  glfwSwapInterval(1);
-  glfwSetKeyCallback(_window, key_callback);
+  glfwMakeContextCurrent(window.glfwWindow);
 
-  return 0;
+  // Set swap interval
+  glfwSwapInterval(1);
+
+  // Setup callbacks
+  glfwSetKeyCallback(window.glfwWindow, GLFWKeyCallback);
+  glfwSetWindowSizeCallback(window.glfwWindow, GLFWWindowSizeCallback);
+
+  // Change the state of the window to intialized
+  window.intialized = true;
 }
 
-bool SampleLauncher::initGL()
+bool SampleLauncher::initGL(Window& window)
 {
   // Initialize 3D context
-  if (!_renderCanvas->initializeContext3d()) {
-    std::cerr << "failed to init GLEW" << std::endl;
+  if (!window.renderCanvas->initializeContext3d()) {
+    fprintf(stderr, "Error occured, Failed to initialize 3D context\n");
     return false;
   }
 
   // Set canvas size
   int width, height;
-  glfwGetFramebufferSize(_window, &width, &height);
-  _renderCanvas->setFrameSize(width, height);
+  glfwGetFramebufferSize(window.glfwWindow, &width, &height);
+  window.renderCanvas->setFrameSize(width, height);
 
   return true;
 }
 
-void SampleLauncher::updateWindowFPS()
+void SampleLauncher::updateWindowFPS(Window& window)
 {
   // Measure speed
   double currentTime = glfwGetTime();
-  ++_frameCount;
+  ++window.frameCount;
 
-  if (currentTime - _lastTime >= 1.0) {
+  if (currentTime - window.lastTime >= 1.0) {
     char title[256];
     title[255] = '\0';
-    snprintf(title, 255, "%s: %s - [%3.2f fps]", _title.c_str(),
-             _renderableScene->getName(), static_cast<double>(_frameCount));
+    snprintf(title, 255, "%s: %s - [%3.2f fps]", window.title.c_str(),
+             window.renderableScene->getName(),
+             static_cast<double>(window.frameCount));
 
-    glfwSetWindowTitle(_window, title);
+    glfwSetWindowTitle(window.glfwWindow, title);
 
-    _frameCount = 0;
-    _lastTime += 1.0;
+    window.frameCount = 0;
+    window.lastTime += 1.0;
   }
 }
 
