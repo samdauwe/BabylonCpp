@@ -80,15 +80,15 @@ struct IGLTFAccessorSparse : public IGLTFProperty {
 }; // end of struct IGLTFAccessorSparse
 
 struct IGLTFAccessor : public IGLTFChildRootProperty {
-  int bufferView;
-  int byteOffset;
+  unsigned int bufferView;
+  Nullable<unsigned int> byteOffset;
   EComponentType componentType;
   bool normalized;
-  int count;
+  unsigned int count;
   string_t type;
   Float32Array max;
   Float32Array min;
-  IGLTFAccessorSparse sparse;
+  Nullable<IGLTFAccessorSparse> sparse;
   // Runtime values
   int index;
 }; // end of struct IGLTFAccessor
@@ -135,10 +135,10 @@ struct IGLTFBuffer : public IGLTFChildRootProperty {
 }; // end of struct IGLTFBuffer
 
 struct IGLTFBufferView : public IGLTFChildRootProperty {
-  int buffer;
+  unsigned int buffer;
   int byteOffset;
   int byteLength;
-  int byteStride;
+  unsigned int byteStride;
   // Runtime values
   int index;
 }; // end of struct IGLTFBufferView

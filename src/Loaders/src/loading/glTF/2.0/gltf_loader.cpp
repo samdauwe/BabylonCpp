@@ -222,20 +222,116 @@ void GLTFLoader::_loadAnimationChannel(const IGLTFAnimation& animation,
 
 void GLTFLoader::_loadBufferAsync(
   const string_t& context, const IGLTFBuffer& buffer,
-  const ::std::function<void(ArrayBuffer& data)>& onSucces)
+  const ::std::function<void(IGLTFBufferView& data)>& onSucces)
 {
 }
 
 void GLTFLoader::_loadBufferViewAsync(
   const string_t& context, const IGLTFBufferView& bufferView,
-  const ::std::function<void(ArrayBuffer& data)>& onSucces)
+  const ::std::function<void(ArrayBufferView& data)>& onSuccess)
 {
+  if (bufferView.buffer >= _gltf->buffers.size()) {
+    throw ::std::runtime_error(context + ": Failed to find buffer "
+                               + ::std::to_string(bufferView.buffer));
+  }
+  auto& buffer = _gltf->buffers[bufferView.buffer];
+
+  _loadBufferAsync("#/buffers/" + ::std::to_string(buffer.index), buffer,
+                   [&](IGLTFBufferView& bufferData) {
+                     ArrayBufferView data;
+
+                     try {
+                       // data = Uint8Array(bufferData.buffer,
+                       //                  bufferData.byteOffset +
+                       //                  (bufferView.byteOffset || 0),
+                       //                  bufferView.byteLength);
+                     }
+                     catch (const ::std::exception& e) {
+                       throw ::std::runtime_error(context + ": " + e.what());
+                     }
+
+                     onSuccess(data);
+                   });
 }
 
 void GLTFLoader::_loadAccessorAsync(
   const string_t& context, const IGLTFAccessor& accessor,
-  const ::std::function<void(ArrayBuffer& data)>& onSuccess)
+  const ::std::function<void(ArrayBufferView& data)>& onSuccess)
 {
+  if (accessor.sparse) {
+    throw ::std::runtime_error(
+      context + ": Sparse accessors are not currently supported");
+  }
+
+  if (accessor.bufferView >= _gltf->bufferViews.size()) {
+    throw ::std::runtime_error(context + ": Failed to find buffer view "
+                               + ::std::to_string(accessor.bufferView));
+  }
+  auto& bufferView = _gltf->bufferViews[accessor.bufferView];
+
+  _loadBufferViewAsync(
+    "#/bufferViews/" + ::std::to_string(bufferView.index), bufferView,
+    [&](ArrayBufferView& bufferViewData) {
+      const auto numComponents = GLTFLoader::_GetNumComponents(accessor.type);
+      if (numComponents == 0) {
+        throw ::std::runtime_error(context + ": Invalid type " + accessor.type);
+      }
+
+      ArrayBufferView data;
+      auto byteOffset = accessor.byteOffset ? *accessor.byteOffset : 0;
+      auto byteStride = bufferView.byteStride;
+
+      try {
+        switch (accessor.componentType) {
+          case EComponentType::BYTE: {
+            data = _buildArrayBuffer<Float32Array>(bufferViewData, byteOffset,
+                                                   accessor.count,
+                                                   numComponents, byteStride);
+            break;
+          }
+          case EComponentType::UNSIGNED_BYTE: {
+            data = _buildArrayBuffer<Uint8Array>(bufferViewData, byteOffset,
+                                                 accessor.count, numComponents,
+                                                 byteStride);
+            break;
+          }
+          case EComponentType::SHORT: {
+            data = _buildArrayBuffer<Int16Array>(bufferViewData, byteOffset,
+                                                 accessor.count, numComponents,
+                                                 byteStride);
+            break;
+          }
+          case EComponentType::UNSIGNED_SHORT: {
+            data = _buildArrayBuffer<Uint16Array>(bufferViewData, byteOffset,
+                                                  accessor.count, numComponents,
+                                                  byteStride);
+            break;
+          }
+          case EComponentType::UNSIGNED_INT: {
+            data = _buildArrayBuffer<Uint32Array>(bufferViewData, byteOffset,
+                                                  accessor.count, numComponents,
+                                                  byteStride);
+            break;
+          }
+          case EComponentType::FLOAT: {
+            data = _buildArrayBuffer<Float32Array>(bufferViewData, byteOffset,
+                                                   accessor.count,
+                                                   numComponents, byteStride);
+            break;
+          }
+          default: {
+            auto componentType = static_cast<unsigned>(accessor.componentType);
+            throw ::std::runtime_error(context + ": Invalid component type "
+                                       + ::std::to_string(componentType));
+          }
+        }
+      }
+      catch (const ::std::exception& e) {
+        throw ::std::runtime_error(context + ": " + e.what());
+      }
+
+      onSuccess(data);
+    });
 }
 
 void GLTFLoader::_whenAction(const ::std::function<void()>& action,

@@ -12,8 +12,10 @@ namespace BABYLON {
 struct ArrayBufferView {
   enum class Type {
     FLOAT32ARRAY_TYPE = 0,
-    UINT8ARRAY_TYPE   = 1,
-    UINT32ARRAY_TYPE  = 2
+    INT16ARRAY_TYPE   = 1,
+    UINT8ARRAY_TYPE   = 2,
+    UINT16ARRAY_TYPE  = 3,
+    UINT32ARRAY_TYPE  = 4
   }; // end of enum class Type
 
   ArrayBufferView() : type{Type::UINT8ARRAY_TYPE}
@@ -23,8 +25,16 @@ struct ArrayBufferView {
       : type{Type::FLOAT32ARRAY_TYPE}, float32Array{iFloat32Array}
   {
   }
+  ArrayBufferView(Int16Array iInt16Array)
+      : type{Type::INT16ARRAY_TYPE}, int16Array{iInt16Array}
+  {
+  }
   ArrayBufferView(Uint8Array iUint8Array)
       : type{Type::UINT8ARRAY_TYPE}, uint8Array{iUint8Array}
+  {
+  }
+  ArrayBufferView(Uint16Array iUint16Array)
+      : type{Type::UINT16ARRAY_TYPE}, uint16Array{iUint16Array}
   {
   }
   ArrayBufferView(Uint32Array iUint32Array)
@@ -34,14 +44,18 @@ struct ArrayBufferView {
   ArrayBufferView(const ArrayBufferView& other)
       : type{other.type}
       , float32Array{other.float32Array}
+      , int16Array{other.int16Array}
       , uint8Array{other.uint8Array}
+      , uint16Array{other.uint16Array}
       , uint32Array{other.uint32Array}
   {
   }
   ArrayBufferView(ArrayBufferView&& other)
       : type{::std::move(other.type)}
       , float32Array{::std::move(other.float32Array)}
+      , int16Array{::std::move(other.int16Array)}
       , uint8Array{::std::move(other.uint8Array)}
+      , uint16Array{::std::move(other.uint16Array)}
       , uint32Array{::std::move(other.uint32Array)}
   {
   }
@@ -50,7 +64,9 @@ struct ArrayBufferView {
     if (&other != this) {
       type         = other.type;
       float32Array = other.float32Array;
+      int16Array   = other.int16Array;
       uint8Array   = other.uint8Array;
+      uint16Array  = other.uint16Array;
       uint32Array  = other.uint32Array;
     }
 
@@ -61,7 +77,9 @@ struct ArrayBufferView {
     if (&other != this) {
       type         = ::std::move(other.type);
       float32Array = ::std::move(other.float32Array);
+      int16Array   = ::std::move(other.int16Array);
       uint8Array   = ::std::move(other.uint8Array);
+      uint16Array  = ::std::move(other.uint16Array);
       uint32Array  = ::std::move(other.uint32Array);
     }
 
@@ -73,7 +91,9 @@ struct ArrayBufferView {
 
   Type type;
   Float32Array float32Array;
+  Int16Array int16Array;
   Uint8Array uint8Array;
+  Uint16Array uint16Array;
   Uint32Array uint32Array;
 }; // end of struct ArrayBufferView
 

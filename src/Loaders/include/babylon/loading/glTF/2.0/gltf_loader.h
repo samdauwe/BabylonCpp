@@ -145,15 +145,19 @@ private:
                              const IGLTFAnimationChannel& channel,
                              const string_t& samplerContext,
                              const IGLTFAnimationSampler& sampler);
-  void
-  _loadBufferAsync(const string_t& context, const IGLTFBuffer& buffer,
-                   const ::std::function<void(ArrayBuffer& data)>& onSucces);
+  void _loadBufferAsync(
+    const string_t& context, const IGLTFBuffer& buffer,
+    const ::std::function<void(IGLTFBufferView& data)>& onSucces);
   void _loadBufferViewAsync(
     const string_t& context, const IGLTFBufferView& bufferView,
-    const ::std::function<void(ArrayBuffer& data)>& onSucces);
-  void
-  _loadAccessorAsync(const string_t& context, const IGLTFAccessor& accessor,
-                     const ::std::function<void(ArrayBuffer& data)>& onSuccess);
+    const ::std::function<void(ArrayBufferView& data)>& onSuccess);
+  void _loadAccessorAsync(
+    const string_t& context, const IGLTFAccessor& accessor,
+    const ::std::function<void(ArrayBufferView& data)>& onSuccess);
+  template <typename T>
+  T _buildArrayBuffer(ArrayBufferView& data, unsigned int byteOffset,
+                      unsigned int count, unsigned int numComponents,
+                      unsigned int byteStride);
   Material* _getDefaultMaterial();
   void _loadMaterialMetallicRoughnessProperties(const string_t& context,
                                                 const IGLTFMaterial& material);
