@@ -64,14 +64,16 @@ set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(TESTS_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 
 # Header files
-file(GLOB LOADERS_HDR_FILES   ${INCLUDE_PATH}/loading/glTF/2.0/*.h)
+file(GLOB LOADERS_HDR_FILES   ${INCLUDE_PATH}/loading/glTF/2.0/*.h
+                              ${INCLUDE_PATH}/loading/glTF/2.0/extensions/*.h)
 
 set(BABYLON_LOADERS_HEADERS
     ${LOADERS_HDR_FILES}
 )
 
 # Source files
-file(GLOB LOADERS_SRC_FILES   ${SOURCE_PATH}/loading/glTF/2.0/*.cpp)
+file(GLOB LOADERS_SRC_FILES   ${SOURCE_PATH}/loading/glTF/2.0/*.cpp
+                              ${SOURCE_PATH}/loading/glTF/2.0/extensions/*.cpp)
 
 set(BABYLON_LOADERS_SOURCES
     ${LOADERS_SRC_FILES}
