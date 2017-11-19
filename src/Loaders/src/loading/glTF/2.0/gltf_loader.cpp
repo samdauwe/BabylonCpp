@@ -1,11 +1,15 @@
 #include <babylon/loading/glTF/2.0/gltf_loader.h>
 
+#include <babylon/babylon_stl_util.h>
+#include <babylon/bones/bone.h>
+#include <babylon/bones/skeleton.h>
 #include <babylon/core/logging.h>
 #include <babylon/engine/scene.h>
 #include <babylon/loading/glTF/2.0/gltf_loader_utils.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/pbr/pbr_material.h>
 #include <babylon/materials/textures/texture.h>
+#include <babylon/mesh/mesh.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -161,33 +165,135 @@ void GLTFLoader::_loadMorphTargetVertexDataAsync(
 {
 }
 
-void GLTFLoader::_loadTransform(IGLTFNode* node)
+void GLTFLoader::_loadTransform(IGLTFNode& node)
 {
+  auto position = Vector3::Zero();
+  auto rotation = Quaternion::Identity();
+  auto scaling  = Vector3::One();
+
+  if (!node.matrix.empty()) {
+    const auto matrix = Matrix::FromArray(node.matrix);
+    matrix.decompose(scaling, rotation, position);
+  }
+  else {
+    if (!node.translation.empty()) {
+      position = Vector3::FromArray(node.translation);
+    }
+    if (!node.rotation.empty()) {
+      rotation = Quaternion::FromArray(node.rotation);
+    }
+    if (!node.scale.empty()) {
+      scaling = Vector3::FromArray(node.scale);
+    }
+  }
+
+  node.babylonMesh->setPosition(position);
+  node.babylonMesh->setRotationQuaternion(rotation);
+  node.babylonMesh->setScaling(scaling);
 }
 
-Skeleton* GLTFLoader::_loadSkin(const string_t& context, const IGLTFSkin& skin)
+Skeleton* GLTFLoader::_loadSkin(const string_t& context, IGLTFSkin& skin)
 {
+  const auto skeletonId   = "skeleton" + ::std::to_string(skin.index);
+  const auto skeletonName = !skin.name.empty() ? skin.name : skeletonId;
+  skin.babylonSkeleton = new Skeleton(skeletonName, skeletonId, _babylonScene);
+
+  if (skin.inverseBindMatrices.isNull()) {
+    _loadBones(context, skin, Float32Array());
+  }
+  else {
+    const auto index = *skin.inverseBindMatrices;
+    if (index >= _gltf->accessors.size()) {
+      throw ::std::runtime_error(
+        context + ": Failed to find inverse bind matrices attribute "
+        + ::std::to_string(index));
+    }
+    auto& accessor = _gltf->accessors[index];
+
+    _loadAccessorAsync("#/accessors/" + ::std::to_string(accessor.index),
+                       accessor, [&](ArrayBufferView& data) {
+                         _loadBones(context, skin, data.float32Array);
+                       });
+  }
+
+  return skin.babylonSkeleton;
 }
 
-Bone* GLTFLoader::_createBone(IGLTFNode* node, const IGLTFSkin& skin,
+Bone* GLTFLoader::_createBone(IGLTFNode& node, const IGLTFSkin& skin,
                               Bone* parent, const Matrix& localMatrix,
                               const Matrix& baseMatrix, unsigned int index)
 {
+  const auto boneName
+    = !node.name.empty() ? node.name : "bone" + ::std::to_string(node.index);
+  const auto babylonBone = Bone::New(boneName, skin.babylonSkeleton, parent,
+                                     localMatrix, nullptr, baseMatrix, index);
+  node.babylonBones[skin.index] = babylonBone;
+  node.babylonAnimationTargets.emplace_back(babylonBone);
+  return babylonBone;
 }
 
-void GLTFLoader::_loadBone(const string_t& context, const IGLTFSkin& skin,
-                           const Float32Array& inverseBindMatrixData)
+void GLTFLoader::_loadBones(const string_t& context, const IGLTFSkin& skin,
+                            const Float32Array& inverseBindMatrixData)
 {
+  unordered_map_t<int, Bone*> babylonBones;
+  for (const auto& index : skin.joints) {
+    if (index >= _gltf->nodes.size()) {
+      throw ::std::runtime_error(context + ": Failed to find joint "
+                                 + ::std::to_string(index));
+    }
+    auto& node = _gltf->nodes[index];
+
+    _loadBone(node, skin, inverseBindMatrixData, babylonBones);
+  }
 }
 
-Bone* GLTFLoader::_loadBone(IGLTFNode* node, const IGLTFSkin& skin,
+Bone* GLTFLoader::_loadBone(const IGLTFNode& node, const IGLTFSkin& skin,
                             const Float32Array& inverseBindMatrixData,
-                            const unordered_map_t<int, Bone*>& babylonBones)
+                            unordered_map_t<int, Bone*>& babylonBones)
 {
+  if (stl_util::contains(babylonBones, node.index)
+      && babylonBones[node.index]) {
+    return babylonBones[node.index];
+  }
+
+  const auto boneIndex = stl_util::index_of(skin.joints, node.index);
+
+  auto baseMatrix = Matrix::Identity();
+  if (!inverseBindMatrixData.empty() && boneIndex != -1) {
+    auto _boneIndex = static_cast<unsigned>(boneIndex);
+    baseMatrix      = Matrix::FromArray(inverseBindMatrixData, _boneIndex * 16);
+    baseMatrix.invertToRef(baseMatrix);
+  }
+
+  Bone* babylonParentBone = nullptr;
+  if (node.index != skin.skeleton && node.parent && node.parent != _rootNode) {
+    babylonParentBone
+      = _loadBone(node.parent, skin, inverseBindMatrixData, babylonBones);
+    baseMatrix.multiplyToRef(babylonParentBone->getInvertedAbsoluteTransform(),
+                             baseMatrix);
+  }
+
+  auto babylonBone = _createBone(node, skin, babylonParentBone,
+                                 _getNodeMatrix(node), baseMatrix, boneIndex);
+  babylonBones[node.index] = babylonBone;
+  return babylonBone;
 }
 
 Matrix GLTFLoader::_getNodeMatrix(const IGLTFNode& node)
 {
+  if (!node.matrix.empty()) {
+    return Matrix::FromArray(node.matrix);
+  }
+  else {
+    auto rotation = !node.rotation.empty() ?
+                      Quaternion::FromArray(node.rotation) :
+                      Quaternion::Identity();
+    return Matrix::Compose(
+      !node.scale.empty() ? Vector3::FromArray(node.scale) : Vector3::One(),
+      rotation,
+      !node.translation.empty() ? Vector3::FromArray(node.translation) :
+                                  Vector3::Zero());
+  }
 }
 
 void GLTFLoader::_traverseNodes(
@@ -195,21 +301,71 @@ void GLTFLoader::_traverseNodes(
   ::std::function<bool(IGLTFNode* node, IGLTFNode* parentNode)>& action,
   IGLTFNode* parentNode)
 {
+  for (const auto& index : indices) {
+    if (index >= _gltf->nodes.size()) {
+      throw ::std::runtime_error(context + ": Failed to find node "
+                                 + ::std::to_string(index));
+    }
+    auto& node = _gltf->nodes[index];
+
+    _traverseNode(context, node, action, parentNode);
+  }
 }
 
 void GLTFLoader::_traverseNode(
   const string_t& context, IGLTFNode* node,
-  ::std::function<bool(IGLTFNode* node, IGLTFNode* parentNode)>& action)
+  ::std::function<bool(IGLTFNode* node, IGLTFNode* parentNode)>& action,
+  IGLTFNode* parentNode)
 {
+  if (GLTFLoaderExtension::TraverseNode(this, context, node, action,
+                                        parentNode)) {
+    return;
+  }
+
+  if (!action(node, parentNode)) {
+    return;
+  }
+
+  if (!node->children.empty()) {
+    _traverseNodes(context, node->children, action, node);
+  }
 }
 
 void GLTFLoader::_loadAnimations()
 {
+  auto& animations = _gltf->animations;
+  if (animations.empty()) {
+    return;
+  }
+
+  for (unsigned int index = 0; index < animations.size(); ++index) {
+    auto& animation = animations[index];
+    _loadAnimation("#/animations/" + ::std::to_string(index), animation);
+  }
 }
 
 void GLTFLoader::_loadAnimation(const string_t& context,
-                                const IGLTFAnimation& animation)
+                                IGLTFAnimation& animation)
 {
+  animation.targets.clear();
+
+  for (unsigned int index = 0; index < animation.channels.size(); ++index) {
+    if (index >= animation.channels.size()) {
+      throw ::std::runtime_error(context + ": Failed to find channel "
+                                 + ::std::to_string(index));
+    }
+    auto& channel = animation.channels[index];
+
+    if (channel.sampler >= animation.samplers.size()) {
+      throw ::std::runtime_error(context + ": Failed to find sampler "
+                                 + ::std::to_string(channel.sampler));
+    }
+    auto& sampler = animation.samplers[channel.sampler];
+
+    _loadAnimationChannel(
+      animation, context + "/channels/" + ::std::to_string(index), channel,
+      context + "/samplers/" + ::std::to_string(channel.sampler), sampler);
+  }
 }
 
 void GLTFLoader::_loadAnimationChannel(const IGLTFAnimation& animation,
@@ -221,9 +377,47 @@ void GLTFLoader::_loadAnimationChannel(const IGLTFAnimation& animation,
 }
 
 void GLTFLoader::_loadBufferAsync(
-  const string_t& context, const IGLTFBuffer& buffer,
-  const ::std::function<void(IGLTFBufferView& data)>& onSucces)
+  const string_t& context, IGLTFBuffer& buffer,
+  const ::std::function<void(IGLTFBufferView& data)>& onSuccess)
 {
+  _addPendingData(buffer);
+
+  if (buffer.loadedData) {
+    onSuccess(buffer.loadedData);
+    _removePendingData(buffer);
+  }
+  else if (buffer.loadedObservable) {
+    buffer.loadedObservable->add([&](IGLTFBuffer* buffer, EventState& /*es*/) {
+      onSuccess(buffer->loadedData);
+      _removePendingData(buffer);
+    });
+  }
+  else {
+    if (buffer.uri.empty()) {
+      throw ::std::runtime_error(context + ": Uri is missing");
+    }
+
+    if (GLTFUtils::IsBase64(buffer.uri)) {
+      const auto data   = GLTFUtils::DecodeBase64(buffer.uri);
+      buffer.loadedData = ArrayBufferView(data);
+      onSuccess(buffer.loadedData);
+      _removePendingData(buffer);
+    }
+    else {
+      buffer.loadedObservable = ::std::make_shared<Observable<IGLTFBuffer>>();
+      buffer.loadedObservable->add(
+        [&](IGLTFBuffer* buffer, EventState& /*es*/) {
+          onSuccess(buffer->loadedData);
+          _removePendingData(buffer);
+        });
+
+      _loadUri(context, buffer.uri, [&](const ArrayBufferView& data) {
+        buffer.loadedData = data;
+        buffer.loadedObservable->notifyObservers(&buffer);
+        buffer.loadedObservable = nullptr;
+      });
+    }
+  }
 }
 
 void GLTFLoader::_loadBufferViewAsync(

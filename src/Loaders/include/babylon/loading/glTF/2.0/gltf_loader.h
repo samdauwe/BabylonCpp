@@ -47,7 +47,8 @@ public:
   void _loadNode(const string_t& context, const IGLTFNode& node);
   void _traverseNode(
     const string_t& context, IGLTFNode* node,
-    ::std::function<bool(IGLTFNode* node, IGLTFNode* parentNode)>& action);
+    ::std::function<bool(IGLTFNode* node, IGLTFNode* parentNode)>& action,
+    IGLTFNode* parentNode = nullptr);
   void _whenAction(const ::std::function<void()>& action,
                    const ::std::function<void()>& onComplete);
   void _loadMaterial(
@@ -123,31 +124,31 @@ private:
     const string_t& context, const VertexData& vertexData,
     const unordered_map_t<string_t, int>& attributes,
     const ::std::function<void(const VertexData& vertexData)>& onSuccess);
-  void _loadTransform(IGLTFNode* node);
-  Skeleton* _loadSkin(const string_t& context, const IGLTFSkin& skin);
-  Bone* _createBone(IGLTFNode* node, const IGLTFSkin& skin, Bone* parent,
+  void _loadTransform(IGLTFNode& node);
+  Skeleton* _loadSkin(const string_t& context, IGLTFSkin& skin);
+  Bone* _createBone(IGLTFNode& node, const IGLTFSkin& skin, Bone* parent,
                     const Matrix& localMatrix, const Matrix& baseMatrix,
                     unsigned int index);
-  void _loadBone(const string_t& context, const IGLTFSkin& skin,
-                 const Float32Array& inverseBindMatrixData);
-  Bone* _loadBone(IGLTFNode* node, const IGLTFSkin& skin,
+  void _loadBones(const string_t& context, const IGLTFSkin& skin,
+                  const Float32Array& inverseBindMatrixData);
+  Bone* _loadBone(const IGLTFNode& node, const IGLTFSkin& skin,
                   const Float32Array& inverseBindMatrixData,
-                  const unordered_map_t<int, Bone*>& babylonBones);
+                  unordered_map_t<int, Bone*>& babylonBones);
   Matrix _getNodeMatrix(const IGLTFNode& node);
   void _traverseNodes(
     const string_t& context, const Uint32Array& indices,
     ::std::function<bool(IGLTFNode* node, IGLTFNode* parentNode)>& action,
     IGLTFNode* parentNode = nullptr);
   void _loadAnimations();
-  void _loadAnimation(const string_t& context, const IGLTFAnimation& animation);
+  void _loadAnimation(const string_t& context, IGLTFAnimation& animation);
   void _loadAnimationChannel(const IGLTFAnimation& animation,
                              const string_t& channelContext,
                              const IGLTFAnimationChannel& channel,
                              const string_t& samplerContext,
                              const IGLTFAnimationSampler& sampler);
   void _loadBufferAsync(
-    const string_t& context, const IGLTFBuffer& buffer,
-    const ::std::function<void(IGLTFBufferView& data)>& onSucces);
+    const string_t& context, IGLTFBuffer& buffer,
+    const ::std::function<void(IGLTFBufferView& data)>& onSuccess);
   void _loadBufferViewAsync(
     const string_t& context, const IGLTFBufferView& bufferView,
     const ::std::function<void(ArrayBufferView& data)>& onSuccess);

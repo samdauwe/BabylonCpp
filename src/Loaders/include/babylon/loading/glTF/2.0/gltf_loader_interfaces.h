@@ -99,7 +99,7 @@ struct IGLTFAnimationChannelTarget : public IGLTFProperty {
 }; // end of struct IGLTFAnimationChannelTarget
 
 struct IGLTFAnimationChannel : public IGLTFProperty {
-  int sampler;
+  unsigned int sampler;
   IGLTFAnimationChannelTarget target;
 }; // end of struct IGLTFAnimationChannel
 
@@ -130,8 +130,8 @@ struct IGLTFBuffer : public IGLTFChildRootProperty {
   int byteLength;
   // Runtime values
   int index;
-  ArrayBufferView loadedData;
-  Observable<IGLTFBuffer> loadedObservable;
+  Nullable<ArrayBufferView> loadedData;
+  Observable<IGLTFBuffer>::SPtr loadedObservable;
 }; // end of struct IGLTFBuffer
 
 struct IGLTFBufferView : public IGLTFChildRootProperty {
@@ -256,9 +256,9 @@ struct IGLTFScene : public IGLTFChildRootProperty {
 }; // end of struct IGLTFScene
 
 struct IGLTFSkin : public IGLTFChildRootProperty {
-  int inverseBindMatrices;
+  Nullable<unsigned int> inverseBindMatrices;
   int skeleton;
-  Float32Array joints;
+  Uint32Array joints;
   // Runtime values
   int index;
   Skeleton* babylonSkeleton;
