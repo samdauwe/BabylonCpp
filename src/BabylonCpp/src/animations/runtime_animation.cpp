@@ -137,9 +137,10 @@ AnimationValue RuntimeAnimation::_interpolate(
             = useTangent ?
                 _animation->quaternionInterpolateFunctionWithTangents(
                   startValue.quaternionData,
-                  startKey.outTangent.quaternionData.scale(frameDelta),
+                  (*startKey.outTangent).quaternionData.scale(frameDelta),
                   endValue.quaternionData,
-                  endKey.inTangent.quaternionData.scale(frameDelta), gradient) :
+                  (*endKey.inTangent).quaternionData.scale(frameDelta),
+                  gradient) :
                 _animation->quaternionInterpolateFunction(
                   startValue.quaternionData, endValue.quaternionData, gradient);
           switch (loopMode) {
@@ -161,9 +162,9 @@ AnimationValue RuntimeAnimation::_interpolate(
             = useTangent ?
                 _animation->vector3InterpolateFunctionWithTangents(
                   startValue.vector3Data,
-                  startKey.outTangent.vector3Data.scale(frameDelta),
+                  (*startKey.outTangent).vector3Data.scale(frameDelta),
                   endValue.vector3Data,
-                  endKey.inTangent.vector3Data.scale(frameDelta), gradient) :
+                  (*endKey.inTangent).vector3Data.scale(frameDelta), gradient) :
                 _animation->vector3InterpolateFunction(
                   startValue.vector3Data, endValue.vector3Data, gradient);
           switch (loopMode) {
@@ -185,9 +186,9 @@ AnimationValue RuntimeAnimation::_interpolate(
             = useTangent ?
                 _animation->vector2InterpolateFunctionWithTangents(
                   startValue.vector2Data,
-                  startKey.outTangent.vector2Data.scale(frameDelta),
+                  (*startKey.outTangent).vector2Data.scale(frameDelta),
                   endValue.vector2Data,
-                  endKey.inTangent.vector2Data.scale(frameDelta), gradient) :
+                  (*endKey.inTangent).vector2Data.scale(frameDelta), gradient) :
                 _animation->vector2InterpolateFunction(
                   startValue.vector2Data, endValue.vector2Data, gradient);
           switch (loopMode) {

@@ -4,6 +4,7 @@
 #include <babylon/babylon_global.h>
 
 #include <babylon/animations/animation_value.h>
+#include <babylon/core/nullable.h>
 
 namespace BABYLON {
 
@@ -13,8 +14,8 @@ struct BABYLON_SHARED_EXPORT AnimationKey {
 
   int frame;
   AnimationValue value;
-  AnimationValue inTangent;
-  AnimationValue outTangent;
+  Nullable<AnimationValue> inTangent;
+  Nullable<AnimationValue> outTangent;
 
 }; // end of class AnimationKey
 

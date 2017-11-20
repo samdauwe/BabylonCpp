@@ -16,6 +16,8 @@ public:
   void setInfluence(float influence);
   bool hasNormals() const;
   bool hasTangents() const;
+  vector_t<Animation*>& animations();
+  const vector_t<Animation*>& animations() const;
   void setPositions(const Float32Array& data);
   Float32Array& getPositions();
   const Float32Array& getPositions() const;
@@ -43,7 +45,7 @@ public:
 
 private:
   string_t _name;
-  vector_t<Animation*> animations;
+  vector_t<Animation*> _animations;
   Float32Array _positions;
   Float32Array _normals;
   Float32Array _tangents;

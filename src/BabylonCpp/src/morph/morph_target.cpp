@@ -47,6 +47,16 @@ bool MorphTarget::hasTangents() const
   return !_tangents.empty();
 }
 
+vector_t<Animation*>& MorphTarget::animations()
+{
+  return _animations;
+}
+
+const vector_t<Animation*>& MorphTarget::animations() const
+{
+  return _animations;
+}
+
 void MorphTarget::setPositions(const Float32Array& data)
 {
   _positions = data;

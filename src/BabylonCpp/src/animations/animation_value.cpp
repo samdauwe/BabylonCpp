@@ -67,6 +67,91 @@ AnimationValue::AnimationValue(const Color4& value)
 {
 }
 
+AnimationValue::AnimationValue(const Float32Array& value)
+    : dataType{Animation::ANIMATIONTYPE_FLOAT32ARRAY}, float32ArrayData{value}
+{
+}
+
+AnimationValue::AnimationValue(const AnimationValue& other)
+    : dataType{other.dataType}
+    , floatData{other.floatData}
+    , vector3Data{other.vector3Data}
+    , quaternionData{other.quaternionData}
+    , matrixData{other.matrixData}
+    , color3Data{other.color3Data}
+    , vector2Data{other.vector2Data}
+    , sizeData{other.sizeData}
+    , boolData{other.boolData}
+    , intData{other.intData}
+    , stringData{other.stringData}
+    , color4Data{other.color4Data}
+    , float32ArrayData{other.float32ArrayData}
+{
+}
+
+AnimationValue::AnimationValue(AnimationValue&& other)
+    : dataType{::std::move(other.dataType)}
+    , floatData{::std::move(other.floatData)}
+    , vector3Data{::std::move(other.vector3Data)}
+    , quaternionData{::std::move(other.quaternionData)}
+    , matrixData{::std::move(other.matrixData)}
+    , color3Data{::std::move(other.color3Data)}
+    , vector2Data{::std::move(other.vector2Data)}
+    , sizeData{::std::move(other.sizeData)}
+    , boolData{::std::move(other.boolData)}
+    , intData{::std::move(other.intData)}
+    , stringData{::std::move(other.stringData)}
+    , color4Data{::std::move(other.color4Data)}
+    , float32ArrayData{::std::move(other.float32ArrayData)}
+{
+}
+
+AnimationValue& AnimationValue::operator=(const AnimationValue& other)
+{
+  if (&other != this) {
+    dataType         = other.dataType;
+    floatData        = other.floatData;
+    vector3Data      = other.vector3Data;
+    quaternionData   = other.quaternionData;
+    matrixData       = other.matrixData;
+    color3Data       = other.color3Data;
+    vector2Data      = other.vector2Data;
+    sizeData         = other.sizeData;
+    boolData         = other.boolData;
+    intData          = other.intData;
+    stringData       = other.stringData;
+    color4Data       = other.color4Data;
+    float32ArrayData = other.float32ArrayData;
+  }
+
+  return *this;
+}
+
+AnimationValue& AnimationValue::operator=(AnimationValue&& other)
+{
+  if (&other != this) {
+    dataType         = ::std::move(other.dataType);
+    floatData        = ::std::move(other.floatData);
+    vector3Data      = ::std::move(other.vector3Data);
+    quaternionData   = ::std::move(other.quaternionData);
+    matrixData       = ::std::move(other.matrixData);
+    color3Data       = ::std::move(other.color3Data);
+    vector2Data      = ::std::move(other.vector2Data);
+    sizeData         = ::std::move(other.sizeData);
+    boolData         = ::std::move(other.boolData);
+    intData          = ::std::move(other.intData);
+    stringData       = ::std::move(other.stringData);
+    color4Data       = ::std::move(other.color4Data);
+    float32ArrayData = ::std::move(other.float32ArrayData);
+  }
+
+  return *this;
+}
+
+AnimationValue::~AnimationValue()
+{
+}
+
 AnimationValue AnimationValue::subtract(const AnimationValue& fromValue)
 {
   switch (dataType) {
@@ -88,6 +173,15 @@ AnimationValue AnimationValue::subtract(const AnimationValue& fromValue)
       return AnimationValue(intData = fromValue.intData);
     case Animation::ANIMATIONTYPE_COLOR4:
       return AnimationValue(color4Data.subtract(fromValue.color4Data));
+    case Animation::ANIMATIONTYPE_FLOAT32ARRAY: {
+      auto count = ::std::min(float32ArrayData.size(),
+                              fromValue.float32ArrayData.size());
+      Float32Array result(count);
+      for (size_t i; i < count; ++i) {
+        result[i] = float32ArrayData[i] - fromValue.float32ArrayData[i];
+      }
+      return AnimationValue(result);
+    }
     default:
       return *this;
   }
@@ -149,6 +243,9 @@ AnimationValue AnimationValue::copy() const
     case Animation::ANIMATIONTYPE_COLOR4:
       v.color4Data = color4Data;
       break;
+    case Animation::ANIMATIONTYPE_FLOAT32ARRAY:
+      v.float32ArrayData = float32ArrayData;
+      break;
     default:
       break;
   }
@@ -192,6 +289,9 @@ any AnimationValue::getValue() const
       break;
     case Animation::ANIMATIONTYPE_COLOR4:
       value = &color4Data;
+      break;
+    case Animation::ANIMATIONTYPE_FLOAT32ARRAY:
+      value = &float32ArrayData;
       break;
     default:
       break;

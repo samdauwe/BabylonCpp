@@ -28,6 +28,12 @@ public:
   AnimationValue(int value);
   AnimationValue(const string_t& value);
   AnimationValue(const Color4& value);
+  AnimationValue(const Float32Array& value);
+  AnimationValue(const AnimationValue& other);
+  AnimationValue(AnimationValue&& other);
+  AnimationValue& operator=(const AnimationValue& other);
+  AnimationValue& operator=(AnimationValue&& other);
+  ~AnimationValue();
 
   AnimationValue subtract(const AnimationValue& fromValue);
   AnimationValue operator-(const AnimationValue& fromValue);
@@ -55,6 +61,7 @@ public:
   int intData;
   string_t stringData;
   Color4 color4Data;
+  Float32Array float32ArrayData;
 
 }; // end of class AnimationValue
 

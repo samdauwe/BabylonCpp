@@ -24,6 +24,7 @@ public:
   static constexpr unsigned int ANIMATIONTYPE_INT          = 21;
   static constexpr unsigned int ANIMATIONTYPE_STRING       = 22;
   static constexpr unsigned int ANIMATIONTYPE_COLOR4       = 23;
+  static constexpr unsigned int ANIMATIONTYPE_FLOAT32ARRAY = 30;
   static constexpr unsigned int ANIMATIONLOOPMODE_RELATIVE = 0;
   static constexpr unsigned int ANIMATIONLOOPMODE_CYCLE    = 1;
   static constexpr unsigned int ANIMATIONLOOPMODE_CONSTANT = 2;
