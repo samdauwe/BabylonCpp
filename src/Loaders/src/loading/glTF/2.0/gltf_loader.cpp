@@ -10,6 +10,7 @@
 #include <babylon/materials/pbr/pbr_material.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/mesh/mesh.h>
+#include <babylon/morph/morph_target_manager.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -368,12 +369,175 @@ void GLTFLoader::_loadAnimation(const string_t& context,
   }
 }
 
-void GLTFLoader::_loadAnimationChannel(const IGLTFAnimation& animation,
+void GLTFLoader::_loadAnimationChannel(IGLTFAnimation& animation,
                                        const string_t& channelContext,
                                        const IGLTFAnimationChannel& channel,
                                        const string_t& samplerContext,
                                        const IGLTFAnimationSampler& sampler)
 {
+  if (channel.target.node >= _gltf->nodes.size()) {
+    throw ::std::runtime_error(channelContext + ": Failed to find target node "
+                               + ::std::to_string(channel.target.node));
+  }
+  auto& targetNode = _gltf->nodes[channel.target.node];
+
+  string_t targetPath;
+  unsigned int animationType{0};
+  if (channel.target.path == "translation") {
+    targetPath    = "position";
+    animationType = Animation::ANIMATIONTYPE_VECTOR3;
+  }
+  else if (channel.target.path == "rotation") {
+    targetPath    = "rotationQuaternion";
+    animationType = Animation::ANIMATIONTYPE_QUATERNION;
+  }
+  else if (channel.target.path == "scale") {
+    targetPath    = "scaling";
+    animationType = Animation::ANIMATIONTYPE_VECTOR3;
+  }
+  else if (channel.target.path == "weights") {
+    targetPath    = "influence";
+    animationType = Animation::ANIMATIONTYPE_FLOAT;
+  }
+  else {
+    throw ::std::runtime_error(channelContext + ": Invalid target path "
+                               + channel.target.path);
+  }
+
+  Float32Array inputData;
+  Float32Array outputData;
+
+  const auto checkSuccess = [&]() {
+    if (inputData.empty() || outputData.empty()) {
+      return;
+    }
+
+    unsigned int outputBufferOffset = 0;
+
+    ::std::function<AnimationValue()> getNextOutputValue;
+    if (targetPath == "position") {
+      getNextOutputValue = [&]() {
+        const auto value = Vector3::FromArray(outputData, outputBufferOffset);
+        outputBufferOffset += 3;
+        return value;
+      };
+    }
+    else if (targetPath == "rotationQuaternion") {
+      getNextOutputValue = [&]() {
+        const auto value
+          = Quaternion::FromArray(outputData, outputBufferOffset);
+        outputBufferOffset += 4;
+        return value;
+      };
+    }
+    else if (targetPath == "scaling") {
+      getNextOutputValue = [&]() {
+        const auto value = Vector3::FromArray(outputData, outputBufferOffset);
+        outputBufferOffset += 3;
+        return value;
+      };
+    }
+    else if (targetPath == "influence") {
+      getNextOutputValue = [&]() {
+        const auto numTargets
+          = targetNode.babylonMesh->morphTargetManager()->numTargets();
+        Float32Array value(numTargets);
+        for (size_t i = 0; i < numTargets; i++) {
+          value[i] = outputData[outputBufferOffset++];
+        }
+        return value;
+      };
+    }
+
+    ::std::function<AnimationKey(unsigned int frameIndex)> getNextKey;
+    if (sampler.interpolation == "LINEAR") {
+      getNextKey = [&](unsigned int frameIndex) {
+        return AnimationKey{static_cast<int>(inputData[frameIndex]),
+                            getNextOutputValue()};
+      };
+    }
+    else if (sampler.interpolation == "CUBICSPLINE") {
+      getNextKey = [&](unsigned int frameIndex) {
+        AnimationKey key{static_cast<int>(inputData[frameIndex]),
+                         getNextOutputValue()};
+        key.value      = getNextOutputValue();
+        key.outTangent = getNextOutputValue();
+        return key;
+      };
+    }
+    else {
+      throw ::std::runtime_error(samplerContext + ": Invalid interpolation "
+                                 + sampler.interpolation);
+    }
+
+    vector_t<AnimationKey> keys(inputData.size());
+    for (unsigned int frameIndex = 0; frameIndex < inputData.size();
+         ++frameIndex) {
+      keys[frameIndex] = getNextKey(frameIndex);
+    }
+
+    if (targetPath == "influence") {
+      auto morphTargetManager = targetNode.babylonMesh->morphTargetManager();
+
+      for (size_t targetIndex = 0;
+           targetIndex < morphTargetManager->numTargets(); ++targetIndex) {
+        auto morphTarget   = morphTargetManager->getTarget(targetIndex);
+        auto animationName = (!animation.name.empty() ?
+                                animation.name :
+                                "anim" + ::std::to_string(animation.index))
+                             + "_" + ::std::to_string(targetIndex);
+        auto babylonAnimation = new Animation(animationName, targetPath, 1,
+                                              static_cast<int>(animationType));
+        vector_t<AnimationKey> animationKeys;
+        for (auto& key : keys) {
+          AnimationKey animationKey(static_cast<int>(key.frame), key.value);
+          animationKeys.emplace_back(animationKey);
+        }
+
+        morphTarget->animations().emplace_back(babylonAnimation);
+        animation.targets.emplace_back(morphTarget);
+      }
+    }
+    else {
+      auto animationName = (!animation.name.empty() ?
+                              animation.name :
+                              "anim" + ::std::to_string(animation.index));
+      auto babylonAnimation = new Animation(animationName, targetPath, 1,
+                                            static_cast<int>(animationType));
+      babylonAnimation->setKeys(keys);
+
+      for (auto& target : targetNode.babylonAnimationTargets) {
+        target->animations.emplace_back(babylonAnimation->clone());
+        animation.targets.emplace_back(target);
+      }
+    }
+  };
+
+  if (sampler.input >= _gltf->accessors.size()) {
+    throw ::std::runtime_error(samplerContext
+                               + ": Failed to find input accessor "
+                               + ::std::to_string(sampler.input));
+  }
+  auto& inputAccessor = _gltf->accessors[sampler.input];
+
+  _loadAccessorAsync("#/accessors/" + ::std::to_string(inputAccessor.index),
+                     inputAccessor, [&](const ArrayBufferView& data) {
+                       inputData = data.float32Array;
+                       checkSuccess();
+                     });
+
+  if (sampler.output >= _gltf->accessors.size()) {
+    throw ::std::runtime_error(samplerContext
+                               + ": Failed to find output accessor "
+                               + ::std::to_string(sampler.input));
+  }
+  auto& outputAccessor = _gltf->accessors[sampler.output];
+
+  _loadAccessorAsync("#/accessors/" + ::std::to_string(outputAccessor.index),
+                     outputAccessor, [&](const ArrayBufferView& data) {
+                       outputData = data.float32Array;
+                       checkSuccess();
+                     });
 }
 
 void GLTFLoader::_loadBufferAsync(

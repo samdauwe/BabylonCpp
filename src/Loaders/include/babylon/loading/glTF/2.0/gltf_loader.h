@@ -141,7 +141,7 @@ private:
     IGLTFNode* parentNode = nullptr);
   void _loadAnimations();
   void _loadAnimation(const string_t& context, IGLTFAnimation& animation);
-  void _loadAnimationChannel(const IGLTFAnimation& animation,
+  void _loadAnimationChannel(IGLTFAnimation& animation,
                              const string_t& channelContext,
                              const IGLTFAnimationChannel& channel,
                              const string_t& samplerContext,

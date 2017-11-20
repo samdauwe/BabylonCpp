@@ -94,7 +94,7 @@ struct IGLTFAccessor : public IGLTFChildRootProperty {
 }; // end of struct IGLTFAccessor
 
 struct IGLTFAnimationChannelTarget : public IGLTFProperty {
-  int node;
+  unsigned int node;
   string_t path;
 }; // end of struct IGLTFAnimationChannelTarget
 
@@ -104,9 +104,9 @@ struct IGLTFAnimationChannel : public IGLTFProperty {
 }; // end of struct IGLTFAnimationChannel
 
 struct IGLTFAnimationSampler : public IGLTFProperty {
-  int input;
+  unsigned int input;
   string_t interpolation;
-  int output;
+  unsigned int output;
 }; // end of struct IGLTFAnimationSampler
 
 struct IGLTFAnimation : public IGLTFChildRootProperty {
