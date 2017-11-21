@@ -133,6 +133,53 @@ GLTFLoader::_convertToFloat4ColorArray(const string_t& context,
                                        const ArrayBufferView& data,
                                        const IGLTFAccessor& accessor)
 {
+  const auto colorComponentCount = GLTFLoader::_GetNumComponents(accessor.type);
+  if (colorComponentCount == 4
+      && accessor.componentType == EComponentType::FLOAT) {
+    return data.float32Array;
+  }
+
+  auto factor = 1.f;
+  switch (accessor.componentType) {
+    case EComponentType::FLOAT: {
+      factor = 1.f;
+      break;
+    }
+    case EComponentType::UNSIGNED_BYTE: {
+      factor = 1.f / 255.f;
+      break;
+    }
+    case EComponentType::UNSIGNED_SHORT: {
+      factor = 1.f / 65535.f;
+      break;
+    }
+    default: {
+      throw ::std::runtime_error(
+        context + ": Invalid component type ("
+        + ::std::to_string(static_cast<unsigned>(accessor.componentType))
+        + ")");
+    }
+  }
+
+  Float32Array result(accessor.count * 4);
+  if (colorComponentCount == 4) {
+    for (unsigned int i = 0; i < result.size(); ++i) {
+      result[i] = buffer[i] * factor;
+    }
+  }
+  else {
+    unsigned int offset = 0;
+    for (unsigned int i = 0; i < result.size(); ++i) {
+      if ((i + 1) % 4 == 0) {
+        result[i] = 1;
+      }
+      else {
+        result[i] = buffer[offset++] * factor;
+      }
+    }
+  }
+
+  return result;
 }
 
 void GLTFLoader::_loadVertexDataAsync(
