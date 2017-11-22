@@ -116,9 +116,21 @@ void GLTFLoader::_loadMesh(const string_t& context, const IGLTFNode& node,
 }
 
 void GLTFLoader::_loadAllVertexDataAsync(
-  const string_t& context, const IGLTFMesh& mesh,
+  const string_t& context, IGLTFMesh& mesh,
   const ::std::function<void()>& onSuccess)
 {
+  auto& primitives            = mesh.primitives;
+  auto numRemainingPrimitives = primitives.size();
+  for (unsigned index = 0; index < primitives.size(); ++index) {
+    auto& primitive = primitives[index];
+    _loadVertexDataAsync(context + "/primitive/" + ::std::to_string(index),
+                         mesh, primitive, [&](const VertexData& vertexData) {
+                           primitive.vertexData = vertexData;
+                           if (--numRemainingPrimitives == 0) {
+                             onSuccess();
+                           }
+                         });
+  }
 }
 
 Float32Array
@@ -126,6 +138,35 @@ GLTFLoader::_convertToFloat4TextureCoordArray(const string_t& context,
                                               const ArrayBufferView& data,
                                               const IGLTFAccessor& accessor)
 {
+  if (accessor.componentType == EComponentType::FLOAT) {
+    return data.float32Array;
+  }
+
+  auto factor = 1.f;
+
+  switch (accessor.componentType) {
+    case EComponentType::UNSIGNED_BYTE: {
+      factor = 1.f / 255.f;
+      break;
+    }
+    case EComponentType::UNSIGNED_SHORT: {
+      factor = 1.f / 65535.f;
+      break;
+    }
+    default: {
+      throw ::std::runtime_error(
+        context + ": Invalid component type ("
+        + ::std::to_string(static_cast<unsigned>(accessor.componentType))
+        + ")");
+    }
+  }
+
+  Float32Array result(accessor.count * 2);
+  for (unsigned int i = 0; i < result.size(); ++i) {
+    result[i] = buffer[i] * factor;
+  }
+
+  return result;
 }
 
 Float32Array
@@ -140,6 +181,7 @@ GLTFLoader::_convertToFloat4ColorArray(const string_t& context,
   }
 
   auto factor = 1.f;
+
   switch (accessor.componentType) {
     case EComponentType::FLOAT: {
       factor = 1.f;

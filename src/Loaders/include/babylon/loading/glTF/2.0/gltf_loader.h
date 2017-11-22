@@ -86,7 +86,7 @@ private:
                   const vector_t<string_t>& nodeNames);
   void _loadMesh(const string_t& context, const IGLTFNode& node,
                  const IGLTFMesh& mesh);
-  void _loadAllVertexDataAsync(const string_t& context, const IGLTFMesh& mesh,
+  void _loadAllVertexDataAsync(const string_t& context, IGLTFMesh& mesh,
                                const ::std::function<void()>& onSuccess);
 
   /**
