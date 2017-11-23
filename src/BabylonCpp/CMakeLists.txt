@@ -44,7 +44,7 @@ set(META_AUTHOR_ORGANIZATION "")
 set(META_AUTHOR_DOMAIN       "")
 set(META_AUTHOR_MAINTAINER   "")
 set(META_VERSION_MAJOR       "3")
-set(META_VERSION_MINOR       "0")
+set(META_VERSION_MINOR       "1")
 set(META_VERSION_PATCH       "0")
 set(META_VERSION_REVISION    "${GIT_REV}")
 set(META_VERSION             "${META_VERSION_MAJOR}.${META_VERSION_MINOR}.${META_VERSION_PATCH}")
@@ -406,13 +406,13 @@ set_policy(CMP0037 OLD)
 # Function: Build test and add command to execute it via target 'test'
 function(add_test_without_ctest target)
     add_subdirectory(${target})
-    
+
     if(NOT TARGET ${target})
         return()
     endif()
-    
+
     add_dependencies(test ${target})
-    add_custom_command(TARGET test POST_BUILD 
+    add_custom_command(TARGET test POST_BUILD
        COMMAND $<TARGET_FILE:${target}> --gtest_output=xml:gtests-${target}.xml)
 endfunction()
 
