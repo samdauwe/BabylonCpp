@@ -7,9 +7,13 @@
 #include <babylon/engine/scene.h>
 #include <babylon/loading/glTF/2.0/gltf_loader_utils.h>
 #include <babylon/materials/material.h>
+#include <babylon/materials/multi_material.h>
 #include <babylon/materials/pbr/pbr_material.h>
 #include <babylon/materials/textures/texture.h>
+#include <babylon/mesh/geometry.h>
 #include <babylon/mesh/mesh.h>
+#include <babylon/mesh/sub_mesh.h>
+#include <babylon/mesh/vertex_data.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/tools/tools.h>
 
@@ -20,7 +24,7 @@ void GLTFLoader::RegisterExtension(GLTFLoaderExtension* extension)
 {
 }
 
-GLTFLoader::GLTFLoader(GLTFFileLoader* parent)
+GLTFLoader::GLTFLoader(GLTFFileLoader* parent) : _parent{parent}
 {
 }
 
@@ -30,18 +34,25 @@ GLTFLoader::~GLTFLoader()
 
 void GLTFLoader::dispose()
 {
+  if (_disposed) {
+    return;
+  }
+
+  _disposed = true;
 }
 
 void GLTFLoader::importMeshAsync(
   const vector_t<string_t>& meshesNames, Scene* scene,
-  const IGLTFLoaderData& data, const vector_t<string_t>& rootUrl,
-  const ::std::function<void(
-    const vector_t<AbstractMesh*>& meshes,
-    const vector_t<ParticleSystem*>& particleSystems,
-    const vector_t<Skeleton*>& skeletons,
-    const ::std::function<void(const ProgressEvent& event)>& onProgress,
-    const ::std::function<void(const string_t& message)>& onError)>& onSuccess)
+  const IGLTFLoaderData& data, const string_t& rootUrl,
+  const ::std::function<void(const vector_t<AbstractMesh*>& meshes,
+                             const vector_t<ParticleSystem*>& particleSystems,
+                             const vector_t<Skeleton*>& skeletons)>& onSuccess,
+  const ::std::function<void(const ProgressEvent& event)>& onProgress,
+  const ::std::function<void(const string_t& message)>& onError)
 {
+  _loadAsync(meshesNames, scene, data, rootUrl,
+             [&]() { onSuccess(_getMeshes(), {}, _getSkeletons()); },
+             onProgress, onError);
 }
 
 void GLTFLoader::loadAsync(
@@ -50,6 +61,7 @@ void GLTFLoader::loadAsync(
   const ::std::function<void(const ProgressEvent& event)>& onProgress,
   const ::std::function<void(const string_t& message)>& onError)
 {
+  _loadAsync({}, scene, data, rootUrl, onSuccess, onProgress, onError);
 }
 
 void GLTFLoader::_loadAsync(
@@ -59,22 +71,57 @@ void GLTFLoader::_loadAsync(
   const ::std::function<void(const ProgressEvent& event)>& onProgress,
   const ::std::function<void(const string_t& message)>& onError)
 {
+  _tryCatchOnError([&] {
+    _loadData(data);
+    _babylonScene = scene;
+    _rootUrl      = rootUrl;
+
+    _successCallback  = onSuccess;
+    _progressCallback = onProgress;
+    _errorCallback    = onError;
+
+    _addPendingData(this);
+    _loadDefaultScene(nodeNames);
+    _loadAnimations();
+    _removePendingData(this);
+  });
 }
 
 void GLTFLoader::_onProgress(const ProgressEvent& event)
 {
+  if (_progressCallback) {
+    _progressCallback(event);
+  }
 }
 
-void GLTFLoader::_executeWhenRenderReady(const ::std::function<void()>& func)
+void GLTFLoader::_executeWhenRenderReady(
+  const ::std::function<void(GLTFLoader* loader, EventState& es)>& func)
 {
+  if (_renderReady) {
+    EventState es{0};
+    func(nullptr, es);
+  }
+  else {
+    _renderReadyObservable.add(func);
+  }
 }
 
 void GLTFLoader::_onRenderReady()
 {
+  _rootNode->babylonMesh->setEnabled(true);
+
+  _startAnimations();
+  _successCallback();
+  _renderReadyObservable.notifyObservers(this);
 }
 
 void GLTFLoader::_onComplete()
 {
+  if (_parent->onComplete) {
+    _parent->onComplete();
+  }
+
+  dispose();
 }
 
 void GLTFLoader::_loadData(const IGLTFLoaderData& data)
@@ -83,27 +130,138 @@ void GLTFLoader::_loadData(const IGLTFLoaderData& data)
 
 vector_t<AbstractMesh*> GLTFLoader::_getMeshes()
 {
+  vector_t<AbstractMesh*> meshes;
+
+  // Root mesh is always first.
+  meshes.emplace_back(_rootNode->babylonMesh);
+
+  const auto& nodes = _gltf->nodes;
+  if (!nodes.empty()) {
+    for (const auto& node : nodes) {
+      if (node.babylonMesh) {
+        meshes.emplace_back(node.babylonMesh);
+      }
+    }
+  }
+
+  return meshes;
 }
 
 vector_t<Skeleton*> GLTFLoader::_getSkeletons()
 {
+  vector_t<Skeleton*> skeletons;
+
+  const auto& skins = _gltf->skins;
+  if (!skins.empty()) {
+    for (const auto& skin : skins) {
+      if (skin.babylonSkeleton) {
+        skeletons.emplace_back(skin.babylonSkeleton);
+      }
+    }
+  }
+
+  return skeletons;
 }
 
 vector_t<Node*> GLTFLoader::_getAnimationTargets()
 {
+  vector_t<Node*> targets;
+
+  const auto& animations = _gltf->animations;
+  if (!animations.empty()) {
+    for (const auto& animation : animations) {
+      stl_util::concat(targets, animation.targets);
+    }
+  }
+
+  return targets;
 }
 
 void GLTFLoader::_startAnimations()
 {
+  for (const auto& target : _getAnimationTargets()) {
+    _babylonScene->beginAnimation(target, 0, numeric_limits_t<int>::max(),
+                                  true);
+  }
 }
 
 void GLTFLoader::_loadDefaultScene(const vector_t<string_t>& nodeNames)
 {
+  const auto index = _gltf->scene ? *_gltf->scene : 0u;
+  if (index >= _gltf->scenes.size()) {
+    throw ::std::runtime_error("Failed to find scene "
+                               + ::std::to_string(index));
+  }
+  auto& scene = _gltf->scenes[index];
+
+  _loadScene("#/scenes/" + ::std::to_string(index), scene, nodeNames);
 }
 
 void GLTFLoader::_loadScene(const string_t& context, const IGLTFScene& scene,
                             const vector_t<string_t>& nodeNames)
 {
+  _rootNode->babylonMesh = Mesh::New("__root__", _babylonScene);
+
+  switch (_parent->coordinateSystemMode) {
+    case GLTFLoaderCoordinateSystemMode::AUTO: {
+      if (!_babylonScene.useRightHandedSystem) {
+        _rootNode->babylonMesh->setRotation(Vector3(0.f, Math::PI, 0.f));
+        _rootNode->babylonMesh->setScaling(Vector3(1.f, 1.f, -1.f));
+      }
+      break;
+    }
+    case GLTFLoaderCoordinateSystemMode::PASS_THROUGH: {
+      // do nothing
+      break;
+    }
+    case GLTFLoaderCoordinateSystemMode::FORCE_RIGHT_HANDED: {
+      _babylonScene->useRightHandedSystem = true;
+      break;
+    }
+    default: {
+      throw ::std::runtime_error("Invalid coordinate system mode "
+                                 + _parent->coordinateSystemMode);
+      return;
+    }
+  }
+
+  auto nodeIndices = scene.nodes;
+
+  _traverseNodes(context, nodeIndices,
+                 [](IGLTFNode* node, IGLTFNode* parentNode) {
+                   node->parent = parentNode;
+                   return true;
+                 },
+                 _rootNode);
+
+  if (!nodeNames.empty()) {
+    Uint32Array filteredNodeIndices;
+    _traverseNodes(context, nodeIndices,
+                   [&](IGLTFNode* node, IGLTFNode* /*parentNode*/) {
+                     if (stl_util::contains(nodeNames, node->name)) {
+                       filteredNodeIndices.emplace_back(node->index);
+                       return false;
+                     }
+
+                     return true;
+                   },
+                   _rootNode);
+
+    nodeIndices = filteredNodeIndices;
+  }
+
+  for (const auto& index : nodeIndices) {
+    if (index >= _gltf->nodes.size()) {
+      throw ::std::runtime_error(context + ": Failed to find node "
+                                 + ::std::to_string(index));
+    }
+    auto& node = _gltf->nodes[index];
+
+    _loadNode("#/nodes/" + ::std::to_string(index), node);
+  }
+
+  // Disable the root mesh until the asset is ready to render.
+  _rootNode->babylonMesh->setEnabled(false);
 }
 
 void GLTFLoader::_loadNode(const string_t& context, const IGLTFNode& node)
@@ -111,8 +269,85 @@ void GLTFLoader::_loadNode(const string_t& context, const IGLTFNode& node)
 }
 
 void GLTFLoader::_loadMesh(const string_t& context, const IGLTFNode& node,
-                           const IGLTFMesh& mesh)
+                           IGLTFMesh& mesh)
 {
+  const auto& primitives = mesh.primitives;
+  if (primitives.empty()) {
+    throw ::std::runtime_error(context + ": Primitives are missing");
+  }
+
+  _createMorphTargets(context, node, mesh);
+
+  _loadAllVertexDataAsync(context, mesh, [&]() {
+    _loadMorphTargets(context, node, mesh);
+
+    VertexData vertexData;
+    for (const auto& primitive : primitives) {
+      vertexData.merge(primitive->vertexData);
+    }
+
+    Geometry::New(node.babylonMesh->name, _babylonScene, vertexData, false,
+                  node.babylonMesh);
+
+    // TODO: optimize this so that sub meshes can be created without being
+    // overwritten after setting vertex data.
+    // Sub meshes must be cleared and created after setting vertex data because
+    // of mesh._createGlobalSubMesh.
+    node.babylonMesh->subMeshes.clear();
+
+    size_t verticesStart = 0;
+    size_t indicesStart  = 0;
+    for (unsigned int index = 0; index < primitives.size(); index++) {
+      const auto& vertexData    = primitives[index]->vertexData;
+      const auto& verticesCount = vertexData->positions.size();
+      const auto& indicesCount  = vertexData->indices.size();
+      SubMesh::AddToMesh(index, verticesStart, verticesCount, indicesStart,
+                         indicesCount, node.babylonMesh);
+      verticesStart += verticesCount;
+      indicesStart += indicesCount;
+    };
+  });
+
+  const auto multiMaterial
+    = MultiMaterial::New(node.babylonMesh->name, _babylonScene);
+  node.babylonMesh->setMaterial(multiMaterial);
+  const auto& subMaterials = multiMaterial->subMaterials();
+  for (unsigned int index = 0; index < primitives.size(); index++) {
+    const auto& primitive = primitives[index];
+
+    if (primitive->material == nullptr) {
+      subMaterials[index] = _getDefaultMaterial();
+    }
+    else {
+      if (primitive->material >= _gltf->materials.size()) {
+        throw ::std::runtime_error(context + ": Failed to find material "
+                                   + ::std::to_string(primitive->material));
+      }
+      auto& material = _gltf->materials[primitive->material];
+
+      _loadMaterial("#/materials/" + ::std::to_string(material.index), material,
+                    [&](Material* babylonMaterial, bool isNew) {
+                      if (isNew && _parent->onMaterialLoaded) {
+                        _parent->onMaterialLoaded(babylonMaterial);
+                      }
+
+                      if (_parent->onBeforeMaterialReadyAsync) {
+                        _addLoaderPendingData(material);
+                        _parent->onBeforeMaterialReadyAsync(
+                          babylonMaterial, node.babylonMesh,
+                          subMaterials[index] != null, []() {
+                            _tryCatchOnError([&]() {
+                              subMaterials[index] = babylonMaterial;
+                              _removeLoaderPendingData(material);
+                            });
+                          });
+                      }
+                      else {
+                        subMaterials[index] = babylonMaterial;
+                      }
+                    });
+    }
+  };
 }
 
 void GLTFLoader::_loadAllVertexDataAsync(
@@ -388,7 +623,7 @@ Matrix GLTFLoader::_getNodeMatrix(const IGLTFNode& node)
 
 void GLTFLoader::_traverseNodes(
   const string_t& context, const Uint32Array& indices,
-  ::std::function<bool(IGLTFNode* node, IGLTFNode* parentNode)>& action,
+  const ::std::function<bool(IGLTFNode* node, IGLTFNode* parentNode)>& action,
   IGLTFNode* parentNode)
 {
   for (const auto& index : indices) {

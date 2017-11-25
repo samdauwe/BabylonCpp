@@ -30,20 +30,20 @@ public:
   void dispose();
   void importMeshAsync(
     const vector_t<string_t>& meshesNames, Scene* scene,
-    const IGLTFLoaderData& data, const vector_t<string_t>& rootUrl,
-    const ::std::function<void(
-      const vector_t<AbstractMesh*>& meshes,
-      const vector_t<ParticleSystem*>& particleSystems,
-      const vector_t<Skeleton*>& skeletons,
-      const ::std::function<void(const ProgressEvent& event)>& onProgress,
-      const ::std::function<void(const string_t& message)>& onError)>&
-      onSuccess);
+    const IGLTFLoaderData& data, const string_t& rootUrl,
+    const ::std::function<void(const vector_t<AbstractMesh*>& meshes,
+                               const vector_t<ParticleSystem*>& particleSystems,
+                               const vector_t<Skeleton*>& skeletons)>&
+      onSuccess,
+    const ::std::function<void(const ProgressEvent& event)>& onProgress,
+    const ::std::function<void(const string_t& message)>& onError);
   void
   loadAsync(Scene* scene, const IGLTFLoaderData& data, const string_t& rootUrl,
             const ::std::function<void()>& onSuccess,
             const ::std::function<void(const ProgressEvent& event)>& onProgress,
             const ::std::function<void(const string_t& message)>& onError);
-  void _executeWhenRenderReady(const ::std::function<void()>& func);
+  void _executeWhenRenderReady(
+    const ::std::function<void(GLTFLoader* loader, EventState& es)>& func);
   void _loadNode(const string_t& context, const IGLTFNode& node);
   void _traverseNode(
     const string_t& context, IGLTFNode* node,
@@ -85,7 +85,7 @@ private:
   void _loadScene(const string_t& context, const IGLTFScene& scene,
                   const vector_t<string_t>& nodeNames);
   void _loadMesh(const string_t& context, const IGLTFNode& node,
-                 const IGLTFMesh& mesh);
+                 IGLTFMesh& mesh);
   void _loadAllVertexDataAsync(const string_t& context, IGLTFMesh& mesh,
                                const ::std::function<void()>& onSuccess);
 
@@ -137,7 +137,7 @@ private:
   Matrix _getNodeMatrix(const IGLTFNode& node);
   void _traverseNodes(
     const string_t& context, const Uint32Array& indices,
-    ::std::function<bool(IGLTFNode* node, IGLTFNode* parentNode)>& action,
+    const ::std::function<bool(IGLTFNode* node, IGLTFNode* parentNode)>& action,
     IGLTFNode* parentNode = nullptr);
   void _loadAnimations();
   void _loadAnimation(const string_t& context, IGLTFAnimation& animation);

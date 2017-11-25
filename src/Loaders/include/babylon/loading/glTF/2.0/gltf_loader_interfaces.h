@@ -115,7 +115,7 @@ struct IGLTFAnimation : public IGLTFChildRootProperty {
 
   // Runtime values
   int index;
-  vector_t<string_t> targets;
+  vector_t<Node*> targets;
 }; // end of struct IGLTFAnimation
 
 struct IGLTFAsset : public IGLTFChildRootProperty {
@@ -218,7 +218,7 @@ struct IGLTFMeshPrimitive : public IGLTFProperty {
 }; // end of struct IGLTFMeshPrimitive
 
 struct IGLTFMesh : public IGLTFChildRootProperty {
-  vector_t<IGLTFMeshPrimitive> primitives;
+  vector_t<IGLTFMeshPrimitive*> primitives;
   Float32Array weights;
   // Runtime values
   int index;
@@ -250,7 +250,7 @@ struct IGLTFSampler : public IGLTFChildRootProperty {
 }; // end of struct IGLTFSampler
 
 struct IGLTFScene : public IGLTFChildRootProperty {
-  Float32Array nodes;
+  Uint32Array nodes;
   // Runtime values
   int index;
 }; // end of struct IGLTFScene
@@ -287,7 +287,7 @@ struct IGLTF : public IGLTFProperty {
   vector_t<IGLTFMesh> meshes;
   vector_t<IGLTFNode> nodes;
   vector_t<IGLTFSampler> sampler;
-  int scene;
+  Nullable<unsigned int> scene;
   vector_t<IGLTFScene> scenes;
   vector_t<IGLTFSkin> skins;
   vector_t<IGLTFTexture> textures;
