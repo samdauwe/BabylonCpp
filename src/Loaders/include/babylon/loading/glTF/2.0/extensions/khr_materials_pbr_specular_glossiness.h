@@ -6,6 +6,10 @@
 namespace BABYLON {
 namespace GLTF2 {
 
+class GLTFLoader;
+struct IGLTFMaterial;
+struct IKHRMaterialsPbrSpecularGlossiness;
+
 class BABYLON_SHARED_EXPORT KHRMaterialsPbrSpecularGlossiness
   : public GLTFLoaderExtension {
 
@@ -20,8 +24,7 @@ protected:
 
 private:
   void _loadSpecularGlossinessProperties(
-    const GLTFLoader& loader, const string_t& context,
-    const IGLTFMaterial& material,
+    GLTFLoader& loader, const string_t& context, IGLTFMaterial& material,
     const IKHRMaterialsPbrSpecularGlossiness& properties);
 
 }; // end of class KHRMaterialsPbrSpecularGlossiness
