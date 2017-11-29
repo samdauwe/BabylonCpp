@@ -64,7 +64,8 @@ set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(TESTS_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 
 # Header files
-file(GLOB LOADERS_HDR_FILES   ${INCLUDE_PATH}/loading/glTF/2.0/*.h
+file(GLOB LOADERS_HDR_FILES   ${INCLUDE_PATH}/loading/glTF/*.h
+                              ${INCLUDE_PATH}/loading/glTF/2.0/*.h
                               ${INCLUDE_PATH}/loading/glTF/2.0/extensions/*.h)
 
 set(BABYLON_LOADERS_HEADERS
@@ -72,7 +73,8 @@ set(BABYLON_LOADERS_HEADERS
 )
 
 # Source files
-file(GLOB LOADERS_SRC_FILES   ${SOURCE_PATH}/loading/glTF/2.0/*.cpp
+file(GLOB LOADERS_SRC_FILES   ${SOURCE_PATH}/loading/glTF/*.cpp
+                              ${SOURCE_PATH}/loading/glTF/2.0/*.cpp
                               ${SOURCE_PATH}/loading/glTF/2.0/extensions/*.cpp)
 
 set(BABYLON_LOADERS_SOURCES
@@ -185,13 +187,13 @@ set_policy(CMP0037 OLD)
 # Function: Build test and add command to execute it via target 'test'
 function(add_test_without_ctest target)
     add_subdirectory(${target})
-    
+
     if(NOT TARGET ${target})
         return()
     endif()
-    
+
     add_dependencies(test ${target})
-    add_custom_command(TARGET test POST_BUILD 
+    add_custom_command(TARGET test POST_BUILD
        COMMAND $<TARGET_FILE:${target}> --gtest_output=xml:gtests-${target}.xml)
 endfunction()
 
