@@ -268,6 +268,19 @@ public:
   Vector3& normalize();
 
   /**
+   * Normalize the current Vector3 to a new vector.
+   * @returns the new Vector3.
+   */
+  Vector3 normalizeToNew() const;
+
+  /**
+   * Normalize the current Vector3 to the reference.
+   * @param the reference to update.
+   * @returns the updated Vector3.
+   */
+  Vector3 normalizeToRef(Vector3& reference) const;
+
+  /**
    * @brief Copies the passed vector coordinates to the current Vector3 ones.
    * @returns The updated Vector3.
    */
@@ -483,6 +496,15 @@ public:
   static Vector3 Unproject(const Vector3& source, float viewportWidth,
                            float viewportHeight, Matrix& world, Matrix& view,
                            Matrix& projection);
+
+  static void UnprojectToRef(const Vector3& source, float viewportWidth,
+                             float viewportHeight, Matrix& world, Matrix& view,
+                             Matrix& projection, Vector3& result);
+
+  static void UnprojectFloatsToRef(float sourceX, float sourceY, float sourceZ,
+                                   float viewportWidth, float viewportHeight,
+                                   Matrix& world, Matrix& view,
+                                   Matrix& projection, Vector3& result);
 
   static Vector3 Minimize(const Vector3& left, const Vector3& right);
 

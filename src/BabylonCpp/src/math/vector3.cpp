@@ -454,7 +454,6 @@ float Vector3::lengthSquared() const
 Vector3& Vector3::normalize()
 {
   const float len = length();
-
   if (stl_util::almost_equal(len, 0.f) || stl_util::almost_equal(len, 1.f)) {
     return *this;
   }
@@ -466,6 +465,26 @@ Vector3& Vector3::normalize()
   z *= num;
 
   return *this;
+}
+
+Vector3 Vector3::normalizeToNew() const
+{
+  Vector3 normalized(0.f, 0.f, 0.f);
+  normalizeToRef(normalized);
+  return normalized;
+}
+
+Vector3 Vector3::normalizeToRef(Vector3& reference) const
+{
+  const float len = length();
+  if (stl_util::almost_equal(len, 0.f) || stl_util::almost_equal(len, 1.f)) {
+    reference.set(x, y, z);
+    return reference;
+  }
+
+  const auto scale = 1.f / len;
+  scaleToRef(scale, reference);
+  return reference;
 }
 
 Vector3& Vector3::copyFrom(const Vector3& source)
@@ -835,22 +854,44 @@ Vector3 Vector3::Unproject(const Vector3& source, float viewportWidth,
                            float viewportHeight, Matrix& world, Matrix& view,
                            Matrix& projection)
 {
+  auto result = Vector3::Zero();
+
+  Vector3::UnprojectToRef(source, viewportWidth, viewportHeight, world, view,
+                          projection, result);
+
+  return result;
+}
+
+void Vector3::UnprojectToRef(const Vector3& source, float viewportWidth,
+                             float viewportHeight, Matrix& world, Matrix& view,
+                             Matrix& projection, Vector3& result)
+{
+  Vector3::UnprojectFloatsToRef(source.x, source.y, source.z, viewportWidth,
+                                viewportHeight, world, view, projection,
+                                result);
+}
+
+void Vector3::UnprojectFloatsToRef(float sourceX, float sourceY, float sourceZ,
+                                   float viewportWidth, float viewportHeight,
+                                   Matrix& world, Matrix& view,
+                                   Matrix& projection, Vector3& result)
+{
   auto& matrix = MathTmp::MatrixArray[0];
   world.multiplyToRef(view, matrix);
   matrix.multiplyToRef(projection, matrix);
   matrix.invert();
-  Vector3 screenSource(source.x / viewportWidth * 2.f - 1.f,
-                       -(source.y / viewportHeight * 2.f - 1.f),
-                       2.f * source.z - 1.f);
-  auto vector    = Vector3::TransformCoordinates(screenSource, matrix);
-  const auto num = screenSource.x * matrix.m[3] + screenSource.y * matrix.m[7]
-                   + screenSource.z * matrix.m[11] + matrix.m[15];
+
+  auto& screenSource = MathTmp::Vector3Array[0];
+  screenSource.x     = sourceX / viewportWidth * 2.f - 1.f;
+  screenSource.y     = -(sourceY / viewportHeight * 2.f - 1.f);
+  screenSource.z     = 2.f * sourceZ - 1.f;
+  Vector3::TransformCoordinatesToRef(screenSource, matrix, result);
+  auto num = screenSource.x * matrix.m[3] + screenSource.y * matrix.m[7]
+             + screenSource.z * matrix.m[11] + matrix.m[15];
 
   if (Scalar::WithinEpsilon(num, 1.f)) {
-    vector = vector.scale(1.f / num);
+    result.scaleInPlace(1.f / num);
   }
-
-  return vector;
 }
 
 Vector3 Vector3::Minimize(const Vector3& left, const Vector3& right)
