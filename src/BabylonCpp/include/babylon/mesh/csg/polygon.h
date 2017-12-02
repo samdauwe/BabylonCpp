@@ -2,7 +2,7 @@
 #define BABYLON_MESH_CSG_POLYGON_H
 
 #include <babylon/babylon_global.h>
-
+#include <babylon/core/nullable.h>
 #include <babylon/mesh/csg/plane.h>
 
 namespace BABYLON {
@@ -24,27 +24,23 @@ struct BABYLON_SHARED_EXPORT PolygonOptions {
 class BABYLON_SHARED_EXPORT Polygon {
 
 public:
-  Polygon(const vector_t<Vertex*>& vertices, const PolygonOptions& shared);
+  Polygon(const vector_t<Vertex>& vertices, const PolygonOptions& shared);
   Polygon(const Polygon& otherPolygon);
   Polygon(Polygon&& otherPolygon);
   Polygon& operator=(const Polygon& otherPolygon);
   Polygon& operator=(Polygon&& otherPolygon);
   ~Polygon();
   Polygon clone() const;
-  Polygon* cloneToNewObject() const;
+  unique_ptr_t<Polygon> cloneToNewObject() const;
   friend std::ostream& operator<<(std::ostream& os, const Polygon& polygon);
   string_t toString() const;
 
   void flip();
-  bool hasPlane() const;
 
 public:
-  vector_t<Vertex*> vertices;
+  vector_t<Vertex> vertices;
   PolygonOptions shared;
-  Plane plane;
-
-private:
-  bool _hasPlane;
+  Nullable<Plane> plane;
 
 }; // end of class Polygon
 

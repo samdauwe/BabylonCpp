@@ -57,9 +57,9 @@ CSG::Plane CSG::Plane::clone() const
   return Plane(*this);
 }
 
-CSG::Plane* CSG::Plane::cloneToNewObject() const
+unique_ptr_t<CSG::Plane> CSG::Plane::cloneToNewObject() const
 {
-  return new Plane(*this);
+  return ::std::make_unique<BABYLON::CSG::Plane>(*this);
 }
 
 namespace CSG {
@@ -84,18 +84,17 @@ void CSG::Plane::flip()
 }
 
 void BABYLON::CSG::Plane::splitPolygon(
-  BABYLON::CSG::Polygon* polygon,
-  vector_t<BABYLON::CSG::Polygon*>& coplanarFront,
-  vector_t<BABYLON::CSG::Polygon*>& coplanarBack,
-  vector_t<BABYLON::CSG::Polygon*>& front,
-  vector_t<BABYLON::CSG::Polygon*>& back)
+  const BABYLON::CSG::Polygon& polygon,
+  vector_t<BABYLON::CSG::Polygon>& coplanarFront,
+  vector_t<BABYLON::CSG::Polygon>& coplanarBack,
+  vector_t<BABYLON::CSG::Polygon>& front, vector_t<BABYLON::CSG::Polygon>& back)
 {
   // Classify each point as well as the entire polygon into one of the above
   // four classes.
   int polygonType = 0;
   Int32Array types;
-  for (unsigned int i = 0; i < polygon->vertices.size(); ++i) {
-    const float t = Vector3::Dot(normal, polygon->vertices[i]->pos) - w;
+  for (unsigned int i = 0; i < polygon.vertices.size(); ++i) {
+    const float t = Vector3::Dot(normal, polygon.vertices[i].pos) - w;
     int type
       = (t < -Plane::EPSILON) ? BACK : (t > Plane::EPSILON) ? FRONT : COPLANAR;
     polygonType |= type;
@@ -106,8 +105,8 @@ void BABYLON::CSG::Plane::splitPolygon(
   switch (polygonType) {
     case COPLANAR:
     default:
-      (Vector3::Dot(normal, polygon->plane.normal) > 0 ? coplanarFront :
-                                                         coplanarBack)
+      (Vector3::Dot(normal, (*polygon.plane).normal) > 0 ? coplanarFront :
+                                                           coplanarBack)
         .emplace_back(polygon);
       break;
     case FRONT:
@@ -117,37 +116,37 @@ void BABYLON::CSG::Plane::splitPolygon(
       back.emplace_back(polygon);
       break;
     case SPANNING:
-      vector_t<BABYLON::CSG::Vertex*> f, b;
-      for (size_t i = 0; i < polygon->vertices.size(); ++i) {
-        size_t j = (i + 1) % polygon->vertices.size();
+      vector_t<BABYLON::CSG::Vertex> f, b;
+      for (size_t i = 0; i < polygon.vertices.size(); ++i) {
+        size_t j = (i + 1) % polygon.vertices.size();
         int ti = types[i], tj = types[j];
-        Vertex *vi = polygon->vertices[i], *vj = polygon->vertices[j];
+        Vertex vi = polygon.vertices[i], vj = polygon.vertices[j];
         if (ti != BACK) {
           f.emplace_back(vi);
         }
         if (ti != FRONT) {
-          b.emplace_back(ti != BACK ? new Vertex(*vi) : vi);
+          b.emplace_back(ti != BACK ? Vertex(vi) : vi);
         }
         if ((ti == SPANNING) || (tj == SPANNING)) {
-          float t = (w - Vector3::Dot(normal, vi->pos))
-                    / Vector3::Dot(normal, vj->pos.subtract(vi->pos));
-          BABYLON::CSG::Vertex v = vi->interpolate(*vj, t);
-          f.emplace_back(new BABYLON::CSG::Vertex(v));
-          b.emplace_back(new BABYLON::CSG::Vertex(v));
+          float t = (w - Vector3::Dot(normal, vi.pos))
+                    / Vector3::Dot(normal, vj.pos.subtract(vi.pos));
+          BABYLON::CSG::Vertex v = vi.interpolate(vj, t);
+          f.emplace_back(BABYLON::CSG::Vertex(v));
+          b.emplace_back(BABYLON::CSG::Vertex(v));
         }
       }
       if (f.size() >= 3) {
-        Polygon* poly = new Polygon(f, polygon->shared);
+        Polygon poly(f, polygon.shared);
 
-        if (poly->hasPlane()) {
+        if (poly.plane) {
           front.emplace_back(poly);
         }
       }
 
       if (b.size() >= 3) {
-        Polygon* poly = new Polygon(b, polygon->shared);
+        Polygon poly(b, polygon.shared);
 
-        if (poly->hasPlane()) {
+        if (poly.plane) {
           back.emplace_back(poly);
         }
       }
@@ -156,16 +155,15 @@ void BABYLON::CSG::Plane::splitPolygon(
   }
 }
 
-CSG::Plane CSG::Plane::FromPoints(const Vector3& a, const Vector3& b,
-                                  const Vector3& c, bool& hasPlane)
+Nullable<CSG::Plane> CSG::Plane::FromPoints(const Vector3& a, const Vector3& b,
+                                            const Vector3& c)
 {
   const auto v0 = c.subtract(a);
   const auto v1 = b.subtract(a);
 
   if (stl_util::almost_equal(v0.lengthSquared(), 0.f)
       || stl_util::almost_equal(v1.lengthSquared(), 0.f)) {
-    hasPlane = false;
-    return Plane();
+    return nullptr;
   }
 
   const Vector3 n = Vector3::Normalize(Vector3::Cross(v0, v1));

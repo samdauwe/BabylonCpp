@@ -21,36 +21,36 @@ class BABYLON_SHARED_EXPORT Node {
 
 public:
   Node();
-  Node(const vector_t<BABYLON::CSG::Polygon*>& polygons);
+  Node(const vector_t<Polygon>& polygons);
   ~Node();
 
-  Node* clone();
+  unique_ptr_t<Node> clone();
 
   // Convert solid space to empty space and empty space to solid space.
   void invert();
 
   // Recursively remove all polygons in `polygons` that are inside this BSP
   // tree.
-  vector_t<Polygon*> clipPolygons(const vector_t<Polygon*>& polygons);
+  vector_t<Polygon> clipPolygons(const vector_t<Polygon>& polygons);
 
   // Remove all polygons in this BSP tree that are inside the other BSP tree
   // `bsp`.
-  void clipTo(Node* bsp);
+  void clipTo(Node& bsp);
 
   // Return a list of all polygons in this BSP tree.
-  vector_t<Polygon*> allPolygons();
+  vector_t<Polygon> allPolygons();
 
   // Build a BSP tree out of `polygons`. When called on an existing tree, the
   // new polygons are filtered down to the bottom of the tree and become new
   // nodes there. Each set of polygons is partitioned using the first polygon
   // (no heuristic is used to pick a good split).
-  void build(const vector_t<Polygon*>& polygons);
+  void build(const vector_t<Polygon>& polygons);
 
 private:
-  Plane* _plane;
-  Node* _front;
-  Node* _back;
-  vector_t<Polygon*> _polygons;
+  unique_ptr_t<Plane> _plane;
+  unique_ptr_t<Node> _front;
+  unique_ptr_t<Node> _back;
+  vector_t<Polygon> _polygons;
 
 }; // end of class Node
 

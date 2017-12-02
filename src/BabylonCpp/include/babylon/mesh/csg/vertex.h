@@ -30,7 +30,7 @@ public:
   Vertex& operator=(Vertex&& otherVertex);
   ~Vertex();
   Vertex clone() const;
-  Vertex* cloneToNewObject() const;
+  unique_ptr_t<Vertex> cloneToNewObject() const;
   friend std::ostream& operator<<(std::ostream& os, const Vertex& vertex);
   string_t toString() const;
 

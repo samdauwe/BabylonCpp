@@ -49,9 +49,9 @@ CSG::Vertex CSG::Vertex::clone() const
   return Vertex(*this);
 }
 
-CSG::Vertex* CSG::Vertex::cloneToNewObject() const
+unique_ptr_t<CSG::Vertex> CSG::Vertex::cloneToNewObject() const
 {
-  return new Vertex(*this);
+  return ::std::make_unique<Vertex>(*this);
 }
 
 namespace CSG {

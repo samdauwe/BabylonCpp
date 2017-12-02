@@ -2,8 +2,8 @@
 #define BABYLON_MESH_CSG_CSG_H
 
 #include <babylon/babylon_global.h>
-
 #include <babylon/math/matrix.h>
+#include <babylon/math/quaternion.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
@@ -19,27 +19,27 @@ public:
   ~CSG();
 
   // Convert BABYLON.Mesh to BABYLON.CSG
-  static CSG* FromMesh(Mesh* mesh);
+  static unique_ptr_t<CSG> FromMesh(Mesh* mesh);
 
-  CSG* clone();
-  CSG* _union(CSG* csg);
+  unique_ptr_t<CSG> clone() const;
+  CSG& _union(const CSG& csg);
   void unionInPlace(CSG* csg);
-  CSG* subtract(CSG* csg);
+  CSG& subtract(const CSG& csg);
   void subtractInPlace(CSG* csg);
-  CSG* intersect(CSG* csg);
+  CSG& intersect(const CSG& csg);
   void intersectInPlace(CSG* csg);
 
   // Return a new BABYLON.CSG solid with solid and empty space switched. This
   // solid is
   // not modified.
-  CSG* inverse();
+  unique_ptr_t<CSG> inverse();
 
   void inverseInPlace();
 
   // This is used to keep meshes transformations so they can be restored
   // when we build back a Babylon Mesh
   // NB : All CSG operations are performed in world coordinates
-  CSG* copyTransformAttributes(CSG* csg);
+  CSG& copyTransformAttributes(const CSG& csg);
 
   // Build Raw mesh from CSG
   // Coordinates here are in world space
@@ -53,19 +53,18 @@ public:
 private:
   // Construct a BABYLON.CSG solid from a list of `BABYLON.CSG.Polygon`
   // instances.
-  static CSG* FromPolygons(const vector_t<Polygon*>& polygons);
-  vector_t<Polygon*>& toPolygons();
+  static unique_ptr_t<CSG> FromPolygons(const vector_t<Polygon>& polygons);
 
 public:
   Matrix matrix;
   Vector3 position;
-  Vector3* rotation;
-  Quaternion* rotationQuaternion;
+  Nullable<Vector3> rotation;
+  Nullable<Quaternion> rotationQuaternion;
   Vector3 scaling;
 
 private:
   static unsigned int currentCSGMeshId;
-  vector_t<Polygon*> _polygons;
+  vector_t<Polygon> _polygons;
 
 }; // end of class CSG
 

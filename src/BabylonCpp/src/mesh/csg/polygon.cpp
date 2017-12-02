@@ -4,12 +4,11 @@
 
 namespace BABYLON {
 
-CSG::Polygon::Polygon(const vector_t<Vertex*>& _vertices,
+CSG::Polygon::Polygon(const vector_t<Vertex>& _vertices,
                       const PolygonOptions& _shared)
-    : vertices{_vertices}, shared{_shared}, _hasPlane{true}
+    : vertices{_vertices}, shared{_shared}
 {
-  plane = Plane::FromPoints(vertices[0]->pos, vertices[1]->pos,
-                            vertices[2]->pos, _hasPlane);
+  plane = Plane::FromPoints(vertices[0].pos, vertices[1].pos, vertices[2].pos);
 }
 
 CSG::Polygon::Polygon(const BABYLON::CSG::Polygon& otherPolygon)
@@ -55,9 +54,9 @@ CSG::Polygon CSG::Polygon::clone() const
   return Polygon(*this);
 }
 
-CSG::Polygon* CSG::Polygon::cloneToNewObject() const
+unique_ptr_t<CSG::Polygon> CSG::Polygon::cloneToNewObject() const
 {
-  return new Polygon(*this);
+  return ::std::make_unique<Polygon>(*this);
 }
 
 namespace CSG {
@@ -87,14 +86,13 @@ void CSG::Polygon::flip()
 {
   std::reverse(vertices.begin(), vertices.end());
   for (auto& vertex : vertices) {
-    vertex->flip();
+    vertex.flip();
   }
-  plane.flip();
-}
-
-bool CSG::Polygon::hasPlane() const
-{
-  return _hasPlane;
+  if (plane) {
+    auto planeTmp = (*plane);
+    planeTmp.flip();
+    plane = planeTmp;
+  }
 }
 
 } // end of namespace BABYLON

@@ -2,7 +2,7 @@
 #define BABYLON_MESH_CSG_PLANE_H
 
 #include <babylon/babylon_global.h>
-
+#include <babylon/core/nullable.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
@@ -33,7 +33,7 @@ public:
   Plane& operator=(Plane&& otherPlane);
   ~Plane();
   Plane clone() const;
-  Plane* cloneToNewObject() const;
+  unique_ptr_t<Plane> cloneToNewObject() const;
   friend std::ostream& operator<<(std::ostream& os, const Plane& plane);
   string_t toString() const;
 
@@ -46,12 +46,12 @@ public:
    * `respect to this plane. Polygons in front or in back of this plane go into
    * `either `front` or `back`.
    */
-  void splitPolygon(Polygon* polygon, vector_t<Polygon*>& coplanarFront,
-                    vector_t<Polygon*>& coplanarBack, vector_t<Polygon*>& front,
-                    vector_t<Polygon*>& back);
+  void splitPolygon(const Polygon& polygon, vector_t<Polygon>& coplanarFront,
+                    vector_t<Polygon>& coplanarBack, vector_t<Polygon>& front,
+                    vector_t<Polygon>& back);
 
-  static Plane FromPoints(const Vector3& a, const Vector3& b, const Vector3& c,
-                          bool& hasPlane);
+  static Nullable<Plane> FromPoints(const Vector3& a, const Vector3& b,
+                                    const Vector3& c);
 
 public:
   Vector3 normal;
