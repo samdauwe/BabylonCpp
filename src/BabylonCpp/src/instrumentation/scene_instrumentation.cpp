@@ -16,6 +16,7 @@ SceneInstrumentation::SceneInstrumentation(Scene* scene)
     , _captureParticlesRenderTime{false}
     , _captureSpritesRenderTime{false}
     , _capturePhysicsTime{false}
+    , _captureAnimationsTime{false}
     , _onBeforeActiveMeshesEvaluationObserver{nullptr}
     , _onAfterActiveMeshesEvaluationObserver{nullptr}
     , _onBeforeRenderTargetsRenderObserver{nullptr}
@@ -30,6 +31,7 @@ SceneInstrumentation::SceneInstrumentation(Scene* scene)
     , _onAfterSpritesRenderingObserver{nullptr}
     , _onBeforePhysicsObserver{nullptr}
     , _onAfterPhysicsObserver{nullptr}
+    , _onAfterAnimationsObserver{nullptr}
 {
   // Before render
   _onBeforeAnimationsObserver = scene->onBeforeAnimationsObservable.add(
@@ -57,6 +59,10 @@ SceneInstrumentation::SceneInstrumentation(Scene* scene)
 
       if (_captureSpritesRenderTime) {
         _spritesRenderTime.fetchNewFrame();
+      }
+
+      if (_captureAnimationsTime) {
+        _animationsTime.beginMonitoring();
       }
 
       _scene->getEngine()->_drawCalls.fetchNewFrame();
@@ -300,6 +306,36 @@ void SceneInstrumentation::setCapturePhysicsTime(bool value)
   }
 }
 
+PerfCounter& SceneInstrumentation::animationsTimeCounter()
+{
+  return _animationsTime;
+}
+
+bool SceneInstrumentation::captureAnimationsTime() const
+{
+  return _captureAnimationsTime;
+}
+
+void SceneInstrumentation::setCaptureAnimationsTime(bool value)
+{
+  if (value == _captureAnimationsTime) {
+    return;
+  }
+
+  _captureAnimationsTime = value;
+
+  if (value) {
+    _onAfterAnimationsObserver = _scene->onAfterAnimationsObservable.add(
+      [this](Scene* /*scene*/, EventState& /*es*/) {
+        _animationsTime.endMonitoring();
+      });
+  }
+  else {
+    _scene->onAfterAnimationsObservable.remove(_onAfterAnimationsObserver);
+    _onAfterAnimationsObserver = nullptr;
+  }
+}
+
 PerfCounter& SceneInstrumentation::frameTimeCounter()
 {
   return _frameTime;
@@ -425,6 +461,9 @@ void SceneInstrumentation::dispose(bool /*doNotRecurse*/)
 
   _scene->onAfterPhysicsObservable.remove(_onAfterPhysicsObserver);
   _onAfterPhysicsObserver = nullptr;
+
+  _scene->onAfterAnimationsObservable.remove(_onAfterAnimationsObserver);
+  _onAfterAnimationsObserver = nullptr;
 
   _scene = nullptr;
 }

@@ -826,6 +826,11 @@ public:
   Observable<Scene> onBeforeAnimationsObservable;
 
   /**
+   * An event triggered after animations processing
+   */
+  Observable<Scene> onAfterAnimationsObservable;
+
+  /**
    * An event triggered before draw calls are ready to be sent
    */
   Observable<Scene> onBeforeDrawPhaseObservable;

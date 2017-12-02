@@ -96,6 +96,21 @@ public:
   void setCapturePhysicsTime(bool value);
 
   /**
+   * @brief Gets the perf counter used for animations time.
+   */
+  PerfCounter& animationsTimeCounter();
+
+  /**
+   * @brief Gets the animations time capture status.
+   */
+  bool captureAnimationsTime() const;
+
+  /**
+   * @brief Enable or disable the animations time capture.
+   */
+  void setCaptureAnimationsTime(bool value);
+
+  /**
    * @brief Gets the perf counter used for frame time capture.
    */
   PerfCounter& frameTimeCounter();
@@ -174,6 +189,9 @@ private:
   bool _capturePhysicsTime;
   PerfCounter _physicsTime;
 
+  bool _captureAnimationsTime;
+  PerfCounter _animationsTime;
+
   // Observers
   Observer<Scene>::Ptr _onBeforeActiveMeshesEvaluationObserver;
   Observer<Scene>::Ptr _onAfterActiveMeshesEvaluationObserver;
@@ -195,6 +213,8 @@ private:
 
   Observer<Scene>::Ptr _onBeforePhysicsObserver;
   Observer<Scene>::Ptr _onAfterPhysicsObserver;
+
+  Observer<Scene>::Ptr _onAfterAnimationsObserver;
 
 }; // end of class SceneInstrumentation
 
