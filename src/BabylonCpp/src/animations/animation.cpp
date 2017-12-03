@@ -78,6 +78,10 @@ Animatable* Animation::CreateAndStartAnimation(
     name, targetProperty, framePerSecond, totalFrame, from, to, loopMode,
     easingFunction);
 
+  if (!animation) {
+    return nullptr;
+  }
+
   return node->getScene()->beginDirectAnimation(
     node, {animation}, 0, totalFrame, (animation->loopMode == 1), 1.f,
     onAnimationEnd);
@@ -93,6 +97,10 @@ Animatable* Animation::CreateMergeAndStartAnimation(
   auto animation = Animation::_PrepareAnimation(
     name, targetProperty, framePerSecond, totalFrame, from, to, loopMode,
     easingFunction);
+
+  if (!animation) {
+    return nullptr;
+  }
 
   node->animations.emplace_back(animation);
 
@@ -207,8 +215,8 @@ void Animation::deleteRange(const string_t& iName, bool deleteFrames)
 {
   if (stl_util::contains(_ranges, iName)) {
     if (deleteFrames) {
-      auto from = _ranges[iName].from;
-      auto to   = _ranges[iName].to;
+      const auto& from = _ranges[iName].from;
+      const auto& to   = _ranges[iName].to;
 
       _keys.erase(::std::remove_if(_keys.begin(), _keys.end(),
                                    [from, to](const AnimationKey& key) {

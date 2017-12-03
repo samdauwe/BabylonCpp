@@ -2,6 +2,7 @@
 #define BABYLON_ANIMATIONS_ANIMATABLE_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/nullable.h>
 
 namespace BABYLON {
 
@@ -42,8 +43,8 @@ public:
   ::std::function<void()> onAnimationEnd;
 
 private:
-  millisecond_t _localDelayOffset;
-  millisecond_t _pausedDelay;
+  Nullable<millisecond_t> _localDelayOffset;
+  Nullable<millisecond_t> _pausedDelay;
   vector_t<RuntimeAnimation*> _runtimeAnimations;
   bool _paused;
   Scene* _scene;

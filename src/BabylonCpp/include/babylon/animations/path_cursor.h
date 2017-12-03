@@ -19,7 +19,6 @@ public:
   PathCursor& move(float step);
 
   // used by animation engine
-  PathCursor& markAsDirty(const string_t& propertyName);
   PathCursor&
   onchange(const ::std::function<void(const PathCursor& cursor)>& f);
 

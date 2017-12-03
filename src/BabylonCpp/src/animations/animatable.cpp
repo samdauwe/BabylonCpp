@@ -18,8 +18,8 @@ Animatable::Animatable(Scene* scene, IAnimatable* iTarget, int iFromFrame,
     , toFrame{iToFrame}
     , loopAnimation{iLoopAnimation}
     , onAnimationEnd{iOnAnimationEnd}
-    , _localDelayOffset{-1}
-    , _pausedDelay{-1}
+    , _localDelayOffset{nullptr}
+    , _pausedDelay{nullptr}
     , _paused{false}
     , _scene{scene}
     , _speedRatio{iSpeedRatio}
@@ -92,8 +92,8 @@ void Animatable::reset()
     runtimeAnimation->reset();
   }
 
-  _localDelayOffset = std::chrono::milliseconds(-1);
-  _pausedDelay      = std::chrono::milliseconds(-1);
+  _localDelayOffset = nullptr;
+  _pausedDelay      = nullptr;
 }
 
 void Animatable::enableBlending(float blendingSpeed)
@@ -119,7 +119,11 @@ void Animatable::goToFrame(int frame)
     auto adjustTime   = frame - currentFrame;
     auto delay
       = static_cast<float>(adjustTime) * 1000.f / static_cast<float>(fps);
-    _localDelayOffset -= std::chrono::milliseconds(static_cast<long>(delay));
+    if (_localDelayOffset == nullptr) {
+      _localDelayOffset = millisecond_t(0);
+    }
+    _localDelayOffset = (*_localDelayOffset)
+                        - std::chrono::milliseconds(static_cast<long>(delay));
   }
 
   for (auto& runtimeAnimations : _runtimeAnimations) {
@@ -178,25 +182,25 @@ bool Animatable::_animate(const millisecond_t& delay)
 {
   if (_paused) {
     animationStarted = false;
-    if (_pausedDelay == std::chrono::milliseconds(-1)) {
+    if (_pausedDelay == nullptr) {
       _pausedDelay = delay;
     }
     return true;
   }
 
-  if (_localDelayOffset == std::chrono::milliseconds(-1)) {
+  if (_localDelayOffset == nullptr) {
     _localDelayOffset = delay;
   }
-  else if (_pausedDelay != std::chrono::milliseconds(-1)) {
-    _localDelayOffset += delay - _pausedDelay;
-    _pausedDelay = std::chrono::milliseconds(-1);
+  else if (_pausedDelay != nullptr) {
+    _localDelayOffset = (*_localDelayOffset) + delay - (*_pausedDelay);
+    _pausedDelay      = nullptr;
   }
 
   // Animating
   bool running = false;
 
   for (auto& animation : _runtimeAnimations) {
-    bool isRunning = animation->animate(delay - _localDelayOffset, fromFrame,
+    bool isRunning = animation->animate(delay - (*_localDelayOffset), fromFrame,
                                         toFrame, loopAnimation, speedRatio());
     running = running || isRunning;
   }

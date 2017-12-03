@@ -69,14 +69,6 @@ PathCursor PathCursor::ensureLimits()
 }
 
 // used by animation engine
-PathCursor& PathCursor::markAsDirty(const string_t& /*propertyName*/)
-{
-  ensureLimits();
-  raiseOnChange();
-
-  return *this;
-}
-
 PathCursor& PathCursor::raiseOnChange()
 {
   for (auto& f : _onchange) {
