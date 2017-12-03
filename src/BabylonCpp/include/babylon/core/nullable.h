@@ -109,6 +109,21 @@ public:
   template <typename T2>
   friend bool operator==(::std::nullptr_t nullpointer, const Nullable<T2>& op);
 
+  template <typename T2>
+  friend bool operator!=(const Nullable<T2>& op1, const Nullable<T2>& op2);
+
+  template <typename T2>
+  friend bool operator!=(const Nullable<T2>& op, const T2& value);
+
+  template <typename T2>
+  friend bool operator!=(const T2& value, const Nullable<T2>& op);
+
+  template <typename T2>
+  friend bool operator!=(const Nullable<T2>& op, ::std::nullptr_t nullpointer);
+
+  template <typename T2>
+  friend bool operator!=(::std::nullptr_t nullpointer, const Nullable<T2>& op);
+
 }; // end of class Nullable
 
 template <typename T>
@@ -166,6 +181,36 @@ bool operator==(::std::nullptr_t /*nullpointer*/, const Nullable<T>& op)
   else {
     return true;
   }
+}
+
+template <typename T>
+bool operator!=(const Nullable<T>& op1, const Nullable<T>& op2)
+{
+  return !(operator==(op1, op2));
+}
+
+template <typename T>
+bool operator!=(const Nullable<T>& op, const T& value)
+{
+  return !(operator==(op, value));
+}
+
+template <typename T>
+bool operator!=(const T& value, const Nullable<T>& op)
+{
+  return !(operator==(value, op));
+}
+
+template <typename T>
+bool operator!=(const Nullable<T>& op, ::std::nullptr_t nullpointer)
+{
+  return !(operator==(op, nullpointer));
+}
+
+template <typename T>
+bool operator!=(::std::nullptr_t nullpointer, const Nullable<T>& op)
+{
+  return !(operator==(nullpointer, op));
 }
 
 } // end of namespace BABYLON
