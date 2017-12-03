@@ -10,6 +10,15 @@ namespace BABYLON {
 namespace Scalar {
 
 /**
+ * @brief Two pi constants convenient for computation.
+ * @return Two pi constants convenient for computation.
+ */
+constexpr float TwoPi()
+{
+  return Math::PI2;
+}
+
+/**
  * @brief Returns if the absolute difference between a and b is lower than
  * epsilon (default = 1.401298E-45)
  */
@@ -82,12 +91,12 @@ constexpr int IMul(int a, int b)
 {
   // the shift by 0 fixes the sign on the high part
   // the final |0 converts the unsigned value into a signed value
-  return ((((a & 0xffff) * (b & 0xffff))
-           + (((((a >> 16) & 0xffff) * (b & 0xffff)
-                + (a & 0xffff) * ((b >> 16) & 0xffff))
-               << 16)
-              >> 0))
-          | 0);
+  return (
+    (((a & 0xffff) * (b & 0xffff)) + (((((a >> 16) & 0xffff) * (b & 0xffff)
+                                        + (a & 0xffff) * ((b >> 16) & 0xffff))
+                                       << 16)
+                                      >> 0))
+    | 0);
 }
 
 /**
@@ -292,6 +301,28 @@ constexpr float RangeToPercent(float number, float min, float max)
 constexpr float PercentToRange(float percent, float min, float max)
 {
   return ((max - min) * percent + min);
+}
+
+/**
+ * @brief Returns the angle converted to equivalent value between -Math.PI and
+ * Math.PI radians.
+ * @param angle The angle to normalize in radian.
+ * @return The converted angle.
+ */
+constexpr float NormalizeRadians(float angle)
+{
+  // More precise but slower version kept for reference.
+  // angle = angle % Tools.TwoPi;
+  // angle = (angle + Tools.TwoPi) % Tools.TwoPi;
+
+  // if (angle > Math.PI) {
+  //	angle -= Tools.TwoPi;
+  //}
+
+  angle
+    -= (Scalar::TwoPi() * ::std::floor((angle + Math::PI) / Scalar::TwoPi()));
+
+  return angle;
 }
 
 } // end of namespace Scalar
