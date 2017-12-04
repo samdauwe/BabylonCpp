@@ -321,6 +321,16 @@ TEST(TestStdUtil, max)
   EXPECT_EQ(stl_util::max("var1", ::std::string{"var2"}), "var2");
 }
 
+TEST(TestStdUtil, remove_duplicates)
+{
+  using namespace BABYLON;
+
+  const Int32Array v{2, 2, 1, 1, 2, 2, 3, 3, 4, 4, 3, 3, 2, 2, 1, 1};
+  const Int32Array result = stl_util::remove_duplicates(v);
+  const Int32Array expected{2, 1, 3, 4};
+  EXPECT_THAT(result, ::testing::ContainerEq(expected));
+}
+
 TEST(TestStdUtil, slice)
 {
   using namespace BABYLON;

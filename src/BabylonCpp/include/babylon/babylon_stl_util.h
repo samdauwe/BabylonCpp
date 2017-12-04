@@ -336,6 +336,23 @@ void erase_if(C& container, P predicate)
 }
 
 /**
+ * @brief Removes duplicate elements from std::vector while maintaining order.
+ * @param v The std::vector to make unique while maintaining order.
+ * @returns The std::vector having no duplicate item.
+ */
+template <typename T>
+vector_t<T> remove_duplicates(const vector_t<T>& v)
+{
+  ::std::set<T> tmpSet;
+  vector_t<T> res; // Resultant vector
+
+  ::std::remove_copy_if(v.begin(), v.end(), ::std::back_inserter(res),
+                        [&tmpSet](T x) { return !tmpSet.insert(x).second; });
+
+  return res;
+}
+
+/**
  * Searches the array for the specified item, and returns its position.
  * Returns -1 if the item is not found.
  * If the item is present more than once, the indexOf method returns the
