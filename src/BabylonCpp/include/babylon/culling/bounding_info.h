@@ -23,6 +23,15 @@ public:
   bool isLocked() const;
   void setIsLocked(bool value);
   void update(const Matrix& world);
+
+  /**
+   * @brief Recreate the bounding info to be centered around a specific point
+   * given a specific extend.
+   * @param center New center of the bounding info
+   * @param extend New extend of the bounding info
+   */
+  BoundingInfo& centerOn(const Vector3& center, const Vector3& extend);
+
   bool isInFrustum(const array_t<Plane, 6>& frustumPlanes) override;
 
   /**

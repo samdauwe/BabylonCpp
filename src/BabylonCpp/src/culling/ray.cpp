@@ -255,7 +255,7 @@ unique_ptr_t<IntersectionInfo> Ray::intersectsTriangle(const Vector3& vertex0,
   return ::std::make_unique<IntersectionInfo>(bu, bv, distance);
 }
 
-unique_ptr_t<float> Ray::intersectsPlane(const Plane& plane)
+Nullable<float> Ray::intersectsPlane(const Plane& plane)
 {
   float distance;
   float result1 = Vector3::Dot(plane.normal, direction);
@@ -263,18 +263,18 @@ unique_ptr_t<float> Ray::intersectsPlane(const Plane& plane)
     return nullptr;
   }
   else {
-    float result2 = Vector3::Dot(plane.normal, origin);
-    distance      = (-plane.d - result2) / result1;
+    const float result2 = Vector3::Dot(plane.normal, origin);
+    distance            = (-plane.d - result2) / result1;
     if (distance < 0.f) {
       if (distance < -9.99999997475243E-07f) {
         return nullptr;
       }
       else {
-        return ::std::make_unique<float>(0.f);
+        return 0.f;
       }
     }
 
-    return ::std::make_unique<float>(distance);
+    return distance;
   }
 }
 
@@ -412,18 +412,31 @@ float Ray::intersectionSegment(const Vector3& sega, const Vector3& segb,
   return -1;
 }
 
+Ray& Ray::update(float x, float y, float viewportWidth, float viewportHeight,
+                 Matrix& world, Matrix& view, Matrix& projection)
+{
+  Vector3::UnprojectFloatsToRef(x, y, 0.f, viewportWidth, viewportHeight, world,
+                                view, projection, origin);
+  Vector3::UnprojectFloatsToRef(x, y, 1.f, viewportWidth, viewportHeight, world,
+                                view, projection, Tmp::Vector3Array[0]);
+
+  Tmp::Vector3Array[0].subtractToRef(origin, direction);
+  direction.normalize();
+  return *this;
+}
+
+Ray Ray::Zero()
+{
+  return Ray(Vector3::Zero(), Vector3::Zero());
+}
+
 Ray Ray::CreateNew(float x, float y, float viewportWidth, float viewportHeight,
                    Matrix& world, Matrix& view, Matrix& projection)
 {
-  Vector3 start = Vector3::Unproject(Vector3(x, y, 0.f), viewportWidth,
-                                     viewportHeight, world, view, projection);
-  Vector3 end = Vector3::Unproject(Vector3(x, y, 1.f), viewportWidth,
-                                   viewportHeight, world, view, projection);
+  auto result = Ray::Zero();
 
-  Vector3 direction = end.subtract(start);
-  direction.normalize();
-
-  return Ray(start, direction);
+  return result.update(x, y, viewportWidth, viewportHeight, world, view,
+                       projection);
 }
 
 Ray Ray::CreateNewFromTo(const Vector3& origin, const Vector3& end,

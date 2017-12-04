@@ -83,6 +83,18 @@ void BoundingInfo::update(const Matrix& world)
   boundingSphere._update(world);
 }
 
+BoundingInfo& BoundingInfo::centerOn(const Vector3& center,
+                                     const Vector3& extend)
+{
+  minimum = center.subtract(extend);
+  maximum = center.add(extend);
+
+  boundingBox    = BoundingBox(minimum, maximum);
+  boundingSphere = BoundingSphere(minimum, maximum);
+
+  return *this;
+}
+
 bool BoundingInfo::isInFrustum(const array_t<Plane, 6>& frustumPlanes)
 {
   if (!boundingSphere.isInFrustum(frustumPlanes)) {
