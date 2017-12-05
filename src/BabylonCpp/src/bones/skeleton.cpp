@@ -16,7 +16,7 @@ Skeleton::Skeleton(const string_t& iName, const string_t& iId, Scene* scene)
     : needInitialSkinMatrix{false}
     , name{iName}
     , id{iId}
-    , _scene{scene}
+    , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _isDirty{true}
     , _identity{Matrix::Identity()}
     , _lastAbsoluteTransformsUpdateId{-1}

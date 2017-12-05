@@ -11,9 +11,9 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT Skeleton
-    : public ::std::enable_shared_from_this<Skeleton>,
-      public IAnimatable,
-      public IDisposable {
+  : public ::std::enable_shared_from_this<Skeleton>,
+    public IAnimatable,
+    public IDisposable {
 
 public:
   Skeleton(const string_t& name, const string_t& id, Scene* scene);
@@ -93,6 +93,7 @@ public:
   vector_t<unique_ptr_t<Bone>> bones;
   unique_ptr_t<Vector3> dimensionsAtRest;
   bool needInitialSkinMatrix;
+  vector_t<Animation*> animations;
   string_t name;
   string_t id;
   // Events
