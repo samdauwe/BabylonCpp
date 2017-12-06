@@ -49,6 +49,8 @@ struct BABYLON_SHARED_EXPORT Tools {
   static int GetExponentOfTwo(int value, int max,
                               unsigned int mode
                               = EngineConstants::SCALEMODE_NEAREST);
+  static string_t GetFilename(const string_t& path);
+  static string_t GetFolderPath(const string_t& uri);
   static float ToDegrees(float angle);
   static float ToRadians(float angle);
   static MinMax ExtractMinAndMaxIndexed(const Float32Array& positions,

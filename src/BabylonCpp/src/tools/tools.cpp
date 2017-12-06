@@ -94,6 +94,26 @@ int Tools::GetExponentOfTwo(int value, int max, unsigned int mode)
   return ::std::min(pot, max);
 }
 
+string_t Tools::GetFilename(const string_t& path)
+{
+  const auto index = String::lastIndexOf(path, "/");
+  if (index < 0) {
+    return path;
+  }
+
+  return path.substr(static_cast<size_t>(index) + 1);
+}
+
+string_t Tools::GetFolderPath(const string_t& uri)
+{
+  const auto index = String::lastIndexOf(uri, "/");
+  if (index < 0) {
+    return "";
+  }
+
+  return uri.substr(0, static_cast<size_t>(index) + 1);
+}
+
 float Tools::ToDegrees(float angle)
 {
   return angle * 180.f / Math::PI;
@@ -105,7 +125,7 @@ float Tools::ToRadians(float angle)
 }
 
 MinMax Tools::ExtractMinAndMaxIndexed(const Float32Array& positions,
-                                      const Uint32Array& indices,
+                                      const IndicesArray& indices,
                                       size_t indexStart, size_t indexCount)
 {
   Vector3 minimum(numeric_limits_t<float>::max(),
