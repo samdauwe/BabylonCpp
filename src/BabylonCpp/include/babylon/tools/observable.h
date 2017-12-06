@@ -56,15 +56,16 @@ public:
    * first position, hence executed before the others ones. If false (default
    * behavior) the callback will be inserted at the last position, executed
    * after all the others already present.
+   * @param scope optional scope for the callback to be called from.
    */
   typename Observer<T>::Ptr add(const CallbackFunc& callback, int mask = -1,
-                                bool insertFirst = false)
+                                bool insertFirst = false, any* scope = nullptr)
   {
     if (!callback) {
       return nullptr;
     }
 
-    auto observer = std::make_shared<Observer<T>>(callback, mask);
+    auto observer = std::make_shared<Observer<T>>(callback, mask, scope);
 
     if (insertFirst) {
       _observers.insert(_observers.begin(), observer);
@@ -91,13 +92,14 @@ public:
    * after all the others already present.
    */
   typename Observer<T>::Ptr add(CallbackFunc&& callback, int mask = -1,
-                                bool insertFirst = false)
+                                bool insertFirst = false, any* scope = nullptr)
   {
     if (!callback) {
       return nullptr;
     }
 
-    auto observer = std::make_shared<Observer<T>>(std::move(callback), mask);
+    auto observer
+      = std::make_shared<Observer<T>>(std::move(callback), mask, scope);
 
     if (insertFirst) {
       _observers.insert(_observers.begin(), observer);
@@ -116,6 +118,10 @@ public:
    */
   bool remove(typename Observer<T>::Ptr& observer)
   {
+    if (!observer) {
+      return false;
+    }
+
     auto it
       = ::std::remove_if(_observers.begin(), _observers.end(),
                          [observer](const typename Observer<T>::Ptr& obs) {
@@ -156,10 +162,17 @@ public:
    * @param eventData
    * @param mask
    */
-  bool notifyObservers(T* eventData = nullptr, int mask = -1)
+  bool notifyObservers(T* eventData = nullptr, int mask = -1,
+                       any* target = nullptr, any* currentTarget = nullptr)
   {
+    if (_observers.empty()) {
+      return true;
+    }
+
     auto& state             = _eventState;
     state.mask              = mask;
+    state.target            = target;
+    state.currentTarget     = currentTarget;
     state.skipNextObservers = false;
 
     for (auto& obs : _observers) {

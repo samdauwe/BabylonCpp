@@ -2,19 +2,26 @@
 
 namespace BABYLON {
 
-EventState::EventState(int _mask, bool _skipNextObservers)
+EventState::EventState(int iMmask, bool iSkipNextObservers, any* iTarget,
+                       any* iCurrentTarget)
 {
-  initalize(_mask, _skipNextObservers);
+  initalize(iMmask, iSkipNextObservers, iTarget, iCurrentTarget);
 }
 
 EventState::EventState(const EventState& other)
-    : skipNextObservers{other.skipNextObservers}, mask{other.mask}
+    : skipNextObservers{other.skipNextObservers}
+    , mask{other.mask}
+    , target{other.target}
+    , currentTarget{other.currentTarget}
 {
 }
 
 EventState::EventState(EventState&& other)
+    : skipNextObservers{::std::move(other.skipNextObservers)}
+    , mask{::std::move(other.mask)}
+    , target{::std::move(other.target)}
+    , currentTarget{::std::move(other.currentTarget)}
 {
-  *this = ::std::move(other);
 }
 
 EventState& EventState::operator=(const EventState& other)
@@ -22,6 +29,8 @@ EventState& EventState::operator=(const EventState& other)
   if (&other != this) {
     skipNextObservers = other.skipNextObservers;
     mask              = other.mask;
+    target            = other.target;
+    currentTarget     = other.currentTarget;
   }
 
   return *this;
@@ -32,6 +41,8 @@ EventState& EventState::operator=(EventState&& other)
   if (&other != this) {
     skipNextObservers = ::std::move(other.skipNextObservers);
     mask              = ::std::move(other.mask);
+    target            = ::std::move(other.target);
+    currentTarget     = ::std::move(other.currentTarget);
   }
 
   return *this;
@@ -41,10 +52,13 @@ EventState::~EventState()
 {
 }
 
-EventState& EventState::initalize(int _mask, bool _skipNextObservers)
+EventState& EventState::initalize(int iMmask, bool iSkipNextObservers,
+                                  any* iTarget, any* iCurrentTarget)
 {
-  mask              = _mask;
-  skipNextObservers = _skipNextObservers;
+  mask              = iMmask;
+  skipNextObservers = iSkipNextObservers;
+  target            = iTarget;
+  currentTarget     = iCurrentTarget;
   return *this;
 }
 

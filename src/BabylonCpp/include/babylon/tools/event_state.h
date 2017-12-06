@@ -2,6 +2,7 @@
 #define BABYLON_TOOLS_EVENT_STATE_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/any.h>
 
 namespace BABYLON {
 
@@ -18,14 +19,16 @@ public:
    * If the callback of a given Observer set skipNextObservers to true the
    * following observers will be ignored
    */
-  EventState(int mask, bool skipNextObservers = false);
+  EventState(int mask, bool skipNextObservers = false, any* target = nullptr,
+             any* currentTarget = nullptr);
   EventState(const EventState& other);            // Copy constructor
   EventState(EventState&& other);                 // Move constructor
   EventState& operator=(const EventState& other); // Copy assignment operator
   EventState& operator=(EventState&& other);      // Move assignment operator
   ~EventState();                                  // Destructor
 
-  EventState& initalize(int mask, bool skipNextObservers = false);
+  EventState& initalize(int mask, bool skipNextObservers = false,
+                        any* target = nullptr, any* currentTarget = nullptr);
 
 public:
   /**
@@ -39,6 +42,16 @@ public:
    * this EventState object
    */
   int mask;
+
+  /**
+   * The object that originally notified the event
+   */
+  any* target;
+
+  /**
+   * The current object in the bubbling phase
+   */
+  any* currentTarget;
 
 }; // end of class Tools
 

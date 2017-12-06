@@ -158,6 +158,11 @@ public:
     return _totalAccumulated;
   }
 
+  size_t count() const
+  {
+    return _totalValueCount;
+  }
+
   /**
    * Call this method to start monitoring a new frame.
    * This scenario is typically used when you accumulate monitoring time many

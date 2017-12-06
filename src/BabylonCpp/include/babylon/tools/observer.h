@@ -18,12 +18,12 @@ public:
   using Ptr = shared_ptr_t<Observer<T>>;
 
 public:
-  Observer() : callback{nullptr}, mask{-1}
+  Observer() : callback{nullptr}, mask{-1}, scope{nullptr}
   {
   }
 
-  Observer(const CallbackFunc& _callback, int _mask)
-      : callback{_callback}, mask{_mask}
+  Observer(const CallbackFunc& iCallback, int iMask, any* iScope)
+      : callback{iCallback}, mask{iMask}, scope{iScope}
   {
   }
 
@@ -33,12 +33,13 @@ public:
 
   operator bool() const
   {
-    return (callback == nullptr) && (mask == -1);
+    return (callback == nullptr) && (mask == -1) && (scope == nullptr);
   }
 
 public:
   CallbackFunc callback;
   int mask;
+  any* scope;
 
 }; // end of class Observer
 
