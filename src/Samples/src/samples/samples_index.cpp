@@ -42,6 +42,7 @@
 #include <babylon/samples/materials/shader_material_double_helix_scene.h>
 #include <babylon/samples/materials/shader_material_generators_scene.h>
 #include <babylon/samples/materials/shader_material_menger_sponge_scene.h>
+#include <babylon/samples/materials/shader_material_morning_city_scene.h>
 #include <babylon/samples/materials/shader_material_pbr_test_scene.h>
 #include <babylon/samples/materials/shader_material_pegasus_galaxy_scene.h>
 #include <babylon/samples/materials/shader_material_physically_based_sdf_scene.h>
@@ -397,6 +398,12 @@ SamplesIndex::SamplesIndex()
     true,
     [](ICanvas* iCanvas) {                                                 //
       return ::std::make_unique<ShaderMaterialMengerSpongeScene>(iCanvas); //
+    });                                                                    //
+  // Shader Material Morning City Scene
+  _samples["ShaderMaterialMorningCityScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                                 //
+      return ::std::make_unique<ShaderMaterialMorningCityScene>(iCanvas); //
     });                                                                    //
   // Shader Material PBR Test Scene
   _samples["ShaderMaterialPBRTestScene"] = ::std::make_tuple(
