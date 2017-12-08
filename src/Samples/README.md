@@ -23,6 +23,7 @@
 ![shader_material_morning_city_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_morning_city_scene.png?raw=true "Shader Material Morning City Scene")
 ![shader_material_pbr_test_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_pbr_test_scene.png?raw=true "Shader Material PBR Test Scene")
 ![shader_material_physically_based_sdf_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_physically_based_sdf_scene.png?raw=true "Shader Material Physically-based SDF Scene")
+![shader_material_speed_tracer_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_speed_tracer_scene.png?raw=true "Shader Material Speed Tracer Scene")
 ![shader_material_pegasus_galaxy_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_pegasus_galaxy_scene.png?raw=true "Shader Material Pegasus Galaxy Scene")
 ![shader_material_planet_shadertoy_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_planet_shadertoy_scene.png?raw=true "Shader Material Planet Shadertoy Scene")
 ![shader_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_scene.png?raw=true "Shader Material Scene")

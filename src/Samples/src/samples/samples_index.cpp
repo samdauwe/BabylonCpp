@@ -53,6 +53,7 @@
 #include <babylon/samples/materials/shader_material_skybox_clouds_scene.h>
 #include <babylon/samples/materials/shader_material_skybox_scene.h>
 #include <babylon/samples/materials/shader_material_sparse_grid_marching_scene.h>
+#include <babylon/samples/materials/shader_material_speed_tracer_scene.h>
 #include <babylon/samples/materials/shader_material_star_nest_scene.h>
 #include <babylon/samples/materials/shader_material_the_drive_home_scene.h>
 #include <babylon/samples/materials/shader_material_the_road_to_hell.h>
@@ -402,9 +403,9 @@ SamplesIndex::SamplesIndex()
   // Shader Material Morning City Scene
   _samples["ShaderMaterialMorningCityScene"] = ::std::make_tuple(
     true,
-    [](ICanvas* iCanvas) {                                                 //
+    [](ICanvas* iCanvas) {                                                //
       return ::std::make_unique<ShaderMaterialMorningCityScene>(iCanvas); //
-    });                                                                    //
+    });                                                                   //
   // Shader Material PBR Test Scene
   _samples["ShaderMaterialPBRTestScene"] = ::std::make_tuple(
     true,
@@ -459,6 +460,12 @@ SamplesIndex::SamplesIndex()
     true, [](ICanvas* iCanvas) {
       return ::std::make_unique<ShaderMaterialSparseGridMarchingScene>(iCanvas);
     }); //
+  // Shader Material Speed Tracer Scene
+  _samples["ShaderMaterialSpeedTracerScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                                //
+      return ::std::make_unique<ShaderMaterialSpeedTracerScene>(iCanvas); //
+    });                                                                   //
   // Shader Material Skybox Scene
   _samples["ShaderMaterialSkyboxScene"] = ::std::make_tuple(
     true,
