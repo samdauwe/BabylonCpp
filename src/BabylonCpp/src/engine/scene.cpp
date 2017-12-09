@@ -1754,14 +1754,35 @@ int Scene::removeMesh(AbstractMesh* toRemove)
                            });
   int index = static_cast<int>(it - meshes.begin());
   if (it != meshes.end()) {
+    // Remove from the scene if mesh found
     meshes.erase(it);
-  }
-  // notify the collision coordinator
-  if (collisionCoordinator) {
-    collisionCoordinator->onMeshRemoved(toRemove);
   }
 
   onMeshRemovedObservable.notifyObservers(toRemove);
+
+  return index;
+}
+
+void Scene::addTransformNode(TransformNode* newTransformNode)
+{
+  transformNodes.emplace_back(newTransformNode);
+
+  onNewTransformNodeAddedObservable.notifyObservers(newTransformNode);
+}
+
+int Scene::removeTransformNode(TransformNode* toRemove)
+{
+  auto it = ::std::find_if(transformNodes.begin(), transformNodes.end(),
+                           [&toRemove](const TransformNode* transformNode) {
+                             return transformNode == toRemove;
+                           });
+  int index = static_cast<int>(it - transformNodes.begin());
+  if (it != transformNodes.end()) {
+    // Remove from the scene if found
+    transformNodes.erase(it);
+  }
+
+  onTransformNodeRemovedObservable.notifyObservers(toRemove);
 
   return index;
 }

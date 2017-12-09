@@ -328,6 +328,7 @@ class Mesh;
 class MeshBuilder;
 class MeshLODLevel;
 class SubMesh;
+class TransformNode;
 class VertexBuffer;
 class VertexData;
 // - Options

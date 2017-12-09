@@ -349,6 +349,8 @@ public:
   unsigned int getUniqueId();
   void addMesh(unique_ptr_t<AbstractMesh>&& newMesh);
   int removeMesh(AbstractMesh* toRemove);
+  void addTransformNode(TransformNode* newTransformNode);
+  int removeTransformNode(TransformNode* toRemove);
   int removeSkeleton(Skeleton* toRemove);
   int removeMorphTargetManager(MorphTargetManager* toRemove);
   int removeLight(Light* toRemove);
@@ -932,6 +934,16 @@ public:
   Observable<Geometry> onGeometryRemovedObservable;
 
   /**
+   * An event triggered when a transform node is created
+   */
+  Observable<TransformNode> onNewTransformNodeAddedObservable;
+
+  /**
+   * An event triggered when a transform node is removed
+   */
+  Observable<TransformNode> onTransformNodeRemovedObservable;
+
+  /**
    * An event triggered when a mesh is created
    */
   Observable<AbstractMesh> onNewMeshAddedObservable;
@@ -1078,6 +1090,10 @@ public:
   Camera* activeCamera;
 
   // Meshes
+  /**
+   * All of the tranform nodes added to this scene.
+   */
+  vector_t<TransformNode*> transformNodes;
   /**
    * All of the (abstract) meshes added to this scene.
    * @see BABYLON.AbstractMesh
