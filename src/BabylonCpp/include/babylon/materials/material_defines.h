@@ -42,6 +42,9 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   unsigned int BonesPerMesh;
   unsigned int NUM_MORPH_INFLUENCERS;
 
+  /**
+  * The direct UV channel to use.
+  */
   unsigned int DIFFUSEDIRECTUV;
   unsigned int AMBIENTDIRECTUV;
   unsigned int OPACITYDIRECTUV;
