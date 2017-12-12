@@ -180,6 +180,8 @@ struct PoseEnabledControllerHelper;
 class ViveController;
 class WebVRController;
 class WindowsMotionController;
+// --- Helpers ---
+struct IEnvironmentHelperOptions;
 // --- Instrumentation ---
 struct _TimeToken;
 class EngineInstrumentation;
@@ -254,6 +256,9 @@ struct ShaderMaterialOptions;
 class StandardMaterial;
 struct StandardMaterialDefines;
 class UniformBuffer;
+// - Background
+class BackgroundMaterial;
+struct BackgroundMaterialDefines;
 // - PBR
 class PBRBaseMaterial;
 class PBRBaseSimpleMaterial;
