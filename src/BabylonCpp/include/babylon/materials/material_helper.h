@@ -8,6 +8,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT MaterialHelper {
 
 public:
+  static void BindEyePosition(Effect* effect, Scene* scene);
   static void
   PrepareDefinesForMergedUV(BaseTexture* texture, MaterialDefines& defines,
                             unsigned int key, const string_t& keyString,

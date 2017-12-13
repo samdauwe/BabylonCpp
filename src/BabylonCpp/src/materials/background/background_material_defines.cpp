@@ -49,10 +49,18 @@ BackgroundMaterialDefines::BackgroundMaterialDefines() : MaterialDefines{}
            "UV2",
            "CLIPPLANE",
            "POINTSIZE",
+           "LOGARITHMICDEPTH",
            "FOG",
            "NORMAL",
            "INSTANCES",
-           "SHADOWFLOAT"};
+           "SHADOWFLOAT",
+           "SPECULARTERM",
+           "VERTEXCOLOR",
+           "VERTEXALPHA",
+           "MORPHTARGETS_NORMAL",
+           "MORPHTARGETS",
+           "ALPHATEST",
+           "DEPTHPREPASS"};
   rebuild();
 
   DIFFUSEDIRECTUV      = 0;

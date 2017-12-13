@@ -106,16 +106,24 @@ struct BABYLON_SHARED_EXPORT BackgroundMaterialDefines
   static constexpr unsigned int GAMMAREFLECTION         = 38;
 
   // Default BJS.
-  static constexpr unsigned int MAINUV1     = 39;
-  static constexpr unsigned int MAINUV2     = 40;
-  static constexpr unsigned int UV1         = 41;
-  static constexpr unsigned int UV2         = 42;
-  static constexpr unsigned int CLIPPLANE   = 43;
-  static constexpr unsigned int POINTSIZE   = 44;
-  static constexpr unsigned int FOG         = 45;
-  static constexpr unsigned int NORMAL      = 46;
-  static constexpr unsigned int INSTANCES   = 47;
-  static constexpr unsigned int SHADOWFLOAT = 48;
+  static constexpr unsigned int MAINUV1             = 39;
+  static constexpr unsigned int MAINUV2             = 40;
+  static constexpr unsigned int UV1                 = 41;
+  static constexpr unsigned int UV2                 = 42;
+  static constexpr unsigned int CLIPPLANE           = 43;
+  static constexpr unsigned int POINTSIZE           = 44;
+  static constexpr unsigned int LOGARITHMICDEPTH    = 45;
+  static constexpr unsigned int FOG                 = 46;
+  static constexpr unsigned int NORMAL              = 47;
+  static constexpr unsigned int INSTANCES           = 48;
+  static constexpr unsigned int SHADOWFLOAT         = 49;
+  static constexpr unsigned int SPECULARTERM        = 50;
+  static constexpr unsigned int VERTEXCOLOR         = 51;
+  static constexpr unsigned int VERTEXALPHA         = 52;
+  static constexpr unsigned int MORPHTARGETS_NORMAL = 53;
+  static constexpr unsigned int MORPHTARGETS        = 54;
+  static constexpr unsigned int ALPHATEST           = 55;
+  static constexpr unsigned int DEPTHPREPASS        = 56;
 
   /**
    * @brief Constructor of the defines.

@@ -1168,6 +1168,7 @@ public:
   vector_t<IDisposable*> _toBeDisposed;
   vector_t<IParticleSystem*> _activeParticleSystems;
   vector_t<Animatable*> _activeAnimatables;
+  unique_ptr_t<Vector3> _forcedViewPosition;
   bool requireLightSorting;
 
 protected:

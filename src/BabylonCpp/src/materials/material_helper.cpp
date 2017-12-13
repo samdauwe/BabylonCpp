@@ -24,6 +24,18 @@
 
 namespace BABYLON {
 
+void MaterialHelper::BindEyePosition(Effect* effect, Scene* scene)
+{
+  if (scene->_forcedViewPosition) {
+    effect->setVector3("vEyePosition", *scene->_forcedViewPosition.get());
+    return;
+  }
+  effect->setVector3("vEyePosition",
+                     scene->_mirroredCameraPosition ?
+                       *scene->_mirroredCameraPosition.get() :
+                       scene->activeCamera->globalPosition());
+}
+
 void MaterialHelper::PrepareDefinesForMergedUV(
   BaseTexture* texture, MaterialDefines& defines, unsigned int key,
   const string_t& keyString, unsigned int MAINUV1, unsigned int MAINUV2)
