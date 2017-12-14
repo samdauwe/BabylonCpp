@@ -181,7 +181,9 @@ class ViveController;
 class WebVRController;
 class WindowsMotionController;
 // --- Helpers ---
+class EnvironmentHelper;
 struct IEnvironmentHelperOptions;
+struct ISceneSize;
 // --- Instrumentation ---
 struct _TimeToken;
 class EngineInstrumentation;
