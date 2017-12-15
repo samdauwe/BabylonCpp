@@ -241,6 +241,18 @@ public:
   Parse(const Json::value& source, Scene* scene, const string_t& url);
 
   /** Getters / Setters **/
+  const Color3& primaryColor() const;
+  void setPrimaryColor(const Color3& value);
+  float primaryLevel() const;
+  void setPrimaryLevel(float value);
+  const Color3& secondaryColor() const;
+  void setSecondaryColor(const Color3& value);
+  float secondaryLevel() const;
+  void setSecondaryLevel(float value);
+  const Color3& tertiaryColor() const;
+  void setTertiaryColor(const Color3& value);
+  float tertiaryLevel() const;
+  void setTertiaryLevel(float value);
   BaseTexture* reflectionTexture() const;
   void setReflectionTexture(RenderTargetTexture* value);
   BaseTexture* diffuseTexture() const;

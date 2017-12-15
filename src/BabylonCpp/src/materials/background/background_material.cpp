@@ -762,6 +762,66 @@ BackgroundMaterial::Parse(const Json::value& /*source*/, Scene* /*scene*/,
   return nullptr;
 }
 
+const Color3& BackgroundMaterial::primaryColor() const
+{
+  return _primaryColor;
+}
+
+void BackgroundMaterial::setPrimaryColor(const Color3& value)
+{
+  _primaryColor = value;
+}
+
+float BackgroundMaterial::primaryLevel() const
+{
+  return _primaryLevel;
+}
+
+void BackgroundMaterial::setPrimaryLevel(float value)
+{
+  _primaryLevel = value;
+}
+
+const Color3& BackgroundMaterial::secondaryColor() const
+{
+  return _secondaryColor;
+}
+
+void BackgroundMaterial::setSecondaryColor(const Color3& value)
+{
+  _secondaryColor = value;
+}
+
+float BackgroundMaterial::secondaryLevel() const
+{
+  return _secondaryLevel;
+}
+
+void BackgroundMaterial::setSecondaryLevel(float value)
+{
+  _secondaryLevel = value;
+}
+
+const Color3& BackgroundMaterial::tertiaryColor() const
+{
+  return _tertiaryColor;
+}
+
+void BackgroundMaterial::setTertiaryColor(const Color3& value)
+{
+  _tertiaryColor = value;
+}
+
+float BackgroundMaterial::tertiaryLevel() const
+{
+  return _tertiaryLevel;
+}
+
+void BackgroundMaterial::setTertiaryLevel(float value)
+{
+  _tertiaryLevel = value;
+}
+
 BaseTexture* BackgroundMaterial::reflectionTexture() const
 {
   return _reflectionTexture;
@@ -860,6 +920,16 @@ bool BackgroundMaterial::useRGBColor() const
 void BackgroundMaterial::setUseRGBColor(bool value)
 {
   _useRGBColor = value;
+}
+
+bool BackgroundMaterial::enableNoise() const
+{
+  return _enableNoise;
+}
+
+void BackgroundMaterial::setEnableNoise(bool value)
+{
+  _enableNoise = value;
 }
 
 } // end of namespace BABYLON
