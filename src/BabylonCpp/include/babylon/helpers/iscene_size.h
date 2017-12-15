@@ -4,6 +4,8 @@
 #include <babylon/babylon_global.h>
 #include <babylon/math/vector3.h>
 
+namespace BABYLON {
+
 struct BABYLON_SHARED_EXPORT ISceneSize {
   int groundSize;
   int skyboxSize;
