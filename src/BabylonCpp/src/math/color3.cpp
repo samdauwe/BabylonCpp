@@ -289,6 +289,11 @@ Color3 Color3::operator*(const Color3& otherColor) const
   return multiply(otherColor);
 }
 
+Color3 Color3::operator/(float iscale) const
+{
+  return scale(1.f / iscale);
+}
+
 /** Statics **/
 Color3 Color3::FromHexString(const string_t& hex)
 {

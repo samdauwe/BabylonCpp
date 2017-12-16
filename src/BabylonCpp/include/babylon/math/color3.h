@@ -182,6 +182,7 @@ public:
   Color3 operator-(const Color3& otherColor) const;
   Color3 operator*(float iscale) const;
   Color3 operator*(const Color3& otherColor) const;
+  Color3 operator/(float iscale) const;
 
   /** Statics **/
 
