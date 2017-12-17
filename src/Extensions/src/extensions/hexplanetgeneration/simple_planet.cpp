@@ -12,17 +12,25 @@ namespace BABYLON {
 namespace Extensions {
 
 SimplePlanet::SimplePlanet(float scale, float degree, Scene* scene,
-                           const std::string& seed)
-    : _degree{degree}, _scale{scale}, _scene{scene}, _renderDeformedMesh{true}
+                           const string_t& seed)
+    : _degree{degree}
+    , _scale{scale}
+    , _scene{scene}
+    , _seed{seed}
+    , _renderDeformedMesh{true}
 {
-  _planet.mesh     = Mesh::New("planet", scene);
-  _terrain         = std::make_unique<Terrain>(seed);
-  _icosahedronMesh = Icosphere::generateIcosahedronMesh(
-    static_cast<size_t>(degree), scale, _random);
 }
 
 SimplePlanet::~SimplePlanet()
 {
+}
+
+void SimplePlanet::initialize()
+{
+  _planet.mesh     = Mesh::New("planet", _scene);
+  _terrain         = std::make_unique<Terrain>(_seed);
+  _icosahedronMesh = Icosphere::generateIcosahedronMesh(
+    static_cast<size_t>(_degree), _scale, _random);
 }
 
 Vector2 SimplePlanet::calculateUVCoord(const Vector3& p) const

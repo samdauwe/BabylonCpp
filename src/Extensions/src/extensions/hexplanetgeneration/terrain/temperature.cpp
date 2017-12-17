@@ -9,7 +9,6 @@ namespace Extensions {
 Temperature::Temperature(const std::string& seed, float maxTemp, float minTemp,
                          float distortion, float height, float width)
     : _seed{seed}
-    , _data{{}}
     , _minTemp{minTemp}
     , _maxTemp{maxTemp}
     , _width{width}
@@ -24,9 +23,6 @@ Temperature::Temperature(const std::string& seed, float maxTemp, float minTemp,
   noiseOptions.persistence = 0.5f;
 
   _noise = std::make_unique<FastSimplexNoise>(noiseOptions);
-
-  setupTemperatureGradient();
-  generateTemperature();
 }
 
 Temperature::~Temperature()
@@ -35,19 +31,24 @@ Temperature::~Temperature()
 
 void Temperature::setupTemperatureGradient()
 {
-  _gradient = std::make_unique<Gradient<float>>(_height);
+  auto gradient = std::make_unique<Gradient<float>>(_height);
 
-  _gradient->addStop(0.f, _minTemp);
-  _gradient->addStop(0.2f, _minTemp);
-  _gradient->addStop(0.5f, _maxTemp);
-  _gradient->addStop(0.8f, _minTemp);
-  _gradient->addStop(1.f, _minTemp);
+  gradient->addStop(0.f, _minTemp);
+  gradient->addStop(0.2f, _minTemp);
+  gradient->addStop(0.5f, _maxTemp);
+  gradient->addStop(0.8f, _minTemp);
+  gradient->addStop(1.f, _minTemp);
 
-  _gradient->calculate();
+  gradient->calculate();
+
+  _gradient = std::move(gradient);
 }
 
 void Temperature::generateTemperature()
 {
+  const auto n = static_cast<size_t>(_height * _width + _width + 1);
+  _data.resize(n);
+
   for (float x = 0.f; x < _width; ++x) {
     for (float y = 0.f; y < _height; ++y) {
       float s = x / _width;

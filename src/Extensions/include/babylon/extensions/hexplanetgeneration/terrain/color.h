@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/extensions/hexplanetgeneration/utils/gradient.h>
+#include <babylon/extensions/hexplanetgeneration/utils/color_gradient_2d.h>
 
 namespace BABYLON {
 namespace Extensions {
@@ -22,8 +23,8 @@ public:
 private:
   float _maxHeight;
   float _parchmentFactor;
-  std::unique_ptr<Gradient<Color3>> _terrainGradient;
-  std::unique_ptr<ColorGradient2D> _terrainGradient2D;
+  Gradient<Color3> _terrainGradient;
+  ColorGradient2D _terrainGradient2D;
 
 }; // end of class Color
 

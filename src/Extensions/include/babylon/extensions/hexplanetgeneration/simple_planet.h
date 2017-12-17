@@ -36,10 +36,10 @@ struct PlanetData {
 class BABYLON_SHARED_EXPORT SimplePlanet {
 
 public:
-  SimplePlanet(float scale, float degree, Scene* scene,
-               const std::string& seed);
+  SimplePlanet(float scale, float degree, Scene* scene, const string_t& seed);
   ~SimplePlanet();
 
+  void initialize();
   Vector2 calculateUVCoord(const Vector3& p) const;
   void revolve();
   void pickTile(unsigned int faceId);
@@ -51,6 +51,7 @@ public:
 private:
   float _scale;
   Scene* _scene;
+  string_t _seed;
   XorShift128 _random;
   IcosahedronMesh _icosahedronMesh;
   PlanetData _planet;

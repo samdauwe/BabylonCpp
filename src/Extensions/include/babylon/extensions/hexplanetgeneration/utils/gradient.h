@@ -24,7 +24,8 @@ public:
 
   void addStop(float stop, const T& value)
   {
-    _stops.emplace_back(std::make_pair(stop, value));
+    auto newStop = std::make_pair(stop, value);
+    _stops.emplace_back(newStop);
   }
 
   T& getValue(size_t index)

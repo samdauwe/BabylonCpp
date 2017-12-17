@@ -20,12 +20,17 @@ Terrain::Terrain(const std::string& seed, float width, float height)
     , _maxRain{400}
 {
   _terrainColor = std::make_unique<Color>(_maxHeight);
+  _terrainColor->setupGradient();
   _terrainHeightmap
     = std::make_unique<Heightmap>(_seed, _maxHeight, _height, _width);
+  _terrainHeightmap->generateHeightmap();
   _terrainRainmap
     = std::make_unique<Rainmap>(_seed + "rain", _maxRain, _height, _width);
+  _terrainRainmap->generateRainmap();
   _terrainTemperature = std::make_unique<Temperature>(
     _seed + "temp", _maxTemp, _minTemp, _tempDistortion, _height, _width);
+  _terrainTemperature->setupTemperatureGradient();
+  _terrainTemperature->generateTemperature();
 }
 
 Terrain::~Terrain()

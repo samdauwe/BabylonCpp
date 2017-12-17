@@ -7,7 +7,7 @@ namespace Extensions {
 
 Rainmap::Rainmap(const std::string& seed, float maxRain, float height,
                  float width)
-    : _seed{seed}, _data{{}}, _width{width}, _height{height}, _maxRain{maxRain}
+    : _seed{seed}, _width{width}, _height{height}, _maxRain{maxRain}
 {
   FastSimplexNoiseOptions noiseOptions;
   noiseOptions.amplitude   = 0.1f;
@@ -18,8 +18,6 @@ Rainmap::Rainmap(const std::string& seed, float maxRain, float height,
   noiseOptions.persistence = 0.5f;
 
   _noise = std::make_unique<FastSimplexNoise>(noiseOptions);
-
-  generateRainmap();
 }
 
 Rainmap::~Rainmap()
@@ -28,6 +26,9 @@ Rainmap::~Rainmap()
 
 void Rainmap::generateRainmap()
 {
+  const auto n = static_cast<size_t>(_height * _width + _width + 1);
+  _data.resize(n);
+
   for (float x = 0.f; x < _width; ++x) {
     for (float y = 0.f; y < _height; ++y) {
       float s = x / _width;

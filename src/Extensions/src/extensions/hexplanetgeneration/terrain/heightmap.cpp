@@ -7,11 +7,7 @@ namespace Extensions {
 
 Heightmap::Heightmap(const std::string& seed, float maxHeight, float height,
                      float width)
-    : _seed{seed}
-    , _data{{}}
-    , _width{width}
-    , _height{height}
-    , _maxHeight{maxHeight}
+    : _seed{seed}, _width{width}, _height{height}, _maxHeight{maxHeight}
 {
   FastSimplexNoiseOptions noiseOptions;
   noiseOptions.amplitude   = 0.4f;
@@ -22,8 +18,6 @@ Heightmap::Heightmap(const std::string& seed, float maxHeight, float height,
   noiseOptions.persistence = 0.5f;
 
   _noise = std::make_unique<FastSimplexNoise>(noiseOptions);
-
-  generateHeightmap();
 }
 
 Heightmap::~Heightmap()
@@ -32,6 +26,9 @@ Heightmap::~Heightmap()
 
 void Heightmap::generateHeightmap()
 {
+  const auto n = static_cast<size_t>(_height * _width + _width + 1);
+  _data.resize(n);
+
   for (float x = 0.f; x < _width; ++x) {
     for (float y = 0.f; y < _height; ++y) {
       float s = x / _width;
