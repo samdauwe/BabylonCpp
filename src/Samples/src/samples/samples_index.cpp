@@ -10,6 +10,7 @@
 #include <babylon/samples/effects/fog_scene.h>
 #include <babylon/samples/environment/height_map_scene.h>
 #include <babylon/samples/extensions/hexplanetgeneration/hex_ico_sphere_scene.h>
+#include <babylon/samples/extensions/hexplanetgeneration/procedural_hex_planet_generation_scene.h>
 #include <babylon/samples/extensions/navigation/crowd_simulation_scene_01.h>
 #include <babylon/samples/extensions/navigation/crowd_simulation_scene_02.h>
 #include <babylon/samples/extensions/navigation/crowd_simulation_scene_03.h>
@@ -340,6 +341,12 @@ SamplesIndex::SamplesIndex()
     [](ICanvas* iCanvas) {                                 //
       return ::std::make_unique<PolyhedronScene>(iCanvas); //
     });                                                    //
+  // Procedural Hex Planet Generation Scene
+  _samples["ProceduralHexPlanetGenerationScene"] = ::std::make_tuple(
+    false,
+    [](ICanvas* iCanvas) {                                                    //
+      return ::std::make_unique<ProceduralHexPlanetGenerationScene>(iCanvas); //
+    });                                                                       //
   // Pump Jack Scene
   _samples["PumpJackScene"]
     = ::std::make_tuple(false,
