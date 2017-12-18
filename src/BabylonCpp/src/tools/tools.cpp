@@ -131,9 +131,9 @@ MinMax Tools::ExtractMinAndMaxIndexed(const Float32Array& positions,
   Vector3 minimum(numeric_limits_t<float>::max(),
                   numeric_limits_t<float>::max(),
                   numeric_limits_t<float>::max());
-  Vector3 maximum(-numeric_limits_t<float>::max(),
-                  -numeric_limits_t<float>::max(),
-                  -numeric_limits_t<float>::max());
+  Vector3 maximum(numeric_limits_t<float>::lowest(),
+                  numeric_limits_t<float>::lowest(),
+                  numeric_limits_t<float>::lowest());
 
   for (size_t index = indexStart; index < indexStart + indexCount; ++index) {
     Vector3 current(positions[indices[index] * 3],
@@ -174,9 +174,9 @@ MinMax Tools::ExtractMinAndMax(const Float32Array& positions, size_t start,
   Vector3 minimum(numeric_limits_t<float>::max(),
                   numeric_limits_t<float>::max(),
                   numeric_limits_t<float>::max());
-  Vector3 maximum(-numeric_limits_t<float>::max(),
-                  -numeric_limits_t<float>::max(),
-                  -numeric_limits_t<float>::max());
+  Vector3 maximum(numeric_limits_t<float>::lowest(),
+                  numeric_limits_t<float>::lowest(),
+                  numeric_limits_t<float>::lowest());
 
   for (size_t index = start; index < start + count; ++index) {
     Vector3 current(positions[index * stride], positions[index * stride + 1],
@@ -213,8 +213,8 @@ MinMaxVector2 Tools::ExtractMinAndMaxVector2(
 {
   Vector2 minimum(numeric_limits_t<float>::max(),
                   numeric_limits_t<float>::max());
-  Vector2 maximum(-numeric_limits_t<float>::max(),
-                  -numeric_limits_t<float>::max());
+  Vector2 maximum(numeric_limits_t<float>::lowest(),
+                  numeric_limits_t<float>::lowest());
 
   std::size_t i = 0;
   auto cur      = feeder(i++);

@@ -95,8 +95,8 @@ Mesh* MeshBuilder::CreateRibbon(const string_t& name, RibbonOptions& options,
                              numeric_limits_t<float>::max(),
                              Tmp::Vector3Array[0]); // minimum
     Vector3::FromFloatsToRef(
-      -numeric_limits_t<float>::max(), -numeric_limits_t<float>::max(),
-      -numeric_limits_t<float>::max(), Tmp::Vector3Array[1]);
+      numeric_limits_t<float>::lowest(), numeric_limits_t<float>::lowest(),
+      numeric_limits_t<float>::lowest(), Tmp::Vector3Array[1]);
     const auto positionFunction = [&](Float32Array& positions) {
       auto minlg     = pathArray[0].size();
       unsigned int i = 0;

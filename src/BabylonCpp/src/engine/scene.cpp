@@ -3334,8 +3334,9 @@ MinMax Scene::getWorldExtends()
 {
   Vector3 min(numeric_limits_t<float>::max(), numeric_limits_t<float>::max(),
               numeric_limits_t<float>::max());
-  Vector3 max(-numeric_limits_t<float>::max(), -numeric_limits_t<float>::max(),
-              -numeric_limits_t<float>::max());
+  Vector3 max(numeric_limits_t<float>::lowest(),
+              numeric_limits_t<float>::lowest(),
+              numeric_limits_t<float>::lowest());
   for (auto& mesh : meshes) {
     if (mesh->subMeshes.empty()) {
       continue;

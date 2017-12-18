@@ -304,9 +304,9 @@ void DynamicTerrain::_updateTerrain()
   Vector3::FromFloatsToRef(numeric_limits_t<float>::max(),
                            numeric_limits_t<float>::max(),
                            numeric_limits_t<float>::max(), _bbMin);
-  Vector3::FromFloatsToRef(-numeric_limits_t<float>::max(),
-                           -numeric_limits_t<float>::max(),
-                           -numeric_limits_t<float>::max(), _bbMax);
+  Vector3::FromFloatsToRef(numeric_limits_t<float>::lowest(),
+                           numeric_limits_t<float>::lowest(),
+                           numeric_limits_t<float>::lowest(), _bbMax);
 
   for (unsigned int j = 0; j <= _terrainSub; ++j) {
     // LOD Z
@@ -690,9 +690,8 @@ void DynamicTerrain::CreateMapFromHeightMapToRef(
         x                = col * width / subX - width * 0.5f;
         z                = row * height / subZ - height * 0.5f;
         float heightmapX = ((x + width * 0.5f) / width * (bufferWidth - 1));
-        float heightmapY
-          = (bufferHeight - 1)
-            - ((z + height * 0.5f) / height * (bufferHeight - 1));
+        float heightmapY = (bufferHeight - 1) - ((z + height * 0.5f) / height
+                                                 * (bufferHeight - 1));
         unsigned int pos
           = static_cast<unsigned>(heightmapX + heightmapY * bufferWidth) * 4;
         float gradient = (buffer[pos] * filter.r + buffer[pos + 1] * filter.g

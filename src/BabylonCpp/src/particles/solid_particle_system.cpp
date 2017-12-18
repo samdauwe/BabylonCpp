@@ -608,9 +608,9 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
       Vector3::FromFloatsToRef(numeric_limits_t<float>::max(),
                                numeric_limits_t<float>::max(),
                                numeric_limits_t<float>::max(), _minimum);
-      Vector3::FromFloatsToRef(-numeric_limits_t<float>::max(),
-                               -numeric_limits_t<float>::max(),
-                               -numeric_limits_t<float>::max(), _maximum);
+      Vector3::FromFloatsToRef(numeric_limits_t<float>::lowest(),
+                               numeric_limits_t<float>::lowest(),
+                               numeric_limits_t<float>::lowest(), _maximum);
     }
     // only some particles are updated, then use the current existing BBox
     // basis. Note : it can only increase.

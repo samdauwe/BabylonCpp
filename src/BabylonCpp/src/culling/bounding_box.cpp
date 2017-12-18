@@ -135,9 +135,9 @@ void BoundingBox::_update(const Matrix& world)
   Vector3::FromFloatsToRef(numeric_limits_t<float>::max(),
                            numeric_limits_t<float>::max(),
                            numeric_limits_t<float>::max(), minimumWorld);
-  Vector3::FromFloatsToRef(-numeric_limits_t<float>::max(),
-                           -numeric_limits_t<float>::max(),
-                           -numeric_limits_t<float>::max(), maximumWorld);
+  Vector3::FromFloatsToRef(numeric_limits_t<float>::lowest(),
+                           numeric_limits_t<float>::lowest(),
+                           numeric_limits_t<float>::lowest(), maximumWorld);
 
   unsigned int index = 0;
   for (auto& vector : vectors) {
