@@ -26,10 +26,12 @@ LensFlareSystem::LensFlareSystem(const string_t iName, Mesh* emitter,
     , layerMask{0x0FFFFFFF}
     , _scene{scene}
     , _emitter{emitter}
+    , _indexBuffer{nullptr}
     , _isEnabled{true}
 {
-  meshesSelectionPredicate = [this](Mesh* m) {
-    return m->material() && m->isVisible && m->isEnabled() && m->isBlocker
+  meshesSelectionPredicate = [this](AbstractMesh* m) {
+    return _scene->activeCamera && m->material() && m->isVisible
+           && m->isEnabled() && m->isBlocker
            && ((m->layerMask() & _scene->activeCamera->layerMask) != 0);
   };
 
@@ -141,7 +143,7 @@ bool LensFlareSystem::computeEffectivePosition(Viewport& globalViewport)
 
 bool LensFlareSystem::_isVisible()
 {
-  if (!_isEnabled) {
+  if (!_isEnabled || !_scene->activeCamera) {
     return false;
   }
 
@@ -159,7 +161,7 @@ bool LensFlareSystem::_isVisible()
 
 bool LensFlareSystem::render()
 {
-  if (!_effect->isReady()) {
+  if (!_effect->isReady() || !_scene->activeCamera) {
     return false;
   }
 
@@ -179,8 +181,8 @@ bool LensFlareSystem::render()
   }
 
   // Intensity
-  float awayX;
-  float awayY;
+  float awayX = 0.f;
+  float awayY = 0.f;
 
   const auto borderLimitf    = static_cast<float>(borderLimit);
   auto globalViewport_x      = static_cast<float>(globalViewport.x);
@@ -257,7 +259,7 @@ bool LensFlareSystem::render()
 
   // Flares
   for (auto& flare : lensFlares) {
-    engine->setAlphaMode(flare->alphaMode);
+    engine->setAlphaMode(static_cast<int>(flare->alphaMode));
 
     auto x = centerX - (distX * flare->position.x);
     auto y = centerY - (distY * flare->position.y);

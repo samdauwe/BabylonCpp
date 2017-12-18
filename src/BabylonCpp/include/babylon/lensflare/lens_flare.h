@@ -12,7 +12,7 @@ class BABYLON_SHARED_EXPORT LensFlare : public IDisposable {
 
 public:
   template <typename... Ts>
-  static LensFlare* New(Ts&&... args);
+  static LensFlare* AddFlare(Ts&&... args);
   virtual ~LensFlare();
 
   void dispose(bool doNotRecurse = false) override;
@@ -27,7 +27,7 @@ public:
   Vector3 position;
   Color3 color;
   Texture* texture;
-  int alphaMode;
+  unsigned int alphaMode;
 
 private:
   LensFlareSystem* _system;

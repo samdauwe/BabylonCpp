@@ -7,7 +7,7 @@
 namespace BABYLON {
 
 template <typename... Ts>
-LensFlare* LensFlare::New(Ts&&... args)
+LensFlare* LensFlare::AddFlare(Ts&&... args)
 {
   auto lensFlare = ::std::make_unique<LensFlare>(std::forward<Ts>(args)...);
   lensFlare->_system->lensFlares.emplace_back(lensFlare);

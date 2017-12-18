@@ -49,7 +49,7 @@ public:
   vector_t<unique_ptr_t<LensFlare>> lensFlares;
   int borderLimit;
   float viewportBorder;
-  ::std::function<bool(Mesh* mesh)> meshesSelectionPredicate;
+  ::std::function<bool(AbstractMesh* mesh)> meshesSelectionPredicate;
   unsigned int layerMask;
 
 private:
