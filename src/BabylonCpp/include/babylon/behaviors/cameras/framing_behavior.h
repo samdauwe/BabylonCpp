@@ -131,6 +131,8 @@ public:
    */
   float framingTime() const;
 
+  void init() override;
+
   void attach(ArcRotateCamera* camera) override;
 
   void detach() override;
@@ -149,6 +151,41 @@ public:
    */
   void zoomOnMesh(AbstractMesh* mesh, bool focusOnOriginXZ = false,
                   const ::std::function<void()>& onAnimationEnd = nullptr);
+
+  /**
+   * @brief Targets the given mesh with its children and updates zoom level
+   * accordingly.
+   * @param mesh  The mesh to target.
+   * @param radius Optional. If a cached radius position already exists,
+   * overrides default.
+   * @param framingPositionY Position on mesh to center camera focus where 0
+   * corresponds bottom of its bounding box and 1, the top
+   * @param focusOnOriginXZ Determines if the camera should focus on 0 in the X
+   * and Z axis instead of the mesh
+   * @param onAnimationEnd Callback triggered at the end of the framing
+   * animation
+   */
+  void zoomOnMeshHierarchy(AbstractMesh* mesh, bool focusOnOriginXZ = false,
+                           const ::std::function<void()>& onAnimationEnd
+                           = nullptr);
+
+  /**
+   * @brief Targets the given meshes with their children and updates zoom level
+   * accordingly.
+   * @param meshes  The mesh to target.
+   * @param radius Optional. If a cached radius position already exists,
+   * overrides default.
+   * @param framingPositionY Position on mesh to center camera focus where 0
+   * corresponds bottom of its bounding box and 1, the top
+   * @param focusOnOriginXZ Determines if the camera should focus on 0 in the X
+   * and Z axis instead of the mesh
+   * @param onAnimationEnd Callback triggered at the end of the framing
+   * animation
+   */
+  void zoomOnMeshesHierarchy(const vector_t<AbstractMesh*>& meshes,
+                             bool focusOnOriginXZ = false,
+                             const ::std::function<void()>& onAnimationEnd
+                             = nullptr);
 
   /**
    * @brief Targets the given mesh and updates zoom level accordingly.
@@ -244,7 +281,6 @@ private:
   Animation* _betaTransition;
   Animation* _radiusTransition;
   Animation* _vectorTransition;
-  float _lastFrameRadius;
 
 }; // end of class FramingBehavior
 

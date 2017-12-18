@@ -16,6 +16,9 @@ BouncingBehavior::BouncingBehavior()
     , lowerRadiusTransitionRange{2}
     , upperRadiusTransitionRange{-2}
     , _autoTransitionRange{false}
+    , _attachedCamera{nullptr}
+    , _onAfterCheckInputsObserver{nullptr}
+    , _onMeshTargetChangedObserver{nullptr}
     , _radiusIsAnimating{false}
     , _radiusBounceTransition{nullptr}
 {
@@ -44,6 +47,9 @@ void BouncingBehavior::setAutoTransitionRange(bool value)
   _autoTransitionRange = value;
 
   auto camera = _attachedCamera;
+  if (!camera) {
+    return;
+  }
 
   if (value) {
     _onMeshTargetChangedObserver = camera->onMeshTargetChangedObservable.add(
@@ -64,11 +70,20 @@ void BouncingBehavior::setAutoTransitionRange(bool value)
   }
 }
 
+void BouncingBehavior::init()
+{
+  // Do nothing
+}
+
 void BouncingBehavior::attach(ArcRotateCamera* camera)
 {
   _attachedCamera = camera;
   _onAfterCheckInputsObserver
     = camera->onAfterCheckInputsObservable.add([this](Camera*, EventState&) {
+        if (!_attachedCamera) {
+          return;
+        }
+
         // Add the bounce animation to the lower radius limit
         if (_isRadiusAtLimit(_attachedCamera->lowerRadiusLimit)) {
           _applyBoundRadiusAnimation(lowerRadiusTransitionRange);
@@ -83,8 +98,13 @@ void BouncingBehavior::attach(ArcRotateCamera* camera)
 
 void BouncingBehavior::detach()
 {
-  _attachedCamera->onAfterCheckInputsObservable.remove(
-    _onAfterCheckInputsObserver);
+  if (!_attachedCamera) {
+    return;
+  }
+  if (_onAfterCheckInputsObserver) {
+    _attachedCamera->onAfterCheckInputsObservable.remove(
+      _onAfterCheckInputsObserver);
+  }
   if (_onMeshTargetChangedObserver) {
     _attachedCamera->onMeshTargetChangedObservable.remove(
       _onMeshTargetChangedObserver);
@@ -94,6 +114,10 @@ void BouncingBehavior::detach()
 
 bool BouncingBehavior::_isRadiusAtLimit(float radiusLimit) const
 {
+  if (!_attachedCamera) {
+    return false;
+  }
+
   if (stl_util::almost_equal(_attachedCamera->radius, radiusLimit)
       && !_radiusIsAnimating) {
     return true;
@@ -103,6 +127,10 @@ bool BouncingBehavior::_isRadiusAtLimit(float radiusLimit) const
 
 void BouncingBehavior::_applyBoundRadiusAnimation(float radiusDelta)
 {
+  if (!_attachedCamera) {
+    return;
+  }
+
   if (!_radiusBounceTransition) {
     BouncingBehavior::_EasingFunction.setEasingMode(
       BouncingBehavior::EasingMode);
@@ -118,21 +146,31 @@ void BouncingBehavior::_applyBoundRadiusAnimation(float radiusDelta)
   // Animate to the radius limit
   stopAllAnimations();
   _radiusIsAnimating = true;
-  _animatables.emplace_back(Animation::TransitionTo(
+  auto animatable    = Animation::TransitionTo(
     "radius", _attachedCamera->radius + radiusDelta, _attachedCamera,
     _attachedCamera->getScene(), 60, _radiusBounceTransition,
-    transitionDuration, [this]() { _clearAnimationLocks(); }));
+    transitionDuration, [this]() { _clearAnimationLocks(); });
+
+  if (animatable) {
+    _animatables.emplace_back(animatable);
+  }
 }
 
 void BouncingBehavior::_clearAnimationLocks()
 {
-  _radiusIsAnimating              = false;
-  _attachedCamera->wheelPrecision = _cachedWheelPrecision;
+  _radiusIsAnimating = false;
+
+  if (_attachedCamera) {
+    _attachedCamera->wheelPrecision = _cachedWheelPrecision;
+  }
 }
 
 void BouncingBehavior::stopAllAnimations()
 {
-  _attachedCamera->animations.clear();
+  if (_attachedCamera) {
+    _attachedCamera->animations.clear();
+  }
+
   for (auto& animatable : _animatables) {
     animatable->onAnimationEnd = nullptr;
     animatable->stop();

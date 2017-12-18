@@ -68,7 +68,10 @@ public:
    */
   bool rotationInProgress() const;
 
+  void init() override;
+
   void attach(ArcRotateCamera* camera) override;
+
   void detach() override;
 
 private:
@@ -99,7 +102,7 @@ private:
   Observer<PointerInfoPre>::Ptr _onPrePointerObservableObserver;
   Observer<Camera>::Ptr _onAfterCheckInputsObserver;
   ArcRotateCamera* _attachedCamera;
-  bool _isPointerDown = false;
+  bool _isPointerDown;
   Nullable<high_res_time_point_t> _lastFrameTime;
   high_res_time_point_t _lastInteractionTime;
   float _cameraRotationSpeed;

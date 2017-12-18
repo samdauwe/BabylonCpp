@@ -12,6 +12,8 @@ AutoRotationBehavior::AutoRotationBehavior()
     , _idleRotationSpeed{0.05f}
     , _idleRotationWaitTime{2000}
     , _idleRotationSpinupTime{2000}
+    , _onPrePointerObservableObserver{nullptr}
+    , _onAfterCheckInputsObserver{nullptr}
     , _attachedCamera{nullptr}
     , _isPointerDown{false}
     , _cameraRotationSpeed{0.f}
@@ -73,6 +75,11 @@ bool AutoRotationBehavior::rotationInProgress() const
   return ::std::abs(_cameraRotationSpeed) > 0.f;
 }
 
+void AutoRotationBehavior::init()
+{
+  // Do nothing
+}
+
 void AutoRotationBehavior::attach(ArcRotateCamera* camera)
 {
   _attachedCamera = camera;
@@ -111,15 +118,22 @@ void AutoRotationBehavior::attach(ArcRotateCamera* camera)
         _cameraRotationSpeed = _idleRotationSpeed * scale;
 
         // Step camera rotation by rotation speed
-        _attachedCamera->alpha -= _cameraRotationSpeed * (dt / 1000.f);
+        if (_attachedCamera) {
+          _attachedCamera->alpha -= _cameraRotationSpeed * (dt / 1000.f);
+        }
       });
 }
 
 void AutoRotationBehavior::detach()
 {
+  if (!_attachedCamera) {
+    return;
+  }
   auto scene = _attachedCamera->getScene();
 
-  scene->onPrePointerObservable.remove(_onPrePointerObservableObserver);
+  if (_onPrePointerObservableObserver) {
+    scene->onPrePointerObservable.remove(_onPrePointerObservableObserver);
+  }
   _attachedCamera->onAfterCheckInputsObservable.remove(
     _onAfterCheckInputsObserver);
   _attachedCamera = nullptr;
@@ -127,11 +141,18 @@ void AutoRotationBehavior::detach()
 
 bool AutoRotationBehavior::_userIsZooming() const
 {
+  if (!_attachedCamera) {
+    return false;
+  }
   return _attachedCamera->inertialRadiusOffset != 0.f;
 }
 
 bool AutoRotationBehavior::_shouldAnimationStopForInteraction()
 {
+  if (!_attachedCamera) {
+    return false;
+  }
+
   auto zoomHasHitLimit = false;
   if (stl_util::almost_equal(_lastFrameRadius, _attachedCamera->radius)
       && !stl_util::almost_equal(_attachedCamera->inertialRadiusOffset, 0.f)) {
@@ -154,6 +175,10 @@ void AutoRotationBehavior::_applyUserInteraction()
 // Tools
 bool AutoRotationBehavior::_userIsMoving()
 {
+  if (!_attachedCamera) {
+    return false;
+  }
+
   return !stl_util::almost_equal(_attachedCamera->inertialAlphaOffset, 0.f)
          || !stl_util::almost_equal(_attachedCamera->inertialBetaOffset, 0.f)
          || !stl_util::almost_equal(_attachedCamera->inertialRadiusOffset, 0.f)

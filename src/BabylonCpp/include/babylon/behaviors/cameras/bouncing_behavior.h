@@ -14,7 +14,7 @@ namespace BABYLON {
  * minimum and maximum radius.
  */
 class BABYLON_SHARED_EXPORT BouncingBehavior
-    : public Behavior<ArcRotateCamera> {
+  : public Behavior<ArcRotateCamera> {
 
 public:
   /**
@@ -46,6 +46,8 @@ public:
    * space
    */
   void setAutoTransitionRange(bool value);
+
+  void init() override;
 
   void attach(ArcRotateCamera* camera) override;
 

@@ -577,8 +577,10 @@ public:
   /**
    * @brief Return the minimum and maximum world vectors of the entire hierarchy
    * under current mesh
+   * @param includeDescendants Include bounding info from descendants as well
+   * (true by default).
    */
-  MinMax getHierarchyBoundingVectors();
+  MinMax getHierarchyBoundingVectors(bool includeDescendants = true);
 
   /**
    * @brief Updates the mesh BoundingInfo object and all its children

@@ -1016,43 +1016,47 @@ void AbstractMesh::markAsDirty(unsigned int property)
   _isDirty         = true;
 }
 
-MinMax AbstractMesh::getHierarchyBoundingVectors()
+MinMax AbstractMesh::getHierarchyBoundingVectors(bool includeDescendants)
 {
   computeWorldMatrix(true);
 
   Vector3 min;
   Vector3 max;
+  auto boundingInfo = getBoundingInfo();
 
   if (subMeshes.empty()) {
     min
       = Vector3(numeric_limits_t<float>::max(), numeric_limits_t<float>::max(),
                 numeric_limits_t<float>::max());
-    max = Vector3(-numeric_limits_t<float>::max(),
-                  -numeric_limits_t<float>::max(),
-                  -numeric_limits_t<float>::max());
+    max = Vector3(numeric_limits_t<float>::lowest(),
+                  numeric_limits_t<float>::lowest(),
+                  numeric_limits_t<float>::lowest());
   }
   else {
-    min = getBoundingInfo()->boundingBox.minimumWorld;
-    max = getBoundingInfo()->boundingBox.maximumWorld;
+    min = boundingInfo->boundingBox.minimumWorld;
+    max = boundingInfo->boundingBox.maximumWorld;
   }
 
-  auto descendants = getDescendants(false);
+  if (includeDescendants) {
+    auto descendants = getDescendants(false);
 
-  for (auto& descendant : descendants) {
-    auto childMesh = static_cast<AbstractMesh*>(descendant);
+    for (auto& descendant : descendants) {
+      auto childMesh = static_cast<AbstractMesh*>(descendant);
 
-    childMesh->computeWorldMatrix(true);
+      childMesh->computeWorldMatrix(true);
+      auto childBoundingInfo = childMesh->getBoundingInfo();
 
-    if (childMesh->getTotalVertices() == 0) {
-      continue;
+      if (childMesh->getTotalVertices() == 0) {
+        continue;
+      }
+      auto boundingBox = childBoundingInfo->boundingBox;
+
+      auto minBox = boundingBox.minimumWorld;
+      auto maxBox = boundingBox.maximumWorld;
+
+      Tools::CheckExtends(minBox, min, max);
+      Tools::CheckExtends(maxBox, min, max);
     }
-    auto boundingBox = childMesh->getBoundingInfo()->boundingBox;
-
-    auto minBox = boundingBox.minimumWorld;
-    auto maxBox = boundingBox.maximumWorld;
-
-    Tools::CheckExtends(minBox, min, max);
-    Tools::CheckExtends(maxBox, min, max);
   }
 
   return {min, max};

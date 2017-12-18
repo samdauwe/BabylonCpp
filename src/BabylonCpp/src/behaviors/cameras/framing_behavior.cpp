@@ -8,6 +8,7 @@
 #include <babylon/engine/engine.h>
 #include <babylon/events/pointer_event_types.h>
 #include <babylon/mesh/abstract_mesh.h>
+#include <babylon/tools/tools.h>
 
 namespace BABYLON {
 
@@ -23,12 +24,15 @@ FramingBehavior::FramingBehavior()
     , _elevationReturnWaitTime{1000}
     , _zoomStopsAnimation{false}
     , _framingTime{1500}
+    , _onPrePointerObservableObserver{nullptr}
+    , _onAfterCheckInputsObserver{nullptr}
+    , _onMeshTargetChangedObserver{nullptr}
+    , _attachedCamera{nullptr}
     , _isPointerDown{false}
     , _betaIsAnimating{false}
     , _betaTransition{nullptr}
     , _radiusTransition{nullptr}
     , _vectorTransition{nullptr}
-    , _lastFrameRadius{0.f}
 {
 }
 
@@ -121,6 +125,11 @@ float FramingBehavior::framingTime() const
   return _framingTime;
 }
 
+void FramingBehavior::init()
+{
+  // Do nothing
+}
+
 void FramingBehavior::attach(ArcRotateCamera* camera)
 {
   _attachedCamera = camera;
@@ -162,13 +171,25 @@ void FramingBehavior::attach(ArcRotateCamera* camera)
 
 void FramingBehavior::detach()
 {
+  if (!_attachedCamera) {
+    return;
+  }
+
   auto scene = _attachedCamera->getScene();
 
-  scene->onPrePointerObservable.remove(_onPrePointerObservableObserver);
-  _attachedCamera->onAfterCheckInputsObservable.remove(
-    _onAfterCheckInputsObserver);
-  _attachedCamera->onMeshTargetChangedObservable.remove(
-    _onMeshTargetChangedObserver);
+  if (_onPrePointerObservableObserver) {
+    scene->onPrePointerObservable.remove(_onPrePointerObservableObserver);
+  }
+
+  if (_onAfterCheckInputsObserver) {
+    _attachedCamera->onAfterCheckInputsObservable.remove(
+      _onAfterCheckInputsObserver);
+  }
+
+  if (_onMeshTargetChangedObserver) {
+    _attachedCamera->onMeshTargetChangedObservable.remove(
+      _onMeshTargetChangedObserver);
+  }
 
   _attachedCamera = nullptr;
 }
@@ -183,11 +204,45 @@ void FramingBehavior::zoomOnMesh(AbstractMesh* mesh, bool focusOnOriginXZ,
                      focusOnOriginXZ, onAnimationEnd);
 }
 
+void FramingBehavior::zoomOnMeshHierarchy(
+  AbstractMesh* mesh, bool focusOnOriginXZ,
+  const ::std::function<void()>& onAnimationEnd)
+{
+  mesh->computeWorldMatrix(true);
+
+  auto boundingBox = mesh->getHierarchyBoundingVectors(true);
+  zoomOnBoundingInfo(boundingBox.min, boundingBox.max, focusOnOriginXZ,
+                     onAnimationEnd);
+}
+
+void FramingBehavior::zoomOnMeshesHierarchy(
+  const vector_t<AbstractMesh*>& meshes, bool focusOnOriginXZ,
+  const ::std::function<void()>& onAnimationEnd)
+{
+  Vector3 min(numeric_limits_t<float>::max(), numeric_limits_t<float>::max(),
+              numeric_limits_t<float>::max());
+  Vector3 max(numeric_limits_t<float>::lowest(),
+              numeric_limits_t<float>::lowest(),
+              numeric_limits_t<float>::lowest());
+
+  for (auto& mesh : meshes) {
+    auto boundingInfo = mesh->getHierarchyBoundingVectors(true);
+    Tools::CheckExtends(boundingInfo.min, min, max);
+    Tools::CheckExtends(boundingInfo.max, min, max);
+  }
+
+  zoomOnBoundingInfo(min, max, focusOnOriginXZ, onAnimationEnd);
+}
+
 void FramingBehavior::zoomOnBoundingInfo(
   const Vector3& minimumWorld, const Vector3& maximumWorld,
   bool focusOnOriginXZ, const ::std::function<void()>& onAnimationEnd)
 {
   Vector3 zoomTarget;
+
+  if (!_attachedCamera) {
+    return;
+  }
 
   // Find target by interpolating from bottom of bounding box in world-space to
   // top via framingPositionY
@@ -211,9 +266,13 @@ void FramingBehavior::zoomOnBoundingInfo(
   }
 
   _betaIsAnimating = true;
-  _animatables.emplace_back(Animation::TransitionTo(
+  auto animatable  = Animation::TransitionTo(
     "target", zoomTarget, _attachedCamera, _attachedCamera->getScene(), 60,
-    _vectorTransition, _framingTime));
+    _vectorTransition, _framingTime);
+
+  if (animatable) {
+    _animatables.emplace_back(animatable);
+  }
 
   // sets the radius and lower radius bounds
   // Small delta ensures camera is not always at lower zoom limit.
@@ -246,14 +305,21 @@ void FramingBehavior::zoomOnBoundingInfo(
                                    &FramingBehavior::_EasingFunction);
   }
 
-  _animatables.emplace_back(Animation::TransitionTo(
+  animatable = Animation::TransitionTo(
     "radius", radius, _attachedCamera, _attachedCamera->getScene(), 60,
     _radiusTransition, _framingTime, [this, &onAnimationEnd]() {
       if (onAnimationEnd) {
         onAnimationEnd();
       }
-      _attachedCamera->storeState();
-    }));
+
+      if (_attachedCamera) {
+        _attachedCamera->storeState();
+      }
+    });
+
+  if (animatable) {
+    _animatables.emplace_back(animatable);
+  }
 }
 
 float FramingBehavior::_calculateLowerRadiusFromModelBoundingSphere(
@@ -277,6 +343,10 @@ float FramingBehavior::_calculateLowerRadiusFromModelBoundingSphere(
   auto distance
     = ::std::max(distanceForHorizontalFrustum, distanceForVerticalFrustum);
   auto camera = _attachedCamera;
+
+  if (!camera) {
+    return 0.f;
+  }
 
   if (camera->lowerRadiusLimit != 0.f
       && _mode == FramingBehavior::IgnoreBoundsSizeMode) {
@@ -307,7 +377,7 @@ void FramingBehavior::_maintainCameraAboveGround()
   auto limitBeta   = Math::PI * 0.5f;
 
   // Bring the camera back up if below the ground plane
-  if (!_betaIsAnimating && _attachedCamera->beta > limitBeta
+  if (_attachedCamera && !_betaIsAnimating && _attachedCamera->beta > limitBeta
       && timeSinceInteraction >= _elevationReturnWaitTime) {
     _betaIsAnimating = true;
 
@@ -320,12 +390,16 @@ void FramingBehavior::_maintainCameraAboveGround()
                                      &FramingBehavior::_EasingFunction);
     }
 
-    _animatables.emplace_back(Animation::TransitionTo(
+    auto animatabe = Animation::TransitionTo(
       "beta", defaultBeta, _attachedCamera, _attachedCamera->getScene(), 60,
       _betaTransition, _elevationReturnTime, [this]() {
         _clearAnimationLocks();
         stopAllAnimations();
-      }));
+      });
+
+    if (animatabe) {
+      _animatables.emplace_back();
+    }
   }
 }
 
@@ -333,7 +407,12 @@ Vector2 FramingBehavior::_getFrustumSlope() const
 {
   // Calculate the viewport ratio
   // Aspect Ratio is Height/Width.
-  auto camera      = _attachedCamera;
+  auto camera = _attachedCamera;
+
+  if (!camera) {
+    return Vector2::Zero();
+  }
+
   auto engine      = camera->getScene()->getEngine();
   auto aspectRatio = engine->getAspectRatio(camera);
 
@@ -366,7 +445,10 @@ void FramingBehavior::_applyUserInteraction()
 
 void FramingBehavior::stopAllAnimations()
 {
-  _attachedCamera->animations.clear();
+  if (_attachedCamera) {
+    _attachedCamera->animations.clear();
+  }
+
   for (auto& animatable : _animatables) {
     animatable->onAnimationEnd = nullptr;
     animatable->stop();
@@ -376,6 +458,10 @@ void FramingBehavior::stopAllAnimations()
 
 bool FramingBehavior::isUserIsMoving() const
 {
+  if (!_attachedCamera) {
+    return false;
+  }
+
   return !stl_util::almost_equal(_attachedCamera->inertialAlphaOffset, 0.f)
          || !stl_util::almost_equal(_attachedCamera->inertialBetaOffset, 0.f)
          || !stl_util::almost_equal(_attachedCamera->inertialRadiusOffset, 0.f)
