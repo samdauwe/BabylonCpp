@@ -159,9 +159,8 @@ int VertexBuffer::KindToStride(unsigned int kind)
       break;
     case VertexBuffer::MatricesWeightsKind:
     case VertexBuffer::MatricesWeightsExtraKind:
-      stride = 4;
-      break;
     default:
+      stride = 4;
       break;
   }
   return stride;

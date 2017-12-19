@@ -49,6 +49,7 @@ public:
   void setIntersectionThreshold(float value);
 
   Material* getMaterial() override;
+  void setMaterial(Material* material);
   bool checkCollisions();
   InstancedMesh* createInstance(const string_t& name);
   void _bind(SubMesh* subMesh, Effect* effect, unsigned int fillMode) override;
@@ -66,7 +67,7 @@ public:
 protected:
   LinesMesh(const string_t& name, Scene* scene, Node* parent = nullptr,
             LinesMesh* source = nullptr, bool doNotCloneChildren = true,
-            bool useVertexColor = false);
+            bool useVertexColor = false, bool useVertexAlpha = false);
 
 public:
   float dashSize;
@@ -74,6 +75,7 @@ public:
   Color3 color;
   float alpha;
   bool useVertexColor;
+  bool useVertexAlpha;
 
 private:
   float _intersectionThreshold;

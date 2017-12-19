@@ -155,11 +155,17 @@ void InstancedMesh::_activate(int renderId)
   }
 }
 
-AbstractMesh* InstancedMesh::getLOD(Camera* /*camera*/,
+AbstractMesh* InstancedMesh::getLOD(Camera* camera,
                                     BoundingSphere* /*boundingSphere*/)
 {
-  AbstractMesh* currentLOD = sourceMesh()->getLOD(
-    getScene()->activeCamera, &getBoundingInfo()->boundingSphere);
+  if (!camera) {
+    return this;
+  }
+
+  auto boundingInfo = getBoundingInfo();
+
+  auto currentLOD = sourceMesh()->getLOD(getScene()->activeCamera,
+                                         &boundingInfo->boundingSphere);
   _currentLOD = dynamic_cast<Mesh*>(currentLOD);
 
   if (_currentLOD == sourceMesh()) {

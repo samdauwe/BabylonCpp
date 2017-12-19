@@ -14,7 +14,7 @@ namespace BABYLON {
 
 LinesMesh::LinesMesh(const string_t& iName, Scene* scene, Node* iParent,
                      LinesMesh* source, bool doNotCloneChildren,
-                     bool useVertexColor)
+                     bool iUseVertexColor, bool iUseVertexAlpha)
     : Mesh(iName, scene, iParent, source, doNotCloneChildren)
     , dashSize{0.f}
     , gapSize{0.f}
@@ -26,19 +26,30 @@ LinesMesh::LinesMesh(const string_t& iName, Scene* scene, Node* iParent,
     color          = source->color;
     alpha          = source->alpha;
     useVertexColor = source->useVertexColor;
+    useVertexAlpha = source->useVertexAlpha;
   }
 
+  vector_t<string_t> defines;
   ShaderMaterialOptions options;
   options.attributes        = {VertexBuffer::PositionKindChars};
   options.uniforms          = {"world", "viewProjection"};
-  options.needAlphaBlending = false;
+  options.needAlphaBlending = true;
+  options.defines           = defines;
 
-  if (!useVertexColor) {
-    options.uniforms.emplace_back("color");
-    options.needAlphaBlending = true;
+  if (!iUseVertexAlpha) {
+    options.needAlphaBlending = false;
   }
 
-  _colorShader = ShaderMaterial::New("colorShader", scene, "color", options);
+  if (!iUseVertexColor) {
+    options.uniforms.emplace_back("color");
+  }
+  else {
+    options.defines.emplace_back("#define VERTEXCOLOR");
+    options.attributes.emplace_back(VertexBuffer::ColorKindChars);
+  }
+
+  _colorShader
+    = ShaderMaterial::New("colorShader", getScene(), "color", options);
 }
 
 LinesMesh::~LinesMesh()
@@ -77,6 +88,11 @@ Material* LinesMesh::getMaterial()
   return _colorShader;
 }
 
+void LinesMesh::setMaterial(Material* /*material*/)
+{
+  // Do nothing
+}
+
 bool LinesMesh::checkCollisions()
 {
   return false;
@@ -92,6 +108,9 @@ InstancedMesh* LinesMesh::createInstance(const string_t& /*name*/)
 void LinesMesh::_bind(SubMesh* /*subMesh*/, Effect* /*effect*/,
                       unsigned int /*fillMode*/)
 {
+  if (!_geometry) {
+    return;
+  }
   // VBOs
   _geometry->_bind(_colorShader->getEffect());
 

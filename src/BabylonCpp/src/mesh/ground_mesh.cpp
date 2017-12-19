@@ -59,7 +59,7 @@ float GroundMesh::getHeightAtCoordinates(float x, float z)
   world->invertToRef(invMat);
   auto& tmpVect = Tmp::Vector3Array[8];
   // transform x,z in the mesh local space
-  Vector3::TransformCoordinatesFromFloatsToRef(x, 0.0, z, invMat, tmpVect);
+  Vector3::TransformCoordinatesFromFloatsToRef(x, 0.f, z, invMat, tmpVect);
   x = tmpVect.x;
   z = tmpVect.z;
   if (x < _minX || x > _maxX || z < _minZ || z > _maxZ) {
@@ -91,7 +91,7 @@ GroundMesh& GroundMesh::getNormalAtCoordinatesToRef(float x, float z,
   world->invertToRef(tmpMat);
   auto& tmpVect = Tmp::Vector3Array[8];
   // transform x,z in the mesh local space
-  Vector3::TransformCoordinatesFromFloatsToRef(x, 0.0, z, tmpMat, tmpVect);
+  Vector3::TransformCoordinatesFromFloatsToRef(x, 0.f, z, tmpMat, tmpVect);
   x = tmpVect.x;
   z = tmpVect.z;
   if (x < _minX || x > _maxX || z < _minZ || z > _maxZ) {
@@ -154,22 +154,27 @@ GroundMesh& GroundMesh::_initHeightQuads()
 GroundMesh& GroundMesh::_computeHeightQuads()
 {
   auto positions = getVerticesData(VertexBuffer::PositionKind);
-  auto v1        = Tmp::Vector3Array[3];
-  auto v2        = Tmp::Vector3Array[2];
-  auto v3        = Tmp::Vector3Array[1];
-  auto v4        = Tmp::Vector3Array[0];
-  auto v1v2      = Tmp::Vector3Array[4];
-  auto v1v3      = Tmp::Vector3Array[5];
-  auto v1v4      = Tmp::Vector3Array[6];
-  auto norm1     = Tmp::Vector3Array[7];
-  auto norm2     = Tmp::Vector3Array[8];
-  size_t i       = 0;
-  size_t j       = 0;
-  size_t k       = 0;
-  auto cd        = 0.f; // 2D slope coefficient : z = cd * x + h
-  auto h         = 0.f;
-  auto d1        = 0.f; // facet plane equation : ax + by + cz + d = 0
-  auto d2        = 0.f;
+
+  if (positions.empty()) {
+    return *this;
+  }
+
+  auto v1    = Tmp::Vector3Array[3];
+  auto v2    = Tmp::Vector3Array[2];
+  auto v3    = Tmp::Vector3Array[1];
+  auto v4    = Tmp::Vector3Array[0];
+  auto v1v2  = Tmp::Vector3Array[4];
+  auto v1v3  = Tmp::Vector3Array[5];
+  auto v1v4  = Tmp::Vector3Array[6];
+  auto norm1 = Tmp::Vector3Array[7];
+  auto norm2 = Tmp::Vector3Array[8];
+  size_t i   = 0;
+  size_t j   = 0;
+  size_t k   = 0;
+  auto cd    = 0.f; // 2D slope coefficient : z = cd * x + h
+  auto h     = 0.f;
+  auto d1    = 0.f; // facet plane equation : ax + by + cz + d = 0
+  auto d2    = 0.f;
 
   for (size_t row = 0; row < _subdivisionsY; ++row) {
     for (size_t col = 0; col < _subdivisionsX; ++col) {

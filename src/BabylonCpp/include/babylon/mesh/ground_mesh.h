@@ -135,7 +135,6 @@ public:
   float _maxZ;
 
 private:
-  Matrix _worldInverse;
   vector_t<Quad> _heightQuads;
 
 }; // end of class GroundMesh
