@@ -16,19 +16,23 @@ struct BABYLON_SHARED_EXPORT IHighlightLayerMesh {
   /**
    * The glowy mesh
    */
-  Mesh* mesh;
+  Mesh* mesh = nullptr;
+
   /**
    * The color of the glow
    */
   Color3 color;
+
   /**
    * The mesh render callback use to insert stencil information
    */
-  Observer<Mesh>::Ptr observerHighlight;
+  Observer<Mesh>::Ptr observerHighlight = nullptr;
+
   /**
    * The mesh render callback use to come to the default behavior
    */
-  Observer<Mesh>::Ptr observerDefault;
+  Observer<Mesh>::Ptr observerDefault = nullptr;
+
   /**
    * If it exists, the emissive color of the material will be used to generate
    * the glow.

@@ -261,6 +261,12 @@ bool Material::needAlphaBlending()
   return (alpha < 1.f);
 }
 
+bool Material::needAlphaBlendingForMesh(AbstractMesh* mesh)
+{
+  return needAlphaBlending() || (mesh->visibility < 1.f)
+         || mesh->hasVertexAlpha();
+}
+
 bool Material::needAlphaTesting()
 {
   return false;

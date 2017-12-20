@@ -22,7 +22,7 @@ Layer::Layer(const string_t& name, const string_t& imgUrl, Scene* scene,
     , _onBeforeRenderObserver{nullptr}
     , _onAfterRenderObserver{nullptr}
     , _name{name}
-    , _scene{scene}
+    , _scene{scene ? scene : Engine::LastCreatedScene()}
 {
   texture = !imgUrl.empty() ? Texture::New(imgUrl, scene, true) : nullptr;
 
@@ -104,7 +104,12 @@ void Layer::_createIndexBuffer()
 
 void Layer::_rebuild()
 {
-  _vertexBuffers[VertexBuffer::PositionKindChars]->_rebuild();
+  auto& vb = _vertexBuffers[VertexBuffer::PositionKindChars];
+
+  if (vb) {
+    vb->_rebuild();
+  }
+
   _createIndexBuffer();
 }
 

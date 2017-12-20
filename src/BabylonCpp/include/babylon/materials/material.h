@@ -88,6 +88,7 @@ public:
   Effect* getEffect();
   Scene* getScene() const;
   virtual bool needAlphaBlending();
+  virtual bool needAlphaBlendingForMesh(AbstractMesh* mesh);
   virtual bool needAlphaTesting();
   virtual BaseTexture* getAlphaTestTexture();
   virtual void trackCreation(

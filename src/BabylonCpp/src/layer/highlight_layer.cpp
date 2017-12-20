@@ -52,6 +52,11 @@ HighlightLayer::HighlightLayer(const string_t& iName, Scene* scene,
     , isEnabled{true}
     , _scene{scene}
     , _engine{scene->getEngine()}
+    , _downSamplePostprocess{nullptr}
+    , _horizontalBlurPostprocess{nullptr}
+    , _verticalBlurPostprocess{nullptr}
+    , _blurTexture{nullptr}
+    , _mainTexture{nullptr}
     , _maxSize{_engine->getCaps().maxTextureSize}
     , _shouldRender{false}
 {
@@ -218,10 +223,14 @@ void HighlightLayer::createTextureAndPostProcesses()
     [this](RenderTargetTexture*, EventState&) {
       onBeforeBlurObservable.notifyObservers(this);
 
-      _scene->postProcessManager->directRender(
-        {_downSamplePostprocess.get(), _horizontalBlurPostprocess.get(),
-         _verticalBlurPostprocess.get()},
-        _blurTexture->getInternalTexture(), true);
+      auto internalTexture = _blurTexture->getInternalTexture();
+
+      if (internalTexture) {
+        _scene->postProcessManager->directRender(
+          {_downSamplePostprocess.get(), _horizontalBlurPostprocess.get(),
+           _verticalBlurPostprocess.get()},
+          internalTexture, true);
+      }
 
       onAfterBlurObservable.notifyObservers(this);
     });
@@ -264,12 +273,26 @@ void HighlightLayer::createTextureAndPostProcesses()
 
 void HighlightLayer::renderSubMesh(SubMesh* subMesh)
 {
-  auto mesh   = subMesh->getRenderingMesh();
-  auto scene  = _scene;
-  auto engine = scene->getEngine();
+  if (_meshes.empty()) {
+    return;
+  }
+
+  auto material = subMesh->getMaterial();
+  auto mesh     = subMesh->getRenderingMesh();
+  auto scene    = _scene;
+  auto engine   = scene->getEngine();
+
+  if (!material) {
+    return;
+  }
+
+  // Do not block in blend mode.
+  if (material->needAlphaBlendingForMesh(mesh)) {
+    return;
+  }
 
   // Culling
-  engine->setState(subMesh->getMaterial()->backFaceCulling());
+  engine->setState(material->backFaceCulling());
 
   // Managing instances
   auto batch = mesh->_getInstancesRenderList(subMesh->_id);
@@ -278,7 +301,8 @@ void HighlightLayer::renderSubMesh(SubMesh* subMesh)
   }
 
   // Excluded Mesh
-  if (stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
+  if (!_excludedMeshes.empty()
+      && stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
     return;
   };
 
@@ -288,7 +312,6 @@ void HighlightLayer::renderSubMesh(SubMesh* subMesh)
       && (!batch->visibleInstances[subMesh->_id].empty());
 
   bool hashighlightLayerMesh   = stl_util::contains(_meshes, mesh->uniqueId);
-  auto material                = subMesh->getMaterial();
   BaseTexture* emissiveTexture = nullptr;
   if (hashighlightLayerMesh && _meshes[mesh->uniqueId].glowEmissiveOnly
       && material) {
@@ -321,8 +344,11 @@ void HighlightLayer::renderSubMesh(SubMesh* subMesh)
       auto alphaTexture = material->getAlphaTestTexture();
       if (alphaTexture) {
         _glowMapGenerationEffect->setTexture("diffuseSampler", alphaTexture);
-        _glowMapGenerationEffect->setMatrix("diffuseMatrix",
-                                            *alphaTexture->getTextureMatrix());
+        auto textureMatrix = alphaTexture->getTextureMatrix();
+
+        if (textureMatrix) {
+          _glowMapGenerationEffect->setMatrix("diffuseMatrix", *textureMatrix);
+        }
       }
     }
 
@@ -334,7 +360,8 @@ void HighlightLayer::renderSubMesh(SubMesh* subMesh)
     }
 
     // Bones
-    if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
+    if (mesh->useBones() && mesh->computeBonesUsingShaders()
+        && mesh->skeleton()) {
       _glowMapGenerationEffect->setMatrices(
         "mBones", mesh->skeleton()->getTransformMatrices(mesh));
     }
@@ -365,7 +392,11 @@ void HighlightLayer::_createIndexBuffer()
 
 void HighlightLayer::_rebuild()
 {
-  _vertexBuffers[VertexBuffer::PositionKindChars]->_rebuild();
+  auto& vb = _vertexBuffers[VertexBuffer::PositionKindChars];
+
+  if (vb) {
+    vb->_rebuild();
+  }
 
   _createIndexBuffer();
 }
@@ -373,17 +404,22 @@ void HighlightLayer::_rebuild()
 bool HighlightLayer::isReady(SubMesh* subMesh, bool useInstances,
                              BaseTexture* emissiveTexture)
 {
-  if (!subMesh->getMaterial()->isReady(subMesh->getMesh(), useInstances)) {
+  auto material = subMesh->getMaterial();
+
+  if (!material) {
+    return false;
+  }
+
+  if (!material->isReady(subMesh->getMesh(), useInstances)) {
     return false;
   }
 
   vector_t<string_t> defines;
   vector_t<string_t> attribs = {VertexBuffer::PositionKindChars};
 
-  auto mesh     = subMesh->getMesh();
-  auto material = subMesh->getMaterial();
-  auto uv1      = false;
-  auto uv2      = false;
+  auto mesh = subMesh->getMesh();
+  auto uv1  = false;
+  auto uv2  = false;
 
   // Alpha test
   if (material && material->needAlphaTesting()) {
@@ -437,7 +473,8 @@ bool HighlightLayer::isReady(SubMesh* subMesh, bool useInstances,
                          + ::std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back(
       "#define BonesPerMesh "
-      + ::std::to_string(mesh->skeleton()->bones.size() + 1));
+      + ::std::to_string(
+          mesh->skeleton() ? (mesh->skeleton()->bones.size() + 1) : 0));
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
@@ -557,6 +594,10 @@ void HighlightLayer::render()
 
 void HighlightLayer::addExcludedMesh(Mesh* mesh)
 {
+  if (_excludedMeshes.empty()) {
+    return;
+  }
+
   if (!stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
     IHighlightLayerExcludedMesh meshExcluded;
     meshExcluded.mesh         = mesh;
@@ -570,10 +611,20 @@ void HighlightLayer::addExcludedMesh(Mesh* mesh)
 
 void HighlightLayer::removeExcludedMesh(Mesh* mesh)
 {
+  if (_excludedMeshes.empty()) {
+    return;
+  }
+
   if (stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
     auto& meshExcluded = _excludedMeshes[mesh->uniqueId];
-    mesh->onBeforeRenderObservable.remove(meshExcluded.beforeRender);
-    mesh->onAfterRenderObservable.remove(meshExcluded.afterRender);
+    if (meshExcluded.beforeRender) {
+      mesh->onBeforeRenderObservable.remove(meshExcluded.beforeRender);
+    }
+
+    if (meshExcluded.afterRender) {
+      mesh->onAfterRenderObservable.remove(meshExcluded.afterRender);
+    }
+
     _excludedMeshes.erase(mesh->uniqueId);
   }
 }
@@ -581,6 +632,10 @@ void HighlightLayer::removeExcludedMesh(Mesh* mesh)
 void HighlightLayer::addMesh(Mesh* mesh, const Color3& color,
                              bool glowEmissiveOnly)
 {
+  if (_meshes.empty()) {
+    return;
+  }
+
   if (stl_util::contains(_meshes, mesh->uniqueId)) {
     _meshes[mesh->uniqueId].color = color;
   }
@@ -591,7 +646,8 @@ void HighlightLayer::addMesh(Mesh* mesh, const Color3& color,
     // Lambda required for capture due to Observable this context
     newMesh.observerHighlight
       = mesh->onBeforeRenderObservable.add([&](Mesh* mesh, EventState&) {
-          if (stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
+          if (!_excludedMeshes.empty()
+              && stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
             defaultStencilReference(mesh);
           }
           else {
@@ -610,10 +666,20 @@ void HighlightLayer::addMesh(Mesh* mesh, const Color3& color,
 
 void HighlightLayer::removeMesh(Mesh* mesh)
 {
+  if (_meshes.empty()) {
+    return;
+  }
+
   if (stl_util::contains(_meshes, mesh->uniqueId)) {
     auto& meshHighlight = _meshes[mesh->uniqueId];
-    mesh->onBeforeRenderObservable.remove(meshHighlight.observerHighlight);
-    mesh->onAfterRenderObservable.remove(meshHighlight.observerDefault);
+    if (meshHighlight.observerHighlight) {
+      mesh->onBeforeRenderObservable.remove(meshHighlight.observerHighlight);
+    }
+
+    if (meshHighlight.observerDefault) {
+      mesh->onAfterRenderObservable.remove(meshHighlight.observerDefault);
+    }
+
     _meshes.erase(mesh->uniqueId);
   }
 
@@ -681,24 +747,37 @@ void HighlightLayer::dispose()
   disposeTextureAndPostProcesses();
 
   // Clean mesh references
-  for (auto item : _meshes) {
-    auto& meshHighlight = item.second;
-    if (meshHighlight.mesh) {
-      meshHighlight.mesh->onBeforeRenderObservable.remove(
-        meshHighlight.observerHighlight);
-      meshHighlight.mesh->onAfterRenderObservable.remove(
-        meshHighlight.observerDefault);
+  if (!_meshes.empty()) {
+    for (auto item : _meshes) {
+      auto& meshHighlight = item.second;
+      if (meshHighlight.mesh) {
+        if (meshHighlight.observerHighlight) {
+          meshHighlight.mesh->onBeforeRenderObservable.remove(
+            meshHighlight.observerHighlight);
+        }
+        if (meshHighlight.observerDefault) {
+          meshHighlight.mesh->onAfterRenderObservable.remove(
+            meshHighlight.observerDefault);
+        }
+      }
     }
+    _meshes.clear();
   }
-  _meshes.clear();
-  for (auto item : _excludedMeshes) {
-    auto& meshHighlight = item.second;
-    meshHighlight.mesh->onBeforeRenderObservable.remove(
-      meshHighlight.beforeRender);
-    meshHighlight.mesh->onAfterRenderObservable.remove(
-      meshHighlight.afterRender);
+
+  if (_excludedMeshes.empty()) {
+    for (auto item : _excludedMeshes) {
+      auto& meshHighlight = item.second;
+      if (meshHighlight.beforeRender) {
+        meshHighlight.mesh->onBeforeRenderObservable.remove(
+          meshHighlight.beforeRender);
+      }
+      if (meshHighlight.afterRender) {
+        meshHighlight.mesh->onAfterRenderObservable.remove(
+          meshHighlight.afterRender);
+      }
+    }
+    _excludedMeshes.clear();
   }
-  _excludedMeshes.clear();
 
   // Remove from scene
   _scene->highlightLayers.erase(
