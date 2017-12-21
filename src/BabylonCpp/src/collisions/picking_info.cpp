@@ -10,6 +10,7 @@ namespace BABYLON {
 PickingInfo::PickingInfo()
     : hit{false}
     , distance{0.f}
+    , pickedPoint{nullptr}
     , pickedMesh{nullptr}
     , bu{0.f}
     , bv{0.f}
@@ -23,15 +24,20 @@ PickingInfo::~PickingInfo()
 {
 }
 
-Vector3 PickingInfo::getNormal(bool useWorldCoordinates,
-                               bool useVerticesNormals)
+Nullable<Vector3> PickingInfo::getNormal(bool useWorldCoordinates,
+                                         bool useVerticesNormals)
 {
   if (!pickedMesh
       || !pickedMesh->isVerticesDataPresent(VertexBuffer::NormalKind)) {
-    return Vector3();
+    return nullptr;
   }
 
   auto indices = pickedMesh->getIndices();
+
+  if (indices.empty()) {
+    return nullptr;
+  }
+
   Vector3 result;
 
   if (useVerticesNormals) {
@@ -69,14 +75,21 @@ Vector3 PickingInfo::getNormal(bool useWorldCoordinates,
   return Vector3::Normalize(result);
 }
 
-Vector2 PickingInfo::getTextureCoordinates()
+Nullable<Vector2> PickingInfo::getTextureCoordinates()
 {
   if (!pickedMesh || !pickedMesh->isVerticesDataPresent(VertexBuffer::UVKind)) {
-    return Vector2();
+    return nullptr;
   }
 
   auto indices = pickedMesh->getIndices();
-  auto uvs     = pickedMesh->getVerticesData(VertexBuffer::UVKind);
+  if (indices.empty()) {
+    return nullptr;
+  }
+
+  auto uvs = pickedMesh->getVerticesData(VertexBuffer::UVKind);
+  if (uvs.empty()) {
+    return nullptr;
+  }
 
   auto uv0 = Vector2::FromArray(uvs, indices[faceId * 3] * 2);
   auto uv1 = Vector2::FromArray(uvs, indices[faceId * 3 + 1] * 2);

@@ -754,7 +754,7 @@ void EditControl::doRotation(Mesh* mesh, Mesh* axis, const Vector3& newPos)
           angle = rotSnap;
         else
           angle = -rotSnap;
-        snapRZ = 0;
+        snapRZ  = 0;
       }
     }
     if (!stl_util::almost_equal(angle, 0.f)) {
@@ -804,7 +804,7 @@ std::tuple<Vector3, bool> EditControl::getPosOnPickPlane()
                   [this](AbstractMesh* mesh) { return mesh == pickPlane; },
                   false, mainCamera);
   if ((pickinfo->hit)) {
-    return std::make_tuple(pickinfo->pickedPoint, true);
+    return std::make_tuple(*pickinfo->pickedPoint, true);
   }
   else {
     return std::make_tuple(Vector3::Zero(), false);

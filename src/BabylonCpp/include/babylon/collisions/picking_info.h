@@ -2,8 +2,9 @@
 #define BABYLON_COLLISIONS_PICKING_INFO_H
 
 #include <babylon/babylon_global.h>
-
 #include <babylon/math/vector3.h>
+
+#include <babylon/core/nullable.h>
 
 namespace BABYLON {
 
@@ -14,14 +15,14 @@ public:
   ~PickingInfo();
 
   /** Methods **/
-  Vector3 getNormal(bool useWorldCoordinates = false,
-                    bool useVerticesNormals  = true);
-  Vector2 getTextureCoordinates();
+  Nullable<Vector3> getNormal(bool useWorldCoordinates = false,
+                              bool useVerticesNormals  = true);
+  Nullable<Vector2> getTextureCoordinates();
 
 public:
   bool hit;
   float distance;
-  Vector3 pickedPoint;
+  Nullable<Vector3> pickedPoint;
   AbstractMesh* pickedMesh;
   float bu;
   float bv;
