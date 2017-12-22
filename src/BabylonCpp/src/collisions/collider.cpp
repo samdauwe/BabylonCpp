@@ -12,6 +12,7 @@ Collider::Collider()
     , velocityWorld{Vector3::Zero()}
     , normalizedVelocity{Vector3::Zero()}
     , intersectionPointSet{false}
+    , collidedMesh{nullptr}
     , _collisionPoint{Vector3::Zero()}
     , _planeIntersectionPoint{Vector3::Zero()}
     , _tempVector{Vector3::Zero()}
