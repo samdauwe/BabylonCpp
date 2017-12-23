@@ -34,7 +34,7 @@ Quaternion AbstractMesh::_rotationAxisCache;
 Vector3 AbstractMesh::_lookAtVectorCache = Vector3(0.f, 0.f, 0.f);
 
 AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
-    : Node(iName, scene)
+    : TransformNode(iName, scene, false)
     , definedFacingForward{true} // orientation for POV movement & rotation
     , occlusionQueryAlgorithmType{AbstractMesh::
                                     OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE}

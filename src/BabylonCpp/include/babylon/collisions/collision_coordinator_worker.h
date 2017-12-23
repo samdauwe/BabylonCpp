@@ -32,7 +32,7 @@ public:
   void init(Scene* scene) override;
   void destroy() override;
   void onMeshAdded(AbstractMesh* mesh) override;
-  void onMeshUpdated(AbstractMesh* mesh) override;
+  void onMeshUpdated(TransformNode* transformNode) override;
   void onMeshRemoved(AbstractMesh* mesh) override;
   void onGeometryAdded(Geometry* geometry) override;
   void onGeometryUpdated(Geometry* geometry) override;
@@ -52,7 +52,6 @@ private:
     _collisionsCallbackArray;
   bool _init;
   int _runningUpdated;
-  bool _runningCollisionTask;
   Worker _worker;
   unordered_map_t<unsigned int, SerializedMesh> _addUpdateMeshesList;
   unordered_map_t<string_t, SerializedGeometry> _addUpdateGeometriesList;

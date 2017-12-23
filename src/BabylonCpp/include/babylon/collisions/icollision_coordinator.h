@@ -18,12 +18,12 @@ struct BABYLON_SHARED_EXPORT ICollisionCoordinator {
   virtual void destroy()          = 0;
 
   // Update meshes and geometries
-  virtual void onMeshAdded(AbstractMesh* mesh)       = 0;
-  virtual void onMeshUpdated(AbstractMesh* mesh)     = 0;
-  virtual void onMeshRemoved(AbstractMesh* mesh)     = 0;
-  virtual void onGeometryAdded(Geometry* geometry)   = 0;
-  virtual void onGeometryUpdated(Geometry* geometry) = 0;
-  virtual void onGeometryDeleted(Geometry* geometry) = 0;
+  virtual void onMeshAdded(AbstractMesh* mesh)             = 0;
+  virtual void onMeshUpdated(TransformNode* transformNode) = 0;
+  virtual void onMeshRemoved(AbstractMesh* mesh)           = 0;
+  virtual void onGeometryAdded(Geometry* geometry)         = 0;
+  virtual void onGeometryUpdated(Geometry* geometry)       = 0;
+  virtual void onGeometryDeleted(Geometry* geometry)       = 0;
 }; // end of struct ICollisionCoordinator
 
 } // end of namespace BABYLON

@@ -129,9 +129,9 @@ void CollideWorker::collideForSubMesh(SerializedSubMesh& subMesh,
 {
   if (meshGeometry.positionsArray.empty()) {
     for (size_t i = 0; i < meshGeometry.positions.size(); i = i + 3) {
-      Vector3 p = Vector3::FromArray({meshGeometry.positions[i],
-                                      meshGeometry.positions[i + 1],
-                                      meshGeometry.positions[i + 2]});
+      auto p = Vector3::FromArray({meshGeometry.positions[i],
+                                   meshGeometry.positions[i + 1],
+                                   meshGeometry.positions[i + 2]});
       meshGeometry.positionsArray.emplace_back(p);
     }
   }
@@ -141,8 +141,8 @@ void CollideWorker::collideForSubMesh(SerializedSubMesh& subMesh,
     subMesh._lastColliderTransformMatrix = transformMatrix;
     subMesh._lastColliderWorldVertices.clear();
     subMesh._trianglePlanes.clear();
-    size_t start = subMesh.verticesStart;
-    size_t end   = (subMesh.verticesStart + subMesh.verticesCount);
+    auto start = subMesh.verticesStart;
+    auto end   = (subMesh.verticesStart + subMesh.verticesCount);
     for (size_t i = start; i < end; ++i) {
       subMesh._lastColliderWorldVertices.emplace_back(
         Vector3::TransformCoordinates(meshGeometry.positionsArray[i],

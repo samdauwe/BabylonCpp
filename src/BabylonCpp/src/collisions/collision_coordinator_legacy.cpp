@@ -56,7 +56,7 @@ void CollisionCoordinatorLegacy::onMeshAdded(AbstractMesh* /*mesh*/)
   // No update in legacy mode
 }
 
-void CollisionCoordinatorLegacy::onMeshUpdated(AbstractMesh* /*mesh*/)
+void CollisionCoordinatorLegacy::onMeshUpdated(TransformNode* /*transformNode*/)
 {
   // No update in legacy mode
 }

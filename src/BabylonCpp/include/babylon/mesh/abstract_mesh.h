@@ -6,13 +6,13 @@
 #include <babylon/core/json.h>
 #include <babylon/culling/icullable.h>
 #include <babylon/culling/octrees/octree.h>
-#include <babylon/engine/node.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/matrix.h>
 #include <babylon/mesh/facet_parameters.h>
 #include <babylon/mesh/iget_set_vertices_data.h>
+#include <babylon/mesh/transform_node.h>
 #include <babylon/physics/iphysics_enabled_object.h>
 #include <babylon/physics/physics_impostor.h>
 #include <babylon/tools/observable.h>
@@ -27,7 +27,7 @@ class IGLQuery;
 /**
  * @brief This class represents a mesh which can't be instantiated.
  */
-class BABYLON_SHARED_EXPORT AbstractMesh : public Node,
+class BABYLON_SHARED_EXPORT AbstractMesh : public TransformNode,
                                            public IPhysicsEnabledObject,
                                            public ICullable,
                                            public IGetSetVerticesData {

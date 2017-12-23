@@ -16,6 +16,7 @@
 #include <babylon/mesh/instanced_mesh.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/sub_mesh.h>
+#include <babylon/mesh/transform_node.h>
 #include <babylon/mesh/vertex_buffer.h>
 
 namespace BABYLON {
@@ -25,7 +26,6 @@ CollisionCoordinatorWorker::CollisionCoordinatorWorker()
     , _scaledVelocity{Vector3::Zero()}
     , _init{false}
     , _runningUpdated{0}
-    , _runningCollisionTask{false}
 {
 }
 
@@ -39,6 +39,7 @@ SerializedMesh CollisionCoordinatorWorker::SerializeMesh(AbstractMesh* mesh)
   if (!mesh->subMeshes.empty()) {
     unsigned int idx = 0;
     for (auto& sm : mesh->subMeshes) {
+      auto boundingInfo = sm->getBoundingInfo();
       SerializedSubMesh ssm;
       ssm.position      = idx;
       ssm.verticesStart = sm->verticesStart;
@@ -46,13 +47,10 @@ SerializedMesh CollisionCoordinatorWorker::SerializeMesh(AbstractMesh* mesh)
       ssm.indexStart    = sm->indexStart;
       ssm.indexCount    = sm->indexCount;
       ssm.hasMaterial   = (sm->getMaterial() != nullptr);
-      ssm.sphereCenter
-        = sm->getBoundingInfo()->boundingSphere.centerWorld.asArray();
-      ssm.sphereRadius = sm->getBoundingInfo()->boundingSphere.radiusWorld;
-      ssm.boxMinimum
-        = sm->getBoundingInfo()->boundingBox.minimumWorld.asArray();
-      ssm.boxMaximum
-        = sm->getBoundingInfo()->boundingBox.maximumWorld.asArray();
+      ssm.sphereCenter  = boundingInfo->boundingSphere.centerWorld.asArray();
+      ssm.sphereRadius  = boundingInfo->boundingSphere.radiusWorld;
+      ssm.boxMinimum    = boundingInfo->boundingBox.minimumWorld.asArray();
+      ssm.boxMaximum    = boundingInfo->boundingBox.maximumWorld.asArray();
       submeshes.emplace_back(ssm);
       ++idx;
     }
@@ -60,26 +58,27 @@ SerializedMesh CollisionCoordinatorWorker::SerializeMesh(AbstractMesh* mesh)
 
   string_t geometryId;
   if (mesh->type() == IReflect::Type::MESH) {
-    Mesh* _mesh = dynamic_cast<Mesh*>(mesh);
-    geometryId  = _mesh->geometry() ? _mesh->geometry()->id : "";
+    auto _mesh = dynamic_cast<Mesh*>(mesh);
+    geometryId = _mesh->geometry() ? _mesh->geometry()->id : "";
   }
   else if (mesh->type() == IReflect::Type::INSTANCEDMESH) {
-    InstancedMesh* _mesh = dynamic_cast<InstancedMesh*>(mesh);
+    auto _mesh = dynamic_cast<InstancedMesh*>(mesh);
     geometryId = (_mesh->sourceMesh() && _mesh->sourceMesh()->geometry()) ?
                    _mesh->sourceMesh()->geometry()->id :
                    "";
   }
 
+  auto boundingInfo = mesh->getBoundingInfo();
+
   SerializedMesh sm;
-  sm.uniqueId   = mesh->uniqueId;
-  sm.id         = mesh->id;
-  sm.name       = mesh->name;
-  sm.geometryId = geometryId;
-  sm.sphereCenter
-    = mesh->getBoundingInfo()->boundingSphere.centerWorld.asArray();
-  sm.sphereRadius = mesh->getBoundingInfo()->boundingSphere.radiusWorld;
-  sm.boxMinimum   = mesh->getBoundingInfo()->boundingBox.minimumWorld.asArray();
-  sm.boxMaximum   = mesh->getBoundingInfo()->boundingBox.maximumWorld.asArray();
+  sm.uniqueId             = mesh->uniqueId;
+  sm.id                   = mesh->id;
+  sm.name                 = mesh->name;
+  sm.geometryId           = geometryId;
+  sm.sphereCenter         = boundingInfo->boundingSphere.centerWorld.asArray();
+  sm.sphereRadius         = boundingInfo->boundingSphere.radiusWorld;
+  sm.boxMinimum           = boundingInfo->boundingBox.minimumWorld.asArray();
+  sm.boxMaximum           = boundingInfo->boundingBox.maximumWorld.asArray();
   sm.worldMatrixFromCache = mesh->worldMatrixFromCache().asArray();
   sm.subMeshes            = submeshes;
   sm.checkCollisions      = mesh->checkCollisions();
@@ -168,10 +167,11 @@ void CollisionCoordinatorWorker::onMeshAdded(AbstractMesh* mesh)
   onMeshUpdated(mesh);
 }
 
-void CollisionCoordinatorWorker::onMeshUpdated(AbstractMesh* mesh)
+void CollisionCoordinatorWorker::onMeshUpdated(TransformNode* transformNode)
 {
-  _addUpdateMeshesList[mesh->uniqueId]
-    = CollisionCoordinatorWorker::SerializeMesh(mesh);
+  _addUpdateMeshesList[transformNode->uniqueId]
+    = CollisionCoordinatorWorker::SerializeMesh(
+      static_cast<AbstractMesh*>(transformNode));
 }
 
 void CollisionCoordinatorWorker::onMeshRemoved(AbstractMesh* mesh)
@@ -272,16 +272,21 @@ void CollisionCoordinatorWorker::_onMessageFromWorker(
       --_runningUpdated;
       break;
     case WorkerTaskType::COLLIDE: {
-      _runningCollisionTask = false;
       const CollisionReplyPayload& returnPayload
         = returnData.collisionReplyPayload;
       if (returnPayload.collisionId >= _collisionsCallbackArray.size()) {
         return;
       }
-      //_collisionsCallbackArray[returnPayload.collisionId](
-      //  returnPayload.collisionId,
-      //  Vector3::FromArray(returnPayload.newPosition),
-      //  _scene->getMeshByUniqueID(returnPayload.collidedMeshUniqueId));
+
+      auto callback = _collisionsCallbackArray[returnPayload.collisionId];
+      if (callback) {
+        auto mesh
+          = _scene->getMeshByUniqueID(returnPayload.collidedMeshUniqueId);
+        if (mesh) {
+          auto newPosition = Vector3::FromArray(returnPayload.newPosition);
+          callback(returnPayload.collisionId, newPosition, mesh);
+        }
+      }
       // cleanup
       _collisionsCallbackArray[returnPayload.collisionId] = nullptr;
     } break;
