@@ -142,14 +142,13 @@ private:
    * Renders the submeshes in a specified order.
    * @param subMeshes The submeshes to sort before render
    * @param sortCompareFn The comparison function use to sort
-   * @param cameraPosition The camera position use to preprocess the submeshes
-   * to help sorting
+   * @param camera The camera to use to preprocess the submeshes to help sorting
    * @param transparent Specifies to activate blending if true
    */
   static void renderSorted(
     const vector_t<SubMesh*>& subMeshes,
     const ::std::function<int(SubMesh* a, SubMesh* b)>& sortCompareFn,
-    const Vector3& cameraPosition, bool transparent);
+    Camera* camera, bool transparent);
 
   /**
    * Renders the submeshes in the order they were dispatched (no sort applied).
@@ -169,7 +168,6 @@ private:
   vector_t<SubMesh*> _depthOnlySubMeshes;
   vector_t<IParticleSystem*> _particleSystems;
   vector_t<SpriteManager*> _spriteManagers;
-  size_t _activeVertices;
 
   ::std::function<int(SubMesh* a, SubMesh* b)> _opaqueSortCompareFn;
   ::std::function<int(SubMesh* a, SubMesh* b)> _alphaTestSortCompareFn;

@@ -143,7 +143,7 @@ void EdgesRenderer::_checkEdge(unsigned int faceIndex, int edge,
     needToCreateLine = true;
   }
   else {
-    auto dotProduct  = Vector3::Dot(faceNormals[faceIndex],
+    auto dotProduct = Vector3::Dot(faceNormals[faceIndex],
                                    faceNormals[static_cast<size_t>(edge)]);
     needToCreateLine = dotProduct < _epsilon;
   }
@@ -205,6 +205,10 @@ void EdgesRenderer::_generateEdgesLines()
 {
   auto positions = _source->getVerticesData(VertexBuffer::PositionKind);
   auto indices   = _source->getIndices();
+
+  if (indices.empty() || positions.empty()) {
+    return;
+  }
 
   // First let's find adjacencies
   vector_t<FaceAdjacencies> adjacencies;
@@ -352,11 +356,12 @@ void EdgesRenderer::_generateEdgesLines()
 
 void EdgesRenderer::render()
 {
-  if (!_lineShader->isReady()) {
+  auto scene = _source->getScene();
+
+  if (!_lineShader->isReady() || !scene->activeCamera) {
     return;
   }
 
-  auto scene  = _source->getScene();
   auto engine = scene->getEngine();
   _lineShader->_preBind();
 
@@ -367,8 +372,8 @@ void EdgesRenderer::render()
   _lineShader->setColor4("color", _source->edgesColor);
 
   if (scene->activeCamera->mode == Camera::ORTHOGRAPHIC_CAMERA) {
-    _lineShader->setFloat("width", _source->edgesWidth
-                                     / edgesWidthScalerForOrthographic);
+    _lineShader->setFloat(
+      "width", _source->edgesWidth / edgesWidthScalerForOrthographic);
   }
   else {
     _lineShader->setFloat("width",

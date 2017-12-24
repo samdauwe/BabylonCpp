@@ -4,7 +4,6 @@
 #include <babylon/babylon_global.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/interfaces/idisposable.h>
-#include <babylon/math/matrix.h>
 
 namespace BABYLON {
 
@@ -31,10 +30,6 @@ private:
   unique_ptr_t<MultiRenderTarget> _multiRenderTarget;
   Effect* _effect;
   float _ratio;
-  Matrix _viewMatrix;
-  Matrix _projectionMatrix;
-  Matrix _transformMatrix;
-  Matrix _worldViewProjection;
   string_t _cachedDefines;
   bool _enablePosition;
 

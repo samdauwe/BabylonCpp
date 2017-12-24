@@ -102,8 +102,6 @@ private:
   vector_t<unique_ptr_t<RenderingGroup>> _renderingGroups;
   bool _depthStencilBufferAlreadyCleaned;
 
-  unsigned int _currentIndex;
-
   vector_t<RenderingManageAutoClearOptions> _autoClearDepthStencil;
   vector_t<::std::function<int(SubMesh* a, SubMesh* b)>>
     _customOpaqueSortCompareFn;

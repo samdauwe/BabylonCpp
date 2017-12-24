@@ -42,6 +42,10 @@ void OutlineRenderer::render(SubMesh* subMesh, _InstancesBatch* batch,
   auto mesh     = subMesh->getRenderingMesh();
   auto material = subMesh->getMaterial();
 
+  if (!material || !_scene->activeCamera) {
+    return;
+  }
+
   engine->enableEffect(_effect);
 
   // Logarithmic depth
@@ -58,7 +62,8 @@ void OutlineRenderer::render(SubMesh* subMesh, _InstancesBatch* batch,
   _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
 
   // Bones
-  if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
+  if (mesh->useBones() && mesh->computeBonesUsingShaders()
+      && mesh->skeleton()) {
     _effect->setMatrices("mBones",
                          mesh->skeleton()->getTransformMatrices(mesh));
   }
@@ -126,7 +131,8 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
                          + ::std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back(
       "#define BonesPerMesh "
-      + ::std::to_string((mesh->skeleton()->bones.size() + 1)));
+      + ::std::to_string(
+          (mesh->skeleton() ? mesh->skeleton()->bones.size() + 1 : 0)));
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");

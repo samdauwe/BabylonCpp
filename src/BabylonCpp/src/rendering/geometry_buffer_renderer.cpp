@@ -21,10 +21,6 @@ GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
     , _multiRenderTarget{nullptr}
     , _effect{nullptr}
     , _ratio{ratio}
-    , _viewMatrix{Matrix::Zero()}
-    , _projectionMatrix{Matrix::Zero()}
-    , _transformMatrix{Matrix::Zero()}
-    , _worldViewProjection{Matrix::Zero()}
     , _cachedDefines{""}
     , _enablePosition{false}
 {
@@ -38,12 +34,17 @@ GeometryBufferRenderer::~GeometryBufferRenderer()
 
 void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
 {
-  auto mesh   = subMesh->getRenderingMesh();
-  auto scene  = _scene;
-  auto engine = scene->getEngine();
+  auto mesh     = subMesh->getRenderingMesh();
+  auto scene    = _scene;
+  auto engine   = scene->getEngine();
+  auto material = subMesh->getMaterial();
+
+  if (!material) {
+    return;
+  }
 
   // Culling
-  engine->setState(subMesh->getMaterial()->backFaceCulling());
+  engine->setState(material->backFaceCulling());
 
   // Managing instances
   auto batch = mesh->_getInstancesRenderList(subMesh->_id);
@@ -60,7 +61,6 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
   if (isReady(subMesh, hardwareInstancedRendering)) {
     engine->enableEffect(_effect);
     mesh->_bind(subMesh, _effect, Material::TriangleFillMode);
-    auto material = subMesh->getMaterial();
 
     _effect->setMatrix("viewProjection", scene->getTransformMatrix());
     _effect->setMatrix("view", scene->getViewMatrix());
@@ -68,12 +68,15 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
     // Alpha test
     if (material && material->needAlphaTesting()) {
       auto alphaTexture = material->getAlphaTestTexture();
-      _effect->setTexture("diffuseSampler", alphaTexture);
-      _effect->setMatrix("diffuseMatrix", *alphaTexture->getTextureMatrix());
+      if (alphaTexture) {
+        _effect->setTexture("diffuseSampler", alphaTexture);
+        _effect->setMatrix("diffuseMatrix", *alphaTexture->getTextureMatrix());
+      }
     }
 
     // Bones
-    if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
+    if (mesh->useBones() && mesh->computeBonesUsingShaders()
+        && mesh->skeleton()) {
       _effect->setMatrices("mBones",
                            mesh->skeleton()->getTransformMatrices(mesh));
     }
@@ -158,7 +161,8 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
                          + ::std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back(
       "#define BonesPerMesh "
-      + ::std::to_string(mesh->skeleton()->bones.size() + 1));
+      + ::std::to_string(mesh->skeleton() ? mesh->skeleton()->bones.size() + 1 :
+                                            0));
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");

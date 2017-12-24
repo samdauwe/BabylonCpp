@@ -61,8 +61,13 @@ void BoundingBoxRenderer::_createIndexBuffer()
 
 void BoundingBoxRenderer::_rebuild()
 {
-  _vertexBuffers[VertexBuffer::PositionKind]->_rebuild();
-  _createIndexBuffer();
+  if (VertexBuffer::PositionKind < _vertexBuffers.size()) {
+    auto& vb = _vertexBuffers[VertexBuffer::PositionKind];
+    if (vb) {
+      vb->_rebuild();
+    }
+    _createIndexBuffer();
+  }
 }
 
 void BoundingBoxRenderer::reset()
@@ -129,7 +134,7 @@ void BoundingBoxRenderer::renderOcclusionBoundingBox(AbstractMesh* mesh)
 {
   _prepareResources();
 
-  if (!_colorShader->isReady()) {
+  if (!_colorShader->isReady() || !mesh->_boundingInfo) {
     return;
   }
 
@@ -175,9 +180,12 @@ void BoundingBoxRenderer::dispose(bool /*doNotRecurse*/)
   _colorShader->dispose();
 
   if (stl_util::contains(_vertexBuffersMap, VertexBuffer::PositionKindChars)) {
-    _vertexBuffers[VertexBuffer::PositionKind]->dispose();
-    _vertexBuffers[VertexBuffer::PositionKind].reset(nullptr);
-    _vertexBuffersMap.erase(VertexBuffer::PositionKindChars);
+    auto& buffer = _vertexBuffers[VertexBuffer::PositionKind];
+    if (buffer) {
+      buffer->dispose();
+      buffer.reset(nullptr);
+      _vertexBuffersMap.erase(VertexBuffer::PositionKindChars);
+    }
   }
 
   _scene->getEngine()->_releaseBuffer(_indexBuffer.get());

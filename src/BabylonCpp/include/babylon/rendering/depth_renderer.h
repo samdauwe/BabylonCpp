@@ -23,10 +23,6 @@ private:
   Scene* _scene;
   unique_ptr_t<RenderTargetTexture> _depthMap;
   Effect* _effect;
-  Matrix _viewMatrix;
-  Matrix _projectionMatrix;
-  Matrix _transformMatrix;
-  Matrix _worldViewProjection;
   string_t _cachedDefines;
 
 }; // end of class DepthRenderer

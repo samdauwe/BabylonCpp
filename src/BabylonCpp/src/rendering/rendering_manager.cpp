@@ -84,12 +84,10 @@ void RenderingManager::render(
       continue;
     }
 
-    _currentIndex = index;
-
     int renderingGroupMask = 0;
 
     // Fire PRECLEAR stage
-    if (hasObservable) {
+    if (hasObservable && info) {
       renderingGroupMask     = static_cast<int>(::std::pow(2, index));
       info->renderStage      = RenderingGroupInfo::STAGE_PRECLEAR;
       info->renderingGroupId = index;
@@ -107,7 +105,7 @@ void RenderingManager::render(
       }
     }
 
-    if (hasObservable) {
+    if (hasObservable && info) {
       // Fire PREOPAQUE stage
       info->renderStage = RenderingGroupInfo::STAGE_PREOPAQUE;
       _scene->onRenderingGroupObservable.notifyObservers(info,
@@ -124,7 +122,7 @@ void RenderingManager::render(
     }
 
     // Fire POSTTRANSPARENT stage
-    if (hasObservable) {
+    if (hasObservable && info) {
       info->renderStage = RenderingGroupInfo::STAGE_POSTTRANSPARENT;
       _scene->onRenderingGroupObservable.notifyObservers(info,
                                                          renderingGroupMask);

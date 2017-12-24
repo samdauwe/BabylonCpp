@@ -173,30 +173,28 @@ void RenderingGroup::render(
 void RenderingGroup::renderOpaqueSorted(const vector_t<SubMesh*>& subMeshes)
 {
   return RenderingGroup::renderSorted(subMeshes, _opaqueSortCompareFn,
-                                      _scene->activeCamera->globalPosition(),
-                                      false);
+                                      _scene->activeCamera, false);
 }
 
 void RenderingGroup::renderAlphaTestSorted(const vector_t<SubMesh*>& subMeshes)
 {
   return RenderingGroup::renderSorted(subMeshes, _alphaTestSortCompareFn,
-                                      _scene->activeCamera->globalPosition(),
-                                      false);
+                                      _scene->activeCamera, false);
 }
 
 void RenderingGroup::renderTransparentSorted(
   const vector_t<SubMesh*>& subMeshes)
 {
   return RenderingGroup::renderSorted(subMeshes, _transparentSortCompareFn,
-                                      _scene->activeCamera->globalPosition(),
-                                      true);
+                                      _scene->activeCamera, true);
 }
 
 void RenderingGroup::renderSorted(
   const vector_t<SubMesh*>& subMeshes,
   const ::std::function<int(SubMesh* a, SubMesh* b)>& sortCompareFn,
-  const Vector3& cameraPosition, bool transparent)
+  Camera* camera, bool transparent)
 {
+  auto cameraPosition = camera ? camera->globalPosition() : Vector3::Zero();
   for (auto& subMesh : subMeshes) {
     subMesh->_alphaIndex = subMesh->getMesh()->alphaIndex;
     subMesh->_distanceToCamera
@@ -208,15 +206,17 @@ void RenderingGroup::renderSorted(
   auto sortedArray = subMeshes;
 
   // sort using a custom function object
-  ::std::sort(
-    sortedArray.begin(), sortedArray.end(),
-    [&sortCompareFn](SubMesh* a, SubMesh* b) { return sortCompareFn(a, b); });
+  if (sortCompareFn) {
+    ::std::sort(
+      sortedArray.begin(), sortedArray.end(),
+      [&sortCompareFn](SubMesh* a, SubMesh* b) { return sortCompareFn(a, b); });
+  }
 
   for (auto& subMesh : sortedArray) {
     if (transparent) {
       auto material = subMesh->getMaterial();
 
-      if (material->needDepthPrePass()) {
+      if (material && material->needDepthPrePass()) {
         auto engine = material->getScene()->getEngine();
         engine->setColorWrite(false);
         engine->setAlphaTesting(true);
@@ -305,8 +305,11 @@ void RenderingGroup::dispatch(SubMesh* subMesh)
   auto material = subMesh->getMaterial();
   auto mesh     = subMesh->getMesh();
 
-  if (material->needAlphaBlending() || mesh->visibility < 1.f
-      || mesh->hasVertexAlpha()) { // Transparent
+  if (!material) {
+    return;
+  }
+
+  if (material->needAlphaBlendingForMesh(mesh)) { // Transparent
     _transparentSubMeshes.emplace_back(subMesh);
   }
   else if (material->needAlphaTesting()) { // Alpha test
@@ -346,9 +349,10 @@ void RenderingGroup::_renderParticles(
 
   // Particles
   auto& activeCamera = _scene->activeCamera;
-  _scene->_particlesDuration.beginMonitoring();
+  _scene->onBeforeParticlesRenderingObservable.notifyObservers(_scene);
   for (auto& particleSystem : _scene->_activeParticleSystems) {
-    if ((activeCamera->layerMask & particleSystem->layerMask) == 0) {
+    if ((activeCamera && activeCamera->layerMask & particleSystem->layerMask)
+        == 0) {
       continue;
     }
     if (!activeMeshes.empty()
@@ -359,7 +363,7 @@ void RenderingGroup::_renderParticles(
       _scene->_activeParticles.addCount(particleSystem->render(), false);
     }
   }
-  _scene->_particlesDuration.endMonitoring(false);
+  _scene->onAfterParticlesRenderingObservable.notifyObservers(_scene);
 }
 
 void RenderingGroup::_renderSprites()
@@ -370,13 +374,14 @@ void RenderingGroup::_renderSprites()
 
   // Sprites
   auto& activeCamera = _scene->activeCamera;
-  _scene->_spritesDuration.beginMonitoring();
+  _scene->onBeforeSpritesRenderingObservable.notifyObservers(_scene);
   for (auto& spriteManager : _spriteManagers) {
-    if (((activeCamera->layerMask & spriteManager->layerMask) != 0)) {
+    if (((activeCamera && activeCamera->layerMask & spriteManager->layerMask)
+         != 0)) {
       spriteManager->render();
     }
   }
-  _scene->_spritesDuration.endMonitoring(false);
+  _scene->onAfterSpritesRenderingObservable.notifyObservers(_scene);
 }
 
 } // end of namespace BABYLON
