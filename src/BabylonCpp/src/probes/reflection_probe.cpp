@@ -56,15 +56,20 @@ ReflectionProbe::ReflectionProbe(const string_t& name, const ISize& size,
       Matrix::LookAtLHToRef(position, _target, Vector3::Up(), _viewMatrix);
 
       _scene->setTransformMatrix(_viewMatrix, _projectionMatrix);
+
+      _scene->_forcedViewPosition = ::std::make_unique<Vector3>(position);
     });
 
   _renderTargetTexture->onAfterUnbindObservable.add(
     [this](RenderTargetTexture*, EventState&) {
+      _scene->_forcedViewPosition = nullptr;
       _scene->updateTransformMatrix(true);
     });
 
-  _projectionMatrix = Matrix::PerspectiveFovLH(
-    Math::PI_2, 1.f, scene->activeCamera->minZ, scene->activeCamera->maxZ);
+  if (scene->activeCamera) {
+    _projectionMatrix = Matrix::PerspectiveFovLH(
+      Math::PI_2, 1.f, scene->activeCamera->minZ, scene->activeCamera->maxZ);
+  }
 }
 
 ReflectionProbe::~ReflectionProbe()
