@@ -141,7 +141,9 @@ void WindowsMotionController::lerpButtonTransform(const string_t& buttonName,
   }
 
   auto meshInfo = (*_loadedMeshInfo).buttonMeshes.at(buttonName);
-  if (!meshInfo) {
+  if (!meshInfo || !(*meshInfo).unpressed->rotationQuaternionSet()
+      || !(*meshInfo).pressed->rotationQuaternionSet()
+      || !(*meshInfo).value->rotationQuaternionSet()) {
     return;
   }
 
@@ -167,7 +169,9 @@ void WindowsMotionController::lerpAxisTransform(unsigned int axis,
   }
 
   auto meshInfo = (*_loadedMeshInfo).axisMeshes.at(axis);
-  if (!meshInfo) {
+  if (!meshInfo || !(*meshInfo).min->rotationQuaternionSet()
+      || !(*meshInfo).max->rotationQuaternionSet()
+      || !(*meshInfo).value->rotationQuaternionSet()) {
     return;
   }
 

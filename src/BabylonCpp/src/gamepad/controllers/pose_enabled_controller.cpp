@@ -37,7 +37,9 @@ void PoseEnabledController::update()
 
   if (_mesh) {
     _mesh->position().copyFrom(_calculatedPosition);
-    _mesh->rotationQuaternion().copyFrom(_calculatedRotation);
+    if (_mesh->rotationQuaternionSet()) {
+      _mesh->rotationQuaternion().copyFrom(_calculatedRotation);
+    }
   }
 }
 
@@ -54,10 +56,11 @@ void PoseEnabledController::updateFromDevice(const DevicePose& poseData)
     devicePosition.scaleToRef(deviceScaleFactor, _calculatedPosition);
     _calculatedPosition.addInPlace(position);
   }
-  if (!poseData.orientation.empty()) {
+  auto& pose = rawPose;
+  if (!poseData.orientation.empty() && !pose.orientation.empty()) {
     deviceRotationQuaternion.copyFromFloats(
-      rawPose.orientation[0], rawPose.orientation[1], -rawPose.orientation[2],
-      -rawPose.orientation[3]);
+      pose.orientation[0], pose.orientation[1], -pose.orientation[2],
+      -pose.orientation[3]);
     if (_mesh) {
       if (_mesh->getScene()->useRightHandedSystem()) {
         deviceRotationQuaternion.z *= -1.f;

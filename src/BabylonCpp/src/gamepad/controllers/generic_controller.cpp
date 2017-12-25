@@ -25,10 +25,10 @@ void GenericController::initControllerMesh(
                                vector_t<ParticleSystem*>& /*particleSystems*/,
                                vector_t<Skeleton*>& /*skeletons*/) {
       _defaultModel = newMeshes[1];
+      attachToMesh(_defaultModel);
       if (meshLoaded) {
         meshLoaded(_defaultModel);
       }
-      attachToMesh(_defaultModel);
     });
 }
 

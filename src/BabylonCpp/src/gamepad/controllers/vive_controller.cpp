@@ -36,10 +36,10 @@ void ViveController::initControllerMesh(
       - LED
       */
       _defaultModel = newMeshes[1];
+      attachToMesh(_defaultModel);
       if (meshLoaded) {
         meshLoaded(_defaultModel);
       }
-      attachToMesh(_defaultModel);
     });
 }
 
