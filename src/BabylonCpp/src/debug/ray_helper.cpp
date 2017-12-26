@@ -17,7 +17,13 @@ unique_ptr_t<RayHelper> RayHelper::CreateAndShow(const Ray& ray, Scene* scene,
   return helper;
 }
 
-RayHelper::RayHelper(const Ray& iRay) : ray{iRay}
+RayHelper::RayHelper(const Ray& iRay)
+    : ray{::std::make_unique<Ray>(iRay)}
+    , _renderLine{nullptr}
+    , _renderFunction{nullptr}
+    , _scene{nullptr}
+    , _updateToMeshFunction{nullptr}
+    , _attachedToMesh{nullptr}
 {
 }
 
@@ -27,41 +33,49 @@ RayHelper::~RayHelper()
 
 void RayHelper::show(Scene* scene, const Color3& color)
 {
-  if (!_renderFunction) {
+  if (!_renderFunction && ray) {
     _renderFunction = [this](Scene*, EventState&) { _render(); };
     _scene          = scene;
     _renderPoints
-      = {ray.origin, ray.origin.add(ray.direction.scale(ray.length))};
+      = {ray->origin, ray->origin.add(ray->direction.scale(ray->length))};
     _renderLine = Mesh::CreateLines("ray", _renderPoints, scene, true);
 
-    _scene->registerBeforeRender(_renderFunction);
+    if (_renderFunction) {
+      _scene->registerBeforeRender(_renderFunction);
+    }
   }
 
-  {
+  if (_renderLine) {
     _renderLine->color.copyFrom(color);
   }
 }
 
 void RayHelper::hide()
 {
-  if (_renderFunction) {
+  if (_renderFunction && _scene) {
     _scene->unregisterBeforeRender(_renderFunction);
     _scene          = nullptr;
     _renderFunction = nullptr;
-    _renderLine->dispose();
-    _renderLine = nullptr;
+    if (_renderLine) {
+      _renderLine->dispose();
+      _renderLine = nullptr;
+    }
     _renderPoints.clear();
   }
 }
 
 void RayHelper::_render()
 {
-  auto& point = _renderPoints[1];
-  float len   = ::std::min(ray.length, 1000000.f);
+  if (!ray) {
+    return;
+  }
 
-  point.copyFrom(ray.direction);
+  auto& point = _renderPoints[1];
+  float len   = ::std::min(ray->length, 1000000.f);
+
+  point.copyFrom(ray->direction);
   point.scaleInPlace(len);
-  point.addInPlace(ray.origin);
+  point.addInPlace(ray->origin);
 
   Mesh::CreateLines("ray", _renderPoints, _scene, true, _renderLine);
 }
@@ -72,8 +86,12 @@ void RayHelper::attachToMesh(AbstractMesh* mesh,
 {
   _attachedToMesh = mesh;
 
-  if (length > 0) {
-    ray.length = length;
+  if (!ray) {
+    return;
+  }
+
+  if (length > 0.f) {
+    ray->length = length;
   }
 
   _meshSpaceDirection = meshSpaceDirection;
@@ -90,7 +108,10 @@ void RayHelper::attachToMesh(AbstractMesh* mesh,
 void RayHelper::detachFromMesh()
 {
   if (_attachedToMesh) {
-    _attachedToMesh->getScene()->unregisterBeforeRender(_updateToMeshFunction);
+    if (_updateToMeshFunction) {
+      _attachedToMesh->getScene()->unregisterBeforeRender(
+        _updateToMeshFunction);
+    }
     _attachedToMesh       = nullptr;
     _updateToMeshFunction = nullptr;
   }
@@ -98,20 +119,25 @@ void RayHelper::detachFromMesh()
 
 void RayHelper::_updateToMesh()
 {
+  if (!_attachedToMesh || !ray) {
+    return;
+  }
+
   if (_attachedToMesh->_isDisposed) {
     detachFromMesh();
     return;
   }
 
-  _attachedToMesh->getDirectionToRef(_meshSpaceDirection, ray.direction);
+  _attachedToMesh->getDirectionToRef(_meshSpaceDirection, ray->direction);
   Vector3::TransformCoordinatesToRef(
-    _meshSpaceOrigin, *_attachedToMesh->getWorldMatrix(), ray.origin);
+    _meshSpaceOrigin, *_attachedToMesh->getWorldMatrix(), ray->origin);
 }
 
 void RayHelper::dispose()
 {
   hide();
   detachFromMesh();
+  ray = nullptr;
 }
 
 } // end of namespace BABYLON

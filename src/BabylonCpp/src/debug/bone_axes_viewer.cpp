@@ -24,6 +24,10 @@ BoneAxesViewer::~BoneAxesViewer()
 
 void BoneAxesViewer::update()
 {
+  if (!mesh || !bone) {
+    return;
+  }
+
   bone->getAbsolutePositionToRef(mesh, pos);
   bone->getDirectionToRef(Axis::X(), xaxis, mesh);
   bone->getDirectionToRef(Axis::Y(), yaxis, mesh);
@@ -34,16 +38,12 @@ void BoneAxesViewer::update()
 
 void BoneAxesViewer::dispose()
 {
-  pos = Vector3::Zero();
+  if (mesh) {
+    mesh = nullptr;
+    bone = nullptr;
 
-  xaxis = Vector3::Zero();
-  yaxis = Vector3::Zero();
-  zaxis = Vector3::Zero();
-
-  mesh = nullptr;
-  bone = nullptr;
-
-  AxesViewer::dispose();
+    AxesViewer::dispose();
+  }
 }
 
 } // end of namespace BABYLON

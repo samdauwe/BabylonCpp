@@ -37,46 +37,58 @@ AxesViewer::~AxesViewer()
 void AxesViewer::update(const Vector3& position, const Vector3& xaxis,
                         const Vector3& yaxis, const Vector3& zaxis)
 {
-  _xmesh->position().copyFrom(position);
-  _ymesh->position().copyFrom(position);
-  _zmesh->position().copyFrom(position);
+  if (_xmesh) {
+    _xmesh->position().copyFrom(position);
+  }
+  if (_ymesh) {
+    _ymesh->position().copyFrom(position);
+  }
+  if (_zmesh) {
+    _zmesh->position().copyFrom(position);
+  }
 
   auto point2 = _xline[1];
   point2.x    = xaxis.x * scaleLines;
   point2.y    = xaxis.y * scaleLines;
   point2.z    = xaxis.z * scaleLines;
-  Mesh::CreateLines(nullptr, _xline, nullptr, false, _xmesh);
+  Mesh::CreateLines("", _xline, nullptr, false, _xmesh);
 
   point2   = _yline[1];
   point2.x = yaxis.x * scaleLines;
   point2.y = yaxis.y * scaleLines;
   point2.z = yaxis.z * scaleLines;
-  Mesh::CreateLines(nullptr, _yline, nullptr, false, _ymesh);
+  Mesh::CreateLines("", _yline, nullptr, false, _ymesh);
 
   point2   = _zline[1];
   point2.x = zaxis.x * scaleLines;
   point2.y = zaxis.y * scaleLines;
   point2.z = zaxis.z * scaleLines;
-  Mesh::CreateLines(nullptr, _zline, nullptr, false, _zmesh);
+  Mesh::CreateLines("", _zline, nullptr, false, _zmesh);
 }
 
 void AxesViewer::dispose()
 {
   if (_xmesh) {
     _xmesh->dispose();
-    _ymesh->dispose();
-    _zmesh->dispose();
-
-    _xmesh = nullptr;
-    _ymesh = nullptr;
-    _zmesh = nullptr;
-
-    _xline.clear();
-    _yline.clear();
-    _zline.clear();
-
-    scene = nullptr;
   }
+
+  if (_ymesh) {
+    _ymesh->dispose();
+  }
+
+  if (_zmesh) {
+    _zmesh->dispose();
+  }
+
+  _xmesh = nullptr;
+  _ymesh = nullptr;
+  _zmesh = nullptr;
+
+  _xline.clear();
+  _yline.clear();
+  _zline.clear();
+
+  scene = nullptr;
 }
 
 } // end of namespace BABYLON

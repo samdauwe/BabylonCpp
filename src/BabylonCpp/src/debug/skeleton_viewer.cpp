@@ -149,6 +149,7 @@ void SkeletonViewer::update()
   LineSystemOptions options;
   options.lines     = _debugLines;
   options.updatable = true;
+  options.instance  = nullptr;
 
   if (!_debugMesh) {
     _debugMesh = MeshBuilder::CreateLineSystem("", options, _scene);

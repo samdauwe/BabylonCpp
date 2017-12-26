@@ -33,7 +33,7 @@ private:
   void dispose();
 
 public:
-  Ray ray;
+  unique_ptr_t<Ray> ray;
 
 private:
   vector_t<Vector3> _renderPoints;
