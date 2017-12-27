@@ -18,15 +18,16 @@ namespace BABYLON {
 const Vector3 PhysicsImpostor::DEFAULT_OBJECT_SIZE = Vector3::One();
 
 PhysicsImpostor::PhysicsImpostor(IPhysicsEnabledObject* _object,
-                                 unsigned int _type,
+                                 unsigned int iType,
                                  PhysicsImpostorParameters& options,
                                  Scene* scene)
     : object{_object}
-    , type{_type}
+    , _type{iType}
     , _options{options}
     , _scene{scene}
     , _bodyUpdateRequired{false}
     , _deltaPosition{Vector3::Zero()}
+    , _isDisposed{false}
 {
   // Sanity check!
   if (!object) {
@@ -117,6 +118,11 @@ void PhysicsImpostor::setParent(PhysicsImpostor* value)
   _parent = value;
 }
 
+unsigned int PhysicsImpostor::type() const
+{
+  return _type;
+}
+
 void PhysicsImpostor::setPhysicsBody(IPhysicsBody* physicsBody)
 {
   if (_physicsBody) {
@@ -160,6 +166,11 @@ float PhysicsImpostor::getParam(const string_t& paramName) const
   }
 
   return 0.f;
+}
+
+bool PhysicsImpostor::isDisposed() const
+{
+  return _isDisposed;
 }
 
 void PhysicsImpostor::setParam(const string_t& paramName, float value)
@@ -339,7 +350,8 @@ PhysicsImpostor::clone(IPhysicsEnabledObject* newObject)
   if (!newObject) {
     return nullptr;
   }
-  return ::std::make_unique<PhysicsImpostor>(newObject, type, _options, _scene);
+  return ::std::make_unique<PhysicsImpostor>(newObject, _type, _options,
+                                             _scene);
 }
 
 void PhysicsImpostor::dispose(bool /*doNotRecurse*/)
@@ -372,6 +384,21 @@ void PhysicsImpostor::setDeltaRotation(const Quaternion& rotation)
   }
   _deltaRotation->copyFrom(rotation);
   _deltaRotationConjugated->copyFrom(_deltaRotation->conjugate());
+}
+
+PhysicsImpostor& PhysicsImpostor::getBoxSizeToRef(Vector3& result)
+{
+  if (_physicsEngine) {
+    _physicsEngine->getPhysicsPlugin()->getBoxSizeToRef(this, result);
+  }
+
+  return *this;
+}
+
+float PhysicsImpostor::getRadius() const
+{
+  return _physicsEngine ? _physicsEngine->getPhysicsPlugin()->getRadius(this) :
+                          0.f;
 }
 
 } // end of namespace BABYLON

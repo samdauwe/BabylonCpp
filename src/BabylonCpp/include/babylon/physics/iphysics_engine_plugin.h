@@ -52,6 +52,11 @@ struct BABYLON_SHARED_EXPORT IPhysicsEnginePlugin {
   virtual void setLimit(IMotorEnabledJoint* joint, float upperLimit,
                         float lowerLimit, unsigned int motorIndex = 0)
     = 0;
+  virtual float getRadius(const PhysicsImpostor* impostor) = 0;
+  virtual void getBoxSizeToRef(PhysicsImpostor* impostor, Vector3& result) = 0;
+  virtual void syncMeshWithImpostor(AbstractMesh* mesh,
+                                    PhysicsImpostor* impostor)
+    = 0;
   virtual void dispose() = 0;
 }; // end of struct IPhysicsEnginePlugin
 

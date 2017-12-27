@@ -62,6 +62,7 @@ public:
 
   PhysicsImpostor* parent();
   void setParent(PhysicsImpostor* value);
+  unsigned int type() const;
 
   /**
    * Set the physics body. Used mainly by the physics engine/plugin
@@ -81,6 +82,8 @@ public:
    * Sets a specific parameter in the options given to the physics plugin
    */
   void setParam(const string_t& paramName, float value);
+
+  bool isDisposed() const;
 
   /**
    * Specifically change the body's mass option. Won't recreate the physics body
@@ -188,6 +191,8 @@ public:
   void dispose(bool doNotRecurse = false) override;
   void setDeltaPosition(const Vector3& position);
   void setDeltaRotation(const Quaternion& rotation);
+  PhysicsImpostor& getBoxSizeToRef(Vector3& result);
+  float getRadius() const;
 
 private:
   PhysicsImpostor* _getPhysicsParent();
@@ -198,7 +203,7 @@ public:
   size_t uniqueId;
 
 private:
-  unsigned int type;
+  unsigned int _type;
   PhysicsImpostorParameters _options;
   Scene* _scene;
   PhysicsEngine* _physicsEngine;
@@ -214,6 +219,7 @@ private:
   unique_ptr_t<Quaternion> _deltaRotationConjugated;
   // If set, this is this impostor's parent
   PhysicsImpostor* _parent;
+  bool _isDisposed;
   vector_t<Joint> _joints;
   Vector3 _tmpPositionWithDelta;
   Quaternion _tmpRotationWithDelta;
