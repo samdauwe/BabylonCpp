@@ -20,6 +20,7 @@
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/math/vector2.h>
 #include <babylon/mesh/_instances_batch.h>
+#include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
 #include <babylon/postprocess/blur_post_process.h>
@@ -57,7 +58,6 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light,
     , _viewMatrix{Matrix::Zero()}
     , _projectionMatrix{Matrix::Zero()}
     , _transformMatrix{Matrix::Zero()}
-    , _worldViewProjection{Matrix::Zero()}
     , _cacheInitialized{false}
     , _downSamplePostprocess{nullptr}
     , _boxBlurPostprocess{nullptr}
@@ -68,7 +68,6 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light,
     , _currentFaceIndexCache{0}
     , _useFullFloat{true}
     , _textureType{0}
-    , _isCube{false}
     , _defaultTextureMatrix{Matrix::Identity()}
 {
   light->_shadowGenerator = this;
@@ -364,6 +363,45 @@ RenderTargetTexture* ShadowGenerator::getShadowMapForRendering()
   return _shadowMap.get();
 }
 
+ShadowGenerator& ShadowGenerator::addShadowCaster(AbstractMesh* mesh,
+                                                  bool includeDescendants)
+{
+  if (!_shadowMap) {
+    return *this;
+  }
+
+  _shadowMap->renderList.emplace_back(mesh);
+
+  if (includeDescendants) {
+    stl_util::concat(_shadowMap->renderList, mesh->getChildMeshes(false));
+  }
+
+  return *this;
+}
+
+ShadowGenerator& ShadowGenerator::removeShadowCaster(AbstractMesh* mesh,
+                                                     bool includeDescendants)
+{
+  if (!_shadowMap || !_shadowMap->renderList.empty()) {
+    return *this;
+  }
+
+  _shadowMap->renderList.erase(::std::remove(_shadowMap->renderList.begin(),
+                                             _shadowMap->renderList.end(),
+                                             mesh),
+                               _shadowMap->renderList.end());
+
+  if (includeDescendants) {
+    for (auto& child : mesh->getChildren()) {
+      if (auto childMesh = static_cast<AbstractMesh*>(child)) {
+        removeShadowCaster(childMesh);
+      }
+    }
+  }
+
+  return *this;
+}
+
 IShadowLight* ShadowGenerator::getLight()
 {
   return _light;
@@ -415,9 +453,12 @@ void ShadowGenerator::_initializeShadowMap()
       _initializeBlurRTTAndPostProcesses();
     }
 
-    _scene->postProcessManager->directRender(
-      _blurPostProcesses, getShadowMapForRendering()->getInternalTexture(),
-      true);
+    auto shadowMap = getShadowMapForRendering();
+
+    if (shadowMap) {
+      _scene->postProcessManager->directRender(
+        _blurPostProcesses, shadowMap->getInternalTexture(), true);
+    }
   });
 
   // Clear according to the chosen filter.
@@ -528,12 +569,17 @@ void ShadowGenerator::_renderForShadowMap(
 
 void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
 {
-  auto mesh   = subMesh->getRenderingMesh();
-  auto scene  = _scene;
-  auto engine = scene->getEngine();
+  auto mesh     = subMesh->getRenderingMesh();
+  auto scene    = _scene;
+  auto engine   = scene->getEngine();
+  auto material = subMesh->getMaterial();
+
+  if (!material) {
+    return;
+  }
 
   // Culling
-  engine->setState(subMesh->getMaterial()->backFaceCulling());
+  engine->setState(material->backFaceCulling());
 
   // Managing instances
   auto batch = mesh->_getInstancesRenderList(subMesh->_id);
@@ -548,17 +594,18 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
   if (isReady(subMesh, hardwareInstancedRendering)) {
     engine->enableEffect(_effect);
     mesh->_bind(subMesh, _effect, Material::TriangleFillMode);
-    auto material = subMesh->getMaterial();
 
     _effect->setFloat2("biasAndScale", bias(), depthScale());
 
     _effect->setMatrix("viewProjection", getTransformMatrix());
     _effect->setVector3("lightPosition", getLight()->position);
 
-    _effect->setFloat2("depthValues",
-                       getLight()->getDepthMinZ(scene->activeCamera),
-                       getLight()->getDepthMinZ(scene->activeCamera)
-                         + getLight()->getDepthMaxZ(scene->activeCamera));
+    if (scene->activeCamera) {
+      _effect->setFloat2("depthValues",
+                         getLight()->getDepthMinZ(scene->activeCamera),
+                         getLight()->getDepthMinZ(scene->activeCamera)
+                           + getLight()->getDepthMaxZ(scene->activeCamera));
+    }
 
     // Alpha test
     if (material && material->needAlphaTesting()) {
@@ -596,12 +643,18 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
   }
   else {
     // Need to reset refresh rate of the shadowMap
-    _shadowMap->resetRefreshCounter();
+    if (_shadowMap) {
+      _shadowMap->resetRefreshCounter();
+    }
   }
 }
 
 void ShadowGenerator::_applyFilterValues()
 {
+  if (!_shadowMap) {
+    return;
+  }
+
   if (filter() == ShadowGenerator::FILTER_NONE) {
     _shadowMap->updateSamplingMode(TextureConstants::NEAREST_SAMPLINGMODE);
   }
@@ -614,23 +667,43 @@ void ShadowGenerator::forceCompilation(
   const ::std::function<void(ShadowGenerator* generator)>& onCompiled,
   const ShadowGeneratorCompileOptions& options)
 {
-  vector_t<SubMesh*> subMeshes;
-  std::size_t currentIndex = 0;
+  auto shadowMap = getShadowMap();
+  if (!shadowMap) {
+    if (onCompiled) {
+      onCompiled(this);
+    }
+    return;
+  }
 
-  for (auto& mesh : getShadowMap()->renderList) {
+  auto& renderList = shadowMap->renderList;
+  if (renderList.empty()) {
+    if (onCompiled) {
+      onCompiled(this);
+    }
+    return;
+  }
+
+  vector_t<SubMesh*> subMeshes;
+  for (auto& mesh : renderList) {
     for (auto& subMesh : mesh->subMeshes) {
       subMeshes.emplace_back(subMesh.get());
     }
   }
+  if (subMeshes.empty()) {
+    if (onCompiled) {
+      onCompiled(this);
+    }
+    return;
+  }
+
+  std::size_t currentIndex = 0;
 
   const auto checkReady = [&]() {
     if (!_scene || !_scene->getEngine()) {
       return;
     }
 
-    const auto& subMesh = subMeshes[currentIndex];
-
-    if (isReady(subMesh, options.useInstances)) {
+    while (isReady(subMeshes[currentIndex], options.useInstances)) {
       ++currentIndex;
       if (currentIndex >= subMeshes.size()) {
         if (onCompiled) {
@@ -641,9 +714,7 @@ void ShadowGenerator::forceCompilation(
     }
   };
 
-  if (!subMeshes.empty()) {
-    checkReady();
-  }
+  checkReady();
 }
 
 bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
@@ -709,7 +780,7 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
   }
 
   // Get correct effect
-  string_t join = String::join(defines, '\n');
+  auto join = String::join(defines, '\n');
   if (_cachedDefines != join) {
     _cachedDefines = join;
 
@@ -759,10 +830,20 @@ void ShadowGenerator::prepareDefines(MaterialDefines& defines,
 void ShadowGenerator::bindShadowLight(const string_t& lightIndex,
                                       Effect* effect)
 {
-  auto scene = _scene;
-  auto light = _light;
+  auto& scene = _scene;
+  auto& light = _light;
 
   if (!scene->shadowsEnabled() || !light->shadowEnabled) {
+    return;
+  }
+
+  auto& camera = scene->activeCamera;
+  if (!camera) {
+    return;
+  }
+
+  auto shadowMap = getShadowMap();
+  if (!shadowMap) {
     return;
   }
 
@@ -771,18 +852,17 @@ void ShadowGenerator::bindShadowLight(const string_t& lightIndex,
   }
   effect->setTexture("shadowSampler" + lightIndex, getShadowMapForRendering());
   light->_uniformBuffer->updateFloat4(
-    "shadowsInfo", getDarkness(), blurScale() / getShadowMap()->getSize().width,
+    "shadowsInfo", getDarkness(), blurScale() / shadowMap->getSize().width,
     depthScale(), frustumEdgeFalloff, lightIndex);
   light->_uniformBuffer->updateFloat2(
-    "depthValues", getLight()->getDepthMinZ(scene->activeCamera),
-    getLight()->getDepthMinZ(scene->activeCamera)
-      + getLight()->getDepthMaxZ(scene->activeCamera),
+    "depthValues", getLight()->getDepthMinZ(camera),
+    getLight()->getDepthMinZ(camera) + getLight()->getDepthMaxZ(camera),
     lightIndex);
 }
 
 Matrix ShadowGenerator::getTransformMatrix()
 {
-  auto scene = _scene;
+  auto& scene = _scene;
   if (_currentRenderID == scene->getRenderId()
       && _currentFaceIndexCache == _currentFaceIndex) {
     return _transformMatrix;
@@ -816,8 +896,15 @@ Matrix ShadowGenerator::getTransformMatrix()
     Matrix::LookAtLHToRef(lightPosition, lightPosition.add(_lightDirection),
                           Vector3::Up(), _viewMatrix);
 
-    _light->setShadowProjectionMatrix(_projectionMatrix, _viewMatrix,
-                                      getShadowMap()->renderList);
+    auto shadowMap = getShadowMap();
+
+    if (shadowMap) {
+      auto& renderList = shadowMap->renderList;
+      if (!renderList.empty()) {
+        _light->setShadowProjectionMatrix(_projectionMatrix, _viewMatrix,
+                                          renderList);
+      }
+    }
 
     _viewMatrix.multiplyToRef(_projectionMatrix, _transformMatrix);
   }
@@ -827,8 +914,12 @@ Matrix ShadowGenerator::getTransformMatrix()
 
 void ShadowGenerator::recreateShadowMap()
 {
+  auto& shadowMap = _shadowMap;
+  if (!shadowMap) {
+    return;
+  }
   // Track render list.
-  auto& renderList = _shadowMap->renderList;
+  auto& renderList = shadowMap->renderList;
   // Clean up existing data.
   _disposeRTTandPostProcesses();
   // Reinitializes.
@@ -885,8 +976,10 @@ void ShadowGenerator::dispose()
 {
   _disposeRTTandPostProcesses();
 
-  _light->_shadowGenerator = nullptr;
-  _light->_markMeshesAsLightDirty();
+  if (_light) {
+    _light->_shadowGenerator = nullptr;
+    _light->_markMeshesAsLightDirty();
+  }
 }
 
 Json::object ShadowGenerator::serialize() const
@@ -921,6 +1014,9 @@ ShadowGenerator::Parse(const Json::value& parsedShadowGenerator, Scene* scene)
        Json::GetArray(parsedShadowGenerator, "renderList")) {
     auto meshes = scene->getMeshesByID(renderItem.get<string_t>());
     for (auto& mesh : meshes) {
+      if (!shadowMap) {
+        continue;
+      }
       shadowMap->renderList.emplace_back(mesh);
     }
   }
@@ -940,7 +1036,7 @@ ShadowGenerator::Parse(const Json::value& parsedShadowGenerator, Scene* scene)
     shadowGenerator->setUseCloseExponentialShadowMap(true);
   }
   else if (Json::GetBool(parsedShadowGenerator,
-                         "useBlurExponentialShadowMap")) {
+                         "useBlurCloseExponentialShadowMap")) {
     shadowGenerator->setUseBlurCloseExponentialShadowMap(true);
   }
 

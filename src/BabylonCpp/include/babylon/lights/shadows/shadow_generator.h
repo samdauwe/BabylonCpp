@@ -99,6 +99,26 @@ public:
   RenderTargetTexture* getShadowMapForRendering() override;
 
   /**
+   * @brief Helper function to add a mesh and its descendants to the list of
+   * shadow casters.
+   * @param mesh Mesh to add
+   * @param includeDescendants boolean indicating if the descendants should be
+   * added. Default to true
+   */
+  ShadowGenerator& addShadowCaster(AbstractMesh* mesh,
+                                   bool includeDescendants = true);
+
+  /**
+   * @brief Helper function to remove a mesh and its descendants from the list
+   * of shadow casters.
+   * @param mesh Mesh to remove
+   * @param includeDescendants boolean indicating if the descendants should be
+   * removed. Default to true
+   */
+  ShadowGenerator& removeShadowCaster(AbstractMesh* mesh,
+                                      bool includeDescendants = true);
+
+  /**
    * @brief Returns the associated light object.
    */
   IShadowLight* getLight();
@@ -198,7 +218,6 @@ private:
   Matrix _viewMatrix;
   Matrix _projectionMatrix;
   Matrix _transformMatrix;
-  Matrix _worldViewProjection;
   bool _cacheInitialized;
   Vector3 _cachedPosition;
   Vector3 _cachedDirection;
@@ -214,7 +233,6 @@ private:
   unsigned int _currentFaceIndexCache;
   bool _useFullFloat;
   unsigned int _textureType;
-  bool _isCube;
   Matrix _defaultTextureMatrix;
 
 }; // end of class ShadowGenerator
