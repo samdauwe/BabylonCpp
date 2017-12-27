@@ -1,5 +1,6 @@
 #include <babylon/morph/morph_target.h>
 
+#include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json.h>
 #include <babylon/mesh/abstract_mesh.h>
@@ -37,6 +38,11 @@ void MorphTarget::setInfluence(float influence)
   }
 }
 
+bool MorphTarget::hasPositions() const
+{
+  return !_positions.empty();
+}
+
 bool MorphTarget::hasNormals() const
 {
   return !_normals.empty();
@@ -67,14 +73,14 @@ Float32Array& MorphTarget::getPositions()
   return _positions;
 }
 
-const Float32Array& MorphTarget::getPositions() const
-{
-  return _positions;
-}
-
 void MorphTarget::setNormals(const Float32Array& data)
 {
   _normals = data;
+}
+
+const Float32Array& MorphTarget::getPositions() const
+{
+  return _positions;
 }
 
 Float32Array& MorphTarget::getNormals()
@@ -124,18 +130,25 @@ MorphTarget::Parse(const Json::value& serializationObject)
     result->setNormals(Json::ToArray<float>(serializationObject, "tangents"));
   }
 
+  // Animations
+  if (serializationObject.contains("animations")) {
+    for (auto parsedAnimation :
+         Json::GetArray(serializationObject, "animations")) {
+      result->animations().emplace_back(Animation::Parse(parsedAnimation));
+    }
+  }
+
   return result;
 }
 
-unique_ptr_t<MorphTarget>
-MorphTarget::FromMesh(AbstractMesh* mesh, const string_t& name, float influence)
+unique_ptr_t<MorphTarget> MorphTarget::FromMesh(AbstractMesh* mesh,
+                                                string_t name, float influence)
 {
-  auto morphTargetName = name;
-  if (morphTargetName.empty()) {
-    morphTargetName = mesh->name;
+  if (name.empty()) {
+    name = mesh->name;
   }
 
-  auto result = ::std::make_unique<MorphTarget>(morphTargetName, influence);
+  auto result = ::std::make_unique<MorphTarget>(name, influence);
 
   result->setPositions(mesh->getVerticesData(VertexBuffer::PositionKind));
 

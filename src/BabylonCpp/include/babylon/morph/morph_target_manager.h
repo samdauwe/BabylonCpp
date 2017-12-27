@@ -48,7 +48,6 @@ protected:
   MorphTargetManager(Scene* scene);
 
 private:
-  void _onInfluenceChanged(bool needUpdate);
   void _syncActiveTargets(bool needUpdate);
 
 private:

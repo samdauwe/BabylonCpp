@@ -10,13 +10,17 @@
 namespace BABYLON {
 
 MorphTargetManager::MorphTargetManager(Scene* scene)
-    : _scene{scene ? scene : Engine::LastCreatedScene()}
-    , _supportsNormals{false}
+    : _supportsNormals{false}
     , _supportsTangents{false}
     , _vertexCount{0}
     , _uniqueId{0}
 {
-  _uniqueId = _scene->getUniqueId();
+  _scene = scene ? scene : Engine::LastCreatedScene();
+
+  if (_scene) {
+    _scene->morphTargetManagers.emplace_back(this);
+    _uniqueId = _scene->getUniqueId();
+  }
 }
 
 MorphTargetManager::~MorphTargetManager()
@@ -84,15 +88,6 @@ MorphTarget* MorphTargetManager::getTarget(std::size_t index)
 
 void MorphTargetManager::addTarget(unique_ptr_t<MorphTarget>&& target)
 {
-  if (_vertexCount) {
-    if (_vertexCount != target->getPositions().size() / 3) {
-      BABYLON_LOG_ERROR(
-        "MorphTargetManager",
-        "Incompatible target. Targets must all have the same vertices count.");
-      return;
-    }
-  }
-
   _targets.emplace_back(::std::move(target));
   _targetObservable.emplace_back(_targets.back()->onInfluenceChanged.add(
     [this](bool needUpdate, EventState&) { _syncActiveTargets(needUpdate); }));
@@ -111,7 +106,6 @@ void MorphTargetManager::removeTarget(MorphTarget* target)
 
     size_t index = static_cast<size_t>(it - _targets.begin());
     target->onInfluenceChanged.remove(_targetObservable[index]);
-    _vertexCount = 0;
     _syncActiveTargets(true);
   }
 }
@@ -119,11 +113,6 @@ void MorphTargetManager::removeTarget(MorphTarget* target)
 Json::object MorphTargetManager::serialize()
 {
   return Json::object();
-}
-
-void MorphTargetManager::_onInfluenceChanged(bool needUpdate)
-{
-  _syncActiveTargets(needUpdate);
 }
 
 void MorphTargetManager::_syncActiveTargets(bool needUpdate)
@@ -134,6 +123,8 @@ void MorphTargetManager::_syncActiveTargets(bool needUpdate)
   _influences.clear();
   _supportsNormals  = true;
   _supportsTangents = true;
+  _vertexCount      = 0;
+
   for (auto& target : _targets) {
     if (target->influence() > 0.f) {
       _activeTargets.emplace_back(target.get());
@@ -143,8 +134,23 @@ void MorphTargetManager::_syncActiveTargets(bool needUpdate)
       _supportsNormals  = _supportsNormals && target->hasNormals();
       _supportsTangents = _supportsTangents && target->hasTangents();
 
+      auto& positions = target->getPositions();
+      if (positions.empty()) {
+        BABYLON_LOG_ERROR("MorphTargetManager",
+                          "Invalid target. Target must have positions.");
+        return;
+      }
+
+      const auto vertexCount = positions.size() / 3;
       if (_vertexCount == 0) {
-        _vertexCount = target->getPositions().size() / 3;
+        _vertexCount = vertexCount;
+      }
+      else if (_vertexCount != vertexCount) {
+        BABYLON_LOG_ERROR(
+          "MorphTargetManager",
+          "Incompatible target. Targets must all have the same vertices "
+          "count.");
+        return;
       }
     }
   }
@@ -153,7 +159,7 @@ void MorphTargetManager::_syncActiveTargets(bool needUpdate)
     _influences = _tempInfluences;
   }
 
-  if (needUpdate) {
+  if (needUpdate && _scene) {
     // Flag meshes as dirty to resync with the active targets
     for (auto& abstractMesh : _scene->meshes) {
       auto mesh = static_cast<Mesh*>(abstractMesh.get());

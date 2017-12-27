@@ -14,6 +14,7 @@ public:
 
   float influence() const;
   void setInfluence(float influence);
+  bool hasPositions() const;
   bool hasNormals() const;
   bool hasTangents() const;
   vector_t<Animation*>& animations();
@@ -37,8 +38,8 @@ public:
   // Statics
   static unique_ptr_t<MorphTarget>
   Parse(const Json::value& serializationObject);
-  static unique_ptr_t<MorphTarget>
-  FromMesh(AbstractMesh* mesh, const string_t& name, float influence = 0.f);
+  static unique_ptr_t<MorphTarget> FromMesh(AbstractMesh* mesh, string_t name,
+                                            float influence = 0.f);
 
 public:
   Observable<bool> onInfluenceChanged;
