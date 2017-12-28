@@ -23,7 +23,7 @@ struct BABYLON_SHARED_EXPORT IGetSetVerticesData {
                                    bool makeItUnique  = false)
     = 0;
   virtual Mesh* setIndices(const IndicesArray& indices,
-                           size_t totalVertices = 0)
+                           size_t totalVertices = 0, bool updatable = false)
     = 0;
 }; // end of struct IGetSetVerticesData
 

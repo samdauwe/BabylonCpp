@@ -373,7 +373,8 @@ public:
    * @returns The Mesh.
    */
   virtual Mesh* setIndices(const IndicesArray& indices,
-                           size_t totalVertices = 0) override;
+                           size_t totalVertices = 0,
+                           bool updatable       = false) override;
 
   /**
    * @brief Returns false by default, used by the class Mesh.

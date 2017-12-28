@@ -106,7 +106,7 @@ Mesh* InstancedMesh::updateVerticesData(unsigned int kind,
 }
 
 Mesh* InstancedMesh::setIndices(const IndicesArray& indices,
-                                size_t totalVertices)
+                                size_t totalVertices, bool /*updatable*/)
 {
   if (sourceMesh()) {
     sourceMesh()->setIndices(indices, totalVertices);

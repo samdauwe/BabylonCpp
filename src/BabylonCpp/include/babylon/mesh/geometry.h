@@ -69,8 +69,8 @@ public:
   unordered_map_t<string_t, VertexBuffer*> getVertexBuffers();
   bool isVerticesDataPresent(unsigned int kind) override;
   Uint32Array getVerticesDataKinds();
-  Mesh* setIndices(const IndicesArray& indices,
-                   size_t totalVertices = 0) override;
+  Mesh* setIndices(const IndicesArray& indices, size_t totalVertices = 0,
+                   bool updatable = false) override;
   size_t getTotalIndices();
   IndicesArray getIndices(bool copyWhenShared = false) override;
   GL::IGLBuffer* getIndexBuffer();

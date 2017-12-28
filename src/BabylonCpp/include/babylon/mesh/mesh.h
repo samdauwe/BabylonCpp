@@ -428,8 +428,8 @@ public:
    * the mesh.
    * This method creates a new index buffer each call.
    */
-  Mesh* setIndices(const IndicesArray& indices,
-                   size_t totalVertices = 0) override;
+  Mesh* setIndices(const IndicesArray& indices, size_t totalVertices = 0,
+                   bool updatable = false) override;
 
   /**
    * @brief Invert the geometry to move from a right handed system to a left
@@ -1460,6 +1460,8 @@ public:
     _delayLoadingFunction;
   unique_ptr_t<_VisibleInstances> _visibleInstances;
   bool _shouldGenerateFlatShading;
+  // Use by builder only to know what orientation were the mesh build in.
+  unsigned int _originalBuilderSideOrientation;
 
 private:
   Observer<Mesh>::Ptr _onBeforeDrawObserver;

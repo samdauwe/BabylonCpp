@@ -361,9 +361,12 @@ LineSystemOptions::LineSystemOptions() : updatable{false}, instance{nullptr}
 }
 
 LineSystemOptions::LineSystemOptions(LinesOptions& options)
-    : updatable{options.updatable}, instance{options.instance}
+    : updatable{options.updatable}
+    , useVertexAlpha{options.useVertexAlpha}
+    , instance{options.instance}
 {
   lines.emplace_back(options.points);
+  colors.emplace_back(options.colors);
 }
 
 LineSystemOptions::~LineSystemOptions()

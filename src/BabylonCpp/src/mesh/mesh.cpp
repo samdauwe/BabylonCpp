@@ -48,6 +48,7 @@ Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
     , _geometry{nullptr}
     , _visibleInstances{nullptr}
     , _shouldGenerateFlatShading{false}
+    , _originalBuilderSideOrientation{Mesh::DEFAULTSIDE}
     , _onBeforeDrawObserver{nullptr}
     , _morphTargetManager{nullptr}
     , _batchCache{::std::make_unique<_InstancesBatch>()}
@@ -652,7 +653,8 @@ Mesh& Mesh::makeGeometryUnique()
   return *this;
 }
 
-Mesh* Mesh::setIndices(const IndicesArray& indices, size_t totalVertices)
+Mesh* Mesh::setIndices(const IndicesArray& indices, size_t totalVertices,
+                       bool /*updatable*/)
 {
   if (!_geometry) {
     auto vertexData     = ::std::make_unique<VertexData>();
@@ -2512,7 +2514,7 @@ Mesh* Mesh::MergeMeshes(vector_t<Mesh*>& meshes, bool disposeSource,
       otherVertexData->transform(*mesh->getWorldMatrix());
 
       if (vertexData) {
-        vertexData->merge(otherVertexData.get());
+        vertexData->merge(*otherVertexData.get());
       }
       else {
         vertexData = ::std::move(otherVertexData);

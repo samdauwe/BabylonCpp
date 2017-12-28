@@ -7,16 +7,19 @@
 
 namespace BABYLON {
 
+struct DepthSortedFacet {
+  unsigned int ind;
+  float sqDistance;
+}; // end of struct DepthSortedFacets
+
 /**
  * @brief Facet parameters.
  */
-class BABYLON_SHARED_EXPORT FacetParameters {
+struct BABYLON_SHARED_EXPORT FacetParameters {
 
-public:
   FacetParameters();
   ~FacetParameters();
 
-public:
   // Array of facet positions (vector3)
   vector_t<Vector3> facetPositions;
   // Array of facet normals (vector3)
@@ -36,8 +39,15 @@ public:
   BoundingInfo bInfo;
   // Whether or not to use a right-handed coordinate system
   bool useRightHandedSystem;
+  // Whether or not to enable the facet depth sort computation
+  bool depthSort;
+  // Vector3 to compute the facet depth from this location
+  Nullable<Vector3> distanceTo;
+  // Array of depthSortedFacets to store the facet distances from the reference
+  // location
+  vector_t<DepthSortedFacet> depthSortedFacets;
 
-}; // end of class FacetParameters
+}; // end of struct FacetParameters
 
 } // end of namespace BABYLON
 

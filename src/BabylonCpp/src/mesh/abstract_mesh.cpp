@@ -684,7 +684,7 @@ Mesh* AbstractMesh::updateVerticesData(unsigned int /*kind*/,
 }
 
 Mesh* AbstractMesh::setIndices(const IndicesArray& /*indices*/,
-                               size_t /*totalVertices*/)
+                               size_t /*totalVertices*/, bool /*updatable*/)
 {
   return nullptr;
 }

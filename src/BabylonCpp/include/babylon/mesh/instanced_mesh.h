@@ -125,8 +125,8 @@ public:
    *
    * @returns The Mesh.
    */
-  Mesh* setIndices(const IndicesArray& indices,
-                   size_t totalVertices = 0) override;
+  Mesh* setIndices(const IndicesArray& indices, size_t totalVertices = 0,
+                   bool updatable = false) override;
 
   /**
    * @brief Returns if the mesh owns the requested kind of data.

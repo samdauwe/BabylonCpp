@@ -7,6 +7,8 @@ FacetParameters::FacetParameters()
     , ratio{1.f}
     , bInfo{Vector3::Zero(), Vector3::Zero()}
     , useRightHandedSystem{false}
+    , depthSort{false}
+    , distanceTo{nullptr}
 {
 }
 

@@ -372,7 +372,9 @@ public:
 
 public:
   vector_t<Vector3> points;
+  vector_t<Color4> colors;
   bool updatable;
+  bool useVertexAlpha;
   LinesMesh* instance;
 
 }; // end of class LinesOptions
@@ -393,7 +395,9 @@ public:
 
 public:
   vector_t<vector_t<Vector3>> lines;
+  vector_t<vector_t<Color4>> colors;
   bool updatable;
+  bool useVertexAlpha;
   LinesMesh* instance;
 
 }; // end of class LineSystemOptions

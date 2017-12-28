@@ -326,7 +326,7 @@ class AbstractMesh;
 class BaseSubMesh;
 class Buffer;
 struct BufferPointer;
-class FacetParameters;
+struct FacetParameters;
 class Geometry;
 class GroundMesh;
 struct IGetSetVerticesData;

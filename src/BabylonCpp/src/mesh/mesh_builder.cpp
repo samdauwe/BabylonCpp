@@ -22,9 +22,11 @@ Mesh* MeshBuilder::CreateBox(const string_t& name, BoxOptions& options,
                              Scene* scene)
 {
   auto box = Mesh::New(name, scene);
+
   options.sideOrientation
-    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
-  box->setSideOrientation(options.sideOrientation);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation);
+  box->_originalBuilderSideOrientation = options.sideOrientation;
+
   auto vertexData = VertexData::CreateBox(options);
 
   vertexData->applyToMesh(box, options.updatable);
@@ -36,9 +38,11 @@ Mesh* MeshBuilder::CreateSphere(const string_t& name, SphereOptions& options,
                                 Scene* scene)
 {
   auto sphere = Mesh::New(name, scene);
+
   options.sideOrientation
-    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
-  sphere->setSideOrientation(options.sideOrientation);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation);
+  sphere->_originalBuilderSideOrientation = options.sideOrientation;
+
   auto vertexData = VertexData::CreateSphere(options);
 
   vertexData->applyToMesh(sphere, options.updatable);
@@ -50,9 +54,11 @@ Mesh* MeshBuilder::CreateDisc(const string_t& name, DiscOptions& options,
                               Scene* scene)
 {
   auto disc = Mesh::New(name, scene);
+
   options.sideOrientation
-    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
-  disc->setSideOrientation(options.sideOrientation);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation);
+  disc->_originalBuilderSideOrientation = options.sideOrientation;
+
   auto vertexData = VertexData::CreateDisc(options);
 
   vertexData->applyToMesh(disc, options.updatable);
@@ -64,9 +70,11 @@ Mesh* MeshBuilder::CreateIcoSphere(const string_t& name,
                                    IcoSphereOptions& options, Scene* scene)
 {
   auto sphere = Mesh::New(name, scene);
+
   options.sideOrientation
-    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
-  sphere->setSideOrientation(options.sideOrientation);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation);
+  sphere->_originalBuilderSideOrientation = options.sideOrientation;
+
   auto vertexData = VertexData::CreateIcoSphere(options);
 
   vertexData->applyToMesh(sphere, options.updatable);
@@ -81,8 +89,9 @@ Mesh* MeshBuilder::CreateRibbon(const string_t& name, RibbonOptions& options,
   const auto& pathArray  = options.pathArray();
   const auto& closeArray = options.closeArray;
   const auto& closePath  = options.closePath;
+
   const auto sideOrientation
-    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation);
   const auto& instance  = options.instance;
   const auto& updatable = options.updatable;
 
@@ -101,7 +110,8 @@ Mesh* MeshBuilder::CreateRibbon(const string_t& name, RibbonOptions& options,
       auto minlg     = pathArray[0].size();
       unsigned int i = 0;
       unsigned int ns
-        = (instance->sideOrientation() == Mesh::DOUBLESIDE) ? 2 : 1;
+        = (instance->_originalBuilderSideOrientation == Mesh::DOUBLESIDE) ? 2 :
+                                                                            1;
       for (std::size_t si = 1; si <= ns; ++si) {
         for (std::size_t p = 0; p < pathArray.size(); ++p) {
           const auto& path = pathArray[p];
@@ -211,8 +221,8 @@ Mesh* MeshBuilder::CreateRibbon(const string_t& name, RibbonOptions& options,
     return instance;
   }
   else { // new ribbon creation
-    auto ribbon = Mesh::New(name, scene);
-    ribbon->setSideOrientation(sideOrientation);
+    auto ribbon                             = Mesh::New(name, scene);
+    ribbon->_originalBuilderSideOrientation = sideOrientation;
 
     auto vertexData = VertexData::CreateRibbon(options);
     if (closePath) {
@@ -231,9 +241,11 @@ Mesh* MeshBuilder::CreateCylinder(const string_t& name,
                                   CylinderOptions& options, Scene* scene)
 {
   auto cylinder = Mesh::New(name, scene);
+
   options.sideOrientation
-    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
-  cylinder->setSideOrientation(options.sideOrientation);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation);
+  cylinder->_originalBuilderSideOrientation = options.sideOrientation;
+
   auto vertexData = VertexData::CreateCylinder(options);
 
   vertexData->applyToMesh(cylinder, options.updatable);
@@ -245,9 +257,11 @@ Mesh* MeshBuilder::CreateTorus(const string_t& name, TorusOptions& options,
                                Scene* scene)
 {
   auto torus = Mesh::New(name, scene);
+
   options.sideOrientation
-    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
-  torus->setSideOrientation(options.sideOrientation);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation);
+  torus->_originalBuilderSideOrientation = options.sideOrientation;
+
   auto vertexData = VertexData::CreateTorus(options);
 
   vertexData->applyToMesh(torus, options.updatable);
@@ -259,9 +273,11 @@ Mesh* MeshBuilder::CreateTorusKnot(const string_t& name,
                                    TorusKnotOptions& options, Scene* scene)
 {
   auto torusKnot = Mesh::New(name, scene);
+
   options.sideOrientation
-    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
-  torusKnot->setSideOrientation(options.sideOrientation);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation);
+  torusKnot->_originalBuilderSideOrientation = options.sideOrientation;
+
   auto vertexData = VertexData::CreateTorusKnot(options);
 
   vertexData->applyToMesh(torusKnot, options.updatable);
@@ -275,25 +291,47 @@ LinesMesh* MeshBuilder::CreateLineSystem(const string_t& name,
 {
   const auto& instance = options.instance;
   const auto& lines    = options.lines;
+  const auto& colors   = options.colors;
 
   if (instance) { // lines update
-    auto positionFunction = [&](Float32Array& positions) {
-      unsigned int i = 0;
-      for (const auto& points : lines) {
-        for (std::size_t p = 0; p < points.size(); ++p) {
-          positions[i + 0] = points[p].x;
-          positions[i + 1] = points[p].y;
-          positions[i + 2] = points[p].z;
-          i += 3;
+    auto positions = instance->getVerticesData(VertexBuffer::PositionKind);
+    Float32Array vertexColor;
+    vector_t<Color4> lineColors;
+    if (!colors.empty()) {
+      vertexColor = instance->getVerticesData(VertexBuffer::ColorKind);
+    }
+    size_t i = 0;
+    size_t c = 0;
+    for (size_t l = 0; l < lines.size(); ++l) {
+      const auto& points = lines[l];
+      for (size_t p = 0; p < points.size(); p++) {
+        positions[i]     = points[p].x;
+        positions[i + 1] = points[p].y;
+        positions[i + 2] = points[p].z;
+        if (!colors.empty() && !vertexColor.empty()) {
+          lineColors         = colors[l];
+          vertexColor[c]     = lineColors[p].r;
+          vertexColor[c + 1] = lineColors[p].g;
+          vertexColor[c + 2] = lineColors[p].b;
+          vertexColor[c + 3] = lineColors[p].a;
+          c += 4;
         }
+        i += 3;
       }
-    };
-    instance->updateMeshPositions(positionFunction, false);
+    }
+    instance->updateVerticesData(VertexBuffer::PositionKind, positions, false,
+                                 false);
+    if (!colors.empty() && !vertexColor.empty()) {
+      instance->updateVerticesData(VertexBuffer::ColorKind, vertexColor, false,
+                                   false);
+    }
     return instance;
   }
 
   // line system creation
-  auto lineSystem = LinesMesh::New(name, scene);
+  auto useVertexColor = (!colors.empty()) ? true : false;
+  auto lineSystem     = LinesMesh::New(name, scene, nullptr, nullptr, true,
+                                   useVertexColor, options.useVertexAlpha);
   auto vertexData = VertexData::CreateLineSystem(options);
   vertexData->applyToMesh(lineSystem, options.updatable);
   return lineSystem;
@@ -374,7 +412,7 @@ Mesh* MeshBuilder::ExtrudeShape(const string_t& name,
                                 ExtrudeShapeOptions& options, Scene* scene)
 {
   options.sideOrientation
-    = updateSideOrientation(options.sideOrientation, scene);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation);
 
   return MeshBuilder::_ExtrudeShapeGeneric(
     name, options.shape, options.path, options.scale, options.rotation, nullptr,
@@ -388,7 +426,7 @@ Mesh* MeshBuilder::ExtrudeShapeCustom(const string_t& name,
                                       Scene* scene)
 {
   options.sideOrientation
-    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation);
 
   return MeshBuilder::_ExtrudeShapeGeneric(
     name, options.shape, options.path, 0.f, 0.f, options.scaleFunction,
@@ -408,7 +446,7 @@ Mesh* MeshBuilder::CreateLathe(const string_t& name, LatheOptions& options,
   const auto& updatable    = options.updatable;
 
   const unsigned int sideOrientation
-    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation);
   const auto& cap = options.cap;
   const auto& pi2 = Math::PI2;
   vector_t<vector_t<Vector3>> paths;
@@ -455,8 +493,8 @@ Mesh* MeshBuilder::CreatePlane(const string_t& name, PlaneOptions& options,
   auto plane = Mesh::New(name, scene);
 
   options.sideOrientation
-    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
-  plane->setSideOrientation(options.sideOrientation);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation);
+  plane->_originalBuilderSideOrientation = options.sideOrientation;
 
   auto vertexData = VertexData::CreatePlane(options);
 
@@ -559,7 +597,7 @@ Mesh* MeshBuilder::CreatePolygon(const string_t& name, PolygonOptions& options,
                                  Scene* scene)
 {
   options.sideOrientation
-    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation);
   const auto& shape = options.shape;
   const auto& holes = options.holes;
   const auto& depth = options.depth;
@@ -582,8 +620,8 @@ Mesh* MeshBuilder::CreatePolygon(const string_t& name, PolygonOptions& options,
     polygonTriangulation.addHole(hole);
   }
   auto polygon = polygonTriangulation.build(options.updatable, depth);
-  polygon->setSideOrientation(options.sideOrientation);
-  auto vertexData = VertexData::CreatePolygon(
+  polygon->_originalBuilderSideOrientation = options.sideOrientation;
+  auto vertexData                          = VertexData::CreatePolygon(
     polygon, options.sideOrientation, options.faceUV, options.faceColors,
     options.frontUVs, options.backUVs);
   vertexData->applyToMesh(polygon, options.updatable);
@@ -608,7 +646,7 @@ Mesh* MeshBuilder::CreateTube(const string_t& name, TubeOptions& options,
   const auto& invertUV       = options.invertUV;
   const auto& updatable      = options.updatable;
   const auto sideOrientation
-    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation);
   auto instance  = options.instance;
   const auto arc = options.arc();
 
@@ -726,9 +764,11 @@ Mesh* MeshBuilder::CreatePolyhedron(const string_t& name,
                                     PolyhedronOptions& options, Scene* scene)
 {
   auto polyhedron = Mesh::New(name, scene);
+
   options.sideOrientation
-    = MeshBuilder::updateSideOrientation(options.sideOrientation, scene);
-  polyhedron->setSideOrientation(options.sideOrientation);
+    = MeshBuilder::updateSideOrientation(options.sideOrientation);
+  polyhedron->_originalBuilderSideOrientation = options.sideOrientation;
+
   auto vertexData = VertexData::CreatePolyhedron(options);
 
   vertexData->applyToMesh(polyhedron, options.updatable);
@@ -779,8 +819,11 @@ Mesh* MeshBuilder::CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
   unsigned int currentVertexDataIndex = 0;
 
   const auto extractDecalVector3 = [&](std::size_t indexId) {
-    const auto& vertexId = indices[indexId];
     PositionNormalVertex result;
+    if (indices.empty() || positions.empty() || normals.empty()) {
+      return result;
+    }
+    const auto& vertexId = indices[indexId];
     result.position
       = Vector3(positions[vertexId * 3], positions[vertexId * 3 + 1],
                 positions[vertexId * 3 + 2]);
@@ -819,10 +862,15 @@ Mesh* MeshBuilder::CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
 
     bool v1Out, v2Out, v3Out;
     unsigned int total;
-    PositionNormalVertex nV1, nV2, nV3, nV4;
+    Nullable<PositionNormalVertex> nV1, nV2, nV3, nV4;
     float d1, d2, d3;
     for (std::size_t index = 0; index < vertices.size(); index += 3) {
       total = 0;
+
+      nV1 = nullptr;
+      nV2 = nullptr;
+      nV3 = nullptr;
+      nV4 = nullptr;
 
       d1 = Vector3::Dot(vertices[index].position, axis) - clipSize;
       d2 = Vector3::Dot(vertices[index + 1].position, axis) - clipSize;
@@ -845,64 +893,66 @@ Mesh* MeshBuilder::CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
           if (v1Out) {
             nV1 = vertices[index + 1];
             nV2 = vertices[index + 2];
-            nV3 = clipVertices(vertices[index], nV1);
-            nV4 = clipVertices(vertices[index], nV2);
+            nV3 = clipVertices(vertices[index], *nV1);
+            nV4 = clipVertices(vertices[index], *nV2);
           }
 
           if (v2Out) {
             nV1 = vertices[index + 0];
             nV2 = vertices[index + 2];
-            nV3 = clipVertices(vertices[index + 1], nV1);
-            nV4 = clipVertices(vertices[index + 1], nV2);
+            nV3 = clipVertices(vertices[index + 1], *nV1);
+            nV4 = clipVertices(vertices[index + 1], *nV2);
 
-            result.emplace_back(nV3);
-            result.emplace_back(nV2);
-            result.emplace_back(nV1);
+            result.emplace_back(*nV3);
+            result.emplace_back(*nV2);
+            result.emplace_back(*nV1);
 
-            result.emplace_back(nV2);
-            result.emplace_back(nV3);
-            result.emplace_back(nV4);
+            result.emplace_back(*nV2);
+            result.emplace_back(*nV3);
+            result.emplace_back(*nV4);
             break;
           }
           if (v3Out) {
             nV1 = vertices[index + 0];
             nV2 = vertices[index + 1];
-            nV3 = clipVertices(vertices[index + 2], nV1);
-            nV4 = clipVertices(vertices[index + 2], nV2);
+            nV3 = clipVertices(vertices[index + 2], *nV1);
+            nV4 = clipVertices(vertices[index + 2], *nV2);
           }
 
-          result.emplace_back(nV1);
-          result.emplace_back(nV2);
-          result.emplace_back(nV3);
+          if (nV1 && nV2 && nV3 && nV4) {
+            result.emplace_back(*nV1);
+            result.emplace_back(*nV2);
+            result.emplace_back(*nV3);
 
-          result.emplace_back(nV4);
-          result.emplace_back(nV3);
-          result.emplace_back(nV2);
+            result.emplace_back(*nV4);
+            result.emplace_back(*nV3);
+            result.emplace_back(*nV2);
+          }
           break;
         case 2:
           if (!v1Out) {
             nV1 = vertices[index + 0];
-            nV2 = clipVertices(nV1, vertices[index + 1]);
-            nV3 = clipVertices(nV1, vertices[index + 2]);
-            result.emplace_back(nV1);
-            result.emplace_back(nV2);
-            result.emplace_back(nV3);
+            nV2 = clipVertices(*nV1, vertices[index + 1]);
+            nV3 = clipVertices(*nV1, vertices[index + 2]);
+            result.emplace_back(*nV1);
+            result.emplace_back(*nV2);
+            result.emplace_back(*nV3);
           }
           if (!v2Out) {
             nV1 = vertices[index + 1];
-            nV2 = clipVertices(nV1, vertices[index + 2]);
-            nV3 = clipVertices(nV1, vertices[index + 0]);
-            result.emplace_back(nV1);
-            result.emplace_back(nV2);
-            result.emplace_back(nV3);
+            nV2 = clipVertices(*nV1, vertices[index + 2]);
+            nV3 = clipVertices(*nV1, vertices[index + 0]);
+            result.emplace_back(*nV1);
+            result.emplace_back(*nV2);
+            result.emplace_back(*nV3);
           }
           if (!v3Out) {
             nV1 = vertices[index + 2];
-            nV2 = clipVertices(nV1, vertices[index + 0]);
-            nV3 = clipVertices(nV1, vertices[index + 1]);
-            result.emplace_back(nV1);
-            result.emplace_back(nV2);
-            result.emplace_back(nV3);
+            nV2 = clipVertices(*nV1, vertices[index + 0]);
+            nV3 = clipVertices(*nV1, vertices[index + 1]);
+            result.emplace_back(*nV1);
+            result.emplace_back(*nV2);
+            result.emplace_back(*nV3);
           }
           break;
         case 3:
@@ -1082,8 +1132,7 @@ Mesh* MeshBuilder::_ExtrudeShapeGeneric(
   return extrudedGeneric;
 }
 
-unsigned int MeshBuilder::updateSideOrientation(unsigned int orientation,
-                                                Scene* /*scene*/)
+unsigned int MeshBuilder::updateSideOrientation(unsigned int orientation)
 {
   if (orientation == Mesh::DOUBLESIDE) {
     return Mesh::DOUBLESIDE;

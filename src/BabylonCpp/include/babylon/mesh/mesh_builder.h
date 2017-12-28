@@ -304,6 +304,10 @@ public:
    * The optional parameter `instance` is an instance of an existing LineSystem
    * object to be updated with the passed `lines` parameter. The way to update
    * it is the same than for
+   * The optional parameter `colors` is an array of line colors, each line
+   * colors being an array of successive Color4, one per line point.
+   * The optional parameter `useVertexAlpha' is to be set to `false` (default
+   * `true`) when you don't need the alpha blending (faster).
    * updating a simple Line mesh, you just need to update every line in the
    * `lines` array :
    * http://doc.babylonjs.com/tutorials/How_to_dynamically_morph_a_mesh#lines-and-dashedlines
@@ -329,6 +333,10 @@ public:
    * The optional parameter `instance` is an instance of an existing LineMesh
    * object to be updated with the passed `points` parameter :
    * http://doc.babylonjs.com/tutorials/How_to_dynamically_morph_a_mesh#lines-and-dashedlines
+   * The optional parameter `colors` is an array of successive Color4, one per
+   * line point.
+   * The optional parameter `useVertexAlpha' is to be set to `false` (default
+   * `true`) when you don't need alpha blending (faster).
    * When updating an instance, remember that only point positions can change,
    * not the number of points.
    * The mesh can be set to updatable with the boolean parameter `updatable`
@@ -771,8 +779,8 @@ public:
     Vector4& frontUVs, Vector4& backUVs);
 
 private:
-  static unsigned int updateSideOrientation(unsigned int orientation,
-                                            Scene* scene);
+  static unsigned int updateSideOrientation(unsigned int orientation
+                                            = Mesh::FRONTSIDE);
 
 }; // end of class MeshBuilder
 

@@ -165,7 +165,7 @@ VertexData& VertexData::_applyTo(IGetSetVerticesData* meshOrGeometry,
   }
 
   if (!indices.empty()) {
-    meshOrGeometry->setIndices(indices);
+    meshOrGeometry->setIndices(indices, 0, updatable);
   }
 
   return *this;
@@ -249,7 +249,7 @@ VertexData& VertexData::_update(IGetSetVerticesData* meshOrGeometry,
   }
 
   if (!indices.empty()) {
-    meshOrGeometry->setIndices(indices);
+    meshOrGeometry->setIndices(indices, 0);
   }
 
   return *this;
@@ -302,32 +302,69 @@ VertexData& VertexData::transform(const Matrix& matrix)
   return *this;
 }
 
-VertexData& VertexData::merge(VertexData* other)
+VertexData& VertexData::merge(VertexData& other, size_t tangentLength)
 {
-  if (!other->indices.empty()) {
+  if (!other.indices.empty()) {
     unsigned int offset
       = (!positions.empty()) ? static_cast<unsigned>(positions.size()) / 3 : 0;
-    for (auto& index : other->indices) {
+    for (auto& index : other.indices) {
       indices.emplace_back(static_cast<int32_t>(index + offset));
     }
   }
 
-  stl_util::concat(positions, other->positions);
-  stl_util::concat(normals, other->normals);
-  stl_util::concat(tangents, other->tangents);
-  stl_util::concat(uvs, other->uvs);
-  stl_util::concat(uvs2, other->uvs2);
-  stl_util::concat(uvs3, other->uvs3);
-  stl_util::concat(uvs4, other->uvs4);
-  stl_util::concat(uvs5, other->uvs5);
-  stl_util::concat(uvs6, other->uvs6);
-  stl_util::concat(colors, other->colors);
-  stl_util::concat(matricesIndices, other->matricesIndices);
-  stl_util::concat(matricesWeights, other->matricesWeights);
-  stl_util::concat(matricesIndicesExtra, other->matricesIndicesExtra);
-  stl_util::concat(matricesWeightsExtra, other->matricesWeightsExtra);
+  positions = _mergeElement(positions, other.positions);
+
+  if (positions.empty()) {
+    return *this;
+  }
+
+  auto count = positions.size() / 3;
+
+  normals  = _mergeElement(normals, other.normals, count * 3);
+  tangents = _mergeElement(tangents, other.tangents, count * tangentLength);
+  uvs      = _mergeElement(uvs, other.uvs, count * 2);
+  uvs2     = _mergeElement(uvs2, other.uvs2, count * 2);
+  uvs3     = _mergeElement(uvs3, other.uvs3, count * 2);
+  uvs4     = _mergeElement(uvs4, other.uvs4, count * 2);
+  uvs5     = _mergeElement(uvs5, other.uvs5, count * 2);
+  uvs6     = _mergeElement(uvs6, other.uvs6, count * 2);
+  colors   = _mergeElement(colors, other.colors, count * 4);
+  matricesIndices
+    = _mergeElement(matricesIndices, other.matricesIndices, count * 4);
+  matricesWeights
+    = _mergeElement(matricesWeights, other.matricesWeights, count * 4);
+  matricesIndicesExtra = _mergeElement(matricesIndicesExtra,
+                                       other.matricesIndicesExtra, count * 4);
+  matricesWeightsExtra = _mergeElement(matricesWeightsExtra,
+                                       other.matricesWeightsExtra, count * 4);
 
   return *this;
+}
+
+Float32Array VertexData::_mergeElement(const Float32Array& source,
+                                       const Float32Array& other,
+                                       size_t length) const
+{
+  if (other.empty() && source.empty()) {
+    return Float32Array();
+  }
+
+  if (other.empty()) {
+    return _mergeElement(source, Float32Array(source.size()), length);
+  }
+
+  if (source.empty()) {
+    if (length == 0 || length == other.size()) {
+      return other;
+    }
+
+    return _mergeElement(Float32Array(length - other.size()), other, length);
+  }
+
+  Float32Array result = source;
+  stl_util::concat(result, other);
+
+  return result;
 }
 
 Json::object VertexData::serialize() const
@@ -530,8 +567,8 @@ unique_ptr_t<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   // vertical distances (v)
   vector_t<Vector3> path1;
   vector_t<Vector3> path2;
-  Vector3 vertex1;
-  Vector3 vertex2;
+  Nullable<Vector3> vertex1 = nullptr;
+  Nullable<Vector3> vertex2 = nullptr;
   for (i = 0, ul = minlg + closePathCorr; i < ul; ++i) {
     vTotalDistance.emplace_back(0.f);
     vs.emplace_back(0);
@@ -546,18 +583,18 @@ unique_ptr_t<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
         vertex1 = path1[i];
         vertex2 = path2[i];
       }
-      vectlg = vertex2.subtract(vertex1).length();
+      vectlg = (*vertex2).subtract(*vertex1).length();
       dist   = vectlg + vTotalDistance[i];
       vs[i].emplace_back(dist);
       vTotalDistance[i] = dist;
     }
-    if (closeArray) {
+    if (closeArray && vertex2 && vertex1) {
       path1 = pathArray[p];
       path2 = pathArray[0];
       if (i == minlg) { // closePath
         vertex2 = path2[0];
       }
-      vectlg            = vertex2.subtract(vertex1).length();
+      vectlg            = (*vertex2).subtract(*vertex1).length();
       dist              = vectlg + vTotalDistance[i];
       vTotalDistance[i] = dist;
     }
@@ -673,7 +710,7 @@ unique_ptr_t<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   vertexData->normals   = ::std::move(normals);
   vertexData->uvs       = ::std::move(uvs);
 
-  if (!customColors.empty()) {
+  if (!colors.empty()) {
     vertexData->set(colors, VertexBuffer::ColorKind);
   }
 
@@ -735,8 +772,9 @@ unique_ptr_t<VertexData> VertexData::CreateBox(BoxOptions& options)
     stl_util::concat(normals, {normal.x, normal.y, normal.z});
     stl_util::concat(uvs, {faceUV[index].z, faceUV[index].w});
     if (!faceColors.empty()) {
-      stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
-                                faceColors[index].b, faceColors[index].a});
+      stl_util::concat(colors,
+                       {faceColors[index].r, faceColors[index].g,
+                        faceColors[index].b, faceColors[index].a});
     }
 
     vertex = normal.subtract(side1).add(side2).multiply(scaleVector);
@@ -744,8 +782,9 @@ unique_ptr_t<VertexData> VertexData::CreateBox(BoxOptions& options)
     stl_util::concat(normals, {normal.x, normal.y, normal.z});
     stl_util::concat(uvs, {faceUV[index].x, faceUV[index].w});
     if (!faceColors.empty()) {
-      stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
-                                faceColors[index].b, faceColors[index].a});
+      stl_util::concat(colors,
+                       {faceColors[index].r, faceColors[index].g,
+                        faceColors[index].b, faceColors[index].a});
     }
 
     vertex = normal.add(side1).add(side2).multiply(scaleVector);
@@ -753,8 +792,9 @@ unique_ptr_t<VertexData> VertexData::CreateBox(BoxOptions& options)
     stl_util::concat(normals, {normal.x, normal.y, normal.z});
     stl_util::concat(uvs, {faceUV[index].x, faceUV[index].y});
     if (!faceColors.empty()) {
-      stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
-                                faceColors[index].b, faceColors[index].a});
+      stl_util::concat(colors,
+                       {faceColors[index].r, faceColors[index].g,
+                        faceColors[index].b, faceColors[index].a});
     }
 
     vertex = normal.add(side1).subtract(side2).multiply(scaleVector);
@@ -762,8 +802,9 @@ unique_ptr_t<VertexData> VertexData::CreateBox(BoxOptions& options)
     stl_util::concat(normals, {normal.x, normal.y, normal.z});
     stl_util::concat(uvs, {faceUV[index].z, faceUV[index].y});
     if (!faceColors.empty()) {
-      stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
-                                faceColors[index].b, faceColors[index].a});
+      stl_util::concat(colors,
+                       {faceColors[index].r, faceColors[index].g,
+                        faceColors[index].b, faceColors[index].a});
     }
   }
 
@@ -973,14 +1014,16 @@ unique_ptr_t<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
         else {
           v = faceUV[s].y + (faceUV[s].w - faceUV[s].y) * h;
         }
-        stl_util::concat(uvs, {faceUV[s].x
-                                 + (faceUV[s].z - faceUV[s].x)
-                                     * static_cast<float>(j)
-                                     / static_cast<float>(tessellation),
-                               v});
+        stl_util::concat(uvs,
+                         {faceUV[s].x
+                            + (faceUV[s].z - faceUV[s].x)
+                                * static_cast<float>(j)
+                                / static_cast<float>(tessellation),
+                          v});
         if (!faceColors.empty()) {
-          stl_util::concat(colors, {faceColors[s].r, faceColors[s].g,
-                                    faceColors[s].b, faceColors[s].a});
+          stl_util::concat(colors,
+                           {faceColors[s].r, faceColors[s].g, faceColors[s].b,
+                            faceColors[s].a});
         }
       }
 
@@ -993,12 +1036,14 @@ unique_ptr_t<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
           positions, {ringFirstVertex.x, ringFirstVertex.y, ringFirstVertex.z});
         Vector3::CrossToRef(Y, ringNormal, quadNormal);
         quadNormal.normalize();
-        stl_util::concat(normals, {quadNormal.x, quadNormal.y, quadNormal.z,
-                                   quadNormal.x, quadNormal.y, quadNormal.z});
+        stl_util::concat(normals,
+                         {quadNormal.x, quadNormal.y, quadNormal.z,
+                          quadNormal.x, quadNormal.y, quadNormal.z});
         Vector3::CrossToRef(ringFirstNormal, Y, quadNormal);
         quadNormal.normalize();
-        stl_util::concat(normals, {quadNormal.x, quadNormal.y, quadNormal.z,
-                                   quadNormal.x, quadNormal.y, quadNormal.z});
+        stl_util::concat(normals,
+                         {quadNormal.x, quadNormal.y, quadNormal.z,
+                          quadNormal.x, quadNormal.y, quadNormal.z});
         if (hasRings) {
           v = (cs != s) ? faceUV[s + 1].y : faceUV[s + 1].w;
         }
@@ -1016,14 +1061,18 @@ unique_ptr_t<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
         stl_util::concat(uvs, {faceUV[s + 2].x, v});
         stl_util::concat(uvs, {faceUV[s + 2].z, v});
         if (!faceColors.empty()) {
-          stl_util::concat(colors, {faceColors[s + 1].r, faceColors[s + 1].g,
-                                    faceColors[s + 1].b, faceColors[s + 1].a});
-          stl_util::concat(colors, {faceColors[s + 1].r, faceColors[s + 1].g,
-                                    faceColors[s + 1].b, faceColors[s + 1].a});
-          stl_util::concat(colors, {faceColors[s + 2].r, faceColors[s + 2].g,
-                                    faceColors[s + 2].b, faceColors[s + 2].a});
-          stl_util::concat(colors, {faceColors[s + 2].r, faceColors[s + 2].g,
-                                    faceColors[s + 2].b, faceColors[s + 2].a});
+          stl_util::concat(colors,
+                           {faceColors[s + 1].r, faceColors[s + 1].g,
+                            faceColors[s + 1].b, faceColors[s + 1].a});
+          stl_util::concat(colors,
+                           {faceColors[s + 1].r, faceColors[s + 1].g,
+                            faceColors[s + 1].b, faceColors[s + 1].a});
+          stl_util::concat(colors,
+                           {faceColors[s + 2].r, faceColors[s + 2].g,
+                            faceColors[s + 2].b, faceColors[s + 2].a});
+          stl_util::concat(colors,
+                           {faceColors[s + 2].r, faceColors[s + 2].g,
+                            faceColors[s + 2].b, faceColors[s + 2].a});
         }
       }
       if (cs != s) {
@@ -1069,8 +1118,8 @@ unique_ptr_t<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
     float _angle;
     Vector3 circleVector;
     Vector2 textureCoordinate;
-    Vector4 u = (isTop) ? faceUV[surfaceNb - 1] : faceUV[0];
-    Color4 c;
+    Vector4 u          = (isTop) ? faceUV[surfaceNb - 1] : faceUV[0];
+    Nullable<Color4> c = nullptr;
     if (!faceColors.empty()) {
       c = (isTop) ? faceColors[surfaceNb - 1] : faceColors[0];
     }
@@ -1081,8 +1130,9 @@ unique_ptr_t<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
     stl_util::concat(positions, {center.x, center.y, center.z});
     stl_util::concat(normals, {0, isTop ? 1.f : -1.f, 0.f});
     stl_util::concat(uvs, {u.x + (u.z - u.x) * 0.5f, u.y + (u.w - u.y) * 0.5f});
-    if (!faceColors.empty()) {
-      stl_util::concat(colors, {c.r, c.g, c.b, c.a});
+    if (c) {
+      auto& _c = *c;
+      stl_util::concat(colors, {_c.r, _c.g, _c.b, _c.a});
     }
 
     Vector2 textureScale(0.5f, 0.5f);
@@ -1097,10 +1147,12 @@ unique_ptr_t<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
       stl_util::concat(positions,
                        {circleVector.x, circleVector.y, circleVector.z});
       stl_util::concat(normals, {0.f, isTop ? 1.f : -1.f, 0.f});
-      stl_util::concat(uvs, {u.x + (u.z - u.x) * textureCoordinate.x,
-                             u.y + (u.w - u.y) * textureCoordinate.y});
-      if (!faceColors.empty()) {
-        stl_util::concat(colors, {c.r, c.g, c.b, c.a});
+      stl_util::concat(uvs,
+                       {u.x + (u.z - u.x) * textureCoordinate.x,
+                        u.y + (u.w - u.y) * textureCoordinate.y});
+      if (c) {
+        auto& _c = *c;
+        stl_util::concat(colors, {_c.r, _c.g, _c.b, _c.a});
       }
     }
     // Cap indices
@@ -1219,13 +1271,23 @@ VertexData::CreateLineSystem(LineSystemOptions& options)
 {
   Uint32Array indices;
   Float32Array positions;
-  const vector_t<vector_t<Vector3>>& lines = options.lines;
-  unsigned int idx                         = 0;
+  const auto& lines  = options.lines;
+  const auto& colors = options.colors;
+  Float32Array vertexColors;
+  unsigned int idx = 0;
 
-  for (const auto& points : lines) {
+  for (size_t l = 0; l < lines.size(); ++l) {
+    const auto& points = lines[l];
     for (size_t index = 0; index < points.size(); ++index) {
       stl_util::concat(positions,
                        {points[index].x, points[index].y, points[index].z});
+
+      if (!colors.empty()) {
+        const auto& color = colors[l];
+        stl_util::concat(
+          vertexColors,
+          {color[index].r, color[index].g, color[index].b, color[index].a});
+      }
 
       if (index > 0) {
         indices.emplace_back(idx - 1);
@@ -1240,6 +1302,9 @@ VertexData::CreateLineSystem(LineSystemOptions& options)
 
   vertexData->indices   = ::std::move(indices);
   vertexData->positions = ::std::move(positions);
+  if (!colors.empty()) {
+    vertexData->colors = vertexColors;
+  }
 
   return vertexData;
 }
@@ -1275,9 +1340,10 @@ VertexData::CreateDashedLines(DashedLinesOptions& options)
     curvect.normalize();
     for (float j = 0.f; j < nb; ++j) {
       curshft = shft * j;
-      stl_util::concat(positions, {points[i].x + curshft * curvect.x,
-                                   points[i].y + curshft * curvect.y,
-                                   points[i].z + curshft * curvect.z});
+      stl_util::concat(positions,
+                       {points[i].x + curshft * curvect.x,
+                        points[i].y + curshft * curvect.y,
+                        points[i].z + curshft * curvect.z});
       stl_util::concat(positions,
                        {points[i].x + (curshft + dashshft) * curvect.x,
                         points[i].y + (curshft + dashshft) * curvect.y,
@@ -1425,8 +1491,9 @@ VertexData::CreateTiledGround(TiledGroundOptions& options)
 
             stl_util::concat(positions, {position.x, position.y, position.z});
             stl_util::concat(normals, {normal.x, normal.y, normal.z});
-            stl_util::concat(uvs, {colf / static_cast<float>(precision_w),
-                                   rowf / static_cast<float>(precision_h)});
+            stl_util::concat(uvs,
+                             {colf / static_cast<float>(precision_w),
+                              rowf / static_cast<float>(precision_h)});
           }
         }
       };
@@ -1483,7 +1550,7 @@ VertexData::CreateGroundFromHeightMap(GroundFromHeightMapOptions& options)
         (colf * width) / subdivisionsf - (width / 2.f),                    // x
         0.f,                                                               // y
         ((subdivisionsf - rowf) * height) / subdivisionsf - (height / 2.f) // z
-      );
+        );
 
       // Compute height
       unsigned int heightMapX = static_cast<unsigned>(
@@ -1688,8 +1755,9 @@ unique_ptr_t<VertexData> VertexData::CreatePolygon(
     uvs[2 * idx + 1] = (1.f - uvs[2 * idx + 1]) * faceUV[face].y
                        + uvs[2 * idx + 1] * faceUV[face].w;
     if (!faceColors.empty()) {
-      stl_util::concat(colors, {faceColors[face].r, faceColors[face].g,
-                                faceColors[face].b, faceColors[face].a});
+      stl_util::concat(colors,
+                       {faceColors[face].r, faceColors[face].g,
+                        faceColors[face].b, faceColors[face].a});
     }
   }
 
@@ -2376,9 +2444,10 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
       // positions, uvs, colors
       for (i = 0; i < fl; ++i) {
         // positions
-        stl_util::concat(positions, {dataVertices[dataFaces[f][i]][0] * sizeX,
-                                     dataVertices[dataFaces[f][i]][1] * sizeY,
-                                     dataVertices[dataFaces[f][i]][2] * sizeZ});
+        stl_util::concat(positions,
+                         {dataVertices[dataFaces[f][i]][0] * sizeX,
+                          dataVertices[dataFaces[f][i]][1] * sizeY,
+                          dataVertices[dataFaces[f][i]][2] * sizeZ});
         indexes.emplace_back(index);
         ++index;
         // uvs
@@ -2390,8 +2459,9 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
         x   = tmp;
         // colors
         if (!faceColors.empty()) {
-          stl_util::concat(colors, {faceColors[f].r, faceColors[f].g,
-                                    faceColors[f].b, faceColors[f].a});
+          stl_util::concat(colors,
+                           {faceColors[f].r, faceColors[f].g, faceColors[f].b,
+                            faceColors[f].a});
         }
       }
 
@@ -2614,7 +2684,17 @@ void VertexData::ComputeNormals(const Float32Array& positions,
   bool computeFacetPositions = (!options.facetPositions.empty()) ? true : false;
   bool computeFacetPartitioning
     = (!options.facetPartitioning.empty()) ? true : false;
-  float faceNormalSign = options.useRightHandedSystem ? -1.f : 1.f;
+  bool computeDepthSort        = options.depthSort;
+  float faceNormalSign         = options.useRightHandedSystem ? -1.f : 1.f;
+  float ratio                  = options.ratio;
+  Nullable<Vector3> distanceTo = options.distanceTo;
+  vector_t<DepthSortedFacet> depthSortedFacets;
+  if (computeDepthSort) {
+    if (distanceTo.isNull()) {
+      distanceTo = Vector3::Zero();
+    }
+    depthSortedFacets = options.depthSortedFacets;
+  }
 
   // facetPartitioning reinit if needed
   unsigned int ox           = 0; // X partitioning index for facet position
@@ -2643,9 +2723,9 @@ void VertexData::ComputeNormals(const Float32Array& positions,
     float bbSizeMax = (options.bbSize.x > options.bbSize.y) ? options.bbSize.x :
                                                               options.bbSize.y;
     bbSizeMax = (bbSizeMax > options.bbSize.z) ? bbSizeMax : options.bbSize.z;
-    xSubRatio = options.subDiv.X * options.ratio / options.bbSize.x;
-    ySubRatio = options.subDiv.Y * options.ratio / options.bbSize.y;
-    zSubRatio = options.subDiv.Z * options.ratio / options.bbSize.z;
+    xSubRatio = options.subDiv.X * ratio / options.bbSize.x;
+    ySubRatio = options.subDiv.Y * ratio / options.bbSize.y;
+    zSubRatio = options.subDiv.Z * ratio / options.bbSize.z;
     subSq     = options.subDiv.max * options.subDiv.max;
     options.facetPartitioning.clear();
   }
@@ -2712,45 +2792,33 @@ void VertexData::ComputeNormals(const Float32Array& positions,
       // store the facet indexes in arrays in the main facetPartitioning array :
       // compute each facet vertex (+ facet barycenter) index in the partiniong
       // array
-      ox = static_cast<unsigned>(
-        ::std::floor((options.facetPositions[index].x
-                      - options.bInfo.minimum.x * options.ratio)
-                     * xSubRatio));
-      oy = static_cast<unsigned>(
-        ::std::floor((options.facetPositions[index].y
-                      - options.bInfo.minimum.y * options.ratio)
-                     * ySubRatio));
-      oz = static_cast<unsigned>(
-        ::std::floor((options.facetPositions[index].z
-                      - options.bInfo.minimum.z * options.ratio)
-                     * zSubRatio));
-      b1x = static_cast<unsigned>(
-        ::std::floor((positions[v1x] - options.bInfo.minimum.x * options.ratio)
-                     * xSubRatio));
-      b1y = static_cast<unsigned>(
-        ::std::floor((positions[v1y] - options.bInfo.minimum.y * options.ratio)
-                     * ySubRatio));
-      b1z = static_cast<unsigned>(
-        ::std::floor((positions[v1z] - options.bInfo.minimum.z * options.ratio)
-                     * zSubRatio));
-      b2x = static_cast<unsigned>(
-        ::std::floor((positions[v2x] - options.bInfo.minimum.x * options.ratio)
-                     * xSubRatio));
-      b2y = static_cast<unsigned>(
-        ::std::floor((positions[v2y] - options.bInfo.minimum.y * options.ratio)
-                     * ySubRatio));
-      b2z = static_cast<unsigned>(
-        ::std::floor((positions[v2z] - options.bInfo.minimum.z * options.ratio)
-                     * zSubRatio));
-      b3x = static_cast<unsigned>(
-        ::std::floor((positions[v3x] - options.bInfo.minimum.x * options.ratio)
-                     * xSubRatio));
-      b3y = static_cast<unsigned>(
-        ::std::floor((positions[v3y] - options.bInfo.minimum.y * options.ratio)
-                     * ySubRatio));
-      b3z = static_cast<unsigned>(
-        ::std::floor((positions[v3z] - options.bInfo.minimum.z * options.ratio)
-                     * zSubRatio));
+      ox = static_cast<unsigned>(::std::floor(
+        (options.facetPositions[index].x - options.bInfo.minimum.x * ratio)
+        * xSubRatio));
+      oy = static_cast<unsigned>(::std::floor(
+        (options.facetPositions[index].y - options.bInfo.minimum.y * ratio)
+        * ySubRatio));
+      oz = static_cast<unsigned>(::std::floor(
+        (options.facetPositions[index].z - options.bInfo.minimum.z * ratio)
+        * zSubRatio));
+      b1x = static_cast<unsigned>(::std::floor(
+        (positions[v1x] - options.bInfo.minimum.x * ratio) * xSubRatio));
+      b1y = static_cast<unsigned>(::std::floor(
+        (positions[v1y] - options.bInfo.minimum.y * ratio) * ySubRatio));
+      b1z = static_cast<unsigned>(::std::floor(
+        (positions[v1z] - options.bInfo.minimum.z * ratio) * zSubRatio));
+      b2x = static_cast<unsigned>(::std::floor(
+        (positions[v2x] - options.bInfo.minimum.x * ratio) * xSubRatio));
+      b2y = static_cast<unsigned>(::std::floor(
+        (positions[v2y] - options.bInfo.minimum.y * ratio) * ySubRatio));
+      b2z = static_cast<unsigned>(::std::floor(
+        (positions[v2z] - options.bInfo.minimum.z * ratio) * zSubRatio));
+      b3x = static_cast<unsigned>(::std::floor(
+        (positions[v3x] - options.bInfo.minimum.x * ratio) * xSubRatio));
+      b3y = static_cast<unsigned>(::std::floor(
+        (positions[v3y] - options.bInfo.minimum.y * ratio) * ySubRatio));
+      b3z = static_cast<unsigned>(::std::floor(
+        (positions[v3z] - options.bInfo.minimum.z * ratio) * zSubRatio));
 
       block_idx_v1 = b1x + options.subDiv.max * b1y + subSq * b1z;
       block_idx_v2 = b2x + options.subDiv.max * b2y + subSq * b2z;
@@ -2778,6 +2846,16 @@ void VertexData::ComputeNormals(const Float32Array& positions,
             || block_idx_o == block_idx_v3)) {
         options.facetPartitioning[block_idx_o].emplace_back(index);
       }
+    }
+
+    if (computeDepthSort && !options.facetPositions.empty()) {
+      if (nbFaces >= depthSortedFacets.size()) {
+        depthSortedFacets.resize(nbFaces);
+      }
+      auto& dsf = depthSortedFacets[index];
+      dsf.ind   = index * 3;
+      dsf.sqDistance
+        = Vector3::DistanceSquared(options.facetPositions[index], *distanceTo);
     }
 
     // compute the normals anyway

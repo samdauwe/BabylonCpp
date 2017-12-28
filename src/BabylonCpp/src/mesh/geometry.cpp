@@ -357,7 +357,8 @@ Uint32Array Geometry::getVerticesDataKinds()
   return result;
 }
 
-Mesh* Geometry::setIndices(const IndicesArray& indices, size_t totalVertices)
+Mesh* Geometry::setIndices(const IndicesArray& indices, size_t totalVertices,
+                           bool /*updatable*/)
 {
   if (_indexBuffer) {
     _engine->_releaseBuffer(_indexBuffer.get());
