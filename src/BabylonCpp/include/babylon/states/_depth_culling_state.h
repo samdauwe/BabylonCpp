@@ -2,6 +2,7 @@
 #define BABYLON_DEPTH_CULLING_STATE_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/nullable.h>
 
 namespace BABYLON {
 namespace Internals {
@@ -10,7 +11,7 @@ class BABYLON_SHARED_EXPORT _DepthCullingState {
 
 public:
   /**
-   * Initializes the state.
+   * @brief Initializes the state.
    */
   _DepthCullingState();
   ~_DepthCullingState();
@@ -18,12 +19,12 @@ public:
   bool isDirty() const;
   float zOffset() const;
   void setZOffset(float value);
-  int cullFace() const;
-  void setCullFace(int value);
-  bool cull() const;
-  void setCull(bool value);
-  int depthFunc() const;
-  void setDepthFunc(int value);
+  Nullable<int> cullFace() const;
+  void setCullFace(const Nullable<int> &value);
+  Nullable<bool> cull() const;
+  void setCull(const Nullable<bool> &value);
+  Nullable<int> depthFunc() const;
+  void setDepthFunc(const Nullable<int> &value);
   bool depthMask() const;
   void setDepthMask(bool value);
   bool depthTest() const;
@@ -41,9 +42,9 @@ private:
 
   bool _depthTest;
   bool _depthMask;
-  int _depthFunc;
-  bool _cull;
-  int _cullFace;
+  Nullable<int> _depthFunc;
+  Nullable<bool> _cull;
+  Nullable<int> _cullFace;
   float _zOffset;
 
 }; // end of class _DepthCullingState

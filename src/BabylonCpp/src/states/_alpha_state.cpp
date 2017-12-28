@@ -42,10 +42,10 @@ void _AlphaState::setAlphaBlend(bool value)
 
 void _AlphaState::setAlphaBlendConstants(float r, float g, float b, float a)
 {
-  if (stl_util::almost_equal(_blendConstants[0], r)
-      && stl_util::almost_equal(_blendConstants[1], g)
-      && stl_util::almost_equal(_blendConstants[2], b)
-      && stl_util::almost_equal(_blendConstants[3], a)) {
+  if (stl_util::almost_equal(*_blendConstants[0], r)
+      && stl_util::almost_equal(*_blendConstants[1], g)
+      && stl_util::almost_equal(*_blendConstants[2], b)
+      && stl_util::almost_equal(*_blendConstants[3], a)) {
     return;
   }
 
@@ -94,18 +94,18 @@ void _AlphaState::setAlphaEquationParameters(unsigned int rgb,
 void _AlphaState::reset()
 {
   _alphaBlend                 = false;
-  _blendFunctionParameters[0] = 0;
-  _blendFunctionParameters[1] = 0;
-  _blendFunctionParameters[2] = 0;
-  _blendFunctionParameters[3] = 0;
+  _blendFunctionParameters[0] = nullptr;
+  _blendFunctionParameters[1] = nullptr;
+  _blendFunctionParameters[2] = nullptr;
+  _blendFunctionParameters[3] = nullptr;
 
-  _blendEquationParameters[0] = 0;
-  _blendEquationParameters[1] = 0;
+  _blendEquationParameters[0] = nullptr;
+  _blendEquationParameters[1] = nullptr;
 
-  _blendConstants[0] = 0;
-  _blendConstants[1] = 0;
-  _blendConstants[2] = 0;
-  _blendConstants[3] = 0;
+  _blendConstants[0] = nullptr;
+  _blendConstants[1] = nullptr;
+  _blendConstants[2] = nullptr;
+  _blendConstants[3] = nullptr;
 
   _isAlphaBlendDirty              = true;
   _isBlendFunctionParametersDirty = false;
@@ -134,22 +134,22 @@ void _AlphaState::apply(GL::IGLRenderingContext& gl)
   // Alpha function
   if (_isBlendFunctionParametersDirty) {
     gl.blendFuncSeparate(
-      _blendFunctionParameters[0], _blendFunctionParameters[1],
-      _blendFunctionParameters[2], _blendFunctionParameters[3]);
+      *_blendFunctionParameters[0], *_blendFunctionParameters[1],
+      *_blendFunctionParameters[2], *_blendFunctionParameters[3]);
     _isBlendFunctionParametersDirty = false;
   }
 
   // Alpha equation
   if (_isBlendEquationParametersDirty) {
-    gl.blendEquationSeparate(_blendEquationParameters[0],
-                             _blendEquationParameters[1]);
+    gl.blendEquationSeparate(*_blendEquationParameters[0],
+                             *_blendEquationParameters[1]);
     _isBlendEquationParametersDirty = false;
   }
 
   // Constants
   if (_isBlendConstantsDirty) {
-    gl.blendColor(_blendConstants[0], _blendConstants[1], _blendConstants[2],
-                  _blendConstants[3]);
+    gl.blendColor(*_blendConstants[0], *_blendConstants[1], *_blendConstants[2],
+                  *_blendConstants[3]);
     _isBlendConstantsDirty = false;
   }
 }

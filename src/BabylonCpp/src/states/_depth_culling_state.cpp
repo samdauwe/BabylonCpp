@@ -13,6 +13,9 @@ _DepthCullingState::_DepthCullingState()
     , _isCullFaceDirty{false}
     , _isCullDirty{false}
     , _isZOffsetDirty{false}
+    , _depthFunc{nullptr}
+    , _cull{nullptr}
+    , _cullFace{nullptr}
 {
   reset();
 }
@@ -42,12 +45,12 @@ void _DepthCullingState::setZOffset(float value)
   _isZOffsetDirty = true;
 }
 
-int _DepthCullingState::cullFace() const
+Nullable<int> _DepthCullingState::cullFace() const
 {
   return _cullFace;
 }
 
-void _DepthCullingState::setCullFace(int value)
+void _DepthCullingState::setCullFace(const Nullable<int>& value)
 {
   if (_cullFace == value) {
     return;
@@ -57,12 +60,12 @@ void _DepthCullingState::setCullFace(int value)
   _isCullFaceDirty = true;
 }
 
-bool _DepthCullingState::cull() const
+Nullable<bool> _DepthCullingState::cull() const
 {
   return _cull;
 }
 
-void _DepthCullingState::setCull(bool value)
+void _DepthCullingState::setCull(const Nullable<bool>& value)
 {
   if (_cull == value) {
     return;
@@ -72,12 +75,12 @@ void _DepthCullingState::setCull(bool value)
   _isCullDirty = true;
 }
 
-int _DepthCullingState::depthFunc() const
+Nullable<int> _DepthCullingState::depthFunc() const
 {
   return _depthFunc;
 }
 
-void _DepthCullingState::setDepthFunc(int value)
+void _DepthCullingState::setDepthFunc(const Nullable<int>& value)
 {
   if (_depthFunc == value) {
     return;
@@ -121,9 +124,9 @@ void _DepthCullingState::reset()
 {
   _depthMask = true;
   _depthTest = true;
-  _depthFunc = -1;
-  _cullFace  = -1;
-  _cull      = false;
+  _depthFunc = nullptr;
+  _cullFace  = nullptr;
+  _cull      = nullptr;
   _zOffset   = 0.f;
 
   _isDepthTestDirty = true;
@@ -154,7 +157,7 @@ void _DepthCullingState::apply(GL::IGLRenderingContext& gl)
 
   // Cull face
   if (_isCullFaceDirty) {
-    gl.cullFace(static_cast<unsigned int>(cullFace()));
+    gl.cullFace(static_cast<unsigned int>(*cullFace()));
     _isCullFaceDirty = false;
   }
 
@@ -177,7 +180,7 @@ void _DepthCullingState::apply(GL::IGLRenderingContext& gl)
 
   // Depth func
   if (_isDepthFuncDirty) {
-    gl.depthFunc(static_cast<unsigned int>(depthFunc()));
+    gl.depthFunc(static_cast<unsigned int>(*depthFunc()));
     _isDepthFuncDirty = false;
   }
 
