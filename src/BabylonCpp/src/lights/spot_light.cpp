@@ -64,7 +64,11 @@ void SpotLight::_setDefaultShadowProjectionMatrix(
 {
   auto activeCamera = getScene()->activeCamera;
 
-  _shadowAngleScale = _shadowAngleScale ? *_shadowAngleScale : 1;
+  if (!activeCamera) {
+    return;
+  }
+
+  _shadowAngleScale = _shadowAngleScale ? *_shadowAngleScale : 1.f;
   auto angle        = _shadowAngleScale * _angle;
 
   Matrix::PerspectiveFovLHToRef(angle, 1.f, getDepthMinZ(activeCamera),

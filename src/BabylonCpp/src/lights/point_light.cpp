@@ -96,6 +96,11 @@ void PointLight::_setDefaultShadowProjectionMatrix(
   const vector_t<AbstractMesh*>& /*renderList*/)
 {
   auto activeCamera = getScene()->activeCamera;
+
+  if (!activeCamera) {
+    return;
+  }
+
   Matrix::PerspectiveFovLHToRef(shadowAngle(), 1.f, getDepthMinZ(activeCamera),
                                 getDepthMaxZ(activeCamera), matrix);
 }

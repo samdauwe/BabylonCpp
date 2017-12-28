@@ -322,10 +322,14 @@ Light* Light::GetConstructorFromName(unsigned int type, const string_t& name,
 
 Light* Light::Parse(const Json::value& parsedLight, Scene* scene)
 {
-  auto light = SerializationHelper::Parse(
-    Light::GetConstructorFromName(Json::GetNumber(parsedLight, "type", 0u),
-                                  Json::GetString(parsedLight, "name"), scene),
-    parsedLight, scene);
+  auto constructor = Light::GetConstructorFromName(
+    Json::GetNumber(parsedLight, "type", 0u),
+    Json::GetString(parsedLight, "name"), scene);
+  if (!constructor) {
+    return nullptr;
+  }
+
+  auto light = SerializationHelper::Parse(constructor, parsedLight, scene);
   if (!light) {
     return nullptr;
   }

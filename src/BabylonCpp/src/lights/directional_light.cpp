@@ -70,7 +70,7 @@ void DirectionalLight::_setDefaultShadowProjectionMatrix(
   Matrix& matrix, const Matrix& viewMatrix,
   const vector_t<AbstractMesh*>& renderList)
 {
-  if (shadowFrustumSize() > 0) {
+  if (shadowFrustumSize() > 0.f) {
     _setDefaultFixedFrustumShadowProjectionMatrix(matrix, viewMatrix);
   }
   else {
@@ -81,7 +81,12 @@ void DirectionalLight::_setDefaultShadowProjectionMatrix(
 void DirectionalLight::_setDefaultFixedFrustumShadowProjectionMatrix(
   Matrix& matrix, const Matrix& /*viewMatrix*/)
 {
-  auto activeCamera = getScene()->activeCamera;
+  auto& activeCamera = getScene()->activeCamera;
+
+  if (!activeCamera) {
+    return;
+  }
+
   Matrix::PerspectiveFovLHToRef(
     shadowFrustumSize(), shadowFrustumSize(),
     shadowMinZ() ? *shadowMinZ() : activeCamera->minZ,
@@ -92,7 +97,11 @@ void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
   Matrix& matrix, const Matrix& viewMatrix,
   const vector_t<AbstractMesh*>& renderList)
 {
-  auto activeCamera = getScene()->activeCamera;
+  auto& activeCamera = getScene()->activeCamera;
+
+  if (!activeCamera) {
+    return;
+  }
 
   // Check extends
   if (autoUpdateExtends

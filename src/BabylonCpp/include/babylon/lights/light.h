@@ -205,6 +205,11 @@ public:
    */
   Json::object serialize() const;
 
+  /**
+   * @brief Reorders the lights in the scene.
+   */
+  void _reorderLightsInScene();
+
   // Statics
 
   /**
@@ -254,11 +259,6 @@ private:
    * intensity mode.
    */
   float _getPhotometricScale();
-
-  /**
-   * @brief Reorders the lights in the scene.
-   */
-  void _reorderLightsInScene();
 
 public:
   Color3 diffuse;
