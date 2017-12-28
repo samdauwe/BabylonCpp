@@ -131,6 +131,12 @@ public:
 
   /** Statics **/
 
+  static SubMesh* AddToMesh(unsigned int materialIndex,
+                            unsigned int verticesStart, size_t verticesCount,
+                            unsigned int indexStart, size_t indexCount,
+                            AbstractMesh* mesh, Mesh* renderingMesh = nullptr,
+                            bool createBoundingBox = true);
+
   /**
    * @brief Creates a new Submesh from the passed parameters.
    * @param materialIndex (integer) : the index of the main mesh material.

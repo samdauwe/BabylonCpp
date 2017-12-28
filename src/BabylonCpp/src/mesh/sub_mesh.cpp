@@ -37,7 +37,7 @@ SubMesh::SubMesh(unsigned int iMaterialIndex, unsigned int iVerticesStart,
     , _linesIndexBuffer{nullptr}
     , _currentMaterial{nullptr}
 {
-  if (!_renderingMesh) {
+  if (!renderingMesh) {
     _renderingMesh = static_cast<Mesh*>(mesh);
   }
 
@@ -56,6 +56,16 @@ SubMesh::~SubMesh()
 void SubMesh::addToMesh(unique_ptr_t<SubMesh>&& newSubMesh)
 {
   _mesh->subMeshes.emplace_back(::std::move(newSubMesh));
+}
+
+SubMesh* SubMesh::AddToMesh(unsigned int materialIndex,
+                            unsigned int verticesStart, size_t verticesCount,
+                            unsigned int indexStart, size_t indexCount,
+                            AbstractMesh* mesh, Mesh* renderingMesh,
+                            bool createBoundingBox)
+{
+  return SubMesh::New(materialIndex, verticesStart, verticesCount, indexStart,
+                      indexCount, mesh, renderingMesh, createBoundingBox);
 }
 
 bool SubMesh::isGlobal() const
@@ -115,7 +125,7 @@ SubMesh& SubMesh::refreshBoundingInfo()
 {
   _lastColliderWorldVertices.clear();
 
-  if (isGlobal()) {
+  if (isGlobal() || !_renderingMesh || !_renderingMesh->geometry()) {
     return *this;
   }
 
@@ -131,10 +141,11 @@ SubMesh& SubMesh::refreshBoundingInfo()
 
   // Is this the only submesh?
   if (indexStart == 0 && indexCount == indices.size()) {
+    auto boundingInfo = _renderingMesh->getBoundingInfo();
     // the rendering mesh's bounding info can be used, it is the standard
     // submesh for all indices.
-    extend.min = _renderingMesh->getBoundingInfo()->minimum;
-    extend.max = _renderingMesh->getBoundingInfo()->maximum;
+    extend.min = boundingInfo->minimum;
+    extend.max = boundingInfo->maximum;
   }
   else {
     extend = Tools::ExtractMinAndMaxIndexed(
@@ -148,28 +159,45 @@ SubMesh& SubMesh::refreshBoundingInfo()
 
 bool SubMesh::_checkCollision(const Collider& collider)
 {
-  return getBoundingInfo()->_checkCollision(collider);
+  auto boundingInfo = _renderingMesh->getBoundingInfo();
+
+  return boundingInfo->_checkCollision(collider);
 }
 
 SubMesh& SubMesh::updateBoundingInfo(const Matrix& world)
 {
-  if (!getBoundingInfo()) {
+  auto boundingInfo = getBoundingInfo();
+
+  if (!boundingInfo) {
     refreshBoundingInfo();
+    boundingInfo = getBoundingInfo();
   }
-  getBoundingInfo()->update(world);
+  boundingInfo->update(world);
 
   return *this;
 }
 
 bool SubMesh::isInFrustum(const array_t<Plane, 6>& frustumPlanes)
 {
-  return getBoundingInfo()->isInFrustum(frustumPlanes);
+  auto boundingInfo = getBoundingInfo();
+
+  if (!boundingInfo) {
+    return false;
+  }
+
+  return boundingInfo->isInFrustum(frustumPlanes);
 }
 
 bool SubMesh::isCompletelyInFrustum(
   const array_t<Plane, 6>& frustumPlanes) const
 {
-  return getBoundingInfo()->isCompletelyInFrustum(frustumPlanes);
+  auto boundingInfo = getBoundingInfo();
+
+  if (!boundingInfo) {
+    return false;
+  }
+
+  return boundingInfo->isCompletelyInFrustum(frustumPlanes);
 }
 
 SubMesh& SubMesh::render(bool enableAlphaMode)
@@ -200,7 +228,13 @@ GL::IGLBuffer* SubMesh::getLinesIndexBuffer(const Uint32Array& indices,
 
 bool SubMesh::canIntersects(const Ray& ray) const
 {
-  return ray.intersectsBox(getBoundingInfo()->boundingBox);
+  auto boundingInfo = getBoundingInfo();
+
+  if (!boundingInfo) {
+    return false;
+  }
+
+  return ray.intersectsBox(boundingInfo->boundingBox);
 }
 
 unique_ptr_t<IntersectionInfo>
@@ -247,7 +281,7 @@ SubMesh::intersects(Ray& ray, const vector_t<Vector3>& positions,
       auto currentIntersectInfo = ray.intersectsTriangle(p0, p1, p2);
 
       if (currentIntersectInfo) {
-        if (currentIntersectInfo->distance < 0) {
+        if (currentIntersectInfo->distance < 0.f) {
           continue;
         }
 
@@ -282,8 +316,14 @@ SubMesh* SubMesh::clone(AbstractMesh* newMesh, Mesh* newRenderingMesh) const
                    indexCount, newMesh, newRenderingMesh, false);
 
   if (!isGlobal()) {
+    auto boundingInfo = getBoundingInfo();
+
+    if (!boundingInfo) {
+      return result;
+    }
+
     result->_boundingInfo = ::std::make_unique<BoundingInfo>(
-      getBoundingInfo()->minimum, getBoundingInfo()->maximum);
+      boundingInfo->minimum, boundingInfo->maximum);
   }
 
   return result;

@@ -10,7 +10,7 @@ namespace BABYLON {
 
 Buffer::Buffer(Engine* engine, const Float32Array& data, bool updatable,
                int stride, bool postponeInternalCreation, bool instanced)
-    : _engine{engine}
+    : _engine{engine ? engine : Engine::LastCreatedEngine()}
     , _buffer{nullptr}
     , _data{data}
     , _updatable{updatable}
@@ -110,6 +110,10 @@ GL::IGLBuffer* Buffer::create(Float32Array data)
 
   if (data.empty()) {
     data = _data;
+  }
+
+  if (data.empty()) {
+    return nullptr;
   }
 
   if (!_buffer) { // create buffer
