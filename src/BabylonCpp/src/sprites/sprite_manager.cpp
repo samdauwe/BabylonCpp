@@ -27,6 +27,7 @@ SpriteManager::SpriteManager(const string_t& iName, const string_t& imgUrl,
     , fogEnabled{true}
     , isPickable{false}
     , _epsilon{epsilon}
+    , _onDisposeObserver{nullptr}
     , _capacity{capacity}
     , _scene{scene}
 {
@@ -50,7 +51,7 @@ SpriteManager::SpriteManager(const string_t& iName, const string_t& imgUrl,
     return;
   }
 
-  Uint32Array indices;
+  IndicesArray indices;
   int index = 0;
   for (unsigned int count = 0; count < capacity; ++count) {
     indices.emplace_back(index + 0);

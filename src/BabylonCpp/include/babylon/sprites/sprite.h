@@ -58,7 +58,6 @@ private:
   int _toIndex;
   float _delay;
   int _direction;
-  int _frameCount;
   SpriteManager* _manager;
   float _time;
   ::std::function<void()> _onAnimationEnd;

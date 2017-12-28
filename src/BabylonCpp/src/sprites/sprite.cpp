@@ -23,7 +23,6 @@ Sprite::Sprite(const string_t& iName, SpriteManager* manager)
     , _toIndex{0}
     , _delay{0}
     , _direction{1}
-    , _frameCount{0}
     , _manager{manager}
     , _time{0}
     , _onAnimationEnd{nullptr}
