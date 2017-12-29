@@ -404,6 +404,7 @@ class SimplificationSettings;
 class MorphTarget;
 class MorphTargetManager;
 // --- Particles ---
+struct DepthSortedParticle;
 class GPUParticleSystem;
 struct IParticleSystem;
 class ModelShape;
