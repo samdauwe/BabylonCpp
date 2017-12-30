@@ -2,6 +2,7 @@
 #define BABYLON_PARTICLES_SOLID_PARTICLE_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/culling/bounding_info.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/quaternion.h>
 #include <babylon/math/vector3.h>
@@ -22,8 +23,10 @@ public:
    * System pool. It's also the particle identifier.
    * `positionIndex` (integer) is the starting index of the particle vertices in
    * the SPS "positions" array.
-   *  `model` (ModelShape) is a reference to the model shape on what the
-   * particle is designed.
+   * `indiceIndex` (integer) is the starting index of the particle indices in
+   * the SPS "indices" array.
+   * `model` (ModelShape) is a reference to the model shape on what the particle
+   * is designed.
    * `shapeId` (integer) is the model shape identifier in the SPS.
    * `idxInShape` (integer) is the index of the particle in the current model
    * (ex: the 10th box of addShape(box, 30))
@@ -31,12 +34,9 @@ public:
    * intersection computations.
    */
   SolidParticle(unsigned int particleIndex, unsigned int positionIndex,
-                ModelShape* model, int shapeId, unsigned int idxInShape,
-                SolidParticleSystem* sps);
-  SolidParticle(unsigned int particleIndex, unsigned int positionIndex,
-                ModelShape* model, int shapeId, unsigned int idxInShape,
-                SolidParticleSystem* sps,
-                const BoundingInfo& modelBoundingInfo);
+                unsigned int indiceIndex, ModelShape* model, int shapeId,
+                unsigned int idxInShape, SolidParticleSystem* sps,
+                const Nullable<BoundingInfo>& modelBoundingInfo = nullptr);
   ~SolidParticle();
 
   /**
@@ -67,12 +67,16 @@ public:
   Vector4 uvs;
   // velocity
   Vector3 velocity;
+  // pivot point in the particle local space
+  Vector3 pivot;
   // alive
   bool alive;
   // visibility
   bool isVisible;
   // index of this particle in the global "positions" array
   unsigned int _pos;
+  // index of this particle in the global "indices" array
+  unsigned int _ind;
   // model shape reference
   ModelShape* _model;
   // model shape id

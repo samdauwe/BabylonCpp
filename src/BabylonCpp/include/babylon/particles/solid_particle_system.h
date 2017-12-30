@@ -14,6 +14,7 @@ struct SolidParticleSystemOptions {
   bool isPickable           = false;
   bool particleIntersection = false;
   bool boundingSphereOnly   = false;
+  bool enableDepthSort      = false;
   float bSphereRadiusFactor = 1.f;
 }; // end of struct SolidParticleSystemOptions
 
@@ -208,6 +209,15 @@ public:
    */
   void setComputeBoundingBox(bool val);
 
+  /**
+   * @brief Tells to `setParticles()` to sort or not the distance between each
+   * particle and the camera.
+   * Skipped when `enableDepthSort` is set to `false` (default) at construction
+   * time.
+   * Default : `true`
+   */
+  void setDepthSortParticles(bool val);
+
   // getters
   bool computeParticleRotation() const;
 
@@ -218,6 +228,8 @@ public:
   bool computeParticleVertex() const;
 
   bool computeBoundingBox() const;
+
+  bool depthSortParticles() const;
 
   // =======================================================================
   // Particle behavior logic
@@ -331,6 +343,7 @@ private:
    * @brief Adds a new particle object in the particles array.
    */
   SolidParticle* _addParticle(unsigned int idx, unsigned int idxpos,
+                              unsigned int idxind,
                               unique_ptr_t<ModelShape>&& model, int shapeId,
                               unsigned int idxInShape,
                               const BoundingInfo& bInfo);
@@ -398,6 +411,12 @@ public:
    */
   vector_t<PickedParticle> pickedParticles;
 
+  /**
+   * This array is populated when `enableDepthSort` is set to true.
+   * Each element of this array is an instance of the class DepthSortedParticle.
+   */
+  vector_t<DepthSortedParticle> depthSortedParticles;
+
   bool _bSphereOnly;
   float _bSphereRadiusFactor;
 
@@ -409,7 +428,10 @@ private:
   Float32Array _normals;
   Float32Array _colors;
   Float32Array _uvs;
-  Float32Array _positions32;
+  // used as depth sorted array if depth sort enabled, else used as typed
+  // indices
+  IndicesArray _indices32;
+  Float32Array _positions32;   // updated positions for the VBO
   Float32Array _normals32;     // updated normals for the VBO
   Float32Array _fixedNormal32; // initial normal references
   Float32Array _colors32;
@@ -419,6 +441,7 @@ private:
   bool _pickable;
   bool _isVisibilityBoxLocked;
   bool _alwaysVisible;
+  bool _depthSort;
   int _shapeCounter;
   unique_ptr_t<SolidParticle> _copy;
   vector_t<Vector3> _shape;
@@ -429,6 +452,7 @@ private:
   bool _computeParticleRotation;
   bool _computeParticleVertex;
   bool _computeBoundingBox;
+  bool _depthSortParticles;
   Vector3 _cam_axisZ;
   Vector3 _cam_axisY;
   Vector3 _cam_axisX;
@@ -438,6 +462,7 @@ private:
   TargetCamera* _camera;
   SolidParticle* _particle;
   Vector3 _camDir;
+  Vector3 _camInvertedPosition;
   Matrix _rotMatrix;
   Matrix _invertMatrix;
   Vector3 _rotated;
@@ -464,6 +489,10 @@ private:
   Vector3 _minBbox;
   Vector3 _maxBbox;
   bool _particlesIntersect;
+  ::std::function<int(const DepthSortedParticle& p1,
+                      const DepthSortedParticle& p2)>
+    _depthSortFunction;
+  bool _needs32Bits;
 
 }; // end of class SolidParticleSystem
 

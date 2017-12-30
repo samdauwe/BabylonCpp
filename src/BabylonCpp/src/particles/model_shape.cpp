@@ -5,7 +5,8 @@
 namespace BABYLON {
 
 ModelShape::ModelShape(
-  int id, const vector_t<Vector3>& shape, const Float32Array& shapeUV,
+  int id, const vector_t<Vector3>& shape, size_t indicesLength,
+  const Float32Array& shapeUV,
   const ::std::function<void(SolidParticle* particle, unsigned int i,
                              unsigned int s)>& posFunction,
   const ::std::function<void(SolidParticle* particle, const Vector3& vertex,
@@ -13,6 +14,7 @@ ModelShape::ModelShape(
     : shapeID{id}
     , _shape{shape}
     , _shapeUV{shapeUV}
+    , _indicesLength{indicesLength}
     , _positionFunction{posFunction}
     , _vertexFunction{vtxFunction}
 {

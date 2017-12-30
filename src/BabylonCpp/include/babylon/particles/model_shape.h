@@ -14,7 +14,8 @@ public:
    * SPS internal tool, don't use it manually.
    */
   ModelShape(
-    int id, const vector_t<Vector3>& shape, const Float32Array& shapeUV,
+    int id, const vector_t<Vector3>& shape, size_t indicesLength,
+    const Float32Array& shapeUV,
     const ::std::function<void(SolidParticle* particle, unsigned int i,
                                unsigned int s)>& posFunction,
     const ::std::function<void(SolidParticle* particle, const Vector3& vertex,
@@ -23,8 +24,12 @@ public:
 
 public:
   int shapeID;
+  // flat array of model positions
   vector_t<Vector3> _shape;
+  // flat array of model UVs
   Float32Array _shapeUV;
+  // length of the shape in the model indices array
+  size_t _indicesLength;
   ::std::function<void(SolidParticle* particle, unsigned int i, unsigned int s)>
     _positionFunction;
   ::std::function<void(SolidParticle* particle, const Vector3& vertex,

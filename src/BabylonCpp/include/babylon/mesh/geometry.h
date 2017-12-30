@@ -69,6 +69,7 @@ public:
   unordered_map_t<string_t, VertexBuffer*> getVertexBuffers();
   bool isVerticesDataPresent(unsigned int kind) override;
   Uint32Array getVerticesDataKinds();
+  void updateIndices(const IndicesArray& indices, int offset = 0);
   Mesh* setIndices(const IndicesArray& indices, size_t totalVertices = 0,
                    bool updatable = false) override;
   size_t getTotalIndices();
@@ -145,6 +146,7 @@ private:
   Nullable<Vector2> _boundingBias;
   Uint32Array _delayInfo;
   unique_ptr_t<GL::IGLBuffer> _indexBuffer;
+  bool _indexBufferIsUpdatable;
 
 }; // end of class Geometry
 

@@ -33,6 +33,7 @@ public:
   using GLRenderBufferPtr      = unique_ptr_t<GL::IGLRenderbuffer>;
   using GLShaderPtr            = unique_ptr_t<GL::IGLShader>;
   using GLTexturePtr           = unique_ptr_t<GL::IGLTexture>;
+  using GLTransformFeedbackPtr = unique_ptr_t<GL::IGLTransformFeedback>;
   using GLUniformLocationPtr   = unique_ptr_t<GL::IGLUniformLocation>;
   using GLVertexArrayObjectPtr = unique_ptr_t<GL::IGLVertexArrayObject>;
 
@@ -122,6 +123,7 @@ public:
   void setStencilOperationDepthFail(unsigned int operation);
   void setStencilOperationPass(unsigned int operation);
   void setDitheringState(bool value);
+  void setRasterizerState(bool value);
 
   /**
    * @brief Stop executing a render loop function and remove it from the
@@ -210,6 +212,8 @@ public:
   /** VBOs **/
   GLBufferPtr createVertexBuffer(const Float32Array& vertices);
   GLBufferPtr createDynamicVertexBuffer(const Float32Array& vertices);
+  void updateDynamicIndexBuffer(const GLBufferPtr& indexBuffer,
+                                const IndicesArray& indices, int offset = 0);
   void updateDynamicVertexBuffer(const GLBufferPtr& vertexBuffer,
                                  const Float32Array& vertices, int offset = -1,
                                  int count = -1);
@@ -246,6 +250,7 @@ public:
   void applyStates();
   void draw(bool useTriangles, unsigned int indexStart, int indexCount,
             int instancesCount = 0);
+  void drawPointClouds(int verticesStart, int verticesCount);
   void drawPointClouds(int verticesStart, int verticesCount,
                        int instancesCount);
   void drawUnIndexed(bool useTriangles, int verticesStart, int verticesCount,
@@ -529,6 +534,16 @@ public:
   /** Time queries **/
   Nullable<_TimeToken> startTimeQuery();
   int endTimeQuery(Nullable<_TimeToken>& token);
+
+  /** Transform feedback **/
+  GLTransformFeedbackPtr createTransformFeedback();
+  void deleteTransformFeedback(GL::IGLTransformFeedback* value);
+  void bindTransformFeedback(GL::IGLTransformFeedback* value);
+  void beginTransformFeedback(bool usePoints = true);
+  void endTransformFeedback();
+  void setTranformFeedbackVaryings(GL::IGLProgram* program,
+                                   const vector_t<string_t>& value);
+  void bindTransformFeedbackBuffer(GL::IGLBuffer* value);
 
   /** Statics **/
   static Engine* LastCreatedEngine();

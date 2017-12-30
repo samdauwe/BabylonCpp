@@ -14,6 +14,7 @@
 #include <babylon/mesh/vertex_buffer.h>
 #include <babylon/mesh/vertex_data.h>
 #include <babylon/mesh/vertex_data_options.h>
+#include <babylon/particles/depth_sorted_particle.h>
 #include <babylon/particles/model_shape.h>
 
 namespace BABYLON {
@@ -35,14 +36,18 @@ SolidParticleSystem::SolidParticleSystem(
     , _pickable{options.isPickable}
     , _isVisibilityBoxLocked{false}
     , _alwaysVisible{false}
+    , _depthSort{options.enableDepthSort}
     , _shapeCounter{0}
-    , _copy{::std::make_unique<SolidParticle>(0, 0, nullptr, 0, 0, nullptr)}
+    , _copy{::std::make_unique<SolidParticle>(
+        0, 0, 0, nullptr, 0, 0, this,
+        BoundingInfo{Vector3::Zero(), Vector3::Zero()})}
     , _color{::std::make_unique<Color4>(0.f, 0.f, 0.f, 0.f)}
     , _computeParticleColor{true}
     , _computeParticleTexture{true}
     , _computeParticleRotation{true}
     , _computeParticleVertex{false}
     , _computeBoundingBox{false}
+    , _depthSortParticles{true}
     , _cam_axisZ{Vector3::Zero()}
     , _cam_axisY{Vector3::Zero()}
     , _cam_axisX{Vector3::Zero()}
@@ -51,6 +56,7 @@ SolidParticleSystem::SolidParticleSystem(
     , _axisZ{Axis::Z()}
     , _camera{dynamic_cast<TargetCamera*>(scene->activeCamera)}
     , _camDir{Vector3::Zero()}
+    , _camInvertedPosition{Vector3::Zero()}
     , _rotated{Vector3::Zero()}
     , _vertex{Vector3::Zero()}
     , _normal{Vector3::Zero()}
@@ -74,7 +80,12 @@ SolidParticleSystem::SolidParticleSystem(
     , _minBbox{Tmp::Vector3Array[4]}
     , _maxBbox{Tmp::Vector3Array[5]}
     , _particlesIntersect{options.particleIntersection}
+    , _needs32Bits{false}
 {
+  _depthSortFunction
+    = [](const DepthSortedParticle& p1, const DepthSortedParticle& p2) {
+        return (p2.sqDistance - p1.sqDistance);
+      };
 }
 
 SolidParticleSystem::~SolidParticleSystem()
@@ -105,9 +116,9 @@ Mesh* SolidParticleSystem::buildMesh()
   if (_mustUnrotateFixedNormals) {
     _unrotateFixedNormals();
   }
-  auto vertexData = ::std::make_unique<VertexData>();
+  auto vertexData     = ::std::make_unique<VertexData>();
+  vertexData->indices = (_depthSort) ? _indices : _indices32;
   vertexData->set(_positions32, VertexBuffer::PositionKind);
-  vertexData->indices = _indices;
   vertexData->set(_normals32, VertexBuffer::NormalKind);
   if (!_uvs32.empty()) {
     vertexData->set(_uvs32, VertexBuffer::UVKind);
@@ -121,6 +132,9 @@ Mesh* SolidParticleSystem::buildMesh()
   mesh->isPickable = _pickable;
 
   // free memory
+  if (!_depthSort) {
+    _indices.clear();
+  }
   _positions.clear();
   _normals.clear();
   _uvs.clear();
@@ -216,16 +230,17 @@ SolidParticleSystem::digest(Mesh* _mesh,
     if (_particlesIntersect) {
       bInfo = BoundingInfo(barycenter, barycenter);
     }
-    auto modelShape = ::std::make_unique<ModelShape>(_shapeCounter, shape,
-                                                     shapeUV, nullptr, nullptr);
+    auto modelShape = ::std::make_unique<ModelShape>(
+      _shapeCounter, shape, size * 3, shapeUV, nullptr, nullptr);
 
     // add the particle in the SPS
     auto currentPos = static_cast<unsigned int>(_positions.size());
+    auto currentInd = static_cast<unsigned int>(_indices.size());
     _meshBuilder(_index, shape, _positions, facetInd, _indices, facetUV, _uvs,
                  facetCol, _colors, meshNor, _normals, idx, 0,
                  {nullptr, nullptr});
-    _addParticle(idx, currentPos, ::std::move(modelShape), _shapeCounter, 0,
-                 bInfo);
+    _addParticle(idx, currentPos, currentInd, ::std::move(modelShape),
+                 _shapeCounter, 0, bInfo);
     // initialize the particle position
     particles[nbParticles]->position.addInPlace(barycenter);
 
@@ -331,6 +346,10 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
     _vertex.y *= _copy->scaling.y;
     _vertex.z *= _copy->scaling.z;
 
+    _vertex.x *= _copy->pivot.x;
+    _vertex.y *= _copy->pivot.y;
+    _vertex.z *= _copy->pivot.z;
+
     Vector3::TransformCoordinatesToRef(_vertex, _rotMatrix, _rotated);
     stl_util::concat(positions,
                      {_copy->position.x + _rotated.x,
@@ -373,7 +392,11 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
   }
 
   for (i = 0; i < meshInd.size(); ++i) {
-    indices.emplace_back(p + meshInd[i]);
+    auto current_ind = p + meshInd[i];
+    indices.emplace_back(current_ind);
+    if (current_ind > 65535) {
+      _needs32Bits = true;
+    }
   }
 
   if (_pickable) {
@@ -383,6 +406,11 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
       pickedParticles.emplace_back(pp);
     }
   }
+
+  if (_depthSort) {
+    depthSortedParticles.emplace_back(DepthSortedParticle());
+  }
+
   return _copy.get();
 }
 
@@ -401,7 +429,7 @@ Float32Array SolidParticleSystem::_uvsToShapeUV(const Float32Array& uvs)
 {
   Float32Array shapeUV;
   if (!uvs.empty()) {
-    for (auto uv : uvs) {
+    for (auto& uv : uvs) {
       shapeUV.emplace_back(uv);
     }
   }
@@ -409,11 +437,12 @@ Float32Array SolidParticleSystem::_uvsToShapeUV(const Float32Array& uvs)
 }
 
 SolidParticle* SolidParticleSystem::_addParticle(
-  unsigned int idx, unsigned int idxpos, unique_ptr_t<ModelShape>&& model,
-  int shapeId, unsigned int idxInShape, const BoundingInfo& bInfo)
+  unsigned int idx, unsigned int idxpos, unsigned int idxind,
+  unique_ptr_t<ModelShape>&& model, int shapeId, unsigned int idxInShape,
+  const BoundingInfo& bInfo)
 {
   particles.emplace_back(::std::make_unique<SolidParticle>(
-    idx, idxpos, model.get(), shapeId, idxInShape, this, bInfo));
+    idx, idxpos, idxind, model.get(), shapeId, idxInShape, this, bInfo));
   return particles.back().get();
 }
 
@@ -436,20 +465,21 @@ int SolidParticleSystem::addShape(
   auto& posfunc = options.positionFunction;
   auto& vtxfunc = options.vertexFunction;
 
-  auto modelShape = ::std::make_unique<ModelShape>(_shapeCounter, shape,
-                                                   shapeUV, posfunc, vtxfunc);
+  auto modelShape = ::std::make_unique<ModelShape>(
+    _shapeCounter, shape, meshInd.size(), shapeUV, posfunc, vtxfunc);
 
   // particles
   SolidParticle* sp;
   unsigned int idx = nbParticles;
   for (unsigned int i = 0; i < nb; ++i) {
     auto currentPos = static_cast<unsigned int>(_positions.size());
+    auto currentInd = static_cast<unsigned int>(_indices.size());
     auto currentCopy
       = _meshBuilder(_index, shape, _positions, meshInd, _indices, meshUV, _uvs,
                      meshCol, _colors, meshNor, _normals, idx, i, options);
     if (_updatable) {
-      sp = _addParticle(idx, currentPos, ::std::move(modelShape), _shapeCounter,
-                        i, bbInfo);
+      sp = _addParticle(idx, currentPos, currentInd, ::std::move(modelShape),
+                        _shapeCounter, i, bbInfo);
       sp->position.copyFrom(currentCopy->position);
       sp->rotation.copyFrom(currentCopy->rotation);
       if (currentCopy->rotationQuaternion) {
@@ -506,6 +536,10 @@ void SolidParticleSystem::_rebuildParticle(SolidParticle* particle)
     _vertex.y *= _copy->scaling.y;
     _vertex.z *= _copy->scaling.z;
 
+    _vertex.x *= _copy->pivot.x;
+    _vertex.y *= _copy->pivot.y;
+    _vertex.z *= _copy->pivot.z;
+
     Vector3::TransformCoordinatesToRef(_vertex, _rotMatrix, _rotated);
 
     _positions32[particle->_pos + pt * 3]     = _copy->position.x + _rotated.x;
@@ -560,24 +594,31 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
   _cam_axisZ.y = 0.f;
   _cam_axisZ.z = 1.f;
 
+  // cases when the World Matrix is to be computed first
+  if (billboard || _depthSort) {
+    mesh->computeWorldMatrix(true);
+    mesh->_worldMatrix->invertToRef(_invertMatrix);
+  }
   // if the particles will always face the camera
   if (billboard) {
-    mesh->computeWorldMatrix(true);
     // compute the camera position and un-rotate it by the current mesh rotation
-    if (mesh->_worldMatrix->decompose(_scale, _quaternion, _translation)) {
-      _quaternionToRotationMatrix();
-      _rotMatrix.invertToRef(_invertMatrix);
-      _camera->_currentTarget.subtractToRef(_camera->globalPosition(), _camDir);
-      Vector3::TransformNormalToRef(_camDir, _invertMatrix, _cam_axisZ);
-      _cam_axisZ.normalize();
-      // same for camera up vector extracted from the cam view matrix
-      auto view = _camera->getViewMatrix(true);
-      Vector3::TransformNormalFromFloatsToRef(view.m[1], view.m[5], view.m[9],
-                                              _invertMatrix, _cam_axisY);
-      Vector3::CrossToRef(_cam_axisY, _cam_axisZ, _cam_axisX);
-      _cam_axisY.normalize();
-      _cam_axisX.normalize();
-    }
+    _camera->getDirectionToRef(_axisZ, _camDir);
+    Vector3::TransformNormalToRef(_camDir, _invertMatrix, _cam_axisZ);
+    _cam_axisZ.normalize();
+    // same for camera up vector extracted from the cam view matrix
+    auto view = _camera->getViewMatrix(true);
+    Vector3::TransformNormalFromFloatsToRef(view.m[1], view.m[5], view.m[9],
+                                            _invertMatrix, _cam_axisY);
+    Vector3::CrossToRef(_cam_axisY, _cam_axisZ, _cam_axisX);
+    _cam_axisY.normalize();
+    _cam_axisX.normalize();
+  }
+
+  // if depthSort, compute the camera global position in the mesh local system
+  if (_depthSort) {
+    Vector3::TransformCoordinatesToRef(
+      _camera->globalPosition(), _invertMatrix,
+      _camInvertedPosition); // then un-rotate the camera
   }
 
   Matrix::IdentityToRef(_rotMatrix);
@@ -625,13 +666,22 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
   auto vpos  = (index / 3) | 0;
   colorIndex = vpos * 4;
   uvIndex    = vpos * 2;
-  for (unsigned int p = start; p <= _end; p++) {
+  for (unsigned int p = start; p <= _end; ++p) {
     _particle = particles[p].get();
     _shape    = _particle->_model->_shape;
     _shapeUV  = _particle->_model->_shapeUV;
 
     // call to custom user function to update the particle properties
     updateParticle(_particle);
+
+    // camera-particle distance for depth sorting
+    if (_depthSort && _depthSortParticles) {
+      auto& dsp         = depthSortedParticles[p];
+      dsp.ind           = _particle->_ind;
+      dsp.indicesLength = _particle->_model->_indicesLength;
+      dsp.sqDistance
+        = Vector3::DistanceSquared(_particle->position, _camInvertedPosition);
+    }
 
     // skip the computations for inactive or already invisible particles
     if (!_particle->alive
@@ -683,6 +733,10 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
         _vertex.x *= _particle->scaling.x;
         _vertex.y *= _particle->scaling.y;
         _vertex.z *= _particle->scaling.z;
+
+        _vertex.x *= _particle->pivot.x;
+        _vertex.y *= _particle->pivot.y;
+        _vertex.z *= _particle->pivot.z;
 
         _rotated.x = _vertex.x * _rotMatrix.m[0] + _vertex.y * _rotMatrix.m[4]
                      + _vertex.z * _rotMatrix.m[8];
@@ -769,9 +823,10 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
     else {
       _particle->_stillInvisible = true; // mark the particle as invisible
       for (pt = 0; pt < _shape.size(); ++pt) {
-        idx                   = index + pt * 3;
-        colidx                = colorIndex + pt * 4;
-        uvidx                 = uvIndex + pt * 2;
+        idx    = index + pt * 3;
+        colidx = colorIndex + pt * 4;
+        uvidx  = uvIndex + pt * 2;
+
         _positions32[idx]     = 0.f;
         _positions32[idx + 1] = 0.f;
         _positions32[idx + 2] = 0.f;
@@ -896,10 +951,28 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
                                  false);
       }
     }
+    if (_depthSort && _depthSortParticles) {
+      ::std::sort(depthSortedParticles.begin(), depthSortedParticles.end(),
+                  _depthSortFunction);
+      auto dspl     = depthSortedParticles.size();
+      size_t sorted = 0;
+      size_t lind   = 0;
+      size_t sind   = 0;
+      size_t sid    = 0;
+      for (sorted = 0; sorted < dspl; ++sorted) {
+        lind = depthSortedParticles[sorted].indicesLength;
+        sind = depthSortedParticles[sorted].ind;
+        for (size_t i = 0; i < lind; ++i) {
+          _indices32[sid] = _indices[sind + i];
+          ++sid;
+        }
+      }
+      mesh->updateIndices(_indices32);
+    }
   }
   if (_computeBoundingBox) {
     mesh->_boundingInfo.reset(new BoundingInfo(_minimum, _maximum));
-    // mesh->_boundingInfo->update(mesh->_worldMatrix);
+    mesh->_boundingInfo->update(*mesh->_worldMatrix);
   }
   afterUpdateParticles(start, _end, update);
 
@@ -968,6 +1041,7 @@ void SolidParticleSystem::dispose(bool /*doNotRecurse*/)
   _normals.clear();
   _uvs.clear();
   _colors.clear();
+  _indices32.clear();
   _positions32.clear();
   _normals32.clear();
   _fixedNormal32.clear();
@@ -1005,7 +1079,10 @@ void SolidParticleSystem::setIsAlwaysVisible(bool val)
 void SolidParticleSystem::setIsVisibilityBoxLocked(bool val)
 {
   _isVisibilityBoxLocked = val;
-  mesh->getBoundingInfo()->setIsLocked(val);
+
+  auto boundingInfo = mesh->getBoundingInfo();
+
+  boundingInfo->setIsLocked(val);
 }
 
 bool SolidParticleSystem::SolidParticleSystem::isVisibilityBoxLocked() const
@@ -1038,6 +1115,11 @@ void SolidParticleSystem::setComputeBoundingBox(bool val)
   _computeBoundingBox = val;
 }
 
+void SolidParticleSystem::setDepthSortParticles(bool val)
+{
+  _depthSortParticles = val;
+}
+
 bool SolidParticleSystem::computeParticleRotation() const
 {
   return _computeParticleRotation;
@@ -1061,6 +1143,11 @@ bool SolidParticleSystem::computeParticleVertex() const
 bool SolidParticleSystem::computeBoundingBox() const
 {
   return _computeBoundingBox;
+}
+
+bool SolidParticleSystem::depthSortParticles() const
+{
+  return _depthSortParticles;
 }
 
 void SolidParticleSystem::initParticles()

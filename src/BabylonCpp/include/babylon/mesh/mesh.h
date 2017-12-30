@@ -432,6 +432,14 @@ public:
                    bool updatable = false) override;
 
   /**
+   * @brief Update the current index buffer
+   * Expects an array populated with integers or a typed array (Int32Array,
+   * Uint32Array, Uint16Array)
+   * @returns The Mesh.
+   */
+  Mesh& updateIndices(const IndicesArray& indices, int offset = 0);
+
+  /**
    * @brief Invert the geometry to move from a right handed system to a left
    * handed one.
    * @returns The Mesh.

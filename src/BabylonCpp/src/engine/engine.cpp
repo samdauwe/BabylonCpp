@@ -600,6 +600,16 @@ void Engine::setDitheringState(bool value)
   }
 }
 
+void Engine::setRasterizerState(bool value)
+{
+  if (value) {
+    _gl->enable(GL::RASTERIZER_DISCARD);
+  }
+  else {
+    _gl->disable(GL::RASTERIZER_DISCARD);
+  }
+}
+
 void Engine::stopRenderLoop()
 {
   _activeRenderLoops.clear();
@@ -1029,6 +1039,12 @@ Engine::createDynamicVertexBuffer(const Float32Array& vertices)
   _resetVertexBufferBinding();
   vbo->references = 1;
   return vbo;
+}
+
+void Engine::updateDynamicIndexBuffer(const GLBufferPtr& /*indexBuffer*/,
+                                      const IndicesArray& /*indices*/,
+                                      int /*offset*/)
+{
 }
 
 void Engine::updateDynamicVertexBuffer(const Engine::GLBufferPtr& vertexBuffer,
@@ -1481,6 +1497,15 @@ void Engine::draw(bool useTriangles, unsigned int indexStart, int indexCount,
                     indexStart * mult);
 }
 
+void Engine::drawPointClouds(int verticesStart, int verticesCount)
+{
+  // Apply states
+  applyStates();
+  _drawCalls.addCount(1, false);
+
+  _gl->drawArrays(GL::POINTS, verticesStart, static_cast<int>(verticesCount));
+}
+
 void Engine::drawPointClouds(int verticesStart, int verticesCount,
                              int instancesCount)
 {
@@ -1488,13 +1513,9 @@ void Engine::drawPointClouds(int verticesStart, int verticesCount,
   applyStates();
   _drawCalls.addCount(1, false);
 
-  if (instancesCount) {
-    _gl->drawArraysInstanced(GL::POINTS, verticesStart, verticesCount,
-                             instancesCount);
-    return;
-  }
-
-  _gl->drawArrays(GL::POINTS, verticesStart, static_cast<int>(verticesCount));
+  _gl->drawArraysInstanced(GL::POINTS, verticesStart, verticesCount,
+                           instancesCount);
+  return;
 }
 
 void Engine::drawUnIndexed(bool useTriangles, int verticesStart,
@@ -3898,6 +3919,36 @@ Nullable<_TimeToken> Engine::startTimeQuery()
 int Engine::endTimeQuery(Nullable<_TimeToken>& /*token*/)
 {
   return -1;
+}
+
+Engine::GLTransformFeedbackPtr Engine::createTransformFeedback()
+{
+  return nullptr;
+}
+
+void Engine::deleteTransformFeedback(GL::IGLTransformFeedback* /*value*/)
+{
+}
+
+void Engine::bindTransformFeedback(GL::IGLTransformFeedback* /*value*/)
+{
+}
+
+void Engine::beginTransformFeedback(bool /*usePoints*/)
+{
+}
+
+void Engine::endTransformFeedback()
+{
+}
+
+void Engine::setTranformFeedbackVaryings(GL::IGLProgram* /*program*/,
+                                         const vector_t<string_t>& /*value*/)
+{
+}
+
+void Engine::bindTransformFeedbackBuffer(GL::IGLBuffer* /*value*/)
+{
 }
 
 unsigned int Engine::getGlAlgorithmType(unsigned int algorithmType) const

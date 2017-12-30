@@ -671,6 +671,16 @@ Mesh* Mesh::setIndices(const IndicesArray& indices, size_t totalVertices,
   return this;
 }
 
+Mesh& Mesh::updateIndices(const IndicesArray& indices, int offset)
+{
+  if (!_geometry) {
+    return *this;
+  }
+
+  _geometry->updateIndices(indices, offset);
+  return *this;
+}
+
 Mesh& Mesh::toLeftHanded()
 {
   if (!_geometry) {

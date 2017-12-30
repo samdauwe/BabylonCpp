@@ -357,6 +357,7 @@ enum GLEnums : GLenum {
   RENDERBUFFER_DEPTH_SIZE                      = 0x8D54,
   RENDERBUFFER_STENCIL_SIZE                    = 0x8D55,
   MAX_SAMPLES                                  = 0x8D57,
+  RASTERIZER_DISCARD                           = 0x8C89,
   FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE           = 0x8CD0,
   FRAMEBUFFER_ATTACHMENT_OBJECT_NAME           = 0x8CD1,
   FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL         = 0x8CD2,
@@ -535,6 +536,10 @@ public:
   // unique_ptr_t<SphericalPolynomial> _sphericalPolynomial;
   vector_t<::std::function<void()>> onLoadedCallbacks;
 }; // end of class IGLTexture
+
+class BABYLON_SHARED_EXPORT IGLTransformFeedback {
+
+}; // end of class IGLTransformFeedback
 
 class BABYLON_SHARED_EXPORT IGLUniformLocation {
 

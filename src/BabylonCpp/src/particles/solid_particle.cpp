@@ -1,15 +1,16 @@
 #include <babylon/particles/solid_particle.h>
 
-#include <babylon/culling/bounding_info.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/particles/solid_particle_system.h>
 
 namespace BABYLON {
 
 SolidParticle::SolidParticle(unsigned int particleIndex,
-                             unsigned int positionIndex, ModelShape* model,
+                             unsigned int positionIndex,
+                             unsigned int iIndiceIndex, ModelShape* model,
                              int iShapeId, unsigned int iIdxInShape,
-                             SolidParticleSystem* sps)
+                             SolidParticleSystem* sps,
+                             const Nullable<BoundingInfo>& modelBoundingInfo)
     : idx{particleIndex}
     , color{Color4(1.f, 1.f, 1.f, 1.f)}
     , position{Vector3::Zero()}
@@ -17,28 +18,23 @@ SolidParticle::SolidParticle(unsigned int particleIndex,
     , scaling{Vector3::One()}
     , uvs{Vector4(0.f, 0.f, 1.f, 1.f)}
     , velocity{Vector3::Zero()}
+    , pivot{Vector3::Zero()}
     , alive{true}
     , isVisible{true}
     , _pos{positionIndex}
+    , _ind{iIndiceIndex}
     , _model{model}
     , shapeId{iShapeId}
     , idxInShape{iIdxInShape}
     , _sps{sps}
     , _stillInvisible{false}
 {
-}
-
-SolidParticle::SolidParticle(unsigned int particleIndex,
-                             unsigned int positionIndex, ModelShape* model,
-                             int iShapeId, unsigned int iIdxInShape,
-                             SolidParticleSystem* sps,
-                             const BoundingInfo& modelBoundingInfo)
-    : SolidParticle(particleIndex, positionIndex, model, iShapeId, iIdxInShape,
-                    sps)
-{
-  _modelBoundingInfo = ::std::make_unique<BoundingInfo>(modelBoundingInfo);
-  _boundingInfo = ::std::make_unique<BoundingInfo>(modelBoundingInfo.minimum,
-                                                   modelBoundingInfo.maximum);
+  if (modelBoundingInfo) {
+    const auto& mdlInfo = *modelBoundingInfo;
+    _modelBoundingInfo  = ::std::make_unique<BoundingInfo>(mdlInfo);
+    _boundingInfo
+      = ::std::make_unique<BoundingInfo>(mdlInfo.minimum, mdlInfo.maximum);
+  }
 }
 
 SolidParticle::~SolidParticle()

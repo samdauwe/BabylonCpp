@@ -11,6 +11,7 @@ struct BABYLON_SHARED_EXPORT EffectCreationOptions {
   vector_t<string_t> uniformsNames{};
   vector_t<string_t> uniformBuffersNames{};
   vector_t<string_t> samplers{};
+  vector_t<string_t> transformFeedbackVaryings{};
   MaterialDefines* materialDefines{nullptr};
   string_t defines{""};
   unique_ptr_t<EffectFallbacks> fallbacks{nullptr};

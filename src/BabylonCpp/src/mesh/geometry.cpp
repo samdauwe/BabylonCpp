@@ -27,6 +27,7 @@ Geometry::Geometry(const string_t& iId, Scene* scene, VertexData* vertexData,
     , _totalVertices{0}
     , _isDisposed{false}
     , _indexBuffer{nullptr}
+    , _indexBufferIsUpdatable{false}
 {
   _meshes.clear();
   // Init vertex buffer cache
@@ -355,6 +356,20 @@ Uint32Array Geometry::getVerticesDataKinds()
   }
 
   return result;
+}
+
+void Geometry::updateIndices(const IndicesArray& indices, int offset)
+{
+  if (!_indexBuffer) {
+    return;
+  }
+
+  if (!_indexBufferIsUpdatable) {
+    setIndices(indices, 0, true);
+  }
+  else {
+    _engine->updateDynamicIndexBuffer(_indexBuffer, indices, offset);
+  }
 }
 
 Mesh* Geometry::setIndices(const IndicesArray& indices, size_t totalVertices,

@@ -490,7 +490,9 @@ void ParticleSystem::animate()
     offset += 4;
   }
 
-  _vertexBuffer->update(_vertexData);
+  if (_vertexBuffer) {
+    _vertexBuffer->update(_vertexData);
+  }
 }
 
 void ParticleSystem::appenedParticleVertexesWithSheet(unsigned int offset,
@@ -515,7 +517,9 @@ void ParticleSystem::rebuild()
 {
   _createIndexBuffer();
 
-  _vertexBuffer->_rebuild();
+  if (_vertexBuffer) {
+    _vertexBuffer->_rebuild();
+  }
 }
 
 size_t ParticleSystem::render()
