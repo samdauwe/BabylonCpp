@@ -312,7 +312,8 @@ public:
   bool useLightmapAsShadowmap;
 
   /**
-   * Specifies that the alpha is coming form the albedo channel alpha channel.
+   * Specifies that the alpha is coming form the albedo channel alpha channel
+   * for alpha blending.
    */
   bool useAlphaFromAlbedoTexture;
 
@@ -452,9 +453,18 @@ public:
   /**
    * A fresnel is applied to the alpha of the model to ensure grazing angles
    * edges are not alpha tested.
-   * And/Or occlude the blended part.
+   * And/Or occlude the blended part. (alpha is converted to gamma to compute
+   * the fresnel)
    */
   bool useAlphaFresnel;
+
+  /**
+   * A fresnel is applied to the alpha of the model to ensure grazing angles
+   * edges are not alpha tested.
+   * And/Or occlude the blended part. (alpha stays linear to compute the
+   * fresnel)
+   */
+  bool useLinearAlphaFresnel;
 
   /**
    * A fresnel is applied to the alpha of the model to ensure grazing angles
@@ -468,6 +478,21 @@ public:
    * (Temporary internal fix to remove before 3.1)
    */
   bool forceNormalForward;
+
+  /**
+   * This parameters will enable/disable Horizon occlusion to prevent normal
+   * maps to look shiny when the normal
+   * makes the reflect vector face the model (under horizon).
+   */
+  bool useHorizonOcclusion;
+
+  /**
+   * This parameters will enable/disable radiance occlusion by preventing the
+   * radiance to lit
+   * too much the area relying on ambient texture to define their ambient
+   * occlusion.
+   */
+  bool useRadianceOcclusion;
 
 }; // end of class PBRMaterial
 

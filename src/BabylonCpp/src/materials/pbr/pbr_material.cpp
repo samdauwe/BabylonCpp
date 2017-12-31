@@ -62,8 +62,11 @@ PBRMaterial::PBRMaterial(const string_t& iName, Scene* scene)
     , twoSidedLighting{false}
     , preMultiplyAlpha{false}
     , useAlphaFresnel{false}
+    , useLinearAlphaFresnel{false}
     , environmentBRDFTexture{nullptr}
     , forceNormalForward{false}
+    , useHorizonOcclusion{true}
+    , useRadianceOcclusion{true}
 {
   _environmentBRDFTexture = TextureTools::GetEnvironmentBRDFTexture(scene);
 }
