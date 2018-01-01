@@ -356,12 +356,10 @@ private:
   Float32Array _data;
   Float32Array _bufferData;
   bool _dynamic;
-  string_t _uniformName;
   unordered_map_t<string_t, size_t> _uniformLocations;
   unordered_map_t<string_t, size_t> _uniformSizes;
   size_t _uniformLocationPointer;
   bool _needSync;
-  Float32Array _cache;
   bool _noUBO;
   Effect* _currentEffect;
 

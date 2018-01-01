@@ -535,7 +535,7 @@ void UniformBuffer::bindToEffect(Effect* effect, const string_t& name)
 {
   _currentEffect = effect;
 
-  if (_noUBO) {
+  if (_noUBO || !_buffer) {
     return;
   }
 
