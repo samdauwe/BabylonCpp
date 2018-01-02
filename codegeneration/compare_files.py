@@ -57,8 +57,8 @@ def fileComparisonToStr(fileComparisonDict):
     return result
 
 if __name__ == "__main__":
-    previous = "/home/sdauwe/Projects/Babylon.js-3.1.0_2017_08_28/src"
-    current = "/home/sdauwe/Projects/Babylon.js-3.1.0_2017_09_23/src"
+    previous = "/home/sdauwe/Projects/Babylon.js-3.1.0_2017_09_23/src"
+    current = "/home/sdauwe/Projects/Babylon.js-3.1.0_2017_12_01/src"
     files = getFilesRecursively(current)
     fileComparisonDict = compareFiles(current, previous, files)
     print fileComparisonToStr(fileComparisonDict)
