@@ -465,7 +465,7 @@ float Light::_getPhotometricScale()
 void Light::_reorderLightsInScene()
 {
   auto scene = getScene();
-  if (renderPriority() != 0) {
+  if (_renderPriority != 0) {
     scene->requireLightSorting = true;
   }
   scene->sortLightsByPriority();
