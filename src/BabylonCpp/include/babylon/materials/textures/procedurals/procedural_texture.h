@@ -72,6 +72,7 @@ private:
   unordered_map_t<string_t, Matrix> _matrices;
   Texture* _fallbackTexture;
   bool _fallbackTextureUsed;
+  Engine* _engine;
 
 }; // end of class ProceduralTexture
 
