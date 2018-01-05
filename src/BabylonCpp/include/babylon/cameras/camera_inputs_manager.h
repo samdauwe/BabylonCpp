@@ -18,7 +18,7 @@ public:
   void removeByType(const string_t& inputType);
   ::std::function<void()> _addCheckInputs(const ::std::function<void()>& fn);
   void attachInput(ICameraInput<TCamera>* input);
-  void attachElement(ICanvas* canvas, bool _noPreventDefault);
+  void attachElement(ICanvas* canvas, bool noPreventDefault = false);
   void detachElement(ICanvas* canvas, bool disconnect = false);
   void rebuildInputCheck();
   void clear();

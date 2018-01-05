@@ -13,6 +13,7 @@ ArcRotateCameraPointersInput::ArcRotateCameraPointersInput()
     , angularSensibilityX{1000.f}
     , angularSensibilityY{1000.f}
     , pinchPrecision{12.f}
+    , pinchDeltaPercentage{0.f}
     , panningSensibility{1000.f}
     , multiTouchPanning{true}
     , multiTouchPanAndZoom{true}
@@ -21,6 +22,13 @@ ArcRotateCameraPointersInput::ArcRotateCameraPointersInput()
     , _engine{nullptr}
     , _noPreventDefault{false}
     , _isPanClick{false}
+    , _observer{nullptr}
+    , _onKeyDown{nullptr}
+    , _onKeyUp{nullptr}
+    , _onMouseMove{nullptr}
+    , _onGesture{nullptr}
+    , _onLostFocus{nullptr}
+    , _onContextMenu{nullptr}
     , _cacheSoloPointerDefined{false}
     , _pointADefined{false}
     , _pointBDefined{false}

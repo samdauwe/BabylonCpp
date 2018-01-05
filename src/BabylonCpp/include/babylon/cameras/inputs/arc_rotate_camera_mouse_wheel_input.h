@@ -26,6 +26,14 @@ public:
 public:
   float wheelPrecision;
 
+  /**
+   * wheelDeltaPercentage will be used instead of wheelPrecision if different
+   * from 0.
+   * It defines the percentage of current camera.radius to use as delta when
+   * wheel is used.
+   */
+  float wheelDeltaPercentage;
+
 private:
   ICanvas* _canvas;
   bool _noPreventDefault;

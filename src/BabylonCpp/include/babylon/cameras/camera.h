@@ -56,8 +56,8 @@ public:
   string_t toString(bool fullDetails = false) const;
 
   Vector3& globalPosition();
-  vector_t<Mesh*>& getActiveMeshes();
-  bool isActiveMesh(Mesh* mesh);
+  vector_t<AbstractMesh*>& getActiveMeshes();
+  bool isActiveMesh(AbstractMesh* mesh);
 
   /** Cache **/
   virtual void _initCache() override;
@@ -80,8 +80,7 @@ public:
   const vector_t<Camera*>& rigCameras() const;
   PostProcess* rigPostProcess();
   int attachPostProcess(PostProcess* postProcess, int insertAt = -1);
-  Int32Array detachPostProcess(PostProcess* postProcess,
-                               const Uint32Array& atIndices = Uint32Array());
+  void detachPostProcess(PostProcess* postProcess);
   Matrix* getWorldMatrix() override;
   virtual Matrix _getViewMatrix();
   Matrix& getViewMatrix(bool force = false);
@@ -174,7 +173,7 @@ public:
   Matrix _projectionMatrix;
   vector_t<PostProcess*> _postProcesses;
   Uint32Array _postProcessesTakenIndices;
-  vector_t<Mesh*> _activeMeshes;
+  vector_t<AbstractMesh*> _activeMeshes;
 
 protected:
   Matrix _webvrViewMatrix;

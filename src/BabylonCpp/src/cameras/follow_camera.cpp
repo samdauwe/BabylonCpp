@@ -76,7 +76,9 @@ void FollowCamera::follow(AbstractMesh* cameraTarget)
 void FollowCamera::_checkInputs()
 {
   TargetCamera::_checkInputs();
-  follow(lockedTarget);
+  if (lockedTarget) {
+    follow(lockedTarget);
+  }
 }
 
 const char* FollowCamera::getClassName() const

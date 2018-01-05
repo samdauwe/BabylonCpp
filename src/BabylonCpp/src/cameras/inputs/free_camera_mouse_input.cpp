@@ -13,6 +13,9 @@ FreeCameraMouseInput::FreeCameraMouseInput(bool iTouchEnabled)
     , touchEnabled{iTouchEnabled}
     , _canvas{nullptr}
     , _engine{nullptr}
+    , _pointerInput{nullptr}
+    , _onMouseMove{nullptr}
+    , _observer{nullptr}
     , _previousPositionDefined{false}
     , _noPreventDefault{false}
 {
@@ -45,9 +48,11 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
         return;
       }
 
-      if (p->type == PointerEventTypes::POINTERDOWN) {
+      auto srcElement = evt.srcElement;
+
+      if (p->type == PointerEventTypes::POINTERDOWN && srcElement) {
         if (evt.srcElement) {
-          evt.srcElement->setPointerCapture(evt.pointerId);
+          srcElement->setPointerCapture(evt.pointerId);
         }
 
         _previousPosition.x      = evt.clientX;
@@ -59,10 +64,8 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
           _canvas->focus();
         }
       }
-      else if (p->type == PointerEventTypes::POINTERUP) {
-        if (evt.srcElement) {
-          evt.srcElement->releasePointerCapture(evt.pointerId);
-        }
+      else if (p->type == PointerEventTypes::POINTERUP && srcElement) {
+        srcElement->releasePointerCapture(evt.pointerId);
 
         _previousPositionDefined = false;
         if (!_noPreventDefault) {

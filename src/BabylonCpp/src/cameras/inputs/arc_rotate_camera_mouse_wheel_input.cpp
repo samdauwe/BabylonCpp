@@ -6,7 +6,12 @@
 namespace BABYLON {
 
 ArcRotateCameraMouseWheelInput::ArcRotateCameraMouseWheelInput()
-    : wheelPrecision{3.f}, _canvas{nullptr}, _noPreventDefault{false}
+    : wheelPrecision{3.f}
+    , wheelDeltaPercentage{0.f}
+    , _canvas{nullptr}
+    , _noPreventDefault{false}
+    , _wheel{nullptr}
+    , _observer{nullptr}
 {
 }
 
@@ -28,7 +33,10 @@ void ArcRotateCameraMouseWheelInput::attachControl(ICanvas* canvas,
     const auto& event = p->mouseWheelEvent;
     float delta       = 0.f;
     if (!stl_util::almost_equal(event.wheelDelta, 0.f)) {
-      delta = event.wheelDelta / (wheelPrecision * 40.f);
+      delta
+        = (wheelDeltaPercentage != 0.f) ?
+            (event.wheelDelta * 0.01f) * camera->radius * wheelDeltaPercentage :
+            event.wheelDelta / (wheelPrecision * 40.f);
     }
     else if (!stl_util::almost_equal(event.detail, 0.f)) {
       delta = -event.detail / wheelPrecision;

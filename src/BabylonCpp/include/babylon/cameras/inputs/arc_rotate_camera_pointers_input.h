@@ -42,6 +42,15 @@ public:
   float angularSensibilityX;
   float angularSensibilityY;
   float pinchPrecision;
+
+  /**
+   * pinchDeltaPercentage will be used instead of pinchPrecision if different
+   * from 0.
+   * It defines the percentage of current camera.radius to use as delta when
+   * pinch zoom is used.
+   */
+  float pinchDeltaPercentage;
+
   float panningSensibility;
   bool multiTouchPanning;
   bool multiTouchPanAndZoom;

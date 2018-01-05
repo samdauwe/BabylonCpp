@@ -13,6 +13,10 @@ ArcRotateCameraKeyboardMoveInput::ArcRotateCameraKeyboardMoveInput()
     , useAltToZoom{true}
     , _canvas{nullptr}
     , _noPreventDefault{false}
+    , _onCanvasBlurObserver{nullptr}
+    , _onKeyboardObserver{nullptr}
+    , _engine{nullptr}
+    , _scene{nullptr}
 {
   keysUp.emplace_back(38);
   keysDown.emplace_back(40);
@@ -95,8 +99,12 @@ void ArcRotateCameraKeyboardMoveInput::attachControl(ICanvas* canvas,
 void ArcRotateCameraKeyboardMoveInput::detachControl(ICanvas* /*canvas*/)
 {
   if (_scene) {
-    _scene->onKeyboardObservable.remove(_onKeyboardObserver);
-    _engine->onCanvasBlurObservable.remove(_onCanvasBlurObserver);
+    if (_onKeyboardObserver) {
+      _scene->onKeyboardObservable.remove(_onKeyboardObserver);
+    }
+    if (_onCanvasBlurObserver) {
+      _engine->onCanvasBlurObservable.remove(_onCanvasBlurObserver);
+    }
     _onKeyboardObserver   = nullptr;
     _onCanvasBlurObserver = nullptr;
   }

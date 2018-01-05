@@ -411,7 +411,7 @@ void ArcRotateCamera::setUseBouncingBehavior(bool value)
     _bouncingBehavior = ::std::make_unique<BouncingBehavior>();
     addBehavior(dynamic_cast<Behavior<Node>*>(_bouncingBehavior.get()));
   }
-  else {
+  else if (_bouncingBehavior) {
     removeBehavior(dynamic_cast<Behavior<Node>*>(_bouncingBehavior.get()));
     _bouncingBehavior = nullptr;
   }
@@ -437,7 +437,7 @@ void ArcRotateCamera::setUseFramingBehavior(bool value)
     _framingBehavior = ::std::make_unique<FramingBehavior>();
     addBehavior(dynamic_cast<Behavior<Node>*>(_framingBehavior.get()));
   }
-  else {
+  else if (_framingBehavior) {
     removeBehavior(dynamic_cast<Behavior<Node>*>(_framingBehavior.get()));
     _framingBehavior = nullptr;
   }
@@ -463,7 +463,7 @@ void ArcRotateCamera::setUseAutoRotationBehavior(bool value)
     _autoRotationBehavior = ::std::make_unique<AutoRotationBehavior>();
     addBehavior(dynamic_cast<Behavior<Node>*>(_autoRotationBehavior.get()));
   }
-  else {
+  else if (_autoRotationBehavior) {
     removeBehavior(dynamic_cast<Behavior<Node>*>(_autoRotationBehavior.get()));
     _autoRotationBehavior = nullptr;
   }

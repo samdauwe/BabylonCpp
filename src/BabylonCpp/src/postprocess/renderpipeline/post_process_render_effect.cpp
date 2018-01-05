@@ -83,9 +83,13 @@ void PostProcessRenderEffect::_attachCameras(const vector_t<Camera*>& cameras)
 {
   string_t cameraKey;
 
-  auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
+  auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
-  for (auto& camera : _cam) {
+  if (cams.empty()) {
+    return;
+  }
+
+  for (auto& camera : cams) {
     auto cameraName = camera->name;
 
     if (_singleInstance) {
@@ -110,7 +114,7 @@ void PostProcessRenderEffect::_attachCameras(const vector_t<Camera*>& cameras)
 
     _indicesForCamera[cameraName].emplace_back(index);
 
-    if (!stl_util::contains(_cameras, camera->name)) {
+    if (!stl_util::contains(_cameras, cameraName)) {
       _cameras[cameraName] = camera;
     }
 
@@ -124,17 +128,22 @@ void PostProcessRenderEffect::_attachCameras(const vector_t<Camera*>& cameras)
 
 void PostProcessRenderEffect::_detachCameras(const vector_t<Camera*>& cameras)
 {
-  auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
+  auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
-  for (auto& camera : _cam) {
+  if (cams.empty()) {
+    return;
+  }
+
+  for (auto& camera : cams) {
     auto cameraName = camera->name;
 
     camera->detachPostProcess(
-      _postProcesses[_singleInstance ? "0" : cameraName],
-      _indicesForCamera[cameraName]);
+      _postProcesses[_singleInstance ? "0" : cameraName]);
 
-    _cameras.erase(cameraName);
-    _indicesForCamera.erase(cameraName);
+    if (stl_util::contains(_cameras, cameraName)) {
+      _indicesForCamera.erase(cameraName);
+      _cameras.erase(cameraName);
+    }
 
     for (auto& item : _renderPasses) {
       item.second->_decRefCount();
@@ -144,9 +153,13 @@ void PostProcessRenderEffect::_detachCameras(const vector_t<Camera*>& cameras)
 
 void PostProcessRenderEffect::_enable(const vector_t<Camera*> cameras)
 {
-  auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
+  auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
-  for (auto& camera : _cam) {
+  if (cams.empty()) {
+    return;
+  }
+
+  for (auto& camera : cams) {
     auto cameraName = camera->name;
 
     for (auto& j : _indicesForCamera[cameraName]) {
@@ -167,14 +180,17 @@ void PostProcessRenderEffect::_enable(const vector_t<Camera*> cameras)
 
 void PostProcessRenderEffect::_disable(vector_t<Camera*> cameras)
 {
-  auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
+  auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
-  for (auto& camera : _cam) {
+  if (cams.empty()) {
+    return;
+  }
+
+  for (auto& camera : cams) {
     auto cameraName = camera->name;
 
     camera->detachPostProcess(
-      _postProcesses[_singleInstance ? "0" : cameraName],
-      _indicesForCamera[cameraName]);
+      _postProcesses[_singleInstance ? "0" : cameraName]);
 
     for (auto& item : _renderPasses) {
       item.second->_decRefCount();
@@ -188,6 +204,9 @@ PostProcess* PostProcessRenderEffect::getPostProcess(Camera* camera)
     return _postProcesses["0"];
   }
   else {
+    if (!camera) {
+      return nullptr;
+    }
     return camera ? _postProcesses[camera->name] : nullptr;
   }
 }

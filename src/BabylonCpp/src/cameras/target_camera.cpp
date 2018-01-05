@@ -296,14 +296,14 @@ void TargetCamera::_updateCameraRotationMatrix()
 {
   if (rotationQuaternion) {
     rotationQuaternion->toRotationMatrix(_cameraRotationMatrix);
-    // update the up vector!
-    Vector3::TransformNormalToRef(*_defaultUpVector, _cameraRotationMatrix,
-                                  upVector);
   }
   else {
     Matrix::RotationYawPitchRollToRef(rotation->y, rotation->x, rotation->z,
                                       _cameraRotationMatrix);
   }
+  // update the up vector!
+  Vector3::TransformNormalToRef(*_defaultUpVector, _cameraRotationMatrix,
+                                upVector);
 }
 
 Matrix TargetCamera::_getViewMatrix()
@@ -319,7 +319,11 @@ Matrix TargetCamera::_getViewMatrix()
     position.addToRef(_transformedReferencePoint, _currentTarget);
   }
   else {
-    _currentTarget.copyFrom(*_getLockedTargetPosition());
+    auto targetPosition = _getLockedTargetPosition();
+
+    if (targetPosition) {
+      _currentTarget.copyFrom(*targetPosition);
+    }
   }
 
   if (getScene()->useRightHandedSystem()) {

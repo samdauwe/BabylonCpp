@@ -28,6 +28,10 @@ IReflect::Type ArcFollowCamera::type() const
 
 void ArcFollowCamera::follow()
 {
+  if (!target) {
+    return;
+  }
+
   _cartesianCoordinates.x = radius * ::std::cos(alpha) * ::std::cos(beta);
   _cartesianCoordinates.y = radius * ::std::sin(beta);
   _cartesianCoordinates.z = radius * ::std::sin(alpha) * ::std::cos(beta);

@@ -88,7 +88,9 @@ template <class TCamera>
 template <class TCamera>
 void CameraInputsManager<TCamera>::attachInput(ICameraInput<TCamera>* input)
 {
-  input->attachControl(attachedElement, noPreventDefault);
+  if (attachedElement) {
+    input->attachControl(attachedElement, noPreventDefault);
+  }
 }
 
 template <class TCamera>

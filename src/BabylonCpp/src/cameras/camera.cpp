@@ -124,12 +124,12 @@ Vector3& Camera::globalPosition()
   return _globalPosition;
 }
 
-vector_t<Mesh*>& Camera::getActiveMeshes()
+vector_t<AbstractMesh*>& Camera::getActiveMeshes()
 {
   return _activeMeshes;
 }
 
-bool Camera::isActiveMesh(Mesh* mesh)
+bool Camera::isActiveMesh(AbstractMesh* mesh)
 {
   return ::std::find(_activeMeshes.begin(), _activeMeshes.end(), mesh)
          != _activeMeshes.end();
@@ -305,30 +305,13 @@ int Camera::attachPostProcess(PostProcess* postProcess, int insertAt)
   return stl_util::index_of(_postProcesses, postProcess);
 }
 
-Int32Array Camera::detachPostProcess(PostProcess* postProcess,
-                                     const Uint32Array& atIndices)
+void Camera::detachPostProcess(PostProcess* postProcess)
 {
-  Int32Array result;
-  size_t i;
-  int index;
-  if (!atIndices.empty()) {
-    _postProcesses.erase(
-      ::std::remove(_postProcesses.begin(), _postProcesses.end(), postProcess),
-      _postProcesses.end());
-  }
-  else {
-    // iterate descending, so can just splice as we go
-    for (i = atIndices.size(); i-- > 0;) {
-      if (_postProcesses[atIndices[i]] != postProcess) {
-        result.emplace_back(static_cast<int32_t>(i));
-        continue;
-      }
-      index = static_cast<int>(atIndices[i]);
-      stl_util::splice(_postProcesses, index, 1);
-    }
-  }
+  _postProcesses.erase(
+    ::std::remove(_postProcesses.begin(), _postProcesses.end(), postProcess),
+    _postProcesses.end());
+
   _cascadePostProcessesToRigCams(); // also ensures framebuffer invalidated
-  return result;
 }
 
 Matrix* Camera::getWorldMatrix()
@@ -551,7 +534,9 @@ void Camera::dispose(bool /*doNotRecurse*/)
   // Remove from scene
   getScene()->removeCamera(this);
   for (auto& rigCamera : _rigCameras) {
-    rigCamera->dispose();
+    if (rigCamera) {
+      rigCamera->dispose();
+    }
   }
   _rigCameras.clear();
 

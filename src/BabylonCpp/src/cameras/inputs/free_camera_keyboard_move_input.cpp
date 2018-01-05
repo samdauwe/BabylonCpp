@@ -8,7 +8,12 @@
 namespace BABYLON {
 
 FreeCameraKeyboardMoveInput::FreeCameraKeyboardMoveInput()
-    : _canvas{nullptr}, _noPreventDefault{false}
+    : _canvas{nullptr}
+    , _noPreventDefault{false}
+    , _onCanvasBlurObserver{nullptr}
+    , _onKeyboardObserver{nullptr}
+    , _engine{nullptr}
+    , _scene{nullptr}
 {
   keysUp.emplace_back(38);
   keysDown.emplace_back(40);
@@ -83,8 +88,12 @@ void FreeCameraKeyboardMoveInput::attachControl(ICanvas* canvas,
 void FreeCameraKeyboardMoveInput::detachControl(ICanvas* /*canvas*/)
 {
   if (_scene) {
-    _scene->onKeyboardObservable.remove(_onKeyboardObserver);
-    _engine->onCanvasBlurObservable.remove(_onCanvasBlurObserver);
+    if (_onKeyboardObserver) {
+      _scene->onKeyboardObservable.remove(_onKeyboardObserver);
+    }
+    if (_onCanvasBlurObserver) {
+      _engine->onCanvasBlurObservable.remove(_onCanvasBlurObserver);
+    }
     _onKeyboardObserver   = nullptr;
     _onCanvasBlurObserver = nullptr;
   }
@@ -96,7 +105,7 @@ void FreeCameraKeyboardMoveInput::checkInputs()
   if (_onKeyboardObserver) {
     // Keyboard
     for (const auto& keyCode : _keys) {
-      const float speed = camera->_computeLocalCameraSpeed();
+      const auto speed = camera->_computeLocalCameraSpeed();
 
       if (::std::find(keysLeft.begin(), keysLeft.end(), keyCode)
           != keysLeft.end()) {
