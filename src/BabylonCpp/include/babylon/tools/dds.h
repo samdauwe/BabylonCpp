@@ -70,6 +70,12 @@ struct DDS {
     = FourCCToInt32<'D', 'X', 'T', '1'>::value;
   static constexpr int FOURCC_DXT3 = FourCCToInt32<'D', 'X', 'T', '3'>::value;
   static constexpr int FOURCC_DXT5 = FourCCToInt32<'D', 'X', 'T', '5'>::value;
+  static constexpr int FOURCC_DX10 = FourCCToInt32<'D', 'X', '1', '0'>::value;
+  static constexpr int FOURCC_D3DFMT_R16G16B16A16F = 113;
+  static constexpr int FOURCC_D3DFMT_R32G32B32A32F = 116;
+
+  static constexpr int DXGI_FORMAT_R16G16B16A16_FLOAT = 10;
+  static constexpr int DXGI_FORMAT_B8G8R8X8_UNORM     = 88;
 
   // The header length in 32 bit ints
   static constexpr int headerLengthInt = 31;
@@ -91,7 +97,10 @@ enum {
   off_BMask       = 25,
   off_AMask       = 26,
   off_caps1       = 27,
-  off_caps2       = 28
+  off_caps2       = 28,
+  off_caps3       = 29,
+  off_caps4       = 30,
+  off_dxgiFormat  = 32
 };
 
 enum PixelFormat {
@@ -118,6 +127,9 @@ struct DDSInfo {
   bool isRGB;
   bool isLuminance;
   bool isCube;
+  bool isCompressed;
+  int dxgiFormat;
+  unsigned int textureType;
 }; // end of struct DDSInfo
 
 class BABYLON_SHARED_EXPORT DDSTools {
@@ -136,9 +148,10 @@ private:
                                             const Uint8Array& arrayBuffer);
 
 public:
-  static void UploadDDSLevels(GL::IGLRenderingContext* gl,
+  static void UploadDDSLevels(Engine* engine, GL::IGLRenderingContext* gl,
                               const Uint8Array& arrayBuffer, DDSInfo& info,
-                              bool loadMipmaps, unsigned int faces);
+                              bool loadMipmaps, unsigned int faces,
+                              int lodIndex = -1, int currentFace = -1);
 
 }; // end of class DDSTools
 

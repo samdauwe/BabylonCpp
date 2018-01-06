@@ -1,5 +1,6 @@
 #include <babylon/tools/performance_monitor.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/time.h>
 
 namespace BABYLON {
@@ -54,7 +55,13 @@ float PerformanceMonitor::averageFPS() const
 
 float PerformanceMonitor::instantaneousFPS() const
 {
-  return 1000.f / _rollingFrameTime.history(0);
+  auto history = _rollingFrameTime.history(0);
+
+  if (stl_util::almost_equal(history, 0.f)) {
+    return 0;
+  }
+
+  return 1000.f / history;
 }
 
 bool PerformanceMonitor::isSaturated() const

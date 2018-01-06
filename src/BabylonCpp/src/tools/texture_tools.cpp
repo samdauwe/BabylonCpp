@@ -624,7 +624,7 @@ unique_ptr_t<Texture> TextureTools::CreateResizedCopy(Texture* texture,
                                               false,                     //
                                               texture->_samplingMode,    //
                                               false                      //
-    );
+                                              );
 
   rtt->wrapU                     = texture->wrapU;
   rtt->wrapV                     = texture->wrapV;
@@ -653,14 +653,18 @@ unique_ptr_t<Texture> TextureTools::CreateResizedCopy(Texture* texture,
       effect->setTexture("textureSampler", texture);
     });
 
-    scene->postProcessManager->directRender({passPostProcess.get()},
-                                            rtt->getInternalTexture());
+    auto internalTexture = rtt->getInternalTexture();
 
-    engine->unBindFramebuffer(rtt->getInternalTexture());
-    rtt->disposeFramebufferObjects();
-    passPostProcess->dispose();
+    if (internalTexture) {
+      scene->postProcessManager->directRender({passPostProcess.get()},
+                                              internalTexture);
 
-    rtt->_texture->isReady = true;
+      engine->unBindFramebuffer(internalTexture);
+      rtt->disposeFramebufferObjects();
+      passPostProcess->dispose();
+
+      internalTexture->isReady = true;
+    }
   });
 
   return rtt;
