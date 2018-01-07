@@ -61,6 +61,7 @@
 #include <babylon/samples/materials/shader_material_tiles_scene.h>
 #include <babylon/samples/materials/shader_material_with_fog_scene.h>
 #include <babylon/samples/materials/shader_material_wolfenstein_3d_scene.h>
+#include <babylon/samples/materials/shader_material_xyptonjtroz_scene.h>
 #include <babylon/samples/mesh/basic_elements_scene.h>
 #include <babylon/samples/mesh/basic_scene.h>
 #include <babylon/samples/mesh/circle_curves_from_beziers.h>
@@ -516,6 +517,12 @@ SamplesIndex::SamplesIndex()
     [](ICanvas* iCanvas) {                                                  //
       return ::std::make_unique<ShaderMaterialWolfenstein3DScene>(iCanvas); //
     });                                                                     //
+  // Shader Material Xyptonjtroz Scene
+  _samples["ShaderMaterialXyptonjtrozScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                                //
+      return ::std::make_unique<ShaderMaterialXyptonjtrozScene>(iCanvas); //
+    });                                                                   //
   // Shape Easings Scene
   _samples["ShapeEasingsScene"] = ::std::make_tuple(
     true,
