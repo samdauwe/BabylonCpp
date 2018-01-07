@@ -35,7 +35,7 @@ public:
   /**
    * @brief Returns the submesh BoudingInfo object.
    */
-  BoundingInfo* getBoundingInfo() const;
+  BoundingInfo& getBoundingInfo() const;
 
   /**
    * @brief Sets the submesh BoundingInfo.

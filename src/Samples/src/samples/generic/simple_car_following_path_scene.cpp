@@ -144,7 +144,7 @@ void SimpleCarFollowingPathScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto theta = ::std::acos(Vector3::Dot(zAxis, _normals[0]));
   auto yAxis = Axis::Y();
   _carBody->rotate(yAxis, theta, Space::WORLD);
-  _startRotation = _carBody->rotationQuaternion();
+  _startRotation = *_carBody->rotationQuaternion();
   /*----------------------- End Position and Rotate Car at Start -------------*/
 
   /*----------------------- Animation Loop -----------------------------------*/

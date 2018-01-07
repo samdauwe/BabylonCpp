@@ -24,6 +24,10 @@ public:
                 bool isPure = true);
   ~TransformNode();
 
+  Vector3& position();
+  const Vector3& position() const;
+  void setPosition(const Vector3& newPosition);
+
   /**
    * @brief Rotation property : a Vector3 depicting the rotation value in
    * radians around each local axis X, Y, Z.
@@ -40,7 +44,7 @@ public:
    * local axis X, Y, Z.
    * Default : (1.0, 1.0, 1.0)
    */
-  Vector3& scaling();
+  virtual Vector3& scaling();
   const Vector3& scaling() const;
 
   /**
@@ -233,7 +237,7 @@ public:
 
   bool nonUniformScaling() const;
 
-  bool _updateNonUniformScalingState(bool value);
+  virtual bool _updateNonUniformScalingState(bool value);
 
   /**
    * @brief Attach the current TransformNode to another TransformNode associated
@@ -368,7 +372,6 @@ public:
   unsigned int billboardMode;
   float scalingDeterminant;
   bool infiniteDistance;
-  Vector3 position;
   // Cache
   unique_ptr_t<Matrix> _poseMatrix;
   unique_ptr_t<Matrix> _worldMatrix;
@@ -391,6 +394,7 @@ private:
 
 private:
   // Properties
+  Vector3 _position;
   Vector3 _rotation;
   unique_ptr_t<Quaternion> _rotationQuaternion;
   TransformNode* _transformToBoneReferal;

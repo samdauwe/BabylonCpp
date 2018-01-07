@@ -128,13 +128,13 @@ bool ArcRotateCamera::_restoreStateValues()
 
 Vector3 ArcRotateCamera::_getTargetPosition()
 {
-  if (_targetHost && _targetHost->getAbsolutePosition()) {
+  if (_targetHost) {
     auto pos = _targetHost->getAbsolutePosition();
     if (_targetBoundingCenter) {
-      pos->addToRef(*_targetBoundingCenter, _target);
+      pos.addToRef(*_targetBoundingCenter, _target);
     }
     else {
-      _target.copyFrom(*pos);
+      _target.copyFrom(pos);
     }
   }
 
@@ -362,10 +362,10 @@ const Vector3& ArcRotateCamera::target() const
 void ArcRotateCamera::setTarget(AbstractMesh* iTarget, bool toBoundingCenter,
                                 bool /*allowSamePosition*/)
 {
-  if (iTarget->getBoundingInfo()) {
+  {
     if (toBoundingCenter) {
       _targetBoundingCenter
-        = iTarget->getBoundingInfo()->boundingBox.centerWorld.clone();
+        = iTarget->getBoundingInfo().boundingBox.centerWorld.clone();
     }
     else {
       _targetBoundingCenter.reset(nullptr);

@@ -528,8 +528,9 @@ public:
   Engine& deleteQuery(const GLQueryPtr& query);
   bool isQueryResultAvailable(const GLQueryPtr& query);
   unsigned int getQueryResult(const GLQueryPtr& query);
-  void beginQuery(unsigned int algorithmType, const GLQueryPtr& query);
-  Engine& endQuery(unsigned int algorithmType);
+  Engine& beginOcclusionQuery(unsigned int algorithmType,
+                              const GLQueryPtr& query);
+  Engine& endOcclusionQuery(unsigned int algorithmType);
 
   /** Time queries **/
   Nullable<_TimeToken> startTimeQuery();

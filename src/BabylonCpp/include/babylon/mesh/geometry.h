@@ -52,15 +52,16 @@ public:
   bool doNotSerialize() const;
   void _rebuild();
   void setAllVerticesData(VertexData* vertexData, bool updatable = false);
-  Mesh* setVerticesData(unsigned int kind, const Float32Array& data,
-                        bool updatable = false, int stride = -1) override;
+  AbstractMesh* setVerticesData(unsigned int kind, const Float32Array& data,
+                                bool updatable = false,
+                                int stride     = -1) override;
   void removeVerticesData(unsigned int kind);
   void setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer);
   void updateVerticesDataDirectly(unsigned int kind, const Float32Array& data,
                                   int offset);
-  Mesh* updateVerticesData(unsigned int kind, const Float32Array& data,
-                           bool updateExtends = false,
-                           bool makeItUnique  = false) override;
+  AbstractMesh* updateVerticesData(unsigned int kind, const Float32Array& data,
+                                   bool updateExtends = false,
+                                   bool makeItUnique  = false) override;
   void _bind(Effect* effect, GL::IGLBuffer* indexToBind = nullptr);
   size_t getTotalVertices() const;
   Float32Array getVerticesData(unsigned int kind, bool copyWhenShared = false,
@@ -70,8 +71,9 @@ public:
   bool isVerticesDataPresent(unsigned int kind) override;
   Uint32Array getVerticesDataKinds();
   void updateIndices(const IndicesArray& indices, int offset = 0);
-  Mesh* setIndices(const IndicesArray& indices, size_t totalVertices = 0,
-                   bool updatable = false) override;
+  AbstractMesh* setIndices(const IndicesArray& indices,
+                           size_t totalVertices = 0,
+                           bool updatable       = false) override;
   size_t getTotalIndices();
   IndicesArray getIndices(bool copyWhenShared = false) override;
   GL::IGLBuffer* getIndexBuffer();

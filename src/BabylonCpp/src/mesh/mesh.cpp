@@ -103,10 +103,10 @@ Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
     // Physics clone
     auto physicsEngine = getScene()->getPhysicsEngine();
     if (clonePhysicsImpostor && physicsEngine) {
-      auto impostor = physicsEngine->getImpostorForPhysicsObject(source);
-      if (impostor) {
-        physicsImpostor = impostor->clone(this);
-      }
+      //auto impostor = physicsEngine->getImpostorForPhysicsObject(source);
+      //if (impostor) {
+      //  physicsImpostor = impostor->clone(this);
+      //}
     }
 
     // Particles
@@ -275,7 +275,7 @@ AbstractMesh* Mesh::getLOD(Camera* camera, BoundingSphere* boundingSphere)
   }
   else {
     getBoundingInfo()
-      ->boundingSphere.centerWorld.subtract(camera->globalPosition())
+      .boundingSphere.centerWorld.subtract(camera->globalPosition())
       .length();
   }
 
@@ -940,7 +940,8 @@ Mesh& Mesh::_processRendering(
   auto engine = scene->getEngine();
 
   if (hardwareInstancedRendering) {
-    _renderWithInstances(subMesh, fillMode, batch, effect, engine);
+    _renderWithInstances(subMesh, static_cast<unsigned>(fillMode), batch,
+                         effect, engine);
   }
   else {
     if (batch->renderSelf[subMesh->_id]) {
@@ -1276,7 +1277,7 @@ Mesh& Mesh::bakeCurrentTransformIntoVertices()
   position().copyFromFloats(0.f, 0.f, 0.f);
   rotation().copyFromFloats(0.f, 0.f, 0.f);
   // only if quaternion is already set
-  if (rotationQuaternionSet()) {
+  if (rotationQuaternion()) {
     setRotationQuaternion(Quaternion::Identity());
   }
   _worldMatrix = ::std::make_unique<Matrix>(Matrix::Identity());
@@ -1738,12 +1739,14 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
   }
 
   if (parsedMesh.contains("localMatrix")) {
-    mesh->setPivotMatrix(
-      Matrix::FromArray(Json::ToArray<float>(parsedMesh, "localMatrix")));
+    auto tmpMatrix
+      = Matrix::FromArray(Json::ToArray<float>(parsedMesh, "localMatrix"));
+    mesh->setPivotMatrix(tmpMatrix);
   }
   else if (parsedMesh.contains("pivotMatrix")) {
-    mesh->setPivotMatrix(
-      Matrix::FromArray(Json::ToArray<float>(parsedMesh, "pivotMatrix")));
+    auto tmpMatrix
+      = Matrix::FromArray(Json::ToArray<float>(parsedMesh, "pivotMatrix"));
+    mesh->setPivotMatrix(tmpMatrix);
   }
 
   mesh->setEnabled(Json::GetBool(parsedMesh, "isEnabled", true));
@@ -2452,7 +2455,7 @@ MinMax Mesh::GetMinMax(const vector_t<AbstractMesh*>& meshes)
   Vector3 minVector;
   Vector3 maxVector;
   for (auto& mesh : meshes) {
-    const BoundingBox& boundingBox = mesh->getBoundingInfo()->boundingBox;
+    const BoundingBox& boundingBox = mesh->getBoundingInfo().boundingBox;
     if (!minVectorSet) {
       minVector    = boundingBox.minimumWorld;
       maxVector    = boundingBox.maximumWorld;

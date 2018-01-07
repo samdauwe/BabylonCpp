@@ -48,7 +48,7 @@ ReflectionProbe::ReflectionProbe(const string_t& name, const ISize& size,
       }
 
       if (_attachedMesh) {
-        position.copyFrom(*_attachedMesh->getAbsolutePosition());
+        position.copyFrom(_attachedMesh->getAbsolutePosition());
       }
 
       position.addToRef(_add, _target);

@@ -141,16 +141,16 @@ void WindowsMotionController::lerpButtonTransform(const string_t& buttonName,
   }
 
   auto meshInfo = (*_loadedMeshInfo).buttonMeshes.at(buttonName);
-  if (!meshInfo || !(*meshInfo).unpressed->rotationQuaternionSet()
-      || !(*meshInfo).pressed->rotationQuaternionSet()
-      || !(*meshInfo).value->rotationQuaternionSet()) {
+  if (!meshInfo || !(*meshInfo).unpressed->rotationQuaternion()
+      || !(*meshInfo).pressed->rotationQuaternion()
+      || !(*meshInfo).value->rotationQuaternion()) {
     return;
   }
 
-  Quaternion::SlerpToRef((*meshInfo).unpressed->rotationQuaternion(), //
-                         (*meshInfo).pressed->rotationQuaternion(),   //
-                         buttonValue,                                 //
-                         (*meshInfo).value->rotationQuaternion());
+  Quaternion::SlerpToRef(*(*meshInfo).unpressed->rotationQuaternion(), //
+                         *(*meshInfo).pressed->rotationQuaternion(),   //
+                         buttonValue,                                  //
+                         *(*meshInfo).value->rotationQuaternion());
   Vector3::LerpToRef((*meshInfo).unpressed->position(), //
                      (*meshInfo).pressed->position(),   //
                      buttonValue,                       //
@@ -169,18 +169,18 @@ void WindowsMotionController::lerpAxisTransform(unsigned int axis,
   }
 
   auto meshInfo = (*_loadedMeshInfo).axisMeshes.at(axis);
-  if (!meshInfo || !(*meshInfo).min->rotationQuaternionSet()
-      || !(*meshInfo).max->rotationQuaternionSet()
-      || !(*meshInfo).value->rotationQuaternionSet()) {
+  if (!meshInfo || !(*meshInfo).min->rotationQuaternion()
+      || !(*meshInfo).max->rotationQuaternion()
+      || !(*meshInfo).value->rotationQuaternion()) {
     return;
   }
 
   // Convert from gamepad value range (-1 to +1) to lerp range (0 to 1)
   auto lerpValue = axisValue * 0.5f + 0.5f;
-  Quaternion::SlerpToRef((*meshInfo).min->rotationQuaternion(), //
-                         (*meshInfo).max->rotationQuaternion(), //
-                         lerpValue,                             //
-                         (*meshInfo).value->rotationQuaternion());
+  Quaternion::SlerpToRef(*(*meshInfo).min->rotationQuaternion(), //
+                         *(*meshInfo).max->rotationQuaternion(), //
+                         lerpValue,                              //
+                         *(*meshInfo).value->rotationQuaternion());
   Vector3::LerpToRef((*meshInfo).min->position(), //
                      (*meshInfo).max->position(), //
                      lerpValue,                   //

@@ -37,8 +37,8 @@ void ArcFollowCamera::follow()
   _cartesianCoordinates.z = radius * ::std::sin(alpha) * ::std::cos(beta);
 
   auto targetPosition = target->getAbsolutePosition();
-  position            = targetPosition->add(_cartesianCoordinates);
-  setTarget(*targetPosition);
+  position            = targetPosition.add(_cartesianCoordinates);
+  setTarget(targetPosition);
 }
 
 void ArcFollowCamera::_checkInputs()

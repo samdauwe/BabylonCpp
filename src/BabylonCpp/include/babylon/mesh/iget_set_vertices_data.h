@@ -15,15 +15,17 @@ struct BABYLON_SHARED_EXPORT IGetSetVerticesData {
                                        bool forceCopy      = false)
     = 0;
   virtual IndicesArray getIndices(bool copyWhenShared = false) = 0;
-  virtual Mesh* setVerticesData(unsigned int kind, const Float32Array& data,
-                                bool updatable = false, int stride = -1)
+  virtual AbstractMesh* setVerticesData(unsigned int kind,
+                                        const Float32Array& data,
+                                        bool updatable = false, int stride = -1)
     = 0;
-  virtual Mesh* updateVerticesData(unsigned int kind, const Float32Array& data,
-                                   bool updateExtends = false,
-                                   bool makeItUnique  = false)
+  virtual AbstractMesh*
+  updateVerticesData(unsigned int kind, const Float32Array& data,
+                     bool updateExtends = false, bool makeItUnique = false)
     = 0;
-  virtual Mesh* setIndices(const IndicesArray& indices,
-                           size_t totalVertices = 0, bool updatable = false)
+  virtual AbstractMesh* setIndices(const IndicesArray& indices,
+                                   size_t totalVertices = 0,
+                                   bool updatable       = false)
     = 0;
 }; // end of struct IGetSetVerticesData
 

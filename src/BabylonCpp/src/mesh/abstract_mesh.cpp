@@ -22,6 +22,7 @@
 #include <babylon/mesh/vertex_buffer.h>
 #include <babylon/mesh/vertex_data.h>
 #include <babylon/particles/particle_system.h>
+#include <babylon/particles/solid_particle.h>
 #include <babylon/physics/joint/physics_joint.h>
 #include <babylon/physics/physics_engine.h>
 #include <babylon/rendering/bounding_box_renderer.h>
@@ -30,7 +31,6 @@
 
 namespace BABYLON {
 
-Quaternion AbstractMesh::_rotationAxisCache;
 Vector3 AbstractMesh::_lookAtVectorCache = Vector3(0.f, 0.f, 0.f);
 
 AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
@@ -40,10 +40,8 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
                                     OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE}
     , occlusionType{AbstractMesh::OCCLUSION_TYPE_NONE}
     , occlusionRetryCount{-1}
-    , billboardMode{AbstractMesh::BILLBOARDMODE_NONE}
     , visibility{1.f}
     , alphaIndex{numeric_limits_t<int>::max()}
-    , infiniteDistance{false}
     , isVisible{true}
     , isPickable{true}
     , showBoundingBox{false}
@@ -57,7 +55,6 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
     , renderOverlay{false}
     , overlayColor{Color3::Red()}
     , overlayAlpha{0.5f}
-    , scalingDeterminant{1.f}
     , useOctreeForRenderingSelection{true}
     , useOctreeForPicking{true}
     , useOctreeForCollisions{true}
@@ -69,7 +66,6 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
     , edgesWidth{1.f}
     , edgesColor{Color4(1.f, 0.f, 0.f, 1.f)}
     , _edgesRenderer{nullptr}
-    , _worldMatrix{::std::make_unique<Matrix>(Matrix::Zero())}
     , _masterMesh{nullptr}
     , _materialDefines{nullptr}
     , _boundingInfo{nullptr}
@@ -77,6 +73,7 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
     , _renderId{0}
     , _submeshesOctree{nullptr}
     , _unIndexed{false}
+    , _waitingFreezeWorldMatrix{nullptr}
     , _isOccluded{false}
     , _facetNb{0}
     , _partitioningSubdivisions{10}
@@ -84,14 +81,15 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
     , _facetDataEnabled{false}
     , _bbSize{Vector3::Zero()}
     , _subDiv{1, 1, 1, 1}
+    , _facetDepthSort{false}
+    , _facetDepthSortEnabled{false}
+    , _facetDepthSortFunction{nullptr}
+    , _facetDepthSortFrom{::std::make_unique<Vector3>(Vector3::Zero())}
     , _onCollideObserver{nullptr}
     , _onCollisionPositionChangeObserver{nullptr}
-    , _position{Vector3::Zero()}
     , _occlusionInternalRetryCounter{0}
     , _isOcclusionQueryInProgress{false}
-    , _rotation{Vector3::Zero()}
-    , _rotationQuaternionSet{false}
-    , _scaling{Vector3::One()}
+    , _occlusionQuery{nullptr}
     , _material{nullptr}
     , _receiveShadows{false}
     , _hasVertexAlpha{false}
@@ -106,15 +104,8 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
     , _collider{nullptr}
     , _oldPositionForCollisions{Vector3(0.f, 0.f, 0.f)}
     , _diffPositionForCollisions{Vector3(0.f, 0.f, 0.f)}
-    , _newPositionForCollisions{Vector3(0.f, 0.f, 0.f)}
-    , _meshToBoneReferal{nullptr}
-    , _localWorld{Matrix::Zero()}
-    , _absolutePosition{::std::make_unique<Vector3>(Vector3::Zero())}
     , _collisionsTransformMatrix{Matrix::Zero()}
     , _collisionsScalingMatrix{Matrix::Zero()}
-    , _isDirty{false}
-    , _pivotMatrix{Matrix::Identity()}
-    , _isWorldMatrixFrozen{false}
     , _skeleton{nullptr}
 {
   _resyncLightSources();
@@ -159,9 +150,43 @@ void AbstractMesh::setPartitioningBBoxRatio(float ratio)
   _partitioningBBoxRatio = ratio;
 }
 
+bool AbstractMesh::mustDepthSortFacets() const
+{
+  return _facetDepthSort;
+}
+
+void AbstractMesh::setMustDepthSortFacets(bool sort)
+{
+  _facetDepthSort = sort;
+}
+
+Vector3& AbstractMesh::facetDepthSortFrom()
+{
+  return *_facetDepthSortFrom.get();
+}
+
+const Vector3& AbstractMesh::facetDepthSortFrom() const
+{
+  return *_facetDepthSortFrom.get();
+}
+
+void AbstractMesh::setFacetDepthSortFrom(const Vector3& location)
+{
+  _facetDepthSortFrom = ::std::make_unique<Vector3>(location);
+}
+
 bool AbstractMesh::isFacetDataEnabled() const
 {
   return _facetDataEnabled;
+}
+
+bool AbstractMesh::_updateNonUniformScalingState(bool value)
+{
+  if (!TransformNode::_updateNonUniformScalingState(value)) {
+    return false;
+  }
+  _markSubMeshesAsMiscDirty();
+  return true;
 }
 
 void AbstractMesh::setOnCollide(
@@ -371,8 +396,8 @@ string_t AbstractMesh::toString(bool fullDetails) const
   }
   if (fullDetails) {
     oss << ", billboard mode: ";
-    vector_t<string_t> billboardModes{"NONE", "X",    "Y",    "null",
-                                      "Z",    "null", "null", "ALL"};
+    const vector_t<string_t> billboardModes{"NONE", "X",    "Y",    "null",
+                                            "Z",    "null", "null", "ALL"};
     if (billboardMode < billboardModes.size()) {
       oss << billboardModes[billboardMode];
     }
@@ -519,31 +544,6 @@ Skeleton* AbstractMesh::skeleton()
   return _skeleton;
 }
 
-vector_t<Vector3>& AbstractMesh::_positions()
-{
-  return _emptyPositions;
-}
-
-Vector3& AbstractMesh::position()
-{
-  return _position;
-}
-
-void AbstractMesh::setPosition(const Vector3& newPosition)
-{
-  _position = newPosition;
-}
-
-Vector3& AbstractMesh::rotation()
-{
-  return _rotation;
-}
-
-void AbstractMesh::setRotation(const Vector3& newRotation)
-{
-  _rotation = newRotation;
-}
-
 Vector3& AbstractMesh::scaling()
 {
   return _scaling;
@@ -555,36 +555,6 @@ void AbstractMesh::setScaling(const Vector3& newScaling)
   if (physicsImpostor) {
     physicsImpostor->forceUpdate();
   }
-}
-
-Quaternion& AbstractMesh::rotationQuaternion()
-{
-  return _rotationQuaternion;
-}
-
-bool AbstractMesh::rotationQuaternionSet() const
-{
-  return _rotationQuaternionSet;
-}
-
-void AbstractMesh::nullifyRotationQuaternion()
-{
-  _rotationQuaternionSet = false;
-}
-
-void AbstractMesh::setRotationQuaternion(const Quaternion& quaternion)
-{
-  _rotationQuaternion    = quaternion;
-  _rotationQuaternionSet = true;
-  // reset the rotation vector.
-  if (rotation().length() > 0) {
-    rotation().copyFromFloats(0.f, 0.f, 0.f);
-  }
-}
-
-void AbstractMesh::resetRotationQuaternion()
-{
-  _rotationQuaternionSet = false;
 }
 
 AbstractMesh* AbstractMesh::getParent()
@@ -601,27 +571,9 @@ Material* AbstractMesh::getMaterial()
   return material();
 }
 
-vector_t<AbstractMesh*>
-AbstractMesh::getChildMeshes(bool directDecendantsOnly,
-                             const ::std::function<bool(Node* node)>& predicate)
-{
-  return Node::getChildMeshes(directDecendantsOnly, predicate);
-}
-
-AbstractMesh& AbstractMesh::updatePoseMatrix(const Matrix& matrix)
-{
-  _poseMatrix->copyFrom(matrix);
-  return *this;
-}
-
-Matrix& AbstractMesh::getPoseMatrix()
-{
-  return *_poseMatrix;
-}
-
 AbstractMesh& AbstractMesh::disableEdgesRendering()
 {
-  if (_edgesRenderer != nullptr) {
+  if (_edgesRenderer) {
     _edgesRenderer->dispose();
     _edgesRenderer.reset(nullptr);
   }
@@ -668,25 +620,26 @@ Float32Array AbstractMesh::getVerticesData(unsigned int /*kind*/,
   return Float32Array();
 }
 
-Mesh* AbstractMesh::setVerticesData(unsigned int /*kind*/,
-                                    const Float32Array& /*data*/,
-                                    bool /*updatable*/, int /*stride*/)
+AbstractMesh* AbstractMesh::setVerticesData(unsigned int /*kind*/,
+                                            const Float32Array& /*data*/,
+                                            bool /*updatable*/, int /*stride*/)
 {
-  return nullptr;
+  return this;
 }
 
-Mesh* AbstractMesh::updateVerticesData(unsigned int /*kind*/,
-                                       const Float32Array& /*data*/,
-                                       bool /*updateExtends*/,
-                                       bool /*makeItUnique*/)
+AbstractMesh* AbstractMesh::updateVerticesData(unsigned int /*kind*/,
+                                               const Float32Array& /*data*/,
+                                               bool /*updateExtends*/,
+                                               bool /*makeItUnique*/)
 {
-  return nullptr;
+  return this;
 }
 
-Mesh* AbstractMesh::setIndices(const IndicesArray& /*indices*/,
-                               size_t /*totalVertices*/, bool /*updatable*/)
+AbstractMesh* AbstractMesh::setIndices(const IndicesArray& /*indices*/,
+                                       size_t /*totalVertices*/,
+                                       bool /*updatable*/)
 {
-  return nullptr;
+  return this;
 }
 
 bool AbstractMesh::isVerticesDataPresent(unsigned int /*kind*/)
@@ -694,16 +647,35 @@ bool AbstractMesh::isVerticesDataPresent(unsigned int /*kind*/)
   return false;
 }
 
-BoundingInfo* AbstractMesh::getBoundingInfo()
+BoundingInfo& AbstractMesh::getBoundingInfo()
 {
   if (_masterMesh) {
     return _masterMesh->getBoundingInfo();
   }
 
   if (!_boundingInfo) {
+    // _boundingInfo is being created here
     _updateBoundingInfo();
   }
-  return _boundingInfo.get();
+  // cannot be null.
+  return *_boundingInfo;
+}
+
+AbstractMesh& AbstractMesh::normalizeToUnitCube(bool includeDescendants)
+{
+  auto boundingVectors = getHierarchyBoundingVectors(includeDescendants);
+  auto sizeVec         = boundingVectors.max.subtract(boundingVectors.min);
+  auto maxDimension    = stl_util::max(sizeVec.x, sizeVec.y, sizeVec.z);
+
+  if (maxDimension == 0.f) {
+    return *this;
+  }
+
+  auto scale = 1.f / maxDimension;
+
+  scaling().scaleInPlace(scale);
+
+  return *this;
 }
 
 AbstractMesh& AbstractMesh::setBoundingInfo(const BoundingInfo& boundingInfo)
@@ -738,174 +710,13 @@ Matrix* AbstractMesh::getWorldMatrix()
     return _masterMesh->getWorldMatrix();
   }
 
-  if (_currentRenderId != getScene()->getRenderId() || !isSynchronized()) {
-    computeWorldMatrix();
-  }
-  return _worldMatrix.get();
-}
-
-Matrix& AbstractMesh::worldMatrixFromCache()
-{
-  return *_worldMatrix.get();
-}
-
-Vector3* AbstractMesh::absolutePosition()
-{
-  return _absolutePosition.get();
-}
-
-AbstractMesh& AbstractMesh::freezeWorldMatrix()
-{
-  // no guarantee world is not already frozen, switch off temporarily
-  _isWorldMatrixFrozen = false;
-  computeWorldMatrix(true);
-  _isWorldMatrixFrozen = true;
-  return *this;
-}
-
-AbstractMesh& AbstractMesh::unfreezeWorldMatrix()
-{
-  _isWorldMatrixFrozen = false;
-  computeWorldMatrix(true);
-  return *this;
-}
-
-bool AbstractMesh::isWorldMatrixFrozen()
-{
-  return _isWorldMatrixFrozen;
-}
-
-AbstractMesh& AbstractMesh::rotate(Vector3& axis, float amount,
-                                   const Space& space)
-{
-  axis.normalize();
-
-  if (!_rotationQuaternionSet) {
-    setRotationQuaternion(
-      Quaternion::RotationYawPitchRoll(_rotation.y, _rotation.x, _rotation.z));
-    _rotation = Vector3::Zero();
-  }
-  Quaternion rotationQuaternionTmp;
-  if (space == Space::LOCAL) {
-    rotationQuaternionTmp = Quaternion::RotationAxisToRef(
-      axis, amount, AbstractMesh::_rotationAxisCache);
-    _rotationQuaternion.multiplyToRef(rotationQuaternionTmp,
-                                      rotationQuaternion());
-  }
-  else {
-    if (parent()) {
-      auto invertParentWorldMatrix = parent()->getWorldMatrix();
-      invertParentWorldMatrix->invert();
-
-      axis = Vector3::TransformNormal(axis, *invertParentWorldMatrix);
-    }
-    rotationQuaternionTmp = Quaternion::RotationAxisToRef(
-      axis, amount, AbstractMesh::_rotationAxisCache);
-    rotationQuaternionTmp.multiplyToRef(rotationQuaternion(),
-                                        rotationQuaternion());
-  }
-  return *this;
-}
-
-AbstractMesh& AbstractMesh::rotateAround(const Vector3& point, Vector3& axis,
-                                         float amount)
-{
-  axis.normalize();
-  if (!rotationQuaternionSet()) {
-    const auto rotationValue = rotation();
-    setRotationQuaternion(Quaternion::RotationYawPitchRoll(
-      rotationValue.y, rotationValue.x, rotationValue.z));
-    rotation().copyFromFloats(0.f, 0.f, 0.f);
-  }
-  point.subtractToRef(position(), Tmp::Vector3Array[0]);
-  Matrix::TranslationToRef(Tmp::Vector3Array[0].x, Tmp::Vector3Array[0].y,
-                           Tmp::Vector3Array[0].z, Tmp::MatrixArray[0]);
-  Tmp::MatrixArray[0].invertToRef(Tmp::MatrixArray[2]);
-  Matrix::RotationAxisToRef(axis, amount, Tmp::MatrixArray[1]);
-  Tmp::MatrixArray[2].multiplyToRef(Tmp::MatrixArray[1], Tmp::MatrixArray[2]);
-  Tmp::MatrixArray[2].multiplyToRef(Tmp::MatrixArray[0], Tmp::MatrixArray[2]);
-
-  Tmp::MatrixArray[2].decompose(Tmp::Vector3Array[0], Tmp::QuaternionArray[0],
-                                Tmp::Vector3Array[1]);
-
-  position().addInPlace(Tmp::Vector3Array[1]);
-  Tmp::QuaternionArray[0].multiplyToRef(rotationQuaternion(),
-                                        rotationQuaternion());
-
-  return *this;
-}
-
-AbstractMesh& AbstractMesh::translate(Vector3& axis, float distance,
-                                      const Space& space)
-{
-  auto displacementVector = axis.scale(distance);
-
-  if (space == Space::LOCAL) {
-    auto tempV3 = getPositionExpressedInLocalSpace().add(displacementVector);
-    setPositionWithLocalVector(tempV3);
-  }
-  else {
-    setAbsolutePosition(getAbsolutePosition()->add(displacementVector));
-  }
-  return *this;
-}
-
-AbstractMesh& AbstractMesh::addRotation(float x, float y, float z)
-{
-  Quaternion rotationQuaternionTmp;
-  if (rotationQuaternionSet()) {
-    rotationQuaternionTmp = rotationQuaternion();
-  }
-  else {
-    rotationQuaternionTmp = Tmp::QuaternionArray[1];
-    Quaternion::RotationYawPitchRollToRef(rotation().y, rotation().x,
-                                          rotation().z, rotationQuaternionTmp);
-  }
-  auto accumulation = Tmp::QuaternionArray[0];
-  Quaternion::RotationYawPitchRollToRef(y, x, z, accumulation);
-  rotationQuaternionTmp.multiplyInPlace(accumulation);
-  if (!rotationQuaternionSet()) {
-    rotationQuaternionTmp.toEulerAnglesToRef(rotation());
-  }
-  return *this;
-}
-
-Vector3* AbstractMesh::getAbsolutePosition()
-{
-  computeWorldMatrix();
-  return _absolutePosition.get();
-}
-
-AbstractMesh&
-AbstractMesh::setAbsolutePosition(const Vector3& absolutePosition_)
-{
-  const float absolutePositionX = absolutePosition_.x;
-  const float absolutePositionY = absolutePosition_.y;
-  const float absolutePositionZ = absolutePosition_.z;
-
-  if (parent()) {
-    auto invertParentWorldMatrix = parent()->getWorldMatrix();
-    invertParentWorldMatrix->invert();
-
-    Vector3 worldPosition(absolutePositionX, absolutePositionY,
-                          absolutePositionZ);
-
-    _position
-      = Vector3::TransformCoordinates(worldPosition, *invertParentWorldMatrix);
-  }
-  else {
-    _position.x = absolutePositionX;
-    _position.y = absolutePositionY;
-    _position.z = absolutePositionZ;
-  }
-
-  return *this;
+  return TransformNode::getWorldMatrix();
 }
 
 AbstractMesh& AbstractMesh::movePOV(float amountRight, float amountUp,
                                     float amountForward)
 {
-  _position.addInPlace(calcMovePOV(amountRight, amountUp, amountForward));
+  position().addInPlace(calcMovePOV(amountRight, amountUp, amountForward));
   return *this;
 }
 
@@ -913,10 +724,10 @@ Vector3 AbstractMesh::calcMovePOV(float amountRight, float amountUp,
                                   float amountForward)
 {
   Matrix rotMatrix;
-  auto rotQuaternion
-    = _rotationQuaternionSet ?
-        rotationQuaternion() :
-        Quaternion::RotationYawPitchRoll(_rotation.y, _rotation.x, _rotation.z);
+  auto rotQuaternion = rotationQuaternion() ?
+                         *rotationQuaternion() :
+                         Quaternion::RotationYawPitchRoll(
+                           rotation().y, rotation().x, rotation().z);
   rotQuaternion.toRotationMatrix(rotMatrix);
 
   auto translationDelta = Vector3::Zero();
@@ -942,80 +753,6 @@ Vector3 AbstractMesh::calcRotatePOV(float flipBack, float twirlClockwise,
                  tiltRight * defForwardMult);
 }
 
-AbstractMesh& AbstractMesh::setPivotMatrix(const Matrix& matrix)
-{
-  _pivotMatrix              = matrix;
-  _cache.pivotMatrixUpdated = true;
-  return *this;
-}
-
-Matrix& AbstractMesh::getPivotMatrix()
-{
-  return _pivotMatrix;
-}
-
-bool AbstractMesh::_isSynchronized()
-{
-  if (_isDirty) {
-    return false;
-  }
-
-  if (billboardMode != _cache.billboardMode
-      || billboardMode != AbstractMesh::BILLBOARDMODE_NONE) {
-    return false;
-  }
-
-  if (_cache.pivotMatrixUpdated) {
-    return false;
-  }
-
-  if (infiniteDistance) {
-    return false;
-  }
-
-  if (!_cache.position.equals(_position)) {
-    return false;
-  }
-
-  if (_rotationQuaternionSet) {
-    if (!_cache.rotationQuaternion.equals(_rotationQuaternion)) {
-      return false;
-    }
-  }
-  else {
-    if (!_cache.rotation.equals(rotation())) {
-      return false;
-    }
-  }
-
-  if (!_cache.scaling.equals(scaling())) {
-    return false;
-  }
-
-  return true;
-}
-
-void AbstractMesh::_initCache()
-{
-  Node::_initCache();
-
-  _cache.localMatrixUpdated = false;
-  _cache.position           = Vector3::Zero();
-  _cache.scaling            = Vector3::Zero();
-  _cache.rotation           = Vector3::Zero();
-  _cache.rotationQuaternion = Quaternion(0.f, 0.f, 0.f, 0.f);
-  _cache.billboardMode      = AbstractMesh::BILLBOARDMODE_NONE;
-}
-
-void AbstractMesh::markAsDirty(unsigned int property)
-{
-  if (property == static_cast<unsigned>(PropertyType::ROTATION)) {
-    resetRotationQuaternion();
-  }
-  _currentRenderId = numeric_limits_t<int>::max();
-  _isDirty         = true;
-}
-
 MinMax AbstractMesh::getHierarchyBoundingVectors(bool includeDescendants)
 {
   computeWorldMatrix(true);
@@ -1033,15 +770,15 @@ MinMax AbstractMesh::getHierarchyBoundingVectors(bool includeDescendants)
                   numeric_limits_t<float>::lowest());
   }
   else {
-    min = boundingInfo->boundingBox.minimumWorld;
-    max = boundingInfo->boundingBox.maximumWorld;
+    min = boundingInfo.boundingBox.minimumWorld;
+    max = boundingInfo.boundingBox.maximumWorld;
   }
 
   if (includeDescendants) {
     auto descendants = getDescendants(false);
 
     for (auto& descendant : descendants) {
-      auto childMesh = static_cast<AbstractMesh*>(descendant);
+      auto childMesh = static_cast<class AbstractMesh*>(descendant);
 
       childMesh->computeWorldMatrix(true);
       auto childBoundingInfo = childMesh->getBoundingInfo();
@@ -1049,7 +786,7 @@ MinMax AbstractMesh::getHierarchyBoundingVectors(bool includeDescendants)
       if (childMesh->getTotalVertices() == 0) {
         continue;
       }
-      auto boundingBox = childBoundingInfo->boundingBox;
+      const auto& boundingBox = childBoundingInfo.boundingBox;
 
       auto minBox = boundingBox.minimumWorld;
       auto maxBox = boundingBox.maximumWorld;
@@ -1065,13 +802,11 @@ MinMax AbstractMesh::getHierarchyBoundingVectors(bool includeDescendants)
 AbstractMesh& AbstractMesh::_updateBoundingInfo()
 {
   if (!_boundingInfo) {
-    auto absolutePos = absolutePosition();
-    _boundingInfo
-      = ::std::make_unique<BoundingInfo>(*absolutePos, *absolutePos);
+    _boundingInfo = ::std::make_unique<BoundingInfo>(absolutePosition(),
+                                                     absolutePosition());
   }
 
   _boundingInfo->update(worldMatrixFromCache());
-
   _updateSubMeshesBoundingInfo(worldMatrixFromCache());
 
   return *this;
@@ -1092,298 +827,59 @@ AbstractMesh& AbstractMesh::_updateSubMeshesBoundingInfo(Matrix& matrix)
   return *this;
 }
 
-Matrix AbstractMesh::computeWorldMatrix(bool force)
-{
-  if (_isWorldMatrixFrozen) {
-    return *_worldMatrix;
-  }
-
-  if (!force && isSynchronized(true)) {
-    _currentRenderId = getScene()->getRenderId();
-    return *_worldMatrix;
-  }
-
-  _cache.position.copyFrom(_position);
-  _cache.scaling.copyFrom(scaling());
-  _cache.pivotMatrixUpdated = false;
-  _cache.billboardMode      = billboardMode;
-  _currentRenderId          = getScene()->getRenderId();
-  _isDirty                  = false;
-
-  // Scaling
-  Matrix::ScalingToRef(_scaling.x * scalingDeterminant,
-                       _scaling.y * scalingDeterminant,
-                       _scaling.z * scalingDeterminant, Tmp::MatrixArray[1]);
-
-  // Rotation
-
-  // Rotate, if quaternion is set and rotation was used
-  if (_rotationQuaternionSet) {
-    float len = _rotation.length();
-    if (len > 0.f) {
-      _rotationQuaternion.multiplyInPlace(Quaternion::RotationYawPitchRoll(
-        rotation().y, rotation().x, rotation().z));
-      rotation().copyFromFloats(0.f, 0.f, 0.f);
-    }
-  }
-
-  if (_rotationQuaternionSet) {
-    _rotationQuaternion.toRotationMatrix(Tmp::MatrixArray[0]);
-    _cache.rotationQuaternion.copyFrom(_rotationQuaternion);
-  }
-  else {
-    Matrix::RotationYawPitchRollToRef(rotation().y, rotation().x, rotation().z,
-                                      Tmp::MatrixArray[0]);
-    _cache.rotation.copyFrom(rotation());
-  }
-
-  // Translation
-  if (infiniteDistance && !parent()) {
-    auto camera = getScene()->activeCamera;
-    if (camera) {
-      auto cameraWorldMatrix = camera->getWorldMatrix();
-
-      Vector3 cameraGlobalPosition(cameraWorldMatrix->m[12],
-                                   cameraWorldMatrix->m[13],
-                                   cameraWorldMatrix->m[14]);
-
-      Matrix::TranslationToRef(_position.x + cameraGlobalPosition.x,
-                               _position.y + cameraGlobalPosition.y,
-                               _position.z + cameraGlobalPosition.z,
-                               Tmp::MatrixArray[2]);
-    }
-  }
-  else {
-    Matrix::TranslationToRef(_position.x, _position.y, _position.z,
-                             Tmp::MatrixArray[2]);
-  }
-
-  // Composing transformations
-  _pivotMatrix.multiplyToRef(Tmp::MatrixArray[1], Tmp::MatrixArray[4]);
-  Tmp::MatrixArray[4].multiplyToRef(Tmp::MatrixArray[0], Tmp::MatrixArray[5]);
-
-  // Billboarding (testing PG:http://www.babylonjs-playground.com/#UJEIL#13)
-  if (billboardMode != AbstractMesh::BILLBOARDMODE_NONE
-      && getScene()->activeCamera) {
-    if ((billboardMode & AbstractMesh::BILLBOARDMODE_ALL)
-        != AbstractMesh::BILLBOARDMODE_ALL) {
-      // Need to decompose each rotation here
-      auto currentPosition = Tmp::Vector3Array[3];
-
-      if (parent() && parent()->getWorldMatrix()) {
-        if (_meshToBoneReferal) {
-          parent()->getWorldMatrix()->multiplyToRef(
-            *_meshToBoneReferal->getWorldMatrix(), Tmp::MatrixArray[6]);
-          Vector3::TransformCoordinatesToRef(position(), Tmp::MatrixArray[6],
-                                             currentPosition);
-        }
-        else {
-          Vector3::TransformCoordinatesToRef(
-            position(), *parent()->getWorldMatrix(), currentPosition);
-        }
-      }
-      else {
-        currentPosition.copyFrom(position());
-      }
-
-      currentPosition.subtractInPlace(
-        getScene()->activeCamera->globalPosition());
-
-      auto finalEuler = Tmp::Vector3Array[4].copyFromFloats(0.f, 0.f, 0.f);
-      if ((billboardMode & AbstractMesh::BILLBOARDMODE_X)
-          == AbstractMesh::BILLBOARDMODE_X) {
-        finalEuler.x = ::std::atan2(-currentPosition.y, currentPosition.z);
-      }
-
-      if ((billboardMode & AbstractMesh::BILLBOARDMODE_Y)
-          == AbstractMesh::BILLBOARDMODE_Y) {
-        finalEuler.y = ::std::atan2(currentPosition.x, currentPosition.z);
-      }
-
-      if ((billboardMode & AbstractMesh::BILLBOARDMODE_Z)
-          == AbstractMesh::BILLBOARDMODE_Z) {
-        finalEuler.z = ::std::atan2(currentPosition.y, currentPosition.x);
-      }
-
-      Matrix::RotationYawPitchRollToRef(finalEuler.y, finalEuler.x,
-                                        finalEuler.z, Tmp::MatrixArray[0]);
-    }
-    else {
-      Tmp::MatrixArray[1].copyFrom(getScene()->activeCamera->getViewMatrix());
-
-      Tmp::MatrixArray[1].setTranslationFromFloats(0, 0, 0);
-      Tmp::MatrixArray[1].invertToRef(Tmp::MatrixArray[0]);
-    }
-
-    Tmp::MatrixArray[1].copyFrom(Tmp::MatrixArray[5]);
-    Tmp::MatrixArray[1].multiplyToRef(Tmp::MatrixArray[0], Tmp::MatrixArray[5]);
-  }
-
-  // Local world
-  Tmp::MatrixArray[5].multiplyToRef(Tmp::MatrixArray[2], _localWorld);
-
-  // Parent
-  if (parent() && parent()->getWorldMatrix()) {
-    if (billboardMode != AbstractMesh::BILLBOARDMODE_NONE) {
-      if (_meshToBoneReferal) {
-        parent()->getWorldMatrix()->multiplyToRef(
-          *_meshToBoneReferal->getWorldMatrix(), Tmp::MatrixArray[6]);
-        Tmp::MatrixArray[5].copyFrom(Tmp::MatrixArray[6]);
-      }
-      else {
-        Tmp::MatrixArray[5].copyFrom(*parent()->getWorldMatrix());
-      }
-
-      _localWorld.getTranslationToRef(Tmp::Vector3Array[5]);
-      Vector3::TransformCoordinatesToRef(
-        Tmp::Vector3Array[5], Tmp::MatrixArray[5], Tmp::Vector3Array[5]);
-      _worldMatrix->copyFrom(_localWorld);
-      _worldMatrix->setTranslation(Tmp::Vector3Array[5]);
-    }
-    else {
-      if (_meshToBoneReferal) {
-        _localWorld.multiplyToRef(*parent()->getWorldMatrix(),
-                                  Tmp::MatrixArray[6]);
-        Tmp::MatrixArray[6].multiplyToRef(*_meshToBoneReferal->getWorldMatrix(),
-                                          *_worldMatrix);
-      }
-      else {
-        _localWorld.multiplyToRef(*parent()->getWorldMatrix(), *_worldMatrix);
-      }
-    }
-    _markSyncedWithParent();
-  }
-  else {
-    _worldMatrix->copyFrom(_localWorld);
-  }
-
-  // Bounding info
-  _updateBoundingInfo();
-
-  // Absolute position
-  _absolutePosition->copyFromFloats(_worldMatrix->m[12], _worldMatrix->m[13],
-                                    _worldMatrix->m[14]);
-
-  // Callbacks
-  onAfterWorldMatrixUpdateObservable.notifyObservers(this);
-
-  if (!_poseMatrix) {
-    _poseMatrix = ::std::make_unique<Matrix>(Matrix::Invert(*_worldMatrix));
-  }
-
-  return *_worldMatrix;
-}
-
-AbstractMesh& AbstractMesh::registerAfterWorldMatrixUpdate(
-  const ::std::function<void(AbstractMesh* mesh, EventState&)>& func)
-{
-  onAfterWorldMatrixUpdateObservable.add(func);
-  return *this;
-}
-
-AbstractMesh& AbstractMesh::unregisterAfterWorldMatrixUpdate(
-  const ::std::function<void(AbstractMesh* mesh, EventState&)>& func)
-{
-  onAfterWorldMatrixUpdateObservable.removeCallback(func);
-  return *this;
-}
-
-AbstractMesh& AbstractMesh::setPositionWithLocalVector(const Vector3& vector3)
-{
-  computeWorldMatrix();
-
-  _position = Vector3(Vector3::TransformNormal(vector3, _localWorld));
-
-  return *this;
-}
-
-Vector3 AbstractMesh::getPositionExpressedInLocalSpace()
-{
-  computeWorldMatrix();
-  auto invLocalWorldMatrix = _localWorld;
-  invLocalWorldMatrix.invert();
-
-  return Vector3::TransformNormal(_position, invLocalWorldMatrix);
-}
-
-AbstractMesh& AbstractMesh::locallyTranslate(const Vector3& vector3)
-{
-  computeWorldMatrix(true);
-
-  _position = Vector3(Vector3::TransformCoordinates(vector3, _localWorld));
-
-  return *this;
-}
-
-AbstractMesh& AbstractMesh::lookAt(const Vector3& targetPoint, float yawCor,
-                                   float pitchCor, float rollCor, Space space)
-{
-  Vector3& dv = AbstractMesh::_lookAtVectorCache;
-  Vector3 pos = (space == Space::LOCAL) ? _position : *getAbsolutePosition();
-  targetPoint.subtractToRef(pos, dv);
-  float yaw   = -::std::atan2(dv.z, dv.x) - Math::PI_2;
-  float len   = ::std::sqrt(dv.x * dv.x + dv.z * dv.z);
-  float pitch = ::std::atan2(dv.y, len);
-  if (!_rotationQuaternionSet) {
-    _rotationQuaternion    = Quaternion();
-    _rotationQuaternionSet = true;
-  }
-  Quaternion::RotationYawPitchRollToRef(yaw + yawCor, pitch + pitchCor, rollCor,
-                                        _rotationQuaternion);
-  return *this;
-}
-
-AbstractMesh& AbstractMesh::attachToBone(Bone* bone, AbstractMesh* affectedMesh)
-{
-  _meshToBoneReferal = affectedMesh;
-  Node::setParent(bone);
-
-  if (bone->getWorldMatrix()->determinant() < 0.f) {
-    scalingDeterminant *= -1.f;
-  }
-
-  return *this;
-}
-
-AbstractMesh& AbstractMesh::detachFromBone()
-{
-  if (parent()->getWorldMatrix()->determinant() < 0.f) {
-    scalingDeterminant *= -1.f;
-  }
-
-  _meshToBoneReferal = nullptr;
-  Node::setParent(nullptr);
-
-  return *this;
-}
-
 bool AbstractMesh::isInFrustum(const array_t<Plane, 6>& frustumPlanes)
 {
-  return _boundingInfo->isInFrustum(frustumPlanes);
+  return _boundingInfo != nullptr && _boundingInfo->isInFrustum(frustumPlanes);
 }
 
 bool AbstractMesh::isCompletelyInFrustum(
   const array_t<Plane, 6>& frustumPlanes) const
 {
-  return _boundingInfo->isCompletelyInFrustum(frustumPlanes);
+  return _boundingInfo != nullptr
+         && _boundingInfo->isCompletelyInFrustum(frustumPlanes);
 }
 
-bool AbstractMesh::intersectsMesh(AbstractMesh* mesh, bool precise)
+bool AbstractMesh::intersectsMesh(class AbstractMesh* mesh, bool precise,
+                                  bool includeDescendants)
 {
   if (!_boundingInfo || !mesh->_boundingInfo) {
     return false;
   }
 
-  return _boundingInfo->intersects(*mesh->_boundingInfo, precise);
+  if (_boundingInfo->intersects(*mesh->_boundingInfo, precise)) {
+    return true;
+  }
+
+  if (includeDescendants) {
+    for (auto& child : getChildMeshes()) {
+      if (child->intersectsMesh(mesh, precise, true)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
-bool AbstractMesh::intersectsMesh(SolidParticle* /*sp*/, bool /*precise*/)
+bool AbstractMesh::intersectsMesh(SolidParticle* sp, bool precise,
+                                  bool includeDescendants)
 {
-  /*if (!_boundingInfo || !sp->_boundingInfo) {
+  if (!_boundingInfo || !sp->_boundingInfo) {
     return false;
   }
 
-  return _boundingInfo->intersects(*sp->_boundingInfo, precise);*/
+  if (_boundingInfo->intersects(*sp->_boundingInfo, precise)) {
+    return true;
+  }
+
+  if (includeDescendants) {
+    for (auto& child : getChildMeshes()) {
+      if (child->intersectsMesh(sp, precise, true)) {
+        return true;
+      }
+    }
+  }
+
   return false;
 }
 
@@ -1398,7 +894,7 @@ bool AbstractMesh::intersectsPoint(const Vector3& point)
 
 PhysicsImpostor* AbstractMesh::getPhysicsImpostor()
 {
-  return physicsImpostor.get();
+  return physicsImpostor ? physicsImpostor.get() : nullptr;
 }
 
 Vector3 AbstractMesh::getPositionInCameraSpace(Camera* camera)
@@ -1407,7 +903,7 @@ Vector3 AbstractMesh::getPositionInCameraSpace(Camera* camera)
     camera = getScene()->activeCamera;
   }
 
-  return Vector3::TransformCoordinates(*_absolutePosition,
+  return Vector3::TransformCoordinates(absolutePosition(),
                                        camera->getViewMatrix());
 }
 
@@ -1417,7 +913,7 @@ float AbstractMesh::getDistanceToCamera(Camera* camera)
     camera = getScene()->activeCamera;
   }
 
-  return _absolutePosition->subtract(camera->position).length();
+  return absolutePosition().subtract(camera->position).length();
 }
 
 AbstractMesh& AbstractMesh::applyImpulse(const Vector3& force,
@@ -1452,18 +948,17 @@ bool AbstractMesh::checkCollisions() const
 void AbstractMesh::setCheckCollisions(bool collisionEnabled)
 {
   _checkCollisions = collisionEnabled;
-  /*if (getScene()->workerCollisions()) {
-    getScene()->collisionCoordinator()->onMeshUpdated(this);
-  }*/
+  if (getScene()->workerCollisions()) {
+    getScene()->collisionCoordinator->onMeshUpdated(this);
+  }
 }
 
-AbstractMesh&
-AbstractMesh::moveWithCollisions(const Vector3& /*moveWithCollisions*/)
+AbstractMesh& AbstractMesh::moveWithCollisions(Vector3& displacement)
 {
   auto globalPosition = getAbsolutePosition();
 
-  globalPosition->subtractFromFloatsToRef(0.f, ellipsoid.y, 0.f,
-                                          _oldPositionForCollisions);
+  globalPosition.subtractFromFloatsToRef(0.f, ellipsoid.y, 0.f,
+                                         _oldPositionForCollisions);
   _oldPositionForCollisions.addInPlace(ellipsoidOffset);
 
   if (!_collider) {
@@ -1472,52 +967,62 @@ AbstractMesh::moveWithCollisions(const Vector3& /*moveWithCollisions*/)
 
   _collider->radius = ellipsoid;
 
-  // getScene()->collisionCoordinator->getNewPosition(
-  //  _oldPositionForCollisions, moveWithCollisions, _collider.get(), 3, this,
-  //  _onCollisionPositionChange(), uniqueId);
+  getScene()->collisionCoordinator->getNewPosition(
+    _oldPositionForCollisions, displacement, _collider.get(), 3, this,
+    [this](int collisionId, Vector3& newPosition, AbstractMesh* collidedMesh) {
+      _onCollisionPositionChange(collisionId, newPosition, collidedMesh);
+    },
+    uniqueId);
 
   return *this;
 }
 
 void AbstractMesh::_onCollisionPositionChange(int /*collisionId*/,
-                                              const Vector3& /*newPosition*/,
-                                              AbstractMesh* /*collidedMesh*/)
+                                              Vector3& newPosition,
+                                              AbstractMesh* collidedMesh)
 {
-  /*if (getScene().workerCollisions) {
-    newPosition.multiplyInPlace(_collider.radius);
+  if (getScene()->workerCollisions()) {
+    newPosition.multiplyInPlace(_collider->radius);
   }
 
   newPosition.subtractToRef(_oldPositionForCollisions,
                             _diffPositionForCollisions);
 
   if (_diffPositionForCollisions.length() > Engine::CollisionsEpsilon) {
-    position.addInPlace(_diffPositionForCollisions);
+    position().addInPlace(_diffPositionForCollisions);
   }
 
   if (collidedMesh) {
     onCollideObservable.notifyObservers(collidedMesh);
   }
 
-  onCollisionPositionChangeObservable.notifyObservers(position);*/
+  onCollisionPositionChangeObservable.notifyObservers(&position());
 }
 
 Octree<SubMesh*>*
-  AbstractMesh::createOrUpdateSubmeshesOctree(size_t /*maxCapacity*/,
-                                              size_t /*maxDepth*/)
+AbstractMesh::createOrUpdateSubmeshesOctree(size_t maxCapacity, size_t maxDepth)
 {
-  // if (!_submeshesOctree) {
-  //  _submeshesOctree = new Octree<SubMesh*>(
-  //    [](SubMesh* entry, OctreeBlock<SubMesh*>& block) {
-  //      Octree<AbstractMesh*>::CreationFuncForSubMeshes(entry, block);
-  //    },
-  //    maxCapacity, maxDepth);
-  //}
+  if (!_submeshesOctree) {
+    _submeshesOctree = new Octree<SubMesh*>(
+      [](SubMesh* entry, OctreeBlock<SubMesh*>& block) {
+        Octree<AbstractMesh*>::CreationFuncForSubMeshes(entry, block);
+      },
+      maxCapacity, maxDepth);
+  }
 
   computeWorldMatrix(true);
 
+  auto boundingInfo = getBoundingInfo();
+
   // Update octree
-  // BoundingBox& bbox = getBoundingInfo()->boundingBox;
-  //_submeshesOctree->update(bbox.minimumWorld, bbox.maximumWorld, subMeshes);
+  vector_t<SubMesh*> subMeshPtrs;
+  subMeshPtrs.reserve(subMeshes.size());
+  for (auto& subMesh : subMeshes) {
+    subMeshPtrs.emplace_back(subMesh.get());
+  }
+
+  BoundingBox& bbox = boundingInfo.boundingBox;
+  _submeshesOctree->update(bbox.minimumWorld, bbox.maximumWorld, subMeshPtrs);
 
   return _submeshesOctree;
 }
@@ -1709,7 +1214,7 @@ AbstractMesh& AbstractMesh::releaseSubMeshes()
   return *this;
 }
 
-void AbstractMesh::dispose(bool doNotRecurse)
+void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   // Action manager
   if (actionManager) {
@@ -1722,9 +1227,6 @@ void AbstractMesh::dispose(bool doNotRecurse)
   if (skeletonTmp) {
     skeletonTmp = nullptr;
   }
-
-  // Animations
-  getScene()->stopAnimation(this);
 
   // Physics
   if (physicsImpostor) {
@@ -1753,8 +1255,10 @@ void AbstractMesh::dispose(bool doNotRecurse)
     auto generator = light->getShadowGenerator();
     if (generator) {
       auto shadowMap = generator->getShadowMap();
-      ::std::remove(shadowMap->renderList.begin(), shadowMap->renderList.end(),
-                    this);
+      if (shadowMap && !shadowMap->renderList.empty()) {
+        ::std::remove(shadowMap->renderList.begin(),
+                      shadowMap->renderList.end(), this);
+      }
     }
   }
 
@@ -1789,6 +1293,12 @@ void AbstractMesh::dispose(bool doNotRecurse)
   // Engine
   engine->wipeCaches();
 
+  if (disposeMaterialAndTextures) {
+    if (material()) {
+      material()->dispose(false, true);
+    }
+  }
+
   if (!doNotRecurse) {
     // Particles
     for (size_t index = 0; index < getScene()->particleSystems.size();
@@ -1799,17 +1309,6 @@ void AbstractMesh::dispose(bool doNotRecurse)
         getScene()->particleSystems[index]->dispose();
         --index;
       }
-    }
-
-    // Children
-    for (auto& object : getDescendants(true)) {
-      object->dispose();
-    }
-  }
-  else {
-    for (auto& child : getChildMeshes(true)) {
-      child->setParent(nullptr);
-      child->computeWorldMatrix(true);
     }
   }
 
@@ -1824,116 +1323,10 @@ void AbstractMesh::dispose(bool doNotRecurse)
 
   _isDisposed = true;
 
-  Node::dispose();
+  TransformNode::dispose(doNotRecurse);
 
   // Remove from scene
   getScene()->removeMesh(this);
-}
-
-Vector3 AbstractMesh::getDirection(const Vector3& localAxis)
-{
-  auto result = Vector3::Zero();
-
-  getDirectionToRef(localAxis, result);
-
-  return result;
-}
-
-AbstractMesh& AbstractMesh::getDirectionToRef(const Vector3& localAxis,
-                                              Vector3& result)
-{
-  Vector3::TransformNormalToRef(localAxis, *getWorldMatrix(), result);
-  return *this;
-}
-
-AbstractMesh& AbstractMesh::setPivotPoint(const Vector3& point,
-                                          const Space& space)
-{
-  auto _point = point;
-  if (getScene()->getRenderId() == 0) {
-    computeWorldMatrix(true);
-  }
-
-  auto wm = getWorldMatrix();
-
-  if (space == Space::WORLD) {
-    auto& tmat = Tmp::MatrixArray[0];
-    wm->invertToRef(tmat);
-    _point = Vector3::TransformCoordinates(_point, tmat);
-  }
-
-  Vector3::TransformCoordinatesToRef(_point, *wm, _position);
-
-  _pivotMatrix.m[12] = -_point.x;
-  _pivotMatrix.m[13] = -_point.y;
-  _pivotMatrix.m[14] = -_point.z;
-
-  _cache.pivotMatrixUpdated = true;
-
-  return *this;
-}
-
-Vector3 AbstractMesh::getPivotPoint() const
-{
-  auto point = Vector3::Zero();
-
-  getPivotPointToRef(point);
-
-  return point;
-}
-
-const AbstractMesh& AbstractMesh::getPivotPointToRef(Vector3& result) const
-{
-  result.x = -_pivotMatrix.m[12];
-  result.y = -_pivotMatrix.m[13];
-  result.z = -_pivotMatrix.m[14];
-
-  return *this;
-}
-
-Vector3 AbstractMesh::getAbsolutePivotPoint()
-{
-  auto point = Vector3::Zero();
-
-  getAbsolutePivotPointToRef(point);
-
-  return point;
-}
-
-AbstractMesh& AbstractMesh::setParent(AbstractMesh* mesh)
-{
-  auto child  = this;
-  auto parent = mesh;
-
-  if (mesh == nullptr) {
-    auto& rotation = Tmp::QuaternionArray[0];
-    auto& position = Tmp::Vector3Array[0];
-    auto& scale    = Tmp::Vector3Array[1];
-
-    child->getWorldMatrix()->decompose(scale, rotation, position);
-
-    if (child->_rotationQuaternionSet) {
-      child->rotationQuaternion().copyFrom(rotation);
-    }
-    else {
-      rotation.toEulerAnglesToRef(child->rotation());
-    }
-
-    child->position().x = position.x;
-    child->position().y = position.y;
-    child->position().z = position.z;
-  }
-  else {
-    auto& position = Tmp::Vector3Array[0];
-    auto& m1       = Tmp::MatrixArray[0];
-
-    parent->getWorldMatrix()->invertToRef(m1);
-    Vector3::TransformCoordinatesToRef(child->position(), m1, position);
-
-    child->position().copyFrom(position);
-  }
-  static_cast<Node*>(child)->setParent(parent);
-  return *this;
 }
 
 AbstractMesh& AbstractMesh::addChild(AbstractMesh* mesh)
@@ -1948,22 +1341,16 @@ AbstractMesh& AbstractMesh::removeChild(AbstractMesh* mesh)
   return *this;
 }
 
-AbstractMesh& AbstractMesh::getAbsolutePivotPointToRef(Vector3& result)
-{
-  result.x = _pivotMatrix.m[12];
-  result.y = _pivotMatrix.m[13];
-  result.z = _pivotMatrix.m[14];
-
-  getPivotPointToRef(result);
-
-  Vector3::TransformCoordinatesToRef(result, *getWorldMatrix(), result);
-
-  return *this;
-}
-
 AbstractMesh& AbstractMesh::_initFacetData()
 {
   _facetNb = getIndices().size() / 3;
+
+  // default nb of partitioning subdivisions = 10
+  _partitioningSubdivisions
+    = (_partitioningSubdivisions) ? _partitioningSubdivisions : 10;
+  // default ratio 1.01 = the partitioning is 1% bigger than the bounding box
+  _partitioningBBoxRatio
+    = (_partitioningBBoxRatio != 0.f) ? _partitioningBBoxRatio : 1.01f;
 
   _facetNormals.resize(_facetNb);
   ::std::fill(_facetNormals.begin(), _facetNormals.end(), Vector3::Zero());
@@ -1985,14 +1372,45 @@ AbstractMesh& AbstractMesh::updateFacetData()
   auto indices   = getIndices();
   auto normals   = getVerticesData(VertexBuffer::NormalKind);
   auto bInfo     = getBoundingInfo();
-  _bbSize.x      = (bInfo->maximum.x - bInfo->minimum.x > Math::Epsilon) ?
-                bInfo->maximum.x - bInfo->minimum.x :
+
+  if (_facetDepthSort && !_facetDepthSortEnabled) {
+    // init arrays, matrix and sort function on first call
+    _facetDepthSortEnabled = true;
+    // indices instanceof Uint32Array
+    {
+      _depthSortedIndices = Uint32Array(indices);
+    }
+
+    _facetDepthSortFunction
+      = [](const DepthSortedFacet& f1, const DepthSortedFacet& f2) {
+          const auto diff = f2.sqDistance - f1.sqDistance;
+          return (diff < 0.f) ? -1 : (diff > 0.f) ? 1 : 0;
+        };
+    if (!_facetDepthSortFrom) {
+      auto& camera        = getScene()->activeCamera;
+      _facetDepthSortFrom = (camera) ?
+                              ::std::make_unique<Vector3>(camera->position) :
+                              ::std::make_unique<Vector3>(Vector3::Zero());
+    }
+    _depthSortedFacets.clear();
+    for (unsigned int f = 0; f < _facetNb; f++) {
+      DepthSortedFacet depthSortedFacet;
+      depthSortedFacet.ind        = f * 3;
+      depthSortedFacet.sqDistance = 0.f;
+      _depthSortedFacets.emplace_back(depthSortedFacet);
+    }
+    _invertedMatrix       = Matrix::Identity();
+    _facetDepthSortOrigin = Vector3::Zero();
+  }
+
+  _bbSize.x = (bInfo.maximum.x - bInfo.minimum.x > Math::Epsilon) ?
+                bInfo.maximum.x - bInfo.minimum.x :
                 Math::Epsilon;
-  _bbSize.y = (bInfo->maximum.y - bInfo->minimum.y > Math::Epsilon) ?
-                bInfo->maximum.y - bInfo->minimum.y :
+  _bbSize.y = (bInfo.maximum.y - bInfo.minimum.y > Math::Epsilon) ?
+                bInfo.maximum.y - bInfo.minimum.y :
                 Math::Epsilon;
-  _bbSize.z = (bInfo->maximum.z - bInfo->minimum.z > Math::Epsilon) ?
-                bInfo->maximum.z - bInfo->minimum.z :
+  _bbSize.z = (bInfo.maximum.z - bInfo.minimum.z > Math::Epsilon) ?
+                bInfo.maximum.z - bInfo.minimum.z :
                 Math::Epsilon;
   auto bbSizeMax = (_bbSize.x > _bbSize.y) ? _bbSize.x : _bbSize.y;
   bbSizeMax      = (bbSizeMax > _bbSize.z) ? bbSizeMax : _bbSize.z;
@@ -2003,20 +1421,44 @@ AbstractMesh& AbstractMesh::updateFacetData()
   // according to each bbox size per axis
   _subDiv.Y
     = static_cast<unsigned>(::std::floor(_subDiv.max * _bbSize.y / bbSizeMax));
+  // at least one subdivision
   _subDiv.Z
     = static_cast<unsigned>(::std::floor(_subDiv.max * _bbSize.z / bbSizeMax));
-  _subDiv.X = _subDiv.X < 1 ? 1 : _subDiv.X; // at least one subdivision
+  _subDiv.X = _subDiv.X < 1 ? 1 : _subDiv.X;
   _subDiv.Y = _subDiv.Y < 1 ? 1 : _subDiv.Y;
   _subDiv.Z = _subDiv.Z < 1 ? 1 : _subDiv.Z;
   // set the parameters for ComputeNormals()
   _facetParameters.facetNormals      = getFacetLocalNormals();
   _facetParameters.facetPositions    = getFacetLocalPositions();
   _facetParameters.facetPartitioning = getFacetLocalPartitioning();
-  _facetParameters.bInfo             = *bInfo;
+  _facetParameters.bInfo             = bInfo;
   _facetParameters.bbSize            = _bbSize;
   _facetParameters.subDiv            = _subDiv;
   _facetParameters.ratio             = partitioningBBoxRatio();
+  _facetParameters.depthSort         = _facetDepthSort;
+  if (_facetDepthSort && _facetDepthSortEnabled) {
+    computeWorldMatrix(true);
+    _worldMatrix->invertToRef(_invertedMatrix);
+    Vector3::TransformCoordinatesToRef(*_facetDepthSortFrom, _invertedMatrix,
+                                       _facetDepthSortOrigin);
+    _facetParameters.distanceTo = _facetDepthSortOrigin;
+  }
+  _facetParameters.depthSortedFacets = _depthSortedFacets;
   VertexData::ComputeNormals(positions, indices, normals, _facetParameters);
+
+  if (_facetDepthSort && _facetDepthSortEnabled) {
+    ::std::sort(_depthSortedFacets.begin(), _depthSortedFacets.end(),
+                _facetDepthSortFunction);
+    auto l = (_depthSortedIndices.size() / 3);
+    for (size_t f = 0; f < l; f++) {
+      const auto& sind               = _depthSortedFacets[f].ind;
+      _depthSortedIndices[f * 3]     = indices[sind];
+      _depthSortedIndices[f * 3 + 1] = indices[sind + 1];
+      _depthSortedIndices[f * 3 + 2] = indices[sind + 2];
+    }
+    updateIndices(_depthSortedIndices);
+  }
+
   return *this;
 }
 
@@ -2076,14 +1518,15 @@ AbstractMesh& AbstractMesh::getFacetNormalToRef(unsigned int i, Vector3& ref)
 Uint32Array AbstractMesh::getFacetsAtLocalCoordinates(float x, float y, float z)
 {
   auto bInfo = getBoundingInfo();
-  int ox     = static_cast<int>(
-    ::std::floor((x - bInfo->minimum.x * _partitioningBBoxRatio) * _subDiv.X
+
+  int ox = static_cast<int>(
+    ::std::floor((x - bInfo.minimum.x * _partitioningBBoxRatio) * _subDiv.X
                  * _partitioningBBoxRatio / _bbSize.x));
   int oy = static_cast<int>(
-    ::std::floor((y - bInfo->minimum.y * _partitioningBBoxRatio) * _subDiv.Y
+    ::std::floor((y - bInfo.minimum.y * _partitioningBBoxRatio) * _subDiv.Y
                  * _partitioningBBoxRatio / _bbSize.y));
   int oz = static_cast<int>(
-    ::std::floor((z - bInfo->minimum.z * _partitioningBBoxRatio) * _subDiv.Z
+    ::std::floor((z - bInfo.minimum.z * _partitioningBBoxRatio) * _subDiv.Z
                  * _partitioningBBoxRatio / _bbSize.z));
 
   if (ox < 0 || oy < 0 || oz < 0) {
@@ -2147,9 +1590,9 @@ int AbstractMesh::getClosestFacetAtLocalCoordinates(float x, float y, float z,
   // Get the closest facet to (x, y, z)
   float shortest    = numeric_limits_t<float>::max(); // init distance vars
   float tmpDistance = shortest;
-  size_t fib;   // current facet in the block
-  Vector3 norm; // current facet normal
-  Vector3 p0;   // current facet barycenter position
+  size_t fib        = 0; // current facet in the block
+  Vector3 norm;          // current facet normal
+  Vector3 p0;            // current facet barycenter position
   // loop on all the facets in the current partitioning block
   for (size_t idx = 0; idx < facetsInBlock.size(); ++idx) {
     fib  = facetsInBlock[idx];
@@ -2200,7 +1643,13 @@ AbstractMesh& AbstractMesh::disableFacetData()
     _facetNormals.clear();
     _facetPartitioning.clear();
     _facetParameters = FacetParameters();
+    _depthSortedIndices.clear();
   }
+  return *this;
+}
+
+AbstractMesh& AbstractMesh::updateIndices(const IndicesArray& /*indices*/)
+{
   return *this;
 }
 
@@ -2220,9 +1669,29 @@ void AbstractMesh::createNormals(bool updatable)
   setVerticesData(VertexBuffer::NormalKind, normals, updatable);
 }
 
+AbstractMesh& AbstractMesh::alignWithNormal(Vector3& normal,
+                                            const Vector3& upDirection)
+{
+  auto& axisX = Tmp::Vector3Array[0];
+  auto& axisZ = Tmp::Vector3Array[1];
+  Vector3::CrossToRef(upDirection, normal, axisZ);
+  Vector3::CrossToRef(normal, axisZ, axisX);
+
+  if (rotationQuaternion()) {
+    auto rotationQuat = *rotationQuaternion();
+    Quaternion::RotationQuaternionFromAxisToRef(axisX, normal, axisZ,
+                                                rotationQuat);
+    setRotationQuaternion(rotationQuat);
+  }
+  else {
+    Vector3::RotationFromAxisToRef(axisX, normal, axisZ, rotation());
+  }
+  return *this;
+}
+
 void AbstractMesh::checkOcclusionQuery()
 {
-  Engine* engine = getEngine();
+  auto engine = getEngine();
 
   if (engine->webGLVersion() < 2.f
       || occlusionType == AbstractMesh::OCCLUSION_TYPE_NONE) {
@@ -2230,7 +1699,7 @@ void AbstractMesh::checkOcclusionQuery()
     return;
   }
 
-  if (isOcclusionQueryInProgress()) {
+  if (isOcclusionQueryInProgress() && _occlusionQuery) {
     auto isOcclusionQueryAvailable
       = engine->isQueryResultAvailable(_occlusionQuery);
     if (isOcclusionQueryAvailable) {
@@ -2268,9 +1737,9 @@ void AbstractMesh::checkOcclusionQuery()
     _occlusionQuery = engine->createQuery();
   }
 
-  engine->beginQuery(occlusionQueryAlgorithmType, _occlusionQuery);
+  engine->beginOcclusionQuery(occlusionQueryAlgorithmType, _occlusionQuery);
   occlusionBoundingBoxRenderer->renderOcclusionBoundingBox(this);
-  engine->endQuery(occlusionQueryAlgorithmType);
+  engine->endOcclusionQuery(occlusionQueryAlgorithmType);
   _isOcclusionQueryInProgress = true;
 }
 

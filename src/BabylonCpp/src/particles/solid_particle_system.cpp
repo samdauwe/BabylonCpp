@@ -456,7 +456,7 @@ int SolidParticleSystem::addShape(
   Float32Array meshNor = iMesh->getVerticesData(VertexBuffer::NormalKind);
   BoundingInfo bbInfo{Vector3::Zero(), Vector3::Zero()};
   if (_particlesIntersect) {
-    bbInfo = *iMesh->getBoundingInfo();
+    bbInfo = iMesh->getBoundingInfo();
   }
 
   auto shape   = _posToShape(meshPos);
@@ -1082,7 +1082,7 @@ void SolidParticleSystem::setIsVisibilityBoxLocked(bool val)
 
   auto boundingInfo = mesh->getBoundingInfo();
 
-  boundingInfo->setIsLocked(val);
+  boundingInfo.setIsLocked(val);
 }
 
 bool SolidParticleSystem::SolidParticleSystem::isVisibilityBoxLocked() const

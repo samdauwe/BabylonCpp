@@ -156,7 +156,7 @@ Mesh* MeshBuilder::CreateRibbon(const string_t& name, RibbonOptions& options,
     positionFunction(positions);
     instance->setBoundingInfo(
       BoundingInfo(Tmp::Vector3Array[0], Tmp::Vector3Array[1]));
-    instance->getBoundingInfo()->update(*instance->_worldMatrix);
+    instance->getBoundingInfo().update(*instance->_worldMatrix);
     instance->updateVerticesData(VertexBuffer::PositionKind, positions, false,
                                  false);
     if (!options.colors.empty()) {

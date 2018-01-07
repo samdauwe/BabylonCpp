@@ -117,7 +117,7 @@ public:
    * Get all child-meshes of this node.
    */
   virtual vector_t<AbstractMesh*>
-  getChildMeshes(bool directDecendantsOnly,
+  getChildMeshes(bool directDecendantsOnly                          = false,
                  const ::std::function<bool(Node* node)>& predicate = nullptr);
 
   /**

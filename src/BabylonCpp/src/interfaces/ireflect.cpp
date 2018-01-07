@@ -279,8 +279,8 @@ Quaternion* IReflect::_getQuaternionProperty(AbstractMesh* target,
                                              const string_t& targetProperty)
 {
   Quaternion* quaternionProperty = nullptr;
-  if (targetProperty == "rotationQuaternion") {
-    quaternionProperty = &target->rotationQuaternion();
+  if (targetProperty == "rotationQuaternion" && target->rotationQuaternion()) {
+    quaternionProperty = target->rotationQuaternion().get();
   }
   return quaternionProperty;
 }

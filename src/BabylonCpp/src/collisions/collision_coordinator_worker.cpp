@@ -47,10 +47,10 @@ SerializedMesh CollisionCoordinatorWorker::SerializeMesh(AbstractMesh* mesh)
       ssm.indexStart    = sm->indexStart;
       ssm.indexCount    = sm->indexCount;
       ssm.hasMaterial   = (sm->getMaterial() != nullptr);
-      ssm.sphereCenter  = boundingInfo->boundingSphere.centerWorld.asArray();
-      ssm.sphereRadius  = boundingInfo->boundingSphere.radiusWorld;
-      ssm.boxMinimum    = boundingInfo->boundingBox.minimumWorld.asArray();
-      ssm.boxMaximum    = boundingInfo->boundingBox.maximumWorld.asArray();
+      ssm.sphereCenter  = boundingInfo.boundingSphere.centerWorld.asArray();
+      ssm.sphereRadius  = boundingInfo.boundingSphere.radiusWorld;
+      ssm.boxMinimum    = boundingInfo.boundingBox.minimumWorld.asArray();
+      ssm.boxMaximum    = boundingInfo.boundingBox.maximumWorld.asArray();
       submeshes.emplace_back(ssm);
       ++idx;
     }
@@ -75,10 +75,10 @@ SerializedMesh CollisionCoordinatorWorker::SerializeMesh(AbstractMesh* mesh)
   sm.id                   = mesh->id;
   sm.name                 = mesh->name;
   sm.geometryId           = geometryId;
-  sm.sphereCenter         = boundingInfo->boundingSphere.centerWorld.asArray();
-  sm.sphereRadius         = boundingInfo->boundingSphere.radiusWorld;
-  sm.boxMinimum           = boundingInfo->boundingBox.minimumWorld.asArray();
-  sm.boxMaximum           = boundingInfo->boundingBox.maximumWorld.asArray();
+  sm.sphereCenter         = boundingInfo.boundingSphere.centerWorld.asArray();
+  sm.sphereRadius         = boundingInfo.boundingSphere.radiusWorld;
+  sm.boxMinimum           = boundingInfo.boundingBox.minimumWorld.asArray();
+  sm.boxMaximum           = boundingInfo.boundingBox.maximumWorld.asArray();
   sm.worldMatrixFromCache = mesh->worldMatrixFromCache().asArray();
   sm.subMeshes            = submeshes;
   sm.checkCollisions      = mesh->checkCollisions();
@@ -163,7 +163,7 @@ void CollisionCoordinatorWorker::destroy()
 void CollisionCoordinatorWorker::onMeshAdded(AbstractMesh* mesh)
 {
   mesh->registerAfterWorldMatrixUpdate(
-    [this](AbstractMesh* mesh, EventState&) { onMeshUpdated(mesh); });
+    [this](TransformNode* mesh, EventState&) { onMeshUpdated(mesh); });
   onMeshUpdated(mesh);
 }
 

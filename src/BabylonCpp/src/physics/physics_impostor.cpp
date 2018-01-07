@@ -49,7 +49,7 @@ PhysicsImpostor::PhysicsImpostor(IPhysicsEnabledObject* _object,
   }
   else {
     // Set the object's quaternion, if not set
-    if (!object->rotationQuaternionSet()) {
+    if (!object->rotationQuaternion()) {
       if (object->rotation() == Vector3::Zero()) {
         object->setRotationQuaternion(Quaternion::RotationYawPitchRoll(
           object->rotation().y, object->rotation().x, object->rotation().z));
@@ -139,9 +139,9 @@ void PhysicsImpostor::resetUpdateFlags()
 
 Vector3 PhysicsImpostor::getObjectExtendSize()
 {
-  if (object->getBoundingInfo()) {
+  if (object->hasBoundingInfo()) {
     object->computeWorldMatrix(true);
-    return object->getBoundingInfo()->boundingBox.extendSize.scale(2).multiply(
+    return object->getBoundingInfo().boundingBox.extendSize.scale(2).multiply(
       object->scaling());
   }
   else {
@@ -151,8 +151,8 @@ Vector3 PhysicsImpostor::getObjectExtendSize()
 
 Vector3 PhysicsImpostor::getObjectCenter()
 {
-  if (object->getBoundingInfo()) {
-    return object->getBoundingInfo()->boundingBox.center;
+  if (object->hasBoundingInfo()) {
+    return object->getBoundingInfo().boundingBox.center;
   }
   else {
     return object->position();
@@ -270,11 +270,11 @@ void PhysicsImpostor::beforeStep()
   object->position().subtractToRef(_deltaPosition, _tmpPositionWithDelta);
   // conjugate deltaRotation
   if (_deltaRotationConjugated) {
-    object->rotationQuaternion().multiplyToRef(*_deltaRotationConjugated,
-                                               _tmpRotationWithDelta);
+    object->rotationQuaternion()->multiplyToRef(*_deltaRotationConjugated,
+                                                _tmpRotationWithDelta);
   }
   else {
-    _tmpRotationWithDelta.copyFrom(object->rotationQuaternion());
+    _tmpRotationWithDelta.copyFrom(*object->rotationQuaternion());
   }
 
   _physicsEngine->getPhysicsPlugin()->setPhysicsBodyTransformation(
@@ -295,7 +295,7 @@ void PhysicsImpostor::afterStep()
 
   object->position().addInPlace(_deltaPosition);
   if (_deltaRotation) {
-    object->rotationQuaternion().multiplyInPlace(*_deltaRotation);
+    object->rotationQuaternion()->multiplyInPlace(*_deltaRotation);
   }
 }
 

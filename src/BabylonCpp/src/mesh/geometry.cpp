@@ -140,8 +140,9 @@ void Geometry::setAllVerticesData(VertexData* vertexData, bool updatable)
   notifyUpdate();
 }
 
-Mesh* Geometry::setVerticesData(unsigned int kind, const Float32Array& data,
-                                bool updatable, int stride)
+AbstractMesh* Geometry::setVerticesData(unsigned int kind,
+                                        const Float32Array& data,
+                                        bool updatable, int stride)
 {
   auto buffer = ::std::make_unique<VertexBuffer>(_engine, data, kind, updatable,
                                                  _meshes.empty(), stride);
@@ -208,8 +209,10 @@ void Geometry::updateVerticesDataDirectly(unsigned int kind,
   notifyUpdate(kind);
 }
 
-Mesh* Geometry::updateVerticesData(unsigned int kind, const Float32Array& data,
-                                   bool updateExtends, bool /*makeItUnique*/)
+AbstractMesh* Geometry::updateVerticesData(unsigned int kind,
+                                           const Float32Array& data,
+                                           bool updateExtends,
+                                           bool /*makeItUnique*/)
 {
   auto vertexBuffer = getVertexBuffer(kind);
 
@@ -372,8 +375,8 @@ void Geometry::updateIndices(const IndicesArray& indices, int offset)
   }
 }
 
-Mesh* Geometry::setIndices(const IndicesArray& indices, size_t totalVertices,
-                           bool /*updatable*/)
+AbstractMesh* Geometry::setIndices(const IndicesArray& indices,
+                                   size_t totalVertices, bool /*updatable*/)
 {
   if (_indexBuffer) {
     _engine->_releaseBuffer(_indexBuffer.get());

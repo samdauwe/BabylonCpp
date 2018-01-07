@@ -10,7 +10,7 @@ namespace Extensions {
 ActHist::ActHist(AbstractMesh* iMesh, int capacity)
     : mesh{iMesh}, lastMax{capacity - 1}, last{-1}, current{-1}
 {
-  if (!mesh->rotationQuaternionSet()) {
+  if (!mesh->rotationQuaternion()) {
     const auto& rotation = mesh->rotation();
     mesh->setRotationQuaternion(
       Quaternion::RotationYawPitchRoll(rotation.y, rotation.x, rotation.z));

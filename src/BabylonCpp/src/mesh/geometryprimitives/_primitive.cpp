@@ -48,8 +48,9 @@ void _Primitive::setAllVerticesData(VertexData* vertexData, bool /*updatable*/)
   Geometry::setAllVerticesData(vertexData, false);
 }
 
-Mesh* _Primitive::setVerticesData(unsigned int kind, const Float32Array& data,
-                                  bool /*updatable*/, int /*stride*/)
+AbstractMesh* _Primitive::setVerticesData(unsigned int kind,
+                                          const Float32Array& data,
+                                          bool /*updatable*/, int /*stride*/)
 {
   if (!_beingRegenerated) {
     return nullptr;

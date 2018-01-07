@@ -37,9 +37,9 @@ void FollowCamera::follow(AbstractMesh* cameraTarget)
   }
 
   float yRotation;
-  if (cameraTarget->rotationQuaternionSet()) {
+  if (cameraTarget->rotationQuaternion()) {
     Matrix rotMatrix;
-    cameraTarget->rotationQuaternion().toRotationMatrix(rotMatrix);
+    cameraTarget->rotationQuaternion()->toRotationMatrix(rotMatrix);
     yRotation = ::std::atan2(rotMatrix.m[8], rotMatrix.m[10]);
   }
   else {
@@ -47,11 +47,11 @@ void FollowCamera::follow(AbstractMesh* cameraTarget)
   }
   float radians       = getRadians(rotationOffset) + yRotation;
   auto targetPosition = cameraTarget->getAbsolutePosition();
-  float targetX       = targetPosition->x + ::std::sin(radians) * radius;
-  float targetZ       = targetPosition->z + ::std::cos(radians) * radius;
+  float targetX       = targetPosition.x + ::std::sin(radians) * radius;
+  float targetZ       = targetPosition.z + ::std::cos(radians) * radius;
 
   float dx = targetX - position.x;
-  float dy = (targetPosition->y + heightOffset) - position.y;
+  float dy = (targetPosition.y + heightOffset) - position.y;
   float dz = targetZ - position.z;
   float vx = dx * cameraAcceleration * 2.f; // this is set to .05
   float vy = dy * cameraAcceleration;
@@ -70,7 +70,7 @@ void FollowCamera::follow(AbstractMesh* cameraTarget)
   }
 
   position = Vector3(position.x + vx, position.y + vy, position.z + vz);
-  setTarget(*targetPosition);
+  setTarget(targetPosition);
 }
 
 void FollowCamera::_checkInputs()

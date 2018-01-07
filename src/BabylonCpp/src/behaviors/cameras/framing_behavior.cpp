@@ -199,7 +199,7 @@ void FramingBehavior::zoomOnMesh(AbstractMesh* mesh, bool focusOnOriginXZ,
 {
   mesh->computeWorldMatrix(true);
 
-  const auto& boundingBox = mesh->getBoundingInfo()->boundingBox;
+  const auto& boundingBox = mesh->getBoundingInfo().boundingBox;
   zoomOnBoundingInfo(boundingBox.minimumWorld, boundingBox.maximumWorld,
                      focusOnOriginXZ, onAnimationEnd);
 }

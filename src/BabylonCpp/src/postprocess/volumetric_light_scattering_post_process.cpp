@@ -333,7 +333,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
       for (auto& submesh : transparentSubMeshes) {
         submesh->_alphaIndex       = submesh->getMesh()->alphaIndex;
         submesh->_distanceToCamera = submesh->getBoundingInfo()
-                                       ->boundingSphere.centerWorld
+                                       .boundingSphere.centerWorld
                                        .subtract(scene->activeCamera->position)
                                        .length();
       }
@@ -385,7 +385,7 @@ void VolumetricLightScatteringPostProcess::_updateMeshScreenCoordinates(
   }
   else {
     meshPosition
-      = mesh->parent() ? *mesh->getAbsolutePosition() : mesh->position();
+      = mesh->parent() ? mesh->getAbsolutePosition() : mesh->position();
   }
 
   auto identityMatrix = Matrix::Identity();

@@ -73,13 +73,13 @@ bool SubMesh::isGlobal() const
   return (verticesStart == 0 && verticesCount == _mesh->getTotalVertices());
 }
 
-BoundingInfo* SubMesh::getBoundingInfo() const
+BoundingInfo& SubMesh::getBoundingInfo() const
 {
   if (isGlobal()) {
     return _mesh->getBoundingInfo();
   }
 
-  return _boundingInfo.get();
+  return *_boundingInfo.get();
 }
 
 SubMesh& SubMesh::setBoundingInfo(const BoundingInfo& boundingInfo)
@@ -144,8 +144,8 @@ SubMesh& SubMesh::refreshBoundingInfo()
     auto boundingInfo = _renderingMesh->getBoundingInfo();
     // the rendering mesh's bounding info can be used, it is the standard
     // submesh for all indices.
-    extend.min = boundingInfo->minimum;
-    extend.max = boundingInfo->maximum;
+    extend.min = boundingInfo.minimum;
+    extend.max = boundingInfo.maximum;
   }
   else {
     extend = Tools::ExtractMinAndMaxIndexed(
@@ -161,18 +161,18 @@ bool SubMesh::_checkCollision(const Collider& collider)
 {
   auto boundingInfo = _renderingMesh->getBoundingInfo();
 
-  return boundingInfo->_checkCollision(collider);
+  return boundingInfo._checkCollision(collider);
 }
 
 SubMesh& SubMesh::updateBoundingInfo(const Matrix& world)
 {
   auto boundingInfo = getBoundingInfo();
 
-  if (!boundingInfo) {
-    refreshBoundingInfo();
-    boundingInfo = getBoundingInfo();
-  }
-  boundingInfo->update(world);
+  // if (!boundingInfo) {
+  //  refreshBoundingInfo();
+  //  boundingInfo = getBoundingInfo();
+  // }
+  boundingInfo.update(world);
 
   return *this;
 }
@@ -181,11 +181,11 @@ bool SubMesh::isInFrustum(const array_t<Plane, 6>& frustumPlanes)
 {
   auto boundingInfo = getBoundingInfo();
 
-  if (!boundingInfo) {
-    return false;
-  }
+  // if (!boundingInfo) {
+  //  return false;
+  // }
 
-  return boundingInfo->isInFrustum(frustumPlanes);
+  return boundingInfo.isInFrustum(frustumPlanes);
 }
 
 bool SubMesh::isCompletelyInFrustum(
@@ -193,11 +193,11 @@ bool SubMesh::isCompletelyInFrustum(
 {
   auto boundingInfo = getBoundingInfo();
 
-  if (!boundingInfo) {
-    return false;
-  }
+  // if (!boundingInfo) {
+  //   return false;
+  // }
 
-  return boundingInfo->isCompletelyInFrustum(frustumPlanes);
+  return boundingInfo.isCompletelyInFrustum(frustumPlanes);
 }
 
 SubMesh& SubMesh::render(bool enableAlphaMode)
@@ -230,11 +230,11 @@ bool SubMesh::canIntersects(const Ray& ray) const
 {
   auto boundingInfo = getBoundingInfo();
 
-  if (!boundingInfo) {
-    return false;
-  }
+  // if (!boundingInfo) {
+  //   return false;
+  // }
 
-  return ray.intersectsBox(boundingInfo->boundingBox);
+  return ray.intersectsBox(boundingInfo.boundingBox);
 }
 
 unique_ptr_t<IntersectionInfo>
@@ -318,12 +318,12 @@ SubMesh* SubMesh::clone(AbstractMesh* newMesh, Mesh* newRenderingMesh) const
   if (!isGlobal()) {
     auto boundingInfo = getBoundingInfo();
 
-    if (!boundingInfo) {
-      return result;
-    }
+    // if (!boundingInfo) {
+    //   return result;
+    // }
 
     result->_boundingInfo = ::std::make_unique<BoundingInfo>(
-      boundingInfo->minimum, boundingInfo->maximum);
+      boundingInfo.minimum, boundingInfo.maximum);
   }
 
   return result;

@@ -138,7 +138,7 @@ void BoneIKController::update()
   auto& mat2 = BoneIKController::_tmpMats[1];
 
   if (targetMesh) {
-    target.copyFrom(*targetMesh->getAbsolutePosition());
+    target.copyFrom(targetMesh->getAbsolutePosition());
   }
 
   if (poleTargetBone) {

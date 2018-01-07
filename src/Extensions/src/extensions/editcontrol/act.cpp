@@ -7,12 +7,12 @@ namespace Extensions {
 
 Act::Act(AbstractMesh* mesh) : p{mesh->position()}, rSet{false}, rESet{false}
 {
-  if (!mesh->rotationQuaternionSet()) {
+  if (!mesh->rotationQuaternion()) {
     rE    = mesh->rotation();
     rESet = true;
   }
   else {
-    r    = mesh->rotationQuaternion();
+    r    = *mesh->rotationQuaternion();
     rSet = true;
   }
   s = mesh->scaling();
@@ -75,7 +75,7 @@ void Act::perform(AbstractMesh* mesh)
   mesh->position().copyFrom(p);
   // Check if we are doing euler or quaternion now also check what were we doing
   // when the rotation value was captured and set value accordingly
-  if (!mesh->rotationQuaternionSet()) {
+  if (!mesh->rotationQuaternion()) {
     if (rESet) {
       mesh->rotation().copyFrom(rE);
     }
@@ -85,10 +85,10 @@ void Act::perform(AbstractMesh* mesh)
   }
   else {
     if (rSet) {
-      mesh->rotationQuaternion().copyFrom(r);
+      mesh->rotationQuaternion()->copyFrom(r);
     }
     else {
-      mesh->rotationQuaternion().copyFrom(rE.toQuaternion());
+      mesh->rotationQuaternion()->copyFrom(rE.toQuaternion());
     }
   }
   mesh->scaling().copyFrom(s);

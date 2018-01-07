@@ -37,8 +37,8 @@ void PoseEnabledController::update()
 
   if (_mesh) {
     _mesh->position().copyFrom(_calculatedPosition);
-    if (_mesh->rotationQuaternionSet()) {
-      _mesh->rotationQuaternion().copyFrom(_calculatedRotation);
+    if (_mesh->rotationQuaternion()) {
+      _mesh->rotationQuaternion()->copyFrom(_calculatedRotation);
     }
   }
 }
@@ -87,7 +87,7 @@ void PoseEnabledController::attachToMesh(AbstractMesh* mesh)
   if (_poseControlledCamera) {
     // _mesh->setParent(_poseControlledCamera);
   }
-  if (!_mesh->rotationQuaternionSet()) {
+  if (!_mesh->rotationQuaternion()) {
     _mesh->setRotationQuaternion(Quaternion());
   }
 }

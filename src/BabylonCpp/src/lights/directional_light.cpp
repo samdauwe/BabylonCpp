@@ -120,11 +120,11 @@ void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
       }
 
       auto boundingInfo = mesh->getBoundingInfo();
-      if (!boundingInfo) {
-        continue;
-      }
+      // if (!boundingInfo) {
+      //  continue;
+      // }
 
-      const auto& boundingBox = boundingInfo->boundingBox;
+      const auto& boundingBox = boundingInfo.boundingBox;
 
       for (const auto& vector : boundingBox.vectorsWorld) {
         Vector3::TransformCoordinatesToRef(vector, viewMatrix, tempVector3);

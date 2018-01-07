@@ -3897,13 +3897,16 @@ unsigned int Engine::getQueryResult(const GLQueryPtr& query)
   return _gl->getQueryParameteri(query, GL::QUERY_RESULT);
 }
 
-void Engine::beginQuery(unsigned int algorithmType, const GLQueryPtr& query)
+Engine& Engine::beginOcclusionQuery(unsigned int algorithmType,
+                                    const GLQueryPtr& query)
 {
   const auto glAlgorithm = getGlAlgorithmType(algorithmType);
   _gl->beginQuery(glAlgorithm, query);
+
+  return *this;
 }
 
-Engine& Engine::endQuery(unsigned int algorithmType)
+Engine& Engine::endOcclusionQuery(unsigned int algorithmType)
 {
   const auto glAlgorithm = getGlAlgorithmType(algorithmType);
   _gl->endQuery(glAlgorithm);

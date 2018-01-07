@@ -568,7 +568,7 @@ public:
   Mesh& bakeCurrentTransformIntoVertices();
 
   /** Cache **/
-  vector_t<Vector3>& _positions() override;
+  vector_t<Vector3>& _positions();
   Mesh& _resetPointsArrayCache();
   bool _generatePointsArray() override;
 

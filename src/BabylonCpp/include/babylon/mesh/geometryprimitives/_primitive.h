@@ -23,8 +23,9 @@ public:
   Geometry* asNewGeometry(const string_t& id);
 
   void setAllVerticesData(VertexData* vertexData, bool updatable);
-  Mesh* setVerticesData(unsigned int kind, const Float32Array& data,
-                        bool updatable = false, int stride = -1) override;
+  AbstractMesh* setVerticesData(unsigned int kind, const Float32Array& data,
+                                bool updatable = false,
+                                int stride     = -1) override;
 
   virtual unique_ptr_t<VertexData> _regenerateVertexData() = 0;
   virtual Geometry* copy(const string_t& id)               = 0;

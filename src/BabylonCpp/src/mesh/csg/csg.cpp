@@ -38,8 +38,8 @@ unique_ptr_t<BABYLON::CSG::CSG> CSG::CSG::FromMesh(Mesh* mesh)
   matrix       = *mesh->getWorldMatrix();
   meshPosition = mesh->position();
   meshRotation = mesh->rotation();
-  if (mesh->rotationQuaternionSet()) {
-    meshRotationQuaternion = mesh->rotationQuaternion();
+  if (mesh->rotationQuaternion()) {
+    meshRotationQuaternion = *mesh->rotationQuaternion();
   }
   meshScaling = mesh->rotation();
 

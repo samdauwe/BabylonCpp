@@ -7,13 +7,13 @@
 #include <babylon/culling/icullable.h>
 #include <babylon/culling/octrees/octree.h>
 #include <babylon/interfaces/idisposable.h>
+#include <babylon/math/axis.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/matrix.h>
 #include <babylon/mesh/facet_parameters.h>
 #include <babylon/mesh/iget_set_vertices_data.h>
 #include <babylon/mesh/transform_node.h>
-#include <babylon/physics/iphysics_enabled_object.h>
 #include <babylon/physics/physics_impostor.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
@@ -28,30 +28,17 @@ class IGLQuery;
  * @brief This class represents a mesh which can't be instantiated.
  */
 class BABYLON_SHARED_EXPORT AbstractMesh : public TransformNode,
-                                           public IPhysicsEnabledObject,
                                            public ICullable,
                                            public IGetSetVerticesData {
 
 public:
   // Statics
-  // The billboard Mode None, the object is normal by default
-  static constexpr unsigned int BILLBOARDMODE_NONE = 0;
-  // The billboard Mode X
-  static constexpr unsigned int BILLBOARDMODE_X = 1;
-  // The billboard Mode Y
-  static constexpr unsigned int BILLBOARDMODE_Y = 2;
-  // The billboard Mode Z
-  static constexpr unsigned int BILLBOARDMODE_Z = 4;
-  // The billboard Mode All
-  static constexpr unsigned int BILLBOARDMODE_ALL = 7;
-
   static constexpr unsigned int OCCLUSION_TYPE_NONE                   = 0;
   static constexpr unsigned int OCCLUSION_TYPE_OPTIMISTIC             = 1;
   static constexpr unsigned int OCCLUSION_TYPE_STRICT                 = 2;
   static constexpr unsigned int OCCLUSION_ALGORITHM_TYPE_ACCURATE     = 0;
   static constexpr unsigned int OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE = 1;
 
-  static Quaternion _rotationAxisCache;
   static Vector3 _lookAtVectorCache;
 
   ~AbstractMesh();
@@ -93,9 +80,30 @@ public:
   void setPartitioningBBoxRatio(float ratio);
 
   /**
+   * @brief Boolean : must the facet be depth sorted on next call to
+   * `updateFacetData()` ?
+   * Works only for updatable meshes.
+   * Doesn't work with multi-materials.
+   */
+  bool mustDepthSortFacets() const;
+  void setMustDepthSortFacets(bool sort);
+
+  /**
+   * @brief The location (Vector3) where the facet depth sort must be computed
+   * from.
+   * By default, the active camera position.
+   * Used only when facet depth sort is enabled.
+   */
+  Vector3& facetDepthSortFrom();
+  const Vector3& facetDepthSortFrom() const;
+  void setFacetDepthSortFrom(const Vector3& location);
+
+  /**
    * @brief Returns if the feature facetData enabled ?
    */
   bool isFacetDataEnabled() const;
+
+  bool _updateNonUniformScalingState(bool value) override;
 
   // Events
   void setOnCollide(
@@ -171,23 +179,6 @@ public:
   Scene* getScene() override;
   void setSkeleton(Skeleton* value);
   virtual Skeleton* skeleton();
-  virtual vector_t<Vector3>& _positions();
-  Vector3& position() override;
-  void setPosition(const Vector3& newPosition);
-
-  /**
-   * @brief Returns the rotation property: a Vector3 depicting the rotation
-   * value in radians around each local axis X, Y, Z.
-   * If rotation quaternion is set, this Vector3 will (almost always) be the
-   * Zero vector!
-   * Default : (0.0, 0.0, 0.0)
-   */
-  Vector3& rotation() override;
-
-  /**
-   * @brief Sets the rotation property.
-   */
-  void setRotation(const Vector3& newRotation);
 
   /**
    * @brief Returns the scaling property: a Vector3 depicting the mesh scaling
@@ -201,51 +192,11 @@ public:
    */
   void setScaling(const Vector3& newScaling);
 
-  /**
-   * @brief Returns the rotation Quaternion property: this a Quaternion object
-   * depicting the mesh rotation by using a unit quaternion.
-   * It's null by default.
-   * If set, only the rotationQuaternion is then used to compute the mesh
-   * rotation and its property `.rotation\ is then ignored and set to (0.0, 0.0,
-   * 0.0)
-   */
-  Quaternion& rotationQuaternion() override;
-
-  /**
-   * @brief Returns if the rotation Quaternion property is set.
-   */
-  bool rotationQuaternionSet() const override;
-
-  /**
-   * @brief Nullifies the rotation Quaternion property.
-   */
-  void nullifyRotationQuaternion();
-
-  /**
-   * @brief Sets the rotation Quaternion property.
-   */
-  void setRotationQuaternion(const Quaternion& quaternion) override;
   void resetRotationQuaternion();
-  virtual AbstractMesh* getParent() override;
+  virtual AbstractMesh* getParent();
 
   /** Methods **/
   virtual Material* getMaterial();
-  vector_t<AbstractMesh*>
-  getChildMeshes(bool directDecendantsOnly,
-                 const ::std::function<bool(Node* node)>& predicate
-                 = nullptr) override;
-
-  /**
-   * @brief Copies the paramater passed Matrix into the mesh Pose matrix.
-   * @returns The AbstractMesh.
-   */
-  AbstractMesh& updatePoseMatrix(const Matrix& matrix);
-
-  /**
-   * @brief Returns the mesh Pose matrix.
-   * @returns The mesh Pose matrix.
-   */
-  Matrix& getPoseMatrix();
 
   /**
    * @brief Disables the mesh edger rendering mode.
@@ -326,9 +277,10 @@ public:
    *
    * @returns The Mesh.
    */
-  virtual Mesh* setVerticesData(unsigned int kind, const Float32Array& data,
-                                bool updatable = false,
-                                int stride     = -1) override;
+  virtual AbstractMesh* setVerticesData(unsigned int kind,
+                                        const Float32Array& data,
+                                        bool updatable = false,
+                                        int stride     = -1) override;
 
   /**
    * @brief Updates the existing vertex data of the mesh geometry for the
@@ -358,9 +310,10 @@ public:
    *
    * @returns The Mesh.
    */
-  virtual Mesh* updateVerticesData(unsigned int kind, const Float32Array& data,
-                                   bool updateExtends = false,
-                                   bool makeItUnique  = false) override;
+  virtual AbstractMesh* updateVerticesData(unsigned int kind,
+                                           const Float32Array& data,
+                                           bool updateExtends = false,
+                                           bool makeItUnique  = false) override;
 
   /**
    * @brief Sets the mesh indices.
@@ -372,9 +325,9 @@ public:
    *
    * @returns The Mesh.
    */
-  virtual Mesh* setIndices(const IndicesArray& indices,
-                           size_t totalVertices = 0,
-                           bool updatable       = false) override;
+  virtual AbstractMesh* setIndices(const IndicesArray& indices,
+                                   size_t totalVertices = 0,
+                                   bool updatable       = false) override;
 
   /**
    * @brief Returns false by default, used by the class Mesh.
@@ -387,7 +340,15 @@ public:
    * returns it if undefined.
    * @returns A BoundingInfo.
    */
-  BoundingInfo* getBoundingInfo() override;
+  BoundingInfo& getBoundingInfo();
+
+  /**
+   * @brief Uniformly scales the mesh to fit inside of a unit cube (1 X 1 X 1
+   * units).
+   * @param includeDescendants Take the hierarchy's bounding box instead of the
+   * mesh's bounding box.
+   */
+  AbstractMesh& normalizeToUnitCube(bool includeDescendants = true);
 
   /**
    * @brief Sets a mesh new object BoundingInfo.
@@ -401,112 +362,10 @@ public:
   virtual void _activate(int renderId);
 
   /**
-   * @brief Returns the last update of the World matrix.
+   * @brief Returns the latest update of the World matrix.
    * @returns A Matrix.
    */
   Matrix* getWorldMatrix() override;
-
-  /**
-   * @brief Returns directly the last state of the mesh World matrix.
-   * @returns A Matrix.
-   */
-  Matrix& worldMatrixFromCache();
-
-  /**
-   * @brief Returns the current mesh absolute position.
-   * @returns A Vector3.
-   */
-  Vector3* absolutePosition();
-
-  /**
-   * @brief Prevents the World matrix to be computed any longer.
-   * @returns The AbstractMesh.
-   */
-  AbstractMesh& freezeWorldMatrix();
-
-  /**
-   * @brief Allows back the World matrix computation.
-   * @returns The AbstractMesh.
-   */
-  AbstractMesh& unfreezeWorldMatrix();
-
-  /**
-   * @brief Returns If the World matrix has been frozen.
-   * @returns A boolean.
-   */
-  bool isWorldMatrixFrozen();
-
-  /**
-   * @brief Rotates the mesh around the axis vector for the passed angle
-   * (amount) expressed in radians, in the given space.
-   * space (default LOCAL) can be either BABYLON.Space.LOCAL, either
-   * BABYLON.Space.WORLD.
-   * Note that the property `rotationQuaternion` is then automatically updated
-   * and the property `rotation` is set to (0,0,0) and no longer used.
-   * The passed axis is also normalized.
-   * @returns The AbstractMesh.
-   */
-  AbstractMesh& rotate(Vector3& axis, float amount,
-                       const Space& space = Space::LOCAL);
-
-  /**
-   * @brief Rotates the mesh around the axis vector for the passed angle
-   * (amount) expressed in radians, in world space.
-   * Note that the property `rotationQuaternion` is then automatically updated
-   * and the property `rotation` is set to (0,0,0) and no longer used.
-   * The passed axis is also normalized.
-   * @returns The AbstractMesh.
-   * Method is based on
-   * http://www.euclideanspace.com/maths/geometry/affine/aroundPoint/index.htm
-   */
-  AbstractMesh& rotateAround(const Vector3& point, Vector3& axis, float amount);
-
-  /**
-   * @brief Translates the mesh along the axis vector for the passed distance
-   * in
-   * the given space.
-   * space (default LOCAL) can be either BABYLON.Space.LOCAL, either
-   * BABYLON.Space.WORLD.
-   * @returns The AbstractMesh.
-   */
-  AbstractMesh& translate(Vector3& axis, float distance,
-                          const Space& space = Space::LOCAL);
-
-  /**
-   * @brief Adds a rotation step to the mesh current rotation.
-   * x, y, z are Euler angles expressed in radians.
-   * This methods updates the current mesh rotation, either mesh.rotation,
-   * either mesh.rotationQuaternion if it's set.
-   * This means this rotation is made in the mesh local space only.
-   * It's useful to set a custom rotation order different from the BJS standard
-   * one YXZ.
-   * Example : this rotates the mesh first around its local X axis, then around
-   * its local Z axis, finally around its local Y axis.
-   * ```javascript
-   * mesh.addRotation(x1, 0, 0).addRotation(0, 0, z2).addRotation(0, 0, y3);
-   * ```
-   * Note that `addRotation()` accumulates the passed rotation values to the
-   * current ones and computes the .rotation or .rotationQuaternion updated
-   * values.
-   * Under the hood, only quaternions are used. So it's a little faster is you
-   * use .rotationQuaternion because it doesn't need to translate them back to
-   * Euler angles.
-   * @returns The AbstractMesh.
-   */
-  AbstractMesh& addRotation(float x, float y, float z);
-
-  /**
-   * @brief Retuns the mesh absolute position in the World.
-   * @returns A Vector3.
-   */
-  Vector3* getAbsolutePosition();
-
-  /**
-   * @brief Sets the mesh absolute position in the World from a Vector3 or an
-   * Array(3).
-   * @returns The AbstractMesh.
-   */
-  AbstractMesh& setAbsolutePosition(const Vector3& absolutePosition);
 
   // ========================= Point of View Movement ==========================
   /**
@@ -559,23 +418,6 @@ public:
   Vector3 calcRotatePOV(float flipBack, float twirlClockwise, float tiltRight);
 
   /**
-   * @brief Sets a new pivot matrix to the mesh.
-   * @returns The AbstractMesh.
-   */
-  AbstractMesh& setPivotMatrix(const Matrix& matrix);
-
-  /**
-   * @brief Returns the mesh pivot matrix.
-   * Default: Identity.
-   * @returns A Matrix.
-   */
-  Matrix& getPivotMatrix();
-
-  bool _isSynchronized() override;
-  void _initCache() override;
-  void markAsDirty(unsigned int flag) override;
-
-  /**
    * @brief Return the minimum and maximum world vectors of the entire hierarchy
    * under current mesh
    * @param includeDescendants Include bounding info from descendants as well
@@ -595,58 +437,6 @@ public:
    * @returns The AbstractMesh.
    */
   AbstractMesh& _updateSubMeshesBoundingInfo(Matrix& matrix);
-
-  /**
-   * @brief Computes the mesh World matrix and returns it.
-   * If the mesh world matrix is frozen, this computation does nothing more than
-   * returning the last frozen values.
-   * If the parameter `force` is let to `false` (default), the current cached
-   * World matrix is returned.
-   * If the parameter `force`is set to `true`, the actual computation is done.
-   * @returns The mesh World Matrix.
-   */
-  Matrix computeWorldMatrix(bool force = false) override;
-
-  /**
-   * @brief If you'd like to be called back after the mesh position, rotation or
-   * scaling has been updated.
-   * @param func: callback function to add
-   * @returns The AbstractMesh.
-   */
-  AbstractMesh& registerAfterWorldMatrixUpdate(
-    const ::std::function<void(AbstractMesh* mesh, EventState&)>& func);
-
-  /**
-   * @brief Removes a registered callback function.
-   * @returns The AbstractMesh.
-   */
-  AbstractMesh& unregisterAfterWorldMatrixUpdate(
-    const ::std::function<void(AbstractMesh* mesh, EventState&)>& func);
-
-  /**
-   * @brief Sets the mesh position in its local space.
-   * @returns The AbstractMesh.
-   */
-  AbstractMesh& setPositionWithLocalVector(const Vector3& vector3);
-
-  /**
-   * @brief Returns the mesh position in the local space from the current World
-   * matrix values.
-   * @returns A new Vector3.
-   */
-  Vector3 getPositionExpressedInLocalSpace();
-
-  /**
-   * @brief Translates the mesh along the passed Vector3 in its local space.
-   *  @returns The AbstractMesh.
-   */
-  AbstractMesh& locallyTranslate(const Vector3& vector3);
-
-  AbstractMesh& lookAt(const Vector3& targetPoint, float yawCor = 0.f,
-                       float pitchCor = 0.f, float rollCor = 0.f,
-                       Space space = Space::LOCAL);
-  AbstractMesh& attachToBone(Bone* bone, AbstractMesh* affectedMesh);
-  AbstractMesh& detachFromBone();
 
   /**
    * @brief Returns if the mesh is within the frustum defined by the passed
@@ -671,18 +461,24 @@ public:
    * Unless the parameter `precise` is set to `true` the intersection is
    * computed according to Axis Aligned Bounding Boxes (AABB), else according to
    * OBB (Oriented BBoxes)
+   * @param includeDescendants can be set to true to test if the mesh defined in
+   * parameters intersects with the current mesh or any child meshes
    * @returns A Boolean.
    */
-  bool intersectsMesh(AbstractMesh* mesh, bool precise);
+  bool intersectsMesh(class AbstractMesh* mesh, bool precise = false,
+                      bool includeDescendants = false);
 
   /**
    * @brief Returns if the mesh intersects a SolidParticle object.
    * Unless the parameter `precise` is set to `true` the intersection is
    * computed according to Axis Aligned Bounding Boxes (AABB), else according to
    * OBB (Oriented BBoxes)
+   * @param includeDescendants can be set to true to test if the mesh defined in
+   * parameters intersects with the current mesh or any child meshes
    * @returns A Boolean.
    */
-  bool intersectsMesh(SolidParticle* sp, bool precise);
+  bool intersectsMesh(SolidParticle* sp, bool precise = false,
+                      bool includeDescendants = false);
 
   /**
    * @brief Returns if the passed point (Vector3) is inside the mesh bounding
@@ -693,13 +489,13 @@ public:
 
   /** Physics **/
   PhysicsImpostor* getPhysicsImpostor();
-  Vector3 getPositionInCameraSpace(Camera* camera);
+  Vector3 getPositionInCameraSpace(Camera* camera = nullptr);
 
   /**
    * @brief Returns the distance from the mesh to the active camera.
    * @returns A float.
    */
-  float getDistanceToCamera(Camera* camera);
+  float getDistanceToCamera(Camera* camera = nullptr);
 
   AbstractMesh& applyImpulse(const Vector3& force, const Vector3& contactPoint);
   AbstractMesh& setPhysicsLinkWith(Mesh* otherMesh, const Vector3& pivot1,
@@ -721,7 +517,7 @@ public:
    */
   void setCheckCollisions(bool collisionEnabled);
 
-  AbstractMesh& moveWithCollisions(const Vector3& moveWithCollisions);
+  AbstractMesh& moveWithCollisions(Vector3& displacement);
 
   /** Submeshes octree **/
 
@@ -771,57 +567,8 @@ public:
    * By default, all the mesh children are also disposed unless the parameter
    * `doNotRecurse` is set to `true`.
    */
-  virtual void dispose(bool doNotRecurse = false) override;
-
-  /**
-   * @brief Returns a new Vector3 what is the localAxis, expressed in the mesh
-   * local space, rotated like the mesh.
-   * This Vector3 is expressed in the World space.
-   */
-  Vector3 getDirection(const Vector3& localAxis);
-
-  /**
-   * @brief Sets the Vector3 "result" as the rotated Vector3 "localAxis" in the
-   * same rotation than the mesh.
-   * localAxis is expressed in the mesh local space.
-   * result is computed in the Wordl space from the mesh World matrix.
-   * @returns The AbstractMesh.
-   */
-  AbstractMesh& getDirectionToRef(const Vector3& localAxis, Vector3& result);
-
-  /**
-   * @brief Sets the mesh pivot point coordinates in the passed space.
-   * @returns The AbstractMesh.
-   */
-  AbstractMesh& setPivotPoint(const Vector3& point,
-                              const Space& space = Space::LOCAL);
-
-  /**
-   * @brief Returns a new Vector3 set with the mesh pivot point coordinates in
-   * the local space.
-   */
-  Vector3 getPivotPoint() const;
-
-  /**
-   * @brief Sets the passed Vector3 "result" with the coordinates of the mesh
-   * pivot point in the local space.
-   * @returns The AbstractMesh.
-   */
-  const AbstractMesh& getPivotPointToRef(Vector3& result) const;
-
-  /**
-   * @brief Returns a new Vector3 set with the mesh pivot point World
-   * coordinates.
-   */
-  Vector3 getAbsolutePivotPoint();
-
-  /**
-   * @brief Defines the passed mesh as the parent of the current mesh.
-   * If keepWorldPositionRotation is set to `true` (default `false`), the
-   * current mesh position and rotation are kept.
-   * @returns The AbstractMesh.
-   */
-  AbstractMesh& setParent(AbstractMesh* mesh);
+  virtual void dispose(bool doNotRecurse               = false,
+                       bool disposeMaterialAndTextures = false);
 
   /**
    * @brief Adds the passed mesh as a child to the current mesh.
@@ -836,13 +583,6 @@ public:
    * @returns The AbstractMesh.
    */
   AbstractMesh& removeChild(AbstractMesh* mesh);
-
-  /**
-   * @brief Sets the Vector3 "result" coordinates with the mesh pivot point
-   * World coordinates.
-   * @returns The AbstractMesh.
-   */
-  AbstractMesh& getAbsolutePivotPointToRef(Vector3& result);
 
   // Facet data
 
@@ -957,10 +697,24 @@ public:
   AbstractMesh& disableFacetData();
 
   /**
+   * @brief Updates the AbstractMesh indices array. Actually, used by the Mesh
+   * object.
+   * @returns Returns the mesh.
+   */
+  AbstractMesh& updateIndices(const IndicesArray& indices);
+
+  /**
    * @brief Creates new normals data for the mesh.
    * @param updatable.
    */
   void createNormals(bool updatable);
+
+  /**
+   * @brief Align the mesh with a normal.
+   * @param Returns the mesh.
+   */
+  AbstractMesh& alignWithNormal(Vector3& normal,
+                                const Vector3& upDirection = Axis::Y());
 
 protected:
   /**
@@ -975,7 +729,7 @@ protected:
 private:
   void _markSubMeshesAsDirty(
     const ::std::function<void(const MaterialDefines& defines)>& func);
-  void _onCollisionPositionChange(int collisionId, const Vector3& newPosition,
+  void _onCollisionPositionChange(int collisionId, Vector3& newPosition,
                                   AbstractMesh* collidedMesh = nullptr);
   // Facet data
 
@@ -991,18 +745,17 @@ public:
    * An event triggered when this mesh collides with another one
    */
   Observable<AbstractMesh> onCollideObservable;
+
   /**
    * An event triggered when the collision's position changes
    */
   Observable<Vector3> onCollisionPositionChangeObservable;
-  /**
-   * An event triggered after the world matrix is updated
-   */
-  Observable<AbstractMesh> onAfterWorldMatrixUpdateObservable;
+
   /**
    * An event triggered when material is changed
    */
   Observable<AbstractMesh> onMaterialChangedObservable;
+
   // Properties
   bool definedFacingForward;
 
@@ -1045,10 +798,8 @@ public:
    */
   int occlusionRetryCount;
 
-  unsigned int billboardMode;
   float visibility;
   int alphaIndex;
-  bool infiniteDistance;
   bool isVisible;
   bool isPickable;
   bool showBoundingBox;
@@ -1062,7 +813,6 @@ public:
   bool renderOverlay;
   Color3 overlayColor;
   float overlayAlpha;
-  float scalingDeterminant;
   bool useOctreeForRenderingSelection;
   bool useOctreeForPicking;
   bool useOctreeForCollisions;
@@ -1082,7 +832,6 @@ public:
   Color4 edgesColor;
   unique_ptr_t<EdgesRenderer> _edgesRenderer;
   // Cache
-  unique_ptr_t<Matrix> _worldMatrix;
   AbstractMesh* _masterMesh;
   unique_ptr_t<MaterialDefines> _materialDefines;
   unique_ptr_t<BoundingInfo> _boundingInfo;
@@ -1092,11 +841,10 @@ public:
   Octree<SubMesh*>* _submeshesOctree;
   vector_t<AbstractMesh*> _intersectionsInProgress;
   bool _unIndexed;
-  unique_ptr_t<Matrix> _poseMatrix;
   vector_t<Light*> _lightSources;
   // Loading properties
   vector_t<Json::value> _waitingActions;
-  bool _waitingFreezeWorldMatrix;
+  Nullable<bool> _waitingFreezeWorldMatrix;
   // Skeleton
   Float32Array _bonesTransformMatrices;
 
@@ -1125,18 +873,29 @@ private:
   Vector3 _bbSize;
   // Actual number of subdivisions per axis for ComputeNormals()
   SubdivisionsPerAxis _subDiv;
+  // is the facet depth sort to be computed
+  bool _facetDepthSort;
+  // is the facet depth sort initialized
+  bool _facetDepthSortEnabled;
+  // copy of the indices array to store them once sorted
+  IndicesArray _depthSortedIndices;
+  // array of depth sorted facets
+  vector_t<DepthSortedFacet> _depthSortedFacets;
+  // facet depth sort function
+  ::std::function<int(const DepthSortedFacet& f1, const DepthSortedFacet& f2)>
+    _facetDepthSortFunction;
+  // location where to depth sort from
+  unique_ptr_t<Vector3> _facetDepthSortFrom;
+  // same as facetDepthSortFrom but expressed in the mesh local space
+  Vector3 _facetDepthSortOrigin;
+  Matrix _invertedMatrix;
   // Events
   Observer<AbstractMesh>::Ptr _onCollideObserver;
   Observer<Vector3>::Ptr _onCollisionPositionChangeObserver;
   // Properties
-  Vector3 _position;
   int _occlusionInternalRetryCounter;
   bool _isOcclusionQueryInProgress;
   unique_ptr_t<GL::IGLQuery> _occlusionQuery;
-  Vector3 _rotation;
-  bool _rotationQuaternionSet;
-  Quaternion _rotationQuaternion;
-  Vector3 _scaling;
   Material* _material;
   bool _receiveShadows;
   bool _hasVertexAlpha;
@@ -1152,18 +911,9 @@ private:
   unique_ptr_t<Collider> _collider;
   Vector3 _oldPositionForCollisions;
   Vector3 _diffPositionForCollisions;
-  Vector3 _newPositionForCollisions;
-  // Attach to bone
-  AbstractMesh* _meshToBoneReferal;
   // Cache
-  Matrix _localWorld;
-  unique_ptr_t<Vector3> _absolutePosition;
   Matrix _collisionsTransformMatrix;
   Matrix _collisionsScalingMatrix;
-  bool _isDirty;
-  Matrix _pivotMatrix;
-  bool _isWorldMatrixFrozen;
-  vector_t<Vector3> _emptyPositions;
   // Skeleton
   Skeleton* _skeleton;
 

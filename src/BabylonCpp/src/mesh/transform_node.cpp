@@ -20,12 +20,12 @@ TransformNode::TransformNode(const string_t& name, Scene* scene, bool isPure)
     , billboardMode{AbstractMesh::BILLBOARDMODE_NONE}
     , scalingDeterminant{1.f}
     , infiniteDistance{false}
-    , position{Vector3::Zero()}
     , _poseMatrix{::std::make_unique<Matrix>(Matrix::Zero())}
     , _worldMatrix{::std::make_unique<Matrix>(Matrix::Zero())}
     , _scaling{Vector3::One()}
     , _isDirty{false}
     , _isWorldMatrixFrozen{false}
+    , _position{Vector3::Zero()}
     , _rotation{Vector3::Zero()}
     , _rotationQuaternion{nullptr}
     , _transformToBoneReferal{nullptr}
@@ -43,6 +43,21 @@ TransformNode::TransformNode(const string_t& name, Scene* scene, bool isPure)
 
 TransformNode::~TransformNode()
 {
+}
+
+Vector3& TransformNode::position()
+{
+  return _position;
+}
+
+const Vector3& TransformNode::position() const
+{
+  return _position;
+}
+
+void TransformNode::setPosition(const Vector3& newPosition)
+{
+  _position = newPosition;
 }
 
 Vector3& TransformNode::rotation()
@@ -148,7 +163,7 @@ bool TransformNode::_isSynchronized()
     return false;
   }
 
-  if (!_cache.position.equals(position))
+  if (!_cache.position.equals(_position))
     return false;
 
   if (rotationQuaternion()) {
@@ -264,13 +279,13 @@ TransformNode::setAbsolutePosition(const Nullable<Vector3>& absolutePosition)
     invertParentWorldMatrix.invert();
     Vector3 worldPosition{absolutePositionX, absolutePositionY,
                           absolutePositionZ};
-    position
+    _position
       = Vector3::TransformCoordinates(worldPosition, invertParentWorldMatrix);
   }
   else {
-    position.x = absolutePositionX;
-    position.y = absolutePositionY;
-    position.z = absolutePositionZ;
+    _position.x = absolutePositionX;
+    _position.y = absolutePositionY;
+    _position.z = absolutePositionZ;
   }
   return *this;
 }
@@ -278,7 +293,7 @@ TransformNode::setAbsolutePosition(const Nullable<Vector3>& absolutePosition)
 TransformNode& TransformNode::setPositionWithLocalVector(const Vector3& vector3)
 {
   computeWorldMatrix();
-  position = Vector3::TransformNormal(vector3, _localWorld);
+  _position = Vector3::TransformNormal(vector3, _localWorld);
   return *this;
 }
 
@@ -288,13 +303,13 @@ Vector3 TransformNode::getPositionExpressedInLocalSpace()
   auto invLocalWorldMatrix = _localWorld;
   invLocalWorldMatrix.invert();
 
-  return Vector3::TransformNormal(position, invLocalWorldMatrix);
+  return Vector3::TransformNormal(_position, invLocalWorldMatrix);
 }
 
 TransformNode& TransformNode::locallyTranslate(const Vector3& vector3)
 {
   computeWorldMatrix(true);
-  position = Vector3::TransformCoordinates(vector3, _localWorld);
+  _position = Vector3::TransformCoordinates(vector3, _localWorld);
   return *this;
 }
 
@@ -302,7 +317,7 @@ TransformNode& TransformNode::lookAt(const Vector3& targetPoint, float yawCor,
                                      float pitchCor, float rollCor, Space space)
 {
   auto dv  = AbstractMesh::_lookAtVectorCache;
-  auto pos = (space == Space::LOCAL) ? position : getAbsolutePosition();
+  auto pos = (space == Space::LOCAL) ? _position : getAbsolutePosition();
   targetPoint.subtractToRef(pos, dv);
   auto yaw   = -::std::atan2(dv.z, dv.x) - Math::PI_2;
   auto len   = ::std::sqrt(dv.x * dv.x + dv.z * dv.z);
@@ -349,7 +364,7 @@ TransformNode& TransformNode::setPivotPoint(Vector3& point, Space space)
     point = Vector3::TransformCoordinates(point, tmat);
   }
 
-  Vector3::TransformCoordinatesToRef(point, wm, position);
+  Vector3::TransformCoordinatesToRef(point, wm, _position);
   _pivotMatrix.m[12]        = -point.x;
   _pivotMatrix.m[13]        = -point.y;
   _pivotMatrix.m[14]        = -point.z;
@@ -416,9 +431,9 @@ TransformNode& TransformNode::setParent(TransformNode* node)
     this->scaling().y = scale.y;
     this->scaling().z = scale.z;
 
-    this->position.x = position.x;
-    this->position.y = position.y;
-    this->position.z = position.z;
+    this->position().x = position.x;
+    this->position().y = position.y;
+    this->position().z = position.z;
   }
   else {
     auto& rotation        = Tmp::QuaternionArray[0];
@@ -441,9 +456,9 @@ TransformNode& TransformNode::setParent(TransformNode* node)
       rotation.toEulerAnglesToRef(this->rotation());
     }
 
-    this->position.x = position.x;
-    this->position.y = position.y;
-    this->position.z = position.z;
+    this->position().x = position.x;
+    this->position().y = position.y;
+    this->position().z = position.z;
 
     this->scaling().x = scale.x;
     this->scaling().y = scale.y;
@@ -506,7 +521,7 @@ TransformNode& TransformNode::rotate(Vector3& axis, float amount, Space space)
   Quaternion rotationQuaternion;
   if (space == Space::LOCAL) {
     rotationQuaternion = Quaternion::RotationAxisToRef(
-      axis, amount, AbstractMesh::_rotationAxisCache);
+      axis, amount, *TransformNode::_rotationAxisCache);
     this->rotationQuaternion()->multiplyToRef(rotationQuaternion,
                                               *this->rotationQuaternion());
   }
@@ -517,7 +532,7 @@ TransformNode& TransformNode::rotate(Vector3& axis, float amount, Space space)
       axis = Vector3::TransformNormal(axis, invertParentWorldMatrix);
     }
     rotationQuaternion = Quaternion::RotationAxisToRef(
-      axis, amount, AbstractMesh::_rotationAxisCache);
+      axis, amount, *TransformNode::_rotationAxisCache);
     rotationQuaternion.multiplyToRef(*this->rotationQuaternion(),
                                      *this->rotationQuaternion());
   }
@@ -533,7 +548,7 @@ TransformNode& TransformNode::rotateAround(const Vector3& point, Vector3& axis,
       rotation().y, rotation().x, rotation().z));
     rotation().copyFromFloats(0, 0, 0);
   }
-  point.subtractToRef(position, Tmp::Vector3Array[0]);
+  point.subtractToRef(_position, Tmp::Vector3Array[0]);
   Matrix::TranslationToRef(Tmp::Vector3Array[0].x, Tmp::Vector3Array[0].y,
                            Tmp::Vector3Array[0].z, Tmp::MatrixArray[0]);
   Tmp::MatrixArray[0].invertToRef(Tmp::MatrixArray[2]);
@@ -544,7 +559,7 @@ TransformNode& TransformNode::rotateAround(const Vector3& point, Vector3& axis,
   Tmp::MatrixArray[2].decompose(Tmp::Vector3Array[0], Tmp::QuaternionArray[0],
                                 Tmp::Vector3Array[1]);
 
-  position.addInPlace(Tmp::Vector3Array[1]);
+  _position.addInPlace(Tmp::Vector3Array[1]);
   Tmp::QuaternionArray[0].multiplyToRef(*rotationQuaternion(),
                                         *rotationQuaternion());
 
@@ -595,7 +610,7 @@ Matrix& TransformNode::computeWorldMatrix(bool force)
     return *_worldMatrix;
   }
 
-  _cache.position.copyFrom(position);
+  _cache.position.copyFrom(_position);
   _cache.scaling.copyFrom(scaling());
   _cache.pivotMatrixUpdated = false;
   _cache.billboardMode      = billboardMode;
@@ -641,12 +656,13 @@ Matrix& TransformNode::computeWorldMatrix(bool force)
                                  cameraWorldMatrix.m[13],
                                  cameraWorldMatrix.m[14]);
 
-    Matrix::TranslationToRef(
-      position.x + cameraGlobalPosition.x, position.y + cameraGlobalPosition.y,
-      position.z + cameraGlobalPosition.z, Tmp::MatrixArray[2]);
+    Matrix::TranslationToRef(_position.x + cameraGlobalPosition.x,
+                             _position.y + cameraGlobalPosition.y,
+                             _position.z + cameraGlobalPosition.z,
+                             Tmp::MatrixArray[2]);
   }
   else {
-    Matrix::TranslationToRef(position.x, position.y, position.z,
+    Matrix::TranslationToRef(_position.x, _position.y, _position.z,
                              Tmp::MatrixArray[2]);
   }
 
@@ -665,16 +681,16 @@ Matrix& TransformNode::computeWorldMatrix(bool force)
         if (_transformToBoneReferal) {
           parent()->getWorldMatrix()->multiplyToRef(
             *_transformToBoneReferal->getWorldMatrix(), Tmp::MatrixArray[6]);
-          Vector3::TransformCoordinatesToRef(position, Tmp::MatrixArray[6],
+          Vector3::TransformCoordinatesToRef(_position, Tmp::MatrixArray[6],
                                              currentPosition);
         }
         else {
           Vector3::TransformCoordinatesToRef(
-            position, *parent()->getWorldMatrix(), currentPosition);
+            _position, *parent()->getWorldMatrix(), currentPosition);
         }
       }
       else {
-        currentPosition.copyFrom(position);
+        currentPosition.copyFrom(_position);
       }
 
       currentPosition.subtractInPlace(camera->globalPosition());

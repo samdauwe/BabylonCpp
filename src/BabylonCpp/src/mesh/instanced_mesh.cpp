@@ -18,8 +18,8 @@ InstancedMesh::InstancedMesh(const string_t& _name, Mesh* source)
   rotation().copyFrom(source->rotation());
   scaling().copyFrom(source->scaling());
 
-  if (source->rotationQuaternionSet()) {
-    setRotationQuaternion(source->rotationQuaternion());
+  if (source->rotationQuaternion()) {
+    setRotationQuaternion(*source->rotationQuaternion());
   }
 
   infiniteDistance = source->infiniteDistance;
@@ -85,9 +85,9 @@ Float32Array InstancedMesh::getVerticesData(unsigned int kind,
   return _sourceMesh->getVerticesData(kind, copyWhenShared, forceCopy);
 }
 
-Mesh* InstancedMesh::setVerticesData(unsigned int kind,
-                                     const Float32Array& data, bool updatable,
-                                     int stride)
+AbstractMesh* InstancedMesh::setVerticesData(unsigned int kind,
+                                             const Float32Array& data,
+                                             bool updatable, int stride)
 {
   if (sourceMesh()) {
     sourceMesh()->setVerticesData(kind, data, updatable, stride);
@@ -95,9 +95,10 @@ Mesh* InstancedMesh::setVerticesData(unsigned int kind,
   return sourceMesh();
 }
 
-Mesh* InstancedMesh::updateVerticesData(unsigned int kind,
-                                        const Float32Array& data,
-                                        bool updateExtends, bool makeItUnique)
+AbstractMesh* InstancedMesh::updateVerticesData(unsigned int kind,
+                                                const Float32Array& data,
+                                                bool updateExtends,
+                                                bool makeItUnique)
 {
   if (sourceMesh()) {
     sourceMesh()->updateVerticesData(kind, data, updateExtends, makeItUnique);
@@ -105,8 +106,9 @@ Mesh* InstancedMesh::updateVerticesData(unsigned int kind,
   return sourceMesh();
 }
 
-Mesh* InstancedMesh::setIndices(const IndicesArray& indices,
-                                size_t totalVertices, bool /*updatable*/)
+AbstractMesh* InstancedMesh::setIndices(const IndicesArray& indices,
+                                        size_t totalVertices,
+                                        bool /*updatable*/)
 {
   if (sourceMesh()) {
     sourceMesh()->setIndices(indices, totalVertices);
@@ -134,7 +136,7 @@ InstancedMesh& InstancedMesh::refreshBoundingInfo()
   auto meshBB = _sourceMesh->getBoundingInfo();
 
   _boundingInfo
-    = ::std::make_unique<BoundingInfo>(meshBB->minimum, meshBB->maximum);
+    = ::std::make_unique<BoundingInfo>(meshBB.minimum, meshBB.maximum);
 
   _updateBoundingInfo();
 
@@ -165,7 +167,7 @@ AbstractMesh* InstancedMesh::getLOD(Camera* camera,
   auto boundingInfo = getBoundingInfo();
 
   auto currentLOD = sourceMesh()->getLOD(getScene()->activeCamera,
-                                         &boundingInfo->boundingSphere);
+                                         &boundingInfo.boundingSphere);
   _currentLOD = dynamic_cast<Mesh*>(currentLOD);
 
   if (_currentLOD == sourceMesh()) {

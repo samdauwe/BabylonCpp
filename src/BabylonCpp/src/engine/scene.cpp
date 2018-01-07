@@ -2348,7 +2348,7 @@ void Scene::_evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh)
 
     if (mesh->showSubMeshesBoundingBox) {
       getBoundingBoxRenderer()->renderList.emplace_back(
-        subMesh->getBoundingInfo()->boundingBox);
+        subMesh->getBoundingInfo().boundingBox);
     }
 
     if (material) {
@@ -2522,7 +2522,7 @@ void Scene::_activeMesh(AbstractMesh* mesh)
 
   if (mesh->showBoundingBox || forceShowBoundingBoxes) {
     getBoundingBoxRenderer()->renderList.emplace_back(
-      mesh->getBoundingInfo()->boundingBox);
+      mesh->getBoundingInfo().boundingBox);
   }
 
   if (mesh && !mesh->subMeshes.empty()) {
@@ -3342,8 +3342,8 @@ MinMax Scene::getWorldExtends()
       continue;
     }
     mesh->computeWorldMatrix(true);
-    auto minBox = mesh->getBoundingInfo()->boundingBox.minimumWorld;
-    auto maxBox = mesh->getBoundingInfo()->boundingBox.maximumWorld;
+    auto minBox = mesh->getBoundingInfo().boundingBox.minimumWorld;
+    auto maxBox = mesh->getBoundingInfo().boundingBox.maximumWorld;
 
     Tools::CheckExtends(minBox, min, max);
     Tools::CheckExtends(maxBox, min, max);

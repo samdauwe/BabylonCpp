@@ -80,8 +80,9 @@ public:
    *
    * @returns The Mesh.
    */
-  Mesh* setVerticesData(unsigned int kind, const Float32Array& data,
-                        bool updatable = false, int stride = -1) override;
+  AbstractMesh* setVerticesData(unsigned int kind, const Float32Array& data,
+                                bool updatable = false,
+                                int stride     = -1) override;
 
   /**
    * @brief Updates the existing vertex data of the mesh geometry for the
@@ -111,9 +112,9 @@ public:
    *
    * @returns The Mesh.
    */
-  Mesh* updateVerticesData(unsigned int kind, const Float32Array& data,
-                           bool updateExtends = false,
-                           bool makeItUnique  = false) override;
+  AbstractMesh* updateVerticesData(unsigned int kind, const Float32Array& data,
+                                   bool updateExtends = false,
+                                   bool makeItUnique  = false) override;
 
   /**
    * @brief Sets the mesh indices.
@@ -125,8 +126,9 @@ public:
    *
    * @returns The Mesh.
    */
-  Mesh* setIndices(const IndicesArray& indices, size_t totalVertices = 0,
-                   bool updatable = false) override;
+  AbstractMesh* setIndices(const IndicesArray& indices,
+                           size_t totalVertices = 0,
+                           bool updatable       = false) override;
 
   /**
    * @brief Returns if the mesh owns the requested kind of data.
@@ -138,7 +140,7 @@ public:
    */
   IndicesArray getIndices(bool copyWhenShared = false) override;
 
-  vector_t<Vector3>& _positions() override;
+  vector_t<Vector3>& _positions();
 
   /**
    * @brief Sets a new updated BoundingInfo to the mesh.
