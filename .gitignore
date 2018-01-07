@@ -49,3 +49,6 @@ src/Editor
 *.exe
 *.out
 *.app
+
+# Dolphin files
+.directory
