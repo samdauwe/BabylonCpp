@@ -44,7 +44,7 @@ public:
   const Vector2& boundingBias() const;
 
   void setBoundingBias(const Vector2& value);
-
+  static Geometry* CreateGeometryForMesh(Mesh* mesh);
   const MinMax& extend() const;
   Scene* getScene();
   Engine* getEngine();
@@ -66,6 +66,26 @@ public:
   size_t getTotalVertices() const;
   Float32Array getVerticesData(unsigned int kind, bool copyWhenShared = false,
                                bool forceCopy = false) override;
+
+  /**
+   * @brief Returns a boolean defining if the vertex data for the requested
+   * `kind` is updatable.
+   * Possible `kind` values :
+   * - BABYLON.VertexBuffer.PositionKind
+   * - BABYLON.VertexBuffer.UVKind
+   * - BABYLON.VertexBuffer.UV2Kind
+   * - BABYLON.VertexBuffer.UV3Kind
+   * - BABYLON.VertexBuffer.UV4Kind
+   * - BABYLON.VertexBuffer.UV5Kind
+   * - BABYLON.VertexBuffer.UV6Kind
+   * - BABYLON.VertexBuffer.ColorKind
+   * - BABYLON.VertexBuffer.MatricesIndicesKind
+   * - BABYLON.VertexBuffer.MatricesIndicesExtraKind
+   * - BABYLON.VertexBuffer.MatricesWeightsKind
+   * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
+   */
+  bool isVertexBufferUpdatable(unsigned int kind) const;
+
   VertexBuffer* getVertexBuffer(unsigned int kind) const;
   unordered_map_t<string_t, VertexBuffer*> getVertexBuffers();
   bool isVerticesDataPresent(unsigned int kind) override;

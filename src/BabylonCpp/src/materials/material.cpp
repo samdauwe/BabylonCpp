@@ -289,14 +289,20 @@ void Material::markDirty()
   _wasPreviouslyReady = false;
 }
 
-void Material::_preBind(Effect* effect)
+bool Material::_preBind(Effect* effect,
+                        Nullable<unsigned int> overrideOrientation)
 {
   auto engine = _scene->getEngine();
 
-  const bool reverse = sideOrientation == Material::ClockWiseSideOrientation;
+  auto orientation = (overrideOrientation.isNull()) ?
+                       static_cast<unsigned>(sideOrientation) :
+                       *overrideOrientation;
+  const bool reverse = orientation == Material::ClockWiseSideOrientation;
 
   engine->enableEffect(effect ? effect : _effect);
   engine->setState(backFaceCulling(), zOffset, false, reverse);
+
+  return reverse;
 }
 
 void Material::bind(Matrix* /*world*/, Mesh* /*mesh*/)

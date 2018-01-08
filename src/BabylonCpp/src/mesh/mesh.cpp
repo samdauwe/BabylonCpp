@@ -18,6 +18,7 @@
 #include <babylon/materials/material.h>
 #include <babylon/materials/multi_material.h>
 #include <babylon/math/matrix.h>
+#include <babylon/math/tmp.h>
 #include <babylon/math/vector2.h>
 #include <babylon/mesh/_instances_batch.h>
 #include <babylon/mesh/_visible_instances.h>
@@ -49,6 +50,7 @@ Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
     , _visibleInstances{nullptr}
     , _shouldGenerateFlatShading{false}
     , _originalBuilderSideOrientation{Mesh::DEFAULTSIDE}
+    , overrideMaterialSideOrientation{nullptr}
     , _onBeforeDrawObserver{nullptr}
     , _morphTargetManager{nullptr}
     , _batchCache{::std::make_unique<_InstancesBatch>()}
@@ -56,7 +58,6 @@ Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
     , _overridenInstanceCount{0}
     , _effectiveMaterial{nullptr}
     , _preActivateId{-1}
-    , _sideOrientation{Mesh::DEFAULTSIDE}
     , _areNormalsFrozen{false}
     , _source{nullptr}
     , _tessellation{0}
@@ -66,6 +67,8 @@ Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
     , _closeArray{false}
 {
   _boundingInfo = nullptr;
+
+  scene = getScene();
 
   if (source) {
     // Source mesh
@@ -103,8 +106,8 @@ Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
     // Physics clone
     auto physicsEngine = getScene()->getPhysicsEngine();
     if (clonePhysicsImpostor && physicsEngine) {
-      //auto impostor = physicsEngine->getImpostorForPhysicsObject(source);
-      //if (impostor) {
+      // auto impostor = physicsEngine->getImpostorForPhysicsObject(source);
+      // if (impostor) {
       //  physicsImpostor = impostor->clone(this);
       //}
     }
@@ -184,12 +187,18 @@ string_t Mesh::toString(bool fullDetails)
   }
 
   if (fullDetails) {
-    oss << ", flat shading: "
-        << (_geometry ? (getVerticesData(VertexBuffer::PositionKind).size() / 3
-                             == getIndices().size() ?
-                           "YES" :
-                           "NO") :
-                        "UNKNOWN");
+    if (_geometry) {
+      auto ib = getIndices();
+      auto vb = getVerticesData(VertexBuffer::PositionKind);
+
+      if (!vb.empty() && !ib.empty()) {
+        oss << ", flat shading: "
+            << (vb.size() / 3 == ib.size() ? "YES" : "NO");
+      }
+    }
+    else {
+      oss << ", flat shading: UNKNOWN";
+    }
   }
   return oss.str();
 }
@@ -269,15 +278,19 @@ AbstractMesh* Mesh::getLOD(Camera* camera, BoundingSphere* boundingSphere)
     return this;
   }
 
-  float distanceToCamera = 0.f;
+  BoundingSphere* bSphere = nullptr;
+
   if (boundingSphere) {
-    boundingSphere->centerWorld.subtract(camera->globalPosition()).length();
+    bSphere = boundingSphere;
   }
   else {
-    getBoundingInfo()
-      .boundingSphere.centerWorld.subtract(camera->globalPosition())
-      .length();
+    auto boundingInfo = getBoundingInfo();
+
+    bSphere = &boundingInfo.boundingSphere;
   }
+
+  auto distanceToCamera
+    = bSphere->centerWorld.subtract(camera->globalPosition()).length();
 
   if (_LODLevels.back()->distance > distanceToCamera) {
     if (onLODLevelSelection) {
@@ -313,10 +326,6 @@ Geometry* Mesh::geometry() const
 
 void Mesh::setGeometry(Geometry* geometry)
 {
-  if (_geometry) {
-    _geometry = nullptr;
-  }
-
   _geometry = geometry;
 }
 
@@ -337,7 +346,7 @@ Float32Array Mesh::getVerticesData(unsigned int kind, bool copyWhenShared,
   return _geometry->getVerticesData(kind, copyWhenShared, forceCopy);
 }
 
-VertexBuffer* Mesh::getVertexBuffer(unsigned int kind)
+VertexBuffer* Mesh::getVertexBuffer(unsigned int kind) const
 {
   if (!_geometry) {
     return nullptr;
@@ -360,7 +369,22 @@ bool Mesh::isVerticesDataPresent(unsigned int kind)
   return _geometry->isVerticesDataPresent(kind);
 }
 
-Uint32Array Mesh::getVerticesDataKinds()
+bool Mesh::isVertexBufferUpdatable(unsigned int kind) const
+{
+  if (!_geometry) {
+    if (!_delayInfo.empty()) {
+      return ::std::find_if(
+               _delayInfo.begin(), _delayInfo.end(),
+               [&](VertexBuffer* item) { return item->getKind() == kind; })
+             != _delayInfo.end();
+    }
+    return false;
+  }
+
+  return _geometry->isVertexBufferUpdatable(kind);
+}
+
+Uint32Array Mesh::getVerticesDataKinds() const
 {
   if (!_geometry) {
     Uint32Array result;
@@ -374,7 +398,7 @@ Uint32Array Mesh::getVerticesDataKinds()
   return _geometry->getVerticesDataKinds();
 }
 
-size_t Mesh::getTotalIndices()
+size_t Mesh::getTotalIndices() const
 {
   if (!_geometry) {
     return 0;
@@ -390,7 +414,7 @@ IndicesArray Mesh::getIndices(bool copyWhenShared)
   return _geometry->getIndices(copyWhenShared);
 }
 
-bool Mesh::isBlocked()
+bool Mesh::isBlocked() const
 {
   return _masterMesh != nullptr;
 }
@@ -402,16 +426,6 @@ bool Mesh::isReady() const
   }
 
   return AbstractMesh::isReady();
-}
-
-unsigned int Mesh::sideOrientation() const
-{
-  return _sideOrientation;
-}
-
-void Mesh::setSideOrientation(unsigned int sideO)
-{
-  _sideOrientation = sideO;
 }
 
 bool Mesh::areNormalsFrozen() const
@@ -474,12 +488,16 @@ Mesh& Mesh::_registerInstanceForRenderId(InstancedMesh* instance, int renderId)
 
 Mesh& Mesh::refreshBoundingInfo()
 {
-  if (_boundingInfo->isLocked()) {
+  return _refreshBoundingInfo(false);
+}
+
+Mesh& Mesh::_refreshBoundingInfo(bool applySkeleton)
+{
+  if (_boundingInfo && _boundingInfo->isLocked()) {
     return *this;
   }
 
-  auto data = getVerticesData(VertexBuffer::PositionKind);
-
+  auto data = _getPositionData(applySkeleton);
   if (!data.empty()) {
     auto extend   = Tools::ExtractMinAndMax(data, 0, getTotalVertices());
     _boundingInfo = ::std::make_unique<BoundingInfo>(extend.min, extend.max);
@@ -496,16 +514,90 @@ Mesh& Mesh::refreshBoundingInfo()
   return *this;
 }
 
+Float32Array Mesh::_getPositionData(bool applySkeleton)
+{
+  auto data = getVerticesData(VertexBuffer::PositionKind);
+
+  if (!data.empty() && applySkeleton && skeleton()) {
+    auto matricesIndicesData
+      = getVerticesData(VertexBuffer::MatricesIndicesKind);
+    auto matricesWeightsData
+      = getVerticesData(VertexBuffer::MatricesWeightsKind);
+    if (!matricesWeightsData.empty() && !matricesIndicesData.empty()) {
+      auto needExtras = numBoneInfluencers() > 4;
+      auto matricesIndicesExtraData
+        = needExtras ? getVerticesData(VertexBuffer::MatricesIndicesExtraKind) :
+                       Float32Array();
+      auto matricesWeightsExtraData
+        = needExtras ? getVerticesData(VertexBuffer::MatricesWeightsExtraKind) :
+                       Float32Array();
+
+      auto skeletonMatrices = skeleton()->getTransformMatrices(this);
+
+      auto& tempVector  = Tmp::Vector3Array[0];
+      auto& finalMatrix = Tmp::MatrixArray[0];
+      auto& tempMatrix  = Tmp::MatrixArray[1];
+
+      unsigned int matWeightIdx = 0;
+      for (unsigned int index = 0; index < data.size();
+           index += 3, matWeightIdx += 4) {
+        finalMatrix.reset();
+
+        unsigned int inf = 0;
+        float weight     = 0.f;
+        for (inf = 0; inf < 4; inf++) {
+          weight = matricesWeightsData[matWeightIdx + inf];
+          if (weight <= 0.f) {
+            break;
+          }
+          Matrix::FromFloat32ArrayToRefScaled(
+            skeletonMatrices,
+            static_cast<unsigned>(matricesIndicesData[matWeightIdx + inf] * 16),
+            weight, tempMatrix);
+          finalMatrix.addToSelf(tempMatrix);
+        }
+        if (needExtras) {
+          for (inf = 0; inf < 4; inf++) {
+            weight = matricesWeightsExtraData[matWeightIdx + inf];
+            if (weight <= 0.f) {
+              break;
+            }
+            Matrix::FromFloat32ArrayToRefScaled(
+              skeletonMatrices,
+              static_cast<unsigned>(matricesIndicesExtraData[matWeightIdx + inf]
+                                    * 16),
+              weight, tempMatrix);
+            finalMatrix.addToSelf(tempMatrix);
+          }
+        }
+
+        Vector3::TransformCoordinatesFromFloatsToRef(
+          data[index], data[index + 1], data[index + 2], finalMatrix,
+          tempVector);
+        tempVector.toArray(data, index);
+      }
+    }
+  }
+
+  return data;
+}
+
 SubMesh* Mesh::_createGlobalSubMesh(bool force)
 {
   auto totalVertices = getTotalVertices();
-  if (!totalVertices) {
+  if (!totalVertices || getIndices().empty()) {
     return nullptr;
   }
 
   // Check if we need to recreate the submeshes
   if (!subMeshes.empty()) {
-    const auto totalIndices = getIndices().size();
+    auto ib = getIndices();
+
+    if (ib.empty()) {
+      return nullptr;
+    }
+
+    const auto totalIndices = ib.size();
     bool needToRecreate     = false;
 
     if (force) {
@@ -526,7 +618,7 @@ SubMesh* Mesh::_createGlobalSubMesh(bool force)
     }
 
     if (!needToRecreate) {
-      return nullptr;
+      return subMeshes[0].get();
     }
   }
 
@@ -587,7 +679,9 @@ Mesh* Mesh::setVerticesData(unsigned int kind, const Float32Array& data,
 
 void Mesh::markVerticesDataAsUpdatable(unsigned int kind, bool updatable)
 {
-  if (getVertexBuffer(kind)->isUpdatable() == updatable) {
+  auto vb = getVertexBuffer(kind);
+
+  if (!vb || vb->isUpdatable() == updatable) {
     return;
   }
 
@@ -597,9 +691,7 @@ void Mesh::markVerticesDataAsUpdatable(unsigned int kind, bool updatable)
 Mesh& Mesh::setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer)
 {
   if (!_geometry) {
-    auto scene = getScene();
-
-    Geometry::New(Geometry::RandomId(), scene)->applyToMesh(this);
+    _geometry = Geometry::CreateGeometryForMesh(this);
   }
 
   _geometry->setVerticesBuffer(::std::move(buffer));
@@ -629,11 +721,21 @@ Mesh& Mesh::updateMeshPositions(
   bool computeNormals)
 {
   auto positions = getVerticesData(VertexBuffer::PositionKind);
+  if (positions.empty()) {
+    return *this;
+  }
+
   positionFunction(positions);
   updateVerticesData(VertexBuffer::PositionKind, positions, false, false);
+
   if (computeNormals) {
     auto indices = getIndices();
     auto normals = getVerticesData(VertexBuffer::NormalKind);
+
+    if (normals.empty()) {
+      return *this;
+    }
+
     VertexData::ComputeNormals(positions, indices, normals);
     updateVerticesData(VertexBuffer::NormalKind, normals, false, false);
   }
@@ -654,7 +756,7 @@ Mesh& Mesh::makeGeometryUnique()
 }
 
 Mesh* Mesh::setIndices(const IndicesArray& indices, size_t totalVertices,
-                       bool /*updatable*/)
+                       bool updatable)
 {
   if (!_geometry) {
     auto vertexData     = ::std::make_unique<VertexData>();
@@ -662,10 +764,10 @@ Mesh* Mesh::setIndices(const IndicesArray& indices, size_t totalVertices,
 
     auto scene = getScene();
 
-    Geometry(Geometry::RandomId(), scene, vertexData.get(), false, this);
+    Geometry(Geometry::RandomId(), scene, vertexData.get(), updatable, this);
   }
   else {
-    _geometry->setIndices(indices, totalVertices);
+    _geometry->setIndices(indices, totalVertices, updatable);
   }
 
   return this;
@@ -694,6 +796,10 @@ Mesh& Mesh::toLeftHanded()
 
 void Mesh::_bind(SubMesh* subMesh, Effect* effect, unsigned int fillMode)
 {
+  if (!_geometry) {
+    return;
+  }
+
   auto engine = getScene()->getEngine();
 
   // Wireframe
@@ -767,6 +873,9 @@ void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount,
   if (scene->_isAlternateRenderingEnabled() && !alternate) {
     auto effect
       = subMesh->effect() ? subMesh->effect() : _effectiveMaterial->getEffect();
+    if (!effect || !scene->activeCamera) {
+      return;
+    }
     scene->_switchToAlternateCameraConfiguration(true);
     _effectiveMaterial->bindView(effect);
     _effectiveMaterial->bindViewProjection(effect);
@@ -862,8 +971,11 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
     return *this;
   }
 
-  vector_t<InstancedMesh*> visibleInstances
-    = batch->visibleInstances[subMesh->_id];
+  auto& visibleInstances = batch->visibleInstances[subMesh->_id];
+  if (visibleInstances.empty()) {
+    return *this;
+  }
+
   size_t matricesCount = visibleInstances.size() + 1;
   size_t bufferSize    = matricesCount * 16 * 4;
 
@@ -953,10 +1065,11 @@ Mesh& Mesh::_processRendering(
       _draw(subMesh, fillMode, _overridenInstanceCount);
     }
 
-    if (!batch->visibleInstances[subMesh->_id].empty()) {
-      for (auto& instance : batch->visibleInstances[subMesh->_id]) {
+    auto& visibleInstancesForSubMesh = batch->visibleInstances[subMesh->_id];
+    if (!visibleInstancesForSubMesh.empty()) {
+      for (auto& instance : visibleInstancesForSubMesh) {
         // World
-        Matrix* world = instance->getWorldMatrix();
+        auto world = instance->getWorldMatrix();
         if (onBeforeDraw) {
           onBeforeDraw(true, *world, effectiveMaterial);
         }
@@ -1002,11 +1115,13 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
       && (!batch->visibleInstances[subMesh->_id].empty());
 
   // Material
-  _effectiveMaterial = subMesh->getMaterial();
+  auto material = subMesh->getMaterial();
 
-  if (!_effectiveMaterial) {
+  if (!material) {
     return *this;
   }
+
+  _effectiveMaterial = material;
 
   if (_effectiveMaterial->storeEffectOnSubMeshes) {
     if (!_effectiveMaterial->isReadyForSubMesh(this, subMesh,
@@ -1039,7 +1154,16 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
     effect = _effectiveMaterial->getEffect();
   }
 
-  _effectiveMaterial->_preBind(effect);
+  if (!effect) {
+    return *this;
+  }
+
+  auto reverse
+    = _effectiveMaterial->_preBind(effect, overrideMaterialSideOrientation);
+
+  if (_effectiveMaterial->forceDepthWrite) {
+    engine->setDepthWrite(true);
+  }
 
   // Bind
   auto fillMode = scene->forcePointsCloud() ?
@@ -1059,6 +1183,19 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
   }
   else {
     _effectiveMaterial->bind(_world, this);
+  }
+
+  if (!_effectiveMaterial->backFaceCulling()
+      && _effectiveMaterial->separateCullingPass) {
+    engine->setState(true, _effectiveMaterial->zOffset, false, !reverse);
+    _processRendering(
+      subMesh, effect, static_cast<int>(fillMode), batch,
+      hardwareInstancedRendering,
+      [&](bool isInstance, Matrix world, Material* _effectiveMaterial) {
+        _onBeforeDraw(isInstance, world, _effectiveMaterial);
+      },
+      _effectiveMaterial);
+    engine->setState(true, _effectiveMaterial->zOffset, false, reverse);
   }
 
   // Draw
@@ -1096,7 +1233,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
 Mesh& Mesh::_onBeforeDraw(bool isInstance, Matrix& world,
                           Material* effectiveMaterial)
 {
-  if (isInstance) {
+  if (isInstance && effectiveMaterial) {
     effectiveMaterial->bindOnlyWorldMatrix(world);
   }
   return *this;
@@ -1317,7 +1454,7 @@ Mesh* Mesh::clone(const string_t& iName, Node* newParent,
                    clonePhysicsImpostor);
 }
 
-void Mesh::dispose(bool /*doNotRecurse*/)
+void Mesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   setMorphTargetManager(nullptr);
 
@@ -1360,7 +1497,7 @@ void Mesh::dispose(bool /*doNotRecurse*/)
   onAfterRenderObservable.clear();
   onBeforeDrawObservable.clear();
 
-  AbstractMesh::dispose();
+  AbstractMesh::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
 void Mesh::applyDisplacementMap(
@@ -1435,8 +1572,8 @@ Mesh& Mesh::convertToFlatShadedMesh()
   unsigned int kindIndex;
   unsigned int kind;
   for (kindIndex = 0; kindIndex < kinds.size(); ++kindIndex) {
-    kind                       = kinds[kindIndex];
-    VertexBuffer* vertexBuffer = getVertexBuffer(kind);
+    kind              = kinds[kindIndex];
+    auto vertexBuffer = getVertexBuffer(kind);
 
     if (kind == VertexBuffer::NormalKind) {
       updatableNormals = vertexBuffer->isUpdatable();
@@ -1479,7 +1616,7 @@ Mesh& Mesh::convertToFlatShadedMesh()
   Float32Array normals;
   auto& positions = newdata[VertexBuffer::PositionKind];
   for (index = 0; index < totalIndices; index += 3) {
-    indices[index + 0] = static_cast<uint16_t>(index + 0);
+    indices[index]     = static_cast<uint16_t>(index);
     indices[index + 1] = static_cast<uint16_t>(index + 1);
     indices[index + 2] = static_cast<uint16_t>(index + 2);
 
@@ -1512,11 +1649,11 @@ Mesh& Mesh::convertToFlatShadedMesh()
   // Updating submeshes
   releaseSubMeshes();
   for (const auto& previousOne : previousSubmeshes) {
-    SubMesh::New(previousOne->materialIndex,
-                 static_cast<unsigned>(previousOne->indexStart),
-                 previousOne->indexCount,
-                 static_cast<unsigned>(previousOne->indexStart),
-                 previousOne->indexCount, dynamic_cast<AbstractMesh*>(this));
+    SubMesh::AddToMesh(
+      previousOne->materialIndex,
+      static_cast<unsigned>(previousOne->indexStart), previousOne->indexCount,
+      static_cast<unsigned>(previousOne->indexStart), previousOne->indexCount,
+      dynamic_cast<AbstractMesh*>(this));
   }
 
   synchronizeInstances();
@@ -1587,11 +1724,11 @@ Mesh& Mesh::convertToUnIndexedMesh()
   // Updating submeshes
   releaseSubMeshes();
   for (const auto& previousOne : previousSubmeshes) {
-    SubMesh::New(previousOne->materialIndex,
-                 static_cast<unsigned>(previousOne->indexStart),
-                 previousOne->indexCount,
-                 static_cast<unsigned>(previousOne->indexStart),
-                 previousOne->indexCount, dynamic_cast<AbstractMesh*>(this));
+    SubMesh::AddToMesh(
+      previousOne->materialIndex,
+      static_cast<unsigned>(previousOne->indexStart), previousOne->indexCount,
+      static_cast<unsigned>(previousOne->indexStart), previousOne->indexCount,
+      dynamic_cast<AbstractMesh*>(this));
   }
 
   _unIndexed = true;
@@ -1604,15 +1741,18 @@ Mesh& Mesh::flipFaces(bool flipNormals)
 {
   auto vertex_data = VertexData::ExtractFromMesh(this);
   unsigned int i;
-  if (flipNormals && isVerticesDataPresent(VertexBuffer::NormalKind)) {
+  if (flipNormals && isVerticesDataPresent(VertexBuffer::NormalKind)
+      && !vertex_data->normals.empty()) {
     for (i = 0; i < vertex_data->normals.size(); ++i) {
       vertex_data->normals[i] *= -1;
     }
   }
 
-  for (i = 0; i < vertex_data->indices.size(); i += 3) {
-    // reassign indices
-    ::std::swap(vertex_data->indices[i + 1], vertex_data->indices[i + 2]);
+  if (!vertex_data->indices.empty()) {
+    for (i = 0; i < vertex_data->indices.size(); i += 3) {
+      // reassign indices
+      ::std::swap(vertex_data->indices[i + 1], vertex_data->indices[i + 2]);
+    }
   }
 
   vertex_data->applyToMesh(this);
@@ -1657,28 +1797,40 @@ void Mesh::_syncGeometryWithMorphTargetManager()
 
   _markSubMeshesAsAttributesDirty();
 
-  if (_morphTargetManager && _morphTargetManager->vertexCount()) {
-    if (_morphTargetManager->vertexCount() != getTotalVertices()) {
+  auto morphTargetManager = _morphTargetManager;
+  if (morphTargetManager && morphTargetManager->vertexCount()) {
+    if (morphTargetManager->vertexCount() != getTotalVertices()) {
       BABYLON_LOG_ERROR("Mesh",
                         "Mesh is incompatible with morph targets. Targets and "
                         "mesh must all have the same vertices count.");
-      setMorphTargetManager(nullptr);
+      morphTargetManager = nullptr;
       return;
     }
 
-    for (unsigned int index = 0; index < morphTargetManager()->numInfluencers();
+    for (unsigned int index = 0; index < morphTargetManager->numInfluencers();
          ++index) {
-      auto morphTarget = morphTargetManager()->getActiveTarget(index);
-      _geometry->setVerticesData(VertexBuffer::PositionKind + index,
-                                 morphTarget->getPositions(), false, 3);
+      auto morphTarget = morphTargetManager->getActiveTarget(index);
 
-      if (morphTarget->hasNormals()) {
-        _geometry->setVerticesData(VertexBuffer::NormalKind + index,
-                                   morphTarget->getNormals(), false, 3);
+      const auto positions = morphTarget->getPositions();
+      if (positions.empty()) {
+        BABYLON_LOG_ERROR("Mesh",
+                          "Invalid morph target. Target must have positions.");
+        return;
       }
-      if (morphTarget->hasTangents()) {
-        _geometry->setVerticesData(VertexBuffer::TangentKind + index,
-                                   morphTarget->getTangents(), false, 3);
+
+      _geometry->setVerticesData(VertexBuffer::PositionKind + index, positions,
+                                 false, 3);
+
+      const auto normals = morphTarget->getNormals();
+      if (!normals.empty()) {
+        _geometry->setVerticesData(VertexBuffer::NormalKind + index, normals,
+                                   false, 3);
+      }
+
+      const auto tangents = morphTarget->getTangents();
+      if (!tangents.empty()) {
+        _geometry->setVerticesData(VertexBuffer::TangentKind + index, tangents,
+                                   false, 3);
       }
     }
   }
@@ -2312,10 +2464,13 @@ Float32Array& Mesh::setPositionsForCPUSkinning()
   Float32Array source;
   if (_sourcePositions.empty()) {
     source = getVerticesData(VertexBuffer::PositionKind);
+    if (source.empty()) {
+      return _sourceNormals;
+    }
 
     _sourcePositions = source;
 
-    if (!getVertexBuffer(VertexBuffer::PositionKind)->isUpdatable()) {
+    if (!isVertexBufferUpdatable(VertexBuffer::PositionKind)) {
       setVerticesData(VertexBuffer::PositionKind, source, true);
     }
   }
@@ -2327,10 +2482,13 @@ Float32Array& Mesh::setNormalsForCPUSkinning()
   Float32Array source;
   if (_sourceNormals.empty()) {
     source = getVerticesData(VertexBuffer::NormalKind);
+    if (source.empty()) {
+      return _sourceNormals;
+    }
 
     _sourceNormals = source;
 
-    if (!getVertexBuffer(VertexBuffer::NormalKind)->isUpdatable()) {
+    if (!isVertexBufferUpdatable(VertexBuffer::NormalKind)) {
       setVerticesData(VertexBuffer::NormalKind, source, true);
     }
   }
@@ -2375,11 +2533,23 @@ Mesh* Mesh::applySkeleton(Skeleton* skeleton)
   // positionsData checks for not being Float32Array will only pass at most once
   auto positionsData = getVerticesData(VertexBuffer::PositionKind);
 
+  if (positionsData.empty()) {
+    return this;
+  }
+
   // normalsData checks for not being Float32Array will only pass at most once
   auto normalsData = getVerticesData(VertexBuffer::NormalKind);
 
+  if (normalsData.empty()) {
+    return this;
+  }
+
   auto matricesIndicesData = getVerticesData(VertexBuffer::MatricesIndicesKind);
   auto matricesWeightsData = getVerticesData(VertexBuffer::MatricesWeightsKind);
+
+  if (matricesWeightsData.empty() || matricesIndicesData.empty()) {
+    return this;
+  }
 
   bool needExtras = numBoneInfluencers() > 4;
   auto matricesIndicesExtraData
@@ -2468,8 +2638,14 @@ MinMax Mesh::GetMinMax(const vector_t<AbstractMesh*>& meshes)
   }
 
   MinMax minMax;
-  minMax.min = minVector;
-  minMax.max = maxVector;
+  if (!minVectorSet) {
+    minMax.min = minVector;
+    minMax.max = maxVector;
+  }
+  else {
+    minMax.min = Vector3::Zero();
+    minMax.max = Vector3::Zero();
+  }
 
   return minMax;
 }

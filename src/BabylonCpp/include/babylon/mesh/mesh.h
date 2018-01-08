@@ -173,6 +173,7 @@ public:
    * shared among some other meshes, the returned array is a copy of the
    * internal one.
    * You can force the copy with forceCopy == true
+   * @returns null if the mesh has no geometry or no vertex buffer.
    * Possible `kind` values :
    * - BABYLON.VertexBuffer.PositionKind
    * - BABYLON.VertexBuffer.UVKind
@@ -193,6 +194,7 @@ public:
   /**
    * @brief Returns the mesh VertexBuffer object from the requested `kind` :
    * positions, indices, normals, etc.
+   * @returns `null` if the mesh has no geometry.
    * Possible `kind` values :
    * - BABYLON.VertexBuffer.PositionKind
    * - BABYLON.VertexBuffer.UVKind
@@ -207,7 +209,7 @@ public:
    * - BABYLON.VertexBuffer.MatricesWeightsKind
    * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
    */
-  VertexBuffer* getVertexBuffer(unsigned int kind);
+  VertexBuffer* getVertexBuffer(unsigned int kind) const;
 
   /**
    * @brief Returns a boolean depending on the existence of the Vertex Data for
@@ -229,6 +231,25 @@ public:
   bool isVerticesDataPresent(unsigned int kind) override;
 
   /**
+   * @brief Returns a boolean defining if the vertex data for the requested
+   * `kind` is updatable.
+   * Possible `kind` values :
+   * - BABYLON.VertexBuffer.PositionKind
+   * - BABYLON.VertexBuffer.UVKind
+   * - BABYLON.VertexBuffer.UV2Kind
+   * - BABYLON.VertexBuffer.UV3Kind
+   * - BABYLON.VertexBuffer.UV4Kind
+   * - BABYLON.VertexBuffer.UV5Kind
+   * - BABYLON.VertexBuffer.UV6Kind
+   * - BABYLON.VertexBuffer.ColorKind
+   * - BABYLON.VertexBuffer.MatricesIndicesKind
+   * - BABYLON.VertexBuffer.MatricesIndicesExtraKind
+   * - BABYLON.VertexBuffer.MatricesWeightsKind
+   * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
+   */
+  bool isVertexBufferUpdatable(unsigned int kind) const;
+
+  /**
    * @brief Returns a string : the list of existing `kinds` of Vertex Data for
    * this mesh.
    * Possible `kind` values :
@@ -245,14 +266,14 @@ public:
    * - BABYLON.VertexBuffer.MatricesWeightsKind
    * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
    */
-  Uint32Array getVerticesDataKinds();
+  Uint32Array getVerticesDataKinds() const;
 
   /**
    * @brief Returns a positive integer : the total number of indices in this
    * mesh geometry.
    * @returns Zero if the mesh has no geometry.
    */
-  size_t getTotalIndices();
+  size_t getTotalIndices() const;
 
   /**
    * @brief Returns an IndicesArray populated with the mesh indices.
@@ -263,23 +284,13 @@ public:
    */
   IndicesArray getIndices(bool copyWhenShared = false) override;
 
-  bool isBlocked();
+  bool isBlocked() const;
 
   /**
    * @brief Returns true once the mesh is ready after all the delayed process
    * (loading, etc) are complete.
    */
   bool isReady() const;
-
-  unsigned int sideOrientation() const;
-
-  /**
-   * @brief Sets the mesh side orientation : BABYLON.Mesh.FRONTSIDE,
-   * BABYLON.Mesh.BACKSIDE, BABYLON.Mesh.DOUBLESIDE or BABYLON.Mesh.DEFAULTSIDE
-   * tuto :
-   * http://doc.babylonjs.com/tutorials/Discover_Basic_Elements#side-orientation
-   */
-  void setSideOrientation(unsigned int sideO);
 
   /**
    * @brief Returns true if the normals aren't to be recomputed on next mesh
@@ -325,6 +336,7 @@ public:
    * @returns The Mesh.
    */
   Mesh& refreshBoundingInfo();
+  Mesh& _refreshBoundingInfo(bool applySkeleton);
 
   SubMesh* _createGlobalSubMesh(bool force);
   void subdivide(size_t count);
@@ -598,7 +610,8 @@ public:
    * This also frees the memory allocated under the hood to all the buffers used
    * by WebGL.
    */
-  virtual void dispose(bool doNotRecurse = false) override;
+  virtual void dispose(bool doNotRecurse               = false,
+                       bool disposeMaterialAndTextures = false) override;
 
   /** Geometric tools **/
 
@@ -732,8 +745,8 @@ public:
   /** Statics **/
 
   /**
-   * @brief Returns a new Mesh object what is a deep copy of the passed mesh.
-   * The parameter `parsedMesh` is the mesh to be copied.
+   * @brief Returns a new Mesh object parsed from the source provided.
+   * The parameter `parsedMesh` is the source.
    * The parameter `rootUrl` is a string, it's the root URL to prefix the
    * `delayLoadingFile` property with
    */
@@ -1451,6 +1464,7 @@ protected:
 
 private:
   void _sortLODLevels();
+  Float32Array _getPositionData(bool applySkeleton);
   Mesh& _onBeforeDraw(bool isInstance, Matrix& world,
                       Material* effectiveMaterial);
   Mesh& _queueLoad(Mesh* mesh, Scene* scene);
@@ -1470,6 +1484,7 @@ public:
   bool _shouldGenerateFlatShading;
   // Use by builder only to know what orientation were the mesh build in.
   unsigned int _originalBuilderSideOrientation;
+  Nullable<unsigned int> overrideMaterialSideOrientation;
 
 private:
   Observer<Mesh>::Ptr _onBeforeDrawObserver;
@@ -1486,7 +1501,6 @@ private:
   size_t _overridenInstanceCount;
   Material* _effectiveMaterial;
   int _preActivateId;
-  unsigned int _sideOrientation;
   // Will be used by ribbons mainly
   bool _areNormalsFrozen;
   // Will be used to save original positions when using software skinning

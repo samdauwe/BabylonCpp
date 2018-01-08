@@ -85,6 +85,15 @@ void Geometry::setBoundingBias(const Vector2& value)
   updateBoundingInfo(true, Float32Array());
 }
 
+Geometry* Geometry::CreateGeometryForMesh(Mesh* mesh)
+{
+  auto geometry = Geometry::New(Geometry::RandomId(), mesh->getScene());
+
+  geometry->applyToMesh(mesh);
+
+  return geometry;
+}
+
 const MinMax& Geometry::extend() const
 {
   return *_extend;
@@ -300,6 +309,17 @@ Float32Array Geometry::getVerticesData(unsigned int kind, bool copyWhenShared,
     ::std::copy(orig.begin(), orig.end(), _copy.begin());
     return _copy;
   }
+}
+
+bool Geometry::isVertexBufferUpdatable(unsigned int kind) const
+{
+  auto it = _vertexBuffers.find(kind);
+
+  if (it == _vertexBuffers.end()) {
+    return false;
+  }
+
+  return it->second->isUpdatable();
 }
 
 VertexBuffer* Geometry::getVertexBuffer(unsigned int kind) const
