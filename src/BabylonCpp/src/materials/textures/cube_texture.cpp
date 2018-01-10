@@ -1,6 +1,7 @@
 #include <babylon/materials/textures/cube_texture.h>
 
 #include <babylon/core/json.h>
+#include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/textures/internal_texture.h>
@@ -58,18 +59,31 @@ CubeTexture::CubeTexture(
 
   _texture = _getFromCache(rootUrl, noMipmap);
 
+  const auto lastDot = String::lastIndexOf(rootUrl, ".");
+  const auto extension
+    = (!forcedExtension.empty()) ?
+        forcedExtension :
+        (lastDot > -1 ?
+           String::toLowerCase(rootUrl.substr(static_cast<size_t>(lastDot))) :
+           "");
+  const auto isDDS = (extension == ".dds");
+
   _files = iFiles;
 
   if (iFiles.empty()) {
     _extensions = extensions;
 
-    if (_extensions.empty()) {
+    if (!isDDS && _extensions.empty()) {
       _extensions
         = {"_px.jpg", "_py.jpg", "_pz.jpg", "_nx.jpg", "_ny.jpg", "_nz.jpg"};
     }
 
-    for (const auto& extension : _extensions) {
-      _files.emplace_back(rootUrl + extension);
+    _files.clear();
+
+    if (!_extensions.empty()) {
+      for (const auto& extension : _extensions) {
+        _files.emplace_back(rootUrl + extension);
+      }
     }
   }
 
@@ -114,19 +128,25 @@ void CubeTexture::delayLoad()
     return;
   }
 
+  auto scene = getScene();
+
+  if (!scene) {
+    return;
+  }
+
   delayLoadState = EngineConstants::DELAYLOADSTATE_LOADED;
   _texture       = _getFromCache(url, _noMipmap);
 
   if (!_texture) {
     if (_prefiltered) {
-      _texture = getScene()->getEngine()->createPrefilteredCubeTexture(
-        url, getScene(), lodGenerationScale, lodGenerationOffset, nullptr,
-        nullptr, _format);
+      _texture = scene->getEngine()->createPrefilteredCubeTexture(
+        url, scene, lodGenerationScale, lodGenerationOffset, nullptr, nullptr,
+        _format);
     }
     else {
 
-      _texture = getScene()->getEngine()->createCubeTexture(
-        url, getScene(), _files, _noMipmap, nullptr, nullptr, _format);
+      _texture = scene->getEngine()->createCubeTexture(
+        url, scene, _files, _noMipmap, nullptr, nullptr, _format);
     }
   }
 }
@@ -163,8 +183,14 @@ unique_ptr_t<CubeTexture> CubeTexture::Parse(const Json::value& parsedTexture,
 
 unique_ptr_t<CubeTexture> CubeTexture::clone() const
 {
-  auto newTexture = ::std::make_unique<CubeTexture>(
-    url, getScene(), _extensions, _noMipmap, _files);
+  auto scene = getScene();
+
+  if (!scene) {
+    return nullptr;
+  }
+
+  auto newTexture = ::std::make_unique<CubeTexture>(url, scene, _extensions,
+                                                    _noMipmap, _files);
 
   return newTexture;
 }
