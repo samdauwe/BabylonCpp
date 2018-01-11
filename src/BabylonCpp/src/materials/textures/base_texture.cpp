@@ -19,9 +19,11 @@ BaseTexture::BaseTexture(Scene* scene)
     , coordinatesIndex{0}
     , wrapU{TextureConstants::WRAP_ADDRESSMODE}
     , wrapV{TextureConstants::WRAP_ADDRESSMODE}
+    , wrapR{TextureConstants::WRAP_ADDRESSMODE}
     , anisotropicFilteringLevel{BaseTexture::
                                   DEFAULT_ANISOTROPIC_FILTERING_LEVEL}
     , isCube{false}
+    , is3D{false}
     , gammaSpace{true}
     , invertZ{false}
     , lodLevelInAlpha{false}

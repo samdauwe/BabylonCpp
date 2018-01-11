@@ -19,12 +19,15 @@ ColorGradingTexture::ColorGradingTexture(const string_t& iUrl, Scene* scene)
     return;
   }
 
-  name = iUrl;
-  url  = iUrl;
+  _engine = scene->getEngine();
+  name    = iUrl;
+  url     = iUrl;
   setHasAlpha(false);
   isCube                    = false;
+  is3D                      = _engine->webGLVersion() > 1.f;
   wrapU                     = TextureConstants::CLAMP_ADDRESSMODE;
   wrapV                     = TextureConstants::CLAMP_ADDRESSMODE;
+  wrapR                     = TextureConstants::CLAMP_ADDRESSMODE;
   anisotropicFilteringLevel = 1;
 
   _texture = _getFromCache(url, true);
@@ -50,7 +53,7 @@ Matrix* ColorGradingTexture::getTextureMatrix()
 
 InternalTexture* ColorGradingTexture::load3dlTexture()
 {
-  _texture = getScene()->getEngine()->createRawTexture(
+  _texture = _engine->createRawTexture(
     Uint8Array(), 1, 1, EngineConstants::TEXTUREFORMAT_RGBA, false, false,
     TextureConstants::BILINEAR_SAMPLINGMODE);
 
@@ -58,7 +61,7 @@ InternalTexture* ColorGradingTexture::load3dlTexture()
     Uint8Array data;
     Float32Array tempData;
 
-    vector_t<string_t> lines = String::split(text, '\n');
+    auto lines  = String::split(text, '\n');
     size_t size = 0, pixelIndexW = 0, pixelIndexH = 0, pixelIndexSlice = 0;
     int maxColor = 0;
 
@@ -72,7 +75,7 @@ InternalTexture* ColorGradingTexture::load3dlTexture()
         continue;
       }
 
-      vector_t<string_t> words = String::split(line, ' ');
+      auto words = String::split(line, ' ');
       if (size == 0) {
         // Number of space + one
         size = words.size();
@@ -97,9 +100,11 @@ InternalTexture* ColorGradingTexture::load3dlTexture()
           = (pixelIndexW + pixelIndexSlice * size + pixelIndexH * size * size)
             * 4;
 
-        tempData[pixelStorageIndex + 0] = static_cast<float>(r);
-        tempData[pixelStorageIndex + 1] = static_cast<float>(g);
-        tempData[pixelStorageIndex + 2] = static_cast<float>(b);
+        if (pixelStorageIndex + 2 < tempData.size()) {
+          tempData[pixelStorageIndex + 0] = static_cast<float>(r);
+          tempData[pixelStorageIndex + 1] = static_cast<float>(g);
+          tempData[pixelStorageIndex + 2] = static_cast<float>(b);
+        }
 
         ++pixelIndexSlice;
         if (pixelIndexSlice % size == 0) {
@@ -113,21 +118,30 @@ InternalTexture* ColorGradingTexture::load3dlTexture()
       }
     }
 
-    for (size_t i = 0; i < tempData.size(); ++i) {
-      if (i > 0 && (i + 1) % 4 == 0) {
-        data[i] = 255;
-      }
-      else {
-        float value = tempData[i];
-        value /= static_cast<float>(maxColor * 255);
-        data[i] = static_cast<std::uint8_t>(value);
+    if (!tempData.empty() && !data.empty()) {
+      for (size_t i = 0; i < tempData.size(); ++i) {
+        if (i > 0 && (i + 1) % 4 == 0) {
+          data[i] = 255;
+        }
+        else {
+          float value = tempData[i];
+          value /= static_cast<float>(maxColor * 255);
+          data[i] = static_cast<std::uint8_t>(value);
+        }
       }
     }
 
     const auto _size = static_cast<int>(size);
-    _texture->updateSize(_size * _size, _size);
-    getScene()->getEngine()->updateRawTexture(
-      _texture, data, EngineConstants::TEXTUREFORMAT_RGBA, false);
+    if (_texture->is3D) {
+     // _texture->updateSize(size, size, size);
+     // _engine->updateRawTexture3D(_texture, data,
+     //                           EngineConstants::TEXTUREFORMAT_RGBA, false);
+    }
+    else {
+      _texture->updateSize(_size * _size, _size);
+      _engine->updateRawTexture(_texture, data,
+                               EngineConstants::TEXTUREFORMAT_RGBA, false);
+    }
   };
 
   Tools::LoadFile(url, callback);

@@ -78,15 +78,12 @@ public:
 
 private:
   /**
-   * The current internal texture size.
-   */
-  size_t _size;
-
-  /**
    * The current texture matrix. (will always be identity in color grading
    * texture)
    */
   unique_ptr_t<Matrix> _textureMatrix;
+
+  Engine* _engine;
 
 }; // end of class ColorGradingTexture
 

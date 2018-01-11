@@ -46,6 +46,7 @@ private:
 public:
   bool isReady;
   bool isCube;
+  bool is3D;
   string_t url;
   unsigned int samplingMode;
   bool generateMipMaps;

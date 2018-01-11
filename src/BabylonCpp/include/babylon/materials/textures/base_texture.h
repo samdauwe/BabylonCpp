@@ -80,8 +80,10 @@ public:
   unsigned int coordinatesIndex;
   unsigned int wrapU;
   unsigned int wrapV;
+  unsigned int wrapR;
   unsigned int anisotropicFilteringLevel;
   bool isCube;
+  bool is3D;
   bool gammaSpace;
   bool invertZ;
   bool lodLevelInAlpha;
