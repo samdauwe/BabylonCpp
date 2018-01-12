@@ -27,6 +27,7 @@ public:
   static constexpr unsigned int DATASOURCE_CUBE              = 7;
   static constexpr unsigned int DATASOURCE_CUBERAW           = 8;
   static constexpr unsigned int DATASOURCE_CUBEPREFILTERED   = 9;
+  static constexpr unsigned int DATASOURCE_RAW3D             = 10;
 
 public:
   InternalTexture(Engine* engine,
@@ -36,7 +37,7 @@ public:
 
   unsigned int dataSource() const;
   void incrementReferences();
-  void updateSize(int width, int height);
+  void updateSize(int width, int height, int depth = 1);
   void _rebuild();
   void dispose();
 
@@ -56,8 +57,10 @@ public:
   Observable<InternalTexture> onLoadedObservable;
   int width;
   int height;
+  int depth;
   int baseWidth;
   int baseHeight;
+  int baseDepth;
   bool invertY;
 
   // Private

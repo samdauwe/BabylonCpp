@@ -28,17 +28,33 @@ RenderTargetTexture::RenderTargetTexture(
     , coordinatesMode{TextureConstants::PROJECTION_MODE}
     , activeCamera{nullptr}
     , ignoreCameraViewport{false}
-    , _generateMipMaps{generateMipMaps}
-    , _size{size}
+    , _generateMipMaps{generateMipMaps ? true : false}
+    , _sizeRatio{0.f}
     , _doNotChangeAspectRatio{doNotChangeAspectRatio}
     , _currentRefreshId{-1}
     , _refreshRate{1}
     , _samples{1}
     , _postProcessManager{nullptr}
+    , _resizeObserver{nullptr}
+    , _onAfterUnbindObserver{nullptr}
+    , _onBeforeRenderObserver{nullptr}
+    , _onAfterRenderObserver{nullptr}
+    , _onClearObserver{nullptr}
 {
+  if (!scene) {
+    return;
+  }
+  _engine        = scene->getEngine();
   name           = iName;
   isRenderTarget = true;
   isCube         = iIsCube;
+
+  _initialSizeParameter = size;
+
+  _processSizeParameter(size);
+
+  _resizeObserver
+    = scene->getEngine()->onResizeObservable.add([](Engine*, EventState&) {});
 
   // Rendering groups
   _renderingManager = ::std::make_unique<RenderingManager>(scene);
@@ -60,7 +76,7 @@ RenderTargetTexture::RenderTargetTexture(
 
   if (iIsCube) {
     _texture = scene->getEngine()->createRenderTargetCubeTexture(
-      size, _renderTargetOptions);
+      getRenderSize(), _renderTargetOptions);
     coordinatesMode = TextureConstants::INVCUBIC_MODE;
     _textureMatrix  = ::std::make_unique<Matrix>(Matrix::Identity());
   }
@@ -72,6 +88,13 @@ RenderTargetTexture::RenderTargetTexture(
 
 RenderTargetTexture::~RenderTargetTexture()
 {
+}
+
+void RenderTargetTexture::_onRatioRescale()
+{
+  if (_sizeRatio != 0.f) {
+    resize(_initialSizeParameter);
+  }
 }
 
 void RenderTargetTexture::setOnAfterUnbind(
@@ -121,6 +144,11 @@ RenderTargetTexture::renderTargetOptions() const
   return _renderTargetOptions;
 }
 
+void RenderTargetTexture::_processSizeParameter(const ISize& size)
+{
+  _size = size;
+}
+
 unsigned int RenderTargetTexture::samples() const
 {
   return _samples;
@@ -132,8 +160,13 @@ void RenderTargetTexture::setSamples(unsigned int value)
     return;
   }
 
-  _samples = getScene()->getEngine()->updateRenderTargetTextureSampleCount(
-    _texture, value);
+  auto scene = getScene();
+  if (!scene) {
+    return;
+  }
+
+  _samples
+    = scene->getEngine()->updateRenderTargetTextureSampleCount(_texture, value);
 }
 
 void RenderTargetTexture::resetRefreshCounter()
@@ -155,7 +188,12 @@ void RenderTargetTexture::setRefreshRate(int value)
 void RenderTargetTexture::addPostProcess(PostProcess* postProcess)
 {
   if (!_postProcessManager) {
-    _postProcessManager = ::std::make_unique<PostProcessManager>(getScene());
+    auto scene = getScene();
+    if (!scene) {
+      return;
+    }
+
+    _postProcessManager = ::std::make_unique<PostProcessManager>(scene);
     _postProcesses.clear();
   }
 
@@ -228,6 +266,16 @@ ISize& RenderTargetTexture::getRenderSize()
   return _size;
 }
 
+int RenderTargetTexture::getRenderWidth() const
+{
+  return _size.width;
+}
+
+int RenderTargetTexture::getRenderHeight() const
+{
+  return _size.height;
+}
+
 bool RenderTargetTexture::canRescale() const
 {
   return true;
@@ -235,8 +283,8 @@ bool RenderTargetTexture::canRescale() const
 
 void RenderTargetTexture::scale(float ratio)
 {
-  ISize newSize = {static_cast<int>(static_cast<float>(_size.width) * ratio),
-                   static_cast<int>(static_cast<float>(_size.height) * ratio)};
+  ISize newSize{static_cast<int>(static_cast<float>(_size.width) * ratio),
+                static_cast<int>(static_cast<float>(_size.height) * ratio)};
 
   resize(newSize);
 }
@@ -253,25 +301,40 @@ Matrix* RenderTargetTexture::getReflectionTextureMatrix()
 void RenderTargetTexture::resize(const ISize& size)
 {
   releaseInternalTexture();
+
+  auto scene = getScene();
+  if (!scene) {
+    return;
+  }
+
+  _processSizeParameter(size);
+
   if (isCube) {
-    _texture = getScene()->getEngine()->createRenderTargetCubeTexture(
-      size, _renderTargetOptions);
+    _texture = scene->getEngine()->createRenderTargetCubeTexture(
+      getRenderSize(), _renderTargetOptions);
   }
   else {
-    _texture = getScene()->getEngine()->createRenderTargetTexture(
-      size, _renderTargetOptions);
+    _texture = scene->getEngine()->createRenderTargetTexture(
+      _size, _renderTargetOptions);
   }
 }
 
 void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
 {
-  auto scene  = getScene();
+  auto scene = getScene();
+  if (!scene) {
+    return;
+  }
+
   auto engine = scene->getEngine();
 
   if (!_waitingRenderList.empty()) {
     renderList.clear();
     for (auto& id : _waitingRenderList) {
-      renderList.emplace_back(scene->getMeshByID(id));
+      auto mesh = scene->getMeshByID(id);
+      if (mesh) {
+        renderList.emplace_back(mesh);
+      }
     }
 
     _waitingRenderList.clear();
@@ -281,15 +344,18 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
   if (renderListPredicate) {
     renderList.clear(); // Clear previous renderList
 
-    for (auto& mesh : getScene()->meshes) {
+    auto scene = getScene();
+    if (!scene) {
+      return;
+    }
+
+    auto& sceneMeshes = scene->meshes;
+
+    for (auto& mesh : sceneMeshes) {
       if (renderListPredicate(mesh.get())) {
         renderList.emplace_back(mesh.get());
       }
     }
-  }
-
-  if (renderList.empty()) {
-    return;
   }
 
   onBeforeBindObservable.notifyObservers(this);
@@ -299,7 +365,8 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
   Camera* camera = nullptr;
   if (activeCamera) {
     camera = activeCamera;
-    engine->setViewport(activeCamera->viewport, _size.width, _size.height);
+    engine->setViewport(activeCamera->viewport, getRenderWidth(),
+                        getRenderHeight());
 
     if (activeCamera != scene->activeCamera) {
       scene->setTransformMatrix(activeCamera->getViewMatrix(),
@@ -308,8 +375,10 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
   }
   else {
     camera = scene->activeCamera;
-    engine->setViewport(scene->activeCamera->viewport, _size.width,
-                        _size.height);
+    if (camera) {
+      engine->setViewport(scene->activeCamera->viewport, getRenderWidth(),
+                          getRenderHeight());
+    }
   }
 
   // Prepare renderingManager
@@ -335,7 +404,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
       mesh->_preActivateForIntermediateRendering(sceneRenderId);
 
       bool isMasked;
-      if (renderList.empty()) {
+      if (renderList.empty() && camera) {
         isMasked = ((mesh->layerMask() & camera->layerMask) == 0);
       }
       else {
@@ -381,14 +450,27 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
 
   onAfterUnbindObservable.notifyObservers(this);
 
-  if (activeCamera && activeCamera != scene->activeCamera) {
-    scene->setTransformMatrix(scene->activeCamera->getViewMatrix(),
-                              scene->activeCamera->getProjectionMatrix(true));
+  if (scene->activeCamera) {
+    if (activeCamera && activeCamera != scene->activeCamera) {
+      scene->setTransformMatrix(scene->activeCamera->getViewMatrix(),
+                                scene->activeCamera->getProjectionMatrix(true));
+    }
+    engine->setViewport(scene->activeCamera->viewport);
   }
 
-  engine->setViewport(scene->activeCamera->viewport);
-
   scene->resetCachedMaterial();
+}
+
+int RenderTargetTexture::_bestReflectionRenderTargetDimension(
+  int renderDimension, float scale) const
+{
+  const int minimum = 128;
+  const float x     = renderDimension * scale;
+  const int curved  = Tools::NearestPOT(
+    static_cast<int>(x + (minimum * minimum / (minimum + x))));
+
+  // Ensure we don't exceed the render dimension (while staying POT)
+  return ::std::min(Tools::FloorPOT(renderDimension), curved);
 }
 
 void RenderTargetTexture::renderToTarget(
@@ -397,8 +479,16 @@ void RenderTargetTexture::renderToTarget(
   bool dumpForDebug)
 
 {
-  auto scene  = getScene();
+  auto scene = getScene();
+  if (!scene) {
+    return;
+  }
+
   auto engine = scene->getEngine();
+
+  if (!_texture) {
+    return;
+  }
 
   // Bind
   if (_postProcessManager) {
@@ -406,8 +496,10 @@ void RenderTargetTexture::renderToTarget(
   }
   else if (!useCameraPostProcess
            || !scene->postProcessManager->_prepareFrame(_texture)) {
-    engine->bindFramebuffer(_texture, isCube ? faceIndex : 0, 0, 0,
-                            ignoreCameraViewport);
+    if (_texture) {
+      engine->bindFramebuffer(_texture, isCube ? faceIndex : 0, 0, 0,
+                              ignoreCameraViewport);
+    }
   }
 
   _faceIndex = static_cast<int>(faceIndex);
@@ -445,7 +537,7 @@ void RenderTargetTexture::renderToTarget(
 
   // Dump ?
   if (dumpForDebug) {
-    Tools::DumpFramebuffer(_size.width, _size.height, engine);
+    Tools::DumpFramebuffer(getRenderWidth(), getRenderHeight(), engine);
   }
 
   // Unbind
@@ -504,7 +596,9 @@ unique_ptr_t<RenderTargetTexture> RenderTargetTexture::clone() const
 
   // RenderTarget Texture
   newTexture->coordinatesMode = coordinatesMode;
-  newTexture->renderList      = renderList;
+  if (!renderList.empty()) {
+    newTexture->renderList = renderList;
+  }
 
   return newTexture;
 }
@@ -516,7 +610,11 @@ Json::object RenderTargetTexture::serialize() const
 
 void RenderTargetTexture::disposeFramebufferObjects()
 {
-  getScene()->getEngine()->_releaseFramebufferObjects(getInternalTexture());
+  auto objBuffer = getInternalTexture();
+  auto scene     = getScene();
+  if (objBuffer && scene) {
+    scene->getEngine()->_releaseFramebufferObjects(objBuffer);
+  }
 }
 
 void RenderTargetTexture::dispose(bool doNotRecurse)
@@ -528,10 +626,19 @@ void RenderTargetTexture::dispose(bool doNotRecurse)
 
   clearPostProcesses(true);
 
+  if (_resizeObserver) {
+    getScene()->getEngine()->onResizeObservable.remove(_resizeObserver);
+    _resizeObserver = nullptr;
+  }
+
   renderList.clear();
 
   // Remove from custom render targets
   auto scene = getScene();
+
+  if (!scene) {
+    return;
+  }
 
   stl_util::erase(scene->customRenderTargets, this);
 

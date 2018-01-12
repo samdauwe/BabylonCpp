@@ -23,6 +23,7 @@ MirrorTexture::MirrorTexture(const string_t& iName, const ISize& size,
     , _savedViewMatrix{Matrix::Zero()}
     , _blurX{nullptr}
     , _blurY{nullptr}
+    , _adaptiveBlurKernel{0.f}
     , _blurKernelX{0.f}
     , _blurKernelY{0.f}
     , _blurRatio{1.f}
@@ -69,6 +70,12 @@ float MirrorTexture::blurRatio() const
   return _blurRatio;
 }
 
+void MirrorTexture::setAdaptiveBlurKernel(float value)
+{
+  _adaptiveBlurKernel = value;
+  _autoComputeBlurKernel();
+}
+
 void MirrorTexture::setBlurKernel(float value)
 {
   setBlurKernelX(value);
@@ -105,6 +112,30 @@ float MirrorTexture::blurKernelY() const
   return _blurKernelY;
 }
 
+void MirrorTexture::_autoComputeBlurKernel()
+{
+  auto engine = getScene()->getEngine();
+
+  auto dw = getRenderWidth() / engine->getRenderWidth();
+  auto dh = getRenderHeight() / engine->getRenderHeight();
+  setBlurKernelX(_adaptiveBlurKernel * dw);
+  setBlurKernelY(_adaptiveBlurKernel * dh);
+}
+
+void MirrorTexture::_onRatioRescale()
+{
+  if (_sizeRatio != 0.f) {
+    resize(_initialSizeParameter);
+    if (_adaptiveBlurKernel == 0.f) {
+      _preparePostProcesses();
+    }
+  }
+
+  if (_adaptiveBlurKernel != 0.f) {
+    _autoComputeBlurKernel();
+  }
+}
+
 void MirrorTexture::_preparePostProcesses()
 {
   clearPostProcesses(true);
@@ -121,7 +152,7 @@ void MirrorTexture::_preparePostProcesses()
       TextureConstants::BILINEAR_SAMPLINGMODE, engine, false, textureType);
     _blurX->autoClear = false;
 
-    if (_blurRatio == 1.f && samples() < 2) {
+    if (_blurRatio == 1.f && samples() < 2 && _texture) {
       _blurX->setOutputTexture(_texture);
     }
     else {
@@ -137,15 +168,33 @@ void MirrorTexture::_preparePostProcesses()
     addPostProcess(_blurX.get());
     addPostProcess(_blurY.get());
   }
+  else {
+    if (_blurY) {
+      removePostProcess(_blurY.get());
+      _blurY->dispose();
+      _blurY = nullptr;
+    }
+    if (_blurX) {
+      removePostProcess(_blurX.get());
+      _blurX->dispose();
+      _blurX = nullptr;
+    }
+  }
 }
 
 unique_ptr_t<MirrorTexture> MirrorTexture::clone() const
 {
+  auto scene = getScene();
+
+  if (!scene) {
+    return nullptr;
+  }
+
   auto textureSize = getSize();
   auto newTexture  = ::std::make_unique<MirrorTexture>(
     name,                                        //
     Size(textureSize.width, textureSize.height), //
-    getScene(),                                  //
+    scene,                                       //
     _renderTargetOptions.generateMipMaps,        //
     _renderTargetOptions.type,                   //
     _renderTargetOptions.samplingMode,           //
@@ -158,7 +207,9 @@ unique_ptr_t<MirrorTexture> MirrorTexture::clone() const
 
   // Mirror Texture
   newTexture->mirrorPlane = mirrorPlane;
-  newTexture->renderList  = renderList;
+  if (!renderList.empty()) {
+    newTexture->renderList = renderList;
+  }
 
   return newTexture;
 }

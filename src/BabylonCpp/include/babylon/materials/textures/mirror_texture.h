@@ -23,6 +23,7 @@ public:
 
   void setBlurRatio(float value);
   float blurRatio() const;
+  void setAdaptiveBlurKernel(float value);
   void setBlurKernel(float value);
   void setBlurKernelX(float value);
   float blurKernelX() const;
@@ -32,7 +33,11 @@ public:
   unique_ptr_t<MirrorTexture> clone() const;
   Json::object serialize() const;
 
+protected:
+  void _onRatioRescale();
+
 private:
+  void _autoComputeBlurKernel();
   void _preparePostProcesses();
 
 public:
@@ -45,6 +50,7 @@ private:
 
   unique_ptr_t<BlurPostProcess> _blurX;
   unique_ptr_t<BlurPostProcess> _blurY;
+  float _adaptiveBlurKernel;
   float _blurKernelX;
   float _blurKernelY;
   float _blurRatio;

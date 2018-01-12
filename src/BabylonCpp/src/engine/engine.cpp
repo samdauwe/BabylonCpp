@@ -3243,6 +3243,21 @@ Engine::_convertRGBtoRGBATextureData(const ArrayBufferView& rgbData, int width,
   }
 }
 
+void Engine::updateRawTexture3D(InternalTexture* /*texture*/,
+                                const Uint8Array& /*data*/,
+                                unsigned int /*format*/, bool /*invertY*/,
+                                const string_t& /*compression*/)
+{
+}
+
+InternalTexture* Engine::createRawTexture3D(
+  const Uint8Array& /*data*/, int /*width*/, int /*height*/, int /*depth*/,
+  unsigned int /*format*/, bool /*generateMipMaps*/, bool /*invertY*/,
+  unsigned int /*samplingMode*/, const string_t& /*compression*/)
+{
+  return nullptr;
+}
+
 void Engine::_releaseFramebufferObjects(InternalTexture* texture)
 {
   if (texture->_framebuffer) {

@@ -17,6 +17,7 @@ constexpr unsigned int InternalTexture::DATASOURCE_MULTIRENDERTARGET;
 constexpr unsigned int InternalTexture::DATASOURCE_CUBE;
 constexpr unsigned int InternalTexture::DATASOURCE_CUBERAW;
 constexpr unsigned int InternalTexture::DATASOURCE_CUBEPREFILTERED;
+constexpr unsigned int InternalTexture::DATASOURCE_RAW3D;
 
 InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource)
     : _dataSource{dataSource}, _references{1}, _engine{engine}
@@ -38,13 +39,17 @@ void InternalTexture::incrementReferences()
   ++_references;
 }
 
-void InternalTexture::updateSize(int iWidth, int iHeight)
+void InternalTexture::updateSize(int iWidth, int iHeight, int iDepth)
 {
-  width      = iWidth;
-  height     = iHeight;
-  _size      = width * height;
-  baseWidth  = width;
-  baseHeight = height;
+  width  = iWidth;
+  height = iHeight;
+  depth  = iDepth;
+
+  baseWidth  = iWidth;
+  baseHeight = iHeight;
+  baseDepth  = iDepth;
+
+  _size = width * height * depth;
 }
 
 void InternalTexture::_rebuild()
@@ -71,6 +76,14 @@ void InternalTexture::_rebuild()
       proxy = _engine->createRawTexture(_bufferView, baseWidth, baseHeight,
                                         format, generateMipMaps, invertY,
                                         samplingMode, _compression);
+      proxy->_swapAndDie(this);
+      isReady = true;
+    }
+      return;
+    case InternalTexture::DATASOURCE_RAW3D: {
+      proxy = _engine->createRawTexture3D(_bufferView, baseWidth, baseHeight,
+                                          baseDepth, format, generateMipMaps,
+                                          invertY, samplingMode, _compression);
       proxy->_swapAndDie(this);
       isReady = true;
     }
@@ -124,8 +137,9 @@ void InternalTexture::_rebuild()
       proxy = _engine->createPrefilteredCubeTexture(
         url, nullptr, _lodGenerationScale, _lodGenerationOffset,
         [this, &proxy](InternalTexture*, EventState&) {
-          proxy->_swapAndDie(this);
-
+          if (proxy) {
+            proxy->_swapAndDie(this);
+          }
           isReady = true;
         },
         nullptr, format, _extension);

@@ -53,9 +53,19 @@ Matrix* ColorGradingTexture::getTextureMatrix()
 
 InternalTexture* ColorGradingTexture::load3dlTexture()
 {
-  _texture = _engine->createRawTexture(
-    Uint8Array(), 1, 1, EngineConstants::TEXTUREFORMAT_RGBA, false, false,
-    TextureConstants::BILINEAR_SAMPLINGMODE);
+  InternalTexture* texture = nullptr;
+  if (_engine->webGLVersion() == 1.f) {
+    texture = _engine->createRawTexture(
+      Uint8Array(), 1, 1, EngineConstants::TEXTUREFORMAT_RGBA, false, false,
+      TextureConstants::BILINEAR_SAMPLINGMODE);
+  }
+  else {
+    texture = _engine->createRawTexture3D(
+      Uint8Array(), 1, 1, 1, EngineConstants::TEXTUREFORMAT_RGBA, false, false,
+      TextureConstants::BILINEAR_SAMPLINGMODE);
+  }
+
+  _texture = texture;
 
   auto callback = [&](const string_t& text) {
     Uint8Array data;
@@ -133,14 +143,14 @@ InternalTexture* ColorGradingTexture::load3dlTexture()
 
     const auto _size = static_cast<int>(size);
     if (_texture->is3D) {
-     // _texture->updateSize(size, size, size);
-     // _engine->updateRawTexture3D(_texture, data,
-     //                           EngineConstants::TEXTUREFORMAT_RGBA, false);
+       _texture->updateSize(_size, _size, _size);
+       _engine->updateRawTexture3D(_texture, data,
+                                 EngineConstants::TEXTUREFORMAT_RGBA, false);
     }
     else {
       _texture->updateSize(_size * _size, _size);
       _engine->updateRawTexture(_texture, data,
-                               EngineConstants::TEXTUREFORMAT_RGBA, false);
+                                EngineConstants::TEXTUREFORMAT_RGBA, false);
     }
   };
 

@@ -29,6 +29,8 @@ public:
     bool isMulti = false);
   ~RenderTargetTexture();
 
+  void _onRatioRescale();
+
   /** Events **/
   void setOnAfterUnbind(
     const ::std::function<void(RenderTargetTexture*, EventState&)>& callback);
@@ -52,6 +54,8 @@ public:
   bool _shouldRender();
   bool isReady() override;
   ISize& getRenderSize();
+  int getRenderWidth() const;
+  int getRenderHeight() const;
   bool canRescale() const;
   void scale(float ratio) override;
   Matrix* getReflectionTextureMatrix() override;
@@ -102,6 +106,9 @@ public:
   void _rebuild() override;
 
 private:
+  void _processSizeParameter(const ISize& size);
+  int _bestReflectionRenderTargetDimension(int renderDimension,
+                                           float scale) const;
   void renderToTarget(unsigned int faceIndex,
                       const vector_t<AbstractMesh*>& currentRenderList,
                       size_t currentRenderListLength, bool useCameraPostProcess,
@@ -168,16 +175,20 @@ public:
 protected:
   RenderTargetCreationOptions _renderTargetOptions;
   ISize _size;
+  ISize _initialSizeParameter;
+  float _sizeRatio;
   unique_ptr_t<RenderingManager> _renderingManager;
   bool _doNotChangeAspectRatio;
   int _currentRefreshId;
   int _refreshRate;
   unique_ptr_t<Matrix> _textureMatrix;
   unsigned int _samples;
+  Engine* _engine;
 
 private:
   unique_ptr_t<PostProcessManager> _postProcessManager;
   vector_t<PostProcess*> _postProcesses;
+  Observer<Engine>::Ptr _resizeObserver;
   // Events
   Observer<RenderTargetTexture>::Ptr _onAfterUnbindObserver;
   Observer<int>::Ptr _onBeforeRenderObserver;

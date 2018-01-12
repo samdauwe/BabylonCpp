@@ -483,6 +483,14 @@ public:
     const ::std::function<void()>& onError = nullptr,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     bool invertY              = false);
+  void updateRawTexture3D(InternalTexture* texture, const Uint8Array& data,
+                          unsigned int format, bool invertY = true,
+                          const string_t& compression = "");
+  InternalTexture* createRawTexture3D(const Uint8Array& data, int width,
+                                      int depth, int height,
+                                      unsigned int format, bool generateMipMaps,
+                                      bool invertY, unsigned int samplingMode,
+                                      const string_t& compression = "");
   void _releaseFramebufferObjects(InternalTexture* texture);
   void _releaseTexture(InternalTexture* texture);
   void bindSamplers(Effect* effect);
