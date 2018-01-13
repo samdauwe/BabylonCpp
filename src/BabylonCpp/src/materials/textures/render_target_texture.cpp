@@ -283,9 +283,7 @@ bool RenderTargetTexture::canRescale() const
 
 void RenderTargetTexture::scale(float ratio)
 {
-  ISize newSize{static_cast<int>(static_cast<float>(_size.width) * ratio),
-                static_cast<int>(static_cast<float>(_size.height) * ratio)};
-
+  ISize newSize = _size * ratio;
   resize(newSize);
 }
 
