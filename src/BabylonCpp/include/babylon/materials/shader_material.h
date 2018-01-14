@@ -50,6 +50,7 @@ public:
   ShaderMaterial& setMatrix(const string_t& name, const Matrix& value);
   ShaderMaterial& setMatrix3x3(const string_t& name, const Float32Array& value);
   ShaderMaterial& setMatrix2x2(const string_t& name, const Float32Array& value);
+  ShaderMaterial& setArray2(const string_t& iName, const Float32Array& value);
   ShaderMaterial& setArray3(const string_t& iName, const Float32Array& value);
   bool isReady(AbstractMesh* mesh = nullptr,
                bool useInstances  = false) override;
@@ -91,6 +92,7 @@ private:
   unordered_map_t<string_t, Matrix> _matrices;
   unordered_map_t<string_t, Float32Array> _matrices3x3;
   unordered_map_t<string_t, Float32Array> _matrices2x2;
+  unordered_map_t<string_t, Float32Array> _vectors2Arrays;
   unordered_map_t<string_t, Float32Array> _vectors3Arrays;
   Matrix _cachedWorldViewMatrix;
   int _renderId;

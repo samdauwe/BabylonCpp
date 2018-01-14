@@ -127,6 +127,15 @@ public:
   bool applyByPostProcess() const;
 
   /**
+   * @brief Gets wether the image processing is enabled or not.
+   */
+  bool isEnabled() const;
+  /**
+   * @brief Sets wether the image processing is enabled or not.
+   */
+  void setIsEnabled(bool value);
+
+  /**
    * @brief Sets wether the image processing is applied through a post process
    * or not.
    */
@@ -260,6 +269,7 @@ private:
   unsigned int _vignetteBlendMode;
   bool _vignetteEnabled;
   bool _applyByPostProcess;
+  bool _isEnabled;
 
 }; // end of class ImageProcessingConfiguration
 

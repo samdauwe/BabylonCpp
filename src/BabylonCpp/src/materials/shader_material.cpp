@@ -196,6 +196,15 @@ ShaderMaterial& ShaderMaterial::setMatrix2x2(const string_t& iName,
   return *this;
 }
 
+ShaderMaterial& ShaderMaterial::setArray2(const string_t& iName,
+                                          const Float32Array& value)
+{
+  _checkUniform(iName);
+  _vectors2Arrays[iName] = value;
+
+  return *this;
+}
+
 ShaderMaterial& ShaderMaterial::setArray3(const string_t& iName,
                                           const Float32Array& value)
 {
@@ -256,7 +265,8 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Bones
-  if (mesh && mesh->useBones() && mesh->computeBonesUsingShaders()) {
+  if (mesh && mesh->useBones() && mesh->computeBonesUsingShaders()
+      && mesh->skeleton()) {
     attribs.emplace_back(VertexBuffer::MatricesIndicesKindChars);
     attribs.emplace_back(VertexBuffer::MatricesWeightsKindChars);
     if (mesh->numBoneInfluencers() > 4) {
@@ -322,6 +332,10 @@ void ShaderMaterial::bindOnlyWorldMatrix(Matrix& world)
 {
   auto scene = getScene();
 
+  if (!_effect) {
+    return;
+  }
+
   if (stl_util::contains(_options.uniforms, "world")) {
     _effect->setMatrix("world", world);
   }
@@ -342,7 +356,7 @@ void ShaderMaterial::bind(Matrix* world, Mesh* mesh)
   // Std values
   bindOnlyWorldMatrix(*world);
 
-  if (getScene()->getCachedMaterial() != this) {
+  if (_effect && getScene()->getCachedMaterial() != this) {
     if (stl_util::contains(_options.uniforms, "view")) {
       _effect->setMatrix("view", getScene()->getViewMatrix());
     }
@@ -422,6 +436,11 @@ void ShaderMaterial::bind(Matrix* world, Mesh* mesh)
     // Matrix 2x2
     for (auto& kv : _matrices2x2) {
       _effect->setMatrix2x2(kv.first, kv.second);
+    }
+
+    // Vector2Array
+    for (auto& kv : _vectors2Arrays) {
+      _effect->setArray2(kv.first, kv.second);
     }
 
     // Vector3Array

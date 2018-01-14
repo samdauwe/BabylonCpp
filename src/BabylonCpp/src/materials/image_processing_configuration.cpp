@@ -24,12 +24,13 @@ ImageProcessingConfiguration::ImageProcessingConfiguration()
     , _contrast{1.f}
     , _colorCurvesEnabled{false}
     , _colorGradingEnabled{false}
-    , _colorGradingWithGreenDepth{false}
-    , _colorGradingBGR{false}
+    , _colorGradingWithGreenDepth{true}
+    , _colorGradingBGR{true}
     , _toneMappingEnabled{false}
     , _vignetteBlendMode{ImageProcessingConfiguration::VIGNETTEMODE_MULTIPLY}
     , _vignetteEnabled{false}
     , _applyByPostProcess{false}
+    , _isEnabled{true}
 {
 }
 
@@ -187,6 +188,21 @@ void ImageProcessingConfiguration::setApplyByPostProcess(bool value)
   _updateParameters();
 }
 
+bool ImageProcessingConfiguration::isEnabled() const
+{
+  return _isEnabled;
+}
+
+void ImageProcessingConfiguration::setIsEnabled(bool value)
+{
+  if (_isEnabled == value) {
+    return;
+  }
+
+  _isEnabled = value;
+  _updateParameters();
+}
+
 void ImageProcessingConfiguration::_updateParameters()
 {
   onUpdateParameters.notifyObservers(this);
@@ -232,15 +248,16 @@ void ImageProcessingConfiguration::PrepareSamplers(
 void ImageProcessingConfiguration::prepareDefines(
   IImageProcessingConfigurationDefines& defines, bool forPostProcess)
 {
-  if (forPostProcess != applyByPostProcess()) {
+  if (forPostProcess != applyByPostProcess() || !_isEnabled) {
     defines.VIGNETTE                   = false;
     defines.TONEMAPPING                = false;
     defines.CONTRAST                   = false;
     defines.EXPOSURE                   = false;
     defines.COLORCURVES                = false;
     defines.COLORGRADING               = false;
+    defines.COLORGRADING3D             = false;
     defines.IMAGEPROCESSING            = false;
-    defines.IMAGEPROCESSINGPOSTPROCESS = applyByPostProcess();
+    defines.IMAGEPROCESSINGPOSTPROCESS = applyByPostProcess() && _isEnabled;
     return;
   }
   defines.VIGNETTE = vignetteEnabled();
@@ -252,9 +269,15 @@ void ImageProcessingConfiguration::prepareDefines(
   defines.CONTRAST                = (contrast() != 1.f);
   defines.EXPOSURE                = (exposure() != 1.f);
   defines.COLORCURVES             = (colorCurvesEnabled() && !colorCurves);
-  defines.COLORGRADING        = (colorGradingEnabled() && !colorGradingTexture);
-  defines.SAMPLER3DGREENDEPTH = colorGradingWithGreenDepth();
-  defines.SAMPLER3DBGRMAP     = colorGradingBGR();
+  defines.COLORGRADING = (colorGradingEnabled() && !colorGradingTexture);
+  if (defines.COLORGRADING) {
+    defines.COLORGRADING3D = colorGradingTexture->is3D;
+  }
+  else {
+    defines.COLORGRADING3D = false;
+  }
+  defines.SAMPLER3DGREENDEPTH        = colorGradingWithGreenDepth();
+  defines.SAMPLER3DBGRMAP            = colorGradingBGR();
   defines.IMAGEPROCESSINGPOSTPROCESS = applyByPostProcess();
   defines.IMAGEPROCESSING            = defines.VIGNETTE || defines.TONEMAPPING
                             || defines.CONTRAST || defines.EXPOSURE
@@ -271,7 +294,7 @@ bool ImageProcessingConfiguration::isReady() const
 void ImageProcessingConfiguration::bind(Effect* effect, float aspectRatio)
 {
   // Color Curves
-  if (_colorCurvesEnabled) {
+  if (_colorCurvesEnabled && colorCurves) {
     ColorCurves::Bind(*colorCurves, effect);
   }
 

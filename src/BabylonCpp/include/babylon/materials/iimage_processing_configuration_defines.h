@@ -19,6 +19,7 @@ struct BABYLON_SHARED_EXPORT IImageProcessingConfigurationDefines {
   bool EXPOSURE                   = false;
   bool COLORCURVES                = false;
   bool COLORGRADING               = false;
+  bool COLORGRADING3D             = false;
   bool FROMLINEARSPACE            = false;
   bool SAMPLER3DGREENDEPTH        = false;
   bool SAMPLER3DBGRMAP            = false;
