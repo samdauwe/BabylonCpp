@@ -45,6 +45,7 @@ private:
   bool _generateMipMaps;
   ICanvas* _canvas;
   ICanvasRenderingContext2D* _context;
+  Engine* _engine;
 
 }; // end of class DynamicTexture
 

@@ -17,20 +17,19 @@ DynamicTexture::DynamicTexture(const string_t& iName,
     , _samplingMode{samplingMode}
     , _generateMipMaps{generateMipMaps}
 {
-  name = iName;
-
-  auto engine = getScene()->getEngine();
-  wrapU       = TextureConstants::CLAMP_ADDRESSMODE;
-  wrapV       = TextureConstants::CLAMP_ADDRESSMODE;
+  name    = iName;
+  _engine = getScene()->getEngine();
+  wrapU   = TextureConstants::CLAMP_ADDRESSMODE;
+  wrapV   = TextureConstants::CLAMP_ADDRESSMODE;
 
   if (options.canvas) {
     _canvas  = options.canvas;
-    _texture = engine->createDynamicTexture(options.width, options.height,
-                                            generateMipMaps, samplingMode);
+    _texture = _engine->createDynamicTexture(options.width, options.height,
+                                             generateMipMaps, samplingMode);
   }
   else {
-    _texture = engine->createDynamicTexture(options.width, options.height,
-                                            generateMipMaps, samplingMode);
+    _texture = _engine->createDynamicTexture(options.width, options.height,
+                                             generateMipMaps, samplingMode);
   }
 
   if (_canvas) {
@@ -57,7 +56,7 @@ void DynamicTexture::_recreate(const ISize& textureSize)
 
   releaseInternalTexture();
 
-  _texture = getScene()->getEngine()->createDynamicTexture(
+  _texture = _engine->createDynamicTexture(
     textureSize.width, textureSize.height, _generateMipMaps, _samplingMode);
 }
 
@@ -65,8 +64,7 @@ void DynamicTexture::scale(float ratio)
 {
   auto textureSize = getSize();
 
-  textureSize.width  = static_cast<int>(textureSize.width * ratio);
-  textureSize.height = static_cast<int>(textureSize.height * ratio);
+  textureSize *= ratio;
 
   _recreate(textureSize);
 }
@@ -94,8 +92,7 @@ void DynamicTexture::clear()
 
 void DynamicTexture::update(bool invertY)
 {
-  getScene()->getEngine()->updateDynamicTexture(_texture, _canvas, invertY,
-                                                false, _format);
+  _engine->updateDynamicTexture(_texture, _canvas, invertY, false, _format);
 }
 
 void DynamicTexture::drawText(const string_t& text, int x, int y,
@@ -134,13 +131,18 @@ void DynamicTexture::drawText(const string_t& text, int x, int y,
 
 unique_ptr_t<DynamicTexture> DynamicTexture::clone() const
 {
+  auto scene = getScene();
+  if (!scene) {
+    return nullptr;
+  }
+
   auto textureSize = getSize();
   DynamicTextureOptions options;
   options.canvas  = _canvas;
   options.width   = textureSize.width;
   options.height  = textureSize.height;
-  auto newTexture = ::std::make_unique<DynamicTexture>(
-    name, options, getScene(), _generateMipMaps);
+  auto newTexture = ::std::make_unique<DynamicTexture>(name, options, scene,
+                                                       _generateMipMaps);
 
   // Base texture
   newTexture->setHasAlpha(hasAlpha());

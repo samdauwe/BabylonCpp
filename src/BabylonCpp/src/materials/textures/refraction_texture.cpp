@@ -24,10 +24,14 @@ RefractionTexture::~RefractionTexture()
 
 unique_ptr_t<RefractionTexture> RefractionTexture::clone() const
 {
+  auto scene = getScene();
+  if (!scene) {
+    return nullptr;
+  }
+
   auto textureSize = getSize();
   auto newTexture  = ::std::make_unique<RefractionTexture>(
-    name, Size(textureSize.width, textureSize.height), getScene(),
-    _generateMipMaps);
+    name, Size(textureSize.width, textureSize.height), scene, _generateMipMaps);
 
   // Base texture
   newTexture->setHasAlpha(hasAlpha());
@@ -35,8 +39,10 @@ unique_ptr_t<RefractionTexture> RefractionTexture::clone() const
 
   // Mirror Texture
   newTexture->refractionPlane = refractionPlane;
-  newTexture->renderList      = renderList;
-  newTexture->depth           = depth;
+  if (!renderList.empty()) {
+    newTexture->renderList = renderList;
+  }
+  newTexture->depth = depth;
 
   return newTexture;
 }

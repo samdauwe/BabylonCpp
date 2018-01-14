@@ -24,6 +24,8 @@ MultiRenderTarget::MultiRenderTarget(const string_t& name, Size size,
   const auto generateDepthTexture   = options.generateDepthTexture;
   const auto doNotChangeAspectRatio = options.doNotChangeAspectRatio;
 
+  _engine = scene->getEngine();
+
   if (!isSupported()) {
     dispose();
     return;
@@ -51,8 +53,7 @@ MultiRenderTarget::MultiRenderTarget(const string_t& name, Size size,
   const auto generateDepthBuffer   = options.generateDepthBuffer;
   const auto generateStencilBuffer = options.generateStencilBuffer;
 
-  _count = count;
-  _size  = size;
+  _size = size;
 
   _multiRenderTargetOptions = IMultiRenderTargetOptions{
     generateMipMaps,        // generateMipMaps
@@ -75,9 +76,8 @@ MultiRenderTarget::~MultiRenderTarget()
 
 bool MultiRenderTarget::isSupported() const
 {
-  auto engine = getScene()->getEngine();
-  return (engine->webGLVersion() > 1.f)
-         || (engine->getCaps().drawBuffersExtension);
+  return (_engine->webGLVersion() > 1.f)
+         || (_engine->getCaps().drawBuffersExtension);
 }
 
 vector_t<Texture*>& MultiRenderTarget::textures()
@@ -124,8 +124,8 @@ void MultiRenderTarget::_rebuild()
 
 void MultiRenderTarget::_createInternalTextures()
 {
-  _internalTextures = getScene()->getEngine()->createMultipleRenderTarget(
-    _size, _multiRenderTargetOptions);
+  _internalTextures
+    = _engine->createMultipleRenderTarget(_size, _multiRenderTargetOptions);
 }
 
 void MultiRenderTarget::_createTextures()
@@ -153,16 +153,16 @@ void MultiRenderTarget::setSamples(unsigned int value)
   }
 
   for (auto& _webGLTexture : _internalTextures) {
-    _samples = getScene()->getEngine()->updateRenderTargetTextureSampleCount(
-      _webGLTexture, value);
+    _samples
+      = _engine->updateRenderTargetTextureSampleCount(_webGLTexture, value);
   }
 }
 
 void MultiRenderTarget::resize(Size size)
 {
   releaseInternalTextures();
-  _internalTextures = getScene()->getEngine()->createMultipleRenderTarget(
-    size, _multiRenderTargetOptions);
+  _internalTextures
+    = _engine->createMultipleRenderTarget(size, _multiRenderTargetOptions);
   _createInternalTextures();
 }
 

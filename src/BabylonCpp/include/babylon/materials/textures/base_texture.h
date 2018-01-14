@@ -104,6 +104,8 @@ private:
   Scene* _scene;
   string_t _uid;
   Observer<BaseTexture>::Ptr _onDisposeObserver;
+  Matrix _textureMatrix;
+  Matrix _reflectionTextureMatrix;
 
 }; // end of class BaseTexture
 

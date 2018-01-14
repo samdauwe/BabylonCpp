@@ -6,12 +6,14 @@
 
 namespace BABYLON {
 
-struct BABYLON_SHARED_EXPORT RawTexture : public Texture {
+class BABYLON_SHARED_EXPORT RawTexture : public Texture {
 
-  RawTexture(const Uint8Array& data, int width, int height, int format,
+public:
+  RawTexture(const Uint8Array& data, int width, int height, unsigned int format,
              Scene* scene, bool generateMipMaps = true, bool invertY = false,
              unsigned int samplingMode
-             = TextureConstants::TRILINEAR_SAMPLINGMODE);
+             = TextureConstants::TRILINEAR_SAMPLINGMODE,
+             unsigned int type = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   ~RawTexture();
 
   void update(const Uint8Array& data);
@@ -32,21 +34,25 @@ struct BABYLON_SHARED_EXPORT RawTexture : public Texture {
     bool generateMipMaps = true, bool invertY = false,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
-  static unique_ptr_t<RawTexture>
-  CreateRGBTexture(const Uint8Array& data, int width, int height, Scene* scene,
-                   bool generateMipMaps = true, bool invertY = false,
-                   unsigned int samplingMode
-                   = TextureConstants::TRILINEAR_SAMPLINGMODE);
+  static unique_ptr_t<RawTexture> CreateRGBTexture(
+    const Uint8Array& data, int width, int height, Scene* scene,
+    bool generateMipMaps = true, bool invertY = false,
+    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
+    unsigned int type         = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
-  static unique_ptr_t<RawTexture>
-  CreateRGBATexture(const Uint8Array& data, int width, int height, Scene* scene,
-                    bool generateMipMaps = true, bool invertY = false,
-                    unsigned int samplingMode
-                    = TextureConstants::TRILINEAR_SAMPLINGMODE);
+  static unique_ptr_t<RawTexture> CreateRGBATexture(
+    const Uint8Array& data, int width, int height, Scene* scene,
+    bool generateMipMaps = true, bool invertY = false,
+    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
+    unsigned int type         = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
-  int format;
+  unsigned int format;
   unsigned int wrapU;
   unsigned int wrapV;
+  unsigned int type;
+
+private:
+  Engine* _engine;
 
 }; // struct of class RawTexture
 

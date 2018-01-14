@@ -6,6 +6,7 @@
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/texture.h>
+#include <babylon/math/spherical_polynomial.h>
 #include <babylon/tools/hdr/cube_map_to_spherical_polynomial_tools.h>
 #include <babylon/tools/tools.h>
 
@@ -34,8 +35,10 @@ BaseTexture::BaseTexture(Scene* scene)
     , _texture{nullptr}
     , _hasAlpha{false}
     , _coordinatesMode{TextureConstants::EXPLICIT_MODE}
-    , _scene{scene}
+    , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _onDisposeObserver{nullptr}
+    , _textureMatrix{Matrix::IdentityReadOnly()}
+    , _reflectionTextureMatrix{Matrix::IdentityReadOnly()}
 {
 }
 
@@ -50,7 +53,9 @@ IReflect::Type BaseTexture::type() const
 
 void BaseTexture::addToScene(unique_ptr_t<BaseTexture>&& newTexture)
 {
-  _scene->textures.emplace_back(::std::move(newTexture));
+  if (_scene) {
+    _scene->textures.emplace_back(::std::move(newTexture));
+  }
 }
 
 bool BaseTexture::hasAlpha() const
@@ -64,7 +69,9 @@ void BaseTexture::setHasAlpha(bool value)
     return;
   }
   _hasAlpha = value;
-  _scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  if (_scene) {
+    _scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  }
 }
 
 unsigned int BaseTexture::coordinatesMode() const
@@ -78,7 +85,9 @@ void BaseTexture::setCoordinatesMode(unsigned int value)
     return;
   }
   _coordinatesMode = value;
-  _scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  if (_scene) {
+    _scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  }
 }
 
 string_t BaseTexture::uid()
@@ -120,12 +129,12 @@ Scene* BaseTexture::getScene() const
 
 Matrix* BaseTexture::getTextureMatrix()
 {
-  return nullptr;
+  return &_textureMatrix;
 }
 
 Matrix* BaseTexture::getReflectionTextureMatrix()
 {
-  return nullptr;
+  return &_reflectionTextureMatrix;
 }
 
 InternalTexture* BaseTexture::getInternalTexture()
@@ -154,11 +163,11 @@ bool BaseTexture::isReady()
 
 ISize BaseTexture::getSize() const
 {
-  if (_texture->width) {
+  if (_texture && _texture->width) {
     return Size(_texture->width, _texture->height);
   }
 
-  if (_texture->_size) {
+  if (_texture && _texture->_size) {
     return Size(_texture->_size, _texture->_size);
   }
 
@@ -190,6 +199,10 @@ bool BaseTexture::canRescale()
 InternalTexture* BaseTexture::_getFromCache(const string_t& url, bool noMipmap,
                                             unsigned int sampling)
 {
+  if (!_scene) {
+    return nullptr;
+  }
+
   auto& texturesCache = _scene->getEngine()->getLoadedTexturesCache();
   for (auto& texturesCacheEntry : texturesCache) {
     if ((texturesCacheEntry->url.compare(url) == 0)
@@ -248,8 +261,13 @@ ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex)
     return ArrayBufferView();
   }
 
-  auto size   = getSize();
-  auto engine = getScene()->getEngine();
+  auto size  = getSize();
+  auto scene = getScene();
+  if (!scene) {
+    return ArrayBufferView();
+  }
+
+  auto engine = scene->getEngine();
 
   if (_texture->isCube) {
     return engine->_readTexturePixels(_texture, size.width, size.height,
@@ -269,7 +287,6 @@ void BaseTexture::releaseInternalTexture()
 
 SphericalPolynomial* BaseTexture::sphericalPolynomial()
 {
-#if 0
   if (!_texture || !isReady()) {
     return nullptr;
   }
@@ -281,19 +298,14 @@ SphericalPolynomial* BaseTexture::sphericalPolynomial()
   }
 
   return _texture->_sphericalPolynomial.get();
-#else
-  return nullptr;
-#endif
 }
 
-void BaseTexture::setSphericalPolynomial(const SphericalPolynomial& /*value*/)
+void BaseTexture::setSphericalPolynomial(const SphericalPolynomial& value)
 {
-#if 0
   if (_texture) {
     _texture->_sphericalPolynomial
       = ::std::make_unique<SphericalPolynomial>(value);
   }
-#endif
 }
 
 BaseTexture* BaseTexture::_lodTextureHigh() const
@@ -322,8 +334,12 @@ BaseTexture* BaseTexture::_lodTextureLow() const
 
 void BaseTexture::dispose(bool /*doNotRecurse*/)
 {
+  if (!_scene) {
+    return;
+  }
+
   // Animations
-  getScene()->stopAnimation(this);
+  _scene->stopAnimation(this);
 
   // Remove from scene
   _scene->textures.erase(

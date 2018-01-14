@@ -418,11 +418,12 @@ public:
   void updateRawTexture(InternalTexture* texture, const Uint8Array& data,
                         unsigned int format, bool invertY = true,
                         const string_t& compression = "");
-  InternalTexture* createRawTexture(const Uint8Array& data, int width,
-                                    int height, unsigned int format,
-                                    bool generateMipMaps, bool invertY,
-                                    unsigned int samplingMode,
-                                    const string_t& compression = "");
+  InternalTexture*
+  createRawTexture(const Uint8Array& data, int width, int height,
+                   unsigned int format, bool generateMipMaps, bool invertY,
+                   unsigned int samplingMode, const string_t& compression = "",
+                   unsigned int type
+                   = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   InternalTexture* createDynamicTexture(int width, int height,
                                         bool generateMipMaps,
                                         unsigned int samplingMode);

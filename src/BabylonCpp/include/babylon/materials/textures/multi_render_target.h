@@ -36,7 +36,6 @@ private:
 private:
   vector_t<InternalTexture*> _internalTextures;
   vector_t<Texture*> _textures;
-  std::size_t _count;
   IMultiRenderTargetOptions _multiRenderTargetOptions;
 
 }; // end of class MultiRenderTarget

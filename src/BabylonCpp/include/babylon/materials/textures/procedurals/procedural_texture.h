@@ -8,6 +8,8 @@ namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT ProceduralTexture : public Texture {
 
+  friend class CustomProceduralTexture;
+
 public:
   ProceduralTexture(const string_t& name, const Size& size,
                     const unordered_map_t<string_t, string_t>& fragment,

@@ -39,6 +39,11 @@ Texture::Texture(const string_t& _url, Scene* scene, bool noMipmap,
 {
   name = _url;
 
+  if (!scene) {
+    return;
+  }
+  scene->getEngine()->onBeforeTextureInitObservable.notifyObservers(this);
+
   _load = [this](InternalTexture*, EventState&) {
     auto onLoadObservable = *_onLoadObservable;
     if (onLoadObservable.hasObservers()) {
@@ -48,8 +53,9 @@ Texture::Texture(const string_t& _url, Scene* scene, bool noMipmap,
       _onLoad();
     }
 
-    if (!isBlocking()) {
-      getScene()->resetCachedMaterial();
+    auto scene = getScene();
+    if (!isBlocking() && scene) {
+      scene->resetCachedMaterial();
     }
   };
 
@@ -139,12 +145,17 @@ void Texture::delayLoad()
     return;
   }
 
+  auto scene = getScene();
+  if (!scene) {
+    return;
+  }
+
   delayLoadState = EngineConstants::DELAYLOADSTATE_LOADED;
   _texture       = _getFromCache(url, _noMipmap, _samplingMode);
 
   if (!_texture) {
 #if 0
-    _texture = getScene()->getEngine()->createTexture(
+    _texture = scene->getEngine()->createTexture(
       url, _noMipmap, _invertY, getScene(), _samplingMode, _delayedOnLoad,
       _delayedOnError, _buffer, nullptr, _format);
     if (_deleteBuffer) {
@@ -155,12 +166,17 @@ void Texture::delayLoad()
   else {
     if (_texture->isReady) {
       Tools::SetImmediate([this]() {
+        if (!_delayedOnLoad) {
+          return;
+        }
         EventState es{-1};
         _delayedOnLoad(nullptr, es);
       });
     }
     else {
-      _texture->onLoadedObservable.add(_delayedOnLoad);
+      if (_delayedOnLoad) {
+        _texture->onLoadedObservable.add(_delayedOnLoad);
+      }
     }
   }
 }
@@ -171,8 +187,13 @@ void Texture::updateSamplingMode(unsigned int samplingMode)
     return;
   }
 
+  auto scene = getScene();
+  if (!scene) {
+    return;
+  }
+
   _samplingMode = samplingMode;
-  getScene()->getEngine()->updateTextureSamplingMode(samplingMode, _texture);
+  scene->getEngine()->updateTextureSamplingMode(samplingMode, _texture);
 }
 
 void Texture::_prepareRowForTextureGeneration(float x, float y, float z,
@@ -243,7 +264,12 @@ Matrix* Texture::getTextureMatrix()
   _cachedTextureMatrix->m[9]  = _t0.y;
   _cachedTextureMatrix->m[10] = _t0.z;
 
-  getScene()->markAllMaterialsAsDirty(
+  auto scene = getScene();
+  if (!scene) {
+    return _cachedTextureMatrix.get();
+  }
+
+  scene->markAllMaterialsAsDirty(
     Material::TextureDirtyFlag,
     [this](Material* mat) { return mat->hasTexture(this); });
 
@@ -253,6 +279,10 @@ Matrix* Texture::getTextureMatrix()
 Matrix* Texture::getReflectionTextureMatrix()
 {
   auto scene = getScene();
+  if (!scene) {
+    return _cachedTextureMatrix.get();
+  }
+
   if (stl_util::almost_equal(uOffset, _cachedUOffset)
       && stl_util::almost_equal(vOffset, _cachedVOffset)
       && stl_util::almost_equal(uScale, _cachedUScale)
@@ -270,7 +300,10 @@ Matrix* Texture::getReflectionTextureMatrix()
   }
 
   if (!_cachedTextureMatrix) {
-    _cachedTextureMatrix  = ::std::make_unique<Matrix>(Matrix::Zero());
+    _cachedTextureMatrix = ::std::make_unique<Matrix>(Matrix::Zero());
+  }
+
+  if (!_projectionModeMatrix) {
     _projectionModeMatrix = ::std::make_unique<Matrix>(Matrix::Zero());
   }
 
@@ -319,8 +352,8 @@ Matrix* Texture::getReflectionTextureMatrix()
 
 Texture* Texture::clone() const
 {
-  auto newTexture = Texture::New(_texture->url, getScene(), _noMipmap, _invertY,
-                                 _samplingMode);
+  auto newTexture = Texture::New(_texture ? _texture->url : nullptr, getScene(),
+                                 _noMipmap, _invertY, _samplingMode);
 
   // Base texture
   newTexture->setHasAlpha(hasAlpha());

@@ -2390,7 +2390,8 @@ InternalTexture* Engine::createRawTexture(const Uint8Array& data, int width,
                                           int height, unsigned int format,
                                           bool generateMipMaps, bool invertY,
                                           unsigned int samplingMode,
-                                          const string_t& compression)
+                                          const string_t& compression,
+                                          unsigned int /*type*/)
 {
   auto texture = ::std::make_unique<InternalTexture>(
     this, InternalTexture::DATASOURCE_RAW);
