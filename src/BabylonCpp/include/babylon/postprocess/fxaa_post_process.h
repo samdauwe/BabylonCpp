@@ -13,7 +13,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT FxaaPostProcess : public PostProcess {
 
 public:
-  FxaaPostProcess(const string_t& _name, float ratio, Camera* camera,
+  FxaaPostProcess(const string_t& _name, float ratio, Camera* camera = nullptr,
                   unsigned int samplingMode
                   = TextureConstants::BILINEAR_SAMPLINGMODE,
                   Engine* engine = nullptr, bool reusable = false,
