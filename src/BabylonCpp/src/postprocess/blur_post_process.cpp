@@ -74,19 +74,19 @@ bool BlurPostProcess::packedFloat() const
 void BlurPostProcess::_updateParameters()
 {
   // Generate sampling offsets and weights
-  float N                  = _kernel;
-  unsigned int centerIndex = static_cast<unsigned>((N - 1) / 2.f);
+  const auto N           = _kernel;
+  const auto centerIndex = static_cast<unsigned>((N - 1) / 2.f);
 
   // Generate Gaussian sampling weights over kernel
-  unsigned int _N = static_cast<unsigned>(N);
+  const auto _N = static_cast<unsigned>(N);
   Int32Array offsets(_N);
   Float32Array weights(_N);
-  float totalWeight = 0;
+  float totalWeight = 0.f;
   for (unsigned int i = 0; i < _N; i++) {
-    float u    = i / static_cast<float>(N - 1);
-    float w    = _gaussianWeight(u * 2.f - 1.f);
-    offsets[i] = static_cast<int>(i - centerIndex);
-    weights[i] = w;
+    const auto u = i / static_cast<float>(N - 1);
+    const auto w = _gaussianWeight(u * 2.f - 1.f);
+    offsets[i]   = static_cast<int>(i - centerIndex);
+    weights[i]   = w;
     totalWeight += w;
   }
 
