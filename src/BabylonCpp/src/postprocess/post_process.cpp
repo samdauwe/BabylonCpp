@@ -57,6 +57,11 @@ PostProcess::PostProcess(
     , _shareOutputWithPostProcess{nullptr}
     , _texelSize{Vector2::Zero()}
     , _forcedOutputTexture{nullptr}
+    , _onActivateObserver{nullptr}
+    , _onSizeChangedObserver{nullptr}
+    , _onApplyObserver{nullptr}
+    , _onBeforeRenderObserver{nullptr}
+    , _onAfterRenderObserver{nullptr}
 {
   if (camera) {
     _camera = camera;
@@ -65,7 +70,7 @@ PostProcess::PostProcess(
     _engine = _scene->getEngine();
     _scene->postProcesses.emplace_back(this);
   }
-  else {
+  else if (engine) {
     _engine = engine;
     _scene->postProcesses.emplace_back(this);
   }
@@ -97,7 +102,9 @@ void PostProcess::setOnActivate(
   if (_onActivateObserver) {
     onActivateObservable.remove(_onActivateObserver);
   }
-  _onActivateObserver = onActivateObservable.add(callback);
+  if (callback) {
+    _onActivateObserver = onActivateObservable.add(callback);
+  }
 }
 
 void PostProcess::setOnSizeChanged(
@@ -197,7 +204,7 @@ void PostProcess::updateEffect(
   options.attributes    = {"position"};
   options.uniformsNames = !uniforms.empty() ? uniforms : _parameters;
   options.samplers      = !samplers.empty() ? samplers : _samplers;
-  options.defines       = defines;
+  options.defines       = !defines.empty() ? defines : "";
   options.onCompiled    = onCompiled;
   options.onError       = onError;
   options.indexParameters
@@ -219,26 +226,26 @@ void PostProcess::markTextureDirty()
 void PostProcess::activate(Camera* camera, InternalTexture* sourceTexture,
                            bool forceDepthStencil)
 {
+  auto pCamera = camera ? camera : _camera;
+
+  auto scene  = pCamera->getScene();
+  auto engine = scene->getEngine();
+
+  const int maxSize = engine->getCaps().maxTextureSize;
+
+  const int requiredWidth = static_cast<int>(
+    static_cast<float>(sourceTexture ? sourceTexture->width :
+                                       _engine->getRenderingCanvas()->width)
+    * _renderRatio);
+  const int requiredHeight = static_cast<int>(
+    static_cast<float>(sourceTexture ? sourceTexture->height :
+                                       _engine->getRenderingCanvas()->height)
+    * _renderRatio);
+
+  int desiredWidth  = _options.width == -1 ? requiredWidth : _options.width;
+  int desiredHeight = _options.height == -1 ? requiredHeight : _options.height;
+
   if (!_shareOutputWithPostProcess && !_forcedOutputTexture) {
-    auto pCamera = camera ? camera : _camera;
-
-    auto scene  = pCamera->getScene();
-    auto engine = scene->getEngine();
-
-    const int maxSize = engine->getCaps().maxTextureSize;
-
-    const int requiredWidth = static_cast<int>(
-      static_cast<float>(sourceTexture ? sourceTexture->width :
-                                         _engine->getRenderingCanvas()->width)
-      * _renderRatio);
-    const int requiredHeight = static_cast<int>(
-      static_cast<float>(sourceTexture ? sourceTexture->height :
-                                         _engine->getRenderingCanvas()->height)
-      * _renderRatio);
-
-    int desiredWidth = _options.width == -1 ? requiredWidth : _options.width;
-    int desiredHeight
-      = _options.height == -1 ? requiredHeight : _options.height;
 
     if (adaptScaleToCurrentViewport) {
       auto currentViewport = engine->currentViewport();

@@ -9,7 +9,8 @@
 
 namespace BABYLON {
 
-PostProcessManager::PostProcessManager(Scene* scene) : _scene{scene}
+PostProcessManager::PostProcessManager(Scene* scene)
+    : _scene{scene}, _indexBuffer{nullptr}
 {
 }
 
@@ -60,15 +61,19 @@ void PostProcessManager::_rebuild()
 bool PostProcessManager::_prepareFrame(
   InternalTexture* sourceTexture, const vector_t<PostProcess*>& iPostProcesses)
 {
-  const auto& postProcesses = !iPostProcesses.empty() ?
-                                iPostProcesses :
-                                _scene->activeCamera->_postProcesses;
+  auto camera = _scene->activeCamera;
+  if (!camera) {
+    return false;
+  }
+
+  const auto& postProcesses
+    = !iPostProcesses.empty() ? iPostProcesses : camera->_postProcesses;
 
   if (postProcesses.empty() || !_scene->postProcessesEnabled) {
     return false;
   }
 
-  postProcesses[0]->activate(_scene->activeCamera, sourceTexture);
+  postProcesses[0]->activate(camera, sourceTexture, !postProcesses.empty());
   return true;
 }
 
@@ -76,6 +81,10 @@ void PostProcessManager::directRender(
   const vector_t<PostProcess*>& postProcesses, InternalTexture* targetTexture,
   bool forceFullscreenViewport)
 {
+  if (!_scene->activeCamera) {
+    return;
+  }
+
   auto engine = _scene->getEngine();
 
   for (unsigned int index = 0; index < postProcesses.size(); ++index) {
@@ -118,9 +127,13 @@ void PostProcessManager::_finalizeFrame(
   bool doNotPresent, InternalTexture* targetTexture, unsigned int faceIndex,
   const vector_t<PostProcess*>& _postProcesses, bool forceFullscreenViewport)
 {
-  const auto& postProcesses = _postProcesses.empty() ?
-                                _scene->activeCamera->_postProcesses :
-                                _postProcesses;
+  auto camera = _scene->activeCamera;
+  if (!camera) {
+    return;
+  }
+
+  const auto& postProcesses
+    = _postProcesses.empty() ? camera->_postProcesses : _postProcesses;
   if (postProcesses.empty() || !_scene->postProcessesEnabled) {
     return;
   }
@@ -128,7 +141,7 @@ void PostProcessManager::_finalizeFrame(
 
   for (unsigned int index = 0; index < postProcesses.size(); ++index) {
     if (index < postProcesses.size() - 1) {
-      postProcesses[index + 1]->activate(_scene->activeCamera, targetTexture);
+      postProcesses[index + 1]->activate(camera, targetTexture);
     }
     else {
       if (targetTexture) {

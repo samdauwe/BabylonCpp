@@ -11,16 +11,29 @@ namespace BABYLON {
 ImageProcessingPostProcess::ImageProcessingPostProcess(
   const string_t& iName, float renderRatio, Camera* camera,
   unsigned int samplingMode, Engine* engine, bool reusable,
-  unsigned int textureType)
+  unsigned int textureType,
+  ImageProcessingConfiguration* imageProcessingConfiguration)
     : PostProcess{iName,       "imageProcessing", {},     {},       renderRatio,
                   camera,      samplingMode,      engine, reusable, "",
                   textureType, "postprocess",     {},     true}
+    , _imageProcessingObserver{nullptr}
     , _fromLinearSpace{false}
 {
+  // Setup the configuration as forced by the constructor. This would then not
+  // force the scene materials output in linear space and let untouched the
+  // default forward pass.
+  if (imageProcessingConfiguration) {
+    imageProcessingConfiguration->setApplyByPostProcess(true);
+    _attachImageProcessingConfiguration(imageProcessingConfiguration, true);
+    // This will cause the shader to be compiled
+    setFromLinearSpace(false);
+  }
   // Setup the default processing configuration to the scene.
-  _attachImageProcessingConfiguration(nullptr, true);
+  else {
+    _attachImageProcessingConfiguration(nullptr, true);
 
-  _imageProcessingConfiguration->setApplyByPostProcess(true);
+    _imageProcessingConfiguration->setApplyByPostProcess(true);
+  }
 
   setOnApply([&](Effect* effect, EventState& /*es*/) {
     _imageProcessingConfiguration->bind(effect, aspectRatio());
@@ -63,8 +76,21 @@ void ImageProcessingPostProcess::_attachImageProcessingConfiguration(
 
   // Pick the scene configuration if needed.
   if (!configuration) {
-    auto camera = getCamera();
-    auto scene  = camera ? camera->getScene() : Engine::LastCreatedScene();
+    Scene* scene = nullptr;
+    auto engine  = getEngine();
+    auto camera  = getCamera();
+
+    if (camera) {
+      scene = camera->getScene();
+    }
+    else if (engine && !engine->scenes.empty()) {
+      auto& scenes = engine->scenes;
+      scene        = scenes.back();
+    }
+    else {
+      scene = Engine::LastCreatedScene();
+    }
+
     _imageProcessingConfiguration = scene->imageProcessingConfiguration();
   }
   else {

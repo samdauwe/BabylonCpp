@@ -17,11 +17,11 @@ public:
 
   /** Methods **/
   void _rebuild();
-  bool _prepareFrame(InternalTexture* sourceTexture,
+  bool _prepareFrame(InternalTexture* sourceTexture              = nullptr,
                      const vector_t<PostProcess*>& postProcesses = {});
   void directRender(const vector_t<PostProcess*>& postProcesses,
-                    InternalTexture* targetTexture,
-                    bool forceFullscreenViewport = false);
+                    InternalTexture* targetTexture = nullptr,
+                    bool forceFullscreenViewport   = false);
   void _finalizeFrame(bool doNotPresent,
                       InternalTexture* targetTexture = nullptr,
                       unsigned int faceIndex         = 0,

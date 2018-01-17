@@ -28,7 +28,6 @@ public:
 
 public:
   string_t _name;
-  bool _enabled;
 
 private:
   vector_t<Mesh*> _renderList;

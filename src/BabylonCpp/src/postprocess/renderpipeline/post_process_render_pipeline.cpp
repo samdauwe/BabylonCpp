@@ -80,10 +80,14 @@ void PostProcessRenderPipeline::_disableEffect(const string_t& renderEffectName,
 void PostProcessRenderPipeline::_attachCameras(const vector_t<Camera*>& cameras,
                                                bool unique)
 {
-  auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
+  auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
+
+  if (cams.empty()) {
+    return;
+  }
 
   vector_t<Camera*> camerasToDelete;
-  for (auto& camera : _cam) {
+  for (auto& camera : cams) {
     const auto& cameraName = camera->name;
 
     if (stl_util::contains(_cameras, camera->name)) {
@@ -101,29 +105,38 @@ void PostProcessRenderPipeline::_attachCameras(const vector_t<Camera*>& cameras,
   }
 
   for (auto& item : _renderEffects) {
-    item.second->_attachCameras(_cam);
+    item.second->_attachCameras(cams);
   }
 }
 
 void PostProcessRenderPipeline::_detachCameras(const vector_t<Camera*>& cameras)
 {
-  auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
+  auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
-  for (auto& item : _renderEffects) {
-    item.second->_detachCameras(_cam);
+  if (cams.empty()) {
+    return;
   }
 
-  for (auto& camera : _cam) {
+  for (auto& item : _renderEffects) {
+    item.second->_detachCameras(cams);
+  }
+
+  for (auto& camera : cams) {
     auto it = _cameras.find(camera->name);
-    if (it != _cameras.end())
+    if (it != _cameras.end()) {
       _cameras.erase(it);
+    }
   }
 }
 
 void PostProcessRenderPipeline::_enableDisplayOnlyPass(
   const string_t& passName, const vector_t<Camera*>& cameras)
 {
-  auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
+  auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
+
+  if (cams.empty()) {
+    return;
+  }
 
   PostProcessRenderPass* pass = nullptr;
   for (auto& item : _renderEffects) {
@@ -139,12 +152,12 @@ void PostProcessRenderPipeline::_enableDisplayOnlyPass(
   }
 
   for (auto& renderEffect : _renderEffects) {
-    renderEffect.second->_disable(_cam);
+    renderEffect.second->_disable(cams);
   }
 
   pass->_name = string_t(PostProcessRenderPipeline::PASS_SAMPLER_NAME);
 
-  for (auto& camera : _cam) {
+  for (auto& camera : cams) {
     const auto& cameraName = camera->name;
     if (!stl_util::contains(_renderEffectsForIsolatedPass, cameraName)) {
       _renderEffectsForIsolatedPass[cameraName] = new PostProcessRenderEffect(
@@ -163,9 +176,13 @@ void PostProcessRenderPipeline::_enableDisplayOnlyPass(
 void PostProcessRenderPipeline::_disableDisplayOnlyPass(
   const string_t& /*passName*/, const vector_t<Camera*>& cameras)
 {
-  auto _cam = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
+  auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
-  for (auto& camera : _cam) {
+  if (cams.empty()) {
+    return;
+  }
+
+  for (auto& camera : cams) {
     const auto& cameraName = camera->name;
     if (!stl_util::contains(_renderEffectsForIsolatedPass, cameraName)) {
       _renderEffectsForIsolatedPass[cameraName] = new PostProcessRenderEffect(
@@ -179,7 +196,7 @@ void PostProcessRenderPipeline::_disableDisplayOnlyPass(
   }
 
   for (auto& item : _renderEffects) {
-    item.second->_enable(_cam);
+    item.second->_enable(cams);
   }
 }
 

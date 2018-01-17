@@ -12,11 +12,7 @@ PostProcessRenderPass::PostProcessRenderPass(
   const vector_t<Mesh*>& renderList,
   const ::std::function<void(int* faceIndex, EventState&)>& beforeRender,
   const ::std::function<void(int* faceIndex, EventState&)>& afterRender)
-    : _name{name}
-    , _enabled{true}
-    , _renderList{renderList}
-    , _scene{scene}
-    , _refCount{0}
+    : _name{name}, _renderList{renderList}, _scene{scene}, _refCount{0}
 {
   _renderTexture = ::std::make_unique<RenderTargetTexture>(name, size, scene);
   setRenderList(renderList);

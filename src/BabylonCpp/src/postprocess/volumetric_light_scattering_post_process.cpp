@@ -90,7 +90,7 @@ bool VolumetricLightScatteringPostProcess::isReady(SubMesh* subMesh,
   auto _mesh = subMesh->getMesh();
 
   // Render mesh as default
-  if (_mesh == mesh) {
+  if (_mesh == mesh && _mesh->material()) {
     return _mesh->material()->isReady(mesh);
   }
 
@@ -122,7 +122,8 @@ bool VolumetricLightScatteringPostProcess::isReady(SubMesh* subMesh,
                          + ::std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back(
       "#define BonesPerMesh "
-      + ::std::to_string(mesh->skeleton()->bones.size() + 1));
+      + ::std::to_string(
+          mesh->skeleton() ? (mesh->skeleton()->bones.size() + 1) : 0));
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
@@ -213,7 +214,14 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
   _volumetricLightScatteringRTT->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
   _volumetricLightScatteringRTT->renderList.clear();
   _volumetricLightScatteringRTT->renderParticles = false;
-  scene->customRenderTargets.emplace_back(_volumetricLightScatteringRTT);
+
+  auto camera = getCamera();
+  if (camera) {
+    camera->customRenderTargets.emplace_back(_volumetricLightScatteringRTT);
+  }
+  else {
+    scene->customRenderTargets.emplace_back(_volumetricLightScatteringRTT);
+  }
 
   // Custom render function for submeshes
   auto renderSubMesh = [&](SubMesh* subMesh) {
@@ -222,11 +230,17 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
       return;
     }
 
+    auto material = subMesh->getMaterial();
+
+    if (!material) {
+      return;
+    }
+
     auto scene_  = _mesh->getScene();
     auto engine_ = scene_->getEngine();
 
     // Culling
-    engine_->setState(subMesh->getMaterial()->backFaceCulling());
+    engine_->setState(material->backFaceCulling());
 
     // Managing instances
     auto batch = _mesh->_getInstancesRenderList(subMesh->_id);
@@ -243,14 +257,14 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
     if (isReady(subMesh, hardwareInstancedRendering)) {
       auto effect = _volumetricLightScatteringPass;
       if (_mesh == mesh) {
-        effect = subMesh->getMaterial()->getEffect();
+        effect = material->getEffect();
       }
 
       engine_->enableEffect(effect);
       _mesh->_bind(subMesh, effect, Material::TriangleFillMode);
 
       if (_mesh == mesh) {
-        subMesh->getMaterial()->bind(_mesh->getWorldMatrix(), _mesh);
+        material->bind(_mesh->getWorldMatrix(), _mesh);
       }
       else {
         auto material = subMesh->getMaterial();
@@ -272,7 +286,8 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
         }
 
         // Bones
-        if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
+        if (mesh->useBones() && mesh->computeBonesUsingShaders()
+            && mesh->skeleton()) {
           _volumetricLightScatteringPass->setMatrices(
             "mBones", mesh->skeleton()->getTransformMatrices(mesh));
         }
@@ -302,73 +317,78 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
   _volumetricLightScatteringRTT->onAfterRenderObservable.add(
     [&](int*, EventState&) { scene->clearColor = savedSceneClearColor; });
 
-  _volumetricLightScatteringRTT->customRenderFunction = [&](
-    const vector_t<SubMesh*>& opaqueSubMeshes,
-    const vector_t<SubMesh*>& alphaTestSubMeshes,
-    const vector_t<SubMesh*>& transparentSubMeshes,
-    const vector_t<SubMesh*>& depthOnlySubMeshes,
-    const ::std::function<void()>& /*beforeTransparents*/) {
-    auto pEngine = scene->getEngine();
+  _volumetricLightScatteringRTT->customRenderFunction
+    = [&](const vector_t<SubMesh*>& opaqueSubMeshes,
+          const vector_t<SubMesh*>& alphaTestSubMeshes,
+          const vector_t<SubMesh*>& transparentSubMeshes,
+          const vector_t<SubMesh*>& depthOnlySubMeshes,
+          const ::std::function<void()>& /*beforeTransparents*/) {
+        auto pEngine = scene->getEngine();
 
-    if (!depthOnlySubMeshes.empty()) {
-      engine->setColorWrite(false);
-      for (auto& depthOnlySubMesh : depthOnlySubMeshes) {
-        renderSubMesh(depthOnlySubMesh);
-      }
-      engine->setColorWrite(true);
-    }
+        if (!depthOnlySubMeshes.empty()) {
+          engine->setColorWrite(false);
+          for (auto& depthOnlySubMesh : depthOnlySubMeshes) {
+            renderSubMesh(depthOnlySubMesh);
+          }
+          engine->setColorWrite(true);
+        }
 
-    for (const auto& opaqueSubMesh : opaqueSubMeshes) {
-      renderSubMesh(opaqueSubMesh);
-    }
+        for (const auto& opaqueSubMesh : opaqueSubMeshes) {
+          renderSubMesh(opaqueSubMesh);
+        }
 
-    pEngine->setAlphaTesting(true);
-    for (const auto& alphaTestSubMesh : alphaTestSubMeshes) {
-      renderSubMesh(alphaTestSubMesh);
-    }
-    pEngine->setAlphaTesting(false);
+        pEngine->setAlphaTesting(true);
+        for (const auto& alphaTestSubMesh : alphaTestSubMeshes) {
+          renderSubMesh(alphaTestSubMesh);
+        }
+        pEngine->setAlphaTesting(false);
 
-    if (!transparentSubMeshes.empty()) {
-      // Sort sub meshes
-      for (auto& submesh : transparentSubMeshes) {
-        submesh->_alphaIndex       = submesh->getMesh()->alphaIndex;
-        submesh->_distanceToCamera = submesh->getBoundingInfo()
-                                       .boundingSphere.centerWorld
-                                       .subtract(scene->activeCamera->position)
-                                       .length();
-      }
+        if (!transparentSubMeshes.empty()) {
+          // Sort sub meshes
+          for (auto& submesh : transparentSubMeshes) {
+            auto boundingInfo = submesh->getBoundingInfo();
 
-      auto sortedArray = stl_util::slice(
-        transparentSubMeshes, 0, static_cast<int>(transparentSubMeshes.size()));
-      ::std::sort(sortedArray.begin(), sortedArray.end(),
-                  [](const SubMesh* a, const SubMesh* b) {
-                    // Alpha index first
-                    if (a->_alphaIndex > b->_alphaIndex) {
-                      return 1;
-                    }
-                    if (a->_alphaIndex < b->_alphaIndex) {
-                      return -1;
-                    }
+            if (scene->activeCamera) {
+              submesh->_alphaIndex = submesh->getMesh()->alphaIndex;
+              submesh->_distanceToCamera
+                = boundingInfo.boundingSphere.centerWorld
+                    .subtract(scene->activeCamera->position)
+                    .length();
+            }
+          }
 
-                    // Then distance to camera
-                    if (a->_distanceToCamera < b->_distanceToCamera) {
-                      return 1;
-                    }
-                    if (a->_distanceToCamera > b->_distanceToCamera) {
-                      return -1;
-                    }
+          auto sortedArray
+            = stl_util::slice(transparentSubMeshes, 0,
+                              static_cast<int>(transparentSubMeshes.size()));
+          ::std::sort(sortedArray.begin(), sortedArray.end(),
+                      [](const SubMesh* a, const SubMesh* b) {
+                        // Alpha index first
+                        if (a->_alphaIndex > b->_alphaIndex) {
+                          return 1;
+                        }
+                        if (a->_alphaIndex < b->_alphaIndex) {
+                          return -1;
+                        }
 
-                    return 0;
-                  });
+                        // Then distance to camera
+                        if (a->_distanceToCamera < b->_distanceToCamera) {
+                          return 1;
+                        }
+                        if (a->_distanceToCamera > b->_distanceToCamera) {
+                          return -1;
+                        }
 
-      // Render sub meshes
-      pEngine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
-      for (const auto& subMesh : sortedArray) {
-        renderSubMesh(subMesh);
-      }
-      pEngine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
-    }
-  };
+                        return 0;
+                      });
+
+          // Render sub meshes
+          pEngine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
+          for (const auto& subMesh : sortedArray) {
+            renderSubMesh(subMesh);
+          }
+          pEngine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
+        }
+      };
 }
 
 void VolumetricLightScatteringPostProcess::_updateMeshScreenCoordinates(
@@ -389,7 +409,7 @@ void VolumetricLightScatteringPostProcess::_updateMeshScreenCoordinates(
   }
 
   auto identityMatrix = Matrix::Identity();
-  Vector3 pos
+  auto pos
     = Vector3::Project(meshPosition, identityMatrix, transform, _viewPort);
 
   _screenCoordinates.x = pos.x / static_cast<float>(_viewPort.width);

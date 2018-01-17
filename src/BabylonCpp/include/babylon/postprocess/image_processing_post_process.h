@@ -14,11 +14,11 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT ImageProcessingPostProcess : public PostProcess {
 
 public:
-  ImageProcessingPostProcess(const string_t& name, float renderRatio,
-                             Camera* camera, unsigned int samplingMode,
-                             Engine* engine, bool reusable = false,
-                             unsigned int textureType
-                             = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+  ImageProcessingPostProcess(
+    const string_t& name, float renderRatio, Camera* camera,
+    unsigned int samplingMode, Engine* engine, bool reusable = false,
+    unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+    ImageProcessingConfiguration* imageProcessingConfiguration = nullptr);
   ~ImageProcessingPostProcess();
 
   /**

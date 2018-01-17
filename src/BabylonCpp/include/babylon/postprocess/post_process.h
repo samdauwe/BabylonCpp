@@ -28,7 +28,7 @@ public:
     unsigned int textureType  = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
     const string_t& vertexUrl = "postprocess",
     const unordered_map_t<string_t, unsigned int>& indexParameters = {},
-    bool blockCompilation = false);
+    bool blockCompilation                                          = false);
   PostProcess(
     const string_t& name, const string_t& fragmentUrl,
     const vector_t<string_t>& parameters, const vector_t<string_t>& samplers,
@@ -39,7 +39,7 @@ public:
     unsigned int textureType  = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
     const string_t& vertexUrl = "postprocess",
     const unordered_map_t<string_t, unsigned int>& indexParameters = {},
-    bool blockCompilation = false);
+    bool blockCompilation                                          = false);
   virtual ~PostProcess();
 
   // Events
@@ -63,9 +63,9 @@ public:
   PostProcess& shareOutputWith(PostProcess* postProcess);
   void updateEffect(
     const string_t& defines = "", const vector_t<string_t>& uniforms = {},
-    const vector_t<string_t>& samplers = {},
+    const vector_t<string_t>& samplers                             = {},
     const unordered_map_t<string_t, unsigned int>& indexParameters = {},
-    const ::std::function<void(Effect* effect)>& onCompiled = nullptr,
+    const ::std::function<void(Effect* effect)>& onCompiled        = nullptr,
     const ::std::function<void(Effect* effect, const string_t& errors)>& onError
     = nullptr);
   bool isReusable() const;
@@ -90,6 +90,7 @@ public:
   bool autoClear;
   unsigned int alphaMode;
   Nullable<Color4> alphaConstants;
+  vector_t<Animation*> animations;
   // Enable Pixel Perfect mode where texture is not scaled to be power of 2.
   // Can only be used on a single postprocess or on the last one of a chain.
   bool enablePixelPerfectMode;
