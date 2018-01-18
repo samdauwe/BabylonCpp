@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT DefaultRenderingPipeline
-  : public PostProcessRenderPipeline {
+    : public PostProcessRenderPipeline {
 
 public:
   static string_t PassPostProcessId;
@@ -37,7 +37,7 @@ public:
                            const unordered_map_t<string_t, Camera*>& cameras
                            = {},
                            bool automaticBuild = true);
-  ~DefaultRenderingPipeline();
+  virtual ~DefaultRenderingPipeline() override;
 
   /**
    * @brief Force the compilation of the entire pipeline.

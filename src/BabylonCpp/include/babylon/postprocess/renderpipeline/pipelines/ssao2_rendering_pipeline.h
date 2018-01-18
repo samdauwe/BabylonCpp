@@ -13,7 +13,7 @@ struct SSAO2Ratio {
 }; // end of struct SSAO2Ratio
 
 class BABYLON_SHARED_EXPORT SSAO2RenderingPipeline
-  : public PostProcessRenderPipeline {
+    : public PostProcessRenderPipeline {
 
 public:
   /**
@@ -57,7 +57,7 @@ public:
   SSAO2RenderingPipeline(const string_t& name, Scene* scene,
                          const SSAO2Ratio& ratio,
                          const vector_t<Camera*>& cameras);
-  virtual ~SSAO2RenderingPipeline();
+  virtual ~SSAO2RenderingPipeline() override;
 
   /** Methods */
   void setSamples(unsigned int n);
@@ -139,8 +139,8 @@ private:
    */
   bool _expensiveBlur;
   Scene* _scene;
-  RenderTargetTexture* _depthTexture;
-  RenderTargetTexture* _normalTexture;
+  Texture* _depthTexture;
+  Texture* _normalTexture;
   DynamicTexture* _randomTexture;
 
   PassPostProcess* _originalColorPostProcess;
@@ -150,7 +150,6 @@ private:
   PostProcess* _ssaoCombinePostProcess;
 
   bool _firstUpdate;
-  SSAO2Ratio _ratio;
 
 }; // end of class SSAORenderingPipeline
 

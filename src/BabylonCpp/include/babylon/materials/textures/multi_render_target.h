@@ -14,7 +14,7 @@ public:
                     Scene* scene);
   MultiRenderTarget(const string_t& name, Size size, std::size_t count,
                     Scene* scene, const IMultiRenderTargetOptions& options);
-  ~MultiRenderTarget();
+  ~MultiRenderTarget() override;
 
   bool isSupported() const;
   vector_t<Texture*>& textures();

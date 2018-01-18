@@ -415,13 +415,13 @@ void StandardRenderingPipeline::_createDownSampleX4PostProcess(Scene* scene,
 
   downSampleX4PostProcess->setOnApply([&](Effect* effect, EventState&) {
     Float32Array downSampleX4Offsets(32);
-    unsigned int id = 0;
+    unsigned int id   = 0;
+    const auto width  = static_cast<float>(downSampleX4PostProcess->width);
+    const auto height = static_cast<float>(downSampleX4PostProcess->height);
     for (int i = -2; i < 2; ++i) {
       for (int j = -2; j < 2; ++j) {
-        downSampleX4Offsets[id]
-          = (i + 0.5f) * (1.f / downSampleX4PostProcess->width);
-        downSampleX4Offsets[id + 1]
-          = (j + 0.5f) * (1.f / downSampleX4PostProcess->height);
+        downSampleX4Offsets[id]     = (i + 0.5f) * (1.f / width);
+        downSampleX4Offsets[id + 1] = (j + 0.5f) * (1.f / height);
         id += 2;
       }
     }
@@ -486,13 +486,13 @@ void StandardRenderingPipeline::_createBlurPostProcesses(
 
   blurX->onActivateObservable.add([&](Camera* /*camera*/, EventState& /*es*/) {
     auto dw = static_cast<float>(blurX->width)
-              / static_cast<float>(engine->getRenderingCanvas()->width);
+              / static_cast<float>(engine->getRenderWidth());
     blurX->setKernel((*this)[blurWidthKey] * dw);
   });
 
   blurY->onActivateObservable.add([&](Camera* /*camera*/, EventState& /*es*/) {
     auto dw = static_cast<float>(blurY->height)
-              / static_cast<float>(engine->getRenderingCanvas()->height);
+              / static_cast<float>(engine->getRenderHeight());
     blurY->setKernel(horizontalBlur ? 64.f * dw : (*this)[blurWidthKey] * dw);
   });
 
@@ -551,7 +551,8 @@ void StandardRenderingPipeline::_createVolumetricLightPostProcess(Scene* scene,
 
   volumetricLightPostProcess->setOnApply([&](Effect* effect,
                                              EventState& /*es*/) {
-    if (sourceLight && sourceLight->getShadowGenerator()) {
+    if (sourceLight && sourceLight->getShadowGenerator()
+        && _scene->activeCamera) {
       auto depthValues = Vector2::Zero();
       auto generator   = sourceLight->getShadowGenerator();
 
@@ -662,6 +663,10 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
     Float32Array downSampleOffsets(18);
 
     pp->setOnApply([&](Effect* effect, EventState&) {
+      if (!lastLuminance) {
+        return;
+      }
+
       unsigned int id = 0;
       for (float x = -1; x < 2; ++x) {
         for (float y = -1; y < 2; ++y) {
@@ -796,6 +801,10 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
 
   // Compose
   lensFlareComposePostProcess->setOnApply([&](Effect* effect, EventState&) {
+    if (!_scene->activeCamera) {
+      return;
+    }
+
     effect->setTextureFromPostProcess("otherSampler",
                                       textureAdderFinalPostProcess);
     effect->setTexture("lensDirtSampler", lensFlareDirtTexture);
@@ -812,20 +821,20 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
                                          0.f, 2.f, -1.f, 0.f, //
                                          0.f, 0.f, 1.f, 0.f,  //
                                          0.f, 0.f, 0.f, 1.f   //
-                                         );
+    );
 
     auto scaleBias2 = Matrix::FromValues(0.5f, 0.f, 0.5f, 0.f, //
                                          0.f, 0.5f, 0.5f, 0.f, //
                                          0.f, 0.f, 1.f, 0.f,   //
                                          0.f, 0.f, 0.f, 1.f    //
-                                         );
+    );
 
     auto starRotation = Matrix::FromValues(
       ::std::cos(camRot) * 0.5f, -::std::sin(camRot), 0.f, 0.f, //
       ::std::sin(camRot), ::std::cos(camRot) * 0.5f, 0.f, 0.f,  //
       0.f, 0.f, 1.f, 0.f,                                       //
       0.f, 0.f, 0.f, 1.f                                        //
-      );
+    );
 
     auto lensStarMatrix
       = scaleBias2.multiply(starRotation).multiply(scaleBias1);
@@ -907,7 +916,8 @@ void StandardRenderingPipeline::_createMotionBlurPostProcess(Scene* scene,
 Texture* StandardRenderingPipeline::_getDepthTexture()
 {
   if (_scene->getEngine()->getCaps().drawBuffersExtension) {
-    return _scene->enableGeometryBufferRenderer()->getGBuffer()->textures()[0];
+    auto renderer = _scene->enableGeometryBufferRenderer();
+    return renderer->getGBuffer()->textures()[0];
   }
 
   return _scene->enableDepthRenderer()->getDepthMap();

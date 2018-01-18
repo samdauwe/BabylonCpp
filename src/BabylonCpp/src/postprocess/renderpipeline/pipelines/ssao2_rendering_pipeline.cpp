@@ -8,13 +8,16 @@
 #include <babylon/interfaces/icanvas_rendering_context2D.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/dynamic_texture.h>
+#include <babylon/materials/textures/multi_render_target.h>
 #include <babylon/materials/textures/render_target_texture.h>
+#include <babylon/math/scalar.h>
 #include <babylon/postprocess/blur_post_process.h>
 #include <babylon/postprocess/pass_post_process.h>
 #include <babylon/postprocess/post_process.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_effect.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_pipeline_manager.h>
 #include <babylon/rendering/depth_renderer.h>
+#include <babylon/rendering/geometry_buffer_renderer.h>
 
 namespace BABYLON {
 
@@ -56,21 +59,21 @@ SSAO2RenderingPipeline::SSAO2RenderingPipeline(const string_t& name,
     return;
   }
 
-  _ratio.ssaoRatio = ratio.ssaoRatio;
-  _ratio.blurRatio = ratio.blurRatio;
+  auto ssaoRatio = ratio.ssaoRatio;
+  auto blurRatio = ratio.blurRatio;
 
   // Set up assets
+  auto geometryBufferRenderer = scene->enableGeometryBufferRenderer();
   _createRandomTexture();
-  // TODO FIXME
-  _depthTexture  = scene->enableDepthRenderer()->getDepthMap();
-  _normalTexture = scene->enableDepthRenderer()->getDepthMap();
+  _depthTexture  = geometryBufferRenderer->getGBuffer()->textures()[0];
+  _normalTexture = geometryBufferRenderer->getGBuffer()->textures()[1];
 
   _originalColorPostProcess = new PassPostProcess(
     "SSAOOriginalSceneColor", 1.f, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false);
   _createSSAOPostProcess(1.0);
-  _createBlurPostProcess(_ratio.ssaoRatio, _ratio.blurRatio);
-  _createSSAOCombinePostProcess(_ratio.blurRatio);
+  _createBlurPostProcess(ssaoRatio, blurRatio);
+  _createSSAOCombinePostProcess(blurRatio);
 
   // Set up pipeline
   addEffect(new PostProcessRenderEffect(
@@ -140,6 +143,9 @@ bool SSAO2RenderingPipeline::expensiveBlur()
 bool SSAO2RenderingPipeline::IsSupported()
 {
   auto engine = Engine::LastCreatedEngine();
+  if (!engine) {
+    return false;
+  }
   return engine->getCaps().drawBuffersExtension;
 }
 
@@ -180,8 +186,13 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio,
     false,
     "#define BILATERAL_BLUR\n#define BILATERAL_BLUR_H\n#define SAMPLES 16");
   _blurHPostProcess->setOnApply([&](Effect* effect, EventState&) {
+    if (!_scene->activeCamera) {
+      return;
+    }
     effect->setFloat("outSize",
-                     static_cast<float>(_ssaoCombinePostProcess->width));
+                     static_cast<float>(_ssaoCombinePostProcess->width > 0 ?
+                                          _ssaoCombinePostProcess->width :
+                                          _originalColorPostProcess->width));
     effect->setFloat("near", _scene->activeCamera->minZ);
     effect->setFloat("far", _scene->activeCamera->maxZ);
     effect->setFloat("radius", radius);
@@ -197,8 +208,13 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio,
     nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(),
     false, "#define BILATERAL_BLUR\n#define SAMPLES 16");
   _blurVPostProcess->setOnApply([&](Effect* effect, EventState&) {
+    if (!_scene->activeCamera) {
+      return;
+    }
     effect->setFloat("outSize",
-                     static_cast<float>(_ssaoCombinePostProcess->height));
+                     static_cast<float>(_ssaoCombinePostProcess->height > 0 ?
+                                          _ssaoCombinePostProcess->height :
+                                          _originalColorPostProcess->height));
     effect->setFloat("near", _scene->activeCamera->minZ);
     effect->setFloat("far", _scene->activeCamera->maxZ);
     effect->setFloat("radius", radius);
@@ -227,15 +243,11 @@ Float32Array SSAO2RenderingPipeline::_generateHemisphere()
   const auto rand
     = [](float min, float max) { return Math::random() * (max - min) + min; };
 
-  const auto lerp = [](float start, float end, float percent) {
-    return (start + percent * (end - start));
-  };
-
   for (unsigned int i = 0; i < numSamples; ++i) {
     vector = Vector3(rand(-1.f, 1.f), rand(-1.f, 1.f), rand(0.3f, 1.f));
     vector.normalize();
     scale = static_cast<float>(i) / static_cast<float>(numSamples);
-    scale = lerp(0.1f, 1.f, scale * scale);
+    scale = Scalar::Lerp(0.1f, 1.f, scale * scale);
     vector.scaleInPlace(scale);
 
     stl_util::concat(result, {vector.x, vector.y, vector.z});
@@ -267,6 +279,10 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
       effect->setFloat("randTextureTiles", 4.f);
     }
 
+    if (!_scene->activeCamera) {
+      return;
+    }
+
     effect->setFloat("samplesFactor", samplesFactor);
     effect->setFloat("totalStrength", totalStrength);
     effect->setFloat2("texelSize",
@@ -278,10 +294,9 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
     effect->setFloat("base", base);
     effect->setFloat("near", _scene->activeCamera->minZ);
     effect->setFloat("far", _scene->activeCamera->maxZ);
-    effect->setFloat(
-      "xViewport",
-      ::std::tan(_scene->activeCamera->fov / 2.f)
-        * _scene->getEngine()->getAspectRatio(_scene->activeCamera, true));
+    effect->setFloat("xViewport", ::std::tan(_scene->activeCamera->fov / 2.f)
+                                    * _scene->getEngine()->getAspectRatio(
+                                        _scene->activeCamera, true));
     effect->setFloat("yViewport", ::std::tan(_scene->activeCamera->fov / 2.f));
     effect->setMatrix("projection", _scene->getProjectionMatrix());
 

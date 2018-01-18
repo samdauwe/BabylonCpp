@@ -13,7 +13,7 @@ struct SSARatio {
 }; // end of struct SSARatio
 
 class BABYLON_SHARED_EXPORT SSAORenderingPipeline
-  : public PostProcessRenderPipeline {
+    : public PostProcessRenderPipeline {
 
 public:
   /**
@@ -57,7 +57,7 @@ public:
   SSAORenderingPipeline(const string_t& name, Scene* scene,
                         const SSARatio& ratio,
                         const vector_t<Camera*>& cameras);
-  virtual ~SSAORenderingPipeline();
+  virtual ~SSAORenderingPipeline() override;
 
   /** Methods */
 
@@ -113,12 +113,11 @@ private:
 
   PassPostProcess* _originalColorPostProcess;
   PostProcess* _ssaoPostProcess;
-  PostProcess* _blurHPostProcess;
-  PostProcess* _blurVPostProcess;
+  BlurPostProcess* _blurHPostProcess;
+  BlurPostProcess* _blurVPostProcess;
   PostProcess* _ssaoCombinePostProcess;
 
   bool _firstUpdate;
-  SSARatio _ratio;
 
 }; // end of class SSAORenderingPipeline
 

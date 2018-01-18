@@ -1,6 +1,7 @@
 #include <babylon/postprocess/renderpipeline/pipelines/ssao_rendering_pipeline.h>
 
 #include <babylon/core/random.h>
+#include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas_rendering_context2D.h>
 #include <babylon/materials/effect.h>
@@ -39,15 +40,15 @@ SSAORenderingPipeline::SSAORenderingPipeline(const string_t& name, Scene* scene,
   // Force depth renderer "on"
   _depthTexture = scene->enableDepthRenderer()->getDepthMap();
 
-  _ratio.ssaoRatio    = ratio.ssaoRatio;
-  _ratio.combineRatio = ratio.combineRatio;
+  auto ssaoRatio    = ratio.ssaoRatio;
+  auto combineRatio = ratio.combineRatio;
 
   _originalColorPostProcess = new PassPostProcess(
-    "SSAOOriginalSceneColor", _ratio.combineRatio, nullptr,
+    "SSAOOriginalSceneColor", combineRatio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false);
-  _createSSAOPostProcess(ratio.ssaoRatio);
-  _createBlurPostProcess(ratio.ssaoRatio);
-  _createSSAOCombinePostProcess(ratio.combineRatio);
+  _createSSAOPostProcess(ssaoRatio);
+  _createBlurPostProcess(ssaoRatio);
+  _createSSAOCombinePostProcess(combineRatio);
 
   // Set up pipeline
   addEffect(new PostProcessRenderEffect(
@@ -105,41 +106,27 @@ void SSAORenderingPipeline::dispose(bool disableDepthRender)
 
 void SSAORenderingPipeline::_createBlurPostProcess(float ratio)
 {
-  Float32Array samplerOffsets;
-  samplerOffsets.reserve(16);
+  auto size = 16;
 
-  for (int i = -8; i < 8; i++) {
-    samplerOffsets.emplace_back(static_cast<float>(i) * 2.f);
-  }
+  _blurHPostProcess = new BlurPostProcess(
+    "BlurH", Vector2(1.f, 0.f), size, ratio, nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
+    EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+  _blurVPostProcess = new BlurPostProcess(
+    "BlurV", Vector2(0.f, 1.f), size, ratio, nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
+    EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
-  _blurHPostProcess = new PostProcess(
-    "BlurH", "ssao", {"outSize", "samplerOffsets"}, {"depthSampler"}, ratio,
-    nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(),
-    false,
-    "#define BILATERAL_BLUR\n#define BILATERAL_BLUR_H\n#define SAMPLES 16");
-  _blurHPostProcess->setOnApply([&](Effect* effect, EventState&) {
-    effect->setFloat("outSize",
-                     static_cast<float>(_ssaoCombinePostProcess->width));
-    effect->setTexture("depthSampler", _depthTexture);
-
-    if (_firstUpdate) {
-      effect->setArray("samplerOffsets", samplerOffsets);
-    }
+  _blurHPostProcess->onActivateObservable.add([&, size](Camera*, EventState&) {
+    auto dw = static_cast<float>(_blurHPostProcess->width)
+              / static_cast<float>(_scene->getEngine()->getRenderWidth());
+    _blurHPostProcess->setKernel(size * dw);
   });
 
-  _blurVPostProcess = new PostProcess(
-    "BlurV", "ssao", {"outSize", "samplerOffsets"}, {"depthSampler"}, ratio,
-    nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(),
-    false, "#define BILATERAL_BLUR\n#define SAMPLES 16");
-  _blurVPostProcess->setOnApply([&](Effect* effect, EventState&) {
-    effect->setFloat("outSize",
-                     static_cast<float>(_ssaoCombinePostProcess->height));
-    effect->setTexture("depthSampler", _depthTexture);
-
-    if (_firstUpdate) {
-      effect->setArray("samplerOffsets", samplerOffsets);
-      _firstUpdate = false;
-    }
+  _blurVPostProcess->onActivateObservable.add([&, size](Camera*, EventState&) {
+    auto dw = static_cast<float>(_blurVPostProcess->height)
+              / static_cast<float>(_scene->getEngine()->getRenderHeight());
+    _blurVPostProcess->setKernel(size * dw);
   });
 }
 
@@ -219,7 +206,7 @@ void SSAORenderingPipeline::_createRandomTexture()
   const auto rand
     = [](float min, float max) { return Math::random() * (max - min) + min; };
 
-  Vector3 randVector = Vector3::Zero();
+  auto randVector = Vector3::Zero();
 
   for (size_t x = 0; x < size; ++x) {
     for (size_t y = 0; y < size; ++y) {

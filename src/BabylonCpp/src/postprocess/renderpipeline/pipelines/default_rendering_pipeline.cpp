@@ -195,9 +195,9 @@ void DefaultRenderingPipeline::_buildPipeline()
     blurX->alwaysForcePOT = true;
     blurX->autoClear      = false;
     blurX->onActivateObservable.add([this](Camera*, EventState&) {
-      const auto dw = static_cast<float>(blurX->width)
-                      / static_cast<float>(
-                          _scene->getEngine()->getRenderingCanvas()->width);
+      const auto dw
+        = static_cast<float>(blurX->width)
+          / static_cast<float>(_scene->getEngine()->getRenderWidth(true));
       blurX->setKernel(bloomKernel * dw);
     });
 
@@ -210,9 +210,9 @@ void DefaultRenderingPipeline::_buildPipeline()
     blurY->alwaysForcePOT = true;
     blurY->autoClear      = false;
     blurY->onActivateObservable.add([this](Camera*, EventState&) {
-      const auto dh = static_cast<float>(blurY->height)
-                      / static_cast<float>(
-                          _scene->getEngine()->getRenderingCanvas()->height);
+      const auto dh
+        = static_cast<float>(blurY->height)
+          / static_cast<float>(_scene->getEngine()->getRenderHeight(true));
       blurY->setKernel(bloomKernel * dh);
     });
 
@@ -255,6 +255,9 @@ void DefaultRenderingPipeline::_buildPipeline()
                                           [this]() { return fxaa; }, true));
 
     fxaa->autoClear = !bloomEnabled() && !imageProcessing;
+  }
+  else if (_hdr && imageProcessing) {
+    // finalMerge = imageProcessing;
   }
   else {
     finalMerge = new PassPostProcess(
@@ -303,44 +306,45 @@ void DefaultRenderingPipeline::_disposePostProcesses()
 
     if (pass) {
       pass->dispose(camera);
-      pass = nullptr;
     }
 
     if (highlights) {
       highlights->dispose(camera);
-      highlights = nullptr;
     }
 
     if (blurX) {
       blurX->dispose(camera);
-      blurX = nullptr;
     }
 
     if (blurY) {
       blurY->dispose(camera);
-      blurY = nullptr;
     }
 
     if (copyBack) {
       copyBack->dispose(camera);
-      copyBack = nullptr;
     }
 
     if (imageProcessing) {
       imageProcessing->dispose(camera);
-      imageProcessing = nullptr;
     }
 
     if (fxaa) {
       fxaa->dispose(camera);
-      fxaa = nullptr;
     }
 
     if (finalMerge) {
       finalMerge->dispose(camera);
-      finalMerge = nullptr;
     }
   }
+
+  pass            = nullptr;
+  highlights      = nullptr;
+  blurX           = nullptr;
+  blurY           = nullptr;
+  copyBack        = nullptr;
+  imageProcessing = nullptr;
+  fxaa            = nullptr;
+  finalMerge      = nullptr;
 }
 
 void DefaultRenderingPipeline::dispose(bool doNotRecurse)

@@ -203,12 +203,11 @@ void LensRenderingPipeline::_createChromaticAberrationPostProcess(float ratio)
 
   _chromaticAberrationPostProcess->setOnApply([&](Effect* effect, EventState&) {
     effect->setFloat("chromatic_aberration", _chromaticAberration);
-    effect->setFloat(
-      "screen_width",
-      static_cast<float>(_scene->getEngine()->getRenderingCanvas()->width));
+    effect->setFloat("screen_width",
+                     static_cast<float>(_scene->getEngine()->getRenderWidth()));
     effect->setFloat(
       "screen_height",
-      static_cast<float>(_scene->getEngine()->getRenderingCanvas()->height));
+      static_cast<float>(_scene->getEngine()->getRenderHeight()));
   });
 }
 
@@ -226,12 +225,11 @@ void LensRenderingPipeline::_createHighlightsPostProcess(float ratio)
     effect->setFloat("threshold", _highlightsThreshold);
     effect->setTextureFromPostProcess("textureSampler",
                                       _chromaticAberrationPostProcess);
-    effect->setFloat(
-      "screen_width",
-      static_cast<float>(_scene->getEngine()->getRenderingCanvas()->width));
+    effect->setFloat("screen_width",
+                     static_cast<float>(_scene->getEngine()->getRenderWidth()));
     effect->setFloat(
       "screen_height",
-      static_cast<float>(_scene->getEngine()->getRenderingCanvas()->height));
+      static_cast<float>(_scene->getEngine()->getRenderHeight()));
   });
 }
 
@@ -255,12 +253,11 @@ void LensRenderingPipeline::_createDepthOfFieldPostProcess(float ratio)
     effect->setFloat("grain_amount", _grainAmount);
     effect->setBool("blur_noise", _blurNoise);
 
-    effect->setFloat(
-      "screen_width",
-      static_cast<float>(_scene->getEngine()->getRenderingCanvas()->width));
+    effect->setFloat("screen_width",
+                     static_cast<float>(_scene->getEngine()->getRenderWidth()));
     effect->setFloat(
       "screen_height",
-      static_cast<float>(_scene->getEngine()->getRenderingCanvas()->height));
+      static_cast<float>(_scene->getEngine()->getRenderHeight()));
 
     effect->setFloat("distortion", _distortion);
 
@@ -274,8 +271,10 @@ void LensRenderingPipeline::_createDepthOfFieldPostProcess(float ratio)
     effect->setBool("highlights",
                     !stl_util::almost_equal(_highlightsGain, -1.f));
 
-    effect->setFloat("near", _scene->activeCamera->minZ);
-    effect->setFloat("far", _scene->activeCamera->maxZ);
+    if (_scene->activeCamera) {
+      effect->setFloat("near", _scene->activeCamera->minZ);
+      effect->setFloat("far", _scene->activeCamera->maxZ);
+    }
   });
 }
 

@@ -9,8 +9,8 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT StandardRenderingPipeline
-  : public PostProcessRenderPipeline,
-    public IAnimatable {
+    : public PostProcessRenderPipeline,
+      public IAnimatable {
 
 public:
   // Luminance steps
@@ -31,9 +31,8 @@ public:
    */
   StandardRenderingPipeline(const string_t& name, Scene* scene, float ratio,
                             PostProcess* originalPostProcess = nullptr,
-                            const vector_t<Camera*>& cameras
-                            = vector_t<Camera*>());
-  virtual ~StandardRenderingPipeline();
+                            const vector_t<Camera*>& cameras = {});
+  virtual ~StandardRenderingPipeline() override;
 
   float operator[](const string_t& key) const;
 
