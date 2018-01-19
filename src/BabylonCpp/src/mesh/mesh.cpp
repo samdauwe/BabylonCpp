@@ -1135,7 +1135,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
 
   // Alpha mode
   if (enableAlphaMode) {
-    engine->setAlphaMode(_effectiveMaterial->alphaMode);
+    engine->setAlphaMode(static_cast<int>(_effectiveMaterial->alphaMode()));
   }
 
   // Outline - step 1

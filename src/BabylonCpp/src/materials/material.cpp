@@ -20,11 +20,9 @@ Material::Material(const string_t& iName, Scene* scene, bool doNotAdd)
     , name{iName}
     , checkReadyOnEveryCall{false}
     , checkReadyOnlyOnce{false}
-    , state{""}
     , alpha{1.f}
     , doNotSerialize{false}
     , storeEffectOnSubMeshes{false}
-    , alphaMode{EngineConstants::ALPHA_COMBINE}
     , disableDepthWrite{false}
     , forceDepthWrite{false}
     , separateCullingPass{false}
@@ -36,6 +34,7 @@ Material::Material(const string_t& iName, Scene* scene, bool doNotAdd)
     , _uniformBuffer{::std::make_unique<UniformBuffer>(scene->getEngine())}
     , _onDisposeObserver{nullptr}
     , _onBindObserver{nullptr}
+    , _alphaMode{EngineConstants::ALPHA_COMBINE}
     , _needDepthPrePass{false}
     , _fogEnabled{true}
     , _useUBO{false}
@@ -92,6 +91,20 @@ void Material::setBackFaceCulling(bool value)
     return;
   }
   _backFaceCulling = value;
+  markAsDirty(Material::TextureDirtyFlag);
+}
+
+unsigned int Material::alphaMode() const
+{
+  return _alphaMode;
+}
+
+void Material::setAlphaMode(unsigned int value)
+{
+  if (_alphaMode == value) {
+    return;
+  }
+  _alphaMode = value;
   markAsDirty(Material::TextureDirtyFlag);
 }
 
@@ -353,7 +366,9 @@ void Material::_afterBind(Mesh* mesh)
     _scene->_cachedVisibility = 1.f;
   }
 
-  onBindObservable.notifyObservers(mesh);
+  if (mesh) {
+    onBindObservable.notifyObservers(mesh);
+  }
 
   if (disableDepthWrite) {
     auto engine            = _scene->getEngine();
@@ -422,8 +437,10 @@ void Material::forceCompilation(
     auto alphaTestState = engine->getAlphaTesting();
     auto clipPlaneState = *scene->clipPlane();
 
-    engine->setAlphaTesting(!alphaTest.isNull() ? *alphaTest :
-                                                  needAlphaTesting());
+    engine->setAlphaTesting(
+      !alphaTest.isNull() ?
+        *alphaTest :
+        (!needAlphaBlendingForMesh(mesh) && needAlphaTesting()));
 
     if (!clipPlane.isNull() && (*clipPlane)) {
       scene->setClipPlane(Plane(0, 0, 0, 1));
@@ -561,6 +578,9 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)
         if (storeEffectOnSubMeshes) {
           for (auto& subMesh : mesh->subMeshes) {
             geometry->_releaseVertexArrayObject(subMesh->_materialEffect);
+            if (forceDisposeEffect && subMesh->_materialEffect) {
+              _scene->getEngine()->_releaseEffect(subMesh->_materialEffect);
+            }
           }
         }
         else {
@@ -574,13 +594,8 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)
 
   // Shader are kept in cache for further use but we can get rid of this by
   // using forceDisposeEffect
-  if (forceDisposeEffect && _effect && _mesh) {
-    if (storeEffectOnSubMeshes) {
-      for (auto& subMesh : _mesh->subMeshes) {
-        _scene->getEngine()->_releaseEffect(subMesh->_materialEffect);
-      }
-    }
-    else {
+  if (forceDisposeEffect && _effect) {
+    if (!storeEffectOnSubMeshes) {
       _scene->getEngine()->_releaseEffect(_effect);
     }
 
@@ -604,8 +619,8 @@ void Material::copyTo(Material* other) const
   other->setBackFaceCulling(backFaceCulling());
   other->setWireframe(wireframe());
   other->setFogEnabled(fogEnabled());
-  other->zOffset           = zOffset;
-  other->alphaMode         = alphaMode;
+  other->zOffset = zOffset;
+  other->setAlphaMode(alphaMode());
   other->sideOrientation   = sideOrientation;
   other->disableDepthWrite = disableDepthWrite;
   other->pointSize         = pointSize;

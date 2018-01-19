@@ -26,7 +26,7 @@ public:
   static constexpr unsigned int AttributesDirtyFlag = 8;
   static constexpr unsigned int MiscDirtyFlag       = 16;
 
-  virtual ~Material();
+  virtual ~Material() override;
 
   /**
    * @brief Child classes can use it to update shaders
@@ -44,6 +44,8 @@ public:
 
   bool backFaceCulling() const;
   void setBackFaceCulling(bool value);
+  unsigned int alphaMode() const;
+  void setAlphaMode(unsigned int value);
   bool needDepthPrePass() const;
   void setNeedDepthPrePass(bool value);
   bool fogEnabled() const;
@@ -117,7 +119,7 @@ public:
   forceCompilation(AbstractMesh* mesh,
                    const ::std::function<void(Material* material)>& onCompiled,
                    Nullable<bool> alphaTest = nullptr,
-                   Nullable<bool> clipPlane = nullptr);
+                   Nullable<bool> clipPlane = false);
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false);
   void copyTo(Material* other) const;
@@ -161,7 +163,6 @@ public:
   string_t name;
   bool checkReadyOnEveryCall;
   bool checkReadyOnlyOnce;
-  string_t state;
   float alpha;
   int sideOrientation;
   ::std::function<void(const Effect* effect)> onCompiled;
@@ -169,7 +170,7 @@ public:
   ::std::function<vector_t<RenderTargetTexture*>()> getRenderTargetTextures;
   bool doNotSerialize;
   bool storeEffectOnSubMeshes;
-  int alphaMode;
+  vector_t<Animation*> animations;
   bool disableDepthWrite;
   bool forceDepthWrite;
   bool separateCullingPass;
@@ -189,6 +190,7 @@ private:
   // Callbacks
   ::std::function<void()> _beforeRenderCallback;
   // Properties
+  unsigned int _alphaMode;
   bool _needDepthPrePass;
   bool _fogEnabled;
   bool _useUBO;

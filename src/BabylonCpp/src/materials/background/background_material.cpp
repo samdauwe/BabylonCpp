@@ -382,8 +382,8 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     }
 
     defines.defines[BMD::PREMULTIPLYALPHA]
-      = (alphaMode == EngineConstants::ALPHA_PREMULTIPLIED
-         || alphaMode == EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF);
+      = (alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED
+         || alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF);
     defines.defines[BMD::USERGBCOLOR] = _useRGBColor;
     defines.defines[BMD::NOISE]       = _enableNoise;
   }

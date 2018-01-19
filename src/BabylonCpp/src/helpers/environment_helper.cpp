@@ -243,8 +243,9 @@ void EnvironmentHelper::_setupGroundMaterial()
   if (!_groundMaterial) {
     _groundMaterial = new BackgroundMaterial("BackgroundPlaneMaterial", _scene);
   }
-  _groundMaterial->alpha     = _options.groundOpacity;
-  _groundMaterial->alphaMode = EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF;
+  _groundMaterial->alpha = _options.groundOpacity;
+  _groundMaterial->setAlphaMode(
+    EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF);
   _groundMaterial->setShadowLevel(_options.groundShadowLevel);
   _groundMaterial->setPrimaryLevel(1);
   _groundMaterial->setPrimaryColor(_options.groundColor);
