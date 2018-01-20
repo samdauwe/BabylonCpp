@@ -18,7 +18,7 @@ public:
 
     return material;
   }
-  ~MultiMaterial();
+  virtual ~MultiMaterial() override;
 
   /**
    * @brief Returns the string "MultiMaterial".
