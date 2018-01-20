@@ -82,21 +82,21 @@ Float32Array PanoramaToCubeMapTools::CreateCubemapTexture(
   Float32Array textureArray(texSize * texSize * 4 * 3);
 
   float texSizef = static_cast<float>(texSize);
-  Vector3 rotDX1 = faceData[1].subtract(faceData[0]).scale(1.f / texSizef);
-  Vector3 rotDX2 = faceData[3].subtract(faceData[2]).scale(1.f / texSizef);
+  auto rotDX1    = faceData[1].subtract(faceData[0]).scale(1.f / texSizef);
+  auto rotDX2    = faceData[3].subtract(faceData[2]).scale(1.f / texSizef);
 
   float dy = 1.f / static_cast<float>(texSize);
   float fy = 0.f;
 
   for (size_t y = 0; y < texSize; ++y) {
-    Vector3 xv1 = faceData[0];
-    Vector3 xv2 = faceData[2];
+    auto xv1 = faceData[0];
+    auto xv2 = faceData[2];
 
     for (size_t x = 0; x < texSize; ++x) {
-      Vector3 v = xv2.subtract(xv1).scale(fy).add(xv1);
+      auto v = xv2.subtract(xv1).scale(fy).add(xv1);
       v.normalize();
 
-      Color3 color
+      auto color
         = CalcProjectionSpherical(v, float32Array, inputWidth, inputHeight);
 
       // 3 channels per pixels

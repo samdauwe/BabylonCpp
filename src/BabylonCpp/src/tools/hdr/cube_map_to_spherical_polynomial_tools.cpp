@@ -93,7 +93,7 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
   float minUV = du * 0.5f - 1.f;
 
   for (unsigned int faceIndex = 0; faceIndex < 6; ++faceIndex) {
-    const FileFaceOrientation& fileFace = FileFaces[faceIndex];
+    const auto& fileFace = FileFaces[faceIndex];
     Float32Array dataArray;
     if (fileFace.name == "right") {
       dataArray = cubeInfo.right.float32Array;
@@ -127,9 +127,9 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
 
       for (size_t x = 0; x < cubeInfo.size; ++x) {
         // World direction (not normalised)
-        Vector3 worldDirection = fileFace.worldAxisForFileX.scale(u)
-                                   .add(fileFace.worldAxisForFileY.scale(v))
-                                   .add(fileFace.worldAxisForNormal);
+        auto worldDirection = fileFace.worldAxisForFileX.scale(u)
+                                .add(fileFace.worldAxisForFileY.scale(v))
+                                .add(fileFace.worldAxisForNormal);
         worldDirection.normalize();
 
         float deltaSolidAngle = ::std::pow(1.f + u * u + v * v, -3.f / 2.f);
@@ -183,11 +183,9 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
   sphericalHarmonics.convertIncidentRadianceToIrradiance();
   sphericalHarmonics.convertIrradianceToLambertianRadiance();
 
-#if 0
-  return SphericalPolynomial::getSphericalPolynomialFromHarmonics(
-    sphericalHarmonics);
-#endif
-  return nullptr;
+  return ::std::make_unique<SphericalPolynomial>(
+    SphericalPolynomial::getSphericalPolynomialFromHarmonics(
+      sphericalHarmonics));
 }
 
 } // end of namespace Internals
