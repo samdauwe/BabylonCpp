@@ -427,6 +427,11 @@ public:
 
 public:
   GLuint value;
+  ::std::function<void(
+    const string_t& vertexSourceCode, const string_t& fragmentSourceCode,
+    const ::std::function<void(GL::IGLProgram* program)>& onCompiled,
+    const ::std::function<void(const string_t& message)>& onError)>
+    __SPECTOR_rebuildProgram;
 
 }; // end of class IGLProgram
 

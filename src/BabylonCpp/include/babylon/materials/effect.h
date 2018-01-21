@@ -39,6 +39,11 @@ public:
   void
   _loadFragmentShader(const string_t& fragment,
                       ::std::function<void(const string_t& data)> callback);
+  void _rebuildProgram(
+    const string_t& vertexSourceCode, const string_t& fragmentSourceCode,
+    const ::std::function<void(GL::IGLProgram* program)>& onCompiled,
+    const ::std::function<void(const string_t& message)>& onError);
+  void _prepareEffect();
   bool isSupported() const;
   void _bindTexture(const string_t& channel, InternalTexture* texture);
   void setTexture(const string_t& channel, BaseTexture* texture);
@@ -98,7 +103,6 @@ private:
   _processIncludes(const string_t& sourceCode,
                    const ::std::function<void(const string_t& data)>& callback);
   string_t _processPrecision(string_t source);
-  void _prepareEffect();
 
 public:
   string_t name;
@@ -111,6 +115,7 @@ public:
   Observable<Effect> onErrorObservable;
   Observable<Effect> onBindObservable;
   string_t _key;
+  unique_ptr_t<GL::IGLProgram> _program;
 
 private:
   Observer<Effect>::Ptr _onCompileObserver;
@@ -128,7 +133,9 @@ private:
   unique_ptr_t<EffectFallbacks> _fallbacks;
   string_t _vertexSourceCode;
   string_t _fragmentSourceCode;
-  unique_ptr_t<GL::IGLProgram> _program;
+  string_t _vertexSourceCodeOverride;
+  string_t _fragmentSourceCodeOverride;
+  vector_t<string_t> _transformFeedbackVaryings;
   unordered_map_t<string_t, Float32Array> _valueCache;
   static unordered_map_t<unsigned int, GL::IGLBuffer*> _baseCache;
 

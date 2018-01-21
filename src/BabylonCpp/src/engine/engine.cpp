@@ -741,7 +741,7 @@ void Engine::scissorClear(int x, int y, int width, int height,
                           const Color4& clearColor)
 {
   // Save state
-  int curScissor = _gl->getParameteri(GL::SCISSOR_TEST);
+  int curScissor                = _gl->getParameteri(GL::SCISSOR_TEST);
   array_t<int, 3> curScissorBox = _gl->getScissorBoxParameter();
 
   // Change state
@@ -1546,6 +1546,10 @@ void Engine::_releaseEffect(Effect* effect)
   }
 }
 
+void Engine::_deleteProgram(GL::IGLProgram* /*program*/)
+{
+}
+
 Effect*
 Engine::createEffect(const string_t& baseName, EffectCreationOptions& options,
                      Engine* engine,
@@ -1620,15 +1624,24 @@ Effect* Engine::createEffectForParticles(
   return createEffect(baseName, options, this);
 }
 
+unique_ptr_t<GL::IGLProgram> Engine::createRawShaderProgram(
+  const string_t& /*vertexCode*/, const string_t& /*fragmentCode*/,
+  GL::IGLRenderingContext* /*context*/,
+  const vector_t<string_t>& /*transformFeedbackVaryings*/)
+{
+  return nullptr;
+}
+
 unique_ptr_t<GL::IGLProgram> Engine::createShaderProgram(
   const string_t& vertexCode, const string_t& fragmentCode,
-  const string_t& defines, GL::IGLRenderingContext* iGl)
+  const string_t& defines, GL::IGLRenderingContext* iGl,
+  const vector_t<string_t>& /*transformFeedbackVaryings*/)
 {
   auto context = iGl ? iGl : _gl;
 
   const string_t shaderVersion
     = (_webGLVersion > 1.f) ? "#version 300 es\n" : "";
-  auto vertexShader = Engine::CompileShader(context, vertexCode, "vertex",
+  auto vertexShader   = Engine::CompileShader(context, vertexCode, "vertex",
                                             defines, shaderVersion);
   auto fragmentShader = Engine::CompileShader(context, fragmentCode, "fragment",
                                               defines, shaderVersion);
@@ -2221,43 +2234,45 @@ InternalTexture* Engine::createTexture(
         texture->_buffer.set<Image>(img);
       }
 
-      const auto processFunction = [&](
-        int potWidth, int potHeight,
-        const ::std::function<void()>& continuationCallback) {
-        auto isPot = (img.width == potWidth && img.height == potHeight);
-        auto internalFormat = format ?
-                                _getInternalFormat(format) :
-                                ((extension == ".jpg") ? GL::RGB : GL::RGBA);
+      const auto processFunction =
+        [&](int potWidth, int potHeight,
+            const ::std::function<void()>& continuationCallback) {
+          auto isPot = (img.width == potWidth && img.height == potHeight);
+          auto internalFormat = format ?
+                                  _getInternalFormat(format) :
+                                  ((extension == ".jpg") ? GL::RGB : GL::RGBA);
 
-        if (isPot) {
+          if (isPot) {
+            _gl->texImage2D(GL::TEXTURE_2D, 0, GL::RGBA, img.width, img.height,
+                            0, GL::RGBA, GL::UNSIGNED_BYTE, img.data);
+            return false;
+          }
+
+          // Using shaders to rescale because canvas.drawImage is lossy
+          auto source
+            = new InternalTexture(this, InternalTexture::DATASOURCE_TEMP);
+          _bindTextureDirectly(GL::TEXTURE_2D, source);
           _gl->texImage2D(GL::TEXTURE_2D, 0, GL::RGBA, img.width, img.height, 0,
                           GL::RGBA, GL::UNSIGNED_BYTE, img.data);
-          return false;
-        }
 
-        // Using shaders to rescale because canvas.drawImage is lossy
-        auto source
-          = new InternalTexture(this, InternalTexture::DATASOURCE_TEMP);
-        _bindTextureDirectly(GL::TEXTURE_2D, source);
-        _gl->texImage2D(GL::TEXTURE_2D, 0, GL::RGBA, img.width, img.height, 0,
-                        GL::RGBA, GL::UNSIGNED_BYTE, img.data);
+          _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER,
+                             GL::LINEAR);
+          _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER,
+                             GL::LINEAR);
+          _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S,
+                             GL::CLAMP_TO_EDGE);
+          _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T,
+                             GL::CLAMP_TO_EDGE);
 
-        _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, GL::LINEAR);
-        _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, GL::LINEAR);
-        _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S,
-                           GL::CLAMP_TO_EDGE);
-        _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T,
-                           GL::CLAMP_TO_EDGE);
+          _rescaleTexture(source, texture, scene, internalFormat, [&]() {
+            _releaseTexture(source);
+            _bindTextureDirectly(GL::TEXTURE_2D, texture);
 
-        _rescaleTexture(source, texture, scene, internalFormat, [&]() {
-          _releaseTexture(source);
-          _bindTextureDirectly(GL::TEXTURE_2D, texture);
+            continuationCallback();
+          });
 
-          continuationCallback();
-        });
-
-        return true;
-      };
+          return true;
+        };
 
       _prepareWebGLTexture(texture, scene, img.width, img.height, invertY,
                            noMipmap, false, processFunction, samplingMode);
@@ -2728,14 +2743,14 @@ Engine::createMultipleRenderTarget(ISize size,
                     GL::DEPTH_COMPONENT,                          //
                     GL::UNSIGNED_SHORT,                           //
                     nullptr                                       //
-                    );
+    );
 
     _gl->framebufferTexture2D(GL::FRAMEBUFFER,                   //
                               GL::DEPTH_ATTACHMENT,              //
                               GL::TEXTURE_2D,                    //
                               depthTexture->_webGLTexture.get(), //
                               0                                  //
-                              );
+    );
 
     depthTexture->_framebuffer           = ::std::move(framebuffer); // FIXME
     depthTexture->baseWidth              = width;
@@ -3025,9 +3040,9 @@ void Engine::updateRawCubeTexture(InternalTexture* texture,
     }
   }
 
-  auto isPot
-    = !needPOTTextures() || (Tools::IsExponentOfTwo(texture->width)
-                             && Tools::IsExponentOfTwo(texture->height));
+  auto isPot = !needPOTTextures()
+               || (Tools::IsExponentOfTwo(texture->width)
+                   && Tools::IsExponentOfTwo(texture->height));
   if (isPot && texture->generateMipMaps && level == 0) {
     _gl->generateMipmap(GL::TEXTURE_CUBE_MAP);
   }
@@ -3065,9 +3080,9 @@ InternalTexture* Engine::createRawCubeTexture(
   texture->height = height;
 
   // Double check on POT to generate Mips.
-  auto isPot
-    = !needPOTTextures() || (Tools::IsExponentOfTwo(texture->width)
-                             && Tools::IsExponentOfTwo(texture->height));
+  auto isPot = !needPOTTextures()
+               || (Tools::IsExponentOfTwo(texture->width)
+                   && Tools::IsExponentOfTwo(texture->height));
   if (!isPot) {
     generateMipMaps = false;
   }
@@ -3161,9 +3176,9 @@ void Engine::_prepareWebGLTextureContinuation(InternalTexture* texture,
 void Engine::_prepareWebGLTexture(
   InternalTexture* texture, Scene* scene, int width, int height,
   Nullable<bool> invertY, bool noMipmap, bool isCompressed,
-  const ::std::function<bool(
-    int width, int height,
-    const ::std::function<void()>& continuationCallback)>& processFunction,
+  const ::std::function<
+    bool(int width, int height,
+         const ::std::function<void()>& continuationCallback)>& processFunction,
   unsigned int samplingMode)
 {
   auto potWidth = needPOTTextures() ?
@@ -3991,9 +4006,9 @@ unique_ptr_t<GL::IGLShader> Engine::CompileShader(GL::IGLRenderingContext* gl,
 {
   auto shader = gl->createShader(type == "vertex" ? GL::VERTEX_SHADER :
                                                     GL::FRAGMENT_SHADER);
-  gl->shaderSource(shader,
-                   shaderVersion + ((!defines.empty()) ? defines + "\n" : "")
-                     + source);
+  gl->shaderSource(shader, shaderVersion
+                             + ((!defines.empty()) ? defines + "\n" : "")
+                             + source);
   gl->compileShader(shader);
 
   if (!gl->getShaderParameter(shader, GL::COMPILE_STATUS)) {

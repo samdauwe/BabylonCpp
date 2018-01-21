@@ -4,10 +4,12 @@
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
+#include <babylon/engine/scene.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/effect_includes_shaders_store.h>
 #include <babylon/materials/effect_shaders_store.h>
+#include <babylon/materials/material.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector4.h>
@@ -25,7 +27,10 @@ Effect::Effect(const string_t& baseName, EffectCreationOptions& options,
     , defines{options.defines}
     , onCompiled{options.onCompiled}
     , onError{options.onError}
+    , onBind{nullptr}
     , uniqueId{Effect::_uniqueIdSeed++}
+    , _program{nullptr}
+    , _onCompileObserver{nullptr}
     , _engine{engine}
     , _uniformsNames{options.uniformsNames}
     , _samplers{options.samplers}
@@ -34,6 +39,7 @@ Effect::Effect(const string_t& baseName, EffectCreationOptions& options,
     , _attributesNames{options.attributes}
     , _indexParameters{options.indexParameters}
     , _fallbacks{::std::move(options.fallbacks)}
+    , _transformFeedbackVaryings{options.transformFeedbackVaryings}
 {
   stl_util::concat(_uniformsNames, options.samplers);
 
@@ -91,7 +97,10 @@ Effect::Effect(const unordered_map_t<string_t, string_t>& baseName,
     : defines{options.defines}
     , onCompiled{options.onCompiled}
     , onError{options.onError}
+    , onBind{nullptr}
     , uniqueId{Effect::_uniqueIdSeed++}
+    , _program{nullptr}
+    , _onCompileObserver{nullptr}
     , _engine{engine}
     , _uniformsNames{options.uniformsNames}
     , _samplers{options.samplers}
@@ -100,6 +109,7 @@ Effect::Effect(const unordered_map_t<string_t, string_t>& baseName,
     , _attributesNames{options.attributes}
     , _indexParameters{options.indexParameters}
     , _fallbacks{::std::move(options.fallbacks)}
+    , _transformFeedbackVaryings{options.transformFeedbackVaryings}
 {
   stl_util::concat(_uniformsNames, options.samplers);
 
@@ -137,8 +147,9 @@ Effect::Effect(const unordered_map_t<string_t, string_t>& baseName,
     _processIncludes(vertexCode, [this, &fragmentSource, &vertexSource](
                                    const string_t& vertexCodeWithIncludes) {
       _processShaderConversion(
-        vertexCodeWithIncludes, false, [this, &fragmentSource, &vertexSource](
-                                         const string_t& migratedVertexCode) {
+        vertexCodeWithIncludes, false,
+        [this, &fragmentSource,
+         &vertexSource](const string_t& migratedVertexCode) {
           _loadFragmentShader(fragmentSource, [this, &migratedVertexCode,
                                                &fragmentSource, &vertexSource](
                                                 const string_t& fragmentCode) {
@@ -343,16 +354,18 @@ void Effect::_dumpShadersSource(string_t vertexCode, string_t fragmentCode,
   unsigned int i = 2;
   const ::std::regex regex("\n", ::std::regex::optimize);
   auto formattedVertexCode
-    = "\n1\t" + String::regexReplace(
-                  vertexCode, regex, [&i](const ::std::smatch& /*m*/) {
-                    return "\n" + ::std::to_string(i++) + "\t";
-                  });
+    = "\n1\t"
+      + String::regexReplace(vertexCode, regex,
+                             [&i](const ::std::smatch& /*m*/) {
+                               return "\n" + ::std::to_string(i++) + "\t";
+                             });
   i = 2;
   auto formattedFragmentCode
-    = "\n1\t" + String::regexReplace(
-                  fragmentCode, regex, [&i](const ::std::smatch& /*m*/) {
-                    return "\n" + ::std::to_string(i++) + "\t";
-                  });
+    = "\n1\t"
+      + String::regexReplace(fragmentCode, regex,
+                             [&i](const ::std::smatch& /*m*/) {
+                               return "\n" + ::std::to_string(i++) + "\t";
+                             });
 
   // Dump shaders name and formatted source code
   BABYLON_LOGF_ERROR("Effect", "Vertex shader: %s%s", name.c_str(),
@@ -578,6 +591,33 @@ string_t Effect::_processPrecision(string_t source)
   return source;
 }
 
+void Effect::_rebuildProgram(
+  const string_t& vertexSourceCode, const string_t& fragmentSourceCode,
+  const ::std::function<void(GL::IGLProgram* program)>& onCompiled,
+  const ::std::function<void(const string_t& message)>& onError)
+{
+  _isReady = false;
+
+  _vertexSourceCodeOverride   = vertexSourceCode;
+  _fragmentSourceCodeOverride = fragmentSourceCode;
+  this->onError               = [&](Effect* /*effect*/, const string_t& error) {
+    if (onError) {
+      onError(error);
+    }
+  };
+  this->onCompiled = [&](Effect* /*effect*/) {
+    for (auto& scene : getEngine()->scenes) {
+      scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+    }
+
+    if (onCompiled) {
+      onCompiled(_program.get());
+    }
+  };
+  _fallbacks = nullptr;
+  _prepareEffect();
+}
+
 void Effect::_prepareEffect()
 {
   auto attributesNames = _attributesNames;
@@ -585,9 +625,35 @@ void Effect::_prepareEffect()
   auto& fallbacks      = _fallbacks;
   _valueCache.clear();
 
-  auto engine = _engine;
+  auto& previousProgram = _program;
 
   try {
+    auto engine = _engine;
+
+    if (previousProgram) {
+      getEngine()->_deleteProgram(previousProgram.get());
+    }
+
+    if (!_vertexSourceCodeOverride.empty()
+        && !_fragmentSourceCodeOverride.empty()) {
+      _program = engine->createRawShaderProgram(
+        _vertexSourceCodeOverride, _fragmentSourceCodeOverride, nullptr,
+        _transformFeedbackVaryings);
+    }
+    else {
+      _program = engine->createShaderProgram(
+        _vertexSourceCode, _fragmentSourceCode, defines, nullptr,
+        _transformFeedbackVaryings);
+    }
+    _program->__SPECTOR_rebuildProgram
+      = [this](
+          const string_t& vertexSourceCode, const string_t& fragmentSourceCode,
+          const ::std::function<void(GL::IGLProgram * program)>& onCompiled,
+          const ::std::function<void(const string_t& message)>& onError) {
+          _rebuildProgram(vertexSourceCode, fragmentSourceCode, onCompiled,
+                          onError);
+        };
+
     _program = engine->createShaderProgram(_vertexSourceCode,
                                            _fragmentSourceCode, _defines);
 
@@ -636,6 +702,14 @@ void Effect::_prepareEffect()
     BABYLON_LOGF_ERROR("Effect", "Attributes: %s",
                        String::join(attributesNames, ' ').c_str());
     BABYLON_LOGF_ERROR("Effect", "Error: %s", _compilationError.c_str());
+    if (previousProgram) {
+      _program = ::std::move(previousProgram);
+      _isReady = true;
+      if (onError) {
+        onError(this, _compilationError);
+      }
+      onErrorObservable.notifyObservers(this);
+    }
 
     if (!fallbacks && fallbacks->isMoreFallbacks()) {
       BABYLON_LOG_ERROR("Effect", "Trying next fallback.");
@@ -789,8 +863,9 @@ bool Effect::_cacheFloat4(const string_t& uniformName, float x, float y,
 void Effect::bindUniformBuffer(GL::IGLBuffer* _buffer, const string_t& name)
 {
   if (stl_util::contains(_uniformBuffersNames, name)) {
-    if (stl_util::contains(Effect::_baseCache, _uniformBuffersNames[name])
-        && Effect::_baseCache[_uniformBuffersNames[name]] == _buffer) {
+    const auto& bufferName = _uniformBuffersNames[name];
+    if (stl_util::contains(Effect::_baseCache, bufferName)
+        && Effect::_baseCache[bufferName] == _buffer) {
       return;
     }
   }
@@ -798,8 +873,9 @@ void Effect::bindUniformBuffer(GL::IGLBuffer* _buffer, const string_t& name)
     _uniformBuffersNames[name] = 0;
   }
 
-  Effect::_baseCache[_uniformBuffersNames[name]] = _buffer;
-  _engine->bindUniformBufferBase(_buffer, _uniformBuffersNames[name]);
+  const auto& bufferName         = _uniformBuffersNames[name];
+  Effect::_baseCache[bufferName] = _buffer;
+  _engine->bindUniformBufferBase(_buffer, bufferName);
 }
 
 void Effect::bindUniformBlock(const string_t& blockName, unsigned index)

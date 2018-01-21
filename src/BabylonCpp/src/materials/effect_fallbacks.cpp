@@ -8,7 +8,8 @@
 
 namespace BABYLON {
 
-EffectFallbacks::EffectFallbacks() : _currentRank{32}, _maxRank{0}
+EffectFallbacks::EffectFallbacks()
+    : _currentRank{32}, _maxRank{0}, _mesh{nullptr}
 {
 }
 
@@ -87,6 +88,8 @@ void EffectFallbacks::addFallback(unsigned int rank, const string_t& define)
     if (rank > _maxRank) {
       _maxRank = rank;
     }
+
+    _defines[rank].clear();
   }
 
   _defines[rank].emplace_back(define);
@@ -95,7 +98,6 @@ void EffectFallbacks::addFallback(unsigned int rank, const string_t& define)
 void EffectFallbacks::addCPUSkinningFallback(unsigned int rank,
                                              AbstractMesh* mesh)
 {
-  _meshRank = rank;
   _mesh     = mesh;
 
   if (rank < _currentRank) {

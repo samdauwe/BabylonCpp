@@ -258,6 +258,7 @@ public:
 
   /** Shaders **/
   void _releaseEffect(Effect* effect);
+  void _deleteProgram(GL::IGLProgram* program);
 
   /**
    * @param baseName The base name of the effect (The name of file without
@@ -278,10 +279,15 @@ public:
     const ::std::function<void(const Effect* effect, const string_t& errors)>&
       onError
     = nullptr);
-  GLFrameProgramPtr createShaderProgram(const string_t& vertexCode,
-                                        const string_t& fragmentCode,
-                                        const string_t& defines,
-                                        GL::IGLRenderingContext* gl = nullptr);
+  GLFrameProgramPtr createRawShaderProgram(
+    const string_t& vertexCode, const string_t& fragmentCode,
+    GL::IGLRenderingContext* context                    = nullptr,
+    const vector_t<string_t>& transformFeedbackVaryings = {});
+  GLFrameProgramPtr
+  createShaderProgram(const string_t& vertexCode, const string_t& fragmentCode,
+                      const string_t& defines,
+                      GL::IGLRenderingContext* context = nullptr,
+                      const vector_t<string_t>& transformFeedbackVaryings = {});
   unordered_map_t<string_t, GLUniformLocationPtr>
   getUniforms(GL::IGLProgram* shaderProgram,
               const vector_t<string_t>& uniformsNames);
@@ -372,7 +378,7 @@ public:
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const ::std::function<void(InternalTexture*, EventState&)>& onLoad
     = nullptr,
-    const ::std::function<void()>& onError = nullptr,
+    const ::std::function<void()>& onError    = nullptr,
     const Variant<ArrayBuffer, Image>& buffer = Variant<ArrayBuffer, Image>());
 
   /**
@@ -411,10 +417,10 @@ public:
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const ::std::function<void(InternalTexture*, EventState&)>& onLoad
     = nullptr,
-    const ::std::function<void()>& onError = nullptr,
+    const ::std::function<void()>& onError    = nullptr,
     const Variant<ArrayBuffer, Image>& buffer = Variant<ArrayBuffer, Image>(),
-    InternalTexture* fallBack = nullptr,
-    unsigned int format       = EngineConstants::TEXTUREFORMAT_RGBA);
+    InternalTexture* fallBack                 = nullptr,
+    unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
   void updateRawTexture(InternalTexture* texture, const Uint8Array& data,
                         unsigned int format, bool invertY = true,
                         const string_t& compression = "");
