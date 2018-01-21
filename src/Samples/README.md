@@ -31,6 +31,7 @@
 ![shader_material_star_nest_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_star_nest_scene.png?raw=true "Shader Material Star Nest Scene")
 ![shader_material_generators_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_generators_scene.png?raw=true "Shader Material Generators Scene")
 ![shader_material_carved_trees_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_carved_trees_scene.png?raw=true "Shader Material Carved Trees Scene")
+![shader_material_chains_and_gears_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_chains_and_gears_scene.png?raw=true "Shader Material Chains and Gears Scene")
 ![shader_material_simplicity_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_simplicity_scene.png?raw=true "Shader Material Simplicity Scene")
 ![shader_material_sparse_grid_marching_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_sparse_grid_marching_scene.png?raw=true "Shader Material Sparse Grid Marching Scene")
 ![shader_material_the_drive_home_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_the_drive_home_scene.png?raw=true "Shader Material The Drive Home Scene")
