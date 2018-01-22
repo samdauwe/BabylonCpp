@@ -199,7 +199,7 @@ void BoneLookController::update()
   auto& upAxis = BoneLookController::_tmpVecs[1];
   upAxis.copyFrom(upAxis);
 
-  if (upAxisSpace == Space::BONE) {
+  if (upAxisSpace == Space::BONE && parentBone) {
     if (_transformYawPitch) {
       Vector3::TransformCoordinatesToRef(upAxis, _transformYawPitchInv, upAxis);
     }
@@ -217,11 +217,11 @@ void BoneLookController::update()
   bool checkPitch = false;
 
   if (!stl_util::almost_equal(_maxYaw, Math::PI)
-      || stl_util::almost_equal(_minYaw, -Math::PI)) {
+      || !stl_util::almost_equal(_minYaw, -Math::PI)) {
     checkYaw = true;
   }
   if (!stl_util::almost_equal(_maxPitch, Math::PI)
-      || stl_util::almost_equal(_minPitch, -Math::PI)) {
+      || !stl_util::almost_equal(_minPitch, -Math::PI)) {
     checkPitch = true;
   }
 
@@ -230,7 +230,7 @@ void BoneLookController::update()
     auto& spaceMat    = BoneLookController::_tmpMats[2];
     auto& spaceMatInv = BoneLookController::_tmpMats[3];
 
-    if (upAxisSpace == Space::BONE && upAxis.y == 1.f) {
+    if (upAxisSpace == Space::BONE && upAxis.y == 1.f && parentBone) {
       parentBone->getRotationMatrixToRef(spaceMat, Space::WORLD, mesh);
     }
     else if (upAxisSpace == Space::LOCAL && upAxis.y == 1.f && !parentBone) {
@@ -270,8 +270,8 @@ void BoneLookController::update()
       target.subtractToRef(bonePos, localTarget);
       Vector3::TransformCoordinatesToRef(localTarget, spaceMatInv, localTarget);
 
-      float xzlen    = ::std::sqrt(localTarget.x * localTarget.x
-                                + localTarget.z * localTarget.z);
+      xzlen          = ::std::sqrt(localTarget.x * localTarget.x
+                          + localTarget.z * localTarget.z);
       float pitch    = ::std::atan2(localTarget.y, xzlen);
       float newPitch = pitch;
 
@@ -384,10 +384,10 @@ void BoneLookController::update()
     }
   }
 
-  auto& zaxis   = BoneLookController::_tmpVecs[5];
-  auto xaxis    = BoneLookController::_tmpVecs[6];
-  auto yaxis    = BoneLookController::_tmpVecs[7];
-  auto _tmpQuat = BoneLookController::_tmpQuat;
+  auto& zaxis    = BoneLookController::_tmpVecs[5];
+  auto& xaxis    = BoneLookController::_tmpVecs[6];
+  auto& yaxis    = BoneLookController::_tmpVecs[7];
+  auto& _tmpQuat = BoneLookController::_tmpQuat;
 
   target.subtractToRef(bonePos, zaxis);
   zaxis.normalize();

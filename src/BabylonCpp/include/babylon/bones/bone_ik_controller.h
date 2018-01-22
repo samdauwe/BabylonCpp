@@ -26,7 +26,7 @@ public:
   void update();
 
 private:
-  void _setMaxAngle(float ang);
+  void _setMaxAngle(float ang = Math::PI);
 
 public:
   AbstractMesh* targetMesh;

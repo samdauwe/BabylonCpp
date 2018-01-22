@@ -39,6 +39,10 @@ BoneIKController::BoneIKController(AbstractMesh* iMesh, Bone* bone,
     , _slerping{false}
     , _adjustRoll{0.f}
 {
+  if (!bone) {
+    return;
+  }
+
   auto bonePos = bone->getPosition();
 
   if (bone->getAbsoluteTransform().determinant() > 0.f) {
@@ -130,9 +134,14 @@ void BoneIKController::_setMaxAngle(float ang)
 
 void BoneIKController::update()
 {
-  auto& bone1         = _bone1;
-  Vector3& target     = targetPosition;
-  Vector3& poleTarget = poleTargetPosition;
+  auto& bone1 = _bone1;
+
+  if (!bone1) {
+    return;
+  }
+
+  auto& target     = targetPosition;
+  auto& poleTarget = poleTargetPosition;
 
   auto& mat1 = BoneIKController::_tmpMats[0];
   auto& mat2 = BoneIKController::_tmpMats[1];
@@ -237,20 +246,22 @@ void BoneIKController::update()
     mat1.multiplyToRef(mat2, mat1);
   }
 
-  if (slerpAmount < 1.f) {
-    if (!_slerping) {
-      Quaternion::FromRotationMatrixToRef(_bone1Mat, _bone1Quat);
+  if (_bone1) {
+    if (slerpAmount < 1.f) {
+      if (!_slerping) {
+        Quaternion::FromRotationMatrixToRef(_bone1Mat, _bone1Quat);
+      }
+      Quaternion::FromRotationMatrixToRef(mat1, _tmpQuat);
+      Quaternion::SlerpToRef(_bone1Quat, _tmpQuat, slerpAmount, _bone1Quat);
+      angC = _bone2Ang * (1.f - slerpAmount) + angC * slerpAmount;
+      _bone1->setRotationQuaternion(_bone1Quat, Space::WORLD, mesh);
+      _slerping = true;
     }
-    Quaternion::FromRotationMatrixToRef(mat1, _tmpQuat);
-    Quaternion::SlerpToRef(_bone1Quat, _tmpQuat, slerpAmount, _bone1Quat);
-    angC = _bone2Ang * (1.f - slerpAmount) + angC * slerpAmount;
-    _bone1->setRotationQuaternion(_bone1Quat, Space::WORLD, mesh);
-    _slerping = true;
-  }
-  else {
-    _bone1->setRotationMatrix(mat1, Space::WORLD, mesh);
-    _bone1Mat.copyFrom(mat1);
-    _slerping = false;
+    else {
+      _bone1->setRotationMatrix(mat1, Space::WORLD, mesh);
+      _bone1Mat.copyFrom(mat1);
+      _slerping = false;
+    }
   }
 
   _bone2->setAxisAngle(_bendAxis, angC, Space::LOCAL);
