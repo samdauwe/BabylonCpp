@@ -11,13 +11,13 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT Skeleton
-  : public ::std::enable_shared_from_this<Skeleton>,
-    public IAnimatable,
-    public IDisposable {
+    : public ::std::enable_shared_from_this<Skeleton>,
+      public IAnimatable,
+      public IDisposable {
 
 public:
   Skeleton(const string_t& name, const string_t& id, Scene* scene);
-  virtual ~Skeleton();
+  virtual ~Skeleton() override;
 
   virtual IReflect::Type type() const override;
 

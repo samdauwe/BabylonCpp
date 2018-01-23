@@ -214,7 +214,7 @@ Skeleton::beginAnimation(const string_t& _name, bool /*loop*/,
                          float /*speedRatio*/,
                          const ::std::function<void()>& /*onAnimationEnd*/)
 {
-  AnimationRange* range = getAnimationRange(_name);
+  auto range = getAnimationRange(_name);
 
   if (!range) {
     return nullptr;
@@ -273,6 +273,7 @@ void Skeleton::_computeTransformMatrices(Float32Array& targetMatrix,
 
     if (*bone->_index != -1) {
       auto mappedIndex = bone->_index.isNull() ?
+
                            index :
                            static_cast<unsigned int>(*bone->_index);
       bone->getInvertedAbsoluteTransform().multiplyToArray(
