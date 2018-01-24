@@ -19,7 +19,7 @@ public:
     bone->addToSkeleton(static_cast<unique_ptr_t<Bone>>(bone));
     return bone;
   }
-  ~Bone();
+  ~Bone() override;
 
   virtual IReflect::Type type() const override;
   void addToSkeleton(unique_ptr_t<Bone>&& newBone);

@@ -230,7 +230,7 @@ bool Bone::copyAnimationRange(Bone* source, const string_t& rangeName,
   }*/
 
   // get animation info / verify there is such a range from the source bone
-  if (source->animations.empty() && !source->animations[0]) {
+  if (source->animations.empty() || !source->animations[0]) {
     return false;
   }
 
@@ -246,10 +246,10 @@ bool Bone::copyAnimationRange(Bone* source, const string_t& rangeName,
   bool parentScalingReqd = rescaleAsRequired && sourceParent
                            && sourceBoneLength > 0 && length > 0
                            && sourceBoneLength != length;
-  float parentRatio = parentScalingReqd ?
+  float parentRatio = parentScalingReqd && parent && sourceParent ?
                         static_cast<float>(parent->length)
                           / static_cast<float>(sourceParent->length) :
-                        0.f;
+                        1.f;
 
   bool dimensionsScalingReqd
     = rescaleAsRequired && !parent && hasSkelDimensionsRatio
@@ -318,14 +318,14 @@ void Bone::translate(const Vector3& vec, Space space, AbstractMesh* mesh)
     auto& tmat = Bone::_tmpMats[0];
     auto& tvec = Bone::_tmpVecs[0];
 
-    if (mesh) {
-      tmat.copyFrom(_parent->getAbsoluteTransform());
-      if (wm) {
+    if (_parent) {
+      if (mesh && wm) {
+        tmat.copyFrom(_parent->getAbsoluteTransform());
         tmat.multiplyToRef(*wm, tmat);
       }
-    }
-    else {
-      tmat.copyFrom(_parent->getAbsoluteTransform());
+      else {
+        tmat.copyFrom(_parent->getAbsoluteTransform());
+      }
     }
 
     tmat.m[12] = 0.f;
@@ -367,14 +367,14 @@ void Bone::setPosition(const Vector3& position, Space space, AbstractMesh* mesh)
     auto& tmat = Bone::_tmpMats[0];
     auto& vec  = Bone::_tmpVecs[0];
 
-    if (mesh) {
-      tmat.copyFrom(_parent->getAbsoluteTransform());
-      if (wm) {
+    if (_parent) {
+      if (mesh && wm) {
+        tmat.copyFrom(_parent->getAbsoluteTransform());
         tmat.multiplyToRef(*wm, tmat);
       }
-    }
-    else {
-      tmat.copyFrom(_parent->getAbsoluteTransform());
+      else {
+        tmat.copyFrom(_parent->getAbsoluteTransform());
+      }
     }
 
     tmat.invert();
@@ -677,11 +677,9 @@ void Bone::getPositionToRef(Vector3& result, Space space,
 
     auto& tmat = Bone::_tmpMats[0];
 
-    if (mesh) {
+    if (mesh && wm) {
       tmat.copyFrom(getAbsoluteTransform());
-      if (wm) {
-        tmat.multiplyToRef(*wm, tmat);
-      }
+      tmat.multiplyToRef(*wm, tmat);
     }
     else {
       tmat = getAbsoluteTransform();
@@ -903,11 +901,9 @@ void Bone::getAbsolutePositionFromLocalToRef(const Vector3& position,
 
   auto& tmat = Bone::_tmpMats[0];
 
-  if (mesh) {
+  if (mesh && wm) {
     tmat.copyFrom(getAbsoluteTransform());
-    if (wm) {
-      tmat.multiplyToRef(*wm, tmat);
-    }
+    tmat.multiplyToRef(*wm, tmat);
   }
   else {
     tmat = getAbsoluteTransform();
@@ -943,10 +939,8 @@ void Bone::getLocalPositionFromAbsoluteToRef(const Vector3& position,
 
   tmat.copyFrom(getAbsoluteTransform());
 
-  if (mesh) {
-    if (wm) {
-      tmat.multiplyToRef(*wm, tmat);
-    }
+  if (mesh && wm) {
+    tmat.multiplyToRef(*wm, tmat);
   }
 
   tmat.invert();
