@@ -126,8 +126,8 @@ HDRInfo HDRTools::RGBE_ReadHeader(const Uint8Array& uint8array)
 CubeMapInfo HDRTools::GetCubeMapTextureData(const Uint8Array& buffer,
                                             size_t size)
 {
-  HDRInfo hdrInfo   = RGBE_ReadHeader(buffer);
-  Float32Array data = RGBE_ReadPixels_RLE(buffer, hdrInfo);
+  auto hdrInfo = RGBE_ReadHeader(buffer);
+  auto data    = RGBE_ReadPixels_RLE(buffer, hdrInfo);
 
   return PanoramaToCubeMapTools::ConvertPanoramaToCubemap(data, hdrInfo.width,
                                                           hdrInfo.height, size);
@@ -208,7 +208,7 @@ Float32Array HDRTools::RGBE_ReadPixels_RLE(const Uint8Array& uint8array,
 
           scanLineArray[index++] = b;
           if (--count > 0) {
-            for (size_t j = 0; j < count; j++) {
+            for (size_t j = 0; j < count; ++j) {
               scanLineArray[index++] = uint8array[dataIndex++];
             }
           }
@@ -217,7 +217,7 @@ Float32Array HDRTools::RGBE_ReadPixels_RLE(const Uint8Array& uint8array,
     }
 
     // now convert data from buffer into floats
-    for (i = 0; i < scanline_width; i++) {
+    for (i = 0; i < scanline_width; ++i) {
       a = scanLineArray[i];
       b = scanLineArray[i + scanline_width];
       c = scanLineArray[i + 2 * scanline_width];

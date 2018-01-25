@@ -10,6 +10,7 @@ namespace Internals {
  * Header information of HDR texture files.
  */
 struct BABYLON_SHARED_EXPORT HDRInfo {
+
   /**
    * The height of the texture in pixels.
    */
@@ -34,6 +35,7 @@ struct BABYLON_SHARED_EXPORT HDRInfo {
    * Header parse error message.
    */
   string_t errorMessage;
+
 }; // end of struct HDRInfo
 
 } // end of namespace Internals
