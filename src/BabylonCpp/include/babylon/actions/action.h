@@ -12,7 +12,7 @@ namespace BABYLON {
  * is launched when its trigger is fired.
  */
 class BABYLON_SHARED_EXPORT Action
-  : public ::std::enable_shared_from_this<Action> {
+    : public ::std::enable_shared_from_this<Action> {
 
 public:
   template <typename... Ts>
@@ -27,7 +27,7 @@ public:
 
   /** Methods **/
   virtual void _prepare();
-  string_t getTriggerParameter();
+  string_t getTriggerParameter() const;
   void _executeCurrent(const ActionEvent& evt);
   virtual void execute(const ActionEvent& evt);
   void skipToNextActiveAction();

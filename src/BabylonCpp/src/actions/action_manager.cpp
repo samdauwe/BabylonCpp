@@ -149,7 +149,7 @@ void ActionManager::processTrigger(unsigned int trigger,
     if (action->trigger == trigger) {
       if (trigger == ActionManager::OnKeyUpTrigger
           || trigger == ActionManager::OnKeyDownTrigger) {
-        const string_t parameter = action->getTriggerParameter();
+        const auto parameter = action->getTriggerParameter();
         if (!parameter.empty() && parameter != evt.sourceEvent.keyCode) {
           auto lowerCase = String::toLowerCase(parameter);
           if (lowerCase.empty()) {

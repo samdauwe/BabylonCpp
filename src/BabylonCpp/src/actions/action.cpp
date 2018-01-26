@@ -35,7 +35,7 @@ void Action::_prepare()
 {
 }
 
-string_t Action::getTriggerParameter()
+string_t Action::getTriggerParameter() const
 {
   return _triggerParameter;
 }
