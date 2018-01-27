@@ -21,6 +21,7 @@ public:
                     const std::unique_ptr<IGLShader>& shader) override;
   void beginQuery(GLenum target,
                   const std::unique_ptr<IGLQuery>& query) override;
+  void beginTransformFeedback(GLenum primitiveMode) override;
   void bindAttribLocation(IGLProgram* program, GLuint index,
                           const std::string& name) override;
   void bindBuffer(GLenum target, IGLBuffer* buffer) override;
@@ -30,6 +31,8 @@ public:
     GLenum target,
     const std::unique_ptr<IGLRenderbuffer>& renderbuffer) override;
   void bindTexture(GLenum target, IGLTexture* texture) override;
+  void bindTransformFeedback(GLenum target,
+                             IGLTransformFeedback* transformFeedback) override;
   void blendColor(GLclampf red, GLclampf green, GLclampf blue,
                   GLclampf alpha) override;
   void blendEquation(GLenum mode) override;
@@ -80,6 +83,7 @@ public:
   std::unique_ptr<IGLRenderbuffer> createRenderbuffer() override;
   std::unique_ptr<IGLShader> createShader(GLenum type) override;
   std::unique_ptr<IGLTexture> createTexture() override;
+  std::unique_ptr<IGLTransformFeedback> createTransformFeedback() override;
   std::unique_ptr<IGLVertexArrayObject> createVertexArray() override;
   void cullFace(GLenum mode) override;
   void deleteBuffer(IGLBuffer* buffer) override;
@@ -89,6 +93,8 @@ public:
   void deleteRenderbuffer(IGLRenderbuffer* renderbuffer) override;
   void deleteShader(const std::unique_ptr<IGLShader>& shader) override;
   void deleteTexture(IGLTexture* texture) override;
+  void
+  deleteTransformFeedback(IGLTransformFeedback* transformFeedback) override;
   void deleteVertexArray(IGLVertexArrayObject* vao) override;
   void depthFunc(GLenum func) override;
   void depthMask(GLboolean flag) override;
@@ -107,6 +113,7 @@ public:
   void enable(GLenum cap) override;
   void enableVertexAttribArray(GLuint index) override;
   void endQuery(GLenum target) override;
+  void endTransformFeedback() override;
   void finish() override;
   void flush() override;
   void framebufferRenderbuffer(
@@ -188,11 +195,18 @@ public:
   void texImage2D(GLenum target, GLint level, GLenum internalformat,
                   GLsizei width, GLsizei height, GLsizei border, GLenum format,
                   GLenum type, ICanvas* pixels) override;
+  void texImage3D(GLenum target, GLint level, GLint internalformat,
+                  GLsizei width, GLsizei height, GLsizei depth, GLint border,
+                  GLenum format, GLenum type,
+                  const Uint8Array& pixels) override;
   void texParameterf(GLenum target, GLenum pname, GLfloat param) override;
   void texParameteri(GLenum target, GLenum pname, GLint param) override;
   void texSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset,
                      GLsizei width, GLsizei height, GLenum format, GLenum type,
                      any pixels) override;
+  void transformFeedbackVaryings(IGLProgram* program,
+                                 const std::vector<std::string>& varyings,
+                                 GLenum bufferMode) override;
   void uniform1f(IGLUniformLocation* location, GLfloat v0) override;
   void uniform1fv(GL::IGLUniformLocation* location,
                   const Float32Array& array) override;

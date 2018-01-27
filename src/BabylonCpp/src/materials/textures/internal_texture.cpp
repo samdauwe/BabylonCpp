@@ -20,7 +20,12 @@ constexpr unsigned int InternalTexture::DATASOURCE_CUBEPREFILTERED;
 constexpr unsigned int InternalTexture::DATASOURCE_RAW3D;
 
 InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource)
-    : _dataSource{dataSource}, _references{1}, _engine{engine}
+    : _dataSource{dataSource}
+    , _cachedWrapU{0}
+    , _cachedWrapV{0}
+    , _cachedWrapR{0}
+    , _references{1}
+    , _engine{engine}
 {
   _webGLTexture = engine->_createTexture();
 }
@@ -59,6 +64,7 @@ void InternalTexture::_rebuild()
   _cachedCoordinatesMode           = 0;
   _cachedWrapU                     = 0;
   _cachedWrapV                     = 0;
+  _cachedWrapR                     = 0;
   _cachedAnisotropicFilteringLevel = 0;
 
   switch (_dataSource) {

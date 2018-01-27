@@ -30,9 +30,8 @@ public:
   static constexpr unsigned int DATASOURCE_RAW3D             = 10;
 
 public:
-  InternalTexture(Engine* engine,
-                  unsigned int dataSource
-                  = InternalTexture::DATASOURCE_UNKNOWN);
+  InternalTexture(Engine* engine, unsigned int dataSource
+                                  = InternalTexture::DATASOURCE_UNKNOWN);
   ~InternalTexture();
 
   unsigned int dataSource() const;
@@ -80,6 +79,7 @@ public:
   unsigned int _cachedCoordinatesMode;
   unsigned int _cachedWrapU;
   unsigned int _cachedWrapV;
+  unsigned int _cachedWrapR;
   unsigned int _cachedAnisotropicFilteringLevel;
   bool _isDisabled;
   string_t _compression;

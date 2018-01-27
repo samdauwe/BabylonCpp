@@ -13,12 +13,12 @@ struct BABYLON_SHARED_EXPORT RenderingGroupInfo {
   /**
    * The Scene that being rendered
    */
-  Scene* scene;
+  Scene* scene = nullptr;
 
   /**
    * The camera currently used for the rendering pass
    */
-  Camera* camera;
+  Camera* camera = nullptr;
 
   /**
    * The ID of the renderingGroup being processed

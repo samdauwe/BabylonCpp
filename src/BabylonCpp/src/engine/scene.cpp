@@ -730,8 +730,8 @@ void Scene::_updatePointerPosition(const PointerEvent evt)
 {
   auto canvasRect = _engine->getRenderingCanvasClientRect();
 
-  _pointerX = evt.clientX - canvasRect.left;
-  _pointerY = evt.clientY - canvasRect.top;
+  _pointerX = evt.clientX - (*canvasRect).left;
+  _pointerY = evt.clientY - (*canvasRect).top;
 
   _unTranslatedPointerX = _pointerX;
   _unTranslatedPointerY = _pointerY;
@@ -1095,8 +1095,9 @@ void Scene::_onPointerMoveEvent(PointerEvent&& evt)
   if (!pointerMovePredicate) {
     pointerMovePredicate = [this](AbstractMesh* mesh) {
       return mesh->isPickable && mesh->isVisible && mesh->isReady()
-             && mesh->isEnabled() && (constantlyUpdateMeshUnderPointer
-                                      || mesh->actionManager != nullptr);
+             && mesh->isEnabled()
+             && (constantlyUpdateMeshUnderPointer
+                 || mesh->actionManager != nullptr);
     };
   }
 
@@ -1748,7 +1749,7 @@ void Scene::addMesh(unique_ptr_t<AbstractMesh>&& newMesh)
 
 int Scene::removeMesh(AbstractMesh* toRemove)
 {
-  auto it = ::std::find_if(meshes.begin(), meshes.end(),
+  auto it   = ::std::find_if(meshes.begin(), meshes.end(),
                            [&toRemove](const unique_ptr_t<AbstractMesh>& mesh) {
                              return mesh.get() == toRemove;
                            });
@@ -1772,7 +1773,7 @@ void Scene::addTransformNode(TransformNode* newTransformNode)
 
 int Scene::removeTransformNode(TransformNode* toRemove)
 {
-  auto it = ::std::find_if(transformNodes.begin(), transformNodes.end(),
+  auto it   = ::std::find_if(transformNodes.begin(), transformNodes.end(),
                            [&toRemove](const TransformNode* transformNode) {
                              return transformNode == toRemove;
                            });
@@ -1789,7 +1790,7 @@ int Scene::removeTransformNode(TransformNode* toRemove)
 
 int Scene::removeSkeleton(Skeleton* toRemove)
 {
-  auto it = ::std::find_if(skeletons.begin(), skeletons.end(),
+  auto it   = ::std::find_if(skeletons.begin(), skeletons.end(),
                            [&toRemove](const unique_ptr_t<Skeleton>& skeleton) {
                              return skeleton.get() == toRemove;
                            });
@@ -1820,7 +1821,7 @@ int Scene::removeMorphTargetManager(MorphTargetManager* toRemove)
 
 int Scene::removeLight(Light* toRemove)
 {
-  auto it = ::std::find_if(lights.begin(), lights.end(),
+  auto it   = ::std::find_if(lights.begin(), lights.end(),
                            [&toRemove](const unique_ptr_t<Light>& light) {
                              return light.get() == toRemove;
                            });
@@ -1838,7 +1839,7 @@ int Scene::removeLight(Light* toRemove)
 
 int Scene::removeCamera(Camera* toRemove)
 {
-  auto it1 = ::std::find_if(cameras.begin(), cameras.end(),
+  auto it1  = ::std::find_if(cameras.begin(), cameras.end(),
                             [&toRemove](const unique_ptr_t<Camera>& camera) {
                               return camera.get() == toRemove;
                             });
@@ -2799,7 +2800,7 @@ void Scene::render()
   _totalVertices.fetchNewFrame();
   _activeIndices.fetchNewFrame();
   _activeBones.fetchNewFrame();
-  getEngine()->drawCallsPerfCounter().fetchNewFrame();
+  // getEngine()->drawCallsPerfCounter().fetchNewFrame();
   _meshesForIntersections.clear();
   resetCachedMaterial();
 
@@ -3427,7 +3428,7 @@ unique_ptr_t<Ray> Scene::createPickingRayInCameraSpace(int x, int y,
   auto cameraViewport = camera->viewport;
   auto viewport       = cameraViewport.toGlobal(engine->getRenderWidth(),
                                           engine->getRenderHeight());
-  auto identity = Matrix::Identity();
+  auto identity       = Matrix::Identity();
 
   // Moving coordinates to local viewport world
   float _x = static_cast<float>(x);

@@ -143,7 +143,7 @@ enum GLEnums : GLenum {
   STENCIL_BACK_WRITEMASK       = 0x8CA5,
   VIEWPORT                     = 0x0BA2,
   SCISSOR_BOX                  = 0x0C10,
-  /* SCISSOR_TEST*/
+  /* SCISSOR_TEST */
   COLOR_CLEAR_VALUE    = 0x0C22,
   COLOR_WRITEMASK      = 0x0C23,
   UNPACK_ALIGNMENT     = 0x0CF5,
@@ -158,6 +158,10 @@ enum GLEnums : GLenum {
   DEPTH_BITS           = 0x0D56,
   STENCIL_BITS         = 0x0D57,
   POLYGON_OFFSET_UNITS = 0x2A00,
+  /* TRANSFORM FEEDBACK */
+  INTERLEAVED_ATTRIBS       = 0x8C8C,
+  TRANSFORM_FEEDBACK_BUFFER = 0x8C8E,
+  TRANSFORM_FEEDBACK        = 0x8E22,
   /*  POLYGON_OFFSET_FILL*/
   POLYGON_OFFSET_FACTOR  = 0x8038,
   TEXTURE_BINDING_2D     = 0x8069,
@@ -238,6 +242,8 @@ enum GLEnums : GLenum {
   RENDERER   = 0x1F01,
   VERSION    = 0x1F02,
   EXTENSIONS = 0x1F03,
+  /* Textures */
+  TEXTURE_3D = 0x806F,
   /* TextureMagFilter */
   NEAREST = 0x2600,
   LINEAR  = 0x2601,
@@ -251,6 +257,7 @@ enum GLEnums : GLenum {
   TEXTURE_MIN_FILTER = 0x2801,
   TEXTURE_WRAP_S     = 0x2802,
   TEXTURE_WRAP_T     = 0x2803,
+  TEXTURE_WRAP_R     = 0x8072,
   /* TextureTarget */
   TEXTURE_2D                  = 0x0DE1,
   TEXTURE                     = 0x1702,
@@ -418,6 +425,18 @@ public:
 
 }; // end of class IGLFramebuffer
 
+class BABYLON_SHARED_EXPORT IGLTransformFeedback {
+
+public:
+  IGLTransformFeedback(GLuint _value) : value{_value}
+  {
+  }
+
+public:
+  GLuint value;
+
+}; // end of class IGLTransformFeedback
+
 class BABYLON_SHARED_EXPORT IGLProgram {
 
 public:
@@ -432,6 +451,7 @@ public:
     const ::std::function<void(GL::IGLProgram* program)>& onCompiled,
     const ::std::function<void(const string_t& message)>& onError)>
     __SPECTOR_rebuildProgram;
+  IGLTransformFeedback* transformFeedback;
 
 }; // end of class IGLProgram
 
@@ -542,10 +562,6 @@ public:
   vector_t<::std::function<void()>> onLoadedCallbacks;
 }; // end of class IGLTexture
 
-class BABYLON_SHARED_EXPORT IGLTransformFeedback {
-
-}; // end of class IGLTransformFeedback
-
 class BABYLON_SHARED_EXPORT IGLUniformLocation {
 
 public:
@@ -609,6 +625,14 @@ public:
     = 0;
 
   /**
+   * @brief Starts a transform feedback operation.
+   * @param primitiveMode A GLenum specifying the output type of the primitives
+   * that will be recorded into the buffer objects that are bound for transform
+   * feedback.
+   */
+  virtual void beginTransformFeedback(GLenum primitiveMode) = 0;
+
+  /**
    * @brief Binds a generic vertex index to a named attribute variable.
    * @param program A IGLProgram object to bind.
    * @param index A GLuint specifying the index of the generic vertex to bind.
@@ -658,6 +682,16 @@ public:
    * @param texture A IGLTexture object to bind.
    */
   virtual void bindTexture(GLenum target, IGLTexture* texture) = 0;
+
+  /**
+   * @brief Binds a passed IGLTransformFeedback object to the current GL state.
+   * @param target A GLenum specifying the target (binding point). Must be
+   * GL::TRANSFORM_FEEDBACK.
+   * @param transformFeedback A IGLTransformFeedback object to bind.
+   */
+  virtual void bindTransformFeedback(GLenum target,
+                                     IGLTransformFeedback* transformFeedback)
+    = 0;
 
   /**
    * @brief Sets the source and destination blending factors.
@@ -1000,6 +1034,12 @@ public:
   virtual unique_ptr_t<IGLTexture> createTexture() = 0;
 
   /**
+   * @brief Creates and initializes a IGLTransformFeedback object.
+   * @return A IGLTransformFeedback object.
+   */
+  virtual unique_ptr_t<IGLTransformFeedback> createTransformFeedback() = 0;
+
+  /**
    * @brief Creates and initializes a IGLVertexArrayObject object that
    * represents a vertex array object (VAO) pointing to vertex array data and
    * which provides names for different sets of vertex data.
@@ -1063,6 +1103,13 @@ public:
    * @param texture A IGLTexture object to delete.
    */
   virtual void deleteTexture(IGLTexture* texture) = 0;
+
+  /**
+   * @brief Deletes a given IGLTransformFeedback object.
+   * @param transformFeedback A IGLTransformFeedback object to delete.
+   */
+  virtual void deleteTransformFeedback(IGLTransformFeedback* transformFeedback)
+    = 0;
 
   /**
    * @brief Deletes a given IGLVertexArrayObject object.
@@ -1203,6 +1250,11 @@ public:
    * written to transform feedback buffers.
    */
   virtual void endQuery(GLenum target) = 0;
+
+  /**
+   * @brief ends a transform feedback operation.
+   */
+  virtual void endTransformFeedback() = 0;
 
   /**
    * @brief Blocks execution until all previously called commands are finished.
@@ -1756,6 +1808,28 @@ public:
     = 0;
 
   /**
+   * @brief Specifies a three-dimensional texture image.
+   * @param target A GLenum specifying the binding point (target) of the active
+   * texture.
+   * @param level A GLint specifying the level of detail. Level 0 is the base
+   * image level and level n is the nth mipmap reduction level.
+   * @param internalformat A GLint specifying the color components in the
+   * texture.
+   * @param width A GLsizei specifying the width of the texture.
+   * @param height A GLsizei specifying the height of the texture.
+   * @param depth A GLsizei specifying the depth of the texture.
+   * @param border A GLint specifying the width of the border. Must be 0.
+   * @param format A GLenum specifying the format of the texel data.
+   * @param type A GLenum specifying the data type of the texel data.
+   * @param pixels An Uint8Array pixel source for the texture.
+   */
+  virtual void texImage3D(GLenum target, GLint level, GLint internalformat,
+                          GLsizei width, GLsizei height, GLsizei depth,
+                          GLint border, GLenum format, GLenum type,
+                          const Uint8Array& pixels)
+    = 0;
+
+  /**
    * @brief Sets texture parameters.
    * @param target A GLenum specifying the binding point (target).
    * @param pname A Glenum specifying the texture parameter to set.
@@ -1792,6 +1866,19 @@ public:
   virtual void texSubImage2D(GLenum target, GLint level, GLint xoffset,
                              GLint yoffset, GLsizei width, GLsizei height,
                              GLenum format, GLenum type, any pixels)
+    = 0;
+
+  /**
+   * @brief Specifies values to record in WebGLTransformFeedback buffers.
+   * @param program A IGLProgram.
+   * @param varyings An Array of Strings specifying the the names of the varying
+   * variables to use.
+   * @param bufferMode A GLenum specifying the mode to use when capturing the
+   * varying variables.
+   */
+  virtual void transformFeedbackVaryings(IGLProgram* program,
+                                         const vector_t<string_t>& varyings,
+                                         GLenum bufferMode)
     = 0;
 
   /**

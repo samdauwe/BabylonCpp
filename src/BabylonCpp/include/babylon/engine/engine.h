@@ -28,7 +28,7 @@ public:
   using ArrayBufferViewArray   = vector_t<ArrayBufferView>;
   using GLBufferPtr            = unique_ptr_t<GL::IGLBuffer>;
   using GLFrameBufferPtr       = unique_ptr_t<GL::IGLFramebuffer>;
-  using GLFrameProgramPtr      = unique_ptr_t<GL::IGLProgram>;
+  using GLProgramPtr           = unique_ptr_t<GL::IGLProgram>;
   using GLQueryPtr             = unique_ptr_t<GL::IGLQuery>;
   using GLRenderBufferPtr      = unique_ptr_t<GL::IGLRenderbuffer>;
   using GLShaderPtr            = unique_ptr_t<GL::IGLShader>;
@@ -65,6 +65,7 @@ public:
 
   // Empty texture
   InternalTexture* emptyTexture();
+  InternalTexture* emptyTexture3D();
   InternalTexture* emptyCubeTexture();
 
   float webGLVersion() const;
@@ -88,14 +89,14 @@ public:
   int getRenderWidth(bool useScreen = false);
   int getRenderHeight(bool useScreen = false);
   ICanvas* getRenderingCanvas();
-  ClientRect getRenderingCanvasClientRect();
+  Nullable<ClientRect> getRenderingCanvasClientRect();
   void setHardwareScalingLevel(int level);
   int getHardwareScalingLevel() const;
   vector_t<unique_ptr_t<InternalTexture>>& getLoadedTexturesCache();
   EngineCapabilities& getCaps();
   /** The number of draw calls submitted last frame */
   size_t drawCalls() const;
-  PerfCounter& drawCallsPerfCounter();
+  Nullable<PerfCounter> drawCallsPerfCounter();
 
   /** Methods **/
   void backupGLState();
@@ -186,11 +187,6 @@ public:
    */
   void setSize(int width, int height);
 
-  /** WebVR functions **/
-  // void initWebVR();
-  // void enableVR(VRDevice vrDevice);
-  // void disableVR();
-
   void bindFramebuffer(InternalTexture* texture, unsigned int faceIndex = 0,
                        int requiredWidth = 0, int requiredHeight = 0,
                        bool forceFullscreenViewport = true);
@@ -217,7 +213,8 @@ public:
   void updateDynamicVertexBuffer(const GLBufferPtr& vertexBuffer,
                                  const Float32Array& vertices, int offset = -1,
                                  int count = -1);
-  GLBufferPtr createIndexBuffer(const IndicesArray& indices);
+  GLBufferPtr createIndexBuffer(const IndicesArray& indices,
+                                bool updatable = false);
   void bindArrayBuffer(GL::IGLBuffer* buffer);
   void bindUniformBuffer(GL::IGLBuffer* buffer);
   void bindUniformBufferBase(GL::IGLBuffer* buffer, unsigned int location);
@@ -250,9 +247,8 @@ public:
   void applyStates();
   void draw(bool useTriangles, unsigned int indexStart, int indexCount,
             int instancesCount = 0);
-  void drawPointClouds(int verticesStart, int verticesCount);
   void drawPointClouds(int verticesStart, int verticesCount,
-                       int instancesCount);
+                       int instancesCount = 0);
   void drawUnIndexed(bool useTriangles, int verticesStart, int verticesCount,
                      int instancesCount = 0);
 
@@ -279,11 +275,11 @@ public:
     const ::std::function<void(const Effect* effect, const string_t& errors)>&
       onError
     = nullptr);
-  GLFrameProgramPtr createRawShaderProgram(
+  GLProgramPtr createRawShaderProgram(
     const string_t& vertexCode, const string_t& fragmentCode,
     GL::IGLRenderingContext* context                    = nullptr,
     const vector_t<string_t>& transformFeedbackVaryings = {});
-  GLFrameProgramPtr
+  GLProgramPtr
   createShaderProgram(const string_t& vertexCode, const string_t& fragmentCode,
                       const string_t& defines,
                       GL::IGLRenderingContext* context = nullptr,
@@ -338,8 +334,8 @@ public:
   void setColorWrite(bool enable);
   bool getColorWrite() const;
   void setAlphaConstants(float r, float g, float b, float a);
-  void setAlphaMode(int mode, bool noDepthWriteChange = false);
-  int getAlphaMode() const;
+  void setAlphaMode(unsigned int mode, bool noDepthWriteChange = false);
+  unsigned int getAlphaMode() const;
   void setAlphaTesting(bool enable);
   bool getAlphaTesting() const;
   Internals::_StencilState* stencilState();
@@ -423,7 +419,9 @@ public:
     unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
   void updateRawTexture(InternalTexture* texture, const Uint8Array& data,
                         unsigned int format, bool invertY = true,
-                        const string_t& compression = "");
+                        const string_t& compression = "",
+                        unsigned int type
+                        = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   InternalTexture*
   createRawTexture(const Uint8Array& data, int width, int height,
                    unsigned int format, bool generateMipMaps, bool invertY,
@@ -490,11 +488,11 @@ public:
     const ::std::function<void()>& onError = nullptr,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     bool invertY              = false);
-  void updateRawTexture3D(InternalTexture* texture, const Uint8Array& data,
+  void updateRawTexture3D(InternalTexture* texture, const ArrayBuffer& data,
                           unsigned int format, bool invertY = true,
                           const string_t& compression = "");
-  InternalTexture* createRawTexture3D(const Uint8Array& data, int width,
-                                      int depth, int height,
+  InternalTexture* createRawTexture3D(const ArrayBuffer& data, int width,
+                                      int height, int depth,
                                       unsigned int format, bool generateMipMaps,
                                       bool invertY, unsigned int samplingMode,
                                       const string_t& compression = "");
@@ -578,6 +576,9 @@ public:
                                    const string_t& source, const string_t& type,
                                    const string_t& defines,
                                    const string_t& shaderVersion);
+  static GLShaderPtr CompileRawShader(GL::IGLRenderingContext* gl,
+                                      const string_t& source,
+                                      const string_t& type);
   static SamplingParameters GetSamplingParameters(unsigned int samplingMode,
                                                   bool generateMipMaps);
 
@@ -596,7 +597,7 @@ private:
   void _initGLContext();
   void _onVRFullScreenTriggered();
   void _getVRDisplays();
-  void _setTexture(unsigned int channel, BaseTexture* texture);
+  bool _setTexture(unsigned int channel, BaseTexture* texture);
   void bindUnboundFramebuffer(GL::IGLFramebuffer* framebuffer);
   void bindIndexBuffer(GL::IGLBuffer* buffer);
   void bindBuffer(GL::IGLBuffer* buffer, int target);
@@ -609,11 +610,18 @@ private:
     Effect* effect);
   void _unbindVertexArrayObject();
   void setProgram(GL::IGLProgram* program);
-  void activateTexture(unsigned int texture);
+  void activateTextureChannel(unsigned int textureChannel);
   void _rescaleTexture(InternalTexture* source, InternalTexture* destination,
                        Scene* scene, unsigned int internalFormat,
                        const ::std::function<void()>& onComplete);
   GL::GLenum _getInternalFormat(unsigned int format) const;
+  GLProgramPtr
+  _createShaderProgram(const unique_ptr_t<GL::IGLShader>& vertexShader,
+                       const unique_ptr_t<GL::IGLShader>& fragmentShader,
+                       GL::IGLRenderingContext* context,
+                       const vector_t<string_t>& transformFeedbackVaryings
+                       = {});
+  void setCubeMapTextureParams(GL::IGLRenderingContext* gl, bool loadMipmap);
   GLRenderBufferPtr
   _setupFramebufferDepthAttachments(bool generateStencilBuffer,
                                     bool generateDepthBuffer, int width,
@@ -729,6 +737,28 @@ public:
    */
   bool disablePerformanceMonitorInBackground;
 
+protected:
+  EngineCapabilities _caps;
+
+  // States
+  unique_ptr_t<Internals::_DepthCullingState> _depthCullingState;
+  unique_ptr_t<Internals::_StencilState> _stencilState;
+  unique_ptr_t<Internals::_AlphaState> _alphaState;
+  unsigned int _alphaMode;
+
+  // Cache
+  unsigned int _activeTextureChannel;
+  unordered_map_t<unsigned int, InternalTexture*> _boundTexturesCache;
+  Effect* _currentEffect;
+  GL::IGLProgram* _currentProgram;
+  Viewport* _cachedViewport;
+  unordered_map_t<string_t, VertexBuffer*> _cachedVertexBuffersMap;
+  GL::IGLBuffer* _cachedVertexBuffers;
+  GL::IGLBuffer* _cachedIndexBuffer;
+  Effect* _cachedEffectForVertexBuffers;
+  InternalTexture* _currentRenderTarget;
+  GL::IGLFramebuffer* _currentFramebuffer;
+
 private:
   // WebVR
   bool _vrExclusivePointerMode;
@@ -753,7 +783,6 @@ private:
   ::std::function<void()> _onPointerLockChange;
 
   int _hardwareScalingLevel;
-  EngineCapabilities _caps;
   bool _pointerLockRequested;
   bool _alphaTest;
   bool _isStencilEnable;
@@ -785,31 +814,13 @@ private:
   float _fps;
   float _deltaTime;
 
-  // States
-  unique_ptr_t<Internals::_DepthCullingState> _depthCullingState;
-  unique_ptr_t<Internals::_StencilState> _stencilState;
-  unique_ptr_t<Internals::_AlphaState> _alphaState;
-  int _alphaMode;
-
   // Cache
   vector_t<unique_ptr_t<InternalTexture>> _internalTexturesCache;
-  unsigned int _maxTextureChannels;
-  unsigned int _activeTexture;
-  unordered_map_t<unsigned int, InternalTexture*> _activeTexturesCache;
-  Effect* _currentEffect;
-  GL::IGLProgram* _currentProgram;
   unordered_map_t<string_t, unique_ptr_t<Effect>> _compiledEffects;
   vector_t<bool> _vertexAttribArraysEnabled;
-  Viewport* _cachedViewport;
   GL::IGLVertexArrayObject* _cachedVertexArrayObject;
-  unordered_map_t<string_t, VertexBuffer*> _cachedVertexBuffersMap;
-  GL::IGLBuffer* _cachedVertexBuffers;
-  GL::IGLBuffer* _cachedIndexBuffer;
-  Effect* _cachedEffectForVertexBuffers;
-  InternalTexture* _currentRenderTarget;
   bool _uintIndicesCurrentlySet;
   unordered_map_t<int, GL::IGLBuffer*> _currentBoundBuffer;
-  GL::IGLFramebuffer* _currentFramebuffer;
   unordered_map_t<unsigned int, BufferPointer> _currentBufferPointers;
   Int32Array _currentInstanceLocations;
   vector_t<GL::IGLBuffer*> _currentInstanceBuffers;
@@ -822,6 +833,7 @@ private:
   bool _mustWipeVertexAttributes;
   InternalTexture* _emptyTexture;
   unique_ptr_t<InternalTexture> _emptyCubeTexture;
+  InternalTexture* _emptyTexture3D;
   int _frameHandler;
   // Hardware supported Compressed Textures
   vector_t<string_t> _texturesSupported;

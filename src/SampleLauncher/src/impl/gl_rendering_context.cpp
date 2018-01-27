@@ -170,6 +170,11 @@ void GLRenderingContext::beginQuery(GLenum target,
   glBeginQuery(target, query ? query->value : 0);
 }
 
+void GLRenderingContext::beginTransformFeedback(GLenum primitiveMode)
+{
+  glBeginTransformFeedback(primitiveMode);
+}
+
 void GLRenderingContext::bindAttribLocation(IGLProgram* program, GLuint index,
                                             const std::string& name)
 {
@@ -207,6 +212,12 @@ void GLRenderingContext::bindTexture(GLenum target, IGLTexture* texture)
   else {
     glDisable(target);
   }
+}
+
+void GLRenderingContext::bindTransformFeedback(
+  GLenum target, IGLTransformFeedback* transformFeedback)
+{
+  glBindTransformFeedback(target, transformFeedback->value);
 }
 
 void GLRenderingContext::blendColor(GLclampf red, GLclampf green, GLclampf blue,
@@ -291,9 +302,10 @@ void GLRenderingContext::bufferSubData(GLenum target, GLintptr offset,
 void GLRenderingContext::bufferSubData(GLenum target, GLintptr offset,
                                        Int32Array& data)
 {
-  glBufferSubData(target, offset, static_cast<GLint>(data.size() * data.size()
-                                                     * sizeof(int32_t)),
-                  data.data());
+  glBufferSubData(
+    target, offset,
+    static_cast<GLint>(data.size() * data.size() * sizeof(int32_t)),
+    data.data());
 }
 
 void GLRenderingContext::bindVertexArray(GL::IGLVertexArrayObject* vao)
@@ -417,6 +429,14 @@ std::unique_ptr<IGLTexture> GLRenderingContext::createTexture()
   return std::make_unique<IGLTexture>(texture);
 }
 
+std::unique_ptr<IGLTransformFeedback>
+GLRenderingContext::createTransformFeedback()
+{
+  GLuint transformFeedbackArray = 0;
+  glGenTransformFeedbacks(1, &transformFeedbackArray);
+  return std::make_unique<IGLTransformFeedback>(transformFeedbackArray);
+}
+
 std::unique_ptr<IGLVertexArrayObject> GLRenderingContext::createVertexArray()
 {
   GLuint vertexArray = 0;
@@ -465,6 +485,13 @@ void GLRenderingContext::deleteTexture(IGLTexture* texture)
 {
   glDeleteTextures(1, &texture->value);
   texture->value = 0;
+}
+
+void GLRenderingContext::deleteTransformFeedback(
+  IGLTransformFeedback* transformFeedback)
+{
+  glDeleteTransformFeedbacks(1, &transformFeedback->value);
+  transformFeedback->value = 0;
 }
 
 void GLRenderingContext::deleteVertexArray(IGLVertexArrayObject* vao)
@@ -548,6 +575,11 @@ void GLRenderingContext::enableVertexAttribArray(GLuint index)
 void GLRenderingContext::endQuery(GLenum target)
 {
   glEndQuery(target);
+}
+
+void GLRenderingContext::endTransformFeedback()
+{
+  glEndTransformFeedback();
 }
 
 void GLRenderingContext::finish()
@@ -944,6 +976,16 @@ void GLRenderingContext::texImage2D(GLenum /*target*/, GLint /*level*/,
 {
 }
 
+void GLRenderingContext::texImage3D(GLenum target, GLint level,
+                                    GLint internalformat, GLsizei width,
+                                    GLsizei height, GLsizei depth, GLint border,
+                                    GLenum format, GLenum type,
+                                    const Uint8Array& pixels)
+{
+  glTexImage3D(target, level, internalformat, width, height, depth, border,
+               format, type, &pixels[0]);
+}
+
 void GLRenderingContext::texParameterf(GLenum target, GLenum pname,
                                        GLfloat param)
 {
@@ -962,6 +1004,19 @@ void GLRenderingContext::texSubImage2D(GLenum target, GLint level,
 {
   glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type,
                   pixels);
+}
+
+void GLRenderingContext::transformFeedbackVaryings(
+  IGLProgram* program, const std::vector<std::string>& varyings,
+  GLenum bufferMode)
+{
+  std::vector<const char*> _varyings;
+  for (auto varying : varyings) {
+    _varyings.emplace_back(varying.c_str());
+  }
+
+  glTransformFeedbackVaryings(program->value, static_cast<int>(varyings.size()),
+                              &_varyings[0], bufferMode);
 }
 
 void GLRenderingContext::uniform1f(IGLUniformLocation* location, GLfloat x)

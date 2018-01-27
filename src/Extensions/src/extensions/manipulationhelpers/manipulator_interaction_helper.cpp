@@ -156,8 +156,8 @@ void ManipulatorInteractionHelper::doRot(const Vector2& rayPos)
 
   const auto cr = _scene->getEngine()->getRenderingCanvasClientRect();
 
-  float ax = (dx / cr.width) * Math::PI2 * _rotationFactor;
-  float ay = (dy / cr.height) * Math::PI2 * _rotationFactor;
+  float ax = (dx / (*cr).width) * Math::PI2 * _rotationFactor;
+  float ay = (dy / (*cr).height) * Math::PI2 * _rotationFactor;
 
   if (rotationStep != 0.f) {
     float rem = std::fmod(ax, rotationStep);
@@ -258,8 +258,9 @@ void ManipulatorInteractionHelper::doPos(const Vector2& rayPos)
     v = hit.subtract(_prevHit);
   }
 
-  else if ((_manipulatedMode & (RadixFeatures::ArrowX | RadixFeatures::ArrowY
-                                | RadixFeatures::ArrowZ))
+  else if ((_manipulatedMode
+            & (RadixFeatures::ArrowX | RadixFeatures::ArrowY
+               | RadixFeatures::ArrowZ))
            != RadixFeatures::None) {
     Plane pl0, pl1;
     Vector3 hit;
@@ -467,8 +468,8 @@ Vector2 ManipulatorInteractionHelper::getRayPosition(const PointerEvent& event)
 {
   const auto canvasRect = _scene->getEngine()->getRenderingCanvasClientRect();
 
-  const auto x = static_cast<float>(event.clientX - canvasRect.left);
-  const auto y = static_cast<float>(event.clientY - canvasRect.top);
+  const auto x = static_cast<float>(event.clientX - (*canvasRect).left);
+  const auto y = static_cast<float>(event.clientY - (*canvasRect).top);
 
   return Vector2(x, y);
 }
