@@ -58,7 +58,7 @@ struct BABYLON_SHARED_EXPORT RenderingGroupInfo {
    */
   static constexpr unsigned int STAGE_POSTTRANSPARENT = 4;
 
-}; // end of struct PointerInfoPre
+}; // end of struct RenderingGroupInfo
 
 } // end of namespace BABYLON
 
