@@ -2,7 +2,7 @@
 
 namespace BABYLON {
 
-GamepadManager::GamepadManager()
+GamepadManager::GamepadManager(Scene* scene) : _scene{scene}
 {
 }
 

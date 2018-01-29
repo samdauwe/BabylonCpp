@@ -239,13 +239,13 @@ void ManipulatorInteractionHelper::doPos(const Vector2& rayPos)
     float clip = 0.06f;
 
     // Check if the plane is too parallel to the ray
-    if (std::abs(Vector3::Dot(pl0.normal, ray->direction)) < clip) {
+    if (std::abs(Vector3::Dot(pl0.normal, ray.direction)) < clip) {
       return;
     }
 
     // Make the intersection
-    auto distance = ray->intersectsPlane(pl0);
-    hit = ManipulatorInteractionHelper::ComputeRayHit(*ray, *distance);
+    auto distance = ray.intersectsPlane(pl0);
+    hit           = ManipulatorInteractionHelper::ComputeRayHit(ray, *distance);
 
     // Check if it's the first call
     if (hasManFlags(ManFlags::FirstHit)) {
@@ -269,16 +269,16 @@ void ManipulatorInteractionHelper::doPos(const Vector2& rayPos)
     if (hasManFlags(ManFlags::FirstHit)) {
       std::tie(pl0, pl1) = setupIntersectionPlanes(_manipulatedMode);
 
-      if (std::abs(Vector3::Dot(pl0.normal, ray->direction))
-          > std::abs(Vector3::Dot(pl1.normal, ray->direction))) {
-        auto distance = ray->intersectsPlane(pl0);
-        hit = ManipulatorInteractionHelper::ComputeRayHit(*ray, *distance);
+      if (std::abs(Vector3::Dot(pl0.normal, ray.direction))
+          > std::abs(Vector3::Dot(pl1.normal, ray.direction))) {
+        auto distance = ray.intersectsPlane(pl0);
+        hit = ManipulatorInteractionHelper::ComputeRayHit(ray, *distance);
         auto number = ~ManFlags::Plane2;
         _flags &= number;
       }
       else {
-        auto distance = ray->intersectsPlane(pl1);
-        hit = ManipulatorInteractionHelper::ComputeRayHit(*ray, *distance);
+        auto distance = ray.intersectsPlane(pl1);
+        hit = ManipulatorInteractionHelper::ComputeRayHit(ray, *distance);
         _flags |= ManFlags::Plane2;
       }
 
@@ -291,8 +291,8 @@ void ManipulatorInteractionHelper::doPos(const Vector2& rayPos)
       std::tie(pl0, axis) = setupIntersectionPlane(
         _manipulatedMode, hasManFlags(ManFlags::Plane2));
 
-      auto distance = ray->intersectsPlane(pl0);
-      hit = ManipulatorInteractionHelper::ComputeRayHit(*ray, *distance);
+      auto distance = ray.intersectsPlane(pl0);
+      hit = ManipulatorInteractionHelper::ComputeRayHit(ray, *distance);
       v   = hit.subtract(_prevHit);
       s   = Vector3::Dot(axis, v);
       v   = axis.multiplyByFloats(s, s, s);
@@ -508,8 +508,8 @@ float ManipulatorInteractionHelper::fromScreenToWorld(float l, float z)
   auto r1 = _scene->createPickingRay(static_cast<int>(l), 0, identity.get(),
                                      camera, true);
 
-  auto p0 = ManipulatorInteractionHelper::evalPosition(*r0, z);
-  auto p1 = ManipulatorInteractionHelper::evalPosition(*r1, z);
+  auto p0 = ManipulatorInteractionHelper::evalPosition(r0, z);
+  auto p1 = ManipulatorInteractionHelper::evalPosition(r1, z);
 
   return p1.x - p0.x;
 }

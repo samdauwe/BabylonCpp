@@ -11,7 +11,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT GamepadManager {
 
 public:
-  GamepadManager();
+  GamepadManager(Scene* scene);
   ~GamepadManager();
 
   Gamepad* getGamepadByType(unsigned int type = Gamepad::XBOX);
@@ -29,6 +29,8 @@ public:
   Observable<Gamepad> onGamepadDisconnectedObservable;
 
 private:
+  Scene* _scene;
+
   vector_t<shared_ptr_t<Gamepad>> _babylonGamepads;
   bool _oneGamepadConnected;
 

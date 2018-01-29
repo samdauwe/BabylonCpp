@@ -22,7 +22,8 @@ public:
    * ActionEvent
    */
   ActionEvent(AbstractMesh* source, int pointerX, int pointerY,
-              AbstractMesh* meshUnderPointer, const Event& sourceEvent);
+              AbstractMesh* meshUnderPointer,
+              const Nullable<Event>& sourceEvent);
   ActionEvent(const ActionEvent& other);
   ActionEvent(ActionEvent&& other);
   ActionEvent& operator=(const ActionEvent& other);
@@ -34,7 +35,8 @@ public:
    * @param source the source mesh that triggered the event
    * @param evt {Event} The original (browser) event
    */
-  static ActionEvent CreateNew(AbstractMesh* source, const Event& evt);
+  static ActionEvent CreateNew(AbstractMesh* source,
+                               const Nullable<Event>& evt = nullptr);
 
   /**
    * @brief Helper function to auto-create an ActionEvent from a source mesh.
@@ -59,7 +61,7 @@ public:
   int pointerX;
   int pointerY;
   AbstractMesh* meshUnderPointer;
-  Event sourceEvent;
+  Nullable<Event> sourceEvent;
 
 }; // end of class ActionEvent
 

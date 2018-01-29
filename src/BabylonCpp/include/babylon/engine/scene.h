@@ -42,6 +42,8 @@ public:
    */
   static constexpr unsigned int FOGMODE_LINEAR = 3;
 
+  static size_t _uniqueIdCounter;
+
   static microseconds_t MinDeltaTime;
   static microseconds_t MaxDeltaTime;
 
@@ -71,7 +73,7 @@ public:
     unique_ptr_t<Scene> scene(new Scene(::std::forward<Ts>(args)...));
     return scene;
   }
-  virtual ~Scene();
+  virtual ~Scene() override;
 
   IReflect::Type type() const override;
 
@@ -219,20 +221,8 @@ public:
   size_t getActiveBones() const;
   PerfCounter& activeBonesPerfCounter();
   /** Stats **/
-  microsecond_t getInterFramePerfCounter() const;
-  PerfCounter& interFramePerfCounter();
-  microsecond_t getLastFrameDuration() const;
-  PerfCounter& lastFramePerfCounter();
-  microsecond_t getEvaluateActiveMeshesDuration() const;
-  PerfCounter& evaluateActiveMeshesDurationPerfCounter();
-  vector_t<Mesh*>& getActiveMeshes();
-  microsecond_t getRenderTargetsDuration() const;
-  microsecond_t getRenderDuration() const;
-  PerfCounter& renderDurationPerfCounter();
-  microsecond_t getParticlesDuration() const;
-  PerfCounter& particlesDurationPerfCounter();
-  microsecond_t getSpritesDuration() const;
-  PerfCounter& spriteDuractionPerfCounter();
+  vector_t<AbstractMesh*>& getActiveMeshes();
+  const vector_t<AbstractMesh*>& getActiveMeshes() const;
   float getAnimationRatio() const;
   int getRenderId() const;
   void incrementRenderId();
@@ -284,6 +274,7 @@ public:
   void _addPendingData(InternalTexture* texure);
   void _removePendingData(InternalTexture* texture);
   void getWaitingItemsCount();
+  bool isLoading() const;
 
   /**
    * @brief Registers a function to be executed when the scene is ready.
@@ -335,6 +326,11 @@ public:
    */
   void stopAnimation(IAnimatable* target, const string_t& animationName = "");
 
+  /**
+   * @brief Stops and removes all animations that have been applied to the scene
+   */
+  void stopAllAnimations();
+
   /** Matrix **/
   void _switchToAlternateCameraConfiguration(bool active);
   Matrix getViewMatrix();
@@ -346,7 +342,7 @@ public:
   UniformBuffer* getSceneUniformBuffer();
 
   /** Methods **/
-  unsigned int getUniqueId();
+  size_t getUniqueId();
   void addMesh(unique_ptr_t<AbstractMesh>&& newMesh);
   int removeMesh(AbstractMesh* toRemove);
   void addTransformNode(TransformNode* newTransformNode);
@@ -496,6 +492,22 @@ public:
   vector_t<AbstractMesh*> getMeshesByID(const string_t& id);
 
   /**
+   * @brief Get the first added transform node found of a given ID.
+   * @param {string} id - the id to search for
+   * @return {BABYLON.TransformNode|null} the transform node found or null if
+   * not found at all.
+   */
+  TransformNode* getTransformNodeByID(const string_t& id);
+
+  /**
+   * @brief Get the all added transform nodes found of a given ID.
+   * @param {string} id - the id to search for
+   * @return {BABYLON.TransformNode[]|[]]} the transform nodes found or an empty
+   * list if not found at all.
+   */
+  vector_t<TransformNode*> getTransformNodesByID(const string_t& id);
+
+  /**
    * @brief Get a mesh with its auto-generated unique id.
    * @param {number} uniqueId - the unique id to search for
    * @return {BABYLON.AbstractMesh|null} the mesh found or null if not found at
@@ -523,12 +535,13 @@ public:
   Node* getNodeByID(const string_t& id);
   Node* getNodeByName(const string_t& name);
   AbstractMesh* getMeshByName(const string_t& name);
+  TransformNode* getTransformNodeByName(const string_t& name);
   Sound* getSoundByName(const string_t& name);
   Skeleton* getLastSkeletonByID(const string_t& id);
   Skeleton* getSkeletonById(const string_t& id);
   Skeleton* getSkeletonByName(const string_t& name);
   MorphTargetManager* getMorphTargetManagerById(unsigned int id);
-  bool isActiveMesh(Mesh* mesh);
+  bool isActiveMesh(AbstractMesh* mesh);
 
   /**
    * @brief Return a the first highlight layer of the scene with a given name.
@@ -587,10 +600,13 @@ public:
                                                        size_t maxDepth    = 2);
 
   /** Picking **/
-  unique_ptr_t<Ray> createPickingRay(int x, int y, Matrix* world,
-                                     Camera* camera,
-                                     bool cameraViewSpace = false);
-  unique_ptr_t<Ray> createPickingRayInCameraSpace(int x, int y, Camera* camera);
+  Ray createPickingRay(int x, int y, Matrix* world, Camera* camera = nullptr,
+                       bool cameraViewSpace = false);
+  Scene& createPickingRayToRef(int x, int y, Matrix* world, Ray& result,
+                               Camera* camera, bool cameraViewSpace = false);
+  Ray createPickingRayInCameraSpace(int x, int y, Camera* camera = nullptr);
+  Scene& createPickingRayInCameraSpaceToRef(int x, int y, Ray& result,
+                                            Camera* camera = nullptr);
 
   /**
    * @brief Launch a ray to try to pick a mesh in the scene
@@ -632,9 +648,10 @@ public:
    * @param fastCheck Launch a fast check only using the bounding boxes. Can be
    * set to null.
    */
-  PickingInfo* pickWithRay(const Ray& ray,
-                           const ::std::function<bool(Mesh* mesh)>& predicate,
-                           bool fastCheck = false);
+  PickingInfo*
+  pickWithRay(const Ray& ray,
+              const ::std::function<bool(AbstractMesh* mesh)>& predicate,
+              bool fastCheck = false);
 
   /**
    * @brief Launch a ray to try to pick a mesh in the scene
@@ -650,7 +667,7 @@ public:
   vector_t<PickingInfo*>
   multiPick(int x, int y,
             const ::std::function<bool(AbstractMesh* mesh)>& predicate,
-            Camera* camera);
+            Camera* camera = nullptr);
 
   /**
    * @brief Launch a ray to try to pick a mesh in the scene
@@ -662,7 +679,7 @@ public:
    */
   vector_t<PickingInfo*>
   multiPickWithRay(const Ray& ray,
-                   const ::std::function<bool(Mesh* mesh)>& predicate);
+                   const ::std::function<bool(AbstractMesh* mesh)>& predicate);
 
   AbstractMesh* getPointerOverMesh();
   void setPointerOverMesh(AbstractMesh* mesh);
@@ -694,6 +711,8 @@ public:
   Mesh* createDefaultSkybox(BaseTexture* environmentTexture = nullptr,
                             bool pbr = false, float scale = 1000.f,
                             float blur = 0.f);
+  unique_ptr_t<EnvironmentHelper>
+  createDefaultEnvironment(const IEnvironmentHelperOptions& options);
 
   /** Tags **/
   vector_t<Mesh*> getMeshesByTags();
@@ -770,7 +789,7 @@ private:
   void _animate();
   void _evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh);
   void _evaluateActiveMeshes();
-  void _activeMesh(AbstractMesh* mesh);
+  void _activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh);
   void _renderForCamera(Camera* camera);
   void _processSubCameras(Camera* camera);
   void _checkIntersections();
@@ -788,11 +807,11 @@ private:
   // void _switchAudioModeForNormalSpeakers();
   /** Picking **/
   PickingInfo*
-  _internalPick(const ::std::function<Ray(const Matrix& world)>& rayFunction,
+  _internalPick(const ::std::function<Ray(Matrix& world)>& rayFunction,
                 const ::std::function<bool(AbstractMesh* mesh)>& predicate,
                 bool fastCheck);
   vector_t<PickingInfo*> _internalMultiPick(
-    const ::std::function<Ray(const Matrix& world)>& rayFunction,
+    const ::std::function<Ray(Matrix& world)>& rayFunction,
     const ::std::function<bool(AbstractMesh* mesh)>& predicate);
   PickingInfo*
   _internalPickSprites(const Ray& ray,
@@ -814,7 +833,8 @@ public:
    */
   Observable<Scene> onDisposeObservable;
   /**
-   * An event triggered before rendering the scene
+   * An event triggered before rendering the scene (right after animations and
+   * physics)
    */
   Observable<Scene> onBeforeRenderObservable;
   /**
@@ -886,7 +906,7 @@ public:
    * An event triggered when particles rendering is done
    * Note: This event can be trigger more than once per frame (because particles
    * can be rendered by render target textures as well)
-  */
+   */
   Observable<Scene> onAfterParticlesRenderingObservable;
 
   /**
@@ -902,6 +922,12 @@ public:
    * can be rendered by render target textures as well)
    */
   Observable<Scene> onAfterSpritesRenderingObservable;
+
+  /**
+   * An event triggered when SceneLoader.Append or SceneLoader.Load or
+   * SceneLoader.ImportMesh were successfully executed
+   */
+  Observable<Scene> onDataLoadedObservable;
 
   /**
    * An event triggered when a camera is created
@@ -1014,6 +1040,12 @@ public:
 
   string_t hoverCursor;
   string_t defaultCursor;
+
+  /**
+   * This is used to call preventDefault() on pointer down
+   * in order to block unwanted artifacts like system double clicks
+   */
+  bool preventDefaultOnPointerDown;
 
   // Metadata
   Json::object metadata;
@@ -1159,12 +1191,10 @@ public:
   // Performance counters
   PerfCounter _activeIndices;
   PerfCounter _activeParticles;
-  PerfCounter _particlesDuration;
-  PerfCounter _spritesDuration;
   PerfCounter _activeBones;
   Material* _cachedMaterial;
   Effect* _cachedEffect;
-  float _cachedVisibility;
+  Nullable<float> _cachedVisibility;
   vector_t<IDisposable*> _toBeDisposed;
   vector_t<IParticleSystem*> _activeParticleSystems;
   vector_t<Animatable*> _activeAnimatables;
@@ -1211,7 +1241,7 @@ private:
   bool _previousHasSwiped;
   unique_ptr_t<PickingInfo> _currentPickResult;
   unique_ptr_t<PickingInfo> _previousPickResult;
-  bool _isButtonPressed;
+  bool _totalPointersPressed;
   bool _doubleClickOccured;
   int _pointerX;
   int _pointerY;
@@ -1225,12 +1255,12 @@ private:
   ::std::function<void()> beforeRender;
   ::std::function<void()> afterRender;
   // Deterministic lockstep
-  unsigned int _timeAccumulator;
+  float _timeAccumulator;
   unsigned int _currentStepId;
   unsigned int _currentInternalStep;
   // Keyboard
-  ::std::function<void(Event&& evt)> _onKeyDown;
-  ::std::function<void(Event&& evt)> _onKeyUp;
+  ::std::function<void(KeyboardEvent&& evt)> _onKeyDown;
+  ::std::function<void(KeyboardEvent&& evt)> _onKeyUp;
   Observer<Engine>::Ptr _onCanvasFocusObserver;
   Observer<Engine>::Ptr _onCanvasBlurObserver;
   // Coordinate system
@@ -1275,16 +1305,7 @@ private:
   // Render engine
   Engine* _engine;
   // Performance counters
-  PerfCounter _totalMeshesCounter;
-  PerfCounter _totalLightsCounter;
-  PerfCounter _totalMaterialsCounter;
-  PerfCounter _totalTexturesCounter;
   PerfCounter _totalVertices;
-  PerfCounter _interFrameDuration;
-  PerfCounter _lastFrameDuration;
-  PerfCounter _evaluateActiveMeshesDuration;
-  PerfCounter _renderTargetsDuration;
-  PerfCounter _renderDuration;
   float _animationRatio;
   bool _animationTimeLastSet;
   high_res_time_point_t _animationTimeLast;
@@ -1298,7 +1319,8 @@ private:
   int _alternateViewUpdateFlag;
   int _alternateProjectionUpdateFlag;
   vector_t<string_t> _pendingData;
-  vector_t<Mesh*> _activeMeshes;
+  bool _isDisposed;
+  vector_t<AbstractMesh*> _activeMeshes;
   bool _activeMeshesFrozen;
   vector_t<Material*> _processedMaterials;
   vector_t<RenderTargetTexture*> _renderTargets;
@@ -1309,7 +1331,7 @@ private:
   Matrix _transformMatrix;
   unique_ptr_t<UniformBuffer> _sceneUbo;
   unique_ptr_t<UniformBuffer> _alternateSceneUbo;
-  Matrix _pickWithRayInverseMatrix;
+  unique_ptr_t<Matrix> _pickWithRayInverseMatrix;
   unique_ptr_t<BoundingBoxRenderer> _boundingBoxRenderer;
   unique_ptr_t<OutlineRenderer> _outlineRenderer;
   Matrix _viewMatrix;
@@ -1327,11 +1349,12 @@ private:
   unique_ptr_t<DebugLayer> _debugLayer;
   unique_ptr_t<DepthRenderer> _depthRenderer;
   unique_ptr_t<GeometryBufferRenderer> _geometryBufferRenderer;
-  unsigned int _uniqueIdCounter;
   AbstractMesh* _pickedDownMesh;
   AbstractMesh* _pickedUpMesh;
   Sprite* _pickedDownSprite;
   string_t _uid;
+  unique_ptr_t<Ray> _tempPickingRay;
+  unique_ptr_t<Ray> _cachedRayForTransform;
 
 }; // end of class Scene
 

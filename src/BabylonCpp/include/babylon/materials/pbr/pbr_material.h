@@ -50,7 +50,7 @@ public:
    * @param scene The scene the material will be use in.
    */
   PBRMaterial(const string_t& name, Scene* scene);
-  ~PBRMaterial();
+  ~PBRMaterial() override;
 
   const char* getClassName() const override;
   vector_t<BaseTexture*> getActiveTextures() const override;
