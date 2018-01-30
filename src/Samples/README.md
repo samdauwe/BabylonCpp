@@ -15,6 +15,7 @@
 ![shader_material_cylinders_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_cylinders_scene.png?raw=true "Shader Material Cylinders Scene")
 ![shader_material_box_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_box_scene.png?raw=true "Shader Material Box Scene")
 ![shader_material_double_helix_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_double_helix_scene.png?raw=true "Shader Material Double Helix Scene")
+![shader_material_voronoian_waterway_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_voronoian_waterway_scene.png?raw=true "Shader Material Voronoian Waterway Scene")
 ![shader_material_with_fog_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_with_fog_scene.png?raw=true "Shader Material With Fog Scene")
 ![shader_material_seascape_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_seascape_scene.png?raw=true "Shader Material Seascape Scene")
 ![shader_material_skybox_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_skybox_scene.png?raw=true "Shader Material Skybox Scene")

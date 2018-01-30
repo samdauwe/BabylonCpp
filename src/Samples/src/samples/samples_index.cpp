@@ -61,6 +61,7 @@
 #include <babylon/samples/materials/shader_material_the_drive_home_scene.h>
 #include <babylon/samples/materials/shader_material_the_road_to_hell.h>
 #include <babylon/samples/materials/shader_material_tiles_scene.h>
+#include <babylon/samples/materials/shader_material_voronoian_waterway_scene.h>
 #include <babylon/samples/materials/shader_material_with_fog_scene.h>
 #include <babylon/samples/materials/shader_material_wolfenstein_3d_scene.h>
 #include <babylon/samples/materials/shader_material_xyptonjtroz_scene.h>
@@ -519,6 +520,13 @@ SamplesIndex::SamplesIndex()
     [](ICanvas* iCanvas) {                                          //
       return ::std::make_unique<ShaderMaterialTilesScene>(iCanvas); //
     });                                                             //
+  // Shader Material Voronoian Waterway Scene
+  _samples["ShaderMaterialVoronoianWaterwayScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) { //
+      return ::std::make_unique<ShaderMaterialVoronoianWaterwayScene>(
+        iCanvas); //
+    });           //
   // Shader Material With Fog Scene
   _samples["ShaderMaterialWithFogScene"] = ::std::make_tuple(
     true,
