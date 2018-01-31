@@ -23,8 +23,8 @@ public:
    * @param {string} name - the name and id to be given to this node
    * @param {BABYLON.Scene} the scene this node will be added to
    */
-  Node(const string_t& name, Scene* scene);
-  virtual ~Node();
+  Node(const string_t& name, Scene* scene = nullptr);
+  virtual ~Node() override;
 
   virtual IReflect::Type type() const override;
   void setParent(Node* parent);
@@ -98,6 +98,10 @@ public:
                        bool directDescendantsOnly = false,
                        const ::std::function<bool(Node* node)>& predicate
                        = nullptr);
+  void _getDescendants(vector_t<TransformNode*>& results,
+                       bool directDescendantsOnly = false,
+                       const ::std::function<bool(Node* node)>& predicate
+                       = nullptr);
   /**
    * Will return all nodes that have this node as ascendant.
    * @param {boolean} directDescendantsOnly if true only direct descendants of
@@ -114,11 +118,19 @@ public:
                  const ::std::function<bool(Node* node)>& predicate = nullptr);
 
   /**
-   * Get all child-meshes of this node.
+   * @brief Get all child-meshes of this node.
    */
   virtual vector_t<AbstractMesh*>
-  getChildMeshes(bool directDecendantsOnly                          = false,
+  getChildMeshes(bool directDescendantsOnly                         = false,
                  const ::std::function<bool(Node* node)>& predicate = nullptr);
+
+  /**
+   * @brief Get all child-transformNodes of this node.
+   */
+  virtual vector_t<TransformNode*>
+  getChildTransformNodes(bool directDescendantsOnly = false,
+                         const ::std::function<bool(Node* node)>& predicate
+                         = nullptr);
 
   /**
    * Get all direct children of this node.
@@ -143,8 +155,7 @@ public:
 public:
   string_t name;
   string_t id;
-  unsigned int uniqueId;
-  string_t state;
+  size_t uniqueId;
 
   Json::object metadata;
   bool doNotSerialize;
@@ -165,7 +176,6 @@ public:
 
 private:
   unordered_map_t<string_t, unique_ptr_t<AnimationRange>> _ranges;
-  int _childrenFlag;
   bool _isEnabled;
   bool _isReady;
   int _parentRenderId;

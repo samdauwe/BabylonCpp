@@ -18,17 +18,18 @@ namespace BABYLON {
 Node::Node(const string_t& iName, Scene* scene)
     : name{iName}
     , id{iName}
-    , state{""}
     , doNotSerialize{false}
     , _currentRenderId{-1}
-    , _childrenFlag{-1}
     , _isEnabled{true}
     , _isReady{true}
     , _parentRenderId{-1}
-    , _scene{scene}
     , _parentNode{nullptr}
     , _worldMatrix{::std::make_unique<Matrix>(Matrix::Identity())}
+    , _onDisposeObserver{nullptr}
 {
+  state    = "";
+  _scene   = scene ? scene : Engine::LastCreatedScene();
+  uniqueId = _scene->getUniqueId();
   _initCache();
 }
 
@@ -98,7 +99,13 @@ Node& Node::addBehavior(Behavior<Node>* behavior)
     return *this;
   }
 
-  behavior->attach(this);
+  behavior->init();
+  if (_scene->isLoading()) {
+    // We defer the attach when the scene will be loaded
+  }
+  else {
+    behavior->attach(this);
+  }
   _behaviors.emplace_back(behavior);
 
   return *this;
@@ -170,7 +177,9 @@ bool Node::_isSynchronized()
 
 void Node::_markSyncedWithParent()
 {
-  _parentRenderId = parent()->_currentRenderId;
+  if (parent()) {
+    _parentRenderId = parent()->_currentRenderId;
+  }
 }
 
 bool Node::isSynchronizedWithParent()
@@ -277,7 +286,28 @@ void Node::_getDescendants(vector_t<AbstractMesh*>& results,
 
   for (auto& item : _children) {
     if (!predicate || predicate(item)) {
-      if (AbstractMesh* m = dynamic_cast<AbstractMesh*>(item)) {
+      if (auto m = dynamic_cast<AbstractMesh*>(item)) {
+        results.emplace_back(m);
+      }
+    }
+
+    if (!directDescendantsOnly) {
+      item->_getDescendants(results, false, predicate);
+    }
+  }
+}
+
+void Node::_getDescendants(vector_t<TransformNode*>& results,
+                           bool directDescendantsOnly,
+                           const ::std::function<bool(Node* node)>& predicate)
+{
+  if (_children.empty()) {
+    return;
+  }
+
+  for (auto& item : _children) {
+    if (!predicate || predicate(item)) {
+      if (auto m = dynamic_cast<TransformNode*>(item)) {
         results.emplace_back(m);
       }
     }
@@ -299,13 +329,25 @@ Node::getDescendants(bool directDescendantsOnly,
 }
 
 vector_t<AbstractMesh*>
-Node::getChildMeshes(bool directDecendantsOnly,
+Node::getChildMeshes(bool directDescendantsOnly,
                      const ::std::function<bool(Node* node)>& predicate)
 {
   vector_t<AbstractMesh*> results;
-  _getDescendants(results, directDecendantsOnly, [&predicate](Node* node) {
+  _getDescendants(results, directDescendantsOnly, [&predicate](Node* node) {
     return ((!predicate || predicate(node))
             && (dynamic_cast<AbstractMesh*>(node)));
+  });
+  return results;
+}
+
+vector_t<TransformNode*>
+Node::getChildTransformNodes(bool directDescendantsOnly,
+                             const ::std::function<bool(Node* node)>& predicate)
+{
+  vector_t<TransformNode*> results;
+  _getDescendants(results, directDescendantsOnly, [&predicate](Node* node) {
+    return ((!predicate || predicate(node))
+            && (dynamic_cast<TransformNode*>(node)));
   });
   return results;
 }
