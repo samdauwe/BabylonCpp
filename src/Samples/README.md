@@ -21,6 +21,7 @@
 ![shader_material_skybox_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_skybox_scene.png?raw=true "Shader Material Skybox Scene")
 ![shader_material_skybox_clouds_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_skybox_clouds_scene.png?raw=true "Shader Material Skybox Clouds Scene")
 ![shader_material_kifs_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_kifs_scene.png?raw=true "Shader Material KIFS Scene")
+![shader_material_luminescence_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_luminescence_scene.png?raw=true "Shader Material Luminescence Scene")
 ![shader_material_menger_sponge_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_menger_sponge_scene.png?raw=true "Shader Material Menger Sponge Scene")
 ![shader_material_morning_city_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_morning_city_scene.png?raw=true "Shader Material Morning City Scene")
 ![shader_material_pbr_test_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_pbr_test_scene.png?raw=true "Shader Material PBR Test Scene")
