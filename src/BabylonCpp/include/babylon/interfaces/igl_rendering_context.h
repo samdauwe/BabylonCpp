@@ -590,6 +590,15 @@ public:
   // Drawing buffer width and height
   int drawingBufferWidth;
   int drawingBufferHeight;
+  // Textures
+  int RASTERIZER_DISCARD;
+  int TEXTURE_3D;
+  int TEXTURE_2D_ARRAY;
+  int TEXTURE_WRAP_R;
+  // Transform feedback
+  int TRANSFORM_FEEDBACK;
+  int INTERLEAVED_ATTRIBS;
+  int TRANSFORM_FEEDBACK_BUFFER;
 
 public:
   virtual bool initialize()     = 0;
