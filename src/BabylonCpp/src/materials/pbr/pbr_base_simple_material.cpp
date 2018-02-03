@@ -20,9 +20,11 @@ PBRBaseSimpleMaterial::PBRBaseSimpleMaterial(const string_t& iName,
     , occlusionStrength{1.f}
     , occlusionTexture{nullptr}
     , alphaCutOff{0.f}
-    , _transparencyMode{PBRMaterial::PBRMATERIAL_OPAQUE}
+    , lightmapTexture{nullptr}
+    , useLightmapAsShadowmap{false}
 {
-  _useAmbientInGrayScale = true;
+  _useAlphaFromAlbedoTexture = true;
+  _useAmbientInGrayScale     = true;
 }
 
 PBRBaseSimpleMaterial::~PBRBaseSimpleMaterial()
@@ -32,27 +34,6 @@ PBRBaseSimpleMaterial::~PBRBaseSimpleMaterial()
 const char* PBRBaseSimpleMaterial::getClassName() const
 {
   return "PBRBaseSimpleMaterial";
-}
-
-unsigned int PBRBaseSimpleMaterial::transparencyMode() const
-{
-  return _transparencyMode;
-}
-
-void PBRBaseSimpleMaterial::setTransparencyMode(unsigned int value)
-{
-  if (_transparencyMode == value) {
-    return;
-  }
-  _transparencyMode = value;
-  if (value == PBRMaterial::PBRMATERIAL_ALPHATESTANDBLEND) {
-    _forceAlphaTest = true;
-  }
-  else {
-    _forceAlphaTest = false;
-  }
-
-  _markAllSubMeshesAsTexturesDirty();
 }
 
 bool PBRBaseSimpleMaterial::doubleSided() const
@@ -76,29 +57,6 @@ bool PBRBaseSimpleMaterial::_shouldUseAlphaFromAlbedoTexture() const
          && _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE;
 }
 
-bool PBRBaseSimpleMaterial::needAlphaBlending()
-{
-  if (_linkRefractionWithTransparency) {
-    return false;
-  }
-
-  return (alpha < 1.f)
-         || (_shouldUseAlphaFromAlbedoTexture()
-             && (_transparencyMode == PBRMaterial::PBRMATERIAL_ALPHABLEND
-                 || _transparencyMode
-                      == PBRMaterial::PBRMATERIAL_ALPHATESTANDBLEND));
-}
-
-bool PBRBaseSimpleMaterial::needAlphaTesting()
-{
-  if (_linkRefractionWithTransparency) {
-    return false;
-  }
-
-  return _shouldUseAlphaFromAlbedoTexture()
-         && _transparencyMode == PBRMaterial::PBRMATERIAL_ALPHATEST;
-}
-
 vector_t<BaseTexture*> PBRBaseSimpleMaterial::getActiveTextures() const
 {
   auto activeTextures = PBRBaseMaterial::getActiveTextures();
@@ -119,7 +77,24 @@ vector_t<BaseTexture*> PBRBaseSimpleMaterial::getActiveTextures() const
     activeTextures.emplace_back(occlusionTexture);
   }
 
+  if (lightmapTexture) {
+    activeTextures.emplace_back(lightmapTexture);
+  }
+
   return activeTextures;
+}
+
+bool PBRBaseSimpleMaterial::hasTexture(BaseTexture* texture) const
+{
+  if (PBRBaseMaterial::hasTexture(texture)) {
+    return true;
+  }
+
+  if (lightmapTexture == texture) {
+    return true;
+  }
+
+  return false;
 }
 
 } // end of namespace Internals

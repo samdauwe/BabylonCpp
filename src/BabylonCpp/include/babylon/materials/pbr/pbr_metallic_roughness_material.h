@@ -23,7 +23,7 @@ public:
    * @param scene The scene the material will be use in.
    */
   PBRMetallicRoughnessMaterial(const string_t& name, Scene* scene);
-  ~PBRMetallicRoughnessMaterial();
+  ~PBRMetallicRoughnessMaterial() override;
 
   /**
    * @brief Return the currrent class name of the material.

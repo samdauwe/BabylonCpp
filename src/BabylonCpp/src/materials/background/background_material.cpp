@@ -399,7 +399,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   // Misc.
   MaterialHelper::PrepareDefinesForMisc(
     mesh, scene, false, pointsCloud(), fogEnabled(), defines,
-    BMD::LOGARITHMICDEPTH, BMD::POINTSIZE, BMD::FOG);
+    BMD::LOGARITHMICDEPTH, BMD::POINTSIZE, BMD::FOG, BMD::NONUNIFORMSCALING);
 
   // Values that need to be evaluated on every frame
   MaterialHelper::PrepareDefinesForFrameBoundValues(

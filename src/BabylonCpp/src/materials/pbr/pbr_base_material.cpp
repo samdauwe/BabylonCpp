@@ -57,6 +57,8 @@ PBRBaseMaterial::PBRBaseMaterial(const string_t& iName, Scene* scene)
     , _invertRefractionY{false}
     , _linkRefractionWithTransparency{false}
     , _useLightmapAsShadowmap{false}
+    , _useHorizonOcclusion{true}
+    , _useRadianceOcclusion{true}
     , _useAlphaFromAlbedoTexture{false}
     , _useSpecularOverAlpha{true}
     , _useMicroSurfaceFromReflectivityMapAlpha{false}
@@ -78,16 +80,16 @@ PBRBaseMaterial::PBRBaseMaterial(const string_t& iName, Scene* scene)
     , _twoSidedLighting{false}
     , _alphaCutOff{0.4f}
     , _forceAlphaTest{false}
-    , _preMultiplyAlpha{false}
     , _useAlphaFresnel{false}
+    , _useLinearAlphaFresnel{false}
+    , _transparencyMode{nullptr}
     , _environmentBRDFTexture{nullptr}
     , _forceIrradianceInFragment{false}
     , _forceNormalForward{false}
     , _lightingInfos{Vector4(_directIntensity, _emissiveIntensity,
                              _environmentIntensity, _specularIntensity)}
-    , _worldViewProjectionMatrix{Matrix::Zero()}
+    , _imageProcessingObserver{nullptr}
     , _globalAmbientColor{Color3(0, 0, 0)}
-    , _renderId{-1}
 {
   // Setup the default processing configuration to the scene.
   _attachImageProcessingConfiguration(nullptr);
@@ -162,13 +164,47 @@ void PBRBaseMaterial::setUseLogarithmicDepth(bool value)
     = value && getScene()->getEngine()->getCaps().fragmentDepthSupported;
 }
 
+Nullable<unsigned int> PBRBaseMaterial::transparencyMode() const
+{
+  return _transparencyMode;
+}
+
+void PBRBaseMaterial::setTransparencyMode(const Nullable<unsigned int>& value)
+{
+  if (_transparencyMode == value) {
+    return;
+  }
+
+  _transparencyMode = value;
+
+  _forceAlphaTest = (*value == PBRMaterial::PBRMATERIAL_ALPHATESTANDBLEND);
+
+  _markAllSubMeshesAsTexturesDirty();
+}
+
+bool PBRBaseMaterial::_disableAlphaBlending() const
+{
+  return (_linkRefractionWithTransparency
+          || _transparencyMode == PBRMaterial::PBRMATERIAL_OPAQUE
+          || _transparencyMode == PBRMaterial::PBRMATERIAL_ALPHATEST);
+}
+
 bool PBRBaseMaterial::needAlphaBlending()
 {
-  if (_linkRefractionWithTransparency) {
+  if (_disableAlphaBlending()) {
     return false;
   }
   return (alpha < 1.f) || (_opacityTexture != nullptr)
          || _shouldUseAlphaFromAlbedoTexture();
+}
+
+bool PBRBaseMaterial::needAlphaBlendingForMesh(AbstractMesh* mesh)
+{
+  if (_disableAlphaBlending()) {
+    return false;
+  }
+
+  return PushMaterial::needAlphaBlendingForMesh(mesh);
 }
 
 bool PBRBaseMaterial::needAlphaTesting()
@@ -180,13 +216,17 @@ bool PBRBaseMaterial::needAlphaTesting()
   if (_linkRefractionWithTransparency) {
     return false;
   }
-  return _albedoTexture != nullptr && _albedoTexture->hasAlpha();
+
+  return _albedoTexture != nullptr && _albedoTexture->hasAlpha()
+         && (_transparencyMode == nullptr
+             || _transparencyMode == PBRMaterial::PBRMATERIAL_ALPHATEST);
 }
 
 bool PBRBaseMaterial::_shouldUseAlphaFromAlbedoTexture() const
 {
   return _albedoTexture != nullptr && _albedoTexture->hasAlpha()
-         && _useAlphaFromAlbedoTexture;
+         && _useAlphaFromAlbedoTexture
+         && _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE;
 }
 
 BaseTexture* PBRBaseMaterial::getAlphaTestTexture()
@@ -197,7 +237,7 @@ BaseTexture* PBRBaseMaterial::getAlphaTestTexture()
 bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                         BaseSubMesh* subMesh, bool useInstances)
 {
-  if (isFrozen()) {
+  if (subMesh->effect() && isFrozen()) {
     if (_wasPreviouslyReady) {
       return true;
     }
@@ -332,7 +372,10 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
             defines.defines[PMD::USESPHERICALFROMREFLECTIONMAP] = true;
             if (_forceIrradianceInFragment
                 || scene->getEngine()->getCaps().maxVaryingVectors <= 8) {
-              defines.defines[PMD::USESPHERICALINFRAGMENT] = true;
+              defines.defines[PMD::USESPHERICALINVERTEX] = false;
+            }
+            else {
+              defines.defines[PMD::USESPHERICALINVERTEX] = true;
             }
           }
         }
@@ -352,7 +395,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           = false;
         defines.defines[PMD::INVERTCUBICMAP]                = false;
         defines.defines[PMD::USESPHERICALFROMREFLECTIONMAP] = false;
-        defines.defines[PMD::USESPHERICALINFRAGMENT]        = false;
+        defines.defines[PMD::USESPHERICALINVERTEX]          = false;
         defines.defines[PMD::REFLECTIONMAP_OPPOSITEZ]       = false;
         defines.defines[PMD::LODINREFLECTIONALPHA]          = false;
         defines.defines[PMD::GAMMAREFLECTION]               = false;
@@ -495,36 +538,46 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         }
         defines.defines[PMD::ENVIRONMENTBRDF] = true;
       }
+      else {
+        defines.defines[PMD::ENVIRONMENTBRDF] = false;
+      }
 
       if (_shouldUseAlphaFromAlbedoTexture()) {
         defines.defines[PMD::ALPHAFROMALBEDO] = true;
       }
+      else {
+        defines.defines[PMD::ALPHAFROMALBEDO] = false;
+      }
     }
 
-    if (_useSpecularOverAlpha) {
-      defines.defines[PMD::SPECULAROVERALPHA] = true;
-    }
+    defines.defines[PMD::SPECULAROVERALPHA] = _useSpecularOverAlpha;
 
-    if (_usePhysicalLightFalloff) {
-      defines.defines[PMD::USEPHYSICALLIGHTFALLOFF] = true;
-    }
+    defines.defines[PMD::USEPHYSICALLIGHTFALLOFF] = _usePhysicalLightFalloff;
 
-    if (_useRadianceOverAlpha) {
-      defines.defines[PMD::RADIANCEOVERALPHA] = true;
-    }
+    defines.defines[PMD::RADIANCEOVERALPHA] = _useRadianceOverAlpha;
 
     if ((_metallic != 0.f) || (_roughness != 0.f)) {
       defines.defines[PMD::METALLICWORKFLOW] = true;
+    }
+    else {
+      defines.defines[PMD::METALLICWORKFLOW] = false;
     }
 
     if (!backFaceCulling() && _twoSidedLighting) {
       defines.defines[PMD::TWOSIDEDLIGHTING] = true;
     }
+    else {
+      defines.defines[PMD::TWOSIDEDLIGHTING] = false;
+    }
 
-    defines.ALPHATESTVALUE                 = _alphaCutOff;
-    defines.defines[PMD::PREMULTIPLYALPHA] = _preMultiplyAlpha;
-    defines.defines[PMD::ALPHABLEND]       = needAlphaBlending();
-    defines.defines[PMD::ALPHAFRESNEL]     = _useAlphaFresnel;
+    defines.ALPHATESTVALUE = _alphaCutOff;
+    defines.defines[PMD::PREMULTIPLYALPHA]
+      = (alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED
+         || alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF);
+    defines.defines[PMD::ALPHABLEND] = needAlphaBlendingForMesh(mesh);
+    defines.defines[PMD::ALPHAFRESNEL]
+      = _useAlphaFresnel || _useLinearAlphaFresnel;
+    defines.defines[PMD::LINEARALPHAFRESNEL] = _useLinearAlphaFresnel;
   }
 
   if (defines._areImageProcessingDirty) {
@@ -537,20 +590,26 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
   defines.defines[PMD::FORCENORMALFORWARD] = _forceNormalForward;
 
+  defines.defines[PMD::RADIANCEOCCLUSION] = _useRadianceOcclusion;
+
+  defines.defines[PMD::HORIZONOCCLUSION] = _useHorizonOcclusion;
+
   // Misc.
   MaterialHelper::PrepareDefinesForMisc(
     mesh, scene, _useLogarithmicDepth, pointsCloud(), fogEnabled(), defines,
-    PMD::LOGARITHMICDEPTH, PMD::POINTSIZE, PMD::FOG);
+    PMD::LOGARITHMICDEPTH, PMD::POINTSIZE, PMD::FOG, PMD::NONUNIFORMSCALING);
 
   // Values that need to be evaluated on every frame
   MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances, PMD::CLIPPLANE, PMD::ALPHATEST,
-    PMD::INSTANCES, _forceAlphaTest);
+    scene, engine, defines, useInstances ? true : false, PMD::CLIPPLANE,
+    PMD::ALPHATEST, PMD::INSTANCES, _forceAlphaTest);
 
   // Attribs
   if (MaterialHelper::PrepareDefinesForAttributes(
-        mesh, defines, true, true, true, PMD::NORMAL, PMD::UV1, PMD::UV2,
-        PMD::VERTEXCOLOR, PMD::VERTEXALPHA, PMD::MORPHTARGETS_NORMAL,
+        mesh, defines, true, true, true,
+        _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE, PMD::NORMAL,
+        PMD::UV1, PMD::UV2, PMD::VERTEXCOLOR, PMD::VERTEXALPHA,
+        PMD::MORPHTARGETS_TANGENT, PMD::MORPHTARGETS_NORMAL,
         PMD::MORPHTARGETS)) {
     if (mesh) {
       if (!scene->getEngine()->getCaps().standardDerivatives
@@ -570,60 +629,77 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     scene->resetCachedMaterial();
 
     // Fallbacks
-    auto fallbacks = ::std::make_unique<EffectFallbacks>();
-    if (defines[PMD::ENVIRONMENTBRDF]) {
-      fallbacks->addFallback(0, "ENVIRONMENTBRDF");
-    }
-
-    if (defines[PMD::REFLECTION]) {
-      fallbacks->addFallback(0, "REFLECTION");
-    }
-
-    if (defines[PMD::REFRACTION]) {
-      fallbacks->addFallback(0, "REFRACTION");
-    }
-
-    if (defines[PMD::REFLECTIVITY]) {
-      fallbacks->addFallback(0, "REFLECTIVITY");
-    }
-
-    if (defines[PMD::BUMP]) {
-      fallbacks->addFallback(0, "BUMP");
-    }
-
-    if (defines[PMD::PARALLAX]) {
-      fallbacks->addFallback(1, "PARALLAX");
-    }
-
-    if (defines[PMD::PARALLAXOCCLUSION]) {
-      fallbacks->addFallback(0, "PARALLAXOCCLUSION");
-    }
-
-    if (defines[PMD::SPECULAROVERALPHA]) {
-      fallbacks->addFallback(0, "SPECULAROVERALPHA");
+    auto fallbacks    = ::std::make_unique<EffectFallbacks>();
+    auto fallbackRank = 0u;
+    if (defines[PMD::USESPHERICALINVERTEX]) {
+      fallbacks->addFallback(fallbackRank++, "USESPHERICALINVERTEX");
     }
 
     if (defines[PMD::FOG]) {
-      fallbacks->addFallback(1, "FOG");
+      fallbacks->addFallback(fallbackRank, "FOG");
     }
-
     if (defines[PMD::POINTSIZE]) {
-      fallbacks->addFallback(0, "POINTSIZE");
+      fallbacks->addFallback(fallbackRank, "POINTSIZE");
     }
-
     if (defines[PMD::LOGARITHMICDEPTH]) {
-      fallbacks->addFallback(0, "LOGARITHMICDEPTH");
+      fallbacks->addFallback(fallbackRank, "LOGARITHMICDEPTH");
+    }
+    if (defines[PMD::PARALLAX]) {
+      fallbacks->addFallback(fallbackRank, "PARALLAX");
+    }
+    if (defines[PMD::PARALLAXOCCLUSION]) {
+      fallbacks->addFallback(fallbackRank++, "PARALLAXOCCLUSION");
     }
 
-    MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
-                                              _maxSimultaneousLights);
+    if (defines[PMD::ENVIRONMENTBRDF]) {
+      fallbacks->addFallback(fallbackRank++, "ENVIRONMENTBRDF");
+    }
+
+    if (defines[PMD::TANGENT]) {
+      fallbacks->addFallback(fallbackRank++, "TANGENT");
+    }
+
+    if (defines[PMD::BUMP]) {
+      fallbacks->addFallback(fallbackRank++, "BUMP");
+    }
+
+    fallbackRank = MaterialHelper::HandleFallbacksForShadows(
+      defines, *fallbacks, _maxSimultaneousLights, fallbackRank++);
 
     if (defines[PMD::SPECULARTERM]) {
-      fallbacks->addFallback(0, "SPECULARTERM");
+      fallbacks->addFallback(fallbackRank++, "SPECULARTERM");
+    }
+
+    if (defines[PMD::USESPHERICALFROMREFLECTIONMAP]) {
+      fallbacks->addFallback(fallbackRank++, "USESPHERICALFROMREFLECTIONMAP");
+    }
+
+    if (defines[PMD::LIGHTMAP]) {
+      fallbacks->addFallback(fallbackRank++, "LIGHTMAP");
+    }
+
+    if (defines[PMD::NORMAL]) {
+      fallbacks->addFallback(fallbackRank++, "NORMAL");
+    }
+
+    if (defines[PMD::AMBIENT]) {
+      fallbacks->addFallback(fallbackRank++, "AMBIENT");
+    }
+
+    if (defines[PMD::EMISSIVE]) {
+      fallbacks->addFallback(fallbackRank++, "EMISSIVE");
+    }
+
+    if (defines[PMD::VERTEXCOLOR]) {
+      fallbacks->addFallback(fallbackRank++, "VERTEXCOLOR");
     }
 
     if (defines.NUM_BONE_INFLUENCERS > 0) {
-      fallbacks->addCPUSkinningFallback(0, mesh);
+      fallbacks->addCPUSkinningFallback(fallbackRank++, mesh);
+    }
+
+    if (defines[PMD::MORPHTARGETS]) {
+      fallbacks->addFallback(fallbackRank++, "MORPHTARGETS");
     }
 
     // Attributes
@@ -723,6 +799,14 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
     auto join = defines.toString();
 
+    auto _onCompiled = [this](Effect* effect) {
+      if (onCompiled) {
+        onCompiled(effect);
+      }
+
+      bindSceneUniformBuffer(effect, getScene()->getSceneUniformBuffer());
+    };
+
     EffectCreationOptions options;
     options.attributes            = ::std::move(attribs);
     options.uniformsNames         = ::std::move(uniforms);
@@ -731,7 +815,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     options.materialDefines       = &defines;
     options.defines               = ::std::move(join);
     options.fallbacks             = ::std::move(fallbacks);
-    options.onCompiled            = onCompiled;
+    options.onCompiled            = _onCompiled;
     options.onError               = onError;
     options.indexParameters       = ::std::move(indexParameters);
     options.maxSimultaneousLights = _maxSimultaneousLights;
@@ -744,7 +828,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     buildUniformLayout();
   }
 
-  if (!subMesh->effect()->isReady()) {
+  if (!subMesh->effect() || !subMesh->effect()->isReady()) {
     return false;
   }
 
@@ -822,7 +906,11 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   }
   auto defines = *definesTmp;
 
-  auto effect   = subMesh->effect();
+  auto effect = subMesh->effect();
+  if (!effect) {
+    return;
+  }
+
   _activeEffect = effect;
 
   // Matrices
@@ -880,8 +968,9 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
           _uniformBuffer->updateFloat2("vReflectionInfos",
                                        reflectionTexture->level, 0, "");
 
-          if (defines.USESPHERICALFROMREFLECTIONMAP) {
-            auto polynomials = *reflectionTexture->sphericalPolynomial();
+          auto _polynomials = reflectionTexture->sphericalPolynomial();
+          if (defines.USESPHERICALFROMREFLECTIONMAP && _polynomials) {
+            auto polynomials = *_polynomials;
             _activeEffect->setFloat3("vSphericalX", polynomials.x.x,
                                      polynomials.x.y, polynomials.x.z);
             _activeEffect->setFloat3("vSphericalY", polynomials.y.x,
@@ -1130,9 +1219,11 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     // Colors
     scene->ambientColor.multiplyToRef(_ambientColor, _globalAmbientColor);
 
-    auto eyePosition = scene->_mirroredCameraPosition ?
-                         *scene->_mirroredCameraPosition :
-                         scene->activeCamera->globalPosition();
+    auto eyePosition = scene->_forcedViewPosition ?
+                         *scene->_forcedViewPosition :
+                         (scene->_mirroredCameraPosition ?
+                            *scene->_mirroredCameraPosition :
+                            scene->activeCamera->globalPosition());
     auto invertNormal = (scene->useRightHandedSystem()
                          == (scene->_mirroredCameraPosition != nullptr));
     effect->setFloat4("vEyePosition", eyePosition.x, eyePosition.y,
@@ -1174,8 +1265,6 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   _uniformBuffer->update();
 
   _afterBind(mesh, effect);
-
-  scene = nullptr;
 }
 
 vector_t<IAnimatable*> PBRBaseMaterial::getAnimatables() const
@@ -1267,7 +1356,8 @@ void PBRBaseMaterial::dispose(bool forceDisposeEffect,
       _reflectionTexture->dispose();
     }
 
-    if (_environmentBRDFTexture) {
+    if (_environmentBRDFTexture
+        && getScene()->_environmentBRDFTexture != _environmentBRDFTexture) {
       _environmentBRDFTexture->dispose();
     }
 

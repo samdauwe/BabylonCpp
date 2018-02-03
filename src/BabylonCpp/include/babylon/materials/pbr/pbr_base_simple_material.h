@@ -25,22 +25,12 @@ public:
    * @param scene The scene the material will be use in.
    */
   PBRBaseSimpleMaterial(const string_t& name, Scene* scene);
-  ~PBRBaseSimpleMaterial();
+  ~PBRBaseSimpleMaterial() override;
 
   /**
    * @brief Returns the string "PBRBaseSimpleMaterial".
    */
   const char* getClassName() const override;
-
-  /**
-   * @brief Gets the current transparency mode.
-   */
-  unsigned int transparencyMode() const;
-
-  /**
-   * @brief Sets the transparency mode of the material.
-   */
-  void setTransparencyMode(unsigned int value);
 
   /**
    * @brief Gets the current double sided mode.
@@ -54,21 +44,11 @@ public:
   void setDoubleSided(bool value);
 
   /**
-   * @brief Specifies wether or not the meshes using this material should be
-   * rendered in alpha blend mode.
-   */
-  bool needAlphaBlending() override;
-
-  /**
-   * @brief Specifies wether or not the meshes using this material should be
-   * rendered in alpha test mode.
-   */
-  bool needAlphaTesting() override;
-
-  /**
    * @brief Return the active textures of the material.
    */
   vector_t<BaseTexture*> getActiveTextures() const override;
+
+  bool hasTexture(BaseTexture* texture) const override;
 
 protected:
   /**
@@ -134,8 +114,9 @@ public:
    */
   float alphaCutOff;
 
-protected:
-  unsigned int _transparencyMode;
+  BaseTexture* lightmapTexture;
+
+  bool useLightmapAsShadowmap;
 
 }; // end of class PBRBaseSimpleMaterial
 

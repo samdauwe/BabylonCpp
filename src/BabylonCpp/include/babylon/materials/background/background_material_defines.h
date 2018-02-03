@@ -11,8 +11,8 @@ namespace BABYLON {
  * @brief Background material defines definition.
  */
 struct BABYLON_SHARED_EXPORT BackgroundMaterialDefines
-  : public MaterialDefines,
-    public IImageProcessingConfigurationDefines {
+    : public MaterialDefines,
+      public IImageProcessingConfigurationDefines {
 
   /**
    * True if the diffuse texture is in use.
@@ -124,12 +124,13 @@ struct BABYLON_SHARED_EXPORT BackgroundMaterialDefines
   static constexpr unsigned int MORPHTARGETS        = 54;
   static constexpr unsigned int ALPHATEST           = 55;
   static constexpr unsigned int DEPTHPREPASS        = 56;
+  static constexpr unsigned int NONUNIFORMSCALING   = 57;
 
   /**
    * @brief Constructor of the defines.
    */
   BackgroundMaterialDefines();
-  ~BackgroundMaterialDefines();
+  ~BackgroundMaterialDefines() override;
 
   void reset() override;
 

@@ -60,7 +60,8 @@ BackgroundMaterialDefines::BackgroundMaterialDefines() : MaterialDefines{}
            "MORPHTARGETS_NORMAL",
            "MORPHTARGETS",
            "ALPHATEST",
-           "DEPTHPREPASS"};
+           "DEPTHPREPASS",
+           "NONUNIFORMSCALING"};
   rebuild();
 
   DIFFUSEDIRECTUV      = 0;

@@ -36,8 +36,40 @@ public:
 
   bool useLogarithmicDepth() const override;
   void setUseLogarithmicDepth(bool value) override;
+
+  /**
+   * @brief Gets the current transparency mode.
+   */
+  Nullable<unsigned int> transparencyMode() const;
+
+  /**
+   * @brief Sets the transparency mode of the material.
+   */
+  void setTransparencyMode(const Nullable<unsigned int>& value);
+
+  /**
+   * @brief Returns true if alpha blending should be disabled.
+   */
+  bool _disableAlphaBlending() const;
+
+  /**
+   * @brief Specifies whether or not this material should be rendered in alpha
+   * blend mode.
+   */
   bool needAlphaBlending() override;
+
+  /**
+   * @brief Specifies whether or not this material should be rendered in alpha
+   * blend mode for the given mesh.
+   */
+  bool needAlphaBlendingForMesh(AbstractMesh* mesh) override;
+
+  /**
+   * @brief Specifies whether or not this material should be rendered in alpha
+   * test mode.
+   */
   bool needAlphaTesting() override;
+
   BaseTexture* getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
@@ -197,7 +229,22 @@ protected:
   bool _useLightmapAsShadowmap;
 
   /**
-   * Specifies that the alpha is coming form the albedo channel alpha channel.
+   * This parameters will enable/disable Horizon occlusion to prevent normal
+   * maps to look shiny when the normal makes the reflect vector face the model
+   * (under horizon).
+   */
+  bool _useHorizonOcclusion;
+
+  /**
+   * This parameters will enable/disable radiance occlusion by preventing the
+   * radiance to lit too much the area relying on ambient texture to define
+   * their ambient occlusion.
+   */
+  bool _useRadianceOcclusion;
+
+  /**
+   * Specifies that the alpha is coming form the albedo channel alpha channel
+   * for alpha blending.
    */
   bool _useAlphaFromAlbedoTexture;
 
@@ -324,18 +371,24 @@ protected:
   bool _forceAlphaTest;
 
   /**
-   * Specifies that the alpha is premultiplied before output (this enables alpha
-   * premultiplied blending).
-   * in your scene composition.
+   * A fresnel is applied to the alpha of the model to ensure grazing angles
+   * edges are not alpha tested.
+   * And/Or occlude the blended part. (alpha is converted to gamma to compute
+   * the fresnel)
    */
-  bool _preMultiplyAlpha;
+  bool _useAlphaFresnel;
 
   /**
    * A fresnel is applied to the alpha of the model to ensure grazing angles
-   * edges are not alpha tested.
-   * And/Or occlude the blended part.
+   * edges are not alpha tested. And/Or occlude the blended part. (alpha stays
+   * linear to compute the fresnel)
    */
-  bool _useAlphaFresnel;
+  bool _useLinearAlphaFresnel;
+
+  /**
+   * The transparency mode of the material.
+   */
+  Nullable<unsigned int> _transparencyMode;
 
   /**
    * Specifies the environment BRDF texture used to comput the scale and offset
@@ -371,10 +424,7 @@ private:
    */
   Observer<ImageProcessingConfiguration>::Ptr _imageProcessingObserver;
   vector_t<RenderTargetTexture*> _renderTargets;
-  Matrix _worldViewProjectionMatrix;
   Color3 _globalAmbientColor;
-  Color3 _tempColor;
-  int _renderId;
   bool _useLogarithmicDepth;
 
 }; // end of class PBRBaseMaterial
