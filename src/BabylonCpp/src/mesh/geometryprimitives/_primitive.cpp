@@ -29,9 +29,8 @@ void _Primitive::regenerate()
   if (!_canBeRegenerated) {
     return;
   }
-  _beingRegenerated          = true;
-  auto regeneratedVertexData = _regenerateVertexData();
-  setAllVerticesData(regeneratedVertexData.get(), false);
+  _beingRegenerated = true;
+  setAllVerticesData(_regenerateVertexData().get(), false);
   _beingRegenerated = false;
 }
 

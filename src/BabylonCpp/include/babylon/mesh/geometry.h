@@ -97,7 +97,7 @@ public:
   size_t getTotalIndices();
   IndicesArray getIndices(bool copyWhenShared = false) override;
   GL::IGLBuffer* getIndexBuffer();
-  void _releaseVertexArrayObject(Effect* effect);
+  void _releaseVertexArrayObject(Effect* effect = nullptr);
   void releaseForMesh(Mesh* mesh, bool shouldDispose = true);
   void applyToMesh(Mesh* mesh);
   void load(Scene* scene, const ::std::function<void()>& onLoaded = nullptr);
@@ -122,8 +122,8 @@ public:
   static Geometry* ExtractFromMesh(Mesh* mesh, const string_t& id);
   static string_t RandomId();
   static void ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh);
-  static void _CleanMatricesWeights(Float32Array& matricesWeights,
-                                    unsigned int influencers);
+  static void _CleanMatricesWeights(const Json::value& parsedGeometry,
+                                    Mesh* mesh);
   static Geometry* Parse(const Json::value& parsedVertexData, Scene* scene,
                          const string_t& rootUrl);
 

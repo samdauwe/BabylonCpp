@@ -16,7 +16,7 @@ class BABYLON_SHARED_EXPORT _Primitive : public Geometry {
 public:
   _Primitive(const string_t& id, Scene* scene, bool canBeRegenerated,
              Mesh* mesh);
-  ~_Primitive();
+  ~_Primitive() override;
 
   bool canBeRegenerated() const;
   void regenerate();

@@ -23,7 +23,7 @@ public:
 
     return sphere;
   }
-  ~Sphere();
+  ~Sphere() override;
 
   unique_ptr_t<VertexData> _regenerateVertexData() override;
   Geometry* copy(const string_t& id) override;
@@ -33,7 +33,7 @@ public:
 
 protected:
   Sphere(const string_t& id, Scene* scene, unsigned int segments,
-         float diameter, bool canBeRegenerated, Mesh* mesh,
+         float diameter, bool canBeRegenerated, Mesh* mesh = nullptr,
          unsigned int side = Mesh::DEFAULTSIDE);
 
 public:

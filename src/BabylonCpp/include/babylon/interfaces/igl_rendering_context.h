@@ -440,18 +440,21 @@ public:
 class BABYLON_SHARED_EXPORT IGLProgram {
 
 public:
-  IGLProgram(GLuint _value) : value{_value}
+  IGLProgram(GLuint _value)
+      : value{_value}
+      , transformFeedback{nullptr}
+      , __SPECTOR_rebuildProgram{nullptr}
   {
   }
 
 public:
   GLuint value;
+  IGLTransformFeedback* transformFeedback;
   ::std::function<void(
     const string_t& vertexSourceCode, const string_t& fragmentSourceCode,
     const ::std::function<void(GL::IGLProgram* program)>& onCompiled,
     const ::std::function<void(const string_t& message)>& onError)>
     __SPECTOR_rebuildProgram;
-  IGLTransformFeedback* transformFeedback;
 
 }; // end of class IGLProgram
 
@@ -466,6 +469,43 @@ public:
   GLuint value;
 
 }; // end of class IGLQuery
+
+struct BABYLON_SHARED_EXPORT EXT_disjoint_timer_query {
+  int QUERY_COUNTER_BITS_EXT;
+  int TIME_ELAPSED_EXT;
+  int TIMESTAMP_EXT;
+  int GPU_DISJOINT_EXT;
+  int QUERY_RESULT_EXT;
+  int QUERY_RESULT_AVAILABLE_EXT;
+  void queryCounterEXT(IGLQuery* /*query*/, int /*target*/)
+  {
+  }
+  unique_ptr_t<IGLQuery> createQueryEXT()
+  {
+    return nullptr;
+  }
+  void beginQueryEXT(int /*target*/, IGLQuery* /*query*/)
+  {
+  }
+  void endQueryEXT(int /*target*/)
+  {
+  }
+  int getQueryObjectEXT(IGLQuery* /*query*/, int /*target*/)
+  {
+    return -1;
+  }
+  void deleteQueryEXT(IGLQuery* /*query*/)
+  {
+  }
+}; // end of struct EXT_disjoint_timer_query
+
+struct BABYLON_SHARED_EXPORT EXT_texture_filter_anisotropic {
+
+}; // end of struct EXT_texture_filter_anisotropic
+
+struct BABYLON_SHARED_EXPORT WEBGL_compressed_texture_s3tc {
+
+}; // end of struct WEBGL_compressed_texture_s3tc
 
 class BABYLON_SHARED_EXPORT IGLRenderbuffer {
 

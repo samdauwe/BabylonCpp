@@ -23,7 +23,7 @@ public:
 
     return plane;
   }
-  ~Plane();
+  ~Plane() override;
 
   unique_ptr_t<VertexData> _regenerateVertexData() override;
   Geometry* copy(const string_t& id) override;
@@ -33,7 +33,7 @@ public:
 
 protected:
   Plane(const string_t& id, Scene* scene, float size, bool canBeRegenerated,
-        Mesh* mesh, unsigned int side = Mesh::DEFAULTSIDE);
+        Mesh* mesh = nullptr, unsigned int side = Mesh::DEFAULTSIDE);
 
 public:
   float size;

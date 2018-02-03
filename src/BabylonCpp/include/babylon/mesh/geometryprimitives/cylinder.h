@@ -23,7 +23,7 @@ public:
 
     return cylinder;
   }
-  ~Cylinder();
+  ~Cylinder() override;
 
   unique_ptr_t<VertexData> _regenerateVertexData() override;
   Geometry* copy(const string_t& id) override;
@@ -34,8 +34,8 @@ public:
 protected:
   Cylinder(const string_t& id, Scene* scene, float height, float diameterTop,
            float diameterBottom, unsigned int tessellation,
-           unsigned int subdivisions, bool canBeRegenerated, Mesh* mesh,
-           unsigned int side = Mesh::DEFAULTSIDE);
+           unsigned int subdivisions, bool canBeRegenerated,
+           Mesh* mesh = nullptr, unsigned int side = Mesh::DEFAULTSIDE);
 
 public:
   float height;

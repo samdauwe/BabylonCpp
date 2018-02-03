@@ -23,7 +23,7 @@ public:
 
     return torusKnot;
   }
-  ~TorusKnot();
+  ~TorusKnot() override;
 
   unique_ptr_t<VertexData> _regenerateVertexData() override;
   Geometry* copy(const string_t& id) override;
@@ -34,7 +34,7 @@ public:
 protected:
   TorusKnot(const string_t& id, Scene* scene, float radius, float tube,
             unsigned int radialSegments, unsigned int tubularSegments, float p,
-            float q, bool canBeRegenerated, Mesh* mesh,
+            float q, bool canBeRegenerated, Mesh* mesh = nullptr,
             unsigned int side = Mesh::DEFAULTSIDE);
 
 public:

@@ -23,7 +23,7 @@ public:
 
     return ground;
   }
-  ~Ground();
+  ~Ground() override;
 
   unique_ptr_t<VertexData> _regenerateVertexData() override;
   Geometry* copy(const string_t& id) override;
@@ -34,7 +34,7 @@ public:
 protected:
   Ground(const string_t& id, Scene* scene, unsigned int width,
          unsigned int height, unsigned int subdivisions, bool canBeRegenerated,
-         Mesh* mesh);
+         Mesh* mesh = nullptr);
 
 public:
   unsigned int width;

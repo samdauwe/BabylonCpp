@@ -1,6 +1,7 @@
 #include <babylon/mesh/geometry.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/bones/skeleton.h>
 #include <babylon/core/json.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/engine/engine.h>
@@ -233,7 +234,7 @@ AbstractMesh* Geometry::updateVerticesData(unsigned int kind,
 
   if (kind == VertexBuffer::PositionKind) {
 
-    int stride     = vertexBuffer->getStrideSize();
+    auto stride    = vertexBuffer->getStrideSize();
     _totalVertices = data.size() / static_cast<size_t>(stride);
 
     updateBoundingInfo(updateExtends, data);
@@ -265,19 +266,29 @@ void Geometry::updateBoundingInfo(bool updateExtends, const Float32Array& data)
 
 void Geometry::_bind(Effect* effect, GL::IGLBuffer* indexToBind)
 {
+  if (!effect) {
+    return;
+  }
+
   if (indexToBind == nullptr) {
     indexToBind = _indexBuffer.get();
   }
 
+  auto vbs = getVertexBuffers();
+
+  if (vbs.empty()) {
+    return;
+  }
+
   if (indexToBind != _indexBuffer.get() || _vertexArrayObjects.empty()) {
-    _engine->bindBuffers(getVertexBuffers(), indexToBind, effect);
+    _engine->bindBuffers(vbs, indexToBind, effect);
     return;
   }
 
   // Using VAO
   if (!stl_util::contains(_vertexArrayObjects, effect->key())) {
-    _vertexArrayObjects[effect->key()] = _engine->recordVertexArrayObject(
-      getVertexBuffers(), indexToBind, effect);
+    _vertexArrayObjects[effect->key()]
+      = _engine->recordVertexArrayObject(vbs, indexToBind, effect);
   }
 
   _engine->bindVertexArrayObject(_vertexArrayObjects[effect->key()].get(),
@@ -300,7 +311,7 @@ Float32Array Geometry::getVerticesData(unsigned int kind, bool copyWhenShared,
   if (!vertexBuffer) {
     return Float32Array();
   }
-  Float32Array& orig = vertexBuffer->getData();
+  auto& orig = vertexBuffer->getData();
   if ((!forceCopy && !copyWhenShared) || _meshes.size() == 1) {
     return orig;
   }
@@ -339,11 +350,12 @@ VertexBuffer* Geometry::getVertexBuffer(unsigned int kind) const
 
 unordered_map_t<string_t, VertexBuffer*> Geometry::getVertexBuffers()
 {
+  unordered_map_t<string_t, VertexBuffer*> vertexBuffers;
+
   if (!isReady()) {
-    return unordered_map_t<string_t, VertexBuffer*>();
+    return vertexBuffers;
   }
 
-  unordered_map_t<string_t, VertexBuffer*> vertexBuffers;
   for (const auto& item : _vertexBuffers) {
     const string_t kind = VertexBuffer::KindAsString(item.first);
     vertexBuffers[kind] = item.second.get();
@@ -396,7 +408,7 @@ void Geometry::updateIndices(const IndicesArray& indices, int offset)
 }
 
 AbstractMesh* Geometry::setIndices(const IndicesArray& indices,
-                                   size_t totalVertices, bool /*updatable*/)
+                                   size_t totalVertices, bool updatable)
 {
   if (_indexBuffer) {
     _engine->_releaseBuffer(_indexBuffer.get());
@@ -404,13 +416,14 @@ AbstractMesh* Geometry::setIndices(const IndicesArray& indices,
 
   _disposeVertexArrayObjects();
 
-  _indices = indices;
+  _indices                = indices;
+  _indexBufferIsUpdatable = updatable;
   if (!_meshes.empty() && !_indices.empty()) {
-    _indexBuffer
-      = unique_ptr_t<GL::IGLBuffer>(_engine->createIndexBuffer(_indices));
+    _indexBuffer = unique_ptr_t<GL::IGLBuffer>(
+      _engine->createIndexBuffer(_indices, updatable));
   }
 
-  if (totalVertices != 0) {
+  if (totalVertices != 0) { // including null and undefined
     _totalVertices = static_cast<size_t>(totalVertices);
   }
 
@@ -712,9 +725,11 @@ Geometry* Geometry::copy(const string_t& iId)
   vertexData->indices.clear();
 
   auto indices = getIndices();
-  vertexData->indices.reserve(indices.size());
-  for (auto& index : indices) {
-    vertexData->indices.emplace_back(index);
+  if (!indices.empty()) {
+    vertexData->indices.reserve(indices.size());
+    for (auto& index : indices) {
+      vertexData->indices.emplace_back(index);
+    }
   }
 
   bool updatable    = false;
@@ -725,13 +740,15 @@ Geometry* Geometry::copy(const string_t& iId)
     auto data = getVerticesData(kind);
     vertexData->set(data, kind);
     if (!stopChecking) {
-      updatable    = getVertexBuffer(kind)->isUpdatable();
-      stopChecking = !updatable;
+      auto vb = getVertexBuffer(kind);
+      if (vb) {
+        updatable    = getVertexBuffer(kind)->isUpdatable();
+        stopChecking = !updatable;
+      }
     }
   }
 
-  auto geometry
-    = Geometry::New(iId, _scene, vertexData.get(), updatable, nullptr);
+  auto geometry = Geometry::New(iId, _scene, vertexData.get(), updatable);
 
   geometry->delayLoadState        = delayLoadState;
   geometry->delayLoadingFile      = delayLoadingFile;
@@ -785,8 +802,7 @@ void Geometry::ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh)
   else if (parsedGeometry.contains("positions")
            && parsedGeometry.contains("normals")
            && parsedGeometry.contains("indices")) {
-    Float32Array parsedPositions
-      = Json::ToArray<float>(parsedGeometry, "positions");
+    auto parsedPositions = Json::ToArray<float>(parsedGeometry, "positions");
     mesh->setVerticesData(VertexBuffer::PositionKind, parsedPositions, false);
     mesh->setVerticesData(VertexBuffer::NormalKind,
                           Json::ToArray<float>(parsedGeometry, "normals"),
@@ -842,9 +858,7 @@ void Geometry::ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh)
     if (parsedGeometry.contains("matricesWeights")) {
       auto matricesWeights
         = Json::ToArray<float>(parsedGeometry, "matricesWeights");
-      auto numBoneInfluencers
-        = Json::GetNumber(parsedGeometry, "numBoneInfluencers", 0u);
-      Geometry::_CleanMatricesWeights(matricesWeights, numBoneInfluencers);
+      Geometry::_CleanMatricesWeights(parsedGeometry, mesh);
       mesh->setVerticesData(VertexBuffer::MatricesWeightsKind, matricesWeights,
                             false);
     }
@@ -852,15 +866,12 @@ void Geometry::ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh)
     if (parsedGeometry.contains("matricesWeightsExtra")) {
       auto matricesWeightsExtra
         = Json::ToArray<float>(parsedGeometry, "matricesWeightsExtra");
-      auto numBoneInfluencers
-        = Json::GetNumber(parsedGeometry, "numBoneInfluencers", 0u);
-      Geometry::_CleanMatricesWeights(matricesWeightsExtra, numBoneInfluencers);
       mesh->setVerticesData(VertexBuffer::MatricesWeightsExtraKind,
                             matricesWeightsExtra, false);
     }
 
     if (parsedGeometry.contains("indices")) {
-      mesh->setIndices(Json::ToArray<uint32_t>(parsedGeometry, "indices"));
+      mesh->setIndices(Json::ToArray<uint32_t>(parsedGeometry, "indices"), 0);
     }
   }
 
@@ -870,11 +881,12 @@ void Geometry::ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh)
     mesh->subMeshes.clear();
     for (auto& parsedSubMesh :
          parsedGeometry.get("subMeshes").get<Json::array>()) {
-      SubMesh::New(Json::GetNumber(parsedSubMesh, "materialIndex", 0u),
-                   Json::GetNumber(parsedSubMesh, "verticesStart", 0u),
-                   Json::GetNumber(parsedSubMesh, "verticesCount", 0ul),
-                   Json::GetNumber(parsedSubMesh, "indexStart", 0u),
-                   Json::GetNumber(parsedSubMesh, "indexCount", 0ul), mesh);
+      SubMesh::AddToMesh(Json::GetNumber(parsedSubMesh, "materialIndex", 0u),
+                         Json::GetNumber(parsedSubMesh, "verticesStart", 0u),
+                         Json::GetNumber(parsedSubMesh, "verticesCount", 0ul),
+                         Json::GetNumber(parsedSubMesh, "indexStart", 0u),
+                         Json::GetNumber(parsedSubMesh, "indexCount", 0ul),
+                         mesh);
     }
   }
 
@@ -887,30 +899,95 @@ void Geometry::ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh)
   mesh->computeWorldMatrix(true);
 
   // Octree
-  // TODO
+  if (scene->selectionOctree()) {
+    // scene->selectionOctree()->addMesh(mesh);
+  }
 }
 
-void Geometry::_CleanMatricesWeights(Float32Array& matricesWeights,
-                                     unsigned int influencers)
+void Geometry::_CleanMatricesWeights(const Json::value& parsedGeometry,
+                                     Mesh* mesh)
 {
+  const auto epsilon = 1e-3f;
   if (!SceneLoader::CleanBoneMatrixWeights()) {
     return;
   }
-  const auto size = matricesWeights.size();
-  for (std::size_t i = 0; i < size; i += influencers) {
-    float weight            = 0;
-    std::size_t biggerIndex = i;
-    float biggerWeight      = 0;
-    for (std::size_t j = 0; j < influencers - 1; ++j) {
-      weight += matricesWeights[i + j];
+  size_t noInfluenceBoneIndex = 0;
+  auto parsedGeometrySkeletonId
+    = Json::GetNumber<int>(parsedGeometry, "skeletonId", -1);
+  if (parsedGeometrySkeletonId > -1) {
+    auto skeleton = mesh->getScene()->getLastSkeletonByID(
+      ::std::to_string(parsedGeometrySkeletonId));
 
-      if (matricesWeights[i + j] > biggerWeight) {
-        biggerWeight = matricesWeights[i + j];
-        biggerIndex  = i + j;
+    if (!skeleton) {
+      return;
+    }
+    noInfluenceBoneIndex = skeleton->bones.size();
+  }
+  else {
+    return;
+  }
+  auto matricesIndices
+    = mesh->getVerticesData(VertexBuffer::MatricesIndicesKind);
+  auto matricesIndicesExtra
+    = mesh->getVerticesData(VertexBuffer::MatricesIndicesExtraKind);
+  auto matricesWeights
+    = Json::ToArray<float>(parsedGeometry, "matricesWeights");
+  auto matricesWeightsExtra
+    = Json::ToArray<float>(parsedGeometry, "matricesWeightsExtra");
+  auto influencers = Json::GetNumber(parsedGeometry, "numBoneInfluencers", 0u);
+  auto size        = matricesWeights.size();
+
+  for (size_t i = 0; i < size; i += 4) {
+    float weight        = 0.f;
+    int firstZeroWeight = -1;
+    for (unsigned int j = 0; j < 4; ++j) {
+      auto w = matricesWeights[i + j];
+      weight += w;
+      if (w < epsilon && firstZeroWeight < 0) {
+        firstZeroWeight = static_cast<int>(j);
       }
     }
+    if (!matricesWeightsExtra.empty()) {
+      for (unsigned int j = 0; j < 4; ++j) {
+        auto w = matricesWeightsExtra[i + j];
+        weight += w;
+        if (w < epsilon && firstZeroWeight < 0) {
+          firstZeroWeight = static_cast<int>(j + 4);
+        }
+      }
+    }
+    auto _firstZeroWeight
+      = (firstZeroWeight < 0) ? 0 : static_cast<unsigned>(firstZeroWeight);
+    if (firstZeroWeight < 0 || _firstZeroWeight > (influencers - 1)) {
+      _firstZeroWeight = influencers - 1;
+    }
+    if (weight > epsilon) {
+      auto mweight = 1.f / weight;
+      for (unsigned int j = 0; j < 4; ++j) {
+        matricesWeights[i + j] *= mweight;
+      }
+      if (!matricesWeightsExtra.empty()) {
+        for (unsigned int j = 0; j < 4; ++j) {
+          matricesWeightsExtra[i + j] *= mweight;
+        }
+      }
+    }
+    else {
+      if (_firstZeroWeight >= 4) {
+        matricesWeightsExtra[i + _firstZeroWeight - 4] = 1.f - weight;
+        matricesIndicesExtra[i + _firstZeroWeight - 4] = noInfluenceBoneIndex;
+      }
+      else {
+        matricesWeights[i + _firstZeroWeight] = 1.f - weight;
+        matricesIndices[i + _firstZeroWeight] = noInfluenceBoneIndex;
+      }
+    }
+  }
 
-    matricesWeights[biggerIndex] += ::std::max(0.f, 1.f - weight);
+  mesh->setVerticesData(VertexBuffer::MatricesIndicesKind, matricesIndices);
+  if (!matricesWeightsExtra.empty()) {
+    mesh->setVerticesData(VertexBuffer::MatricesIndicesExtraKind,
+                          matricesIndicesExtra);
   }
 }
 

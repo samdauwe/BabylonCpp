@@ -23,7 +23,7 @@ public:
 
     return torus;
   }
-  ~Torus();
+  ~Torus() override;
 
   unique_ptr_t<VertexData> _regenerateVertexData() override;
   Geometry* copy(const string_t& id) override;
@@ -33,7 +33,7 @@ public:
 
 protected:
   Torus(const string_t& id, Scene* scene, float diameter, float thickness,
-        unsigned int tessellation, bool canBeRegenerated, Mesh* mesh,
+        unsigned int tessellation, bool canBeRegenerated, Mesh* mesh = nullptr,
         unsigned int side = Mesh::DEFAULTSIDE);
 
 private:

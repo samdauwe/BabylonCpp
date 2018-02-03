@@ -23,7 +23,7 @@ public:
 
     return tiledGround;
   }
-  ~TiledGround();
+  ~TiledGround() override;
 
   unique_ptr_t<VertexData> _regenerateVertexData() override;
   Geometry* copy(const string_t& id) override;
@@ -31,7 +31,8 @@ public:
 protected:
   TiledGround(const string_t& id, Scene* scene, float xmin, float zmin,
               float xmax, float zmax, const ISize& subdivisions,
-              const ISize& precision, bool canBeRegenerated, Mesh* mesh);
+              const ISize& precision, bool canBeRegenerated,
+              Mesh* mesh = nullptr);
 
 private:
   float xmin;

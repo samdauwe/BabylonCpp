@@ -21,18 +21,6 @@ struct BABYLON_SHARED_EXPORT InstancedArrays {
     drawArraysInstancedANGLE;
 }; // end of struct InstancedArrays
 
-struct BABYLON_SHARED_EXPORT EXT_disjoint_timer_query {
-
-}; // end of struct EXT_disjoint_timer_query
-
-struct BABYLON_SHARED_EXPORT EXT_texture_filter_anisotropic {
-
-}; // end of struct EXT_texture_filter_anisotropic
-
-struct BABYLON_SHARED_EXPORT WEBGL_compressed_texture_s3tc {
-
-}; // end of struct WEBGL_compressed_texture_s3tc
-
 struct BABYLON_SHARED_EXPORT EngineCapabilities {
   /** The maximum textures image */
   int maxTexturesImageUnits;
@@ -46,7 +34,7 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   int maxVertexUniformVectors;
   int maxFragmentUniformVectors;
   bool standardDerivatives;
-  Nullable<WEBGL_compressed_texture_s3tc> s3tc;
+  Nullable<GL::WEBGL_compressed_texture_s3tc> s3tc;
   GL::any pvrtc; // WEBGL_compressed_texture_pvrtc;
   GL::any etc1;  // WEBGL_compressed_texture_etc1;
   GL::any etc2;  // WEBGL_compressed_texture_etc;
@@ -54,7 +42,8 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   GL::any atc;   // WEBGL_compressed_texture_atc;
   bool textureFloat;
   bool vertexArrayObject = false;
-  Nullable<EXT_texture_filter_anisotropic> textureAnisotropicFilterExtension;
+  Nullable<GL::EXT_texture_filter_anisotropic>
+    textureAnisotropicFilterExtension;
   unsigned int maxAnisotropy;
   bool instancedArrays;
   bool uintIndices;
@@ -69,7 +58,7 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   bool drawBuffersExtension;
   bool depthTextureExtension;
   bool colorBufferFloat;
-  EXT_disjoint_timer_query timerQuery;
+  GL::EXT_disjoint_timer_query timerQuery;
   bool canUseTimestampForTimerQuery;
 }; // end of struct EngineCapabilities
 
