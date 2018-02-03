@@ -37,7 +37,7 @@ public:
 
     return material;
   }
-  ~StandardMaterial();
+  ~StandardMaterial() override;
 
   /**
    * @brief Returns the string "StandardMaterial".

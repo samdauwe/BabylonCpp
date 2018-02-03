@@ -63,6 +63,8 @@ StandardMaterialDefines::StandardMaterialDefines() : MaterialDefines{}
            "MORPHTARGETS",
            "MORPHTARGETS_NORMAL",
            "MORPHTARGETS_TANGENT",
+           "NONUNIFORMSCALING",
+           "PREMULTIPLYALPHA",
            "IMAGEPROCESSING",
            "VIGNETTE",
            "VIGNETTEBLENDMODEMULTIPLY",
@@ -71,6 +73,7 @@ StandardMaterialDefines::StandardMaterialDefines() : MaterialDefines{}
            "CONTRAST",
            "COLORCURVES",
            "COLORGRADING",
+           "COLORGRADING3D",
            "SAMPLER3DGREENDEPTH",
            "SAMPLER3DBGRMAP",
            "IMAGEPROCESSINGPOSTPROCESS",
@@ -85,9 +88,14 @@ StandardMaterialDefines::~StandardMaterialDefines()
 void StandardMaterialDefines::setReflectionMode(unsigned int modeToEnable)
 {
   static const array_t<unsigned int, 9> modes{{
-    REFLECTIONMAP_CUBIC, REFLECTIONMAP_EXPLICIT, REFLECTIONMAP_PLANAR,
-    REFLECTIONMAP_PROJECTION, REFLECTIONMAP_SKYBOX, REFLECTIONMAP_SPHERICAL,
-    REFLECTIONMAP_EQUIRECTANGULAR, REFLECTIONMAP_EQUIRECTANGULAR_FIXED,
+    REFLECTIONMAP_CUBIC,
+    REFLECTIONMAP_EXPLICIT,
+    REFLECTIONMAP_PLANAR,
+    REFLECTIONMAP_PROJECTION,
+    REFLECTIONMAP_SKYBOX,
+    REFLECTIONMAP_SPHERICAL,
+    REFLECTIONMAP_EQUIRECTANGULAR,
+    REFLECTIONMAP_EQUIRECTANGULAR_FIXED,
     REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED,
   }};
 

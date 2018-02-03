@@ -34,7 +34,7 @@ public:
 protected:
   PushMaterial(const string_t& name, Scene* scene);
 
-  void _afterBind(Mesh* mesh, Effect* effect);
+  void _afterBind(Mesh* mesh, Effect* effect = nullptr);
   bool _mustRebind(Scene* scene, Effect* effect, float visibility = 1.f);
 
 protected:

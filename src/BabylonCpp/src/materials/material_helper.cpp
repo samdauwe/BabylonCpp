@@ -30,10 +30,9 @@ void MaterialHelper::BindEyePosition(Effect* effect, Scene* scene)
     effect->setVector3("vEyePosition", *scene->_forcedViewPosition.get());
     return;
   }
-  effect->setVector3("vEyePosition",
-                     scene->_mirroredCameraPosition ?
-                       *scene->_mirroredCameraPosition.get() :
-                       scene->activeCamera->globalPosition());
+  effect->setVector3("vEyePosition", scene->_mirroredCameraPosition ?
+                                       *scene->_mirroredCameraPosition.get() :
+                                       scene->activeCamera->globalPosition());
 }
 
 void MaterialHelper::PrepareDefinesForMergedUV(
@@ -61,6 +60,15 @@ void MaterialHelper::PrepareDefinesForMergedUV(
     }
     else if (keyString == "LIGHTMAP") {
       defines.LIGHTMAPDIRECTUV = value;
+    }
+    else if (keyString == "ALBEDO") {
+      defines.ALBEDODIRECTUV = value;
+    }
+    else if (keyString == "REFLECTIVITY") {
+      defines.REFLECTIVITYDIRECTUV = value;
+    }
+    else if (keyString == "MICROSURFACEMAP") {
+      defines.MICROSURFACEMAPDIRECTUV = value;
     }
   };
 
@@ -94,7 +102,7 @@ void MaterialHelper::BindTextureMatrix(BaseTexture& texture,
 void MaterialHelper::PrepareDefinesForMisc(
   AbstractMesh* mesh, Scene* scene, bool useLogarithmicDepth, bool pointsCloud,
   bool fogEnabled, MaterialDefines& defines, unsigned int LOGARITHMICDEPTH,
-  unsigned int POINTSIZE, unsigned int FOG)
+  unsigned int POINTSIZE, unsigned int FOG, unsigned int NONUNIFORMSCALING)
 {
   if (defines._areMiscDirty) {
     defines.defines[LOGARITHMICDEPTH] = useLogarithmicDepth;
@@ -102,6 +110,7 @@ void MaterialHelper::PrepareDefinesForMisc(
     defines.defines[FOG]
       = (scene->fogEnabled() && mesh->applyFog()
          && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled);
+    defines.defines[NONUNIFORMSCALING] = mesh->nonUniformScaling();
   }
 }
 
@@ -139,8 +148,9 @@ void MaterialHelper::PrepareDefinesForFrameBoundValues(
 
 bool MaterialHelper::PrepareDefinesForAttributes(
   AbstractMesh* mesh, MaterialDefines& defines, bool useVertexColor,
-  bool useBones, bool useMorphTargets, unsigned int NORMAL, unsigned int UV1,
-  unsigned int UV2, unsigned int VERTEXCOLOR, unsigned int VERTEXALPHA,
+  bool useBones, bool useMorphTargets, bool useVertexAlpha, unsigned int NORMAL,
+  unsigned int UV1, unsigned int UV2, unsigned int VERTEXCOLOR,
+  unsigned int VERTEXALPHA, unsigned int MORPHTARGETS_TANGENT,
   unsigned int MORPHTARGETS_NORMAL, unsigned int MORPHTARGETS)
 {
   if (!defines._areAttributesDirty && defines._needNormals == defines._normals
@@ -170,14 +180,16 @@ bool MaterialHelper::PrepareDefinesForAttributes(
   }
 
   if (useVertexColor) {
-    defines.defines[VERTEXCOLOR]
+    auto hasVertexColors
       = mesh->useVertexColors()
         && mesh->isVerticesDataPresent(VertexBuffer::ColorKind);
-    defines.defines[VERTEXALPHA] = mesh->hasVertexAlpha();
+    defines.defines[VERTEXCOLOR] = hasVertexColors;
+    defines.defines[VERTEXALPHA] = mesh->hasVertexAlpha() && useVertexAlpha;
   }
 
   if (useBones) {
-    if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
+    if (mesh->useBones() && mesh->computeBonesUsingShaders()
+        && mesh->skeleton()) {
       defines.NUM_BONE_INFLUENCERS = mesh->numBoneInfluencers();
       defines.BonesPerMesh
         = static_cast<unsigned>(mesh->skeleton()->bones.size() + 1);
@@ -189,9 +201,11 @@ bool MaterialHelper::PrepareDefinesForAttributes(
   }
 
   if (useMorphTargets) {
-    auto _mesh = static_cast<Mesh*>(mesh);
-    if (_mesh && _mesh->morphTargetManager()) {
-      auto manager = _mesh->morphTargetManager();
+    auto _mesh   = static_cast<Mesh*>(mesh);
+    auto manager = _mesh ? _mesh->morphTargetManager() : nullptr;
+    if (manager) {
+      defines.defines[MORPHTARGETS_TANGENT]
+        = manager->supportsTangents() && defines.TANGENT;
       defines.defines[MORPHTARGETS_NORMAL]
         = manager->supportsNormals() && defines[NORMAL];
       defines.defines[MORPHTARGETS] = (manager->numInfluencers() > 0);
@@ -199,9 +213,10 @@ bool MaterialHelper::PrepareDefinesForAttributes(
         = static_cast<unsigned>(manager->numInfluencers());
     }
     else {
-      defines.defines[MORPHTARGETS_NORMAL] = false;
-      defines.defines[MORPHTARGETS]        = false;
-      defines.NUM_MORPH_INFLUENCERS        = 0;
+      defines.defines[MORPHTARGETS_TANGENT] = false;
+      defines.defines[MORPHTARGETS_NORMAL]  = false;
+      defines.defines[MORPHTARGETS]         = false;
+      defines.NUM_MORPH_INFLUENCERS         = 0;
     }
   }
 
@@ -378,14 +393,11 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
   }
 }
 
-void MaterialHelper::HandleFallbacksForShadows(
+unsigned int MaterialHelper::HandleFallbacksForShadows(
   MaterialDefines& defines, EffectFallbacks& fallbacks,
-  unsigned int maxSimultaneousLights)
+  unsigned int maxSimultaneousLights, unsigned int rank)
 {
-  if (!defines.SHADOWS) {
-    return;
-  }
-
+  unsigned int lightFallbackRank = 0;
   for (unsigned int lightIndex = 0; lightIndex < maxSimultaneousLights;
        ++lightIndex) {
     if (lightIndex >= defines.lights.size() || !defines.lights[lightIndex]) {
@@ -395,21 +407,25 @@ void MaterialHelper::HandleFallbacksForShadows(
     const string_t lightIndexStr = ::std::to_string(lightIndex);
 
     if (lightIndex > 0) {
-      fallbacks.addFallback(lightIndex, "LIGHT" + lightIndexStr);
+      lightFallbackRank = rank + lightIndex;
+      fallbacks.addFallback(lightFallbackRank, "LIGHT" + lightIndexStr);
     }
 
-    if (defines.shadows[lightIndex]) {
-      fallbacks.addFallback(0, "SHADOW" + lightIndexStr);
-    }
+    if (!defines.SHADOWS) {
+      if (defines.shadows[lightIndex]) {
+        fallbacks.addFallback(0, "SHADOW" + lightIndexStr);
+      }
 
-    if (defines.shadowpcfs[lightIndex]) {
-      fallbacks.addFallback(0, "SHADOWPCF" + lightIndexStr);
-    }
+      if (defines.shadowpcfs[lightIndex]) {
+        fallbacks.addFallback(0, "SHADOWPCF" + lightIndexStr);
+      }
 
-    if (defines.shadowesms[lightIndex]) {
-      fallbacks.addFallback(0, "SHADOWESM" + lightIndexStr);
+      if (defines.shadowesms[lightIndex]) {
+        fallbacks.addFallback(0, "SHADOWESM" + lightIndexStr);
+      }
     }
   }
+  return ++lightFallbackRank;
 }
 
 void MaterialHelper::PrepareAttributesForMorphTargets(
@@ -418,29 +434,33 @@ void MaterialHelper::PrepareAttributesForMorphTargets(
 {
   auto influencers = defines.NUM_MORPH_INFLUENCERS;
 
-  if (influencers > 0) {
-    auto engine = Engine::LastCreatedEngine();
-    auto _mesh  = static_cast<Mesh*>(mesh);
-    if (engine && mesh) {
-      auto maxAttributesCount
-        = static_cast<unsigned>(engine->getCaps().maxVertexAttribs);
-      auto manager = _mesh->morphTargetManager();
-      auto normal  = manager->supportsNormals() && defines[NORMAL];
-      for (unsigned int index = 0; index < influencers; index++) {
-        const string_t indexStr = ::std::to_string(index);
-        attribs.emplace_back(string_t(VertexBuffer::PositionKindChars)
+  auto engine = Engine::LastCreatedEngine();
+  auto _mesh  = static_cast<Mesh*>(mesh);
+  if (influencers > 0 && engine && mesh) {
+    auto maxAttributesCount
+      = static_cast<unsigned>(engine->getCaps().maxVertexAttribs);
+    auto manager = _mesh->morphTargetManager();
+    auto normal  = manager && manager->supportsNormals() && defines[NORMAL];
+    auto tangent = manager && manager->supportsNormals() && defines.TANGENT;
+    for (unsigned int index = 0; index < influencers; index++) {
+      const auto indexStr = ::std::to_string(index);
+      attribs.emplace_back(string_t(VertexBuffer::PositionKindChars)
+                           + indexStr);
+
+      if (normal) {
+        attribs.emplace_back(string_t(VertexBuffer::NormalKindChars)
                              + indexStr);
+      }
 
-        if (normal) {
-          attribs.emplace_back(string_t(VertexBuffer::NormalKindChars)
-                               + indexStr);
-        }
+      if (tangent) {
+        attribs.emplace_back(string_t(VertexBuffer::TangentKindChars)
+                             + indexStr);
+      }
 
-        if (attribs.size() > maxAttributesCount) {
-          BABYLON_LOGF_ERROR("MaterialHelper",
-                             "Cannot add more vertex attributes for mesh %s",
-                             mesh->name.c_str());
-        }
+      if (attribs.size() > maxAttributesCount) {
+        BABYLON_LOGF_ERROR("MaterialHelper",
+                           "Cannot add more vertex attributes for mesh %s",
+                           mesh->name.c_str());
       }
     }
   }
@@ -502,8 +522,8 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
   unsigned int lightIndex = 0;
 
   for (auto& light : mesh->_lightSources) {
-    const string_t lightIndexStr = ::std::to_string(lightIndex);
-    const auto scaledIntensity   = light->getScaledIntensity();
+    const auto lightIndexStr   = ::std::to_string(lightIndex);
+    const auto scaledIntensity = light->getScaledIntensity();
     light->_uniformBuffer->bindToEffect(effect, "Light" + lightIndexStr);
 
     MaterialHelper::BindLightProperties(light, effect, lightIndex);
@@ -544,9 +564,10 @@ void MaterialHelper::BindFogParameters(Scene* scene, AbstractMesh* mesh,
 
 void MaterialHelper::BindBonesParameters(AbstractMesh* mesh, Effect* effect)
 {
-  if (mesh && mesh->useBones() && mesh->computeBonesUsingShaders()) {
+  if (mesh && mesh->useBones() && mesh->computeBonesUsingShaders()
+      && mesh->skeleton()) {
     const auto& matrices = mesh->skeleton()->getTransformMatrices(mesh);
-    if (!matrices.empty()) {
+    if (!matrices.empty() && effect) {
       effect->setMatrices("mBones", matrices);
     }
   }
@@ -557,12 +578,12 @@ void MaterialHelper::BindMorphTargetParameters(AbstractMesh* abstractMesh,
 {
   auto mesh = static_cast<Mesh*>(abstractMesh);
   if (mesh) {
-    if (!abstractMesh || !mesh->morphTargetManager()) {
+    auto manager = mesh->morphTargetManager();
+    if (!abstractMesh || !manager) {
       return;
     }
 
-    effect->setFloatArray("morphTargetInfluences",
-                          mesh->morphTargetManager()->influences());
+    effect->setFloatArray("morphTargetInfluences", manager->influences());
   }
 }
 

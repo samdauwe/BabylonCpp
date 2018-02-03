@@ -8,8 +8,8 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT StandardMaterialDefines
-  : public MaterialDefines,
-    public IImageProcessingConfigurationDefines {
+    : public MaterialDefines,
+      public IImageProcessingConfigurationDefines {
 
   static constexpr unsigned int MAINUV1                             = 0;
   static constexpr unsigned int MAINUV2                             = 1;
@@ -71,19 +71,24 @@ struct BABYLON_SHARED_EXPORT StandardMaterialDefines
   static constexpr unsigned int MORPHTARGETS         = 56;
   static constexpr unsigned int MORPHTARGETS_NORMAL  = 57;
   static constexpr unsigned int MORPHTARGETS_TANGENT = 58;
+  static constexpr unsigned int NONUNIFORMSCALING
+    = 59; // https://playground.babylonjs.com#V6DWIH
+  static constexpr unsigned int PREMULTIPLYALPHA
+    = 60; // https://playground.babylonjs.com#LNVJJ7
 
-  static constexpr unsigned int IMAGEPROCESSING            = 59;
-  static constexpr unsigned int VIGNETTE                   = 60;
-  static constexpr unsigned int VIGNETTEBLENDMODEMULTIPLY  = 61;
-  static constexpr unsigned int VIGNETTEBLENDMODEOPAQUE    = 63;
-  static constexpr unsigned int TONEMAPPING                = 64;
-  static constexpr unsigned int CONTRAST                   = 65;
-  static constexpr unsigned int COLORCURVES                = 66;
-  static constexpr unsigned int COLORGRADING               = 67;
-  static constexpr unsigned int SAMPLER3DGREENDEPTH        = 68;
-  static constexpr unsigned int SAMPLER3DBGRMAP            = 69;
-  static constexpr unsigned int IMAGEPROCESSINGPOSTPROCESS = 69;
-  static constexpr unsigned int EXPOSURE                   = 70;
+  static constexpr unsigned int IMAGEPROCESSING            = 61;
+  static constexpr unsigned int VIGNETTE                   = 62;
+  static constexpr unsigned int VIGNETTEBLENDMODEMULTIPLY  = 63;
+  static constexpr unsigned int VIGNETTEBLENDMODEOPAQUE    = 64;
+  static constexpr unsigned int TONEMAPPING                = 65;
+  static constexpr unsigned int CONTRAST                   = 66;
+  static constexpr unsigned int COLORCURVES                = 67;
+  static constexpr unsigned int COLORGRADING               = 68;
+  static constexpr unsigned int COLORGRADING3D             = 69;
+  static constexpr unsigned int SAMPLER3DGREENDEPTH        = 70;
+  static constexpr unsigned int SAMPLER3DBGRMAP            = 71;
+  static constexpr unsigned int IMAGEPROCESSINGPOSTPROCESS = 72;
+  static constexpr unsigned int EXPOSURE                   = 73;
 
   StandardMaterialDefines();
   ~StandardMaterialDefines();

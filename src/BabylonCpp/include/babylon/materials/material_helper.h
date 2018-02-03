@@ -20,16 +20,19 @@ public:
                                     bool useLogarithmicDepth, bool pointsCloud,
                                     bool fogEnabled, MaterialDefines& defines,
                                     unsigned int LOGARITHMICDEPTH,
-                                    unsigned int POINTSIZE, unsigned int FOG);
+                                    unsigned int POINTSIZE, unsigned int FOG,
+                                    unsigned int NONUNIFORMSCALING);
   static void PrepareDefinesForFrameBoundValues(
     Scene* scene, Engine* engine, MaterialDefines& defines, bool useInstances,
     unsigned int CLIPPLANE, unsigned int ALPHATEST, unsigned int DEPTHPREPASS,
     unsigned int INSTANCES, bool forceAlphaTest = false);
   static bool PrepareDefinesForAttributes(
     AbstractMesh* mesh, MaterialDefines& defines, bool useVertexColor,
-    bool useBones, bool useMorphTargets, unsigned int NORMAL, unsigned int UV1,
-    unsigned int UV2, unsigned int VERTEXCOLOR, unsigned int VERTEXALPHA,
-    unsigned int MORPHTARGETS_NORMAL = 0, unsigned int MORPHTARGETS = 0);
+    bool useBones, bool useMorphTargets, bool useVertexAlpha,
+    unsigned int NORMAL, unsigned int UV1, unsigned int UV2,
+    unsigned int VERTEXCOLOR, unsigned int VERTEXALPHA,
+    unsigned int MORPHTARGETS_TANGENT = 0, unsigned int MORPHTARGETS_NORMAL = 0,
+    unsigned int MORPHTARGETS = 0);
   static bool PrepareDefinesForLights(
     Scene* scene, AbstractMesh* mesh, MaterialDefines& defines,
     bool specularSupported, unsigned int maxSimultaneousLights,
@@ -40,9 +43,9 @@ public:
                                              unsigned int maxSimultaneousLights
                                              = 4);
   static void PrepareUniformsAndSamplersList(EffectCreationOptions& options);
-  static void HandleFallbacksForShadows(MaterialDefines& defines,
-                                        EffectFallbacks& fallbacks,
-                                        unsigned int maxSimultaneousLights);
+  static unsigned int HandleFallbacksForShadows(
+    MaterialDefines& defines, EffectFallbacks& fallbacks,
+    unsigned int maxSimultaneousLights = 4, unsigned int rank = 0);
   static void PrepareAttributesForMorphTargets(vector_t<string_t>& attribs,
                                                AbstractMesh* mesh,
                                                MaterialDefines& defines,

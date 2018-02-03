@@ -90,6 +90,7 @@ StandardMaterial::StandardMaterial(const string_t& iName, Scene* scene)
     , _invertNormalMapX{false}
     , _invertNormalMapY{false}
     , _twoSidedLighting{false}
+    , _imageProcessingObserver{nullptr}
 {
   // Setup the default processing configuration to the scene.
   _attachImageProcessingConfiguration(nullptr);
@@ -252,7 +253,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                          BaseSubMesh* subMesh,
                                          bool useInstances)
 {
-  if (isFrozen()) {
+  if (subMesh->effect() && isFrozen()) {
     if (_wasPreviouslyReady && subMesh->effect()) {
       return true;
     }
@@ -481,6 +482,10 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     defines.defines[SMD::LINKEMISSIVEWITHDIFFUSE] = _linkEmissiveWithDiffuse;
 
     defines.defines[SMD::SPECULAROVERALPHA] = _useSpecularOverAlpha;
+
+    defines.defines[SMD::PREMULTIPLYALPHA]
+      = (alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED
+         || alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF);
   }
 
   if (defines._areImageProcessingDirty) {
@@ -533,7 +538,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   // Misc.
   MaterialHelper::PrepareDefinesForMisc(
     mesh, scene, _useLogarithmicDepth, pointsCloud(), fogEnabled(), defines,
-    SMD::LOGARITHMICDEPTH, SMD::POINTSIZE, SMD::FOG);
+    SMD::LOGARITHMICDEPTH, SMD::POINTSIZE, SMD::FOG, SMD::NONUNIFORMSCALING);
 
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(
@@ -727,7 +732,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     buildUniformLayout();
   }
 
-  if (!subMesh->effect()->isReady()) {
+  if (!subMesh->effect() || !subMesh->effect()->isReady()) {
     return false;
   }
 
@@ -805,7 +810,10 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   }
   auto defines = *definesTmp;
 
-  auto effect   = subMesh->effect();
+  auto effect = subMesh->effect();
+  if (!effect) {
+    return;
+  }
   _activeEffect = effect;
 
   // Matrices
@@ -1048,10 +1056,7 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     // Colors
     scene->ambientColor.multiplyToRef(ambientColor, _globalAmbientColor);
 
-    effect->setVector3("vEyePosition",
-                       scene->_mirroredCameraPosition ?
-                         *scene->_mirroredCameraPosition :
-                         scene->activeCamera->globalPosition());
+    MaterialHelper::BindEyePosition(effect, scene);
     effect->setColor3("vAmbientColor", _globalAmbientColor);
   }
 
@@ -1081,7 +1086,9 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     MaterialHelper::BindLogDepth(defines, effect, scene, SMD::LOGARITHMICDEPTH);
 
     // Image processing
-    _imageProcessingConfiguration->bind(_activeEffect);
+    if (!_imageProcessingConfiguration->applyByPostProcess()) {
+      _imageProcessingConfiguration->bind(_activeEffect);
+    }
   }
 
   _uniformBuffer->update();
