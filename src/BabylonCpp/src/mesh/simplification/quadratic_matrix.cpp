@@ -16,12 +16,41 @@ QuadraticMatrix::QuadraticMatrix(const array_t<float, 10>& _data)
   }
 }
 
+QuadraticMatrix::QuadraticMatrix(const QuadraticMatrix& other)
+    : data{other.data}
+{
+}
+
+QuadraticMatrix::QuadraticMatrix(QuadraticMatrix&& other)
+    : data{::std::move(other.data)}
+{
+}
+
+QuadraticMatrix& QuadraticMatrix::operator=(const QuadraticMatrix& other)
+{
+  if (&other != this) {
+    data = other.data;
+  }
+
+  return *this;
+}
+
+QuadraticMatrix& QuadraticMatrix::operator=(QuadraticMatrix&& other)
+{
+  if (&other != this) {
+    data = ::std::move(other.data);
+  }
+
+  return *this;
+}
+
 QuadraticMatrix::~QuadraticMatrix()
 {
 }
 
-float QuadraticMatrix::det(int a11, int a12, int a13, int a21, int a22, int a23,
-                           int a31, int a32, int a33)
+float QuadraticMatrix::det(unsigned int a11, unsigned int a12, int unsigned a13,
+                           unsigned int a21, unsigned int a22, unsigned int a23,
+                           unsigned int a31, unsigned int a32, unsigned int a33)
 {
   return data[a11] * data[a22] * data[a33] + data[a13] * data[a21] * data[a32]
          + data[a12] * data[a23] * data[a31] - data[a13] * data[a22] * data[a31]

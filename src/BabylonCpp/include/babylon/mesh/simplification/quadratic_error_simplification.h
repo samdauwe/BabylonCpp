@@ -2,6 +2,7 @@
 #define BABYLON_MESH_SIMPLIFICATION_QUADRATIC_ERROR_SIMPLIFICATION_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/mesh/simplification/isimplifier.h>
 
 namespace BABYLON {
 
@@ -17,7 +18,7 @@ class BABYLON_SHARED_EXPORT QuadraticErrorSimplification : public ISimplifier {
 
 public:
   QuadraticErrorSimplification();
-  ~QuadraticErrorSimplification();
+  virtual ~QuadraticErrorSimplification();
 
 }; // end of class QuadraticErrorSimplification
 

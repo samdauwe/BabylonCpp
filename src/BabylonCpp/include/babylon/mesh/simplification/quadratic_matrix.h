@@ -13,10 +13,16 @@ class BABYLON_SHARED_EXPORT QuadraticMatrix {
 public:
   QuadraticMatrix();
   QuadraticMatrix(const array_t<float, 10>& data);
+  QuadraticMatrix(const QuadraticMatrix& other);
+  QuadraticMatrix(QuadraticMatrix&& other);
+  QuadraticMatrix& operator=(const QuadraticMatrix& other);
+  QuadraticMatrix& operator=(QuadraticMatrix&& other);
   ~QuadraticMatrix();
 
-  float det(int a11, int a12, int a13, int a21, int a22, int a23, int a31,
-            int a32, int a33);
+  float det(unsigned int a11, unsigned int a12, unsigned int a13, //
+            unsigned int a21, unsigned int a22, int unsigned a23, //
+            int unsigned a31, int unsigned a32, int unsigned a33  //
+  );
   void addInPlace(const QuadraticMatrix& matrix);
   void addArrayInPlace(const array_t<float, 10>& data);
   QuadraticMatrix add(const QuadraticMatrix& matrix);

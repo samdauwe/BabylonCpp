@@ -32,9 +32,6 @@ void SimplificationQueue::executeNext()
 
 void SimplificationQueue::runSimplification(const ISimplificationTask& /*task*/)
 {
-  // TODO IMPLEMENT
-  // if (task.parallelProcessing)
-  //  std::cout << "";
 }
 
 ISimplifier* SimplificationQueue::getSimplifier(const ISimplificationTask& task)
