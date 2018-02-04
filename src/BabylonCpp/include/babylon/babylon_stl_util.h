@@ -225,6 +225,18 @@ inline vector_t<T*> to_raw_ptr_vector(const vector_t<unique_ptr_t<T>>& c)
   return result;
 }
 
+template <typename K, typename V>
+inline unordered_map_t<K, V*>
+to_raw_ptr_map(const unordered_map_t<K, unique_ptr_t<V>>& c)
+{
+  unordered_map_t<K, V*> result;
+  result.reserve(c.size());
+  for (const auto& ci : c) {
+    result[ci.first] = ci.second.get();
+  }
+  return result;
+}
+
 /**
  * The concat() method is used to join two or more arrays.
  * Note: This method does not change the existing arrays, but returns a new
