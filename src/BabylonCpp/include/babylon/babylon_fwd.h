@@ -212,7 +212,9 @@ class IGLVertexArrayObject;
 class ILoadingScreen;
 class IRenderableScene;
 // --- Layer ---
+class EffectLayer;
 class HighlightLayer;
+struct IEffectLayerOptions;
 struct IHighlightLayerExcludedMesh;
 struct IHighlightLayerMesh;
 struct IHighlightLayerOptions;

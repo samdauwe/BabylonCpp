@@ -77,6 +77,13 @@ public:
                 bool forceDepthStencil = false);
   bool isSupported() const;
   float aspectRatio() const;
+
+  /**
+   * @brief Get a value indicating if the post-process is ready to be used
+   * @returns true if the post-process is ready (shader is compiled)
+   */
+  bool isReady() const;
+
   Effect* apply();
   void _disposeTextures();
   virtual void dispose(Camera* camera = nullptr);

@@ -1043,7 +1043,7 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
 Mesh& Mesh::_processRendering(
   SubMesh* subMesh, Effect* effect, int fillMode, _InstancesBatch* batch,
   bool hardwareInstancedRendering,
-  ::std::function<void(bool isInstance, Matrix world,
+  ::std::function<void(bool isInstance, const Matrix& world,
                        Material* effectiveMaterial)>
     onBeforeDraw,
   Material* effectiveMaterial)

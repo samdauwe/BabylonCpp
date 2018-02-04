@@ -373,6 +373,11 @@ float PostProcess::aspectRatio() const
   return static_cast<float>(width) / static_cast<float>(height);
 }
 
+bool PostProcess::isReady() const
+{
+  return _effect && _effect->isReady();
+}
+
 Effect* PostProcess::apply()
 {
   // Check

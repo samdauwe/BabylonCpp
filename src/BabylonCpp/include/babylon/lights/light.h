@@ -86,7 +86,7 @@ public:
   static constexpr unsigned int LIGHTTYPEID_HEMISPHERICLIGHT = 3;
 
 public:
-  ~Light();
+  ~Light() override;
 
   virtual IReflect::Type type() const override;
   void addToScene(unique_ptr_t<Light>&& newLight);

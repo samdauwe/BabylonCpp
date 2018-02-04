@@ -27,7 +27,7 @@ public:
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     bool generateDepthBuffer = true, bool generateStencilBuffer = false,
     bool isMulti = false);
-  ~RenderTargetTexture();
+  ~RenderTargetTexture() override;
 
   void _onRatioRescale();
 

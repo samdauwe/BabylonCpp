@@ -502,13 +502,13 @@ public:
   Mesh& _renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
                              _InstancesBatch* batch, Effect* effect,
                              Engine* engine);
-  Mesh& _processRendering(SubMesh* subMesh, Effect* effect, int fillMode,
-                          _InstancesBatch* batch,
-                          bool hardwareInstancedRendering,
-                          ::std::function<void(bool isInstance, Matrix world,
-                                               Material* effectiveMaterial)>
-                            onBeforeDraw,
-                          Material* effectiveMaterial = nullptr);
+  Mesh&
+  _processRendering(SubMesh* subMesh, Effect* effect, int fillMode,
+                    _InstancesBatch* batch, bool hardwareInstancedRendering,
+                    ::std::function<void(bool isInstance, const Matrix& world,
+                                         Material* effectiveMaterial)>
+                      onBeforeDraw,
+                    Material* effectiveMaterial = nullptr);
 
   /**
    * @brief Triggers the draw call for the mesh.

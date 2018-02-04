@@ -1143,8 +1143,17 @@ public:
   bool spritesEnabled;
   vector_t<unique_ptr_t<SpriteManager>> spriteManagers;
   ::std::function<bool(Sprite* sprite)> spritePredicate;
-  // Layers
+
+  /**
+   * The list of layers (background and foreground) of the scene.
+   */
   vector_t<Layer*> layers;
+
+  /**
+   * The list of effect layers (highlights/glow) contained in the scene.
+   */
+  vector_t<unique_ptr_t<EffectLayer>> effectLayers;
+
   vector_t<unique_ptr_t<HighlightLayer>> highlightLayers;
   // Skeletons
   vector_t<unique_ptr_t<Skeleton>> skeletons;
