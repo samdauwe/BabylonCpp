@@ -127,6 +127,10 @@ using Uint16Array = ::std::vector<uint16_t>;
 using Int32Array = ::std::vector<int32_t>;
 // 32-bit unsigned integer
 using Uint32Array = ::std::vector<uint32_t>;
+// 64-bit twos complement signed integer
+using Int64Array = ::std::vector<int64_t>;
+// 64-bit unsigned integer
+using Uint64Array = ::std::vector<uint64_t>;
 // 32-bit IEEE floating point number
 using Float32Array = ::std::vector<float_t>;
 // 64-bit IEEE floating point number
