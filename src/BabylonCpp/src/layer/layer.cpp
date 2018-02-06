@@ -1,5 +1,6 @@
 #include <babylon/layer/layer.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/engine/engine.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
@@ -22,16 +23,21 @@ Layer::Layer(const string_t& name, const string_t& imgUrl, Scene* scene,
     , _onBeforeRenderObserver{nullptr}
     , _onAfterRenderObserver{nullptr}
     , _name{name}
-    , _scene{scene ? scene : Engine::LastCreatedScene()}
 {
   texture = !imgUrl.empty() ? Texture::New(imgUrl, scene, true) : nullptr;
 
+  _scene = scene ? scene : Engine::LastCreatedScene();
   _scene->layers.emplace_back(this);
 
-  Engine* engine = scene->getEngine();
+  auto engine = scene->getEngine();
 
   // VBO
-  Float32Array vertices{1.f, 1.f, -1.f, 1.f, -1.f, -1.f, 1.f, -1.f};
+  Float32Array vertices{
+    1.f,  1.f,  //
+    -1.f, 1.f,  //
+    -1.f, -1.f, //
+    1.f,  -1.f  //
+  };
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
     = ::std::make_unique<VertexBuffer>(
@@ -45,6 +51,7 @@ Layer::Layer(const string_t& name, const string_t& imgUrl, Scene* scene,
     options.attributes    = {VertexBuffer::PositionKindChars};
     options.uniformsNames = {"textureMatrix", "color", "scale", "offset"};
     options.samplers      = {"textureSampler"};
+    options.defines       = "";
 
     _effect = engine->createEffect("layer", options, _scene->getEngine());
   }
@@ -98,7 +105,14 @@ void Layer::_createIndexBuffer()
   auto engine = _scene->getEngine();
 
   // Indices
-  Uint32Array indices{0, 1, 2, 0, 2, 3};
+  Uint32Array indices{
+    0, //
+    1, //
+    2, //
+    0, //
+    2, //
+    3  //
+  };
   _indexBuffer = engine->createIndexBuffer(indices);
 }
 
@@ -142,11 +156,8 @@ void Layer::render()
   currentEffect->setVector2("scale", scale);
 
   // VBOs
-  unordered_map_t<string_t, VertexBuffer*> vertexBuffersTmp;
-  for (auto& item : _vertexBuffers) {
-    vertexBuffersTmp[item.first] = item.second.get();
-  }
-  engine->bindBuffers(vertexBuffersTmp, _indexBuffer.get(), currentEffect);
+  engine->bindBuffers(stl_util::to_raw_ptr_map(_vertexBuffers),
+                      _indexBuffer.get(), currentEffect);
 
   // Draw order
   if (!_alphaTestEffect) {
@@ -163,15 +174,17 @@ void Layer::render()
 
 void Layer::dispose(bool /*doNotRecurse*/)
 {
-  auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKindChars];
-  if (vertexBuffer) {
-    vertexBuffer->dispose();
-    _vertexBuffers.erase(VertexBuffer::PositionKindChars);
+  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)) {
+    auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKindChars];
+    if (vertexBuffer) {
+      vertexBuffer->dispose();
+      _vertexBuffers.erase(VertexBuffer::PositionKindChars);
+    }
   }
 
   if (_indexBuffer) {
     _scene->getEngine()->_releaseBuffer(_indexBuffer.get());
-    _indexBuffer.reset(nullptr);
+    _indexBuffer = nullptr;
   }
 
   if (texture) {

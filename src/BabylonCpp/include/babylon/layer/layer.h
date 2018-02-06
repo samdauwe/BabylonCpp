@@ -53,7 +53,7 @@ public:
   Color4 color;
   Vector2 scale;
   Vector2 offset;
-  int alphaBlendingMode;
+  unsigned int alphaBlendingMode;
   bool alphaTest;
   unsigned int layerMask;
 
