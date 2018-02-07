@@ -146,6 +146,14 @@ public:
   }
 }; // end of struct variant
 
+template <typename T1, typename T2, typename T>
+Variant<T1, T2> ToVariant(const T& value)
+{
+  Variant<T1, T2> variant;
+  variant.template set<T>(value);
+  return variant;
+}
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_CORE_VARIANT_H
