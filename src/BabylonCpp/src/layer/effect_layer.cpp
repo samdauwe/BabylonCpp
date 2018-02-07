@@ -121,7 +121,7 @@ void EffectLayer::_setMainTextureSize()
 
 void EffectLayer::_createMainTexture()
 {
-  _mainTexture = new RenderTargetTexture(
+  _mainTexture = ::std::make_unique<RenderTargetTexture>(
     "HighlightLayerMainRTT",
     ISize{_mainTextureDesiredSize.width, _mainTextureDesiredSize.height},
     _scene, false, true, EngineConstants::TEXTURETYPE_UNSIGNED_INT);

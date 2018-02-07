@@ -2,6 +2,7 @@
 #define BABYLON_LAYER_IHIGHLIGHT_LAYER_OPTIONS_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/nullable.h>
 #include <babylon/engine/engine_constants.h>
 
 namespace BABYLON {
@@ -22,7 +23,7 @@ struct BABYLON_SHARED_EXPORT IHighlightLayerOptions {
   /**
    * Enforces a fixed size texture to ensure resize independant blur.
    */
-  int mainTextureFixedSize;
+  Nullable<int> mainTextureFixedSize = nullptr;
 
   /**
    * Multiplication factor apply to the main texture size in the first step of
@@ -44,12 +45,17 @@ struct BABYLON_SHARED_EXPORT IHighlightLayerOptions {
   /**
    * Alpha blending mode used to apply the blur. Default is combine.
    */
-  int alphaBlendingMode = EngineConstants::ALPHA_COMBINE;
+  unsigned int alphaBlendingMode = EngineConstants::ALPHA_COMBINE;
 
   /**
    * The camera attached to the layer.
    */
   Camera* camera = nullptr;
+
+  /**
+   * Should we display highlight as a solid stroke?
+   */
+  Nullable<bool> isStroke = nullptr;
 
 }; // end of struct IHighlightLayerOptions
 

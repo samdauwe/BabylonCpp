@@ -2,6 +2,7 @@
 #define BABYLON_LAYER_HIGHLIGHT_LAYER_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/layer/effect_layer.h>
 #include <babylon/layer/ihighlight_layer_excluded_mesh.h>
 #include <babylon/layer/ihighlight_layer_mesh.h>
 #include <babylon/layer/ihighlight_layer_options.h>
@@ -20,29 +21,34 @@ namespace BABYLON {
  *
  * !!! THIS REQUIRES AN ACTIVE STENCIL BUFFER ON THE CANVAS !!!
  */
-class BABYLON_SHARED_EXPORT HighlightLayer {
+class BABYLON_SHARED_EXPORT HighlightLayer : public EffectLayer {
 
 public:
+  /**
+   * Effect Name of the highlight layer.
+   */
+  static constexpr const char* EffectName = "HighlightLayer";
+
   /**
    * The neutral color used during the preparation of the glow effect.
    * This is black by default as the blend operation is a blend operation.
    */
-  static Color4 neutralColor;
+  static Color4 NeutralColor;
 
   /**
    * Stencil value used for glowing meshes.
    */
-  static int glowingMeshStencilReference;
+  static int GlowingMeshStencilReference;
 
   /**
    * Stencil value used for the other meshes in the scene.
    */
-  static int normalMeshStencilReference;
+  static int NormalMeshStencilReference;
 
 public:
   template <typename... Ts>
   static HighlightLayer* New(Ts&&... args);
-  ~HighlightLayer();
+  ~HighlightLayer() override;
 
   /**
    * @brief Specifies the horizontal size of the blur.
@@ -65,22 +71,33 @@ public:
   float blurVerticalSize() const;
 
   /**
-   * @brief Gets the camera attached to the layer.
+   * @brief Get the effect name of the layer.
+   * @return The effect name
    */
-  Camera* camera() const;
+  string_t getEffectName() const override;
 
   /**
-   * @brief Gets the render target texture.
+   * @brief Returns wether or nood the layer needs stencil enabled during the
+   * mesh rendering.
    */
-  RenderTargetTexture* mainTexture() const;
-
-  void _rebuild();
+  bool needStencil() const override;
 
   /**
-   * @brief Renders the glowing part of the scene by blending the blurred
-   * glowing meshes on top of the rendered scene.
+   * @brief Checks for the readiness of the element composing the layer.
+   * @param subMesh the mesh to check for
+   * @param useInstances specify wether or not to use instances to render the
+   * mesh
+   * @param emissiveTexture the associated emissive texture used to generate the
+   * glow
+   * @return true if ready otherwise, false
    */
-  void render();
+  bool isReady(SubMesh* subMesh, bool useInstances) override;
+
+  /**
+   * @brief Returns true if the layer contains information to display, otherwise
+   * false.
+   */
+  bool shouldRender() const override;
 
   /**
    * @brief Add a mesh in the exclusion list to prevent it to impact or being
@@ -95,6 +112,14 @@ public:
    * @param mesh The mesh to highlight
    */
   void removeExcludedMesh(Mesh* mesh);
+
+  /**
+   * @brief Determine if a given mesh will be highlighted by the current
+   * HighlightLayer
+   * @param mesh mesh to test
+   * @returns true if the mesh will be highlighted by the current HighlightLayer
+   */
+  bool hasMesh(AbstractMesh* mesh) const override;
 
   /**
    * @brief Add a mesh in the highlight layer in order to make it glow with the
@@ -113,10 +138,11 @@ public:
   void removeMesh(Mesh* mesh);
 
   /**
-   * @brief Returns true if the layer contains information to display, otherwise
-   * false.
+   * Free any resources and references associated to a mesh.
+   * Internal use
+   * @param mesh The mesh to free.
    */
-  bool shouldRender() const;
+  void _disposeMesh(Mesh* mesh) override;
 
   /**
    * @brief Dispose the highlight layer and free resources.
@@ -135,8 +161,11 @@ protected:
   HighlightLayer(const string_t& name, Scene* scene,
                  const IHighlightLayerOptions& options);
 
-private:
-  void _createIndexBuffer();
+  /**
+   * @brief Create the merge effect. This is the shader use to blit the
+   * information back to the main canvas at the end of the scene rendering.
+   */
+  Effect* _createMergeEffect() override;
 
   /**
    * @brief Creates the render target textures and post processes used in the
@@ -145,81 +174,34 @@ private:
   void createTextureAndPostProcesses();
 
   /**
-   * @brief Custom render function.
+   * @brief Implementation specific of rendering the generating effect on the
+   * main canvas.
+   * @param effect The effect used to render through
    */
-  void renderSubMesh(SubMesh* subMesh);
+  void _internalRender(Effect* effect) override;
 
   /**
-   * @brief Checks for the readiness of the element composing the layer.
-   * @param subMesh the mesh to check for
-   * @param useInstances specify wether or not to use instances to render the
-   * mesh
-   * @param emissiveTexture the associated emissive texture used to generate the
-   * glow
-   * @return true if ready otherwise, false
+   * @brief Returns true if the mesh should render, otherwise false.
+   * @param mesh The mesh to render
+   * @returns true if it should render otherwise false
    */
-  bool isReady(SubMesh* subMesh, bool useInstances,
-               BaseTexture* emissiveTexture);
+  bool _shouldRenderMesh(Mesh* mesh) const override;
 
   /**
-   * @brief Sets the main texture desired size which is the closest power of two
-   * of the engine canvas size.
+   * @brief Sets the required values for both the emissive texture and and the
+   * main color.
    */
-  void setMainTextureSize();
+  void _setEmissiveTextureAndColor(Mesh* mesh, SubMesh* subMesh,
+                                   Material* material) override;
 
+private:
   /**
    * @brief Force the stencil to the normal expected value for none glowing
    * parts
    */
-  void defaultStencilReference(Mesh* mesh);
-
-  /**
-   * @brief Dispose only the render target textures and post process.
-   */
-  void disposeTextureAndPostProcesses();
+  void _defaultStencilReference(Mesh* mesh);
 
 public:
-  /**
-   * An event triggered when the highlight layer has been disposed.
-   */
-  Observable<HighlightLayer> onDisposeObservable;
-
-  /**
-   * An event triggered when the highlight layer is about rendering the main
-   * texture with the glowy parts.
-   */
-  Observable<HighlightLayer> onBeforeRenderMainTextureObservable;
-
-  /**
-   * An event triggered when the highlight layer is being blurred.
-   */
-  Observable<HighlightLayer> onBeforeBlurObservable;
-
-  /**
-   * An event triggered when the highlight layer has been blurred.
-   */
-  Observable<HighlightLayer> onAfterBlurObservable;
-
-  /**
-   * An event triggered when the glowing blurred texture is being merged in the
-   * scene.
-   */
-  Observable<HighlightLayer> onBeforeComposeObservable;
-
-  /**
-   * An event triggered when the glowing blurred texture has been merged in the
-   * scene.
-   */
-  Observable<HighlightLayer> onAfterComposeObservable;
-
-  /**
-   * An event triggered when the highlight layer changes its size.
-   */
-  Observable<HighlightLayer> onSizeChangedObservable;
-
-public:
-  string_t name;
-
   /**
    * Specifies whether or not the inner glow is ACTIVE in the layer.
    */
@@ -231,30 +213,24 @@ public:
   bool outerGlow;
 
   /**
-   * Specifies wether the highlight layer is enabled or not.
+   * An event triggered when the highlight layer is being blurred.
    */
-  bool isEnabled;
+  Observable<HighlightLayer> onBeforeBlurObservable;
+
+  /**
+   * An event triggered when the highlight layer has been blurred.
+   */
+  Observable<HighlightLayer> onAfterBlurObservable;
 
 private:
-  Scene* _scene;
-  Engine* _engine;
   IHighlightLayerOptions _options;
-  unordered_map_t<string_t, unique_ptr_t<VertexBuffer>> _vertexBuffers;
-  unique_ptr_t<GL::IGLBuffer> _indexBuffer;
+  unsigned int _instanceGlowingMeshStencilReference;
   unique_ptr_t<PassPostProcess> _downSamplePostprocess;
   unique_ptr_t<GlowBlurPostProcess> _horizontalBlurPostprocess;
   unique_ptr_t<GlowBlurPostProcess> _verticalBlurPostprocess;
-  string_t _cachedDefines;
-  Effect* _glowMapGenerationEffect;
-  Effect* _glowMapMergeEffect;
   unique_ptr_t<RenderTargetTexture> _blurTexture;
-  unique_ptr_t<RenderTargetTexture> _mainTexture;
-  ISize _mainTextureDesiredSize;
-  unordered_map_t<unsigned int, IHighlightLayerMesh> _meshes;
-  int _maxSize;
-  bool _shouldRender;
-  int _instanceGlowingMeshStencilReference;
-  unordered_map_t<unsigned int, IHighlightLayerExcludedMesh> _excludedMeshes;
+  unordered_map_t<size_t, IHighlightLayerMesh> _meshes;
+  unordered_map_t<size_t, IHighlightLayerExcludedMesh> _excludedMeshes;
 
 }; // end of struct HighlightLayer
 

@@ -56,7 +56,7 @@ public:
    * @returns true if the effect requires stencil during the main canvas render
    * pass.
    */
-  virtual bool needStencil() = 0;
+  virtual bool needStencil() const = 0;
 
   /**
    * @brief Free any resources and references associated to a mesh.
@@ -247,7 +247,7 @@ protected:
   Engine* _engine;
   int _maxSize;
   ISize _mainTextureDesiredSize;
-  RenderTargetTexture* _mainTexture;
+  unique_ptr_t<RenderTargetTexture> _mainTexture;
   bool _shouldRender;
   vector_t<PostProcess*> _postProcesses;
   vector_t<BaseTexture*> _textures;
