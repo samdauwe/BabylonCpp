@@ -213,8 +213,10 @@ class ILoadingScreen;
 class IRenderableScene;
 // --- Layer ---
 class EffectLayer;
+class GlowLayer;
 class HighlightLayer;
 struct IEffectLayerOptions;
+struct IGlowLayerOptions;
 struct IHighlightLayerExcludedMesh;
 struct IHighlightLayerMesh;
 struct IHighlightLayerOptions;
