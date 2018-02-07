@@ -251,6 +251,8 @@ public:
                        int instancesCount = 0);
   void drawUnIndexed(bool useTriangles, int verticesStart, int verticesCount,
                      int instancesCount = 0);
+  void drawElementsType(unsigned int fillMode, int verticesStart,
+                        int verticesCount, int instancesCount = 0);
 
   /** Shaders **/
   void _releaseEffect(Effect* effect);

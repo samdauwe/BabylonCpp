@@ -4,6 +4,7 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
 #include <babylon/core/structs.h>
+#include <babylon/core/variant.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/postprocess/blur_post_process.h>
@@ -148,7 +149,8 @@ void MirrorTexture::_preparePostProcesses()
                          EngineConstants::TEXTURETYPE_HALF_FLOAT;
 
     _blurX = ::std::make_unique<BlurPostProcess>(
-      "horizontal blur", Vector2(1.f, 0.f), _blurKernelX, _blurRatio, nullptr,
+      "horizontal blur", Vector2(1.f, 0.f), _blurKernelX,
+      ToVariant<float, PostProcessOptions>(_blurRatio), nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, engine, false, textureType);
     _blurX->autoClear = false;
 
@@ -160,7 +162,8 @@ void MirrorTexture::_preparePostProcesses()
     }
 
     _blurY = ::std::make_unique<BlurPostProcess>(
-      "vertical blur", Vector2(0.f, 1.f), _blurKernelY, _blurRatio, nullptr,
+      "vertical blur", Vector2(0.f, 1.f), _blurKernelY,
+      ToVariant<float, PostProcessOptions>(_blurRatio), nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, engine, false, textureType);
     _blurY->autoClear      = false;
     _blurY->alwaysForcePOT = _blurRatio != 1.f;
@@ -199,7 +202,7 @@ unique_ptr_t<MirrorTexture> MirrorTexture::clone() const
     _renderTargetOptions.type,                   //
     _renderTargetOptions.samplingMode,           //
     _renderTargetOptions.generateDepthBuffer     //
-    );
+  );
 
   // Base texture
   newTexture->setHasAlpha(hasAlpha());

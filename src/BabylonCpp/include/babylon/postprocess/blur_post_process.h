@@ -2,6 +2,7 @@
 #define BABYLON_POSTPROCESS_BLUR_POST_PROCESS_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/variant.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/math/vector2.h>
 #include <babylon/postprocess/post_process.h>
@@ -15,12 +16,14 @@ class BABYLON_SHARED_EXPORT BlurPostProcess : public PostProcess {
 
 public:
   BlurPostProcess(const string_t& name, const Vector2& direction, float kernel,
-                  float ratio, Camera* camera,
+                  const Variant<float, PostProcessOptions>& options,
+                  Camera* camera,
                   unsigned int samplingMode
                   = TextureConstants::BILINEAR_SAMPLINGMODE,
                   Engine* engine = nullptr, bool reusable = false,
                   unsigned int textureType
-                  = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+                  = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+                  const string_t& defines = "");
   ~BlurPostProcess();
 
   /**
@@ -84,6 +87,9 @@ protected:
   float _kernel;
   float _idealKernel;
   bool _packedFloat;
+
+private:
+  string_t _staticDefines;
 
 }; // end of class BlurPostProcess
 

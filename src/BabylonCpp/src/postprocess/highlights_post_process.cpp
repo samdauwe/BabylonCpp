@@ -1,5 +1,7 @@
 #include <babylon/postprocess/highlights_post_process.h>
 
+#include <babylon/core/variant.h>
+
 namespace BABYLON {
 
 HighlightsPostProcess::HighlightsPostProcess(const string_t& iName, float ratio,
@@ -7,9 +9,17 @@ HighlightsPostProcess::HighlightsPostProcess(const string_t& iName, float ratio,
                                              unsigned int samplingMode,
                                              Engine* engine, bool reusable,
                                              unsigned int textureType)
-    : PostProcess{iName,    "highlights", {},           {},
-                  ratio,    camera,       samplingMode, engine,
-                  reusable, nullptr,      textureType}
+    : PostProcess{iName,
+                  "highlights",
+                  {},
+                  {},
+                  ToVariant<float, PostProcessOptions>(ratio),
+                  camera,
+                  samplingMode,
+                  engine,
+                  reusable,
+                  nullptr,
+                  textureType}
 {
 }
 

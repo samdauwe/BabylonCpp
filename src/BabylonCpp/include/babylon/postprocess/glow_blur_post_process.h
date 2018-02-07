@@ -15,12 +15,8 @@ class BABYLON_SHARED_EXPORT GlowBlurPostProcess : public PostProcess {
 
 public:
   GlowBlurPostProcess(const string_t& name, const Vector2& direction,
-                      float kernel, float options, Camera* camera,
-                      unsigned int samplingMode
-                      = TextureConstants::BILINEAR_SAMPLINGMODE,
-                      Engine* engine = nullptr, bool reusable = false);
-  GlowBlurPostProcess(const string_t& name, const Vector2& direction,
-                      float kernel, const PostProcessOptions& options,
+                      float kernel,
+                      const Variant<float, PostProcessOptions>& options,
                       Camera* camera,
                       unsigned int samplingMode
                       = TextureConstants::BILINEAR_SAMPLINGMODE,

@@ -1627,6 +1627,11 @@ void Engine::drawUnIndexed(bool useTriangles, int verticesStart,
                   static_cast<int>(verticesCount));
 }
 
+void Engine::drawElementsType(unsigned int /*fillMode*/, int /*verticesStart*/,
+                              int /*verticesCount*/, int /*instancesCount*/)
+{
+}
+
 // Shaders
 void Engine::_releaseEffect(Effect* effect)
 {

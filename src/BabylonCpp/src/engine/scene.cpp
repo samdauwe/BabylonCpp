@@ -2725,12 +2725,12 @@ void Scene::_renderForCamera(Camera* camera)
 
         renderhighlights = true;
 
-        auto renderTarget = highlightLayer->mainTexture();
+        /*auto renderTarget = highlightLayer->mainTexture();
         if (renderTarget->_shouldRender()) {
           ++_renderId;
           renderTarget->render(false, false);
           needsRestoreFrameBuffer = true;
-        }
+        }*/
       }
     }
 

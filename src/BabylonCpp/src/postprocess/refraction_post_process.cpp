@@ -1,6 +1,7 @@
 #include <babylon/postprocess/refraction_post_process.h>
 
 #include <babylon/cameras/camera.h>
+#include <babylon/core/variant.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/texture.h>
 
@@ -14,7 +15,7 @@ RefractionPostProcess::RefractionPostProcess(
                   "refraction",
                   {"baseColor", "depth", "colorLevel"},
                   {"refractionSampler"},
-                  ratio,
+                  ToVariant<float, PostProcessOptions>(ratio),
                   camera,
                   samplingMode,
                   engine,
@@ -25,8 +26,9 @@ RefractionPostProcess::RefractionPostProcess(
     , _refRexture{nullptr}
 {
   onActivateObservable.add([&](Camera* cam, EventState&) {
-    _refRexture = _refRexture ? _refRexture : Texture::New(refractionTextureUrl,
-                                                           cam->getScene());
+    _refRexture = _refRexture ?
+                    _refRexture :
+                    Texture::New(refractionTextureUrl, cam->getScene());
   });
 
   onApplyObservable.add([&](Effect* effect, EventState&) {

@@ -3,6 +3,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/random.h>
+#include <babylon/core/variant.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas.h>
@@ -198,8 +199,8 @@ void LensRenderingPipeline::_createChromaticAberrationPostProcess(float ratio)
     "LensChromaticAberration", "chromaticAberration",
     {"chromatic_aberration", "screen_width", "screen_height"}, // uniforms
     {},                                                        // samplers
-    ratio, nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE,
-    _scene->getEngine(), false);
+    ToVariant<float, PostProcessOptions>(ratio), nullptr,
+    TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
 
   _chromaticAberrationPostProcess->setOnApply([&](Effect* effect, EventState&) {
     effect->setFloat("chromatic_aberration", _chromaticAberration);
@@ -217,8 +218,9 @@ void LensRenderingPipeline::_createHighlightsPostProcess(float ratio)
     "LensHighlights", "lensHighlights",
     {"gain", "threshold", "screen_width", "screen_height"}, // uniforms
     {},                                                     // samplers
-    ratio, nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE,
-    _scene->getEngine(), false, _dofPentagon ? "#define PENTAGON\n" : "");
+    ToVariant<float, PostProcessOptions>(ratio), nullptr,
+    TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
+    _dofPentagon ? "#define PENTAGON\n" : "");
 
   _highlightsPostProcess->setOnApply([&](Effect* effect, EventState&) {
     effect->setFloat("gain", _highlightsGain);
@@ -240,7 +242,8 @@ void LensRenderingPipeline::_createDepthOfFieldPostProcess(float ratio)
     {"grain_amount", "blur_noise", "screen_width", "screen_height",
      "distortion", "dof_enabled", "screen_distance", "aperture", "darken",
      "edge_blur", "highlights", "near", "far"},
-    {"depthSampler", "grainSampler", "highlightsSampler"}, ratio, nullptr,
+    {"depthSampler", "grainSampler", "highlightsSampler"},
+    ToVariant<float, PostProcessOptions>(ratio), nullptr,
     TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
 
   _depthOfFieldPostProcess->setOnApply([&](Effect* effect, EventState&) {

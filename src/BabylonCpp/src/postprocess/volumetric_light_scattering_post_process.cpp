@@ -4,6 +4,7 @@
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/string.h>
+#include <babylon/core/variant.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/bounding_sphere.h>
 #include <babylon/engine/engine.h>
@@ -26,8 +27,9 @@ VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
     : PostProcess(
         iName, "volumetricLightScattering",
         {"decay", "exposure", "weight", "meshPositionOnScreen", "density"},
-        {"lightScatteringSampler"}, ratio, camera, samplingMode, engine,
-        reusable, "#define NUM_SAMPLES " + ::std::to_string(samples))
+        {"lightScatteringSampler"}, ToVariant<float, PostProcessOptions>(ratio),
+        camera, samplingMode, engine, reusable,
+        "#define NUM_SAMPLES " + ::std::to_string(samples))
     , attachedNode{nullptr}
     , customMeshPosition{Vector3::Zero()}
     , useCustomMeshPosition{false}

@@ -7,16 +7,16 @@
 
 namespace BABYLON {
 
-BlurPostProcess::BlurPostProcess(const string_t& iName,
-                                 const Vector2& direction, float kernel,
-                                 float ratio, Camera* camera,
-                                 unsigned int samplingMode, Engine* engine,
-                                 bool reusable, unsigned int textureType)
+BlurPostProcess::BlurPostProcess(
+  const string_t& iName, const Vector2& direction, float kernel,
+  const Variant<float, PostProcessOptions>& options, Camera* camera,
+  unsigned int samplingMode, Engine* engine, bool reusable,
+  unsigned int textureType, const string_t& defines)
     : PostProcess{iName,
                   "kernelBlur",
-                  {"delta", "direction"},
-                  {},
-                  ratio,
+                  {"delta", "direction", "cameraMinMaxZ"},
+                  {"circleOfConfusionSampler"},
+                  options,
                   camera,
                   samplingMode,
                   engine,
@@ -27,6 +27,7 @@ BlurPostProcess::BlurPostProcess(const string_t& iName,
                   {{"varyingCount", 0}, {"depCount", 0}},
                   true}
     , _packedFloat{false}
+    , _staticDefines{defines}
 {
   setKernel(kernel);
 

@@ -3,6 +3,7 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/random.h>
+#include <babylon/core/variant.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas_rendering_context2D.h>
@@ -181,9 +182,9 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio,
   }
 
   _blurHPostProcess = new PostProcess(
-    "BlurH", "ssao", {"outSize", "samplerOffsets"}, {"depthSampler"}, ssaoRatio,
-    nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(),
-    false,
+    "BlurH", "ssao", {"outSize", "samplerOffsets"}, {"depthSampler"},
+    ToVariant<float, PostProcessOptions>(ssaoRatio), nullptr,
+    TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
     "#define BILATERAL_BLUR\n#define BILATERAL_BLUR_H\n#define SAMPLES 16");
   _blurHPostProcess->setOnApply([&](Effect* effect, EventState&) {
     if (!_scene->activeCamera) {
@@ -204,9 +205,10 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio,
   });
 
   _blurVPostProcess = new PostProcess(
-    "BlurV", "ssao", {"outSize", "samplerOffsets"}, {"depthSampler"}, blurRatio,
-    nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(),
-    false, "#define BILATERAL_BLUR\n#define SAMPLES 16");
+    "BlurV", "ssao", {"outSize", "samplerOffsets"}, {"depthSampler"},
+    ToVariant<float, PostProcessOptions>(blurRatio), nullptr,
+    TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
+    "#define BILATERAL_BLUR\n#define SAMPLES 16");
   _blurVPostProcess->setOnApply([&](Effect* effect, EventState&) {
     if (!_scene->activeCamera) {
       return;
@@ -269,7 +271,8 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
     {"sampleSphere", "samplesFactor", "randTextureTiles", "totalStrength",
      "radius", "base", "range", "projection", "near", "far", "texelSize",
      "xViewport", "yViewport", "maxZ", "minZAspect"},
-    {"randomSampler", "normalSampler"}, ratio, nullptr,
+    {"randomSampler", "normalSampler"},
+    ToVariant<float, PostProcessOptions>(ratio), nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
     "#define SAMPLES " + ::std::to_string(numSamples) + "\n#define SSAO");
 
@@ -309,7 +312,8 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
 void SSAO2RenderingPipeline::_createSSAOCombinePostProcess(float ratio)
 {
   _ssaoCombinePostProcess = new PostProcess(
-    "ssaoCombine", "ssaoCombine", {}, {"originalColor"}, ratio, nullptr,
+    "ssaoCombine", "ssaoCombine", {}, {"originalColor"},
+    ToVariant<float, PostProcessOptions>(ratio), nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
 
   _ssaoCombinePostProcess->setOnApply([&](Effect* effect, EventState&) {

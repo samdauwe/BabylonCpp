@@ -4,6 +4,7 @@
 #include <babylon/babylon_global.h>
 #include <babylon/core/nullable.h>
 #include <babylon/core/structs.h>
+#include <babylon/core/variant.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/math/color4.h>
@@ -21,18 +22,7 @@ public:
   PostProcess(
     const string_t& name, const string_t& fragmentUrl,
     const vector_t<string_t>& parameters, const vector_t<string_t>& samplers,
-    float renderRatio, Camera* camera,
-    unsigned int samplingMode = TextureConstants::NEAREST_SAMPLINGMODE,
-    Engine* engine = nullptr, bool reusable = false,
-    const string_t& defines   = "",
-    unsigned int textureType  = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
-    const string_t& vertexUrl = "postprocess",
-    const unordered_map_t<string_t, unsigned int>& indexParameters = {},
-    bool blockCompilation                                          = false);
-  PostProcess(
-    const string_t& name, const string_t& fragmentUrl,
-    const vector_t<string_t>& parameters, const vector_t<string_t>& samplers,
-    const PostProcessOptions& options, Camera* camera,
+    const Variant<float, PostProcessOptions>& options, Camera* camera,
     unsigned int samplingMode = TextureConstants::NEAREST_SAMPLINGMODE,
     Engine* engine = nullptr, bool reusable = false,
     const string_t& defines   = "",
@@ -137,7 +127,7 @@ private:
   Scene* _scene;
   Engine* _engine;
   float _renderRatio;
-  PostProcessOptions _options;
+  Variant<float, PostProcessOptions> _options;
   bool _reusable;
   unsigned int _textureType;
   Effect* _effect;

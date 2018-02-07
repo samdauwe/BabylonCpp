@@ -16,24 +16,9 @@ namespace BABYLON {
 PostProcess::PostProcess(
   const string_t& iName, const string_t& fragmentUrl,
   const vector_t<string_t>& parameters, const vector_t<string_t>& samplers,
-  float renderRatio, Camera* camera, unsigned int samplingMode, Engine* engine,
-  bool reusable, const string_t& defines, unsigned int textureType,
-  const string_t& vertexUrl,
-  const unordered_map_t<string_t, unsigned int>& indexParameters,
-  bool blockCompilation)
-    : PostProcess(iName, fragmentUrl, parameters, samplers, {-1, -1}, camera,
-                  samplingMode, engine, reusable, defines, textureType,
-                  vertexUrl, indexParameters, blockCompilation)
-{
-  _renderRatio = renderRatio;
-}
-
-PostProcess::PostProcess(
-  const string_t& iName, const string_t& fragmentUrl,
-  const vector_t<string_t>& parameters, const vector_t<string_t>& samplers,
-  const PostProcessOptions& options, Camera* camera, unsigned int samplingMode,
-  Engine* engine, bool reusable, const string_t& defines,
-  unsigned int textureType, const string_t& vertexUrl,
+  const Variant<float, PostProcessOptions>& options, Camera* camera,
+  unsigned int samplingMode, Engine* engine, bool reusable,
+  const string_t& defines, unsigned int textureType, const string_t& vertexUrl,
   const unordered_map_t<string_t, unsigned int>& indexParameters,
   bool blockCompilation)
     : name{iName}
@@ -242,8 +227,12 @@ void PostProcess::activate(Camera* camera, InternalTexture* sourceTexture,
                                        _engine->getRenderingCanvas()->height)
     * _renderRatio);
 
-  int desiredWidth  = _options.width == -1 ? requiredWidth : _options.width;
-  int desiredHeight = _options.height == -1 ? requiredHeight : _options.height;
+  int desiredWidth = _options.is<PostProcessOptions>() ?
+                       _options.get<PostProcessOptions>().width :
+                       requiredWidth;
+  int desiredHeight = _options.is<PostProcessOptions>() ?
+                        _options.get<PostProcessOptions>().height :
+                        requiredHeight;
 
   if (!_shareOutputWithPostProcess && !_forcedOutputTexture) {
 
@@ -258,14 +247,14 @@ void PostProcess::activate(Camera* camera, InternalTexture* sourceTexture,
 
     if (renderTargetSamplingMode != TextureConstants::TRILINEAR_SAMPLINGMODE
         || alwaysForcePOT) {
-      if (_options.width <= 0) {
+      if (!_options.is<PostProcessOptions>()) {
         desiredWidth
           = engine->needPOTTextures() ?
               Tools::GetExponentOfTwo(desiredWidth, maxSize, scaleMode) :
               desiredWidth;
       }
 
-      if (_options.height <= 0) {
+      if (!_options.is<PostProcessOptions>()) {
         desiredHeight
           = engine->needPOTTextures() ?
               Tools::GetExponentOfTwo(desiredHeight, maxSize, scaleMode) :
@@ -392,7 +381,7 @@ Effect* PostProcess::apply()
   _engine->setDepthWrite(false);
 
   // Alpha
-  _engine->setAlphaMode(static_cast<int>(alphaMode));
+  _engine->setAlphaMode(alphaMode);
   if (alphaConstants) {
     const auto& _alphaConstants = *alphaConstants;
     getEngine()->setAlphaConstants(_alphaConstants.r, _alphaConstants.g,

@@ -6,6 +6,7 @@
 #include <babylon/core/json.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
+#include <babylon/core/variant.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/lights/ishadow_light.h>
@@ -488,9 +489,9 @@ void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
 
   if (useKernelBlur()) {
     _kernelBlurXPostprocess = ::std::make_unique<BlurPostProcess>(
-      _light->name + "KernelBlurX", Vector2(1.f, 0.f), blurKernel(), 1.f,
-      nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, engine, false,
-      _textureType);
+      _light->name + "KernelBlurX", Vector2(1.f, 0.f), blurKernel(),
+      ToVariant<float, PostProcessOptions>(1.f), nullptr,
+      TextureConstants::BILINEAR_SAMPLINGMODE, engine, false, _textureType);
     _kernelBlurXPostprocess->width  = targetSize;
     _kernelBlurXPostprocess->height = targetSize;
     _kernelBlurXPostprocess->onApplyObservable.add(
@@ -499,9 +500,9 @@ void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
       });
 
     _kernelBlurYPostprocess = ::std::make_unique<BlurPostProcess>(
-      _light->name + "KernelBlurY", Vector2(0.f, 1.f), blurKernel(), 1.f,
-      nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, engine, false,
-      _textureType);
+      _light->name + "KernelBlurY", Vector2(0.f, 1.f), blurKernel(),
+      ToVariant<float, PostProcessOptions>(1.f), nullptr,
+      TextureConstants::BILINEAR_SAMPLINGMODE, engine, false, _textureType);
 
     _kernelBlurXPostprocess->autoClear = false;
     _kernelBlurYPostprocess->autoClear = false;

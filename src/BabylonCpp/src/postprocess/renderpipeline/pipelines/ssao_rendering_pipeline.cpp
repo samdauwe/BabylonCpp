@@ -1,6 +1,7 @@
 #include <babylon/postprocess/renderpipeline/pipelines/ssao_rendering_pipeline.h>
 
 #include <babylon/core/random.h>
+#include <babylon/core/variant.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas_rendering_context2D.h>
@@ -109,11 +110,13 @@ void SSAORenderingPipeline::_createBlurPostProcess(float ratio)
   auto size = 16;
 
   _blurHPostProcess = new BlurPostProcess(
-    "BlurH", Vector2(1.f, 0.f), size, ratio, nullptr,
+    "BlurH", Vector2(1.f, 0.f), size,
+    ToVariant<float, PostProcessOptions>(ratio), nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
     EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   _blurVPostProcess = new BlurPostProcess(
-    "BlurV", Vector2(0.f, 1.f), size, ratio, nullptr,
+    "BlurV", Vector2(0.f, 1.f), size,
+    ToVariant<float, PostProcessOptions>(ratio), nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
     EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
@@ -153,8 +156,8 @@ void SSAORenderingPipeline::_createSSAOPostProcess(float ratio)
     "ssao", "ssao",
     {"sampleSphere", "samplesFactor", "randTextureTiles", "totalStrength",
      "radius", "area", "fallOff", "base", "range", "viewport"},
-    {"randomSampler"}, ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
-    _scene->getEngine(), false,
+    {"randomSampler"}, ToVariant<float, PostProcessOptions>(ratio), nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
     "#define SAMPLES " + ::std::to_string(numSamples) + "\n#define SSAO");
 
   _ssaoPostProcess->setOnApply([&](Effect* effect, EventState&) {
@@ -178,7 +181,8 @@ void SSAORenderingPipeline::_createSSAOPostProcess(float ratio)
 void SSAORenderingPipeline::_createSSAOCombinePostProcess(float ratio)
 {
   _ssaoCombinePostProcess = new PostProcess(
-    "ssaoCombine", "ssaoCombine", {}, {"originalColor"}, ratio, nullptr,
+    "ssaoCombine", "ssaoCombine", {}, {"originalColor"},
+    ToVariant<float, PostProcessOptions>(ratio), nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
 
   _ssaoCombinePostProcess->setOnApply([&](Effect* effect, EventState&) {

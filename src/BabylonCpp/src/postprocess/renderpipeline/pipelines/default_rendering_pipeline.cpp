@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json.h>
+#include <babylon/core/variant.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas.h>
@@ -186,10 +187,11 @@ void DefaultRenderingPipeline::_buildPipeline()
       highlights->alwaysForcePOT = true;
     }
 
-    blurX = new BlurPostProcess("horizontal blur", Vector2(1.f, 0.f), 10.f,
-                                bloomScale(), nullptr,
-                                TextureConstants::BILINEAR_SAMPLINGMODE, engine,
-                                false, _defaultPipelineTextureType);
+    blurX
+      = new BlurPostProcess("horizontal blur", Vector2(1.f, 0.f), 10.f,
+                            ToVariant<float, PostProcessOptions>(bloomScale()),
+                            nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
+                            engine, false, _defaultPipelineTextureType);
     addEffect(new PostProcessRenderEffect(engine, BlurXPostProcessId,
                                           [this]() { return blurX; }, true));
     blurX->alwaysForcePOT = true;
@@ -201,10 +203,11 @@ void DefaultRenderingPipeline::_buildPipeline()
       blurX->setKernel(bloomKernel * dw);
     });
 
-    blurY = new BlurPostProcess("vertical blur", Vector2(0.f, 1.f), 10.f,
-                                bloomScale(), nullptr,
-                                TextureConstants::BILINEAR_SAMPLINGMODE, engine,
-                                false, _defaultPipelineTextureType);
+    blurY
+      = new BlurPostProcess("vertical blur", Vector2(0.f, 1.f), 10.f,
+                            ToVariant<float, PostProcessOptions>(bloomScale()),
+                            nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
+                            engine, false, _defaultPipelineTextureType);
     addEffect(new PostProcessRenderEffect(engine, BlurYPostProcessId,
                                           [this]() { return blurY; }, true));
     blurY->alwaysForcePOT = true;
