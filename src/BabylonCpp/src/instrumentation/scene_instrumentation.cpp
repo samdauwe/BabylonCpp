@@ -66,6 +66,7 @@ SceneInstrumentation::SceneInstrumentation(Scene* scene)
       }
 
       _scene->getEngine()->_drawCalls.fetchNewFrame();
+      _scene->getEngine()->_textureCollisions.fetchNewFrame();
     });
 
   // After render
@@ -408,6 +409,11 @@ void SceneInstrumentation::setCaptureRenderTime(bool value)
 PerfCounter& SceneInstrumentation::drawCallsCounter()
 {
   return _scene->getEngine()->_drawCalls;
+}
+
+PerfCounter& SceneInstrumentation::textureCollisionsCounter()
+{
+  return _scene->getEngine()->_textureCollisions;
 }
 
 void SceneInstrumentation::dispose(bool /*doNotRecurse*/)

@@ -729,6 +729,7 @@ public:
 
   static AudioEngine* audioEngine;
   PerfCounter _drawCalls;
+  PerfCounter _textureCollisions;
 
   // Lost context
   Observable<Engine> onContextLostObservable;

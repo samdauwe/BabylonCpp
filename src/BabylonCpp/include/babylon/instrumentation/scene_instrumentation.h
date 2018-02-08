@@ -156,9 +156,14 @@ public:
   void setCaptureRenderTime(bool value);
 
   /**
-   * @brief Gets the perf counter used for frame time capture.
+   * @brief Gets the perf counter used for draw calls.
    */
   PerfCounter& drawCallsCounter();
+
+  /**
+   * @brief Gets the perf counter used for texture collisions.
+   */
+  PerfCounter& textureCollisionsCounter();
 
   void dispose(bool doNotRecurse = false) override;
 
