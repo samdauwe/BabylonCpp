@@ -5,6 +5,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/material.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/matrix.h>
 #include <babylon/mesh/vertex_buffer.h>
@@ -160,13 +161,13 @@ void Layer::render()
                       _indexBuffer.get(), currentEffect);
 
   // Draw order
-  if (!_alphaTestEffect) {
+  if (!alphaTest) {
     engine->setAlphaMode(alphaBlendingMode);
-    engine->draw(true, 0, 6);
+    engine->drawElementsType(Material::TriangleFillMode, 0, 6);
     engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
   }
   else {
-    engine->draw(true, 0, 6);
+    engine->drawElementsType(Material::TriangleFillMode, 0, 6);
   }
 
   onAfterRenderObservable.notifyObservers(this);
