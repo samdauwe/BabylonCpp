@@ -273,15 +273,6 @@ Vector3 Vector3::multiplyByFloats(float ix, float iy, float iz) const
   return Vector3(x * ix, y * iy, z * iz);
 }
 
-Vector3& Vector3::divideInPlace(const Vector3& otherVector)
-{
-  x /= otherVector.x;
-  y /= otherVector.y;
-  z /= otherVector.z;
-
-  return *this;
-}
-
 Vector3 Vector3::divide(const Vector3& otherVector) const
 {
   return Vector3(x / otherVector.x, y / otherVector.y, z / otherVector.z);
@@ -293,6 +284,15 @@ const Vector3& Vector3::divideToRef(const Vector3& otherVector,
   result.x = x / otherVector.x;
   result.y = y / otherVector.y;
   result.z = z / otherVector.z;
+
+  return *this;
+}
+
+Vector3& Vector3::divideInPlace(const Vector3& otherVector)
+{
+  x /= otherVector.x;
+  y /= otherVector.y;
+  z /= otherVector.z;
 
   return *this;
 }
@@ -520,6 +520,20 @@ float Vector3::GetClipFactor(const Vector3& vector0, const Vector3& vector1,
   const float s = d0 / (d0 - d1);
 
   return s;
+}
+
+float Vector3::GetAngleBetweenVectors(const Vector3& vector0,
+                                      const Vector3& vector1,
+                                      const Vector3& normal)
+{
+  const auto v0  = vector0.copy().normalize();
+  const auto v1  = vector1.copy().normalize();
+  const auto dot = Vector3::Dot(v0, v1);
+  const auto n   = Vector3::Cross(v0, v1);
+  if (Vector3::Dot(n, normal) > 0.f) {
+    return ::std::acos(dot);
+  }
+  return -::std::acos(dot);
 }
 
 Vector3 Vector3::FromArray(const Float32Array& array, unsigned int offset)

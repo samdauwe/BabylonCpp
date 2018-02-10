@@ -203,7 +203,7 @@ public:
    * - a scale vector3 passed as a reference to update,
    * - a rotation quaternion passed as a reference to update,
    * - a translation vector3 passed as a reference to update.
-   * @returns The boolean `true`.
+   * @returns The true if operation was successful.
    */
   bool decompose(Vector3& scale, Quaternion& rotation,
                  Vector3& translation) const;

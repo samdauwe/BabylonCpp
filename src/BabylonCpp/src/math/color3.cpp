@@ -155,6 +155,15 @@ const Color3& Color3::scaleToRef(float iscale, Color3& result) const
   return *this;
 }
 
+const Color3& Color3::clampToRef(Color3& result, float min, float max) const
+{
+  result.r = Scalar::Clamp(r, min, max);
+  result.g = Scalar::Clamp(g, min, max);
+  result.b = Scalar::Clamp(b, min, max);
+
+  return *this;
+}
+
 Color3 Color3::add(const Color3& otherColor) const
 {
   return Color3(r + otherColor.r, g + otherColor.g, b + otherColor.b);
@@ -302,9 +311,9 @@ Color3 Color3::FromHexString(const string_t& hex)
   }
 
   return Color3::FromInts(
-    static_cast<int>(strtol(hex.substr(1, 2).c_str(), NULL, 16)),
-    static_cast<int>(strtol(hex.substr(3, 2).c_str(), NULL, 16)),
-    static_cast<int>(strtol(hex.substr(5, 2).c_str(), NULL, 16)));
+    static_cast<int>(strtol(hex.substr(1, 2).c_str(), nullptr, 16)),
+    static_cast<int>(strtol(hex.substr(3, 2).c_str(), nullptr, 16)),
+    static_cast<int>(strtol(hex.substr(5, 2).c_str(), nullptr, 16)));
 }
 
 Color3 Color3::FromArray(const Float32Array& array, unsigned int offset)

@@ -155,17 +155,17 @@ public:
   Vector2 divide(const Vector2& otherVector) const;
 
   /**
-   * @brief Divides in place the current Vector2 coordinates by the passed ones.
-   * @returns The updated Vector2.
-   */
-  Vector2& divideInPlace(const Vector2& otherVector);
-
-  /**
    * @brief Sets the "result" coordinates with the Vector2 divided by the passed
    * one coordinates.
    * @returns The Vector2.
    */
   const Vector2& divideToRef(const Vector2& otherVector, Vector2& result) const;
+
+  /**
+   * @brief Divides the current Vector3 coordinates by the passed ones.
+   * @returns the updated Vector3.
+   */
+  Vector2& divideInPlace(const Vector2& otherVector);
 
   /**
    * @brief Returns a new Vector2 with current Vector2 negated coordinates.

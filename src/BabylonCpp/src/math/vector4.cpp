@@ -272,6 +272,16 @@ const Vector4& Vector4::divideToRef(const Vector4& otherVector,
   return *this;
 }
 
+Vector4& Vector4::divideInPlace(const Vector4& otherVector)
+{
+  x /= otherVector.x;
+  y /= otherVector.y;
+  z /= otherVector.z;
+  w /= otherVector.w;
+
+  return *this;
+}
+
 Vector4& Vector4::minimizeInPlace(const Vector4& other)
 {
   if (other.x < x) {

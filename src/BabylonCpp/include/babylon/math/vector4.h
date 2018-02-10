@@ -196,6 +196,12 @@ public:
   const Vector4& divideToRef(const Vector4& otherVector, Vector4& result) const;
 
   /**
+   * @brief Divides the current Vector4 coordinates by the passed ones.
+   * @returns the updated Vector4.
+   */
+  Vector4& divideInPlace(const Vector4& otherVector);
+
+  /**
    * @brief Updates the Vector4 coordinates with the minimum values between its
    * own and the passed vector ones.
    */

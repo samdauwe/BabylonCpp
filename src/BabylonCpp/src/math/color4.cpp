@@ -154,6 +154,16 @@ const Color4& Color4::scaleToRef(float iscale, Color4& result) const
   return *this;
 }
 
+const Color4& Color4::clampToRef(Color4& result, float min, float max) const
+{
+  result.r = Scalar::Clamp(r, min, max);
+  result.g = Scalar::Clamp(g, min, max);
+  result.b = Scalar::Clamp(b, min, max);
+  result.a = Scalar::Clamp(a, min, max);
+
+  return *this;
+}
+
 Color4 Color4::multiply(const Color4& color) const
 {
   return Color4(r * color.r, g * color.g, b * color.b, a * color.a);

@@ -193,19 +193,19 @@ Vector2 Vector2::divide(const Vector2& otherVector) const
   return Vector2(x / otherVector.x, y / otherVector.y);
 }
 
-Vector2& Vector2::divideInPlace(const Vector2& otherVector)
-{
-  x /= otherVector.x;
-  y /= otherVector.y;
-
-  return *this;
-}
-
 const Vector2& Vector2::divideToRef(const Vector2& otherVector,
                                     Vector2& result) const
 {
   result.x = x / otherVector.x;
   result.y = y / otherVector.y;
+
+  return *this;
+}
+
+Vector2& Vector2::divideInPlace(const Vector2& otherVector)
+{
+  x /= otherVector.x;
+  y /= otherVector.y;
 
   return *this;
 }
@@ -547,8 +547,9 @@ void Vector2::TransformToRef(const Vector2& vector,
 bool Vector2::PointInTriangle(const Vector2& p, const Vector2& p0,
                               const Vector2& p1, const Vector2& p2)
 {
-  const float a = 1.f / 2.f * (-p1.y * p2.x + p0.y * (-p1.x + p2.x)
-                               + p0.x * (p1.y - p2.y) + p1.x * p2.y);
+  const float a = 1.f / 2.f
+                  * (-p1.y * p2.x + p0.y * (-p1.x + p2.x) + p0.x * (p1.y - p2.y)
+                     + p1.x * p2.y);
   const float sign = a < 0.f ? -1.f : 1.f;
   const float s
     = (p0.y * p2.x - p0.x * p2.y + (p2.y - p0.y) * p.x + (p0.x - p2.x) * p.y)
