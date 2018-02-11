@@ -442,8 +442,12 @@ class OimoPhysicsEnginePlugin;
 class AnaglyphPostProcess;
 class BlackAndWhitePostProcess;
 class BlurPostProcess;
+class CircleOfConfusionPostProcess;
 class ColorCorrectionPostProcess;
 class ConvolutionPostProcess;
+struct DepthOfFieldBlurPostProcess;
+class DepthOfFieldEffect;
+struct DepthOfFieldMergePostProcess;
 class DisplayPassPostProcess;
 class FilterPostProcess;
 class FxaaPostProcess;
@@ -460,7 +464,6 @@ class VolumetricLightScatteringPostProcess;
 class VRDistortionCorrectionPostProcess;
 // - Render Pipeline
 class PostProcessRenderEffect;
-class PostProcessRenderPass;
 class PostProcessRenderPipeline;
 class PostProcessRenderPipelineManager;
 // -- Pipelines
@@ -484,11 +487,9 @@ class RenderingManager;
 class Sprite;
 class SpriteManager;
 // --- States ---
-namespace Internals {
 class _AlphaState;
 class _DepthCullingState;
 class _StencilState;
-} // end of namespace Internals
 } // end of namespace BABYLON
 // --- Tools ---
 class EventState;

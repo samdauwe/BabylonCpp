@@ -64,30 +64,6 @@ void PostProcessRenderPipelineManager::disableEffectInPipeline(
                                                        cameras);
 }
 
-void PostProcessRenderPipelineManager::enableDisplayOnlyPassInPipeline(
-  const string_t& renderPipelineName, const string_t& passName,
-  const vector_t<Camera*>& cameras)
-{
-  if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
-    return;
-  }
-
-  _renderPipelines[renderPipelineName]->_enableDisplayOnlyPass(passName,
-                                                               cameras);
-}
-
-void PostProcessRenderPipelineManager::disableDisplayOnlyPassInPipeline(
-  const string_t& renderPipelineName, const string_t& passName,
-  const vector_t<Camera*>& cameras)
-{
-  if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
-    return;
-  }
-
-  _renderPipelines[renderPipelineName]->_disableDisplayOnlyPass(passName,
-                                                                cameras);
-}
-
 void PostProcessRenderPipelineManager::update()
 {
   vector_t<string_t> pipelinesToRemove;

@@ -5,16 +5,16 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/postprocess/post_process.h>
-#include <babylon/postprocess/renderpipeline/post_process_render_pass.h>
 
 namespace BABYLON {
 
 PostProcessRenderEffect::PostProcessRenderEffect(
   Engine* engine, const string_t& name,
-  const ::std::function<PostProcess*()>& getPostProcess, bool singleInstance)
+  const ::std::function<vector_t<PostProcess*>()>& getPostProcesses,
+  bool singleInstance)
     : _name{name}
     , _engine{engine}
-    , _getPostProcess{getPostProcess}
+    , _getPostProcesses{getPostProcesses}
     , _singleInstance{singleInstance}
 {
 }
@@ -26,8 +26,10 @@ PostProcessRenderEffect::~PostProcessRenderEffect()
 bool PostProcessRenderEffect::isSupported() const
 {
   for (auto& item : _postProcesses) {
-    if (!item.second->isSupported()) {
-      return false;
+    for (auto& pp : item.second) {
+      if (!pp->isSupported()) {
+        return false;
+      }
     }
   }
   return true;
@@ -35,48 +37,6 @@ bool PostProcessRenderEffect::isSupported() const
 
 void PostProcessRenderEffect::_update()
 {
-  for (auto& item : _renderPasses) {
-    item.second->_update();
-  }
-}
-
-void PostProcessRenderEffect::addPass(PostProcessRenderPass* renderPass)
-{
-  _renderPasses[renderPass->_name] = renderPass;
-
-  _linkParameters();
-}
-
-void PostProcessRenderEffect::removePass(PostProcessRenderPass* renderPass)
-{
-  _renderPasses.erase(renderPass->_name);
-
-  _linkParameters();
-}
-
-void PostProcessRenderEffect::addRenderEffectAsPass(
-  PostProcessRenderEffect* renderEffect)
-{
-  _renderEffectAsPasses[renderEffect->_name] = renderEffect;
-
-  _linkParameters();
-}
-
-PostProcessRenderPass*
-PostProcessRenderEffect::getPass(const string_t& passName)
-{
-  if (stl_util::contains(_renderPasses, passName)) {
-    return _renderPasses[passName];
-  }
-
-  return nullptr;
-}
-
-void PostProcessRenderEffect::emptyPasses()
-{
-  _renderPasses.clear();
-
-  _linkParameters();
 }
 
 void PostProcessRenderEffect::_attachCameras(const vector_t<Camera*>& cameras)
@@ -90,7 +50,7 @@ void PostProcessRenderEffect::_attachCameras(const vector_t<Camera*>& cameras)
   }
 
   for (auto& camera : cams) {
-    auto cameraName = camera->name;
+    const auto& cameraName = camera->name;
 
     if (_singleInstance) {
       cameraKey = "0";
@@ -99,31 +59,27 @@ void PostProcessRenderEffect::_attachCameras(const vector_t<Camera*>& cameras)
       cameraKey = cameraName;
     }
 
-    if (stl_util::contains(_postProcesses, cameraKey)) {
-      _postProcesses[cameraKey] = _postProcesses[cameraKey];
+    if (!stl_util::contains(_postProcesses, cameraKey)) {
+      auto postProcess = _getPostProcesses();
+      if (!postProcess.empty()) {
+        _postProcesses[cameraKey] = postProcess;
+      }
     }
-    else {
-      _postProcesses[cameraKey] = _getPostProcess();
-    }
-
-    auto index = camera->attachPostProcess(_postProcesses[cameraKey]);
 
     if (!stl_util::contains(_indicesForCamera, cameraName)) {
       _indicesForCamera[cameraName].clear();
     }
 
-    _indicesForCamera[cameraName].emplace_back(index);
+    for (auto& postProcess : _postProcesses[cameraKey]) {
+      auto index = camera->attachPostProcess(postProcess);
+
+      _indicesForCamera[cameraName].emplace_back(index);
+    }
 
     if (!stl_util::contains(_cameras, cameraName)) {
       _cameras[cameraName] = camera;
     }
-
-    for (auto& pass : _renderPasses) {
-      pass.second->_incRefCount();
-    }
   }
-
-  _linkParameters();
 }
 
 void PostProcessRenderEffect::_detachCameras(const vector_t<Camera*>& cameras)
@@ -137,16 +93,14 @@ void PostProcessRenderEffect::_detachCameras(const vector_t<Camera*>& cameras)
   for (auto& camera : cams) {
     auto cameraName = camera->name;
 
-    camera->detachPostProcess(
-      _postProcesses[_singleInstance ? "0" : cameraName]);
-
-    if (stl_util::contains(_cameras, cameraName)) {
-      _indicesForCamera.erase(cameraName);
-      _cameras.erase(cameraName);
+    const auto cameraKey = _singleInstance ? "0" : cameraName;
+    for (auto& postProcess : _postProcesses[cameraKey]) {
+      camera->detachPostProcess(postProcess);
     }
 
-    for (auto& item : _renderPasses) {
-      item.second->_decRefCount();
+    if (stl_util::contains(_cameras, cameraName)) {
+      // _indicesForCamera.erase(cameraName);
+      _cameras.erase(cameraName);
     }
   }
 }
@@ -166,14 +120,12 @@ void PostProcessRenderEffect::_enable(const vector_t<Camera*> cameras)
       auto index = _indicesForCamera[cameraName][j];
       if (index >= camera->_postProcesses.size()
           || camera->_postProcesses[index] == nullptr) {
-        camera->attachPostProcess(
-          _postProcesses[_singleInstance ? "0" : cameraName],
-          static_cast<int>(_indicesForCamera[cameraName][j]));
+        const auto cameraKey = _singleInstance ? "0" : cameraName;
+        for (auto& postProcess : _postProcesses[cameraKey]) {
+          camera->attachPostProcess(
+            postProcess, static_cast<int>(_indicesForCamera[cameraName][j]));
+        }
       }
-    }
-
-    for (auto& item : _renderPasses) {
-      item.second->_incRefCount();
     }
   }
 }
@@ -187,51 +139,24 @@ void PostProcessRenderEffect::_disable(vector_t<Camera*> cameras)
   }
 
   for (auto& camera : cams) {
-    auto cameraName = camera->name;
-
-    camera->detachPostProcess(
-      _postProcesses[_singleInstance ? "0" : cameraName]);
-
-    for (auto& item : _renderPasses) {
-      item.second->_decRefCount();
+    auto cameraName      = camera->name;
+    const auto cameraKey = _singleInstance ? "0" : cameraName;
+    for (auto& postProcess : _postProcesses[cameraKey]) {
+      camera->detachPostProcess(postProcess);
     }
   }
 }
 
-PostProcess* PostProcessRenderEffect::getPostProcess(Camera* camera)
+vector_t<PostProcess*> PostProcessRenderEffect::getPostProcesses(Camera* camera)
 {
   if (_singleInstance) {
     return _postProcesses["0"];
   }
   else {
     if (!camera) {
-      return nullptr;
+      return {};
     }
-    return camera ? _postProcesses[camera->name] : nullptr;
-  }
-}
-
-void PostProcessRenderEffect::_linkParameters()
-{
-  for (auto& item : _postProcesses) {
-    if (applyParameters) {
-      applyParameters(item.second);
-    }
-
-    item.second->onBeforeRenderObservable.add(
-      [this](Effect* effect, EventState&) { _linkTextures(effect); });
-  }
-}
-
-void PostProcessRenderEffect::_linkTextures(Effect* effect)
-{
-  for (auto& item : _renderPasses) {
-    effect->setTexture(item.first, item.second->getRenderTexture());
-  }
-
-  for (auto& item : _renderEffectAsPasses) {
-    effect->setTextureFromPostProcess(item.first + "Sampler",
-                                      item.second->getPostProcess());
+    return _postProcesses[camera->name];
   }
 }
 

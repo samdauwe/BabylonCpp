@@ -12,10 +12,6 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT PostProcessRenderPipeline : public IDisposable {
 
 public:
-  static constexpr const char* PASS_EFFECT_NAME  = "passEffect";
-  static constexpr const char* PASS_SAMPLER_NAME = "passSampler";
-
-public:
   PostProcessRenderPipeline(Engine* engine, const string_t& name);
   virtual ~PostProcessRenderPipeline();
 
@@ -34,17 +30,12 @@ public:
                       const vector_t<Camera*>& cameras);
   void _attachCameras(const vector_t<Camera*>& cameras, bool unique);
   void _detachCameras(const vector_t<Camera*>& cameras);
-  void _enableDisplayOnlyPass(const string_t& passName,
-                              const vector_t<Camera*>& cameras);
-  void _disableDisplayOnlyPass(const string_t& passName,
-                               const vector_t<Camera*>& cameras);
   void _update();
   void _reset();
   virtual void dispose(bool doNotRecurse = false) override;
 
 public:
   string_t _name;
-  Engine* _engine;
 
 protected:
   unordered_map_t<string_t, Camera*> _cameras;

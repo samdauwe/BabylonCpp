@@ -79,20 +79,22 @@ SSAO2RenderingPipeline::SSAO2RenderingPipeline(const string_t& name,
   // Set up pipeline
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), SSAOOriginalSceneColorEffect,
-    [&]() { return _originalColorPostProcess; }, true));
-  addEffect(new PostProcessRenderEffect(scene->getEngine(), SSAORenderEffect,
-                                        [&]() { return _ssaoPostProcess; },
-                                        true));
-  addEffect(
-    new PostProcessRenderEffect(scene->getEngine(), SSAOBlurHRenderEffect,
-                                [&]() { return _blurHPostProcess; }, true));
-  addEffect(
-    new PostProcessRenderEffect(scene->getEngine(), SSAOBlurVRenderEffect,
-                                [&]() { return _blurVPostProcess; }, true));
+    [&]() -> vector_t<PostProcess*> { return {_originalColorPostProcess}; },
+    true));
+  addEffect(new PostProcessRenderEffect(
+    scene->getEngine(), SSAORenderEffect,
+    [&]() -> vector_t<PostProcess*> { return {_ssaoPostProcess}; }, true));
+  addEffect(new PostProcessRenderEffect(
+    scene->getEngine(), SSAOBlurHRenderEffect,
+    [&]() -> vector_t<PostProcess*> { return {_blurHPostProcess}; }, true));
+  addEffect(new PostProcessRenderEffect(
+    scene->getEngine(), SSAOBlurVRenderEffect,
+    [&]() -> vector_t<PostProcess*> { return {_blurVPostProcess}; }, true));
 
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), SSAOCombineRenderEffect,
-    [&]() { return _ssaoCombinePostProcess; }, true));
+    [&]() -> vector_t<PostProcess*> { return {_ssaoCombinePostProcess}; },
+    true));
 
   // Finish
   scene->postProcessRenderPipelineManager()->addPipeline(this);

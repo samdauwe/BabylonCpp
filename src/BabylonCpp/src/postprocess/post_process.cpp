@@ -128,12 +128,12 @@ void PostProcess::setOnAfterRender(
   _onAfterRenderObserver = onAfterRenderObservable.add(callback);
 }
 
-InternalTexture* PostProcess::outputTexture()
+InternalTexture* PostProcess::inputTexture()
 {
   return _textures[_currentRenderTextureInd];
 }
 
-void PostProcess::setOutputTexture(InternalTexture* value)
+void PostProcess::setInputTexture(InternalTexture* value)
 {
   _forcedOutputTexture = value;
 }
@@ -306,7 +306,7 @@ void PostProcess::activate(Camera* camera, InternalTexture* sourceTexture,
 
     InternalTexture* target = nullptr;
     if (_shareOutputWithPostProcess) {
-      target = _shareOutputWithPostProcess->outputTexture();
+      target = _shareOutputWithPostProcess->inputTexture();
     }
     else if (_forcedOutputTexture) {
       target = _forcedOutputTexture;
@@ -314,9 +314,11 @@ void PostProcess::activate(Camera* camera, InternalTexture* sourceTexture,
       height = _forcedOutputTexture->height;
     }
     else {
-      target = outputTexture();
+      target = inputTexture();
     }
 
+    // Bind the input of this post process to be used as the output of the
+    // previous post process.
     if (enablePixelPerfectMode) {
       _scaleRatio.copyFromFloats(
         static_cast<float>(requiredWidth) / static_cast<float>(desiredWidth),
@@ -388,16 +390,17 @@ Effect* PostProcess::apply()
                                    _alphaConstants.b, _alphaConstants.a);
   }
 
-  // Texture
+  // Bind the output texture of the preivous post process as the input to this
+  // post process.
   InternalTexture* source = nullptr;
   if (_shareOutputWithPostProcess) {
-    source = _shareOutputWithPostProcess->outputTexture();
+    source = _shareOutputWithPostProcess->inputTexture();
   }
   else if (_forcedOutputTexture) {
     source = _forcedOutputTexture;
   }
   else {
-    source = outputTexture();
+    source = inputTexture();
   }
   _effect->_bindTexture("textureSampler", source);
 

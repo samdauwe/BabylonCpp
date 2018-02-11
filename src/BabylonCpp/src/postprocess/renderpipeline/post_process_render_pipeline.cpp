@@ -4,25 +4,23 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/postprocess/display_pass_post_process.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_effect.h>
-#include <babylon/postprocess/renderpipeline/post_process_render_pass.h>
 
 namespace BABYLON {
 
-PostProcessRenderPipeline::PostProcessRenderPipeline(Engine* engine,
+PostProcessRenderPipeline::PostProcessRenderPipeline(Engine* /*engine*/,
                                                      const string_t& name)
 
-    : _name{name}, _engine{engine}
+    : _name{name}
 {
 }
 
-vector_t<Camera*> PostProcessRenderPipeline::getCameras() const
+PostProcessRenderPipeline::~PostProcessRenderPipeline()
 {
-  vector_t<Camera*> cameras;
-  cameras.reserve(_cameras.size());
-  for (auto& item : _cameras) {
-    cameras.emplace_back(item.second);
-  }
-  return cameras;
+}
+
+const char* PostProcessRenderPipeline::getClassName() const
+{
+  return "PostProcessRenderPipeline";
 }
 
 bool PostProcessRenderPipeline::isSupported() const
@@ -35,13 +33,14 @@ bool PostProcessRenderPipeline::isSupported() const
   return true;
 }
 
-PostProcessRenderPipeline::~PostProcessRenderPipeline()
+vector_t<Camera*> PostProcessRenderPipeline::getCameras() const
 {
-}
-
-const char* PostProcessRenderPipeline::getClassName() const
-{
-  return "PostProcessRenderPipeline";
+  vector_t<Camera*> cameras;
+  cameras.reserve(_cameras.size());
+  for (auto& item : _cameras) {
+    cameras.emplace_back(item.second);
+  }
+  return cameras;
 }
 
 void PostProcessRenderPipeline::addEffect(PostProcessRenderEffect* renderEffect)
@@ -126,77 +125,6 @@ void PostProcessRenderPipeline::_detachCameras(const vector_t<Camera*>& cameras)
     if (it != _cameras.end()) {
       _cameras.erase(it);
     }
-  }
-}
-
-void PostProcessRenderPipeline::_enableDisplayOnlyPass(
-  const string_t& passName, const vector_t<Camera*>& cameras)
-{
-  auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
-
-  if (cams.empty()) {
-    return;
-  }
-
-  PostProcessRenderPass* pass = nullptr;
-  for (auto& item : _renderEffects) {
-    pass = item.second->getPass(passName);
-
-    if (pass != nullptr) {
-      break;
-    }
-  }
-
-  if (pass == nullptr) {
-    return;
-  }
-
-  for (auto& renderEffect : _renderEffects) {
-    renderEffect.second->_disable(cams);
-  }
-
-  pass->_name = string_t(PostProcessRenderPipeline::PASS_SAMPLER_NAME);
-
-  for (auto& camera : cams) {
-    const auto& cameraName = camera->name;
-    if (!stl_util::contains(_renderEffectsForIsolatedPass, cameraName)) {
-      _renderEffectsForIsolatedPass[cameraName] = new PostProcessRenderEffect(
-        _engine, PostProcessRenderPipeline::PASS_EFFECT_NAME, [this]() {
-          return new DisplayPassPostProcess(
-            PostProcessRenderPipeline::PASS_EFFECT_NAME, 1.f, nullptr, 0,
-            _engine, true);
-        });
-    }
-    _renderEffectsForIsolatedPass[cameraName]->emptyPasses();
-    _renderEffectsForIsolatedPass[cameraName]->addPass(pass);
-    _renderEffectsForIsolatedPass[cameraName]->_attachCameras({camera});
-  }
-}
-
-void PostProcessRenderPipeline::_disableDisplayOnlyPass(
-  const string_t& /*passName*/, const vector_t<Camera*>& cameras)
-{
-  auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
-
-  if (cams.empty()) {
-    return;
-  }
-
-  for (auto& camera : cams) {
-    const auto& cameraName = camera->name;
-    if (!stl_util::contains(_renderEffectsForIsolatedPass, cameraName)) {
-      _renderEffectsForIsolatedPass[cameraName] = new PostProcessRenderEffect(
-        _engine, PostProcessRenderPipeline::PASS_EFFECT_NAME, [this]() {
-          return new DisplayPassPostProcess(
-            PostProcessRenderPipeline::PASS_EFFECT_NAME, 1.f, nullptr, 0,
-            _engine, true);
-        });
-    }
-    _renderEffectsForIsolatedPass[cameraName]->_disable({camera});
-  }
-
-  for (auto& item : _renderEffects) {
-    item.second->_enable(cams);
   }
 }
 

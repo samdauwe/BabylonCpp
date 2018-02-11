@@ -340,7 +340,7 @@ public:
   unsigned int getAlphaMode() const;
   void setAlphaTesting(bool enable);
   bool getAlphaTesting() const;
-  Internals::_StencilState* stencilState();
+  _StencilState* stencilState();
 
   /** Textures **/
   void wipeCaches(bool bruteForce = false);
@@ -744,9 +744,9 @@ protected:
   EngineCapabilities _caps;
 
   // States
-  unique_ptr_t<Internals::_DepthCullingState> _depthCullingState;
-  unique_ptr_t<Internals::_StencilState> _stencilState;
-  unique_ptr_t<Internals::_AlphaState> _alphaState;
+  unique_ptr_t<_DepthCullingState> _depthCullingState;
+  unique_ptr_t<_StencilState> _stencilState;
+  unique_ptr_t<_AlphaState> _alphaState;
   unsigned int _alphaMode;
 
   // Cache

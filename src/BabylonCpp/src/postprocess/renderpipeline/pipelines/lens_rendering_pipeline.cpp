@@ -54,13 +54,18 @@ LensRenderingPipeline::LensRenderingPipeline(
   // Set up pipeline
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), LensChromaticAberrationEffect,
-    [&]() { return _chromaticAberrationPostProcess; }, true));
+    [&]() -> vector_t<PostProcess*> {
+      return {_chromaticAberrationPostProcess};
+    },
+    true));
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), HighlightsEnhancingEffect,
-    [&]() { return _highlightsPostProcess; }, true));
+    [&]() -> vector_t<PostProcess*> { return {_highlightsPostProcess}; },
+    true));
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), LensDepthOfFieldEffect,
-    [&]() { return _depthOfFieldPostProcess; }, true));
+    [&]() -> vector_t<PostProcess*> { return {_depthOfFieldPostProcess}; },
+    true));
 
   if (stl_util::almost_equal(_highlightsGain, -1.f)) {
     _disableEffect(HighlightsEnhancingEffect, vector_t<Camera*>());

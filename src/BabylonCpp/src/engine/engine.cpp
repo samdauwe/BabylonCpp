@@ -54,9 +54,9 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _vrDisplayEnabled{false}
     , disableUniformBuffers{false}
     , disablePerformanceMonitorInBackground{false}
-    , _depthCullingState{::std::make_unique<Internals::_DepthCullingState>()}
-    , _stencilState{::std::make_unique<Internals::_StencilState>()}
-    , _alphaState{::std::make_unique<Internals::_AlphaState>()}
+    , _depthCullingState{::std::make_unique<_DepthCullingState>()}
+    , _stencilState{::std::make_unique<_StencilState>()}
+    , _alphaState{::std::make_unique<_AlphaState>()}
     , _alphaMode{EngineConstants::ALPHA_DISABLE}
     , _currentEffect{nullptr}
     , _currentProgram{nullptr}
@@ -2230,7 +2230,7 @@ bool Engine::getAlphaTesting() const
   return _alphaTest;
 }
 
-Internals::_StencilState* Engine::stencilState()
+_StencilState* Engine::stencilState()
 {
   return _stencilState.get();
 }

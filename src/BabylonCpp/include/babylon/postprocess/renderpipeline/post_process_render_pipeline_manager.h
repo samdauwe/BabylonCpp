@@ -26,12 +26,6 @@ public:
   void disableEffectInPipeline(const string_t& renderPipelineName,
                                const string_t& renderEffectName,
                                const vector_t<Camera*>& cameras);
-  void enableDisplayOnlyPassInPipeline(const string_t& renderPipelineName,
-                                       const string_t& passName,
-                                       const vector_t<Camera*>& cameras);
-  void disableDisplayOnlyPassInPipeline(const string_t& renderPipelineName,
-                                        const string_t& passName,
-                                        const vector_t<Camera*>& cameras);
   void update();
   void _rebuild();
   void dispose();
