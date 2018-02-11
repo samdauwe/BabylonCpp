@@ -4,7 +4,6 @@
 #include <babylon/interfaces/igl_rendering_context.h>
 
 namespace BABYLON {
-namespace Internals {
 
 _StencilState::_StencilState()
     : _isStencilTestDirty{false}
@@ -201,5 +200,4 @@ void _StencilState::apply(GL::IGLRenderingContext& gl)
   }
 }
 
-} // end of namespace Internals
 } // end of namespace BABYLON

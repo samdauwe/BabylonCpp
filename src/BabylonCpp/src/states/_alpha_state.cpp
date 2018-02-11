@@ -4,7 +4,6 @@
 #include <babylon/interfaces/igl_rendering_context.h>
 
 namespace BABYLON {
-namespace Internals {
 
 _AlphaState::_AlphaState()
     : _isAlphaBlendDirty{false}
@@ -154,5 +153,4 @@ void _AlphaState::apply(GL::IGLRenderingContext& gl)
   }
 }
 
-} // end of namespace Internals
 } // end of namespace BABYLON

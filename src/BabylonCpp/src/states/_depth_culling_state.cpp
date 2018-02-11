@@ -4,7 +4,6 @@
 #include <babylon/interfaces/igl_rendering_context.h>
 
 namespace BABYLON {
-namespace Internals {
 
 _DepthCullingState::_DepthCullingState()
     : _isDepthTestDirty{false}
@@ -13,9 +12,11 @@ _DepthCullingState::_DepthCullingState()
     , _isCullFaceDirty{false}
     , _isCullDirty{false}
     , _isZOffsetDirty{false}
+    , _isFrontFaceDirty{false}
     , _depthFunc{nullptr}
     , _cull{nullptr}
     , _cullFace{nullptr}
+    , _frontFace{nullptr}
 {
   reset();
 }
@@ -27,7 +28,8 @@ _DepthCullingState::~_DepthCullingState()
 bool _DepthCullingState::isDirty() const
 {
   return _isDepthFuncDirty || _isDepthTestDirty || _isDepthMaskDirty
-         || _isCullFaceDirty || _isCullDirty || _isZOffsetDirty;
+         || _isCullFaceDirty || _isCullDirty || _isZOffsetDirty
+         || _isFrontFaceDirty;
 }
 
 float _DepthCullingState::zOffset() const
@@ -120,6 +122,21 @@ void _DepthCullingState::setDepthTest(bool value)
   _isDepthTestDirty = true;
 }
 
+Nullable<unsigned int> _DepthCullingState::frontFace() const
+{
+  return _frontFace;
+}
+
+void _DepthCullingState::setFrontFace(const Nullable<unsigned int>& value)
+{
+  if (_frontFace == value) {
+    return;
+  }
+
+  _frontFace        = value;
+  _isFrontFaceDirty = true;
+}
+
 void _DepthCullingState::reset()
 {
   _depthMask = true;
@@ -128,6 +145,7 @@ void _DepthCullingState::reset()
   _cullFace  = nullptr;
   _cull      = nullptr;
   _zOffset   = 0.f;
+  _frontFace = nullptr;
 
   _isDepthTestDirty = true;
   _isDepthMaskDirty = true;
@@ -135,6 +153,7 @@ void _DepthCullingState::reset()
   _isCullFaceDirty  = false;
   _isCullDirty      = false;
   _isZOffsetDirty   = false;
+  _isFrontFaceDirty = false;
 }
 
 void _DepthCullingState::apply(GL::IGLRenderingContext& gl)
@@ -196,7 +215,12 @@ void _DepthCullingState::apply(GL::IGLRenderingContext& gl)
 
     _isZOffsetDirty = false;
   }
+
+  // Front face
+  if (_isFrontFaceDirty) {
+    gl.frontFace(*frontFace());
+    _isFrontFaceDirty = false;
+  }
 }
 
-} // end of namespace Internals
 } // end of namespace BABYLON

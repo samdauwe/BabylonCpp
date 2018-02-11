@@ -5,7 +5,6 @@
 #include <babylon/core/nullable.h>
 
 namespace BABYLON {
-namespace Internals {
 
 class BABYLON_SHARED_EXPORT _AlphaState {
 
@@ -39,7 +38,6 @@ private:
 
 }; // end of class _AlphaState
 
-} // end of namespace Internals
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_ALPHA_STATE_H

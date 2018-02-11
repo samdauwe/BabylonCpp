@@ -4,7 +4,6 @@
 #include <babylon/babylon_global.h>
 
 namespace BABYLON {
-namespace Internals {
 
 class BABYLON_SHARED_EXPORT _StencilState {
 
@@ -55,7 +54,6 @@ private:
 
 }; // end of class _StencilState
 
-} // end of namespace Internals
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_STENCIL_STATE_H
