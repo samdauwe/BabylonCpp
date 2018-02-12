@@ -6,15 +6,17 @@
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
+#include <babylon/materials/material.h>
 #include <babylon/mesh/buffer.h>
 #include <babylon/mesh/vertex_buffer.h>
 
 namespace BABYLON {
 
-GPUParticleSystem::GPUParticleSystem(const string_t& name, size_t capacity,
+GPUParticleSystem::GPUParticleSystem(const string_t& iName, size_t capacity,
                                      Scene* scene)
 {
-  id        = name;
+  id        = iName;
+  name      = iName;
   _scene    = scene ? scene : Engine::LastCreatedScene();
   _capacity = capacity;
   _engine   = _scene->getEngine();
@@ -150,7 +152,7 @@ void GPUParticleSystem::_initialize()
 
 size_t GPUParticleSystem::render()
 {
-  if (!emitter || !_updateEffect->isReady() || !_renderEffect->isReady()) {
+  if (/*!emitter ||*/ !_updateEffect->isReady() || !_renderEffect->isReady()) {
     return 0;
   }
 
@@ -174,7 +176,9 @@ size_t GPUParticleSystem::render()
   _engine->bindTransformFeedbackBuffer(_targetBuffer->getBuffer());
   _engine->setRasterizerState(false);
   _engine->beginTransformFeedback();
-  _engine->drawPointClouds(0, static_cast<int>(_capacity));
+
+  _engine->drawArraysType(Material::PointListDrawMode, 0,
+                          static_cast<int>(_capacity));
   _engine->endTransformFeedback();
   _engine->setRasterizerState(true);
   _engine->bindTransformFeedbackBuffer(nullptr);
@@ -186,7 +190,8 @@ size_t GPUParticleSystem::render()
   _engine->bindVertexArrayObject(_targetVAO, nullptr);
 
   // Render
-  _engine->drawPointClouds(0, static_cast<int>(_capacity));
+  _engine->drawArraysType(Material::PointListDrawMode, 0,
+                          static_cast<int>(_capacity));
 
   // Switch VAOs
   auto tmpVAO = _sourceVAO;

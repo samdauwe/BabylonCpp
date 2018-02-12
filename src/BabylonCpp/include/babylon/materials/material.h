@@ -13,9 +13,17 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT Material : public IAnimatable {
 
 public:
+  // Triangle views
   static constexpr unsigned int TriangleFillMode  = 0;
   static constexpr unsigned int WireFrameFillMode = 1;
   static constexpr unsigned int PointFillMode     = 2;
+  // Draw modes
+  static constexpr unsigned int PointListDrawMode     = 3;
+  static constexpr unsigned int LineListDrawMode      = 4;
+  static constexpr unsigned int LineLoopDrawMode      = 5;
+  static constexpr unsigned int LineStripDrawMode     = 6;
+  static constexpr unsigned int TriangleStripDrawMode = 7;
+  static constexpr unsigned int TriangleFanDrawMode   = 8;
 
   static constexpr unsigned int ClockWiseSideOrientation        = 0;
   static constexpr unsigned int CounterClockWiseSideOrientation = 1;

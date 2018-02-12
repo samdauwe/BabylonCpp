@@ -14,6 +14,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/material.h>
 #include <babylon/materials/textures/imulti_render_target_options.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
@@ -1570,66 +1571,95 @@ void Engine::applyStates()
   _alphaState->apply(*_gl);
 }
 
-void Engine::draw(bool useTriangles, unsigned int indexStart, int indexCount,
+void Engine::draw(bool useTriangles, int indexStart, int indexCount,
                   int instancesCount)
+{
+  drawElementsType(useTriangles ? Material::TriangleFillMode :
+                                  Material::WireFrameFillMode,
+                   indexStart, indexCount, instancesCount);
+}
+
+void Engine::drawPointClouds(int verticesStart, int verticesCount,
+                             int instancesCount)
+{
+  drawArraysType(Material::PointFillMode, verticesStart, verticesCount,
+                 instancesCount);
+}
+
+void Engine::drawUnIndexed(bool useTriangles, int verticesStart,
+                           int verticesCount, int instancesCount)
+{
+  drawArraysType(useTriangles ? Material::TriangleFillMode :
+                                Material::WireFrameFillMode,
+                 verticesStart, verticesCount, instancesCount);
+}
+
+void Engine::drawElementsType(unsigned int fillMode, int indexStart,
+                              int indexCount, int instancesCount)
+{
+  // Apply states
+  applyStates();
+
+  _drawCalls.addCount(1, false);
+
+  // Render
+  const auto drawMode = DrawMode(fillMode);
+  auto indexFormat
+    = _uintIndicesCurrentlySet ? GL::UNSIGNED_INT : GL::UNSIGNED_SHORT;
+  auto mult = _uintIndicesCurrentlySet ? 4 : 2;
+  if (instancesCount) {
+    _gl->drawElementsInstanced(drawMode, indexCount, indexFormat,
+                               indexStart * mult, instancesCount);
+  }
+  else {
+    _gl->drawElements(drawMode, indexCount, indexFormat, indexStart * mult);
+  }
+}
+
+void Engine::drawArraysType(unsigned int fillMode, int verticesStart,
+                            int verticesCount, int instancesCount)
 {
   // Apply states
   applyStates();
   _drawCalls.addCount(1, false);
 
   // Render
-  auto indexFormat
-    = _uintIndicesCurrentlySet ? GL::UNSIGNED_INT : GL::UNSIGNED_SHORT;
-  auto mult = _uintIndicesCurrentlySet ? 4u : 2u;
-
+  const auto drawMode = DrawMode(fillMode);
   if (instancesCount) {
-    _gl->drawElementsInstanced(useTriangles ? GL::TRIANGLES : GL::LINES,
-                               indexCount, indexFormat, indexStart * mult,
-                               instancesCount);
-    return;
-  }
-
-  _gl->drawElements(useTriangles ? GL::TRIANGLES : GL::LINES,
-                    static_cast<int>(indexCount), indexFormat,
-                    indexStart * mult);
-}
-
-void Engine::drawPointClouds(int verticesStart, int verticesCount,
-                             int instancesCount)
-{
-  // Apply states
-  applyStates();
-  _drawCalls.addCount(1, false);
-
-  if (instancesCount > 0) {
-    _gl->drawArraysInstanced(GL::POINTS, verticesStart, verticesCount,
+    _gl->drawArraysInstanced(drawMode, verticesStart, verticesCount,
                              instancesCount);
-    return;
   }
-
-  _gl->drawArrays(GL::POINTS, verticesStart, static_cast<int>(verticesCount));
+  else {
+    _gl->drawArrays(drawMode, verticesStart, verticesCount);
+  }
 }
 
-void Engine::drawUnIndexed(bool useTriangles, int verticesStart,
-                           int verticesCount, int instancesCount)
+unsigned int Engine::DrawMode(unsigned int fillMode)
 {
-  // Apply states
-  applyStates();
-  _drawCalls.addCount(1, false);
-
-  if (instancesCount > 0) {
-    _gl->drawArraysInstanced(useTriangles ? GL::TRIANGLES : GL::LINES,
-                             verticesStart, verticesCount, instancesCount);
-    return;
+  switch (fillMode) {
+    // Triangle views
+    case Material::TriangleFillMode:
+      return GL::TRIANGLES;
+    case Material::PointFillMode:
+      return GL::POINTS;
+    case Material::WireFrameFillMode:
+      return GL::LINES;
+    // Draw modes
+    case Material::PointListDrawMode:
+      return GL::POINTS;
+    case Material::LineListDrawMode:
+      return GL::LINES;
+    case Material::LineLoopDrawMode:
+      return GL::LINE_LOOP;
+    case Material::LineStripDrawMode:
+      return GL::LINE_STRIP;
+    case Material::TriangleStripDrawMode:
+      return GL::TRIANGLE_STRIP;
+    case Material::TriangleFanDrawMode:
+      return GL::TRIANGLE_FAN;
+    default:
+      return GL::TRIANGLES;
   }
-
-  _gl->drawArrays(useTriangles ? GL::TRIANGLES : GL::LINES, verticesStart,
-                  static_cast<int>(verticesCount));
-}
-
-void Engine::drawElementsType(unsigned int /*fillMode*/, int /*verticesStart*/,
-                              int /*verticesCount*/, int /*instancesCount*/)
-{
 }
 
 // Shaders

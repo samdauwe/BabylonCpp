@@ -245,14 +245,16 @@ public:
     GL::IGLBuffer* instancesBuffer, const Float32Array& data,
     const vector_t<InstancingAttributeInfo>& offsetLocations);
   void applyStates();
-  void draw(bool useTriangles, unsigned int indexStart, int indexCount,
+  void draw(bool useTriangles, int indexStart, int indexCount,
             int instancesCount = 0);
   void drawPointClouds(int verticesStart, int verticesCount,
                        int instancesCount = 0);
   void drawUnIndexed(bool useTriangles, int verticesStart, int verticesCount,
                      int instancesCount = 0);
-  void drawElementsType(unsigned int fillMode, int verticesStart,
+  void drawElementsType(unsigned int fillMode, int indexStart,
                         int verticesCount, int instancesCount = 0);
+  void drawArraysType(unsigned int fillMode, int verticesStart,
+                      int verticesCount, int instancesCount = 0);
 
   /** Shaders **/
   void _releaseEffect(Effect* effect);
@@ -617,6 +619,7 @@ private:
                        Scene* scene, unsigned int internalFormat,
                        const ::std::function<void()>& onComplete);
   GL::GLenum _getInternalFormat(unsigned int format) const;
+  unsigned int DrawMode(unsigned int fillMode);
   GLProgramPtr
   _createShaderProgram(const unique_ptr_t<GL::IGLShader>& vertexShader,
                        const unique_ptr_t<GL::IGLShader>& fragmentShader,
