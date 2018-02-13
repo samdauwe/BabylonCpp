@@ -193,7 +193,7 @@ class SceneInstrumentation;
 class IBrowserGamepad;
 class ICanvas;
 class ICanvasRenderingContext2D;
-class IDisposable;
+struct IDisposable;
 class IReflect;
 namespace GL {
 struct GLInfo;

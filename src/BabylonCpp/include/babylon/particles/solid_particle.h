@@ -12,26 +12,30 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Represents one particle of a solid particle system.
+ * @see SolidParticleSystem
+ */
 class BABYLON_SHARED_EXPORT SolidParticle {
 
 public:
   /**
-   * Creates a Solid Particle object.
+   * @brief Creates a Solid Particle object.
    * Don't create particles manually, use instead the Solid Particle System
    * internal tools like _addParticle()
-   * `particleIndex` (integer) is the particle index in the Solid Particle
+   * @param particleIndex (integer) is the particle index in the Solid Particle
    * System pool. It's also the particle identifier.
-   * `positionIndex` (integer) is the starting index of the particle vertices in
-   * the SPS "positions" array.
-   * `indiceIndex` (integer) is the starting index of the particle indices in
-   * the SPS "indices" array.
-   * `model` (ModelShape) is a reference to the model shape on what the particle
-   * is designed.
-   * `shapeId` (integer) is the model shape identifier in the SPS.
-   * `idxInShape` (integer) is the index of the particle in the current model
-   * (ex: the 10th box of addShape(box, 30))
-   * `modelBoundingInfo` is the reference to the model BoundingInfo used for
-   * intersection computations.
+   * @param positionIndex (integer) is the starting index of the particle
+   * vertices in the SPS "positions" array.
+   * @param indiceIndex (integer) is the starting index of the particle indices
+   * in the SPS "indices" array.
+   * @param model (ModelShape) is a reference to the model shape on what the
+   * particle is designed.
+   * @param shapeId (integer) is the model shape identifier in the SPS.
+   * @param idxInShape (integer) is the index of the particle in the current
+   * model (ex: the 10th box of addShape(box, 30))
+   * @param modelBoundingInfo is the reference to the model BoundingInfo used
+   * for intersection computations.
    */
   SolidParticle(unsigned int particleIndex, unsigned int positionIndex,
                 unsigned int indiceIndex, ModelShape* model, int shapeId,
@@ -40,57 +44,109 @@ public:
   ~SolidParticle();
 
   /**
-   * Returns a boolean. True if the particle intersects another particle or
-   * another mesh, else false.
-   * The intersection is computed on the particle bounding sphere and Axis
-   * Aligned Bounding Box (AABB)
-   * `target` is the object (solid particle or mesh) what the intersection is
-   * computed against.
+   * @brief Returns a boolean. True if the particle intersects another particle
+   * or another mesh, else false. The intersection is computed on the particle
+   * bounding sphere and Axis Aligned Bounding Box (AABB)
+   * @param target is the object (solid particle or mesh) what the intersection
+   * is computed against.
+   * @returns true if it intersects
    */
   bool intersectsMesh(Mesh* target) const;
   bool intersectsMesh(SolidParticle* target) const;
 
 public:
-  // particle global index
+  /**
+   * particle global index
+   */
   unsigned int idx;
-  // color
+  /**
+   * The color of the particle
+   */
   Nullable<Color4> color;
-  // position
+  /**
+   * The world space position of the particle.
+   */
   Vector3 position;
-  // rotation
+  /**
+   * The world space rotation of the particle. (Not use if rotationQuaternion is
+   * set)
+   */
   Vector3 rotation;
-  // quaternion, will overwrite rotation
+  /**
+   * The world space rotation quaternion of the particle.
+   */
   unique_ptr_t<Quaternion> rotationQuaternion;
-  // scale
+  /**
+   * The scaling of the particle.
+   */
   Vector3 scaling;
-  // uvs
+  /**
+   * The uvs of the particle.
+   */
   Vector4 uvs;
-  // velocity
+  /**
+   * The current speed of the particle.
+   */
   Vector3 velocity;
-  // pivot point in the particle local space
+  /**
+   * The pivot point in the particle local space.
+   */
   Vector3 pivot;
-  // alive
+  /**
+   * Must the particle be translated from its pivot point in its local space ?
+   * In this case, the pivot point is set at the origin of the particle local
+   * space and the particle is translated. Default : false
+   */
+  bool translateFromPivot;
+  /**
+   * Is the particle active or not ?
+   */
   bool alive;
-  // visibility
+  /**
+   * Is the particle visible or not ?
+   */
   bool isVisible;
-  // index of this particle in the global "positions" array
+  /**
+   * Index of this particle in the global "positions" array (Internal use)
+   */
   unsigned int _pos;
-  // index of this particle in the global "indices" array
+  /**
+   * Index of this particle in the global "indices" array (Internal use)
+   */
   unsigned int _ind;
-  // model shape reference
+  /**
+   * ModelShape of this particle (Internal use)
+   */
   ModelShape* _model;
-  // model shape id
+  /**
+   * ModelShape id of this particle
+   */
   int shapeId;
-  // index of the particle in its shape id
+  /**
+   * Index of the particle in its shape id (Internal use)
+   */
   unsigned int idxInShape;
-  // reference to the shape model BoundingInfo object
+  /**
+   * Reference to the shape model BoundingInfo object (Internal use)
+   */
   unique_ptr_t<BoundingInfo> _modelBoundingInfo;
-  // particle BoundingInfo
+  /**
+   * Particle BoundingInfo object (Internal use)
+   */
   unique_ptr_t<BoundingInfo> _boundingInfo;
-  // reference to the SPS what the particle belongs to
+  /**
+   * Reference to the SPS what the particle belongs to (Internal use)
+   */
   SolidParticleSystem* _sps;
-  // still set as invisible in order to skip useless computations
+  /**
+   * Still set as invisible in order to skip useless computations (Internal use)
+   */
   bool _stillInvisible;
+  /**
+   * Last computed particle rotation matrix
+   */
+  Float32Array _rotationMatrix;
+
   unordered_map_t<string_t, float> extraFields;
 
 }; // end of class SolidParticle

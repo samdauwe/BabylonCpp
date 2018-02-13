@@ -5,12 +5,22 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Represents a Depth Sorted Particle in the solid particle system.
+ * @see SolidParticleSystem
+ */
 struct BABYLON_SHARED_EXPORT DepthSortedParticle {
-  // index of the particle in the "indices" array
+  /**
+   * Index of the particle in the "indices" array
+   */
   unsigned int ind = 0;
-  // length of the particle shape in the "indices" array
+  /**
+   * Index of the particle in the "indices" array
+   */
   size_t indicesLength = 0;
-  // squared distance from the particle to the camera end of class SolidParticle
+  /**
+   * Index of the particle in the "indices" array
+   */
   float sqDistance = 0.f;
 }; // end of struct DepthSortedParticle
 

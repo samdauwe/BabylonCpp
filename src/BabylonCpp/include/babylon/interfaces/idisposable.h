@@ -6,14 +6,16 @@
 namespace BABYLON {
 
 /**
- * @brief
+ * @brief IDisposable interface.
  */
-class BABYLON_SHARED_EXPORT IDisposable {
+struct BABYLON_SHARED_EXPORT IDisposable {
 
-public:
+  /**
+   * @brief Dispose the particle system and frees its associated resources.
+   */
   virtual void dispose(bool doNotRecurse = false) = 0;
 
-}; // end of class IDisposable
+}; // end of struct IDisposable
 
 } // end of namespace BABYLON
 

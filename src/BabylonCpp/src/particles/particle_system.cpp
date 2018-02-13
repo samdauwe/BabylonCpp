@@ -8,11 +8,17 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/material.h>
 #include <babylon/materials/textures/texture.h>
+#include <babylon/math/scalar.h>
 #include <babylon/mesh/buffer.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
+#include <babylon/particles/box_particle_emitter.h>
+#include <babylon/particles/cone_particle_emitter.h>
 #include <babylon/particles/particle.h>
+#include <babylon/particles/sphere_directed_particle_emitter.h>
+#include <babylon/particles/sphere_particle_emitter.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -47,14 +53,13 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
     , color2{Color4(1.f, 1.f, 1.f, 1.f)}
     , colorDead{Color4(0.f, 0.f, 0.f, 1.f)}
     , textureMask{Color4(1.f, 1.f, 1.f, 1.f)}
-    , startSpriteCellID{0}
-    , endSpriteCellID{0}
     , spriteCellLoop{true}
     , spriteCellChangeSpeed{0.f}
+    , startSpriteCellID{0}
+    , endSpriteCellID{0}
     , spriteCellWidth{0}
     , spriteCellHeight{0}
     , _vertexBufferSize{11}
-    , appendParticleVertexes{nullptr}
     , _epsilon{epsilon}
     , _capacity{capacity}
     , _scene{scene ? scene : Engine::LastCreatedScene()}
@@ -69,6 +74,7 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
     , _stopped{false}
     , _actualFrame{0}
     , _isAnimationSheetEnabled{isAnimationSheetEnabled}
+    , _appendParticleVertexes{nullptr}
 {
   _scene->particleSystems.emplace_back(this);
 
@@ -77,6 +83,7 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
   renderingGroupId = 0;
   layerMask        = 0x0FFFFFFF;
 
+  _isAnimationSheetEnabled = isAnimationSheetEnabled;
   if (isAnimationSheetEnabled) {
     _vertexBufferSize = 12;
   }
@@ -107,28 +114,7 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
   _vertexBuffers["options"]                       = ::std::move(options);
 
   // Default behaviors
-  startDirectionFunction
-    = [this](float emitPower, const Matrix& worldMatrix,
-             Vector3& directionToUpdate, Particle* /*particle*/) {
-        const float randX = Math::randomNumber(direction1.x, direction2.x);
-        const float randY = Math::randomNumber(direction1.y, direction2.y);
-        const float randZ = Math::randomNumber(direction1.z, direction2.z);
-
-        Vector3::TransformNormalFromFloatsToRef(
-          randX * emitPower, randY * emitPower, randZ * emitPower, worldMatrix,
-          directionToUpdate);
-      };
-
-  startPositionFunction = [this](const Matrix& worldMatrix,
-                                 Vector3& positionToUpdate,
-                                 Particle* /*particle*/) {
-    const float randX = Math::randomNumber(minEmitBox.x, maxEmitBox.x);
-    const float randY = Math::randomNumber(minEmitBox.y, maxEmitBox.y);
-    const float randZ = Math::randomNumber(minEmitBox.z, maxEmitBox.z);
-
-    Vector3::TransformCoordinatesFromFloatsToRef(randX, randY, randZ,
-                                                 worldMatrix, positionToUpdate);
-  };
+  particleEmitterType = ::std::make_unique<BoxParticleEmitter>(this);
 
   updateFunction = [this](vector_t<Particle*>& _particles) {
     for (unsigned int pIndex = 0; pIndex < _particles.size(); ++pIndex) {
@@ -208,8 +194,8 @@ void ParticleSystem::_createIndexBuffer()
 
 void ParticleSystem::recycleParticle(Particle* particle)
 {
-  auto lastParticle = particles.back();
-  particles.pop_back();
+  auto lastParticle = _particles.back();
+  _particles.pop_back();
 
   if (lastParticle != particle) {
     lastParticle->copyTo(*particle);
@@ -303,9 +289,9 @@ void ParticleSystem::_appendParticleVertexWithAnimation(unsigned int index,
 void ParticleSystem::_update(int newParticles)
 {
   // Update current
-  _alive = !particles.empty();
+  _alive = !_particles.empty();
 
-  updateFunction(particles);
+  updateFunction(_particles);
 
   // Add new ones
   Matrix worldMatrix;
@@ -320,7 +306,7 @@ void ParticleSystem::_update(int newParticles)
   }
 
   for (int index = 0; index < newParticles; ++index) {
-    if (particles.size() == _capacity) {
+    if (_particles.size() == _capacity) {
       break;
     }
 
@@ -334,22 +320,35 @@ void ParticleSystem::_update(int newParticles)
     else {
       particle = new Particle(this);
     }
-    particles.emplace_back(particle);
 
-    float emitPower = Math::randomNumber(minEmitPower, maxEmitPower);
+    _particles.emplace_back(particle);
 
-    startDirectionFunction(emitPower, worldMatrix, particle->direction,
-                           particle);
+    auto emitPower = Scalar::RandomRange(minEmitPower, maxEmitPower);
 
-    particle->lifeTime = Math::randomNumber(minLifeTime, maxLifeTime);
+    if (startPositionFunction) {
+      startPositionFunction(worldMatrix, particle->position, particle);
+    }
+    else {
+      particleEmitterType->startPositionFunction(worldMatrix,
+                                                 particle->position, particle);
+    }
 
-    particle->size = Math::randomNumber(minSize, maxSize);
+    if (startDirectionFunction) {
+      startDirectionFunction(emitPower, worldMatrix, particle->direction,
+                             particle);
+    }
+    else {
+      particleEmitterType->startDirectionFunction(
+        emitPower, worldMatrix, particle->direction, particle);
+    }
+
+    particle->lifeTime = Scalar::RandomRange(minLifeTime, maxLifeTime);
+
+    particle->size = Scalar::RandomRange(minSize, maxSize);
     particle->angularSpeed
-      = Math::randomNumber(minAngularSpeed, maxAngularSpeed);
+      = Scalar::RandomRange(minAngularSpeed, maxAngularSpeed);
 
-    startPositionFunction(worldMatrix, particle->position, particle);
-
-    float step = Math::random();
+    auto step = Scalar::RandomRange(0, 1.f);
 
     Color4::LerpToRef(color1, color2, step, particle->color);
 
@@ -473,20 +472,20 @@ void ParticleSystem::animate()
 
   // Animation sheet
   if (_isAnimationSheetEnabled) {
-    appendParticleVertexes = [this](unsigned int offset, Particle* particle) {
-      appenedParticleVertexesWithSheet(offset, particle);
+    _appendParticleVertexes = [this](unsigned int offset, Particle* particle) {
+      _appenedParticleVertexesWithSheet(offset, particle);
     };
   }
   else {
-    appendParticleVertexes = [this](unsigned int offset, Particle* particle) {
-      appenedParticleVertexesWithSheet(offset, particle);
+    _appendParticleVertexes = [this](unsigned int offset, Particle* particle) {
+      _appenedParticleVertexesWithSheet(offset, particle);
     };
   }
 
   // Update VBO
   unsigned int offset = 0;
-  for (auto& particle : particles) {
-    appendParticleVertexes(offset, particle);
+  for (auto& particle : _particles) {
+    _appendParticleVertexes(offset, particle);
     offset += 4;
   }
 
@@ -495,8 +494,8 @@ void ParticleSystem::animate()
   }
 }
 
-void ParticleSystem::appenedParticleVertexesWithSheet(unsigned int offset,
-                                                      Particle* particle)
+void ParticleSystem::_appenedParticleVertexesWithSheet(unsigned int offset,
+                                                       Particle* particle)
 {
   _appendParticleVertexWithAnimation(offset++, particle, 0, 0);
   _appendParticleVertexWithAnimation(offset++, particle, 1, 0);
@@ -504,8 +503,8 @@ void ParticleSystem::appenedParticleVertexesWithSheet(unsigned int offset,
   _appendParticleVertexWithAnimation(offset++, particle, 0, 1);
 }
 
-void ParticleSystem::appenedParticleVertexesNoSheet(unsigned int offset,
-                                                    Particle* particle)
+void ParticleSystem::_appenedParticleVertexesNoSheet(unsigned int offset,
+                                                     Particle* particle)
 {
   _appendParticleVertex(offset++, particle, 0, 0);
   _appendParticleVertex(offset++, particle, 1, 0);
@@ -528,7 +527,7 @@ size_t ParticleSystem::render()
 
   // Check
   if (!hasEmitter() || !effect->isReady() || !particleTexture
-      || !particleTexture->isReady() || !particles.size()) {
+      || !particleTexture->isReady() || !_particles.size()) {
     return 0;
   }
 
@@ -582,10 +581,11 @@ size_t ParticleSystem::render()
     engine->setDepthWrite(true);
   }
 
-  engine->draw(true, 0, static_cast<int>(particles.size() * 6));
+  engine->drawElementsType(Material::TriangleFillMode, 0,
+                           static_cast<int>(_particles.size() * 6));
   engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
 
-  return particles.size();
+  return _particles.size();
 }
 
 void ParticleSystem::dispose(bool /*doNotRecurse*/)
@@ -622,6 +622,44 @@ void ParticleSystem::dispose(bool /*doNotRecurse*/)
 vector_t<Animation*> ParticleSystem::getAnimations()
 {
   return animations;
+}
+
+SphereParticleEmitter* ParticleSystem::createSphereEmitter(float radius)
+{
+  auto particleEmitter = ::std::make_unique<SphereParticleEmitter>(radius);
+  particleEmitterType  = ::std::move(particleEmitter);
+  return particleEmitter.get();
+}
+
+SphereDirectedParticleEmitter* ParticleSystem::createDirectedSphereEmitter(
+  float radius, const Vector3& direction1, const Vector3& direction2)
+{
+  auto particleEmitter = ::std::make_unique<SphereDirectedParticleEmitter>(
+    radius, direction1, direction2);
+  particleEmitterType = ::std::move(particleEmitter);
+  return particleEmitter.get();
+}
+
+ConeParticleEmitter* ParticleSystem::createConeEmitter(float radius,
+                                                       float angle)
+{
+  auto particleEmitter = ::std::make_unique<ConeParticleEmitter>(radius, angle);
+  particleEmitterType  = ::std::move(particleEmitter);
+  return particleEmitter.get();
+}
+
+BoxParticleEmitter* ParticleSystem::createBoxEmitter(const Vector3& iDirection1,
+                                                     const Vector3& iDirection2,
+                                                     const Vector3& iMinEmitBox,
+                                                     const Vector3& iMaxEmitBox)
+{
+  auto particleEmitter = ::std::make_unique<BoxParticleEmitter>(this);
+  direction1           = iDirection1;
+  direction2           = iDirection2;
+  minEmitBox           = iMinEmitBox;
+  maxEmitBox           = iMaxEmitBox;
+  particleEmitterType  = ::std::move(particleEmitter);
+  return particleEmitter.get();
 }
 
 IParticleSystem* ParticleSystem::clone(const string_t& /*iName*/,
@@ -746,8 +784,21 @@ ParticleSystem* ParticleSystem::Parse(const Json::value& parsedParticleSystem,
     = Json::GetNumber(parsedParticleSystem, "targetStopDuration", 0);
   particleSystem->textureMask = Color4::FromArray(
     Json::ToArray<float>(parsedParticleSystem, "textureMask"));
-  particleSystem->blendMode = Json::GetNumber(parsedParticleSystem, "blendMode",
-                                              ParticleSystem::BLENDMODE_ONEONE);
+  particleSystem->blendMode = Json::GetNumber<unsigned>(
+    parsedParticleSystem, "blendMode", ParticleSystem::BLENDMODE_ONEONE);
+
+  particleSystem->startSpriteCellID
+    = Json::GetNumber<unsigned>(parsedParticleSystem, "startSpriteCellID", 0u);
+  particleSystem->endSpriteCellID
+    = Json::GetNumber<unsigned>(parsedParticleSystem, "endSpriteCellID", 0u);
+  particleSystem->spriteCellLoop
+    = Json::GetBool(parsedParticleSystem, "spriteCellLoop", true);
+  particleSystem->spriteCellChangeSpeed = Json::GetNumber<float>(
+    parsedParticleSystem, "spriteCellChangeSpeed", 0.f);
+  particleSystem->spriteCellWidth
+    = Json::GetNumber<unsigned>(parsedParticleSystem, "spriteCellWidth", 0u);
+  particleSystem->spriteCellHeight
+    = Json::GetNumber<unsigned>(parsedParticleSystem, "spriteCellHeight", 0u);
 
   if (!particleSystem->preventAutoStart) {
     particleSystem->start();
