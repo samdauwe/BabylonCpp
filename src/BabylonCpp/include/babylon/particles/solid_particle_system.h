@@ -32,26 +32,44 @@ struct SolidParticleSystemMeshBuilderOptions {
     vertexFunction = nullptr;
 }; // end of struct SolidParticleSystemMeshBuilderOptions
 
+/**
+ * @brief The SPS is a single updatable mesh. The solid particles are simply
+ * separate parts or faces fo this big mesh. As it is just a mesh, the SPS has
+ * all the same properties than any other BJS mesh : not more, not less. It can
+ * be scaled, rotated, translated, enlighted, textured, moved, etc.
+ *
+ * The SPS is also a particle system. It provides some methods to manage the
+ * particles. However it is behavior agnostic. This means it has no emitter, no
+ * particle physics, no particle recycler. You have to implement your own
+ * behavior.
+ *
+ * Full documentation here :
+ * http://doc.babylonjs.com/overviews/Solid_Particle_System
+ */
 class BABYLON_SHARED_EXPORT SolidParticleSystem : public IDisposable {
 
 public:
   /**
-   * @brief Creates a SPS (Solid Particle System) object.
-   * `name` (String) is the SPS name, this will be the underlying mesh name.
-   * `scene` (Scene) is the scene in which the SPS is added.
-   * `updatable` (optional boolean, default true) : if the SPS must be updatable
-   * or immutable.
-   * `isPickable` (optional boolean, default false) : if the solid particles
-   * must be pickable.
-   * `particleIntersection` (optional boolean, default false) : if the solid
-   * particle intersections must be computed.
-   * `boundingSphereOnly` (optional boolean, default false) : if the particle
-   * intersection must be computed only with the bounding sphere (no bounding
-   * box computation, so faster).
-   * `bSphereRadiusFactor` (optional float, default 1.0) : a number to multiply
-   * the boundind sphere radius by in order to reduce it for instance.
-   *  Example : bSphereRadiusFactor = 1.0 / Math.sqrt(3.0) => the bounding
-   * sphere exactly matches a spherical mesh.
+   * Creates a SPS (Solid Particle System) object.
+   * @param name (String) is the SPS name, this will be the underlying mesh
+   * name.
+   * @param scene (Scene) is the scene in which the SPS is added.
+   * @param updatable (optional boolean, default true) : if the SPS must be
+   * updatable or immutable.
+   * @param isPickable (optional boolean, default false) : if the solid
+   * particles must be pickable.
+   * @param enableDepthSort (optional boolean, default false) : if the solid
+   * particles must be sorted in the geometry according to their distance to the
+   * camera.
+   * @param particleIntersection (optional boolean, default false) : if the
+   * solid particle intersections must be computed.
+   * @param boundingSphereOnly (optional boolean, default false) : if the
+   * particle intersection must be computed only with the bounding sphere (no
+   * bounding box computation, so faster).
+   * @param bSphereRadiusFactor (optional float, default 1.0) : a number to
+   * multiply the boundind sphere radius by in order to reduce it for instance.
+   * Example: bSphereRadiusFactor = 1.0 / Math.sqrt(3.0) => the bounding sphere
+   * exactly matches a spherical mesh.
    */
   SolidParticleSystem(const string_t& name, Scene* scene,
                       const SolidParticleSystemOptions& options);
@@ -59,43 +77,44 @@ public:
 
   /**
    * @brief Builds the SPS underlying mesh. Returns a standard Mesh.
-   * If no model shape was added to the SPS, the returned mesh is just a
-   * single triangular plane.
+   * If no model shape was added to the SPS, the returned mesh is just a single
+   * triangular plane.
+   * @returns the created mesh
    */
   Mesh* buildMesh();
 
   /**
    * @brief Digests the mesh and generates as many solid particles in the system
-   * as wanted. Returns the SPS.
-   * These particles will have the same geometry than the mesh parts and
-   * will be positioned at the same localisation than the mesh original places.
-   * Thus the particles generated from `digest()` have their property
-   * `position` set yet.
-   * `mesh` (`Mesh`) is the mesh to be digested
-   * `facetNb` (optional integer, default 1) is the number of mesh facets
-   * per particle, this parameter is overriden by the parameter `number` if any
-   * `delta` (optional integer, default 0) is the random extra number of
-   * facets per particle , each particle will have between `facetNb` and
-   * `facetNb + delta` facets
-   * `number` (optional positive integer) is the wanted number of particles
-   * : each particle is built with `mesh_total_facets / number` facets
+   * as wanted. Returns the SPS. These particles will have the same geometry
+   * than the mesh parts and will be positioned at the same localisation than
+   * the mesh original places. Thus the particles generated from `digest()` have
+   * their property `position` set yet.
+   * @param mesh ( Mesh ) is the mesh to be digested
+   * @param options {facetNb} (optional integer, default 1) is the number of
+   * mesh facets per particle, this parameter is overriden by the parameter
+   * `number` if any {delta} (optional integer, default 0) is the random extra
+   * number of facets per particle , each particle will have between `facetNb`
+   * and `facetNb + delta` facets {number} (optional positive integer) is the
+   * wanted number of particles : each particle is built with `mesh_total_facets
+   * / number` facets
+   * @returns the current SPS
    */
   SolidParticleSystem& digest(Mesh* mesh,
                               const SolidParticleSystemDigestOptions& options);
 
   /**
    * @brief Adds some particles to the SPS from the model shape. Returns the
-   * shape id.
-   * Please read the doc :
+   * shape id. Please read the doc :
    * http://doc.babylonjs.com/overviews/Solid_Particle_System#create-an-immutable-sps
-   * `mesh` is any `Mesh` object that will be used as a model for the
-   * solid particles.
-   * `nb` (positive integer) the number of particles to be created from
+   * @param mesh is any Mesh object that will be used as a model for the solid
+   * particles.
+   * @param nb (positive integer) the number of particles to be created from
    * this model
-   * `positionFunction` is an optional javascript function to called for
-   * each particle on SPS creation.
-   * `vertexFunction` is an optional javascript function to called for
-   * each vertex of each particle on SPS creation
+   * @param options {positionFunction} is an optional javascript function to
+   * called for each particle on SPS creation. {vertexFunction} is an optional
+   * javascript function to called for each vertex of each particle on SPS
+   * creation
+   * @returns the number of shapes in the system
    */
   int addShape(Mesh* mesh, size_t nb,
                const SolidParticleSystemMeshBuilderOptions& options);
@@ -103,22 +122,22 @@ public:
   /**
    * @brief Rebuilds the whole mesh and updates the VBO : custom positions and
    * vertices are recomputed if needed.
-   * @returns The SPS.
+   * @returns the SPS.
    */
   SolidParticleSystem& rebuildMesh();
 
   /**
    * @brief Sets all the particles : this method actually really updates the
    * mesh according to the particle positions, rotations, colors, textures, etc.
-   *  This method calls `updateParticle()` for each particle of the SPS.
-   *  For an animated SPS, it is usually called within the render loop.
-   * @param start (default 0) the particle index in the particle array
-   * where to start to compute the particle property values
-   * @param end (default nbParticle - 1)  the particle index in the
-   * particle array where to stop to compute the particle property values
-   * @param update (default true) if the mesh must be finally updated on
-   * this call after all the particle computations.
-   * @returns The SPS.
+   * This method calls `updateParticle()` for each particle of the SPS.
+   * For an animated SPS, it is usually called within the render loop.
+   * @param start The particle index in the particle array where to start to
+   * compute the particle property values _(default 0)_
+   * @param end The particle index in the particle array where to stop to
+   * compute the particle property values _(default nbParticle - 1)_
+   * @param update If the mesh must be finally updated on this call after all
+   * the particle computations _(default true)_
+   * @returns the SPS.
    */
   SolidParticleSystem& setParticles(unsigned int start = 0,
                                     unsigned int end = 0, bool update = true);
@@ -130,10 +149,9 @@ public:
 
   /**
    * @brief Visibilty helper : Recomputes the visible size according to the mesh
-   * bounding box
-   * doc :
+   * bounding box doc :
    * http://doc.babylonjs.com/overviews/Solid_Particle_System#sps-visibility
-   * @returns The SPS.
+   * @returns the SPS.
    */
   SolidParticleSystem& refreshVisibleSize();
 
@@ -148,8 +166,9 @@ public:
   void setVisibilityBox(float size);
 
   /**
-   * @brief Returns if the SPS is as always visible or not.
-   * @return If the SPS is as always visible or not.
+   * @brief Gets whether the SPS as always visible or not
+   * doc :
+   * http://doc.babylonjs.com/overviews/Solid_Particle_System#sps-visibility
    */
   bool isAlwaysVisible() const;
 
@@ -168,9 +187,13 @@ public:
    */
   void setIsVisibilityBoxLocked(bool val);
 
+  /**
+   * @brief Gets if the SPS visibility box as locked or not. This
+   * enables/disables the underlying mesh bounding box updates. doc :
+   * http://doc.babylonjs.com/overviews/Solid_Particle_System#sps-visibility
+   */
   bool isVisibilityBoxLocked() const;
 
-  // Optimizer setters
   /**
    * @brief Tells to `setParticles()` to compute the particle rotations or not.
    * Default value : true. The SPS is faster when it's set to false.
@@ -197,9 +220,9 @@ public:
 
   /**
    * @brief Tells to `setParticles()` to call the vertex function for each
-   * vertex of each particle, or not.
-   * Default value : false. The SPS is faster when it's set to false.
-   * Note : the particle custom vertex positions aren't stored values.
+   * vertex of each particle, or not. Default value : false. The SPS is faster
+   * when it's set to false. Note : the particle custom vertex positions aren't
+   * stored values.
    */
   void setComputeParticleVertex(bool val);
 
@@ -211,24 +234,54 @@ public:
 
   /**
    * @brief Tells to `setParticles()` to sort or not the distance between each
-   * particle and the camera.
-   * Skipped when `enableDepthSort` is set to `false` (default) at construction
-   * time.
-   * Default : `true`
+   * particle and the camera. Skipped when `enableDepthSort` is set to `false`
+   * (default) at construction time. Default : `true`
    */
   void setDepthSortParticles(bool val);
 
-  // getters
+  /**
+   * @brief Gets if `setParticles()` computes the particle rotations or not.
+   * Default value : true. The SPS is faster when it's set to false.
+   * Note : the particle rotations aren't stored values, so setting
+   * `computeParticleRotation` to false will prevents the particle to rotate.
+   */
   bool computeParticleRotation() const;
 
+  /**
+   * @brief Gets if `setParticles()` computes the particle colors or not.
+   * Default value : true. The SPS is faster when it's set to false.
+   * Note : the particle colors are stored values, so setting
+   * `computeParticleColor` to false will keep yet the last colors set.
+   */
   bool computeParticleColor() const;
 
+  /**
+   * @brief Gets if `setParticles()` computes the particle textures or not.
+   * Default value : true. The SPS is faster when it's set to false.
+   * Note : the particle textures are stored values, so setting
+   * `computeParticleTexture` to false will keep yet the last colors set.
+   */
   bool computeParticleTexture() const;
 
+  /**
+   * @brief Gets if `setParticles()` calls the vertex function for each vertex
+   * of each particle, or not. Default value : false. The SPS is faster when
+   * it's set to false. Note : the particle custom vertex positions aren't
+   * stored values.
+   */
   bool computeParticleVertex() const;
 
+  /**
+   * @brief Gets if `setParticles()` computes or not the mesh bounding box when
+   * computing the particle positions.
+   */
   bool computeBoundingBox() const;
 
+  /**
+   * @brief Gets if `setParticles()` sorts or not the distance between each
+   * particle and the camera. Skipped when `enableDepthSort` is set to `false`
+   * (default) at construction time. Default : `true`
+   */
   bool depthSortParticles() const;
 
   // =======================================================================
@@ -237,30 +290,30 @@ public:
 
   /**
    * @brief This function does nothing. It may be overwritten to set all the
-   * particle first values.
-   * The SPS doesn't call this function, you may have to call it by your own.
-   * doc :
+   * particle first values. The SPS doesn't call this function, you may have to
+   * call it by your own. doc :
    * http://doc.babylonjs.com/overviews/Solid_Particle_System#particle-management
    */
   virtual void initParticles();
 
   /**
    * @brief This function does nothing. It may be overwritten to recycle a
-   * particle.
-   * The SPS doesn't call this function, you may have to call it by your
-   * own.
-   * doc :
+   * particle. The SPS doesn't call this function, you may have to call it by
+   * your own. doc :
    * http://doc.babylonjs.com/overviews/Solid_Particle_System#particle-management
+   * @param particle The particle to recycle
+   * @returns the recycled particle
    */
   virtual SolidParticle* recycleParticle(SolidParticle* particle);
 
   /**
    * @brief Updates a particle : this function should  be overwritten by the
    * user. It is called on each particle by `setParticles()`. This is the place
-   * to code each particle behavior.
-   * doc :
+   * to code each particle behavior. doc :
    * http://doc.babylonjs.com/overviews/Solid_Particle_System#particle-management
-   * ex : just set a particle position or velocity and recycle conditions
+   * Example : just set a particle position or velocity and recycle conditions
+   * @param particle The particle to update
+   * @returns the updated particle
    */
   virtual SolidParticle* updateParticle(SolidParticle* particle);
 
@@ -273,15 +326,16 @@ public:
    * @param pt the index of the current vertex in the particle shape
    * doc :
    * http://doc.babylonjs.com/overviews/Solid_Particle_System#update-each-particle-shape
-   * ex : just set a vertex particle position
+   * Example : just set a vertex particle position
+   * @returns the updated vertex
    */
   virtual Vector3 updateParticleVertex(SolidParticle* particle,
                                        const Vector3& vertex, unsigned int pt);
 
   /**
    * @brief This will be called before any other treatment by `setParticles()`
-   * and will be passed three parameters.
-   * This does nothing and may be overwritten by the user.
+   * and will be passed three parameters. This does nothing and may be
+   * overwritten by the user.
    * @param start the particle index in the particle array where to stop to
    * iterate, same than the value passed to setParticle()
    * @param stop the particle index in the particle array where to stop to
@@ -293,9 +347,8 @@ public:
 
   /**
    * @brief This will be called  by `setParticles()` after all the other
-   * treatments and just before the actual mesh update.
-   * This will be passed three parameters.
-   * This does nothing and may be overwritten by the user.
+   * treatments and just before the actual mesh update. This will be passed
+   * three parameters. This does nothing and may be overwritten by the user.
    * @param start the particle index in the particle array where to stop to
    * iterate, same than the value passed to setParticle()
    * @param stop the particle index in the particle array where to stop to
@@ -357,7 +410,6 @@ private:
   void _quaternionToRotationMatrix();
 
 public:
-  // Members
   /**
    * The SPS array of Solid Particle objects. Just access each particle as with
    * any classic array.
@@ -367,8 +419,7 @@ public:
 
   /**
    * The SPS total number of particles. Read only. Use SPS.counter instead if
-   * you
-   * need to set your own value.
+   * you need to set your own value.
    */
   unsigned int nbParticles;
 
@@ -417,7 +468,16 @@ public:
    */
   vector_t<DepthSortedParticle> depthSortedParticles;
 
+  /**
+   * If the particle intersection must be computed only with the bounding sphere
+   * (no bounding box computation, so faster). (Internal use only)
+   */
   bool _bSphereOnly;
+
+  /**
+   * A number to multiply the boundind sphere radius by in order to reduce it
+   * for instance. (Internal use only)
+   */
   float _bSphereRadiusFactor;
 
 private:
@@ -493,6 +553,7 @@ private:
                       const DepthSortedParticle& p2)>
     _depthSortFunction;
   bool _needs32Bits;
+  Vector3 _pivotBackTranslation;
 
 }; // end of class SolidParticleSystem
 

@@ -73,14 +73,15 @@ SolidParticleSystem::SolidParticleSystem(
     , _sinYaw{0.f}
     , _cosYaw{0.f}
     , _mustUnrotateFixedNormals{false}
-    , _minimum{Tmp::Vector3Array[0]}
-    , _maximum{Tmp::Vector3Array[1]}
+    , _minimum{Vector3::Zero()}
+    , _maximum{Vector3::Zero()}
     , _scale{Tmp::Vector3Array[2]}
     , _translation{Tmp::Vector3Array[3]}
-    , _minBbox{Tmp::Vector3Array[4]}
-    , _maxBbox{Tmp::Vector3Array[5]}
+    , _minBbox{Vector3::Zero()}
+    , _maxBbox{Vector3::Zero()}
     , _particlesIntersect{options.particleIntersection}
     , _needs32Bits{false}
+    , _pivotBackTranslation{Vector3::Zero()}
 {
   _depthSortFunction
     = [](const DepthSortedParticle& p1, const DepthSortedParticle& p2) {
@@ -107,7 +108,7 @@ Mesh* SolidParticleSystem::buildMesh()
   _uvs32       = Float32Array(_uvs);
   _colors32    = Float32Array(_colors);
   if (recomputeNormals) {
-    VertexData::ComputeNormals(_positions32, _indices, _normals);
+    VertexData::ComputeNormals(_positions32, _indices32, _normals);
   }
   _normals32     = Float32Array(_normals);
   _fixedNormal32 = Float32Array(_normals);
@@ -168,7 +169,7 @@ SolidParticleSystem::digest(Mesh* _mesh,
     number = (number > totalFacets) ? totalFacets : number;
     size   = static_cast<size_t>(::std::round(static_cast<float>(totalFacets)
                                             / static_cast<float>(number)));
-    delta = 0;
+    delta  = 0;
   }
   else {
     size = (size > totalFacets) ? totalFacets : size;
@@ -178,12 +179,13 @@ SolidParticleSystem::digest(Mesh* _mesh,
   Uint32Array facetInd;  // submesh indices
   Float32Array facetUV;  // submesh UV
   Float32Array facetCol; // submesh colors
-  Vector3& barycenter = Tmp::Vector3Array[0];
-  size_t sizeO        = size;
+  auto barycenter = Vector3::Zero();
+  auto sizeO      = size;
 
   while (f < totalFacets) {
-    size = sizeO + static_cast<size_t>(::std::floor(
-                     (1.f + static_cast<float>(delta)) * Math::random()));
+    size = sizeO
+           + static_cast<size_t>(::std::floor((1.f + static_cast<float>(delta))
+                                              * Math::random()));
     if (f > totalFacets - size) {
       size = totalFacets - f;
     }
@@ -204,9 +206,8 @@ SolidParticleSystem::digest(Mesh* _mesh,
         stl_util::concat(facetUV, {meshUV[i * 2], meshUV[i * 2 + 1]});
       }
       if (!meshCol.empty()) {
-        stl_util::concat(facetCol,
-                         {meshCol[i * 4 + 0], meshCol[i * 4 + 1],
-                          meshCol[i * 4 + 2], meshCol[i * 4 + 3]});
+        stl_util::concat(facetCol, {meshCol[i * 4 + 0], meshCol[i * 4 + 1],
+                                    meshCol[i * 4 + 2], meshCol[i * 4 + 3]});
       }
       ++fi;
     }
@@ -302,6 +303,7 @@ void SolidParticleSystem::_resetCopy()
   _copy->uvs.z              = 1.f;
   _copy->uvs.w              = 1.f;
   _copy->color              = nullptr;
+  _copy->translateFromPivot = false;
 }
 
 SolidParticle* SolidParticleSystem::_meshBuilder(
@@ -333,6 +335,13 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
   }
   _quaternionToRotationMatrix();
 
+  if (_copy->translateFromPivot) {
+    _pivotBackTranslation.copyFromFloats(0.f, 0.f, 0.f);
+  }
+  else {
+    _pivotBackTranslation.copyFrom(_copy->pivot);
+  }
+
   for (unsigned int si = 0; si < shape.size(); ++si) {
     _vertex.x = shape[si].x;
     _vertex.y = shape[si].y;
@@ -346,20 +355,20 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
     _vertex.y *= _copy->scaling.y;
     _vertex.z *= _copy->scaling.z;
 
-    _vertex.x *= _copy->pivot.x;
-    _vertex.y *= _copy->pivot.y;
-    _vertex.z *= _copy->pivot.z;
+    _vertex.x -= _copy->pivot.x;
+    _vertex.y -= _copy->pivot.y;
+    _vertex.z -= _copy->pivot.z;
 
     Vector3::TransformCoordinatesToRef(_vertex, _rotMatrix, _rotated);
-    stl_util::concat(positions,
-                     {_copy->position.x + _rotated.x,
-                      _copy->position.y + _rotated.y,
-                      _copy->position.z + _rotated.z});
+
+    _rotated.addInPlace(_pivotBackTranslation);
+    stl_util::concat(positions, {_copy->position.x + _rotated.x,
+                                 _copy->position.y + _rotated.y,
+                                 _copy->position.z + _rotated.z});
     if (!meshUV.empty()) {
       stl_util::concat(
-        uvs,
-        {(_copy->uvs.z - _copy->uvs.x) * meshUV[u] + _copy->uvs.x,
-         (_copy->uvs.w - _copy->uvs.y) * meshUV[u + 1] + _copy->uvs.y});
+        uvs, {(_copy->uvs.z - _copy->uvs.x) * meshUV[u] + _copy->uvs.x,
+              (_copy->uvs.w - _copy->uvs.y) * meshUV[u + 1] + _copy->uvs.y});
       u += 2;
     }
 
@@ -521,6 +530,13 @@ void SolidParticleSystem::_rebuildParticle(SolidParticle* particle)
   }
   _quaternionToRotationMatrix();
 
+  if (_copy->translateFromPivot) {
+    _pivotBackTranslation.copyFromFloats(0.f, 0.f, 0.f);
+  }
+  else {
+    _pivotBackTranslation.copyFrom(_copy->pivot);
+  }
+
   _shape = particle->_model->_shape;
   for (unsigned int pt = 0; pt < _shape.size(); ++pt) {
     _vertex.x = _shape[pt].x;
@@ -536,11 +552,12 @@ void SolidParticleSystem::_rebuildParticle(SolidParticle* particle)
     _vertex.y *= _copy->scaling.y;
     _vertex.z *= _copy->scaling.z;
 
-    _vertex.x *= _copy->pivot.x;
-    _vertex.y *= _copy->pivot.y;
-    _vertex.z *= _copy->pivot.z;
+    _vertex.x -= _copy->pivot.x;
+    _vertex.y -= _copy->pivot.y;
+    _vertex.z -= _copy->pivot.z;
 
     Vector3::TransformCoordinatesToRef(_vertex, _rotMatrix, _rotated);
+    _rotated.addInPlace(_pivotBackTranslation);
 
     _positions32[particle->_pos + pt * 3]     = _copy->position.x + _rotated.x;
     _positions32[particle->_pos + pt * 3 + 1] = _copy->position.y + _rotated.y;
@@ -713,6 +730,26 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
           _quaternionRotationYPR();
         }
         _quaternionToRotationMatrix();
+        _particle->_rotationMatrix[0] = _rotMatrix.m[0];
+        _particle->_rotationMatrix[1] = _rotMatrix.m[1];
+        _particle->_rotationMatrix[2] = _rotMatrix.m[2];
+        _particle->_rotationMatrix[3] = _rotMatrix.m[4];
+        _particle->_rotationMatrix[4] = _rotMatrix.m[5];
+        _particle->_rotationMatrix[5] = _rotMatrix.m[6];
+        _particle->_rotationMatrix[6] = _rotMatrix.m[8];
+        _particle->_rotationMatrix[7] = _rotMatrix.m[9];
+        _particle->_rotationMatrix[8] = _rotMatrix.m[10];
+      }
+
+      if (_particle->translateFromPivot) {
+        _pivotBackTranslation.x = 0.f;
+        _pivotBackTranslation.y = 0.f;
+        _pivotBackTranslation.z = 0.f;
+      }
+      else {
+        _pivotBackTranslation.x = _particle->pivot.x;
+        _pivotBackTranslation.y = _particle->pivot.y;
+        _pivotBackTranslation.z = _particle->pivot.z;
       }
 
       // particle vertex loop
@@ -734,16 +771,23 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
         _vertex.y *= _particle->scaling.y;
         _vertex.z *= _particle->scaling.z;
 
-        _vertex.x *= _particle->pivot.x;
-        _vertex.y *= _particle->pivot.y;
-        _vertex.z *= _particle->pivot.z;
+        _vertex.x -= _particle->pivot.x;
+        _vertex.y -= _particle->pivot.y;
+        _vertex.z -= _particle->pivot.z;
 
-        _rotated.x = _vertex.x * _rotMatrix.m[0] + _vertex.y * _rotMatrix.m[4]
-                     + _vertex.z * _rotMatrix.m[8];
-        _rotated.y = _vertex.x * _rotMatrix.m[1] + _vertex.y * _rotMatrix.m[5]
-                     + _vertex.z * _rotMatrix.m[9];
-        _rotated.z = _vertex.x * _rotMatrix.m[2] + _vertex.y * _rotMatrix.m[6]
-                     + _vertex.z * _rotMatrix.m[10];
+        _rotated.x = _vertex.x * _particle->_rotationMatrix[0]
+                     + _vertex.y * _particle->_rotationMatrix[3]
+                     + _vertex.z * _particle->_rotationMatrix[6];
+        _rotated.y = _vertex.x * _particle->_rotationMatrix[1]
+                     + _vertex.y * _particle->_rotationMatrix[4]
+                     + _vertex.z * _particle->_rotationMatrix[7];
+        _rotated.z = _vertex.x * _particle->_rotationMatrix[2]
+                     + _vertex.y * _particle->_rotationMatrix[5]
+                     + _vertex.z * _particle->_rotationMatrix[8];
+
+        _rotated.x += _pivotBackTranslation.x;
+        _rotated.y += _pivotBackTranslation.y;
+        _rotated.z += _pivotBackTranslation.z;
 
         _positions32[idx] = _particle->position.x + _cam_axisX.x * _rotated.x
                             + _cam_axisY.x * _rotated.y
@@ -783,12 +827,15 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
           _normal.y = _fixedNormal32[idx + 1];
           _normal.z = _fixedNormal32[idx + 2];
 
-          _rotated.x = _normal.x * _rotMatrix.m[0] + _normal.y * _rotMatrix.m[4]
-                       + _normal.z * _rotMatrix.m[8];
-          _rotated.y = _normal.x * _rotMatrix.m[1] + _normal.y * _rotMatrix.m[5]
-                       + _normal.z * _rotMatrix.m[9];
-          _rotated.z = _normal.x * _rotMatrix.m[2] + _normal.y * _rotMatrix.m[6]
-                       + _normal.z * _rotMatrix.m[10];
+          _rotated.x = _normal.x * _particle->_rotationMatrix[0]
+                       + _normal.y * _particle->_rotationMatrix[3]
+                       + _normal.z * _particle->_rotationMatrix[6];
+          _rotated.y = _normal.x * _particle->_rotationMatrix[1]
+                       + _normal.y * _particle->_rotationMatrix[4]
+                       + _normal.z * _particle->_rotationMatrix[7];
+          _rotated.z = _normal.x * _particle->_rotationMatrix[2]
+                       + _normal.y * _particle->_rotationMatrix[5]
+                       + _normal.z * _particle->_rotationMatrix[8];
 
           _normals32[idx] = _cam_axisX.x * _rotated.x
                             + _cam_axisY.x * _rotated.y
@@ -866,12 +913,15 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
                       * _particle->scaling.y;
           _vertex.z = _particle->_modelBoundingInfo->boundingBox.vectors[b].z
                       * _particle->scaling.z;
-          _rotated.x = _vertex.x * _rotMatrix.m[0] + _vertex.y * _rotMatrix.m[4]
-                       + _vertex.z * _rotMatrix.m[8];
-          _rotated.y = _vertex.x * _rotMatrix.m[1] + _vertex.y * _rotMatrix.m[5]
-                       + _vertex.z * _rotMatrix.m[9];
-          _rotated.z = _vertex.x * _rotMatrix.m[2] + _vertex.y * _rotMatrix.m[6]
-                       + _vertex.z * _rotMatrix.m[10];
+          _rotated.x = _vertex.x * _particle->_rotationMatrix[0]
+                       + _vertex.y * _particle->_rotationMatrix[3]
+                       + _vertex.z * _particle->_rotationMatrix[6];
+          _rotated.y = _vertex.x * _particle->_rotationMatrix[1]
+                       + _vertex.y * _particle->_rotationMatrix[4]
+                       + _vertex.z * _particle->_rotationMatrix[7];
+          _rotated.z = _vertex.x * _particle->_rotationMatrix[2]
+                       + _vertex.y * _particle->_rotationMatrix[5]
+                       + _vertex.z * _particle->_rotationMatrix[8];
           bBox.vectors[b].x = _particle->position.x + _cam_axisX.x * _rotated.x
                               + _cam_axisY.x * _rotated.y
                               + _cam_axisZ.x * _rotated.z;
@@ -936,11 +986,11 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
         // then also the normal reference array _fixedNormal32[]
         if (mesh->isFacetDataEnabled()) {
           auto params = mesh->getFacetDataParameters();
-          VertexData::ComputeNormals(_positions32, _indices, _normals32,
+          VertexData::ComputeNormals(_positions32, _indices32, _normals32,
                                      params);
         }
         else {
-          VertexData::ComputeNormals(_positions32, _indices, _normals32);
+          VertexData::ComputeNormals(_positions32, _indices32, _normals32);
         }
         for (size_t i = 0; i < _normals32.size(); ++i) {
           _fixedNormal32[i] = _normals32[i];
