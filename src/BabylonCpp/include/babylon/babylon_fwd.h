@@ -34,12 +34,14 @@ class InterpolateValueAction;
 class Animatable;
 class Animation;
 class AnimationEvent;
+class AnimationGroup;
 struct AnimationKey;
 class AnimationRange;
 class AnimationValue;
 struct IAnimatable;
 class PathCursor;
 class RuntimeAnimation;
+struct TargetedAnimation;
 // - Easing
 class BackEase;
 class BezierCurveEase;

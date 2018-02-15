@@ -3,6 +3,7 @@
 #include <babylon/actions/action_event.h>
 #include <babylon/actions/action_manager.h>
 #include <babylon/animations/animatable.h>
+#include <babylon/animations/animation_group.h>
 #include <babylon/audio/sound_track.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>

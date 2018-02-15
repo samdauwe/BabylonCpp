@@ -16,6 +16,7 @@ struct BABYLON_SHARED_EXPORT AnimationKey {
   AnimationValue value;
   Nullable<AnimationValue> inTangent;
   Nullable<AnimationValue> outTangent;
+  Nullable<AnimationValue> interpolation;
 
 }; // end of class AnimationKey
 

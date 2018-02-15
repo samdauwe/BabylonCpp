@@ -1131,6 +1131,13 @@ public:
    * @see BABYLON.AbstractMesh
    */
   vector_t<unique_ptr_t<AbstractMesh>> meshes;
+
+  /**
+   * All of the animation groups added to this scene.
+   * @see BABYLON.AnimationGroup
+   */
+  vector_t<unique_ptr_t<AnimationGroup>> animationGroups;
+
   // Geometries
   vector_t<unique_ptr_t<Material>> materials;
   vector_t<unique_ptr_t<MultiMaterial>> multiMaterials;
@@ -1291,6 +1298,7 @@ private:
    * is light enabled on this scene.
    */
   bool _lightsEnabled;
+
   // Geometries
   vector_t<unique_ptr_t<Geometry>> _geometries;
   // Materials
