@@ -143,7 +143,7 @@ void EdgesRenderer::_checkEdge(unsigned int faceIndex, int edge,
     needToCreateLine = true;
   }
   else {
-    auto dotProduct = Vector3::Dot(faceNormals[faceIndex],
+    auto dotProduct  = Vector3::Dot(faceNormals[faceIndex],
                                    faceNormals[static_cast<size_t>(edge)]);
     needToCreateLine = dotProduct < _epsilon;
   }
@@ -372,8 +372,8 @@ void EdgesRenderer::render()
   _lineShader->setColor4("color", _source->edgesColor);
 
   if (scene->activeCamera->mode == Camera::ORTHOGRAPHIC_CAMERA) {
-    _lineShader->setFloat(
-      "width", _source->edgesWidth / edgesWidthScalerForOrthographic);
+    _lineShader->setFloat("width", _source->edgesWidth
+                                     / edgesWidthScalerForOrthographic);
   }
   else {
     _lineShader->setFloat("width",
@@ -385,7 +385,8 @@ void EdgesRenderer::render()
   _lineShader->bind(_source->getWorldMatrix());
 
   // Draw order
-  engine->draw(true, 0, static_cast<int>(_indicesCount));
+  engine->drawElementsType(Material::TriangleFillMode, 0,
+                           static_cast<int>(_indicesCount));
   _lineShader->unbind();
   engine->setDepthWrite(true);
 }

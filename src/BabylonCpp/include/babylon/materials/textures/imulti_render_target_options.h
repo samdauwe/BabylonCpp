@@ -14,6 +14,7 @@ struct BABYLON_SHARED_EXPORT IMultiRenderTargetOptions {
   bool generateDepthTexture            = false;
   bool doNotChangeAspectRatio          = true;
   std::size_t textureCount             = 0;
+  unsigned int defaultType             = 0;
 }; // end of struct IMultiRenderTargetOptions
 
 } // end of namespace BABYLON

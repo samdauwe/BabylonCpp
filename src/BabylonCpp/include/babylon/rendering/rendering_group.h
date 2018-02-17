@@ -9,7 +9,7 @@ class BABYLON_SHARED_EXPORT RenderingGroup {
 
 public:
   /**
-   * Creates a new rendering group.
+   * @brief Creates a new rendering group.
    * @param index The rendering group index
    * @param opaqueSortCompareFn The opaque sort comparison function. If null no
    * order is applied
@@ -29,28 +29,28 @@ public:
   ~RenderingGroup();
 
   /**
-   * Set the opaque sort comparison function.
+   * @brief Set the opaque sort comparison function.
    * If null the sub meshes will be render in the order they were created
    */
   void setOpaqueSortCompareFn(
     const ::std::function<int(SubMesh* a, SubMesh* b)>& value);
 
   /**
-   * Set the alpha test sort comparison function.
+   * @brief Set the alpha test sort comparison function.
    * If null the sub meshes will be render in the order they were created
    */
   void setAlphaTestSortCompareFn(
     const ::std::function<int(SubMesh* a, SubMesh* b)>& value);
 
   /**
-   * Set the transparent sort comparison function.
+   * @brief Set the transparent sort comparison function.
    * If null the sub meshes will be render in the order they were created
    */
   void setTransparentSortCompareFn(
     const ::std::function<int(SubMesh* a, SubMesh* b)>& value);
 
   /**
-   * Render all the sub meshes contained in the group.
+   * @brief Render all the sub meshes contained in the group.
    * @param customRenderFunction Used to override the default render behaviour
    * of the group.
    */
@@ -65,9 +65,9 @@ public:
     const vector_t<AbstractMesh*> activeMeshes);
 
   /**
-   * Build in function which can be applied to ensure meshes of a special queue
-   * (opaque, alpha test, transparent)
-   * are rendered back to front if in the same alpha index.
+   * @brief Build in function which can be applied to ensure meshes of a special
+   * queue (opaque, alpha test, transparent) are rendered back to front if in
+   * the same alpha index.
    *
    * @param a The first submesh
    * @param b The second submesh
@@ -76,9 +76,8 @@ public:
   static int defaultTransparentSortCompare(SubMesh* a, SubMesh* b);
 
   /**
-   * Build in function which can be applied to ensure meshes of a special queue
-   * (opaque, alpha test, transparent)
-   * are rendered back to front.
+   * @brief Build in function which can be applied to ensure meshes of a special
+   * queue (opaque, alpha test, transparent) are rendered back to front.
    *
    * @param a The first submesh
    * @param b The second submesh
@@ -87,9 +86,9 @@ public:
   static int backToFrontSortCompare(SubMesh* a, SubMesh* b);
 
   /**
-   * Build in function which can be applied to ensure meshes of a special queue
-   * (opaque, alpha test, transparent)
-   * are rendered front to back (prevent overdraw).
+   * @brief Build in function which can be applied to ensure meshes of a special
+   * queue (opaque, alpha test, transparent) are rendered front to back (prevent
+   * overdraw).
    *
    * @param a The first submesh
    * @param b The second submesh
@@ -98,17 +97,22 @@ public:
   static int frontToBackSortCompare(SubMesh* a, SubMesh* b);
 
   /**
-   * Resets the different lists of submeshes to prepare a new frame.
+   * @brief Resets the different lists of submeshes to prepare a new frame.
    */
   void prepare();
 
   void dispose();
 
   /**
-   * Inserts the submesh in its correct queue depending on its material.
+   * @brief Inserts the submesh in its correct queue depending on its material.
    * @param subMesh The submesh to dispatch
+   * @param [mesh] Optional reference to the submeshes's mesh. Provide if you
+   * have an exiting reference to improve performance.
+   * @param [material] Optional reference to the submeshes's material. Provide
+   * if you have an exiting reference to improve performance.
    */
-  void dispatch(SubMesh* subMesh);
+  void dispatch(SubMesh* subMesh, AbstractMesh* mesh = nullptr,
+                Material* material = nullptr);
 
   void dispatchSprites(SpriteManager* spriteManager);
 
@@ -116,19 +120,21 @@ public:
 
 private:
   /**
-   * Renders the opaque submeshes in the order from the opaqueSortCompareFn.
+   * @brief Renders the opaque submeshes in the order from the
+   * opaqueSortCompareFn.
    * @param subMeshes The submeshes to render
    */
   void renderOpaqueSorted(const vector_t<SubMesh*>& subMeshes);
 
   /**
-   * Renders the opaque submeshes in the order from the alphatestSortCompareFn.
+   * @brief Renders the opaque submeshes in the order from the
+   * alphatestSortCompareFn.
    * @param subMeshes The submeshes to render
    */
   void renderAlphaTestSorted(const vector_t<SubMesh*>& subMeshes);
 
   /**
-   * Renders the opaque submeshes in the order from the
+   * @brief Renders the opaque submeshes in the order from the
    * transparentSortCompareFn.
    * @param subMeshes The submeshes to render
    */
@@ -139,7 +145,7 @@ private:
   void _renderSprites();
 
   /**
-   * Renders the submeshes in a specified order.
+   * @brief Renders the submeshes in a specified order.
    * @param subMeshes The submeshes to sort before render
    * @param sortCompareFn The comparison function use to sort
    * @param camera The camera to use to preprocess the submeshes to help sorting
@@ -151,7 +157,8 @@ private:
     Camera* camera, bool transparent);
 
   /**
-   * Renders the submeshes in the order they were dispatched (no sort applied).
+   * @brief Renders the submeshes in the order they were dispatched (no sort
+   * applied).
    * @param subMeshes The submeshes to render
    */
   static void renderUnsorted(const vector_t<SubMesh*>& subMeshes);

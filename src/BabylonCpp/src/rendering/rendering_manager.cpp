@@ -3,6 +3,7 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/rendering_group_info.h>
+#include <babylon/materials/material.h>
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/rendering/rendering_group.h>
@@ -192,14 +193,18 @@ void RenderingManager::dispatchParticles(IParticleSystem* particleSystem)
   _renderingGroups[renderingGroupId]->dispatchParticles(particleSystem);
 }
 
-void RenderingManager::dispatch(SubMesh* subMesh)
+void RenderingManager::dispatch(SubMesh* subMesh, AbstractMesh* iMesh,
+                                Material* material)
 {
-  auto mesh                    = subMesh->getMesh();
+  auto mesh = iMesh;
+  if (!iMesh) {
+    mesh = subMesh->getMesh();
+  }
   const auto& renderingGroupId = mesh->renderingGroupId;
 
   _prepareRenderingGroup(renderingGroupId);
 
-  _renderingGroups[renderingGroupId]->dispatch(subMesh);
+  _renderingGroups[renderingGroupId]->dispatch(subMesh, mesh, material);
 }
 
 void RenderingManager::setRenderingOrder(

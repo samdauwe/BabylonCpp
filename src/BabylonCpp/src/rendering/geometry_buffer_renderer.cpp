@@ -17,11 +17,11 @@
 namespace BABYLON {
 
 GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
-    : _scene{scene}
-    , _multiRenderTarget{nullptr}
-    , _effect{nullptr}
-    , _ratio{ratio}
+    : _effect{nullptr}
     , _cachedDefines{""}
+    , _scene{scene}
+    , _multiRenderTarget{nullptr}
+    , _ratio{ratio}
     , _enablePosition{false}
 {
   // Render target
@@ -30,65 +30,6 @@ GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
 
 GeometryBufferRenderer::~GeometryBufferRenderer()
 {
-}
-
-void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
-{
-  auto mesh     = subMesh->getRenderingMesh();
-  auto scene    = _scene;
-  auto engine   = scene->getEngine();
-  auto material = subMesh->getMaterial();
-
-  if (!material) {
-    return;
-  }
-
-  // Culling
-  engine->setState(material->backFaceCulling());
-
-  // Managing instances
-  auto batch = mesh->_getInstancesRenderList(subMesh->_id);
-
-  if (batch->mustReturn) {
-    return;
-  }
-
-  auto hardwareInstancedRendering
-    = (engine->getCaps().instancedArrays != 0)
-      && (stl_util::contains(batch->visibleInstances, subMesh->_id))
-      && (!batch->visibleInstances[subMesh->_id].empty());
-
-  if (isReady(subMesh, hardwareInstancedRendering)) {
-    engine->enableEffect(_effect);
-    mesh->_bind(subMesh, _effect, Material::TriangleFillMode);
-
-    _effect->setMatrix("viewProjection", scene->getTransformMatrix());
-    _effect->setMatrix("view", scene->getViewMatrix());
-
-    // Alpha test
-    if (material && material->needAlphaTesting()) {
-      auto alphaTexture = material->getAlphaTestTexture();
-      if (alphaTexture) {
-        _effect->setTexture("diffuseSampler", alphaTexture);
-        _effect->setMatrix("diffuseMatrix", *alphaTexture->getTextureMatrix());
-      }
-    }
-
-    // Bones
-    if (mesh->useBones() && mesh->computeBonesUsingShaders()
-        && mesh->skeleton()) {
-      _effect->setMatrices("mBones",
-                           mesh->skeleton()->getTransformMatrices(mesh));
-    }
-
-    // Draw
-    mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode, batch,
-                            hardwareInstancedRendering,
-                            [this](bool /*isInstance*/, Matrix world,
-                                   Material* /*effectiveMaterial*/) {
-                              _effect->setMatrix("world", world);
-                            });
-  }
 }
 
 void GeometryBufferRenderer::setRenderList(const vector_t<Mesh*>& meshes)
@@ -117,9 +58,20 @@ void GeometryBufferRenderer::setEnablePosition(bool enable)
   _createRenderTargets();
 }
 
+Scene* GeometryBufferRenderer::scene() const
+{
+  return _scene;
+}
+
+float GeometryBufferRenderer::ratio() const
+{
+  return _ratio;
+}
+
 bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
 {
   auto material = subMesh->getMaterial();
+
   if (material && material->disableDepthWrite) {
     return false;
   }
@@ -178,7 +130,7 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
   }
 
   // Get correct effect
-  string_t join = String::join(defines, '\n');
+  auto join = String::join(defines, '\n');
   if (_cachedDefines != join) {
     _cachedDefines = join;
 
@@ -200,9 +152,19 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
   return _effect->isReady();
 }
 
-MultiRenderTarget* GeometryBufferRenderer::getGBuffer()
+MultiRenderTarget* GeometryBufferRenderer::getGBuffer() const
 {
   return _multiRenderTarget.get();
+}
+
+unsigned int GeometryBufferRenderer::samples() const
+{
+  return _multiRenderTarget->samples();
+}
+
+void GeometryBufferRenderer::setSamples(unsigned int value)
+{
+  _multiRenderTarget->setSamples(value);
 }
 
 void GeometryBufferRenderer::dispose(bool doNotRecurse)
@@ -219,9 +181,11 @@ void GeometryBufferRenderer::_createRenderTargets()
   IMultiRenderTargetOptions options;
   options.generateMipMaps      = false;
   options.generateDepthTexture = true;
+  options.defaultType          = EngineConstants::TEXTURETYPE_FLOAT;
   _multiRenderTarget           = ::std::make_unique<MultiRenderTarget>(
-    "gBuffer", Size{static_cast<int>(engine->getRenderWidth() * _ratio),
-                    static_cast<int>(engine->getRenderHeight() * _ratio)},
+    "gBuffer",
+    Size{static_cast<int>(engine->getRenderWidth() * _ratio),
+         static_cast<int>(engine->getRenderHeight() * _ratio)},
     count, _scene, options);
   if (!isSupported()) {
     return;
@@ -262,6 +226,66 @@ void GeometryBufferRenderer::_createRenderTargets()
           renderSubMesh(alphaTestSubMesh);
         }
       };
+}
+
+void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
+{
+  auto mesh     = subMesh->getRenderingMesh();
+  auto scene    = _scene;
+  auto engine   = scene->getEngine();
+  auto material = subMesh->getMaterial();
+
+  if (!material) {
+    return;
+  }
+
+  // Culling
+  engine->setState(material->backFaceCulling(), 0, false,
+                   scene->useRightHandedSystem());
+
+  // Managing instances
+  auto batch = mesh->_getInstancesRenderList(subMesh->_id);
+
+  if (batch->mustReturn) {
+    return;
+  }
+
+  auto hardwareInstancedRendering
+    = (engine->getCaps().instancedArrays != 0)
+      && (stl_util::contains(batch->visibleInstances, subMesh->_id))
+      && (!batch->visibleInstances[subMesh->_id].empty());
+
+  if (isReady(subMesh, hardwareInstancedRendering)) {
+    engine->enableEffect(_effect);
+    mesh->_bind(subMesh, _effect, Material::TriangleFillMode);
+
+    _effect->setMatrix("viewProjection", scene->getTransformMatrix());
+    _effect->setMatrix("view", scene->getViewMatrix());
+
+    // Alpha test
+    if (material && material->needAlphaTesting()) {
+      auto alphaTexture = material->getAlphaTestTexture();
+      if (alphaTexture) {
+        _effect->setTexture("diffuseSampler", alphaTexture);
+        _effect->setMatrix("diffuseMatrix", *alphaTexture->getTextureMatrix());
+      }
+    }
+
+    // Bones
+    if (mesh->useBones() && mesh->computeBonesUsingShaders()
+        && mesh->skeleton()) {
+      _effect->setMatrices("mBones",
+                           mesh->skeleton()->getTransformMatrices(mesh));
+    }
+
+    // Draw
+    mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode, batch,
+                            hardwareInstancedRendering,
+                            [this](bool /*isInstance*/, Matrix world,
+                                   Material* /*effectiveMaterial*/) {
+                              _effect->setMatrix("world", world);
+                            });
+  }
 }
 
 } // end of namespace BABYLON

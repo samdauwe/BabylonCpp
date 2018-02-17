@@ -58,7 +58,7 @@ void RenderingGroup::setOpaqueSortCompareFn(
     };
   }
   else {
-    _renderOpaque = [this](const vector_t<SubMesh*>& subMeshes) {
+    _renderOpaque = [](const vector_t<SubMesh*>& subMeshes) {
       RenderingGroup::renderUnsorted(subMeshes);
     };
   }
@@ -74,7 +74,7 @@ void RenderingGroup::setAlphaTestSortCompareFn(
     };
   }
   else {
-    _renderAlphaTest = [this](const vector_t<SubMesh*>& subMeshes) {
+    _renderAlphaTest = [](const vector_t<SubMesh*>& subMeshes) {
       RenderingGroup::renderUnsorted(subMeshes);
     };
   }
@@ -87,7 +87,7 @@ void RenderingGroup::setTransparentSortCompareFn(
     _transparentSortCompareFn = value;
   }
   else {
-    _transparentSortCompareFn = [this](SubMesh* a, SubMesh* b) {
+    _transparentSortCompareFn = [](SubMesh* a, SubMesh* b) {
       return RenderingGroup::defaultTransparentSortCompare(a, b);
     };
   }
@@ -116,10 +116,8 @@ void RenderingGroup::render(
 
   // Depth only
   if (!_depthOnlySubMeshes.empty()) {
-    engine->setAlphaTesting(true);
     engine->setColorWrite(false);
     _renderAlphaTest(_depthOnlySubMeshes);
-    engine->setAlphaTesting(false);
     engine->setColorWrite(true);
   }
 
@@ -130,9 +128,7 @@ void RenderingGroup::render(
 
   // Alpha test
   if (!_alphaTestSubMeshes.empty()) {
-    engine->setAlphaTesting(true);
     _renderAlphaTest(_alphaTestSubMeshes);
-    engine->setAlphaTesting(false);
   }
 
   auto stencilState = engine->getStencilBuffer();
@@ -219,10 +215,8 @@ void RenderingGroup::renderSorted(
       if (material && material->needDepthPrePass()) {
         auto engine = material->getScene()->getEngine();
         engine->setColorWrite(false);
-        engine->setAlphaTesting(true);
         engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
         subMesh->render(false);
-        engine->setAlphaTesting(false);
         engine->setColorWrite(true);
       }
     }
@@ -300,10 +294,19 @@ void RenderingGroup::dispose()
   _edgesRenderers.clear();
 }
 
-void RenderingGroup::dispatch(SubMesh* subMesh)
+void RenderingGroup::dispatch(SubMesh* subMesh, AbstractMesh* iMesh,
+                              Material* iMaterial)
 {
-  auto material = subMesh->getMaterial();
-  auto mesh     = subMesh->getMesh();
+  // Get mesh and materials if not provided
+  auto mesh = iMesh;
+  if (!mesh) {
+    mesh = subMesh->getMesh();
+  }
+
+  auto material = iMaterial;
+  if (!material) {
+    material = subMesh->getMaterial();
+  }
 
   if (!material) {
     return;
@@ -350,7 +353,7 @@ void RenderingGroup::_renderParticles(
   // Particles
   auto& activeCamera = _scene->activeCamera;
   _scene->onBeforeParticlesRenderingObservable.notifyObservers(_scene);
-  for (auto& particleSystem : _scene->_activeParticleSystems) {
+  for (auto& particleSystem : _particleSystems) {
     if ((activeCamera && activeCamera->layerMask & particleSystem->layerMask)
         == 0) {
       continue;
