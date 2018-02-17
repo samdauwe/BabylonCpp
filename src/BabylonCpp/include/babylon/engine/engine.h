@@ -194,6 +194,10 @@ public:
                          bool disableGenerateMipMaps = false,
                          const ::std::function<void()>& onBeforeUnbind
                          = nullptr);
+  void unBindMultiColorAttachmentFramebuffer(
+    const vector_t<InternalTexture*>& textures,
+    bool disableGenerateMipMaps                   = false,
+    const ::std::function<void()>& onBeforeUnbind = nullptr);
   void generateMipMapsForCubemap(InternalTexture* texture);
   void flushFramebuffer();
   void restoreDefaultFramebuffer();
@@ -317,6 +321,7 @@ public:
                     const Float32Array& matrix);
   void setMatrix2x2(GL::IGLUniformLocation* uniform,
                     const Float32Array& matrix);
+  void setInt(GL::IGLUniformLocation* uniform, int value);
   void setFloat(GL::IGLUniformLocation* uniform, float value);
   void setFloat2(GL::IGLUniformLocation* uniform, float x, float y);
   void setFloat3(GL::IGLUniformLocation* uniform, float x, float y, float z);
@@ -340,8 +345,6 @@ public:
   void setAlphaConstants(float r, float g, float b, float a);
   void setAlphaMode(unsigned int mode, bool noDepthWriteChange = false);
   unsigned int getAlphaMode() const;
-  void setAlphaTesting(bool enable);
-  bool getAlphaTesting() const;
   _StencilState* stencilState();
 
   /** Textures **/
@@ -448,6 +451,8 @@ public:
                              const IMultiRenderTargetOptions& options);
   unsigned int updateRenderTargetTextureSampleCount(InternalTexture* texture,
                                                     unsigned int samples);
+  unsigned int updateMultipleRenderTargetTextureSampleCount(
+    const vector_t<InternalTexture*>& textures, unsigned int samples);
   void _uploadDataToTexture(unsigned int target, int lod, int internalFormat,
                             int width, int height, unsigned int format,
                             unsigned int type, const Uint8Array& data);
@@ -503,7 +508,6 @@ public:
   void _releaseFramebufferObjects(InternalTexture* texture);
   void _releaseTexture(InternalTexture* texture);
   void bindSamplers(Effect* effect);
-  void _bindTextureDirectly(unsigned int target, InternalTexture* texture);
   void _bindTexture(int channel, InternalTexture* texture);
   void setTextureFromPostProcess(int channel, PostProcess* postProcess);
   void unbindAllTextures();
@@ -539,6 +543,7 @@ public:
                                      int height, int faceIndex = -1);
   GL::GLenum _getWebGLTextureType(unsigned int type) const;
   GL::GLenum _getRGBABufferInternalSizedFormat(unsigned int type) const;
+  GL::GLenum _getRGBAMultiSampleBufferFormat(unsigned int type) const;
 
   /** Occlusion Queries **/
   GLQueryPtr createQuery();
@@ -588,11 +593,18 @@ public:
 
 protected:
   /**
-   * @brief Constructor.
-   * @param {HTMLCanvasElement} canvas - the canvas to be used for rendering
-   * @param options - further options to be sent to the getContext function
+   * @param canvasOrContext defines the canvas or WebGL context to use for
+   * rendering
+   * @param antialias defines enable antialiasing (default: false)
+   * @param options defines further options to be sent to the getContext()
+   * function
+   * @param adaptToDeviceRatio defines whether to adapt to the device's viewport
+   * characteristics (default: false)
    */
   Engine(ICanvas* canvas, const EngineOptions& options = EngineOptions());
+
+  void _bindTextureDirectly(unsigned int target, InternalTexture* texture,
+                            bool forTextureDataUpdate = false);
 
 private:
   void _rebuildInternalTextures();
@@ -601,7 +613,9 @@ private:
   void _initGLContext();
   void _onVRFullScreenTriggered();
   void _getVRDisplays();
-  bool _setTexture(unsigned int channel, BaseTexture* texture);
+  void _bindSamplerUniformToChannel(int sourceSlot, int destination);
+  bool _setTexture(int channel, BaseTexture* texture,
+                   bool isPartOfTextureArray = false);
   void bindUnboundFramebuffer(GL::IGLFramebuffer* framebuffer);
   void bindIndexBuffer(GL::IGLBuffer* buffer);
   void bindBuffer(GL::IGLBuffer* buffer, int target);
@@ -614,7 +628,13 @@ private:
     Effect* effect);
   void _unbindVertexArrayObject();
   void setProgram(GL::IGLProgram* program);
-  void activateTextureChannel(unsigned int textureChannel);
+  void _moveBoundTextureOnTop(InternalTexture* internalTexture);
+  int _getCorrectTextureChannel(int channel,
+                                InternalTexture* internalTexture = nullptr);
+  void _linkTrackers(IInternalTextureTracker* previous,
+                     IInternalTextureTracker* next);
+  int _removeDesignatedSlot(InternalTexture* internalTexture);
+  void _activateCurrentTexture();
   void _rescaleTexture(InternalTexture* source, InternalTexture* destination,
                        Scene* scene, unsigned int internalFormat,
                        const ::std::function<void()>& onComplete);
@@ -717,6 +737,15 @@ public:
    */
   Observable<Engine> onAfterShaderCompilationObservable;
 
+  /**
+   * Gets or sets a value indicating if we want to disable texture binding
+   * optmization. This could be required on some buggy drivers which wants to
+   * have textures bound in a progressive order By default Babylon.js will try
+   * to let textures bound where they are and only update the samplers to point
+   * where the texture is.
+   */
+  bool disableTextureBindingOptimization;
+
   // WebVR
   // The new WebVR uses promises.
   // this promise resolves with the current devices available.
@@ -753,8 +782,8 @@ protected:
   unsigned int _alphaMode;
 
   // Cache
-  unsigned int _activeTextureChannel;
-  unordered_map_t<unsigned int, InternalTexture*> _boundTexturesCache;
+  int _activeChannel;
+  unordered_map_t<int, InternalTexture*> _boundTexturesCache;
   Effect* _currentEffect;
   GL::IGLProgram* _currentProgram;
   Viewport* _cachedViewport;
@@ -790,7 +819,6 @@ private:
 
   int _hardwareScalingLevel;
   bool _pointerLockRequested;
-  bool _alphaTest;
   bool _isStencilEnable;
   bool _colorWrite;
 
@@ -822,6 +850,7 @@ private:
 
   // Cache
   vector_t<unique_ptr_t<InternalTexture>> _internalTexturesCache;
+  int _currentTextureChannel;
   unordered_map_t<string_t, unique_ptr_t<Effect>> _compiledEffects;
   vector_t<bool> _vertexAttribArraysEnabled;
   GL::IGLVertexArrayObject* _cachedVertexArrayObject;
@@ -831,6 +860,8 @@ private:
   Int32Array _currentInstanceLocations;
   vector_t<GL::IGLBuffer*> _currentInstanceBuffers;
   Int32Array _textureUnits;
+  unique_ptr_t<DummyInternalTextureTracker> _firstBoundInternalTextureTracker;
+  unique_ptr_t<DummyInternalTextureTracker> _lastBoundInternalTextureTracker;
   ICanvas* _workingCanvas;
   ICanvasRenderingContext2D* _workingContext;
   unique_ptr_t<PassPostProcess> _rescalePostProcess;
@@ -843,7 +874,10 @@ private:
   int _frameHandler;
   // Hardware supported Compressed Textures
   vector_t<string_t> _texturesSupported;
+  Int32Array _nextFreeTextureSlots;
+  unsigned int _maxSimultaneousTextures;
   string_t _textureFormatInUse;
+  unordered_map_t<int, GL::IGLUniformLocation*> _boundUniforms;
 
 }; // end of class Engine
 

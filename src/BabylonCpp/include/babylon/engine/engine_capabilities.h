@@ -25,6 +25,7 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   /** The maximum textures image */
   int maxTexturesImageUnits;
   int maxVertexTextureImageUnits;
+  int maxCombinedTexturesImageUnits;
   /** The maximum texture size */
   int maxTextureSize;
   int maxCubemapTextureSize;

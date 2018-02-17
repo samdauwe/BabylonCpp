@@ -160,13 +160,13 @@ public:
    * @brief The entire material has been created in order to prevent overdraw.
    * @returns false
    */
-  bool needAlphaTesting() override;
+  bool needAlphaTesting() const override;
 
   /**
    * @brief The entire material has been created in order to prevent overdraw.
    * @returns true if blending is enable
    */
-  bool needAlphaBlending() override;
+  bool needAlphaBlending() const override;
 
   /**
    * @brief Checks wether the material is ready to be rendered for a given mesh.

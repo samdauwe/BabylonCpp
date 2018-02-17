@@ -371,6 +371,36 @@ enum GLEnums : GLenum {
   FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE = 0x8CD3,
   COLOR_ATTACHMENT0                            = 0x8CE0,
   COLOR_ATTACHMENT1                            = 0x8CE1,
+  COLOR_ATTACHMENT2                            = 0x8CE2,
+  COLOR_ATTACHMENT3                            = 0x8CE3,
+  COLOR_ATTACHMENT4                            = 0x8CE4,
+  COLOR_ATTACHMENT5                            = 0x8CE5,
+  COLOR_ATTACHMENT6                            = 0x8CE6,
+  COLOR_ATTACHMENT7                            = 0x8CE7,
+  COLOR_ATTACHMENT8                            = 0x8CE8,
+  COLOR_ATTACHMENT9                            = 0x8CE9,
+  COLOR_ATTACHMENT10                           = 0x8CEA,
+  COLOR_ATTACHMENT11                           = 0x8CEB,
+  COLOR_ATTACHMENT12                           = 0x8CEC,
+  COLOR_ATTACHMENT13                           = 0x8CED,
+  COLOR_ATTACHMENT14                           = 0x8CEE,
+  COLOR_ATTACHMENT15                           = 0x8CEF,
+  COLOR_ATTACHMENT16                           = 0x8CF0,
+  COLOR_ATTACHMENT17                           = 0x8CF1,
+  COLOR_ATTACHMENT18                           = 0x8CF2,
+  COLOR_ATTACHMENT19                           = 0x8CF3,
+  COLOR_ATTACHMENT20                           = 0x8CF4,
+  COLOR_ATTACHMENT21                           = 0x8CF5,
+  COLOR_ATTACHMENT22                           = 0x8CF6,
+  COLOR_ATTACHMENT23                           = 0x8CF7,
+  COLOR_ATTACHMENT24                           = 0x8CF8,
+  COLOR_ATTACHMENT25                           = 0x8CF9,
+  COLOR_ATTACHMENT26                           = 0x8CFA,
+  COLOR_ATTACHMENT27                           = 0x8CFB,
+  COLOR_ATTACHMENT28                           = 0x8CFC,
+  COLOR_ATTACHMENT29                           = 0x8CFD,
+  COLOR_ATTACHMENT30                           = 0x8CFE,
+  COLOR_ATTACHMENT31                           = 0x8CFF,
   DEPTH_ATTACHMENT                             = 0x8D00,
   STENCIL_ATTACHMENT                           = 0x8D20,
   DEPTH_STENCIL_ATTACHMENT                     = 0x821A,
@@ -611,6 +641,7 @@ public:
 
 public:
   GLint value;
+  int _currentState;
 
 }; // end of class IGLUniformLocation
 
@@ -1629,6 +1660,13 @@ public:
    * offset.
    */
   virtual void polygonOffset(GLfloat factor, GLfloat units) = 0;
+
+  /**
+   * @brief Selects a color buffer as the source for pixels for subsequent calls
+   * to copyTexImage2D, copyTexSubImage2D, copyTexSubImage3D or readPixels.
+   * @param src A GLenum specifying a color buffer.
+   */
+  virtual void readBuffer(GLenum src) = 0;
 
   /**
    * @brief Reads a block of pixels from a specified rectangle of the current

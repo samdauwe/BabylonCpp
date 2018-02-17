@@ -189,7 +189,7 @@ bool PBRBaseMaterial::_disableAlphaBlending() const
           || _transparencyMode == PBRMaterial::PBRMATERIAL_ALPHATEST);
 }
 
-bool PBRBaseMaterial::needAlphaBlending()
+bool PBRBaseMaterial::needAlphaBlending() const
 {
   if (_disableAlphaBlending()) {
     return false;
@@ -198,7 +198,7 @@ bool PBRBaseMaterial::needAlphaBlending()
          || _shouldUseAlphaFromAlbedoTexture();
 }
 
-bool PBRBaseMaterial::needAlphaBlendingForMesh(AbstractMesh* mesh)
+bool PBRBaseMaterial::needAlphaBlendingForMesh(AbstractMesh* mesh) const
 {
   if (_disableAlphaBlending()) {
     return false;
@@ -207,7 +207,7 @@ bool PBRBaseMaterial::needAlphaBlendingForMesh(AbstractMesh* mesh)
   return PushMaterial::needAlphaBlendingForMesh(mesh);
 }
 
-bool PBRBaseMaterial::needAlphaTesting()
+bool PBRBaseMaterial::needAlphaTesting() const
 {
   if (_forceAlphaTest) {
     return true;

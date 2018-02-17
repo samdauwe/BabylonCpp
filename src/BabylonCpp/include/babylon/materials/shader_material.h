@@ -33,8 +33,8 @@ public:
 
   IReflect::Type type() const override;
 
-  bool needAlphaBlending() override;
-  bool needAlphaTesting() override;
+  bool needAlphaBlending() const override;
+  bool needAlphaTesting() const override;
   ShaderMaterial& setTexture(const string_t& name, Texture* texture);
   ShaderMaterial& setTextureArray(const string_t& iName,
                                   const vector_t<BaseTexture*>& textures);

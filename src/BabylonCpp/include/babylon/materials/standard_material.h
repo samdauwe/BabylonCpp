@@ -53,8 +53,8 @@ public:
 
   bool useLogarithmicDepth() const override;
   void setUseLogarithmicDepth(bool value) override;
-  bool needAlphaBlending() override;
-  bool needAlphaTesting() override;
+  bool needAlphaBlending() const override;
+  bool needAlphaTesting() const override;
   BaseTexture* getAlphaTestTexture() override;
 
   /**
@@ -279,7 +279,7 @@ protected:
   void _attachImageProcessingConfiguration(
     ImageProcessingConfiguration* configuration);
 
-  bool _shouldUseAlphaFromDiffuseTexture();
+  bool _shouldUseAlphaFromDiffuseTexture() const;
   bool _checkCache(Scene* scene, AbstractMesh* mesh, bool useInstances = false);
 
 public:

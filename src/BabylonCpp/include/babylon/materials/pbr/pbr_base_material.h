@@ -56,19 +56,19 @@ public:
    * @brief Specifies whether or not this material should be rendered in alpha
    * blend mode.
    */
-  bool needAlphaBlending() override;
+  bool needAlphaBlending() const override;
 
   /**
    * @brief Specifies whether or not this material should be rendered in alpha
    * blend mode for the given mesh.
    */
-  bool needAlphaBlendingForMesh(AbstractMesh* mesh) override;
+  bool needAlphaBlendingForMesh(AbstractMesh* mesh) const override;
 
   /**
    * @brief Specifies whether or not this material should be rendered in alpha
    * test mode.
    */
-  bool needAlphaTesting() override;
+  bool needAlphaTesting() const override;
 
   BaseTexture* getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,

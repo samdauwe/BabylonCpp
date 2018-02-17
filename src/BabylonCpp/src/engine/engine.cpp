@@ -15,6 +15,7 @@
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material.h>
+#include <babylon/materials/textures/dummy_internal_texture_tracker.h>
 #include <babylon/materials/textures/imulti_render_target_options.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
@@ -52,6 +53,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , renderEvenInBackground{true}
     , preventCacheWipeBetweenFrames{false}
     , enableOfflineSupport{false}
+    , disableTextureBindingOptimization{false}
     , _vrDisplayEnabled{false}
     , disableUniformBuffers{false}
     , disablePerformanceMonitorInBackground{false}
@@ -59,6 +61,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _stencilState{::std::make_unique<_StencilState>()}
     , _alphaState{::std::make_unique<_AlphaState>()}
     , _alphaMode{EngineConstants::ALPHA_DISABLE}
+    , _activeChannel{0}
     , _currentEffect{nullptr}
     , _currentProgram{nullptr}
     , _cachedViewport{nullptr}
@@ -73,7 +76,6 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _windowIsBackground{false}
     , _webGLVersion{1.f}
     , _badOS{false}
-    , _alphaTest{false}
     , _colorWrite{true}
     , _videoTextureSupported{false}
     , _renderingQueueLaunched{false}
@@ -84,8 +86,13 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _performanceMonitor{::std::make_unique<PerformanceMonitor>()}
     , _fps{60.f}
     , _deltaTime{0.f}
+    , _currentTextureChannel{-1}
     , _cachedVertexArrayObject{nullptr}
     , _uintIndicesCurrentlySet{false}
+    , _firstBoundInternalTextureTracker{::std::make_unique<
+        DummyInternalTextureTracker>()}
+    , _lastBoundInternalTextureTracker{::std::make_unique<
+        DummyInternalTextureTracker>()}
     , _workingCanvas{nullptr}
     , _workingContext{nullptr}
     , _rescalePostProcess{nullptr}
@@ -95,6 +102,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _emptyTexture{nullptr}
     , _emptyCubeTexture{nullptr}
     , _emptyTexture3D{nullptr}
+    , _maxSimultaneousTextures{0}
 {
   Engine::Instances.emplace_back(this);
 
@@ -159,9 +167,14 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
   //  Engine::audioEngine = new AudioEngine();
   //}
 
-  // Default loading screen
-  //_loadingScreen
-  //  = ::std::make_unique<DefaultLoadingScreen>(_renderingCanvas);
+  // Prepare buffer pointers
+  for (unsigned int i = 0, ul = static_cast<unsigned>(_caps.maxVertexAttribs);
+       i < ul; ++i) {
+    _currentBufferPointers[i] = BufferPointer();
+  }
+
+  _linkTrackers(_firstBoundInternalTextureTracker.get(),
+                _lastBoundInternalTextureTracker.get());
 
   // Load WebVR Devices
   // if (options.autoEnableWebVR) {
@@ -299,7 +312,9 @@ void Engine::_initGLContext()
   // Caps
   _caps                       = EngineCapabilities();
   _caps.maxTexturesImageUnits = _gl->getParameteri(GL::MAX_TEXTURE_IMAGE_UNITS);
-  _caps.maxTextureSize        = _gl->getParameteri(GL::MAX_TEXTURE_SIZE);
+  _caps.maxCombinedTexturesImageUnits
+    = _gl->getParameteri(GL::MAX_COMBINED_TEXTURE_IMAGE_UNITS);
+  _caps.maxTextureSize = _gl->getParameteri(GL::MAX_TEXTURE_SIZE);
   _caps.maxCubemapTextureSize
     = _gl->getParameteri(GL::MAX_CUBE_MAP_TEXTURE_SIZE);
   _caps.maxRenderTextureSize = _gl->getParameteri(GL::MAX_RENDERBUFFER_SIZE);
@@ -376,6 +391,13 @@ void Engine::_initGLContext()
   setDepthBuffer(true);
   setDepthFunctionToLessOrEqual();
   setDepthWrite(true);
+
+  // Texture maps
+  _maxSimultaneousTextures
+    = static_cast<unsigned>(_caps.maxCombinedTexturesImageUnits);
+  for (unsigned int slot = 0; slot < _maxSimultaneousTextures; ++slot) {
+    _nextFreeTextureSlots.emplace_back(slot);
+  }
 }
 
 float Engine::webGLVersion() const
@@ -421,8 +443,21 @@ bool Engine::isStencilEnable() const
 void Engine::resetTextureCache()
 {
   for (auto& boundTextureItem : _boundTexturesCache) {
+    auto& boundTexture = boundTextureItem.second;
+    if (boundTexture) {
+      _removeDesignatedSlot(boundTexture);
+    }
     boundTextureItem.second = nullptr;
   }
+
+  if (!disableTextureBindingOptimization) {
+    _nextFreeTextureSlots.clear();
+    for (unsigned int slot = 0; slot < _maxSimultaneousTextures; ++slot) {
+      _nextFreeTextureSlots.emplace_back(slot);
+    }
+  }
+
+  _currentTextureChannel = -1;
 }
 
 bool Engine::isDeterministicLockStep() const
@@ -962,7 +997,7 @@ void Engine::unBindFramebuffer(InternalTexture* texture,
   }
 
   if (texture->generateMipMaps && !disableGenerateMipMaps && !texture->isCube) {
-    _bindTextureDirectly(GL::TEXTURE_2D, texture);
+    _bindTextureDirectly(GL::TEXTURE_2D, texture, true);
     _gl->generateMipmap(GL::TEXTURE_2D);
     _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
   }
@@ -978,10 +1013,75 @@ void Engine::unBindFramebuffer(InternalTexture* texture,
   bindUnboundFramebuffer(nullptr);
 }
 
+void Engine::unBindMultiColorAttachmentFramebuffer(
+  const vector_t<InternalTexture*>& textures, bool disableGenerateMipMaps,
+  const ::std::function<void()>& onBeforeUnbind)
+{
+  _currentRenderTarget = nullptr;
+
+  // If MSAA, we need to bitblt back to main texture
+  if (textures[0]->_MSAAFramebuffer) {
+    _gl->bindFramebuffer(GL::READ_FRAMEBUFFER,
+                         textures[0]->_MSAAFramebuffer.get());
+    _gl->bindFramebuffer(GL::DRAW_FRAMEBUFFER, textures[0]->_framebuffer.get());
+
+    auto& attachments = textures[0]->_attachments;
+    if (attachments.empty()) {
+      attachments               = Uint32Array(textures.size());
+      textures[0]->_attachments = attachments;
+    }
+
+    for (size_t i = 0; i < textures.size(); ++i) {
+      const auto iStr = ::std::to_string(i);
+      auto& texture   = textures[i];
+
+      for (size_t j = 0; j < attachments.size(); ++j) {
+        attachments[j] = GL::NONE;
+      }
+
+      attachments[i]
+        = (*_gl)[webGLVersion() > 1.f ? "COLOR_ATTACHMENT" + iStr :
+                                        "COLOR_ATTACHMENT" + iStr + "_WEBGL"];
+      _gl->readBuffer(attachments[i]);
+      _gl->drawBuffers(attachments);
+      _gl->blitFramebuffer(0, 0, texture->width, texture->height, 0, 0,
+                           texture->width, texture->height,
+                           GL::COLOR_BUFFER_BIT, GL::NEAREST);
+    }
+    for (size_t i = 0; i < attachments.size(); i++) {
+      const auto iStr = ::std::to_string(i);
+      attachments[i]
+        = (*_gl)[webGLVersion() > 1.f ? "COLOR_ATTACHMENT" + iStr :
+                                        "COLOR_ATTACHMENT" + iStr + "_WEBGL"];
+    }
+    _gl->drawBuffers(attachments);
+  }
+
+  for (size_t i = 0; i < textures.size(); i++) {
+    auto& texture = textures[i];
+    if (texture->generateMipMaps && !disableGenerateMipMaps
+        && !texture->isCube) {
+      _bindTextureDirectly(GL::TEXTURE_2D, texture);
+      _gl->generateMipmap(GL::TEXTURE_2D);
+      _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
+    }
+  }
+
+  if (onBeforeUnbind) {
+    if (textures[0]->_MSAAFramebuffer) {
+      // Bind the correct framebuffer
+      bindUnboundFramebuffer(textures[0]->_framebuffer.get());
+    }
+    onBeforeUnbind();
+  }
+
+  bindUnboundFramebuffer(nullptr);
+}
+
 void Engine::generateMipMapsForCubemap(InternalTexture* texture)
 {
   if (texture->generateMipMaps) {
-    _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture);
+    _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture, true);
     _gl->generateMipmap(GL::TEXTURE_CUBE_MAP);
     _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
   }
@@ -1876,7 +1976,7 @@ void Engine::enableEffect(Effect* effect)
   }
 
   // Use program
-  setProgram(effect->getProgram());
+  bindSamplers(effect);
 
   _currentEffect = effect;
 
@@ -2045,6 +2145,15 @@ void Engine::setMatrix2x2(GL::IGLUniformLocation* uniform,
   _gl->uniformMatrix2fv(uniform, false, matrix);
 }
 
+void Engine::setInt(GL::IGLUniformLocation* uniform, int value)
+{
+  if (!uniform) {
+    return;
+  }
+
+  _gl->uniform1i(uniform, value);
+}
+
 void Engine::setFloat(GL::IGLUniformLocation* uniform, float value)
 {
   if (!uniform) {
@@ -2115,23 +2224,24 @@ void Engine::setColor4(GL::IGLUniformLocation* uniform, const Color3& color3,
 void Engine::setState(bool culling, float zOffset, bool force, bool reverseSide)
 {
   // Culling
-  auto showSide = reverseSide ? GL::FRONT : GL::BACK;
-  auto hideSide = reverseSide ? GL::BACK : GL::FRONT;
-  auto cullFace = cullBackFaces ? showSide : hideSide;
+  if (_depthCullingState->cull() != culling || force) {
+    _depthCullingState->setCull(culling);
+  }
 
-  if (_depthCullingState->cull() != culling || force
-      || _depthCullingState->cullFace() != static_cast<int>(cullFace)) {
-    if (culling) {
-      _depthCullingState->setCullFace(static_cast<int>(cullFace));
-      _depthCullingState->setCull(true);
-    }
-    else {
-      _depthCullingState->setCull(false);
-    }
+  // Cull face
+  const auto cullFace = cullBackFaces ? GL::BACK : GL::FRONT;
+  if (_depthCullingState->cullFace() != cullFace || force) {
+    _depthCullingState->setCullFace(static_cast<int>(cullFace));
   }
 
   // Z offset
   setZOffset(zOffset);
+
+  // Front face
+  const auto frontFace = reverseSide ? GL::CW : GL::CCW;
+  if (_depthCullingState->frontFace() != frontFace || force) {
+    _depthCullingState->setFrontFace(frontFace);
+  }
 }
 
 void Engine::setZOffset(float value)
@@ -2250,16 +2360,6 @@ unsigned int Engine::getAlphaMode() const
   return _alphaMode;
 }
 
-void Engine::setAlphaTesting(bool enable)
-{
-  _alphaTest = enable;
-}
-
-bool Engine::getAlphaTesting() const
-{
-  return _alphaTest;
-}
-
 _StencilState* Engine::stencilState()
 {
   return _stencilState.get();
@@ -2268,13 +2368,13 @@ _StencilState* Engine::stencilState()
 // Textures
 void Engine::wipeCaches(bool bruteForce)
 {
-  if (preventCacheWipeBetweenFrames) {
+  if (preventCacheWipeBetweenFrames && !bruteForce) {
     return;
   }
-  resetTextureCache();
   _currentEffect = nullptr;
 
   if (bruteForce) {
+    resetTextureCache();
     _currentProgram = nullptr;
 
     _stencilState->reset();
@@ -2283,12 +2383,11 @@ void Engine::wipeCaches(bool bruteForce)
     _alphaState->reset();
   }
 
-  _cachedVertexBuffers          = nullptr;
+  _resetVertexBufferBinding();
   _cachedIndexBuffer            = nullptr;
   _cachedEffectForVertexBuffers = nullptr;
   _unbindVertexArrayObject();
   bindIndexBuffer(nullptr);
-  bindArrayBuffer(nullptr);
 }
 
 string_t&
@@ -2511,7 +2610,7 @@ void Engine::_rescaleTexture(InternalTexture* source,
       hostingScene->postProcessManager->directRender(
         {_rescalePostProcess.get()}, rtt, true);
 
-      _bindTextureDirectly(GL::TEXTURE_2D, destination);
+      _bindTextureDirectly(GL::TEXTURE_2D, destination, true);
       _gl->copyTexImage2D(GL::TEXTURE_2D, 0, internalFormat, 0, 0,
                           destination->width, destination->height, 0);
 
@@ -2561,7 +2660,7 @@ void Engine::updateRawTexture(InternalTexture* texture, const Uint8Array& data,
   auto internalFormat     = _getInternalFormat(format);
   auto internalSizedFomat = _getRGBABufferInternalSizedFormat(type);
   auto textureType        = _getWebGLTextureType(type);
-  _bindTextureDirectly(GL::TEXTURE_2D, texture);
+  _bindTextureDirectly(GL::TEXTURE_2D, texture, true);
   _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL, invertY ? 1 : 0);
 
   if (!_doNotHandleContextLost) {
@@ -2590,7 +2689,7 @@ void Engine::updateRawTexture(InternalTexture* texture, const Uint8Array& data,
     _gl->generateMipmap(GL::TEXTURE_2D);
   }
   _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
-  resetTextureCache();
+  // resetTextureCache();
   texture->isReady = true;
 }
 
@@ -2620,7 +2719,7 @@ InternalTexture* Engine::createRawTexture(const Uint8Array& data, int width,
   }
 
   updateRawTexture(_texture, data, format, invertY, compression, type);
-  _bindTextureDirectly(GL::TEXTURE_2D, _texture);
+  _bindTextureDirectly(GL::TEXTURE_2D, _texture, true);
 
   // Filters
   auto filters = GetSamplingParameters(samplingMode, generateMipMaps);
@@ -2660,7 +2759,7 @@ InternalTexture* Engine::createDynamicTexture(int width, int height,
                height;
   }
 
-  resetTextureCache();
+  // resetTextureCache();
   texture->width           = width;
   texture->height          = height;
   texture->isReady         = false;
@@ -2680,7 +2779,7 @@ void Engine::updateTextureSamplingMode(unsigned int samplingMode,
   auto filters = GetSamplingParameters(samplingMode, texture->generateMipMaps);
 
   if (texture->isCube) {
-    _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture);
+    _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture, true);
 
     _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER,
                        filters.mag);
@@ -2689,14 +2788,14 @@ void Engine::updateTextureSamplingMode(unsigned int samplingMode,
     _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
   }
   else if (texture->is3D) {
-    _bindTextureDirectly(GL::TEXTURE_3D, texture);
+    _bindTextureDirectly(GL::TEXTURE_3D, texture, true);
 
     _gl->texParameteri(GL::TEXTURE_3D, GL::TEXTURE_MAG_FILTER, filters.mag);
     _gl->texParameteri(GL::TEXTURE_3D, GL::TEXTURE_MIN_FILTER, filters.min);
     _bindTextureDirectly(GL::TEXTURE_3D, nullptr);
   }
   else {
-    _bindTextureDirectly(GL::TEXTURE_2D, texture);
+    _bindTextureDirectly(GL::TEXTURE_2D, texture, true);
 
     _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, filters.mag);
     _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, filters.min);
@@ -2714,7 +2813,7 @@ void Engine::updateDynamicTexture(InternalTexture* texture, ICanvas* canvas,
     return;
   }
 
-  _bindTextureDirectly(GL::TEXTURE_2D, texture);
+  _bindTextureDirectly(GL::TEXTURE_2D, texture, true);
   _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL, invertY ? 1 : 0);
   if (premulAlpha) {
     _gl->pixelStorei(GL::UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
@@ -2763,7 +2862,7 @@ Engine::createRenderTargetTexture(ISize size,
   auto texture = ::std::make_unique<InternalTexture>(
     this, InternalTexture::DATASOURCE_RENDERTARGET);
   auto _texture = texture.get();
-  _bindTextureDirectly(GL::TEXTURE_2D, _texture);
+  _bindTextureDirectly(GL::TEXTURE_2D, _texture, true);
 
   int width  = size.width;
   int height = size.height;
@@ -2819,7 +2918,7 @@ Engine::createRenderTargetTexture(ISize size,
   _texture->_generateDepthBuffer   = generateDepthBuffer;
   _texture->_generateStencilBuffer = generateStencilBuffer ? true : false;
 
-  resetTextureCache();
+  // resetTextureCache();
 
   _internalTexturesCache.emplace_back(::std::move(texture));
 
@@ -2924,6 +3023,7 @@ Engine::createMultipleRenderTarget(ISize size,
     texture->type                   = type;
     texture->_generateDepthBuffer   = generateDepthBuffer;
     texture->_generateStencilBuffer = generateStencilBuffer;
+    texture->_attachments           = attachments;
 
     _internalTexturesCache.emplace_back(texture.get());
   }
@@ -3044,14 +3144,17 @@ Engine::updateRenderTargetTextureSampleCount(InternalTexture* texture,
   // Dispose previous render buffers
   if (texture->_depthStencilBuffer) {
     _gl->deleteRenderbuffer(texture->_depthStencilBuffer.get());
+    texture->_depthStencilBuffer = nullptr;
   }
 
   if (texture->_MSAAFramebuffer) {
     _gl->deleteFramebuffer(texture->_MSAAFramebuffer.get());
+    texture->_MSAAFramebuffer = nullptr;
   }
 
   if (texture->_MSAARenderBuffer) {
     _gl->deleteRenderbuffer(texture->_MSAARenderBuffer.get());
+    texture->_MSAARenderBuffer = nullptr;
   }
 
   if (samples > 1) {
@@ -3073,9 +3176,10 @@ Engine::updateRenderTargetTextureSampleCount(InternalTexture* texture,
     }
 
     _gl->bindRenderbuffer(GL::RENDERBUFFER, colorRenderbuffer);
-    _gl->renderbufferStorageMultisample(GL::RENDERBUFFER,
-                                        static_cast<int>(samples), GL::RGBA8,
-                                        texture->width, texture->height);
+    _gl->renderbufferStorageMultisample(
+      GL::RENDERBUFFER, static_cast<int>(samples),
+      _getRGBAMultiSampleBufferFormat(texture->type), texture->width,
+      texture->height);
 
     _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
                                  GL::RENDERBUFFER, colorRenderbuffer);
@@ -3092,6 +3196,96 @@ Engine::updateRenderTargetTextureSampleCount(InternalTexture* texture,
     texture->width, texture->height, static_cast<int>(samples));
 
   _gl->bindRenderbuffer(GL::RENDERBUFFER, nullptr);
+  bindUnboundFramebuffer(nullptr);
+
+  return samples;
+}
+
+unsigned int Engine::updateMultipleRenderTargetTextureSampleCount(
+  const vector_t<InternalTexture*>& textures, unsigned int samples)
+{
+  if (webGLVersion() < 2.f || textures.empty()) {
+    return 1;
+  }
+
+  if (textures[0]->samples == samples) {
+    return samples;
+  }
+
+  samples = ::std::min(
+    samples, static_cast<unsigned>(_gl->getParameteri(GL::MAX_SAMPLES)));
+
+  // Dispose previous render buffers
+  if (textures[0]->_depthStencilBuffer) {
+    _gl->deleteRenderbuffer(textures[0]->_depthStencilBuffer.get());
+    textures[0]->_depthStencilBuffer = nullptr;
+  }
+
+  if (textures[0]->_MSAAFramebuffer) {
+    _gl->deleteFramebuffer(textures[0]->_MSAAFramebuffer.get());
+    textures[0]->_MSAAFramebuffer = nullptr;
+  }
+
+  for (auto& texture : textures) {
+    if (texture->_MSAARenderBuffer) {
+      _gl->deleteRenderbuffer(texture->_MSAARenderBuffer.get());
+      texture->_MSAARenderBuffer = nullptr;
+    }
+  }
+
+  if (samples > 1) {
+    auto framebuffer = _gl->createFramebuffer();
+
+    if (!framebuffer) {
+      BABYLON_LOG_ERROR("Engine", "Unable to create multi sampled framebuffer");
+      return 0;
+    }
+
+    bindUnboundFramebuffer(framebuffer.get());
+
+    auto depthStencilBuffer = _setupFramebufferDepthAttachments(
+      textures[0]->_generateStencilBuffer, textures[0]->_generateDepthBuffer,
+      textures[0]->width, textures[0]->height, static_cast<int>(samples));
+
+    Uint32Array attachments;
+
+    for (size_t i = 0; i < textures.size(); ++i) {
+      auto iStr     = ::std::to_string(i);
+      auto& texture = textures[i];
+      auto attachment
+        = (*_gl)[webGLVersion() > 1.f ? "COLOR_ATTACHMENT" + iStr :
+                                        "COLOR_ATTACHMENT" + iStr + "_WEBGL"];
+
+      auto colorRenderbuffer = _gl->createRenderbuffer();
+
+      if (!colorRenderbuffer) {
+        BABYLON_LOG_ERROR("Engine",
+                          "Unable to create multi sampled framebuffer");
+        return 0;
+      }
+
+      _gl->bindRenderbuffer(GL::RENDERBUFFER, colorRenderbuffer);
+      _gl->renderbufferStorageMultisample(
+        GL::RENDERBUFFER, static_cast<int>(samples),
+        _getRGBAMultiSampleBufferFormat(texture->type), texture->width,
+        texture->height);
+
+      _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, attachment,
+                                   GL::RENDERBUFFER, colorRenderbuffer);
+
+      texture->_MSAAFramebuffer    = ::std::move(framebuffer);
+      texture->_MSAARenderBuffer   = ::std::move(colorRenderbuffer);
+      texture->samples             = samples;
+      texture->_depthStencilBuffer = ::std::move(depthStencilBuffer);
+      _gl->bindRenderbuffer(GL::RENDERBUFFER, nullptr);
+      attachments.emplace_back(attachment);
+    }
+    _gl->drawBuffers(attachments);
+  }
+  else {
+    bindUnboundFramebuffer(textures[0]->_framebuffer.get());
+  }
+
   bindUnboundFramebuffer(nullptr);
 
   return samples;
@@ -3136,7 +3330,7 @@ InternalTexture* Engine::createRenderTargetCubeTexture(
 
   auto filters = Engine::GetSamplingParameters(samplingMode, generateMipMaps);
 
-  _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, _texture);
+  _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, _texture, true);
 
   for (unsigned int face = 0; face < 6; ++face) {
     _gl->texImage2D((GL::TEXTURE_CUBE_MAP_POSITIVE_X + face), 0, GL::RGBA,
@@ -3177,7 +3371,7 @@ InternalTexture* Engine::createRenderTargetCubeTexture(
   _texture->height       = size.height;
   _texture->isReady      = true;
 
-  resetTextureCache();
+  // resetTextureCache();
 
   _internalTexturesCache.emplace_back(::std::move(texture));
 
@@ -3217,7 +3411,7 @@ void Engine::setCubeMapTextureParams(GL::IGLRenderingContext* gl,
 
   _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
 
-  resetTextureCache();
+  // resetTextureCache();
 }
 
 void Engine::updateRawCubeTexture(InternalTexture* texture,
@@ -3242,7 +3436,7 @@ void Engine::updateRawCubeTexture(InternalTexture* texture,
     needConversion = true;
   }
 
-  _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture);
+  _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture, true);
   _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL, invertY ? 1 : 0);
 
   if (texture->width % 4 != 0) {
@@ -3282,7 +3476,7 @@ void Engine::updateRawCubeTexture(InternalTexture* texture,
   }
   _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
 
-  resetTextureCache();
+  // resetTextureCache();
   texture->isReady = true;
 }
 
@@ -3383,7 +3577,7 @@ void Engine::updateRawTexture3D(InternalTexture* texture,
                                 bool invertY, const string_t& compression)
 {
   auto internalFormat = _getInternalFormat(format);
-  _bindTextureDirectly(GL::TEXTURE_3D, texture);
+  _bindTextureDirectly(GL::TEXTURE_3D, texture, true);
   _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL, invertY ? 1 : 0);
 
   if (!_doNotHandleContextLost) {
@@ -3412,7 +3606,7 @@ void Engine::updateRawTexture3D(InternalTexture* texture,
     _gl->generateMipmap(GL::TEXTURE_3D);
   }
   _bindTextureDirectly(GL::TEXTURE_3D, nullptr);
-  resetTextureCache();
+  // resetTextureCache();
   texture->isReady = true;
 }
 
@@ -3440,7 +3634,7 @@ InternalTexture* Engine::createRawTexture3D(const ArrayBuffer& data, int width,
   }
 
   updateRawTexture3D(texture, data, format, invertY, compression);
-  _bindTextureDirectly(GL::TEXTURE_3D, texture);
+  _bindTextureDirectly(GL::TEXTURE_3D, texture, true);
 
   // Filters
   auto filters = GetSamplingParameters(samplingMode, generateMipMaps);
@@ -3479,7 +3673,7 @@ void Engine::_prepareWebGLTextureContinuation(InternalTexture* texture,
 
   _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
 
-  resetTextureCache();
+  // resetTextureCache();
   if (scene) {
     scene->_removePendingData(texture);
   }
@@ -3508,7 +3702,7 @@ void Engine::_prepareWebGLTexture(
   }
 
   if (!texture->_webGLTexture) {
-    resetTextureCache();
+    // resetTextureCache();
     if (scene) {
       scene->_removePendingData(texture);
     }
@@ -3516,7 +3710,7 @@ void Engine::_prepareWebGLTexture(
     return;
   }
 
-  _bindTextureDirectly(GL::TEXTURE_2D, texture);
+  _bindTextureDirectly(GL::TEXTURE_2D, texture, true);
   _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL,
                    invertY.isNull() ? 1 : (*invertY ? 1 : 0));
 
@@ -3650,26 +3844,152 @@ void Engine::bindSamplers(Effect* effect)
   const auto& samplers = effect->getSamplers();
   for (size_t index = 0; index < samplers.size(); ++index) {
     auto uniform = effect->getUniform(samplers[index]);
-    _gl->uniform1i(uniform, static_cast<int>(index));
+
+    if (uniform) {
+      _boundUniforms[static_cast<int>(index)] = uniform;
+    }
   }
   _currentEffect = nullptr;
 }
 
-void Engine::activateTextureChannel(unsigned int textureChannel)
+void Engine::_moveBoundTextureOnTop(InternalTexture* internalTexture)
 {
-  if (_activeTextureChannel != textureChannel) {
-    _gl->activeTexture(textureChannel);
-    _activeTextureChannel = textureChannel;
+  if (disableTextureBindingOptimization
+      || _lastBoundInternalTextureTracker->previous == internalTexture) {
+    return;
+  }
+
+  // Remove
+  _linkTrackers(internalTexture->previous, internalTexture->next);
+
+  // Bind last to it
+  _linkTrackers(_lastBoundInternalTextureTracker->previous, internalTexture);
+
+  // Bind to dummy
+  _linkTrackers(internalTexture, _lastBoundInternalTextureTracker.get());
+}
+
+int Engine::_getCorrectTextureChannel(int channel,
+                                      InternalTexture* internalTexture)
+{
+  if (!internalTexture) {
+    return -1;
+  }
+
+  internalTexture->_initialSlot = channel;
+
+  if (disableTextureBindingOptimization) { // We want texture sampler ID ===
+                                           // texture channel
+    if (channel != internalTexture->_designatedSlot) {
+      _textureCollisions.addCount(1, false);
+    }
+  }
+  else {
+    if (channel != internalTexture->_designatedSlot) {
+      if (internalTexture->_designatedSlot
+          > -1) { // Texture is already assigned to a slot
+        return internalTexture->_designatedSlot;
+      }
+      else {
+        // No slot for this texture, let's pick a new one (if we find a free
+        // slot)
+        if (!_nextFreeTextureSlots.empty()) {
+          return _nextFreeTextureSlots.front();
+        }
+
+        // We need to recycle the oldest bound texture, sorry.
+        _textureCollisions.addCount(1, false);
+        return _removeDesignatedSlot(static_cast<InternalTexture*>(
+          _firstBoundInternalTextureTracker->next));
+      }
+    }
+  }
+
+  return channel;
+}
+
+void Engine::_linkTrackers(IInternalTextureTracker* previous,
+                           IInternalTextureTracker* next)
+{
+  if (previous) {
+    previous->next = next;
+  }
+  if (next) {
+    next->previous = previous;
   }
 }
 
-void Engine::_bindTextureDirectly(unsigned int target, InternalTexture* texture)
+int Engine::_removeDesignatedSlot(InternalTexture* internalTexture)
 {
-  if ((_boundTexturesCache.find(_activeTextureChannel)
-       != _boundTexturesCache.end())
-      && (_boundTexturesCache[_activeTextureChannel] != texture)) {
+  const auto currentSlot = internalTexture->_designatedSlot;
+  if (currentSlot == -1) {
+    return -1;
+  }
+
+  internalTexture->_designatedSlot = -1;
+
+  if (disableTextureBindingOptimization) {
+    return -1;
+  }
+
+  // Remove from bound list
+  _linkTrackers(internalTexture->previous, internalTexture->next);
+
+  // Free the slot
+  _boundTexturesCache[currentSlot] = nullptr;
+  _nextFreeTextureSlots.emplace_back(currentSlot);
+
+  return currentSlot;
+}
+
+void Engine::_activateCurrentTexture()
+{
+  if (_currentTextureChannel != _activeChannel) {
+    _gl->activeTexture((*_gl)["TEXTURE0" + ::std::to_string(_activeChannel)]);
+    _currentTextureChannel = _activeChannel;
+  }
+}
+
+void Engine::_bindTextureDirectly(unsigned int target, InternalTexture* texture,
+                                  bool forTextureDataUpdate)
+{
+  if (forTextureDataUpdate && texture && texture->_designatedSlot > -1) {
+    _activeChannel = texture->_designatedSlot;
+  }
+
+  auto& currentTextureBound  = _boundTexturesCache[_activeChannel];
+  auto isTextureForRendering = texture && (texture->_initialSlot > -1);
+
+  if (currentTextureBound != texture) {
+    if (currentTextureBound) {
+      _removeDesignatedSlot(currentTextureBound);
+    }
+
+    _activateCurrentTexture();
+
     _gl->bindTexture(target, texture ? texture->_webGLTexture.get() : nullptr);
-    _boundTexturesCache[_activeTextureChannel] = texture;
+    _boundTexturesCache[_activeChannel] = texture;
+
+    if (texture) {
+      if (!disableTextureBindingOptimization) {
+        _nextFreeTextureSlots.erase(::std::remove(_nextFreeTextureSlots.begin(),
+                                                  _nextFreeTextureSlots.end(),
+                                                  _activeChannel),
+                                    _nextFreeTextureSlots.end());
+
+        _linkTrackers(_lastBoundInternalTextureTracker->previous, texture);
+        _linkTrackers(texture, _lastBoundInternalTextureTracker.get());
+      }
+
+      texture->_designatedSlot = _activeChannel;
+    }
+  }
+  else if (forTextureDataUpdate) {
+    _activateCurrentTexture();
+  }
+
+  if (isTextureForRendering && !forTextureDataUpdate && texture) {
+    _bindSamplerUniformToChannel(texture->_initialSlot, _activeChannel);
   }
 }
 
@@ -3679,7 +3999,11 @@ void Engine::_bindTexture(int channel, InternalTexture* texture)
     return;
   }
 
-  activateTextureChannel(GL::TEXTURE0 + static_cast<unsigned>(channel));
+  if (texture) {
+    channel = _getCorrectTextureChannel(channel, texture);
+  }
+
+  _activeChannel = channel;
   _bindTextureDirectly(GL::TEXTURE_2D, texture);
 }
 
@@ -3691,10 +4015,9 @@ void Engine::setTextureFromPostProcess(int channel, PostProcess* postProcess)
 
 void Engine::unbindAllTextures()
 {
-  for (unsigned int channel = 0,
-                    ul = static_cast<unsigned>(_caps.maxTexturesImageUnits);
-       channel < ul; ++channel) {
-    activateTextureChannel(GL::TEXTURE0 + channel);
+  for (unsigned int channel = 0; channel < _maxSimultaneousTextures;
+       ++channel) {
+    _activeChannel = static_cast<int>(channel);
     _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
     _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
     if (webGLVersion() > 1.f) {
@@ -3710,18 +4033,31 @@ void Engine::setTexture(int channel, GL::IGLUniformLocation* uniform,
     return;
   }
 
-  if (_setTexture(static_cast<unsigned>(channel), texture)) {
-    _gl->uniform1i(uniform, channel);
+  if (uniform) {
+    _boundUniforms[channel] = uniform;
   }
+
+  _setTexture(channel, texture);
 }
 
-bool Engine::_setTexture(unsigned int channel, BaseTexture* texture)
+void Engine::_bindSamplerUniformToChannel(int sourceSlot, int destination)
+{
+  auto& uniform = _boundUniforms[sourceSlot];
+  if (uniform->_currentState == destination) {
+    return;
+  }
+  _gl->uniform1i(uniform, destination);
+  uniform->_currentState = destination;
+}
+
+bool Engine::_setTexture(int channel, BaseTexture* texture,
+                         bool isPartOfTextureArray)
 {
   // Not ready?
   if (!texture) {
     if ((_boundTexturesCache.find(channel) != _boundTexturesCache.end())
         && (_boundTexturesCache[channel] != nullptr)) {
-      activateTextureChannel(GL::TEXTURE0 + channel);
+      _activeChannel = channel;
       _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
       _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
       if (webGLVersion() > 1.f) {
@@ -3732,7 +4068,6 @@ bool Engine::_setTexture(unsigned int channel, BaseTexture* texture)
   }
 
   // Video (not supported)
-  bool alreadyActivated = false;
   if (texture->delayLoadState == EngineConstants::DELAYLOADSTATE_NOTLOADED) {
     // Delay loading
     texture->delayLoad();
@@ -3753,18 +4088,23 @@ bool Engine::_setTexture(unsigned int channel, BaseTexture* texture)
     internalTexture = emptyTexture();
   }
 
-  if (!alreadyActivated) {
-    activateTextureChannel(GL::TEXTURE0 + channel);
+  if (!isPartOfTextureArray) {
+    channel = _getCorrectTextureChannel(channel, internalTexture);
   }
 
-  if ((_boundTexturesCache.find(_activeTextureChannel)
-       != _boundTexturesCache.end())
-      && (_boundTexturesCache[_activeTextureChannel] == internalTexture)) {
+  if ((_boundTexturesCache.find(channel) != _boundTexturesCache.end())
+      && (_boundTexturesCache[channel] == internalTexture)) {
+    _moveBoundTextureOnTop(internalTexture);
+    if (!isPartOfTextureArray) {
+      _bindSamplerUniformToChannel(internalTexture->_initialSlot, channel);
+    }
     return false;
   }
 
+  _activeChannel = channel;
+
   if (internalTexture && internalTexture->is3D) {
-    _bindTextureDirectly(GL::TEXTURE_3D, internalTexture);
+    _bindTextureDirectly(GL::TEXTURE_3D, internalTexture, isPartOfTextureArray);
 
     if (internalTexture && internalTexture->_cachedWrapU != texture->wrapU) {
       internalTexture->_cachedWrapU = texture->wrapU;
@@ -3803,7 +4143,7 @@ bool Engine::_setTexture(unsigned int channel, BaseTexture* texture)
 
     if (internalTexture && internalTexture->_cachedWrapR != texture->wrapR) {
       internalTexture->_cachedWrapR = texture->wrapR;
-      switch (texture->wrapV) {
+      switch (texture->wrapR) {
         case TextureConstants::WRAP_ADDRESSMODE:
           _gl->texParameteri(GL::TEXTURE_3D, GL::TEXTURE_WRAP_R, GL::REPEAT);
           break;
@@ -3821,7 +4161,8 @@ bool Engine::_setTexture(unsigned int channel, BaseTexture* texture)
     _setAnisotropicLevel(GL::TEXTURE_3D, texture);
   }
   else if (internalTexture && internalTexture->isCube) {
-    _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, internalTexture);
+    _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, internalTexture,
+                         isPartOfTextureArray);
 
     if (internalTexture->_cachedCoordinatesMode != texture->coordinatesMode()) {
       internalTexture->_cachedCoordinatesMode = texture->coordinatesMode();
@@ -3841,7 +4182,7 @@ bool Engine::_setTexture(unsigned int channel, BaseTexture* texture)
     _setAnisotropicLevel(GL::TEXTURE_CUBE_MAP, texture);
   }
   else {
-    _bindTextureDirectly(GL::TEXTURE_2D, internalTexture);
+    _bindTextureDirectly(GL::TEXTURE_2D, internalTexture, isPartOfTextureArray);
 
     if (internalTexture && internalTexture->_cachedWrapU != texture->wrapU) {
       internalTexture->_cachedWrapU = texture->wrapU;
@@ -3895,21 +4236,19 @@ void Engine::setTextureArray(int channel, GL::IGLUniformLocation* uniform,
     return;
   }
 
-  auto channeli = static_cast<unsigned>(channel);
-
   if (_textureUnits.empty() || _textureUnits.size() != textures.size()) {
     _textureUnits.clear();
     _textureUnits.resize(textures.size());
   }
-  int _i = 0;
-  for (unsigned int i = 0; i < textures.size(); ++i, ++_i) {
-    _textureUnits[i] = channel + _i;
+  for (unsigned int i = 0; i < textures.size(); ++i) {
+    _textureUnits[i] = _getCorrectTextureChannel(
+      channel + static_cast<int>(i), textures[i]->getInternalTexture());
   }
   _gl->uniform1iv(uniform, _textureUnits);
 
   unsigned int index = 0;
   for (auto& texture : textures) {
-    _setTexture(channeli + index, texture);
+    _setTexture(_textureUnits[index], texture, true);
     ++index;
   }
 }
@@ -4302,6 +4641,18 @@ GL::GLenum Engine::_getRGBABufferInternalSizedFormat(unsigned int type) const
   }
 
   return GL::RGBA;
+}
+
+GL::GLenum Engine::_getRGBAMultiSampleBufferFormat(unsigned int type) const
+{
+  if (type == EngineConstants::TEXTURETYPE_FLOAT) {
+    return _gl->RGBA32F;
+  }
+  else if (type == EngineConstants::TEXTURETYPE_HALF_FLOAT) {
+    return _gl->RGBA16F;
+  }
+
+  return GL::RGBA8;
 }
 
 Engine::GLQueryPtr Engine::createQuery()

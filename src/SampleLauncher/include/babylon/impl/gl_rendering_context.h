@@ -166,6 +166,7 @@ public:
   bool linkProgram(const std::unique_ptr<IGLProgram>& program) override;
   void pixelStorei(GLenum pname, GLint param) override;
   void polygonOffset(GLfloat factor, GLfloat units) override;
+  void readBuffer(GLenum src) override;
   void readPixels(GLint x, GLint y, GLsizei width, GLsizei height,
                   GLenum format, GLenum type, Float32Array& pixels) override;
   void readPixels(GLint x, GLint y, GLsizei width, GLsizei height,

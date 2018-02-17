@@ -116,18 +116,13 @@ void MaterialHelper::PrepareDefinesForMisc(
 
 void MaterialHelper::PrepareDefinesForFrameBoundValues(
   Scene* scene, Engine* engine, MaterialDefines& defines, bool useInstances,
-  unsigned int CLIPPLANE, unsigned int ALPHATEST, unsigned int DEPTHPREPASS,
-  unsigned int INSTANCES, bool forceAlphaTest)
+  unsigned int CLIPPLANE, unsigned int /*ALPHATEST*/, unsigned int DEPTHPREPASS,
+  unsigned int INSTANCES, bool /*forceAlphaTest*/)
 {
   bool changed = false;
 
   if (defines[CLIPPLANE] != (scene->clipPlane() != nullptr)) {
     defines.defines[CLIPPLANE] = !defines[CLIPPLANE];
-    changed                    = true;
-  }
-
-  if (defines[ALPHATEST] != (engine->getAlphaTesting() || forceAlphaTest)) {
-    defines.defines[ALPHATEST] = !defines[ALPHATEST];
     changed                    = true;
   }
 

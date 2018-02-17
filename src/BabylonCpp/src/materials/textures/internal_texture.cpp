@@ -20,13 +20,18 @@ constexpr unsigned int InternalTexture::DATASOURCE_CUBEPREFILTERED;
 constexpr unsigned int InternalTexture::DATASOURCE_RAW3D;
 
 InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource)
-    : _dataSource{dataSource}
+    : _initialSlot{-1}
+    , _designatedSlot{-1}
+    , _dataSource{dataSource}
     , _cachedWrapU{0}
     , _cachedWrapV{0}
     , _cachedWrapR{0}
     , _references{1}
     , _engine{engine}
 {
+  previous = nullptr;
+  next     = nullptr;
+
   _webGLTexture = engine->_createTexture();
 }
 
@@ -206,6 +211,8 @@ void InternalTexture::dispose()
   if (_references == 0) {
     _engine->_releaseTexture(this);
     _webGLTexture = nullptr;
+    previous      = nullptr;
+    next          = nullptr;
   }
 }
 

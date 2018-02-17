@@ -225,7 +225,7 @@ void StandardMaterial::setUseLogarithmicDepth(bool value)
   _markAllSubMeshesAsMiscDirty();
 }
 
-bool StandardMaterial::needAlphaBlending()
+bool StandardMaterial::needAlphaBlending() const
 {
   return (alpha < 1.f) || (_opacityTexture != nullptr)
          || _shouldUseAlphaFromDiffuseTexture()
@@ -233,12 +233,12 @@ bool StandardMaterial::needAlphaBlending()
              && _opacityFresnelParameters->isEnabled());
 }
 
-bool StandardMaterial::needAlphaTesting()
+bool StandardMaterial::needAlphaTesting() const
 {
   return _diffuseTexture != nullptr && _diffuseTexture->hasAlpha();
 }
 
-bool StandardMaterial::_shouldUseAlphaFromDiffuseTexture()
+bool StandardMaterial::_shouldUseAlphaFromDiffuseTexture() const
 {
   return _diffuseTexture != nullptr && _diffuseTexture->hasAlpha()
          && _useAlphaFromDiffuseTexture;

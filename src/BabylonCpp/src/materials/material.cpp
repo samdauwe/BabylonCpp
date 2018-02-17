@@ -269,18 +269,18 @@ Scene* Material::getScene() const
   return _scene;
 }
 
-bool Material::needAlphaBlending()
+bool Material::needAlphaBlending() const
 {
   return (alpha < 1.f);
 }
 
-bool Material::needAlphaBlendingForMesh(AbstractMesh* mesh)
+bool Material::needAlphaBlendingForMesh(AbstractMesh* mesh) const
 {
   return needAlphaBlending() || (mesh->visibility < 1.f)
          || mesh->hasVertexAlpha();
 }
 
-bool Material::needAlphaTesting()
+bool Material::needAlphaTesting() const
 {
   return false;
 }
@@ -356,6 +356,11 @@ void Material::bindViewProjection(Effect* effect)
   }
 }
 
+bool Material::_shouldTurnAlphaTestOn(AbstractMesh* mesh) const
+{
+  return (!needAlphaBlendingForMesh(mesh) && needAlphaTesting());
+}
+
 void Material::_afterBind(Mesh* mesh)
 {
   _scene->_cachedMaterial = this;
@@ -419,11 +424,10 @@ vector_t<AbstractMesh*> Material::getBindedMeshes()
 void Material::forceCompilation(
   AbstractMesh* mesh,
   const ::std::function<void(Material* material)>& onCompiled,
-  Nullable<bool> alphaTest, Nullable<bool> clipPlane)
+  Nullable<bool> clipPlane)
 {
   auto subMesh = ::std::make_unique<BaseSubMesh>();
   auto scene   = getScene();
-  auto engine  = scene->getEngine();
 
   const auto checkReady = [&]() {
     if (!_scene || !_scene->getEngine()) {
@@ -434,16 +438,10 @@ void Material::forceCompilation(
       subMesh->_materialDefines->_renderId = -1;
     }
 
-    auto alphaTestState = engine->getAlphaTesting();
     auto clipPlaneState = *scene->clipPlane();
 
-    engine->setAlphaTesting(
-      !alphaTest.isNull() ?
-        *alphaTest :
-        (!needAlphaBlendingForMesh(mesh) && needAlphaTesting()));
-
-    if (!clipPlane.isNull() && (*clipPlane)) {
-      scene->setClipPlane(Plane(0, 0, 0, 1));
+    if (clipPlane) {
+      scene->setClipPlane(Plane(0.f, 0.f, 0.f, 1.f));
     }
 
     if (storeEffectOnSubMeshes) {
@@ -466,8 +464,6 @@ void Material::forceCompilation(
         // setTimeout(checkReady, 16);
       }
     }
-
-    engine->setAlphaTesting(alphaTestState);
 
     if (!clipPlane.isNull() && (*clipPlane)) {
       scene->setClipPlane(clipPlaneState);

@@ -50,12 +50,12 @@ IReflect::Type ShaderMaterial::type() const
   return IReflect::Type::SHADERMATERIAL;
 }
 
-bool ShaderMaterial::needAlphaBlending()
+bool ShaderMaterial::needAlphaBlending() const
 {
   return _options.needAlphaBlending;
 }
 
-bool ShaderMaterial::needAlphaTesting()
+bool ShaderMaterial::needAlphaTesting() const
 {
   return _options.needAlphaTesting;
 }
@@ -296,7 +296,7 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Alpha test
-  if (engine->getAlphaTesting()) {
+  if (mesh && _shouldTurnAlphaTestOn(mesh)) {
     defines.emplace_back("#define ALPHATEST");
   }
 

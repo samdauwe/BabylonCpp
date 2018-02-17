@@ -221,12 +221,12 @@ void BackgroundMaterial::setCameraColorCurves(ColorCurves* value)
     = ::std::make_unique<ColorCurves>(*value);
 }
 
-bool BackgroundMaterial::needAlphaTesting()
+bool BackgroundMaterial::needAlphaTesting() const
 {
   return true;
 }
 
-bool BackgroundMaterial::needAlphaBlending()
+bool BackgroundMaterial::needAlphaBlending() const
 {
   return ((alpha < 0.f)
           || (_diffuseTexture != nullptr && _diffuseTexture->hasAlpha()));

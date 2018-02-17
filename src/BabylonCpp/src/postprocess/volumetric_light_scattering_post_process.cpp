@@ -339,11 +339,9 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
           renderSubMesh(opaqueSubMesh);
         }
 
-        pEngine->setAlphaTesting(true);
         for (const auto& alphaTestSubMesh : alphaTestSubMeshes) {
           renderSubMesh(alphaTestSubMesh);
         }
-        pEngine->setAlphaTesting(false);
 
         if (!transparentSubMeshes.empty()) {
           // Sort sub meshes

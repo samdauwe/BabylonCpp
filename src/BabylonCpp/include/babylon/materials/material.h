@@ -97,9 +97,9 @@ public:
                                  bool useInstances = false);
   Effect* getEffect();
   Scene* getScene() const;
-  virtual bool needAlphaBlending();
-  virtual bool needAlphaBlendingForMesh(AbstractMesh* mesh);
-  virtual bool needAlphaTesting();
+  virtual bool needAlphaBlending() const;
+  virtual bool needAlphaBlendingForMesh(AbstractMesh* mesh) const;
+  virtual bool needAlphaTesting() const;
   virtual BaseTexture* getAlphaTestTexture();
   virtual void trackCreation(
     const ::std::function<void(const Effect* effect)>& onCompiled,
@@ -126,7 +126,6 @@ public:
   void
   forceCompilation(AbstractMesh* mesh,
                    const ::std::function<void(Material* material)>& onCompiled,
-                   Nullable<bool> alphaTest = nullptr,
                    Nullable<bool> clipPlane = false);
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false);
@@ -141,6 +140,13 @@ public:
 
 protected:
   Material(const string_t& name, Scene* scene, bool doNotAdd = false);
+
+  /**
+   * @brief Specifies if material alpha testing should be turned on for the
+   * mesh.
+   * @param mesh - BJS mesh.
+   */
+  bool _shouldTurnAlphaTestOn(AbstractMesh* mesh) const;
 
   void _afterBind(Mesh* mesh);
   void _markAllSubMeshesAsDirty(
