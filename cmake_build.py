@@ -84,6 +84,7 @@ The supported build commands are:
         supported build options:
             [--mode=<mode>]     the build mode, should we either 'release' or 'debug' mode
     update                      fetches sources from master and integrates then into the local branch
+    update submodules           fetches latest version of all git submodules
 ''' % progName)
         parser.add_argument('command', help='Subcommand to run')
         args = parser.parse_args(sys.argv[1:2])
@@ -139,7 +140,7 @@ The supported build commands are:
         Parses the devenv command and starts the IDE.
         '''
         import argparse, sys
-        parser = argparse.ArgumentParser(description='configure')
+        parser = argparse.ArgumentParser(description='devenv')
         parser.add_argument('--mode', type=str, dest='mode',
                             choices = ['release', 'debug'], action='store',
                             default='release', help="the build mode, ' \
@@ -151,9 +152,19 @@ The supported build commands are:
         '''
         Fetches sources from master and integrates then into the local branch.
         '''
-        import os
-        gitPullCmd = ['git', 'pull', 'origin', 'master']
-        self._tools.runCommand(os.getcwd(), gitPullCmd)
+        import os, sys
+        updateArgs = sys.argv[2:]
+        if len(updateArgs) == 0:
+            # Pull latest version from master
+            gitPullCmd = ['git', 'pull', 'origin', 'master']
+            self._tools.runCommand(os.getcwd(), gitPullCmd)
+        else:
+            updateMode = updateArgs[0]
+            # Pull latest version of all git submodules
+            if updateMode == 'submodules':
+                gitPullCmd = ['git', 'submodule', 'update', '--recursive',
+                              '--remote']
+                self._tools.runCommand(os.getcwd(), gitPullCmd)
 
     def _getBuildDirectory(self, releaseBuild = True):
         """
