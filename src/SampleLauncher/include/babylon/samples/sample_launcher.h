@@ -54,7 +54,8 @@ public:
 
 public:
   SampleLauncher(const std::string& title   = "Sample",
-                 const ResolutionSize& size = SMALL_RESOLUTION_SIZE);
+                 const ResolutionSize& size = SMALL_RESOLUTION_SIZE,
+                 bool showInspectorWindow   = false);
   ~SampleLauncher();
 
   bool intialize();
@@ -79,6 +80,7 @@ private:
 private:
   State _sampleLauncherState;
   int _defaultWinResX, _defaultWinResY;
+  bool _showInspectorWindow;
 
 }; // end of class SampleLauncher
 

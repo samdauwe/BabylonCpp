@@ -38,6 +38,7 @@ const SampleLauncher::ResolutionSize SampleLauncher::FULL_RESOLUTION_SIZE
   = std::make_pair(0, 0);
 
 static Window _sceneWindow;
+static Window _inspectorWindow;
 
 static void GLFWErrorCallback(int error, const char* description)
 {
@@ -67,10 +68,12 @@ static void GLFWWindowSizeCallback(GLFWwindow* window, int width, int height)
 }
 
 SampleLauncher::SampleLauncher(const std::string& title,
-                               const ResolutionSize& size)
+                               const ResolutionSize& size,
+                               bool showInspectorWindow)
     : _sampleLauncherState{State::UNINITIALIZED}
     , _defaultWinResX{size.first}
     , _defaultWinResY{size.second}
+    , _showInspectorWindow{showInspectorWindow}
 {
   _sceneWindow                 = Window();
   _sceneWindow.title           = title;
@@ -78,6 +81,11 @@ SampleLauncher::SampleLauncher(const std::string& title,
   _sceneWindow.renderCanvas    = std::make_unique<BABYLON::impl::Canvas>();
   _sceneWindow.renderableScene = nullptr;
   _sceneWindow.lastTime        = glfwGetTime();
+  if (showInspectorWindow) {
+    _inspectorWindow          = Window();
+    _inspectorWindow.title    = title;
+    _inspectorWindow.lastTime = glfwGetTime();
+  }
 }
 
 SampleLauncher::~SampleLauncher()
@@ -111,22 +119,40 @@ int SampleLauncher::run()
   }
 
   while (_sampleLauncherState == State::RUNNING) {
-    // Make the window's context current
-    glfwMakeContextCurrent(_sceneWindow.glfwWindow);
-    // FPS
-    updateWindowFPS(_sceneWindow);
-    // Render Scene
-    _sceneWindow.renderableScene->render();
-    // Swap front and back buffers
-    glfwSwapBuffers(_sceneWindow.glfwWindow);
-    // Swap front and back buffers
+    //*** Scene Window ***//
+    {
+      // Make the window's context current
+      glfwMakeContextCurrent(_sceneWindow.glfwWindow);
+      // FPS
+      updateWindowFPS(_sceneWindow);
+      // Render Scene
+      _sceneWindow.renderableScene->render();
+      // Swap front and back buffers
+      glfwSwapBuffers(_sceneWindow.glfwWindow);
+    }
+    //*** Inspector Window ***//
+    if (_showInspectorWindow) {
+      // Make the window's context current
+      glfwMakeContextCurrent(_inspectorWindow.glfwWindow);
+      // clear the backbuffer to our clear colour and clear the depth buffer
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      glClearColor(0.2f, 0.2f, 0.3f, 1.f);
+      // Swap front and back buffers
+      glfwSwapBuffers(_inspectorWindow.glfwWindow);
+    }
+    // Timeout
     // std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+    // Process events
     glfwPollEvents();
     // Check if should close
-    _sampleLauncherState = (glfwWindowShouldClose(_sceneWindow.glfwWindow)
-                            || (_sampleLauncherState == State::FINISHED)) ?
-                             State::FINISHED :
-                             _sampleLauncherState;
+    _sampleLauncherState
+      = (glfwWindowShouldClose(_sceneWindow.glfwWindow)
+         || (_showInspectorWindow ?
+               glfwWindowShouldClose(_inspectorWindow.glfwWindow) :
+               false)
+         || (_sampleLauncherState == State::FINISHED)) ?
+          State::FINISHED :
+          _sampleLauncherState;
   }
 
   return 0;
@@ -134,7 +160,12 @@ int SampleLauncher::run()
 
 void SampleLauncher::destroy()
 {
+  // Cleanup window(s)
   glfwDestroyWindow(_sceneWindow.glfwWindow);
+  if (_showInspectorWindow) {
+    glfwDestroyWindow(_inspectorWindow.glfwWindow);
+  }
+  // Terminate GLFW
   glfwTerminate();
   _sampleLauncherState = State::DESTROYED;
 }
@@ -184,6 +215,12 @@ int SampleLauncher::initGLFW()
   // Create the scene window
   CreateWindow(_sceneWindow, _defaultWinResX, _defaultWinResY,
                _sceneWindow.title.c_str(), nullptr, nullptr);
+
+  // Create the inspector window
+  if (_showInspectorWindow) {
+    CreateWindow(_inspectorWindow, _defaultWinResX / 2, _defaultWinResY,
+                 _inspectorWindow.title.c_str(), nullptr, &_sceneWindow);
+  }
 
   return 0;
 }
