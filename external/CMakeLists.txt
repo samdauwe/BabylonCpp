@@ -45,3 +45,6 @@ include_directories("imgui")
 set(IMGUI_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/imgui
     CACHE INTERNAL "Include directories of imgui")
+set(IMGUI_SOURCE_DIRS
+    ${CMAKE_CURRENT_SOURCE_DIR}/imgui
+    CACHE INTERNAL "Source directories of imgui")
