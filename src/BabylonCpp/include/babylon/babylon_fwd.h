@@ -153,6 +153,7 @@ class ClickInfo;
 class Engine;
 struct EngineCapabilities;
 struct EngineOptions;
+struct IActiveMeshCandidateProvider;
 struct InstancingAttributeInfo;
 class Node;
 class Scene;

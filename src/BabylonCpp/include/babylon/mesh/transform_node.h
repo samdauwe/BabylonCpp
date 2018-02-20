@@ -316,15 +316,14 @@ public:
    * If the parameter `force`is set to `true`, the actual computation is done.
    * @returns the mesh World Matrix.
    */
-  Matrix& computeWorldMatrix(bool force = false);
+  Matrix& computeWorldMatrix(bool force = false) override;
 
   /**
-  * @brief If you'd like to be called back after the mesh position, rotation or
-  * scaling has been updated.
-  * @param func: callback function to add
-  *
-  * @returns the TransformNode.
-  */
+   * @brief If you'd like to be called back after the mesh position, rotation or
+   * scaling has been updated.
+   * @param func: callback function to add
+   * @returns the TransformNode.
+   */
   TransformNode& registerAfterWorldMatrixUpdate(
     const ::std::function<void(TransformNode* mesh, EventState& es)>& func);
 

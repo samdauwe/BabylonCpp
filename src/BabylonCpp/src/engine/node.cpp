@@ -48,15 +48,18 @@ void Node::setParent(Node* parent)
     return;
   }
 
-  if (_parentNode) {
+  // Remove self from list of children of parent
+  if (_parentNode && !_parentNode->_children.empty()) {
     _parentNode->_children.erase(::std::remove(_parentNode->_children.begin(),
                                                _parentNode->_children.end(),
                                                this),
                                  _parentNode->_children.end());
   }
 
+  // Store new parent
   _parentNode = parent;
 
+  // Add as child to new parent
   if (_parentNode) {
     _parentNode->_children.emplace_back(this);
   }
@@ -228,14 +231,18 @@ bool Node::isReady() const
   return _isReady;
 }
 
-bool Node::isEnabled()
+bool Node::isEnabled(bool checkAncestors)
 {
-  if (!_isEnabled) {
+  if (checkAncestors == false) {
+    return _isEnabled;
+  }
+
+  if (_isEnabled == false) {
     return false;
   }
 
   if (parent()) {
-    return parent()->isEnabled();
+    return parent()->isEnabled(checkAncestors);
   }
 
   return true;
@@ -426,7 +433,7 @@ Animatable* Node::beginAnimation(const string_t& iName, bool loop,
                                  float speedRatio,
                                  ::std::function<void()> onAnimationEnd)
 {
-  AnimationRange* range = getAnimationRange(iName);
+  auto range = getAnimationRange(iName);
 
   if (!range) {
     return nullptr;
@@ -448,6 +455,11 @@ vector_t<AnimationRange> Node::serializeAnimationRanges()
   return serializationRanges;
 }
 
+Matrix& Node::computeWorldMatrix(bool /*force*/)
+{
+  return *_worldMatrix;
+}
+
 void Node::dispose(bool /*doNotRecurse*/)
 {
   setParent(nullptr);
@@ -455,6 +467,13 @@ void Node::dispose(bool /*doNotRecurse*/)
   // Callback
   onDisposeObservable.notifyObservers(this);
   onDisposeObservable.clear();
+
+  // Behaviors
+  for (auto& behavior : _behaviors) {
+    behavior->detach();
+  }
+
+  _behaviors.clear();
 }
 
 void Node::ParseAnimationRanges(Node* node, const Json::value& parsedNode,

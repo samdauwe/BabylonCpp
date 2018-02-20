@@ -31,7 +31,7 @@ private:
   bool _hasSwiped;
   bool _ignore;
 
-}; // end of struct PointerInfo
+}; // end of class PointerInfo
 
 } // end of namespace BABYLON
 

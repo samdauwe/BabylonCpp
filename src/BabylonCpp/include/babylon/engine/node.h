@@ -19,7 +19,7 @@ class BABYLON_SHARED_EXPORT Node : public IAnimatable, public IDisposable {
 
 public:
   /**
-   * Constructor
+   * @brief Constructor
    * @param {string} name - the name and id to be given to this node
    * @param {BABYLON.Scene} the scene this node will be added to
    */
@@ -51,36 +51,45 @@ public:
   bool isSynchronizedWithParent();
   bool isSynchronized(bool updateCache = false);
   bool hasNewParent(bool update = false);
+
   /**
-   * Is this node ready to be used/rendered
+   * @brief Is this node ready to be used/rendered
    * @return {boolean} is it ready
    */
   bool isReady() const;
+
   /**
-   * Is this node enabled.
-   * If the node has a parent and is enabled, the parent will be inspected as
-   * well.
+   * @brief Is this node enabled.
+   * If the node has a parent, all ancestors will be checked and false will be
+   * returned if any are false (not enabled), otherwise will return true.
+   * @param {boolean} [checkAncestors=true] - Indicates if this method should
+   * check the ancestors. The default is to check the ancestors. If set to
+   * false, the method will return the value of this node without checking
+   * ancestors.
    * @return {boolean} whether this node (and its parent) is enabled.
    * @see setEnabled
    */
-  bool isEnabled();
+  bool isEnabled(bool checkAncestors = true);
+
   /**
-   * Set the enabled state of this node.
+   * @brief Set the enabled state of this node.
    * @param {boolean} value - the new enabled state
    * @see isEnabled
    */
   void setEnabled(bool value);
+
   /**
-   * Is this node a descendant of the given node.
+   * @brief Is this node a descendant of the given node.
    * The function will iterate up the hierarchy until the ancestor was found or
    * no more parents defined.
    * @param {BABYLON.Node} ancestor - The parent node to inspect
    * @see parent
    */
   bool isDescendantOf(const Node* ancestor);
+
   /**
-   * Evaluate the list of children and determine if they should be considered as
-   * descendants considering the given criterias
+   * @brief Evaluate the list of children and determine if they should be
+   * considered as descendants considering the given criterias
    * @param {BABYLON.Node[]} results the result array containing the nodes
    * matching the given criterias
    * @param {boolean} directDescendantsOnly if true only direct descendants of
@@ -102,8 +111,9 @@ public:
                        bool directDescendantsOnly = false,
                        const ::std::function<bool(Node* node)>& predicate
                        = nullptr);
+
   /**
-   * Will return all nodes that have this node as ascendant.
+   * @brief Will return all nodes that have this node as ascendant.
    * @param {boolean} directDescendantsOnly if true only direct descendants of
    * 'this' will be considered, if false direct and also indirect (children of
    * children, an so on in a recursive manner) descendants of 'this' will be
@@ -144,10 +154,24 @@ public:
   void createAnimationRange(const string_t& name, float from, float to);
   void deleteAnimationRange(const string_t& name, bool deleteFrames = true);
   AnimationRange* getAnimationRange(const string_t& name);
+
+  /**
+   * @brief Will start the animation sequence.
+   * @param name defines the range frames for animation sequence
+   * @param loop defines if the animation should loop (false by default)
+   * @param speedRatio defines the speed factor in which to run the animation (1
+   * by default)
+   * @param onAnimationEnd defines a function to be executed when the animation
+   * ended (undefined by default)
+   * @returns the {BABYLON.Animatable} object created for this animation. If
+   * range does not exist, it will return null
+   */
   Animatable* beginAnimation(const string_t& name, bool loop = false,
                              float speedRatio                       = 1.f,
                              ::std::function<void()> onAnimationEnd = nullptr);
+
   vector_t<AnimationRange> serializeAnimationRanges();
+  virtual Matrix& computeWorldMatrix(bool force = false);
   virtual void dispose(bool doNotRecurse = false) override;
   static void ParseAnimationRanges(Node* node, const Json::value& parsedNode,
                                    Scene* scene);

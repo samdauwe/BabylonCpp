@@ -59,7 +59,7 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   bool drawBuffersExtension;
   bool depthTextureExtension;
   bool colorBufferFloat;
-  GL::EXT_disjoint_timer_query timerQuery;
+  GL::EXT_disjoint_timer_query* timerQuery = nullptr;
   bool canUseTimestampForTimerQuery;
 }; // end of struct EngineCapabilities
 

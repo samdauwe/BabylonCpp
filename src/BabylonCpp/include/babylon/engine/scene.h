@@ -159,6 +159,18 @@ public:
   void setSkeletonsEnabled(bool value);
   PostProcessRenderPipelineManager* postProcessRenderPipelineManager();
   SoundTrack* mainSoundTrack();
+
+  /**
+   * @brief Gets the current geometry buffer associated to the scene.
+   */
+  shared_ptr_t<GeometryBufferRenderer>& geometryBufferRenderer();
+
+  /**
+   * @brief Sets the current geometry buffer for the scene.
+   */
+  void setGeometryBufferRenderer(
+    const shared_ptr_t<GeometryBufferRenderer>& geometryBufferRenderer);
+
   Plane* clipPlane();
   void setClipPlane(const Plane& plane);
   void resetClipPlane();
@@ -259,8 +271,15 @@ public:
   void attachControl(bool attachUp = true, bool attachDown = true,
                      bool attachMove = true);
   void detachControl();
-  /** Ready **/
+
+  /**
+   * @brief This function will check if the scene can be rendered (textures are
+   * loaded, shaders are compiled) Delay loaded resources are not taking in
+   * account
+   * @return true if all required resources are ready
+   */
   bool isReady();
+
   void resetCachedMaterial();
   void registerBeforeRender(
     const ::std::function<void(Scene* scene, EventState& es)>& func);
@@ -310,11 +329,52 @@ public:
                              const ::std::function<void()>& onAnimationEnd
                              = nullptr,
                              Animatable* animatable = nullptr);
+
+  /**
+   * @brief Begin a new animation on a given node.
+   * @param {BABYLON.Node} node defines the root node where the animation will
+   * take place
+   * @param {BABYLON.Animation[]} defines the list of animations to start
+   * @param {number} from defines the initial value
+   * @param {number} to defines the final value
+   * @param {boolean} loop defines if you want animation to loop (off by
+   * default)
+   * @param {number} speedRatio defines the speed ratio to apply to all
+   * animations
+   * @param onAnimationEnd defines the callback to call when an animation ends
+   * (will be called once per node)
+   * @returns the list of created animatables
+   */
   Animatable*
   beginDirectAnimation(IAnimatable* target,
                        const vector_t<Animation*>& animations, int from, int to,
                        bool loop = false, float speedRatio = 1.f,
                        const ::std::function<void()>& onAnimationEnd = nullptr);
+
+  /**
+   * @brief Begin a new animation on a given node and its hierarchy
+   * @param {BABYLON.Node} node defines the root node where the animation will
+   * take place
+   * @param {boolean} directDescendantsOnly if true only direct descendants will
+   * be used, if false direct and also indirect (children of children, an so on
+   * in a recursive manner) descendants will be used.
+   * @param {BABYLON.Animation[]} defines the list of animations to start
+   * @param {number} from defines the initial value
+   * @param {number} to defines the final value
+   * @param {boolean} loop defines if you want animation to loop (off by
+   * default)
+   * @param {number} speedRatio defines the speed ratio to apply to all
+   * animations
+   * @param onAnimationEnd defines the callback to call when an animation ends
+   * (will be called once per node)
+   * @returns the list of animatables created for all nodes
+   */
+  vector_t<Animatable*> beginDirectHierarchyAnimation(
+    Node* target, bool directDescendantsOnly,
+    const vector_t<Animation*>& animations, int from, int to, bool loop = false,
+    float speedRatio                              = 1.f,
+    const ::std::function<void()>& onAnimationEnd = nullptr);
+
   Animatable* getAnimatableByTarget(IAnimatable* target);
   vector_t<Animatable*>& animatables();
 
@@ -351,9 +411,25 @@ public:
   int removeMorphTargetManager(MorphTargetManager* toRemove);
   int removeLight(Light* toRemove);
   int removeCamera(Camera* toRemove);
+  int removeParticleSystem(ParticleSystem* toRemove);
+  int removeAnimation(Animation* toRemove);
+  int removeMultiMaterial(MultiMaterial* toRemove);
+  int removeMaterial(Material* toRemove);
+  int removeLensFlareSystem(LensFlareSystem* toRemove);
+  int removeActionManager(ActionManager* toRemove);
   void addLight(unique_ptr_t<Light>&& newLight);
   void sortLightsByPriority();
   void addCamera(unique_ptr_t<Camera>&& newCamera);
+  void addSkeleton(unique_ptr_t<Skeleton>&& newSkeleton);
+  void addParticleSystem(unique_ptr_t<ParticleSystem>&& newParticleSystem);
+  void addAnimation(Animation* newAnimation);
+  void addMultiMaterial(unique_ptr_t<MultiMaterial>&& newMultiMaterial);
+  void addMaterial(unique_ptr_t<Material>&& newMaterial);
+  void addMorphTargetManager(
+    unique_ptr_t<MorphTargetManager>&& newMorphTargetManager);
+  void addGeometry(unique_ptr_t<Geometry>&& newGeometry);
+  void addLensFlareSystem(unique_ptr_t<LensFlareSystem>&& newLensFlareSystem);
+  void addActionManager(unique_ptr_t<ActionManager>&& newActionManager);
 
   /**
    * @brief Switch active camera.
@@ -378,6 +454,14 @@ public:
    * @see activeCamera
    */
   Camera* setActiveCameraByName(const string_t& name);
+
+  /**
+   * @brief Get an animation group using its name.
+   * @param {string} the material's name
+   * @return {BABYLON.AnimationGroup|null} the animation group or null if none
+   * found.
+   */
+  AnimationGroup* getAnimationGroupByName(const string_t& name);
 
   /**
    * @brief Get a material using its id.
@@ -1036,6 +1120,7 @@ public:
   bool forceShowBoundingBoxes;
   unique_ptr_t<Plane> _clipPlane;
   bool animationsEnabled;
+  bool useConstantAnimationDeltaTime;
   bool constantlyUpdateMeshUnderPointer;
 
   string_t hoverCursor;
@@ -1212,6 +1297,7 @@ public:
   Effect* _cachedEffect;
   Nullable<float> _cachedVisibility;
   vector_t<IDisposable*> _toBeDisposed;
+  bool dispatchAllSubMeshesOfActiveMeshes;
   vector_t<IParticleSystem*> _activeParticleSystems;
   vector_t<Animatable*> _activeAnimatables;
   unique_ptr_t<Vector3> _forcedViewPosition;
@@ -1365,7 +1451,7 @@ private:
   Sprite* _pointerOverSprite;
   unique_ptr_t<DebugLayer> _debugLayer;
   unique_ptr_t<DepthRenderer> _depthRenderer;
-  unique_ptr_t<GeometryBufferRenderer> _geometryBufferRenderer;
+  shared_ptr_t<GeometryBufferRenderer> _geometryBufferRenderer;
   AbstractMesh* _pickedDownMesh;
   AbstractMesh* _pickedUpMesh;
   Sprite* _pickedDownSprite;

@@ -90,6 +90,7 @@ Scene::Scene(Engine* engine)
     , forceShowBoundingBoxes{false}
     , _clipPlane{nullptr}
     , animationsEnabled{true}
+    , useConstantAnimationDeltaTime{false}
     , constantlyUpdateMeshUnderPointer{false}
     , hoverCursor{"pointer"}
     , defaultCursor{""}
@@ -118,6 +119,7 @@ Scene::Scene(Engine* engine)
     , _cachedMaterial{nullptr}
     , _cachedEffect{nullptr}
     , _cachedVisibility{0.f}
+    , dispatchAllSubMeshesOfActiveMeshes{false}
     , requireLightSorting{false}
     , _environmentTexture{nullptr}
     , _spritePredicate{nullptr}
@@ -471,6 +473,19 @@ SoundTrack* Scene::mainSoundTrack()
   }
 
   return _mainSoundTrack.get();
+}
+
+shared_ptr_t<GeometryBufferRenderer>& Scene::geometryBufferRenderer()
+{
+  return _geometryBufferRenderer;
+}
+
+void Scene::setGeometryBufferRenderer(
+  const shared_ptr_t<GeometryBufferRenderer>& geometryBufferRenderer)
+{
+  if (geometryBufferRenderer && geometryBufferRenderer->isSupported()) {
+    _geometryBufferRenderer = geometryBufferRenderer;
+  }
 }
 
 Plane* Scene::clipPlane()
@@ -1429,6 +1444,8 @@ bool Scene::isReady()
     }
   }
 
+  auto engine = getEngine();
+
   // Meshes
   for (const auto& mesh : meshes) {
     if (!mesh->isEnabled()) {
@@ -1443,10 +1460,20 @@ bool Scene::isReady()
       return false;
     }
 
-    auto mat = mesh->material();
-    if (mat) {
-      if (!mat->isReady(mesh.get())) {
-        return false;
+    // Effect layers
+    auto _mesh = static_cast<Mesh*>(mesh.get());
+    auto hardwareInstancedRendering
+      = mesh->getClassName() == string_t("InstancedMesh")
+        || (engine->getCaps().instancedArrays && _mesh->instances.size() > 0);
+    for (auto& layer : effectLayers) {
+      if (!layer->hasMesh(_mesh)) {
+        continue;
+      }
+
+      for (auto& subMesh : _mesh->subMeshes) {
+        if (!layer->isReady(subMesh.get(), hardwareInstancedRendering)) {
+          return false;
+        }
       }
     }
   }
@@ -1591,6 +1618,21 @@ Scene::beginDirectAnimation(IAnimatable* target,
                         onAnimationEnd, _animations);
 }
 
+vector_t<Animatable*> Scene::beginDirectHierarchyAnimation(
+  Node* target, bool directDescendantsOnly,
+  const vector_t<Animation*>& animations, int from, int to, bool loop,
+  float speedRatio, const ::std::function<void()>& onAnimationEnd)
+{
+  auto children = target->getDescendants(directDescendantsOnly);
+  vector_t<Animatable*> result;
+  for (auto& child : children) {
+    result.emplace_back(beginDirectAnimation(child, animations, from, to, loop,
+                                             speedRatio, onAnimationEnd));
+  }
+
+  return result;
+}
+
 Animatable* Scene::getAnimatableByTarget(IAnimatable* target)
 {
   auto it = ::std::find_if(_activeAnimatables.begin(), _activeAnimatables.end(),
@@ -1639,8 +1681,10 @@ void Scene::_animate()
     _animationTimeLast    = now;
     _animationTimeLastSet = true;
   }
-  auto deltaTime = Time::fpTimeSince<size_t, ::std::milli>(_animationTimeLast)
-                   * animationTimeScale;
+  auto deltaTime = useConstantAnimationDeltaTime ?
+                     16.f :
+                     Time::fpTimeSince<size_t, ::std::milli>(_animationTimeLast)
+                       * animationTimeScale;
   _animationTime += static_cast<int>(deltaTime);
   _animationTimeLast = now;
   for (auto& activeAnimatable : _activeAnimatables) {
@@ -1759,13 +1803,14 @@ size_t Scene::getUniqueId()
 
 void Scene::addMesh(unique_ptr_t<AbstractMesh>&& newMesh)
 {
-  auto _newMesh = newMesh.get();
   meshes.emplace_back(::std::move(newMesh));
+  auto _newMesh = meshes.back().get();
 
   // notify the collision coordinator
   if (collisionCoordinator) {
     collisionCoordinator->onMeshAdded(_newMesh);
   }
+  _newMesh->_resyncLightSources();
 
   onNewMeshAddedObservable.notifyObservers(_newMesh);
 }
@@ -1850,6 +1895,10 @@ int Scene::removeLight(Light* toRemove)
                            });
   int index = static_cast<int>(it - lights.begin());
   if (it != lights.end()) {
+    // Remove from meshes
+    for (auto& mesh : meshes) {
+      mesh->_removeLightSource(toRemove);
+    }
     // Remove from the scene if mesh found
     lights.erase(it);
     sortLightsByPriority();
@@ -1892,11 +1941,101 @@ int Scene::removeCamera(Camera* toRemove)
   return index;
 }
 
+int Scene::removeParticleSystem(ParticleSystem* toRemove)
+{
+  auto it = ::std::find_if(
+    particleSystems.begin(), particleSystems.end(),
+    [&toRemove](const unique_ptr_t<IParticleSystem>& particleSystem) {
+      return particleSystem.get() == toRemove;
+    });
+  int index = static_cast<int>(it - particleSystems.begin());
+  if (it != particleSystems.end()) {
+    particleSystems.erase(it);
+  }
+  return index;
+}
+
+int Scene::removeAnimation(Animation* toRemove)
+{
+  auto it = ::std::find_if(
+    animations.begin(), animations.end(),
+    [&toRemove](const Animation* animation) { return animation == toRemove; });
+  int index = static_cast<int>(it - animations.begin());
+  if (it != animations.end()) {
+    animations.erase(it);
+  }
+  return index;
+}
+
+int Scene::removeMultiMaterial(MultiMaterial* toRemove)
+{
+  auto it = ::std::find_if(
+    multiMaterials.begin(), multiMaterials.end(),
+    [&toRemove](const unique_ptr_t<MultiMaterial>& multiMaterial) {
+      return multiMaterial.get() == toRemove;
+    });
+  int index = static_cast<int>(it - multiMaterials.begin());
+  if (it != multiMaterials.end()) {
+    multiMaterials.erase(it);
+  }
+  return index;
+}
+
+int Scene::removeMaterial(Material* toRemove)
+{
+  auto it   = ::std::find_if(materials.begin(), materials.end(),
+                           [&toRemove](const unique_ptr_t<Material>& material) {
+                             return material.get() == toRemove;
+                           });
+  int index = static_cast<int>(it - materials.begin());
+  if (it != materials.end()) {
+    materials.erase(it);
+  }
+  return index;
+}
+
+int Scene::removeLensFlareSystem(LensFlareSystem* toRemove)
+{
+  auto it = ::std::find_if(
+    lensFlareSystems.begin(), lensFlareSystems.end(),
+    [&toRemove](const unique_ptr_t<LensFlareSystem>& lensFlareSystem) {
+      return lensFlareSystem.get() == toRemove;
+    });
+  int index = static_cast<int>(it - lensFlareSystems.begin());
+  if (it != lensFlareSystems.end()) {
+    lensFlareSystems.erase(it);
+  }
+  return index;
+}
+
+int Scene::removeActionManager(ActionManager* toRemove)
+{
+  auto it = ::std::find_if(
+    _actionManagers.begin(), _actionManagers.end(),
+    [&toRemove](const unique_ptr_t<ActionManager>& actionManager) {
+      return actionManager.get() == toRemove;
+    });
+  int index = static_cast<int>(it - _actionManagers.begin());
+  if (it != _actionManagers.end()) {
+    _actionManagers.erase(it);
+  }
+  return index;
+}
+
 void Scene::addLight(unique_ptr_t<Light>&& newLight)
 {
   auto _newLight = newLight.get();
   lights.emplace_back(::std::move(newLight));
   sortLightsByPriority();
+
+  // Add light to all meshes (To support if the light is removed and then
+  // readded)
+  for (auto& mesh : meshes) {
+    if (!stl_util::contains(mesh->_lightSources, newLight.get())) {
+      mesh->_lightSources.emplace_back(newLight.get());
+      mesh->_resyncLightSources();
+    }
+  }
 
   onNewLightAddedObservable.notifyObservers(_newLight);
 }
@@ -1916,6 +2055,53 @@ void Scene::addCamera(unique_ptr_t<Camera>&& newCamera)
   auto _newCamera = newCamera.get();
   cameras.emplace_back(::std::move(newCamera));
   onNewCameraAddedObservable.notifyObservers(_newCamera);
+}
+
+void Scene::addSkeleton(unique_ptr_t<Skeleton>&& newSkeleton)
+{
+  skeletons.emplace_back(::std::move(newSkeleton));
+}
+
+void Scene::addParticleSystem(unique_ptr_t<ParticleSystem>&& newParticleSystem)
+{
+  particleSystems.emplace_back(::std::move(newParticleSystem));
+}
+
+void Scene::addAnimation(Animation* newAnimation)
+{
+  animations.emplace_back(::std::move(newAnimation));
+}
+
+void Scene::addMultiMaterial(unique_ptr_t<MultiMaterial>&& newMultiMaterial)
+{
+  multiMaterials.emplace_back(::std::move(newMultiMaterial));
+}
+
+void Scene::addMaterial(unique_ptr_t<Material>&& newMaterial)
+{
+  materials.emplace_back(::std::move(newMaterial));
+}
+
+void Scene::addMorphTargetManager(
+  unique_ptr_t<MorphTargetManager>&& newMorphTargetManager)
+{
+  morphTargetManagers.emplace_back(::std::move(newMorphTargetManager));
+}
+
+void Scene::addGeometry(unique_ptr_t<Geometry>&& newGeometry)
+{
+  _geometries.emplace_back(::std::move(newGeometry));
+}
+
+void Scene::addLensFlareSystem(
+  unique_ptr_t<LensFlareSystem>&& newLensFlareSystem)
+{
+  lensFlareSystems.emplace_back(::std::move(newLensFlareSystem));
+}
+
+void Scene::addActionManager(unique_ptr_t<ActionManager>&& newActionManager)
+{
+  _actionManagers.emplace_back(::std::move(newActionManager));
 }
 
 void Scene::switchActiveCamera(Camera* newCamera, bool attachControl)
@@ -1958,6 +2144,17 @@ Camera* Scene::setActiveCameraByName(const string_t& name)
   }
 
   return nullptr;
+}
+
+AnimationGroup* Scene::getAnimationGroupByName(const string_t& name)
+{
+  auto it = ::std::find_if(
+    animationGroups.begin(), animationGroups.end(),
+    [&name](const unique_ptr_t<AnimationGroup>& animationGroup) {
+      return animationGroup->name == name;
+    });
+
+  return (it == animationGroups.end()) ? nullptr : (*it).get();
 }
 
 Material* Scene::getMaterialByID(const string_t& id)
