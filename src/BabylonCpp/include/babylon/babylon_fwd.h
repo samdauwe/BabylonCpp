@@ -503,6 +503,7 @@ class _StencilState;
 } // end of namespace BABYLON
 // --- Tools ---
 class EventState;
+struct IFileRequest;
 class PerformanceMonitor;
 class RollingAverage;
 struct SerializationHelper;

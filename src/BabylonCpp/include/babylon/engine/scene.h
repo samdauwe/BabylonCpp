@@ -11,6 +11,7 @@
 #include <babylon/math/color3.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/plane.h>
+#include <babylon/tools/ifile_request.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
 #include <babylon/tools/perf_counter.h>
@@ -635,12 +636,22 @@ public:
   HighlightLayer* getHighlightLayerByName(const string_t& name);
 
   /**
+   * @brief Return a the first highlight layer of the scene with a given name.
+   * @param name The name of the highlight layer to look for.
+   * @return The highlight layer if found otherwise null.
+   */
+  GlowLayer* getGlowLayerByName(const string_t& name);
+
+  /**
    * @brief Return a unique id as a string which can serve as an identifier for
    * the scene.
    */
   string_t uid();
 
   bool _isInIntermediateRendering() const;
+
+  void setActiveMeshCandidateProvider(IActiveMeshCandidateProvider* provider);
+  IActiveMeshCandidateProvider* getActiveMeshCandidateProvider() const;
 
   /**
    * @brief Use this function to stop evaluating active meshes. The current list
@@ -789,6 +800,25 @@ public:
   /** Misc. **/
   void _rebuildGeometries();
   void _rebuildTextures();
+
+  /**
+   * @brief Creates a default light for the scene.
+   * @param replace Whether to replace the existing lights in the scene.
+   */
+  void createDefaultLight(bool replace);
+
+  /**
+   * @brief Creates a default camera for the scene.
+   * @param createArcRotateCamera Whether to create an arc rotate or a free
+   * camera.
+   * @param replace Whether to replace the existing active camera in the scene.
+   * @param attachCameraControls Whether to attach camera controls to the
+   * canvas.
+   */
+  void createDefaultCamera(bool createArcRotateCamera = false,
+                           bool replace               = false,
+                           bool attachCameraControls  = false);
+
   void createDefaultCameraOrLight(bool createArcRotateCamera = false,
                                   bool replace               = false,
                                   bool attachCameraControls  = false);
@@ -1421,9 +1451,11 @@ private:
   int _projectionUpdateFlag;
   int _alternateViewUpdateFlag;
   int _alternateProjectionUpdateFlag;
+  vector_t<IFileRequest> _activeRequests;
   vector_t<string_t> _pendingData;
   bool _isDisposed;
   vector_t<AbstractMesh*> _activeMeshes;
+  IActiveMeshCandidateProvider* _activeMeshCandidateProvider;
   bool _activeMeshesFrozen;
   vector_t<Material*> _processedMaterials;
   vector_t<RenderTargetTexture*> _renderTargets;

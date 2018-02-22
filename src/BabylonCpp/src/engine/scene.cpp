@@ -22,11 +22,13 @@
 #include <babylon/debug/debug_layer.h>
 #include <babylon/engine/click_info.h>
 #include <babylon/engine/engine.h>
+#include <babylon/engine/iactive_mesh_candidate_provider.h>
 #include <babylon/events/pointer_event_types.h>
 #include <babylon/gamepad/gamepad_manager.h>
 #include <babylon/helpers/environment_helper.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/layer/effect_layer.h>
+#include <babylon/layer/glow_layer.h>
 #include <babylon/layer/highlight_layer.h>
 #include <babylon/layer/layer.h>
 #include <babylon/lensflare/lens_flare_system.h>
@@ -180,6 +182,7 @@ Scene::Scene(Engine* engine)
     , _alternateViewUpdateFlag{-1}
     , _alternateProjectionUpdateFlag{-1}
     , _isDisposed{false}
+    , _activeMeshCandidateProvider{nullptr}
     , _activeMeshesFrozen{false}
     , _renderingManager{nullptr}
     , _physicsEngine{nullptr}
@@ -2590,12 +2593,27 @@ bool Scene::isActiveMesh(AbstractMesh* mesh)
 HighlightLayer* Scene::getHighlightLayerByName(const string_t& name)
 {
   auto it = ::std::find_if(
-    highlightLayers.begin(), highlightLayers.end(),
-    [&name](const unique_ptr_t<HighlightLayer>& highlightLayer) {
-      return highlightLayer->name == name;
+    effectLayers.begin(), effectLayers.end(),
+    [&name](const unique_ptr_t<EffectLayer>& effectLayer) {
+      return effectLayer->name == name
+             && effectLayer->getEffectName() == HighlightLayer::EffectName;
     });
 
-  return (it == highlightLayers.end()) ? nullptr : (*it).get();
+  return (it == effectLayers.end()) ? nullptr :
+                                      static_cast<HighlightLayer*>((*it).get());
+}
+
+GlowLayer* Scene::getGlowLayerByName(const string_t& name)
+{
+  auto it = ::std::find_if(
+    effectLayers.begin(), effectLayers.end(),
+    [&name](const unique_ptr_t<EffectLayer>& effectLayer) {
+      return effectLayer->name == name
+             && effectLayer->getEffectName() == HighlightLayer::EffectName;
+    });
+
+  return (it == effectLayers.end()) ? nullptr :
+                                      static_cast<GlowLayer*>((*it).get());
 }
 
 string_t Scene::uid()
@@ -2608,9 +2626,8 @@ string_t Scene::uid()
 
 void Scene::_evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh)
 {
-  if (mesh->alwaysSelectAsActiveMesh || mesh->subMeshes.size() == 1
-      || subMesh->isInFrustum(_frustumPlanes)) {
-    auto material = subMesh->getMaterial();
+  if (dispatchAllSubMeshesOfActiveMeshes || mesh->alwaysSelectAsActiveMesh
+      || mesh->subMeshes.size() == 1 || subMesh->isInFrustum(_frustumPlanes)) {
 
     if (mesh->showSubMeshesBoundingBox) {
       auto boundingInfo = subMesh->getBoundingInfo();
@@ -2618,6 +2635,7 @@ void Scene::_evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh)
         boundingInfo.boundingBox);
     }
 
+    auto material = subMesh->getMaterial();
     if (material) {
       // Render targets
       if (material->getRenderTargetTextures) {
@@ -2637,7 +2655,7 @@ void Scene::_evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh)
 
       // Dispatch
       _activeIndices.addCount(subMesh->indexCount, false);
-      _renderingManager->dispatch(subMesh);
+      _renderingManager->dispatch(subMesh, mesh, material);
     }
   }
 }
@@ -2645,6 +2663,17 @@ void Scene::_evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh)
 bool Scene::_isInIntermediateRendering() const
 {
   return _intermediateRendering;
+}
+
+void Scene::setActiveMeshCandidateProvider(
+  IActiveMeshCandidateProvider* provider)
+{
+  _activeMeshCandidateProvider = provider;
+}
+
+IActiveMeshCandidateProvider* Scene::getActiveMeshCandidateProvider() const
+{
+  return _activeMeshCandidateProvider;
 }
 
 Scene& Scene::freezeActiveMeshes()
@@ -2693,22 +2722,32 @@ void Scene::_evaluateActiveMeshes()
 
   // Meshes
   vector_t<AbstractMesh*> _meshes;
+  bool checkIsEnabled = true;
 
-  if (_selectionOctree) { // Octree
+  // Determine mesh candidates
+  if (_activeMeshCandidateProvider) {
+    // Use _activeMeshCandidateProvider
+    _meshes        = _activeMeshCandidateProvider->getMeshes(this);
+    checkIsEnabled = _activeMeshCandidateProvider->checksIsEnabled == false;
+  }
+  else if (_selectionOctree) {
+    // Octree
     _meshes = _selectionOctree->select(_frustumPlanes);
   }
-  else { // Full scene traversal
+  else {
+    // Full scene traversal
     _meshes = getMeshes();
   }
 
-  for (auto& mesh : meshes) {
+  // Check each mesh
+  for (auto& mesh : _meshes) {
     if (mesh->isBlocked()) {
       continue;
     }
 
     _totalVertices.addCount(mesh->getTotalVertices(), false);
 
-    if (!mesh->isReady() || !mesh->isEnabled()) {
+    if (!mesh->isReady() | (checkIsEnabled && !mesh->isEnabled())) {
       continue;
     }
 
@@ -2720,9 +2759,9 @@ void Scene::_evaluateActiveMeshes()
              {ActionManager::OnIntersectionEnterTrigger,
               ActionManager::OnIntersectionExitTrigger})) {
       if (::std::find(_meshesForIntersections.begin(),
-                      _meshesForIntersections.end(), mesh.get())
+                      _meshesForIntersections.end(), mesh)
           == _meshesForIntersections.end()) {
-        _meshesForIntersections.emplace_back(mesh.get());
+        _meshesForIntersections.emplace_back(mesh);
       }
     }
 
@@ -2739,15 +2778,15 @@ void Scene::_evaluateActiveMeshes()
         || ((mesh->isVisible && mesh->visibility > 0)
             && ((mesh->layerMask() & activeCamera->layerMask) != 0)
             && mesh->isInFrustum(_frustumPlanes))) {
-      _activeMeshes.emplace_back(dynamic_cast<Mesh*>(mesh.get()));
+      _activeMeshes.emplace_back(dynamic_cast<Mesh*>(mesh));
       activeCamera->_activeMeshes.emplace_back(_activeMeshes.back());
 
       mesh->_activate(_renderId);
-      if (meshLOD != mesh.get()) {
+      if (meshLOD != mesh) {
         meshLOD->_activate(_renderId);
       }
 
-      _activeMesh(mesh.get(), meshLOD);
+      _activeMesh(mesh, meshLOD);
     }
   }
 
@@ -2772,7 +2811,7 @@ void Scene::_evaluateActiveMeshes()
 
 void Scene::_activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh)
 {
-  if (mesh->skeleton() && skeletonsEnabled()) {
+  if (skeletonsEnabled() && mesh->skeleton() && skeletonsEnabled()) {
     if (::std::find(_activeSkeletons.begin(), _activeSkeletons.end(),
                     mesh->skeleton())
         == _activeSkeletons.end()) {
@@ -2903,25 +2942,25 @@ void Scene::_renderForCamera(Camera* camera)
     needsRestoreFrameBuffer = true; // Restore back buffer
   }
 
-  // Render HighlightLayer Texture
-  auto stencilState     = _engine->getStencilBuffer();
-  bool renderhighlights = false;
-  if (renderTargetsEnabled && !highlightLayers.empty()) {
+  // Render EffectLayer Texture
+  auto stencilState  = _engine->getStencilBuffer();
+  bool renderEffects = false;
+  bool needStencil   = false;
+  if (renderTargetsEnabled && !effectLayers.empty()) {
     _intermediateRendering = true;
-    for (auto& highlightLayer : highlightLayers) {
-      if (highlightLayer->shouldRender()
-          && (!highlightLayer->camera()
-              || (highlightLayer->camera()->cameraRigMode
-                    == Camera::RIG_MODE_NONE
-                  && camera == highlightLayer->camera())
-              || (highlightLayer->camera()->cameraRigMode
-                    != Camera::RIG_MODE_NONE
-                  && (::std::find(highlightLayer->camera()->_rigCameras.begin(),
-                                  highlightLayer->camera()->_rigCameras.end(),
+    for (auto& effectLayer : effectLayers) {
+      if (effectLayer->shouldRender()
+          && (!effectLayer->camera()
+              || (effectLayer->camera()->cameraRigMode == Camera::RIG_MODE_NONE
+                  && camera == effectLayer->camera())
+              || (effectLayer->camera()->cameraRigMode != Camera::RIG_MODE_NONE
+                  && (::std::find(effectLayer->camera()->_rigCameras.begin(),
+                                  effectLayer->camera()->_rigCameras.end(),
                                   camera)
-                      != highlightLayer->camera()->_rigCameras.end())))) {
+                      != effectLayer->camera()->_rigCameras.end())))) {
 
-        renderhighlights = true;
+        renderEffects = true;
+        needStencil   = needStencil || effectLayer->needStencil();
 
         /*auto renderTarget = highlightLayer->mainTexture();
         if (renderTarget->_shouldRender()) {
@@ -2957,8 +2996,8 @@ void Scene::_renderForCamera(Camera* camera)
     engine->setDepthBuffer(true);
   }
 
-  // Activate HighlightLayer stencil
-  if (renderhighlights) {
+  // Activate effect Layer  stencil
+  if (needStencil) {
     _engine->setStencilBuffer(true);
   }
 
@@ -2967,8 +3006,8 @@ void Scene::_renderForCamera(Camera* camera)
   _renderingManager->render(nullptr, {}, true, true);
   onAfterDrawPhaseObservable.notifyObservers(this);
 
-  // Restore HighlightLayer stencil
-  if (renderhighlights) {
+  // Restore effect Layer stencil
+  if (needStencil) {
     _engine->setStencilBuffer(stencilState);
   }
 
@@ -3000,12 +3039,12 @@ void Scene::_renderForCamera(Camera* camera)
     engine->setDepthBuffer(true);
   }
 
-  // Highlight Layer
-  if (renderhighlights) {
+  // Effect Layer
+  if (renderEffects) {
     engine->setDepthBuffer(false);
-    for (auto& highlightLayer : highlightLayers) {
-      if (highlightLayer->shouldRender()) {
-        highlightLayer->render();
+    for (auto& effectLayer : effectLayers) {
+      if (effectLayer->shouldRender()) {
+        effectLayer->render();
       }
     }
     engine->setDepthBuffer(true);
@@ -3088,7 +3127,7 @@ void Scene::render()
     auto defaultFrameTime = 1000.f / 60.f; // frame time in MS
 
     if (_physicsEngine) {
-      defaultFrameTime = _physicsEngine->getTimeStep();
+      defaultFrameTime = _physicsEngine->getTimeStep() * 1000.f;
     }
 
     auto stepsTaken = 0u;
@@ -3112,30 +3151,29 @@ void Scene::render()
       // Physics
       if (_physicsEngine) {
         onBeforePhysicsObservable.notifyObservers(this);
-        _physicsEngine->_step(defaultFPS);
+        _physicsEngine->_step(defaultFrameTime / 1000.f);
         onAfterPhysicsObservable.notifyObservers(this);
       }
 
       onAfterStepObservable.notifyObservers(this);
       ++_currentStepId;
 
-      if ((internalSteps > 1) && (_currentInternalStep != internalSteps - 1)) {
-        _evaluateActiveMeshes();
-      }
-
       ++stepsTaken;
       deltaTime -= defaultFrameTime;
 
-    } while (deltaTime > 0 && stepsTaken < maxSubSteps);
+    } while (deltaTime > 0 && stepsTaken < internalSteps);
 
-    _timeAccumulator = deltaTime;
+    _timeAccumulator = deltaTime < 0 ? 0 : deltaTime;
   }
   else {
     // Animations
-    const float deltaTime = ::std::max(
-      Time::fpMillisecondsDuration<float>(Scene::MinDeltaTime),
-      ::std::min(_engine->getDeltaTime(),
-                 Time::fpMillisecondsDuration<float>(Scene::MaxDeltaTime)));
+    const float deltaTime
+      = useConstantAnimationDeltaTime ?
+          16.f :
+          ::std::max(Time::fpMillisecondsDuration<float>(Scene::MinDeltaTime),
+                     ::std::min(_engine->getDeltaTime(),
+                                Time::fpMillisecondsDuration<float>(
+                                  Scene::MaxDeltaTime)));
     _animationRatio = deltaTime * (60.f / 1000.f);
     _animate();
     onAfterAnimationsObservable.notifyObservers(this);
@@ -3474,6 +3512,13 @@ void Scene::dispose(bool /*doNotRecurse*/)
   _meshesForIntersections.clear();
   _toBeDisposed.clear();
 
+  // Abort active requests
+  for (auto& request : _activeRequests) {
+    if (request.abort) {
+      request.abort();
+    }
+  }
+
   // Debug layer
   if (_debugLayer) {
     _debugLayer->hide();
@@ -3516,6 +3561,11 @@ void Scene::dispose(bool /*doNotRecurse*/)
     for (auto& camera : cameras) {
       camera->detachControl(canvas);
     }
+  }
+
+  // Release animation groups
+  for (auto& animationGroup : animationGroups) {
+    animationGroup->dispose();
   }
 
   // Release lights
@@ -3569,8 +3619,8 @@ void Scene::dispose(bool /*doNotRecurse*/)
     layer->dispose();
   }
 
-  for (auto& highlightLayer : highlightLayers) {
-    highlightLayer->dispose();
+  for (auto& effectLayer : effectLayers) {
+    effectLayer->dispose();
   }
 
   // Release textures
@@ -3602,7 +3652,7 @@ void Scene::dispose(bool /*doNotRecurse*/)
     ::std::remove(_engine->scenes.begin(), _engine->scenes.end(), this),
     _engine->scenes.end());
 
-  _engine->wipeCaches();
+  _engine->wipeCaches(true);
   _isDisposed = true;
 }
 
@@ -4046,8 +4096,8 @@ void Scene::_rebuildGeometries()
     layer->_rebuild();
   }
 
-  for (auto& highlightLayer : highlightLayers) {
-    highlightLayer->_rebuild();
+  for (auto& effectLayer : effectLayers) {
+    effectLayer->_rebuild();
   }
 
   if (_boundingBoxRenderer) {
@@ -4071,16 +4121,10 @@ void Scene::_rebuildTextures()
   markAllMaterialsAsDirty(Material::TextureDirtyFlag);
 }
 
-void Scene::createDefaultCameraOrLight(bool createArcRotateCamera, bool replace,
-                                       bool attachCameraControls)
+void Scene::createDefaultLight(bool replace)
 {
-  // Dispose existing camera or light in replace mode.
+  // Dispose existing light in replace mode.
   if (replace) {
-    if (activeCamera) {
-      activeCamera->dispose();
-      activeCamera = nullptr;
-    }
-
     if (!lights.empty()) {
       for (auto& light : lights) {
         light->dispose();
@@ -4092,6 +4136,18 @@ void Scene::createDefaultCameraOrLight(bool createArcRotateCamera, bool replace,
   if (lights.empty()) {
     HemisphericLight::New("default light", Vector3::Up(), this);
   }
+}
+
+void Scene::createDefaultCamera(bool createArcRotateCamera, bool replace,
+                                bool attachCameraControls)
+{
+  // Dispose existing camera in replace mode.
+  if (replace) {
+    if (activeCamera) {
+      activeCamera->dispose();
+      activeCamera = nullptr;
+    }
+  }
 
   // Camera
   if (!activeCamera) {
@@ -4101,6 +4157,11 @@ void Scene::createDefaultCameraOrLight(bool createArcRotateCamera, bool replace,
 
     TargetCamera* camera = nullptr;
     auto radius          = worldSize.length() * 1.5f;
+    // empty scene scenario!
+    if (::std::isinf(radius)) {
+      radius = 1.f;
+      worldCenter.copyFromFloats(0.f, 0.f, 0.f);
+    }
     if (createArcRotateCamera) {
       auto arcRotateCamera = ArcRotateCamera::New(
         "default camera", -Math::PI_2, Math::PI_2, radius, worldCenter, this);
@@ -4115,7 +4176,7 @@ void Scene::createDefaultCameraOrLight(bool createArcRotateCamera, bool replace,
       camera = freeCamera;
     }
     camera->minZ  = radius * 0.01f;
-    camera->maxZ  = radius * 100.f;
+    camera->maxZ  = radius * 1000.f;
     camera->speed = radius * 0.2f;
     activeCamera  = camera;
 
@@ -4124,6 +4185,13 @@ void Scene::createDefaultCameraOrLight(bool createArcRotateCamera, bool replace,
       camera->attachControl(canvas);
     }
   }
+}
+
+void Scene::createDefaultCameraOrLight(bool createArcRotateCamera, bool replace,
+                                       bool attachCameraControls)
+{
+  createDefaultLight(replace);
+  createDefaultCamera(createArcRotateCamera, replace, attachCameraControls);
 }
 
 Mesh* Scene::createDefaultSkybox(BaseTexture* iEnvironmentTexture, bool pbr,
