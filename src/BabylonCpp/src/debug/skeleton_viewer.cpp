@@ -107,7 +107,7 @@ void SkeletonViewer::_getLinesForBonesNoLength(
   auto meshPos         = mesh->position();
   unsigned int boneNum = 0;
   for (size_t i = bones.size(); i-- > 0;) {
-    auto childBone  = bones[i].get();
+    auto& childBone = bones[i];
     auto parentBone = childBone->getParent();
     if (!parentBone) {
       continue;

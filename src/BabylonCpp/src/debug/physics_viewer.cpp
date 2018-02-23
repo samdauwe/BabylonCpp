@@ -61,7 +61,7 @@ void PhysicsViewer::showImpostor(PhysicsImpostor* impostor)
     return;
   }
 
-  for (size_t i = 0; i < _numMeshes; i++) {
+  for (size_t i = 0; i < _numMeshes; ++i) {
     if (_impostors[i] == impostor) {
       return;
     }
@@ -90,7 +90,7 @@ void PhysicsViewer::hideImpostor(PhysicsImpostor* impostor)
 
   auto removed = false;
 
-  for (size_t i = 0; i < _numMeshes; i++) {
+  for (size_t i = 0; i < _numMeshes; ++i) {
     if (_impostors[i] == impostor) {
       auto& mesh = _meshes[i];
 
