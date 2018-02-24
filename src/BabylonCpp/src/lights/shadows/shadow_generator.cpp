@@ -47,7 +47,7 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light,
     , _blurScale{2.f}
     , _blurKernel{1.f}
     , _useKernelBlur{false}
-    , _filter{ShadowGenerator::FILTER_NONE}
+    , _filter{ShadowGenerator::FILTER_NONE()}
     , _darkness{0.f}
     , _transparencyShadow{false}
     , _shadowMap{nullptr}
@@ -60,7 +60,6 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light,
     , _projectionMatrix{Matrix::Zero()}
     , _transformMatrix{Matrix::Zero()}
     , _cacheInitialized{false}
-    , _downSamplePostprocess{nullptr}
     , _boxBlurPostprocess{nullptr}
     , _kernelBlurXPostprocess{nullptr}
     , _kernelBlurYPostprocess{nullptr}
@@ -197,11 +196,11 @@ void ShadowGenerator::setFilter(unsigned int value)
   // Blurring the cubemap is going to be too expensive. Reverting to unblurred
   // version
   if (_light->needCube()) {
-    if (value == ShadowGenerator::FILTER_BLUREXPONENTIALSHADOWMAP) {
+    if (value == ShadowGenerator::FILTER_BLUREXPONENTIALSHADOWMAP()) {
       setUseExponentialShadowMap(true);
       return;
     }
-    else if (value == ShadowGenerator::FILTER_BLURCLOSEEXPONENTIALSHADOWMAP) {
+    else if (value == ShadowGenerator::FILTER_BLURCLOSEEXPONENTIALSHADOWMAP()) {
       setUseCloseExponentialShadowMap(true);
       return;
     }
@@ -219,17 +218,17 @@ void ShadowGenerator::setFilter(unsigned int value)
 
 bool ShadowGenerator::usePoissonSampling() const
 {
-  return filter() == ShadowGenerator::FILTER_POISSONSAMPLING;
+  return filter() == ShadowGenerator::FILTER_POISSONSAMPLING();
 }
 
 void ShadowGenerator::setUsePoissonSampling(bool value)
 {
-  if (!value && filter() != ShadowGenerator::FILTER_POISSONSAMPLING) {
+  if (!value && filter() != ShadowGenerator::FILTER_POISSONSAMPLING()) {
     return;
   }
 
-  setFilter(value ? ShadowGenerator::FILTER_POISSONSAMPLING :
-                    ShadowGenerator::FILTER_NONE);
+  setFilter(value ? ShadowGenerator::FILTER_POISSONSAMPLING() :
+                    ShadowGenerator::FILTER_NONE());
 }
 
 bool ShadowGenerator::useVarianceShadowMap() const
@@ -266,63 +265,65 @@ void ShadowGenerator::setUseBlurVarianceShadowMap(bool value)
 
 bool ShadowGenerator::useExponentialShadowMap() const
 {
-  return filter() == ShadowGenerator::FILTER_EXPONENTIALSHADOWMAP;
+  return filter() == ShadowGenerator::FILTER_EXPONENTIALSHADOWMAP();
 }
 
 void ShadowGenerator::setUseExponentialShadowMap(bool value)
 {
-  if (!value && filter() != ShadowGenerator::FILTER_EXPONENTIALSHADOWMAP) {
+  if (!value && filter() != ShadowGenerator::FILTER_EXPONENTIALSHADOWMAP()) {
     return;
   }
 
-  setFilter(value ? ShadowGenerator::FILTER_EXPONENTIALSHADOWMAP :
-                    ShadowGenerator::FILTER_NONE);
+  setFilter(value ? ShadowGenerator::FILTER_EXPONENTIALSHADOWMAP() :
+                    ShadowGenerator::FILTER_NONE());
 }
 
 bool ShadowGenerator::useBlurExponentialShadowMap() const
 {
-  return filter() == ShadowGenerator::FILTER_BLUREXPONENTIALSHADOWMAP;
+  return filter() == ShadowGenerator::FILTER_BLUREXPONENTIALSHADOWMAP();
 }
 
 void ShadowGenerator::setUseBlurExponentialShadowMap(bool value)
 {
-  if (!value && filter() != ShadowGenerator::FILTER_BLUREXPONENTIALSHADOWMAP) {
+  if (!value
+      && filter() != ShadowGenerator::FILTER_BLUREXPONENTIALSHADOWMAP()) {
     return;
   }
 
-  setFilter(value ? ShadowGenerator::FILTER_BLUREXPONENTIALSHADOWMAP :
-                    ShadowGenerator::FILTER_NONE);
+  setFilter(value ? ShadowGenerator::FILTER_BLUREXPONENTIALSHADOWMAP() :
+                    ShadowGenerator::FILTER_NONE());
 }
 
 bool ShadowGenerator::useCloseExponentialShadowMap() const
 {
-  return filter() == ShadowGenerator::FILTER_CLOSEEXPONENTIALSHADOWMAP;
+  return filter() == ShadowGenerator::FILTER_CLOSEEXPONENTIALSHADOWMAP();
 }
 
 void ShadowGenerator::setUseCloseExponentialShadowMap(bool value)
 {
-  if (!value && filter() != ShadowGenerator::FILTER_CLOSEEXPONENTIALSHADOWMAP) {
+  if (!value
+      && filter() != ShadowGenerator::FILTER_CLOSEEXPONENTIALSHADOWMAP()) {
     return;
   }
 
-  setFilter(value ? ShadowGenerator::FILTER_CLOSEEXPONENTIALSHADOWMAP :
-                    ShadowGenerator::FILTER_NONE);
+  setFilter(value ? ShadowGenerator::FILTER_CLOSEEXPONENTIALSHADOWMAP() :
+                    ShadowGenerator::FILTER_NONE());
 }
 
 bool ShadowGenerator::useBlurCloseExponentialShadowMap() const
 {
-  return filter() == ShadowGenerator::FILTER_BLURCLOSEEXPONENTIALSHADOWMAP;
+  return filter() == ShadowGenerator::FILTER_BLURCLOSEEXPONENTIALSHADOWMAP();
 }
 
 void ShadowGenerator::setUseBlurCloseExponentialShadowMap(bool value)
 {
   if (!value
-      && filter() != ShadowGenerator::FILTER_BLURCLOSEEXPONENTIALSHADOWMAP) {
+      && filter() != ShadowGenerator::FILTER_BLURCLOSEEXPONENTIALSHADOWMAP()) {
     return;
   }
 
-  setFilter(value ? ShadowGenerator::FILTER_BLURCLOSEEXPONENTIALSHADOWMAP :
-                    ShadowGenerator::FILTER_NONE);
+  setFilter(value ? ShadowGenerator::FILTER_BLURCLOSEEXPONENTIALSHADOWMAP() :
+                    ShadowGenerator::FILTER_NONE());
 }
 
 float ShadowGenerator::getDarkness() const
@@ -344,9 +345,9 @@ ShadowGenerator& ShadowGenerator::setDarkness(float darkness)
   return *this;
 }
 
-ShadowGenerator& ShadowGenerator::setTransparencyShadow(bool hasShadow)
+ShadowGenerator& ShadowGenerator::setTransparencyShadow(bool transparent)
 {
-  _transparencyShadow = hasShadow;
+  _transparencyShadow = transparent;
   return *this;
 }
 
@@ -448,10 +449,6 @@ void ShadowGenerator::_initializeShadowMap()
                                                  EventState&) {
     if (!useBlurExponentialShadowMap() && !useBlurCloseExponentialShadowMap()) {
       return;
-    }
-
-    if (_blurPostProcesses.empty()) {
-      _initializeBlurRTTAndPostProcesses();
     }
 
     auto shadowMap = getShadowMapForRendering();
@@ -656,7 +653,7 @@ void ShadowGenerator::_applyFilterValues()
     return;
   }
 
-  if (filter() == ShadowGenerator::FILTER_NONE) {
+  if (filter() == ShadowGenerator::FILTER_NONE()) {
     _shadowMap->updateSamplingMode(TextureConstants::NEAREST_SAMPLINGMODE);
   }
   else {
@@ -686,9 +683,7 @@ void ShadowGenerator::forceCompilation(
 
   vector_t<SubMesh*> subMeshes;
   for (auto& mesh : renderList) {
-    for (auto& subMesh : mesh->subMeshes) {
-      subMeshes.emplace_back(subMesh.get());
-    }
+    stl_util::concat(subMeshes, stl_util::to_raw_ptr_vector(mesh->subMeshes));
   }
   if (subMeshes.empty()) {
     if (onCompiled) {
@@ -797,7 +792,27 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
                                                 _scene->getEngine());
   }
 
-  return _effect->isReady();
+  if (!_effect->isReady()) {
+    return false;
+  }
+
+  if (useBlurExponentialShadowMap() || useBlurCloseExponentialShadowMap()) {
+    if (_blurPostProcesses.empty()) {
+      _initializeBlurRTTAndPostProcesses();
+    }
+  }
+
+  if (_kernelBlurXPostprocess && !_kernelBlurXPostprocess->isReady()) {
+    return false;
+  }
+  if (_kernelBlurYPostprocess && !_kernelBlurYPostprocess->isReady()) {
+    return false;
+  }
+  if (_boxBlurPostprocess && !_boxBlurPostprocess->isReady()) {
+    return false;
+  }
+
+  return true;
 }
 
 void ShadowGenerator::prepareDefines(MaterialDefines& defines,
@@ -937,27 +952,22 @@ void ShadowGenerator::_disposeBlurPostProcesses()
 {
   if (_shadowMap2) {
     _shadowMap2->dispose();
-    _shadowMap2.reset(nullptr);
-  }
-
-  if (_downSamplePostprocess) {
-    _downSamplePostprocess->dispose();
-    _downSamplePostprocess.reset(nullptr);
+    _shadowMap2 = nullptr;
   }
 
   if (_boxBlurPostprocess) {
     _boxBlurPostprocess->dispose();
-    _boxBlurPostprocess.reset(nullptr);
+    _boxBlurPostprocess = nullptr;
   }
 
   if (_kernelBlurXPostprocess) {
     _kernelBlurXPostprocess->dispose();
-    _kernelBlurXPostprocess.reset(nullptr);
+    _kernelBlurXPostprocess = nullptr;
   }
 
   if (_kernelBlurYPostprocess) {
     _kernelBlurYPostprocess->dispose();
-    _kernelBlurYPostprocess.reset(nullptr);
+    _kernelBlurYPostprocess = nullptr;
   }
 
   _blurPostProcesses.clear();
