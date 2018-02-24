@@ -7,46 +7,119 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Interface describing all the common properties and methods a shadow
+ * light needs to implement. This helps both the shadow generator and materials
+ * to genrate the corresponding shadow maps as well as binding the different
+ * shadow properties to the effects.
+ */
 class BABYLON_SHARED_EXPORT IShadowLight : public Light {
 
 public:
   IShadowLight(const string_t& name, Scene* scene);
   virtual ~IShadowLight();
 
-  virtual Vector3& direction()            = 0;
-  virtual Vector3& transformedPosition()  = 0;
+  /**
+   * @brief In 2d mode (needCube being false), the direction used to cast the
+   * shadow.
+   */
+  virtual Vector3& direction() = 0;
+
+  /**
+   * @brief The transformed position. Position of the light in world space
+   * taking parenting in account.
+   */
+  virtual Vector3& transformedPosition() = 0;
+
+  /**
+   * @brief The transformed direction. Direction of the light in world space
+   * taking parenting in account.
+   */
   virtual Vector3& transformedDirection() = 0;
 
+  /**
+   * @brief Computes the transformed information (transformedPosition and
+   * transformedDirection in World space) of the current light
+   * @returns true if the information has been computed, false if it does not
+   * need to (no parenting)
+   */
   virtual bool computeTransformedInformation() = 0;
-  virtual Scene* getScene()                    = 0;
 
+  /**
+   * Gets the scene the light belongs to.
+   * @returns The scene
+   */
+  virtual Scene* getScene() = 0;
+
+  /**
+   * @brief Sets the shadow projection matrix in parameter to the generated
+   * projection matrix.
+   * @param matrix The materix to updated with the projection information
+   * @param viewMatrix The transform matrix of the light
+   * @param renderList The list of mesh to render in the map
+   * @returns The current light
+   */
   virtual IShadowLight*
   setShadowProjectionMatrix(Matrix& matrix, Matrix& viewMatrix,
                             const vector_t<AbstractMesh*>& renderList)
     = 0;
+
+  /**
+   * @brief Gets the current depth scale used in ESM.
+   * @returns The scale
+   */
   virtual float getDepthScale() const = 0;
 
-  virtual bool needCube() const               = 0;
-  virtual bool needProjectionMatrixCompute()  = 0;
+  /**
+   * @brief Returns whether or not the shadow generation require a cube texture
+   * or a 2d texture.
+   * @returns true if a cube texture needs to be use
+   */
+  virtual bool needCube() const = 0;
+
+  /**
+   * @brief Detects if the projection matrix requires to be recomputed this
+   * frame.
+   * @returns true if it requires to be recomputed otherwise, false.
+   */
+  virtual bool needProjectionMatrixCompute() = 0;
+
+  /**
+   * @brief Forces the shadow generator to recompute the projection matrix even
+   * if position and direction did not changed.
+   */
   virtual void forceProjectionMatrixCompute() = 0;
 
+  /**
+   * @brief Get the direction to use to render the shadow map. In case of cube
+   * texture, the face index can be passed.
+   * @param faceIndex The index of the face we are computed the direction to
+   * generate shadow
+   * @returns The set direction in 2d mode otherwise the direction to the
+   * cubemap face if needCube() is true
+   */
   virtual Vector3 getShadowDirection(unsigned int faceIndex = 0) = 0;
 
   /**
    * @brief Gets the minZ used for shadow according to both the scene and the
    * light.
-   * @param activeCamera
+   * @param activeCamera The camera we are returning the min for
+   * @returns the depth min z
    */
   virtual float getDepthMinZ(Camera* activeCamera) const = 0;
 
   /**
-   * @brief Gets the minZ used for shadow according to both the scene and the
+   * @brief Gets the maxZ used for shadow according to both the scene and the
    * light.
-   * @param activeCamera
+   * @param activeCamera The camera we are returning the max for
+   * @returns the depth max z
    */
   virtual float getDepthMaxZ(Camera* activeCamera) const = 0;
 
 public:
+  /**
+   * The position the shdow will be casted from.
+   */
   Vector3 position;
 
 }; // end of class IShadowLight

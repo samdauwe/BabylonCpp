@@ -44,7 +44,7 @@ void SimplePineScene::initializeScene(ICanvas* canvas, Scene* scene)
     = DirectionalLight::New("dir01", Vector3(-0.5f, -1.f, -0.5f), scene);
   light->diffuse  = Color3(1.f, 1.f, 1.f);
   light->specular = Color3(0.f, 0.f, 0.f);
-  light->position = Vector3(20.f, 40.f, 20.f);
+  light->setPosition(Vector3(20.f, 40.f, 20.f));
 
   // Create 5 strict and 5 non-strict trees
   auto pine = Extensions::SimplePineGenerator::CreateTree(scene, trunkMaterial,

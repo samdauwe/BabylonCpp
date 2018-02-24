@@ -84,7 +84,7 @@ Matrix* HemisphericLight::_getWorldMatrix()
 
 unsigned int HemisphericLight::getTypeID() const
 {
-  return Light::LIGHTTYPEID_HEMISPHERICLIGHT;
+  return Light::LIGHTTYPEID_HEMISPHERICLIGHT();
 }
 
 } // end of namespace BABYLON

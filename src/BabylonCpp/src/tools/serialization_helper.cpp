@@ -184,8 +184,8 @@ Light* SerializationHelper::Parse(Light* light, const Json::value& parsedLight,
       auto pointLight = dynamic_cast<PointLight*>(light);
       // position
       if (parsedLight.contains("position")) {
-        pointLight->position
-          = Vector3::FromArray(Json::ToArray<float>(parsedLight, "position"));
+        pointLight->setPosition(
+          Vector3::FromArray(Json::ToArray<float>(parsedLight, "position")));
       }
     } break;
     case 1: {
@@ -193,8 +193,8 @@ Light* SerializationHelper::Parse(Light* light, const Json::value& parsedLight,
       auto directionalLight = dynamic_cast<DirectionalLight*>(light);
       // position
       if (parsedLight.contains("position")) {
-        directionalLight->position
-          = Vector3::FromArray(Json::ToArray<float>(parsedLight, "position"));
+        directionalLight->setPosition(
+          Vector3::FromArray(Json::ToArray<float>(parsedLight, "position")));
       }
       // direction
       if (parsedLight.contains("direction")) {
@@ -217,8 +217,8 @@ Light* SerializationHelper::Parse(Light* light, const Json::value& parsedLight,
       auto spotLight = dynamic_cast<SpotLight*>(light);
       // position
       if (parsedLight.contains("position")) {
-        spotLight->position
-          = Vector3::FromArray(Json::ToArray<float>(parsedLight, "position"));
+        spotLight->setPosition(
+          Vector3::FromArray(Json::ToArray<float>(parsedLight, "position")));
       }
       // direction
       if (parsedLight.contains("direction")) {

@@ -21,7 +21,7 @@ DirectionalLight::DirectionalLight(const string_t& iName,
     , _orthoTop{numeric_limits_t<float>::min()}
     , _orthoBottom{numeric_limits_t<float>::max()}
 {
-  position = direction.scale(-1.f);
+  setPosition(direction.scale(-1.f));
   setDirection(direction);
 }
 
@@ -41,7 +41,7 @@ const char* DirectionalLight::getClassName() const
 
 unsigned int DirectionalLight::getTypeID() const
 {
-  return Light::LIGHTTYPEID_DIRECTIONALLIGHT;
+  return Light::LIGHTTYPEID_DIRECTIONALLIGHT();
 }
 
 float DirectionalLight::shadowFrustumSize() const
@@ -119,12 +119,8 @@ void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
         continue;
       }
 
-      auto boundingInfo = mesh->getBoundingInfo();
-      // if (!boundingInfo) {
-      //  continue;
-      // }
-
-      const auto& boundingBox = boundingInfo.boundingBox;
+      const auto& boundingInfo = mesh->getBoundingInfo();
+      const auto& boundingBox  = boundingInfo.boundingBox;
 
       for (const auto& vector : boundingBox.vectorsWorld) {
         Vector3::TransformCoordinatesToRef(vector, viewMatrix, tempVector3);
@@ -183,31 +179,11 @@ void DirectionalLight::transferToEffect(Effect* /*effect*/,
                                _direction.z, 1, lightIndex);
 }
 
-/**
- * @brief Gets the minZ used for shadow according to both the scene and the
- * light.
- *
- * Values are fixed on directional lights as it relies on an ortho projection
- * hence the need to convert being
- * -1 and 1 to 0 and 1 doing (depth + min) / (min + max) -> (depth + 1) / (1 +
- * 1) -> (depth * 0.5) + 0.5.
- * @param activeCamera
- */
 float DirectionalLight::getDepthMinZ(Camera* /*activeCamera*/) const
 {
   return 1.f;
 }
 
-/**
- * @brief Gets the maxZ used for shadow according to both the scene and the
- * light.
- *
- * Values are fixed on directional lights as it relies on an ortho projection
- * hence the need to convert being
- * -1 and 1 to 0 and 1 doing (depth + min) / (min + max) -> (depth + 1) / (1 +
- * 1) -> (depth * 0.5) + 0.5.
- * @param activeCamera
- */
 float DirectionalLight::getDepthMaxZ(Camera* /*activeCamera*/) const
 {
   return 1.f;

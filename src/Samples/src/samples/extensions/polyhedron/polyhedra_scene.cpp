@@ -77,7 +77,7 @@ void PolyhedraScene::initializeScene(ICanvas* canvas, Scene* scene)
       _polygons[p]->rotation().y += _rotations[p];
       _polygons[p]->rotation().x += _rotations[p] / 4.f;
     }
-    _pointLight->position = _camera->position;
+    _pointLight->setPosition(_camera->position);
   });
 }
 

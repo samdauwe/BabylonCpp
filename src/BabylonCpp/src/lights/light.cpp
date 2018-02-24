@@ -24,7 +24,7 @@ Light::Light(const string_t& iName, Scene* scene)
     , _shadowGenerator{nullptr}
     , _uniformBuffer{::std::make_unique<UniformBuffer>(scene->getEngine())}
     , _photometricScale{1.f}
-    , _intensityMode{Light::INTENSITYMODE_AUTOMATIC}
+    , _intensityMode{Light::INTENSITYMODE_AUTOMATIC()}
     , _radius{0.00001f}
     , _renderPriority{0}
     , _includedOnlyMeshes{}
@@ -192,12 +192,6 @@ void Light::transferToEffect(Effect* /*effect*/,
 {
 }
 
-Matrix* Light::_getWorldMatrix()
-{
-
-  return _worldMatrix.get();
-}
-
 bool Light::canAffectMesh(AbstractMesh* mesh)
 {
   if (!mesh) {
@@ -249,7 +243,7 @@ Matrix* Light::getWorldMatrix()
   return worldMatrix;
 }
 
-int Light::compareLightsPriority(Light* a, Light* b)
+int Light::CompareLightsPriority(Light* a, Light* b)
 {
   // shadow-casting lights have priority over non-shadow-casting lights
   // the renderPrioirty is a secondary sort criterion
@@ -306,14 +300,14 @@ Light* Light::GetConstructorFromName(unsigned int type, const string_t& name,
                                      Scene* scene)
 {
   switch (type) {
-    case Light::LIGHTTYPEID_POINTLIGHT:
+    case Light::LIGHTTYPEID_POINTLIGHT():
       return PointLight::New(name, Vector3::Zero(), scene);
-    case Light::LIGHTTYPEID_DIRECTIONALLIGHT:
+    case Light::LIGHTTYPEID_DIRECTIONALLIGHT():
       return DirectionalLight::New(name, Vector3::Zero(), scene);
-    case Light::LIGHTTYPEID_SPOTLIGHT:
+    case Light::LIGHTTYPEID_SPOTLIGHT():
       return SpotLight::New(name, Vector3::Zero(), Vector3::Zero(), 0.f, 0.f,
                             scene);
-    case Light::LIGHTTYPEID_HEMISPHERICLIGHT:
+    case Light::LIGHTTYPEID_HEMISPHERICLIGHT():
       return HemisphericLight::New(name, Vector3::Zero(), scene);
   }
 
@@ -406,38 +400,38 @@ float Light::_getPhotometricScale()
 
   // get photometric mode
   auto photometricMode = intensityMode();
-  if (photometricMode == Light::INTENSITYMODE_AUTOMATIC) {
-    if (lightTypeID == Light::LIGHTTYPEID_DIRECTIONALLIGHT) {
-      photometricMode = Light::INTENSITYMODE_ILLUMINANCE;
+  if (photometricMode == Light::INTENSITYMODE_AUTOMATIC()) {
+    if (lightTypeID == Light::LIGHTTYPEID_DIRECTIONALLIGHT()) {
+      photometricMode = Light::INTENSITYMODE_ILLUMINANCE();
     }
     else {
-      photometricMode = Light::INTENSITYMODE_LUMINOUSINTENSITY;
+      photometricMode = Light::INTENSITYMODE_LUMINOUSINTENSITY();
     }
   }
 
   // compute photometric scale
   switch (lightTypeID) {
-    case Light::LIGHTTYPEID_POINTLIGHT:
-    case Light::LIGHTTYPEID_SPOTLIGHT:
+    case Light::LIGHTTYPEID_POINTLIGHT():
+    case Light::LIGHTTYPEID_SPOTLIGHT():
       switch (photometricMode) {
-        case Light::INTENSITYMODE_LUMINOUSPOWER:
+        case Light::INTENSITYMODE_LUMINOUSPOWER():
           photometricScale = 1.f / (4.f * Math::PI);
           break;
-        case Light::INTENSITYMODE_LUMINOUSINTENSITY:
+        case Light::INTENSITYMODE_LUMINOUSINTENSITY():
           photometricScale = 1.f;
           break;
-        case Light::INTENSITYMODE_LUMINANCE:
+        case Light::INTENSITYMODE_LUMINANCE():
           photometricScale = radius() * radius();
           break;
       }
       break;
 
-    case Light::LIGHTTYPEID_DIRECTIONALLIGHT:
+    case Light::LIGHTTYPEID_DIRECTIONALLIGHT():
       switch (photometricMode) {
-        case Light::INTENSITYMODE_ILLUMINANCE:
+        case Light::INTENSITYMODE_ILLUMINANCE():
           photometricScale = 1.f;
           break;
-        case Light::INTENSITYMODE_LUMINANCE:
+        case Light::INTENSITYMODE_LUMINANCE():
           // When radius (and therefore solid angle) is non-zero a directional
           // lights brightness can be specified via central (peak) luminance.
           // For a directional light the 'radius' defines the angular radius (in
@@ -454,7 +448,7 @@ float Light::_getPhotometricScale()
       }
       break;
 
-    case Light::LIGHTTYPEID_HEMISPHERICLIGHT:
+    case Light::LIGHTTYPEID_HEMISPHERICLIGHT():
       // No fall off in hemisperic light.
       photometricScale = 1.f;
       break;

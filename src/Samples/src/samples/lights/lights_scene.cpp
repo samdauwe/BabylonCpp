@@ -122,20 +122,20 @@ void LightsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Animations
   scene->onBeforeRenderObservable.add([this](Scene*, EventState&) {
-    _lights[0]->position
-      = Vector3(10.f * std::sin(_alpha), 0.f, 10.f * std::cos(_alpha));
-    _lights[1]->position
-      = Vector3(10.f * std::sin(_alpha), 0.f, -10.f * std::cos(_alpha));
-    _lights[2]->position
-      = Vector3(10.f * std::cos(_alpha), 0.f, 10.f * std::sin(_alpha));
-    _lights[3]->position
-      = Vector3(10.f * std::cos(_alpha), 0.f, -10.f * std::sin(_alpha));
-    _lights[4]->position
-      = Vector3(10.f * std::cos(_alpha), 10.f * std::sin(_alpha), 0.f);
-    _lights[5]->position
-      = Vector3(10.f * std::cos(_alpha), -10.f * std::sin(_alpha), 0.f);
+    _lights[0]->setPosition(
+      Vector3(10.f * std::sin(_alpha), 0.f, 10.f * std::cos(_alpha)));
+    _lights[1]->setPosition(
+      Vector3(10.f * std::sin(_alpha), 0.f, -10.f * std::cos(_alpha)));
+    _lights[2]->setPosition(
+      Vector3(10.f * std::cos(_alpha), 0.f, 10.f * std::sin(_alpha)));
+    _lights[3]->setPosition(
+      Vector3(10.f * std::cos(_alpha), 0.f, -10.f * std::sin(_alpha)));
+    _lights[4]->setPosition(
+      Vector3(10.f * std::cos(_alpha), 10.f * std::sin(_alpha), 0.f));
+    _lights[5]->setPosition(
+      Vector3(10.f * std::cos(_alpha), -10.f * std::sin(_alpha), 0.f));
     for (unsigned int index = 0; index < _lights.size(); ++index) {
-      _lightSpheres[index]->setPosition(_lights[index]->position);
+      _lightSpheres[index]->setPosition(_lights[index]->position());
     }
     _alpha += 0.01f;
   });

@@ -246,13 +246,13 @@ bool MaterialHelper::PrepareDefinesForLights(
       defines.pointlights[lightIndex] = false;
       defines.dirlights[lightIndex]   = false;
 
-      if (light->getTypeID() == Light::LIGHTTYPEID_SPOTLIGHT) {
+      if (light->getTypeID() == Light::LIGHTTYPEID_SPOTLIGHT()) {
         defines.spotlights[lightIndex] = true;
       }
-      else if (light->getTypeID() == Light::LIGHTTYPEID_HEMISPHERICLIGHT) {
+      else if (light->getTypeID() == Light::LIGHTTYPEID_HEMISPHERICLIGHT()) {
         defines.hemilights[lightIndex] = true;
       }
-      else if (light->getTypeID() == Light::LIGHTTYPEID_POINTLIGHT) {
+      else if (light->getTypeID() == Light::LIGHTTYPEID_POINTLIGHT()) {
         defines.pointlights[lightIndex] = true;
       }
       else {
@@ -279,11 +279,11 @@ bool MaterialHelper::PrepareDefinesForLights(
         }
       }
 
-      if (light->lightmapMode() != Light::LIGHTMAP_DEFAULT) {
+      if (light->lightmapMode() != Light::LIGHTMAP_DEFAULT()) {
         lightmapMode                         = true;
         defines.lightmapexcluded[lightIndex] = true;
         defines.lightmapnospecular[lightIndex]
-          = (light->lightmapMode() == Light::LIGHTMAP_SHADOWSONLY);
+          = (light->lightmapMode() == Light::LIGHTMAP_SHADOWSONLY());
       }
       else {
         defines.lightmapexcluded[lightIndex]   = false;

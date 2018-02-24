@@ -6,6 +6,12 @@
 
 namespace BABYLON {
 
+/**
+ * @brief A point light is a light defined by an unique point in world space.
+ * The light is emitted in every direction from this point.
+ * A good example of a point light is a standard light bulb.
+ * Documentation: https://doc.babylonjs.com/babylon101/lights
+ */
 class BABYLON_SHARED_EXPORT PointLight : public ShadowLight {
 
 public:
@@ -17,7 +23,7 @@ public:
 
     return light;
   }
-  ~PointLight();
+  ~PointLight() override;
 
   IReflect::Type type() const override;
 
@@ -41,6 +47,11 @@ public:
    */
   void setShadowAngle(float value);
 
+  /**
+   * @brief Gets the direction if it has been set.
+   * In case of direction provided, the shadow will not use a cube texture but
+   * simulate a spot shadow as a fallback
+   */
   Vector3& direction() override;
 
   /**
@@ -50,40 +61,55 @@ public:
   void setDirection(const Vector3& value);
 
   /**
-   * @brief Returns the string "PointLight".
+   * @brief Returns the string "PointLight"
+   * @returns the class name
    */
   const char* getClassName() const override;
 
   /**
    * @brief Returns the integer 0.
+   * @returns The light Type id as a constant defines in Light.LIGHTTYPEID_x
    */
   unsigned int getTypeID() const override;
 
   /**
-   * @returns True by default.
+   * @brief Specifies wether or not the shadowmap should be a cube texture.
+   * @returns true if the shadowmap needs to be a cube texture.
    */
   bool needCube() const override;
 
   /**
    * @brief Returns a new Vector3 aligned with the PointLight cube system
    * according to the passed cube face index (integer).
+   * @param faceIndex The index of the face we are computed the direction to
+   * generate shadow
+   * @returns The set direction in 2d mode otherwise the direction to the
+   * cubemap face if needCube() is true
    */
   Vector3 getShadowDirection(unsigned int faceIndex) override;
 
   /**
    * @brief Sets the passed Effect "effect" with the PointLight transformed
    * position (or position, if none) and passed name (string).
-   * Returns the PointLight.
+   * @param effect The effect to update
+   * @param lightIndex The index of the light in the effect to update
+   * @returns The point light
    */
   void transferToEffect(Effect* effect, const string_t& lightIndex) override;
 
 protected:
   /**
    * @brief Creates a PointLight object from the passed name and position
-   * (Vector3) and adds it in the scene.
-   * A PointLight emits the light in every direction.
-   * It can cast shadows.
+   * (Vector3) and adds it in the scene. A PointLight emits the light in every
+   * direction. It can cast shadows. If the scene camera is already defined and
+   * you want to set your PointLight at the camera position, just set it :
+   * ```javascript
+   * var pointLight = new BABYLON.PointLight("pl", camera.position, scene);
+   * ```
    * Documentation : http://doc.babylonjs.com/tutorials/lights
+   * @param name The light friendly name
+   * @param position The position of the point light in the scene
+   * @param scene The scene the lights belongs to
    */
   PointLight(const string_t& name, const Vector3& position, Scene* scene);
 

@@ -2048,7 +2048,7 @@ void Scene::sortLightsByPriority()
   if (requireLightSorting) {
     ::std::sort(lights.begin(), lights.end(),
                 [](const unique_ptr_t<Light>& a, const unique_ptr_t<Light>& b) {
-                  return Light::compareLightsPriority(a.get(), b.get());
+                  return Light::CompareLightsPriority(a.get(), b.get());
                 });
   }
 }

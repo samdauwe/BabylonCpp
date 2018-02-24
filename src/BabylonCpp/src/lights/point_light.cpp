@@ -12,7 +12,7 @@ PointLight::PointLight(const string_t& iName, const Vector3& iPosition,
                        Scene* scene)
     : ShadowLight{iName, scene}, _shadowAngle{Math::PI_2}
 {
-  position = iPosition;
+  setPosition(iPosition);
 }
 
 PointLight::~PointLight()
@@ -56,7 +56,7 @@ const char* PointLight::getClassName() const
 
 unsigned int PointLight::getTypeID() const
 {
-  return Light::LIGHTTYPEID_POINTLIGHT;
+  return Light::LIGHTTYPEID_POINTLIGHT();
 }
 
 bool PointLight::needCube() const
@@ -128,8 +128,8 @@ void PointLight::transferToEffect(Effect* /*effect*/,
     return;
   }
 
-  _uniformBuffer->updateFloat4("vLightData", position.x, position.y, position.z,
-                               0, lightIndex);
+  _uniformBuffer->updateFloat4("vLightData", position().x, position().y,
+                               position().z, 0, lightIndex);
 }
 
 } // end of namespace BABYLON

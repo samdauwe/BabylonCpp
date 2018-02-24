@@ -15,6 +15,16 @@ ShadowLight::~ShadowLight()
 {
 }
 
+Vector3& ShadowLight::position()
+{
+  return _position;
+}
+
+void ShadowLight::setPosition(const Vector3& value)
+{
+  _setPosition(value);
+}
+
 Vector3& ShadowLight::direction()
 {
   return *_direction;
@@ -33,6 +43,16 @@ Vector3& ShadowLight::transformedPosition()
 Vector3& ShadowLight::transformedDirection()
 {
   return *_transformedDirection;
+}
+
+void ShadowLight::_setDirection(const Vector3& value)
+{
+  _direction = ::std::make_unique<Vector3>(value);
+}
+
+void ShadowLight::_setPosition(const Vector3& value)
+{
+  _position = value;
 }
 
 const Nullable<float>& ShadowLight::shadowMinZ() const
@@ -63,7 +83,7 @@ bool ShadowLight::computeTransformedInformation()
     if (!_transformedPosition) {
       _transformedPosition = ::std::make_unique<Vector3>(Vector3::Zero());
     }
-    Vector3::TransformCoordinatesToRef(position, *parent()->getWorldMatrix(),
+    Vector3::TransformCoordinatesToRef(position(), *parent()->getWorldMatrix(),
                                        *_transformedPosition);
 
     // In case the direction is present.
@@ -96,12 +116,12 @@ Vector3 ShadowLight::getShadowDirection(unsigned int /*faceIndex*/)
 
 Vector3 ShadowLight::getAbsolutePosition()
 {
-  return _transformedPosition ? *_transformedPosition : position;
+  return _transformedPosition ? *_transformedPosition : position();
 }
 
 Vector3 ShadowLight::setDirectionToTarget(const Vector3& target)
 {
-  setDirection(Vector3::Normalize(target.subtract(position)));
+  setDirection(Vector3::Normalize(target.subtract(position())));
   return direction();
 }
 
@@ -134,7 +154,8 @@ Matrix* ShadowLight::_getWorldMatrix()
     _worldMatrix = ::std::make_unique<Matrix>(Matrix::Identity());
   }
 
-  Matrix::TranslationToRef(position.x, position.y, position.z, *_worldMatrix);
+  Matrix::TranslationToRef(position().x, position().y, position().z,
+                           *_worldMatrix);
 
   return _worldMatrix.get();
 }
