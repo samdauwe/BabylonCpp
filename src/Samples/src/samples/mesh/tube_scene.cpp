@@ -43,8 +43,8 @@ void TubeScene::initializeScene(ICanvas* canvas, Scene* scene)
   spot->specular  = Color3(0.f, 0.f, 0.f);
   spot->intensity = 0.8f;
 
-  auto mat          = StandardMaterial::New("mat1", scene);
-  mat->alpha        = 1.f;
+  auto mat = StandardMaterial::New("mat1", scene);
+  mat->setAlpha(1.f);
   mat->diffuseColor = Color3(0.5f, 0.5f, 1.0f);
   mat->setBackFaceCulling(false);
   mat->setWireframe(false);

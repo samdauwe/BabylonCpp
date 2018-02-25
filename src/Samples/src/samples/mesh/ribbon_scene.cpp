@@ -45,8 +45,8 @@ void RibbonScene::initializeScene(ICanvas* canvas, Scene* scene)
   light->intensity = 0.7f;
 
   // Create a material
-  auto mat          = StandardMaterial::New("mat1", scene);
-  mat->alpha        = 1.f;
+  auto mat = StandardMaterial::New("mat1", scene);
+  mat->setAlpha(1.f);
   mat->diffuseColor = Color3(0.5f, 0.5f, 1.f);
   mat->setBackFaceCulling(false);
 

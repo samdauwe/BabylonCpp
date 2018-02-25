@@ -43,7 +43,7 @@ void FresnelParametersTorusKnotScene::initializeScene(ICanvas* canvas,
   material->diffuseColor  = Color3(0, 0, 0);
   material->emissiveColor = Color3(1, 1, 1);
   material->specularPower = 128;
-  material->alpha         = 0.2f;
+  material->setAlpha(0.2f);
   material->setAlphaMode(EngineConstants::ALPHA_PREMULTIPLIED);
   torusKnot->setMaterial(material);
 
@@ -60,7 +60,7 @@ void FresnelParametersTorusKnotScene::initializeScene(ICanvas* canvas,
   emissiveFresnelParameters.rightColor = Color3::Teal().scale(0.5f);
 
   // Mark fresnel parameters a dirty
-  material->markAsDirty(Material::FresnelDirtyFlag);
+  material->markAsDirty(Material::FresnelDirtyFlag());
 }
 
 } // end of namespace Samples

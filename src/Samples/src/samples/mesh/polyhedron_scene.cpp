@@ -52,8 +52,8 @@ void PolyhedronScene::initializeScene(ICanvas* canvas, Scene* scene)
   _pointLight->intensity = 0.8f;
 
   // Create new material
-  auto mat          = StandardMaterial::New("mat1", scene);
-  mat->alpha        = 1.f;
+  auto mat = StandardMaterial::New("mat1", scene);
+  mat->setAlpha(1.f);
   mat->diffuseColor = Color3(0.73f, 0.04f, 0.12f); // Ruby red
 
   int col = 0, row = 0;

@@ -43,8 +43,8 @@ void TubeAnimationScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto light       = HemisphericLight::New("light1", Vector3(0, 1, 0), scene);
   light->intensity = 0.7f;
 
-  auto mat          = StandardMaterial::New("mat1", scene);
-  mat->alpha        = 1.f;
+  auto mat = StandardMaterial::New("mat1", scene);
+  mat->setAlpha(1.f);
   mat->diffuseColor = Color3(0.5f, 0.5f, 1.0f);
   mat->setBackFaceCulling(false);
   mat->setWireframe(true);
@@ -66,8 +66,8 @@ void TubeAnimationScene::initializeScene(ICanvas* canvas, Scene* scene)
                                Mesh::FRONTSIDE);
   tube->setMaterial(mat);
 
-  auto mat1          = StandardMaterial::New("mat1", scene);
-  mat1->alpha        = 1.f;
+  auto mat1 = StandardMaterial::New("mat1", scene);
+  mat1->setAlpha(1.f);
   mat1->diffuseColor = Color3(0.5f, 0.5f, 1.f);
 
   BoxOptions options(2.f);
