@@ -1674,23 +1674,23 @@ void Engine::applyStates()
 void Engine::draw(bool useTriangles, int indexStart, int indexCount,
                   int instancesCount)
 {
-  drawElementsType(useTriangles ? Material::TriangleFillMode :
-                                  Material::WireFrameFillMode,
+  drawElementsType(useTriangles ? Material::TriangleFillMode() :
+                                  Material::WireFrameFillMode(),
                    indexStart, indexCount, instancesCount);
 }
 
 void Engine::drawPointClouds(int verticesStart, int verticesCount,
                              int instancesCount)
 {
-  drawArraysType(Material::PointFillMode, verticesStart, verticesCount,
+  drawArraysType(Material::PointFillMode(), verticesStart, verticesCount,
                  instancesCount);
 }
 
 void Engine::drawUnIndexed(bool useTriangles, int verticesStart,
                            int verticesCount, int instancesCount)
 {
-  drawArraysType(useTriangles ? Material::TriangleFillMode :
-                                Material::WireFrameFillMode,
+  drawArraysType(useTriangles ? Material::TriangleFillMode() :
+                                Material::WireFrameFillMode(),
                  verticesStart, verticesCount, instancesCount);
 }
 
@@ -1738,24 +1738,24 @@ unsigned int Engine::DrawMode(unsigned int fillMode)
 {
   switch (fillMode) {
     // Triangle views
-    case Material::TriangleFillMode:
+    case Material::TriangleFillMode():
       return GL::TRIANGLES;
-    case Material::PointFillMode:
+    case Material::PointFillMode():
       return GL::POINTS;
-    case Material::WireFrameFillMode:
+    case Material::WireFrameFillMode():
       return GL::LINES;
     // Draw modes
-    case Material::PointListDrawMode:
+    case Material::PointListDrawMode():
       return GL::POINTS;
-    case Material::LineListDrawMode:
+    case Material::LineListDrawMode():
       return GL::LINES;
-    case Material::LineLoopDrawMode:
+    case Material::LineLoopDrawMode():
       return GL::LINE_LOOP;
-    case Material::LineStripDrawMode:
+    case Material::LineStripDrawMode():
       return GL::LINE_STRIP;
-    case Material::TriangleStripDrawMode:
+    case Material::TriangleStripDrawMode():
       return GL::TRIANGLE_STRIP;
-    case Material::TriangleFanDrawMode:
+    case Material::TriangleFanDrawMode():
       return GL::TRIANGLE_FAN;
     default:
       return GL::TRIANGLES;
@@ -4738,6 +4738,14 @@ void Engine::setTranformFeedbackVaryings(GL::IGLProgram* program,
 void Engine::bindTransformFeedbackBuffer(GL::IGLBuffer* value)
 {
   _gl->bindBufferBase(GL::TRANSFORM_FEEDBACK_BUFFER, 0, value);
+}
+
+IFileRequest Engine::_loadFile(
+  const string_t& /*url*/,
+  const ::std::function<void(Variant<string_t, ArrayBuffer>& data,
+                             const string_t& responseURL)>& /*onSuccess*/)
+{
+  return IFileRequest();
 }
 
 unsigned int Engine::getGlAlgorithmType(unsigned int algorithmType) const

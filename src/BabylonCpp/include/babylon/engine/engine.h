@@ -12,6 +12,7 @@
 #include <babylon/math/size.h>
 #include <babylon/math/viewport.h>
 #include <babylon/mesh/buffer_pointer.h>
+#include <babylon/tools/ifile_request.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/perf_counter.h>
 #include <babylon/tools/performance_monitor.h>
@@ -567,6 +568,10 @@ public:
   void setTranformFeedbackVaryings(GL::IGLProgram* program,
                                    const vector_t<string_t>& value);
   void bindTransformFeedbackBuffer(GL::IGLBuffer* value);
+  IFileRequest _loadFile(
+    const string_t& url,
+    const ::std::function<void(Variant<string_t, ArrayBuffer>& data,
+                               const string_t& responseURL)>& onSuccess);
 
   /** Statics **/
   static Engine* LastCreatedEngine();

@@ -324,7 +324,7 @@ void Scene::setEnvironmentTexture(BaseTexture* value)
   }
 
   _environmentTexture = value;
-  markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  markAllMaterialsAsDirty(Material::TextureDirtyFlag());
 }
 
 void Scene::setUseRightHandedSystem(bool value)
@@ -333,7 +333,7 @@ void Scene::setUseRightHandedSystem(bool value)
     return;
   }
   _useRightHandedSystem = value;
-  markAllMaterialsAsDirty(Material::MiscDirtyFlag);
+  markAllMaterialsAsDirty(Material::MiscDirtyFlag());
 }
 
 bool Scene::useRightHandedSystem() const
@@ -372,7 +372,7 @@ void Scene::setForcePointsCloud(bool value)
     return;
   }
   _forcePointsCloud = value;
-  markAllMaterialsAsDirty(Material::MiscDirtyFlag);
+  markAllMaterialsAsDirty(Material::MiscDirtyFlag());
 }
 
 bool Scene::fogEnabled() const
@@ -386,7 +386,7 @@ void Scene::setFogEnabled(bool value)
     return;
   }
   _fogEnabled = value;
-  markAllMaterialsAsDirty(Material::MiscDirtyFlag);
+  markAllMaterialsAsDirty(Material::MiscDirtyFlag());
 }
 
 bool Scene::fogMode() const
@@ -400,7 +400,7 @@ void Scene::setFogMode(unsigned int value)
     return;
   }
   _fogMode = value;
-  markAllMaterialsAsDirty(Material::MiscDirtyFlag);
+  markAllMaterialsAsDirty(Material::MiscDirtyFlag());
 }
 
 bool Scene::shadowsEnabled() const
@@ -414,7 +414,7 @@ void Scene::setShadowsEnabled(bool value)
     return;
   }
   _shadowsEnabled = value;
-  markAllMaterialsAsDirty(Material::LightDirtyFlag);
+  markAllMaterialsAsDirty(Material::LightDirtyFlag());
 }
 
 bool Scene::lightsEnabled() const
@@ -428,7 +428,7 @@ void Scene::setLightsEnabled(bool value)
     return;
   }
   _lightsEnabled = value;
-  markAllMaterialsAsDirty(Material::LightDirtyFlag);
+  markAllMaterialsAsDirty(Material::LightDirtyFlag());
 }
 
 bool Scene::texturesEnabled() const
@@ -442,7 +442,7 @@ void Scene::setTexturesEnabled(bool value)
     return;
   }
   _texturesEnabled = value;
-  markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  markAllMaterialsAsDirty(Material::TextureDirtyFlag());
 }
 
 bool Scene::skeletonsEnabled() const
@@ -456,7 +456,7 @@ void Scene::setSkeletonsEnabled(bool value)
     return;
   }
   _skeletonsEnabled = value;
-  markAllMaterialsAsDirty(Material::AttributesDirtyFlag);
+  markAllMaterialsAsDirty(Material::AttributesDirtyFlag());
 }
 
 PostProcessRenderPipelineManager* Scene::postProcessRenderPipelineManager()
@@ -4118,7 +4118,7 @@ void Scene::_rebuildTextures()
     texture->_rebuild();
   }
 
-  markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  markAllMaterialsAsDirty(Material::TextureDirtyFlag());
 }
 
 void Scene::createDefaultLight(bool replace)
@@ -4301,6 +4301,14 @@ void Scene::markAllMaterialsAsDirty(
     }
     material->markAsDirty(flag);
   }
+}
+
+IFileRequest
+Scene::_loadFile(const string_t& /*url*/,
+                 const ::std::function<void(Variant<string_t, ArrayBuffer>&,
+                                            const string_t&)>& /*onSuccess*/)
+{
+  return IFileRequest();
 }
 
 } // end of namespace BABYLON

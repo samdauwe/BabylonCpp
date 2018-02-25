@@ -4,6 +4,7 @@
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_global.h>
 #include <babylon/core/structs.h>
+#include <babylon/core/variant.h>
 #include <babylon/culling/octrees/octree.h>
 #include <babylon/events/pointer_info.h>
 #include <babylon/events/pointer_info_pre.h>
@@ -881,6 +882,11 @@ public:
   markAllMaterialsAsDirty(unsigned int flag,
                           const ::std::function<bool(Material* mat)>& predicate
                           = nullptr);
+
+  IFileRequest _loadFile(
+    const string_t& url,
+    const ::std::function<void(Variant<string_t, ArrayBuffer>& data,
+                               const string_t& responseURL)>& onSuccess);
 
 protected:
   /**
