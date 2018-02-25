@@ -7,13 +7,13 @@
 namespace BABYLON {
 
 /**
- * The PBR material of BJS following the metal roughness convention.
+ * @brief The PBR material of BJS following the metal roughness convention.
  *
  * This fits to the PBR convention in the GLTF definition:
  * https://github.com/KhronosGroup/glTF/tree/2.0/specification/2.0
  */
 class BABYLON_SHARED_EXPORT PBRMetallicRoughnessMaterial
-    : public Internals::PBRBaseSimpleMaterial {
+    : public PBRBaseSimpleMaterial {
 
 public:
   /**
@@ -35,8 +35,17 @@ public:
    */
   vector_t<BaseTexture*> getActiveTextures() const override;
 
+  /**
+   * @brief Checks to see if a texture is used in the material.
+   * @param texture - Base texture to use.
+   * @returns - Boolean specifying if a texture is used in the material.
+   */
   bool hasTexture(BaseTexture* texture) const override;
 
+  /**
+   * @brief Makes a duplicate of the current material.
+   * @param name - name to use for the new material.
+   */
   PBRMetallicRoughnessMaterial*
   clone(const string_t& name, bool cloneChildren = false) const override;
 

@@ -4,7 +4,6 @@
 #include <babylon/materials/textures/base_texture.h>
 
 namespace BABYLON {
-namespace Internals {
 
 PBRBaseSimpleMaterial::PBRBaseSimpleMaterial(const string_t& iName,
                                              Scene* scene)
@@ -54,7 +53,7 @@ void PBRBaseSimpleMaterial::setDoubleSided(bool value)
 bool PBRBaseSimpleMaterial::_shouldUseAlphaFromAlbedoTexture() const
 {
   return _albedoTexture && _albedoTexture->hasAlpha()
-         && _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE;
+         && _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE();
 }
 
 vector_t<BaseTexture*> PBRBaseSimpleMaterial::getActiveTextures() const
@@ -97,5 +96,4 @@ bool PBRBaseSimpleMaterial::hasTexture(BaseTexture* texture) const
   return false;
 }
 
-} // end of namespace Internals
 } // end of namespace BABYLON

@@ -6,7 +6,7 @@ namespace BABYLON {
 
 PBRMetallicRoughnessMaterial::PBRMetallicRoughnessMaterial(
   const string_t& iName, Scene* scene)
-    : Internals::PBRBaseSimpleMaterial{iName, scene}
+    : PBRBaseSimpleMaterial{iName, scene}
     , baseTexture{nullptr}
     , metallic{0.f}
     , roughness{0.f}
@@ -15,6 +15,7 @@ PBRMetallicRoughnessMaterial::PBRMetallicRoughnessMaterial(
   _useRoughnessFromMetallicTextureAlpha = false;
   _useRoughnessFromMetallicTextureGreen = true;
   _useMetallnessFromMetallicTextureBlue = true;
+  _forceMetallicWorkflow                = true;
 }
 
 PBRMetallicRoughnessMaterial::~PBRMetallicRoughnessMaterial()
@@ -28,7 +29,7 @@ const char* PBRMetallicRoughnessMaterial::getClassName() const
 
 vector_t<BaseTexture*> PBRMetallicRoughnessMaterial::getActiveTextures() const
 {
-  auto activeTextures = Internals::PBRBaseSimpleMaterial::getActiveTextures();
+  auto activeTextures = PBRBaseSimpleMaterial::getActiveTextures();
 
   if (baseTexture) {
     activeTextures.emplace_back(baseTexture);
@@ -43,7 +44,7 @@ vector_t<BaseTexture*> PBRMetallicRoughnessMaterial::getActiveTextures() const
 
 bool PBRMetallicRoughnessMaterial::hasTexture(BaseTexture* texture) const
 {
-  if (Internals::PBRBaseSimpleMaterial::hasTexture(texture)) {
+  if (PBRBaseSimpleMaterial::hasTexture(texture)) {
     return true;
   }
 

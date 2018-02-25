@@ -13,11 +13,14 @@
 #include <babylon/materials/pbr/pbr_material_defines.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/base_texture.h>
+#include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/refraction_texture.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/math/spherical_polynomial.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/base_sub_mesh.h>
+#include <babylon/mesh/geometry.h>
+#include <babylon/mesh/instanced_mesh.h>
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
 #include <babylon/tools/texture_tools.h>
@@ -86,6 +89,7 @@ PBRBaseMaterial::PBRBaseMaterial(const string_t& iName, Scene* scene)
     , _environmentBRDFTexture{nullptr}
     , _forceIrradianceInFragment{false}
     , _forceNormalForward{false}
+    , _forceMetallicWorkflow{false}
     , _lightingInfos{Vector4(_directIntensity, _emissiveIntensity,
                              _environmentIntensity, _specularIntensity)}
     , _imageProcessingObserver{nullptr}
@@ -177,16 +181,16 @@ void PBRBaseMaterial::setTransparencyMode(const Nullable<unsigned int>& value)
 
   _transparencyMode = value;
 
-  _forceAlphaTest = (*value == PBRMaterial::PBRMATERIAL_ALPHATESTANDBLEND);
+  _forceAlphaTest = (*value == PBRMaterial::PBRMATERIAL_ALPHATESTANDBLEND());
 
-  _markAllSubMeshesAsTexturesDirty();
+  _markAllSubMeshesAsTexturesAndMiscDirty();
 }
 
 bool PBRBaseMaterial::_disableAlphaBlending() const
 {
   return (_linkRefractionWithTransparency
-          || _transparencyMode == PBRMaterial::PBRMATERIAL_OPAQUE
-          || _transparencyMode == PBRMaterial::PBRMATERIAL_ALPHATEST);
+          || _transparencyMode == PBRMaterial::PBRMATERIAL_OPAQUE()
+          || _transparencyMode == PBRMaterial::PBRMATERIAL_ALPHATEST());
 }
 
 bool PBRBaseMaterial::needAlphaBlending() const
@@ -194,7 +198,7 @@ bool PBRBaseMaterial::needAlphaBlending() const
   if (_disableAlphaBlending()) {
     return false;
   }
-  return (alpha < 1.f) || (_opacityTexture != nullptr)
+  return (alpha() < 1.f) || (_opacityTexture != nullptr)
          || _shouldUseAlphaFromAlbedoTexture();
 }
 
@@ -219,14 +223,14 @@ bool PBRBaseMaterial::needAlphaTesting() const
 
   return _albedoTexture != nullptr && _albedoTexture->hasAlpha()
          && (_transparencyMode == nullptr
-             || _transparencyMode == PBRMaterial::PBRMATERIAL_ALPHATEST);
+             || _transparencyMode == PBRMaterial::PBRMATERIAL_ALPHATEST());
 }
 
 bool PBRBaseMaterial::_shouldUseAlphaFromAlbedoTexture() const
 {
   return _albedoTexture != nullptr && _albedoTexture->hasAlpha()
          && _useAlphaFromAlbedoTexture
-         && _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE;
+         && _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE();
 }
 
 BaseTexture* PBRBaseMaterial::getAlphaTestTexture()
@@ -258,6 +262,349 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
   auto engine = scene->getEngine();
 
+  if (defines._areTexturesDirty) {
+    if (scene->texturesEnabled()) {
+      if (_albedoTexture && StandardMaterial::DiffuseTextureEnabled()) {
+        if (!_albedoTexture->isReadyOrNotBlocking()) {
+          return false;
+        }
+      }
+
+      if (_ambientTexture && StandardMaterial::AmbientTextureEnabled()) {
+        if (!_ambientTexture->isReadyOrNotBlocking()) {
+          return false;
+        }
+      }
+
+      if (_opacityTexture && StandardMaterial::OpacityTextureEnabled()) {
+        if (!_opacityTexture->isReadyOrNotBlocking()) {
+          return false;
+        }
+      }
+
+      auto reflectionTexture = _getReflectionTexture();
+      if (reflectionTexture && StandardMaterial::ReflectionTextureEnabled()) {
+        if (!reflectionTexture->isReadyOrNotBlocking()) {
+          return false;
+        }
+      }
+
+      if (_lightmapTexture && StandardMaterial::LightmapTextureEnabled()) {
+        if (!_lightmapTexture->isReadyOrNotBlocking()) {
+          return false;
+        }
+      }
+
+      if (_emissiveTexture && StandardMaterial::EmissiveTextureEnabled()) {
+        if (!_emissiveTexture->isReadyOrNotBlocking()) {
+          return false;
+        }
+      }
+
+      if (StandardMaterial::SpecularTextureEnabled()) {
+        if (_metallicTexture) {
+          if (!_metallicTexture->isReadyOrNotBlocking()) {
+            return false;
+          }
+        }
+        else if (_reflectivityTexture) {
+          if (!_reflectivityTexture->isReadyOrNotBlocking()) {
+            return false;
+          }
+        }
+
+        if (_microSurfaceTexture) {
+          if (!_microSurfaceTexture->isReadyOrNotBlocking()) {
+            return false;
+          }
+        }
+      }
+
+      if (engine->getCaps().standardDerivatives && _bumpTexture
+          && StandardMaterial::BumpTextureEnabled() && !_disableBumpMap) {
+        // Bump texture cannot be not blocking.
+        if (!_bumpTexture->isReady()) {
+          return false;
+        }
+      }
+
+      auto refractionTexture = _getRefractionTexture();
+      if (refractionTexture && StandardMaterial::RefractionTextureEnabled()) {
+        if (!refractionTexture->isReadyOrNotBlocking()) {
+          return false;
+        }
+      }
+
+      if (_environmentBRDFTexture
+          && StandardMaterial::ReflectionTextureEnabled()) {
+        // This is blocking.
+        if (!_environmentBRDFTexture->isReady()) {
+          return false;
+        }
+      }
+    }
+  }
+
+  if (defines._areImageProcessingDirty) {
+    if (!_imageProcessingConfiguration->isReady()) {
+      return false;
+    }
+  }
+
+  if (!engine->getCaps().standardDerivatives) {
+    Mesh* bufferMesh             = nullptr;
+    const string_t meshClassName = mesh->getClassName();
+    if (meshClassName == "InstancedMesh") {
+      bufferMesh = (static_cast<InstancedMesh*>(mesh))->sourceMesh();
+    }
+    else if (meshClassName == "Mesh") {
+      bufferMesh = static_cast<Mesh*>(mesh);
+    }
+
+    if (bufferMesh && bufferMesh->geometry()
+        && bufferMesh->geometry()->isReady()
+        && !bufferMesh->geometry()->isVerticesDataPresent(
+             VertexBuffer::NormalKind)) {
+      bufferMesh->createNormals(true);
+      BABYLON_LOGF_WARN(
+        "PBRBaseMaterial",
+        "PBRMaterial: Normals have been created for the mesh: %s",
+        bufferMesh->name.c_str())
+    }
+  }
+
+  auto effect
+    = _prepareEffect(mesh, defines, onCompiled, onError, useInstances);
+  if (effect) {
+    scene->resetCachedMaterial();
+    subMesh->setEffect(effect, defines);
+    buildUniformLayout();
+  }
+
+  if (!subMesh->effect() || !subMesh->effect()->isReady()) {
+    return false;
+  }
+
+  defines._renderId   = scene->getRenderId();
+  _wasPreviouslyReady = true;
+
+  return true;
+}
+
+Effect* PBRBaseMaterial::_prepareEffect(
+  AbstractMesh* mesh, PBRMaterialDefines& defines,
+  const ::std::function<void(Effect* effect)> onCompiled,
+  ::std::function<void(Effect* effect, const string_t& errors)> onError,
+  const Nullable<bool>& useInstances, const Nullable<bool>& useClipPlane)
+{
+  _prepareDefines(mesh, defines, useInstances, useClipPlane);
+  if (!defines.isDirty()) {
+    return nullptr;
+  }
+
+  defines.markAsProcessed();
+
+  auto scene  = getScene();
+  auto engine = scene->getEngine();
+
+  // Fallbacks
+  auto fallbacks    = ::std::make_unique<EffectFallbacks>();
+  auto fallbackRank = 0u;
+  if (defines[PMD::USESPHERICALINVERTEX]) {
+    fallbacks->addFallback(fallbackRank++, "USESPHERICALINVERTEX");
+  }
+
+  if (defines[PMD::FOG]) {
+    fallbacks->addFallback(fallbackRank, "FOG");
+  }
+  if (defines[PMD::POINTSIZE]) {
+    fallbacks->addFallback(fallbackRank, "POINTSIZE");
+  }
+  if (defines[PMD::LOGARITHMICDEPTH]) {
+    fallbacks->addFallback(fallbackRank, "LOGARITHMICDEPTH");
+  }
+  if (defines[PMD::PARALLAX]) {
+    fallbacks->addFallback(fallbackRank, "PARALLAX");
+  }
+  if (defines[PMD::PARALLAXOCCLUSION]) {
+    fallbacks->addFallback(fallbackRank++, "PARALLAXOCCLUSION");
+  }
+
+  if (defines[PMD::ENVIRONMENTBRDF]) {
+    fallbacks->addFallback(fallbackRank++, "ENVIRONMENTBRDF");
+  }
+
+  if (defines[PMD::TANGENT]) {
+    fallbacks->addFallback(fallbackRank++, "TANGENT");
+  }
+
+  if (defines[PMD::BUMP]) {
+    fallbacks->addFallback(fallbackRank++, "BUMP");
+  }
+
+  fallbackRank = MaterialHelper::HandleFallbacksForShadows(
+    defines, *fallbacks, _maxSimultaneousLights, fallbackRank++);
+
+  if (defines[PMD::SPECULARTERM]) {
+    fallbacks->addFallback(fallbackRank++, "SPECULARTERM");
+  }
+
+  if (defines[PMD::USESPHERICALFROMREFLECTIONMAP]) {
+    fallbacks->addFallback(fallbackRank++, "USESPHERICALFROMREFLECTIONMAP");
+  }
+
+  if (defines[PMD::LIGHTMAP]) {
+    fallbacks->addFallback(fallbackRank++, "LIGHTMAP");
+  }
+
+  if (defines[PMD::NORMAL]) {
+    fallbacks->addFallback(fallbackRank++, "NORMAL");
+  }
+
+  if (defines[PMD::AMBIENT]) {
+    fallbacks->addFallback(fallbackRank++, "AMBIENT");
+  }
+
+  if (defines[PMD::EMISSIVE]) {
+    fallbacks->addFallback(fallbackRank++, "EMISSIVE");
+  }
+
+  if (defines[PMD::VERTEXCOLOR]) {
+    fallbacks->addFallback(fallbackRank++, "VERTEXCOLOR");
+  }
+
+  if (defines.NUM_BONE_INFLUENCERS > 0) {
+    fallbacks->addCPUSkinningFallback(fallbackRank++, mesh);
+  }
+
+  if (defines[PMD::MORPHTARGETS]) {
+    fallbacks->addFallback(fallbackRank++, "MORPHTARGETS");
+  }
+
+  // Attributes
+  vector_t<string_t> attribs{VertexBuffer::PositionKindChars};
+
+  if (defines[PMD::NORMAL]) {
+    attribs.emplace_back(VertexBuffer::NormalKindChars);
+  }
+
+  if (defines[PMD::TANGENT]) {
+    attribs.emplace_back(VertexBuffer::TangentKindChars);
+  }
+
+  if (defines[PMD::UV1]) {
+    attribs.emplace_back(VertexBuffer::UVKindChars);
+  }
+
+  if (defines[PMD::UV2]) {
+    attribs.emplace_back(VertexBuffer::UV2KindChars);
+  }
+
+  if (defines[PMD::VERTEXCOLOR]) {
+    attribs.emplace_back(VertexBuffer::ColorKindChars);
+  }
+
+  MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines, *fallbacks);
+  MaterialHelper::PrepareAttributesForInstances(attribs, defines,
+                                                PMD::INSTANCES);
+  MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh, defines,
+                                                   PMD::NORMAL);
+
+  vector_t<string_t> uniforms{"world",
+                              "view",
+                              "viewProjection",
+                              "vEyePosition",
+                              "vLightsType",
+                              "vAmbientColor",
+                              "vAlbedoColor",
+                              "vReflectivityColor",
+                              "vEmissiveColor",
+                              "vReflectionColor",
+                              "vFogInfos",
+                              "vFogColor",
+                              "pointSize",
+                              "vAlbedoInfos",
+                              "vAmbientInfos",
+                              "vOpacityInfos",
+                              "vReflectionInfos",
+                              "vReflectionPosition",
+                              "vReflectionSize",
+                              "vEmissiveInfos",
+                              "vReflectivityInfos",
+                              "vMicroSurfaceSamplerInfos",
+                              "vBumpInfos",
+                              "vLightmapInfos",
+                              "vRefractionInfos",
+                              "mBones",
+                              "vClipPlane",
+                              "albedoMatrix",
+                              "ambientMatrix",
+                              "opacityMatrix",
+                              "reflectionMatrix",
+                              "emissiveMatrix",
+                              "reflectivityMatrix",
+                              "microSurfaceSamplerMatrix",
+                              "bumpMatrix",
+                              "lightmapMatrix",
+                              "refractionMatrix",
+                              "vLightingIntensity",
+                              "logarithmicDepthConstant",
+                              "vSphericalX",
+                              "vSphericalY",
+                              "vSphericalZ",
+                              "vSphericalXX",
+                              "vSphericalYY",
+                              "vSphericalZZ",
+                              "vSphericalXY",
+                              "vSphericalYZ",
+                              "vSphericalZX",
+                              "vReflectionMicrosurfaceInfos",
+                              "vRefractionMicrosurfaceInfos",
+                              "vTangentSpaceParams"};
+
+  vector_t<string_t> samplers{
+    "albedoSampler",         "reflectivitySampler", "ambientSampler",
+    "emissiveSampler",       "bumpSampler",         "lightmapSampler",
+    "opacitySampler",        "refractionSampler",   "refractionSamplerLow",
+    "refractionSamplerHigh", "reflectionSampler",   "reflectionSamplerLow",
+    "reflectionSamplerHigh", "microSurfaceSampler", "environmentBrdfSampler"};
+  vector_t<string_t> uniformBuffers{"Material", "Scene"};
+
+  ImageProcessingConfiguration::PrepareUniforms(uniforms, defines);
+  ImageProcessingConfiguration::PrepareSamplers(samplers, defines);
+
+  unordered_map_t<string_t, unsigned int> indexParameters{
+    {"maxSimultaneousLights", _maxSimultaneousLights},
+    {"maxSimultaneousMorphTargets", defines.NUM_MORPH_INFLUENCERS}};
+
+  auto join = defines.toString();
+
+  EffectCreationOptions options;
+  options.attributes            = ::std::move(attribs);
+  options.uniformsNames         = ::std::move(uniforms);
+  options.uniformBuffersNames   = ::std::move(uniformBuffers);
+  options.samplers              = ::std::move(samplers);
+  options.materialDefines       = &defines;
+  options.defines               = ::std::move(join);
+  options.fallbacks             = ::std::move(fallbacks);
+  options.onCompiled            = onCompiled;
+  options.onError               = onError;
+  options.indexParameters       = ::std::move(indexParameters);
+  options.maxSimultaneousLights = _maxSimultaneousLights;
+
+  MaterialHelper::PrepareUniformsAndSamplersList(options);
+
+  return engine->createEffect("pbr", options, engine);
+}
+
+void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
+                                      PBRMaterialDefines& defines,
+                                      const Nullable<bool>& useInstances,
+                                      const Nullable<bool>& useClipPlane)
+{
+  auto scene  = getScene();
+  auto engine = scene->getEngine();
+
   // Lights
   MaterialHelper::PrepareDefinesForLights(
     scene, mesh, defines, true, _maxSimultaneousLights, _disableLighting,
@@ -273,10 +620,6 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
       }
 
       if (_albedoTexture && StandardMaterial::DiffuseTextureEnabled()) {
-        if (!_albedoTexture->isReadyOrNotBlocking()) {
-          return false;
-        }
-
         MaterialHelper::PrepareDefinesForMergedUV(_albedoTexture, defines,
                                                   PMD::ALBEDO, "ALBEDO",
                                                   PMD::MAINUV1, PMD::MAINUV2);
@@ -286,10 +629,6 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
       }
 
       if (_ambientTexture && StandardMaterial::AmbientTextureEnabled()) {
-        if (!_ambientTexture->isReadyOrNotBlocking()) {
-          return false;
-        }
-
         MaterialHelper::PrepareDefinesForMergedUV(_ambientTexture, defines,
                                                   PMD::AMBIENT, "AMBIENT",
                                                   PMD::MAINUV1, PMD::MAINUV2);
@@ -300,10 +639,6 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
       }
 
       if (_opacityTexture && StandardMaterial::OpacityTextureEnabled()) {
-        if (!_opacityTexture->isReadyOrNotBlocking()) {
-          return false;
-        }
-
         MaterialHelper::PrepareDefinesForMergedUV(_opacityTexture, defines,
                                                   PMD::OPACITY, "OPACITY",
                                                   PMD::MAINUV1, PMD::MAINUV2);
@@ -315,10 +650,6 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
       auto reflectionTexture = _getReflectionTexture();
       if (reflectionTexture && StandardMaterial::ReflectionTextureEnabled()) {
-        if (!reflectionTexture->isReadyOrNotBlocking()) {
-          return false;
-        }
-
         defines.defines[PMD::REFLECTION]      = true;
         defines.defines[PMD::GAMMAREFLECTION] = reflectionTexture->gammaSpace;
         defines.defines[PMD::REFLECTIONMAP_OPPOSITEZ]
@@ -338,6 +669,8 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           case TextureConstants::CUBIC_MODE:
           case TextureConstants::INVCUBIC_MODE:
             defines.defines[PMD::REFLECTIONMAP_CUBIC] = true;
+            defines.defines[PMD::USE_LOCAL_REFLECTIONMAP_CUBIC]
+              = reflectionTexture->boundingBoxSize() ? true : false;
             break;
           case TextureConstants::EXPLICIT_MODE:
             defines.defines[PMD::REFLECTIONMAP_EXPLICIT] = true;
@@ -386,6 +719,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         defines.defines[PMD::REFLECTIONMAP_SPHERICAL]             = false;
         defines.defines[PMD::REFLECTIONMAP_PLANAR]                = false;
         defines.defines[PMD::REFLECTIONMAP_CUBIC]                 = false;
+        defines.defines[PMD::USE_LOCAL_REFLECTIONMAP_CUBIC]       = false;
         defines.defines[PMD::REFLECTIONMAP_PROJECTION]            = false;
         defines.defines[PMD::REFLECTIONMAP_SKYBOX]                = false;
         defines.defines[PMD::REFLECTIONMAP_EXPLICIT]              = false;
@@ -402,10 +736,6 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
       }
 
       if (_lightmapTexture && StandardMaterial::LightmapTextureEnabled()) {
-        if (!_lightmapTexture->isReadyOrNotBlocking()) {
-          return false;
-        }
-
         MaterialHelper::PrepareDefinesForMergedUV(_lightmapTexture, defines,
                                                   PMD::LIGHTMAP, "LIGHTMAP",
                                                   PMD::MAINUV1, PMD::MAINUV2);
@@ -416,10 +746,6 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
       }
 
       if (_emissiveTexture && StandardMaterial::EmissiveTextureEnabled()) {
-        if (!_emissiveTexture->isReadyOrNotBlocking()) {
-          return false;
-        }
-
         MaterialHelper::PrepareDefinesForMergedUV(_emissiveTexture, defines,
                                                   PMD::EMISSIVE, "EMISSIVE",
                                                   PMD::MAINUV1, PMD::MAINUV2);
@@ -430,10 +756,6 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
       if (StandardMaterial::SpecularTextureEnabled()) {
         if (_metallicTexture) {
-          if (!_metallicTexture->isReadyOrNotBlocking()) {
-            return false;
-          }
-
           MaterialHelper::PrepareDefinesForMergedUV(
             _metallicTexture, defines, PMD::REFLECTIVITY, "REFLECTIVITY",
             PMD::MAINUV1, PMD::MAINUV2);
@@ -449,10 +771,6 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
             = _useAmbientOcclusionFromMetallicTextureRed;
         }
         else if (_reflectivityTexture) {
-          if (!_reflectivityTexture->isReadyOrNotBlocking()) {
-            return false;
-          }
-
           defines.defines[PMD::METALLICWORKFLOW] = false;
           MaterialHelper::PrepareDefinesForMergedUV(
             _reflectivityTexture, defines, PMD::REFLECTIVITY, "REFLECTIVITY",
@@ -468,10 +786,6 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         }
 
         if (_microSurfaceTexture) {
-          if (!_microSurfaceTexture->isReadyOrNotBlocking()) {
-            return false;
-          }
-
           MaterialHelper::PrepareDefinesForMergedUV(
             _microSurfaceTexture, defines, PMD::MICROSURFACEMAP,
             "MICROSURFACEMAP", PMD::MAINUV1, PMD::MAINUV2);
@@ -487,11 +801,6 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
       if (scene->getEngine()->getCaps().standardDerivatives && _bumpTexture
           && StandardMaterial::BumpTextureEnabled() && !_disableBumpMap) {
-        // Bump texure can not be none blocking.
-        if (!_bumpTexture->isReady()) {
-          return false;
-        }
-
         MaterialHelper::PrepareDefinesForMergedUV(
           _bumpTexture, defines, PMD::BUMP, "BUMP", PMD::MAINUV1, PMD::MAINUV2);
 
@@ -510,17 +819,13 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
       auto refractionTexture = _getRefractionTexture();
       if (refractionTexture && StandardMaterial::RefractionTextureEnabled()) {
-        if (!refractionTexture->isReadyOrNotBlocking()) {
-          return false;
-        }
-
         defines.defines[PMD::REFRACTION]       = true;
         defines.defines[PMD::REFRACTIONMAP_3D] = refractionTexture->isCube;
         defines.defines[PMD::GAMMAREFRACTION]  = refractionTexture->gammaSpace;
         defines.defines[PMD::REFRACTIONMAP_OPPOSITEZ]
-          = reflectionTexture->invertZ;
+          = refractionTexture->invertZ;
         defines.defines[PMD::LODINREFRACTIONALPHA]
-          = reflectionTexture->lodLevelInAlpha;
+          = refractionTexture->lodLevelInAlpha;
 
         if (_linkRefractionWithTransparency) {
           defines.defines[PMD::LINKREFRACTIONTOTRANSPARENCY] = true;
@@ -532,10 +837,6 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
       if (_environmentBRDFTexture
           && StandardMaterial::ReflectionTextureEnabled()) {
-        // This is blocking.
-        if (!_environmentBRDFTexture->isReady()) {
-          return false;
-        }
         defines.defines[PMD::ENVIRONMENTBRDF] = true;
       }
       else {
@@ -556,7 +857,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
     defines.defines[PMD::RADIANCEOVERALPHA] = _useRadianceOverAlpha;
 
-    if ((_metallic != 0.f) || (_roughness != 0.f)) {
+    if (_forceMetallicWorkflow || (_metallic != 0.f) || (_roughness != 0.f)) {
       defines.defines[PMD::METALLICWORKFLOW] = true;
     }
     else {
@@ -581,10 +882,6 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   }
 
   if (defines._areImageProcessingDirty) {
-    if (!_imageProcessingConfiguration->isReady()) {
-      return false;
-    }
-
     _imageProcessingConfiguration->prepareDefines(defines);
   }
 
@@ -596,246 +893,44 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
   // Misc.
   MaterialHelper::PrepareDefinesForMisc(
-    mesh, scene, _useLogarithmicDepth, pointsCloud(), fogEnabled(), defines,
-    PMD::LOGARITHMICDEPTH, PMD::POINTSIZE, PMD::FOG, PMD::NONUNIFORMSCALING);
+    mesh, scene, _useLogarithmicDepth, pointsCloud(), fogEnabled(),
+    _shouldTurnAlphaTestOn(mesh) || _forceAlphaTest, defines,
+    PMD::LOGARITHMICDEPTH, PMD::POINTSIZE, PMD::FOG, PMD::NONUNIFORMSCALING,
+    PMD::ALPHATEST);
 
   // Values that need to be evaluated on every frame
   MaterialHelper::PrepareDefinesForFrameBoundValues(
     scene, engine, defines, useInstances ? true : false, PMD::CLIPPLANE,
-    PMD::ALPHATEST, PMD::INSTANCES, _forceAlphaTest);
+    PMD::ALPHATEST, PMD::INSTANCES, useClipPlane);
 
   // Attribs
-  if (MaterialHelper::PrepareDefinesForAttributes(
-        mesh, defines, true, true, true,
-        _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE, PMD::NORMAL,
-        PMD::UV1, PMD::UV2, PMD::VERTEXCOLOR, PMD::VERTEXALPHA,
-        PMD::MORPHTARGETS_TANGENT, PMD::MORPHTARGETS_NORMAL,
-        PMD::MORPHTARGETS)) {
-    if (mesh) {
-      if (!scene->getEngine()->getCaps().standardDerivatives
-          && !mesh->isVerticesDataPresent(VertexBuffer::NormalKind)) {
-        mesh->createNormals(true);
-        BABYLON_LOGF_WARN(
-          "PBRBaseMaterial",
-          "PBRMaterial: Normals have been created for the mesh: %s",
-          mesh->name.c_str())
-      }
+  MaterialHelper::PrepareDefinesForAttributes(
+    mesh, defines, true, true, true,
+    _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE(), PMD::NORMAL,
+    PMD::UV1, PMD::UV2, PMD::VERTEXCOLOR, PMD::VERTEXALPHA,
+    PMD::MORPHTARGETS_TANGENT, PMD::MORPHTARGETS_NORMAL, PMD::MORPHTARGETS);
+}
+
+void PBRBaseMaterial::forceCompilation(
+  AbstractMesh* mesh, ::std::function<void(Material* material)>& onCompiled,
+  bool clipPlane)
+{
+  PBRMaterialDefines defines;
+  auto effect
+    = _prepareEffect(mesh, defines, nullptr, nullptr, nullptr, clipPlane);
+  if (effect->isReady()) {
+    if (onCompiled) {
+      onCompiled(this);
     }
   }
-
-  // Get correct effect
-  if (defines.isDirty()) {
-    defines.markAsProcessed();
-    scene->resetCachedMaterial();
-
-    // Fallbacks
-    auto fallbacks    = ::std::make_unique<EffectFallbacks>();
-    auto fallbackRank = 0u;
-    if (defines[PMD::USESPHERICALINVERTEX]) {
-      fallbacks->addFallback(fallbackRank++, "USESPHERICALINVERTEX");
-    }
-
-    if (defines[PMD::FOG]) {
-      fallbacks->addFallback(fallbackRank, "FOG");
-    }
-    if (defines[PMD::POINTSIZE]) {
-      fallbacks->addFallback(fallbackRank, "POINTSIZE");
-    }
-    if (defines[PMD::LOGARITHMICDEPTH]) {
-      fallbacks->addFallback(fallbackRank, "LOGARITHMICDEPTH");
-    }
-    if (defines[PMD::PARALLAX]) {
-      fallbacks->addFallback(fallbackRank, "PARALLAX");
-    }
-    if (defines[PMD::PARALLAXOCCLUSION]) {
-      fallbacks->addFallback(fallbackRank++, "PARALLAXOCCLUSION");
-    }
-
-    if (defines[PMD::ENVIRONMENTBRDF]) {
-      fallbacks->addFallback(fallbackRank++, "ENVIRONMENTBRDF");
-    }
-
-    if (defines[PMD::TANGENT]) {
-      fallbacks->addFallback(fallbackRank++, "TANGENT");
-    }
-
-    if (defines[PMD::BUMP]) {
-      fallbacks->addFallback(fallbackRank++, "BUMP");
-    }
-
-    fallbackRank = MaterialHelper::HandleFallbacksForShadows(
-      defines, *fallbacks, _maxSimultaneousLights, fallbackRank++);
-
-    if (defines[PMD::SPECULARTERM]) {
-      fallbacks->addFallback(fallbackRank++, "SPECULARTERM");
-    }
-
-    if (defines[PMD::USESPHERICALFROMREFLECTIONMAP]) {
-      fallbacks->addFallback(fallbackRank++, "USESPHERICALFROMREFLECTIONMAP");
-    }
-
-    if (defines[PMD::LIGHTMAP]) {
-      fallbacks->addFallback(fallbackRank++, "LIGHTMAP");
-    }
-
-    if (defines[PMD::NORMAL]) {
-      fallbacks->addFallback(fallbackRank++, "NORMAL");
-    }
-
-    if (defines[PMD::AMBIENT]) {
-      fallbacks->addFallback(fallbackRank++, "AMBIENT");
-    }
-
-    if (defines[PMD::EMISSIVE]) {
-      fallbacks->addFallback(fallbackRank++, "EMISSIVE");
-    }
-
-    if (defines[PMD::VERTEXCOLOR]) {
-      fallbacks->addFallback(fallbackRank++, "VERTEXCOLOR");
-    }
-
-    if (defines.NUM_BONE_INFLUENCERS > 0) {
-      fallbacks->addCPUSkinningFallback(fallbackRank++, mesh);
-    }
-
-    if (defines[PMD::MORPHTARGETS]) {
-      fallbacks->addFallback(fallbackRank++, "MORPHTARGETS");
-    }
-
-    // Attributes
-    vector_t<string_t> attribs{VertexBuffer::PositionKindChars};
-
-    if (defines[PMD::NORMAL]) {
-      attribs.emplace_back(VertexBuffer::NormalKindChars);
-    }
-
-    if (defines[PMD::TANGENT]) {
-      attribs.emplace_back(VertexBuffer::TangentKindChars);
-    }
-
-    if (defines[PMD::UV1]) {
-      attribs.emplace_back(VertexBuffer::UVKindChars);
-    }
-
-    if (defines[PMD::UV2]) {
-      attribs.emplace_back(VertexBuffer::UV2KindChars);
-    }
-
-    if (defines[PMD::VERTEXCOLOR]) {
-      attribs.emplace_back(VertexBuffer::ColorKindChars);
-    }
-
-    MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
-                                              *fallbacks);
-    MaterialHelper::PrepareAttributesForInstances(attribs, defines,
-                                                  PMD::INSTANCES);
-    MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh, defines,
-                                                     PMD::NORMAL);
-
-    vector_t<string_t> uniforms{"world",
-                                "view",
-                                "viewProjection",
-                                "vEyePosition",
-                                "vLightsType",
-                                "vAmbientColor",
-                                "vAlbedoColor",
-                                "vReflectivityColor",
-                                "vEmissiveColor",
-                                "vReflectionColor",
-                                "vFogInfos",
-                                "vFogColor",
-                                "pointSize",
-                                "vAlbedoInfos",
-                                "vAmbientInfos",
-                                "vOpacityInfos",
-                                "vReflectionInfos",
-                                "vEmissiveInfos",
-                                "vReflectivityInfos",
-                                "vMicroSurfaceSamplerInfos",
-                                "vBumpInfos",
-                                "vLightmapInfos",
-                                "vRefractionInfos",
-                                "mBones",
-                                "vClipPlane",
-                                "albedoMatrix",
-                                "ambientMatrix",
-                                "opacityMatrix",
-                                "reflectionMatrix",
-                                "emissiveMatrix",
-                                "reflectivityMatrix",
-                                "microSurfaceSamplerMatrix",
-                                "bumpMatrix",
-                                "lightmapMatrix",
-                                "refractionMatrix",
-                                "vLightingIntensity",
-                                "logarithmicDepthConstant",
-                                "vSphericalX",
-                                "vSphericalY",
-                                "vSphericalZ",
-                                "vSphericalXX",
-                                "vSphericalYY",
-                                "vSphericalZZ",
-                                "vSphericalXY",
-                                "vSphericalYZ",
-                                "vSphericalZX",
-                                "vReflectionMicrosurfaceInfos",
-                                "vRefractionMicrosurfaceInfos",
-                                "vTangentSpaceParams"};
-
-    vector_t<string_t> samplers{
-      "albedoSampler",         "reflectivitySampler", "ambientSampler",
-      "emissiveSampler",       "bumpSampler",         "lightmapSampler",
-      "opacitySampler",        "refractionSampler",   "refractionSamplerLow",
-      "refractionSamplerHigh", "reflectionSampler",   "reflectionSamplerLow",
-      "reflectionSamplerHigh", "microSurfaceSampler", "environmentBrdfSampler"};
-    vector_t<string_t> uniformBuffers{"Material", "Scene"};
-
-    ImageProcessingConfiguration::PrepareUniforms(uniforms, defines);
-    ImageProcessingConfiguration::PrepareSamplers(samplers, defines);
-
-    unordered_map_t<string_t, unsigned int> indexParameters{
-      {"maxSimultaneousLights", _maxSimultaneousLights},
-      {"maxSimultaneousMorphTargets", defines.NUM_MORPH_INFLUENCERS}};
-
-    auto join = defines.toString();
-
-    auto _onCompiled = [this](Effect* effect) {
-      if (onCompiled) {
-        onCompiled(effect);
-      }
-
-      bindSceneUniformBuffer(effect, getScene()->getSceneUniformBuffer());
-    };
-
-    EffectCreationOptions options;
-    options.attributes            = ::std::move(attribs);
-    options.uniformsNames         = ::std::move(uniforms);
-    options.uniformBuffersNames   = ::std::move(uniformBuffers);
-    options.samplers              = ::std::move(samplers);
-    options.materialDefines       = &defines;
-    options.defines               = ::std::move(join);
-    options.fallbacks             = ::std::move(fallbacks);
-    options.onCompiled            = _onCompiled;
-    options.onError               = onError;
-    options.indexParameters       = ::std::move(indexParameters);
-    options.maxSimultaneousLights = _maxSimultaneousLights;
-
-    MaterialHelper::PrepareUniformsAndSamplersList(options);
-
-    subMesh->setEffect(scene->getEngine()->createEffect("pbr", options, engine),
-                       defines);
-
-    buildUniformLayout();
+  else {
+    effect->onCompileObservable.add(
+      [&](Effect* /*effect*/, EventState& /*es*/) {
+        if (onCompiled) {
+          onCompiled(this);
+        }
+      });
   }
-
-  if (!subMesh->effect() || !subMesh->effect()->isReady()) {
-    return false;
-  }
-
-  defines._renderId   = scene->getRenderId();
-  _wasPreviouslyReady = true;
-
-  return true;
 }
 
 void PBRBaseMaterial::buildUniformLayout()
@@ -850,6 +945,8 @@ void PBRBaseMaterial::buildUniformLayout()
   _uniformBuffer->addUniform("vMicroSurfaceSamplerInfos", 2);
   _uniformBuffer->addUniform("vRefractionInfos", 4);
   _uniformBuffer->addUniform("vReflectionInfos", 2);
+  _uniformBuffer->addUniform("vReflectionPosition", 3);
+  _uniformBuffer->addUniform("vReflectionSize", 3);
   _uniformBuffer->addUniform("vBumpInfos", 3);
   _uniformBuffer->addUniform("albedoMatrix", 16);
   _uniformBuffer->addUniform("ambientMatrix", 16);
@@ -967,6 +1064,16 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
             *reflectionTexture->getReflectionTextureMatrix());
           _uniformBuffer->updateFloat2("vReflectionInfos",
                                        reflectionTexture->level, 0, "");
+
+          if (reflectionTexture->boundingBoxSize()) {
+            if (auto cubeTexture
+                = static_cast<CubeTexture*>(reflectionTexture)) {
+              _uniformBuffer->updateVector3("vReflectionPosition",
+                                            cubeTexture->boundingBoxPosition);
+              _uniformBuffer->updateVector3("vReflectionSize",
+                                            *cubeTexture->boundingBoxSize());
+            }
+          }
 
           auto _polynomials = reflectionTexture->sphericalPolynomial();
           if (defines.USESPHERICALFROMREFLECTIONMAP && _polynomials) {
@@ -1114,7 +1221,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
       _uniformBuffer->updateColor3("vEmissiveColor", _emissiveColor, "");
       _uniformBuffer->updateColor3("vReflectionColor", _reflectionColor, "");
       _uniformBuffer->updateColor4("vAlbedoColor", _albedoColor,
-                                   alpha * mesh->visibility, "");
+                                   alpha() * mesh->visibility, "");
 
       // Misc
       _lightingInfos.x = _directIntensity;

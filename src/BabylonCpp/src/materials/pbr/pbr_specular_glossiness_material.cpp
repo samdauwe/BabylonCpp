@@ -6,7 +6,7 @@ namespace BABYLON {
 
 PBRSpecularGlossinessMaterial::PBRSpecularGlossinessMaterial(
   const string_t& iName, Scene* scene)
-    : Internals::PBRBaseSimpleMaterial{iName, scene}
+    : PBRBaseSimpleMaterial{iName, scene}
     , diffuseTexture{nullptr}
     , glossiness{0.f}
     , specularGlossinessTexture{nullptr}
@@ -25,7 +25,7 @@ const char* PBRSpecularGlossinessMaterial::getClassName() const
 
 vector_t<BaseTexture*> PBRSpecularGlossinessMaterial::getActiveTextures() const
 {
-  auto activeTextures = Internals::PBRBaseSimpleMaterial::getActiveTextures();
+  auto activeTextures = PBRBaseSimpleMaterial::getActiveTextures();
 
   if (diffuseTexture) {
     activeTextures.emplace_back(diffuseTexture);
@@ -40,7 +40,7 @@ vector_t<BaseTexture*> PBRSpecularGlossinessMaterial::getActiveTextures() const
 
 bool PBRSpecularGlossinessMaterial::hasTexture(BaseTexture* texture) const
 {
-  if (Internals::PBRBaseSimpleMaterial::hasTexture(texture)) {
+  if (PBRBaseSimpleMaterial::hasTexture(texture)) {
     return true;
   }
 

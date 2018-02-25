@@ -7,7 +7,7 @@
 namespace BABYLON {
 
 /**
- * The Physically based material of BJS.
+ * @brief The Physically based material of BJS.
  *
  * This offers the main features of a standard PBR material.
  * For more information, please refer to the documentation :
@@ -15,32 +15,70 @@ namespace BABYLON {
  */
 class BABYLON_SHARED_EXPORT PBRMaterial : public PBRBaseMaterial {
 
+private:
+  /**
+   * No transparency mode, Alpha channel is not use.
+   */
+  static constexpr unsigned int _PBRMATERIAL_OPAQUE = 0;
+
+  /**
+   * Alpha Test mode, pixel are discarded below a certain threshold defined by
+   * the alpha cutoff value.
+   */
+  static constexpr unsigned int _PBRMATERIAL_ALPHATEST = 1;
+
+  /**
+   * Represents the value for Alpha Blend.  Pixels are blended (according to the
+   * alpha mode) with the already drawn pixels in the current frame buffer.
+   */
+  static constexpr unsigned int _PBRMATERIAL_ALPHABLEND = 2;
+
+  /**
+   * Represents the value for Alpha Test and Blend.  Pixels are blended
+   * (according to the alpha mode) with the already drawn pixels in the current
+   * frame buffer. They are also discarded below the alpha cutoff threshold to
+   * improve performances.
+   */
+  static constexpr unsigned int _PBRMATERIAL_ALPHATESTANDBLEND = 3;
+
 public:
   /**
-   * PBRMaterialTransparencyMode: No transparency mode, Alpha channel is not
-   * use.
+   * @brief PBRMaterialTransparencyMode: No transparency mode, Alpha channel is
+   * not use.
    */
-  static constexpr unsigned int PBRMATERIAL_OPAQUE = 0;
+  static constexpr unsigned int PBRMATERIAL_OPAQUE()
+  {
+    return PBRMaterial::_PBRMATERIAL_OPAQUE;
+  }
 
   /**
-   * PBRMaterialTransparencyMode: Alpha Test mode, pixel are discarded below a
-   * certain threshold defined by the alpha cutoff value.
+   * @brief PBRMaterialTransparencyMode: Alpha Test mode, pixel are discarded
+   * below a certain threshold defined by the alpha cutoff value.
    */
-  static constexpr unsigned int PBRMATERIAL_ALPHATEST = 1;
+  static constexpr unsigned int PBRMATERIAL_ALPHATEST()
+  {
+    return PBRMaterial::_PBRMATERIAL_ALPHATEST;
+  }
 
   /**
-   * PBRMaterialTransparencyMode: Pixels are blended (according to the alpha
-   * mode) with the already drawn pixels in the current frame buffer.
+   * @brief PBRMaterialTransparencyMode: Pixels are blended (according to the
+   * alpha mode) with the already drawn pixels in the current frame buffer.
    */
-  static constexpr unsigned int PBRMATERIAL_ALPHABLEND = 2;
+  static constexpr unsigned int PBRMATERIAL_ALPHABLEND()
+  {
+    return PBRMaterial::_PBRMATERIAL_ALPHABLEND;
+  }
 
   /**
-   * PBRMaterialTransparencyMode: Pixels are blended (according to the alpha
-   * mode) with the already drawn pixels in the current frame buffer.
-   * They are also discarded below the alpha cutoff threshold to improve
+   * @brief PBRMaterialTransparencyMode: Pixels are blended (according to the
+   * alpha mode) with the already drawn pixels in the current frame buffer. They
+   * are also discarded below the alpha cutoff threshold to improve
    * performances.
    */
-  static constexpr unsigned int PBRMATERIAL_ALPHATESTANDBLEND = 3;
+  static constexpr unsigned int PBRMATERIAL_ALPHATESTANDBLEND()
+  {
+    return PBRMaterial::_PBRMATERIAL_ALPHATESTANDBLEND;
+  }
 
 public:
   /**
@@ -52,14 +90,45 @@ public:
   PBRMaterial(const string_t& name, Scene* scene);
   ~PBRMaterial() override;
 
+  /**
+   * @brief Returns the name of this material class.
+   */
   const char* getClassName() const override;
+
+  /**
+   * @brief Returns an array of the actively used textures.
+   * @returns - Array of BaseTextures
+   */
   vector_t<BaseTexture*> getActiveTextures() const override;
+
+  /**
+   * @brief Checks to see if a texture is used in the material.
+   * @param texture - Base texture to use.
+   * @returns - Boolean specifying if a texture is used in the material.
+   */
   bool hasTexture(BaseTexture* texture) const override;
+
+  /**
+   * @brief Makes a duplicate of the current material.
+   * @param name - name to use for the new material.
+   */
   PBRMaterial* clone(const string_t& name,
                      bool cloneChildren = false) const override;
+
+  /**
+   * @brief Serializes this PBR Material.
+   * @returns - An object with the serialized material.
+   */
   Json::object serialize() const;
 
   // Statics
+  /**
+   * @brief Parses a PBR Material from a serialized object.
+   * @param source - Serialized object.
+   * @param scene - BJS scene instance.
+   * @param rootUrl - url for the scene object
+   * @returns - PBRMaterial
+   */
   static PBRMaterial* Parse(const Json::value& source, Scene* scene,
                             const string_t& rootUrl);
 
@@ -227,10 +296,19 @@ public:
    */
   float ambientTextureStrength;
 
+  /**
+   * Stores the alpha values in a texture.
+   */
   BaseTexture* opacityTexture;
 
+  /**
+   * Stores the reflection values in a texture.
+   */
   BaseTexture* reflectionTexture;
 
+  /**
+   * Stores the emissive values in a texture.
+   */
   BaseTexture* emissiveTexture;
 
   /**
@@ -263,12 +341,24 @@ public:
    */
   BaseTexture* microSurfaceTexture;
 
+  /**
+   * Stores surface normal data used to displace a mesh in a texture.
+   */
   BaseTexture* bumpTexture;
 
+  /**
+   * Stores the pre-calculated light information of a mesh in a texture.
+   */
   BaseTexture* lightmapTexture;
 
+  /**
+   * Stores the refracted light information in a texture.
+   */
   BaseTexture* refractionTexture;
 
+  /**
+   * The color of a material in ambient lighting.
+   */
   Color3 ambientColor;
 
   /**
@@ -281,8 +371,14 @@ public:
    */
   Color3 reflectivityColor;
 
+  /**
+   * The color reflected from the material.
+   */
   Color3 reflectionColor;
 
+  /**
+   * The color emitted from the material.
+   */
   Color3 emissiveColor;
 
   /**
@@ -475,7 +571,6 @@ public:
 
   /**
    * Force normal to face away from face.
-   * (Temporary internal fix to remove before 3.1)
    */
   bool forceNormalForward;
 

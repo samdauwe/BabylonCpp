@@ -7,11 +7,6 @@
 
 namespace BABYLON {
 
-constexpr unsigned int PBRMaterial::PBRMATERIAL_OPAQUE;
-constexpr unsigned int PBRMaterial::PBRMATERIAL_ALPHATEST;
-constexpr unsigned int PBRMaterial::PBRMATERIAL_ALPHABLEND;
-constexpr unsigned int PBRMaterial::PBRMATERIAL_ALPHATESTANDBLEND;
-
 PBRMaterial::PBRMaterial(const string_t& iName, Scene* scene)
     : PBRBaseMaterial{iName, scene}
     , directIntensity{1.f}

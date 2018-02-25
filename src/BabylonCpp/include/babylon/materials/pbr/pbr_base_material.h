@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 /**
- * The Physically based material base class of BJS.
+ * @brief The Physically based material base class of BJS.
  *
  * This offers the main features of a standard PBR material.
  * For more information, please refer to the documentation :
@@ -30,11 +30,20 @@ public:
   ~PBRBaseMaterial() override;
 
   /**
-   * @brief Returns the string "PBRBaseMaterial".
+   * @brief Gets the name of the material class.
    */
   virtual const char* getClassName() const;
 
+  /**
+   * @brief Enabled the use of logarithmic depth buffers, which is good for wide
+   * depth buffers.
+   */
   bool useLogarithmicDepth() const override;
+
+  /**
+   * @brief Enabled the use of logarithmic depth buffers, which is good for wide
+   * depth buffers.
+   */
   void setUseLogarithmicDepth(bool value) override;
 
   /**
@@ -59,8 +68,8 @@ public:
   bool needAlphaBlending() const override;
 
   /**
-   * @brief Specifies whether or not this material should be rendered in alpha
-   * blend mode for the given mesh.
+   * @brief Specifies if the mesh will require alpha blending.
+   * @param mesh - BJS mesh.
    */
   bool needAlphaBlendingForMesh(AbstractMesh* mesh) const override;
 
@@ -70,14 +79,63 @@ public:
    */
   bool needAlphaTesting() const override;
 
+  /**
+   * @brief Gets the texture used for the alpha test.
+   */
   BaseTexture* getAlphaTestTexture() override;
+
+  /**
+   * @brief Specifies that the submesh is ready to be used.
+   * @param mesh - BJS mesh.
+   * @param subMesh - A submesh of the BJS mesh.  Used to check if it is ready.
+   * @param useInstances - Specifies that instances should be used.
+   * @returns - boolean indicating that the submesh is ready or not.
+   */
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
+
+  /**
+   * @brief Force shader compilation
+   */
+  void forceCompilation(AbstractMesh* mesh,
+                        ::std::function<void(Material* material)>& onCompiled,
+                        bool clipPlane = false);
+
+  /**
+   * @brief Initializes the uniform buffer layout for the shader.
+   */
   void buildUniformLayout();
+
+  /**
+   * @brief Unbinds the textures.
+   */
   void unbind() override;
+
+  /**
+   * @brief Binds to the world matrix.
+   * @param world - The world matrix.
+   */
   void bindOnlyWorldMatrix(Matrix& world) override;
+
+  /**
+   * @brief Binds the submesh data.
+   * @param world - The world matrix.
+   * @param mesh - The BJS mesh.
+   * @param subMesh - A submesh of the BJS mesh.
+   */
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
+
+  /**
+   * @brief Returns the animatable textures.
+   * @returns - Array of animatable textures.
+   */
   vector_t<IAnimatable*> getAnimatables() const;
+
+  /**
+   * @brief Disposes the resources of the material.
+   * @param forceDisposeEffect - Forces the disposal of effects.
+   * @param forceDisposeTextures - Forces the disposal of all textures.
+   */
   void dispose(bool forceDisposeEffect   = false,
                bool forceDisposeTextures = false) override;
 
@@ -92,7 +150,30 @@ protected:
   bool _shouldUseAlphaFromAlbedoTexture() const;
 
 private:
+  Effect* _prepareEffect(
+    AbstractMesh* mesh, PBRMaterialDefines& defines,
+    const ::std::function<void(Effect* effect)> onCompiled = nullptr,
+    ::std::function<void(Effect* effect, const string_t& errors)> onError
+    = nullptr,
+    const Nullable<bool>& useInstances = nullptr,
+    const Nullable<bool>& useClipPlane = nullptr);
+  void _prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& defines,
+                       const Nullable<bool>& useInstances = nullptr,
+                       const Nullable<bool>& useClipPlane = nullptr);
+
+  /**
+   * @brief Returns the texture used for reflections.
+   * @returns - Reflection texture if present.  Otherwise, returns the
+   * environment texture.
+   */
   BaseTexture* _getReflectionTexture() const;
+
+  /**
+   * @brief Returns the texture used for refraction or null if none is used.
+   * @returns - Refection texture if present.  If no refraction texture and
+   * refraction is linked with transparency, returns environment texture.
+   * Otherwise, returns null.
+   */
   BaseTexture* _getRefractionTexture() const;
 
 protected:
@@ -144,12 +225,24 @@ protected:
    */
   float _ambientTextureStrength;
 
+  /**
+   * Stores the alpha values in a texture.
+   */
   BaseTexture* _opacityTexture;
 
+  /**
+   * Stores the reflection values in a texture.
+   */
   BaseTexture* _reflectionTexture;
 
+  /**
+   * Stores the refraction values in a texture.
+   */
   BaseTexture* _refractionTexture;
 
+  /**
+   * Stores the emissive values in a texture.
+   */
   BaseTexture* _emissiveTexture;
 
   /**
@@ -182,10 +275,19 @@ protected:
    */
   BaseTexture* _microSurfaceTexture;
 
+  /**
+   * Stores surface normal data used to displace a mesh in a texture.
+   */
   BaseTexture* _bumpTexture;
 
+  /**
+   * Stores the pre-calculated light information of a mesh in a texture.
+   */
   BaseTexture* _lightmapTexture;
 
+  /**
+   * The color of a material in ambient lighting.
+   */
   Color3 _ambientColor;
 
   /**
@@ -198,8 +300,14 @@ protected:
    */
   Color3 _reflectivityColor;
 
+  /**
+   * The color applied when light is reflected from a material.
+   */
   Color3 _reflectionColor;
 
+  /**
+   * The color applied when light is emitted from a material.
+   */
   Color3 _emissiveColor;
 
   /**
@@ -226,6 +334,9 @@ protected:
    */
   bool _linkRefractionWithTransparency;
 
+  /**
+   * Specifies that the material will use the light map as a show map.
+   */
   bool _useLightmapAsShadowmap;
 
   /**
@@ -406,9 +517,13 @@ protected:
 
   /**
    * Force normal to face away from face.
-   * (Temporary internal fix to remove before 3.1)
    */
   bool _forceNormalForward;
+
+  /**
+   * Force metallic workflow.
+   */
+  bool _forceMetallicWorkflow;
 
   /**
    * Default configuration related to image processing available in the PBR
@@ -417,14 +532,36 @@ protected:
   ImageProcessingConfiguration* _imageProcessingConfiguration;
 
 private:
+  /**
+   * Stores the reflectivity values based on metallic roughness workflow.
+   */
   static Color3 _scaledReflectivity;
+
+  /**
+   * This stores the direct, emissive, environment, and specular light
+   * intensities into a Vector4.
+   */
   Vector4 _lightingInfos;
   /**
    * Keep track of the image processing observer to allow dispose and replace.
    */
   Observer<ImageProcessingConfiguration>::Ptr _imageProcessingObserver;
+
+  /**
+   * Stores the available render targets.
+   */
   vector_t<RenderTargetTexture*> _renderTargets;
+
+  /**
+   * Sets the global ambient color for the material used in lighting
+   * calculations.
+   */
   Color3 _globalAmbientColor;
+
+  /**
+   * Enables the use of logarithmic depth buffers, which is good for wide depth
+   * buffers.
+   */
   bool _useLogarithmicDepth;
 
 }; // end of class PBRBaseMaterial
