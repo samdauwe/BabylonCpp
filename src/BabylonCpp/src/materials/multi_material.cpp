@@ -40,6 +40,10 @@ void MultiMaterial::setSubMaterials(const vector_t<Material*>& value)
   _hookArray(value);
 }
 
+void MultiMaterial::_hookArray(const vector_t<Material*>& /*array*/)
+{
+}
+
 Material* MultiMaterial::getSubMaterial(unsigned int index)
 {
   if (index >= _subMaterials.size()) {
@@ -56,11 +60,6 @@ vector_t<BaseTexture*> MultiMaterial::getActiveTextures() const
     stl_util::concat(activeTextures, subMaterial->getActiveTextures());
   }
   return activeTextures;
-}
-
-// Methods
-void MultiMaterial::_hookArray(const vector_t<Material*>& /*array*/)
-{
 }
 
 bool MultiMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,

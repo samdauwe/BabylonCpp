@@ -15,18 +15,18 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT BaseTexture : public IAnimatable,
                                           public IDisposable {
 public:
-  static unsigned int DEFAULT_ANISOTROPIC_FILTERING_LEVEL;
+  static constexpr unsigned int DEFAULT_ANISOTROPIC_FILTERING_LEVEL = 4;
 
 public:
-  virtual ~BaseTexture();
+  virtual ~BaseTexture() override;
 
   virtual IReflect::Type type() const override;
   void addToScene(unique_ptr_t<BaseTexture>&& newTexture);
 
-  bool hasAlpha() const;
   void setHasAlpha(bool value);
-  unsigned int coordinatesMode() const;
+  bool hasAlpha() const;
   void setCoordinatesMode(unsigned int value);
+  unsigned int coordinatesMode() const;
 
   string_t uid();
   virtual string_t toString() const;
@@ -53,6 +53,7 @@ public:
                                  unsigned int sampling = 0);
   virtual void _rebuild();
   virtual void delayLoad();
+  virtual Vector3* boundingBoxSize() const;
   vector_t<Animation*> getAnimations() override;
   unique_ptr_t<BaseTexture> clone() const;
   unsigned int textureType() const;
@@ -78,7 +79,34 @@ public:
   bool getAlphaFromRGB;
   float level;
   unsigned int coordinatesIndex;
+
+  /*
+   * How a texture is mapped.
+   *
+   * | Value | Type                                | Description |
+   * | ----- | ----------------------------------- | ----------- |
+   * | 0     | EXPLICIT_MODE                       |             |
+   * | 1     | SPHERICAL_MODE                      |             |
+   * | 2     | PLANAR_MODE                         |             |
+   * | 3     | CUBIC_MODE                          |             |
+   * | 4     | PROJECTION_MODE                     |             |
+   * | 5     | SKYBOX_MODE                         |             |
+   * | 6     | INVCUBIC_MODE                       |             |
+   * | 7     | EQUIRECTANGULAR_MODE                |             |
+   * | 8     | FIXED_EQUIRECTANGULAR_MODE          |             |
+   * | 9     | FIXED_EQUIRECTANGULAR_MIRRORED_MODE |             |
+   */
+
   unsigned int wrapU;
+
+  /*
+   * | Value | Type               | Description |
+   * | ----- | ------------------ | ----------- |
+   * | 0     | CLAMP_ADDRESSMODE  |             |
+   * | 1     | WRAP_ADDRESSMODE   |             |
+   * | 2     | MIRROR_ADDRESSMODE |             |
+   */
+
   unsigned int wrapV;
   unsigned int wrapR;
   unsigned int anisotropicFilteringLevel;

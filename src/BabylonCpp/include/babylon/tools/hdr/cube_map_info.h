@@ -5,7 +5,6 @@
 #include <babylon/core/structs.h>
 
 namespace BABYLON {
-namespace Internals {
 
 /**
  * CubeMap information grouping all the data for each faces as well as the
@@ -75,7 +74,6 @@ struct BABYLON_SHARED_EXPORT CubeMapInfo {
   bool gammaSpace;
 }; // end of struct CubeMapInfo
 
-} // end of namespace Internals
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_TOOLS_HDR_CUBE_MAP_INFO_H

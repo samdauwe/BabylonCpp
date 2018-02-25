@@ -27,7 +27,7 @@ ImageProcessingConfiguration::ImageProcessingConfiguration()
     , _colorGradingWithGreenDepth{true}
     , _colorGradingBGR{true}
     , _toneMappingEnabled{false}
-    , _vignetteBlendMode{ImageProcessingConfiguration::VIGNETTEMODE_MULTIPLY}
+    , _vignetteBlendMode{ImageProcessingConfiguration::VIGNETTEMODE_MULTIPLY()}
     , _vignetteEnabled{false}
     , _applyByPostProcess{false}
     , _isEnabled{true}
@@ -263,7 +263,7 @@ void ImageProcessingConfiguration::prepareDefines(
   defines.VIGNETTE = vignetteEnabled();
   defines.VIGNETTEBLENDMODEMULTIPLY
     = (vignetteBlendMode()
-       == ImageProcessingConfiguration::VIGNETTEMODE_MULTIPLY);
+       == ImageProcessingConfiguration::VIGNETTEMODE_MULTIPLY());
   defines.VIGNETTEBLENDMODEOPAQUE = !defines.VIGNETTEBLENDMODEMULTIPLY;
   defines.TONEMAPPING             = toneMappingEnabled();
   defines.CONTRAST                = (contrast() != 1.f);
@@ -341,7 +341,7 @@ void ImageProcessingConfiguration::bind(Effect* effect, float aspectRatio)
                       0.5f / textureSize,              // textureOffset
                       textureSize,                     // textureSize
                       weight                           // weight
-                      );
+    );
   }
 }
 

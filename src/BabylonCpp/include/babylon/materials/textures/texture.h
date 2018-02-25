@@ -22,7 +22,7 @@ public:
 
     return texture;
   }
-  virtual ~Texture();
+  virtual ~Texture() override;
 
   virtual IReflect::Type type() const override;
 

@@ -1,7 +1,6 @@
 #include <babylon/tools/hdr/file_face_orientation.h>
 
 namespace BABYLON {
-namespace Internals {
 
 FileFaceOrientation::FileFaceOrientation(const string_t& iName,
                                          const Vector3& _worldAxisForNormal,
@@ -59,5 +58,4 @@ FileFaceOrientation::~FileFaceOrientation()
 {
 }
 
-} // end of namespace Internals
 } // end of namespace BABYLON

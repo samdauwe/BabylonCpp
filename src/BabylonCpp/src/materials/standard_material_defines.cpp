@@ -47,6 +47,7 @@ StandardMaterialDefines::StandardMaterialDefines() : MaterialDefines{}
            "REFLECTIONMAP_SPHERICAL",
            "REFLECTIONMAP_PLANAR",
            "REFLECTIONMAP_CUBIC",
+           "USE_LOCAL_REFLECTIONMAP_CUBIC",
            "REFLECTIONMAP_PROJECTION",
            "REFLECTIONMAP_SKYBOX",
            "REFLECTIONMAP_EXPLICIT",

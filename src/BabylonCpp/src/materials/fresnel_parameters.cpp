@@ -75,8 +75,8 @@ void FresnelParameters::setIsEnabled(bool value)
   }
 
   _isEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::FresnelDirtyFlag
-                                  | Material::MiscDirtyFlag);
+  Engine::MarkAllMaterialsAsDirty(Material::FresnelDirtyFlag()
+                                  | Material::MiscDirtyFlag());
 }
 
 unique_ptr_t<FresnelParameters> FresnelParameters::clone() const

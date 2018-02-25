@@ -93,6 +93,14 @@ ShaderMaterial::setTextureArray(const string_t& iName,
   return *this;
 }
 
+ShaderMaterial& ShaderMaterial::setInt(const string_t& name, int value)
+{
+  _checkUniform(name);
+  _ints[name] = value;
+
+  return *this;
+}
+
 ShaderMaterial& ShaderMaterial::setFloat(const string_t& iName, float value)
 {
   _checkUniform(iName);
@@ -380,6 +388,11 @@ void ShaderMaterial::bind(Matrix* world, Mesh* mesh)
     // Texture arrays
     for (auto& kv : _textureArrays) {
       _effect->setTextureArray(kv.first, kv.second);
+    }
+
+    // Int
+    for (auto& kv : _ints) {
+      _effect->setInt(kv.first, kv.second);
     }
 
     // Float

@@ -12,8 +12,6 @@
 
 namespace BABYLON {
 
-unsigned int BaseTexture::DEFAULT_ANISOTROPIC_FILTERING_LEVEL = 4;
-
 BaseTexture::BaseTexture(Scene* scene)
     : getAlphaFromRGB{false}
     , level{1.f}
@@ -58,11 +56,6 @@ void BaseTexture::addToScene(unique_ptr_t<BaseTexture>&& newTexture)
   }
 }
 
-bool BaseTexture::hasAlpha() const
-{
-  return _hasAlpha;
-}
-
 void BaseTexture::setHasAlpha(bool value)
 {
   if (_hasAlpha == value) {
@@ -70,13 +63,14 @@ void BaseTexture::setHasAlpha(bool value)
   }
   _hasAlpha = value;
   if (_scene) {
-    _scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+    _scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag()
+                                    | Material::MiscDirtyFlag());
   }
 }
 
-unsigned int BaseTexture::coordinatesMode() const
+bool BaseTexture::hasAlpha() const
 {
-  return _coordinatesMode;
+  return _hasAlpha;
 }
 
 void BaseTexture::setCoordinatesMode(unsigned int value)
@@ -86,8 +80,13 @@ void BaseTexture::setCoordinatesMode(unsigned int value)
   }
   _coordinatesMode = value;
   if (_scene) {
-    _scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+    _scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag());
   }
+}
+
+unsigned int BaseTexture::coordinatesMode() const
+{
+  return _coordinatesMode;
 }
 
 string_t BaseTexture::uid()
@@ -225,6 +224,11 @@ void BaseTexture::delayLoad()
 {
 }
 
+Vector3* BaseTexture::boundingBoxSize() const
+{
+  return nullptr;
+}
+
 vector_t<Animation*> BaseTexture::getAnimations()
 {
   return animations;
@@ -263,6 +267,7 @@ ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex)
 
   auto size  = getSize();
   auto scene = getScene();
+
   if (!scene) {
     return ArrayBufferView();
   }
@@ -292,9 +297,8 @@ SphericalPolynomial* BaseTexture::sphericalPolynomial()
   }
 
   if (!_texture->_sphericalPolynomial) {
-    _texture->_sphericalPolynomial
-      = Internals::CubeMapToSphericalPolynomialTools::
-        ConvertCubeMapTextureToSphericalPolynomial(this);
+    _texture->_sphericalPolynomial = CubeMapToSphericalPolynomialTools::
+      ConvertCubeMapTextureToSphericalPolynomial(this);
   }
 
   return _texture->_sphericalPolynomial.get();

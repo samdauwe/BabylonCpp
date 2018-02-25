@@ -113,7 +113,7 @@ void BoundingBoxRenderer::render()
       _colorShader->bind(&worldMatrix, nullptr);
 
       // Draw order
-      engine->drawElementsType(Material::LineListDrawMode, 0, 24);
+      engine->drawElementsType(Material::LineListDrawMode(), 0, 24);
     }
 
     // Front
@@ -123,7 +123,7 @@ void BoundingBoxRenderer::render()
     _colorShader->bind(&worldMatrix);
 
     // Draw order
-    engine->drawElementsType(Material::LineListDrawMode, 0, 24);
+    engine->drawElementsType(Material::LineListDrawMode(), 0, 24);
   }
   _colorShader->unbind();
   engine->setDepthFunctionToLessOrEqual();
@@ -161,7 +161,7 @@ void BoundingBoxRenderer::renderOcclusionBoundingBox(AbstractMesh* mesh)
   _scene->resetCachedMaterial();
   _colorShader->bind(&worldMatrix);
 
-  engine->drawElementsType(Material::LineListDrawMode, 0, 24);
+  engine->drawElementsType(Material::LineListDrawMode(), 0, 24);
 
   _colorShader->unbind();
   engine->setDepthFunctionToLessOrEqual();

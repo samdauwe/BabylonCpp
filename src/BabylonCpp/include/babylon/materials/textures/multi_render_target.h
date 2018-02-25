@@ -11,9 +11,9 @@ class BABYLON_SHARED_EXPORT MultiRenderTarget : public RenderTargetTexture {
 
 public:
   MultiRenderTarget(const string_t& name, Size size, std::size_t count,
-                    Scene* scene);
-  MultiRenderTarget(const string_t& name, Size size, std::size_t count,
-                    Scene* scene, const IMultiRenderTargetOptions& options);
+                    Scene* scene,
+                    const Nullable<IMultiRenderTargetOptions>& options
+                    = nullptr);
   ~MultiRenderTarget() override;
 
   bool isSupported() const;
@@ -28,6 +28,9 @@ public:
   void resize(Size size);
   void dispose(bool doNotRecurse = false) override;
   void releaseInternalTextures();
+
+protected:
+  void unbindFrameBuffer(Engine* engine, unsigned int faceIndex);
 
 private:
   void _createInternalTextures();

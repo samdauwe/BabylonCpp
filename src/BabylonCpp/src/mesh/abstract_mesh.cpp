@@ -510,7 +510,7 @@ void AbstractMesh::_markSubMeshesAsMiscDirty()
   for (auto& subMesh : subMeshes) {
     auto material = subMesh->getMaterial();
     if (material) {
-      material->markAsDirty(Material::MiscDirtyFlag);
+      material->markAsDirty(Material::MiscDirtyFlag());
     }
   }
 }

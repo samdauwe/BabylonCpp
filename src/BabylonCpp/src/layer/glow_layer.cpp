@@ -247,7 +247,7 @@ void GlowLayer::_internalRender(Effect* effect)
   // Draw order
   engine->setStencilBuffer(false);
 
-  engine->drawElementsType(Material::TriangleFillMode, 0, 6);
+  engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
 
   // Draw order
   engine->setStencilBuffer(previousStencilBuffer);

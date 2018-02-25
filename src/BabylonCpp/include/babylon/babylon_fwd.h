@@ -258,7 +258,7 @@ class ImageProcessingConfiguration;
 struct IMaterialDefines;
 class Material;
 struct MaterialDefines;
-class MaterialHelper;
+struct MaterialHelper;
 class MultiMaterial;
 class PushMaterial;
 class ShaderMaterial;

@@ -13,10 +13,26 @@ namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT RenderTargetTexture : public Texture {
 
+private:
+  static constexpr unsigned int _REFRESHRATE_RENDER_ONCE             = 0;
+  static constexpr unsigned int _REFRESHRATE_RENDER_ONEVERYFRAME     = 1;
+  static constexpr unsigned int _REFRESHRATE_RENDER_ONEVERYTWOFRAMES = 2;
+
 public:
-  static constexpr unsigned int REFRESHRATE_RENDER_ONCE             = 0;
-  static constexpr unsigned int REFRESHRATE_RENDER_ONEVERYFRAME     = 1;
-  static constexpr unsigned int REFRESHRATE_RENDER_ONEVERYTWOFRAMES = 2;
+  static constexpr unsigned int REFRESHRATE_RENDER_ONCE()
+  {
+    return RenderTargetTexture::_REFRESHRATE_RENDER_ONCE;
+  }
+
+  static constexpr unsigned int REFRESHRATE_RENDER_ONEVERYFRAME()
+  {
+    return RenderTargetTexture::_REFRESHRATE_RENDER_ONEVERYFRAME;
+  }
+
+  static constexpr unsigned int REFRESHRATE_RENDER_ONEVERYTWOFRAMES()
+  {
+    return RenderTargetTexture::_REFRESHRATE_RENDER_ONEVERYTWOFRAMES;
+  }
 
 public:
   RenderTargetTexture(
@@ -30,6 +46,17 @@ public:
   ~RenderTargetTexture() override;
 
   void _onRatioRescale();
+
+  /**
+   * @brief Gets or sets the size of the bounding box associated with the
+   * texture (when in cube mode) When defined, the cubemap will switch to local
+   * mode
+   * @see
+   * https://community.arm.com/graphics/b/blog/posts/reflections-based-on-local-cubemaps-in-unity
+   * Example: https://www.babylonjs-playground.com/#RNASML
+   */
+  void setBoundingBoxSize(const Vector3& value);
+  Vector3* boundingBoxSize() const override;
 
   /** Events **/
   void setOnAfterUnbind(
@@ -105,6 +132,9 @@ public:
   void dispose(bool doNotRecurse = false) override;
   void _rebuild() override;
 
+protected:
+  void unbindFrameBuffer(Engine* engine, unsigned int faceIndex);
+
 private:
   void _processSizeParameter(const ISize& size);
   int _bestReflectionRenderTargetDimension(int renderDimension,
@@ -144,6 +174,13 @@ public:
   vector_t<string_t> _waitingRenderList;
   ::std::function<void()> onAfterRender;
   ::std::function<void()> onBeforeRender;
+
+  /**
+   * Gets or sets the center of the bounding box associated with the texture
+   * (when in cube mode) It must define where the camera used to render the
+   * texture is set
+   */
+  Vector3 boundingBoxPosition;
 
   // Events
 
@@ -196,6 +233,7 @@ private:
   Observer<Engine>::Ptr _onClearObserver;
   // Properties
   int _faceIndex;
+  unique_ptr_t<Vector3> _boundingBoxSize;
 
 }; // end of class RenderTargetTexture
 

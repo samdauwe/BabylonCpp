@@ -22,6 +22,7 @@
 #include <babylon/materials/standard_material_defines.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/color_grading_texture.h>
+#include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/refraction_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/uniform_buffer.h>
@@ -227,7 +228,7 @@ void StandardMaterial::setUseLogarithmicDepth(bool value)
 
 bool StandardMaterial::needAlphaBlending() const
 {
-  return (alpha < 1.f) || (_opacityTexture != nullptr)
+  return (alpha() < 1.f) || (_opacityTexture != nullptr)
          || _shouldUseAlphaFromDiffuseTexture()
          || (_opacityFresnelParameters
              && _opacityFresnelParameters->isEnabled());
@@ -375,6 +376,9 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                 SMD::REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED);
               break;
           }
+
+          defines.defines[SMD::USE_LOCAL_REFLECTIONMAP_CUBIC]
+            = _reflectionTexture->boundingBoxSize() ? true : false;
         }
       }
       else {
@@ -537,8 +541,9 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
   // Misc.
   MaterialHelper::PrepareDefinesForMisc(
-    mesh, scene, _useLogarithmicDepth, pointsCloud(), fogEnabled(), defines,
-    SMD::LOGARITHMICDEPTH, SMD::POINTSIZE, SMD::FOG, SMD::NONUNIFORMSCALING);
+    mesh, scene, _useLogarithmicDepth, pointsCloud(), fogEnabled(),
+    _shouldTurnAlphaTestOn(mesh), defines, SMD::LOGARITHMICDEPTH,
+    SMD::POINTSIZE, SMD::FOG, SMD::NONUNIFORMSCALING, SMD::ALPHATEST);
 
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(
@@ -690,6 +695,8 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                 "emissiveRightColor",
                                 "refractionLeftColor",
                                 "refractionRightColor",
+                                "vReflectionPosition",
+                                "vReflectionSize",
                                 "logarithmicDepthConstant",
                                 "vTangentSpaceParams"};
     vector_t<string_t> samplers{
@@ -759,6 +766,8 @@ void StandardMaterial::buildUniformLayout()
   _uniformBuffer->addUniform("vAmbientInfos", 2);
   _uniformBuffer->addUniform("vOpacityInfos", 2);
   _uniformBuffer->addUniform("vReflectionInfos", 2);
+  _uniformBuffer->addUniform("vReflectionPosition", 3);
+  _uniformBuffer->addUniform("vReflectionSize", 3);
   _uniformBuffer->addUniform("vEmissiveInfos", 2);
   _uniformBuffer->addUniform("vLightmapInfos", 2);
   _uniformBuffer->addUniform("vSpecularInfos", 2);
@@ -918,6 +927,16 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
           _uniformBuffer->updateMatrix(
             "reflectionMatrix",
             *_reflectionTexture->getReflectionTextureMatrix());
+
+          if (_reflectionTexture->boundingBoxSize()) {
+            if (auto cubeTexture
+                = static_cast<CubeTexture*>(_reflectionTexture)) {
+              _uniformBuffer->updateVector3("vReflectionPosition",
+                                            cubeTexture->boundingBoxPosition);
+              _uniformBuffer->updateVector3("vReflectionSize",
+                                            *cubeTexture->boundingBoxSize());
+            }
+          }
         }
 
         if (_emissiveTexture && StandardMaterial::EmissiveTextureEnabled()) {
@@ -997,7 +1016,7 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
       _uniformBuffer->updateColor3("vEmissiveColor", emissiveColor, "");
       // Diffuse
       _uniformBuffer->updateColor4("vDiffuseColor", diffuseColor,
-                                   alpha * mesh->visibility, "");
+                                   alpha() * mesh->visibility, "");
     }
 
     // Textures
@@ -1753,7 +1772,7 @@ void StandardMaterial::SetDiffuseTextureEnabled(bool value)
   }
 
   StandardMaterial::_DiffuseTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag());
 }
 
 bool StandardMaterial::AmbientTextureEnabled()
@@ -1768,7 +1787,7 @@ void StandardMaterial::SetAmbientTextureEnabled(bool value)
   }
 
   StandardMaterial::_AmbientTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag());
 }
 
 bool StandardMaterial::OpacityTextureEnabled()
@@ -1783,7 +1802,7 @@ void StandardMaterial::SetOpacityTextureEnabled(bool value)
   }
 
   StandardMaterial::_OpacityTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag());
 }
 
 bool StandardMaterial::ReflectionTextureEnabled()
@@ -1798,7 +1817,7 @@ void StandardMaterial::SetReflectionTextureEnabled(bool value)
   }
 
   StandardMaterial::_ReflectionTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag());
 }
 
 bool StandardMaterial::EmissiveTextureEnabled()
@@ -1813,7 +1832,7 @@ void StandardMaterial::SetEmissiveTextureEnabled(bool value)
   }
 
   StandardMaterial::_EmissiveTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag());
 }
 
 bool StandardMaterial::SpecularTextureEnabled()
@@ -1828,7 +1847,7 @@ void StandardMaterial::SetSpecularTextureEnabled(bool value)
   }
 
   StandardMaterial::_SpecularTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag());
 }
 
 bool StandardMaterial::BumpTextureEnabled()
@@ -1843,7 +1862,7 @@ void StandardMaterial::SetBumpTextureEnabled(bool value)
   }
 
   StandardMaterial::_BumpTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag());
 }
 
 bool StandardMaterial::LightmapTextureEnabled()
@@ -1858,7 +1877,7 @@ void StandardMaterial::SetLightmapTextureEnabled(bool value)
   }
 
   StandardMaterial::_LightmapTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag());
 }
 
 bool StandardMaterial::RefractionTextureEnabled()
@@ -1873,7 +1892,7 @@ void StandardMaterial::SetRefractionTextureEnabled(bool value)
   }
 
   StandardMaterial::_RefractionTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag());
 }
 
 bool StandardMaterial::ColorGradingTextureEnabled()
@@ -1888,7 +1907,7 @@ void StandardMaterial::SetColorGradingTextureEnabled(bool value)
   }
 
   StandardMaterial::_ColorGradingTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag());
 }
 
 bool StandardMaterial::FresnelEnabled()
@@ -1903,7 +1922,7 @@ void StandardMaterial::SetFresnelEnabled(bool value)
   }
 
   StandardMaterial::_FresnelEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::FresnelDirtyFlag);
+  Engine::MarkAllMaterialsAsDirty(Material::FresnelDirtyFlag());
 }
 
 } // end of namespace BABYLON

@@ -4,6 +4,7 @@
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/materials/material.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/matrix.h>
@@ -40,6 +41,8 @@ CubeTexture::CubeTexture(
     : BaseTexture{scene}
     , url{rootUrl}
     , coordinatesMode{TextureConstants::CUBIC_MODE}
+    , boundingBoxPosition{Vector3::Zero()}
+    , _boundingBoxSize{nullptr}
     , _noMipmap{noMipmap}
     , _textureMatrix{::std::make_unique<Matrix>(Matrix::Identity())}
     , _format{format}
@@ -121,7 +124,23 @@ CubeTexture::~CubeTexture()
 {
 }
 
-// Methods
+void CubeTexture::setBoundingBoxSize(const Vector3& value)
+{
+  if (_boundingBoxSize && _boundingBoxSize->equals(value)) {
+    return;
+  }
+  _boundingBoxSize = ::std::make_unique<Vector3>(value);
+  auto scene       = getScene();
+  if (scene) {
+    scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag());
+  }
+}
+
+Vector3* CubeTexture::boundingBoxSize() const
+{
+  return _boundingBoxSize ? _boundingBoxSize.get() : nullptr;
+}
+
 void CubeTexture::delayLoad()
 {
   if (delayLoadState != EngineConstants::DELAYLOADSTATE_NOTLOADED) {

@@ -263,7 +263,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
       }
 
       engine_->enableEffect(effect);
-      _mesh->_bind(subMesh, effect, Material::TriangleFillMode);
+      _mesh->_bind(subMesh, effect, Material::TriangleFillMode());
 
       if (_mesh == mesh) {
         material->bind(_mesh->getWorldMatrix(), _mesh);
@@ -297,7 +297,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
 
       // Draw
       mesh->_processRendering(subMesh, _volumetricLightScatteringPass,
-                              Material::TriangleFillMode, batch,
+                              Material::TriangleFillMode(), batch,
                               hardwareInstancedRendering,
                               [&](bool /*isInstance*/, Matrix world,
                                   Material* /*effectiveMaterial*/) {

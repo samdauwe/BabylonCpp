@@ -9,6 +9,7 @@
 #include <babylon/lights/ishadow_light.h>
 #include <babylon/lights/light.h>
 #include <babylon/lights/shadows/shadow_generator.h>
+#include <babylon/lights/spot_light.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
@@ -101,8 +102,9 @@ void MaterialHelper::BindTextureMatrix(BaseTexture& texture,
 
 void MaterialHelper::PrepareDefinesForMisc(
   AbstractMesh* mesh, Scene* scene, bool useLogarithmicDepth, bool pointsCloud,
-  bool fogEnabled, MaterialDefines& defines, unsigned int LOGARITHMICDEPTH,
-  unsigned int POINTSIZE, unsigned int FOG, unsigned int NONUNIFORMSCALING)
+  bool fogEnabled, bool alphaTest, MaterialDefines& defines,
+  unsigned int LOGARITHMICDEPTH, unsigned int POINTSIZE, unsigned int FOG,
+  unsigned int NONUNIFORMSCALING, unsigned int ALPHATEST)
 {
   if (defines._areMiscDirty) {
     defines.defines[LOGARITHMICDEPTH] = useLogarithmicDepth;
@@ -111,18 +113,23 @@ void MaterialHelper::PrepareDefinesForMisc(
       = (scene->fogEnabled() && mesh->applyFog()
          && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled);
     defines.defines[NONUNIFORMSCALING] = mesh->nonUniformScaling();
+    defines.defines[ALPHATEST]         = alphaTest;
   }
 }
 
 void MaterialHelper::PrepareDefinesForFrameBoundValues(
   Scene* scene, Engine* engine, MaterialDefines& defines, bool useInstances,
-  unsigned int CLIPPLANE, unsigned int /*ALPHATEST*/, unsigned int DEPTHPREPASS,
-  unsigned int INSTANCES, bool /*forceAlphaTest*/)
+  unsigned int CLIPPLANE, unsigned int DEPTHPREPASS, unsigned int INSTANCES,
+  Nullable<bool> useClipPlane)
 {
   bool changed = false;
 
-  if (defines[CLIPPLANE] != (scene->clipPlane() != nullptr)) {
-    defines.defines[CLIPPLANE] = !defines[CLIPPLANE];
+  if (useClipPlane == nullptr) {
+    useClipPlane = (scene->clipPlane() != nullptr);
+  }
+
+  if (defines[CLIPPLANE] != *useClipPlane) {
+    defines.defines[CLIPPLANE] = *useClipPlane;
     changed                    = true;
   }
 
@@ -248,6 +255,15 @@ bool MaterialHelper::PrepareDefinesForLights(
 
       if (light->getTypeID() == Light::LIGHTTYPEID_SPOTLIGHT()) {
         defines.spotlights[lightIndex] = true;
+        if (auto spotLight = static_cast<SpotLight*>(light)) {
+          if (lightIndex >= defines.projectedLightTexture.size()) {
+            defines.projectedLightTexture.resize(lightIndex + 1);
+          }
+          defines.projectedLightTexture[lightIndex]
+            = spotLight->projectionTexture() ?
+                spotLight->projectionTexture()->isReady() :
+                false;
+        }
       }
       else if (light->getTypeID() == Light::LIGHTTYPEID_HEMISPHERICLIGHT()) {
         defines.hemilights[lightIndex] = true;
@@ -314,8 +330,10 @@ bool MaterialHelper::PrepareDefinesForLights(
   auto caps = scene->getEngine()->getCaps();
 
   defines.defines[SHADOWFLOAT]
-    = (shadowEnabled && caps.textureFloat && caps.textureFloatLinearFiltering
-       && caps.textureFloatRender);
+    = shadowEnabled
+      && ((caps.textureFloatRender && caps.textureFloatLinearFiltering)
+          || (caps.textureHalfFloatRender
+              && caps.textureHalfFloatLinearFiltering));
   defines.LIGHTMAPEXCLUDED = lightmapMode;
 
   if (needRebuild) {
@@ -349,6 +367,11 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
                      });
 
     samplersList.emplace_back("shadowSampler" + lightIndexStr);
+    if (lightIndex < defines.projectedLightTexture.size()
+        || !defines.projectedLightTexture[lightIndex]) {
+      samplersList.emplace_back("projectionLightSampler" + lightIndexStr);
+      uniformsList.emplace_back("textureProjectionMatrix" + lightIndexStr);
+    }
   }
 
   if (defines.NUM_MORPH_INFLUENCERS > 0) {
@@ -359,16 +382,22 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
 void MaterialHelper::PrepareUniformsAndSamplersList(
   EffectCreationOptions& options)
 {
-  for (unsigned int lightIndex = 0; lightIndex < options.maxSimultaneousLights;
+  auto& uniformsList          = options.uniformsNames;
+  auto& uniformBuffersList    = options.uniformBuffersNames;
+  auto& samplersList          = options.samplers;
+  auto& defines               = options.materialDefines;
+  auto& maxSimultaneousLights = options.maxSimultaneousLights;
+
+  for (unsigned int lightIndex = 0; lightIndex < maxSimultaneousLights;
        ++lightIndex) {
-    if (options.materialDefines
-        && (lightIndex >= options.materialDefines->lights.size()
-            || !options.materialDefines->lights[lightIndex])) {
+    if (defines
+        && (lightIndex >= defines->lights.size()
+            || !defines->lights[lightIndex])) {
       break;
     }
 
     const string_t lightIndexStr = ::std::to_string(lightIndex);
-    stl_util::concat(options.uniformsNames,
+    stl_util::concat(uniformsList,
                      {
                        "vLightData" + lightIndexStr,      //
                        "vLightDiffuse" + lightIndexStr,   //
@@ -376,15 +405,21 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
                        "vLightDirection" + lightIndexStr, //
                        "vLightGround" + lightIndexStr,    //
                        "lightMatrix" + lightIndexStr,     //
-                       "shadowsInfo" + lightIndexStr      //
+                       "shadowsInfo" + lightIndexStr,     //
+                       "depthValues" + lightIndexStr      //
                      });
 
-    options.uniformBuffersNames.emplace_back("Light" + lightIndexStr);
-    options.samplers.emplace_back("shadowSampler" + lightIndexStr);
+    uniformBuffersList.emplace_back("Light" + lightIndexStr);
+    samplersList.emplace_back("shadowSampler" + lightIndexStr);
+    if (lightIndex < defines->projectedLightTexture.size()
+        || !defines->projectedLightTexture[lightIndex]) {
+      samplersList.emplace_back("projectionLightSampler" + lightIndexStr);
+      uniformsList.emplace_back("textureProjectionMatrix" + lightIndexStr);
+    }
   }
 
-  if (options.materialDefines->NUM_MORPH_INFLUENCERS > 0) {
-    options.uniformsNames.emplace_back("morphTargetInfluences");
+  if (defines->NUM_MORPH_INFLUENCERS > 0) {
+    uniformsList.emplace_back("morphTargetInfluences");
   }
 }
 
@@ -514,35 +549,34 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
                                 unsigned int SPECULARTERM,
                                 bool usePhysicalLightFalloff)
 {
-  unsigned int lightIndex = 0;
+  auto len = ::std::min(mesh->_lightSources.size(),
+                        static_cast<size_t>(maxSimultaneousLights));
 
-  for (auto& light : mesh->_lightSources) {
-    const auto lightIndexStr   = ::std::to_string(lightIndex);
-    const auto scaledIntensity = light->getScaledIntensity();
-    light->_uniformBuffer->bindToEffect(effect, "Light" + lightIndexStr);
+  for (unsigned int i = 0; i < len; i++) {
 
-    MaterialHelper::BindLightProperties(light, effect, lightIndex);
+    auto& light    = mesh->_lightSources[i];
+    auto iAsString = ::std::to_string(i);
+
+    auto scaledIntensity = light->getScaledIntensity();
+    light->_uniformBuffer->bindToEffect(effect, "Light" + iAsString);
+
+    MaterialHelper::BindLightProperties(light, effect, i);
 
     light->diffuse.scaleToRef(scaledIntensity, Tmp::Color3Array[0]);
     light->_uniformBuffer->updateColor4(
       "vLightDiffuse", Tmp::Color3Array[0],
-      usePhysicalLightFalloff ? light->radius() : light->range, lightIndexStr);
+      usePhysicalLightFalloff ? light->radius() : light->range, iAsString);
     if (defines[SPECULARTERM]) {
       light->specular.scaleToRef(scaledIntensity, Tmp::Color3Array[1]);
       light->_uniformBuffer->updateColor3("vLightSpecular", Tmp::Color3Array[1],
-                                          lightIndexStr);
+                                          iAsString);
     }
 
     // Shadows
     if (scene->shadowsEnabled()) {
-      BindLightShadow(light, scene, mesh, lightIndex, effect);
+      BindLightShadow(light, scene, mesh, i, effect);
     }
     light->_uniformBuffer->update();
-    ++lightIndex;
-
-    if (lightIndex == maxSimultaneousLights) {
-      break;
-    }
   }
 }
 

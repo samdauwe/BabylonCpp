@@ -14,10 +14,27 @@ namespace BABYLON {
  */
 class BABYLON_SHARED_EXPORT ImageProcessingConfiguration {
 
-public:
+private:
   // Static constants associated to the image processing.
-  static constexpr unsigned int VIGNETTEMODE_MULTIPLY = 0;
-  static constexpr unsigned int VIGNETTEMODE_OPAQUE   = 1;
+  static constexpr unsigned int _VIGNETTEMODE_MULTIPLY = 0;
+  static constexpr unsigned int _VIGNETTEMODE_OPAQUE   = 1;
+
+public:
+  /**
+   * @brief Used to apply the vignette as a mix with the pixel color.
+   */
+  static constexpr unsigned int VIGNETTEMODE_MULTIPLY()
+  {
+    return ImageProcessingConfiguration::_VIGNETTEMODE_MULTIPLY;
+  }
+
+  /**
+   * @brief Used to apply the vignette as a replacement of the pixel color.
+   */
+  static constexpr unsigned int VIGNETTEMODE_OPAQUE()
+  {
+    return ImageProcessingConfiguration::_VIGNETTEMODE_OPAQUE;
+  }
 
 public:
   ImageProcessingConfiguration();

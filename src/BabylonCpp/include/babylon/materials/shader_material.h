@@ -24,7 +24,7 @@ public:
 
     return material;
   }
-  virtual ~ShaderMaterial();
+  virtual ~ShaderMaterial() override;
 
   /**
    * @brief Returns the string "ShaderMaterial".
@@ -38,6 +38,7 @@ public:
   ShaderMaterial& setTexture(const string_t& name, Texture* texture);
   ShaderMaterial& setTextureArray(const string_t& iName,
                                   const vector_t<BaseTexture*>& textures);
+  ShaderMaterial& setInt(const string_t& name, int value);
   ShaderMaterial& setFloat(const string_t& name, float value);
   ShaderMaterial& setFloats(const string_t& name, const Float32Array& value);
   ShaderMaterial& setColor3(const string_t& name, const Color3& value);
@@ -82,6 +83,7 @@ private:
   unordered_map_t<string_t, Texture*> _textures;
   unordered_map_t<string_t, vector_t<BaseTexture*>> _textureArrays;
   unordered_map_t<string_t, float> _floats;
+  unordered_map_t<string_t, int> _ints;
   unordered_map_t<string_t, Float32Array> _floatsArrays;
   unordered_map_t<string_t, Color3> _colors3;
   unordered_map_t<string_t, Float32Array> _colors3Arrays;

@@ -65,6 +65,7 @@ void MaterialDefines::resizeLights(unsigned int lightIndex)
       shadowcloseesms.emplace_back(false);
       shadowpcfs.emplace_back(false);
       shadowcubes.emplace_back(false);
+      projectedLightTexture.emplace_back(false);
       lightmapexcluded.emplace_back(false);
       lightmapnospecular.emplace_back(false);
     }
@@ -153,6 +154,12 @@ std::ostream& operator<<(std::ostream& os,
   for (size_t i = 0; i < materialDefines.shadowcubes.size(); ++i) {
     if (materialDefines.shadowcubes[i]) {
       os << "#define SHADOWCUBE" << i << "\n";
+    }
+  }
+
+  for (size_t i = 0; i < materialDefines.projectedLightTexture.size(); ++i) {
+    if (materialDefines.projectedLightTexture[i]) {
+      os << "#define PROJECTEDLIGHTTEXTURE" << i << "\n";
     }
   }
 
@@ -263,7 +270,10 @@ bool MaterialDefines::isEqual(const MaterialDefines& other) const
       || (shadowesms.size() != other.shadowesms.size())
       || (shadowcloseesms.size() != other.shadowcloseesms.size())
       || (shadowpcfs.size() != other.shadowpcfs.size())
-      || (shadowcubes.size() != other.shadowcubes.size())) {
+      || (shadowcubes.size() != other.shadowcubes.size())
+      || (projectedLightTexture.size() != other.projectedLightTexture.size())
+      || (lightmapexcluded.size() != other.lightmapexcluded.size())
+      || (lightmapnospecular.size() != other.lightmapnospecular.size())) {
     return false;
   }
 
@@ -363,6 +373,24 @@ bool MaterialDefines::isEqual(const MaterialDefines& other) const
     }
   }
 
+  for (size_t i = 0; i < projectedLightTexture.size(); ++i) {
+    if (projectedLightTexture[i] != other.projectedLightTexture[i]) {
+      return false;
+    }
+  }
+
+  for (size_t i = 0; i < lightmapexcluded.size(); ++i) {
+    if (lightmapexcluded[i] != other.lightmapexcluded[i]) {
+      return false;
+    }
+  }
+
+  for (size_t i = 0; i < lightmapnospecular.size(); ++i) {
+    if (lightmapnospecular[i] != other.lightmapnospecular[i]) {
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -397,16 +425,19 @@ void MaterialDefines::cloneTo(MaterialDefines& other)
   other._needNormals          = _needNormals;
   other._needUVs              = _needUVs;
 
-  other.lights          = lights;
-  other.pointlights     = pointlights;
-  other.dirlights       = dirlights;
-  other.hemilights      = hemilights;
-  other.spotlights      = spotlights;
-  other.shadows         = shadows;
-  other.shadowesms      = shadowesms;
-  other.shadowcloseesms = shadowcloseesms;
-  other.shadowpcfs      = shadowpcfs;
-  other.shadowcubes     = shadowcubes;
+  other.lights                = lights;
+  other.pointlights           = pointlights;
+  other.dirlights             = dirlights;
+  other.hemilights            = hemilights;
+  other.spotlights            = spotlights;
+  other.shadows               = shadows;
+  other.shadowesms            = shadowesms;
+  other.shadowcloseesms       = shadowcloseesms;
+  other.shadowpcfs            = shadowpcfs;
+  other.shadowcubes           = shadowcubes;
+  other.projectedLightTexture = projectedLightTexture;
+  other.lightmapexcluded      = lightmapexcluded;
+  other.lightmapnospecular    = lightmapnospecular;
 }
 
 void MaterialDefines::reset()
@@ -451,6 +482,9 @@ void MaterialDefines::reset()
   shadowcloseesms.clear();
   shadowpcfs.clear();
   shadowcubes.clear();
+  projectedLightTexture.clear();
+  lightmapexcluded.clear();
+  lightmapnospecular.clear();
 }
 
 string_t MaterialDefines::toString() const

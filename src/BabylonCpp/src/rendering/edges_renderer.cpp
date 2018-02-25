@@ -385,7 +385,7 @@ void EdgesRenderer::render()
   _lineShader->bind(_source->getWorldMatrix());
 
   // Draw order
-  engine->drawElementsType(Material::TriangleFillMode, 0,
+  engine->drawElementsType(Material::TriangleFillMode(), 0,
                            static_cast<int>(_indicesCount));
   _lineShader->unbind();
   engine->setDepthWrite(true);

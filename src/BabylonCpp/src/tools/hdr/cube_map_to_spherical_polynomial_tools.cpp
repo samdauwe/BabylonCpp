@@ -9,7 +9,6 @@
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
-namespace Internals {
 
 array_t<FileFaceOrientation, 6> CubeMapToSphericalPolynomialTools::FileFaces
   = {{
@@ -188,5 +187,4 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
       sphericalHarmonics));
 }
 
-} // end of namespace Internals
 } // end of namespace BABYLON

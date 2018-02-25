@@ -68,7 +68,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type)
 
     if (isReady(subMesh, hardwareInstancedRendering) && scene->activeCamera) {
       engine->enableEffect(_effect);
-      mesh->_bind(subMesh, _effect, Material::TriangleFillMode);
+      mesh->_bind(subMesh, _effect, Material::TriangleFillMode());
 
       _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
 
@@ -94,7 +94,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type)
       }
 
       // Draw
-      mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode,
+      mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode(),
                               batch, hardwareInstancedRendering,
                               [this](bool /*isInstance*/, Matrix world,
                                      Material* /*effectiveMaterial*/) {
@@ -103,29 +103,30 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type)
     }
   };
 
-  _depthMap->customRenderFunction = [engine, renderSubMesh](
-    const vector_t<SubMesh*>& opaqueSubMeshes,
-    const vector_t<SubMesh*>& alphaTestSubMeshes,
-    const vector_t<SubMesh*>& /*transparentSubMeshes*/,
-    const vector_t<SubMesh*>& depthOnlySubMeshes,
-    const ::std::function<void()>& /*beforeTransparents*/) {
+  _depthMap->customRenderFunction
+    = [engine,
+       renderSubMesh](const vector_t<SubMesh*>& opaqueSubMeshes,
+                      const vector_t<SubMesh*>& alphaTestSubMeshes,
+                      const vector_t<SubMesh*>& /*transparentSubMeshes*/,
+                      const vector_t<SubMesh*>& depthOnlySubMeshes,
+                      const ::std::function<void()>& /*beforeTransparents*/) {
 
-    if (!depthOnlySubMeshes.empty()) {
-      engine->setColorWrite(false);
-      for (auto& depthOnlySubMesh : depthOnlySubMeshes) {
-        renderSubMesh(depthOnlySubMesh);
-      }
-      engine->setColorWrite(true);
-    }
+        if (!depthOnlySubMeshes.empty()) {
+          engine->setColorWrite(false);
+          for (auto& depthOnlySubMesh : depthOnlySubMeshes) {
+            renderSubMesh(depthOnlySubMesh);
+          }
+          engine->setColorWrite(true);
+        }
 
-    for (auto& opaqueSubMesh : opaqueSubMeshes) {
-      renderSubMesh(opaqueSubMesh);
-    }
+        for (auto& opaqueSubMesh : opaqueSubMeshes) {
+          renderSubMesh(opaqueSubMesh);
+        }
 
-    for (auto& alphaTestSubMesh : alphaTestSubMeshes) {
-      renderSubMesh(alphaTestSubMesh);
-    }
-  };
+        for (auto& alphaTestSubMesh : alphaTestSubMeshes) {
+          renderSubMesh(alphaTestSubMesh);
+        }
+      };
 }
 
 DepthRenderer::~DepthRenderer()

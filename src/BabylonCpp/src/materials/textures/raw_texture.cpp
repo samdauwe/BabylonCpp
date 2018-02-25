@@ -2,6 +2,7 @@
 
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/materials/textures/internal_texture.h>
 
 namespace BABYLON {
 
@@ -11,8 +12,6 @@ RawTexture::RawTexture(const Uint8Array& data, int width, int height,
                        unsigned int iType)
     : Texture{nullptr, scene, !generateMipMaps, invertY}
     , format{iFormat}
-    , wrapU{TextureConstants::CLAMP_ADDRESSMODE}
-    , wrapV{TextureConstants::CLAMP_ADDRESSMODE}
     , type{iType}
 {
   _engine  = scene->getEngine();
@@ -22,6 +21,9 @@ RawTexture::RawTexture(const Uint8Array& data, int width, int height,
 
   _texture = scene->getEngine()->createRawTexture(
     data, width, height, iFormat, generateMipMaps, invertY, samplingMode);
+
+  wrapU = TextureConstants::CLAMP_ADDRESSMODE;
+  wrapV = TextureConstants::CLAMP_ADDRESSMODE;
 }
 
 RawTexture::~RawTexture()
@@ -30,7 +32,10 @@ RawTexture::~RawTexture()
 
 void RawTexture::update(const Uint8Array& data)
 {
-  _engine->updateRawTexture(_texture, data, format, _invertY);
+  if (_texture) {
+    _engine->updateRawTexture(_texture, data, _texture->format,
+                              _texture->invertY, "", _texture->type);
+  }
 }
 
 unique_ptr_t<RawTexture> RawTexture::CreateLuminanceTexture(

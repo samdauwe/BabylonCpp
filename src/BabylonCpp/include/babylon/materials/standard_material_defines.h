@@ -54,41 +54,42 @@ struct BABYLON_SHARED_EXPORT StandardMaterialDefines
   static constexpr unsigned int REFLECTIONMAP_SPHERICAL             = 40;
   static constexpr unsigned int REFLECTIONMAP_PLANAR                = 41;
   static constexpr unsigned int REFLECTIONMAP_CUBIC                 = 42;
-  static constexpr unsigned int REFLECTIONMAP_PROJECTION            = 43;
-  static constexpr unsigned int REFLECTIONMAP_SKYBOX                = 44;
+  static constexpr unsigned int USE_LOCAL_REFLECTIONMAP_CUBIC       = 43;
+  static constexpr unsigned int REFLECTIONMAP_PROJECTION            = 44;
+  static constexpr unsigned int REFLECTIONMAP_SKYBOX                = 45;
   static constexpr unsigned int REFLECTIONMAP_EXPLICIT              = 45;
-  static constexpr unsigned int REFLECTIONMAP_EQUIRECTANGULAR       = 46;
-  static constexpr unsigned int REFLECTIONMAP_EQUIRECTANGULAR_FIXED = 47;
+  static constexpr unsigned int REFLECTIONMAP_EQUIRECTANGULAR       = 47;
+  static constexpr unsigned int REFLECTIONMAP_EQUIRECTANGULAR_FIXED = 48;
   static constexpr unsigned int REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED
-    = 48;
-  static constexpr unsigned int INVERTCUBICMAP       = 49;
-  static constexpr unsigned int LOGARITHMICDEPTH     = 50;
-  static constexpr unsigned int REFRACTION           = 51;
-  static constexpr unsigned int REFRACTIONMAP_3D     = 52;
-  static constexpr unsigned int REFLECTIONOVERALPHA  = 53;
-  static constexpr unsigned int TWOSIDEDLIGHTING     = 54;
-  static constexpr unsigned int SHADOWFLOAT          = 55;
-  static constexpr unsigned int MORPHTARGETS         = 56;
-  static constexpr unsigned int MORPHTARGETS_NORMAL  = 57;
-  static constexpr unsigned int MORPHTARGETS_TANGENT = 58;
+    = 49;
+  static constexpr unsigned int INVERTCUBICMAP       = 50;
+  static constexpr unsigned int LOGARITHMICDEPTH     = 51;
+  static constexpr unsigned int REFRACTION           = 52;
+  static constexpr unsigned int REFRACTIONMAP_3D     = 53;
+  static constexpr unsigned int REFLECTIONOVERALPHA  = 54;
+  static constexpr unsigned int TWOSIDEDLIGHTING     = 55;
+  static constexpr unsigned int SHADOWFLOAT          = 56;
+  static constexpr unsigned int MORPHTARGETS         = 57;
+  static constexpr unsigned int MORPHTARGETS_NORMAL  = 58;
+  static constexpr unsigned int MORPHTARGETS_TANGENT = 59;
   static constexpr unsigned int NONUNIFORMSCALING
-    = 59; // https://playground.babylonjs.com#V6DWIH
+    = 60; // https://playground.babylonjs.com#V6DWIH
   static constexpr unsigned int PREMULTIPLYALPHA
-    = 60; // https://playground.babylonjs.com#LNVJJ7
+    = 61; // https://playground.babylonjs.com#LNVJJ7
 
-  static constexpr unsigned int IMAGEPROCESSING            = 61;
-  static constexpr unsigned int VIGNETTE                   = 62;
-  static constexpr unsigned int VIGNETTEBLENDMODEMULTIPLY  = 63;
-  static constexpr unsigned int VIGNETTEBLENDMODEOPAQUE    = 64;
-  static constexpr unsigned int TONEMAPPING                = 65;
-  static constexpr unsigned int CONTRAST                   = 66;
-  static constexpr unsigned int COLORCURVES                = 67;
+  static constexpr unsigned int IMAGEPROCESSING            = 62;
+  static constexpr unsigned int VIGNETTE                   = 63;
+  static constexpr unsigned int VIGNETTEBLENDMODEMULTIPLY  = 64;
+  static constexpr unsigned int VIGNETTEBLENDMODEOPAQUE    = 65;
+  static constexpr unsigned int TONEMAPPING                = 66;
+  static constexpr unsigned int CONTRAST                   = 67;
+  static constexpr unsigned int COLORCURVES                = 68;
   static constexpr unsigned int COLORGRADING               = 68;
-  static constexpr unsigned int COLORGRADING3D             = 69;
-  static constexpr unsigned int SAMPLER3DGREENDEPTH        = 70;
-  static constexpr unsigned int SAMPLER3DBGRMAP            = 71;
-  static constexpr unsigned int IMAGEPROCESSINGPOSTPROCESS = 72;
-  static constexpr unsigned int EXPOSURE                   = 73;
+  static constexpr unsigned int COLORGRADING3D             = 70;
+  static constexpr unsigned int SAMPLER3DGREENDEPTH        = 71;
+  static constexpr unsigned int SAMPLER3DBGRMAP            = 72;
+  static constexpr unsigned int IMAGEPROCESSINGPOSTPROCESS = 73;
+  static constexpr unsigned int EXPOSURE                   = 74;
 
   StandardMaterialDefines();
   ~StandardMaterialDefines();

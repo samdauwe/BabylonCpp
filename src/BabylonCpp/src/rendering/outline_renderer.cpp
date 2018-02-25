@@ -58,7 +58,7 @@ void OutlineRenderer::render(SubMesh* subMesh, _InstancesBatch* batch,
   _effect->setFloat("offset", useOverlay ? 0 : mesh->outlineWidth);
   _effect->setColor4("color",
                      useOverlay ? mesh->overlayColor : mesh->outlineColor,
-                     useOverlay ? mesh->overlayAlpha : material->alpha);
+                     useOverlay ? mesh->overlayAlpha : material->alpha());
   _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
 
   // Bones
@@ -68,7 +68,7 @@ void OutlineRenderer::render(SubMesh* subMesh, _InstancesBatch* batch,
                          mesh->skeleton()->getTransformMatrices(mesh));
   }
 
-  mesh->_bind(subMesh, _effect, Material::TriangleFillMode);
+  mesh->_bind(subMesh, _effect, Material::TriangleFillMode());
 
   // Alpha test
   if (material && material->needAlphaTesting()) {
@@ -81,7 +81,7 @@ void OutlineRenderer::render(SubMesh* subMesh, _InstancesBatch* batch,
 
   engine->setZOffset(-zOffset);
 
-  mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode, batch,
+  mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode(), batch,
                           hardwareInstancedRendering,
                           [this](bool, Matrix world, Material*) {
                             _effect->setMatrix("world", world);

@@ -6,6 +6,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/material.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/render_target_texture.h>
@@ -118,7 +119,14 @@ ProceduralTexture::~ProceduralTexture()
 void ProceduralTexture::_createIndexBuffer()
 {
   // Indices
-  Uint32Array indices{0, 1, 2, 0, 2, 3};
+  Uint32Array indices{
+    0, //
+    1, //
+    2, //
+    0, //
+    2, //
+    3  //
+  };
 
   _indexBuffer = _engine->createIndexBuffer(indices);
 }
@@ -134,8 +142,8 @@ void ProceduralTexture::_rebuild()
 
   _createIndexBuffer();
 
-  if (refreshRate() == RenderTargetTexture::REFRESHRATE_RENDER_ONCE) {
-    setRefreshRate(RenderTargetTexture::REFRESHRATE_RENDER_ONCE);
+  if (refreshRate() == RenderTargetTexture::REFRESHRATE_RENDER_ONCE()) {
+    setRefreshRate(RenderTargetTexture::REFRESHRATE_RENDER_ONCE());
   }
 }
 
@@ -385,7 +393,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
 
   // Color4
   for (auto& item : _colors4) {
-    const Color4& color = item.second;
+    const auto& color = item.second;
     _effect->setFloat4(item.first, color.r, color.g, color.b, color.a);
   }
 
@@ -408,19 +416,13 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
     return;
   }
 
-  // VBOs
-  unordered_map_t<string_t, VertexBuffer*> vertexBuffersTmp;
-  vertexBuffersTmp.reserve(_vertexBuffers.size());
-  for (const auto& item : _vertexBuffers) {
-    vertexBuffersTmp[item.first] = item.second.get();
-  }
-
   if (isCube) {
     for (unsigned int face = 0; face < 6; ++face) {
       engine->bindFramebuffer(_texture, face, 0, 0, true);
 
       // VBOs
-      engine->bindBuffers(vertexBuffersTmp, _indexBuffer.get(), _effect);
+      engine->bindBuffers(stl_util::to_raw_ptr_map(_vertexBuffers),
+                          _indexBuffer.get(), _effect);
 
       _effect->setFloat("face", static_cast<float>(face));
 
@@ -428,7 +430,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
       engine->clear(scene->clearColor, true, true, true);
 
       // Draw order
-      engine->draw(true, 0, 6);
+      engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
 
       // Mipmaps
       if (face == 5) {
@@ -440,13 +442,14 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
     engine->bindFramebuffer(_texture, 0, 0, 0, true);
 
     // VBOs
-    engine->bindBuffers(vertexBuffersTmp, _indexBuffer.get(), _effect);
+    engine->bindBuffers(stl_util::to_raw_ptr_map(_vertexBuffers),
+                        _indexBuffer.get(), _effect);
 
     // Clear
     engine->clear(scene->clearColor, true, true, true);
 
     // Draw order
-    engine->draw(true, 0, 6);
+    engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
   }
 
   // Unbind
@@ -459,8 +462,8 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
 
 unique_ptr_t<ProceduralTexture> ProceduralTexture::clone() const
 {
-  ISize textureSize = getSize();
-  auto newTexture   = ::std::make_unique<ProceduralTexture>(
+  auto textureSize = getSize();
+  auto newTexture  = ::std::make_unique<ProceduralTexture>(
     name, textureSize.width, _fragment, getScene(), _fallbackTexture,
     _generateMipMaps);
 

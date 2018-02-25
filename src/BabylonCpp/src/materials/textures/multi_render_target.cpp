@@ -6,23 +6,26 @@
 
 namespace BABYLON {
 
-MultiRenderTarget::MultiRenderTarget(const string_t& name, Size size,
-                                     std::size_t count, Scene* scene)
-    : MultiRenderTarget{
-        name, size, count, scene,
-        IMultiRenderTargetOptions{false, {}, {}, true, false, false, true, 0}}
+MultiRenderTarget::MultiRenderTarget(
+  const string_t& name, Size size, std::size_t count, Scene* scene,
+  const Nullable<IMultiRenderTargetOptions>& options)
+    : RenderTargetTexture{name, size, scene,
+                          options && (*options).generateMipMaps ?
+                            *(*options).generateMipMaps :
+                            false,
+                          options && (*options).doNotChangeAspectRatio ?
+                            *(*options).doNotChangeAspectRatio :
+                            true}
 {
-}
-
-MultiRenderTarget::MultiRenderTarget(const string_t& name, Size size,
-                                     std::size_t count, Scene* scene,
-                                     const IMultiRenderTargetOptions& options)
-    : RenderTargetTexture{name, size, scene, options.generateMipMaps,
-                          options.doNotChangeAspectRatio}
-{
-  const auto generateMipMaps        = options.generateMipMaps;
-  const auto generateDepthTexture   = options.generateDepthTexture;
-  const auto doNotChangeAspectRatio = options.doNotChangeAspectRatio;
+  auto generateMipMaps = options && (*options).generateMipMaps ?
+                           *(*options).generateMipMaps :
+                           false;
+  auto generateDepthTexture = options && (*options).generateDepthTexture ?
+                                *(*options).generateDepthTexture :
+                                false;
+  auto doNotChangeAspectRatio = options && (*options).doNotChangeAspectRatio ?
+                                  *(*options).doNotChangeAspectRatio :
+                                  true;
 
   _engine = scene->getEngine();
 
@@ -31,39 +34,48 @@ MultiRenderTarget::MultiRenderTarget(const string_t& name, Size size,
     return;
   }
 
-  vector_t<unsigned int> types;
-  vector_t<unsigned int> samplingModes;
+  Uint32Array types;
+  Uint32Array samplingModes;
 
   for (std::size_t i = 0; i < count; ++i) {
-    if (i < options.types.size()) {
-      types.emplace_back(options.types[i]);
+    if (options && i < (*options).types.size()) {
+      types.emplace_back((*options).types[i]);
     }
     else {
-      types.emplace_back(EngineConstants::TEXTURETYPE_FLOAT);
+      types.emplace_back(options && (*options).defaultType ?
+                           *(*options).defaultType :
+                           EngineConstants::TEXTURETYPE_UNSIGNED_INT);
     }
 
-    if (i < options.samplingModes.size()) {
-      samplingModes.emplace_back(options.samplingModes[i]);
+    if (options && i < (*options).samplingModes.size()) {
+      samplingModes.emplace_back((*options).samplingModes[i]);
     }
     else {
       samplingModes.emplace_back(TextureConstants::BILINEAR_SAMPLINGMODE);
     }
   }
 
-  const auto generateDepthBuffer   = options.generateDepthBuffer;
-  const auto generateStencilBuffer = options.generateStencilBuffer;
+  const auto generateDepthBuffer
+    = !options || (*options).generateDepthBuffer == nullptr ?
+        true :
+        *(*options).generateDepthBuffer;
+  const auto generateStencilBuffer
+    = !options || (*options).generateStencilBuffer == nullptr ?
+        false :
+        *(*options).generateStencilBuffer;
 
   _size = size;
 
   _multiRenderTargetOptions = IMultiRenderTargetOptions{
-    generateMipMaps,        // generateMipMaps
-    types,                  // types
-    samplingModes,          // samplingModes
-    generateDepthBuffer,    // generateDepthBuffer
-    generateStencilBuffer,  // generateStencilBuffer
-    generateDepthTexture,   // generateDepthTexture
-    doNotChangeAspectRatio, // doNotChangeAspectRatio
-    count                   // textureCount
+    generateMipMaps,                          // generateMipMaps
+    types,                                    // types
+    samplingModes,                            // samplingModes
+    generateDepthBuffer,                      // generateDepthBuffer
+    generateStencilBuffer,                    // generateStencilBuffer
+    generateDepthTexture,                     // generateDepthTexture
+    doNotChangeAspectRatio,                   // doNotChangeAspectRatio
+    count,                                    // textureCount
+    EngineConstants::TEXTURETYPE_UNSIGNED_INT // defaultType
   };
 
   _createInternalTextures();
@@ -114,7 +126,7 @@ void MultiRenderTarget::_rebuild()
   _createInternalTextures();
 
   for (std::size_t i = 0; i < _internalTextures.size(); ++i) {
-    auto texture      = _textures[i];
+    auto& texture     = _textures[i];
     texture->_texture = _internalTextures[i];
   }
 
@@ -131,7 +143,7 @@ void MultiRenderTarget::_createInternalTextures()
 void MultiRenderTarget::_createTextures()
 {
   _textures.clear();
-  for (std::size_t i = 0; i < _internalTextures.size(); ++i) {
+  for (size_t i = 0; i < _internalTextures.size(); ++i) {
     auto texture      = Texture::New("", getScene());
     texture->_texture = _internalTextures[i];
     _textures.emplace_back(texture);
@@ -152,10 +164,8 @@ void MultiRenderTarget::setSamples(unsigned int value)
     return;
   }
 
-  for (auto& _webGLTexture : _internalTextures) {
-    _samples
-      = _engine->updateRenderTargetTextureSampleCount(_webGLTexture, value);
-  }
+  _samples = _engine->updateMultipleRenderTargetTextureSampleCount(
+    _internalTextures, value);
 }
 
 void MultiRenderTarget::resize(Size size)
@@ -164,6 +174,16 @@ void MultiRenderTarget::resize(Size size)
   _internalTextures
     = _engine->createMultipleRenderTarget(size, _multiRenderTargetOptions);
   _createInternalTextures();
+}
+
+void MultiRenderTarget::unbindFrameBuffer(Engine* engine,
+                                          unsigned int faceIndex)
+{
+  engine->unBindMultiColorAttachmentFramebuffer(
+    _internalTextures, isCube, [&, faceIndex]() {
+      auto _faceIndex = static_cast<int>(faceIndex);
+      onAfterRenderObservable.notifyObservers(&_faceIndex);
+    });
 }
 
 void MultiRenderTarget::dispose(bool doNotRecurse)

@@ -13,21 +13,22 @@ namespace BABYLON {
 
 ColorGradingTexture::ColorGradingTexture(const string_t& iUrl, Scene* scene)
     : BaseTexture{scene}
-    , _textureMatrix{::std::make_unique<Matrix>(Matrix::Identity())}
 {
   if (iUrl.empty()) {
     return;
   }
 
-  _engine = scene->getEngine();
-  name    = iUrl;
-  url     = iUrl;
+  _engine        = scene->getEngine();
+  _textureMatrix = ::std::make_unique<Matrix>(Matrix::Identity());
+  name           = iUrl;
+  url            = iUrl;
   setHasAlpha(false);
-  isCube                    = false;
-  is3D                      = _engine->webGLVersion() > 1.f;
-  wrapU                     = TextureConstants::CLAMP_ADDRESSMODE;
-  wrapV                     = TextureConstants::CLAMP_ADDRESSMODE;
-  wrapR                     = TextureConstants::CLAMP_ADDRESSMODE;
+  isCube = false;
+  is3D   = _engine->webGLVersion() > 1.f;
+  wrapU  = TextureConstants::CLAMP_ADDRESSMODE;
+  wrapV  = TextureConstants::CLAMP_ADDRESSMODE;
+  wrapR  = TextureConstants::CLAMP_ADDRESSMODE;
+
   anisotropicFilteringLevel = 1;
 
   _texture = _getFromCache(url, true);
@@ -67,7 +68,14 @@ InternalTexture* ColorGradingTexture::load3dlTexture()
 
   _texture = texture;
 
-  auto callback = [&](const string_t& text) {
+  const auto callback = [&](Variant<string_t, ArrayBuffer>& iText) {
+
+    if (!iText.is<string_t>()) {
+      return;
+    }
+
+    auto text = iText.get<string_t>();
+
     Uint8Array data;
     Float32Array tempData;
 
@@ -143,9 +151,9 @@ InternalTexture* ColorGradingTexture::load3dlTexture()
 
     const auto _size = static_cast<int>(size);
     if (_texture->is3D) {
-       _texture->updateSize(_size, _size, _size);
-       _engine->updateRawTexture3D(_texture, data,
-                                 EngineConstants::TEXTUREFORMAT_RGBA, false);
+      _texture->updateSize(_size, _size, _size);
+      _engine->updateRawTexture3D(_texture, data,
+                                  EngineConstants::TEXTUREFORMAT_RGBA, false);
     }
     else {
       _texture->updateSize(_size * _size, _size);
@@ -154,7 +162,14 @@ InternalTexture* ColorGradingTexture::load3dlTexture()
     }
   };
 
-  Tools::LoadFile(url, callback);
+  auto scene = getScene();
+  if (scene) {
+    // scene->_loadFile(url, callback);
+  }
+  else {
+    // _engine->_loadFile(url, callback);
+  }
+
   return _texture;
 }
 

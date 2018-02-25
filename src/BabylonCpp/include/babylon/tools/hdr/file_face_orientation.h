@@ -5,7 +5,6 @@
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
-namespace Internals {
 
 struct BABYLON_SHARED_EXPORT FileFaceOrientation {
 
@@ -28,7 +27,6 @@ struct BABYLON_SHARED_EXPORT FileFaceOrientation {
 
 }; // end of struct FileFaceOrientation
 
-} // end of namespace Internals
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_TOOLS_HDR_FILE_FACE_ORIENTATION_H

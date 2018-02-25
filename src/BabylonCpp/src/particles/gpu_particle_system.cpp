@@ -177,7 +177,7 @@ size_t GPUParticleSystem::render()
   _engine->setRasterizerState(false);
   _engine->beginTransformFeedback();
 
-  _engine->drawArraysType(Material::PointListDrawMode, 0,
+  _engine->drawArraysType(Material::PointListDrawMode(), 0,
                           static_cast<int>(_capacity));
   _engine->endTransformFeedback();
   _engine->setRasterizerState(true);
@@ -190,7 +190,7 @@ size_t GPUParticleSystem::render()
   _engine->bindVertexArrayObject(_targetVAO, nullptr);
 
   // Render
-  _engine->drawArraysType(Material::PointListDrawMode, 0,
+  _engine->drawArraysType(Material::PointListDrawMode(), 0,
                           static_cast<int>(_capacity));
 
   // Switch VAOs

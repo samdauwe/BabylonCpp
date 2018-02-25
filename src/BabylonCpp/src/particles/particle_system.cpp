@@ -581,7 +581,7 @@ size_t ParticleSystem::render()
     engine->setDepthWrite(true);
   }
 
-  engine->drawElementsType(Material::TriangleFillMode, 0,
+  engine->drawElementsType(Material::TriangleFillMode(), 0,
                            static_cast<int>(_particles.size() * 6));
   engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
 

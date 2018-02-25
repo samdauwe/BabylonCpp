@@ -607,7 +607,7 @@ void Effect::_rebuildProgram(
   };
   this->onCompiled = [&](Effect* /*effect*/) {
     for (auto& scene : getEngine()->scenes) {
-      scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+      scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag());
     }
 
     if (onCompiled) {
@@ -881,6 +881,21 @@ void Effect::bindUniformBuffer(GL::IGLBuffer* _buffer, const string_t& name)
 void Effect::bindUniformBlock(const string_t& blockName, unsigned index)
 {
   _engine->bindUniformBlock(_program.get(), blockName, index);
+}
+
+Effect& Effect::setInt(const string_t& uniformName, int value)
+{
+  Float32Array _value{static_cast<float>(value)};
+  if (stl_util::contains(_valueCache, uniformName)
+      && (_valueCache[uniformName] == _value)) {
+    return *this;
+  }
+
+  _valueCache[uniformName] = _value;
+
+  _engine->setInt(getUniform(uniformName), value);
+
+  return *this;
 }
 
 Effect& Effect::setIntArray(const string_t& uniformName,

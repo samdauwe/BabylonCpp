@@ -58,6 +58,7 @@ public:
                     float w);
   void bindUniformBuffer(GL::IGLBuffer* _buffer, const string_t& name);
   void bindUniformBlock(const string_t& blockName, unsigned index);
+  Effect& setInt(const string_t& uniformName, int value);
   Effect& setIntArray(const string_t& uniformName, const Int32Array& array);
   Effect& setIntArray2(const string_t& uniformName, const Int32Array& array);
   Effect& setIntArray3(const string_t& uniformName, const Int32Array& array);

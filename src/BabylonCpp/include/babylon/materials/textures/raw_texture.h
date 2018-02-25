@@ -47,8 +47,6 @@ public:
     unsigned int type         = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
   unsigned int format;
-  unsigned int wrapU;
-  unsigned int wrapV;
   unsigned int type;
 
 private:

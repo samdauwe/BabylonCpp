@@ -7,7 +7,7 @@
 namespace BABYLON {
 
 /**
- * This represents a texture coming from an HDR input.
+ * @brief This represents a texture coming from an HDR input.
  *
  * The only supported format is currently panorama picture stored in RGBE
  * format. Example of such files can be found on HDRLib: http://hdrlib.com/
@@ -16,7 +16,7 @@ class BABYLON_SHARED_EXPORT HDRCubeTexture : public BaseTexture {
 
 public:
   /**
-   * Instantiates an HDRTexture from the following parameters.
+   * @brief Instantiates an HDRTexture from the following parameters.
    *
    * @param url The location of the HDR raw data (Panorama stored in RGBE
    * format)
@@ -25,12 +25,12 @@ public:
    * generation will be) If the size is omitted this implies you are using a
    * preprocessed cubemap.
    * @param noMipmap Forces to not generate the mipmap if true
-   * @param generateHarmonics Specifies wether you want to extract the
+   * @param generateHarmonics Specifies whether you want to extract the
    * polynomial harmonics during the generation process
    * @param useInGammaSpace Specifies if the texture will be use in gamma or
    * linear space (the PBR material requires those texture in linear space, but
    * the standard material would require them in Gamma space)
-   * @param usePMREMGenerator Specifies wether or not to generate the CubeMap
+   * @param usePMREMGenerator Specifies whether or not to generate the CubeMap
    * through CubeMapGen to avoid seams issue at run time.
    */
   HDRCubeTexture(const string_t& url, Scene* scene, size_t size,

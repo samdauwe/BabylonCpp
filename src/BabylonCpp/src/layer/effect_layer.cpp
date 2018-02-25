@@ -400,7 +400,7 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh)
                _emissiveTextureAndColor.texture)) {
     engine->enableEffect(_effectLayerMapGenerationEffect);
     mesh->_bind(subMesh, _effectLayerMapGenerationEffect,
-                Material::TriangleFillMode);
+                Material::TriangleFillMode());
 
     _effectLayerMapGenerationEffect->setMatrix("viewProjection",
                                                scene->getTransformMatrix());
@@ -446,7 +446,7 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh)
 
     // Draw
     mesh->_processRendering(
-      subMesh, _effectLayerMapGenerationEffect, Material::TriangleFillMode,
+      subMesh, _effectLayerMapGenerationEffect, Material::TriangleFillMode(),
       batch, hardwareInstancedRendering,
       [&](bool /*isInstance*/, const Matrix& world,
           Material* /*effectiveMaterial*/) {

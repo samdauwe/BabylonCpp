@@ -291,12 +291,12 @@ void HighlightLayer::_internalRender(Effect* effect)
   if (outerGlow) {
     effect->setFloat("offset", 0);
     engine->setStencilFunction(EngineConstants::NOTEQUAL);
-    engine->drawElementsType(Material::TriangleFillMode, 0, 6);
+    engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
   }
   if (innerGlow) {
     effect->setFloat("offset", 1);
     engine->setStencilFunction(EngineConstants::EQUAL);
-    engine->drawElementsType(Material::TriangleFillMode, 0, 6);
+    engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
   }
 
   // Restore Cache

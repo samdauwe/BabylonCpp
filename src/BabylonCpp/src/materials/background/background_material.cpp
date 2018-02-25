@@ -228,13 +228,13 @@ bool BackgroundMaterial::needAlphaTesting() const
 
 bool BackgroundMaterial::needAlphaBlending() const
 {
-  return ((alpha < 0.f)
+  return ((alpha() < 0.f)
           || (_diffuseTexture != nullptr && _diffuseTexture->hasAlpha()));
 }
 
 bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                            BaseSubMesh* subMesh,
-                                           bool useInstances)
+                                           bool /*useInstances*/)
 {
   if (subMesh->effect() && isFrozen()) {
     if (_wasPreviouslyReady) {
@@ -396,7 +396,8 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     _imageProcessingConfiguration->prepareDefines(defines);
   }
 
-  // Misc.
+    // Misc.
+#if 0
   MaterialHelper::PrepareDefinesForMisc(
     mesh, scene, false, pointsCloud(), fogEnabled(), defines,
     BMD::LOGARITHMICDEPTH, BMD::POINTSIZE, BMD::FOG, BMD::NONUNIFORMSCALING);
@@ -405,6 +406,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   MaterialHelper::PrepareDefinesForFrameBoundValues(
     scene, engine, defines, useInstances, BMD::CLIPPLANE, BMD::ALPHATEST,
     BMD::DEPTHPREPASS, BMD::INSTANCES, false);
+#endif
 
   // Attribs
   if (MaterialHelper::PrepareDefinesForAttributes(
@@ -637,7 +639,7 @@ void BackgroundMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
       if (shadowLevel() > 0) {
         _uniformBuffer->updateFloat("shadowLevel", shadowLevel());
       }
-      _uniformBuffer->updateFloat("alpha", alpha);
+      _uniformBuffer->updateFloat("alpha", alpha());
 
       // Point size
       if (pointsCloud()) {

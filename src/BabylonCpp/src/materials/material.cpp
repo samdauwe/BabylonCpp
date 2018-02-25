@@ -1,5 +1,6 @@
 #include <babylon/materials/material.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
@@ -20,7 +21,7 @@ Material::Material(const string_t& iName, Scene* scene, bool doNotAdd)
     , name{iName}
     , checkReadyOnEveryCall{false}
     , checkReadyOnlyOnce{false}
-    , alpha{1.f}
+
     , doNotSerialize{false}
     , storeEffectOnSubMeshes{false}
     , disableDepthWrite{false}
@@ -30,6 +31,7 @@ Material::Material(const string_t& iName, Scene* scene, bool doNotAdd)
     , zOffset{0.f}
     , _effect{nullptr}
     , _wasPreviouslyReady{false}
+    , _alpha{1.f}
     , _backFaceCulling{true}
     , _uniformBuffer{::std::make_unique<UniformBuffer>(scene->getEngine())}
     , _onDisposeObserver{nullptr}
@@ -39,13 +41,13 @@ Material::Material(const string_t& iName, Scene* scene, bool doNotAdd)
     , _fogEnabled{true}
     , _useUBO{false}
     , _scene{scene ? scene : Engine::LastCreatedScene()}
-    , _fillMode{Material::TriangleFillMode}
+    , _fillMode{Material::TriangleFillMode()}
 {
   if (_scene->useRightHandedSystem()) {
-    sideOrientation = Material::ClockWiseSideOrientation;
+    sideOrientation = Material::ClockWiseSideOrientation();
   }
   else {
-    sideOrientation = Material::CounterClockWiseSideOrientation;
+    sideOrientation = Material::CounterClockWiseSideOrientation();
   }
 
   _useUBO = getScene()->getEngine()->supportsUniformBuffers();
@@ -59,9 +61,32 @@ Material::~Material()
 {
 }
 
-const char* Material::getClassName() const
+void Material::setAlpha(float value)
 {
-  return "Material";
+  if (stl_util::almost_equal(_alpha, value)) {
+    return;
+  }
+  _alpha = value;
+  markAsDirty(Material::MiscDirtyFlag());
+}
+
+float Material::alpha() const
+{
+  return _alpha;
+}
+
+void Material::setBackFaceCulling(bool value)
+{
+  if (_backFaceCulling == value) {
+    return;
+  }
+  _backFaceCulling = value;
+  markAsDirty(Material::TextureDirtyFlag());
+}
+
+bool Material::backFaceCulling() const
+{
+  return _backFaceCulling;
 }
 
 IReflect::Type Material::type() const
@@ -80,20 +105,6 @@ void Material::addMultiMaterialToScene(
   _scene->multiMaterials.emplace_back(::std::move(newMultiMaterial));
 }
 
-bool Material::backFaceCulling() const
-{
-  return _backFaceCulling;
-}
-
-void Material::setBackFaceCulling(bool value)
-{
-  if (_backFaceCulling == value) {
-    return;
-  }
-  _backFaceCulling = value;
-  markAsDirty(Material::TextureDirtyFlag);
-}
-
 unsigned int Material::alphaMode() const
 {
   return _alphaMode;
@@ -105,7 +116,7 @@ void Material::setAlphaMode(unsigned int value)
     return;
   }
   _alphaMode = value;
-  markAsDirty(Material::TextureDirtyFlag);
+  markAsDirty(Material::TextureDirtyFlag());
 }
 
 bool Material::needDepthPrePass() const
@@ -135,7 +146,7 @@ void Material::setFogEnabled(bool value)
     return;
   }
   _fogEnabled = value;
-  markAsDirty(Material::MiscDirtyFlag);
+  markAsDirty(Material::MiscDirtyFlag());
 }
 
 bool Material::useLogarithmicDepth() const
@@ -189,23 +200,24 @@ void Material::setOnBind(
 
 bool Material::wireframe() const
 {
-  return _fillMode == Material::WireFrameFillMode;
+  return _fillMode == Material::WireFrameFillMode();
 }
 
 void Material::setWireframe(bool value)
 {
   _fillMode
-    = (value ? Material::WireFrameFillMode : Material::TriangleFillMode);
+    = (value ? Material::WireFrameFillMode() : Material::TriangleFillMode());
 }
 
 bool Material::pointsCloud() const
 {
-  return _fillMode == Material::PointFillMode;
+  return _fillMode == Material::PointFillMode();
 }
 
 void Material::setPointsCloud(bool value)
 {
-  _fillMode = (value ? Material::PointFillMode : Material::TriangleFillMode);
+  _fillMode
+    = (value ? Material::PointFillMode() : Material::TriangleFillMode());
 }
 
 unsigned int Material::fillMode() const
@@ -220,7 +232,7 @@ void Material::setFillMode(unsigned int value)
   }
 
   _fillMode = value;
-  markAsDirty(Material::MiscDirtyFlag);
+  markAsDirty(Material::MiscDirtyFlag());
 }
 
 string_t Material::toString(bool fullDetails) const
@@ -230,6 +242,11 @@ string_t Material::toString(bool fullDetails) const
   if (fullDetails) {
   }
   return oss.str();
+}
+
+const char* Material::getClassName() const
+{
+  return "Material";
 }
 
 bool Material::isFrozen() const
@@ -271,7 +288,7 @@ Scene* Material::getScene() const
 
 bool Material::needAlphaBlending() const
 {
-  return (alpha < 1.f);
+  return (_alpha < 1.f);
 }
 
 bool Material::needAlphaBlendingForMesh(AbstractMesh* mesh) const
@@ -310,7 +327,7 @@ bool Material::_preBind(Effect* effect,
   auto orientation = (overrideOrientation.isNull()) ?
                        static_cast<unsigned>(sideOrientation) :
                        *overrideOrientation;
-  const bool reverse = orientation == Material::ClockWiseSideOrientation;
+  const bool reverse = orientation == Material::ClockWiseSideOrientation();
 
   engine->enableEffect(effect ? effect : _effect);
   engine->setState(backFaceCulling(), zOffset, false, reverse);
@@ -475,23 +492,23 @@ void Material::forceCompilation(
 
 void Material::markAsDirty(unsigned int flag)
 {
-  if (flag & Material::TextureDirtyFlag) {
+  if (flag & Material::TextureDirtyFlag()) {
     _markAllSubMeshesAsTexturesDirty();
   }
 
-  if (flag & Material::LightDirtyFlag) {
+  if (flag & Material::LightDirtyFlag()) {
     _markAllSubMeshesAsLightsDirty();
   }
 
-  if (flag & Material::FresnelDirtyFlag) {
+  if (flag & Material::FresnelDirtyFlag()) {
     _markAllSubMeshesAsFresnelDirty();
   }
 
-  if (flag & Material::AttributesDirtyFlag) {
+  if (flag & Material::AttributesDirtyFlag()) {
     _markAllSubMeshesAsAttributesDirty();
   }
 
-  if (flag & Material::MiscDirtyFlag) {
+  if (flag & Material::MiscDirtyFlag()) {
     _markAllSubMeshesAsMiscDirty();
   }
 
@@ -521,32 +538,54 @@ void Material::_markAllSubMeshesAsDirty(
 
 void Material::_markAllSubMeshesAsImageProcessingDirty()
 {
-  // _markAllSubMeshesAsDirty(defines => defines.markAsImageProcessingDirty());
+  _markAllSubMeshesAsDirty(
+    [](MaterialDefines& defines) { defines.markAsImageProcessingDirty(); });
 }
 
 void Material::_markAllSubMeshesAsTexturesDirty()
 {
-  // _markAllSubMeshesAsDirty(defines => defines.markAsTexturesDirty());
+  _markAllSubMeshesAsDirty(
+    [](MaterialDefines& defines) { defines.markAsTexturesDirty(); });
 }
 
 void Material::_markAllSubMeshesAsFresnelDirty()
 {
-  // _markAllSubMeshesAsDirty(defines => defines.markAsFresnelDirty());
+  _markAllSubMeshesAsDirty(
+    [](MaterialDefines& defines) { defines.markAsFresnelDirty(); });
+}
+
+void Material::_markAllSubMeshesAsFresnelAndMiscDirty()
+{
+  _markAllSubMeshesAsDirty([](MaterialDefines& defines) {
+    defines.markAsFresnelDirty();
+    defines.markAsMiscDirty();
+  });
 }
 
 void Material::_markAllSubMeshesAsLightsDirty()
 {
-  // _markAllSubMeshesAsDirty(defines => defines.markAsLightDirty());
+  _markAllSubMeshesAsDirty(
+    [](MaterialDefines& defines) { defines.markAsLightDirty(); });
 }
 
 void Material::_markAllSubMeshesAsAttributesDirty()
 {
-  // _markAllSubMeshesAsDirty(defines => defines.markAsAttributesDirty());
+  _markAllSubMeshesAsDirty(
+    [](MaterialDefines& defines) { defines.markAsAttributesDirty(); });
 }
 
 void Material::_markAllSubMeshesAsMiscDirty()
 {
-  // _markAllSubMeshesAsDirty(defines => defines.markAsMiscDirty());
+  _markAllSubMeshesAsDirty(
+    [](MaterialDefines& defines) { defines.markAsMiscDirty(); });
+}
+
+void Material::_markAllSubMeshesAsTexturesAndMiscDirty()
+{
+  _markAllSubMeshesAsDirty([](MaterialDefines& defines) {
+    defines.markAsTexturesDirty();
+    defines.markAsMiscDirty();
+  });
 }
 
 void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)
@@ -610,7 +649,7 @@ void Material::copyTo(Material* other) const
 {
   other->checkReadyOnlyOnce    = checkReadyOnlyOnce;
   other->checkReadyOnEveryCall = checkReadyOnEveryCall;
-  other->alpha                 = alpha;
+  other->setAlpha(_alpha);
   other->setFillMode(fillMode());
   other->setBackFaceCulling(backFaceCulling());
   other->setWireframe(wireframe());

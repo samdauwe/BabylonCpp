@@ -810,14 +810,14 @@ void Mesh::_bind(SubMesh* subMesh, Effect* effect, unsigned int fillMode)
   }
   else {
     switch (fillMode) {
-      case Material::PointFillMode:
+      case Material::PointFillMode():
         indexToBind = nullptr;
         break;
-      case Material::WireFrameFillMode:
+      case Material::WireFrameFillMode():
         indexToBind = subMesh->getLinesIndexBuffer(getIndices(), engine);
         break;
       default:
-      case Material::TriangleFillMode:
+      case Material::TriangleFillMode():
         indexToBind = _unIndexed ? nullptr : _geometry->getIndexBuffer();
         break;
     }
@@ -845,11 +845,11 @@ void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount,
 
   // Draw order
   switch (fillMode) {
-    case Material::PointFillMode:
+    case Material::PointFillMode():
       engine->drawPointClouds(subMeshVerticesStart, subMeshVerticesCount,
                               _instancesCount);
       break;
-    case Material::WireFrameFillMode:
+    case Material::WireFrameFillMode():
       if (_unIndexed) {
         engine->drawUnIndexed(false, subMeshVerticesStart, subMeshVerticesCount,
                               _instancesCount);
@@ -1167,8 +1167,8 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
 
   // Bind
   auto fillMode = scene->forcePointsCloud() ?
-                    Material::PointFillMode :
-                    (scene->forceWireframe ? Material::WireFrameFillMode :
+                    Material::PointFillMode() :
+                    (scene->forceWireframe ? Material::WireFrameFillMode() :
                                              _effectiveMaterial->fillMode());
 
   // Binding will be done later because we need to add more info to the VB

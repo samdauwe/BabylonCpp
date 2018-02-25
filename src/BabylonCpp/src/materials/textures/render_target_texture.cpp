@@ -4,6 +4,7 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/materials/material.h>
 #include <babylon/math/matrix.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
@@ -21,7 +22,6 @@ RenderTargetTexture::RenderTargetTexture(
   bool doNotChangeAspectRatio, unsigned int type, bool iIsCube,
   unsigned int samplingMode, bool generateDepthBuffer,
   bool generateStencilBuffer, bool isMulti)
-
     : Texture{"", scene, !generateMipMaps}
     , renderParticles{true}
     , renderSprites{false}
@@ -29,6 +29,7 @@ RenderTargetTexture::RenderTargetTexture(
     , activeCamera{nullptr}
     , ignoreCameraViewport{false}
     , _generateMipMaps{generateMipMaps ? true : false}
+    , boundingBoxPosition{Vector3::Zero()}
     , _sizeRatio{0.f}
     , _doNotChangeAspectRatio{doNotChangeAspectRatio}
     , _currentRefreshId{-1}
@@ -40,6 +41,7 @@ RenderTargetTexture::RenderTargetTexture(
     , _onBeforeRenderObserver{nullptr}
     , _onAfterRenderObserver{nullptr}
     , _onClearObserver{nullptr}
+    , _boundingBoxSize{nullptr}
 {
   if (!scene) {
     return;
@@ -95,6 +97,23 @@ void RenderTargetTexture::_onRatioRescale()
   if (_sizeRatio != 0.f) {
     resize(_initialSizeParameter);
   }
+}
+
+void RenderTargetTexture::setBoundingBoxSize(const Vector3& value)
+{
+  if (_boundingBoxSize && _boundingBoxSize->equals(value)) {
+    return;
+  }
+  _boundingBoxSize = ::std::make_unique<Vector3>(value);
+  auto scene       = getScene();
+  if (scene) {
+    scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag());
+  }
+}
+
+Vector3* RenderTargetTexture::boundingBoxSize() const
+{
+  return _boundingBoxSize ? _boundingBoxSize.get() : nullptr;
 }
 
 void RenderTargetTexture::setOnAfterUnbind(
@@ -414,7 +433,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
         mesh->_activate(scene->getRenderId());
         for (auto& subMesh : mesh->subMeshes) {
           scene->_activeIndices.addCount(subMesh->indexCount, false);
-          _renderingManager->dispatch(subMesh.get());
+          _renderingManager->dispatch(subMesh.get(), mesh);
         }
       }
     }
@@ -469,6 +488,18 @@ int RenderTargetTexture::_bestReflectionRenderTargetDimension(
 
   // Ensure we don't exceed the render dimension (while staying POT)
   return ::std::min(Tools::FloorPOT(renderDimension), curved);
+}
+
+void RenderTargetTexture::unbindFrameBuffer(Engine* engine,
+                                            unsigned int faceIndex)
+{
+  if (!_texture) {
+    return;
+  }
+  engine->unBindFramebuffer(_texture, isCube, [&, faceIndex]() {
+    auto _faceIndex = static_cast<int>(faceIndex);
+    onAfterRenderObservable.notifyObservers(&_faceIndex);
+  });
 }
 
 void RenderTargetTexture::renderToTarget(
@@ -546,9 +577,7 @@ void RenderTargetTexture::renderToTarget(
       }
     }
 
-    engine->unBindFramebuffer(_texture, isCube, [this]() {
-      onAfterRenderObservable.notifyObservers(&_faceIndex);
-    });
+    unbindFrameBuffer(engine, faceIndex);
   }
   else {
     onAfterRenderObservable.notifyObservers(&_faceIndex);
@@ -586,7 +615,7 @@ unique_ptr_t<RenderTargetTexture> RenderTargetTexture::clone() const
     _renderTargetOptions.samplingMode,         //
     _renderTargetOptions.generateDepthBuffer,  //
     _renderTargetOptions.generateStencilBuffer //
-    );
+  );
 
   // Base texture
   newTexture->setHasAlpha(hasAlpha());
@@ -649,8 +678,8 @@ void RenderTargetTexture::dispose(bool doNotRecurse)
 
 void RenderTargetTexture::_rebuild()
 {
-  if (refreshRate() == RenderTargetTexture::REFRESHRATE_RENDER_ONCE) {
-    setRefreshRate(RenderTargetTexture::REFRESHRATE_RENDER_ONCE);
+  if (refreshRate() == RenderTargetTexture::REFRESHRATE_RENDER_ONCE()) {
+    setRefreshRate(RenderTargetTexture::REFRESHRATE_RENDER_ONCE());
   }
 
   if (_postProcessManager) {
