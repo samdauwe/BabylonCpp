@@ -828,7 +828,7 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   // Matrices
   bindOnlyWorldMatrix(*world);
 
-  const auto mustRebind = _mustRebind(scene, effect, mesh->visibility);
+  const auto mustRebind = _mustRebind(scene, effect, mesh->visibility());
 
   // Bones
   MaterialHelper::BindBonesParameters(mesh, effect);
@@ -1016,7 +1016,7 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
       _uniformBuffer->updateColor3("vEmissiveColor", emissiveColor, "");
       // Diffuse
       _uniformBuffer->updateColor4("vDiffuseColor", diffuseColor,
-                                   alpha() * mesh->visibility, "");
+                                   alpha() * mesh->visibility(), "");
     }
 
     // Textures

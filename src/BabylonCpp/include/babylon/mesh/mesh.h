@@ -16,50 +16,78 @@ class BABYLON_SHARED_EXPORT Mesh : public AbstractMesh {
 
   friend class MeshBuilder;
 
+private:
+  // Consts
+  static constexpr unsigned int _FRONTSIDE   = 0;
+  static constexpr unsigned int _BACKSIDE    = 1;
+  static constexpr unsigned int _DOUBLESIDE  = 2;
+  static constexpr unsigned int _DEFAULTSIDE = 0;
+  static constexpr unsigned int _NO_CAP      = 0;
+  static constexpr unsigned int _CAP_START   = 1;
+  static constexpr unsigned int _CAP_END     = 2;
+  static constexpr unsigned int _CAP_ALL     = 3;
+
 public:
   /** Consts **/
 
   /**
-   * Mesh side orientation : usually the external or front surface
+   * @brief Mesh side orientation : usually the external or front surface
    */
-  static constexpr unsigned int FRONTSIDE = 0;
-
+  static constexpr unsigned int FRONTSIDE()
+  {
+    return Mesh::_FRONTSIDE;
+  }
   /**
-   * Mesh side orientation : usually the internal or back surface
+   * @brief Mesh side orientation : usually the internal or back surface
    */
-  static constexpr unsigned int BACKSIDE = 1;
-
+  static constexpr unsigned int BACKSIDE()
+  {
+    return Mesh::_BACKSIDE;
+  }
   /**
-   * Mesh side orientation : both internal and external or front and back
+   * @brief Mesh side orientation : both internal and external or front and back
    * surfaces
    */
-  static constexpr unsigned int DOUBLESIDE = 2;
-
+  static constexpr unsigned int DOUBLESIDE()
+  {
+    return Mesh::_DOUBLESIDE;
+  }
   /**
-   * Mesh side orientation : by default, `FRONTSIDE`
+   * @brief Mesh side orientation : by default, `FRONTSIDE`
    */
-  static constexpr unsigned int DEFAULTSIDE = 0;
-
+  static constexpr unsigned int DEFAULTSIDE()
+  {
+    return Mesh::_DEFAULTSIDE;
+  }
   /**
-   * Mesh cap setting : no cap
+   * @brief Mesh cap setting : no cap
    */
-  static constexpr unsigned int NO_CAP = 0;
-
+  static constexpr unsigned int NO_CAP()
+  {
+    return Mesh::_NO_CAP;
+  }
   /**
-   * Mesh cap setting : one cap at the beginning of the mesh
+   * @brief Mesh cap setting : one cap at the beginning of the mesh
    */
-  static constexpr unsigned int CAP_START = 1;
-
+  static constexpr unsigned int CAP_START()
+  {
+    return Mesh::_CAP_START;
+  }
   /**
-   * Mesh cap setting : one cap at the end of the mesh
+   * @brief Mesh cap setting : one cap at the end of the mesh
    */
-  static constexpr unsigned int CAP_END = 2;
-
+  static constexpr unsigned int CAP_END()
+  {
+    return Mesh::_CAP_END;
+  }
   /**
-   * Mesh cap setting : two caps, one at the beginning  and one at the end of
-   * the mesh
+   * @brief Mesh cap setting : two caps, one at the beginning  and one at the
+   * end of the mesh
    */
-  static constexpr unsigned int CAP_ALL = 3;
+  static constexpr unsigned int CAP_ALL()
+  {
+    return Mesh::_CAP_ALL;
+  }
 
   /** Events **/
 
@@ -86,12 +114,15 @@ public:
 
     return mesh;
   }
-  ~Mesh();
+  ~Mesh() override;
 
   MorphTargetManager* morphTargetManager();
   void setMorphTargetManager(MorphTargetManager* value);
 
   Mesh* source();
+
+  bool isUnIndexed() const;
+  void setIsUnIndexed(bool value);
 
   /**
    * @brief Returns the string "Mesh".
@@ -117,6 +148,13 @@ public:
    * @brief Returns if the mesh has some Levels Of Details (LOD).
    */
   bool hasLODLevels() const;
+
+  /**
+   * @brief Gets the list of {BABYLON.MeshLODLevel} associated with the current
+   * mesh
+   * @returns an array of {BABYLON.MeshLODLevel}
+   */
+  vector_t<MeshLODLevel*> getLODLevels();
 
   /**
    * @brief Add a mesh as LOD level triggered at the given distance.
@@ -287,10 +325,13 @@ public:
   bool isBlocked() const;
 
   /**
-   * @brief Returns true once the mesh is ready after all the delayed process
-   * (loading, etc) are complete.
+   * @brief Determine if the current mesh is ready to be rendered.
+   * @param forceInstanceSupport will check if the mesh will be ready when used
+   * with instances (false by default)
+   * @returns true if all associated assets are ready (material, textures,
+   * shaders)
    */
-  bool isReady() const;
+  bool isReady(bool forceInstanceSupport = false);
 
   /**
    * @brief Returns true if the normals aren't to be recomputed on next mesh
@@ -555,15 +596,12 @@ public:
   vector_t<IAnimatable*> getAnimatables();
 
   /**
-   * @brief Modifies the mesh geometry according to the passed transformation
-   * matrix.
-   * This method returns nothing but it really modifies the mesh even if it's
-   * originally not set as updatable.
-   * The mesh normals are modified accordingly the same transformation.
-   * tuto :
-   * http://doc.babylonjs.com/tutorials/How_Rotations_and_Translations_Work#baking-transform
+   * @brief Modifies the mesh geometry according to its own current World
+   * Matrix. The mesh World Matrix is then reset. This method returns nothing
+   * but really modifies the mesh even if it's originally not set as updatable.
+   * tuto : tuto : http://doc.babylonjs.com/resources/baking_transformations
    * Note that, under the hood, this method sets a new VertexBuffer each call.
-   * @returns the Mesh.
+   * Returns the Mesh.
    */
   Mesh& bakeTransformIntoVertices(const Matrix& transform);
 
@@ -791,7 +829,7 @@ public:
                             bool closeArray = false, bool closePath = false,
                             int offset = -1, Scene* = nullptr,
                             bool updatable               = false,
-                            unsigned int sideOrientation = Mesh::DEFAULTSIDE,
+                            unsigned int sideOrientation = Mesh::DEFAULTSIDE(),
                             Mesh* ribbonInstance         = nullptr);
 
   /**
@@ -814,7 +852,7 @@ public:
   static Mesh* CreateDisc(const string_t& name, float radius = 0.5f,
                           unsigned int tessellation = 64, Scene* = nullptr,
                           bool updatable               = false,
-                          unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+                          unsigned int sideOrientation = Mesh::DEFAULTSIDE());
 
   /**
    * @brief Creates a box mesh.
@@ -831,7 +869,7 @@ public:
    */
   static Mesh* CreateBox(const string_t& name, float size = 1.f,
                          Scene* = nullptr, bool updatable = false,
-                         unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+                         unsigned int sideOrientation = Mesh::DEFAULTSIDE());
 
   /**
    * @brief Creates a sphere mesh.
@@ -852,7 +890,7 @@ public:
   static Mesh* CreateSphere(const string_t& name, unsigned int segments = 32,
                             float diameter = 1.f, Scene* = nullptr,
                             bool updatable               = false,
-                            unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+                            unsigned int sideOrientation = Mesh::DEFAULTSIDE());
 
   /**
    * @brief Creates a cylinder or a cone mesh.
@@ -877,13 +915,12 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateCylinder(const string_t& name, float height = 2.f,
-                              float diameterTop         = 1.f,
-                              float diameterBottom      = 1.f,
-                              unsigned int tessellation = 24,
-                              unsigned int subdivisions = 1, Scene* = nullptr,
-                              bool updatable               = false,
-                              unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+  static Mesh*
+  CreateCylinder(const string_t& name, float height = 2.f,
+                 float diameterTop = 1.f, float diameterBottom = 1.f,
+                 unsigned int tessellation = 24, unsigned int subdivisions = 1,
+                 Scene* = nullptr, bool updatable = false,
+                 unsigned int sideOrientation = Mesh::DEFAULTSIDE());
 
   // Torus  (Code from SharpDX.org)
   /**
@@ -908,7 +945,7 @@ public:
                            float thickness           = 0.5f,
                            unsigned int tessellation = 16, Scene* = nullptr,
                            bool updatable               = false,
-                           unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+                           unsigned int sideOrientation = Mesh::DEFAULTSIDE());
 
   /**
    * @brief Creates a torus knot mesh.
@@ -935,7 +972,7 @@ public:
                   unsigned int radialSegments  = 32,
                   unsigned int tubularSegments = 32, float p = 2.f,
                   float q = 3.f, Scene* = nullptr, bool updatable = false,
-                  unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+                  unsigned int sideOrientation = Mesh::DEFAULTSIDE());
 
   /**
    * @brief Creates a line mesh.
@@ -1007,22 +1044,20 @@ public:
    * Remember you can only change the shape positions, not their number when
    * updating a polygon.
    */
-  static Mesh* CreatePolygon(const string_t& name,
-                             const vector_t<Vector3>& shape, Scene* scene,
-                             const vector_t<vector_t<Vector3>>& holes,
-                             bool updatable               = false,
-                             unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+  static Mesh*
+  CreatePolygon(const string_t& name, const vector_t<Vector3>& shape,
+                Scene* scene, const vector_t<vector_t<Vector3>>& holes,
+                bool updatable               = false,
+                unsigned int sideOrientation = Mesh::DEFAULTSIDE());
 
   /**
    * Creates an extruded polygon mesh, with depth in the Y direction.
    * Please consider using the same method from the MeshBuilder class instead.
    */
-  static Mesh* ExtrudePolygon(const string_t& name,
-                              const vector_t<Vector3>& shape, float depth,
-                              Scene* scene,
-                              const vector_t<vector_t<Vector3>>& holes,
-                              bool updatable               = false,
-                              unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+  static Mesh* ExtrudePolygon(
+    const string_t& name, const vector_t<Vector3>& shape, float depth,
+    Scene* scene, const vector_t<vector_t<Vector3>>& holes,
+    bool updatable = false, unsigned int sideOrientation = Mesh::DEFAULTSIDE());
 
   /**
    * @brief Creates an extruded shape mesh.
@@ -1066,7 +1101,7 @@ public:
                             const vector_t<Vector3>& path, float scale,
                             float rotation, unsigned int cap, Scene*,
                             bool updatable               = false,
-                            unsigned int sideOrientation = Mesh::DEFAULTSIDE,
+                            unsigned int sideOrientation = Mesh::DEFAULTSIDE(),
                             Mesh* instance               = nullptr);
 
   /**
@@ -1135,7 +1170,7 @@ public:
     const ::std::function<float(float i, float distance)>& scaleFunction,
     const ::std::function<float(float i, float distance)>& rotationFunction,
     bool ribbonCloseArray, bool ribbonClosePath, unsigned int cap, Scene*,
-    bool updatable = false, unsigned int sideOrientation = Mesh::DEFAULTSIDE,
+    bool updatable = false, unsigned int sideOrientation = Mesh::DEFAULTSIDE(),
     Mesh* instance = nullptr);
 
   /**
@@ -1165,7 +1200,7 @@ public:
   static Mesh* CreateLathe(const string_t& name, const vector_t<Vector3>& shape,
                            float radius, unsigned int tessellation,
                            Scene* = nullptr, bool updatable = false,
-                           unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+                           unsigned int sideOrientation = Mesh::DEFAULTSIDE());
 
   /**
    * @brief Creates a plane mesh.
@@ -1183,7 +1218,7 @@ public:
    */
   static Mesh* CreatePlane(const string_t& name, float size, Scene* = nullptr,
                            bool updatable               = false,
-                           unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+                           unsigned int sideOrientation = Mesh::DEFAULTSIDE());
 
   /**
    * @brief Creates a ground mesh.
@@ -1301,8 +1336,9 @@ public:
     unsigned int tessellation = 64,
     const ::std::function<float(unsigned int i, float distance)>& radiusFunction
     = nullptr,
-    unsigned int cap = Mesh::NO_CAP, Scene* = nullptr, bool updatable = false,
-    unsigned int sideOrientation = Mesh::DEFAULTSIDE, Mesh* instance = nullptr);
+    unsigned int cap = Mesh::NO_CAP(), Scene* = nullptr, bool updatable = false,
+    unsigned int sideOrientation = Mesh::DEFAULTSIDE(),
+    Mesh* instance               = nullptr);
 
   /**
    * @brief Creates a polyhedron mesh.
@@ -1467,7 +1503,7 @@ private:
   Float32Array _getPositionData(bool applySkeleton);
   Mesh& _onBeforeDraw(bool isInstance, Matrix& world,
                       Material* effectiveMaterial);
-  Mesh& _queueLoad(Mesh* mesh, Scene* scene);
+  Mesh& _queueLoad(Scene* scene);
 
 public:
   int delayLoadState;

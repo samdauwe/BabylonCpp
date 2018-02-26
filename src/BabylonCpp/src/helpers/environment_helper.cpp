@@ -302,7 +302,7 @@ void EnvironmentHelper::_setupSkybox(const ISceneSize& sceneSize)
 {
   if (!_skybox) {
     _skybox = Mesh::CreateBox("BackgroundSkybox", sceneSize.skyboxSize, _scene,
-                              false, Mesh::BACKSIDE);
+                              false, Mesh::BACKSIDE());
     _skybox->onDisposeObservable.add(
       [this](Node* /*node*/, EventState& /*es*/) { _skybox = nullptr; });
   }

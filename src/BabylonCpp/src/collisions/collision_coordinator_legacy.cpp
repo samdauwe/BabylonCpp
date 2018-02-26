@@ -27,8 +27,8 @@ void CollisionCoordinatorLegacy::getNewPosition(
                              AbstractMesh* AbstractMesh)>& onNewPosition,
   unsigned int collisionIndex)
 {
-  position.divideToRef(collider->radius, _scaledPosition);
-  displacement.divideToRef(collider->radius, _scaledVelocity);
+  position.divideToRef(collider->_radius, _scaledPosition);
+  displacement.divideToRef(collider->_radius, _scaledVelocity);
   collider->collidedMesh    = nullptr;
   collider->retry           = 0;
   collider->initialVelocity = _scaledVelocity;
@@ -36,7 +36,7 @@ void CollisionCoordinatorLegacy::getNewPosition(
   _collideWithWorld(_scaledPosition, _scaledVelocity, collider, maximumRetry,
                     _finalPosition, excludedMesh);
 
-  _finalPosition.multiplyInPlace(collider->radius);
+  _finalPosition.multiplyInPlace(collider->_radius);
   // run the callback
   onNewPosition(collisionIndex, _finalPosition, collider->collidedMesh);
 }

@@ -41,7 +41,7 @@ public:
 
   static Vector3 _lookAtVectorCache;
 
-  ~AbstractMesh();
+  ~AbstractMesh() override;
 
   virtual IReflect::Type type() const override;
   void addToScene(unique_ptr_t<AbstractMesh>&& newMesh);
@@ -147,6 +147,16 @@ public:
    */
   bool isOcclusionQueryInProgress() const;
 
+  /**
+   * @brief Gets or sets mesh visibility between 0 and 1 (defult is 1).
+   */
+  float visibility() const;
+
+  /**
+   * @brief Gets or sets mesh visibility between 0 and 1 (defult is 1).
+   */
+  void setVisibility(float value);
+
   // Collisions
   int collisionMask() const;
   void setCollisionMask(int mask);
@@ -154,7 +164,7 @@ public:
   void setCollisionGroup(int mask);
 
   /**
-   * Returns the string "AbstractMesh"
+   * @brief Returns the string "AbstractMesh"
    */
   const char* getClassName() const override;
 
@@ -517,6 +527,11 @@ public:
    */
   void setCheckCollisions(bool collisionEnabled);
 
+  /**
+   * @brief Gets Collider object used to compute collisions (not physics)
+   */
+  Collider* collider() const;
+
   AbstractMesh& moveWithCollisions(Vector3& displacement);
 
   /** Submeshes octree **/
@@ -724,6 +739,11 @@ protected:
    */
   AbstractMesh(const string_t& name, Scene* scene);
 
+  /**
+   * @brief Returns the latest update of the World matrix determinant.
+   */
+  float _getWorldMatrixDeterminant() const override;
+
   void checkOcclusionQuery();
 
 private:
@@ -798,7 +818,6 @@ public:
    */
   int occlusionRetryCount;
 
-  float visibility;
   int alphaIndex;
   bool isVisible;
   bool isPickable;
@@ -896,6 +915,7 @@ private:
   int _occlusionInternalRetryCounter;
   bool _isOcclusionQueryInProgress;
   unique_ptr_t<GL::IGLQuery> _occlusionQuery;
+  float _visibility;
   Material* _material;
   bool _receiveShadows;
   bool _hasVertexAlpha;

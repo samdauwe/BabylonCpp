@@ -71,7 +71,7 @@ SerializedMesh CollisionCoordinatorWorker::SerializeMesh(AbstractMesh* mesh)
   auto boundingInfo = mesh->getBoundingInfo();
 
   SerializedMesh sm;
-  sm.uniqueId             = mesh->uniqueId;
+  sm.uniqueId             = static_cast<unsigned>(mesh->uniqueId);
   sm.id                   = mesh->id;
   sm.name                 = mesh->name;
   sm.geometryId           = geometryId;
@@ -111,8 +111,8 @@ void CollisionCoordinatorWorker::getNewPosition(
     return;
   }
 
-  position.divideToRef(collider->radius, _scaledPosition);
-  displacement.divideToRef(collider->radius, _scaledVelocity);
+  position.divideToRef(collider->_radius, _scaledPosition);
+  displacement.divideToRef(collider->_radius, _scaledVelocity);
 
   if (collisionIndex >= _collisionsCallbackArray.size()) {
     _collisionsCallbackArray.resize(collisionIndex + 1);
@@ -123,7 +123,7 @@ void CollisionCoordinatorWorker::getNewPosition(
   SerializedColliderToWorker _collider;
   _collider.position = _scaledPosition.asArray();
   _collider.velocity = _scaledVelocity.asArray();
-  _collider.radius   = collider->radius.asArray();
+  _collider.radius   = collider->_radius.asArray();
 
   CollidePayload payload;
   payload.collisionId  = collisionIndex;
@@ -169,7 +169,7 @@ void CollisionCoordinatorWorker::onMeshAdded(AbstractMesh* mesh)
 
 void CollisionCoordinatorWorker::onMeshUpdated(TransformNode* transformNode)
 {
-  _addUpdateMeshesList[transformNode->uniqueId]
+  _addUpdateMeshesList[static_cast<unsigned>(transformNode->uniqueId)]
     = CollisionCoordinatorWorker::SerializeMesh(
       static_cast<AbstractMesh*>(transformNode));
 }
@@ -181,8 +181,10 @@ void CollisionCoordinatorWorker::onMeshRemoved(AbstractMesh* mesh)
 
 void CollisionCoordinatorWorker::onGeometryAdded(Geometry* geometry)
 {
-  geometry->onGeometryUpdated = [this](
-    Geometry* geometry, unsigned int /*kind*/) { onGeometryUpdated(geometry); };
+  geometry->onGeometryUpdated
+    = [this](Geometry* geometry, unsigned int /*kind*/) {
+        onGeometryUpdated(geometry);
+      };
   onGeometryUpdated(geometry);
 }
 

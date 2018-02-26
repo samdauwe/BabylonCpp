@@ -102,7 +102,11 @@ Material* SubMesh::getMaterial()
 {
   auto rootMaterial = _renderingMesh->getMaterial();
 
-  if (rootMaterial && (rootMaterial->type() == IReflect::Type::MULTIMATERIAL)) {
+  if (!rootMaterial) {
+    return _mesh->getScene()->defaultMaterial();
+  }
+  else if (rootMaterial
+           && (rootMaterial->type() == IReflect::Type::MULTIMATERIAL)) {
     auto multiMaterial     = static_cast<MultiMaterial*>(rootMaterial);
     auto effectiveMaterial = multiMaterial->getSubMaterial(materialIndex);
     if (_currentMaterial != effectiveMaterial) {
@@ -111,10 +115,6 @@ Material* SubMesh::getMaterial()
     }
 
     return effectiveMaterial;
-  }
-
-  if (!rootMaterial) {
-    return _mesh->getScene()->defaultMaterial();
   }
 
   return rootMaterial;
@@ -214,10 +214,9 @@ GL::IGLBuffer* SubMesh::getLinesIndexBuffer(const Uint32Array& indices,
 
     for (size_t index = indexStart; index < indexStart + indexCount;
          index += 3) {
-      stl_util::concat(linesIndices,
-                       {indices[index + 0], indices[index + 1],
-                        indices[index + 1], indices[index + 2],
-                        indices[index + 2], indices[index + 0]});
+      stl_util::concat(linesIndices, {indices[index + 0], indices[index + 1],
+                                      indices[index + 1], indices[index + 2],
+                                      indices[index + 2], indices[index + 0]});
     }
 
     _linesIndexBuffer = engine->createIndexBuffer(linesIndices);

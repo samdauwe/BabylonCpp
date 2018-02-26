@@ -22,7 +22,7 @@ public:
 public:
   TransformNode(const string_t& name, Scene* scene = nullptr,
                 bool isPure = true);
-  ~TransformNode();
+  ~TransformNode() override;
 
   Vector3& position();
   const Vector3& position() const;
@@ -104,11 +104,23 @@ public:
   const Vector3& absolutePosition() const;
 
   /**
-   * @brief Sets a new pivot matrix to the mesh.
-   * @returns the AbstractMesh.
+   * @brief Sets a new matrix to apply before all other transformation
+   * @param matrix defines the transform matrix
+   * @returns the current TransformNode
+   */
+  TransformNode& setPreTransformMatrix(Matrix& matrix);
+
+  /**
+   * @brief Sets a new pivot matrix to the current node.
+   * @param matrix defines the new pivot matrix to use
+   * @param postMultiplyPivotMatrix defines if the pivot matrix must be
+   * cancelled in the world matrix. When this parameter is set to true
+   * (default), the inverse of the pivot matrix is also applied at the end to
+   * cancel the transformation effect
+   * @returns the current TransformNode
    */
   TransformNode& setPivotMatrix(Matrix& matrix,
-                                bool postMultiplyPivotMatrix = false);
+                                bool postMultiplyPivotMatrix = true);
 
   /**
    * @brief Returns the mesh pivot matrix.
@@ -199,6 +211,13 @@ public:
    */
   TransformNode& getDirectionToRef(const Vector3& localAxis, Vector3& result);
 
+  /**
+   * @brief Sets a new pivot point to the current node
+   * @param point defines the new pivot point to use
+   * @param space defines if the point is in world or local space (local by
+   * default)
+   * @returns the current TransformNode
+   */
   TransformNode& setPivotPoint(Vector3& point, Space space = Space::LOCAL);
 
   /**
@@ -233,7 +252,7 @@ public:
    * be updated accordingly
    * @returns the TransformNode.
    */
-  TransformNode& setParent(TransformNode* node);
+  TransformNode& setParent(Node* node);
 
   bool nonUniformScaling() const;
 
@@ -365,6 +384,11 @@ public:
   void dispose(bool doNotRecurse = false) override;
 
 protected:
+  /**
+   * @brief Returns the latest update of the World matrix determinant.
+   */
+  virtual float _getWorldMatrixDeterminant() const;
+
   void _afterComputeWorldMatrix();
 
 public:
@@ -374,6 +398,7 @@ public:
   // Cache
   unique_ptr_t<Matrix> _poseMatrix;
   unique_ptr_t<Matrix> _worldMatrix;
+  float _worldMatrixDeterminant;
 
 protected:
   // Properties
@@ -400,7 +425,7 @@ private:
   Matrix _localWorld;
   Vector3 _absolutePosition;
   Matrix _pivotMatrix;
-  Matrix _pivotMatrixInverse;
+  unique_ptr_t<Matrix> _pivotMatrixInverse;
   bool _postMultiplyPivotMatrix;
   bool _nonUniformScaling;
 

@@ -22,6 +22,7 @@ TransformNode::TransformNode(const string_t& name, Scene* scene, bool isPure)
     , infiniteDistance{false}
     , _poseMatrix{::std::make_unique<Matrix>(Matrix::Zero())}
     , _worldMatrix{::std::make_unique<Matrix>(Matrix::Zero())}
+    , _worldMatrixDeterminant{0.f}
     , _scaling{Vector3::One()}
     , _isDirty{false}
     , _isWorldMatrixFrozen{false}
@@ -32,7 +33,7 @@ TransformNode::TransformNode(const string_t& name, Scene* scene, bool isPure)
     , _localWorld{Matrix::Zero()}
     , _absolutePosition{Vector3::Zero()}
     , _pivotMatrix{Matrix::Identity()}
-    , _pivotMatrixInverse{}
+    , _pivotMatrixInverse{nullptr}
     , _postMultiplyPivotMatrix{false}
     , _nonUniformScaling{false}
 {
@@ -117,6 +118,11 @@ Matrix* TransformNode::getWorldMatrix()
     computeWorldMatrix();
   }
   return _worldMatrix.get();
+}
+
+float TransformNode::_getWorldMatrixDeterminant() const
+{
+  return _worldMatrixDeterminant;
 }
 
 Matrix& TransformNode::worldMatrixFromCache()
@@ -214,6 +220,11 @@ const Vector3& TransformNode::absolutePosition() const
   return _absolutePosition;
 }
 
+TransformNode& TransformNode::setPreTransformMatrix(Matrix& matrix)
+{
+  return setPivotMatrix(matrix, false);
+}
+
 TransformNode& TransformNode::setPivotMatrix(Matrix& matrix,
                                              bool postMultiplyPivotMatrix)
 {
@@ -222,7 +233,13 @@ TransformNode& TransformNode::setPivotMatrix(Matrix& matrix,
   _postMultiplyPivotMatrix  = postMultiplyPivotMatrix;
 
   if (_postMultiplyPivotMatrix) {
-    _pivotMatrixInverse = Matrix::Invert(matrix);
+    if (!_pivotMatrixInverse) {
+      _pivotMatrixInverse
+        = ::std::make_unique<Matrix>(Matrix::Invert(_pivotMatrix));
+    }
+    else {
+      _pivotMatrix.invertToRef(*_pivotMatrixInverse);
+    }
   }
   return *this;
 }
@@ -364,12 +381,8 @@ TransformNode& TransformNode::setPivotPoint(Vector3& point, Space space)
     point = Vector3::TransformCoordinates(point, tmat);
   }
 
-  Vector3::TransformCoordinatesToRef(point, wm, _position);
-  _pivotMatrix.m[12]        = -point.x;
-  _pivotMatrix.m[13]        = -point.y;
-  _pivotMatrix.m[14]        = -point.z;
-  _cache.pivotMatrixUpdated = true;
-  return *this;
+  auto pivotMatrix = Matrix::Translation(-point.x, -point.y, -point.z);
+  return setPivotMatrix(pivotMatrix, true);
 }
 
 Vector3 TransformNode::getPivotPoint()
@@ -404,7 +417,7 @@ TransformNode& TransformNode::getAbsolutePivotPointToRef(Vector3& result)
   return *this;
 }
 
-TransformNode& TransformNode::setParent(TransformNode* node)
+TransformNode& TransformNode::setParent(Node* node)
 {
   if (node == nullptr) {
     auto& rotation = Tmp::QuaternionArray[0];
@@ -412,10 +425,7 @@ TransformNode& TransformNode::setParent(TransformNode* node)
     auto& scale    = Tmp::Vector3Array[1];
 
     if (parent()) {
-      auto parentTransformNode = static_cast<TransformNode*>(parent());
-      if (parentTransformNode) {
-        parentTransformNode->computeWorldMatrix(true);
-      }
+      parent()->computeWorldMatrix(true);
     }
     computeWorldMatrix(true);
     getWorldMatrix()->decompose(scale, rotation, position);
@@ -765,7 +775,7 @@ Matrix& TransformNode::computeWorldMatrix(bool force)
 
   // Post multiply inverse of pivotMatrix
   if (_postMultiplyPivotMatrix) {
-    _worldMatrix->multiplyToRef(_pivotMatrixInverse, *_worldMatrix);
+    _worldMatrix->multiplyToRef(*_pivotMatrixInverse, *_worldMatrix);
   }
 
   // Normal matrix
@@ -794,6 +804,9 @@ Matrix& TransformNode::computeWorldMatrix(bool force)
   if (!_poseMatrix) {
     _poseMatrix = ::std::make_unique<Matrix>(Matrix::Invert(*_worldMatrix));
   }
+
+  // Cache the determinant
+  _worldMatrixDeterminant = _worldMatrix->determinant();
 
   return *_worldMatrix;
 }

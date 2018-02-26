@@ -6,7 +6,7 @@
 namespace BABYLON {
 
 Collider::Collider()
-    : radius{Vector3::One()}
+    : _radius{Vector3::One()}
     , retry{0}
     , basePointWorld{Vector3::Zero()}
     , velocityWorld{Vector3::Zero()}
@@ -111,8 +111,8 @@ void Collider::_initialize(Vector3& source, Vector3& dir, float e)
   Vector3::NormalizeToRef(dir, normalizedVelocity);
   basePoint = source;
 
-  source.multiplyToRef(radius, basePointWorld);
-  dir.multiplyToRef(radius, velocityWorld);
+  source.multiplyToRef(_radius, basePointWorld);
+  dir.multiplyToRef(_radius, velocityWorld);
 
   velocityWorldLength = velocityWorld.length();
 
@@ -151,7 +151,7 @@ bool Collider::_canDoCollision(const Vector3& sphereCenter, float sphereRadius,
 {
   float distance = Vector3::Distance(basePointWorld, sphereCenter);
 
-  float max = stl_util::max(radius.x, radius.y, radius.z);
+  float max = stl_util::max(_radius.x, _radius.y, _radius.z);
 
   if (distance > velocityWorldLength + max + sphereRadius) {
     return false;

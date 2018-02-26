@@ -603,7 +603,7 @@ void BackgroundMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   // Bones
   MaterialHelper::BindBonesParameters(mesh, _activeEffect);
 
-  auto mustRebind = _mustRebind(scene, effect, mesh->visibility);
+  auto mustRebind = _mustRebind(scene, effect, mesh->visibility());
   if (mustRebind) {
     _uniformBuffer->bindToEffect(effect, "Material");
 

@@ -35,7 +35,7 @@ protected:
   Cylinder(const string_t& id, Scene* scene, float height, float diameterTop,
            float diameterBottom, unsigned int tessellation,
            unsigned int subdivisions, bool canBeRegenerated,
-           Mesh* mesh = nullptr, unsigned int side = Mesh::DEFAULTSIDE);
+           Mesh* mesh = nullptr, unsigned int side = Mesh::DEFAULTSIDE());
 
 public:
   float height;

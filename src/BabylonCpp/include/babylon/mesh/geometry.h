@@ -121,7 +121,7 @@ public:
   /** Statics **/
   static Geometry* ExtractFromMesh(Mesh* mesh, const string_t& id);
   static string_t RandomId();
-  static void ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh);
+  static void _ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh);
   static void _CleanMatricesWeights(const Json::value& parsedGeometry,
                                     Mesh* mesh);
   static Geometry* Parse(const Json::value& parsedVertexData, Scene* scene,

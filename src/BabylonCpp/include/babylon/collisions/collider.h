@@ -38,7 +38,7 @@ public:
   void _getResponse(Vector3& pos, Vector3& vel);
 
 public:
-  Vector3 radius;
+  Vector3 _radius;
   unsigned int retry;
   Vector3 velocity;
   Vector3 basePoint;

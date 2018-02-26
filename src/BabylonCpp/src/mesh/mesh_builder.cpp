@@ -110,8 +110,9 @@ Mesh* MeshBuilder::CreateRibbon(const string_t& name, RibbonOptions& options,
       auto minlg     = pathArray[0].size();
       unsigned int i = 0;
       unsigned int ns
-        = (instance->_originalBuilderSideOrientation == Mesh::DOUBLESIDE) ? 2 :
-                                                                            1;
+        = (instance->_originalBuilderSideOrientation == Mesh::DOUBLESIDE()) ?
+            2 :
+            1;
       for (std::size_t si = 1; si <= ns; ++si) {
         for (std::size_t p = 0; p < pathArray.size(); ++p) {
           const auto& path = pathArray[p];
@@ -332,7 +333,7 @@ LinesMesh* MeshBuilder::CreateLineSystem(const string_t& name,
   auto useVertexColor = (!colors.empty()) ? true : false;
   auto lineSystem     = LinesMesh::New(name, scene, nullptr, nullptr, true,
                                    useVertexColor, options.useVertexAlpha);
-  auto vertexData = VertexData::CreateLineSystem(options);
+  auto vertexData     = VertexData::CreateLineSystem(options);
   vertexData->applyToMesh(lineSystem, options.updatable);
   return lineSystem;
 }
@@ -456,7 +457,7 @@ Mesh* MeshBuilder::CreateLathe(const string_t& name, LatheOptions& options,
   Vector3 rotated;
   for (float i = 0.f; i <= tessellation; ++i) {
     vector_t<Vector3> path;
-    if (cap == Mesh::CAP_START || cap == Mesh::CAP_ALL) {
+    if (cap == Mesh::CAP_START() || cap == Mesh::CAP_ALL()) {
       path.emplace_back(Vector3(0.f, shape[0].y, 0.f));
       path.emplace_back(Vector3(::std::cos(i * step) * shape[0].x * radius,
                                 shape[0].y,
@@ -467,7 +468,7 @@ Mesh* MeshBuilder::CreateLathe(const string_t& name, LatheOptions& options,
                         ::std::sin(i * step) * shape[p].x * radius);
       path.emplace_back(rotated);
     }
-    if (cap == Mesh::CAP_END || cap == Mesh::CAP_ALL) {
+    if (cap == Mesh::CAP_END() || cap == Mesh::CAP_ALL()) {
       path.emplace_back(
         Vector3(::std::cos(i * step) * shape[shape.size() - 1].x * radius,
                 shape[shape.size() - 1].y,
@@ -651,77 +652,77 @@ Mesh* MeshBuilder::CreateTube(const string_t& name, TubeOptions& options,
   const auto arc = options.arc();
 
   // tube geometry
-  const auto tubePathArray = [](
-    const vector_t<Vector3>& _path, Path3D& path3D,
-    vector_t<vector_t<Vector3>>& circlePaths, float _radius,
-    unsigned int _tessellation,
-    const ::std::function<float(unsigned int i, float distance)>&
-      _radiusFunction,
-    unsigned int _cap, float _arc) {
-    auto& tangents        = path3D.getTangents();
-    const auto& normals   = path3D.getNormals();
-    const auto& distances = path3D.getDistances();
-    const auto& pi2       = Math::PI2;
-    const auto step       = pi2 / static_cast<float>(_tessellation) * _arc;
+  const auto tubePathArray
+    = [](const vector_t<Vector3>& _path, Path3D& path3D,
+         vector_t<vector_t<Vector3>>& circlePaths, float _radius,
+         unsigned int _tessellation,
+         const ::std::function<float(unsigned int i, float distance)>&
+           _radiusFunction,
+         unsigned int _cap, float _arc) {
+        auto& tangents        = path3D.getTangents();
+        const auto& normals   = path3D.getNormals();
+        const auto& distances = path3D.getDistances();
+        const auto& pi2       = Math::PI2;
+        const auto step       = pi2 / static_cast<float>(_tessellation) * _arc;
 
-    auto rad = 0.f;
-    Vector3 normal;
-    Vector3 rotated;
-    Matrix rotationMatrix = Tmp::MatrixArray[0];
-    unsigned int index
-      = (_cap == Mesh::NO_CAP || _cap == Mesh::CAP_END) ? 0 : 2;
-    circlePaths.resize(_path.size() + index + 2);
-    for (unsigned int i = 0; i < _path.size(); ++i) {
-      rad = (_radiusFunction == nullptr) ?
-              _radius :
-              _radiusFunction(i, distances[i]); // current radius
-      vector_t<Vector3> circlePath;             // current circle array
-      normal = normals[i];                      // current normal
-      for (std::size_t t = 0; t < _tessellation; ++t) {
-        Matrix::RotationAxisToRef(tangents[i], step * static_cast<float>(t),
-                                  rotationMatrix);
-        rotated
-          = (t + 1 <= circlePath.size()) ? circlePath[t] : Vector3::Zero();
-        Vector3::TransformCoordinatesToRef(normal, rotationMatrix, rotated);
-        rotated.scaleInPlace(rad).addInPlace(_path[i]);
-        circlePath.emplace_back(rotated);
-      }
-      circlePaths[index] = circlePath;
-      ++index;
-    }
-    // cap
-    const auto capPath
-      = [_path](unsigned int nbPoints, unsigned int pathIndex) {
-          vector_t<Vector3> pointCap;
-          for (std::size_t i = 0; i < nbPoints; ++i) {
-            pointCap.emplace_back(_path[pathIndex]);
+        auto rad = 0.f;
+        Vector3 normal;
+        Vector3 rotated;
+        Matrix rotationMatrix = Tmp::MatrixArray[0];
+        unsigned int index
+          = (_cap == Mesh::NO_CAP() || _cap == Mesh::CAP_END()) ? 0 : 2;
+        circlePaths.resize(_path.size() + index + 2);
+        for (unsigned int i = 0; i < _path.size(); ++i) {
+          rad = (_radiusFunction == nullptr) ?
+                  _radius :
+                  _radiusFunction(i, distances[i]); // current radius
+          vector_t<Vector3> circlePath;             // current circle array
+          normal = normals[i];                      // current normal
+          for (std::size_t t = 0; t < _tessellation; ++t) {
+            Matrix::RotationAxisToRef(tangents[i], step * static_cast<float>(t),
+                                      rotationMatrix);
+            rotated
+              = (t + 1 <= circlePath.size()) ? circlePath[t] : Vector3::Zero();
+            Vector3::TransformCoordinatesToRef(normal, rotationMatrix, rotated);
+            rotated.scaleInPlace(rad).addInPlace(_path[i]);
+            circlePath.emplace_back(rotated);
           }
-          return pointCap;
-        };
-    switch (_cap) {
-      case Mesh::NO_CAP:
-        break;
-      case Mesh::CAP_START:
-        circlePaths[0] = capPath(_tessellation, 0);
-        circlePaths[1] = circlePaths[2];
-        break;
-      case Mesh::CAP_END:
-        circlePaths[index] = circlePaths[index - 1];
-        circlePaths[index + 1]
-          = capPath(_tessellation, static_cast<unsigned int>(_path.size() - 1));
-        break;
-      case Mesh::CAP_ALL:
-        circlePaths[0]     = capPath(_tessellation, 0);
-        circlePaths[1]     = circlePaths[2];
-        circlePaths[index] = circlePaths[index - 1];
-        circlePaths[index + 1]
-          = capPath(_tessellation, static_cast<unsigned int>(_path.size() - 1));
-        break;
-      default:
-        break;
-    }
-    return circlePaths;
-  };
+          circlePaths[index] = circlePath;
+          ++index;
+        }
+        // cap
+        const auto capPath
+          = [_path](unsigned int nbPoints, unsigned int pathIndex) {
+              vector_t<Vector3> pointCap;
+              for (std::size_t i = 0; i < nbPoints; ++i) {
+                pointCap.emplace_back(_path[pathIndex]);
+              }
+              return pointCap;
+            };
+        switch (_cap) {
+          case Mesh::NO_CAP():
+            break;
+          case Mesh::CAP_START():
+            circlePaths[0] = capPath(_tessellation, 0);
+            circlePaths[1] = circlePaths[2];
+            break;
+          case Mesh::CAP_END():
+            circlePaths[index]     = circlePaths[index - 1];
+            circlePaths[index + 1] = capPath(
+              _tessellation, static_cast<unsigned int>(_path.size() - 1));
+            break;
+          case Mesh::CAP_ALL():
+            circlePaths[0]         = capPath(_tessellation, 0);
+            circlePaths[1]         = circlePaths[2];
+            circlePaths[index]     = circlePaths[index - 1];
+            circlePaths[index + 1] = capPath(
+              _tessellation, static_cast<unsigned int>(_path.size() - 1));
+            break;
+          default:
+            break;
+        }
+        return circlePaths;
+      };
   Path3D path3D;
   vector_t<vector_t<Vector3>> pathArray;
   if (instance) {
@@ -1039,7 +1040,7 @@ Mesh* MeshBuilder::_ExtrudeShapeGeneric(
         auto rotate = _custom ? _rotateFunction : returnRotation;
         auto scl    = _custom ? _scaleFunction : returnScale;
         unsigned int index
-          = (_cap == Mesh::NO_CAP || _cap == Mesh::CAP_END) ? 0 : 2;
+          = (_cap == Mesh::NO_CAP() || _cap == Mesh::CAP_END()) ? 0 : 2;
         auto& rotationMatrix = Tmp::MatrixArray[0];
         shapePaths.resize(_curve.size());
 
@@ -1049,7 +1050,7 @@ Mesh* MeshBuilder::_ExtrudeShapeGeneric(
           auto scaleRatio = scl(static_cast<float>(i), distances[i]);
           for (std::size_t p = 0; p < _shape.size(); ++p) {
             Matrix::RotationAxisToRef(tangents[i], angle, rotationMatrix);
-            auto planed = ((tangents[i].scale(_shape[p].z))
+            auto planed  = ((tangents[i].scale(_shape[p].z))
                              .add(normals[i].scale(_shape[p].x))
                              .add(binormals[i].scale(_shape[p].y)));
             auto rotated = Vector3::Zero();
@@ -1075,17 +1076,17 @@ Mesh* MeshBuilder::_ExtrudeShapeGeneric(
           return pointCap;
         };
         switch (_cap) {
-          case Mesh::NO_CAP:
+          case Mesh::NO_CAP():
             break;
-          case Mesh::CAP_START:
+          case Mesh::CAP_START():
             shapePaths[0] = capPath(shapePaths[2]);
             shapePaths[1] = shapePaths[2];
             break;
-          case Mesh::CAP_END:
+          case Mesh::CAP_END():
             shapePaths[index + 0] = shapePaths[index - 1];
             shapePaths[index + 1] = capPath(shapePaths[index - 1]);
             break;
-          case Mesh::CAP_ALL:
+          case Mesh::CAP_ALL():
             shapePaths[0]         = capPath(shapePaths[2]);
             shapePaths[1]         = shapePaths[2];
             shapePaths[index + 0] = shapePaths[index - 1];
@@ -1105,7 +1106,7 @@ Mesh* MeshBuilder::_ExtrudeShapeGeneric(
       shape, curve, instance->_path3D, instance->_pathArray, scale, rotation,
       scaleFunction, rotateFunction, instance->_cap, custom);
     instance = Mesh::CreateRibbon("", pathArray, false, false, 0, scene, false,
-                                  Mesh::DEFAULTSIDE, instance);
+                                  Mesh::DEFAULTSIDE(), instance);
 
     return instance;
   }
@@ -1134,12 +1135,12 @@ Mesh* MeshBuilder::_ExtrudeShapeGeneric(
 
 unsigned int MeshBuilder::updateSideOrientation(unsigned int orientation)
 {
-  if (orientation == Mesh::DOUBLESIDE) {
-    return Mesh::DOUBLESIDE;
+  if (orientation == Mesh::DOUBLESIDE()) {
+    return Mesh::DOUBLESIDE();
   }
 
-  if (orientation == Mesh::DEFAULTSIDE) {
-    return Mesh::FRONTSIDE;
+  if (orientation == Mesh::DEFAULTSIDE()) {
+    return Mesh::FRONTSIDE();
   }
 
   return orientation;

@@ -20,7 +20,7 @@ public:
 
     return mesh;
   }
-  ~InstancedMesh();
+  ~InstancedMesh() override;
 
   /**
    * @brief Returns the string "InstancedMesh"
@@ -42,6 +42,12 @@ public:
   size_t getTotalVertices() const override;
 
   Mesh* sourceMesh() const;
+
+  /**
+   * @brief Is this node ready to be used/rendered.
+   * @return {boolean} is it ready
+   */
+  bool isReady() const;
 
   /**
    * @brief Returns Float32Array of the requested kind of data : positons,

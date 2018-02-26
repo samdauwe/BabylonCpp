@@ -33,7 +33,7 @@ public:
 
 protected:
   Box(const string_t& id, Scene* scene, float size, bool canBeRegenerated,
-      Mesh* mesh = nullptr, unsigned int side = Mesh::DEFAULTSIDE);
+      Mesh* mesh = nullptr, unsigned int side = Mesh::DEFAULTSIDE());
 
 public:
   float size;

@@ -56,7 +56,7 @@ Material* InstancedMesh::material() const
 
 float InstancedMesh::visibility() const
 {
-  return _sourceMesh->visibility;
+  return _sourceMesh->visibility();
 }
 
 Skeleton* InstancedMesh::skeleton()
@@ -77,6 +77,11 @@ size_t InstancedMesh::getTotalVertices() const
 Mesh* InstancedMesh::sourceMesh() const
 {
   return _sourceMesh;
+}
+
+bool InstancedMesh::isReady() const
+{
+  return _sourceMesh->isReady(true);
 }
 
 Float32Array InstancedMesh::getVerticesData(unsigned int kind,
@@ -168,7 +173,7 @@ AbstractMesh* InstancedMesh::getLOD(Camera* camera,
 
   auto currentLOD = sourceMesh()->getLOD(getScene()->activeCamera,
                                          &boundingInfo.boundingSphere);
-  _currentLOD = dynamic_cast<Mesh*>(currentLOD);
+  _currentLOD     = dynamic_cast<Mesh*>(currentLOD);
 
   if (_currentLOD == sourceMesh()) {
     return this;

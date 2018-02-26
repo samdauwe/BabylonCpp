@@ -33,7 +33,7 @@ protected:
   Ribbon(const string_t& id, Scene* scene,
          const vector_t<vector_t<Vector3>>& pathArray, bool closeArray,
          bool closePath, int offset, bool canBeRegenerated, Mesh* mesh,
-         unsigned int side = Mesh::DEFAULTSIDE);
+         unsigned int side = Mesh::DEFAULTSIDE());
 
 public:
   vector_t<vector_t<Vector3>> pathArray;

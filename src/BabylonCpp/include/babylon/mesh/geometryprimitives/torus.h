@@ -34,7 +34,7 @@ public:
 protected:
   Torus(const string_t& id, Scene* scene, float diameter, float thickness,
         unsigned int tessellation, bool canBeRegenerated, Mesh* mesh = nullptr,
-        unsigned int side = Mesh::DEFAULTSIDE);
+        unsigned int side = Mesh::DEFAULTSIDE());
 
 private:
   float diameter;

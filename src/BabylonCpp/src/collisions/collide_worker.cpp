@@ -82,8 +82,8 @@ void CollideWorker::checkCollision(SerializedMesh& mesh)
   };
 
   // Transformation matrix
-  Matrix::ScalingToRef(1.f / collider->radius.x, 1.f / collider->radius.y,
-                       1.f / collider->radius.z, collisionsScalingMatrix);
+  Matrix::ScalingToRef(1.f / collider->_radius.x, 1.f / collider->_radius.y,
+                       1.f / collider->_radius.z, collisionsScalingMatrix);
   Matrix worldFromCache = Matrix::FromArray(mesh.worldMatrixFromCache);
   worldFromCache.multiplyToRef(collisionsScalingMatrix,
                                collisionTranformationMatrix);

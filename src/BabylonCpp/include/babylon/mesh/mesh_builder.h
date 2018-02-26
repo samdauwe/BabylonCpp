@@ -780,7 +780,7 @@ public:
 
 private:
   static unsigned int updateSideOrientation(unsigned int orientation
-                                            = Mesh::FRONTSIDE);
+                                            = Mesh::FRONTSIDE());
 
 }; // end of class MeshBuilder
 

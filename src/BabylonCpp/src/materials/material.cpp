@@ -293,7 +293,7 @@ bool Material::needAlphaBlending() const
 
 bool Material::needAlphaBlendingForMesh(AbstractMesh* mesh) const
 {
-  return needAlphaBlending() || (mesh->visibility < 1.f)
+  return needAlphaBlending() || (mesh->visibility() < 1.f)
          || mesh->hasVertexAlpha();
 }
 
@@ -382,7 +382,7 @@ void Material::_afterBind(Mesh* mesh)
 {
   _scene->_cachedMaterial = this;
   if (mesh) {
-    _scene->_cachedVisibility = mesh->visibility;
+    _scene->_cachedVisibility = mesh->visibility();
   }
   else {
     _scene->_cachedVisibility = 1.f;

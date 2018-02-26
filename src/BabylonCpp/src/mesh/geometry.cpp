@@ -788,7 +788,7 @@ string_t Geometry::RandomId()
   return Tools::RandomId();
 }
 
-void Geometry::ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh)
+void Geometry::_ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh)
 {
   auto scene = mesh->getScene();
 

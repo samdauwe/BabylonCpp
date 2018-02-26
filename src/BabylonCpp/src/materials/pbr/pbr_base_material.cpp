@@ -1013,7 +1013,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   // Matrices
   bindOnlyWorldMatrix(*world);
 
-  const auto mustRebind = _mustRebind(scene, effect, mesh->visibility);
+  const auto mustRebind = _mustRebind(scene, effect, mesh->visibility());
 
   // Bones
   MaterialHelper::BindBonesParameters(mesh, effect);
@@ -1221,7 +1221,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
       _uniformBuffer->updateColor3("vEmissiveColor", _emissiveColor, "");
       _uniformBuffer->updateColor3("vReflectionColor", _reflectionColor, "");
       _uniformBuffer->updateColor4("vAlbedoColor", _albedoColor,
-                                   alpha() * mesh->visibility, "");
+                                   alpha() * mesh->visibility(), "");
 
       // Misc
       _lightingInfos.x = _directIntensity;

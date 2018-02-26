@@ -60,7 +60,7 @@ CollisionDetectorTransferable::onCollision(const CollidePayload& payload)
   Vector3 finalPosition = Vector3::Zero();
   // Create a new collider
   Collider* collider = new Collider();
-  collider->radius   = Vector3::FromArray(payload.collider.radius);
+  collider->_radius  = Vector3::FromArray(payload.collider.radius);
   // Create new collide worker
   CollideWorker colliderWorker(collider, *_collisionCache.get(), finalPosition);
   Vector3 position = Vector3::FromArray(payload.collider.position);

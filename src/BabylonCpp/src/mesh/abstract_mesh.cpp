@@ -40,7 +40,6 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
                                     OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE}
     , occlusionType{AbstractMesh::OCCLUSION_TYPE_NONE}
     , occlusionRetryCount{-1}
-    , visibility{1.f}
     , alphaIndex{numeric_limits_t<int>::max()}
     , isVisible{true}
     , isPickable{true}
@@ -90,6 +89,7 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
     , _occlusionInternalRetryCounter{0}
     , _isOcclusionQueryInProgress{false}
     , _occlusionQuery{nullptr}
+    , _visibility{1.f}
     , _material{nullptr}
     , _receiveShadows{false}
     , _hasVertexAlpha{false}
@@ -263,6 +263,7 @@ void AbstractMesh::setHasVertexAlpha(bool value)
 
   _hasVertexAlpha = value;
   _markSubMeshesAsAttributesDirty();
+  _markSubMeshesAsMiscDirty();
 }
 
 bool AbstractMesh::useVertexColors() const
@@ -353,6 +354,21 @@ void AbstractMesh::isOccluded(bool value)
 bool AbstractMesh::isOcclusionQueryInProgress() const
 {
   return _isOcclusionQueryInProgress;
+}
+
+float AbstractMesh::visibility() const
+{
+  return _visibility;
+}
+
+void AbstractMesh::setVisibility(float value)
+{
+  if (stl_util::almost_equal(_visibility, value)) {
+    return;
+  }
+
+  _visibility = value;
+  _markSubMeshesAsMiscDirty();
 }
 
 int AbstractMesh::collisionMask() const
@@ -477,6 +493,8 @@ void AbstractMesh::_removeLightSource(Light* light)
   }
 
   _lightSources.erase(index);
+
+  _markSubMeshesAsLightDirty();
 }
 
 void AbstractMesh::_markSubMeshesAsDirty(
@@ -713,6 +731,15 @@ Matrix* AbstractMesh::getWorldMatrix()
   return TransformNode::getWorldMatrix();
 }
 
+float AbstractMesh::_getWorldMatrixDeterminant() const
+{
+  if (_masterMesh) {
+    return _masterMesh->_getWorldMatrixDeterminant();
+  }
+
+  return TransformNode::_getWorldMatrixDeterminant();
+}
+
 AbstractMesh& AbstractMesh::movePOV(float amountRight, float amountUp,
                                     float amountForward)
 {
@@ -781,11 +808,13 @@ MinMax AbstractMesh::getHierarchyBoundingVectors(bool includeDescendants)
       auto childMesh = static_cast<class AbstractMesh*>(descendant);
 
       childMesh->computeWorldMatrix(true);
-      auto childBoundingInfo = childMesh->getBoundingInfo();
 
+      // make sure we have the needed params to get mix and max
       if (childMesh->getTotalVertices() == 0) {
         continue;
       }
+
+      auto childBoundingInfo  = childMesh->getBoundingInfo();
       const auto& boundingBox = childBoundingInfo.boundingBox;
 
       auto minBox = boundingBox.minimumWorld;
@@ -953,26 +982,29 @@ void AbstractMesh::setCheckCollisions(bool collisionEnabled)
   }
 }
 
+Collider* AbstractMesh::collider() const
+{
+  return _collider.get();
+}
+
 AbstractMesh& AbstractMesh::moveWithCollisions(Vector3& displacement)
 {
   auto globalPosition = getAbsolutePosition();
 
-  globalPosition.subtractFromFloatsToRef(0.f, ellipsoid.y, 0.f,
-                                         _oldPositionForCollisions);
-  _oldPositionForCollisions.addInPlace(ellipsoidOffset);
+  globalPosition.addToRef(ellipsoidOffset, _oldPositionForCollisions);
 
   if (!_collider) {
     _collider = ::std::make_unique<Collider>();
   }
 
-  _collider->radius = ellipsoid;
+  _collider->_radius = ellipsoid;
 
   getScene()->collisionCoordinator->getNewPosition(
     _oldPositionForCollisions, displacement, _collider.get(), 3, this,
     [this](int collisionId, Vector3& newPosition, AbstractMesh* collidedMesh) {
       _onCollisionPositionChange(collisionId, newPosition, collidedMesh);
     },
-    uniqueId);
+    static_cast<unsigned int>(uniqueId));
 
   return *this;
 }
@@ -982,7 +1014,7 @@ void AbstractMesh::_onCollisionPositionChange(int /*collisionId*/,
                                               AbstractMesh* collidedMesh)
 {
   if (getScene()->workerCollisions()) {
-    newPosition.multiplyInPlace(_collider->radius);
+    newPosition.multiplyInPlace(_collider->_radius);
   }
 
   newPosition.subtractToRef(_oldPositionForCollisions,

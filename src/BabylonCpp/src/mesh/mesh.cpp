@@ -13,6 +13,8 @@
 #include <babylon/engine/engine.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/layer/highlight_layer.h>
+#include <babylon/lights/light.h>
+#include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/loading/scene_loader.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material.h>
@@ -49,7 +51,7 @@ Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
     , _geometry{nullptr}
     , _visibleInstances{nullptr}
     , _shouldGenerateFlatShading{false}
-    , _originalBuilderSideOrientation{Mesh::DEFAULTSIDE}
+    , _originalBuilderSideOrientation{Mesh::DEFAULTSIDE()}
     , overrideMaterialSideOrientation{nullptr}
     , _onBeforeDrawObserver{nullptr}
     , _morphTargetManager{nullptr}
@@ -61,7 +63,7 @@ Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
     , _areNormalsFrozen{false}
     , _source{nullptr}
     , _tessellation{0}
-    , _cap{Mesh::NO_CAP}
+    , _cap{Mesh::NO_CAP()}
     , _arc{1.f}
     , _closePath{false}
     , _closeArray{false}
@@ -152,6 +154,19 @@ Mesh* Mesh::source()
   return _source;
 }
 
+bool Mesh::isUnIndexed() const
+{
+  return _unIndexed;
+}
+
+void Mesh::setIsUnIndexed(bool value)
+{
+  if (_unIndexed != value) {
+    _unIndexed = value;
+    _markSubMeshesAsAttributesDirty();
+  }
+}
+
 const char* Mesh::getClassName() const
 {
   return "Mesh";
@@ -213,6 +228,11 @@ bool Mesh::hasLODLevels() const
   return _LODLevels.size() > 0;
 }
 
+vector_t<MeshLODLevel*> Mesh::getLODLevels()
+{
+  return stl_util::to_raw_ptr_vector(_LODLevels);
+}
+
 void Mesh::_sortLODLevels()
 {
   ::std::sort(_LODLevels.begin(), _LODLevels.end(),
@@ -236,7 +256,8 @@ Mesh& Mesh::addLODLevel(float distance, Mesh* mesh)
     return *this;
   }
 
-  _LODLevels.emplace_back(::std::make_unique<MeshLODLevel>(distance, mesh));
+  auto level = ::std::make_unique<MeshLODLevel>(distance, mesh);
+  _LODLevels.emplace_back(::std::move(level));
 
   if (mesh) {
     mesh->_masterMesh = this;
@@ -419,13 +440,69 @@ bool Mesh::isBlocked() const
   return _masterMesh != nullptr;
 }
 
-bool Mesh::isReady() const
+bool Mesh::isReady(bool forceInstanceSupport)
 {
   if (delayLoadState == EngineConstants::DELAYLOADSTATE_LOADING) {
     return false;
   }
 
-  return AbstractMesh::isReady();
+  if (!AbstractMesh::isReady()) {
+    return false;
+  }
+
+  if (subMeshes.empty()) {
+    return true;
+  }
+
+  auto engine = getEngine();
+  auto scene  = getScene();
+  auto hardwareInstancedRendering
+    = forceInstanceSupport
+      || (engine->getCaps().instancedArrays && instances.size() > 0);
+
+  computeWorldMatrix();
+
+  auto mat = material() ? material() : scene->defaultMaterial();
+  if (mat) {
+    if (mat->storeEffectOnSubMeshes) {
+      for (auto& subMesh : subMeshes) {
+        auto effectiveMaterial = subMesh->getMaterial();
+        if (effectiveMaterial) {
+          if (!effectiveMaterial->isReadyForSubMesh(
+                this, subMesh.get(), hardwareInstancedRendering)) {
+            return false;
+          }
+        }
+      }
+    }
+    else {
+      if (!mat->isReady(this, hardwareInstancedRendering)) {
+        return false;
+      }
+    }
+  }
+
+  // Shadows
+  for (auto& light : _lightSources) {
+    auto generator = light->getShadowGenerator();
+
+    if (generator) {
+      for (auto& subMesh : subMeshes) {
+        if (!generator->isReady(subMesh.get(), hardwareInstancedRendering)) {
+          return false;
+        }
+      }
+    }
+  }
+
+  // LOD
+  for (auto& lod : _LODLevels) {
+    if (lod->mesh && !lod->mesh->isReady(hardwareInstancedRendering)) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 bool Mesh::areNormalsFrozen() const
@@ -836,38 +913,27 @@ void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount,
   }
 
   onBeforeDrawObservable.notifyObservers(this);
-  int _instancesCount = static_cast<int>(instancesCount);
 
-  auto scene                = getScene();
-  auto engine               = scene->getEngine();
-  auto subMeshVerticesStart = static_cast<int>(subMesh->verticesStart);
-  auto subMeshVerticesCount = static_cast<int>(subMesh->verticesCount);
+  auto scene  = getScene();
+  auto engine = scene->getEngine();
 
-  // Draw order
-  switch (fillMode) {
-    case Material::PointFillMode():
-      engine->drawPointClouds(subMeshVerticesStart, subMeshVerticesCount,
-                              _instancesCount);
-      break;
-    case Material::WireFrameFillMode():
-      if (_unIndexed) {
-        engine->drawUnIndexed(false, subMeshVerticesStart, subMeshVerticesCount,
-                              _instancesCount);
-      }
-      else {
-        engine->draw(false, 0, static_cast<int>(subMesh->linesIndexCount),
-                     _instancesCount);
-      }
-      break;
-    default:
-      if (_unIndexed) {
-        engine->drawUnIndexed(true, subMeshVerticesStart, subMeshVerticesCount,
-                              _instancesCount);
-      }
-      else {
-        engine->draw(true, static_cast<unsigned>(subMesh->indexStart),
-                     static_cast<int>(subMesh->indexCount), _instancesCount);
-      }
+  auto _fillMode = static_cast<unsigned>(fillMode);
+  if (_unIndexed || fillMode == Material::PointFillMode()) {
+    // or triangles as points
+    engine->drawArraysType(_fillMode, static_cast<int>(subMesh->verticesStart),
+                           static_cast<int>(subMesh->verticesCount),
+                           static_cast<int>(instancesCount));
+  }
+  else if (fillMode == Material::WireFrameFillMode()) {
+    // Triangles as wireframe
+    engine->drawElementsType(_fillMode, 0,
+                             static_cast<int>(subMesh->linesIndexCount),
+                             static_cast<int>(instancesCount));
+  }
+  else {
+    engine->drawElementsType(_fillMode, static_cast<int>(subMesh->indexStart),
+                             static_cast<int>(subMesh->indexCount),
+                             static_cast<int>(instancesCount));
   }
 
   if (scene->_isAlternateRenderingEnabled() && !alternate) {
@@ -1135,7 +1201,8 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
 
   // Alpha mode
   if (enableAlphaMode) {
-    engine->setAlphaMode(static_cast<int>(_effectiveMaterial->alphaMode()));
+    engine->setAlphaMode(
+      static_cast<unsigned>(_effectiveMaterial->alphaMode()));
   }
 
   // Outline - step 1
@@ -1158,8 +1225,19 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
     return *this;
   }
 
-  auto reverse
-    = _effectiveMaterial->_preBind(effect, overrideMaterialSideOrientation);
+  auto sideOrientation = overrideMaterialSideOrientation;
+  if (sideOrientation == nullptr) {
+    sideOrientation
+      = static_cast<unsigned>(_effectiveMaterial->sideOrientation);
+    if (_getWorldMatrixDeterminant() < 0) {
+      sideOrientation
+        = (sideOrientation == Material::ClockWiseSideOrientation() ?
+             Material::CounterClockWiseSideOrientation() :
+             Material::ClockWiseSideOrientation());
+    }
+  }
+
+  auto reverse = _effectiveMaterial->_preBind(effect, sideOrientation);
 
   if (_effectiveMaterial->forceDepthWrite) {
     engine->setDepthWrite(true);
@@ -1219,7 +1297,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
 
   // Overlay
   if (renderOverlay) {
-    int currentMode = engine->getAlphaMode();
+    auto currentMode = engine->getAlphaMode();
     engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
     scene->getOutlineRenderer()->render(subMesh, batch, true);
     engine->setAlphaMode(currentMode);
@@ -1293,15 +1371,15 @@ Mesh& Mesh::_checkDelayState()
   else if (delayLoadState == EngineConstants::DELAYLOADSTATE_NOTLOADED) {
     delayLoadState = EngineConstants::DELAYLOADSTATE_LOADING;
 
-    _queueLoad(this, scene);
+    _queueLoad(scene);
   }
 
   return *this;
 }
 
-Mesh& Mesh::_queueLoad(Mesh* mesh, Scene* scene)
+Mesh& Mesh::_queueLoad(Scene* scene)
 {
-  scene->_addPendingData(mesh);
+  scene->_addPendingData(this);
   return *this;
 }
 
@@ -1483,12 +1561,11 @@ void Mesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
     instance->dispose();
   }
 
-  // Highlight layers.
-  auto& highlightLayers = getScene()->highlightLayers;
-  for (auto& highlightLayer : highlightLayers) {
-    if (highlightLayer) {
-      highlightLayer->removeMesh(this);
-      highlightLayer->removeExcludedMesh(this);
+  // Effect layers.
+  auto& effectLayers = getScene()->effectLayers;
+  for (auto& effectLayer : effectLayers) {
+    if (effectLayer) {
+      effectLayer->_disposeMesh(this);
     }
   }
 
@@ -1893,7 +1970,7 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
   if (parsedMesh.contains("localMatrix")) {
     auto tmpMatrix
       = Matrix::FromArray(Json::ToArray<float>(parsedMesh, "localMatrix"));
-    mesh->setPivotMatrix(tmpMatrix);
+    mesh->setPreTransformMatrix(tmpMatrix);
   }
   else if (parsedMesh.contains("pivotMatrix")) {
     auto tmpMatrix
@@ -1927,7 +2004,7 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
                                         AbstractMesh::BILLBOARDMODE_NONE);
 
   if (parsedMesh.contains("visibility")) {
-    mesh->visibility = Json::GetNumber(parsedMesh, "visibility", 1.f);
+    mesh->setVisibility(Json::GetNumber(parsedMesh, "visibility", 1.f));
   }
 
   mesh->setCheckCollisions(Json::GetBool(parsedMesh, "checkCollisions"));
@@ -1970,6 +2047,7 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
   }
 
   // Geometry
+  mesh->setIsUnIndexed(Json::GetBool(parsedMesh, "isUnIndexed", false));
   mesh->setHasVertexAlpha(Json::GetBool(parsedMesh, "hasVertexAlpha", false));
 
   if (parsedMesh.contains("delayLoadingFile")) {
@@ -2023,14 +2101,14 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
       mesh->_delayInfoKinds.emplace_back(VertexBuffer::MatricesWeightsKind);
     }
 
-    mesh->_delayLoadingFunction = Geometry::ImportGeometry;
+    mesh->_delayLoadingFunction = Geometry::_ImportGeometry;
 
     if (SceneLoader::ForceFullSceneLoadingForIncremental()) {
       mesh->_checkDelayState();
     }
   }
   else {
-    Geometry::ImportGeometry(parsedMesh, mesh);
+    Geometry::_ImportGeometry(parsedMesh, mesh);
   }
 
   // Material
@@ -2094,6 +2172,10 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
     for (auto& parsedInstance : Json::GetArray(parsedMesh, "instances")) {
       auto instance
         = mesh->createInstance(Json::GetString(parsedInstance, "name"));
+
+      if (parsedInstance.contains("id")) {
+        instance->id = Json::GetString(parsedInstance, "id");
+      }
 
       // Tags.AddTagsTo(instance, parsedInstance.tags);
 
@@ -2334,7 +2416,7 @@ Mesh* Mesh::ExtrudeShapeCustom(
   options.rotationFunction = rotationFunction;
   options.ribbonCloseArray = ribbonCloseArray;
   options.ribbonClosePath  = ribbonClosePath;
-  options.cap              = (cap == 0) ? 0 : Mesh::NO_CAP;
+  options.cap              = (cap == 0) ? 0 : Mesh::NO_CAP();
   options.sideOrientation  = sideOrientation;
   options.instance         = instance;
   options.updatable        = updatable;

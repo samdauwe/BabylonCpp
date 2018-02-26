@@ -131,8 +131,9 @@ void LinesMesh::_draw(SubMesh* subMesh, int /*fillMode*/,
   auto engine = getScene()->getEngine();
 
   // Draw order
-  engine->draw(false, subMesh->indexStart,
-               static_cast<int>(subMesh->indexCount));
+  engine->drawElementsType(Material::LineListDrawMode(),
+                           static_cast<int>(subMesh->indexStart),
+                           static_cast<int>(subMesh->indexCount));
 }
 
 PickingInfo LinesMesh::intersects(const Ray& /*ray*/, bool /*fastCheck*/)
