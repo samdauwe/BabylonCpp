@@ -172,7 +172,7 @@ DynamicTerrain::DynamicTerrain(const std::string& iName,
 
   RibbonOptions ribbonOptions(terrainData);
   ribbonOptions.sideOrientation
-    = (options.invertSide) ? Mesh::FRONTSIDE : Mesh::BACKSIDE;
+    = (options.invertSide) ? Mesh::FRONTSIDE() : Mesh::BACKSIDE();
   ribbonOptions.colors    = terrainColor;
   ribbonOptions.uvs       = terrainUV;
   ribbonOptions.updatable = true;
@@ -690,8 +690,9 @@ void DynamicTerrain::CreateMapFromHeightMapToRef(
         x                = col * width / subX - width * 0.5f;
         z                = row * height / subZ - height * 0.5f;
         float heightmapX = ((x + width * 0.5f) / width * (bufferWidth - 1));
-        float heightmapY = (bufferHeight - 1) - ((z + height * 0.5f) / height
-                                                 * (bufferHeight - 1));
+        float heightmapY
+          = (bufferHeight - 1)
+            - ((z + height * 0.5f) / height * (bufferHeight - 1));
         unsigned int pos
           = static_cast<unsigned>(heightmapX + heightmapY * bufferWidth) * 4;
         float gradient = (buffer[pos] * filter.r + buffer[pos + 1] * filter.g

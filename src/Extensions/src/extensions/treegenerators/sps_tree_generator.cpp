@@ -37,7 +37,7 @@ Mesh* SPSTreeGenerator::CreateTree(
   DiscOptions discOptions;
   discOptions.radius          = _leaf_width / 2.f;
   discOptions.tessellation    = 12;
-  discOptions.sideOrientation = Mesh::DOUBLESIDE;
+  discOptions.sideOrientation = Mesh::DOUBLESIDE();
   auto _leaf = MeshBuilder::CreateDisc("leaf", discOptions, scene);
 
   // Create solid particle system for leaves
