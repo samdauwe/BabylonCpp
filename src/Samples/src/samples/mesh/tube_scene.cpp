@@ -68,7 +68,7 @@ void TubeScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create tube
   auto tube = Mesh::CreateTube("tube", curve, 2, 60, radiusFunction, 0, scene,
-                               false, Mesh::FRONTSIDE);
+                               false, Mesh::FRONTSIDE());
   tube->setMaterial(mat);
 }
 

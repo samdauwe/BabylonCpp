@@ -126,8 +126,9 @@ Mesh* HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
   auto nbWalls = walls.size();
   outerData.resize(nbWalls);
   for (size_t w = 0; w < nbWalls; ++w) {
-    angle = Math::PI - ::std::acos(Vector3::Dot(line, nextLine)
-                                   / (line.length() * nextLine.length()));
+    angle = Math::PI
+            - ::std::acos(Vector3::Dot(line, nextLine)
+                          / (line.length() * nextLine.length()));
     direction       = Vector3::Cross(nextLine, line).normalize().y;
     auto lineNormal = Vector3(line.z, 0.f, -1.f * line.x).normalize();
     line.normalize();
@@ -268,9 +269,8 @@ Mesh* HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
       uvx = interiorUV.x + p.x * (interiorUV.z - interiorUV.x) / maxL;
       uvy = interiorUV.y + p.y * (interiorUV.w - interiorUV.y) / height;
       stl_util::concat(uvs, {uvx, uvy});
-      stl_util::concat(
-        colors,
-        {interiorColor.r, interiorColor.g, interiorColor.b, interiorColor.a});
+      stl_util::concat(colors, {interiorColor.r, interiorColor.g,
+                                interiorColor.b, interiorColor.a});
     }
 
     // Add inner wall positions (repeated for flat shaded mesh)
@@ -398,69 +398,55 @@ Mesh* HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
       nbIndices       = positions.size() / 3; // current number of indices
       auto _nbIndices = static_cast<uint32_t>(nbIndices);
 
-      stl_util::concat(positions,
-                       {innerBaseCorners[w].x, innerBaseCorners[w].y,
-                        innerBaseCorners[w].z}); // tl
-      stl_util::concat(positions,
-                       {outerBaseCorners[w].x, outerBaseCorners[w].y,
-                        outerBaseCorners[w].z}); // bl
-      stl_util::concat(positions,
-                       {innerDoorCorners[w][doorNb][0].x,
-                        innerDoorCorners[w][doorNb][0].y,
-                        innerDoorCorners[w][doorNb][0].z}); // tr
-      stl_util::concat(positions,
-                       {outerDoorCorners[w][doorNb][0].x,
-                        outerDoorCorners[w][doorNb][0].y,
-                        outerDoorCorners[w][doorNb][0].z}); // br
+      stl_util::concat(positions, {innerBaseCorners[w].x, innerBaseCorners[w].y,
+                                   innerBaseCorners[w].z}); // tl
+      stl_util::concat(positions, {outerBaseCorners[w].x, outerBaseCorners[w].y,
+                                   outerBaseCorners[w].z}); // bl
+      stl_util::concat(positions, {innerDoorCorners[w][doorNb][0].x,
+                                   innerDoorCorners[w][doorNb][0].y,
+                                   innerDoorCorners[w][doorNb][0].z}); // tr
+      stl_util::concat(positions, {outerDoorCorners[w][doorNb][0].x,
+                                   outerDoorCorners[w][doorNb][0].y,
+                                   outerDoorCorners[w][doorNb][0].z}); // br
 
+      stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y
+                                             + (exteriorUV.w - exteriorUV.y)
+                                                 * ply / maxH}); // top Left
+      stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y});       // base Left
       stl_util::concat(
-        uvs,
-        {exteriorUV.x,
-         exteriorUV.y
-           + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top Left
-      stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y}); // base Left
-      stl_util::concat(
-        uvs,
-        {exteriorUV.x
-           + (exteriorUV.z - exteriorUV.x) * walls[w].doorSpaces[doorNb].left
-               / maxL,
-         exteriorUV.y
-           + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top right
-      stl_util::concat(uvs,
-                       {exteriorUV.x
-                          + (exteriorUV.z - exteriorUV.x)
-                              * walls[w].doorSpaces[doorNb].left / maxL,
-                        exteriorUV.y}); // base right
+        uvs, {exteriorUV.x
+                + (exteriorUV.z - exteriorUV.x)
+                    * walls[w].doorSpaces[doorNb].left / maxL,
+              exteriorUV.y
+                + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top right
+      stl_util::concat(uvs, {exteriorUV.x
+                               + (exteriorUV.z - exteriorUV.x)
+                                   * walls[w].doorSpaces[doorNb].left / maxL,
+                             exteriorUV.y}); // base right
 
-      stl_util::concat(indices,
-                       {_nbIndices, _nbIndices + 2, _nbIndices + 3,
-                        _nbIndices + 3, _nbIndices + 1, _nbIndices});
+      stl_util::concat(indices, {_nbIndices, _nbIndices + 2, _nbIndices + 3,
+                                 _nbIndices + 3, _nbIndices + 1, _nbIndices});
 
       // Left side
       nbIndices  = positions.size() / 3; // current number of indices
       _nbIndices = static_cast<uint32_t>(nbIndices);
 
-      stl_util::concat(positions,
-                       {innerDoorCorners[w][doorNb][0].x,
-                        innerDoorCorners[w][doorNb][0].y,
-                        innerDoorCorners[w][doorNb][0].z}); // br
-      stl_util::concat(positions,
-                       {innerDoorCorners[w][doorNb][1].x,
-                        innerDoorCorners[w][doorNb][1].y,
-                        innerDoorCorners[w][doorNb][1].z}); // tr
-      stl_util::concat(positions,
-                       {outerDoorCorners[w][doorNb][0].x,
-                        outerDoorCorners[w][doorNb][0].y,
-                        outerDoorCorners[w][doorNb][0].z}); // bl
-      stl_util::concat(positions,
-                       {outerDoorCorners[w][doorNb][1].x,
-                        outerDoorCorners[w][doorNb][1].y,
-                        outerDoorCorners[w][doorNb][1].z}); // tl
+      stl_util::concat(positions, {innerDoorCorners[w][doorNb][0].x,
+                                   innerDoorCorners[w][doorNb][0].y,
+                                   innerDoorCorners[w][doorNb][0].z}); // br
+      stl_util::concat(positions, {innerDoorCorners[w][doorNb][1].x,
+                                   innerDoorCorners[w][doorNb][1].y,
+                                   innerDoorCorners[w][doorNb][1].z}); // tr
+      stl_util::concat(positions, {outerDoorCorners[w][doorNb][0].x,
+                                   outerDoorCorners[w][doorNb][0].y,
+                                   outerDoorCorners[w][doorNb][0].z}); // bl
+      stl_util::concat(positions, {outerDoorCorners[w][doorNb][1].x,
+                                   outerDoorCorners[w][doorNb][1].y,
+                                   outerDoorCorners[w][doorNb][1].z}); // tl
 
       stl_util::concat(
-        uvs,
-        {exteriorUV.x + (exteriorUV.z - exteriorUV.x) * ply / maxL,
-         exteriorUV.y}); // base right
+        uvs, {exteriorUV.x + (exteriorUV.z - exteriorUV.x) * ply / maxL,
+              exteriorUV.y}); // base right
       stl_util::concat(
         uvs,
         {exteriorUV.x + (exteriorUV.z - exteriorUV.x) * ply / maxL,
@@ -468,37 +454,31 @@ Mesh* HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
            + (exteriorUV.w - exteriorUV.y)
                * walls[w].doorSpaces[doorNb].door.height / maxH}); // top right
       stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y});         // base Left
-      stl_util::concat(uvs,
-                       {exteriorUV.x,
-                        exteriorUV.y
-                          + (exteriorUV.w - exteriorUV.y)
-                              * walls[w].doorSpaces[doorNb].door.height
-                              / maxH}); // top Left
+      stl_util::concat(
+        uvs, {exteriorUV.x, exteriorUV.y
+                              + (exteriorUV.w - exteriorUV.y)
+                                  * walls[w].doorSpaces[doorNb].door.height
+                                  / maxH}); // top Left
 
-      stl_util::concat(indices,
-                       {_nbIndices, _nbIndices + 1, _nbIndices + 3, _nbIndices,
-                        _nbIndices + 3, _nbIndices + 2});
+      stl_util::concat(indices, {_nbIndices, _nbIndices + 1, _nbIndices + 3,
+                                 _nbIndices, _nbIndices + 3, _nbIndices + 2});
 
       // Top
       nbIndices  = positions.size() / 3; // current number of indices
       _nbIndices = static_cast<uint32_t>(nbIndices);
 
-      stl_util::concat(positions,
-                       {innerDoorCorners[w][doorNb][1].x,
-                        innerDoorCorners[w][doorNb][1].y,
-                        innerDoorCorners[w][doorNb][1].z}); // bl
-      stl_util::concat(positions,
-                       {innerDoorCorners[w][doorNb][2].x,
-                        innerDoorCorners[w][doorNb][2].y,
-                        innerDoorCorners[w][doorNb][2].z}); // br
-      stl_util::concat(positions,
-                       {outerDoorCorners[w][doorNb][1].x,
-                        outerDoorCorners[w][doorNb][1].y,
-                        outerDoorCorners[w][doorNb][1].z}); // tl
-      stl_util::concat(positions,
-                       {outerDoorCorners[w][doorNb][2].x,
-                        outerDoorCorners[w][doorNb][2].y,
-                        outerDoorCorners[w][doorNb][2].z}); // tr
+      stl_util::concat(positions, {innerDoorCorners[w][doorNb][1].x,
+                                   innerDoorCorners[w][doorNb][1].y,
+                                   innerDoorCorners[w][doorNb][1].z}); // bl
+      stl_util::concat(positions, {innerDoorCorners[w][doorNb][2].x,
+                                   innerDoorCorners[w][doorNb][2].y,
+                                   innerDoorCorners[w][doorNb][2].z}); // br
+      stl_util::concat(positions, {outerDoorCorners[w][doorNb][1].x,
+                                   outerDoorCorners[w][doorNb][1].y,
+                                   outerDoorCorners[w][doorNb][1].z}); // tl
+      stl_util::concat(positions, {outerDoorCorners[w][doorNb][2].x,
+                                   outerDoorCorners[w][doorNb][2].y,
+                                   outerDoorCorners[w][doorNb][2].z}); // tr
 
       stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y}); // base Left
       stl_util::concat(uvs,
@@ -506,50 +486,41 @@ Mesh* HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
                           + (exteriorUV.z - exteriorUV.x)
                               * walls[w].doorSpaces[doorNb].door.width / maxL,
                         exteriorUV.y}); // base right
+      stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y
+                                             + (exteriorUV.w - exteriorUV.y)
+                                                 * ply / maxH}); // top Left
       stl_util::concat(
-        uvs,
-        {exteriorUV.x,
-         exteriorUV.y
-           + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top Left
-      stl_util::concat(
-        uvs,
-        {exteriorUV.x
-           + (exteriorUV.z - exteriorUV.x)
-               * walls[w].doorSpaces[doorNb].door.width / maxL,
-         exteriorUV.y
-           + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top right
+        uvs, {exteriorUV.x
+                + (exteriorUV.z - exteriorUV.x)
+                    * walls[w].doorSpaces[doorNb].door.width / maxL,
+              exteriorUV.y
+                + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top right
 
-      stl_util::concat(indices,
-                       {_nbIndices + 2, _nbIndices + 1, _nbIndices + 3,
-                        _nbIndices + 2, _nbIndices, _nbIndices + 1});
+      stl_util::concat(indices, {_nbIndices + 2, _nbIndices + 1, _nbIndices + 3,
+                                 _nbIndices + 2, _nbIndices, _nbIndices + 1});
 
       // Right side
       nbIndices  = positions.size() / 3; // current number of indices
       _nbIndices = static_cast<uint32_t>(nbIndices);
 
-      stl_util::concat(positions,
-                       {innerDoorCorners[w][doorNb][2].x,
-                        innerDoorCorners[w][doorNb][2].y,
-                        innerDoorCorners[w][doorNb][2].z}); // tl
-      stl_util::concat(positions,
-                       {innerDoorCorners[w][doorNb][3].x,
-                        innerDoorCorners[w][doorNb][3].y,
-                        innerDoorCorners[w][doorNb][3].z}); // bl
-      stl_util::concat(positions,
-                       {outerDoorCorners[w][doorNb][2].x,
-                        outerDoorCorners[w][doorNb][2].y,
-                        outerDoorCorners[w][doorNb][2].z}); // tr
-      stl_util::concat(positions,
-                       {outerDoorCorners[w][doorNb][3].x,
-                        outerDoorCorners[w][doorNb][3].y,
-                        outerDoorCorners[w][doorNb][3].z}); // br
+      stl_util::concat(positions, {innerDoorCorners[w][doorNb][2].x,
+                                   innerDoorCorners[w][doorNb][2].y,
+                                   innerDoorCorners[w][doorNb][2].z}); // tl
+      stl_util::concat(positions, {innerDoorCorners[w][doorNb][3].x,
+                                   innerDoorCorners[w][doorNb][3].y,
+                                   innerDoorCorners[w][doorNb][3].z}); // bl
+      stl_util::concat(positions, {outerDoorCorners[w][doorNb][2].x,
+                                   outerDoorCorners[w][doorNb][2].y,
+                                   outerDoorCorners[w][doorNb][2].z}); // tr
+      stl_util::concat(positions, {outerDoorCorners[w][doorNb][3].x,
+                                   outerDoorCorners[w][doorNb][3].y,
+                                   outerDoorCorners[w][doorNb][3].z}); // br
 
-      stl_util::concat(uvs,
-                       {exteriorUV.x,
-                        exteriorUV.y
-                          + (exteriorUV.w - exteriorUV.y)
-                              * walls[w].doorSpaces[doorNb].door.height
-                              / maxH});                    // top Left
+      stl_util::concat(
+        uvs, {exteriorUV.x, exteriorUV.y
+                              + (exteriorUV.w - exteriorUV.y)
+                                  * walls[w].doorSpaces[doorNb].door.height
+                                  / maxH});                // top Left
       stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y}); // base Left
       stl_util::concat(
         uvs,
@@ -558,13 +529,11 @@ Mesh* HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
            + (exteriorUV.w - exteriorUV.y)
                * walls[w].doorSpaces[doorNb].door.height / maxH}); // top right
       stl_util::concat(
-        uvs,
-        {exteriorUV.x + (exteriorUV.z - exteriorUV.x) * ply / maxL,
-         exteriorUV.y}); // base right
+        uvs, {exteriorUV.x + (exteriorUV.z - exteriorUV.x) * ply / maxL,
+              exteriorUV.y}); // base right
 
-      stl_util::concat(indices,
-                       {_nbIndices, _nbIndices + 3, _nbIndices + 2, _nbIndices,
-                        _nbIndices + 1, _nbIndices + 3});
+      stl_util::concat(indices, {_nbIndices, _nbIndices + 3, _nbIndices + 2,
+                                 _nbIndices, _nbIndices + 1, _nbIndices + 3});
     }
     --doorsRemaining;
     ++doorNb;
@@ -574,78 +543,64 @@ Mesh* HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
       nbIndices       = positions.size() / 3; // current number of indices
       auto _nbIndices = static_cast<uint32_t>(nbIndices);
 
-      stl_util::concat(positions,
-                       {innerDoorCorners[w][doorNb - 1][3].x,
-                        innerDoorCorners[w][doorNb - 1][3].y,
-                        innerDoorCorners[w][doorNb - 1][3].z}); // bl
-      stl_util::concat(positions,
-                       {innerDoorCorners[w][doorNb][0].x,
-                        innerDoorCorners[w][doorNb][0].y,
-                        innerDoorCorners[w][doorNb][0].z}); // br
-      stl_util::concat(positions,
-                       {outerDoorCorners[w][doorNb - 1][3].x,
-                        outerDoorCorners[w][doorNb - 1][3].y,
-                        outerDoorCorners[w][doorNb - 1][3].z}); // tl
-      stl_util::concat(positions,
-                       {outerDoorCorners[w][doorNb][0].x,
-                        outerDoorCorners[w][doorNb][0].y,
-                        outerDoorCorners[w][doorNb][0].z}); // tr
+      stl_util::concat(positions, {innerDoorCorners[w][doorNb - 1][3].x,
+                                   innerDoorCorners[w][doorNb - 1][3].y,
+                                   innerDoorCorners[w][doorNb - 1][3].z}); // bl
+      stl_util::concat(positions, {innerDoorCorners[w][doorNb][0].x,
+                                   innerDoorCorners[w][doorNb][0].y,
+                                   innerDoorCorners[w][doorNb][0].z}); // br
+      stl_util::concat(positions, {outerDoorCorners[w][doorNb - 1][3].x,
+                                   outerDoorCorners[w][doorNb - 1][3].y,
+                                   outerDoorCorners[w][doorNb - 1][3].z}); // tl
+      stl_util::concat(positions, {outerDoorCorners[w][doorNb][0].x,
+                                   outerDoorCorners[w][doorNb][0].y,
+                                   outerDoorCorners[w][doorNb][0].z}); // tr
 
       stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y}); // base Left
       stl_util::concat(
-        uvs,
-        {exteriorUV.x
-           + (exteriorUV.z - exteriorUV.x)
-               * (walls[w].doorSpaces[doorNb].left
-                  - (walls[w].doorSpaces[doorNb - 1].left
-                     + walls[w].doorSpaces[doorNb - 1].door.width))
-               / maxL / maxL,
-         exteriorUV.y}); // base right
+        uvs, {exteriorUV.x
+                + (exteriorUV.z - exteriorUV.x)
+                    * (walls[w].doorSpaces[doorNb].left
+                       - (walls[w].doorSpaces[doorNb - 1].left
+                          + walls[w].doorSpaces[doorNb - 1].door.width))
+                    / maxL / maxL,
+              exteriorUV.y}); // base right
+      stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y
+                                             + (exteriorUV.w - exteriorUV.y)
+                                                 * ply / maxH}); // top Left
       stl_util::concat(
-        uvs,
-        {exteriorUV.x,
-         exteriorUV.y
-           + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top Left
-      stl_util::concat(
-        uvs,
-        {exteriorUV.x
-           + (exteriorUV.z - exteriorUV.x)
-               * (walls[w].doorSpaces[doorNb].left
-                  - (walls[w].doorSpaces[doorNb - 1].left
-                     + walls[w].doorSpaces[doorNb - 1].door.width))
-               / maxL,
-         exteriorUV.y
-           + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top right
+        uvs, {exteriorUV.x
+                + (exteriorUV.z - exteriorUV.x)
+                    * (walls[w].doorSpaces[doorNb].left
+                       - (walls[w].doorSpaces[doorNb - 1].left
+                          + walls[w].doorSpaces[doorNb - 1].door.width))
+                    / maxL,
+              exteriorUV.y
+                + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top right
 
-      stl_util::concat(indices,
-                       {_nbIndices, _nbIndices + 1, _nbIndices + 3,
-                        _nbIndices + 3, _nbIndices + 2, _nbIndices});
+      stl_util::concat(indices, {_nbIndices, _nbIndices + 1, _nbIndices + 3,
+                                 _nbIndices + 3, _nbIndices + 2, _nbIndices});
 
       // Left side
       nbIndices  = positions.size() / 3; // current number of indices
       _nbIndices = static_cast<uint32_t>(nbIndices);
 
-      stl_util::concat(positions,
-                       {innerDoorCorners[w][doorNb][0].x,
-                        innerDoorCorners[w][doorNb][0].y,
-                        innerDoorCorners[w][doorNb][0].z}); // br
-      stl_util::concat(positions,
-                       {innerDoorCorners[w][doorNb][1].x,
-                        innerDoorCorners[w][doorNb][1].y,
-                        innerDoorCorners[w][doorNb][1].z}); // tr
-      stl_util::concat(positions,
-                       {outerDoorCorners[w][doorNb][0].x,
-                        outerDoorCorners[w][doorNb][0].y,
-                        outerDoorCorners[w][doorNb][0].z}); // bl
-      stl_util::concat(positions,
-                       {outerDoorCorners[w][doorNb][1].x,
-                        outerDoorCorners[w][doorNb][1].y,
-                        outerDoorCorners[w][doorNb][1].z}); // tl
+      stl_util::concat(positions, {innerDoorCorners[w][doorNb][0].x,
+                                   innerDoorCorners[w][doorNb][0].y,
+                                   innerDoorCorners[w][doorNb][0].z}); // br
+      stl_util::concat(positions, {innerDoorCorners[w][doorNb][1].x,
+                                   innerDoorCorners[w][doorNb][1].y,
+                                   innerDoorCorners[w][doorNb][1].z}); // tr
+      stl_util::concat(positions, {outerDoorCorners[w][doorNb][0].x,
+                                   outerDoorCorners[w][doorNb][0].y,
+                                   outerDoorCorners[w][doorNb][0].z}); // bl
+      stl_util::concat(positions, {outerDoorCorners[w][doorNb][1].x,
+                                   outerDoorCorners[w][doorNb][1].y,
+                                   outerDoorCorners[w][doorNb][1].z}); // tl
 
       stl_util::concat(
-        uvs,
-        {exteriorUV.x + (exteriorUV.z - exteriorUV.x) * ply / maxL,
-         exteriorUV.y}); // base right
+        uvs, {exteriorUV.x + (exteriorUV.z - exteriorUV.x) * ply / maxL,
+              exteriorUV.y}); // base right
       stl_util::concat(
         uvs,
         {exteriorUV.x + (exteriorUV.z - exteriorUV.x) * ply / maxL,
@@ -653,37 +608,31 @@ Mesh* HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
            + (exteriorUV.w - exteriorUV.y)
                * walls[w].doorSpaces[doorNb].door.height / maxH}); // top right
       stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y});         // base Left
-      stl_util::concat(uvs,
-                       {exteriorUV.x,
-                        exteriorUV.y
-                          + (exteriorUV.w - exteriorUV.y)
-                              * walls[w].doorSpaces[doorNb].door.height
-                              / maxH}); // top Left
+      stl_util::concat(
+        uvs, {exteriorUV.x, exteriorUV.y
+                              + (exteriorUV.w - exteriorUV.y)
+                                  * walls[w].doorSpaces[doorNb].door.height
+                                  / maxH}); // top Left
 
-      stl_util::concat(indices,
-                       {_nbIndices, _nbIndices + 1, _nbIndices + 3, _nbIndices,
-                        _nbIndices + 3, _nbIndices + 2});
+      stl_util::concat(indices, {_nbIndices, _nbIndices + 1, _nbIndices + 3,
+                                 _nbIndices, _nbIndices + 3, _nbIndices + 2});
 
       // Top
       nbIndices  = positions.size() / 3; // current number of indices
       _nbIndices = static_cast<uint32_t>(nbIndices);
 
-      stl_util::concat(positions,
-                       {innerDoorCorners[w][doorNb][1].x,
-                        innerDoorCorners[w][doorNb][1].y,
-                        innerDoorCorners[w][doorNb][1].z}); // bl
-      stl_util::concat(positions,
-                       {innerDoorCorners[w][doorNb][2].x,
-                        innerDoorCorners[w][doorNb][2].y,
-                        innerDoorCorners[w][doorNb][2].z}); // br
-      stl_util::concat(positions,
-                       {outerDoorCorners[w][doorNb][1].x,
-                        outerDoorCorners[w][doorNb][1].y,
-                        outerDoorCorners[w][doorNb][1].z}); // tl
-      stl_util::concat(positions,
-                       {outerDoorCorners[w][doorNb][2].x,
-                        outerDoorCorners[w][doorNb][2].y,
-                        outerDoorCorners[w][doorNb][2].z}); // tr
+      stl_util::concat(positions, {innerDoorCorners[w][doorNb][1].x,
+                                   innerDoorCorners[w][doorNb][1].y,
+                                   innerDoorCorners[w][doorNb][1].z}); // bl
+      stl_util::concat(positions, {innerDoorCorners[w][doorNb][2].x,
+                                   innerDoorCorners[w][doorNb][2].y,
+                                   innerDoorCorners[w][doorNb][2].z}); // br
+      stl_util::concat(positions, {outerDoorCorners[w][doorNb][1].x,
+                                   outerDoorCorners[w][doorNb][1].y,
+                                   outerDoorCorners[w][doorNb][1].z}); // tl
+      stl_util::concat(positions, {outerDoorCorners[w][doorNb][2].x,
+                                   outerDoorCorners[w][doorNb][2].y,
+                                   outerDoorCorners[w][doorNb][2].z}); // tr
 
       stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y}); // base Left
       stl_util::concat(uvs,
@@ -691,50 +640,41 @@ Mesh* HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
                           + (exteriorUV.z - exteriorUV.x)
                               * walls[w].doorSpaces[doorNb].door.width / maxL,
                         exteriorUV.y}); // base right
+      stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y
+                                             + (exteriorUV.w - exteriorUV.y)
+                                                 * ply / maxH}); // top Left
       stl_util::concat(
-        uvs,
-        {exteriorUV.x,
-         exteriorUV.y
-           + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top Left
-      stl_util::concat(
-        uvs,
-        {exteriorUV.x
-           + (exteriorUV.z - exteriorUV.x)
-               * walls[w].doorSpaces[doorNb].door.width / maxL,
-         exteriorUV.y
-           + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top right
+        uvs, {exteriorUV.x
+                + (exteriorUV.z - exteriorUV.x)
+                    * walls[w].doorSpaces[doorNb].door.width / maxL,
+              exteriorUV.y
+                + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top right
 
-      stl_util::concat(indices,
-                       {_nbIndices + 2, _nbIndices + 1, _nbIndices + 3,
-                        _nbIndices + 2, _nbIndices, _nbIndices + 1});
+      stl_util::concat(indices, {_nbIndices + 2, _nbIndices + 1, _nbIndices + 3,
+                                 _nbIndices + 2, _nbIndices, _nbIndices + 1});
 
       // Right side
       nbIndices  = positions.size() / 3; // current number of indices
       _nbIndices = static_cast<uint32_t>(nbIndices);
 
-      stl_util::concat(positions,
-                       {innerDoorCorners[w][doorNb][2].x,
-                        innerDoorCorners[w][doorNb][2].y,
-                        innerDoorCorners[w][doorNb][2].z}); // tl
-      stl_util::concat(positions,
-                       {innerDoorCorners[w][doorNb][3].x,
-                        innerDoorCorners[w][doorNb][3].y,
-                        innerDoorCorners[w][doorNb][3].z}); // bl
-      stl_util::concat(positions,
-                       {outerDoorCorners[w][doorNb][2].x,
-                        outerDoorCorners[w][doorNb][2].y,
-                        outerDoorCorners[w][doorNb][2].z}); // tr
-      stl_util::concat(positions,
-                       {outerDoorCorners[w][doorNb][3].x,
-                        outerDoorCorners[w][doorNb][3].y,
-                        outerDoorCorners[w][doorNb][3].z}); // br
+      stl_util::concat(positions, {innerDoorCorners[w][doorNb][2].x,
+                                   innerDoorCorners[w][doorNb][2].y,
+                                   innerDoorCorners[w][doorNb][2].z}); // tl
+      stl_util::concat(positions, {innerDoorCorners[w][doorNb][3].x,
+                                   innerDoorCorners[w][doorNb][3].y,
+                                   innerDoorCorners[w][doorNb][3].z}); // bl
+      stl_util::concat(positions, {outerDoorCorners[w][doorNb][2].x,
+                                   outerDoorCorners[w][doorNb][2].y,
+                                   outerDoorCorners[w][doorNb][2].z}); // tr
+      stl_util::concat(positions, {outerDoorCorners[w][doorNb][3].x,
+                                   outerDoorCorners[w][doorNb][3].y,
+                                   outerDoorCorners[w][doorNb][3].z}); // br
 
-      stl_util::concat(uvs,
-                       {exteriorUV.x,
-                        exteriorUV.y
-                          + (exteriorUV.w - exteriorUV.y)
-                              * walls[w].doorSpaces[doorNb].door.height
-                              / maxH});                    // top Left
+      stl_util::concat(
+        uvs, {exteriorUV.x, exteriorUV.y
+                              + (exteriorUV.w - exteriorUV.y)
+                                  * walls[w].doorSpaces[doorNb].door.height
+                                  / maxH});                // top Left
       stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y}); // base Left
       stl_util::concat(
         uvs,
@@ -743,13 +683,11 @@ Mesh* HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
            + (exteriorUV.w - exteriorUV.y)
                * walls[w].doorSpaces[doorNb].door.height / maxH}); // top right
       stl_util::concat(
-        uvs,
-        {exteriorUV.x + (exteriorUV.z - exteriorUV.x) * ply / maxL,
-         exteriorUV.y}); // base right
+        uvs, {exteriorUV.x + (exteriorUV.z - exteriorUV.x) * ply / maxL,
+              exteriorUV.y}); // base right
 
-      stl_util::concat(indices,
-                       {_nbIndices, _nbIndices + 3, _nbIndices + 2, _nbIndices,
-                        _nbIndices + 1, _nbIndices + 3});
+      stl_util::concat(indices, {_nbIndices, _nbIndices + 3, _nbIndices + 2,
+                                 _nbIndices, _nbIndices + 1, _nbIndices + 3});
 
       --doorsRemaining;
       ++doorNb;
@@ -761,58 +699,52 @@ Mesh* HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
 
     // Final base
     if (doors > 0) {
-      stl_util::concat(positions,
-                       {innerDoorCorners[w][doorNb][3].x,
-                        innerDoorCorners[w][doorNb][3].y,
-                        innerDoorCorners[w][doorNb][3].z}); // bl
+      stl_util::concat(positions, {innerDoorCorners[w][doorNb][3].x,
+                                   innerDoorCorners[w][doorNb][3].y,
+                                   innerDoorCorners[w][doorNb][3].z}); // bl
       stl_util::concat(positions,
                        {innerBaseCorners[(w + 1) % nbWalls].x,
                         innerBaseCorners[(w + 1) % nbWalls].y,
                         innerBaseCorners[(w + 1) % nbWalls].z}); // br
-      stl_util::concat(positions,
-                       {outerDoorCorners[w][doorNb][3].x,
-                        outerDoorCorners[w][doorNb][3].y,
-                        outerDoorCorners[w][doorNb][3].z}); // tl
+      stl_util::concat(positions, {outerDoorCorners[w][doorNb][3].x,
+                                   outerDoorCorners[w][doorNb][3].y,
+                                   outerDoorCorners[w][doorNb][3].z}); // tl
       stl_util::concat(positions,
                        {outerBaseCorners[(w + 1) % nbWalls].x,
                         outerBaseCorners[(w + 1) % nbWalls].y,
                         outerBaseCorners[(w + 1) % nbWalls].z}); // tr
 
       stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y}); // base Left
+      stl_util::concat(uvs,
+                       {exteriorUV.x
+                          + (exteriorUV.z - exteriorUV.x)
+                              * (wallLength
+                                 - (walls[w].doorSpaces[doorNb].left
+                                    + walls[w].doorSpaces[doorNb].door.width))
+                              / maxL,
+                        exteriorUV.y}); // base right
+      stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y
+                                             + (exteriorUV.w - exteriorUV.y)
+                                                 * ply / maxH}); // top Left
       stl_util::concat(
-        uvs,
-        {exteriorUV.x
-           + (exteriorUV.z - exteriorUV.x)
-               * (wallLength - (walls[w].doorSpaces[doorNb].left
-                                + walls[w].doorSpaces[doorNb].door.width))
-               / maxL,
-         exteriorUV.y}); // base right
-      stl_util::concat(
-        uvs,
-        {exteriorUV.x,
-         exteriorUV.y
-           + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top Left
-      stl_util::concat(
-        uvs,
-        {exteriorUV.x
-           + (exteriorUV.z - exteriorUV.x)
-               * (wallLength - (walls[w].doorSpaces[doorNb].left
-                                + walls[w].doorSpaces[doorNb].door.width))
-               / maxL,
-         exteriorUV.y
-           + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top right
+        uvs, {exteriorUV.x
+                + (exteriorUV.z - exteriorUV.x)
+                    * (wallLength
+                       - (walls[w].doorSpaces[doorNb].left
+                          + walls[w].doorSpaces[doorNb].door.width))
+                    / maxL,
+              exteriorUV.y
+                + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top right
     }
     else {
-      stl_util::concat(positions,
-                       {innerBaseCorners[w].x, innerBaseCorners[w].y,
-                        innerBaseCorners[w].z}); // bl
+      stl_util::concat(positions, {innerBaseCorners[w].x, innerBaseCorners[w].y,
+                                   innerBaseCorners[w].z}); // bl
       stl_util::concat(positions,
                        {innerBaseCorners[(w + 1) % nbWalls].x,
                         innerBaseCorners[(w + 1) % nbWalls].y,
                         innerBaseCorners[(w + 1) % nbWalls].z}); // br
-      stl_util::concat(positions,
-                       {outerBaseCorners[w].x, outerBaseCorners[w].y,
-                        outerBaseCorners[w].z}); // tl
+      stl_util::concat(positions, {outerBaseCorners[w].x, outerBaseCorners[w].y,
+                                   outerBaseCorners[w].z}); // tl
       stl_util::concat(positions,
                        {outerBaseCorners[(w + 1) % nbWalls].x,
                         outerBaseCorners[(w + 1) % nbWalls].y,
@@ -820,23 +752,18 @@ Mesh* HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
 
       stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y}); // base Left
       stl_util::concat(
-        uvs,
-        {exteriorUV.x + (exteriorUV.z - exteriorUV.x) * wallLength / maxL,
-         exteriorUV.y}); // base right
+        uvs, {exteriorUV.x + (exteriorUV.z - exteriorUV.x) * wallLength / maxL,
+              exteriorUV.y}); // base right
+      stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y
+                                             + (exteriorUV.w - exteriorUV.y)
+                                                 * ply / maxH}); // top Left
       stl_util::concat(
-        uvs,
-        {exteriorUV.x,
-         exteriorUV.y
-           + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top Left
-      stl_util::concat(
-        uvs,
-        {exteriorUV.x + (exteriorUV.z - exteriorUV.x) * wallLength / maxL,
-         exteriorUV.y
-           + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top right
+        uvs, {exteriorUV.x + (exteriorUV.z - exteriorUV.x) * wallLength / maxL,
+              exteriorUV.y
+                + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top right
     }
-    stl_util::concat(indices,
-                     {_nbIndices, _nbIndices + 1, _nbIndices + 3,
-                      _nbIndices + 3, _nbIndices + 2, _nbIndices});
+    stl_util::concat(indices, {_nbIndices, _nbIndices + 1, _nbIndices + 3,
+                               _nbIndices + 3, _nbIndices + 2, _nbIndices});
 
     // Construct facets for window base, top and sides, repeating positions for
     // flatshaded mesh
@@ -845,22 +772,18 @@ Mesh* HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
       nbIndices  = positions.size() / 3; // current number of indices
       _nbIndices = static_cast<uint32_t>(nbIndices);
 
-      stl_util::concat(positions,
-                       {innerWindowCorners[w][ww][3].x,
-                        innerWindowCorners[w][ww][3].y,
-                        innerWindowCorners[w][ww][3].z}); // tr
-      stl_util::concat(positions,
-                       {innerWindowCorners[w][ww][0].x,
-                        innerWindowCorners[w][ww][0].y,
-                        innerWindowCorners[w][ww][0].z}); // br
-      stl_util::concat(positions,
-                       {outerWindowCorners[w][ww][3].x,
-                        outerWindowCorners[w][ww][3].y,
-                        outerWindowCorners[w][ww][3].z}); // tl
-      stl_util::concat(positions,
-                       {outerWindowCorners[w][ww][0].x,
-                        outerWindowCorners[w][ww][0].y,
-                        outerWindowCorners[w][ww][0].z}); // bl
+      stl_util::concat(positions, {innerWindowCorners[w][ww][3].x,
+                                   innerWindowCorners[w][ww][3].y,
+                                   innerWindowCorners[w][ww][3].z}); // tr
+      stl_util::concat(positions, {innerWindowCorners[w][ww][0].x,
+                                   innerWindowCorners[w][ww][0].y,
+                                   innerWindowCorners[w][ww][0].z}); // br
+      stl_util::concat(positions, {outerWindowCorners[w][ww][3].x,
+                                   outerWindowCorners[w][ww][3].y,
+                                   outerWindowCorners[w][ww][3].z}); // tl
+      stl_util::concat(positions, {outerWindowCorners[w][ww][0].x,
+                                   outerWindowCorners[w][ww][0].y,
+                                   outerWindowCorners[w][ww][0].z}); // bl
 
       stl_util::concat(
         uvs,
@@ -869,128 +792,105 @@ Mesh* HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
            + (exteriorUV.w - exteriorUV.y)
                * walls[w].windowSpaces[ww].window.height / maxH}); // top right
       stl_util::concat(
-        uvs,
-        {exteriorUV.x + (exteriorUV.z - exteriorUV.x) * ply / maxL,
-         exteriorUV.y}); // base right
-      stl_util::concat(uvs,
-                       {exteriorUV.x,
-                        exteriorUV.y
-                          + (exteriorUV.w - exteriorUV.y)
-                              * walls[w].windowSpaces[ww].window.height
-                              / maxH});                    // top Left
+        uvs, {exteriorUV.x + (exteriorUV.z - exteriorUV.x) * ply / maxL,
+              exteriorUV.y}); // base right
+      stl_util::concat(
+        uvs, {exteriorUV.x, exteriorUV.y
+                              + (exteriorUV.w - exteriorUV.y)
+                                  * walls[w].windowSpaces[ww].window.height
+                                  / maxH});                // top Left
       stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y}); // base Left
 
-      stl_util::concat(indices,
-                       {_nbIndices + 1, _nbIndices, _nbIndices + 3,
-                        _nbIndices + 2, _nbIndices + 3, _nbIndices});
+      stl_util::concat(indices, {_nbIndices + 1, _nbIndices, _nbIndices + 3,
+                                 _nbIndices + 2, _nbIndices + 3, _nbIndices});
 
       // Base
       nbIndices  = positions.size() / 3; // current number of indices
       _nbIndices = static_cast<uint32_t>(nbIndices);
 
-      stl_util::concat(positions,
-                       {innerWindowCorners[w][ww][0].x,
-                        innerWindowCorners[w][ww][0].y,
-                        innerWindowCorners[w][ww][0].z}); // tl
-      stl_util::concat(positions,
-                       {innerWindowCorners[w][ww][1].x,
-                        innerWindowCorners[w][ww][1].y,
-                        innerWindowCorners[w][ww][1].z}); // tr
-      stl_util::concat(positions,
-                       {outerWindowCorners[w][ww][0].x,
-                        outerWindowCorners[w][ww][0].y,
-                        outerWindowCorners[w][ww][0].z}); // bl
-      stl_util::concat(positions,
-                       {outerWindowCorners[w][ww][1].x,
-                        outerWindowCorners[w][ww][1].y,
-                        outerWindowCorners[w][ww][1].z}); // br
+      stl_util::concat(positions, {innerWindowCorners[w][ww][0].x,
+                                   innerWindowCorners[w][ww][0].y,
+                                   innerWindowCorners[w][ww][0].z}); // tl
+      stl_util::concat(positions, {innerWindowCorners[w][ww][1].x,
+                                   innerWindowCorners[w][ww][1].y,
+                                   innerWindowCorners[w][ww][1].z}); // tr
+      stl_util::concat(positions, {outerWindowCorners[w][ww][0].x,
+                                   outerWindowCorners[w][ww][0].y,
+                                   outerWindowCorners[w][ww][0].z}); // bl
+      stl_util::concat(positions, {outerWindowCorners[w][ww][1].x,
+                                   outerWindowCorners[w][ww][1].y,
+                                   outerWindowCorners[w][ww][1].z}); // br
 
+      stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y
+                                             + (exteriorUV.w - exteriorUV.y)
+                                                 * ply / maxH}); // top Left
       stl_util::concat(
-        uvs,
-        {exteriorUV.x,
-         exteriorUV.y
-           + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top Left
-      stl_util::concat(
-        uvs,
-        {exteriorUV.x
-           + (exteriorUV.z - exteriorUV.x)
-               * walls[w].windowSpaces[ww].window.width / maxL,
-         exteriorUV.y
-           + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top right
-      stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y}); // base Left
+        uvs, {exteriorUV.x
+                + (exteriorUV.z - exteriorUV.x)
+                    * walls[w].windowSpaces[ww].window.width / maxL,
+              exteriorUV.y
+                + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top right
+      stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y});      // base Left
       stl_util::concat(uvs,
                        {exteriorUV.x
                           + (exteriorUV.z - exteriorUV.x)
                               * walls[w].windowSpaces[ww].window.width / maxL,
                         exteriorUV.y}); // base right
 
-      stl_util::concat(indices,
-                       {_nbIndices + 1, _nbIndices, _nbIndices + 3,
-                        _nbIndices + 3, _nbIndices, _nbIndices + 2});
+      stl_util::concat(indices, {_nbIndices + 1, _nbIndices, _nbIndices + 3,
+                                 _nbIndices + 3, _nbIndices, _nbIndices + 2});
 
       // Right side
       nbIndices  = positions.size() / 3; // current number of indices
       _nbIndices = static_cast<uint32_t>(nbIndices);
 
-      stl_util::concat(positions,
-                       {innerWindowCorners[w][ww][1].x,
-                        innerWindowCorners[w][ww][1].y,
-                        innerWindowCorners[w][ww][1].z}); // bl
-      stl_util::concat(positions,
-                       {innerWindowCorners[w][ww][2].x,
-                        innerWindowCorners[w][ww][2].y,
-                        innerWindowCorners[w][ww][2].z}); // tl
-      stl_util::concat(positions,
-                       {outerWindowCorners[w][ww][1].x,
-                        outerWindowCorners[w][ww][1].y,
-                        outerWindowCorners[w][ww][1].z}); // br
-      stl_util::concat(positions,
-                       {outerWindowCorners[w][ww][2].x,
-                        outerWindowCorners[w][ww][2].y,
-                        outerWindowCorners[w][ww][2].z}); // tr
+      stl_util::concat(positions, {innerWindowCorners[w][ww][1].x,
+                                   innerWindowCorners[w][ww][1].y,
+                                   innerWindowCorners[w][ww][1].z}); // bl
+      stl_util::concat(positions, {innerWindowCorners[w][ww][2].x,
+                                   innerWindowCorners[w][ww][2].y,
+                                   innerWindowCorners[w][ww][2].z}); // tl
+      stl_util::concat(positions, {outerWindowCorners[w][ww][1].x,
+                                   outerWindowCorners[w][ww][1].y,
+                                   outerWindowCorners[w][ww][1].z}); // br
+      stl_util::concat(positions, {outerWindowCorners[w][ww][2].x,
+                                   outerWindowCorners[w][ww][2].y,
+                                   outerWindowCorners[w][ww][2].z}); // tr
 
       stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y}); // base Left
-      stl_util::concat(uvs,
-                       {exteriorUV.x,
-                        exteriorUV.y
-                          + (exteriorUV.w - exteriorUV.y)
-                              * walls[w].windowSpaces[ww].window.height
-                              / maxH}); // top Left
       stl_util::concat(
-        uvs,
-        {exteriorUV.x + (exteriorUV.z - exteriorUV.x) * ply / maxL,
-         exteriorUV.y}); // base right
-      stl_util::concat(uvs,
-                       {exteriorUV.x + (exteriorUV.z - exteriorUV.x),
-                        exteriorUV.y
-                          + (exteriorUV.w - exteriorUV.y)
-                              * walls[w].windowSpaces[ww].window.height
-                              / maxH}); // top right
+        uvs, {exteriorUV.x, exteriorUV.y
+                              + (exteriorUV.w - exteriorUV.y)
+                                  * walls[w].windowSpaces[ww].window.height
+                                  / maxH}); // top Left
+      stl_util::concat(
+        uvs, {exteriorUV.x + (exteriorUV.z - exteriorUV.x) * ply / maxL,
+              exteriorUV.y}); // base right
+      stl_util::concat(uvs, {exteriorUV.x + (exteriorUV.z - exteriorUV.x),
+                             exteriorUV.y
+                               + (exteriorUV.w - exteriorUV.y)
+                                   * walls[w].windowSpaces[ww].window.height
+                                   / maxH}); // top right
 
-      stl_util::concat(indices,
-                       {_nbIndices + 1, _nbIndices + 2, _nbIndices + 3,
-                        _nbIndices, _nbIndices + 2, _nbIndices + 1});
+      stl_util::concat(indices, {_nbIndices + 1, _nbIndices + 2, _nbIndices + 3,
+                                 _nbIndices, _nbIndices + 2, _nbIndices + 1});
 
       // Top
       nbIndices  = positions.size() / 3; // current number of indices
       _nbIndices = static_cast<uint32_t>(nbIndices);
 
-      stl_util::concat(positions,
-                       {innerWindowCorners[w][ww][2].x,
-                        innerWindowCorners[w][ww][2].y,
-                        innerWindowCorners[w][ww][2].z}); // br
-      stl_util::concat(positions,
-                       {innerWindowCorners[w][ww][3].x,
-                        innerWindowCorners[w][ww][3].y,
-                        innerWindowCorners[w][ww][3].z}); // bl
-      stl_util::concat(positions,
-                       {outerWindowCorners[w][ww][2].x,
-                        outerWindowCorners[w][ww][2].y,
-                        outerWindowCorners[w][ww][2].z}); // tr
-      stl_util::concat(positions,
-                       {outerWindowCorners[w][ww][3].x,
-                        outerWindowCorners[w][ww][3].y,
-                        outerWindowCorners[w][ww][3].z}); // tl
+      stl_util::concat(positions, {innerWindowCorners[w][ww][2].x,
+                                   innerWindowCorners[w][ww][2].y,
+                                   innerWindowCorners[w][ww][2].z}); // br
+      stl_util::concat(positions, {innerWindowCorners[w][ww][3].x,
+                                   innerWindowCorners[w][ww][3].y,
+                                   innerWindowCorners[w][ww][3].z}); // bl
+      stl_util::concat(positions, {outerWindowCorners[w][ww][2].x,
+                                   outerWindowCorners[w][ww][2].y,
+                                   outerWindowCorners[w][ww][2].z}); // tr
+      stl_util::concat(positions, {outerWindowCorners[w][ww][3].x,
+                                   outerWindowCorners[w][ww][3].y,
+                                   outerWindowCorners[w][ww][3].z}); // tl
 
       stl_util::concat(uvs,
                        {exteriorUV.x
@@ -999,76 +899,64 @@ Mesh* HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
                         exteriorUV.y});                    // base right
       stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y}); // base Left
       stl_util::concat(
-        uvs,
-        {exteriorUV.x
-           + (exteriorUV.z - exteriorUV.x)
-               * walls[w].windowSpaces[ww].window.width / maxL,
-         exteriorUV.y
-           + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top right
-      stl_util::concat(
-        uvs,
-        {exteriorUV.x,
-         exteriorUV.y
-           + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top Left
+        uvs, {exteriorUV.x
+                + (exteriorUV.z - exteriorUV.x)
+                    * walls[w].windowSpaces[ww].window.width / maxL,
+              exteriorUV.y
+                + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top right
+      stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y
+                                             + (exteriorUV.w - exteriorUV.y)
+                                                 * ply / maxH}); // top Left
 
-      stl_util::concat(indices,
-                       {_nbIndices + 3, _nbIndices, _nbIndices + 2,
-                        _nbIndices + 1, _nbIndices, _nbIndices + 3});
+      stl_util::concat(indices, {_nbIndices + 3, _nbIndices, _nbIndices + 2,
+                                 _nbIndices + 1, _nbIndices, _nbIndices + 3});
     }
 
     // Construction of top of wall facets
     nbIndices  = positions.size() / 3; // current number of indices
     _nbIndices = static_cast<uint32_t>(nbIndices);
 
-    stl_util::concat(
-      positions,
-      {innerTopCorners[w].x, innerTopCorners[w].y, innerTopCorners[w].z}); // tl
-    stl_util::concat(positions,
-                     {innerTopCorners[(w + 1) % nbWalls].x,
-                      innerTopCorners[(w + 1) % nbWalls].y,
-                      innerTopCorners[(w + 1) % nbWalls].z}); // tr
-    stl_util::concat(
-      positions,
-      {outerTopCorners[w].x, outerTopCorners[w].y, outerTopCorners[w].z}); // bl
-    stl_util::concat(positions,
-                     {outerTopCorners[(w + 1) % nbWalls].x,
-                      outerTopCorners[(w + 1) % nbWalls].y,
-                      outerTopCorners[(w + 1) % nbWalls].z}); // br
+    stl_util::concat(positions, {innerTopCorners[w].x, innerTopCorners[w].y,
+                                 innerTopCorners[w].z}); // tl
+    stl_util::concat(positions, {innerTopCorners[(w + 1) % nbWalls].x,
+                                 innerTopCorners[(w + 1) % nbWalls].y,
+                                 innerTopCorners[(w + 1) % nbWalls].z}); // tr
+    stl_util::concat(positions, {outerTopCorners[w].x, outerTopCorners[w].y,
+                                 outerTopCorners[w].z}); // bl
+    stl_util::concat(positions, {outerTopCorners[(w + 1) % nbWalls].x,
+                                 outerTopCorners[(w + 1) % nbWalls].y,
+                                 outerTopCorners[(w + 1) % nbWalls].z}); // br
 
     uvx = exteriorUV.x + 0.5f * wallDiff * (exteriorUV.z - exteriorUV.x) / maxL;
     stl_util::concat(
-      uvs,
-      {uvx,
-       exteriorUV.y + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top Left
+      uvs, {uvx, exteriorUV.y
+                   + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top Left
 
     uvx
       = exteriorUV.x
         + (0.5f * wallDiff + wallLength) * (exteriorUV.z - exteriorUV.x) / maxL;
     stl_util::concat(
-      uvs,
-      {uvx,
-       exteriorUV.y + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top right
+      uvs, {uvx, exteriorUV.y
+                   + (exteriorUV.w - exteriorUV.y) * ply / maxH}); // top right
 
     stl_util::concat(uvs, {exteriorUV.x, exteriorUV.y}); // base Left
-    stl_util::concat(uvs,
-                     {exteriorUV.x
-                        + (exteriorUV.z - exteriorUV.x) * exteriorWallLength
-                            / (maxL + wallDiff),
-                      exteriorUV.y}); // base right
+    stl_util::concat(uvs, {exteriorUV.x
+                             + (exteriorUV.z - exteriorUV.x)
+                                 * exteriorWallLength / (maxL + wallDiff),
+                           exteriorUV.y}); // base right
 
-    stl_util::concat(indices,
-                     {_nbIndices + 1, _nbIndices, _nbIndices + 3,
-                      _nbIndices + 2, _nbIndices + 3, _nbIndices});
+    stl_util::concat(indices, {_nbIndices + 1, _nbIndices, _nbIndices + 3,
+                               _nbIndices + 2, _nbIndices + 3, _nbIndices});
 
     for (size_t p = interiorIndex; p < positions.size() / 3; ++p) {
-      stl_util::concat(
-        colors,
-        {exteriorColor.r, exteriorColor.g, exteriorColor.b, exteriorColor.a});
+      stl_util::concat(colors, {exteriorColor.r, exteriorColor.g,
+                                exteriorColor.b, exteriorColor.a});
     }
   }
 
   VertexData::ComputeNormals(positions, indices, normals);
-  VertexData::_ComputeSides(Mesh::FRONTSIDE, positions, indices, normals, uvs);
+  VertexData::_ComputeSides(Mesh::FRONTSIDE(), positions, indices, normals,
+                            uvs);
 
   // Create a custom mesh
   auto customMesh = Mesh::New("custom", scene);

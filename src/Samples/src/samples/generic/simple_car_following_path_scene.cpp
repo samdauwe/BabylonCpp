@@ -68,7 +68,7 @@ void SimpleCarFollowingPathScene::initializeScene(ICanvas* canvas, Scene* scene)
   ExtrudeShapeOptions extrudeShapeOptions;
   extrudeShapeOptions.shape = side;
   extrudeShapeOptions.path  = extrudePath;
-  extrudeShapeOptions.cap   = Mesh::NO_CAP;
+  extrudeShapeOptions.cap   = Mesh::NO_CAP();
   _carBody = MeshBuilder::ExtrudeShape("body", extrudeShapeOptions, scene);
   _carBody->setMaterial(bodyMaterial);
   /*----------------------- End Car Body -------------------------------------*/
@@ -78,8 +78,9 @@ void SimpleCarFollowingPathScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto wheelMaterial = StandardMaterial::New("wheel_mat", scene);
 
   // Lambda that creates a wheel
-  const auto createWheel = [this, &scene, &wheelMaterial](
-    const string_t& wheelName, const Vector3& position) {
+  const auto createWheel = [this, &scene,
+                            &wheelMaterial](const string_t& wheelName,
+                                            const Vector3& position) {
     // Create wheel front inside and apply material
     CylinderOptions cylinderOptions(3.f);
     cylinderOptions.height       = 1.f;

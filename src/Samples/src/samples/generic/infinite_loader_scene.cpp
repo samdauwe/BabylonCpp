@@ -25,8 +25,8 @@ Ring::~Ring()
 
 void Ring::addTube(const std::vector<Vector3>& points)
 {
-  auto tube = Mesh::CreateTube("tube", points, 1, 3, nullptr, Mesh::CAP_ALL,
-                               center->getScene(), false, Mesh::FRONTSIDE);
+  auto tube = Mesh::CreateTube("tube", points, 1, 3, nullptr, Mesh::CAP_ALL(),
+                               center->getScene(), false, Mesh::FRONTSIDE());
   tube->setParent(center);
   tubes.emplace_back(tube);
 }
