@@ -28,7 +28,7 @@ void CollideWorker::collideWithWorld(Vector3& position, Vector3& velocity,
 {
 
   const float closeDistance = 0.01f;
-  if (collider->retry >= maximumRetry) {
+  if (collider->_retry >= maximumRetry) {
     finalPosition.copyFrom(position);
     return;
   }
@@ -68,7 +68,7 @@ void CollideWorker::collideWithWorld(Vector3& position, Vector3& velocity,
     return;
   }
 
-  ++collider->retry;
+  ++collider->_retry;
   collideWithWorld(position, velocity, maximumRetry, excludedMeshUniqueId);
 }
 

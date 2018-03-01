@@ -81,12 +81,12 @@ Nullable<Vector2> PickingInfo::getTextureCoordinates()
     return nullptr;
   }
 
-  auto indices = pickedMesh->getIndices();
+  const auto indices = pickedMesh->getIndices();
   if (indices.empty()) {
     return nullptr;
   }
 
-  auto uvs = pickedMesh->getVerticesData(VertexBuffer::UVKind);
+  const auto uvs = pickedMesh->getVerticesData(VertexBuffer::UVKind);
   if (uvs.empty()) {
     return nullptr;
   }

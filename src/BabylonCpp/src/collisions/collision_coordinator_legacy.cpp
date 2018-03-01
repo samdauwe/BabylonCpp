@@ -29,10 +29,10 @@ void CollisionCoordinatorLegacy::getNewPosition(
 {
   position.divideToRef(collider->_radius, _scaledPosition);
   displacement.divideToRef(collider->_radius, _scaledVelocity);
-  collider->collidedMesh    = nullptr;
-  collider->retry           = 0;
-  collider->initialVelocity = _scaledVelocity;
-  collider->initialPosition = _scaledPosition;
+  collider->collidedMesh     = nullptr;
+  collider->_retry           = 0;
+  collider->_initialVelocity = _scaledVelocity;
+  collider->_initialPosition = _scaledPosition;
   _collideWithWorld(_scaledPosition, _scaledVelocity, collider, maximumRetry,
                     _finalPosition, excludedMesh);
 
@@ -87,7 +87,7 @@ void CollisionCoordinatorLegacy::_collideWithWorld(
 {
   auto closeDistance = Engine::CollisionsEpsilon * 10.f;
 
-  if (collider->retry >= maximumRetry) {
+  if (collider->_retry >= maximumRetry) {
     finalPosition.copyFrom(position);
     return;
   }
@@ -123,7 +123,7 @@ void CollisionCoordinatorLegacy::_collideWithWorld(
     return;
   }
 
-  ++collider->retry;
+  ++collider->_retry;
   _collideWithWorld(position, velocity, collider, maximumRetry, finalPosition,
                     excludedMesh);
 }

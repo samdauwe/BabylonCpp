@@ -19,9 +19,16 @@ public:
                                    float sphereRadius);
   static LowestRoot GetLowestRoot(float a, float b, float c, float maxR);
 
-  /** Methods **/
   int collisionMask() const;
   void setCollisionMask(int mask);
+
+  /**
+   * @brief Gets the plane normal used to compute the sliding response (in local
+   * space)
+   */
+  Vector3& slidePlaneNormal();
+
+  /** Methods **/
   void _initialize(Vector3& source, Vector3& dir, float e);
   bool _checkPointInTriangle(const Vector3& point, const Vector3& pa,
                              const Vector3& pb, const Vector3& pc,
@@ -38,23 +45,29 @@ public:
   void _getResponse(Vector3& pos, Vector3& vel);
 
 public:
-  Vector3 _radius;
-  unsigned int retry;
-  Vector3 velocity;
-  Vector3 basePoint;
-  float epsilon;
+  /**
+   * Define if a collision was found
+   */
   bool collisionFound;
-  float velocityWorldLength;
-  Vector3 basePointWorld;
-  Vector3 velocityWorld;
-  Vector3 normalizedVelocity;
-  Vector3 initialVelocity;
-  Vector3 initialPosition;
-  float nearestDistance;
+
+  /**
+   * Define last intersection point in local space
+   */
   Vector3 intersectionPoint;
   bool intersectionPointSet;
+
+  /**
+   * Define last collided mesh
+   */
   AbstractMesh* collidedMesh;
+
   unsigned int collidedMeshId;
+  Vector3 _radius;
+  unsigned int _retry;
+  float _velocityWorldLength;
+  Vector3 _basePointWorld;
+  Vector3 _initialVelocity;
+  Vector3 _initialPosition;
 
 private:
   Vector3 _collisionPoint;
@@ -68,6 +81,12 @@ private:
   Vector3 _destinationPoint;
   Vector3 _slidePlaneNormal;
   Vector3 _displacementVector;
+  Vector3 _velocity;
+  Vector3 _basePoint;
+  float _epsilon;
+  Vector3 _velocityWorld;
+  Vector3 _normalizedVelocity;
+  float _nearestDistance;
   int _collisionMask;
 
 }; // end of class Collider
