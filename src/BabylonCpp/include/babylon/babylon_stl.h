@@ -209,6 +209,127 @@ using basic_string_t = ::std::basic_string<charT, traits, Alloc>;
 
 using string_t = ::std::basic_string<char>;
 
+// -- Properties -- //
+
+template <typename C, typename T>
+class ReadOnlyProperty {
+public:
+  using TGetter = T& (C::*)();
+
+  ReadOnlyProperty(C* propObject, TGetter propGetter)
+      : _object{propObject}, _getter{propGetter}
+  {
+  }
+
+  ReadOnlyProperty& operator=(const ReadOnlyProperty&) = delete;
+  ReadOnlyProperty(const ReadOnlyProperty&)            = delete;
+
+  operator const T&() const
+  {
+    return (_object->*_getter)();
+  }
+
+  const T& operator()() const
+  {
+    return (_object->*_getter)();
+  }
+
+private:
+  C* const _object;
+  TGetter const _getter;
+};
+
+template <typename C, typename T, typename E = void>
+class Property; // undefined
+
+template <typename C, typename T>
+class Property<
+  C, T,
+  typename std::enable_if<std::is_fundamental<T>::value
+                          || std::is_same<std::string, T>::value>::type> {
+public:
+  using TGetter = T (C::*)() const;
+  using TSetter = void (C::*)(T);
+
+  Property(C* propObject, TGetter propGetter, TSetter propSetter)
+      : _object{propObject}, _getter{propGetter}, _setter{propSetter}
+  {
+  }
+
+  Property& operator=(const Property&) = delete;
+  Property(const Property&)            = delete;
+
+  operator T() const
+  {
+    return (_object->*_getter)();
+  }
+
+  T operator()() const
+  {
+    return (_object->*_getter)();
+  }
+
+  C& operator=(T theValue)
+  {
+    (_object->*_setter)(theValue);
+    return *_object;
+  }
+
+private:
+  C* const _object;
+  TGetter const _getter;
+  TSetter const _setter;
+};
+
+template <typename C, typename T>
+class Property<
+  C, T,
+  typename std::enable_if<!std::is_fundamental<T>::value
+                          && !std::is_same<std::string, T>::value>::type> {
+public:
+  using TGetter = T& (C::*)();
+  using TSetter = void (C::*)(const T&);
+
+  Property(C* propObject, TGetter propGetter, TSetter propSetter)
+      : _object{propObject}, _getter{propGetter}, _setter{propSetter}
+  {
+  }
+
+  Property& operator=(const Property&) = delete;
+  Property(const Property&)            = delete;
+
+  operator T&()
+  {
+    return (_object->*_getter)();
+  }
+
+  operator const T&() const
+  {
+    return (_object->*_getter)();
+  }
+
+  T& operator()()
+  {
+    return (_object->*_getter)();
+  }
+
+  const T& operator()() const
+  {
+    return (_object->*_getter)();
+  }
+
+  C& operator=(const T& newValue)
+  {
+    (_object->*_setter)(newValue);
+    return *_object;
+  }
+
+private:
+  C* const _object;
+  TGetter const _getter;
+  TSetter const _setter;
+};
+
 // -- Thread support library -- //
 using condition_variable_t = ::std::condition_variable;
 using mutex_t              = ::std::mutex;
