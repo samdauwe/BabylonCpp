@@ -6,7 +6,25 @@
 namespace BABYLON {
 
 _StencilState::_StencilState()
-    : _isStencilTestDirty{false}
+    : isDirty{this, &_StencilState::get_isDirty}
+    , stencilFunc{this, &_StencilState::get_stencilFunc,
+                  &_StencilState::set_stencilFunc}
+    , stencilFuncRef{this, &_StencilState::get_stencilFuncRef,
+                     &_StencilState::set_stencilFuncRef}
+    , stencilFuncMask{this, &_StencilState::get_stencilFuncMask,
+                      &_StencilState::set_stencilFuncMask}
+    , stencilOpStencilFail{this, &_StencilState::get_stencilOpStencilFail,
+                           &_StencilState::set_stencilOpStencilFail}
+    , stencilOpDepthFail{this, &_StencilState::get_stencilOpDepthFail,
+                         &_StencilState::set_stencilOpDepthFail}
+    , stencilOpStencilDepthPass{this,
+                                &_StencilState::get_stencilOpStencilDepthPass,
+                                &_StencilState::set_stencilOpStencilDepthPass}
+    , stencilMask{this, &_StencilState::get_stencilMask,
+                  &_StencilState::set_stencilMask}
+    , stencilTest{this, &_StencilState::get_stencilTest,
+                  &_StencilState::set_stencilTest}
+    , _isStencilTestDirty{false}
     , _isStencilMaskDirty{false}
     , _isStencilFuncDirty{false}
     , _isStencilOpDirty{false}
@@ -18,18 +36,18 @@ _StencilState::~_StencilState()
 {
 }
 
-bool _StencilState::isDirty() const
+bool _StencilState::get_isDirty() const
 {
   return _isStencilTestDirty || _isStencilMaskDirty || _isStencilFuncDirty
          || _isStencilOpDirty;
 }
 
-unsigned int _StencilState::stencilFunc() const
+unsigned int _StencilState::get_stencilFunc() const
 {
   return _stencilFunc;
 }
 
-void _StencilState::setStencilFunc(unsigned int value)
+void _StencilState::set_stencilFunc(unsigned int value)
 {
   if (_stencilFunc == value) {
     return;
@@ -39,12 +57,12 @@ void _StencilState::setStencilFunc(unsigned int value)
   _isStencilFuncDirty = true;
 }
 
-int _StencilState::stencilFuncRef() const
+int _StencilState::get_stencilFuncRef() const
 {
   return _stencilFuncRef;
 }
 
-void _StencilState::setStencilFuncRef(int value)
+void _StencilState::set_stencilFuncRef(int value)
 {
   if (_stencilFuncRef == value) {
     return;
@@ -54,12 +72,12 @@ void _StencilState::setStencilFuncRef(int value)
   _isStencilFuncDirty = true;
 }
 
-unsigned int _StencilState::stencilFuncMask() const
+unsigned int _StencilState::get_stencilFuncMask() const
 {
   return _stencilFuncMask;
 }
 
-void _StencilState::setStencilFuncMask(unsigned int value)
+void _StencilState::set_stencilFuncMask(unsigned int value)
 {
   if (_stencilFuncMask == value) {
     return;
@@ -69,12 +87,12 @@ void _StencilState::setStencilFuncMask(unsigned int value)
   _isStencilFuncDirty = true;
 }
 
-unsigned int _StencilState::stencilOpStencilFail() const
+unsigned int _StencilState::get_stencilOpStencilFail() const
 {
   return _stencilOpStencilFail;
 }
 
-void _StencilState::setStencilOpStencilFail(unsigned int value)
+void _StencilState::set_stencilOpStencilFail(unsigned int value)
 {
   if (_stencilOpStencilFail == value) {
     return;
@@ -84,12 +102,12 @@ void _StencilState::setStencilOpStencilFail(unsigned int value)
   _isStencilOpDirty     = true;
 }
 
-unsigned int _StencilState::stencilOpDepthFail() const
+unsigned int _StencilState::get_stencilOpDepthFail() const
 {
   return _stencilOpDepthFail;
 }
 
-void _StencilState::setStencilOpDepthFail(unsigned int value)
+void _StencilState::set_stencilOpDepthFail(unsigned int value)
 {
   if (_stencilOpDepthFail == value) {
     return;
@@ -99,12 +117,12 @@ void _StencilState::setStencilOpDepthFail(unsigned int value)
   _isStencilOpDirty   = true;
 }
 
-unsigned int _StencilState::stencilOpStencilDepthPass() const
+unsigned int _StencilState::get_stencilOpStencilDepthPass() const
 {
   return _stencilOpStencilDepthPass;
 }
 
-void _StencilState::setStencilOpStencilDepthPass(unsigned int value)
+void _StencilState::set_stencilOpStencilDepthPass(unsigned int value)
 {
   if (_stencilOpStencilDepthPass == value) {
     return;
@@ -114,12 +132,12 @@ void _StencilState::setStencilOpStencilDepthPass(unsigned int value)
   _isStencilOpDirty          = true;
 }
 
-unsigned int _StencilState::stencilMask() const
+unsigned int _StencilState::get_stencilMask() const
 {
   return _stencilMask;
 }
 
-void _StencilState::setStencilMask(unsigned int value)
+void _StencilState::set_stencilMask(unsigned int value)
 {
   if (_stencilMask == value) {
     return;
@@ -129,12 +147,12 @@ void _StencilState::setStencilMask(unsigned int value)
   _isStencilMaskDirty = true;
 }
 
-bool _StencilState::stencilTest() const
+bool _StencilState::get_stencilTest() const
 {
   return _stencilTest;
 }
 
-void _StencilState::setStencilTest(bool value)
+void _StencilState::set_stencilTest(bool value)
 {
   if (_stencilTest == value) {
     return;

@@ -6,7 +6,21 @@
 namespace BABYLON {
 
 _DepthCullingState::_DepthCullingState()
-    : _isDepthTestDirty{false}
+    : isDirty{this, &_DepthCullingState::get_isDirty}
+    , zOffset{this, &_DepthCullingState::get_zOffset,
+              &_DepthCullingState::set_zOffset}
+    , cullFace{this, &_DepthCullingState::get_cullFace,
+               &_DepthCullingState::set_cullFace}
+    , cull{this, &_DepthCullingState::get_cull, &_DepthCullingState::set_cull}
+    , depthFunc{this, &_DepthCullingState::get_depthFunc,
+                &_DepthCullingState::set_depthFunc}
+    , depthMask{this, &_DepthCullingState::get_depthMask,
+                &_DepthCullingState::set_depthMask}
+    , depthTest{this, &_DepthCullingState::get_depthTest,
+                &_DepthCullingState::set_depthTest}
+    , frontFace{this, &_DepthCullingState::get_frontFace,
+                &_DepthCullingState::set_frontFace}
+    , _isDepthTestDirty{false}
     , _isDepthMaskDirty{false}
     , _isDepthFuncDirty{false}
     , _isCullFaceDirty{false}
@@ -25,19 +39,19 @@ _DepthCullingState::~_DepthCullingState()
 {
 }
 
-bool _DepthCullingState::isDirty() const
+bool _DepthCullingState::get_isDirty() const
 {
   return _isDepthFuncDirty || _isDepthTestDirty || _isDepthMaskDirty
          || _isCullFaceDirty || _isCullDirty || _isZOffsetDirty
          || _isFrontFaceDirty;
 }
 
-float _DepthCullingState::zOffset() const
+float _DepthCullingState::get_zOffset() const
 {
   return _zOffset;
 }
 
-void _DepthCullingState::setZOffset(float value)
+void _DepthCullingState::set_zOffset(float value)
 {
   if (stl_util::almost_equal(_zOffset, value)) {
     return;
@@ -47,12 +61,12 @@ void _DepthCullingState::setZOffset(float value)
   _isZOffsetDirty = true;
 }
 
-Nullable<int> _DepthCullingState::cullFace() const
+Nullable<int>& _DepthCullingState::get_cullFace()
 {
   return _cullFace;
 }
 
-void _DepthCullingState::setCullFace(const Nullable<int>& value)
+void _DepthCullingState::set_cullFace(const Nullable<int>& value)
 {
   if (_cullFace == value) {
     return;
@@ -62,12 +76,12 @@ void _DepthCullingState::setCullFace(const Nullable<int>& value)
   _isCullFaceDirty = true;
 }
 
-Nullable<bool> _DepthCullingState::cull() const
+Nullable<bool>& _DepthCullingState::get_cull()
 {
   return _cull;
 }
 
-void _DepthCullingState::setCull(const Nullable<bool>& value)
+void _DepthCullingState::set_cull(const Nullable<bool>& value)
 {
   if (_cull == value) {
     return;
@@ -77,12 +91,12 @@ void _DepthCullingState::setCull(const Nullable<bool>& value)
   _isCullDirty = true;
 }
 
-Nullable<int> _DepthCullingState::depthFunc() const
+Nullable<int>& _DepthCullingState::get_depthFunc()
 {
   return _depthFunc;
 }
 
-void _DepthCullingState::setDepthFunc(const Nullable<int>& value)
+void _DepthCullingState::set_depthFunc(const Nullable<int>& value)
 {
   if (_depthFunc == value) {
     return;
@@ -92,12 +106,12 @@ void _DepthCullingState::setDepthFunc(const Nullable<int>& value)
   _isDepthFuncDirty = true;
 }
 
-bool _DepthCullingState::depthMask() const
+bool _DepthCullingState::get_depthMask() const
 {
   return _depthMask;
 }
 
-void _DepthCullingState::setDepthMask(bool value)
+void _DepthCullingState::set_depthMask(bool value)
 {
   if (_depthMask == value) {
     return;
@@ -107,12 +121,12 @@ void _DepthCullingState::setDepthMask(bool value)
   _isDepthMaskDirty = true;
 }
 
-bool _DepthCullingState::depthTest() const
+bool _DepthCullingState::get_depthTest() const
 {
   return _depthTest;
 }
 
-void _DepthCullingState::setDepthTest(bool value)
+void _DepthCullingState::set_depthTest(bool value)
 {
   if (_depthTest == value) {
     return;
@@ -122,12 +136,12 @@ void _DepthCullingState::setDepthTest(bool value)
   _isDepthTestDirty = true;
 }
 
-Nullable<unsigned int> _DepthCullingState::frontFace() const
+Nullable<unsigned int>& _DepthCullingState::get_frontFace()
 {
   return _frontFace;
 }
 
-void _DepthCullingState::setFrontFace(const Nullable<unsigned int>& value)
+void _DepthCullingState::set_frontFace(const Nullable<unsigned int>& value)
 {
   if (_frontFace == value) {
     return;

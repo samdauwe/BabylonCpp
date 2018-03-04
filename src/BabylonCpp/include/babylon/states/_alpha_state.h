@@ -15,9 +15,6 @@ public:
   _AlphaState();
   ~_AlphaState();
 
-  bool isDirty() const;
-  bool alphaBlend() const;
-  void setAlphaBlend(bool value);
   void setAlphaBlendConstants(float r, float g, float b, float a);
   void setAlphaBlendFunctionParameters(unsigned int value0, unsigned int value1,
                                        unsigned int value2,
@@ -25,6 +22,15 @@ public:
   void setAlphaEquationParameters(unsigned int rgb, unsigned int alpha);
   void reset();
   void apply(GL::IGLRenderingContext& gl);
+
+private:
+  bool get_isDirty() const;
+  bool get_alphaBlend() const;
+  void set_alphaBlend(bool value);
+
+public:
+  ReadOnlyProperty<_AlphaState, bool> isDirty;
+  Property<_AlphaState, bool> alphaBlend;
 
 private:
   bool _isAlphaBlendDirty;

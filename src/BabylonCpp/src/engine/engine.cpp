@@ -572,27 +572,27 @@ int Engine::getDepthFunction() const
 
 void Engine::setDepthFunction(int depthFunc)
 {
-  _depthCullingState->setDepthFunc(depthFunc);
+  _depthCullingState->depthFunc = depthFunc;
 }
 
 void Engine::setDepthFunctionToGreater()
 {
-  _depthCullingState->setDepthFunc(GL::GREATER);
+  _depthCullingState->depthFunc = GL::GREATER;
 }
 
 void Engine::setDepthFunctionToGreaterOrEqual()
 {
-  _depthCullingState->setDepthFunc(GL::GEQUAL);
+  _depthCullingState->depthFunc = GL::GEQUAL;
 }
 
 void Engine::setDepthFunctionToLess()
 {
-  _depthCullingState->setDepthFunc(GL::LESS);
+  _depthCullingState->depthFunc = GL::LESS;
 }
 
 void Engine::setDepthFunctionToLessOrEqual()
 {
-  _depthCullingState->setDepthFunc(GL::LEQUAL);
+  _depthCullingState->depthFunc = GL::LEQUAL;
 }
 
 bool Engine::getStencilBuffer() const
@@ -602,7 +602,7 @@ bool Engine::getStencilBuffer() const
 
 void Engine::setStencilBuffer(bool enable)
 {
-  _stencilState->setStencilTest(enable);
+  _stencilState->stencilTest = enable;
 }
 
 unsigned int Engine::getStencilMask() const
@@ -612,7 +612,7 @@ unsigned int Engine::getStencilMask() const
 
 void Engine::setStencilMask(unsigned int mask)
 {
-  _stencilState->setStencilMask(mask);
+  _stencilState->stencilMask = mask;
 }
 
 unsigned int Engine::getStencilFunction() const
@@ -632,17 +632,17 @@ unsigned int Engine::getStencilFunctionMask() const
 
 void Engine::setStencilFunction(unsigned int stencilFunc)
 {
-  _stencilState->setStencilFunc(stencilFunc);
+  _stencilState->stencilFunc = stencilFunc;
 }
 
 void Engine::setStencilFunctionReference(int reference)
 {
-  _stencilState->setStencilFuncRef(reference);
+  _stencilState->stencilFuncRef = reference;
 }
 
 void Engine::setStencilFunctionMask(unsigned int mask)
 {
-  _stencilState->setStencilFuncMask(mask);
+  _stencilState->stencilFuncMask = mask;
 }
 
 unsigned int Engine::getStencilOperationFail() const
@@ -662,17 +662,17 @@ unsigned int Engine::getStencilOperationPass() const
 
 void Engine::setStencilOperationFail(unsigned int operation)
 {
-  _stencilState->setStencilOpStencilFail(operation);
+  _stencilState->stencilOpStencilFail = operation;
 }
 
 void Engine::setStencilOperationDepthFail(unsigned int operation)
 {
-  _stencilState->setStencilOpDepthFail(operation);
+  _stencilState->stencilOpDepthFail = operation;
 }
 
 void Engine::setStencilOperationPass(unsigned int operation)
 {
-  _stencilState->setStencilOpStencilDepthPass(operation);
+  _stencilState->stencilOpStencilDepthPass = operation;
 }
 
 void Engine::setDitheringState(bool value)
@@ -2225,13 +2225,13 @@ void Engine::setState(bool culling, float zOffset, bool force, bool reverseSide)
 {
   // Culling
   if (_depthCullingState->cull() != culling || force) {
-    _depthCullingState->setCull(culling);
+    _depthCullingState->cull = culling;
   }
 
   // Cull face
   const auto cullFace = cullBackFaces ? GL::BACK : GL::FRONT;
   if (_depthCullingState->cullFace() != cullFace || force) {
-    _depthCullingState->setCullFace(static_cast<int>(cullFace));
+    _depthCullingState->cullFace = static_cast<int>(cullFace);
   }
 
   // Z offset
@@ -2240,13 +2240,13 @@ void Engine::setState(bool culling, float zOffset, bool force, bool reverseSide)
   // Front face
   const auto frontFace = reverseSide ? GL::CW : GL::CCW;
   if (_depthCullingState->frontFace() != frontFace || force) {
-    _depthCullingState->setFrontFace(frontFace);
+    _depthCullingState->frontFace = frontFace;
   }
 }
 
 void Engine::setZOffset(float value)
 {
-  _depthCullingState->setZOffset(value);
+  _depthCullingState->zOffset = value;
 }
 
 float Engine::getZOffset() const
@@ -2256,7 +2256,7 @@ float Engine::getZOffset() const
 
 void Engine::setDepthBuffer(bool enable)
 {
-  _depthCullingState->setDepthTest(enable);
+  _depthCullingState->depthTest = enable;
 }
 
 bool Engine::getDepthWrite() const
@@ -2266,7 +2266,7 @@ bool Engine::getDepthWrite() const
 
 void Engine::setDepthWrite(bool enable)
 {
-  _depthCullingState->setDepthMask(enable);
+  _depthCullingState->depthMask = enable;
 }
 
 void Engine::setColorWrite(bool enable)
@@ -2293,58 +2293,58 @@ void Engine::setAlphaMode(unsigned int mode, bool noDepthWriteChange)
 
   switch (mode) {
     case EngineConstants::ALPHA_DISABLE:
-      _alphaState->setAlphaBlend(false);
+      _alphaState->alphaBlend = false;
       break;
     case EngineConstants::ALPHA_PREMULTIPLIED:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::ONE, GL::ONE_MINUS_SRC_ALPHA, GL::ONE, GL::ONE);
-      _alphaState->setAlphaBlend(true);
+      _alphaState->alphaBlend = true;
       break;
     case EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::ONE, GL::ONE_MINUS_SRC_ALPHA, GL::ONE, GL::ONE_MINUS_SRC_ALPHA);
-      _alphaState->setAlphaBlend(true);
+      _alphaState->alphaBlend = true;
       break;
     case EngineConstants::ALPHA_COMBINE:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::SRC_ALPHA, GL::ONE_MINUS_SRC_ALPHA, GL::ONE, GL::ONE);
-      _alphaState->setAlphaBlend(true);
+      _alphaState->alphaBlend = true;
       break;
     case EngineConstants::ALPHA_ONEONE:
       _alphaState->setAlphaBlendFunctionParameters(GL::ONE, GL::ONE, GL::ZERO,
                                                    GL::ONE);
-      _alphaState->setAlphaBlend(true);
+      _alphaState->alphaBlend = true;
       break;
     case EngineConstants::ALPHA_ADD:
       _alphaState->setAlphaBlendFunctionParameters(GL::SRC_ALPHA, GL::ONE,
                                                    GL::ZERO, GL::ONE);
-      _alphaState->setAlphaBlend(true);
+      _alphaState->alphaBlend = true;
       break;
     case EngineConstants::ALPHA_SUBTRACT:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::ZERO, GL::ONE_MINUS_SRC_COLOR, GL::ONE, GL::ONE);
-      _alphaState->setAlphaBlend(true);
+      _alphaState->alphaBlend = true;
       break;
     case EngineConstants::ALPHA_MULTIPLY:
       _alphaState->setAlphaBlendFunctionParameters(GL::DST_COLOR, GL::ZERO,
                                                    GL::ONE, GL::ONE);
-      _alphaState->setAlphaBlend(true);
+      _alphaState->alphaBlend = true;
       break;
     case EngineConstants::ALPHA_MAXIMIZED:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::SRC_ALPHA, GL::ONE_MINUS_SRC_COLOR, GL::ONE, GL::ONE);
-      _alphaState->setAlphaBlend(true);
+      _alphaState->alphaBlend = true;
       break;
     case EngineConstants::ALPHA_INTERPOLATE:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::CONSTANT_COLOR, GL::ONE_MINUS_CONSTANT_COLOR, GL::CONSTANT_ALPHA,
         GL::ONE_MINUS_CONSTANT_ALPHA);
-      _alphaState->setAlphaBlend(true);
+      _alphaState->alphaBlend = true;
       break;
     case EngineConstants::ALPHA_SCREENMODE:
       _alphaState->setAlphaBlendFunctionParameters(
         GL::ONE, GL::ONE_MINUS_SRC_COLOR, GL::ONE, GL::ONE_MINUS_SRC_ALPHA);
-      _alphaState->setAlphaBlend(true);
+      _alphaState->alphaBlend = true;
       break;
     default:
       break;

@@ -14,25 +14,38 @@ public:
   _StencilState();
   ~_StencilState();
 
-  bool isDirty() const;
-  unsigned int stencilFunc() const;
-  void setStencilFunc(unsigned int value);
-  int stencilFuncRef() const;
-  void setStencilFuncRef(int value);
-  unsigned int stencilFuncMask() const;
-  void setStencilFuncMask(unsigned int value);
-  unsigned int stencilOpStencilFail() const;
-  void setStencilOpStencilFail(unsigned int value);
-  unsigned int stencilOpDepthFail() const;
-  void setStencilOpDepthFail(unsigned int value);
-  unsigned int stencilOpStencilDepthPass() const;
-  void setStencilOpStencilDepthPass(unsigned int value);
-  unsigned int stencilMask() const;
-  void setStencilMask(unsigned int value);
-  bool stencilTest() const;
-  void setStencilTest(bool value);
   void reset();
   void apply(GL::IGLRenderingContext& gl);
+
+private:
+  bool get_isDirty() const;
+  unsigned int get_stencilFunc() const;
+  void set_stencilFunc(unsigned int value);
+  int get_stencilFuncRef() const;
+  void set_stencilFuncRef(int value);
+  unsigned int get_stencilFuncMask() const;
+  void set_stencilFuncMask(unsigned int value);
+  unsigned int get_stencilOpStencilFail() const;
+  void set_stencilOpStencilFail(unsigned int value);
+  unsigned int get_stencilOpDepthFail() const;
+  void set_stencilOpDepthFail(unsigned int value);
+  unsigned int get_stencilOpStencilDepthPass() const;
+  void set_stencilOpStencilDepthPass(unsigned int value);
+  unsigned int get_stencilMask() const;
+  void set_stencilMask(unsigned int value);
+  bool get_stencilTest() const;
+  void set_stencilTest(bool value);
+
+public:
+  ReadOnlyProperty<_StencilState, bool> isDirty;
+  Property<_StencilState, unsigned int> stencilFunc;
+  Property<_StencilState, int> stencilFuncRef;
+  Property<_StencilState, unsigned int> stencilFuncMask;
+  Property<_StencilState, unsigned int> stencilOpStencilFail;
+  Property<_StencilState, unsigned int> stencilOpDepthFail;
+  Property<_StencilState, unsigned int> stencilOpStencilDepthPass;
+  Property<_StencilState, unsigned int> stencilMask;
+  Property<_StencilState, bool> stencilTest;
 
 private:
   bool _isStencilTestDirty;

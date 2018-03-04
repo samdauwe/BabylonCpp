@@ -15,23 +15,35 @@ public:
   _DepthCullingState();
   ~_DepthCullingState();
 
-  bool isDirty() const;
-  float zOffset() const;
-  void setZOffset(float value);
-  Nullable<int> cullFace() const;
-  void setCullFace(const Nullable<int>& value);
-  Nullable<bool> cull() const;
-  void setCull(const Nullable<bool>& value);
-  Nullable<int> depthFunc() const;
-  void setDepthFunc(const Nullable<int>& value);
-  bool depthMask() const;
-  void setDepthMask(bool value);
-  bool depthTest() const;
-  void setDepthTest(bool value);
-  Nullable<unsigned int> frontFace() const;
-  void setFrontFace(const Nullable<unsigned int>& value);
   void reset();
   void apply(GL::IGLRenderingContext& _gl);
+
+private:
+  bool get_isDirty() const;
+  float get_zOffset() const;
+  void set_zOffset(float value);
+  Nullable<int>& get_cullFace();
+  void set_cullFace(const Nullable<int>& value);
+  Nullable<bool>& get_cull();
+  void set_cull(const Nullable<bool>& value);
+  Nullable<int>& get_depthFunc();
+  void set_depthFunc(const Nullable<int>& value);
+  bool get_depthMask() const;
+  void set_depthMask(bool value);
+  bool get_depthTest() const;
+  void set_depthTest(bool value);
+  Nullable<unsigned int>& get_frontFace();
+  void set_frontFace(const Nullable<unsigned int>& value);
+
+public:
+  ReadOnlyProperty<_DepthCullingState, bool> isDirty;
+  Property<_DepthCullingState, float> zOffset;
+  Property<_DepthCullingState, Nullable<int>> cullFace;
+  Property<_DepthCullingState, Nullable<bool>> cull;
+  Property<_DepthCullingState, Nullable<int>> depthFunc;
+  Property<_DepthCullingState, bool> depthMask;
+  Property<_DepthCullingState, bool> depthTest;
+  Property<_DepthCullingState, Nullable<unsigned int>> frontFace;
 
 private:
   bool _isDepthTestDirty;

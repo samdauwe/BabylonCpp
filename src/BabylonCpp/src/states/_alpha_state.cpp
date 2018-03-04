@@ -6,7 +6,10 @@
 namespace BABYLON {
 
 _AlphaState::_AlphaState()
-    : _isAlphaBlendDirty{false}
+    : isDirty{this, &_AlphaState::get_isDirty}
+    , alphaBlend{this, &_AlphaState::get_alphaBlend,
+                 &_AlphaState::set_alphaBlend}
+    , _isAlphaBlendDirty{false}
     , _isBlendFunctionParametersDirty{false}
     , _isBlendEquationParametersDirty{false}
     , _isBlendConstantsDirty{false}
@@ -19,17 +22,17 @@ _AlphaState::~_AlphaState()
 {
 }
 
-bool _AlphaState::isDirty() const
+bool _AlphaState::get_isDirty() const
 {
   return _isAlphaBlendDirty || _isBlendFunctionParametersDirty;
 }
 
-bool _AlphaState::alphaBlend() const
+bool _AlphaState::get_alphaBlend() const
 {
   return _alphaBlend;
 }
 
-void _AlphaState::setAlphaBlend(bool value)
+void _AlphaState::set_alphaBlend(bool value)
 {
   if (_alphaBlend == value) {
     return;
