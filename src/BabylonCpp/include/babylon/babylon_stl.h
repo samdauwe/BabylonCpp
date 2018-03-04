@@ -209,10 +209,47 @@ using basic_string_t = ::std::basic_string<charT, traits, Alloc>;
 
 using string_t = ::std::basic_string<char>;
 
-// -- Properties -- //
+// -- Read-Only Properties -- //
+
+template <typename C, typename T, typename E = void>
+class ReadOnlyProperty; // undefined
 
 template <typename C, typename T>
-class ReadOnlyProperty {
+class ReadOnlyProperty<
+  C, T,
+  typename std::enable_if<std::is_fundamental<T>::value
+                          || std::is_same<std::string, T>::value>::type> {
+public:
+  using TGetter = T (C::*)() const;
+
+  ReadOnlyProperty(C* propObject, TGetter propGetter)
+      : _object{propObject}, _getter{propGetter}
+  {
+  }
+
+  ReadOnlyProperty& operator=(const ReadOnlyProperty&) = delete;
+  ReadOnlyProperty(const ReadOnlyProperty&)            = delete;
+
+  operator T() const
+  {
+    return (_object->*_getter)();
+  }
+
+  T operator()() const
+  {
+    return (_object->*_getter)();
+  }
+
+private:
+  C* const _object;
+  TGetter const _getter;
+};
+
+template <typename C, typename T>
+class ReadOnlyProperty<
+  C, T,
+  typename std::enable_if<!std::is_fundamental<T>::value
+                          && !std::is_same<std::string, T>::value>::type> {
 public:
   using TGetter = T& (C::*)();
 
@@ -238,6 +275,8 @@ private:
   C* const _object;
   TGetter const _getter;
 };
+
+// -- Read-Write Properties -- //
 
 template <typename C, typename T, typename E = void>
 class Property; // undefined
