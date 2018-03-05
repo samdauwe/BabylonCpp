@@ -26,8 +26,6 @@ public:
 
   void addToScene(unique_ptr_t<SpriteManager>&& newSpriteManager);
 
-  Texture* texture() const;
-  void texture(Texture* value);
   void setOnDispose(
     const ::std::function<void(SpriteManager*, EventState&)>& callback);
   PickingInfo* intersects(const Ray ray, Camera* camera,
@@ -44,6 +42,8 @@ protected:
                 = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
 private:
+  Texture*& get_texture();
+  void set_texture(Texture* const& value);
   void _appendSpriteVertex(size_t index, Sprite* sprite, int offsetX,
                            int offsetY, int rowSize);
 
@@ -61,6 +61,8 @@ public:
    * An event triggered when the manager is disposed.
    */
   Observable<SpriteManager> onDisposeObservable;
+
+  Property<SpriteManager, Texture*> texture;
 
 private:
   Observer<SpriteManager>::Ptr _onDisposeObserver;

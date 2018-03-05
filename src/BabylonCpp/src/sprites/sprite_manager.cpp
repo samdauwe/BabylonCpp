@@ -8,6 +8,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/material.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/matrix.h>
@@ -27,6 +28,7 @@ SpriteManager::SpriteManager(const string_t& iName, const string_t& imgUrl,
     , fogEnabled{true}
     , isPickable{false}
     , _epsilon{epsilon}
+    , texture{this, &SpriteManager::get_texture, &SpriteManager::set_texture}
     , _onDisposeObserver{nullptr}
     , _capacity{capacity}
     , _scene{scene}
@@ -93,7 +95,7 @@ SpriteManager::SpriteManager(const string_t& iName, const string_t& imgUrl,
 
   {
     EffectCreationOptions options;
-    options.attributes = {VertexBuffer::PositionKindChars, "options",
+    options.attributes    = {VertexBuffer::PositionKindChars, "options",
                           "cellInfo", VertexBuffer::ColorKindChars};
     options.uniformsNames = {"view", "projection", "textureInfos", "alphaTest"};
     options.samplers      = {"diffuseSampler"};
@@ -104,12 +106,12 @@ SpriteManager::SpriteManager(const string_t& iName, const string_t& imgUrl,
 
   {
     EffectCreationOptions options;
-    options.attributes = {VertexBuffer::PositionKindChars, "options",
+    options.attributes    = {VertexBuffer::PositionKindChars, "options",
                           "cellInfo", VertexBuffer::ColorKindChars};
     options.uniformsNames = {"view",      "projection", "textureInfos",
                              "alphaTest", "vFogInfos",  "vFogColor"};
-    options.samplers = {"diffuseSampler"};
-    options.defines  = "#define FOG";
+    options.samplers      = {"diffuseSampler"};
+    options.defines       = "#define FOG";
 
     _effectFog = _scene->getEngine()->createEffect("sprites", options,
                                                    _scene->getEngine());
@@ -125,16 +127,6 @@ void SpriteManager::addToScene(unique_ptr_t<SpriteManager>&& newSpriteManager)
   _scene->spriteManagers.emplace_back(::std::move(newSpriteManager));
 }
 
-Texture* SpriteManager::texture() const
-{
-  return _spriteTexture;
-}
-
-void SpriteManager::texture(Texture* value)
-{
-  _spriteTexture = value;
-}
-
 void SpriteManager::setOnDispose(
   const ::std::function<void(SpriteManager*, EventState&)>& callback)
 {
@@ -142,6 +134,16 @@ void SpriteManager::setOnDispose(
     onDisposeObservable.remove(_onDisposeObserver);
   }
   _onDisposeObserver = onDisposeObservable.add(callback);
+}
+
+Texture*& SpriteManager::get_texture()
+{
+  return _spriteTexture;
+}
+
+void SpriteManager::set_texture(Texture* const& value)
+{
+  _spriteTexture = value;
 }
 
 void SpriteManager::_appendSpriteVertex(size_t index, Sprite* sprite,
@@ -319,12 +321,16 @@ void SpriteManager::render()
   engine->setDepthFunctionToLessOrEqual();
   effect->setBool("alphaTest", true);
   engine->setColorWrite(false);
-  engine->draw(true, 0, static_cast<int>(max * 6));
+
+  engine->drawElementsType(Material::TriangleFillMode(), 0,
+                           static_cast<int>(max * 6));
   engine->setColorWrite(true);
   effect->setBool("alphaTest", false);
 
   engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
-  engine->draw(true, 0, static_cast<int>(max * 6));
+
+  engine->drawElementsType(Material::TriangleFillMode(), 0,
+                           static_cast<int>(max * 6));
   engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
 }
 
@@ -332,12 +338,12 @@ void SpriteManager::dispose(bool /*doNotRecurse*/)
 {
   if (_buffer) {
     _buffer->dispose();
-    _buffer.reset(nullptr);
+    _buffer = nullptr;
   }
 
   if (_indexBuffer) {
     _scene->getEngine()->_releaseBuffer(_indexBuffer.get());
-    _indexBuffer.reset(nullptr);
+    _indexBuffer = nullptr;
   }
 
   if (_spriteTexture) {

@@ -25,8 +25,6 @@ public:
 
   void addToSpriteManager(unique_ptr_t<Sprite>&& newSprite);
 
-  int size() const;
-  void setSize(int value);
   void playAnimation(int from, int to, bool loop, float delay,
                      const ::std::function<void()>& onAnimationEnd);
   void stopAnimation();
@@ -35,6 +33,10 @@ public:
 
 protected:
   Sprite(const string_t& name, SpriteManager* manager);
+
+private:
+  int get_size() const;
+  void set_size(int value);
 
 public:
   string_t name;
@@ -50,6 +52,8 @@ public:
   vector_t<Animation*> animations;
   bool isPickable;
   ActionManager* actionManager;
+
+  Property<Sprite, int> size;
 
 private:
   bool _animationStarted;

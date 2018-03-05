@@ -17,6 +17,8 @@ Sprite::Sprite(const string_t& iName, SpriteManager* manager)
     , invertU{0}
     , invertV{0}
     , isPickable{false}
+    , actionManager{nullptr}
+    , size{this, &Sprite::get_size, &Sprite::set_size}
     , _animationStarted{false}
     , _loopAnimation{false}
     , _fromIndex{0}
@@ -38,12 +40,12 @@ void Sprite::addToSpriteManager(unique_ptr_t<Sprite>&& newSprite)
   _manager->sprites.emplace_back(::std::move(newSprite));
 }
 
-int Sprite::size() const
+int Sprite::get_size() const
 {
   return width;
 }
 
-void Sprite::setSize(int value)
+void Sprite::set_size(int value)
 {
   width  = value;
   height = value;
