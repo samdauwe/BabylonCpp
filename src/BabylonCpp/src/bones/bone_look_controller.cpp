@@ -27,6 +27,14 @@ BoneLookController::BoneLookController(
     , adjustPitch{0.f}
     , adjustRoll{0.f}
     , slerpAmount{1.f}
+    , minYaw{this, &BoneLookController::get_minYaw,
+             &BoneLookController::set_minYaw}
+    , maxYaw{this, &BoneLookController::get_maxYaw,
+             &BoneLookController::set_maxYaw}
+    , minPitch{this, &BoneLookController::get_minPitch,
+               &BoneLookController::set_minPitch}
+    , maxPitch{this, &BoneLookController::get_maxPitch,
+               &BoneLookController::set_maxPitch}
     , _minYawSet{false}
     , _maxYawSet{false}
     , _boneQuat{Quaternion::Identity()}
@@ -49,31 +57,31 @@ BoneLookController::BoneLookController(
     }
 
     if (options.maxYaw.hasValue()) {
-      setMaxYaw(options.maxYaw.value);
+      maxYaw = options.maxYaw.value;
     }
     else {
-      setMaxYaw(Math::PI);
+      maxYaw = Math::PI;
     }
 
     if (options.minYaw.hasValue()) {
-      setMinYaw(options.minYaw.value);
+      minYaw = options.minYaw.value;
     }
     else {
-      setMinYaw(-Math::PI);
+      minYaw = -Math::PI;
     }
 
     if (options.maxPitch.hasValue()) {
-      setMaxPitch(options.maxPitch.value);
+      maxPitch = options.maxPitch.value;
     }
     else {
-      setMaxPitch(Math::PI);
+      maxPitch = Math::PI;
     }
 
     if (options.minPitch.hasValue()) {
-      setMinPitch(options.minPitch.value);
+      minPitch = options.minPitch.value;
     }
     else {
-      setMinPitch(-Math::PI);
+      minPitch = -Math::PI;
     }
 
     if (options.slerpAmount.hasValue()) {
@@ -124,12 +132,12 @@ BoneLookController::~BoneLookController()
 {
 }
 
-float BoneLookController::minYaw() const
+float BoneLookController::get_minYaw() const
 {
   return _minYaw;
 }
 
-void BoneLookController::setMinYaw(float value)
+void BoneLookController::set_minYaw(float value)
 {
   _minYaw    = value;
   _minYawSet = true;
@@ -141,12 +149,12 @@ void BoneLookController::setMinYaw(float value)
   }
 }
 
-float BoneLookController::maxYaw() const
+float BoneLookController::get_maxYaw() const
 {
   return _maxYaw;
 }
 
-void BoneLookController::setMaxYaw(float value)
+void BoneLookController::set_maxYaw(float value)
 {
   _maxYaw    = value;
   _minYawSet = true;
@@ -158,23 +166,23 @@ void BoneLookController::setMaxYaw(float value)
   }
 }
 
-float BoneLookController::minPitch() const
+float BoneLookController::get_minPitch() const
 {
   return _minPitch;
 }
 
-void BoneLookController::setMinPitch(float value)
+void BoneLookController::set_minPitch(float value)
 {
   _minPitch    = value;
   _minPitchTan = ::std::tan(value);
 }
 
-float BoneLookController::maxPitch() const
+float BoneLookController::get_maxPitch() const
 {
   return _maxPitch;
 }
 
-void BoneLookController::setMaxPitch(float value)
+void BoneLookController::set_maxPitch(float value)
 {
   _maxPitch    = value;
   _maxPitchTan = ::std::tan(value);

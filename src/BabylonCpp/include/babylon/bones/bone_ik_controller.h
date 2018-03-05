@@ -8,24 +8,29 @@
 
 namespace BABYLON {
 
+struct BoneIKControllerOptions {
+  AbstractMesh* targetMesh                = nullptr;
+  AbstractMesh* poleTargetMesh            = nullptr;
+  Bone* poleTargetBone                    = nullptr;
+  Nullable<Vector3> poleTargetLocalOffset = nullptr;
+  Nullable<float> poleAngle               = nullptr;
+  Nullable<Vector3> bendAxis              = nullptr;
+  Nullable<float> maxAngle                = nullptr;
+  Nullable<float> slerpAmount             = nullptr;
+}; // end of struct BoneIKControllerOptions
+
 class BABYLON_SHARED_EXPORT BoneIKController {
 
 public:
   BoneIKController(AbstractMesh* mesh, Bone* bone,
-                   AbstractMesh* targetMesh             = nullptr,
-                   AbstractMesh* poleTargetMesh         = nullptr,
-                   Bone* poleTargetBone                 = nullptr,
-                   const Vector3& poleTargetLocalOffset = Vector3::Zero(),
-                   float poleAngle                      = 0.f,
-                   const Vector3& bendAxis              = Vector3::Right(),
-                   float maxAngle = Math::PI, float slerpAmount = 1.f);
+                   const Nullable<BoneIKControllerOptions>& options);
   ~BoneIKController();
 
-  float maxAngle() const;
-  void setMaxAngle(float value = Math::PI);
   void update();
 
 private:
+  float get_maxAngle() const;
+  void set_maxAngle(float value = Math::PI);
   void _setMaxAngle(float ang = Math::PI);
 
 public:
@@ -38,6 +43,8 @@ public:
   float poleAngle;
   AbstractMesh* mesh;
   float slerpAmount;
+
+  Property<BoneIKController, float> maxAngle;
 
 private:
   static array_t<Vector3, 6> _tmpVecs;

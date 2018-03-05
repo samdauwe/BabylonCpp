@@ -13,35 +13,35 @@ Quaternion BoneIKController::_tmpQuat{Quaternion::Identity()};
 array_t<Matrix, 2> BoneIKController::_tmpMats{
   {Matrix::Identity(), Matrix::Identity()}};
 
-BoneIKController::BoneIKController(AbstractMesh* iMesh, Bone* bone,
-                                   AbstractMesh* iTargetMesh,
-                                   AbstractMesh* iPoleTargetMesh,
-                                   Bone* iPoleTargetBone,
-                                   const Vector3& iPoleTargetLocalOffset,
-                                   float iPoleAngle, const Vector3& iBendAxis,
-                                   float iMaxAngle, float iSlerpAmount)
+BoneIKController::BoneIKController(
+  AbstractMesh* iMesh, Bone* bone,
+  const Nullable<BoneIKControllerOptions>& iOptions)
     : targetMesh{nullptr}
     , poleTargetMesh{nullptr}
     , targetPosition{Vector3::Zero()}
     , poleTargetPosition{Vector3::Zero()}
-    , poleTargetLocalOffset{iPoleTargetLocalOffset}
-    , poleAngle{iPoleAngle}
-    , mesh{iMesh}
-    , slerpAmount{iSlerpAmount}
+    , poleTargetLocalOffset{Vector3::Zero()}
+    , poleAngle{0.f}
+    , slerpAmount{1.f}
+    , maxAngle{this, &BoneIKController::get_maxAngle,
+               &BoneIKController::set_maxAngle}
     , _bone1Quat{Quaternion::Identity()}
     , _bone1Mat{Matrix::Identity()}
     , _bone2Ang{Math::PI}
-    , _bone1{bone->getParent()}
-    , _bone2{bone}
-    , _maxAngle{iMaxAngle}
+    , _maxAngle{Math::PI}
     , _rightHandedSystem{false}
-    , _bendAxis{iBendAxis}
+    , _bendAxis{Vector3::Right()}
     , _slerping{false}
     , _adjustRoll{0.f}
 {
-  if (!bone) {
+  _bone2 = bone;
+  _bone1 = bone->getParent();
+
+  if (!_bone1) {
     return;
   }
+
+  mesh = iMesh;
 
   auto bonePos = bone->getPosition();
 
@@ -69,33 +69,55 @@ BoneIKController::BoneIKController(AbstractMesh* iMesh, Bone* bone,
 
     mesh->computeWorldMatrix(true);
 
-    auto pos1 = _bone2->children[0]->getAbsolutePosition(iMesh);
-    auto pos2 = _bone2->getAbsolutePosition(iMesh);
-    auto pos3 = _bone1->getAbsolutePosition(iMesh);
+    auto pos1 = _bone2->children[0]->getAbsolutePosition(mesh);
+    auto pos2 = _bone2->getAbsolutePosition(mesh);
+    auto pos3 = _bone1->getAbsolutePosition(mesh);
 
     _bone1Length = Vector3::Distance(pos1, pos2);
     _bone2Length = Vector3::Distance(pos2, pos3);
   }
 
   _bone1->getRotationMatrixToRef(_bone1Mat, Space::WORLD, mesh);
-  setMaxAngle(Math::PI);
+  maxAngle = Math::PI;
 
   // Options
-  {
-    if (iTargetMesh) {
-      targetMesh = iTargetMesh;
+  if (iOptions) {
+    const auto& options = *iOptions;
+    if (options.targetMesh) {
+      targetMesh = options.targetMesh;
       targetMesh->computeWorldMatrix(true);
     }
 
-    if (iPoleTargetMesh) {
-      poleTargetMesh = iPoleTargetMesh;
+    if (options.poleTargetMesh) {
+
+      poleTargetMesh = options.poleTargetMesh;
       poleTargetMesh->computeWorldMatrix(true);
     }
-    else if (iPoleTargetBone) {
-      poleTargetBone = iPoleTargetBone;
+    else if (options.poleTargetBone) {
+      poleTargetBone = options.poleTargetBone;
     }
     else if (_bone1->getParent()) {
       poleTargetBone = _bone1->getParent();
+    }
+
+    if (options.poleTargetLocalOffset) {
+      poleTargetLocalOffset.copyFrom(*options.poleTargetLocalOffset);
+    }
+
+    if (options.poleAngle) {
+      poleAngle = *options.poleAngle;
+    }
+
+    if (options.bendAxis) {
+      _bendAxis.copyFrom(*options.bendAxis);
+    }
+
+    if (options.maxAngle) {
+      maxAngle = *options.maxAngle;
+    }
+
+    if (options.slerpAmount) {
+      slerpAmount = *options.slerpAmount;
     }
   }
 }
@@ -104,12 +126,12 @@ BoneIKController::~BoneIKController()
 {
 }
 
-float BoneIKController::maxAngle() const
+float BoneIKController::get_maxAngle() const
 {
   return _maxAngle;
 }
 
-void BoneIKController::setMaxAngle(float value)
+void BoneIKController::set_maxAngle(float value)
 {
   _setMaxAngle(value);
 }

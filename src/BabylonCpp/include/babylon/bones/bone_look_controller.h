@@ -56,52 +56,20 @@ public:
   ~BoneLookController();
 
   /**
-   * @brief Get the minimum yaw angle that the bone can look to.
-   */
-  float minYaw() const;
-
-  /**
-   * @brief Set the minimum yaw angle that the bone can look to.
-   */
-  void setMinYaw(float value);
-
-  /**
-   * @brief Get the maximum yaw angle that the bone can look to.
-   */
-  float maxYaw() const;
-
-  /**
-   * @brief Set the maximum yaw angle that the bone can look to.
-   */
-  void setMaxYaw(float value);
-
-  /**
-   * @brief Get the minimum pitch angle that the bone can look to.
-   */
-  float minPitch() const;
-
-  /**
-   * @brief Set the minimum pitch angle that the bone can look to.
-   */
-  void setMinPitch(float value);
-
-  /**
-   * @brief Get the maximum pitch angle that the bone can look to.
-   */
-  float maxPitch() const;
-
-  /**
-   * @brief Set the maximum pitch angle that the bone can look to.
-   */
-  void setMaxPitch(float value);
-
-  /**
    * @brief Update the bone to look at the target. This should be called before
    * the scene is rendered (use scene.registerBeforeRender()).
    */
   void update();
 
 private:
+  float get_minYaw() const;
+  void set_minYaw(float value);
+  float get_maxYaw() const;
+  void set_maxYaw(float value);
+  float get_minPitch() const;
+  void set_minPitch(float value);
+  float get_maxPitch() const;
+  void set_maxPitch(float value);
   float _getAngleDiff(float ang1, float ang2) const;
   float _getAngleBetween(float ang1, float ang2) const;
   bool _isAngleBetween(float ang, float ang1, float ang2) const;
@@ -153,6 +121,26 @@ public:
    * this to a value between 0 and 1 (a value of 1 disables slerp).
    */
   float slerpAmount;
+
+  /**
+   * Get/set the minimum yaw angle that the bone can look to.
+   */
+  Property<BoneLookController, float> minYaw;
+
+  /**
+   * Get/set the maximum yaw angle that the bone can look to.
+   */
+  Property<BoneLookController, float> maxYaw;
+
+  /**
+   * Get/set the minimum pitch angle that the bone can look to.
+   */
+  Property<BoneLookController, float> minPitch;
+
+  /**
+   * Get/set the maximum pitch angle that the bone can look to.
+   */
+  Property<BoneLookController, float> maxPitch;
 
 private:
   static array_t<Vector3, 10> _tmpVecs;
