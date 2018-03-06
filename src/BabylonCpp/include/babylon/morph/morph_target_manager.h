@@ -22,7 +22,7 @@ public:
 
   void addToScene(unique_ptr_t<MorphTargetManager>&& newMorphTargetManager);
 
-  unsigned int uniqueId() const;
+  size_t uniqueId() const;
   std::size_t vertexCount() const;
   bool supportsNormals() const;
   bool supportsTangents() const;
@@ -59,7 +59,7 @@ private:
   bool _supportsNormals;
   bool _supportsTangents;
   std::size_t _vertexCount;
-  unsigned int _uniqueId;
+  size_t _uniqueId;
   Float32Array _tempInfluences;
 
 }; // end of class MorphTargetManager

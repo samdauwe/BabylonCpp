@@ -33,7 +33,7 @@ void MorphTargetManager::addToScene(
   _scene->morphTargetManagers.emplace_back(::std::move(newMorphTargetManager));
 }
 
-unsigned int MorphTargetManager::uniqueId() const
+size_t MorphTargetManager::uniqueId() const
 {
   return _uniqueId;
 }
@@ -126,20 +126,14 @@ void MorphTargetManager::_syncActiveTargets(bool needUpdate)
   _vertexCount      = 0;
 
   for (auto& target : _targets) {
-    if (target->influence() > 0.f) {
-      _activeTargets.emplace_back(target.get());
-      _tempInfluences.emplace_back(target->influence());
-      ++influenceCount;
+    _activeTargets.emplace_back(target.get());
+    _tempInfluences.emplace_back(target->influence());
+    ++influenceCount;
 
+    auto& positions = target->getPositions();
+    if (!positions.empty()) {
       _supportsNormals  = _supportsNormals && target->hasNormals();
       _supportsTangents = _supportsTangents && target->hasTangents();
-
-      auto& positions = target->getPositions();
-      if (positions.empty()) {
-        BABYLON_LOG_ERROR("MorphTargetManager",
-                          "Invalid target. Target must have positions.");
-        return;
-      }
 
       const auto vertexCount = positions.size() / 3;
       if (_vertexCount == 0) {
