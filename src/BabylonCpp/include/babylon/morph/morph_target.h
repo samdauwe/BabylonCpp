@@ -12,11 +12,6 @@ public:
   MorphTarget(const string_t& name, float influence = 0.f);
   ~MorphTarget();
 
-  float influence() const;
-  void setInfluence(float influence);
-  bool hasPositions() const;
-  bool hasNormals() const;
-  bool hasTangents() const;
   vector_t<Animation*>& animations();
   const vector_t<Animation*>& animations() const;
   void setPositions(const Float32Array& data);
@@ -41,8 +36,19 @@ public:
   static unique_ptr_t<MorphTarget> FromMesh(AbstractMesh* mesh, string_t name,
                                             float influence = 0.f);
 
+private:
+  float get_influence() const;
+  void set_influence(float influence);
+  bool get_hasPositions() const;
+  bool get_hasNormals() const;
+  bool get_hasTangents() const;
+
 public:
   Observable<bool> onInfluenceChanged;
+  Property<MorphTarget, float> influence;
+  ReadOnlyProperty<MorphTarget, bool> hasPositions;
+  ReadOnlyProperty<MorphTarget, bool> hasNormals;
+  ReadOnlyProperty<MorphTarget, bool> hasTangents;
 
 private:
   string_t _name;

@@ -8,22 +8,27 @@
 
 namespace BABYLON {
 
-MorphTarget::MorphTarget(const string_t& name, float influence)
-    : _name{name}, _influence{numeric_limits_t<float>::max()}
+MorphTarget::MorphTarget(const string_t& name, float iInfluence)
+    : influence{this, &MorphTarget::get_influence, &MorphTarget::set_influence}
+    , hasPositions{this, &MorphTarget::get_hasPositions}
+    , hasNormals{this, &MorphTarget::get_hasNormals}
+    , hasTangents{this, &MorphTarget::get_hasTangents}
+    , _name{name}
+    , _influence{numeric_limits_t<float>::max()}
 {
-  setInfluence(influence);
+  influence = iInfluence;
 }
 
 MorphTarget::~MorphTarget()
 {
 }
 
-float MorphTarget::influence() const
+float MorphTarget::get_influence() const
 {
   return _influence;
 }
 
-void MorphTarget::setInfluence(float influence)
+void MorphTarget::set_influence(float influence)
 {
   if (stl_util::almost_equal(_influence, influence)) {
     return;
@@ -38,17 +43,17 @@ void MorphTarget::setInfluence(float influence)
   }
 }
 
-bool MorphTarget::hasPositions() const
+bool MorphTarget::get_hasPositions() const
 {
   return !_positions.empty();
 }
 
-bool MorphTarget::hasNormals() const
+bool MorphTarget::get_hasNormals() const
 {
   return !_normals.empty();
 }
 
-bool MorphTarget::hasTangents() const
+bool MorphTarget::get_hasTangents() const
 {
   return !_tangents.empty();
 }

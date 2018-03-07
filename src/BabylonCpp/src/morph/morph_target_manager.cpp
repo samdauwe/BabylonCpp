@@ -10,7 +10,14 @@
 namespace BABYLON {
 
 MorphTargetManager::MorphTargetManager(Scene* scene)
-    : _supportsNormals{false}
+    : uniqueId{this, &MorphTargetManager::get_uniqueId}
+    , vertexCount{this, &MorphTargetManager::get_vertexCount}
+    , supportsNormals{this, &MorphTargetManager::get_supportsNormals}
+    , supportsTangents{this, &MorphTargetManager::get_supportsTangents}
+    , numTargets{this, &MorphTargetManager::get_numTargets}
+    , numInfluencers{this, &MorphTargetManager::get_numInfluencers}
+    , influences{this, &MorphTargetManager::get_influences}
+    , _supportsNormals{false}
     , _supportsTangents{false}
     , _vertexCount{0}
     , _uniqueId{0}
@@ -33,37 +40,37 @@ void MorphTargetManager::addToScene(
   _scene->morphTargetManagers.emplace_back(::std::move(newMorphTargetManager));
 }
 
-size_t MorphTargetManager::uniqueId() const
+size_t MorphTargetManager::get_uniqueId() const
 {
   return _uniqueId;
 }
 
-size_t MorphTargetManager::vertexCount() const
+size_t MorphTargetManager::get_vertexCount() const
 {
   return _vertexCount;
 }
 
-bool MorphTargetManager::supportsNormals() const
+bool MorphTargetManager::get_supportsNormals() const
 {
   return _supportsNormals;
 }
 
-bool MorphTargetManager::supportsTangents() const
+bool MorphTargetManager::get_supportsTangents() const
 {
   return _supportsTangents;
 }
 
-std::size_t MorphTargetManager::numTargets() const
+std::size_t MorphTargetManager::get_numTargets() const
 {
   return _targets.size();
 }
 
-size_t MorphTargetManager::numInfluencers() const
+size_t MorphTargetManager::get_numInfluencers() const
 {
   return _activeTargets.size();
 }
 
-Float32Array& MorphTargetManager::influences()
+Float32Array& MorphTargetManager::get_influences()
 {
   return _influences;
 }

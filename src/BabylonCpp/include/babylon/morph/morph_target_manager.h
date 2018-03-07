@@ -22,13 +22,6 @@ public:
 
   void addToScene(unique_ptr_t<MorphTargetManager>&& newMorphTargetManager);
 
-  size_t uniqueId() const;
-  std::size_t vertexCount() const;
-  bool supportsNormals() const;
-  bool supportsTangents() const;
-  std::size_t numTargets() const;
-  size_t numInfluencers() const;
-  Float32Array& influences();
   MorphTarget* getActiveTarget(std::size_t index);
   MorphTarget* getTarget(std::size_t index);
   void addTarget(unique_ptr_t<MorphTarget>&& target);
@@ -48,7 +41,24 @@ protected:
   MorphTargetManager(Scene* scene);
 
 private:
+  size_t get_uniqueId() const;
+  size_t get_vertexCount() const;
+  bool get_supportsNormals() const;
+  bool get_supportsTangents() const;
+  size_t get_numTargets() const;
+  size_t get_numInfluencers() const;
+  Float32Array& get_influences();
+
   void _syncActiveTargets(bool needUpdate);
+
+public:
+  ReadOnlyProperty<MorphTargetManager, size_t> uniqueId;
+  ReadOnlyProperty<MorphTargetManager, size_t> vertexCount;
+  ReadOnlyProperty<MorphTargetManager, bool> supportsNormals;
+  ReadOnlyProperty<MorphTargetManager, bool> supportsTangents;
+  ReadOnlyProperty<MorphTargetManager, size_t> numTargets;
+  ReadOnlyProperty<MorphTargetManager, size_t> numInfluencers;
+  ReadOnlyProperty<MorphTargetManager, Float32Array> influences;
 
 private:
   vector_t<shared_ptr_t<MorphTarget>> _targets;
