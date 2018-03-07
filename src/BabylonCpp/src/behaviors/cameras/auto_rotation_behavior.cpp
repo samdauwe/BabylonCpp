@@ -8,7 +8,18 @@
 namespace BABYLON {
 
 AutoRotationBehavior::AutoRotationBehavior()
-    : _zoomStopsAnimation{false}
+    : zoomStopsAnimation{this, &AutoRotationBehavior::get_zoomStopsAnimation,
+                         &AutoRotationBehavior::set_zoomStopsAnimation}
+    , idleRotationSpeed{this, &AutoRotationBehavior::get_idleRotationSpeed,
+                        &AutoRotationBehavior::set_idleRotationSpeed}
+    , idleRotationWaitTime{this,
+                           &AutoRotationBehavior::get_idleRotationWaitTime,
+                           &AutoRotationBehavior::set_idleRotationWaitTime}
+    , idleRotationSpinupTime{this,
+                             &AutoRotationBehavior::get_idleRotationSpinupTime,
+                             &AutoRotationBehavior::set_idleRotationSpinupTime}
+    , rotationInProgress{this, &AutoRotationBehavior::get_rotationInProgress}
+    , _zoomStopsAnimation{false}
     , _idleRotationSpeed{0.05f}
     , _idleRotationWaitTime{2000}
     , _idleRotationSpinupTime{2000}
@@ -30,47 +41,47 @@ const char* AutoRotationBehavior::name() const
   return "AutoRotation";
 }
 
-void AutoRotationBehavior::setZoomStopsAnimation(bool flag)
+void AutoRotationBehavior::set_zoomStopsAnimation(bool flag)
 {
   _zoomStopsAnimation = flag;
 }
 
-bool AutoRotationBehavior::zoomStopsAnimation() const
+bool AutoRotationBehavior::get_zoomStopsAnimation() const
 {
   return _zoomStopsAnimation;
 }
 
-void AutoRotationBehavior::setIdleRotationSpeed(float speed)
+void AutoRotationBehavior::set_idleRotationSpeed(float speed)
 {
   _idleRotationSpeed = speed;
 }
 
-float AutoRotationBehavior::idleRotationSpeed() const
+float AutoRotationBehavior::get_idleRotationSpeed() const
 {
   return _idleRotationSpeed;
 }
 
-void AutoRotationBehavior::setIdleRotationWaitTime(float time)
+void AutoRotationBehavior::set_idleRotationWaitTime(float time)
 {
   _idleRotationWaitTime = time;
 }
 
-float AutoRotationBehavior::idleRotationWaitTime() const
+float AutoRotationBehavior::get_idleRotationWaitTime() const
 {
   return _idleRotationWaitTime;
 }
 
-void AutoRotationBehavior::setIdleRotationSpinupTime(float time)
+void AutoRotationBehavior::set_idleRotationSpinupTime(float time)
 {
   _idleRotationSpinupTime = time;
 }
 
-float AutoRotationBehavior::idleRotationSpinupTime() const
+float AutoRotationBehavior::get_idleRotationSpinupTime() const
 {
   return _idleRotationSpinupTime;
 }
 
-bool AutoRotationBehavior::rotationInProgress() const
+bool AutoRotationBehavior::get_rotationInProgress() const
 {
   return ::std::abs(_cameraRotationSpeed) > 0.f;
 }

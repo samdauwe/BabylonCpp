@@ -10,63 +10,13 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT AutoRotationBehavior
-  : public Behavior<ArcRotateCamera> {
+    : public Behavior<ArcRotateCamera> {
 
 public:
   AutoRotationBehavior();
   virtual ~AutoRotationBehavior();
 
   const char* name() const;
-
-  /**
-   * @brief Sets the flag that indicates if user zooming should stop animation.
-   */
-  void setZoomStopsAnimation(bool flag);
-
-  /**
-   * @brief Gets the flag that indicates if user zooming should stop animation.
-   */
-  bool zoomStopsAnimation() const;
-
-  /**
-   * @brief Sets the default speed at which the camera rotates around the model.
-   */
-  void setIdleRotationSpeed(float speed);
-
-  /**
-   * @brief Gets the default speed at which the camera rotates around the model.
-   */
-  float idleRotationSpeed() const;
-
-  /**
-   * @brief Sets the time (in milliseconds) to wait after user interaction
-   * before the camera starts rotating.
-   */
-  void setIdleRotationWaitTime(float time);
-
-  /**
-   * @brief Gets the time (milliseconds) to wait after user interaction before
-   * the camera starts rotating.
-   */
-  float idleRotationWaitTime() const;
-
-  /**
-   * @brief Sets the time (milliseconds) to take to spin up to the full idle
-   * rotation speed.
-   */
-  void setIdleRotationSpinupTime(float time);
-
-  /**
-   * @brief Gets the time (milliseconds) to take to spin up to the full idle
-   * rotation speed.
-   */
-  float idleRotationSpinupTime() const;
-
-  /**
-   * @brief Gets a value indicating if the camera is currently rotating because
-   * of this behavior.
-   */
-  bool rotationInProgress() const;
 
   void init() override;
 
@@ -75,6 +25,56 @@ public:
   void detach() override;
 
 private:
+  /**
+   * @brief Sets the flag that indicates if user zooming should stop animation.
+   */
+  void set_zoomStopsAnimation(bool flag);
+
+  /**
+   * @brief Gets the flag that indicates if user zooming should stop animation.
+   */
+  bool get_zoomStopsAnimation() const;
+
+  /**
+   * @brief Sets the default speed at which the camera rotates around the model.
+   */
+  void set_idleRotationSpeed(float speed);
+
+  /**
+   * @brief Gets the default speed at which the camera rotates around the model.
+   */
+  float get_idleRotationSpeed() const;
+
+  /**
+   * @brief Sets the time (in milliseconds) to wait after user interaction
+   * before the camera starts rotating.
+   */
+  void set_idleRotationWaitTime(float time);
+
+  /**
+   * @brief Gets the time (milliseconds) to wait after user interaction before
+   * the camera starts rotating.
+   */
+  float get_idleRotationWaitTime() const;
+
+  /**
+   * @brief Sets the time (milliseconds) to take to spin up to the full idle
+   * rotation speed.
+   */
+  void set_idleRotationSpinupTime(float time);
+
+  /**
+   * @brief Gets the time (milliseconds) to take to spin up to the full idle
+   * rotation speed.
+   */
+  float get_idleRotationSpinupTime() const;
+
+  /**
+   * @brief Gets a value indicating if the camera is currently rotating because
+   * of this behavior.
+   */
+  bool get_rotationInProgress() const;
+
   /**
    * @brief Returns true if user is scrolling.
    * @return true if user is scrolling.
@@ -91,6 +91,34 @@ private:
 
   // Tools
   bool _userIsMoving();
+
+public:
+  /**
+   * Flag that indicates if user zooming should stop animation.
+   */
+  Property<AutoRotationBehavior, bool> zoomStopsAnimation;
+
+  /**
+   * Default speed at which the camera rotates around the model.
+   */
+  Property<AutoRotationBehavior, float> idleRotationSpeed;
+
+  /**
+   *Time (in milliseconds) to wait after user interaction before the camera
+   *starts rotating.
+   */
+  Property<AutoRotationBehavior, float> idleRotationWaitTime;
+
+  /**
+   * Time (milliseconds) to take to spin up to the full idle rotation speed.
+   */
+  Property<AutoRotationBehavior, float> idleRotationSpinupTime;
+
+  /**
+   * Value indicating if the camera is currently rotating because of this
+   * behavior.
+   */
+  ReadOnlyProperty<AutoRotationBehavior, bool> rotationInProgress;
 
 private:
   bool _zoomStopsAnimation;

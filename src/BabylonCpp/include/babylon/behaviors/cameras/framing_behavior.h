@@ -41,96 +41,6 @@ public:
 
   const char* name() const;
 
-  /**
-   * @brief Sets the current mode used by the behavior
-   */
-  void setMode(unsigned int mode);
-
-  /**
-   * @brief Gets current mode used by the behavior.
-   */
-  unsigned int mode() const;
-
-  /**
-   * @brief Sets the scale applied to the radius (1 by default)
-   */
-  void setRadiusScale(float radius);
-
-  /**
-   * @brief Gets the scale applied to the radius
-   */
-  float radiusScale() const;
-
-  /**
-   * @brief Sets the scale to apply on Y axis to position camera focus. 0.5 by
-   * default which means the center of the bounding box.
-   */
-  void setPositionScale(float scale);
-
-  /**
-   * @brief Gets the scale to apply on Y axis to position camera focus. 0.5 by
-   * default which means the center of the bounding box.
-   */
-  float positionScale() const;
-
-  /**
-   * @brief Sets the angle above/below the horizontal plane to return to when
-   * the return to default elevation idle behaviour is triggered, in radians.
-   */
-  void setDefaultElevation(float elevation);
-
-  /**
-   * @brief Gets the angle above/below the horizontal plane to return to when
-   * the return to default elevation idle behaviour is triggered, in radians.
-   */
-  float defaultElevation() const;
-
-  /**
-   * @brief Sets the time (in milliseconds) taken to return to the default beta
-   * position.
-   * Negative value indicates camera should not return to default.
-   */
-  void setElevationReturnTime(float speed);
-
-  /**
-   * @brief Gets the time (in milliseconds) taken to return to the default beta
-   * position.
-   * Negative value indicates camera should not return to default.
-   */
-  float elevationReturnTime() const;
-
-  /**
-   * @brief Sets the delay (in milliseconds) taken before the camera returns to
-   * the default beta position.
-   */
-  void setElevationReturnWaitTime(float time);
-
-  /**
-   * @brief Gets the delay (in milliseconds) taken before the camera returns to
-   * the default beta position.
-   */
-  float elevationReturnWaitTime() const;
-
-  /**
-   * @brief Sets the flag that indicates if user zooming should stop animation.
-   */
-  void setZoomStopsAnimation(bool flag);
-
-  /**
-   * @brief Gets the flag that indicates if user zooming should stop animation.
-   */
-  bool zoomStopsAnimation() const;
-
-  /**
-   * Sets the transition time when framing the mesh, in milliseconds
-   */
-  void setFramingTime(float time);
-
-  /**
-   * @brief Gets the transition time when framing the mesh, in milliseconds
-   */
-  float framingTime() const;
-
   void init() override;
 
   void attach(ArcRotateCamera* camera) override;
@@ -220,6 +130,96 @@ protected:
 
 private:
   /**
+   * @brief Sets the current mode used by the behavior
+   */
+  void set_mode(unsigned int mode);
+
+  /**
+   * @brief Gets current mode used by the behavior.
+   */
+  unsigned int get_mode() const;
+
+  /**
+   * @brief Sets the scale applied to the radius (1 by default)
+   */
+  void set_radiusScale(float radius);
+
+  /**
+   * @brief Gets the scale applied to the radius
+   */
+  float get_radiusScale() const;
+
+  /**
+   * @brief Sets the scale to apply on Y axis to position camera focus. 0.5 by
+   * default which means the center of the bounding box.
+   */
+  void set_positionScale(float scale);
+
+  /**
+   * @brief Gets the scale to apply on Y axis to position camera focus. 0.5 by
+   * default which means the center of the bounding box.
+   */
+  float get_positionScale() const;
+
+  /**
+   * @brief Sets the angle above/below the horizontal plane to return to when
+   * the return to default elevation idle behaviour is triggered, in radians.
+   */
+  void set_defaultElevation(float elevation);
+
+  /**
+   * @brief Gets the angle above/below the horizontal plane to return to when
+   * the return to default elevation idle behaviour is triggered, in radians.
+   */
+  float get_defaultElevation() const;
+
+  /**
+   * @brief Sets the time (in milliseconds) taken to return to the default beta
+   * position.
+   * Negative value indicates camera should not return to default.
+   */
+  void set_elevationReturnTime(float speed);
+
+  /**
+   * @brief Gets the time (in milliseconds) taken to return to the default beta
+   * position.
+   * Negative value indicates camera should not return to default.
+   */
+  float get_elevationReturnTime() const;
+
+  /**
+   * @brief Sets the delay (in milliseconds) taken before the camera returns to
+   * the default beta position.
+   */
+  void set_elevationReturnWaitTime(float time);
+
+  /**
+   * @brief Gets the delay (in milliseconds) taken before the camera returns to
+   * the default beta position.
+   */
+  float get_elevationReturnWaitTime() const;
+
+  /**
+   * @brief Sets the flag that indicates if user zooming should stop animation.
+   */
+  void set_zoomStopsAnimation(bool flag);
+
+  /**
+   * @brief Gets the flag that indicates if user zooming should stop animation.
+   */
+  bool get_zoomStopsAnimation() const;
+
+  /**
+   * Sets the transition time when framing the mesh, in milliseconds
+   */
+  void set_framingTime(float time);
+
+  /**
+   * @brief Gets the transition time when framing the mesh, in milliseconds
+   */
+  float get_framingTime() const;
+
+  /**
    * @brief Keeps the camera above the ground plane. If the user pulls the
    * camera below the ground plane, the camera is automatically returned to its
    * default position (expected to be above ground plane).
@@ -255,6 +255,51 @@ private:
    * @brief Gets a value indicating if the user is moving the camera
    */
   bool isUserIsMoving() const;
+
+public:
+  /**
+   * Current mode used by the behavior
+   */
+  Property<FramingBehavior, unsigned int> mode;
+
+  /**
+   * Scale applied to the radius (1 by default)
+   */
+  Property<FramingBehavior, float> radiusScale;
+
+  /**
+   * Scale to apply on Y axis to position camera focus. 0.5 by default which
+   * means the center of the bounding box.
+   */
+  Property<FramingBehavior, float> positionScale;
+
+  /**
+   * Angle above/below the horizontal plane to return to when the return to
+   * default elevation idle behaviour is triggered, in radians.
+   */
+  Property<FramingBehavior, float> defaultElevation;
+
+  /**
+   * Time (in milliseconds) taken to return to the default beta position.
+   * Negative value indicates camera should not return to default.
+   */
+  Property<FramingBehavior, float> elevationReturnTime;
+
+  /**
+   * Delay (in milliseconds) taken before the camera returns to the default beta
+   * position.
+   */
+  Property<FramingBehavior, float> elevationReturnWaitTime;
+
+  /**
+   *Flag that indicates if user zooming should stop animation.
+   */
+  Property<FramingBehavior, bool> zoomStopsAnimation;
+
+  /**
+   * Transition time when framing the mesh, in milliseconds
+   */
+  Property<FramingBehavior, float> framingTime;
 
 private:
   unsigned int _mode;

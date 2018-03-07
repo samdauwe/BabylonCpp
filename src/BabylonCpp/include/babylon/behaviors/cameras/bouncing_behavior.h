@@ -14,7 +14,7 @@ namespace BABYLON {
  * minimum and maximum radius.
  */
 class BABYLON_SHARED_EXPORT BouncingBehavior
-  : public Behavior<ArcRotateCamera> {
+    : public Behavior<ArcRotateCamera> {
 
 public:
   /**
@@ -32,20 +32,6 @@ public:
   virtual ~BouncingBehavior();
 
   const char* name() const;
-
-  /**
-   * @brief Gets a value indicating if the lowerRadiusTransitionRange and
-   * upperRadiusTransitionRange are defined automatically.
-   */
-  bool autoTransitionRange() const;
-
-  /**
-   * @brief Sets a value indicating if the lowerRadiusTransitionRange and
-   * upperRadiusTransitionRange are defined automatically
-   * Transition ranges will be set to 5% of the bounding box diagonal in world
-   * space
-   */
-  void setAutoTransitionRange(bool value);
 
   void init() override;
 
@@ -67,6 +53,20 @@ protected:
   void _clearAnimationLocks();
 
 private:
+  /**
+   * @brief Gets a value indicating if the lowerRadiusTransitionRange and
+   * upperRadiusTransitionRange are defined automatically.
+   */
+  bool get_autoTransitionRange() const;
+
+  /**
+   * @brief Sets a value indicating if the lowerRadiusTransitionRange and
+   * upperRadiusTransitionRange are defined automatically
+   * Transition ranges will be set to 5% of the bounding box diagonal in world
+   * space
+   */
+  void set_autoTransitionRange(bool value);
+
   /**
    * @brief Checks if the camera radius is at the specified limit. Takes into
    * account animation locks.
@@ -99,6 +99,12 @@ public:
    * reached
    */
   float upperRadiusTransitionRange;
+
+  /**
+   * Value indicating if the lowerRadiusTransitionRange and
+   * upperRadiusTransitionRange are defined automatically
+   */
+  Property<BouncingBehavior, bool> autoTransitionRange;
 
 private:
   bool _autoTransitionRange;

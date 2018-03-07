@@ -15,6 +15,8 @@ BouncingBehavior::BouncingBehavior()
     : transitionDuration{450}
     , lowerRadiusTransitionRange{2}
     , upperRadiusTransitionRange{-2}
+    , autoTransitionRange{this, &BouncingBehavior::get_autoTransitionRange,
+                          &BouncingBehavior::set_autoTransitionRange}
     , _autoTransitionRange{false}
     , _attachedCamera{nullptr}
     , _onAfterCheckInputsObserver{nullptr}
@@ -33,12 +35,12 @@ const char* BouncingBehavior::name() const
   return "Bouncing";
 }
 
-bool BouncingBehavior::autoTransitionRange() const
+bool BouncingBehavior::get_autoTransitionRange() const
 {
   return _autoTransitionRange;
 }
 
-void BouncingBehavior::setAutoTransitionRange(bool value)
+void BouncingBehavior::set_autoTransitionRange(bool value)
 {
   if (_autoTransitionRange == value) {
     return;

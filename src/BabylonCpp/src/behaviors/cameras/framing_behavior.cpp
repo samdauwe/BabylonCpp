@@ -16,7 +16,23 @@ ExponentialEase FramingBehavior::_EasingFunction = ExponentialEase();
 unsigned int FramingBehavior::EasingMode = EasingFunction::EASINGMODE_EASEINOUT;
 
 FramingBehavior::FramingBehavior()
-    : _mode{FramingBehavior::FitFrustumSidesMode}
+    : mode{this, &FramingBehavior::get_mode, &FramingBehavior::set_mode}
+    , radiusScale{this, &FramingBehavior::get_radiusScale,
+                  &FramingBehavior::set_radiusScale}
+    , positionScale{this, &FramingBehavior::get_positionScale,
+                    &FramingBehavior::set_positionScale}
+    , defaultElevation{this, &FramingBehavior::get_defaultElevation,
+                       &FramingBehavior::set_defaultElevation}
+    , elevationReturnTime{this, &FramingBehavior::get_elevationReturnTime,
+                          &FramingBehavior::set_elevationReturnTime}
+    , elevationReturnWaitTime{this,
+                              &FramingBehavior::get_elevationReturnWaitTime,
+                              &FramingBehavior::set_elevationReturnWaitTime}
+    , zoomStopsAnimation{this, &FramingBehavior::get_zoomStopsAnimation,
+                         &FramingBehavior::set_zoomStopsAnimation}
+    , framingTime{this, &FramingBehavior::get_framingTime,
+                  &FramingBehavior::set_framingTime}
+    , _mode{FramingBehavior::FitFrustumSidesMode}
     , _radiusScale{1.f}
     , _positionScale{0.5f}
     , _defaultElevation{0.3f}
@@ -45,82 +61,82 @@ const char* FramingBehavior::name() const
   return "Framing";
 }
 
-void FramingBehavior::setMode(unsigned int mode)
+void FramingBehavior::set_mode(unsigned int mode)
 {
   _mode = mode;
 }
 
-unsigned int FramingBehavior::mode() const
+unsigned int FramingBehavior::get_mode() const
 {
   return _mode;
 }
 
-void FramingBehavior::setRadiusScale(float radius)
+void FramingBehavior::set_radiusScale(float radius)
 {
   _radiusScale = radius;
 }
 
-float FramingBehavior::radiusScale() const
+float FramingBehavior::get_radiusScale() const
 {
   return _radiusScale;
 }
 
-void FramingBehavior::setPositionScale(float scale)
+void FramingBehavior::set_positionScale(float scale)
 {
   _positionScale = scale;
 }
 
-float FramingBehavior::positionScale() const
+float FramingBehavior::get_positionScale() const
 {
   return _positionScale;
 }
 
-void FramingBehavior::setDefaultElevation(float elevation)
+void FramingBehavior::set_defaultElevation(float elevation)
 {
   _defaultElevation = elevation;
 }
 
-float FramingBehavior::defaultElevation() const
+float FramingBehavior::get_defaultElevation() const
 {
   return _defaultElevation;
 }
 
-void FramingBehavior::setElevationReturnTime(float speed)
+void FramingBehavior::set_elevationReturnTime(float speed)
 {
   _elevationReturnTime = speed;
 }
 
-float FramingBehavior::elevationReturnTime() const
+float FramingBehavior::get_elevationReturnTime() const
 {
   return _elevationReturnTime;
 }
 
-void FramingBehavior::setElevationReturnWaitTime(float time)
+void FramingBehavior::set_elevationReturnWaitTime(float time)
 {
   _elevationReturnWaitTime = time;
 }
 
-float FramingBehavior::elevationReturnWaitTime() const
+float FramingBehavior::get_elevationReturnWaitTime() const
 {
   return _elevationReturnWaitTime;
 }
 
-void FramingBehavior::setZoomStopsAnimation(bool flag)
+void FramingBehavior::set_zoomStopsAnimation(bool flag)
 {
   _zoomStopsAnimation = flag;
 }
 
-bool FramingBehavior::zoomStopsAnimation() const
+bool FramingBehavior::get_zoomStopsAnimation() const
 {
   return _zoomStopsAnimation;
 }
 
-void FramingBehavior::setFramingTime(float time)
+void FramingBehavior::set_framingTime(float time)
 {
   _framingTime = time;
 }
 
-float FramingBehavior::framingTime() const
+float FramingBehavior::get_framingTime() const
 {
   return _framingTime;
 }
