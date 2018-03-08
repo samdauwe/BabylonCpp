@@ -281,14 +281,44 @@ void EnvironmentHelper::_setupGroundDiffuseTexture()
   // _groundMaterial->setDiffuseTexture(diffuseTexture);
 }
 
-void EnvironmentHelper::_setupGroundMirrorTexture(ISceneSize* /*sceneSize*/)
+void EnvironmentHelper::_setupGroundMirrorTexture(ISceneSize* sceneSize)
 {
+  auto wrapping = TextureConstants::CLAMP_ADDRESSMODE;
+  if (!_groundMirror) {
+    /*_groundMirror = new MirrorTexture("BackgroundPlaneMirrorTexture",
+        { ratio: _options.groundMirrorSizeRatio },
+        _scene,
+        false,
+        _options.groundMirrorTextureType,
+        TextureConstants::BILINEAR_SAMPLINGMODE,
+        true);*/
+    _groundMirror->mirrorPlane = Plane(0, -1, 0, sceneSize->rootPosition.y);
+    _groundMirror->anisotropicFilteringLevel = 1;
+    _groundMirror->wrapU                     = wrapping;
+    _groundMirror->wrapV                     = wrapping;
+    _groundMirror->gammaSpace                = false;
+
+    if (!_groundMirror->renderList.empty()) {
+      for (const auto& mesh : _scene->meshes) {
+        auto _mesh = mesh.get();
+        if (_mesh != _ground && _mesh != _skybox && _mesh != _rootMesh) {
+          _groundMirror->renderList.emplace_back(_mesh);
+        }
+      }
+    }
+  }
+
+  _groundMirror->clearColor = Color4(_options.groundColor.r, //
+                                     _options.groundColor.g, //
+                                     _options.groundColor.b, //
+                                     1.f);
+  // _groundMirror->adaptiveBlurKernel = _options.groundMirrorBlurKernel
 }
 
 void EnvironmentHelper::_setupMirrorInGroundMaterial()
 {
   if (_groundMaterial) {
-    // _groundMaterial->setReflectionTexture(_groundMirror);
+    _groundMaterial->setReflectionTexture(_groundMirror);
     _groundMaterial->setReflectionFresnel(true);
     _groundMaterial->setReflectionAmount(_options.groundMirrorAmount);
     _groundMaterial->setReflectionStandardFresnelWeight(
