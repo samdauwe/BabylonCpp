@@ -23,7 +23,7 @@ public:
 
     return camera;
   }
-  ~ArcRotateCamera();
+  ~ArcRotateCamera() override;
 
   virtual IReflect::Type type() const override;
 
@@ -51,21 +51,10 @@ public:
   void _checkInputs() override;
   void rebuildAnglesAndRadius();
   void setPosition(const Vector3& position);
-  Vector3& target();
-  const Vector3& target() const;
   void setTarget(AbstractMesh* target, bool toBoundingCenter = false,
                  bool allowSamePosition = false);
   void setTarget(const Vector3& target, bool toBoundingCenter = false,
                  bool allowSamePosition = false);
-  BouncingBehavior* bouncingBehavior() const;
-  bool useBouncingBehavior() const;
-  void setUseBouncingBehavior(bool value);
-  FramingBehavior* framingBehavior() const;
-  bool useFramingBehavior() const;
-  void setUseFramingBehavior(bool value);
-  AutoRotationBehavior* autoRotationBehavior() const;
-  bool useAutoRotationBehavior() const;
-  void setUseAutoRotationBehavior(bool value);
   Matrix _getViewMatrix() override;
   void zoomOn(const vector_t<AbstractMesh*> meshes,
               bool doNotUpdateMaxZ = false);
@@ -88,10 +77,24 @@ protected:
   void _onCollisionPositionChange(int collisionId, Vector3& newPosition,
                                   AbstractMesh* collidedMesh = nullptr);
 
+private:
+  Vector3& get_target();
+  void set_target(const Vector3& value);
+  unique_ptr_t<BouncingBehavior>& get_bouncingBehavior();
+  bool get_useBouncingBehavior() const;
+  void set_useBouncingBehavior(bool value);
+  unique_ptr_t<FramingBehavior>& get_framingBehavior();
+  bool get_useFramingBehavior() const;
+  void set_useFramingBehavior(bool value);
+  unique_ptr_t<AutoRotationBehavior>& get_autoRotationBehavior();
+  bool get_useAutoRotationBehavior() const;
+  void set_useAutoRotationBehavior(bool value);
+
 public:
   float alpha;
   float beta;
   float radius;
+  Property<ArcRotateCamera, Vector3> target;
   float inertialAlphaOffset;
   float inertialBetaOffset;
   float inertialRadiusOffset;
@@ -118,6 +121,16 @@ public:
   ::std::function<void()> _reset;
   // Panning
   unique_ptr_t<Vector3> panningAxis;
+  // Behaviors
+  ReadOnlyProperty<ArcRotateCamera, unique_ptr_t<BouncingBehavior>>
+    bouncingBehavior;
+  Property<ArcRotateCamera, bool> useBouncingBehavior;
+  ReadOnlyProperty<ArcRotateCamera, unique_ptr_t<FramingBehavior>>
+    framingBehavior;
+  Property<ArcRotateCamera, bool> useFramingBehavior;
+  ReadOnlyProperty<ArcRotateCamera, unique_ptr_t<AutoRotationBehavior>>
+    autoRotationBehavior;
+  Property<ArcRotateCamera, bool> useAutoRotationBehavior;
   // Behaviors
   Observable<AbstractMesh> onMeshTargetChangedObservable;
   // Collisions

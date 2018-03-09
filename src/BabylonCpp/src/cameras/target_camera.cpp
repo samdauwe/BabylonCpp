@@ -27,7 +27,7 @@ TargetCamera::TargetCamera(const string_t& iName, const Vector3& iPosition,
     , _transformedReferencePoint{Vector3::Zero()}
     , _lookAtTemp{Matrix::Zero()}
     , _tempMatrix{Matrix::Zero()}
-    , _defaultUpVector{::std::make_unique<Vector3>(0.f, 1.f, 0.f)}
+    , _currentUpVector{::std::make_unique<Vector3>(0.f, 1.f, 0.f)}
 {
   _initCache();
 }
@@ -43,6 +43,7 @@ IReflect::Type TargetCamera::type() const
 
 Vector3 TargetCamera::getFrontPosition(float distance)
 {
+  getWorldMatrix();
   auto direction = getTarget().subtract(position);
   direction.normalize();
   direction.scaleInPlace(distance);
@@ -168,7 +169,7 @@ void TargetCamera::setTarget(const Vector3& target)
 {
   upVector.normalize();
 
-  Matrix::LookAtLHToRef(position, target, *_defaultUpVector, _camMatrix);
+  Matrix::LookAtLHToRef(position, target, upVector, _camMatrix);
   _camMatrix.invert();
 
   rotation->x = ::std::atan(_camMatrix.m[6] / _camMatrix.m[10]);
@@ -302,35 +303,34 @@ void TargetCamera::_updateCameraRotationMatrix()
                                       _cameraRotationMatrix);
   }
   // update the up vector!
-  Vector3::TransformNormalToRef(*_defaultUpVector, _cameraRotationMatrix,
-                                upVector);
+  Vector3::TransformNormalToRef(upVector, _cameraRotationMatrix,
+                                *_currentUpVector);
 }
 
 Matrix TargetCamera::_getViewMatrix()
 {
-  if (!lockedTarget) {
-    // Compute
-    _updateCameraRotationMatrix();
-
-    Vector3::TransformCoordinatesToRef(*_referencePoint, _cameraRotationMatrix,
-                                       _transformedReferencePoint);
-
-    // Computing target and final matrix
-    position.addToRef(_transformedReferencePoint, _currentTarget);
-  }
-  else {
-    auto targetPosition = _getLockedTargetPosition();
-
-    if (targetPosition) {
-      _currentTarget.copyFrom(*targetPosition);
+  if (lockedTarget) {
+    if (auto lockedTargetPosition = _getLockedTargetPosition()) {
+      setTarget(*lockedTargetPosition);
     }
   }
 
+  // Compute
+  _updateCameraRotationMatrix();
+
+  Vector3::TransformCoordinatesToRef(*_referencePoint, _cameraRotationMatrix,
+                                     _transformedReferencePoint);
+
+  // Computing target and final matrix
+  position.addToRef(_transformedReferencePoint, _currentTarget);
+
   if (getScene()->useRightHandedSystem()) {
-    Matrix::LookAtRHToRef(position, _currentTarget, upVector, _viewMatrix);
+    Matrix::LookAtRHToRef(position, _currentTarget, *_currentUpVector,
+                          _viewMatrix);
   }
   else {
-    Matrix::LookAtLHToRef(position, _currentTarget, upVector, _viewMatrix);
+    Matrix::LookAtLHToRef(position, _currentTarget, *_currentUpVector,
+                          _viewMatrix);
   }
 
   return _viewMatrix;
@@ -340,10 +340,10 @@ Matrix TargetCamera::_getViewMatrix()
 Camera* TargetCamera::createRigCamera(const string_t& iName,
                                       int /*cameraIndex*/)
 {
-  if (cameraRigMode != Camera::RIG_MODE_NONE) {
+  if (cameraRigMode != Camera::RIG_MODE_NONE()) {
     auto rigCamera = TargetCamera::New(iName, position, getScene());
-    if (cameraRigMode == Camera::RIG_MODE_VR
-        || cameraRigMode == Camera::RIG_MODE_WEBVR) {
+    if (cameraRigMode == Camera::RIG_MODE_VR()
+        || cameraRigMode == Camera::RIG_MODE_WEBVR()) {
       if (!rotationQuaternion) {
         rotationQuaternion = ::std::make_unique<Quaternion>();
       }
@@ -361,19 +361,20 @@ void TargetCamera::_updateRigCameras()
   auto camRight = dynamic_cast<TargetCamera*>(_rigCameras[1]);
 
   switch (cameraRigMode) {
-    case Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH:
-    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL:
-    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED:
-    case Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER: {
+    case Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH():
+    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL():
+    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED():
+    case Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER(): {
       // provisionnaly using _cameraRigParams.stereoHalfAngle instead of
       // calculations based on _cameraRigParams.interaxialDistance:
-      float leftSign = (cameraRigMode
-                        == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED) ?
-                         1.f :
-                         -1.f;
+      float leftSign
+        = (cameraRigMode
+           == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED()) ?
+            1.f :
+            -1.f;
       float rightSign
         = (cameraRigMode
-           == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED) ?
+           == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED()) ?
             -1.f :
             1.f;
       _getRigCamPosition(_cameraRigParams.stereoHalfAngle * leftSign,
@@ -384,7 +385,7 @@ void TargetCamera::_updateRigCameras()
       camLeft->setTarget(getTarget());
       camRight->setTarget(getTarget());
     } break;
-    case Camera::RIG_MODE_VR: {
+    case Camera::RIG_MODE_VR(): {
       if (camLeft->rotationQuaternion) {
         camLeft->rotationQuaternion->copyFrom(*rotationQuaternion);
         camRight->rotationQuaternion->copyFrom(*rotationQuaternion);

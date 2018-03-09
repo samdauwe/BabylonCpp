@@ -18,7 +18,7 @@ public:
 
     return camera;
   }
-  ~TargetCamera();
+  ~TargetCamera() override;
 
   virtual IReflect::Type type() const override;
 
@@ -98,7 +98,7 @@ public:
 
 private:
   Matrix _rigCamTransformMatrix;
-  unique_ptr_t<Vector3> _defaultUpVector;
+  unique_ptr_t<Vector3> _currentUpVector;
   /**
    * Store current camera state (fov, position, etc..)
    */

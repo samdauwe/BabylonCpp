@@ -14,9 +14,12 @@ FreeCamera::FreeCamera(const string_t& iName, const Vector3& iPosition,
                        Scene* scene)
     : TargetCamera{iName, iPosition, scene}
     , ellipsoid{Vector3(0.5f, 1.f, 0.5f)}
+    , ellipsoidOffset{Vector3(0.f, 0.f, 0.f)}
     , checkCollisions{false}
     , applyGravity{false}
     , inputs{::std::make_unique<FreeCameraInputsManager>(this)}
+    , collisionMask{this, &FreeCamera::get_collisionMask,
+                    &FreeCamera::set_collisionMask}
     , _collider{nullptr}
     , _collisionMask{-1}
     , _needMoveForGravity{false}
@@ -52,12 +55,12 @@ void FreeCamera::detachControl(ICanvas* canvas)
   cameraRotation  = ::std::make_unique<Vector2>(0.f, 0.f);
 }
 
-int FreeCamera::collisionMask()
+int FreeCamera::get_collisionMask() const
 {
   return _collisionMask;
 }
 
-void FreeCamera::setCollisionMask(int mask)
+void FreeCamera::set_collisionMask(int mask)
 {
   _collisionMask = !isNan(mask) ? mask : -1;
 }
@@ -75,6 +78,7 @@ void FreeCamera::_collideWithWorld(Vector3& displacement)
   }
 
   globalPosition_.subtractFromFloatsToRef(0, ellipsoid.y, 0, _oldPosition);
+  _oldPosition.addInPlace(ellipsoidOffset);
 
   if (!_collider) {
     _collider = ::std::make_unique<Collider>();

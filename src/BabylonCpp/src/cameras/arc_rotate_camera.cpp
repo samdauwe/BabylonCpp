@@ -25,6 +25,7 @@ ArcRotateCamera::ArcRotateCamera(const string_t& iName, float iAlpha,
     , alpha{iAlpha}
     , beta{iBeta}
     , radius{iRadius}
+    , target{this, &ArcRotateCamera::get_target, &ArcRotateCamera::set_target}
     , inertialAlphaOffset{0.f}
     , inertialBetaOffset{0.f}
     , inertialRadiusOffset{0.f}
@@ -43,6 +44,16 @@ ArcRotateCamera::ArcRotateCamera(const string_t& iName, float iAlpha,
     , targetScreenOffset{Vector2::Zero()}
     , allowUpsideDown{true}
     , panningAxis{::std::make_unique<Vector3>(1.f, 1.f, 0.f)}
+    , bouncingBehavior{this, &ArcRotateCamera::get_bouncingBehavior}
+    , useBouncingBehavior{this, &ArcRotateCamera::get_useBouncingBehavior,
+                          &ArcRotateCamera::set_useBouncingBehavior}
+    , framingBehavior{this, &ArcRotateCamera::get_framingBehavior}
+    , useFramingBehavior{this, &ArcRotateCamera::get_useFramingBehavior,
+                         &ArcRotateCamera::set_useFramingBehavior}
+    , autoRotationBehavior{this, &ArcRotateCamera::get_autoRotationBehavior}
+    , useAutoRotationBehavior{this,
+                              &ArcRotateCamera::get_useAutoRotationBehavior,
+                              &ArcRotateCamera::set_useAutoRotationBehavior}
     , checkCollisions{false}
     , collisionRadius{::std::make_unique<Vector3>(0.5f, 0.5f, 0.5f)}
     , _targetHost{nullptr}
@@ -350,14 +361,14 @@ void ArcRotateCamera::setPosition(const Vector3& iPosition)
   rebuildAnglesAndRadius();
 }
 
-Vector3& ArcRotateCamera::target()
+Vector3& ArcRotateCamera::get_target()
 {
   return _target;
 }
 
-const Vector3& ArcRotateCamera::target() const
+void ArcRotateCamera::set_target(const Vector3& value)
 {
-  return _target;
+  setTarget(value);
 }
 
 void ArcRotateCamera::setTarget(AbstractMesh* iTarget, bool toBoundingCenter,
@@ -392,17 +403,17 @@ void ArcRotateCamera::setTarget(const Vector3& iTarget,
   rebuildAnglesAndRadius();
 }
 
-BouncingBehavior* ArcRotateCamera::bouncingBehavior() const
+unique_ptr_t<BouncingBehavior>& ArcRotateCamera::get_bouncingBehavior()
 {
-  return _bouncingBehavior.get();
+  return _bouncingBehavior;
 }
 
-bool ArcRotateCamera::useBouncingBehavior() const
+bool ArcRotateCamera::get_useBouncingBehavior() const
 {
   return _bouncingBehavior != nullptr;
 }
 
-void ArcRotateCamera::setUseBouncingBehavior(bool value)
+void ArcRotateCamera::set_useBouncingBehavior(bool value)
 {
   if (value == useBouncingBehavior()) {
     return;
@@ -418,17 +429,17 @@ void ArcRotateCamera::setUseBouncingBehavior(bool value)
   }
 }
 
-FramingBehavior* ArcRotateCamera::framingBehavior() const
+unique_ptr_t<FramingBehavior>& ArcRotateCamera::get_framingBehavior()
 {
-  return _framingBehavior.get();
+  return _framingBehavior;
 }
 
-bool ArcRotateCamera::useFramingBehavior() const
+bool ArcRotateCamera::get_useFramingBehavior() const
 {
   return _framingBehavior != nullptr;
 }
 
-void ArcRotateCamera::setUseFramingBehavior(bool value)
+void ArcRotateCamera::set_useFramingBehavior(bool value)
 {
   if (value == useFramingBehavior()) {
     return;
@@ -444,17 +455,17 @@ void ArcRotateCamera::setUseFramingBehavior(bool value)
   }
 }
 
-AutoRotationBehavior* ArcRotateCamera::autoRotationBehavior() const
+unique_ptr_t<AutoRotationBehavior>& ArcRotateCamera::get_autoRotationBehavior()
 {
-  return _autoRotationBehavior.get();
+  return _autoRotationBehavior;
 }
 
-bool ArcRotateCamera::useAutoRotationBehavior() const
+bool ArcRotateCamera::get_useAutoRotationBehavior() const
 {
   return _autoRotationBehavior != nullptr;
 }
 
-void ArcRotateCamera::setUseAutoRotationBehavior(bool value)
+void ArcRotateCamera::set_useAutoRotationBehavior(bool value)
 {
   if (value == useAutoRotationBehavior()) {
     return;
@@ -597,14 +608,14 @@ Camera* ArcRotateCamera::createRigCamera(const string_t& iName, int cameraIndex)
   float alphaShift = 0.f;
 
   switch (cameraRigMode) {
-    case Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH:
-    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL:
-    case Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER:
-    case Camera::RIG_MODE_VR:
+    case Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH():
+    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL():
+    case Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER():
+    case Camera::RIG_MODE_VR():
       alphaShift
         = _cameraRigParams.stereoHalfAngle * (cameraIndex == 0 ? 1 : -1);
       break;
-    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED:
+    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED():
       alphaShift
         = _cameraRigParams.stereoHalfAngle * (cameraIndex == 0 ? -1 : 1);
       break;
@@ -626,14 +637,14 @@ void ArcRotateCamera::_updateRigCameras()
   camLeft->radius = camRight->radius = radius;
 
   switch (cameraRigMode) {
-    case Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH:
-    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL:
-    case Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER:
-    case Camera::RIG_MODE_VR:
+    case Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH():
+    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL():
+    case Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER():
+    case Camera::RIG_MODE_VR():
       camLeft->alpha  = alpha - _cameraRigParams.stereoHalfAngle;
       camRight->alpha = alpha + _cameraRigParams.stereoHalfAngle;
       break;
-    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED:
+    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED():
       camLeft->alpha  = alpha + _cameraRigParams.stereoHalfAngle;
       camRight->alpha = alpha - _cameraRigParams.stereoHalfAngle;
       break;

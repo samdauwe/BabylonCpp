@@ -54,7 +54,7 @@ void DeviceOrientationCamera::resetToCurrentRotation(const Vector3& axis)
     _initialQuaternion->x = 0.f;
   }
   else {
-    _initialQuaternion->x = -1.f;
+    _initialQuaternion->x *= -1.f;
   }
 
   // y
@@ -62,7 +62,7 @@ void DeviceOrientationCamera::resetToCurrentRotation(const Vector3& axis)
     _initialQuaternion->y = 0.f;
   }
   else {
-    _initialQuaternion->y = -1.f;
+    _initialQuaternion->y *= -1.f;
   }
 
   // z
@@ -70,7 +70,7 @@ void DeviceOrientationCamera::resetToCurrentRotation(const Vector3& axis)
     _initialQuaternion->z = 0.f;
   }
   else {
-    _initialQuaternion->z = -1.f;
+    _initialQuaternion->z *= -1.f;
   }
 
   _initialQuaternion->normalize();

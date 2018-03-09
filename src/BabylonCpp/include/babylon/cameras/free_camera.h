@@ -19,7 +19,7 @@ public:
 
     return camera;
   }
-  ~FreeCamera();
+  ~FreeCamera() override;
 
   IReflect::Type type() const override;
 
@@ -29,8 +29,6 @@ public:
                      MouseButtonType panningMouseButton
                      = MouseButtonType::RIGHT) override;
   void detachControl(ICanvas* canvas) override;
-  int collisionMask();
-  void setCollisionMask(int mask);
   void _collideWithWorld(Vector3& displacement);
   void _checkInputs() override;
   bool _decideIfNeedsToMove() override;
@@ -40,6 +38,8 @@ public:
   Json::object serialize() const override;
 
 private:
+  int get_collisionMask() const;
+  void set_collisionMask(int mask);
   void _onCollisionPositionChange(int collisionId, Vector3& newPosition,
                                   AbstractMesh* collidedMesh = nullptr);
 
@@ -48,6 +48,7 @@ protected:
 
 public:
   Vector3 ellipsoid;
+  Vector3 ellipsoidOffset;
   bool checkCollisions;
   bool applyGravity;
   unique_ptr_t<FreeCameraInputsManager> inputs;
@@ -56,6 +57,8 @@ public:
   // Direction
   unique_ptr_t<Vector3> _localDirection;
   Vector3 _transformedDirection;
+
+  Property<FreeCamera, int> collisionMask;
 
 private:
   // Collisions

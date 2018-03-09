@@ -2951,9 +2951,11 @@ void Scene::_renderForCamera(Camera* camera)
     for (auto& effectLayer : effectLayers) {
       if (effectLayer->shouldRender()
           && (!effectLayer->camera()
-              || (effectLayer->camera()->cameraRigMode == Camera::RIG_MODE_NONE
+              || (effectLayer->camera()->cameraRigMode
+                    == Camera::RIG_MODE_NONE()
                   && camera == effectLayer->camera())
-              || (effectLayer->camera()->cameraRigMode != Camera::RIG_MODE_NONE
+              || (effectLayer->camera()->cameraRigMode
+                    != Camera::RIG_MODE_NONE()
                   && (::std::find(effectLayer->camera()->_rigCameras.begin(),
                                   effectLayer->camera()->_rigCameras.end(),
                                   camera)
@@ -3065,7 +3067,7 @@ void Scene::_renderForCamera(Camera* camera)
 
 void Scene::_processSubCameras(Camera* camera)
 {
-  if (camera->cameraRigMode == Camera::RIG_MODE_NONE) {
+  if (camera->cameraRigMode == Camera::RIG_MODE_NONE()) {
     _renderForCamera(camera);
     return;
   }

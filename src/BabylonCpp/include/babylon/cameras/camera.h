@@ -14,27 +14,95 @@ namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT Camera : public Node {
 
-public:
+private:
   /** Statics **/
-  static constexpr unsigned int PERSPECTIVE_CAMERA  = 0;
-  static constexpr unsigned int ORTHOGRAPHIC_CAMERA = 1;
+  static constexpr unsigned int _PERSPECTIVE_CAMERA  = 0;
+  static constexpr unsigned int _ORTHOGRAPHIC_CAMERA = 1;
 
-  static constexpr unsigned int FOVMODE_VERTICAL_FIXED   = 0;
-  static constexpr unsigned int FOVMODE_HORIZONTAL_FIXED = 1;
+  static constexpr unsigned int _FOVMODE_VERTICAL_FIXED   = 0;
+  static constexpr unsigned int _FOVMODE_HORIZONTAL_FIXED = 1;
 
-  static constexpr unsigned int RIG_MODE_NONE                              = 0;
-  static constexpr unsigned int RIG_MODE_STEREOSCOPIC_ANAGLYPH             = 10;
-  static constexpr unsigned int RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL  = 11;
-  static constexpr unsigned int RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED = 12;
-  static constexpr unsigned int RIG_MODE_STEREOSCOPIC_OVERUNDER            = 13;
-  static constexpr unsigned int RIG_MODE_VR                                = 20;
-  static constexpr unsigned int RIG_MODE_WEBVR                             = 21;
+  static constexpr unsigned int _RIG_MODE_NONE                             = 0;
+  static constexpr unsigned int _RIG_MODE_STEREOSCOPIC_ANAGLYPH            = 10;
+  static constexpr unsigned int _RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL = 11;
+  static constexpr unsigned int _RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED
+    = 12;
+  static constexpr unsigned int _RIG_MODE_STEREOSCOPIC_OVERUNDER = 13;
+  static constexpr unsigned int _RIG_MODE_VR                     = 20;
+  static constexpr unsigned int _RIG_MODE_WEBVR                  = 21;
+
+public:
+  static constexpr unsigned int PERSPECTIVE_CAMERA()
+  {
+    return Camera::_PERSPECTIVE_CAMERA;
+  }
+
+  static constexpr unsigned int ORTHOGRAPHIC_CAMERA()
+  {
+    return Camera::_ORTHOGRAPHIC_CAMERA;
+  }
+
+  /**
+   * @brief This is the default FOV mode for perspective cameras.
+   * This setting aligns the upper and lower bounds of the viewport to the upper
+   * and lower bounds of the camera frustum.
+   *
+   */
+  static constexpr unsigned int FOVMODE_VERTICAL_FIXED()
+  {
+    return Camera::_FOVMODE_VERTICAL_FIXED;
+  }
+
+  /**
+   * @brief This setting aligns the left and right bounds of the viewport to the
+   * left and right bounds of the camera frustum.
+   *
+   */
+  static constexpr unsigned int FOVMODE_HORIZONTAL_FIXED()
+  {
+    return Camera::_FOVMODE_HORIZONTAL_FIXED;
+  }
+
+  static constexpr unsigned int RIG_MODE_NONE()
+  {
+    return Camera::_RIG_MODE_NONE;
+  }
+
+  static constexpr unsigned int RIG_MODE_STEREOSCOPIC_ANAGLYPH()
+  {
+    return Camera::_RIG_MODE_STEREOSCOPIC_ANAGLYPH;
+  }
+
+  static constexpr unsigned int RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL()
+  {
+    return Camera::_RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL;
+  }
+
+  static constexpr unsigned int RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED()
+  {
+    return Camera::_RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED;
+  }
+
+  static constexpr unsigned int RIG_MODE_STEREOSCOPIC_OVERUNDER()
+  {
+    return Camera::_RIG_MODE_STEREOSCOPIC_OVERUNDER;
+  }
+
+  static constexpr unsigned int RIG_MODE_VR()
+  {
+    return Camera::_RIG_MODE_VR;
+  }
+
+  static constexpr unsigned int RIG_MODE_WEBVR()
+  {
+    return Camera::_RIG_MODE_WEBVR;
+  }
 
   static bool ForceAttachControlToAlwaysPreventDefault;
   static bool UseAlternateWebVRRendering;
 
 public:
-  virtual ~Camera();
+  virtual ~Camera() override;
 
   virtual IReflect::Type type() const override;
   void addToScene(unique_ptr_t<Camera>&& newCamera);
@@ -55,7 +123,6 @@ public:
    */
   string_t toString(bool fullDetails = false) const;
 
-  Vector3& globalPosition();
   vector_t<AbstractMesh*>& getActiveMeshes();
   bool isActiveMesh(AbstractMesh* mesh);
 
@@ -112,6 +179,7 @@ public:
   Camera* clone(const string_t& name);
   Vector3 getDirection(const Vector3& localAxis);
   void getDirectionToRef(const Vector3& localAxis, Vector3& result);
+  Matrix& computeWorldMatrix(bool force = false) override;
 
   // Statics
   static Camera* GetConstructorFromName(const string_t& type,
@@ -126,6 +194,7 @@ protected:
   virtual bool _restoreStateValues();
 
 private:
+  Vector3& get_globalPosition();
   void _cascadePostProcessesToRigCams();
   void updateFrustumPlanes();
   Matrix& _getVRProjectionMatrix();
@@ -137,19 +206,41 @@ private:
 public:
   /** Members **/
   Vector3 position;
+
+  /**
+   * The vector the camera should consider as up.
+   * (default is Vector3(0, 1, 0) aka Vector3.Up())
+   */
   Vector3 upVector;
+
   float orthoLeft;
   float orthoRight;
   float orthoBottom;
   float orthoTop;
+
+  /**
+   * FOV is set in Radians. (default is 0.8)
+   */
   float fov;
+
   float minZ;
   float maxZ;
   float inertia;
   unsigned int mode;
   bool isIntermediate;
   Viewport viewport;
+
+  /**
+   * Restricts the camera to viewing objects with the same layerMask.
+   * A camera with a layerMask of 1 will render mesh.layerMask &
+   * camera.layerMask!== 0
+   */
   unsigned int layerMask;
+
+  /**
+   * fovMode sets the camera frustum bounds to the viewport bounds. (default is
+   * FOVMODE_VERTICAL_FIXED)
+   */
   unsigned int fovMode;
 
   /** Camera rig members **/
@@ -174,6 +265,8 @@ public:
   vector_t<PostProcess*> _postProcesses;
   Uint32Array _postProcessesTakenIndices;
   vector_t<AbstractMesh*> _activeMeshes;
+
+  ReadOnlyProperty<Camera, Vector3> globalPosition;
 
 protected:
   Matrix _webvrViewMatrix;

@@ -36,15 +36,16 @@ Camera::Camera(const string_t& iName, const Vector3& iPosition, Scene* scene)
     , minZ{1.f}
     , maxZ{10000.f}
     , inertia{0.9f}
-    , mode{Camera::PERSPECTIVE_CAMERA}
+    , mode{Camera::PERSPECTIVE_CAMERA()}
     , isIntermediate{false}
     , viewport{Viewport(0, 0, 1, 1)}
     , layerMask{0x0FFFFFFF}
-    , fovMode{Camera::FOVMODE_VERTICAL_FIXED}
-    , cameraRigMode{Camera::RIG_MODE_NONE}
+    , fovMode{Camera::FOVMODE_VERTICAL_FIXED()}
+    , cameraRigMode{Camera::RIG_MODE_NONE()}
     , _skipRendering{false}
     , _alternateCamera{nullptr}
     , _projectionMatrix{Matrix()}
+    , globalPosition{this, &Camera::get_globalPosition}
     , _webvrViewMatrix{Matrix::Identity()}
     , _computedViewMatrix{Matrix::Identity()}
     , _doNotComputeProjectionMatrix{false}
@@ -119,7 +120,7 @@ string_t Camera::toString(bool fullDetails) const
   return oss.str();
 }
 
-Vector3& Camera::globalPosition()
+Vector3& Camera::get_globalPosition()
 {
   return _globalPosition;
 }
@@ -199,7 +200,7 @@ bool Camera::_isSynchronizedProjectionMatrix()
 
   auto engine = getEngine();
 
-  if (mode == Camera::PERSPECTIVE_CAMERA) {
+  if (mode == Camera::PERSPECTIVE_CAMERA()) {
     check = stl_util::almost_equal(_cache.fov, fov) && _cache.fovMode == fovMode
             && stl_util::almost_equal(_cache.aspectRatio,
                                       engine->getAspectRatio(this));
@@ -230,7 +231,7 @@ void Camera::detachControl(ICanvas* /*canvas*/)
 void Camera::update()
 {
   _checkInputs();
-  if (cameraRigMode != Camera::RIG_MODE_NONE) {
+  if (cameraRigMode != Camera::RIG_MODE_NONE()) {
     _updateRigCameras();
   }
 }
@@ -408,7 +409,7 @@ Matrix& Camera::getProjectionMatrix(bool force)
 
   auto engine = getEngine();
   auto scene  = getScene();
-  if (mode == Camera::PERSPECTIVE_CAMERA) {
+  if (mode == Camera::PERSPECTIVE_CAMERA()) {
     _cache.fov         = fov;
     _cache.fovMode     = fovMode;
     _cache.aspectRatio = engine->getAspectRatio(this);
@@ -418,14 +419,14 @@ Matrix& Camera::getProjectionMatrix(bool force)
     }
 
     if (scene->useRightHandedSystem()) {
-      Matrix::PerspectiveFovRHToRef(fov, engine->getAspectRatio(this), minZ,
-                                    maxZ, _projectionMatrix,
-                                    fovMode == Camera::FOVMODE_VERTICAL_FIXED);
+      Matrix::PerspectiveFovRHToRef(
+        fov, engine->getAspectRatio(this), minZ, maxZ, _projectionMatrix,
+        fovMode == Camera::FOVMODE_VERTICAL_FIXED());
     }
     else {
-      Matrix::PerspectiveFovLHToRef(fov, engine->getAspectRatio(this), minZ,
-                                    maxZ, _projectionMatrix,
-                                    fovMode == Camera::FOVMODE_VERTICAL_FIXED);
+      Matrix::PerspectiveFovLHToRef(
+        fov, engine->getAspectRatio(this), minZ, maxZ, _projectionMatrix,
+        fovMode == Camera::FOVMODE_VERTICAL_FIXED());
     }
   }
   else {
@@ -546,7 +547,7 @@ void Camera::dispose(bool /*doNotRecurse*/)
     _rigPostProcess = nullptr;
     _postProcesses.clear();
   }
-  else if (cameraRigMode != Camera::RIG_MODE_NONE) {
+  else if (cameraRigMode != Camera::RIG_MODE_NONE()) {
     _rigPostProcess = nullptr;
     _postProcesses.clear();
   }
@@ -677,7 +678,7 @@ void Camera::_updateRigCameras()
   }
 
   // only update viewport when ANAGLYPH
-  if (cameraRigMode == Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH) {
+  if (cameraRigMode == Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH()) {
     _rigCameras[0]->viewport = _rigCameras[1]->viewport = viewport;
   }
 }
@@ -713,6 +714,11 @@ Vector3 Camera::getDirection(const Vector3& localAxis)
 void Camera::getDirectionToRef(const Vector3& localAxis, Vector3& result)
 {
   Vector3::TransformNormalToRef(localAxis, *getWorldMatrix(), result);
+}
+
+Matrix& Camera::computeWorldMatrix(bool /*force*/)
+{
+  return *getWorldMatrix();
 }
 
 Camera* Camera::GetConstructorFromName(const string_t& type,
