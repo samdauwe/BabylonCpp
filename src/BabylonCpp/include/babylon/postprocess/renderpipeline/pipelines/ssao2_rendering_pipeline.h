@@ -60,10 +60,6 @@ public:
   virtual ~SSAO2RenderingPipeline() override;
 
   /** Methods */
-  void setSamples(unsigned int n);
-  unsigned int samples() const;
-  void setExpensiveBlur(bool b);
-  bool expensiveBlur();
   static bool IsSupported();
   void _rebuild() override;
 
@@ -74,6 +70,10 @@ public:
   void dispose(bool disableGeometryBufferRenderer = false) override;
 
 private:
+  void set_samples(unsigned int n);
+  unsigned int get_samples() const;
+  void set_expensiveBlur(bool b);
+  bool get_expensiveBlur() const;
   void _createBlurPostProcess(float ssaoRatio, float blurRatio);
   Float32Array _generateHemisphere();
   void _createSSAOPostProcess(float ratio);
@@ -85,21 +85,35 @@ public:
    * The output strength of the SSAO post-process. Default value is 1.0.
    */
   float totalStrength;
+
   /**
    * Maximum depth value to still render AO. A smooth falloff makes the dimming
    * more natural, so there will be no abrupt shading change.
    */
   float maxZ;
+
   /**
    * In order to save performances, SSAO radius is clamped on close geometry.
    * This ratio changes by how much
    */
   float minZAspect;
+
+  /**
+   * Number of samples used for the SSAO calculations.
+   */
+  Property<SSAO2RenderingPipeline, unsigned int> samples;
+
+  /**
+   * Are we using bilateral blur ?
+   */
+  Property<SSAO2RenderingPipeline, bool> expensiveBlur;
+
   /**
    * The radius around the analyzed pixel used by the SSAO post-process. Default
    * value is 2.0
    */
   float radius;
+
   /**
    * Related to fallOff, used to interpolate SSAO samples (first interpolate
    * function input) based on the occlusion difference of each pixel
@@ -107,6 +121,7 @@ public:
    * Default value is 0.0075
    */
   float area;
+
   /**
    * Related to area, used to interpolate SSAO samples (second interpolate
    * function input) based on the occlusion difference of each pixel

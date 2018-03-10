@@ -37,6 +37,10 @@ SSAO2RenderingPipeline::SSAO2RenderingPipeline(const string_t& name,
     , totalStrength{1.f}
     , maxZ{100.f}
     , minZAspect{0.2f}
+    , samples{this, &SSAO2RenderingPipeline::get_samples,
+              &SSAO2RenderingPipeline::set_samples}
+    , expensiveBlur{this, &SSAO2RenderingPipeline::get_expensiveBlur,
+                    &SSAO2RenderingPipeline::set_expensiveBlur}
     , radius{2.f}
     , area{0.0075f}
     , fallOff{0.000001f}
@@ -108,7 +112,7 @@ SSAO2RenderingPipeline::~SSAO2RenderingPipeline()
 {
 }
 
-void SSAO2RenderingPipeline::setSamples(unsigned int n)
+void SSAO2RenderingPipeline::set_samples(unsigned int n)
 {
   _ssaoPostProcess->updateEffect("#define SAMPLES " + ::std::to_string(n)
                                  + "\n#define SSAO");
@@ -118,12 +122,12 @@ void SSAO2RenderingPipeline::setSamples(unsigned int n)
   _firstUpdate = true;
 }
 
-unsigned int SSAO2RenderingPipeline::samples() const
+unsigned int SSAO2RenderingPipeline::get_samples() const
 {
   return _samples;
 }
 
-void SSAO2RenderingPipeline::setExpensiveBlur(bool b)
+void SSAO2RenderingPipeline::set_expensiveBlur(bool b)
 {
   _blurHPostProcess->updateEffect(
     "#define BILATERAL_BLUR\n#define BILATERAL_BLUR_H\n#define SAMPLES "
@@ -138,7 +142,7 @@ void SSAO2RenderingPipeline::setExpensiveBlur(bool b)
   _firstUpdate   = true;
 }
 
-bool SSAO2RenderingPipeline::expensiveBlur()
+bool SSAO2RenderingPipeline::get_expensiveBlur() const
 {
   return _expensiveBlur;
 }

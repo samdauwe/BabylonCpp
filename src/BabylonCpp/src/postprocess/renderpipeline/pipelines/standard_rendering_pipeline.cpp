@@ -506,13 +506,13 @@ void StandardRenderingPipeline::_createBlurPostProcesses(
   blurX->onActivateObservable.add([&](Camera* /*camera*/, EventState& /*es*/) {
     auto dw = static_cast<float>(blurX->width)
               / static_cast<float>(engine->getRenderWidth());
-    blurX->setKernel((*this)[blurWidthKey] * dw);
+    blurX->kernel = (*this)[blurWidthKey] * dw;
   });
 
   blurY->onActivateObservable.add([&](Camera* /*camera*/, EventState& /*es*/) {
     auto dw = static_cast<float>(blurY->height)
               / static_cast<float>(engine->getRenderHeight());
-    blurY->setKernel(horizontalBlur ? 64.f * dw : (*this)[blurWidthKey] * dw);
+    blurY->kernel = horizontalBlur ? 64.f * dw : (*this)[blurWidthKey] * dw;
   });
 
   addEffect(new PostProcessRenderEffect(

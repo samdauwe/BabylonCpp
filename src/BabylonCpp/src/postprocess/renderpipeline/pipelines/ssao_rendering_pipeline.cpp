@@ -125,13 +125,13 @@ void SSAORenderingPipeline::_createBlurPostProcess(float ratio)
   _blurHPostProcess->onActivateObservable.add([&, size](Camera*, EventState&) {
     auto dw = static_cast<float>(_blurHPostProcess->width)
               / static_cast<float>(_scene->getEngine()->getRenderWidth());
-    _blurHPostProcess->setKernel(size * dw);
+    _blurHPostProcess->kernel = size * dw;
   });
 
   _blurVPostProcess->onActivateObservable.add([&, size](Camera*, EventState&) {
     auto dw = static_cast<float>(_blurVPostProcess->height)
               / static_cast<float>(_scene->getEngine()->getRenderHeight());
-    _blurVPostProcess->setKernel(size * dw);
+    _blurVPostProcess->kernel = size * dw;
   });
 }
 
@@ -144,14 +144,24 @@ void SSAORenderingPipeline::_rebuild()
 void SSAORenderingPipeline::_createSSAOPostProcess(float ratio)
 {
   const unsigned int numSamples = 16;
-  Float32Array sampleSphere{
-    {0.5381f,  0.1856f,  -0.4319f, 0.1379f,  0.2486f,  0.4430f,  0.3371f,
-     0.5679f,  -0.0057f, -0.6999f, -0.0451f, -0.0019f, 0.0689f,  -0.1598f,
-     -0.8547f, 0.0560f,  0.0069f,  -0.1843f, -0.0146f, 0.1402f,  0.0762f,
-     0.0100f,  -0.1924f, -0.0344f, -0.3577f, -0.5301f, -0.4358f, -0.3169f,
-     0.1063f,  0.0158f,  0.0103f,  -0.5869f, 0.0046f,  -0.0897f, -0.4940f,
-     0.3287f,  0.7119f,  -0.0154f, -0.0918f, -0.0533f, 0.0596f,  -0.5411f,
-     0.0352f,  -0.0631f, 0.5460f,  -0.4776f, 0.2847f,  -0.0271f}};
+  const Float32Array sampleSphere{{
+    0.5381f,  0.1856f,  -0.4319f, //
+    0.1379f,  0.2486f,  0.4430f,  //
+    0.3371f,  0.5679f,  -0.0057f, //
+    -0.6999f, -0.0451f, -0.0019f, //
+    0.0689f,  -0.1598f, -0.8547f, //
+    0.0560f,  0.0069f,  -0.1843f, //
+    -0.0146f, 0.1402f,  0.0762f,  //
+    0.0100f,  -0.1924f, -0.0344f, //
+    -0.3577f, -0.5301f, -0.4358f, //
+    -0.3169f, 0.1063f,  0.0158f,  //
+    0.0103f,  -0.5869f, 0.0046f,  //
+    -0.0897f, -0.4940f, 0.3287f,  //
+    0.7119f,  -0.0154f, -0.0918f, //
+    -0.0533f, 0.0596f,  -0.5411f, //
+    0.0352f,  -0.0631f, 0.5460f,  //
+    -0.4776f, 0.2847f,  -0.0271f  //
+  }};
   float samplesFactor = 1.f / static_cast<float>(numSamples);
 
   _ssaoPostProcess = new PostProcess(
