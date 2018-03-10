@@ -10,15 +10,17 @@ namespace BABYLON {
 PoseEnabledController::PoseEnabledController(
   const shared_ptr_t<IBrowserGamepad>& browserGamepad)
     : Gamepad(browserGamepad->id, browserGamepad->index, browserGamepad)
-    , devicePosition{Vector3::Zero()}
-    , deviceScaleFactor{1.f}
-    , position{Vector3::Zero()}
-    , controllerType{PoseEnabledControllerType::GENERIC}
     , _mesh{nullptr}
-    , _calculatedPosition{Vector3::Zero()}
-
+    , _deviceToWorld{Matrix::Identity()}
+    , _workingMatrix{Matrix::Identity()}
 {
-  type = Gamepad::POSE_ENABLED;
+  type              = Gamepad::POSE_ENABLED;
+  controllerType    = PoseEnabledControllerType::GENERIC;
+  devicePosition    = Vector3::Zero();
+  deviceScaleFactor = 1.f;
+  position          = Vector3::Zero();
+
+  _calculatedPosition = Vector3::Zero();
   Quaternion::RotationYawPitchRollToRef(Math::PI, 0, 0,
                                         _leftHandSystemQuaternion);
 }
@@ -35,10 +37,16 @@ void PoseEnabledController::update()
     updateFromDevice(*pose);
   }
 
+  Vector3::TransformCoordinatesToRef(_calculatedPosition, _deviceToWorld,
+                                     devicePosition);
+  _deviceToWorld.getRotationMatrixToRef(_workingMatrix);
+  Quaternion::FromRotationMatrixToRef(_workingMatrix, deviceRotationQuaternion);
+  deviceRotationQuaternion.multiplyInPlace(_calculatedRotation);
+
   if (_mesh) {
-    _mesh->position().copyFrom(_calculatedPosition);
+    _mesh->position().copyFrom(devicePosition);
     if (_mesh->rotationQuaternion()) {
-      _mesh->rotationQuaternion()->copyFrom(_calculatedRotation);
+      _mesh->rotationQuaternion()->copyFrom(deviceRotationQuaternion);
     }
   }
 }
@@ -47,34 +55,34 @@ void PoseEnabledController::updateFromDevice(const DevicePose& poseData)
 {
   rawPose = poseData;
   if (!poseData.position.empty()) {
-    devicePosition.copyFromFloats(poseData.position[0], poseData.position[1],
-                                  -poseData.position[2]);
+    _deviceRoomPosition.copyFromFloats(
+      poseData.position[0], poseData.position[1], -poseData.position[2]);
     if (_mesh && _mesh->getScene()->useRightHandedSystem()) {
-      devicePosition.z *= -1.f;
+      _deviceRoomPosition.z *= -1.f;
     }
 
-    devicePosition.scaleToRef(deviceScaleFactor, _calculatedPosition);
+    _deviceRoomPosition.scaleToRef(deviceScaleFactor, _calculatedPosition);
     _calculatedPosition.addInPlace(position);
   }
   auto& pose = rawPose;
   if (!poseData.orientation.empty() && !pose.orientation.empty()) {
-    deviceRotationQuaternion.copyFromFloats(
+    _deviceRoomRotationQuaternion.copyFromFloats(
       pose.orientation[0], pose.orientation[1], -pose.orientation[2],
       -pose.orientation[3]);
     if (_mesh) {
       if (_mesh->getScene()->useRightHandedSystem()) {
-        deviceRotationQuaternion.z *= -1.f;
-        deviceRotationQuaternion.w *= -1.f;
+        _deviceRoomRotationQuaternion.z *= -1.f;
+        _deviceRoomRotationQuaternion.w *= -1.f;
       }
       else {
-        deviceRotationQuaternion.multiplyToRef(_leftHandSystemQuaternion,
-                                               deviceRotationQuaternion);
+        _deviceRoomRotationQuaternion.multiplyToRef(_leftHandSystemQuaternion,
+                                                    deviceRotationQuaternion);
       }
     }
 
     // if the camera is set, rotate to the camera's rotation
-    deviceRotationQuaternion.multiplyToRef(rotationQuaternion,
-                                           _calculatedRotation);
+    _deviceRoomRotationQuaternion.multiplyToRef(rotationQuaternion,
+                                                _calculatedRotation);
   }
 }
 

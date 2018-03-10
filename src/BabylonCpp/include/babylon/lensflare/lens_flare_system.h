@@ -24,8 +24,6 @@ public:
 
   void addToScene(unique_ptr_t<LensFlareSystem>&& lensFlareSystem);
 
-  bool isEnabled() const;
-  void setIsEnabled(bool value);
   Scene* getScene();
   Mesh* getEmitter();
   void setEmitter(Mesh* newEmitter);
@@ -43,6 +41,10 @@ public:
 protected:
   LensFlareSystem(const string_t name, Mesh* emitter, Scene* scene);
 
+private:
+  bool get_isEnabled() const;
+  void set_isEnabled(bool value);
+
 public:
   string_t id;
   string_t name;
@@ -51,6 +53,7 @@ public:
   float viewportBorder;
   ::std::function<bool(AbstractMesh* mesh)> meshesSelectionPredicate;
   unsigned int layerMask;
+  Property<LensFlareSystem, bool> isEnabled;
 
 private:
   Scene* _scene;

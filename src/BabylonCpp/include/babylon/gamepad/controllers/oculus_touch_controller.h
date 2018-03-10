@@ -8,7 +8,7 @@ namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT OculusTouchController : public WebVRController {
 
-private:
+public:
   static constexpr const char* MODEL_BASE_URL
     = "https://controllers.babylonjs.com/oculus/";
   static constexpr const char* MODEL_LEFT_FILENAME  = "left.babylon";
@@ -16,7 +16,7 @@ private:
 
 public:
   OculusTouchController(const shared_ptr_t<IBrowserGamepad>& vrGamepad);
-  ~OculusTouchController();
+  ~OculusTouchController() override;
 
   void initControllerMesh(
     Scene* scene,
@@ -45,9 +45,6 @@ protected:
 public:
   Observable<ExtendedGamepadButton> onSecondaryTriggerStateChangedObservable;
   Observable<ExtendedGamepadButton> onThumbRestChangedObservable;
-
-private:
-  AbstractMesh* _defaultModel;
 
 }; // end of class GenericController
 

@@ -4,6 +4,7 @@
 #include <babylon/babylon_global.h>
 #include <babylon/cameras/vr/pose_controlled.h>
 #include <babylon/gamepad/generic_pad.h>
+#include <babylon/math/matrix.h>
 
 namespace BABYLON {
 
@@ -15,12 +16,13 @@ public:
     VIVE,
     OCULUS,
     WINDOWS,
+    GEAR_VR,
     GENERIC
   }; // end of enum class PoseEnabledControllerType
 
 public:
   PoseEnabledController(const shared_ptr_t<IBrowserGamepad>& browserGamepad);
-  ~PoseEnabledController();
+  ~PoseEnabledController() override;
 
   void update() override;
   void updateFromDevice(const DevicePose& poseData) override;
@@ -31,23 +33,22 @@ public:
   Ray getForwardRay(float length);
 
 public:
-  Vector3 devicePosition;
-  Quaternion deviceRotationQuaternion;
-  float deviceScaleFactor;
-
-  Vector3 position;
-  Quaternion rotationQuaternion;
   PoseEnabledControllerType controllerType;
-
-  DevicePose rawPose;  // GamepadPose;
   AbstractMesh* _mesh; // a node that will be attached to this Gamepad
+  Matrix _deviceToWorld;
 
 private:
+  // Represents device position and rotation in room space. Should only be used
+  // to help calculate babylon space values
+  Vector3 _deviceRoomPosition;
+  Quaternion _deviceRoomRotationQuaternion;
+
   Vector3 _calculatedPosition;
   Quaternion _calculatedRotation;
 
   TargetCamera* _poseControlledCamera;
   Quaternion _leftHandSystemQuaternion;
+  Matrix _workingMatrix;
 
 }; // end of struct PoseEnabledController
 

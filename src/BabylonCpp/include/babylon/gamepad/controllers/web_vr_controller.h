@@ -14,7 +14,7 @@ class BABYLON_SHARED_EXPORT WebVRController : public PoseEnabledController {
 
 public:
   WebVRController(const shared_ptr_t<IBrowserGamepad>& vrGamepad);
-  ~WebVRController();
+  ~WebVRController() override;
 
   AbstractMesh* defaultModel();
 
@@ -44,11 +44,9 @@ private:
 
 public:
   Observable<ExtendedGamepadButton> onTriggerStateChangedObservable;
-
+  Observable<ExtendedGamepadButton> onTrackpadChangedObservable;
   Observable<ExtendedGamepadButton> onMainButtonStateChangedObservable;
-
   Observable<ExtendedGamepadButton> onSecondaryButtonStateChangedObservable;
-
   Observable<ExtendedGamepadButton> onPadStateChangedObservable;
   Observable<StickValues> onPadValuesChangedObservable;
 

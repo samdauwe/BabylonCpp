@@ -9,9 +9,10 @@ namespace BABYLON {
 
 OculusTouchController::OculusTouchController(
   const shared_ptr_t<IBrowserGamepad>& vrGamepad)
-    : WebVRController{vrGamepad}, _defaultModel{nullptr}
+    : WebVRController{vrGamepad}
 {
   controllerType = PoseEnabledControllerType::OCULUS;
+  _defaultModel  = nullptr;
 }
 
 OculusTouchController::~OculusTouchController()

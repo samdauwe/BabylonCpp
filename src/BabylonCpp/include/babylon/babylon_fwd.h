@@ -176,6 +176,7 @@ struct StickValues;
 class Xbox360Pad;
 // - Controllers
 class ExtendedGamepadButton;
+class GearVRController;
 class GenericController;
 class MutableGamepadButton;
 class OculusTouchController;
