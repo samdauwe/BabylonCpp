@@ -9,6 +9,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/material.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/vector3.h>
@@ -24,6 +25,8 @@ LensFlareSystem::LensFlareSystem(const string_t iName, Mesh* emitter,
     , borderLimit{300}
     , viewportBorder{0.f}
     , layerMask{0x0FFFFFFF}
+    , isEnabled{this, &LensFlareSystem::get_isEnabled,
+                &LensFlareSystem::set_isEnabled}
     , _scene{scene}
     , _emitter{emitter}
     , _indexBuffer{nullptr}
@@ -71,12 +74,12 @@ void LensFlareSystem::addToScene(
   _scene->lensFlareSystems.emplace_back(::std::move(lensFlareSystem));
 }
 
-bool LensFlareSystem::isEnabled() const
+bool LensFlareSystem::get_isEnabled() const
 {
   return _isEnabled;
 }
 
-void LensFlareSystem::setIsEnabled(bool value)
+void LensFlareSystem::set_isEnabled(bool value)
 {
   _isEnabled = value;
 }
@@ -259,7 +262,7 @@ bool LensFlareSystem::render()
 
   // Flares
   for (auto& flare : lensFlares) {
-    engine->setAlphaMode(static_cast<int>(flare->alphaMode));
+    engine->setAlphaMode(flare->alphaMode);
 
     auto x = centerX - (distX * flare->position.x);
     auto y = centerY - (distY * flare->position.y);
@@ -273,7 +276,8 @@ bool LensFlareSystem::render()
     auto viewportMatrix = Matrix::FromValues(cw / 2, 0, 0, 0, //
                                              0, ch / 2, 0, 0, //
                                              0, 0, 1, 0,      //
-                                             cx, cy, 0, 1);
+                                             cx, cy, 0, 1     //
+    );
 
     _effect->setMatrix("viewportMatrix", viewportMatrix);
 
@@ -286,7 +290,7 @@ bool LensFlareSystem::render()
                        1.f);
 
     // Draw order
-    engine->draw(true, 0, 6);
+    engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
   }
 
   engine->setDepthBuffer(true);
