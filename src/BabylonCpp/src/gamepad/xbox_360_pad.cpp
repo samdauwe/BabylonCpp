@@ -9,6 +9,27 @@ Xbox360Pad::Xbox360Pad(const string_t& id, int index,
                        const shared_ptr_t<IBrowserGamepad>& gamepad,
                        bool xboxOne)
     : Gamepad(id, index, gamepad, 0, 1, 2, 3)
+    , leftTrigger{this, &Xbox360Pad::get_leftTrigger,
+                  &Xbox360Pad::set_leftTrigger}
+    , rightTrigger{this, &Xbox360Pad::get_rightTrigger,
+                   &Xbox360Pad::set_rightTrigger}
+    , buttonA{this, &Xbox360Pad::get_buttonA, &Xbox360Pad::set_buttonA}
+    , buttonB{this, &Xbox360Pad::get_buttonB, &Xbox360Pad::set_buttonB}
+    , buttonX{this, &Xbox360Pad::get_buttonX, &Xbox360Pad::set_buttonX}
+    , buttonY{this, &Xbox360Pad::get_buttonY, &Xbox360Pad::set_buttonY}
+    , buttonStart{this, &Xbox360Pad::get_buttonStart,
+                  &Xbox360Pad::set_buttonStart}
+    , buttonBack{this, &Xbox360Pad::get_buttonBack, &Xbox360Pad::set_buttonBack}
+    , buttonLB{this, &Xbox360Pad::get_buttonLB, &Xbox360Pad::set_buttonLB}
+    , buttonRB{this, &Xbox360Pad::get_buttonRB, &Xbox360Pad::set_buttonRB}
+    , buttonLeftStick{this, &Xbox360Pad::get_buttonLeftStick,
+                      &Xbox360Pad::set_buttonLeftStick}
+    , buttonRightStick{this, &Xbox360Pad::get_buttonRightStick,
+                       &Xbox360Pad::set_buttonRightStick}
+    , dPadUp{this, &Xbox360Pad::get_dPadUp, &Xbox360Pad::set_dPadUp}
+    , dPadDown{this, &Xbox360Pad::get_dPadDown, &Xbox360Pad::set_dPadDown}
+    , dPadLeft{this, &Xbox360Pad::get_dPadLeft, &Xbox360Pad::set_dPadLeft}
+    , dPadRight{this, &Xbox360Pad::get_dPadRight, &Xbox360Pad::set_dPadRight}
     , _leftTrigger{0}
     , _rightTrigger{0}
     , _buttonA{0}
@@ -46,12 +67,12 @@ void Xbox360Pad::onrighttriggerchanged(
   _onrighttriggerchanged = callback;
 }
 
-float Xbox360Pad::leftTrigger() const
+float Xbox360Pad::get_leftTrigger() const
 {
   return _leftTrigger;
 }
 
-void Xbox360Pad::setLeftTrigger(float newValue)
+void Xbox360Pad::set_leftTrigger(float newValue)
 {
   if (_onlefttriggerchanged
       && !stl_util::almost_equal(_leftTrigger, newValue)) {
@@ -60,12 +81,12 @@ void Xbox360Pad::setLeftTrigger(float newValue)
   _leftTrigger = newValue;
 }
 
-float Xbox360Pad::rightTrigger() const
+float Xbox360Pad::get_rightTrigger() const
 {
   return _rightTrigger;
 }
 
-void Xbox360Pad::setRightTrigger(float newValue)
+void Xbox360Pad::set_rightTrigger(float newValue)
 {
   if (_onrighttriggerchanged
       && !stl_util::almost_equal(_rightTrigger, newValue)) {
@@ -145,144 +166,144 @@ unsigned int Xbox360Pad::_setDPadValue(unsigned int newValue,
   return newValue;
 }
 
-unsigned int Xbox360Pad::buttonA() const
+unsigned int Xbox360Pad::get_buttonA() const
 {
   return _buttonA;
 }
 
-void Xbox360Pad::setButtonA(unsigned int value)
+void Xbox360Pad::set_buttonA(unsigned int value)
 {
   _buttonA = _setButtonValue(value, _buttonA, Xbox360Button::A);
 }
 
-unsigned int Xbox360Pad::buttonB() const
+unsigned int Xbox360Pad::get_buttonB() const
 {
   return _buttonB;
 }
 
-void Xbox360Pad::setButtonB(unsigned int value)
+void Xbox360Pad::set_buttonB(unsigned int value)
 {
   _buttonB = _setButtonValue(value, _buttonB, Xbox360Button::B);
 }
 
-unsigned int Xbox360Pad::buttonX() const
+unsigned int Xbox360Pad::get_buttonX() const
 {
   return _buttonX;
 }
 
-void Xbox360Pad::setButtonX(unsigned int value)
+void Xbox360Pad::set_buttonX(unsigned int value)
 {
   _buttonX = _setButtonValue(value, _buttonX, Xbox360Button::X);
 }
 
-unsigned int Xbox360Pad::buttonY() const
+unsigned int Xbox360Pad::get_buttonY() const
 {
   return _buttonY;
 }
 
-void Xbox360Pad::setButtonY(unsigned int value)
+void Xbox360Pad::set_buttonY(unsigned int value)
 {
   _buttonY = _setButtonValue(value, _buttonY, Xbox360Button::Y);
 }
 
-unsigned int Xbox360Pad::buttonStart() const
+unsigned int Xbox360Pad::get_buttonStart() const
 {
   return _buttonStart;
 }
 
-void Xbox360Pad::setButtonStart(unsigned int value)
+void Xbox360Pad::set_buttonStart(unsigned int value)
 {
   _buttonStart = _setButtonValue(value, _buttonStart, Xbox360Button::Start);
 }
 
-unsigned int Xbox360Pad::buttonBack() const
+unsigned int Xbox360Pad::get_buttonBack() const
 {
   return _buttonBack;
 }
 
-void Xbox360Pad::setButtonBack(unsigned int value)
+void Xbox360Pad::set_buttonBack(unsigned int value)
 {
   _buttonBack = _setButtonValue(value, _buttonBack, Xbox360Button::Back);
 }
 
-unsigned int Xbox360Pad::buttonLB() const
+unsigned int Xbox360Pad::get_buttonLB() const
 {
   return _buttonLB;
 }
 
-void Xbox360Pad::setButtonLB(unsigned int value)
+void Xbox360Pad::set_buttonLB(unsigned int value)
 {
   _buttonLB = _setButtonValue(value, _buttonLB, Xbox360Button::LB);
 }
 
-unsigned int Xbox360Pad::buttonRB() const
+unsigned int Xbox360Pad::get_buttonRB() const
 {
   return _buttonRB;
 }
 
-void Xbox360Pad::setButtonRB(unsigned int value)
+void Xbox360Pad::set_buttonRB(unsigned int value)
 {
   _buttonRB = _setButtonValue(value, _buttonRB, Xbox360Button::RB);
 }
 
-unsigned int Xbox360Pad::buttonLeftStick() const
+unsigned int Xbox360Pad::get_buttonLeftStick() const
 {
   return _buttonLeftStick;
 }
 
-void Xbox360Pad::setButtonLeftStick(unsigned int value)
+void Xbox360Pad::set_buttonLeftStick(unsigned int value)
 {
   _buttonLeftStick
     = _setButtonValue(value, _buttonLeftStick, Xbox360Button::LeftStick);
 }
 
-unsigned int Xbox360Pad::buttonRightStick() const
+unsigned int Xbox360Pad::get_buttonRightStick() const
 {
   return _buttonRightStick;
 }
 
-void Xbox360Pad::setButtonRightStick(unsigned int value)
+void Xbox360Pad::set_buttonRightStick(unsigned int value)
 {
   _buttonRightStick
     = _setButtonValue(value, _buttonRightStick, Xbox360Button::RightStick);
 }
 
-unsigned int Xbox360Pad::dPadUp() const
+unsigned int Xbox360Pad::get_dPadUp() const
 {
   return _dPadUp;
 }
 
-void Xbox360Pad::setDPadUp(unsigned int value)
+void Xbox360Pad::set_dPadUp(unsigned int value)
 {
   _dPadUp = _setDPadValue(value, _dPadUp, Xbox360Dpad::Up);
 }
 
-unsigned int Xbox360Pad::dPadDown() const
+unsigned int Xbox360Pad::get_dPadDown() const
 {
   return _dPadDown;
 }
 
-void Xbox360Pad::setDPadDown(unsigned int value)
+void Xbox360Pad::set_dPadDown(unsigned int value)
 {
   _dPadDown = _setDPadValue(value, _dPadDown, Xbox360Dpad::Down);
 }
 
-unsigned int Xbox360Pad::dPadLeft() const
+unsigned int Xbox360Pad::get_dPadLeft() const
 {
   return _dPadLeft;
 }
 
-void Xbox360Pad::setDPadLeft(unsigned int value)
+void Xbox360Pad::set_dPadLeft(unsigned int value)
 {
   _dPadLeft = _setDPadValue(value, _dPadLeft, Xbox360Dpad::Left);
 }
 
-unsigned int Xbox360Pad::dPadRight() const
+unsigned int Xbox360Pad::get_dPadRight() const
 {
   return _dPadRight;
 }
 
-void Xbox360Pad::setDPadRight(unsigned int value)
+void Xbox360Pad::set_dPadRight(unsigned int value)
 {
   _dPadRight = _setDPadValue(value, _dPadRight, Xbox360Dpad::Right);
 }
@@ -291,41 +312,50 @@ void Xbox360Pad::update()
 {
   Gamepad::update();
   if (_isXboxOnePad) {
-    setButtonA(_browserGamepad->buttons[0].value);
-    setButtonB(_browserGamepad->buttons[1].value);
-    setButtonX(_browserGamepad->buttons[2].value);
-    setButtonY(_browserGamepad->buttons[3].value);
-    setButtonLB(_browserGamepad->buttons[4].value);
-    setButtonRB(_browserGamepad->buttons[5].value);
-    setLeftTrigger(_browserGamepad->axes[2]);
-    setRightTrigger(_browserGamepad->axes[5]);
-    setButtonBack(_browserGamepad->buttons[9].value);
-    setButtonStart(_browserGamepad->buttons[8].value);
-    setButtonLeftStick(_browserGamepad->buttons[6].value);
-    setButtonRightStick(_browserGamepad->buttons[7].value);
-    setDPadUp(_browserGamepad->buttons[11].value);
-    setDPadDown(_browserGamepad->buttons[12].value);
-    setDPadLeft(_browserGamepad->buttons[13].value);
-    setDPadRight(_browserGamepad->buttons[14].value);
+    buttonA          = _browserGamepad->buttons[0].value;
+    buttonB          = _browserGamepad->buttons[1].value;
+    buttonX          = _browserGamepad->buttons[2].value;
+    buttonY          = _browserGamepad->buttons[3].value;
+    buttonLB         = _browserGamepad->buttons[4].value;
+    buttonRB         = _browserGamepad->buttons[5].value;
+    leftTrigger      = _browserGamepad->axes[2];
+    rightTrigger     = _browserGamepad->axes[5];
+    buttonBack       = _browserGamepad->buttons[9].value;
+    buttonStart      = _browserGamepad->buttons[8].value;
+    buttonLeftStick  = _browserGamepad->buttons[6].value;
+    buttonRightStick = _browserGamepad->buttons[7].value;
+    dPadUp           = _browserGamepad->buttons[11].value;
+    dPadDown         = _browserGamepad->buttons[12].value;
+    dPadLeft         = _browserGamepad->buttons[13].value;
+    dPadRight        = _browserGamepad->buttons[14].value;
   }
   else {
-    setButtonA(_browserGamepad->buttons[0].value);
-    setButtonB(_browserGamepad->buttons[1].value);
-    setButtonX(_browserGamepad->buttons[2].value);
-    setButtonY(_browserGamepad->buttons[3].value);
-    setButtonLB(_browserGamepad->buttons[4].value);
-    setButtonRB(_browserGamepad->buttons[5].value);
-    setLeftTrigger(_browserGamepad->buttons[6].value * 1.f);
-    setRightTrigger(_browserGamepad->buttons[7].value * 1.f);
-    setButtonBack(_browserGamepad->buttons[8].value);
-    setButtonStart(_browserGamepad->buttons[9].value);
-    setButtonLeftStick(_browserGamepad->buttons[10].value);
-    setButtonRightStick(_browserGamepad->buttons[11].value);
-    setDPadUp(_browserGamepad->buttons[12].value);
-    setDPadDown(_browserGamepad->buttons[13].value);
-    setDPadLeft(_browserGamepad->buttons[14].value);
-    setDPadRight(_browserGamepad->buttons[15].value);
+    buttonA          = _browserGamepad->buttons[0].value;
+    buttonB          = _browserGamepad->buttons[1].value;
+    buttonX          = _browserGamepad->buttons[2].value;
+    buttonY          = _browserGamepad->buttons[3].value;
+    buttonLB         = _browserGamepad->buttons[4].value;
+    buttonRB         = _browserGamepad->buttons[5].value;
+    leftTrigger      = _browserGamepad->buttons[6].value;
+    rightTrigger     = _browserGamepad->buttons[7].value;
+    buttonBack       = _browserGamepad->buttons[8].value;
+    buttonStart      = _browserGamepad->buttons[9].value;
+    buttonLeftStick  = _browserGamepad->buttons[10].value;
+    buttonRightStick = _browserGamepad->buttons[11].value;
+    dPadUp           = _browserGamepad->buttons[12].value;
+    dPadDown         = _browserGamepad->buttons[13].value;
+    dPadLeft         = _browserGamepad->buttons[14].value;
+    dPadRight        = _browserGamepad->buttons[15].value;
   }
+}
+
+void Xbox360Pad::dispose()
+{
+  Gamepad::dispose();
+  onButtonDownObservable.clear();
+  onButtonUpObservable.clear();
+  onPadDownObservable.clear();
+  onPadUpObservable.clear();
 }
 
 } // end of namespace BABYLON

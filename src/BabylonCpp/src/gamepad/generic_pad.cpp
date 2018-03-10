@@ -60,4 +60,11 @@ void GenericPad::update()
   }
 }
 
+void GenericPad::dispose()
+{
+  Gamepad::dispose();
+  onButtonDownObservable.clear();
+  onButtonUpObservable.clear();
+}
+
 } // end of namespace BABYLON

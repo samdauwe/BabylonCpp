@@ -9,7 +9,8 @@ namespace BABYLON {
 ViveController::ViveController(const shared_ptr_t<IBrowserGamepad>& vrGamepad)
     : WebVRController{vrGamepad}, _defaultModel{nullptr}
 {
-  controllerType = PoseEnabledControllerType::VIVE;
+  controllerType    = PoseEnabledControllerType::VIVE;
+  _invertLeftStickY = true;
 }
 
 ViveController::~ViveController()

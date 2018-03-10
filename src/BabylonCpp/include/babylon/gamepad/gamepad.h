@@ -23,15 +23,10 @@ public:
           unsigned int rightStickX = 2, unsigned int rightStickY = 3);
   virtual ~Gamepad();
 
-  bool isConnected() const;
   void setOnleftstickchanged(
     const ::std::function<void(const StickValues& values)>& callback);
   void setOnrightstickchanged(
     const ::std::function<void(const StickValues& values)>& callback);
-  const StickValues& leftStick() const;
-  void setLeftStick(const StickValues& newValues);
-  const StickValues& rightStick() const;
-  void setRightStick(const StickValues& newValues);
   virtual void update();
   virtual void dispose();
 
@@ -41,10 +36,20 @@ public:
   unsigned int type;
   bool _isConnected;
 
+  ReadOnlyProperty<Gamepad, bool> isConnected;
+  Property<Gamepad, Nullable<StickValues>> leftStick;
+  Property<Gamepad, Nullable<StickValues>> rightStick;
+
 protected:
+  bool _invertLeftStickY;
   shared_ptr_t<IBrowserGamepad> _browserGamepad;
 
 private:
+  bool get_isConnected() const;
+  Nullable<StickValues>& get_leftStick();
+  void set_leftStick(const Nullable<StickValues>& newValues);
+  Nullable<StickValues>& get_rightStick();
+  void set_rightStick(const Nullable<StickValues>& newValues);
   Nullable<StickValues> _leftStick;
   Nullable<StickValues> _rightStick;
 

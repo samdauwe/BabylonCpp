@@ -46,10 +46,11 @@ void WebVRController::update()
   for (unsigned int index = 0; index < _buttons.size(); ++index) {
     // _setButtonValue(_browserGamepad->buttons[index], _buttons[index], index);
   };
-  if (!stl_util::almost_equal(leftStick().x, pad.x)
-      || !stl_util::almost_equal(leftStick().y, pad.y)) {
-    pad.x = leftStick().x;
-    pad.y = leftStick().y;
+  const auto& pLeftStick = *leftStick();
+  if (!stl_util::almost_equal(pLeftStick.x, pad.x)
+      || !stl_util::almost_equal(pLeftStick.y, pad.y)) {
+    pad.x = pLeftStick.x;
+    pad.y = pLeftStick.y;
     onPadValuesChangedObservable.notifyObservers(&pad);
   }
 }

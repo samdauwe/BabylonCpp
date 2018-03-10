@@ -32,24 +32,23 @@ struct BABYLON_SHARED_EXPORT LoadedMeshInfo {
 class BABYLON_SHARED_EXPORT WindowsMotionController : public WebVRController {
 
 public:
-  static const string_t GAMEPAD_ID_PREFIX;
-
-private:
   static const string_t MODEL_BASE_URL;
   static const string_t MODEL_LEFT_FILENAME;
   static const string_t MODEL_RIGHT_FILENAME;
 
+  static const string_t GAMEPAD_ID_PREFIX;
   static const string_t GAMEPAD_ID_PATTERN;
 
 public:
   WindowsMotionController(const shared_ptr_t<IBrowserGamepad>& vrGamepad);
-  ~WindowsMotionController();
+  ~WindowsMotionController() override;
 
   Observable<ExtendedGamepadButton>& onTriggerButtonStateChangedObservable();
   Observable<ExtendedGamepadButton>& onMenuButtonStateChangedObservable();
   Observable<ExtendedGamepadButton>& onGripButtonStateChangedObservable();
   Observable<ExtendedGamepadButton>& onThumbstickButtonStateChangedObservable();
   Observable<ExtendedGamepadButton>& onTouchpadButtonStateChangedObservable();
+  Observable<StickValues>& onTouchpadValuesChangedObservable();
 
   /**
    * Called once per frame by the engine.
@@ -101,6 +100,8 @@ private:
 
 public:
   Observable<ExtendedGamepadButton> onTrackpadChangedObservable;
+  Observable<StickValues> onTrackpadValuesChangedObservable;
+  StickValues trackpad;
 
 private:
   Nullable<LoadedMeshInfo> _loadedMeshInfo;

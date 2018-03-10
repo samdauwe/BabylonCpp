@@ -19,6 +19,7 @@ const string_t WindowsMotionController::GAMEPAD_ID_PATTERN
 WindowsMotionController::WindowsMotionController(
   const shared_ptr_t<IBrowserGamepad>& vrGamepad)
     : WebVRController{vrGamepad}
+    , trackpad{0.f,0.f}
     , _loadedMeshInfo{nullptr}
     ,_mappingButtons{"thumbstick", "trigger", "grip", "menu", "trackpad"}
     , _mappingButtonMeshNames{              //
@@ -79,6 +80,12 @@ Observable<ExtendedGamepadButton>&
 WindowsMotionController::onTouchpadButtonStateChangedObservable()
 {
   return onTrackpadChangedObservable;
+}
+
+Observable<StickValues>&
+WindowsMotionController::onTouchpadValuesChangedObservable()
+{
+  return onTrackpadValuesChangedObservable;
 }
 
 void WindowsMotionController::update()

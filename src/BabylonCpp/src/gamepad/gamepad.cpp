@@ -13,6 +13,10 @@ Gamepad::Gamepad(const string_t& iId, int iIndex,
     , index{iIndex}
     , type{Gamepad::GAMEPAD}
     , _isConnected{true}
+    , isConnected{this, &Gamepad::get_isConnected}
+    , leftStick{this, &Gamepad::get_leftStick, &Gamepad::set_leftStick}
+    , rightStick{this, &Gamepad::get_rightStick, &Gamepad::set_rightStick}
+    , _invertLeftStickY{false}
     , _browserGamepad{browserGamepad}
     , _leftStickAxisX{leftStickX}
     , _leftStickAxisY{leftStickY}
@@ -33,7 +37,7 @@ Gamepad::~Gamepad()
 {
 }
 
-bool Gamepad::isConnected() const
+bool Gamepad::get_isConnected() const
 {
   return _isConnected;
 }
@@ -50,32 +54,32 @@ void Gamepad::setOnrightstickchanged(
   _onrightstickchanged = callback;
 }
 
-const StickValues& Gamepad::leftStick() const
+Nullable<StickValues>& Gamepad::get_leftStick()
 {
-  return *_leftStick;
+  return _leftStick;
 }
 
-void Gamepad::setLeftStick(const StickValues& newValues)
+void Gamepad::set_leftStick(const Nullable<StickValues>& newValues)
 {
   if (_onleftstickchanged
-      && (!stl_util::almost_equal((*_leftStick).x, newValues.x)
-          || !stl_util::almost_equal((*_leftStick).y, newValues.y))) {
-    _onleftstickchanged(newValues);
+      && (!stl_util::almost_equal((*_leftStick).x, (*newValues).x)
+          || !stl_util::almost_equal((*_leftStick).y, (*newValues).y))) {
+    _onleftstickchanged(*newValues);
   }
   _leftStick = newValues;
 }
 
-const StickValues& Gamepad::rightStick() const
+Nullable<StickValues>& Gamepad::get_rightStick()
 {
-  return *_rightStick;
+  return _rightStick;
 }
 
-void Gamepad::setRightStick(const StickValues& newValues)
+void Gamepad::set_rightStick(const Nullable<StickValues>& newValues)
 {
   if (_onrightstickchanged
-      && (!stl_util::almost_equal((*_rightStick).x, newValues.x)
-          || !stl_util::almost_equal((*_rightStick).y, newValues.y))) {
-    _onrightstickchanged(newValues);
+      && (!stl_util::almost_equal((*_rightStick).x, (*newValues).x)
+          || !stl_util::almost_equal((*_rightStick).y, (*newValues).y))) {
+    _onrightstickchanged(*newValues);
   }
   _rightStick = newValues;
 }
@@ -83,8 +87,14 @@ void Gamepad::setRightStick(const StickValues& newValues)
 void Gamepad::update()
 {
   if (_leftStick) {
-    _leftStick = StickValues(_browserGamepad->axes[_leftStickAxisX],
-                             _browserGamepad->axes[_leftStickAxisY]);
+    if (_invertLeftStickY) {
+      _leftStick = StickValues(_browserGamepad->axes[_leftStickAxisX],
+                               _browserGamepad->axes[_leftStickAxisY] * -1.f);
+    }
+    else {
+      _leftStick = StickValues(_browserGamepad->axes[_leftStickAxisX],
+                               _browserGamepad->axes[_leftStickAxisY]);
+    }
   }
   if (_rightStick) {
     _rightStick = StickValues(_browserGamepad->axes[_rightStickAxisX],

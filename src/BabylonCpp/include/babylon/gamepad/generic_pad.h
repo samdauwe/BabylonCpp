@@ -12,13 +12,14 @@ class BABYLON_SHARED_EXPORT GenericPad : public Gamepad {
 public:
   GenericPad(const string_t& id, int index,
              const shared_ptr_t<IBrowserGamepad>& browserGamepad);
-  virtual ~GenericPad();
+  virtual ~GenericPad() override;
 
   void setOnbuttondown(
     const ::std::function<void(unsigned int buttonPressed)>& callback);
   void
   onbuttonup(const ::std::function<void(unsigned int buttonPressed)>& callback);
   void update() override;
+  void dispose() override;
 
 private:
   unsigned int _setButtonValue(unsigned int newValue, unsigned int currentValue,
