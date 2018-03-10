@@ -66,10 +66,10 @@ GlowLayer::~GlowLayer()
 
 void GlowLayer::setBlurKernelSize(float value)
 {
-  _horizontalBlurPostprocess1->setKernel(value);
-  _verticalBlurPostprocess1->setKernel(value);
-  _horizontalBlurPostprocess2->setKernel(value);
-  _verticalBlurPostprocess2->setKernel(value);
+  _horizontalBlurPostprocess1->kernel = value;
+  _verticalBlurPostprocess1->kernel   = value;
+  _horizontalBlurPostprocess2->kernel = value;
+  _verticalBlurPostprocess2->kernel   = value;
 }
 
 float GlowLayer::blurKernelSize() const

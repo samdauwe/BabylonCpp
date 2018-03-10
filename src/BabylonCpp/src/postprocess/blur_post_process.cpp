@@ -26,10 +26,13 @@ BlurPostProcess::BlurPostProcess(
                   "kernelBlur",
                   {{"varyingCount", 0}, {"depCount", 0}},
                   true}
+    , kernel{this, &BlurPostProcess::get_kernel, &BlurPostProcess::set_kernel}
+    , packedFloat{this, &BlurPostProcess::get_packedFloat,
+                  &BlurPostProcess::set_packedFloat}
     , _packedFloat{false}
     , _staticDefines{defines}
 {
-  setKernel(kernel);
+  set_kernel(kernel);
 
   onApplyObservable.add([&](Effect* effect, EventState&) {
     effect->setFloat2("delta", (1.f / static_cast<float>(width)) * direction.x,
@@ -41,7 +44,7 @@ BlurPostProcess::~BlurPostProcess()
 {
 }
 
-void BlurPostProcess::setKernel(float v)
+void BlurPostProcess::set_kernel(float v)
 {
   if (stl_util::almost_equal(_idealKernel, v)) {
     return;
@@ -53,12 +56,12 @@ void BlurPostProcess::setKernel(float v)
   _updateParameters();
 }
 
-float BlurPostProcess::kernel() const
+float BlurPostProcess::get_kernel() const
 {
   return _idealKernel;
 }
 
-void BlurPostProcess::setPackedFloat(bool v)
+void BlurPostProcess::set_packedFloat(bool v)
 {
   if (_packedFloat == v) {
     return;
@@ -67,7 +70,7 @@ void BlurPostProcess::setPackedFloat(bool v)
   _updateParameters();
 }
 
-bool BlurPostProcess::packedFloat() const
+bool BlurPostProcess::get_packedFloat() const
 {
   return _packedFloat;
 }
@@ -152,6 +155,7 @@ void BlurPostProcess::_updateParameters()
     = ::std::min(static_cast<int>(offsets.size()), freeVaryingVec2);
 
   std::ostringstream defines;
+  defines << _staticDefines;
   for (unsigned int i = 0; i < static_cast<unsigned>(varyingCount); ++i) {
     defines << "#define KERNEL_OFFSET" << i << " "
             << _glslFloat(static_cast<float>(offsets[i])) << "\r\n";

@@ -86,8 +86,8 @@ const char* VolumetricLightScatteringPostProcess::getClassName() const
   return "VolumetricLightScatteringPostProcess";
 }
 
-bool VolumetricLightScatteringPostProcess::isReady(SubMesh* subMesh,
-                                                   bool useInstances)
+bool VolumetricLightScatteringPostProcess::_isReady(SubMesh* subMesh,
+                                                    bool useInstances)
 {
   auto _mesh = subMesh->getMesh();
 
@@ -256,7 +256,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
         && (batch->visibleInstances.find(subMesh->_id)
             != batch->visibleInstances.end());
 
-    if (isReady(subMesh, hardwareInstancedRendering)) {
+    if (_isReady(subMesh, hardwareInstancedRendering)) {
       auto effect = _volumetricLightScatteringPass;
       if (_mesh == mesh) {
         effect = material->getEffect();

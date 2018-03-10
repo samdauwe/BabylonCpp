@@ -505,10 +505,10 @@ void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
     _kernelBlurYPostprocess->autoClear = false;
 
     if (_textureType == EngineConstants::TEXTURETYPE_UNSIGNED_INT) {
-      static_cast<BlurPostProcess*>(_kernelBlurXPostprocess.get())
-        ->setPackedFloat(true);
-      static_cast<BlurPostProcess*>(_kernelBlurYPostprocess.get())
-        ->setPackedFloat(true);
+      static_cast<BlurPostProcess*>(_kernelBlurXPostprocess.get())->packedFloat
+        = true;
+      static_cast<BlurPostProcess*>(_kernelBlurYPostprocess.get())->packedFloat
+        = true;
     }
 
     _blurPostProcesses

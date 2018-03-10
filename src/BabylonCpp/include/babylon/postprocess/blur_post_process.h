@@ -10,11 +10,31 @@
 namespace BABYLON {
 
 /**
- * @brief
+ * @brief  The Blur Post Process which blurs an image based on a kernel and
+ * direction. Can be used twice in x and y directions to perform a guassian blur
+ * in two passes.
  */
 class BABYLON_SHARED_EXPORT BlurPostProcess : public PostProcess {
 
 public:
+  /**
+   * @brief Creates a new instance of @see BlurPostProcess
+   * @param name The name of the effect.
+   * @param direction The direction in which to blur the image.
+   * @param kernel The size of the kernel to be used when computing the blur.
+   * eg. Size of 3 will blur the center pixel by 2 pixels surrounding it.
+   * @param options The required width/height ratio to downsize to before
+   * computing the render pass. (Use 1.0 for full size)
+   * @param camera The camera to apply the render pass to.
+   * @param samplingMode The sampling mode to be used when computing the pass.
+   * (default: 0)
+   * @param engine The engine which the post process will be applied. (default:
+   * current engine)
+   * @param reusable If the post process can be reused on the same frame.
+   * (default: false)
+   * @param textureType Type of textures used when performing the post process.
+   * (default: 0)
+   */
   BlurPostProcess(const string_t& name, const Vector2& direction, float kernel,
                   const Variant<float, PostProcessOptions>& options,
                   Camera* camera,
@@ -25,26 +45,6 @@ public:
                   = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
                   const string_t& defines = "");
   ~BlurPostProcess();
-
-  /**
-   * @brief Sets the length in pixels of the blur sample region.
-   */
-  void setKernel(float v);
-
-  /**
-   * @brief Gets the length in pixels of the blur sample region.
-   */
-  float kernel() const;
-
-  /**
-   * @brief Sets whether or not the blur needs to unpack/repack floats.
-   */
-  void setPackedFloat(bool v);
-
-  /**
-   * @brief Gets whether or not the blur is unpacking/repacking floats.
-   */
-  bool packedFloat() const;
 
 protected:
   void _updateParameters();
@@ -82,6 +82,38 @@ protected:
    * @return GLSL float string.
    */
   string_t _glslFloat(float x, unsigned int decimalFigures = 8) const;
+
+private:
+  /**
+   * @brief Sets the length in pixels of the blur sample region.
+   */
+  void set_kernel(float v);
+
+  /**
+   * @brief Gets the length in pixels of the blur sample region.
+   */
+  float get_kernel() const;
+
+  /**
+   * @brief Sets whether or not the blur needs to unpack/repack floats.
+   */
+  void set_packedFloat(bool v);
+
+  /**
+   * @brief Gets whether or not the blur is unpacking/repacking floats.
+   */
+  bool get_packedFloat() const;
+
+public:
+  /**
+   * Length in pixels of the blur sample region.
+   */
+  Property<BlurPostProcess, float> kernel;
+
+  /**
+   * Wether or not the blur needs to unpack/repack floats.
+   */
+  Property<BlurPostProcess, bool> packedFloat;
 
 protected:
   float _kernel;

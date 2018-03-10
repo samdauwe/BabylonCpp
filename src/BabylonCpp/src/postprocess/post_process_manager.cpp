@@ -4,6 +4,7 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/materials/material.h>
 #include <babylon/mesh/vertex_buffer.h>
 #include <babylon/postprocess/post_process.h>
 
@@ -26,10 +27,12 @@ void PostProcessManager::_prepareBuffers()
   }
 
   // VBO
-  Float32Array vertices{1.f,  1.f,  //
-                        -1.f, 1.f,  //
-                        -1.f, -1.f, //
-                        1.f,  -1.f};
+  Float32Array vertices{
+    1.f,  1.f,  //
+    -1.f, 1.f,  //
+    -1.f, -1.f, //
+    1.f,  -1.f  //
+  };
   _vertexBuffers[VertexBuffer::PositionKindChars]
     = ::std::make_unique<VertexBuffer>(_scene->getEngine(), vertices,
                                        VertexBuffer::PositionKind, false, false,
@@ -43,7 +46,14 @@ void PostProcessManager::_prepareBuffers()
 void PostProcessManager::_buildIndexBuffer()
 {
   // Indices
-  IndicesArray indices{0, 1, 2, 0, 2, 3};
+  IndicesArray indices{
+    0, //
+    1, //
+    2, //
+    0, //
+    2, //
+    3  //
+  };
 
   _indexBuffer = _scene->getEngine()->createIndexBuffer(indices);
 }
@@ -81,10 +91,6 @@ void PostProcessManager::directRender(
   const vector_t<PostProcess*>& postProcesses, InternalTexture* targetTexture,
   bool forceFullscreenViewport)
 {
-  if (!_scene->activeCamera) {
-    return;
-  }
-
   auto engine = _scene->getEngine();
 
   for (unsigned int index = 0; index < postProcesses.size(); ++index) {
@@ -112,7 +118,7 @@ void PostProcessManager::directRender(
       engine->bindBuffers(_vertexBufferPtrs, _indexBuffer.get(), effect);
 
       // Draw order
-      engine->draw(true, 0, 6);
+      engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
 
       pp->onAfterRenderObservable.notifyObservers(effect);
     }
@@ -168,7 +174,7 @@ void PostProcessManager::_finalizeFrame(
       engine->bindBuffers(_vertexBufferPtrs, _indexBuffer.get(), effect);
 
       // Draw order
-      engine->draw(true, 0, 6);
+      engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
 
       pp->onAfterRenderObservable.notifyObservers(effect);
     }
@@ -194,7 +200,7 @@ void PostProcessManager::dispose(bool /*doNotRecurse*/)
 
   if (_indexBuffer) {
     _scene->getEngine()->_releaseBuffer(_indexBuffer.get());
-    _indexBuffer.reset(nullptr);
+    _indexBuffer = nullptr;
   }
 }
 

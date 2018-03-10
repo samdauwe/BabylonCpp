@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 /**
- * @brief
+ * @brief VolumetricLightScatteringPostProcess class.
  *
  * Inspired by http://http.developer.nvidia.com/GPUGems3/gpugems3_ch13.html
  */
@@ -45,8 +45,6 @@ public:
    */
   const char* getClassName() const;
 
-  bool isReady(SubMesh* subMesh, bool useInstances);
-
   /**
    * Sets the new light position for light scattering effect
    * @param {BABYLON.Vector3} The new custom light position
@@ -81,6 +79,7 @@ public:
   static Mesh* CreateDefaultMesh(const string_t& name, Scene* scene);
 
 private:
+  bool _isReady(SubMesh* subMesh, bool useInstances);
   bool _meshExcluded(AbstractMesh* mesh);
   void _createPass(Scene* scene, float ratio);
   void _updateMeshScreenCoordinates(Scene* scene);
