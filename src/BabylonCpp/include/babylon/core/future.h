@@ -37,4 +37,4 @@ spawn_task(Func func, BgWorker* worker)
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_CORE_DELEGATE_H
+#endif // end of BABYLON_CORE_FUTURE_H
