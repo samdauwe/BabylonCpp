@@ -18,6 +18,7 @@ Animatable::Animatable(Scene* scene, IAnimatable* iTarget, int iFromFrame,
     , toFrame{iToFrame}
     , loopAnimation{iLoopAnimation}
     , onAnimationEnd{iOnAnimationEnd}
+    , speedRatio{this, &Animatable::get_speedRatio, &Animatable::set_speedRatio}
     , _localDelayOffset{nullptr}
     , _pausedDelay{nullptr}
     , _paused{false}
@@ -35,12 +36,12 @@ Animatable::~Animatable()
 {
 }
 
-float Animatable::speedRatio() const
+float Animatable::get_speedRatio() const
 {
   return _speedRatio;
 }
 
-void Animatable::setSpeedRatio(float value)
+void Animatable::set_speedRatio(float value)
 {
   for (auto& animation : _runtimeAnimations) {
     animation->_prepareForSpeedRatioChange(value);
@@ -90,6 +91,12 @@ void Animatable::reset()
 {
   for (auto& runtimeAnimation : _runtimeAnimations) {
     runtimeAnimation->reset();
+  }
+
+  // Reset to original value
+  for (auto& animation : _runtimeAnimations) {
+    animation->animate(millisecond_t(0), fromFrame, toFrame, false,
+                       _speedRatio);
   }
 
   _localDelayOffset = nullptr;
@@ -190,6 +197,7 @@ bool Animatable::_animate(const millisecond_t& delay)
 
   if (_localDelayOffset == nullptr) {
     _localDelayOffset = delay;
+    _pausedDelay      = nullptr;
   }
   else if (_pausedDelay != nullptr) {
     _localDelayOffset = (*_localDelayOffset) + delay - (*_pausedDelay);
@@ -202,7 +210,7 @@ bool Animatable::_animate(const millisecond_t& delay)
   for (auto& animation : _runtimeAnimations) {
     bool isRunning = animation->animate(delay - (*_localDelayOffset), fromFrame,
                                         toFrame, loopAnimation, speedRatio());
-    running = running || isRunning;
+    running        = running || isRunning;
   }
 
   animationStarted = running;

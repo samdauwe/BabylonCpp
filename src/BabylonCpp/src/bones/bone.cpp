@@ -1,6 +1,7 @@
 #include <babylon/bones/bone.h>
 
 #include <babylon/animations/animation.h>
+#include <babylon/animations/ianimation_key.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/mesh/abstract_mesh.h>
@@ -288,7 +289,7 @@ bool Bone::copyAnimationRange(Bone* source, const string_t& rangeName,
       else {
         mat = orig.value.matrixData;
       }
-      destKeys.emplace_back(AnimationKey(orig.frame + frameOffset, mat));
+      destKeys.emplace_back(IAnimationKey(orig.frame + frameOffset, mat));
     }
   }
   animations[0]->createRange(rangeName, from + frameOffset, to + frameOffset);

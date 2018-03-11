@@ -1,6 +1,7 @@
 #include <babylon/samples/animations/tube_animation_scene.h>
 
 #include <babylon/animations/animation.h>
+#include <babylon/animations/ianimation_key.h>
 #include <babylon/cameras/free_camera.h>
 #include <babylon/core/logging.h>
 #include <babylon/engine/engine.h>
@@ -77,14 +78,14 @@ void TubeAnimationScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Animation on position
   auto cubeAnimation = new Animation("myAnimation", "position", 30,
-                                     Animation::ANIMATIONTYPE_VECTOR3,
-                                     Animation::ANIMATIONLOOPMODE_CYCLE);
+                                     Animation::ANIMATIONTYPE_VECTOR3(),
+                                     Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Animation keys
-  std::vector<AnimationKey> keys;
+  std::vector<IAnimationKey> keys;
   int frame = 0;
   for (auto& point : curve) {
-    keys.emplace_back(AnimationKey(frame, AnimationValue(point)));
+    keys.emplace_back(IAnimationKey(frame, AnimationValue(point)));
     ++frame;
   }
 
@@ -92,12 +93,13 @@ void TubeAnimationScene::initializeScene(ICanvas* canvas, Scene* scene)
   cube->animations.emplace_back(cubeAnimation);
 
   // Animation on rotation
-  auto cubeRotationAnimation = new Animation(
-    "rotateAnimation", "rotationQuaternion", 30,
-    Animation::ANIMATIONTYPE_QUATERNION, Animation::ANIMATIONLOOPMODE_CYCLE);
+  auto cubeRotationAnimation
+    = new Animation("rotateAnimation", "rotationQuaternion", 30,
+                    Animation::ANIMATIONTYPE_QUATERNION(),
+                    Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Animation keys
-  std::vector<AnimationKey> rotationKeys;
+  std::vector<IAnimationKey> rotationKeys;
   frame = 0;
   for (unsigned int index = 0; index < curve.size() - 1; ++index) {
     Vector3 pointToRotateTo = curve[index + 1];
@@ -120,7 +122,7 @@ void TubeAnimationScene::initializeScene(ICanvas* canvas, Scene* scene)
     matrix.m[10] = axis3.z;
 
     Quaternion rotation = Quaternion::FromRotationMatrix(matrix);
-    rotationKeys.emplace_back(AnimationKey(frame, AnimationValue(rotation)));
+    rotationKeys.emplace_back(IAnimationKey(frame, AnimationValue(rotation)));
     ++frame;
   }
 

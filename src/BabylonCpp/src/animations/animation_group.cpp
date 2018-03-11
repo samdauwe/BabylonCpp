@@ -2,6 +2,7 @@
 
 #include <babylon/animations/animatable.h>
 #include <babylon/animations/animation.h>
+#include <babylon/animations/ianimation_key.h>
 #include <babylon/animations/targeted_animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/engine/engine.h>
@@ -11,6 +12,10 @@ namespace BABYLON {
 
 AnimationGroup::AnimationGroup(const string_t& iName, Scene* scene)
     : name{iName}
+    , isStarted{this, &AnimationGroup::get_isStarted}
+    , speedRatio{this, &AnimationGroup::get_speedRatio,
+                 &AnimationGroup::set_speedRatio}
+    , targetedAnimations{this, &AnimationGroup::get_targetedAnimations}
     , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _from{numeric_limits_t<int>::max()}
     , _to{numeric_limits_t<int>::lowest()}
@@ -29,17 +34,17 @@ void AnimationGroup::addToScene(
   _scene->animationGroups.emplace_back(::std::move(newAnimationGroup));
 }
 
-bool AnimationGroup::isStarted() const
+bool AnimationGroup::get_isStarted() const
 {
   return _isStarted;
 }
 
-float AnimationGroup::speedRatio() const
+float AnimationGroup::get_speedRatio() const
 {
   return _speedRatio;
 }
 
-void AnimationGroup::setSpeedRatio(float value)
+void AnimationGroup::set_speedRatio(float value)
 {
   if (stl_util::almost_equal(_speedRatio, value)) {
     return;
@@ -48,11 +53,12 @@ void AnimationGroup::setSpeedRatio(float value)
   _speedRatio = value;
 
   for (auto& animatable : _animatables) {
-    animatable->setSpeedRatio(_speedRatio);
+    animatable->speedRatio = _speedRatio;
   }
 }
 
-vector_t<unique_ptr_t<TargetedAnimation>>& AnimationGroup::targetedAnimations()
+vector_t<unique_ptr_t<TargetedAnimation>>&
+AnimationGroup::get_targetedAnimations()
 {
   return _targetedAnimations;
 }
@@ -91,7 +97,7 @@ AnimationGroup& AnimationGroup::normalize(int beginFrame, int endFrame)
     const auto& endKey   = keys.back();
 
     if (startKey.frame > beginFrame) {
-      AnimationKey newKey(beginFrame, startKey.value);
+      IAnimationKey newKey(beginFrame, startKey.value);
       newKey.inTangent     = startKey.inTangent;
       newKey.outTangent    = startKey.outTangent;
       newKey.interpolation = startKey.interpolation;
@@ -99,7 +105,7 @@ AnimationGroup& AnimationGroup::normalize(int beginFrame, int endFrame)
     }
 
     if (endKey.frame < endFrame) {
-      AnimationKey newKey(endFrame, endKey.value);
+      IAnimationKey newKey(endFrame, endKey.value);
       newKey.inTangent     = endKey.inTangent;
       newKey.outTangent    = endKey.outTangent;
       newKey.interpolation = endKey.interpolation;

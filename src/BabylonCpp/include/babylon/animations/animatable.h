@@ -17,8 +17,6 @@ public:
   ~Animatable();
 
   /** Methods **/
-  float speedRatio() const;
-  void setSpeedRatio(float value);
   vector_t<RuntimeAnimation*>& getAnimations();
   void appendAnimations(IAnimatable* target,
                         const vector_t<Animation*>& animations);
@@ -34,6 +32,10 @@ public:
   void stop(const string_t& animationName = "");
   bool _animate(const millisecond_t& delay);
 
+private:
+  float get_speedRatio() const;
+  void set_speedRatio(float value);
+
 public:
   IAnimatable* target;
   bool animationStarted;
@@ -41,6 +43,7 @@ public:
   int toFrame;
   bool loopAnimation;
   ::std::function<void()> onAnimationEnd;
+  Property<Animatable, float> speedRatio;
 
 private:
   Nullable<millisecond_t> _localDelayOffset;

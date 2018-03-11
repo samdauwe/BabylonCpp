@@ -3,6 +3,7 @@
 #include <babylon/animations/animation.h>
 #include <babylon/animations/easing/bezier_curve_ease.h>
 #include <babylon/animations/easing/circle_ease.h>
+#include <babylon/animations/ianimation_key.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/standard_material.h>
@@ -47,16 +48,16 @@ void EasingFunctionsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create a Vector3 animation at 30 FPS
   auto animationTorus = new Animation("torusEasingAnimation", "position", 30,
-                                      Animation::ANIMATIONTYPE_VECTOR3,
-                                      Animation::ANIMATIONLOOPMODE_CYCLE);
+                                      Animation::ANIMATIONTYPE_VECTOR3(),
+                                      Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // the torus destination position
   auto nextPos = torus->position().add(Vector3(-80.f, 0.f, 0.f));
 
   // Animation keys
-  std::vector<AnimationKey> keysTorus{
-    AnimationKey(0, AnimationValue(torus->position())),
-    AnimationKey(120, AnimationValue(nextPos)),
+  std::vector<IAnimationKey> keysTorus{
+    IAnimationKey(0, AnimationValue(torus->position())),
+    IAnimationKey(120, AnimationValue(nextPos)),
   };
   animationTorus->setKeys(keysTorus);
 
@@ -102,11 +103,11 @@ void EasingFunctionsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create the animation
   auto animationBezierTorus = new Animation(
-    "animationBezierTorus", "position", 30, Animation::ANIMATIONTYPE_VECTOR3,
-    Animation::ANIMATIONLOOPMODE_CYCLE);
-  std::vector<AnimationKey> keysBezierTorus{
-    AnimationKey(0, AnimationValue(bezierTorus->position())),
-    AnimationKey(
+    "animationBezierTorus", "position", 30, Animation::ANIMATIONTYPE_VECTOR3(),
+    Animation::ANIMATIONLOOPMODE_CYCLE());
+  std::vector<IAnimationKey> keysBezierTorus{
+    IAnimationKey(0, AnimationValue(bezierTorus->position())),
+    IAnimationKey(
       120, AnimationValue(bezierTorus->position().add(Vector3(-80, 0, 0))))};
   animationBezierTorus->setKeys(keysBezierTorus);
   auto bezierEase = new BezierCurveEase(0.32f, -0.73f, 0.69f, 1.59f);

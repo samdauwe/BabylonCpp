@@ -3,6 +3,7 @@
 #include <babylon/animations/animation.h>
 #include <babylon/animations/easing/ieasing_function.h>
 #include <babylon/animations/ianimatable.h>
+#include <babylon/animations/ianimation_key.h>
 
 namespace BABYLON {
 
@@ -56,7 +57,7 @@ AnimationValue RuntimeAnimation::_interpolate(
   int iCurrentFrame, int repeatCount, unsigned int loopMode,
   const AnimationValue& offsetValue, const AnimationValue& highLimitValue)
 {
-  if (loopMode == Animation::ANIMATIONLOOPMODE_CONSTANT && repeatCount > 0) {
+  if (loopMode == Animation::ANIMATIONLOOPMODE_CONSTANT() && repeatCount > 0) {
     return highLimitValue.copy();
   }
 
@@ -90,7 +91,11 @@ AnimationValue RuntimeAnimation::_interpolate(
 
       const auto& startKey  = keys[key];
       const auto startValue = _getKeyValue(startKey.value);
-      const auto endValue   = _getKeyValue(endKey.value);
+      if ((*startKey.interpolation).dataType
+          == static_cast<int>(AnimationKeyInterpolation::STEP)) {
+        return startValue;
+      }
+      const auto endValue = _getKeyValue(endKey.value);
 
       bool useTangent  = startKey.outTangent && endKey.inTangent;
       float frameDelta = static_cast<float>(endKey.frame - startKey.frame);
@@ -110,7 +115,7 @@ AnimationValue RuntimeAnimation::_interpolate(
 
       switch (_animation->dataType) {
         // Float
-        case Animation::ANIMATIONTYPE_FLOAT: {
+        case Animation::ANIMATIONTYPE_FLOAT(): {
           const auto floatValue
             = useTangent ?
                 _animation->floatInterpolateFunctionWithTangents(
@@ -119,11 +124,11 @@ AnimationValue RuntimeAnimation::_interpolate(
                 _animation->floatInterpolateFunction(
                   startValue.floatData, endValue.floatData, gradient);
           switch (loopMode) {
-            case Animation::ANIMATIONLOOPMODE_CYCLE:
-            case Animation::ANIMATIONLOOPMODE_CONSTANT:
+            case Animation::ANIMATIONLOOPMODE_CYCLE():
+            case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale.floatData = floatValue;
               return newVale;
-            case Animation::ANIMATIONLOOPMODE_RELATIVE:
+            case Animation::ANIMATIONLOOPMODE_RELATIVE():
               newVale.floatData
                 = offsetValue.floatData * _repeatCount + floatValue;
               return newVale;
@@ -132,7 +137,7 @@ AnimationValue RuntimeAnimation::_interpolate(
           }
         } break;
         // Quaternion
-        case Animation::ANIMATIONTYPE_QUATERNION: {
+        case Animation::ANIMATIONTYPE_QUATERNION(): {
           const auto quatValue
             = useTangent ?
                 _animation->quaternionInterpolateFunctionWithTangents(
@@ -144,11 +149,11 @@ AnimationValue RuntimeAnimation::_interpolate(
                 _animation->quaternionInterpolateFunction(
                   startValue.quaternionData, endValue.quaternionData, gradient);
           switch (loopMode) {
-            case Animation::ANIMATIONLOOPMODE_CYCLE:
-            case Animation::ANIMATIONLOOPMODE_CONSTANT:
+            case Animation::ANIMATIONLOOPMODE_CYCLE():
+            case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale.quaternionData = quatValue;
               return newVale;
-            case Animation::ANIMATIONLOOPMODE_RELATIVE:
+            case Animation::ANIMATIONLOOPMODE_RELATIVE():
               newVale.quaternionData
                 = quatValue.add(offsetValue.quaternionData.scale(_repeatCount));
               return newVale;
@@ -157,7 +162,7 @@ AnimationValue RuntimeAnimation::_interpolate(
           }
         } break;
         // Vector3
-        case Animation::ANIMATIONTYPE_VECTOR3: {
+        case Animation::ANIMATIONTYPE_VECTOR3(): {
           const auto vec3Value
             = useTangent ?
                 _animation->vector3InterpolateFunctionWithTangents(
@@ -168,11 +173,11 @@ AnimationValue RuntimeAnimation::_interpolate(
                 _animation->vector3InterpolateFunction(
                   startValue.vector3Data, endValue.vector3Data, gradient);
           switch (loopMode) {
-            case Animation::ANIMATIONLOOPMODE_CYCLE:
-            case Animation::ANIMATIONLOOPMODE_CONSTANT:
+            case Animation::ANIMATIONLOOPMODE_CYCLE():
+            case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale.vector3Data = vec3Value;
               return newVale;
-            case Animation::ANIMATIONLOOPMODE_RELATIVE:
+            case Animation::ANIMATIONLOOPMODE_RELATIVE():
               newVale.vector3Data
                 = vec3Value.add(offsetValue.vector3Data.scale(_repeatCount));
               return newVale;
@@ -181,7 +186,7 @@ AnimationValue RuntimeAnimation::_interpolate(
           }
         } break;
         // Vector2
-        case Animation::ANIMATIONTYPE_VECTOR2: {
+        case Animation::ANIMATIONTYPE_VECTOR2(): {
           const auto vec2Value
             = useTangent ?
                 _animation->vector2InterpolateFunctionWithTangents(
@@ -192,11 +197,11 @@ AnimationValue RuntimeAnimation::_interpolate(
                 _animation->vector2InterpolateFunction(
                   startValue.vector2Data, endValue.vector2Data, gradient);
           switch (loopMode) {
-            case Animation::ANIMATIONLOOPMODE_CYCLE:
-            case Animation::ANIMATIONLOOPMODE_CONSTANT:
+            case Animation::ANIMATIONLOOPMODE_CYCLE():
+            case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale.vector2Data = vec2Value;
               return newVale;
-            case Animation::ANIMATIONLOOPMODE_RELATIVE:
+            case Animation::ANIMATIONLOOPMODE_RELATIVE():
               newVale.vector2Data
                 = vec2Value.add(offsetValue.vector2Data.scale(_repeatCount));
               return newVale;
@@ -205,14 +210,14 @@ AnimationValue RuntimeAnimation::_interpolate(
           }
         } break;
         // Size
-        case Animation::ANIMATIONTYPE_SIZE:
+        case Animation::ANIMATIONTYPE_SIZE():
           switch (loopMode) {
-            case Animation::ANIMATIONLOOPMODE_CYCLE:
-            case Animation::ANIMATIONLOOPMODE_CONSTANT:
+            case Animation::ANIMATIONLOOPMODE_CYCLE():
+            case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale.sizeData = _animation->sizeInterpolateFunction(
                 startValue.sizeData, endValue.sizeData, gradient);
               return newVale;
-            case Animation::ANIMATIONLOOPMODE_RELATIVE:
+            case Animation::ANIMATIONLOOPMODE_RELATIVE():
               newVale.sizeData
                 = _animation
                     ->sizeInterpolateFunction(startValue.sizeData,
@@ -224,14 +229,14 @@ AnimationValue RuntimeAnimation::_interpolate(
           }
           break;
         // Color3
-        case Animation::ANIMATIONTYPE_COLOR3:
+        case Animation::ANIMATIONTYPE_COLOR3():
           switch (loopMode) {
-            case Animation::ANIMATIONLOOPMODE_CYCLE:
-            case Animation::ANIMATIONLOOPMODE_CONSTANT:
+            case Animation::ANIMATIONLOOPMODE_CYCLE():
+            case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale.color3Data = _animation->color3InterpolateFunction(
                 startValue.color3Data, endValue.color3Data, gradient);
               return newVale;
-            case Animation::ANIMATIONLOOPMODE_RELATIVE:
+            case Animation::ANIMATIONLOOPMODE_RELATIVE():
               newVale.color3Data
                 = _animation
                     ->color3InterpolateFunction(startValue.color3Data,
@@ -243,10 +248,10 @@ AnimationValue RuntimeAnimation::_interpolate(
           }
           break;
         // Matrix
-        case Animation::ANIMATIONTYPE_MATRIX:
+        case Animation::ANIMATIONTYPE_MATRIX():
           switch (loopMode) {
-            case Animation::ANIMATIONLOOPMODE_CYCLE:
-            case Animation::ANIMATIONLOOPMODE_CONSTANT:
+            case Animation::ANIMATIONLOOPMODE_CYCLE():
+            case Animation::ANIMATIONLOOPMODE_CONSTANT():
               if (Animation::AllowMatricesInterpolation()) {
                 newVale.matrixData = _animation->matrixInterpolateFunction(
                   startValue.matrixData, endValue.matrixData, gradient);
@@ -254,7 +259,7 @@ AnimationValue RuntimeAnimation::_interpolate(
               }
               newVale.matrixData = startValue.matrixData;
               return newVale;
-            case Animation::ANIMATIONLOOPMODE_RELATIVE:
+            case Animation::ANIMATIONLOOPMODE_RELATIVE():
               newVale.matrixData = startValue.matrixData;
               return newVale;
             default:
@@ -341,7 +346,7 @@ bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
 
   // Adding a start key at frame 0 if missing
   if (keys[0].frame != 0) {
-    keys.insert(keys.begin(), AnimationKey(0, keys[0].value));
+    keys.insert(keys.begin(), IAnimationKey(0, keys[0].value));
   }
 
   // Check limits
@@ -381,36 +386,36 @@ bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
   }
   else {
     // Get max value if required
-    if (_animation->loopMode != Animation::ANIMATIONLOOPMODE_CYCLE) {
+    if (_animation->loopMode != Animation::ANIMATIONLOOPMODE_CYCLE()) {
       string_t keyOffset = ::std::to_string(to) + ::std::to_string(from);
       if (!_offsetsCache.count(keyOffset)) {
         AnimationValue fromValue = _interpolate(
-          static_cast<int>(from), 0, Animation::ANIMATIONLOOPMODE_CYCLE);
+          static_cast<int>(from), 0, Animation::ANIMATIONLOOPMODE_CYCLE());
         AnimationValue toValue = _interpolate(
-          static_cast<int>(to), 0, Animation::ANIMATIONLOOPMODE_CYCLE);
+          static_cast<int>(to), 0, Animation::ANIMATIONLOOPMODE_CYCLE());
         switch (_animation->dataType) {
           // Float
-          case Animation::ANIMATIONTYPE_FLOAT:
+          case Animation::ANIMATIONTYPE_FLOAT():
             _offsetsCache[keyOffset] = toValue - fromValue;
             break;
           // Quaternion
-          case Animation::ANIMATIONTYPE_QUATERNION:
+          case Animation::ANIMATIONTYPE_QUATERNION():
             _offsetsCache[keyOffset] = toValue.subtract(fromValue);
             break;
           // Vector3
-          case Animation::ANIMATIONTYPE_VECTOR3:
+          case Animation::ANIMATIONTYPE_VECTOR3():
             _offsetsCache[keyOffset] = toValue.subtract(fromValue);
             break;
           // Vector2
-          case Animation::ANIMATIONTYPE_VECTOR2:
+          case Animation::ANIMATIONTYPE_VECTOR2():
             _offsetsCache[keyOffset] = toValue.subtract(fromValue);
             break;
           // Size
-          case Animation::ANIMATIONTYPE_SIZE:
+          case Animation::ANIMATIONTYPE_SIZE():
             _offsetsCache[keyOffset] = toValue.subtract(fromValue);
             break;
           // Color3
-          case Animation::ANIMATIONTYPE_COLOR3:
+          case Animation::ANIMATIONTYPE_COLOR3():
             _offsetsCache[keyOffset] = toValue.subtract(fromValue);
             break;
           default:
@@ -428,27 +433,27 @@ bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
   if (offsetValue.dataType == -1) {
     switch (_animation->dataType) {
       // Float
-      case Animation::ANIMATIONTYPE_FLOAT:
+      case Animation::ANIMATIONTYPE_FLOAT():
         offsetValue = AnimationValue(0.f);
         break;
       // Quaternion
-      case Animation::ANIMATIONTYPE_QUATERNION:
+      case Animation::ANIMATIONTYPE_QUATERNION():
         offsetValue = AnimationValue(Quaternion(0.f, 0.f, 0.f, 0.f));
         break;
       // Vector3
-      case Animation::ANIMATIONTYPE_VECTOR3:
+      case Animation::ANIMATIONTYPE_VECTOR3():
         offsetValue = AnimationValue(Vector3::Zero());
         break;
       // Vector2
-      case Animation::ANIMATIONTYPE_VECTOR2:
+      case Animation::ANIMATIONTYPE_VECTOR2():
         offsetValue = AnimationValue(Vector2::Zero());
         break;
       // Size
-      case Animation::ANIMATIONTYPE_SIZE:
+      case Animation::ANIMATIONTYPE_SIZE():
         offsetValue = Size::Zero();
         break;
       // Color3
-      case Animation::ANIMATIONTYPE_COLOR3:
+      case Animation::ANIMATIONTYPE_COLOR3():
         offsetValue = AnimationValue(Color3::Black());
         break;
       default:

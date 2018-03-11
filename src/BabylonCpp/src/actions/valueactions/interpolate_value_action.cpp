@@ -2,9 +2,9 @@
 
 #include <babylon/actions/action_manager.h>
 #include <babylon/animations/animation.h>
-#include <babylon/animations/animation_key.h>
 #include <babylon/animations/animation_value.h>
 #include <babylon/animations/ianimatable.h>
+#include <babylon/animations/ianimation_key.h>
 #include <babylon/audio/sound.h>
 #include <babylon/core/json.h>
 #include <babylon/core/logging.h>
@@ -41,9 +41,9 @@ void InterpolateValueAction::_prepare()
 void InterpolateValueAction::execute(const ActionEvent& /*evt*/)
 {
   auto scene = _actionManager->getScene();
-  vector_t<AnimationKey> keys{
-    AnimationKey(0, (*_effectiveTarget)[_property]), //
-    AnimationKey(100, *value)};
+  vector_t<IAnimationKey> keys{
+    IAnimationKey(0, (*_effectiveTarget)[_property]), //
+    IAnimationKey(100, *value)};
 
   int dataType = value->dataType;
   if (dataType == -1) {

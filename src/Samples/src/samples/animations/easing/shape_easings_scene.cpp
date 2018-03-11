@@ -4,6 +4,7 @@
 #include <babylon/animations/animation.h>
 #include <babylon/animations/easing/cubic_ease.h>
 #include <babylon/animations/easing/quadratic_ease.h>
+#include <babylon/animations/ianimation_key.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
@@ -86,63 +87,63 @@ void ShapeEasingsScene::initializeScene(ICanvas* canvas, Scene* scene)
   ground->material()->setDiffuseColor(Color3(0.1f, 0.2f, 0.f));
 
   // Create 6 animations keys
-  std::vector<AnimationKey> keys1{
-    AnimationKey(1000, AnimationValue(3.f)),
-    AnimationKey(1060, AnimationValue(1.f)),
-    AnimationKey(1120, AnimationValue(3.f)),
+  std::vector<IAnimationKey> keys1{
+    IAnimationKey(1000, AnimationValue(3.f)),
+    IAnimationKey(1060, AnimationValue(1.f)),
+    IAnimationKey(1120, AnimationValue(3.f)),
   };
 
-  std::vector<AnimationKey> keys2{
-    AnimationKey(1000, AnimationValue(-Math::PI / 8.f)),
-    AnimationKey(1060, AnimationValue(Math::PI / 8.f)),
-    AnimationKey(1120, AnimationValue(-Math::PI / 8.f)),
+  std::vector<IAnimationKey> keys2{
+    IAnimationKey(1000, AnimationValue(-Math::PI / 8.f)),
+    IAnimationKey(1060, AnimationValue(Math::PI / 8.f)),
+    IAnimationKey(1120, AnimationValue(-Math::PI / 8.f)),
   };
 
-  std::vector<AnimationKey> keys3{
-    AnimationKey(1000, AnimationValue(Math::PI)),
-    AnimationKey(1060, AnimationValue(-Math::PI)),
-    AnimationKey(1120, AnimationValue(Math::PI)),
+  std::vector<IAnimationKey> keys3{
+    IAnimationKey(1000, AnimationValue(Math::PI)),
+    IAnimationKey(1060, AnimationValue(-Math::PI)),
+    IAnimationKey(1120, AnimationValue(Math::PI)),
   };
 
-  std::vector<AnimationKey> keys4{
-    AnimationKey(1000, AnimationValue(Color3(0.f, 0.f, 1.f))),
-    AnimationKey(1030, AnimationValue(Color3(0.f, 1.f, 0.f))),
-    AnimationKey(1060, AnimationValue(Color3(1.f, 0.f, 0.f))),
-    AnimationKey(1090, AnimationValue(Color3(1.f, 0.f, 1.f))),
-    AnimationKey(1120, AnimationValue(Color3(0.f, 0.f, 1.f))),
+  std::vector<IAnimationKey> keys4{
+    IAnimationKey(1000, AnimationValue(Color3(0.f, 0.f, 1.f))),
+    IAnimationKey(1030, AnimationValue(Color3(0.f, 1.f, 0.f))),
+    IAnimationKey(1060, AnimationValue(Color3(1.f, 0.f, 0.f))),
+    IAnimationKey(1090, AnimationValue(Color3(1.f, 0.f, 1.f))),
+    IAnimationKey(1120, AnimationValue(Color3(0.f, 0.f, 1.f))),
   };
 
-  std::vector<AnimationKey> keys5{
-    AnimationKey(1000, AnimationValue(1.f)),
-    AnimationKey(1060, AnimationValue(-1.f)),
-    AnimationKey(1120, AnimationValue(1.f)),
+  std::vector<IAnimationKey> keys5{
+    IAnimationKey(1000, AnimationValue(1.f)),
+    IAnimationKey(1060, AnimationValue(-1.f)),
+    IAnimationKey(1120, AnimationValue(1.f)),
   };
 
-  std::vector<AnimationKey> keys6{
-    AnimationKey(1000, AnimationValue(-Math::PI / 4.f)),
-    AnimationKey(1060, AnimationValue(Math::PI / 4.f)),
-    AnimationKey(1120, AnimationValue(-Math::PI / 4.f)),
+  std::vector<IAnimationKey> keys6{
+    IAnimationKey(1000, AnimationValue(-Math::PI / 4.f)),
+    IAnimationKey(1060, AnimationValue(Math::PI / 4.f)),
+    IAnimationKey(1120, AnimationValue(-Math::PI / 4.f)),
   };
 
   // Create 8 animations
   auto a1
-    = new Animation("at", "position.y", 30, Animation::ANIMATIONTYPE_FLOAT,
-                    Animation::ANIMATIONLOOPMODE_CYCLE);
+    = new Animation("at", "position.y", 30, Animation::ANIMATIONTYPE_FLOAT(),
+                    Animation::ANIMATIONLOOPMODE_CYCLE());
   auto a2
-    = new Animation("a2", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT,
-                    Animation::ANIMATIONLOOPMODE_CYCLE);
+    = new Animation("a2", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
+                    Animation::ANIMATIONLOOPMODE_CYCLE());
   auto a3
-    = new Animation("a3", "rotation.x", 30, Animation::ANIMATIONTYPE_FLOAT,
-                    Animation::ANIMATIONLOOPMODE_CYCLE);
+    = new Animation("a3", "rotation.x", 30, Animation::ANIMATIONTYPE_FLOAT(),
+                    Animation::ANIMATIONLOOPMODE_CYCLE());
   auto a4 = new Animation("a4", "material.diffuseColor", 30,
-                          Animation::ANIMATIONTYPE_COLOR3,
-                          Animation::ANIMATIONLOOPMODE_CYCLE);
+                          Animation::ANIMATIONTYPE_COLOR3(),
+                          Animation::ANIMATIONLOOPMODE_CYCLE());
   auto a5
-    = new Animation("a5", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT,
-                    Animation::ANIMATIONLOOPMODE_CYCLE);
+    = new Animation("a5", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
+                    Animation::ANIMATIONLOOPMODE_CYCLE());
   auto a6
-    = new Animation("a6", "rotation.y", 30, Animation::ANIMATIONTYPE_FLOAT,
-                    Animation::ANIMATIONLOOPMODE_CYCLE);
+    = new Animation("a6", "rotation.y", 30, Animation::ANIMATIONTYPE_FLOAT(),
+                    Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Set the animation keys
   a1->setKeys(keys1);
@@ -185,26 +186,26 @@ void ShapeEasingsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create animations at7 and at7b
   auto a7a = new Animation("shape7EasingAnimation", "position", 30,
-                           Animation::ANIMATIONTYPE_VECTOR3,
-                           Animation::ANIMATIONLOOPMODE_CYCLE);
+                           Animation::ANIMATIONTYPE_VECTOR3(),
+                           Animation::ANIMATIONLOOPMODE_CYCLE());
 
   auto a7b = new Animation("shape7EasingAnimationb", "rotation", 30,
-                           Animation::ANIMATIONTYPE_VECTOR3,
-                           Animation::ANIMATIONLOOPMODE_CYCLE);
+                           Animation::ANIMATIONTYPE_VECTOR3(),
+                           Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Animation keys
-  std::vector<AnimationKey> keys7{
-    AnimationKey(0, AnimationValue(shape7->position())),
-    AnimationKey(40, AnimationValue(box1->position())),
-    AnimationKey(80, AnimationValue(box4->position())),
-    AnimationKey(230, AnimationValue(shape7->position())),
+  std::vector<IAnimationKey> keys7{
+    IAnimationKey(0, AnimationValue(shape7->position())),
+    IAnimationKey(40, AnimationValue(box1->position())),
+    IAnimationKey(80, AnimationValue(box4->position())),
+    IAnimationKey(230, AnimationValue(shape7->position())),
   };
 
-  std::vector<AnimationKey> keys7b{
-    AnimationKey(0, AnimationValue(Vector3(0, 0, 0))),
-    AnimationKey(40, AnimationValue(Vector3(0, -Math::PI2, 0))),
-    AnimationKey(80, AnimationValue(Vector3(0, Math::PI2, 0))),
-    AnimationKey(230, AnimationValue(Vector3(0, 0, 0))),
+  std::vector<IAnimationKey> keys7b{
+    IAnimationKey(0, AnimationValue(Vector3(0, 0, 0))),
+    IAnimationKey(40, AnimationValue(Vector3(0, -Math::PI2, 0))),
+    IAnimationKey(80, AnimationValue(Vector3(0, Math::PI2, 0))),
+    IAnimationKey(230, AnimationValue(Vector3(0, 0, 0))),
   };
 
   // Set the animation keys

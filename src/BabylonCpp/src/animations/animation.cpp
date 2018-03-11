@@ -2,6 +2,7 @@
 
 #include <babylon/animations/animatable.h>
 #include <babylon/animations/easing/ieasing_function.h>
+#include <babylon/animations/ianimation_key.h>
 #include <babylon/animations/runtime_animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json.h>
@@ -42,7 +43,8 @@ Animation* Animation::_PrepareAnimation(
     = new Animation(name, targetProperty, framePerSecond, dataType, loopMode);
 
   animation->setKeys({
-    AnimationKey(0, from), AnimationKey(totalFrame, to),
+    IAnimationKey(0, from),
+    IAnimationKey(totalFrame, to),
   });
 
   if (easingFunction != nullptr) {
@@ -59,7 +61,7 @@ Animation* Animation::CreateAnimation(const string_t& property,
 {
   auto animation
     = new Animation(property + "Animation", property, framePerSecond,
-                    animationType, Animation::ANIMATIONLOOPMODE_CONSTANT);
+                    animationType, Animation::ANIMATIONLOOPMODE_CONSTANT());
 
   animation->setEasingFunction(easingFunction);
 
@@ -85,6 +87,27 @@ Animatable* Animation::CreateAndStartAnimation(
   return node->getScene()->beginDirectAnimation(
     node, {animation}, 0, totalFrame, (animation->loopMode == 1), 1.f,
     onAnimationEnd);
+}
+
+vector_t<Animatable*> Animation::CreateAndStartHierarchyAnimation(
+  const string_t& name, Node* node, bool directDescendantsOnly,
+  const string_t& targetProperty, size_t framePerSecond, int totalFrame,
+  const AnimationValue& from, const AnimationValue& to, unsigned int loopMode,
+  IEasingFunction* easingFunction,
+  const ::std::function<void()>& onAnimationEnd)
+{
+  auto animation = Animation::_PrepareAnimation(
+    name, targetProperty, framePerSecond, totalFrame, from, to, loopMode,
+    easingFunction);
+
+  if (!animation) {
+    return {};
+  }
+
+  auto scene = node->getScene();
+  return scene->beginDirectHierarchyAnimation(
+    node, directDescendantsOnly, {animation}, 0, totalFrame,
+    (animation->loopMode == 1), 1.f, onAnimationEnd);
 }
 
 Animatable* Animation::CreateMergeAndStartAnimation(
@@ -122,7 +145,7 @@ vector_t<RuntimeAnimation*>& Animation::runtimeAnimations()
   return _runtimeAnimations;
 }
 
-bool Animation::hasRunningRuntimeAnimations()
+bool Animation::get_hasRunningRuntimeAnimations() const
 {
   for (auto& runtimeAnimation : _runtimeAnimations) {
     if (!runtimeAnimation->isStopped()) {
@@ -145,6 +168,8 @@ Animation::Animation(const string_t& iName, const string_t& iTargetProperty,
     , loopMode{iLoopMode}
     , blendingSpeed{0.01f}
     , enableBlending{false}
+    , hasRunningRuntimeAnimations{this,
+                                  &Animation::get_hasRunningRuntimeAnimations}
     , _easingFunction{nullptr}
 {
 }
@@ -158,7 +183,7 @@ string_t Animation::toString(bool fullDetails) const
   std::ostringstream oss;
   oss << "Name: " << name << ", property: " << targetProperty;
   if (dataType >= 0
-      && static_cast<unsigned int>(dataType) <= ANIMATIONTYPE_BOOL) {
+      && static_cast<unsigned int>(dataType) <= ANIMATIONTYPE_BOOL()) {
     size_t _dataType = static_cast<size_t>(dataType);
     oss << ", datatype: "
         << vector_t<string_t>{
@@ -219,7 +244,7 @@ void Animation::deleteRange(const string_t& iName, bool deleteFrames)
       const auto& to   = _ranges[iName].to;
 
       _keys.erase(::std::remove_if(_keys.begin(), _keys.end(),
-                                   [from, to](const AnimationKey& key) {
+                                   [from, to](const IAnimationKey& key) {
                                      return key.frame >= from
                                             && key.frame <= to;
                                    }),
@@ -234,7 +259,7 @@ AnimationRange& Animation::getRange(const string_t& iName)
   return _ranges[iName];
 }
 
-vector_t<AnimationKey>& Animation::getKeys()
+vector_t<IAnimationKey>& Animation::getKeys()
 {
   return _keys;
 }
@@ -365,7 +390,7 @@ unique_ptr_t<Animation> Animation::clone() const
   return clonedAnimation;
 }
 
-void Animation::setKeys(const vector_t<AnimationKey>& values)
+void Animation::setKeys(const vector_t<IAnimationKey>& values)
 {
   _keys = values;
 }
@@ -385,19 +410,19 @@ Json::object Animation::serialize() const
     const AnimationValue& value = animationKey.value;
     Float32Array keyValues;
     switch (dataType) {
-      case Animation::ANIMATIONTYPE_FLOAT:
+      case Animation::ANIMATIONTYPE_FLOAT():
         keyValues.emplace_back(value.floatData);
         break;
-      case Animation::ANIMATIONTYPE_QUATERNION:
+      case Animation::ANIMATIONTYPE_QUATERNION():
         stl_util::concat(keyValues, value.quaternionData.asArray());
         break;
-      case Animation::ANIMATIONTYPE_MATRIX:
+      case Animation::ANIMATIONTYPE_MATRIX():
         stl_util::concat(keyValues, value.matrixData.asArray());
         break;
-      case Animation::ANIMATIONTYPE_VECTOR3:
+      case Animation::ANIMATIONTYPE_VECTOR3():
         stl_util::concat(keyValues, value.vector3Data.asArray());
         break;
-      case Animation::ANIMATIONTYPE_COLOR3:
+      case Animation::ANIMATIONTYPE_COLOR3():
         stl_util::concat(keyValues, value.color3Data.asArray());
         break;
     }
@@ -429,10 +454,10 @@ Animation* Animation::Parse(const Json::value& parsedAnimation)
                     Json::GetNumber(parsedAnimation, "framePerSecond", 30ull),
                     Json::GetNumber(parsedAnimation, "dataType", 0),
                     Json::GetNumber(parsedAnimation, "loopBehavior",
-                                    Animation::ANIMATIONLOOPMODE_CYCLE));
+                                    Animation::ANIMATIONLOOPMODE_CYCLE()));
 
   auto dataType = Json::GetNumber(parsedAnimation, "dataType", 0);
-  vector_t<AnimationKey> keys;
+  vector_t<IAnimationKey> keys;
 
   if (parsedAnimation.contains("enableBlending")) {
     animation->enableBlending
@@ -448,29 +473,29 @@ Animation* Animation::Parse(const Json::value& parsedAnimation)
     AnimationValue data;
 
     switch (dataType) {
-      case Animation::ANIMATIONTYPE_FLOAT:
+      case Animation::ANIMATIONTYPE_FLOAT():
         data = AnimationValue(Json::ToArray<float>(key, "values")[0]);
         break;
-      case Animation::ANIMATIONTYPE_QUATERNION:
+      case Animation::ANIMATIONTYPE_QUATERNION():
         data = AnimationValue(
           Quaternion::FromArray(Json::ToArray<float>(key, "values")));
         break;
-      case Animation::ANIMATIONTYPE_MATRIX:
+      case Animation::ANIMATIONTYPE_MATRIX():
         data = AnimationValue(
           Matrix::FromArray(Json::ToArray<float>(key, "values")));
         break;
-      case Animation::ANIMATIONTYPE_COLOR3:
+      case Animation::ANIMATIONTYPE_COLOR3():
         data = AnimationValue(
           Color3::FromArray(Json::ToArray<float>(key, "values")));
         break;
-      case Animation::ANIMATIONTYPE_VECTOR3:
+      case Animation::ANIMATIONTYPE_VECTOR3():
       default:
         data = AnimationValue(
           Vector3::FromArray(Json::ToArray<float>(key, "values")));
         break;
     }
 
-    keys.emplace_back(AnimationKey(Json::GetNumber(key, "frame", 0), data));
+    keys.emplace_back(IAnimationKey(Json::GetNumber(key, "frame", 0), data));
   }
 
   animation->setKeys(keys);

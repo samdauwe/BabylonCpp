@@ -137,8 +137,8 @@ void BouncingBehavior::_applyBoundRadiusAnimation(float radiusDelta)
     BouncingBehavior::_EasingFunction.setEasingMode(
       BouncingBehavior::EasingMode);
     _radiusBounceTransition
-      = Animation::CreateAnimation("radius", Animation::ANIMATIONTYPE_FLOAT, 60,
-                                   &BouncingBehavior::_EasingFunction);
+      = Animation::CreateAnimation("radius", Animation::ANIMATIONTYPE_FLOAT(),
+                                   60, &BouncingBehavior::_EasingFunction);
   }
   // Prevent zoom until bounce has completed
   _cachedWheelPrecision                 = _attachedCamera->wheelPrecision;

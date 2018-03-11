@@ -1,6 +1,7 @@
 #include <babylon/samples/animations/cartoon_animations_scene.h>
 
 #include <babylon/animations/animation.h>
+#include <babylon/animations/ianimation_key.h>
 #include <babylon/cameras/target_camera.h>
 #include <babylon/lights/directional_light.h>
 #include <babylon/lights/hemispheric_light.h>
@@ -93,15 +94,15 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // -- For camera to sweep round --
   auto rotate = new Animation("rotate", "rotation.y", frameRate,
-                              Animation::ANIMATIONTYPE_FLOAT,
-                              Animation::ANIMATIONLOOPMODE_CONSTANT);
+                              Animation::ANIMATIONTYPE_FLOAT(),
+                              Animation::ANIMATIONLOOPMODE_CONSTANT());
 
   // Create rotate animation keys
   auto frameRateInt = static_cast<int>(frameRate);
-  std::vector<AnimationKey> rotateKeys{
-    AnimationKey(0, AnimationValue(0.f)),
-    AnimationKey(9 * frameRateInt, AnimationValue(0.f)),
-    AnimationKey(14 * frameRateInt, AnimationValue(Math::PI)),
+  std::vector<IAnimationKey> rotateKeys{
+    IAnimationKey(0, AnimationValue(0.f)),
+    IAnimationKey(9 * frameRateInt, AnimationValue(0.f)),
+    IAnimationKey(14 * frameRateInt, AnimationValue(Math::PI)),
   };
 
   // Set rotate animation keys
@@ -109,15 +110,15 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // -- For camera move forward --
   auto movein = new Animation("movein", "position", frameRate,
-                              Animation::ANIMATIONTYPE_VECTOR3,
-                              Animation::ANIMATIONLOOPMODE_CONSTANT);
+                              Animation::ANIMATIONTYPE_VECTOR3(),
+                              Animation::ANIMATIONLOOPMODE_CONSTANT());
 
   // Create movein animation keys
-  std::vector<AnimationKey> moveinKeys{
-    AnimationKey(0, AnimationValue(Vector3(0, 5, -30))),
-    AnimationKey(3, AnimationValue(Vector3(0, 2, -10))),
-    AnimationKey(5, AnimationValue(Vector3(0, 2, -10))),
-    AnimationKey(8, AnimationValue(Vector3(-2, 2, 3))),
+  std::vector<IAnimationKey> moveinKeys{
+    IAnimationKey(0, AnimationValue(Vector3(0, 5, -30))),
+    IAnimationKey(3, AnimationValue(Vector3(0, 2, -10))),
+    IAnimationKey(5, AnimationValue(Vector3(0, 2, -10))),
+    IAnimationKey(8, AnimationValue(Vector3(-2, 2, 3))),
   };
 
   // Set movein animation keys
@@ -125,16 +126,16 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // -- For door to open and close --
   auto sweep = new Animation("sweep", "rotation.y", frameRate,
-                             Animation::ANIMATIONTYPE_FLOAT,
-                             Animation::ANIMATIONLOOPMODE_CONSTANT);
+                             Animation::ANIMATIONTYPE_FLOAT(),
+                             Animation::ANIMATIONLOOPMODE_CONSTANT());
 
   // Create sweep animation keys
-  std::vector<AnimationKey> sweepKeys{
-    AnimationKey(0, AnimationValue(0)),
-    AnimationKey(3 * frameRateInt, AnimationValue(0.f)),
-    AnimationKey(5 * frameRateInt, AnimationValue(Math::PI / 3.f)),
-    AnimationKey(13 * frameRateInt, AnimationValue(Math::PI / 3.f)),
-    AnimationKey(15 * frameRateInt, AnimationValue(0.f)),
+  std::vector<IAnimationKey> sweepKeys{
+    IAnimationKey(0, AnimationValue(0)),
+    IAnimationKey(3 * frameRateInt, AnimationValue(0.f)),
+    IAnimationKey(5 * frameRateInt, AnimationValue(Math::PI / 3.f)),
+    IAnimationKey(13 * frameRateInt, AnimationValue(Math::PI / 3.f)),
+    IAnimationKey(15 * frameRateInt, AnimationValue(0.f)),
   };
 
   // Set sweep animation keys
@@ -142,16 +143,16 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // -- For light to brighten and dim --
   auto lightDimmer = new Animation("dimmer", "intensity", frameRate,
-                                   Animation::ANIMATIONTYPE_FLOAT,
-                                   Animation::ANIMATIONLOOPMODE_CONSTANT);
+                                   Animation::ANIMATIONTYPE_FLOAT(),
+                                   Animation::ANIMATIONLOOPMODE_CONSTANT());
 
   // Create light dimmer animation keys
-  std::vector<AnimationKey> lightKeys{
-    AnimationKey(0, AnimationValue(0)),
-    AnimationKey(7 * frameRateInt, AnimationValue(0.f)),
-    AnimationKey(10 * frameRateInt, AnimationValue(1.f)),
-    AnimationKey(14 * frameRateInt, AnimationValue(1.f)),
-    AnimationKey(15 * frameRateInt, AnimationValue(0.f)),
+  std::vector<IAnimationKey> lightKeys{
+    IAnimationKey(0, AnimationValue(0)),
+    IAnimationKey(7 * frameRateInt, AnimationValue(0.f)),
+    IAnimationKey(10 * frameRateInt, AnimationValue(1.f)),
+    IAnimationKey(14 * frameRateInt, AnimationValue(1.f)),
+    IAnimationKey(15 * frameRateInt, AnimationValue(0.f)),
   };
 
   // Set light dimmer animation keys

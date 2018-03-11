@@ -148,28 +148,28 @@ Json::object Action::_serialize(const Json::object& serializedAction,
 string_t Action::_SerializeValueAsString(const AnimationValue& value)
 {
   switch (value.dataType) {
-    case Animation::ANIMATIONTYPE_INT:
+    case Animation::ANIMATIONTYPE_INT():
       return ::std::to_string(value.intData);
-    case Animation::ANIMATIONTYPE_FLOAT:
+    case Animation::ANIMATIONTYPE_FLOAT():
       return ::std::to_string(value.floatData);
-    case Animation::ANIMATIONTYPE_BOOL:
+    case Animation::ANIMATIONTYPE_BOOL():
       return value.boolData ? "true" : "false";
-    case Animation::ANIMATIONTYPE_STRING:
+    case Animation::ANIMATIONTYPE_STRING():
       return value.stringData;
-    case Animation::ANIMATIONTYPE_COLOR3: {
+    case Animation::ANIMATIONTYPE_COLOR3(): {
       const Color3& _value = value.color3Data;
       return String::concat(_value.r, ", ", _value.g, ", ", _value.b);
     }
-    case Animation::ANIMATIONTYPE_COLOR4: {
+    case Animation::ANIMATIONTYPE_COLOR4(): {
       const Color4& _value = value.color4Data;
       return String::concat(_value.r, ", ", _value.g, ", ", _value.b, ", ",
                             _value.a);
     }
-    case Animation::ANIMATIONTYPE_VECTOR2: {
+    case Animation::ANIMATIONTYPE_VECTOR2(): {
       const Vector2& _value = value.vector2Data;
       return String::concat(_value.x, ", ", _value.y);
     }
-    case Animation::ANIMATIONTYPE_VECTOR3: {
+    case Animation::ANIMATIONTYPE_VECTOR3(): {
       const Vector3& _value = value.vector3Data;
       return String::concat(_value.x, ", ", _value.y, ", ", _value.z);
     }

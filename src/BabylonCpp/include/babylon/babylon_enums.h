@@ -13,6 +13,15 @@ struct EnumClassHashFunction {
   }
 };
 
+/** Animation types **/
+enum class AnimationKeyInterpolation {
+  /**
+   * Do not interpolate between keys and use the start key value only. Tangents
+   * are ignored.
+   */
+  STEP = 1
+}; // end of enum class AnimationKeyInterpolation
+
 /** Event types **/
 enum class EventType {
   CONTEXT_MENU      = 0,

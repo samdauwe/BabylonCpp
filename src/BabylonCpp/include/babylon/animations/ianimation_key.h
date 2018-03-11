@@ -1,5 +1,5 @@
-#ifndef BABYLON_ANIMATIONS_ANIMATION_KEY_H
-#define BABYLON_ANIMATIONS_ANIMATION_KEY_H
+#ifndef BABYLON_ANIMATIONS_IANIMATION_KEY_H
+#define BABYLON_ANIMATIONS_IANIMATION_KEY_H
 
 #include <babylon/babylon_global.h>
 
@@ -8,9 +8,9 @@
 
 namespace BABYLON {
 
-struct BABYLON_SHARED_EXPORT AnimationKey {
+struct BABYLON_SHARED_EXPORT IAnimationKey {
 
-  AnimationKey(int frame, AnimationValue value);
+  IAnimationKey(int frame, AnimationValue value);
 
   int frame;
   AnimationValue value;
@@ -18,8 +18,8 @@ struct BABYLON_SHARED_EXPORT AnimationKey {
   Nullable<AnimationValue> outTangent;
   Nullable<AnimationValue> interpolation;
 
-}; // end of class AnimationKey
+}; // end of struct AnimationKey
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_ANIMATIONS_ANIMATION_KEY_H
+#endif // end of BABYLON_ANIMATIONS_IANIMATION_KEY_H

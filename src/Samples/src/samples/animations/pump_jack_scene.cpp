@@ -2,6 +2,7 @@
 
 #include <babylon/animations/animation.h>
 #include <babylon/animations/easing/bezier_curve_ease.h>
+#include <babylon/animations/ianimation_key.h>
 #include <babylon/cameras/free_camera.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/mesh/mesh.h>
@@ -77,17 +78,17 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   motorAxis->setParent(parentObject);
 
   auto motorAnimation
-    = new Animation("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT,
-                    Animation::ANIMATIONLOOPMODE_CYCLE);
+    = new Animation("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
+                    Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Animation keys
-  std::vector<AnimationKey> motorAnimationKeys{
-    AnimationKey(0, AnimationValue(0.f)),
-    AnimationKey(animationFrames,
-                 AnimationValue(Math::PI2 * (moveDirection ? -1.f : 1.f))),
+  std::vector<IAnimationKey> motorIAnimationKeys{
+    IAnimationKey(0, AnimationValue(0.f)),
+    IAnimationKey(animationFrames,
+                  AnimationValue(Math::PI2 * (moveDirection ? -1.f : 1.f))),
   };
 
-  motorAnimation->setKeys(motorAnimationKeys);
+  motorAnimation->setKeys(motorIAnimationKeys);
   parentObject->animations.emplace_back(motorAnimation);
   scene->beginAnimation(parentObject, 0, animationFrames, true);
 
@@ -121,19 +122,19 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   frontStick->setScaling(Vector3(lengthOfStick, 0.2f, 0.2f));
 
   auto frontStickAnimation
-    = new Animation("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT,
-                    Animation::ANIMATIONLOOPMODE_CYCLE);
+    = new Animation("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
+                    Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Animation keys
-  std::vector<AnimationKey> frontStickAnimationKeys{
-    AnimationKey(
+  std::vector<IAnimationKey> frontStickIAnimationKeys{
+    IAnimationKey(
       0, AnimationValue(moveDirection ? -2.5f * Math::PI : -Math::PI_2)),
-    AnimationKey(
+    IAnimationKey(
       animationFrames,
       AnimationValue(moveDirection ? -Math::PI_2 : -2.5f * Math::PI)),
   };
 
-  frontStickAnimation->setKeys(frontStickAnimationKeys);
+  frontStickAnimation->setKeys(frontStickIAnimationKeys);
   frontStickAnimation->setEasingFunction(myEase);
   frontPivot->animations.emplace_back(frontStickAnimation);
   scene->beginAnimation(frontPivot, 0, animationFrames, true);
@@ -168,19 +169,19 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   backStick->setScaling(Vector3(lengthOfStick, 0.2f, 0.2f));
 
   auto backStickAnimation
-    = new Animation("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT,
-                    Animation::ANIMATIONLOOPMODE_CYCLE);
+    = new Animation("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
+                    Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Animation keys
-  std::vector<AnimationKey> backStickAnimationKeys{
-    AnimationKey(
+  std::vector<IAnimationKey> backStickIAnimationKeys{
+    IAnimationKey(
       0, AnimationValue(moveDirection ? -2.5f * Math::PI : -Math::PI_2)),
-    AnimationKey(
+    IAnimationKey(
       animationFrames,
       AnimationValue(moveDirection ? -Math::PI_2 : -2.5f * Math::PI)),
   };
 
-  backStickAnimation->setKeys(backStickAnimationKeys);
+  backStickAnimation->setKeys(backStickIAnimationKeys);
   backStickAnimation->setEasingFunction(myEase);
   backPivot->animations.emplace_back(backStickAnimation);
   scene->beginAnimation(backPivot, 0, animationFrames, true);
@@ -195,19 +196,19 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   topStick->position().y = lengthOfStick;
 
   auto topStickAnimation
-    = new Animation("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT,
-                    Animation::ANIMATIONLOOPMODE_CYCLE);
+    = new Animation("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
+                    Animation::ANIMATIONLOOPMODE_CYCLE());
 
   float moveAngle = std::asin((2.f * distanceOfStick) / lengthOfTopStick);
 
   // Animation keys
-  std::vector<AnimationKey> topStickAnimationKeys{
-    AnimationKey(0, AnimationValue(moveAngle)),
-    AnimationKey(animationFrames / 2, AnimationValue(-moveAngle)),
-    AnimationKey(animationFrames, AnimationValue(moveAngle)),
+  std::vector<IAnimationKey> topStickIAnimationKeys{
+    IAnimationKey(0, AnimationValue(moveAngle)),
+    IAnimationKey(animationFrames / 2, AnimationValue(-moveAngle)),
+    IAnimationKey(animationFrames, AnimationValue(moveAngle)),
   };
 
-  topStickAnimation->setKeys(topStickAnimationKeys);
+  topStickAnimation->setKeys(topStickIAnimationKeys);
   topStickAnimation->setEasingFunction(
     new BezierCurveEase(0.35f, 0.1f, 0.65f, 0.9f));
   topStick->animations.emplace_back(topStickAnimation);
@@ -234,22 +235,22 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   pumpStick->setScaling(Vector3(0.2f, lengthOfPumpStick, 0.2f));
 
   auto pumpStickAnimation
-    = new Animation("anim", "position.y", 30, Animation::ANIMATIONTYPE_FLOAT,
-                    Animation::ANIMATIONLOOPMODE_CYCLE);
+    = new Animation("anim", "position.y", 30, Animation::ANIMATIONTYPE_FLOAT(),
+                    Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Animation keys
-  std::vector<AnimationKey> pumpStickAnimationKeys{
-    AnimationKey(0, AnimationValue(lengthOfStick - (lengthOfPumpStick / 2.f)
-                                   - distanceOfStick)),
-    AnimationKey(animationFrames / 2,
-                 AnimationValue(lengthOfStick - (lengthOfPumpStick / 2.f)
-                                + distanceOfStick)),
-    AnimationKey(animationFrames,
-                 AnimationValue(lengthOfStick - (lengthOfPumpStick / 2.f)
-                                - distanceOfStick)),
+  std::vector<IAnimationKey> pumpStickIAnimationKeys{
+    IAnimationKey(0, AnimationValue(lengthOfStick - (lengthOfPumpStick / 2.f)
+                                    - distanceOfStick)),
+    IAnimationKey(animationFrames / 2,
+                  AnimationValue(lengthOfStick - (lengthOfPumpStick / 2.f)
+                                 + distanceOfStick)),
+    IAnimationKey(animationFrames,
+                  AnimationValue(lengthOfStick - (lengthOfPumpStick / 2.f)
+                                 - distanceOfStick)),
   };
 
-  pumpStickAnimation->setKeys(pumpStickAnimationKeys);
+  pumpStickAnimation->setKeys(pumpStickIAnimationKeys);
   pumpStickAnimation->setEasingFunction(
     new BezierCurveEase(0.35f, 0.1f, 0.65f, 0.9f));
   pumpStick->animations.emplace_back(pumpStickAnimation);

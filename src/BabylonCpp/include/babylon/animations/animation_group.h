@@ -27,26 +27,6 @@ public:
   void addToScene(unique_ptr_t<AnimationGroup>&& newAnimationGroup);
 
   /**
-   * @brief Define if the animations are started.
-   */
-  bool isStarted() const;
-
-  /**
-   * @brief Gets or sets the speed ratio to use for all animations.
-   */
-  float speedRatio() const;
-
-  /**
-   * @brief Gets or sets the speed ratio to use for all animations.
-   */
-  void setSpeedRatio(float value);
-
-  /**
-   * @brief Gets the targeted animations for this animation group.
-   */
-  vector_t<unique_ptr_t<TargetedAnimation>>& targetedAnimations();
-
-  /**
    * @brief Add an animation (with its target) in the group.
    * @param animation defines the animation we want to add
    * @param target defines the target of the animation
@@ -111,13 +91,49 @@ public:
 protected:
   AnimationGroup(const string_t& name, Scene* scene = nullptr);
 
+private:
+  /**
+   * @brief Define if the animations are started.
+   */
+  bool get_isStarted() const;
+
+  /**
+   * @brief Gets or sets the speed ratio to use for all animations.
+   */
+  float get_speedRatio() const;
+
+  /**
+   * @brief Gets or sets the speed ratio to use for all animations.
+   */
+  void set_speedRatio(float value);
+
+  /**
+   * @brief Gets the targeted animations for this animation group.
+   */
+  vector_t<unique_ptr_t<TargetedAnimation>>& get_targetedAnimations();
+
 public:
   string_t name;
   Observable<TargetedAnimation> onAnimationEndObservable;
 
+  /**
+   * Define if the animations are started.
+   */
+  ReadOnlyProperty<AnimationGroup, bool> isStarted;
+
+  /**
+   * Speed ratio to use for all animations.
+   */
+  Property<AnimationGroup, float> speedRatio;
+
+  /**
+   * Targeted animations for this animation group.
+   */
+  ReadOnlyProperty<AnimationGroup, vector_t<unique_ptr_t<TargetedAnimation>>>
+    targetedAnimations;
+
 private:
   Scene* _scene;
-
   vector_t<unique_ptr_t<TargetedAnimation>> _targetedAnimations;
   vector_t<Animatable*> _animatables;
   int _from;

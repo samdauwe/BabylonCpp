@@ -1,6 +1,7 @@
 #include <babylon/samples/animations/animations_scene.h>
 
 #include <babylon/animations/animation.h>
+#include <babylon/animations/ianimation_key.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/standard_material.h>
@@ -70,17 +71,17 @@ void AnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   //-----------------------------------------
   // Create a scaling animation at 30 FPS
   auto animationBox1 = new Animation("scalingAnimation", "scaling.x", 30,
-                                     Animation::ANIMATIONTYPE_FLOAT,
-                                     Animation::ANIMATIONLOOPMODE_CYCLE);
+                                     Animation::ANIMATIONTYPE_FLOAT(),
+                                     Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Animation keys
-  std::vector<AnimationKey> keysBox1{
+  std::vector<IAnimationKey> keysBox1{
     // At the animation key 0, the value of scaling is "1"
-    AnimationKey(0, AnimationValue(1.f)),
+    IAnimationKey(0, AnimationValue(1.f)),
     // At the animation key 20, the value of scaling is "0.2"
-    AnimationKey(20, AnimationValue(0.2f)),
+    IAnimationKey(20, AnimationValue(0.2f)),
     // At the animation key 100, the value of scaling is "1"
-    AnimationKey(100, AnimationValue(1.f)),
+    IAnimationKey(100, AnimationValue(1.f)),
   };
 
   // Adding keys to the animation object
@@ -97,14 +98,14 @@ void AnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   //---------------------------------------------
   // Create a scaling animation at 30 FPS
   auto animationBox2RotX = new Animation("rotationAnimation", "rotation.x", 30,
-                                         Animation::ANIMATIONTYPE_FLOAT,
-                                         Animation::ANIMATIONLOOPMODE_CYCLE);
+                                         Animation::ANIMATIONTYPE_FLOAT(),
+                                         Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Animation keys
-  std::vector<AnimationKey> keysRotation{
-    AnimationKey(0, AnimationValue(0.f)),
-    AnimationKey(20, AnimationValue(Math::PI)),
-    AnimationKey(100, AnimationValue(Math::PI2)),
+  std::vector<IAnimationKey> keysRotation{
+    IAnimationKey(0, AnimationValue(0.f)),
+    IAnimationKey(20, AnimationValue(Math::PI)),
+    IAnimationKey(100, AnimationValue(Math::PI2)),
   };
 
   // Adding keys to the animation object
@@ -121,21 +122,21 @@ void AnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   //---------------------------------------------
   // Create a scaling animation at 30 FPS
   auto animationBox3RotX = new Animation("rotationAnimation", "rotation.x", 30,
-                                         Animation::ANIMATIONTYPE_FLOAT,
-                                         Animation::ANIMATIONLOOPMODE_CYCLE);
+                                         Animation::ANIMATIONTYPE_FLOAT(),
+                                         Animation::ANIMATIONLOOPMODE_CYCLE());
   auto animationBox3RotY = new Animation("rotationAnimation", "rotation.y", 30,
-                                         Animation::ANIMATIONTYPE_FLOAT,
-                                         Animation::ANIMATIONLOOPMODE_CYCLE);
+                                         Animation::ANIMATIONTYPE_FLOAT(),
+                                         Animation::ANIMATIONLOOPMODE_CYCLE());
   auto animationBox3RotZ = new Animation("rotationAnimation", "rotation.z", 30,
-                                         Animation::ANIMATIONTYPE_FLOAT,
-                                         Animation::ANIMATIONLOOPMODE_CYCLE);
+                                         Animation::ANIMATIONTYPE_FLOAT(),
+                                         Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Animation keys
   keysRotation = {
-    AnimationKey(0, AnimationValue(0.f)),
-    AnimationKey(25, AnimationValue(Math::PI_2)),
-    AnimationKey(50, AnimationValue(Math::PI)),
-    AnimationKey(100, AnimationValue(Math::PI2)),
+    IAnimationKey(0, AnimationValue(0.f)),
+    IAnimationKey(25, AnimationValue(Math::PI_2)),
+    IAnimationKey(50, AnimationValue(Math::PI)),
+    IAnimationKey(100, AnimationValue(Math::PI2)),
   };
 
   // Adding keys to the animation object

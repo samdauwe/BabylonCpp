@@ -277,7 +277,7 @@ void FramingBehavior::zoomOnBoundingInfo(
 
   if (!_vectorTransition) {
     _vectorTransition
-      = Animation::CreateAnimation("target", Animation::ANIMATIONTYPE_VECTOR3,
+      = Animation::CreateAnimation("target", Animation::ANIMATIONTYPE_VECTOR3(),
                                    60, &FramingBehavior::_EasingFunction);
   }
 
@@ -317,8 +317,8 @@ void FramingBehavior::zoomOnBoundingInfo(
   // transition to new radius
   if (!_radiusTransition) {
     _radiusTransition
-      = Animation::CreateAnimation("radius", Animation::ANIMATIONTYPE_FLOAT, 60,
-                                   &FramingBehavior::_EasingFunction);
+      = Animation::CreateAnimation("radius", Animation::ANIMATIONTYPE_FLOAT(),
+                                   60, &FramingBehavior::_EasingFunction);
   }
 
   animatable = Animation::TransitionTo(
@@ -402,8 +402,8 @@ void FramingBehavior::_maintainCameraAboveGround()
 
     if (!_betaTransition) {
       _betaTransition
-        = Animation::CreateAnimation("beta", Animation::ANIMATIONTYPE_FLOAT, 60,
-                                     &FramingBehavior::_EasingFunction);
+        = Animation::CreateAnimation("beta", Animation::ANIMATIONTYPE_FLOAT(),
+                                     60, &FramingBehavior::_EasingFunction);
     }
 
     auto animatabe = Animation::TransitionTo(
