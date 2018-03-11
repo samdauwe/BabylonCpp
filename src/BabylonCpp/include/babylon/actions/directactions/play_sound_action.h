@@ -11,7 +11,7 @@ class BABYLON_SHARED_EXPORT PlaySoundAction : public Action {
 public:
   PlaySoundAction(unsigned int triggerOptions, Sound* sound,
                   Condition* condition = nullptr);
-  ~PlaySoundAction();
+  ~PlaySoundAction() override;
 
   void _prepare() override;
   void execute(const ActionEvent& evt) override;

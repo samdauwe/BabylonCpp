@@ -11,7 +11,7 @@ class BABYLON_SHARED_EXPORT SetParentAction : public Action {
 public:
   SetParentAction(unsigned int triggerOptions, IAnimatable* target,
                   IAnimatable* parent, Condition* condition = nullptr);
-  ~SetParentAction();
+  ~SetParentAction() override;
 
   void _prepare() override;
   void execute(const ActionEvent& evt) override;

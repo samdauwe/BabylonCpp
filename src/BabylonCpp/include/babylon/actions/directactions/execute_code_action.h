@@ -12,7 +12,7 @@ public:
   ExecuteCodeAction(unsigned int triggerOptions,
                     const ::std::function<void(const ActionEvent&)>& func,
                     Condition* condition = nullptr);
-  ~ExecuteCodeAction();
+  ~ExecuteCodeAction() override;
 
   void execute(const ActionEvent& evt) override;
 

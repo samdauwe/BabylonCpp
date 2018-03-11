@@ -11,7 +11,7 @@ class BABYLON_SHARED_EXPORT CombineAction : public Action {
 public:
   CombineAction(unsigned int triggerOptions, const vector_t<Action*>& children,
                 Condition* condition = nullptr);
-  ~CombineAction();
+  ~CombineAction() override;
 
   void _prepare() override;
   void execute(const ActionEvent& evt) override;

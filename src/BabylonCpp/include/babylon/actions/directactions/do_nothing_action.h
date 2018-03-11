@@ -10,9 +10,9 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT DoNothingAction : public Action {
 
 public:
-  DoNothingAction(unsigned int triggerOptions = ActionManager::NothingTrigger,
+  DoNothingAction(unsigned int triggerOptions = ActionManager::NothingTrigger(),
                   Condition* condition        = nullptr);
-  ~DoNothingAction();
+  ~DoNothingAction() override;
 
   void execute(const ActionEvent& evt) override;
   Json::object serialize(Json::object& parent) const override;

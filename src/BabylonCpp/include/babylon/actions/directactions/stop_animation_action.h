@@ -11,7 +11,7 @@ class BABYLON_SHARED_EXPORT StopAnimationAction : public Action {
 public:
   StopAnimationAction(unsigned int triggerOptions, IAnimatable* target,
                       Condition* condition = nullptr);
-  ~StopAnimationAction();
+  ~StopAnimationAction() override;
 
   void _prepare() override;
   void execute(const ActionEvent& evt) override;

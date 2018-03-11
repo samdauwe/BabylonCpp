@@ -11,7 +11,7 @@ class BABYLON_SHARED_EXPORT StopSoundAction : public Action {
 public:
   StopSoundAction(unsigned int triggerOptions, Sound* sound,
                   Condition* condition = nullptr);
-  ~StopSoundAction();
+  ~StopSoundAction() override;
 
   void _prepare() override;
   void execute(const ActionEvent& evt) override;

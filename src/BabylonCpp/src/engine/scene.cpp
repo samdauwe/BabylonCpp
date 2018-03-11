@@ -829,22 +829,22 @@ Scene& Scene::_processPointerDown(const PickingInfo* pickResult,
     if (actionManager) {
       if (actionManager->hasPickTriggers()) {
         actionManager->processTrigger(
-          ActionManager::OnPickDownTrigger,
+          ActionManager::OnPickDownTrigger(),
           ActionEvent::CreateNew(pickResult->pickedMesh, evt));
         switch (evt.button) {
           case MouseButtonType::LEFT:
             actionManager->processTrigger(
-              ActionManager::OnLeftPickTrigger,
+              ActionManager::OnLeftPickTrigger(),
               ActionEvent::CreateNew(pickResult->pickedMesh, evt));
             break;
           case MouseButtonType::MIDDLE:
             actionManager->processTrigger(
-              ActionManager::OnCenterPickTrigger,
+              ActionManager::OnCenterPickTrigger(),
               ActionEvent::CreateNew(pickResult->pickedMesh, evt));
             break;
           case MouseButtonType::RIGHT:
             actionManager->processTrigger(
-              ActionManager::OnRightPickTrigger,
+              ActionManager::OnRightPickTrigger(),
               ActionEvent::CreateNew(pickResult->pickedMesh, evt));
             break;
           default:
@@ -853,7 +853,7 @@ Scene& Scene::_processPointerDown(const PickingInfo* pickResult,
       }
 
       if (actionManager->hasSpecificTrigger(
-            ActionManager::OnLongPressTrigger)) {
+            ActionManager::OnLongPressTrigger())) {
 #if 0
         window.setTimeout(
           (function() {
@@ -933,30 +933,30 @@ Scene& Scene::_processPointerUp(const PickingInfo* pickResult,
     if (pickResult->pickedMesh->actionManager) {
       if (clickInfo.ignore()) {
         pickResult->pickedMesh->actionManager->processTrigger(
-          ActionManager::OnPickUpTrigger,
+          ActionManager::OnPickUpTrigger(),
           ActionEvent::CreateNew(pickResult->pickedMesh, evt));
       }
       if (!clickInfo.hasSwiped() && !clickInfo.ignore()
           && clickInfo.singleClick()) {
         pickResult->pickedMesh->actionManager->processTrigger(
-          ActionManager::OnPickTrigger,
+          ActionManager::OnPickTrigger(),
           ActionEvent::CreateNew(pickResult->pickedMesh, evt));
       }
       if (clickInfo.doubleClick() && !clickInfo.ignore()
           && pickResult->pickedMesh->actionManager->hasSpecificTrigger(
-               ActionManager::OnDoublePickTrigger)) {
+               ActionManager::OnDoublePickTrigger())) {
         pickResult->pickedMesh->actionManager->processTrigger(
-          ActionManager::OnDoublePickTrigger,
+          ActionManager::OnDoublePickTrigger(),
           ActionEvent::CreateNew(pickResult->pickedMesh, evt));
       }
     }
   }
   if (_pickedDownMesh && _pickedDownMesh->actionManager
       && _pickedDownMesh->actionManager->hasSpecificTrigger(
-           ActionManager::OnPickOutTrigger)
+           ActionManager::OnPickOutTrigger())
       && _pickedDownMesh != _pickedUpMesh) {
     _pickedDownMesh->actionManager->processTrigger(
-      ActionManager::OnPickOutTrigger,
+      ActionManager::OnPickOutTrigger(),
       ActionEvent::CreateNew(_pickedDownMesh, evt));
   }
 
@@ -1206,31 +1206,31 @@ void Scene::_onPointerDownEvent(PointerEvent&& evt)
         switch (evt.button) {
           case MouseButtonType::LEFT:
             pickResult->pickedMesh->actionManager->processTrigger(
-              ActionManager::OnLeftPickTrigger,
+              ActionManager::OnLeftPickTrigger(),
               ActionEvent::CreateNew(pickResult->pickedMesh, evt));
             break;
           case MouseButtonType::MIDDLE:
             pickResult->pickedMesh->actionManager->processTrigger(
-              ActionManager::OnCenterPickTrigger,
+              ActionManager::OnCenterPickTrigger(),
               ActionEvent::CreateNew(pickResult->pickedMesh, evt));
             break;
           case MouseButtonType::RIGHT:
           default:
             pickResult->pickedMesh->actionManager->processTrigger(
-              ActionManager::OnRightPickTrigger,
+              ActionManager::OnRightPickTrigger(),
               ActionEvent::CreateNew(pickResult->pickedMesh, evt));
             break;
         }
         if (pickResult->pickedMesh->actionManager) {
           pickResult->pickedMesh->actionManager->processTrigger(
-            ActionManager::OnPickDownTrigger,
+            ActionManager::OnPickDownTrigger(),
             ActionEvent::CreateNew(pickResult->pickedMesh, evt));
         }
       }
 
       if (pickResult->pickedMesh->actionManager
           && pickResult->pickedMesh->actionManager->hasSpecificTrigger(
-               ActionManager::OnLongPressTrigger)) {
+               ActionManager::OnLongPressTrigger())) {
         // Long press trigger
         auto pickResult
           = pick(_unTranslatedPointerX, _unTranslatedPointerY,
@@ -1238,7 +1238,7 @@ void Scene::_onPointerDownEvent(PointerEvent&& evt)
                    return mesh->isPickable && mesh->isVisible && mesh->isReady()
                           && mesh->actionManager
                           && mesh->actionManager->hasSpecificTrigger(
-                               ActionManager::OnLongPressTrigger);
+                               ActionManager::OnLongPressTrigger());
                  },
                  false, cameraToUseForPointers);
 
@@ -1254,7 +1254,7 @@ void Scene::_onPointerDownEvent(PointerEvent&& evt)
                              < ActionManager::DragMovementThreshold))) {
               _startingPointerTime = high_res_time_point_t();
               pickResult->pickedMesh->actionManager->processTrigger(
-                ActionManager::OnLongPressTrigger,
+                ActionManager::OnLongPressTrigger(),
                 ActionEvent::CreateNew(pickResult->pickedMesh, evt));
             }
           }
@@ -1281,27 +1281,27 @@ void Scene::_onPointerDownEvent(PointerEvent&& evt)
         switch (evt.button) {
           case MouseButtonType::LEFT:
             pickResult->pickedSprite->actionManager->processTrigger(
-              ActionManager::OnLeftPickTrigger,
+              ActionManager::OnLeftPickTrigger(),
               ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, this,
                                                evt));
             break;
           case MouseButtonType::MIDDLE:
             pickResult->pickedSprite->actionManager->processTrigger(
-              ActionManager::OnCenterPickTrigger,
+              ActionManager::OnCenterPickTrigger(),
               ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, this,
                                                evt));
             break;
           case MouseButtonType::RIGHT:
           default:
             pickResult->pickedSprite->actionManager->processTrigger(
-              ActionManager::OnRightPickTrigger,
+              ActionManager::OnRightPickTrigger(),
               ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, this,
                                                evt));
             break;
         }
         if (pickResult->pickedSprite->actionManager) {
           pickResult->pickedSprite->actionManager->processTrigger(
-            ActionManager::OnPickDownTrigger,
+            ActionManager::OnPickDownTrigger(),
             ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, this,
                                              evt));
         }
@@ -1352,7 +1352,7 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
     }
     if (pickResult->pickedMesh->actionManager) {
       pickResult->pickedMesh->actionManager->processTrigger(
-        ActionManager::OnPickUpTrigger,
+        ActionManager::OnPickUpTrigger(),
         ActionEvent::CreateNew(pickResult->pickedMesh, evt));
       if (pickResult->pickedMesh->actionManager) {
         if (::std::abs(_startingPointerPosition.x - _pointerX)
@@ -1360,7 +1360,7 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
             && ::std::abs(_startingPointerPosition.y - _pointerY)
                  < ActionManager::DragMovementThreshold) {
           pickResult->pickedMesh->actionManager->processTrigger(
-            ActionManager::OnPickTrigger,
+            ActionManager::OnPickTrigger(),
             ActionEvent::CreateNew(pickResult->pickedMesh, evt));
         }
       }
@@ -1369,7 +1369,7 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
   if (_pickedDownMesh && _pickedDownMesh->actionManager
       && _pickedDownMesh != pickResult->pickedMesh) {
     _pickedDownMesh->actionManager->processTrigger(
-      ActionManager::OnPickOutTrigger,
+      ActionManager::OnPickOutTrigger(),
       ActionEvent::CreateNew(_pickedDownMesh, evt));
   }
 
@@ -1389,7 +1389,7 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
     if (pickResult->hit && pickResult->pickedSprite) {
       if (pickResult->pickedSprite->actionManager) {
         pickResult->pickedSprite->actionManager->processTrigger(
-          ActionManager::OnPickUpTrigger,
+          ActionManager::OnPickUpTrigger(),
           ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, this,
                                            evt));
         if (pickResult->pickedSprite->actionManager) {
@@ -1398,7 +1398,7 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
               && ::std::abs(_startingPointerPosition.y - _pointerY)
                    < ActionManager::DragMovementThreshold) {
             pickResult->pickedSprite->actionManager->processTrigger(
-              ActionManager::OnPickTrigger,
+              ActionManager::OnPickTrigger(),
               ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, this,
                                                evt));
           }
@@ -1408,7 +1408,7 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
     if (_pickedDownSprite && _pickedDownSprite->actionManager
         && _pickedDownSprite != pickResult->pickedSprite) {
       _pickedDownSprite->actionManager->processTrigger(
-        ActionManager::OnPickOutTrigger,
+        ActionManager::OnPickOutTrigger(),
         ActionEvent::CreateNewFromSprite(_pickedDownSprite, this, evt));
     }
   }
@@ -1417,7 +1417,7 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
 void Scene::_onKeyDownEvent(Event&& evt)
 {
   if (actionManager) {
-    actionManager->processTrigger(ActionManager::OnKeyDownTrigger,
+    actionManager->processTrigger(ActionManager::OnKeyDownTrigger(),
                                   ActionEvent::CreateNewFromScene(this, evt));
   }
 }
@@ -1425,7 +1425,7 @@ void Scene::_onKeyDownEvent(Event&& evt)
 void Scene::_onKeyUpEvent(Event&& evt)
 {
   if (actionManager) {
-    actionManager->processTrigger(ActionManager::OnKeyUpTrigger,
+    actionManager->processTrigger(ActionManager::OnKeyUpTrigger(),
                                   ActionEvent::CreateNewFromScene(this, evt));
   }
 }
@@ -2756,8 +2756,8 @@ void Scene::_evaluateActiveMeshes()
     // Intersections
     if (mesh->actionManager
         && mesh->actionManager->hasSpecificTriggers(
-             {ActionManager::OnIntersectionEnterTrigger,
-              ActionManager::OnIntersectionExitTrigger})) {
+             {ActionManager::OnIntersectionEnterTrigger(),
+              ActionManager::OnIntersectionExitTrigger()})) {
       if (::std::find(_meshesForIntersections.begin(),
                       _meshesForIntersections.end(), mesh)
           == _meshesForIntersections.end()) {
@@ -3108,7 +3108,7 @@ void Scene::render()
 
   // Actions
   if (actionManager) {
-    actionManager->processTrigger(ActionManager::OnEveryFrameTrigger);
+    actionManager->processTrigger(ActionManager::OnEveryFrameTrigger());
   }
 
   // Simplification Queue
@@ -4000,14 +4000,14 @@ void Scene::setPointerOverMesh(AbstractMesh* mesh)
 
   if (_pointerOverMesh && _pointerOverMesh->actionManager) {
     _pointerOverMesh->actionManager->processTrigger(
-      ActionManager::OnPointerOutTrigger,
+      ActionManager::OnPointerOutTrigger(),
       ActionEvent::CreateNew(_pointerOverMesh));
   }
 
   _pointerOverMesh = mesh;
   if (_pointerOverMesh && _pointerOverMesh->actionManager) {
     _pointerOverMesh->actionManager->processTrigger(
-      ActionManager::OnPointerOverTrigger,
+      ActionManager::OnPointerOverTrigger(),
       ActionEvent::CreateNew(_pointerOverMesh));
   }
 }
@@ -4026,7 +4026,7 @@ void Scene::setPointerOverSprite(Sprite* sprite)
   if (_pointerOverSprite && _pointerOverSprite->actionManager) {
     Event evt;
     _pointerOverSprite->actionManager->processTrigger(
-      ActionManager::OnPointerOutTrigger,
+      ActionManager::OnPointerOutTrigger(),
       ActionEvent::CreateNewFromSprite(_pointerOverSprite, this, evt));
   }
 
@@ -4034,7 +4034,7 @@ void Scene::setPointerOverSprite(Sprite* sprite)
   if (_pointerOverSprite && _pointerOverSprite->actionManager) {
     Event evt;
     _pointerOverSprite->actionManager->processTrigger(
-      ActionManager::OnPointerOverTrigger,
+      ActionManager::OnPointerOverTrigger(),
       ActionEvent::CreateNewFromSprite(_pointerOverSprite, this, evt));
   }
 }

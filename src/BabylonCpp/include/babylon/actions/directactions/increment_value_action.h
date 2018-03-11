@@ -12,7 +12,7 @@ public:
   IncrementValueAction(unsigned int triggerOptions, IAnimatable* target,
                        const string_t& propertyPath, AnimationValue* value,
                        Condition* condition = nullptr);
-  ~IncrementValueAction();
+  ~IncrementValueAction() override;
 
   void _prepare() override;
   void execute(const ActionEvent& evt) override;

@@ -12,7 +12,7 @@ public:
   SwitchBooleanAction(unsigned int triggerOptions, IAnimatable* target,
                       const string_t& propertyPath,
                       Condition* condition = nullptr);
-  ~SwitchBooleanAction();
+  ~SwitchBooleanAction() override;
 
   void _prepare() override;
   void execute(const ActionEvent& evt) override;

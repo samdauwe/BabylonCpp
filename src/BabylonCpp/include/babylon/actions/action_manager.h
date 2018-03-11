@@ -17,25 +17,112 @@ class BABYLON_SHARED_EXPORT ActionManager : public IDisposable {
 public:
   friend class Scene;
 
-public:
+private:
   /** Statics **/
-  static constexpr unsigned int NothingTrigger             = 0;
-  static constexpr unsigned int OnPickTrigger              = 1;
-  static constexpr unsigned int OnLeftPickTrigger          = 2;
-  static constexpr unsigned int OnRightPickTrigger         = 3;
-  static constexpr unsigned int OnCenterPickTrigger        = 4;
-  static constexpr unsigned int OnPickDownTrigger          = 5;
-  static constexpr unsigned int OnDoublePickTrigger        = 6;
-  static constexpr unsigned int OnPickUpTrigger            = 7;
-  static constexpr unsigned int OnLongPressTrigger         = 8;
-  static constexpr unsigned int OnPointerOverTrigger       = 9;
-  static constexpr unsigned int OnPointerOutTrigger        = 10;
-  static constexpr unsigned int OnEveryFrameTrigger        = 11;
-  static constexpr unsigned int OnIntersectionEnterTrigger = 12;
-  static constexpr unsigned int OnIntersectionExitTrigger  = 13;
-  static constexpr unsigned int OnKeyDownTrigger           = 14;
-  static constexpr unsigned int OnKeyUpTrigger             = 15;
-  static constexpr unsigned int OnPickOutTrigger           = 16;
+  static constexpr unsigned int _NothingTrigger             = 0;
+  static constexpr unsigned int _OnPickTrigger              = 1;
+  static constexpr unsigned int _OnLeftPickTrigger          = 2;
+  static constexpr unsigned int _OnRightPickTrigger         = 3;
+  static constexpr unsigned int _OnCenterPickTrigger        = 4;
+  static constexpr unsigned int _OnPickDownTrigger          = 5;
+  static constexpr unsigned int _OnDoublePickTrigger        = 6;
+  static constexpr unsigned int _OnPickUpTrigger            = 7;
+  static constexpr unsigned int _OnLongPressTrigger         = 8;
+  static constexpr unsigned int _OnPointerOverTrigger       = 9;
+  static constexpr unsigned int _OnPointerOutTrigger        = 10;
+  static constexpr unsigned int _OnEveryFrameTrigger        = 11;
+  static constexpr unsigned int _OnIntersectionEnterTrigger = 12;
+  static constexpr unsigned int _OnIntersectionExitTrigger  = 13;
+  static constexpr unsigned int _OnKeyDownTrigger           = 14;
+  static constexpr unsigned int _OnKeyUpTrigger             = 15;
+  static constexpr unsigned int _OnPickOutTrigger           = 16;
+
+public:
+  static constexpr unsigned int NothingTrigger()
+  {
+    return ActionManager::_NothingTrigger;
+  }
+
+  static constexpr unsigned int OnPickTrigger()
+  {
+    return ActionManager::_OnPickTrigger;
+  }
+
+  static constexpr unsigned int OnLeftPickTrigger()
+  {
+    return ActionManager::_OnLeftPickTrigger;
+  }
+
+  static constexpr unsigned int OnRightPickTrigger()
+  {
+    return ActionManager::_OnRightPickTrigger;
+  }
+
+  static constexpr unsigned int OnCenterPickTrigger()
+  {
+    return ActionManager::_OnCenterPickTrigger;
+  }
+
+  static constexpr unsigned int OnPickDownTrigger()
+  {
+    return ActionManager::_OnPickDownTrigger;
+  }
+
+  static constexpr unsigned int OnDoublePickTrigger()
+  {
+    return ActionManager::_OnDoublePickTrigger;
+  }
+
+  static constexpr unsigned int OnPickUpTrigger()
+  {
+    return ActionManager::_OnPickUpTrigger;
+  }
+
+  static constexpr unsigned int OnLongPressTrigger()
+  {
+    return ActionManager::_OnLongPressTrigger;
+  }
+
+  static constexpr unsigned int OnPointerOverTrigger()
+  {
+    return ActionManager::_OnPointerOverTrigger;
+  }
+
+  static constexpr unsigned int OnPointerOutTrigger()
+  {
+    return ActionManager::_OnPointerOutTrigger;
+  }
+
+  static constexpr unsigned int OnEveryFrameTrigger()
+  {
+    return ActionManager::_OnEveryFrameTrigger;
+  }
+
+  static constexpr unsigned int OnIntersectionEnterTrigger()
+  {
+    return ActionManager::_OnIntersectionEnterTrigger;
+  }
+
+  static constexpr unsigned int OnIntersectionExitTrigger()
+  {
+    return ActionManager::_OnIntersectionExitTrigger;
+  }
+
+  static constexpr unsigned int OnKeyDownTrigger()
+  {
+    return ActionManager::_OnKeyDownTrigger;
+  }
+
+  static constexpr unsigned int OnKeyUpTrigger()
+  {
+    return ActionManager::_OnKeyUpTrigger;
+  }
+
+  // This trigger will only be raised if you also declared a OnPickDown
+  static constexpr unsigned int OnPickOutTrigger()
+  {
+    return ActionManager::_OnPickOutTrigger;
+  }
 
   static array_t<unsigned int, 17> Triggers;
   static size_t DragMovementThreshold; // in pixels
@@ -82,6 +169,13 @@ public:
    * @return {BABYLON.Action} the action amended (prepared) after registration
    */
   Action* registerAction(Action* action);
+
+  /**
+   * @brief Unregisters an action to this action manager
+   * @param action The action to be unregistered
+   * @return whether the action has been unregistered
+   */
+  bool unregisterAction(Action* action);
 
   /**
    * @brief Process a specific trigger

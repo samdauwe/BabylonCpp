@@ -12,7 +12,7 @@ public:
   SetValueAction(unsigned int triggerOptions, IAnimatable* target,
                  const string_t& propertyPath, AnimationValue* value,
                  Condition* condition = nullptr);
-  ~SetValueAction();
+  ~SetValueAction() override;
 
   void _prepare() override;
   void execute(const ActionEvent& evt) override;

@@ -12,7 +12,7 @@ public:
   PlayAnimationAction(unsigned int triggerOptions, IAnimatable* target,
                       int from, int to, bool loop = false,
                       Condition* condition = nullptr);
-  ~PlayAnimationAction();
+  ~PlayAnimationAction() override;
 
   void _prepare() override;
   void execute(const ActionEvent& evt) override;
