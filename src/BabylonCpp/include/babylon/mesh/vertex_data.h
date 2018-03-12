@@ -57,7 +57,7 @@ public:
    * @brief Merges the passed VertexData into the current one.
    * @returns The modified VertexData.
    */
-  VertexData& merge(VertexData& other, size_t tangentLength = 4);
+  VertexData& merge(VertexData& other);
 
   /**
    * @brief Serializes the VertexData.
@@ -200,8 +200,8 @@ private:
   VertexData& _update(IGetSetVerticesData* meshOrGeometry,
                       bool updateExtends = false, bool makeItUnique = false);
   Float32Array _mergeElement(const Float32Array& source,
-                             const Float32Array& other,
-                             size_t length = 0) const;
+                             const Float32Array& other) const;
+  void _validate();
   static unique_ptr_t<VertexData>
   _ExtractFrom(IGetSetVerticesData* meshOrGeometry, bool copyWhenShared = false,
                bool forceCopy = false);

@@ -302,8 +302,11 @@ VertexData& VertexData::transform(const Matrix& matrix)
   return *this;
 }
 
-VertexData& VertexData::merge(VertexData& other, size_t tangentLength)
+VertexData& VertexData::merge(VertexData& other)
 {
+  _validate();
+  other._validate();
+
   if (!other.indices.empty()) {
     unsigned int offset
       = (!positions.empty()) ? static_cast<unsigned>(positions.size()) / 3 : 0;
@@ -314,57 +317,116 @@ VertexData& VertexData::merge(VertexData& other, size_t tangentLength)
 
   positions = _mergeElement(positions, other.positions);
 
-  if (positions.empty()) {
-    return *this;
-  }
-
-  auto count = positions.size() / 3;
-
-  normals  = _mergeElement(normals, other.normals, count * 3);
-  tangents = _mergeElement(tangents, other.tangents, count * tangentLength);
-  uvs      = _mergeElement(uvs, other.uvs, count * 2);
-  uvs2     = _mergeElement(uvs2, other.uvs2, count * 2);
-  uvs3     = _mergeElement(uvs3, other.uvs3, count * 2);
-  uvs4     = _mergeElement(uvs4, other.uvs4, count * 2);
-  uvs5     = _mergeElement(uvs5, other.uvs5, count * 2);
-  uvs6     = _mergeElement(uvs6, other.uvs6, count * 2);
-  colors   = _mergeElement(colors, other.colors, count * 4);
-  matricesIndices
-    = _mergeElement(matricesIndices, other.matricesIndices, count * 4);
-  matricesWeights
-    = _mergeElement(matricesWeights, other.matricesWeights, count * 4);
-  matricesIndicesExtra = _mergeElement(matricesIndicesExtra,
-                                       other.matricesIndicesExtra, count * 4);
-  matricesWeightsExtra = _mergeElement(matricesWeightsExtra,
-                                       other.matricesWeightsExtra, count * 4);
+  normals         = _mergeElement(normals, other.normals);
+  tangents        = _mergeElement(tangents, other.tangents);
+  uvs             = _mergeElement(uvs, other.uvs);
+  uvs2            = _mergeElement(uvs2, other.uvs2);
+  uvs3            = _mergeElement(uvs3, other.uvs3);
+  uvs4            = _mergeElement(uvs4, other.uvs4);
+  uvs5            = _mergeElement(uvs5, other.uvs5);
+  uvs6            = _mergeElement(uvs6, other.uvs6);
+  colors          = _mergeElement(colors, other.colors);
+  matricesIndices = _mergeElement(matricesIndices, other.matricesIndices);
+  matricesWeights = _mergeElement(matricesWeights, other.matricesWeights);
+  matricesIndicesExtra
+    = _mergeElement(matricesIndicesExtra, other.matricesIndicesExtra);
+  matricesWeightsExtra
+    = _mergeElement(matricesWeightsExtra, other.matricesWeightsExtra);
 
   return *this;
 }
 
 Float32Array VertexData::_mergeElement(const Float32Array& source,
-                                       const Float32Array& other,
-                                       size_t length) const
+                                       const Float32Array& other) const
 {
-  if (other.empty() && source.empty()) {
-    return Float32Array();
+  if (source.empty()) {
+    return other;
   }
 
   if (other.empty()) {
-    return _mergeElement(source, Float32Array(source.size()), length);
+    return source;
   }
 
-  if (source.empty()) {
-    if (length == 0 || length == other.size()) {
-      return other;
+  // use non-loop method when the source is Float32Array
+  Float32Array ret32 = source;
+  stl_util::concat(ret32, other);
+  return ret32;
+}
+
+void VertexData::_validate()
+{
+  if (positions.empty()) {
+    throw new std::runtime_error("Positions are required");
+  }
+
+  const auto getElementCount
+    = [](unsigned int kind, const Float32Array& values) -> size_t {
+    const auto stride = VertexBuffer::DeduceStride(kind);
+    if ((values.size() % stride) != 0) {
+      throw new std::runtime_error("The " + VertexBuffer::KindAsString(kind)
+                                   + "s array count must be a multiple of "
+                                   + ::std::to_string(stride));
     }
 
-    return _mergeElement(Float32Array(length - other.size()), other, length);
+    return values.size() / stride;
+  };
+
+  const auto positionsElementCount
+    = getElementCount(VertexBuffer::PositionKind, positions);
+
+  const auto validateElementCount
+    = [&](unsigned int kind, const Float32Array& values) {
+        const auto elementCount = getElementCount(kind, values);
+        if (elementCount != positionsElementCount) {
+          throw new std::runtime_error(
+            "The " + VertexBuffer::KindAsString(kind) + "s element count ("
+            + ::std::to_string(elementCount)
+            + ") does not match the positions count ("
+            + ::std::to_string(positionsElementCount) + ")");
+        }
+      };
+
+  if (!normals.empty()) {
+    validateElementCount(VertexBuffer::NormalKind, normals);
   }
-
-  Float32Array result = source;
-  stl_util::concat(result, other);
-
-  return result;
+  if (!tangents.empty()) {
+    validateElementCount(VertexBuffer::TangentKind, tangents);
+  }
+  if (!uvs.empty()) {
+    validateElementCount(VertexBuffer::UVKind, uvs);
+  }
+  if (!uvs2.empty()) {
+    validateElementCount(VertexBuffer::UV2Kind, uvs2);
+  }
+  if (!uvs3.empty()) {
+    validateElementCount(VertexBuffer::UV3Kind, uvs3);
+  }
+  if (!uvs4.empty()) {
+    validateElementCount(VertexBuffer::UV4Kind, uvs4);
+  }
+  if (!uvs5.empty()) {
+    validateElementCount(VertexBuffer::UV5Kind, uvs5);
+  }
+  if (!uvs6.empty()) {
+    validateElementCount(VertexBuffer::UV6Kind, uvs6);
+  }
+  if (!colors.empty()) {
+    validateElementCount(VertexBuffer::ColorKind, colors);
+  }
+  if (!matricesIndices.empty()) {
+    validateElementCount(VertexBuffer::MatricesIndicesKind, matricesIndices);
+  }
+  if (!matricesWeights.empty()) {
+    validateElementCount(VertexBuffer::MatricesWeightsKind, matricesWeights);
+  }
+  if (!matricesIndicesExtra.empty()) {
+    validateElementCount(VertexBuffer::MatricesIndicesExtraKind,
+                         matricesIndicesExtra);
+  }
+  if (!matricesWeightsExtra.empty()) {
+    validateElementCount(VertexBuffer::MatricesWeightsExtraKind,
+                         matricesWeightsExtra);
+  }
 }
 
 Json::object VertexData::serialize() const

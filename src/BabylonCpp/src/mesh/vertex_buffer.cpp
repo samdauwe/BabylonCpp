@@ -60,7 +60,7 @@ VertexBuffer::VertexBuffer(Engine* engine, const Float32Array& data,
     : _ownedBuffer{nullptr}, _buffer{nullptr}, _kind{kind}, _ownsBuffer{true}
 {
   // Deduce stride from kind
-  _stride = (stride == -1) ? VertexBuffer::KindToStride(kind) : stride;
+  _stride = (stride == -1) ? VertexBuffer::DeduceStride(kind) : stride;
   _stride = (_stride == -1) ? 3 : _stride;
 
   _ownedBuffer = ::std::make_unique<Buffer>(
@@ -77,7 +77,7 @@ VertexBuffer::VertexBuffer(Engine* /*engine*/, Buffer* buffer,
     : _ownedBuffer{nullptr}, _buffer{buffer}, _kind{kind}, _ownsBuffer{false}
 {
   // Deduce stride from kind
-  _stride = (stride == -1) ? VertexBuffer::KindToStride(kind) : stride;
+  _stride = (stride == -1) ? VertexBuffer::DeduceStride(kind) : stride;
   _stride = (_stride == -1) ? buffer->getStrideSize() : _stride;
 
   _offset = (offset != -1) ? static_cast<unsigned int>(offset) : 0;
@@ -140,42 +140,6 @@ string_t VertexBuffer::KindAsString(unsigned int kind)
     case VertexBuffer::VelocityKind:
       return string_t(VertexBuffer::VelocityKindChars);
   }
-}
-
-int VertexBuffer::KindToStride(unsigned int kind)
-{
-  int stride = -1;
-  // Deduce stride from kind
-  switch (kind) {
-    case VertexBuffer::PositionKind:
-      stride = 3;
-      break;
-    case VertexBuffer::NormalKind:
-      stride = 3;
-      break;
-    case VertexBuffer::UVKind:
-    case VertexBuffer::UV2Kind:
-    case VertexBuffer::UV3Kind:
-    case VertexBuffer::UV4Kind:
-    case VertexBuffer::UV5Kind:
-    case VertexBuffer::UV6Kind:
-      stride = 2;
-      break;
-    case VertexBuffer::TangentKind:
-    case VertexBuffer::ColorKind:
-      stride = 4;
-      break;
-    case VertexBuffer::MatricesIndicesKind:
-    case VertexBuffer::MatricesIndicesExtraKind:
-      stride = 4;
-      break;
-    case VertexBuffer::MatricesWeightsKind:
-    case VertexBuffer::MatricesWeightsExtraKind:
-    default:
-      stride = 4;
-      break;
-  }
-  return stride;
 }
 
 void VertexBuffer::_rebuild()
@@ -270,6 +234,42 @@ void VertexBuffer::dispose(bool /*doNotRecurse*/)
     _ownedBuffer->dispose();
     _ownedBuffer.reset(nullptr);
   }
+}
+
+int VertexBuffer::DeduceStride(unsigned int kind)
+{
+  int stride = -1;
+  // Deduce stride from kind
+  switch (kind) {
+    case VertexBuffer::PositionKind:
+      stride = 3;
+      break;
+    case VertexBuffer::NormalKind:
+      stride = 3;
+      break;
+    case VertexBuffer::UVKind:
+    case VertexBuffer::UV2Kind:
+    case VertexBuffer::UV3Kind:
+    case VertexBuffer::UV4Kind:
+    case VertexBuffer::UV5Kind:
+    case VertexBuffer::UV6Kind:
+      stride = 2;
+      break;
+    case VertexBuffer::TangentKind:
+    case VertexBuffer::ColorKind:
+      stride = 4;
+      break;
+    case VertexBuffer::MatricesIndicesKind:
+    case VertexBuffer::MatricesIndicesExtraKind:
+      stride = 4;
+      break;
+    case VertexBuffer::MatricesWeightsKind:
+    case VertexBuffer::MatricesWeightsExtraKind:
+    default:
+      stride = 4;
+      break;
+  }
+  return stride;
 }
 
 } // end of namespace BABYLON

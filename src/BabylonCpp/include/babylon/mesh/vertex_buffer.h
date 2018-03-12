@@ -77,7 +77,13 @@ public:
 
   /** Statics **/
   static string_t KindAsString(unsigned int kind);
-  static int KindToStride(unsigned int kind);
+
+  /**
+   * @brief Deduces the stride given a kind.
+   * @param kind The kind string to deduce
+   * @returns The deduced stride
+   */
+  static int DeduceStride(unsigned int kind);
 
   /** Rebuild **/
   void _rebuild();
@@ -148,6 +154,7 @@ public:
   /**
    * @brief Updates the underlying WebGLBuffer according to the passed numeric
    * array or Float32Array.
+   * This function will create a new buffer if the current one is not updatable
    * @returns The updated WebGLBuffer.
    */
   GL::IGLBuffer* update(const Float32Array& data);
