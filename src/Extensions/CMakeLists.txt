@@ -39,7 +39,7 @@ string(SUBSTRING "${GIT_SHA1}" 0 12 GIT_REV)
 
 # Meta information about the project
 set(META_PROJECT_NAME        "Extensions")
-set(META_PROJECT_DESCRIPTION "")
+set(META_PROJECT_DESCRIPTION "Extensions for BabylonCpp")
 set(META_AUTHOR_ORGANIZATION "")
 set(META_AUTHOR_DOMAIN       "")
 set(META_AUTHOR_MAINTAINER   "")
