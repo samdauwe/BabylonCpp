@@ -29,7 +29,7 @@ public:
 
     return mesh;
   }
-  ~GroundMesh();
+  ~GroundMesh() override;
 
   /**
    * @brief Returns the string "GroundMesh"
@@ -38,9 +38,6 @@ public:
 
   IReflect::Type type() const override;
 
-  size_t subdivisions() const;
-  size_t subdivisionsX() const;
-  size_t subdivisionsY() const;
   void optimize(size_t chunksCount, size_t octreeBlocksSize = 32);
 
   /**
@@ -84,6 +81,10 @@ public:
   static GroundMesh* Parse(const Json::value& parsedMesh, Scene* scene);
 
 private:
+  size_t get_subdivisions() const;
+  size_t get_subdivisionsX() const;
+  size_t get_subdivisionsY() const;
+
   /**
    * @brief Returns the element "facet" from the heightQuads array relative to
    * (x, z) local coordinates
@@ -133,6 +134,10 @@ public:
   float _maxX;
   float _minZ;
   float _maxZ;
+
+  ReadOnlyProperty<GroundMesh, size_t> subdivisions;
+  ReadOnlyProperty<GroundMesh, size_t> subdivisionsX;
+  ReadOnlyProperty<GroundMesh, size_t> subdivisionsY;
 
 private:
   vector_t<Quad> _heightQuads;
