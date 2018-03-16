@@ -37,9 +37,15 @@ struct BABYLON_SHARED_EXPORT IPhysicsEnginePlugin {
   virtual void setAngularVelocity(PhysicsImpostor* impostor,
                                   const Vector3& velocity)
     = 0;
-  virtual Vector3 getLinearVelocity(PhysicsImpostor* impostor)  = 0;
-  virtual Vector3 getAngularVelocity(PhysicsImpostor* impostor) = 0;
-  virtual void setBodyMass(PhysicsImpostor* impostor, float mass) = 0;
+  virtual Vector3 getLinearVelocity(PhysicsImpostor* impostor)            = 0;
+  virtual Vector3 getAngularVelocity(PhysicsImpostor* impostor)           = 0;
+  virtual void setBodyMass(PhysicsImpostor* impostor, float mass)         = 0;
+  virtual float getBodyMass(const PhysicsImpostor* impostor)              = 0;
+  virtual float getBodyFriction(const PhysicsImpostor* impostor)          = 0;
+  virtual void setBodyFriction(PhysicsImpostor* impostor, float friction) = 0;
+  virtual float getBodyRestitution(const PhysicsImpostor* impostor)       = 0;
+  virtual void setBodyRestitution(PhysicsImpostor* impostor, float restitution)
+    = 0;
   virtual void sleepBody(PhysicsImpostor* impostor)  = 0;
   virtual void wakeUpBody(PhysicsImpostor* impostor) = 0;
   // Joint Update
@@ -52,7 +58,7 @@ struct BABYLON_SHARED_EXPORT IPhysicsEnginePlugin {
   virtual void setLimit(IMotorEnabledJoint* joint, float upperLimit,
                         float lowerLimit, unsigned int motorIndex = 0)
     = 0;
-  virtual float getRadius(const PhysicsImpostor* impostor) = 0;
+  virtual float getRadius(const PhysicsImpostor* impostor)                 = 0;
   virtual void getBoxSizeToRef(PhysicsImpostor* impostor, Vector3& result) = 0;
   virtual void syncMeshWithImpostor(AbstractMesh* mesh,
                                     PhysicsImpostor* impostor)

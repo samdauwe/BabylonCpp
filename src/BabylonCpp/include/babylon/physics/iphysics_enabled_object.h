@@ -7,9 +7,10 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT IPhysicsEnabledObject : public AbstractMesh {
-  virtual AbstractMesh* getParent() = 0;
-  virtual Scene* getScene()         = 0;
-  virtual bool hasBoundingInfo()    = 0;
+  virtual AbstractMesh* getParent()        = 0;
+  virtual Scene* getScene()                = 0;
+  virtual bool hasBoundingInfo()           = 0;
+  virtual const char* getClassName() const = 0;
 }; // end of struct IPhysicsEnabledObject
 
 } // end of namespace BABYLON

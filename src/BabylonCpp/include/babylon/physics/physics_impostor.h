@@ -19,6 +19,8 @@ class BABYLON_SHARED_EXPORT PhysicsImpostor : public IDisposable {
 public:
   static const Vector3 DEFAULT_OBJECT_SIZE;
 
+  static Quaternion IDENTITY_QUATERNION;
+
   // Impostor types
   static constexpr unsigned int NoImpostor        = 0;
   static constexpr unsigned int SphereImpostor    = 1;
@@ -35,7 +37,7 @@ public:
   virtual ~PhysicsImpostor();
 
   /**
-   * This function will completly initialize this impostor.
+   * @brief This function will completly initialize this impostor.
    * It will create a new body - but only if this mesh has no parent.
    * If it has, this impostor will not be used other than to define the impostor
    * of the child mesh.
@@ -43,20 +45,21 @@ public:
   void _init();
 
   /**
-   * Should a new body be generated.
+   * @brief Should a new body be generated.
    */
   bool isBodyInitRequired() const;
 
   void setScalingUpdated();
 
   /**
-   * Force a regeneration of this or the parent's impostor's body.
+   * @brief Force a regeneration of this or the parent's impostor's body.
    * Use under cautious - This will remove all joints already implemented.
    */
   void forceUpdate();
 
   /**
-   * Gets the body that holds this impostor. Either its own, or its parent.
+   * @brief Gets the body that holds this impostor. Either its own, or its
+   * parent.
    */
   IPhysicsBody* physicsBody();
 
@@ -65,7 +68,7 @@ public:
   unsigned int type() const;
 
   /**
-   * Set the physics body. Used mainly by the physics engine/plugin
+   * @brief Set the physics body. Used mainly by the physics engine/plugin
    */
   void setPhysicsBody(IPhysicsBody* physicsBody);
 
@@ -74,39 +77,37 @@ public:
   Vector3 getObjectCenter();
 
   /**
-   * Get a specific parametes from the options parameter.
+   * @brief Get a specific parametes from the options parameter.
    */
   float getParam(const string_t& paramName) const;
 
   /**
-   * Sets a specific parameter in the options given to the physics plugin
+   * @brief Sets a specific parameter in the options given to the physics plugin
    */
   void setParam(const string_t& paramName, float value);
 
-  bool isDisposed() const;
-
   /**
-   * Specifically change the body's mass option. Won't recreate the physics body
-   * object
+   * @brief Specifically change the body's mass option. Won't recreate the
+   * physics body object
    */
   void setMass(float mass);
 
   Vector3 getLinearVelocity();
 
   /**
-   * Set the body's linear velocity.
+   * @brief Set the body's linear velocity.
    */
   void setLinearVelocity(const Vector3& velocity);
 
   Vector3 getAngularVelocity();
 
   /**
-   * Set the body's angular velocity.
+   * @brief Set the body's angular velocity.
    */
   void setAngularVelocity(const Vector3& velocity);
 
   /**
-   * Execute a function with the physics plugin native code.
+   * @brief Execute a function with the physics plugin native code.
    * Provide a function the will have two variables - the world object and the
    * physics body object.
    */
@@ -114,8 +115,8 @@ public:
     const ::std::function<void(Mesh* world, IPhysicsBody* physicsBody)>& func);
 
   /**
-   * Register a function that will be executed before the physics world is
-   * stepping forward.
+   * @brief Register a function that will be executed before the physics world
+   * is stepping forward.
    */
   void registerBeforePhysicsStep(
     const ::std::function<void(PhysicsImpostor* impostor)>& func);
@@ -124,7 +125,7 @@ public:
     const ::std::function<void(PhysicsImpostor* impostor)>& func);
 
   /**
-   * Register a function that will be executed after the physics step
+   * @brief Register a function that will be executed after the physics step
    */
   void registerAfterPhysicsStep(
     const ::std::function<void(PhysicsImpostor* impostor)>& func);
@@ -133,57 +134,59 @@ public:
     const ::std::function<void(PhysicsImpostor* impostor)>& func);
 
   /**
-   * register a function that will be executed when this impostor collides
-   * against a different body.
+   * @brief Register a function that will be executed when this impostor
+   * collides against a different body.
    */
   void registerOnPhysicsCollide();
 
   void unregisterOnPhysicsCollide();
 
+  void getParentsRotation();
+
   /**
-   * This function is executed by the physics engine.
+   * @brief This function is executed by the physics engine.
    */
   void beforeStep();
 
   /**
-   * This function is executed by the physics engine.
+   * @brief This function is executed by the physics engine.
    */
   void afterStep();
 
   /**
-   * Event and body object due to cannon's event-based architecture.
+   * @brief Event and body object due to cannon's event-based architecture.
    */
   void onCollide(IPhysicsBody* body);
 
   /**
-   * Apply a force
+   * @brief Apply a force
    */
   void applyForce(const Vector3& force, const Vector3& contactPoint);
 
   /**
-   * Apply an impulse
+   * @brief Apply an impulse
    */
   void applyImpulse(const Vector3& force, const Vector3& contactPoint);
 
   /**
-   * A help function to create a joint.
+   * @brief A help function to create a joint.
    */
   void createJoint(PhysicsImpostor* otherImpostor, unsigned int jointType,
                    const PhysicsJointData& jointData);
 
   /**
-   * Add a joint to this impostor with a different impostor.
+   * @brief Add a joint to this impostor with a different impostor.
    */
   void addJoint(PhysicsImpostor* otherImpostor,
                 const shared_ptr_t<PhysicsJoint>& joint);
 
   /**
-   * Will keep this body still, in a sleep mode.
+   * @brief Will keep this body still, in a sleep mode.
    */
   void sleep();
 
   /**
-   * Wake the body up.
+   * @brief Wake the body up.
    */
   void wakeUp();
 
@@ -195,12 +198,24 @@ public:
   float getRadius() const;
 
 private:
+  bool get_isDisposed() const;
+  float get_mass() const;
+  void set_mass(float value);
+  float get_friction() const;
+  void set_friction(float value);
+  float get_restitution() const;
+  void set_restitution(float value);
   PhysicsImpostor* _getPhysicsParent();
 
 public:
   IPhysicsEnabledObject* object;
   // set by the physics engine when adding this impostor to the array.
   size_t uniqueId;
+
+  ReadOnlyProperty<PhysicsImpostor, bool> isDisposed;
+  Property<PhysicsImpostor, float> mass;
+  Property<PhysicsImpostor, float> friction;
+  Property<PhysicsImpostor, float> restitution;
 
 private:
   unsigned int _type;
@@ -223,6 +238,10 @@ private:
   vector_t<Joint> _joints;
   Vector3 _tmpPositionWithDelta;
   Quaternion _tmpRotationWithDelta;
+
+  // Temp variables for parent rotation calculations
+  Quaternion _tmpQuat;
+  Quaternion _tmpQuat2;
 
 }; // end of class PhysicsImpostor
 

@@ -7,19 +7,22 @@ namespace BABYLON {
 bool PhysicsImpostorParameters::contains(const string_t& key) const
 {
   return (key == "mass") || (key == "friction") || (key == "restitution")
-         || stl_util::contains(nativeOptions, key);
+         || (key == "ignoreParent") || stl_util::contains(nativeOptions, key);
 }
 
 float PhysicsImpostorParameters::operator[](const string_t& key) const
 {
   if (key == "mass") {
-    return mass;
+    return *mass;
   }
   else if (key == "friction") {
-    return friction;
+    return *friction;
   }
   else if (key == "restitution") {
-    return restitution;
+    return *restitution;
+  }
+  else if (key == "ignoreParent") {
+    return ignoreParent;
   }
   else {
     auto it = nativeOptions.find(key);
@@ -41,6 +44,9 @@ void PhysicsImpostorParameters::setValue(const string_t& key, float value)
   }
   else if (key == "restitution") {
     restitution = value;
+  }
+  else if (key == "ignoreParent") {
+    ignoreParent = static_cast<bool>(value);
   }
   else {
     nativeOptions[key] = value;
