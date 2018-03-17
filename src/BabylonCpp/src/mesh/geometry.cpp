@@ -804,9 +804,16 @@ void Geometry::_ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh)
            && parsedGeometry.contains("indices")) {
     auto parsedPositions = Json::ToArray<float>(parsedGeometry, "positions");
     mesh->setVerticesData(VertexBuffer::PositionKind, parsedPositions, false);
+
     mesh->setVerticesData(VertexBuffer::NormalKind,
                           Json::ToArray<float>(parsedGeometry, "normals"),
                           false);
+
+    if (parsedGeometry.contains("tangents")) {
+      mesh->setVerticesData(VertexBuffer::TangentKind,
+                            Json::ToArray<float>(parsedGeometry, "tangents"),
+                            false);
+    }
 
     if (parsedGeometry.contains("uvs")) {
       mesh->setVerticesData(VertexBuffer::UVKind,
@@ -899,8 +906,9 @@ void Geometry::_ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh)
   mesh->computeWorldMatrix(true);
 
   // Octree
-  if (scene->selectionOctree()) {
-    // scene->selectionOctree()->addMesh(mesh);
+  auto sceneOctree = scene->selectionOctree();
+  if (sceneOctree) {
+    // sceneOctree->addMesh(mesh);
   }
 }
 

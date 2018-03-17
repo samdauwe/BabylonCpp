@@ -1,0 +1,71 @@
+#include <babylon/mesh/primitivegeometries/_primitive_geometry.h>
+
+#include <babylon/mesh/vertex_data.h>
+
+namespace BABYLON {
+
+_PrimitiveGeometry::_PrimitiveGeometry(const string_t& _id, Scene* scene,
+                                       bool canBeRegenerated, Mesh* mesh)
+    : Geometry(_id, scene, nullptr, false, mesh)
+    , _canBeRegenerated{canBeRegenerated}
+{
+  _beingRegenerated = true;
+  regenerate();
+  _beingRegenerated = false;
+}
+
+_PrimitiveGeometry::~_PrimitiveGeometry()
+{
+}
+
+bool _PrimitiveGeometry::canBeRegenerated() const
+{
+  return _canBeRegenerated;
+}
+
+void _PrimitiveGeometry::regenerate()
+{
+  if (!_canBeRegenerated) {
+    return;
+  }
+  _beingRegenerated = true;
+  setAllVerticesData(_regenerateVertexData().get(), false);
+  _beingRegenerated = false;
+}
+
+Geometry* _PrimitiveGeometry::asNewGeometry(const string_t& iId)
+{
+  return Geometry::copy(iId);
+}
+
+void _PrimitiveGeometry::setAllVerticesData(VertexData* vertexData,
+                                            bool /*updatable*/)
+{
+  if (!_beingRegenerated) {
+    return;
+  }
+  Geometry::setAllVerticesData(vertexData, false);
+}
+
+AbstractMesh* _PrimitiveGeometry::setVerticesData(unsigned int kind,
+                                                  const Float32Array& data,
+                                                  bool /*updatable*/,
+                                                  int /*stride*/)
+{
+  if (!_beingRegenerated) {
+    return nullptr;
+  }
+
+  return Geometry::setVerticesData(kind, data, false);
+}
+
+Json::object _PrimitiveGeometry::serialize() const
+{
+  auto serializationObject = Geometry::serialize();
+
+  serializationObject["canBeRegenerated"] = picojson::value(canBeRegenerated());
+
+  return serializationObject;
+}
+
+} // end of namespace BABYLON

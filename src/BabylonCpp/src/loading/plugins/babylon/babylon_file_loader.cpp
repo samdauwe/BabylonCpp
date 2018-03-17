@@ -15,8 +15,8 @@
 #include <babylon/materials/material.h>
 #include <babylon/materials/multi_material.h>
 #include <babylon/mesh/geometry.h>
-#include <babylon/mesh/geometry_primitives.h>
 #include <babylon/mesh/mesh.h>
+#include <babylon/mesh/primitive_geometries.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/tools/tools.h>
 
@@ -131,29 +131,25 @@ bool BabylonFileLoader::importMesh(const vector_t<string_t>& meshesNames,
                 if (!parsedGeometryDataId.empty()
                     && (parsedGeometryDataId == parsedMeshGeometryId)) {
                   if (geometryType == "boxes") {
-                    GeometryPrimitives::Box::Parse(parsedGeometryData, scene);
+                    BoxGeometry::Parse(parsedGeometryData, scene);
                   }
                   else if (geometryType == "spheres") {
-                    GeometryPrimitives::Sphere::Parse(parsedGeometryData,
-                                                      scene);
+                    SphereGeometry::Parse(parsedGeometryData, scene);
                   }
                   else if (geometryType == "cylinders") {
-                    GeometryPrimitives::Cylinder::Parse(parsedGeometryData,
-                                                        scene);
+                    CylinderGeometry::Parse(parsedGeometryData, scene);
                   }
                   else if (geometryType == "toruses") {
-                    GeometryPrimitives::Torus::Parse(parsedGeometryData, scene);
+                    TorusGeometry::Parse(parsedGeometryData, scene);
                   }
                   else if (geometryType == "grounds") {
-                    GeometryPrimitives::Ground::Parse(parsedGeometryData,
-                                                      scene);
+                    GroundGeometry::Parse(parsedGeometryData, scene);
                   }
                   else if (geometryType == "planes") {
-                    GeometryPrimitives::Plane::Parse(parsedGeometryData, scene);
+                    PlaneGeometry::Parse(parsedGeometryData, scene);
                   }
                   else if (geometryType == "torusKnots") {
-                    GeometryPrimitives::TorusKnot::Parse(parsedGeometryData,
-                                                         scene);
+                    TorusKnotGeometry::Parse(parsedGeometryData, scene);
                   }
                   else if (geometryType == "vertexData") {
                     Geometry::Parse(parsedGeometryData, scene, rootUrl);
@@ -422,38 +418,38 @@ bool BabylonFileLoader::load(Scene* scene, const string_t& data,
 
     // Boxes
     for (const auto& parsedBox : Json::GetArray(geometries, "boxes")) {
-      GeometryPrimitives::Box::Parse(parsedBox, scene);
+      BoxGeometry::Parse(parsedBox, scene);
     }
 
     // Spheres
     for (const auto& parsedSphere : Json::GetArray(geometries, "spheres")) {
-      GeometryPrimitives::Sphere::Parse(parsedSphere, scene);
+      SphereGeometry::Parse(parsedSphere, scene);
     }
 
     // Cylinders
     for (const auto& parsedCylinder : Json::GetArray(geometries, "cylinders")) {
-      GeometryPrimitives::Cylinder::Parse(parsedCylinder, scene);
+      CylinderGeometry::Parse(parsedCylinder, scene);
     }
 
     // Toruses
     for (const auto& parsedTorus : Json::GetArray(geometries, "toruses")) {
-      GeometryPrimitives::Torus::Parse(parsedTorus, scene);
+      TorusGeometry::Parse(parsedTorus, scene);
     }
 
     // Grounds
     for (const auto& parsedGround : Json::GetArray(geometries, "grounds")) {
-      GeometryPrimitives::Ground::Parse(parsedGround, scene);
+      GroundGeometry::Parse(parsedGround, scene);
     }
 
     // Planes
     for (const auto& parsedPlane : Json::GetArray(geometries, "planes")) {
-      GeometryPrimitives::Plane::Parse(parsedPlane, scene);
+      PlaneGeometry::Parse(parsedPlane, scene);
     }
 
     // TorusKnots
     for (const auto& parsedTorusKnot :
          Json::GetArray(geometries, "torusKnots")) {
-      GeometryPrimitives::TorusKnot::Parse(parsedTorusKnot, scene);
+      TorusKnotGeometry::Parse(parsedTorusKnot, scene);
     }
 
     // VertexData

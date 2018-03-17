@@ -380,20 +380,18 @@ class Plane;
 class Polygon;
 class Vertex;
 } // end of namespace CSG
-// - Geometry Primitives
-namespace GeometryPrimitives {
-class _Primitive;
-class Box;
-class Cylinder;
-class Disc;
-class Ground;
-class Plane;
-class Ribbon;
-class Sphere;
-class TiledGround;
-class Torus;
-class TorusKnot;
-} // end of namespace GeometryPrimitives
+// - Primitive Geometries
+class _PrimitiveGeometry;
+class BoxGeometry;
+class CylinderGeometry;
+class DiscGeometry;
+class GroundGeometry;
+class PlaneGeometry;
+class RibbonGeometry;
+class SphereGeometry;
+class TiledGroundGeometry;
+class TorusGeometry;
+class TorusKnotGeometry;
 // - Polygon Mesh
 class IndexedVector2;
 struct Polygon;

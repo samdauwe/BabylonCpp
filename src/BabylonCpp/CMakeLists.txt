@@ -117,8 +117,8 @@ file(GLOB MATERIALS_HDR_FILES       ${INCLUDE_PATH}/materials/*.h
 file(GLOB MATH_HDR_FILES            ${INCLUDE_PATH}/math/*.h)
 file(GLOB MESH_HDR_FILES            ${INCLUDE_PATH}/mesh/*.h
                                     ${INCLUDE_PATH}/mesh/csg/*.h
-                                    ${INCLUDE_PATH}/mesh/geometryprimitives/*.h
                                     ${INCLUDE_PATH}/mesh/polygonmesh/*.h
+                                    ${INCLUDE_PATH}/mesh/primitivegeometries/*.h
                                     ${INCLUDE_PATH}/mesh/simplification/*.h)
 file(GLOB MORPH_HDR_FILES           ${INCLUDE_PATH}/morph/*.h)
 file(GLOB PARTICLES_HDR_FILES       ${INCLUDE_PATH}/particles/*.h)
@@ -233,8 +233,8 @@ file(GLOB MATERIALS_SRC_FILES       ${SOURCE_PATH}/materials/*.cpp
 file(GLOB MATH_SRC_FILES            ${SOURCE_PATH}/math/*.cpp)
 file(GLOB MESH_SRC_FILES            ${SOURCE_PATH}/mesh/*.cpp
                                     ${SOURCE_PATH}/mesh/csg/*.cpp
-                                    ${SOURCE_PATH}/mesh/geometryprimitives/*.cpp
                                     ${SOURCE_PATH}/mesh/polygonmesh/*.cpp
+                                    ${SOURCE_PATH}/mesh/primitivegeometries/*.cpp
                                     ${SOURCE_PATH}/mesh/simplification/*.cpp)
 file(GLOB MORPH_SRC_FILES           ${SOURCE_PATH}/morph/*.cpp)
 file(GLOB PARTICLES_SRC_FILES       ${SOURCE_PATH}/particles/*.cpp)
