@@ -135,23 +135,30 @@ struct DDSInfo {
 class BABYLON_SHARED_EXPORT DDSTools {
 
 private:
-  static DDSInfo GetDDSInfo(const Uint8Array& arrayBuffer);
-  static Uint8Array GetRGBAArrayBuffer(float width, float height,
+  static float _ToHalfFloat(float value);
+  static float _FromHalfFloat(int value);
+  static Uint8Array _GetRGBAArrayBuffer(float width, float height,
+                                        size_t dataOffset, size_t dataLength,
+                                        const Uint8Array& arrayBuffer);
+  static Uint8Array _GetRGBArrayBuffer(float width, float height,
                                        size_t dataOffset, size_t dataLength,
                                        const Uint8Array& arrayBuffer);
-  static Uint8Array GetRGBArrayBuffer(float width, float height,
-                                      size_t dataOffset, size_t dataLength,
-                                      const Uint8Array& arrayBuffer);
-  static Uint8Array GetLuminanceArrayBuffer(float width, float height,
-                                            size_t dataOffset,
-                                            size_t dataLength,
-                                            const Uint8Array& arrayBuffer);
+  static Uint8Array _GetLuminanceArrayBuffer(float width, float height,
+                                             size_t dataOffset,
+                                             size_t dataLength,
+                                             const Uint8Array& arrayBuffer);
 
 public:
+  static DDSInfo GetDDSInfo(const Uint8Array& arrayBuffer);
   static void UploadDDSLevels(Engine* engine, GL::IGLRenderingContext* gl,
                               const Uint8Array& arrayBuffer, DDSInfo& info,
                               bool loadMipmaps, unsigned int faces,
                               int lodIndex = -1, int currentFace = -1);
+
+public:
+  static bool StoreLODInAlphaChannel;
+  static Float32Array _FloatView;
+  static Int32Array _Int32View;
 
 }; // end of class DDSTools
 

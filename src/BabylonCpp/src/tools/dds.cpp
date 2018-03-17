@@ -8,6 +8,10 @@
 namespace BABYLON {
 namespace Internals {
 
+bool DDSTools::StoreLODInAlphaChannel = false;
+Float32Array DDSTools::_FloatView;
+Int32Array DDSTools::_Int32View;
+
 DDSInfo DDSTools::GetDDSInfo(const Uint8Array& arrayBuffer)
 {
   Int32Array header(
@@ -64,9 +68,52 @@ DDSInfo DDSTools::GetDDSInfo(const Uint8Array& arrayBuffer)
           textureType};
 }
 
-Uint8Array DDSTools::GetRGBAArrayBuffer(float width, float height,
-                                        size_t dataOffset, size_t dataLength,
-                                        const Uint8Array& arrayBuffer)
+float DDSTools::_ToHalfFloat(float value)
+{
+  if (DDSTools::_FloatView.empty()) {
+    DDSTools::_FloatView = Float32Array(1);
+    DDSTools::_Int32View = Int32Array(DDSTools::_FloatView.size());
+  }
+
+  DDSTools::_FloatView[0] = value;
+  auto x                  = DDSTools::_Int32View[0];
+
+  auto bits = (x >> 16) & 0x8000; /* Get the sign */
+  auto m    = (x >> 12) & 0x07ff; /* Keep one extra bit for rounding */
+  auto e    = (x >> 23) & 0xff;   /* Using int is faster here */
+
+  /* If zero, or denormal, or exponent underflows too much for a denormal
+   * half, return signed zero. */
+  if (e < 103) {
+    return bits;
+  }
+
+  /* If NaN, return NaN. If Inf or exponent overflow, return Inf. */
+  if (e > 142) {
+    bits |= 0x7c00;
+    /* If exponent was 0xff and one mantissa bit was set, it means NaN,
+     * not Inf, so make sure we set one mantissa bit too. */
+    bits |= ((e == 255) ? 0 : 1) && (x & 0x007fffff);
+    return bits;
+  }
+
+  /* If exponent underflows but not too much, return a denormal */
+  if (e < 113) {
+    m |= 0x0800;
+    /* Extra rounding may overflow and set mantissa to 0 and exponent
+     * to 1, which is OK. */
+    bits |= (m >> (114 - e)) + ((m >> (113 - e)) & 1);
+    return bits;
+  }
+
+  bits |= ((e - 112) << 10) | (m >> 1);
+  bits += m & 1;
+  return bits;
+}
+
+Uint8Array DDSTools::_GetRGBAArrayBuffer(float width, float height,
+                                         size_t dataOffset, size_t dataLength,
+                                         const Uint8Array& arrayBuffer)
 {
   Uint8Array byteArray(dataLength);
   Uint8Array srcData(arrayBuffer);
@@ -85,9 +132,9 @@ Uint8Array DDSTools::GetRGBAArrayBuffer(float width, float height,
   return byteArray;
 }
 
-Uint8Array DDSTools::GetRGBArrayBuffer(float width, float height,
-                                       size_t dataOffset, size_t dataLength,
-                                       const Uint8Array& arrayBuffer)
+Uint8Array DDSTools::_GetRGBArrayBuffer(float width, float height,
+                                        size_t dataOffset, size_t dataLength,
+                                        const Uint8Array& arrayBuffer)
 {
   Uint8Array byteArray(dataLength);
   Uint8Array srcData(arrayBuffer);
@@ -105,10 +152,10 @@ Uint8Array DDSTools::GetRGBArrayBuffer(float width, float height,
   return byteArray;
 }
 
-Uint8Array DDSTools::GetLuminanceArrayBuffer(float width, float height,
-                                             size_t dataOffset,
-                                             size_t dataLength,
-                                             const Uint8Array& arrayBuffer)
+Uint8Array DDSTools::_GetLuminanceArrayBuffer(float width, float height,
+                                              size_t dataOffset,
+                                              size_t dataLength,
+                                              const Uint8Array& arrayBuffer)
 {
   Uint8Array byteArray(dataLength);
   Uint8Array srcData(arrayBuffer);
@@ -252,16 +299,16 @@ void DDSTools::UploadDDSLevels(Engine* engine, GL::IGLRenderingContext* gl,
         else if (info.isRGB) {
           if (bpp == 24) {
             dataLength = static_cast<size_t>(width * height * 3);
-            byteArray  = DDSTools::GetRGBArrayBuffer(width, height, dataOffset,
-                                                    dataLength, arrayBuffer);
+            byteArray  = DDSTools::_GetRGBArrayBuffer(width, height, dataOffset,
+                                                     dataLength, arrayBuffer);
             gl->texImage2D(sampler, i, GL::RGB, static_cast<int>(width),
                            static_cast<int>(height), 0, GL::RGB,
                            GL::UNSIGNED_BYTE, byteArray);
           }
           else { // 32
             dataLength = static_cast<size_t>(width * height * 4);
-            byteArray  = DDSTools::GetRGBAArrayBuffer(width, height, dataOffset,
-                                                     dataLength, arrayBuffer);
+            byteArray = DDSTools::_GetRGBAArrayBuffer(width, height, dataOffset,
+                                                      dataLength, arrayBuffer);
             gl->texImage2D(sampler, i, GL::RGBA, static_cast<int>(width),
                            static_cast<int>(height), 0, GL::RGBA,
                            GL::UNSIGNED_BYTE, byteArray);
@@ -276,7 +323,7 @@ void DDSTools::UploadDDSLevels(Engine* engine, GL::IGLRenderingContext* gl,
           dataLength = static_cast<size_t>(paddedRowSize * (height - 1)
                                            + unpaddedRowSize);
 
-          byteArray = DDSTools::GetLuminanceArrayBuffer(
+          byteArray = DDSTools::_GetLuminanceArrayBuffer(
             width, height, dataOffset, dataLength, arrayBuffer);
           gl->texImage2D(sampler, i, GL::LUMINANCE, static_cast<int>(width),
                          static_cast<int>(height), 0, GL::LUMINANCE,
