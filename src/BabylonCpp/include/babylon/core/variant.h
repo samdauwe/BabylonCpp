@@ -111,7 +111,7 @@ public:
   }
 
   template <typename T>
-  size_t is()
+  size_t is() const
   {
     return (type_id == typeid(T).hash_code());
   }
@@ -136,6 +136,16 @@ public:
     // It is a dynamic_cast-like behaviour
     if (type_id == typeid(T).hash_code())
       return *reinterpret_cast<T*>(&data);
+    else
+      throw ::std::bad_cast();
+  }
+
+  template <typename T>
+  const T& get() const
+  {
+    // It is a dynamic_cast-like behaviour
+    if (type_id == typeid(T).hash_code())
+      return *reinterpret_cast<const T*>(&data);
     else
       throw ::std::bad_cast();
   }
