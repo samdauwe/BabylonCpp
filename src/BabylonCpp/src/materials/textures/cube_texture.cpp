@@ -23,8 +23,8 @@ CubeTexture::CreateFromImages(const vector_t<string_t>& iFiles, Scene* scene,
 }
 
 unique_ptr_t<CubeTexture>
-CreateFromPrefilteredData(const string_t& url, Scene* scene,
-                          const string_t& forcedExtension)
+CubeTexture::CreateFromPrefilteredData(const string_t& url, Scene* scene,
+                                       const string_t& forcedExtension)
 {
   const vector_t<string_t> emptyStringList;
   return ::std::make_unique<CubeTexture>(

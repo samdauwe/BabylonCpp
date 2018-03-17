@@ -32,9 +32,68 @@ EnvironmentHelper::EnvironmentHelper(const IEnvironmentHelperOptions& options,
   _setupImageProcessing();
 }
 
-void EnvironmentHelper::updateOptions(
-  const IEnvironmentHelperOptions& /*options*/)
+void EnvironmentHelper::updateOptions(const IEnvironmentHelperOptions& options)
 {
+  auto& newOptions = options;
+
+  if (_ground && !newOptions.createGround) {
+    _ground->dispose();
+    _ground = nullptr;
+  }
+
+  if (_groundMaterial && !newOptions.createGround) {
+    _groundMaterial->dispose();
+    _groundMaterial = nullptr;
+  }
+
+  if (_groundTexture) {
+    if (_options.groundTexture.is<BaseTexture*>()
+        && newOptions.groundTexture.is<BaseTexture*>()
+        && _options.groundTexture.get<BaseTexture*>()
+             != newOptions.groundTexture.get<BaseTexture*>()) {
+      _groundTexture->dispose();
+      _groundTexture = nullptr;
+    }
+  }
+
+  if (_skybox && !newOptions.createSkybox) {
+    _skybox->dispose();
+    _skybox = nullptr;
+  }
+
+  if (_skyboxMaterial && !newOptions.createSkybox) {
+    _skyboxMaterial->dispose();
+    _skyboxMaterial = nullptr;
+  }
+
+  if (_skyboxTexture) {
+    if (_options.skyboxTexture.is<BaseTexture*>()
+        && newOptions.skyboxTexture.is<BaseTexture*>()
+        && _options.skyboxTexture.get<BaseTexture*>()
+             != newOptions.skyboxTexture.get<BaseTexture*>()) {
+      _skyboxTexture->dispose();
+      _skyboxTexture = nullptr;
+    }
+  }
+
+  if (_groundMirror && !newOptions.enableGroundMirror) {
+    _groundMirror->dispose();
+    _groundMirror = nullptr;
+  }
+
+  if (_scene->environmentTexture()) {
+    if (_options.environmentTexture.is<BaseTexture*>()
+        && newOptions.environmentTexture.is<BaseTexture*>()
+        && _options.environmentTexture.get<BaseTexture*>()
+             != newOptions.environmentTexture.get<BaseTexture*>()) {
+      _scene->environmentTexture()->dispose();
+    }
+  }
+
+  _options = newOptions;
+
+  _setupBackground();
+  _setupImageProcessing();
 }
 
 void EnvironmentHelper::setMainColor(const Color3& color)
@@ -119,6 +178,8 @@ IEnvironmentHelperOptions EnvironmentHelper::_getDefaultOptions()
   options.groundMirrorFallOffDistance = 0;
   options.groundMirrorTextureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
 
+  options.groundYBias = 0.00001f;
+
   options.createSkybox = true;
   options.skyboxSize   = 20;
   options.skyboxTexture.set<string_t>(_skyboxTextureCDNUrl);
@@ -152,6 +213,19 @@ void EnvironmentHelper::_setupImageProcessing()
 
 void EnvironmentHelper::_setupEnvironmentTexture()
 {
+  if (_scene->environmentTexture()) {
+    return;
+  }
+
+  if (_options.environmentTexture.is<BaseTexture*>()) {
+    _scene->setEnvironmentTexture(
+      _options.environmentTexture.get<BaseTexture*>());
+    return;
+  }
+
+  const auto environmentTexture = CubeTexture::CreateFromPrefilteredData(
+    _options.environmentTexture.get<string_t>(), _scene);
+  _scene->setEnvironmentTexture(environmentTexture.get());
 }
 
 void EnvironmentHelper::_setupBackground()
@@ -196,29 +270,25 @@ ISceneSize EnvironmentHelper::_getSceneSize()
 
   const auto sceneExtends  = _scene->getWorldExtends();
   const auto sceneDiagonal = sceneExtends.max.subtract(sceneExtends.min);
-  auto bias                = 0.0001f;
 
   if (_options.sizeAuto) {
     if (_scene->activeCamera->type() == IReflect::Type::ARCROTATECAMERA) {
       auto activecamera = static_cast<ArcRotateCamera*>(_scene->activeCamera);
       groundSize = static_cast<int>(activecamera->upperRadiusLimit * 2.f);
-    }
-
-    if (_scene->activeCamera) {
-      bias
-        = (_scene->activeCamera->maxZ - _scene->activeCamera->minZ) / 10000.f;
+      skyboxSize = groundSize;
     }
 
     const auto sceneDiagonalLenght = sceneDiagonal.length();
     if (sceneDiagonalLenght > groundSize) {
       groundSize = static_cast<int>(sceneDiagonalLenght * 2.f);
+      skyboxSize = groundSize;
     }
 
     // 10 % bigger.
     groundSize *= 1.1f;
     skyboxSize *= 1.5f;
     rootPosition   = sceneExtends.min.add(sceneDiagonal.scale(0.5f));
-    rootPosition.y = sceneExtends.min.y - bias;
+    rootPosition.y = sceneExtends.min.y - _options.groundYBias;
   }
 
   return ISceneSize{groundSize, skyboxSize, rootPosition};

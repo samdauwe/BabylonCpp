@@ -108,6 +108,12 @@ struct BABYLON_SHARED_EXPORT IEnvironmentHelperOptions {
   unsigned int groundMirrorTextureType;
 
   /**
+   * Specifies a bias applied to the ground vertical position to prevent
+   * z-fighyting with the shown objects.
+   */
+  float groundYBias;
+
+  /**
    * Specifies wether or not to create a skybox.
    * True by default.
    */
