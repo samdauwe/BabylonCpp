@@ -1,7 +1,6 @@
 #include <babylon/tools/hdr/pmrem_generator.h>
 
 namespace BABYLON {
-namespace Internals {
 
 template <typename ArrayBufferView>
 const vector_t<vector_t<Float32Array>>
@@ -1040,5 +1039,4 @@ void PMREMGenerator<ArrayBufferView>::fixupCubeEdges(
   }
 }
 
-} // end of namespace Internals
 } // end of namespace BABYLON

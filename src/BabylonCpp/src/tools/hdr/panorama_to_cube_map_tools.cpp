@@ -1,9 +1,9 @@
 #include <babylon/tools/hdr/panorama_to_cube_map_tools.h>
 
 #include <babylon/core/logging.h>
+#include <babylon/engine/engine_constants.h>
 
 namespace BABYLON {
-namespace Internals {
 
 array_t<Vector3, 4> PanoramaToCubeMapTools::FACE_FRONT{{
   Vector3(-1.f, -1.f, -1.f), //
@@ -68,9 +68,12 @@ CubeMapInfo PanoramaToCubeMapTools::ConvertPanoramaToCubemap(
                                            inputWidth, inputHeight);
   cubeMapInfo.up = CreateCubemapTexture(size, FACE_UP, float32Array, inputWidth,
                                         inputHeight);
-  cubeMapInfo.down = CreateCubemapTexture(size, FACE_DOWN, float32Array,
+  cubeMapInfo.down       = CreateCubemapTexture(size, FACE_DOWN, float32Array,
                                           inputWidth, inputHeight);
-  cubeMapInfo.size = size;
+  cubeMapInfo.size       = size;
+  cubeMapInfo.type       = EngineConstants::TEXTURETYPE_FLOAT;
+  cubeMapInfo.format     = EngineConstants::TEXTUREFORMAT_RGB;
+  cubeMapInfo.gammaSpace = false;
 
   return cubeMapInfo;
 }
@@ -159,5 +162,4 @@ Color3 PanoramaToCubeMapTools::CalcProjectionSpherical(
   return Color3(r, g, b);
 }
 
-} // end of namespace Internals
 } // end of namespace BABYLON

@@ -5,10 +5,9 @@
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
-namespace Internals {
 
 /**
- * The bounding box information used during the conversion process.
+ * @brief The bounding box information used during the conversion process.
  */
 struct BABYLON_SHARED_EXPORT CMGBoundinBox {
 
@@ -32,7 +31,6 @@ public:
 
 }; // end of struct CMGBoundinBox
 
-} // end of namespace Internals
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_TOOLS_HDR_CMG_BOUNDING_BOX_H

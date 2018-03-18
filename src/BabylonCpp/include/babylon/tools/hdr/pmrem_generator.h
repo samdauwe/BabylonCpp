@@ -14,7 +14,6 @@
 #include <babylon/tools/hdr/cmg_bounding_box.h>
 
 namespace BABYLON {
-namespace Internals {
 
 /**
  * Helper class to PreProcess a cubemap in order to generate mipmap according
@@ -344,7 +343,6 @@ private:
 
 }; // end of class PMREMGenerator
 
-} // end of namespace Internals
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_TOOLS_HDR_PMREM_GENERATOR_H

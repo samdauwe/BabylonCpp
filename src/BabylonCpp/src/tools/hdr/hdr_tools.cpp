@@ -5,7 +5,6 @@
 #include <babylon/tools/hdr/panorama_to_cube_map_tools.h>
 
 namespace BABYLON {
-namespace Internals {
 
 float HDRTools::Ldexp(float mantissa, float exponent)
 {
@@ -233,5 +232,4 @@ Float32Array HDRTools::RGBE_ReadPixels_RLE(const Uint8Array& uint8array,
   return resultArray;
 }
 
-} // end of namespace Internals
 } // end of namespace BABYLON

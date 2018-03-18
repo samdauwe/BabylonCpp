@@ -6,17 +6,16 @@
 #include <babylon/tools/hdr/hdr_info.h>
 
 namespace BABYLON {
-namespace Internals {
 
 /**
- * This groups tools to convert HDR texture to native colors array.
+ * @brief This groups tools to convert HDR texture to native colors array.
  */
 class BABYLON_SHARED_EXPORT HDRTools {
 
 public:
   /**
-   * Reads header information from an RGBE texture stored in a native array.
-   * More information on this format are available here:
+   * @brief Reads header information from an RGBE texture stored in a native
+   * array. More information on this format are available here:
    * https://en.wikipedia.org/wiki/RGBE_image_format
    *
    * @param uint8array The binary file stored in  native array.
@@ -25,9 +24,9 @@ public:
   static HDRInfo RGBE_ReadHeader(const Uint8Array& uint8array);
 
   /**
-   * Returns the cubemap information (each faces texture data) extracted from an
-   * RGBE texture.
-   * This RGBE texture needs to store the information as a panorama.
+   * @brief Returns the cubemap information (each faces texture data) extracted
+   * from an RGBE texture. This RGBE texture needs to store the information as a
+   * panorama.
    *
    * More information on this format are available here:
    * https://en.wikipedia.org/wiki/RGBE_image_format
@@ -40,7 +39,7 @@ public:
                                            size_t size);
 
   /**
-   * Returns the pixels data extracted from an RGBE texture.
+   * @brief Returns the pixels data extracted from an RGBE texture.
    * This pixels will be stored left to right up to down in the R G B order in
    * one array.
    *
@@ -65,7 +64,6 @@ private:
 
 }; // end of struct HDRTools
 
-} // end of namespace Internals
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_TOOLS_HDR_HDR_TOOLS_H

@@ -4,10 +4,9 @@
 #include <babylon/babylon_global.h>
 
 namespace BABYLON {
-namespace Internals {
 
 /**
- * Header information of HDR texture files.
+ * @brief Header information of HDR texture files.
  */
 struct BABYLON_SHARED_EXPORT HDRInfo {
 
@@ -38,7 +37,6 @@ struct BABYLON_SHARED_EXPORT HDRInfo {
 
 }; // end of struct HDRInfo
 
-} // end of namespace Internals
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_TOOLS_HDR_HDR_INFO_H

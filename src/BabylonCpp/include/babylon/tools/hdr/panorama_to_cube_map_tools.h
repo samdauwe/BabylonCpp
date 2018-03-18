@@ -7,7 +7,6 @@
 #include <babylon/tools/hdr/cube_map_info.h>
 
 namespace BABYLON {
-namespace Internals {
 
 class BABYLON_SHARED_EXPORT PanoramaToCubeMapTools {
 
@@ -21,7 +20,7 @@ private:
 
 public:
   /**
-   * Converts a panorma stored in RGB right to left up to down format
+   * @brief Converts a panorma stored in RGB right to left up to down format
    * into a cubemap (6 faces).
    *
    * @param float32Array The source data.
@@ -47,7 +46,6 @@ private:
 
 }; // end of struct PanoramaToCubeMapTools
 
-} // end of namespace Internals
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_TOOLS_HDR_PANORAMA_TO_CUBE_MAP_TOOLS_H

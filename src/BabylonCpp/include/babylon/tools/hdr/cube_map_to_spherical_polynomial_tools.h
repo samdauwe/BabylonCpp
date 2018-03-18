@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 /**
- * Helper class dealing with the extraction of spherical polynomial
+ * @brief Helper class dealing with the extraction of spherical polynomial
  * dataArray from a cube map.
  */
 class BABYLON_SHARED_EXPORT CubeMapToSphericalPolynomialTools {

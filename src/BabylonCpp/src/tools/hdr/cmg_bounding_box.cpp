@@ -1,7 +1,6 @@
 #include <babylon/tools/hdr/cmg_bounding_box.h>
 
 namespace BABYLON {
-namespace Internals {
 
 float CMGBoundinBox::MAX = numeric_limits_t<float>::max();
 float CMGBoundinBox::MIN = numeric_limits_t<float>::max();
@@ -61,5 +60,4 @@ bool CMGBoundinBox::empty() const
   }
 }
 
-} // end of namespace Internals
 } // end of namespace BABYLON

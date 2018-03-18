@@ -7,10 +7,11 @@
 namespace BABYLON {
 
 /**
- * CubeMap information grouping all the data for each faces as well as the
- * cubemap size.
+ * @brief CubeMap information grouping all the data for each faces as well as
+ * the cubemap size.
  */
 struct BABYLON_SHARED_EXPORT CubeMapInfo {
+
   /**
    * The pixel array for the front face.
    * This is stored in RGB, left to right, up to down format.
@@ -72,6 +73,7 @@ struct BABYLON_SHARED_EXPORT CubeMapInfo {
    * Specifies whether the texture is in gamma space.
    */
   bool gammaSpace;
+
 }; // end of struct CubeMapInfo
 
 } // end of namespace BABYLON

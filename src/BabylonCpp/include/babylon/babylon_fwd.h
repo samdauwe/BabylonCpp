@@ -506,6 +506,16 @@ struct IFileRequest;
 class PerformanceMonitor;
 class RollingAverage;
 struct SerializationHelper;
+// - HDR
+struct CMGBoundinBox;
+struct CubeMapInfo;
+class CubeMapToSphericalPolynomialTools;
+struct FileFaceOrientation;
+struct HDRInfo;
+class HDRTools;
+class PanoramaToCubeMapTools;
+template <typename ArrayBufferView>
+class PMREMGenerator;
 // - Optimization
 class HardwareScalingOptimization;
 class LensFlaresOptimization;
