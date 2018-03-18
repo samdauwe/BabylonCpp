@@ -23,18 +23,19 @@ namespace BABYLON {
 float BackgroundMaterial::_standardReflectance0  = 0.05f;
 float BackgroundMaterial::_standardReflectance90 = 0.5f;
 
-float BackgroundMaterial::standardReflectance0()
+float BackgroundMaterial::StandardReflectance0()
 {
   return _standardReflectance0;
 }
 
-float BackgroundMaterial::standardReflectance90()
+float BackgroundMaterial::StandardReflectance90()
 {
   return _standardReflectance90;
 }
 
 BackgroundMaterial::BackgroundMaterial(const string_t& iName, Scene* scene)
     : PushMaterial{iName, scene}
+    , useEquirectangularFOV{false}
     , _primaryColor{Color3::White()}
     , _primaryLevel{1.f}
     , _secondaryColor{Color3::Gray()}
@@ -56,6 +57,7 @@ BackgroundMaterial::BackgroundMaterial(const string_t& iName, Scene* scene)
     , _useRGBColor{true}
     , _enableNoise{false}
     , _imageProcessingConfiguration{nullptr}
+    , _fovMultiplier{1.f}
     , _maxSimultaneousLights{4}
     , _imageProcessingObserver{nullptr}
     , _reflectionControls{Vector4::Zero()}
@@ -90,20 +92,33 @@ void BackgroundMaterial::setReflectionStandardFresnelWeight(float value)
 
   if (reflectionWeight < 0.5f) {
     reflectionWeight = reflectionWeight * 2.f;
-    setReflectionReflectance0(BackgroundMaterial::standardReflectance0()
+    setReflectionReflectance0(BackgroundMaterial::StandardReflectance0()
                               * reflectionWeight);
-    setReflectionReflectance90(BackgroundMaterial::standardReflectance90()
+    setReflectionReflectance90(BackgroundMaterial::StandardReflectance90()
                                * reflectionWeight);
   }
   else {
     reflectionWeight = reflectionWeight * 2.f - 1.f;
     setReflectionReflectance0(
-      BackgroundMaterial::standardReflectance0()
-      + (1.f - BackgroundMaterial::standardReflectance0()) * reflectionWeight);
+      BackgroundMaterial::StandardReflectance0()
+      + (1.f - BackgroundMaterial::StandardReflectance0()) * reflectionWeight);
     setReflectionReflectance90(
-      BackgroundMaterial::standardReflectance90()
-      + (1.f - BackgroundMaterial::standardReflectance90()) * reflectionWeight);
+      BackgroundMaterial::StandardReflectance90()
+      + (1.f - BackgroundMaterial::StandardReflectance90()) * reflectionWeight);
   }
+}
+
+float BackgroundMaterial::fovMultiplier() const
+{
+  return _fovMultiplier;
+}
+
+void BackgroundMaterial::setFovMultiplier(float value)
+{
+  if (::std::isnan(value)) {
+    value = 1.f;
+  }
+  _fovMultiplier = ::std::max(0.f, ::std::min(2.f, value));
 }
 
 void BackgroundMaterial::_attachImageProcessingConfiguration(
@@ -304,6 +319,8 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                                  reflectionTexture->invertZ;
         defines.defines[BMD::LODINREFLECTIONALPHA]
           = reflectionTexture->lodLevelInAlpha;
+        defines.defines[BMD::EQUIRECTANGULAR_RELFECTION_FOV]
+          = useEquirectangularFOV;
 
         if (reflectionTexture->coordinatesMode
             == TextureConstants::INVCUBIC_MODE) {
@@ -399,13 +416,14 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     // Misc.
 #if 0
   MaterialHelper::PrepareDefinesForMisc(
-    mesh, scene, false, pointsCloud(), fogEnabled(), defines,
+    mesh, scene, false, pointsCloud(), fogEnabled(),
+    _shouldTurnAlphaTestOn(mesh), defines,
     BMD::LOGARITHMICDEPTH, BMD::POINTSIZE, BMD::FOG, BMD::NONUNIFORMSCALING);
 
   // Values that need to be evaluated on every frame
   MaterialHelper::PrepareDefinesForFrameBoundValues(
     scene, engine, defines, useInstances, BMD::CLIPPLANE, BMD::ALPHATEST,
-    BMD::DEPTHPREPASS, BMD::INSTANCES, false);
+    BMD::DEPTHPREPASS, BMD::INSTANCES);
 #endif
 
   // Attribs
@@ -483,6 +501,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                 "vReflectionInfos",
                                 "reflectionMatrix",
                                 "vReflectionMicrosurfaceInfos",
+                                "fFovMultiplier",
                                 "shadowLevel",
                                 "alpha",
                                 "vBackgroundCenter",
@@ -552,6 +571,7 @@ void BackgroundMaterial::buildUniformLayout()
   _uniformBuffer->addUniform("diffuseMatrix", 16);
   _uniformBuffer->addUniform("reflectionMatrix", 16);
   _uniformBuffer->addUniform("vReflectionMicrosurfaceInfos", 3);
+  _uniformBuffer->addUniform("fFovMultiplier", 1);
   _uniformBuffer->addUniform("pointSize", 1);
   _uniformBuffer->addUniform("shadowLevel", 1);
   _uniformBuffer->addUniform("alpha", 1);
@@ -653,6 +673,8 @@ void BackgroundMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
       _uniformBuffer->updateColor4("vTertiaryColor", _tertiaryColor,
                                    _tertiaryLevel, "");
     }
+
+    _uniformBuffer->updateFloat("fFovMultiplier", _fovMultiplier);
 
     // Textures
     if (scene->texturesEnabled()) {

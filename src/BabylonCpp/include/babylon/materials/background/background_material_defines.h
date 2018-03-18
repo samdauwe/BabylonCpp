@@ -9,6 +9,7 @@ namespace BABYLON {
 
 /**
  * @brief Background material defines definition.
+ * Ignore Mainly internal Use
  */
 struct BABYLON_SHARED_EXPORT BackgroundMaterialDefines
     : public MaterialDefines,
@@ -100,31 +101,32 @@ struct BABYLON_SHARED_EXPORT BackgroundMaterialDefines
   static constexpr unsigned int REFLECTIONMAP_EQUIRECTANGULAR_FIXED = 33;
   static constexpr unsigned int REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED
     = 34;
-  static constexpr unsigned int INVERTCUBICMAP          = 35;
-  static constexpr unsigned int REFLECTIONMAP_OPPOSITEZ = 36;
-  static constexpr unsigned int LODINREFLECTIONALPHA    = 37;
-  static constexpr unsigned int GAMMAREFLECTION         = 38;
+  static constexpr unsigned int INVERTCUBICMAP                 = 35;
+  static constexpr unsigned int REFLECTIONMAP_OPPOSITEZ        = 36;
+  static constexpr unsigned int LODINREFLECTIONALPHA           = 37;
+  static constexpr unsigned int GAMMAREFLECTION                = 38;
+  static constexpr unsigned int EQUIRECTANGULAR_RELFECTION_FOV = 39;
 
   // Default BJS.
-  static constexpr unsigned int MAINUV1             = 39;
-  static constexpr unsigned int MAINUV2             = 40;
-  static constexpr unsigned int UV1                 = 41;
-  static constexpr unsigned int UV2                 = 42;
-  static constexpr unsigned int CLIPPLANE           = 43;
-  static constexpr unsigned int POINTSIZE           = 44;
-  static constexpr unsigned int LOGARITHMICDEPTH    = 45;
-  static constexpr unsigned int FOG                 = 46;
-  static constexpr unsigned int NORMAL              = 47;
-  static constexpr unsigned int INSTANCES           = 48;
-  static constexpr unsigned int SHADOWFLOAT         = 49;
-  static constexpr unsigned int SPECULARTERM        = 50;
-  static constexpr unsigned int VERTEXCOLOR         = 51;
-  static constexpr unsigned int VERTEXALPHA         = 52;
-  static constexpr unsigned int MORPHTARGETS_NORMAL = 53;
-  static constexpr unsigned int MORPHTARGETS        = 54;
-  static constexpr unsigned int ALPHATEST           = 55;
-  static constexpr unsigned int DEPTHPREPASS        = 56;
-  static constexpr unsigned int NONUNIFORMSCALING   = 57;
+  static constexpr unsigned int MAINUV1             = 40;
+  static constexpr unsigned int MAINUV2             = 41;
+  static constexpr unsigned int UV1                 = 42;
+  static constexpr unsigned int UV2                 = 43;
+  static constexpr unsigned int CLIPPLANE           = 44;
+  static constexpr unsigned int POINTSIZE           = 45;
+  static constexpr unsigned int LOGARITHMICDEPTH    = 46;
+  static constexpr unsigned int FOG                 = 47;
+  static constexpr unsigned int NORMAL              = 48;
+  static constexpr unsigned int INSTANCES           = 49;
+  static constexpr unsigned int SHADOWFLOAT         = 50;
+  static constexpr unsigned int SPECULARTERM        = 51;
+  static constexpr unsigned int VERTEXCOLOR         = 52;
+  static constexpr unsigned int VERTEXALPHA         = 53;
+  static constexpr unsigned int MORPHTARGETS_NORMAL = 54;
+  static constexpr unsigned int MORPHTARGETS        = 55;
+  static constexpr unsigned int ALPHATEST           = 56;
+  static constexpr unsigned int DEPTHPREPASS        = 57;
+  static constexpr unsigned int NONUNIFORMSCALING   = 58;
 
   /**
    * @brief Constructor of the defines.

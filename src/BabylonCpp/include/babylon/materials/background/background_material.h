@@ -24,27 +24,43 @@ public:
   /**
    * @brief Returns Standard reflectance value at parallel view angle.
    */
-  static float standardReflectance0();
+  static float StandardReflectance0();
 
   /**
    * @brief Returns Standard reflectance value at grazing angle.
    */
-  static float standardReflectance90();
+  static float StandardReflectance90();
 
 public:
   /**
-   * @brief Constructor
-   * @param name The name of the material
+   * @brief Instantiates a Background Material in the given scene
+   * @param name The friendly name of the material
    * @param scene The scene to add the material to
    */
   BackgroundMaterial(const string_t& name, Scene* scene);
-  ~BackgroundMaterial();
+  ~BackgroundMaterial() override;
 
   /**
    * @brief Sets the reflection reflectance fresnel values according to the
    * default standard empirically know to work well :-)
    */
   void setReflectionStandardFresnelWeight(float value);
+
+  /**
+   * @brief Gets the current fov(field of view) multiplier.
+   * @return The current fov(field of view) multiplier.
+   */
+  float fovMultiplier() const;
+
+  /**
+   * @brief Sets the current fov(field of view) multiplier, 0.0 - 2.0. Defaults
+   * to 1.0. Lower values "zoom in" and higher values "zoom out". Best used when
+   * trying to implement visual zoom effects like fish-eye or binoculars while
+   * not adjusting camera fov. Recommended to be keep at 1.0 except for special
+   * cases.
+   * @param value The fov(field of view) multiplier value.
+   */
+  void setFovMultiplier(float value);
 
   /**
    * @brief Gets the image processing configuration used either in this
@@ -174,6 +190,7 @@ public:
    * @param subMesh The submesh to check against
    * @param useInstances Specify wether or not the material is used with
    * instances
+   * @returns true if all the dependencies are ready (Textures, Effects...)
    */
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
@@ -212,7 +229,7 @@ public:
 
   /**
    * @brief Clones the material.
-   * @name The cloned name.
+   * @param name The cloned name.
    * @returns The cloned material.
    */
   BackgroundMaterial* clone(const string_t& name,
@@ -232,9 +249,9 @@ public:
 
   /**
    * @brief Parse a JSON input to create back a background material.
-   * @param source
-   * @param scene
-   * @param rootUrl
+   * @param source The JSON data to parse
+   * @param scene The scene to create the parsed material in
+   * @param rootUrl The root url of the assets the material depends upon
    * @returns the instantiated BackgroundMaterial.
    */
   static unique_ptr_t<BackgroundMaterial>
@@ -283,6 +300,12 @@ protected:
    */
   void _attachImageProcessingConfiguration(
     ImageProcessingConfiguration* configuration);
+
+public:
+  /**
+   * Enable the FOV adjustment feature controlled by fovMultiplier.
+   */
+  bool useEquirectangularFOV;
 
 protected:
   /**
@@ -436,6 +459,15 @@ private:
   static float _standardReflectance90;
 
 private:
+  /**
+   * The current fov(field of view) multiplier, 0.0 - 2.0. Defaults to 1.0.
+   * Lower values "zoom in" and higher values "zoom out". Best used when trying
+   * to implement visual zoom effects like fish-eye or binoculars while not
+   * adjusting camera fov. Recommended to be keep at 1.0 except for special
+   * cases.
+   */
+  float _fovMultiplier;
+
   /**
    * Number of Simultaneous lights allowed on the material.
    */

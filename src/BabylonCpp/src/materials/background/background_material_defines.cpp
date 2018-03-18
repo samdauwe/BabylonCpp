@@ -43,6 +43,7 @@ BackgroundMaterialDefines::BackgroundMaterialDefines() : MaterialDefines{}
            "REFLECTIONMAP_OPPOSITEZ",
            "LODINREFLECTIONALPHA",
            "GAMMAREFLECTION",
+           "EQUIRECTANGULAR_RELFECTION_FOV",
            "MAINUV1",
            "MAINUV2",
            "UV1",
