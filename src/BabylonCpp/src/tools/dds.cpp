@@ -4,9 +4,9 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/interfaces/igl_rendering_context.h>
+#include <babylon/math/scalar.h>
 
 namespace BABYLON {
-namespace Internals {
 
 bool DDSTools::StoreLODInAlphaChannel = false;
 Float32Array DDSTools::_FloatView;
@@ -111,20 +111,179 @@ float DDSTools::_ToHalfFloat(float value)
   return bits;
 }
 
+float DDSTools::_FromHalfFloat(uint8_t value)
+{
+  auto s = (value & 0x8000) >> 15;
+  auto e = (value & 0x7C00) >> 10;
+  auto f = value & 0x03FF;
+
+  if (e == 0) {
+    auto result = (s ? -1 : 1) * ::std::pow(2, -14) * (f / std::pow(2, 10));
+    return static_cast<float>(result);
+  }
+  else if (e == 0x1F) {
+    return f ? 0 : ((s ? -1 : 1) * numeric_limits_t<int>::infinity());
+  }
+
+  auto result
+    = (s ? -1 : 1) * ::std::pow(2, e - 15) * (1 + (f / ::std::pow(2, 10)));
+  return static_cast<float>(result);
+}
+
+Float32Array DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
+  float width, float height, size_t dataOffset, size_t dataLength,
+  const Uint8Array& arrayBuffer, float lod)
+{
+  Float32Array destArray(dataLength);
+  Uint8Array srcData(arrayBuffer);
+  size_t index = 0;
+  for (float y = 0; y < height; ++y) {
+    for (float x = 0; x < width; ++x) {
+      size_t srcPos    = dataOffset + static_cast<size_t>(x + y * width) * 4;
+      destArray[index] = DDSTools::_FromHalfFloat(srcData[srcPos]);
+      destArray[index + 1] = DDSTools::_FromHalfFloat(srcData[srcPos + 1]);
+      destArray[index + 2] = DDSTools::_FromHalfFloat(srcData[srcPos + 2]);
+      if (DDSTools::StoreLODInAlphaChannel) {
+        destArray[index + 3] = lod;
+      }
+      else {
+        destArray[index + 3] = DDSTools::_FromHalfFloat(srcData[srcPos + 3]);
+      }
+      index += 4;
+    }
+  }
+
+  return destArray;
+}
+
+Uint16Array
+DDSTools::_GetHalfFloatRGBAArrayBuffer(float width, float height,
+                                       size_t dataOffset, size_t dataLength,
+                                       const Uint8Array& arrayBuffer, float lod)
+{
+  if (DDSTools::StoreLODInAlphaChannel) {
+    Uint16Array destArray(dataLength);
+    Uint8Array srcData(arrayBuffer);
+    size_t index = 0;
+    for (float y = 0; y < height; ++y) {
+      for (float x = 0; x < width; ++x) {
+        size_t srcPos    = dataOffset + static_cast<size_t>(x + y * width) * 4;
+        destArray[index] = srcData[srcPos];
+        destArray[index + 1] = srcData[srcPos + 1];
+        destArray[index + 2] = srcData[srcPos + 2];
+        destArray[index + 3]
+          = static_cast<uint8_t>(DDSTools::_ToHalfFloat(lod));
+        index += 4;
+      }
+    }
+
+    return destArray;
+  }
+
+  return Uint16Array();
+}
+
+Float32Array DDSTools::_GetFloatRGBAArrayBuffer(float width, float height,
+                                                size_t dataOffset,
+                                                size_t dataLength,
+                                                const Uint8Array& arrayBuffer,
+                                                float lod)
+{
+  if (DDSTools::StoreLODInAlphaChannel) {
+    Float32Array destArray(dataLength);
+    Uint8Array srcData(arrayBuffer);
+    size_t index = 0;
+    for (float y = 0; y < height; ++y) {
+      for (float x = 0; x < width; ++x) {
+        size_t srcPos    = dataOffset + static_cast<size_t>(x + y * width) * 4;
+        destArray[index] = srcData[srcPos];
+        destArray[index + 1] = srcData[srcPos + 1];
+        destArray[index + 2] = srcData[srcPos + 2];
+        destArray[index + 3] = lod;
+        index += 4;
+      }
+    }
+
+    return destArray;
+  }
+  return Float32Array();
+}
+
+Float32Array DDSTools::_GetFloatAsUIntRGBAArrayBuffer(
+  float width, float height, size_t dataOffset, size_t dataLength,
+  const Uint8Array& arrayBuffer, float lod)
+{
+  Float32Array destArray(dataLength);
+  Uint8Array srcData(arrayBuffer);
+  size_t index = 0;
+  for (float y = 0; y < height; ++y) {
+    for (float x = 0; x < width; ++x) {
+      size_t srcPos    = dataOffset + static_cast<size_t>(x + y * width) * 4;
+      destArray[index] = Scalar::Clamp(srcData[srcPos]) * 255;
+      destArray[index + 1] = Scalar::Clamp(srcData[srcPos + 1]) * 255;
+      destArray[index + 2] = Scalar::Clamp(srcData[srcPos + 2]) * 255;
+      if (DDSTools::StoreLODInAlphaChannel) {
+        destArray[index + 3] = lod;
+      }
+      else {
+        destArray[index + 3] = Scalar::Clamp(srcData[srcPos + 3]) * 255;
+      }
+      index += 4;
+    }
+  }
+
+  return destArray;
+}
+
+Float32Array DDSTools::_GetHalfFloatAsUIntRGBAArrayBuffer(
+  float width, float height, size_t dataOffset, size_t dataLength,
+  const Uint8Array& arrayBuffer, float lod)
+{
+  Float32Array destArray(dataLength);
+  Uint8Array srcData(arrayBuffer);
+  size_t index = 0;
+  for (float y = 0; y < height; ++y) {
+    for (float x = 0; x < width; ++x) {
+      size_t srcPos = dataOffset + static_cast<size_t>(x + y * width) * 4;
+
+      destArray[index]
+        = Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos])) * 255;
+      destArray[index + 1]
+        = Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos + 1])) * 255;
+      destArray[index + 2]
+        = Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos + 2])) * 255;
+      if (DDSTools::StoreLODInAlphaChannel) {
+        destArray[index + 3] = lod;
+      }
+      else {
+        destArray[index + 3]
+          = Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos + 3])) * 255;
+      }
+      index += 4;
+    }
+  }
+
+  return destArray;
+}
+
 Uint8Array DDSTools::_GetRGBAArrayBuffer(float width, float height,
                                          size_t dataOffset, size_t dataLength,
-                                         const Uint8Array& arrayBuffer)
+                                         const Uint8Array& arrayBuffer,
+                                         int rOffset, int gOffset, int bOffset,
+                                         int aOffset)
 {
   Uint8Array byteArray(dataLength);
   Uint8Array srcData(arrayBuffer);
   size_t index = 0;
-  for (float y = height - 1; y >= 0; --y) {
+  for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
-      size_t srcPos = dataOffset + static_cast<size_t>(x + y * width) * 4;
-      byteArray[index + 2] = srcData[srcPos];
-      byteArray[index + 1] = srcData[srcPos + 1];
-      byteArray[index]     = srcData[srcPos + 2];
-      byteArray[index + 3] = srcData[srcPos + 3];
+      int srcPos
+        = static_cast<int>(dataOffset) + static_cast<int>(x + y * width) * 4;
+
+      byteArray[index]     = srcData[static_cast<size_t>(srcPos + rOffset)];
+      byteArray[index + 1] = srcData[static_cast<size_t>(srcPos + gOffset)];
+      byteArray[index + 2] = srcData[static_cast<size_t>(srcPos + bOffset)];
+      byteArray[index + 3] = srcData[static_cast<size_t>(srcPos + aOffset)];
       index += 4;
     }
   }
@@ -132,19 +291,31 @@ Uint8Array DDSTools::_GetRGBAArrayBuffer(float width, float height,
   return byteArray;
 }
 
+int DDSTools::_ExtractLongWordOrder(int value)
+{
+  if (value == 0 || value == 255 || value == -16777216) {
+    return 0;
+  }
+
+  return 1 + DDSTools::_ExtractLongWordOrder(value >> 8);
+}
+
 Uint8Array DDSTools::_GetRGBArrayBuffer(float width, float height,
                                         size_t dataOffset, size_t dataLength,
-                                        const Uint8Array& arrayBuffer)
+                                        const Uint8Array& arrayBuffer,
+                                        int rOffset, int gOffset, int bOffset)
 {
   Uint8Array byteArray(dataLength);
   Uint8Array srcData(arrayBuffer);
   size_t index = 0;
-  for (float y = height - 1; y >= 0; --y) {
+  for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
-      size_t srcPos = dataOffset + static_cast<size_t>(x + y * width) * 3;
-      byteArray[index + 2] = srcData[srcPos];
-      byteArray[index + 1] = srcData[srcPos + 1];
-      byteArray[index]     = srcData[srcPos + 2];
+      int srcPos
+        = static_cast<int>(dataOffset) + static_cast<int>(x + y * width) * 3;
+
+      byteArray[index]     = srcData[static_cast<size_t>(srcPos + rOffset)];
+      byteArray[index + 1] = srcData[static_cast<size_t>(srcPos + gOffset)];
+      byteArray[index + 2] = srcData[static_cast<size_t>(srcPos + bOffset)];
       index += 3;
     }
   }
@@ -160,7 +331,7 @@ Uint8Array DDSTools::_GetLuminanceArrayBuffer(float width, float height,
   Uint8Array byteArray(dataLength);
   Uint8Array srcData(arrayBuffer);
   size_t index = 0;
-  for (float y = height - 1; y >= 0; --y) {
+  for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
       size_t srcPos    = dataOffset + static_cast<size_t>(x + y * width);
       byteArray[index] = srcData[srcPos];
@@ -258,6 +429,11 @@ void DDSTools::UploadDDSLevels(Engine* engine, GL::IGLRenderingContext* gl,
     }
   }
 
+  auto rOffset = DDSTools::_ExtractLongWordOrder(header[off_RMask]);
+  auto gOffset = DDSTools::_ExtractLongWordOrder(header[off_GMask]);
+  auto bOffset = DDSTools::_ExtractLongWordOrder(header[off_BMask]);
+  auto aOffset = DDSTools::_ExtractLongWordOrder(header[off_AMask]);
+
   if (computeFormats) {
     format = engine->_getWebGLTextureType(info.textureType);
     internalFormat
@@ -300,15 +476,17 @@ void DDSTools::UploadDDSLevels(Engine* engine, GL::IGLRenderingContext* gl,
           if (bpp == 24) {
             dataLength = static_cast<size_t>(width * height * 3);
             byteArray  = DDSTools::_GetRGBArrayBuffer(width, height, dataOffset,
-                                                     dataLength, arrayBuffer);
+                                                     dataLength, arrayBuffer,
+                                                     rOffset, gOffset, bOffset);
             gl->texImage2D(sampler, i, GL::RGB, static_cast<int>(width),
                            static_cast<int>(height), 0, GL::RGB,
                            GL::UNSIGNED_BYTE, byteArray);
           }
           else { // 32
             dataLength = static_cast<size_t>(width * height * 4);
-            byteArray = DDSTools::_GetRGBAArrayBuffer(width, height, dataOffset,
-                                                      dataLength, arrayBuffer);
+            byteArray  = DDSTools::_GetRGBAArrayBuffer(
+              width, height, dataOffset, dataLength, arrayBuffer, rOffset,
+              gOffset, bOffset, aOffset);
             gl->texImage2D(sampler, i, GL::RGBA, static_cast<int>(width),
                            static_cast<int>(height), 0, GL::RGBA,
                            GL::UNSIGNED_BYTE, byteArray);
@@ -356,5 +534,4 @@ void DDSTools::UploadDDSLevels(Engine* engine, GL::IGLRenderingContext* gl,
   }
 }
 
-} // end of namespace Internals
 } // end of namespace BABYLON
