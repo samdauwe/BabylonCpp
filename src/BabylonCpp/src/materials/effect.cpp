@@ -618,6 +618,12 @@ void Effect::_rebuildProgram(
   _prepareEffect();
 }
 
+unordered_map_t<string_t, unique_ptr_t<GL::IGLUniformLocation>>
+Effect::getSpecificUniformLocations(const vector_t<string_t>& names)
+{
+  return _engine->getUniforms(_program.get(), names);
+}
+
 void Effect::_prepareEffect()
 {
   auto attributesNames = _attributesNames;
@@ -657,7 +663,7 @@ void Effect::_prepareEffect()
     _program = engine->createShaderProgram(_vertexSourceCode,
                                            _fragmentSourceCode, _defines);
 
-    if (engine->webGLVersion() > 1.f) {
+    if (engine->supportsUniformBuffers()) {
       for (auto& item : _uniformBuffersNames) {
         bindUniformBlock(name, item.second);
       }

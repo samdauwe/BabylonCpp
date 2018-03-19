@@ -568,6 +568,10 @@ GroundMesh* MeshBuilder::CreateGroundFromHeightMap(
   ground->_setReady(false);
 
   const auto onload = [&](const Image& img) {
+    if (scene->isDisposed()) {
+      return;
+    }
+
     // Create VertexData from map data
     options.bufferWidth  = static_cast<unsigned int>(img.width);
     options.bufferHeight = static_cast<unsigned int>(img.height);
