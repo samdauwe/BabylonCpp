@@ -501,6 +501,9 @@ class _DepthCullingState;
 class _StencilState;
 } // end of namespace BABYLON
 // --- Tools ---
+struct DDS;
+struct DDSInfo;
+class DDSTools;
 class EventState;
 struct IFileRequest;
 class PerformanceMonitor;
