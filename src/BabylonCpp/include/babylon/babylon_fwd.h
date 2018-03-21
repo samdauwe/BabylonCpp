@@ -124,6 +124,8 @@ struct WorkerReply;
 // --- Core ---
 struct Image;
 struct NodeCache;
+template <typename T>
+class Promise;
 // - Logging
 class LogChannel;
 class LogMessage;
