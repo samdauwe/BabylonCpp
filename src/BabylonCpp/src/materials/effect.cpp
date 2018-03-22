@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
+#include <babylon/core/promise.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -52,44 +53,42 @@ Effect::Effect(const string_t& baseName, EffectCreationOptions& options,
   const auto& vertexSource   = baseName;
   const auto& fragmentSource = baseName;
 
-  _loadVertexShader(vertexSource, [this, &fragmentSource,
-                                   &baseName](const string_t& vertexCode) {
-    _processIncludes(vertexCode, [this, &fragmentSource, &baseName](
-                                   const string_t& vertexCodeWithIncludes) {
-      _processShaderConversion(
-        vertexCodeWithIncludes, false,
-        [this, &fragmentSource, &baseName](const string_t& migratedVertexCode) {
-          _loadFragmentShader(fragmentSource, [this, &migratedVertexCode,
-                                               &baseName](
-                                                const string_t& fragmentCode) {
-            _processIncludes(
-              fragmentCode, [this, &migratedVertexCode, &baseName](
-                              const string_t& fragmentCodeWithIncludes) {
-                _processShaderConversion(
-                  fragmentCodeWithIncludes, true,
-                  [this, &migratedVertexCode,
-                   &baseName](const string_t& migratedFragmentCode) {
-                    if (!baseName.empty()) {
-                      const auto& vertex   = baseName;
-                      const auto& fragment = baseName;
+  string_t finalVertexCode;
 
-                      _vertexSourceCode = "#define SHADER_NAME vertex:" + vertex
-                                          + "\n" + migratedVertexCode;
-                      _fragmentSourceCode
-                        = "#define SHADER_NAME fragment:" + fragment + "\n"
-                          + migratedFragmentCode;
-                    }
-                    else {
-                      _vertexSourceCode   = migratedVertexCode;
-                      _fragmentSourceCode = migratedFragmentCode;
-                    }
-                    _prepareEffect();
-                  });
-              });
-          });
-        });
+  Promise<string_t> promise;
+  promise.future()
+    .then([&](const string_t& vertexSource) {
+      return _loadVertexShaderAsync(vertexSource);
+    })
+    .then([&](const string_t& vertexCode) {
+      return _processIncludesAsync(vertexCode);
+    })
+    .then([&](const string_t& vertexCodeWithIncludes) {
+      finalVertexCode = _processShaderConversion(vertexCodeWithIncludes, false);
+      return _loadFragmentShaderAsync(fragmentSource);
+    })
+    .then([&](const string_t& fragmentCode) {
+      return _processIncludesAsync(fragmentCode);
+    })
+    .then([&](const string_t& fragmentCodeWithIncludes) {
+      auto migratedFragmentCode
+        = _processShaderConversion(fragmentCodeWithIncludes, true);
+      if (!baseName.empty()) {
+        const auto& vertex   = baseName;
+        const auto& fragment = baseName;
+
+        _vertexSourceCode
+          = "#define SHADER_NAME vertex:" + vertex + "\n" + finalVertexCode;
+        _fragmentSourceCode = "#define SHADER_NAME fragment:" + fragment + "\n"
+                              + migratedFragmentCode;
+      }
+      else {
+        _vertexSourceCode   = finalVertexCode;
+        _fragmentSourceCode = migratedFragmentCode;
+      }
+      _prepareEffect();
     });
-  });
+  promise.resolve(vertexSource);
 }
 
 Effect::Effect(const unordered_map_t<string_t, string_t>& baseName,
@@ -142,46 +141,42 @@ Effect::Effect(const unordered_map_t<string_t, string_t>& baseName,
 
   name = fragmentSource;
 
-  _loadVertexShader(vertexSource, [this, &fragmentSource,
-                                   &vertexSource](const string_t& vertexCode) {
-    _processIncludes(vertexCode, [this, &fragmentSource, &vertexSource](
-                                   const string_t& vertexCodeWithIncludes) {
-      _processShaderConversion(
-        vertexCodeWithIncludes, false,
-        [this, &fragmentSource,
-         &vertexSource](const string_t& migratedVertexCode) {
-          _loadFragmentShader(fragmentSource, [this, &migratedVertexCode,
-                                               &fragmentSource, &vertexSource](
-                                                const string_t& fragmentCode) {
-            _processIncludes(
-              fragmentCode,
-              [this, &migratedVertexCode, &fragmentSource,
-               &vertexSource](const string_t& fragmentCodeWithIncludes) {
-                _processShaderConversion(
-                  fragmentCodeWithIncludes, true,
-                  [this, &migratedVertexCode, &fragmentSource,
-                   &vertexSource](const string_t& migratedFragmentCode) {
-                    if (!vertexSource.empty()) {
-                      const auto& vertex   = vertexSource;
-                      const auto& fragment = fragmentSource;
+  string_t finalVertexCode;
 
-                      _vertexSourceCode = "#define SHADER_NAME vertex:" + vertex
-                                          + "\n" + migratedVertexCode;
-                      _fragmentSourceCode
-                        = "#define SHADER_NAME fragment:" + fragment + "\n"
-                          + migratedFragmentCode;
-                    }
-                    else {
-                      _vertexSourceCode   = migratedVertexCode;
-                      _fragmentSourceCode = migratedFragmentCode;
-                    }
-                    _prepareEffect();
-                  });
-              });
-          });
-        });
+  Promise<string_t> promise;
+  promise.future()
+    .then([&](const string_t& vertexSource) {
+      return _loadVertexShaderAsync(vertexSource);
+    })
+    .then([&](const string_t& vertexCode) {
+      return _processIncludesAsync(vertexCode);
+    })
+    .then([&](const string_t& vertexCodeWithIncludes) {
+      finalVertexCode = _processShaderConversion(vertexCodeWithIncludes, false);
+      return _loadFragmentShaderAsync(fragmentSource);
+    })
+    .then([&](const string_t& fragmentCode) {
+      return _processIncludesAsync(fragmentCode);
+    })
+    .then([&](const string_t& fragmentCodeWithIncludes) {
+      auto migratedFragmentCode
+        = _processShaderConversion(fragmentCodeWithIncludes, true);
+      if (!vertexSource.empty()) {
+        const auto& vertex   = vertexSource;
+        const auto& fragment = fragmentSource;
+
+        _vertexSourceCode
+          = "#define SHADER_NAME vertex:" + vertex + "\n" + finalVertexCode;
+        _fragmentSourceCode = "#define SHADER_NAME fragment:" + fragment + "\n"
+                              + migratedFragmentCode;
+      }
+      else {
+        _vertexSourceCode   = finalVertexCode;
+        _fragmentSourceCode = migratedFragmentCode;
+      }
+      _prepareEffect();
     });
-  });
+  promise.resolve(vertexSource);
 }
 
 Effect::~Effect()
@@ -269,22 +264,22 @@ void Effect::executeWhenCompiled(
   onCompileObservable.add([&](Effect* effect, EventState&) { func(effect); });
 }
 
-void Effect::_loadVertexShader(
-  const string_t& vertex, ::std::function<void(const string_t& data)> callback)
+string_t Effect::_loadVertexShaderAsync(const string_t& vertex)
 {
   // Base64 encoded ?
   if (vertex.substr(0, 7) == "base64:") {
     auto vertexBinary = base64_atob(vertex.substr(7));
-    callback(vertexBinary);
-    return;
+    return vertexBinary;
   }
 
   // Is in local store ?
   const string_t vertexShaderName = vertex + "VertexShader";
   EffectShadersStore effectShadersStore;
   if (stl_util::contains(effectShadersStore.shaders(), vertexShaderName)) {
-    callback(string_t(effectShadersStore.shaders()[vertexShaderName]));
-    return;
+    const string_t vertexShaderName = vertex + "VertexShader";
+    auto vertexShader
+      = string_t(effectShadersStore.shaders()[vertexShaderName]);
+    return vertexShader;
   }
 
   string_t vertexShaderUrl;
@@ -298,32 +293,32 @@ void Effect::_loadVertexShader(
   }
 
   // Vertex shader
-  Tools::LoadFile(vertexShaderUrl + ".vertex.fx", callback);
+  // Tools::LoadFile(vertexShaderUrl + ".vertex.fx", callback);
+  return "";
 }
 
-void Effect::_loadFragmentShader(
-  const string_t& fragment,
-  ::std::function<void(const string_t& data)> callback)
+string_t Effect::_loadFragmentShaderAsync(const string_t& fragment)
 {
   // Base64 encoded ?
   if (fragment.substr(0, 7) == "base64:") {
-    auto vertexBinary = base64_atob(fragment.substr(7));
-    callback(vertexBinary);
-    return;
+    auto fragmentBinary = base64_atob(fragment.substr(7));
+    return fragmentBinary;
   }
 
   // Is in local store ?
   string_t fragmentShaderName = fragment + "PixelShader";
   EffectShadersStore effectShadersStore;
   if (stl_util::contains(effectShadersStore.shaders(), fragmentShaderName)) {
-    callback(string_t(effectShadersStore.shaders()[fragmentShaderName]));
-    return;
+    auto pixelShader
+      = string_t(effectShadersStore.shaders()[fragmentShaderName]);
+    return pixelShader;
   }
 
   fragmentShaderName = fragment + "FragmentShader";
   if (stl_util::contains(effectShadersStore.shaders(), fragmentShaderName)) {
-    callback(string_t(effectShadersStore.shaders()[fragmentShaderName]));
-    return;
+    auto fragmentShader
+      = string_t(effectShadersStore.shaders()[fragmentShaderName]);
+    return fragmentShader;
   }
 
   string_t fragmentShaderUrl;
@@ -337,7 +332,8 @@ void Effect::_loadFragmentShader(
   }
 
   // Fragment shader
-  Tools::LoadFile(fragmentShaderUrl + ".fragment.fx", callback);
+  // Tools::LoadFile(fragmentShaderUrl + ".fragment.fx", callback);
+  return "";
 }
 
 void Effect::_dumpShadersSource(string_t vertexCode, string_t fragmentCode,
@@ -374,23 +370,20 @@ void Effect::_dumpShadersSource(string_t vertexCode, string_t fragmentCode,
                      formattedFragmentCode.c_str());
 }
 
-void Effect::_processShaderConversion(
-  const string_t& sourceCode, bool isFragment,
-  const ::std::function<void(const string_t& data)>& callback)
+string_t Effect::_processShaderConversion(const string_t& sourceCode,
+                                          bool isFragment)
 {
 
   auto preparedSourceCode = _processPrecision(sourceCode);
 
   if (_engine->webGLVersion() == 1.f) {
-    callback(preparedSourceCode);
-    return;
+    return preparedSourceCode;
   }
 
   // Already converted
   if (String::contains(preparedSourceCode, "#version 3")) {
     String::replaceInPlace(preparedSourceCode, "#version 300 es", "");
-    callback(preparedSourceCode);
-    return;
+    return preparedSourceCode;
   }
 
   const auto hasDrawBuffersExtension = String::contains(
@@ -434,12 +427,10 @@ void Effect::_processShaderConversion(
     }
   }
 
-  callback(result);
+  return result;
 }
 
-void Effect::_processIncludes(
-  const string_t& sourceCode,
-  const ::std::function<void(const string_t& data)>& callback)
+string_t Effect::_processIncludesAsync(const string_t& sourceCode)
 {
   const ::std::regex regex("#include<(.+)>(\\((.*)\\))*(\\[(.*)\\])*",
                            ::std::regex::optimize);
@@ -551,7 +542,7 @@ void Effect::_processIncludes(
     }
   }
 
-  callback(returnValue.str());
+  return returnValue.str();
 }
 
 string_t Effect::_processPrecision(string_t source)

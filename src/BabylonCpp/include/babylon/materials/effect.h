@@ -128,11 +128,8 @@ public:
    */
   void executeWhenCompiled(const ::std::function<void(Effect* effect)>& func);
 
-  void _loadVertexShader(const string_t& vertex,
-                         ::std::function<void(const string_t& data)> callback);
-  void
-  _loadFragmentShader(const string_t& fragment,
-                      ::std::function<void(const string_t& data)> callback);
+  string_t _loadVertexShaderAsync(const string_t& vertex);
+  string_t _loadFragmentShaderAsync(const string_t& fragment);
 
   /**
    * @brief Recompiles the webGL program
@@ -463,12 +460,9 @@ public:
 private:
   void _dumpShadersSource(string_t vertexCode, string_t fragmentCode,
                           string_t defines);
-  void _processShaderConversion(
-    const string_t& sourceCode, bool isFragment,
-    const ::std::function<void(const string_t& data)>& callback);
-  void
-  _processIncludes(const string_t& sourceCode,
-                   const ::std::function<void(const string_t& data)>& callback);
+  string_t _processShaderConversion(const string_t& sourceCode,
+                                    bool isFragment);
+  string_t _processIncludesAsync(const string_t& sourceCode);
   string_t _processPrecision(string_t source);
 
 public:

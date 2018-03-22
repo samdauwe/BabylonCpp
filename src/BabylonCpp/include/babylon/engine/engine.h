@@ -572,6 +572,7 @@ public:
     const string_t& url,
     const ::std::function<void(Variant<string_t, ArrayBuffer>& data,
                                const string_t& responseURL)>& onSuccess);
+  Promise<string_t> _loadFileAsync(const string_t& url);
 
   /** Statics **/
   static Engine* LastCreatedEngine();
