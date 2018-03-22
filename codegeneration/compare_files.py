@@ -56,9 +56,27 @@ def fileComparisonToStr(fileComparisonDict):
         result += "%s|- %s\n" % (indent, file)
     return result
 
-if __name__ == "__main__":
-    previous = "/home/sdauwe/Projects/Babylon.js-3.1.0_2017_09_23/src"
-    current = "/home/sdauwe/Projects/Babylon.js-3.1.0_2017_12_01/src"
+def main():
+    # Versions to compare
+    current, previous = "3.2.0-alpha7", "3.1-beta-6"
+    # Dictionary mapping from BabylonJs version to relative path
+    BabylonJsVersions = {
+        "3.1-alpha" : "3.1.0_2017_09_23",
+        "3.1-beta-6" : "3.1.0_2017_12_01",
+        "3.2.0-alpha7" : "3.1.0_2018_02_03"
+    }
+    # Create mapping from BabylonJs version to full path
+    for version in BabylonJsVersions:
+        fullPath = os.path.join(os.path.expanduser('~'), "Projects",
+                                "Babylon.js-%s" % BabylonJsVersions[version],
+                                "src")
+        BabylonJsVersions[version] = fullPath
+    # Perform comparison
+    previous = BabylonJsVersions[previous]
+    current = BabylonJsVersions[current]
     files = getFilesRecursively(current)
     fileComparisonDict = compareFiles(current, previous, files)
     print fileComparisonToStr(fileComparisonDict)
+
+if __name__ == "__main__":
+    main()
