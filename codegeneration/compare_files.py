@@ -59,11 +59,13 @@ def fileComparisonToStr(fileComparisonDict):
 def main():
     # Versions to compare
     current, previous = "3.2.0-alpha7", "3.1-beta-6"
+    current, previous = "3.2.0-beta.2", "3.2.0-alpha7"
     # Dictionary mapping from BabylonJs version to relative path
     BabylonJsVersions = {
         "3.1-alpha" : "3.1.0_2017_09_23",
         "3.1-beta-6" : "3.1.0_2017_12_01",
-        "3.2.0-alpha7" : "3.1.0_2018_02_03"
+        "3.2.0-alpha7" : "3.2.0_2018_02_03",
+        "3.2.0-beta.2" : "3.2.0_2018_03_22"
     }
     # Create mapping from BabylonJs version to full path
     for version in BabylonJsVersions:
