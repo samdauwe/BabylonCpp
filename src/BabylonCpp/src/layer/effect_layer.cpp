@@ -8,10 +8,13 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/material.h>
+#include <babylon/materials/material_defines.h>
+#include <babylon/materials/material_helper.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/mesh/_instances_batch.h>
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
+#include <babylon/morph/morph_target_manager.h>
 #include <babylon/postprocess/post_process.h>
 #include <babylon/tools/tools.h>
 
@@ -252,6 +255,24 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
   }
 
+  // Morph targets
+  unsigned int morphInfluencers = 0;
+  if (auto _mesh = static_cast<Mesh*>(mesh)) {
+    auto manager = _mesh->morphTargetManager();
+    if (manager) {
+      if (manager->numInfluencers > 0) {
+        defines.emplace_back("#define MORPHTARGETS");
+        morphInfluencers = static_cast<unsigned>(manager->numInfluencers);
+        defines.emplace_back("#define NUM_MORPH_INFLUENCERS "
+                             + ::std::to_string(morphInfluencers));
+        MaterialDefines defines;
+        defines.NUM_MORPH_INFLUENCERS = morphInfluencers;
+        MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh, defines,
+                                                         0);
+      }
+    }
+  }
+
   // Instances
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
@@ -269,9 +290,11 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
     EffectCreationOptions effectCreationOptions;
     effectCreationOptions.attributes = ::std::move(attribs);
     effectCreationOptions.defines    = ::std::move(join);
+    effectCreationOptions.indexParameters
+      = {{"maxSimultaneousMorphTargets", morphInfluencers}};
     effectCreationOptions.uniformsNames
-      = {"world",         "mBones", "viewProjection",
-         "diffuseMatrix", "color",  "emissiveMatrix"};
+      = {"world", "mBones",         "viewProjection",       "diffuseMatrix",
+         "color", "emissiveMatrix", "morphTargetInfluences"};
     effectCreationOptions.samplers = {"diffuseSampler", "emissiveSampler"};
 
     _effectLayerMapGenerationEffect = _scene->getEngine()->createEffect(
@@ -443,6 +466,10 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh)
       _effectLayerMapGenerationEffect->setMatrices(
         "mBones", mesh->skeleton()->getTransformMatrices(mesh));
     }
+
+    // Morph targets
+    MaterialHelper::BindMorphTargetParameters(mesh,
+                                              _effectLayerMapGenerationEffect);
 
     // Draw
     mesh->_processRendering(

@@ -51,26 +51,6 @@ public:
   ~HighlightLayer() override;
 
   /**
-   * @brief Specifies the horizontal size of the blur.
-   */
-  void setBlurHorizontalSize(float value);
-
-  /**
-   * @brief Specifies the vertical size of the blur.
-   */
-  void setBlurVerticalSize(float value);
-
-  /**
-   * @brief Gets the horizontal size of the blur.
-   */
-  float blurHorizontalSize() const;
-
-  /**
-   * @brief Gets the vertical size of the blur.
-   */
-  float blurVerticalSize() const;
-
-  /**
    * @brief Get the effect name of the layer.
    * @return The effect name
    */
@@ -196,6 +176,26 @@ protected:
 
 private:
   /**
+   * @brief Specifies the horizontal size of the blur.
+   */
+  void set_blurHorizontalSize(float value);
+
+  /**
+   * @brief Specifies the vertical size of the blur.
+   */
+  void set_blurVerticalSize(float value);
+
+  /**
+   * @brief Gets the horizontal size of the blur.
+   */
+  float get_blurHorizontalSize() const;
+
+  /**
+   * @brief Gets the vertical size of the blur.
+   */
+  float get_blurVerticalSize() const;
+
+  /**
    * @brief Force the stencil to the normal expected value for none glowing
    * parts
    */
@@ -211,6 +211,16 @@ public:
    * Specifies whether or not the outer glow is ACTIVE in the layer.
    */
   bool outerGlow;
+
+  /**
+   * Specifies the horizontal size of the blur.
+   */
+  Property<HighlightLayer, float> blurHorizontalSize;
+
+  /**
+   * Specifies the vertical size of the blur.
+   */
+  Property<HighlightLayer, float> blurVerticalSize;
 
   /**
    * An event triggered when the highlight layer is being blurred.

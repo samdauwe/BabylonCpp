@@ -34,6 +34,11 @@ GlowLayer::GlowLayer(const string_t& name, Scene* scene)
 GlowLayer::GlowLayer(const string_t& iName, Scene* scene,
                      const IGlowLayerOptions& options)
     : EffectLayer{iName, scene}
+    , customEmissiveColorSelector{nullptr}
+    , customEmissiveTextureSelector{nullptr}
+    , blurKernelSize{this, &GlowLayer::get_blurKernelSize,
+                     &GlowLayer::set_blurKernelSize}
+    , intensity{this, &GlowLayer::get_intensity, &GlowLayer::set_intensity}
     , _intensity{1.f}
     , _horizontalBlurPostprocess1{nullptr}
     , _verticalBlurPostprocess1{nullptr}
@@ -64,7 +69,7 @@ GlowLayer::~GlowLayer()
 {
 }
 
-void GlowLayer::setBlurKernelSize(float value)
+void GlowLayer::set_blurKernelSize(float value)
 {
   _horizontalBlurPostprocess1->kernel = value;
   _verticalBlurPostprocess1->kernel   = value;
@@ -72,17 +77,17 @@ void GlowLayer::setBlurKernelSize(float value)
   _verticalBlurPostprocess2->kernel   = value;
 }
 
-float GlowLayer::blurKernelSize() const
+float GlowLayer::get_blurKernelSize() const
 {
   return _horizontalBlurPostprocess1->kernel();
 }
 
-void GlowLayer::setIntensity(float value)
+void GlowLayer::set_intensity(float value)
 {
   _intensity = value;
 }
 
-float GlowLayer::intensity() const
+float GlowLayer::get_intensity() const
 {
   return _intensity;
 }
@@ -253,8 +258,7 @@ void GlowLayer::_internalRender(Effect* effect)
   engine->setStencilBuffer(previousStencilBuffer);
 }
 
-void GlowLayer::_setEmissiveTextureAndColor(Mesh* /*mesh*/,
-                                            SubMesh* /*subMesh*/,
+void GlowLayer::_setEmissiveTextureAndColor(Mesh* mesh, SubMesh* subMesh,
                                             Material* iMaterial)
 {
   StandardMaterial* material = nullptr;
@@ -263,28 +267,41 @@ void GlowLayer::_setEmissiveTextureAndColor(Mesh* /*mesh*/,
   }
 
   auto textureLevel = 1.f;
-  if (material) {
-    _emissiveTextureAndColor.texture = material->emissiveTexture();
-    if (_emissiveTextureAndColor.texture) {
-      textureLevel = _emissiveTextureAndColor.texture->level;
+
+  if (customEmissiveTextureSelector) {
+    _emissiveTextureAndColor.texture
+      = customEmissiveTextureSelector(mesh, subMesh, material);
+  }
+  else {
+    if (material) {
+      _emissiveTextureAndColor.texture = material->emissiveTexture();
+      if (_emissiveTextureAndColor.texture) {
+        textureLevel = _emissiveTextureAndColor.texture->level;
+      }
+    }
+    else {
+      _emissiveTextureAndColor.texture = nullptr;
     }
   }
-  else {
-    _emissiveTextureAndColor.texture = nullptr;
-  }
 
-  if (material) {
-    _emissiveTextureAndColor.color.set(
-      material->emissiveColor.r * textureLevel, //
-      material->emissiveColor.g * textureLevel, //
-      material->emissiveColor.b * textureLevel, //
-      1.f);
+  if (customEmissiveColorSelector) {
+    customEmissiveColorSelector(mesh, subMesh, material,
+                                _emissiveTextureAndColor.color);
   }
   else {
-    _emissiveTextureAndColor.color.set(neutralColor.r, //
-                                       neutralColor.g, //
-                                       neutralColor.b, //
-                                       neutralColor.a);
+    if (material) {
+      _emissiveTextureAndColor.color.set(
+        material->emissiveColor.r * textureLevel, //
+        material->emissiveColor.g * textureLevel, //
+        material->emissiveColor.b * textureLevel, //
+        1.f);
+    }
+    else {
+      _emissiveTextureAndColor.color.set(neutralColor.r, //
+                                         neutralColor.g, //
+                                         neutralColor.b, //
+                                         neutralColor.a);
+    }
   }
 }
 

@@ -60,6 +60,10 @@ HighlightLayer::HighlightLayer(const string_t& iName, Scene* scene,
     : EffectLayer{iName, scene}
     , innerGlow{true}
     , outerGlow{true}
+    , blurHorizontalSize{this, &HighlightLayer::get_blurHorizontalSize,
+                         &HighlightLayer::set_blurHorizontalSize}
+    , blurVerticalSize{this, &HighlightLayer::get_blurVerticalSize,
+                       &HighlightLayer::set_blurVerticalSize}
     , _downSamplePostprocess{nullptr}
     , _horizontalBlurPostprocess{nullptr}
     , _verticalBlurPostprocess{nullptr}
@@ -87,28 +91,31 @@ HighlightLayer::HighlightLayer(const string_t& iName, Scene* scene,
   effectLayerOptions.mainTextureFixedSize = _options.mainTextureFixedSize;
   effectLayerOptions.mainTextureRatio     = _options.mainTextureRatio;
   _init(effectLayerOptions);
+
+  // Do not render as long as no meshes have been added
+  _shouldRender = false;
 }
 
 HighlightLayer::~HighlightLayer()
 {
 }
 
-void HighlightLayer::setBlurHorizontalSize(float value)
+void HighlightLayer::set_blurHorizontalSize(float value)
 {
   _horizontalBlurPostprocess->kernel = value;
 }
 
-void HighlightLayer::setBlurVerticalSize(float value)
+void HighlightLayer::set_blurVerticalSize(float value)
 {
   _verticalBlurPostprocess->kernel = value;
 }
 
-float HighlightLayer::blurHorizontalSize() const
+float HighlightLayer::get_blurHorizontalSize() const
 {
   return _horizontalBlurPostprocess->kernel;
 }
 
-float HighlightLayer::blurVerticalSize() const
+float HighlightLayer::get_blurVerticalSize() const
 {
   return _verticalBlurPostprocess->kernel;
 }
@@ -275,6 +282,7 @@ void HighlightLayer::_internalRender(Effect* effect)
   auto previousStencilOperationFail = engine->getStencilOperationFail();
   auto previousStencilOperationDepthFail
     = engine->getStencilOperationDepthFail();
+  auto previousStencilReference = engine->getStencilFunctionReference();
 
   // Stencil operations
   engine->setStencilOperationPass(EngineConstants::REPLACE);
@@ -306,6 +314,7 @@ void HighlightLayer::_internalRender(Effect* effect)
   engine->setStencilOperationPass(previousStencilOperationPass);
   engine->setStencilOperationFail(previousStencilOperationFail);
   engine->setStencilOperationDepthFail(previousStencilOperationDepthFail);
+  engine->setStencilFunctionReference(previousStencilReference);
 }
 
 bool HighlightLayer::shouldRender() const

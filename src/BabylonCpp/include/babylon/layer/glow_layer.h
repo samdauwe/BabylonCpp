@@ -46,26 +46,6 @@ public:
   ~GlowLayer() override;
 
   /**
-   * @brief Sets the kernel size of the blur.
-   */
-  void setBlurKernelSize(float value);
-
-  /**
-   * @brief Gets the kernel size of the blur.
-   */
-  float blurKernelSize() const;
-
-  /**
-   * @brief Sets the glow intensity.
-   */
-  void setIntensity(float value);
-
-  /**
-   * @brief Gets the glow intensity.
-   */
-  float intensity() const;
-
-  /**
    * @brief Get the effect name of the layer.
    * @return The effect name
    */
@@ -176,6 +156,44 @@ protected:
   bool _shouldRenderMesh(Mesh* mesh) const override;
 
 private:
+  /**
+   * @brief Sets the kernel size of the blur.
+   */
+  void set_blurKernelSize(float value);
+
+  /**
+   * @brief Gets the kernel size of the blur.
+   */
+  float get_blurKernelSize() const;
+
+  /**
+   * @brief Sets the glow intensity.
+   */
+  void set_intensity(float value);
+
+  /**
+   * @brief Gets the glow intensity.
+   */
+  float get_intensity() const;
+
+public:
+  /**
+   * Callback used to let the user override the color selection on a per mesh
+   * basis
+   */
+  ::std::function<void(Mesh* mesh, SubMesh* subMesh, Material* material,
+                       Color4& result)>
+    customEmissiveColorSelector;
+  /**
+   * Callback used to let the user override the texture selection on a per mesh
+   * basis
+   */
+  ::std::function<Texture*(Mesh* mesh, SubMesh* subMesh, Material* material)>
+    customEmissiveTextureSelector;
+
+private:
+  Property<GlowLayer, float> blurKernelSize;
+  Property<GlowLayer, float> intensity;
   IGlowLayerOptions _options;
   float _intensity;
   unique_ptr_t<BlurPostProcess> _horizontalBlurPostprocess1;
