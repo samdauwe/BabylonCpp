@@ -18,6 +18,7 @@
 ![shader_material_voronoian_waterway_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_voronoian_waterway_scene.png?raw=true "Shader Material Voronoian Waterway Scene")
 ![shader_material_with_fog_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_with_fog_scene.png?raw=true "Shader Material With Fog Scene")
 ![shader_material_seascape_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_seascape_scene.png?raw=true "Shader Material Seascape Scene")
+![shader_material_server_room_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_server_room_scene.png?raw=true "Shader Material Server Room Scene")
 ![shader_material_skybox_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_skybox_scene.png?raw=true "Shader Material Skybox Scene")
 ![shader_material_skybox_clouds_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_skybox_clouds_scene.png?raw=true "Shader Material Skybox Clouds Scene")
 ![shader_material_kifs_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_kifs_scene.png?raw=true "Shader Material KIFS Scene")

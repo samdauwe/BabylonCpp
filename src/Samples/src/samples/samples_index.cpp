@@ -54,6 +54,7 @@
 #include <babylon/samples/materials/shader_material_planet_shadertoy_scene.h>
 #include <babylon/samples/materials/shader_material_scene.h>
 #include <babylon/samples/materials/shader_material_seascape_scene.h>
+#include <babylon/samples/materials/shader_material_server_room_scene.h>
 #include <babylon/samples/materials/shader_material_simplicity_scene.h>
 #include <babylon/samples/materials/shader_material_skybox_clouds_scene.h>
 #include <babylon/samples/materials/shader_material_skybox_scene.h>
@@ -479,6 +480,12 @@ SamplesIndex::SamplesIndex()
     [](ICanvas* iCanvas) {                                             //
       return ::std::make_unique<ShaderMaterialSeascapeScene>(iCanvas); //
     });                                                                //
+  // Shader Material Server Room Scene
+  _samples["ShaderMaterialServerRoomScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                               //
+      return ::std::make_unique<ShaderMaterialServerRoomScene>(iCanvas); //
+    });                                                                  //
   // Shader Material Simplicity Scene
   _samples["ShaderMaterialSimplicityScene"] = ::std::make_tuple(
     true,
