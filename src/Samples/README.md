@@ -38,7 +38,6 @@
 ![shader_material_simplicity_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_simplicity_scene.png?raw=true "Shader Material Simplicity Scene")
 ![shader_material_sparse_grid_marching_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_sparse_grid_marching_scene.png?raw=true "Shader Material Sparse Grid Marching Scene")
 ![shader_material_the_drive_home_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_the_drive_home_scene.png?raw=true "Shader Material The Drive Home Scene")
-![shader_material_the_road_to_hell](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_the_road_to_hell.png?raw=true "Shader Material The Road To Hell Scene")
 ![shader_material_wolfenstein_3d_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_wolfenstein_3d_scene.png?raw=true "Shader Material Wolfenstein 3D Scene")
 ![shader_material_xyptonjtroz_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_xyptonjtroz_scene.png?raw=true "Shader Material Xyptonjtroz Scene")
 
