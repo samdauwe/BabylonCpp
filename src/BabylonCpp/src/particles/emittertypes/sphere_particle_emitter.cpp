@@ -1,5 +1,7 @@
-#include <babylon/particles/sphere_particle_emitter.h>
+#include <babylon/particles/emittertypes/sphere_particle_emitter.h>
 
+#include <babylon/core/json.h>
+#include <babylon/materials/effect.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/scalar.h>
 #include <babylon/math/vector3.h>
@@ -56,6 +58,38 @@ unique_ptr_t<IParticleEmitterType> SphereParticleEmitter::clone() const
     = ::std::make_unique<SphereParticleEmitter>(radius, directionRandomizer);
 
   return newOne;
+}
+
+void SphereParticleEmitter::applyToShader(Effect* effect)
+{
+  effect->setFloat("radius", radius);
+  effect->setFloat("directionRandomizer", directionRandomizer);
+}
+
+const char* SphereParticleEmitter::getEffectDefines() const
+{
+  return "#define SPHEREEMITTER";
+}
+
+const char* SphereParticleEmitter::getClassName() const
+{
+  return "SphereParticleEmitter";
+}
+
+Json::object SphereParticleEmitter::serialize() const
+{
+  return Json::object();
+}
+
+void SphereParticleEmitter::parse(const Json::value& serializationObject)
+{
+  if (serializationObject.contains("radius")) {
+    radius = Json::GetNumber<float>(serializationObject, "radius", 1.f);
+  }
+  if (serializationObject.contains("directionRandomizer")) {
+    directionRandomizer
+      = Json::GetNumber<float>(serializationObject, "directionRandomizer", 0.f);
+  }
 }
 
 } // end of namespace BABYLON

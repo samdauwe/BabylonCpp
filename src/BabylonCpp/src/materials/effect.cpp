@@ -1144,6 +1144,16 @@ Effect& Effect::setColor4(const string_t& uniformName, const Color3& color3,
   return *this;
 }
 
+Effect& Effect::setDirectColor4(const string_t& uniformName,
+                                const Color4& color4)
+{
+  if (_cacheFloat4(uniformName, color4.r, color4.g, color4.b, color4.a)) {
+    _engine->setDirectColor4(getUniform(uniformName), color4);
+  }
+
+  return *this;
+}
+
 void Effect::ResetCache()
 {
   Effect::_baseCache.clear();

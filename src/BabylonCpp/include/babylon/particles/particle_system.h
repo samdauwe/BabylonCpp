@@ -3,9 +3,7 @@
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_global.h>
-#include <babylon/math/color4.h>
-#include <babylon/math/vector3.h>
-#include <babylon/particles/iparticle_emitter_Type.h>
+#include <babylon/particles/emittertypes/iparticle_emitter_Type.h>
 #include <babylon/particles/iparticle_system.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
@@ -58,6 +56,17 @@ public:
   virtual IReflect::Type type() const override;
 
   /**
+   * @brief Gets the current list of active particles.
+   */
+  vector_t<Particle*>& particles();
+
+  /**
+   * @brief Returns the string "ParticleSystem".
+   * @returns a string containing the class name
+   */
+  const char* getClassName() const;
+
+  /**
    * @brief Sets a callback that will be triggered when the system is disposed.
    */
   void setOnDispose(
@@ -70,18 +79,10 @@ public:
   bool isAnimationSheetEnabled() const;
 
   /**
-   * @brief "Recycles" one of the particle by copying it back to the "stock" of
-   * particles and removing it from the active list. Its lifetime will start
-   * back at 0.
-   * @param particle The particle to recycle
-   */
-  void recycleParticle(Particle* particle);
-
-  /**
    * @brief Gets the maximum number of particles active at the same time.
    * @returns The max number of active particles.
    */
-  size_t getCapacity() const;
+  size_t getCapacity() const override;
 
   /**
    * @brief Gets Wether there are still active particles in the system.
@@ -98,12 +99,26 @@ public:
   /**
    * @brief Starts the particle system and begins to emit.
    */
-  void start();
+  void start() override;
 
   /**
    * @brief Stops the particle system.
    */
-  void stop();
+  void stop() override;
+
+  /**
+   * @brief Stops the particle system.
+   * @param stopSubEmitters if true it will stop the current system and all
+   * created sub-Systems if false it will stop the current root system only,
+   * this param is used by the root particle system only. the default value is
+   * true.
+   */
+  void stop(bool stopSubEmitters);
+
+  /**
+   * @brief Remove all active particles
+   */
+  void reset() override;
 
   /**
    * @brief ignore (for internal use only)
@@ -130,15 +145,23 @@ public:
   void rebuild() override;
 
   /**
+   * @brief Is this system ready to be used/rendered.
+   * @return true if the system is ready
+   */
+  bool isReady() override;
+
+  /**
    * @brief Renders the particle system in its current state.
-   * @returns the current number of particles.
+   * @returns the current number of particles
    */
   size_t render() override;
 
   /**
    * @brief Disposes the particle system and free the associated resources.
+   * @param disposeTexture defines if the particule texture must be disposed as
+   * well (true by default)
    */
-  void dispose(bool doNotRecurse = false) override;
+  void dispose(bool disposeTexture = true) override;
 
   vector_t<Animation*> getAnimations() override;
 
@@ -222,7 +245,28 @@ public:
                                Scene* scene, const string_t& url);
 
 private:
+  Vector3& get_direction1();
+  void set_direction1(const Vector3& value);
+  Vector3& get_direction2();
+  void set_direction2(const Vector3& value);
+  Vector3& get_minEmitBox();
+  void set_minEmitBox(const Vector3& value);
+  Vector3& get_maxEmitBox();
+  void set_maxEmitBox(const Vector3& value);
+
   void _createIndexBuffer();
+  // start of sub system methods
+  /**
+   * @brief "Recycles" one of the particle by copying it back to the "stock" of
+   * particles and removing it from the active list. Its lifetime will start
+   * back at 0.
+   */
+  void recycleParticle(Particle* particle);
+  void _stopSubEmitters();
+  Particle* _createParticle();
+  void _removeFromRoot();
+  void _emitFromParticle(Particle* particle);
+  // end of sub system methods
   void _update(int newParticles);
   Effect* _getEffect();
   void _appenedParticleVertexesWithSheet(unsigned int offset,
@@ -234,12 +278,6 @@ public:
    * List of animations used by the particle system.
    */
   vector_t<Animation*> animations;
-
-  /**
-   * The density of particles, the rate of particle flow
-   */
-  int emitRate;
-
   /**
    * If you want to launch only a few particles at once, that can be done, as
    * well.
@@ -247,49 +285,10 @@ public:
   int manualEmitCount;
 
   /**
-   * The overall motion speed (0.01 is default update speed, faster updates =
-   * faster animation)
-   */
-  float updateSpeed;
-
-  /**
-   * The amount of time the particle system is running (depends of the overall
-   * speed above).
-   */
-  int targetStopDuration;
-
-  /**
    * Specifies whether the particle system will be disposed once it reaches the
    * end of the animation.
    */
   bool disposeOnStop;
-
-  /**
-   * Minimum power of emitting particles.
-   */
-  float minEmitPower;
-  /**
-   * Maximum power of emitting particles.
-   */
-  float maxEmitPower;
-
-  /**
-   * Minimum life time of emitting particles.
-   */
-  float minLifeTime;
-  /**
-   * Maximum life time of emitting particles.
-   */
-  float maxLifeTime;
-
-  /**
-   * Minimum Size of emitting particles.
-   */
-  float minSize;
-  /**
-   * Maximum Size of emitting particles.
-   */
-  float maxSize;
 
   /**
    * Minimum angular speed of emitting particles (Z-axis rotation for each
@@ -301,11 +300,6 @@ public:
    * particle).
    */
   float maxAngularSpeed;
-
-  /**
-   * The texture used to render each particle. (this can be a spritesheet)
-   */
-  Texture* particleTexture;
 
   /**
    * This can help using your own shader to render the particle system.
@@ -334,72 +328,46 @@ public:
   ::std::function<void()> onAnimationEnd;
 
   /**
-   * Blend mode use to render the particle, it can be either
-   * ParticleSystem.BLENDMODE_ONEONE or ParticleSystem.BLENDMODE_STANDARD.
-   */
-  unsigned int blendMode;
-
-  /**
    * Forces the particle to write their depth information to the depth buffer.
    * This can help preventing other draw calls to override the particles.
    */
   bool forceDepthWrite;
 
   /**
-   * You can use gravity if you want to give an orientation to your particles.
+   * Random direction of each particle after it has been emitted, between
+   * direction1 and direction2 vectors. This only works when particleEmitterTyps
+   * is a BoxParticleEmitter
    */
-  Vector3 gravity;
+  Property<ParticleSystem, Vector3> direction1;
 
   /**
    * Random direction of each particle after it has been emitted, between
-   * direction1 and direction2 vectors.
+   * direction1 and direction2 vectors. This only works when particleEmitterTyps
+   * is a BoxParticleEmitter
    */
-  Vector3 direction1;
-  /**
-   * Random direction of each particle after it has been emitted, between
-   * direction1 and direction2 vectors.
-   */
-  Vector3 direction2;
+  Property<ParticleSystem, Vector3> direction2;
 
   /**
    * Minimum box point around our emitter. Our emitter is the center of
    * particles source, but if you want your particles to emit from more than one
-   * point, then you can tell it to do so.
+   * point, then you can tell it to do so. This only works when
+   * particleEmitterTyps is a BoxParticleEmitter
    */
-  Vector3 minEmitBox;
+  Property<ParticleSystem, Vector3> minEmitBox;
+
   /**
    * Maximum box point around our emitter. Our emitter is the center of
    * particles source, but if you want your particles to emit from more than one
-   * point, then you can tell it to do so.
+   * point, then you can tell it to do so. This only works when
+   * particleEmitterTyps is a BoxParticleEmitter
    */
-  Vector3 maxEmitBox;
-
-  /**
-   * Random color of each particle after it has been emitted, between color1 and
-   * color2 vectors.
-   */
-  Color4 color1;
-  /**
-   * Random color of each particle after it has been emitted, between color1 and
-   * color2 vectors.
-   */
-  Color4 color2;
-  /**
-   * Color the particle will have at the end of its lifetime.
-   */
-  Color4 colorDead;
+  Property<ParticleSystem, Vector3> maxEmitBox;
 
   /**
    * An optional mask to filter some colors out of the texture, or filter a part
    * of the alpha channel.
    */
   Color4 textureMask;
-
-  /**
-   * The particle emitter type defines the emitter used by the particle system.
-   * It can be for example box, sphere, or cone...
-   */
-  unique_ptr_t<IParticleEmitterType> particleEmitterType;
 
   /**
    * This function can be defined to specify initial direction for every new
@@ -454,6 +422,19 @@ public:
 
   unsigned int _vertexBufferSize;
 
+  // Sub-emitters
+  /**
+   * this is the Sub-emitters templates that will be used to generate particle
+   * system when the particle dies, this property is used by the root particle
+   * system only.
+   */
+  vector_t<ParticleSystem*> subEmitters;
+  /**
+   * The current active Sub-systems, this property is used by the root particle
+   * system only.
+   */
+  vector_t<ParticleSystem*> activeSubSystems;
+
 private:
   Observer<ParticleSystem>::Ptr _onDisposeObserver;
   vector_t<Particle*> _particles;
@@ -486,6 +467,9 @@ private:
 
   ::std::function<void(unsigned int offset, Particle* particle)>
     _appendParticleVertexes;
+
+  ParticleSystem* _rootParticleSystem;
+  Vector3 _zeroVector3;
 
 }; // end of class ParticleSystem
 

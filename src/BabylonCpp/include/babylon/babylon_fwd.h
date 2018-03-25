@@ -414,17 +414,18 @@ class SimplificationSettings;
 class MorphTarget;
 class MorphTargetManager;
 // --- Particles ---
-class BoxParticleEmitter;
-class ConeParticleEmitter;
 struct DepthSortedParticle;
 class GPUParticleSystem;
-struct IParticleEmitterType;
 struct IParticleSystem;
 class ModelShape;
 class Particle;
 class ParticleSystem;
 class SolidParticle;
 class SolidParticleSystem;
+// - EmitterTypes
+class BoxParticleEmitter;
+class ConeParticleEmitter;
+struct IParticleEmitterType;
 class SphereDirectedParticleEmitter;
 class SphereParticleEmitter;
 // --- Physics ---

@@ -22,18 +22,7 @@ Particle::Particle(ParticleSystem* iParticleSystem)
     return;
   }
 
-  cellIndex = particleSystem->startSpriteCellID;
-
-  if (particleSystem->spriteCellChangeSpeed == 0.f) {
-    updateCellIndex = [this](float scaledUpdateSpeed) {
-      updateCellIndexWithSpeedCalculated(scaledUpdateSpeed);
-    };
-  }
-  else {
-    updateCellIndex = [this](float scaledUpdateSpeed) {
-      updateCellIndexWithSpeedCalculated(scaledUpdateSpeed);
-    };
-  }
+  updateCellInfoFromSystem();
 }
 
 Particle::Particle(const Particle& other)
@@ -106,7 +95,23 @@ Particle* Particle::clone() const
   return new Particle(*this);
 }
 
-void Particle::updateCellIndexWithSpeedCalculated(float scaledUpdateSpeed)
+void Particle::updateCellInfoFromSystem()
+{
+  cellIndex = particleSystem->startSpriteCellID;
+
+  if (particleSystem->spriteCellChangeSpeed == 0.f) {
+    updateCellIndex = [this](float scaledUpdateSpeed) {
+      _updateCellIndexWithSpeedCalculated(scaledUpdateSpeed);
+    };
+  }
+  else {
+    updateCellIndex = [this](float scaledUpdateSpeed) {
+      _updateCellIndexWithSpeedCalculated(scaledUpdateSpeed);
+    };
+  }
+}
+
+void Particle::_updateCellIndexWithSpeedCalculated(float scaledUpdateSpeed)
 {
   //   (ageOffset / scaledUpdateSpeed) / available cells
   float numberOfScaledUpdatesPerCell
@@ -124,7 +129,7 @@ void Particle::updateCellIndexWithSpeedCalculated(float scaledUpdateSpeed)
   }
 }
 
-void Particle::updateCellIndexWithCustomSpeed()
+void Particle::_updateCellIndexWithCustomSpeed()
 {
   if (_currentFrameCounter >= particleSystem->spriteCellChangeSpeed) {
     ++cellIndex;

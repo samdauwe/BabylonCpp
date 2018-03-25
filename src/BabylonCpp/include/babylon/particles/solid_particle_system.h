@@ -50,7 +50,7 @@ class BABYLON_SHARED_EXPORT SolidParticleSystem : public IDisposable {
 
 public:
   /**
-   * Creates a SPS (Solid Particle System) object.
+   * @brief Creates a SPS (Solid Particle System) object.
    * @param name (String) is the SPS name, this will be the underlying mesh
    * name.
    * @param scene (Scene) is the scene in which the SPS is added.
@@ -554,6 +554,9 @@ private:
     _depthSortFunction;
   bool _needs32Bits;
   Vector3 _pivotBackTranslation;
+  Vector3 _scaledPivot;
+  bool _particleHasParent;
+  SolidParticle* _parent;
 
 }; // end of class SolidParticleSystem
 

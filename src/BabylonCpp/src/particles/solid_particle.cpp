@@ -31,6 +31,8 @@ SolidParticle::SolidParticle(unsigned int particleIndex,
     , _sps{sps}
     , _stillInvisible{false}
     , _rotationMatrix{{1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f}}
+    , parentId{nullptr}
+    , _globalPosition{Vector3::Zero()}
 {
   if (modelBoundingInfo) {
     const auto& mdlInfo = *modelBoundingInfo;

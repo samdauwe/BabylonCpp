@@ -36,6 +36,10 @@ public:
   static constexpr unsigned int AgeKind                  = 22;
   static constexpr unsigned int LifeKind                 = 23;
   static constexpr unsigned int VelocityKind             = 24;
+  static constexpr unsigned int DirectionKind            = 25;
+  static constexpr unsigned int OffsetKind               = 26;
+  static constexpr unsigned int SeedKind                 = 27;
+  static constexpr unsigned int SizeKind                 = 28;
 
   static constexpr const char* PositionKindChars        = "position";
   static constexpr const char* NormalKindChars          = "normal";
@@ -63,6 +67,10 @@ public:
   static constexpr const char* AgeKindChars       = "age";
   static constexpr const char* LifeKindChars      = "life";
   static constexpr const char* VelocityKindChars  = "velocity";
+  static constexpr const char* DirectionKindChars = "direction";
+  static constexpr const char* OffsetKindChars    = "offset";
+  static constexpr const char* SeedKindChars      = "seed";
+  static constexpr const char* SizeKindChars      = "size";
 
 public:
   VertexBuffer(Engine* engine, const Float32Array& data, unsigned int kind,

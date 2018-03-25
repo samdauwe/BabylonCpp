@@ -43,20 +43,14 @@ Buffer::~Buffer()
 }
 
 unique_ptr_t<VertexBuffer> Buffer::createVertexBuffer(unsigned int kind,
-                                                      int offset, int size)
+                                                      int offset, int size,
+                                                      Nullable<int> stride,
+                                                      Nullable<bool> instanced)
 {
   // a lot of these parameters are ignored as they are overriden by the buffer
-  return ::std::make_unique<VertexBuffer>(_engine, this, kind, _updatable, true,
-                                          _strideSize, _instanced, offset,
-                                          size);
-}
-
-unique_ptr_t<VertexBuffer>
-Buffer::createVertexBuffer(unsigned int kind, int offset, int size, int stride)
-{
-  // a lot of these parameters are ignored as they are overriden by the buffer
-  return ::std::make_unique<VertexBuffer>(_engine, this, kind, _updatable, true,
-                                          stride, _instanced, offset, size);
+  return ::std::make_unique<VertexBuffer>(
+    _engine, this, kind, _updatable, true, stride ? *stride : _strideSize,
+    instanced.isNull() ? _instanced : *instanced, offset, size);
 }
 
 // Properties

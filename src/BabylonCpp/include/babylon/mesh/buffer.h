@@ -2,13 +2,14 @@
 #define BABYLON_MESH_BUFFER_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/nullable.h>
 #include <babylon/interfaces/idisposable.h>
 
 namespace BABYLON {
 
 /**
-* @brief
-*/
+ * @brief Buffer representation.
+ */
 class BABYLON_SHARED_EXPORT Buffer : public IDisposable {
 
 public:
@@ -18,10 +19,21 @@ public:
          bool postponeInternalCreation = false, bool instanced = false);
   virtual ~Buffer();
 
-  unique_ptr_t<VertexBuffer> createVertexBuffer(unsigned int kind, int offset,
-                                                int size);
-  unique_ptr_t<VertexBuffer> createVertexBuffer(unsigned int kind, int offset,
-                                                int size, int stride);
+  /**
+   * @param Create a new {BABYLON.VertexBuffer} based on the current buffer.
+   * @param kind defines the vertex buffer kind (position, normal, etc.)
+   * @param offset defines offset in the buffer (0 by default)
+   * @param size defines the size in floats of attributes (position is 3 for
+   * instance)
+   * @param stride defines the stride size in floats in the buffer (the offset
+   * to apply to reach next value when data is interleaved)
+   * @param instanced defines if the vertex buffer contains indexed data
+   * @returns the new vertex buffer
+   */
+  unique_ptr_t<VertexBuffer>
+  createVertexBuffer(unsigned int kind, int offset, int size,
+                     Nullable<int> stride     = nullptr,
+                     Nullable<bool> instanced = nullptr);
 
   // Properties
   bool isUpdatable() const;

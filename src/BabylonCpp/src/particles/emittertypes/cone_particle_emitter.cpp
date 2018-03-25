@@ -1,5 +1,7 @@
-#include <babylon/particles/cone_particle_emitter.h>
+#include <babylon/particles/emittertypes/cone_particle_emitter.h>
 
+#include <babylon/core/json.h>
+#include <babylon/materials/effect.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/scalar.h>
 #include <babylon/math/vector3.h>
@@ -7,23 +9,26 @@
 
 namespace BABYLON {
 
-ConeParticleEmitter::ConeParticleEmitter(float radius, float iAngle,
+ConeParticleEmitter::ConeParticleEmitter(float iRadius, float iAngle,
                                          float iDirectionRandomizer)
-    : angle{iAngle}, directionRandomizer{iDirectionRandomizer}
+    : radius{this, &ConeParticleEmitter::get_radius,
+             &ConeParticleEmitter::set_radius}
+    , angle{iAngle}
+    , directionRandomizer{iDirectionRandomizer}
 {
-  setRadius(radius);
+  radius = iRadius;
 }
 
 ConeParticleEmitter::~ConeParticleEmitter()
 {
 }
 
-float ConeParticleEmitter::radius() const
+float ConeParticleEmitter::get_radius() const
 {
   return _radius;
 }
 
-void ConeParticleEmitter::setRadius(float value)
+void ConeParticleEmitter::set_radius(float value)
 {
   _radius = value;
   if (angle != 0.f) {
@@ -82,10 +87,47 @@ void ConeParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
 
 unique_ptr_t<IParticleEmitterType> ConeParticleEmitter::clone() const
 {
-  auto newOne = ::std::make_unique<ConeParticleEmitter>(radius(), angle,
+  auto newOne = ::std::make_unique<ConeParticleEmitter>(radius, angle,
                                                         directionRandomizer);
 
   return newOne;
+}
+
+void ConeParticleEmitter::applyToShader(Effect* effect)
+{
+  effect->setFloat("radius", radius);
+  effect->setFloat("angle", angle);
+  effect->setFloat("height", _height);
+  effect->setFloat("directionRandomizer", directionRandomizer);
+}
+
+const char* ConeParticleEmitter::getEffectDefines() const
+{
+  return "#define CONEEMITTER";
+}
+
+const char* ConeParticleEmitter::getClassName() const
+{
+  return "ConeEmitter";
+}
+
+Json::object ConeParticleEmitter::serialize() const
+{
+  return Json::object();
+}
+
+void ConeParticleEmitter::parse(const Json::value& serializationObject)
+{
+  if (serializationObject.contains("radius")) {
+    radius = Json::GetNumber<float>(serializationObject, "radius", 1.f);
+  }
+  if (serializationObject.contains("angle")) {
+    angle = Json::GetNumber<float>(serializationObject, "angle", Math::PI);
+  }
+  if (serializationObject.contains("directionRandomizer")) {
+    directionRandomizer
+      = Json::GetNumber<float>(serializationObject, "directionRandomizer", 0.f);
+  }
 }
 
 } // end of namespace BABYLON

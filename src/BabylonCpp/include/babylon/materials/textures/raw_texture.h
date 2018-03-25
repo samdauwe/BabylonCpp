@@ -9,39 +9,40 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT RawTexture : public Texture {
 
 public:
-  RawTexture(const Uint8Array& data, int width, int height, unsigned int format,
-             Scene* scene, bool generateMipMaps = true, bool invertY = false,
+  RawTexture(const ArrayBufferView& data, int width, int height,
+             unsigned int format, Scene* scene, bool generateMipMaps = true,
+             bool invertY = false,
              unsigned int samplingMode
              = TextureConstants::TRILINEAR_SAMPLINGMODE,
              unsigned int type = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   ~RawTexture();
 
-  void update(const Uint8Array& data);
+  void update(const ArrayBufferView& data);
 
   // Statics
   static unique_ptr_t<RawTexture> CreateLuminanceTexture(
-    const Uint8Array& data, int width, int height, Scene* scene,
+    const ArrayBufferView& data, int width, int height, Scene* scene,
     bool generateMipMaps = true, bool invertY = false,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
   static unique_ptr_t<RawTexture> CreateLuminanceAlphaTexture(
-    const Uint8Array& data, int width, int height, Scene* scene,
+    const ArrayBufferView& data, int width, int height, Scene* scene,
     bool generateMipMaps = true, bool invertY = false,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
   static unique_ptr_t<RawTexture> CreateAlphaTexture(
-    const Uint8Array& data, int width, int height, Scene* scene,
+    const ArrayBufferView& data, int width, int height, Scene* scene,
     bool generateMipMaps = true, bool invertY = false,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
   static unique_ptr_t<RawTexture> CreateRGBTexture(
-    const Uint8Array& data, int width, int height, Scene* scene,
+    const ArrayBufferView& data, int width, int height, Scene* scene,
     bool generateMipMaps = true, bool invertY = false,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     unsigned int type         = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
   static unique_ptr_t<RawTexture> CreateRGBATexture(
-    const Uint8Array& data, int width, int height, Scene* scene,
+    const ArrayBufferView& data, int width, int height, Scene* scene,
     bool generateMipMaps = true, bool invertY = false,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     unsigned int type         = EngineConstants::TEXTURETYPE_UNSIGNED_INT);

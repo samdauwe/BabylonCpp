@@ -1,5 +1,5 @@
-#ifndef BABYLON_PARTICLES_IPARTICLE_EMITTER_TYPE_H
-#define BABYLON_PARTICLES_IPARTICLE_EMITTER_TYPE_H
+#ifndef BABYLON_PARTICLES_EMITTER_TYPES_IPARTICLE_EMITTER_TYPE_H
+#define BABYLON_PARTICLES_EMITTER_TYPES_IPARTICLE_EMITTER_TYPE_H
 
 #include <babylon/babylon_global.h>
 
@@ -38,13 +38,43 @@ struct BABYLON_SHARED_EXPORT IParticleEmitterType {
     = 0;
 
   /**
-   * @brief Clones the current emitter and returns a copy of it
+   * @brief Clones the current emitter and returns a copy of it.
    * @returns the new emitter
    */
   virtual unique_ptr_t<IParticleEmitterType> clone() const = 0;
+
+  /**
+   * @brief Called by the {BABYLON.GPUParticleSystem} to setup the update shader
+   * @param effect defines the update shader
+   */
+  virtual void applyToShader(Effect* effect) = 0;
+
+  /**
+   * @brief Returns a string to use to update the GPU particles update shader
+   * @returns a string containng the defines string
+   */
+  virtual const char* getEffectDefines() const = 0;
+
+  /**
+   * @brief Returns the string "SphereDirectedParticleEmitter"
+   * @returns a string containing the class name
+   */
+  virtual const char* getClassName() const = 0;
+
+  /**
+   * @brief Serializes the particle system to a JSON object.
+   * @returns the JSON object
+   */
+  virtual Json::object serialize() const = 0;
+
+  /**
+   * @brief Parse properties from a JSON object
+   * @param serializationObject defines the JSON object
+   */
+  virtual void parse(const Json::value& serializationObject) = 0;
 
 }; // end of struct IParticleEmitterType
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_PARTICLES_IPARTICLE_EMITTER_TYPE_H
+#endif // end of BABYLON_PARTICLES_EMITTER_TYPES_IPARTICLE_EMITTER_TYPE_H

@@ -121,7 +121,8 @@ file(GLOB MESH_HDR_FILES            ${INCLUDE_PATH}/mesh/*.h
                                     ${INCLUDE_PATH}/mesh/primitivegeometries/*.h
                                     ${INCLUDE_PATH}/mesh/simplification/*.h)
 file(GLOB MORPH_HDR_FILES           ${INCLUDE_PATH}/morph/*.h)
-file(GLOB PARTICLES_HDR_FILES       ${INCLUDE_PATH}/particles/*.h)
+file(GLOB PARTICLES_HDR_FILES       ${INCLUDE_PATH}/particles/*.h
+                                    ${INCLUDE_PATH}/particles/emittertypes/*.h)
 file(GLOB PHYSICS_HDR_FILES         ${INCLUDE_PATH}/physics/*.h
                                     ${INCLUDE_PATH}/physics/joint/*.h
                                     ${INCLUDE_PATH}/physics/plugins/*.h)
@@ -237,7 +238,8 @@ file(GLOB MESH_SRC_FILES            ${SOURCE_PATH}/mesh/*.cpp
                                     ${SOURCE_PATH}/mesh/primitivegeometries/*.cpp
                                     ${SOURCE_PATH}/mesh/simplification/*.cpp)
 file(GLOB MORPH_SRC_FILES           ${SOURCE_PATH}/morph/*.cpp)
-file(GLOB PARTICLES_SRC_FILES       ${SOURCE_PATH}/particles/*.cpp)
+file(GLOB PARTICLES_SRC_FILES       ${SOURCE_PATH}/particles/*.cpp
+                                    ${SOURCE_PATH}/particles/emittertypes/*.cpp)
 file(GLOB PHYSICS_SRC_FILES         ${SOURCE_PATH}/physics/*.cpp
                                     ${SOURCE_PATH}/physics/joint/*.cpp
                                     ${SOURCE_PATH}/physics/plugins/*.cpp)

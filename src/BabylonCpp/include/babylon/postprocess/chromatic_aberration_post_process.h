@@ -42,8 +42,6 @@ public:
     bool blockCompilation    = false);
   virtual ~ChromaticAberrationPostProcess() override;
 
-  void dispose(Camera* camera = nullptr) override;
-
 public:
   /**
    * The amount of seperation of rgb channels (default: 30)

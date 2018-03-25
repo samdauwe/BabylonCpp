@@ -14,11 +14,11 @@
 #include <babylon/mesh/buffer.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
-#include <babylon/particles/box_particle_emitter.h>
-#include <babylon/particles/cone_particle_emitter.h>
+#include <babylon/particles/emittertypes/box_particle_emitter.h>
+#include <babylon/particles/emittertypes/cone_particle_emitter.h>
+#include <babylon/particles/emittertypes/sphere_directed_particle_emitter.h>
+#include <babylon/particles/emittertypes/sphere_particle_emitter.h>
 #include <babylon/particles/particle.h>
-#include <babylon/particles/sphere_directed_particle_emitter.h>
-#include <babylon/particles/sphere_particle_emitter.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -26,32 +26,22 @@ namespace BABYLON {
 ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
                                Scene* scene, Effect* customEffect,
                                bool isAnimationSheetEnabled, float epsilon)
-    : emitRate{10}
-    , manualEmitCount{-1}
-    , updateSpeed{0.01f}
-    , targetStopDuration{0}
+    : manualEmitCount{-1}
     , disposeOnStop{false}
-    , minEmitPower{1.f}
-    , maxEmitPower{1.f}
-    , minLifeTime{1.f}
-    , maxLifeTime{1.f}
-    , minSize{1.f}
-    , maxSize{1.f}
     , minAngularSpeed{0.f}
     , maxAngularSpeed{0.f}
     , preventAutoStart{false}
     , updateFunction{nullptr}
     , onAnimationEnd{nullptr}
-    , blendMode{ParticleSystem::BLENDMODE_ONEONE}
     , forceDepthWrite{false}
-    , gravity{Vector3::Zero()}
-    , direction1{Vector3(0.f, 1.f, 0.f)}
-    , direction2{Vector3(0.f, 1.f, 0.f)}
-    , minEmitBox{Vector3(-0.5f, -0.5f, -0.5f)}
-    , maxEmitBox{Vector3(0.5f, 0.5f, 0.5f)}
-    , color1{Color4(1.f, 1.f, 1.f, 1.f)}
-    , color2{Color4(1.f, 1.f, 1.f, 1.f)}
-    , colorDead{Color4(0.f, 0.f, 0.f, 1.f)}
+    , direction1{this, &ParticleSystem::get_direction1,
+                 &ParticleSystem::set_direction1}
+    , direction2{this, &ParticleSystem::get_direction2,
+                 &ParticleSystem::set_direction2}
+    , minEmitBox{this, &ParticleSystem::get_minEmitBox,
+                 &ParticleSystem::set_minEmitBox}
+    , maxEmitBox{this, &ParticleSystem::get_maxEmitBox,
+                 &ParticleSystem::set_maxEmitBox}
     , textureMask{Color4(1.f, 1.f, 1.f, 1.f)}
     , spriteCellLoop{true}
     , spriteCellChangeSpeed{0.f}
@@ -75,13 +65,35 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
     , _actualFrame{0}
     , _isAnimationSheetEnabled{isAnimationSheetEnabled}
     , _appendParticleVertexes{nullptr}
+    , _zeroVector3{Vector3::Zero()}
 {
   _scene->particleSystems.emplace_back(this);
 
-  id               = iName;
-  name             = iName;
-  renderingGroupId = 0;
-  layerMask        = 0x0FFFFFFF;
+  // IParticleSystem
+  {
+    id                  = iName;
+    name                = iName;
+    renderingGroupId    = 0;
+    emitRate            = 10.f;
+    updateSpeed         = 0.01f;
+    targetStopDuration  = 0;
+    particleTexture     = nullptr;
+    blendMode           = ParticleSystem::BLENDMODE_ONEONE;
+    minLifeTime         = 1.f;
+    maxLifeTime         = 1.f;
+    minSize             = 1.f;
+    maxSize             = 1.f;
+    layerMask           = 0x0FFFFFFF;
+    color1              = Color4{1.f, 1.f, 1.f, 1.f};
+    color2              = Color4{1.f, 1.f, 1.f, 1.f};
+    colorDead           = Color4{0.f, 0.f, 0.f, 1.f};
+    textureMask         = Color4{1.f, 1.f, 1.f, 1.f};
+    emitRate            = 100;
+    gravity             = Vector3::Zero();
+    minEmitPower        = 1.f;
+    maxEmitPower        = 1.f;
+    particleEmitterType = nullptr;
+  }
 
   _isAnimationSheetEnabled = isAnimationSheetEnabled;
   if (isAnimationSheetEnabled) {
@@ -113,8 +125,8 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
   _vertexBuffers[VertexBuffer::ColorKindChars]    = ::std::move(colors);
   _vertexBuffers["options"]                       = ::std::move(options);
 
-  // Default behaviors
-  particleEmitterType = ::std::make_unique<BoxParticleEmitter>(this);
+  // Default emitter type
+  particleEmitterType = ::std::make_unique<BoxParticleEmitter>();
 
   updateFunction = [this](vector_t<Particle*>& _particles) {
     for (unsigned int pIndex = 0; pIndex < _particles.size(); ++pIndex) {
@@ -123,6 +135,7 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
 
       if (particle->age >= particle->lifeTime) {
         // Recycle by swapping with last particle
+        _emitFromParticle(particle);
         recycleParticle(particle);
         --pIndex;
         continue;
@@ -161,6 +174,16 @@ IReflect::Type ParticleSystem::type() const
   return IReflect::Type::PARTICLESYSTEM;
 }
 
+vector_t<Particle*>& ParticleSystem::particles()
+{
+  return _particles;
+}
+
+const char* ParticleSystem::getClassName() const
+{
+  return "ParticleSystem";
+}
+
 void ParticleSystem::setOnDispose(
   const ::std::function<void(ParticleSystem*, EventState&)>& callback)
 {
@@ -173,6 +196,78 @@ void ParticleSystem::setOnDispose(
 bool ParticleSystem::isAnimationSheetEnabled() const
 {
   return _isAnimationSheetEnabled;
+}
+
+Vector3& ParticleSystem::get_direction1()
+{
+  if (auto boxParticleEmitter
+      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
+    return boxParticleEmitter->direction1;
+  }
+
+  return _zeroVector3;
+}
+
+void ParticleSystem::set_direction1(const Vector3& value)
+{
+  if (auto boxParticleEmitter
+      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
+    boxParticleEmitter->direction1 = value;
+  }
+}
+
+Vector3& ParticleSystem::get_direction2()
+{
+  if (auto boxParticleEmitter
+      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
+    return boxParticleEmitter->direction2;
+  }
+
+  return _zeroVector3;
+}
+
+void ParticleSystem::set_direction2(const Vector3& value)
+{
+  if (auto boxParticleEmitter
+      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
+    boxParticleEmitter->direction2 = value;
+  }
+}
+
+Vector3& ParticleSystem::get_minEmitBox()
+{
+  if (auto boxParticleEmitter
+      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
+    return boxParticleEmitter->minEmitBox;
+  }
+
+  return _zeroVector3;
+}
+
+void ParticleSystem::set_minEmitBox(const Vector3& value)
+{
+  if (auto boxParticleEmitter
+      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
+    boxParticleEmitter->minEmitBox = value;
+  }
+}
+
+Vector3& ParticleSystem::get_maxEmitBox()
+{
+  if (auto boxParticleEmitter
+      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
+    return boxParticleEmitter->maxEmitBox;
+  }
+
+  return _zeroVector3;
+}
+
+void ParticleSystem::set_maxEmitBox(const Vector3& value)
+{
+  if (auto boxParticleEmitter
+      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
+    boxParticleEmitter->maxEmitBox = value;
+  }
 }
 
 void ParticleSystem::_createIndexBuffer()
@@ -190,17 +285,6 @@ void ParticleSystem::_createIndexBuffer()
   }
 
   _indexBuffer = _scene->getEngine()->createIndexBuffer(indices);
-}
-
-void ParticleSystem::recycleParticle(Particle* particle)
-{
-  auto lastParticle = _particles.back();
-  _particles.pop_back();
-
-  if (lastParticle != particle) {
-    lastParticle->copyTo(*particle);
-    _stockParticles.emplace_back(lastParticle);
-  }
 }
 
 size_t ParticleSystem::getCapacity() const
@@ -223,14 +307,31 @@ void ParticleSystem::start()
   _started     = true;
   _stopped     = false;
   _actualFrame = 0;
+  if (!subEmitters.empty()) {
+    activeSubSystems.clear();
+  }
 }
 
 void ParticleSystem::stop()
 {
   _stopped = true;
+  _stopSubEmitters();
 }
 
-// animation sheet
+void ParticleSystem::stop(bool stopSubEmitters)
+{
+  _stopped = true;
+
+  if (stopSubEmitters) {
+    _stopSubEmitters();
+  }
+}
+
+void ParticleSystem::reset()
+{
+  _stockParticles.clear();
+  _particles.clear();
+}
 
 void ParticleSystem::_appendParticleVertex(unsigned int index,
                                            Particle* particle, int offsetX,
@@ -255,8 +356,8 @@ void ParticleSystem::_appendParticleVertexWithAnimation(unsigned int index,
                                                         int offsetX,
                                                         int offsetY)
 {
-  float _offsetX = static_cast<float>(offsetX);
-  float _offsetY = static_cast<float>(offsetY);
+  auto _offsetX = static_cast<float>(offsetX);
+  auto _offsetY = static_cast<float>(offsetY);
   if (offsetX == 0) {
     _offsetX = _epsilon;
   }
@@ -286,6 +387,72 @@ void ParticleSystem::_appendParticleVertexWithAnimation(unsigned int index,
   _vertexData[offset + 11] = particle->cellIndex;
 }
 
+void ParticleSystem::recycleParticle(Particle* particle)
+{
+  auto lastParticle = _particles.back();
+  _particles.pop_back();
+
+  if (lastParticle != particle) {
+    lastParticle->copyTo(*particle);
+  }
+  _stockParticles.emplace_back(lastParticle);
+}
+
+void ParticleSystem::_stopSubEmitters()
+{
+  if (activeSubSystems.empty()) {
+    return;
+  }
+  for (auto& subSystem : activeSubSystems) {
+    subSystem->stop(true);
+  }
+  activeSubSystems.clear();
+}
+
+Particle* ParticleSystem::_createParticle()
+{
+  Particle* particle;
+  if (!_stockParticles.empty()) {
+    particle = _stockParticles.back();
+    _stockParticles.pop_back();
+    particle->age       = 0;
+    particle->cellIndex = startSpriteCellID;
+  }
+  else {
+    particle = new Particle(this);
+  }
+  return particle;
+}
+
+void ParticleSystem::_removeFromRoot()
+{
+  if (!_rootParticleSystem) {
+    return;
+  }
+
+  _rootParticleSystem->activeSubSystems.erase(
+    ::std::remove(_rootParticleSystem->activeSubSystems.begin(),
+                  _rootParticleSystem->activeSubSystems.end(), this),
+    _rootParticleSystem->activeSubSystems.end());
+}
+
+void ParticleSystem::_emitFromParticle(Particle* /*particle*/)
+{
+  if (subEmitters.empty()) {
+    return;
+  }
+#if 0
+  auto templateIndex
+    = static_cast<size_t>(::std::floor(Math::random() * subEmitters.size()));
+
+  auto subSystem
+    = subEmitters[templateIndex]->clone(name + "_sub", particle->position);
+  subSystem._rootParticleSystem = this;
+  activeSubSystems.emplace_back(subSystem);
+  subSystem.start();
+#endif
+}
+
 void ParticleSystem::_update(int newParticles)
 {
   // Update current
@@ -305,21 +472,13 @@ void ParticleSystem::_update(int newParticles)
                                       emitterPosition.z);
   }
 
+  Particle* particle = nullptr;
   for (int index = 0; index < newParticles; ++index) {
     if (_particles.size() == _capacity) {
       break;
     }
 
-    Particle* particle = nullptr;
-    if (!_stockParticles.empty()) {
-      particle = _stockParticles.back();
-      _stockParticles.pop_back();
-      particle->age       = 0;
-      particle->cellIndex = startSpriteCellID;
-    }
-    else {
-      particle = new Particle(this);
-    }
+    particle = _createParticle();
 
     _particles.emplace_back(particle);
 
@@ -492,6 +651,10 @@ void ParticleSystem::animate()
   if (_vertexBuffer) {
     _vertexBuffer->update(_vertexData);
   }
+
+  if (manualEmitCount == 0 && disposeOnStop) {
+    stop();
+  }
 }
 
 void ParticleSystem::_appenedParticleVertexesWithSheet(unsigned int offset,
@@ -521,13 +684,23 @@ void ParticleSystem::rebuild()
   }
 }
 
+bool ParticleSystem::isReady()
+{
+  auto effect = _getEffect();
+  if (!hasEmitter() || !effect->isReady() || !particleTexture
+      || !particleTexture->isReady()) {
+    return false;
+  }
+
+  return true;
+}
+
 size_t ParticleSystem::render()
 {
   auto effect = _getEffect();
 
   // Check
-  if (!hasEmitter() || !effect->isReady() || !particleTexture
-      || !particleTexture->isReady() || !_particles.size()) {
+  if (!isReady() || _particles.empty()) {
     return 0;
   }
 
@@ -542,7 +715,7 @@ size_t ParticleSystem::render()
   effect->setMatrix("view", viewMatrix);
   effect->setMatrix("projection", _scene->getProjectionMatrix());
 
-  if (_isAnimationSheetEnabled) {
+  if (_isAnimationSheetEnabled && particleTexture) {
     auto baseSize = particleTexture->getBaseSize();
     effect->setFloat3("particlesInfos",
                       spriteCellWidth / static_cast<float>(baseSize.width),
@@ -588,7 +761,7 @@ size_t ParticleSystem::render()
   return _particles.size();
 }
 
-void ParticleSystem::dispose(bool /*doNotRecurse*/)
+void ParticleSystem::dispose(bool disposeTexture)
 {
   if (_vertexBuffer) {
     _vertexBuffer->dispose();
@@ -597,13 +770,15 @@ void ParticleSystem::dispose(bool /*doNotRecurse*/)
 
   if (_indexBuffer) {
     _scene->getEngine()->_releaseBuffer(_indexBuffer.get());
-    _indexBuffer.reset(nullptr);
+    _indexBuffer = nullptr;
   }
 
-  if (particleTexture) {
+  if (disposeTexture && particleTexture) {
     particleTexture->dispose();
     particleTexture = nullptr;
   }
+
+  _removeFromRoot();
 
   // Remove from scene
   _scene->particleSystems.erase(
@@ -653,12 +828,12 @@ BoxParticleEmitter* ParticleSystem::createBoxEmitter(const Vector3& iDirection1,
                                                      const Vector3& iMinEmitBox,
                                                      const Vector3& iMaxEmitBox)
 {
-  auto particleEmitter = ::std::make_unique<BoxParticleEmitter>(this);
+  auto particleEmitter = ::std::make_unique<BoxParticleEmitter>();
+  particleEmitterType  = ::std::move(particleEmitter);
   direction1           = iDirection1;
   direction2           = iDirection2;
   minEmitBox           = iMinEmitBox;
   maxEmitBox           = iMaxEmitBox;
-  particleEmitterType  = ::std::move(particleEmitter);
   return particleEmitter.get();
 }
 

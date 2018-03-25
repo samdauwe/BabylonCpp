@@ -2221,6 +2221,16 @@ void Engine::setColor4(GL::IGLUniformLocation* uniform, const Color3& color3,
   _gl->uniform4f(uniform, color3.r, color3.g, color3.b, alpha);
 }
 
+void Engine::setDirectColor4(GL::IGLUniformLocation* uniform,
+                             const Color4& color4)
+{
+  if (!uniform) {
+    return;
+  }
+
+  _gl->uniform4f(uniform, color4.r, color4.g, color4.b, color4.a);
+}
+
 /** States **/
 void Engine::setState(bool culling, float zOffset, bool force, bool reverseSide)
 {

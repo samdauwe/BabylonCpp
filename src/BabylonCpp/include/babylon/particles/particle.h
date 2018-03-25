@@ -34,8 +34,9 @@ public:
   void copyTo(Particle& other);
 
 private:
-  void updateCellIndexWithSpeedCalculated(float scaledUpdateSpeed);
-  void updateCellIndexWithCustomSpeed();
+  void updateCellInfoFromSystem();
+  void _updateCellIndexWithSpeedCalculated(float scaledUpdateSpeed);
+  void _updateCellIndexWithCustomSpeed();
 
 public:
   /**
@@ -94,8 +95,12 @@ public:
    */
   ::std::function<void(float scaledUpdateSpeed)> updateCellIndex;
 
-private:
+  /**
+   * The particle system the particle belongs to.
+   */
   ParticleSystem* particleSystem;
+
+private:
   unsigned int _currentFrameCounter;
 
 }; // end of class Particle

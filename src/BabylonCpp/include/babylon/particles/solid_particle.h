@@ -146,6 +146,15 @@ public:
    * Last computed particle rotation matrix
    */
   Float32Array _rotationMatrix;
+  /**
+   * Parent particle Id, if any.
+   * Default null.
+   */
+  Nullable<unsigned int> parentId;
+  /**
+   * Internal global position in the SPS.
+   */
+  Vector3 _globalPosition;
 
   unordered_map_t<string_t, float> extraFields;
 

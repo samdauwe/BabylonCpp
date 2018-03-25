@@ -82,6 +82,9 @@ SolidParticleSystem::SolidParticleSystem(
     , _particlesIntersect{options.particleIntersection}
     , _needs32Bits{false}
     , _pivotBackTranslation{Vector3::Zero()}
+    , _scaledPivot{Vector3::Zero()}
+    , _particleHasParent{false}
+    , _parent{nullptr}
 {
   _depthSortFunction
     = [](const DepthSortedParticle& p1, const DepthSortedParticle& p2) {
@@ -335,11 +338,15 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
   }
   _quaternionToRotationMatrix();
 
+  _scaledPivot.x = _copy->pivot.x * _copy->scaling.x;
+  _scaledPivot.y = _copy->pivot.y * _copy->scaling.y;
+  _scaledPivot.z = _copy->pivot.z * _copy->scaling.z;
+
   if (_copy->translateFromPivot) {
     _pivotBackTranslation.copyFromFloats(0.f, 0.f, 0.f);
   }
   else {
-    _pivotBackTranslation.copyFrom(_copy->pivot);
+    _pivotBackTranslation.copyFrom(_scaledPivot);
   }
 
   for (unsigned int si = 0; si < shape.size(); ++si) {
@@ -355,9 +362,9 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
     _vertex.y *= _copy->scaling.y;
     _vertex.z *= _copy->scaling.z;
 
-    _vertex.x -= _copy->pivot.x;
-    _vertex.y -= _copy->pivot.y;
-    _vertex.z -= _copy->pivot.z;
+    _vertex.x -= _scaledPivot.x;
+    _vertex.y -= _scaledPivot.y;
+    _vertex.z -= _scaledPivot.z;
 
     Vector3::TransformCoordinatesToRef(_vertex, _rotMatrix, _rotated);
 
@@ -530,11 +537,15 @@ void SolidParticleSystem::_rebuildParticle(SolidParticle* particle)
   }
   _quaternionToRotationMatrix();
 
+  _scaledPivot.x = _particle->pivot.x * _particle->scaling.x;
+  _scaledPivot.y = _particle->pivot.y * _particle->scaling.y;
+  _scaledPivot.z = _particle->pivot.z * _particle->scaling.z;
+
   if (_copy->translateFromPivot) {
     _pivotBackTranslation.copyFromFloats(0.f, 0.f, 0.f);
   }
   else {
-    _pivotBackTranslation.copyFrom(_copy->pivot);
+    _pivotBackTranslation.copyFrom(_scaledPivot);
   }
 
   _shape = particle->_model->_shape;
@@ -552,9 +563,9 @@ void SolidParticleSystem::_rebuildParticle(SolidParticle* particle)
     _vertex.y *= _copy->scaling.y;
     _vertex.z *= _copy->scaling.z;
 
-    _vertex.x -= _copy->pivot.x;
-    _vertex.y -= _copy->pivot.y;
-    _vertex.z -= _copy->pivot.z;
+    _vertex.x -= _scaledPivot.x;
+    _vertex.y -= _scaledPivot.y;
+    _vertex.z -= _scaledPivot.z;
 
     Vector3::TransformCoordinatesToRef(_vertex, _rotMatrix, _rotated);
     _rotated.addInPlace(_pivotBackTranslation);
@@ -573,6 +584,15 @@ void SolidParticleSystem::_rebuildParticle(SolidParticle* particle)
   particle->scaling.x          = 1.f;
   particle->scaling.y          = 1.f;
   particle->scaling.z          = 1.f;
+  particle->uvs.x              = 0.f;
+  particle->uvs.y              = 0.f;
+  particle->uvs.z              = 1.f;
+  particle->uvs.w              = 1.f;
+  particle->pivot.x            = 0.f;
+  particle->pivot.y            = 0.f;
+  particle->pivot.z            = 0.f;
+  particle->translateFromPivot = false;
+  particle->parentId           = nullptr;
 }
 
 SolidParticleSystem& SolidParticleSystem::rebuildMesh()
@@ -714,6 +734,12 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
     if (_particle->isVisible) {
       _particle->_stillInvisible = false; // un-mark permanent invisibility
 
+      _particleHasParent = (_particle->parentId != nullptr);
+
+      _scaledPivot.x = _particle->pivot.x * _particle->scaling.x;
+      _scaledPivot.y = _particle->pivot.y * _particle->scaling.y;
+      _scaledPivot.z = _particle->pivot.z * _particle->scaling.z;
+
       // particle rotation matrix
       if (billboard) {
         _particle->rotation.x = 0.f;
@@ -730,15 +756,79 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
           _quaternionRotationYPR();
         }
         _quaternionToRotationMatrix();
-        _particle->_rotationMatrix[0] = _rotMatrix.m[0];
-        _particle->_rotationMatrix[1] = _rotMatrix.m[1];
-        _particle->_rotationMatrix[2] = _rotMatrix.m[2];
-        _particle->_rotationMatrix[3] = _rotMatrix.m[4];
-        _particle->_rotationMatrix[4] = _rotMatrix.m[5];
-        _particle->_rotationMatrix[5] = _rotMatrix.m[6];
-        _particle->_rotationMatrix[6] = _rotMatrix.m[8];
-        _particle->_rotationMatrix[7] = _rotMatrix.m[9];
-        _particle->_rotationMatrix[8] = _rotMatrix.m[10];
+      }
+
+      if (_particleHasParent && _particle->parentId < particles.size()) {
+        _parent    = particles[_particle->parentId].get();
+        _rotated.x = _particle->position.x * _parent->_rotationMatrix[0]
+                     + _particle->position.y * _parent->_rotationMatrix[3]
+                     + _particle->position.z * _parent->_rotationMatrix[6];
+        _rotated.y = _particle->position.x * _parent->_rotationMatrix[1]
+                     + _particle->position.y * _parent->_rotationMatrix[4]
+                     + _particle->position.z * _parent->_rotationMatrix[7];
+        _rotated.z = _particle->position.x * _parent->_rotationMatrix[2]
+                     + _particle->position.y * _parent->_rotationMatrix[5]
+                     + _particle->position.z * _parent->_rotationMatrix[8];
+
+        _particle->_globalPosition.x = _parent->_globalPosition.x + _rotated.x;
+        _particle->_globalPosition.y = _parent->_globalPosition.y + _rotated.y;
+        _particle->_globalPosition.z = _parent->_globalPosition.z + _rotated.z;
+
+        if (_computeParticleRotation || billboard) {
+          _particle->_rotationMatrix[0]
+            = _rotMatrix.m[0] * _parent->_rotationMatrix[0]
+              + _rotMatrix.m[1] * _parent->_rotationMatrix[3]
+              + _rotMatrix.m[2] * _parent->_rotationMatrix[6];
+          _particle->_rotationMatrix[1]
+            = _rotMatrix.m[0] * _parent->_rotationMatrix[1]
+              + _rotMatrix.m[1] * _parent->_rotationMatrix[4]
+              + _rotMatrix.m[2] * _parent->_rotationMatrix[7];
+          _particle->_rotationMatrix[2]
+            = _rotMatrix.m[0] * _parent->_rotationMatrix[2]
+              + _rotMatrix.m[1] * _parent->_rotationMatrix[5]
+              + _rotMatrix.m[2] * _parent->_rotationMatrix[8];
+          _particle->_rotationMatrix[3]
+            = _rotMatrix.m[4] * _parent->_rotationMatrix[0]
+              + _rotMatrix.m[5] * _parent->_rotationMatrix[3]
+              + _rotMatrix.m[6] * _parent->_rotationMatrix[6];
+          _particle->_rotationMatrix[4]
+            = _rotMatrix.m[4] * _parent->_rotationMatrix[1]
+              + _rotMatrix.m[5] * _parent->_rotationMatrix[4]
+              + _rotMatrix.m[6] * _parent->_rotationMatrix[7];
+          _particle->_rotationMatrix[5]
+            = _rotMatrix.m[4] * _parent->_rotationMatrix[2]
+              + _rotMatrix.m[5] * _parent->_rotationMatrix[5]
+              + _rotMatrix.m[6] * _parent->_rotationMatrix[8];
+          _particle->_rotationMatrix[6]
+            = _rotMatrix.m[8] * _parent->_rotationMatrix[0]
+              + _rotMatrix.m[9] * _parent->_rotationMatrix[3]
+              + _rotMatrix.m[10] * _parent->_rotationMatrix[6];
+          _particle->_rotationMatrix[7]
+            = _rotMatrix.m[8] * _parent->_rotationMatrix[1]
+              + _rotMatrix.m[9] * _parent->_rotationMatrix[4]
+              + _rotMatrix.m[10] * _parent->_rotationMatrix[7];
+          _particle->_rotationMatrix[8]
+            = _rotMatrix.m[8] * _parent->_rotationMatrix[2]
+              + _rotMatrix.m[9] * _parent->_rotationMatrix[5]
+              + _rotMatrix.m[10] * _parent->_rotationMatrix[8];
+        }
+      }
+      else {
+        _particle->_globalPosition.x = _particle->position.x;
+        _particle->_globalPosition.y = _particle->position.y;
+        _particle->_globalPosition.z = _particle->position.z;
+
+        if (_computeParticleRotation || billboard) {
+          _particle->_rotationMatrix[0] = _rotMatrix.m[0];
+          _particle->_rotationMatrix[1] = _rotMatrix.m[1];
+          _particle->_rotationMatrix[2] = _rotMatrix.m[2];
+          _particle->_rotationMatrix[3] = _rotMatrix.m[4];
+          _particle->_rotationMatrix[4] = _rotMatrix.m[5];
+          _particle->_rotationMatrix[5] = _rotMatrix.m[6];
+          _particle->_rotationMatrix[6] = _rotMatrix.m[8];
+          _particle->_rotationMatrix[7] = _rotMatrix.m[9];
+          _particle->_rotationMatrix[8] = _rotMatrix.m[10];
+        }
       }
 
       if (_particle->translateFromPivot) {
@@ -747,9 +837,9 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
         _pivotBackTranslation.z = 0.f;
       }
       else {
-        _pivotBackTranslation.x = _particle->pivot.x;
-        _pivotBackTranslation.y = _particle->pivot.y;
-        _pivotBackTranslation.z = _particle->pivot.z;
+        _pivotBackTranslation.x = _scaledPivot.x;
+        _pivotBackTranslation.y = _scaledPivot.y;
+        _pivotBackTranslation.z = _scaledPivot.z;
       }
 
       // particle vertex loop
@@ -771,9 +861,9 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
         _vertex.y *= _particle->scaling.y;
         _vertex.z *= _particle->scaling.z;
 
-        _vertex.x -= _particle->pivot.x;
-        _vertex.y -= _particle->pivot.y;
-        _vertex.z -= _particle->pivot.z;
+        _vertex.x -= _scaledPivot.x;
+        _vertex.y -= _scaledPivot.y;
+        _vertex.z -= _scaledPivot.z;
 
         _rotated.x = _vertex.x * _particle->_rotationMatrix[0]
                      + _vertex.y * _particle->_rotationMatrix[3]
@@ -789,14 +879,14 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
         _rotated.y += _pivotBackTranslation.y;
         _rotated.z += _pivotBackTranslation.z;
 
-        _positions32[idx] = _particle->position.x + _cam_axisX.x * _rotated.x
-                            + _cam_axisY.x * _rotated.y
-                            + _cam_axisZ.x * _rotated.z;
+        _positions32[idx]
+          = _particle->_globalPosition.x + _cam_axisX.x * _rotated.x
+            + _cam_axisY.x * _rotated.y + _cam_axisZ.x * _rotated.z;
         _positions32[idx + 1]
-          = _particle->position.y + _cam_axisX.y * _rotated.x
+          = _particle->_globalPosition.y + _cam_axisX.y * _rotated.x
             + _cam_axisY.y * _rotated.y + _cam_axisZ.y * _rotated.z;
         _positions32[idx + 2]
-          = _particle->position.z + _cam_axisX.z * _rotated.x
+          = _particle->_globalPosition.z + _cam_axisX.z * _rotated.x
             + _cam_axisY.z * _rotated.y + _cam_axisZ.z * _rotated.z;
 
         if (_computeBoundingBox) {
@@ -949,11 +1039,11 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
       _maxBbox.z
         = _particle->_modelBoundingInfo->maximum.z * _particle->scaling.z;
       bSphere.center.x
-        = _particle->position.x + (_minBbox.x + _maxBbox.x) * 0.5f;
+        = _particle->_globalPosition.x + (_minBbox.x + _maxBbox.x) * 0.5f;
       bSphere.center.y
-        = _particle->position.y + (_minBbox.y + _maxBbox.y) * 0.5f;
+        = _particle->_globalPosition.y + (_minBbox.y + _maxBbox.y) * 0.5f;
       bSphere.center.z
-        = _particle->position.z + (_minBbox.z + _maxBbox.z) * 0.5f;
+        = _particle->_globalPosition.z + (_minBbox.z + _maxBbox.z) * 0.5f;
       bSphere.radius
         = _bSphereRadiusFactor * 0.5f
           * ::std::sqrt((_maxBbox.x - _minBbox.x) * (_maxBbox.x - _minBbox.x)

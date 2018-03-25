@@ -333,6 +333,13 @@ public:
   void setColor4(GL::IGLUniformLocation* uniform, const Color3& color3,
                  float alpha);
 
+  /**
+   * @brief Sets a Color4 on a uniform variable.
+   * @param uniform defines the uniform location
+   * @param color4 defines the value to be set
+   */
+  void setDirectColor4(GL::IGLUniformLocation* uniform, const Color4& color4);
+
   /** States **/
   void setState(bool culling, float zOffset = 0.f, bool force = false,
                 bool reverseSide = false);

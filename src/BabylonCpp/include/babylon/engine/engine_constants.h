@@ -30,6 +30,10 @@ struct BABYLON_SHARED_EXPORT EngineConstants {
   static constexpr unsigned int TEXTUREFORMAT_LUMINANCE_ALPHA = 2;
   static constexpr unsigned int TEXTUREFORMAT_RGB             = 4;
   static constexpr unsigned int TEXTUREFORMAT_RGBA            = 5;
+  static constexpr unsigned int TEXTUREFORMAT_R32F            = 6;
+  static constexpr unsigned int TEXTUREFORMAT_RG32F           = 7;
+  static constexpr unsigned int TEXTUREFORMAT_RGB32F          = 8;
+  static constexpr unsigned int TEXTUREFORMAT_RGBA32F         = 9;
 
   static constexpr unsigned int TEXTURETYPE_UNSIGNED_INT = 0;
   static constexpr unsigned int TEXTURETYPE_FLOAT        = 1;

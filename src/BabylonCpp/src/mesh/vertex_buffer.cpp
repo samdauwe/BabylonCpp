@@ -28,6 +28,10 @@ constexpr unsigned int VertexBuffer::OptionsKind;
 constexpr unsigned int VertexBuffer::AgeKind;
 constexpr unsigned int VertexBuffer::LifeKind;
 constexpr unsigned int VertexBuffer::VelocityKind;
+constexpr unsigned int VertexBuffer::DirectionKind;
+constexpr unsigned int VertexBuffer::OffsetKind;
+constexpr unsigned int VertexBuffer::SeedKind;
+constexpr unsigned int VertexBuffer::SizeKind;
 
 constexpr const char* VertexBuffer::PositionKindChars;
 constexpr const char* VertexBuffer::NormalKindChars;
@@ -52,6 +56,10 @@ constexpr const char* VertexBuffer::OptionsKindChars;
 constexpr const char* VertexBuffer::AgeKindChars;
 constexpr const char* VertexBuffer::LifeKindChars;
 constexpr const char* VertexBuffer::VelocityKindChars;
+constexpr const char* VertexBuffer::DirectionKindChars;
+constexpr const char* VertexBuffer::OffsetKindChars;
+constexpr const char* VertexBuffer::SeedKindChars;
+constexpr const char* VertexBuffer::SizeKindChars;
 
 VertexBuffer::VertexBuffer(Engine* engine, const Float32Array& data,
                            unsigned int kind, bool updatable,
@@ -139,6 +147,14 @@ string_t VertexBuffer::KindAsString(unsigned int kind)
       return string_t(VertexBuffer::LifeKindChars);
     case VertexBuffer::VelocityKind:
       return string_t(VertexBuffer::VelocityKindChars);
+    case VertexBuffer::DirectionKind:
+      return string_t(VertexBuffer::DirectionKindChars);
+    case VertexBuffer::OffsetKind:
+      return string_t(VertexBuffer::OffsetKindChars);
+    case VertexBuffer::SeedKind:
+      return string_t(VertexBuffer::SeedKindChars);
+    case VertexBuffer::SizeKind:
+      return string_t(VertexBuffer::SizeKindChars);
   }
 }
 

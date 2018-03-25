@@ -1,8 +1,8 @@
-#ifndef BABYLON_PARTICLES_CONE_PARTICLE_EMITTER_H
-#define BABYLON_PARTICLES_CONE_PARTICLE_EMITTER_H
+#ifndef BABYLON_PARTICLES_EMITTER_TYPES_CONE_PARTICLE_EMITTER_H
+#define BABYLON_PARTICLES_EMITTER_TYPES_CONE_PARTICLE_EMITTER_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/particles/iparticle_emitter_Type.h>
+#include <babylon/particles/emittertypes/iparticle_emitter_Type.h>
 
 namespace BABYLON {
 
@@ -16,24 +16,14 @@ class BABYLON_SHARED_EXPORT ConeParticleEmitter : public IParticleEmitterType {
 public:
   /**
    * @brief Creates a new instance of @see ConeParticleEmitter
-   * @param radius the radius of the emission cone
-   * @param angles the cone base angle
+   * @param radius the radius of the emission cone (1 by default)
+   * @param angles the cone base angle (PI by default)
    * @param directionRandomizer defines how much to randomize the particle
    * direction [0-1]
    */
-  ConeParticleEmitter(float radius, float angle,
+  ConeParticleEmitter(float radius = 1.f, float angle = Math::PI,
                       float directionRandomizer = 0.f);
   virtual ~ConeParticleEmitter();
-
-  /**
-   * @brief Gets the radius of the emission cone.
-   */
-  float radius() const;
-
-  /**
-   * @brief Sets the radius of the emission cone.
-   */
-  void setRadius(float value);
 
   /**
    * @brief Called by the particle System when the direction is computed for the
@@ -64,9 +54,55 @@ public:
    */
   unique_ptr_t<IParticleEmitterType> clone() const override;
 
+  /**
+   * @brief Called by the {BABYLON.GPUParticleSystem} to setup the update shader
+   * @param effect defines the update shader
+   */
+  void applyToShader(Effect* effect) override;
+
+  /**
+   * @brief Returns a string to use to update the GPU particles update shader
+   * @returns a string containng the defines string
+   */
+  const char* getEffectDefines() const override;
+
+  /**
+   * @brief Returns the string "ConeEmitter"
+   * @returns a string containing the class name
+   */
+  const char* getClassName() const override;
+
+  /**
+   * @brief Serializes the particle system to a JSON object.
+   * @returns the JSON object
+   */
+  Json::object serialize() const override;
+
+  /**
+   * @brief Parse properties from a JSON object
+   * @param serializationObject defines the JSON object
+   */
+  void parse(const Json::value& serializationObject) override;
+
+private:
+  /**
+   * @brief Gets the radius of the emission cone.
+   */
+  float get_radius() const;
+
+  /**
+   * @brief Sets the radius of the emission cone.
+   */
+  void set_radius(float value);
+
 public:
   /**
    * The radius of the emission cone.
+   */
+  Property<ConeParticleEmitter, float> radius;
+
+  /**
+   * The qngle of the emission cone.
    */
   float angle;
   /**
@@ -82,4 +118,4 @@ private:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_PARTICLES_CONE_PARTICLE_EMITTER_H
+#endif // end of BABYLON_PARTICLES_EMITTER_TYPES_CONE_PARTICLE_EMITTER_H

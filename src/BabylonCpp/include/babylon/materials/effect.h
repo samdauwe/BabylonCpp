@@ -450,6 +450,14 @@ public:
   Effect& setColor4(const string_t& uniformName, const Color3& color3,
                     float alpha);
 
+  /**
+   * @brief Sets a Color4 on a uniform variable.
+   * @param uniformName defines the name of the variable
+   * @param color4 defines the value to be set
+   * @returns this effect.
+   */
+  Effect& setDirectColor4(const string_t& uniformName, const Color4& color4);
+
   // Statics
 
   /**

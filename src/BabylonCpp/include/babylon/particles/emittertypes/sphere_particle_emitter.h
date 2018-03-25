@@ -1,8 +1,8 @@
-#ifndef BABYLON_PARTICLES_SPHERE_PARTICLE_EMITTER_H
-#define BABYLON_PARTICLES_SPHERE_PARTICLE_EMITTER_H
+#ifndef BABYLON_PARTICLES_EMITTER_TYPES_SPHERE_PARTICLE_EMITTER_H
+#define BABYLON_PARTICLES_EMITTER_TYPES_SPHERE_PARTICLE_EMITTER_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/particles/iparticle_emitter_Type.h>
+#include <babylon/particles/emittertypes/iparticle_emitter_Type.h>
 
 namespace BABYLON {
 
@@ -17,11 +17,11 @@ class BABYLON_SHARED_EXPORT SphereParticleEmitter
 public:
   /**
    * @brief Creates a new instance of @see SphereParticleEmitter
-   * @param radius the radius of the emission sphere
+   * @param radius the radius of the emission sphere (1 by default)
    * @param directionRandomizer defines how much to randomize the particle
    * direction [0-1]
    */
-  SphereParticleEmitter(float radius, float directionRandomizer = 0.f);
+  SphereParticleEmitter(float radius = 1.f, float directionRandomizer = 0.f);
   virtual ~SphereParticleEmitter();
 
   /**
@@ -54,6 +54,36 @@ public:
    */
   virtual unique_ptr_t<IParticleEmitterType> clone() const override;
 
+  /**
+   * @brief Called by the {BABYLON.GPUParticleSystem} to setup the update shader
+   * @param effect defines the update shader
+   */
+  void applyToShader(Effect* effect) override;
+
+  /**
+   * @brief Returns a string to use to update the GPU particles update shader
+   * @returns a string containng the defines string
+   */
+  const char* getEffectDefines() const override;
+
+  /**
+   * @brief Returns the string "SphereParticleEmitter"
+   * @returns a string containing the class name
+   */
+  const char* getClassName() const override;
+
+  /**
+   * @brief Serializes the particle system to a JSON object.
+   * @returns the JSON object
+   */
+  Json::object serialize() const override;
+
+  /**
+   * @brief Parse properties from a JSON object
+   * @param serializationObject defines the JSON object
+   */
+  void parse(const Json::value& serializationObject) override;
+
 public:
   /**
    * The radius of the emission sphere.
@@ -68,4 +98,4 @@ public:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_PARTICLES_SPHERE_PARTICLE_EMITTER_H
+#endif // end of BABYLON_PARTICLES_EMITTER_TYPES_SPHERE_PARTICLE_EMITTER_H
