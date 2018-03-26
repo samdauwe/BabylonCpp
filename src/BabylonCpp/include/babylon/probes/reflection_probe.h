@@ -25,13 +25,8 @@ public:
 
   void addToScene(unique_ptr_t<ReflectionProbe>&& newReflectionProbe);
 
-  unsigned int samples() const;
-  void setSamples(unsigned int value);
-  int refreshRate() const;
-  void setRefreshRate(int value);
   Scene* getScene() const;
   RenderTargetTexture* cubeTexture();
-  vector_t<AbstractMesh*>& renderList();
   void attachToMesh(AbstractMesh* mesh);
 
   /**
@@ -50,9 +45,18 @@ protected:
   ReflectionProbe(const string_t& name, const ISize& size, Scene* scene,
                   bool generateMipMaps = true);
 
+private:
+  unsigned int get_samples() const;
+  void set_samples(unsigned int value);
+  int get_refreshRate() const;
+  void set_refreshRate(int value);
+  vector_t<AbstractMesh*>& get_renderList();
+
 public:
-  bool invertYAxis;
   Vector3 position;
+  Property<ReflectionProbe, unsigned int> samples;
+  Property<ReflectionProbe, int> refreshRate;
+  ReadOnlyProperty<ReflectionProbe, vector_t<AbstractMesh*>> renderList;
 
 private:
   Scene* _scene;
@@ -62,6 +66,7 @@ private:
   Vector3 _target;
   Vector3 _add;
   AbstractMesh* _attachedMesh;
+  bool _invertYAxis;
 
 }; // end of class ReflectionProbe
 

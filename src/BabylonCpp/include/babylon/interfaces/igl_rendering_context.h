@@ -657,7 +657,14 @@ public:
   unsigned int RGBA16F;
   // RGBA 32-bit floating-point color-renderable internal sized format.
   unsigned int RGBA32F;
+  unsigned int R32F;
+  unsigned int RG32F;
+  unsigned int RGB32F;
   unsigned int DEPTH24_STENCIL8;
+  // Other
+  unsigned int RED;
+  unsigned int RG;
+  unsigned int UNSIGNED_INT_24_8;
   // Drawing buffer width and height
   int drawingBufferWidth;
   int drawingBufferHeight;

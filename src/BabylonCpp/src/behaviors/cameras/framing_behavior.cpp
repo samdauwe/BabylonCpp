@@ -324,6 +324,7 @@ void FramingBehavior::zoomOnBoundingInfo(
   animatable = Animation::TransitionTo(
     "radius", radius, _attachedCamera, _attachedCamera->getScene(), 60,
     _radiusTransition, _framingTime, [this, &onAnimationEnd]() {
+      stopAllAnimations();
       if (onAnimationEnd) {
         onAnimationEnd();
       }

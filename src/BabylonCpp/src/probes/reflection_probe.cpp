@@ -10,13 +10,18 @@ namespace BABYLON {
 
 ReflectionProbe::ReflectionProbe(const string_t& name, const ISize& size,
                                  Scene* scene, bool generateMipMaps)
-    : invertYAxis{false}
-    , position{Vector3::Zero()}
+    : position{Vector3::Zero()}
+    , samples{this, &ReflectionProbe::get_samples,
+              &ReflectionProbe::set_samples}
+    , refreshRate{this, &ReflectionProbe::get_refreshRate,
+                  &ReflectionProbe::set_refreshRate}
+    , renderList{this, &ReflectionProbe::get_renderList}
     , _scene{scene}
     , _viewMatrix{Matrix::Identity()}
     , _target{Vector3::Zero()}
     , _add{Vector3::Zero()}
     , _attachedMesh{nullptr}
+    , _invertYAxis{false}
 {
   _renderTargetTexture = ::std::make_unique<RenderTargetTexture>(
     name, size, scene, generateMipMaps, true,
@@ -32,10 +37,10 @@ ReflectionProbe::ReflectionProbe(const string_t& name, const ISize& size,
           _add.copyFromFloats(-1.f, 0.f, 0.f);
           break;
         case 2:
-          _add.copyFromFloats(0.f, invertYAxis ? 1.f : -1.f, 0.f);
+          _add.copyFromFloats(0.f, _invertYAxis ? 1.f : -1.f, 0.f);
           break;
         case 3:
-          _add.copyFromFloats(0.f, invertYAxis ? -1.f : 1.f, 0.f);
+          _add.copyFromFloats(0.f, _invertYAxis ? -1.f : 1.f, 0.f);
           break;
         case 4:
           _add.copyFromFloats(0.f, 0.f, 1.f);
@@ -82,22 +87,22 @@ void ReflectionProbe::addToScene(
   _scene->reflectionProbes.emplace_back(::std::move(newReflectionProbe));
 }
 
-unsigned int ReflectionProbe::samples() const
+unsigned int ReflectionProbe::get_samples() const
 {
   return _renderTargetTexture->samples();
 }
 
-void ReflectionProbe::setSamples(unsigned int value)
+void ReflectionProbe::set_samples(unsigned int value)
 {
   _renderTargetTexture->setSamples(value);
 }
 
-int ReflectionProbe::refreshRate() const
+int ReflectionProbe::get_refreshRate() const
 {
   return _renderTargetTexture->refreshRate();
 }
 
-void ReflectionProbe::setRefreshRate(int value)
+void ReflectionProbe::set_refreshRate(int value)
 {
   _renderTargetTexture->setRefreshRate(value);
 }
@@ -112,7 +117,7 @@ RenderTargetTexture* ReflectionProbe::cubeTexture()
   return _renderTargetTexture.get();
 }
 
-vector_t<AbstractMesh*>& ReflectionProbe::renderList()
+vector_t<AbstractMesh*>& ReflectionProbe::get_renderList()
 {
   return _renderTargetTexture->renderList;
 }
