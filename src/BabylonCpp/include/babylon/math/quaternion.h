@@ -93,6 +93,24 @@ public:
   Quaternion scale(float value) const;
 
   /**
+   * @brief Scale the current Quaternion values by a factor to a given
+   * Quaternion.
+   * @param scale defines the scale factor
+   * @param result defines the Quaternion object where to store the result
+   * @returns the unmodified current Quaternion
+   */
+  const Quaternion& scaleToRef(float iscale, Quaternion& result) const;
+
+  /**
+   * @brief Scale the current Quaternion values by a factor and add the result
+   * to a given Quaternion.
+   * @param scale defines the scale factor
+   * @param result defines the Quaternion object where to store the result
+   * @returns the unmodified current Quaternion
+   */
+  const Quaternion& scaleAndAddToRef(float iscale, Quaternion& result) const;
+
+  /**
    * @brief Returns a new Quaternion set as the quaternion mulplication result
    * of the current one with the passed one "q1".
    */
@@ -145,13 +163,17 @@ public:
   /**
    * @brief Returns a new Vector3 set with the Euler angles translated from the
    * current Quaternion.
+   * @param order is a reserved parameter and is ignore for now
+   * @returns the new Vector3
    */
-  Vector3 toEulerAngles() const;
+  Vector3 toEulerAngles(const string_t& order = "YZX") const;
 
   /**
-   * @brief Sets the passed vector3 "result" with the Euler angles translated
-   * from the current Quaternion.
-   * @returns The current Quaternion.
+   * Sets the passed vector3 "result" with the Euler angles translated from the
+   * current Quaternion
+   * @param result defines the vector which will be filled with the Euler angles
+   * @param order is a reserved parameter and is ignore for now
+   * @returns the current Quaternion
    */
   const Quaternion& toEulerAnglesToRef(Vector3& result,
                                        const string_t& order = "YZX") const;

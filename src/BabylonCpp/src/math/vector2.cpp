@@ -223,9 +223,28 @@ Vector2& Vector2::scaleInPlace(float scaleVal)
   return *this;
 }
 
-Vector2 Vector2::scale(float scaleVal) const
+Vector2 Vector2::scale(float iScale) const
 {
-  return Vector2(x * scaleVal, y * scaleVal);
+  Vector2 result{0.f, 0.f};
+  scaleToRef(iScale, result);
+
+  return result;
+}
+
+const Vector2& Vector2::scaleToRef(float iScale, Vector2& result) const
+{
+  result.x = x * iScale;
+  result.y = y * iScale;
+
+  return *this;
+}
+
+const Vector2& Vector2::scaleAndAddToRef(float iScale, Vector2& result) const
+{
+  result.x += x * iScale;
+  result.y += y * iScale;
+
+  return *this;
 }
 
 bool Vector2::equals(const Vector2& otherVector) const

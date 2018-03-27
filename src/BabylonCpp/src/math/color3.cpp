@@ -155,6 +155,14 @@ const Color3& Color3::scaleToRef(float iscale, Color3& result) const
   return *this;
 }
 
+const Color3& Color3::scaleAndAddToRef(float scale, Color3& result) const
+{
+  result.r += r * scale;
+  result.g += g * scale;
+  result.b += b * scale;
+  return *this;
+}
+
 const Color3& Color3::clampToRef(Color3& result, float min, float max) const
 {
   result.r = Scalar::Clamp(r, min, max);

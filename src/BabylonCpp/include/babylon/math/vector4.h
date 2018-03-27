@@ -138,6 +138,15 @@ public:
   const Vector4& scaleToRef(float iscale, Vector4& result) const;
 
   /**
+   * @brief Scale the current Vector4 values by a factor and add the result to a
+   * given Vector4.
+   * @param scale defines the scale factor
+   * @param result defines the Vector4 object where to store the result
+   * @returns the unmodified current Vector4
+   */
+  const Vector4& scaleAndAddToRef(float iscale, Vector4& result) const;
+
+  /**
    * @brief Returns if the current Vector4 coordinates are stricly equal to the
    * passed ones.
    */

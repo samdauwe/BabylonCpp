@@ -209,6 +209,70 @@ public:
                  Vector3& translation) const;
 
   /**
+   * @brief Returns the index-th row of the current matrix as a new Vector4.
+   */
+  Nullable<Vector4> getRow(unsigned int index) const;
+
+  /**
+   * @brief Sets the index-th row of the current matrix with the passed Vector4
+   * values.
+   * @returns The updated Matrix.
+   */
+  Matrix& setRow(unsigned int index, const Vector4& row);
+
+  /**
+   * @brief Compute the transpose of the matrix.
+   * @returns a new Matrix.
+   */
+  Matrix transpose() const;
+
+  /**
+   * @brief Compute the transpose of the matrix.
+   * @returns the current matrix.
+   */
+  Matrix& transposeToRef(Matrix& result);
+
+  /**
+   * @brief Sets the index-th row of the current matrix with the passed 4 x
+   * float values.
+   * @returns The updated Matrix.
+   */
+  Matrix& setRowFromFloats(unsigned int index, float x, float y, float z,
+                           float w);
+
+  /**
+   * @brief Compute a new Matrix set with the current Matrix values multiplied
+   * by scale (float).
+   * @param scale defines the scale factor
+   * @returns a new Matrix
+   */
+  Matrix scale(float iscale);
+
+  /**
+   * @brief Scale the current Matrix values by a factor to a given result Matrix
+   * @param scale defines the scale factor
+   * @param result defines the Matrix to store the result
+   * @returns the current Matrix
+   */
+  const Matrix& scaleToRef(float iscale, Matrix& result) const;
+
+  /**
+   * @brief Scale the current Matrix values by a factor and add the result to a
+   * given Matrix
+   * @param scale defines the scale factor
+   * @param result defines the Matrix to store the result
+   * @returns the current Matrix
+   */
+  const Matrix& scaleAndAddToRef(float iscale, Matrix& result) const;
+
+  /**
+   * @brief Writes to the given matrix a normal matrix, computed from this one
+   * (using values from identity matrix for fourth row and column).
+   * @param ref matrix to store the result
+   */
+  void toNormalMatrix(Matrix& ref);
+
+  /**
    * @brief Returns a new Matrix as the extracted rotation matrix from the
    * current one.
    */
@@ -265,38 +329,6 @@ public:
                   float initialM32, float initialM33, float initialM34,
                   float initialM41, float initialM42, float initialM43,
                   float initialM44, Matrix& result);
-
-  /**
-   * @brief Returns the index-th row of the current matrix as a new Vector4.
-   */
-  Nullable<Vector4> getRow(unsigned int index) const;
-
-  /**
-   * @brief Sets the index-th row of the current matrix with the passed Vector4
-   * values.
-   * @returns The updated Matrix.
-   */
-  Matrix& setRow(unsigned int index, const Vector4& row);
-
-  /**
-   * @brief Compute the transpose of the matrix.
-   * @returns a new Matrix.
-   */
-  Matrix transpose() const;
-
-  /**
-   * @brief Compute the transpose of the matrix.
-   * @returns the current matrix.
-   */
-  Matrix& transposeToRef(Matrix& result);
-
-  /**
-   * @brief Sets the index-th row of the current matrix with the passed 4 x
-   * float values.
-   * @returns The updated Matrix.
-   */
-  Matrix& setRowFromFloats(unsigned int index, float x, float y, float z,
-                           float w);
 
   /**
    * @brief Static identity matrix to be used as readonly matrix
@@ -432,11 +464,27 @@ public:
 
   /**
    * @brief Returns a new Matrix whose values are the interpolated values for
-   * "gradien" (float) between the ones of the matrices "startValue" and
+   * "gradient" (float) between the ones of the matrices "startValue" and
    * "endValue".
+   * @param startValue defines the start value
+   * @param endValue defines the end value
+   * @param gradient defines the gradient factor
+   * @returns the new matrix
    */
   static Matrix Lerp(const Matrix& startValue, const Matrix& endValue,
                      float gradient);
+
+  /**
+   * @brief Set the passed matrix "result" as the interpolated values for
+   * "gradient" (float) between the ones of the matrices "startValue" and
+   * "endValue".
+   * @param startValue defines the start value
+   * @param endValue defines the end value
+   * @param gradient defines the gradient factor
+   * @param result defines the Matrix object where to store data
+   */
+  static void LerpToRef(const Matrix& startValue, const Matrix& endValue,
+                        float gradient, Matrix& result);
 
   /**
    * @brief Returns a new Matrix whose values are computed by :

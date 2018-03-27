@@ -111,7 +111,7 @@ public:
    * in "result".
    * @param scale defines the scaling factor to apply
    * @param result defines the Color4 object where to store the result
-   * @returns the current Color4.
+   * @returns the current unmodified Color4
    */
   const Color4& scaleToRef(int iscale, Color4& result) const;
 
@@ -120,9 +120,18 @@ public:
    * in "result".
    * @param scale defines the scaling factor to apply
    * @param result defines the Color4 object where to store the result
-   * @returns the current Color4.
+   * @returns the current unmodified Color4
    */
   const Color4& scaleToRef(float iscale, Color4& result) const;
+
+  /**
+   * @brief Scale the current Color4 values by a factor and add the result to a
+   * given Color4
+   * @param scale defines the scale factor
+   * @param result defines the Color4 object where to store the result
+   * @returns the unmodified current Color4
+   */
+  const Color4& scaleAndAddToRef(float scale, Color4& result) const;
 
   /**
    * @brief Clamps the rgb values by the min and max values and stores the

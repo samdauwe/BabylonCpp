@@ -184,6 +184,23 @@ public:
   Vector2 scale(float scaleVal) const;
 
   /**
+   * @brief Scale the current Vector2 values by a factor to a given Vector2.
+   * @param scale defines the scale factor
+   * @param result defines the Vector2 object where to store the result
+   * @returns the unmodified current Vector2
+   */
+  const Vector2& scaleToRef(float iScale, Vector2& result) const;
+
+  /**
+   * @brief Scale the current Vector2 values by a factor and add the result to a
+   * given Vector2.
+   * @param scale defines the scale factor
+   * @param result defines the Vector2 object where to store the result
+   * @returns the unmodified current Vector2
+   */
+  const Vector2& scaleAndAddToRef(float iScale, Vector2& result) const;
+
+  /**
    * @brief Returns if the passed vector coordinates strictly equal the current
    * Vector2 ones.
    */

@@ -224,6 +224,24 @@ const Vector3& Vector3::scaleToRef(float iscale, Vector3& result) const
   return *this;
 }
 
+const Vector3& Vector3::scaleAndAddToRef(int iscale, Vector3& result) const
+{
+  result.x += x * static_cast<float>(iscale);
+  result.y += y * static_cast<float>(iscale);
+  result.z += z * static_cast<float>(iscale);
+
+  return *this;
+}
+
+const Vector3& Vector3::scaleAndAddToRef(float iscale, Vector3& result) const
+{
+  result.x += x * iscale;
+  result.y += y * iscale;
+  result.z += z * iscale;
+
+  return *this;
+}
+
 bool Vector3::equals(const Vector3& otherVector) const
 {
   return stl_util::almost_equal(x, otherVector.x)

@@ -517,6 +517,103 @@ bool Matrix::decompose(Vector3& scale, Quaternion& rotation,
   return true;
 }
 
+Nullable<Vector4> Matrix::getRow(unsigned int index) const
+{
+  if (index > 3) {
+    return nullptr;
+  }
+
+  const unsigned int i = index * 4;
+  return Vector4(m[i + 0], m[i + 1], m[i + 2], m[i + 3]);
+}
+
+Matrix& Matrix::setRow(unsigned int index, const Vector4& row)
+{
+  if (index > 3) {
+    return *this;
+  }
+
+  const auto i = index * 4;
+  m[i + 0]     = row.x;
+  m[i + 1]     = row.y;
+  m[i + 2]     = row.z;
+  m[i + 3]     = row.w;
+
+  _markAsUpdated();
+
+  return *this;
+}
+
+Matrix Matrix::transpose() const
+{
+  return Matrix::Transpose(*this);
+}
+
+Matrix& Matrix::transposeToRef(Matrix& result)
+{
+  Matrix::TransposeToRef(*this, result);
+
+  return *this;
+}
+
+Matrix& Matrix::setRowFromFloats(unsigned int index, float x, float y, float z,
+                                 float w)
+{
+  if (index > 3) {
+    return *this;
+  }
+
+  const auto i = index * 4;
+  m[i + 0]     = x;
+  m[i + 1]     = y;
+  m[i + 2]     = z;
+  m[i + 3]     = w;
+
+  _markAsUpdated();
+
+  return *this;
+}
+
+Matrix Matrix::scale(float iscale)
+{
+  Matrix result;
+  scaleToRef(iscale, result);
+
+  return result;
+}
+
+const Matrix& Matrix::scaleToRef(float iscale, Matrix& result) const
+{
+  for (unsigned int index = 0; index < 16; ++index) {
+    result.m[index] = m[index] * iscale;
+  }
+  result._markAsUpdated();
+
+  return *this;
+}
+
+const Matrix& Matrix::scaleAndAddToRef(float iscale, Matrix& result) const
+{
+  for (unsigned int index = 0; index < 16; ++index) {
+    result.m[index] += m[index] * iscale;
+  }
+  result._markAsUpdated();
+
+  return *this;
+}
+
+void Matrix::toNormalMatrix(Matrix& ref)
+{
+  invertToRef(ref);
+  ref.transpose();
+  const auto& m = ref.m;
+  Matrix::FromValuesToRef(m[0], m[1], m[2], 0.f,  //
+                          m[4], m[5], m[6], 0.f,  //
+                          m[8], m[9], m[10], 0.f, //
+                          0.f, 0.f, 0.f, 1.f, ref //
+  );
+}
+
 Matrix Matrix::getRotationMatrix() const
 {
   Matrix result = Matrix::Identity();
@@ -651,63 +748,6 @@ void Matrix::FromValuesToRef(float initialM11, float initialM12,
   result.m[15] = initialM44;
 
   result._markAsUpdated();
-}
-
-Nullable<Vector4> Matrix::getRow(unsigned int index) const
-{
-  if (index > 3) {
-    return nullptr;
-  }
-
-  const unsigned int i = index * 4;
-  return Vector4(m[i + 0], m[i + 1], m[i + 2], m[i + 3]);
-}
-
-Matrix& Matrix::setRow(unsigned int index, const Vector4& row)
-{
-  if (index > 3) {
-    return *this;
-  }
-
-  const auto i = index * 4;
-  m[i + 0]     = row.x;
-  m[i + 1]     = row.y;
-  m[i + 2]     = row.z;
-  m[i + 3]     = row.w;
-
-  _markAsUpdated();
-
-  return *this;
-}
-
-Matrix Matrix::transpose() const
-{
-  return Matrix::Transpose(*this);
-}
-
-Matrix& Matrix::transposeToRef(Matrix& result)
-{
-  Matrix::TransposeToRef(*this, result);
-
-  return *this;
-}
-
-Matrix& Matrix::setRowFromFloats(unsigned int index, float x, float y, float z,
-                                 float w)
-{
-  if (index > 3) {
-    return *this;
-  }
-
-  const auto i = index * 4;
-  m[i + 0]     = x;
-  m[i + 1]     = y;
-  m[i + 2]     = z;
-  m[i + 3]     = w;
-
-  _markAsUpdated();
-
-  return *this;
 }
 
 Matrix Matrix::IdentityReadOnly()
@@ -1013,15 +1053,20 @@ Matrix Matrix::Lerp(const Matrix& startValue, const Matrix& endValue,
                     float gradient)
 {
   Matrix result = Matrix::Zero();
+  Matrix::LerpToRef(startValue, endValue, gradient, result);
 
+  return result;
+}
+
+void Matrix::LerpToRef(const Matrix& startValue, const Matrix& endValue,
+                       float gradient, Matrix& result)
+{
   for (unsigned int index = 0; index < 16; ++index) {
     result.m[index]
       = startValue.m[index] * (1.f - gradient) + endValue.m[index] * gradient;
   }
 
   result._markAsUpdated();
-
-  return result;
 }
 
 Matrix Matrix::DecomposeLerp(Matrix& startValue, Matrix& endValue,

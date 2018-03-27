@@ -134,6 +134,15 @@ public:
   const Color3& scaleToRef(float iscale, Color3& result) const;
 
   /**
+   * @brief Scale the current Color3 values by a factor and add the result to a
+   * given Color3.
+   * @param scale defines the scale factor
+   * @param result defines color to store the result into
+   * @returns the unmodified current Color3
+   */
+  const Color3& scaleAndAddToRef(float scale, Color3& result) const;
+
+  /**
    * @brief Clamps the rgb values by the min and max values and stores the
    * result into "result".
    * @param result defines color to store the result into

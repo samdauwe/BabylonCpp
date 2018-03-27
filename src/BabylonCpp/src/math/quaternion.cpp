@@ -142,6 +142,27 @@ Quaternion Quaternion::scale(float value) const
   return Quaternion(x * value, y * value, z * value, w * value);
 }
 
+const Quaternion& Quaternion::scaleToRef(float iscale, Quaternion& result) const
+{
+  result.x = x * iscale;
+  result.y = y * iscale;
+  result.z = z * iscale;
+  result.w = w * iscale;
+
+  return *this;
+}
+
+const Quaternion& Quaternion::scaleAndAddToRef(float iscale,
+                                               Quaternion& result) const
+{
+  result.x += x * iscale;
+  result.y += y * iscale;
+  result.z += z * iscale;
+  result.w += w * iscale;
+
+  return *this;
+}
+
 Quaternion Quaternion::multiply(const Quaternion& q1) const
 {
   Quaternion result(0.f, 0.f, 0.f, 1.f);
@@ -205,11 +226,11 @@ Quaternion& Quaternion::normalize()
   return *this;
 }
 
-Vector3 Quaternion::toEulerAngles() const
+Vector3 Quaternion::toEulerAngles(const string_t& order) const
 {
   Vector3 result = Vector3::Zero();
 
-  toEulerAnglesToRef(result);
+  toEulerAnglesToRef(result, order);
 
   return result;
 }

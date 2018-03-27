@@ -201,6 +201,16 @@ const Vector4& Vector4::scaleToRef(float iscale, Vector4& result) const
   return *this;
 }
 
+const Vector4& Vector4::scaleAndAddToRef(float iscale, Vector4& result) const
+{
+  result.x += x * iscale;
+  result.y += y * iscale;
+  result.z += z * iscale;
+  result.w += w * iscale;
+
+  return *this;
+}
+
 bool Vector4::equals(const Vector4& otherVector) const
 {
   return stl_util::almost_equal(x, otherVector.x)

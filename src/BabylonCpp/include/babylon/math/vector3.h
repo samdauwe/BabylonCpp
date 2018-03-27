@@ -189,6 +189,24 @@ public:
   const Vector3& scaleToRef(float iscale, Vector3& result) const;
 
   /**
+   * @brief Scale the current Vector3 values by a factor and add the result to a
+   * given Vector3
+   * @param scale defines the scale factor
+   * @param result defines the Vector3 object where to store the result
+   * @returns the unmodified current Vector3
+   */
+  const Vector3& scaleAndAddToRef(int iscale, Vector3& result) const;
+
+  /**
+   * @brief Scale the current Vector3 values by a factor and add the result to a
+   * given Vector3
+   * @param scale defines the scale factor
+   * @param result defines the Vector3 object where to store the result
+   * @returns the unmodified current Vector3
+   */
+  const Vector3& scaleAndAddToRef(float iscale, Vector3& result) const;
+
+  /**
    * @brief Returns true if the current Vector3 and the passed vector
    * coordinates are strictly equal.
    * @param otherVector defines the second operand
