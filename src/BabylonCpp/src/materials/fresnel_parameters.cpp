@@ -7,7 +7,9 @@
 namespace BABYLON {
 
 FresnelParameters::FresnelParameters()
-    : leftColor{Color3::White()}
+    : isEnabled{this, &FresnelParameters::get_isEnabled,
+                &FresnelParameters::set_isEnabled}
+    , leftColor{Color3::White()}
     , rightColor{Color3::Black()}
     , bias{0.f}
     , power{1.f}
@@ -16,7 +18,9 @@ FresnelParameters::FresnelParameters()
 }
 
 FresnelParameters::FresnelParameters(const FresnelParameters& other)
-    : leftColor{other.leftColor}
+    : isEnabled{this, &FresnelParameters::get_isEnabled,
+                &FresnelParameters::set_isEnabled}
+    , leftColor{other.leftColor}
     , rightColor{other.rightColor}
     , bias{other.bias}
     , power{other.power}
@@ -25,7 +29,9 @@ FresnelParameters::FresnelParameters(const FresnelParameters& other)
 }
 
 FresnelParameters::FresnelParameters(FresnelParameters&& other)
-    : leftColor{::std::move(other.leftColor)}
+    : isEnabled{this, &FresnelParameters::get_isEnabled,
+                &FresnelParameters::set_isEnabled}
+    , leftColor{::std::move(other.leftColor)}
     , rightColor{::std::move(other.rightColor)}
     , bias{::std::move(other.bias)}
     , power{::std::move(other.power)}
@@ -63,12 +69,12 @@ FresnelParameters::~FresnelParameters()
 {
 }
 
-bool FresnelParameters::isEnabled() const
+bool FresnelParameters::get_isEnabled() const
 {
   return _isEnabled;
 }
 
-void FresnelParameters::setIsEnabled(bool value)
+void FresnelParameters::set_isEnabled(bool value)
 {
   if (_isEnabled == value) {
     return;
@@ -94,8 +100,8 @@ FresnelParameters::Parse(const Json::value& parsedFresnelParameters)
 {
   auto fresnelParameters = ::std::make_unique<FresnelParameters>();
 
-  fresnelParameters->setIsEnabled(
-    Json::GetBool(parsedFresnelParameters, "isEnabled", true));
+  fresnelParameters->isEnabled
+    = Json::GetBool(parsedFresnelParameters, "isEnabled", true);
   fresnelParameters->leftColor = Color3::FromArray(
     Json::ToArray<float>(parsedFresnelParameters, "leftColor"));
   fresnelParameters->rightColor = Color3::FromArray(

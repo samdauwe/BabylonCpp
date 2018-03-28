@@ -59,6 +59,7 @@ BackgroundMaterial::BackgroundMaterial(const string_t& iName, Scene* scene)
     , _imageProcessingConfiguration{nullptr}
     , _fovMultiplier{1.f}
     , _maxSimultaneousLights{4}
+    , switchToBGR{false}
     , _imageProcessingObserver{nullptr}
     , _reflectionControls{Vector4::Zero()}
 {
@@ -321,6 +322,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           = reflectionTexture->lodLevelInAlpha;
         defines.defines[BMD::EQUIRECTANGULAR_RELFECTION_FOV]
           = useEquirectangularFOV;
+        defines.defines[BMD::REFLECTIONBGR] = switchToBGR;
 
         if (reflectionTexture->coordinatesMode
             == TextureConstants::INVCUBIC_MODE) {

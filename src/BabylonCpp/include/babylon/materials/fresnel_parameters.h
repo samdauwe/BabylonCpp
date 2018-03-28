@@ -16,16 +16,18 @@ public:
   FresnelParameters& operator=(FresnelParameters&& other);
   ~FresnelParameters();
 
-  bool isEnabled() const;
-  void setIsEnabled(bool value);
-
   unique_ptr_t<FresnelParameters> clone() const;
   Json::object serialize() const;
 
   static unique_ptr_t<FresnelParameters>
   Parse(const Json::value& parsedFresnelParameters);
 
+private:
+  bool get_isEnabled() const;
+  void set_isEnabled(bool value);
+
 public:
+  Property<FresnelParameters, bool> isEnabled;
   Color3 leftColor;
   Color3 rightColor;
   float bias;

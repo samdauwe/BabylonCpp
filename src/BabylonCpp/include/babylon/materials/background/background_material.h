@@ -474,6 +474,13 @@ private:
   unsigned int _maxSimultaneousLights;
 
   /**
+   * Due to a bug in iOS10, video tags (which are using the background material)
+   * are in BGR and not RGB. Setting this flag to true (not done automatically!)
+   * will convert it back to RGB.
+   */
+  bool switchToBGR;
+
+  /**
    * Keep track of the image processing observer to allow dispose and replace.
    */
   Observer<ImageProcessingConfiguration>::Ptr _imageProcessingObserver;
