@@ -42,7 +42,7 @@ WindowsMotionController::WindowsMotionController(
         "TOUCHPAD_TOUCH_X", //
         "TOUCHPAD_TOUCH_Y"  //
     }                       //
-    ,_mappingPointingPoseMeshName{ "POINTING_POSE"}
+    ,_mappingPointingPoseMeshName{ PoseEnabledController::POINTING_POSE}
 
 {
   controllerType = PoseEnabledControllerType::WINDOWS;
@@ -97,7 +97,7 @@ void WindowsMotionController::update()
   }
 }
 
-void WindowsMotionController::handleButtonChange(
+void WindowsMotionController::_handleButtonChange(
   unsigned int buttonIdx, const ExtendedGamepadButton& state,
   const GamepadButtonChanges& /*changes*/)
 {

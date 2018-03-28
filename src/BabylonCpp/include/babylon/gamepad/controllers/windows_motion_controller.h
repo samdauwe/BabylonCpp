@@ -73,9 +73,9 @@ protected:
    * @param state New state of the button
    * @param changes Which properties on the state changed since last frame
    */
-  void handleButtonChange(unsigned int buttonIdx,
-                          const ExtendedGamepadButton& state,
-                          const GamepadButtonChanges& changes) override;
+  void _handleButtonChange(unsigned int buttonIdx,
+                           const ExtendedGamepadButton& state,
+                           const GamepadButtonChanges& changes) override;
 
   void lerpButtonTransform(const string_t& buttonName, float buttonValue);
   void lerpAxisTransform(unsigned int axis, float axisValue);
@@ -99,7 +99,6 @@ private:
   LoadedMeshInfo createMeshInfo(AbstractMesh* rootNode);
 
 public:
-  Observable<ExtendedGamepadButton> onTrackpadChangedObservable;
   Observable<StickValues> onTrackpadValuesChangedObservable;
   StickValues trackpad;
 

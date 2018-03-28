@@ -36,7 +36,7 @@ void GearVRController::initControllerMesh(
     });
 }
 
-void GearVRController::handleButtonChange(
+void GearVRController::_handleButtonChange(
   unsigned int buttonIdx, const ExtendedGamepadButton& state,
   const GamepadButtonChanges& /*changes*/)
 {

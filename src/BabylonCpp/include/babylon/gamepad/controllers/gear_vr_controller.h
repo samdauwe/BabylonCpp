@@ -25,9 +25,9 @@ public:
     const ::std::function<void(AbstractMesh* mesh)>& meshLoaded) override;
 
 protected:
-  void handleButtonChange(unsigned int buttonIdx,
-                          const ExtendedGamepadButton& state,
-                          const GamepadButtonChanges& changes) override;
+  void _handleButtonChange(unsigned int buttonIdx,
+                           const ExtendedGamepadButton& state,
+                           const GamepadButtonChanges& changes) override;
 
 private:
   const array_t<string_t, 2> _buttonIndexToObservableNameMap;

@@ -15,19 +15,16 @@ private:
 
 public:
   GenericController(const shared_ptr_t<IBrowserGamepad>& vrGamepad);
-  ~GenericController();
+  ~GenericController() override;
 
   void initControllerMesh(
     Scene* scene,
     const ::std::function<void(AbstractMesh* mesh)>& meshLoaded) override;
 
 protected:
-  void handleButtonChange(unsigned int buttonIdx,
-                          const ExtendedGamepadButton& state,
-                          const GamepadButtonChanges& changes) override;
-
-private:
-  AbstractMesh* _defaultModel;
+  void _handleButtonChange(unsigned int buttonIdx,
+                           const ExtendedGamepadButton& state,
+                           const GamepadButtonChanges& changes) override;
 
 }; // end of class GenericController
 

@@ -29,9 +29,9 @@ public:
     = 0;
 
 protected:
-  virtual void handleButtonChange(unsigned int buttonIdx,
-                                  const ExtendedGamepadButton& state,
-                                  const GamepadButtonChanges& changes)
+  virtual void _handleButtonChange(unsigned int buttonIdx,
+                                   const ExtendedGamepadButton& state,
+                                   const GamepadButtonChanges& changes)
     = 0;
 
 private:

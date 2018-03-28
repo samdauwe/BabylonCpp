@@ -17,6 +17,10 @@ public:
     OCULUS,
     WINDOWS,
     GEAR_VR,
+    /**
+     * Google Daydream
+     */
+    DAYDREAM,
     GENERIC
   }; // end of enum class PoseEnabledControllerType
 
@@ -30,12 +34,21 @@ public:
   void attachToPoseControlledCamera(TargetCamera* camera);
   virtual void dispose() override;
   AbstractMesh* mesh();
-  Ray getForwardRay(float length);
+  Ray getForwardRay(float length = 100.f);
 
 public:
   PoseEnabledControllerType controllerType;
   AbstractMesh* _mesh; // a node that will be attached to this Gamepad
   Matrix _deviceToWorld;
+
+  /**
+   * Node to be used when casting a ray from the controller
+   */
+  AbstractMesh* _pointingPoseNode;
+  /**
+   * Name of the child mesh that can be used to cast a ray from the controller
+   */
+  static constexpr const char* POINTING_POSE = "POINTING_POSE";
 
 private:
   // Represents device position and rotation in room space. Should only be used

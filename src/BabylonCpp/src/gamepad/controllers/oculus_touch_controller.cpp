@@ -99,7 +99,7 @@ OculusTouchController::onYButtonStateChangedObservable()
   }
 }
 
-void OculusTouchController::handleButtonChange(
+void OculusTouchController::_handleButtonChange(
   unsigned int buttonIdx, const ExtendedGamepadButton& state,
   const GamepadButtonChanges& /*changes*/)
 {

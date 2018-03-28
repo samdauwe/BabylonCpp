@@ -73,7 +73,7 @@ void WebVRController::_setButtonValue(
       _onButtonStateChange(index, buttonIndex, *newState);
     }
 
-    handleButtonChange(buttonIndex, *newState, _changes);
+    _handleButtonChange(buttonIndex, *newState, _changes);
   }
   _buttons[buttonIndex].setPressed((*newState).pressed());
   _buttons[buttonIndex].setTouched((*newState).touched());

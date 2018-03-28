@@ -35,6 +35,7 @@ class Animatable;
 class Animation;
 class AnimationEvent;
 class AnimationGroup;
+struct AnimationPropertiesOverride;
 class AnimationRange;
 class AnimationValue;
 struct IAnimatable;
@@ -177,6 +178,7 @@ class GenericPad;
 struct StickValues;
 class Xbox360Pad;
 // - Controllers
+class DaydreamController;
 class ExtendedGamepadButton;
 class GearVRController;
 class GenericController;

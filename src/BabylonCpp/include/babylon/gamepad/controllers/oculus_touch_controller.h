@@ -38,9 +38,9 @@ protected:
    * 4) B / Y
    * 5) thumb rest
    */
-  void handleButtonChange(unsigned int buttonIdx,
-                          const ExtendedGamepadButton& state,
-                          const GamepadButtonChanges& changes) override;
+  void _handleButtonChange(unsigned int buttonIdx,
+                           const ExtendedGamepadButton& state,
+                           const GamepadButtonChanges& changes) override;
 
 public:
   Observable<ExtendedGamepadButton> onSecondaryTriggerStateChangedObservable;

@@ -12,6 +12,7 @@ PoseEnabledController::PoseEnabledController(
     : Gamepad(browserGamepad->id, browserGamepad->index, browserGamepad)
     , _mesh{nullptr}
     , _deviceToWorld{Matrix::Identity()}
+    , _pointingPoseNode{nullptr}
     , _workingMatrix{Matrix::Identity()}
 {
   type              = Gamepad::POSE_ENABLED;
@@ -126,13 +127,14 @@ AbstractMesh* PoseEnabledController::mesh()
 Ray PoseEnabledController::getForwardRay(float length)
 {
   if (!mesh()) {
-    return Ray(Vector3::Zero(), Vector3(0.f, 0.f, 1.f), length);
+    return Ray(Vector3::Zero(), Vector3{0.f, 0.f, 1.f}, length);
   }
 
-  auto m      = mesh()->getWorldMatrix();
+  auto m = _pointingPoseNode ? _pointingPoseNode->getWorldMatrix() :
+                               mesh()->getWorldMatrix();
   auto origin = m->getTranslation();
 
-  Vector3 forward(0.f, 0.f, -1.f);
+  Vector3 forward{0.f, 0.f, -1.f};
   auto forwardWorld = Vector3::TransformNormal(forward, *m);
 
   auto direction = Vector3::Normalize(forwardWorld);

@@ -1,6 +1,7 @@
 #include <babylon/gamepad/controllers/pose_enabled_controller_helper.h>
 
 #include <babylon/core/string.h>
+#include <babylon/gamepad/controllers/daydream_controller.h>
 #include <babylon/gamepad/controllers/gear_vr_controller.h>
 #include <babylon/gamepad/controllers/generic_controller.h>
 #include <babylon/gamepad/controllers/oculus_touch_controller.h>
@@ -30,6 +31,11 @@ WebVRController* PoseEnabledControllerHelper::InitiateController(
   else if (String::contains(vrGamepad->id,
                             GearVRController::GAMEPAD_ID_PREFIX)) {
     return new GearVRController(vrGamepad);
+  }
+  // Google Daydream
+  else if (String::contains(vrGamepad->id,
+                            DaydreamController::GAMEPAD_ID_PREFIX)) {
+    return new DaydreamController(vrGamepad);
   }
   // Generic
   else {

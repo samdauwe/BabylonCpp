@@ -7,8 +7,9 @@
 namespace BABYLON {
 
 ViveController::ViveController(const shared_ptr_t<IBrowserGamepad>& vrGamepad)
-    : WebVRController{vrGamepad}, _defaultModel{nullptr}
+    : WebVRController{vrGamepad}
 {
+  _defaultModel     = nullptr;
   controllerType    = PoseEnabledControllerType::VIVE;
   _invertLeftStickY = true;
 }
@@ -62,9 +63,9 @@ ViveController::onMenuButtonStateChangedObservable()
   return onSecondaryButtonStateChangedObservable;
 }
 
-void ViveController::handleButtonChange(unsigned int buttonIdx,
-                                        const ExtendedGamepadButton& state,
-                                        const GamepadButtonChanges& /*changes*/)
+void ViveController::_handleButtonChange(
+  unsigned int buttonIdx, const ExtendedGamepadButton& state,
+  const GamepadButtonChanges& /*changes*/)
 {
   auto notifyObject         = state; //{ state: state, changes: changes };
   auto defaultModelChildren = dynamic_cast<Node*>(_defaultModel)->getChildren();

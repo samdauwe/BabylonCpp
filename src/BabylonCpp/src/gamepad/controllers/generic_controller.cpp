@@ -8,8 +8,9 @@ namespace BABYLON {
 
 GenericController::GenericController(
   const shared_ptr_t<IBrowserGamepad>& vrGamepad)
-    : WebVRController{vrGamepad}, _defaultModel{nullptr}
+    : WebVRController{vrGamepad}
 {
+  _defaultModel = nullptr;
 }
 
 GenericController::~GenericController()
@@ -21,9 +22,10 @@ void GenericController::initControllerMesh(
 {
   SceneLoader::ImportMesh(
     {}, GenericController::MODEL_BASE_URL, GenericController::MODEL_FILENAME,
-    scene, [this, &meshLoaded](vector_t<AbstractMesh*>& newMeshes,
-                               vector_t<ParticleSystem*>& /*particleSystems*/,
-                               vector_t<Skeleton*>& /*skeletons*/) {
+    scene,
+    [this, &meshLoaded](vector_t<AbstractMesh*>& newMeshes,
+                        vector_t<ParticleSystem*>& /*particleSystems*/,
+                        vector_t<Skeleton*>& /*skeletons*/) {
       _defaultModel = newMeshes[1];
       attachToMesh(_defaultModel);
       if (meshLoaded) {
@@ -32,9 +34,9 @@ void GenericController::initControllerMesh(
     });
 }
 
-void GenericController::handleButtonChange(unsigned int buttonIdx,
-                                           const ExtendedGamepadButton& state,
-                                           const GamepadButtonChanges& changes)
+void GenericController::_handleButtonChange(unsigned int buttonIdx,
+                                            const ExtendedGamepadButton& state,
+                                            const GamepadButtonChanges& changes)
 {
   BABYLON_LOGF_INFO("GenericController", "Button id: %d", buttonIdx);
   BABYLON_LOGF_INFO("GenericController", "State: %s", state.toString().c_str());
