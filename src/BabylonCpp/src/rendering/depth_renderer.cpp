@@ -19,8 +19,8 @@
 
 namespace BABYLON {
 
-DepthRenderer::DepthRenderer(Scene* scene, unsigned int type)
-    : _scene{scene}, _depthMap{nullptr}, _effect{nullptr}
+DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, Camera* camera)
+    : _scene{scene}, _depthMap{nullptr}, _effect{nullptr}, _camera{camera}
 {
   auto engine = scene->getEngine();
 
@@ -33,6 +33,11 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type)
   _depthMap->setRefreshRate(1);
   _depthMap->renderParticles = false;
   _depthMap->renderList.clear();
+
+  // Camera to get depth map from to support multiple concurrent cameras
+  _depthMap->activeCamera           = _camera;
+  _depthMap->ignoreCameraViewport   = true;
+  _depthMap->useCameraPostProcesses = false;
 
   // set default depth value to 1.0 (far away)
   _depthMap->onClearObservable.add([](Engine* _engine, EventState&) {
@@ -66,15 +71,15 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type)
         && (batch->visibleInstances.find(subMesh->_id)
             != batch->visibleInstances.end());
 
-    if (isReady(subMesh, hardwareInstancedRendering) && scene->activeCamera) {
+    auto camera = (!_camera) ? _camera : scene->activeCamera;
+    if (isReady(subMesh, hardwareInstancedRendering) && camera) {
       engine->enableEffect(_effect);
       mesh->_bind(subMesh, _effect, Material::TriangleFillMode());
 
       _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
 
-      _effect->setFloat2("depthValues", _scene->activeCamera->minZ,
-                         _scene->activeCamera->minZ
-                           + _scene->activeCamera->maxZ);
+      _effect->setFloat2("depthValues", camera->minZ,
+                         camera->minZ + camera->maxZ);
 
       // Alpha test
       if (material && material->needAlphaTesting()) {
@@ -147,7 +152,8 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
   auto mesh = subMesh->getMesh();
 
   // Alpha test
-  if (material && material->needAlphaTesting()) {
+  if (material && material->needAlphaTesting()
+      && material->getAlphaTestTexture()) {
     defines.emplace_back("#define ALPHATEST");
     if (mesh->isVerticesDataPresent(VertexBuffer::UVKind)) {
       attribs.emplace_back(VertexBuffer::UVKindChars);

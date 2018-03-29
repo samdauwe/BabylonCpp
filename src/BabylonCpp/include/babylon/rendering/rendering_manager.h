@@ -49,6 +49,13 @@ public:
     bool renderSprites);
   void reset();
   void dispose();
+
+  /**
+   * @brief Clear the info related to rendering groups preventing retention
+   * points during dispose.
+   */
+  void freeRenderingGroups();
+
   void dispatchSprites(SpriteManager* spriteManager);
   void dispatchParticles(IParticleSystem* particleSystem);
 

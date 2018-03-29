@@ -146,6 +146,12 @@ void RenderingManager::reset()
 
 void RenderingManager::dispose()
 {
+  freeRenderingGroups();
+  _renderingGroups.clear();
+}
+
+void RenderingManager::freeRenderingGroups()
+{
   for (unsigned index = RenderingManager::MIN_RENDERINGGROUPS;
        index < RenderingManager::MAX_RENDERINGGROUPS; ++index) {
     if (index < _renderingGroups.size()) {
@@ -155,7 +161,6 @@ void RenderingManager::dispose()
       }
     }
   }
-  _renderingGroups.clear();
 }
 
 void RenderingManager::_prepareRenderingGroup(unsigned int renderingGroupId)
