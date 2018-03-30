@@ -25,6 +25,8 @@
 
 namespace BABYLON {
 
+static ImFont* _font = nullptr;
+
 Inspector::Inspector(GLFWwindow* glfwWindow, Scene* scene)
     : _glfwWindow{glfwWindow}
     , _scene{scene}
@@ -54,11 +56,17 @@ void Inspector::intialize()
 {
   // Setup ImGui binding
   ImGui::CreateContext();
-  ImGuiIO& io = ImGui::GetIO();
-  (void)io;
   ImGui_ImplGlfwGL2_Init(_glfwWindow, true);
   // ImGui docking (Auto-load the imgui.ini settings)
   ImGui::InitDock();
+  // Loads fonts
+  ImGuiIO& io = ImGui::GetIO();
+  io.Fonts->AddFontDefault();
+  static ImWchar ranges[] = {0xf000, 0xf3ff, 0};
+  ImFontConfig config;
+  config.MergeMode = true;
+  _font            = io.Fonts->AddFontFromFileTTF(
+    "..//assets/fonts/fontawesome-webfont.ttf", 16.0f, &config, ranges);
   // Setup style
   ImGui::StyleColorsDark();
   // Actions
@@ -69,6 +77,8 @@ void Inspector::render()
 {
   // New ImGUI frame
   ImGui_ImplGlfwGL2_NewFrame();
+  // Push Font
+  ImGui::PushFont(_font);
   // Render main menu bar
   if (ImGui::BeginMainMenuBar()) {
     _fileMenu();
@@ -89,6 +99,8 @@ void Inspector::render()
   }
   // Render dock widgets
   _renderDockGUI();
+  // Pop font
+  ImGui::PopFont();
   // Rendering
   ImGui::Render();
   ImGui_ImplGlfwGL2_RenderDrawData(ImGui::GetDrawData());

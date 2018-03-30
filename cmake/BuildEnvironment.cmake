@@ -63,6 +63,11 @@ if("${LIBRARY_OUTPUT_PATH}" STREQUAL "")
   set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/build/lib")
 endif()
 
+# Set assets output path if not defined by user
+if("${ASSETS_OUTPUT_PATH}" STREQUAL "")
+  set(ASSETS_OUTPUT_PATH "${CMAKE_BINARY_DIR}/build/assets")
+endif()
+
 # Set archive output path if not defined by user
 if("${INCLUDE_OUTPUT_PATH}" STREQUAL "")
   set(INCLUDE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/include")

@@ -139,6 +139,7 @@ set_target_properties(${TARGET}
 # Include directories
 target_include_directories(${TARGET}
     PRIVATE
+    ${GLFW_INCLUDE_DIRS}
     ${IMGUI_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -153,6 +154,7 @@ target_include_directories(${TARGET}
 target_link_libraries(${TARGET}
     PUBLIC
     PRIVATE
+    glfw
     BabylonCpp
 )
 
@@ -203,7 +205,7 @@ endfunction()
 
 # Build gmock
 set(gmock_build_tests           OFF CACHE BOOL "")
-set(gtest_build_INSPECTOR         OFF CACHE BOOL "")
+set(gtest_build_INSPECTOR       OFF CACHE BOOL "")
 set(gtest_build_tests           OFF CACHE BOOL "")
 set(gtest_disable_pthreads      OFF CACHE BOOL "")
 set(gtest_force_shared_crt      ON  CACHE BOOL "")
@@ -241,3 +243,7 @@ install(EXPORT ${TARGET}Config
 export(TARGETS ${TARGET}
     FILE ${TARGET}Config.cmake
 )
+
+# Copy asset directories
+## - Fonts
+copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/fonts")

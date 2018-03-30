@@ -47,3 +47,21 @@ macro(display test desc summary)
     set(${summary} no)
   endif()
 endmacro()
+
+# Copy single files
+macro(copy_resource_files files)
+    foreach(file ${files})
+        message(STATUS "Copying resource ${file}")
+        file(COPY ${file} DESTINATION ${ASSETS_OUTPUT_PATH})
+    endforeach()
+endmacro()
+
+# Copy full directories
+macro(copy_resource_dirs dirs)
+    foreach(dir ${dirs})
+        # Replace / at the end of the path (copy dir content VS copy dir)
+        string(REGEX REPLACE "/+$" "" dirclean "${dir}")
+        message(STATUS "Copying resource ${dirclean} to ${ASSETS_OUTPUT_PATH}")
+        file(COPY ${dirclean} DESTINATION ${ASSETS_OUTPUT_PATH})
+    endforeach()
+endmacro()
