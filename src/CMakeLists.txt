@@ -13,5 +13,6 @@ add_subdirectory(ProceduralTexturesLibrary)
 
 # Applications
 #add_subdirectory(Editor)
+add_subdirectory(Inspector)
 add_subdirectory(Samples)
 add_subdirectory(SampleLauncher)
