@@ -24,12 +24,15 @@ message(STATUS "App ${TARGET}")
 # ============================================================================ #
 
 # Sources
-file(GLOB_RECURSE HEADER_FILES  ${GLXW_INCLUDE_DIRS}/GL/*.h
-                                ${GLXW_INCLUDE_DIRS}/GLXW/glxw.h
-                                ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
-file(GLOB_RECURSE SOURCE_FILES  ${GLXW_SOURCE_DIRS}/glxw.c
-                                ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c
-                                ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+file(GLOB_RECURSE HEADER_FILES
+    ${GLXW_INCLUDE_DIRS}/GL/*.h
+    ${GLXW_INCLUDE_DIRS}/GLXW/glxw.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
+
+file(GLOB_RECURSE SOURCE_FILES
+    ${GLXW_SOURCE_DIRS}/glxw.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 
 set(BABYLON_SAMPLES_SOURCES
     ${HEADER_FILES}
@@ -54,6 +57,8 @@ target_include_directories(${TARGET}
     ${CMAKE_CURRENT_BINARY_DIR}/../BabylonCpp/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../Extensions/include
     ${CMAKE_CURRENT_BINARY_DIR}/../Extensions/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../Inspector/include
+    ${CMAKE_CURRENT_BINARY_DIR}/../Inspector/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../Samples/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
@@ -64,6 +69,7 @@ target_link_libraries(${TARGET}
     glfw
     ${OPENGL_LIBRARIES}
     BabylonCpp
+    Inspector
     Samples
 )
 

@@ -12,6 +12,7 @@ struct GLFWwindow;
 namespace BABYLON {
 
 class ICanvas;
+class Inspector;
 
 namespace Samples {
 
@@ -31,6 +32,12 @@ struct Window {
   double lastTime                                = 0.0;
   int frameCount                                 = 0;
 }; // end of struct Window
+
+struct SampleLauncherOptions {
+  std::string title        = "Sample";
+  std::pair<int, int> size = std::make_pair(800, 600);
+  bool showInspectorWindow = false;
+}; // end of struct SampleLauncherOptions
 
 class SampleLauncher {
 
@@ -53,9 +60,7 @@ public:
   static const ResolutionSize FULL_RESOLUTION_SIZE;
 
 public:
-  SampleLauncher(const std::string& title   = "Sample",
-                 const ResolutionSize& size = SMALL_RESOLUTION_SIZE,
-                 bool showInspectorWindow   = false);
+  SampleLauncher(const SampleLauncherOptions& options);
   ~SampleLauncher();
 
   bool intialize();
@@ -81,6 +86,10 @@ private:
   State _sampleLauncherState;
   int _defaultWinResX, _defaultWinResY;
   bool _showInspectorWindow;
+  // Inspector
+  unique_ptr_t<Inspector> _inspector;
+  // Other settings
+  bool _useOpenGLES;
 
 }; // end of class SampleLauncher
 

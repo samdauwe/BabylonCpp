@@ -57,7 +57,7 @@ void initializeLogging()
  * @param sample name of the sample to run
  * @return exit code
  */
-int sampleLauncherMain(int l, int v, const char* sample)
+int sampleLauncherMain(int l, int v, int i, const char* sample)
 {
   using namespace BABYLON::Samples;
   SamplesIndex samples;
@@ -85,7 +85,9 @@ int sampleLauncherMain(int l, int v, const char* sample)
       return 1;
     }
     // Create the sample launcher
-    SampleLauncher sampleLauncher;
+    SampleLauncherOptions options;
+    options.showInspectorWindow = (i > 0);
+    SampleLauncher sampleLauncher{options};
     if (sampleLauncher.intialize()) {
       // Create the renderable scene
       auto canvas = sampleLauncher.getRenderCanvas();
@@ -105,11 +107,13 @@ int main(int argc, char** argv)
   struct arg_str* sample = arg_str0(
     "S", "sample", "<SAMPE>", "sample to launch (default is \"BasicScene\")");
   struct arg_lit* verbose = arg_lit0("v", "verbose,debug", "verbose messages");
-  struct arg_lit* help    = arg_lit0(NULL, "help", "print this help and exit");
+  struct arg_lit* inspector
+    = arg_lit0("i", "inspector", "show inspector window");
+  struct arg_lit* help = arg_lit0(NULL, "help", "print this help and exit");
   struct arg_lit* version
     = arg_lit0(NULL, "version", "print version information and exit");
   struct arg_end* end  = arg_end(20);
-  void* argtable[]     = {list, sample, verbose, help, version, end};
+  void* argtable[]     = {list, sample, verbose, inspector, help, version, end};
   const char* progname = "SampleLauncher";
   int nerrors;
   int exitcode = 0;
@@ -161,7 +165,8 @@ int main(int argc, char** argv)
   }
 
   /** Normal case: run sample **/
-  exitcode = sampleLauncherMain(list->count, verbose->count, sample->sval[0]);
+  exitcode = sampleLauncherMain(list->count, verbose->count, inspector->count,
+                                sample->sval[0]);
 
   /** Deallocate each non-null entry in argtable[] **/
   arg_freetable(argtable, sizeof(argtable) / sizeof(argtable[0]));

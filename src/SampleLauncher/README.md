@@ -4,10 +4,12 @@ $ ./SampleLauncher --help
 ```
 
 ```{r, engine='bash', ./SampleLauncher --help}
+Usage: SampleLauncher [-lvi] [-S <SAMPE>] [--help] [--version]
 This program acts as a sample launcher for demonstrating the usage of the BabylonCpp library
   -l, -L                    list samples
   -S, --sample=<SAMPE>      sample to launch (default is "BasicScene")
   -v, --verbose, --debug    verbose messages
+  -i, --inspector           show inspector window
   --help                    print this help and exit
   --version                 print version information and exit
 ```

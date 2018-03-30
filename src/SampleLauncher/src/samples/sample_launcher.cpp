@@ -16,11 +16,12 @@
 
 // Babylon
 #include <babylon/babylon_stl_util.h>
-#include <babylon/impl/canvas.h>
-
-// Samples
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/impl/canvas.h>
+
+// Inspector
+#include <babylon/inspector/inspector.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -28,7 +29,7 @@ namespace Samples {
 const SampleLauncher::ResolutionSize SampleLauncher::DESIGN_RESOLUTION_SIZE
   = std::make_pair(1280, 720);
 const SampleLauncher::ResolutionSize SampleLauncher::SMALL_RESOLUTION_SIZE
-  // = std::make_pair(240, 160);
+  //  = std::make_pair(240, 160);
   = std::make_pair(800, 600);
 const SampleLauncher::ResolutionSize SampleLauncher::MEDIUM_RESOLUTION_SIZE
   = std::make_pair(1024, 768);
@@ -67,23 +68,23 @@ static void GLFWWindowSizeCallback(GLFWwindow* window, int width, int height)
   }
 }
 
-SampleLauncher::SampleLauncher(const std::string& title,
-                               const ResolutionSize& size,
-                               bool showInspectorWindow)
+SampleLauncher::SampleLauncher(const SampleLauncherOptions& options)
     : _sampleLauncherState{State::UNINITIALIZED}
-    , _defaultWinResX{size.first}
-    , _defaultWinResY{size.second}
-    , _showInspectorWindow{showInspectorWindow}
+    , _defaultWinResX{options.size.first}
+    , _defaultWinResY{options.size.second}
+    , _showInspectorWindow{options.showInspectorWindow}
+    , _inspector{nullptr}
+    , _useOpenGLES{false}
 {
   _sceneWindow                 = Window();
-  _sceneWindow.title           = title;
+  _sceneWindow.title           = options.title;
   _sceneWindow.sceneIntialized = false;
   _sceneWindow.renderCanvas    = std::make_unique<BABYLON::impl::Canvas>();
   _sceneWindow.renderableScene = nullptr;
   _sceneWindow.lastTime        = glfwGetTime();
-  if (showInspectorWindow) {
+  if (options.showInspectorWindow) {
     _inspectorWindow          = Window();
-    _inspectorWindow.title    = title;
+    _inspectorWindow.title    = "Inspector";
     _inspectorWindow.lastTime = glfwGetTime();
   }
 }
@@ -131,12 +132,11 @@ int SampleLauncher::run()
       glfwSwapBuffers(_sceneWindow.glfwWindow);
     }
     //*** Inspector Window ***//
-    if (_showInspectorWindow) {
+    if (_showInspectorWindow && _inspector) {
       // Make the window's context current
       glfwMakeContextCurrent(_inspectorWindow.glfwWindow);
-      // clear the backbuffer to our clear colour and clear the depth buffer
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      glClearColor(0.2f, 0.2f, 0.3f, 1.f);
+      // Render inspector window
+      _inspector->render();
       // Swap front and back buffers
       glfwSwapBuffers(_inspectorWindow.glfwWindow);
     }
@@ -162,8 +162,8 @@ void SampleLauncher::destroy()
 {
   // Cleanup window(s)
   glfwDestroyWindow(_sceneWindow.glfwWindow);
-  if (_showInspectorWindow) {
-    glfwDestroyWindow(_inspectorWindow.glfwWindow);
+  if (_showInspectorWindow && _inspector) {
+    _inspector->dispose();
   }
   // Terminate GLFW
   glfwTerminate();
@@ -178,6 +178,7 @@ ICanvas* SampleLauncher::getRenderCanvas()
 void SampleLauncher::setRenderableScene(
   std::unique_ptr<IRenderableScene>& renderableScene)
 {
+  // Main scene window
   if (renderableScene && !_sceneWindow.renderableScene) {
     renderableScene->initialize();
     _sceneWindow.renderableScene = std::move(renderableScene);
@@ -187,6 +188,11 @@ void SampleLauncher::setRenderableScene(
     snprintf(title, 255, "%s: %s", _sceneWindow.title.c_str(),
              _sceneWindow.renderableScene->getName());
     glfwSetWindowTitle(_sceneWindow.glfwWindow, title);
+  }
+  // Inspector window
+  if (_showInspectorWindow && _inspector && _sceneWindow.renderableScene) {
+    auto scene = _sceneWindow.renderableScene->getScene();
+    _inspector->setScene(scene);
   }
 }
 
@@ -205,12 +211,18 @@ int SampleLauncher::initGLFW()
 
   // Draw smooth line with antialias
   glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
-  // Set context and api
-  // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-  // glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+
+  // Initialize OpenGL context
+  if (_useOpenGLES) {
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+  }
+  else {
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+  }
 
   // Create the scene window
   CreateWindow(_sceneWindow, _defaultWinResX, _defaultWinResY,
@@ -220,6 +232,8 @@ int SampleLauncher::initGLFW()
   if (_showInspectorWindow) {
     CreateWindow(_inspectorWindow, _defaultWinResX / 2, _defaultWinResY,
                  _inspectorWindow.title.c_str(), nullptr, &_sceneWindow);
+    _inspector = ::std::make_unique<Inspector>(_inspectorWindow.glfwWindow);
+    _inspector->intialize();
   }
 
   return 0;
@@ -273,7 +287,7 @@ void SampleLauncher::CreateWindow(Window& window, int width, int height,
   // Make the window's context current
   glfwMakeContextCurrent(window.glfwWindow);
 
-  // Set swap interval
+  // Enable vsync
   glfwSwapInterval(1);
 
   // Setup callbacks
