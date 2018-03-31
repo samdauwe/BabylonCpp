@@ -114,7 +114,7 @@ public:
   }
 
   /**
-   * Returns the smallest value ever
+   * @brief Returns the smallest value ever.
    */
   size_t min() const
   {
@@ -122,7 +122,7 @@ public:
   }
 
   /**
-   * Returns the biggest value ever
+   * @brief eturns the biggest value ever.
    */
   size_t max() const
   {
@@ -130,7 +130,7 @@ public:
   }
 
   /**
-   * Returns the average value since the performance counter is running
+   * @brief Returns the average value since the performance counter is running.
    */
   double average() const
   {
@@ -138,7 +138,8 @@ public:
   }
 
   /**
-   * Returns the average value of the last second the counter was monitored
+   * @brief Returns the average value of the last second the counter was
+   * monitored.
    */
   double lastSecAverage() const
   {
@@ -146,7 +147,7 @@ public:
   }
 
   /**
-   * Returns the current value
+   * @brief Returns the current value.
    */
   size_t current() const
   {
@@ -164,7 +165,7 @@ public:
   }
 
   /**
-   * Call this method to start monitoring a new frame.
+   * @brief Call this method to start monitoring a new frame.
    * This scenario is typically used when you accumulate monitoring time many
    * times for a single frame, you call this method at the start of the frame,
    * then beginMonitoring to start recording and endMonitoring(false) to
@@ -179,7 +180,7 @@ public:
   }
 
   /**
-   * Call this method to monitor a count of something (e.g. mesh drawn in
+   * @brief Call this method to monitor a count of something (e.g. mesh drawn in
    * viewport count)
    * @param newCount the count value to add to the monitored count
    * @param fetchResult true when it's the last time in the frame you add to the
@@ -195,7 +196,7 @@ public:
   }
 
   /**
-   * Start monitoring this performance counter
+   * @brief Start monitoring this performance counter
    */
   void beginMonitoring()
   {
@@ -203,7 +204,7 @@ public:
   }
 
   /**
-   * Compute the time lapsed since the previous beginMonitoring() call.
+   * @brief Compute the time lapsed since the previous beginMonitoring() call.
    * @param newFrame true by default to fetch the result and monitor a new
    * frame, if false the time monitored will be added to the current frame
    * counter
@@ -215,7 +216,7 @@ public:
     }
 
     auto currentTime = Time::highresTimepointNow();
-    _current = Time::fpTimeDiff<size_t, ::std::micro>(_startMonitoringTime,
+    _current = Time::fpTimeDiff<size_t, ::std::milli>(_startMonitoringTime,
                                                       currentTime);
 
     if (newFrame) {
