@@ -21,6 +21,8 @@
 
 // Inspector
 #include <babylon/inspector/actions/action_store.h>
+#include <babylon/inspector/tabs/logs_tab.h>
+#include <babylon/inspector/tabs/scene_tab.h>
 #include <babylon/inspector/tabs/stats_tab.h>
 
 namespace BABYLON {
@@ -32,6 +34,8 @@ Inspector::Inspector(GLFWwindow* glfwWindow, Scene* scene)
     , _scene{scene}
     , _actionStore{std::make_unique<ActionStore>()}
     , _showDockingWindow{true}
+    , _logsTab{::std::make_unique<LogsTab>()}
+    , _sceneTab{nullptr}
     , _statsTab{nullptr}
 {
 }
@@ -49,6 +53,7 @@ void Inspector::setScene(Scene* scene)
 {
   _scene = scene;
   // Reset tabs
+  _sceneTab = ::std::make_unique<SceneTab>(*this);
   _statsTab = ::std::make_unique<StatsTab>(*this);
 }
 
@@ -108,6 +113,17 @@ void Inspector::render()
 
 void Inspector::dispose()
 {
+  // Dispose tabs
+  if (_logsTab) {
+    _logsTab->dispose();
+  }
+  if (_sceneTab) {
+    _sceneTab->dispose();
+  }
+  if (_statsTab) {
+    _statsTab->dispose();
+  }
+  // Shotdown ImGui
   ImGui_ImplGlfwGL2_Shutdown();
   ImGui::DestroyContext();
   glfwDestroyWindow(_glfwWindow);
@@ -142,7 +158,7 @@ void Inspector::_renderDockGUI()
     return;
   }
 
-  if (!_statsTab) {
+  if (!_logsTab || !_sceneTab || !_statsTab) {
     return;
   }
 
@@ -160,6 +176,16 @@ void Inspector::_renderDockGUI()
                      | ImGuiWindowFlags_NoBringToFrontOnFocus)) {
     // Dock layout by hard-coded or .ini file
     ImGui::BeginDockspace();
+
+    // Render logs dock
+    if (_logsTab) {
+      _logsTab->render();
+    }
+
+    // Render scene dock
+    if (_sceneTab) {
+      _sceneTab->render();
+    }
 
     // Render statistics dock
     if (_statsTab) {

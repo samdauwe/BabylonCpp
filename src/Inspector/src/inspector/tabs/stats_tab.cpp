@@ -60,8 +60,12 @@ void StatsTab::render()
   if (ImGui::BeginDock("Stats")) {
     float offsetX = ImGui::GetContentRegionMax().x - statsSize.x;
     // Engine version and framerate
-    ImGui::TextWrapped("BabylonCpp v%s - %.f fps", Engine::Version().c_str(),
-                       static_cast<double>(_engine->getFps()));
+    ImGui::TextWrapped("BabylonCpp v%s -", Engine::Version().c_str());
+    ImGui::SameLine();
+    // Color #f29766 -> rgba(242, 151, 102, 1)
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.95f, 0.59f, 0.4f, 1.0f));
+    ImGui::TextWrapped("%.f fps", static_cast<double>(_engine->getFps()));
+    ImGui::PopStyleColor();
     // OpengGL Info
     if (ImGui::CollapsingHeader("OpenGL Info", "OpenGL Info", true, true)) {
       ImGui::TextWrapped("Version: %s", _glInfo.version.c_str());

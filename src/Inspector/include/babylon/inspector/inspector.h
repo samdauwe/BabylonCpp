@@ -9,6 +9,8 @@ namespace BABYLON {
 
 class ActionStore;
 struct InspectorAction;
+class LogsTab;
+class SceneTab;
 class StatsTab;
 
 class BABYLON_SHARED_EXPORT Inspector {
@@ -38,7 +40,12 @@ private:
   // GUI
   bool _showDockingWindow;
   int _menuHeight;
-  // - Tabs
+  // Tabs
+  // - Logs tab
+  unique_ptr_t<LogsTab> _logsTab;
+  // - Scene tab
+  unique_ptr_t<SceneTab> _sceneTab;
+  // - Statistics tab
   unique_ptr_t<StatsTab> _statsTab;
 
 }; // end of class Inspector

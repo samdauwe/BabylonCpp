@@ -1043,8 +1043,7 @@ struct DockContext {
   }
 };
 
-// --------------------------------------Wrap
-// Function------------------------------------------
+// ------------------------------Wrap Function----------------------------------
 #include <map>
 #include <string>
 
@@ -1234,7 +1233,7 @@ static void writeAll(ImGuiContext* /*ctx*/, ImGuiSettingsHandler* handler,
   }
 }
 
-// ----------------------------------------------API-------------------------------------------------
+// -----------------------------------API---------------------------------------
 void ImGui::ShutdownDock()
 {
   for (auto& iter : g_docklist) {
