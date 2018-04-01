@@ -45,7 +45,7 @@ float PhysicsEngine::getTimeStep() const
   return _physicsPlugin->getTimeStep();
 }
 
-void PhysicsEngine::dispose(bool /*doNotRecurse*/)
+void PhysicsEngine::dispose()
 {
   for (auto& impostor : _impostors) {
     impostor->dispose();
@@ -143,6 +143,11 @@ void PhysicsEngine::_step(float delta)
 IPhysicsEnginePlugin* PhysicsEngine::getPhysicsPlugin()
 {
   return _physicsPlugin;
+}
+
+vector_t<shared_ptr_t<PhysicsImpostor>>& PhysicsEngine::getImpostors()
+{
+  return _impostors;
 }
 
 PhysicsImpostor*

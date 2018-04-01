@@ -153,6 +153,7 @@ class RayHelper;
 class SkeletonViewer;
 // --- Engine ---
 class ClickInfo;
+struct DepthTextureCreationOptions;
 class Engine;
 struct EngineCapabilities;
 struct EngineOptions;
@@ -440,6 +441,17 @@ class PhysicsImpostor;
 struct PhysicsImpostorJoint;
 struct PhysicsImpostorParameters;
 struct PhysicsParams;
+// - Helper
+struct PhysicsForceAndContactPoint;
+class PhysicsGravitationalFieldEvent;
+struct PhysicsGravitationalFieldEventData;
+class PhysicsHelper;
+class PhysicsRadialExplosionEvent;
+struct PhysicsRadialExplosionEventData;
+class PhysicsUpdraftEvent;
+struct PhysicsUpdraftEventData;
+class PhysicsVortexEvent;
+struct PhysicsVortexEventData;
 // - Joint
 class DistanceJoint;
 struct DistanceJointData;

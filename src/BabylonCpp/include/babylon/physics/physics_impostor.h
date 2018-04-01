@@ -2,7 +2,6 @@
 #define BABYLON_PHYSICS_PHYSICS_IMPOSTER_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/interfaces/idisposable.h>
 #include <babylon/math/quaternion.h>
 #include <babylon/math/vector3.h>
 #include <babylon/physics/physics_impostor_parameters.h>
@@ -14,7 +13,7 @@ struct Joint {
   PhysicsImpostor* otherImpostor;
 }; // end of class JointElement
 
-class BABYLON_SHARED_EXPORT PhysicsImpostor : public IDisposable {
+class BABYLON_SHARED_EXPORT PhysicsImpostor {
 
 public:
   static const Vector3 DEFAULT_OBJECT_SIZE;
@@ -161,41 +160,78 @@ public:
   /**
    * @brief Apply a force
    */
-  void applyForce(const Vector3& force, const Vector3& contactPoint);
+  PhysicsImpostor& applyForce(const Vector3& force,
+                              const Vector3& contactPoint);
 
   /**
    * @brief Apply an impulse
    */
-  void applyImpulse(const Vector3& force, const Vector3& contactPoint);
+  PhysicsImpostor& applyImpulse(const Vector3& force,
+                                const Vector3& contactPoint);
 
   /**
    * @brief A help function to create a joint.
    */
-  void createJoint(PhysicsImpostor* otherImpostor, unsigned int jointType,
-                   const PhysicsJointData& jointData);
+  PhysicsImpostor& createJoint(PhysicsImpostor* otherImpostor,
+                               unsigned int jointType,
+                               const PhysicsJointData& jointData);
 
   /**
    * @brief Add a joint to this impostor with a different impostor.
    */
-  void addJoint(PhysicsImpostor* otherImpostor,
-                const shared_ptr_t<PhysicsJoint>& joint);
+  PhysicsImpostor& addJoint(PhysicsImpostor* otherImpostor,
+                            const shared_ptr_t<PhysicsJoint>& joint);
 
   /**
    * @brief Will keep this body still, in a sleep mode.
    */
-  void sleep();
+  PhysicsImpostor& sleep();
 
   /**
    * @brief Wake the body up.
    */
-  void wakeUp();
+  PhysicsImpostor& wakeUp();
 
   unique_ptr_t<PhysicsImpostor> clone(IPhysicsEnabledObject* newObject);
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
   void setDeltaPosition(const Vector3& position);
   void setDeltaRotation(const Quaternion& rotation);
   PhysicsImpostor& getBoxSizeToRef(Vector3& result);
   float getRadius() const;
+
+  /**
+   * @brief Sync a bone with this impostor.
+   * @param bone The bone to sync to the impostor.
+   * @param boneMesh The mesh that the bone is influencing.
+   * @param jointPivot The pivot of the joint / bone in local space.
+   * @param distToJoint Optional distance from the impostor to the joint.
+   * @param adjustRotation Optional quaternion for adjusting the local rotation
+   * of the bone.
+   */
+  void syncBoneWithImpostor(Bone* bone, AbstractMesh* boneMesh,
+                            const Nullable<Vector3>& jointPivot,
+                            Nullable<float> distToJoint,
+                            const Nullable<Quaternion>& adjustRotation);
+
+  /**
+   * @brief Sync impostor to a bone.
+   * @param bone The bone that the impostor will be synced to.
+   * @param boneMesh The mesh that the bone is influencing.
+   * @param jointPivot The pivot of the joint / bone in local space.
+   * @param distToJoint Optional distance from the impostor to the joint.
+   * @param adjustRotation Optional quaternion for adjusting the local rotation
+   * of the bone.
+   * @param boneAxis Optional vector3 axis the bone is aligned with
+   */
+  void syncImpostorWithBone(Bone* bone, AbstractMesh* boneMesh,
+                            const Nullable<Vector3>& jointPivot,
+                            Nullable<float> distToJoint,
+                            const Nullable<Quaternion>& adjustRotation,
+                            Nullable<Vector3>& boneAxis);
+
+private:
+  static array_t<Vector3, 3> _tmpVecs;
+  static Quaternion _tmpQuat;
 
 private:
   bool get_isDisposed() const;
@@ -240,7 +276,6 @@ private:
   Quaternion _tmpRotationWithDelta;
 
   // Temp variables for parent rotation calculations
-  Quaternion _tmpQuat;
   Quaternion _tmpQuat2;
 
 }; // end of class PhysicsImpostor

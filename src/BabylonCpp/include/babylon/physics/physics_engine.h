@@ -2,12 +2,11 @@
 #define BABYLON_PHYSICS_PHYSICS_ENGINE_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/interfaces/idisposable.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT PhysicsEngine : public IDisposable {
+class BABYLON_SHARED_EXPORT PhysicsEngine {
 
 public:
   PhysicsEngine(const Vector3& gravity = Vector3(0.f, -9.807f, 0.f),
@@ -30,7 +29,7 @@ public:
    */
   float getTimeStep() const;
 
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
   string_t getPhysicsPluginName() const;
 
   /**
@@ -69,6 +68,8 @@ public:
   void _step(float delta);
 
   IPhysicsEnginePlugin* getPhysicsPlugin();
+
+  vector_t<shared_ptr_t<PhysicsImpostor>>& getImpostors();
 
   PhysicsImpostor* getImpostorForPhysicsObject(IPhysicsEnabledObject* object);
 

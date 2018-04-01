@@ -1,6 +1,7 @@
 #include <babylon/physics/physics_impostor.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/bones/bone.h>
 #include <babylon/core/logging.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
@@ -18,6 +19,10 @@ namespace BABYLON {
 const Vector3 PhysicsImpostor::DEFAULT_OBJECT_SIZE = Vector3::One();
 
 Quaternion PhysicsImpostor::IDENTITY_QUATERNION = Quaternion::Identity();
+
+array_t<Vector3, 3> PhysicsImpostor::_tmpVecs
+  = {{Vector3::Zero(), Vector3::Zero(), Vector3::Zero()}};
+Quaternion PhysicsImpostor::_tmpQuat = Quaternion::Identity();
 
 PhysicsImpostor::PhysicsImpostor(IPhysicsEnabledObject* _object,
                                  unsigned int iType,
@@ -367,18 +372,32 @@ void PhysicsImpostor::getParentsRotation()
 
 void PhysicsImpostor::beforeStep()
 {
-  object->position().subtractToRef(_deltaPosition, _tmpPositionWithDelta);
-  // conjugate deltaRotation
-  if (_deltaRotationConjugated) {
-    object->rotationQuaternion()->multiplyToRef(*_deltaRotationConjugated,
-                                                _tmpRotationWithDelta);
-  }
-  else {
-    _tmpRotationWithDelta.copyFrom(*object->rotationQuaternion());
+  if (!_physicsEngine) {
+    return;
   }
 
-  _physicsEngine->getPhysicsPlugin()->setPhysicsBodyTransformation(
-    this, _tmpPositionWithDelta, _tmpRotationWithDelta);
+  object->translate(_deltaPosition, -1.f);
+  if (_deltaRotationConjugated && object->rotationQuaternion()) {
+    object->rotationQuaternion()->multiplyToRef(*_deltaRotationConjugated,
+                                                *object->rotationQuaternion());
+  }
+  object->computeWorldMatrix(false);
+  if (object->parent() && object->rotationQuaternion()) {
+    getParentsRotation();
+    _tmpQuat.multiplyToRef(*object->rotationQuaternion(), _tmpQuat);
+  }
+  else {
+    _tmpQuat.copyFrom(object->rotationQuaternion() ?
+                        *object->rotationQuaternion() :
+                        Quaternion());
+  }
+  if (!_options.disableBidirectionalTransformation) {
+    if (object->rotationQuaternion()) {
+      _physicsEngine->getPhysicsPlugin()->setPhysicsBodyTransformation(
+        this, /*bInfo.boundingBox.centerWorld*/ object->getAbsolutePivotPoint(),
+        _tmpQuat);
+    }
+  }
 
   for (auto& func : _onBeforePhysicsStepCallbacks) {
     func(this);
@@ -387,61 +406,97 @@ void PhysicsImpostor::beforeStep()
 
 void PhysicsImpostor::afterStep()
 {
+  if (!_physicsEngine) {
+    return;
+  }
+
   for (auto& func : _onAfterPhysicsStepCallbacks) {
     func(this);
   }
 
   _physicsEngine->getPhysicsPlugin()->setTransformationFromPhysicsBody(this);
-
-  object->position().addInPlace(_deltaPosition);
-  if (_deltaRotation) {
-    object->rotationQuaternion()->multiplyInPlace(*_deltaRotation);
+  // object has now its world rotation. needs to be converted to local.
+  if (object->parent() && object->rotationQuaternion()) {
+    getParentsRotation();
+    _tmpQuat.conjugateInPlace();
+    _tmpQuat.multiplyToRef(*object->rotationQuaternion(),
+                           *object->rotationQuaternion());
   }
+  // take the position set and make it the absolute position of this object.
+  object->setAbsolutePosition(object->position());
+  if (_deltaRotation && object->rotationQuaternion()) {
+    object->rotationQuaternion()->multiplyToRef(*_deltaRotation,
+                                                *object->rotationQuaternion());
+  }
+  object->translate(_deltaPosition, 1.f);
 }
 
 void PhysicsImpostor::onCollide(IPhysicsBody* /*body*/)
 {
 }
 
-void PhysicsImpostor::applyForce(const Vector3& force,
-                                 const Vector3& contactPoint)
+PhysicsImpostor& PhysicsImpostor::applyForce(const Vector3& force,
+                                             const Vector3& contactPoint)
 {
-  _physicsEngine->getPhysicsPlugin()->applyForce(this, force, contactPoint);
+  if (_physicsEngine) {
+    _physicsEngine->getPhysicsPlugin()->applyForce(this, force, contactPoint);
+  }
+
+  return *this;
 }
 
-void PhysicsImpostor::applyImpulse(const Vector3& force,
-                                   const Vector3& contactPoint)
+PhysicsImpostor& PhysicsImpostor::applyImpulse(const Vector3& force,
+                                               const Vector3& contactPoint)
 {
-  _physicsEngine->getPhysicsPlugin()->applyImpulse(this, force, contactPoint);
+  if (_physicsEngine) {
+    _physicsEngine->getPhysicsPlugin()->applyImpulse(this, force, contactPoint);
+  }
+
+  return *this;
 }
 
-void PhysicsImpostor::createJoint(PhysicsImpostor* otherImpostor,
-                                  unsigned int jointType,
-                                  const PhysicsJointData& jointData)
+PhysicsImpostor& PhysicsImpostor::createJoint(PhysicsImpostor* otherImpostor,
+                                              unsigned int jointType,
+                                              const PhysicsJointData& jointData)
 {
   addJoint(otherImpostor,
            ::std::make_shared<PhysicsJoint>(jointType, jointData));
+
+  return *this;
 }
 
-void PhysicsImpostor::addJoint(PhysicsImpostor* otherImpostor,
-                               const shared_ptr_t<PhysicsJoint>& joint)
+PhysicsImpostor&
+PhysicsImpostor::addJoint(PhysicsImpostor* otherImpostor,
+                          const shared_ptr_t<PhysicsJoint>& joint)
 {
   Joint _joint;
   _joint.otherImpostor = otherImpostor;
   _joint.joint         = joint;
   _joints.emplace_back(_joint);
 
-  _physicsEngine->addJoint(this, otherImpostor, joint);
+  if (_physicsEngine) {
+    _physicsEngine->addJoint(this, otherImpostor, joint);
+  }
+
+  return *this;
 }
 
-void PhysicsImpostor::sleep()
+PhysicsImpostor& PhysicsImpostor::sleep()
 {
-  _physicsEngine->getPhysicsPlugin()->sleepBody(this);
+  if (_physicsEngine) {
+    _physicsEngine->getPhysicsPlugin()->sleepBody(this);
+  }
+
+  return *this;
 }
 
-void PhysicsImpostor::wakeUp()
+PhysicsImpostor& PhysicsImpostor::wakeUp()
 {
-  _physicsEngine->getPhysicsPlugin()->wakeUpBody(this);
+  if (_physicsEngine) {
+    _physicsEngine->getPhysicsPlugin()->wakeUpBody(this);
+  }
+
+  return *this;
 }
 
 unique_ptr_t<PhysicsImpostor>
@@ -454,7 +509,7 @@ PhysicsImpostor::clone(IPhysicsEnabledObject* newObject)
                                              _scene);
 }
 
-void PhysicsImpostor::dispose(bool /*doNotRecurse*/)
+void PhysicsImpostor::dispose()
 {
   // No dispose if no physics engine is available.
   if (!_physicsEngine) {
@@ -462,7 +517,9 @@ void PhysicsImpostor::dispose(bool /*doNotRecurse*/)
   }
 
   for (auto& j : _joints) {
-    _physicsEngine->removeJoint(this, j.otherImpostor, j.joint.get());
+    if (_physicsEngine) {
+      _physicsEngine->removeJoint(this, j.otherImpostor, j.joint.get());
+    }
   }
 
   // Dispose the physics body
@@ -470,6 +527,8 @@ void PhysicsImpostor::dispose(bool /*doNotRecurse*/)
   if (parent()) {
     parent()->forceUpdate();
   }
+
+  _isDisposed = true;
 }
 
 void PhysicsImpostor::setDeltaPosition(const Vector3& position)
@@ -499,6 +558,105 @@ float PhysicsImpostor::getRadius() const
 {
   return _physicsEngine ? _physicsEngine->getPhysicsPlugin()->getRadius(this) :
                           0.f;
+}
+
+void PhysicsImpostor::syncBoneWithImpostor(
+  Bone* bone, AbstractMesh* boneMesh, const Nullable<Vector3>& jointPivot,
+  Nullable<float> distToJoint, const Nullable<Quaternion>& adjustRotation)
+{
+  auto& tempVec = PhysicsImpostor::_tmpVecs[0];
+  auto mesh     = static_cast<AbstractMesh*>(object);
+
+  if (mesh->rotationQuaternion()) {
+    if (adjustRotation) {
+      auto& tempQuat = PhysicsImpostor::_tmpQuat;
+      mesh->rotationQuaternion()->multiplyToRef(*adjustRotation, tempQuat);
+      bone->setRotationQuaternion(tempQuat, Space::WORLD, boneMesh);
+    }
+    else {
+      bone->setRotationQuaternion(*mesh->rotationQuaternion(), Space::WORLD,
+                                  boneMesh);
+    }
+  }
+
+  tempVec.x = 0;
+  tempVec.y = 0;
+  tempVec.z = 0;
+
+  if (jointPivot) {
+    auto _jointPivot = *jointPivot;
+    tempVec.x        = _jointPivot.x;
+    tempVec.y        = _jointPivot.y;
+    tempVec.z        = _jointPivot.z;
+
+    bone->getDirectionToRef(tempVec, tempVec, boneMesh);
+
+    if (distToJoint.isNull()) {
+      distToJoint = (*jointPivot).length();
+    }
+
+    tempVec.x *= distToJoint;
+    tempVec.y *= distToJoint;
+    tempVec.z *= distToJoint;
+  }
+
+  if (bone->getParent()) {
+    tempVec.addInPlace(mesh->getAbsolutePosition());
+    bone->setAbsolutePosition(tempVec, boneMesh);
+  }
+  else {
+    boneMesh->setAbsolutePosition(mesh->getAbsolutePosition());
+    boneMesh->position().x -= tempVec.x;
+    boneMesh->position().y -= tempVec.y;
+    boneMesh->position().z -= tempVec.z;
+  }
+}
+
+void PhysicsImpostor::syncImpostorWithBone(
+  Bone* bone, AbstractMesh* boneMesh, const Nullable<Vector3>& jointPivot,
+  Nullable<float> distToJoint, const Nullable<Quaternion>& adjustRotation,
+  Nullable<Vector3>& boneAxis)
+{
+  auto mesh = static_cast<AbstractMesh*>(object);
+
+  if (mesh->rotationQuaternion()) {
+    if (adjustRotation) {
+      auto& tempQuat = PhysicsImpostor::_tmpQuat;
+      bone->getRotationQuaternionToRef(tempQuat, Space::WORLD, boneMesh);
+      tempQuat.multiplyToRef(*adjustRotation, *mesh->rotationQuaternion());
+    }
+    else {
+      bone->getRotationQuaternionToRef(*mesh->rotationQuaternion(),
+                                       Space::WORLD, boneMesh);
+    }
+  }
+
+  auto& pos     = PhysicsImpostor::_tmpVecs[0];
+  auto& boneDir = PhysicsImpostor::_tmpVecs[1];
+
+  if (!boneAxis) {
+    auto& _boneAxis = PhysicsImpostor::_tmpVecs[2];
+    _boneAxis.x     = 0;
+    _boneAxis.y     = 1;
+    _boneAxis.z     = 0;
+    boneAxis        = _boneAxis;
+  }
+
+  bone->getDirectionToRef(*boneAxis, boneDir, boneMesh);
+  bone->getAbsolutePositionToRef(boneMesh, pos);
+
+  if ((distToJoint.isNull()) && jointPivot) {
+    distToJoint = (*jointPivot).length();
+  }
+
+  if (!distToJoint.isNull()) {
+    float _distToJoint = *distToJoint;
+    pos.x += boneDir.x * _distToJoint;
+    pos.y += boneDir.y * _distToJoint;
+    pos.z += boneDir.z * _distToJoint;
+  }
+
+  mesh->setAbsolutePosition(pos);
 }
 
 } // end of namespace BABYLON
