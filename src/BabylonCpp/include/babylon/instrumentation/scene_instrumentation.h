@@ -165,7 +165,8 @@ public:
    */
   PerfCounter& textureCollisionsCounter();
 
-  void dispose(bool doNotRecurse = false) override;
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
 
 private:
   Scene* _scene;

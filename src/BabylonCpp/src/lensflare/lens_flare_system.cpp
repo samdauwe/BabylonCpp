@@ -48,11 +48,19 @@ LensFlareSystem::LensFlareSystem(const string_t iName, Mesh* emitter,
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
     = ::std::make_unique<VertexBuffer>(
-      engine, vertices, VertexBuffer::PositionKind, false, false, 2);
+      engine, ToVariant<Float32Array, Buffer*>(vertices),
+      VertexBuffer::PositionKind, false, false, 2);
 
   // Indices
-  Uint32Array indices = {0, 1, 2, 0, 2, 3};
-  _indexBuffer        = engine->createIndexBuffer(indices);
+  Uint32Array indices = {
+    0, //
+    1, //
+    2, //
+    0, //
+    2, //
+    3  //
+  };
+  _indexBuffer = engine->createIndexBuffer(indices);
 
   // Effects
   EffectCreationOptions effectCreationOptions;
@@ -298,20 +306,20 @@ bool LensFlareSystem::render()
   return true;
 }
 
-void LensFlareSystem::dispose(bool /*doNotRecurse*/)
+void LensFlareSystem::dispose()
 {
   if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)) {
     auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKindChars];
     if (vertexBuffer) {
       vertexBuffer->dispose();
       _vertexBuffers.erase(VertexBuffer::PositionKindChars);
-      vertexBuffer.reset(nullptr);
+      vertexBuffer = nullptr;
     }
   }
 
   if (_indexBuffer) {
     _scene->getEngine()->_releaseBuffer(_indexBuffer.get());
-    _indexBuffer.reset(nullptr);
+    _indexBuffer = nullptr;
   }
 
   for (auto& lensFlare : lensFlares) {

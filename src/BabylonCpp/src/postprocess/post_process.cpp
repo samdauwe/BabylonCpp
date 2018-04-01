@@ -24,6 +24,7 @@ PostProcess::PostProcess(
     : name{iName}
     , width{-1}
     , height{-1}
+    , _outputTexture{nullptr}
     , autoClear{true}
     , alphaMode{EngineConstants::ALPHA_DISABLE}
     , enablePixelPerfectMode{false}
@@ -175,6 +176,15 @@ PostProcess& PostProcess::shareOutputWith(PostProcess* postProcess)
   return *this;
 }
 
+void PostProcess::useOwnOutput()
+{
+  if (_textures.empty()) {
+    _textures.resize(2);
+  }
+
+  _shareOutputWithPostProcess = nullptr;
+}
+
 void PostProcess::updateEffect(
   const string_t& defines, const vector_t<string_t>& uniforms,
   const vector_t<string_t>& samplers,
@@ -208,14 +218,14 @@ void PostProcess::markTextureDirty()
   width = -1;
 }
 
-void PostProcess::activate(Camera* camera, InternalTexture* sourceTexture,
-                           bool forceDepthStencil)
+InternalTexture* PostProcess::activate(Camera* camera,
+                                       InternalTexture* sourceTexture,
+                                       bool forceDepthStencil)
 {
   auto pCamera = camera ? camera : _camera;
 
-  auto scene  = pCamera->getScene();
-  auto engine = scene->getEngine();
-
+  auto scene        = pCamera->getScene();
+  auto engine       = scene->getEngine();
   const int maxSize = engine->getCaps().maxTextureSize;
 
   const int requiredWidth = static_cast<int>(
@@ -303,45 +313,46 @@ void PostProcess::activate(Camera* camera, InternalTexture* sourceTexture,
         _engine->updateRenderTargetTextureSampleCount(texture, samples);
       }
     }
-
-    InternalTexture* target = nullptr;
-    if (_shareOutputWithPostProcess) {
-      target = _shareOutputWithPostProcess->inputTexture();
-    }
-    else if (_forcedOutputTexture) {
-      target = _forcedOutputTexture;
-      width  = _forcedOutputTexture->width;
-      height = _forcedOutputTexture->height;
-    }
-    else {
-      target = inputTexture();
-    }
-
-    // Bind the input of this post process to be used as the output of the
-    // previous post process.
-    if (enablePixelPerfectMode) {
-      _scaleRatio.copyFromFloats(
-        static_cast<float>(requiredWidth) / static_cast<float>(desiredWidth),
-        static_cast<float>(requiredHeight) / static_cast<float>(desiredHeight));
-      _engine->bindFramebuffer(target, 0, requiredWidth, requiredHeight, true);
-    }
-    else {
-      _scaleRatio.copyFromFloats(1.f, 1.f);
-      _engine->bindFramebuffer(target);
-    }
-
-    onActivateObservable.notifyObservers(camera);
-
-    // Clear
-    if (autoClear && alphaMode == EngineConstants::ALPHA_DISABLE) {
-      _engine->clear(clearColor ? *clearColor : scene->clearColor, true, true,
-                     true);
-    }
-
-    if (_reusable) {
-      _currentRenderTextureInd = (_currentRenderTextureInd + 1) % 2;
-    }
   }
+
+  InternalTexture* target = nullptr;
+  if (_shareOutputWithPostProcess) {
+    target = _shareOutputWithPostProcess->inputTexture();
+  }
+  else if (_forcedOutputTexture) {
+    target = _forcedOutputTexture;
+    width  = _forcedOutputTexture->width;
+    height = _forcedOutputTexture->height;
+  }
+  else {
+    target = inputTexture();
+  }
+
+  // Bind the input of this post process to be used as the output of the
+  // previous post process.
+  if (enablePixelPerfectMode) {
+    _scaleRatio.copyFromFloats(
+      static_cast<float>(requiredWidth) / static_cast<float>(desiredWidth),
+      static_cast<float>(requiredHeight) / static_cast<float>(desiredHeight));
+    _engine->bindFramebuffer(target, 0u, requiredWidth, requiredHeight, true);
+  }
+  else {
+    _scaleRatio.copyFromFloats(1.f, 1.f);
+    _engine->bindFramebuffer(target, 0u, nullptr, nullptr, true);
+  }
+
+  onActivateObservable.notifyObservers(camera);
+
+  // Clear
+  if (autoClear && alphaMode == EngineConstants::ALPHA_DISABLE) {
+    _engine->clear(clearColor ? *clearColor : scene->clearColor, true, true,
+                   true);
+  }
+
+  if (_reusable) {
+    _currentRenderTextureInd = (_currentRenderTextureInd + 1) % 2;
+  }
+  return target;
 }
 
 bool PostProcess::isSupported() const
@@ -452,7 +463,10 @@ void PostProcess::dispose(Camera* camera)
 
   const int index = stl_util::index_of(pCamera->_postProcesses, this);
   if (index == 0 && pCamera->_postProcesses.size() > 0) {
-    _camera->_postProcesses[0]->markTextureDirty();
+    auto firstPostProcess = _camera->_getFirstPostProcess();
+    if (firstPostProcess) {
+      firstPostProcess->markTextureDirty();
+    }
   }
 
   onActivateObservable.clear();

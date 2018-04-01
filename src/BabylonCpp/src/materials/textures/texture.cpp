@@ -11,6 +11,8 @@
 
 namespace BABYLON {
 
+bool Texture::UseSerializedUrlIfAny = false;
+
 Texture::Texture(const string_t& _url, Scene* scene, bool noMipmap,
                  bool invertY, unsigned int samplingMode,
                  const ::std::function<void()>& onLoad,
@@ -164,21 +166,21 @@ void Texture::delayLoad()
 #endif
   }
   else {
-    if (_texture->isReady) {
-      Tools::SetImmediate([this]() {
-        if (!_delayedOnLoad) {
-          return;
-        }
-        EventState es{-1};
-        _delayedOnLoad(nullptr, es);
-      });
-    }
-    else {
-      if (_delayedOnLoad) {
+    if (_delayedOnLoad) {
+      if (_texture->isReady) {
+        Tools::SetImmediate([this]() {
+          EventState es{-1};
+          _delayedOnLoad(nullptr, es);
+        });
+      }
+      else {
         _texture->onLoadedObservable.add(_delayedOnLoad);
       }
     }
   }
+
+  _delayedOnLoad  = nullptr;
+  _delayedOnError = nullptr;
 }
 
 void Texture::updateSamplingMode(unsigned int samplingMode)
@@ -385,7 +387,7 @@ Json::object Texture::serialize() const
   return Json::object();
 }
 
-void Texture::dispose(bool /*doNotRecurse*/)
+void Texture::dispose()
 {
   BaseTexture::dispose();
 

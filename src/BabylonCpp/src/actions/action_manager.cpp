@@ -31,7 +31,7 @@ ActionManager::~ActionManager()
 {
 }
 
-void ActionManager::dispose(bool /*doNotRecurse*/)
+void ActionManager::dispose()
 {
   for (auto& action : actions) {
     if ((action->trigger < ActionManager::Triggers.size())

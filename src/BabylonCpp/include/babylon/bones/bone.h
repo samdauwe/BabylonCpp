@@ -50,6 +50,12 @@ public:
 
   /** Methods **/
   vector_t<Animation*> getAnimations() override;
+
+  /**
+   * @brief Gets the animation properties override.
+   */
+  AnimationPropertiesOverride* animationPropertiesOverride() const;
+
   void updateMatrix(const Matrix& matrix, bool updateDifferenceMatrix = true);
   void _updateDifferenceMatrix();
   void _updateDifferenceMatrix(Matrix& rootMatrix);
@@ -288,7 +294,7 @@ public:
    * world space.
    */
   void getRotationQuaternionToRef(Quaternion& result,
-                                  Space space        = Space::LOCAL,
+                                  const Space& space = Space::LOCAL,
                                   AbstractMesh* mesh = nullptr) const;
 
   /**
@@ -369,7 +375,6 @@ private:
 
 public:
   vector_t<Bone*> children;
-  vector_t<Animation*> animations;
   int length;
 
   // Set this value to map this bone to a different index in the transform

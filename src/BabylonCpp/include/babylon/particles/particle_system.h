@@ -161,7 +161,8 @@ public:
    * @param disposeTexture defines if the particule texture must be disposed as
    * well (true by default)
    */
-  void dispose(bool disposeTexture = true) override;
+  void dispose(bool disposeTexture             = true,
+               bool disposeMaterialAndTextures = false) override;
 
   vector_t<Animation*> getAnimations() override;
 

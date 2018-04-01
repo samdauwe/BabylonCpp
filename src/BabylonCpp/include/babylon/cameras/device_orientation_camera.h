@@ -32,7 +32,7 @@ public:
    * This helps avoiding instanceof at run time.
    * @returns the class name
    */
-  const char* getClassName() const override;
+  const string_t getClassName() const override;
 
   /**
    * @brief Checks and applies the current values of the inputs to the camera.

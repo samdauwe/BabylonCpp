@@ -4,13 +4,12 @@
 #include <babylon/babylon_global.h>
 
 #include <babylon/animations/animation.h>
-#include <babylon/interfaces/idisposable.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT Sprite : public IDisposable {
+class BABYLON_SHARED_EXPORT Sprite {
 
 public:
   template <typename... Ts>
@@ -29,7 +28,7 @@ public:
                      const ::std::function<void()>& onAnimationEnd);
   void stopAnimation();
   void _animate(float deltaTime);
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
 
 protected:
   Sprite(const string_t& name, SpriteManager* manager);

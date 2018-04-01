@@ -243,7 +243,11 @@ enum GLEnums : GLenum {
   VERSION    = 0x1F02,
   EXTENSIONS = 0x1F03,
   /* Textures */
-  TEXTURE_3D = 0x806F,
+  TEXTURE_3D             = 0x806F,
+  TEXTURE_2D_ARRAY       = 0x8C1A,
+  TEXTURE_COMPARE_MODE   = 0x884C,
+  TEXTURE_COMPARE_FUNC   = 0x884D,
+  COMPARE_REF_TO_TEXTURE = 0x884E,
   /* TextureMagFilter */
   NEAREST = 0x2600,
   LINEAR  = 0x2601,
@@ -350,6 +354,7 @@ enum GLEnums : GLenum {
   RGBA8                                        = 0x8058,
   RGB565                                       = 0x8D62,
   DEPTH_COMPONENT16                            = 0x81A5,
+  DEPTH_COMPONENT24                            = 0x81A6,
   STENCIL_INDEX                                = 0x1901,
   STENCIL_INDEX8                               = 0x8D48,
   DEPTH_STENCIL                                = 0x84F9,

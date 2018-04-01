@@ -203,8 +203,8 @@ Light* SerializationHelper::Parse(Light* light, const Json::value& parsedLight,
       }
       // shadowOrthoScale
       if (parsedLight.contains("shadowOrthoScale")) {
-        directionalLight->setShadowOrthoScale(
-          Json::GetNumber(parsedLight, "shadowOrthoScale", 0.5f));
+        directionalLight->shadowOrthoScale
+          = Json::GetNumber(parsedLight, "shadowOrthoScale", 0.5f);
       }
       // autoUpdateExtends
       if (parsedLight.contains("autoUpdateExtends")) {

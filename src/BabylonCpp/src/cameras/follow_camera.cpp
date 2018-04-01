@@ -81,7 +81,7 @@ void FollowCamera::_checkInputs()
   }
 }
 
-const char* FollowCamera::getClassName() const
+const string_t FollowCamera::getClassName() const
 {
   return "FollowCamera";
 }

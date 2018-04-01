@@ -2,14 +2,15 @@
 #define BABYLON_MESH_VERTEX_BUFFER_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/interfaces/idisposable.h>
+#include <babylon/core/nullable.h>
+#include <babylon/core/variant.h>
 
 namespace BABYLON {
 
 /**
  * @brief
  */
-class BABYLON_SHARED_EXPORT VertexBuffer : public IDisposable {
+class BABYLON_SHARED_EXPORT VertexBuffer {
 
 public:
   static constexpr unsigned int PositionKind             = 1;
@@ -73,14 +74,13 @@ public:
   static constexpr const char* SizeKindChars      = "size";
 
 public:
-  VertexBuffer(Engine* engine, const Float32Array& data, unsigned int kind,
-               bool updatable, bool postponeInternalCreation = false,
-               int stride = -1, bool instanced = false, int offset = -1,
-               int size = -1);
-  VertexBuffer(Engine* engine, Buffer* buffer, unsigned int kind,
-               bool updatable, bool postponeInternalCreation = false,
-               int stride = -1, bool instanced = false, int offset = -1,
-               int size = -1);
+  VertexBuffer(Engine* engine, const Variant<Float32Array, Buffer*> data,
+               unsigned int kind, bool updatable,
+               Nullable<bool> postponeInternalCreation = nullptr,
+               Nullable<int> stride                    = nullptr,
+               Nullable<bool> instanced                = nullptr,
+               Nullable<unsigned int> offset           = nullptr,
+               Nullable<int> size                      = nullptr);
   virtual ~VertexBuffer();
 
   /** Statics **/
@@ -177,10 +177,26 @@ public:
   /**
    * @brief Disposes the VertexBuffer and the underlying WebGLBuffer.
    */
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
 
 private:
+  /**
+   * @brief Gets the instance divisor when in instanced mode
+   */
+  unsigned int get_instanceDivisor() const;
+
+  /**
+   * @brief Sets the instance divisor when in instanced mode
+   */
+  void set_instanceDivisor(unsigned int value);
+
   Buffer* _getBuffer() const;
+
+public:
+  /**
+   * Instance divisor when in instanced mode
+   */
+  Property<VertexBuffer, unsigned int> instanceDivisor;
 
 private:
   unique_ptr_t<Buffer> _ownedBuffer;
@@ -190,6 +206,8 @@ private:
   int _size;
   int _stride;
   bool _ownsBuffer;
+  bool _instanced;
+  unsigned int _instanceDivisor;
 
 }; // end of class VertexBuffer
 

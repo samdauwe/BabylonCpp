@@ -2,12 +2,11 @@
 #define BABYLON_RENDERING_BOUNDING_BOX_RENDERER_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/interfaces/idisposable.h>
 #include <babylon/math/color3.h>
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT BoundingBoxRenderer : public IDisposable {
+class BABYLON_SHARED_EXPORT BoundingBoxRenderer {
 
 public:
   BoundingBoxRenderer(Scene* scene);
@@ -17,7 +16,7 @@ public:
   void reset();
   void render();
   void renderOcclusionBoundingBox(AbstractMesh* mesh);
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
 
 private:
   void _prepareResources();

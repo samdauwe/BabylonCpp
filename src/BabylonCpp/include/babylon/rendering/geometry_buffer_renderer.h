@@ -3,7 +3,6 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/engine/engine_constants.h>
-#include <babylon/interfaces/idisposable.h>
 
 namespace BABYLON {
 
@@ -11,7 +10,7 @@ namespace BABYLON {
  * @brief This renderer is helpfull to fill one of the render target with a
  * geometry buffer.
  */
-class BABYLON_SHARED_EXPORT GeometryBufferRenderer : public IDisposable {
+class BABYLON_SHARED_EXPORT GeometryBufferRenderer {
 
 public:
   /**
@@ -84,7 +83,7 @@ public:
   /**
    * @brief Disposes the renderer and frees up associated resources.
    */
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
 
 protected:
   void _createRenderTargets();

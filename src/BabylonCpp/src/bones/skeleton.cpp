@@ -16,6 +16,8 @@ Skeleton::Skeleton(const string_t& iName, const string_t& iId, Scene* scene)
     : needInitialSkinMatrix{false}
     , name{iName}
     , id{iId}
+    , doNotSerialize{false}
+    , animationPropertiesOverride{nullptr}
     , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _isDirty{true}
     , _identity{Matrix::Identity()}
@@ -382,7 +384,8 @@ void Skeleton::enableBlending(float blendingSpeed)
   }
 }
 
-void Skeleton::dispose(bool /*doNotRecurse*/)
+void Skeleton::dispose(bool /*doNotRecurse*/,
+                       bool /*disposeMaterialAndTextures*/)
 {
   _meshesWithPoseMatrix.clear();
 

@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/engine/depth_texture_creation_options.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/material.h>
@@ -30,6 +31,11 @@ RenderTargetTexture::RenderTargetTexture(
     , ignoreCameraViewport{false}
     , _generateMipMaps{generateMipMaps ? true : false}
     , boundingBoxPosition{Vector3::Zero()}
+    , depthStencilTexture{nullptr}
+    , samples{this, &RenderTargetTexture::get_samples,
+              &RenderTargetTexture::set_samples}
+    , refreshRate{this, &RenderTargetTexture::get_refreshRate,
+                  &RenderTargetTexture::set_refreshRate}
     , _sizeRatio{0.f}
     , _doNotChangeAspectRatio{doNotChangeAspectRatio}
     , _currentRefreshId{-1}
@@ -163,17 +169,37 @@ RenderTargetTexture::renderTargetOptions() const
   return _renderTargetOptions;
 }
 
+void RenderTargetTexture::createDepthStencilTexture(int comparisonFunction,
+                                                    bool bilinearFiltering,
+                                                    bool generateStencil)
+{
+  if (!getScene()) {
+    return;
+  }
+
+  auto engine = getScene()->getEngine();
+  DepthTextureCreationOptions options;
+  options.bilinearFiltering  = bilinearFiltering;
+  options.comparisonFunction = comparisonFunction;
+  options.generateStencil    = generateStencil;
+  options.isCube             = isCube;
+  depthStencilTexture
+    = engine->createDepthStencilTexture(ToVariant<int, ISize>(_size), options);
+
+  engine->setFrameBufferDepthStencilTexture(this);
+}
+
 void RenderTargetTexture::_processSizeParameter(const ISize& size)
 {
   _size = size;
 }
 
-unsigned int RenderTargetTexture::samples() const
+unsigned int RenderTargetTexture::get_samples() const
 {
   return _samples;
 }
 
-void RenderTargetTexture::setSamples(unsigned int value)
+void RenderTargetTexture::set_samples(unsigned int value)
 {
   if (_samples == value) {
     return;
@@ -193,12 +219,12 @@ void RenderTargetTexture::resetRefreshCounter()
   _currentRefreshId = -1;
 }
 
-int RenderTargetTexture::refreshRate() const
+int RenderTargetTexture::get_refreshRate() const
 {
   return _refreshRate;
 }
 
-void RenderTargetTexture::setRefreshRate(int value)
+void RenderTargetTexture::set_refreshRate(int value)
 {
   _refreshRate = value;
   resetRefreshCounter();
@@ -412,8 +438,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
   auto sceneRenderId           = scene->getRenderId();
   for (auto& mesh : currentRenderList) {
     if (mesh) {
-      if (!mesh->isReady()) {
-        // Reset _currentRefreshId
+      if (!mesh->isReady(refreshRate() == 0)) {
         resetRefreshCounter();
         continue;
       }
@@ -526,8 +551,13 @@ void RenderTargetTexture::renderToTarget(
   else if (!useCameraPostProcess
            || !scene->postProcessManager->_prepareFrame(_texture)) {
     if (_texture) {
-      engine->bindFramebuffer(_texture, isCube ? faceIndex : 0, 0, 0,
-                              ignoreCameraViewport);
+      Nullable<unsigned int> faceIndexVal = nullptr;
+      if (isCube) {
+        faceIndexVal = faceIndex;
+      }
+      engine->bindFramebuffer(
+        _texture, faceIndexVal, nullptr, nullptr, ignoreCameraViewport,
+        depthStencilTexture ? depthStencilTexture : nullptr);
     }
   }
 
@@ -644,7 +674,7 @@ void RenderTargetTexture::disposeFramebufferObjects()
   }
 }
 
-void RenderTargetTexture::dispose(bool doNotRecurse)
+void RenderTargetTexture::dispose()
 {
   if (_postProcessManager) {
     _postProcessManager->dispose();
@@ -673,17 +703,24 @@ void RenderTargetTexture::dispose(bool doNotRecurse)
     stl_util::erase(camera->customRenderTargets, this);
   }
 
-  Texture::dispose(doNotRecurse);
+  Texture::dispose();
 }
 
 void RenderTargetTexture::_rebuild()
 {
   if (refreshRate() == RenderTargetTexture::REFRESHRATE_RENDER_ONCE()) {
-    setRefreshRate(RenderTargetTexture::REFRESHRATE_RENDER_ONCE());
+    refreshRate = RenderTargetTexture::REFRESHRATE_RENDER_ONCE();
   }
 
   if (_postProcessManager) {
     _postProcessManager->_rebuild();
+  }
+}
+
+void RenderTargetTexture::freeRenderingGroups()
+{
+  if (_renderingManager) {
+    _renderingManager->freeRenderingGroups();
   }
 }
 

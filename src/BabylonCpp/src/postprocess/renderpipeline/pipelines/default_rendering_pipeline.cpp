@@ -397,14 +397,15 @@ void DefaultRenderingPipeline::_disposePostProcesses()
   depthOfField    = nullptr;
 }
 
-void DefaultRenderingPipeline::dispose(bool doNotRecurse)
+void DefaultRenderingPipeline::dispose(bool /*doNotRecurse*/,
+                                       bool /*disposeMaterialAndTextures*/)
 {
   _disposePostProcesses();
 
   _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(
     _name, getCameras());
 
-  PostProcessRenderPipeline::dispose(doNotRecurse);
+  PostProcessRenderPipeline::dispose();
 }
 
 Json::object DefaultRenderingPipeline::serialize() const

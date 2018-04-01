@@ -34,9 +34,9 @@ void PostProcessManager::_prepareBuffers()
     1.f,  -1.f  //
   };
   _vertexBuffers[VertexBuffer::PositionKindChars]
-    = ::std::make_unique<VertexBuffer>(_scene->getEngine(), vertices,
-                                       VertexBuffer::PositionKind, false, false,
-                                       2);
+    = ::std::make_unique<VertexBuffer>(
+      _scene->getEngine(), ToVariant<Float32Array, Buffer*>(vertices),
+      VertexBuffer::PositionKind, false, false, 2);
   _vertexBufferPtrs[VertexBuffer::PositionKindChars]
     = _vertexBuffers[VertexBuffer::PositionKindChars].get();
 
@@ -60,8 +60,8 @@ void PostProcessManager::_buildIndexBuffer()
 
 void PostProcessManager::_rebuild()
 {
-  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)
-      && _vertexBuffers[VertexBuffer::PositionKindChars]) {
+  if (!stl_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)
+      || !_vertexBuffers[VertexBuffer::PositionKindChars]) {
     return;
   }
   _vertexBuffers[VertexBuffer::PositionKindChars]->_rebuild();
@@ -76,8 +76,14 @@ bool PostProcessManager::_prepareFrame(
     return false;
   }
 
-  const auto& postProcesses
+  auto postProcesses
     = !iPostProcesses.empty() ? iPostProcesses : camera->_postProcesses;
+
+  // Filter out all null elements
+  postProcesses.erase(
+    std::remove_if(postProcesses.begin(), postProcesses.end(),
+                   [](const PostProcess* pp) { return pp == nullptr; }),
+    postProcesses.end());
 
   if (postProcesses.empty() || !_scene->postProcessesEnabled) {
     return false;
@@ -99,7 +105,7 @@ void PostProcessManager::directRender(
     }
     else {
       if (targetTexture) {
-        engine->bindFramebuffer(targetTexture, 0, 0, 0,
+        engine->bindFramebuffer(targetTexture, 0u, nullptr, nullptr,
                                 forceFullscreenViewport);
       }
       else {
@@ -138,16 +144,25 @@ void PostProcessManager::_finalizeFrame(
     return;
   }
 
-  const auto& postProcesses
+  auto postProcesses
     = _postProcesses.empty() ? camera->_postProcesses : _postProcesses;
+
+  // Filter out all null elements
+  postProcesses.erase(
+    std::remove_if(postProcesses.begin(), postProcesses.end(),
+                   [](const PostProcess* pp) { return pp == nullptr; }),
+    postProcesses.end());
+
   if (postProcesses.empty() || !_scene->postProcessesEnabled) {
     return;
   }
   auto engine = _scene->getEngine();
 
-  for (unsigned int index = 0; index < postProcesses.size(); ++index) {
-    if (index < postProcesses.size() - 1) {
-      postProcesses[index + 1]->activate(camera, targetTexture);
+  for (size_t index = 0, len = postProcesses.size(); index < len; ++index) {
+    auto& pp = postProcesses[index];
+    if (index < len - 1) {
+      pp->_outputTexture
+        = postProcesses[index + 1]->activate(camera, targetTexture);
     }
     else {
       if (targetTexture) {
@@ -163,7 +178,6 @@ void PostProcessManager::_finalizeFrame(
       break;
     }
 
-    auto pp     = postProcesses[index];
     auto effect = pp->apply();
 
     if (effect) {
@@ -186,13 +200,13 @@ void PostProcessManager::_finalizeFrame(
   engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
 }
 
-void PostProcessManager::dispose(bool /*doNotRecurse*/)
+void PostProcessManager::dispose()
 {
   if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)) {
     auto& buffer = _vertexBuffers[VertexBuffer::PositionKindChars];
     if (buffer) {
       buffer->dispose();
-      _vertexBuffers[VertexBuffer::PositionKindChars].reset(nullptr);
+      _vertexBuffers[VertexBuffer::PositionKindChars] = nullptr;
       _vertexBuffers.erase(VertexBuffer::PositionKindChars);
       _vertexBufferPtrs.erase(VertexBuffer::PositionKindChars);
     }

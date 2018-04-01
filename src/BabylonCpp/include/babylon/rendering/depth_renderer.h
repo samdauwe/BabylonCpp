@@ -3,7 +3,6 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/engine/engine_constants.h>
-#include <babylon/interfaces/idisposable.h>
 #include <babylon/math/matrix.h>
 
 namespace BABYLON {
@@ -13,7 +12,7 @@ namespace BABYLON {
  * A depth renderer will render to it's depth map every frame which can be
  * displayed or used in post processing
  */
-class BABYLON_SHARED_EXPORT DepthRenderer : public IDisposable {
+class BABYLON_SHARED_EXPORT DepthRenderer {
 
 public:
   /**
@@ -47,7 +46,7 @@ public:
   /**
    * @brief Disposes of the depth renderer.
    */
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
 
 private:
   Scene* _scene;

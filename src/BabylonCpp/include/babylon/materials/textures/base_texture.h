@@ -5,15 +5,13 @@
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_global.h>
 #include <babylon/core/structs.h>
-#include <babylon/interfaces/idisposable.h>
 #include <babylon/math/isize.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT BaseTexture : public IAnimatable,
-                                          public IDisposable {
+class BABYLON_SHARED_EXPORT BaseTexture : public IAnimatable {
 public:
   static constexpr unsigned int DEFAULT_ANISOTROPIC_FILTERING_LEVEL = 4;
 
@@ -65,7 +63,7 @@ public:
   BaseTexture* _lodTextureHigh() const;
   BaseTexture* _lodTextureMid() const;
   BaseTexture* _lodTextureLow() const;
-  virtual void dispose(bool doNotRecurse = false) override;
+  virtual void dispose();
   Json::object serialize() const;
 
   static void WhenAllReady(const vector_t<BaseTexture*>& textures,
@@ -78,9 +76,8 @@ public:
   string_t name;
   bool getAlphaFromRGB;
   float level;
-  unsigned int coordinatesIndex;
 
-  /*
+  /**
    * How a texture is mapped.
    *
    * | Value | Type                                | Description |
@@ -96,19 +93,35 @@ public:
    * | 8     | FIXED_EQUIRECTANGULAR_MODE          |             |
    * | 9     | FIXED_EQUIRECTANGULAR_MIRRORED_MODE |             |
    */
+  unsigned int coordinatesIndex;
 
-  unsigned int wrapU;
-
-  /*
+  /**
    * | Value | Type               | Description |
    * | ----- | ------------------ | ----------- |
    * | 0     | CLAMP_ADDRESSMODE  |             |
    * | 1     | WRAP_ADDRESSMODE   |             |
    * | 2     | MIRROR_ADDRESSMODE |             |
    */
+  unsigned int wrapU;
 
+  /**
+   * | Value | Type               | Description |
+   * | ----- | ------------------ | ----------- |
+   * | 0     | CLAMP_ADDRESSMODE  |             |
+   * | 1     | WRAP_ADDRESSMODE   |             |
+   * | 2     | MIRROR_ADDRESSMODE |             |
+   */
   unsigned int wrapV;
+
+  /**
+   * | Value | Type               | Description |
+   * | ----- | ------------------ | ----------- |
+   * | 0     | CLAMP_ADDRESSMODE  |             |
+   * | 1     | WRAP_ADDRESSMODE   |             |
+   * | 2     | MIRROR_ADDRESSMODE |             |
+   */
   unsigned int wrapR;
+
   unsigned int anisotropicFilteringLevel;
   bool isCube;
   bool is3D;

@@ -16,7 +16,11 @@ struct BABYLON_SHARED_EXPORT IAnimatable : public IReflect {
     SCENE   = 4,
   }; // end of enum class Type
 
+  /**
+   * Gets or sets a string used to store user defined state for the node
+   */
   string_t state;
+
   virtual Node* parent() const
   {
     return nullptr;

@@ -2,11 +2,10 @@
 #define BABYLON_LENSFLARE_LENS_FLARE_SYSTEM_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/interfaces/idisposable.h>
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT LensFlareSystem : public IDisposable {
+class BABYLON_SHARED_EXPORT LensFlareSystem {
 
 public:
   template <typename... Ts>
@@ -31,7 +30,7 @@ public:
   bool computeEffectivePosition(Viewport& globalViewport);
   bool _isVisible();
   bool render();
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
   Json::object serialize() const;
 
   // Statics

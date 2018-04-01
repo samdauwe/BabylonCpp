@@ -416,7 +416,8 @@ PerfCounter& SceneInstrumentation::textureCollisionsCounter()
   return _scene->getEngine()->_textureCollisions;
 }
 
-void SceneInstrumentation::dispose(bool /*doNotRecurse*/)
+void SceneInstrumentation::dispose(bool /*doNotRecurse*/,
+                                   bool /*disposeMaterialAndTextures*/)
 {
   _scene->onAfterRenderObservable.remove(_onAfterRenderObserver);
   _onAfterRenderObserver = nullptr;

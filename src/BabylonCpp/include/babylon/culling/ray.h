@@ -37,7 +37,7 @@ public:
                                                     const Vector3& vertex1,
                                                     const Vector3& vertex2);
   Nullable<float> intersectsPlane(const Plane& plane);
-  PickingInfo intersectsMesh(AbstractMesh* mesh, bool fastCheck);
+  PickingInfo intersectsMesh(AbstractMesh* mesh, bool fastCheck = false);
   vector_t<PickingInfo> intersectsMeshes(vector_t<AbstractMesh*>& meshes,
                                          bool fastCheck,
                                          vector_t<PickingInfo>& results);

@@ -2,7 +2,6 @@
 #define BABYLON_SPRITES_SPRITE_MANAGER_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/interfaces/idisposable.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/sprites/sprite.h>
 #include <babylon/tools/observable.h>
@@ -10,7 +9,7 @@
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT SpriteManager : public IDisposable {
+class BABYLON_SHARED_EXPORT SpriteManager {
 
 public:
   template <typename... Ts>
@@ -32,7 +31,7 @@ public:
                           ::std::function<bool(Sprite* sprite)> predicate,
                           bool fastCheck);
   void render();
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
 
 protected:
   SpriteManager(const string_t& name, const string_t& imgUrl,

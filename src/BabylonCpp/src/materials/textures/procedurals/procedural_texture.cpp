@@ -57,7 +57,8 @@ ProceduralTexture::ProceduralTexture(
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
     = ::std::make_unique<VertexBuffer>(
-      _engine, vertices, VertexBuffer::PositionKind, false, false, 2);
+      _engine, ToVariant<Float32Array, Buffer*>(vertices),
+      VertexBuffer::PositionKind, false, false, 2);
 
   // Indices
   Uint32Array indices{0, 1, 2, 0, 2, 3};
@@ -107,7 +108,8 @@ ProceduralTexture::ProceduralTexture(const string_t& _name, const Size& size,
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
     = ::std::make_unique<VertexBuffer>(
-      _engine, vertices, VertexBuffer::PositionKind, false, false, 2);
+      _engine, ToVariant<Float32Array, Buffer*>(vertices),
+      VertexBuffer::PositionKind, false, false, 2);
 
   _createIndexBuffer();
 }
@@ -418,7 +420,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
 
   if (isCube) {
     for (unsigned int face = 0; face < 6; ++face) {
-      engine->bindFramebuffer(_texture, face, 0, 0, true);
+      engine->bindFramebuffer(_texture, face, nullptr, nullptr, true);
 
       // VBOs
       engine->bindBuffers(stl_util::to_raw_ptr_map(_vertexBuffers),
@@ -439,7 +441,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
     }
   }
   else {
-    engine->bindFramebuffer(_texture, 0, 0, 0, true);
+    engine->bindFramebuffer(_texture, 0u, nullptr, nullptr, true);
 
     // VBOs
     engine->bindBuffers(stl_util::to_raw_ptr_map(_vertexBuffers),
@@ -477,7 +479,7 @@ unique_ptr_t<ProceduralTexture> ProceduralTexture::clone() const
   return newTexture;
 }
 
-void ProceduralTexture::dispose(bool /*doNotRecurse*/)
+void ProceduralTexture::dispose()
 {
   auto scene = getScene();
 
@@ -496,12 +498,12 @@ void ProceduralTexture::dispose(bool /*doNotRecurse*/)
   auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKindChars];
   if (vertexBuffer) {
     vertexBuffer->dispose();
-    vertexBuffer.reset(nullptr);
+    vertexBuffer = nullptr;
     _vertexBuffers.erase(VertexBuffer::PositionKindChars);
   }
 
   if (_indexBuffer && _engine->_releaseBuffer(_indexBuffer.get())) {
-    _indexBuffer.reset(nullptr);
+    _indexBuffer = nullptr;
   }
 
   Texture::dispose();

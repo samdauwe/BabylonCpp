@@ -17,7 +17,7 @@ unique_ptr_t<Quaternion> TransformNode::_rotationAxisCache
 
 TransformNode::TransformNode(const string_t& name, Scene* scene, bool isPure)
     : Node{name, scene}
-    , billboardMode{AbstractMesh::BILLBOARDMODE_NONE}
+    , billboardMode{TransformNode::BILLBOARDMODE_NONE}
     , scalingDeterminant{1.f}
     , infiniteDistance{false}
     , _poseMatrix{::std::make_unique<Matrix>(Matrix::Zero())}
@@ -26,6 +26,11 @@ TransformNode::TransformNode(const string_t& name, Scene* scene, bool isPure)
     , _scaling{Vector3::One()}
     , _isDirty{false}
     , _isWorldMatrixFrozen{false}
+    , _forward{Vector3{0.f, 0.f, 1.f}}
+    , _forwardInverted{Vector3{0.f, 0.f, -1.f}}
+    , _up{Vector3{0.f, 1.f, 0.f}}
+    , _right{Vector3{1.f, 0.f, 0.f}}
+    , _rightInverted{Vector3{-1.f, 0.f, 0.f}}
     , _position{Vector3::Zero()}
     , _rotation{Vector3::Zero()}
     , _rotationQuaternion{nullptr}
@@ -44,6 +49,11 @@ TransformNode::TransformNode(const string_t& name, Scene* scene, bool isPure)
 
 TransformNode::~TransformNode()
 {
+}
+
+const string_t TransformNode::getClassName() const
+{
+  return "TransformNode";
 }
 
 Vector3& TransformNode::position()
@@ -112,6 +122,29 @@ void TransformNode::setRotationQuaternion(
   }
 }
 
+Vector3 TransformNode::forward()
+{
+  return Vector3::Normalize(Vector3::TransformNormal(
+    getScene()->useRightHandedSystem() ? _forwardInverted : _forward, //
+    *getWorldMatrix()                                                 //
+    ));
+}
+
+Vector3 TransformNode::up()
+{
+  return Vector3::Normalize(Vector3::TransformNormal(_up,              //
+                                                     *getWorldMatrix() //
+                                                     ));
+}
+
+Vector3 TransformNode::right()
+{
+  return Vector3::Normalize(Vector3::TransformNormal(
+    getScene()->useRightHandedSystem() ? _rightInverted : _right, //
+    *getWorldMatrix()                                             //
+    ));
+}
+
 Matrix* TransformNode::getWorldMatrix()
 {
   if (_currentRenderId != getScene()->getRenderId()) {
@@ -157,7 +190,7 @@ bool TransformNode::_isSynchronized()
   }
 
   if (billboardMode != _cache.billboardMode
-      || billboardMode != AbstractMesh::BILLBOARDMODE_NONE) {
+      || billboardMode != TransformNode::BILLBOARDMODE_NONE) {
     return false;
   }
 
@@ -333,7 +366,7 @@ TransformNode& TransformNode::locallyTranslate(const Vector3& vector3)
 TransformNode& TransformNode::lookAt(const Vector3& targetPoint, float yawCor,
                                      float pitchCor, float rollCor, Space space)
 {
-  auto dv  = AbstractMesh::_lookAtVectorCache;
+  auto& dv = *TransformNode::_lookAtVectorCache;
   auto pos = (space == Space::LOCAL) ? _position : getAbsolutePosition();
   targetPoint.subtractToRef(pos, dv);
   auto yaw   = -::std::atan2(dv.z, dv.x) - Math::PI_2;
@@ -617,6 +650,7 @@ Matrix& TransformNode::computeWorldMatrix(bool force)
   }
 
   if (!force && isSynchronized(true)) {
+    _currentRenderId = getScene()->getRenderId();
     return *_worldMatrix;
   }
 
@@ -625,6 +659,7 @@ Matrix& TransformNode::computeWorldMatrix(bool force)
   _cache.pivotMatrixUpdated = false;
   _cache.billboardMode      = billboardMode;
   _currentRenderId          = getScene()->getRenderId();
+  _childRenderId            = getScene()->getRenderId();
   _isDirty                  = false;
 
   // Scaling
@@ -681,8 +716,8 @@ Matrix& TransformNode::computeWorldMatrix(bool force)
   Tmp::MatrixArray[4].multiplyToRef(Tmp::MatrixArray[0], Tmp::MatrixArray[5]);
 
   // Billboarding (testing PG:http://www.babylonjs-playground.com/#UJEIL#13)
-  if (billboardMode != AbstractMesh::BILLBOARDMODE_NONE && camera) {
-    if ((billboardMode & AbstractMesh::BILLBOARDMODE_ALL)
+  if (billboardMode != TransformNode::BILLBOARDMODE_NONE && camera) {
+    if ((billboardMode & TransformNode::BILLBOARDMODE_ALL)
         != AbstractMesh::BILLBOARDMODE_ALL) {
       // Need to decompose each rotation here
       auto& currentPosition = Tmp::Vector3Array[3];
@@ -706,18 +741,18 @@ Matrix& TransformNode::computeWorldMatrix(bool force)
       currentPosition.subtractInPlace(camera->globalPosition());
 
       auto finalEuler = Tmp::Vector3Array[4].copyFromFloats(0.f, 0.f, 0.f);
-      if ((billboardMode & AbstractMesh::BILLBOARDMODE_X)
-          == AbstractMesh::BILLBOARDMODE_X) {
+      if ((billboardMode & TransformNode::BILLBOARDMODE_X)
+          == TransformNode::BILLBOARDMODE_X) {
         finalEuler.x = ::std::atan2(-currentPosition.y, currentPosition.z);
       }
 
-      if ((billboardMode & AbstractMesh::BILLBOARDMODE_Y)
-          == AbstractMesh::BILLBOARDMODE_Y) {
+      if ((billboardMode & TransformNode::BILLBOARDMODE_Y)
+          == TransformNode::BILLBOARDMODE_Y) {
         finalEuler.y = ::std::atan2(currentPosition.x, currentPosition.z);
       }
 
-      if ((billboardMode & AbstractMesh::BILLBOARDMODE_Z)
-          == AbstractMesh::BILLBOARDMODE_Z) {
+      if ((billboardMode & TransformNode::BILLBOARDMODE_Z)
+          == TransformNode::BILLBOARDMODE_Z) {
         finalEuler.z = ::std::atan2(currentPosition.y, currentPosition.x);
       }
 
@@ -740,7 +775,7 @@ Matrix& TransformNode::computeWorldMatrix(bool force)
 
   // Parent
   if (parent() && parent()->getWorldMatrix()) {
-    if (billboardMode != AbstractMesh::BILLBOARDMODE_NONE) {
+    if (billboardMode != TransformNode::BILLBOARDMODE_NONE) {
       if (_transformToBoneReferal) {
         parent()->getWorldMatrix()->multiplyToRef(
           *_transformToBoneReferal->getWorldMatrix(), Tmp::MatrixArray[6]);
@@ -849,7 +884,7 @@ TransformNode* TransformNode::Parse(const Json::value& /*parsedTransformNode*/,
   return nullptr;
 }
 
-void TransformNode::dispose(bool doNotRecurse)
+void TransformNode::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   // Animations
   getScene()->stopAnimation(this);
@@ -857,24 +892,9 @@ void TransformNode::dispose(bool doNotRecurse)
   // Remove from scene
   getScene()->removeTransformNode(this);
 
-  if (!doNotRecurse) {
-    // Children
-    auto objects = getDescendants(true);
-    for (auto& object : objects) {
-      object->dispose();
-    }
-  }
-  else {
-    auto childMeshes = getChildMeshes(true);
-    for (auto& child : childMeshes) {
-      child->setParent(nullptr);
-      child->computeWorldMatrix(true);
-    }
-  }
-
   onAfterWorldMatrixUpdateObservable.clear();
 
-  Node::dispose();
+  Node::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
 } // end of namespace BABYLON

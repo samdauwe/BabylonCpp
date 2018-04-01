@@ -28,7 +28,7 @@ public:
    * @brief Returns the string "HemisphericLight".
    * @return The class name
    */
-  const char* getClassName() const override;
+  const string_t getClassName() const override;
 
   IReflect::Type type() const override;
 

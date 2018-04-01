@@ -167,7 +167,9 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * @param disposeTexture defines if the particule texture must be disposed as
    * well (true by default)
    */
-  virtual void dispose(bool disposeTexture = false) = 0;
+  virtual void dispose(bool doNotRecurse               = false,
+                       bool disposeMaterialAndTextures = false)
+    = 0;
 
   /**
    * @brief Clones the particle system.

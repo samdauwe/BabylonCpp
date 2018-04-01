@@ -14,6 +14,14 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT Texture : public BaseTexture {
 
 public:
+  /**
+   * Gets or sets a boolean which defines if the texture url must be build from
+   * the serialized URL instead of just using the name and loading them side by
+   * side with the scene file
+   */
+  static bool UseSerializedUrlIfAny;
+
+public:
   template <typename... Ts>
   static Texture* New(Ts&&... args)
   {
@@ -44,7 +52,7 @@ public:
   Texture* clone() const;
   Nullable<Observable<Texture>>& onLoadObservable();
   Json::object serialize() const;
-  void dispose(bool doNotRecurse = false) override;
+  void dispose() override;
 
   /** Statics **/
   static Texture* CreateFromBase64String(
@@ -90,6 +98,7 @@ public:
 
 protected:
   unsigned int _format;
+  Nullable<Observable<Texture>> _onLoadObservable;
   bool _isBlocking;
 
 private:
@@ -114,7 +123,6 @@ private:
   bool _deleteBuffer;
   ::std::function<void(InternalTexture*, EventState&)> _delayedOnLoad;
   ::std::function<void()> _delayedOnError;
-  Nullable<Observable<Texture>> _onLoadObservable;
 
   ::std::function<void()> _onLoad;
   ::std::function<void(InternalTexture*, EventState&)> _load;

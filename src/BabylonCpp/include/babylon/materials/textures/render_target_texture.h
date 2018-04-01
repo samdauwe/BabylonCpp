@@ -35,6 +35,26 @@ public:
   }
 
 public:
+  /**
+   * @brief Instantiate a render target texture. This is mainly to render of
+   * screen the scene to for instance apply post processse or used a shadow,
+   * depth texture.
+   * @param name The friendly name of the texture
+   * @param size The size of the RTT (number if square, or {with: number,
+   * height:number} or {ratio:} to define a ratio from the main scene)
+   * @param scene The scene the RTT belongs to. The latest created scene will be
+   * used if not precised.
+   * @param generateMipMaps True if mip maps need to be generated after render.
+   * @param doNotChangeAspectRatio True to not change the aspect ratio of the
+   * scene in the RTT
+   * @param type The type of the buffer in the RTT (int, half float, float...)
+   * @param isCube True if a cube texture needs to be created
+   * @param samplingMode The sampling mode to be usedwith the render target
+   * (Linear, Nearest...)
+   * @param generateDepthBuffer True to generate a depth buffer
+   * @param generateStencilBuffer True to generate a stencil buffer
+   * @param isMulti True if multiple textures need to be created (Draw Buffers)
+   */
   RenderTargetTexture(
     const string_t& name, const ISize& size, Scene* scene,
     bool generateMipMaps = false, bool doNotChangeAspectRatio = true,
@@ -44,6 +64,21 @@ public:
     bool generateDepthBuffer = true, bool generateStencilBuffer = false,
     bool isMulti = false);
   ~RenderTargetTexture() override;
+
+  /**
+   * @brief Creates a depth stencil texture.
+   * This is only available in WebGL 2 or with the depth texture extension
+   * available.
+   * @param comparisonFunction Specifies the comparison function to set on the
+   * texture. If 0 or undefined, the texture is not in comparison mode
+   * @param bilinearFiltering Specifies whether or not bilinear filtering is
+   * enable on the texture
+   * @param generateStencil Specifies whether or not a stencil should be
+   * allocated in the texture
+   */
+  void createDepthStencilTexture(int comparisonFunction = 0,
+                                 bool bilinearFiltering = true,
+                                 bool generateStencil   = false);
 
   void _onRatioRescale();
 
@@ -70,11 +105,7 @@ public:
 
   RenderTargetCreationOptions& renderTargetOptions();
   const RenderTargetCreationOptions& renderTargetOptions() const;
-  unsigned int samples() const;
-  void setSamples(unsigned int value);
   void resetRefreshCounter();
-  int refreshRate() const;
-  void setRefreshRate(int value);
   void addPostProcess(PostProcess* postProcess);
   void clearPostProcesses(bool dispose = false);
   void removePostProcess(PostProcess* postProcess);
@@ -129,13 +160,23 @@ public:
    */
   void disposeFramebufferObjects();
 
-  void dispose(bool doNotRecurse = false) override;
+  void dispose() override;
   void _rebuild() override;
+
+  /**
+   * @brief Clear the info related to rendering groups preventing retention
+   * point in material dispose.
+   */
+  void freeRenderingGroups();
 
 protected:
   void unbindFrameBuffer(Engine* engine, unsigned int faceIndex);
 
 private:
+  unsigned int get_samples() const;
+  void set_samples(unsigned int value);
+  int get_refreshRate() const;
+  void set_refreshRate(int value);
   void _processSizeParameter(const ISize& size);
   int _bestReflectionRenderTargetDimension(int renderDimension,
                                            float scale) const;
@@ -182,6 +223,13 @@ public:
    */
   Vector3 boundingBoxPosition;
 
+  /**
+   * In case the RTT has been created with a depth texture, get the associated
+   * depth texture.
+   * Otherwise, return null.
+   */
+  InternalTexture* depthStencilTexture;
+
   // Events
 
   /**
@@ -208,6 +256,10 @@ public:
    * An event triggered after the texture clear
    */
   Observable<Engine> onClearObservable;
+
+  Property<RenderTargetTexture, unsigned int> samples;
+
+  Property<RenderTargetTexture, int> refreshRate;
 
 protected:
   RenderTargetCreationOptions _renderTargetOptions;

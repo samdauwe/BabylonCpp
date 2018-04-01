@@ -1,5 +1,6 @@
 #include <babylon/mesh/instanced_mesh.h>
 
+#include <babylon/core/logging.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/engine/scene.h>
 #include <babylon/mesh/mesh.h>
@@ -9,10 +10,12 @@ namespace BABYLON {
 
 InstancedMesh::InstancedMesh(const string_t& _name, Mesh* source)
     : AbstractMesh(_name, source->getScene())
+    , renderingGroupId{this, &InstancedMesh::get_renderingGroupId,
+                       &InstancedMesh::set_renderingGroupId}
+    , _sourceMesh{source}
+    , _currentLOD{nullptr}
 {
   source->instances.emplace_back(this);
-
-  _sourceMesh = source;
 
   position().copyFrom(source->position());
   rotation().copyFrom(source->rotation());
@@ -34,7 +37,7 @@ InstancedMesh::~InstancedMesh()
 {
 }
 
-const char* InstancedMesh::getClassName() const
+const string_t InstancedMesh::getClassName() const
 {
   return "InstancedMesh";
 }
@@ -64,9 +67,21 @@ Skeleton* InstancedMesh::skeleton()
   return _sourceMesh->skeleton();
 }
 
-unsigned int InstancedMesh::renderingGroupId() const
+unsigned int InstancedMesh::get_renderingGroupId() const
 {
   return _sourceMesh->renderingGroupId;
+}
+
+void InstancedMesh::set_renderingGroupId(unsigned int value)
+{
+  if (!_sourceMesh || value == _sourceMesh->renderingGroupId) {
+    return;
+  }
+
+  // no-op with warning
+  BABYLON_LOG_WARN("InstancedMesh",
+                   "Note - setting renderingGroupId of an instanced mesh has "
+                   "no effect on the scene");
 }
 
 size_t InstancedMesh::getTotalVertices() const
@@ -79,9 +94,9 @@ Mesh* InstancedMesh::sourceMesh() const
   return _sourceMesh;
 }
 
-bool InstancedMesh::isReady() const
+bool InstancedMesh::isReady(bool completeCheck) const
 {
-  return _sourceMesh->isReady(true);
+  return _sourceMesh->isReady(completeCheck, true);
 }
 
 Float32Array InstancedMesh::getVerticesData(unsigned int kind,
@@ -229,7 +244,7 @@ InstancedMesh* InstancedMesh::clone(const string_t& /*iNname*/, Node* newParent,
   return result;
 }
 
-void InstancedMesh::dispose(bool doNotRecurse)
+void InstancedMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   // Remove from mesh
   _sourceMesh->instances.erase(::std::remove(_sourceMesh->instances.begin(),
@@ -237,7 +252,7 @@ void InstancedMesh::dispose(bool doNotRecurse)
                                              this),
                                _sourceMesh->instances.end());
 
-  AbstractMesh::dispose(doNotRecurse);
+  AbstractMesh::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
 } // end of namespace BABYLON

@@ -4,7 +4,6 @@
 #include <babylon/babylon_global.h>
 #include <babylon/core/nullable.h>
 #include <babylon/core/structs.h>
-#include <babylon/interfaces/idisposable.h>
 #include <babylon/mesh/iget_set_vertices_data.h>
 
 namespace BABYLON {
@@ -12,8 +11,7 @@ namespace BABYLON {
 /**
  * @brief Class used to store geometry data (vertex buffers + index buffer).
  */
-class BABYLON_SHARED_EXPORT Geometry : public IGetSetVerticesData,
-                                       public IDisposable {
+class BABYLON_SHARED_EXPORT Geometry : public IGetSetVerticesData {
 
 public:
   friend class Mesh;
@@ -279,9 +277,9 @@ public:
   bool isDisposed() const;
 
   /**
-   * Free all associated resources
+   * @brief Free all associated resources.
    */
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
 
   /**
    * @brief Clone the current geometry into a new geometry.

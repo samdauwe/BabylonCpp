@@ -2,20 +2,19 @@
 #define BABYLON_LENSFLARE_LENS_FLARE_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/interfaces/idisposable.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT LensFlare : public IDisposable {
+class BABYLON_SHARED_EXPORT LensFlare {
 
 public:
   template <typename... Ts>
   static LensFlare* AddFlare(Ts&&... args);
   virtual ~LensFlare();
 
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
 
 protected:
   LensFlare(float size, const Vector3& position,

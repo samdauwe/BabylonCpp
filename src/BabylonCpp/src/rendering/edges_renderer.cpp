@@ -65,7 +65,7 @@ void EdgesRenderer::_rebuild()
   _ib         = engine->createIndexBuffer(_linesIndices);
 }
 
-void EdgesRenderer::dispose(bool /*doNotRecurse*/)
+void EdgesRenderer::dispose()
 {
   if (_buffers.find(VertexBuffer::PositionKind) != _buffers.end()) {
     auto& buffer = _buffers[VertexBuffer::PositionKind];
@@ -341,9 +341,11 @@ void EdgesRenderer::_generateEdgesLines()
   auto engine = _source->getScene()->getEngine();
 
   _buffers[VertexBuffer::PositionKind] = ::std::make_unique<VertexBuffer>(
-    engine, _linesPositions, VertexBuffer::PositionKind, false);
+    engine, ToVariant<Float32Array, Buffer*>(_linesPositions),
+    VertexBuffer::PositionKind, false);
   _buffers[VertexBuffer::NormalKind] = ::std::make_unique<VertexBuffer>(
-    engine, _linesNormals, VertexBuffer::NormalKind, false, false, 4);
+    engine, ToVariant<Float32Array, Buffer*>(_linesNormals),
+    VertexBuffer::NormalKind, false, false, 4);
   _bufferPtrs[VertexBuffer::PositionKindChars]
     = _buffers[VertexBuffer::PositionKind].get();
   _bufferPtrs[VertexBuffer::NormalKindChars]

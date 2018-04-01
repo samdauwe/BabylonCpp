@@ -156,7 +156,8 @@ bool SSAO2RenderingPipeline::IsSupported()
   return engine->getCaps().drawBuffersExtension;
 }
 
-void SSAO2RenderingPipeline::dispose(bool disableGeometryBufferRenderer)
+void SSAO2RenderingPipeline::dispose(bool disableGeometryBufferRenderer,
+                                     bool /*disposeMaterialAndTextures*/)
 {
   for (auto& camera : _scene->cameras) {
     auto _camera = camera.get();

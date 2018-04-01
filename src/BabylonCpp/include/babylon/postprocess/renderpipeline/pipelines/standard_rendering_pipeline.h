@@ -78,7 +78,8 @@ private:
   Texture* _getDepthTexture();
   void _disposePostProcesses();
   // Dispose
-  void dispose(bool doNotRecurse = false) override;
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
 
 public:
   // Post-processes

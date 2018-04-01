@@ -94,7 +94,7 @@ unsigned int ReflectionProbe::get_samples() const
 
 void ReflectionProbe::set_samples(unsigned int value)
 {
-  _renderTargetTexture->setSamples(value);
+  _renderTargetTexture->samples = value;
 }
 
 int ReflectionProbe::get_refreshRate() const
@@ -104,7 +104,7 @@ int ReflectionProbe::get_refreshRate() const
 
 void ReflectionProbe::set_refreshRate(int value)
 {
-  _renderTargetTexture->setRefreshRate(value);
+  _renderTargetTexture->refreshRate = value;
 }
 
 Scene* ReflectionProbe::getScene() const
@@ -134,7 +134,7 @@ void ReflectionProbe::setRenderingAutoClearDepthStencil(
     renderingGroupId, autoClearDepthStencil);
 }
 
-void ReflectionProbe::dispose(bool /*doNotRecurse*/)
+void ReflectionProbe::dispose()
 {
   // Remove from the scene if found
   _scene->reflectionProbes.erase(

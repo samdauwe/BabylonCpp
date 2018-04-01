@@ -167,9 +167,9 @@ void GeometryBufferRenderer::setSamples(unsigned int value)
   _multiRenderTarget->setSamples(value);
 }
 
-void GeometryBufferRenderer::dispose(bool doNotRecurse)
+void GeometryBufferRenderer::dispose()
 {
-  getGBuffer()->dispose(doNotRecurse);
+  getGBuffer()->dispose();
 }
 
 void GeometryBufferRenderer::_createRenderTargets()
@@ -193,7 +193,7 @@ void GeometryBufferRenderer::_createRenderTargets()
 
   _multiRenderTarget->setWrapU(TextureConstants::CLAMP_ADDRESSMODE);
   _multiRenderTarget->setWrapV(TextureConstants::CLAMP_ADDRESSMODE);
-  _multiRenderTarget->setRefreshRate(1);
+  _multiRenderTarget->refreshRate     = 1;
   _multiRenderTarget->renderParticles = false;
   _multiRenderTarget->renderList      = {};
 

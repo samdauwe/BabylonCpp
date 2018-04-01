@@ -3,7 +3,6 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/engine/scene.h>
-#include <babylon/interfaces/idisposable.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/vector2.h>
 #include <babylon/tools/observable.h>
@@ -11,7 +10,7 @@
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT Layer : public IDisposable {
+class BABYLON_SHARED_EXPORT Layer {
 
 public:
   Layer(const string_t& name, const string_t& imgUrl, Scene* scene,
@@ -28,7 +27,7 @@ public:
 
   void _rebuild();
   void render();
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
 
 private:
   void _createIndexBuffer();

@@ -3472,7 +3472,7 @@ void Scene::unfreezeMaterials()
   }
 }
 
-void Scene::dispose(bool /*doNotRecurse*/)
+void Scene::dispose()
 {
   beforeRender = nullptr;
   afterRender  = nullptr;

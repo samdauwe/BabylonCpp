@@ -28,9 +28,9 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, Camera* camera)
   _depthMap = ::std::make_unique<RenderTargetTexture>(
     "depthMap", ISize{engine->getRenderWidth(), engine->getRenderHeight()},
     _scene, false, true, type);
-  _depthMap->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
-  _depthMap->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
-  _depthMap->setRefreshRate(1);
+  _depthMap->wrapU           = TextureConstants::CLAMP_ADDRESSMODE;
+  _depthMap->wrapV           = TextureConstants::CLAMP_ADDRESSMODE;
+  _depthMap->refreshRate     = 1;
   _depthMap->renderParticles = false;
   _depthMap->renderList.clear();
 
@@ -217,7 +217,7 @@ RenderTargetTexture* DepthRenderer::getDepthMap()
   return _depthMap.get();
 }
 
-void DepthRenderer::dispose(bool /*doNotRecurse*/)
+void DepthRenderer::dispose()
 {
   _depthMap->dispose();
 }

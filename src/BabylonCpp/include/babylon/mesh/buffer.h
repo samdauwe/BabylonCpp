@@ -3,14 +3,13 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/core/nullable.h>
-#include <babylon/interfaces/idisposable.h>
 
 namespace BABYLON {
 
 /**
  * @brief Buffer representation.
  */
-class BABYLON_SHARED_EXPORT Buffer : public IDisposable {
+class BABYLON_SHARED_EXPORT Buffer {
 
 public:
   Buffer(Engine* engine, const Float32Array& data, bool updatable, int stride,
@@ -51,7 +50,7 @@ public:
   GL::IGLBuffer* updateDirectly(const Float32Array& data, int offset);
   GL::IGLBuffer* updateDirectly(const Float32Array& data, int offset,
                                 size_t vertexCount);
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
 
 private:
   Engine* _engine;

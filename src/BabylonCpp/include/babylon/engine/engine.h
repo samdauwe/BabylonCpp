@@ -7,7 +7,6 @@
 #include <babylon/engine/engine_capabilities.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/engine/engine_options.h>
-#include <babylon/interfaces/idisposable.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/math/size.h>
 #include <babylon/math/viewport.h>
@@ -23,7 +22,7 @@ namespace BABYLON {
  * @brief The engine class is responsible for interfacing with all lower-level
  * APIs such as OpenGL and Audio.
  */
-class BABYLON_SHARED_EXPORT Engine : public IDisposable {
+class BABYLON_SHARED_EXPORT Engine {
 
 public:
   using ArrayBufferViewArray   = vector_t<ArrayBufferView>;
@@ -188,9 +187,23 @@ public:
    */
   void setSize(int width, int height);
 
-  void bindFramebuffer(InternalTexture* texture, unsigned int faceIndex = 0,
-                       int requiredWidth = 0, int requiredHeight = 0,
-                       bool forceFullscreenViewport = true);
+  /**
+   * @brief Binds the frame buffer to the specified texture.
+   * @param texture The texture to render to or null for the default canvas
+   * @param faceIndex The face of the texture to render to in case of cube
+   * texture
+   * @param requiredWidth The width of the target to render to
+   * @param requiredHeight The height of the target to render to
+   * @param forceFullscreenViewport Forces the viewport to be the entire
+   * texture/screen if true
+   * @param depthStencilTexture The depth stencil texture to use to render
+   */
+  void bindFramebuffer(InternalTexture* texture,
+                       Nullable<unsigned int> faceIndex       = nullptr,
+                       Nullable<int> requiredWidth            = nullptr,
+                       Nullable<int> requiredHeight           = nullptr,
+                       Nullable<bool> forceFullscreenViewport = nullptr,
+                       InternalTexture* depthStencilTexture   = nullptr);
   void unBindFramebuffer(InternalTexture* texture,
                          bool disableGenerateMipMaps = false,
                          const ::std::function<void()>& onBeforeUnbind
@@ -452,6 +465,26 @@ public:
                             bool invertY, bool premulAlpha = false,
                             unsigned int format
                             = EngineConstants::TEXTUREFORMAT_RGBA);
+
+  /**
+   * @brief Creates a depth stencil texture.
+   * This is only available in WebGL 2 or with the depth texture extension
+   * available.
+   * @param size The size of face edge in the texture.
+   * @param options The options defining the texture.
+   * @returns The texture
+   */
+  InternalTexture*
+  createDepthStencilTexture(const Variant<int, ISize> size,
+                            const DepthTextureCreationOptions& options);
+
+  /**
+   * @brief Sets the frame buffer Depth / Stencil attachement of the render
+   * target to the defined depth stencil texture.
+   * @param renderTarget The render target to set the frame buffer for
+   */
+  void setFrameBufferDepthStencilTexture(RenderTargetTexture* renderTarget);
+
   InternalTexture*
   createRenderTargetTexture(ISize size, const IRenderTargetOptions& options);
   vector_t<InternalTexture*>
@@ -529,7 +562,7 @@ public:
   void releaseEffects();
 
   /** Dispose **/
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
 
   /** Loading screen **/
   void displayLoadingUI();

@@ -256,11 +256,23 @@ PostProcess* Camera::rigPostProcess()
   return _rigPostProcess;
 }
 
+PostProcess* Camera::_getFirstPostProcess() const
+{
+  for (const auto& pp : _postProcesses) {
+    if (pp != nullptr) {
+      return pp;
+    }
+  }
+
+  return nullptr;
+}
+
 void Camera::_cascadePostProcessesToRigCams()
 {
   // invalidate framebuffer
-  if (!_postProcesses.empty()) {
-    _postProcesses[0]->markTextureDirty();
+  auto firstPostProcess = _getFirstPostProcess();
+  if (firstPostProcess) {
+    firstPostProcess->markTextureDirty();
   }
 
   // glue the rigPostProcess to the end of the user postprocesses & assign to
@@ -299,6 +311,10 @@ int Camera::attachPostProcess(PostProcess* postProcess, int insertAt)
   if (insertAt < 0) {
     _postProcesses.emplace_back(postProcess);
   }
+  else if (static_cast<size_t>(insertAt) < _postProcesses.size()
+           && _postProcesses[static_cast<size_t>(insertAt)] == nullptr) {
+    _postProcesses[static_cast<size_t>(insertAt)] = postProcess;
+  }
   else {
     stl_util::splice(_postProcesses, insertAt, 0, {postProcess});
   }
@@ -308,10 +324,10 @@ int Camera::attachPostProcess(PostProcess* postProcess, int insertAt)
 
 void Camera::detachPostProcess(PostProcess* postProcess)
 {
-  _postProcesses.erase(
-    ::std::remove(_postProcesses.begin(), _postProcesses.end(), postProcess),
-    _postProcesses.end());
-
+  auto idx = stl_util::index_of(_postProcesses, postProcess);
+  if (idx != -1) {
+    _postProcesses[static_cast<size_t>(idx)] = nullptr;
+  }
   _cascadePostProcessesToRigCams(); // also ensures framebuffer invalidated
 }
 
@@ -521,7 +537,7 @@ Ray Camera::getForwardRay(float length, const Matrix& transform,
   return Ray(origin, direction, length);
 }
 
-void Camera::dispose(bool /*doNotRecurse*/)
+void Camera::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   // Observables
   onViewMatrixChangedObservable.clear();
@@ -553,7 +569,9 @@ void Camera::dispose(bool /*doNotRecurse*/)
   }
   else {
     for (size_t i = _postProcesses.size(); i-- > 0;) {
-      _postProcesses[i]->dispose(this);
+      if (_postProcesses[i]) {
+        _postProcesses[i]->dispose(this);
+      }
     }
     _postProcesses.clear();
   }
@@ -568,7 +586,7 @@ void Camera::dispose(bool /*doNotRecurse*/)
   // Active Meshes
   _activeMeshes.clear();
 
-  Node::dispose();
+  Node::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
 // ---- Camera rigs section ----
@@ -692,7 +710,7 @@ Json::object Camera::serialize() const
   return Json::object();
 }
 
-const char* Camera::getClassName() const
+const string_t Camera::getClassName() const
 {
   return "Camera";
 }

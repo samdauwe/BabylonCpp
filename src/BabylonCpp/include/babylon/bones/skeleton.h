@@ -74,7 +74,8 @@ public:
   vector_t<Animation*> getAnimations() override;
   unique_ptr_t<Skeleton> clone(const string_t& name, const string_t& id) const;
   void enableBlending(float blendingSpeed = 0.01f);
-  void dispose(bool doNotRecurse = false) override;
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
   Json::object serialize() const;
 
   // Statics
@@ -96,6 +97,17 @@ public:
   vector_t<Animation*> animations;
   string_t name;
   string_t id;
+
+  /**
+   * Specifies if the skeleton should be serialized.
+   */
+  bool doNotSerialize;
+
+  /**
+   * Gets or sets the animation properties override
+   */
+  AnimationPropertiesOverride* animationPropertiesOverride;
+
   // Events
   /**
    * An event triggered before computing the skeleton's matrices

@@ -49,7 +49,8 @@ unique_ptr_t<VertexBuffer> Buffer::createVertexBuffer(unsigned int kind,
 {
   // a lot of these parameters are ignored as they are overriden by the buffer
   return ::std::make_unique<VertexBuffer>(
-    _engine, this, kind, _updatable, true, stride ? *stride : _strideSize,
+    _engine, ToVariant<Float32Array, Buffer*>(this), kind, _updatable, true,
+    stride ? *stride : _strideSize,
     instanced.isNull() ? _instanced : *instanced, offset, size);
 }
 
@@ -168,7 +169,7 @@ GL::IGLBuffer* Buffer::updateDirectly(const Float32Array& data, int offset,
   return _buffer ? _buffer.get() : nullptr;
 }
 
-void Buffer::dispose(bool /*doNotRecurse*/)
+void Buffer::dispose()
 {
   if (!_buffer) {
     return;

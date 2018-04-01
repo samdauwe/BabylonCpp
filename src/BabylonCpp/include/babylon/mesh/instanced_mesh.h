@@ -25,7 +25,7 @@ public:
   /**
    * @brief Returns the string "InstancedMesh"
    */
-  const char* getClassName() const override;
+  const string_t getClassName() const override;
 
   IReflect::Type type() const override;
 
@@ -34,7 +34,6 @@ public:
   Material* material() const;
   float visibility() const;
   Skeleton* skeleton() override;
-  unsigned int renderingGroupId() const;
 
   /**
    * @brief Returns the total number of vertices (integer).
@@ -45,9 +44,11 @@ public:
 
   /**
    * @brief Is this node ready to be used/rendered.
+   * @param completeCheck defines if a complete check (including materials and
+   * lights) has to be done (false by default)
    * @return {boolean} is it ready
    */
-  bool isReady() const;
+  bool isReady(bool completeCheck = false) const override;
 
   /**
    * @brief Returns Float32Array of the requested kind of data : positons,
@@ -183,10 +184,18 @@ public:
   /**
    * @brief Disposes the InstancedMesh.
    */
-  void dispose(bool doNotRecurse = false) override;
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
 
 protected:
   InstancedMesh(const string_t& name, Mesh* source);
+
+private:
+  unsigned int get_renderingGroupId() const;
+  void set_renderingGroupId(unsigned int value);
+
+public:
+  Property<InstancedMesh, unsigned int> renderingGroupId;
 
 private:
   Mesh* _sourceMesh;

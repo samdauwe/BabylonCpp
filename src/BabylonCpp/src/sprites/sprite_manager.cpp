@@ -334,7 +334,7 @@ void SpriteManager::render()
   engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
 }
 
-void SpriteManager::dispose(bool /*doNotRecurse*/)
+void SpriteManager::dispose()
 {
   if (_buffer) {
     _buffer->dispose();

@@ -6,7 +6,7 @@
 
 namespace BABYLON {
 
-struct InstancingAttributeInfo {
+struct BABYLON_SHARED_EXPORT InstancingAttributeInfo {
   /**
    * Index/offset of the attribute in the vertex shader
    */

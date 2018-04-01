@@ -35,40 +35,13 @@ public:
    * @brief Returns the string "DirectionalLight".
    * @return The class name
    */
-  const char* getClassName() const override;
+  const string_t getClassName() const override;
 
   /**
    * @brief Returns the integer 1.
    * @return The light Type id as a constant defines in Light.LIGHTTYPEID_x
    */
   unsigned int getTypeID() const override;
-
-  /**
-   * @brief Fix frustum size for the shadow generation. This is disabled if the
-   * value is 0.
-   */
-  float shadowFrustumSize() const;
-
-  /**
-   * @brief Specifies a fix frustum size for the shadow generation.
-   */
-  void setShadowFrustumSize(float value);
-
-  /**
-   * @brief Gets the shadow projection scale against the optimal computed one.
-   * 0.1 by default which means that the projection window is increase by 10%
-   * from the optimal size. This does not impact in fixed frustum size
-   * (shadowFrustumSize being set)
-   */
-  float shadowOrthoScale() const;
-
-  /**
-   * @brief Sets the shadow projection scale against the optimal computed one.
-   * 0.1 by default which means that the projection window is increase by 10%
-   * from the optimal size. This does not impact in fixed frustum size
-   * (shadowFrustumSize being set)
-   */
-  void setShadowOrthoScale(float value);
 
   /**
    * @brief Sets the passed Effect object with the DirectionalLight transformed
@@ -140,7 +113,45 @@ protected:
 
   void _buildUniformLayout() override;
 
+private:
+  /**
+   * @brief Fix frustum size for the shadow generation. This is disabled if the
+   * value is 0.
+   */
+  float get_shadowFrustumSize() const;
+
+  /**
+   * @brief Specifies a fix frustum size for the shadow generation.
+   */
+  void set_shadowFrustumSize(float value);
+
+  /**
+   * @brief Gets the shadow projection scale against the optimal computed one.
+   * 0.1 by default which means that the projection window is increase by 10%
+   * from the optimal size. This does not impact in fixed frustum size
+   * (shadowFrustumSize being set)
+   */
+  float get_shadowOrthoScale() const;
+
+  /**
+   * @brief Sets the shadow projection scale against the optimal computed one.
+   * 0.1 by default which means that the projection window is increase by 10%
+   * from the optimal size. This does not impact in fixed frustum size
+   * (shadowFrustumSize being set)
+   */
+  void set_shadowOrthoScale(float value);
+
 public:
+  /**
+   * Frustum size for the shadow generation.
+   */
+  Property<DirectionalLight, float> shadowFrustumSize;
+
+  /**
+   * Shadow projection scale against the optimal computed one.
+   */
+  Property<DirectionalLight, float> shadowOrthoScale;
+
   /**
    * Automatically compute the projection matrix to best fit (including all the
    * casters) on each frame.

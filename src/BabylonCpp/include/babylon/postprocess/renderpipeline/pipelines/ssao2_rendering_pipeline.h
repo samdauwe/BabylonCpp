@@ -67,7 +67,8 @@ public:
    * @brief Removes the internal pipeline assets and detatches the pipeline from
    * the scene cameras.
    */
-  void dispose(bool disableGeometryBufferRenderer = false) override;
+  void dispose(bool disableGeometryBufferRenderer = false,
+               bool disposeMaterialAndTextures    = false) override;
 
 private:
   void set_samples(unsigned int n);

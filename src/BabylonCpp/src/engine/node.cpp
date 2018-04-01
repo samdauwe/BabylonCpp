@@ -19,11 +19,14 @@ Node::Node(const string_t& iName, Scene* scene)
     : name{iName}
     , id{iName}
     , doNotSerialize{false}
+    , _isDisposed{false}
     , _currentRenderId{-1}
+    , _childRenderId{-1}
     , _isEnabled{true}
     , _isReady{true}
     , _parentRenderId{-1}
     , _parentNode{nullptr}
+    , _animationPropertiesOverride{nullptr}
     , _worldMatrix{::std::make_unique<Matrix>(Matrix::Identity())}
     , _onDisposeObserver{nullptr}
 {
@@ -40,6 +43,11 @@ Node::~Node()
 IReflect::Type Node::type() const
 {
   return IReflect::Type::NODE;
+}
+
+bool Node::isDisposed() const
+{
+  return _isDisposed;
 }
 
 void Node::setParent(Node* parent)
@@ -70,7 +78,17 @@ Node* Node::parent() const
   return _parentNode;
 }
 
-const char* Node::getClassName() const
+AnimationPropertiesOverride* Node::animationPropertiesOverride()
+{
+  return _animationPropertiesOverride;
+}
+
+void Node::setAnimationPropertiesOverride(AnimationPropertiesOverride* value)
+{
+  _animationPropertiesOverride = value;
+}
+
+const string_t Node::getClassName() const
 {
   return "Node";
 }
@@ -181,17 +199,17 @@ bool Node::_isSynchronized()
 void Node::_markSyncedWithParent()
 {
   if (parent()) {
-    _parentRenderId = parent()->_currentRenderId;
+    _parentRenderId = parent()->_childRenderId;
   }
 }
 
-bool Node::isSynchronizedWithParent()
+bool Node::isSynchronizedWithParent() const
 {
   if (!parent()) {
     return true;
   }
 
-  if (_parentRenderId != _parentNode->_currentRenderId) {
+  if (_parentRenderId != parent()->_childRenderId) {
     return false;
   }
 
@@ -226,7 +244,7 @@ bool Node::hasNewParent(bool update)
   return true;
 }
 
-bool Node::isReady() const
+bool Node::isReady(bool /*completeCheck*/) const
 {
   return _isReady;
 }
@@ -380,6 +398,7 @@ void Node::_setReady(bool iState)
   if (onReady) {
     onReady(this);
   }
+  _isReady = true;
 }
 
 vector_t<Animation*> Node::getAnimations()
@@ -460,8 +479,22 @@ Matrix& Node::computeWorldMatrix(bool /*force*/)
   return *_worldMatrix;
 }
 
-void Node::dispose(bool /*doNotRecurse*/)
+void Node::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
+  if (!doNotRecurse) {
+    auto nodes = getDescendants(true);
+    for (auto& node : nodes) {
+      node->dispose(doNotRecurse, disposeMaterialAndTextures);
+    }
+  }
+  else {
+    auto transformNodes = getChildTransformNodes(true);
+    for (auto& transformNode : transformNodes) {
+      transformNode->setParent(nullptr);
+      transformNode->computeWorldMatrix(true);
+    }
+  }
+
   setParent(nullptr);
 
   // Callback
@@ -474,6 +507,7 @@ void Node::dispose(bool /*doNotRecurse*/)
   }
 
   _behaviors.clear();
+  _isDisposed = true;
 }
 
 void Node::ParseAnimationRanges(Node* node, const Json::value& parsedNode,

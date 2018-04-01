@@ -1061,7 +1061,8 @@ void StandardRenderingPipeline::_disposePostProcesses()
   blurVPostProcesses.clear();
 }
 
-void StandardRenderingPipeline::dispose(bool doNotRecurse)
+void StandardRenderingPipeline::dispose(bool doNotRecurse,
+                                        bool /*disposeMaterialAndTextures*/)
 {
   _disposePostProcesses();
 

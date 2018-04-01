@@ -45,7 +45,8 @@ void BoundingBoxRenderer::_prepareResources()
   auto boxdata = VertexData::CreateBox(options);
   _vertexBuffers.resize(VertexBuffer::PositionKind + 1);
   _vertexBuffers[VertexBuffer::PositionKind] = ::std::make_unique<VertexBuffer>(
-    engine, boxdata->positions, VertexBuffer::PositionKind, false);
+    engine, ToVariant<Float32Array, Buffer*>(boxdata->positions),
+    VertexBuffer::PositionKind, false);
   _vertexBuffersMap[VertexBuffer::PositionKindChars]
     = _vertexBuffers[VertexBuffer::PositionKind].get();
   _createIndexBuffer();
@@ -169,7 +170,7 @@ void BoundingBoxRenderer::renderOcclusionBoundingBox(AbstractMesh* mesh)
   engine->setColorWrite(true);
 }
 
-void BoundingBoxRenderer::dispose(bool /*doNotRecurse*/)
+void BoundingBoxRenderer::dispose()
 {
   if (!_colorShader) {
     return;

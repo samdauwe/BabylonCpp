@@ -83,7 +83,8 @@ SSAORenderingPipeline::~SSAORenderingPipeline()
 {
 }
 
-void SSAORenderingPipeline::dispose(bool disableDepthRender)
+void SSAORenderingPipeline::dispose(bool disableDepthRender,
+                                    bool /*disposeMaterialAndTextures*/)
 {
   for (auto& camera : _scene->cameras) {
     auto _camera = camera.get();

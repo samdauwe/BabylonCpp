@@ -336,7 +336,7 @@ BaseTexture* BaseTexture::_lodTextureLow() const
   return nullptr;
 }
 
-void BaseTexture::dispose(bool /*doNotRecurse*/)
+void BaseTexture::dispose()
 {
   if (!_scene) {
     return;

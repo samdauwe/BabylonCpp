@@ -24,6 +24,12 @@ public:
                 bool isPure = true);
   ~TransformNode() override;
 
+  /**
+   * @brief Gets a string idenfifying the name of the class.
+   * @returns "TransformNode" string
+   */
+  const string_t getClassName() const override;
+
   Vector3& position();
   const Vector3& position() const;
   void setPosition(const Vector3& newPosition);
@@ -67,6 +73,21 @@ public:
   void setRotationQuaternion(const Nullable<Quaternion>& quaternion);
 
   /**
+   * @brief The forward direction of that transform in world space.
+   */
+  Vector3 forward();
+
+  /**
+   * @brief The up direction of that transform in world space.
+   */
+  Vector3 up();
+
+  /**
+   * @brief The right direction of that transform in world space.
+   */
+  Vector3 right();
+
+  /**
    * @brief Returns the latest update of the World matrix.
    * @returns a Matrix.
    */
@@ -81,7 +102,7 @@ public:
 
   /**
    * @brief Copies the paramater passed Matrix into the mesh Pose matrix.
-   * @returns the AbstractMesh.
+   * @returns the TransformNode.
    */
   TransformNode& updatePoseMatrix(const Matrix& matrix);
 
@@ -132,13 +153,13 @@ public:
 
   /**
    * @brief Prevents the World matrix to be computed any longer.
-   * @returns the AbstractMesh.
+   * @returns the TransformNode.
    */
   TransformNode& freezeWorldMatrix();
 
   /**
    * @brief Allows back the World matrix computation.
-   * @returns Returns the AbstractMesh.
+   * @returns Returns the TransformNode.
    */
   TransformNode& unfreezeWorldMatrix();
 
@@ -157,13 +178,13 @@ public:
   /**
    * @brief Sets the mesh absolute position in the World from a Vector3 or an
    * Array(3).
-   * @returns the AbstractMesh.
+   * @returns the TransformNode.
    */
   TransformNode& setAbsolutePosition(const Nullable<Vector3>& absolutePosition);
 
   /**
    * @brief Sets the mesh position in its local space.
-   * @returns the AbstractMesh.
+   * @returns the TransformNode.
    */
   TransformNode& setPositionWithLocalVector(const Vector3& vector3);
 
@@ -176,7 +197,7 @@ public:
 
   /**
    * @brief Translates the mesh along the passed Vector3 in its local space.
-   * @returns the AbstractMesh.
+   * @returns the TransformNode.
    */
   TransformNode& locallyTranslate(const Vector3& vector3);
 
@@ -207,7 +228,7 @@ public:
    * same rotation than the mesh.
    * localAxis is expressed in the mesh local space.
    * result is computed in the Wordl space from the mesh World matrix.
-   * @returns the AbstractMesh.
+   * @returns the TransformNode.
    */
   TransformNode& getDirectionToRef(const Vector3& localAxis, Vector3& result);
 
@@ -229,7 +250,7 @@ public:
   /**
    * @brief Sets the passed Vector3 "result" with the coordinates of the mesh
    * pivot point in the local space.
-   * @returns the AbstractMesh.
+   * @returns the TransformNode.
    */
   TransformNode& getPivotPointToRef(Vector3& result);
 
@@ -242,7 +263,7 @@ public:
   /**
    * @brief Sets the Vector3 "result" coordinates with the mesh pivot point
    * World coordinates.
-   * @returns the AbstractMesh.
+   * @returns the TransformNode.
    */
   TransformNode& getAbsolutePivotPointToRef(Vector3& result);
 
@@ -276,7 +297,7 @@ public:
    * Note that the property `rotationQuaternion` is then automatically updated
    * and the property `rotation` is set to (0,0,0) and no longer used.
    * The passed axis is also normalized.
-   * @returns the AbstractMesh.
+   * @returns the TransformNode.
    */
   TransformNode& rotate(Vector3& axis, float amount,
                         Space space = Space::LOCAL);
@@ -287,7 +308,7 @@ public:
    * Note that the property `rotationQuaternion` is then automatically updated
    * and the property `rotation` is set to (0,0,0) and no longer used.
    * The passed axis is also normalized.
-   * Returns the AbstractMesh.
+   * @returns the TransformNode.
    * Method is based on
    * http://www.euclideanspace.com/maths/geometry/affine/aroundPoint/index.htm
    */
@@ -299,7 +320,7 @@ public:
    * the given space.
    * @param space (default LOCAL) can be either BABYLON.Space.LOCAL, either
    * BABYLON.Space.WORLD.
-   * @returns the AbstractMesh.
+   * @returns the TransformNode.
    */
   TransformNode& translate(const Vector3& axis, float distance,
                            Space space = Space::LOCAL);
@@ -322,7 +343,7 @@ public:
    * Under the hood, only quaternions are used. So it's a little faster is you
    * use .rotationQuaternion because it doesn't need to translate them back to
    * Euler angles.
-   * @returns the AbstractMesh.
+   * @returns the TransformNode.
    */
   TransformNode& addRotation(float x, float y, float z);
 
@@ -376,12 +397,14 @@ public:
                               Scene* scene, const string_t& rootUrl);
 
   /**
-   * @brief Disposes the TransformNode.
-   * By default, all the children are also disposed unless the parameter
-   * `doNotRecurse` is set to `true`.
-   * @returns nothing.
+   * @brief Releases resources associated with this transform node.
+   * @param doNotRecurse Set to true to not recurse into each children (recurse
+   * into each children by default)
+   * @param disposeMaterialAndTextures Set to true to also dispose referenced
+   * materials and textures (false by default)
    */
-  void dispose(bool doNotRecurse = false) override;
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
 
 protected:
   /**
@@ -417,6 +440,12 @@ private:
   static unique_ptr_t<Quaternion> _rotationAxisCache;
 
 private:
+  Vector3 _forward;
+  Vector3 _forwardInverted;
+  Vector3 _up;
+  Vector3 _right;
+  Vector3 _rightInverted;
+
   // Properties
   Vector3 _position;
   Vector3 _rotation;

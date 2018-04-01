@@ -602,7 +602,8 @@ void GPUParticleSystem::_releaseVAOs()
   _renderVAO.clear();
 }
 
-void GPUParticleSystem::dispose(bool disposeTexture)
+void GPUParticleSystem::dispose(bool disposeTexture,
+                                bool /*disposeMaterialAndTextures*/)
 {
   // Remove from scene
   _scene->particleSystems.erase(

@@ -62,8 +62,9 @@ public:
                bool doNotUpdateMaxZ = false);
   Camera* createRigCamera(const string_t& name, int cameraIndex) override;
   void _updateRigCameras() override;
-  void dispose(bool doNotRecurse = false) override;
-  const char* getClassName() const override;
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
+  const string_t getClassName() const override;
   Json::object serialize() const override;
 
 protected:
@@ -161,6 +162,8 @@ protected:
   unique_ptr_t<AutoRotationBehavior> _autoRotationBehavior;
 
 private:
+  Vector3 _computationVector;
+
   /**
    * Store current camera state (fov, position, etc..)
    */

@@ -2,6 +2,7 @@
 #define BABYLON_ANIMATIONS_ANIMATION_GROUP_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/nullable.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/tools/observable.h>
 
@@ -52,8 +53,13 @@ public:
    * @param loop defines if animations must loop
    * @param speedRatio defines the ratio to apply to animation speed (1 by
    * default)
+   * @param from defines the from key (optional)
+   * @param to defines the to key (optional)
+   * @returns the current animation group
    */
-  AnimationGroup& start(bool loop = false, float speedRatio = 1.f);
+  AnimationGroup& start(bool loop = false, float speedRatio = 1.f,
+                        Nullable<int> from = nullptr,
+                        Nullable<int> to   = nullptr);
 
   /**
    * @brief Pause all animations.
@@ -84,9 +90,18 @@ public:
   AnimationGroup& stop();
 
   /**
+   * @brief Goes to a specific frame in this animation group
+   *
+   * @param frame the frame number to go to
+   * @return the animationGroup
+   */
+  AnimationGroup& goToFrame(int frame);
+
+  /**
    * @brief Dispose all associated resources.
    */
-  void dispose(bool doNotRecurse = false) override;
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
 
 protected:
   AnimationGroup(const string_t& name, Scene* scene = nullptr);
@@ -112,6 +127,12 @@ private:
    */
   vector_t<unique_ptr_t<TargetedAnimation>>& get_targetedAnimations();
 
+  /**
+   * @brief Returning the list of animatables controlled by this animation
+   * group.
+   */
+  vector_t<Animatable*>& get_animatables();
+
 public:
   string_t name;
   Observable<TargetedAnimation> onAnimationEndObservable;
@@ -131,6 +152,11 @@ public:
    */
   ReadOnlyProperty<AnimationGroup, vector_t<unique_ptr_t<TargetedAnimation>>>
     targetedAnimations;
+
+  /**
+   * Animatables controlled by this animation group.
+   */
+  ReadOnlyProperty<AnimationGroup, vector_t<Animatable*>> animatables;
 
 private:
   Scene* _scene;

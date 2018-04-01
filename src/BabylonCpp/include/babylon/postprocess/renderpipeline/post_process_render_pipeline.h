@@ -32,7 +32,8 @@ public:
   void _detachCameras(const vector_t<Camera*>& cameras);
   void _update();
   void _reset();
-  virtual void dispose(bool doNotRecurse = false) override;
+  virtual void dispose(bool doNotRecurse               = false,
+                       bool disposeMaterialAndTextures = false) override;
 
 public:
   string_t _name;

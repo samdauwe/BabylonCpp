@@ -49,7 +49,7 @@ void PointLight::setDirection(const Vector3& value)
   }
 }
 
-const char* PointLight::getClassName() const
+const string_t PointLight::getClassName() const
 {
   return "PointLight";
 }

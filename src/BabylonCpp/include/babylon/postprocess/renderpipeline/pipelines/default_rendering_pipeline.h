@@ -124,7 +124,8 @@ public:
   /**
    * @brief Dispose of the pipeline and stop all post processes.
    */
-  void dispose(bool doNotRecurse = false) override;
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Serialize the rendering pipeline (Used when exporting)

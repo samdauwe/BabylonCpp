@@ -3,7 +3,6 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/culling/icullable.h>
-#include <babylon/interfaces/idisposable.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/plane.h>
 #include <babylon/mesh/base_sub_mesh.h>
@@ -14,9 +13,7 @@ namespace BABYLON {
 /**
  * @brief
  */
-class BABYLON_SHARED_EXPORT SubMesh : public BaseSubMesh,
-                                      public ICullable,
-                                      public IDisposable {
+class BABYLON_SHARED_EXPORT SubMesh : public BaseSubMesh, public ICullable {
 
 public:
   template <typename... Ts>
@@ -127,7 +124,7 @@ public:
   /**
    * @brief Disposes the Submesh.
    */
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
 
   /** Statics **/
 

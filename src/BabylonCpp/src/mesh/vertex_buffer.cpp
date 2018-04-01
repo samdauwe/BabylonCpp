@@ -61,39 +61,63 @@ constexpr const char* VertexBuffer::OffsetKindChars;
 constexpr const char* VertexBuffer::SeedKindChars;
 constexpr const char* VertexBuffer::SizeKindChars;
 
-VertexBuffer::VertexBuffer(Engine* engine, const Float32Array& data,
+VertexBuffer::VertexBuffer(Engine* engine,
+                           const Variant<Float32Array, Buffer*> data,
                            unsigned int kind, bool updatable,
-                           bool postponeInternalCreation, int stride,
-                           bool instanced, int offset, int size)
-    : _ownedBuffer{nullptr}, _buffer{nullptr}, _kind{kind}, _ownsBuffer{true}
+                           Nullable<bool> postponeInternalCreation,
+                           Nullable<int> stride, Nullable<bool> instanced,
+                           Nullable<unsigned int> offset, Nullable<int> size)
+    : instanceDivisor{this, &VertexBuffer::get_instanceDivisor,
+                      &VertexBuffer::set_instanceDivisor}
 {
-  // Deduce stride from kind
-  _stride = (stride == -1) ? VertexBuffer::DeduceStride(kind) : stride;
-  _stride = (_stride == -1) ? 3 : _stride;
+  if (data.is<Buffer*>()) {
+    if (!stride) {
+      stride = data.get<Buffer*>()->getStrideSize();
+    }
+    _buffer      = data.get<Buffer*>();
+    _ownedBuffer = nullptr;
+    _ownsBuffer  = false;
+  }
+  else {
+    if (!stride) {
+      stride = VertexBuffer::DeduceStride(kind);
+    }
+    _ownedBuffer
+      = ::std::make_unique<Buffer>(engine, data.get<Float32Array>(), updatable,
+                                   stride, postponeInternalCreation, instanced);
+    _buffer     = nullptr;
+    _ownsBuffer = true;
+  }
 
-  _ownedBuffer = ::std::make_unique<Buffer>(
-    engine, data, updatable, _stride, postponeInternalCreation, instanced);
+  _stride = stride;
 
-  _offset = (offset != -1) ? static_cast<unsigned int>(offset) : 0;
-  _size   = (size != -1) ? size : _stride;
-}
+  _instanced       = instanced.hasValue() ? *instanced : false;
+  _instanceDivisor = instanced ? 1 : 0;
 
-VertexBuffer::VertexBuffer(Engine* /*engine*/, Buffer* buffer,
-                           unsigned int kind, bool /*updatable*/,
-                           bool /*postponeInternalCreation*/, int stride,
-                           bool /*instanced*/, int offset, int size)
-    : _ownedBuffer{nullptr}, _buffer{buffer}, _kind{kind}, _ownsBuffer{false}
-{
-  // Deduce stride from kind
-  _stride = (stride == -1) ? VertexBuffer::DeduceStride(kind) : stride;
-  _stride = (_stride == -1) ? buffer->getStrideSize() : _stride;
+  _offset = offset ? *offset : 0;
+  _size   = size ? size : stride;
 
-  _offset = (offset != -1) ? static_cast<unsigned int>(offset) : 0;
-  _size   = (size != -1) ? size : _stride;
+  _kind = kind;
 }
 
 VertexBuffer::~VertexBuffer()
 {
+}
+
+unsigned int VertexBuffer::get_instanceDivisor() const
+{
+  return _instanceDivisor;
+}
+
+void VertexBuffer::set_instanceDivisor(unsigned int value)
+{
+  _instanceDivisor = value;
+  if (value == 0) {
+    _instanced = false;
+  }
+  else {
+    _instanced = true;
+  }
 }
 
 string_t VertexBuffer::KindAsString(unsigned int kind)
@@ -214,12 +238,12 @@ int VertexBuffer::getSize() const
 
 bool VertexBuffer::getIsInstanced() const
 {
-  return _getBuffer()->getIsInstanced();
+  return _instanced;
 }
 
 unsigned int VertexBuffer::getInstanceDivisor() const
 {
-  return _getBuffer()->instanceDivisor();
+  return _instanceDivisor;
 }
 
 // Methods
@@ -244,48 +268,40 @@ GL::IGLBuffer* VertexBuffer::updateDirectly(const Float32Array& data,
   return _getBuffer()->updateDirectly(data, offset);
 }
 
-void VertexBuffer::dispose(bool /*doNotRecurse*/)
+void VertexBuffer::dispose()
 {
   if (_ownsBuffer && _ownedBuffer) {
     _ownedBuffer->dispose();
-    _ownedBuffer.reset(nullptr);
+    _ownedBuffer = nullptr;
   }
 }
 
 int VertexBuffer::DeduceStride(unsigned int kind)
 {
-  int stride = -1;
   // Deduce stride from kind
   switch (kind) {
-    case VertexBuffer::PositionKind:
-      stride = 3;
-      break;
-    case VertexBuffer::NormalKind:
-      stride = 3;
-      break;
     case VertexBuffer::UVKind:
     case VertexBuffer::UV2Kind:
     case VertexBuffer::UV3Kind:
     case VertexBuffer::UV4Kind:
     case VertexBuffer::UV5Kind:
     case VertexBuffer::UV6Kind:
-      stride = 2;
-      break;
-    case VertexBuffer::TangentKind:
+      return 2;
+    case VertexBuffer::NormalKind:
+    case VertexBuffer::PositionKind:
+      return 3;
     case VertexBuffer::ColorKind:
-      stride = 4;
-      break;
     case VertexBuffer::MatricesIndicesKind:
     case VertexBuffer::MatricesIndicesExtraKind:
-      stride = 4;
-      break;
     case VertexBuffer::MatricesWeightsKind:
     case VertexBuffer::MatricesWeightsExtraKind:
+    case VertexBuffer::TangentKind:
+      return 4;
     default:
-      stride = 4;
-      break;
+      throw ::std::runtime_error("Invalid kind '" + ::std::to_string(kind)
+                                 + "'");
   }
-  return stride;
+  return -1;
 }
 
 } // end of namespace BABYLON

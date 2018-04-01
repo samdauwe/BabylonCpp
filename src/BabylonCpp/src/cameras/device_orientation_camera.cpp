@@ -21,7 +21,7 @@ IReflect::Type DeviceOrientationCamera::type() const
   return IReflect::Type::DEVICEORIENTATIONCAMERA;
 }
 
-const char* DeviceOrientationCamera::getClassName() const
+const string_t DeviceOrientationCamera::getClassName() const
 {
   return "DeviceOrientationCamera";
 }

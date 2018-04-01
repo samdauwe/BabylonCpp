@@ -133,7 +133,8 @@ public:
    * Removes the internal pipeline assets and detaches the pipeline from the
    * scene cameras
    */
-  void dispose(bool disableDepthRender = false) override;
+  void dispose(bool disableDepthRender         = false,
+               bool disposeMaterialAndTextures = false) override;
 
 private:
   /**

@@ -64,7 +64,7 @@ public:
    * @brief Returns the string "PointLight"
    * @returns the class name
    */
-  const char* getClassName() const override;
+  const string_t getClassName() const override;
 
   /**
    * @brief Returns the integer 0.

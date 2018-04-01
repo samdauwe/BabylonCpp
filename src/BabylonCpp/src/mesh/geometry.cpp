@@ -154,8 +154,9 @@ AbstractMesh* Geometry::setVerticesData(unsigned int kind,
                                         const Float32Array& data,
                                         bool updatable, int stride)
 {
-  auto buffer = ::std::make_unique<VertexBuffer>(_engine, data, kind, updatable,
-                                                 _meshes.empty(), stride);
+  auto buffer = ::std::make_unique<VertexBuffer>(
+    _engine, ToVariant<Float32Array, Buffer*>(data), kind, updatable,
+    _meshes.empty(), stride);
 
   setVerticesBuffer(::std::move(buffer));
 
@@ -685,7 +686,7 @@ void Geometry::_disposeVertexArrayObjects()
   }
 }
 
-void Geometry::dispose(bool /*doNotRecurse*/)
+void Geometry::dispose()
 {
   for (const auto& mesh : _meshes) {
     releaseForMesh(mesh);

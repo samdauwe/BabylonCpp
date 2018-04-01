@@ -127,7 +127,7 @@ public:
   /**
    * @brief Returns the string "Mesh".
    */
-  const char* getClassName() const override;
+  const string_t getClassName() const override;
 
   virtual IReflect::Type type() const override;
 
@@ -325,13 +325,15 @@ public:
   bool isBlocked() const;
 
   /**
-   * @brief Determine if the current mesh is ready to be rendered.
+   * @brief Determine if the current mesh is ready to be rendered
+   * @param completeCheck defines if a complete check (including materials and
+   * lights) has to be done (false by default)
    * @param forceInstanceSupport will check if the mesh will be ready when used
    * with instances (false by default)
    * @returns true if all associated assets are ready (material, textures,
    * shaders)
    */
-  bool isReady(bool forceInstanceSupport = false);
+  bool isReady(bool completeCheck = false, bool forceInstanceSupport = false);
 
   /**
    * @brief Returns true if the normals aren't to be recomputed on next mesh
@@ -644,9 +646,11 @@ public:
   /** Dispose **/
 
   /**
-   * @brief Disposes the mesh.
-   * This also frees the memory allocated under the hood to all the buffers used
-   * by WebGL.
+   * @brief Releases resources associated with this mesh.
+   * @param doNotRecurse Set to true to not recurse into each children (recurse
+   * into each children by default)
+   * @param disposeMaterialAndTextures Set to true to also dispose referenced
+   * materials and textures (false by default)
    */
   virtual void dispose(bool doNotRecurse               = false,
                        bool disposeMaterialAndTextures = false) override;

@@ -18,12 +18,12 @@ public:
 
     return camera;
   }
-  ~ArcFollowCamera();
+  ~ArcFollowCamera() override;
 
   virtual IReflect::Type type() const override;
 
   void _checkInputs() override;
-  const char* getClassName() const override;
+  const string_t getClassName() const override;
 
 protected:
   ArcFollowCamera(const string_t& name, float alpha, float beta, float radius,

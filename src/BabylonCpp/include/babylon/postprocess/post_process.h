@@ -136,6 +136,13 @@ public:
   PostProcess& shareOutputWith(PostProcess* postProcess);
 
   /**
+   * @brief Reverses the effect of calling shareOutputWith and returns the post
+   * process back to its original state. This should be called if the post
+   * process that shares output with this post process is disabled/disposed.
+   */
+  void useOwnOutput();
+
+  /**
    * @brief Updates the effect with the current post process compile time values
    * and recompiles the shader.
    * @param defines Define statements that should be added at the beginning of
@@ -183,9 +190,11 @@ public:
    * null)
    * @param forceDepthStencil If true, a depth and stencil buffer will be
    * generated. (default: false)
+   * @returns The target texture that was bound to be written to.
    */
-  void activate(Camera* camera, InternalTexture* sourceTexture = nullptr,
-                bool forceDepthStencil = false);
+  InternalTexture* activate(Camera* camera,
+                            InternalTexture* sourceTexture = nullptr,
+                            bool forceDepthStencil         = false);
 
   /**
    * @brief If the post process is supported.
@@ -229,6 +238,13 @@ public:
    * Height of the texture to apply the post process on
    */
   int height;
+
+  /**
+   * Internal, reference to the location where this postprocess was output to.
+   * (Typically the texture on the next postprocess in the chain)
+   */
+  InternalTexture* _outputTexture;
+
   /**
    * Sampling mode used by the shader
    * See https://doc.babylonjs.com/classes/3.1/texture

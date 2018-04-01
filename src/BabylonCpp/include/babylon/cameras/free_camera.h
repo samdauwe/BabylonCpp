@@ -33,8 +33,9 @@ public:
   void _checkInputs() override;
   bool _decideIfNeedsToMove() override;
   void _updatePosition() override;
-  void dispose(bool doNotRecurse = false) override;
-  const char* getClassName() const override;
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
+  const string_t getClassName() const override;
   Json::object serialize() const override;
 
 private:

@@ -26,7 +26,7 @@ public:
   unsigned int samples() const;
   void setSamples(unsigned int value);
   void resize(Size size);
-  void dispose(bool doNotRecurse = false) override;
+  void dispose() override;
   void releaseInternalTextures();
 
 protected:

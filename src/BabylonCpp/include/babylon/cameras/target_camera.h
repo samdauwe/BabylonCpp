@@ -62,7 +62,7 @@ public:
   /** Camera rigs section **/
   Camera* createRigCamera(const string_t& name, int cameraIndex) override;
   void _updateRigCameras() override;
-  const char* getClassName() const override;
+  const string_t getClassName() const override;
   virtual Json::object serialize() const override;
 
 protected:

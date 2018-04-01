@@ -42,7 +42,8 @@ Layer::Layer(const string_t& name, const string_t& imgUrl, Scene* scene,
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
     = ::std::make_unique<VertexBuffer>(
-      engine, vertices, VertexBuffer::PositionKind, false, false, 2);
+      engine, ToVariant<Float32Array, Buffer*>(vertices),
+      VertexBuffer::PositionKind, false, false, 2);
 
   _createIndexBuffer();
 
@@ -173,7 +174,7 @@ void Layer::render()
   onAfterRenderObservable.notifyObservers(this);
 }
 
-void Layer::dispose(bool /*doNotRecurse*/)
+void Layer::dispose()
 {
   if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)) {
     auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKindChars];

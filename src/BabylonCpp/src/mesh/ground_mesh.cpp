@@ -23,7 +23,7 @@ GroundMesh::~GroundMesh()
 {
 }
 
-const char* GroundMesh::getClassName() const
+const string_t GroundMesh::getClassName() const
 {
   return "GroundMesh";
 }

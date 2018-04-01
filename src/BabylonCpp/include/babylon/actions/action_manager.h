@@ -2,7 +2,6 @@
 #define BABYLON_ACTIONS_ACTION_MANAGER_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/interfaces/idisposable.h>
 
 namespace BABYLON {
 
@@ -12,7 +11,7 @@ namespace BABYLON {
  * A single scene can have many Action Managers to handle predefined actions on
  * specific meshes.
  */
-class BABYLON_SHARED_EXPORT ActionManager : public IDisposable {
+class BABYLON_SHARED_EXPORT ActionManager {
 
 public:
   friend class Scene;
@@ -133,7 +132,7 @@ public:
   virtual ~ActionManager();
 
   /** Methods **/
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
   Scene* getScene() const;
 
   /**

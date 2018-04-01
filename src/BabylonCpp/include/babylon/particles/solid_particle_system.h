@@ -145,7 +145,8 @@ public:
   /**
    * @brief Disposes the SPS.
    */
-  void dispose(bool doNotRecurse = false) override;
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Visibilty helper : Recomputes the visible size according to the mesh

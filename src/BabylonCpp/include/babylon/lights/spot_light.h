@@ -34,7 +34,7 @@ public:
    * @brief Returns the string "SpotLight".
    * @returns the class name
    */
-  const char* getClassName() const override;
+  const string_t getClassName() const override;
 
   /**
    * @brief Returns the integer 2.
@@ -119,7 +119,8 @@ public:
   /**
    * @brief Disposes the light and the associated resources.
    */
-  void dispose(bool doNotRecurse = false) override;
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
 
 protected:
   /**

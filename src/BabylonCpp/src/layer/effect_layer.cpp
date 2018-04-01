@@ -90,7 +90,8 @@ void EffectLayer::_generateVertexBuffer()
   };
 
   auto vertexBuffer = ::std::make_unique<VertexBuffer>(
-    _engine, vertices, VertexBuffer::PositionKind, false, false, 2);
+    _engine, ToVariant<Float32Array, Buffer*>(vertices),
+    VertexBuffer::PositionKind, false, false, 2);
   _vertexBuffers[VertexBuffer::PositionKindChars] = ::std::move(vertexBuffer);
 }
 

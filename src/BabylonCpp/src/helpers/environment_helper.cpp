@@ -451,6 +451,13 @@ void EnvironmentHelper::_setupSkyboxReflectionTexture()
   _skyboxMaterial->setReflectionTexture(_skyboxTexture);
 }
 
+void EnvironmentHelper::_errorHandler(const string_t& message,
+                                      const ::std::exception& exception)
+{
+  Exception _exception{message, exception};
+  onErrorObservable.notifyObservers(&_exception);
+}
+
 void EnvironmentHelper::dispose()
 {
   if (_groundMaterial) {

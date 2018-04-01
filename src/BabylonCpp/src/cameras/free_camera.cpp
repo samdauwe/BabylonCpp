@@ -158,13 +158,13 @@ void FreeCamera::_updatePosition()
   }
 }
 
-void FreeCamera::dispose(bool doNotRecurse)
+void FreeCamera::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   inputs->clear();
-  TargetCamera::dispose(doNotRecurse);
+  TargetCamera::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
-const char* FreeCamera::getClassName() const
+const string_t FreeCamera::getClassName() const
 {
   return "FreeCamera";
 }

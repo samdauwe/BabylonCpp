@@ -2,12 +2,11 @@
 #define BABYLON_RENDERING_EDGES_RENDERER_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/interfaces/idisposable.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT EdgesRenderer : public IDisposable {
+class BABYLON_SHARED_EXPORT EdgesRenderer {
 
 public:
   EdgesRenderer(AbstractMesh* source, float epsilon = 0.95f,
@@ -15,7 +14,7 @@ public:
   virtual ~EdgesRenderer();
 
   void _rebuild();
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
   void render();
 
 private:

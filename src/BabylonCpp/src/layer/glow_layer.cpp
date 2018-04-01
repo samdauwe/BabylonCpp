@@ -193,7 +193,7 @@ void GlowLayer::_createTextureAndPostProcesses()
   _postProcesses2
     = {_horizontalBlurPostprocess2.get(), _verticalBlurPostprocess2.get()};
 
-  _mainTexture->setSamples(_options.mainTextureSamples);
+  _mainTexture->samples = _options.mainTextureSamples;
   _mainTexture->onAfterUnbindObservable.add(
     [this](RenderTargetTexture* /*renderTargetTexture*/, EventState& /*es*/) {
       auto internalTexture = _blurTexture1->getInternalTexture();

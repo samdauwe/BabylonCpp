@@ -81,9 +81,16 @@ Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
       source->_geometry->applyToMesh(this);
     }
 
-    // Deep copy
-    // Tools.DeepCopy(source, this, ["name", "material", "skeleton",
-    // "instances"], []);
+      // Deep copy
+#if 0
+    Tools::DeepCopy(source, this,
+                    [
+                      "name", "material", "skeleton", "instances", "parent",
+                      "uniqueId", "source", "metadata", "hasLODLevels",
+                      "geometry", "isBlocked", "areNormalsFrozen"
+                    ],
+                    [ "_poseMatrix", "_source" ]);
+#endif
 
     // Parent
     Node::setParent(source->parent());
@@ -167,7 +174,7 @@ void Mesh::setIsUnIndexed(bool value)
   }
 }
 
-const char* Mesh::getClassName() const
+const string_t Mesh::getClassName() const
 {
   return "Mesh";
 }
@@ -440,17 +447,21 @@ bool Mesh::isBlocked() const
   return _masterMesh != nullptr;
 }
 
-bool Mesh::isReady(bool forceInstanceSupport)
+bool Mesh::isReady(bool completeCheck, bool forceInstanceSupport)
 {
   if (delayLoadState == EngineConstants::DELAYLOADSTATE_LOADING) {
     return false;
   }
 
-  if (!AbstractMesh::isReady()) {
+  if (!AbstractMesh::isReady(completeCheck)) {
     return false;
   }
 
   if (subMeshes.empty()) {
+    return true;
+  }
+
+  if (!completeCheck) {
     return true;
   }
 
@@ -629,7 +640,8 @@ Float32Array Mesh::_getPositionData(bool applySkeleton)
           }
           Matrix::FromFloat32ArrayToRefScaled(
             skeletonMatrices,
-            static_cast<unsigned>(matricesIndicesData[matWeightIdx + inf] * 16),
+            static_cast<unsigned int>(
+              ::std::floor(matricesIndicesData[matWeightIdx + inf] * 16)),
             weight, tempMatrix);
           finalMatrix.addToSelf(tempMatrix);
         }
@@ -641,8 +653,8 @@ Float32Array Mesh::_getPositionData(bool applySkeleton)
             }
             Matrix::FromFloat32ArrayToRefScaled(
               skeletonMatrices,
-              static_cast<unsigned>(matricesIndicesExtraData[matWeightIdx + inf]
-                                    * 16),
+              static_cast<unsigned int>(::std::floor(
+                matricesIndicesExtraData[matWeightIdx + inf] * 16)),
               weight, tempMatrix);
             finalMatrix.addToSelf(tempMatrix);
           }
@@ -2657,7 +2669,8 @@ Mesh* Mesh::applySkeleton(Skeleton* skeleton)
       if (weight > 0.f) {
         Matrix::FromFloat32ArrayToRefScaled(
           skeletonMatrices,
-          static_cast<unsigned>(matricesIndicesData[matWeightIdx + inf]) * 16,
+          static_cast<unsigned int>(
+            ::std::floor(matricesIndicesData[matWeightIdx + inf] * 16)),
           weight, tempMatrix);
         finalMatrix.addToSelf(tempMatrix);
       }
@@ -2671,8 +2684,8 @@ Mesh* Mesh::applySkeleton(Skeleton* skeleton)
         if (weight > 0.f) {
           Matrix::FromFloat32ArrayToRefScaled(
             skeletonMatrices,
-            static_cast<unsigned>(matricesIndicesExtraData[matWeightIdx + inf])
-              * 16,
+            static_cast<unsigned int>(
+              ::std::floor(matricesIndicesExtraData[matWeightIdx + inf] * 16)),
             weight, tempMatrix);
           finalMatrix.addToSelf(tempMatrix);
         }

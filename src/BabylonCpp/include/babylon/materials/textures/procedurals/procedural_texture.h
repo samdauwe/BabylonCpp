@@ -18,7 +18,7 @@ public:
   ProceduralTexture(const string_t& name, const Size& size,
                     const string_t& fragment, Scene* scene,
                     Texture* fallbackTexture, bool generateMipMaps = true);
-  ~ProceduralTexture();
+  ~ProceduralTexture() override;
 
   void _rebuild() override;
   void reset();
@@ -43,7 +43,7 @@ public:
   ProceduralTexture& setMatrix(const string_t& name, const Matrix& value);
   void render(bool useCameraPostProcess = false);
   unique_ptr_t<ProceduralTexture> clone() const;
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
 
 private:
   void _createIndexBuffer();

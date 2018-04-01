@@ -13,9 +13,13 @@ namespace BABYLON {
 DirectionalLight::DirectionalLight(const string_t& iName,
                                    const Vector3& direction, Scene* scene)
     : ShadowLight{iName, scene}
+    , shadowFrustumSize{this, &DirectionalLight::get_shadowFrustumSize,
+                        &DirectionalLight::set_shadowFrustumSize}
+    , shadowOrthoScale{this, &DirectionalLight::get_shadowOrthoScale,
+                       &DirectionalLight::set_shadowOrthoScale}
     , autoUpdateExtends{true}
     , _shadowFrustumSize{0.f}
-    , _shadowOrthoScale{0.5f}
+    , _shadowOrthoScale{0.1f}
     , _orthoLeft{numeric_limits_t<float>::max()}
     , _orthoRight{numeric_limits_t<float>::min()}
     , _orthoTop{numeric_limits_t<float>::min()}
@@ -34,7 +38,7 @@ IReflect::Type DirectionalLight::type() const
   return IReflect::Type::DIRECTIONALLIGHT;
 }
 
-const char* DirectionalLight::getClassName() const
+const string_t DirectionalLight::getClassName() const
 {
   return "DirectionalLight";
 }
@@ -44,23 +48,23 @@ unsigned int DirectionalLight::getTypeID() const
   return Light::LIGHTTYPEID_DIRECTIONALLIGHT();
 }
 
-float DirectionalLight::shadowFrustumSize() const
+float DirectionalLight::get_shadowFrustumSize() const
 {
   return _shadowFrustumSize;
 }
 
-void DirectionalLight::setShadowFrustumSize(float value)
+void DirectionalLight::set_shadowFrustumSize(float value)
 {
   _shadowFrustumSize = value;
   forceProjectionMatrixCompute();
 }
 
-float DirectionalLight::shadowOrthoScale() const
+float DirectionalLight::get_shadowOrthoScale() const
 {
   return _shadowOrthoScale;
 }
 
-void DirectionalLight::setShadowOrthoScale(float value)
+void DirectionalLight::set_shadowOrthoScale(float value)
 {
   _shadowOrthoScale = value;
   forceProjectionMatrixCompute();
@@ -87,10 +91,10 @@ void DirectionalLight::_setDefaultFixedFrustumShadowProjectionMatrix(
     return;
   }
 
-  Matrix::PerspectiveFovLHToRef(
-    shadowFrustumSize(), shadowFrustumSize(),
-    shadowMinZ() ? *shadowMinZ() : activeCamera->minZ,
-    shadowMaxZ() ? *shadowMaxZ() : activeCamera->maxZ, matrix);
+  Matrix::OrthoLHToRef(shadowFrustumSize(), shadowFrustumSize(),
+                       shadowMinZ() ? *shadowMinZ() : activeCamera->minZ,
+                       shadowMaxZ() ? *shadowMaxZ() : activeCamera->maxZ,
+                       matrix);
 }
 
 void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(

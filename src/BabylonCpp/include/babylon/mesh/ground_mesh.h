@@ -34,7 +34,7 @@ public:
   /**
    * @brief Returns the string "GroundMesh"
    */
-  const char* getClassName() const override;
+  const string_t getClassName() const override;
 
   IReflect::Type type() const override;
 

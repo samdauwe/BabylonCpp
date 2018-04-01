@@ -1172,7 +1172,8 @@ void SolidParticleSystem::_quaternionToRotationMatrix()
   _rotMatrix.m[15] = 1.f;
 }
 
-void SolidParticleSystem::dispose(bool /*doNotRecurse*/)
+void SolidParticleSystem::dispose(bool /*doNotRecurse*/,
+                                  bool /*disposeMaterialAndTextures*/)
 {
   mesh->dispose();
   // drop references to internal big arrays for the GC

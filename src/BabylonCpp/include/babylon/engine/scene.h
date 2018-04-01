@@ -22,7 +22,7 @@ namespace BABYLON {
 /**
  * @brief Represents a scene to be rendered by the engine.
  */
-class BABYLON_SHARED_EXPORT Scene : public IAnimatable, public IDisposable {
+class BABYLON_SHARED_EXPORT Scene : public IAnimatable {
 
 public:
   // Statics
@@ -684,7 +684,7 @@ public:
   void disableGeometryBufferRenderer();
   void freezeMaterials();
   void unfreezeMaterials();
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
   bool isDisposed() const;
 
   /** Release sounds & sounds tracks **/

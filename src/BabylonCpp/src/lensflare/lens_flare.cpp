@@ -31,7 +31,7 @@ LensFlare::~LensFlare()
 {
 }
 
-void LensFlare::dispose(bool /*doNotRecurse*/)
+void LensFlare::dispose()
 {
   if (texture) {
     texture->dispose();

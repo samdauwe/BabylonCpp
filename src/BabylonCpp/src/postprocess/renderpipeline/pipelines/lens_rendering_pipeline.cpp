@@ -181,7 +181,8 @@ void LensRenderingPipeline::disableHighlights()
   _highlightsGain = -1.f;
 }
 
-void LensRenderingPipeline::dispose(bool disableDepthRender)
+void LensRenderingPipeline::dispose(bool disableDepthRender,
+                                    bool /*disposeMaterialAndTextures */)
 {
   // TODO FIXME
   // _scene->postProcessRenderPipelineManager->detachCamerasFromRenderPipeline(

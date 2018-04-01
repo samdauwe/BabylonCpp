@@ -2,7 +2,6 @@
 #define BABYLON_POSTPROCESS_POST_PROCESS_MANANGER_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/interfaces/idisposable.h>
 
 namespace BABYLON {
 
@@ -11,7 +10,7 @@ namespace BABYLON {
  * post process pipelines See
  * https://doc.babylonjs.com/how_to/how_to_use_postprocesses
  */
-class BABYLON_SHARED_EXPORT PostProcessManager : public IDisposable {
+class BABYLON_SHARED_EXPORT PostProcessManager {
 
 public:
   /**
@@ -67,7 +66,7 @@ public:
   /**
    * @brief Disposes of the post process manager.
    */
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
 
 private:
   void _prepareBuffers();

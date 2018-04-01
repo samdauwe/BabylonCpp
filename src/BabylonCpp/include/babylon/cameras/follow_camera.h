@@ -17,12 +17,12 @@ public:
 
     return camera;
   }
-  ~FollowCamera();
+  ~FollowCamera() override;
 
   IReflect::Type type() const override;
 
   void _checkInputs() override;
-  const char* getClassName() const override;
+  const string_t getClassName() const override;
   Json::object serialize() const override;
 
 protected:

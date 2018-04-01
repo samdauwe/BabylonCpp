@@ -3,13 +3,12 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/core/structs.h>
-#include <babylon/interfaces/idisposable.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT ReflectionProbe : IDisposable {
+class BABYLON_SHARED_EXPORT ReflectionProbe {
 
 public:
   template <typename... Ts>
@@ -39,7 +38,7 @@ public:
   void setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
                                          bool autoClearDepthStencil);
 
-  void dispose(bool doNotRecurse = false) override;
+  void dispose();
 
 protected:
   ReflectionProbe(const string_t& name, const ISize& size, Scene* scene,

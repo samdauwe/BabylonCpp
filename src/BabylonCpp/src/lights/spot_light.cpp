@@ -45,7 +45,7 @@ IReflect::Type SpotLight::type() const
   return IReflect::Type::SPOTLIGHT;
 }
 
-const char* SpotLight::getClassName() const
+const string_t SpotLight::getClassName() const
 {
   return "SpotLight";
 }
@@ -267,9 +267,9 @@ void SpotLight::transferToEffect(Effect* effect, const string_t& lightIndex)
   }
 }
 
-void SpotLight::dispose(bool doNotRecurse)
+void SpotLight::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
-  ShadowLight::dispose(doNotRecurse);
+  ShadowLight::dispose(doNotRecurse, disposeMaterialAndTextures);
   if (_projectionTexture) {
     _projectionTexture->dispose();
   }

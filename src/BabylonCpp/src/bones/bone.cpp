@@ -175,6 +175,11 @@ vector_t<Animation*> Bone::getAnimations()
   return animations;
 }
 
+AnimationPropertiesOverride* Bone::animationPropertiesOverride() const
+{
+  return _skeleton->animationPropertiesOverride;
+}
+
 void Bone::updateMatrix(const Matrix& matrix, bool updateDifferenceMatrix)
 {
   _baseMatrix  = matrix;
@@ -818,7 +823,7 @@ Quaternion Bone::getRotationQuaternion(Space space, AbstractMesh* mesh) const
   return result;
 }
 
-void Bone::getRotationQuaternionToRef(Quaternion& result, Space space,
+void Bone::getRotationQuaternionToRef(Quaternion& result, const Space& space,
                                       AbstractMesh* mesh) const
 {
   if (space == Space::LOCAL) {

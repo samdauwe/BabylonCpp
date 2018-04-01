@@ -11,9 +11,15 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT IDisposable {
 
   /**
-   * @brief Dispose the particle system and frees its associated resources.
+   * @brief Releases resources associated with this node.
+   * @param doNotRecurse Set to true to not recurse into each children (recurse
+   * into each children by default)
+   * @param disposeMaterialAndTextures Set to true to also dispose referenced
+   * materials and textures (false by default)
    */
-  virtual void dispose(bool doNotRecurse = false) = 0;
+  virtual void dispose(bool doNotRecurse               = false,
+                       bool disposeMaterialAndTextures = false)
+    = 0;
 
 }; // end of struct IDisposable
 

@@ -159,7 +159,7 @@ SubMesh& SubMesh::refreshBoundingInfo()
 
 bool SubMesh::_checkCollision(const Collider& collider)
 {
-  auto boundingInfo = _renderingMesh->getBoundingInfo();
+  auto boundingInfo = getBoundingInfo();
 
   return boundingInfo._checkCollision(collider);
 }
@@ -242,6 +242,21 @@ SubMesh::intersects(Ray& ray, const vector_t<Vector3>& positions,
 {
 
   unique_ptr_t<IntersectionInfo> intersectInfo = nullptr;
+
+  const auto material = getMaterial();
+  if (!material) {
+    return nullptr;
+  }
+
+  switch (material->fillMode()) {
+    case Material::PointListDrawMode():
+    case Material::LineListDrawMode():
+    case Material::LineLoopDrawMode():
+    case Material::LineStripDrawMode():
+    case Material::TriangleFanDrawMode():
+    case Material::TriangleStripDrawMode():
+      return nullptr;
+  }
 
   // LineMesh first as it's also a Mesh...
   if (_mesh->type() == IReflect::Type::LINESMESH) {
@@ -329,7 +344,7 @@ SubMesh* SubMesh::clone(AbstractMesh* newMesh, Mesh* newRenderingMesh) const
 }
 
 // Dispose
-void SubMesh::dispose(bool /*doNotRecurse*/)
+void SubMesh::dispose()
 {
   if (_linesIndexBuffer) {
     _mesh->getScene()->getEngine()->_releaseBuffer(_linesIndexBuffer.get());

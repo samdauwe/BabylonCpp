@@ -186,11 +186,11 @@ void MultiRenderTarget::unbindFrameBuffer(Engine* engine,
     });
 }
 
-void MultiRenderTarget::dispose(bool doNotRecurse)
+void MultiRenderTarget::dispose()
 {
   releaseInternalTextures();
 
-  RenderTargetTexture::dispose(doNotRecurse);
+  RenderTargetTexture::dispose();
 }
 
 void MultiRenderTarget::releaseInternalTextures()

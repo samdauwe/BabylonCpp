@@ -65,6 +65,7 @@ ArcRotateCamera::ArcRotateCamera(const string_t& iName, float iAlpha,
     , _bouncingBehavior{nullptr}
     , _framingBehavior{nullptr}
     , _autoRotationBehavior{nullptr}
+    , _computationVector{Vector3::Zero()}
 {
   setTarget(iTarget);
   getViewMatrix();
@@ -332,20 +333,24 @@ void ArcRotateCamera::_checkLimits()
 
 void ArcRotateCamera::rebuildAnglesAndRadius()
 {
-  auto radiusv3 = position.subtract(_getTargetPosition());
-  radius        = radiusv3.length();
+  position.subtractToRef(_getTargetPosition(), _computationVector);
+  radius = _computationVector.length();
+
+  if (radius == 0.f) {
+    radius = 0.0001f; // Just to avoid division by zero
+  }
 
   // Alpha
-  alpha = ::std::acos(
-    radiusv3.x
-    / ::std::sqrt(::std::pow(radiusv3.x, 2.f) + ::std::pow(radiusv3.z, 2.f)));
+  alpha = ::std::acos(_computationVector.x
+                      / ::std::sqrt(::std::pow(_computationVector.x, 2.f)
+                                    + ::std::pow(_computationVector.z, 2.f)));
 
-  if (radiusv3.z < 0.f) {
+  if (_computationVector.z < 0.f) {
     alpha = Math::PI2 - alpha;
   }
 
   // Beta
-  beta = ::std::acos(radiusv3.y / radius);
+  beta = ::std::acos(_computationVector.y / radius);
 
   _checkLimits();
 }
@@ -489,14 +494,14 @@ Matrix ArcRotateCamera::_getViewMatrix()
   const float cosb = ::std::cos(beta);
   float sinb       = ::std::sin(beta);
 
-  if (stl_util::almost_equal(sinb, 0.f)) {
+  if (sinb == 0.f) {
     sinb = 0.0001f;
   }
 
   auto _target = _getTargetPosition();
-  _target.addToRef(
-    Vector3(radius * cosa * sinb, radius * cosb, radius * sina * sinb),
-    _newPosition);
+  _computationVector.copyFromFloats(radius * cosa * sinb, radius * cosb,
+                                    radius * sina * sinb);
+  _target.addToRef(_computationVector, _newPosition);
   if (getScene()->collisionsEnabled && checkCollisions) {
     if (!_collider) {
       _collider = ::std::make_unique<Collider>();
@@ -558,14 +563,14 @@ void ArcRotateCamera::_onCollisionPositionChange(int /*collisionId*/,
   const float cosb = ::std::cos(beta);
   float sinb       = ::std::sin(beta);
 
-  if (stl_util::almost_equal(sinb, 0.f)) {
+  if (sinb == 0.f) {
     sinb = 0.0001f;
   }
 
   auto _target = _getTargetPosition();
-  _target.addToRef(
-    Vector3(radius * cosa * sinb, radius * cosb, radius * sina * sinb),
-    _newPosition);
+  _computationVector.copyFromFloats(radius * cosa * sinb, radius * cosb,
+                                    radius * sina * sinb);
+  _target.addToRef(_computationVector, _newPosition);
   position.copyFrom(_newPosition);
 
   auto up = upVector;
@@ -654,13 +659,14 @@ void ArcRotateCamera::_updateRigCameras()
   TargetCamera::_updateRigCameras();
 }
 
-void ArcRotateCamera::dispose(bool doNotRecurse)
+void ArcRotateCamera::dispose(bool doNotRecurse,
+                              bool disposeMaterialAndTextures)
 {
   inputs->clear();
-  TargetCamera::dispose(doNotRecurse);
+  TargetCamera::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
-const char* ArcRotateCamera::getClassName() const
+const string_t ArcRotateCamera::getClassName() const
 {
   return "ArcRotateCamera";
 }

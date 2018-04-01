@@ -53,7 +53,8 @@ public:
    */
   void setCaptureShaderCompilationTime(bool value);
 
-  void dispose(bool doNotRecurse = false) override;
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
 
 private:
   Engine* _engine;

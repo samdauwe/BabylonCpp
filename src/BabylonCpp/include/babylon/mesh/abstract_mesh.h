@@ -166,7 +166,7 @@ public:
   /**
    * @brief Returns the string "AbstractMesh"
    */
-  const char* getClassName() const override;
+  const string_t getClassName() const override;
 
   /**
    * @brief Returns true if the mesh has been disposed.

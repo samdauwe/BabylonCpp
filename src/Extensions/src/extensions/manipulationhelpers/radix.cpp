@@ -278,10 +278,10 @@ void Radix::constructArrow(RadixFeatures feature, const std::string& name,
   auto wireMesh = LinesMesh::New(name + "Wire", _scene);
   wireMesh->setRotationQuaternion(rotation);
   wireMesh->setParent(_rootMesh);
-  wireMesh->color            = mtl->diffuseColor;
-  wireMesh->renderingGroupId = 1;
-  wireMesh->setIntersectionThreshold(wireSelectionThreshold());
-  wireMesh->isPickable = false;
+  wireMesh->color                 = mtl->diffuseColor;
+  wireMesh->renderingGroupId      = 1;
+  wireMesh->intersectionThreshold = wireSelectionThreshold();
+  wireMesh->isPickable            = false;
 
   auto vd       = std::make_unique<VertexData>();
   vd->positions = points;
@@ -318,9 +318,9 @@ void Radix::constructPlaneSelection(RadixFeatures /*feature*/,
   wireMesh->setParent(_rootMesh);
   wireMesh->color = mtl->diffuseColor;
   wireMesh->setRotationQuaternion(Quaternion::FromRotationMatrix(transform));
-  wireMesh->renderingGroupId = 1;
-  wireMesh->setIntersectionThreshold(wireSelectionThreshold());
-  wireMesh->isPickable = false;
+  wireMesh->renderingGroupId      = 1;
+  wireMesh->intersectionThreshold = wireSelectionThreshold();
+  wireMesh->isPickable            = false;
 }
 
 void Radix::constructRotation(RadixFeatures /*feature*/,
@@ -418,7 +418,7 @@ void Radix::setWireSelectionThreshold(float value)
   for (auto mesh : meshes) {
     auto lm = static_cast<LinesMesh*>(mesh);
     if (lm) {
-      lm->setIntersectionThreshold(value);
+      lm->intersectionThreshold = value;
     }
   }
 }

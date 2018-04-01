@@ -148,7 +148,8 @@ void PostProcessRenderPipeline::_reset()
   _renderEffectsForIsolatedPass.clear();
 }
 
-void PostProcessRenderPipeline::dispose(bool /*doNotRecurse*/)
+void PostProcessRenderPipeline::dispose(bool /*doNotRecurse*/,
+                                        bool /*disposeMaterialAndTextures*/)
 {
   // Must be implemented by children
 }

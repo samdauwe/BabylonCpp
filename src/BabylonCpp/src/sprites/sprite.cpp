@@ -100,7 +100,7 @@ void Sprite::_animate(float deltaTime)
   }
 }
 
-void Sprite::dispose(bool /*doNotRecurse*/)
+void Sprite::dispose()
 {
   // Remove from scene
   _manager->sprites.erase(

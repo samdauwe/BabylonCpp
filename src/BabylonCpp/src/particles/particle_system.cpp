@@ -761,7 +761,8 @@ size_t ParticleSystem::render()
   return _particles.size();
 }
 
-void ParticleSystem::dispose(bool disposeTexture)
+void ParticleSystem::dispose(bool disposeTexture,
+                             bool /*disposeMaterialAndTextures*/)
 {
   if (_vertexBuffer) {
     _vertexBuffer->dispose();

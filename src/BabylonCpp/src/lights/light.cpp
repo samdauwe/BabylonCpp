@@ -53,7 +53,7 @@ void Light::addToScene(unique_ptr_t<Light>&& newLight)
   getScene()->addLight(::std::move(newLight));
 }
 
-const char* Light::getClassName() const
+const string_t Light::getClassName() const
 {
   return "Light";
 }
@@ -253,7 +253,7 @@ int Light::CompareLightsPriority(Light* a, Light* b)
   return b->renderPriority() - a->renderPriority();
 }
 
-void Light::dispose(bool /*doNotRecurse*/)
+void Light::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   if (_shadowGenerator) {
     _shadowGenerator->dispose();
@@ -273,7 +273,7 @@ void Light::dispose(bool /*doNotRecurse*/)
   // Remove from scene
   getScene()->removeLight(this);
 
-  Node::dispose();
+  Node::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
 unsigned int Light::getTypeID() const

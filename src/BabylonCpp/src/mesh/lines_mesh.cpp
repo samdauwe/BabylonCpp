@@ -20,6 +20,8 @@ LinesMesh::LinesMesh(const string_t& iName, Scene* scene, Node* iParent,
     , gapSize{0.f}
     , color{Color3(1.f, 1.f, 1.f)}
     , alpha{1.f}
+    , intersectionThreshold{this, &LinesMesh::get_intersectionThreshold,
+                            &LinesMesh::set_intersectionThreshold}
     , _intersectionThreshold{0.1f}
 {
   if (source) {
@@ -56,7 +58,7 @@ LinesMesh::~LinesMesh()
 {
 }
 
-const char* LinesMesh::getClassName() const
+const string_t LinesMesh::getClassName() const
 {
   return "LinesMesh";
 }
@@ -66,12 +68,12 @@ IReflect::Type LinesMesh::type() const
   return IReflect::Type::LINESMESH;
 }
 
-float LinesMesh::intersectionThreshold() const
+float LinesMesh::get_intersectionThreshold() const
 {
   return _intersectionThreshold;
 }
 
-void LinesMesh::setIntersectionThreshold(float value)
+void LinesMesh::set_intersectionThreshold(float value)
 {
   if (stl_util::almost_equal(_intersectionThreshold, value)) {
     return;
@@ -141,11 +143,11 @@ PickingInfo LinesMesh::intersects(const Ray& /*ray*/, bool /*fastCheck*/)
   return PickingInfo();
 }
 
-void LinesMesh::dispose(bool /*doNotRecurse*/)
+void LinesMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   _colorShader->dispose();
 
-  Mesh::dispose();
+  Mesh::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
 LinesMesh* LinesMesh::clone(const string_t& iName, Node* newParent,

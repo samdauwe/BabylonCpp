@@ -20,6 +20,7 @@
 #include <babylon/materials/textures/imulti_render_target_options.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
+#include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/math/color3.h>
@@ -945,9 +946,12 @@ void Engine::_getVRDisplays()
 {
 }
 
-void Engine::bindFramebuffer(InternalTexture* texture, unsigned int faceIndex,
-                             int requiredWidth, int requiredHeight,
-                             bool forceFullscreenViewport)
+void Engine::bindFramebuffer(InternalTexture* texture,
+                             Nullable<unsigned int> faceIndex,
+                             Nullable<int> requiredWidth,
+                             Nullable<int> requiredHeight,
+                             Nullable<bool> forceFullscreenViewport,
+                             InternalTexture* depthStencilTexture)
 {
   if (_currentRenderTarget) {
     unBindFramebuffer(_currentRenderTarget);
@@ -956,19 +960,34 @@ void Engine::bindFramebuffer(InternalTexture* texture, unsigned int faceIndex,
   bindUnboundFramebuffer(texture->_MSAAFramebuffer ?
                            texture->_MSAAFramebuffer.get() :
                            texture->_framebuffer.get());
-
   if (texture->isCube) {
+    if (faceIndex.isNull()) {
+      faceIndex = 0u;
+    }
     _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
-                              GL::TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex,
+                              GL::TEXTURE_CUBE_MAP_POSITIVE_X + (*faceIndex),
                               texture->_webGLTexture.get(), 0);
+
+    if (depthStencilTexture) {
+      if (depthStencilTexture->_generateStencilBuffer) {
+        _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_STENCIL_ATTACHMENT,
+                                  GL::TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex,
+                                  depthStencilTexture->_webGLTexture.get(), 0);
+      }
+      else {
+        _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_ATTACHMENT,
+                                  GL::TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex,
+                                  depthStencilTexture->_webGLTexture.get(), 0);
+      }
+    }
   }
 
   if (_cachedViewport && !forceFullscreenViewport) {
     setViewport(*_cachedViewport, requiredWidth, requiredHeight);
   }
   else {
-    _gl->viewport(0, 0, (requiredWidth == 0) ? texture->width : requiredWidth,
-                  (requiredHeight == 0) ? texture->height : requiredHeight);
+    _gl->viewport(0, 0, requiredWidth ? *requiredWidth : texture->width,
+                  requiredHeight ? *requiredHeight : texture->height);
   }
 
   wipeCaches();
@@ -2843,6 +2862,53 @@ void Engine::updateDynamicTexture(InternalTexture* texture, ICanvas* canvas,
   texture->isReady = true;
 }
 
+InternalTexture* Engine::createDepthStencilTexture(
+  const Variant<int, ISize> /*size*/,
+  const DepthTextureCreationOptions& /*options*/)
+{
+  return nullptr;
+}
+
+void Engine::setFrameBufferDepthStencilTexture(
+  RenderTargetTexture* renderTarget)
+{
+  // Create the framebuffer
+  auto internalTexture = renderTarget->getInternalTexture();
+  if (!internalTexture || !internalTexture->_framebuffer
+      || !renderTarget->depthStencilTexture) {
+    return;
+  }
+
+  auto depthStencilTexture = renderTarget->depthStencilTexture;
+
+  bindUnboundFramebuffer(internalTexture->_framebuffer.get());
+  if (depthStencilTexture->isCube) {
+    if (depthStencilTexture->_generateStencilBuffer) {
+      _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_STENCIL_ATTACHMENT,
+                                GL::TEXTURE_CUBE_MAP_POSITIVE_X,
+                                depthStencilTexture->_webGLTexture.get(), 0);
+    }
+    else {
+      _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_ATTACHMENT,
+                                GL::TEXTURE_CUBE_MAP_POSITIVE_X,
+                                depthStencilTexture->_webGLTexture.get(), 0);
+    }
+  }
+  else {
+    if (depthStencilTexture->_generateStencilBuffer) {
+      _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_STENCIL_ATTACHMENT,
+                                GL::TEXTURE_2D,
+                                depthStencilTexture->_webGLTexture.get(), 0);
+    }
+    else {
+      _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_ATTACHMENT,
+                                GL::TEXTURE_2D,
+                                depthStencilTexture->_webGLTexture.get(), 0);
+    }
+  }
+  bindUnboundFramebuffer(nullptr);
+}
+
 InternalTexture*
 Engine::createRenderTargetTexture(ISize size,
                                   const IRenderTargetOptions& options)
@@ -4341,7 +4407,7 @@ void Engine::releaseEffects()
 }
 
 // Dispose
-void Engine::dispose(bool /*doNotRecurse*/)
+void Engine::dispose()
 {
   hideLoadingUI();
   stopRenderLoop();
@@ -4802,6 +4868,7 @@ Engine::CompileRawShader(GL::IGLRenderingContext* gl, const string_t& source,
     auto log = gl->getShaderInfoLog(shader);
     if (!log.empty()) {
       BABYLON_LOG_ERROR("Engine", log);
+      BABYLON_LOG_ERROR("Engine", source);
     }
     return nullptr;
   }

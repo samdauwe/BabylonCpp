@@ -138,6 +138,11 @@ struct Event {
   char* keyCode;
 }; // end of struct Event
 
+struct Exception {
+  string_t message;
+  ::std::exception exception;
+}; // end of struct Exception
+
 struct Extents {
   float min;
   float max;

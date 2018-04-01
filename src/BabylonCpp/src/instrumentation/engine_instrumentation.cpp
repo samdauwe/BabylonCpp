@@ -110,7 +110,8 @@ void EngineInstrumentation::setCaptureShaderCompilationTime(bool value)
   }
 }
 
-void EngineInstrumentation::dispose(bool /*doNotRecurse*/)
+void EngineInstrumentation::dispose(bool /*doNotRecurse*/,
+                                    bool /*disposeMaterialAndTextures*/)
 {
   _engine->onBeginFrameObservable.remove(_onBeginFrameObserver);
   _onBeginFrameObserver = nullptr;

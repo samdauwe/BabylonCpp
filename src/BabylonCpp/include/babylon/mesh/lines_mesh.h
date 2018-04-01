@@ -2,7 +2,6 @@
 #define BABYLON_MESH_LINE_MESH_H
 
 #include <babylon/babylon_global.h>
-
 #include <babylon/math/color3.h>
 #include <babylon/mesh/mesh.h>
 
@@ -22,31 +21,14 @@ public:
 
     return mesh;
   }
-  ~LinesMesh();
+  ~LinesMesh() override;
 
   /**
    * @brief Returns the string "LineMesh".
    */
-  const char* getClassName() const override;
+  const string_t getClassName() const override;
 
   IReflect::Type type() const override;
-
-  /**
-   * @brief The intersection Threshold is the margin applied when intersection a
-   * segment of the LinesMesh with a Ray.
-   * This margin is expressed in world space coordinates, so its value may vary.
-   * Default value is 0.1
-   * @returns the intersection Threshold value.
-   */
-  float intersectionThreshold() const;
-
-  /**
-   * @brief The intersection Threshold is the margin applied when intersection a
-   * segment of the LinesMesh with a Ray.
-   * This margin is expressed in world space coordinates, so its value may vary.
-   * @param value the new threshold to apply
-   */
-  void setIntersectionThreshold(float value);
 
   Material* getMaterial() override;
   void setMaterial(Material* material);
@@ -56,7 +38,8 @@ public:
   void _draw(SubMesh* subMesh, int fillMode, size_t instancesCount = 0,
              bool alternate = false) override;
   PickingInfo intersects(const Ray& ray, bool fastCheck = true) override;
-  void dispose(bool doNotRecurse = false) override;
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Returns a new LineMesh object cloned from the current one.
@@ -69,6 +52,24 @@ protected:
             LinesMesh* source = nullptr, bool doNotCloneChildren = true,
             bool useVertexColor = false, bool useVertexAlpha = false);
 
+private:
+  /**
+   * @brief The intersection Threshold is the margin applied when intersection a
+   * segment of the LinesMesh with a Ray.
+   * This margin is expressed in world space coordinates, so its value may vary.
+   * Default value is 0.1
+   * @returns the intersection Threshold value.
+   */
+  float get_intersectionThreshold() const;
+
+  /**
+   * @brief The intersection Threshold is the margin applied when intersection a
+   * segment of the LinesMesh with a Ray.
+   * This margin is expressed in world space coordinates, so its value may vary.
+   * @param value the new threshold to apply
+   */
+  void set_intersectionThreshold(float value);
+
 public:
   float dashSize;
   float gapSize;
@@ -76,6 +77,8 @@ public:
   float alpha;
   bool useVertexColor;
   bool useVertexAlpha;
+
+  Property<LinesMesh, float> intersectionThreshold;
 
 private:
   float _intersectionThreshold;

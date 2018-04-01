@@ -16,6 +16,7 @@ AnimationGroup::AnimationGroup(const string_t& iName, Scene* scene)
     , speedRatio{this, &AnimationGroup::get_speedRatio,
                  &AnimationGroup::set_speedRatio}
     , targetedAnimations{this, &AnimationGroup::get_targetedAnimations}
+    , animatables{this, &AnimationGroup::get_animatables}
     , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _from{numeric_limits_t<int>::max()}
     , _to{numeric_limits_t<int>::lowest()}
@@ -61,6 +62,11 @@ vector_t<unique_ptr_t<TargetedAnimation>>&
 AnimationGroup::get_targetedAnimations()
 {
   return _targetedAnimations;
+}
+
+vector_t<Animatable*>& AnimationGroup::get_animatables()
+{
+  return _animatables;
 }
 
 TargetedAnimation AnimationGroup::addTargetedAnimation(Animation* animation,
@@ -116,16 +122,24 @@ AnimationGroup& AnimationGroup::normalize(int beginFrame, int endFrame)
   return *this;
 }
 
-AnimationGroup& AnimationGroup::start(bool loop, float speedRatio)
+AnimationGroup& AnimationGroup::start(bool loop, float speedRatio,
+                                      Nullable<int> from, Nullable<int> to)
 {
   if (_isStarted || _targetedAnimations.empty()) {
     return *this;
   }
 
   for (auto& targetedAnimation : _targetedAnimations) {
+    if (!stl_util::contains(targetedAnimation->target->getAnimations(),
+                            targetedAnimation->animation)) {
+      targetedAnimation->target->getAnimations().emplace_back(
+        targetedAnimation->animation);
+    }
+
     _animatables.emplace_back(_scene->beginDirectAnimation(
-      targetedAnimation->target, {targetedAnimation->animation}, _from, _to,
-      loop, speedRatio, [this, &targetedAnimation]() {
+      targetedAnimation->target, {targetedAnimation->animation},
+      !from.isNull() ? *from : _from, !to.isNull() ? *to : _to, loop,
+      speedRatio, [this, &targetedAnimation]() {
         onAnimationEndObservable.notifyObservers(targetedAnimation.get());
       }));
   }
@@ -210,7 +224,21 @@ AnimationGroup& AnimationGroup::stop()
   return *this;
 }
 
-void AnimationGroup::dispose(bool /*doNotRecurse*/)
+AnimationGroup& AnimationGroup::goToFrame(int frame)
+{
+  if (!_isStarted) {
+    return *this;
+  }
+
+  for (auto& animatable : _animatables) {
+    animatable->goToFrame(frame);
+  }
+
+  return *this;
+}
+
+void AnimationGroup::dispose(bool /*doNotRecurse*/,
+                             bool /*disposeMaterialAndTextures*/)
 {
   _targetedAnimations.clear();
   _animatables.clear();

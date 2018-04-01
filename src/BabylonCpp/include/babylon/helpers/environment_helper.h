@@ -2,7 +2,9 @@
 #define BABYLON_HELPERS_ENVIRONMENT_HELPER_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/structs.h>
 #include <babylon/helpers/ienvironment_helper_options.h>
+#include <babylon/tools/observable.h>
 
 namespace BABYLON {
 
@@ -160,6 +162,16 @@ private:
    * options.
    */
   void _setupSkyboxReflectionTexture();
+
+  void _errorHandler(const string_t& message           = "",
+                     const ::std::exception& exception = ::std::exception());
+
+public:
+  /**
+   * This observable will be notified with any error during the creation of
+   * the environment, mainly texture creation errors.
+   */
+  Observable<Exception> onErrorObservable;
 
 private:
   /**
