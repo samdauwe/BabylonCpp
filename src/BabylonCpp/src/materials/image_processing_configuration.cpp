@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json.h>
+#include <babylon/core/random.h>
 #include <babylon/engine/engine.h>
 #include <babylon/materials/color_curves.h>
 #include <babylon/materials/effect.h>
@@ -27,6 +28,9 @@ ImageProcessingConfiguration::ImageProcessingConfiguration()
     , _colorGradingWithGreenDepth{true}
     , _colorGradingBGR{true}
     , _toneMappingEnabled{false}
+    , _grainEnabled{false}
+    , _grainIntensity{30.f}
+    , _grainAnimated{false}
     , _vignetteBlendMode{ImageProcessingConfiguration::VIGNETTEMODE_MULTIPLY()}
     , _vignetteEnabled{false}
     , _applyByPostProcess{false}
@@ -143,6 +147,49 @@ void ImageProcessingConfiguration::setContrast(float value)
   _updateParameters();
 }
 
+bool ImageProcessingConfiguration::grainEnabled() const
+{
+  return _grainEnabled;
+}
+
+void ImageProcessingConfiguration::setGrainEnabled(bool value)
+{
+  if (_grainEnabled == value) {
+    return;
+  }
+
+  _grainEnabled = value;
+  _updateParameters();
+}
+
+float ImageProcessingConfiguration::grainIntensity() const
+{
+  return _grainIntensity;
+}
+
+void ImageProcessingConfiguration::setGrainIntensity(float value)
+{
+  if (stl_util::almost_equal(_grainIntensity, value)) {
+    return;
+  }
+  _grainIntensity = value;
+}
+
+bool ImageProcessingConfiguration::grainAnimated() const
+{
+  return _grainAnimated;
+}
+
+void ImageProcessingConfiguration::setGrainAnimated(bool value)
+{
+  if (_grainAnimated == value) {
+    return;
+  }
+
+  _grainAnimated = value;
+  _updateParameters();
+}
+
 unsigned int ImageProcessingConfiguration::vignetteBlendMode() const
 {
   return _vignetteBlendMode;
@@ -234,6 +281,10 @@ void ImageProcessingConfiguration::PrepareUniforms(
   if (defines.COLORCURVES) {
     ColorCurves::PrepareUniforms(uniforms);
   }
+  if (defines.GRAIN) {
+    uniforms.emplace_back("grainVarianceAmount");
+    uniforms.emplace_back("grainAnimatedSeed");
+  }
 }
 
 void ImageProcessingConfiguration::PrepareSamplers(
@@ -282,6 +333,11 @@ void ImageProcessingConfiguration::prepareDefines(
   defines.IMAGEPROCESSING            = defines.VIGNETTE || defines.TONEMAPPING
                             || defines.CONTRAST || defines.EXPOSURE
                             || defines.COLORCURVES || defines.COLORGRADING;
+  defines.GRAIN           = grainEnabled();
+  defines.IMAGEPROCESSING = defines.VIGNETTE || defines.TONEMAPPING
+                            || defines.CONTRAST || defines.EXPOSURE
+                            || defines.COLORCURVES || defines.COLORGRADING
+                            || defines.GRAIN;
 }
 
 bool ImageProcessingConfiguration::isReady() const
@@ -343,6 +399,10 @@ void ImageProcessingConfiguration::bind(Effect* effect, float aspectRatio)
                       weight                           // weight
     );
   }
+
+  effect->setFloat("grainVarianceAmount", grainIntensity());
+  effect->setFloat("grainAnimatedSeed",
+                   grainAnimated() ? Math::random() + 1.f : 1.f);
 }
 
 unique_ptr_t<ImageProcessingConfiguration> ImageProcessingConfiguration::clone()
