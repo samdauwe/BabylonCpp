@@ -197,6 +197,34 @@ public:
   void setVignetteEnabled(bool value);
 
   /**
+   * @brief Gets wether the grain effect is enabled.
+   */
+  bool grainEnabled() const;
+  /**
+   * @brief Sets wether the grain effect is enabled.
+   */
+  void setGrainEnabled(bool value);
+
+  /**
+   * @brief Gets the grain effect's intensity.
+   */
+  float grainIntensity() const;
+
+  /**
+   * @brief Sets the grain effect's intensity.
+   */
+  void setGrainIntensity(float value);
+
+  /**
+   * @brief Gets wether the grain effect is animated.
+   */
+  bool grainAnimated() const;
+  /**
+   * @brief Sets wether the grain effect is animated.
+   */
+  void setGrainAnimated(bool value);
+
+  /**
    * @brief Gets wether the input of the processing is in Gamma or Linear Space.
    */
   bool fromLinearSpace() const;

@@ -272,6 +272,36 @@ void ImageProcessingPostProcess::setVignetteEnabled(bool value)
   _imageProcessingConfiguration->setVignetteEnabled(value);
 }
 
+bool ImageProcessingPostProcess::grainEnabled() const
+{
+  return _imageProcessingConfiguration->grainEnabled();
+}
+
+void ImageProcessingPostProcess::setGrainEnabled(bool value)
+{
+  _imageProcessingConfiguration->setGrainEnabled(value);
+}
+
+float ImageProcessingPostProcess::grainIntensity() const
+{
+  return _imageProcessingConfiguration->grainIntensity();
+}
+
+void ImageProcessingPostProcess::setGrainIntensity(float value)
+{
+  _imageProcessingConfiguration->setGrainIntensity(value);
+}
+
+bool ImageProcessingPostProcess::grainAnimated() const
+{
+  return _imageProcessingConfiguration->grainAnimated();
+}
+
+void ImageProcessingPostProcess::setGrainAnimated(bool value)
+{
+  _imageProcessingConfiguration->setGrainAnimated(value);
+}
+
 bool ImageProcessingPostProcess::fromLinearSpace() const
 {
   return _fromLinearSpace;
@@ -331,6 +361,12 @@ void ImageProcessingPostProcess::_updateParameters()
   }
   else if (_defines.IMAGEPROCESSINGPOSTPROCESS) {
     defines += "#define IMAGEPROCESSINGPOSTPROCESS;\r\n";
+  }
+  else if (_defines.EXPOSURE) {
+    defines += "#define EXPOSURE;\r\n";
+  }
+  else if (_defines.GRAIN) {
+    defines += "#define GRAIN;\r\n";
   }
 
   vector_t<string_t> samplers{"textureSampler"};
