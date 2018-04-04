@@ -474,7 +474,7 @@ class ColorCorrectionPostProcess;
 class ConvolutionPostProcess;
 struct DepthOfFieldBlurPostProcess;
 class DepthOfFieldEffect;
-struct DepthOfFieldMergePostProcess;
+class DepthOfFieldMergePostProcess;
 class DisplayPassPostProcess;
 class FilterPostProcess;
 class FxaaPostProcess;

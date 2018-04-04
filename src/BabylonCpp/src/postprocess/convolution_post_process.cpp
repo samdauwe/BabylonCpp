@@ -22,7 +22,8 @@ ConvolutionPostProcess::ConvolutionPostProcess(const string_t& iName,
                                                const Float32Array& iKernel,
                                                float ratio, Camera* camera,
                                                unsigned int samplingMode,
-                                               Engine* engine, bool reusable)
+                                               Engine* engine, bool reusable,
+                                               unsigned int textureType)
     : PostProcess{iName,
                   "convolution",
                   {"kernel", "screenSize"},
@@ -31,7 +32,9 @@ ConvolutionPostProcess::ConvolutionPostProcess(const string_t& iName,
                   camera,
                   samplingMode,
                   engine,
-                  reusable}
+                  reusable,
+                  "",
+                  textureType}
     , kernel{iKernel}
 {
   setOnApply([&](Effect* effect, EventState&) {

@@ -766,6 +766,11 @@ void Effect::setTextureFromPostProcess(const string_t& channel,
                                      postProcess);
 }
 
+void Effect::setTextureFromPostProcessOutput(const string_t& /*channel*/,
+                                             PostProcess* /*postProcess*/)
+{
+}
+
 bool Effect::_cacheMatrix(const string_t& uniformName, const Matrix& matrix)
 {
   auto flag = matrix.updateFlag;

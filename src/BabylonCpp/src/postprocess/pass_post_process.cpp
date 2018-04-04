@@ -7,7 +7,8 @@ namespace BABYLON {
 PassPostProcess::PassPostProcess(const string_t& iName, float ratio,
                                  Camera* camera, unsigned int samplingMode,
                                  Engine* engine, bool reusable,
-                                 unsigned int textureType)
+                                 unsigned int textureType,
+                                 bool blockCompilation)
     : PostProcess{iName,
                   "pass",
                   {},
@@ -18,7 +19,10 @@ PassPostProcess::PassPostProcess(const string_t& iName, float ratio,
                   engine,
                   reusable,
                   "",
-                  textureType}
+                  textureType,
+                  "",
+                  {},
+                  blockCompilation}
 {
 }
 

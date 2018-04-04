@@ -19,9 +19,6 @@ public:
                                     const VRCameraMetrics& vrMetrics);
   ~VRDistortionCorrectionPostProcess();
 
-public:
-  float aspectRatio;
-
 private:
   bool _isRightEye;
   Float32Array _distortionFactors;

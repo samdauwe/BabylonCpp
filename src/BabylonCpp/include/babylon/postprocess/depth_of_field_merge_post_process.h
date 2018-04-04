@@ -10,8 +10,9 @@ namespace BABYLON {
  * @brief The DepthOfFieldMergePostProcess merges blurred images with the
  * original based on the values of the circle of confusion.
  */
-struct BABYLON_SHARED_EXPORT DepthOfFieldMergePostProcess : public PostProcess {
+class BABYLON_SHARED_EXPORT DepthOfFieldMergePostProcess : public PostProcess {
 
+public:
   /**
    * @brief Creates a new instance of @see CircleOfConfusionPostProcess
    * @param name The name of the effect.
@@ -30,6 +31,9 @@ struct BABYLON_SHARED_EXPORT DepthOfFieldMergePostProcess : public PostProcess {
    * (default: false)
    * @param textureType Type of textures used when performing the post process.
    * (default: 0)
+   * @param blockCompilation If compilation of the shader should not be done in
+   * the constructor. The updateEffect method can be used to compile the shader
+   * at a later time. (default: false)
    */
   DepthOfFieldMergePostProcess(
     const string_t& name, PostProcess* original, PostProcess* circleOfConfusion,
@@ -37,8 +41,35 @@ struct BABYLON_SHARED_EXPORT DepthOfFieldMergePostProcess : public PostProcess {
     const Variant<float, PostProcessOptions>& options, Camera* camera,
     unsigned int samplingMode = 0, Engine* engine = nullptr,
     bool reusable            = false,
-    unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
-  ~DepthOfFieldMergePostProcess();
+    unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+    bool blockCompilation    = false);
+  ~DepthOfFieldMergePostProcess() override;
+
+  /**
+   * @brief Updates the effect with the current post process compile time values
+   * and recompiles the shader.
+   * @param defines Define statements that should be added at the beginning of
+   * the shader. (default: null)
+   * @param uniforms Set of uniform variables that will be passed to the shader.
+   * (default: null)
+   * @param samplers Set of Texture2D variables that will be passed to the
+   * shader. (default: null)
+   * @param indexParameters The index parameters to be used for babylons include
+   * syntax "#include<kernelBlurVaryingDeclaration>[0..varyingCount]". (default:
+   * undefined) See usage in babylon.blurPostProcess.ts and kernelBlur.vertex.fx
+   * @param onCompiled Called when the shader has been compiled.
+   * @param onError Called if there is an error when compiling a shader.
+   */
+  void updateEffect(
+    const string_t& defines = "", const vector_t<string_t>& uniforms = {},
+    const vector_t<string_t>& samplers                             = {},
+    const unordered_map_t<string_t, unsigned int>& indexParameters = {},
+    const ::std::function<void(Effect* effect)>& onCompiled        = nullptr,
+    const ::std::function<void(Effect* effect, const string_t& errors)>& onError
+    = nullptr) override;
+
+private:
+  vector_t<PostProcess*> blurSteps;
 
 }; // end of class DepthOfFieldMergePostProcess
 

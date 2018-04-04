@@ -34,6 +34,9 @@ public:
    * (default: false)
    * @param textureType Type of textures used when performing the post process.
    * (default: 0)
+   * @param blockCompilation If compilation of the shader should not be done in
+   * the constructor. The updateEffect method can be used to compile the shader
+   * at a later time. (default: false)
    */
   BlurPostProcess(const string_t& name, const Vector2& direction, float kernel,
                   const Variant<float, PostProcessOptions>& options,
@@ -43,11 +46,37 @@ public:
                   Engine* engine = nullptr, bool reusable = false,
                   unsigned int textureType
                   = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
-                  const string_t& defines = "");
-  ~BlurPostProcess();
+                  const string_t& defines = "", bool blockCompilation = false);
+  ~BlurPostProcess() override;
+
+  /**
+   * @brief Updates the effect with the current post process compile time values
+   * and recompiles the shader.
+   * @param defines Define statements that should be added at the beginning of
+   * the shader. (default: null)
+   * @param uniforms Set of uniform variables that will be passed to the shader.
+   * (default: null)
+   * @param samplers Set of Texture2D variables that will be passed to the
+   * shader. (default: null)
+   * @param indexParameters The index parameters to be used for babylons include
+   * syntax "#include<kernelBlurVaryingDeclaration>[0..varyingCount]". (default:
+   * undefined) See usage in babylon.blurPostProcess.ts and kernelBlur.vertex.fx
+   * @param onCompiled Called when the shader has been compiled.
+   * @param onError Called if there is an error when compiling a shader.
+   */
+  void updateEffect(
+    const string_t& defines = "", const vector_t<string_t>& uniforms = {},
+    const vector_t<string_t>& samplers                             = {},
+    const unordered_map_t<string_t, unsigned int>& indexParameters = {},
+    const ::std::function<void(Effect* effect)>& onCompiled        = nullptr,
+    const ::std::function<void(Effect* effect, const string_t& errors)>& onError
+    = nullptr) override;
 
 protected:
-  void _updateParameters();
+  void _updateParameters(
+    const ::std::function<void(Effect* effect)>& onCompiled = nullptr,
+    const ::std::function<void(Effect* effect, const string_t& errors)>& onError
+    = nullptr);
 
   /**
    * @brief Best kernels are odd numbers that when divided by 2, their integer
@@ -122,6 +151,7 @@ protected:
 
 private:
   string_t _staticDefines;
+  bool blockCompilation;
 
 }; // end of class BlurPostProcess
 

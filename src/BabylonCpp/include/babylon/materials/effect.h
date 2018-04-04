@@ -186,6 +186,8 @@ public:
 
   void setTextureFromPostProcess(const string_t& channel,
                                  PostProcess* postProcess);
+  void setTextureFromPostProcessOutput(const string_t& channel,
+                                       PostProcess* postProcess);
   bool _cacheMatrix(const string_t& uniformName, const Matrix& matrix);
   bool _cacheFloat2(const string_t& uniformName, float x, float y);
   bool _cacheFloat3(const string_t& uniformName, float x, float y, float z);

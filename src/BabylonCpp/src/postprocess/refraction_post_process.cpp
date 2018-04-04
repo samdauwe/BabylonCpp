@@ -23,11 +23,14 @@ RefractionPostProcess::RefractionPostProcess(
     , color{iColor}
     , depth{iDepth}
     , colorLevel{iColorLevel}
-    , _refRexture{nullptr}
+    , refractionTexture{this, &RefractionPostProcess::get_refractionTexture,
+                        &RefractionPostProcess::set_refractionTexture}
+    , _refTexture{nullptr}
+    , _ownRefractionTexture{true}
 {
   onActivateObservable.add([&](Camera* cam, EventState&) {
-    _refRexture = _refRexture ?
-                    _refRexture :
+    _refTexture = _refTexture ?
+                    _refTexture :
                     Texture::New(refractionTextureUrl, cam->getScene());
   });
 
@@ -35,7 +38,7 @@ RefractionPostProcess::RefractionPostProcess(
     effect->setColor3("baseColor", color);
     effect->setFloat("depth", depth);
     effect->setFloat("colorLevel", static_cast<float>(colorLevel));
-    effect->setTexture("refractionSampler", _refRexture);
+    effect->setTexture("refractionSampler", _refTexture);
   });
 }
 
@@ -43,10 +46,26 @@ RefractionPostProcess::~RefractionPostProcess()
 {
 }
 
+Texture*& RefractionPostProcess::get_refractionTexture()
+{
+  return _refTexture;
+}
+
+void RefractionPostProcess::set_refractionTexture(Texture* const& value)
+{
+  if (_refTexture && _ownRefractionTexture) {
+    _refTexture->dispose();
+  }
+
+  _refTexture           = value;
+  _ownRefractionTexture = false;
+}
+
 void RefractionPostProcess::dispose(Camera* camera)
 {
-  if (_refRexture) {
-    _refRexture->dispose();
+  if (_refTexture && _ownRefractionTexture) {
+    _refTexture->dispose();
+    _refTexture = nullptr;
   }
 
   PostProcess::dispose(camera);

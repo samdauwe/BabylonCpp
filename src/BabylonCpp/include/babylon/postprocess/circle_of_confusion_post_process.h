@@ -15,11 +15,11 @@ class BABYLON_SHARED_EXPORT CircleOfConfusionPostProcess : public PostProcess {
 
 public:
   /**
-   * @brief Creates a new instance of @see CircleOfConfusionPostProcess.
+   * @brief Creates a new instance of @see CircleOfConfusionPostProcess
    * @param name The name of the effect.
-   * @param scene The scene the effect belongs to.
    * @param depthTexture The depth texture of the scene to compute the circle of
-   * confusion.
+   * confusion. This must be set in order for this to function but may be set
+   * after initialization if needed.
    * @param options The required width/height ratio to downsize to before
    * computing the render pass.
    * @param camera The camera to apply the render pass to.
@@ -31,14 +31,25 @@ public:
    * (default: false)
    * @param textureType Type of textures used when performing the post process.
    * (default: 0)
+   * @param blockCompilation If compilation of the shader should not be done in
+   * the constructor. The updateEffect method can be used to compile the shader
+   * at a later time. (default: false)
    */
   CircleOfConfusionPostProcess(
-    const string_t& name, Scene* scene, RenderTargetTexture* depthTexture,
+    const string_t& name, RenderTargetTexture* depthTexture,
     const Variant<float, PostProcessOptions>& options, Camera* camera,
     unsigned int samplingMode = 0, Engine* engine = nullptr,
     bool reusable            = false,
-    unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+    unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+    bool blockCompilation    = false);
   ~CircleOfConfusionPostProcess();
+
+  /**
+   * @brief Depth texture to be used to compute the circle of confusion. This
+   * must be set here or in the constructor in order for the post process to
+   * function.
+   */
+  void setDepthTexture(RenderTargetTexture* value);
 
 public:
   /**
@@ -65,6 +76,9 @@ public:
    * (default: 50)
    */
   float focalLength;
+
+private:
+  RenderTargetTexture* _depthTexture;
 
 }; // end of class DepthOfFieldMergePostProcess
 

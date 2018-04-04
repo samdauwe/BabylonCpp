@@ -18,17 +18,35 @@ public:
                         const Color3& color, float depth, int colorLevel,
                         float ratio, Camera* camera, unsigned int samplingMode,
                         Engine* engine, bool reusable = false);
-  virtual ~RefractionPostProcess();
+  virtual ~RefractionPostProcess() override;
 
   void dispose(Camera* camera = nullptr) override;
+
+private:
+  /**
+   * @brief Gets the refraction texture.
+   * Please note that you are responsible for disposing the texture if you set
+   * it manually
+   */
+  Texture*& get_refractionTexture();
+
+  /**
+   * @brief Sets the refraction texture.
+   * Please note that you are responsible for disposing the texture if you set
+   * it manually
+   */
+  void set_refractionTexture(Texture* const& value);
 
 public:
   Color3 color;
   float depth;
   int colorLevel;
 
+  Property<RefractionPostProcess, Texture*> refractionTexture;
+
 private:
-  Texture* _refRexture;
+  Texture* _refTexture;
+  bool _ownRefractionTexture;
 
 }; // end of class RefractionPostProcess
 

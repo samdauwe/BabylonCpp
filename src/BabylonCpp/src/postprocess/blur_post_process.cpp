@@ -11,7 +11,7 @@ BlurPostProcess::BlurPostProcess(
   const string_t& iName, const Vector2& direction, float kernel,
   const Variant<float, PostProcessOptions>& options, Camera* camera,
   unsigned int samplingMode, Engine* engine, bool reusable,
-  unsigned int textureType, const string_t& defines)
+  unsigned int textureType, const string_t& defines, bool iBlockCompilation)
     : PostProcess{iName,
                   "kernelBlur",
                   {"delta", "direction", "cameraMinMaxZ"},
@@ -31,6 +31,7 @@ BlurPostProcess::BlurPostProcess(
                   &BlurPostProcess::set_packedFloat}
     , _packedFloat{false}
     , _staticDefines{defines}
+    , blockCompilation{iBlockCompilation}
 {
   set_kernel(kernel);
 
@@ -75,7 +76,19 @@ bool BlurPostProcess::get_packedFloat() const
   return _packedFloat;
 }
 
-void BlurPostProcess::_updateParameters()
+void BlurPostProcess::updateEffect(
+  const string_t& /*defines*/, const vector_t<string_t>& /*uniforms*/,
+  const vector_t<string_t>& /*samplers*/,
+  const unordered_map_t<string_t, unsigned int>& /*indexParameters*/,
+  const ::std::function<void(Effect* effect)>& onCompiled,
+  const ::std::function<void(Effect* effect, const string_t& errors)>& onError)
+{
+  _updateParameters(onCompiled, onError);
+}
+
+void BlurPostProcess::_updateParameters(
+  const ::std::function<void(Effect* effect)>& onCompiled,
+  const ::std::function<void(Effect* effect, const string_t& errors)>& onError)
 {
   // Generate sampling offsets and weights
   const auto N           = _kernel;
@@ -177,9 +190,11 @@ void BlurPostProcess::_updateParameters()
     defines << "#define PACKEDFLOAT 1";
   }
 
-  updateEffect(defines.str(), {}, {},
-               {{"varyingCount", static_cast<unsigned>(varyingCount)},
-                {"depCount", depCount}});
+  PostProcess::updateEffect(
+    defines.str(), {}, {},
+    {{"varyingCount", static_cast<unsigned>(varyingCount)},
+     {"depCount", depCount}},
+    onCompiled, onError);
 }
 
 float BlurPostProcess::_nearestBestKernel(float idealKernel) const

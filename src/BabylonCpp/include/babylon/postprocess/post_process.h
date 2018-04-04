@@ -157,7 +157,7 @@ public:
    * @param onCompiled Called when the shader has been compiled.
    * @param onError Called if there is an error when compiling a shader.
    */
-  void updateEffect(
+  virtual void updateEffect(
     const string_t& defines = "", const vector_t<string_t>& uniforms = {},
     const vector_t<string_t>& samplers                             = {},
     const unordered_map_t<string_t, unsigned int>& indexParameters = {},

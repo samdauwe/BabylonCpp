@@ -23,12 +23,11 @@ VRDistortionCorrectionPostProcess::VRDistortionCorrectionPostProcess(
 {
   adaptScaleToCurrentViewport = true;
 
-  onSizeChangedObservable.add([&](PostProcess*, EventState&) {
-    aspectRatio = static_cast<float>(width) * 0.5f / static_cast<float>(height);
-    _scaleIn    = Vector2(2.f, 2.f / aspectRatio);
+  onSizeChangedObservable.add([this](PostProcess*, EventState&) {
+    _scaleIn = Vector2(2.f, 2.f / aspectRatio());
     _scaleFactor
       = Vector2(0.5f * (1.f / _postProcessScaleFactor),
-                0.5f * (1.f / _postProcessScaleFactor) * aspectRatio);
+                0.5f * (1.f / _postProcessScaleFactor) * aspectRatio());
     _lensCenter = Vector2(_isRightEye ? 0.5f - _lensCenterOffset * 0.5f :
                                         0.5f + _lensCenterOffset * 0.5f,
                           0.5f);

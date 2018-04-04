@@ -17,7 +17,8 @@ public:
                   unsigned int samplingMode, Engine* engine,
                   bool reusable = false,
                   unsigned int textureType
-                  = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+                  = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+                  bool blockCompilation = false);
   ~PassPostProcess();
 
 }; // end of class PassPostProcess

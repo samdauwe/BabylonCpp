@@ -215,7 +215,8 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
   _volumetricLightScatteringRTT->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
   _volumetricLightScatteringRTT->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
   _volumetricLightScatteringRTT->renderList.clear();
-  _volumetricLightScatteringRTT->renderParticles = false;
+  _volumetricLightScatteringRTT->renderParticles      = false;
+  _volumetricLightScatteringRTT->ignoreCameraViewport = true;
 
   auto camera = getCamera();
   if (camera) {

@@ -37,6 +37,9 @@ struct BABYLON_SHARED_EXPORT DepthOfFieldBlurPostProcess
    * (default: false)
    * @param textureType Type of textures used when performing the post process.
    * (default: 0)
+   * @param blockCompilation If compilation of the shader should not be done in
+   * the constructor. The updateEffect method can be used to compile the shader
+   * at a later time. (default: false)
    */
   DepthOfFieldBlurPostProcess(
     const string_t& name, Scene* scene, const Vector2& direction, float kernel,
@@ -44,7 +47,8 @@ struct BABYLON_SHARED_EXPORT DepthOfFieldBlurPostProcess
     PostProcess* circleOfConfusion, PostProcess* imageToBlur = nullptr,
     unsigned int samplingMode = TextureConstants::BILINEAR_SAMPLINGMODE,
     Engine* engine = nullptr, bool reusable = false,
-    unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+    unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+    bool blockCompilation    = false);
   ~DepthOfFieldBlurPostProcess();
 
 }; // end of class DepthOfFieldBlurPostProcess
