@@ -199,9 +199,9 @@ void DefaultRenderingPipeline::_buildPipeline()
   _reset();
 
   if (depthOfFieldEnabled()) {
-    depthOfField = new DepthOfFieldEffect(_scene, _depthOfFieldBlurLevel,
+    /*depthOfField = new DepthOfFieldEffect(_scene, _depthOfFieldBlurLevel,
                                           _defaultPipelineTextureType);
-    addEffect(depthOfField);
+    addEffect(depthOfField);*/
   }
 
   if (bloomEnabled()) {

@@ -2,15 +2,16 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/engine/engine.h>
 #include <babylon/postprocess/display_pass_post_process.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_effect.h>
 
 namespace BABYLON {
 
-PostProcessRenderPipeline::PostProcessRenderPipeline(Engine* /*engine*/,
+PostProcessRenderPipeline::PostProcessRenderPipeline(Engine* iEngine,
                                                      const string_t& name)
 
-    : _name{name}
+    : _name{name}, engine{iEngine}
 {
 }
 
@@ -146,6 +147,22 @@ void PostProcessRenderPipeline::_reset()
 {
   _renderEffects.clear();
   _renderEffectsForIsolatedPass.clear();
+}
+
+bool PostProcessRenderPipeline::_enableMSAAOnFirstPostProcess()
+{
+  // Set samples of the very first post process to 4 to enable native
+  // anti-aliasing in browsers that support webGL 2.0 (See:
+  // https://github.com/BabylonJS/Babylon.js/issues/3754)
+  auto effectKeys = stl_util::extract_keys(_renderEffects);
+  if (engine->webGLVersion() >= 2.f && !effectKeys.empty()) {
+    auto postProcesses = _renderEffects[effectKeys[0]]->getPostProcesses();
+    if (!postProcesses.empty()) {
+      postProcesses[0]->samples = 4;
+      return true;
+    }
+  }
+  return false;
 }
 
 void PostProcessRenderPipeline::dispose(bool /*doNotRecurse*/,

@@ -35,6 +35,9 @@ public:
   virtual void dispose(bool doNotRecurse               = false,
                        bool disposeMaterialAndTextures = false) override;
 
+protected:
+  bool _enableMSAAOnFirstPostProcess();
+
 public:
   string_t _name;
 
@@ -42,6 +45,7 @@ protected:
   unordered_map_t<string_t, Camera*> _cameras;
 
 private:
+  Engine* engine;
   unordered_map_t<string_t, PostProcessRenderEffect*> _renderEffects;
   unordered_map_t<string_t, PostProcessRenderEffect*>
     _renderEffectsForIsolatedPass;
