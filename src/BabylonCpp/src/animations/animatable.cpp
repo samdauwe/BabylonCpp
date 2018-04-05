@@ -18,12 +18,17 @@ Animatable::Animatable(Scene* scene, IAnimatable* iTarget, int iFromFrame,
     , toFrame{iToFrame}
     , loopAnimation{iLoopAnimation}
     , onAnimationEnd{iOnAnimationEnd}
+    , syncRoot{this, &Animatable::get_syncRoot}
+    , masterFrame{this, &Animatable::get_masterFrame}
+    , weight{this, &Animatable::get_weight, &Animatable::set_weight}
     , speedRatio{this, &Animatable::get_speedRatio, &Animatable::set_speedRatio}
     , _localDelayOffset{nullptr}
     , _pausedDelay{nullptr}
     , _paused{false}
     , _scene{scene}
     , _speedRatio{iSpeedRatio}
+    , _weight{-1.f}
+    , _syncRoot{nullptr}
 {
   if (!animations.empty()) {
     appendAnimations(target, animations);
@@ -34,6 +39,36 @@ Animatable::Animatable(Scene* scene, IAnimatable* iTarget, int iFromFrame,
 
 Animatable::~Animatable()
 {
+}
+
+Animatable*& Animatable::get_syncRoot()
+{
+  return _syncRoot;
+}
+
+int Animatable::get_masterFrame() const
+{
+  if (_runtimeAnimations.empty()) {
+    return 0;
+  }
+
+  return _runtimeAnimations[0]->currentFrame;
+}
+
+float Animatable::get_weight() const
+{
+  return _weight;
+}
+
+void Animatable::set_weight(float value)
+{
+  if (stl_util::almost_equal(value, -1.f)) { // -1 is ok and means no weight
+    _weight = -1.f;
+    return;
+  }
+
+  // Else weight must be in [0, 1] range
+  _weight = ::std::min(std::max(value, 0.f), 1.f);
 }
 
 float Animatable::get_speedRatio() const
@@ -50,6 +85,22 @@ void Animatable::set_speedRatio(float value)
 }
 
 // Methods
+Animatable& Animatable::syncWith(Animatable* root)
+{
+  _syncRoot = root;
+
+  if (root) {
+    // Make sure this animatable will animate after the root
+    auto index = stl_util::index_of(_scene->_activeAnimatables, this);
+    if (index > -1) {
+      stl_util::splice(_scene->_activeAnimatables, index, 1);
+      _scene->_activeAnimatables.emplace_back(this);
+    }
+  }
+
+  return *this;
+}
+
 vector_t<RuntimeAnimation*>& Animatable::getAnimations()
 {
   return _runtimeAnimations;
@@ -59,7 +110,8 @@ void Animatable::appendAnimations(IAnimatable* /*iTarget*/,
                                   const vector_t<Animation*>& animations)
 {
   for (auto& animation : animations) {
-    _runtimeAnimations.emplace_back(new RuntimeAnimation(target, animation));
+    _runtimeAnimations.emplace_back(
+      new RuntimeAnimation(target, animation, _scene, this));
   }
 }
 
@@ -124,8 +176,8 @@ void Animatable::goToFrame(int frame)
     auto fps          = _runtimeAnimations[0]->animation()->framePerSecond;
     auto currentFrame = _runtimeAnimations[0]->currentFrame;
     auto adjustTime   = frame - currentFrame;
-    auto delay
-      = static_cast<float>(adjustTime) * 1000.f / static_cast<float>(fps);
+    auto delay        = static_cast<float>(adjustTime) * 1000.f
+                 / (static_cast<float>(fps) * speedRatio);
     if (_localDelayOffset == nullptr) {
       _localDelayOffset = millisecond_t(0);
     }
@@ -204,13 +256,19 @@ bool Animatable::_animate(const millisecond_t& delay)
     _pausedDelay      = nullptr;
   }
 
+  if (_weight == 0.f) { // We consider that an animation with a weight === 0 is
+                        // "actively" paused
+    return true;
+  }
+
   // Animating
   bool running = false;
 
   for (auto& animation : _runtimeAnimations) {
-    bool isRunning = animation->animate(delay - (*_localDelayOffset), fromFrame,
-                                        toFrame, loopAnimation, speedRatio());
-    running        = running || isRunning;
+    bool isRunning
+      = animation->animate(delay - (*_localDelayOffset), fromFrame, toFrame,
+                           loopAnimation, speedRatio(), _weight);
+    running = running || isRunning;
   }
 
   animationStarted = running;

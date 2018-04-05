@@ -9,7 +9,8 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT RuntimeAnimation {
 
 public:
-  RuntimeAnimation(IAnimatable* target, Animation* animation);
+  RuntimeAnimation(IAnimatable* target, Animation* animation, Scene* scene,
+                   Animatable* host);
   ~RuntimeAnimation();
 
   Animation* animation();
@@ -20,7 +21,7 @@ public:
   void goToFrame(int frame);
   void _prepareForSpeedRatioChange(float newSpeedRatio);
   bool animate(millisecond_t delay, int from, int to, bool loop,
-               float speedRatio);
+               float speedRatio, float weight = -1.f);
 
 private:
   AnimationValue _getKeyValue(const AnimationValue& value) const;

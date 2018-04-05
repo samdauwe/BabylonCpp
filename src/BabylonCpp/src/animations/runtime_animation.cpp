@@ -7,7 +7,8 @@
 
 namespace BABYLON {
 
-RuntimeAnimation::RuntimeAnimation(IAnimatable* target, Animation* animation)
+RuntimeAnimation::RuntimeAnimation(IAnimatable* target, Animation* animation,
+                                   Scene* /*scene*/, Animatable* /*host*/)
     : _animation{animation}
     , _target{target}
     , _stopped{false}
@@ -333,7 +334,7 @@ void RuntimeAnimation::_prepareForSpeedRatioChange(float newSpeedRatio)
 }
 
 bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
-                               float speedRatio)
+                               float speedRatio, float /*weight*/)
 {
   const auto& targetPropertyPath = _animation->targetPropertyPath;
   if (targetPropertyPath.empty()) {

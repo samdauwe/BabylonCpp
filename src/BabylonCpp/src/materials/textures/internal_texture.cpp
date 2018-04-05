@@ -1,5 +1,6 @@
 #include <babylon/materials/textures/internal_texture.h>
 
+#include <babylon/engine/depth_texture_creation_options.h>
 #include <babylon/engine/engine.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
@@ -18,6 +19,7 @@ constexpr unsigned int InternalTexture::DATASOURCE_CUBE;
 constexpr unsigned int InternalTexture::DATASOURCE_CUBERAW;
 constexpr unsigned int InternalTexture::DATASOURCE_CUBEPREFILTERED;
 constexpr unsigned int InternalTexture::DATASOURCE_RAW3D;
+constexpr unsigned int InternalTexture::DATASOURCE_DEPTHTEXTURE;
 
 InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource)
     : _initialSlot{-1}
@@ -26,6 +28,7 @@ InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource)
     , _cachedWrapU{0}
     , _cachedWrapV{0}
     , _cachedWrapR{0}
+    , _comparisonFunction{0}
     , _references{1}
     , _engine{engine}
 {
@@ -123,6 +126,22 @@ void InternalTexture::_rebuild()
         auto size = ISize{width, height};
         proxy     = _engine->createRenderTargetTexture(size, options);
       }
+      proxy->_swapAndDie(this);
+
+      isReady = true;
+    }
+      return;
+    case InternalTexture::DATASOURCE_DEPTHTEXTURE: {
+      DepthTextureCreationOptions depthTextureOptions;
+      depthTextureOptions.bilinearFiltering
+        = samplingMode != TextureConstants::BILINEAR_SAMPLINGMODE;
+      depthTextureOptions.comparisonFunction = _comparisonFunction;
+      depthTextureOptions.generateStencil    = _generateStencilBuffer;
+      depthTextureOptions.isCube             = isCube;
+
+      auto size = ISize{width, height};
+      proxy = _engine->createDepthStencilTexture(ToVariant<int, ISize>(size),
+                                                 depthTextureOptions);
       proxy->_swapAndDie(this);
 
       isReady = true;

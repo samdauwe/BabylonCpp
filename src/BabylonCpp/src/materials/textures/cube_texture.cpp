@@ -17,9 +17,15 @@ unique_ptr_t<CubeTexture>
 CubeTexture::CreateFromImages(const vector_t<string_t>& iFiles, Scene* scene,
                               bool noMipmap)
 {
+  string_t rootUrlKey = "";
+
+  for (const auto& url : iFiles) {
+    rootUrlKey += url;
+  }
+
   const vector_t<string_t> emptyStringList;
-  return ::std::make_unique<CubeTexture>("", scene, emptyStringList, noMipmap,
-                                         iFiles);
+  return ::std::make_unique<CubeTexture>(rootUrlKey, scene, emptyStringList,
+                                         noMipmap, iFiles);
 }
 
 unique_ptr_t<CubeTexture>
@@ -189,6 +195,16 @@ unique_ptr_t<CubeTexture> CubeTexture::Parse(const Json::value& parsedTexture,
     rootUrl + Json::GetString(parsedTexture, "name"), scene,
     Json::ToStringVector(parsedTexture, "extensions"));
   SerializationHelper::Parse(cubeTexture.get(), parsedTexture, scene);
+
+  // Local Cubemaps
+  if (parsedTexture.contains("boundingBoxPosition")) {
+    cubeTexture->boundingBoxPosition = Vector3::FromArray(
+      Json::ToArray<float>(parsedTexture, "boundingBoxPosition"));
+  }
+  if (parsedTexture.contains("boundingBoxSize")) {
+    cubeTexture->setBoundingBoxSize(Vector3::FromArray(
+      Json::ToArray<float>(parsedTexture, "boundingBoxSize")));
+  }
 
   // Animations
   if (parsedTexture.contains("animations")) {

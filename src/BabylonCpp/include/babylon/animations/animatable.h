@@ -17,6 +17,15 @@ public:
   ~Animatable();
 
   /** Methods **/
+  /**
+   * @brief Synchronize and normalize current Animatable with a source
+   * Animatable. This is useful when using animation weights and when animations
+   * are not of the same length.
+   * @param root defines the root Animatable to synchronize with
+   * @returns the current Animatable
+   */
+  Animatable& syncWith(Animatable* root);
+
   vector_t<RuntimeAnimation*>& getAnimations();
   void appendAnimations(IAnimatable* target,
                         const vector_t<Animation*>& animations);
@@ -33,7 +42,36 @@ public:
   bool _animate(const millisecond_t& delay);
 
 private:
+  /**
+   * @brief Gets the root Animatable used to synchronize and normalize
+   * animations.
+   */
+  Animatable*& get_syncRoot();
+
+  /**
+   * @brief Gets the current frame of the first RuntimeAnimation.
+   * Used to synchronize Animatables
+   */
+  int get_masterFrame() const;
+
+  /**
+   * @brief Gets the animatable weight (-1.0 by default meaning not weighted).
+   */
+  float get_weight() const;
+
+  /**
+   * @brief Sets the animatable weight (-1.0 by default meaning not weighted).
+   */
+  void set_weight(float value);
+
+  /**
+   * @brief Gets the speed ratio to apply to the animatable (1.0 by default).
+   */
   float get_speedRatio() const;
+
+  /**
+   * @brief Sets the speed ratio to apply to the animatable (1.0 by default).
+   */
   void set_speedRatio(float value);
 
 public:
@@ -43,6 +81,9 @@ public:
   int toFrame;
   bool loopAnimation;
   ::std::function<void()> onAnimationEnd;
+  ReadOnlyProperty<Animatable, Animatable*> syncRoot;
+  ReadOnlyProperty<Animatable, int> masterFrame;
+  Property<Animatable, float> weight;
   Property<Animatable, float> speedRatio;
 
 private:
@@ -52,6 +93,8 @@ private:
   bool _paused;
   Scene* _scene;
   float _speedRatio;
+  float _weight;
+  Animatable* _syncRoot;
 
 }; // end of class Animatable
 

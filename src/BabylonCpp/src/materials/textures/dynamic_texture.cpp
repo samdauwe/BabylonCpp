@@ -14,13 +14,14 @@ DynamicTexture::DynamicTexture(const string_t& iName,
                                unsigned int samplingMode, unsigned int format)
     : Texture{nullptr, scene,   !generateMipMaps, true,  samplingMode,
               nullptr, nullptr, nullptr,          false, format}
-    , _samplingMode{samplingMode}
     , _generateMipMaps{generateMipMaps}
 {
   name    = iName;
   _engine = getScene()->getEngine();
   wrapU   = TextureConstants::CLAMP_ADDRESSMODE;
   wrapV   = TextureConstants::CLAMP_ADDRESSMODE;
+
+  _samplingMode = samplingMode;
 
   if (options.canvas) {
     _canvas  = options.canvas;

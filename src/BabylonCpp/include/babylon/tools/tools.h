@@ -23,7 +23,7 @@ struct BABYLON_SHARED_EXPORT Tools {
    * @return The mixed value
    */
   static float Mix(float a, float b, float alpha);
-  static bool IsExponentOfTwo(int value);
+  static bool IsExponentOfTwo(size_t value);
 
   /**
    * @brief Find the next highest power of two.
@@ -50,7 +50,8 @@ struct BABYLON_SHARED_EXPORT Tools {
                               unsigned int mode
                               = EngineConstants::SCALEMODE_NEAREST);
   static string_t GetFilename(const string_t& path);
-  static string_t GetFolderPath(const string_t& uri);
+  static string_t GetFolderPath(const string_t& uri,
+                                bool returnUnchangedIfNoSlash = false);
   static float ToDegrees(float angle);
   static float ToRadians(float angle);
   static MinMax ExtractMinAndMaxIndexed(const Float32Array& positions,

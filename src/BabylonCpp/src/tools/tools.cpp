@@ -35,9 +35,9 @@ float Tools::Mix(float a, float b, float alpha)
   return a * (1 - alpha) + b * alpha;
 }
 
-bool Tools::IsExponentOfTwo(int value)
+bool Tools::IsExponentOfTwo(size_t value)
 {
-  int count = 1;
+  size_t count = 1;
 
   do {
     count *= 2;
@@ -104,10 +104,14 @@ string_t Tools::GetFilename(const string_t& path)
   return path.substr(static_cast<size_t>(index) + 1);
 }
 
-string_t Tools::GetFolderPath(const string_t& uri)
+string_t Tools::GetFolderPath(const string_t& uri,
+                              bool returnUnchangedIfNoSlash)
 {
   const auto index = String::lastIndexOf(uri, "/");
   if (index < 0) {
+    if (returnUnchangedIfNoSlash) {
+      return uri;
+    }
     return "";
   }
 

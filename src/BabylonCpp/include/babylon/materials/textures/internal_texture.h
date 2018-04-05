@@ -66,6 +66,10 @@ public:
    * Texture content is raw 3D data
    */
   static constexpr unsigned int DATASOURCE_RAW3D = 10;
+  /**
+   * Texture content is a depth texture
+   */
+  static constexpr unsigned int DATASOURCE_DEPTHTEXTURE = 11;
 
 public:
   /**
@@ -209,6 +213,7 @@ public:
   string_t _compression;
   bool _generateStencilBuffer;
   bool _generateDepthBuffer;
+  int _comparisonFunction;
   unique_ptr_t<SphericalPolynomial> _sphericalPolynomial;
   float _lodGenerationScale;
   float _lodGenerationOffset;
