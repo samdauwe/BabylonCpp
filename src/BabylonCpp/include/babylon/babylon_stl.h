@@ -276,6 +276,65 @@ private:
   TGetter const _getter;
 };
 
+// -- Write-Only Properties -- //
+
+template <typename C, typename T, typename E = void>
+class WriteOnlyProperty; // undefined
+
+template <typename C, typename T>
+class WriteOnlyProperty<
+  C, T,
+  typename std::enable_if<std::is_fundamental<T>::value
+                          || std::is_same<std::string, T>::value>::type> {
+public:
+  using TSetter = void (C::*)(T);
+
+  WriteOnlyProperty(C* propObject, TSetter propSetter)
+      : _object{propObject}, _setter{propSetter}
+  {
+  }
+
+  WriteOnlyProperty& operator=(const WriteOnlyProperty&) = delete;
+  WriteOnlyProperty(const WriteOnlyProperty&)            = delete;
+
+  C& operator=(T theValue)
+  {
+    (_object->*_setter)(theValue);
+    return *_object;
+  }
+
+private:
+  C* const _object;
+  TSetter const _setter;
+};
+
+template <typename C, typename T>
+class WriteOnlyProperty<
+  C, T,
+  typename std::enable_if<!std::is_fundamental<T>::value
+                          && !std::is_same<std::string, T>::value>::type> {
+public:
+  using TSetter = void (C::*)(const T&);
+
+  WriteOnlyProperty(C* propObject, TSetter propSetter)
+      : _object{propObject}, _setter{propSetter}
+  {
+  }
+
+  WriteOnlyProperty& operator=(const WriteOnlyProperty&) = delete;
+  WriteOnlyProperty(const WriteOnlyProperty&)            = delete;
+
+  C& operator=(const T& newValue)
+  {
+    (_object->*_setter)(newValue);
+    return *_object;
+  }
+
+private:
+  C* const _object;
+  TSetter const _setter;
+};
+
 // -- Read-Write Properties -- //
 
 template <typename C, typename T, typename E = void>
