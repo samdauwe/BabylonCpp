@@ -2629,6 +2629,37 @@ void Scene::freeProcessedMaterials()
   _processedMaterials.clear();
 }
 
+void Scene::freeActiveMeshes()
+{
+  _activeMeshes.clear();
+  if (activeCamera && !activeCamera->_activeMeshes.empty()) {
+    activeCamera->_activeMeshes.clear();
+  }
+  if (!activeCameras.empty()) {
+    for (auto& activeCamera : activeCameras) {
+      if (activeCamera && !activeCamera->_activeMeshes.empty()) {
+        activeCamera->_activeMeshes.clear();
+      }
+    }
+  }
+}
+
+void Scene::freeRenderingGroups()
+{
+  if (_renderingManager) {
+    _renderingManager->freeRenderingGroups();
+  }
+  if (!textures.empty()) {
+    for (auto& texture : textures) {
+      if (texture
+          && !static_cast<RenderTargetTexture*>(texture.get())
+                ->renderList.empty()) {
+        static_cast<RenderTargetTexture*>(texture.get())->freeRenderingGroups();
+      }
+    }
+  }
+}
+
 void Scene::_evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh)
 {
   if (dispatchAllSubMeshesOfActiveMeshes || mesh->alwaysSelectAsActiveMesh
@@ -3674,14 +3705,28 @@ void Scene::disposeSounds()
 }
 
 /** Octrees **/
-MinMax Scene::getWorldExtends()
+MinMax Scene::getWorldExtends(
+  const ::std::function<bool(AbstractMesh*)>& filterPredicate)
 {
   Vector3 min(numeric_limits_t<float>::max(), numeric_limits_t<float>::max(),
               numeric_limits_t<float>::max());
   Vector3 max(numeric_limits_t<float>::lowest(),
               numeric_limits_t<float>::lowest(),
               numeric_limits_t<float>::lowest());
-  for (auto& mesh : meshes) {
+
+  vector_t<AbstractMesh*> filteredMeshes;
+  if (filterPredicate) {
+    for (auto& mesh : meshes) {
+      if (filterPredicate(mesh.get())) {
+        filteredMeshes.emplace_back(mesh.get());
+      }
+    }
+  }
+  else {
+    filteredMeshes = stl_util::to_raw_ptr_vector(meshes);
+  }
+
+  for (auto& mesh : filteredMeshes) {
     if (mesh->subMeshes.empty() || mesh->infiniteDistance) {
       continue;
     }

@@ -169,11 +169,6 @@ public:
   const string_t getClassName() const override;
 
   /**
-   * @brief Returns true if the mesh has been disposed.
-   */
-  bool isDisposed() const;
-
-  /**
    * @brief Returns the string representatin of the AbstractMesh Object.
    * @param {boolean} fullDetails - support for multiple levels of logging
    * within scene loading
@@ -577,13 +572,14 @@ public:
   AbstractMesh& releaseSubMeshes();
 
   /**
-   * @brief Disposes the AbstractMesh.
-   * Some internal references are kept for further use.
-   * By default, all the mesh children are also disposed unless the parameter
-   * `doNotRecurse` is set to `true`.
+   * @brief Releases resources associated with this abstract mesh.
+   * @param doNotRecurse Set to true to not recurse into each children (recurse
+   * into each children by default)
+   * @param disposeMaterialAndTextures Set to true to also dispose referenced
+   * materials and textures (false by default)
    */
   virtual void dispose(bool doNotRecurse               = false,
-                       bool disposeMaterialAndTextures = false);
+                       bool disposeMaterialAndTextures = false) override;
 
   /**
    * @brief Adds the passed mesh as a child to the current mesh.
@@ -854,7 +850,6 @@ public:
   AbstractMesh* _masterMesh;
   unique_ptr_t<MaterialDefines> _materialDefines;
   unique_ptr_t<BoundingInfo> _boundingInfo;
-  bool _isDisposed;
   int _renderId;
   vector_t<unique_ptr_t<SubMesh>> subMeshes;
   Octree<SubMesh*>* _submeshesOctree;

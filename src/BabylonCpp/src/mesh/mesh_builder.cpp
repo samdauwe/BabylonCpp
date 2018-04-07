@@ -582,12 +582,12 @@ GroundMesh* MeshBuilder::CreateGroundFromHeightMap(
 
     vertexData->applyToMesh(ground, options.updatable);
 
-    ground->_setReady(true);
-
     // execute ready callback, if set
     if (options.onReady) {
       options.onReady(ground);
     }
+
+    ground->_setReady(true);
   };
 
   const auto onError

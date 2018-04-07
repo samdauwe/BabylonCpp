@@ -4090,6 +4090,12 @@ void Engine::setTextureFromPostProcess(int channel, PostProcess* postProcess)
   _bindTexture(channel, postProcess ? postProcess->_textures[_ind] : nullptr);
 }
 
+void Engine::setTextureFromPostProcessOutput(int channel,
+                                             PostProcess* postProcess)
+{
+  _bindTexture(channel, postProcess ? postProcess->_outputTexture : nullptr);
+}
+
 void Engine::unbindAllTextures()
 {
   for (unsigned int channel = 0; channel < _maxSimultaneousTextures;

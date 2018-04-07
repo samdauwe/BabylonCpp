@@ -268,7 +268,9 @@ ISceneSize EnvironmentHelper::_getSceneSize()
     return ISceneSize{groundSize, skyboxSize, rootPosition};
   }
 
-  const auto sceneExtends  = _scene->getWorldExtends();
+  const auto sceneExtends = _scene->getWorldExtends([this](AbstractMesh* mesh) {
+    return (mesh != _ground && mesh != _rootMesh && mesh != _skybox);
+  });
   const auto sceneDiagonal = sceneExtends.max.subtract(sceneExtends.min);
 
   if (_options.sizeAuto) {

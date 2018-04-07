@@ -19,7 +19,7 @@ public:
   virtual ~Buffer();
 
   /**
-   * @param Create a new {BABYLON.VertexBuffer} based on the current buffer.
+   * @brief Create a new {BABYLON.VertexBuffer} based on the current buffer.
    * @param kind defines the vertex buffer kind (position, normal, etc.)
    * @param offset defines offset in the buffer (0 by default)
    * @param size defines the size in floats of attributes (position is 3 for
@@ -39,9 +39,6 @@ public:
   Float32Array& getData();
   GL::IGLBuffer* getBuffer();
   int getStrideSize() const;
-  bool getIsInstanced() const;
-  unsigned int instanceDivisor() const;
-  void setInstanceDivisor(unsigned int value);
 
   // Methods
   void _rebuild();
@@ -59,7 +56,6 @@ private:
   bool _updatable;
   int _strideSize;
   bool _instanced;
-  unsigned int _instanceDivisor;
 
 }; // end of class Buffer
 

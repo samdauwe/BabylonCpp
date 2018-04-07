@@ -16,7 +16,6 @@ Buffer::Buffer(Engine* engine, const Float32Array& data, bool updatable,
     , _updatable{updatable}
     , _strideSize{stride}
     , _instanced{instanced}
-    , _instanceDivisor{instanced ? 1u : 0u}
 {
   if (!postponeInternalCreation) { // by default
     create();
@@ -73,27 +72,6 @@ GL::IGLBuffer* Buffer::getBuffer()
 int Buffer::getStrideSize() const
 {
   return _strideSize;
-}
-
-bool Buffer::getIsInstanced() const
-{
-  return _instanced;
-}
-
-unsigned int Buffer::instanceDivisor() const
-{
-  return _instanceDivisor;
-}
-
-void Buffer::setInstanceDivisor(unsigned int value)
-{
-  _instanceDivisor = value;
-  if (value == 0) {
-    _instanced = false;
-  }
-  else {
-    _instanced = true;
-  }
 }
 
 // Methods

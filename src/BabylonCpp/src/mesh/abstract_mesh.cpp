@@ -68,7 +68,6 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
     , _masterMesh{nullptr}
     , _materialDefines{nullptr}
     , _boundingInfo{nullptr}
-    , _isDisposed{false}
     , _renderId{0}
     , _submeshesOctree{nullptr}
     , _unIndexed{false}
@@ -394,11 +393,6 @@ void AbstractMesh::setCollisionGroup(int mask)
 const string_t AbstractMesh::getClassName() const
 {
   return "AbstractMesh";
-}
-
-bool AbstractMesh::isDisposed() const
-{
-  return _isDisposed;
 }
 
 string_t AbstractMesh::toString(bool fullDetails) const
@@ -1248,6 +1242,10 @@ AbstractMesh& AbstractMesh::releaseSubMeshes()
 
 void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
+  // Smart Array Retainers.
+  getScene()->freeActiveMeshes();
+  getScene()->freeRenderingGroups();
+
   // Action manager
   if (actionManager) {
     actionManager->dispose();
@@ -1255,10 +1253,7 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   }
 
   // Skeleton
-  auto skeletonTmp = skeleton();
-  if (skeletonTmp) {
-    skeletonTmp = nullptr;
-  }
+  _skeleton = nullptr;
 
   // Physics
   if (physicsImpostor) {
@@ -1355,7 +1350,7 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 
   _isDisposed = true;
 
-  TransformNode::dispose(doNotRecurse);
+  TransformNode::dispose(doNotRecurse, disposeMaterialAndTextures);
 
   // Remove from scene
   getScene()->removeMesh(this);

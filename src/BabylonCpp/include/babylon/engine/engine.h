@@ -551,6 +551,15 @@ public:
   void bindSamplers(Effect* effect);
   void _bindTexture(int channel, InternalTexture* texture);
   void setTextureFromPostProcess(int channel, PostProcess* postProcess);
+
+  /**
+   * @brief Binds the output of the passed in post process to the texture
+   * channel specified.
+   * @param channel The channel the texture should be bound to
+   * @param postProcess The post process which's output should be bound
+   */
+  void setTextureFromPostProcessOutput(int channel, PostProcess* postProcess);
+
   void unbindAllTextures();
   void setTexture(int channel, GL::IGLUniformLocation* uniform,
                   BaseTexture* texture);

@@ -655,6 +655,18 @@ public:
    */
   void freeProcessedMaterials();
 
+  /**
+   * @brief Clear the active meshes smart array preventing retention point in
+   * mesh dispose.
+   */
+  void freeActiveMeshes();
+
+  /**
+   * @brief Clear the info related to rendering groups preventing retention
+   * points during dispose.
+   */
+  void freeRenderingGroups();
+
   bool _isInIntermediateRendering() const;
 
   void setActiveMeshCandidateProvider(IActiveMeshCandidateProvider* provider);
@@ -697,7 +709,16 @@ public:
   void disposeSounds();
 
   /** Octrees **/
-  MinMax getWorldExtends();
+
+  /**
+   * @brief Get the world extend vectors with an optional filter.
+   * @param filterPredicate the predicate - which meshes should be included when
+   * calculating the world size
+   * @returns {{ min: Vector3; max: Vector3 }} min and max vectors
+   */
+  MinMax getWorldExtends(
+    const ::std::function<bool(AbstractMesh* Mesh)>& filterPredicate = nullptr);
+
   Octree<AbstractMesh*>* createOrUpdateSelectionOctree(size_t maxCapacity = 64,
                                                        size_t maxDepth    = 2);
 
