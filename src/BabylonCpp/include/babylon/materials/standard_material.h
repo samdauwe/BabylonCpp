@@ -105,6 +105,8 @@ public:
   void setUseReflectionOverAlpha(bool value);
   bool disableLighting() const;
   void setDisableLighting(bool value);
+  bool useObjectSpaceNormalMap() const;
+  void setUseObjectSpaceNormalMap(bool value);
   bool useParallax() const;
   void setUseParallax(bool value);
   bool useParallaxOcclusion() const;
@@ -325,6 +327,7 @@ private:
   bool _useSpecularOverAlpha;
   bool _useReflectionOverAlpha;
   bool _disableLighting;
+  bool _useObjectSpaceNormalMap;
   bool _useParallax;
   bool _useParallaxOcclusion;
   float _roughness;

@@ -77,6 +77,7 @@ StandardMaterial::StandardMaterial(const string_t& iName, Scene* scene)
     , _useSpecularOverAlpha{false}
     , _useReflectionOverAlpha{false}
     , _disableLighting{false}
+    , _useObjectSpaceNormalMap{false}
     , _useParallax{false}
     , _useParallaxOcclusion{false}
     , _roughness{0.f}
@@ -444,6 +445,8 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           defines.defines[SMD::PARALLAX]          = _useParallax;
           defines.defines[SMD::PARALLAXOCCLUSION] = _useParallaxOcclusion;
         }
+
+        defines.defines[SMD::OBJECTSPACE_NORMALMAP] = _useObjectSpaceNormalMap;
       }
       else {
         defines.defines[SMD::BUMP] = false;
@@ -684,6 +687,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                 "emissiveMatrix",
                                 "specularMatrix",
                                 "bumpMatrix",
+                                "normalMatrix",
                                 "lightmapMatrix",
                                 "refractionMatrix",
                                 "diffuseLeftColor",
@@ -827,6 +831,12 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
 
   // Matrices
   bindOnlyWorldMatrix(*world);
+
+  // Normal Matrix
+  if (defines.defines[SMD::OBJECTSPACE_NORMALMAP]) {
+    world->toNormalMatrix(_normalMatrix);
+    bindOnlyNormalMatrix(_normalMatrix);
+  }
 
   const auto mustRebind = _mustRebind(scene, effect, mesh->visibility());
 
@@ -1474,6 +1484,19 @@ void StandardMaterial::setDisableLighting(bool value)
     return;
   }
   _disableLighting = value;
+}
+
+bool StandardMaterial::useObjectSpaceNormalMap() const
+{
+  return _useObjectSpaceNormalMap;
+}
+
+void StandardMaterial::setUseObjectSpaceNormalMap(bool value)
+{
+  if (_useObjectSpaceNormalMap == value) {
+    return;
+  }
+  _useObjectSpaceNormalMap = value;
 }
 
 bool StandardMaterial::useParallax() const

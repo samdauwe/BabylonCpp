@@ -95,6 +95,13 @@ public:
                          bool useInstances = false) override;
 
   /**
+   * @brief Specifies if the material uses metallic roughness workflow.
+   * @returns boolean specifiying if the material uses metallic roughness
+   * workflow.
+   */
+  bool isMetallicWorkflow() const;
+
+  /**
    * @brief Force shader compilation
    */
   void forceCompilation(AbstractMesh* mesh,
@@ -110,12 +117,6 @@ public:
    * @brief Unbinds the textures.
    */
   void unbind() override;
-
-  /**
-   * @brief Binds to the world matrix.
-   * @param world - The world matrix.
-   */
-  void bindOnlyWorldMatrix(Matrix& world) override;
 
   /**
    * @brief Binds the submesh data.
@@ -428,6 +429,11 @@ protected:
   bool _useRadianceOverAlpha;
 
   /**
+   * Allows using an object space normal map (instead of tangent space).
+   */
+  bool _useObjectSpaceNormalMap;
+
+  /**
    * Allows using the bump map in parallax mode.
    */
   bool _useParallax;
@@ -521,11 +527,6 @@ protected:
   bool _forceNormalForward;
 
   /**
-   * Force metallic workflow.
-   */
-  bool _forceMetallicWorkflow;
-
-  /**
    * Default configuration related to image processing available in the PBR
    * Material.
    */
@@ -563,6 +564,11 @@ private:
    * buffers.
    */
   bool _useLogarithmicDepth;
+
+  /**
+   * If set to true, no lighting calculations will be applied.
+   */
+  bool _unlit;
 
 }; // end of class PBRBaseMaterial
 

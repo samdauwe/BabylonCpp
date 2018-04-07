@@ -73,6 +73,7 @@ PBRBaseMaterial::PBRBaseMaterial(const string_t& iName, Scene* scene)
     , _useAutoMicroSurfaceFromReflectivityMap{false}
     , _usePhysicalLightFalloff{true}
     , _useRadianceOverAlpha{true}
+    , _useObjectSpaceNormalMap{false}
     , _useParallax{false}
     , _useParallaxOcclusion{false}
     , _parallaxScaleBias{0.05f}
@@ -89,11 +90,11 @@ PBRBaseMaterial::PBRBaseMaterial(const string_t& iName, Scene* scene)
     , _environmentBRDFTexture{nullptr}
     , _forceIrradianceInFragment{false}
     , _forceNormalForward{false}
-    , _forceMetallicWorkflow{false}
     , _lightingInfos{Vector4(_directIntensity, _emissiveIntensity,
                              _environmentIntensity, _specularIntensity)}
     , _imageProcessingObserver{nullptr}
     , _globalAmbientColor{Color3(0, 0, 0)}
+    , _unlit{false}
 {
   // Setup the default processing configuration to the scene.
   _attachImageProcessingConfiguration(nullptr);
@@ -351,26 +352,12 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     }
   }
 
-  if (!engine->getCaps().standardDerivatives) {
-    Mesh* bufferMesh             = nullptr;
-    const string_t meshClassName = mesh->getClassName();
-    if (meshClassName == "InstancedMesh") {
-      bufferMesh = (static_cast<InstancedMesh*>(mesh))->sourceMesh();
-    }
-    else if (meshClassName == "Mesh") {
-      bufferMesh = static_cast<Mesh*>(mesh);
-    }
-
-    if (bufferMesh && bufferMesh->geometry()
-        && bufferMesh->geometry()->isReady()
-        && !bufferMesh->geometry()->isVerticesDataPresent(
-             VertexBuffer::NormalKind)) {
-      bufferMesh->createNormals(true);
-      BABYLON_LOGF_WARN(
-        "PBRBaseMaterial",
-        "PBRMaterial: Normals have been created for the mesh: %s",
-        bufferMesh->name.c_str())
-    }
+  if (!engine->getCaps().standardDerivatives
+      && !mesh->isVerticesDataPresent(VertexBuffer::NormalKind)) {
+    mesh->createNormals(true);
+    BABYLON_LOGF_WARN("PBRBaseMaterial",
+                      "PBRMaterial: Normals have been created for the mesh: %s",
+                      mesh->name.c_str());
   }
 
   auto effect
@@ -389,6 +376,15 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   _wasPreviouslyReady = true;
 
   return true;
+}
+
+bool PBRBaseMaterial::isMetallicWorkflow() const
+{
+  if (_metallic != 0.f || _roughness != 0.f || _metallicTexture) {
+    return true;
+  }
+
+  return false;
 }
 
 Effect* PBRBaseMaterial::_prepareEffect(
@@ -543,6 +539,7 @@ Effect* PBRBaseMaterial::_prepareEffect(
                               "reflectionMatrix",
                               "emissiveMatrix",
                               "reflectivityMatrix",
+                              "normalMatrix",
                               "microSurfaceSamplerMatrix",
                               "bumpMatrix",
                               "lightmapMatrix",
@@ -612,6 +609,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
   defines._needNormals = true;
 
   // Textures
+  defines.defines[PMD::METALLICWORKFLOW] = isMetallicWorkflow();
   if (defines._areTexturesDirty) {
     defines._needUVs = false;
     if (scene->texturesEnabled()) {
@@ -740,6 +738,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
                                                   PMD::LIGHTMAP, "LIGHTMAP",
                                                   PMD::MAINUV1, PMD::MAINUV2);
         defines.defines[PMD::USELIGHTMAPASSHADOWMAP] = _useLightmapAsShadowmap;
+        defines.defines[PMD::GAMMALIGHTMAP] = _lightmapTexture->gammaSpace;
       }
       else {
         defines.defines[PMD::LIGHTMAP] = false;
@@ -759,7 +758,6 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
           MaterialHelper::PrepareDefinesForMergedUV(
             _metallicTexture, defines, PMD::REFLECTIVITY, "REFLECTIVITY",
             PMD::MAINUV1, PMD::MAINUV2);
-          defines.defines[PMD::METALLICWORKFLOW] = true;
           defines.defines[PMD::ROUGHNESSSTOREINMETALMAPALPHA]
             = _useRoughnessFromMetallicTextureAlpha;
           defines.defines[PMD::ROUGHNESSSTOREINMETALMAPGREEN]
@@ -771,7 +769,6 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
             = _useAmbientOcclusionFromMetallicTextureRed;
         }
         else if (_reflectivityTexture) {
-          defines.defines[PMD::METALLICWORKFLOW] = false;
           MaterialHelper::PrepareDefinesForMergedUV(
             _reflectivityTexture, defines, PMD::REFLECTIVITY, "REFLECTIVITY",
             PMD::MAINUV1, PMD::MAINUV2);
@@ -781,8 +778,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
             = _useAutoMicroSurfaceFromReflectivityMap;
         }
         else {
-          defines.defines[PMD::METALLICWORKFLOW] = false;
-          defines.defines[PMD::REFLECTIVITY]     = false;
+          defines.defines[PMD::REFLECTIVITY] = false;
         }
 
         if (_microSurfaceTexture) {
@@ -812,6 +808,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
         else {
           defines.defines[PMD::PARALLAX] = false;
         }
+        defines.defines[PMD::OBJECTSPACE_NORMALMAP] = _useObjectSpaceNormalMap;
       }
       else {
         defines.defines[PMD::BUMP] = false;
@@ -857,13 +854,6 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
 
     defines.defines[PMD::RADIANCEOVERALPHA] = _useRadianceOverAlpha;
 
-    if (_forceMetallicWorkflow || (_metallic != 0.f) || (_roughness != 0.f)) {
-      defines.defines[PMD::METALLICWORKFLOW] = true;
-    }
-    else {
-      defines.defines[PMD::METALLICWORKFLOW] = false;
-    }
-
     if (!backFaceCulling() && _twoSidedLighting) {
       defines.defines[PMD::TWOSIDEDLIGHTING] = true;
     }
@@ -871,7 +861,8 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
       defines.defines[PMD::TWOSIDEDLIGHTING] = false;
     }
 
-    defines.ALPHATESTVALUE = _alphaCutOff;
+    defines.ALPHATESTVALUE
+      = "${_alphaCutOff}${_alphaCutOff % 1 === 0 ? \".\" : \"\"}";
     defines.defines[PMD::PREMULTIPLYALPHA]
       = (alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED
          || alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF);
@@ -892,11 +883,17 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
   defines.defines[PMD::HORIZONOCCLUSION] = _useHorizonOcclusion;
 
   // Misc.
-  MaterialHelper::PrepareDefinesForMisc(
-    mesh, scene, _useLogarithmicDepth, pointsCloud(), fogEnabled(),
-    _shouldTurnAlphaTestOn(mesh) || _forceAlphaTest, defines,
-    PMD::LOGARITHMICDEPTH, PMD::POINTSIZE, PMD::FOG, PMD::NONUNIFORMSCALING,
-    PMD::ALPHATEST);
+  if (defines._areMiscDirty) {
+    MaterialHelper::PrepareDefinesForMisc(
+      mesh, scene, _useLogarithmicDepth, pointsCloud(), fogEnabled(),
+      _shouldTurnAlphaTestOn(mesh) || _forceAlphaTest, defines,
+      PMD::LOGARITHMICDEPTH, PMD::POINTSIZE, PMD::FOG, PMD::NONUNIFORMSCALING,
+      PMD::ALPHATEST);
+    defines.defines[PMD::UNLIT]
+      = _unlit
+        || ((pointsCloud() || wireframe())
+            && !mesh->isVerticesDataPresent(VertexBuffer::NormalKind));
+  }
 
   // Values that need to be evaluated on every frame
   MaterialHelper::PrepareDefinesForFrameBoundValues(
@@ -986,11 +983,6 @@ void PBRBaseMaterial::unbind()
   PushMaterial::unbind();
 }
 
-void PBRBaseMaterial::bindOnlyWorldMatrix(Matrix& world)
-{
-  _activeEffect->setMatrix("world", world);
-}
-
 void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
                                      SubMesh* subMesh)
 {
@@ -1012,6 +1004,12 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
 
   // Matrices
   bindOnlyWorldMatrix(*world);
+
+  // Normal Matrix
+  if (defines.defines[PMD::OBJECTSPACE_NORMALMAP]) {
+    world->toNormalMatrix(_normalMatrix);
+    bindOnlyNormalMatrix(_normalMatrix);
+  }
 
   const auto mustRebind = _mustRebind(scene, effect, mesh->visibility());
 

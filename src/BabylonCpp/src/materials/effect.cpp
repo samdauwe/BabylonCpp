@@ -710,7 +710,7 @@ void Effect::_prepareEffect()
 
     if (!fallbacks && fallbacks->isMoreFallbacks()) {
       BABYLON_LOG_ERROR("Effect", "Trying next fallback.");
-      defines = fallbacks->reduce(defines);
+      defines = fallbacks->reduce(defines, this);
       _prepareEffect();
     }
     else { // Sorry we did everything we can
@@ -773,9 +773,11 @@ void Effect::setTextureFromPostProcess(const string_t& channel,
                                      postProcess);
 }
 
-void Effect::setTextureFromPostProcessOutput(const string_t& /*channel*/,
-                                             PostProcess* /*postProcess*/)
+void Effect::setTextureFromPostProcessOutput(const string_t& channel,
+                                             PostProcess* postProcess)
 {
+  _engine->setTextureFromPostProcessOutput(
+    stl_util::index_of(_samplers, channel), postProcess);
 }
 
 bool Effect::_cacheMatrix(const string_t& uniformName, const Matrix& matrix)

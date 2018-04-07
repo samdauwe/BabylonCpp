@@ -15,7 +15,9 @@ PBRMetallicRoughnessMaterial::PBRMetallicRoughnessMaterial(
   _useRoughnessFromMetallicTextureAlpha = false;
   _useRoughnessFromMetallicTextureGreen = true;
   _useMetallnessFromMetallicTextureBlue = true;
-  _forceMetallicWorkflow                = true;
+
+  metallic  = 1.f;
+  roughness = 1.f;
 }
 
 PBRMetallicRoughnessMaterial::~PBRMetallicRoughnessMaterial()

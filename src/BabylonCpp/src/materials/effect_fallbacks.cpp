@@ -3,7 +3,9 @@
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/scene.h>
+#include <babylon/materials/material.h>
 #include <babylon/mesh/abstract_mesh.h>
+#include <babylon/mesh/sub_mesh.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -98,7 +100,7 @@ void EffectFallbacks::addFallback(unsigned int rank, const string_t& define)
 void EffectFallbacks::addCPUSkinningFallback(unsigned int rank,
                                              AbstractMesh* mesh)
 {
-  _mesh     = mesh;
+  _mesh = mesh;
 
   if (rank < _currentRank) {
     _currentRank = rank;
@@ -113,7 +115,7 @@ bool EffectFallbacks::isMoreFallbacks() const
   return _currentRank <= _maxRank;
 }
 
-string_t EffectFallbacks::reduce(const string_t& currentDefines)
+string_t EffectFallbacks::reduce(string_t currentDefines, Effect* effect)
 {
   // First we try to switch to CPU skinning
   string_t currentDefinesCpy(currentDefines);
@@ -133,6 +135,42 @@ string_t EffectFallbacks::reduce(const string_t& currentDefines)
           && otherMesh->computeBonesUsingShaders()
           && otherMesh->numBoneInfluencers() > 0) {
         otherMesh->setComputeBonesUsingShaders(false);
+      }
+    }
+  }
+
+  // First we try to switch to CPU skinning
+  if (_mesh && _mesh->computeBonesUsingShaders()
+      && _mesh->numBoneInfluencers() > 0 && _mesh->material()) {
+    _mesh->setComputeBonesUsingShaders(false);
+    const string_t toReplace = string_t("#define NUM_BONE_INFLUENCERS ")
+                               + ::std::to_string(_mesh->numBoneInfluencers());
+    String::replaceInPlace(currentDefines, toReplace,
+                           "#define NUM_BONE_INFLUENCERS 0");
+
+    auto scene = _mesh->getScene();
+    for (auto& otherMesh : scene->meshes) {
+      if (!otherMesh->material()) {
+        continue;
+      }
+
+      if (!otherMesh->computeBonesUsingShaders()
+          || otherMesh->numBoneInfluencers() == 0) {
+        continue;
+      }
+
+      if (otherMesh->material()->getEffect() == effect) {
+        otherMesh->setComputeBonesUsingShaders(false);
+      }
+      else {
+        for (auto& subMesh : otherMesh->subMeshes) {
+          auto subMeshEffect = subMesh->effect();
+
+          if (subMeshEffect == effect) {
+            otherMesh->setComputeBonesUsingShaders(false);
+            break;
+          }
+        }
       }
     }
   }

@@ -28,7 +28,19 @@ public:
 
   Effect* getEffect();
   bool isReady(AbstractMesh* mesh, bool useInstances) override;
+
+  /**
+   * @brief Binds the given world matrix to the active effect.
+   * @param world the matrix to bind
+   */
   void bindOnlyWorldMatrix(Matrix& world) override;
+
+  /**
+   * @brief Binds the given normal matrix to the active effect.
+   * @param normalMatrix the matrix to bind
+   */
+  void bindOnlyNormalMatrix(Matrix& normalMatrix);
+
   void bind(Matrix* world, Mesh* mesh) override;
 
 protected:
@@ -39,6 +51,7 @@ protected:
 
 protected:
   Effect* _activeEffect;
+  Matrix _normalMatrix;
 
 }; // end of class PushMaterial
 

@@ -126,7 +126,7 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   unsigned int ALBEDODIRECTUV;
   unsigned int REFLECTIVITYDIRECTUV;
   unsigned int MICROSURFACEMAPDIRECTUV;
-  float ALPHATESTVALUE;
+  string_t ALPHATESTVALUE;
 
   vector_t<bool> lights;
   vector_t<bool> pointlights;

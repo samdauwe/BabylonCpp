@@ -193,10 +193,26 @@ public:
   void setTextureArray(const string_t& channel,
                        const vector_t<BaseTexture*>& textures);
 
+  /**
+   * @brief Sets a texture to be the input of the specified post process. (To
+   * use the output, pass in the next post process in the pipeline).
+   * @param channel Name of the sampler variable.
+   * @param postProcess Post process to get the input texture from.
+   */
   void setTextureFromPostProcess(const string_t& channel,
                                  PostProcess* postProcess);
+
+  /**
+   * @brief (Warning! setTextureFromPostProcessOutput may be desired instead)
+   * Sets the input texture of the passed in post process to be input of this
+   * effect. (To use the output of the passed in post process use
+   * setTextureFromPostProcessOutput)
+   * @param channel Name of the sampler variable.
+   * @param postProcess Post process to get the output texture from.
+   */
   void setTextureFromPostProcessOutput(const string_t& channel,
                                        PostProcess* postProcess);
+
   bool _cacheMatrix(const string_t& uniformName, const Matrix& matrix);
   bool _cacheFloat2(const string_t& uniformName, float x, float y);
   bool _cacheFloat3(const string_t& uniformName, float x, float y, float z);

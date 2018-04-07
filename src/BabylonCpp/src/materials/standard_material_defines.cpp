@@ -42,6 +42,7 @@ StandardMaterialDefines::StandardMaterialDefines() : MaterialDefines{}
            "LINKEMISSIVEWITHDIFFUSE",
            "REFLECTIONFRESNELFROMSPECULAR",
            "LIGHTMAP",
+           "OBJECTSPACE_NORMALMAP",
            "USELIGHTMAPASSHADOWMAP",
            "REFLECTIONMAP_3D",
            "REFLECTIONMAP_SPHERICAL",
@@ -78,8 +79,20 @@ StandardMaterialDefines::StandardMaterialDefines() : MaterialDefines{}
            "SAMPLER3DGREENDEPTH",
            "SAMPLER3DBGRMAP",
            "IMAGEPROCESSINGPOSTPROCESS",
-           "EXPOSURE"};
+           "EXPOSURE",
+           "GRAIN"};
   rebuild();
+
+  DIFFUSEDIRECTUV       = 0;
+  AMBIENTDIRECTUV       = 0;
+  OPACITYDIRECTUV       = 0;
+  EMISSIVEDIRECTUV      = 0;
+  SPECULARDIRECTUV      = 0;
+  BUMPDIRECTUV          = 0;
+  NUM_BONE_INFLUENCERS  = 0;
+  BonesPerMesh          = 0;
+  LIGHTMAPDIRECTUV      = 0;
+  NUM_MORPH_INFLUENCERS = 0;
 }
 
 StandardMaterialDefines::~StandardMaterialDefines()

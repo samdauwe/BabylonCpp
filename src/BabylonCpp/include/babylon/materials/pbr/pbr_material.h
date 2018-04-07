@@ -493,6 +493,11 @@ public:
   bool useRadianceOverAlpha;
 
   /**
+   * Allows using an object space normal map (instead of tangent space).
+   */
+  bool useObjectSpaceNormalMap;
+
+  /**
    * Allows using the bump map in parallax mode.
    */
   bool useParallax;
@@ -588,6 +593,11 @@ public:
    * occlusion.
    */
   bool useRadianceOcclusion;
+
+  /**
+   * If set to true, no lighting calculations will be applied.
+   */
+  bool unlit;
 
 }; // end of class PBRMaterial
 

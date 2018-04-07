@@ -50,6 +50,11 @@ void PushMaterial::bindOnlyWorldMatrix(Matrix& world)
   _activeEffect->setMatrix("world", world);
 }
 
+void PushMaterial::bindOnlyNormalMatrix(Matrix& normalMatrix)
+{
+  _activeEffect->setMatrix("normalMatrix", normalMatrix);
+}
+
 void PushMaterial::bind(Matrix* world, Mesh* mesh)
 {
   if (!mesh) {

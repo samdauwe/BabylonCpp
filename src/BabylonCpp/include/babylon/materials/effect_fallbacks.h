@@ -52,10 +52,11 @@ public:
 
   /**
    * @brief Removes the defines that shoould be removed when falling back.
-   * @param currentDefines The current define statements for the shader.
+   * @param currentDefines defines the current define statements for the shader.
+   * @param effect defines the current effect we try to compile
    * @returns The resulting defines with defines of the current rank removed.
    */
-  string_t reduce(const string_t& currentDefines);
+  string_t reduce(string_t currentDefines, Effect* effect);
 
 private:
   unordered_map_t<unsigned int, vector_t<string_t>> _defines;

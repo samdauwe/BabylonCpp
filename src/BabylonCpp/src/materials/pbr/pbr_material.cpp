@@ -51,6 +51,7 @@ PBRMaterial::PBRMaterial(const string_t& iName, Scene* scene)
     , useAutoMicroSurfaceFromReflectivityMap{false}
     , usePhysicalLightFalloff{true}
     , useRadianceOverAlpha{true}
+    , useObjectSpaceNormalMap{false}
     , useParallax{false}
     , useParallaxOcclusion{false}
     , parallaxScaleBias{0.05f}
@@ -67,6 +68,7 @@ PBRMaterial::PBRMaterial(const string_t& iName, Scene* scene)
     , forceNormalForward{false}
     , useHorizonOcclusion{true}
     , useRadianceOcclusion{true}
+    , unlit{false}
 {
   _environmentBRDFTexture = TextureTools::GetEnvironmentBRDFTexture(scene);
 }
