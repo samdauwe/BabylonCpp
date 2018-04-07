@@ -136,9 +136,14 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   vector_t<bool> shadows;
   vector_t<bool> shadowesms;
   vector_t<bool> shadowcloseesms;
+  vector_t<bool> shadowpcsss;
   vector_t<bool> shadowpcfs;
+  vector_t<bool> shadowpoissons;
   vector_t<bool> shadowcubes;
   vector_t<bool> projectedLightTexture;
+  vector_t<bool> shadowlowqualities;
+  vector_t<bool> shadowmediumqualities;
+  vector_t<bool> shadowhighqualities;
 
   bool TANGENT;
   bool SHADOWS;

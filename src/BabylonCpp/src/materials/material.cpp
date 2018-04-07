@@ -200,24 +200,37 @@ void Material::setOnBind(
 
 bool Material::wireframe() const
 {
-  return _fillMode == Material::WireFrameFillMode();
+  switch (_fillMode) {
+    case Material::WireFrameFillMode():
+    case Material::LineListDrawMode():
+    case Material::LineLoopDrawMode():
+    case Material::LineStripDrawMode():
+      return true;
+  }
+
+  return _scene->forceWireframe;
 }
 
 void Material::setWireframe(bool value)
 {
-  _fillMode
-    = (value ? Material::WireFrameFillMode() : Material::TriangleFillMode());
+  setFillMode(value ? Material::WireFrameFillMode() :
+                      Material::TriangleFillMode());
 }
 
 bool Material::pointsCloud() const
 {
-  return _fillMode == Material::PointFillMode();
+  switch (_fillMode) {
+    case Material::PointFillMode():
+    case Material::PointListDrawMode():
+      return true;
+  }
+
+  return _scene->forcePointsCloud();
 }
 
 void Material::setPointsCloud(bool value)
 {
-  _fillMode
-    = (value ? Material::PointFillMode() : Material::TriangleFillMode());
+  setFillMode(value ? Material::PointFillMode() : Material::TriangleFillMode());
 }
 
 unsigned int Material::fillMode() const
@@ -592,6 +605,7 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)
 {
   // Animations
   getScene()->stopAnimation(this);
+  getScene()->freeProcessedMaterials();
 
   // Remove from scene
   _scene->materials.erase(
@@ -695,7 +709,9 @@ Material::ParseMultiMaterial(const Json::value& parsedMultiMaterial,
 Material* Material::Parse(const Json::value& parsedMaterial, Scene* scene,
                           const string_t& rootUrl)
 {
-  if (!parsedMaterial.contains("customType")) {
+  if (!parsedMaterial.contains("customType")
+      || Json::GetString(parsedMaterial, "customType")
+           == "BABYLON.StandardMaterial") {
     return StandardMaterial::Parse(parsedMaterial, scene, rootUrl);
   }
 

@@ -2624,6 +2624,11 @@ string_t Scene::uid()
   return _uid;
 }
 
+void Scene::freeProcessedMaterials()
+{
+  _processedMaterials.clear();
+}
+
 void Scene::_evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh)
 {
   if (dispatchAllSubMeshesOfActiveMeshes || mesh->alwaysSelectAsActiveMesh

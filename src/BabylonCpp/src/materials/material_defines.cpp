@@ -63,9 +63,14 @@ void MaterialDefines::resizeLights(unsigned int lightIndex)
       shadows.emplace_back(false);
       shadowesms.emplace_back(false);
       shadowcloseesms.emplace_back(false);
+      shadowpcsss.emplace_back(false);
       shadowpcfs.emplace_back(false);
+      shadowpoissons.emplace_back(false);
       shadowcubes.emplace_back(false);
       projectedLightTexture.emplace_back(false);
+      shadowlowqualities.emplace_back(false);
+      shadowmediumqualities.emplace_back(false);
+      shadowhighqualities.emplace_back(false);
       lightmapexcluded.emplace_back(false);
       lightmapnospecular.emplace_back(false);
     }
@@ -145,9 +150,21 @@ std::ostream& operator<<(std::ostream& os,
     }
   }
 
+  for (size_t i = 0; i < materialDefines.shadowpcsss.size(); ++i) {
+    if (materialDefines.shadowpcsss[i]) {
+      os << "#define SHADOWPCSS" << i << "\n";
+    }
+  }
+
   for (size_t i = 0; i < materialDefines.shadowpcfs.size(); ++i) {
     if (materialDefines.shadowpcfs[i]) {
       os << "#define SHADOWPCF" << i << "\n";
+    }
+  }
+
+  for (size_t i = 0; i < materialDefines.shadowpoissons.size(); ++i) {
+    if (materialDefines.shadowpoissons[i]) {
+      os << "#define SHADOWPOISSON" << i << "\n";
     }
   }
 
@@ -160,6 +177,36 @@ std::ostream& operator<<(std::ostream& os,
   for (size_t i = 0; i < materialDefines.projectedLightTexture.size(); ++i) {
     if (materialDefines.projectedLightTexture[i]) {
       os << "#define PROJECTEDLIGHTTEXTURE" << i << "\n";
+    }
+  }
+
+  for (size_t i = 0; i < materialDefines.shadowlowqualities.size(); ++i) {
+    if (materialDefines.shadowlowqualities[i]) {
+      os << "#define SHADOWLOWQUALITY" << i << "\n";
+    }
+  }
+
+  for (size_t i = 0; i < materialDefines.shadowmediumqualities.size(); ++i) {
+    if (materialDefines.shadowmediumqualities[i]) {
+      os << "#define SHADOWMEDIUMQUALITY" << i << "\n";
+    }
+  }
+
+  for (size_t i = 0; i < materialDefines.shadowhighqualities.size(); ++i) {
+    if (materialDefines.shadowhighqualities[i]) {
+      os << "#define SHADOWHIGHQUALITY" << i << "\n";
+    }
+  }
+
+  for (size_t i = 0; i < materialDefines.lightmapexcluded.size(); ++i) {
+    if (materialDefines.lightmapexcluded[i]) {
+      os << "#define LIGHTMAPEXCLUDED" << i << "\n";
+    }
+  }
+
+  for (size_t i = 0; i < materialDefines.lightmapnospecular.size(); ++i) {
+    if (materialDefines.lightmapnospecular[i]) {
+      os << "#define LIGHTMAPNOSPECULAR" << i << "\n";
     }
   }
 
@@ -269,9 +316,14 @@ bool MaterialDefines::isEqual(const MaterialDefines& other) const
       || (shadows.size() != other.shadows.size())
       || (shadowesms.size() != other.shadowesms.size())
       || (shadowcloseesms.size() != other.shadowcloseesms.size())
+      || (shadowpcsss.size() != other.shadowpcsss.size())
       || (shadowpcfs.size() != other.shadowpcfs.size())
+      || (shadowpoissons.size() != other.shadowpoissons.size())
       || (shadowcubes.size() != other.shadowcubes.size())
       || (projectedLightTexture.size() != other.projectedLightTexture.size())
+      || (shadowlowqualities.size() != other.shadowlowqualities.size())
+      || (shadowmediumqualities.size() != other.shadowmediumqualities.size())
+      || (shadowhighqualities.size() != other.shadowhighqualities.size())
       || (lightmapexcluded.size() != other.lightmapexcluded.size())
       || (lightmapnospecular.size() != other.lightmapnospecular.size())) {
     return false;
@@ -361,8 +413,20 @@ bool MaterialDefines::isEqual(const MaterialDefines& other) const
     }
   }
 
+  for (size_t i = 0; i < shadowpcsss.size(); ++i) {
+    if (shadowpcsss[i] != other.shadowpcsss[i]) {
+      return false;
+    }
+  }
+
   for (size_t i = 0; i < shadowpcfs.size(); ++i) {
     if (shadowpcfs[i] != other.shadowpcfs[i]) {
+      return false;
+    }
+  }
+
+  for (size_t i = 0; i < shadowpoissons.size(); ++i) {
+    if (shadowpoissons[i] != other.shadowpoissons[i]) {
       return false;
     }
   }
@@ -375,6 +439,24 @@ bool MaterialDefines::isEqual(const MaterialDefines& other) const
 
   for (size_t i = 0; i < projectedLightTexture.size(); ++i) {
     if (projectedLightTexture[i] != other.projectedLightTexture[i]) {
+      return false;
+    }
+  }
+
+  for (size_t i = 0; i < shadowlowqualities.size(); ++i) {
+    if (shadowlowqualities[i] != other.shadowlowqualities[i]) {
+      return false;
+    }
+  }
+
+  for (size_t i = 0; i < shadowmediumqualities.size(); ++i) {
+    if (shadowmediumqualities[i] != other.shadowmediumqualities[i]) {
+      return false;
+    }
+  }
+
+  for (size_t i = 0; i < shadowhighqualities.size(); ++i) {
+    if (shadowhighqualities[i] != other.shadowhighqualities[i]) {
       return false;
     }
   }
@@ -433,9 +515,14 @@ void MaterialDefines::cloneTo(MaterialDefines& other)
   other.shadows               = shadows;
   other.shadowesms            = shadowesms;
   other.shadowcloseesms       = shadowcloseesms;
+  other.shadowpcsss           = shadowpcsss;
   other.shadowpcfs            = shadowpcfs;
+  other.shadowpoissons        = shadowpoissons;
   other.shadowcubes           = shadowcubes;
   other.projectedLightTexture = projectedLightTexture;
+  other.shadowlowqualities    = shadowlowqualities;
+  other.shadowmediumqualities = shadowmediumqualities;
+  other.shadowhighqualities   = shadowhighqualities;
   other.lightmapexcluded      = lightmapexcluded;
   other.lightmapnospecular    = lightmapnospecular;
 }
@@ -480,9 +567,14 @@ void MaterialDefines::reset()
   shadows.clear();
   shadowesms.clear();
   shadowcloseesms.clear();
+  shadowpcsss.clear();
   shadowpcfs.clear();
+  shadowpoissons.clear();
   shadowcubes.clear();
   projectedLightTexture.clear();
+  shadowlowqualities.clear();
+  shadowmediumqualities.clear();
+  shadowhighqualities.clear();
   lightmapexcluded.clear();
   lightmapnospecular.clear();
 }

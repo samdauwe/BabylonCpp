@@ -177,6 +177,15 @@ public:
   void setTexture(const string_t& channel, BaseTexture* texture);
 
   /**
+   * @brief Sets a depth stencil texture from a render target on the engine to
+   * be used in the shader.
+   * @param channel Name of the sampler variable.
+   * @param texture Texture to set.
+   */
+  void setDepthStencilTexture(const string_t& channel,
+                              RenderTargetTexture* texture);
+
+  /**
    * @brief Sets an array of textures on the engine to be used in the shader.
    * @param channel Name of the variable.
    * @param textures Textures to set.

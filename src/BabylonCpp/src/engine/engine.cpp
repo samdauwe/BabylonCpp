@@ -4117,6 +4117,26 @@ void Engine::setTexture(int channel, GL::IGLUniformLocation* uniform,
   _setTexture(channel, texture);
 }
 
+void Engine::setDepthStencilTexture(int channel,
+                                    GL::IGLUniformLocation* uniform,
+                                    RenderTargetTexture* texture)
+{
+  if (channel < 0) {
+    return;
+  }
+
+  if (uniform) {
+    _boundUniforms[channel] = uniform;
+  }
+
+  if (!texture || !texture->depthStencilTexture) {
+    _setTexture(channel, nullptr);
+  }
+  else {
+    _setTexture(channel, texture, false, true);
+  }
+}
+
 void Engine::_bindSamplerUniformToChannel(int sourceSlot, int destination)
 {
   auto& uniform = _boundUniforms[sourceSlot];
@@ -4128,7 +4148,8 @@ void Engine::_bindSamplerUniformToChannel(int sourceSlot, int destination)
 }
 
 bool Engine::_setTexture(int channel, BaseTexture* texture,
-                         bool isPartOfTextureArray)
+                         bool isPartOfTextureArray,
+                         bool /*depthStencilTexture*/)
 {
   // Not ready?
   if (!texture) {

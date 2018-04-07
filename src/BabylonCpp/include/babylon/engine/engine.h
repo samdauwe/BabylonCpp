@@ -554,6 +554,18 @@ public:
   void unbindAllTextures();
   void setTexture(int channel, GL::IGLUniformLocation* uniform,
                   BaseTexture* texture);
+
+  /**
+   * @brief Sets a depth stencil texture from a render target to the according
+   * uniform.
+   * @param channel The texture channel
+   * @param uniform The uniform to set
+   * @param texture The render target texture containing the depth stencil
+   * texture to apply
+   */
+  void setDepthStencilTexture(int channel, GL::IGLUniformLocation* uniform,
+                              RenderTargetTexture* texture);
+
   void setTextureArray(int channel, GL::IGLUniformLocation* uniform,
                        const vector_t<BaseTexture*>& textures);
   void _setAnisotropicLevel(unsigned int key, BaseTexture* texture);
@@ -661,7 +673,8 @@ private:
   void _getVRDisplays();
   void _bindSamplerUniformToChannel(int sourceSlot, int destination);
   bool _setTexture(int channel, BaseTexture* texture,
-                   bool isPartOfTextureArray = false);
+                   bool isPartOfTextureArray = false,
+                   bool depthStencilTexture  = false);
   void bindUnboundFramebuffer(GL::IGLFramebuffer* framebuffer);
   void bindIndexBuffer(GL::IGLBuffer* buffer);
   void bindBuffer(GL::IGLBuffer* buffer, int target);

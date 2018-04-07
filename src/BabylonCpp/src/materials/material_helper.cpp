@@ -108,7 +108,7 @@ void MaterialHelper::PrepareDefinesForMisc(
 {
   if (defines._areMiscDirty) {
     defines.defines[LOGARITHMICDEPTH] = useLogarithmicDepth;
-    defines.defines[POINTSIZE] = (pointsCloud || scene->forcePointsCloud());
+    defines.defines[POINTSIZE]        = pointsCloud;
     defines.defines[FOG]
       = (scene->fogEnabled() && mesh->applyFog()
          && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled);
@@ -281,10 +281,14 @@ bool MaterialHelper::PrepareDefinesForLights(
       }
 
       // Shadows
-      defines.shadows[lightIndex]     = false;
-      defines.shadowpcfs[lightIndex]  = false;
-      defines.shadowesms[lightIndex]  = false;
-      defines.shadowcubes[lightIndex] = false;
+      defines.shadows[lightIndex]               = false;
+      defines.shadowpcfs[lightIndex]            = false;
+      defines.shadowpcsss[lightIndex]           = false;
+      defines.shadowpoissons[lightIndex]        = false;
+      defines.shadowesms[lightIndex]            = false;
+      defines.shadowcubes[lightIndex]           = false;
+      defines.shadowlowqualities[lightIndex]    = false;
+      defines.shadowmediumqualities[lightIndex] = false;
 
       if (mesh && mesh->receiveShadows() && scene->shadowsEnabled()
           && light->shadowEnabled) {
@@ -367,6 +371,8 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
                      });
 
     samplersList.emplace_back("shadowSampler" + lightIndexStr);
+    samplersList.emplace_back("depthSampler" + lightIndexStr);
+
     if (lightIndex < defines.projectedLightTexture.size()
         || !defines.projectedLightTexture[lightIndex]) {
       samplersList.emplace_back("projectionLightSampler" + lightIndexStr);
@@ -410,7 +416,10 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
                      });
 
     uniformBuffersList.emplace_back("Light" + lightIndexStr);
+
     samplersList.emplace_back("shadowSampler" + lightIndexStr);
+    samplersList.emplace_back("depthSampler" + lightIndexStr);
+
     if (lightIndex < defines->projectedLightTexture.size()
         || !defines->projectedLightTexture[lightIndex]) {
       samplersList.emplace_back("projectionLightSampler" + lightIndexStr);
@@ -443,19 +452,27 @@ unsigned int MaterialHelper::HandleFallbacksForShadows(
 
     if (!defines.SHADOWS) {
       if (defines.shadows[lightIndex]) {
-        fallbacks.addFallback(0, "SHADOW" + lightIndexStr);
+        fallbacks.addFallback(rank, "SHADOW" + lightIndexStr);
       }
 
       if (defines.shadowpcfs[lightIndex]) {
-        fallbacks.addFallback(0, "SHADOWPCF" + lightIndexStr);
+        fallbacks.addFallback(rank, "SHADOWPCF" + lightIndexStr);
+      }
+
+      if (defines.shadowpcsss[lightIndex]) {
+        fallbacks.addFallback(rank, "SHADOWPCSS" + lightIndexStr);
+      }
+
+      if (defines.shadowpoissons[lightIndex]) {
+        fallbacks.addFallback(rank, "SHADOWPOISSON" + lightIndexStr);
       }
 
       if (defines.shadowesms[lightIndex]) {
-        fallbacks.addFallback(0, "SHADOWESM" + lightIndexStr);
+        fallbacks.addFallback(rank, "SHADOWESM" + lightIndexStr);
       }
     }
   }
-  return ++lightFallbackRank;
+  return lightFallbackRank++;
 }
 
 void MaterialHelper::PrepareAttributesForMorphTargets(

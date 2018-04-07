@@ -649,6 +649,12 @@ public:
    */
   string_t uid();
 
+  /**
+   * @brief Clear the processed materials smart array preventing retention point
+   * in material dispose.
+   */
+  void freeProcessedMaterials();
+
   bool _isInIntermediateRendering() const;
 
   void setActiveMeshCandidateProvider(IActiveMeshCandidateProvider* provider);

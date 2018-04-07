@@ -744,6 +744,13 @@ void Effect::setTexture(const string_t& channel, BaseTexture* texture)
                       getUniform(channel), texture);
 }
 
+void Effect::setDepthStencilTexture(const string_t& channel,
+                                    RenderTargetTexture* texture)
+{
+  _engine->setDepthStencilTexture(stl_util::index_of(_samplers, channel),
+                                  getUniform(channel), texture);
+}
+
 void Effect::setTextureArray(const string_t& channel,
                              const vector_t<BaseTexture*>& textures)
 {
