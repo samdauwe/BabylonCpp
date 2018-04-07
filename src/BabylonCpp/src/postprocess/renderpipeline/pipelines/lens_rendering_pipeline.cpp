@@ -203,8 +203,9 @@ void LensRenderingPipeline::_createChromaticAberrationPostProcess(float ratio)
 {
   _chromaticAberrationPostProcess = new PostProcess(
     "LensChromaticAberration", "chromaticAberration",
-    {"chromatic_aberration", "screen_width", "screen_height"}, // uniforms
-    {},                                                        // samplers
+    {"chromatic_aberration", "screen_width", "screen_height", "direction",
+     "radialIntensity", "centerPosition"}, // uniforms
+    {},                                    // samplers
     ToVariant<float, PostProcessOptions>(ratio), nullptr,
     TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
 
@@ -215,6 +216,9 @@ void LensRenderingPipeline::_createChromaticAberrationPostProcess(float ratio)
     effect->setFloat(
       "screen_height",
       static_cast<float>(_scene->getEngine()->getRenderHeight()));
+    effect->setFloat("radialIntensity", 1.f);
+    effect->setFloat2("direction", 17.f, 17.f);
+    effect->setFloat2("centerPosition", 0.5f, 0.5f);
   });
 }
 
