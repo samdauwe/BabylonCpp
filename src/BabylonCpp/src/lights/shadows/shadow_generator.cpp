@@ -16,6 +16,7 @@
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/material_defines.h>
+#include <babylon/materials/material_helper.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/uniform_buffer.h>
@@ -24,6 +25,7 @@
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
+#include <babylon/morph/morph_target_manager.h>
 #include <babylon/postprocess/blur_post_process.h>
 #include <babylon/postprocess/pass_post_process.h>
 #include <babylon/postprocess/post_process.h>
@@ -43,11 +45,14 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light,
     : frustumEdgeFalloff{0.f}
     , forceBackFacesOnly{false}
     , _bias{0.00005f}
+    , _normalBias{0.f}
     , _blurBoxOffset{1}
     , _blurScale{2.f}
     , _blurKernel{1.f}
     , _useKernelBlur{false}
     , _filter{ShadowGenerator::FILTER_NONE()}
+    , _filteringQuality{ShadowGenerator::QUALITY_HIGH()}
+    , _contactHardeningLightSizeUVRatio{0.1f}
     , _darkness{0.f}
     , _transparencyShadow{false}
     , _shadowMap{nullptr}
@@ -60,6 +65,12 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light,
     , _projectionMatrix{Matrix::Zero()}
     , _transformMatrix{Matrix::Zero()}
     , _cacheInitialized{false}
+    , _cachedPosition{Vector3{numeric_limits_t<float>::max(),
+                              numeric_limits_t<float>::max(),
+                              numeric_limits_t<float>::max()}}
+    , _cachedDirection{Vector3{numeric_limits_t<float>::max(),
+                               numeric_limits_t<float>::max(),
+                               numeric_limits_t<float>::max()}}
     , _boxBlurPostprocess{nullptr}
     , _kernelBlurXPostprocess{nullptr}
     , _kernelBlurYPostprocess{nullptr}
@@ -100,6 +111,7 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light,
   }
 
   _initializeGenerator();
+  _applyFilterValues();
 }
 
 ShadowGenerator::~ShadowGenerator()
@@ -114,6 +126,16 @@ float ShadowGenerator::bias() const
 void ShadowGenerator::setBias(float iBias)
 {
   _bias = iBias;
+}
+
+float ShadowGenerator::normalBias() const
+{
+  return _normalBias;
+}
+
+void ShadowGenerator::setNormalBias(float normalBias)
+{
+  _normalBias = normalBias;
 }
 
 int ShadowGenerator::blurBoxOffset() const
@@ -202,6 +224,21 @@ void ShadowGenerator::setFilter(unsigned int value)
     }
     else if (value == ShadowGenerator::FILTER_BLURCLOSEEXPONENTIALSHADOWMAP()) {
       setUseCloseExponentialShadowMap(true);
+      return;
+    }
+    // PCF on cubemap would also be expensive
+    else if (value == ShadowGenerator::FILTER_PCF()
+             || value == ShadowGenerator::FILTER_PCSS()) {
+      setUsePoissonSampling(true);
+      return;
+    }
+  }
+
+  // Weblg 1 fallback for PCF.
+  if (value == ShadowGenerator::FILTER_PCF()
+      || value == ShadowGenerator::FILTER_PCSS()) {
+    if (_scene->getEngine()->webGLVersion() == 1.f) {
+      setUsePoissonSampling(true);
       return;
     }
   }
@@ -326,6 +363,55 @@ void ShadowGenerator::setUseBlurCloseExponentialShadowMap(bool value)
                     ShadowGenerator::FILTER_NONE());
 }
 
+bool ShadowGenerator::usePercentageCloserFiltering() const
+{
+  return filter() == ShadowGenerator::FILTER_PCF();
+}
+
+void ShadowGenerator::setUsePercentageCloserFiltering(bool value)
+{
+  if (!value && filter() != ShadowGenerator::FILTER_PCF()) {
+    return;
+  }
+  setFilter(value ? ShadowGenerator::FILTER_PCF() :
+                    ShadowGenerator::FILTER_NONE());
+}
+
+unsigned int ShadowGenerator::filteringQuality() const
+{
+  return _filteringQuality;
+}
+
+void ShadowGenerator::setFilteringQuality(unsigned int filteringQuality)
+{
+  _filteringQuality = filteringQuality;
+}
+
+bool ShadowGenerator::useContactHardeningShadow() const
+{
+  return filter() == ShadowGenerator::FILTER_PCSS();
+}
+
+void ShadowGenerator::setUseContactHardeningShadow(bool value)
+{
+  if (!value && filter() != ShadowGenerator::FILTER_PCSS()) {
+    return;
+  }
+  setFilter(value ? ShadowGenerator::FILTER_PCSS() :
+                    ShadowGenerator::FILTER_NONE());
+}
+
+float ShadowGenerator::contactHardeningLightSizeUVRatio() const
+{
+  return _contactHardeningLightSizeUVRatio;
+}
+
+void ShadowGenerator::setContactHardeningLightSizeUVRatio(
+  float contactHardeningLightSizeUVRatio)
+{
+  _contactHardeningLightSizeUVRatio = contactHardeningLightSizeUVRatio;
+}
+
 float ShadowGenerator::getDarkness() const
 {
   return _darkness;
@@ -418,9 +504,19 @@ void ShadowGenerator::_initializeGenerator()
 void ShadowGenerator::_initializeShadowMap()
 {
   // Render target
-  _shadowMap = ::std::make_unique<RenderTargetTexture>(
-    _light->name + "_shadowMap", _mapSize, _scene, false, true, _textureType,
-    _light->needCube());
+  auto engine = _scene->getEngine();
+  if (engine->webGLVersion() > 1.f) {
+    _shadowMap = ::std::make_unique<RenderTargetTexture>(
+      _light->name + "_shadowMap", _mapSize, _scene, false, true, _textureType,
+      _light->needCube(), TextureConstants::TRILINEAR_SAMPLINGMODE, false,
+      false);
+    _shadowMap->createDepthStencilTexture(EngineConstants::LESS, true);
+  }
+  else {
+    _shadowMap = ::std::make_unique<RenderTargetTexture>(
+      _light->name + "_shadowMap", _mapSize, _scene, false, true, _textureType,
+      _light->needCube());
+  }
   _shadowMap->wrapU                     = TextureConstants::CLAMP_ADDRESSMODE;
   _shadowMap->wrapV                     = TextureConstants::CLAMP_ADDRESSMODE;
   _shadowMap->anisotropicFilteringLevel = 1;
@@ -431,6 +527,9 @@ void ShadowGenerator::_initializeShadowMap()
   // Record Face Index before render.
   _shadowMap->onBeforeRenderObservable.add([this](int* faceIndex, EventState&) {
     _currentFaceIndex = static_cast<unsigned int>(*faceIndex);
+    if (_filter == ShadowGenerator::FILTER_PCF()) {
+      _scene->getEngine()->setColorWrite(false);
+    }
   });
 
   // Custom render function.
@@ -447,6 +546,9 @@ void ShadowGenerator::_initializeShadowMap()
   // Blur if required afer render.
   _shadowMap->onAfterUnbindObservable.add([this](RenderTargetTexture*,
                                                  EventState&) {
+    if (_filter == ShadowGenerator::FILTER_PCF()) {
+      _scene->getEngine()->setColorWrite(true);
+    }
     if (!useBlurExponentialShadowMap() && !useBlurCloseExponentialShadowMap()) {
       return;
     }
@@ -461,11 +563,16 @@ void ShadowGenerator::_initializeShadowMap()
 
   // Clear according to the chosen filter.
   _shadowMap->onClearObservable.add([this](Engine* engine, EventState&) {
-    if (useExponentialShadowMap() || useBlurExponentialShadowMap()) {
-      engine->clear(Color4(0.f, 0.f, 0.f, 0.f), true, true, true);
+    Color4 clearZero{0.f, 0.f, 0.f, 0.f};
+    Color4 clearOne{1.f, 1.f, 1.f, 1.f};
+    if (_filter == ShadowGenerator::FILTER_PCF()) {
+      engine->clear(clearOne, false, true, false);
+    }
+    else if (useExponentialShadowMap() || useBlurExponentialShadowMap()) {
+      engine->clear(clearZero, true, true, false);
     }
     else {
-      engine->clear(Color4(1.f, 1.f, 1.f, 1.f), true, true, true);
+      engine->clear(clearOne, true, true, false);
     }
   });
 }
@@ -593,10 +700,15 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
     engine->enableEffect(_effect);
     mesh->_bind(subMesh, _effect, Material::TriangleFillMode());
 
-    _effect->setFloat2("biasAndScale", bias(), depthScale());
+    _effect->setFloat3("biasAndScale", bias(), normalBias(), depthScale());
 
     _effect->setMatrix("viewProjection", getTransformMatrix());
-    _effect->setVector3("lightPosition", getLight()->position);
+    if (getLight()->getTypeID() == Light::LIGHTTYPEID_DIRECTIONALLIGHT()) {
+      _effect->setVector3("lightData", _cachedDirection);
+    }
+    else {
+      _effect->setVector3("lightData", _cachedPosition);
+    }
 
     if (scene->activeCamera) {
       _effect->setFloat2("depthValues",
@@ -622,6 +734,9 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
       _effect->setMatrices("mBones",
                            mesh->skeleton()->getTransformMatrices(mesh));
     }
+
+    // Morph targets
+    MaterialHelper::BindMorphTargetParameters(mesh, _effect);
 
     if (forceBackFacesOnly) {
       engine->setState(true, 0, false, true);
@@ -653,7 +768,8 @@ void ShadowGenerator::_applyFilterValues()
     return;
   }
 
-  if (filter() == ShadowGenerator::FILTER_NONE()) {
+  if (filter() == ShadowGenerator::FILTER_NONE()
+      || filter() == ShadowGenerator::FILTER_PCSS()) {
     _shadowMap->updateSamplingMode(TextureConstants::NEAREST_SAMPLINGMODE);
   }
   else {
@@ -724,11 +840,27 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
   if (useExponentialShadowMap() || useBlurExponentialShadowMap()) {
     defines.emplace_back("#define ESM");
   }
+  else if (usePercentageCloserFiltering() || useContactHardeningShadow()) {
+    defines.emplace_back("#define DEPTHTEXTURE");
+  }
 
   vector_t<string_t> attribs{VertexBuffer::PositionKindChars};
 
   auto mesh     = subMesh->getMesh();
   auto material = subMesh->getMaterial();
+
+  // Normal bias.
+  if (normalBias() > 0.f
+      && mesh->isVerticesDataPresent(VertexBuffer::NormalKind)) {
+    attribs.emplace_back(VertexBuffer::NormalKindChars);
+    defines.emplace_back("#define NORMAL");
+    if (mesh->nonUniformScaling()) {
+      defines.emplace_back("#define NONUNIFORMSCALING");
+    }
+    if (getLight()->getTypeID() == Light::LIGHTTYPEID_DIRECTIONALLIGHT()) {
+      defines.emplace_back("#define DIRECTIONINLIGHTDATA");
+    }
+  }
 
   // Alpha test
   if (material && material->needAlphaTesting()) {
@@ -766,6 +898,22 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
   }
 
+  // Morph targets
+  auto manager = (static_cast<Mesh*>(mesh))->morphTargetManager();
+  unsigned int morphInfluencers = 0;
+  if (manager) {
+    if (manager->numInfluencers() > 0) {
+      defines.emplace_back("#define MORPHTARGETS");
+      morphInfluencers = static_cast<unsigned int>(manager->numInfluencers());
+      defines.emplace_back("#define NUM_MORPH_INFLUENCERS "
+                           + ::std::to_string(morphInfluencers));
+      MaterialDefines defines;
+      defines.NUM_MORPH_INFLUENCERS = morphInfluencers;
+      MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh, defines,
+                                                       0);
+    }
+  }
+
   // Instances
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
@@ -783,10 +931,12 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
     EffectCreationOptions options;
     options.attributes = ::std::move(attribs);
     options.uniformsNames
-      = {"world",         "mBones",      "viewProjection", "diffuseMatrix",
-         "lightPosition", "depthValues", "biasAndScale"};
+      = {"world",     "mBones",      "viewProjection", "diffuseMatrix",
+         "lightData", "depthValues", "biasAndScale",   "morphTargetInfluences"};
     options.samplers = {"diffuseSampler"};
     options.defines  = ::std::move(join);
+    options.indexParameters
+      = {{"maxSimultaneousMorphTargets", morphInfluencers}};
 
     _effect = _scene->getEngine()->createEffect("shadowMap", options,
                                                 _scene->getEngine());
@@ -827,8 +977,28 @@ void ShadowGenerator::prepareDefines(MaterialDefines& defines,
 
   defines.shadows[lightIndex] = true;
 
-  if (usePoissonSampling()) {
+  if (useContactHardeningShadow()) {
+    defines.shadowpcsss[lightIndex] = true;
+    if (_filteringQuality == ShadowGenerator::QUALITY_LOW()) {
+      defines.shadowlowqualities[lightIndex] = true;
+    }
+    else if (_filteringQuality == ShadowGenerator::QUALITY_MEDIUM()) {
+      defines.shadowmediumqualities[lightIndex] = true;
+    }
+    // else default to high.
+  }
+  if (usePercentageCloserFiltering()) {
     defines.shadowpcfs[lightIndex] = true;
+    if (_filteringQuality == ShadowGenerator::QUALITY_LOW()) {
+      defines.shadowlowqualities[lightIndex] = true;
+    }
+    else if (_filteringQuality == ShadowGenerator::QUALITY_MEDIUM()) {
+      defines.shadowmediumqualities[lightIndex] = true;
+    }
+    // else default to high.
+  }
+  else if (usePoissonSampling()) {
+    defines.shadowpoissons[lightIndex] = true;
   }
   else if (useExponentialShadowMap() || useBlurExponentialShadowMap()) {
     defines.shadowesms[lightIndex] = true;
@@ -866,10 +1036,32 @@ void ShadowGenerator::bindShadowLight(const string_t& lightIndex,
   if (!light->needCube()) {
     effect->setMatrix("lightMatrix" + lightIndex, getTransformMatrix());
   }
-  effect->setTexture("shadowSampler" + lightIndex, getShadowMapForRendering());
-  light->_uniformBuffer->updateFloat4(
-    "shadowsInfo", getDarkness(), blurScale() / shadowMap->getSize().width,
-    depthScale(), frustumEdgeFalloff, lightIndex);
+
+  // Only PCF uses depth stencil texture.
+  if (_filter == ShadowGenerator::FILTER_PCF()) {
+    effect->setDepthStencilTexture("shadowSampler" + lightIndex,
+                                   getShadowMapForRendering());
+    light->_uniformBuffer->updateFloat4(
+      "shadowsInfo", getDarkness(), shadowMap->getSize().width,
+      1 / shadowMap->getSize().width, frustumEdgeFalloff, lightIndex);
+  }
+  else if (_filter == ShadowGenerator::FILTER_PCSS()) {
+    effect->setDepthStencilTexture("shadowSampler" + lightIndex,
+                                   getShadowMapForRendering());
+    effect->setTexture("depthSampler" + lightIndex, getShadowMapForRendering());
+    light->_uniformBuffer->updateFloat4(
+      "shadowsInfo", getDarkness(), 1 / shadowMap->getSize().width,
+      _contactHardeningLightSizeUVRatio * shadowMap->getSize().width,
+      frustumEdgeFalloff, lightIndex);
+  }
+  else {
+    effect->setTexture("shadowSampler" + lightIndex,
+                       getShadowMapForRendering());
+    light->_uniformBuffer->updateFloat4(
+      "shadowsInfo", getDarkness(), blurScale() / shadowMap->getSize().width,
+      depthScale(), frustumEdgeFalloff, lightIndex);
+  }
+
   light->_uniformBuffer->updateFloat2(
     "depthValues", getLight()->getDepthMinZ(camera),
     getLight()->getDepthMinZ(camera) + getLight()->getDepthMaxZ(camera),
@@ -905,8 +1097,8 @@ Matrix ShadowGenerator::getTransformMatrix()
       || !lightPosition.equals(_cachedPosition)
       || !_lightDirection.equals(_cachedDirection)) {
 
-    _cachedPosition   = lightPosition;
-    _cachedDirection  = _lightDirection;
+    _cachedPosition.copyFrom(lightPosition);
+    _cachedDirection.copyFrom(_lightDirection);
     _cacheInitialized = true;
 
     Matrix::LookAtLHToRef(lightPosition, lightPosition.add(_lightDirection),
@@ -1050,6 +1242,24 @@ ShadowGenerator::Parse(const Json::value& parsedShadowGenerator, Scene* scene)
                          "useBlurCloseExponentialShadowMap")) {
     shadowGenerator->setUseBlurCloseExponentialShadowMap(true);
   }
+  else if (Json::GetBool(parsedShadowGenerator,
+                         "usePercentageCloserFiltering")) {
+    shadowGenerator->setUsePercentageCloserFiltering(true);
+  }
+  else if (Json::GetBool(parsedShadowGenerator, "useContactHardeningShadow")) {
+    shadowGenerator->setUseContactHardeningShadow(true);
+  }
+
+  if (parsedShadowGenerator.contains("filteringQuality")) {
+    shadowGenerator->setFilteringQuality(
+      Json::GetNumber(parsedShadowGenerator, "filteringQuality",
+                      ShadowGenerator::QUALITY_HIGH()));
+  }
+
+  if (parsedShadowGenerator.contains("contactHardeningLightSizeUVRatio")) {
+    shadowGenerator->setContactHardeningLightSizeUVRatio(Json::GetNumber(
+      parsedShadowGenerator, "contactHardeningLightSizeUVRatio", 0.1f));
+  }
 
   // Backward compat
   else if (Json::GetBool(parsedShadowGenerator, "useVarianceShadowMap")) {
@@ -1087,6 +1297,11 @@ ShadowGenerator::Parse(const Json::value& parsedShadowGenerator, Scene* scene)
   if (parsedShadowGenerator.contains("bias")) {
     shadowGenerator->setBias(
       Json::GetNumber(parsedShadowGenerator, "bias", 0.00005f));
+  }
+
+  if (parsedShadowGenerator.contains("normalBias")) {
+    shadowGenerator->setNormalBias(
+      Json::GetNumber(parsedShadowGenerator, "normalBias", 0.f));
   }
 
   if (parsedShadowGenerator.contains("darkness")) {

@@ -25,6 +25,12 @@ private:
   static constexpr unsigned int _FILTER_BLUREXPONENTIALSHADOWMAP      = 3;
   static constexpr unsigned int _FILTER_CLOSEEXPONENTIALSHADOWMAP     = 4;
   static constexpr unsigned int _FILTER_BLURCLOSEEXPONENTIALSHADOWMAP = 5;
+  static constexpr unsigned int _FILTER_PCF                           = 6;
+  static constexpr unsigned int _FILTER_PCSS                          = 7;
+
+  static constexpr unsigned int _QUALITY_HIGH   = 0;
+  static constexpr unsigned int _QUALITY_MEDIUM = 1;
+  static constexpr unsigned int _QUALITY_LOW    = 2;
 
 public:
   /**
@@ -36,6 +42,15 @@ public:
   }
 
   /**
+   * @brief Shadow generator mode ESM: Exponential Shadow Mapping.
+   * (http://developer.download.nvidia.com/presentations/2008/GDC/GDC08_SoftShadowMapping.pdf)
+   */
+  static constexpr unsigned int FILTER_EXPONENTIALSHADOWMAP()
+  {
+    return ShadowGenerator::_FILTER_EXPONENTIALSHADOWMAP;
+  }
+
+  /**
    * @brief Shadow generator mode Poisson Sampling: Percentage Closer Filtering.
    * (Multiple Tap around evenly distributed around the pixel are used to
    * evaluate the shadow strength)
@@ -43,15 +58,6 @@ public:
   static constexpr unsigned int FILTER_POISSONSAMPLING()
   {
     return ShadowGenerator::_FILTER_POISSONSAMPLING;
-  }
-
-  /**
-   * @brief Shadow generator mode ESM: Exponential Shadow Mapping.
-   * (http://developer.download.nvidia.com/presentations/2008/GDC/GDC08_SoftShadowMapping.pdf)
-   */
-  static constexpr unsigned int FILTER_EXPONENTIALSHADOWMAP()
-  {
-    return ShadowGenerator::_FILTER_EXPONENTIALSHADOWMAP;
   }
 
   /**
@@ -84,6 +90,65 @@ public:
   }
 
   /**
+   * @brief Shadow generator mode PCF: Percentage Closer Filtering.
+   * benefits from Webgl 2 shadow samplers. Fallback to Poisson Sampling in
+   * Webgl 1 (https://developer.nvidia.com/gpugems/GPUGems/gpugems_ch11.html)
+   */
+  static constexpr unsigned int FILTER_PCF()
+  {
+    return ShadowGenerator::_FILTER_PCF;
+  }
+
+  /**
+   * @brief Shadow generator mode PCSS: Percentage Closering Soft Shadow.
+   * benefits from Webgl 2 shadow samplers. Fallback to Poisson Sampling in
+   * Webgl 1 Contact Hardening
+   */
+  static constexpr unsigned int FILTER_PCSS()
+  {
+    return ShadowGenerator::_FILTER_PCSS;
+  }
+
+  /**
+   * @brief Reserved for PCF and PCSS.
+   * Highest Quality.
+   *
+   * Execute PCF on a 5*5 kernel improving a lot the shadow aliasing artifacts.
+   *
+   * Execute PCSS with 32 taps blocker search and 64 taps PCF.
+   */
+  static constexpr unsigned int QUALITY_HIGH()
+  {
+    return ShadowGenerator::_QUALITY_HIGH;
+  }
+
+  /**
+   * @brief Reserved for PCF and PCSS.
+   * Good tradeoff for quality/perf cross devices
+   *
+   * Execute PCF on a 3*3 kernel.
+   *
+   * Execute PCSS with 16 taps blocker search and 32 taps PCF.
+   */
+  static constexpr unsigned int QUALITY_MEDIUM()
+  {
+    return ShadowGenerator::_QUALITY_MEDIUM;
+  }
+
+  /**
+   * @brief Reserved for PCF and PCSS.
+   * The lowest quality but the fastest.
+   *
+   * Execute PCF on a 1*1 kernel.
+   *
+   * Execute PCSS with 16 taps blocker search and 16 taps PCF.
+   */
+  static constexpr unsigned int QUALITY_LOW()
+  {
+    return ShadowGenerator::_QUALITY_LOW;
+  }
+
+  /**
    * @brief Creates a ShadowGenerator object.
    * A ShadowGenerator is the required tool to use the shadows.
    * Each light casting shadows needs to use its own ShadowGenerator.
@@ -102,14 +167,30 @@ public:
   virtual ~ShadowGenerator();
 
   /**
-   * @brief Gets the bias: offset applied on the depth preventing acnea.
+   * @brief Gets the bias: offset applied on the depth preventing acnea (in
+   * light direction).
    */
   float bias() const;
 
   /**
-   * @brief Sets the bias: offset applied on the depth preventing acnea.
+   * @brief Sets the bias: offset applied on the depth preventing acnea (in
+   * light direction).
    */
   void setBias(float bias);
+
+  /**
+   * @brief Gets the normalBias: offset applied on the depth preventing acnea
+   * (along side the normal direction and proportinal to the light/normal
+   * angle).
+   */
+  float normalBias() const;
+
+  /**
+   * @brief Sets the normalBias: offset applied on the depth preventing acnea
+   * (along side the normal direction and proportinal to the light/normal
+   * angle).
+   */
+  void setNormalBias(float normalBias);
 
   /**
    * @brief Gets the blur box offset: offset applied during the blur pass.
@@ -185,12 +266,12 @@ public:
   void setFilter(unsigned int value);
 
   /**
-   * @brief Gets if the current filter is set to Poisson Sampling aka PCF.
+   * @brief Gets if the current filter is set to Poisson Sampling.
    */
   bool usePoissonSampling() const;
 
   /**
-   * @brief Sets the current filter to Poisson Sampling aka PCF.
+   * @brief Sets the current filter to Poisson Sampling.
    */
   void setUsePoissonSampling(bool value);
 
@@ -257,10 +338,70 @@ public:
   bool useBlurCloseExponentialShadowMap() const;
 
   /**
-   * @brief Sets the current filter to fileterd "close ESM" (using the inverse
+   * @brief Sets the current filter to filtered "close ESM" (using the inverse
    * of the exponential to prevent steep falloff artifacts).
    */
   void setUseBlurCloseExponentialShadowMap(bool value);
+
+  /**
+   * @brief Gets if the current filter is set to "PCF" (percentage closer
+   * filtering).
+   */
+  bool usePercentageCloserFiltering() const;
+
+  /**
+   * @brief Sets the current filter to "PCF" (percentage closer filtering).
+   */
+  void setUsePercentageCloserFiltering(bool value);
+
+  /**
+   * @brief Gets the PCF or PCSS Quality.
+   * Only valid if usePercentageCloserFiltering or usePercentageCloserFiltering
+   * is true.
+   */
+  unsigned int filteringQuality() const;
+
+  /**
+   * @brief Sets the PCF or PCSS Quality.
+   * Only valid if usePercentageCloserFiltering or usePercentageCloserFiltering
+   * is true.
+   */
+  void setFilteringQuality(unsigned int filteringQuality);
+
+  /**
+   * @brief Gets if the current filter is set to "PCSS" (contact hardening).
+   */
+  bool useContactHardeningShadow() const;
+
+  /**
+   * @brief Sets the current filter to "PCSS" (contact hardening).
+   */
+  void setUseContactHardeningShadow(bool value);
+
+  /**
+   * @brief Gets the Light Size (in shadow map uv unit) used in PCSS to
+   * determine the blocker search area and the penumbra size. Using a ratio
+   * helps keeping shape stability independently of the map size.
+   *
+   * It does not account for the light projection as it was having too much
+   * instability during the light setup or during light position changes.
+   *
+   * Only valid if useContactHardeningShadow is true.
+   */
+  float contactHardeningLightSizeUVRatio() const;
+
+  /**
+   * @brief Sets the Light Size (in shadow map uv unit) used in PCSS to
+   * determine the blocker search area and the penumbra size. Using a ratio
+   * helps keeping shape stability independently of the map size.
+   *
+   * It does not account for the light projection as it was having too much
+   * instability during the light setup or during light position changes.
+   *
+   * Only valid if useContactHardeningShadow is true.
+   */
+  void
+  setContactHardeningLightSizeUVRatio(float contactHardeningLightSizeUVRatio);
 
   /**
    * @brief Returns the darkness value (float). This can only decrease the
@@ -430,12 +571,15 @@ public:
 
 private:
   float _bias;
+  float _normalBias;
   int _blurBoxOffset;
   float _blurScale;
   float _blurKernel;
   bool _useKernelBlur;
   Nullable<float> _depthScale;
   unsigned int _filter;
+  unsigned int _filteringQuality;
+  float _contactHardeningLightSizeUVRatio;
   float _darkness;
   bool _transparencyShadow;
   unique_ptr_t<RenderTargetTexture> _shadowMap;
