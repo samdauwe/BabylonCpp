@@ -3,7 +3,13 @@
 namespace BABYLON {
 
 ClickInfo::ClickInfo()
-    : _singleClick{false}
+    : singleClick{this, &ClickInfo::get_singleClick,
+                  &ClickInfo::set_singleClick}
+    , doubleClick{this, &ClickInfo::get_doubleClick,
+                  &ClickInfo::set_doubleClick}
+    , hasSwiped{this, &ClickInfo::get_hasSwiped, &ClickInfo::set_hasSwiped}
+    , ignore{this, &ClickInfo::get_ignore, &ClickInfo::set_ignore}
+    , _singleClick{false}
     , _doubleClick{false}
     , _hasSwiped{false}
     , _ignore{false}
@@ -11,7 +17,13 @@ ClickInfo::ClickInfo()
 }
 
 ClickInfo::ClickInfo(const ClickInfo& otherClickInfo)
-    : _singleClick{otherClickInfo._singleClick}
+    : singleClick{this, &ClickInfo::get_singleClick,
+                  &ClickInfo::set_singleClick}
+    , doubleClick{this, &ClickInfo::get_doubleClick,
+                  &ClickInfo::set_doubleClick}
+    , hasSwiped{this, &ClickInfo::get_hasSwiped, &ClickInfo::set_hasSwiped}
+    , ignore{this, &ClickInfo::get_ignore, &ClickInfo::set_ignore}
+    , _singleClick{otherClickInfo._singleClick}
     , _doubleClick{otherClickInfo._doubleClick}
     , _hasSwiped{otherClickInfo._hasSwiped}
     , _ignore{otherClickInfo._ignore}
@@ -19,7 +31,13 @@ ClickInfo::ClickInfo(const ClickInfo& otherClickInfo)
 }
 
 ClickInfo::ClickInfo(ClickInfo&& otherClickInfo)
-    : _singleClick{::std::move(otherClickInfo._singleClick)}
+    : singleClick{this, &ClickInfo::get_singleClick,
+                  &ClickInfo::set_singleClick}
+    , doubleClick{this, &ClickInfo::get_doubleClick,
+                  &ClickInfo::set_doubleClick}
+    , hasSwiped{this, &ClickInfo::get_hasSwiped, &ClickInfo::set_hasSwiped}
+    , ignore{this, &ClickInfo::get_ignore, &ClickInfo::set_ignore}
+    , _singleClick{::std::move(otherClickInfo._singleClick)}
     , _doubleClick{::std::move(otherClickInfo._doubleClick)}
     , _hasSwiped{::std::move(otherClickInfo._hasSwiped)}
     , _ignore{::std::move(otherClickInfo._ignore)}
@@ -54,42 +72,42 @@ ClickInfo::~ClickInfo()
 {
 }
 
-bool ClickInfo::singleClick() const
+bool ClickInfo::get_singleClick() const
 {
   return _singleClick;
 }
 
-bool ClickInfo::doubleClick() const
+bool ClickInfo::get_doubleClick() const
 {
   return _doubleClick;
 }
 
-bool ClickInfo::hasSwiped() const
+bool ClickInfo::get_hasSwiped() const
 {
   return _hasSwiped;
 }
 
-bool ClickInfo::ignore() const
+bool ClickInfo::get_ignore() const
 {
   return _ignore;
 }
 
-void ClickInfo::setSingleClick(bool b)
+void ClickInfo::set_singleClick(bool b)
 {
   _singleClick = b;
 }
 
-void ClickInfo::setDoubleClick(bool b)
+void ClickInfo::set_doubleClick(bool b)
 {
   _doubleClick = b;
 }
 
-void ClickInfo::setHasSwiped(bool b)
+void ClickInfo::set_hasSwiped(bool b)
 {
   _hasSwiped = b;
 }
 
-void ClickInfo::setIgnore(bool b)
+void ClickInfo::set_ignore(bool b)
 {
   _ignore = b;
 }

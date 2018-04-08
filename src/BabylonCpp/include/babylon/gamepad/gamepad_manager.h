@@ -10,6 +10,8 @@ namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT GamepadManager {
 
+  friend class Scene;
+
 public:
   GamepadManager(Scene* scene);
   ~GamepadManager();

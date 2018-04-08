@@ -1258,8 +1258,8 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
   // Bind
   auto fillMode = scene->forcePointsCloud() ?
                     Material::PointFillMode() :
-                    (scene->forceWireframe ? Material::WireFrameFillMode() :
-                                             _effectiveMaterial->fillMode());
+                    (scene->forceWireframe() ? Material::WireFrameFillMode() :
+                                               _effectiveMaterial->fillMode());
 
   // Binding will be done later because we need to add more info to the VB
   if (!hardwareInstancedRendering) {

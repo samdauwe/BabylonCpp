@@ -321,8 +321,8 @@ bool BabylonFileLoader::load(Scene* scene, const string_t& data,
   }
 
   // Fog
-  auto fogMode = Json::GetNumber(parsedData, "fogMode", Scene::FOGMODE_NONE);
-  if (fogMode != Scene::FOGMODE_NONE) {
+  auto fogMode = Json::GetNumber(parsedData, "fogMode", Scene::FOGMODE_NONE());
+  if (fogMode != Scene::FOGMODE_NONE()) {
     scene->setFogMode(fogMode);
     scene->fogColor
       = Color3::FromArray(Json::ToArray<float>(parsedData, "fogColor"));
@@ -331,13 +331,13 @@ bool BabylonFileLoader::load(Scene* scene, const string_t& data,
     scene->fogDensity = Json::GetNumber(parsedData, "fogDensity", 0.1f);
     log << "\tFog mode for scene:  ";
     switch (fogMode) {
-      case Scene::FOGMODE_EXP:
+      case Scene::FOGMODE_EXP():
         log << "exp\n";
         break;
-      case Scene::FOGMODE_EXP2:
+      case Scene::FOGMODE_EXP2():
         log << "exp2\n";
         break;
-      case Scene::FOGMODE_LINEAR:
+      case Scene::FOGMODE_LINEAR():
         log << "linear\n";
         break;
       default:

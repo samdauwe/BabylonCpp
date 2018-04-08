@@ -32,11 +32,11 @@ void SceneTab::render()
                                 true)) {
       // Determine current render mode
       int currenRenderMode = -1;
-      if (!_scene->forceWireframe && !_scene->forcePointsCloud()) {
+      if (!_scene->forceWireframe() && !_scene->forcePointsCloud()) {
         // Solid render mode
         currenRenderMode = 0;
       }
-      else if (_scene->forceWireframe) {
+      else if (_scene->forceWireframe()) {
         // Wireframe render mode
         currenRenderMode = 1;
       }
@@ -52,15 +52,15 @@ void SceneTab::render()
       // Handle render mode change
       if (renderModeChoice != currenRenderMode) {
         if (renderModeChoice == 0) {
-          _scene->forceWireframe = false;
+          _scene->setForceWireframe(false);
           _scene->setForcePointsCloud(false);
         }
         else if (renderModeChoice == 1) {
-          _scene->forceWireframe = true;
+          _scene->setForceWireframe(true);
           _scene->setForcePointsCloud(false);
         }
         else if (renderModeChoice == 2) {
-          _scene->forceWireframe = false;
+          _scene->setForceWireframe(false);
           _scene->setForcePointsCloud(true);
         }
       }

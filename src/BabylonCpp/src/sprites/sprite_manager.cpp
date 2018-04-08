@@ -290,7 +290,7 @@ void SpriteManager::render()
   // Render
   auto effect = _effectBase;
 
-  if (_scene->fogEnabled() && _scene->fogMode() != Scene::FOGMODE_NONE
+  if (_scene->fogEnabled() && _scene->fogMode() != Scene::FOGMODE_NONE()
       && fogEnabled) {
     effect = _effectFog;
   }
@@ -307,7 +307,7 @@ void SpriteManager::render()
     static_cast<float>(cellWidth) / static_cast<float>(baseSize.height));
 
   // Fog
-  if (_scene->fogEnabled() && _scene->fogMode() != Scene::FOGMODE_NONE
+  if (_scene->fogEnabled() && _scene->fogMode() != Scene::FOGMODE_NONE()
       && fogEnabled) {
     effect->setFloat4("vFogInfos", static_cast<float>(_scene->fogMode()),
                       _scene->fogStart, _scene->fogEnd, _scene->fogDensity);

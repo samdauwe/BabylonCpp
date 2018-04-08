@@ -1346,7 +1346,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
 
     // View
     if ((scene->fogEnabled() && mesh->applyFog()
-         && scene->fogMode() != Scene::FOGMODE_NONE)
+         && scene->fogMode() != Scene::FOGMODE_NONE())
         || _reflectionTexture) {
       bindView(effect);
     }

@@ -67,7 +67,7 @@ void ShaderMaterialWithFogScene::initializeScene(ICanvas* canvas, Scene* scene)
     effect->setColor3("vFogColor", _scene->fogColor);
   });
 
-  scene->setFogMode(Scene::FOGMODE_LINEAR);
+  scene->setFogMode(Scene::FOGMODE_LINEAR());
   scene->fogStart = 0.f;
   scene->fogEnd   = 10.f;
   scene->fogColor

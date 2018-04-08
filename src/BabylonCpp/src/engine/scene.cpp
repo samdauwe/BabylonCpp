@@ -4,6 +4,7 @@
 #include <babylon/actions/action_manager.h>
 #include <babylon/animations/animatable.h>
 #include <babylon/animations/animation_group.h>
+#include <babylon/animations/runtime_animation.h>
 #include <babylon/audio/sound_track.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
@@ -88,7 +89,6 @@ Scene::Scene(Engine* engine)
     , pointerDownPredicate{nullptr}
     , pointerUpPredicate{nullptr}
     , pointerMovePredicate{nullptr}
-    , forceWireframe{false}
     , forceShowBoundingBoxes{false}
     , _clipPlane{nullptr}
     , animationsEnabled{true}
@@ -157,9 +157,10 @@ Scene::Scene(Engine* engine)
     , _onCanvasFocusObserver{nullptr}
     , _onCanvasBlurObserver{nullptr}
     , _useRightHandedSystem{false}
+    , _forceWireframe{false}
     , _forcePointsCloud{false}
     , _fogEnabled{true}
-    , _fogMode{Scene::FOGMODE_NONE}
+    , _fogMode{Scene::FOGMODE_NONE()}
     , _shadowsEnabled{true}
     , _lightsEnabled{true}
     , _defaultMaterial{nullptr}
@@ -200,7 +201,6 @@ Scene::Scene(Engine* engine)
     , _pointerOverMesh{nullptr}
     , _pointerOverSprite{nullptr}
     , _debugLayer{nullptr}
-    , _depthRenderer{nullptr}
     , _geometryBufferRenderer{nullptr}
     , _pickedDownMesh{nullptr}
     , _pickedUpMesh{nullptr}
@@ -359,6 +359,20 @@ unsigned int Scene::getInternalStep() const
 ImageProcessingConfiguration* Scene::imageProcessingConfiguration()
 {
   return _imageProcessingConfiguration.get();
+}
+
+bool Scene::forceWireframe() const
+{
+  return _forceWireframe;
+}
+
+void Scene::setForceWireframe(bool value)
+{
+  if (_forceWireframe == value) {
+    return;
+  }
+  _forceWireframe = value;
+  markAllMaterialsAsDirty(Material::MiscDirtyFlag());
 }
 
 bool Scene::forcePointsCloud() const
@@ -797,8 +811,13 @@ Scene& Scene::_processPointerMove(const PickingInfo* pickResult,
   }
 
   if (pickResult) {
+    auto type = (evt.type == EventType::MOUSE_WHEEL
+                 || evt.type == EventType::DOM_MOUSE_SCROLL) ?
+                  PointerEventTypes::POINTERWHEEL :
+                  PointerEventTypes::POINTERMOVE;
+
     if (onPointerMove) {
-      onPointerMove(evt, pickResult);
+      onPointerMove(evt, pickResult, type);
     }
 
     if (onPointerObservable.hasObservers()) {
@@ -889,8 +908,10 @@ Scene& Scene::_processPointerDown(const PickingInfo* pickResult,
   }
 
   if (pickResult) {
+    auto type = PointerEventTypes::POINTERDOWN;
+
     if (onPointerDown) {
-      onPointerDown(evt, pickResult);
+      onPointerDown(evt, pickResult, type);
     }
 
     if (onPointerObservable.hasObservers()) {
@@ -907,8 +928,8 @@ Scene& Scene::simulatePointerUp(const PickingInfo* pickResult)
 {
   PointerEvent evt("pointerup");
   ClickInfo clickInfo;
-  clickInfo.setSingleClick(true);
-  clickInfo.setIgnore(true);
+  clickInfo.singleClick = true;
+  clickInfo.ignore      = true;
 
   return _processPointerUp(pickResult, evt, clickInfo);
 }
@@ -960,9 +981,7 @@ Scene& Scene::_processPointerUp(const PickingInfo* pickResult,
       ActionEvent::CreateNew(_pickedDownMesh, evt));
   }
 
-  if (onPointerUp) {
-    onPointerUp(evt, pickResult);
-  }
+  auto type = PointerEventTypes::POINTERUP;
 
   if (onPointerObservable.hasObservers()) {
     if (!clickInfo.ignore()) {
@@ -988,6 +1007,10 @@ Scene& Scene::_processPointerUp(const PickingInfo* pickResult,
       auto pi   = new PointerInfo(type, evt, *pickResult);
       onPointerObservable.notifyObservers(pi, static_cast<int>(type));
     }
+  }
+
+  if (onPointerUp) {
+    onPointerUp(evt, pickResult, type);
   }
 
   return *this;
@@ -1459,7 +1482,7 @@ bool Scene::isReady()
       continue;
     }
 
-    if (!mesh->isReady()) {
+    if (!mesh->isReady(true)) {
       return false;
     }
 
@@ -1478,6 +1501,13 @@ bool Scene::isReady()
           return false;
         }
       }
+    }
+  }
+
+  // Particles
+  for (auto& particleSystem : particleSystems) {
+    if (!particleSystem->isReady()) {
+      return false;
     }
   }
 
@@ -1567,16 +1597,31 @@ vector_t<Animation*> Scene::getAnimations()
   return vector_t<Animation*>();
 }
 
+Animatable*
+Scene::beginWeightedAnimation(IAnimatable* target, int from, int to,
+                              float weight, bool loop, float speedRatio,
+                              const ::std::function<void()>& onAnimationEnd,
+                              Animatable* animatable)
+{
+  auto returnedAnimatable = beginAnimation(target, from, to, loop, speedRatio,
+                                           onAnimationEnd, animatable, false);
+  returnedAnimatable->weight = weight;
+
+  return returnedAnimatable;
+}
+
 Animatable* Scene::beginAnimation(IAnimatable* target, int from, int to,
                                   bool loop, float speedRatio,
                                   const ::std::function<void()>& onAnimationEnd,
-                                  Animatable* animatable)
+                                  Animatable* animatable, bool stopCurrent)
 {
   if (from > to && speedRatio > 0.f) {
     speedRatio *= -1;
   }
 
-  stopAnimation(target);
+  if (stopCurrent) {
+    stopAnimation(target);
+  }
 
   if (!animatable) {
     animatable = new Animatable(this, target, from, to, loop, speedRatio,
@@ -1601,9 +1646,11 @@ Animatable* Scene::beginAnimation(IAnimatable* target, int from, int to,
     animatables = m->getAnimatables();
   }
 
-  for (auto& childAnimatable : animatables) {
-    beginAnimation(childAnimatable, from, to, loop, speedRatio, onAnimationEnd,
-                   animatable);
+  if (!animatables.empty()) {
+    for (auto& childAnimatable : animatables) {
+      beginAnimation(childAnimatable, from, to, loop, speedRatio,
+                     onAnimationEnd, animatable, stopCurrent);
+    }
   }
 
   animatable->reset();
@@ -1645,6 +1692,18 @@ Animatable* Scene::getAnimatableByTarget(IAnimatable* target)
   return (it == _activeAnimatables.end()) ? nullptr : *it;
 }
 
+vector_t<Animatable*> Scene::getAllAnimatablesByTarget(IAnimatable* target)
+{
+  vector_t<Animatable*> result;
+  for (auto& activeAnimatable : _activeAnimatables) {
+    if (activeAnimatable->target == target) {
+      result.emplace_back(activeAnimatable);
+    }
+  }
+
+  return result;
+}
+
 vector_t<Animatable*>& Scene::animatables()
 {
   return _activeAnimatables;
@@ -1652,9 +1711,9 @@ vector_t<Animatable*>& Scene::animatables()
 
 void Scene::stopAnimation(IAnimatable* target, const string_t& animationName)
 {
-  auto animatable = getAnimatableByTarget(target);
+  auto animatables = getAllAnimatablesByTarget(target);
 
-  if (animatable) {
+  for (auto& animatable : animatables) {
     animatable->stop(animationName);
   }
 }
@@ -1693,6 +1752,18 @@ void Scene::_animate()
   for (auto& activeAnimatable : _activeAnimatables) {
     activeAnimatable->_animate(std::chrono::milliseconds(_animationTime));
   }
+
+  // Late animation bindings
+  _processLateAnimationBindings();
+}
+
+void Scene::_registerTargetForLateAnimationBinding(
+  RuntimeAnimation* /*runtimeAnimation*/)
+{
+}
+
+void Scene::_processLateAnimationBindings()
+{
 }
 
 void Scene::_switchToAlternateCameraConfiguration(bool active)
@@ -1944,7 +2015,7 @@ int Scene::removeCamera(Camera* toRemove)
   return index;
 }
 
-int Scene::removeParticleSystem(ParticleSystem* toRemove)
+int Scene::removeParticleSystem(IParticleSystem* toRemove)
 {
   auto it = ::std::find_if(
     particleSystems.begin(), particleSystems.end(),
@@ -2714,6 +2785,15 @@ IActiveMeshCandidateProvider* Scene::getActiveMeshCandidateProvider() const
 
 Scene& Scene::freezeActiveMeshes()
 {
+  if (!activeCamera) {
+    return *this;
+  }
+
+  if (_frustumPlanes.empty()) {
+    setTransformMatrix(activeCamera->getViewMatrix(),
+                       activeCamera->getProjectionMatrix());
+  }
+
   _evaluateActiveMeshes();
   _activeMeshesFrozen = true;
   return *this;
@@ -2908,7 +2988,7 @@ void Scene::updateAlternateTransformMatrix(Camera* alternateCamera)
                                alternateCamera->getProjectionMatrix());
 }
 
-void Scene::_renderForCamera(Camera* camera)
+void Scene::_renderForCamera(Camera* camera, Camera* rigParent)
 {
   if (camera && camera->_skipRendering) {
     return;
@@ -2931,7 +3011,6 @@ void Scene::_renderForCamera(Camera* camera)
   // Camera
   resetCachedMaterial();
   ++_renderId;
-  activeCamera->update();
   updateTransformMatrix();
 
   if (camera->_alternateCamera) {
@@ -2953,9 +3032,15 @@ void Scene::_renderForCamera(Camera* camera)
   OnBeforeRenderTargetsRenderObservable.notifyObservers(this);
   bool needsRestoreFrameBuffer = false;
 
-  // if (camera->customRenderTargets && !camera.customRenderTargets.empty) {
-  //  _renderTargets.concatWithNoDuplicate(camera->customRenderTargets);
-  // }
+  if (!camera->customRenderTargets.empty()) {
+    stl_util::concat_with_no_duplicates(_renderTargets,
+                                        camera->customRenderTargets);
+  }
+
+  if (rigParent && !rigParent->customRenderTargets.empty()) {
+    stl_util::concat_with_no_duplicates(_renderTargets,
+                                        rigParent->customRenderTargets);
+  }
 
   if (renderTargetsEnabled && !_renderTargets.empty()) {
     _intermediateRendering = true;
@@ -3108,14 +3193,9 @@ void Scene::_processSubCameras(Camera* camera)
     return;
   }
 
-  // Update camera
-  if (activeCamera) {
-    activeCamera->update();
-  }
-
   // rig cameras
   for (auto& rigCamera : camera->_rigCameras) {
-    _renderForCamera(rigCamera);
+    _renderForCamera(rigCamera, camera);
   }
 
   activeCamera = camera;
@@ -3224,6 +3304,33 @@ void Scene::render()
     }
   }
 
+  // Update gamepad manager
+  if (_gamepadManager && _gamepadManager->_isMonitoring) {
+    _gamepadManager->_checkGamepadsStatus();
+  }
+
+  // Update Cameras
+  if (!activeCameras.empty()) {
+    for (auto& camera : activeCameras) {
+      camera->update();
+      if (camera->cameraRigMode != Camera::RIG_MODE_NONE()) {
+        // Rig cameras
+        for (auto& rigCamera : camera->_rigCameras) {
+          rigCamera->update();
+        }
+      }
+    }
+  }
+  else if (activeCamera) {
+    activeCamera->update();
+    if (activeCamera->cameraRigMode != Camera::RIG_MODE_NONE()) {
+      // rig cameras
+      for (auto& rigCamera : activeCamera->_rigCameras) {
+        rigCamera->update();
+      }
+    }
+  }
+
   // Before render
   onBeforeRenderObservable.notifyObservers(this);
 
@@ -3299,7 +3406,7 @@ void Scene::render()
   else {
     if (autoClearDepthAndStencil || autoClear) {
       _engine->clear(clearColor,
-                     autoClear || forceWireframe || forcePointsCloud(),
+                     autoClear || forceWireframe() || forcePointsCloud(),
                      autoClearDepthAndStencil, autoClearDepthAndStencil);
     }
   }
@@ -3324,8 +3431,8 @@ void Scene::render()
   }
 
   // Depth renderer
-  if (_depthRenderer) {
-    _renderTargets.emplace_back(_depthRenderer->getDepthMap());
+  for (auto& depthRendererItem : _depthRenderer) {
+    _renderTargets.emplace_back(depthRendererItem.second->getDepthMap());
   }
 
   // Geometry renderer
@@ -3448,25 +3555,31 @@ void Scene::_switchAudioModeForNormalSpeakers()
 {
 }
 
-DepthRenderer* Scene::enableDepthRenderer()
+DepthRenderer* Scene::enableDepthRenderer(Camera* camera)
 {
-  if (_depthRenderer) {
-    return _depthRenderer.get();
+  auto _camera = camera ? camera : activeCamera;
+  if (!_camera) {
+    throw ::std::runtime_error("No camera available to enable depth renderer");
+  }
+  if (!stl_util::contains(_depthRenderer, _camera->id)
+      || !_depthRenderer[_camera->id]) {
+    _depthRenderer[_camera->id] = ::std::make_unique<DepthRenderer>(
+      this, EngineConstants::TEXTURETYPE_FLOAT, _camera);
   }
 
-  _depthRenderer = ::std::make_unique<DepthRenderer>(this);
-
-  return _depthRenderer.get();
+  return _depthRenderer[_camera->id].get();
 }
 
-void Scene::disableDepthRenderer()
+void Scene::disableDepthRenderer(Camera* camera)
 {
-  if (!_depthRenderer) {
+  auto _camera = camera ? camera : activeCamera;
+  if (!_camera || !stl_util::contains(_depthRenderer, _camera->id)
+      || !_depthRenderer[_camera->id]) {
     return;
   }
 
-  _depthRenderer->dispose();
-  _depthRenderer = nullptr;
+  _depthRenderer[camera->id]->dispose();
+  _depthRenderer.erase(camera->id);
 }
 
 GeometryBufferRenderer* Scene::enableGeometryBufferRenderer(float ratio)
@@ -3522,9 +3635,10 @@ void Scene::dispose()
 
   resetCachedMaterial();
 
-  if (_depthRenderer) {
-    _depthRenderer->dispose();
+  for (auto& depthRendererItem : _depthRenderer) {
+    depthRendererItem.second->dispose();
   }
+  _depthRenderer.clear();
 
   if (_gamepadManager) {
     _gamepadManager->dispose();
@@ -3543,6 +3657,7 @@ void Scene::dispose()
   _activeSkeletons.clear();
   _softwareSkinnedMeshes.clear();
   _renderTargets.clear();
+  _registeredForLateAnimationBindings.clear();
 
   if (_boundingBoxRenderer) {
     _boundingBoxRenderer->dispose();

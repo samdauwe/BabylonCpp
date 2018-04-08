@@ -221,9 +221,11 @@ public:
 protected:
   ActionManager(Scene* scene);
 
+public:
+  string_t hoverCursor;
+
 private:
   vector_t<Action*> actions;
-  string_t hoverCursor;
   Scene* _scene;
 
 }; // end of class ActionManager

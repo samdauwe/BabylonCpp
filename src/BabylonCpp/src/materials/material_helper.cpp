@@ -111,7 +111,7 @@ void MaterialHelper::PrepareDefinesForMisc(
     defines.defines[POINTSIZE]        = pointsCloud;
     defines.defines[FOG]
       = (scene->fogEnabled() && mesh->applyFog()
-         && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled);
+         && scene->fogMode() != Scene::FOGMODE_NONE() && fogEnabled);
     defines.defines[NONUNIFORMSCALING] = mesh->nonUniformScaling();
     defines.defines[ALPHATEST]         = alphaTest;
   }
@@ -601,7 +601,7 @@ void MaterialHelper::BindFogParameters(Scene* scene, AbstractMesh* mesh,
                                        Effect* effect)
 {
   if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+      && scene->fogMode() != Scene::FOGMODE_NONE()) {
     effect->setFloat4("vFogInfos", static_cast<float>(scene->fogMode()),
                       scene->fogStart, scene->fogEnd, scene->fogDensity);
     effect->setColor3("vFogColor", scene->fogColor);

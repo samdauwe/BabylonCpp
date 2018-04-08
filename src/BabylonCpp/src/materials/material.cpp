@@ -208,7 +208,7 @@ bool Material::wireframe() const
       return true;
   }
 
-  return _scene->forceWireframe;
+  return _scene->forceWireframe();
 }
 
 void Material::setWireframe(bool value)

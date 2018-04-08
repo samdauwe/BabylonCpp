@@ -15,15 +15,22 @@ public:
   ClickInfo& operator=(ClickInfo&& otherClickInfo);
   ~ClickInfo();
 
-  bool singleClick() const;
-  bool doubleClick() const;
-  bool hasSwiped() const;
-  bool ignore() const;
+private:
+  bool get_singleClick() const;
+  bool get_doubleClick() const;
+  bool get_hasSwiped() const;
+  bool get_ignore() const;
 
-  void setSingleClick(bool b);
-  void setDoubleClick(bool b);
-  void setHasSwiped(bool b);
-  void setIgnore(bool b);
+  void set_singleClick(bool b);
+  void set_doubleClick(bool b);
+  void set_hasSwiped(bool b);
+  void set_ignore(bool b);
+
+public:
+  Property<ClickInfo, bool> singleClick;
+  Property<ClickInfo, bool> doubleClick;
+  Property<ClickInfo, bool> hasSwiped;
+  Property<ClickInfo, bool> ignore;
 
 private:
   bool _singleClick;

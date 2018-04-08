@@ -24,30 +24,43 @@ namespace BABYLON {
  */
 class BABYLON_SHARED_EXPORT Scene : public IAnimatable {
 
-public:
+private:
   // Statics
-  /**
-   * The fog is deactivated
-   */
-  static constexpr unsigned int FOGMODE_NONE = 0;
-  /**
-   * The fog density is following an exponential function
-   */
-  static constexpr unsigned int FOGMODE_EXP = 1;
-  /**
-   * The fog density is following an exponential function faster than
-   * FOGMODE_EXP
-   */
-  static constexpr unsigned int FOGMODE_EXP2 = 2;
-  /**
-   * The fog density is following a linear function.
-   */
-  static constexpr unsigned int FOGMODE_LINEAR = 3;
+  static constexpr unsigned int _FOGMODE_NONE   = 0;
+  static constexpr unsigned int _FOGMODE_EXP    = 1;
+  static constexpr unsigned int _FOGMODE_EXP2   = 2;
+  static constexpr unsigned int _FOGMODE_LINEAR = 3;
 
+public:
   static size_t _uniqueIdCounter;
 
   static microseconds_t MinDeltaTime;
   static microseconds_t MaxDeltaTime;
+
+  /** The fog is deactivated */
+  static constexpr unsigned int FOGMODE_NONE()
+  {
+    return Scene::_FOGMODE_NONE;
+  }
+
+  /** The fog density is following an exponential function */
+  static constexpr unsigned int FOGMODE_EXP()
+  {
+    return Scene::_FOGMODE_EXP;
+  }
+
+  /** The fog density is following an exponential function faster than
+   * FOGMODE_EXP */
+  static constexpr unsigned int FOGMODE_EXP2()
+  {
+    return Scene::_FOGMODE_EXP2;
+  }
+
+  /** The fog density is following a linear function. */
+  static constexpr unsigned int FOGMODE_LINEAR()
+  {
+    return Scene::_FOGMODE_LINEAR;
+  }
 
   /**
    * The distance in pixel that you have to move to prevent some events.
@@ -145,6 +158,8 @@ public:
    */
   ImageProcessingConfiguration* imageProcessingConfiguration();
 
+  bool forceWireframe() const;
+  void setForceWireframe(bool value);
   bool forcePointsCloud() const;
   void setForcePointsCloud(bool value);
   bool fogEnabled() const;
@@ -244,9 +259,13 @@ public:
   /** Pointers handling **/
 
   /**
-   * @brief Use this method to simulate a pointer move on a mesh
+   * @brief Use this method to simulate a pointer move on a mesh.
    * The pickResult parameter can be obtained from a scene.pick or
    * scene.pickWithRay
+   * @param pickResult pickingInfo of the object wished to simulate pointer
+   * event on
+   * @param pointerEventInit pointer event state to be used when simulating the
+   * pointer event (eg. pointer id for multitouch)
    */
   Scene& simulatePointerMove(const PickingInfo* pickResult);
   /**
@@ -310,27 +329,48 @@ public:
 
   /**
    * @brief Will start the animation sequence of a given target.
-   * @param target - the target
-   * @param {number} from - from which frame should animation start
-   * @param {number} to - till which frame should animation run.
-   * @param {boolean} [loop] - should the animation loop
-   * @param {number} [speedRatio] - the speed in which to run the animation
-   * @param {Function} [onAnimationEnd] function to be executed when the
-   * animation ended.
-   * @param {BABYLON.Animatable} [animatable] an animatable object. If not
-   * provided a new one will be created from the given params.
-   * @return {BABYLON.Animatable} the animatable object created for this
-   * animation
-   * @returns {BABYLON.Animatable} the animatable object created for this
-   * animation
-   * See BABYLON.Animatable
-   * @see http://doc.babylonjs.com/page.php?p=22081
+   * @param target defines the target
+   * @param from defines from which frame should animation start
+   * @param to defines until which frame should animation run.
+   * @param weight defines the weight to apply to the animation (1.0 by default)
+   * @param loop defines if the animation loops
+   * @param speedRatio defines the speed in which to run the animation (1.0 by
+   * default)
+   * @param onAnimationEnd defines the function to be executed when the
+   * animation ends
+   * @param animatable defines an animatable object. If not provided a new one
+   * will be created from the given params
+   * @returns the animatable object created for this animation
+   * @see BABYLON.Animatable
    */
-  Animatable* beginAnimation(IAnimatable* target, int from, int to,
-                             bool loop = false, float speedRatio = 1.f,
-                             const ::std::function<void()>& onAnimationEnd
-                             = nullptr,
-                             Animatable* animatable = nullptr);
+  Animatable* beginWeightedAnimation(
+    IAnimatable* target, int from, int to, float weight = 1.f,
+    bool loop = false, float speedRatio = 1.f,
+    const ::std::function<void()>& onAnimationEnd = nullptr,
+    Animatable* animatable                        = nullptr);
+
+  /**
+   * @brief Will start the animation sequence of a given target.
+   * @param target defines the target
+   * @param from defines from which frame should animation start
+   * @param to defines until which frame should animation run.
+   * @param loop defines if the animation loops
+   * @param speedRatio defines the speed in which to run the animation (1.0 by
+   * default)
+   * @param onAnimationEnd defines the function to be executed when the
+   * animation ends
+   * @param animatable defines an animatable object. If not provided a new one
+   * will be created from the given params
+   * @param stopCurrent defines if the current animations must be stopped first
+   * (true by default)
+   * @returns the animatable object created for this animation
+   * @see BABYLON.Animatable
+   */
+  Animatable*
+  beginAnimation(IAnimatable* target, int from, int to, bool loop = false,
+                 float speedRatio                              = 1.f,
+                 const ::std::function<void()>& onAnimationEnd = nullptr,
+                 Animatable* animatable = nullptr, bool stopCurrent = true);
 
   /**
    * @brief Begin a new animation on a given node.
@@ -378,6 +418,14 @@ public:
     const ::std::function<void()>& onAnimationEnd = nullptr);
 
   Animatable* getAnimatableByTarget(IAnimatable* target);
+
+  /**
+   * @brief Gets all animatables associated with a given target.
+   * @param target defines the target to look animatables for
+   * @returns an array of Animatables
+   */
+  vector_t<Animatable*> getAllAnimatablesByTarget(IAnimatable* target);
+
   vector_t<Animatable*>& animatables();
 
   /**
@@ -392,6 +440,9 @@ public:
    * @brief Stops and removes all animations that have been applied to the scene
    */
   void stopAllAnimations();
+
+  void
+  _registerTargetForLateAnimationBinding(RuntimeAnimation* runtimeAnimation);
 
   /** Matrix **/
   void _switchToAlternateCameraConfiguration(bool active);
@@ -413,7 +464,7 @@ public:
   int removeMorphTargetManager(MorphTargetManager* toRemove);
   int removeLight(Light* toRemove);
   int removeCamera(Camera* toRemove);
-  int removeParticleSystem(ParticleSystem* toRemove);
+  int removeParticleSystem(IParticleSystem* toRemove);
   int removeAnimation(Animation* toRemove);
   int removeMultiMaterial(MultiMaterial* toRemove);
   int removeMaterial(Material* toRemove);
@@ -696,8 +747,23 @@ public:
   void _switchAudioModeForNormalSpeakers();
 
   /** Rendering **/
-  DepthRenderer* enableDepthRenderer();
-  void disableDepthRenderer();
+
+  /**
+   * @brief Creates a depth renderer a given camera which contains a depth map
+   * which can be used for post processing.
+   * @param camera The camera to create the depth renderer on (default: scene's
+   * active camera)
+   * @returns the created depth renderer
+   */
+  DepthRenderer* enableDepthRenderer(Camera* camera = nullptr);
+
+  /**
+   * @brief Disables a depth renderer for a given camera.
+   * @param camera The camera to disable the depth renderer on (default: scene's
+   * active camera)
+   */
+  void disableDepthRenderer(Camera* camera = nullptr);
+
   GeometryBufferRenderer* enableGeometryBufferRenderer(float ratio = 1.f);
   void disableGeometryBufferRenderer();
   void freezeMaterials();
@@ -934,10 +1000,11 @@ private:
   Scene& _processPointerUp(const PickingInfo* pickResult,
                            const PointerEvent& evt, const ClickInfo& clickInfo);
   void _animate();
+  void _processLateAnimationBindings();
   void _evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh);
   void _evaluateActiveMeshes();
   void _activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh);
-  void _renderForCamera(Camera* camera);
+  void _renderForCamera(Camera* camera, Camera* rigParent = nullptr);
   void _processSubCameras(Camera* camera);
   void _checkIntersections();
   void _updateAudioParameters();
@@ -1167,19 +1234,21 @@ public:
   ::std::function<bool(AbstractMesh* Mesh)> pointerMovePredicate;
 
   /** Deprecated. Use onPointerObservable instead */
-  ::std::function<void(const PointerEvent& evt, const PickingInfo* pickInfo)>
+  ::std::function<void(const PointerEvent& evt, const PickingInfo* pickInfo,
+                       unsigned int type)>
     onPointerMove;
   /** Deprecated. Use onPointerObservable instead */
-  ::std::function<void(const PointerEvent& evt, const PickingInfo* pickInfo)>
+  ::std::function<void(const PointerEvent& evt, const PickingInfo* pickInfo,
+                       unsigned int type)>
     onPointerDown;
   /** Deprecated. Use onPointerObservable instead */
-  ::std::function<void(const PointerEvent& evt, const PickingInfo* pickInfo)>
+  ::std::function<void(const PointerEvent& evt, const PickingInfo* pickInfo,
+                       unsigned int type)>
     onPointerUp;
   /** Deprecated. Use onPointerObservable instead */
   ::std::function<void(const PointerEvent& evt, const PickingInfo* pickInfo)>
     onPointerPick;
 
-  bool forceWireframe;
   bool forceShowBoundingBoxes;
   unique_ptr_t<Plane> _clipPlane;
   bool animationsEnabled;
@@ -1378,6 +1447,8 @@ private:
   Observer<Scene>::Ptr _onAfterRenderObserver;
   Observer<Camera>::Ptr _onBeforeCameraRenderObserver;
   Observer<Camera>::Ptr _onAfterCameraRenderObserver;
+  // Animations
+  vector_t<string_t> _registeredForLateAnimationBindings;
   // Pointers
   ::std::function<void(PointerEvent&& evt)> _onPointerMove;
   ::std::function<void(PointerEvent&& evt)> _onPointerDown;
@@ -1431,6 +1502,7 @@ private:
   // Coordinate system
   bool _useRightHandedSystem;
   // Members
+  bool _forceWireframe;
   bool _forcePointsCloud;
   // Fog
   /**
@@ -1515,7 +1587,7 @@ private:
   AbstractMesh* _pointerOverMesh;
   Sprite* _pointerOverSprite;
   unique_ptr_t<DebugLayer> _debugLayer;
-  unique_ptr_t<DepthRenderer> _depthRenderer;
+  unordered_map_t<string_t, unique_ptr_t<DepthRenderer>> _depthRenderer;
   shared_ptr_t<GeometryBufferRenderer> _geometryBufferRenderer;
   AbstractMesh* _pickedDownMesh;
   AbstractMesh* _pickedUpMesh;
