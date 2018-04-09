@@ -6,6 +6,7 @@
 #include <babylon/core/structs.h>
 #include <babylon/core/variant.h>
 #include <babylon/culling/octrees/octree.h>
+#include <babylon/events/pointer_event_types.h>
 #include <babylon/events/pointer_info.h>
 #include <babylon/events/pointer_info_pre.h>
 #include <babylon/interfaces/idisposable.h>
@@ -1235,15 +1236,15 @@ public:
 
   /** Deprecated. Use onPointerObservable instead */
   ::std::function<void(const PointerEvent& evt, const PickingInfo* pickInfo,
-                       unsigned int type)>
+                       PointerEventTypes type)>
     onPointerMove;
   /** Deprecated. Use onPointerObservable instead */
   ::std::function<void(const PointerEvent& evt, const PickingInfo* pickInfo,
-                       unsigned int type)>
+                       PointerEventTypes type)>
     onPointerDown;
   /** Deprecated. Use onPointerObservable instead */
   ::std::function<void(const PointerEvent& evt, const PickingInfo* pickInfo,
-                       unsigned int type)>
+                       PointerEventTypes type)>
     onPointerUp;
   /** Deprecated. Use onPointerObservable instead */
   ::std::function<void(const PointerEvent& evt, const PickingInfo* pickInfo)>

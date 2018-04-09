@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/collisions/picking_info.h>
+#include <babylon/events/pointer_event_types.h>
 #include <babylon/events/pointer_info_base.h>
 
 namespace BABYLON {
@@ -17,9 +18,9 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT PointerInfo : public PointerInfoBase {
 
 public:
-  PointerInfo(unsigned int type, const PointerEvent& event,
+  PointerInfo(PointerEventTypes type, const PointerEvent& event,
               const PickingInfo& pickInfo);
-  PointerInfo(unsigned int type, const MouseWheelEvent& event,
+  PointerInfo(PointerEventTypes type, const MouseWheelEvent& event,
               const PickingInfo& pickInfo);
   ~PointerInfo();
 

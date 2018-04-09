@@ -2,16 +2,18 @@
 
 namespace BABYLON {
 
-PointerInfoPre::PointerInfoPre(unsigned int _type, const PointerEvent& event,
-                               float localX, float localY)
+PointerInfoPre::PointerInfoPre(PointerEventTypes _type,
+                               const PointerEvent& event, float localX,
+                               float localY)
     : PointerInfoBase(_type, event)
     , localPosition{Vector2(localX, localY)}
     , skipOnPointerObservable{false}
 {
 }
 
-PointerInfoPre::PointerInfoPre(unsigned int _type, const MouseWheelEvent& event,
-                               float localX, float localY)
+PointerInfoPre::PointerInfoPre(PointerEventTypes _type,
+                               const MouseWheelEvent& event, float localX,
+                               float localY)
     : PointerInfoBase(_type, event)
     , localPosition{Vector2(localX, localY)}
     , skipOnPointerObservable{false}

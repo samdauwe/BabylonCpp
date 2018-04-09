@@ -51,8 +51,9 @@ void SimpleInteractionHelper::pointerCallback(const PointerInfo& p,
       doSelectorInteraction(p, s);
       break;
     case SIHCurrentAction::Camerator:
-      if (p.type
-          & (PointerEventTypes::POINTERUP | PointerEventTypes::POINTERWHEEL)) {
+      if (static_cast<int>(p.type)
+          & (static_cast<int>(PointerEventTypes::POINTERUP)
+             | (static_cast<int>(PointerEventTypes::POINTERWHEEL)))) {
         if (!_actionStack.empty()) {
           _actionStack.pop_back();
         }

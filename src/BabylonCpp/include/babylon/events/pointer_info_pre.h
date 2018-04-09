@@ -2,6 +2,7 @@
 #define BABYLON_EVENTS_POINTER_INFO_PRE_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/events/pointer_event_types.h>
 #include <babylon/events/pointer_info_base.h>
 
 namespace BABYLON {
@@ -16,10 +17,10 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT PointerInfoPre : public PointerInfoBase {
 
 public:
-  PointerInfoPre(unsigned int type, const PointerEvent& event, float localX,
-                 float localY);
-  PointerInfoPre(unsigned int type, const MouseWheelEvent& event, float localX,
-                 float localY);
+  PointerInfoPre(PointerEventTypes type, const PointerEvent& event,
+                 float localX, float localY);
+  PointerInfoPre(PointerEventTypes type, const MouseWheelEvent& event,
+                 float localX, float localY);
   ~PointerInfoPre();
 
 public:

@@ -277,9 +277,10 @@ void ArcRotateCameraPointersInput::attachControl(ICanvas* canvas,
   };
 
   _observer = camera->getScene()->onPointerObservable.add(
-    _pointerInput,
-    PointerEventTypes::POINTERDOWN | PointerEventTypes::POINTERUP
-      | PointerEventTypes::POINTERMOVE | PointerEventTypes::POINTERDOUBLETAP);
+    _pointerInput, static_cast<int>(PointerEventTypes::POINTERDOWN)
+                     | static_cast<int>(PointerEventTypes::POINTERUP)
+                     | static_cast<int>(PointerEventTypes::POINTERMOVE)
+                     | static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
 
   _onContextMenu = [](PointerEvent&& evt) { evt.preventDefault(); };
 

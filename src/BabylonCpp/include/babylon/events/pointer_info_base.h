@@ -3,18 +3,19 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/core/structs.h>
+#include <babylon/events/pointer_event_types.h>
 
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT PointerInfoBase {
 
 public:
-  PointerInfoBase(unsigned int type, const PointerEvent& event);
-  PointerInfoBase(unsigned int type, const MouseWheelEvent& event);
+  PointerInfoBase(PointerEventTypes type, const PointerEvent& event);
+  PointerInfoBase(PointerEventTypes type, const MouseWheelEvent& event);
   ~PointerInfoBase();
 
 public:
-  unsigned int type;
+  PointerEventTypes type;
   PointerEvent pointerEvent;
   MouseWheelEvent mouseWheelEvent;
 

@@ -165,7 +165,6 @@ class Scene;
 struct KeyboardEventTypes;
 class KeyboardInfo;
 class KeyboardInfoPre;
-struct PointerEventTypes;
 class PointerInfo;
 class PointerInfoBase;
 class PointerInfoPre;

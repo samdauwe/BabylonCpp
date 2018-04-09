@@ -52,7 +52,7 @@ void ArcRotateCameraMouseWheelInput::attachControl(ICanvas* canvas,
   };
 
   _observer = camera->getScene()->onPointerObservable.add(
-    _wheel, PointerEventTypes::POINTERWHEEL);
+    _wheel, static_cast<int>(PointerEventTypes::POINTERWHEEL));
 }
 
 void ArcRotateCameraMouseWheelInput::detachControl(ICanvas* canvas)

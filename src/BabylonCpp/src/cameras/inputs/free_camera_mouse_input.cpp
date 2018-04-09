@@ -130,9 +130,9 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
   };
 
   _observer = camera->getScene()->onPointerObservable.add(
-    _pointerInput,
-    PointerEventTypes::POINTERDOWN | PointerEventTypes::POINTERUP
-      | PointerEventTypes::POINTERMOVE);
+    _pointerInput, static_cast<int>(PointerEventTypes::POINTERDOWN)
+                     | static_cast<int>(PointerEventTypes::POINTERUP)
+                     | static_cast<int>(PointerEventTypes::POINTERMOVE));
 }
 
 void FreeCameraMouseInput::detachControl(ICanvas* canvas)

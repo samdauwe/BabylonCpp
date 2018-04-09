@@ -988,14 +988,14 @@ Scene& Scene::_processPointerUp(const PickingInfo* pickResult,
       if (!clickInfo.hasSwiped()) {
         if (clickInfo.singleClick()
             && onPointerObservable.hasSpecificMask(
-                 PointerEventTypes::POINTERTAP)) {
+                 static_cast<int>(PointerEventTypes::POINTERTAP))) {
           auto type = PointerEventTypes::POINTERTAP;
           auto pi   = new PointerInfo(type, evt, *pickResult);
           onPointerObservable.notifyObservers(pi, static_cast<int>(type));
         }
         if (clickInfo.doubleClick()
             && onPointerObservable.hasSpecificMask(
-                 PointerEventTypes::POINTERDOUBLETAP)) {
+                 static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
           auto type = PointerEventTypes::POINTERDOUBLETAP;
           auto pi   = new PointerInfo(type, evt, *pickResult);
           onPointerObservable.notifyObservers(pi, static_cast<int>(type));
@@ -1760,10 +1760,12 @@ void Scene::_animate()
 void Scene::_registerTargetForLateAnimationBinding(
   RuntimeAnimation* /*runtimeAnimation*/)
 {
+  // TODO Implement
 }
 
 void Scene::_processLateAnimationBindings()
 {
+  // TODO Implement
 }
 
 void Scene::_switchToAlternateCameraConfiguration(bool active)
