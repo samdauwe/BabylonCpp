@@ -1,13 +1,16 @@
 #include <babylon/postprocess/renderpipeline/pipelines/default_rendering_pipeline.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
+#include <babylon/core/logging.h>
 #include <babylon/core/variant.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/postprocess/blur_post_process.h>
+#include <babylon/postprocess/chromatic_aberration_post_process.h>
 #include <babylon/postprocess/depth_of_field_effect.h>
 #include <babylon/postprocess/fxaa_post_process.h>
 #include <babylon/postprocess/highlights_post_process.h>
@@ -15,6 +18,8 @@
 #include <babylon/postprocess/pass_post_process.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_effect.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_pipeline_manager.h>
+#include <babylon/postprocess/sharpen_post_process.h>
+#include <babylon/rendering/depth_renderer.h>
 
 namespace BABYLON {
 
@@ -31,16 +36,52 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
     , imageProcessing{nullptr}
     , finalMerge{nullptr}
     , bloomKernel{64.f}
+    , sharpenEnabled{this, &DefaultRenderingPipeline::get_sharpenEnabled,
+                     &DefaultRenderingPipeline::set_sharpenEnabled}
+    , bloomWeight{this, &DefaultRenderingPipeline::get_bloomWeight,
+                  &DefaultRenderingPipeline::set_bloomWeight}
+    , bloomScale{this, &DefaultRenderingPipeline::get_bloomScale,
+                 &DefaultRenderingPipeline::set_bloomScale}
+    , bloomEnabled{this, &DefaultRenderingPipeline::get_bloomEnabled,
+                   &DefaultRenderingPipeline::set_bloomEnabled}
+    , depthOfFieldEnabled{this,
+                          &DefaultRenderingPipeline::get_depthOfFieldEnabled,
+                          &DefaultRenderingPipeline::set_depthOfFieldEnabled}
+    , depthOfFieldBlurLevel{this,
+                            &DefaultRenderingPipeline::
+                              get_depthOfFieldBlurLevel,
+                            &DefaultRenderingPipeline::
+                              set_depthOfFieldBlurLevel}
+    , fxaaEnabled{this, &DefaultRenderingPipeline::get_fxaaEnabled,
+                  &DefaultRenderingPipeline::set_fxaaEnabled}
+    , msaaEnabled{this, &DefaultRenderingPipeline::get_msaaEnabled,
+                  &DefaultRenderingPipeline::set_msaaEnabled}
+    , imageProcessingEnabled{this,
+                             &DefaultRenderingPipeline::
+                               get_imageProcessingEnabled,
+                             &DefaultRenderingPipeline::
+                               set_imageProcessingEnabled}
+    , chromaticAberrationEnabled{this,
+                                 &DefaultRenderingPipeline::
+                                   get_chromaticAberrationEnabled,
+                                 &DefaultRenderingPipeline::
+                                   set_chromaticAberrationEnabled}
+    , _sharpenEnabled{false}
     , _bloomEnabled{false}
     , _depthOfFieldEnabled{false}
     , _depthOfFieldBlurLevel{DepthOfFieldEffectBlurLevel::Low}
     , _fxaaEnabled{false}
+    , _msaaEnabled{false}
     , _imageProcessingEnabled{true}
     , _bloomScale{0.6f}
+    , _chromaticAberrationEnabled{false}
     , _buildAllowed{automaticBuild}
     , _bloomWeight{0.15f}
+    , _prevPostProcess{nullptr}
+    , _prevPrevPostProcess{nullptr}
 {
-  _cameras = cameras;
+  _cameras         = cameras;
+  _originalCameras = stl_util::extract_values(_cameras);
 
   // Initialize
   _scene           = scene;
@@ -63,6 +104,30 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
   // Attach
   scene->postProcessRenderPipelineManager()->addPipeline(this);
 
+  auto engine = _scene->getEngine();
+  // Create post processes before hand so they can be modified before enabled.
+  // Block compilation flag is set to true to avoid compilation prior to use,
+  // these will be updated on first use in build pipeline.
+  sharpen = new SharpenPostProcess(
+    "sharpen", ToVariant<float, PostProcessOptions>(1.f), nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, engine, false,
+    _defaultPipelineTextureType, true);
+  _sharpenEffect = new PostProcessRenderEffect(
+    engine, SharpenPostProcessId,
+    [this]() -> vector_t<PostProcess*> { return {sharpen}; }, true);
+
+  depthOfField = new DepthOfFieldEffect(_scene, nullptr, _depthOfFieldBlurLevel,
+                                        _defaultPipelineTextureType, true);
+
+  chromaticAberration = new ChromaticAberrationPostProcess(
+    "ChromaticAberration", engine->getRenderWidth(), engine->getRenderHeight(),
+    ToVariant<float, PostProcessOptions>(1.f), nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, engine, false,
+    _defaultPipelineTextureType, true);
+  _chromaticAberrationEffect = new PostProcessRenderEffect(
+    engine, ChromaticAberrationPostProcessId,
+    [this]() -> vector_t<PostProcess*> { return {chromaticAberration}; }, true);
+
   _buildPipeline();
 }
 
@@ -70,7 +135,22 @@ DefaultRenderingPipeline::~DefaultRenderingPipeline()
 {
 }
 
-void DefaultRenderingPipeline::setBloomWeight(float value)
+void DefaultRenderingPipeline::set_sharpenEnabled(bool enabled)
+{
+  if (_sharpenEnabled == enabled) {
+    return;
+  }
+  _sharpenEnabled = enabled;
+
+  _buildPipeline();
+}
+
+bool DefaultRenderingPipeline::get_sharpenEnabled() const
+{
+  return _sharpenEnabled;
+}
+
+void DefaultRenderingPipeline::set_bloomWeight(float value)
 {
   if (stl_util::almost_equal(_bloomWeight, value)) {
     return;
@@ -82,12 +162,12 @@ void DefaultRenderingPipeline::setBloomWeight(float value)
   }
 }
 
-float DefaultRenderingPipeline::bloomWeight() const
+float DefaultRenderingPipeline::get_bloomWeight() const
 {
   return _bloomWeight;
 }
 
-void DefaultRenderingPipeline::setBloomScale(float value)
+void DefaultRenderingPipeline::set_bloomScale(float value)
 {
   if (stl_util::almost_equal(_bloomScale, value)) {
     return;
@@ -97,12 +177,12 @@ void DefaultRenderingPipeline::setBloomScale(float value)
   _buildPipeline();
 }
 
-float DefaultRenderingPipeline::bloomScale() const
+float DefaultRenderingPipeline::get_bloomScale() const
 {
   return _bloomScale;
 }
 
-void DefaultRenderingPipeline::setBloomEnabled(bool enabled)
+void DefaultRenderingPipeline::set_bloomEnabled(bool enabled)
 {
   if (_bloomEnabled == enabled) {
     return;
@@ -112,17 +192,17 @@ void DefaultRenderingPipeline::setBloomEnabled(bool enabled)
   _buildPipeline();
 }
 
-bool DefaultRenderingPipeline::bloomEnabled() const
+bool DefaultRenderingPipeline::get_bloomEnabled() const
 {
   return _bloomEnabled;
 }
 
-bool DefaultRenderingPipeline::depthOfFieldEnabled() const
+bool DefaultRenderingPipeline::get_depthOfFieldEnabled() const
 {
   return _depthOfFieldEnabled;
 }
 
-void DefaultRenderingPipeline::setDepthOfFieldEnabled(bool enabled)
+void DefaultRenderingPipeline::set_depthOfFieldEnabled(bool enabled)
 {
   if (_depthOfFieldEnabled == enabled) {
     return;
@@ -132,24 +212,38 @@ void DefaultRenderingPipeline::setDepthOfFieldEnabled(bool enabled)
   _buildPipeline();
 }
 
-DepthOfFieldEffectBlurLevel
-DefaultRenderingPipeline::depthOfFieldBlurLevel() const
+DepthOfFieldEffectBlurLevel&
+DefaultRenderingPipeline::get_depthOfFieldBlurLevel()
 {
   return _depthOfFieldBlurLevel;
 }
 
-void DefaultRenderingPipeline::setDepthOfFieldBlurLevel(
-  DepthOfFieldEffectBlurLevel value)
+void DefaultRenderingPipeline::set_depthOfFieldBlurLevel(
+  const DepthOfFieldEffectBlurLevel& value)
 {
   if (_depthOfFieldBlurLevel == value) {
     return;
   }
   _depthOfFieldBlurLevel = value;
 
+  // recreate dof and dispose old as this setting is not dynamic
+  auto oldDof = depthOfField;
+
+  depthOfField = new DepthOfFieldEffect(_scene, nullptr, _depthOfFieldBlurLevel,
+                                        _defaultPipelineTextureType);
+  depthOfField->setFocalLength(oldDof->focalLength());
+  depthOfField->setFocusDistance(oldDof->focusDistance());
+  depthOfField->setFStop(oldDof->fStop());
+  depthOfField->setLensSize(oldDof->lensSize());
+
+  for (auto& camera : _cameras) {
+    oldDof->disposeEffects(camera.second);
+  }
+
   _buildPipeline();
 }
 
-void DefaultRenderingPipeline::setFxaaEnabled(bool enabled)
+void DefaultRenderingPipeline::set_fxaaEnabled(bool enabled)
 {
   if (_fxaaEnabled == enabled) {
     return;
@@ -159,12 +253,27 @@ void DefaultRenderingPipeline::setFxaaEnabled(bool enabled)
   _buildPipeline();
 }
 
-bool DefaultRenderingPipeline::fxaaEnabled() const
+bool DefaultRenderingPipeline::get_fxaaEnabled() const
 {
   return _fxaaEnabled;
 }
 
-void DefaultRenderingPipeline::setImageProcessingEnabled(bool enabled)
+void DefaultRenderingPipeline::set_msaaEnabled(bool enabled)
+{
+  if (_msaaEnabled == enabled) {
+    return;
+  }
+  _msaaEnabled = enabled;
+
+  _buildPipeline();
+}
+
+bool DefaultRenderingPipeline::get_msaaEnabled() const
+{
+  return _msaaEnabled;
+}
+
+void DefaultRenderingPipeline::set_imageProcessingEnabled(bool enabled)
 {
   if (_imageProcessingEnabled == enabled) {
     return;
@@ -174,9 +283,24 @@ void DefaultRenderingPipeline::setImageProcessingEnabled(bool enabled)
   _buildPipeline();
 }
 
-bool DefaultRenderingPipeline::imageProcessingEnabled() const
+bool DefaultRenderingPipeline::get_imageProcessingEnabled() const
 {
   return _imageProcessingEnabled;
+}
+
+void DefaultRenderingPipeline::set_chromaticAberrationEnabled(bool enabled)
+{
+  if (_chromaticAberrationEnabled == enabled) {
+    return;
+  }
+  _chromaticAberrationEnabled = enabled;
+
+  _buildPipeline();
+}
+
+bool DefaultRenderingPipeline::get_chromaticAberrationEnabled() const
+{
+  return _chromaticAberrationEnabled;
 }
 
 void DefaultRenderingPipeline::prepare()
@@ -185,6 +309,31 @@ void DefaultRenderingPipeline::prepare()
   _buildAllowed      = true;
   _buildPipeline();
   _buildAllowed = previousState;
+}
+
+void DefaultRenderingPipeline::_setAutoClearAndTextureSharing(
+  PostProcess* postProcess, bool skipTextureSharing)
+{
+  if (_prevPostProcess && _prevPostProcess->autoClear) {
+    postProcess->autoClear = false;
+  }
+  else {
+    postProcess->autoClear = true;
+  }
+
+  if (!skipTextureSharing) {
+    if (_prevPrevPostProcess) {
+      postProcess->shareOutputWith(_prevPrevPostProcess);
+    }
+    else {
+      postProcess->useOwnOutput();
+    }
+
+    if (_prevPostProcess) {
+      _prevPrevPostProcess = _prevPostProcess;
+    }
+    _prevPostProcess = postProcess;
+  }
 }
 
 void DefaultRenderingPipeline::_buildPipeline()
@@ -196,18 +345,44 @@ void DefaultRenderingPipeline::_buildPipeline()
   auto engine = _scene->getEngine();
 
   _disposePostProcesses();
+  if (!_cameras.empty()) {
+    _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(
+      _name, stl_util::extract_values(_cameras));
+    // get back cameras to be used to reattach pipeline
+    _cameras.clear();
+    for (auto& camera : _originalCameras) {
+      _cameras[camera->name] = camera;
+    }
+  }
   _reset();
+  _prevPostProcess     = nullptr;
+  _prevPrevPostProcess = nullptr;
 
-  if (depthOfFieldEnabled()) {
-    /*depthOfField = new DepthOfFieldEffect(_scene, _depthOfFieldBlurLevel,
-                                          _defaultPipelineTextureType);
-    addEffect(depthOfField);*/
+  if (sharpenEnabled) {
+    if (!sharpen->isReady()) {
+      sharpen->updateEffect();
+    }
+    addEffect(_sharpenEffect);
+    _setAutoClearAndTextureSharing(sharpen);
+  }
+
+  if (depthOfFieldEnabled) {
+    // TODO use indexing instead of "0"
+    auto depthTexture
+      = _scene->enableDepthRenderer(_cameras["0"])->getDepthMap();
+    depthOfField->setDepthTexture(depthTexture);
+    if (!depthOfField->_isReady()) {
+      depthOfField->_updateEffects();
+    }
+    addEffect(depthOfField);
+    // _setAutoClearAndTextureSharing(depthOfField->_depthOfFieldMerge);
   }
 
   if (bloomEnabled()) {
     pass = new PassPostProcess("sceneRenderTarget", 1.0, nullptr,
                                TextureConstants::BILINEAR_SAMPLINGMODE, engine,
                                false, _defaultPipelineTextureType);
+    _setAutoClearAndTextureSharing(pass, true);
     addEffect(new PostProcessRenderEffect(
       engine, PassPostProcessId,
       [&]() -> vector_t<PostProcess*> { return {pass}; }, true));
@@ -290,17 +465,7 @@ void DefaultRenderingPipeline::_buildPipeline()
     }
   }
 
-  if (fxaaEnabled()) {
-    fxaa = new FxaaPostProcess("fxaa", 1.0, nullptr,
-                               TextureConstants::BILINEAR_SAMPLINGMODE, engine,
-                               false, _defaultPipelineTextureType);
-    addEffect(new PostProcessRenderEffect(
-      engine, FxaaPostProcessId,
-      [&]() -> vector_t<PostProcess*> { return {fxaa}; }, true));
-
-    fxaa->autoClear = !bloomEnabled() && (!_hdr || !imageProcessing);
-  }
-  else if (_hdr && imageProcessing) {
+  if (_hdr && imageProcessing) {
     finalMerge = imageProcessing;
   }
   else {
@@ -310,6 +475,8 @@ void DefaultRenderingPipeline::_buildPipeline()
     addEffect(new PostProcessRenderEffect(
       engine, FinalMergePostProcessId,
       [&]() -> vector_t<PostProcess*> { return {finalMerge}; }, true));
+
+    _setAutoClearAndTextureSharing(finalMerge, true);
 
     finalMerge->autoClear = !bloomEnabled() && (!_hdr || !imageProcessing);
   }
@@ -321,30 +488,48 @@ void DefaultRenderingPipeline::_buildPipeline()
         imageProcessing->shareOutputWith(pass);
         imageProcessing->autoClear = false;
       }
-      else if (fxaa) {
-        fxaa->shareOutputWith(pass);
-      }
       else {
         finalMerge->shareOutputWith(pass);
       }
     }
     else {
-      if (fxaa) {
-        fxaa->shareOutputWith(pass);
-      }
-      else {
-        finalMerge->shareOutputWith(pass);
-      }
+      finalMerge->shareOutputWith(pass);
     }
+  }
+
+  if (fxaaEnabled) {
+    fxaa = new FxaaPostProcess("fxaa", 1.f, nullptr,
+                               TextureConstants::BILINEAR_SAMPLINGMODE, engine,
+                               false, _defaultPipelineTextureType);
+    addEffect(new PostProcessRenderEffect(
+      engine, FxaaPostProcessId,
+      [this]() -> vector_t<PostProcess*> { return {fxaa}; }, true));
+    _setAutoClearAndTextureSharing(fxaa);
+  }
+
+  if (chromaticAberrationEnabled) {
+    if (!chromaticAberration->isReady()) {
+      chromaticAberration->updateEffect();
+    }
+    addEffect(_chromaticAberrationEffect);
+    _setAutoClearAndTextureSharing(chromaticAberration);
   }
 
   if (!_cameras.empty()) {
     _scene->postProcessRenderPipelineManager()->attachCamerasToRenderPipeline(
       _name, stl_util::extract_values(_cameras));
   }
+
+  if (msaaEnabled) {
+    if (!_enableMSAAOnFirstPostProcess()) {
+      BABYLON_LOG_WARN("DefaultRenderingPipeline",
+                       "MSAA failed to enable, MSAA is only supported in "
+                       "browsers that support webGL >= 2.0");
+    }
+  }
 }
 
-void DefaultRenderingPipeline::_disposePostProcesses()
+void DefaultRenderingPipeline::_disposePostProcesses(bool disposeNonRecreated)
 {
   for (auto& item : _cameras) {
     auto camera = item.second;
@@ -381,8 +566,20 @@ void DefaultRenderingPipeline::_disposePostProcesses()
       finalMerge->dispose(camera);
     }
 
-    if (depthOfField) {
-      depthOfField->disposeEffects(camera);
+    // These are created in the constructor and should not be disposed on every
+    // pipeline change
+    if (disposeNonRecreated) {
+      if (sharpen) {
+        sharpen->dispose(camera);
+      }
+
+      if (depthOfField) {
+        depthOfField->disposeEffects(camera);
+      }
+
+      if (chromaticAberration) {
+        chromaticAberration->dispose(camera);
+      }
     }
   }
 
@@ -395,12 +592,18 @@ void DefaultRenderingPipeline::_disposePostProcesses()
   fxaa            = nullptr;
   finalMerge      = nullptr;
   depthOfField    = nullptr;
+
+  if (disposeNonRecreated) {
+    sharpen             = nullptr;
+    depthOfField        = nullptr;
+    chromaticAberration = nullptr;
+  }
 }
 
 void DefaultRenderingPipeline::dispose(bool /*doNotRecurse*/,
                                        bool /*disposeMaterialAndTextures*/)
 {
-  _disposePostProcesses();
+  _disposePostProcesses(true);
 
   _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(
     _name, getCameras());

@@ -18,6 +18,11 @@ class BABYLON_SHARED_EXPORT DefaultRenderingPipeline
 
 public:
   /**
+   * ID of the sharpen post process,
+   */
+  static constexpr const char* SharpenPostProcessId
+    = "SharpenPostProcessEffect";
+  /**
    * ID of the pass post process used for bloom,
    */
   static constexpr const char* PassPostProcessId = "PassPostProcessEffect";
@@ -53,6 +58,11 @@ public:
    */
   static constexpr const char* FinalMergePostProcessId
     = "FinalMergePostProcessEffect";
+  /**
+   * ID of the chromatic aberration post process,
+   */
+  static constexpr const char* ChromaticAberrationPostProcessId
+    = "ChromaticAberrationPostProcessEffect";
 
 public:
   /**
@@ -79,49 +89,6 @@ public:
   void prepare();
 
   /**
-   * @brief The strength of the bloom.
-   */
-  void setBloomWeight(float value);
-  float bloomWeight() const;
-
-  /**
-   * @brief The scale of the bloom, lower value will provide better performance.
-   */
-  void setBloomScale(float value);
-  float bloomScale() const;
-
-  /**
-   * @brief Enable or disable the bloom from the pipeline.
-   */
-  void setBloomEnabled(bool enabled);
-  bool bloomEnabled() const;
-
-  /**
-   * @brief If the depth of field is enabled.
-   */
-  void setDepthOfFieldEnabled(bool enabled);
-  bool depthOfFieldEnabled() const;
-
-  /**
-   * @brief Blur level of the depth of field effect. (Higher blur will effect
-   * performance).
-   */
-  DepthOfFieldEffectBlurLevel depthOfFieldBlurLevel() const;
-  void setDepthOfFieldBlurLevel(DepthOfFieldEffectBlurLevel value);
-
-  /**
-   * @brief If the anti aliasing is enabled.
-   */
-  void setFxaaEnabled(bool enabled);
-  bool fxaaEnabled() const;
-
-  /**
-   * @brief If image processing is enabled.
-   */
-  void setImageProcessingEnabled(bool enabled);
-  bool imageProcessingEnabled() const;
-
-  /**
    * @brief Dispose of the pipeline and stop all post processes.
    */
   void dispose(bool doNotRecurse               = false,
@@ -144,11 +111,79 @@ public:
   Parse(const Json::value& source, Scene* scene, const string_t& rootUrl);
 
 private:
+  /**
+   * @brief Enable or disable the sharpen process from the pipeline.
+   */
+  void set_sharpenEnabled(bool enabled);
+  bool get_sharpenEnabled() const;
+
+  /**
+   * @brief The strength of the bloom.
+   */
+  void set_bloomWeight(float value);
+  float get_bloomWeight() const;
+
+  /**
+   * @brief The scale of the bloom, lower value will provide better performance.
+   */
+  void set_bloomScale(float value);
+  float get_bloomScale() const;
+
+  /**
+   * @brief Enable or disable the bloom from the pipeline.
+   */
+  void set_bloomEnabled(bool enabled);
+  bool get_bloomEnabled() const;
+
+  /**
+   * @brief If the depth of field is enabled.
+   */
+  void set_depthOfFieldEnabled(bool enabled);
+  bool get_depthOfFieldEnabled() const;
+
+  /**
+   * @brief Blur level of the depth of field effect. (Higher blur will effect
+   * performance).
+   */
+  DepthOfFieldEffectBlurLevel& get_depthOfFieldBlurLevel();
+  void set_depthOfFieldBlurLevel(const DepthOfFieldEffectBlurLevel& value);
+
+  /**
+   * @brief If the anti aliasing is enabled.
+   */
+  void set_fxaaEnabled(bool enabled);
+  bool get_fxaaEnabled() const;
+
+  /**
+   * @brief If the multisample anti-aliasing is enabled.
+   */
+  void set_msaaEnabled(bool enabled);
+  bool get_msaaEnabled() const;
+
+  /**
+   * @brief If image processing is enabled.
+   */
+  void set_imageProcessingEnabled(bool enabled);
+  bool get_imageProcessingEnabled() const;
+
+  /**
+   * @brief Enable or disable the chromaticAberration process from the pipeline.
+   */
+  void set_chromaticAberrationEnabled(bool enabled);
+  bool get_chromaticAberrationEnabled() const;
+
+  void _setAutoClearAndTextureSharing(PostProcess* postProcess,
+                                      bool skipTextureSharing = false);
   void _buildPipeline();
-  void _disposePostProcesses();
+  void _disposePostProcesses(bool disposeNonRecreated = false);
 
 public:
   // Post-processes
+  /**
+   * Sharpen post process which will apply a sharpen convolution to enhance
+   * edges
+   */
+  SharpenPostProcess* sharpen;
   /**
    * First pass of bloom to capture the original image texture for later use.
    */
@@ -194,6 +229,11 @@ public:
   PostProcess* finalMerge; // PassPostProcess
 
   /**
+   * Chromatic aberration post process which will shift rgb colors in the image
+   */
+  ChromaticAberrationPostProcess* chromaticAberration;
+
+  /**
    * Animations which can be used to tweak settings over a period of time
    */
   vector_t<Animation*> animations;
@@ -204,14 +244,74 @@ public:
    */
   float bloomKernel;
 
+  /**
+   * Enable or disable the sharpen process from the pipeline
+   */
+  Property<DefaultRenderingPipeline, bool> sharpenEnabled;
+
+  /**
+   * The strength of the bloom.
+   */
+  Property<DefaultRenderingPipeline, float> bloomWeight;
+
+  /**
+   * The scale of the bloom, lower value will provide better performance.
+   */
+  Property<DefaultRenderingPipeline, float> bloomScale;
+
+  /**
+   * Enable or disable the bloom from the pipeline.
+   */
+  Property<DefaultRenderingPipeline, bool> bloomEnabled;
+
+  /**
+   * If the depth of field is enabled.
+   */
+  Property<DefaultRenderingPipeline, bool> depthOfFieldEnabled;
+
+  /**
+   * Blur level of the depth of field effect. (Higher blur will effect
+   * performance).
+   */
+  Property<DefaultRenderingPipeline, DepthOfFieldEffectBlurLevel>
+    depthOfFieldBlurLevel;
+
+  /**
+   * If the anti aliasing is enabled.
+   */
+  Property<DefaultRenderingPipeline, bool> fxaaEnabled;
+
+  /**
+   * If the multisample anti-aliasing is enabled.
+   */
+  Property<DefaultRenderingPipeline, bool> msaaEnabled;
+
+  /**
+   * If image processing is enabled.
+   */
+  Property<DefaultRenderingPipeline, bool> imageProcessingEnabled;
+
+  /**
+   * Enable or disable the chromaticAberration process from the pipeline
+   */
+  Property<DefaultRenderingPipeline, bool> chromaticAberrationEnabled;
+
 private:
+  // Post-processes
+  PostProcessRenderEffect* _sharpenEffect;
+  PostProcessRenderEffect* _chromaticAberrationEffect;
+
+  // Values
+  bool _sharpenEnabled;
   bool _bloomEnabled;
   bool _depthOfFieldEnabled;
   DepthOfFieldEffectBlurLevel _depthOfFieldBlurLevel;
   bool _fxaaEnabled;
+  bool _msaaEnabled;
   bool _imageProcessingEnabled;
   unsigned int _defaultPipelineTextureType;
   float _bloomScale;
+  bool _chromaticAberrationEnabled;
   bool _buildAllowed;
 
   /**
@@ -221,6 +321,10 @@ private:
 
   bool _hdr;
   Scene* _scene;
+  vector_t<Camera*> _originalCameras;
+
+  PostProcess* _prevPostProcess;
+  PostProcess* _prevPrevPostProcess;
 
 }; // end of class SSAORenderingPipeline
 
