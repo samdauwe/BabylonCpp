@@ -174,7 +174,7 @@ void Animatable::goToFrame(int frame)
 {
   if (!_runtimeAnimations.empty() && _runtimeAnimations[0]) {
     auto fps          = _runtimeAnimations[0]->animation()->framePerSecond;
-    auto currentFrame = _runtimeAnimations[0]->currentFrame;
+    auto currentFrame = _runtimeAnimations[0]->currentFrame();
     auto adjustTime   = frame - currentFrame;
     auto delay        = static_cast<float>(adjustTime) * 1000.f
                  / (static_cast<float>(fps) * speedRatio);

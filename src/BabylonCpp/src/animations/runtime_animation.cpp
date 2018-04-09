@@ -8,18 +8,61 @@
 namespace BABYLON {
 
 RuntimeAnimation::RuntimeAnimation(IAnimatable* target, Animation* animation,
-                                   Scene* /*scene*/, Animatable* /*host*/)
-    : _animation{animation}
+                                   Scene* scene, Animatable* host)
+    : currentFrame{this, &RuntimeAnimation::get_currentFrame}
+    , weight{this, &RuntimeAnimation::get_weight}
+    , originalValue{this, &RuntimeAnimation::get_originalValue}
+    , currentValue{this, &RuntimeAnimation::get_currentValue}
+    , targetPath{this, &RuntimeAnimation::get_targetPath}
+    , target{this, &RuntimeAnimation::get_target}
+    , _currentFrame{0}
+    , _animation{animation}
     , _target{target}
+    , _host{host}
     , _stopped{false}
-    , _blendingFactor{0}
+    , _blendingFactor{0.f}
+    , _scene{scene}
+    , _targetPath{""}
+    , _weight{1.f}
     , _ratioOffset{0.f}
+    , _previousDelay{millisecond_t{0}}
+    , _previousRatio{0.f}
 {
   animation->_runtimeAnimations.emplace_back(this);
 }
 
 RuntimeAnimation::~RuntimeAnimation()
 {
+}
+
+int RuntimeAnimation::get_currentFrame() const
+{
+  return _currentFrame;
+}
+
+float RuntimeAnimation::get_weight() const
+{
+  return _weight;
+}
+
+Nullable<AnimationValue>& RuntimeAnimation::get_originalValue()
+{
+  return _originalValue;
+}
+
+Nullable<AnimationValue>& RuntimeAnimation::get_currentValue()
+{
+  return _currentValue;
+}
+
+string_t RuntimeAnimation::get_targetPath() const
+{
+  return _targetPath;
+}
+
+IAnimatable*& RuntimeAnimation::get_target()
+{
+  return _activeTarget;
 }
 
 Animation* RuntimeAnimation::animation()
@@ -31,9 +74,9 @@ void RuntimeAnimation::reset()
 {
   _offsetsCache.clear();
   _highLimitsCache.clear();
-  currentFrame        = 0;
-  _blendingFactor     = 0;
-  _originalBlendValue = 0.f;
+  _currentFrame   = 0;
+  _blendingFactor = 0;
+  _originalValue  = nullptr;
 }
 
 bool RuntimeAnimation::isStopped() const
@@ -62,7 +105,7 @@ AnimationValue RuntimeAnimation::_interpolate(
     return highLimitValue.copy();
   }
 
-  currentFrame      = iCurrentFrame;
+  _currentFrame     = iCurrentFrame;
   auto _repeatCount = static_cast<float>(repeatCount);
 
   auto& keys = _animation->getKeys();
@@ -72,14 +115,14 @@ AnimationValue RuntimeAnimation::_interpolate(
   int startKeyIndex = ::std::max(
     0, ::std::min(_keysLength - 1,
                   static_cast<int>(
-                    ::std::floor(_keysLength * (currentFrame - keys[0].frame)
+                    ::std::floor(_keysLength * (_currentFrame - keys[0].frame)
                                  / (keys.back().frame - keys[0].frame))
                     - 1)));
 
-  if (keys[static_cast<unsigned int>(startKeyIndex)].frame >= currentFrame) {
+  if (keys[static_cast<unsigned int>(startKeyIndex)].frame >= _currentFrame) {
     while (startKeyIndex - 1 >= 0
            && keys[static_cast<unsigned int>(startKeyIndex)].frame
-                >= currentFrame) {
+                >= _currentFrame) {
       --startKeyIndex;
     }
   }
@@ -88,7 +131,7 @@ AnimationValue RuntimeAnimation::_interpolate(
        ++key) {
     const auto& endKey = keys[key + 1];
 
-    if (endKey.frame >= currentFrame) {
+    if (endKey.frame >= _currentFrame) {
 
       const auto& startKey  = keys[key];
       const auto startValue = _getKeyValue(startKey.value);
@@ -104,7 +147,7 @@ AnimationValue RuntimeAnimation::_interpolate(
       // gradient : percent of currentFrame between the frame inf and the frame
       // sup
       float gradient
-        = static_cast<float>(currentFrame - startKey.frame) / frameDelta;
+        = static_cast<float>(_currentFrame - startKey.frame) / frameDelta;
 
       // check for easingFunction and correction of gradient
       auto easingFunction = _animation->getEasingFunction();
@@ -276,8 +319,8 @@ AnimationValue RuntimeAnimation::_interpolate(
   return _getKeyValue(keys.back().value);
 }
 
-void RuntimeAnimation::setValue(const AnimationValue& currentValue,
-                                bool /*blend*/)
+void RuntimeAnimation::setValue(const AnimationValue& /*currentValue*/,
+                                float weight)
 {
   // Set value
   string_t path;
@@ -300,13 +343,14 @@ void RuntimeAnimation::setValue(const AnimationValue& currentValue,
     destination = _target;
   }
 
-  // Blending
-  if (_animation->enableBlending && _blendingFactor <= 1.f) {
-  }
-  else {
-    any newValue = currentValue.getValue();
-    _target->setProperty(destination, path, newValue);
-  }
+  _targetPath   = path;
+  _activeTarget = destination;
+  _weight       = weight;
+}
+
+Nullable<unsigned int> RuntimeAnimation::_getCorrectLoopMode() const
+{
+  return 0u;
 }
 
 void RuntimeAnimation::goToFrame(int frame)
@@ -478,9 +522,9 @@ bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
     // Make sure current frame has passed event frame and that event frame is
     // within the current range
     // Also, handle both forward and reverse animations
-    if ((range > 0 && currentFrame >= events[index].frame
+    if ((range > 0 && _currentFrame >= events[index].frame
          && events[index].frame >= from)
-        || (range < 0 && currentFrame <= events[index].frame
+        || (range < 0 && _currentFrame <= events[index].frame
             && events[index].frame <= from)) {
       AnimationEvent& event = events[index];
       if (!event.isDone) {
