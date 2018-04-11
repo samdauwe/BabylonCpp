@@ -13,7 +13,7 @@
 #include <imgui.h>
 
 // ImGui GL2
-#include <babylon/imgui/imgui_impl_glfw_gl2.h>
+#include <examples/opengl2_example/imgui_impl_glfw_gl2.h>
 
 // ImGUI bindings and utils
 #include <babylon/imgui/icons_font_awesome.h>

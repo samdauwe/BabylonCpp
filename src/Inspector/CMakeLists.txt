@@ -68,9 +68,7 @@ file(GLOB_RECURSE INSPECTOR_HDR_FILES   ${INCLUDE_PATH}/*.h)
 
 set(BABYLON_INSPECTOR_HEADERS
     ${INSPECTOR_HDR_FILES}
-    ${IMGUI_SOURCE_DIRS}/imgui.cpp
-    ${IMGUI_SOURCE_DIRS}/imgui_draw.cpp
-    ${IMGUI_SOURCE_DIRS}/imgui_demo.cpp
+    ${IMGUI_INCLUDE_DIRS}/examples/opengl2_example/imgui_impl_glfw_gl2.h
 )
 
 # Source files
@@ -80,6 +78,8 @@ set(BABYLON_INSPECTOR_SOURCES
     ${INSPECTOR_SRC_FILES}
     ${IMGUI_SOURCE_DIRS}/imgui.cpp
     ${IMGUI_SOURCE_DIRS}/imgui_draw.cpp
+    ${IMGUI_SOURCE_DIRS}/imgui_demo.cpp
+    ${IMGUI_SOURCE_DIRS}/examples/opengl2_example/imgui_impl_glfw_gl2.cpp
 )
 
 # Group source files
