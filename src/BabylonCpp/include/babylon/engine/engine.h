@@ -467,6 +467,18 @@ public:
                             = EngineConstants::TEXTUREFORMAT_RGBA);
 
   /**
+   *@brief Updates a depth texture Comparison Mode and Function.
+   * If the comparison Function is equal to 0, the mode will be set to none.
+   * Otherwise, this only works in webgl 2 and requires a shadow sampler in the
+   *shader.
+   * @param texture The texture to set the comparison function for
+   * @param comparisonFunction The comparison function to set, 0 if no
+   *comparison required
+   */
+  void updateTextureComparisonFunction(InternalTexture* texture,
+                                       int comparisonFunction);
+
+  /**
    * @brief Creates a depth stencil texture.
    * This is only available in WebGL 2 or with the depth texture extension
    * available.
@@ -474,8 +486,8 @@ public:
    * @param options The options defining the texture.
    * @returns The texture
    */
-  InternalTexture*
-  createDepthStencilTexture(const Variant<int, ISize> size,
+  unique_ptr_t<InternalTexture>
+  createDepthStencilTexture(const Variant<int, ISize>& size,
                             const DepthTextureCreationOptions& options);
 
   /**
@@ -561,6 +573,13 @@ public:
   void setTextureFromPostProcessOutput(int channel, PostProcess* postProcess);
 
   void unbindAllTextures();
+
+  /**
+   * @brief Sets a texture to the according uniform.
+   * @param channel The texture channel
+   * @param uniform The uniform to set
+   * @param texture The texture to apply
+   */
   void setTexture(int channel, GL::IGLUniformLocation* uniform,
                   BaseTexture* texture);
 
@@ -604,7 +623,8 @@ public:
   ArrayBufferView _readTexturePixels(InternalTexture* texture, int width,
                                      int height, int faceIndex = -1);
   GL::GLenum _getWebGLTextureType(unsigned int type) const;
-  GL::GLenum _getRGBABufferInternalSizedFormat(unsigned int type) const;
+  GL::GLenum _getRGBABufferInternalSizedFormat(
+    unsigned int type, const Nullable<unsigned int>& format = nullptr) const;
   GL::GLenum _getRGBAMultiSampleBufferFormat(unsigned int type) const;
 
   /** Occlusion Queries **/
@@ -706,8 +726,35 @@ private:
   void _rescaleTexture(InternalTexture* source, InternalTexture* destination,
                        Scene* scene, unsigned int internalFormat,
                        const ::std::function<void()>& onComplete);
-  GL::GLenum _getInternalFormat(unsigned int format) const;
-  unsigned int DrawMode(unsigned int fillMode);
+  void _setupDepthStencilTexture(InternalTexture* internalTexture,
+                                 const Variant<int, ISize>& size,
+                                 bool generateStencil, bool bilinearFiltering,
+                                 int comparisonFunction);
+
+  /**
+   * @brief Creates a depth stencil texture.
+   * This is only available in WebGL 2 or with the depth texture extension
+   * available.
+   * @param size The size of face edge in the texture.
+   * @param options The options defining the texture.
+   * @returns The texture
+   */
+  unique_ptr_t<InternalTexture>
+  _createDepthStencilTexture(const Variant<int, ISize>& size,
+                             const DepthTextureCreationOptions& options);
+
+  /**
+   * @brief Creates a depth stencil cube texture.
+   * This is only available in WebGL 2.
+   * @param size The size of face edge in the cube texture.
+   * @param options The options defining the cube texture.
+   * @returns The cube texture
+   */
+  unique_ptr_t<InternalTexture>
+  _createDepthStencilCubeTexture(int size,
+                                 const DepthTextureCreationOptions& options);
+
+  unsigned int _drawMode(unsigned int fillMode);
   GLProgramPtr
   _createShaderProgram(const unique_ptr_t<GL::IGLShader>& vertexShader,
                        const unique_ptr_t<GL::IGLShader>& fragmentShader,
@@ -741,6 +788,7 @@ private:
   bool _canRenderToFloatFramebuffer();
   bool _canRenderToHalfFloatFramebuffer();
   bool _canRenderToFramebuffer(unsigned int type);
+  GL::GLenum _getInternalFormat(unsigned int format) const;
 
   /** Occlusion Queries **/
   unsigned int getGlAlgorithmType(unsigned int algorithmType) const;
@@ -934,6 +982,7 @@ private:
   ICanvasRenderingContext2D* _workingContext;
   unique_ptr_t<PassPostProcess> _rescalePostProcess;
   unique_ptr_t<GL::IGLFramebuffer> _dummyFramebuffer;
+  ::std::function<void()> _bindedRenderFunction;
   bool _vaoRecordInProgress;
   bool _mustWipeVertexAttributes;
   InternalTexture* _emptyTexture;

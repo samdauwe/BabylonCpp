@@ -6,6 +6,7 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/material.h>
+#include <babylon/materials/textures/internal_texture.h>
 #include <babylon/math/matrix.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
@@ -557,7 +558,7 @@ void RenderTargetTexture::renderToTarget(
       }
       engine->bindFramebuffer(
         _texture, faceIndexVal, nullptr, nullptr, ignoreCameraViewport,
-        depthStencilTexture ? depthStencilTexture : nullptr);
+        depthStencilTexture ? depthStencilTexture.get() : nullptr);
     }
   }
 

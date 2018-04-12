@@ -196,7 +196,11 @@ enum GLEnums : GLenum {
   UNSIGNED_SHORT_4_4_4_4 = 0x8033,
   UNSIGNED_SHORT_5_5_5_1 = 0x8034,
   UNSIGNED_SHORT_5_6_5   = 0x8363,
-  /* Uniform Buffers*/
+  /* Color schemes */
+  RGBA32F = 0x8814,
+  RGB32F  = 0x8815,
+  RGBA16F = 0x881A,
+  /* Uniform Buffers */
   UNIFORM_BUFFER = 0x8A11,
   /* Shaders */
   FRAGMENT_SHADER                  = 0x8B30,
@@ -356,8 +360,10 @@ enum GLEnums : GLenum {
   DEPTH_COMPONENT16                            = 0x81A5,
   DEPTH_COMPONENT24                            = 0x81A6,
   STENCIL_INDEX                                = 0x1901,
+  RED                                          = 0x1903,
   STENCIL_INDEX8                               = 0x8D48,
   DEPTH_STENCIL                                = 0x84F9,
+  UNSIGNED_INT_24_8                            = 0x84FA,
   DEPTH24_STENCIL8                             = 0x88F0,
   RENDERBUFFER_WIDTH                           = 0x8D42,
   RENDERBUFFER_HEIGHT                          = 0x8D43,
@@ -409,6 +415,9 @@ enum GLEnums : GLenum {
   DEPTH_ATTACHMENT                             = 0x8D00,
   STENCIL_ATTACHMENT                           = 0x8D20,
   DEPTH_STENCIL_ATTACHMENT                     = 0x821A,
+  RG                                           = 0x8227,
+  R32F                                         = 0x822E,
+  RG32F                                        = 0x8230,
   NONE                                         = 0x0000,
   FRAMEBUFFER_COMPLETE                         = 0x8CD5,
   FRAMEBUFFER_INCOMPLETE_ATTACHMENT            = 0x8CD6,

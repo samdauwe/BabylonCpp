@@ -7,6 +7,7 @@
 #include <babylon/core/promise.h>
 #include <babylon/core/string.h>
 #include <babylon/core/time.h>
+#include <babylon/engine/depth_texture_creation_options.h>
 #include <babylon/engine/instancing_attribute_info.h>
 #include <babylon/instrumentation/_time_token.h>
 #include <babylon/interfaces/icanvas.h>
@@ -99,6 +100,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _workingContext{nullptr}
     , _rescalePostProcess{nullptr}
     , _dummyFramebuffer{nullptr}
+    , _bindedRenderFunction{nullptr}
     , _vaoRecordInProgress{false}
     , _mustWipeVertexAttributes{false}
     , _emptyTexture{nullptr}
@@ -1723,7 +1725,7 @@ void Engine::drawElementsType(unsigned int fillMode, int indexStart,
   _drawCalls.addCount(1, false);
 
   // Render
-  const auto drawMode = DrawMode(fillMode);
+  const auto drawMode = _drawMode(fillMode);
   auto indexFormat
     = _uintIndicesCurrentlySet ? GL::UNSIGNED_INT : GL::UNSIGNED_SHORT;
   auto mult = _uintIndicesCurrentlySet ? 4 : 2;
@@ -1744,7 +1746,7 @@ void Engine::drawArraysType(unsigned int fillMode, int verticesStart,
   _drawCalls.addCount(1, false);
 
   // Render
-  const auto drawMode = DrawMode(fillMode);
+  const auto drawMode = _drawMode(fillMode);
   if (instancesCount) {
     _gl->drawArraysInstanced(drawMode, verticesStart, verticesCount,
                              instancesCount);
@@ -1754,7 +1756,7 @@ void Engine::drawArraysType(unsigned int fillMode, int verticesStart,
   }
 }
 
-unsigned int Engine::DrawMode(unsigned int fillMode)
+unsigned int Engine::_drawMode(unsigned int fillMode)
 {
   switch (fillMode) {
     // Triangle views
@@ -1903,7 +1905,7 @@ unique_ptr_t<GL::IGLProgram> Engine::createShaderProgram(
   onBeforeShaderCompilationObservable.notifyObservers(this);
 
   const string_t shaderVersion
-    = (_webGLVersion > 1.f) ? "#version 300 es\n" : "";
+    = (_webGLVersion > 1.f) ? "#version 300 es\n#define WEBGL2 \n" : "";
   auto vertexShader   = Engine::CompileShader(context, vertexCode, "vertex",
                                             defines, shaderVersion);
   auto fragmentShader = Engine::CompileShader(context, fragmentCode, "fragment",
@@ -2653,32 +2655,6 @@ void Engine::_rescaleTexture(InternalTexture* source,
     });
 }
 
-GL::GLenum Engine::_getInternalFormat(unsigned int format) const
-{
-  GL::GLenum internalFormat = GL::RGBA;
-  switch (format) {
-    case EngineConstants::TEXTUREFORMAT_ALPHA:
-      internalFormat = GL::ALPHA;
-      break;
-    case EngineConstants::TEXTUREFORMAT_LUMINANCE:
-      internalFormat = GL::LUMINANCE;
-      break;
-    case EngineConstants::TEXTUREFORMAT_LUMINANCE_ALPHA:
-      internalFormat = GL::LUMINANCE_ALPHA;
-      break;
-    case EngineConstants::TEXTUREFORMAT_RGB:
-      internalFormat = GL::RGB;
-      break;
-    case EngineConstants::TEXTUREFORMAT_RGBA:
-      internalFormat = GL::RGBA;
-      break;
-    default:
-      break;
-  }
-
-  return internalFormat;
-}
-
 void Engine::updateRawTexture(InternalTexture* texture, const Uint8Array& data,
                               unsigned int format, bool invertY,
                               const string_t& compression, unsigned int type)
@@ -2687,9 +2663,10 @@ void Engine::updateRawTexture(InternalTexture* texture, const Uint8Array& data,
     return;
   }
 
+  auto internalSizedFomat = _getRGBABufferInternalSizedFormat(type, format);
   auto internalFormat     = _getInternalFormat(format);
-  auto internalSizedFomat = _getRGBABufferInternalSizedFormat(type);
-  auto textureType        = _getWebGLTextureType(type);
+
+  auto textureType = _getWebGLTextureType(type);
   _bindTextureDirectly(GL::TEXTURE_2D, texture, true);
   _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL, invertY ? 1 : 0);
 
@@ -2862,11 +2839,211 @@ void Engine::updateDynamicTexture(InternalTexture* texture, ICanvas* canvas,
   texture->isReady = true;
 }
 
-InternalTexture* Engine::createDepthStencilTexture(
-  const Variant<int, ISize> /*size*/,
-  const DepthTextureCreationOptions& /*options*/)
+void Engine::updateTextureComparisonFunction(InternalTexture* texture,
+                                             int comparisonFunction)
 {
-  return nullptr;
+  if (webGLVersion() == 1.f) {
+    BABYLON_LOG_ERROR("Engine", "WebGL 1 does not support texture comparison.");
+    return;
+  }
+
+  if (texture->isCube) {
+    _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture, true);
+
+    if (comparisonFunction == 0) {
+      _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_COMPARE_FUNC,
+                         EngineConstants::LEQUAL);
+      _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_COMPARE_MODE,
+                         GL::NONE);
+    }
+    else {
+      _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_COMPARE_FUNC,
+                         comparisonFunction);
+      _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_COMPARE_MODE,
+                         GL::COMPARE_REF_TO_TEXTURE);
+    }
+
+    _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
+  }
+  else {
+    _bindTextureDirectly(GL::TEXTURE_2D, texture, true);
+
+    if (comparisonFunction == 0) {
+      _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_COMPARE_FUNC,
+                         EngineConstants::LEQUAL);
+      _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_COMPARE_MODE, GL::NONE);
+    }
+    else {
+      _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_COMPARE_FUNC,
+                         comparisonFunction);
+      _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_COMPARE_MODE,
+                         GL::COMPARE_REF_TO_TEXTURE);
+    }
+
+    _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
+  }
+
+  texture->_comparisonFunction = comparisonFunction;
+}
+
+void Engine::_setupDepthStencilTexture(InternalTexture* internalTexture,
+                                       const Variant<int, ISize>& size,
+                                       bool generateStencil,
+                                       bool bilinearFiltering,
+                                       int comparisonFunction)
+{
+  auto width  = size.is<int>() ? size.get<int>() : size.get<ISize>().width;
+  auto height = size.is<int>() ? size.get<int>() : size.get<ISize>().height;
+  internalTexture->baseWidth              = width;
+  internalTexture->baseHeight             = height;
+  internalTexture->width                  = width;
+  internalTexture->height                 = height;
+  internalTexture->isReady                = true;
+  internalTexture->samples                = 1;
+  internalTexture->generateMipMaps        = false;
+  internalTexture->_generateDepthBuffer   = true;
+  internalTexture->_generateStencilBuffer = generateStencil;
+  internalTexture->samplingMode           = bilinearFiltering ?
+                                    TextureConstants::BILINEAR_SAMPLINGMODE :
+                                    TextureConstants::NEAREST_SAMPLINGMODE;
+  internalTexture->type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+  internalTexture->_comparisonFunction = comparisonFunction;
+
+  auto target = internalTexture->isCube ? GL::TEXTURE_CUBE_MAP : GL::TEXTURE_2D;
+  auto samplingParameters
+    = GetSamplingParameters(internalTexture->samplingMode, false);
+  _gl->texParameteri(target, GL::TEXTURE_MAG_FILTER, samplingParameters.mag);
+  _gl->texParameteri(target, GL::TEXTURE_MIN_FILTER, samplingParameters.min);
+  _gl->texParameteri(target, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE);
+  _gl->texParameteri(target, GL::TEXTURE_WRAP_T, GL::CLAMP_TO_EDGE);
+
+  if (comparisonFunction == 0) {
+    _gl->texParameteri(target, GL::TEXTURE_COMPARE_FUNC,
+                       EngineConstants::LEQUAL);
+    _gl->texParameteri(target, GL::TEXTURE_COMPARE_MODE, GL::NONE);
+  }
+  else {
+    _gl->texParameteri(target, GL::TEXTURE_COMPARE_FUNC, comparisonFunction);
+    _gl->texParameteri(target, GL::TEXTURE_COMPARE_MODE,
+                       GL::COMPARE_REF_TO_TEXTURE);
+  }
+}
+
+unique_ptr_t<InternalTexture>
+Engine::createDepthStencilTexture(const Variant<int, ISize>& size,
+                                  const DepthTextureCreationOptions& options)
+{
+  if (options.isCube) {
+    auto width = size.is<int>() ? size.get<int>() : size.get<ISize>().width;
+    return _createDepthStencilCubeTexture(width, options);
+  }
+  else {
+    return _createDepthStencilTexture(size, options);
+  }
+}
+
+unique_ptr_t<InternalTexture>
+Engine::_createDepthStencilTexture(const Variant<int, ISize>& size,
+                                   const DepthTextureCreationOptions& options)
+{
+  auto internalTexture = ::std::make_unique<InternalTexture>(
+    this, InternalTexture::DATASOURCE_DEPTHTEXTURE);
+
+  if (!_caps.depthTextureExtension) {
+    BABYLON_LOG_ERROR(
+      "Engine", "Depth texture is not supported by your browser or hardware.");
+    return internalTexture;
+  }
+
+  auto internalOptions = options;
+  internalOptions.bilinearFiltering
+    = options.bilinearFiltering ? *options.bilinearFiltering : false;
+  internalOptions.comparisonFunction
+    = options.comparisonFunction ? *options.comparisonFunction : 0;
+  internalOptions.generateStencil
+    = options.generateStencil ? *options.generateStencil : false;
+
+  _bindTextureDirectly(GL::TEXTURE_2D, internalTexture.get(), true);
+
+  _setupDepthStencilTexture(
+    internalTexture.get(), size, internalOptions.generateStencil,
+    internalOptions.bilinearFiltering, internalOptions.comparisonFunction);
+
+  if (webGLVersion() > 1.f) {
+    if (internalOptions.generateStencil) {
+      _gl->texImage2D(GL::TEXTURE_2D, 0, GL::DEPTH24_STENCIL8,
+                      internalTexture->width, internalTexture->height, 0,
+                      GL::DEPTH_STENCIL, GL::UNSIGNED_INT_24_8, nullptr);
+    }
+    else {
+      _gl->texImage2D(GL::TEXTURE_2D, 0, GL::DEPTH_COMPONENT24,
+                      internalTexture->width, internalTexture->height, 0,
+                      GL::DEPTH_COMPONENT, GL::UNSIGNED_INT, nullptr);
+    }
+  }
+  else {
+    if (internalOptions.generateStencil) {
+      _gl->texImage2D(GL::TEXTURE_2D, 0, GL::DEPTH_STENCIL,
+                      internalTexture->width, internalTexture->height, 0,
+                      GL::DEPTH_STENCIL, GL::UNSIGNED_INT_24_8, nullptr);
+    }
+    else {
+      _gl->texImage2D(GL::TEXTURE_2D, 0, GL::DEPTH_COMPONENT,
+                      internalTexture->width, internalTexture->height, 0,
+                      GL::DEPTH_COMPONENT, GL::UNSIGNED_INT, nullptr);
+    }
+  }
+
+  _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
+
+  return internalTexture;
+}
+
+unique_ptr_t<InternalTexture> Engine::_createDepthStencilCubeTexture(
+  int size, const DepthTextureCreationOptions& options)
+{
+  auto internalTexture = ::std::make_unique<InternalTexture>(
+    this, InternalTexture::DATASOURCE_UNKNOWN);
+  internalTexture->isCube = true;
+
+  if (webGLVersion() == 1.f) {
+    BABYLON_LOG_ERROR("Engine",
+                      "Depth cube texture is not supported by WebGL 1.");
+    return internalTexture;
+  }
+
+  auto internalOptions = options;
+  internalOptions.bilinearFiltering
+    = options.bilinearFiltering ? *options.bilinearFiltering : false;
+  internalOptions.comparisonFunction
+    = options.comparisonFunction ? *options.comparisonFunction : 0;
+  internalOptions.generateStencil
+    = options.generateStencil ? *options.generateStencil : false;
+
+  _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, internalTexture.get(), true);
+
+  _setupDepthStencilTexture(internalTexture.get(), ToVariant<int, ISize>(size),
+                            internalOptions.generateStencil,
+                            internalOptions.bilinearFiltering,
+                            internalOptions.comparisonFunction);
+
+  // Create the depth/stencil buffer
+  for (unsigned int face = 0; face < 6; ++face) {
+    if (internalOptions.generateStencil) {
+      _gl->texImage2D(GL::TEXTURE_CUBE_MAP_POSITIVE_X + face, 0,
+                      GL::DEPTH24_STENCIL8, size, size, 0, GL::DEPTH_STENCIL,
+                      GL::UNSIGNED_INT_24_8, nullptr);
+    }
+    else {
+      _gl->texImage2D(GL::TEXTURE_CUBE_MAP_POSITIVE_X + face, 0,
+                      GL::DEPTH_COMPONENT24, size, size, 0, GL::DEPTH_COMPONENT,
+                      GL::UNSIGNED_INT, nullptr);
+    }
+  }
+
+  _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
+
+  return internalTexture;
 }
 
 void Engine::setFrameBufferDepthStencilTexture(
@@ -2879,7 +3056,7 @@ void Engine::setFrameBufferDepthStencilTexture(
     return;
   }
 
-  auto depthStencilTexture = renderTarget->depthStencilTexture;
+  auto& depthStencilTexture = renderTarget->depthStencilTexture;
 
   bindUnboundFramebuffer(internalTexture->_framebuffer.get());
   if (depthStencilTexture->isCube) {
@@ -3545,9 +3722,10 @@ void Engine::updateRawCubeTexture(InternalTexture* texture,
     }
   }
 
-  auto isPot = !needPOTTextures()
-               || (Tools::IsExponentOfTwo(texture->width)
-                   && Tools::IsExponentOfTwo(texture->height));
+  auto isPot
+    = !needPOTTextures()
+      || (Tools::IsExponentOfTwo(static_cast<size_t>(texture->width))
+          && Tools::IsExponentOfTwo(static_cast<size_t>(texture->height)));
   if (isPot && texture->generateMipMaps && level == 0) {
     _gl->generateMipmap(GL::TEXTURE_CUBE_MAP);
   }
@@ -3585,9 +3763,10 @@ InternalTexture* Engine::createRawCubeTexture(
   texture->height = height;
 
   // Double check on POT to generate Mips.
-  auto isPot = !needPOTTextures()
-               || (Tools::IsExponentOfTwo(texture->width)
-                   && Tools::IsExponentOfTwo(texture->height));
+  auto isPot
+    = !needPOTTextures()
+      || (Tools::IsExponentOfTwo(static_cast<size_t>(texture->width))
+          && Tools::IsExponentOfTwo(static_cast<size_t>(texture->height)));
   if (!isPot) {
     generateMipMaps = false;
   }
@@ -3904,6 +4083,25 @@ void Engine::_releaseTexture(InternalTexture* texture)
   if (texture->_lodTextureLow) {
     texture->_lodTextureLow->dispose();
   }
+
+  // Set output texture of post process to null if the texture has been
+  // released/disposed
+  for (auto& scene : scenes) {
+    for (auto& postProcess : scene->postProcesses) {
+      if (postProcess->_outputTexture == texture) {
+        postProcess->_outputTexture = nullptr;
+      }
+    }
+    for (auto& camera : scene->cameras) {
+      for (auto& postProcess : camera->_postProcesses) {
+        if (postProcess) {
+          if (postProcess->_outputTexture == texture) {
+            postProcess->_outputTexture = nullptr;
+          }
+        }
+      }
+    }
+  }
 }
 
 void Engine::setProgram(GL::IGLProgram* program)
@@ -4154,8 +4352,7 @@ void Engine::_bindSamplerUniformToChannel(int sourceSlot, int destination)
 }
 
 bool Engine::_setTexture(int channel, BaseTexture* texture,
-                         bool isPartOfTextureArray,
-                         bool /*depthStencilTexture*/)
+                         bool isPartOfTextureArray, bool depthStencilTexture)
 {
   // Not ready?
   if (!texture) {
@@ -4179,7 +4376,11 @@ bool Engine::_setTexture(int channel, BaseTexture* texture,
   }
 
   InternalTexture* internalTexture = nullptr;
-  if (texture->isReady()) {
+  if (depthStencilTexture) {
+    internalTexture
+      = static_cast<RenderTargetTexture*>(texture)->depthStencilTexture.get();
+  }
+  else if (texture->isReady()) {
     internalTexture = texture->getInternalTexture();
   }
   else if (texture->isCube) {
@@ -4476,6 +4677,7 @@ void Engine::dispose()
 
   // Unbind
   unbindAllAttributes();
+  _boundUniforms.clear();
 
   if (_dummyFramebuffer) {
     _gl->deleteFramebuffer(_dummyFramebuffer.get());
@@ -4492,8 +4694,9 @@ void Engine::dispose()
   _workingCanvas  = nullptr;
   _workingContext = nullptr;
   _currentBufferPointers.clear();
-  _renderingCanvas = nullptr;
-  _currentProgram  = nullptr;
+  _renderingCanvas      = nullptr;
+  _currentProgram       = nullptr;
+  _bindedRenderFunction = nullptr;
 
   onResizeObservable.clear();
   onCanvasBlurObservable.clear();
@@ -4718,6 +4921,38 @@ bool Engine::_canRenderToFramebuffer(unsigned int /*type*/)
   return true;
 }
 
+GL::GLenum Engine::_getInternalFormat(unsigned int format) const
+{
+  GL::GLenum internalFormat = GL::RGBA;
+  switch (format) {
+    case EngineConstants::TEXTUREFORMAT_ALPHA:
+      internalFormat = GL::ALPHA;
+      break;
+    case EngineConstants::TEXTUREFORMAT_LUMINANCE:
+      internalFormat = GL::LUMINANCE;
+      break;
+    case EngineConstants::TEXTUREFORMAT_LUMINANCE_ALPHA:
+      internalFormat = GL::LUMINANCE_ALPHA;
+      break;
+    case EngineConstants::TEXTUREFORMAT_RGB:
+    case EngineConstants::TEXTUREFORMAT_RGB32F:
+      internalFormat = GL::RGB;
+      break;
+    case EngineConstants::TEXTUREFORMAT_RGBA:
+    case EngineConstants::TEXTUREFORMAT_RGBA32F:
+      internalFormat = GL::RGBA;
+      break;
+    case EngineConstants::TEXTUREFORMAT_R32F:
+      internalFormat = GL::RED;
+      break;
+    case EngineConstants::TEXTUREFORMAT_RG32F:
+      internalFormat = GL::RG;
+      break;
+  }
+
+  return internalFormat;
+}
+
 GL::GLenum Engine::_getWebGLTextureType(unsigned int type) const
 {
   if (type == EngineConstants::TEXTURETYPE_FLOAT) {
@@ -4731,19 +4966,42 @@ GL::GLenum Engine::_getWebGLTextureType(unsigned int type) const
   return GL::UNSIGNED_BYTE;
 }
 
-GL::GLenum Engine::_getRGBABufferInternalSizedFormat(unsigned int type) const
+GL::GLenum Engine::_getRGBABufferInternalSizedFormat(
+  unsigned int type, const Nullable<unsigned int>& format) const
 {
   if (_webGLVersion == 1.f) {
+    if (format) {
+      switch (*format) {
+        case EngineConstants::TEXTUREFORMAT_LUMINANCE:
+          return GL::LUMINANCE;
+      }
+    }
     return GL::RGBA;
   }
 
   if (type == EngineConstants::TEXTURETYPE_FLOAT) {
-    return _gl->RGBA32F;
+    if (format) {
+      switch (*format) {
+        case EngineConstants::TEXTUREFORMAT_R32F:
+          return GL::R32F;
+        case EngineConstants::TEXTUREFORMAT_RG32F:
+          return GL::RG32F;
+        case EngineConstants::TEXTUREFORMAT_RGB32F:
+          return GL::RGB32F;
+      }
+    }
+    return GL::RGBA32F;
   }
   else if (type == EngineConstants::TEXTURETYPE_HALF_FLOAT) {
-    return _gl->RGBA16F;
+    return GL::RGBA16F;
   }
 
+  if (format) {
+    switch (*format) {
+      case EngineConstants::TEXTUREFORMAT_LUMINANCE:
+        return GL::LUMINANCE;
+    }
+  }
   return GL::RGBA;
 }
 

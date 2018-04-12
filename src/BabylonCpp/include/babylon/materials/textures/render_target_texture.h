@@ -228,7 +228,7 @@ public:
    * depth texture.
    * Otherwise, return null.
    */
-  InternalTexture* depthStencilTexture;
+  unique_ptr_t<InternalTexture> depthStencilTexture;
 
   // Events
 

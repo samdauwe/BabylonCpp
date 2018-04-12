@@ -140,8 +140,11 @@ void InternalTexture::_rebuild()
       depthTextureOptions.isCube             = isCube;
 
       auto size = ISize{width, height};
-      proxy = _engine->createDepthStencilTexture(ToVariant<int, ISize>(size),
-                                                 depthTextureOptions);
+      // TODO FIXME
+      proxy = _engine
+                ->createDepthStencilTexture(ToVariant<int, ISize>(size),
+                                            depthTextureOptions)
+                .get();
       proxy->_swapAndDie(this);
 
       isReady = true;
