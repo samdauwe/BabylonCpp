@@ -1,6 +1,7 @@
 option(BUILD_OGL43 "Build OpenGL 4.3 examples" OFF)
 mark_as_advanced(BUILD_OGL43)
 
+set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL REQUIRED)
 
 # Configure build environment

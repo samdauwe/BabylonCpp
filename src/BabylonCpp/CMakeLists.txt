@@ -409,10 +409,6 @@ set_target_properties(${TARGET}
 # Check if tests are enabled
 if(OPTION_BUILD_TESTS AND EXISTS ${TESTS_PATH})
 
-# DISABLE CMP0037: Target names should not be reserved and should match a
-# validity pattern.
-set_policy(CMP0037 OLD)
-
 # Function: Build test and add command to execute it via target 'test'
 function(add_test_without_ctest target)
     add_subdirectory(${target})
