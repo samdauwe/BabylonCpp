@@ -388,11 +388,11 @@ protected:
   Light(const string_t& name, Scene* scene);
 
   virtual void _buildUniformLayout();
+  void _resyncMeshes();
 
 private:
   void _hookArrayForExcluded(const vector_t<AbstractMesh*>& array);
   void _hookArrayForIncludedOnly(const vector_t<AbstractMesh*>& array);
-  void _resyncMeshes();
 
   /**
    * @brief Recomputes the cached photometric scale if needed.

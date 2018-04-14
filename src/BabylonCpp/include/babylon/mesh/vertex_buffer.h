@@ -76,11 +76,11 @@ public:
 public:
   VertexBuffer(Engine* engine, const Variant<Float32Array, Buffer*> data,
                unsigned int kind, bool updatable,
-               Nullable<bool> postponeInternalCreation = nullptr,
-               Nullable<int> stride                    = nullptr,
-               Nullable<bool> instanced                = nullptr,
-               Nullable<unsigned int> offset           = nullptr,
-               Nullable<int> size                      = nullptr);
+               const Nullable<bool>& postponeInternalCreation = nullptr,
+               Nullable<int> stride                           = nullptr,
+               const Nullable<bool>& instanced                = nullptr,
+               const Nullable<unsigned int>& offset           = nullptr,
+               const Nullable<int>& size                      = nullptr);
   virtual ~VertexBuffer();
 
   /** Statics **/

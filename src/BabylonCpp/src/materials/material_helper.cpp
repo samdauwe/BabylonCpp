@@ -421,7 +421,7 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
     samplersList.emplace_back("depthSampler" + lightIndexStr);
 
     if (lightIndex < defines->projectedLightTexture.size()
-        || !defines->projectedLightTexture[lightIndex]) {
+        && defines->projectedLightTexture[lightIndex]) {
       samplersList.emplace_back("projectionLightSampler" + lightIndexStr);
       uniformsList.emplace_back("textureProjectionMatrix" + lightIndexStr);
     }

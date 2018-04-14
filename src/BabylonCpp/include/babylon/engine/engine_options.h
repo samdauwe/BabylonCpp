@@ -12,7 +12,7 @@ struct BABYLON_SHARED_EXPORT EngineOptions {
   bool autoEnableWebVR          = false;
   bool preserveDrawingBuffer    = false;
   bool stencil                  = true;
-  bool disableWebGL2Support     = true;
+  bool disableWebGL2Support     = false;
   bool audioEngine              = false;
   bool deterministicLockstep    = false;
   unsigned int lockstepMaxSteps = 4;

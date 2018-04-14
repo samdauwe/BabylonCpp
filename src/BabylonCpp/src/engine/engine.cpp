@@ -110,17 +110,13 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
 {
   Engine::Instances.emplace_back(this);
 
-  // Checks if some of the format renders first to allow the use of webgl
-  // inspector.
-  // auto renderToFullFloat = _canRenderToFloatTexture();
-  // auto renderToHalfFloat = _canRenderToHalfFloatTexture();
-
   if (!canvas) {
     return;
   }
 
   // GL
   if (!options.disableWebGL2Support) {
+    _gl = canvas->getContext3d(options);
     if (_gl) {
       _webGLVersion = 2.f;
     }

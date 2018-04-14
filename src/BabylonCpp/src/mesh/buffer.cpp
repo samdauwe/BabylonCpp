@@ -77,7 +77,7 @@ int Buffer::getStrideSize() const
 // Methods
 GL::IGLBuffer* Buffer::create(Float32Array data)
 {
-  if (data.empty() && _buffer) {
+  if (_buffer) {
     return nullptr; // nothing to do
   }
 

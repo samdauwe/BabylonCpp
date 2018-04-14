@@ -35,8 +35,6 @@ Light::Light(const string_t& iName, Scene* scene)
     , _parentedWorldMatrix{nullptr}
     , _worldMatrix{::std::make_unique<Matrix>(Matrix::Identity())}
 {
-  _buildUniformLayout();
-  _resyncMeshes();
 }
 
 Light::~Light()

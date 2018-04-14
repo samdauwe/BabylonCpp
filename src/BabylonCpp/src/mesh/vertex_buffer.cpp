@@ -61,12 +61,11 @@ constexpr const char* VertexBuffer::OffsetKindChars;
 constexpr const char* VertexBuffer::SeedKindChars;
 constexpr const char* VertexBuffer::SizeKindChars;
 
-VertexBuffer::VertexBuffer(Engine* engine,
-                           const Variant<Float32Array, Buffer*> data,
-                           unsigned int kind, bool updatable,
-                           Nullable<bool> postponeInternalCreation,
-                           Nullable<int> stride, Nullable<bool> instanced,
-                           Nullable<unsigned int> offset, Nullable<int> size)
+VertexBuffer::VertexBuffer(
+  Engine* engine, const Variant<Float32Array, Buffer*> data, unsigned int kind,
+  bool updatable, const Nullable<bool>& postponeInternalCreation,
+  Nullable<int> stride, const Nullable<bool>& instanced,
+  const Nullable<unsigned int>& offset, const Nullable<int>& size)
     : instanceDivisor{this, &VertexBuffer::get_instanceDivisor,
                       &VertexBuffer::set_instanceDivisor}
 {
@@ -82,9 +81,9 @@ VertexBuffer::VertexBuffer(Engine* engine,
     if (!stride) {
       stride = VertexBuffer::DeduceStride(kind);
     }
-    _ownedBuffer
-      = ::std::make_unique<Buffer>(engine, data.get<Float32Array>(), updatable,
-                                   stride, postponeInternalCreation, instanced);
+    _ownedBuffer = ::std::make_unique<Buffer>(
+      engine, data.get<Float32Array>(), updatable, stride,
+      postponeInternalCreation ? *postponeInternalCreation : false, instanced);
     _buffer     = nullptr;
     _ownsBuffer = true;
   }

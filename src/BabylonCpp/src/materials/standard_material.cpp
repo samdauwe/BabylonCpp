@@ -550,14 +550,14 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(
-    mesh, defines, true, true, true, SMD::NORMAL, SMD::UV1, SMD::UV2,
-    SMD::VERTEXCOLOR, SMD::VERTEXALPHA, SMD::MORPHTARGETS_NORMAL,
-    SMD::MORPHTARGETS);
+    mesh, defines, true, true, true, true, SMD::NORMAL, SMD::UV1, SMD::UV2,
+    SMD::VERTEXCOLOR, SMD::VERTEXALPHA, SMD::MORPHTARGETS_TANGENT,
+    SMD::MORPHTARGETS_NORMAL, SMD::MORPHTARGETS);
 
   // Values that need to be evaluated on every frame
   MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances, SMD::CLIPPLANE, SMD::ALPHATEST,
-    SMD::DEPTHPREPASS, SMD::INSTANCES);
+    scene, engine, defines, useInstances, SMD::CLIPPLANE, SMD::DEPTHPREPASS,
+    SMD::INSTANCES);
 
   // Get correct effect
   if (defines.isDirty()) {
