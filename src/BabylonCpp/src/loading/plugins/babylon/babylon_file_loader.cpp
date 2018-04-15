@@ -250,8 +250,8 @@ bool BabylonFileLoader::importMesh(const vector_t<string_t>& meshesNames,
   // Connecting parents
   for (auto& currentMesh : scene->meshes) {
     if (!currentMesh->_waitingParentId.empty()) {
-      static_cast<Node*>(currentMesh.get())
-        ->setParent(scene->getLastEntryByID(currentMesh->_waitingParentId));
+      static_cast<Node*>(currentMesh.get())->parent
+        = scene->getLastEntryByID(currentMesh->_waitingParentId);
       currentMesh->_waitingParentId = "";
     }
   }
@@ -483,14 +483,14 @@ bool BabylonFileLoader::load(Scene* scene, const string_t& data,
   // Browsing all the graph to connect the dots
   for (auto& camera : scene->cameras) {
     if (!camera->_waitingParentId.empty()) {
-      camera->setParent(scene->getLastEntryByID(camera->_waitingParentId));
+      camera->parent = scene->getLastEntryByID(camera->_waitingParentId);
       camera->_waitingParentId.clear();
     }
   }
 
   for (auto& light : scene->lights) {
     if (!light->_waitingParentId.empty()) {
-      light->setParent(scene->getLastEntryByID(light->_waitingParentId));
+      light->parent = scene->getLastEntryByID(light->_waitingParentId);
       light->_waitingParentId.clear();
     }
   }
@@ -500,8 +500,8 @@ bool BabylonFileLoader::load(Scene* scene, const string_t& data,
   // Connect parents & children and parse actions
   for (auto& mesh : scene->meshes) {
     if (!mesh->_waitingParentId.empty()) {
-      static_cast<Node*>(mesh.get())
-        ->setParent(scene->getLastEntryByID(mesh->_waitingParentId));
+      static_cast<Node*>(mesh.get())->parent
+        = scene->getLastEntryByID(mesh->_waitingParentId);
       mesh->_waitingParentId.clear();
     }
     if (!mesh->_waitingActions.empty()) {

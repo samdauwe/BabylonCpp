@@ -21,6 +21,10 @@ Node::Node(const string_t& iName, Scene* scene)
     , doNotSerialize{false}
     , _isDisposed{false}
     , _currentRenderId{-1}
+    , animationPropertiesOverride{this, &Node::get_animationPropertiesOverride,
+                                  &Node::set_animationPropertiesOverride}
+    , onDispose{this, &Node::set_onDispose}
+    , behaviors{this, &Node::get_behaviors}
     , _childRenderId{-1}
     , _isEnabled{true}
     , _isReady{true}
@@ -50,7 +54,7 @@ bool Node::isDisposed() const
   return _isDisposed;
 }
 
-void Node::setParent(Node* parent)
+void Node::set_parent(Node* const& parent)
 {
   if (_parentNode == parent) {
     return;
@@ -73,17 +77,21 @@ void Node::setParent(Node* parent)
   }
 }
 
-Node* Node::parent() const
+Node*& Node::get_parent()
 {
   return _parentNode;
 }
 
-AnimationPropertiesOverride* Node::animationPropertiesOverride()
+AnimationPropertiesOverride*& Node::get_animationPropertiesOverride()
 {
+  if (!_animationPropertiesOverride) {
+    return _scene->animationPropertiesOverride;
+  }
   return _animationPropertiesOverride;
 }
 
-void Node::setAnimationPropertiesOverride(AnimationPropertiesOverride* value)
+void Node::set_animationPropertiesOverride(
+  AnimationPropertiesOverride* const& value)
 {
   _animationPropertiesOverride = value;
 }
@@ -93,7 +101,7 @@ const string_t Node::getClassName() const
   return "Node";
 }
 
-void Node::setOnDispose(
+void Node::set_onDispose(
   const ::std::function<void(Node* node, EventState& es)>& callback)
 {
   if (_onDisposeObserver) {
@@ -146,12 +154,7 @@ Node& Node::removeBehavior(Behavior<Node>* behavior)
   return *this;
 }
 
-vector_t<Behavior<Node>*>& Node::behaviors()
-{
-  return _behaviors;
-}
-
-const vector_t<Behavior<Node>*>& Node::behaviors() const
+vector_t<Behavior<Node>*>& Node::get_behaviors()
 {
   return _behaviors;
 }
@@ -283,7 +286,8 @@ bool Node::isDescendantOf(const Node* ancestor)
   return false;
 }
 
-void Node::_getDescendants(vector_t<Node*>& results, bool directDescendantsOnly,
+template <typename T>
+void Node::_getDescendants(vector_t<T*>& results, bool directDescendantsOnly,
                            const ::std::function<bool(Node* node)>& predicate)
 {
   if (_children.empty()) {
@@ -292,47 +296,7 @@ void Node::_getDescendants(vector_t<Node*>& results, bool directDescendantsOnly,
 
   for (auto& item : _children) {
     if (!predicate || predicate(item)) {
-      results.emplace_back(item);
-    }
-
-    if (!directDescendantsOnly) {
-      item->_getDescendants(results, false, predicate);
-    }
-  }
-}
-
-void Node::_getDescendants(vector_t<AbstractMesh*>& results,
-                           bool directDescendantsOnly,
-                           const ::std::function<bool(Node* node)>& predicate)
-{
-  if (_children.empty()) {
-    return;
-  }
-
-  for (auto& item : _children) {
-    if (!predicate || predicate(item)) {
-      if (auto m = dynamic_cast<AbstractMesh*>(item)) {
-        results.emplace_back(m);
-      }
-    }
-
-    if (!directDescendantsOnly) {
-      item->_getDescendants(results, false, predicate);
-    }
-  }
-}
-
-void Node::_getDescendants(vector_t<TransformNode*>& results,
-                           bool directDescendantsOnly,
-                           const ::std::function<bool(Node* node)>& predicate)
-{
-  if (_children.empty()) {
-    return;
-  }
-
-  for (auto& item : _children) {
-    if (!predicate || predicate(item)) {
-      if (auto m = dynamic_cast<TransformNode*>(item)) {
+      if (auto m = dynamic_cast<T*>(item)) {
         results.emplace_back(m);
       }
     }
@@ -495,7 +459,7 @@ void Node::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
     }
   }
 
-  setParent(nullptr);
+  parent = nullptr;
 
   // Callback
   onDisposeObservable.notifyObservers(this);
@@ -516,10 +480,20 @@ void Node::ParseAnimationRanges(Node* node, const Json::value& parsedNode,
   if (parsedNode.contains("ranges")) {
     for (auto& range : Json::GetArray(parsedNode, "ranges")) {
       node->createAnimationRange(Json::GetString(range, "name"),
-                                 Json::GetNumber<float>(range, "from", 0),
-                                 Json::GetNumber<float>(range, "to", 0));
+                                 Json::GetNumber<float>(range, "from", 0.f),
+                                 Json::GetNumber<float>(range, "to", 0.f));
     }
   }
 }
+
+template void Node::_getDescendants<Node>(
+  vector_t<Node*>& results, bool directDescendantsOnly = false,
+  const ::std::function<bool(Node* node)>& predicate = nullptr);
+template void Node::_getDescendants<AbstractMesh>(
+  vector_t<AbstractMesh*>& results, bool directDescendantsOnly = false,
+  const ::std::function<bool(Node* node)>& predicate = nullptr);
+template void Node::_getDescendants<TransformNode>(
+  vector_t<TransformNode*>& results, bool directDescendantsOnly = false,
+  const ::std::function<bool(Node* node)>& predicate = nullptr);
 
 } // end of namespace BABYLON

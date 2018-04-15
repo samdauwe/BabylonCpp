@@ -38,7 +38,7 @@ class AnimationGroup;
 struct AnimationPropertiesOverride;
 class AnimationRange;
 class AnimationValue;
-struct IAnimatable;
+class IAnimatable;
 struct IAnimationKey;
 class PathCursor;
 class RuntimeAnimation;

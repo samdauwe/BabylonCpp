@@ -35,36 +35,10 @@ public:
   bool isDisposed() const;
 
   /**
-   * @brief Sets the parent of the node.
-   */
-  void setParent(Node* parent);
-
-  /**
-   * @brief Gets the parent of the node.
-   */
-  Node* parent() const override;
-
-  /**
-   * @brief Gets the animation properties override.
-   */
-  AnimationPropertiesOverride* animationPropertiesOverride();
-
-  /**
-   * @brief Sets the animation properties override.
-   */
-  void setAnimationPropertiesOverride(AnimationPropertiesOverride* value);
-
-  /**
    * @brief Gets a string idenfifying the name of the class.
    * @returns "Node" string
    */
   virtual const string_t getClassName() const;
-
-  /**
-   * @brief Sets a callback that will be raised when the node will be disposed.
-   */
-  void setOnDispose(
-    const ::std::function<void(Node* node, EventState& es)>& callback);
 
   /**
    * @brief Gets the scene of the node.
@@ -94,18 +68,6 @@ public:
    * @returns the current Node
    */
   Node& removeBehavior(Behavior<Node>* behavior);
-
-  /**
-   * @brief Gets the list of attached behaviors.
-   * @see http://doc.babylonjs.com/features/behaviour
-   */
-  vector_t<Behavior<Node>*>& behaviors();
-
-  /**
-   * @brief Gets the list of attached behaviors.
-   * @see http://doc.babylonjs.com/features/behaviour
-   */
-  const vector_t<Behavior<Node>*>& behaviors() const;
 
   /**
    * @brief Gets an attached behavior by name.
@@ -146,14 +108,12 @@ public:
    * The default is to check the ancestors. If set to false, the method will
    * return the value of this node without checking ancestors
    * @return whether this node (and its parent) is enabled
-   * @see setEnabled
    */
   bool isEnabled(bool checkAncestors = true);
 
   /**
    * @brief Set the enabled state of this node.
    * @param value defines the new enabled state
-   * @see isEnabled
    */
   void setEnabled(bool value);
 
@@ -162,7 +122,6 @@ public:
    * The function will iterate up the hierarchy until the ancestor was found or
    * no more parents defined
    * @param ancestor defines the parent node to inspect
-   * @see parent
    * @returns a boolean indicating if this node is a descendant of the given
    * node
    */
@@ -181,41 +140,10 @@ public:
    * evaluated children, the predicate must return true for a given child to be
    * part of the result, otherwise it will be ignored.
    */
+  template <typename T>
   void
-  _getDescendants(vector_t<Node*>& results, bool directDescendantsOnly = false,
+  _getDescendants(vector_t<T*>& results, bool directDescendantsOnly = false,
                   const ::std::function<bool(Node* node)>& predicate = nullptr);
-
-  /**
-   * @brief Will return all nodes that have this node as ascendant.
-   * @param directDescendantsOnly defines if true only direct descendants of
-   * 'this' will be considered, if false direct and also indirect (children of
-   * children, an so on in a recursive manner) descendants of 'this' will be
-   * considered
-   * @param predicate defines an optional predicate that will be called on every
-   * evaluated child, the predicate must return true for a given child to be
-   * part of the result, otherwise it will be ignored
-   * @return all children nodes of all types
-   */
-  void _getDescendants(vector_t<AbstractMesh*>& results,
-                       bool directDescendantsOnly = false,
-                       const ::std::function<bool(Node* node)>& predicate
-                       = nullptr);
-
-  /**
-   * @brief Will return all nodes that have this node as ascendant.
-   * @param directDescendantsOnly defines if true only direct descendants of
-   * 'this' will be considered, if false direct and also indirect (children of
-   * children, an so on in a recursive manner) descendants of 'this' will be
-   * considered
-   * @param predicate defines an optional predicate that will be called on every
-   * evaluated child, the predicate must return true for a given child to be
-   * part of the result, otherwise it will be ignored
-   * @return all children nodes of all types
-   */
-  void _getDescendants(vector_t<TransformNode*>& results,
-                       bool directDescendantsOnly = false,
-                       const ::std::function<bool(Node* node)>& predicate
-                       = nullptr);
 
   /**
    * @brief Will return all nodes that have this node as ascendant.
@@ -355,6 +283,40 @@ public:
   static void ParseAnimationRanges(Node* node, const Json::value& parsedNode,
                                    Scene* scene);
 
+protected:
+  /**
+   * @brief Sets the parent of the node.
+   */
+  void set_parent(Node* const& parent) override;
+
+  /**
+   * @brief Gets the parent of the node.
+   */
+  Node*& get_parent() override;
+
+  /**
+   * @brief Gets the animation properties override.
+   */
+  AnimationPropertiesOverride*& get_animationPropertiesOverride();
+
+  /**
+   * @brief Sets the animation properties override.
+   */
+  void
+  set_animationPropertiesOverride(AnimationPropertiesOverride* const& value);
+
+  /**
+   * @brief Sets a callback that will be raised when the node will be disposed.
+   */
+  void set_onDispose(
+    const ::std::function<void(Node* node, EventState& es)>& callback);
+
+  /**
+   * @brief Gets the list of attached behaviors.
+   * @see http://doc.babylonjs.com/features/behaviour
+   */
+  vector_t<Behavior<Node>*>& get_behaviors();
+
 public:
   /**
    * Gets or sets the name of the node
@@ -384,7 +346,7 @@ public:
   bool _isDisposed;
 
   /**
-   * Gets a list of {BABYLON.Animation} associated with the node
+   * Gets a list of Animations associated with the node.
    */
   vector_t<Animation*> animations;
 
@@ -399,9 +361,25 @@ public:
   NodeCache _cache;
 
   /**
+   * Animation properties override.
+   */
+  Property<Node, AnimationPropertiesOverride*> animationPropertiesOverride;
+
+  /**
    * An event triggered when the mesh is disposed.
    */
   Observable<Node> onDisposeObservable;
+
+  /**
+   * Callback that will be raised when the node will be disposed.
+   */
+  WriteOnlyProperty<Node, ::std::function<void(Node* node, EventState& es)>>
+    onDispose;
+
+  /**
+   * List of attached behaviors
+   */
+  ReadOnlyProperty<Node, vector_t<Behavior<Node>*>> behaviors;
 
 protected:
   int _childRenderId;

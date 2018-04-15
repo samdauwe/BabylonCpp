@@ -93,7 +93,7 @@ Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
 #endif
 
     // Parent
-    Node::setParent(source->parent());
+    Node::set_parent(source->parent());
 
     // Pivot
     setPivotMatrix(source->getPivotMatrix());
@@ -134,7 +134,7 @@ Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
 
   // Parent
   if (iParent != nullptr) {
-    Node::setParent(iParent);
+    Node::set_parent(iParent);
   }
 }
 

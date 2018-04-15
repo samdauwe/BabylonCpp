@@ -7,7 +7,9 @@
 
 namespace BABYLON {
 
-struct BABYLON_SHARED_EXPORT IAnimatable : public IReflect {
+class BABYLON_SHARED_EXPORT IAnimatable : public IReflect {
+
+public:
   enum class Type {
     UNKNOWN = 0,
     CAMERA  = 1,
@@ -16,15 +18,15 @@ struct BABYLON_SHARED_EXPORT IAnimatable : public IReflect {
     SCENE   = 4,
   }; // end of enum class Type
 
+public:
+  IAnimatable();
+  ~IAnimatable();
+
   /**
    * Gets or sets a string used to store user defined state for the node
    */
   string_t state;
 
-  virtual Node* parent() const
-  {
-    return nullptr;
-  }
   virtual Type animatableType() const
   {
     return Type::UNKNOWN;
@@ -48,6 +50,20 @@ struct BABYLON_SHARED_EXPORT IAnimatable : public IReflect {
   {
     return AnimationValue(true);
   }
+
+protected:
+  virtual Node*& get_parent();
+  virtual void set_parent(Node* const& parent);
+
+public:
+  /**
+   * Parent of the node.
+   */
+  Property<IAnimatable, Node*> parent;
+
+private:
+  Node* nullNode;
+
 }; // end of struct IAnimatable
 
 } // end of namespace BABYLON

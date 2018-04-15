@@ -92,6 +92,8 @@ Scene::Scene(Engine* engine)
     , forceShowBoundingBoxes{false}
     , _clipPlane{nullptr}
     , animationsEnabled{true}
+    , animationPropertiesOverride{this, &Scene::get_animationPropertiesOverride,
+                                  &Scene::set_animationPropertiesOverride}
     , useConstantAnimationDeltaTime{false}
     , constantlyUpdateMeshUnderPointer{false}
     , hoverCursor{"pointer"}
@@ -124,6 +126,7 @@ Scene::Scene(Engine* engine)
     , dispatchAllSubMeshesOfActiveMeshes{false}
     , requireLightSorting{false}
     , _environmentTexture{nullptr}
+    , _animationPropertiesOverride{nullptr}
     , _spritePredicate{nullptr}
     , _onDisposeObserver{nullptr}
     , _onBeforeRenderObserver{nullptr}
@@ -387,6 +390,17 @@ void Scene::setForcePointsCloud(bool value)
   }
   _forcePointsCloud = value;
   markAllMaterialsAsDirty(Material::MiscDirtyFlag());
+}
+
+AnimationPropertiesOverride*& Scene::get_animationPropertiesOverride()
+{
+  return _animationPropertiesOverride;
+}
+
+void Scene::set_animationPropertiesOverride(
+  AnimationPropertiesOverride* const& value)
+{
+  _animationPropertiesOverride = value;
 }
 
 bool Scene::fogEnabled() const

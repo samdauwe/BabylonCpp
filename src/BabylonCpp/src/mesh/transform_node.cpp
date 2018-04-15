@@ -508,7 +508,7 @@ TransformNode& TransformNode::setParent(Node* node)
     this->scaling().z = scale.z;
   }
 
-  Node::setParent(node);
+  Node::set_parent(node);
   return *this;
 }
 
@@ -531,7 +531,7 @@ TransformNode& TransformNode::attachToBone(Bone* bone,
                                            TransformNode* affectedTransformNode)
 {
   _transformToBoneReferal = affectedTransformNode;
-  Node::setParent(bone);
+  Node::set_parent(bone);
 
   if (bone->getWorldMatrix()->determinant() < 0.f) {
     scalingDeterminant *= -1.f;

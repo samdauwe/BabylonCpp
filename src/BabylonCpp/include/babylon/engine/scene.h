@@ -1252,7 +1252,17 @@ public:
 
   bool forceShowBoundingBoxes;
   unique_ptr_t<Plane> _clipPlane;
+
+  /**
+   * Gets or sets a boolean indicating if animations are enabled
+   */
   bool animationsEnabled;
+
+  /**
+   * Animation properties override.
+   */
+  Property<Scene, AnimationPropertiesOverride*> animationPropertiesOverride;
+
   bool useConstantAnimationDeltaTime;
   bool constantlyUpdateMeshUnderPointer;
 
@@ -1437,10 +1447,24 @@ public:
   bool requireLightSorting;
 
 protected:
+  /**
+   * @brief Gets the animation properties override.
+   */
+  AnimationPropertiesOverride*& get_animationPropertiesOverride();
+
+  /**
+   * @brief Sets the animation properties override.
+   */
+  void
+  set_animationPropertiesOverride(AnimationPropertiesOverride* const& value);
+
+protected:
   BaseTexture* _environmentTexture;
   unique_ptr_t<ImageProcessingConfiguration> _imageProcessingConfiguration;
 
 private:
+  // Animations
+  AnimationPropertiesOverride* _animationPropertiesOverride;
   // Events
   ::std::function<bool(Sprite* sprite)> _spritePredicate;
   Observer<Scene>::Ptr _onDisposeObserver;
