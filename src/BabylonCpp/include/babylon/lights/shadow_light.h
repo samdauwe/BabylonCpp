@@ -9,7 +9,7 @@
 namespace BABYLON {
 
 /**
- * @brief Base implementation of @see IShadowLight
+ * @brief Base implementation IShadowLight.
  * It groups all the common behaviour in order to reduce dupplication and better
  * follow the DRY pattern.
  */
@@ -146,7 +146,7 @@ public:
 
   /**
    * @brief Get the world matrix of the sahdow lights.
-   * Ignore Internal Use Only
+   * Internal Use Only
    */
   Matrix* _getWorldMatrix() override;
 

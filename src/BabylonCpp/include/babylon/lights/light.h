@@ -167,7 +167,6 @@ public:
   /**
    * @brief Set the enabled state of this node.
    * @param value - the new enabled state
-   * @see isEnabled
    */
   void setEnabled(bool value);
 
@@ -283,7 +282,7 @@ public:
                                 const string_t& uniformName1);
 
   /**
-   * @brief Ignore internal use only.
+   * @brief Internal use only.
    */
   virtual Matrix* _getWorldMatrix() = 0;
 
@@ -338,13 +337,14 @@ public:
 
   /**
    * @brief Forces the meshes to update their light related information in their
-   * rendering used effects Ignore Internal Use Only
+   * rendering used effects
+   * Internal Use Only
    */
   void _markMeshesAsLightDirty();
 
   /**
    * @brief Reorder the light in the scene according to their defined priority.
-   * Ignore Internal Use Only
+   * Internal Use Only
    */
   void _reorderLightsInScene();
 
@@ -445,18 +445,18 @@ public:
   ShadowGenerator* _shadowGenerator;
 
   /**
-   * Ignore Internal use only.
+   * Internal use only.
    */
   vector_t<string_t> _excludedMeshesIds;
 
   /**
-   * Ignore Internal use only.
+   * Internal use only.
    */
   vector_t<string_t> _includedOnlyMeshesIds;
 
   /**
    * The current light unifom buffer.
-   * Ignore Internal use only.
+   * Internal use only.
    */
   unique_ptr_t<UniformBuffer> _uniformBuffer;
 

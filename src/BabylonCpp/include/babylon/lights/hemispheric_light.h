@@ -57,7 +57,7 @@ public:
   void transferToEffect(Effect* effect, const string_t& lightIndex) override;
 
   /**
-   * @brief Ignore internal use only.
+   * @brief Internal use only.
    */
   Matrix* _getWorldMatrix() override;
 

@@ -11,7 +11,7 @@
 namespace BABYLON {
 
 /**
- * @brief Default implementation of @see IShadowGenerator.
+ * @brief Default implementation IShadowGenerator.
  * This is the main object responsible of generating shadows in the framework.
  * Documentation: https://doc.babylonjs.com/babylon101/shadows
  */

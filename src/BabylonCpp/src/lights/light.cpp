@@ -222,6 +222,7 @@ bool Light::canAffectMesh(AbstractMesh* mesh)
 Matrix* Light::getWorldMatrix()
 {
   _currentRenderId = getScene()->getRenderId();
+  _childRenderId   = _currentRenderId;
 
   auto worldMatrix = _getWorldMatrix();
 
