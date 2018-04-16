@@ -481,38 +481,53 @@ bool Matrix::equals(const Matrix& other) const
           && stl_util::almost_equal(m[15], other.m[15]));
 }
 
-bool Matrix::decompose(Vector3& scale, Quaternion& rotation,
-                       Vector3& translation) const
+bool Matrix::decompose(Nullable<Vector3> scale, Nullable<Quaternion> rotation,
+                       Nullable<Vector3> translation) const
 {
-  translation.x = m[12];
-  translation.y = m[13];
-  translation.z = m[14];
-
-  scale.x = ::std::sqrt(m[0] * m[0] + m[1] * m[1] + m[2] * m[2]);
-  scale.y = ::std::sqrt(m[4] * m[4] + m[5] * m[5] + m[6] * m[6]);
-  scale.z = ::std::sqrt(m[8] * m[8] + m[9] * m[9] + m[10] * m[10]);
-
-  if (determinant() <= 0.f) {
-    scale.y *= -1.f;
+  if (translation) {
+    translation = Vector3{
+      m[12], // x
+      m[13], // y
+      m[14]  // z
+    };
   }
 
-  if (stl_util::almost_equal(scale.x, 0.f)
-      || stl_util::almost_equal(scale.y, 0.f)
-      || stl_util::almost_equal(scale.z, 0.f)) {
-    rotation.x = 0.f;
-    rotation.y = 0.f;
-    rotation.z = 0.f;
-    rotation.w = 1.f;
+  auto _scale = scale ? *scale : MathTmp::Vector3Array[0];
+  _scale.x    = ::std::sqrt(m[0] * m[0] + m[1] * m[1] + m[2] * m[2]);
+  _scale.y    = ::std::sqrt(m[4] * m[4] + m[5] * m[5] + m[6] * m[6]);
+  _scale.z    = ::std::sqrt(m[8] * m[8] + m[9] * m[9] + m[10] * m[10]);
+
+  if (determinant() <= 0.f) {
+    _scale.y *= -1.f;
+  }
+
+  scale = _scale;
+
+  if (stl_util::almost_equal(_scale.x, 0.f)
+      || stl_util::almost_equal(_scale.y, 0.f)
+      || stl_util::almost_equal(_scale.z, 0.f)) {
+    if (rotation) {
+      rotation = Quaternion{
+        0.f, // x
+        0.f, // y
+        0.f, // z
+        1.f  // w
+      };
+    }
     return false;
   }
 
-  Matrix::FromValuesToRef(
-    m[0] / scale.x, m[1] / scale.x, m[2] / scale.x, 0.f,  //
-    m[4] / scale.y, m[5] / scale.y, m[6] / scale.y, 0.f,  //
-    m[8] / scale.z, m[9] / scale.z, m[10] / scale.z, 0.f, //
-    0.f, 0.f, 0.f, 1.f, MathTmp::MatrixArray[0]);
+  if (rotation) {
+    auto _rotation = *rotation;
+    Matrix::FromValuesToRef(
+      m[0] / _scale.x, m[1] / _scale.x, m[2] / _scale.x, 0.f,  //
+      m[4] / _scale.y, m[5] / _scale.y, m[6] / _scale.y, 0.f,  //
+      m[8] / _scale.z, m[9] / _scale.z, m[10] / _scale.z, 0.f, //
+      0.f, 0.f, 0.f, 1.f, MathTmp::MatrixArray[0]);
 
-  Quaternion::FromRotationMatrixToRef(MathTmp::MatrixArray[0], rotation);
+    Quaternion::FromRotationMatrixToRef(MathTmp::MatrixArray[0], _rotation);
+    rotation = _rotation;
+  }
 
   return true;
 }
@@ -625,18 +640,23 @@ Matrix Matrix::getRotationMatrix() const
 
 const Matrix& Matrix::getRotationMatrixToRef(Matrix& result) const
 {
-  const float xs = m[0] * m[1] * m[2] * m[3] < 0 ? -1.f : 1.f;
-  const float ys = m[4] * m[5] * m[6] * m[7] < 0 ? -1.f : 1.f;
-  const float zs = m[8] * m[9] * m[10] * m[11] < 0 ? -1.f : 1.f;
+  const float sx = ::std::sqrt(m[0] * m[0] + m[1] * m[1] + m[2] * m[2]);
+  float sy       = ::std::sqrt(m[4] * m[4] + m[5] * m[5] + m[6] * m[6]);
+  const float sz = ::std::sqrt(m[8] * m[8] + m[9] * m[9] + m[10] * m[10]);
 
-  const float sx = xs * ::std::sqrt(m[0] * m[0] + m[1] * m[1] + m[2] * m[2]);
-  const float sy = ys * ::std::sqrt(m[4] * m[4] + m[5] * m[5] + m[6] * m[6]);
-  const float sz = zs * ::std::sqrt(m[8] * m[8] + m[9] * m[9] + m[10] * m[10]);
+  if (determinant() <= 0.f) {
+    sy *= -1.f;
+  }
 
-  Matrix::FromValuesToRef(m[0] / sx, m[1] / sx, m[2] / sx, 0.f,  //
-                          m[4] / sy, m[5] / sy, m[6] / sy, 0.f,  //
-                          m[8] / sz, m[9] / sz, m[10] / sz, 0.f, //
-                          0.f, 0.f, 0.f, 1.f, result);
+  if (sx == 0.f || sy == 0.f || sz == 0.f) {
+    Matrix::IdentityToRef(result);
+  }
+  else {
+    Matrix::FromValuesToRef(m[0] / sx, m[1] / sx, m[2] / sx, 0.f,  //
+                            m[4] / sy, m[5] / sy, m[6] / sy, 0.f,  //
+                            m[8] / sz, m[9] / sz, m[10] / sz, 0.f, //
+                            0.f, 0.f, 0.f, 1.f, result);
+  }
 
   return *this;
 }
@@ -1072,23 +1092,34 @@ void Matrix::LerpToRef(const Matrix& startValue, const Matrix& endValue,
 Matrix Matrix::DecomposeLerp(Matrix& startValue, Matrix& endValue,
                              float gradient)
 {
-  Vector3 startScale(0.f, 0.f, 0.f);
-  Quaternion startRotation;
-  Vector3 startTranslation(0.f, 0.f, 0.f);
+  auto result = Matrix::Zero();
+  Matrix::DecomposeLerpToRef(startValue, endValue, gradient, result);
+  return result;
+}
+
+void Matrix::DecomposeLerpToRef(Matrix& startValue, Matrix& endValue,
+                                float gradient, Matrix& result)
+{
+  auto startScale       = MathTmp::Vector3Array[0];
+  auto startRotation    = MathTmp::QuaternionArray[0];
+  auto startTranslation = MathTmp::Vector3Array[1];
   startValue.decompose(startScale, startRotation, startTranslation);
 
-  Vector3 endScale(0.f, 0.f, 0.f);
-  Quaternion endRotation;
-  Vector3 endTranslation(0.f, 0.f, 0.f);
+  auto endScale       = MathTmp::Vector3Array[2];
+  auto endRotation    = MathTmp::QuaternionArray[1];
+  auto endTranslation = MathTmp::Vector3Array[3];
   endValue.decompose(endScale, endRotation, endTranslation);
 
-  Vector3 resultScale = Vector3::Lerp(startScale, endScale, gradient);
-  Quaternion resultRotation
-    = Quaternion::Slerp(startRotation, endRotation, gradient);
-  Vector3 resultTranslation
-    = Vector3::Lerp(startTranslation, endTranslation, gradient);
+  auto resultScale = MathTmp::Vector3Array[4];
+  Vector3::LerpToRef(startScale, endScale, gradient, resultScale);
+  auto resultRotation = MathTmp::QuaternionArray[2];
+  Quaternion::SlerpToRef(startRotation, endRotation, gradient, resultRotation);
 
-  return Matrix::Compose(resultScale, resultRotation, resultTranslation);
+  auto resultTranslation = MathTmp::Vector3Array[5];
+  Vector3::LerpToRef(startTranslation, endTranslation, gradient,
+                     resultTranslation);
+
+  Matrix::ComposeToRef(resultScale, resultRotation, resultTranslation, result);
 }
 
 Matrix Matrix::LookAtLH(const Vector3& eye, Vector3& target, const Vector3& up)
@@ -1360,14 +1391,14 @@ void Matrix::PerspectiveFovWebVRToRef(const VRFov& fov, float znear, float zfar,
   result.m[1] = result.m[2] = result.m[3] = result.m[4] = 0.f;
   result.m[5]                                           = yScale;
   result.m[6] = result.m[7] = 0.0;
-  result.m[8] = ((leftTan - rightTan) * xScale * 0.5f); // * rightHandedFactor;
-  result.m[9] = -((upTan - downTan) * yScale * 0.5f);   // * rightHandedFactor;
-  // result.m[10] = -(znear + zfar) / (zfar - znear) * rightHandedFactor;
+
+  result.m[8]  = ((leftTan - rightTan) * xScale * 0.5f);
+  result.m[9]  = -((upTan - downTan) * yScale * 0.5f);
   result.m[10] = -zfar / (znear - zfar);
   result.m[11] = 1.f * rightHandedFactor;
+
   result.m[12] = result.m[13] = result.m[15] = 0.f;
   result.m[14] = -(2.f * zfar * znear) / (zfar - znear);
-  // result.m[14] = (znear * zfar) / (znear - zfar);
 
   result._markAsUpdated();
 }

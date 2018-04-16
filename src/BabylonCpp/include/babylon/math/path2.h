@@ -12,7 +12,8 @@ class BABYLON_SHARED_EXPORT Path2 {
 
 public:
   /**
-   * @brief Creates a Path2 object from the starting 2D coordinates x and y.
+   * @brief Adds a new segment until the given coordinates (x, y) to the current
+   * Path2. Returns the updated Path2.
    */
   Path2(float x, float y);
   Path2(const Path2& otherPath);

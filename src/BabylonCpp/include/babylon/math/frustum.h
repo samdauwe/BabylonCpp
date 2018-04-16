@@ -14,7 +14,7 @@ public:
   /** Statics **/
 
   /**
-   * @brief Returns a new array of 6 Frustum planes computed by the passed
+   * @brief Returns a new array of 6 Frustum planes computed by the given
    * transformation matrix.
    */
   static array_t<Plane, 6> GetPlanes(const Matrix& transform);
@@ -27,8 +27,8 @@ public:
   static void GetBottomPlaneToRef(const Matrix& transform, Plane& frustumPlane);
 
   /**
-   * @brief Sets the passed array "frustumPlanes" with the 6 Frustum planes
-   * computed by the passed transformation matrix.
+   * @brief Sets the given array "frustumPlanes" with the 6 Frustum planes
+   * computed by the given transformation matrix.
    */
   static void GetPlanesToRef(const Matrix& transform,
                              array_t<Plane, 6>& frustumPlanes);

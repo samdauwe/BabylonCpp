@@ -10,7 +10,7 @@ class BABYLON_SHARED_EXPORT Size : public ISize {
 
 public:
   /**
-   * @brief Creates a Size object from the passed width and height (floats).
+   * @brief Creates a Size object from the given width and height (floats).
    */
   Size(int width = 0, int height = 0);
   Size(const Size& otherSize);
@@ -21,7 +21,7 @@ public:
   Size copy() const;
 
   /**
-   * @brief Returns a new Size copied from the passed one.
+   * @brief Returns a new Size copied from the given one.
    */
   unique_ptr_t<Size> clone() const;
 
@@ -43,32 +43,32 @@ public:
   int getHashCode() const;
 
   /**
-   * @brief Updates the current size from the passed one.
-   * @returns The updated Size.
+   * @brief Updates the current size from the given one.
+   * @returns the updated Size.
    */
   void copyFrom(const Size& src);
 
   /**
-   * @brief Updates in place the current Size from the passed floats.
-   * @returns The updated Size.
+   * @brief Updates in place the current Size from the given floats.
+   * @returns the updated Size.
    */
   Size& copyFromFloats(float width, float height);
 
   /**
-   * @brief Updates in place the current Size from the passed floats.
-   * @returns The updated Size.
+   * @brief Updates in place the current Size from the given floats.
+   * @returns the updated Size.
    */
   Size& set(float width, float height);
 
   /**
    * @brief Returns a new Size set with the multiplication result of the current
-   * Size and the passed floats.
+   * Size and the given floats.
    */
   Size multiplyByFloats(float w, float h) const;
 
   /**
-   * @brief Returns if the current Size and the passed one width and height are
-   * strictly equal.
+   * @brief Boolean : True if the current Size and the given one width and
+   * height are strictly equal.
    */
   bool equals(const Size& otherSize);
 
@@ -84,13 +84,13 @@ public:
 
   /**
    * @brief Returns a new Size set as the addition result of the current Size
-   * and the passed one.
+   * and the given one.
    */
   Size add(const Size& otherSize) const;
 
   /**
-   * @brief Returns a new Size set as the subtraction result of  the passed one
-   * from the current Size.
+   *@brief  Returns a new Size set as the subtraction result of  the given one
+   *from the current Size.
    */
   Size subtract(const Size& otherSize) const;
 

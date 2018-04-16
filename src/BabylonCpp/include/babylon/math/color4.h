@@ -42,7 +42,7 @@ public:
   const char* getClassName() const;
 
   /**
-   * @brief Compute the Color4 hash code
+   * @brief Compute the Color4 hash code.
    * @returns an unique number that can be used to hash Color4 objects
    */
   int getHashCode() const;
@@ -50,7 +50,7 @@ public:
   /** Operators **/
 
   /**
-   * @brief Adds in place the passed Color4 values to the current Color4 object.
+   * @brief Adds in place the given Color4 values to the current Color4 object.
    * @param right defines the second operand
    * @returns the current updated Color4 object
    */
@@ -64,7 +64,7 @@ public:
   const Float32Array asArray() const;
 
   /**
-   * @brief Stores from the starting index in the passed array the Color4
+   * @brief Stores from the starting index in the given array the Color4
    * successive values.
    * @param array defines the array where to store the r,g,b components
    * @param index defines an optional index in the target array to define where
@@ -75,22 +75,22 @@ public:
 
   /**
    * @brief Creates a new Color4 set with the added values of the current Color4
-   * and of the passed one.
+   * and of the given one.
    * @param right defines the second operand
    * @returns a new Color4 object
    */
   Color4 add(const Color4& right) const;
 
   /**
-   * @brief Creates a new Color4 set with the subtracted values of the passed
-   * one from the current Color4.
+   * @brief Creates a new Color4 set with the subtracted values of the given one
+   * from the current Color4.
    * @param right defines the second operand
    * @returns a new Color4 object
    */
   Color4 subtract(const Color4& right) const;
 
   /**
-   * @brief Subtracts the passed ones from the current Color4 values and stores
+   * @brief Subtracts the given ones from the current Color4 values and stores
    * the results in "result".
    * @param right defines the second operand
    * @param result defines the Color4 object where to store the result
@@ -172,14 +172,14 @@ public:
   string_t toString() const;
 
   /**
-   * @brief Copies the passed Color4 values into the current one.
+   * @brief Copies the given Color4 values into the current one.
    * @param source defines the source Color4 object
    * @returns the current updated Color4 object
    */
   Color4& copyFrom(const Color4& source);
 
   /**
-   * @brief Copies the passed float values into the current one.
+   * @brief Copies the given float values into the current one.
    * @param r defines the red component to read from
    * @param g defines the green component to read from
    * @param b defines the blue component to read from
@@ -189,7 +189,7 @@ public:
   Color4& copyFromFloats(float red, float green, float blue, float alpha);
 
   /**
-   * @brief Copies the passed float values into the current one.
+   * Copies the given float values into the current one.
    * @param r defines the red component to read from
    * @param g defines the green component to read from
    * @param b defines the blue component to read from
@@ -222,7 +222,7 @@ public:
   const Color4& toLinearSpaceToRef(Color4& convertedColor) const;
 
   /**
-   * @brief Computes a new Color4 converted from the current one to gamma space
+   * @brief Computes a new Color4 converted from the current one to gamma space.
    * @returns a new Color4 object
    */
   Color4 toGammaSpace() const;
@@ -267,7 +267,7 @@ public:
   static Color4 Lerp(const Color4& left, const Color4& right, float amount);
 
   /**
-   * @brief Set the passed "result" with the linearly interpolated values of
+   * @brief Set the given "result" with the linearly interpolated values of
    * "amount" between the left Color4 object and the right Color4 object.
    * @param left defines the start value
    * @param right defines the end value
@@ -278,7 +278,7 @@ public:
                         Color4& result);
 
   /**
-   * @brief Creates a new Color4 from the starting index element of the passed
+   * @brief Creates a new Color4 from the starting index element of the given
    * array.
    * @param array defines the source array to read from
    * @param offset defines the offset in the source array

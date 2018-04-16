@@ -14,7 +14,7 @@ class BABYLON_SHARED_EXPORT Plane {
 
 public:
   /**
-   * @brief Creates a Plane object according to the passed floats a, b, c, d and
+   * @brief Creates a Plane object according to the given floats a, b, c, d and
    * the plane equation : ax + by + cz + d = 0
    */
   Plane();
@@ -60,7 +60,7 @@ public:
 
   /**
    * @brief Returns a new Plane as the result of the transformation of the
-   * current Plane by the passed matrix.
+   * current Plane by the given matrix.
    */
   Plane transform(const Matrix& transformation) const;
 
@@ -71,9 +71,8 @@ public:
   float dotCoordinate(const Vector3& point) const;
 
   /**
-   * @brief Updates the current Plane from the plane defined by the three passed
-   * points.
-   * @returns The updated Plane.
+   * @brief Updates the current Plane from the plane defined by the three given
+   * points. Returns the updated Plane.
    */
   Plane& copyFromPoints(const Vector3& point1, const Vector3& point2,
                         const Vector3& point3);
@@ -85,7 +84,7 @@ public:
   bool isFrontFacingTo(const Vector3& direction, float epsilon) const;
 
   /**
-   * @brief Returns the signed distance (float) from the passed point to the
+   * @brief Returns the signed distance (float) from the given point to the
    * Plane.
    */
   float signedDistanceTo(const Vector3& point) const;
@@ -93,26 +92,25 @@ public:
   /** Statics **/
 
   /**
-   * @brief Returns a new Plane from the passed array.
+   * @brief Returns a new Plane from the given array.
    */
   static Plane FromArray(const Float32Array& array);
 
   /**
-   * @brief Returns a new Plane defined by the three passed points.
+   * @brief Returns a new Plane defined by the three given points.
    */
   static Plane FromPoints(const Vector3& point1, const Vector3& point2,
                           const Vector3& point3);
 
   /**
-   * @brief Returns a new Plane the normal vector to this plane at the passed
-   * origin point.
-   * Note : the vector "normal" is updated because normalized.
+   * @brief Returns a new Plane the normal vector to this plane at the given
+   * origin point. Note : the vector "normal" is updated because normalized.
    */
   static Plane FromPositionAndNormal(const Vector3& origin, Vector3& normal);
 
   /**
    * @brief Returns the signed distance between the plane defined by the normal
-   * vector at the "origin"" point and the passed other point.
+   * vector at the "origin"" point and the given other point.
    */
   static float SignedDistanceToPlaneFromPositionAndNormal(const Vector3& origin,
                                                           const Vector3& normal,

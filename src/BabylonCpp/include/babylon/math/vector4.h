@@ -13,7 +13,7 @@ class BABYLON_SHARED_EXPORT Vector4 {
 
 public:
   /**
-   * @brief Creates a Vector4 object from the passed floats.
+   * @brief Creates a Vector4 object from the given floats.
    */
   Vector4(float x = 0.f, float y = 0.f, float z = 0.f, float w = 0.f);
   Vector4(const Vector4& otherVector);
@@ -52,62 +52,61 @@ public:
   Float32Array asArray() const;
 
   /**
-   * @brief Populates the passed array from the passed index with the Vector4
+   * @brief Populates the given array from the given index with the Vector4
    * coordinates.
-   * @returns The Vector4.
+   * @returns the Vector4.
    */
   const Vector4& toArray(Float32Array& array, unsigned int index = 0) const;
 
   /**
-   * @brief Adds the passed vector to the current Vector4.
-   * @returns The updated Vector4.
+   * @brief Adds the given vector to the current Vector4.
+   * @returns the updated Vector4.
    */
   Vector4& addInPlace(const Vector4& otherVector);
 
   /**
    * @brief Returns a new Vector4 as the result of the addition of the current
-   * Vector4 and the passed one.
+   * Vector4 and the given one.
    */
   Vector4 add(const Vector4& otherVector) const;
 
   /**
-   * @brief Updates the passed vector "result" with the result of the addition
-   * of the current Vector4 and the passed one.
-   * @returns The current Vector4.
+   * @brief Updates the given vector "result" with the result of the addition of
+   * the current Vector4 and the given one.
+   * @returns the current Vector4.
    */
   const Vector4& addToRef(const Vector4& otherVector, Vector4& result) const;
 
   /**
-   * @brief Subtract in place the passed vector from the current Vector4.
-   * @returns The updated Vector4.
+   * @brief Subtract in place the given vector from the current Vector4.
+   * @returns the updated Vector4.
    */
   Vector4& subtractInPlace(const Vector4& otherVector);
 
   /**
    * @brief Returns a new Vector4 with the result of the subtraction of the
-   * passed vector from the current Vector4.
+   * given vector from the current Vector4.
    */
   Vector4 subtract(const Vector4& otherVector) const;
 
   /**
-   * @brief Sets the passed vector "result" with the result of the subtraction
-   * of the passed vector from the current Vector4.
-   * @returns The current Vector4.
+   * @brief Sets the given vector "result" with the result of the subtraction of
+   * the given vector from the current Vector4.
+   * @returns the current Vector4.
    */
   const Vector4& subtractToRef(const Vector4& otherVector,
                                Vector4& result) const;
 
   /**
-   * @brief Sets the passed vector "result" set with the result of the
-   * subtraction of the passed floats from the current Vector4 coordinates.
-   * @returns The current Vector4.
+   * @brief Returns a new Vector4 set with the result of the subtraction of the
+   * given floats from the current Vector4 coordinates.
    */
   Vector4 subtractFromFloats(float ix, float iy, float iz, float iw) const;
 
   /**
-   * @brief Sets the passed vector "result" set with the result of the
-   * subtraction of the passed floats from the current Vector4 coordinates.
-   * @returns The current Vector4.
+   * @brief Sets the given vector "result" set with the result of the
+   * subtraction of the given floats from the current Vector4 coordinates.
+   * @returns the current Vector4.
    */
   const Vector4& subtractFromFloatsToRef(float ix, float iy, float iz, float iw,
                                          Vector4& result) const;
@@ -131,9 +130,9 @@ public:
   Vector4 scale(float iscale) const;
 
   /**
-   * @brief Sets the passed vector "result" with the current Vector4 coordinates
+   * @brief Sets the given vector "result" with the current Vector4 coordinates
    * multiplied by scale (float).
-   * @returns The current Vector4.
+   * @returns the current Vector4.
    */
   const Vector4& scaleToRef(float iscale, Vector4& result) const;
 
@@ -147,78 +146,82 @@ public:
   const Vector4& scaleAndAddToRef(float iscale, Vector4& result) const;
 
   /**
-   * @brief Returns if the current Vector4 coordinates are stricly equal to the
-   * passed ones.
+   * @brief Boolean : True if the current Vector4 coordinates are stricly equal
+   * to the given ones.
    */
   bool equals(const Vector4& otherVector) const;
 
   /**
-   * @brief Returns if the current Vector4 coordinates are each beneath the
-   * distance "epsilon" from the passed vector ones.
+   * @brief Boolean : True if the current Vector4 coordinates are each beneath
+   * the distance "epsilon" from the given vector ones.
    */
   bool equalsWithEpsilon(const Vector4& otherVector,
                          float epsilon = Math::Epsilon) const;
 
   /**
-   * @brief Returns if the passed floats are strictly equal to the current
+   * @brief Boolean : True if the given floats are strictly equal to the current
    * Vector4 coordinates.
    */
   bool equalsToFloats(float x, float y, float z, float w) const;
 
   /**
-   * @brief Multiplies in place the current Vector4 by the passed one.
-   * @returns The updated Vector4.
+   * @brief Multiplies in place the current Vector4 by the given one.
+   * @returns the updated Vector4.
    */
   Vector4& multiplyInPlace(const Vector4& otherVector);
 
   /**
    * @brief Returns a new Vector4 set with the multiplication result of the
-   * current Vector4 and the passed one.
+   * current Vector4 and the given one.
    */
   Vector4 multiply(const Vector4& otherVector) const;
 
   /**
-   * @brief Updates the passed vector "result" with the multiplication result of
-   * the current Vector4 and the passed one.
-   * @returns The current Vector4.
+   * @brief Updates the given vector "result" with the multiplication result of
+   * the current Vector4 and the given one.
+   * @returns the current Vector4.
    */
   const Vector4& multiplyToRef(const Vector4& otherVector,
                                Vector4& result) const;
 
   /**
    * @brief Returns a new Vector4 set with the multiplication result of the
-   * passed floats and the current Vector4 coordinates.
+   * given floats and the current Vector4 coordinates.
    */
   Vector4 multiplyByFloats(float x, float y, float z, float w) const;
 
   /**
    * @brief Returns a new Vector4 set with the division result of the current
-   * Vector4 by the passed one.
+   * Vector4 by the given one.
    */
   Vector4 divide(const Vector4& otherVector) const;
 
   /**
-   * @brief Updates the passed vector "result" with the division result of the
-   * current Vector4 by the passed one.
-   * @returns The current Vector4.
+   *@brief Updates the given vector "result" with the division result of the
+   *current Vector4 by the given one.
+   * @returns the current Vector4.
    */
   const Vector4& divideToRef(const Vector4& otherVector, Vector4& result) const;
 
   /**
-   * @brief Divides the current Vector4 coordinates by the passed ones.
-   * @returns the updated Vector4.
+   * @brief Divides the current Vector3 coordinates by the given ones.
+   * @returns the updated Vector3.
    */
   Vector4& divideInPlace(const Vector4& otherVector);
 
   /**
    * @brief Updates the Vector4 coordinates with the minimum values between its
-   * own and the passed vector ones.
+   * own and the given vector ones.
+   * @param other defines the second operand
+   * @returns the current updated Vector4
    */
   Vector4& minimizeInPlace(const Vector4& other);
 
   /**
    * @brief Updates the Vector4 coordinates with the maximum values between its
-   * own and the passed vector ones.
+   * own and the given vector ones.
+   * @param other defines the second operand
+   * @returns the current updated Vector4
    */
   Vector4& maximizeInPlace(const Vector4& other);
 
@@ -263,41 +266,40 @@ public:
   Vector3 toVector3() const;
 
   /**
-   * @brief Updates the current Vector4 with the passed one coordinates.
-   * @returns The updated Vector4.
+   * @brief Updates the current Vector4 with the given one coordinates.
+   * @returns the updated Vector4.
    */
   Vector4& copyFrom(const Vector4& source);
 
   /**
-   * @brief Updates the current Vector4 coordinates with the passed floats.
-   * @returns The updated Vector4.
+   * @brief Updates the current Vector4 coordinates with the given floats.
+   * @returns the updated Vector4.
    */
   Vector4& copyFromFloats(float x, float y, float z, float w);
 
   /**
-   * @brief Updates the current Vector4 coordinates with the passed floats.
-   * @returns The updated Vector4.
+   * @brief Updates the current Vector4 coordinates with the given floats.
+   * @returns the updated Vector4.
    */
   Vector4& set(float x, float y, float z, float w);
 
   /** Statics **/
 
   /**
-   * @brief Returns a new Vector4 set from the starting index of the passed
+   * @brief Returns a new Vector4 set from the starting index of the given
    * array.
    */
   static Vector4 FromArray(const Float32Array& array, unsigned int offset = 0);
 
   /**
-   * @brief Updates the passed vector "result" from the starting index of the
-   * passed array.
+   * @brief Updates the given vector "result" from the starting index of the
+   * given Float32Array.
    */
   static void FromArrayToRef(const Float32Array& array, unsigned int offset,
                              Vector4& result);
 
   /**
-   * @brief Updates the passed vector "result" coordinates from the passed
-   * floats.
+   * @brief Updates the given vector "result" coordinates from the given floats.
    */
   static void FromFloatsToRef(float x, float y, float z, float w,
                               Vector4& result);
@@ -308,18 +310,18 @@ public:
   static Vector4 Zero();
 
   /**
-   * Returns a new Vector4 set to (1.0, 1.0, 1.0, 1.0)
+   * @brief Returns a new Vector4 set to (1.0, 1.0, 1.0, 1.0)
    */
   static Vector4 One();
 
   /**
-   * @brief Returns a new normalized Vector4 from the passed one.
+   * @brief Returns a new normalized Vector4 from the given one.
    */
   static Vector4 Normalize(const Vector4& vector);
 
   /**
-   * @brief Updates the passed vector "result" from the normalization of the
-   * passed one.
+   * @brief Updates the given vector "result" from the normalization of the
+   * given one.
    */
   static void NormalizeToRef(const Vector4& vector, Vector4& result);
 
@@ -346,25 +348,25 @@ public:
 
   /**
    * @brief Returns a new Vector4 set with the result of the normal
-   * transformation by the passed matrix of the passed vector.
-   * This methods computes transformed normalized direction vectors only.
+   * transformation by the given matrix of the given vector. This methods
+   * computes transformed normalized direction vectors only.
    */
   static Vector4 TransformNormal(const Vector4& vector,
                                  const Matrix& transformation);
 
   /**
-   * @brief Sets the passed vector "result" with the result of the normal
-   * transformation by the passed matrix of the passed vector.
-   * This methods computes transformed normalized direction vectors only.
+   * @brief Sets the given vector "result" with the result of the normal
+   * transformation by the given matrix of the given vector. This methods
+   * computes transformed normalized direction vectors only.
    */
   static void TransformNormalToRef(const Vector4& vector,
                                    const Matrix& transformation,
                                    Vector4& result);
 
   /**
-   * @brief Sets the passed vector "result" with the result of the normal
-   * transformation by the passed matrix of the passed floats (x, y, z, w).
-   * This methods computes transformed normalized direction vectors only.
+   * @brief Sets the given vector "result" with the result of the normal
+   * transformation by the given matrix of the given floats (x, y, z, w). This
+   * methods computes transformed normalized direction vectors only.
    */
   static void TransformNormalFromFloatsToRef(float x, float y, float z, float w,
                                              const Matrix& transformation,

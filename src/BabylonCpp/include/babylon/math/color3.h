@@ -52,7 +52,7 @@ public:
   /** Operators **/
 
   /**
-   * @brief Stores in the passed array from the passed starting index the red,
+   * @brief Stores in the given array from the given starting index the red,
    * green, blue values as successive elements.
    * @param array defines the array where to store the r,g,b components
    * @param index defines an optional index in the target array to define where
@@ -63,7 +63,7 @@ public:
 
   /**
    * @brief Returns a new {BABYLON.Color4} object from the current Color3 and
-   * the passed alpha.
+   * the given alpha.
    * @param alpha defines the alpha component on the new {BABYLON.Color4} object
    * (default is 1)
    * @returns a new {BABYLON.Color4} object
@@ -84,7 +84,7 @@ public:
   float toLuminance() const;
 
   /**
-   * @brief Multiply each Color3 rgb values by the passed Color3 rgb values in a
+   * @brief Multiply each Color3 rgb values by the given Color3 rgb values in a
    * new Color3 object.
    * @param otherColor defines the second operand
    * @returns the new Color3 object
@@ -92,7 +92,7 @@ public:
   Color3 multiply(const Color3& otherColor) const;
 
   /**
-   * @brief Multiply the rgb values of the Color3 and the passed Color3 and
+   * @brief Multiply the rgb values of the Color3 and the given Color3 and
    * stores the result in the object "result".
    * @param otherColor defines the second operand
    * @param result defines the Color3 object where to store the result
@@ -101,9 +101,9 @@ public:
   const Color3& multiplyToRef(const Color3& otherColor, Color3& result) const;
 
   /**
-   * @brief Determines equality between Color3 objects.
+   * @brief Determines equality between Color3 objects
    * @param otherColor defines the second operand
-   * @returns true if the rgb values are equal to the passed ones
+   * @returns true if the rgb values are equal to the given ones
    */
   bool equals(const Color3& otherColor) const;
 
@@ -113,7 +113,7 @@ public:
    * @param r defines the red component to check
    * @param g defines the green component to check
    * @param b defines the blue component to check
-   * @returns true if the rgb values are equal to the passed ones
+   * @returns true if the rgb values are equal to the given ones
    */
   bool equalsFloats(float red, float green, float blue) const;
 
@@ -155,14 +155,14 @@ public:
 
   /**
    * @brief Creates a new Color3 set with the added values of the current Color3
-   * and of the passed one.
+   * and of the given one.
    * @param otherColor defines the second operand
    * @returns the new Color3
    */
   Color3 add(const Color3& otherColor) const;
 
   /**
-   * @brief Stores the result of the addition of the current Color3 and passed
+   * @brief Stores the result of the addition of the current Color3 and given
    * one rgb values into "result".
    * @param otherColor defines the second operand
    * @param result defines Color3 object to store the result into
@@ -171,15 +171,15 @@ public:
   const Color3& addToRef(const Color3& otherColor, Color3& result) const;
 
   /**
-   * @brief Returns a new Color3 set with the subtracted values of the passed
-   * one from the current Color3.
+   * @brief Returns a new Color3 set with the subtracted values of the given one
+   * from the current Color3.
    * @param otherColor defines the second operand
    * @returns the new Color3
    */
   Color3 subtract(const Color3& otherColor) const;
 
   /**
-   * @brief Stores the result of the subtraction of passed one from the current
+   * @brief Stores the result of the subtraction of given one from the current
    * Color3 rgb values into "result".
    * @param otherColor defines the second operand
    * @param result defines Color3 object to store the result into
@@ -195,7 +195,7 @@ public:
   Color3& copyFrom(const Color3& source);
 
   /**
-   * @brief Updates the Color3 rgb values from the passed floats.
+   * @brief Updates the Color3 rgb values from the given floats.
    * @param r defines the red component to read from
    * @param g defines the green component to read from
    * @param b defines the blue component to read from
@@ -204,7 +204,7 @@ public:
   Color3& copyFromFloats(float red, float green, float blue);
 
   /**
-   * @brief Updates the Color3 rgb values from the passed floats.
+   * @brief Updates the Color3 rgb values from the given floats.
    * @param r defines the red component to read from
    * @param g defines the green component to read from
    * @param b defines the blue component to read from
@@ -269,7 +269,7 @@ public:
   static Color3 FromHexString(const string_t& hex);
 
   /**
-   * @brief Creates a new Vector3 from the starting index of the passed array.
+   * @brief Creates a new Vector3 from the starting index of the given array.
    * @param array defines the source array
    * @param offset defines an offset in the source array
    * @returns a new Color3 object

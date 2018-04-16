@@ -132,6 +132,15 @@ Quaternion Quaternion::add(const Quaternion& other) const
   return Quaternion(x + other.x, y + other.y, z + other.z, w + other.w);
 }
 
+Quaternion& Quaternion::addInPlace(const Quaternion& other)
+{
+  x += other.x;
+  y += other.y;
+  z += other.z;
+  w += other.w;
+  return *this;
+}
+
 Quaternion Quaternion::subtract(const Quaternion& other) const
 {
   return Quaternion(x - other.x, y - other.y, z - other.z, w - other.w);
@@ -148,6 +157,16 @@ const Quaternion& Quaternion::scaleToRef(float iscale, Quaternion& result) const
   result.y = y * iscale;
   result.z = z * iscale;
   result.w = w * iscale;
+
+  return *this;
+}
+
+Quaternion& Quaternion::scaleInPlace(float value)
+{
+  x *= value;
+  y *= value;
+  z *= value;
+  w *= value;
 
   return *this;
 }
@@ -539,7 +558,7 @@ Quaternion Quaternion::Slerp(const Quaternion& left, const Quaternion& right,
 void Quaternion::SlerpToRef(const Quaternion& left, const Quaternion& right,
                             float amount, Quaternion& result)
 {
-  float num2, num3, num = amount;
+  float num2, num3;
   float num4 = (((left.x * right.x) + (left.y * right.y)) + (left.z * right.z))
                + (left.w * right.w);
   bool flag = false;
@@ -550,15 +569,15 @@ void Quaternion::SlerpToRef(const Quaternion& left, const Quaternion& right,
   }
 
   if (num4 > 0.999999f) {
-    num3 = 1.f - num;
-    num2 = flag ? -num : num;
+    num3 = 1.f - amount;
+    num2 = flag ? -amount : amount;
   }
   else {
     const float num5 = ::std::acos(num4);
     const float num6 = (1.f / ::std::sin(num5));
-    num3             = (::std::sin((1.f - num) * num5)) * num6;
-    num2             = flag ? ((-::std::sin(num * num5)) * num6) :
-                  ((::std::sin(num * num5)) * num6);
+    num3             = (::std::sin((1.f - amount) * num5)) * num6;
+    num2             = flag ? ((-::std::sin(amount * num5)) * num6) :
+                  ((::std::sin(amount * num5)) * num6);
   }
 
   result.x = (num3 * left.x) + (num2 * right.x);

@@ -77,9 +77,28 @@ enum class TonemappingOperator {
 }; // end of enum class TonemappingOperator
 
 /** Math Enums **/
-enum class Space { LOCAL = 0, WORLD = 1, BONE = 2 }; // end of enum class Space
 
-enum class Orientation { CW = 0, CCW = 1 }; // end of enum class Orientation
+/**
+ * @brief Defines supported spaces.
+ */
+enum class Space {
+  /** Local (object) space */
+  LOCAL = 0,
+  /** World space */
+  WORLD = 1,
+  /** Bone space */
+  BONE = 2
+}; // end of enum class Space
+
+/**
+ * @brief Defines potential orientation for back face culling.
+ */
+enum class Orientation {
+  /** Clockwise */
+  CW = 0,
+  /** Counter clockwise */
+  CCW = 1
+}; // end of enum class Orientation
 
 /** Mesh Enums **/
 enum class SimplificationType {

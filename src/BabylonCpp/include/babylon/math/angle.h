@@ -6,7 +6,7 @@
 namespace BABYLON {
 
 /**
- * @brief Represents an Angle.
+ * @brief Defines angle representation.
  */
 class BABYLON_SHARED_EXPORT Angle {
 
@@ -28,30 +28,39 @@ public:
   friend bool operator!=(const Angle& lhs, const Angle& rhs);
 
   /**
-   * @brief Returns the Angle value in degrees (float).
+   * @brief Get value in degrees.
+   * @returns the Angle value in degrees (float)
    */
   float degrees() const;
 
   /**
-   * @brief Returns the Angle value in radians (float).
+   * @brief Get value in radians.
+   * @returns the Angle value in radians (float)
    */
   float radians() const;
 
   /** Statics **/
 
   /**
-   * @brief Returns a new Angle object valued with the angle value in radians
-   * between the two passed vectors.
+   * @brief Gets a new Angle object valued with the angle value in radians.
+   * between the two given vectors
+   * @param a defines first vector
+   * @param b defines second vector
+   * @returns a new Angle
    */
   static Angle BetweenTwoPoints(const Vector2& a, const Vector2& b);
 
   /**
-   * @brief Returns a new Angle object from the passed float in radians.
+   * @brief Gets a new Angle object from the given float in radians.
+   * @param radians defines the angle value in radians
+   * @returns a new Angle
    */
   static Angle FromRadians(float radians);
 
   /**
-   * @brief Returns a new Angle object from the passed float in degrees.
+   * @brief Gets a new Angle object from the given float in degrees.
+   * @param degrees defines the angle value in degrees
+   * @returns a new Angle
    */
   static Angle FromDegrees(float degrees);
 

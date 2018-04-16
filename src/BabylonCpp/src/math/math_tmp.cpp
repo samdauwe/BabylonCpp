@@ -6,8 +6,11 @@
 
 namespace BABYLON {
 
-array_t<Vector3, 1> MathTmp::Vector3Array{{Vector3::Zero()}};
+array_t<Vector3, 6> MathTmp::Vector3Array{{Vector3::Zero(), Vector3::Zero(),
+                                           Vector3::Zero(), Vector3::Zero(),
+                                           Vector3::Zero(), Vector3::Zero()}};
 array_t<Matrix, 2> MathTmp::MatrixArray{{Matrix::Zero(), Matrix::Zero()}};
-array_t<Quaternion, 1> MathTmp::QuaternionArray{{Quaternion::Zero()}};
+array_t<Quaternion, 3> MathTmp::QuaternionArray{
+  {Quaternion::Zero(), Quaternion::Zero(), Quaternion::Zero()}};
 
 } // end of namespace BABYLON
