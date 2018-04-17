@@ -12,22 +12,23 @@ namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT Layer {
 
+  using LayerCallbackType = ::std::function<void(Layer*, EventState&)>;
+
 public:
   Layer(const string_t& name, const string_t& imgUrl, Scene* scene,
         bool isBackground   = true,
         const Color4& color = Color4(1.f, 1.f, 1.f, 1.f));
   virtual ~Layer();
 
-  // Events
-  void setOnDispose(const ::std::function<void(Layer*, EventState&)>& callback);
-  void
-  setOnBeforeRender(const ::std::function<void(Layer*, EventState&)>& callback);
-  void
-  setOnAfterRender(const ::std::function<void(Layer*, EventState&)>& callback);
-
   void _rebuild();
   void render();
   void dispose();
+
+protected:
+  // Events
+  void set_onDispose(const LayerCallbackType& callback);
+  void set_onBeforeRender(const LayerCallbackType& callback);
+  void set_onAfterRender(const LayerCallbackType& callback);
 
 private:
   void _createIndexBuffer();
@@ -55,6 +56,10 @@ public:
   unsigned int alphaBlendingMode;
   bool alphaTest;
   unsigned int layerMask;
+
+  WriteOnlyProperty<Layer, LayerCallbackType> onDispose;
+  WriteOnlyProperty<Layer, LayerCallbackType> onBeforeRender;
+  WriteOnlyProperty<Layer, LayerCallbackType> onAfterRender;
 
 private:
   // Events

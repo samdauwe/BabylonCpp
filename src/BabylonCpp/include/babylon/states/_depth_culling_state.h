@@ -18,7 +18,7 @@ public:
   void reset();
   void apply(GL::IGLRenderingContext& _gl);
 
-private:
+protected:
   bool get_isDirty() const;
   float get_zOffset() const;
   void set_zOffset(float value);

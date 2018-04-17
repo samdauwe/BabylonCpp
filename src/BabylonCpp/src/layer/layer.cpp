@@ -20,6 +20,9 @@ Layer::Layer(const string_t& name, const string_t& imgUrl, Scene* scene,
     , offset{Vector2(0.f, 0.f)}
     , alphaBlendingMode{EngineConstants::ALPHA_COMBINE}
     , layerMask{0x0FFFFFFF}
+    , onDispose{this, &Layer::set_onDispose}
+    , onBeforeRender{this, &Layer::set_onBeforeRender}
+    , onAfterRender{this, &Layer::set_onAfterRender}
     , _onDisposeObserver{nullptr}
     , _onBeforeRenderObserver{nullptr}
     , _onAfterRenderObserver{nullptr}
@@ -33,7 +36,7 @@ Layer::Layer(const string_t& name, const string_t& imgUrl, Scene* scene,
   auto engine = scene->getEngine();
 
   // VBO
-  Float32Array vertices{
+  const Float32Array vertices{
     1.f,  1.f,  //
     -1.f, 1.f,  //
     -1.f, -1.f, //
@@ -75,8 +78,7 @@ Layer::~Layer()
 }
 
 // Events
-void Layer::setOnDispose(
-  const ::std::function<void(Layer*, EventState&)>& callback)
+void Layer::set_onDispose(const LayerCallbackType& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);
@@ -84,8 +86,7 @@ void Layer::setOnDispose(
   _onDisposeObserver = onDisposeObservable.add(callback);
 }
 
-void Layer::setOnBeforeRender(
-  const ::std::function<void(Layer*, EventState&)>& callback)
+void Layer::set_onBeforeRender(const LayerCallbackType& callback)
 {
   if (_onBeforeRenderObserver) {
     onBeforeRenderObservable.remove(_onBeforeRenderObserver);
@@ -93,8 +94,7 @@ void Layer::setOnBeforeRender(
   _onBeforeRenderObserver = onBeforeRenderObservable.add(callback);
 }
 
-void Layer::setOnAfterRender(
-  const ::std::function<void(Layer*, EventState&)>& callback)
+void Layer::set_onAfterRender(const LayerCallbackType& callback)
 {
   if (_onAfterRenderObserver) {
     onAfterRenderObservable.remove(_onAfterRenderObserver);

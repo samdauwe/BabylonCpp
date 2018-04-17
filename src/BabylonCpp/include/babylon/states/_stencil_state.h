@@ -17,7 +17,7 @@ public:
   void reset();
   void apply(GL::IGLRenderingContext& gl);
 
-private:
+protected:
   bool get_isDirty() const;
   unsigned int get_stencilFunc() const;
   void set_stencilFunc(unsigned int value);

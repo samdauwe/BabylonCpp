@@ -556,8 +556,8 @@ void StandardRenderingPipeline::_createTextureAdderPostProcess(Scene* scene,
 void StandardRenderingPipeline::_createVolumetricLightPostProcess(Scene* scene,
                                                                   float ratio)
 {
-  auto geometryRenderer = scene->enableGeometryBufferRenderer();
-  geometryRenderer->setEnablePosition(true);
+  auto geometryRenderer            = scene->enableGeometryBufferRenderer();
+  geometryRenderer->enablePosition = true;
 
   auto geometry = geometryRenderer->getGBuffer();
 

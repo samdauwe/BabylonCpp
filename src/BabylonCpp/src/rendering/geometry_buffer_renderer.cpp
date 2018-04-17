@@ -17,7 +17,15 @@
 namespace BABYLON {
 
 GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
-    : _effect{nullptr}
+    : renderList{this, &GeometryBufferRenderer::set_renderList}
+    , isSupported{this, &GeometryBufferRenderer::get_isSupported}
+    , enablePosition{this, &GeometryBufferRenderer::get_enablePosition,
+                     &GeometryBufferRenderer::set_enablePosition}
+    , scene{this, &GeometryBufferRenderer::get_scene}
+    , ratio{this, &GeometryBufferRenderer::get_ratio}
+    , samples{this, &GeometryBufferRenderer::get_samples,
+              &GeometryBufferRenderer::set_samples}
+    , _effect{nullptr}
     , _cachedDefines{""}
     , _scene{scene}
     , _multiRenderTarget{nullptr}
@@ -32,7 +40,7 @@ GeometryBufferRenderer::~GeometryBufferRenderer()
 {
 }
 
-void GeometryBufferRenderer::setRenderList(const vector_t<Mesh*>& meshes)
+void GeometryBufferRenderer::set_renderList(const vector_t<Mesh*>& meshes)
 {
   _multiRenderTarget->renderList.clear();
   _multiRenderTarget->renderList.reserve(meshes.size());
@@ -41,29 +49,29 @@ void GeometryBufferRenderer::setRenderList(const vector_t<Mesh*>& meshes)
   }
 }
 
-bool GeometryBufferRenderer::isSupported() const
+bool GeometryBufferRenderer::get_isSupported() const
 {
   return _multiRenderTarget->isSupported();
 }
 
-bool GeometryBufferRenderer::enablePosition() const
+bool GeometryBufferRenderer::get_enablePosition() const
 {
   return _enablePosition;
 }
 
-void GeometryBufferRenderer::setEnablePosition(bool enable)
+void GeometryBufferRenderer::set_enablePosition(bool enable)
 {
   _enablePosition = enable;
   dispose();
   _createRenderTargets();
 }
 
-Scene* GeometryBufferRenderer::scene() const
+Scene*& GeometryBufferRenderer::get_scene()
 {
   return _scene;
 }
 
-float GeometryBufferRenderer::ratio() const
+float GeometryBufferRenderer::get_ratio() const
 {
   return _ratio;
 }
@@ -157,12 +165,12 @@ MultiRenderTarget* GeometryBufferRenderer::getGBuffer() const
   return _multiRenderTarget.get();
 }
 
-unsigned int GeometryBufferRenderer::samples() const
+unsigned int GeometryBufferRenderer::get_samples() const
 {
   return _multiRenderTarget->samples();
 }
 
-void GeometryBufferRenderer::setSamples(unsigned int value)
+void GeometryBufferRenderer::set_samples(unsigned int value)
 {
   _multiRenderTarget->setSamples(value);
 }

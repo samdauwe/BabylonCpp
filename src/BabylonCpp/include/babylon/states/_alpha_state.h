@@ -23,7 +23,7 @@ public:
   void reset();
   void apply(GL::IGLRenderingContext& gl);
 
-private:
+protected:
   bool get_isDirty() const;
   bool get_alphaBlend() const;
   void set_alphaBlend(bool value);
