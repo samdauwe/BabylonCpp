@@ -15,7 +15,7 @@ class BABYLON_SHARED_EXPORT BoxParticleEmitter : public IParticleEmitterType {
 
 public:
   /**
-   * @brief Creates a new instance of @see BoxParticleEmitter
+   * @brief Creates a new instance BoxParticleEmitter.
    */
   BoxParticleEmitter();
   virtual ~BoxParticleEmitter();

@@ -16,7 +16,7 @@ class BABYLON_SHARED_EXPORT Particle {
 
 public:
   /**
-   * @brief Creates a new instance of @see Particle
+   * @brief Creates a new instance Particle.
    * @param particleSystem the particle system the particle belongs to
    */
   Particle(ParticleSystem* particleSystem);

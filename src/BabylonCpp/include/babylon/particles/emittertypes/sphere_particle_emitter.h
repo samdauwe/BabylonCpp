@@ -16,7 +16,7 @@ class BABYLON_SHARED_EXPORT SphereParticleEmitter
 
 public:
   /**
-   * @brief Creates a new instance of @see SphereParticleEmitter
+   * @brief Creates a new instance of SphereParticleEmitter.
    * @param radius the radius of the emission sphere (1 by default)
    * @param directionRandomizer defines how much to randomize the particle
    * direction [0-1]

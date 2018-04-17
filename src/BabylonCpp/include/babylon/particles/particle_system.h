@@ -121,13 +121,13 @@ public:
   void reset() override;
 
   /**
-   * @brief ignore (for internal use only)
+   * @brief For internal use only.
    */
   void _appendParticleVertex(unsigned int index, Particle* particle,
                              int offsetX, int offsetY);
 
   /**
-   * @brief ignore (for internal use only)
+   * @brief For internal use only.
    */
   void _appendParticleVertexWithAnimation(unsigned int index,
                                           Particle* particle, int offsetX,
@@ -245,7 +245,7 @@ public:
   static ParticleSystem* Parse(const Json::value& parsedParticleSystem,
                                Scene* scene, const string_t& url);
 
-private:
+protected:
   Vector3& get_direction1();
   void set_direction1(const Vector3& value);
   Vector3& get_direction2();
@@ -255,6 +255,7 @@ private:
   Vector3& get_maxEmitBox();
   void set_maxEmitBox(const Vector3& value);
 
+private:
   void _createIndexBuffer();
   // start of sub system methods
   /**

@@ -7,7 +7,6 @@ namespace BABYLON {
 
 /**
  * @brief Represents a Depth Sorted Particle in the solid particle system.
- * @see SolidParticleSystem
  */
 struct BABYLON_SHARED_EXPORT DepthSortedParticle {
   /**

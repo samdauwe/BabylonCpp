@@ -13,8 +13,7 @@ namespace BABYLON {
  * @brief Interface representing a particle system in Babylon.
  * This groups the common functionalities that needs to be implemented in order
  * to create a particle system. A particle system represents a way to manage
- * particles (@see Particle) from their emission to their animation and
- * rendering.
+ * particles from their emission to their animation and rendering.
  */
 struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
 
@@ -61,7 +60,7 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
   /**
    * The texture used to render each particle. (this can be a spritesheet)
    */
-  Texture* particleTexture;
+  Texture* particleTexture = nullptr;
 
   /**
    * Blend mode use to render the particle, it can be either

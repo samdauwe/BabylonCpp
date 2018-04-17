@@ -133,7 +133,7 @@ public:
   Parse(const Json::value& parsedParticleSystem, Scene* scene,
         const string_t& rootUrl);
 
-private:
+protected:
   Vector3& get_direction1();
   void set_direction1(const Vector3& value);
   Vector3& get_direction2();
@@ -145,6 +145,7 @@ private:
   size_t get_activeParticleCount() const;
   void set_activeParticleCount(size_t value);
 
+private:
   unique_ptr_t<GL::IGLVertexArrayObject> _createUpdateVAO(Buffer* source);
   unique_ptr_t<GL::IGLVertexArrayObject> _createRenderVAO(Buffer* source,
                                                           Buffer* spriteSource);

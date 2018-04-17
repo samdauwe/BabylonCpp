@@ -15,7 +15,7 @@ class BABYLON_SHARED_EXPORT ConeParticleEmitter : public IParticleEmitterType {
 
 public:
   /**
-   * @brief Creates a new instance of @see ConeParticleEmitter
+   * @brief Creates a new instance of ConeParticleEmitter.
    * @param radius the radius of the emission cone (1 by default)
    * @param angles the cone base angle (PI by default)
    * @param directionRandomizer defines how much to randomize the particle
@@ -84,7 +84,7 @@ public:
    */
   void parse(const Json::value& serializationObject) override;
 
-private:
+protected:
   /**
    * @brief Gets the radius of the emission cone.
    */

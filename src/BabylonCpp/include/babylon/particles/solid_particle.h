@@ -14,7 +14,6 @@ namespace BABYLON {
 
 /**
  * @brief Represents one particle of a solid particle system.
- * @see SolidParticleSystem
  */
 class BABYLON_SHARED_EXPORT SolidParticle {
 

@@ -16,7 +16,7 @@ class BABYLON_SHARED_EXPORT SphereDirectedParticleEmitter
 
 public:
   /**
-   * @brief Creates a new instance of @see SphereDirectedParticleEmitter
+   * @brief Creates a new instance of SphereDirectedParticleEmitter.
    * @param radius the radius of the emission sphere (1 by default)
    * @param direction1 the min limit of the emission direction (up vector by
    * default)
