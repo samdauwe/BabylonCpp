@@ -136,6 +136,18 @@ bool Camera::isActiveMesh(AbstractMesh* mesh)
          != _activeMeshes.end();
 }
 
+bool Camera::isReady(bool completeCheck) const
+{
+  if (completeCheck) {
+    for (auto& pp : _postProcesses) {
+      if (pp && !pp->isReady()) {
+        return false;
+      }
+    }
+  }
+  return Node::isReady(completeCheck);
+}
+
 // Cache
 void Camera::_initCache()
 {
@@ -358,6 +370,7 @@ Matrix& Camera::getViewMatrix(bool force)
   _updateCache();
   _computedViewMatrix = _getViewMatrix();
   _currentRenderId    = getScene()->getRenderId();
+  _childRenderId      = _currentRenderId;
 
   _refreshFrustumPlanes = true;
 

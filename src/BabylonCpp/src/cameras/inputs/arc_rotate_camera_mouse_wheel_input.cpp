@@ -33,10 +33,19 @@ void ArcRotateCameraMouseWheelInput::attachControl(ICanvas* canvas,
     const auto& event = p->mouseWheelEvent;
     float delta       = 0.f;
     if (!stl_util::almost_equal(event.wheelDelta, 0.f)) {
-      delta
-        = (wheelDeltaPercentage != 0.f) ?
-            (event.wheelDelta * 0.01f) * camera->radius * wheelDeltaPercentage :
-            event.wheelDelta / (wheelPrecision * 40.f);
+      if (!stl_util::almost_equal(wheelDeltaPercentage, 0.f)) {
+        const auto wheelDelta
+          = (event.wheelDelta * 0.01f * wheelDeltaPercentage) * camera->radius;
+        if (event.wheelDelta > 0.f) {
+          delta = wheelDelta / (1.f + wheelDeltaPercentage);
+        }
+        else {
+          delta = wheelDelta * (1.f + wheelDeltaPercentage);
+        }
+      }
+      else {
+        delta = event.wheelDelta / (wheelPrecision * 40.f);
+      }
     }
     else if (!stl_util::almost_equal(event.detail, 0.f)) {
       delta = -event.detail / wheelPrecision;

@@ -49,8 +49,7 @@ public:
 
 protected:
   /**
-   * @brief Creates a new device orientation camera. @see
-   * DeviceOrientationCamera
+   * @brief Creates a new device orientation camera.
    * @param name The name of the camera
    * @param position The start position camera
    * @param scene The scene the camera belongs to

@@ -49,28 +49,19 @@ void DeviceOrientationCamera::resetToCurrentRotation(const Vector3& axis)
   _initialQuaternion->copyFrom(_quaternionCache ? *_quaternionCache :
                                                   *rotationQuaternion);
 
-  // x
-  if (axis.x == 0.f) {
-    _initialQuaternion->x = 0.f;
-  }
-  else {
-    _initialQuaternion->x *= -1.f;
-  }
+  using Vec3Float = float Vector3::*;
+  const vector_t<Vec3Float> vecAttrs{&Vector3::x, &Vector3::y, &Vector3::z};
+  using QuatFloat = float Quaternion::*;
+  const vector_t<QuatFloat> quatAttrs{&Quaternion::x, &Quaternion::y,
+                                      &Quaternion::z};
 
-  // y
-  if (axis.y == 0.f) {
-    _initialQuaternion->y = 0.f;
-  }
-  else {
-    _initialQuaternion->y *= -1.f;
-  }
-
-  // z
-  if (axis.z == 0.f) {
-    _initialQuaternion->z = 0.f;
-  }
-  else {
-    _initialQuaternion->z *= -1.f;
+  for (unsigned int i = 0; i < vecAttrs.size(); ++i) {
+    if (axis.*vecAttrs[i] == 0.f) {
+      (*_initialQuaternion).*quatAttrs[i] = 0.f;
+    }
+    else {
+      (*_initialQuaternion).*quatAttrs[i] *= -1.f;
+    }
   }
 
   _initialQuaternion->normalize();

@@ -126,6 +126,14 @@ public:
   vector_t<AbstractMesh*>& getActiveMeshes();
   bool isActiveMesh(AbstractMesh* mesh);
 
+  /**
+   * @brief Is this camera ready to be used/rendered.
+   * @param completeCheck defines if a complete check (including post processes)
+   * has to be done (false by default)
+   * @return true if the camera is ready
+   */
+  bool isReady(bool completeCheck) const override;
+
   /** Cache **/
   virtual void _initCache() override;
   void _updateCache(bool ignoreParentClass = false) override;
