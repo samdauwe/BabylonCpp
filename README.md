@@ -1,6 +1,6 @@
 # BabylonCpp - A port of Babylon.js to C++
 
-[Babylon.js](http://www.babylonjs.com) is a complete JavaScript framework for building 3D games with HTML 5 and WebGL.
+[Babylon.js](http://www.babylonjs.com) is a complete JavaScript framework for building 3D games with HTML 5 and WebGL. BabylonJS was chosen because it is the most efficient, most feature-rich, and most modern WebGL graphics library available.
 
 The goal with BabylonCpp is to fully implement the relevant portions of the excellent Babylon.js 3D framework/engine in C++14, facilitating the creation of lightweight, cross-platform 3D games and applications with native performance.
 
