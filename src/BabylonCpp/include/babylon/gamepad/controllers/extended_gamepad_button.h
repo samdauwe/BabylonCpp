@@ -6,16 +6,31 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Defines the ExtendedGamepadButton interface for a gamepad button which
+ * includes state provided by a pose controller.
+ */
 class BABYLON_SHARED_EXPORT ExtendedGamepadButton
-  : public MutableGamepadButton {
+    : public MutableGamepadButton {
 
 public:
   ExtendedGamepadButton();
   ExtendedGamepadButton(int value, bool touched, bool pressed);
   ~ExtendedGamepadButton();
 
+  /**
+   * @brief Sets if the button/trigger is currently pressed.
+   */
   void setValue(int value);
+
+  /**
+   * @brief Sets if the button/trigger is currently touched.
+   */
   void setTouched(bool value);
+
+  /**
+   * @brief Sets the Value of the button/trigger.
+   */
   void setPressed(bool value);
 
 }; // end of class MutableGamepadButton

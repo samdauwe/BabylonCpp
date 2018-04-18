@@ -7,51 +7,148 @@
 
 namespace BABYLON {
 
+/**
+ * Defines the IMeshInfo object that describes information a webvr controller
+ * mesh
+ */
 struct BABYLON_SHARED_EXPORT IMeshInfo {
+  /**
+   * Index of the mesh inside the root mesh
+   */
   unsigned int index;
+  /**
+   * The mesh
+   */
   AbstractMesh* value;
 }; // end of struct IMeshInfo
 
+/**
+ * Defines the IButtonMeshInfo object that describes a button mesh
+ */
 struct BABYLON_SHARED_EXPORT IButtonMeshInfo : public IMeshInfo {
+  /**
+   * The mesh that should be displayed when pressed
+   */
   AbstractMesh* pressed;
+  /**
+   * The mesh that should be displayed when not pressed
+   */
   AbstractMesh* unpressed;
 }; // end of struct IButtonMeshInfo
 
+/**
+ * Defines the IAxisMeshInfo object that describes an axis mesh
+ */
 struct BABYLON_SHARED_EXPORT IAxisMeshInfo : public IMeshInfo {
+  /**
+   * The mesh that should be set when at its min
+   */
   AbstractMesh* min;
+  /**
+   * The mesh that should be set when at its max
+   */
   AbstractMesh* max;
 }; // end of struct IAxisMeshInfo
 
+/**
+ * Defines the LoadedMeshInfo object that describes information about the loaded
+ * webVR controller mesh
+ */
 struct BABYLON_SHARED_EXPORT LoadedMeshInfo {
+  /**
+   * Root of the mesh
+   */
   AbstractMesh* rootNode;
+  /**
+   * Node of the mesh corrisponding to the direction the ray should be cast from
+   * the controller
+   */
   AbstractMesh* pointingPoseNode;
+  /**
+   * Map of the button meshes contained in the controller
+   */
   unordered_map_t<string_t, Nullable<IButtonMeshInfo>> buttonMeshes;
+  /**
+   * Map of the axis meshes contained in the controller
+   */
   unordered_map_t<unsigned int, Nullable<IAxisMeshInfo>> axisMeshes;
 }; // end of struct LoadedMeshInfo
 
+/**
+ * Defines the WindowsMotionController object that the state of the windows
+ * motion controller
+ */
 class BABYLON_SHARED_EXPORT WindowsMotionController : public WebVRController {
 
 public:
+  /**
+   * The base url used to load the left and right controller models
+   */
   static const string_t MODEL_BASE_URL;
+  /**
+   * The name of the left controller model file
+   */
   static const string_t MODEL_LEFT_FILENAME;
+  /**
+   * The name of the right controller model file
+   */
   static const string_t MODEL_RIGHT_FILENAME;
 
+  /**
+   * The controller name prefix for this controller type
+   */
   static const string_t GAMEPAD_ID_PREFIX;
+  /**
+   * The controller id pattern for this controller type
+   */
   static const string_t GAMEPAD_ID_PATTERN;
 
 public:
+  /**
+   * Creates a new WindowsMotionController from a gamepad.
+   * @param vrGamepad the gamepad that the controller should be created from
+   */
   WindowsMotionController(const shared_ptr_t<IBrowserGamepad>& vrGamepad);
   ~WindowsMotionController() override;
 
-  Observable<ExtendedGamepadButton>& onTriggerButtonStateChangedObservable();
-  Observable<ExtendedGamepadButton>& onMenuButtonStateChangedObservable();
-  Observable<ExtendedGamepadButton>& onGripButtonStateChangedObservable();
-  Observable<ExtendedGamepadButton>& onThumbstickButtonStateChangedObservable();
-  Observable<ExtendedGamepadButton>& onTouchpadButtonStateChangedObservable();
-  Observable<StickValues>& onTouchpadValuesChangedObservable();
+  /**
+   * Fired when the trigger on this controller is modified.
+   */
+  ReadOnlyProperty<WindowsMotionController, Observable<ExtendedGamepadButton>>
+    onTriggerButtonStateChangedObservable;
 
   /**
-   * Called once per frame by the engine.
+   *  Fired when the menu button on this controller is modified.
+   */
+  ReadOnlyProperty<WindowsMotionController, Observable<ExtendedGamepadButton>>
+    onMenuButtonStateChangedObservable;
+
+  /**
+   * Fired when the grip button on this controller is modified.
+   */
+  ReadOnlyProperty<WindowsMotionController, Observable<ExtendedGamepadButton>>
+    onGripButtonStateChangedObservable;
+
+  /**
+   * Fired when the thumbstick button on this controller is modified.
+   */
+  ReadOnlyProperty<WindowsMotionController, Observable<ExtendedGamepadButton>>
+    onThumbstickButtonStateChangedObservable;
+
+  /**
+   * Fired when the touchpad button on this controller is modified.
+   */
+  ReadOnlyProperty<WindowsMotionController, Observable<ExtendedGamepadButton>>
+    onTouchpadButtonStateChangedObservable;
+
+  /**
+   * Fired when the touchpad values on this controller are modified.
+   */
+  ReadOnlyProperty<WindowsMotionController, Observable<StickValues>>
+    onTouchpadValuesChangedObservable;
+
+  /**
+   * @brief Called once per frame by the engine.
    */
   void update() override;
 
@@ -77,10 +174,69 @@ protected:
                            const ExtendedGamepadButton& state,
                            const GamepadButtonChanges& changes) override;
 
-  void lerpButtonTransform(const string_t& buttonName, float buttonValue);
-  void lerpAxisTransform(unsigned int axis, float axisValue);
+  /**
+   * @brief Moves the buttons on the controller mesh based on their current
+   * state.
+   * @param buttonName the name of the button to move
+   * @param buttonValue the value of the button which determines the buttons new
+   * position
+   */
+  void _lerpButtonTransform(const string_t& buttonName, float buttonValue);
+
+  /**
+   * @brief Moves the axis on the controller mesh based on its current state
+   * @param axis the index of the axis
+   * @param axisValue the value of the axis which determines the meshes new
+   * position
+   */
+  void _lerpAxisTransform(unsigned int axis, float axisValue);
+
+  /**
+   * @brief Gets the ray of the controller in the direction the controller is
+   * pointing.
+   * @param length the length the resulting ray should be
+   * @returns a ray in the direction the controller is pointing
+   */
   Ray getForwardRay(float length = 100.f);
+
+  /**
+   * @brief Disposes of the controller.
+   */
   void dispose() override;
+
+protected:
+  /**
+   * @brief Fired when the trigger on this controller is modified.
+   */
+  Observable<ExtendedGamepadButton>&
+  get_onTriggerButtonStateChangedObservable();
+
+  /**
+   * @brief Fired when the menu button on this controller is modified.
+   */
+  Observable<ExtendedGamepadButton>& get_onMenuButtonStateChangedObservable();
+
+  /**
+   * @brief Fired when the grip button on this controller is modified.
+   */
+  Observable<ExtendedGamepadButton>& get_onGripButtonStateChangedObservable();
+
+  /**
+   * @brief Fired when the thumbstick button on this controller is modified.
+   */
+  Observable<ExtendedGamepadButton>&
+  get_onThumbstickButtonStateChangedObservable();
+
+  /**
+   * @brief Fired when the touchpad button on this controller is modified.
+   */
+  Observable<ExtendedGamepadButton>&
+  get_onTouchpadButtonStateChangedObservable();
+
+  /**
+   * @brief Fired when the touchpad values on this controller are modified.
+   */
+  Observable<StickValues>& get_onTouchpadValuesChangedObservable();
 
 private:
   /**
@@ -99,7 +255,14 @@ private:
   LoadedMeshInfo createMeshInfo(AbstractMesh* rootNode);
 
 public:
+  /**
+   * Fired when the trackpad on this controller is modified
+   */
   Observable<StickValues> onTrackpadValuesChangedObservable;
+
+  /**
+   * The current x and y values of this controller's trackpad
+   */
   StickValues trackpad;
 
 private:

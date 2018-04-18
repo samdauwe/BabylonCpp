@@ -6,6 +6,10 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Defines the MutableGamepadButton interface for the state of a gamepad
+ * button.
+ */
 class BABYLON_SHARED_EXPORT MutableGamepadButton : public IGamepadButton {
 
 public:
@@ -30,8 +34,17 @@ public:
   bool pressed() const;
 
 protected:
+  /**
+   * Value of the button/trigger
+   */
   int _value;
+  /**
+   * If the button/trigger is currently touched
+   */
   bool _touched;
+  /**
+   * If the button/trigger is currently pressed
+   */
   bool _pressed;
 
 }; // end of class MutableGamepadButton

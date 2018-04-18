@@ -10,6 +10,7 @@ WebVRController::WebVRController(const shared_ptr_t<IBrowserGamepad>& vrGamepad)
     : PoseEnabledController(vrGamepad)
     , pad{StickValues(0.f, 0.f)}
     , hand{vrGamepad->hand}
+    , defaultModel{this, &WebVRController::get_defaultModel}
     , _changes{GamepadButtonChanges{
         // changed
         false,
@@ -28,7 +29,7 @@ WebVRController::~WebVRController()
 {
 }
 
-AbstractMesh* WebVRController::defaultModel()
+AbstractMesh*& WebVRController::get_defaultModel()
 {
   return _defaultModel;
 }
@@ -79,7 +80,7 @@ void WebVRController::_setButtonValue(
   _buttons[buttonIndex].setTouched((*newState).touched());
   // oculus triggers are never 0, thou not touched.
   _buttons[buttonIndex].setValue(
-    (*newState).value() < 0.00000001 ? 0 : (*newState).value());
+    (*newState).value() < 0.00000001f ? 0.f : (*newState).value());
 }
 
 GamepadButtonChanges&

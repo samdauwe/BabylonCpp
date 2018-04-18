@@ -13,6 +13,7 @@ PoseEnabledController::PoseEnabledController(
     , _mesh{nullptr}
     , _deviceToWorld{Matrix::Identity()}
     , _pointingPoseNode{nullptr}
+    , mesh{this, &PoseEnabledController::get_mesh}
     , _workingMatrix{Matrix::Identity()}
 {
   type              = Gamepad::POSE_ENABLED;
@@ -119,7 +120,7 @@ void PoseEnabledController::dispose()
   Gamepad::dispose();
 }
 
-AbstractMesh* PoseEnabledController::mesh()
+AbstractMesh*& PoseEnabledController::get_mesh()
 {
   return _mesh;
 }

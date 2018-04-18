@@ -19,6 +19,18 @@ const string_t WindowsMotionController::GAMEPAD_ID_PATTERN
 WindowsMotionController::WindowsMotionController(
   const shared_ptr_t<IBrowserGamepad>& vrGamepad)
     : WebVRController{vrGamepad}
+    , onTriggerButtonStateChangedObservable{this,
+         &WindowsMotionController::get_onTriggerButtonStateChangedObservable}
+    , onMenuButtonStateChangedObservable{this,
+        &WindowsMotionController::get_onMenuButtonStateChangedObservable}
+    , onGripButtonStateChangedObservable{this,
+        &WindowsMotionController::get_onGripButtonStateChangedObservable}
+    , onThumbstickButtonStateChangedObservable{this,
+        &WindowsMotionController::get_onThumbstickButtonStateChangedObservable}
+    , onTouchpadButtonStateChangedObservable{this,
+        &WindowsMotionController::get_onTouchpadButtonStateChangedObservable}
+    , onTouchpadValuesChangedObservable{this,
+        &WindowsMotionController::get_onTouchpadValuesChangedObservable}
     , trackpad{0.f,0.f}
     , _loadedMeshInfo{nullptr}
     ,_mappingButtons{"thumbstick", "trigger", "grip", "menu", "trackpad"}
@@ -53,37 +65,37 @@ WindowsMotionController::~WindowsMotionController()
 }
 
 Observable<ExtendedGamepadButton>&
-WindowsMotionController::onTriggerButtonStateChangedObservable()
+WindowsMotionController::get_onTriggerButtonStateChangedObservable()
 {
   return onTriggerStateChangedObservable;
 }
 
 Observable<ExtendedGamepadButton>&
-WindowsMotionController::onMenuButtonStateChangedObservable()
+WindowsMotionController::get_onMenuButtonStateChangedObservable()
 {
   return onSecondaryButtonStateChangedObservable;
 }
 
 Observable<ExtendedGamepadButton>&
-WindowsMotionController::onGripButtonStateChangedObservable()
+WindowsMotionController::get_onGripButtonStateChangedObservable()
 {
   return onMainButtonStateChangedObservable;
 }
 
 Observable<ExtendedGamepadButton>&
-WindowsMotionController::onThumbstickButtonStateChangedObservable()
+WindowsMotionController::get_onThumbstickButtonStateChangedObservable()
 {
   return onPadStateChangedObservable;
 }
 
 Observable<ExtendedGamepadButton>&
-WindowsMotionController::onTouchpadButtonStateChangedObservable()
+WindowsMotionController::get_onTouchpadButtonStateChangedObservable()
 {
   return onTrackpadChangedObservable;
 }
 
 Observable<StickValues>&
-WindowsMotionController::onTouchpadValuesChangedObservable()
+WindowsMotionController::get_onTouchpadValuesChangedObservable()
 {
   return onTrackpadValuesChangedObservable;
 }
@@ -132,11 +144,11 @@ void WindowsMotionController::_handleButtonChange(
     }
   }
 
-  lerpButtonTransform(buttonName, static_cast<float>(state.value()));
+  _lerpButtonTransform(buttonName, static_cast<float>(state.value()));
 }
 
-void WindowsMotionController::lerpButtonTransform(const string_t& buttonName,
-                                                  float buttonValue)
+void WindowsMotionController::_lerpButtonTransform(const string_t& buttonName,
+                                                   float buttonValue)
 {
   // If there is no loaded mesh, there is nothing to transform.
   if (!_loadedMeshInfo) {
@@ -164,8 +176,8 @@ void WindowsMotionController::lerpButtonTransform(const string_t& buttonName,
                      (*meshInfo).value->position());
 }
 
-void WindowsMotionController::lerpAxisTransform(unsigned int axis,
-                                                float axisValue)
+void WindowsMotionController::_lerpAxisTransform(unsigned int axis,
+                                                 float axisValue)
 {
   if (!_loadedMeshInfo) {
     return;

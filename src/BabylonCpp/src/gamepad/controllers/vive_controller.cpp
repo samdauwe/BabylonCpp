@@ -8,6 +8,14 @@ namespace BABYLON {
 
 ViveController::ViveController(const shared_ptr_t<IBrowserGamepad>& vrGamepad)
     : WebVRController{vrGamepad}
+    , onLeftButtonStateChangedObservable{this,
+                                         &ViveController::
+                                           get_onLeftButtonStateChangedObservable}
+    , onRightButtonStateChangedObservable{this,
+                                          &ViveController::
+                                            get_onRightButtonStateChangedObservable}
+    , onMenuButtonStateChangedObservable{
+        this, &ViveController::get_onMenuButtonStateChangedObservable}
 {
   _defaultModel     = nullptr;
   controllerType    = PoseEnabledControllerType::VIVE;
@@ -46,19 +54,19 @@ void ViveController::initControllerMesh(
 }
 
 Observable<ExtendedGamepadButton>&
-ViveController::onLeftButtonStateChangedObservable()
+ViveController::get_onLeftButtonStateChangedObservable()
 {
   return onMainButtonStateChangedObservable;
 }
 
 Observable<ExtendedGamepadButton>&
-ViveController::onRightButtonStateChangedObservable()
+ViveController::get_onRightButtonStateChangedObservable()
 {
   return onMainButtonStateChangedObservable;
 }
 
 Observable<ExtendedGamepadButton>&
-ViveController::onMenuButtonStateChangedObservable()
+ViveController::get_onMenuButtonStateChangedObservable()
 {
   return onSecondaryButtonStateChangedObservable;
 }

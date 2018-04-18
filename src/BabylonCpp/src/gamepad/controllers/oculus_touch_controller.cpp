@@ -10,6 +10,17 @@ namespace BABYLON {
 OculusTouchController::OculusTouchController(
   const shared_ptr_t<IBrowserGamepad>& vrGamepad)
     : WebVRController{vrGamepad}
+    , onAButtonStateChangedObservable{this,
+                                      &OculusTouchController::
+                                        get_onAButtonStateChangedObservable}
+    , onBButtonStateChangedObservable{this,
+                                      &OculusTouchController::
+                                        get_onBButtonStateChangedObservable}
+    , onXButtonStateChangedObservable{this,
+                                      &OculusTouchController::
+                                        get_onXButtonStateChangedObservable}
+    , onYButtonStateChangedObservable{
+        this, &OculusTouchController::get_onYButtonStateChangedObservable}
 {
   controllerType = PoseEnabledControllerType::OCULUS;
   _defaultModel  = nullptr;
@@ -56,7 +67,7 @@ void OculusTouchController::initControllerMesh(
 }
 
 Observable<ExtendedGamepadButton>&
-OculusTouchController::onAButtonStateChangedObservable()
+OculusTouchController::get_onAButtonStateChangedObservable()
 {
   if (hand == "right") {
     return onMainButtonStateChangedObservable;
@@ -67,7 +78,7 @@ OculusTouchController::onAButtonStateChangedObservable()
 }
 
 Observable<ExtendedGamepadButton>&
-OculusTouchController::onBButtonStateChangedObservable()
+OculusTouchController::get_onBButtonStateChangedObservable()
 {
   if (hand == "right") {
     return onSecondaryButtonStateChangedObservable;
@@ -78,7 +89,7 @@ OculusTouchController::onBButtonStateChangedObservable()
 }
 
 Observable<ExtendedGamepadButton>&
-OculusTouchController::onXButtonStateChangedObservable()
+OculusTouchController::get_onXButtonStateChangedObservable()
 {
   if (hand == "left") {
     return onMainButtonStateChangedObservable;
@@ -89,7 +100,7 @@ OculusTouchController::onXButtonStateChangedObservable()
 }
 
 Observable<ExtendedGamepadButton>&
-OculusTouchController::onYButtonStateChangedObservable()
+OculusTouchController::get_onYButtonStateChangedObservable()
 {
   if (hand == "left") {
     return onSecondaryButtonStateChangedObservable;
