@@ -68,11 +68,15 @@ enum class WorkerReplyType {
   UNKNOWN_ERROR = 1
 }; // end of enum class WorkerReplyType
 
-/** Postproces Enums **/
+/** Defines operator used for tonemapping **/
 enum class TonemappingOperator {
-  HABLE        = 0,
-  REINHARD     = 1,
-  HEJIDAWSON   = 2,
+  /** Hable */
+  HABLE = 0,
+  /** Reinhard */
+  REINHARD = 1,
+  /** HejiDawson */
+  HEJIDAWSON = 2,
+  /** Photographic */
   PHOTOGRAPHIC = 3,
 }; // end of enum class TonemappingOperator
 

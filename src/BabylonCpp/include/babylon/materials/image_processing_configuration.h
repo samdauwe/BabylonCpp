@@ -257,7 +257,7 @@ public:
   /**
    * Color curves setup used in the effect if colorCurvesEnabled is set to true
    */
-  unique_ptr_t<ColorCurves> colorCurves;
+  shared_ptr_t<ColorCurves> colorCurves;
 
   /**
    * Color grading LUT texture used in the effect if colorGradingEnabled is set

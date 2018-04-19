@@ -31,6 +31,7 @@ CircleOfConfusionPostProcess::CircleOfConfusionPostProcess(
     , fStop{1.4f}
     , focusDistance{2000.f}
     , focalLength{50.f}
+    , depthTexture{this, &CircleOfConfusionPostProcess::set_depthTexture}
     , _depthTexture{depthTexture}
 {
   onApplyObservable.add([&](Effect* effect, EventState& /*es*/) {
@@ -64,7 +65,8 @@ CircleOfConfusionPostProcess::~CircleOfConfusionPostProcess()
 {
 }
 
-void CircleOfConfusionPostProcess::setDepthTexture(RenderTargetTexture* value)
+void CircleOfConfusionPostProcess::set_depthTexture(
+  RenderTargetTexture* const& value)
 {
   _depthTexture = value;
 }

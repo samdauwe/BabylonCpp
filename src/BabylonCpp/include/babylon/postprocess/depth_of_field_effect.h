@@ -16,7 +16,7 @@ class BABYLON_SHARED_EXPORT DepthOfFieldEffect
 
 public:
   /**
-   * @brief  Creates a new instance of @see DepthOfFieldEffect.
+   * @brief  Creates a new instance DepthOfFieldEffect.
    * @param scene The scene the effect belongs to.
    * @param depthTexture The depth texture of the scene to compute the circle of
    * confusion.This must be set in order for this to function but may be set
@@ -35,41 +35,6 @@ public:
   ~DepthOfFieldEffect();
 
   /**
-   * @brief The focal the length of the camera used in the effect
-   */
-  void setFocalLength(float value);
-  float focalLength() const;
-
-  /**
-   * @brief F-Stop of the effect's camera. The diamater of the resulting
-   * aperture can be computed by lensSize/fStop. (default: 1.4)
-   */
-  void setFStop(float value);
-  float fStop() const;
-
-  /**
-   * @brief Distance away from the camera to focus on in scene units/1000 (eg.
-   * millimeter). (default: 2000)
-   */
-  void setFocusDistance(float value);
-  float focusDistance() const;
-
-  /**
-   * @brief Max lens size in scene units/1000 (eg. millimeter). Standard cameras
-   * are 50mm. (default: 50) The diamater of the resulting aperture can be
-   * computed by lensSize/fStop.
-   */
-  void setLensSize(float value);
-  float lensSize() const;
-
-  /**
-   * @brief Depth texture to be used to compute the circle of confusion. This
-   * must be set here or in the constructor in order for the post process to
-   * function.
-   */
-  void setDepthTexture(RenderTargetTexture* value);
-
-  /**
    * @brief Disposes each of the internal effects for a given camera.
    * @param camera The camera to dispose the effect on.
    */
@@ -86,18 +51,89 @@ public:
    */
   bool _isReady() const;
 
+protected:
+  /**
+   * @brief The focal the length of the camera used in the effect in scene
+   * units/1000 (eg. millimeter).
+   */
+  void set_focalLength(float value);
+  float get_focalLength() const;
+
+  /**
+   * @brief F-Stop of the effect's camera. The diamater of the resulting
+   * aperture can be computed by lensSize/fStop. (default: 1.4).
+   */
+  void set_fStop(float value);
+  float get_fStop() const;
+
+  /**
+   * @brief Distance away from the camera to focus on in scene units/1000 (eg.
+   * millimeter). (default: 2000).
+   */
+  void set_focusDistance(float value);
+  float get_focusDistance() const;
+
+  /**
+   * @brief Max lens size in scene units/1000 (eg. millimeter). Standard cameras
+   * are 50mm. (default: 50) The diamater of the resulting aperture can be
+   * computed by lensSize/fStop.
+   */
+  void set_lensSize(float value);
+  float get_lensSize() const;
+
+  /**
+   * @brief Depth texture to be used to compute the circle of confusion. This
+   * must be set here or in the constructor in order for the post process to
+   * function.
+   */
+  void set_depthTexture(RenderTargetTexture* const& value);
+
 public:
   /**
-   * Private, last post process of dof
+   * Internal, blurs from high to low
    */
-  unique_ptr_t<DepthOfFieldMergePostProcess> _depthOfFieldMerge;
+  std::vector<unique_ptr_t<DepthOfFieldBlurPostProcess>> _depthOfFieldBlurX;
+
+  /**
+   * Internal post processes in depth of field effect
+   */
+  vector_t<PostProcess*> _effects;
+
+  /**
+   * The focal the length of the camera used in the effect
+   */
+  Property<DepthOfFieldEffect, float> focalLength;
+
+  /**
+   * F-Stop of the effect's camera. The diamater of the resulting aperture can
+   * be computed by lensSize/fStop. (default: 1.4)
+   */
+  Property<DepthOfFieldEffect, float> fStop;
+
+  /**
+   * Distance away from the camera to focus on in scene units/1000 (eg.
+   * millimeter). (default: 2000)
+   */
+  Property<DepthOfFieldEffect, float> focusDistance;
+
+  /**
+   * Max lens size in scene units/1000 (eg. millimeter). Standard cameras are
+   * 50mm. (default: 50) The diamater of the resulting aperture can be computed
+   * by lensSize/fStop.
+   */
+  Property<DepthOfFieldEffect, float> lensSize;
+
+  /**
+   * Depth texture to be used to compute the circle of confusion. This must be
+   * set here or in the constructor in order for the post process to function.
+   */
+  WriteOnlyProperty<DepthOfFieldEffect, RenderTargetTexture*> depthTexture;
 
 private:
+  unique_ptr_t<DepthOfFieldMergePostProcess> _dofMerge;
   unique_ptr_t<PassPostProcess> _depthOfFieldPass;
   unique_ptr_t<CircleOfConfusionPostProcess> _circleOfConfusion;
-  std::vector<unique_ptr_t<DepthOfFieldBlurPostProcess>> _depthOfFieldBlurX;
   std::vector<unique_ptr_t<DepthOfFieldBlurPostProcess>> _depthOfFieldBlurY;
-  vector_t<PostProcess*> _effects;
 
 }; // end of class ConvolutionPostProcess
 

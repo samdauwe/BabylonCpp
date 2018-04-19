@@ -26,11 +26,14 @@ public:
    */
   const char* getClassName() const;
 
+  void dispose(Camera* camera = nullptr);
+
+protected:
   /**
    * @brief Gets the image processing configuration used either in this
    * material.
    */
-  ImageProcessingConfiguration* imageProcessingConfiguration();
+  ImageProcessingConfiguration*& get_imageProcessingConfiguration();
 
   /**
    * @brief Sets the Default image processing configuration used either in the
@@ -38,205 +41,175 @@ public:
    *
    * If sets to null, the scene one is in use.
    */
-  void setImageProcessingConfiguration(ImageProcessingConfiguration* value);
+  void
+  set_imageProcessingConfiguration(ImageProcessingConfiguration* const& value);
 
   /**
    * @brief Gets Color curves setup used in the effect if colorCurvesEnabled is
    * set to true .
    */
-  ColorCurves* colorCurves() const;
+  shared_ptr_t<ColorCurves>& get_colorCurves();
 
   /**
    * Sets Color curves setup used in the effect if colorCurvesEnabled is set to
    * true .
    */
-  void setColorCurves(ColorCurves* value);
+  void set_colorCurves(const shared_ptr_t<ColorCurves>& value);
 
   /**
    * @brief Gets wether the color curves effect is enabled.
    */
-  bool colorCurvesEnabled() const;
+  bool get_colorCurvesEnabled() const;
 
   /**
    * Sets wether the color curves effect is enabled.
    */
-  void setColorCurvesEnabled(bool value);
+  void set_colorCurvesEnabled(bool value);
 
   /**
    * @brief Gets Color grading LUT texture used in the effect if
    * colorGradingEnabled is set to true.
    */
-  BaseTexture* colorGradingTexture() const;
+  BaseTexture*& get_colorGradingTexture();
 
   /**
    * @brief Sets Color grading LUT texture used in the effect if
    * colorGradingEnabled is set to true.
    */
-  void setColorGradingTexture(BaseTexture* value);
+  void set_colorGradingTexture(BaseTexture* const& value);
 
   /**
    * @brief Gets wether the color grading effect is enabled.
    */
-  bool colorGradingEnabled() const;
+  bool get_colorGradingEnabled() const;
 
   /**
    * @brief Gets wether the color grading effect is enabled.
    */
-  void setColorGradingEnabled(bool value);
+  void set_colorGradingEnabled(bool value);
 
   /**
    * @brief Gets exposure used in the effect.
    */
-  float exposure() const;
+  float get_exposure() const;
 
   /**
    * @brief Sets exposure used in the effect.
    */
-  void setExposure(float value);
+  void set_exposure(float value);
 
   /**
    * @brief Gets wether tonemapping is enabled or not.
    */
-  bool toneMappingEnabled() const;
+  bool get_toneMappingEnabled() const;
 
   /**
    * @brief Sets wether tonemapping is enabled or not
    */
-  void setToneMappingEnabled(bool value);
+  void set_toneMappingEnabled(bool value);
 
   /**
    * @brief Gets contrast used in the effect.
    */
-  float contrast() const;
+  float get_contrast() const;
 
   /**
    * @brief Sets contrast used in the effect.
    */
-  void setContrast(float value);
+  void set_contrast(float value);
 
   /**
    * @brief Gets Vignette stretch size.
    */
-  float vignetteStretch() const;
+  float get_vignetteStretch() const;
 
   /**
    * @brief Sets Vignette stretch size.
    */
-  void setVignetteStretch(float value);
+  void set_vignetteStretch(float value);
 
   /**
    * @brief Gets Vignette centre X Offset.
    */
-  float vignetteCentreX() const;
+  float get_vignetteCentreX() const;
 
   /**
    * @brief Sets Vignette centre X Offset.
    */
-  void setVignetteCentreX(float value);
+  void set_vignetteCentreX(float value);
 
   /**
    * @brief Gets Vignette centre Y Offset.
    */
-  float vignetteCentreY() const;
+  float get_vignetteCentreY() const;
 
   /**
    * @brief Sets Vignette centre Y Offset.
    */
-  void setVignetteCentreY(float value);
+  void set_vignetteCentreY(float value);
 
   /**
    * @brief Gets Vignette weight or intensity of the vignette effect.
    */
-  float vignetteWeight() const;
+  float get_vignetteWeight() const;
 
   /**
    * @brief Sets Vignette weight or intensity of the vignette effect.
    */
-  void setVignetteWeight(float value);
+  void set_vignetteWeight(float value);
 
   /**
    * @brief Gets Color of the vignette applied on the screen through the chosen
    * blend mode (vignetteBlendMode) if vignetteEnabled is set to true.
    */
-  Color4& vignetteColor();
+  Color4& get_vignetteColor();
 
   /**
    * @brief Sets Color of the vignette applied on the screen through the chosen
    * blend mode (vignetteBlendMode) if vignetteEnabled is set to true.
    */
-  void setVignetteColor(const Color4& value);
+  void set_vignetteColor(const Color4& value);
 
   /**
    * @brief Gets Camera field of view used by the Vignette effect.
    */
-  float vignetteCameraFov() const;
+  float get_vignetteCameraFov() const;
 
   /**
    * @brief Sets Camera field of view used by the Vignette effect.
    */
-  void setVignetteCameraFov(float value);
+  void set_vignetteCameraFov(float value);
 
   /**
    * @brief Gets the vignette blend mode allowing different kind of effect.
    */
-  unsigned int vignetteBlendMode() const;
+  unsigned int get_vignetteBlendMode() const;
 
   /**
    * @brief Sets the vignette blend mode allowing different kind of effect.
    */
-  void setVignetteBlendMode(unsigned int value);
+  void set_vignetteBlendMode(unsigned int value);
 
   /**
    * @brief Gets wether the vignette effect is enabled.
    */
-  bool vignetteEnabled() const;
+  bool get_vignetteEnabled() const;
 
   /**
    * @brief Sets wether the vignette effect is enabled.
    */
-  void setVignetteEnabled(bool value);
-
-  /**
-   * @brief Gets wether the grain effect is enabled.
-   */
-  bool grainEnabled() const;
-  /**
-   * @brief Sets wether the grain effect is enabled.
-   */
-  void setGrainEnabled(bool value);
-
-  /**
-   * @brief Gets the grain effect's intensity.
-   */
-  float grainIntensity() const;
-
-  /**
-   * @brief Sets the grain effect's intensity.
-   */
-  void setGrainIntensity(float value);
-
-  /**
-   * @brief Gets wether the grain effect is animated.
-   */
-  bool grainAnimated() const;
-  /**
-   * @brief Sets wether the grain effect is animated.
-   */
-  void setGrainAnimated(bool value);
+  void set_vignetteEnabled(bool value);
 
   /**
    * @brief Gets wether the input of the processing is in Gamma or Linear Space.
    */
-  bool fromLinearSpace() const;
+  bool get_fromLinearSpace() const;
 
   /**
    * @brief Sets wether the input of the processing is in Gamma or Linear Space.
    */
-  void setFromLinearSpace(bool value);
+  void set_fromLinearSpace(bool value);
 
-  void dispose(Camera* camera = nullptr);
-
-protected:
   /**
    * @brief Attaches a new image processing configuration to the PBR Material.
    * @param configuration
@@ -245,6 +218,96 @@ protected:
     ImageProcessingConfiguration* configuration, bool doNotBuild = false);
 
   void _updateParameters();
+
+public:
+  /**
+   * Image processing configuration used either in this material.
+   */
+  Property<ImageProcessingPostProcess, ImageProcessingConfiguration*>
+    imageProcessingConfiguration;
+
+  /**
+   * Color curves setup used in the effect if colorCurvesEnabled is set to true
+   * .
+   */
+  Property<ImageProcessingPostProcess, shared_ptr_t<ColorCurves>> colorCurves;
+
+  /**
+   * Wether the color curves effect is enabled.
+   */
+  Property<ImageProcessingPostProcess, bool> colorCurvesEnabled;
+
+  /**
+   * Color grading LUT texture used in the effect if colorGradingEnabled is set
+   * to true.
+   */
+  Property<ImageProcessingPostProcess, BaseTexture*> colorGradingTexture;
+
+  /**
+   * Wether the color grading effect is enabled.
+   */
+  Property<ImageProcessingPostProcess, bool> colorGradingEnabled;
+
+  /**
+   * Exposure used in the effect.
+   */
+  Property<ImageProcessingPostProcess, float> exposure;
+
+  /**
+   * Wwether tonemapping is enabled or not.
+   */
+  Property<ImageProcessingPostProcess, bool> toneMappingEnabled;
+
+  /**
+   * Contrast used in the effect.
+   */
+  Property<ImageProcessingPostProcess, float> contrast;
+
+  /**
+   * Vignette stretch size.
+   */
+  Property<ImageProcessingPostProcess, float> vignetteStretch;
+
+  /**
+   * Vignette centre X Offset.
+   */
+  Property<ImageProcessingPostProcess, float> vignetteCentreX;
+
+  /**
+   * Vignette centre Y Offset.
+   */
+  Property<ImageProcessingPostProcess, float> vignetteCentreY;
+
+  /**
+   * Vignette weight or intensity of the vignette effect.
+   */
+  Property<ImageProcessingPostProcess, float> vignetteWeight;
+
+  /**
+   * Color of the vignette applied on the screen through the chosen blend mode
+   * (vignetteBlendMode) if vignetteEnabled is set to true.
+   */
+  Property<ImageProcessingPostProcess, Color4> vignetteColor;
+
+  /**
+   * Gets Camera field of view used by the Vignette effect.
+   */
+  Property<ImageProcessingPostProcess, float> vignetteCameraFov;
+
+  /**
+   * Gets the vignette blend mode allowing different kind of effect.
+   */
+  Property<ImageProcessingPostProcess, unsigned int> vignetteBlendMode;
+
+  /**
+   * Wether the vignette effect is enabled.
+   */
+  Property<ImageProcessingPostProcess, bool> vignetteEnabled;
+
+  /**
+   * Wether the input of the processing is in Gamma or Linear Space.
+   */
+  Property<ImageProcessingPostProcess, bool> fromLinearSpace;
 
 protected:
   /**

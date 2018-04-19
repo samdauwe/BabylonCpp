@@ -14,12 +14,14 @@ class BABYLON_SHARED_EXPORT DepthOfFieldMergePostProcess : public PostProcess {
 
 public:
   /**
-   * @brief Creates a new instance of @see CircleOfConfusionPostProcess
+   * @brief Creates a new instance of DepthOfFieldMergePostProcess.
    * @param name The name of the effect.
-   * @param original The non-blurred image to be modified
-   * @param circleOfConfusion The circle of confusion post process that will
-   * determine how blurred each pixel should become.
-   * @param blurSteps Incrimental bluring post processes.
+   * @param originalFromInput Post process which's input will be used for the
+   * merge.
+   * @param circleOfConfusion Circle of confusion post process which's output
+   * will be used to blur each pixel.
+   * @param blurSteps Blur post processes from low to high which will be mixed
+   * with the original image.
    * @param options The required width/height ratio to downsize to before
    * computing the render pass.
    * @param camera The camera to apply the render pass to.
@@ -36,8 +38,8 @@ public:
    * at a later time. (default: false)
    */
   DepthOfFieldMergePostProcess(
-    const string_t& name, PostProcess* original, PostProcess* circleOfConfusion,
-    const vector_t<PostProcess*>& blurSteps,
+    const string_t& name, PostProcess* originalFromInput,
+    PostProcess* circleOfConfusion, const vector_t<PostProcess*>& blurSteps,
     const Variant<float, PostProcessOptions>& options, Camera* camera,
     unsigned int samplingMode = 0, Engine* engine = nullptr,
     bool reusable            = false,

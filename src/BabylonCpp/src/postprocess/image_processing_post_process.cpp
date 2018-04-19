@@ -28,6 +28,49 @@ ImageProcessingPostProcess::ImageProcessingPostProcess(
                   "postprocess",
                   {},
                   true}
+    , imageProcessingConfiguration{this,
+                                   &ImageProcessingPostProcess::
+                                     get_imageProcessingConfiguration,
+                                   &ImageProcessingPostProcess::
+                                     set_imageProcessingConfiguration}
+    , colorCurves{this, &ImageProcessingPostProcess::get_colorCurves,
+                  &ImageProcessingPostProcess::set_colorCurves}
+    , colorCurvesEnabled{this,
+                         &ImageProcessingPostProcess::get_colorCurvesEnabled,
+                         &ImageProcessingPostProcess::set_colorCurvesEnabled}
+    , colorGradingTexture{this,
+                          &ImageProcessingPostProcess::get_colorGradingTexture,
+                          &ImageProcessingPostProcess::set_colorGradingTexture}
+    , colorGradingEnabled{this,
+                          &ImageProcessingPostProcess::get_colorGradingEnabled,
+                          &ImageProcessingPostProcess::set_colorGradingEnabled}
+    , exposure{this, &ImageProcessingPostProcess::get_exposure,
+               &ImageProcessingPostProcess::set_exposure}
+    , toneMappingEnabled{this,
+                         &ImageProcessingPostProcess::get_toneMappingEnabled,
+                         &ImageProcessingPostProcess::set_toneMappingEnabled}
+    , contrast{this, &ImageProcessingPostProcess::get_contrast,
+               &ImageProcessingPostProcess::set_contrast}
+    , vignetteStretch{this, &ImageProcessingPostProcess::get_vignetteStretch,
+                      &ImageProcessingPostProcess::set_vignetteStretch}
+    , vignetteCentreX{this, &ImageProcessingPostProcess::get_vignetteCentreX,
+                      &ImageProcessingPostProcess::set_vignetteCentreX}
+    , vignetteCentreY{this, &ImageProcessingPostProcess::get_vignetteCentreY,
+                      &ImageProcessingPostProcess::set_vignetteCentreY}
+    , vignetteWeight{this, &ImageProcessingPostProcess::get_vignetteWeight,
+                     &ImageProcessingPostProcess::set_vignetteWeight}
+    , vignetteColor{this, &ImageProcessingPostProcess::get_vignetteColor,
+                    &ImageProcessingPostProcess::set_vignetteColor}
+    , vignetteCameraFov{this,
+                        &ImageProcessingPostProcess::get_vignetteCameraFov,
+                        &ImageProcessingPostProcess::set_vignetteCameraFov}
+    , vignetteBlendMode{this,
+                        &ImageProcessingPostProcess::get_vignetteBlendMode,
+                        &ImageProcessingPostProcess::set_vignetteBlendMode}
+    , vignetteEnabled{this, &ImageProcessingPostProcess::get_vignetteEnabled,
+                      &ImageProcessingPostProcess::set_vignetteEnabled}
+    , fromLinearSpace{this, &ImageProcessingPostProcess::get_fromLinearSpace,
+                      &ImageProcessingPostProcess::set_fromLinearSpace}
     , _imageProcessingObserver{nullptr}
     , _fromLinearSpace{false}
 {
@@ -38,7 +81,7 @@ ImageProcessingPostProcess::ImageProcessingPostProcess(
     imageProcessingConfiguration->setApplyByPostProcess(true);
     _attachImageProcessingConfiguration(imageProcessingConfiguration, true);
     // This will cause the shader to be compiled
-    setFromLinearSpace(false);
+    fromLinearSpace = false;
   }
   // Setup the default processing configuration to the scene.
   else {
@@ -61,14 +104,14 @@ const char* ImageProcessingPostProcess::getClassName() const
   return "ImageProcessingPostProcess";
 }
 
-ImageProcessingConfiguration*
-ImageProcessingPostProcess::imageProcessingConfiguration()
+ImageProcessingConfiguration*&
+ImageProcessingPostProcess::get_imageProcessingConfiguration()
 {
   return _imageProcessingConfiguration;
 }
 
-void ImageProcessingPostProcess::setImageProcessingConfiguration(
-  ImageProcessingConfiguration* value)
+void ImageProcessingPostProcess::set_imageProcessingConfiguration(
+  ImageProcessingConfiguration* const& value)
 {
   _attachImageProcessingConfiguration(value);
 }
@@ -122,192 +165,164 @@ void ImageProcessingPostProcess::_attachImageProcessingConfiguration(
   }
 }
 
-ColorCurves* ImageProcessingPostProcess::colorCurves() const
+shared_ptr_t<ColorCurves>& ImageProcessingPostProcess::get_colorCurves()
 {
-  return _imageProcessingConfiguration->colorCurves.get();
+  return _imageProcessingConfiguration->colorCurves;
 }
 
-void ImageProcessingPostProcess::setColorCurves(ColorCurves* value)
+void ImageProcessingPostProcess::set_colorCurves(
+  const shared_ptr_t<ColorCurves>& value)
 {
-  _imageProcessingConfiguration->colorCurves.reset(value);
+  _imageProcessingConfiguration->colorCurves = value;
 }
 
-bool ImageProcessingPostProcess::colorCurvesEnabled() const
+bool ImageProcessingPostProcess::get_colorCurvesEnabled() const
 {
   return _imageProcessingConfiguration->colorCurvesEnabled();
 }
 
-void ImageProcessingPostProcess::setColorCurvesEnabled(bool value)
+void ImageProcessingPostProcess::set_colorCurvesEnabled(bool value)
 {
   _imageProcessingConfiguration->setColorCurvesEnabled(value);
 }
 
-BaseTexture* ImageProcessingPostProcess::colorGradingTexture() const
+BaseTexture*& ImageProcessingPostProcess::get_colorGradingTexture()
 {
   return _imageProcessingConfiguration->colorGradingTexture;
 }
 
-void ImageProcessingPostProcess::setColorGradingTexture(BaseTexture* value)
+void ImageProcessingPostProcess::set_colorGradingTexture(
+  BaseTexture* const& value)
 {
   _imageProcessingConfiguration->colorGradingTexture = value;
 }
 
-bool ImageProcessingPostProcess::colorGradingEnabled() const
+bool ImageProcessingPostProcess::get_colorGradingEnabled() const
 {
   return _imageProcessingConfiguration->colorGradingEnabled();
 }
 
-void ImageProcessingPostProcess::setColorGradingEnabled(bool value)
+void ImageProcessingPostProcess::set_colorGradingEnabled(bool value)
 {
   _imageProcessingConfiguration->setColorGradingEnabled(value);
 }
 
-float ImageProcessingPostProcess::exposure() const
+float ImageProcessingPostProcess::get_exposure() const
 {
   return _imageProcessingConfiguration->exposure();
 }
 
-void ImageProcessingPostProcess::setExposure(float value)
+void ImageProcessingPostProcess::set_exposure(float value)
 {
   _imageProcessingConfiguration->setExposure(value);
 }
 
-bool ImageProcessingPostProcess::toneMappingEnabled() const
+bool ImageProcessingPostProcess::get_toneMappingEnabled() const
 {
   return _imageProcessingConfiguration->toneMappingEnabled();
 }
 
-void ImageProcessingPostProcess::setToneMappingEnabled(bool value)
+void ImageProcessingPostProcess::set_toneMappingEnabled(bool value)
 {
   _imageProcessingConfiguration->setToneMappingEnabled(value);
 }
 
-float ImageProcessingPostProcess::contrast() const
+float ImageProcessingPostProcess::get_contrast() const
 {
   return _imageProcessingConfiguration->contrast();
 }
 
-void ImageProcessingPostProcess::setContrast(float value)
+void ImageProcessingPostProcess::set_contrast(float value)
 {
   _imageProcessingConfiguration->setContrast(value);
 }
 
-float ImageProcessingPostProcess::vignetteStretch() const
+float ImageProcessingPostProcess::get_vignetteStretch() const
 {
   return _imageProcessingConfiguration->vignetteStretch;
 }
 
-void ImageProcessingPostProcess::setVignetteStretch(float value)
+void ImageProcessingPostProcess::set_vignetteStretch(float value)
 {
   _imageProcessingConfiguration->vignetteStretch = value;
 }
 
-float ImageProcessingPostProcess::vignetteCentreX() const
+float ImageProcessingPostProcess::get_vignetteCentreX() const
 {
   return _imageProcessingConfiguration->vignetteCentreX;
 }
 
-void ImageProcessingPostProcess::setVignetteCentreX(float value)
+void ImageProcessingPostProcess::set_vignetteCentreX(float value)
 {
   _imageProcessingConfiguration->vignetteCentreX = value;
 }
 
-float ImageProcessingPostProcess::vignetteCentreY() const
+float ImageProcessingPostProcess::get_vignetteCentreY() const
 {
   return _imageProcessingConfiguration->vignetteCentreY;
 }
 
-void ImageProcessingPostProcess::setVignetteCentreY(float value)
+void ImageProcessingPostProcess::set_vignetteCentreY(float value)
 {
   _imageProcessingConfiguration->vignetteCentreY = value;
 }
 
-float ImageProcessingPostProcess::vignetteWeight() const
+float ImageProcessingPostProcess::get_vignetteWeight() const
 {
   return _imageProcessingConfiguration->vignetteWeight;
 }
 
-void ImageProcessingPostProcess::setVignetteWeight(float value)
+void ImageProcessingPostProcess::set_vignetteWeight(float value)
 {
   _imageProcessingConfiguration->vignetteWeight = value;
 }
 
-Color4& ImageProcessingPostProcess::vignetteColor()
+Color4& ImageProcessingPostProcess::get_vignetteColor()
 {
   return _imageProcessingConfiguration->vignetteColor;
 }
 
-void ImageProcessingPostProcess::setVignetteColor(const Color4& value)
+void ImageProcessingPostProcess::set_vignetteColor(const Color4& value)
 {
   _imageProcessingConfiguration->vignetteColor = value;
 }
 
-float ImageProcessingPostProcess::vignetteCameraFov() const
+float ImageProcessingPostProcess::get_vignetteCameraFov() const
 {
   return _imageProcessingConfiguration->vignetteCameraFov;
 }
 
-void ImageProcessingPostProcess::setVignetteCameraFov(float value)
+void ImageProcessingPostProcess::set_vignetteCameraFov(float value)
 {
   _imageProcessingConfiguration->vignetteCameraFov = value;
 }
 
-unsigned int ImageProcessingPostProcess::vignetteBlendMode() const
+unsigned int ImageProcessingPostProcess::get_vignetteBlendMode() const
 {
   return _imageProcessingConfiguration->vignetteBlendMode();
 }
 
-void ImageProcessingPostProcess::setVignetteBlendMode(unsigned int value)
+void ImageProcessingPostProcess::set_vignetteBlendMode(unsigned int value)
 {
   _imageProcessingConfiguration->setVignetteBlendMode(value);
 }
 
-bool ImageProcessingPostProcess::vignetteEnabled() const
+bool ImageProcessingPostProcess::get_vignetteEnabled() const
 {
   return _imageProcessingConfiguration->vignetteEnabled();
 }
 
-void ImageProcessingPostProcess::setVignetteEnabled(bool value)
+void ImageProcessingPostProcess::set_vignetteEnabled(bool value)
 {
   _imageProcessingConfiguration->setVignetteEnabled(value);
 }
 
-bool ImageProcessingPostProcess::grainEnabled() const
-{
-  return _imageProcessingConfiguration->grainEnabled();
-}
-
-void ImageProcessingPostProcess::setGrainEnabled(bool value)
-{
-  _imageProcessingConfiguration->setGrainEnabled(value);
-}
-
-float ImageProcessingPostProcess::grainIntensity() const
-{
-  return _imageProcessingConfiguration->grainIntensity();
-}
-
-void ImageProcessingPostProcess::setGrainIntensity(float value)
-{
-  _imageProcessingConfiguration->setGrainIntensity(value);
-}
-
-bool ImageProcessingPostProcess::grainAnimated() const
-{
-  return _imageProcessingConfiguration->grainAnimated();
-}
-
-void ImageProcessingPostProcess::setGrainAnimated(bool value)
-{
-  _imageProcessingConfiguration->setGrainAnimated(value);
-}
-
-bool ImageProcessingPostProcess::fromLinearSpace() const
+bool ImageProcessingPostProcess::get_fromLinearSpace() const
 {
   return _fromLinearSpace;
 }
 
-void ImageProcessingPostProcess::setFromLinearSpace(bool value)
+void ImageProcessingPostProcess::set_fromLinearSpace(bool value)
 {
   if (_fromLinearSpace == value) {
     return;

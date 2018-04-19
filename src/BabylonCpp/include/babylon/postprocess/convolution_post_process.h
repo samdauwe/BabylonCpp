@@ -48,7 +48,7 @@ public:
 
 public:
   /**
-   * @brief Creates a new instance of @see ConvolutionPostProcess.
+   * @brief Creates a new instance ConvolutionPostProcess.
    * @param name The name of the effect.
    * @param kernel Array of 9 values corrisponding to the 3x3 kernel to be
    * applied

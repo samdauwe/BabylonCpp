@@ -15,7 +15,7 @@ class BABYLON_SHARED_EXPORT ChromaticAberrationPostProcess
 
 public:
   /**
-   * @brief Creates a new instance of @see ChromaticAberrationPostProcess.
+   * @brief Creates a new instance ChromaticAberrationPostProcess.
    * @param name The name of the effect.
    * @param screenWidth The width of the screen to apply the effect on.
    * @param screenHeight The height of the screen to apply the effect on.

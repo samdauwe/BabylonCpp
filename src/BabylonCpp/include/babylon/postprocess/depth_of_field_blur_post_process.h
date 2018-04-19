@@ -17,7 +17,7 @@ struct BABYLON_SHARED_EXPORT DepthOfFieldBlurPostProcess
     : public BlurPostProcess {
 
   /**
-   * @brief Creates a new instance of @see CircleOfConfusionPostProcess
+   * @brief Creates a new instance CircleOfConfusionPostProcess.
    * @param name The name of the effect.
    * @param scene The scene the effect belongs to.
    * @param direction The direction the blur should be applied.

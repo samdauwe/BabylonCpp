@@ -5,8 +5,8 @@
 namespace BABYLON {
 
 DepthOfFieldMergePostProcess::DepthOfFieldMergePostProcess(
-  const string_t& name, PostProcess* original, PostProcess* circleOfConfusion,
-  const vector_t<PostProcess*>& iBlurSteps,
+  const string_t& name, PostProcess* originalFromInput,
+  PostProcess* circleOfConfusion, const vector_t<PostProcess*>& iBlurSteps,
   const Variant<float, PostProcessOptions>& options, Camera* camera,
   unsigned int samplingMode, Engine* engine, bool reusable,
   unsigned int textureType, bool blockCompilation)
@@ -30,7 +30,7 @@ DepthOfFieldMergePostProcess::DepthOfFieldMergePostProcess(
   onApplyObservable.add([&](Effect* effect, EventState& /*es*/) {
     effect->setTextureFromPostProcessOutput("circleOfConfusionSampler",
                                             circleOfConfusion);
-    effect->setTextureFromPostProcess("textureSampler", original);
+    effect->setTextureFromPostProcess("textureSampler", originalFromInput);
     for (size_t index = 0; index < blurSteps.size(); ++index)
       effect->setTextureFromPostProcessOutput(
         "blurStep" + ::std::to_string(blurSteps.size() - 1), blurSteps[index]);
@@ -52,11 +52,14 @@ void DepthOfFieldMergePostProcess::updateEffect(
   const ::std::function<void(Effect* effect)>& onCompiled,
   const ::std::function<void(Effect* effect, const string_t& errors)>& onError)
 {
-  PostProcess::updateEffect(
-    !defines.empty() ?
-      defines :
-      "#define BLUR_LEVEL " + ::std::to_string(blurSteps.size() - 1) + "\n",
-    uniforms, samplers, indexParameters, onCompiled, onError);
+  auto _defines = defines;
+  if (!defines.empty()) {
+    _defines = "";
+    _defines
+      += "#define BLUR_LEVEL " + ::std::to_string(blurSteps.size() - 1) + "\n";
+  }
+  PostProcess::updateEffect(_defines, uniforms, samplers, indexParameters,
+                            onCompiled, onError);
 }
 
 } // end of namespace BABYLON

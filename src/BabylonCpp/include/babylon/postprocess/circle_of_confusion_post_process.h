@@ -15,7 +15,7 @@ class BABYLON_SHARED_EXPORT CircleOfConfusionPostProcess : public PostProcess {
 
 public:
   /**
-   * @brief Creates a new instance of @see CircleOfConfusionPostProcess
+   * @brief Creates a new instance CircleOfConfusionPostProcess.
    * @param name The name of the effect.
    * @param depthTexture The depth texture of the scene to compute the circle of
    * confusion. This must be set in order for this to function but may be set
@@ -44,12 +44,13 @@ public:
     bool blockCompilation    = false);
   ~CircleOfConfusionPostProcess();
 
+protected:
   /**
    * @brief Depth texture to be used to compute the circle of confusion. This
    * must be set here or in the constructor in order for the post process to
    * function.
    */
-  void setDepthTexture(RenderTargetTexture* value);
+  void set_depthTexture(RenderTargetTexture* const& value);
 
 public:
   /**
@@ -76,6 +77,13 @@ public:
    * (default: 50)
    */
   float focalLength;
+
+  /**
+   * Depth texture to be used to compute the circle of confusion. This must be
+   * set here or in the constructor in order for the post process to function.
+   */
+  WriteOnlyProperty<CircleOfConfusionPostProcess, RenderTargetTexture*>
+    depthTexture;
 
 private:
   RenderTargetTexture* _depthTexture;

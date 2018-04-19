@@ -17,9 +17,20 @@ DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene,
                                        DepthOfFieldEffectBlurLevel blurLevel,
                                        unsigned int pipelineTextureType,
                                        bool blockCompilation)
-    : PostProcessRenderEffect{
-        scene->getEngine(), "depth of field",
-        [&]() -> vector_t<PostProcess*> { return _effects; }, true}
+    : PostProcessRenderEffect{scene->getEngine(), "depth of field",
+                              [&]() -> vector_t<PostProcess*> {
+                                return _effects;
+                              },
+                              true}
+    , focalLength{this, &DepthOfFieldEffect::get_focalLength,
+                  &DepthOfFieldEffect::set_focalLength}
+    , fStop{this, &DepthOfFieldEffect::get_fStop,
+            &DepthOfFieldEffect::set_fStop}
+    , focusDistance{this, &DepthOfFieldEffect::get_focusDistance,
+                    &DepthOfFieldEffect::set_focusDistance}
+    , lensSize{this, &DepthOfFieldEffect::get_lensSize,
+               &DepthOfFieldEffect::set_lensSize}
+    , depthTexture{this, &DepthOfFieldEffect::set_depthTexture}
 {
   // Circle of confusion value for each pixel is used to determine how
   // much to blur that pixel
@@ -56,23 +67,21 @@ DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene,
     }
   }
   auto adjustedKernelSize = kernelSize / ::std::pow(2, blurCount - 1);
-  for (int i = 0; i < blurCount; i++) {
+  auto ratio              = 1.f;
+  for (int i = 0; i < blurCount; ++i) {
     auto blurY = ::std::make_unique<DepthOfFieldBlurPostProcess>(
       "verticle blur", scene, Vector2(0.f, 1.f), adjustedKernelSize,
-      ToVariant<float, PostProcessOptions>(
-        1.f / static_cast<float>(::std::pow(2.f, i))),
-      nullptr, _depthOfFieldPass.get(),
-      i == 0 ? _circleOfConfusion.get() : nullptr,
+      ToVariant<float, PostProcessOptions>(ratio), nullptr,
+      _depthOfFieldPass.get(), i == 0 ? _circleOfConfusion.get() : nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
       pipelineTextureType, blockCompilation);
     blurY->autoClear = false;
+    ratio            = 0.75f / ::std::pow(2.f, static_cast<float>(i));
     auto blurX       = ::std::make_unique<DepthOfFieldBlurPostProcess>(
       "horizontal blur", scene, Vector2(1.f, 0.f), adjustedKernelSize,
-      ToVariant<float, PostProcessOptions>(
-        1.f / static_cast<float>(::std::pow(2.f, i))),
-      nullptr, _depthOfFieldPass.get(), nullptr,
-      TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-      pipelineTextureType, blockCompilation);
+      ToVariant<float, PostProcessOptions>(ratio), nullptr,
+      _depthOfFieldPass.get(), nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
+      scene->getEngine(), false, pipelineTextureType, blockCompilation);
     blurX->autoClear = false;
     _depthOfFieldBlurY.emplace_back(::std::move(blurY));
     _depthOfFieldBlurX.emplace_back(::std::move(blurX));
@@ -83,83 +92,80 @@ DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene,
     blurSteps.emplace_back(static_cast<PostProcess*>(depthOfFieldBlurX.get()));
   }
 
-  // Merge blurred images with original image based on circleOfConfusion
-  _depthOfFieldMerge = ::std::make_unique<DepthOfFieldMergePostProcess>(
-    "depthOfFieldMerge", _circleOfConfusion.get(), _circleOfConfusion.get(),
-    blurSteps, ToVariant<float, PostProcessOptions>(1.f), nullptr,
-    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-    pipelineTextureType, blockCompilation);
-  _depthOfFieldMerge->autoClear = false;
-
   // Set all post processes on the effect.
   _effects = {_circleOfConfusion.get()};
   for (size_t i = 0; i < _depthOfFieldBlurX.size(); i++) {
     _effects.emplace_back(_depthOfFieldBlurY[i].get());
     _effects.emplace_back(_depthOfFieldBlurX[i].get());
   }
-  _effects.emplace_back(_depthOfFieldMerge.get());
+
+    // Merge blurred images with original image based on circleOfConfusion
+#if 0
+  _dofMerge = ::std::make_unique<DepthOfFieldMergePostProcess>(
+    "dofMerge", _circleOfConfusion.get(), _circleOfConfusion.get(),
+    stl_util::to_raw_ptr_vector(_depthOfFieldBlurX),
+    ToVariant<float, PostProcessOptions>(ratio), nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
+    pipelineTextureType, blockCompilation);
+  _dofMerge->autoClear = false;
+  _effects.emplace_back(_dofMerge.get());
+#endif
 }
 
 DepthOfFieldEffect::~DepthOfFieldEffect()
 {
 }
 
-void DepthOfFieldEffect::setFocalLength(float value)
+void DepthOfFieldEffect::set_focalLength(float value)
 {
   _circleOfConfusion->focalLength = value;
 }
 
-float DepthOfFieldEffect::focalLength() const
+float DepthOfFieldEffect::get_focalLength() const
 {
   return _circleOfConfusion->focalLength;
 }
 
-void DepthOfFieldEffect::setFStop(float value)
+void DepthOfFieldEffect::set_fStop(float value)
 {
   _circleOfConfusion->fStop = value;
 }
 
-float DepthOfFieldEffect::fStop() const
+float DepthOfFieldEffect::get_fStop() const
 {
   return _circleOfConfusion->fStop;
 }
 
-void DepthOfFieldEffect::setFocusDistance(float value)
+void DepthOfFieldEffect::set_focusDistance(float value)
 {
   _circleOfConfusion->focusDistance = value;
 }
 
-float DepthOfFieldEffect::focusDistance() const
+float DepthOfFieldEffect::get_focusDistance() const
 {
   return _circleOfConfusion->focusDistance;
 }
 
-void DepthOfFieldEffect::setLensSize(float value)
+void DepthOfFieldEffect::set_lensSize(float value)
 {
   _circleOfConfusion->lensSize = value;
 }
 
-float DepthOfFieldEffect::lensSize() const
+float DepthOfFieldEffect::get_lensSize() const
 {
   return _circleOfConfusion->lensSize;
 }
 
-void DepthOfFieldEffect::setDepthTexture(RenderTargetTexture* value)
+void DepthOfFieldEffect::set_depthTexture(RenderTargetTexture* const& value)
 {
-  _circleOfConfusion->setDepthTexture(value);
+  _circleOfConfusion->depthTexture = value;
 }
 
 void DepthOfFieldEffect::disposeEffects(Camera* camera)
 {
-  _depthOfFieldPass->dispose(camera);
-  _circleOfConfusion->dispose(camera);
-  for (auto& element : _depthOfFieldBlurX) {
-    element->dispose(camera);
-  };
-  for (auto& element : _depthOfFieldBlurY) {
-    element->dispose(camera);
-  };
-  _depthOfFieldMerge->dispose(camera);
+  for (auto& effect : _effects) {
+    effect->dispose(camera);
+  }
 }
 
 void DepthOfFieldEffect::_updateEffects()

@@ -231,10 +231,10 @@ void DefaultRenderingPipeline::set_depthOfFieldBlurLevel(
 
   depthOfField = new DepthOfFieldEffect(_scene, nullptr, _depthOfFieldBlurLevel,
                                         _defaultPipelineTextureType);
-  depthOfField->setFocalLength(oldDof->focalLength());
-  depthOfField->setFocusDistance(oldDof->focusDistance());
-  depthOfField->setFStop(oldDof->fStop());
-  depthOfField->setLensSize(oldDof->lensSize());
+  depthOfField->focalLength   = oldDof->focalLength();
+  depthOfField->focusDistance = oldDof->focusDistance();
+  depthOfField->fStop         = oldDof->fStop();
+  depthOfField->lensSize      = oldDof->lensSize();
 
   for (auto& camera : _cameras) {
     oldDof->disposeEffects(camera.second);
@@ -370,7 +370,7 @@ void DefaultRenderingPipeline::_buildPipeline()
     // TODO use indexing instead of "0"
     auto depthTexture
       = _scene->enableDepthRenderer(_cameras["0"])->getDepthMap();
-    depthOfField->setDepthTexture(depthTexture);
+    depthOfField->depthTexture = depthTexture;
     if (!depthOfField->_isReady()) {
       depthOfField->_updateEffects();
     }

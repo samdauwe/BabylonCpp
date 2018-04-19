@@ -14,7 +14,7 @@ class BABYLON_SHARED_EXPORT SharpenPostProcess : public PostProcess {
 
 public:
   /**
-   * @brief Creates a new instance of @see ConvolutionPostProcess.
+   * @brief Creates a new instance ConvolutionPostProcess.
    * @param name The name of the effect.
    * @param options The required width/height ratio to downsize to before
    * computing the render pass.
