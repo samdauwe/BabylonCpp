@@ -10,12 +10,24 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT BoundingSphere {
 
 public:
-  BoundingSphere(const Vector3& minimum, const Vector3& maximum);
+  /**
+   * @brief Creates a new bounding sphere
+   * @param min defines the minimum vector (in local space)
+   * @param max defines the maximum vector (in local space)
+   */
+  BoundingSphere(const Vector3& min, const Vector3& max);
   BoundingSphere(const BoundingSphere& other);
   BoundingSphere(BoundingSphere&& other);
   BoundingSphere& operator=(const BoundingSphere& other);
   BoundingSphere& operator=(BoundingSphere&& other);
   ~BoundingSphere();
+
+  /**
+   * @brief Recreates the entire bounding sphere from scratch.
+   * @param min defines the new minimum vector (in local space)
+   * @param max defines the new maximum vector (in local space)
+   */
+  void reConstruct(const Vector3& min, const Vector3& max);
 
   /** Methods **/
   void _update(const Matrix& world);
@@ -31,6 +43,8 @@ public:
   float radius;
   Vector3 centerWorld;
   float radiusWorld;
+  Vector3 minimum;
+  Vector3 maximum;
 
 private:
   Vector3 _tempRadiusVector;

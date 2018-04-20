@@ -6,9 +6,16 @@
 
 namespace BABYLON {
 
-BoundingBox::BoundingBox(const Vector3& _minimum, const Vector3& _maximum)
-    : minimum{_minimum}, maximum{_maximum}
+BoundingBox::BoundingBox(const Vector3& min, const Vector3& max)
+    : _worldMatrix{Matrix::Identity()}
 {
+  reConstruct(min, max);
+}
+
+void BoundingBox::reConstruct(const Vector3& min, const Vector3& max)
+{
+  minimum = min;
+  maximum = max;
   // Bounding vectors
   vectors.reserve(8);
   vectors.emplace_back(minimum);
@@ -48,7 +55,7 @@ BoundingBox::BoundingBox(const Vector3& _minimum, const Vector3& _maximum)
   centerWorld     = Vector3::Zero();
   extendSizeWorld = Vector3::Zero();
 
-  _update(Matrix::Identity());
+  _update(_worldMatrix);
 }
 
 BoundingBox::BoundingBox(const BoundingBox& other)

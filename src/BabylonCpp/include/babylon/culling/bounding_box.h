@@ -11,7 +11,12 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT BoundingBox : public ICullable {
 
 public:
-  BoundingBox(const Vector3& minimum, const Vector3& maximum);
+  /**
+   * @brief Creates a new bounding box.
+   * @param min defines the minimum vector (in local space)
+   * @param max defines the maximum vector (in local space)
+   */
+  BoundingBox(const Vector3& min, const Vector3& max);
   BoundingBox(const BoundingBox& other);
   BoundingBox(BoundingBox&& other);
   BoundingBox& operator=(const BoundingBox& other);
@@ -19,6 +24,14 @@ public:
   virtual ~BoundingBox();
 
   /** Methods **/
+
+  /**
+   * @brief Recreates the entire bounding box from scratch.
+   * @param min defines the new minimum vector (in local space)
+   * @param max defines the new maximum vector (in local space)
+   */
+  void reConstruct(const Vector3& min, const Vector3& max);
+
   Matrix& getWorldMatrix();
   BoundingBox& setWorldMatrix(const Matrix& matrix);
   void _update(const Matrix& world);
@@ -48,6 +61,7 @@ public:
   vector_t<Vector3> vectorsWorld;
   Vector3 minimumWorld;
   Vector3 maximumWorld;
+
   Vector3 minimum;
   Vector3 maximum;
 
