@@ -6,6 +6,7 @@
 #include <babylon/mesh/mesh.h>
 
 namespace BABYLON {
+namespace Debug {
 
 AxesViewer::AxesViewer(Scene* iScene, float iScaleLines)
     : scene{iScene}
@@ -91,4 +92,5 @@ void AxesViewer::dispose()
   scene = nullptr;
 }
 
+} // end of namespace Debug
 } // end of namespace BABYLON

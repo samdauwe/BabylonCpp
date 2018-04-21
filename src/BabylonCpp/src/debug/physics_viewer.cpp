@@ -12,6 +12,7 @@
 #include <babylon/physics/physics_impostor.h>
 
 namespace BABYLON {
+namespace Debug {
 
 PhysicsViewer::PhysicsViewer(Scene* scene)
     : _scene{scene ? scene : Engine::LastCreatedScene()}
@@ -202,4 +203,5 @@ void PhysicsViewer::dispose()
   _physicsEnginePlugin = nullptr;
 }
 
+} // end of namespace Debug
 } // end of namespace BABYLON

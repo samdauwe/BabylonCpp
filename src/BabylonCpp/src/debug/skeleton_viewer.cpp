@@ -10,6 +10,7 @@
 #include <babylon/mesh/vertex_data_options.h>
 
 namespace BABYLON {
+namespace Debug {
 
 SkeletonViewer::SkeletonViewer(Skeleton* iSkeleton, AbstractMesh* iMesh,
                                Scene* iScene, bool iAutoUpdateBonesMatrices,
@@ -19,6 +20,8 @@ SkeletonViewer::SkeletonViewer(Skeleton* iSkeleton, AbstractMesh* iMesh,
     , mesh{iMesh}
     , autoUpdateBonesMatrices{iAutoUpdateBonesMatrices}
     , renderingGroupId{iRenderingGroupId}
+    , isEnabled{this, &SkeletonViewer::get_isEnabled,
+                &SkeletonViewer::set_isEnabled}
     , _scene{iScene}
     , _debugMesh{nullptr}
     , _isEnabled{false}
@@ -31,7 +34,7 @@ SkeletonViewer::~SkeletonViewer()
 {
 }
 
-void SkeletonViewer::setIsEnabled(bool value)
+void SkeletonViewer::set_isEnabled(bool value)
 {
   if (_isEnabled == value) {
     return;
@@ -47,7 +50,7 @@ void SkeletonViewer::setIsEnabled(bool value)
   }
 }
 
-bool SkeletonViewer::isEnabled() const
+bool SkeletonViewer::get_isEnabled() const
 {
   return _isEnabled;
 }
@@ -166,10 +169,11 @@ void SkeletonViewer::update()
 void SkeletonViewer::dispose()
 {
   if (_debugMesh) {
-    setIsEnabled(false);
+    isEnabled = false;
     _debugMesh->dispose();
     _debugMesh = nullptr;
   }
 }
 
+} // end of namespace Debug
 } // end of namespace BABYLON

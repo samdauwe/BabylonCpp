@@ -4,7 +4,11 @@
 #include <babylon/babylon_global.h>
 
 namespace BABYLON {
+namespace Debug {
 
+/**
+ * @brief The Axes viewer will show 3 axes in a specific point in space.
+ */
 class BABYLON_SHARED_EXPORT AxesViewer {
 
 public:
@@ -30,6 +34,7 @@ private:
 
 }; // end of class AxesViewer
 
+} // end of namespace Debug
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_DEBUG_AXES_VIEWER_H

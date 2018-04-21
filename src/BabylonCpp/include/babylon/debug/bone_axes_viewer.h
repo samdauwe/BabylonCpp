@@ -6,11 +6,16 @@
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+namespace Debug {
 
+/**
+ * @brief The BoneAxesViewer will attach 3 axes to a specific bone of a specific
+ * mesh.
+ */
 class BABYLON_SHARED_EXPORT BoneAxesViewer : public AxesViewer {
 
 public:
-  BoneAxesViewer(Scene* scene, Bone* bone, Mesh* mesh, float scaleLines);
+  BoneAxesViewer(Scene* scene, Bone* bone, Mesh* mesh, float scaleLines = 1.f);
   ~BoneAxesViewer();
 
   void update();
@@ -27,6 +32,7 @@ public:
 
 }; // end of class BoneAxesViewer
 
+} // end of namespace Debug
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_DEBUG_BONE_AXES_VIEWER_H

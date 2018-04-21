@@ -4,7 +4,11 @@
 #include <babylon/babylon_global.h>
 
 namespace BABYLON {
+namespace Debug {
 
+/**
+ * @brief Used to show the physics impostor around the specific mesh.
+ */
 class BABYLON_SHARED_EXPORT PhysicsViewer {
 
 public:
@@ -39,6 +43,7 @@ private:
 
 }; // end of class PhysicsViewer
 
+} // end of namespace Debug
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_DEBUG_PHYSICS_VIEWER_H

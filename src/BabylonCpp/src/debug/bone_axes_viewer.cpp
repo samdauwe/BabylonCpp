@@ -5,6 +5,7 @@
 #include <babylon/mesh/mesh.h>
 
 namespace BABYLON {
+namespace Debug {
 
 BoneAxesViewer::BoneAxesViewer(Scene* iScene, Bone* iBone, Mesh* iMesh,
                                float iScaleLines)
@@ -46,4 +47,5 @@ void BoneAxesViewer::dispose()
   }
 }
 
+} // end of namespace Debug
 } // end of namespace BABYLON

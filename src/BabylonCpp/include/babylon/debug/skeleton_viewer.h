@@ -6,7 +6,11 @@
 #include <babylon/tools/event_state.h>
 
 namespace BABYLON {
+namespace Debug {
 
+/**
+ * @brief Demo available here: http://www.babylonjs-playground.com/#1BZJVJ#8
+ */
 class BABYLON_SHARED_EXPORT SkeletonViewer {
 
 public:
@@ -15,10 +19,12 @@ public:
                  unsigned int renderingGroupId = 1);
   ~SkeletonViewer();
 
-  void setIsEnabled(bool value);
-  bool isEnabled() const;
   void update();
   void dispose();
+
+protected:
+  void set_isEnabled(bool value);
+  bool get_isEnabled() const;
 
 private:
   void _getBonePosition(Vector3& position, Bone* bone, const Matrix& meshMat,
@@ -36,6 +42,8 @@ public:
   bool autoUpdateBonesMatrices;
   unsigned int renderingGroupId;
 
+  Property<SkeletonViewer, bool> isEnabled;
+
 private:
   Scene* _scene;
   vector_t<vector_t<Vector3>> _debugLines;
@@ -45,6 +53,7 @@ private:
 
 }; // end of class SkeletonViewer
 
+} // end of namespace Debug
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_DEBUG_SKELETON_VIEWER_H
