@@ -145,12 +145,14 @@ class Octree;
 template <class T>
 class OctreeBlock;
 // --- Debug ---
+class DebugLayer;
+class RayHelper;
+namespace Debug {
 class AxesViewer;
 class BoneAxesViewer;
-class DebugLayer;
 class PhysicsViewer;
-class RayHelper;
 class SkeletonViewer;
+} // end of namespace Debug
 // --- Engine ---
 class ClickInfo;
 struct DepthTextureCreationOptions;
@@ -466,6 +468,8 @@ class OimoPhysicsEnginePlugin;
 // --- Post Process ---
 class AnaglyphPostProcess;
 class BlackAndWhitePostProcess;
+class BloomEffect;
+class BloomMergePostProcess;
 class BlurPostProcess;
 class ChromaticAberrationPostProcess;
 class CircleOfConfusionPostProcess;
@@ -476,9 +480,11 @@ class DepthOfFieldEffect;
 class DepthOfFieldMergePostProcess;
 struct DepthOfFieldMergePostProcessOptions;
 class DisplayPassPostProcess;
+class ExtractHighlightsPostProcess;
 class FilterPostProcess;
 class FxaaPostProcess;
 class GlowBlurPostProcess;
+class GrainPostProcess;
 class HighlightsPostProcess;
 class ImageProcessingPostProcess;
 class PassPostProcess;
