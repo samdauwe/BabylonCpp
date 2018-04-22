@@ -78,3 +78,7 @@ target_link_libraries(${TARGET}
 if(NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
     set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -ldl")
 endif()
+
+# Copy asset directories
+## - Icons
+copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/icons")
