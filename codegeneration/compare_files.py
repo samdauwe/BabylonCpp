@@ -21,14 +21,14 @@ def filesAreEqual(file1, file2):
     import filecmp
     return filecmp.cmp(file1, file2)
 
-def compareFiles(currentDir, previousDir, fileList):
+def compareFiles(currentDir, previousDir, fileList, whiteList):
     """
     Checks which files were changed or added compared to the previous version.
     """
     result = {"ChangedFiles" : [], "NewFiles" : []}
     for file in fileList:
         # ignore already updated files
-        if file.endswith("_done.ts"):
+        if file.endswith("_done.ts") or file.endswith(tuple(whiteList)):
             continue
         # check if file has been changed
         prevFullpathOrig = file.replace(currentDir, previousDir)
@@ -60,13 +60,22 @@ def main():
     # Versions to compare
     current, previous = "3.2.0-alpha7", "3.1-beta-6"
     current, previous = "3.2.0-beta.2", "3.2.0-alpha7"
+    current, previous = "3.2.0-beta.5", "3.2.0-beta.2"
     # Dictionary mapping from BabylonJs version to relative path
     BabylonJsVersions = {
         "3.1-alpha" : "3.1.0_2017_09_23",
         "3.1-beta-6" : "3.1.0_2017_12_01",
         "3.2.0-alpha7" : "3.2.0_2018_02_03",
-        "3.2.0-beta.2" : "3.2.0_2018_03_22"
+        "3.2.0-beta.2" : "3.2.0_2018_03_22",
+        "3.2.0-beta.5" : "3.2.0_2018_04_14"
     }
+    # List containing the files to ignore
+    whiteList = ["babylon.assetContainer.ts", "babylon.nullEngine.ts",
+                 "babylon.assetsManager.ts", "babylon.virtualJoystick.ts",
+                 "babylon.decorators.ts", "babylon.andOrNotEvaluator.ts",
+                 "babylon.dracoCompression.ts", "babylon.vrExperienceHelper.ts",
+                 "babylon.webVRCamera.ts", "babylon.analyser.ts",
+                 "babylon.stereoscopicCameras.ts"]
     # Create mapping from BabylonJs version to full path
     for version in BabylonJsVersions:
         fullPath = os.path.join(os.path.expanduser('~'), "Projects",
@@ -77,7 +86,7 @@ def main():
     previous = BabylonJsVersions[previous]
     current = BabylonJsVersions[current]
     files = getFilesRecursively(current)
-    fileComparisonDict = compareFiles(current, previous, files)
+    fileComparisonDict = compareFiles(current, previous, files, whiteList)
     print fileComparisonToStr(fileComparisonDict)
 
 if __name__ == "__main__":
