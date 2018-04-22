@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <imgui.h>
+#include <imgui_internal.h>
 
 // from https://github.com/juliettef/IconFontCppHeaders
 #include <babylon/imgui/icons_font_awesome.h>
@@ -52,13 +53,15 @@ inline void SetupImGuiStyle(bool bStyleDark_, float alpha_)
   style.Colors[ImGuiCol_ResizeGrip]        = ImVec4(1.00f, 1.00f, 1.00f, 0.50f);
   style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
   style.Colors[ImGuiCol_ResizeGripActive]  = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
+#if 0
   style.Colors[ImGuiCol_CloseButton]       = ImVec4(0.59f, 0.59f, 0.59f, 0.50f);
   style.Colors[ImGuiCol_CloseButtonHovered]
     = ImVec4(0.98f, 0.39f, 0.36f, 1.00f);
   style.Colors[ImGuiCol_CloseButtonActive] = ImVec4(0.98f, 0.39f, 0.36f, 1.00f);
-  style.Colors[ImGuiCol_PlotLines]         = ImVec4(0.39f, 0.39f, 0.39f, 1.00f);
-  style.Colors[ImGuiCol_PlotLinesHovered]  = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
-  style.Colors[ImGuiCol_PlotHistogram]     = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+#endif
+  style.Colors[ImGuiCol_PlotLines]        = ImVec4(0.39f, 0.39f, 0.39f, 1.00f);
+  style.Colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
+  style.Colors[ImGuiCol_PlotHistogram]    = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
   style.Colors[ImGuiCol_PlotHistogramHovered]
     = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
   style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
@@ -91,6 +94,33 @@ inline void SetupImGuiStyle(bool bStyleDark_, float alpha_)
       }
     }
   }
+}
+
+/**
+ * @brief Splitter implementation using SplitterBehavior in imgui_internal.h as
+ * a helper.
+ * Ref: https://github.com/ocornut/imgui/issues/319
+ */
+inline bool Splitter(bool split_vertically, float thickness, float* size1,
+                     float* size2, float min_size1, float min_size2,
+                     float splitter_long_axis_size = -1.0f)
+{
+  using namespace ImGui;
+  ImGuiContext& g     = *GImGui;
+  ImGuiWindow* window = g.CurrentWindow;
+  ImGuiID id          = window->GetID("##Splitter");
+  ImRect bb;
+  auto bbMin = (split_vertically ? ImVec2(*size1, 0.0f) : ImVec2(0.0f, *size1));
+  bb.Min.x   = window->DC.CursorPos.x + bbMin.x;
+  bb.Min.y   = window->DC.CursorPos.y + bbMin.y;
+  auto bbMax = CalcItemSize(split_vertically ?
+                              ImVec2(thickness, splitter_long_axis_size) :
+                              ImVec2(splitter_long_axis_size, thickness),
+                            0.0f, 0.0f);
+  bb.Max.x   = bb.Min.x + bbMax.x;
+  bb.Max.y   = bb.Min.y + bbMax.y;
+  return SplitterBehavior(id, bb, split_vertically ? ImGuiAxis_X : ImGuiAxis_Y,
+                          size1, size2, min_size1, min_size2, 0.0f);
 }
 
 inline bool CheckBoxFont(const char* name_, bool* pB_, const char* pOn_ = "[X]",

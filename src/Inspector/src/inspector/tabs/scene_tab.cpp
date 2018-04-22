@@ -22,7 +22,7 @@ void SceneTab::render()
     return;
   }
 
-  if (ImGui::BeginDock("Scene")) {
+  if (ImGui::BeginDock(name.c_str())) {
     // General
     if (ImGui::CollapsingHeader("General", "General", true, true)) {
       ImGui::Checkbox("Bounding boxes", &_scene->forceShowBoundingBoxes);

@@ -9,11 +9,20 @@ namespace BABYLON {
 
 class ActionStore;
 struct InspectorAction;
-class LogsTab;
-class SceneTab;
-class StatsTab;
+class Tab;
 
 class BABYLON_SHARED_EXPORT Inspector {
+
+public:
+  // Const statics
+  // - Scene tab
+  static constexpr unsigned int SCENE_TAB = 0;
+  // - Logs tab
+  static constexpr unsigned int LOGS_TAB = 1;
+  // - Statistics tab
+  static constexpr unsigned int STATS_TAB =2;
+  // - Ligt tab
+  static constexpr unsigned int LIGHT_TAB = 3;
 
 public:
   Inspector(GLFWwindow* glfwWindow, Scene* scene = nullptr);
@@ -41,12 +50,7 @@ private:
   bool _showDockingWindow;
   int _menuHeight;
   // Tabs
-  // - Logs tab
-  unique_ptr_t<LogsTab> _logsTab;
-  // - Scene tab
-  unique_ptr_t<SceneTab> _sceneTab;
-  // - Statistics tab
-  unique_ptr_t<StatsTab> _statsTab;
+  array_t<unique_ptr_t<Tab>, 4> _tabs;
 
 }; // end of class Inspector
 

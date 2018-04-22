@@ -50,7 +50,7 @@ void LogsTab::initialize()
 
 void LogsTab::render()
 {
-  if (ImGui::BeginDock("Logs")) {
+  if (ImGui::BeginDock(name.c_str())) {
     // Clear logg messages
     if (ImGui::Button("Clear")) {
       _messages.clear();

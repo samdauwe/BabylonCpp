@@ -21,6 +21,7 @@
 
 // Inspector
 #include <babylon/inspector/actions/action_store.h>
+#include <babylon/inspector/tabs/light_tab.h>
 #include <babylon/inspector/tabs/logs_tab.h>
 #include <babylon/inspector/tabs/scene_tab.h>
 #include <babylon/inspector/tabs/stats_tab.h>
@@ -34,10 +35,11 @@ Inspector::Inspector(GLFWwindow* glfwWindow, Scene* scene)
     , _scene{scene}
     , _actionStore{std::make_unique<ActionStore>()}
     , _showDockingWindow{true}
-    , _logsTab{::std::make_unique<LogsTab>()}
-    , _sceneTab{nullptr}
-    , _statsTab{nullptr}
 {
+  // Reset tabs
+  ::std::fill(_tabs.begin(), _tabs.end(), nullptr);
+  // Create log tab
+  _tabs[LOGS_TAB] = ::std::make_unique<LogsTab>();
 }
 
 Inspector::~Inspector()
@@ -53,8 +55,9 @@ void Inspector::setScene(Scene* scene)
 {
   _scene = scene;
   // Reset tabs
-  _sceneTab = ::std::make_unique<SceneTab>(*this);
-  _statsTab = ::std::make_unique<StatsTab>(*this);
+  _tabs[SCENE_TAB] = ::std::make_unique<SceneTab>(*this);
+  _tabs[STATS_TAB] = ::std::make_unique<StatsTab>(*this);
+  _tabs[LIGHT_TAB] = ::std::make_unique<LightTab>(*this);
 }
 
 void Inspector::intialize()
@@ -114,14 +117,8 @@ void Inspector::render()
 void Inspector::dispose()
 {
   // Dispose tabs
-  if (_logsTab) {
-    _logsTab->dispose();
-  }
-  if (_sceneTab) {
-    _sceneTab->dispose();
-  }
-  if (_statsTab) {
-    _statsTab->dispose();
+  for (auto& tab : _tabs) {
+    tab->dispose();
   }
   // Shotdown ImGui
   ImGui_ImplGlfwGL2_Shutdown();
@@ -158,10 +155,6 @@ void Inspector::_renderDockGUI()
     return;
   }
 
-  if (!_logsTab || !_sceneTab || !_statsTab) {
-    return;
-  }
-
   // Setup root docking window size
   auto pos  = ImVec2(0, _menuHeight);
   auto size = ImGui::GetIO().DisplaySize;
@@ -177,19 +170,11 @@ void Inspector::_renderDockGUI()
     // Dock layout by hard-coded or .ini file
     ImGui::BeginDockspace();
 
-    // Render logs dock
-    if (_logsTab) {
-      _logsTab->render();
-    }
-
-    // Render scene dock
-    if (_sceneTab) {
-      _sceneTab->render();
-    }
-
-    // Render statistics dock
-    if (_statsTab) {
-      _statsTab->render();
+    // Render tab
+    for (auto& tab : _tabs) {
+      if (tab) {
+        tab->render();
+      }
     }
 
     ImGui::EndDockspace();

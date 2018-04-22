@@ -57,12 +57,12 @@ void StatsTab::render()
   static auto statsSize         = ImGui::CalcTextSize("4096x2160");
   const auto engineCapabilities = _engine->getCaps();
 
-  if (ImGui::BeginDock("Stats")) {
+  if (ImGui::BeginDock(name.c_str())) {
     float offsetX = ImGui::GetContentRegionMax().x - statsSize.x;
     // Engine version and framerate
     ImGui::TextWrapped("BabylonCpp v%s -", Engine::Version().c_str());
     ImGui::SameLine();
-    // Color #f29766 -> rgba(242, 151, 102, 1)
+    // Color "color-top" #f29766 -> rgba(242, 151, 102, 1)
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.95f, 0.59f, 0.4f, 1.0f));
     ImGui::TextWrapped("%.f fps", static_cast<double>(_engine->getFps()));
     ImGui::PopStyleColor();
