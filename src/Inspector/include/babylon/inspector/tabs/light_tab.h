@@ -7,9 +7,9 @@
 
 namespace BABYLON {
 
+class Inspector;
 class Light;
 class LightAdapter;
-class Inspector;
 
 class BABYLON_SHARED_EXPORT LightTab : public PropertyTab {
 
