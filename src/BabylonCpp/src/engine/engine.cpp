@@ -3825,15 +3825,18 @@ InternalTexture* Engine::createRawCubeTextureFromUrl(
 }
 
 void Engine::updateRawTexture3D(InternalTexture* texture,
-                                const ArrayBuffer& data, unsigned int format,
-                                bool invertY, const string_t& compression)
+                                const ArrayBufferView& data,
+                                unsigned int format, bool invertY,
+                                const string_t& compression)
 {
+  const auto& _data = data.uint8Array;
+
   auto internalFormat = _getInternalFormat(format);
   _bindTextureDirectly(GL::TEXTURE_3D, texture, true);
   _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL, invertY ? 1 : 0);
 
   if (!_doNotHandleContextLost) {
-    texture->_bufferView  = data;
+    texture->_bufferView  = _data;
     texture->format       = format;
     texture->invertY      = invertY;
     texture->_compression = compression;
@@ -3843,7 +3846,7 @@ void Engine::updateRawTexture3D(InternalTexture* texture,
     _gl->pixelStorei(GL::UNPACK_ALIGNMENT, 1);
   }
 
-  if (!compression.empty() && !data.empty()) {
+  if (!compression.empty() && !_data.empty()) {
     // _gl.compressedTexImage3D(GL::TEXTURE_3D, 0,
     // (<any>getCaps().s3tc)[compression], texture->width, texture->height,
     // texture->depth, 0, data);
@@ -3851,7 +3854,7 @@ void Engine::updateRawTexture3D(InternalTexture* texture,
   else {
     _gl->texImage3D(GL::TEXTURE_3D, 0, static_cast<int>(internalFormat),
                     texture->width, texture->height, texture->depth, 0,
-                    internalFormat, GL::UNSIGNED_BYTE, data);
+                    internalFormat, GL::UNSIGNED_BYTE, _data);
   }
 
   if (texture->generateMipMaps) {
@@ -3862,8 +3865,8 @@ void Engine::updateRawTexture3D(InternalTexture* texture,
   texture->isReady = true;
 }
 
-InternalTexture* Engine::createRawTexture3D(const ArrayBuffer& data, int width,
-                                            int height, int depth,
+InternalTexture* Engine::createRawTexture3D(const ArrayBufferView& data,
+                                            int width, int height, int depth,
                                             unsigned int format,
                                             bool generateMipMaps, bool invertY,
                                             unsigned int samplingMode,
@@ -3882,7 +3885,7 @@ InternalTexture* Engine::createRawTexture3D(const ArrayBuffer& data, int width,
   texture->is3D            = true;
 
   if (!_doNotHandleContextLost) {
-    texture->_bufferView = data;
+    texture->_bufferView = data.uint8Array;
   }
 
   updateRawTexture3D(texture, data, format, invertY, compression);

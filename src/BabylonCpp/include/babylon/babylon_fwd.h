@@ -298,6 +298,7 @@ using RenderTargetCreationOptions = IRenderTargetOptions;
 class MirrorTexture;
 class MultiRenderTarget;
 class RawTexture;
+class RawTexture3D;
 class RefractionTexture;
 class RenderTargetTexture;
 class Texture;
