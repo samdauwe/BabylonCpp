@@ -5,7 +5,17 @@
 namespace BABYLON {
 
 EngineInstrumentation::EngineInstrumentation(Engine* engine)
-    : _engine{engine}
+    : gpuFrameTimeCounter{this, &EngineInstrumentation::get_gpuFrameTimeCounter}
+    , captureGPUFrameTime{this, &EngineInstrumentation::get_captureGPUFrameTime,
+                          &EngineInstrumentation::set_captureGPUFrameTime}
+    , shaderCompilationTimeCounter{this, &EngineInstrumentation::
+                                           get_shaderCompilationTimeCounter}
+    , captureShaderCompilationTime{this,
+                                   &EngineInstrumentation::
+                                     get_captureShaderCompilationTime,
+                                   &EngineInstrumentation::
+                                     set_captureShaderCompilationTime}
+    , _engine{engine}
     , _captureGPUFrameTime{false}
     , _gpuFrameTimeToken{nullptr}
     , _captureShaderCompilationTime{false}
@@ -20,17 +30,17 @@ EngineInstrumentation::~EngineInstrumentation()
 {
 }
 
-PerfCounter& EngineInstrumentation::gpuFrameTimeCounter()
+PerfCounter& EngineInstrumentation::get_gpuFrameTimeCounter()
 {
   return _gpuFrameTime;
 }
 
-bool EngineInstrumentation::captureGPUFrameTime() const
+bool EngineInstrumentation::get_captureGPUFrameTime() const
 {
   return _captureGPUFrameTime;
 }
 
-void EngineInstrumentation::setCaptureGPUFrameTime(bool value)
+void EngineInstrumentation::set_captureGPUFrameTime(bool value)
 {
   if (value == _captureGPUFrameTime) {
     return;
@@ -68,17 +78,17 @@ void EngineInstrumentation::setCaptureGPUFrameTime(bool value)
   }
 }
 
-PerfCounter& EngineInstrumentation::shaderCompilationTimeCounter()
+PerfCounter& EngineInstrumentation::get_shaderCompilationTimeCounter()
 {
   return _shaderCompilationTime;
 }
 
-bool EngineInstrumentation::captureShaderCompilationTime() const
+bool EngineInstrumentation::get_captureShaderCompilationTime() const
 {
   return _captureShaderCompilationTime;
 }
 
-void EngineInstrumentation::setCaptureShaderCompilationTime(bool value)
+void EngineInstrumentation::set_captureShaderCompilationTime(bool value)
 {
   if (value == _captureShaderCompilationTime) {
     return;

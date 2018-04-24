@@ -21,40 +21,63 @@ public:
   EngineInstrumentation(Engine* engine);
   virtual ~EngineInstrumentation();
 
-  // Properties
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
 
+protected:
+  // Properties
   /**
    * @brief Gets the perf counter used for GPU frame time.
    */
-  PerfCounter& gpuFrameTimeCounter();
+  PerfCounter& get_gpuFrameTimeCounter();
 
   /**
    * @brief Gets the GPU frame time capture status.
    */
-  bool captureGPUFrameTime() const;
+  bool get_captureGPUFrameTime() const;
 
   /**
    * @brief Enable or disable the GPU frame time capture.
    */
-  void setCaptureGPUFrameTime(bool value);
+  void set_captureGPUFrameTime(bool value);
 
   /**
    * @brief Gets the perf counter used for shader compilation time.
    */
-  PerfCounter& shaderCompilationTimeCounter();
+  PerfCounter& get_shaderCompilationTimeCounter();
 
   /**
    * @brief Gets the shader compilation time capture status.
    */
-  bool captureShaderCompilationTime() const;
+  bool get_captureShaderCompilationTime() const;
 
   /**
    * @brief Enable or disable the shader compilation time capture.
    */
-  void setCaptureShaderCompilationTime(bool value);
+  void set_captureShaderCompilationTime(bool value);
 
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
+public:
+  // Properties
+  /**
+   * Perf counter used for GPU frame time.
+   */
+  ReadOnlyProperty<EngineInstrumentation, PerfCounter> gpuFrameTimeCounter;
+
+  /**
+   * Enable or disable the GPU frame time capture.
+   */
+  Property<EngineInstrumentation, bool> captureGPUFrameTime;
+
+  /**
+   * Perf counter used for shader compilation time.
+   */
+  ReadOnlyProperty<EngineInstrumentation, PerfCounter>
+    shaderCompilationTimeCounter;
+
+  /**
+   * Enable or disable the shader compilation time capture.
+   */
+  Property<EngineInstrumentation, bool> captureShaderCompilationTime;
 
 private:
   Engine* _engine;

@@ -1198,13 +1198,13 @@ public:
    * An event triggered when render targets are about to be rendered
    * Can happen multiple times per frame.
    */
-  Observable<Scene> OnBeforeRenderTargetsRenderObservable;
+  Observable<Scene> onBeforeRenderTargetsRenderObservable;
 
   /**
    * An event triggered when render targets were rendered.
    * Can happen multiple times per frame.
    */
-  Observable<Scene> OnAfterRenderTargetsRenderObservable;
+  Observable<Scene> onAfterRenderTargetsRenderObservable;
 
   /**
    * An event triggered before calculating deterministic simulation step

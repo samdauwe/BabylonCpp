@@ -3045,7 +3045,7 @@ void Scene::_renderForCamera(Camera* camera, Camera* rigParent)
   }
 
   // Render targets
-  OnBeforeRenderTargetsRenderObservable.notifyObservers(this);
+  onBeforeRenderTargetsRenderObservable.notifyObservers(this);
   bool needsRestoreFrameBuffer = false;
 
   if (!camera->customRenderTargets.empty()) {
@@ -3118,7 +3118,7 @@ void Scene::_renderForCamera(Camera* camera, Camera* rigParent)
     engine->restoreDefaultFramebuffer(); // Restore back buffer
   }
 
-  OnAfterRenderTargetsRenderObservable.notifyObservers(this);
+  onAfterRenderTargetsRenderObservable.notifyObservers(this);
 
   // Prepare Frame
   postProcessManager->_prepareFrame(nullptr);
@@ -3351,7 +3351,7 @@ void Scene::render()
   onBeforeRenderObservable.notifyObservers(this);
 
   // Customs render targets
-  OnBeforeRenderTargetsRenderObservable.notifyObservers(this);
+  onBeforeRenderTargetsRenderObservable.notifyObservers(this);
   auto engine              = getEngine();
   auto currentActiveCamera = activeCamera;
   if (renderTargetsEnabled) {
@@ -3397,7 +3397,7 @@ void Scene::render()
     engine->restoreDefaultFramebuffer();
   }
 
-  OnAfterRenderTargetsRenderObservable.notifyObservers(this);
+  onAfterRenderTargetsRenderObservable.notifyObservers(this);
   activeCamera = currentActiveCamera;
 
   // Procedural textures
@@ -3699,8 +3699,8 @@ void Scene::dispose()
   onDisposeObservable.clear();
   onBeforeRenderObservable.clear();
   onAfterRenderObservable.clear();
-  OnBeforeRenderTargetsRenderObservable.clear();
-  OnAfterRenderTargetsRenderObservable.clear();
+  onBeforeRenderTargetsRenderObservable.clear();
+  onAfterRenderTargetsRenderObservable.clear();
   onAfterStepObservable.clear();
   onBeforeStepObservable.clear();
   onBeforeActiveMeshesEvaluationObservable.clear();

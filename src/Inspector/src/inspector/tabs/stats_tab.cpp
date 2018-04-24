@@ -33,18 +33,18 @@ void StatsTab::_connectToInstrumentation()
   }
 
   _sceneInstrumentation = ::std::make_unique<SceneInstrumentation>(_scene);
-  _sceneInstrumentation->setCaptureActiveMeshesEvaluationTime(true);
-  _sceneInstrumentation->setCaptureRenderTargetsRenderTime(true);
-  _sceneInstrumentation->setCaptureFrameTime(true);
-  _sceneInstrumentation->setCaptureRenderTime(true);
-  _sceneInstrumentation->setCaptureInterFrameTime(true);
-  _sceneInstrumentation->setCaptureParticlesRenderTime(true);
-  _sceneInstrumentation->setCaptureSpritesRenderTime(true);
-  _sceneInstrumentation->setCapturePhysicsTime(true);
-  _sceneInstrumentation->setCaptureAnimationsTime(true);
+  _sceneInstrumentation->captureActiveMeshesEvaluationTime = true;
+  _sceneInstrumentation->captureRenderTargetsRenderTime    = true;
+  _sceneInstrumentation->captureFrameTime                  = true;
+  _sceneInstrumentation->captureRenderTime                 = true;
+  _sceneInstrumentation->captureInterFrameTime             = true;
+  _sceneInstrumentation->captureParticlesRenderTime        = true;
+  _sceneInstrumentation->captureSpritesRenderTime          = true;
+  _sceneInstrumentation->capturePhysicsTime                = true;
+  _sceneInstrumentation->captureAnimationsTime             = true;
 
   _engineInstrumentation = ::std::make_unique<EngineInstrumentation>(_engine);
-  _engineInstrumentation->setCaptureGPUFrameTime(true);
+  _engineInstrumentation->captureGPUFrameTime = true;
 }
 
 void StatsTab::render()
