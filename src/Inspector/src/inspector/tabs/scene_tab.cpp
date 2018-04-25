@@ -32,28 +32,28 @@ void SceneTab::render()
                                 true)) {
       // Determine current render mode
       int currenRenderMode = -1;
-      if (!_scene->forceWireframe() && !_scene->forcePointsCloud()) {
-        // Solid render mode
+      if (_scene->forcePointsCloud()) {
+        // Points cloud render mode
         currenRenderMode = 0;
       }
       else if (_scene->forceWireframe()) {
         // Wireframe render mode
         currenRenderMode = 1;
       }
-      else if (_scene->forcePointsCloud()) {
-        // Points cloud render mode
+      else if (!_scene->forceWireframe() && !_scene->forcePointsCloud()) {
+        // Solid render mode
         currenRenderMode = 2;
       }
       int renderModeChoice = currenRenderMode;
       // Radio buttons
-      ImGui::RadioButton("Solid", &renderModeChoice, 0);
+      ImGui::RadioButton("Point", &renderModeChoice, 0);
       ImGui::RadioButton("Wireframe", &renderModeChoice, 1);
-      ImGui::RadioButton("Point", &renderModeChoice, 2);
+      ImGui::RadioButton("Solid", &renderModeChoice, 2);
       // Handle render mode change
       if (renderModeChoice != currenRenderMode) {
         if (renderModeChoice == 0) {
           _scene->setForceWireframe(false);
-          _scene->setForcePointsCloud(false);
+          _scene->setForcePointsCloud(true);
         }
         else if (renderModeChoice == 1) {
           _scene->setForceWireframe(true);
@@ -61,7 +61,7 @@ void SceneTab::render()
         }
         else if (renderModeChoice == 2) {
           _scene->setForceWireframe(false);
-          _scene->setForcePointsCloud(true);
+          _scene->setForcePointsCloud(false);
         }
       }
     }

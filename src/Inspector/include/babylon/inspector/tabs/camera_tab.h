@@ -1,5 +1,5 @@
-#ifndef BABYLON_INSPECTOR_TABS_LIGHT_TAB_H
-#define BABYLON_INSPECTOR_TABS_LIGHT_TAB_H
+#ifndef BABYLON_INSPECTOR_TABS_CAMERA_TAB_H
+#define BABYLON_INSPECTOR_TABS_CAMERA_TAB_H
 
 #include <babylon/babylon_global.h>
 #include <babylon/inspector/tabs/property_tab.h>
@@ -7,14 +7,14 @@
 
 namespace BABYLON {
 
+class CameraAdapter;
 class Inspector;
-class LightAdapter;
 
-class BABYLON_SHARED_EXPORT LightTab : public PropertyTab {
+class BABYLON_SHARED_EXPORT CameraTab : public PropertyTab {
 
 public:
-  LightTab(Inspector& inspector);
-  ~LightTab() override;
+  CameraTab(Inspector& inspector);
+  ~CameraTab() override;
 
 protected:
   /** Builds the tree */
@@ -24,10 +24,10 @@ protected:
 
 private:
   bool _isInitialized;
-  std::vector<TreeItem<LightAdapter>> _lights;
+  std::vector<TreeItem<CameraAdapter>> _cameras;
 
-}; // end of class LightTab
+}; // end of class CameraTab
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_INSPECTOR_TABS_LIGHT_TAB_H
+#endif // end of BABYLON_INSPECTOR_TABS_CAMERA_TAB_H

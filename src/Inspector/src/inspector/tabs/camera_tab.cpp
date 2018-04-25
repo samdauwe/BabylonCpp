@@ -1,26 +1,26 @@
-#include <babylon/inspector/tabs/light_tab.h>
+#include <babylon/inspector/tabs/camera_tab.h>
 
+#include <babylon/cameras/camera.h>
 #include <babylon/engine/scene.h>
-#include <babylon/inspector/adapters/light_adapter.h>
+#include <babylon/inspector/adapters/camera_adapter.h>
 #include <babylon/inspector/inspector.h>
 #include <babylon/inspector/treetools/abstract_tree_tool.h>
-#include <babylon/lights/light.h>
 
 #include <imgui.h>
 
 namespace BABYLON {
 
-LightTab::LightTab(Inspector& inspector)
-    : PropertyTab("Light", inspector), _isInitialized{false}
+CameraTab::CameraTab(Inspector& inspector)
+    : PropertyTab("Camera", inspector), _isInitialized{false}
 {
   _buildTree();
 }
 
-LightTab::~LightTab()
+CameraTab::~CameraTab()
 {
 }
 
-void LightTab::_buildTree()
+void CameraTab::_buildTree()
 {
   // Get the scene object
   const auto& scene = _inspector.scene();
@@ -28,35 +28,35 @@ void LightTab::_buildTree()
     return;
   }
 
-  // Get all lights from the first scene.
-  _lights.clear();
-  for (const auto& light : scene->lights) {
-    _lights.emplace_back(TreeItem<LightAdapter>{
-      *this, ::std::make_unique<LightAdapter>(light.get())});
+  // Get all cameras from the first scene.
+  _cameras.clear();
+  for (const auto& camera : scene->cameras) {
+    _cameras.emplace_back(TreeItem<CameraAdapter>{
+      *this, ::std::make_unique<CameraAdapter>(camera.get())});
   }
 
   // Set initialized flag
   _isInitialized = true;
 }
 
-void LightTab::_renderTree()
+void CameraTab::_renderTree()
 {
   if (!_isInitialized) {
     return;
   }
 
-  // Lights
-  for (auto& lightTreeItem : _lights) {
+  // Cameras
+  for (auto& cameraTreeItem : _cameras) {
     // Get the item adapter
-    auto& adapter = lightTreeItem.adapter();
+    auto& adapter = cameraTreeItem.adapter();
     // Render the tools
     for (auto& tool : adapter.getTools()) {
       tool->render();
       ImGui::SameLine();
     }
     // Render tree item
-    if (ImGui::Selectable(adapter.id().c_str(), lightTreeItem.isActive())) {
-      toggleSelection(lightTreeItem, _lights);
+    if (ImGui::Selectable(adapter.id().c_str(), cameraTreeItem.isActive())) {
+      toggleSelection(cameraTreeItem, _cameras);
     }
     ImGui::SameLine();
     // Color "color-bot" #5db0d7 -> rgba(93, 176, 215, 1)
