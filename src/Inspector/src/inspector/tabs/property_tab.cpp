@@ -20,9 +20,9 @@ PropertyTab::~PropertyTab()
 void PropertyTab::render()
 {
   if (ImGui::BeginDock(name.c_str())) {
-    float width      = ImGui::GetContentRegionMax().x;
-    static float sz1 = ImGui::GetContentRegionMax().y / 2.f;
-    static float sz2 = ImGui::GetContentRegionMax().y / 2.f;
+    float width = ImGui::GetContentRegionMax().x;
+    float sz1   = ImGui::GetContentRegionMax().y / 2.f;
+    float sz2   = ImGui::GetContentRegionMax().y / 2.f;
     ImGui::Splitter(false, 1.0f, &sz1, &sz2, 8, 8, width);
     // Render the treepanel
     if (ImGui::BeginChild("top", ImVec2(width, sz1), true)) {

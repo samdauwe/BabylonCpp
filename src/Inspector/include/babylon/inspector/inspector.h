@@ -23,8 +23,10 @@ public:
   static constexpr unsigned int STATS_TAB = 2;
   // - Ligt tab
   static constexpr unsigned int LIGHT_TAB = 3;
+  // - Material tab
+  static constexpr unsigned int MATERIAL_TAB = 4;
   // - Camera tab
-  static constexpr unsigned int CAMERA_TAB = 4;
+  static constexpr unsigned int CAMERA_TAB = 5;
 
 public:
   Inspector(GLFWwindow* glfwWindow, Scene* scene = nullptr);
@@ -52,7 +54,7 @@ private:
   bool _showDockingWindow;
   int _menuHeight;
   // Tabs
-  array_t<unique_ptr_t<Tab>, 5> _tabs;
+  array_t<unique_ptr_t<Tab>, 6> _tabs;
 
 }; // end of class Inspector
 

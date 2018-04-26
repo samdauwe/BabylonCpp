@@ -64,6 +64,6 @@ void CameraTab::_renderTree()
     ImGui::TextWrapped("- %s", adapter.type().c_str());
     ImGui::PopStyleColor();
   }
-} // namespace BABYLON
+}
 
 } // end of namespace BABYLON

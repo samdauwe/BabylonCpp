@@ -1,26 +1,26 @@
-#include <babylon/inspector/tabs/light_tab.h>
+#include <babylon/inspector/tabs/material_tab.h>
 
 #include <babylon/engine/scene.h>
-#include <babylon/inspector/adapters/light_adapter.h>
+#include <babylon/inspector/adapters/material_adapter.h>
 #include <babylon/inspector/inspector.h>
 #include <babylon/inspector/treetools/abstract_tree_tool.h>
-#include <babylon/lights/light.h>
+#include <babylon/materials/material.h>
 
 #include <imgui.h>
 
 namespace BABYLON {
 
-LightTab::LightTab(Inspector& inspector)
-    : PropertyTab("Light", inspector), _isInitialized{false}
+MaterialTab::MaterialTab(Inspector& inspector)
+    : PropertyTab("Material", inspector), _isInitialized{false}
 {
   _buildTree();
 }
 
-LightTab::~LightTab()
+MaterialTab::~MaterialTab()
 {
 }
 
-void LightTab::_buildTree()
+void MaterialTab::_buildTree()
 {
   // Get the scene object
   const auto& scene = _inspector.scene();
@@ -29,34 +29,34 @@ void LightTab::_buildTree()
   }
 
   // Get all lights from the first scene.
-  _lights.clear();
-  for (const auto& light : scene->lights) {
-    _lights.emplace_back(TreeItem<LightAdapter>{
-      *this, ::std::make_unique<LightAdapter>(light.get())});
+  _materials.clear();
+  for (const auto& mat : scene->materials) {
+    _materials.emplace_back(TreeItem<MaterialAdapter>{
+      *this, ::std::make_unique<MaterialAdapter>(mat.get())});
   }
 
   // Set initialized flag
   _isInitialized = true;
 }
 
-void LightTab::_renderTree()
+void MaterialTab::_renderTree()
 {
   if (!_isInitialized) {
     return;
   }
 
   // Lights
-  for (auto& lightTreeItem : _lights) {
+  for (auto& materialTreeItem : _materials) {
     // Get the item adapter
-    auto& adapter = lightTreeItem.adapter();
+    auto& adapter = materialTreeItem.adapter();
     // Render the tools
     for (auto& tool : adapter.getTools()) {
       tool->render();
       ImGui::SameLine();
     }
     // Render tree item
-    if (ImGui::Selectable(adapter.id().c_str(), lightTreeItem.isActive())) {
-      toggleSelection(lightTreeItem, _lights);
+    if (ImGui::Selectable(adapter.id().c_str(), materialTreeItem.isActive())) {
+      toggleSelection(materialTreeItem, _materials);
     }
     ImGui::SameLine();
     // Color "color-bot" #5db0d7 -> rgba(93, 176, 215, 1)
