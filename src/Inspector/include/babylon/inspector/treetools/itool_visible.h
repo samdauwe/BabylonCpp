@@ -4,7 +4,7 @@
 namespace BABYLON {
 
 /**
- * @brief Any object implementing this interface should  provide methods to
+ * @brief Any object implementing this interface should provide methods to
  * toggle its visibility.
  */
 struct IToolVisible {

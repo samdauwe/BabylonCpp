@@ -1,6 +1,7 @@
 #ifndef BABYLON_INSPECTOR_TREE_TOOLS_CHECKBOX_H
 #define BABYLON_INSPECTOR_TREE_TOOLS_CHECKBOX_H
 
+#include <babylon/imgui/icons_font_awesome.h>
 #include <babylon/inspector/treetools/abstract_tree_tool.h>
 
 namespace BABYLON {
@@ -15,9 +16,9 @@ class Checkbox : public AbstractTreeTool {
 public:
   /** Font Awesome Icon Unicodes **/
   // fa-eye
-  static constexpr const char* VISIBLE_ICON = u8"\uf06e";
+  static constexpr const char* VISIBLE_ICON = ICON_FA_EYE;
   // fa-eye-slash
-  static constexpr const char* INVISIBLE_ICON = u8"\uf070";
+  static constexpr const char* INVISIBLE_ICON = ICON_FA_EYE_SLASH;
 
 public:
   Checkbox(IToolVisible* obj);

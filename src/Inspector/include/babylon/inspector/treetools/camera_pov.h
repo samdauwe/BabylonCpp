@@ -1,6 +1,7 @@
 #ifndef BABYLON_INSPECTOR_TREE_TOOLS_CAMERA_POV_H
 #define BABYLON_INSPECTOR_TREE_TOOLS_CAMERA_POV_H
 
+#include <babylon/imgui/icons_font_awesome.h>
 #include <babylon/inspector/treetools/abstract_tree_tool.h>
 
 namespace BABYLON {
@@ -12,9 +13,9 @@ class CameraPOV : public AbstractTreeTool {
 public:
   /** Font Awesome Icon Unicodes **/
   // fa-check-circle
-  static constexpr const char* POV_ACTIVE_ICON = u8"\uf058";
+  static constexpr const char* POV_ACTIVE_ICON = ICON_FA_CHECK_CIRCLE;
   // fa-circle
-  static constexpr const char* POV_INACTIVE_ICON = u8"\uf111";
+  static constexpr const char* POV_INACTIVE_ICON = ICON_FA_CIRCLE;
 
 public:
   CameraPOV(ICameraPOV* camera);
