@@ -160,13 +160,21 @@ void MorphTargetManager::_syncActiveTargets(bool needUpdate)
     _influences = _tempInfluences;
   }
 
-  if (needUpdate && _scene) {
-    // Flag meshes as dirty to resync with the active targets
-    for (auto& abstractMesh : _scene->meshes) {
-      auto mesh = static_cast<Mesh*>(abstractMesh.get());
-      if (mesh && (mesh->morphTargetManager() == this)) {
-        mesh->_syncGeometryWithMorphTargetManager();
-      }
+  if (needUpdate) {
+    synchronize();
+  }
+}
+
+void MorphTargetManager::synchronize()
+{
+  if (!_scene) {
+    return;
+  }
+  // Flag meshes as dirty to resync with the active targets
+  for (auto& abstractMesh : _scene->meshes) {
+    auto mesh = static_cast<Mesh*>(abstractMesh.get());
+    if (mesh && (mesh->morphTargetManager() == this)) {
+      mesh->_syncGeometryWithMorphTargetManager();
     }
   }
 }

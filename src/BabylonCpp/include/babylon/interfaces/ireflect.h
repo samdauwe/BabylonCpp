@@ -51,7 +51,9 @@ public:
     PARTICLESYSTEM = 201,
     // Texture
     BASETEXTURE = 250,
-    TEXTURE     = 251
+    TEXTURE     = 251,
+    // Morph
+    MORPHTARGET = 300
   }; // end of enum class Type
 
 public:

@@ -23,6 +23,11 @@ MorphTarget::~MorphTarget()
 {
 }
 
+IReflect::Type MorphTarget::type() const
+{
+  return IReflect::Type::MORPHTARGET;
+}
+
 float MorphTarget::get_influence() const
 {
   return _influence;
@@ -56,16 +61,6 @@ bool MorphTarget::get_hasNormals() const
 bool MorphTarget::get_hasTangents() const
 {
   return !_tangents.empty();
-}
-
-vector_t<Animation*>& MorphTarget::animations()
-{
-  return _animations;
-}
-
-const vector_t<Animation*>& MorphTarget::animations() const
-{
-  return _animations;
 }
 
 void MorphTarget::setPositions(const Float32Array& data)
@@ -139,7 +134,7 @@ MorphTarget::Parse(const Json::value& serializationObject)
   if (serializationObject.contains("animations")) {
     for (auto parsedAnimation :
          Json::GetArray(serializationObject, "animations")) {
-      result->animations().emplace_back(Animation::Parse(parsedAnimation));
+      result->animations.emplace_back(Animation::Parse(parsedAnimation));
     }
   }
 

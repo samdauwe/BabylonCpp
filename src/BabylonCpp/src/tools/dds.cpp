@@ -5,6 +5,7 @@
 #include <babylon/engine/engine_constants.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/math/scalar.h>
+#include <babylon/tools/hdr/cube_map_to_spherical_polynomial_tools.h>
 
 namespace BABYLON {
 
@@ -347,6 +348,11 @@ void DDSTools::UploadDDSLevels(Engine* engine, GL::IGLRenderingContext* gl,
                                bool loadMipmaps, unsigned int faces,
                                int lodIndex, int currentFace)
 {
+  bool hasSphericalPolynomialFaces = false;
+  vector_t<ArrayBufferView> sphericalPolynomialFaces;
+  if (info.sphericalPolynomial) {
+    hasSphericalPolynomialFaces = true;
+  }
   auto ext = engine->getCaps().s3tc;
 
   Int32Array header(
@@ -531,6 +537,26 @@ void DDSTools::UploadDDSLevels(Engine* engine, GL::IGLRenderingContext* gl,
       // Loading a single face
       break;
     }
+  }
+  if (hasSphericalPolynomialFaces && sphericalPolynomialFaces.size() >= 6) {
+    CubeMapInfo cubeInfo;
+    cubeInfo.size       = static_cast<size_t>(header[off_width]);
+    cubeInfo.right      = sphericalPolynomialFaces[0];
+    cubeInfo.left       = sphericalPolynomialFaces[1];
+    cubeInfo.up         = sphericalPolynomialFaces[2];
+    cubeInfo.down       = sphericalPolynomialFaces[3];
+    cubeInfo.front      = sphericalPolynomialFaces[4];
+    cubeInfo.back       = sphericalPolynomialFaces[5];
+    cubeInfo.format     = EngineConstants::TEXTUREFORMAT_RGBA;
+    cubeInfo.type       = EngineConstants::TEXTURETYPE_FLOAT;
+    cubeInfo.gammaSpace = false;
+
+    info.sphericalPolynomial
+      = CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
+        cubeInfo);
+  }
+  else {
+    info.sphericalPolynomial = nullptr;
   }
 }
 

@@ -2,6 +2,7 @@
 #define BABYLON_TOOLS_DDS_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/math/spherical_polynomial.h>
 
 namespace BABYLON {
 
@@ -129,6 +130,8 @@ struct DDSInfo {
   bool isCompressed;
   int dxgiFormat;
   unsigned int textureType;
+  /** Sphericle polynomial created for the dds texture */
+  unique_ptr_t<SphericalPolynomial> sphericalPolynomial = nullptr;
 }; // end of struct DDSInfo
 
 class BABYLON_SHARED_EXPORT DDSTools {
