@@ -1427,7 +1427,7 @@ public:
   vector_t<unique_ptr_t<ActionManager>> _actionManagers;
   // Procedural textures
   bool proceduralTexturesEnabled;
-  vector_t<unique_ptr_t<ProceduralTexture>> _proceduralTextures;
+  vector_t<unique_ptr_t<ProceduralTexture>> proceduralTextures;
   // Sound Tracks
   vector_t<SoundTrack*> soundTracks;
   // Simplification Queue

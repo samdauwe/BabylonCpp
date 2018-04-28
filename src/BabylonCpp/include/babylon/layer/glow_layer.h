@@ -110,6 +110,28 @@ public:
    */
   void _disposeMesh(Mesh* mesh) override;
 
+  /**
+   * @brief Gets the class name of the effect layer.
+   * @returns the string with the class name of the effect layer
+   */
+  string_t getClassName() const override;
+
+  /**
+   * @brief Serializes this glow layer.
+   * @returns a serialized glow layer object
+   */
+  Json::object serialize() const override;
+
+  /**
+   * @brief Creates a Glow Layer from parsed glow layer data.
+   * @param parsedGlowLayer defines glow layer data
+   * @param scene defines the current scene
+   * @param rootUrl defines the root URL containing the glow layer information
+   * @returns a parsed Glow Layer
+   */
+  static GlowLayer* Parse(const Json::value& parsedGlowLayer, Scene* scene,
+                          const string_t& rootUrl);
+
 protected:
   /**
    * @brief Instantiates a new glow Layer and references it to the scene.

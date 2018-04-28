@@ -19,7 +19,7 @@ CustomProceduralTexture::CustomProceduralTexture(const string_t& name,
   // Try to load json
   _configSet = false;
   loadJson(texturePath);
-  setRefreshRate(1);
+  set_refreshRate(1);
 }
 
 CustomProceduralTexture::~CustomProceduralTexture()

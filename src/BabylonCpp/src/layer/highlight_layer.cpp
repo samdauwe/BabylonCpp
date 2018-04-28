@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
+#include <babylon/core/json.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/core/variant.h>
@@ -531,6 +532,23 @@ void HighlightLayer::dispose()
   }
 
   EffectLayer::dispose();
+}
+
+string_t HighlightLayer::getClassName() const
+{
+  return "HighlightLayer";
+}
+
+Json::object HighlightLayer::serialize() const
+{
+  return Json::object();
+}
+
+HighlightLayer*
+HighlightLayer::Parse(const Json::value& /*parsedHightlightLayer*/,
+                      Scene* /*scene*/, const string_t& /*rootUrl*/)
+{
+  return nullptr;
 }
 
 } // end of namespace BABYLON

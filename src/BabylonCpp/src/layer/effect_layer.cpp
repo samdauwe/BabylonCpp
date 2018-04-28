@@ -555,4 +555,15 @@ void EffectLayer::dispose()
   onSizeChangedObservable.clear();
 }
 
+string_t EffectLayer::getClassName() const
+{
+  return "EffectLayer";
+}
+
+EffectLayer* EffectLayer::Parse(const Json::value& /*parsedEffectLayer*/,
+                                Scene* /*scene*/, const string_t& /*rootUrl*/)
+{
+  return nullptr;
+}
+
 } // end of namespace BABYLON

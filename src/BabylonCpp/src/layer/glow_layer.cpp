@@ -1,6 +1,7 @@
 #include <babylon/layer/glow_layer.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
@@ -121,9 +122,17 @@ void GlowLayer::_createTextureAndPostProcesses()
                         Tools::GetExponentOfTwo(blurTextureHeight, _maxSize) :
                         blurTextureHeight;
 
+  unsigned int textureType = 0;
+  if (_engine->getCaps().textureHalfFloatRender) {
+    textureType = EngineConstants::TEXTURETYPE_HALF_FLOAT;
+  }
+  else {
+    textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+  }
+
   _blurTexture1 = ::std::make_unique<RenderTargetTexture>(
     "GlowLayerBlurRTT", ISize{blurTextureWidth, blurTextureHeight}, _scene,
-    false, true, EngineConstants::TEXTURETYPE_HALF_FLOAT);
+    false, true, textureType);
   _blurTexture1->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
   _blurTexture1->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
   _blurTexture1->updateSamplingMode(TextureConstants::BILINEAR_SAMPLINGMODE);
@@ -136,7 +145,7 @@ void GlowLayer::_createTextureAndPostProcesses()
 
   _blurTexture2 = ::std::make_unique<RenderTargetTexture>(
     "GlowLayerBlurRTT2", ISize{blurTextureWidth2, blurTextureHeight2}, _scene,
-    false, true, EngineConstants::TEXTURETYPE_HALF_FLOAT);
+    false, true, textureType);
   _blurTexture2->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
   _blurTexture2->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
   _blurTexture2->updateSamplingMode(TextureConstants::BILINEAR_SAMPLINGMODE);
@@ -150,7 +159,7 @@ void GlowLayer::_createTextureAndPostProcesses()
     ToVariant<float, PostProcessOptions>(
       PostProcessOptions{blurTextureWidth, blurTextureHeight}),
     nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(),
-    false, EngineConstants::TEXTURETYPE_HALF_FLOAT);
+    false, textureType);
   _horizontalBlurPostprocess1->width  = blurTextureWidth;
   _horizontalBlurPostprocess1->height = blurTextureHeight;
   _horizontalBlurPostprocess1->onApplyObservable.add(
@@ -163,14 +172,14 @@ void GlowLayer::_createTextureAndPostProcesses()
     ToVariant<float, PostProcessOptions>(
       PostProcessOptions{blurTextureWidth, blurTextureHeight}),
     nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(),
-    false, EngineConstants::TEXTURETYPE_HALF_FLOAT);
+    false, textureType);
 
   _horizontalBlurPostprocess2 = ::std::make_unique<BlurPostProcess>(
     "GlowLayerHBP2", Vector2(1.f, 0.f), _options.blurKernelSize / 2,
     ToVariant<float, PostProcessOptions>(
       PostProcessOptions{blurTextureWidth2, blurTextureHeight2}),
     nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(),
-    false, EngineConstants::TEXTURETYPE_HALF_FLOAT);
+    false, textureType);
   _horizontalBlurPostprocess2->width  = blurTextureWidth2;
   _horizontalBlurPostprocess2->height = blurTextureHeight2;
   _horizontalBlurPostprocess2->onApplyObservable.add(
@@ -183,7 +192,7 @@ void GlowLayer::_createTextureAndPostProcesses()
     ToVariant<float, PostProcessOptions>(
       PostProcessOptions{blurTextureWidth2, blurTextureHeight2}),
     nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(),
-    false, EngineConstants::TEXTURETYPE_HALF_FLOAT);
+    false, textureType);
 
   _postProcesses
     = {_horizontalBlurPostprocess1.get(), _verticalBlurPostprocess1.get(),
@@ -358,6 +367,22 @@ void GlowLayer::_disposeMesh(Mesh* mesh)
 {
   removeIncludedOnlyMesh(mesh);
   removeExcludedMesh(mesh);
+}
+
+string_t GlowLayer::getClassName() const
+{
+  return "GlowLayer";
+}
+
+Json::object GlowLayer::serialize() const
+{
+  return Json::object();
+}
+
+GlowLayer* GlowLayer::Parse(const Json::value& /*parsedGlowLayer*/,
+                            Scene* /*scene*/, const string_t& /*rootUrl*/)
+{
+  return nullptr;
 }
 
 } // end of namespace BABYLON

@@ -66,6 +66,12 @@ public:
   virtual void _disposeMesh(Mesh* mesh) = 0;
 
   /**
+   * @brief Serializes this layer (Glow or Highlight for example).
+   * @returns a serialized layer object
+   */
+  virtual Json::object serialize() const = 0;
+
+  /**
    * @brief Renders the glowing part of the scene by blending the blurred
    * glowing meshes on top of the rendered scene.
    */
@@ -95,6 +101,22 @@ public:
    * @brief Dispose the highlight layer and free resources.
    */
   void dispose();
+
+  /**
+   * @brief Gets the class name of the effect layer.
+   * @returns the string with the class name of the effect layer
+   */
+  virtual string_t getClassName() const;
+
+  /**
+   * @brief Creates an effect layer from parsed effect layer data.
+   * @param parsedEffectLayer defines effect layer data
+   * @param scene defines the current scene
+   * @param rootUrl defines the root URL containing the effect layer information
+   * @returns a parsed effect Layer
+   */
+  static EffectLayer* Parse(const Json::value& parsedEffectLayer, Scene* scene,
+                            const string_t& rootUrl);
 
 protected:
   /**
@@ -202,7 +224,7 @@ private:
 
 public:
   /**
-   * The Friendly of the effect in the scene
+   * The name of the layer.
    */
   string_t name;
 

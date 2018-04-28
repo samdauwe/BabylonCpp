@@ -35,18 +35,22 @@ private:
 
 public:
   // Events
+
   /**
    * An event triggered when the layer is disposed.
    */
   Observable<Layer> onDisposeObservable;
+
   /**
    * An event triggered before rendering the scene
    */
   Observable<Layer> onBeforeRenderObservable;
+
   /**
    * An event triggered after rendering the scene
    */
   Observable<Layer> onAfterRenderObservable;
+
   // Properties
   Texture* texture;
   bool isBackground;

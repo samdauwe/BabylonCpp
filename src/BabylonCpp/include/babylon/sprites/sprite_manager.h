@@ -40,9 +40,10 @@ protected:
                 unsigned int samplingMode
                 = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
-private:
   Texture*& get_texture();
   void set_texture(Texture* const& value);
+
+private:
   void _appendSpriteVertex(size_t index, Sprite* sprite, int offsetX,
                            int offsetY, int rowSize);
 

@@ -3403,14 +3403,14 @@ void Scene::render()
   // Procedural textures
   if (proceduralTexturesEnabled) {
     Tools::StartPerformanceCounter("Procedural textures",
-                                   !_proceduralTextures.empty());
-    for (auto& proceduralTexture : _proceduralTextures) {
+                                   !proceduralTextures.empty());
+    for (auto& proceduralTexture : proceduralTextures) {
       if (proceduralTexture->_shouldRender()) {
         proceduralTexture->render();
       }
     }
     Tools::EndPerformanceCounter("Procedural textures",
-                                 !_proceduralTextures.empty());
+                                 !proceduralTextures.empty());
   }
 
   // Clear

@@ -129,6 +129,29 @@ public:
    */
   void dispose();
 
+  /**
+   * @brief Gets the class name of the effect layer.
+   * @returns the string with the class name of the effect layer
+   */
+  string_t getClassName() const override;
+
+  /**
+   * @brief Serializes this Highlight layer.
+   * @returns a serialized Highlight layer object
+   */
+  Json::object serialize() const override;
+
+  /**
+   * @brief Creates a Highlight layer from parsed Highlight layer data.
+   * @param parsedHightlightLayer defines the Highlight layer data
+   * @param scene defines the current scene
+   * @param rootUrl defines the root URL containing the Highlight layer
+   * information
+   * @returns a parsed Highlight layer
+   */
+  static HighlightLayer* Parse(const Json::value& parsedHightlightLayer,
+                               Scene* scene, const string_t& rootUrl);
+
 protected:
   /**
    * @brief Instantiates a new highlight Layer and references it to the scene..

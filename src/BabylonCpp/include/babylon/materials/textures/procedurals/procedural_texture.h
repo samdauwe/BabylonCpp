@@ -26,8 +26,6 @@ public:
   void resetRefreshCounter();
   void setFragment(const unordered_map_t<string_t, string_t>& fragment);
   void setFragment(const string_t& fragment);
-  int refreshRate() const;
-  void setRefreshRate(int value);
   bool _shouldRender();
   Size& getRenderSize();
   const Size& getRenderSize() const;
@@ -43,7 +41,17 @@ public:
   ProceduralTexture& setMatrix(const string_t& name, const Matrix& value);
   void render(bool useCameraPostProcess = false);
   unique_ptr_t<ProceduralTexture> clone() const;
-  void dispose();
+  void dispose() override;
+
+protected:
+  int get_refreshRate() const;
+
+  /**
+   * @brief Use 0 to render just once, 1 to render on every frame, 2 to render
+   * every two frames and so on...
+   * @param value
+   */
+  void set_refreshRate(int value);
 
 private:
   void _createIndexBuffer();
@@ -52,6 +60,8 @@ public:
   bool _generateMipMaps;
   bool isEnabled;
   ::std::function<void()> onGenerated;
+
+  Property<ProceduralTexture, int> refreshRate;
 
 private:
   Size _size;

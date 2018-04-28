@@ -21,6 +21,8 @@ ProceduralTexture::ProceduralTexture(
     : Texture("", scene, !generateMipMaps)
     , _generateMipMaps{generateMipMaps}
     , isEnabled{true}
+    , refreshRate{this, &ProceduralTexture::get_refreshRate,
+                  &ProceduralTexture::set_refreshRate}
     , _size{size}
     , _currentRefreshId{-1}
     , _refreshRate{1}
@@ -73,13 +75,15 @@ ProceduralTexture::ProceduralTexture(const string_t& _name, const Size& size,
     : Texture("", scene, !generateMipMaps)
     , _generateMipMaps{generateMipMaps}
     , isEnabled{true}
+    , refreshRate{this, &ProceduralTexture::get_refreshRate,
+                  &ProceduralTexture::set_refreshRate}
     , _size{size}
     , _currentRefreshId{-1}
     , _refreshRate{1}
     , _fallbackTexture{fallbackTexture}
     , _fallbackTextureUsed{false}
 {
-  scene->_proceduralTextures.emplace_back(this);
+  scene->proceduralTextures.emplace_back(this);
 
   name           = _name;
   isRenderTarget = true;
@@ -145,7 +149,7 @@ void ProceduralTexture::_rebuild()
   _createIndexBuffer();
 
   if (refreshRate() == RenderTargetTexture::REFRESHRATE_RENDER_ONCE()) {
-    setRefreshRate(RenderTargetTexture::REFRESHRATE_RENDER_ONCE());
+    refreshRate = RenderTargetTexture::REFRESHRATE_RENDER_ONCE();
   }
 }
 
@@ -219,12 +223,12 @@ void ProceduralTexture::setFragment(const string_t& fragment)
 
 // Use 0 to render just once, 1 to render on every frame, 2 to render every two
 // frames and so on...
-int ProceduralTexture::refreshRate() const
+int ProceduralTexture::get_refreshRate() const
 {
   return _refreshRate;
 }
 
-void ProceduralTexture::setRefreshRate(int value)
+void ProceduralTexture::set_refreshRate(int value)
 {
   _refreshRate = value;
   resetRefreshCounter();
@@ -487,13 +491,13 @@ void ProceduralTexture::dispose()
     return;
   }
 
-  scene->_proceduralTextures.erase(
+  scene->proceduralTextures.erase(
     ::std::remove_if(
-      scene->_proceduralTextures.begin(), scene->_proceduralTextures.end(),
+      scene->proceduralTextures.begin(), scene->proceduralTextures.end(),
       [this](const unique_ptr_t<ProceduralTexture>& proceduralTexture) {
         return proceduralTexture.get() == this;
       }),
-    scene->_proceduralTextures.end());
+    scene->proceduralTextures.end());
 
   auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKindChars];
   if (vertexBuffer) {
