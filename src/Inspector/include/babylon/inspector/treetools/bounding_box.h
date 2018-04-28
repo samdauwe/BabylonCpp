@@ -11,7 +11,7 @@ struct IToolBoundingBox;
 /**
  * @brief Checkbox to display/hide the primitive.
  */
-class BoundingBox : public AbstractTreeTool {
+class BoundingBoxInsp : public AbstractTreeTool {
 
 public:
   /** Font Awesome Icon Unicodes **/
@@ -21,11 +21,11 @@ public:
   static constexpr const char* INVISIBLE_ICON = ICON_FA_SQUARE_O;
 
 public:
-  BoundingBox(IToolBoundingBox* obj);
-  virtual ~BoundingBox() override;
+  BoundingBoxInsp(IToolBoundingBox* obj);
+  virtual ~BoundingBoxInsp() override;
 
-  BoundingBox(const BoundingBox& other) = delete;
-  BoundingBox(BoundingBox&& other);
+  BoundingBoxInsp(const BoundingBoxInsp& other) = delete;
+  BoundingBoxInsp(BoundingBoxInsp&& other);
 
   void render() override;
 
@@ -38,7 +38,7 @@ private:
 private:
   IToolBoundingBox* _obj;
 
-}; // end of class BoundingBox
+}; // end of class BoundingBoxInsp
 
 } // end of namespace BABYLON
 

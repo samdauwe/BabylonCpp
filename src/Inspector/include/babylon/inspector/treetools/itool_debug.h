@@ -9,7 +9,7 @@ namespace BABYLON {
  */
 struct IToolDebug {
 
-  virtual void debug(bool b) const = 0;
+  virtual void debug(bool b) = 0;
 
 }; // end of struct IToolDebug
 

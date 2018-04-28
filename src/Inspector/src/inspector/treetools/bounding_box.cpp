@@ -7,23 +7,23 @@
 
 namespace BABYLON {
 
-BoundingBox::BoundingBox(IToolBoundingBox* obj) : AbstractTreeTool{}
+BoundingBoxInsp::BoundingBoxInsp(IToolBoundingBox* obj) : AbstractTreeTool{}
 {
   _obj = obj;
   _on  = _obj->isBoxVisible();
   _check();
 }
 
-BoundingBox::~BoundingBox()
+BoundingBoxInsp::~BoundingBoxInsp()
 {
 }
 
-BoundingBox::BoundingBox(BoundingBox&& other)
+BoundingBoxInsp::BoundingBoxInsp(BoundingBoxInsp&& other)
     : AbstractTreeTool{std::move(other)}, _obj{::std::move(other._obj)}
 {
 }
 
-void BoundingBox::render()
+void BoundingBoxInsp::render()
 {
   // Render visibility icon (eye / eye-slash)
   if (_on) {
@@ -49,14 +49,14 @@ void BoundingBox::render()
   ImGui::PopStyleColor(3);
 }
 
-void BoundingBox::action()
+void BoundingBoxInsp::action()
 {
   AbstractTreeTool::action();
   // update object and gui according to the new status
   _check();
 }
 
-void BoundingBox::_check()
+void BoundingBoxInsp::_check()
 {
   _obj->setBoxVisible(_on);
 }
