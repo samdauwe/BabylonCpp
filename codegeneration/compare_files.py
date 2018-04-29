@@ -75,7 +75,7 @@ def main():
                  "babylon.decorators.ts", "babylon.andOrNotEvaluator.ts",
                  "babylon.dracoCompression.ts", "babylon.vrExperienceHelper.ts",
                  "babylon.webVRCamera.ts", "babylon.analyser.ts",
-                 "babylon.stereoscopicCameras.ts"]
+                 "babylon.stereoscopicCameras.ts", "babylon.sceneSerializer.ts"]
     # Create mapping from BabylonJs version to full path
     for version in BabylonJsVersions:
         fullPath = os.path.join(os.path.expanduser('~'), "Projects",
