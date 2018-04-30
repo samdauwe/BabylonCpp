@@ -349,8 +349,19 @@ public:
   using TGetter = T (C::*)() const;
   using TSetter = void (C::*)(T);
 
+  Property(C* propObject, T(C::*attribute))
+      : _object{propObject}
+      , _attribute{attribute}
+      , _getter{nullptr}
+      , _setter{nullptr}
+  {
+  }
+
   Property(C* propObject, TGetter propGetter, TSetter propSetter)
-      : _object{propObject}, _getter{propGetter}, _setter{propSetter}
+      : _object{propObject}
+      , _attribute{nullptr}
+      , _getter{propGetter}
+      , _setter{propSetter}
   {
   }
 
@@ -359,22 +370,28 @@ public:
 
   operator T() const
   {
-    return (_object->*_getter)();
+    return _attribute ? (_object->*_attribute) : (_object->*_getter)();
   }
 
   T operator()() const
   {
-    return (_object->*_getter)();
+    return _attribute ? (_object->*_attribute) : (_object->*_getter)();
   }
 
-  C& operator=(T theValue)
+  C& operator=(T newValue)
   {
-    (_object->*_setter)(theValue);
+    if (_attribute) {
+      (_object->*_attribute) = newValue;
+    }
+    else {
+      (_object->*_setter)(newValue);
+    }
     return *_object;
   }
 
 private:
   C* const _object;
+  T(C::*_attribute);
   TGetter const _getter;
   TSetter const _setter;
 };
@@ -388,8 +405,19 @@ public:
   using TGetter = T& (C::*)();
   using TSetter = void (C::*)(const T&);
 
+  Property(C* propObject, T(C::*attribute))
+      : _object{propObject}
+      , _attribute{attribute}
+      , _getter{nullptr}
+      , _setter{nullptr}
+  {
+  }
+
   Property(C* propObject, TGetter propGetter, TSetter propSetter)
-      : _object{propObject}, _getter{propGetter}, _setter{propSetter}
+      : _object{propObject}
+      , _attribute{nullptr}
+      , _getter{propGetter}
+      , _setter{propSetter}
   {
   }
 
@@ -398,32 +426,38 @@ public:
 
   operator T&()
   {
-    return (_object->*_getter)();
+    return _attribute ? (_object->*_attribute) : (_object->*_getter)();
   }
 
   operator const T&() const
   {
-    return (_object->*_getter)();
+    return _attribute ? (_object->*_attribute) : (_object->*_getter)();
   }
 
   T& operator()()
   {
-    return (_object->*_getter)();
+    return _attribute ? (_object->*_attribute) : (_object->*_getter)();
   }
 
   const T& operator()() const
   {
-    return (_object->*_getter)();
+    return _attribute ? (_object->*_attribute) : (_object->*_getter)();
   }
 
   C& operator=(const T& newValue)
   {
-    (_object->*_setter)(newValue);
+    if (_attribute) {
+      (_object->*_attribute) = newValue;
+    }
+    else {
+      (_object->*_setter)(newValue);
+    }
     return *_object;
   }
 
 private:
   C* const _object;
+  T(C::*_attribute);
   TGetter const _getter;
   TSetter const _setter;
 };
