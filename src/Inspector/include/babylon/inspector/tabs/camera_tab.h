@@ -21,6 +21,8 @@ protected:
   void _buildTree();
   /** Renders the tree panel */
   void _renderTree() override;
+  /** Renders the properties panel */
+  void _renderProperties() override;
 
 private:
   bool _isInitialized;

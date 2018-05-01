@@ -8,6 +8,7 @@
 
 namespace BABYLON {
 
+class HemisphericLight;
 class Light;
 
 class LightAdapter : public Adapter, public IToolVisible {
@@ -26,6 +27,14 @@ public:
    */
   string_t type() override;
 
+  /**
+   * @brief Returns the list of properties to be displayed for this adapter.
+   */
+  unique_ptr_t<PropertiesView>& getProperties() override;
+
+  /**
+   * @brief Returns the list of tools available for this adapter.
+   */
   vector_t<AbstractTreeToolUPtr>& getTools() override;
 
   void setVisible(bool b) override;
@@ -33,7 +42,12 @@ public:
   bool isVisible() const override;
 
 private:
+  void _buildPropertiesView();
+
+private:
   Light* _light;
+  HemisphericLight* _hemispericLight;
+  unique_ptr_t<PropertiesView> _properties;
   vector_t<unique_ptr_t<AbstractTreeTool>> _tools;
 
 }; // end of class LightAdapter

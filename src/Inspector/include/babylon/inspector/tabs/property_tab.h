@@ -56,8 +56,10 @@ public:
   }
 
 protected:
-  /** Builds the tree panel */
+  /** Renders the tree panel */
   virtual void _renderTree() = 0;
+  /** Renders the properties panel */
+  virtual void _renderProperties() = 0;
 
 protected:
   Inspector& _inspector;

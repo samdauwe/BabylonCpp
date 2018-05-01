@@ -1,12 +1,15 @@
 #include <babylon/inspector/adapters/camera_adapter.h>
 
 #include <babylon/cameras/camera.h>
+
+#include <babylon/inspector/properties/properties_view.h>
 #include <babylon/inspector/treetools/camera_pov.h>
 #include <babylon/inspector/treetools/checkbox.h>
 
 namespace BABYLON {
 
-CameraAdapter::CameraAdapter(Camera* camera) : _camera{camera}
+CameraAdapter::CameraAdapter(Camera* camera)
+    : _camera{camera}, _properties{nullptr}
 {
   _tools.emplace_back(::std::make_unique<CameraPOV>(this));
 }
@@ -23,6 +26,11 @@ string_t CameraAdapter::id()
 string_t CameraAdapter::type()
 {
   return _camera->getClassName();
+}
+
+unique_ptr_t<PropertiesView>& CameraAdapter::getProperties()
+{
+  return _properties;
 }
 
 vector_t<unique_ptr_t<AbstractTreeTool>>& CameraAdapter::getTools()

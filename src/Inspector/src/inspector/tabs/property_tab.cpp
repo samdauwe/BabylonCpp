@@ -24,13 +24,14 @@ void PropertyTab::render()
     float sz1   = ImGui::GetContentRegionMax().y / 2.f;
     float sz2   = ImGui::GetContentRegionMax().y / 2.f;
     ImGui::Splitter(false, 1.0f, &sz1, &sz2, 8, 8, width);
-    // Render the treepanel
+    // Render the tree panel
     if (ImGui::BeginChild("top", ImVec2(width, sz1), true)) {
       _renderTree();
     }
     ImGui::EndChild();
-    // Render the detail panel
+    // Render the properties panel
     if (ImGui::BeginChild("bottom", ImVec2(width, sz2), true)) {
+      _renderProperties();
     }
     ImGui::EndChild();
   }

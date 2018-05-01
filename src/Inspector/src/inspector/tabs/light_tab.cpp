@@ -1,10 +1,12 @@
 #include <babylon/inspector/tabs/light_tab.h>
 
 #include <babylon/engine/scene.h>
+#include <babylon/lights/light.h>
+
 #include <babylon/inspector/adapters/light_adapter.h>
 #include <babylon/inspector/inspector.h>
+#include <babylon/inspector/properties/properties_view.h>
 #include <babylon/inspector/treetools/abstract_tree_tool.h>
-#include <babylon/lights/light.h>
 
 #include <imgui.h>
 
@@ -63,6 +65,21 @@ void LightTab::_renderTree()
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.36f, 0.69f, 0.84f, 1.0f));
     ImGui::TextWrapped("- %s", adapter.type().c_str());
     ImGui::PopStyleColor();
+  }
+}
+
+void LightTab::_renderProperties()
+{
+  // Lights
+  for (auto& lightTreeItem : _lights) {
+    if (lightTreeItem.isActive()) {
+      // Get the item adapter
+      auto& adapter    = lightTreeItem.adapter();
+      auto& properties = adapter.getProperties();
+      if (properties) {
+        properties->render();
+      }
+    }
   }
 }
 

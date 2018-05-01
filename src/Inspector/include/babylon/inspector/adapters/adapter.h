@@ -6,6 +6,7 @@
 namespace BABYLON {
 
 class AbstractTreeTool;
+class PropertiesView;
 
 class Adapter {
 
@@ -25,6 +26,11 @@ public:
    * @brief Returns the type of this object - displayed in the tree.
    */
   virtual string_t type() = 0;
+
+  /**
+   * @brief Returns the list of properties to be displayed for this adapter.
+   */
+  virtual unique_ptr_t<PropertiesView>& getProperties() = 0;
 
   /**
    * @brief Returns the list of tools available for this adapter.

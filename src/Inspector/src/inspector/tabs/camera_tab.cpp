@@ -66,4 +66,8 @@ void CameraTab::_renderTree()
   }
 }
 
+void CameraTab::_renderProperties()
+{
+}
+
 } // end of namespace BABYLON

@@ -2,9 +2,12 @@
 
 #include <babylon/materials/material.h>
 
+#include <babylon/inspector/properties/properties_view.h>
+
 namespace BABYLON {
 
-MaterialAdapter::MaterialAdapter(Material* material) : _material{material}
+MaterialAdapter::MaterialAdapter(Material* material)
+    : _material{material}, _properties{nullptr}
 {
 }
 
@@ -20,6 +23,11 @@ string_t MaterialAdapter::id()
 string_t MaterialAdapter::type()
 {
   return _material->getClassName();
+}
+
+unique_ptr_t<PropertiesView>& MaterialAdapter::getProperties()
+{
+  return _properties;
 }
 
 vector_t<unique_ptr_t<AbstractTreeTool>>& MaterialAdapter::getTools()

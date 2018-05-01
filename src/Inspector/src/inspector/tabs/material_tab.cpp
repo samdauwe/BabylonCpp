@@ -66,4 +66,8 @@ void MaterialTab::_renderTree()
   }
 }
 
+void MaterialTab::_renderProperties()
+{
+}
+
 } // end of namespace BABYLON

@@ -27,12 +27,18 @@ public:
   string_t type() override;
 
   /**
+   * @brief Returns the list of properties to be displayed for this adapter.
+   */
+  unique_ptr_t<PropertiesView>& getProperties() override;
+
+  /**
    * @brief No tools for a material adapter.
    */
   vector_t<AbstractTreeToolUPtr>& getTools() override;
 
 private:
   Material* _material;
+  unique_ptr_t<PropertiesView> _properties;
   vector_t<unique_ptr_t<AbstractTreeTool>> _tools;
 
 }; // end of class MaterialAdapter
