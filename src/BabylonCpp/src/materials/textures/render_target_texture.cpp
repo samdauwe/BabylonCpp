@@ -106,21 +106,21 @@ void RenderTargetTexture::_onRatioRescale()
   }
 }
 
-void RenderTargetTexture::setBoundingBoxSize(const Vector3& value)
+void RenderTargetTexture::set_boundingBoxSize(const Nullable<Vector3>& value)
 {
-  if (_boundingBoxSize && _boundingBoxSize->equals(value)) {
+  if (_boundingBoxSize && (*_boundingBoxSize).equals(*value)) {
     return;
   }
-  _boundingBoxSize = ::std::make_unique<Vector3>(value);
+  _boundingBoxSize = value;
   auto scene       = getScene();
   if (scene) {
     scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag());
   }
 }
 
-Vector3* RenderTargetTexture::boundingBoxSize() const
+Nullable<Vector3>& RenderTargetTexture::get_boundingBoxSize()
 {
-  return _boundingBoxSize ? _boundingBoxSize.get() : nullptr;
+  return _boundingBoxSize;
 }
 
 void RenderTargetTexture::setOnAfterUnbind(

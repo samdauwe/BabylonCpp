@@ -9,8 +9,8 @@ namespace BABYLON {
 
 struct DynamicTextureOptions {
   ICanvas* canvas = nullptr;
-  int width;
-  int height;
+  int width       = 0;
+  int height      = 0;
 }; // end of struct struct DynamicTexture
 
 /**
@@ -39,11 +39,6 @@ public:
                  = TextureConstants::TRILINEAR_SAMPLINGMODE,
                  unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
   ~DynamicTexture() override;
-
-  /**
-   * @brief Gets the current state of canRescale.
-   */
-  bool canRescale();
 
   /**
    * @brief Scales the texture.
@@ -104,8 +99,17 @@ public:
 
   void _rebuild() override;
 
+protected:
+  /**
+   * @brief Gets the current state of canRescale.
+   */
+  bool get_canRescale() const;
+
 private:
   void _recreate(const ISize& textureSize);
+
+public:
+  ReadOnlyProperty<DynamicTexture, bool> canRescale;
 
 private:
   bool _generateMipMaps;

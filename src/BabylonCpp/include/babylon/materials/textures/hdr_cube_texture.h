@@ -82,7 +82,7 @@ public:
     const ::std::function<void(const ArrayBuffer& arrayBuffer)>& callback,
     const ::std::function<void()>& onError = nullptr);
 
-private:
+protected:
   /**
    * @brief Sets wether or not the texture is blocking during loading.
    */
@@ -94,13 +94,23 @@ private:
   bool get_isBlocking() const;
 
   /**
+   * @brief Sets texture matrix rotation angle around Y axis in radians.
+   */
+  void set_rotationY(float value);
+
+  /**
+   * @brief Gets texture matrix rotation angle around Y axis radians.
+   */
+  float get_rotationY() const;
+
+  /**
    * @brief Sets the size of the bounding box associated with the cube texture.
    * When defined, the cubemap will switch to local mode
    * @see
    * https://community.arm.com/graphics/b/blog/posts/reflections-based-on-local-cubemaps-in-unity
    * Example https://www.babylonjs-playground.com/#RNASML
    */
-  void set_boundingBoxSize(const Nullable<Vector3>& value);
+  void set_boundingBoxSize(const Nullable<Vector3>& value) override;
 
   /**
    * @brief Gets the size of the bounding box associated with the cube texture.
@@ -109,8 +119,9 @@ private:
    * https://community.arm.com/graphics/b/blog/posts/reflections-based-on-local-cubemaps-in-unity
    * Example https://www.babylonjs-playground.com/#RNASML
    */
-  Nullable<Vector3>& get_boundingBoxSize();
+  Nullable<Vector3>& get_boundingBoxSize() override;
 
+private:
   /**
    * @brief Occurs when the file is a preprocessed .babylon.hdr file.
    */
@@ -156,19 +167,19 @@ public:
   Property<HDRCubeTexture, bool> isBlocking;
 
   /**
+   * Texture matrix rotation angle around Y axis in radians.
+   */
+  Property<HDRCubeTexture, float> rotationY;
+
+  /**
    * Gets or sets the center of the bounding box associated with the cube
    * texture It must define where the camera used to render the texture was set
    */
   Vector3 boundingBoxPosition;
 
-  /**
-   * Specifies the size of the bounding box associated with the cube texture
-   * When defined, the cubemap will switch to local mode
-   */
-  Property<HDRCubeTexture, Nullable<Vector3>> boundingBoxSize;
-
 protected:
   bool _isBlocking;
+  float _rotationY;
 
 private:
   static vector_t<string_t> _facesMapping;

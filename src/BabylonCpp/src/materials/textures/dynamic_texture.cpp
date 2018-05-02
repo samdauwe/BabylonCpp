@@ -14,6 +14,7 @@ DynamicTexture::DynamicTexture(const string_t& iName,
                                unsigned int samplingMode, unsigned int format)
     : Texture{nullptr, scene,   !generateMipMaps, true,  samplingMode,
               nullptr, nullptr, nullptr,          false, format}
+    , canRescale{this, &DynamicTexture::get_canRescale}
     , _generateMipMaps{generateMipMaps}
 {
   name    = iName;
@@ -45,7 +46,7 @@ DynamicTexture::~DynamicTexture()
 {
 }
 
-bool DynamicTexture::canRescale()
+bool DynamicTexture::get_canRescale() const
 {
   return true;
 }

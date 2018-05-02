@@ -7,18 +7,28 @@
 #include <babylon/core/variant.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/materials/image_processing_configuration.h>
 #include <babylon/postprocess/blur_post_process.h>
 
 namespace BABYLON {
 
 MirrorTexture::MirrorTexture(const string_t& iName, const ISize& size,
-                             Scene* scene, bool generateMipMaps,
+                             Scene* iScene, bool generateMipMaps,
                              unsigned int type, unsigned int samplingMode,
                              bool generateDepthBuffer)
 
-    : RenderTargetTexture{iName, size,  scene,        generateMipMaps,    true,
+    : RenderTargetTexture{iName, size,  iScene,       generateMipMaps,    true,
                           type,  false, samplingMode, generateDepthBuffer}
     , mirrorPlane{Plane(0.f, 1.f, 0.f, 1.f)}
+    , blurRatio{this, &MirrorTexture::get_blurRatio,
+                &MirrorTexture::set_blurRatio}
+    , adaptiveBlurKernel{this, &MirrorTexture::set_adaptiveBlurKernel}
+    , blurKernel{this, &MirrorTexture::set_blurKernel}
+    , blurKernelX{this, &MirrorTexture::get_blurKernelX,
+                  &MirrorTexture::set_blurKernelX}
+    , blurKernelY{this, &MirrorTexture::get_blurKernelY,
+                  &MirrorTexture::set_blurKernelY}
+    , scene{iScene}
     , _transformMatrix{Matrix::Zero()}
     , _mirrorMatrix{Matrix::Zero()}
     , _savedViewMatrix{Matrix::Zero()}
@@ -31,6 +41,13 @@ MirrorTexture::MirrorTexture(const string_t& iName, const ISize& size,
 
 {
   ignoreCameraViewport = true;
+
+  _updateGammaSpace();
+  _imageProcessingConfigChangeObserver
+    = scene->imageProcessingConfiguration()->onUpdateParameters.add(
+      [this](ImageProcessingConfiguration* /*ipc*/, EventState& /*es*/) {
+        _updateGammaSpace();
+      });
 
   onBeforeRenderObservable.add([this](int*, EventState&) {
     auto scene = getScene();
@@ -56,7 +73,7 @@ MirrorTexture::~MirrorTexture()
 {
 }
 
-void MirrorTexture::setBlurRatio(float value)
+void MirrorTexture::set_blurRatio(float value)
 {
   if (stl_util::almost_equal(_blurRatio, value)) {
     return;
@@ -66,24 +83,24 @@ void MirrorTexture::setBlurRatio(float value)
   _preparePostProcesses();
 }
 
-float MirrorTexture::blurRatio() const
+float MirrorTexture::get_blurRatio() const
 {
   return _blurRatio;
 }
 
-void MirrorTexture::setAdaptiveBlurKernel(float value)
+void MirrorTexture::set_adaptiveBlurKernel(float value)
 {
   _adaptiveBlurKernel = value;
   _autoComputeBlurKernel();
 }
 
-void MirrorTexture::setBlurKernel(float value)
+void MirrorTexture::set_blurKernel(float value)
 {
-  setBlurKernelX(value);
-  setBlurKernelY(value);
+  blurKernelX = value;
+  blurKernelY = value;
 }
 
-void MirrorTexture::setBlurKernelX(float value)
+void MirrorTexture::set_blurKernelX(float value)
 {
   if (stl_util::almost_equal(_blurKernelX, value)) {
     return;
@@ -93,12 +110,12 @@ void MirrorTexture::setBlurKernelX(float value)
   _preparePostProcesses();
 }
 
-float MirrorTexture::blurKernelX() const
+float MirrorTexture::get_blurKernelX() const
 {
   return _blurKernelX;
 }
 
-void MirrorTexture::setBlurKernelY(float value)
+void MirrorTexture::set_blurKernelY(float value)
 {
   if (stl_util::almost_equal(_blurKernelY, value)) {
     return;
@@ -108,7 +125,7 @@ void MirrorTexture::setBlurKernelY(float value)
   _preparePostProcesses();
 }
 
-float MirrorTexture::blurKernelY() const
+float MirrorTexture::get_blurKernelY() const
 {
   return _blurKernelY;
 }
@@ -117,10 +134,10 @@ void MirrorTexture::_autoComputeBlurKernel()
 {
   auto engine = getScene()->getEngine();
 
-  auto dw = getRenderWidth() / engine->getRenderWidth();
-  auto dh = getRenderHeight() / engine->getRenderHeight();
-  setBlurKernelX(_adaptiveBlurKernel * dw);
-  setBlurKernelY(_adaptiveBlurKernel * dh);
+  auto dw     = getRenderWidth() / engine->getRenderWidth();
+  auto dh     = getRenderHeight() / engine->getRenderHeight();
+  blurKernelX = _adaptiveBlurKernel * dw;
+  blurKernelY = _adaptiveBlurKernel * dh;
 }
 
 void MirrorTexture::_onRatioRescale()
@@ -135,6 +152,12 @@ void MirrorTexture::_onRatioRescale()
   if (_adaptiveBlurKernel != 0.f) {
     _autoComputeBlurKernel();
   }
+}
+
+void MirrorTexture::_updateGammaSpace()
+{
+  gammaSpace = !scene->imageProcessingConfiguration()->isEnabled()
+               || !scene->imageProcessingConfiguration()->applyByPostProcess();
 }
 
 void MirrorTexture::_preparePostProcesses()
@@ -220,6 +243,13 @@ unique_ptr_t<MirrorTexture> MirrorTexture::clone() const
 Json::object MirrorTexture::serialize() const
 {
   return Json::object();
+}
+
+void MirrorTexture::dispose()
+{
+  RenderTargetTexture::dispose();
+  scene->imageProcessingConfiguration()->onUpdateParameters.remove(
+    _imageProcessingConfigChangeObserver);
 }
 
 } // end of namespace BABYLON

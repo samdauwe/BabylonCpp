@@ -51,7 +51,6 @@ public:
                                  unsigned int sampling = 0);
   virtual void _rebuild();
   virtual void delayLoad();
-  virtual Vector3* boundingBoxSize() const;
   vector_t<Animation*> getAnimations() override;
   unique_ptr_t<BaseTexture> clone() const;
   unsigned int textureType() const;
@@ -71,6 +70,9 @@ public:
 
 protected:
   BaseTexture(Scene* scene);
+
+  virtual void set_boundingBoxSize(const Nullable<Vector3>& value);
+  virtual Nullable<Vector3>& get_boundingBoxSize();
 
 public:
   string_t name;
@@ -139,6 +141,11 @@ public:
   unsigned int delayLoadState;
   InternalTexture* _texture;
 
+  /**
+   * Size of the bounding box associated with the texture (when in cube mode)
+   */
+  Property<BaseTexture, Nullable<Vector3>> boundingBoxSize;
+
 private:
   bool _hasAlpha;
   unsigned int _coordinatesMode;
@@ -147,6 +154,7 @@ private:
   Observer<BaseTexture>::Ptr _onDisposeObserver;
   Matrix _textureMatrix;
   Matrix _reflectionTextureMatrix;
+  Nullable<Vector3> emptyVector3;
 
 }; // end of class BaseTexture
 

@@ -20,16 +20,6 @@ public:
               bool prefiltered = false, const string_t& forcedExtension = "");
   ~CubeTexture() override;
 
-  /**
-   * @brief Gets or sets the size of the bounding box associated with the cube
-   * texture When defined, the cubemap will switch to local mode
-   * @see
-   * https://community.arm.com/graphics/b/blog/posts/reflections-based-on-local-cubemaps-in-unity
-   * Example: https://www.babylonjs-playground.com/#RNASML
-   */
-  void setBoundingBoxSize(const Vector3& value);
-  Vector3* boundingBoxSize() const override;
-
   void delayLoad() override;
   Matrix* getReflectionTextureMatrix() override;
   void setReflectionTextureMatrix(const Matrix& value);
@@ -45,6 +35,29 @@ public:
   static unique_ptr_t<CubeTexture> Parse(const Json::value& parsedTexture,
                                          Scene* scene, const string_t& rootUrl);
 
+protected:
+  /**
+   * @brief Gets or sets the size of the bounding box associated with the cube
+   * texture When defined, the cubemap will switch to local mode
+   * @see
+   * https://community.arm.com/graphics/b/blog/posts/reflections-based-on-local-cubemaps-in-unity
+   * Example: https://www.babylonjs-playground.com/#RNASML
+   */
+  void set_boundingBoxSize(const Nullable<Vector3>& value) override;
+  Nullable<Vector3>& get_boundingBoxSize() override;
+
+  /**
+   * @brief Sets texture matrix rotation angle around Y axis in radians.
+   * @param value rotation angle around Y axis in radians
+   */
+  void set_rotationY(float value);
+
+  /**
+   * @brief Gets texture matrix rotation angle around Y axis radians.
+   * @return rotation angle around Y axis radians
+   */
+  float get_rotationY() const;
+
 public:
   string_t url;
   unsigned int coordinatesMode;
@@ -55,8 +68,14 @@ public:
    */
   Vector3 boundingBoxPosition;
 
+  /**
+   * Texture matrix rotation angle around Y axis in radians
+   */
+  Property<CubeTexture, float> rotationY;
+
 private:
-  unique_ptr_t<Vector3> _boundingBoxSize;
+  Nullable<Vector3> _boundingBoxSize;
+  float _rotationY;
   bool _noMipmap;
   vector_t<string_t> _files;
   vector_t<string_t> _extensions;

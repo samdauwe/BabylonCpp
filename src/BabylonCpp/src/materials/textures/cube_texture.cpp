@@ -48,7 +48,9 @@ CubeTexture::CubeTexture(
     , url{rootUrl}
     , coordinatesMode{TextureConstants::CUBIC_MODE}
     , boundingBoxPosition{Vector3::Zero()}
+    , rotationY{this, &CubeTexture::get_rotationY, &CubeTexture::set_rotationY}
     , _boundingBoxSize{nullptr}
+    , _rotationY{0.f}
     , _noMipmap{noMipmap}
     , _textureMatrix{::std::make_unique<Matrix>(Matrix::Identity())}
     , _format{format}
@@ -130,21 +132,32 @@ CubeTexture::~CubeTexture()
 {
 }
 
-void CubeTexture::setBoundingBoxSize(const Vector3& value)
+void CubeTexture::set_boundingBoxSize(const Nullable<Vector3>& value)
 {
-  if (_boundingBoxSize && _boundingBoxSize->equals(value)) {
+  if (_boundingBoxSize && (*_boundingBoxSize).equals(*value)) {
     return;
   }
-  _boundingBoxSize = ::std::make_unique<Vector3>(value);
+  _boundingBoxSize = value;
   auto scene       = getScene();
   if (scene) {
     scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag());
   }
 }
 
-Vector3* CubeTexture::boundingBoxSize() const
+Nullable<Vector3>& CubeTexture::get_boundingBoxSize()
 {
-  return _boundingBoxSize ? _boundingBoxSize.get() : nullptr;
+  return _boundingBoxSize;
+}
+
+void CubeTexture::set_rotationY(float value)
+{
+  _rotationY = value;
+  setReflectionTextureMatrix(Matrix::RotationY(_rotationY));
+}
+
+float CubeTexture::get_rotationY() const
+{
+  return _rotationY;
 }
 
 void CubeTexture::delayLoad()
@@ -202,8 +215,8 @@ unique_ptr_t<CubeTexture> CubeTexture::Parse(const Json::value& parsedTexture,
       Json::ToArray<float>(parsedTexture, "boundingBoxPosition"));
   }
   if (parsedTexture.contains("boundingBoxSize")) {
-    cubeTexture->setBoundingBoxSize(Vector3::FromArray(
-      Json::ToArray<float>(parsedTexture, "boundingBoxSize")));
+    cubeTexture->boundingBoxSize = Vector3::FromArray(
+      Json::ToArray<float>(parsedTexture, "boundingBoxSize"));
   }
 
   // Animations

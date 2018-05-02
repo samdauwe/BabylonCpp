@@ -31,12 +31,15 @@ BaseTexture::BaseTexture(Scene* scene)
     , isRenderTarget{false}
     , delayLoadState{EngineConstants::DELAYLOADSTATE_NONE}
     , _texture{nullptr}
+    , boundingBoxSize{this, &BaseTexture::get_boundingBoxSize,
+                      &BaseTexture::set_boundingBoxSize}
     , _hasAlpha{false}
     , _coordinatesMode{TextureConstants::EXPLICIT_MODE}
     , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _onDisposeObserver{nullptr}
     , _textureMatrix{Matrix::IdentityReadOnly()}
     , _reflectionTextureMatrix{Matrix::IdentityReadOnly()}
+    , emptyVector3{nullptr}
 {
 }
 
@@ -224,9 +227,13 @@ void BaseTexture::delayLoad()
 {
 }
 
-Vector3* BaseTexture::boundingBoxSize() const
+void BaseTexture::set_boundingBoxSize(const Nullable<Vector3>& /*value*/)
 {
-  return nullptr;
+}
+
+Nullable<Vector3>& BaseTexture::get_boundingBoxSize()
+{
+  return emptyVector3;
 }
 
 vector_t<Animation*> BaseTexture::getAnimations()

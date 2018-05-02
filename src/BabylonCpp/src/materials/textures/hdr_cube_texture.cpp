@@ -32,10 +32,11 @@ HDRCubeTexture::HDRCubeTexture(
     , isPMREM{false}
     , isBlocking{this, &HDRCubeTexture::get_isBlocking,
                  &HDRCubeTexture::set_isBlocking}
+    , rotationY{this, &HDRCubeTexture::get_rotationY,
+                &HDRCubeTexture::set_rotationY}
     , boundingBoxPosition{Vector3::Zero()}
-    , boundingBoxSize{this, &HDRCubeTexture::get_boundingBoxSize,
-                      &HDRCubeTexture::set_boundingBoxSize}
     , _isBlocking{true}
+    , _rotationY{0.f}
     , _useInGammaSpace{false}
     , _generateHarmonics{generateHarmonics}
     , _noMipmap{noMipmap}
@@ -102,6 +103,17 @@ void HDRCubeTexture::set_isBlocking(bool value)
 bool HDRCubeTexture::get_isBlocking() const
 {
   return _isBlocking;
+}
+
+void HDRCubeTexture::set_rotationY(float value)
+{
+  _rotationY = value;
+  setReflectionTextureMatrix(Matrix::RotationY(_rotationY));
+}
+
+float HDRCubeTexture::get_rotationY() const
+{
+  return _rotationY;
 }
 
 void HDRCubeTexture::set_boundingBoxSize(const Nullable<Vector3>& value)

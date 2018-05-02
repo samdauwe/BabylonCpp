@@ -82,17 +82,6 @@ public:
 
   void _onRatioRescale();
 
-  /**
-   * @brief Gets or sets the size of the bounding box associated with the
-   * texture (when in cube mode) When defined, the cubemap will switch to local
-   * mode
-   * @see
-   * https://community.arm.com/graphics/b/blog/posts/reflections-based-on-local-cubemaps-in-unity
-   * Example: https://www.babylonjs-playground.com/#RNASML
-   */
-  void setBoundingBoxSize(const Vector3& value);
-  Vector3* boundingBoxSize() const override;
-
   /** Events **/
   void setOnAfterUnbind(
     const ::std::function<void(RenderTargetTexture*, EventState&)>& callback);
@@ -170,13 +159,25 @@ public:
   void freeRenderingGroups();
 
 protected:
-  void unbindFrameBuffer(Engine* engine, unsigned int faceIndex);
+  /**
+   * @brief Gets or sets the size of the bounding box associated with the
+   * texture (when in cube mode) When defined, the cubemap will switch to local
+   * mode
+   * @see
+   * https://community.arm.com/graphics/b/blog/posts/reflections-based-on-local-cubemaps-in-unity
+   * Example: https://www.babylonjs-playground.com/#RNASML
+   */
+  virtual void set_boundingBoxSize(const Nullable<Vector3>& value) override;
+  virtual Nullable<Vector3>& get_boundingBoxSize() override;
 
-private:
   unsigned int get_samples() const;
   void set_samples(unsigned int value);
   int get_refreshRate() const;
   void set_refreshRate(int value);
+
+  void unbindFrameBuffer(Engine* engine, unsigned int faceIndex);
+
+private:
   void _processSizeParameter(const ISize& size);
   int _bestReflectionRenderTargetDimension(int renderDimension,
                                            float scale) const;
@@ -285,7 +286,7 @@ private:
   Observer<Engine>::Ptr _onClearObserver;
   // Properties
   int _faceIndex;
-  unique_ptr_t<Vector3> _boundingBoxSize;
+  Nullable<Vector3> _boundingBoxSize;
 
 }; // end of class RenderTargetTexture
 
