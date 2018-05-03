@@ -119,17 +119,18 @@ struct BABYLON_SHARED_EXPORT PBRMaterialDefines
   static constexpr unsigned int SAMPLER3DBGRMAP            = 85;
   static constexpr unsigned int IMAGEPROCESSINGPOSTPROCESS = 86;
   static constexpr unsigned int EXPOSURE                   = 87;
-  static constexpr unsigned int GRAIN                      = 88;
 
-  static constexpr unsigned int USEPHYSICALLIGHTFALLOFF = 89;
-  static constexpr unsigned int TWOSIDEDLIGHTING        = 90;
-  static constexpr unsigned int SHADOWFLOAT             = 91;
-  static constexpr unsigned int CLIPPLANE               = 92;
-  static constexpr unsigned int POINTSIZE               = 93;
-  static constexpr unsigned int FOG                     = 94;
-  static constexpr unsigned int LOGARITHMICDEPTH        = 95;
+  static constexpr unsigned int USEPHYSICALLIGHTFALLOFF = 88;
+  static constexpr unsigned int TWOSIDEDLIGHTING        = 89;
+  static constexpr unsigned int SHADOWFLOAT             = 90;
+  static constexpr unsigned int CLIPPLANE               = 91;
+  static constexpr unsigned int POINTSIZE               = 92;
+  static constexpr unsigned int FOG                     = 93;
+  static constexpr unsigned int LOGARITHMICDEPTH        = 94;
 
-  static constexpr unsigned int FORCENORMALFORWARD = 96;
+  static constexpr unsigned int FORCENORMALFORWARD = 95;
+
+  static constexpr unsigned int GEOMETRYAA = 96;
 
   static constexpr unsigned int UNLIT = 97;
 

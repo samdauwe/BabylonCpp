@@ -580,6 +580,13 @@ public:
   bool forceNormalForward;
 
   /**
+   * Enables specular anti aliasing in the PBR shader.
+   * It will both interacts on the Geometry for analytical and IBL lighting.
+   * It also prefilter the roughness map based on the bump values.
+   */
+  bool enableSpecularAntiAliasing;
+
+  /**
    * This parameters will enable/disable Horizon occlusion to prevent normal
    * maps to look shiny when the normal
    * makes the reflect vector face the model (under horizon).

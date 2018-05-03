@@ -92,7 +92,6 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
            "SAMPLER3DBGRMAP",
            "IMAGEPROCESSINGPOSTPROCESS",
            "EXPOSURE",
-           "GRAIN",
            "USEPHYSICALLIGHTFALLOFF",
            "TWOSIDEDLIGHTING",
            "SHADOWFLOAT",
@@ -101,6 +100,7 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
            "FOG",
            "LOGARITHMICDEPTH",
            "FORCENORMALFORWARD",
+           "GEOMETRYAA",
            "UNLIT"};
   rebuild();
 } // namespace BABYLON

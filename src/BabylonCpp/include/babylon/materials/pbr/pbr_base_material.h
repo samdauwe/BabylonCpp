@@ -527,6 +527,13 @@ protected:
   bool _forceNormalForward;
 
   /**
+   * Enables specular anti aliasing in the PBR shader.
+   * It will both interacts on the Geometry for analytical and IBL lighting.
+   * It also prefilter the roughness map based on the bump values.
+   */
+  bool _enableSpecularAntiAliasing;
+
+  /**
    * Default configuration related to image processing available in the PBR
    * Material.
    */

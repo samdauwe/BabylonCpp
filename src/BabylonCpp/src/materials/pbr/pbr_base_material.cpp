@@ -90,6 +90,7 @@ PBRBaseMaterial::PBRBaseMaterial(const string_t& iName, Scene* scene)
     , _environmentBRDFTexture{nullptr}
     , _forceIrradianceInFragment{false}
     , _forceNormalForward{false}
+    , _enableSpecularAntiAliasing{false}
     , _lightingInfos{Vector4(_directIntensity, _emissiveIntensity,
                              _environmentIntensity, _specularIntensity)}
     , _imageProcessingObserver{nullptr}
@@ -870,6 +871,10 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
     defines.defines[PMD::ALPHAFRESNEL]
       = _useAlphaFresnel || _useLinearAlphaFresnel;
     defines.defines[PMD::LINEARALPHAFRESNEL] = _useLinearAlphaFresnel;
+
+    defines.defines[PMD::GEOMETRYAA]
+      = scene->getEngine()->getCaps().standardDerivatives
+        && _enableSpecularAntiAliasing;
   }
 
   if (defines._areImageProcessingDirty) {

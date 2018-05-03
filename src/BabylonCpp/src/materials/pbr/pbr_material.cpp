@@ -66,6 +66,7 @@ PBRMaterial::PBRMaterial(const string_t& iName, Scene* scene)
     , useLinearAlphaFresnel{false}
     , environmentBRDFTexture{nullptr}
     , forceNormalForward{false}
+    , enableSpecularAntiAliasing{false}
     , useHorizonOcclusion{true}
     , useRadianceOcclusion{true}
     , unlit{false}
