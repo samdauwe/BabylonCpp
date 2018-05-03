@@ -48,13 +48,13 @@ Json::object ValueCondition::serialize() const
 string_t ValueCondition::GetOperatorName(unsigned int operatorType)
 {
   switch (operatorType) {
-    case ValueCondition::IsEqual:
+    case ValueCondition::IsEqual():
       return "IsEqual";
-    case ValueCondition::IsDifferent:
+    case ValueCondition::IsDifferent():
       return "IsDifferent";
-    case ValueCondition::IsGreater:
+    case ValueCondition::IsGreater():
       return "IsGreater";
-    case ValueCondition::IsLesser:
+    case ValueCondition::IsLesser():
       return "IsLesser";
     default:
       return "";

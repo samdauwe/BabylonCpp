@@ -6,15 +6,33 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Defines a state condition as an extension of Condition.
+ */
 class BABYLON_SHARED_EXPORT StateCondition : public Condition {
 
 public:
+  /**
+   * @brief Creates a new StateCondition.
+   * @param actionManager manager for the action the condition applies to
+   * @param target of the condition
+   * @param value to compare with target state
+   */
   StateCondition(ActionManager* actionManager, IAnimatable* target,
                  AnimationValue* value);
-  virtual ~StateCondition();
+  virtual ~StateCondition() override;
 
   /** Methods **/
+
+  /**
+   * @returns the validity of the state.
+   */
   bool isValid() override;
+
+  /**
+   * @brief Serialize the StateCondition into a JSON compatible object.
+   * @returns serialization object
+   */
   Json::object serialize() const override;
 
 public:
@@ -22,6 +40,10 @@ public:
 
 private:
   /** Members **/
+
+  /**
+   * Internal only
+   */
   IAnimatable* _target;
 
 }; // end of class StateCondition

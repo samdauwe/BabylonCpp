@@ -7,12 +7,14 @@ namespace BABYLON {
 
 ActionEvent::ActionEvent(AbstractMesh* iSource, int iPointerX, int iPointerY,
                          AbstractMesh* iMeshUnderPointer,
-                         const Nullable<Event>& iSourceEvent)
+                         const Nullable<Event>& iSourceEvent,
+                         const string_t& iAdditionalData)
     : source{iSource}
     , pointerX{iPointerX}
     , pointerY{iPointerY}
     , meshUnderPointer{iMeshUnderPointer}
     , sourceEvent{iSourceEvent}
+    , additionalData{iAdditionalData}
 {
 }
 
@@ -23,6 +25,7 @@ ActionEvent::ActionEvent(const ActionEvent& other)
     , pointerY{other.pointerY}
     , meshUnderPointer{other.meshUnderPointer}
     , sourceEvent{other.sourceEvent}
+    , additionalData{other.additionalData}
 {
 }
 
@@ -33,6 +36,7 @@ ActionEvent::ActionEvent(ActionEvent&& other)
     , pointerY{::std::move(other.pointerY)}
     , meshUnderPointer{::std::move(other.meshUnderPointer)}
     , sourceEvent{::std::move(other.sourceEvent)}
+    , additionalData{::std::move(other.additionalData)}
 {
 }
 
@@ -45,6 +49,7 @@ ActionEvent& ActionEvent::operator=(const ActionEvent& other)
     pointerY         = other.pointerY;
     meshUnderPointer = other.meshUnderPointer;
     sourceEvent      = other.sourceEvent;
+    additionalData   = other.additionalData;
   }
 
   return *this;
@@ -59,6 +64,7 @@ ActionEvent& ActionEvent::operator=(ActionEvent&& other)
     pointerY         = ::std::move(other.pointerY);
     meshUnderPointer = ::std::move(other.meshUnderPointer);
     sourceEvent      = ::std::move(other.sourceEvent);
+    additionalData   = ::std::move(other.additionalData);
   }
 
   return *this;
@@ -89,6 +95,16 @@ ActionEvent ActionEvent::CreateNewFromScene(Scene* scene, const Event& evt)
 {
   return ActionEvent(nullptr, scene->pointerX(), scene->pointerY(),
                      scene->meshUnderPointer(), evt);
+}
+
+ActionEvent ActionEvent::CreateNewFromPrimitive(AbstractMesh* prim,
+                                                const Vector2& pointerPos,
+                                                const Event& evt,
+                                                const string_t& additionalData)
+{
+  return ActionEvent(prim, static_cast<int>(pointerPos.x),
+                     static_cast<int>(pointerPos.y), nullptr, evt,
+                     additionalData);
 }
 
 } // end of namespace BABYLON

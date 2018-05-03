@@ -4,6 +4,7 @@
 #include <babylon/actions/action_event.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
+#include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/tools/tools.h>
@@ -23,7 +24,8 @@ ActionManager* ActionManager::New(Ts&&... args)
   return actionManager.get();
 }
 
-ActionManager::ActionManager(Scene* scene) : hoverCursor{""}, _scene{scene}
+ActionManager::ActionManager(Scene* scene)
+    : hoverCursor{""}, _scene{scene ? scene : Engine::LastCreatedScene()}
 {
 }
 
@@ -65,11 +67,26 @@ bool ActionManager::hasSpecificTriggers(const Uint32Array& triggers) const
          != actions.end();
 }
 
-bool ActionManager::hasSpecificTrigger(unsigned int trigger) const
+bool ActionManager::hasSpecificTrigger(
+  unsigned int trigger,
+  const ::std::function<bool(const string_t& parameter)>& parameterPredicate)
+  const
 {
   return ::std::find_if(
            actions.begin(), actions.end(),
-           [&trigger](Action* action) { return action->trigger == trigger; })
+           [&trigger, &parameterPredicate](Action* action) {
+             if (action->trigger == trigger) {
+               if (parameterPredicate) {
+                 if (parameterPredicate(action->getTriggerParameter())) {
+                   return true;
+                 }
+               }
+               else {
+                 return true;
+               }
+             }
+             return false;
+           })
          != actions.end();
 }
 

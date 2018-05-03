@@ -7,23 +7,25 @@
 namespace BABYLON {
 
 /**
- * @brief ActionEvent is the event beint sent when an action is triggered.
+ * @brief ActionEvent is the event being sent when an action is triggered.
  */
 class BABYLON_SHARED_EXPORT ActionEvent {
 
 public:
   /**
-   * @brief Constructor
-   * @param source The mesh that triggered the action.
-   * @param pointerX the X mouse cursor position at the time of the event
-   * @param pointerY the Y mouse cursor position at the time of the event
+   * @brief Creates a new ActionEvent.
+   * @param source The mesh or sprite that triggered the action
+   * @param pointerX The X mouse cursor position at the time of the event
+   * @param pointerY The Y mouse cursor position at the time of the event
    * @param meshUnderPointer The mesh that is currently pointed at (can be null)
    * @param sourceEvent the original (browser) event that triggered the
    * ActionEvent
+   * @param additionalData additional data for the event
    */
   ActionEvent(AbstractMesh* source, int pointerX, int pointerY,
               AbstractMesh* meshUnderPointer,
-              const Nullable<Event>& sourceEvent);
+              const Nullable<Event>& sourceEvent,
+              const string_t& additionalData = "");
   ActionEvent(const ActionEvent& other);
   ActionEvent(ActionEvent&& other);
   ActionEvent& operator=(const ActionEvent& other);
@@ -32,28 +34,45 @@ public:
 
   /**
    * @brief Helper function to auto-create an ActionEvent from a source mesh.
-   * @param source the source mesh that triggered the event
-   * @param evt {Event} The original (browser) event
+   * @param source The source mesh that triggered the event
+   * @param evt The original (browser) event
+   * @param additionalData additional data for the event
+   * @returns the new ActionEvent
    */
   static ActionEvent CreateNew(AbstractMesh* source,
                                const Nullable<Event>& evt = nullptr);
 
   /**
-   * @brief Helper function to auto-create an ActionEvent from a source mesh.
+   * @brief Helper function to auto-create an ActionEvent from a source sprite.
    * @param source The source sprite that triggered the event
    * @param scene Scene associated with the sprite
-   * @param evt {Event} The original (browser) event
+   * @param evt The original (browser) event
+   * @param additionalData additional data for the event
+   * @returns the new ActionEvent
    */
   static ActionEvent CreateNewFromSprite(Sprite* source, Scene* scene,
                                          const Event& evt);
 
   /**
    * @brief Helper function to auto-create an ActionEvent from a scene. If
-   * triggered by a mesh use ActionEvent.CreateNew
+   * triggered by a mesh use ActionEvent.CreateNew.
    * @param scene the scene where the event occurred
-   * @param evt {Event} The original (browser) event
+   * @param evt The original (browser) event
+   * @returns the new ActionEvent
    */
   static ActionEvent CreateNewFromScene(Scene* scene, const Event& evt);
+
+  /**
+   * @brief Helper function to auto-create an ActionEvent from a primitive.
+   * @param prim defines the target primitive
+   * @param pointerPos defines the pointer position
+   * @param evt The original (browser) event
+   * @param additionalData additional data for the event
+   * @returns the new ActionEvent
+   */
+  static ActionEvent
+  CreateNewFromPrimitive(AbstractMesh* prim, const Vector2& pointerPos,
+                         const Event& evt, const string_t& additionalData = "");
 
 public:
   AbstractMesh* source;
@@ -62,6 +81,7 @@ public:
   int pointerY;
   AbstractMesh* meshUnderPointer;
   Nullable<Event> sourceEvent;
+  string_t additionalData;
 
 }; // end of class ActionEvent
 

@@ -6,14 +6,27 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Defines a predicate condition as an extension of Condition.
+ */
 class BABYLON_SHARED_EXPORT PredicateCondition : public Condition {
 
 public:
+  /**
+   * @brief Creates a new PredicateCondition.
+   * @param actionManager manager for the action the condition applies to
+   * @param predicate defines the predicate function used to validate the
+   * condition
+   */
   PredicateCondition(ActionManager* actionManager,
                      const ::std::function<bool()>& predicate);
-  ~PredicateCondition();
+  ~PredicateCondition() override;
 
   /** Methods **/
+
+  /**
+   * @returns the validity of the predicate condition.
+   */
   bool isValid() override;
 
 private:
