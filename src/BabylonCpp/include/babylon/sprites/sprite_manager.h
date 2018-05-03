@@ -57,6 +57,7 @@ public:
   float _epsilon;
   int cellWidth;
   int cellHeight;
+
   /**
    * An event triggered when the manager is disposed.
    */

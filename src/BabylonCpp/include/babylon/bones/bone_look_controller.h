@@ -26,29 +26,34 @@ struct BABYLON_SHARED_EXPORT BoneLookControllerOptions {
   Nullable<float> adjustRoll;
 }; // end of struct BoneLookControllerOptions
 
+/**
+ * @brief Class used to make a bone look toward a point in space.
+ * @see
+ * http://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons#bonelookcontroller
+ */
 class BABYLON_SHARED_EXPORT BoneLookController {
 
 public:
   /**
-   * @brief Create a BoneLookController
+   * @brief Create a BoneLookController.
    * @param mesh the mesh that the bone belongs to
    * @param bone the bone that will be looking to the target
    * @param target the target Vector3 to look at
    * @param settings optional settings:
-   * - maxYaw: the maximum angle the bone will yaw to
-   * - minYaw: the minimum angle the bone will yaw to
-   * - maxPitch: the maximum angle the bone will pitch to
-   * - minPitch: the minimum angle the bone will yaw to
-   * - slerpAmount: set the between 0 and 1 to make the bone slerp to the
-   *                target.
-   * - upAxis: the up axis of the coordinate system
-   * - upAxisSpace: the space that the up axis is in - BABYLON.Space.BONE,
-   *                BABYLON.Space.LOCAL (default), or BABYLON.Space.WORLD.
-   * - yawAxis: set yawAxis if the bone does not yaw on the y axis
-   * - pitchAxis: set pitchAxis if the bone does not pitch on the x axis
-   * - adjustYaw: used to make an adjustment to the yaw of the bone
-   * - adjustPitch: used to make an adjustment to the pitch of the bone
-   * - adjustRoll: used to make an adjustment to the roll of the bone
+   * * maxYaw: the maximum angle the bone will yaw to
+   * * minYaw: the minimum angle the bone will yaw to
+   * * maxPitch: the maximum angle the bone will pitch to
+   * * minPitch: the minimum angle the bone will yaw to
+   * * slerpAmount: set the between 0 and 1 to make the bone slerp to the
+   *target.
+   * * upAxis: the up axis of the coordinate system
+   * * upAxisSpace: the space that the up axis is in - BABYLON.Space.BONE,
+   *BABYLON.Space.LOCAL (default), or BABYLON.Space.WORLD.
+   * * yawAxis: set yawAxis if the bone does not yaw on the y axis
+   * * pitchAxis: set pitchAxis if the bone does not pitch on the x axis
+   * * adjustYaw: used to make an adjustment to the yaw of the bone
+   * * adjustPitch: used to make an adjustment to the pitch of the bone
+   * * adjustRoll: used to make an adjustment to the roll of the bone
    **/
   BoneLookController(AbstractMesh* mesh, Bone* bone, const Vector3& target,
                      const Nullable<BoneLookControllerOptions>& options
@@ -56,89 +61,122 @@ public:
   ~BoneLookController();
 
   /**
-   * @brief Update the bone to look at the target. This should be called before
+   * @brief Update the bone to look at the target.  This should be called before
    * the scene is rendered (use scene.registerBeforeRender()).
    */
   void update();
 
-private:
+protected:
+  /**
+   * @brief Gets the minimum yaw angle that the bone can look to.
+   */
   float get_minYaw() const;
+
+  /**
+   * @brief Sets the minimum yaw angle that the bone can look to.
+   */
   void set_minYaw(float value);
+
+  /**
+   * @brief Gets the maximum yaw angle that the bone can look to.
+   */
   float get_maxYaw() const;
+
+  /**
+   * @brief Sets the maximum yaw angle that the bone can look to.
+   */
   void set_maxYaw(float value);
+
+  /**
+   * @brief Gets the minimum pitch angle that the bone can look to.
+   */
   float get_minPitch() const;
+
+  /**
+   * @brief Sets the minimum pitch angle that the bone can look to.
+   */
   void set_minPitch(float value);
+
+  /**
+   * @brief Gets the maximum pitch angle that the bone can look to.
+   */
   float get_maxPitch() const;
+
+  /**
+   * @brief Sets the maximum pitch angle that the bone can look to.
+   */
   void set_maxPitch(float value);
+
+private:
   float _getAngleDiff(float ang1, float ang2) const;
   float _getAngleBetween(float ang1, float ang2) const;
   bool _isAngleBetween(float ang, float ang1, float ang2) const;
 
 public:
   /**
-   * The target Vector3 that the bone will look at.
+   * The target Vector3 that the bone will look at
    */
   Vector3 target;
 
   /**
-   * The mesh that the bone is attached to.
+   * The mesh that the bone is attached to
    */
   AbstractMesh* mesh;
 
   /**
-   * The bone that will be looking to the target.
+   * The bone that will be looking to the target
    */
   Bone* bone;
 
   /**
-   * The up axis of the coordinate system that is used when the bone is rotated.
+   * The up axis of the coordinate system that is used when the bone is rotated
    */
   Vector3 upAxis;
 
   /**
    * The space that the up axis is in - BABYLON.Space.BONE, BABYLON.Space.LOCAL
-   * (default), or BABYLON.Space.WORLD.
+   * (default), or BABYLON.Space.WORLD
    */
   Space upAxisSpace;
 
   /**
-   * Used to make an adjustment to the yaw of the bone.
+   * Used to make an adjustment to the yaw of the bone
    */
   float adjustYaw;
 
   /**
-   * Used to make an adjustment to the pitch of the bone.
+   * Used to make an adjustment to the pitch of the bone
    */
   float adjustPitch;
 
   /**
-   * Used to make an adjustment to the roll of the bone.
+   * Used to make an adjustment to the roll of the bone
    */
   float adjustRoll;
 
   /**
    * The amount to slerp (spherical linear interpolation) to the target.  Set
-   * this to a value between 0 and 1 (a value of 1 disables slerp).
+   * this to a value between 0 and 1 (a value of 1 disables slerp)
    */
   float slerpAmount;
 
   /**
-   * Get/set the minimum yaw angle that the bone can look to.
+   * Gets or sets the minimum yaw angle that the bone can look to
    */
   Property<BoneLookController, float> minYaw;
 
   /**
-   * Get/set the maximum yaw angle that the bone can look to.
+   * Gets or sets the maximum yaw angle that the bone can look to
    */
   Property<BoneLookController, float> maxYaw;
 
   /**
-   * Get/set the minimum pitch angle that the bone can look to.
+   * Gets or sets the minimum pitch angle that the bone can look to
    */
   Property<BoneLookController, float> minPitch;
 
   /**
-   * Get/set the maximum pitch angle that the bone can look to.
+   * Gets or sets the maximum pitch angle that the bone can look to
    */
   Property<BoneLookController, float> maxPitch;
 

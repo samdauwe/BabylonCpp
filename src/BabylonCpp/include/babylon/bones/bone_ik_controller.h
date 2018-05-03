@@ -19,31 +19,95 @@ struct BoneIKControllerOptions {
   Nullable<float> slerpAmount             = nullptr;
 }; // end of struct BoneIKControllerOptions
 
+/**
+ * @brief Class used to apply inverse kinematics to bones.
+ * @see
+ * http://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons#boneikcontroller
+ */
 class BABYLON_SHARED_EXPORT BoneIKController {
 
 public:
+  /**
+   * @brief Creates a new BoneIKController.
+   * @param mesh defines the mesh to control
+   * @param bone defines the bone to control
+   * @param options defines options to set up the controller
+   */
   BoneIKController(AbstractMesh* mesh, Bone* bone,
                    const Nullable<BoneIKControllerOptions>& options);
   ~BoneIKController();
 
+  /**
+   * @brief Force the controller to update the bones.
+   */
   void update();
 
-private:
+protected:
+  /**
+   * @brief Gets maximum allowed angle.
+   */
   float get_maxAngle() const;
+
+  /**
+   * @brief Sets maximum allowed angle.
+   */
   void set_maxAngle(float value = Math::PI);
+
+  /**
+   * @brief Sets maximum allowed angle.
+   */
   void _setMaxAngle(float ang = Math::PI);
 
 public:
+  /**
+   * Gets or sets the target mesh
+   */
   AbstractMesh* targetMesh;
+
+  /**
+   * Gets or sets the mesh used as pole
+   */
   AbstractMesh* poleTargetMesh;
+
+  /**
+   * Gets or sets the bone used as pole
+   */
   Bone* poleTargetBone;
+
+  /**
+   * Gets or sets the target position
+   */
   Vector3 targetPosition;
+
+  /**
+   * Gets or sets the pole target position
+   */
   Vector3 poleTargetPosition;
+
+  /**
+   * Gets or sets the pole target local offset
+   */
   Vector3 poleTargetLocalOffset;
+
+  /**
+   * Gets or sets the pole angle
+   */
   float poleAngle;
+
+  /**
+   * Gets or sets the mesh associated with the controller
+   */
   AbstractMesh* mesh;
+
+  /**
+   * The amount to slerp (spherical linear interpolation) to the target.  Set
+   * this to a value between 0 and 1 (a value of 1 disables slerp)
+   */
   float slerpAmount;
 
+  /**
+   * Gets or sets maximum allowed angle
+   */
   Property<BoneIKController, float> maxAngle;
 
 private:
