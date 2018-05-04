@@ -52,7 +52,6 @@ protected:
             LinesMesh* source = nullptr, bool doNotCloneChildren = true,
             bool useVertexColor = false, bool useVertexAlpha = false);
 
-private:
   /**
    * @brief The intersection Threshold is the margin applied when intersection a
    * segment of the LinesMesh with a Ray.
@@ -78,6 +77,9 @@ public:
   bool useVertexColor;
   bool useVertexAlpha;
 
+  /**
+   * The margin applied when intersection a segment of the LinesMesh with a Ray
+   */
   Property<LinesMesh, float> intersectionThreshold;
 
 private:

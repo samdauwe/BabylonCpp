@@ -17,11 +17,14 @@ Skeleton::Skeleton(const string_t& iName, const string_t& iId, Scene* scene)
     , name{iName}
     , id{iId}
     , doNotSerialize{false}
-    , animationPropertiesOverride{nullptr}
+    , animationPropertiesOverride{this,
+                                  &Skeleton::get_animationPropertiesOverride,
+                                  &Skeleton::set_animationPropertiesOverride}
     , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _isDirty{true}
     , _identity{Matrix::Identity()}
     , _lastAbsoluteTransformsUpdateId{-1}
+    , _animationPropertiesOverride{nullptr}
 {
   bones.clear();
   scene->skeletons.emplace_back(this);
@@ -36,6 +39,20 @@ Skeleton::~Skeleton()
 IReflect::Type Skeleton::type() const
 {
   return IReflect::Type::SKELETON;
+}
+
+AnimationPropertiesOverride*& Skeleton ::get_animationPropertiesOverride()
+{
+  if (!_animationPropertiesOverride) {
+    return _scene->animationPropertiesOverride;
+  }
+  return _animationPropertiesOverride;
+}
+
+void Skeleton ::set_animationPropertiesOverride(
+  AnimationPropertiesOverride* const& value)
+{
+  _animationPropertiesOverride = value;
 }
 
 // Members

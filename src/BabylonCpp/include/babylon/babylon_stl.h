@@ -349,7 +349,7 @@ public:
   using TGetter = T (C::*)() const;
   using TSetter = void (C::*)(T);
 
-  Property(C* propObject, T(C::*attribute))
+  Property(C* propObject, T C::*attribute)
       : _object{propObject}
       , _attribute{attribute}
       , _getter{nullptr}
@@ -391,7 +391,7 @@ public:
 
 private:
   C* const _object;
-  T(C::*_attribute);
+  T C::*_attribute;
   TGetter const _getter;
   TSetter const _setter;
 };
@@ -405,7 +405,7 @@ public:
   using TGetter = T& (C::*)();
   using TSetter = void (C::*)(const T&);
 
-  Property(C* propObject, T(C::*attribute))
+  Property(C* propObject, T C::*attribute)
       : _object{propObject}
       , _attribute{attribute}
       , _getter{nullptr}
@@ -457,7 +457,7 @@ public:
 
 private:
   C* const _object;
-  T(C::*_attribute);
+  T C::*_attribute;
   TGetter const _getter;
   TSetter const _setter;
 };
