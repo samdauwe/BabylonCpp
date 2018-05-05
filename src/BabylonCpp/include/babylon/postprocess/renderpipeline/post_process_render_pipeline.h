@@ -36,7 +36,7 @@ public:
                        bool disposeMaterialAndTextures = false) override;
 
 protected:
-  bool _enableMSAAOnFirstPostProcess();
+  bool _enableMSAAOnFirstPostProcess(unsigned int sampleCount);
 
 public:
   string_t _name;

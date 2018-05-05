@@ -18,12 +18,30 @@ public:
   using Ptr = shared_ptr_t<Observer<T>>;
 
 public:
-  Observer() : callback{nullptr}, mask{-1}, scope{nullptr}
+  /**
+   * @brief Creates a new observer.
+   */
+  Observer()
+      : _willBeUnregistered{false}
+      , unregisterOnNextCall{false}
+      , callback{nullptr}
+      , mask{-1}
+      , scope{nullptr}
   {
   }
 
+  /**
+   * @brief Creates a new observer.
+   * @param callback defines the callback to call when the observer is notified
+   * @param mask defines the mask of the observer (used to filter notifications)
+   * @param scope defines the current scope used to restore the JS context
+   */
   Observer(const CallbackFunc& iCallback, int iMask, any* iScope)
-      : callback{iCallback}, mask{iMask}, scope{iScope}
+      : _willBeUnregistered{false}
+      , unregisterOnNextCall{false}
+      , callback{iCallback}
+      , mask{iMask}
+      , scope{iScope}
   {
   }
 
@@ -37,8 +55,24 @@ public:
   }
 
 public:
+  /** Hidden */
+  bool _willBeUnregistered;
+  /**
+   * Gets or sets a property defining that the observer as to be unregistered
+   * after the next notification
+   */
+  bool unregisterOnNextCall;
+  /**
+   * Defines the callback to call when the observer is notified
+   */
   CallbackFunc callback;
+  /**
+   * Defines the mask of the observer (used to filter notifications)
+   */
   int mask;
+  /**
+   * Defines the current scope used to restore the JS context
+   */
   any* scope;
 
 }; // end of class Observer

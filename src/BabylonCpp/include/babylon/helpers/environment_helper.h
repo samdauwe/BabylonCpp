@@ -35,7 +35,7 @@ public:
 
   /**
    * Updates the background according to the new options.
-   * @param options
+   * @param color the main color to affect to the ground and the background
    */
   void updateOptions(const IEnvironmentHelperOptions& options);
 

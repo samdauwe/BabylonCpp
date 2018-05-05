@@ -28,6 +28,9 @@ public:
   {
   }
 
+  /**
+   * @brief Release associated resources.
+   */
   void dispose()
   {
     if (!_observers.empty() && !_observables.empty()) {
@@ -40,12 +43,21 @@ public:
     _observables.clear();
   }
 
+  /**
+   * @brief Raise a callback when one of the observable will notify.
+   * @param observables defines a list of observables to watch
+   * @param callback defines the callback to call on notification
+   * @param mask defines the mask used to filter notifications
+   * @param scope defines the current scope used to restore the JS context
+   * @returns the new MultiObserver
+   */
   static shared_ptr_t<MultiObserver<T>>
   Watch(const vector_t<typename Observable<T>::Ptr>& observables,
         const CallbackFunc& callback, int mask = -1, any* scope = nullptr)
   {
     MultiObserver<T>::SPtr result = ::std::make_shared<MultiObserver<T>>();
 
+    result._observers.clear();
     result._observables = observables;
 
     for (const auto& observable : observables) {

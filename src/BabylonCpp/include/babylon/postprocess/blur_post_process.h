@@ -18,7 +18,7 @@ class BABYLON_SHARED_EXPORT BlurPostProcess : public PostProcess {
 
 public:
   /**
-   * @brief Creates a new instance of @see BlurPostProcess
+   * @brief Creates a new instance BlurPostProcess.
    * @param name The name of the effect.
    * @param direction The direction in which to blur the image.
    * @param kernel The size of the kernel to be used when computing the blur.

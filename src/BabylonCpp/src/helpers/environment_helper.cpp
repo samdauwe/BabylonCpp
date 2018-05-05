@@ -319,10 +319,7 @@ void EnvironmentHelper::_setupGroundMaterial()
   _groundMaterial->setAlphaMode(
     EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF);
   _groundMaterial->setShadowLevel(_options.groundShadowLevel);
-  _groundMaterial->setPrimaryLevel(1);
   _groundMaterial->setPrimaryColor(_options.groundColor);
-  _groundMaterial->setSecondaryLevel(0);
-  _groundMaterial->setTertiaryLevel(0);
   _groundMaterial->setUseRGBColor(false);
   _groundMaterial->setEnableNoise(true);
 
@@ -422,10 +419,7 @@ void EnvironmentHelper::_setupSkyboxMaterial()
       = new BackgroundMaterial("BackgroundSkyboxMaterial", _scene);
   }
   _skyboxMaterial->setUseRGBColor(false);
-  _skyboxMaterial->setPrimaryLevel(1);
   _skyboxMaterial->setPrimaryColor(_options.skyboxColor);
-  _skyboxMaterial->setSecondaryLevel(0);
-  _skyboxMaterial->setTertiaryLevel(0);
   _skyboxMaterial->setEnableNoise(true);
 
   _skybox->setMaterial(_skyboxMaterial);
@@ -442,7 +436,8 @@ void EnvironmentHelper::_setupSkyboxReflectionTexture()
   }
 
   if (_options.skyboxTexture.is<BaseTexture*>()) {
-    _skyboxMaterial->setReflectionTexture(_skyboxTexture);
+    _skyboxMaterial->setReflectionTexture(static_cast<RenderTargetTexture*>(
+      _options.skyboxTexture.get<BaseTexture*>()));
     return;
   }
 

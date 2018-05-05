@@ -355,9 +355,10 @@ void SSAO2RenderingPipeline::_createRandomTexture()
       randVector.x = rand(0.f, 1.f);
       randVector.y = rand(0.f, 1.f);
       randVector.z = 0.f;
-      randVector.normalize();
-      randVector.scaleInPlace(255);
 
+      randVector.normalize();
+
+      randVector.scaleInPlace(255);
       randVector.x = ::std::floor(randVector.x);
       randVector.y = ::std::floor(randVector.y);
 

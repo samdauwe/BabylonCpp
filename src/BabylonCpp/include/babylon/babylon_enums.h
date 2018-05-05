@@ -56,15 +56,21 @@ enum class PropertyType : unsigned int {
   ROTATION = 100
 }; // end of enum class PropertyType
 
-/** Collisions Enums **/
+/** Defines supported task for worker process **/
 enum class WorkerTaskType {
-  INIT    = 0,
-  UPDATE  = 1,
+  /** Initialization */
+  INIT = 0,
+  /** Update of geometry */
+  UPDATE = 1,
+  /** Evaluate collision */
   COLLIDE = 2
 }; // end of enum class WorkerTaskType
 
+/** Defines kind of replies returned by worker */
 enum class WorkerReplyType {
-  SUCCESS       = 0,
+  /** Success */
+  SUCCESS = 0,
+  /** Unkown error */
   UNKNOWN_ERROR = 1
 }; // end of enum class WorkerReplyType
 

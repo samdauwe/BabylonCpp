@@ -5,6 +5,7 @@
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/postprocess/depth_of_field_effect_blur_level.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_pipeline.h>
+#include <babylon/tools/observer.h>
 
 namespace BABYLON {
 
@@ -16,53 +17,34 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT DefaultRenderingPipeline
     : public PostProcessRenderPipeline {
 
-public:
+private:
   /**
    * ID of the sharpen post process,
    */
   static constexpr const char* SharpenPostProcessId
     = "SharpenPostProcessEffect";
-  /**
-   * ID of the pass post process used for bloom,
-   */
-  static constexpr const char* PassPostProcessId = "PassPostProcessEffect";
-  /**
-   * ID of the highlight post process used for bloom,
-   */
-  static constexpr const char* HighLightsPostProcessId
-    = "HighLightsPostProcessEffect";
-  /**
-   * ID of the blurX post process used for bloom,
-   */
-  static constexpr const char* BlurXPostProcessId = "BlurXPostProcessEffect";
-  /**
-   * ID of the blurY post process used for bloom,
-   */
-  static constexpr const char* BlurYPostProcessId = "BlurYPostProcessEffect";
-  /**
-   * ID of the copy back post process used for bloom,
-   */
-  static constexpr const char* CopyBackPostProcessId
-    = "CopyBackPostProcessEffect";
+
   /**
    * ID of the image processing post process;
    */
   static constexpr const char* ImageProcessingPostProcessId
     = "ImageProcessingPostProcessEffect";
+
   /**
    * ID of the Fast Approximate Anti-Aliasing post process;
    */
   static constexpr const char* FxaaPostProcessId = "FxaaPostProcessEffect";
-  /**
-   * ID of the final merge post process;
-   */
-  static constexpr const char* FinalMergePostProcessId
-    = "FinalMergePostProcessEffect";
+
   /**
    * ID of the chromatic aberration post process,
    */
   static constexpr const char* ChromaticAberrationPostProcessId
     = "ChromaticAberrationPostProcessEffect";
+
+  /**
+   * ID of the grain post process
+   */
+  static constexpr const char* GrainPostProcessId = "GrainPostProcessEffect";
 
 public:
   /**
@@ -118,10 +100,23 @@ private:
   bool get_sharpenEnabled() const;
 
   /**
+   * @brief Specifies the size of the bloom blur kernel, relative to the final
+   * output size.
+   */
+  void set_bloomKernel(float value);
+  float get_bloomKernel() const;
+
+  /**
    * @brief The strength of the bloom.
    */
   void set_bloomWeight(float value);
   float get_bloomWeight() const;
+
+  /**
+   * @brief The threshold of the bloom.
+   */
+  void set_bloomThreshold(float value);
+  float get_bloomThreshold() const;
 
   /**
    * @brief The scale of the bloom, lower value will provide better performance.
@@ -155,10 +150,11 @@ private:
   bool get_fxaaEnabled() const;
 
   /**
-   * @brief If the multisample anti-aliasing is enabled.
+   * @brief MSAA sample count, setting this to 4 will provide 4x anti aliasing.
+   * (default: 1)
    */
-  void set_msaaEnabled(bool enabled);
-  bool get_msaaEnabled() const;
+  void set_samples(unsigned int sampleCount);
+  unsigned int get_samples() const;
 
   /**
    * @brief If image processing is enabled.
@@ -172,6 +168,13 @@ private:
   void set_chromaticAberrationEnabled(bool enabled);
   bool get_chromaticAberrationEnabled() const;
 
+  /**
+   * @brief Enable or disable the grain process from the pipeline.
+   */
+  void set_grainEnabled(bool enabled);
+  bool get_grainEnabled() const;
+
+  void _rebuildBloom();
   void _setAutoClearAndTextureSharing(PostProcess* postProcess,
                                       bool skipTextureSharing = false);
   void _buildPipeline();
@@ -184,29 +187,6 @@ public:
    * edges
    */
   SharpenPostProcess* sharpen;
-  /**
-   * First pass of bloom to capture the original image texture for later use.
-   */
-  PassPostProcess* pass;
-  /**
-   * Second pass of bloom used to brighten bright portions of the image.
-   */
-  HighlightsPostProcess* highlights;
-  /**
-   * BlurX post process used in coordination with blurY to guassian blur the
-   * highlighted image.
-   */
-  BlurPostProcess* blurX;
-  /**
-   * BlurY post process used in coordination with blurX to guassian blur the
-   * highlighted image.
-   */
-  BlurPostProcess* blurY;
-  /**
-   * Final pass run for bloom to copy the resulting bloom texture back to
-   * screen.
-   */
-  PassPostProcess* copyBack;
   /**
    * Depth of field effect, applies a blur based on how far away objects are
    * from the focus distance.
@@ -224,14 +204,14 @@ public:
   PostProcess* imageProcessing; // ImageProcessingPostProcess
 
   /**
-   * Final post process to merge results of all previous passes
-   */
-  PostProcess* finalMerge; // PassPostProcess
-
-  /**
    * Chromatic aberration post process which will shift rgb colors in the image
    */
   ChromaticAberrationPostProcess* chromaticAberration;
+
+  /**
+   * Grain post process which add noise to the image
+   */
+  GrainPostProcess* grain;
 
   /**
    * Animations which can be used to tweak settings over a period of time
@@ -242,7 +222,7 @@ public:
    * Specifies the size of the bloom blur kernel, relative to the final output
    * size
    */
-  float bloomKernel;
+  Property<DefaultRenderingPipeline, float> bloomKernel;
 
   /**
    * Enable or disable the sharpen process from the pipeline
@@ -250,22 +230,27 @@ public:
   Property<DefaultRenderingPipeline, bool> sharpenEnabled;
 
   /**
-   * The strength of the bloom.
+   * The strength of the bloom
    */
   Property<DefaultRenderingPipeline, float> bloomWeight;
 
   /**
-   * The scale of the bloom, lower value will provide better performance.
+   * The threshold of the bloom
+   */
+  Property<DefaultRenderingPipeline, float> bloomThreshold;
+
+  /**
+   * The scale of the bloom, lower value will provide better performance
    */
   Property<DefaultRenderingPipeline, float> bloomScale;
 
   /**
-   * Enable or disable the bloom from the pipeline.
+   * Enable or disable the bloom from the pipeline
    */
   Property<DefaultRenderingPipeline, bool> bloomEnabled;
 
   /**
-   * If the depth of field is enabled.
+   * If the depth of field is enabled
    */
   Property<DefaultRenderingPipeline, bool> depthOfFieldEnabled;
 
@@ -277,17 +262,17 @@ public:
     depthOfFieldBlurLevel;
 
   /**
-   * If the anti aliasing is enabled.
+   * If the anti aliasing is enabled
    */
   Property<DefaultRenderingPipeline, bool> fxaaEnabled;
 
   /**
-   * If the multisample anti-aliasing is enabled.
+   * MSAA sample count, setting this to 4 will provide 4x anti aliasing
    */
-  Property<DefaultRenderingPipeline, bool> msaaEnabled;
+  Property<DefaultRenderingPipeline, unsigned int> samples;
 
   /**
-   * If image processing is enabled.
+   * If image processing is enabled
    */
   Property<DefaultRenderingPipeline, bool> imageProcessingEnabled;
 
@@ -296,10 +281,20 @@ public:
    */
   Property<DefaultRenderingPipeline, bool> chromaticAberrationEnabled;
 
+  /**
+   * Enable or disable the grain process from the pipeline
+   */
+  Property<DefaultRenderingPipeline, bool> grainEnabled;
+
 private:
   // Post-processes
   PostProcessRenderEffect* _sharpenEffect;
+  BloomEffect* bloom;
   PostProcessRenderEffect* _chromaticAberrationEffect;
+  PostProcessRenderEffect* _grainEffect;
+
+  Observer<ImageProcessingConfiguration>::Ptr
+    _imageProcessingConfigurationObserver;
 
   // Values
   bool _sharpenEnabled;
@@ -307,22 +302,30 @@ private:
   bool _depthOfFieldEnabled;
   DepthOfFieldEffectBlurLevel _depthOfFieldBlurLevel;
   bool _fxaaEnabled;
-  bool _msaaEnabled;
   bool _imageProcessingEnabled;
   unsigned int _defaultPipelineTextureType;
   float _bloomScale;
   bool _chromaticAberrationEnabled;
+  bool _grainEnabled;
   bool _buildAllowed;
+
+  Observer<Engine>::Ptr _resizeObserver;
+  float _hardwareScaleLevel;
+  float _bloomKernel;
 
   /**
    * Specifies the weight of the bloom in the final rendering
    */
   float _bloomWeight;
 
+  float _bloomThreshold;
+
   bool _hdr;
+  unsigned int _samples;
   Scene* _scene;
   vector_t<Camera*> _originalCameras;
 
+  bool _hasCleared;
   PostProcess* _prevPostProcess;
   PostProcess* _prevPrevPostProcess;
 

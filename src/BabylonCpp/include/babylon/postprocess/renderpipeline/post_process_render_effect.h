@@ -32,11 +32,6 @@ public:
   ~PostProcessRenderEffect();
 
   /**
-   * @brief Checks if all the post processes in the effect are supported.
-   */
-  bool isSupported() const;
-
-  /**
    * @brief Updates the current state of the effect.
    */
   void _update();
@@ -72,6 +67,12 @@ public:
    */
   vector_t<PostProcess*> getPostProcesses(Camera* camera = nullptr);
 
+protected:
+  /**
+   * @brief Checks if all the post processes in the effect are supported.
+   */
+  bool get_isSupported() const;
+
 public:
   /**
    * Name of the effect
@@ -79,6 +80,11 @@ public:
   string_t _name;
 
   Engine* _engine;
+
+  /**
+   * Whether all the post processes in the effect are supported
+   */
+  ReadOnlyProperty<PostProcessRenderEffect, bool> isSupported;
 
 private:
   unordered_map_t<string_t, vector_t<PostProcess*>> _postProcesses;

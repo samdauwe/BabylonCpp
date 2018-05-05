@@ -14,7 +14,7 @@ class BABYLON_SHARED_EXPORT PostProcessManager {
 
 public:
   /**
-   * @brief Creates a new instance of @see PostProcess
+   * @brief Creates a new instance PostProcess.
    * @param scene The scene that the post process is associated with.
    */
   PostProcessManager(Scene* scene);

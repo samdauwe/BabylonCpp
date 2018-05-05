@@ -8,9 +8,13 @@ namespace BABYLON {
  * affected object
  */
 enum class PhysicsRadialImpulseFalloff {
-  // impulse is constant in strength across it's whole radius
+  /**
+   * Defines that impulse is constant in strength across it's whole radius
+   */
   Constant = 0,
-  // impulse gets weaker if it's further from the origin
+  /**
+   * Defines that impulse gets weaker if it's further from the origin
+   */
   Linear = 1
 }; // end of enum class PhysicsRadialImpulseFalloff
 
@@ -19,10 +23,15 @@ enum class PhysicsRadialImpulseFalloff {
  * affected object
  */
 enum class PhysicsUpdraftMode {
-  // the upstream forces will pull towards the top center of the cylinder
+  /**
+   * Defines that the upstream forces will pull towards the top center of the //
+   * cylinder
+   */
   Center = 0,
-  // once a impostor is inside the cylinder, it will shoot out perpendicular
-  // from the ground of the cylinder
+  /**
+   * Defines that once a impostor is inside the cylinder, it will shoot out
+   * perpendicular from the ground of the cylinder
+   */
   Perpendicular = 1
 }; // end of enum class PhysicsUpdraftMode
 

@@ -16,8 +16,12 @@ public:
 
 public:
   /**
-   * If the callback of a given Observer set skipNextObservers to true the
-   * following observers will be ignored
+   * @brief Create a new EventState.
+   * @param mask defines the mask associated with this state
+   * @param skipNextObservers defines a flag which will instruct the observable
+   * to skip following observers when set to true
+   * @param target defines the original target of the state
+   * @param currentTarget defines the current target of the state
    */
   EventState(int mask, bool skipNextObservers = false, any* target = nullptr,
              any* currentTarget = nullptr);
@@ -27,6 +31,15 @@ public:
   EventState& operator=(EventState&& other);      // Move assignment operator
   ~EventState();                                  // Destructor
 
+  /**
+   * @brief Initialize the current event state.
+   * @param mask defines the mask associated with this state
+   * @param skipNextObservers defines a flag which will instruct the observable
+   * to skip following observers when set to true
+   * @param target defines the original target of the state
+   * @param currentTarget defines the current target of the state
+   * @returns the current event state
+   */
   EventState& initalize(int mask, bool skipNextObservers = false,
                         any* target = nullptr, any* currentTarget = nullptr);
 
@@ -52,6 +65,13 @@ public:
    * The current object in the bubbling phase
    */
   any* currentTarget;
+
+  /**
+   * This will be populated with the return value of the last function that was
+   * executed. If it is the first function in the callback chain it will be the
+   * event data.
+   */
+  any lastReturnValue;
 
 }; // end of class Tools
 

@@ -14,6 +14,7 @@ PostProcessRenderEffect::PostProcessRenderEffect(
   bool singleInstance)
     : _name{name}
     , _engine{engine}
+    , isSupported{this, &PostProcessRenderEffect::get_isSupported}
     , _getPostProcesses{getPostProcesses}
     , _singleInstance{singleInstance}
 {
@@ -23,11 +24,11 @@ PostProcessRenderEffect::~PostProcessRenderEffect()
 {
 }
 
-bool PostProcessRenderEffect::isSupported() const
+bool PostProcessRenderEffect::get_isSupported() const
 {
   for (auto& item : _postProcesses) {
-    for (auto& pp : item.second) {
-      if (!pp->isSupported()) {
+    for (auto& pps : item.second) {
+      if (!pps->isSupported()) {
         return false;
       }
     }

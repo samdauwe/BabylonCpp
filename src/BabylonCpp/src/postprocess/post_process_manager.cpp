@@ -168,9 +168,11 @@ void PostProcessManager::_finalizeFrame(
       if (targetTexture) {
         engine->bindFramebuffer(targetTexture, faceIndex, 0, 0,
                                 forceFullscreenViewport);
+        pp->_outputTexture = targetTexture;
       }
       else {
         engine->restoreDefaultFramebuffer();
+        pp->_outputTexture = nullptr;
       }
     }
 

@@ -149,7 +149,8 @@ void PostProcessRenderPipeline::_reset()
   _renderEffectsForIsolatedPass.clear();
 }
 
-bool PostProcessRenderPipeline::_enableMSAAOnFirstPostProcess()
+bool PostProcessRenderPipeline::_enableMSAAOnFirstPostProcess(
+  unsigned int sampleCount)
 {
   // Set samples of the very first post process to 4 to enable native
   // anti-aliasing in browsers that support webGL 2.0 (See:
@@ -158,7 +159,7 @@ bool PostProcessRenderPipeline::_enableMSAAOnFirstPostProcess()
   if (engine->webGLVersion() >= 2.f && !effectKeys.empty()) {
     auto postProcesses = _renderEffects[effectKeys[0]]->getPostProcesses();
     if (!postProcesses.empty()) {
-      postProcesses[0]->samples = 4;
+      postProcesses[0]->samples = sampleCount;
       return true;
     }
   }

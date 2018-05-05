@@ -13,6 +13,7 @@ EventState::EventState(const EventState& other)
     , mask{other.mask}
     , target{other.target}
     , currentTarget{other.currentTarget}
+    , lastReturnValue{other.lastReturnValue}
 {
 }
 
@@ -21,6 +22,7 @@ EventState::EventState(EventState&& other)
     , mask{::std::move(other.mask)}
     , target{::std::move(other.target)}
     , currentTarget{::std::move(other.currentTarget)}
+    , lastReturnValue{::std::move(other.lastReturnValue)}
 {
 }
 
@@ -31,6 +33,7 @@ EventState& EventState::operator=(const EventState& other)
     mask              = other.mask;
     target            = other.target;
     currentTarget     = other.currentTarget;
+    lastReturnValue   = other.lastReturnValue;
   }
 
   return *this;
@@ -43,6 +46,7 @@ EventState& EventState::operator=(EventState&& other)
     mask              = ::std::move(other.mask);
     target            = ::std::move(other.target);
     currentTarget     = ::std::move(other.currentTarget);
+    lastReturnValue   = ::std::move(other.lastReturnValue);
   }
 
   return *this;
@@ -59,6 +63,7 @@ EventState& EventState::initalize(int iMmask, bool iSkipNextObservers,
   skipNextObservers = iSkipNextObservers;
   target            = iTarget;
   currentTarget     = iCurrentTarget;
+  lastReturnValue   = nullptr;
   return *this;
 }
 

@@ -21,7 +21,7 @@ class BABYLON_SHARED_EXPORT PostProcess {
 
 public:
   /**
-   * @brief Creates a new instance of @see PostProcess.
+   * @brief Creates a new instance PostProcess.
    * @param name The name of the PostProcess.
    * @param fragmentUrl The url of the fragment shader to be used.
    * @param parameters Array of the names of uniform non-sampler2D variables

@@ -4,6 +4,7 @@
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/textures/internal_texture.h>
 
 namespace BABYLON {
 
@@ -36,8 +37,17 @@ BlurPostProcess::BlurPostProcess(
   set_kernel(kernel);
 
   onApplyObservable.add([&](Effect* effect, EventState&) {
-    effect->setFloat2("delta", (1.f / static_cast<float>(width)) * direction.x,
-                      (1.f / static_cast<float>(height)) * direction.y);
+    if (_outputTexture) {
+      effect->setFloat2(
+        "delta",
+        (1.f / static_cast<float>(_outputTexture->width)) * direction.x,
+        (1.f / static_cast<float>(_outputTexture->height)) * direction.y);
+    }
+    else {
+      effect->setFloat2("delta",
+                        (1.f / static_cast<float>(width)) * direction.x,
+                        (1.f / static_cast<float>(height)) * direction.y);
+    }
   });
 }
 
@@ -54,7 +64,9 @@ void BlurPostProcess::set_kernel(float v)
   v            = ::std::max(v, 1.f);
   _idealKernel = v;
   _kernel      = _nearestBestKernel(v);
-  _updateParameters();
+  if (!blockCompilation) {
+    _updateParameters();
+  }
 }
 
 float BlurPostProcess::get_kernel() const
@@ -68,7 +80,9 @@ void BlurPostProcess::set_packedFloat(bool v)
     return;
   }
   _packedFloat = v;
-  _updateParameters();
+  if (!blockCompilation) {
+    _updateParameters();
+  }
 }
 
 bool BlurPostProcess::get_packedFloat() const
@@ -169,6 +183,16 @@ void BlurPostProcess::_updateParameters(
 
   std::ostringstream defines;
   defines << _staticDefines;
+
+  // The DOF fragment should ignore the center pixel when looping as it is
+  // handled manualy in the fragment shader.
+  if (String::contains(_staticDefines, "DOF")) {
+    defines << "#define CENTER_WEIGHT "
+            << _glslFloat(weights[static_cast<unsigned>(varyingCount) - 1])
+            << "\r\n";
+    --varyingCount;
+  }
+
   for (unsigned int i = 0; i < static_cast<unsigned>(varyingCount); ++i) {
     defines << "#define KERNEL_OFFSET" << i << " "
             << _glslFloat(static_cast<float>(offsets[i])) << "\r\n";
@@ -190,6 +214,7 @@ void BlurPostProcess::_updateParameters(
     defines << "#define PACKEDFLOAT 1";
   }
 
+  blockCompilation = false;
   PostProcess::updateEffect(
     defines.str(), {}, {},
     {{"varyingCount", static_cast<unsigned>(varyingCount)},
