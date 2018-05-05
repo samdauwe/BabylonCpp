@@ -23,6 +23,19 @@ Light::Light(const string_t& iName, Scene* scene)
     , shadowEnabled{true}
     , _shadowGenerator{nullptr}
     , _uniformBuffer{::std::make_unique<UniformBuffer>(scene->getEngine())}
+    , intensityMode{this, &Light::get_intensityMode, &Light::set_intensityMode}
+    , radius{this, &Light::get_radius, &Light::set_radius}
+    , renderPriority{this, &Light::get_renderPriority,
+                     &Light::set_renderPriority}
+    , includedOnlyMeshes{this, &Light::get_includedOnlyMeshes,
+                         &Light::set_includedOnlyMeshes}
+    , excludedMeshes{this, &Light::get_excludedMeshes,
+                     &Light::set_excludedMeshes}
+    , excludeWithLayerMask{this, &Light::get_excludeWithLayerMask,
+                           &Light::set_excludeWithLayerMask}
+    , includeOnlyWithLayerMask{this, &Light::get_includeOnlyWithLayerMask,
+                               &Light::set_includeOnlyWithLayerMask}
+    , lightmapMode{this, &Light::get_lightmapMode, &Light::set_lightmapMode}
     , _photometricScale{1.f}
     , _intensityMode{Light::INTENSITYMODE_AUTOMATIC()}
     , _radius{0.00001f}
@@ -84,83 +97,89 @@ void Light::setEnabled(bool value)
   _resyncMeshes();
 }
 
-unsigned int Light::intensityMode() const
+unsigned int Light::get_intensityMode() const
 {
   return _intensityMode;
 }
 
-void Light::setIntensityMode(unsigned int value)
+void Light::set_intensityMode(unsigned int value)
 {
   _intensityMode = value;
   _computePhotometricScale();
 }
 
-float Light::radius() const
+float Light::get_radius() const
 {
   return _radius;
 }
 
-void Light::setRadius(float value)
+void Light::set_radius(float value)
 {
   _radius = value;
   _computePhotometricScale();
 }
 
-int Light::renderPriority() const
+int Light::get_renderPriority() const
 {
   return _renderPriority;
 }
 
-vector_t<AbstractMesh*>& Light::includedOnlyMeshes()
+void Light::set_renderPriority(int value)
+{
+  _renderPriority = value;
+  _reorderLightsInScene();
+}
+
+vector_t<AbstractMesh*>& Light::get_includedOnlyMeshes()
 {
   return _includedOnlyMeshes;
 }
 
-void Light::setIncludedOnlyMeshes(const vector_t<AbstractMesh*>& value)
+void Light::set_includedOnlyMeshes(const vector_t<AbstractMesh*>& value)
 {
   _includedOnlyMeshes = value;
   _hookArrayForIncludedOnly(value);
 }
 
-vector_t<AbstractMesh*>& Light::excludedMeshes()
+vector_t<AbstractMesh*>& Light::get_excludedMeshes()
 {
   return _excludedMeshes;
 }
 
-void Light::setExcludedMeshes(const vector_t<AbstractMesh*>& value)
+void Light::set_excludedMeshes(const vector_t<AbstractMesh*>& value)
 {
   _excludedMeshes = value;
   _hookArrayForExcluded(value);
 }
 
-unsigned int Light::includeOnlyWithLayerMask() const
-{
-  return _includeOnlyWithLayerMask;
-}
-
-void Light::setIncludeOnlyWithLayerMask(unsigned int value)
-{
-  _includeOnlyWithLayerMask = value;
-  _resyncMeshes();
-}
-
-unsigned int Light::excludeWithLayerMask() const
+unsigned int Light::get_excludeWithLayerMask() const
 {
   return _excludeWithLayerMask;
 }
 
-void Light::setExcludeWithLayerMask(unsigned int value)
+void Light::set_excludeWithLayerMask(unsigned int value)
 {
   _excludeWithLayerMask = value;
   _resyncMeshes();
 }
 
-unsigned int Light::lightmapMode() const
+unsigned int Light::get_includeOnlyWithLayerMask() const
+{
+  return _includeOnlyWithLayerMask;
+}
+
+void Light::set_includeOnlyWithLayerMask(unsigned int value)
+{
+  _includeOnlyWithLayerMask = value;
+  _resyncMeshes();
+}
+
+unsigned int Light::get_lightmapMode() const
 {
   return _lightmapMode;
 }
 
-void Light::setLightmapMode(unsigned int value)
+void Light::set_lightmapMode(unsigned int value)
 {
   if (_lightmapMode == value) {
     return;

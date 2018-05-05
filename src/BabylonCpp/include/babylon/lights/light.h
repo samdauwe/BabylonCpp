@@ -183,94 +183,6 @@ public:
   virtual Vector3 getAbsolutePosition();
 
   /**
-   * @brief Gets the photometric scale used to interpret the intensity.
-   * This is only relevant with PBR Materials where the light intensity can be
-   * defined in a physical way.
-   */
-  unsigned int intensityMode() const;
-
-  /**
-   * @brief Sets the photometric scale used to interpret the intensity.
-   * This is only relevant with PBR Materials where the light intensity can be
-   * defined in a physical way.
-   */
-  void setIntensityMode(unsigned int value);
-
-  /**
-   * @brief Gets the light radius used by PBR Materials to simulate soft area
-   * lights.
-   */
-  float radius() const;
-
-  /**
-   * @brief Sets the light radius used by PBR Materials to simulate soft area
-   * lights.
-   */
-  void setRadius(float value);
-
-  /**
-   * @brief Defines the rendering priority of the lights. It can help in case of
-   * fallback or number of lights exceeding the number allowed of the materials.
-   */
-  int renderPriority() const;
-
-  /**
-   * @brief Gets the only meshes impacted by this light.
-   */
-  vector_t<AbstractMesh*>& includedOnlyMeshes();
-
-  /**
-   * @brief Sets the only meshes impacted by this light.
-   */
-  void setIncludedOnlyMeshes(const vector_t<AbstractMesh*>& value);
-
-  /**
-   * @brief Gets the meshes not impacted by this light.
-   */
-  vector_t<AbstractMesh*>& excludedMeshes();
-
-  /**
-   * @brief Sets the meshes not impacted by this light.
-   */
-  void setExcludedMeshes(const vector_t<AbstractMesh*>& value);
-
-  /**
-   * @brief Gets the layer id use to find what meshes are impacted by the light.
-   * Inactive if 0
-   */
-  unsigned int includeOnlyWithLayerMask() const;
-
-  /**
-   * @brief Sets the layer id use to find what meshes are impacted by the light.
-   * Inactive if 0
-   */
-  void setIncludeOnlyWithLayerMask(unsigned int value);
-
-  /**
-   * @brief Gets the layer id use to find what meshes are not impacted by the
-   * light. Inactive if 0
-   */
-  unsigned int excludeWithLayerMask() const;
-
-  /**
-   * @brief Sets the layer id use to find what meshes are not impacted by the
-   * light. Inactive if 0
-   */
-  void setExcludeWithLayerMask(unsigned int value);
-
-  /**
-   * @brief Gets the lightmap mode of this light (should be one of the constants
-   * defined by Light.LIGHTMAP_x)
-   */
-  unsigned int lightmapMode() const;
-
-  /**
-   * @brief Sets the lightmap mode of this light (should be one of the constants
-   * defined by Light.LIGHTMAP_x)
-   */
-  void setLightmapMode(unsigned int value);
-
-  /**
    * @brief Sets the passed Effect "effect" with the Light information.
    * @param effect The effect to update
    * @param lightIndex The index of the light in the effect to update
@@ -387,6 +299,100 @@ protected:
    */
   Light(const string_t& name, Scene* scene);
 
+  /**
+   * @brief Gets the photometric scale used to interpret the intensity.
+   * This is only relevant with PBR Materials where the light intensity can be
+   * defined in a physical way.
+   */
+  unsigned int get_intensityMode() const;
+
+  /**
+   * @brief Sets the photometric scale used to interpret the intensity.
+   * This is only relevant with PBR Materials where the light intensity can be
+   * defined in a physical way.
+   */
+  void set_intensityMode(unsigned int value);
+
+  /**
+   * @brief Gets the light radius used by PBR Materials to simulate soft area
+   * lights.
+   */
+  float get_radius() const;
+
+  /**
+   * @brief Sets the light radius used by PBR Materials to simulate soft area
+   * lights.
+   */
+  void set_radius(float value);
+
+  /**
+   * @brief Gets the rendering priority of the lights. It can help in case of
+   * fallback or number of lights exceeding the number allowed of the materials.
+   */
+  int get_renderPriority() const;
+
+  /**
+   * @brief Sets the rendering priority of the lights. It can help in case of
+   * fallback or number of lights exceeding the number allowed of the materials.
+   */
+  void set_renderPriority(int value);
+
+  /**
+   * @brief Gets the only meshes impacted by this light.
+   */
+  vector_t<AbstractMesh*>& get_includedOnlyMeshes();
+
+  /**
+   * @brief Sets the only meshes impacted by this light.
+   */
+  void set_includedOnlyMeshes(const vector_t<AbstractMesh*>& value);
+
+  /**
+   * @brief Gets the meshes not impacted by this light.
+   */
+  vector_t<AbstractMesh*>& get_excludedMeshes();
+
+  /**
+   * @brief Sets the meshes not impacted by this light.
+   */
+  void set_excludedMeshes(const vector_t<AbstractMesh*>& value);
+
+  /**
+   * @brief Gets the layer id use to find what meshes are not impacted by the
+   * light. Inactive if 0
+   */
+  unsigned int get_excludeWithLayerMask() const;
+
+  /**
+   * @brief Sets the layer id use to find what meshes are not impacted by the
+   * light. Inactive if 0
+   */
+  void set_excludeWithLayerMask(unsigned int value);
+
+  /**
+   * @brief Gets the layer id use to find what meshes are impacted by the light.
+   * Inactive if 0
+   */
+  unsigned int get_includeOnlyWithLayerMask() const;
+
+  /**
+   * @brief Sets the layer id use to find what meshes are impacted by the light.
+   * Inactive if 0
+   */
+  void set_includeOnlyWithLayerMask(unsigned int value);
+
+  /**
+   * @brief Gets the lightmap mode of this light (should be one of the constants
+   * defined by Light.LIGHTMAP_x)
+   */
+  unsigned int get_lightmapMode() const;
+
+  /**
+   * @brief Sets the lightmap mode of this light (should be one of the constants
+   * defined by Light.LIGHTMAP_x)
+   */
+  void set_lightmapMode(unsigned int value);
+
   virtual void _buildUniformLayout();
   void _resyncMeshes();
 
@@ -459,6 +465,47 @@ public:
    * Internal use only.
    */
   unique_ptr_t<UniformBuffer> _uniformBuffer;
+
+  /**
+   * Photometric scale used to interpret the intensity
+   */
+  Property<Light, unsigned int> intensityMode;
+
+  /**
+   * Light radius used by PBR Materials to simulate soft area lights
+   */
+  Property<Light, float> radius;
+
+  /**
+   * Rendering priority of the lights. It can help in case of fallback or number
+   * of lights exceeding the number allowed of the materials
+   */
+  Property<Light, int> renderPriority;
+
+  /**
+   * Meshes impacted by this light
+   */
+  Property<Light, vector_t<AbstractMesh*>> includedOnlyMeshes;
+
+  /**
+   * Meshes not impacted by this light
+   */
+  Property<Light, vector_t<AbstractMesh*>> excludedMeshes;
+
+  /**
+   * Layer id use to find what meshes are not impacted by the light
+   */
+  Property<Light, unsigned int> excludeWithLayerMask;
+
+  /**
+   * Layer id use to find what meshes are impacted by the light
+   */
+  Property<Light, unsigned int> includeOnlyWithLayerMask;
+
+  /**
+   * Lightmap mode of this light
+   */
+  Property<Light, unsigned int> lightmapMode;
 
 private:
   /**
