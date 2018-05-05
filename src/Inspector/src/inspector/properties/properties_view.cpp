@@ -4,7 +4,6 @@
 
 #include <babylon/inspector/properties/bool_property.h>
 #include <babylon/inspector/properties/color3_property.h>
-#include <babylon/inspector/properties/float_property.h>
 #include <babylon/inspector/properties/string_property.h>
 
 #include <imgui.h>
@@ -32,14 +31,38 @@ void PropertiesView::addBoolProperty(const string_t& name,
 }
 
 void PropertiesView::addFloatProperty(const string_t& name,
-                                      const TFloatGetter& getter,
-                                      const TFloatSetter& setter)
+                                      const TNumberGetter<float>& getter,
+                                      const TNumberSetter<float>& setter)
 {
   // Create property
-  _floatProperties.emplace_back(FloatProperty{getter, setter});
+  _floatProperties.emplace_back(NumberProperty<float>{getter, setter});
   // Store mapping
   auto index = _floatProperties.size() - 1;
   auto type  = PropertyTypeInsp::FLOAT_PROPERTY;
+  _propertyEntries.emplace_back(PropertyEntry{name, index, type});
+}
+
+void PropertiesView::addIntProperty(const string_t& name,
+                                    const TNumberGetter<int>& getter,
+                                    const TNumberSetter<int>& setter)
+{
+  // Create property
+  _intProperties.emplace_back(NumberProperty<int>{getter, setter});
+  // Store mapping
+  auto index = _intProperties.size() - 1;
+  auto type  = PropertyTypeInsp::INT_PROPERTY;
+  _propertyEntries.emplace_back(PropertyEntry{name, index, type});
+}
+
+void PropertiesView::addSizeTProperty(const string_t& name,
+                                      const TNumberGetter<size_t>& getter,
+                                      const TNumberSetter<size_t>& setter)
+{
+  // Create property
+  _sizeTProperties.emplace_back(NumberProperty<size_t>{getter, setter});
+  // Store mapping
+  auto index = _sizeTProperties.size() - 1;
+  auto type  = PropertyTypeInsp::SIZE_T_PROPERT;
   _propertyEntries.emplace_back(PropertyEntry{name, index, type});
 }
 
@@ -99,6 +122,12 @@ void PropertiesView::render()
         break;
       case PropertyTypeInsp::FLOAT_PROPERTY:
         _floatProperties[property.index].render();
+        break;
+      case PropertyTypeInsp::INT_PROPERTY:
+        _intProperties[property.index].render();
+        break;
+      case PropertyTypeInsp::SIZE_T_PROPERT:
+        _sizeTProperties[property.index].render();
         break;
       case PropertyTypeInsp::STRING_PROPERTY:
         _stringProperties[property.index].render();

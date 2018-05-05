@@ -9,9 +9,11 @@ namespace BABYLON {
 using TBoolGetter = ::std::function<bool()>;
 using TBoolSetter = ::std::function<void(const bool)>;
 
-// Float property callbacks
-using TFloatGetter = ::std::function<float()>;
-using TFloatSetter = ::std::function<void(const float)>;
+// Number property callbacks
+template <typename T>
+using TNumberGetter = ::std::function<T()>;
+template <typename T>
+using TNumberSetter = ::std::function<void(const T)>;
 
 // String property callbacks
 using TStringGetter = ::std::function<string_t()>;
