@@ -56,7 +56,9 @@ enum class PropertyType : unsigned int {
   ROTATION = 100
 }; // end of enum class PropertyType
 
-/** Defines supported task for worker process **/
+/**
+ * @brief Defines supported task for worker process.
+ */
 enum class WorkerTaskType {
   /** Initialization */
   INIT = 0,
@@ -66,7 +68,9 @@ enum class WorkerTaskType {
   COLLIDE = 2
 }; // end of enum class WorkerTaskType
 
-/** Defines kind of replies returned by worker */
+/**
+ * @brief Defines kind of replies returned by worker
+ */
 enum class WorkerReplyType {
   /** Success */
   SUCCESS = 0,
@@ -74,7 +78,9 @@ enum class WorkerReplyType {
   UNKNOWN_ERROR = 1
 }; // end of enum class WorkerReplyType
 
-/** Defines operator used for tonemapping **/
+/**
+ * @brief Defines operator used for tonemapping
+ */
 enum class TonemappingOperator {
   /** Hable */
   HABLE = 0,
@@ -111,7 +117,13 @@ enum class Orientation {
 }; // end of enum class Orientation
 
 /** Mesh Enums **/
+
+/**
+ * @brief The implemented types of simplification.
+ * At the moment only Quadratic Error Decimation is implemented
+ */
 enum class SimplificationType {
+  /** Quadratic error decimation */
   QUADRATIC
 }; // end of enum class SimplificationType
 

@@ -229,9 +229,7 @@ void AbstractMesh::setMaterial(Material* value)
     return;
   }
 
-  for (auto& subMesh : subMeshes) {
-    subMesh->setEffect(nullptr);
-  }
+  _unBindEffect();
 }
 
 bool AbstractMesh::receiveShadows() const
@@ -476,6 +474,13 @@ void AbstractMesh::_resyncLighSource(Light* light)
   }
 
   _markSubMeshesAsLightDirty();
+}
+
+void AbstractMesh::_unBindEffect()
+{
+  for (auto& subMesh : subMeshes) {
+    subMesh->setEffect(nullptr);
+  }
 }
 
 void AbstractMesh::_removeLightSource(Light* light)
@@ -848,6 +853,12 @@ AbstractMesh& AbstractMesh::_updateSubMeshesBoundingInfo(Matrix& matrix)
   }
 
   return *this;
+}
+
+void AbstractMesh::_afterComputeWorldMatrix()
+{
+  // Bounding info
+  _updateBoundingInfo();
 }
 
 bool AbstractMesh::isInFrustum(const array_t<Plane, 6>& frustumPlanes)
@@ -1680,7 +1691,7 @@ AbstractMesh& AbstractMesh::updateIndices(const IndicesArray& /*indices*/)
   return *this;
 }
 
-void AbstractMesh::createNormals(bool updatable)
+AbstractMesh& AbstractMesh::createNormals(bool updatable)
 {
   auto positions = getVerticesData(VertexBuffer::PositionKind);
   auto indices   = getIndices();
@@ -1694,6 +1705,8 @@ void AbstractMesh::createNormals(bool updatable)
   options.useRightHandedSystem = getScene()->useRightHandedSystem();
   VertexData::ComputeNormals(positions, indices, normals, options);
   setVerticesData(VertexBuffer::NormalKind, normals, updatable);
+
+  return *this;
 }
 
 AbstractMesh& AbstractMesh::alignWithNormal(Vector3& normal,

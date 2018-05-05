@@ -81,7 +81,7 @@ Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
       source->_geometry->applyToMesh(this);
     }
 
-      // Deep copy
+    // Deep copy
 #if 0
     Tools::DeepCopy(source, this,
                     [
@@ -228,6 +228,15 @@ string_t Mesh::toString(bool fullDetails)
 void Mesh::addSubMesh(SubMesh* subMesh)
 {
   subMeshes.emplace_back(subMesh);
+}
+
+void Mesh::_unBindEffect()
+{
+  AbstractMesh::_unBindEffect();
+
+  for (auto& instance : instances) {
+    instance->_unBindEffect();
+  }
 }
 
 bool Mesh::hasLODLevels() const
@@ -479,9 +488,16 @@ bool Mesh::isReady(bool completeCheck, bool forceInstanceSupport)
       for (auto& subMesh : subMeshes) {
         auto effectiveMaterial = subMesh->getMaterial();
         if (effectiveMaterial) {
-          if (!effectiveMaterial->isReadyForSubMesh(
-                this, subMesh.get(), hardwareInstancedRendering)) {
-            return false;
+          if (effectiveMaterial->storeEffectOnSubMeshes) {
+            if (!effectiveMaterial->isReadyForSubMesh(
+                  this, subMesh.get(), hardwareInstancedRendering)) {
+              return false;
+            }
+          }
+          else {
+            if (!effectiveMaterial->isReady(this, hardwareInstancedRendering)) {
+              return false;
+            }
           }
         }
       }
@@ -920,7 +936,7 @@ void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount,
                  bool alternate)
 {
   if (!_geometry || !_geometry->getVertexBuffers().size()
-      || !_geometry->getIndexBuffer()) {
+      || (!_unIndexed && !_geometry->getIndexBuffer())) {
     return;
   }
 
@@ -1163,7 +1179,7 @@ Mesh& Mesh::_processRendering(
 
 Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
 {
-  checkOcclusionQuery();
+  _checkOcclusionQuery();
   if (_isOccluded) {
     return *this;
   }
@@ -1179,7 +1195,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
 
   // Checking geometry state
   if (!_geometry || _geometry->getVertexBuffers().empty()
-      || !_geometry->getIndexBuffer()) {
+      || (!_unIndexed && !_geometry->getIndexBuffer())) {
     return *this;
   }
 

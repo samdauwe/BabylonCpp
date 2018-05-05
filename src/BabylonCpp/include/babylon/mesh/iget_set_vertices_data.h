@@ -6,7 +6,8 @@
 namespace BABYLON {
 
 /**
- * @brief
+ * @brief Define an interface for all classes that will get and set the data on
+ * vertices.
  */
 struct BABYLON_SHARED_EXPORT IGetSetVerticesData {
   virtual bool isVerticesDataPresent(unsigned int kind) = 0;

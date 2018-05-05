@@ -13,11 +13,31 @@ class BABYLON_SHARED_EXPORT TransformNode : public Node {
 
 public:
   // Statics
+
+  /**
+   * No billboard
+   */
   static constexpr unsigned int BILLBOARDMODE_NONE = 0;
-  static constexpr unsigned int BILLBOARDMODE_X    = 1;
-  static constexpr unsigned int BILLBOARDMODE_Y    = 2;
-  static constexpr unsigned int BILLBOARDMODE_Z    = 4;
-  static constexpr unsigned int BILLBOARDMODE_ALL  = 7;
+
+  /**
+   * Billboard on X axis
+   */
+  static constexpr unsigned int BILLBOARDMODE_X = 1;
+
+  /**
+   * Billboard on Y axis
+   */
+  static constexpr unsigned int BILLBOARDMODE_Y = 2;
+
+  /**
+   * Billboard on Z axis
+   */
+  static constexpr unsigned int BILLBOARDMODE_Z = 4;
+
+  /**
+   * Billboard on all axes
+   */
+  static constexpr unsigned int BILLBOARDMODE_ALL = 7;
 
 public:
   TransformNode(const string_t& name, Scene* scene = nullptr,
