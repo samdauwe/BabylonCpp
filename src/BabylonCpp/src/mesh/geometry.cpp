@@ -53,7 +53,7 @@ Geometry::Geometry(const string_t& iId, Scene* scene, VertexData* vertexData,
     if (mesh->type() == IReflect::Type::LINESMESH) {
       auto linesMesh = static_cast<LinesMesh*>(mesh);
       setBoundingBias(Vector2(0, linesMesh->intersectionThreshold()));
-      updateExtend(Float32Array());
+      _updateExtend(Float32Array());
     }
 
     applyToMesh(mesh);
@@ -83,7 +83,7 @@ void Geometry::setBoundingBias(const Vector2& value)
 
   _boundingBias = value;
 
-  updateBoundingInfo(true, Float32Array());
+  _updateBoundingInfo(true, Float32Array());
 }
 
 Geometry* Geometry::CreateGeometryForMesh(Mesh* mesh)
@@ -171,7 +171,8 @@ void Geometry::removeVerticesData(unsigned int kind)
   }
 }
 
-void Geometry::setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer)
+void Geometry::setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer,
+                                 const Nullable<size_t>& totalVertices)
 {
   auto kind = buffer->getKind();
   if (stl_util::contains(_vertexBuffers, kind)) {
@@ -182,12 +183,18 @@ void Geometry::setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer)
   auto _buffer         = _vertexBuffers[kind].get();
 
   if (kind == VertexBuffer::PositionKind) {
-    auto& data  = _buffer->getData();
-    auto stride = _buffer->getStrideSize();
+    auto& data = _buffer->getData();
 
-    _totalVertices = data.size() / static_cast<size_t>(stride);
+    if (totalVertices != nullptr) {
+      _totalVertices = *totalVertices;
+    }
+    else {
+      if (!data.empty()) {
+        _totalVertices = data.size() / (buffer->byteStride / 4);
+      }
+    }
 
-    updateExtend(data, stride);
+    _updateExtend(data);
     _resetPointsArrayCache();
 
     for (auto& mesh : _meshes) {
@@ -208,7 +215,8 @@ void Geometry::setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer)
 }
 
 void Geometry::updateVerticesDataDirectly(unsigned int kind,
-                                          const Float32Array& data, int offset)
+                                          const Float32Array& data,
+                                          size_t offset, bool useBytes)
 {
   auto vertexBuffer = getVertexBuffer(kind);
 
@@ -216,7 +224,7 @@ void Geometry::updateVerticesDataDirectly(unsigned int kind,
     return;
   }
 
-  vertexBuffer->updateDirectly(data, offset);
+  vertexBuffer->updateDirectly(data, offset, useBytes);
   notifyUpdate(kind);
 }
 
@@ -234,21 +242,17 @@ AbstractMesh* Geometry::updateVerticesData(unsigned int kind,
   vertexBuffer->update(data);
 
   if (kind == VertexBuffer::PositionKind) {
-
-    auto stride    = vertexBuffer->getStrideSize();
-    _totalVertices = data.size() / static_cast<size_t>(stride);
-
-    updateBoundingInfo(updateExtends, data);
+    _updateBoundingInfo(updateExtends, data);
   }
   notifyUpdate(kind);
 
   return nullptr;
 }
 
-void Geometry::updateBoundingInfo(bool updateExtends, const Float32Array& data)
+void Geometry::_updateBoundingInfo(bool updateExtends, const Float32Array& data)
 {
   if (updateExtends) {
-    updateExtend(data);
+    _updateExtend(data);
   }
 
   _resetPointsArrayCache();
@@ -312,15 +316,31 @@ Float32Array Geometry::getVerticesData(unsigned int kind, bool copyWhenShared,
   if (!vertexBuffer) {
     return Float32Array();
   }
-  auto& orig = vertexBuffer->getData();
-  if ((!forceCopy && !copyWhenShared) || _meshes.size() == 1) {
-    return orig;
+
+  auto data = vertexBuffer->getData();
+
+  if (data.empty()) {
+    return Float32Array();
   }
-  else {
-    Float32Array _copy(orig.size());
-    ::std::copy(orig.begin(), orig.end(), _copy.begin());
-    return _copy;
+
+  auto defaultStride = VertexBuffer::DeduceStride(vertexBuffer->getKind());
+  auto defaultByteStride
+    = defaultStride * VertexBuffer::GetTypeByteLength(vertexBuffer->type);
+  auto count = _totalVertices * static_cast<size_t>(defaultStride);
+
+  if (vertexBuffer->type != VertexBuffer::FLOAT
+      || vertexBuffer->byteStride != defaultByteStride) {
+    Float32Array copy(count);
+    vertexBuffer->forEach(
+      count, [&](float value, size_t index) { copy[index] = value; });
+    return copy;
   }
+
+  if (forceCopy || (copyWhenShared && _meshes.size() != 1)) {
+    return data;
+  }
+
+  return data;
 }
 
 bool Geometry::isVertexBufferUpdatable(unsigned int kind) const
@@ -524,17 +544,13 @@ void Geometry::applyToMesh(Mesh* mesh)
   }
 }
 
-void Geometry::updateExtend(const Float32Array& data, int stride)
+void Geometry::_updateExtend(Float32Array data)
 {
   if (data.empty()) {
-    _extend = Tools::ExtractMinAndMax(
-      _vertexBuffers[VertexBuffer::PositionKind]->getData(), 0, _totalVertices,
-      boundingBias(), static_cast<unsigned>(stride));
+    data = getVerticesData(VertexBuffer::PositionKind);
   }
-  else {
-    _extend = Tools::ExtractMinAndMax(data, 0, _totalVertices, boundingBias(),
-                                      static_cast<unsigned>(stride));
-  }
+
+  _extend = Tools::ExtractMinAndMax(data, 0, _totalVertices, boundingBias(), 3);
 }
 
 void Geometry::_applyToMesh(Mesh* mesh)
@@ -557,8 +573,7 @@ void Geometry::_applyToMesh(Mesh* mesh)
       mesh->_resetPointsArrayCache();
 
       if (!_extend) {
-        _extend = Tools::ExtractMinAndMax(_vertexBuffers[kind]->getData(), 0,
-                                          _totalVertices);
+        _updateExtend(Float32Array());
       }
       mesh->_boundingInfo
         = ::std::make_unique<BoundingInfo>(extend().min, extend().max);

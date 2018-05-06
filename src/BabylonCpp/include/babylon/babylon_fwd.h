@@ -123,6 +123,7 @@ struct UpdatePayload;
 class Worker;
 struct WorkerReply;
 // --- Core ---
+class DataView;
 struct Image;
 struct NodeCache;
 template <typename T>

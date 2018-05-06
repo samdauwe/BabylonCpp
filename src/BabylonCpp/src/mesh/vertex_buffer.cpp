@@ -1,5 +1,6 @@
 #include <babylon/mesh/vertex_buffer.h>
 
+#include <babylon/core/data_view.h>
 #include <babylon/engine/engine.h>
 #include <babylon/mesh/buffer.h>
 
@@ -61,26 +62,29 @@ constexpr const char* VertexBuffer::OffsetKindChars;
 constexpr const char* VertexBuffer::SeedKindChars;
 constexpr const char* VertexBuffer::SizeKindChars;
 
+constexpr const unsigned int VertexBuffer::BYTE;
+constexpr const unsigned int VertexBuffer::UNSIGNED_BYTE;
+constexpr const unsigned int VertexBuffer::SHORT;
+constexpr const unsigned int VertexBuffer::UNSIGNED_SHORT;
+constexpr const unsigned int VertexBuffer::INT;
+constexpr const unsigned int VertexBuffer::UNSIGNED_INT;
+constexpr const unsigned int VertexBuffer::FLOAT;
+
 VertexBuffer::VertexBuffer(
   Engine* engine, const Variant<Float32Array, Buffer*> data, unsigned int kind,
   bool updatable, const Nullable<bool>& postponeInternalCreation,
-  Nullable<int> stride, const Nullable<bool>& instanced,
-  const Nullable<unsigned int>& offset, const Nullable<int>& size)
+  Nullable<size_t> stride, const Nullable<bool>& instanced,
+  const Nullable<unsigned int>& offset, const Nullable<size_t>& size,
+  Nullable<unsigned int> type, bool iNormalized, bool useBytes)
     : instanceDivisor{this, &VertexBuffer::get_instanceDivisor,
                       &VertexBuffer::set_instanceDivisor}
 {
   if (data.is<Buffer*>()) {
-    if (!stride) {
-      stride = data.get<Buffer*>()->getStrideSize();
-    }
     _buffer      = data.get<Buffer*>();
     _ownedBuffer = nullptr;
     _ownsBuffer  = false;
   }
   else {
-    if (!stride) {
-      stride = VertexBuffer::DeduceStride(kind);
-    }
     _ownedBuffer = ::std::make_unique<Buffer>(
       engine, data.get<Float32Array>(), updatable, stride,
       postponeInternalCreation ? *postponeInternalCreation : false, instanced);
@@ -88,15 +92,38 @@ VertexBuffer::VertexBuffer(
     _ownsBuffer = true;
   }
 
-  _stride = stride;
+  _kind = kind;
+
+  if (type.isNull()) {
+    type = VertexBuffer::FLOAT;
+  }
+  else {
+    type = type;
+  }
+
+  const auto typeByteLength = VertexBuffer::GetTypeByteLength(type);
+
+  if (useBytes) {
+    _size = size ? *size :
+                   (stride ? (stride / typeByteLength) :
+                             VertexBuffer::DeduceStride(kind));
+    byteStride = stride ? *stride :
+                          _buffer->byteStride ? _buffer->byteStride :
+                                                (_size * typeByteLength);
+    byteOffset = offset ? *offset : 0;
+  }
+  else {
+    _size = size ? *size : stride ? *stride : VertexBuffer::DeduceStride(kind);
+    byteStride = stride ? (stride * typeByteLength) :
+                          (_buffer->byteStride ? _buffer->byteStride :
+                                                 (_size * typeByteLength));
+    byteOffset = (offset ? *offset : 0) * typeByteLength;
+  }
+
+  normalized = iNormalized;
 
   _instanced       = instanced.hasValue() ? *instanced : false;
   _instanceDivisor = instanced ? 1 : 0;
-
-  _offset = offset ? *offset : 0;
-  _size   = size ? size : stride;
-
-  _kind = kind;
 }
 
 VertexBuffer::~VertexBuffer()
@@ -220,17 +247,17 @@ GL::IGLBuffer* VertexBuffer::getBuffer()
   return _getBuffer()->getBuffer();
 }
 
-int VertexBuffer::getStrideSize() const
+size_t VertexBuffer::getStrideSize() const
 {
-  return _stride;
+  return byteStride / VertexBuffer::GetTypeByteLength(type);
 }
 
-unsigned int VertexBuffer::getOffset() const
+size_t VertexBuffer::getOffset() const
 {
-  return _offset;
+  return byteOffset / VertexBuffer::GetTypeByteLength(type);
 }
 
-int VertexBuffer::getSize() const
+size_t VertexBuffer::getSize() const
 {
   return _size;
 }
@@ -262,9 +289,9 @@ GL::IGLBuffer* VertexBuffer::update(const Float32Array& data)
 }
 
 GL::IGLBuffer* VertexBuffer::updateDirectly(const Float32Array& data,
-                                            int offset)
+                                            size_t offset, bool useBytes)
 {
-  return _getBuffer()->updateDirectly(data, offset);
+  return _getBuffer()->updateDirectly(data, offset, nullptr, useBytes);
 }
 
 void VertexBuffer::dispose()
@@ -275,7 +302,15 @@ void VertexBuffer::dispose()
   }
 }
 
-int VertexBuffer::DeduceStride(unsigned int kind)
+void VertexBuffer::forEach(
+  size_t count,
+  const ::std::function<void(float value, size_t index)>& callback)
+{
+  VertexBuffer::ForEach(_buffer->getData(), byteOffset, byteStride, _size, type,
+                        count, normalized, callback);
+}
+
+size_t VertexBuffer::DeduceStride(unsigned int kind)
 {
   // Deduce stride from kind
   switch (kind) {
@@ -300,7 +335,105 @@ int VertexBuffer::DeduceStride(unsigned int kind)
       throw ::std::runtime_error("Invalid kind '" + ::std::to_string(kind)
                                  + "'");
   }
-  return -1;
+}
+
+unsigned int VertexBuffer::GetTypeByteLength(unsigned int type)
+{
+  switch (type) {
+    case VertexBuffer::BYTE:
+    case VertexBuffer::UNSIGNED_BYTE:
+      return 1;
+    case VertexBuffer::SHORT:
+    case VertexBuffer::UNSIGNED_SHORT:
+      return 2;
+    case VertexBuffer::INT:
+    case VertexBuffer::FLOAT:
+      return 4;
+    default:
+      throw ::std::runtime_error("Invalid type " + ::std::to_string(type));
+  }
+}
+
+void VertexBuffer::ForEach(
+  const Float32Array& data, size_t byteOffset, size_t byteStride,
+  size_t componentCount, unsigned int /*componentType*/, size_t count,
+  bool /*normalized*/,
+  const ::std::function<void(float value, size_t index)>& callback)
+{
+  auto offset = byteOffset / 4;
+  auto stride = byteStride / 4;
+  for (size_t index = 0; index < count; index += componentCount) {
+    for (size_t componentIndex = 0; componentIndex < componentCount;
+         componentIndex++) {
+      callback(data[offset + componentIndex], index + componentIndex);
+    }
+    offset += stride;
+  }
+}
+
+void VertexBuffer::ForEach(
+  const Variant<ArrayBuffer, DataView>& data, size_t byteOffset,
+  size_t byteStride, size_t componentCount, unsigned int componentType,
+  size_t count, bool normalized,
+  const ::std::function<void(float value, size_t index)>& callback)
+{
+  DataView dataView = data.is<ArrayBuffer>() ?
+                        DataView(data.get<ArrayBuffer>()) :
+                        DataView(data.get<DataView>());
+  auto componentByteLength = VertexBuffer::GetTypeByteLength(componentType);
+  for (size_t index = 0; index < count; index += componentCount) {
+    auto componentByteOffset = byteOffset;
+    for (size_t componentIndex = 0; componentIndex < componentCount;
+         componentIndex++) {
+      const auto value = VertexBuffer::_GetFloatValue(
+        dataView, componentType, componentByteOffset, normalized);
+      callback(value, index + componentIndex);
+      componentByteOffset += componentByteLength;
+    }
+    byteOffset += byteStride;
+  }
+}
+
+float VertexBuffer::_GetFloatValue(const DataView& dataView, unsigned int type,
+                                   size_t byteOffset, bool normalized)
+{
+  switch (type) {
+    case VertexBuffer::BYTE: {
+      auto value = static_cast<float>(dataView.getInt8(byteOffset));
+      if (normalized) {
+        value = (value + 0.5f) / 127.5f;
+      }
+      return value;
+    }
+    case VertexBuffer::UNSIGNED_BYTE: {
+      auto value = static_cast<float>(dataView.getUint8(byteOffset));
+      if (normalized) {
+        value = value / 255.f;
+      }
+      return value;
+    }
+    case VertexBuffer::SHORT: {
+      auto value = static_cast<float>(dataView.getInt16(byteOffset, true));
+      if (normalized) {
+        value = (value + 0.5f) / 16383.5f;
+      }
+      return value;
+    }
+    case VertexBuffer::UNSIGNED_SHORT: {
+      auto value = static_cast<float>(dataView.getUint16(byteOffset, true));
+      if (normalized) {
+        value = value / 65535.f;
+      }
+      return value;
+    }
+    case VertexBuffer::FLOAT: {
+      return dataView.getFloat32(byteOffset, true);
+    }
+    default: {
+      throw ::std::runtime_error("Invalid component type "
+                                 + ::std::to_string(type));
+    }
+  }
 }
 
 } // end of namespace BABYLON

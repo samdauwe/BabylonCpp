@@ -9,29 +9,32 @@
 namespace BABYLON {
 
 Buffer::Buffer(Engine* engine, const Float32Array& data, bool updatable,
-               int stride, bool postponeInternalCreation, bool instanced)
+               size_t stride, bool postponeInternalCreation, bool instanced,
+               bool useBytes)
     : _engine{engine ? engine : Engine::LastCreatedEngine()}
     , _buffer{nullptr}
     , _data{data}
     , _updatable{updatable}
-    , _strideSize{stride}
     , _instanced{instanced}
 {
+  byteStride = useBytes ? stride : stride * sizeof(float);
+
   if (!postponeInternalCreation) { // by default
     create();
   }
 }
 
-Buffer::Buffer(Mesh* mesh, const Float32Array& data, bool updatable, int stride,
-               bool postponeInternalCreation, bool instanced)
-    : _buffer{nullptr}
+Buffer::Buffer(Mesh* mesh, const Float32Array& data, bool updatable,
+               size_t stride, bool postponeInternalCreation, bool instanced,
+               bool useBytes)
+    : _engine{mesh->getScene()->getEngine()}
+    , _buffer{nullptr}
     , _data{data}
     , _updatable{updatable}
-    , _strideSize{stride}
     , _instanced{instanced}
 {
-  // old versions of BABYLON.VertexBuffer accepted 'mesh' instead of 'engine'
-  _engine = mesh->getScene()->getEngine();
+  byteStride = useBytes ? stride : stride * sizeof(float);
+
   if (!postponeInternalCreation) { // by default
     create();
   }
@@ -42,15 +45,20 @@ Buffer::~Buffer()
 }
 
 unique_ptr_t<VertexBuffer> Buffer::createVertexBuffer(unsigned int kind,
-                                                      int offset, int size,
-                                                      Nullable<int> stride,
-                                                      Nullable<bool> instanced)
+                                                      size_t offset, int size,
+                                                      Nullable<size_t> stride,
+                                                      Nullable<bool> instanced,
+                                                      bool useBytes)
 {
+  const auto _byteOffset = useBytes ? offset : offset * sizeof(float);
+  const auto _byteStride
+    = stride ? (useBytes ? *stride : *stride * sizeof(float)) : byteStride;
+
   // a lot of these parameters are ignored as they are overriden by the buffer
   return ::std::make_unique<VertexBuffer>(
     _engine, ToVariant<Float32Array, Buffer*>(this), kind, _updatable, true,
-    stride ? *stride : _strideSize,
-    instanced.isNull() ? _instanced : *instanced, offset, size);
+    _byteStride, instanced.isNull() ? _instanced : _byteOffset, offset, size,
+    nullptr, false, true);
 }
 
 // Properties
@@ -69,9 +77,9 @@ GL::IGLBuffer* Buffer::getBuffer()
   return _buffer.get();
 }
 
-int Buffer::getStrideSize() const
+size_t Buffer::getStrideSize() const
 {
-  return _strideSize;
+  return byteStride / sizeof(float);
 }
 
 // Methods
@@ -117,22 +125,9 @@ GL::IGLBuffer* Buffer::update(const Float32Array& data)
   return create(data);
 }
 
-GL::IGLBuffer* Buffer::updateDirectly(const Float32Array& data, int offset)
-{
-  if (!_buffer) {
-    return nullptr;
-  }
-
-  if (_updatable) { // update buffer
-    _engine->updateDynamicVertexBuffer(_buffer, data, offset, -1);
-    _data.clear();
-  }
-
-  return _buffer ? _buffer.get() : nullptr;
-}
-
-GL::IGLBuffer* Buffer::updateDirectly(const Float32Array& data, int offset,
-                                      size_t vertexCount)
+GL::IGLBuffer* Buffer::updateDirectly(const Float32Array& data, size_t offset,
+                                      const Nullable<size_t>& vertexCount,
+                                      bool useBytes)
 {
   if (!_buffer) {
     return nullptr;
@@ -140,7 +135,10 @@ GL::IGLBuffer* Buffer::updateDirectly(const Float32Array& data, int offset,
 
   if (_updatable) { // update buffer
     _engine->updateDynamicVertexBuffer(
-      _buffer, data, offset, static_cast<int>(vertexCount) * getStrideSize());
+      _buffer, data,
+      useBytes ? static_cast<int>(offset) :
+                 static_cast<int>(offset * sizeof(float)),
+      (vertexCount ? static_cast<int>(*vertexCount * byteStride) : -1));
     _data.clear();
   }
 

@@ -26,7 +26,11 @@ public:
   }
   ~RibbonGeometry();
 
+  /**
+   * @brief Hidden
+   */
   unique_ptr_t<VertexData> _regenerateVertexData();
+
   Geometry* copy(const string_t& id);
 
 protected:

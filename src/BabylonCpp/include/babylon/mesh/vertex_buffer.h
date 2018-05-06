@@ -73,14 +73,67 @@ public:
   static constexpr const char* SeedKindChars      = "seed";
   static constexpr const char* SizeKindChars      = "size";
 
+  /**
+   * The byte type.
+   */
+  static constexpr const unsigned int BYTE = 5120;
+
+  /**
+   * The unsigned byte type.
+   */
+  static constexpr const unsigned int UNSIGNED_BYTE = 5121;
+
+  /**
+   * The short type.
+   */
+  static constexpr const unsigned int SHORT = 5122;
+
+  /**
+   * The unsigned short type.
+   */
+  static constexpr const unsigned int UNSIGNED_SHORT = 5123;
+
+  /**
+   * The integer type.
+   */
+  static constexpr const unsigned int INT = 5124;
+
+  /**
+   * The unsigned integer type.
+   */
+  static constexpr const unsigned int UNSIGNED_INT = 5125;
+
+  /**
+   * The float type.
+   */
+  static constexpr const unsigned int FLOAT = 5126;
+
 public:
+  /**
+   * @brief Constructor
+   * @param engine the engine
+   * @param data the data to use for this vertex buffer
+   * @param kind the vertex buffer kind
+   * @param updatable whether the data is updatable
+   * @param postponeInternalCreation whether to postpone creating the internal
+   * WebGL buffer (optional)
+   * @param stride the stride (optional)
+   * @param instanced whether the buffer is instanced (optional)
+   * @param offset the offset of the data (optional)
+   * @param size the number of components (optional)
+   * @param type the type of the component (optional)
+   * @param normalized whether the data contains normalized data (optional)
+   * @param useBytes set to true if stride and offset are in bytes (optional)
+   */
   VertexBuffer(Engine* engine, const Variant<Float32Array, Buffer*> data,
                unsigned int kind, bool updatable,
                const Nullable<bool>& postponeInternalCreation = nullptr,
-               Nullable<int> stride                           = nullptr,
+               Nullable<size_t> stride                        = nullptr,
                const Nullable<bool>& instanced                = nullptr,
                const Nullable<unsigned int>& offset           = nullptr,
-               const Nullable<int>& size                      = nullptr);
+               const Nullable<size_t>& size                   = nullptr,
+               Nullable<unsigned int> type = nullptr, bool normalized = false,
+               bool useBytes = false);
   virtual ~VertexBuffer();
 
   /** Statics **/
@@ -91,7 +144,7 @@ public:
    * @param kind The kind string to deduce
    * @returns The deduced stride
    */
-  static int DeduceStride(unsigned int kind);
+  static size_t DeduceStride(unsigned int kind);
 
   /** Rebuild **/
   void _rebuild();
@@ -121,17 +174,17 @@ public:
   /**
    * Returns the stride of the VertexBuffer (integer).
    */
-  int getStrideSize() const;
+  size_t getStrideSize() const;
 
   /**
    * @brief Returns the offset (integer).
    */
-  unsigned int getOffset() const;
+  size_t getOffset() const;
 
   /**
    * @brief Returns the VertexBuffer total size (integer).
    */
-  int getSize() const;
+  size_t getSize() const;
 
   /**
    * @brief Returns if the WebGLBuffer of the VertexBuffer instanced now.
@@ -168,16 +221,69 @@ public:
   GL::IGLBuffer* update(const Float32Array& data);
 
   /**
-   * @brief Updates directly the underlying WebGLBuffer according to the passed
-   * numeric array or Float32Array.
-   * @returns The directly updated WebGLBuffer.
+   *@brief  Updates directly the underlying WebGLBuffer according to the passed
+   *numeric array or Float32Array. Returns the directly updated WebGLBuffer.
+   * @param data the new data
+   * @param offset the new offset
+   * @param useBytes set to true if the offset is in bytes
    */
-  GL::IGLBuffer* updateDirectly(const Float32Array& data, int offset);
+  GL::IGLBuffer* updateDirectly(const Float32Array& data, size_t offset,
+                                bool useBytes = false);
 
   /**
    * @brief Disposes the VertexBuffer and the underlying WebGLBuffer.
    */
   void dispose();
+
+  /**
+   * @brief Enumerates each value of this vertex buffer as numbers.
+   * @param count the number of values to enumerate
+   * @param callback the callback function called for each value
+   */
+  void
+  forEach(size_t count,
+          const ::std::function<void(float value, size_t index)>& callback);
+
+  /**
+   * @brief Gets the byte length of the given type.
+   * @param type the type
+   * @returns the number of bytes
+   */
+  static unsigned int GetTypeByteLength(unsigned int type);
+
+  /**
+   * @brief Enumerates each value of the given parameters as numbers.
+   * @param data the data to enumerate
+   * @param byteOffset the byte offset of the data
+   * @param byteStride the byte stride of the data
+   * @param componentCount the number of components per element
+   * @param componentType the type of the component
+   * @param count the total number of components
+   * @param normalized whether the data is normalized
+   * @param callback the callback function called for each value
+   */
+  static void
+  ForEach(const Float32Array& data, size_t byteOffset, size_t byteStride,
+          size_t componentCount, unsigned int componentType, size_t count,
+          bool normalized,
+          const ::std::function<void(float value, size_t index)>& callback);
+
+  /**
+   * @brief Enumerates each value of the given parameters as numbers.
+   * @param data the data to enumerate
+   * @param byteOffset the byte offset of the data
+   * @param byteStride the byte stride of the data
+   * @param componentCount the number of components per element
+   * @param componentType the type of the component
+   * @param count the total number of components
+   * @param normalized whether the data is normalized
+   * @param callback the callback function called for each value
+   */
+  static void
+  ForEach(const Variant<ArrayBuffer, DataView>& data, size_t byteOffset,
+          size_t byteStride, size_t componentCount, unsigned int componentType,
+          size_t count, bool normalized,
+          const ::std::function<void(float value, size_t index)>& callback);
 
 private:
   /**
@@ -192,19 +298,41 @@ private:
 
   Buffer* _getBuffer() const;
 
+  static float _GetFloatValue(const DataView& dataView, unsigned int type,
+                              size_t byteOffset, bool normalized);
+
 public:
   /**
    * Instance divisor when in instanced mode
    */
   Property<VertexBuffer, unsigned int> instanceDivisor;
 
+  /**
+   * Gets the byte stride.
+   */
+  size_t byteStride;
+
+  /**
+   * Gets the byte offset.
+   */
+  size_t byteOffset;
+
+  /**
+   * Gets whether integer data values should be normalized into a certain range
+   * when being casted to a float.
+   */
+  bool normalized;
+
+  /**
+   * Gets the data type of each component in the array.
+   */
+  unsigned int type;
+
 private:
   unique_ptr_t<Buffer> _ownedBuffer;
   Buffer* _buffer;
   unsigned int _kind;
-  unsigned int _offset;
-  int _size;
-  int _stride;
+  size_t _size;
   bool _ownsBuffer;
   bool _instanced;
   unsigned int _instanceDivisor;

@@ -83,6 +83,9 @@ public:
    */
   bool doNotSerialize() const;
 
+  /**
+   * @brief Hidden
+   */
   void _rebuild();
 
   /**
@@ -116,8 +119,11 @@ public:
    * @brief Affect a vertex buffer to the geometry. the vertexBuffer.getKind()
    * function is used to determine where to store the data.
    * @param buffer defines the vertex buffer to use
+   * @param totalVertices defines the total number of vertices for position kind
+   * (could be null)
    */
-  void setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer);
+  void setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer,
+                         const Nullable<size_t>& totalVertices = nullptr);
 
   /**
    * @brief Update a specific vertex buffer.
@@ -128,9 +134,10 @@ public:
    * @param data defines the data to use
    * @param offset defines the offset in the target buffer where to store the
    * data
+   * @param useBytes set to true if the offset is in bytes
    */
   void updateVerticesDataDirectly(unsigned int kind, const Float32Array& data,
-                                  int offset);
+                                  size_t offset, bool useBytes = false);
 
   /**
    * @brief Update a specific vertex buffer.
@@ -144,6 +151,9 @@ public:
                                    bool updateExtends = false,
                                    bool makeItUnique  = false) override;
 
+  /**
+   * @brief Hidden
+   */
   void _bind(Effect* effect, GL::IGLBuffer* indexToBind = nullptr);
 
   /**
@@ -153,7 +163,8 @@ public:
   size_t getTotalVertices() const;
 
   /**
-   * Gets a specific vertex data attached to this geometry.
+   * @brief Gets a specific vertex data attached to this geometry. Float data is
+   * constructed if the vertex buffer data cannot be returned directly.
    * @param kind defines the data kind (Position, normal, etc...)
    * @param copyWhenShared defines if the returned array must be cloned upon
    * returning it if the current geometry is shared between multiple meshes
@@ -237,6 +248,9 @@ public:
    */
   GL::IGLBuffer* getIndexBuffer();
 
+  /**
+   * @brief Hidden
+   */
   void _releaseVertexArrayObject(Effect* effect = nullptr);
 
   /**
@@ -267,7 +281,15 @@ public:
   void toLeftHanded();
 
   // Cache
+
+  /**
+   * @brief Hidden
+   */
   void _resetPointsArrayCache();
+
+  /**
+   * @brief Hidden
+   */
   bool _generatePointsArray();
 
   /**
@@ -324,7 +346,14 @@ public:
    */
   static string_t RandomId();
 
+  /**
+   * @brief Hidden
+   */
   static void _ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh);
+
+  /**
+   * @brief Hidden
+   */
   static void _CleanMatricesWeights(const Json::value& parsedGeometry,
                                     Mesh* mesh);
 
@@ -354,8 +383,8 @@ protected:
            bool updatable = false, Mesh* mesh = nullptr);
 
 private:
-  void updateBoundingInfo(bool updateExtends, const Float32Array& data);
-  void updateExtend(const Float32Array& data, int stride = 3);
+  void _updateBoundingInfo(bool updateExtends, const Float32Array& data);
+  void _updateExtend(Float32Array data);
   void _applyToMesh(Mesh* mesh);
   void notifyUpdate(unsigned int kind = 1);
   void _queueLoad(Scene* scene, const ::std::function<void()>& onLoaded);
@@ -386,11 +415,16 @@ public:
     onGeometryUpdated;
 
   Uint32Array _delayInfoKinds;
+  /** Hidden */
   unique_ptr_t<BoundingInfo> _boundingInfo;
+  /** Hidden */
   ::std::function<void(const Json::value& parsedVertexData, Geometry* geometry)>
     _delayLoadingFunction;
+  /** Hidden */
   int _softwareSkinningRenderId;
-  vector_t<Vector3> _positions; // Cache
+  // Cache
+  /** Hidden */
+  vector_t<Vector3> _positions;
   unordered_map_t<string_t, unique_ptr_t<GL::IGLVertexArrayObject>>
     _vertexArrayObjects;
   bool _updatable;
@@ -406,6 +440,7 @@ private:
   bool _isDisposed;
   Nullable<MinMax> _extend;
   Nullable<Vector2> _boundingBias;
+  /** Hidden */
   Uint32Array _delayInfo;
   unique_ptr_t<GL::IGLBuffer> _indexBuffer;
   bool _indexBufferIsUpdatable;

@@ -1729,7 +1729,7 @@ AbstractMesh& AbstractMesh::alignWithNormal(Vector3& normal,
   return *this;
 }
 
-void AbstractMesh::checkOcclusionQuery()
+void AbstractMesh::_checkOcclusionQuery()
 {
   auto engine = getEngine();
 

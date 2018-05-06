@@ -9,6 +9,7 @@ namespace BABYLON {
 /**
  * @brief Abstract class used to provide common services for all typed
  * geometries.
+ * Hidden
  */
 class BABYLON_SHARED_EXPORT _PrimitiveGeometry : public Geometry {
 
@@ -46,7 +47,12 @@ public:
   Geometry* asNewGeometry(const string_t& id);
 
   // overrides
+
+  /**
+   * @brief Hidden
+   */
   void setAllVerticesData(VertexData* vertexData, bool updatable);
+
   AbstractMesh* setVerticesData(unsigned int kind, const Float32Array& data,
                                 bool updatable = false,
                                 int stride     = -1) override;
