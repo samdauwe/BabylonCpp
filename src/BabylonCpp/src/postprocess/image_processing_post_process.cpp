@@ -380,9 +380,6 @@ void ImageProcessingPostProcess::_updateParameters()
   else if (_defines.EXPOSURE) {
     defines += "#define EXPOSURE;\r\n";
   }
-  else if (_defines.GRAIN) {
-    defines += "#define GRAIN;\r\n";
-  }
 
   vector_t<string_t> samplers{"textureSampler"};
   ImageProcessingConfiguration::PrepareSamplers(samplers, _defines);

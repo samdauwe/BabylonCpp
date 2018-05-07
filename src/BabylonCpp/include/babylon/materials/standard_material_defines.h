@@ -90,8 +90,18 @@ struct BABYLON_SHARED_EXPORT StandardMaterialDefines
   static constexpr unsigned int SAMPLER3DGREENDEPTH        = 72;
   static constexpr unsigned int SAMPLER3DBGRMAP            = 73;
   static constexpr unsigned int IMAGEPROCESSINGPOSTPROCESS = 74;
-  static constexpr unsigned int EXPOSURE                   = 75;
-  static constexpr unsigned int GRAIN                      = 76;
+
+  /**
+   * If the reflection texture on this material is in linear color space
+   */
+  static constexpr unsigned int IS_REFLECTION_LINEAR = 75;
+
+  /**
+   * If the refraction texture on this material is in linear color space
+   */
+  static constexpr unsigned int IS_REFRACTION_LINEAR = 76;
+
+  static constexpr unsigned int EXPOSURE = 77;
 
   StandardMaterialDefines();
   ~StandardMaterialDefines();

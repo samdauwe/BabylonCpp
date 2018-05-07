@@ -118,36 +118,6 @@ public:
   void setContrast(float value);
 
   /**
-   * @brief Gets if the grain effect should be enabled.
-   */
-  bool grainEnabled() const;
-
-  /**
-   * @brief Sets if the grain effect should be enabled.
-   */
-  void setGrainEnabled(bool value);
-
-  /**
-   * @brief Gets the amount of grain to be applied by the grain effect.
-   */
-  float grainIntensity() const;
-
-  /**
-   * @brief Sets the amount of grain to be applied by the grain effect.
-   */
-  void setGrainIntensity(float value);
-
-  /**
-   * @brief Gets if the grain effect should be animated.
-   */
-  bool grainAnimated() const;
-
-  /**
-   * @brief Sets if the grain effect should be animated.
-   */
-  void setGrainAnimated(bool value);
-
-  /**
    * @brief Gets the vignette blend mode allowing different kind of effect.
    */
   unsigned int vignetteBlendMode() const;
@@ -313,9 +283,6 @@ private:
   bool _colorGradingWithGreenDepth;
   bool _colorGradingBGR;
   bool _toneMappingEnabled;
-  bool _grainEnabled;
-  float _grainIntensity;
-  bool _grainAnimated;
   unsigned int _vignetteBlendMode;
   bool _vignetteEnabled;
   bool _applyByPostProcess;

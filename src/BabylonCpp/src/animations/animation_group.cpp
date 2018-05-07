@@ -130,12 +130,6 @@ AnimationGroup& AnimationGroup::start(bool loop, float speedRatio,
   }
 
   for (auto& targetedAnimation : _targetedAnimations) {
-    if (!stl_util::contains(targetedAnimation->target->getAnimations(),
-                            targetedAnimation->animation)) {
-      targetedAnimation->target->getAnimations().emplace_back(
-        targetedAnimation->animation);
-    }
-
     _animatables.emplace_back(_scene->beginDirectAnimation(
       targetedAnimation->target, {targetedAnimation->animation},
       !from.isNull() ? *from : _from, !to.isNull() ? *to : _to, loop,
@@ -220,6 +214,24 @@ AnimationGroup& AnimationGroup::stop()
   }
 
   _isStarted = false;
+
+  return *this;
+}
+
+AnimationGroup& AnimationGroup::setWeightForAllAnimatables(float weight)
+{
+  for (auto& animatable : _animatables) {
+    animatable->weight = weight;
+  }
+
+  return *this;
+}
+
+AnimationGroup& AnimationGroup::syncAllAnimationsWith(Animatable* root)
+{
+  for (auto& animatable : _animatables) {
+    animatable->syncWith(root);
+  }
 
   return *this;
 }

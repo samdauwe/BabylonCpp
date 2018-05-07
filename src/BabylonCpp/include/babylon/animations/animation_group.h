@@ -90,6 +90,22 @@ public:
   AnimationGroup& stop();
 
   /**
+   * @brief Set animation weight for all animatables.
+   * @param weight defines the weight to use
+   * @return the animationGroup
+   * @see http://doc.babylonjs.com/babylon101/animations#animation-weights
+   */
+  AnimationGroup& setWeightForAllAnimatables(float weight);
+
+  /**
+   * @brief Synchronize and normalize all animatables with a source animatable.
+   * @param root defines the root animatable to synchronize with
+   * @return the animationGroup
+   * @see http://doc.babylonjs.com/babylon101/animations#animation-weights
+   */
+  AnimationGroup& syncAllAnimationsWith(Animatable* root);
+
+  /**
    * @brief Goes to a specific frame in this animation group
    *
    * @param frame the frame number to go to

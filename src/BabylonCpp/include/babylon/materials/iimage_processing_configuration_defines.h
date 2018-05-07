@@ -24,10 +24,6 @@ struct BABYLON_SHARED_EXPORT IImageProcessingConfigurationDefines {
   bool SAMPLER3DGREENDEPTH        = false;
   bool SAMPLER3DBGRMAP            = false;
   bool IMAGEPROCESSINGPOSTPROCESS = false;
-  /**
-   * If the grain should be performed in the image processing shader.
-   */
-  bool GRAIN = false;
 }; // end of struct IImageProcessingConfigurationDefines
 
 } // end of namespace BABYLON

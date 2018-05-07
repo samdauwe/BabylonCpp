@@ -79,8 +79,9 @@ StandardMaterialDefines::StandardMaterialDefines() : MaterialDefines{}
            "SAMPLER3DGREENDEPTH",
            "SAMPLER3DBGRMAP",
            "IMAGEPROCESSINGPOSTPROCESS",
-           "EXPOSURE",
-           "GRAIN"};
+           "IS_REFLECTION_LINEAR",
+           "IS_REFRACTION_LINEAR",
+           "EXPOSURE"};
   rebuild();
 
   DIFFUSEDIRECTUV       = 0;

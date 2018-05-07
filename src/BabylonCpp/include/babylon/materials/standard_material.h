@@ -293,6 +293,12 @@ public:
   float parallaxScaleBias;
   float indexOfRefraction;
   bool invertRefractionY;
+
+  /**
+   * Defines the alpha limits in alpha test mode
+   */
+  float alphaCutOff;
+
   ::std::function<string_t(
     const string_t& shaderName, vector_t<string_t>& uniforms,
     vector_t<string_t>& uniformBuffers, vector_t<string_t>& samplers,

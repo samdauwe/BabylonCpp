@@ -56,6 +56,7 @@ StandardMaterial::StandardMaterial(const string_t& iName, Scene* scene)
     , parallaxScaleBias{0.05f}
     , indexOfRefraction{0.98f}
     , invertRefractionY{true}
+    , alphaCutOff{0.4f}
     , customShaderNameResolve{nullptr}
     , _worldViewProjectionMatrix{Matrix::Zero()}
     , _globalAmbientColor{Color3(0.f, 0.f, 0.f)}
@@ -501,6 +502,11 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     }
 
     _imageProcessingConfiguration->prepareDefines(defines);
+
+    defines.defines[SMD::IS_REFLECTION_LINEAR]
+      = (reflectionTexture() != nullptr && !reflectionTexture()->gammaSpace);
+    defines.defines[SMD::IS_REFRACTION_LINEAR]
+      = (refractionTexture() != nullptr && !refractionTexture()->gammaSpace);
   }
 
   if (defines._areFresnelDirty) {
@@ -702,7 +708,8 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                 "vReflectionPosition",
                                 "vReflectionSize",
                                 "logarithmicDepthConstant",
-                                "vTangentSpaceParams"};
+                                "vTangentSpaceParams",
+                                "alphaCutOff"};
     vector_t<string_t> samplers{
       "diffuseSampler",        "ambientSampler",      "opacitySampler",
       "reflectionCubeSampler", "reflection2DSampler", "emissiveSampler",
@@ -799,12 +806,19 @@ void StandardMaterial::buildUniformLayout()
 void StandardMaterial::unbind()
 {
   if (_activeEffect) {
+    auto needFlag = false;
     if (_reflectionTexture && _reflectionTexture->isRenderTarget) {
       _activeEffect->setTexture("reflection2DSampler", nullptr);
+      needFlag = true;
     }
 
     if (_refractionTexture && _refractionTexture->isRenderTarget) {
       _activeEffect->setTexture("refraction2DSampler", nullptr);
+      needFlag = true;
+    }
+
+    if (needFlag) {
+      _markAllSubMeshesAsTexturesDirty();
     }
   }
 
@@ -910,6 +924,10 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
             static_cast<float>(_diffuseTexture->level), "");
           MaterialHelper::BindTextureMatrix(*_diffuseTexture, *_uniformBuffer,
                                             "diffuse");
+
+          if (_diffuseTexture->hasAlpha()) {
+            effect->setFloat("alphaCutOff", alphaCutOff);
+          }
         }
 
         if (_ambientTexture && StandardMaterial::AmbientTextureEnabled()) {

@@ -17,6 +17,7 @@ public:
   ~Animatable();
 
   /** Methods **/
+
   /**
    * @brief Synchronize and normalize current Animatable with a source
    * Animatable. This is useful when using animation weights and when animations
@@ -81,9 +82,25 @@ public:
   int toFrame;
   bool loopAnimation;
   ::std::function<void()> onAnimationEnd;
+
+  /**
+   * Root Animatable used to synchronize and normalize animations
+   */
   ReadOnlyProperty<Animatable, Animatable*> syncRoot;
+
+  /**
+   * Current frame of the first RuntimeAnimation
+   */
   ReadOnlyProperty<Animatable, int> masterFrame;
+
+  /**
+   * Animatable weight (-1.0 by default meaning not weighted)
+   */
   Property<Animatable, float> weight;
+
+  /**
+   * Speed ratio to apply to the animatable (1.0 by default)
+   */
   Property<Animatable, float> speedRatio;
 
 private:

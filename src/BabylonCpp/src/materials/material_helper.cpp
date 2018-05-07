@@ -260,9 +260,7 @@ bool MaterialHelper::PrepareDefinesForLights(
             defines.projectedLightTexture.resize(lightIndex + 1);
           }
           defines.projectedLightTexture[lightIndex]
-            = spotLight->projectionTexture() ?
-                spotLight->projectionTexture()->isReady() :
-                false;
+            = spotLight->projectionTexture() ? true : false;
         }
       }
       else if (light->getTypeID() == Light::LIGHTTYPEID_HEMISPHERICLIGHT()) {
