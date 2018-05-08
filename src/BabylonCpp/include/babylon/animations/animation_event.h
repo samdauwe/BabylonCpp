@@ -11,14 +11,35 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT AnimationEvent {
 
 public:
+  /**
+   * @brief Initializes the animation event.
+   * @param frame The frame for which the event is triggered
+   * @param action The event to perform when triggered
+   * @param onlyOnce Specifies if the event should be triggered only once
+   */
   AnimationEvent(int frame, const ::std::function<void()>& action,
                  bool onlyOnce = false);
   ~AnimationEvent();
 
 public:
+  /**
+   * The frame for which the event is triggered
+   */
   int frame;
+
+  /**
+   * The event to perform when triggered
+   */
   ::std::function<void()> action;
+
+  /**
+   * Specifies if the event should be triggered only once
+   */
   bool onlyOnce;
+
+  /**
+   * Specifies if the animation event is done
+   */
   bool isDone;
 
 }; // end of class AnimationEvent

@@ -14,10 +14,14 @@ struct EnumClassHashFunction {
 };
 
 /** Animation types **/
+
+/**
+ * @brief Enum for the animation key frame interpolation type.
+ */
 enum class AnimationKeyInterpolation {
   /**
    * Do not interpolate between keys and use the start key value only. Tangents
-   * are ignored.
+   * are ignored
    */
   STEP = 1
 }; // end of enum class AnimationKeyInterpolation

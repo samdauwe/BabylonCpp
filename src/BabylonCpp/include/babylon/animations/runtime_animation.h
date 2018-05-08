@@ -38,7 +38,6 @@ public:
                float speedRatio, float weight = -1.f);
 
 private:
-  AnimationValue _getKeyValue(const AnimationValue& value) const;
   AnimationValue
   _interpolate(int currentFrame, int repeatCount, unsigned int loopMode,
                const AnimationValue& offsetValue    = AnimationValue(),

@@ -23,9 +23,16 @@ namespace BABYLON {
 
 bool Animation::_AllowMatricesInterpolation = false;
 
+bool Animation::_AllowMatrixDecomposeForInterpolation = true;
+
 bool Animation::AllowMatricesInterpolation()
 {
   return _AllowMatricesInterpolation;
+}
+
+bool Animation::AllowMatrixDecomposeForInterpolation()
+{
+  return _AllowMatrixDecomposeForInterpolation;
 }
 
 Animation* Animation::_PrepareAnimation(
@@ -361,11 +368,256 @@ Color3 Animation::color3InterpolateFunction(const Color3& startValue,
   return Color3::Lerp(startValue, endValue, gradient);
 }
 
-Matrix Animation::matrixInterpolateFunction(const Matrix& startValue,
-                                            const Matrix& endValue,
+AnimationValue Animation::_getKeyValue(const AnimationValue& value) const
+{
+  return value;
+}
+
+AnimationValue Animation::_interpolate(int currentFrame, int repeatCount,
+                                       Nullable<Matrix>& workValue,
+                                       unsigned int loopMode,
+                                       const AnimationValue& offsetValue,
+                                       const AnimationValue& highLimitValue)
+{
+  if (loopMode == Animation::ANIMATIONLOOPMODE_CONSTANT() && repeatCount > 0) {
+    return highLimitValue.copy();
+  }
+
+  auto _repeatCount = static_cast<float>(repeatCount);
+
+  auto& keys = getKeys();
+
+  // Try to get a hash to find the right key
+  int _keysLength   = static_cast<int>(keys.size());
+  int startKeyIndex = ::std::max(
+    0, ::std::min(_keysLength - 1,
+                  static_cast<int>(
+                    ::std::floor(_keysLength * (currentFrame - keys[0].frame)
+                                 / (keys.back().frame - keys[0].frame))
+                    - 1)));
+
+  if (keys[static_cast<unsigned int>(startKeyIndex)].frame >= currentFrame) {
+    while (startKeyIndex - 1 >= 0
+           && keys[static_cast<unsigned int>(startKeyIndex)].frame
+                >= currentFrame) {
+      --startKeyIndex;
+    }
+  }
+
+  for (size_t key = static_cast<size_t>(startKeyIndex); key < keys.size();
+       ++key) {
+    const auto& endKey = keys[key + 1];
+
+    if (endKey.frame >= currentFrame) {
+
+      const auto& startKey = keys[key];
+      auto startValue      = _getKeyValue(startKey.value);
+      if ((*startKey.interpolation).dataType
+          == static_cast<int>(AnimationKeyInterpolation::STEP)) {
+        return startValue;
+      }
+      auto endValue = _getKeyValue(endKey.value);
+
+      bool useTangent  = startKey.outTangent && endKey.inTangent;
+      float frameDelta = static_cast<float>(endKey.frame - startKey.frame);
+
+      // gradient : percent of currentFrame between the frame inf and the frame
+      // sup
+      float gradient
+        = static_cast<float>(currentFrame - startKey.frame) / frameDelta;
+
+      // check for easingFunction and correction of gradient
+      auto easingFunction = getEasingFunction();
+      if (easingFunction != nullptr) {
+        gradient = easingFunction->ease(gradient);
+      }
+
+      auto newVale = keys[key].value.copy();
+
+      switch (dataType) {
+        // Float
+        case Animation::ANIMATIONTYPE_FLOAT(): {
+          const auto floatValue
+            = useTangent ?
+                floatInterpolateFunctionWithTangents(
+                  startValue.floatData, startKey.outTangent * frameDelta,
+                  endValue.floatData, endKey.inTangent * frameDelta, gradient) :
+                floatInterpolateFunction(startValue.floatData,
+                                         endValue.floatData, gradient);
+          switch (loopMode) {
+            case Animation::ANIMATIONLOOPMODE_CYCLE():
+            case Animation::ANIMATIONLOOPMODE_CONSTANT():
+              newVale.floatData = floatValue;
+              return newVale;
+            case Animation::ANIMATIONLOOPMODE_RELATIVE():
+              newVale.floatData
+                = offsetValue.floatData * _repeatCount + floatValue;
+              return newVale;
+            default:
+              break;
+          }
+        } break;
+        // Quaternion
+        case Animation::ANIMATIONTYPE_QUATERNION(): {
+          const auto quatValue
+            = useTangent ?
+                quaternionInterpolateFunctionWithTangents(
+                  startValue.quaternionData,
+                  (*startKey.outTangent).quaternionData.scale(frameDelta),
+                  endValue.quaternionData,
+                  (*endKey.inTangent).quaternionData.scale(frameDelta),
+                  gradient) :
+                quaternionInterpolateFunction(
+                  startValue.quaternionData, endValue.quaternionData, gradient);
+          switch (loopMode) {
+            case Animation::ANIMATIONLOOPMODE_CYCLE():
+            case Animation::ANIMATIONLOOPMODE_CONSTANT():
+              newVale.quaternionData = quatValue;
+              return newVale;
+            case Animation::ANIMATIONLOOPMODE_RELATIVE():
+              newVale.quaternionData
+                = quatValue.add(offsetValue.quaternionData.scale(_repeatCount));
+              return newVale;
+            default:
+              break;
+          }
+        } break;
+        // Vector3
+        case Animation::ANIMATIONTYPE_VECTOR3(): {
+          const auto vec3Value
+            = useTangent ?
+                vector3InterpolateFunctionWithTangents(
+                  startValue.vector3Data,
+                  (*startKey.outTangent).vector3Data.scale(frameDelta),
+                  endValue.vector3Data,
+                  (*endKey.inTangent).vector3Data.scale(frameDelta), gradient) :
+                vector3InterpolateFunction(startValue.vector3Data,
+                                           endValue.vector3Data, gradient);
+          switch (loopMode) {
+            case Animation::ANIMATIONLOOPMODE_CYCLE():
+            case Animation::ANIMATIONLOOPMODE_CONSTANT():
+              newVale.vector3Data = vec3Value;
+              return newVale;
+            case Animation::ANIMATIONLOOPMODE_RELATIVE():
+              newVale.vector3Data
+                = vec3Value.add(offsetValue.vector3Data.scale(_repeatCount));
+              return newVale;
+            default:
+              break;
+          }
+        } break;
+        // Vector2
+        case Animation::ANIMATIONTYPE_VECTOR2(): {
+          const auto vec2Value
+            = useTangent ?
+                vector2InterpolateFunctionWithTangents(
+                  startValue.vector2Data,
+                  (*startKey.outTangent).vector2Data.scale(frameDelta),
+                  endValue.vector2Data,
+                  (*endKey.inTangent).vector2Data.scale(frameDelta), gradient) :
+                vector2InterpolateFunction(startValue.vector2Data,
+                                           endValue.vector2Data, gradient);
+          switch (loopMode) {
+            case Animation::ANIMATIONLOOPMODE_CYCLE():
+            case Animation::ANIMATIONLOOPMODE_CONSTANT():
+              newVale.vector2Data = vec2Value;
+              return newVale;
+            case Animation::ANIMATIONLOOPMODE_RELATIVE():
+              newVale.vector2Data
+                = vec2Value.add(offsetValue.vector2Data.scale(_repeatCount));
+              return newVale;
+            default:
+              break;
+          }
+        } break;
+        // Size
+        case Animation::ANIMATIONTYPE_SIZE():
+          switch (loopMode) {
+            case Animation::ANIMATIONLOOPMODE_CYCLE():
+            case Animation::ANIMATIONLOOPMODE_CONSTANT():
+              newVale.sizeData = sizeInterpolateFunction(
+                startValue.sizeData, endValue.sizeData, gradient);
+              return newVale;
+            case Animation::ANIMATIONLOOPMODE_RELATIVE():
+              newVale.sizeData
+                = sizeInterpolateFunction(startValue.sizeData,
+                                          endValue.sizeData, gradient)
+                    .add(offsetValue.sizeData.scale(_repeatCount));
+              return newVale;
+            default:
+              break;
+          }
+          break;
+        // Color3
+        case Animation::ANIMATIONTYPE_COLOR3():
+          switch (loopMode) {
+            case Animation::ANIMATIONLOOPMODE_CYCLE():
+            case Animation::ANIMATIONLOOPMODE_CONSTANT():
+              newVale.color3Data = color3InterpolateFunction(
+                startValue.color3Data, endValue.color3Data, gradient);
+              return newVale;
+            case Animation::ANIMATIONLOOPMODE_RELATIVE():
+              newVale.color3Data
+                = color3InterpolateFunction(startValue.color3Data,
+                                            endValue.color3Data, gradient)
+                    .add(offsetValue.color3Data.scale(_repeatCount));
+              return newVale;
+            default:
+              break;
+          }
+          break;
+        // Matrix
+        case Animation::ANIMATIONTYPE_MATRIX():
+          switch (loopMode) {
+            case Animation::ANIMATIONLOOPMODE_CYCLE():
+            case Animation::ANIMATIONLOOPMODE_CONSTANT():
+              if (Animation::AllowMatricesInterpolation()) {
+                auto _workValue    = *workValue;
+                newVale.matrixData = matrixInterpolateFunction(
+                  startValue.matrixData, endValue.matrixData, gradient,
+                  _workValue);
+                workValue = _workValue;
+                return newVale;
+              }
+              newVale.matrixData = startValue.matrixData;
+              return newVale;
+            case Animation::ANIMATIONLOOPMODE_RELATIVE():
+              newVale.matrixData = startValue.matrixData;
+              return newVale;
+            default:
+              break;
+          }
+          break;
+        default:
+          break;
+      }
+      break;
+    }
+  }
+  return _getKeyValue(keys.back().value);
+}
+
+Matrix Animation::matrixInterpolateFunction(Matrix& startValue,
+                                            Matrix& endValue,
                                             float gradient) const
 {
+  if (Animation::AllowMatrixDecomposeForInterpolation()) {
+    return Matrix::DecomposeLerp(startValue, endValue, gradient);
+  }
   return Matrix::Lerp(startValue, endValue, gradient);
+}
+
+Matrix Animation::matrixInterpolateFunction(Matrix& startValue,
+                                            Matrix& endValue, float gradient,
+                                            Matrix& result) const
+{
+  if (Animation::AllowMatrixDecomposeForInterpolation()) {
+    Matrix::DecomposeLerpToRef(startValue, endValue, gradient, result);
+    return result;
+  }
+
+  Matrix::LerpToRef(startValue, endValue, gradient, result);
+  return result;
 }
 
 unique_ptr_t<Animation> Animation::clone() const
