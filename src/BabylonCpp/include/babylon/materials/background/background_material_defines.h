@@ -9,7 +9,7 @@ namespace BABYLON {
 
 /**
  * @brief Background material defines definition.
- * Ignore Mainly internal Use
+ * Hidden Mainly internal Use
  */
 struct BABYLON_SHARED_EXPORT BackgroundMaterialDefines
     : public MaterialDefines,
@@ -69,31 +69,37 @@ struct BABYLON_SHARED_EXPORT BackgroundMaterialDefines
   static constexpr unsigned int USERGBCOLOR = 9;
 
   /**
+   * True if highlight and shadow levels have been specified. It can help
+   * ensuring the main perceived color stays aligned with the desired
+   * configuration.
+   */
+  static constexpr unsigned int USEHIGHLIGHTANDSHADOWCOLORS = 10;
+
+  /**
    * True to add noise in order to reduce the banding effect.
    */
-  static constexpr unsigned int NOISE = 10;
+  static constexpr unsigned int NOISE = 11;
 
   /**
    * is the reflection texture in BGR color scheme?
    * Mainly used to solve a bug in ios10 video tag
    */
-  static constexpr unsigned int REFLECTIONBGR = 11;
+  static constexpr unsigned int REFLECTIONBGR = 12;
 
   // Image Processing Configuration.
-  static constexpr unsigned int IMAGEPROCESSING            = 12;
-  static constexpr unsigned int VIGNETTE                   = 13;
-  static constexpr unsigned int VIGNETTEBLENDMODEMULTIPLY  = 14;
-  static constexpr unsigned int VIGNETTEBLENDMODEOPAQUE    = 15;
-  static constexpr unsigned int TONEMAPPING                = 16;
-  static constexpr unsigned int CONTRAST                   = 17;
-  static constexpr unsigned int COLORCURVES                = 18;
-  static constexpr unsigned int COLORGRADING               = 19;
-  static constexpr unsigned int COLORGRADING3D             = 20;
-  static constexpr unsigned int SAMPLER3DGREENDEPTH        = 21;
-  static constexpr unsigned int SAMPLER3DBGRMAP            = 22;
-  static constexpr unsigned int IMAGEPROCESSINGPOSTPROCESS = 23;
-  static constexpr unsigned int EXPOSURE                   = 24;
-  static constexpr unsigned int GRAIN                      = 25;
+  static constexpr unsigned int IMAGEPROCESSING            = 13;
+  static constexpr unsigned int VIGNETTE                   = 14;
+  static constexpr unsigned int VIGNETTEBLENDMODEMULTIPLY  = 15;
+  static constexpr unsigned int VIGNETTEBLENDMODEOPAQUE    = 16;
+  static constexpr unsigned int TONEMAPPING                = 17;
+  static constexpr unsigned int CONTRAST                   = 18;
+  static constexpr unsigned int COLORCURVES                = 19;
+  static constexpr unsigned int COLORGRADING               = 20;
+  static constexpr unsigned int COLORGRADING3D             = 21;
+  static constexpr unsigned int SAMPLER3DGREENDEPTH        = 22;
+  static constexpr unsigned int SAMPLER3DBGRMAP            = 23;
+  static constexpr unsigned int IMAGEPROCESSINGPOSTPROCESS = 24;
+  static constexpr unsigned int EXPOSURE                   = 25;
 
   // Reflection.
   static constexpr unsigned int REFLECTION                          = 26;

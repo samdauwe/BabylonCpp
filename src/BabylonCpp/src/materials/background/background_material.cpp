@@ -37,15 +37,12 @@ BackgroundMaterial::BackgroundMaterial(const string_t& iName, Scene* scene)
     : PushMaterial{iName, scene}
     , useEquirectangularFOV{false}
     , _primaryColor{Color3::White()}
-    , _primaryLevel{1.f}
-    , _secondaryColor{Color3::Gray()}
-    , _secondaryLevel{1.f}
-    , _tertiaryColor{Color3::Black()}
-    , _tertiaryLevel{1.f}
+    , __perceptualColor{nullptr}
+    , _primaryColorShadowLevel{0.f}
+    , _primaryColorHighlightLevel{0.f}
     , _reflectionTexture{nullptr}
     , _reflectionBlur{0.f}
     , _diffuseTexture{nullptr}
-    , _shadowBlurScale{1}
     , _shadowLevel{0.f}
     , _sceneCenter{Vector3::Zero()}
     , _opacityFresnel{true}
@@ -62,6 +59,9 @@ BackgroundMaterial::BackgroundMaterial(const string_t& iName, Scene* scene)
     , switchToBGR{false}
     , _imageProcessingObserver{nullptr}
     , _reflectionControls{Vector4::Zero()}
+    , _white{Color3::White()}
+    , _primaryShadowColor{Color3::Black()}
+    , _primaryHighlightColor{Color3::Black()}
 {
   // Setup the default processing configuration to the scene.
   _attachImageProcessingConfiguration(nullptr);
@@ -147,6 +147,7 @@ void BackgroundMaterial::_attachImageProcessingConfiguration(
   _imageProcessingObserver
     = _imageProcessingConfiguration->onUpdateParameters.add(
       [this](ImageProcessingConfiguration* /*conf*/, EventState /*es*/) {
+        _computePrimaryColorFromPerceptualColor();
         _markAllSubMeshesAsImageProcessingDirty();
       });
 }
@@ -380,6 +381,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
       }
       else {
         defines.defines[BMD::REFLECTION]                          = false;
+        defines.defines[BMD::REFLECTIONFRESNEL]                   = false;
         defines.defines[BMD::REFLECTIONFALLOFF]                   = false;
         defines.defines[BMD::REFLECTIONBLUR]                      = false;
         defines.defines[BMD::REFLECTIONMAP_3D]                    = false;
@@ -407,6 +409,13 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     defines.defines[BMD::NOISE]       = _enableNoise;
   }
 
+  if (defines._areLightsDirty) {
+    defines.defines[BMD::USEHIGHLIGHTANDSHADOWCOLORS]
+      = !_useRGBColor
+        && (_primaryColorShadowLevel != 0.f
+            || _primaryColorHighlightLevel != 0.f);
+  }
+
   if (defines._areImageProcessingDirty) {
     if (!_imageProcessingConfiguration->isReady()) {
       return false;
@@ -415,7 +424,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     _imageProcessingConfiguration->prepareDefines(defines);
   }
 
-    // Misc.
+  // Misc.
 #if 0
   MaterialHelper::PrepareDefinesForMisc(
     mesh, scene, false, pointsCloud(), fogEnabled(),
@@ -498,8 +507,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                 "vClipPlane",
                                 "mBones",
                                 "vPrimaryColor",
-                                "vSecondaryColor",
-                                "vTertiaryColor",
+                                "vPrimaryColorShadow",
                                 "vReflectionInfos",
                                 "reflectionMatrix",
                                 "vReflectionMicrosurfaceInfos",
@@ -562,12 +570,49 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   return true;
 }
 
+void BackgroundMaterial::_computePrimaryColorFromPerceptualColor()
+{
+  if (!__perceptualColor) {
+    return;
+  }
+
+  _primaryColor.copyFrom(*__perceptualColor);
+
+  // Revert gamma space.
+  _primaryColor.toLinearSpaceToRef(_primaryColor);
+
+  // Revert image processing configuration.
+  if (_imageProcessingConfiguration) {
+    // Revert Exposure.
+    _primaryColor.scaleToRef(1.f / _imageProcessingConfiguration->exposure(),
+                             _primaryColor);
+  }
+
+  _computePrimaryColors();
+}
+
+void BackgroundMaterial::_computePrimaryColors()
+{
+  if (_primaryColorShadowLevel == 0.f && _primaryColorHighlightLevel == 0.f) {
+    return;
+  }
+
+  // Find the highlight color based on the configuration.
+  _primaryColor.scaleToRef(_primaryColorShadowLevel, _primaryShadowColor);
+  _primaryColor.subtractToRef(_primaryShadowColor, _primaryShadowColor);
+
+  // Find the shadow color based on the configuration.
+  _white.subtractToRef(_primaryColor, _primaryHighlightColor);
+  _primaryHighlightColor.scaleToRef(_primaryColorHighlightLevel,
+                                    _primaryHighlightColor);
+  _primaryColor.addToRef(_primaryHighlightColor, _primaryHighlightColor);
+}
+
 void BackgroundMaterial::buildUniformLayout()
 {
   // Order is important !
   _uniformBuffer->addUniform("vPrimaryColor", 4);
-  _uniformBuffer->addUniform("vSecondaryColor", 4);
-  _uniformBuffer->addUniform("vTertiaryColor", 4);
+  _uniformBuffer->addUniform("vPrimaryColorShadow", 4);
   _uniformBuffer->addUniform("vDiffuseInfos", 2);
   _uniformBuffer->addUniform("vReflectionInfos", 2);
   _uniformBuffer->addUniform("diffuseMatrix", 16);
@@ -668,12 +713,15 @@ void BackgroundMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
         _uniformBuffer->updateFloat("pointSize", pointSize);
       }
 
-      _uniformBuffer->updateColor4("vPrimaryColor", _primaryColor,
-                                   _primaryLevel, "");
-      _uniformBuffer->updateColor4("vSecondaryColor", _secondaryColor,
-                                   _secondaryLevel, "");
-      _uniformBuffer->updateColor4("vTertiaryColor", _tertiaryColor,
-                                   _tertiaryLevel, "");
+      if (defines.defines[BMD::USEHIGHLIGHTANDSHADOWCOLORS]) {
+        _uniformBuffer->updateColor4("vPrimaryColor", _primaryHighlightColor,
+                                     1.f, "");
+        _uniformBuffer->updateColor4("vPrimaryColorShadow", _primaryShadowColor,
+                                     1.f, "");
+      }
+      else {
+        _uniformBuffer->updateColor4("vPrimaryColor", _primaryColor, 1.f, "");
+      }
     }
 
     _uniformBuffer->updateFloat("fFovMultiplier", _fovMultiplier);
@@ -798,54 +846,40 @@ void BackgroundMaterial::setPrimaryColor(const Color3& value)
   _primaryColor = value;
 }
 
-float BackgroundMaterial::primaryLevel() const
+Nullable<Color3>& BackgroundMaterial::_perceptualColor()
 {
-  return _primaryLevel;
+  return __perceptualColor;
 }
 
-void BackgroundMaterial::setPrimaryLevel(float value)
+void BackgroundMaterial::setPerceptualColor(const Nullable<Color3>& value)
 {
-  _primaryLevel = value;
+  __perceptualColor = value;
+  _computePrimaryColorFromPerceptualColor();
+  _markAllSubMeshesAsLightsDirty();
 }
 
-const Color3& BackgroundMaterial::secondaryColor() const
+float BackgroundMaterial::primaryColorShadowLevel() const
 {
-  return _secondaryColor;
+  return _primaryColorShadowLevel;
 }
 
-void BackgroundMaterial::setSecondaryColor(const Color3& value)
+void BackgroundMaterial::setPrimaryColorShadowLevel(float value)
 {
-  _secondaryColor = value;
+  _primaryColorShadowLevel = value;
+  _computePrimaryColors();
+  _markAllSubMeshesAsLightsDirty();
 }
 
-float BackgroundMaterial::secondaryLevel() const
+float BackgroundMaterial::primaryColorHighlightLevel() const
 {
-  return _secondaryLevel;
+  return _primaryColorHighlightLevel;
 }
 
-void BackgroundMaterial::setSecondaryLevel(float value)
+void BackgroundMaterial::setPrimaryColorHighlightLevel(float value)
 {
-  _secondaryLevel = value;
-}
-
-const Color3& BackgroundMaterial::tertiaryColor() const
-{
-  return _tertiaryColor;
-}
-
-void BackgroundMaterial::setTertiaryColor(const Color3& value)
-{
-  _tertiaryColor = value;
-}
-
-float BackgroundMaterial::tertiaryLevel() const
-{
-  return _tertiaryLevel;
-}
-
-void BackgroundMaterial::setTertiaryLevel(float value)
-{
-  _tertiaryLevel = value;
+  _primaryColorHighlightLevel = value;
+  _computePrimaryColors();
+  _markAllSubMeshesAsLightsDirty();
 }
 
 BaseTexture* BackgroundMaterial::reflectionTexture() const

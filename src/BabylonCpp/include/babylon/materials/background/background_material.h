@@ -260,16 +260,12 @@ public:
   /** Getters / Setters **/
   const Color3& primaryColor() const;
   void setPrimaryColor(const Color3& value);
-  float primaryLevel() const;
-  void setPrimaryLevel(float value);
-  const Color3& secondaryColor() const;
-  void setSecondaryColor(const Color3& value);
-  float secondaryLevel() const;
-  void setSecondaryLevel(float value);
-  const Color3& tertiaryColor() const;
-  void setTertiaryColor(const Color3& value);
-  float tertiaryLevel() const;
-  void setTertiaryLevel(float value);
+  Nullable<Color3>& _perceptualColor();
+  void setPerceptualColor(const Nullable<Color3>& value);
+  float primaryColorShadowLevel() const;
+  void setPrimaryColorShadowLevel(float value);
+  float primaryColorHighlightLevel() const;
+  void setPrimaryColorHighlightLevel(float value);
   BaseTexture* reflectionTexture() const;
   void setReflectionTexture(RenderTargetTexture* value);
   BaseTexture* diffuseTexture() const;
@@ -301,6 +297,18 @@ protected:
   void _attachImageProcessingConfiguration(
     ImageProcessingConfiguration* configuration);
 
+private:
+  /**
+   * @brief Compute the primary color according to the chosen perceptual color.
+   */
+  void _computePrimaryColorFromPerceptualColor();
+
+  /**
+   * @brief Compute the highlights and shadow colors according to their chosen
+   * levels.
+   */
+  void _computePrimaryColors();
+
 public:
   /**
    * Enable the FOV adjustment feature controlled by fovMultiplier.
@@ -309,37 +317,36 @@ public:
 
 protected:
   /**
-   * Key light Color (multiply against the R channel of the environement
-   * texture)
+   * Key light Color (multiply against the environement texture)
    */
   Color3 _primaryColor;
 
   /**
-   * Key light Level (allowing HDR output of the background)
+   * Experimental Internal Use Only.
+   *
+   * Key light Color in "perceptual value" meaning the color you would like to
+   * see on screen. This acts as a helper to set the primary color to a more
+   * "human friendly" value. Conversion to linear space as well as exposure and
+   * tone mapping correction will be applied to keep the output color as close
+   * as possible from the chosen value. (This does not account for contrast
+   * color grading and color curves as they are considered post effect and not
+   * directly part of lighting setup.)
    */
-  float _primaryLevel;
+  Nullable<Color3> __perceptualColor;
 
   /**
-   * Secondary light Color (multiply against the G channel of the environement
-   * texture)
+   * Defines the level of the shadows (dark area of the reflection map) in order
+   * to help scaling the colors. The color opposite to the primary color is used
+   * at the level chosen to define what the black area would look.
    */
-  Color3 _secondaryColor;
+  float _primaryColorShadowLevel;
 
   /**
-   * Secondary light Level (allowing HDR output of the background)
+   * Defines the level of the highliights (highlight area of the reflection map)
+   * in order to help scaling the colors. The primary color is used at the level
+   * chosen to define what the white area would look.
    */
-  float _secondaryLevel;
-
-  /**
-   * Tertiary light Color (multiply against the B channel of the environement
-   * texture)
-   */
-  Color3 _tertiaryColor;
-
-  /**
-   * Tertiary light Level (allowing HDR output of the background)
-   */
-  float _tertiaryLevel;
+  float _primaryColorHighlightLevel;
 
   /**
    * Reflection Texture used in the material.
@@ -369,13 +376,6 @@ protected:
    * All scene shadow lights will be included if null.
    */
   vector_t<IShadowLight*> _shadowLights;
-
-  /**
-   * For the lights having a blurred shadow generator, this can add a second
-   * blur pass in order to reach
-   * soft lighting on the background.
-   */
-  int _shadowBlurScale;
 
   /**
    * Helps adjusting the shadow to a softer level if required.
@@ -488,6 +488,9 @@ private:
   // Temp values kept as cache in the material.
   vector_t<RenderTargetTexture*> _renderTargets;
   Vector4 _reflectionControls;
+  Color3 _white;
+  Color3 _primaryShadowColor;
+  Color3 _primaryHighlightColor;
 
 }; // end of class BackgroundMaterial
 

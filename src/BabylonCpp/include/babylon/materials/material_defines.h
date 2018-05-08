@@ -154,19 +154,30 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   bool USERIGHTHANDEDSYSTEM;
 
   bool _isDirty;
+  /** Hidden */
   int _renderId;
 
+  /** Hidden */
   bool _areLightsDirty;
+  /** Hidden */
   bool _areAttributesDirty;
+  /** Hidden */
   bool _areTexturesDirty;
+  /** Hidden */
   bool _areFresnelDirty;
+  /** Hidden */
   bool _areMiscDirty;
+  /** Hidden */
   bool _areImageProcessingDirty;
 
+  /** Hidden */
   bool _normals;
+  /** Hidden */
   bool _uvs;
 
+  /** Hidden */
   bool _needNormals;
+  /** Hidden */
   bool _needUVs;
 
 }; // end of struct MaterialDefines
