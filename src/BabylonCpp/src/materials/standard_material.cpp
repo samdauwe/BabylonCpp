@@ -347,10 +347,6 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           defines.defines[SMD::REFLECTIONMAP_3D] = _reflectionTexture->isCube;
 
           switch (_reflectionTexture->coordinatesMode()) {
-            case TextureConstants::CUBIC_MODE:
-            case TextureConstants::INVCUBIC_MODE:
-              defines.setReflectionMode(SMD::REFLECTIONMAP_CUBIC);
-              break;
             case TextureConstants::EXPLICIT_MODE:
               defines.setReflectionMode(SMD::REFLECTIONMAP_EXPLICIT);
               break;
@@ -376,6 +372,10 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
             case TextureConstants::FIXED_EQUIRECTANGULAR_MIRRORED_MODE:
               defines.setReflectionMode(
                 SMD::REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED);
+              break;
+            case TextureConstants::CUBIC_MODE:
+            case TextureConstants::INVCUBIC_MODE:
+              defines.setReflectionMode(SMD::REFLECTIONMAP_CUBIC);
               break;
           }
 

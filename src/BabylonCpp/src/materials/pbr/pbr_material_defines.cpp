@@ -100,7 +100,7 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
            "FOG",
            "LOGARITHMICDEPTH",
            "FORCENORMALFORWARD",
-           "GEOMETRYAA",
+           "SPECULARAA",
            "UNLIT"};
   rebuild();
 } // namespace BABYLON

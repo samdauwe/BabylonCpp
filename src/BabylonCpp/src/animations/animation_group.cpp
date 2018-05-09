@@ -12,6 +12,8 @@ namespace BABYLON {
 
 AnimationGroup::AnimationGroup(const string_t& iName, Scene* scene)
     : name{iName}
+    , from{this, &AnimationGroup::get_from}
+    , to{this, &AnimationGroup::get_to}
     , isStarted{this, &AnimationGroup::get_isStarted}
     , speedRatio{this, &AnimationGroup::get_speedRatio,
                  &AnimationGroup::set_speedRatio}
@@ -33,6 +35,16 @@ void AnimationGroup::addToScene(
   unique_ptr_t<AnimationGroup>&& newAnimationGroup)
 {
   _scene->animationGroups.emplace_back(::std::move(newAnimationGroup));
+}
+
+int AnimationGroup::get_from() const
+{
+  return _from;
+}
+
+int AnimationGroup::get_to() const
+{
+  return _to;
 }
 
 bool AnimationGroup::get_isStarted() const
@@ -92,10 +104,11 @@ TargetedAnimation AnimationGroup::addTargetedAnimation(Animation* animation,
   return targetedAnimation;
 }
 
-AnimationGroup& AnimationGroup::normalize(int beginFrame, int endFrame)
+AnimationGroup& AnimationGroup::normalize(const Nullable<int>& iBeginFrame,
+                                          const Nullable<int>& iEndFrame)
 {
-  beginFrame = ::std::max(beginFrame, _from);
-  endFrame   = ::std::max(endFrame, _to);
+  auto beginFrame = iBeginFrame ? *iBeginFrame : _from;
+  auto endFrame   = iEndFrame ? *iEndFrame : _to;
 
   for (auto& targetedAnimation : _targetedAnimations) {
     auto& keys           = targetedAnimation->animation->getKeys();
@@ -118,6 +131,9 @@ AnimationGroup& AnimationGroup::normalize(int beginFrame, int endFrame)
       keys.emplace_back(newKey);
     }
   }
+
+  _from = beginFrame;
+  _to   = endFrame;
 
   return *this;
 }

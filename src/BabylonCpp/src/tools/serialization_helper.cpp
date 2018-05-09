@@ -227,7 +227,7 @@ Light* SerializationHelper::Parse(Light* light, const Json::value& parsedLight,
       }
       // angle
       if (parsedLight.contains("angle")) {
-        spotLight->setAngle(Json::GetNumber(parsedLight, "angle", 0.f));
+        spotLight->angle = Json::GetNumber(parsedLight, "angle", 0.f);
       }
       // exponent
       if (parsedLight.contains("exponent")) {

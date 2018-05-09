@@ -608,10 +608,19 @@ void MaterialHelper::BindFogParameters(Scene* scene, AbstractMesh* mesh,
 
 void MaterialHelper::BindBonesParameters(AbstractMesh* mesh, Effect* effect)
 {
-  if (mesh && mesh->useBones() && mesh->computeBonesUsingShaders()
+  if (!effect || !mesh) {
+    return;
+  }
+  if (mesh->computeBonesUsingShaders()
+      && effect->_bonesComputationForcedToCPU) {
+    mesh->setComputeBonesUsingShaders(false);
+  }
+
+  if (mesh->useBones() && mesh->computeBonesUsingShaders()
       && mesh->skeleton()) {
     const auto& matrices = mesh->skeleton()->getTransformMatrices(mesh);
-    if (!matrices.empty() && effect) {
+
+    if (!matrices.empty()) {
       effect->setMatrices("mBones", matrices);
     }
   }

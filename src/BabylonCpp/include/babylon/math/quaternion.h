@@ -272,6 +272,23 @@ public:
   static void FromRotationMatrixToRef(const Matrix& matrix, Quaternion& result);
 
   /**
+   * @brief Returns the dot product (float) between the quaternions "left" and
+   * "right".
+   * @param left defines the left operand
+   * @param right defines the right operand
+   * @returns the dot product
+   */
+  static float Dot(const Quaternion& left, const Quaternion& right);
+
+  /**
+   * @brief Checks if the two quaternions are close to each other.
+   * @param quat0 defines the first quaternion to check
+   * @param quat1 defines the second quaternion to check
+   * @returns true if the two quaternions are close to each other
+   */
+  static bool AreClose(const Quaternion& quat0, const Quaternion& quat1);
+
+  /**
    * @brief Creates an empty quaternion.
    * @returns a new quaternion set to (0.0, 0.0, 0.0)
    */

@@ -425,6 +425,18 @@ void Quaternion::FromRotationMatrixToRef(const Matrix& matrix,
   }
 }
 
+float Quaternion::Dot(const Quaternion& left, const Quaternion& right)
+{
+  return (left.x * right.x + left.y * right.y + left.z * right.z
+          + left.w * right.w);
+}
+
+bool Quaternion::AreClose(const Quaternion& quat0, const Quaternion& quat1)
+{
+  const float dot = Quaternion::Dot(quat0, quat1);
+  return dot >= 0.f;
+}
+
 Quaternion Quaternion::Zero()
 {
   return Quaternion(0.f, 0.f, 0.f, 0.f);

@@ -130,7 +130,7 @@ struct BABYLON_SHARED_EXPORT PBRMaterialDefines
 
   static constexpr unsigned int FORCENORMALFORWARD = 95;
 
-  static constexpr unsigned int GEOMETRYAA = 96;
+  static constexpr unsigned int SPECULARAA = 96;
 
   static constexpr unsigned int UNLIT = 97;
 

@@ -38,15 +38,15 @@ public:
 
   /**
    * @brief This function will normalize every animation in the group to make
-   * sure they all go from beginFrame to endFrame It can add constant keys at
-   * begin or end.
-   * @param beginFrame defines the new begin frame for all animations. It can't
-   * be bigger than the smallest begin frame of all animations
-   * @param endFrame defines the new end frame for all animations. It can't be
-   * smaller than the largest end frame of all animations
+   * sure they all go from beginFrame to endFrame. It can add constant keys at
+   * begin or end
+   * @param beginFrame defines the new begin frame for all animations or the
+   * smallest begin frame of all animations if null (defaults to null)
+   * @param endFrame defines the new end frame for all animations or the largest
+   * end frame of all animations if null (defaults to null)
    */
-  AnimationGroup& normalize(int beginFrame = numeric_limits_t<int>::max(),
-                            int endFrame   = numeric_limits_t<int>::lowest());
+  AnimationGroup& normalize(const Nullable<int>& beginFrame = nullptr,
+                            const Nullable<int>& endFrame   = nullptr);
 
   /**
    * @brief Start all animations on given targets.
@@ -124,6 +124,16 @@ protected:
 
 private:
   /**
+   * @brief Gets the first frame.
+   */
+  int get_from() const;
+
+  /**
+   * @brief Gets the last frame.
+   */
+  int get_to() const;
+
+  /**
    * @brief Define if the animations are started.
    */
   bool get_isStarted() const;
@@ -152,6 +162,16 @@ private:
 public:
   string_t name;
   Observable<TargetedAnimation> onAnimationEndObservable;
+
+  /**
+   * Gets the first frame
+   */
+  ReadOnlyProperty<AnimationGroup, int> from;
+
+  /**
+   * Gets the last frame
+   */
+  ReadOnlyProperty<AnimationGroup, int> to;
 
   /**
    * Define if the animations are started.

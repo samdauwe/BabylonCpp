@@ -120,10 +120,12 @@ Mesh* SolidParticleSystem::buildMesh()
   if (_mustUnrotateFixedNormals) {
     _unrotateFixedNormals();
   }
+
   auto vertexData     = ::std::make_unique<VertexData>();
   vertexData->indices = (_depthSort) ? _indices : _indices32;
   vertexData->set(_positions32, VertexBuffer::PositionKind);
   vertexData->set(_normals32, VertexBuffer::NormalKind);
+
   if (!_uvs32.empty()) {
     vertexData->set(_uvs32, VertexBuffer::UVKind);
   }

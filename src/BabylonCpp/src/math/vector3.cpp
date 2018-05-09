@@ -107,21 +107,7 @@ const Vector3& Vector3::toArray(Float32Array& array, unsigned int index) const
 
 Quaternion Vector3::toQuaternion() const
 {
-  Quaternion result(0.f, 0.f, 0.f, 1.f);
-
-  const float cosxPlusz  = ::std::cos((x + z) * 0.5f);
-  const float sinxPlusz  = ::std::sin((x + z) * 0.5f);
-  const float coszMinusx = ::std::cos((z - x) * 0.5f);
-  const float sinzMinusx = ::std::sin((z - x) * 0.5f);
-  const float cosy       = ::std::cos(y * 0.5f);
-  const float siny       = ::std::sin(y * 0.5f);
-
-  result.x = coszMinusx * siny;
-  result.y = -sinzMinusx * siny;
-  result.z = sinxPlusz * cosy;
-  result.w = cosxPlusz * cosy;
-
-  return result;
+  return Quaternion::RotationYawPitchRoll(x, y, z);
 }
 
 Vector3& Vector3::addInPlace(const Vector3& otherVector)

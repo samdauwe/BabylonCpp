@@ -539,6 +539,8 @@ public:
    * Observable that will be called when effect is bound.
    */
   Observable<Effect> onBindObservable;
+  /** Hidden */
+  bool _bonesComputationForcedToCPU;
   /**
    * Key for the effect.
    */

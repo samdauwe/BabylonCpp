@@ -3,6 +3,7 @@
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/scene.h>
+#include <babylon/materials/effect.h>
 #include <babylon/materials/material.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/sub_mesh.h>
@@ -118,28 +119,6 @@ bool EffectFallbacks::isMoreFallbacks() const
 string_t EffectFallbacks::reduce(string_t currentDefines, Effect* effect)
 {
   // First we try to switch to CPU skinning
-  string_t currentDefinesCpy(currentDefines);
-  if (_mesh && _mesh->computeBonesUsingShaders()
-      && _mesh->numBoneInfluencers() > 0) {
-    _mesh->setComputeBonesUsingShaders(false);
-    const string_t toReplace = string_t("#define NUM_BONE_INFLUENCERS ")
-                               + ::std::to_string(_mesh->numBoneInfluencers());
-    String::replaceInPlace(currentDefinesCpy, toReplace,
-                           "#define NUM_BONE_INFLUENCERS 0");
-    BABYLON_LOGF_DEBUG("EffectFallbacks", "Falling back to CPU skinning for %s",
-                       _mesh->name.c_str());
-
-    auto scene = _mesh->getScene();
-    for (auto& otherMesh : scene->meshes) {
-      if (otherMesh->material() == _mesh->material()
-          && otherMesh->computeBonesUsingShaders()
-          && otherMesh->numBoneInfluencers() > 0) {
-        otherMesh->setComputeBonesUsingShaders(false);
-      }
-    }
-  }
-
-  // First we try to switch to CPU skinning
   if (_mesh && _mesh->computeBonesUsingShaders()
       && _mesh->numBoneInfluencers() > 0 && _mesh->material()) {
     _mesh->setComputeBonesUsingShaders(false);
@@ -147,6 +126,7 @@ string_t EffectFallbacks::reduce(string_t currentDefines, Effect* effect)
                                + ::std::to_string(_mesh->numBoneInfluencers());
     String::replaceInPlace(currentDefines, toReplace,
                            "#define NUM_BONE_INFLUENCERS 0");
+    effect->_bonesComputationForcedToCPU = true;
 
     auto scene = _mesh->getScene();
     for (auto& otherMesh : scene->meshes) {
@@ -162,7 +142,7 @@ string_t EffectFallbacks::reduce(string_t currentDefines, Effect* effect)
       if (otherMesh->material()->getEffect() == effect) {
         otherMesh->setComputeBonesUsingShaders(false);
       }
-      else {
+      else if (!otherMesh->subMeshes.empty()) {
         for (auto& subMesh : otherMesh->subMeshes) {
           auto subMeshEffect = subMesh->effect();
 
@@ -178,14 +158,14 @@ string_t EffectFallbacks::reduce(string_t currentDefines, Effect* effect)
     if (_defines.find(_currentRank) != _defines.end()
         && !_defines[_currentRank].empty()) {
       for (auto& currentFallback : _defines[_currentRank]) {
-        String::replaceInPlace(currentDefinesCpy, "#define " + currentFallback,
+        String::replaceInPlace(currentDefines, "#define " + currentFallback,
                                "");
       }
     }
     ++_currentRank;
   }
 
-  return currentDefinesCpy;
+  return currentDefines;
 }
 
 } // end of namespace BABYLON

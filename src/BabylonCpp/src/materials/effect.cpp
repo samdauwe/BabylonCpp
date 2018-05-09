@@ -30,6 +30,7 @@ Effect::Effect(const string_t& baseName, EffectCreationOptions& options,
     , onError{options.onError}
     , onBind{nullptr}
     , uniqueId{Effect::_uniqueIdSeed++}
+    , _bonesComputationForcedToCPU{false}
     , _program{nullptr}
     , _onCompileObserver{nullptr}
     , _engine{engine}

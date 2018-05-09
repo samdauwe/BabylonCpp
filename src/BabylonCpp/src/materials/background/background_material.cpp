@@ -333,10 +333,6 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         defines.defines[BMD::REFLECTIONMAP_3D] = reflectionTexture->isCube;
 
         switch (reflectionTexture->coordinatesMode) {
-          case TextureConstants::CUBIC_MODE:
-          case TextureConstants::INVCUBIC_MODE:
-            defines.defines[BMD::REFLECTIONMAP_CUBIC] = true;
-            break;
           case TextureConstants::EXPLICIT_MODE:
             defines.defines[BMD::REFLECTIONMAP_EXPLICIT] = true;
             break;
@@ -361,6 +357,11 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           case TextureConstants::FIXED_EQUIRECTANGULAR_MIRRORED_MODE:
             defines.defines[BMD::REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED]
               = true;
+            break;
+          case TextureConstants::CUBIC_MODE:
+          case TextureConstants::INVCUBIC_MODE:
+          default:
+            defines.defines[BMD::REFLECTIONMAP_CUBIC] = true;
             break;
         }
 

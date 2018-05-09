@@ -43,71 +43,6 @@ public:
   unsigned int getTypeID() const override;
 
   /**
-   * @brief Gets the cone angle of the spot light in Radians.
-   */
-  float angle() const;
-
-  /**
-   * @brief Sets the cone angle of the spot light in Radians.
-   */
-  void setAngle(float value);
-
-  /**
-   * @brief Allows scaling the angle of the light for shadow generation only.
-   */
-  float shadowAngleScale() const;
-
-  /**
-   * @brief Allows scaling the angle of the light for shadow generation only.
-   */
-  void setShadowAngleScale(float value);
-
-  /**
-   * @brief Allows reading the projecton texture.
-   */
-  Matrix& projectionTextureMatrix();
-  const Matrix& projectionTextureMatrix() const;
-
-  /**
-   * @brief Gets the near clip of the Spotlight for texture projection.
-   */
-  float projectionTextureLightNear() const;
-  /**
-   * @brief Sets the near clip of the Spotlight for texture projection.
-   */
-  void setProjectionTextureLightNear(float value);
-
-  /**
-   * @brief Gets the far clip of the Spotlight for texture projection.
-   */
-  float projectionTextureLightFar() const;
-
-  /**
-   * @brief Sets the far clip of the Spotlight for texture projection.
-   */
-  void setProjectionTextureLightFar(float value);
-
-  /**
-   * @brief Gets the Up vector of the Spotlight for texture projection.
-   */
-  Vector3& projectionTextureUpDirection();
-  const Vector3& projectionTextureUpDirection() const;
-
-  /**
-   * @brief Sets the Up vector of the Spotlight for texture projection.
-   */
-  void setProjectionTextureUpDirection(const Vector3& value);
-
-  /**
-   * @brief Gets the projection texture of the light.
-   */
-  BaseTexture* projectionTexture() const;
-  /**
-   * @brief Sets the projection texture of the light.
-   */
-  void setProjectionTexture(BaseTexture* value);
-
-  /**
    * @brief Sets the passed Effect object with the SpotLight transfomed position
    * (or position if not parented) and normalized direction.
    * @param effect The effect to update
@@ -138,6 +73,71 @@ protected:
   SpotLight(const string_t& name, const Vector3& position,
             const Vector3& direction, float angle, float exponent,
             Scene* scene);
+
+  /**
+   * @brief Gets the cone angle of the spot light in Radians.
+   */
+  float get_angle() const;
+
+  /**
+   * @brief Sets the cone angle of the spot light in Radians.
+   */
+  void set_angle(float value);
+
+  /**
+   * @brief Allows scaling the angle of the light for shadow generation only.
+   */
+  float get_shadowAngleScale() const;
+
+  /**
+   * @brief Allows scaling the angle of the light for shadow generation only.
+   */
+  void set_shadowAngleScale(float value);
+
+  /**
+   * @brief Allows reading the projecton texture.
+   */
+  Matrix& get_projectionTextureMatrix();
+
+  /**
+   * @brief Gets the near clip of the Spotlight for texture projection.
+   */
+  float get_projectionTextureLightNear() const;
+
+  /**
+   * @brief Sets the near clip of the Spotlight for texture projection.
+   */
+  void set_projectionTextureLightNear(float value);
+
+  /**
+   * @brief Gets the far clip of the Spotlight for texture projection.
+   */
+  float get_projectionTextureLightFar() const;
+
+  /**
+   * @brief Sets the far clip of the Spotlight for texture projection.
+   */
+  void set_projectionTextureLightFar(float value);
+
+  /**
+   * @brief Gets the Up vector of the Spotlight for texture projection.
+   */
+  Vector3& get_projectionTextureUpDirection();
+
+  /**
+   * @brief Sets the Up vector of the Spotlight for texture projection.
+   */
+  void set_projectionTextureUpDirection(const Vector3& value);
+
+  /**
+   * @brief Gets the projection texture of the light.
+   */
+  BaseTexture*& get_projectionTexture();
+
+  /**
+   * @brief Sets the projection texture of the light.
+   */
+  void set_projectionTexture(BaseTexture* const& value);
 
   /**
    * @brief Overrides the direction setter to recompute the projection texture
@@ -173,9 +173,44 @@ protected:
 
 public:
   /**
-   * The light decay speed with the distance from the emission spot.
+   * The light decay speed with the distance from the emission spot
    */
   float exponent;
+
+  /**
+   * The cone angle of the spot light in Radians
+   */
+  Property<SpotLight, float> angle;
+
+  /**
+   * Allows scaling the angle of the light for shadow generation only
+   */
+  Property<SpotLight, float> shadowAngleScale;
+
+  /**
+   * Allows reading the projecton texture
+   */
+  ReadOnlyProperty<SpotLight, Matrix> projectionTextureMatrix;
+
+  /**
+   * The near clip of the Spotlight for texture projection
+   */
+  Property<SpotLight, float> projectionTextureLightNear;
+
+  /**
+   * The far clip of the Spotlight for texture projection
+   */
+  Property<SpotLight, float> projectionTextureLightFar;
+
+  /**
+   * The Up vector of the Spotlight for texture projection
+   */
+  Property<SpotLight, Vector3> projectionTextureUpDirection;
+
+  /**
+   * The projection texture of the light
+   */
+  Property<SpotLight, BaseTexture*> projectionTexture;
 
 protected:
   float _projectionTextureLightNear;

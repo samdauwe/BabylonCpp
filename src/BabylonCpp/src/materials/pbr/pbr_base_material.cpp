@@ -414,6 +414,9 @@ Effect* PBRBaseMaterial::_prepareEffect(
   if (defines[PMD::FOG]) {
     fallbacks->addFallback(fallbackRank, "FOG");
   }
+  if (defines[PMD::SPECULARAA]) {
+    fallbacks->addFallback(fallbackRank, "SPECULARAA");
+  }
   if (defines[PMD::POINTSIZE]) {
     fallbacks->addFallback(fallbackRank, "POINTSIZE");
   }
@@ -665,12 +668,6 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
         defines.defines[PMD::REFLECTIONMAP_3D] = reflectionTexture->isCube;
 
         switch (reflectionTexture->coordinatesMode()) {
-          case TextureConstants::CUBIC_MODE:
-          case TextureConstants::INVCUBIC_MODE:
-            defines.defines[PMD::REFLECTIONMAP_CUBIC] = true;
-            defines.defines[PMD::USE_LOCAL_REFLECTIONMAP_CUBIC]
-              = reflectionTexture->boundingBoxSize() ? true : false;
-            break;
           case TextureConstants::EXPLICIT_MODE:
             defines.defines[PMD::REFLECTIONMAP_EXPLICIT] = true;
             break;
@@ -695,6 +692,12 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
           case TextureConstants::FIXED_EQUIRECTANGULAR_MIRRORED_MODE:
             defines.defines[PMD::REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED]
               = true;
+            break;
+          case TextureConstants::CUBIC_MODE:
+          case TextureConstants::INVCUBIC_MODE:
+            defines.defines[PMD::REFLECTIONMAP_CUBIC] = true;
+            defines.defines[PMD::USE_LOCAL_REFLECTIONMAP_CUBIC]
+              = reflectionTexture->boundingBoxSize() ? true : false;
             break;
         }
 
@@ -872,7 +875,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
       = _useAlphaFresnel || _useLinearAlphaFresnel;
     defines.defines[PMD::LINEARALPHAFRESNEL] = _useLinearAlphaFresnel;
 
-    defines.defines[PMD::GEOMETRYAA]
+    defines.defines[PMD::SPECULARAA]
       = scene->getEngine()->getCaps().standardDerivatives
         && _enableSpecularAntiAliasing;
   }
@@ -1374,7 +1377,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
 
   _uniformBuffer->update();
 
-  _afterBind(mesh, effect);
+  _afterBind(mesh, _activeEffect);
 }
 
 vector_t<IAnimatable*> PBRBaseMaterial::getAnimatables() const

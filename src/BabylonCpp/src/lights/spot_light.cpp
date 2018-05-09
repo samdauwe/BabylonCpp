@@ -13,6 +13,20 @@ SpotLight::SpotLight(const string_t& iName, const Vector3& iPosition,
                      Scene* scene)
     : ShadowLight{iName, scene}
     , exponent{iExponent}
+    , angle{this, &SpotLight::get_angle, &SpotLight::set_angle}
+    , shadowAngleScale{this, &SpotLight::get_shadowAngleScale,
+                       &SpotLight::set_shadowAngleScale}
+    , projectionTextureMatrix{this, &SpotLight::get_projectionTextureMatrix}
+    , projectionTextureLightNear{this,
+                                 &SpotLight::get_projectionTextureLightNear,
+                                 &SpotLight::set_projectionTextureLightNear}
+    , projectionTextureLightFar{this, &SpotLight::get_projectionTextureLightFar,
+                                &SpotLight::set_projectionTextureLightFar}
+    , projectionTextureUpDirection{this,
+                                   &SpotLight::get_projectionTextureUpDirection,
+                                   &SpotLight::set_projectionTextureUpDirection}
+    , projectionTexture{this, &SpotLight::get_projectionTexture,
+                        &SpotLight::set_projectionTexture}
     , _projectionTextureLightNear{1e-6f}
     , _projectionTextureLightFar{1000.f}
     , _projectionTextureUpDirection{Vector3::Up()}
@@ -33,7 +47,7 @@ SpotLight::SpotLight(const string_t& iName, const Vector3& iPosition,
 {
   setPosition(iPosition);
   setDirection(direction);
-  setAngle(iAngle);
+  set_angle(iAngle);
 }
 
 SpotLight::~SpotLight()
@@ -55,82 +69,73 @@ unsigned int SpotLight::getTypeID() const
   return Light::LIGHTTYPEID_SPOTLIGHT();
 }
 
-float SpotLight::angle() const
+float SpotLight::get_angle() const
 {
   return _angle;
 }
 
-void SpotLight::setAngle(float value)
+void SpotLight::set_angle(float value)
 {
   _angle                                 = value;
   _projectionTextureProjectionLightDirty = true;
   forceProjectionMatrixCompute();
 }
 
-float SpotLight::shadowAngleScale() const
+float SpotLight::get_shadowAngleScale() const
 {
   return _shadowAngleScale;
 }
 
-void SpotLight::setShadowAngleScale(float value)
+void SpotLight::set_shadowAngleScale(float value)
 {
   _shadowAngleScale = value;
   forceProjectionMatrixCompute();
 }
-Matrix& SpotLight::projectionTextureMatrix()
+
+Matrix& SpotLight::get_projectionTextureMatrix()
 {
   return _projectionTextureMatrix;
 }
 
-const Matrix& SpotLight::projectionTextureMatrix() const
-{
-  return _projectionTextureMatrix;
-}
-
-float SpotLight::projectionTextureLightNear() const
+float SpotLight::get_projectionTextureLightNear() const
 {
   return _projectionTextureLightNear;
 }
 
-void SpotLight::setProjectionTextureLightNear(float value)
+void SpotLight::set_projectionTextureLightNear(float value)
 {
   _projectionTextureLightNear            = value;
   _projectionTextureProjectionLightDirty = true;
 }
 
-float SpotLight::projectionTextureLightFar() const
+float SpotLight::get_projectionTextureLightFar() const
 {
   return _projectionTextureLightFar;
 }
 
-void SpotLight::setProjectionTextureLightFar(float value)
+void SpotLight::set_projectionTextureLightFar(float value)
 {
   _projectionTextureLightFar             = value;
   _projectionTextureProjectionLightDirty = true;
 }
 
-Vector3& SpotLight::projectionTextureUpDirection()
+Vector3& SpotLight::get_projectionTextureUpDirection()
 {
   return _projectionTextureUpDirection;
 }
 
-const Vector3& SpotLight::projectionTextureUpDirection() const
-{
-  return _projectionTextureUpDirection;
-}
-
-void SpotLight::setProjectionTextureUpDirection(const Vector3& value)
+void SpotLight::set_projectionTextureUpDirection(const Vector3& value)
 {
   _projectionTextureUpDirection          = value;
   _projectionTextureProjectionLightDirty = true;
 }
 
-BaseTexture* SpotLight::projectionTexture() const
+BaseTexture*& SpotLight::get_projectionTexture()
 {
   return _projectionTexture;
 }
 
-void SpotLight::setProjectionTexture(BaseTexture* value)
+void SpotLight::set_projectionTexture(BaseTexture* const& value)
 {
   _projectionTexture      = value;
   _projectionTextureDirty = true;
