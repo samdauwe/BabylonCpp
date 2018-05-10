@@ -109,7 +109,7 @@ bool MergeMeshesOptimization::_apply(Scene* scene, bool updateSelectionTree)
     }
 
     // Merge meshes
-    Mesh::MergeMeshes(currentPool);
+    Mesh::MergeMeshes(currentPool, true, true);
   }
 
   if (updateSelectionTree) {

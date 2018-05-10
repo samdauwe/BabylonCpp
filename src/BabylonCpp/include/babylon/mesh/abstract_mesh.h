@@ -597,6 +597,11 @@ public:
    */
   Matrix* getWorldMatrix() override;
 
+  /**
+   * @brief Hidden
+   */
+  float _getWorldMatrixDeterminant() const override;
+
   // ========================= Point of View Movement ==========================
 
   /**
@@ -1073,11 +1078,6 @@ protected:
    * @param scene defines the hosting scene
    */
   AbstractMesh(const string_t& name, Scene* scene);
-
-  /**
-   * @brief Hidden
-   */
-  float _getWorldMatrixDeterminant() const override;
 
   /**
    * @brief Hidden

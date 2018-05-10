@@ -19,7 +19,8 @@ public:
    * @param name defines the name of the target
    * @param influence defines the influence to use
    */
-  MorphTarget(const string_t& name, float influence = 0.f);
+  MorphTarget(const string_t& name, float influence = 0.f,
+              Scene* scene = nullptr);
   ~MorphTarget() override;
 
   IReflect::Type type() const override;
@@ -118,6 +119,17 @@ protected:
   void set_influence(float influence);
 
   /**
+   * @brief Gets the animation properties override
+   */
+  AnimationPropertiesOverride*& get_animationPropertiesOverride();
+
+  /**
+   * @brief Sets the animation properties override
+   */
+  void
+  set_animationPropertiesOverride(AnimationPropertiesOverride* const& value);
+
+  /**
    * @brief Gets a boolean defining if the target contains position data.
    */
   bool get_hasPositions() const;
@@ -149,6 +161,12 @@ public:
   Property<MorphTarget, float> influence;
 
   /**
+   * Animation properties override
+   */
+  Property<MorphTarget, AnimationPropertiesOverride*>
+    animationPropertiesOverride;
+
+  /**
    * Boolean defining if the target contains position data
    */
   ReadOnlyProperty<MorphTarget, bool> hasPositions;
@@ -164,11 +182,17 @@ public:
   ReadOnlyProperty<MorphTarget, bool> hasTangents;
 
 private:
+  /**
+   * Defines the name of the target
+   */
   string_t _name;
+
+  Scene* _scene;
   Float32Array _positions;
   Float32Array _normals;
   Float32Array _tangents;
   float _influence;
+  AnimationPropertiesOverride* _animationPropertiesOverride;
 
 }; // end of class MorphTarget
 

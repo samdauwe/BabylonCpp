@@ -497,6 +497,12 @@ public:
    */
   vector_t<IParticleSystem*> getHierarchyEmittedParticleSystems();
 
+  /**
+   * @brief Normalize matrix weights so that all vertices have a total weight
+   * set to 1.
+   */
+  void cleanMatrixWeights();
+
   vector_t<Node*> getChildren();
   Mesh& _checkDelayState();
 
@@ -522,12 +528,12 @@ public:
   vector_t<IAnimatable*> getAnimatables();
 
   /**
-   * @brief Modifies the mesh geometry according to its own current World
-   * Matrix. The mesh World Matrix is then reset. This method returns nothing
-   * but really modifies the mesh even if it's originally not set as updatable.
-   * tuto : tuto : http://doc.babylonjs.com/resources/baking_transformations
-   * Note that, under the hood, this method sets a new VertexBuffer each call.
-   * Returns the Mesh.
+   * @brief Modifies the mesh geometry according to the passed transformation
+   * matrix. This method returns nothing but it really modifies the mesh even if
+   * it's originally not set as updatable. The mesh normals are modified
+   * accordingly the same transformation. tuto :
+   * http://doc.babylonjs.com/resources/baking_transformations Note that, under
+   * the hood, this method sets a new VertexBuffer each call. Returns the Mesh.
    */
   Mesh& bakeTransformIntoVertices(const Matrix& transform);
 
@@ -727,27 +733,24 @@ public:
    * shape. Its final shape will depend on the input parameters.
    *
    * Please read this full tutorial to understand how to design a ribbon :
-   * http://doc.babylonjs.com/tutorials/Ribbon_Tutorial
-   * The parameter `pathArray` is a required array of paths, what are each an
-   * array of successive Vector3. The pathArray parameter depicts the ribbon
-   * geometry.
+   * http://doc.babylonjs.com/tutorials/Ribbon_Tutorial The parameter
+   * `pathArray` is a required array of paths, what are each an array of
+   * successive Vector3. The pathArray parameter depicts the ribbon geometry.
    * The parameter `closeArray` (boolean, default false) creates a seam between
-   * the first and the last paths of the path array.
-   * The parameter `closePath` (boolean, default false) creates a seam between
-   * the first and the last points of each path of the path array.
-   * The parameter `offset` (positive integer, default : rounded half size of
-   * the pathArray length), is taken in account only if the `pathArray` is
-   * containing a single path.
-   * It's the offset to join together the points from the same path. Ex : offset
-   * = 10 means the point 1 is joined to the point 11.
-   * The optional parameter `instance` is an instance of an existing Ribbon
-   * object to be updated with the passed `pathArray` parameter :
+   * the first and the last paths of the path array. The parameter `closePath`
+   * (boolean, default false) creates a seam between the first and the last
+   * points of each path of the path array. The parameter `offset` (positive
+   * integer, default : rounded half size of the pathArray length), is taken in
+   * account only if the `pathArray` is containing a single path. It's the
+   * offset to join together the points from the same path. Ex : offset = 10
+   * means the point 1 is joined to the point 11. The optional parameter
+   * `instance` is an instance of an existing Ribbon object to be updated with
+   * the passed `pathArray` parameter :
    * http://doc.babylonjs.com/tutorials/How_to_dynamically_morph_a_mesh#ribbon
    * You can also set the mesh side orientation with the values :
    * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
-   * Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * BABYLON.Mesh.DOUBLESIDE Detail here :
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.
@@ -764,15 +767,12 @@ public:
    * @brief Creates a plane polygonal mesh.  By default, this is a disc.
    * Please consider using the same method from the MeshBuilder class instead.
    * The parameter `radius` sets the radius size (float) of the polygon (default
-   * 0.5).
-   * The parameter `tessellation` sets the number of polygon sides (positive
-   * integer, default 64). So a tessellation valued to 3 will build a triangle,
-   * to 4 a square, etc.
-   * You can also set the mesh side orientation with the values :
-   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
-   * Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * 0.5). The parameter `tessellation` sets the number of polygon sides
+   * (positive integer, default 64). So a tessellation valued to 3 will build a
+   * triangle, to 4 a square, etc. You can also set the mesh side orientation
+   * with the values : BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE
+   * or BABYLON.Mesh.DOUBLESIDE Detail here :
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.
@@ -788,9 +788,8 @@ public:
    * The parameter `size` sets the size (float) of each box side (default 1).
    * You can also set the mesh side orientation with the values :
    * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
-   * Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * BABYLON.Mesh.DOUBLESIDE Detail here :
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.
@@ -803,14 +802,11 @@ public:
    * @brief Creates a sphere mesh.
    * Please consider using the same method from the MeshBuilder class instead.
    * The parameter `diameter` sets the diameter size (float) of the sphere
-   * (default 1).
-   * The parameter `segments` sets the sphere number of horizontal stripes
-   * (positive integer, default 32).
-   * You can also set the mesh side orientation with the values :
-   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
-   * Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * (default 1). The parameter `segments` sets the sphere number of horizontal
+   * stripes (positive integer, default 32). You can also set the mesh side
+   * orientation with the values : BABYLON.Mesh.FRONTSIDE (default),
+   * BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE Detail here :
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.
@@ -824,21 +820,17 @@ public:
    * @brief Creates a cylinder or a cone mesh.
    * Please consider using the same method from the MeshBuilder class instead.
    * The parameter `height` sets the height size (float) of the cylinder/cone
-   * (float, default 2).
-   * The parameter `diameter` sets the diameter of the top and bottom cap at
-   * once (float, default 1).
-   * The parameters `diameterTop` and `diameterBottom` overwrite the parameter
-   * `diameter` and set respectively the top cap and bottom cap diameter
-   * (floats, default 1). The parameter "diameterBottom" can't be zero.
-   * The parameter `tessellation` sets the number of cylinder sides (positive
-   * integer, default 24). Set it to 3 to get a prism for instance.
-   * The parameter `subdivisions` sets the number of rings along the cylinder
-   * height (positive integer, default 1).
-   * You can also set the mesh side orientation with the values :
-   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
-   * Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * (float, default 2). The parameter `diameter` sets the diameter of the top
+   * and bottom cap at once (float, default 1). The parameters `diameterTop` and
+   * `diameterBottom` overwrite the parameter `diameter` and set respectively
+   * the top cap and bottom cap diameter (floats, default 1). The parameter
+   * "diameterBottom" can't be zero. The parameter `tessellation` sets the
+   * number of cylinder sides (positive integer, default 24). Set it to 3 to get
+   * a prism for instance. The parameter `subdivisions` sets the number of rings
+   * along the cylinder height (positive integer, default 1). You can also set
+   * the mesh side orientation with the values : BABYLON.Mesh.FRONTSIDE
+   * (default), BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE Detail here :
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.
@@ -855,16 +847,12 @@ public:
    * @brief Creates a torus mesh.
    * Please consider using the same method from the MeshBuilder class instead.
    * The parameter `diameter` sets the diameter size (float) of the torus
-   * (default 1).
-   * The parameter `thickness` sets the diameter size of the tube of the torus
-   * (float, default 0.5).
-   * The parameter `tessellation` sets the number of torus sides (postive
-   * integer, default 16).
-   * You can also set the mesh side orientation with the values :
-   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
-   * Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * (default 1). The parameter `thickness` sets the diameter size of the tube
+   * of the torus (float, default 0.5). The parameter `tessellation` sets the
+   * number of torus sides (postive integer, default 16). You can also set the
+   * mesh side orientation with the values : BABYLON.Mesh.FRONTSIDE (default),
+   * BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE Detail here :
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.
@@ -879,18 +867,14 @@ public:
    * @brief Creates a torus knot mesh.
    * Please consider using the same method from the MeshBuilder class instead.
    * The parameter `radius` sets the global radius size (float) of the torus
-   * knot (default 2).
-   * The parameter `radialSegments` sets the number of sides on each tube
-   * segments (positive integer, default 32).
-   * The parameter `tubularSegments` sets the number of tubes to decompose the
-   * knot into (positive integer, default 32).
-   * The parameters `p` and `q` are the number of windings on each axis
-   * (positive integers, default 2 and 3).
-   * You can also set the mesh side orientation with the values :
-   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
-   * Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * knot (default 2). The parameter `radialSegments` sets the number of sides
+   * on each tube segments (positive integer, default 32). The parameter
+   * `tubularSegments` sets the number of tubes to decompose the knot into
+   * (positive integer, default 32). The parameters `p` and `q` are the number
+   * of windings on each axis (positive integers, default 2 and 3). You can also
+   * set the mesh side orientation with the values : BABYLON.Mesh.FRONTSIDE
+   * (default), BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE Detail here :
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.
@@ -979,7 +963,7 @@ public:
                 unsigned int sideOrientation = Mesh::DEFAULTSIDE());
 
   /**
-   * Creates an extruded polygon mesh, with depth in the Y direction.
+   * @brief Creates an extruded polygon mesh, with depth in the Y direction.
    * Please consider using the same method from the MeshBuilder class instead.
    */
   static Mesh* ExtrudePolygon(
@@ -991,35 +975,30 @@ public:
    * @brief Creates an extruded shape mesh.
    * The extrusion is a parametric shape :
    * http://doc.babylonjs.com/tutorials/Parametric_Shapes.  It has no predefined
-   * shape. Its final shape will depend on the input parameters.
-   * Please consider using the same method from the MeshBuilder class instead.
+   * shape. Its final shape will depend on the input parameters. Please consider
+   * using the same method from the MeshBuilder class instead.
    *
    * Please read this full tutorial to understand how to design an extruded
-   * shape : http://doc.babylonjs.com/tutorials/Parametric_Shapes#extrusion
+   * shape : http://doc.babylonjs.com/how_to/parametric_shapes#extruded-shapes
    * The parameter `shape` is a required array of successive Vector3. This array
    * depicts the shape to be extruded in its local space : the shape must be
-   * designed in the xOy plane and will be
-   * extruded along the Z axis.
-   * The parameter `path` is a required array of successive Vector3. This is the
-   * axis curve the shape is extruded along.
-   * The parameter `rotation` (float, default 0 radians) is the angle value to
-   * rotate the shape each step (each path point), from the former step (so
-   * rotation added each step) along the curve.
-   * The parameter `scale` (float, default 1) is the value to scale the shape.
-   * The parameter `cap` sets the way the extruded shape is capped. Possible
-   * values : BABYLON.Mesh.NO_CAP (default), BABYLON.Mesh.CAP_START,
-   * BABYLON.Mesh.CAP_END, BABYLON.Mesh.CAP_ALL
-   * The optional parameter `instance` is an instance of an existing
-   * ExtrudedShape object to be updated with the passed `shape`, `path`, `scale`
-   * or `rotation` parameters :
+   * designed in the xOy plane and will be extruded along the Z axis. The
+   * parameter `path` is a required array of successive Vector3. This is the
+   * axis curve the shape is extruded along. The parameter `rotation` (float,
+   * default 0 radians) is the angle value to rotate the shape each step (each
+   * path point), from the former step (so rotation added each step) along the
+   * curve. The parameter `scale` (float, default 1) is the value to scale the
+   * shape. The parameter `cap` sets the way the extruded shape is capped.
+   * Possible values : BABYLON.Mesh.NO_CAP (default), BABYLON.Mesh.CAP_START,
+   * BABYLON.Mesh.CAP_END, BABYLON.Mesh.CAP_ALL The optional parameter
+   * `instance` is an instance of an existing ExtrudedShape object to be updated
+   * with the passed `shape`, `path`, `scale` or `rotation` parameters :
    * http://doc.babylonjs.com/tutorials/How_to_dynamically_morph_a_mesh#extruded-shape
    * Remember you can only change the shape or path point positions, not their
-   * number when updating an extruded shape.
-   * You can also set the mesh side orientation with the values :
-   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
-   * Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * number when updating an extruded shape. You can also set the mesh side
+   * orientation with the values : BABYLON.Mesh.FRONTSIDE (default),
+   * BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE Detail here :
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.
@@ -1036,58 +1015,51 @@ public:
    * @brief Creates an custom extruded shape mesh.
    * The custom extrusion is a parametric shape :
    * http://doc.babylonjs.com/tutorials/Parametric_Shapes.  It has no predefined
-   * shape. Its final shape will depend on the input parameters.
-   * Please consider using the same method from the MeshBuilder class instead.
+   * shape. Its final shape will depend on the input parameters. Please consider
+   * using the same method from the MeshBuilder class instead.
    *
    * Please read this full tutorial to understand how to design a custom
    * extruded shape :
-   * http://doc.babylonjs.com/tutorials/Parametric_Shapes#extrusion
-   * The parameter `shape` is a required array of successive Vector3. This array
+   * http://doc.babylonjs.com/how_to/parametric_shapes#extruded-shapes The
+   * parameter `shape` is a required array of successive Vector3. This array
    * depicts the shape to be extruded in its local space : the shape must be
-   * designed in the xOy plane and will be
-   * extruded along the Z axis.
-   * The parameter `path` is a required array of successive Vector3. This is the
-   * axis curve the shape is extruded along.
-   * The parameter `rotationFunction` (JS function) is a custom Javascript
-   * function called on each path point. This function is passed the position i
-   * of the point in the path
-   * and the distance of this point from the begining of the path :
+   * designed in the xOy plane and will be extruded along the Z axis. The
+   * parameter `path` is a required array of successive Vector3. This is the
+   * axis curve the shape is extruded along. The parameter `rotationFunction`
+   * (JS function) is a custom Javascript function called on each path point.
+   * This function is passed the position i of the point in the path and the
+   * distance of this point from the begining of the path :
    * ```javascript
    * var rotationFunction = function(i, distance) {
    *     // do things
    *     return rotationValue; }
    * ```
    * It must returns a float value that will be the rotation in radians applied
-   * to the shape on each path point.
-   * The parameter `scaleFunction` (JS function) is a custom Javascript function
-   * called on each path point. This function is passed the position i of the
-   * point in the path
-   * and the distance of this point from the begining of the path :
+   * to the shape on each path point. The parameter `scaleFunction` (JS
+   * function) is a custom Javascript function called on each path point. This
+   * function is passed the position i of the point in the path and the distance
+   * of this point from the begining of the path :
    * ```javascript
    * var scaleFunction = function(i, distance) {
    *     // do things
    *    return scaleValue;}
    * ```
    * It must returns a float value that will be the scale value applied to the
-   * shape on each path point.
-   * The parameter `ribbonClosePath` (boolean, default false) forces the
-   * extrusion underlying ribbon to close all the paths in its `pathArray`.
-   * The parameter `ribbonCloseArray` (boolean, default false) forces the
-   * extrusion underlying ribbon to close its `pathArray`.
-   * The parameter `cap` sets the way the extruded shape is capped. Possible
-   * values : BABYLON.Mesh.NO_CAP (default), BABYLON.Mesh.CAP_START,
-   * BABYLON.Mesh.CAP_END, BABYLON.Mesh.CAP_ALL
-   * The optional parameter `instance` is an instance of an existing
-   * ExtrudedShape object to be updated with the passed `shape`, `path`, `scale`
-   * or `rotation` parameters :
+   * shape on each path point. The parameter `ribbonClosePath` (boolean, default
+   * false) forces the extrusion underlying ribbon to close all the paths in its
+   * `pathArray`. The parameter `ribbonCloseArray` (boolean, default false)
+   * forces the extrusion underlying ribbon to close its `pathArray`. The
+   * parameter `cap` sets the way the extruded shape is capped. Possible values
+   * : BABYLON.Mesh.NO_CAP (default), BABYLON.Mesh.CAP_START,
+   * BABYLON.Mesh.CAP_END, BABYLON.Mesh.CAP_ALL The optional parameter
+   * `instance` is an instance of an existing ExtrudedShape object to be updated
+   * with the passed `shape`, `path`, `scale` or `rotation` parameters :
    * http://doc.babylonjs.com/tutorials/How_to_dynamically_morph_a_mesh#extruded-shape
    * Remember you can only change the shape or path point positions, not their
-   * number when updating an extruded shape.
-   * You can also set the mesh side orientation with the values :
-   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
-   * Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * number when updating an extruded shape. You can also set the mesh side
+   * orientation with the values : BABYLON.Mesh.FRONTSIDE (default),
+   * BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE Detail here :
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.
@@ -1104,23 +1076,17 @@ public:
   /**
    * @brief Creates lathe mesh.
    * The lathe is a shape with a symetry axis : a 2D model shape is rotated
-   * around this axis to design the lathe.
-   * Please consider using the same method from the MeshBuilder class instead.
-   *
-   * The parameter `shape` is a required array of successive Vector3. This array
-   * depicts the shape to be rotated in its local space : the shape must be
-   * designed in the xOy plane and will be
+   * around this axis to design the lathe. Please consider using the same method
+   * from the MeshBuilder class instead. The parameter `shape` is a required
+   * array of successive Vector3. This array depicts the shape to be rotated in
+   * its local space : the shape must be designed in the xOy plane and will be
    * rotated around the Y axis. It's usually a 2D shape, so the Vector3 z
-   * coordinates are often set to zero.
-   * The parameter `radius` (positive float, default 1) is the radius value of
-   * the lathe.
-   * The parameter `tessellation` (positive integer, default 64) is the side
-   * number of the lathe.
-   * You can also set the mesh side orientation with the values :
-   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
-   * Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * coordinates are often set to zero. The parameter `radius` (positive float,
+   * default 1) is the radius value of the lathe. The parameter `tessellation`
+   * (positive integer, default 64) is the side number of the lathe. You can
+   * also set the mesh side orientation with the values : BABYLON.Mesh.FRONTSIDE
+   * (default), BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE Detail here :
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.
@@ -1134,12 +1100,10 @@ public:
    * @brief Creates a plane mesh.
    * Please consider using the same method from the MeshBuilder class instead.
    * The parameter `size` sets the size (float) of both sides of the plane at
-   * once (default 1).
-   * You can also set the mesh side orientation with the values :
-   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
-   * Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * once (default 1). You can also set the mesh side orientation with the
+   * values : BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
+   * BABYLON.Mesh.DOUBLESIDE Detail here :
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.
@@ -1165,19 +1129,22 @@ public:
                             bool updatable = false);
 
   /**
-   * @brief Creates a tiled ground mesh.
+   * @brief Creates a ground mesh from a height map.
+   * tuto : http://doc.babylonjs.com/babylon101/height_map
    * Please consider using the same method from the MeshBuilder class instead.
-   * The parameters `xmin` and `xmax` (floats, default -1 and 1) set the ground
-   * minimum and maximum X coordinates.
-   * The parameters `zmin` and `zmax` (floats, default -1 and 1) set the ground
-   * minimum and maximum Z coordinates.
-   * The parameter `subdivisions` is a javascript object `{w: positive integer,
-   * h: positive integer}` (default `{w: 6, h: 6}`). `w` and `h` are the
-   * numbers of subdivisions on the ground width and height. Each subdivision is
-   * called a tile.
-   * The parameter `precision` is a javascript object `{w: positive integer, h:
-   * positive integer}` (default `{w: 2, h: 2}`). `w` and `h` are the
-   * numbers of subdivisions on the ground width and height of each tile.
+   * The parameter `url` sets the URL of the height map image resource.
+   * The parameters `width` and `height` (positive floats, default 10) set the
+   * ground width and height sizes. The parameter `subdivisions` (positive
+   * integer, default 1) sets the number of subdivision per side. The parameter
+   * `minHeight` (float, default 0) is the minimum altitude on the ground. The
+   * parameter `maxHeight` (float, default 1) is the maximum altitude on the
+   * ground. The parameter `onReady` is a javascript callback function that will
+   * be called  once the mesh is just built (the height map download can last
+   * some time). This function is passed the newly built mesh :
+   * ```javascript
+   * function(mesh) { // do things
+   *     return; }
+   * ```
    * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.
@@ -1223,22 +1190,18 @@ public:
    * @brief Creates a tube mesh.
    * The tube is a parametric shape :
    * http://doc.babylonjs.com/tutorials/Parametric_Shapes.  It has no predefined
-   * shape. Its final shape will depend on the input parameters.
-   *
-   * Please consider using the same method from the MeshBuilder class instead.
-   * The parameter `path` is a required array of successive Vector3. It is the
-   * curve used as the axis of the tube.
-   * The parameter `radius` (positive float, default 1) sets the tube radius
-   * size.
-   * The parameter `tessellation` (positive float, default 64) is the number of
-   * sides on the tubular surface.
-   * The parameter `radiusFunction` (javascript function, default null) is a
-   * vanilla javascript function. If it is not null, it overwrittes the
-   * parameter `radius`.
-   * This function is called on each point of the tube path and is passed the
-   * index `i` of the i-th point and the distance of this point from the first
-   * point of the path.
-   * It must return a radius value (positive float) :
+   * shape. Its final shape will depend on the input parameters. Please consider
+   * using the same method from the MeshBuilder class instead. The parameter
+   * `path` is a required array of successive Vector3. It is the curve used as
+   * the axis of the tube. The parameter `radius` (positive float, default 1)
+   * sets the tube radius size. The parameter `tessellation` (positive float,
+   * default 64) is the number of sides on the tubular surface. The parameter
+   * `radiusFunction` (javascript function, default null) is a vanilla
+   * javascript function. If it is not null, it overwrittes the parameter
+   * `radius`. This function is called on each point of the tube path and is
+   * passed the index `i` of the i-th point and the distance of this point from
+   * the first point of the path. It must return a radius value (positive float)
+   * :
    * ```javascript
    * var radiusFunction = function(i, distance) {
    *     // do things
@@ -1246,15 +1209,14 @@ public:
    * ```
    * The parameter `cap` sets the way the extruded shape is capped. Possible
    * values : BABYLON.Mesh.NO_CAP (default), BABYLON.Mesh.CAP_START,
-   * BABYLON.Mesh.CAP_END, BABYLON.Mesh.CAP_ALL
-   * The optional parameter `instance` is an instance of an existing Tube object
-   * to be updated with the passed `pathArray` parameter :
-   * http://doc.babylonjs.com/tutorials/How_to_dynamically_morph_a_mesh#tube
-   * You can also set the mesh side orientation with the values :
+   * BABYLON.Mesh.CAP_END, BABYLON.Mesh.CAP_ALL The optional parameter
+   * `instance` is an instance of an existing Tube object to be updated with the
+   * passed `pathArray` parameter :
+   * http://doc.babylonjs.com/tutorials/How_to_dynamically_morph_a_mesh#tube You
+   * can also set the mesh side orientation with the values :
    * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
-   * Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * BABYLON.Mesh.DOUBLESIDE Detail here :
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.
@@ -1270,36 +1232,30 @@ public:
 
   /**
    * @brief Creates a polyhedron mesh.
-   *
    * Please consider using the same method from the MeshBuilder class instead.
    * The parameter `type` (positive integer, max 14, default 0) sets the
    * polyhedron type to build among the 15 embbeded types. Please refer to the
-   * type sheet in the tutorial
-   *  to choose the wanted type.
-   * The parameter `size` (positive float, default 1) sets the polygon size.
-   * You can overwrite the `size` on each dimension bu using the parameters
-   * `sizeX`, `sizeY` or `sizeZ` (positive floats, default to `size` value).
-   * You can build other polyhedron types than the 15 embbeded ones by setting
-   * the parameter `custom` (`polyhedronObject`, default null). If you set the
-   * parameter `custom`, this overwrittes the parameter `type`.
-   * A `polyhedronObject` is a formatted javascript object. You'll find a full
-   * file with pre-set polyhedra here :
-   * https://github.com/BabylonJS/Extensions/tree/master/Polyhedron
-   * You can set the color and the UV of each side of the polyhedron with the
+   * type sheet in the tutorial to choose the wanted type. The parameter `size`
+   * (positive float, default 1) sets the polygon size. You can overwrite the
+   * `size` on each dimension bu using the parameters `sizeX`, `sizeY` or
+   * `sizeZ` (positive floats, default to `size` value). You can build other
+   * polyhedron types than the 15 embbeded ones by setting the parameter
+   * `custom` (`polyhedronObject`, default null). If you set the parameter
+   * `custom`, this overwrittes the parameter `type`. A `polyhedronObject` is a
+   * formatted javascript object. You'll find a full file with pre-set polyhedra
+   * here : https://github.com/BabylonJS/Extensions/tree/master/Polyhedron You
+   * can set the color and the UV of each side of the polyhedron with the
    * parameters `faceColors` (Color4, default `(1, 1, 1, 1)`) and faceUV
-   * (Vector4, default `(0, 0, 1, 1)`).
-   * To understand how to set `faceUV` or `faceColors`, please read this by
-   * considering the right number of faces of your polyhedron, instead of only 6
-   * for the box :
+   * (Vector4, default `(0, 0, 1, 1)`). To understand how to set `faceUV` or
+   * `faceColors`, please read this by considering the right number of faces of
+   * your polyhedron, instead of only 6 for the box :
    * http://doc.babylonjs.com/tutorials/CreateBox_Per_Face_Textures_And_Colors
    * The parameter `flat` (boolean, default true). If set to false, it gives the
    * polyhedron a single global face, so less vertices and shared normals. In
-   * this case, `faceColors` and `faceUV` are ignored.
-   * You can also set the mesh side orientation with the values :
-   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
-   * Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * this case, `faceColors` and `faceUV` are ignored. You can also set the mesh
+   * side orientation with the values : BABYLON.Mesh.FRONTSIDE (default),
+   * BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE Detail here :
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.
@@ -1309,24 +1265,19 @@ public:
 
   /**
    * @brief Creates a sphere based upon an icosahedron with 20 triangular faces
-   * which can be subdivided.
-   * Please consider using the same method from the MeshBuilder class instead.
-   * The parameter `radius` sets the radius size (float) of the icosphere
-   * (default 1).
-   * You can set some different icosphere dimensions, for instance to build an
-   * ellipsoid, by using the parameters `radiusX`, `radiusY` and `radiusZ` (all
-   * by default have the same value than `radius`).
-   * The parameter `subdivisions` sets the number of subdivisions (postive
-   * integer, default 4). The more subdivisions, the more faces on the icosphere
-   * whatever its size.
-   * The parameter `flat` (boolean, default true) gives each side its own
-   * normals. Set it to false to get a smooth continuous light reflection on the
-   * surface.
-   * You can also set the mesh side orientation with the values :
-   * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
-   * BABYLON.Mesh.DOUBLESIDE
-   * Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * which can be subdivided. Please consider using the same method from the
+   * MeshBuilder class instead. The parameter `radius` sets the radius size
+   * (float) of the icosphere (default 1). You can set some different icosphere
+   * dimensions, for instance to build an ellipsoid, by using the parameters
+   * `radiusX`, `radiusY` and `radiusZ` (all by default have the same value than
+   * `radius`). The parameter `subdivisions` sets the number of subdivisions
+   * (postive integer, default 4). The more subdivisions, the more faces on the
+   * icosphere whatever its size. The parameter `flat` (boolean, default true)
+   * gives each side its own normals. Set it to false to get a smooth continuous
+   * light reflection on the surface. You can also set the mesh side orientation
+   * with the values : BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE
+   * or BABYLON.Mesh.DOUBLESIDE Detail here :
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.

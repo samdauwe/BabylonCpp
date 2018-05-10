@@ -100,6 +100,7 @@ void PoseEnabledController::attachToMesh(AbstractMesh* mesh)
   if (!_mesh->rotationQuaternion()) {
     _mesh->setRotationQuaternion(Quaternion());
   }
+  _meshAttachedObservable.notifyObservers(mesh);
 }
 
 void PoseEnabledController::attachToPoseControlledCamera(TargetCamera* camera)

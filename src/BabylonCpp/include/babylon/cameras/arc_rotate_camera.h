@@ -69,9 +69,10 @@ public:
 
 protected:
   ArcRotateCamera(const string_t& name, float alpha, float beta, float radius,
-                  Scene* scene);
+                  Scene* scene, bool setActiveOnSceneIfNoneActive = true);
   ArcRotateCamera(const string_t& name, float alpha, float beta, float radius,
-                  const Vector3& target, Scene* scene);
+                  const Vector3& target, Scene* scene,
+                  bool setActiveOnSceneIfNoneActive = true);
 
   Vector3 _getTargetPosition();
   void _checkLimits();

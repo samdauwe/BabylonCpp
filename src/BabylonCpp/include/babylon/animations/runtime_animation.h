@@ -21,7 +21,7 @@ public:
   ~RuntimeAnimation();
 
   Animation* animation();
-  void reset();
+  void reset(bool value = true);
   bool isStopped() const;
   void dispose();
 

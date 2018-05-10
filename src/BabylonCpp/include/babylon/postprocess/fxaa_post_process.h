@@ -21,6 +21,9 @@ public:
                   = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   ~FxaaPostProcess();
 
+private:
+  string_t _getDefines();
+
 public:
   float texelWidth;
   float texelHeight;

@@ -213,7 +213,8 @@ public:
   static Camera* Parse(const Json::value& parsedCamera, Scene* scene);
 
 protected:
-  Camera(const string_t& name, const Vector3& position, Scene* scene);
+  Camera(const string_t& name, const Vector3& position, Scene* scene,
+         bool setActiveOnSceneIfNoneActive = true);
 
   virtual bool _restoreStateValues();
 
@@ -294,6 +295,7 @@ public:
 
 protected:
   Matrix _webvrViewMatrix;
+  Vector3 _globalPosition;
 
 private:
   Matrix _computedViewMatrix;
@@ -301,11 +303,11 @@ private:
   unique_ptr_t<Matrix> _worldMatrix;
   Matrix _transformMatrix;
   Matrix _webvrProjectionMatrix;
-  Vector3 _globalPosition;
   array_t<Plane, 6> _frustumPlanes;
   bool _refreshFrustumPlanes;
   float _storedFov;
   bool _stateStored;
+  bool _setActiveOnSceneIfNoneActive;
 
 }; // end of class Camera
 

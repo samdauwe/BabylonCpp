@@ -45,7 +45,8 @@ private:
                                   AbstractMesh* collidedMesh = nullptr);
 
 protected:
-  FreeCamera(const string_t& name, const Vector3& position, Scene* scene);
+  FreeCamera(const string_t& name, const Vector3& position, Scene* scene,
+             bool setActiveOnSceneIfNoneActive = true);
 
 public:
   Vector3 ellipsoid;

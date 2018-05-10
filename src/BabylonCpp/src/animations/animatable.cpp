@@ -142,13 +142,7 @@ Animatable::getRuntimeAnimationByTargetProperty(const string_t& property) const
 void Animatable::reset()
 {
   for (auto& runtimeAnimation : _runtimeAnimations) {
-    runtimeAnimation->reset();
-  }
-
-  // Reset to original value
-  for (auto& animation : _runtimeAnimations) {
-    animation->animate(millisecond_t(0), fromFrame, toFrame, false,
-                       _speedRatio);
+    runtimeAnimation->reset(true);
   }
 
   _localDelayOffset = nullptr;

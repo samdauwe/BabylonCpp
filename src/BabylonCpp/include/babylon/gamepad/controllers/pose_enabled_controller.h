@@ -122,6 +122,11 @@ public:
   ReadOnlyProperty<PoseEnabledController, AbstractMesh*> mesh;
 
   /**
+   * Hidden
+   */
+  Observable<AbstractMesh> _meshAttachedObservable;
+
+  /**
    * Name of the child mesh that can be used to cast a ray from the controller
    */
   static constexpr const char* POINTING_POSE = "POINTING_POSE";

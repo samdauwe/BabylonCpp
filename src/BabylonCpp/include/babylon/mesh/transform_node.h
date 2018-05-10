@@ -114,6 +114,11 @@ public:
   Matrix* getWorldMatrix() override;
 
   /**
+   * @brief Hidden
+   */
+  float _getWorldMatrixDeterminant() const override;
+
+  /**
    * @brief Returns directly the latest state of the mesh World matrix.
    * A Matrix is returned.
    */
@@ -427,11 +432,6 @@ public:
                bool disposeMaterialAndTextures = false) override;
 
 protected:
-  /**
-   * @brief Returns the latest update of the World matrix determinant.
-   */
-  virtual float _getWorldMatrixDeterminant() const;
-
   void _afterComputeWorldMatrix();
 
 public:

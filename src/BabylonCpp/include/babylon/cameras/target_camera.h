@@ -66,7 +66,11 @@ public:
   virtual Json::object serialize() const override;
 
 protected:
-  TargetCamera(const string_t& name, const Vector3& position, Scene* scene);
+  TargetCamera(const string_t& name, const Vector3& position, Scene* scene,
+               bool setActiveOnSceneIfNoneActive = true);
+
+  void _computeViewMatrix(const Vector3& position, const Vector3& target,
+                          const Vector3& up);
 
 private:
   void _getRigCamPosition(float halfSpace, Vector3& result);
@@ -90,11 +94,13 @@ public:
   Matrix _cameraRotationMatrix;
   unique_ptr_t<Vector3> _referencePoint;
   Vector3 _transformedReferencePoint;
-  Matrix _lookAtTemp;
-  Matrix _tempMatrix;
 
   ::std::function<void()> _reset;
   string_t _waitingLockedTargetId;
+
+protected:
+  Vector3 _globalCurrentTarget;
+  Vector3 _globalCurrentUpVector;
 
 private:
   Matrix _rigCamTransformMatrix;

@@ -70,6 +70,22 @@ public:
   void dispose(bool disableGeometryBufferRenderer = false,
                bool disposeMaterialAndTextures    = false) override;
 
+  /**
+   * @brief Serialize the rendering pipeline (Used when exporting).
+   * @returns the serialized object
+   */
+  Json::object serialize() const;
+
+  /**
+   * @brief Parse the serialized pipeline.
+   * @param source Source pipeline.
+   * @param scene The scene to load the pipeline to.
+   * @param rootUrl The URL of the serialized pipeline.
+   * @returns An instantiated pipeline from the serialized object.
+   */
+  static unique_ptr_t<SSAO2RenderingPipeline>
+  Parse(const Json::value& source, Scene* scene, const string_t& url);
+
 private:
   void set_samples(unsigned int n);
   unsigned int get_samples() const;
@@ -142,18 +158,28 @@ private:
    * Number of samples used for the SSAO calculations. Default value is 8
    */
   unsigned int _samples;
+
+  /**
+   * Ratio object used for SSAO ratio and blur ratio
+   */
+  SSAO2Ratio _ratio;
+
   /**
    * Dynamically generated sphere sampler.
    */
+
   Float32Array _sampleSphere;
+
   /**
    * Blur filter offsets
    */
   Float32Array _samplerOffsets;
+
   /**
    * Are we using bilateral blur ?
    */
   bool _expensiveBlur;
+
   Scene* _scene;
   Texture* _depthTexture;
   Texture* _normalTexture;

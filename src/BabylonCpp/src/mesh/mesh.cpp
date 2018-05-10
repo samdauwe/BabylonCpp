@@ -1377,6 +1377,86 @@ vector_t<IParticleSystem*> Mesh::getHierarchyEmittedParticleSystems()
   return results;
 }
 
+void Mesh::cleanMatrixWeights()
+{
+  const float epsilon = 1e-3f;
+
+  size_t noInfluenceBoneIndex = 0;
+  if (skeleton()) {
+    noInfluenceBoneIndex = skeleton()->bones.size();
+  }
+  else {
+    return;
+  }
+
+  auto matricesIndices = getVerticesData(VertexBuffer::MatricesIndicesKind);
+  auto matricesIndicesExtra
+    = getVerticesData(VertexBuffer::MatricesIndicesExtraKind);
+  auto matricesWeights = getVerticesData(VertexBuffer::MatricesWeightsKind);
+  auto matricesWeightsExtra
+    = getVerticesData(VertexBuffer::MatricesWeightsExtraKind);
+  auto influencers = static_cast<int>(numBoneInfluencers());
+  auto size        = matricesWeights.size();
+
+  for (size_t i = 0; i < size; i += 4) {
+    float weight        = 0.f;
+    int firstZeroWeight = -1;
+    for (size_t j = 0; j < 4; j++) {
+      auto w = matricesWeights[i + j];
+      weight += w;
+      if (w < epsilon && firstZeroWeight < 0) {
+        firstZeroWeight = static_cast<int>(j);
+      }
+    }
+    if (!matricesWeightsExtra.empty()) {
+      for (size_t j = 0; j < 4; j++) {
+        auto w = matricesWeightsExtra[i + j];
+        weight += w;
+        if (w < epsilon && firstZeroWeight < 0) {
+          firstZeroWeight = static_cast<int>(j) + 4;
+        }
+      }
+    }
+    if (firstZeroWeight < 0 || firstZeroWeight > (influencers - 1)) {
+      firstZeroWeight = influencers - 1;
+    }
+    if (weight > epsilon) {
+      auto mweight = 1.f / weight;
+      for (size_t j = 0; j < 4; j++) {
+        matricesWeights[i + j] *= mweight;
+      }
+      if (!matricesWeightsExtra.empty()) {
+        for (size_t j = 0; j < 4; j++) {
+          matricesWeightsExtra[i + j] *= mweight;
+        }
+      }
+    }
+    else {
+      auto _firstZeroWeight = static_cast<size_t>(firstZeroWeight);
+      if (firstZeroWeight >= 4) {
+        matricesWeightsExtra[i + _firstZeroWeight - 4] = 1.f - weight;
+        matricesIndicesExtra[i + _firstZeroWeight - 4] = noInfluenceBoneIndex;
+      }
+      else {
+        matricesWeights[i + _firstZeroWeight] = 1.f - weight;
+        matricesIndices[i + _firstZeroWeight] = noInfluenceBoneIndex;
+      }
+    }
+  }
+
+  setVerticesData(VertexBuffer::MatricesIndicesKind, matricesIndices);
+  if (!matricesIndicesExtra.empty()) {
+    setVerticesData(VertexBuffer::MatricesIndicesExtraKind,
+                    matricesIndicesExtra);
+  }
+
+  setVerticesData(VertexBuffer::MatricesWeightsKind, matricesWeights);
+  if (!matricesWeightsExtra.empty()) {
+    setVerticesData(VertexBuffer::MatricesWeightsExtraKind,
+                    matricesWeightsExtra);
+  }
+}
+
 vector_t<BABYLON::Node*> Mesh::getChildren()
 {
   vector_t<Node*> results;

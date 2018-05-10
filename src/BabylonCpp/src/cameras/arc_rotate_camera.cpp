@@ -13,15 +13,18 @@
 namespace BABYLON {
 
 ArcRotateCamera::ArcRotateCamera(const string_t& iName, float iAlpha,
-                                 float iBeta, float iRadius, Scene* scene)
-    : ArcRotateCamera(iName, iAlpha, iBeta, iRadius, Vector3::Zero(), scene)
+                                 float iBeta, float iRadius, Scene* scene,
+                                 bool setActiveOnSceneIfNoneActive)
+    : ArcRotateCamera(iName, iAlpha, iBeta, iRadius, Vector3::Zero(), scene,
+                      setActiveOnSceneIfNoneActive)
 {
 }
 
 ArcRotateCamera::ArcRotateCamera(const string_t& iName, float iAlpha,
                                  float iBeta, float iRadius,
-                                 const Vector3& iTarget, Scene* scene)
-    : TargetCamera{iName, Vector3::Zero(), scene}
+                                 const Vector3& iTarget, Scene* scene,
+                                 bool setActiveOnSceneIfNoneActive)
+    : TargetCamera{iName, Vector3::Zero(), scene, setActiveOnSceneIfNoneActive}
     , alpha{iAlpha}
     , beta{iBeta}
     , radius{iRadius}
@@ -214,13 +217,17 @@ void ArcRotateCamera::_checkInputs()
       || !stl_util::almost_equal(inertialBetaOffset, 0.f)
       || !stl_util::almost_equal(inertialRadiusOffset, 0.f)) {
 
-    if (getScene()->useRightHandedSystem()) {
-      alpha -= beta <= 0.f ? -inertialAlphaOffset : inertialAlphaOffset;
+    if (beta <= 0.f) {
+      inertialAlphaOffset *= -1.f;
     }
-    else {
-      alpha += beta <= 0.f ? -inertialAlphaOffset : inertialAlphaOffset;
+    if (getScene()->useRightHandedSystem()) {
+      inertialAlphaOffset *= -1.f;
+    }
+    if (parent && parent()->_getWorldMatrixDeterminant() < 0.f) {
+      inertialAlphaOffset *= -1.f;
     }
 
+    alpha += inertialAlphaOffset;
     beta += inertialBetaOffset;
 
     radius -= inertialRadiusOffset;
@@ -524,12 +531,8 @@ Matrix ArcRotateCamera::_getViewMatrix()
       up = up.negate();
     }
 
-    if (getScene()->useRightHandedSystem()) {
-      Matrix::LookAtRHToRef(position, _target, up, _viewMatrix);
-    }
-    else {
-      Matrix::LookAtLHToRef(position, _target, up, _viewMatrix);
-    }
+    _computeViewMatrix(position, target, up);
+
     _viewMatrix.m[12] += targetScreenOffset.x;
     _viewMatrix.m[13] += targetScreenOffset.y;
   }

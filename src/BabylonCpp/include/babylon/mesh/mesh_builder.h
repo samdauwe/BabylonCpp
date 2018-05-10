@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 /**
- * @brief Class containing static functions to help procedurally build meshes
+ * @brief Class containing static functions to help procedurally build meshes.
  */
 class BABYLON_SHARED_EXPORT MeshBuilder {
 
@@ -30,7 +30,7 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once created
    * @see
@@ -64,7 +64,7 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once created
    * @param name defines the name of the mesh
@@ -93,15 +93,14 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once created
    * @param name defines the name of the mesh
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
    * @returns the plane polygonal mesh
-   * @see
-   * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#disc
+   * @see http://doc.babylonjs.com/how_to/set_shapes#disc-or-regular-polygon
    */
   static Mesh* CreateDisc(const string_t& name, DiscOptions& options,
                           Scene* scene);
@@ -126,15 +125,14 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once created
    * @param name defines the name of the mesh
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
    * @returns the icosahedron mesh
-   * @see
-   * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#icosphere
+   * @see http://doc.babylonjs.com/how_to/polyhedra_shapes#icosphere
    */
   static Mesh* CreateIcoSphere(const string_t& name, IcoSphereOptions& options,
                                Scene* scene);
@@ -163,7 +161,7 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The optional parameter `invertUV` (boolean, default false) swaps in the
    * geometry the U and V coordinates to apply a texture
    * * The parameter `uvs` is an optional flat array of `Vector2` to update/set
@@ -232,7 +230,7 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.
@@ -260,7 +258,7 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.
@@ -290,7 +288,7 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.
@@ -327,8 +325,7 @@ public:
    * change, not the number of points, neither the number of lines
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once created
-   * @see
-   * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#linesystem
+   * @see http://doc.babylonjs.com/how_to/parametric_shapes#line-system
    * @param name defines the name of the new line system
    * @param options defines the options used to create the line system
    * @param scene defines the hosting scene
@@ -356,8 +353,7 @@ public:
    * not the number of points
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once created
-   * @see
-   * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#lines
+   * @see http://doc.babylonjs.com/how_to/parametric_shapes#lines
    * @param name defines the name of the new line system
    * @param options defines the options used to create the line system
    * @param scene defines the hosting scene
@@ -391,8 +387,7 @@ public:
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
    * @returns the dashed line mesh
-   * @see
-   * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#dashed-lines
+   * @see http://doc.babylonjs.com/how_to/parametric_shapes#dashed-lines
    */
   static LinesMesh* CreateDashedLines(const string_t& name,
                                       DashedLinesOptions& options,
@@ -426,7 +421,7 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The optional parameter `invertUV` (boolean, default false) swaps in the
    * geometry the U and V coordinates to apply a texture.
    * * The mesh can be set to updatable with the boolean parameter `updatable`
@@ -437,9 +432,8 @@ public:
    * @param scene defines the hosting scene
    * @returns the extruded shape mesh
    * @see http://doc.babylonjs.com/tutorials/Parametric_Shapes
-   * @see http://doc.babylonjs.com/tutorials/Parametric_Shapes#extrusion
-   * @see
-   * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#extruded-shapes
+   * @see http://doc.babylonjs.com/how_to/parametric_shapes#extruded-shapes
+   * @see http://doc.babylonjs.com/how_to/parametric_shapes#extruded-shapes
    */
   static Mesh* ExtrudeShape(const string_t& name, ExtrudeShapeOptions& options,
                             Scene* scene);
@@ -484,7 +478,7 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The optional parameter `invertUV` (boolean, default false) swaps in the
    * geometry the U and V coordinates to apply a texture
    * * The mesh can be set to updatable with the boolean parameter `updatable`
@@ -494,9 +488,9 @@ public:
    * @param scene defines the hosting scene
    * @returns the custom extruded shape mesh
    * @see
-   * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#custom-extruded-shapes
+   * http://doc.babylonjs.com/how_to/parametric_shapes#custom-extruded-shapes
    * @see http://doc.babylonjs.com/tutorials/Parametric_Shapes
-   * @see http://doc.babylonjs.com/tutorials/Parametric_Shapes#extrusion
+   * @see http://doc.babylonjs.com/how_to/parametric_shapes#extruded-shapes
    */
   static Mesh* ExtrudeShapeCustom(const string_t& name,
                                   ExtrudeShapeCustomOptions& options,
@@ -505,7 +499,7 @@ public:
   /**
    * @brief Creates lathe mesh.
    * The lathe is a shape with a symetry axis : a 2D model shape is rotated
-   * around this axis to design the lathe.
+   * around this axis to design the lathe
    * * The parameter `shape` is a required array of successive Vector3. This
    * array depicts the shape to be rotated in its local space : the shape must
    * be designed in the xOy plane and will be rotated around the Y axis. It's
@@ -557,7 +551,7 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once created
    * @param name defines the name of the mesh
@@ -638,7 +632,7 @@ public:
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
    * @returns the ground mesh
-   * @see http://doc.babylonjs.com/tutorials/14._Height_Map
+   * @see http://doc.babylonjs.com/babylon101/height_map
    * @see
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#ground-from-a-height-map
    */
@@ -716,7 +710,7 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The optional parameter `invertUV` (boolean, default false) swaps in the
    * geometry the U and V coordinates to apply a texture
    * * The mesh can be set to updatable with the boolean parameter `updatable`
@@ -762,15 +756,14 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once created
    * @param name defines the name of the mesh
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
    * @returns the polyhedron mesh
-   * @see
-   * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#polyhedron
+   * @see http://doc.babylonjs.com/how_to/polyhedra_shapes
    */
   static Mesh* CreatePolyhedron(const string_t& name,
                                 PolyhedronOptions& options, Scene* scene);
@@ -791,8 +784,7 @@ public:
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
    * @returns the decal mesh
-   * @see
-   * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#decals
+   * @see http://doc.babylonjs.com/how_to/decals
    */
   static Mesh* CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
                            DecalOptions& options);

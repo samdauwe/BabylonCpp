@@ -174,6 +174,11 @@ Matrix* Node::getWorldMatrix()
   return _worldMatrix.get();
 }
 
+float Node::_getWorldMatrixDeterminant() const
+{
+  return 1.f;
+}
+
 void Node::_initCache()
 {
   _cache.parent = nullptr;

@@ -3,20 +3,26 @@
 #include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json.h>
+#include <babylon/engine/engine.h>
+#include <babylon/engine/scene.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
 
 namespace BABYLON {
 
-MorphTarget::MorphTarget(const string_t& name, float iInfluence)
+MorphTarget::MorphTarget(const string_t& name, float iInfluence, Scene* scene)
     : influence{this, &MorphTarget::get_influence, &MorphTarget::set_influence}
+    , animationPropertiesOverride{this,
+                                  &MorphTarget::get_animationPropertiesOverride,
+                                  &MorphTarget::set_animationPropertiesOverride}
     , hasPositions{this, &MorphTarget::get_hasPositions}
     , hasNormals{this, &MorphTarget::get_hasNormals}
     , hasTangents{this, &MorphTarget::get_hasTangents}
     , _name{name}
-    , _influence{numeric_limits_t<float>::max()}
+    , _scene{scene ? scene : Engine::LastCreatedScene()}
+    , _influence{iInfluence}
+    , _animationPropertiesOverride{nullptr}
 {
-  influence = iInfluence;
 }
 
 MorphTarget::~MorphTarget()
@@ -46,6 +52,20 @@ void MorphTarget::set_influence(float influence)
     auto value = ::std::make_unique<bool>(previous == 0.f || influence == 0.f);
     onInfluenceChanged.notifyObservers(value.get());
   }
+}
+
+AnimationPropertiesOverride*& MorphTarget::get_animationPropertiesOverride()
+{
+  if (!_animationPropertiesOverride && _scene) {
+    return _scene->animationPropertiesOverride;
+  }
+  return _animationPropertiesOverride;
+}
+
+void MorphTarget::set_animationPropertiesOverride(
+  AnimationPropertiesOverride* const& value)
+{
+  _animationPropertiesOverride = value;
 }
 
 bool MorphTarget::get_hasPositions() const
@@ -148,7 +168,8 @@ unique_ptr_t<MorphTarget> MorphTarget::FromMesh(AbstractMesh* mesh,
     name = mesh->name;
   }
 
-  auto result = ::std::make_unique<MorphTarget>(name, influence);
+  auto result
+    = ::std::make_unique<MorphTarget>(name, influence, mesh->getScene());
 
   result->setPositions(mesh->getVerticesData(VertexBuffer::PositionKind));
 

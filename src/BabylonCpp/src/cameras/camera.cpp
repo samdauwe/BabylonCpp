@@ -24,7 +24,8 @@ namespace BABYLON {
 bool Camera::ForceAttachControlToAlwaysPreventDefault = false;
 bool Camera::UseAlternateWebVRRendering               = false;
 
-Camera::Camera(const string_t& iName, const Vector3& iPosition, Scene* scene)
+Camera::Camera(const string_t& iName, const Vector3& iPosition, Scene* scene,
+               bool setActiveOnSceneIfNoneActive)
     : Node(iName, scene)
     , position{iPosition}
     , upVector{Vector3::Up()}
@@ -47,12 +48,14 @@ Camera::Camera(const string_t& iName, const Vector3& iPosition, Scene* scene)
     , _projectionMatrix{Matrix()}
     , globalPosition{this, &Camera::get_globalPosition}
     , _webvrViewMatrix{Matrix::Identity()}
+    , _globalPosition{Vector3::Zero()}
     , _computedViewMatrix{Matrix::Identity()}
     , _doNotComputeProjectionMatrix{false}
+    , _worldMatrix{::std::make_unique<Matrix>(Matrix::Identity())}
     , _transformMatrix{Matrix::Zero()}
     , _webvrProjectionMatrix{Matrix::Identity()}
-    , _globalPosition{Vector3::Zero()}
     , _refreshFrustumPlanes{true}
+    , _setActiveOnSceneIfNoneActive{setActiveOnSceneIfNoneActive}
 {
   _initCache();
 }
@@ -68,7 +71,7 @@ IReflect::Type Camera::type() const
 
 void Camera::addToScene(unique_ptr_t<Camera>&& newCamera)
 {
-  if (!getScene()->activeCamera) {
+  if (_setActiveOnSceneIfNoneActive && !getScene()->activeCamera) {
     getScene()->activeCamera = newCamera.get();
   }
 
@@ -345,13 +348,12 @@ void Camera::detachPostProcess(PostProcess* postProcess)
 
 Matrix* Camera::getWorldMatrix()
 {
-  if (!_worldMatrix) {
-    _worldMatrix = ::std::make_unique<Matrix>(Matrix::Identity());
+  if (_isSynchronizedViewMatrix()) {
+    return _worldMatrix.get();
   }
 
-  auto viewMatrix = getViewMatrix();
-
-  viewMatrix.invertToRef(*_worldMatrix);
+  // Getting the the view matrix will also compute the world matrix.
+  getViewMatrix();
 
   return _worldMatrix.get();
 }
@@ -374,33 +376,14 @@ Matrix& Camera::getViewMatrix(bool force)
 
   _refreshFrustumPlanes = true;
 
-  if (!parent() || !parent()->getWorldMatrix()) {
-    _globalPosition.copyFrom(position);
-  }
-  else {
-    if (!_worldMatrix) {
-      _worldMatrix = ::std::make_unique<Matrix>(Matrix::Identity());
-    }
-
-    _computedViewMatrix.invertToRef(*_worldMatrix);
-
-    _worldMatrix->multiplyToRef(*parent()->getWorldMatrix(),
-                                _computedViewMatrix);
-    _globalPosition.copyFromFloats(_computedViewMatrix.m[12],
-                                   _computedViewMatrix.m[13],
-                                   _computedViewMatrix.m[14]);
-
-    _computedViewMatrix.invert();
-
-    _markSyncedWithParent();
-  }
-
   if (_cameraRigParams.vrPreViewMatrixSet) {
     _computedViewMatrix.multiplyToRef(_cameraRigParams.vrPreViewMatrix,
                                       _computedViewMatrix);
   }
 
   onViewMatrixChangedObservable.notifyObservers(this);
+
+  _computedViewMatrix.invertToRef(*_worldMatrix);
 
   return _computedViewMatrix;
 }

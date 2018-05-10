@@ -83,13 +83,49 @@ public:
    */
   virtual Matrix* getWorldMatrix() override;
 
+  /**
+   * @brief Hidden
+   */
+  virtual float _getWorldMatrixDeterminant() const;
+
+  /**
+   * @brief Hidden
+   */
   virtual void _initCache();
+
+  /**
+   * @brief Hidden
+   */
   virtual void updateCache(bool force = false);
+
+  /**
+   * @brief Hidden
+   */
   virtual void _updateCache(bool ignoreParentClass = false);
+
+  /**
+   * @brief Hidden
+   */
   virtual bool _isSynchronized();
+
+  /**
+   * @brief Hidden
+   */
   void _markSyncedWithParent();
+
+  /**
+   * @brief Hidden
+   */
   bool isSynchronizedWithParent() const;
+
+  /**
+   * @brief Hidden
+   */
   bool isSynchronized(bool updateCache = false);
+
+  /**
+   * @brief Hidden
+   */
   bool hasNewParent(bool update = false);
 
   /**
@@ -201,7 +237,14 @@ public:
   vector_t<Node*> getChildren(const ::std::function<bool(Node* node)>& predicate
                               = nullptr);
 
+  /**
+   * @brief Hidden
+   */
   void _setReady(bool state);
+
+  /**
+   * @brief Hidden
+   */
   virtual vector_t<Animation*> getAnimations() override;
 
   /**

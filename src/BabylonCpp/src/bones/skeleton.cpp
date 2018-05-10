@@ -461,6 +461,10 @@ Skeleton* Skeleton::Parse(const Json::value& parsedSkeleton, Scene* scene)
       bone->length = Json::GetNumber(parsedBone, "length", 0);
     }
 
+    if (parsedBone.contains("metadata")) {
+      // bone.metadata = parsedBone.metadata;
+    }
+
     if (parsedBone.contains("animation")) {
       bone->animations.emplace_back(
         Animation::Parse(parsedBone.get("animation")));

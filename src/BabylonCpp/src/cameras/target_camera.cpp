@@ -10,11 +10,12 @@
 namespace BABYLON {
 
 TargetCamera::TargetCamera(const string_t& iName, const Vector3& iPosition,
-                           Scene* scene)
-    : Camera(iName, iPosition, scene)
+                           Scene* scene, bool setActiveOnSceneIfNoneActive)
+    : Camera(iName, iPosition, scene, setActiveOnSceneIfNoneActive)
     , cameraDirection{::std::make_unique<Vector3>(0.f, 0.f, 0.f)}
     , cameraRotation{::std::make_unique<Vector2>(0.f, 0.f)}
     , rotation{::std::make_unique<Vector3>(0.f, 0.f, 0.f)}
+    , rotationQuaternion{nullptr}
     , speed{2.f}
     , noRotationConstraint{false}
     , lockedTarget{nullptr}
@@ -25,8 +26,8 @@ TargetCamera::TargetCamera(const string_t& iName, const Vector3& iPosition,
     , _cameraRotationMatrix{Matrix::Zero()}
     , _referencePoint{::std::make_unique<Vector3>(0.f, 0.f, 1.f)}
     , _transformedReferencePoint{Vector3::Zero()}
-    , _lookAtTemp{Matrix::Zero()}
-    , _tempMatrix{Matrix::Zero()}
+    , _globalCurrentTarget{Vector3::Zero()}
+    , _globalCurrentUpVector{Vector3::Zero()}
     , _currentUpVector{::std::make_unique<Vector3>(0.f, 1.f, 0.f)}
 {
   _initCache();
@@ -324,16 +325,38 @@ Matrix TargetCamera::_getViewMatrix()
   // Computing target and final matrix
   position.addToRef(_transformedReferencePoint, _currentTarget);
 
-  if (getScene()->useRightHandedSystem()) {
-    Matrix::LookAtRHToRef(position, _currentTarget, *_currentUpVector,
-                          _viewMatrix);
-  }
-  else {
-    Matrix::LookAtLHToRef(position, _currentTarget, *_currentUpVector,
-                          _viewMatrix);
-  }
+  _computeViewMatrix(position, _currentTarget, *_currentUpVector);
 
   return _viewMatrix;
+}
+
+void TargetCamera::_computeViewMatrix(const Vector3& position,
+                                      const Vector3& target, const Vector3& up)
+{
+  if (parent()) {
+    auto parentWorldMatrix = *parent()->getWorldMatrix();
+    Vector3::TransformCoordinatesToRef(position, parentWorldMatrix,
+                                       _globalPosition);
+    Vector3::TransformCoordinatesToRef(target, parentWorldMatrix,
+                                       _globalCurrentTarget);
+    Vector3::TransformNormalToRef(up, parentWorldMatrix,
+                                  _globalCurrentUpVector);
+    _markSyncedWithParent();
+  }
+  else {
+    _globalPosition.copyFrom(position);
+    _globalCurrentTarget.copyFrom(target);
+    _globalCurrentUpVector.copyFrom(up);
+  }
+
+  if (getScene()->useRightHandedSystem()) {
+    Matrix::LookAtRHToRef(_globalPosition, _globalCurrentTarget,
+                          _globalCurrentUpVector, _viewMatrix);
+  }
+  else {
+    Matrix::LookAtLHToRef(_globalPosition, _globalCurrentTarget,
+                          _globalCurrentUpVector, _viewMatrix);
+  }
 }
 
 /** Camera rigs section **/

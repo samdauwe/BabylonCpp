@@ -781,6 +781,9 @@ Vector3 AbstractMesh::calcRotatePOV(float flipBack, float twirlClockwise,
 
 MinMax AbstractMesh::getHierarchyBoundingVectors(bool includeDescendants)
 {
+  // Ensures that all world matrix will be recomputed.
+  getScene()->incrementRenderId();
+
   computeWorldMatrix(true);
 
   Vector3 min;

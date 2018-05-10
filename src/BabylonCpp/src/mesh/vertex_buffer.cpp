@@ -401,7 +401,7 @@ float VertexBuffer::_GetFloatValue(const DataView& dataView, unsigned int type,
     case VertexBuffer::BYTE: {
       auto value = static_cast<float>(dataView.getInt8(byteOffset));
       if (normalized) {
-        value = (value + 0.5f) / 127.5f;
+        value = ::std::max(value / 127.f, -1.f);
       }
       return value;
     }
@@ -415,7 +415,7 @@ float VertexBuffer::_GetFloatValue(const DataView& dataView, unsigned int type,
     case VertexBuffer::SHORT: {
       auto value = static_cast<float>(dataView.getInt16(byteOffset, true));
       if (normalized) {
-        value = (value + 0.5f) / 16383.5f;
+        value = ::std::max(value / 16383.f, -1.f);
       }
       return value;
     }

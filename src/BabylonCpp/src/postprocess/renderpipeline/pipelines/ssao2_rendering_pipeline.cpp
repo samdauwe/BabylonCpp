@@ -1,6 +1,7 @@
 #include <babylon/postprocess/renderpipeline/pipelines/ssao2_rendering_pipeline.h>
 
 #include <babylon/cameras/camera.h>
+#include <babylon/core/json.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/random.h>
 #include <babylon/core/variant.h>
@@ -31,7 +32,7 @@ SSAO2RenderingPipeline::SSAO2RenderingPipeline(const string_t& name,
 
 SSAO2RenderingPipeline::SSAO2RenderingPipeline(const string_t& name,
                                                Scene* scene,
-                                               const SSAO2Ratio& ratio,
+                                               const SSAO2Ratio& iRatio,
                                                const vector_t<Camera*>& cameras)
     : PostProcessRenderPipeline(scene->getEngine(), name)
     , totalStrength{1.f}
@@ -46,6 +47,7 @@ SSAO2RenderingPipeline::SSAO2RenderingPipeline(const string_t& name,
     , fallOff{0.000001f}
     , base{0.1f}
     , _samples{8}
+    , _ratio{iRatio}
     , _expensiveBlur{true}
     , _scene{scene}
     , _depthTexture{nullptr}
@@ -64,8 +66,8 @@ SSAO2RenderingPipeline::SSAO2RenderingPipeline(const string_t& name,
     return;
   }
 
-  auto ssaoRatio = ratio.ssaoRatio;
-  auto blurRatio = ratio.blurRatio;
+  auto ssaoRatio = _ratio.ssaoRatio;
+  auto blurRatio = _ratio.blurRatio;
 
   // Set up assets
   auto geometryBufferRenderer = scene->enableGeometryBufferRenderer();
@@ -370,6 +372,18 @@ void SSAO2RenderingPipeline::_createRandomTexture()
   }
 
   _randomTexture->update(false);
+}
+
+Json::object SSAO2RenderingPipeline::serialize() const
+{
+  return Json::object();
+}
+
+unique_ptr_t<SSAO2RenderingPipeline>
+SSAO2RenderingPipeline::Parse(const Json::value& /*source*/, Scene* /*scene*/,
+                              const string_t& /*url*/)
+{
+  return nullptr;
 }
 
 } // end of namespace BABYLON

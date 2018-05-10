@@ -11,8 +11,8 @@
 namespace BABYLON {
 
 FreeCamera::FreeCamera(const string_t& iName, const Vector3& iPosition,
-                       Scene* scene)
-    : TargetCamera{iName, iPosition, scene}
+                       Scene* scene, bool setActiveOnSceneIfNoneActive)
+    : TargetCamera{iName, iPosition, scene, setActiveOnSceneIfNoneActive}
     , ellipsoid{Vector3(0.5f, 1.f, 0.5f)}
     , ellipsoidOffset{Vector3(0.f, 0.f, 0.f)}
     , checkCollisions{false}

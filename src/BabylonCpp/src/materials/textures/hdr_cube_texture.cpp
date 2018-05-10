@@ -21,15 +21,14 @@ vector_t<string_t> HDRCubeTexture::_facesMapping{
 };
 
 HDRCubeTexture::HDRCubeTexture(
-  const string_t& iUrl, Scene* scene, const Nullable<size_t>& size,
-  bool noMipmap, bool generateHarmonics, bool useInGammaSpace,
-  bool usePMREMGenerator, const ::std::function<void()>& onLoad,
+  const string_t& iUrl, Scene* scene, size_t size, bool noMipmap,
+  bool generateHarmonics, bool iGammaSpace, bool /*reserved*/,
+  const ::std::function<void()>& onLoad,
   const ::std::function<void(const string_t& message,
                              const string_t& exception)>& onError)
     : BaseTexture(scene)
     , url{iUrl}
     , coordinatesMode{TextureConstants::CUBIC_MODE}
-    , isPMREM{false}
     , isBlocking{this, &HDRCubeTexture::get_isBlocking,
                  &HDRCubeTexture::set_isBlocking}
     , rotationY{this, &HDRCubeTexture::get_rotationY,
@@ -37,12 +36,9 @@ HDRCubeTexture::HDRCubeTexture(
     , boundingBoxPosition{Vector3::Zero()}
     , _isBlocking{true}
     , _rotationY{0.f}
-    , _useInGammaSpace{false}
     , _generateHarmonics{generateHarmonics}
     , _noMipmap{noMipmap}
     , _size{size}
-    , _usePMREMGenerator{usePMREMGenerator}
-    , _isBABYLONPreprocessed{false}
     , _onLoad{onLoad}
     , _onError{onError}
     , _boundingBoxSize{nullptr}
@@ -58,26 +54,10 @@ HDRCubeTexture::HDRCubeTexture(
   _textureMatrix = Matrix::Identity();
   _onLoad        = onLoad;
   _onError       = onError;
-  gammaSpace     = false;
+  gammaSpace     = iGammaSpace;
 
-  auto caps = scene->getEngine()->getCaps();
-
-  if (size) {
-    _isBABYLONPreprocessed = false;
-    _noMipmap              = noMipmap;
-    _size                  = size;
-    _useInGammaSpace       = useInGammaSpace;
-    _usePMREMGenerator     = usePMREMGenerator && caps.textureLOD
-                         && caps.textureFloat && !_useInGammaSpace;
-  }
-  else {
-    _isBABYLONPreprocessed = true;
-    _noMipmap              = false;
-    _useInGammaSpace       = false;
-    _usePMREMGenerator
-      = caps.textureLOD && caps.textureFloat && !_useInGammaSpace;
-  }
-  isPMREM = _usePMREMGenerator;
+  _noMipmap = noMipmap;
+  _size     = size;
 
   _texture = _getFromCache(url, _noMipmap);
 
@@ -137,24 +117,9 @@ Nullable<Vector3>& HDRCubeTexture::get_boundingBoxSize()
   return _boundingBoxSize;
 }
 
-Float32Array HDRCubeTexture::loadBabylonTexture()
+Float32Array HDRCubeTexture::loadTexture()
 {
   return Float32Array();
-}
-
-Float32Array HDRCubeTexture::loadHDRTexture()
-{
-  return Float32Array();
-}
-
-void HDRCubeTexture::loadTexture()
-{
-  if (_isBABYLONPreprocessed) {
-    loadBabylonTexture();
-  }
-  else {
-    loadHDRTexture();
-  }
 }
 
 HDRCubeTexture* HDRCubeTexture::clone()
@@ -186,32 +151,6 @@ HDRCubeTexture* HDRCubeTexture::Parse(const Json::value& /*parsedTexture*/,
 Json::object HDRCubeTexture::serialize() const
 {
   return Json::object();
-}
-
-void HDRCubeTexture::generateBabylonHDROnDisk(
-  const string_t& /*url*/, size_t /*size*/,
-  const ::std::function<void()>& /*onError*/)
-{
-}
-
-void HDRCubeTexture::generateBabylonHDR(
-  const string_t& url, size_t size,
-  const ::std::function<void(const ArrayBuffer& arrayBuffer)>& /*callback*/,
-  const ::std::function<void()>& /*onError*/)
-{
-  // Needs the url tho create the texture.
-  if (url.empty()) {
-    return;
-  }
-
-  // Check Power of two size.
-  if (!Tools::IsExponentOfTwo(size)) { // Need to check engine.needPOTTextures
-    return;
-  }
-
-  // Coming Back in 3.x.
-  BABYLON_LOG_ERROR("HDRCubeTexture",
-                    "Generation of Babylon HDR is coming back in 3.2.");
 }
 
 } // end of namespace BABYLON

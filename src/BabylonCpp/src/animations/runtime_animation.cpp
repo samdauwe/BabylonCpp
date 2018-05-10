@@ -70,7 +70,7 @@ Animation* RuntimeAnimation::animation()
   return _animation;
 }
 
-void RuntimeAnimation::reset()
+void RuntimeAnimation::reset(bool /*value*/)
 {
   _offsetsCache.clear();
   _highLimitsCache.clear();

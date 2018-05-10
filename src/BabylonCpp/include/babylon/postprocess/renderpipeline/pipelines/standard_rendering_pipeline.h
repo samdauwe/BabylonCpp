@@ -18,7 +18,7 @@ public:
 
 public:
   /**
-   * Constructor
+   * @brief Constructor
    * @param {string} name - The rendering pipeline name
    * @param {BABYLON.Scene} scene - The scene linked to this pipeline
    * @param {any} ratio - The size of the postprocesses (0.5 means that your
@@ -53,6 +53,28 @@ public:
   float motionBlurSamples() const;
   void setMotionBlurSamples(float samples);
 
+  /**
+   * @brief Dispose of the pipeline and stop all post processes.
+   */
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
+
+  /**
+   * @brief Serialize the rendering pipeline (Used when exporting).
+   * @returns the serialized object
+   */
+  Json::object serialize() const;
+
+  /**
+   * @brief Parse the serialized pipeline.
+   * @param source Source pipeline.
+   * @param scene The scene to load the pipeline to.
+   * @param rootUrl The URL of the serialized pipeline.
+   * @returns An instantiated pipeline from the serialized object.
+   */
+  static unique_ptr_t<StandardRenderingPipeline>
+  Parse(const Json::value& source, Scene* scene, const string_t& url);
+
 private:
   void _buildPipeline();
   // Down Sample X4 Post-Processs
@@ -77,9 +99,6 @@ private:
   void _createMotionBlurPostProcess(Scene* scene, float ratio);
   Texture* _getDepthTexture();
   void _disposePostProcesses();
-  // Dispose
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
 
 public:
   // Post-processes

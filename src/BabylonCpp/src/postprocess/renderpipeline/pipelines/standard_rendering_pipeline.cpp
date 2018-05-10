@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/core/json.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/variant.h>
 #include <babylon/engine/engine.h>
@@ -318,24 +319,6 @@ void StandardRenderingPipeline::_buildPipeline()
 
   _currentDepthOfFieldSource = originalPostProcess;
 
-  if (_vlsEnabled) {
-    // Create volumetric light
-    _createVolumetricLightPostProcess(scene, ratio);
-
-    // Create volumetric light final post-process
-    volumetricLightFinalPostProcess = new PostProcess(
-      "HDRVLSFinal", "standard", {}, {},
-      ToVariant<float, PostProcessOptions>(ratio), nullptr,
-      TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-      "#define PASS_POST_PROCESS", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
-    addEffect(new PostProcessRenderEffect(scene->getEngine(), "HDRVLSFinal",
-                                          [this]() -> vector_t<PostProcess*> {
-                                            return {
-                                              volumetricLightFinalPostProcess};
-                                          },
-                                          true));
-  }
-
   if (_bloomEnabled) {
     // Create down sample X4 post-process
     _createDownSampleX4PostProcess(scene, ratio / 2.f);
@@ -361,6 +344,24 @@ void StandardRenderingPipeline::_buildPipeline()
         return {textureAdderFinalPostProcess};
       },
       true));
+  }
+
+  if (_vlsEnabled) {
+    // Create volumetric light
+    _createVolumetricLightPostProcess(scene, ratio);
+
+    // Create volumetric light final post-process
+    volumetricLightFinalPostProcess = new PostProcess(
+      "HDRVLSFinal", "standard", {}, {},
+      ToVariant<float, PostProcessOptions>(ratio), nullptr,
+      TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
+      "#define PASS_POST_PROCESS", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+    addEffect(new PostProcessRenderEffect(scene->getEngine(), "HDRVLSFinal",
+                                          [this]() -> vector_t<PostProcess*> {
+                                            return {
+                                              volumetricLightFinalPostProcess};
+                                          },
+                                          true));
   }
 
   if (_lensFlareEnabled) {
@@ -619,7 +620,9 @@ void StandardRenderingPipeline::_createVolumetricLightPostProcess(Scene* scene,
 
   volumetricLightMergePostProces->setOnApply(
     [this](Effect* effect, EventState& /*es*/) {
-      effect->setTextureFromPostProcess("originalSampler", originalPostProcess);
+      effect->setTextureFromPostProcess(
+        "originalSampler",
+        _bloomEnabled ? textureAdderFinalPostProcess : originalPostProcess);
 
       _currentDepthOfFieldSource = volumetricLightFinalPostProcess;
     });
@@ -751,7 +754,6 @@ void StandardRenderingPipeline::_createHdrPostProcess(Scene* scene, float ratio)
   float lastTime        = 0.f;
 
   hdrPostProcess->setOnApply([&](Effect* effect, EventState&) {
-
     effect->setTextureFromPostProcess("textureAdderSampler",
                                       _currentDepthOfFieldSource);
 
@@ -1071,6 +1073,18 @@ void StandardRenderingPipeline::dispose(bool doNotRecurse,
     _name, cameras);
 
   PostProcessRenderPipeline::dispose(doNotRecurse);
+}
+
+Json::object StandardRenderingPipeline::serialize() const
+{
+  return Json::object();
+}
+
+unique_ptr_t<StandardRenderingPipeline>
+StandardRenderingPipeline::Parse(const Json::value& /*source*/,
+                                 Scene* /*scene*/, const string_t& /*url*/)
+{
+  return nullptr;
 }
 
 } // end of namespace BABYLON

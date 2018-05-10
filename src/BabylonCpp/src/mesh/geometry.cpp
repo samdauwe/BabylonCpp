@@ -318,18 +318,17 @@ Float32Array Geometry::getVerticesData(unsigned int kind, bool copyWhenShared,
   }
 
   auto data = vertexBuffer->getData();
-
   if (data.empty()) {
     return Float32Array();
   }
 
-  auto defaultStride = VertexBuffer::DeduceStride(vertexBuffer->getKind());
-  auto defaultByteStride
-    = defaultStride * VertexBuffer::GetTypeByteLength(vertexBuffer->type);
-  auto count = _totalVertices * static_cast<size_t>(defaultStride);
+  const auto tightlyPackedByteStride
+    = vertexBuffer->getSize()
+      * VertexBuffer::GetTypeByteLength(vertexBuffer->type);
+  const auto count = _totalVertices * vertexBuffer->getSize();
 
   if (vertexBuffer->type != VertexBuffer::FLOAT
-      || vertexBuffer->byteStride != defaultByteStride) {
+      || vertexBuffer->byteStride != tightlyPackedByteStride) {
     Float32Array copy(count);
     vertexBuffer->forEach(
       count, [&](float value, size_t index) { copy[index] = value; });

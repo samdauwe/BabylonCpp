@@ -21,21 +21,18 @@ public:
    * format)
    * @param scene The scene the texture will be used in
    * @param size The cubemap desired size (the more it increases the longer the
-   * generation will be) If the size is omitted this implies you are using a
-   * preprocessed cubemap.
+   * generation will be)
    * @param noMipmap Forces to not generate the mipmap if true
    * @param generateHarmonics Specifies whether you want to extract the
    * polynomial harmonics during the generation process
-   * @param useInGammaSpace Specifies if the texture will be use in gamma or
-   * linear space (the PBR material requires those texture in linear space, but
-   * the standard material would require them in Gamma space)
-   * @param usePMREMGenerator Specifies whether or not to generate the CubeMap
-   * through CubeMapGen to avoid seams issue at run time.
+   * @param gammaSpace Specifies if the texture will be use in gamma or linear
+   * space (the PBR material requires those texture in linear space, but the
+   * standard material would require them in Gamma space)
+   * @param reserved Reserved flag for internal use.
    */
-  HDRCubeTexture(const string_t& url, Scene* scene,
-                 const Nullable<size_t>& size, bool noMipmap = false,
-                 bool generateHarmonics = true, bool useInGammaSpace = false,
-                 bool usePMREMGenerator                = false,
+  HDRCubeTexture(const string_t& url, Scene* scene, size_t size,
+                 bool noMipmap = false, bool generateHarmonics = true,
+                 bool gammaSpace = false, bool reserved = false,
                  const ::std::function<void()>& onLoad = nullptr,
                  const ::std::function<void(const string_t& message,
                                             const string_t& exception)>& onError
@@ -51,36 +48,6 @@ public:
   static HDRCubeTexture* Parse(const Json::value& parsedTexture, Scene* scene,
                                const string_t& rootUrl);
   Json::object serialize() const;
-
-  /**
-   * @brief Saves as a file the data contained in the texture in a binary
-   * format. This can be used to prevent the long loading tie associated with
-   * creating the seamless texture as well as the spherical used in the
-   * lighting.
-   * @param url The HDR file url.
-   * @param size The size of the texture data to generate (one of the cubemap
-   * face desired width).
-   * @param onError Method called if any error happens during download.
-   * @return The packed binary data.
-   */
-  static void generateBabylonHDROnDisk(const string_t& url, size_t size,
-                                       const ::std::function<void()>& onError
-                                       = nullptr);
-
-  /**
-   * @brief Serializes the data contained in the texture in a binary format.
-   * This can be used to prevent the long loading tie associated with creating
-   * the seamless texture as well as the spherical used in the lighting.
-   * @param url The HDR file url.
-   * @param size The size of the texture data to generate (one of the cubemap
-   * face desired width).
-   * @param onError Method called if any error happens during download.
-   * @return The packed binary data.
-   */
-  static void generateBabylonHDR(
-    const string_t& url, size_t size,
-    const ::std::function<void(const ArrayBuffer& arrayBuffer)>& callback,
-    const ::std::function<void()>& onError = nullptr);
 
 protected:
   /**
@@ -123,19 +90,9 @@ protected:
 
 private:
   /**
-   * @brief Occurs when the file is a preprocessed .babylon.hdr file.
-   */
-  Float32Array loadBabylonTexture();
-
-  /**
    * @brief Occurs when the file is raw .hdr file.
    */
-  Float32Array loadHDRTexture();
-
-  /**
-   * @brief Starts the loading process of the texture.
-   */
-  void loadTexture();
+  Float32Array loadTexture();
 
 public:
   /**
@@ -153,13 +110,6 @@ public:
    * The spherical polynomial data extracted from the texture.
    */
   SphericalPolynomial* sphericalPolynomial;
-
-  /**
-   * Specifies wether the texture has been generated through the PMREMGenerator
-   * tool.
-   * This is usefull at run time to apply the good shader.
-   */
-  bool isPMREM;
 
   /**
    * Specifies wether or not the texture is blocking during loading.
@@ -183,14 +133,11 @@ protected:
 
 private:
   static vector_t<string_t> _facesMapping;
-  bool _useInGammaSpace;
   bool _generateHarmonics;
   bool _noMipmap;
   vector_t<string_t> _extensions;
   Matrix _textureMatrix;
   size_t _size;
-  bool _usePMREMGenerator;
-  bool _isBABYLONPreprocessed;
   ::std::function<void()> _onLoad;
   ::std::function<void(const string_t& message, const string_t& exception)>
     _onError;
