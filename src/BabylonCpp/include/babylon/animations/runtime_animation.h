@@ -76,32 +76,37 @@ public:
 
 public:
   /**
-   * Current frame.
+   * Current frame
    */
   ReadOnlyProperty<RuntimeAnimation, int> currentFrame;
 
   /**
-   * Weight of the runtime animation.
+   * Weight of the runtime animation
    */
   ReadOnlyProperty<RuntimeAnimation, float> weight;
 
   /**
-   * Original value of the runtime animation.
+   * Original value of the runtime animation
    */
   ReadOnlyProperty<RuntimeAnimation, Nullable<AnimationValue>> originalValue;
 
   /**
-   * Current value of the runtime animation.
+   * Current value of the runtime animation
    */
   ReadOnlyProperty<RuntimeAnimation, Nullable<AnimationValue>> currentValue;
 
   /**
-   * Path where to store the animated value in the target.
+   * Hidden
+   */
+  AnimationValue _workValue;
+
+  /**
+   * Path where to store the animated value in the target
    */
   ReadOnlyProperty<RuntimeAnimation, string_t> targetPath;
 
   /**
-   * Actual target of the runtime animation.
+   * Actual target of the runtime animation
    */
   ReadOnlyProperty<RuntimeAnimation, IAnimatable*> target;
 

@@ -120,6 +120,7 @@ Scene::Scene(Engine* engine)
     , actionManager{nullptr}
     , proceduralTexturesEnabled{true}
     , simplificationQueue{nullptr}
+    , animationTimeScale{1}
     , _cachedMaterial{nullptr}
     , _cachedEffect{nullptr}
     , _cachedVisibility{0.f}
@@ -177,7 +178,6 @@ Scene::Scene(Engine* engine)
     , _engine{engine ? engine : Engine::LastCreatedEngine()}
     , _animationRatio{0}
     , _animationTimeLastSet{false}
-    , animationTimeScale{1}
     , _renderId{0}
     , _executeWhenReadyTimeoutId{-1}
     , _intermediateRendering{false}
@@ -1518,6 +1518,20 @@ bool Scene::isReady()
     }
   }
 
+  // Post-processes
+  if (!activeCameras.empty()) {
+    for (auto& camera : activeCameras) {
+      if (!camera->isReady(true)) {
+        return false;
+      }
+    }
+  }
+  else if (activeCamera) {
+    if (!activeCamera->isReady(true)) {
+      return false;
+    }
+  }
+
   // Particles
   for (auto& particleSystem : particleSystems) {
     if (!particleSystem->isReady()) {
@@ -1740,6 +1754,10 @@ void Scene::stopAllAnimations()
     }
     _activeAnimatables.clear();
   }
+
+  for (auto& group : animationGroups) {
+    group->stop();
+  }
 }
 
 void Scene::_animate()
@@ -1775,6 +1793,59 @@ void Scene::_registerTargetForLateAnimationBinding(
   RuntimeAnimation* /*runtimeAnimation*/)
 {
   // TODO Implement
+}
+
+AnimationValue Scene::_processLateAnimationBindingsForMatrices(
+  float holderTotalWeight, vector_t<RuntimeAnimation*>& holderAnimations,
+  Matrix& originalValue)
+{
+  auto normalizer         = 1.f;
+  auto& finalPosition     = Tmp::Vector3Array[0];
+  auto& finalScaling      = Tmp::Vector3Array[1];
+  auto& finalQuaternion   = Tmp::QuaternionArray[0];
+  auto startIndex         = 0u;
+  auto& originalAnimation = holderAnimations[0];
+
+  auto scale = 1.f;
+  if (holderTotalWeight < 1.f) {
+    // We need to mix the original value in
+    originalValue.decompose(finalScaling, finalQuaternion, finalPosition);
+    scale = 1.f - holderTotalWeight;
+  }
+  else {
+    startIndex = 1;
+    // We need to normalize the weights
+    normalizer = holderTotalWeight;
+    (*originalAnimation->currentValue())
+      .matrixData.decompose(finalScaling, finalQuaternion, finalPosition);
+    scale = originalAnimation->weight / normalizer;
+    if (scale == 1.f) {
+      return *originalAnimation->currentValue();
+    }
+  }
+
+  finalScaling.scaleInPlace(scale);
+  finalPosition.scaleInPlace(scale);
+  finalQuaternion.scaleInPlace(scale);
+
+  for (size_t animIndex = startIndex; animIndex < holderAnimations.size();
+       ++animIndex) {
+    auto& runtimeAnimation  = holderAnimations[animIndex];
+    auto scale              = runtimeAnimation->weight / normalizer;
+    auto& currentPosition   = Tmp::Vector3Array[2];
+    auto& currentScaling    = Tmp::Vector3Array[3];
+    auto& currentQuaternion = Tmp::QuaternionArray[1];
+
+    (*runtimeAnimation->currentValue())
+      .matrixData.decompose(currentScaling, currentQuaternion, currentPosition);
+    currentScaling.scaleAndAddToRef(scale, finalScaling);
+    currentQuaternion.scaleAndAddToRef(scale, finalQuaternion);
+    currentPosition.scaleAndAddToRef(scale, finalPosition);
+  }
+
+  Matrix::ComposeToRef(finalScaling, finalQuaternion, finalPosition,
+                       originalAnimation->_workValue.matrixData);
+  return originalAnimation->_workValue;
 }
 
 void Scene::_processLateAnimationBindings()
@@ -2057,6 +2128,20 @@ int Scene::removeAnimation(Animation* toRemove)
   return index;
 }
 
+int Scene::removeAnimationGroup(AnimationGroup* toRemove)
+{
+  auto it = ::std::find_if(
+    animationGroups.begin(), animationGroups.end(),
+    [&toRemove](const unique_ptr_t<AnimationGroup>& animationGroup) {
+      return animationGroup.get() == toRemove;
+    });
+  int index = static_cast<int>(it - animationGroups.begin());
+  if (it != animationGroups.end()) {
+    animationGroups.erase(it);
+  }
+  return index;
+}
+
 int Scene::removeMultiMaterial(MultiMaterial* toRemove)
 {
   auto it = ::std::find_if(
@@ -2112,6 +2197,34 @@ int Scene::removeActionManager(ActionManager* toRemove)
   return index;
 }
 
+int Scene::removeEffectLayer(EffectLayer* toRemove)
+{
+  auto it
+    = ::std::find_if(effectLayers.begin(), effectLayers.end(),
+                     [&toRemove](const unique_ptr_t<EffectLayer>& effectLayer) {
+                       return effectLayer.get() == toRemove;
+                     });
+  int index = static_cast<int>(it - effectLayers.begin());
+  if (it != effectLayers.end()) {
+    effectLayers.erase(it);
+  }
+  return index;
+}
+
+int Scene::removeTexture(BaseTexture* toRemove)
+{
+  auto it
+    = ::std::find_if(textures.begin(), textures.end(),
+                     [&toRemove](const unique_ptr_t<BaseTexture>& baseTexture) {
+                       return baseTexture.get() == toRemove;
+                     });
+  int index = static_cast<int>(it - textures.begin());
+  if (it != textures.end()) {
+    textures.erase(it);
+  }
+  return index;
+}
+
 void Scene::addLight(unique_ptr_t<Light>&& newLight)
 {
   auto _newLight = newLight.get();
@@ -2162,6 +2275,11 @@ void Scene::addAnimation(Animation* newAnimation)
   animations.emplace_back(::std::move(newAnimation));
 }
 
+void Scene::addAnimationGroup(unique_ptr_t<AnimationGroup>&& newAnimationGroup)
+{
+  animationGroups.emplace_back(::std::move(newAnimationGroup));
+}
+
 void Scene::addMultiMaterial(unique_ptr_t<MultiMaterial>&& newMultiMaterial)
 {
   multiMaterials.emplace_back(::std::move(newMultiMaterial));
@@ -2189,9 +2307,19 @@ void Scene::addLensFlareSystem(
   lensFlareSystems.emplace_back(::std::move(newLensFlareSystem));
 }
 
+void Scene::addEffectLayer(unique_ptr_t<EffectLayer>&& newEffectLayer)
+{
+  effectLayers.emplace_back(::std::move(newEffectLayer));
+}
+
 void Scene::addActionManager(unique_ptr_t<ActionManager>&& newActionManager)
 {
   _actionManagers.emplace_back(::std::move(newActionManager));
+}
+
+void Scene::addTexture(unique_ptr_t<BaseTexture>&& newTexture)
+{
+  textures.emplace_back(::std::move(newTexture));
 }
 
 void Scene::switchActiveCamera(Camera* newCamera, bool attachControl)
@@ -3166,6 +3294,17 @@ void Scene::_renderForCamera(Camera* camera, Camera* rigParent)
     Tools::EndPerformanceCounter("Lens flares", !lensFlareSystems.empty());
   }
 
+  // Effect Layer
+  if (renderEffects) {
+    engine->setDepthBuffer(false);
+    for (auto& effectLayer : effectLayers) {
+      if (effectLayer->shouldRender()) {
+        effectLayer->render();
+      }
+    }
+    engine->setDepthBuffer(true);
+  }
+
   // Foregrounds
   if (!layers.empty()) {
     engine->setDepthBuffer(false);
@@ -3173,17 +3312,6 @@ void Scene::_renderForCamera(Camera* camera, Camera* rigParent)
       if (!layer->isBackground
           && ((layer->layerMask & activeCamera->layerMask) != 0)) {
         layer->render();
-      }
-    }
-    engine->setDepthBuffer(true);
-  }
-
-  // Effect Layer
-  if (renderEffects) {
-    engine->setDepthBuffer(false);
-    for (auto& effectLayer : effectLayers) {
-      if (effectLayer->shouldRender()) {
-        effectLayer->render();
       }
     }
     engine->setDepthBuffer(true);
@@ -3579,8 +3707,19 @@ DepthRenderer* Scene::enableDepthRenderer(Camera* camera)
   }
   if (!stl_util::contains(_depthRenderer, _camera->id)
       || !_depthRenderer[_camera->id]) {
-    _depthRenderer[_camera->id] = ::std::make_unique<DepthRenderer>(
-      this, EngineConstants::TEXTURETYPE_FLOAT, _camera);
+    unsigned int textureType = 0;
+    if (_engine->getCaps().textureHalfFloatRender) {
+      textureType = EngineConstants::TEXTURETYPE_HALF_FLOAT;
+    }
+    else if (_engine->getCaps().textureFloatRender) {
+      textureType = EngineConstants::TEXTURETYPE_FLOAT;
+    }
+    else {
+      throw ::std::runtime_error(
+        "Depth renderer does not support int texture type");
+    }
+    _depthRenderer[_camera->id]
+      = ::std::make_unique<DepthRenderer>(this, textureType, _camera);
   }
 
   return _depthRenderer[_camera->id].get();
@@ -4173,6 +4312,11 @@ vector_t<PickingInfo*> Scene::multiPickWithRay(
     predicate);
 }
 
+AbstractMesh* Scene::getPointerOverMesh()
+{
+  return _pointerOverMesh;
+}
+
 void Scene::setPointerOverMesh(AbstractMesh* mesh)
 {
   if (_pointerOverMesh == mesh) {
@@ -4191,11 +4335,6 @@ void Scene::setPointerOverMesh(AbstractMesh* mesh)
       ActionManager::OnPointerOverTrigger(),
       ActionEvent::CreateNew(_pointerOverMesh));
   }
-}
-
-AbstractMesh* Scene::getPointerOverMesh()
-{
-  return _pointerOverMesh;
 }
 
 void Scene::setPointerOverSprite(Sprite* sprite)
@@ -4378,16 +4517,19 @@ void Scene::createDefaultCameraOrLight(bool createArcRotateCamera, bool replace,
 }
 
 Mesh* Scene::createDefaultSkybox(BaseTexture* iEnvironmentTexture, bool pbr,
-                                 float scale, float blur)
+                                 float scale, float blur,
+                                 bool setGlobalEnvTexture)
 {
-  if (environmentTexture()) {
-    setEnvironmentTexture(iEnvironmentTexture);
-  }
-
   if (!environmentTexture()) {
     BABYLON_LOG_WARN(
       "Scene", "Can not create default skybox without environment texture.");
     return nullptr;
+  }
+
+  if (setGlobalEnvTexture) {
+    if (iEnvironmentTexture) {
+      setEnvironmentTexture(iEnvironmentTexture);
+    }
   }
 
   // Skybox

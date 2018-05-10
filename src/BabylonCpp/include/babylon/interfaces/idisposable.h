@@ -6,7 +6,7 @@
 namespace BABYLON {
 
 /**
- * @brief IDisposable interface.
+ * @brief Define an interface for all classes that will hold resources.
  */
 struct BABYLON_SHARED_EXPORT IDisposable {
 
