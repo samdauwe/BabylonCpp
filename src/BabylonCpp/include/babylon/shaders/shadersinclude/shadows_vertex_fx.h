@@ -9,7 +9,7 @@ const char* shadowsVertex
   = "#ifdef SHADOWS\n"
     "  #if defined(SHADOW{X}) && !defined(SHADOWCUBE{X})\n"
     "  vPositionFromLight{X} = lightMatrix{X} * worldPos;\n"
-    "  vDepthMetric{X} =  ((vPositionFromLight{X}.z + light{X}.depthValues.x) / (light{X}.depthValues.y));\n"
+    "  vDepthMetric{X} = ((vPositionFromLight{X}.z + light{X}.depthValues.x) / (light{X}.depthValues.y));\n"
     "  #endif\n"
     "#endif\n";
 

@@ -66,6 +66,11 @@ const char* pbrFragmentDeclaration
     "  uniform vec2 vReflectionInfos;\n"
     "  uniform mat4 reflectionMatrix;\n"
     "  uniform vec3 vReflectionMicrosurfaceInfos;\n"
+    "\n"
+    "  #if defined(USE_LOCAL_REFLECTIONMAP_CUBIC) && defined(REFLECTIONMAP_CUBIC)\n"
+    "  uniform vec3 vReflectionPosition;\n"
+    "  uniform vec3 vReflectionSize; \n"
+    "  #endif\n"
     "#endif\n";
 
 } // end of namespace BABYLON

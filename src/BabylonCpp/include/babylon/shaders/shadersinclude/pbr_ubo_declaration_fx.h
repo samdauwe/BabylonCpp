@@ -19,6 +19,8 @@ const char* pbrUboDeclaration
     "  uniform vec2 vMicroSurfaceSamplerInfos;\n"
     "  uniform vec4 vRefractionInfos;\n"
     "  uniform vec2 vReflectionInfos;\n"
+    "  uniform vec3 vReflectionPosition;\n"
+    "  uniform vec3 vReflectionSize;  \n"
     "  uniform vec3 vBumpInfos;\n"
     "  uniform mat4 albedoMatrix;\n"
     "  uniform mat4 ambientMatrix;\n"

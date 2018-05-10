@@ -33,7 +33,12 @@ const char* bumpFragment
     "#endif\n"
     "\n"
     "#ifdef BUMP\n"
+    "#ifdef OBJECTSPACE_NORMALMAP\n"
+    "  normalW = normalize(texture2D(bumpSampler, vBumpUV).xyz  * 2.0 - 1.0);\n"
+    "  normalW = normalize(mat3(normalMatrix) * normalW);  \n"
+    "#else\n"
     "  normalW = perturbNormal(TBN, vBumpUV + uvOffset);\n"
+    "#endif\n"
     "#endif\n";
 
 } // end of namespace BABYLON

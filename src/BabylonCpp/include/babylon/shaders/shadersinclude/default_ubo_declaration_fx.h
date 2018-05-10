@@ -23,6 +23,8 @@ const char* defaultUboDeclaration
     "  vec2 vAmbientInfos;\n"
     "  vec2 vOpacityInfos;\n"
     "  vec2 vReflectionInfos;\n"
+    "  vec3 vReflectionPosition;\n"
+    "  vec3 vReflectionSize;\n"
     "  vec2 vEmissiveInfos;\n"
     "  vec2 vLightmapInfos;\n"
     "  vec2 vSpecularInfos;\n"

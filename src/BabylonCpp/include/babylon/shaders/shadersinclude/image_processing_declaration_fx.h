@@ -27,7 +27,11 @@ const char* imageProcessingDeclaration
     "#endif\n"
     "\n"
     "#ifdef COLORGRADING\n"
+    "  #ifdef COLORGRADING3D\n"
+    "  uniform highp sampler3D txColorTransform;\n"
+    "  #else\n"
     "  uniform sampler2D txColorTransform;\n"
+    "  #endif\n"
     "  uniform vec4 colorTransformSettings;\n"
     "#endif\n";
 

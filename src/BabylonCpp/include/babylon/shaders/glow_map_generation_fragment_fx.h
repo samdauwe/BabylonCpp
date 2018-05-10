@@ -26,7 +26,7 @@ const char* glowMapGenerationPixelShader
     "#endif\n"
     "\n"
     "#ifdef EMISSIVE\n"
-    "  gl_FragColor = texture2D(emissiveSampler, vUVEmissive);\n"
+    "  gl_FragColor = texture2D(emissiveSampler, vUVEmissive) * color;\n"
     "#else\n"
     "  gl_FragColor = color;\n"
     "#endif\n"

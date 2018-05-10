@@ -1,9 +1,13 @@
 ﻿#include <babylon/materials/effect_shaders_store.h>
 
 #include <babylon/shaders/anaglyph_fragment_fx.h>
+#include <babylon/shaders/background_fragment_fx.h>
+#include <babylon/shaders/background_vertex_fx.h>
 #include <babylon/shaders/black_and_white_fragment_fx.h>
+#include <babylon/shaders/bloom_merge_fragment_fx.h>
 #include <babylon/shaders/blur_fragment_fx.h>
 #include <babylon/shaders/chromatic_aberration_fragment_fx.h>
+#include <babylon/shaders/circle_of_confusion_fragment_fx.h>
 #include <babylon/shaders/color_correction_fragment_fx.h>
 #include <babylon/shaders/color_fragment_fx.h>
 #include <babylon/shaders/color_vertex_fx.h>
@@ -13,8 +17,10 @@
 #include <babylon/shaders/depth_box_blur_fragment_fx.h>
 #include <babylon/shaders/depth_fragment_fx.h>
 #include <babylon/shaders/depth_of_field_fragment_fx.h>
+#include <babylon/shaders/depth_of_field_merge_fragment_fx.h>
 #include <babylon/shaders/depth_vertex_fx.h>
 #include <babylon/shaders/display_pass_fragment_fx.h>
+#include <babylon/shaders/extract_highlights_fragment_fx.h>
 #include <babylon/shaders/filter_fragment_fx.h>
 #include <babylon/shaders/fxaa_fragment_fx.h>
 #include <babylon/shaders/fxaa_vertex_fx.h>
@@ -25,6 +31,11 @@
 #include <babylon/shaders/glow_map_generation_vertex_fx.h>
 #include <babylon/shaders/glow_map_merge_fragment_fx.h>
 #include <babylon/shaders/glow_map_merge_vertex_fx.h>
+#include <babylon/shaders/gpu_render_particles_fragment_fx.h>
+#include <babylon/shaders/gpu_render_particles_vertex_fx.h>
+#include <babylon/shaders/gpu_update_particles_fragment_fx.h>
+#include <babylon/shaders/gpu_update_particles_vertex_fx.h>
+#include <babylon/shaders/grain_fragment_fx.h>
 #include <babylon/shaders/highlights_fragment_fx.h>
 #include <babylon/shaders/image_processing_fragment_fx.h>
 #include <babylon/shaders/kernel_blur_fragment_fx.h>
@@ -48,6 +59,7 @@
 #include <babylon/shaders/refraction_fragment_fx.h>
 #include <babylon/shaders/shadow_map_fragment_fx.h>
 #include <babylon/shaders/shadow_map_vertex_fx.h>
+#include <babylon/shaders/sharpen_fragment_fx.h>
 #include <babylon/shaders/sprites_fragment_fx.h>
 #include <babylon/shaders/sprites_vertex_fx.h>
 #include <babylon/shaders/ssao2_fragment_fx.h>
@@ -83,9 +95,13 @@ EffectShadersStore::shaders() const
 
 unordered_map_t<string_t, const char*> EffectShadersStore::_shaders
   = {{"anaglyphPixelShader", anaglyphPixelShader},
+     {"backgroundPixelShader", backgroundPixelShader},
+     {"backgroundVertexShader", backgroundVertexShader},
      {"blackAndWhitePixelShader", blackAndWhitePixelShader},
+     {"bloomMergePixelShader", bloomMergePixelShader},
      {"blurPixelShader", blurPixelShader},
      {"chromaticAberrationPixelShader", chromaticAberrationPixelShader},
+     {"circleOfConfusionPixelShader", circleOfConfusionPixelShader},
      {"colorPixelShader", colorPixelShader},
      {"colorVertexShader", colorVertexShader},
      {"colorCorrectionPixelShader", colorCorrectionPixelShader},
@@ -96,7 +112,9 @@ unordered_map_t<string_t, const char*> EffectShadersStore::_shaders
      {"depthVertexShader", depthVertexShader},
      {"depthBoxBlurPixelShader", depthBoxBlurPixelShader},
      {"depthOfFieldPixelShader", depthOfFieldPixelShader},
+     {"depthOfFieldMergePixelShader", depthOfFieldMergePixelShader},
      {"displayPassPixelShader", displayPassPixelShader},
+     {"extractHighlightsPixelShader", extractHighlightsPixelShader},
      {"filterPixelShader", filterPixelShader},
      {"fxaaPixelShader", fxaaPixelShader},
      {"fxaaVertexShader", fxaaVertexShader},
@@ -107,6 +125,11 @@ unordered_map_t<string_t, const char*> EffectShadersStore::_shaders
      {"glowMapGenerationVertexShader", glowMapGenerationVertexShader},
      {"glowMapMergePixelShader", glowMapMergePixelShader},
      {"glowMapMergeVertexShader", glowMapMergeVertexShader},
+     {"gpuRenderParticlesPixelShader", gpuRenderParticlesPixelShader},
+     {"gpuRenderParticlesVertexShader", gpuRenderParticlesVertexShader},
+     {"gpuUpdateParticlesPixelShader", gpuUpdateParticlesPixelShader},
+     {"gpuUpdateParticlesVertexShader", gpuUpdateParticlesVertexShader},
+     {"grainPixelShader", grainPixelShader},
      {"highlightsPixelShader", highlightsPixelShader},
      {"imageProcessingPixelShader", imageProcessingPixelShader},
      {"kernelBlurPixelShader", kernelBlurPixelShader},
@@ -130,6 +153,7 @@ unordered_map_t<string_t, const char*> EffectShadersStore::_shaders
      {"refractionPixelShader", refractionPixelShader},
      {"shadowMapPixelShader", shadowMapPixelShader},
      {"shadowMapVertexShader", shadowMapVertexShader},
+     {"sharpenPixelShader", sharpenPixelShader},
      {"spritesPixelShader", spritesPixelShader},
      {"spritesVertexShader", spritesVertexShader},
      {"ssaoPixelShader", ssaoPixelShader},

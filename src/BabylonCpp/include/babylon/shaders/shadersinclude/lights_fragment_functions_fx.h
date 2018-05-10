@@ -40,9 +40,7 @@ const char* lightsFragmentFunctions
     "#ifdef NDOTL\n"
     "  result.ndl = ndl;\n"
     "#endif\n"
-    "\n"
     "  result.diffuse = ndl * diffuseColor * attenuation;\n"
-    "\n"
     "#ifdef SPECULARTERM\n"
     "  // Specular\n"
     "  vec3 angleW = normalize(viewDirectionW + lightVectorW);\n"
@@ -75,7 +73,6 @@ const char* lightsFragmentFunctions
     "  result.ndl = ndl;\n"
     "#endif\n"
     "  result.diffuse = ndl * diffuseColor * attenuation;\n"
-    "\n"
     "#ifdef SPECULARTERM\n"
     "  // Specular\n"
     "  vec3 angleW = normalize(viewDirectionW + lightVectorW);\n"
@@ -117,8 +114,14 @@ const char* lightsFragmentFunctions
     "\n"
     "  result.specular = specComp * specularColor;\n"
     "#endif\n"
-    "\n"
     "  return result;\n"
+    "}\n"
+    "\n"
+    "vec3 computeProjectionTextureDiffuseLighting(sampler2D projectionLightSampler, mat4 textureProjectionMatrix){\n"
+    "  vec4 strq = textureProjectionMatrix * vec4(vPositionW, 1.0);\n"
+    "  strq /= strq.w;\n"
+    "  vec3 textureColor = texture2D(projectionLightSampler, strq.xy).rgb;\n"
+    "  return textureColor;\n"
     "}\n";
 
 } // end of namespace BABYLON
