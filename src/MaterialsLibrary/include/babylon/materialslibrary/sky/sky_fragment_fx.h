@@ -81,7 +81,7 @@ const char* skyPixelShader
     "\n"
     "float sunIntensity(float zenithAngleCos)\n"
     "{\n"
-    "  return EE * max(0.0, 1.0 - exp(-((cutoffAngle - acos(zenithAngleCos))/steepness)));\n"
+    "  return EE * max(0.0, 1.0 - exp((-(cutoffAngle - acos(zenithAngleCos))/steepness)));\n"
     "}\n"
     "\n"
     "float A = 0.15;\n"

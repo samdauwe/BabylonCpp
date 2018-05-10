@@ -148,7 +148,7 @@ const char* cellPixelShader
     "  alpha *= vColor.a;\n"
     "#endif\n"
     "\n"
-    "  vec3 finalDiffuse = clamp(diffuseBase * diffuseColor, 0.0, 1.0) * baseColor.rgb;;\n"
+    "  vec3 finalDiffuse = clamp(diffuseBase * diffuseColor, 0.0, 1.0) * baseColor.rgb;\n"
     "\n"
     "  // Composition\n"
     "  vec4 color = vec4(finalDiffuse, alpha);\n"
