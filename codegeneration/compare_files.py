@@ -61,7 +61,7 @@ def main():
     current, previous = "3.2.0-alpha7", "3.1-beta-6"
     current, previous = "3.2.0-beta.2", "3.2.0-alpha7"
     current, previous = "3.2.0-beta.5", "3.2.0-beta.2"
-    #current, previous = "3.2.0", "3.2.0-beta.5"
+    current, previous = "3.2.0", "3.2.0-beta.5"
     # Dictionary mapping from BabylonJs version to relative path
     BabylonJsVersions = {
         "3.1-alpha"    : "3.1.0_2017_09_23",
@@ -77,7 +77,9 @@ def main():
                  "babylon.decorators.ts", "babylon.andOrNotEvaluator.ts",
                  "babylon.dracoCompression.ts", "babylon.vrExperienceHelper.ts",
                  "babylon.webVRCamera.ts", "babylon.analyser.ts",
-                 "babylon.stereoscopicCameras.ts", "babylon.sceneSerializer.ts"]
+                 "babylon.stereoscopicCameras.ts", "babylon.sceneSerializer.ts",
+                 "babylon.videoTexture.ts", "babylon.database.ts",
+                 "babylon.promise.ts"]
     # Create mapping from BabylonJs version to full path
     for version in BabylonJsVersions:
         fullPath = os.path.join(os.path.expanduser('~'), "Projects",
