@@ -124,7 +124,7 @@ void ArcRotateCameraPointersInput::attachControl(ICanvas* canvas,
       // pressed forever if we don't release all pointers
       // will be ok to put back pointers.remove(evt.pointerId); when iPhone bug
       // corrected
-      if (_engine->badOS()) {
+      if (_engine->_badOS) {
         _pointADefined = _pointBDefined = false;
       }
       else {

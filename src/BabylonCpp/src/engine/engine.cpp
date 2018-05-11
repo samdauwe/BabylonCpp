@@ -56,6 +56,9 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , renderEvenInBackground{true}
     , preventCacheWipeBetweenFrames{false}
     , enableOfflineSupport{false}
+    , disableManifestCheck{false}
+    , _badOS{false}
+    , _badDesktopOS{false}
     , disableTextureBindingOptimization{false}
     , _vrDisplayEnabled{false}
     , disableUniformBuffers{false}
@@ -78,7 +81,6 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _renderingCanvas{canvas}
     , _windowIsBackground{false}
     , _webGLVersion{1.f}
-    , _badOS{false}
     , _colorWrite{true}
     , _videoTextureSupported{false}
     , _renderingQueueLaunched{false}
@@ -418,16 +420,6 @@ bool Engine::supportsUniformBuffers() const
 bool Engine::needPOTTextures() const
 {
   return _webGLVersion < 2.f || forcePOTTextures;
-}
-
-bool Engine::badOS() const
-{
-  return _badOS;
-}
-
-bool Engine::badDesktopOS() const
-{
-  return _badDesktopOS;
 }
 
 PerformanceMonitor* Engine::performanceMonitor() const
@@ -894,7 +886,7 @@ void Engine::endFrame()
     flushFramebuffer();
   }
 
-  // submit frame to the vr device, if enabled
+  // Submit frame to the vr device, if enabled
   // if (_vrDisplayEnabled && _vrDisplayEnabled.isPresenting) {
   //  _vrDisplayEnabled.submitFrame()
   //}
@@ -1245,21 +1237,22 @@ void Engine::updateDynamicIndexBuffer(const GLBufferPtr& indexBuffer,
 }
 
 void Engine::updateDynamicVertexBuffer(const Engine::GLBufferPtr& vertexBuffer,
-                                       const Float32Array& vertices, int offset,
-                                       int count)
+                                       const Float32Array& vertices,
+                                       int byteOffset, int byteLength)
 {
   bindArrayBuffer(vertexBuffer.get());
 
-  if (offset == -1) {
-    offset = 0;
+  if (byteOffset == -1) {
+    byteOffset = 0;
   }
 
-  if (count == -1) {
-    _gl->bufferSubData(GL::ARRAY_BUFFER, offset, vertices);
+  if (byteLength == -1) {
+    _gl->bufferSubData(GL::ARRAY_BUFFER, byteOffset, vertices);
   }
   else {
     Float32Array subvector;
-    ::std::copy(vertices.begin() + offset, vertices.begin() + offset + count,
+    ::std::copy(vertices.begin() + byteOffset,
+                vertices.begin() + byteOffset + byteLength,
                 ::std::back_inserter(subvector));
     _gl->bufferSubData(GL::ARRAY_BUFFER, 0, subvector);
   }
@@ -1363,9 +1356,9 @@ void Engine::updateArrayBuffer(const Float32Array& data)
   _gl->bufferSubData(GL::ARRAY_BUFFER, 0, data);
 }
 
-void Engine::vertexAttribPointer(GL::IGLBuffer* buffer, unsigned int indx,
-                                 int size, unsigned int type, bool normalized,
-                                 int stride, int offset)
+void Engine::_vertexAttribPointer(GL::IGLBuffer* buffer, unsigned int indx,
+                                  int size, unsigned int type, bool normalized,
+                                  int stride, int offset)
 {
   bool changed = false;
   if (_currentBufferPointers.find(indx) == _currentBufferPointers.end()) {
@@ -1452,9 +1445,10 @@ void Engine::_bindVertexBuffersAttributes(
 
       auto buffer = vertexBuffer->getBuffer();
       if (buffer) {
-        vertexAttribPointer(buffer, _order, vertexBuffer->getSize(), GL::FLOAT,
-                            false, vertexBuffer->getStrideSize() * 4,
-                            static_cast<int>(vertexBuffer->getOffset() * 4));
+        _vertexAttribPointer(
+          buffer, _order, static_cast<int>(vertexBuffer->getSize()), GL::FLOAT,
+          false, static_cast<int>(vertexBuffer->getStrideSize() * 4),
+          static_cast<int>(vertexBuffer->getOffset() * 4));
 
         if (vertexBuffer->getIsInstanced()) {
           _gl->vertexAttribDivisor(_order, vertexBuffer->getInstanceDivisor());
@@ -1642,8 +1636,8 @@ void Engine::updateAndBindInstancesBuffer(GL::IGLBuffer* instancesBuffer,
       _vertexAttribArraysEnabled[offsetLocation] = true;
     }
 
-    vertexAttribPointer(instancesBuffer, offsetLocation, 4, GL::FLOAT, false,
-                        64, static_cast<int>(index * 16));
+    _vertexAttribPointer(instancesBuffer, offsetLocation, 4, GL::FLOAT, false,
+                         64, static_cast<int>(index * 16));
     _gl->vertexAttribDivisor(offsetLocation, 1);
     _currentInstanceLocations.emplace_back(offsetLocation);
     _currentInstanceBuffers.emplace_back(instancesBuffer);
@@ -1674,8 +1668,8 @@ void Engine::updateAndBindInstancesBuffer(
     }
 
     _gl->enableVertexAttribArray(ai.index);
-    vertexAttribPointer(instancesBuffer, ai.index, ai.attributeSize,
-                        ai.attribyteType, ai.normalized, stride, ai.offset);
+    _vertexAttribPointer(instancesBuffer, ai.index, ai.attributeSize,
+                         ai.attribyteType, ai.normalized, stride, ai.offset);
     _gl->vertexAttribDivisor(ai.index, 1);
     _currentInstanceLocations.emplace_back(ai.index);
     _currentInstanceBuffers.emplace_back(instancesBuffer);
@@ -2466,7 +2460,7 @@ InternalTexture* Engine::createTexture(
   unsigned int samplingMode,
   const ::std::function<void(InternalTexture*, EventState&)>& onLoad,
   const ::std::function<void()>& onError,
-  const Variant<ArrayBuffer, Image>& buffer, InternalTexture* fallBack,
+  const Variant<ArrayBuffer, Image>& buffer, InternalTexture* fallback,
   unsigned int format)
 {
   // assign a new string, so that the original is still available in case of
@@ -2476,8 +2470,8 @@ InternalTexture* Engine::createTexture(
   auto fromBlob = url.substr(0, 5) == "blob:";
   auto isBase64 = fromData && String::contains(url, "base64");
 
-  auto texture = fallBack ?
-                   fallBack :
+  auto texture = fallback ?
+                   fallback :
                    new InternalTexture(this, InternalTexture::DATASOURCE_URL);
 
   // establish the file extension, if possible
@@ -2490,7 +2484,7 @@ InternalTexture* Engine::createTexture(
 
   // determine if a ktx file should be substituted
   auto isKTX = false;
-  if (!_textureFormatInUse.empty() && !isBase64 && !fallBack) {
+  if (!_textureFormatInUse.empty() && !isBase64 && !fallback) {
     url   = url.substr(0, lastDot) + _textureFormatInUse;
     isKTX = true;
   }
@@ -2508,11 +2502,11 @@ InternalTexture* Engine::createTexture(
     texture->_buffer = buffer;
   }
 
-  if (onLoad && !fallBack) {
+  if (onLoad && !fallback) {
     texture->onLoadedObservable.add(onLoad);
   }
 
-  if (!fallBack) {
+  if (!fallback) {
     _internalTexturesCache.emplace_back(texture);
   }
 
@@ -2782,26 +2776,24 @@ void Engine::updateTextureSamplingMode(unsigned int samplingMode,
   auto filters = GetSamplingParameters(samplingMode, texture->generateMipMaps);
 
   if (texture->isCube) {
-    _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture, true);
-
-    _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER,
-                       filters.mag);
-    _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MIN_FILTER,
-                       filters.min);
+    _setTextureParameterInteger(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER,
+                                filters.mag, texture);
+    _setTextureParameterInteger(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MIN_FILTER,
+                                filters.min);
     _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
   }
   else if (texture->is3D) {
-    _bindTextureDirectly(GL::TEXTURE_3D, texture, true);
-
-    _gl->texParameteri(GL::TEXTURE_3D, GL::TEXTURE_MAG_FILTER, filters.mag);
-    _gl->texParameteri(GL::TEXTURE_3D, GL::TEXTURE_MIN_FILTER, filters.min);
+    _setTextureParameterInteger(GL::TEXTURE_3D, GL::TEXTURE_MAG_FILTER,
+                                filters.mag, texture);
+    _setTextureParameterInteger(GL::TEXTURE_3D, GL::TEXTURE_MIN_FILTER,
+                                filters.min);
     _bindTextureDirectly(GL::TEXTURE_3D, nullptr);
   }
   else {
-    _bindTextureDirectly(GL::TEXTURE_2D, texture, true);
-
-    _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, filters.mag);
-    _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, filters.min);
+    _setTextureParameterInteger(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER,
+                                filters.mag, texture);
+    _setTextureParameterInteger(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER,
+                                filters.min);
     _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
   }
 
@@ -3643,7 +3635,7 @@ InternalTexture* Engine::createCubeTexture(
   const vector_t<string_t>& /*extensions*/, bool /*noMipmap*/,
   const ::std::function<void(InternalTexture*, EventState&)>& /*onLoad*/,
   const ::std::function<void()>& /*onError*/, unsigned int /*format*/,
-  const string_t& /*forcedExtension*/)
+  const string_t& /*forcedExtension*/, bool /*createPolynomials*/)
 {
   return nullptr;
 }
@@ -4225,7 +4217,7 @@ void Engine::_activateCurrentTexture()
 }
 
 void Engine::_bindTextureDirectly(unsigned int target, InternalTexture* texture,
-                                  bool forTextureDataUpdate)
+                                  bool forTextureDataUpdate, bool force)
 {
   if (forTextureDataUpdate && texture && texture->_designatedSlot > -1) {
     _activeChannel = texture->_designatedSlot;
@@ -4234,7 +4226,7 @@ void Engine::_bindTextureDirectly(unsigned int target, InternalTexture* texture,
   auto& currentTextureBound  = _boundTexturesCache[_activeChannel];
   auto isTextureForRendering = texture && (texture->_initialSlot > -1);
 
-  if (currentTextureBound != texture) {
+  if (currentTextureBound != texture || force) {
     if (currentTextureBound) {
       _removeDesignatedSlot(currentTextureBound);
     }
@@ -4350,6 +4342,19 @@ void Engine::_bindSamplerUniformToChannel(int sourceSlot, int destination)
   uniform->_currentState = destination;
 }
 
+unsigned int Engine::_getTextureWrapMode(unsigned int mode) const
+{
+  switch (mode) {
+    case TextureConstants::WRAP_ADDRESSMODE:
+      return GL::REPEAT;
+    case TextureConstants::CLAMP_ADDRESSMODE:
+      return GL::CLAMP_TO_EDGE;
+    case TextureConstants::MIRROR_ADDRESSMODE:
+      return GL::MIRRORED_REPEAT;
+  }
+  return GL::REPEAT;
+}
+
 bool Engine::_setTexture(int channel, BaseTexture* texture,
                          bool isPartOfTextureArray, bool depthStencilTexture)
 {
@@ -4396,77 +4401,52 @@ bool Engine::_setTexture(int channel, BaseTexture* texture,
     channel = _getCorrectTextureChannel(channel, internalTexture);
   }
 
+  bool needToBind = true;
   if ((_boundTexturesCache.find(channel) != _boundTexturesCache.end())
       && (_boundTexturesCache[channel] == internalTexture)) {
     _moveBoundTextureOnTop(internalTexture);
     if (!isPartOfTextureArray) {
       _bindSamplerUniformToChannel(internalTexture->_initialSlot, channel);
     }
-    return false;
+    needToBind = false;
   }
 
   _activeChannel = channel;
 
   if (internalTexture && internalTexture->is3D) {
-    _bindTextureDirectly(GL::TEXTURE_3D, internalTexture, isPartOfTextureArray);
+    if (needToBind) {
+      _bindTextureDirectly(GL::TEXTURE_3D, internalTexture,
+                           isPartOfTextureArray);
+    }
 
     if (internalTexture && internalTexture->_cachedWrapU != texture->wrapU) {
       internalTexture->_cachedWrapU = texture->wrapU;
-
-      switch (texture->wrapU) {
-        case TextureConstants::WRAP_ADDRESSMODE:
-          _gl->texParameteri(GL::TEXTURE_3D, GL::TEXTURE_WRAP_S, GL::REPEAT);
-          break;
-        case TextureConstants::CLAMP_ADDRESSMODE:
-          _gl->texParameteri(GL::TEXTURE_3D, GL::TEXTURE_WRAP_S,
-                             GL::CLAMP_TO_EDGE);
-          break;
-        case TextureConstants::MIRROR_ADDRESSMODE:
-          _gl->texParameteri(GL::TEXTURE_3D, GL::TEXTURE_WRAP_S,
-                             GL::MIRRORED_REPEAT);
-          break;
-      }
+      _setTextureParameterInteger(
+        GL::TEXTURE_3D, GL::TEXTURE_WRAP_S,
+        static_cast<int>(_getTextureWrapMode(texture->wrapU)), internalTexture);
     }
 
     if (internalTexture && internalTexture->_cachedWrapV != texture->wrapV) {
       internalTexture->_cachedWrapV = texture->wrapV;
-      switch (texture->wrapV) {
-        case TextureConstants::WRAP_ADDRESSMODE:
-          _gl->texParameteri(GL::TEXTURE_3D, GL::TEXTURE_WRAP_T, GL::REPEAT);
-          break;
-        case TextureConstants::CLAMP_ADDRESSMODE:
-          _gl->texParameteri(GL::TEXTURE_3D, GL::TEXTURE_WRAP_T,
-                             GL::CLAMP_TO_EDGE);
-          break;
-        case TextureConstants::MIRROR_ADDRESSMODE:
-          _gl->texParameteri(GL::TEXTURE_3D, GL::TEXTURE_WRAP_T,
-                             GL::MIRRORED_REPEAT);
-          break;
-      }
+      _setTextureParameterInteger(
+        GL::TEXTURE_3D, GL::TEXTURE_WRAP_T,
+        static_cast<int>(_getTextureWrapMode(texture->wrapV)), internalTexture);
     }
 
     if (internalTexture && internalTexture->_cachedWrapR != texture->wrapR) {
       internalTexture->_cachedWrapR = texture->wrapR;
-      switch (texture->wrapR) {
-        case TextureConstants::WRAP_ADDRESSMODE:
-          _gl->texParameteri(GL::TEXTURE_3D, GL::TEXTURE_WRAP_R, GL::REPEAT);
-          break;
-        case TextureConstants::CLAMP_ADDRESSMODE:
-          _gl->texParameteri(GL::TEXTURE_3D, GL::TEXTURE_WRAP_R,
-                             GL::CLAMP_TO_EDGE);
-          break;
-        case TextureConstants::MIRROR_ADDRESSMODE:
-          _gl->texParameteri(GL::TEXTURE_3D, GL::TEXTURE_WRAP_R,
-                             GL::MIRRORED_REPEAT);
-          break;
-      }
+      _setTextureParameterInteger(
+        GL::TEXTURE_3D, GL::TEXTURE_WRAP_R,
+        static_cast<int>(_getTextureWrapMode(texture->wrapR)), internalTexture);
     }
 
     _setAnisotropicLevel(GL::TEXTURE_3D, texture);
   }
   else if (internalTexture && internalTexture->isCube) {
-    _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, internalTexture,
-                         isPartOfTextureArray);
+    if (needToBind) {
+      _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, internalTexture,
+                           isPartOfTextureArray);
+    }
 
     if (internalTexture->_cachedCoordinatesMode != texture->coordinatesMode()) {
       internalTexture->_cachedCoordinatesMode = texture->coordinatesMode();
@@ -4477,54 +4457,33 @@ bool Engine::_setTexture(int channel, BaseTexture* texture,
            && texture->coordinatesMode() != TextureConstants::SKYBOX_MODE) ?
             GL::REPEAT :
             GL::CLAMP_TO_EDGE;
-      _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_S,
-                         textureWrapMode);
-      _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_T,
-                         textureWrapMode);
+      _setTextureParameterInteger(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_S,
+                                  static_cast<int>(textureWrapMode),
+                                  internalTexture);
+      _setTextureParameterInteger(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_T,
+                                  static_cast<int>(textureWrapMode));
     }
 
     _setAnisotropicLevel(GL::TEXTURE_CUBE_MAP, texture);
   }
   else {
-    _bindTextureDirectly(GL::TEXTURE_2D, internalTexture, isPartOfTextureArray);
+    if (needToBind) {
+      _bindTextureDirectly(GL::TEXTURE_2D, internalTexture,
+                           isPartOfTextureArray);
+    }
 
     if (internalTexture && internalTexture->_cachedWrapU != texture->wrapU) {
       internalTexture->_cachedWrapU = texture->wrapU;
-
-      switch (texture->wrapU) {
-        case TextureConstants::WRAP_ADDRESSMODE:
-          _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::REPEAT);
-          break;
-        case TextureConstants::CLAMP_ADDRESSMODE:
-          _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S,
-                             GL::CLAMP_TO_EDGE);
-          break;
-        case TextureConstants::MIRROR_ADDRESSMODE:
-          _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S,
-                             GL::MIRRORED_REPEAT);
-          break;
-        default:
-          break;
-      }
+      _setTextureParameterInteger(
+        GL::TEXTURE_2D, GL::TEXTURE_WRAP_S,
+        static_cast<int>(_getTextureWrapMode(texture->wrapU)), internalTexture);
     }
 
     if (internalTexture && internalTexture->_cachedWrapV != texture->wrapV) {
       internalTexture->_cachedWrapV = texture->wrapV;
-      switch (texture->wrapV) {
-        case TextureConstants::WRAP_ADDRESSMODE:
-          _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T, GL::REPEAT);
-          break;
-        case TextureConstants::CLAMP_ADDRESSMODE:
-          _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T,
-                             GL::CLAMP_TO_EDGE);
-          break;
-        case TextureConstants::MIRROR_ADDRESSMODE:
-          _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T,
-                             GL::MIRRORED_REPEAT);
-          break;
-        default:
-          break;
-      }
+      _setTextureParameterInteger(
+        GL::TEXTURE_2D, GL::TEXTURE_WRAP_T,
+        static_cast<int>(_getTextureWrapMode(texture->wrapV)), internalTexture);
     }
 
     _setAnisotropicLevel(GL::TEXTURE_2D, texture);
@@ -4557,7 +4516,7 @@ void Engine::setTextureArray(int channel, GL::IGLUniformLocation* uniform,
   }
 }
 
-void Engine::_setAnisotropicLevel(unsigned int key, BaseTexture* texture)
+void Engine::_setAnisotropicLevel(unsigned int target, BaseTexture* texture)
 {
   auto internalTexture = texture->getInternalTexture();
 
@@ -4579,11 +4538,29 @@ void Engine::_setAnisotropicLevel(unsigned int key, BaseTexture* texture)
 
   if (anisotropicFilterExtension
       && internalTexture->_cachedAnisotropicFilteringLevel != value) {
-    _gl->texParameterf(
-      key, AnisotropicFilterExtension::TEXTURE_MAX_ANISOTROPY_EXT,
-      static_cast<float>(::std::min(value, _caps.maxAnisotropy)));
+    _setTextureParameterFloat(
+      target, AnisotropicFilterExtension::TEXTURE_MAX_ANISOTROPY_EXT,
+      static_cast<float>(::std::min(value, _caps.maxAnisotropy)),
+      internalTexture);
     internalTexture->_cachedAnisotropicFilteringLevel = value;
   }
+}
+void Engine::_setTextureParameterFloat(unsigned int target,
+                                       unsigned int parameter, float value,
+                                       InternalTexture* texture)
+{
+  _bindTextureDirectly(target, texture, true, true);
+  _gl->texParameterf(target, parameter, value);
+}
+
+void Engine::_setTextureParameterInteger(unsigned int target,
+                                         unsigned int parameter, int value,
+                                         InternalTexture* texture)
+{
+  if (texture) {
+    _bindTextureDirectly(target, texture, true, true);
+  }
+  _gl->texParameteri(target, parameter, value);
 }
 
 Uint8Array Engine::readPixels(int x, int y, int width, int height)
@@ -4999,6 +4976,8 @@ GL::GLenum Engine::_getRGBABufferInternalSizedFormat(
     switch (*format) {
       case EngineConstants::TEXTUREFORMAT_LUMINANCE:
         return GL::LUMINANCE;
+      case EngineConstants::TEXTUREFORMAT_RGB:
+        return GL::RGB;
     }
   }
   return GL::RGBA;

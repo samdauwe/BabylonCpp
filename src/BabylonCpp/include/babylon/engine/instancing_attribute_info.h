@@ -6,6 +6,10 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Interface for attribute information associated with buffer
+ * instanciation.
+ */
 struct BABYLON_SHARED_EXPORT InstancingAttributeInfo {
   /**
    * Index/offset of the attribute in the vertex shader
