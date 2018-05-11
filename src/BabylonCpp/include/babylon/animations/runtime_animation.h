@@ -6,13 +6,16 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Defines a runtime animation.
+ */
 class BABYLON_SHARED_EXPORT RuntimeAnimation {
 
 public:
   /**
    * @brief Create a new RuntimeAnimation object.
    * @param target defines the target of the animation
-   * @param animation defines the source {BABYLON.Animation} object
+   * @param animation defines the source animation object
    * @param scene defines the hosting scene
    * @param host defines the initiating Animatable
    */
@@ -20,32 +23,70 @@ public:
                    Animatable* host);
   ~RuntimeAnimation();
 
+  /**
+   * @brief Gets the animation from the runtime animation.
+   */
   Animation* animation();
-  void reset(bool value = true);
+
+  /**
+   * @brief Resets the runtime animation to the beginning.
+   * @param restoreOriginal defines whether to restore the target property to
+   * the original value
+   */
+  void reset(bool restoreOriginal = false);
+
+  /**
+   * @brief Specifies if the runtime animation is stopped.
+   * @returns Boolean specifying if the runtime animation is stopped
+   */
   bool isStopped() const;
+
+  /**
+   * @brief Disposes of the runtime animation.
+   */
   void dispose();
 
   /**
-   * @brief Affect the interpolated value to the target.
+   * @brief Apply the interpolated value to the target.
    * @param currentValue defines the value computed by the animation
-   * @param weight defines the weight to apply to this value
+   * @param weight defines the weight to apply to this value (Defaults to 1.0)
    */
   void setValue(const AnimationValue& currentValue, float weight = 1.f);
+
+  /**
+   * @brief Gets the loop pmode of the runtime animation
+   * @returns Loop Mode
+   */
   Nullable<unsigned int> _getCorrectLoopMode() const;
+
+  /**
+   * @brief Move the current animation to a given frame.
+   * @param frame defines the frame to move to
+   */
   void goToFrame(int frame);
+
+  /**
+   * @brief Hidden Internal use only
+   */
   void _prepareForSpeedRatioChange(float newSpeedRatio);
+
+  /**
+   * @brief Execute the current animation.
+   * @param delay defines the delay to add to the current frame
+   * @param from defines the lower bound of the animation range
+   * @param to defines the upper bound of the animation range
+   * @param loop defines if the current animation must loop
+   * @param speedRatio defines the current speed ratio
+   * @param weight defines the weight of the animation (default is -1 so no
+   * weight)
+   * @returns a boolean indicating if the animation has ended
+   */
   bool animate(millisecond_t delay, int from, int to, bool loop,
                float speedRatio, float weight = -1.f);
 
-private:
-  AnimationValue
-  _interpolate(int currentFrame, int repeatCount, unsigned int loopMode,
-               const AnimationValue& offsetValue    = AnimationValue(),
-               const AnimationValue& highLimitValue = AnimationValue());
-
-public:
+protected:
   /**
-   * @brief Gets the current frame.
+   * @brief Gets the current frame of the runtime animation.
    */
   int get_currentFrame() const;
 
@@ -55,17 +96,12 @@ public:
   float get_weight() const;
 
   /**
-   * @brief Gets the original value of the runtime animation.
-   */
-  Nullable<AnimationValue>& get_originalValue();
-
-  /**
    * @brief Gets the current value of the runtime animation.
    */
   Nullable<AnimationValue>& get_currentValue();
 
   /**
-   * @brief Gets the path where to store the animated value in the target.
+   * @brief Gets the target path of the runtime animation.
    */
   string_t get_targetPath() const;
 
@@ -74,9 +110,24 @@ public:
    */
   IAnimatable*& get_target();
 
+private:
+  /**
+   * @brief Interpolates the animation from the current frame.
+   * @param currentFrame The frame to interpolate the animation to
+   * @param repeatCount The number of times that the animation should loop
+   * @param loopMode The type of looping mode to use
+   * @param offsetValue Animation offset value
+   * @param highLimitValue The high limit value
+   * @returns The interpolated value
+   */
+  AnimationValue
+  _interpolate(int currentFrame, int repeatCount, unsigned int loopMode,
+               const AnimationValue& offsetValue    = AnimationValue(),
+               const AnimationValue& highLimitValue = AnimationValue());
+
 public:
   /**
-   * Current frame
+   * Current frame of the runtime animation
    */
   ReadOnlyProperty<RuntimeAnimation, int> currentFrame;
 
@@ -84,11 +135,6 @@ public:
    * Weight of the runtime animation
    */
   ReadOnlyProperty<RuntimeAnimation, float> weight;
-
-  /**
-   * Original value of the runtime animation
-   */
-  ReadOnlyProperty<RuntimeAnimation, Nullable<AnimationValue>> originalValue;
 
   /**
    * Current value of the runtime animation
@@ -101,7 +147,7 @@ public:
   AnimationValue _workValue;
 
   /**
-   * Path where to store the animated value in the target
+   * Target path of the runtime animation
    */
   ReadOnlyProperty<RuntimeAnimation, string_t> targetPath;
 
@@ -111,26 +157,94 @@ public:
   ReadOnlyProperty<RuntimeAnimation, IAnimatable*> target;
 
 private:
+  /**
+   * The current frame of the runtime animation
+   */
   int _currentFrame;
+
+  /**
+   * The animation used by the runtime animation
+   */
   Animation* _animation;
+
+  /**
+   * The target of the runtime animation
+   */
   IAnimatable* _target;
+
+  /**
+   * The initiating animatable
+   */
   Animatable* _host;
 
-  Nullable<AnimationValue> _originalValue;
+  /**
+   * The original value of the runtime animation
+   */
+  vector_t<Nullable<AnimationValue>> _originalValue;
+
+  /**
+   * The original blend value of the runtime animation
+   */
   AnimationValue _originalBlendValue;
-  std::map<string_t, AnimationValue> _offsetsCache;
-  std::map<string_t, AnimationValue> _highLimitsCache;
+
+  /**
+   * The offsets cache of the runtime animation
+   */
+  unordered_map_t<string_t, AnimationValue> _offsetsCache;
+
+  /**
+   * The high limits cache of the runtime animation
+   */
+  unordered_map_t<string_t, AnimationValue> _highLimitsCache;
+
+  /**
+   * Specifies if the runtime animation has been stopped
+   */
   bool _stopped;
+
+  /**
+   * The blending factor of the runtime animation
+   */
   float _blendingFactor;
+
+  /**
+   * The BabylonJS scene
+   */
   Scene* _scene;
 
+  /**
+   * The current value of the runtime animation
+   */
   Nullable<AnimationValue> _currentValue;
+
+  /**
+   * The active target of the runtime animation
+   */
   IAnimatable* _activeTarget;
+
+  /**
+   * The target path of the runtime animation
+   */
   string_t _targetPath;
+
+  /**
+   * The weight of the runtime animation
+   */
   float _weight;
 
+  /**
+   * The ratio offset of the runtime animation
+   */
   float _ratioOffset;
+
+  /**
+   * The previous delay of the runtime animation
+   */
   millisecond_t _previousDelay;
+
+  /**
+   * The previous ratio of the runtime animation
+   */
   float _previousRatio;
 
 }; // end of class RuntimeAnimation

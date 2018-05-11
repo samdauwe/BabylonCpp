@@ -59,8 +59,8 @@ BoneIKController::BoneIKController(
 
   if (_bone1->length) {
 
-    auto boneScale1 = _bone1->getScale();
-    auto boneScale2 = _bone2->getScale();
+    auto boneScale1 = *_bone1->getScale();
+    auto boneScale2 = *_bone2->getScale();
 
     _bone1Length = _bone1->length * boneScale1.y * mesh->scaling().y;
     _bone2Length = _bone2->length * boneScale2.y * mesh->scaling().y;

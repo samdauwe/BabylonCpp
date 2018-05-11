@@ -1118,7 +1118,9 @@ void Scene::_onPointerMoveEvent(PointerEvent&& evt)
   _updatePointerPosition(evt);
 
   // PreObservable support
-  if (onPrePointerObservable.hasObservers()) {
+  if (onPrePointerObservable.hasObservers()
+      && stl_util::contains(_pointerCaptures, evt.pointerId)
+      && !_pointerCaptures[evt.pointerId]) {
     auto type = evt.type == EventType::MOUSE_WHEEL ?
                   PointerEventTypes::POINTERWHEEL :
                   PointerEventTypes::POINTERMOVE;
@@ -1220,9 +1222,10 @@ void Scene::_onPointerDownEvent(PointerEvent&& evt)
     return;
   }
 
-  _startingPointerPosition.x = static_cast<float>(_pointerX);
-  _startingPointerPosition.y = static_cast<float>(_pointerY);
-  _startingPointerTime       = Time::highresTimepointNow();
+  _pointerCaptures[evt.pointerId] = true;
+  _startingPointerPosition.x      = static_cast<float>(_pointerX);
+  _startingPointerPosition.y      = static_cast<float>(_pointerY);
+  _startingPointerTime            = Time::highresTimepointNow();
 
   if (!pointerDownPredicate) {
     pointerDownPredicate = [](AbstractMesh* mesh) {
@@ -1352,7 +1355,9 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
   _updatePointerPosition(evt);
 
   // PreObservable support
-  if (onPrePointerObservable.hasObservers()) {
+  if (onPrePointerObservable.hasObservers()
+      && stl_util::contains(_pointerCaptures, evt.pointerId)
+      && !_pointerCaptures[evt.pointerId]) {
     auto type = PointerEventTypes::POINTERUP;
     auto pi   = ::std::make_unique<PointerInfoPre>(
       type, evt, static_cast<float>(_unTranslatedPointerX),
@@ -1366,6 +1371,8 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
   if (!cameraToUseForPointers && !activeCamera) {
     return;
   }
+
+  _pointerCaptures[evt.pointerId] = false;
 
   if (!pointerUpPredicate) {
     pointerUpPredicate = [](AbstractMesh* mesh) {
@@ -1790,14 +1797,15 @@ void Scene::_animate()
 }
 
 void Scene::_registerTargetForLateAnimationBinding(
-  RuntimeAnimation* /*runtimeAnimation*/)
+  RuntimeAnimation* /*runtimeAnimation*/,
+  const AnimationValue& /*originalValue*/)
 {
   // TODO Implement
 }
 
 AnimationValue Scene::_processLateAnimationBindingsForMatrices(
   float holderTotalWeight, vector_t<RuntimeAnimation*>& holderAnimations,
-  Matrix& originalValue)
+  Matrix& holderOriginalValue)
 {
   auto normalizer         = 1.f;
   auto& finalPosition     = Tmp::Vector3Array[0];
@@ -1805,6 +1813,7 @@ AnimationValue Scene::_processLateAnimationBindingsForMatrices(
   auto& finalQuaternion   = Tmp::QuaternionArray[0];
   auto startIndex         = 0u;
   auto& originalAnimation = holderAnimations[0];
+  auto& originalValue     = holderOriginalValue;
 
   auto scale = 1.f;
   if (holderTotalWeight < 1.f) {
@@ -1846,6 +1855,75 @@ AnimationValue Scene::_processLateAnimationBindingsForMatrices(
   Matrix::ComposeToRef(finalScaling, finalQuaternion, finalPosition,
                        originalAnimation->_workValue.matrixData);
   return originalAnimation->_workValue;
+}
+
+Quaternion Scene::_processLateAnimationBindingsForQuaternions(
+  float holderTotalWeight, vector_t<RuntimeAnimation*>& holderAnimations,
+  Quaternion& holderOriginalValue)
+{
+  auto& originalAnimation = holderAnimations[0];
+  auto& originalValue     = holderOriginalValue;
+
+  if (holderAnimations.size() == 1) {
+    return Quaternion::Slerp(
+      originalValue, (*originalAnimation->currentValue()).quaternionData,
+      ::std::min(1.f, holderTotalWeight));
+  }
+
+  auto normalizer = 1.f;
+  vector_t<Quaternion> quaternions;
+  Float32Array weights;
+
+  if (holderTotalWeight < 1.f) {
+    auto scale = 1.f - holderTotalWeight;
+
+    quaternions.clear();
+    weights.clear();
+
+    quaternions.emplace_back(originalValue);
+    weights.emplace_back(scale);
+  }
+  else {
+    if (holderAnimations.size() == 2) { // Slerp as soon as we can
+      return Quaternion::Slerp(
+        (*holderAnimations[0]->currentValue()).quaternionData,
+        (*holderAnimations[1]->currentValue()).quaternionData,
+        holderAnimations[1]->weight / holderTotalWeight);
+    }
+    quaternions.clear();
+    weights.clear();
+
+    normalizer = holderTotalWeight;
+  }
+  for (auto& runtimeAnimation : holderAnimations) {
+    quaternions.emplace_back(
+      (*runtimeAnimation->currentValue()).quaternionData);
+    weights.emplace_back(runtimeAnimation->weight / normalizer);
+  }
+
+  // https://gamedev.stackexchange.com/questions/62354/method-for-interpolation-between-3-quaternions
+
+  auto cumulativeAmount                     = 0.f;
+  Nullable<Quaternion> cumulativeQuaternion = nullptr;
+  for (size_t index = 0; index < quaternions.size();) {
+    if (!cumulativeQuaternion) {
+      cumulativeQuaternion = Quaternion::Slerp(
+        quaternions[index], quaternions[index + 1],
+        weights[index + 1] / (weights[index] + weights[index + 1]));
+      cumulativeAmount = weights[index] + weights[index + 1];
+      index += 2;
+      continue;
+    }
+    cumulativeAmount += weights[index];
+    auto _cumulativeQuaternion = *cumulativeQuaternion;
+    Quaternion::SlerpToRef(*cumulativeQuaternion, quaternions[index],
+                           weights[index] / cumulativeAmount,
+                           _cumulativeQuaternion);
+    cumulativeQuaternion = _cumulativeQuaternion;
+    ++index;
+  }
+
+  return cumulativeQuaternion ? *cumulativeQuaternion : Quaternion();
 }
 
 void Scene::_processLateAnimationBindings()
@@ -1976,7 +2054,7 @@ void Scene::addMesh(unique_ptr_t<AbstractMesh>&& newMesh)
   onNewMeshAddedObservable.notifyObservers(_newMesh);
 }
 
-int Scene::removeMesh(AbstractMesh* toRemove)
+int Scene::removeMesh(AbstractMesh* toRemove, bool recursive)
 {
   auto it   = ::std::find_if(meshes.begin(), meshes.end(),
                            [&toRemove](const unique_ptr_t<AbstractMesh>& mesh) {
@@ -1989,6 +2067,12 @@ int Scene::removeMesh(AbstractMesh* toRemove)
   }
 
   onMeshRemovedObservable.notifyObservers(toRemove);
+
+  if (recursive) {
+    for (auto& m : toRemove->getChildMeshes()) {
+      removeMesh(m);
+    }
+  }
 
   return index;
 }

@@ -11,7 +11,6 @@ RuntimeAnimation::RuntimeAnimation(IAnimatable* target, Animation* animation,
                                    Scene* scene, Animatable* host)
     : currentFrame{this, &RuntimeAnimation::get_currentFrame}
     , weight{this, &RuntimeAnimation::get_weight}
-    , originalValue{this, &RuntimeAnimation::get_originalValue}
     , currentValue{this, &RuntimeAnimation::get_currentValue}
     , targetPath{this, &RuntimeAnimation::get_targetPath}
     , target{this, &RuntimeAnimation::get_target}
@@ -45,11 +44,6 @@ float RuntimeAnimation::get_weight() const
   return _weight;
 }
 
-Nullable<AnimationValue>& RuntimeAnimation::get_originalValue()
-{
-  return _originalValue;
-}
-
 Nullable<AnimationValue>& RuntimeAnimation::get_currentValue()
 {
   return _currentValue;
@@ -70,13 +64,19 @@ Animation* RuntimeAnimation::animation()
   return _animation;
 }
 
-void RuntimeAnimation::reset(bool /*value*/)
+void RuntimeAnimation::reset(bool restoreOriginal)
 {
+  if (restoreOriginal) {
+    if (!_originalValue.empty() && _originalValue[0] != nullptr) {
+      // _setValue(_target, _originalValue[0], -1);
+    }
+  }
+
   _offsetsCache.clear();
   _highLimitsCache.clear();
   _currentFrame   = 0;
   _blendingFactor = 0;
-  _originalValue  = nullptr;
+  _originalValue.clear();
 }
 
 bool RuntimeAnimation::isStopped() const

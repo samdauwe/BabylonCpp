@@ -785,7 +785,8 @@ public:
    * @brief Hidden
    */
   void
-  _registerTargetForLateAnimationBinding(RuntimeAnimation* runtimeAnimation);
+  _registerTargetForLateAnimationBinding(RuntimeAnimation* runtimeAnimation,
+                                         const AnimationValue& originalValue);
 
   /** Matrix **/
 
@@ -851,9 +852,10 @@ public:
   /**
    * @brief Remove a mesh for the list of scene's meshes.
    * @param toRemove defines the mesh to remove
+   * @param recursive if all child meshes should also be removed from the scene
    * @returns the index where the mesh was in the mesh list
    */
-  int removeMesh(AbstractMesh* toRemove);
+  int removeMesh(AbstractMesh* toRemove, bool recursive = false);
 
   /**
    * @brief Add a transform node to the list of scene's transform nodes.
@@ -1882,7 +1884,10 @@ private:
   void _animate();
   AnimationValue _processLateAnimationBindingsForMatrices(
     float holderTotalWeight, vector_t<RuntimeAnimation*>& holderAnimations,
-    Matrix& originalValue);
+    Matrix& holderOriginalValue);
+  Quaternion _processLateAnimationBindingsForQuaternions(
+    float holderTotalWeight, vector_t<RuntimeAnimation*>& holderAnimations,
+    Quaternion& holderOriginalValue);
   void _processLateAnimationBindings();
   void _evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh);
   void _evaluateActiveMeshes();
@@ -2690,6 +2695,7 @@ private:
   Vector2 _previousStartingPointerPosition;
   high_res_time_point_t _startingPointerTime;
   high_res_time_point_t _previousStartingPointerTime;
+  unordered_map_t<int, bool> _pointerCaptures;
   // AbstractMesh* _meshUnderPointer;
   ::std::function<void()> beforeRender;
   ::std::function<void()> afterRender;
