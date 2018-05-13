@@ -1,5 +1,6 @@
 #include <babylon/inspector/properties/properties_view.h>
 
+#include <babylon/imgui/imgui_utils.h>
 #include <imgui.h>
 
 namespace BABYLON {
@@ -84,6 +85,18 @@ void PropertiesView::addColor3Property(const string_t& name,
   _propertyEntries.emplace_back(PropertyEntry{name, index, type});
 }
 
+void PropertiesView::addVector3Property(const string_t& name,
+                                        const TBabylonGetter<Vector3>& getter,
+                                        const TBabylonSetter<Vector3>& setter)
+{
+  // Create property
+  _vector3Properties.emplace_back(BabylonProperty<Vector3>{getter, setter});
+  // Store mapping
+  auto index = _vector3Properties.size() - 1;
+  auto type  = PropertyTypeInsp::VECTOR3_PROPERTY;
+  _propertyEntries.emplace_back(PropertyEntry{name, index, type});
+}
+
 void PropertiesView::sortPropertiesByName()
 {
   ::std::sort(_propertyEntries.begin(), _propertyEntries.end(),
@@ -104,7 +117,7 @@ void PropertiesView::render()
   int i = 0;
   for (auto& property : _propertyEntries) {
     // Render label
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.95f, 0.59f, 0.4f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetColorTop());
     ImGui::TextWrapped("%s", property.name.c_str());
     ImGui::PopStyleColor();
     ImGui::NextColumn();
@@ -128,6 +141,9 @@ void PropertiesView::render()
         break;
       case PropertyTypeInsp::COLOR3_PROPERTY:
         _color3Properties[property.index].render();
+        break;
+      case PropertyTypeInsp::VECTOR3_PROPERTY:
+        _vector3Properties[property.index].render();
         break;
     }
     ImGui::PopID();

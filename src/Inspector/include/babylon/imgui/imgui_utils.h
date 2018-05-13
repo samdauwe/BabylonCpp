@@ -9,6 +9,24 @@
 
 namespace ImGui {
 
+/**
+ * @brief Returns color "color-bot" #5db0d7 -> rgba(93, 176, 215, 1)
+ * @return color "color-bot"
+ */
+inline ImVec4 GetColorBot()
+{
+  return ImVec4(0.36f, 0.69f, 0.84f, 1.0f);
+}
+
+/**
+ * @brief Returns color "color-top" #f29766 -> rgba(242, 151, 102, 1)
+ * @return color "color-bot"
+ */
+inline ImVec4 GetColorTop()
+{
+  return ImVec4(0.95f, 0.59f, 0.4f, 1.0f);
+}
+
 inline void SetupImGuiStyle(bool bStyleDark_, float alpha_)
 {
   ImGuiStyle& style = ImGui::GetStyle();

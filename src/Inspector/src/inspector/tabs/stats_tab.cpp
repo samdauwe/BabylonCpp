@@ -2,10 +2,12 @@
 
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
-#include <babylon/imgui/imgui_dock.h>
 #include <babylon/inspector/inspector.h>
 #include <babylon/instrumentation/engine_instrumentation.h>
 #include <babylon/instrumentation/scene_instrumentation.h>
+
+#include <babylon/imgui/imgui_dock.h>
+#include <babylon/imgui/imgui_utils.h>
 
 namespace BABYLON {
 
@@ -62,8 +64,8 @@ void StatsTab::render()
     // Engine version and framerate
     ImGui::TextWrapped("BabylonCpp v%s -", Engine::Version().c_str());
     ImGui::SameLine();
-    // Color "color-top" #f29766 -> rgba(242, 151, 102, 1)
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.95f, 0.59f, 0.4f, 1.0f));
+    // Render label
+    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetColorTop());
     ImGui::TextWrapped("%.f fps", static_cast<double>(_engine->getFps()));
     ImGui::PopStyleColor();
     // OpengGL Info

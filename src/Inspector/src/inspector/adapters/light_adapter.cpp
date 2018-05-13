@@ -129,6 +129,10 @@ void LightAdapter::_buildPropertiesView()
     [&](const Color3& value) { _light->specular = value; });
   /** HemisphericLight properties **/
   if (_hemispericLight) {
+    // direction
+    view.addVector3Property(
+      "direction", [&]() -> Vector3& { return _hemispericLight->direction; },
+      [&](const Vector3& value) { _hemispericLight->direction = value; });
     // - ground color
     view.addColor3Property(
       "groundColor", [&]() -> Color3& { return _hemispericLight->groundColor; },

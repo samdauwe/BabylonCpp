@@ -10,12 +10,13 @@
 namespace BABYLON {
 
 enum class PropertyTypeInsp {
-  BOOL_PROPERTY   = 0,
-  FLOAT_PROPERTY  = 1,
-  INT_PROPERTY    = 2,
-  SIZE_T_PROPERT  = 3,
-  STRING_PROPERTY = 4,
-  COLOR3_PROPERTY = 5,
+  BOOL_PROPERTY    = 0,
+  FLOAT_PROPERTY   = 1,
+  INT_PROPERTY     = 2,
+  SIZE_T_PROPERT   = 3,
+  STRING_PROPERTY  = 4,
+  COLOR3_PROPERTY  = 5,
+  VECTOR3_PROPERTY = 6,
 }; // end of enum class PropertyType
 
 struct PropertyEntry {
@@ -47,6 +48,9 @@ public:
   void addColor3Property(const string_t& name,
                          const TBabylonGetter<Color3>& getter,
                          const TBabylonSetter<Color3>& setter);
+  void addVector3Property(const string_t& name,
+                          const TBabylonGetter<Vector3>& getter,
+                          const TBabylonSetter<Vector3>& setter);
   void sortPropertiesByName();
 
   void render();
@@ -59,6 +63,7 @@ private:
   vector_t<PrimitiveProperty<size_t>> _sizeTProperties;
   vector_t<PrimitiveProperty<string_t>> _stringProperties;
   vector_t<BabylonProperty<Color3>> _color3Properties;
+  vector_t<BabylonProperty<Vector3>> _vector3Properties;
   vector_t<PropertyEntry> _propertyEntries;
 
 }; // end of class PropertiesView
