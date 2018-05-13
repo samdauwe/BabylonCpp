@@ -5,23 +5,17 @@
 
 namespace BABYLON {
 
-// Boolean property callbacks
-using TBoolGetter = ::std::function<bool()>;
-using TBoolSetter = ::std::function<void(const bool)>;
-
-// Number property callbacks
+// Primitive property callbacks
 template <typename T>
-using TNumberGetter = ::std::function<T()>;
+using TPrimitiveGetter = ::std::function<T()>;
 template <typename T>
-using TNumberSetter = ::std::function<void(const T)>;
+using TPrimitiveSetter = ::std::function<void(const T)>;
 
-// String property callbacks
-using TStringGetter = ::std::function<string_t()>;
-using TStringSetter = ::std::function<void(const string_t)>;
-
-// Color3 property callbacks
-using TColor3Getter = ::std::function<Color3&()>;
-using TColor3Setter = ::std::function<void(const Color3&)>;
+// Babylon property callbacks
+template <typename T>
+using TBabylonGetter = ::std::function<T&()>;
+template <typename T>
+using TBabylonSetter = ::std::function<void(const T&)>;
 
 } // end of namespace BABYLON
 

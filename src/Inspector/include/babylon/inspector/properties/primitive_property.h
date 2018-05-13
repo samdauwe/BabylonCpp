@@ -1,5 +1,5 @@
-#ifndef BABYLON_INSPECTOR_PROPERTIES_NUMBER_PROPERTY_H
-#define BABYLON_INSPECTOR_PROPERTIES_NUMBER_PROPERTY_H
+#ifndef BABYLON_INSPECTOR_PROPERTIES_PRIMITIVE_PROPERTY_H
+#define BABYLON_INSPECTOR_PROPERTIES_PRIMITIVE_PROPERTY_H
 
 #include <babylon/babylon_global.h>
 
@@ -11,25 +11,35 @@
 namespace BABYLON {
 
 template <typename T>
-class BABYLON_SHARED_EXPORT NumberProperty {
+class BABYLON_SHARED_EXPORT PrimitiveProperty {
 
 public:
-  NumberProperty(const TNumberGetter<T>& getter, const TNumberSetter<T>& setter)
+  PrimitiveProperty(const TPrimitiveGetter<T>& getter,
+                    const TPrimitiveSetter<T>& setter)
       : _id{Geometry::RandomId()}, _getter{getter}, _setter{setter}
   {
   }
 
-  NumberProperty(const NumberProperty& other) = delete;
+  PrimitiveProperty(const PrimitiveProperty& other) = delete;
 
-  NumberProperty(NumberProperty&& other)
+  PrimitiveProperty(PrimitiveProperty&& other)
       : _id{::std::move(other._id)}
       , _getter{::std::move(other._getter)}
       , _setter{::std::move(other._setter)}
   {
   }
 
-  virtual ~NumberProperty()
+  virtual ~PrimitiveProperty()
   {
+  }
+
+  template <typename U = T>
+  typename std::enable_if<std::is_same<U, bool>::value>::type render()
+  {
+    bool boolValue = _getter();
+    if (ImGui::Checkbox("", &boolValue)) {
+      _setter(boolValue);
+    }
   }
 
   template <typename U = T>
@@ -61,17 +71,26 @@ public:
     }
   }
 
+  template <typename U = T>
+  typename std::enable_if<std::is_same<U, string_t>::value>::type render()
+  {
+    string_t stringValue = _getter();
+    char* cstr           = &stringValue[0u];
+    if (ImGui::InputText("", cstr, stringValue.size())) {
+    }
+  }
+
   void dispose()
   {
   }
 
 public:
   string_t _id;
-  TNumberGetter<T> _getter;
-  TNumberSetter<T> _setter;
+  TPrimitiveGetter<T> _getter;
+  TPrimitiveSetter<T> _setter;
 
-}; // end of class NumberProperty
+}; // end of class PrimitiveProperty
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_INSPECTOR_PROPERTIES_NUMBER_PROPERTY_H
+#endif // end of BABYLON_INSPECTOR_PROPERTIES_PRIMITIVE_PROPERTY_H

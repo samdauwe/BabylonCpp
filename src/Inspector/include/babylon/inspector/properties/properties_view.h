@@ -3,14 +3,11 @@
 
 #include <babylon/babylon_global.h>
 
+#include <babylon/inspector/properties/babylon_property.h>
 #include <babylon/inspector/properties/callbacks.h>
-#include <babylon/inspector/properties/number_property.h>
+#include <babylon/inspector/properties/primitive_property.h>
 
 namespace BABYLON {
-
-class BoolProperty;
-class Color3Property;
-class StringProperty;
 
 enum class PropertyTypeInsp {
   BOOL_PROPERTY   = 0,
@@ -33,32 +30,35 @@ public:
   PropertiesView();
   virtual ~PropertiesView();
 
-  void addBoolProperty(const string_t& name, const TBoolGetter& getter,
-                       const TBoolSetter& setter);
+  void addBoolProperty(const string_t& name,
+                       const TPrimitiveGetter<bool>& getter,
+                       const TPrimitiveSetter<bool>& setter);
   void addFloatProperty(const string_t& name,
-                        const TNumberGetter<float>& getter,
-                        const TNumberSetter<float>& setter);
-  void addIntProperty(const string_t& name, const TNumberGetter<int>& getter,
-                      const TNumberSetter<int>& setter);
+                        const TPrimitiveGetter<float>& getter,
+                        const TPrimitiveSetter<float>& setter);
+  void addIntProperty(const string_t& name, const TPrimitiveGetter<int>& getter,
+                      const TPrimitiveSetter<int>& setter);
   void addSizeTProperty(const string_t& name,
-                        const TNumberGetter<size_t>& getter,
-                        const TNumberSetter<size_t>& setter);
-  void addStringProperty(const string_t& name, const TStringGetter& getter,
-                         const TStringSetter& setter);
-  void addColor3Property(const string_t& name, const TColor3Getter& getter,
-                         const TColor3Setter& setter);
+                        const TPrimitiveGetter<size_t>& getter,
+                        const TPrimitiveSetter<size_t>& setter);
+  void addStringProperty(const string_t& name,
+                         const TPrimitiveGetter<string_t>& getter,
+                         const TPrimitiveSetter<string_t>& setter);
+  void addColor3Property(const string_t& name,
+                         const TBabylonGetter<Color3>& getter,
+                         const TBabylonSetter<Color3>& setter);
   void sortPropertiesByName();
 
   void render();
   void dispose();
 
 private:
-  vector_t<BoolProperty> _boolProperties;
-  vector_t<NumberProperty<float>> _floatProperties;
-  vector_t<NumberProperty<int>> _intProperties;
-  vector_t<NumberProperty<size_t>> _sizeTProperties;
-  vector_t<Color3Property> _color3Properties;
-  vector_t<StringProperty> _stringProperties;
+  vector_t<PrimitiveProperty<bool>> _boolProperties;
+  vector_t<PrimitiveProperty<float>> _floatProperties;
+  vector_t<PrimitiveProperty<int>> _intProperties;
+  vector_t<PrimitiveProperty<size_t>> _sizeTProperties;
+  vector_t<PrimitiveProperty<string_t>> _stringProperties;
+  vector_t<BabylonProperty<Color3>> _color3Properties;
   vector_t<PropertyEntry> _propertyEntries;
 
 }; // end of class PropertiesView

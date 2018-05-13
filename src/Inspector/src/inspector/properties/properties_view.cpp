@@ -1,11 +1,5 @@
 #include <babylon/inspector/properties/properties_view.h>
 
-#include <babylon/math/color3.h>
-
-#include <babylon/inspector/properties/bool_property.h>
-#include <babylon/inspector/properties/color3_property.h>
-#include <babylon/inspector/properties/string_property.h>
-
 #include <imgui.h>
 
 namespace BABYLON {
@@ -19,11 +13,11 @@ PropertiesView::~PropertiesView()
 }
 
 void PropertiesView::addBoolProperty(const string_t& name,
-                                     const TBoolGetter& getter,
-                                     const TBoolSetter& setter)
+                                     const TPrimitiveGetter<bool>& getter,
+                                     const TPrimitiveSetter<bool>& setter)
 {
   // Create property
-  _boolProperties.emplace_back(BoolProperty{getter, setter});
+  _boolProperties.emplace_back(PrimitiveProperty<bool>{getter, setter});
   // Store mapping
   auto index = _boolProperties.size() - 1;
   auto type  = PropertyTypeInsp::BOOL_PROPERTY;
@@ -31,11 +25,11 @@ void PropertiesView::addBoolProperty(const string_t& name,
 }
 
 void PropertiesView::addFloatProperty(const string_t& name,
-                                      const TNumberGetter<float>& getter,
-                                      const TNumberSetter<float>& setter)
+                                      const TPrimitiveGetter<float>& getter,
+                                      const TPrimitiveSetter<float>& setter)
 {
   // Create property
-  _floatProperties.emplace_back(NumberProperty<float>{getter, setter});
+  _floatProperties.emplace_back(PrimitiveProperty<float>{getter, setter});
   // Store mapping
   auto index = _floatProperties.size() - 1;
   auto type  = PropertyTypeInsp::FLOAT_PROPERTY;
@@ -43,11 +37,11 @@ void PropertiesView::addFloatProperty(const string_t& name,
 }
 
 void PropertiesView::addIntProperty(const string_t& name,
-                                    const TNumberGetter<int>& getter,
-                                    const TNumberSetter<int>& setter)
+                                    const TPrimitiveGetter<int>& getter,
+                                    const TPrimitiveSetter<int>& setter)
 {
   // Create property
-  _intProperties.emplace_back(NumberProperty<int>{getter, setter});
+  _intProperties.emplace_back(PrimitiveProperty<int>{getter, setter});
   // Store mapping
   auto index = _intProperties.size() - 1;
   auto type  = PropertyTypeInsp::INT_PROPERTY;
@@ -55,11 +49,11 @@ void PropertiesView::addIntProperty(const string_t& name,
 }
 
 void PropertiesView::addSizeTProperty(const string_t& name,
-                                      const TNumberGetter<size_t>& getter,
-                                      const TNumberSetter<size_t>& setter)
+                                      const TPrimitiveGetter<size_t>& getter,
+                                      const TPrimitiveSetter<size_t>& setter)
 {
   // Create property
-  _sizeTProperties.emplace_back(NumberProperty<size_t>{getter, setter});
+  _sizeTProperties.emplace_back(PrimitiveProperty<size_t>{getter, setter});
   // Store mapping
   auto index = _sizeTProperties.size() - 1;
   auto type  = PropertyTypeInsp::SIZE_T_PROPERT;
@@ -67,11 +61,11 @@ void PropertiesView::addSizeTProperty(const string_t& name,
 }
 
 void PropertiesView::addStringProperty(const string_t& name,
-                                       const TStringGetter& getter,
-                                       const TStringSetter& setter)
+                                       const TPrimitiveGetter<string_t>& getter,
+                                       const TPrimitiveSetter<string_t>& setter)
 {
   // Create property
-  _stringProperties.emplace_back(StringProperty{getter, setter});
+  _stringProperties.emplace_back(PrimitiveProperty<string_t>{getter, setter});
   // Store mapping
   auto index = _stringProperties.size() - 1;
   auto type  = PropertyTypeInsp::STRING_PROPERTY;
@@ -79,11 +73,11 @@ void PropertiesView::addStringProperty(const string_t& name,
 }
 
 void PropertiesView::addColor3Property(const string_t& name,
-                                       const TColor3Getter& getter,
-                                       const TColor3Setter& setter)
+                                       const TBabylonGetter<Color3>& getter,
+                                       const TBabylonSetter<Color3>& setter)
 {
   // Create property
-  _color3Properties.emplace_back(Color3Property{getter, setter});
+  _color3Properties.emplace_back(BabylonProperty<Color3>{getter, setter});
   // Store mapping
   auto index = _color3Properties.size() - 1;
   auto type  = PropertyTypeInsp::COLOR3_PROPERTY;
