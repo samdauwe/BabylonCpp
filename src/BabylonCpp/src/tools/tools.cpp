@@ -129,8 +129,9 @@ float Tools::ToRadians(float angle)
 }
 
 MinMax Tools::ExtractMinAndMaxIndexed(const Float32Array& positions,
-                                      const IndicesArray& indices,
-                                      size_t indexStart, size_t indexCount)
+                                      const Uint32Array& indices,
+                                      size_t indexStart, size_t indexCount,
+                                      const Nullable<Vector2>& bias)
 {
   Vector3 minimum(numeric_limits_t<float>::max(),
                   numeric_limits_t<float>::max(),
@@ -148,32 +149,22 @@ MinMax Tools::ExtractMinAndMaxIndexed(const Float32Array& positions,
     maximum = Vector3::Maximize(current, maximum);
   }
 
-  return {minimum, maximum};
-}
-
-MinMax Tools::ExtractMinAndMaxIndexed(const Float32Array& positions,
-                                      const Uint32Array& indices,
-                                      size_t indexStart, size_t indexCount,
-                                      const Vector2& bias)
-{
-  MinMax minMax = Tools::ExtractMinAndMaxIndexed(positions, indices, indexStart,
-                                                 indexCount);
-
-  Vector3& minimum = minMax.min;
-  Vector3& maximum = minMax.max;
-
-  minimum.x -= minimum.x * bias.x + bias.y;
-  minimum.y -= minimum.y * bias.x + bias.y;
-  minimum.z -= minimum.z * bias.x + bias.y;
-  maximum.x += maximum.x * bias.x + bias.y;
-  maximum.y += maximum.y * bias.x + bias.y;
-  maximum.z += maximum.z * bias.x + bias.y;
+  if (bias) {
+    const auto& _bias = *bias;
+    minimum.x -= minimum.x * _bias.x + _bias.y;
+    minimum.y -= minimum.y * _bias.x + _bias.y;
+    minimum.z -= minimum.z * _bias.x + _bias.y;
+    maximum.x += maximum.x * _bias.x + _bias.y;
+    maximum.y += maximum.y * _bias.x + _bias.y;
+    maximum.z += maximum.z * _bias.x + _bias.y;
+  }
 
   return {minimum, maximum};
 }
 
 MinMax Tools::ExtractMinAndMax(const Float32Array& positions, size_t start,
-                               size_t count, unsigned int stride)
+                               size_t count, const Nullable<Vector2>& bias,
+                               Nullable<unsigned int> stride)
 {
   Vector3 minimum(numeric_limits_t<float>::max(),
                   numeric_limits_t<float>::max(),
@@ -182,38 +173,35 @@ MinMax Tools::ExtractMinAndMax(const Float32Array& positions, size_t start,
                   numeric_limits_t<float>::lowest(),
                   numeric_limits_t<float>::lowest());
 
+  if (!stride) {
+    stride = 3;
+  }
+
+  auto _stride = *stride;
   for (size_t index = start; index < start + count; ++index) {
-    Vector3 current(positions[index * stride], positions[index * stride + 1],
-                    positions[index * stride + 2]);
+    Vector3 current(positions[index * _stride], positions[index * _stride + 1],
+                    positions[index * _stride + 2]);
 
     minimum = Vector3::Minimize(current, minimum);
     maximum = Vector3::Maximize(current, maximum);
   }
 
-  return {minimum, maximum};
-}
-
-MinMax Tools::ExtractMinAndMax(const Float32Array& positions, size_t start,
-                               size_t count, const Vector2& bias,
-                               unsigned int stride)
-{
-  auto minMax = Tools::ExtractMinAndMax(positions, start, count, stride);
-
-  auto& minimum = minMax.min;
-  auto& maximum = minMax.max;
-
-  minimum.x -= minimum.x * bias.x + bias.y;
-  minimum.y -= minimum.y * bias.x + bias.y;
-  minimum.z -= minimum.z * bias.x + bias.y;
-  maximum.x += maximum.x * bias.x + bias.y;
-  maximum.y += maximum.y * bias.x + bias.y;
-  maximum.z += maximum.z * bias.x + bias.y;
+  if (bias) {
+    const auto& _bias = *bias;
+    minimum.x -= minimum.x * _bias.x + _bias.y;
+    minimum.y -= minimum.y * _bias.x + _bias.y;
+    minimum.z -= minimum.z * _bias.x + _bias.y;
+    maximum.x += maximum.x * _bias.x + _bias.y;
+    maximum.y += maximum.y * _bias.x + _bias.y;
+    maximum.z += maximum.z * _bias.x + _bias.y;
+  }
 
   return {minimum, maximum};
 }
 
 MinMaxVector2 Tools::ExtractMinAndMaxVector2(
-  const ::std::function<Nullable<Vector2>(std::size_t index)>& feeder)
+  const ::std::function<Nullable<Vector2>(std::size_t index)>& feeder,
+  const Nullable<Vector2>& bias)
 {
   Vector2 minimum(numeric_limits_t<float>::max(),
                   numeric_limits_t<float>::max());
@@ -229,22 +217,13 @@ MinMaxVector2 Tools::ExtractMinAndMaxVector2(
     cur = feeder(i++);
   }
 
-  return {minimum, maximum};
-}
-
-MinMaxVector2 Tools::ExtractMinAndMaxVector2(
-  const ::std::function<Nullable<Vector2>(std::size_t index)>& feeder,
-  const Vector2& bias)
-{
-  auto minMax = Tools::ExtractMinAndMaxVector2(feeder);
-
-  auto& minimum = minMax.min;
-  auto& maximum = minMax.max;
-
-  minimum.x -= minimum.x * bias.x + bias.y;
-  minimum.y -= minimum.y * bias.x + bias.y;
-  maximum.x += maximum.x * bias.x + bias.y;
-  maximum.y += maximum.y * bias.x + bias.y;
+  if (bias) {
+    const auto& _bias = *bias;
+    minimum.x -= minimum.x * _bias.x + _bias.y;
+    minimum.y -= minimum.y * _bias.x + _bias.y;
+    maximum.x += maximum.x * _bias.x + _bias.y;
+    maximum.y += maximum.y * _bias.x + _bias.y;
+  }
 
   return {minimum, maximum};
 }

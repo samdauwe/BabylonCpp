@@ -9,15 +9,19 @@
 namespace BABYLON {
 
 Buffer::Buffer(Engine* engine, const Float32Array& data, bool updatable,
-               size_t stride, bool postponeInternalCreation, bool instanced,
-               bool useBytes)
+               Nullable<size_t> stride, bool postponeInternalCreation,
+               bool instanced, bool useBytes)
     : _engine{engine ? engine : Engine::LastCreatedEngine()}
     , _buffer{nullptr}
     , _data{data}
     , _updatable{updatable}
     , _instanced{instanced}
 {
-  byteStride = useBytes ? stride : stride * sizeof(float);
+  if (!stride) {
+    stride = 0ul;
+  }
+
+  byteStride = useBytes ? *stride : *stride * sizeof(float);
 
   if (!postponeInternalCreation) { // by default
     create();
@@ -25,15 +29,19 @@ Buffer::Buffer(Engine* engine, const Float32Array& data, bool updatable,
 }
 
 Buffer::Buffer(Mesh* mesh, const Float32Array& data, bool updatable,
-               size_t stride, bool postponeInternalCreation, bool instanced,
-               bool useBytes)
+               Nullable<size_t> stride, bool postponeInternalCreation,
+               bool instanced, bool useBytes)
     : _engine{mesh->getScene()->getEngine()}
     , _buffer{nullptr}
     , _data{data}
     , _updatable{updatable}
     , _instanced{instanced}
 {
-  byteStride = useBytes ? stride : stride * sizeof(float);
+  if (!stride) {
+    stride = 0ul;
+  }
+
+  byteStride = useBytes ? *stride : *stride * sizeof(float);
 
   if (!postponeInternalCreation) { // by default
     create();

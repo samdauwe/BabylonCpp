@@ -107,7 +107,8 @@ Float32Array InstancedMesh::getVerticesData(unsigned int kind,
 
 AbstractMesh* InstancedMesh::setVerticesData(unsigned int kind,
                                              const Float32Array& data,
-                                             bool updatable, int stride)
+                                             bool updatable,
+                                             const Nullable<size_t>& stride)
 {
   if (sourceMesh()) {
     sourceMesh()->setVerticesData(kind, data, updatable, stride);

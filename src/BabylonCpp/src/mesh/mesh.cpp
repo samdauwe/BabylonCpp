@@ -764,7 +764,7 @@ void Mesh::subdivide(size_t count)
 }
 
 Mesh* Mesh::setVerticesData(unsigned int kind, const Float32Array& data,
-                            bool updatable, int stride)
+                            bool updatable, const Nullable<size_t>& stride)
 {
   if (!_geometry) {
     auto vertexData = ::std::make_unique<VertexData>();

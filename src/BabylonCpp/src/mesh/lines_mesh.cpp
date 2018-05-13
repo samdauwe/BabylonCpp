@@ -81,7 +81,7 @@ void LinesMesh::set_intersectionThreshold(float value)
 
   _intersectionThreshold = value;
   if (geometry()) {
-    geometry()->setBoundingBias(Vector2(0.f, value));
+    geometry()->boundingBias = Vector2(0.f, value);
   }
 }
 

@@ -89,7 +89,8 @@ public:
    */
   AbstractMesh* setVerticesData(unsigned int kind, const Float32Array& data,
                                 bool updatable = false,
-                                int stride     = -1) override;
+                                const Nullable<size_t>& stride
+                                = nullptr) override;
 
   /**
    * @brief Updates the existing vertex data of the mesh geometry for the

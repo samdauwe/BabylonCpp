@@ -34,21 +34,6 @@ public:
   void addToScene(unique_ptr_t<Geometry>&& newGeometry);
 
   /**
-   * @brief Gets the Bias Vector to apply on the bounding elements (box/sphere),
-   * the max extend is computed as v += v * bias.x + bias.y, the min is computed
-   * as v -= v * bias.x + bias.y
-   * @returns The Bias Vector
-   */
-  const Vector2& boundingBias() const;
-
-  /**
-   *  @brief Sets the Bias Vector to apply on the bounding elements.
-   * (box/sphere), the max extend is computed as v += v * bias.x + bias.y, the
-   * min is computed as v -= v * bias.x + bias.y
-   */
-  void setBoundingBias(const Vector2& value);
-
-  /**
    * @brief Static function used to attach a new empty geometry to a mesh.
    * @param mesh defines the mesh to attach the geometry to
    * @returns the new {BABYLON.Geometry}
@@ -107,7 +92,8 @@ public:
    */
   AbstractMesh* setVerticesData(unsigned int kind, const Float32Array& data,
                                 bool updatable = false,
-                                int stride     = -1) override;
+                                const Nullable<size_t>& stride
+                                = nullptr) override;
 
   /**
    * @brief Removes a specific vertex data.
@@ -382,6 +368,21 @@ protected:
   Geometry(const string_t& id, Scene* scene, VertexData* vertexData = nullptr,
            bool updatable = false, Mesh* mesh = nullptr);
 
+  /**
+   * @brief Gets the Bias Vector to apply on the bounding elements (box/sphere),
+   * the max extend is computed as v += v * bias.x + bias.y, the min is computed
+   * as v -= v * bias.x + bias.y
+   * @returns The Bias Vector
+   */
+  Nullable<Vector2>& get_boundingBias();
+
+  /**
+   *  @brief Sets the Bias Vector to apply on the bounding elements.
+   * (box/sphere), the max extend is computed as v += v * bias.x + bias.y, the
+   * min is computed as v -= v * bias.x + bias.y
+   */
+  void set_boundingBias(const Nullable<Vector2>& value);
+
 private:
   void _updateBoundingInfo(bool updateExtends, const Float32Array& data);
   void _updateExtend(Float32Array data);
@@ -429,6 +430,13 @@ public:
     _vertexArrayObjects;
   bool _updatable;
   vector_t<Vector3> centroids;
+
+  /**
+   * Bias Vector to apply on the bounding elements (box/sphere), the max extend
+   * is computed as v += v * bias.x + bias.y, the min is computed as v -= v *
+   * bias.x + bias.y
+   */
+  Property<Geometry, Nullable<Vector2>> boundingBias;
 
 private:
   Scene* _scene;

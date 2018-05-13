@@ -56,21 +56,16 @@ struct BABYLON_SHARED_EXPORT Tools {
   static float ToRadians(float angle);
   static MinMax ExtractMinAndMaxIndexed(const Float32Array& positions,
                                         const Uint32Array& indices,
-                                        size_t indexStart, size_t indexCount);
-  static MinMax ExtractMinAndMaxIndexed(const Float32Array& positions,
-                                        const Uint32Array& indices,
                                         size_t indexStart, size_t indexCount,
-                                        const Vector2& bias);
+                                        const Nullable<Vector2>& bias
+                                        = nullptr);
   static MinMax ExtractMinAndMax(const Float32Array& positions, size_t start,
-                                 size_t count, unsigned int stride = 3);
-  static MinMax ExtractMinAndMax(const Float32Array& positions, size_t start,
-                                 size_t count, const Vector2& bias,
-                                 unsigned int stride = 3);
-  static MinMaxVector2 ExtractMinAndMaxVector2(
-    const ::std::function<Nullable<Vector2>(std::size_t index)>& feeder);
+                                 size_t count,
+                                 const Nullable<Vector2>& bias = nullptr,
+                                 Nullable<unsigned int> stride = nullptr);
   static MinMaxVector2 ExtractMinAndMaxVector2(
     const ::std::function<Nullable<Vector2>(std::size_t index)>& feeder,
-    const Vector2& bias);
+    const Nullable<Vector2>& bias = nullptr);
   static Image CreateCheckerboardImage(unsigned int size = 256);
   static Image CreateNoiseImage(unsigned int size = 8);
   // External files

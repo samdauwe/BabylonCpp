@@ -2,6 +2,7 @@
 #define BABYLON_MESH_IGET_SET_VERTICES_DATA_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/nullable.h>
 
 namespace BABYLON {
 
@@ -16,9 +17,10 @@ struct BABYLON_SHARED_EXPORT IGetSetVerticesData {
                                        bool forceCopy      = false)
     = 0;
   virtual IndicesArray getIndices(bool copyWhenShared = false) = 0;
-  virtual AbstractMesh* setVerticesData(unsigned int kind,
-                                        const Float32Array& data,
-                                        bool updatable = false, int stride = -1)
+  virtual AbstractMesh*
+  setVerticesData(unsigned int kind, const Float32Array& data,
+                  bool updatable                 = false,
+                  const Nullable<size_t>& stride = nullptr)
     = 0;
   virtual AbstractMesh*
   updateVerticesData(unsigned int kind, const Float32Array& data,

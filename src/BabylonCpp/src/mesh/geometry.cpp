@@ -23,6 +23,8 @@ Geometry::Geometry(const string_t& iId, Scene* scene, VertexData* vertexData,
     : id{iId}
     , delayLoadState{EngineConstants::DELAYLOADSTATE_NONE}
     , _updatable{updatable}
+    , boundingBias(this, &Geometry::get_boundingBias,
+                   &Geometry::set_boundingBias)
     , _scene{scene}
     , _engine{scene->getEngine()}
     , _totalVertices{0}
@@ -52,7 +54,7 @@ Geometry::Geometry(const string_t& iId, Scene* scene, VertexData* vertexData,
   if (mesh) {
     if (mesh->type() == IReflect::Type::LINESMESH) {
       auto linesMesh = static_cast<LinesMesh*>(mesh);
-      setBoundingBias(Vector2(0, linesMesh->intersectionThreshold()));
+      boundingBias   = Vector2(0, linesMesh->intersectionThreshold());
       _updateExtend(Float32Array());
     }
 
@@ -70,14 +72,14 @@ void Geometry::addToScene(unique_ptr_t<Geometry>&& newGeometry)
   _scene->pushGeometry(::std::move(newGeometry), true);
 }
 
-const Vector2& Geometry::boundingBias() const
+Nullable<Vector2>& Geometry::get_boundingBias()
 {
-  return *_boundingBias;
+  return _boundingBias;
 }
 
-void Geometry::setBoundingBias(const Vector2& value)
+void Geometry::set_boundingBias(const Nullable<Vector2>& value)
 {
-  if (_boundingBias && boundingBias().equals(value)) {
+  if (_boundingBias && (*_boundingBias).equals(*value)) {
     return;
   }
 
@@ -152,7 +154,8 @@ void Geometry::setAllVerticesData(VertexData* vertexData, bool updatable)
 
 AbstractMesh* Geometry::setVerticesData(unsigned int kind,
                                         const Float32Array& data,
-                                        bool updatable, int stride)
+                                        bool updatable,
+                                        const Nullable<size_t>& stride)
 {
   auto buffer = ::std::make_unique<VertexBuffer>(
     _engine, ToVariant<Float32Array, Buffer*>(data), kind, updatable,
@@ -190,7 +193,7 @@ void Geometry::setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer,
     }
     else {
       if (!data.empty()) {
-        _totalVertices = data.size() / (buffer->byteStride / 4);
+        _totalVertices = data.size() / (_buffer->byteStride / 4);
       }
     }
 

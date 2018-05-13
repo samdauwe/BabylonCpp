@@ -101,22 +101,23 @@ VertexBuffer::VertexBuffer(
     type = type;
   }
 
-  const auto typeByteLength = VertexBuffer::GetTypeByteLength(type);
+  const auto typeByteLength = VertexBuffer::GetTypeByteLength(*type);
 
+  auto buffer = _buffer ? _buffer : _ownedBuffer.get();
   if (useBytes) {
     _size = size ? *size :
-                   (stride ? (stride / typeByteLength) :
+                   (stride ? (*stride / typeByteLength) :
                              VertexBuffer::DeduceStride(kind));
     byteStride = stride ? *stride :
-                          _buffer->byteStride ? _buffer->byteStride :
-                                                (_size * typeByteLength);
+                          buffer->byteStride ? buffer->byteStride :
+                                               (_size * typeByteLength);
     byteOffset = offset ? *offset : 0;
   }
   else {
     _size = size ? *size : stride ? *stride : VertexBuffer::DeduceStride(kind);
-    byteStride = stride ? (stride * typeByteLength) :
-                          (_buffer->byteStride ? _buffer->byteStride :
-                                                 (_size * typeByteLength));
+    byteStride = stride ? (*stride * typeByteLength) :
+                          (buffer->byteStride != 0 ? buffer->byteStride :
+                                                     (_size * typeByteLength));
     byteOffset = (offset ? *offset : 0) * typeByteLength;
   }
 

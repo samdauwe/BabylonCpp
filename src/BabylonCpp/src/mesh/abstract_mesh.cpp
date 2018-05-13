@@ -639,7 +639,8 @@ Float32Array AbstractMesh::getVerticesData(unsigned int /*kind*/,
 
 AbstractMesh* AbstractMesh::setVerticesData(unsigned int /*kind*/,
                                             const Float32Array& /*data*/,
-                                            bool /*updatable*/, int /*stride*/)
+                                            bool /*updatable*/,
+                                            const Nullable<size_t>& /*stride*/)
 {
   return this;
 }

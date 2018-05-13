@@ -197,8 +197,11 @@ enum GLEnums : GLenum {
   UNSIGNED_SHORT_5_5_5_1 = 0x8034,
   UNSIGNED_SHORT_5_6_5   = 0x8363,
   /* Color schemes */
+  /* RGBA 32-bit floating-point color-renderable internal sized format */
   RGBA32F = 0x8814,
-  RGB32F  = 0x8815,
+  /* RGB 32-bit floating-point color-renderable internal sized format */
+  RGB32F = 0x8815,
+  /* RGBA 16-bit floating-point color-renderable internal sized format */
   RGBA16F = 0x881A,
   /* Uniform Buffers */
   UNIFORM_BUFFER = 0x8A11,
@@ -224,6 +227,8 @@ enum GLEnums : GLenum {
   /* Algorithm types */
   ANY_SAMPLES_PASSED              = 0x8C2F,
   ANY_SAMPLES_PASSED_CONSERVATIVE = 0x8D6A,
+  /* Half floating-point type (16-bit) */
+  HALF_FLOAT_OES = 0x8D61,
   /* StencilFunction */
   NEVER    = 0x0200,
   LESS     = 0x0201,
@@ -666,19 +671,7 @@ class BABYLON_SHARED_EXPORT IGLRenderingContext {
 
 public:
   // Half floating-point type (16-bit).
-  unsigned int HALF_FLOAT_OES;
-  // RGBA 16-bit floating-point color-renderable internal sized format.
-  unsigned int RGBA16F;
-  // RGBA 32-bit floating-point color-renderable internal sized format.
-  unsigned int RGBA32F;
-  unsigned int R32F;
-  unsigned int RG32F;
-  unsigned int RGB32F;
-  unsigned int DEPTH24_STENCIL8;
-  // Other
-  unsigned int RED;
-  unsigned int RG;
-  unsigned int UNSIGNED_INT_24_8;
+  unsigned int HALF_FLOAT_OES = GL::HALF_FLOAT_OES;
   // Drawing buffer width and height
   int drawingBufferWidth;
   int drawingBufferHeight;

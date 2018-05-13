@@ -24,8 +24,9 @@ public:
    * @param useBytes set to true if the stride in in bytes (optional)
    */
   Buffer(Engine* engine, const Float32Array& data, bool updatable,
-         size_t stride = 0, bool postponeInternalCreation = false,
-         bool instanced = false, bool useBytes = false);
+         Nullable<size_t> stride       = nullptr,
+         bool postponeInternalCreation = false, bool instanced = false,
+         bool useBytes = false);
 
   /**
    * @brief Constructor
@@ -39,8 +40,9 @@ public:
    * @param useBytes set to true if the stride in in bytes (optional)
    */
   Buffer(Mesh* mesh, const Float32Array& data, bool updatable,
-         size_t stride = 0, bool postponeInternalCreation = false,
-         bool instanced = false, bool useBytes = false);
+         Nullable<size_t> stride       = nullptr,
+         bool postponeInternalCreation = false, bool instanced = false,
+         bool useBytes = false);
 
   virtual ~Buffer();
 

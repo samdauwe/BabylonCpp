@@ -335,21 +335,6 @@ void Engine::_initGLContext()
     _glRenderer = "Unknown renderer";
   }
 
-  // Constants
-  // Half floating-point type (16-bit).
-  _gl->HALF_FLOAT_OES = 0x8D61;
-  if (_gl->RGBA16F != 0x881A) {
-    // RGBA 16-bit floating-point color-renderable internal sized format.
-    _gl->RGBA16F = 0x881A;
-  }
-  if (_gl->RGBA32F != 0x8814) {
-    // RGBA 32-bit floating-point color-renderable internal sized format.
-    _gl->RGBA32F = 0x8814;
-  }
-  if (_gl->DEPTH24_STENCIL8 != 35056) {
-    _gl->DEPTH24_STENCIL8 = 35056;
-  }
-
   // Extensions
   auto extensionList = String::split(_gl->getString(GL::EXTENSIONS), ' ');
   std::set<string_t> extensions;
@@ -4986,10 +4971,10 @@ GL::GLenum Engine::_getRGBABufferInternalSizedFormat(
 GL::GLenum Engine::_getRGBAMultiSampleBufferFormat(unsigned int type) const
 {
   if (type == EngineConstants::TEXTURETYPE_FLOAT) {
-    return _gl->RGBA32F;
+    return GL::RGBA32F;
   }
   else if (type == EngineConstants::TEXTURETYPE_HALF_FLOAT) {
-    return _gl->RGBA16F;
+    return GL::RGBA16F;
   }
 
   return GL::RGBA8;

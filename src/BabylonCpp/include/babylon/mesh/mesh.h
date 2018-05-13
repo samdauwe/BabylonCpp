@@ -370,7 +370,8 @@ public:
   void subdivide(size_t count);
 
   Mesh* setVerticesData(unsigned int kind, const Float32Array& data,
-                        bool updatable = false, int stride = -1) override;
+                        bool updatable                 = false,
+                        const Nullable<size_t>& stride = nullptr) override;
 
   void markVerticesDataAsUpdatable(unsigned int kind, bool updatable = true);
 
