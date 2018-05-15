@@ -13,7 +13,7 @@ using TPrimitiveSetter = ::std::function<void(const T)>;
 
 // Babylon property callbacks
 template <typename T>
-using TBabylonGetter = ::std::function<T&()>;
+using TBabylonGetter = ::std::function<T const&()>;
 template <typename T>
 using TBabylonSetter = ::std::function<void(const T&)>;
 

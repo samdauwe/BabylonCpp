@@ -9,6 +9,7 @@
 namespace BABYLON {
 
 class Camera;
+class FreeCamera;
 
 class CameraAdapter : public Adapter, public ICameraPOV {
 
@@ -46,7 +47,11 @@ public:
   string_t cameraId() const override;
 
 private:
+  void _buildPropertiesView();
+
+private:
   Camera* _camera;
+  FreeCamera* _freeCamera;
   unique_ptr_t<PropertiesView> _properties;
   vector_t<unique_ptr_t<AbstractTreeTool>> _tools;
 

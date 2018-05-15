@@ -14,7 +14,7 @@ LightAdapter::LightAdapter(Light* light)
   _tools.emplace_back(::std::make_unique<Checkbox>(this));
   // Cast light
   if (_light->type() == IReflect::Type::HEMISPHERICLIGHT) {
-    _hemispericLight = static_cast<HemisphericLight*>(light);
+    _hemispericLight = static_cast<HemisphericLight*>(_light);
   }
   // Build properties view
   _properties = ::std::make_unique<PropertiesView>();
@@ -125,17 +125,19 @@ void LightAdapter::_buildPropertiesView()
                          [&](const Color3& value) { _light->diffuse = value; });
   // - specular color
   view.addColor3Property(
-    "specular", [&]() -> Color3& { return _light->specular; },
+    "specular", [&]() -> Color3 const& { return _light->specular; },
     [&](const Color3& value) { _light->specular = value; });
   /** HemisphericLight properties **/
   if (_hemispericLight) {
     // direction
     view.addVector3Property(
-      "direction", [&]() -> Vector3& { return _hemispericLight->direction; },
+      "direction",
+      [&]() -> Vector3 const& { return _hemispericLight->direction; },
       [&](const Vector3& value) { _hemispericLight->direction = value; });
     // - ground color
     view.addColor3Property(
-      "groundColor", [&]() -> Color3& { return _hemispericLight->groundColor; },
+      "groundColor",
+      [&]() -> Color3 const& { return _hemispericLight->groundColor; },
       [&](const Color3& value) { _hemispericLight->groundColor = value; });
   }
   // -- Sort properties by property name -- //

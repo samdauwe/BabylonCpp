@@ -62,7 +62,7 @@ void LightTab::_renderTree()
       toggleSelection(lightTreeItem, _lights);
     }
     ImGui::SameLine();
-    // Type information
+    // Render type information
     ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetColorBot());
     ImGui::TextWrapped("- %s", adapter.type().c_str());
     ImGui::PopStyleColor();

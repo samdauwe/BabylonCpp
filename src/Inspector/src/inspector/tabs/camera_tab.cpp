@@ -2,10 +2,13 @@
 
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/scene.h>
+
 #include <babylon/inspector/adapters/camera_adapter.h>
 #include <babylon/inspector/inspector.h>
+#include <babylon/inspector/properties/properties_view.h>
 #include <babylon/inspector/treetools/abstract_tree_tool.h>
 
+#include <babylon/imgui/imgui_utils.h>
 #include <imgui.h>
 
 namespace BABYLON {
@@ -59,8 +62,8 @@ void CameraTab::_renderTree()
       toggleSelection(cameraTreeItem, _cameras);
     }
     ImGui::SameLine();
-    // Color "color-bot" #5db0d7 -> rgba(93, 176, 215, 1)
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.36f, 0.69f, 0.84f, 1.0f));
+    // Render type information
+    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetColorBot());
     ImGui::TextWrapped("- %s", adapter.type().c_str());
     ImGui::PopStyleColor();
   }
@@ -68,6 +71,17 @@ void CameraTab::_renderTree()
 
 void CameraTab::_renderProperties()
 {
+  // Cameras
+  for (auto& cameraTreeItem : _cameras) {
+    if (cameraTreeItem.isActive()) {
+      // Get the item adapter
+      auto& adapter    = cameraTreeItem.adapter();
+      auto& properties = adapter.getProperties();
+      if (properties) {
+        properties->render();
+      }
+    }
+  }
 }
 
 } // end of namespace BABYLON

@@ -50,6 +50,46 @@ public:
 
   template <class U                                                 = T,
             typename std::enable_if<std::is_same<
+              Vector2, typename std::decay<U>::type>::value>::type* = nullptr>
+  void render()
+  {
+    const auto& vector = _getter();
+    bool changed       = false;
+    float x = 0.f, y = 0.f;
+    if (ImGui::TreeNode(_id.c_str(), "x:%.3f, y:%.3f", vector.x, vector.y)) {
+      // Vector2 properties
+      {
+        // x
+        ImGui::NextColumn();
+        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetColorTop());
+        ImGui::TextWrapped("x");
+        ImGui::PopStyleColor();
+        ImGui::NextColumn();
+        x = vector.x;
+        if (ImGui::InputFloat(" ", &x)) {
+          changed = true;
+        }
+        // y
+        ImGui::NextColumn();
+        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetColorTop());
+        ImGui::TextWrapped("y");
+        ImGui::PopStyleColor();
+        ImGui::NextColumn();
+        y = vector.y;
+        if (ImGui::InputFloat(" ", &y)) {
+          changed = true;
+        }
+      }
+      // Update
+      if (changed) {
+        _setter(Vector2{x, y});
+      }
+      ImGui::TreePop();
+    }
+  }
+
+  template <class U                                                 = T,
+            typename std::enable_if<std::is_same<
               Vector3, typename std::decay<U>::type>::value>::type* = nullptr>
   void render()
   {
@@ -95,7 +135,7 @@ public:
         ImGui::TextWrapped("z");
         ImGui::PopStyleColor();
         ImGui::NextColumn();
-        x = vector.x;
+        z = vector.z;
         if (ImGui::InputFloat(" ", &z)) {
           changed = true;
         }
