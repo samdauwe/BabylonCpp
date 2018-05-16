@@ -9,6 +9,7 @@
 namespace BABYLON {
 
 class Material;
+class StandardMaterial;
 
 class MaterialAdapter : public Adapter {
 
@@ -37,7 +38,11 @@ public:
   vector_t<AbstractTreeToolUPtr>& getTools() override;
 
 private:
+  void _buildPropertiesView();
+
+private:
   Material* _material;
+  StandardMaterial* _standardMaterial;
   unique_ptr_t<PropertiesView> _properties;
   vector_t<unique_ptr_t<AbstractTreeTool>> _tools;
 
