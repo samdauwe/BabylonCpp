@@ -28,7 +28,7 @@ public:
   /**
    * @brief Return the currrent class name of the material.
    */
-  const char* getClassName() const override;
+  const string_t getClassName() const override;
 
   /**
    * @brief Return the active textures of the material.

@@ -40,7 +40,7 @@ ShaderMaterial::~ShaderMaterial()
 {
 }
 
-const char* ShaderMaterial::getClassName() const
+const string_t ShaderMaterial::getClassName() const
 {
   return "ShaderMaterial";
 }

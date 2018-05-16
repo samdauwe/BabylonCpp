@@ -105,7 +105,7 @@ string_t BaseTexture::toString() const
   return name;
 }
 
-const char* BaseTexture::getClassName() const
+const string_t BaseTexture::getClassName() const
 {
   return "BaseTexture";
 }

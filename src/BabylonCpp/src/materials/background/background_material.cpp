@@ -825,7 +825,7 @@ Json::object BackgroundMaterial::serialize() const
   return Json::object();
 }
 
-const char* BackgroundMaterial::getClassName() const
+const string_t BackgroundMaterial::getClassName() const
 {
   return "BackgroundMaterial";
 }

@@ -30,7 +30,7 @@ public:
   /**
    * @brief Returns the string "ColorCurves".
    */
-  const char* getClassName() const;
+  const string_t getClassName() const;
 
   /**
    * @brief Clones the current color curve instance.

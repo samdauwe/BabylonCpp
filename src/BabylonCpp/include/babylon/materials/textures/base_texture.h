@@ -32,7 +32,7 @@ public:
   /**
    * @brief Returns the string "BaseTexture".
    */
-  const char* getClassName() const;
+  const string_t getClassName() const;
 
   void setOnDispose(
     const ::std::function<void(BaseTexture*, EventState&)>& callback);

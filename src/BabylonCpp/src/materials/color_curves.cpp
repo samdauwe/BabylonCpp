@@ -300,7 +300,7 @@ void ColorCurves::setShadowsExposure(float value)
   _dirty           = true;
 }
 
-const char* ColorCurves::getClassName() const
+const string_t ColorCurves::getClassName() const
 {
   return "ColorCurves";
 }

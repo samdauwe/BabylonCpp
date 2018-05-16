@@ -43,7 +43,7 @@ public:
   /**
    * @brief Returns the string "ImageProcessingConfiguration".
    */
-  const char* getClassName() const;
+  const string_t getClassName() const;
 
   /**
    * @brief Gets wether the color curves effect is enabled.

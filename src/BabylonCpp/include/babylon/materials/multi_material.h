@@ -23,7 +23,7 @@ public:
   /**
    * @brief Returns the string "MultiMaterial".
    */
-  const char* getClassName() const;
+  const string_t getClassName() const override;
 
   IReflect::Type type() const override;
 

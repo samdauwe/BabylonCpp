@@ -93,7 +93,7 @@ public:
   /**
    * @brief Returns the name of this material class.
    */
-  const char* getClassName() const override;
+  const string_t getClassName() const override;
 
   /**
    * @brief Returns an array of the actively used textures.

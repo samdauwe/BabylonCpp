@@ -17,7 +17,7 @@ PushMaterial::~PushMaterial()
 {
 }
 
-const char* PushMaterial::getClassName() const
+const string_t PushMaterial::getClassName() const
 {
   return "PushMaterial";
 }

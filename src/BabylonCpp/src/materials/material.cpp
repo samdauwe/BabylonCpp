@@ -257,7 +257,7 @@ string_t Material::toString(bool fullDetails) const
   return oss.str();
 }
 
-const char* Material::getClassName() const
+const string_t Material::getClassName() const
 {
   return "Material";
 }

@@ -18,7 +18,7 @@ MultiMaterial::~MultiMaterial()
 {
 }
 
-const char* MultiMaterial::getClassName() const
+const string_t MultiMaterial::getClassName() const
 {
   return "MultiMaterial";
 }

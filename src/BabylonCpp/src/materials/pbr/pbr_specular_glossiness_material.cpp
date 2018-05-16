@@ -18,7 +18,7 @@ PBRSpecularGlossinessMaterial::~PBRSpecularGlossinessMaterial()
 {
 }
 
-const char* PBRSpecularGlossinessMaterial::getClassName() const
+const string_t PBRSpecularGlossinessMaterial::getClassName() const
 {
   return "PBRSpecularGlossinessMaterial";
 }

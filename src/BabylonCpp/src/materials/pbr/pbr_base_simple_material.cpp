@@ -30,7 +30,7 @@ PBRBaseSimpleMaterial::~PBRBaseSimpleMaterial()
 {
 }
 
-const char* PBRBaseSimpleMaterial::getClassName() const
+const string_t PBRBaseSimpleMaterial::getClassName() const
 {
   return "PBRBaseSimpleMaterial";
 }

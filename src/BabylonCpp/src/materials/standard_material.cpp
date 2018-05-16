@@ -187,7 +187,7 @@ StandardMaterial::~StandardMaterial()
 {
 }
 
-const char* StandardMaterial::getClassName() const
+const string_t StandardMaterial::getClassName() const
 {
   return "StandardMaterial";
 }

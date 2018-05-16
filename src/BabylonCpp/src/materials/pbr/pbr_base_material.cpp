@@ -154,7 +154,7 @@ void PBRBaseMaterial::_attachImageProcessingConfiguration(
       });
 }
 
-const char* PBRBaseMaterial::getClassName() const
+const string_t PBRBaseMaterial::getClassName() const
 {
   return "PBRBaseMaterial";
 }

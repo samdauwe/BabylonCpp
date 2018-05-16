@@ -24,7 +24,7 @@ PBRMetallicRoughnessMaterial::~PBRMetallicRoughnessMaterial()
 {
 }
 
-const char* PBRMetallicRoughnessMaterial::getClassName() const
+const string_t PBRMetallicRoughnessMaterial::getClassName() const
 {
   return "PBRMetallicRoughnessMaterial";
 }

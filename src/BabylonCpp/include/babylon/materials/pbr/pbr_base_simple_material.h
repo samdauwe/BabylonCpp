@@ -29,7 +29,7 @@ public:
   /**
    * @brief Returns the string "PBRBaseSimpleMaterial".
    */
-  const char* getClassName() const override;
+  const string_t getClassName() const override;
 
   /**
    * @brief Gets the current double sided mode.

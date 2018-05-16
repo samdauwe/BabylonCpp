@@ -32,7 +32,7 @@ public:
   /**
    * @brief Gets the name of the material class.
    */
-  virtual const char* getClassName() const;
+  const string_t getClassName() const override;
 
   /**
    * @brief Enabled the use of logarithmic depth buffers, which is good for wide

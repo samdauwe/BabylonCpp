@@ -209,7 +209,7 @@ void ImageProcessingConfiguration::_updateParameters()
   onUpdateParameters.notifyObservers(this);
 }
 
-const char* ImageProcessingConfiguration::getClassName() const
+const string_t ImageProcessingConfiguration::getClassName() const
 {
   return "ImageProcessingConfiguration";
 }
