@@ -132,6 +132,8 @@ public:
   void setInvertNormalMapX(bool value);
   bool invertNormalMapY() const;
   void setInvertNormalMapY(bool value);
+  bool twoSidedLighting() const;
+  void setTwoSidedLighting(bool value);
 
   /**
    * @brief Gets the image processing configuration used either in this

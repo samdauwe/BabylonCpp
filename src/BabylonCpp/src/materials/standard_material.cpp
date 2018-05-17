@@ -1679,6 +1679,19 @@ void StandardMaterial::setInvertNormalMapY(bool value)
   _invertNormalMapY = value;
 }
 
+bool StandardMaterial::twoSidedLighting() const
+{
+  return _twoSidedLighting;
+}
+
+void StandardMaterial::setTwoSidedLighting(bool value)
+{
+  if (_twoSidedLighting == value) {
+    return;
+  }
+  _twoSidedLighting = value;
+}
+
 ImageProcessingConfiguration*
 StandardMaterial::imageProcessingConfiguration() const
 {
