@@ -10,14 +10,16 @@
 namespace BABYLON {
 
 enum class PropertyTypeInsp {
-  BOOL_PROPERTY    = 0,
-  FLOAT_PROPERTY   = 1,
-  INT_PROPERTY     = 2,
-  SIZE_T_PROPERT   = 3,
-  STRING_PROPERTY  = 4,
-  COLOR3_PROPERTY  = 5,
-  VECTOR2_PROPERTY = 6,
-  VECTOR3_PROPERTY = 7,
+  BOOL_PROPERTY                           = 0,
+  FLOAT_PROPERTY                          = 1,
+  INT_PROPERTY                            = 2,
+  SIZE_T_PROPERT                          = 3,
+  STRING_PROPERTY                         = 4,
+  COLOR3_PROPERTY                         = 5,
+  VECTOR2_PROPERTY                        = 6,
+  VECTOR3_PROPERTY                        = 7,
+  COLOR_CURVES_PROPERTY                   = 8,
+  IMAGE_PROCESSING_CONFIGURATION_PROPERTY = 9,
 }; // end of enum class PropertyType
 
 struct PropertyEntry {
@@ -55,6 +57,13 @@ public:
   void addVector3Property(const string_t& name,
                           const TBabylonGetter<Vector3>& getter,
                           const TBabylonSetter<Vector3>& setter);
+  void addColorCurvesConfigurationProperty(
+    const string_t& name, const TBabylonGetter<ColorCurves>& getter,
+    const TBabylonSetter<ColorCurves>& setter);
+  void addImageProcessingConfigurationProperty(
+    const string_t& name,
+    const TBabylonGetter<ImageProcessingConfiguration>& getter,
+    const TBabylonSetter<ImageProcessingConfiguration>& setter);
   void sortPropertiesByName();
 
   void render();
@@ -69,6 +78,9 @@ private:
   vector_t<BabylonProperty<Color3>> _color3Properties;
   vector_t<BabylonProperty<Vector2>> _vector2Properties;
   vector_t<BabylonProperty<Vector3>> _vector3Properties;
+  vector_t<BabylonProperty<ColorCurves>> _colorCurvesProperties;
+  vector_t<BabylonProperty<ImageProcessingConfiguration>>
+    _imageProcessingConfigurationProperties;
   vector_t<PropertyEntry> _propertyEntries;
 
 }; // end of class PropertiesView
