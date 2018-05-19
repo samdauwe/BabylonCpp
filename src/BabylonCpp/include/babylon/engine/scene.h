@@ -148,7 +148,7 @@ public:
    * @brief Gets the pointer coordinates without any translation (ie. straight
    * out of the pointer event).
    */
-  Vector2 unTranslatedPointer() const;
+  Vector2& unTranslatedPointer();
 
   /** Properties **/
 
@@ -1351,7 +1351,7 @@ public:
    * @brief Return a unique id as a string which can serve as an identifier for
    * the scene.
    */
-  string_t uid();
+  string_t& uid();
 
   /**
    * @brief Clear the processed materials smart array preventing retention point
@@ -2792,6 +2792,7 @@ private:
   bool _frustumPlanesSet;
   array_t<Plane, 6> _frustumPlanes;
   Octree<AbstractMesh*>* _selectionOctree;
+  Vector2 _unTranslatedPointer;
   AbstractMesh* _pointerOverMesh;
   Sprite* _pointerOverSprite;
   unique_ptr_t<DebugLayer> _debugLayer;

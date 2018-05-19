@@ -307,10 +307,12 @@ GamepadManager& Scene::gamepadManager()
 }
 
 // Pointers
-Vector2 Scene::unTranslatedPointer() const
+Vector2& Scene::unTranslatedPointer()
 {
-  return Vector2(static_cast<float>(_unTranslatedPointerX),
-                 static_cast<float>(_unTranslatedPointerY));
+  _unTranslatedPointer = Vector2(static_cast<float>(_unTranslatedPointerX),
+                                 static_cast<float>(_unTranslatedPointerY));
+
+  return _unTranslatedPointer;
 }
 
 // Properties
@@ -2915,7 +2917,7 @@ GlowLayer* Scene::getGlowLayerByName(const string_t& name)
                                       static_cast<GlowLayer*>((*it).get());
 }
 
-string_t Scene::uid()
+string_t& Scene::uid()
 {
   if (_uid.empty()) {
     _uid = Tools::RandomId();
