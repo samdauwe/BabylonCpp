@@ -16,10 +16,11 @@ enum class PropertyTypeInsp {
   SIZE_T_PROPERT                          = 3,
   STRING_PROPERTY                         = 4,
   COLOR3_PROPERTY                         = 5,
-  VECTOR2_PROPERTY                        = 6,
-  VECTOR3_PROPERTY                        = 7,
-  COLOR_CURVES_PROPERTY                   = 8,
-  IMAGE_PROCESSING_CONFIGURATION_PROPERTY = 9,
+  COLOR4_PROPERTY                         = 6,
+  VECTOR2_PROPERTY                        = 7,
+  VECTOR3_PROPERTY                        = 8,
+  COLOR_CURVES_PROPERTY                   = 9,
+  IMAGE_PROCESSING_CONFIGURATION_PROPERTY = 10,
 }; // end of enum class PropertyType
 
 struct PropertyEntry {
@@ -51,6 +52,9 @@ public:
   void addColor3Property(const string_t& name,
                          const TBabylonGetter<Color3>& getter,
                          const TBabylonSetter<Color3>& setter);
+  void addColor4Property(const string_t& name,
+                         const TBabylonGetter<Color4>& getter,
+                         const TBabylonSetter<Color4>& setter);
   void addVector2Property(const string_t& name,
                           const TBabylonGetter<Vector2>& getter,
                           const TBabylonSetter<Vector2>& setter);
@@ -75,6 +79,7 @@ private:
   vector_t<PrimitiveProperty<size_t>> _sizeTProperties;
   vector_t<PrimitiveProperty<string_t>> _stringProperties;
   vector_t<BabylonProperty<Color3>> _color3Properties;
+  vector_t<BabylonProperty<Color4>> _color4Properties;
   vector_t<BabylonProperty<Vector2>> _vector2Properties;
   vector_t<BabylonProperty<Vector3>> _vector3Properties;
   vector_t<BabylonProperty<ColorCurves>> _colorCurvesProperties;

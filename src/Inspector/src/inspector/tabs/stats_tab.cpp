@@ -198,7 +198,7 @@ void StatsTab::render()
                          _engine->getRenderHeight());
     }
     // Extensions
-    if (ImGui::CollapsingHeader("Extension", "Extensions")) {
+    if (ImGui::CollapsingHeader("Extension", "Extensions", true, true)) {
       // Std derivates
       ImGui::TextWrapped("Std derivates");
       ImGui::SameLine(offsetX);
@@ -247,7 +247,7 @@ void StatsTab::render()
       ImGui::TextWrapped("%s", engineCapabilities.timerQuery ? "Yes" : "No");
     }
     // Caps.
-    if (ImGui::CollapsingHeader("Caps.", "Caps.")) {
+    if (ImGui::CollapsingHeader("Caps.", "Caps.", true, true)) {
       // Stencil
       ImGui::TextWrapped("Stencil");
       ImGui::SameLine(offsetX);

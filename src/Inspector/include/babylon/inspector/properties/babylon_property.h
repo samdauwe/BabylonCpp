@@ -62,6 +62,19 @@ public:
     }
   }
 
+  template <class U                                                = T,
+            typename std::enable_if<std::is_same<
+              Color4, typename std::decay<U>::type>::value>::type* = nullptr>
+  void render()
+  {
+    const auto& color = _getter();
+    array_t<float, 4> _colorArray{{color.r, color.g, color.b, color.a}};
+    if (_render(_colorArray)) {
+      _setter(
+        Color4{_colorArray[0], _colorArray[1], _colorArray[2], _colorArray[3]});
+    }
+  }
+
   template <class U                                                 = T,
             typename std::enable_if<std::is_same<
               Vector2, typename std::decay<U>::type>::value>::type* = nullptr>

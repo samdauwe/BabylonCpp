@@ -85,6 +85,18 @@ void PropertiesView::addColor3Property(const string_t& name,
   _propertyEntries.emplace_back(PropertyEntry{name, index, type});
 }
 
+void PropertiesView::addColor4Property(const string_t& name,
+                                       const TBabylonGetter<Color4>& getter,
+                                       const TBabylonSetter<Color4>& setter)
+{
+  // Create property
+  _color4Properties.emplace_back(BabylonProperty<Color4>{getter, setter});
+  // Store mapping
+  auto index = _color4Properties.size() - 1;
+  auto type  = PropertyTypeInsp::COLOR4_PROPERTY;
+  _propertyEntries.emplace_back(PropertyEntry{name, index, type});
+}
+
 void PropertiesView::addVector2Property(const string_t& name,
                                         const TBabylonGetter<Vector2>& getter,
                                         const TBabylonSetter<Vector2>& setter)
@@ -179,6 +191,9 @@ void PropertiesView::render()
         break;
       case PropertyTypeInsp::COLOR3_PROPERTY:
         _color3Properties[property.index].render();
+        break;
+      case PropertyTypeInsp::COLOR4_PROPERTY:
+        _color4Properties[property.index].render();
         break;
       case PropertyTypeInsp::VECTOR2_PROPERTY:
         _vector2Properties[property.index].render();
