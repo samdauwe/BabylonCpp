@@ -57,13 +57,12 @@ public:
   void addVector3Property(const string_t& name,
                           const TBabylonGetter<Vector3>& getter,
                           const TBabylonSetter<Vector3>& setter);
-  void addColorCurvesConfigurationProperty(
-    const string_t& name, const TBabylonGetter<ColorCurves>& getter,
-    const TBabylonSetter<ColorCurves>& setter);
+  void addColorCurvesProperty(
+    const string_t& name,
+    const TBabylonNonConstGetter<ColorCurves>& getterNonConst);
   void addImageProcessingConfigurationProperty(
     const string_t& name,
-    const TBabylonGetter<ImageProcessingConfiguration>& getter,
-    const TBabylonSetter<ImageProcessingConfiguration>& setter);
+    const TBabylonNonConstGetter<ImageProcessingConfiguration>& getterNonConst);
   void sortPropertiesByName();
 
   void render();

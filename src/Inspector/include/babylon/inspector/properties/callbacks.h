@@ -15,6 +15,8 @@ using TPrimitiveSetter = ::std::function<void(const T)>;
 template <typename T>
 using TBabylonGetter = ::std::function<T const&()>;
 template <typename T>
+using TBabylonNonConstGetter = ::std::function<T&()>;
+template <typename T>
 using TBabylonSetter = ::std::function<void(const T&)>;
 
 } // end of namespace BABYLON

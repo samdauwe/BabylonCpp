@@ -109,13 +109,13 @@ void PropertiesView::addVector3Property(const string_t& name,
   _propertyEntries.emplace_back(PropertyEntry{name, index, type});
 }
 
-void PropertiesView::addColorCurvesConfigurationProperty(
-  const string_t& name, const TBabylonGetter<ColorCurves>& getter,
-  const TBabylonSetter<ColorCurves>& setter)
+void PropertiesView::addColorCurvesProperty(
+  const string_t& name,
+  const TBabylonNonConstGetter<ColorCurves>& getterNonConst)
 {
   // Create property
   _colorCurvesProperties.emplace_back(
-    BabylonProperty<ColorCurves>{getter, setter});
+    BabylonProperty<ColorCurves>{getterNonConst});
   // Store mapping
   auto index = _colorCurvesProperties.size() - 1;
   auto type  = PropertyTypeInsp::COLOR_CURVES_PROPERTY;
@@ -124,12 +124,11 @@ void PropertiesView::addColorCurvesConfigurationProperty(
 
 void PropertiesView::addImageProcessingConfigurationProperty(
   const string_t& name,
-  const TBabylonGetter<ImageProcessingConfiguration>& getter,
-  const TBabylonSetter<ImageProcessingConfiguration>& setter)
+  const TBabylonNonConstGetter<ImageProcessingConfiguration>& getterNonConst)
 {
   // Create property
   _imageProcessingConfigurationProperties.emplace_back(
-    BabylonProperty<ImageProcessingConfiguration>{getter, setter});
+    BabylonProperty<ImageProcessingConfiguration>{getterNonConst});
   // Store mapping
   auto index = _imageProcessingConfigurationProperties.size() - 1;
   auto type  = PropertyTypeInsp::IMAGE_PROCESSING_CONFIGURATION_PROPERTY;
@@ -188,8 +187,10 @@ void PropertiesView::render()
         _vector3Properties[property.index].render();
         break;
       case PropertyTypeInsp::COLOR_CURVES_PROPERTY:
+        _colorCurvesProperties[property.index].render();
         break;
       case PropertyTypeInsp::IMAGE_PROCESSING_CONFIGURATION_PROPERTY:
+        _imageProcessingConfigurationProperties[property.index].render();
         break;
     }
     ImGui::PopID();

@@ -181,6 +181,12 @@ void MaterialAdapter::_buildPropertiesView()
       [&](const bool& value) {
         _standardMaterial->setCameraToneMappingEnabled(value);
       });
+    // - cameraColorCurves
+    if (_standardMaterial->cameraColorCurves()) {
+      view.addColorCurvesProperty("cameraColorCurves", [&]() -> ColorCurves& {
+        return *_standardMaterial->cameraColorCurves();
+      });
+    }
     // - diffuseColor
     view.addColor3Property(
       "diffuseColor",
@@ -196,6 +202,13 @@ void MaterialAdapter::_buildPropertiesView()
       "emissiveColor",
       [&]() -> Color3 const& { return _standardMaterial->emissiveColor; },
       [&](const Color3& value) { _standardMaterial->emissiveColor = value; });
+    // - imageProcessingConfiguration
+    if (_standardMaterial->imageProcessingConfiguration()) {
+      view.addImageProcessingConfigurationProperty(
+        "imageProcessingConfiguration", [&]() -> ImageProcessingConfiguration& {
+          return *_standardMaterial->imageProcessingConfiguration();
+        });
+    }
     // - indexOfRefraction
     view.addFloatProperty(
       "indexOfRefraction",
