@@ -46,119 +46,6 @@ public:
   const string_t getClassName() const;
 
   /**
-   * @brief Gets wether the color curves effect is enabled.
-   */
-  bool colorCurvesEnabled() const;
-
-  /**
-   * @brief Sets wether the color curves effect is enabled.
-   */
-  void setColorCurvesEnabled(bool value);
-
-  /**
-   * @brief Gets wether the color grading effect is enabled.
-   */
-  bool colorGradingEnabled() const;
-
-  /**
-   * @brief Sets wether the color grading effect is enabled.
-   */
-  void setColorGradingEnabled(bool value);
-
-  /**
-   * @brief Gets wether the color grading effect is using a green depth for the
-   * 3d Texture.
-   */
-  bool colorGradingWithGreenDepth() const;
-
-  /**
-   * @brief Sets wether the color grading effect is using a green depth for the
-   * 3d Texture.
-   */
-  void setColorGradingWithGreenDepth(bool value);
-
-  /**
-   * @brief Gets wether the color grading texture contains BGR values.
-   */
-  bool colorGradingBGR() const;
-
-  /**
-   * @brief Sets wether the color grading texture contains BGR values.
-   */
-  void setColorGradingBGR(bool value);
-
-  /**
-   * @brief Gets the Exposure used in the effect.
-   */
-  float exposure() const;
-
-  /**
-   * @brief Sets the Exposure used in the effect.
-   */
-  void setExposure(float value);
-
-  /**
-   * @brief Gets wether the tone mapping effect is enabled.
-   */
-  bool toneMappingEnabled() const;
-
-  /**
-   * @brief Sets wether the tone mapping effect is enabled.
-   */
-  void setToneMappingEnabled(bool value);
-
-  /**
-   * @brief Gets the contrast used in the effect.
-   */
-  float contrast() const;
-
-  /**
-   * @brief Sets the contrast used in the effect.
-   */
-  void setContrast(float value);
-
-  /**
-   * @brief Gets the vignette blend mode allowing different kind of effect.
-   */
-  unsigned int vignetteBlendMode() const;
-
-  /**
-   * @brief Sets the vignette blend mode allowing different kind of effect.
-   */
-  void setVignetteBlendMode(unsigned int value);
-
-  /**
-   * @brief Gets wether the vignette effect is enabled.
-   */
-  bool vignetteEnabled() const;
-
-  /**
-   * @brief Sets wether the vignette effect is enabled.
-   */
-  void setVignetteEnabled(bool value);
-
-  /**
-   * @brief Gets wether the image processing is applied through a post process
-   * or not.
-   */
-  bool applyByPostProcess() const;
-
-  /**
-   * @brief Gets wether the image processing is enabled or not.
-   */
-  bool isEnabled() const;
-  /**
-   * @brief Sets wether the image processing is enabled or not.
-   */
-  void setIsEnabled(bool value);
-
-  /**
-   * @brief Sets wether the image processing is applied through a post process
-   * or not.
-   */
-  void setApplyByPostProcess(bool value);
-
-  /**
    * @brief Prepare the list of uniforms associated with the Image Processing
    * effects.
    * @param uniformsList The list of uniforms used in the effect
@@ -218,12 +105,180 @@ public:
 
 protected:
   /**
+   * @brief Gets wether the color curves effect is enabled.
+   */
+  bool get_colorCurvesEnabled() const;
+
+  /**
+   * @brief Sets wether the color curves effect is enabled.
+   */
+  void set_colorCurvesEnabled(bool value);
+
+  /**
+   * @brief Gets wether the color grading effect is enabled.
+   */
+  bool get_colorGradingEnabled() const;
+
+  /**
+   * @brief Sets wether the color grading effect is enabled.
+   */
+  void set_colorGradingEnabled(bool value);
+
+  /**
+   * @brief Gets wether the color grading effect is using a green depth for the
+   * 3d Texture.
+   */
+  bool get_colorGradingWithGreenDepth() const;
+
+  /**
+   * @brief Sets wether the color grading effect is using a green depth for the
+   * 3d Texture.
+   */
+  void set_colorGradingWithGreenDepth(bool value);
+
+  /**
+   * @brief Gets wether the color grading texture contains BGR values.
+   */
+  bool get_colorGradingBGR() const;
+
+  /**
+   * @brief Sets wether the color grading texture contains BGR values.
+   */
+  void set_colorGradingBGR(bool value);
+
+  /**
+   * @brief Gets the Exposure used in the effect.
+   */
+  float get_exposure() const;
+
+  /**
+   * @brief Sets the Exposure used in the effect.
+   */
+  void set_exposure(float value);
+
+  /**
+   * @brief Gets wether the tone mapping effect is enabled.
+   */
+  bool get_toneMappingEnabled() const;
+
+  /**
+   * @brief Sets wether the tone mapping effect is enabled.
+   */
+  void set_toneMappingEnabled(bool value);
+
+  /**
+   * @brief Gets the contrast used in the effect.
+   */
+  float get_contrast() const;
+
+  /**
+   * @brief Sets the contrast used in the effect.
+   */
+  void set_contrast(float value);
+
+  /**
+   * @brief Gets the vignette blend mode allowing different kind of effect.
+   */
+  unsigned int get_vignetteBlendMode() const;
+
+  /**
+   * @brief Sets the vignette blend mode allowing different kind of effect.
+   */
+  void set_vignetteBlendMode(unsigned int value);
+
+  /**
+   * @brief Gets wether the vignette effect is enabled.
+   */
+  bool get_vignetteEnabled() const;
+
+  /**
+   * @brief Sets wether the vignette effect is enabled.
+   */
+  void set_vignetteEnabled(bool value);
+
+  /**
+   * @brief Gets wether the image processing is applied through a post process
+   * or not.
+   */
+  bool get_applyByPostProcess() const;
+
+  /**
+   * @brief Sets wether the image processing is applied through a post process
+   * or not.
+   */
+  void set_applyByPostProcess(bool value);
+
+  /**
+   * @brief Gets wether the image processing is enabled or not.
+   */
+  bool get_isEnabled() const;
+  /**
+   * @brief Sets wether the image processing is enabled or not.
+   */
+  void set_isEnabled(bool value);
+
+  /**
    * Method called each time the image processing information changes requires
    * to recompile the effect.
    */
   void _updateParameters();
 
 public:
+  /**
+   * Wether the color curves effect is enabled.
+   */
+  Property<ImageProcessingConfiguration, bool> colorCurvesEnabled;
+
+  /**
+   * Wether the color grading effect is enabled.
+   */
+  Property<ImageProcessingConfiguration, bool> colorGradingEnabled;
+
+  /**
+   * Wether the color grading effect is using a green depth for the 3d Texture.
+   */
+  Property<ImageProcessingConfiguration, bool> colorGradingWithGreenDepth;
+
+  /**
+   * Wether the color grading texture contains BGR values.
+   */
+  Property<ImageProcessingConfiguration, bool> colorGradingBGR;
+
+  /**
+   * Exposure used in the effect.
+   */
+  Property<ImageProcessingConfiguration, float> exposure;
+
+  /**
+   * Wether the tone mapping effect is enabled.
+   */
+  Property<ImageProcessingConfiguration, bool> toneMappingEnabled;
+
+  /**
+   * Contrast used in the effect.
+   */
+  Property<ImageProcessingConfiguration, float> contrast;
+
+  /**
+   * Vignette blend mode allowing different kind of effect.
+   */
+  Property<ImageProcessingConfiguration, unsigned int> vignetteBlendMode;
+
+  /**
+   *Wether the vignette effect is enabled.
+   */
+  Property<ImageProcessingConfiguration, bool> vignetteEnabled;
+
+  /**
+   * Wether the image processing is applied through a post process or not.
+   */
+  Property<ImageProcessingConfiguration, bool> applyByPostProcess;
+
+  /**
+   * Wether the image processing is enabled or not.
+   */
+  Property<ImageProcessingConfiguration, bool> isEnabled;
+
   /**
    * Color curves setup used in the effect if colorCurvesEnabled is set to true
    */

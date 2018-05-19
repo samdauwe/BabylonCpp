@@ -105,7 +105,7 @@ bool PBRMaterial::cameraColorCurvesEnabled() const
 
 void PBRMaterial::setCameraColorCurvesEnabled(bool value)
 {
-  imageProcessingConfiguration()->setColorCurvesEnabled(value);
+  imageProcessingConfiguration()->colorCurvesEnabled = value;
 }
 
 bool PBRMaterial::cameraColorGradingEnabled() const
@@ -115,7 +115,7 @@ bool PBRMaterial::cameraColorGradingEnabled() const
 
 void PBRMaterial::setCameraColorGradingEnabled(bool value)
 {
-  imageProcessingConfiguration()->setColorGradingEnabled(value);
+  imageProcessingConfiguration()->colorGradingEnabled = value;
 }
 
 bool PBRMaterial::cameraToneMappingEnabled() const
@@ -125,7 +125,7 @@ bool PBRMaterial::cameraToneMappingEnabled() const
 
 void PBRMaterial::setCameraToneMappingEnabled(bool value)
 {
-  _imageProcessingConfiguration->setToneMappingEnabled(value);
+  _imageProcessingConfiguration->toneMappingEnabled = value;
 }
 
 float PBRMaterial::cameraExposure() const
@@ -135,7 +135,7 @@ float PBRMaterial::cameraExposure() const
 
 void PBRMaterial::setCameraExposure(float value)
 {
-  _imageProcessingConfiguration->setExposure(value);
+  _imageProcessingConfiguration->exposure = value;
 }
 
 float PBRMaterial::cameraContrast() const
@@ -145,7 +145,7 @@ float PBRMaterial::cameraContrast() const
 
 void PBRMaterial::setCameraContrast(float value)
 {
-  _imageProcessingConfiguration->setContrast(value);
+  _imageProcessingConfiguration->contrast = value;
 }
 
 BaseTexture* PBRMaterial::cameraColorGradingTexture() const

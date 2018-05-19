@@ -13,7 +13,39 @@
 namespace BABYLON {
 
 ImageProcessingConfiguration::ImageProcessingConfiguration()
-    : colorCurves{::std::make_unique<ColorCurves>()}
+    : colorCurvesEnabled{this,
+                         &ImageProcessingConfiguration::get_colorCurvesEnabled,
+                         &ImageProcessingConfiguration::set_colorCurvesEnabled}
+    , colorGradingEnabled{this,
+                          &ImageProcessingConfiguration::
+                            get_colorGradingEnabled,
+                          &ImageProcessingConfiguration::
+                            set_colorGradingEnabled}
+    , colorGradingWithGreenDepth{this,
+                                 &ImageProcessingConfiguration::
+                                   get_colorGradingWithGreenDepth,
+                                 &ImageProcessingConfiguration::
+                                   set_colorGradingWithGreenDepth}
+    , colorGradingBGR{this, &ImageProcessingConfiguration::get_colorGradingBGR,
+                      &ImageProcessingConfiguration::set_colorGradingBGR}
+    , exposure{this, &ImageProcessingConfiguration::get_exposure,
+               &ImageProcessingConfiguration::set_exposure}
+    , toneMappingEnabled{this,
+                         &ImageProcessingConfiguration::get_toneMappingEnabled,
+                         &ImageProcessingConfiguration::set_toneMappingEnabled}
+    , contrast{this, &ImageProcessingConfiguration::get_contrast,
+               &ImageProcessingConfiguration::set_contrast}
+    , vignetteBlendMode{this,
+                        &ImageProcessingConfiguration::get_vignetteBlendMode,
+                        &ImageProcessingConfiguration::set_vignetteBlendMode}
+    , vignetteEnabled{this, &ImageProcessingConfiguration::get_vignetteEnabled,
+                      &ImageProcessingConfiguration::set_vignetteEnabled}
+    , applyByPostProcess{this,
+                         &ImageProcessingConfiguration::get_applyByPostProcess,
+                         &ImageProcessingConfiguration::set_applyByPostProcess}
+    , isEnabled{this, &ImageProcessingConfiguration::get_isEnabled,
+                &ImageProcessingConfiguration::set_isEnabled}
+    , colorCurves{::std::make_unique<ColorCurves>()}
     , colorGradingTexture{nullptr}
     , _exposure{1.f}
     , vignetteStretch{0}
@@ -39,12 +71,12 @@ ImageProcessingConfiguration::~ImageProcessingConfiguration()
 {
 }
 
-bool ImageProcessingConfiguration::colorCurvesEnabled() const
+bool ImageProcessingConfiguration::get_colorCurvesEnabled() const
 {
   return _colorCurvesEnabled;
 }
 
-void ImageProcessingConfiguration::setColorCurvesEnabled(bool value)
+void ImageProcessingConfiguration::set_colorCurvesEnabled(bool value)
 {
   if (_colorCurvesEnabled == value) {
     return;
@@ -54,12 +86,12 @@ void ImageProcessingConfiguration::setColorCurvesEnabled(bool value)
   _updateParameters();
 }
 
-bool ImageProcessingConfiguration::colorGradingEnabled() const
+bool ImageProcessingConfiguration::get_colorGradingEnabled() const
 {
   return _colorGradingEnabled;
 }
 
-void ImageProcessingConfiguration::setColorGradingEnabled(bool value)
+void ImageProcessingConfiguration::set_colorGradingEnabled(bool value)
 {
   if (_colorGradingEnabled == value) {
     return;
@@ -69,12 +101,12 @@ void ImageProcessingConfiguration::setColorGradingEnabled(bool value)
   _updateParameters();
 }
 
-bool ImageProcessingConfiguration::colorGradingWithGreenDepth() const
+bool ImageProcessingConfiguration::get_colorGradingWithGreenDepth() const
 {
   return _colorGradingWithGreenDepth;
 }
 
-void ImageProcessingConfiguration::setColorGradingWithGreenDepth(bool value)
+void ImageProcessingConfiguration::set_colorGradingWithGreenDepth(bool value)
 {
   if (_colorGradingWithGreenDepth == value) {
     return;
@@ -84,12 +116,12 @@ void ImageProcessingConfiguration::setColorGradingWithGreenDepth(bool value)
   _updateParameters();
 }
 
-bool ImageProcessingConfiguration::colorGradingBGR() const
+bool ImageProcessingConfiguration::get_colorGradingBGR() const
 {
   return _colorGradingBGR;
 }
 
-void ImageProcessingConfiguration::setColorGradingBGR(bool value)
+void ImageProcessingConfiguration::set_colorGradingBGR(bool value)
 {
   if (_colorGradingWithGreenDepth == value) {
     return;
@@ -99,12 +131,12 @@ void ImageProcessingConfiguration::setColorGradingBGR(bool value)
   _updateParameters();
 }
 
-float ImageProcessingConfiguration::exposure() const
+float ImageProcessingConfiguration::get_exposure() const
 {
   return _exposure;
 }
 
-void ImageProcessingConfiguration::setExposure(float value)
+void ImageProcessingConfiguration::set_exposure(float value)
 {
   if (stl_util::almost_equal(_exposure, value)) {
     return;
@@ -114,12 +146,12 @@ void ImageProcessingConfiguration::setExposure(float value)
   _updateParameters();
 }
 
-bool ImageProcessingConfiguration::toneMappingEnabled() const
+bool ImageProcessingConfiguration::get_toneMappingEnabled() const
 {
   return _toneMappingEnabled;
 }
 
-void ImageProcessingConfiguration::setToneMappingEnabled(bool value)
+void ImageProcessingConfiguration::set_toneMappingEnabled(bool value)
 {
   if (_toneMappingEnabled == value) {
     return;
@@ -129,12 +161,12 @@ void ImageProcessingConfiguration::setToneMappingEnabled(bool value)
   _updateParameters();
 }
 
-float ImageProcessingConfiguration::contrast() const
+float ImageProcessingConfiguration::get_contrast() const
 {
   return _contrast;
 }
 
-void ImageProcessingConfiguration::setContrast(float value)
+void ImageProcessingConfiguration::set_contrast(float value)
 {
   if (stl_util::almost_equal(_contrast, value)) {
     return;
@@ -144,12 +176,12 @@ void ImageProcessingConfiguration::setContrast(float value)
   _updateParameters();
 }
 
-unsigned int ImageProcessingConfiguration::vignetteBlendMode() const
+unsigned int ImageProcessingConfiguration::get_vignetteBlendMode() const
 {
   return _vignetteBlendMode;
 }
 
-void ImageProcessingConfiguration::setVignetteBlendMode(unsigned int value)
+void ImageProcessingConfiguration::set_vignetteBlendMode(unsigned int value)
 {
   if (_vignetteBlendMode == value) {
     return;
@@ -159,12 +191,12 @@ void ImageProcessingConfiguration::setVignetteBlendMode(unsigned int value)
   _updateParameters();
 }
 
-bool ImageProcessingConfiguration::vignetteEnabled() const
+bool ImageProcessingConfiguration::get_vignetteEnabled() const
 {
   return _vignetteEnabled;
 }
 
-void ImageProcessingConfiguration::setVignetteEnabled(bool value)
+void ImageProcessingConfiguration::set_vignetteEnabled(bool value)
 {
   if (_vignetteEnabled == value) {
     return;
@@ -174,12 +206,12 @@ void ImageProcessingConfiguration::setVignetteEnabled(bool value)
   _updateParameters();
 }
 
-bool ImageProcessingConfiguration::applyByPostProcess() const
+bool ImageProcessingConfiguration::get_applyByPostProcess() const
 {
   return _applyByPostProcess;
 }
 
-void ImageProcessingConfiguration::setApplyByPostProcess(bool value)
+void ImageProcessingConfiguration::set_applyByPostProcess(bool value)
 {
   if (_applyByPostProcess == value) {
     return;
@@ -189,12 +221,12 @@ void ImageProcessingConfiguration::setApplyByPostProcess(bool value)
   _updateParameters();
 }
 
-bool ImageProcessingConfiguration::isEnabled() const
+bool ImageProcessingConfiguration::get_isEnabled() const
 {
   return _isEnabled;
 }
 
-void ImageProcessingConfiguration::setIsEnabled(bool value)
+void ImageProcessingConfiguration::set_isEnabled(bool value)
 {
   if (_isEnabled == value) {
     return;

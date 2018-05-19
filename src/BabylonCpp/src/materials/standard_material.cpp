@@ -1743,7 +1743,7 @@ bool StandardMaterial::cameraColorCurvesEnabled() const
 
 void StandardMaterial::setCameraColorCurvesEnabled(bool value)
 {
-  imageProcessingConfiguration()->setColorCurvesEnabled(value);
+  imageProcessingConfiguration()->colorCurvesEnabled = value;
 }
 
 bool StandardMaterial::cameraColorGradingEnabled() const
@@ -1753,7 +1753,7 @@ bool StandardMaterial::cameraColorGradingEnabled() const
 
 void StandardMaterial::setCameraColorGradingEnabled(bool value)
 {
-  imageProcessingConfiguration()->setColorGradingEnabled(value);
+  imageProcessingConfiguration()->colorGradingEnabled = value;
 }
 
 bool StandardMaterial::cameraToneMappingEnabled() const
@@ -1763,7 +1763,7 @@ bool StandardMaterial::cameraToneMappingEnabled() const
 
 void StandardMaterial::setCameraToneMappingEnabled(bool value)
 {
-  _imageProcessingConfiguration->setToneMappingEnabled(value);
+  _imageProcessingConfiguration->toneMappingEnabled = value;
 }
 
 float StandardMaterial::cameraExposure() const
@@ -1773,7 +1773,7 @@ float StandardMaterial::cameraExposure() const
 
 void StandardMaterial::setCameraExposure(float value)
 {
-  _imageProcessingConfiguration->setExposure(value);
+  _imageProcessingConfiguration->exposure = value;
 }
 
 float StandardMaterial::cameraContrast() const
@@ -1783,7 +1783,7 @@ float StandardMaterial::cameraContrast() const
 
 void StandardMaterial::setCameraContrast(float value)
 {
-  _imageProcessingConfiguration->setContrast(value);
+  _imageProcessingConfiguration->contrast = value;
 }
 
 BaseTexture* StandardMaterial::cameraColorGradingTexture() const
@@ -1796,14 +1796,15 @@ void StandardMaterial::setCameraColorGradingTexture(BaseTexture* value)
   _imageProcessingConfiguration->colorGradingTexture = value;
 }
 
-ColorCurves* StandardMaterial::cameraColorCurves() const
+shared_ptr_t<ColorCurves>& StandardMaterial::cameraColorCurves() const
 {
-  return _imageProcessingConfiguration->colorCurves.get();
+  return _imageProcessingConfiguration->colorCurves;
 }
 
-void StandardMaterial::setCameraColorCurves(ColorCurves* value)
+void StandardMaterial::setCameraColorCurves(
+  const shared_ptr_t<ColorCurves>& value)
 {
-  *_imageProcessingConfiguration->colorCurves.get() = *value;
+  _imageProcessingConfiguration->colorCurves = value;
 }
 
 StandardMaterial* StandardMaterial::Parse(const Json::value& source,

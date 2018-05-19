@@ -228,7 +228,7 @@ public:
    * corresponding to low luminance, medium luminance, and high luminance areas
    * respectively.
    */
-  ColorCurves* cameraColorCurves() const;
+  shared_ptr_t<ColorCurves>& cameraColorCurves() const;
 
   /**
    * @brief The color grading curves provide additional color adjustmnent that
@@ -243,7 +243,7 @@ public:
    * corresponding to low luminance, medium luminance, and high luminance areas
    * respectively.
    */
-  void setCameraColorCurves(ColorCurves* value);
+  void setCameraColorCurves(const shared_ptr_t<ColorCurves>& value);
 
   // Statics
   static StandardMaterial* Parse(const Json::value& source, Scene* scene,

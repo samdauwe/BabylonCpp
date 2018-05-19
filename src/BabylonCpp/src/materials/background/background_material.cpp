@@ -174,7 +174,7 @@ bool BackgroundMaterial::cameraColorCurvesEnabled() const
 
 void BackgroundMaterial::setCameraColorCurvesEnabled(bool value)
 {
-  _imageProcessingConfiguration->setColorCurvesEnabled(value);
+  _imageProcessingConfiguration->colorCurvesEnabled = value;
 }
 
 bool BackgroundMaterial::cameraColorGradingEnabled() const
@@ -184,7 +184,7 @@ bool BackgroundMaterial::cameraColorGradingEnabled() const
 
 void BackgroundMaterial::setCameraColorGradingEnabled(bool value)
 {
-  _imageProcessingConfiguration->setColorGradingEnabled(value);
+  _imageProcessingConfiguration->colorGradingEnabled = value;
 }
 
 bool BackgroundMaterial::cameraToneMappingEnabled() const
@@ -194,7 +194,7 @@ bool BackgroundMaterial::cameraToneMappingEnabled() const
 
 void BackgroundMaterial::setCameraToneMappingEnabled(bool value)
 {
-  _imageProcessingConfiguration->setToneMappingEnabled(value);
+  _imageProcessingConfiguration->toneMappingEnabled = value;
 }
 
 float BackgroundMaterial::cameraExposure()
@@ -204,7 +204,7 @@ float BackgroundMaterial::cameraExposure()
 
 void BackgroundMaterial::setCameraExposure(float value)
 {
-  _imageProcessingConfiguration->setExposure(value);
+  _imageProcessingConfiguration->exposure = value;
 }
 
 float BackgroundMaterial::cameraContrast() const
@@ -214,7 +214,7 @@ float BackgroundMaterial::cameraContrast() const
 
 void BackgroundMaterial::setCameraContrast(float value)
 {
-  _imageProcessingConfiguration->setContrast(value);
+  _imageProcessingConfiguration->contrast = value;
 }
 
 BaseTexture* BackgroundMaterial::cameraColorGradingTexture() const

@@ -7,7 +7,36 @@
 namespace BABYLON {
 
 ColorCurves::ColorCurves()
-    : _dirty{true}
+    : globalHue{this, &ColorCurves::get_globalHue, &ColorCurves::set_globalHue}
+    , globalDensity{this, &ColorCurves::get_globalDensity,
+                    &ColorCurves::set_globalDensity}
+    , globalSaturation{this, &ColorCurves::get_globalSaturation,
+                       &ColorCurves::set_globalSaturation}
+    , highlightsHue{this, &ColorCurves::get_highlightsHue,
+                    &ColorCurves::set_highlightsHue}
+    , highlightsDensity{this, &ColorCurves::get_highlightsDensity,
+                        &ColorCurves::set_highlightsDensity}
+    , highlightsSaturation{this, &ColorCurves::get_highlightsSaturation,
+                           &ColorCurves::set_highlightsSaturation}
+    , highlightsExposure{this, &ColorCurves::get_highlightsExposure,
+                         &ColorCurves::set_highlightsExposure}
+    , midtonesHue{this, &ColorCurves::get_midtonesHue,
+                  &ColorCurves::set_midtonesHue}
+    , midtonesDensity{this, &ColorCurves::get_midtonesDensity,
+                      &ColorCurves::set_midtonesDensity}
+    , midtonesSaturation{this, &ColorCurves::get_midtonesSaturation,
+                         &ColorCurves::set_midtonesSaturation}
+    , midtonesExposure{this, &ColorCurves::get_midtonesExposure,
+                       &ColorCurves::set_midtonesExposure}
+    , shadowsHue{this, &ColorCurves::get_shadowsHue,
+                 &ColorCurves::set_shadowsHue}
+    , shadowsDensity{this, &ColorCurves::get_shadowsDensity,
+                     &ColorCurves::set_shadowsDensity}
+    , shadowsSaturation{this, &ColorCurves::get_shadowsSaturation,
+                        &ColorCurves::set_shadowsSaturation}
+    , shadowsExposure{this, &ColorCurves::get_shadowsExposure,
+                      &ColorCurves::set_shadowsExposure}
+    , _dirty{true}
     , _tempColor{Color4(0.f, 0.f, 0.f, 0.f)}
     , _globalCurve{Color4(0.f, 0.f, 0.f, 0.f)}
     , _highlightsCurve{Color4(0.f, 0.f, 0.f, 0.f)}
@@ -35,7 +64,36 @@ ColorCurves::ColorCurves()
 }
 
 ColorCurves::ColorCurves(const ColorCurves& other)
-    : _dirty{other._dirty}
+    : globalHue{this, &ColorCurves::get_globalHue, &ColorCurves::set_globalHue}
+    , globalDensity{this, &ColorCurves::get_globalDensity,
+                    &ColorCurves::set_globalDensity}
+    , globalSaturation{this, &ColorCurves::get_globalSaturation,
+                       &ColorCurves::set_globalSaturation}
+    , highlightsHue{this, &ColorCurves::get_highlightsHue,
+                    &ColorCurves::set_highlightsHue}
+    , highlightsDensity{this, &ColorCurves::get_highlightsDensity,
+                        &ColorCurves::set_highlightsDensity}
+    , highlightsSaturation{this, &ColorCurves::get_highlightsSaturation,
+                           &ColorCurves::set_highlightsSaturation}
+    , highlightsExposure{this, &ColorCurves::get_highlightsExposure,
+                         &ColorCurves::set_highlightsExposure}
+    , midtonesHue{this, &ColorCurves::get_midtonesHue,
+                  &ColorCurves::set_midtonesHue}
+    , midtonesDensity{this, &ColorCurves::get_midtonesDensity,
+                      &ColorCurves::set_midtonesDensity}
+    , midtonesSaturation{this, &ColorCurves::get_midtonesSaturation,
+                         &ColorCurves::set_midtonesSaturation}
+    , midtonesExposure{this, &ColorCurves::get_midtonesExposure,
+                       &ColorCurves::set_midtonesExposure}
+    , shadowsHue{this, &ColorCurves::get_shadowsHue,
+                 &ColorCurves::set_shadowsHue}
+    , shadowsDensity{this, &ColorCurves::get_shadowsDensity,
+                     &ColorCurves::set_shadowsDensity}
+    , shadowsSaturation{this, &ColorCurves::get_shadowsSaturation,
+                        &ColorCurves::set_shadowsSaturation}
+    , shadowsExposure{this, &ColorCurves::get_shadowsExposure,
+                      &ColorCurves::set_shadowsExposure}
+    , _dirty{other._dirty}
     , _tempColor{other._tempColor}
     , _globalCurve{other._globalCurve}
     , _highlightsCurve{other._highlightsCurve}
@@ -63,6 +121,35 @@ ColorCurves::ColorCurves(const ColorCurves& other)
 }
 
 ColorCurves::ColorCurves(ColorCurves&& other)
+    : globalHue{this, &ColorCurves::get_globalHue, &ColorCurves::set_globalHue}
+    , globalDensity{this, &ColorCurves::get_globalDensity,
+                    &ColorCurves::set_globalDensity}
+    , globalSaturation{this, &ColorCurves::get_globalSaturation,
+                       &ColorCurves::set_globalSaturation}
+    , highlightsHue{this, &ColorCurves::get_highlightsHue,
+                    &ColorCurves::set_highlightsHue}
+    , highlightsDensity{this, &ColorCurves::get_highlightsDensity,
+                        &ColorCurves::set_highlightsDensity}
+    , highlightsSaturation{this, &ColorCurves::get_highlightsSaturation,
+                           &ColorCurves::set_highlightsSaturation}
+    , highlightsExposure{this, &ColorCurves::get_highlightsExposure,
+                         &ColorCurves::set_highlightsExposure}
+    , midtonesHue{this, &ColorCurves::get_midtonesHue,
+                  &ColorCurves::set_midtonesHue}
+    , midtonesDensity{this, &ColorCurves::get_midtonesDensity,
+                      &ColorCurves::set_midtonesDensity}
+    , midtonesSaturation{this, &ColorCurves::get_midtonesSaturation,
+                         &ColorCurves::set_midtonesSaturation}
+    , midtonesExposure{this, &ColorCurves::get_midtonesExposure,
+                       &ColorCurves::set_midtonesExposure}
+    , shadowsHue{this, &ColorCurves::get_shadowsHue,
+                 &ColorCurves::set_shadowsHue}
+    , shadowsDensity{this, &ColorCurves::get_shadowsDensity,
+                     &ColorCurves::set_shadowsDensity}
+    , shadowsSaturation{this, &ColorCurves::get_shadowsSaturation,
+                        &ColorCurves::set_shadowsSaturation}
+    , shadowsExposure{this, &ColorCurves::get_shadowsExposure,
+                      &ColorCurves::set_shadowsExposure}
 {
   *this = ::std::move(other);
 }
@@ -135,166 +222,166 @@ ColorCurves::~ColorCurves()
 {
 }
 
-float ColorCurves::globalHue() const
+float ColorCurves::get_globalHue() const
 {
   return _globalHue;
 }
 
-void ColorCurves::setGlobalHue(float value)
+void ColorCurves::set_globalHue(float value)
 {
   _globalHue = value;
   _dirty     = true;
 }
 
-float ColorCurves::globalDensity() const
+float ColorCurves::get_globalDensity() const
 {
   return _globalDensity;
 }
 
-void ColorCurves::setGlobalDensity(float value)
+void ColorCurves::set_globalDensity(float value)
 {
   _globalDensity = value;
   _dirty         = true;
 }
 
-float ColorCurves::globalSaturation() const
+float ColorCurves::get_globalSaturation() const
 {
   return _globalSaturation;
 }
 
-void ColorCurves::setGlobalSaturation(float value)
+void ColorCurves::set_globalSaturation(float value)
 {
   _globalSaturation = value;
   _dirty            = true;
 }
 
-float ColorCurves::highlightsHue() const
+float ColorCurves::get_highlightsHue() const
 {
   return _highlightsHue;
 }
 
-void ColorCurves::setHighlightsHue(float value)
+void ColorCurves::set_highlightsHue(float value)
 {
   _highlightsHue = value;
   _dirty         = true;
 }
 
-float ColorCurves::highlightsDensity() const
+float ColorCurves::get_highlightsDensity() const
 {
   return _highlightsDensity;
 }
 
-void ColorCurves::setHighlightsDensity(float value)
+void ColorCurves::set_highlightsDensity(float value)
 {
   _highlightsDensity = value;
   _dirty             = true;
 }
 
-float ColorCurves::highlightsSaturation() const
+float ColorCurves::get_highlightsSaturation() const
 {
   return _highlightsSaturation;
 }
 
-void ColorCurves::setHighlightsSaturation(float value)
+void ColorCurves::set_highlightsSaturation(float value)
 {
   _highlightsSaturation = value;
   _dirty                = true;
 }
 
-float ColorCurves::highlightsExposure() const
+float ColorCurves::get_highlightsExposure() const
 {
   return _highlightsExposure;
 }
 
-void ColorCurves::setHighlightsExposure(float value)
+void ColorCurves::set_highlightsExposure(float value)
 {
   _highlightsExposure = value;
   _dirty              = true;
 }
 
-float ColorCurves::midtonesHue() const
+float ColorCurves::get_midtonesHue() const
 {
   return _midtonesHue;
 }
 
-void ColorCurves::setMidtonesHue(float value)
+void ColorCurves::set_midtonesHue(float value)
 {
   _midtonesHue = value;
   _dirty       = true;
 }
 
-float ColorCurves::midtonesDensity() const
+float ColorCurves::get_midtonesDensity() const
 {
   return _midtonesDensity;
 }
 
-void ColorCurves::setMidtonesDensity(float value)
+void ColorCurves::set_midtonesDensity(float value)
 {
   _midtonesDensity = value;
   _dirty           = true;
 }
 
-float ColorCurves::midtonesSaturation() const
+float ColorCurves::get_midtonesSaturation() const
 {
   return _midtonesSaturation;
 }
 
-void ColorCurves::setMidtonesSaturation(float value)
+void ColorCurves::set_midtonesSaturation(float value)
 {
   _midtonesSaturation = value;
   _dirty              = true;
 }
 
-float ColorCurves::midtonesExposure() const
+float ColorCurves::get_midtonesExposure() const
 {
   return _midtonesExposure;
 }
 
-void ColorCurves::setMidtonesExposure(float value)
+void ColorCurves::set_midtonesExposure(float value)
 {
   _midtonesExposure = value;
   _dirty            = true;
 }
 
-float ColorCurves::shadowsHue() const
+float ColorCurves::get_shadowsHue() const
 {
   return _shadowsHue;
 }
 
-void ColorCurves::setShadowsHue(float value)
+void ColorCurves::set_shadowsHue(float value)
 {
   _shadowsHue = value;
   _dirty      = true;
 }
 
-float ColorCurves::shadowsDensity() const
+float ColorCurves::get_shadowsDensity() const
 {
   return _shadowsDensity;
 }
 
-void ColorCurves::setShadowsDensity(float value)
+void ColorCurves::set_shadowsDensity(float value)
 {
   _shadowsDensity = value;
   _dirty          = true;
 }
 
-float ColorCurves::shadowsSaturation() const
+float ColorCurves::get_shadowsSaturation() const
 {
   return _shadowsSaturation;
 }
 
-void ColorCurves::setShadowsSaturation(float value)
+void ColorCurves::set_shadowsSaturation(float value)
 {
   _shadowsSaturation = value;
   _dirty             = true;
 }
 
-float ColorCurves::shadowsExposure() const
+float ColorCurves::get_shadowsExposure() const
 {
   return _shadowsExposure;
 }
 
-void ColorCurves::setShadowsExposure(float value)
+void ColorCurves::set_shadowsExposure(float value)
 {
   _shadowsExposure = value;
   _dirty           = true;

@@ -483,7 +483,7 @@ void DefaultRenderingPipeline::_buildPipeline()
       _setAutoClearAndTextureSharing(imageProcessing);
     }
     else {
-      _scene->imageProcessingConfiguration()->setApplyByPostProcess(false);
+      _scene->imageProcessingConfiguration()->applyByPostProcess = false;
     }
   }
 

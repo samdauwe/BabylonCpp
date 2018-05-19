@@ -78,7 +78,7 @@ ImageProcessingPostProcess::ImageProcessingPostProcess(
   // force the scene materials output in linear space and let untouched the
   // default forward pass.
   if (imageProcessingConfiguration) {
-    imageProcessingConfiguration->setApplyByPostProcess(true);
+    imageProcessingConfiguration->applyByPostProcess = true;
     _attachImageProcessingConfiguration(imageProcessingConfiguration, true);
     // This will cause the shader to be compiled
     fromLinearSpace = false;
@@ -87,7 +87,7 @@ ImageProcessingPostProcess::ImageProcessingPostProcess(
   else {
     _attachImageProcessingConfiguration(nullptr, true);
 
-    _imageProcessingConfiguration->setApplyByPostProcess(true);
+    _imageProcessingConfiguration->applyByPostProcess = true;
   }
 
   setOnApply([&](Effect* effect, EventState& /*es*/) {
@@ -183,7 +183,7 @@ bool ImageProcessingPostProcess::get_colorCurvesEnabled() const
 
 void ImageProcessingPostProcess::set_colorCurvesEnabled(bool value)
 {
-  _imageProcessingConfiguration->setColorCurvesEnabled(value);
+  _imageProcessingConfiguration->colorCurvesEnabled = value;
 }
 
 BaseTexture*& ImageProcessingPostProcess::get_colorGradingTexture()
@@ -204,7 +204,7 @@ bool ImageProcessingPostProcess::get_colorGradingEnabled() const
 
 void ImageProcessingPostProcess::set_colorGradingEnabled(bool value)
 {
-  _imageProcessingConfiguration->setColorGradingEnabled(value);
+  _imageProcessingConfiguration->colorGradingEnabled = value;
 }
 
 float ImageProcessingPostProcess::get_exposure() const
@@ -214,7 +214,7 @@ float ImageProcessingPostProcess::get_exposure() const
 
 void ImageProcessingPostProcess::set_exposure(float value)
 {
-  _imageProcessingConfiguration->setExposure(value);
+  _imageProcessingConfiguration->exposure = value;
 }
 
 bool ImageProcessingPostProcess::get_toneMappingEnabled() const
@@ -224,7 +224,7 @@ bool ImageProcessingPostProcess::get_toneMappingEnabled() const
 
 void ImageProcessingPostProcess::set_toneMappingEnabled(bool value)
 {
-  _imageProcessingConfiguration->setToneMappingEnabled(value);
+  _imageProcessingConfiguration->toneMappingEnabled = value;
 }
 
 float ImageProcessingPostProcess::get_contrast() const
@@ -234,7 +234,7 @@ float ImageProcessingPostProcess::get_contrast() const
 
 void ImageProcessingPostProcess::set_contrast(float value)
 {
-  _imageProcessingConfiguration->setContrast(value);
+  _imageProcessingConfiguration->contrast = value;
 }
 
 float ImageProcessingPostProcess::get_vignetteStretch() const
@@ -304,7 +304,7 @@ unsigned int ImageProcessingPostProcess::get_vignetteBlendMode() const
 
 void ImageProcessingPostProcess::set_vignetteBlendMode(unsigned int value)
 {
-  _imageProcessingConfiguration->setVignetteBlendMode(value);
+  _imageProcessingConfiguration->vignetteBlendMode = value;
 }
 
 bool ImageProcessingPostProcess::get_vignetteEnabled() const
@@ -314,7 +314,7 @@ bool ImageProcessingPostProcess::get_vignetteEnabled() const
 
 void ImageProcessingPostProcess::set_vignetteEnabled(bool value)
 {
-  _imageProcessingConfiguration->setVignetteEnabled(value);
+  _imageProcessingConfiguration->vignetteEnabled = value;
 }
 
 bool ImageProcessingPostProcess::get_fromLinearSpace() const
@@ -399,7 +399,7 @@ void ImageProcessingPostProcess::dispose(Camera* camera)
       _imageProcessingObserver);
   }
 
-  _imageProcessingConfiguration->setApplyByPostProcess(false);
+  _imageProcessingConfiguration->applyByPostProcess = false;
 }
 
 } // end of namespace BABYLON

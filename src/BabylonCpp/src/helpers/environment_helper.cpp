@@ -201,12 +201,10 @@ IEnvironmentHelperOptions EnvironmentHelper::_getDefaultOptions()
 void EnvironmentHelper::_setupImageProcessing()
 {
   if (_options.setupImageProcessing) {
-    _scene->imageProcessingConfiguration()->setContrast(
-      _options.cameraContrast);
-    _scene->imageProcessingConfiguration()->setExposure(
-      _options.cameraExposure);
-    _scene->imageProcessingConfiguration()->setToneMappingEnabled(
-      _options.toneMappingEnabled);
+    _scene->imageProcessingConfiguration()->contrast = _options.cameraContrast;
+    _scene->imageProcessingConfiguration()->exposure = _options.cameraExposure;
+    _scene->imageProcessingConfiguration()->toneMappingEnabled
+      = _options.toneMappingEnabled;
     _setupEnvironmentTexture();
   }
 }
