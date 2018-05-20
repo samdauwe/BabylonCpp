@@ -21,12 +21,14 @@ public:
   static constexpr unsigned int LOGS_TAB = 1;
   // - Statistics tab
   static constexpr unsigned int STATS_TAB = 2;
+  // - Mesh tab
+  static constexpr unsigned int MESH_TAB = 3;
   // - Ligt tab
-  static constexpr unsigned int LIGHT_TAB = 3;
+  static constexpr unsigned int LIGHT_TAB = 4;
   // - Material tab
-  static constexpr unsigned int MATERIAL_TAB = 4;
+  static constexpr unsigned int MATERIAL_TAB = 5;
   // - Camera tab
-  static constexpr unsigned int CAMERA_TAB = 5;
+  static constexpr unsigned int CAMERA_TAB = 6;
 
 public:
   Inspector(GLFWwindow* glfwWindow, Scene* scene = nullptr);

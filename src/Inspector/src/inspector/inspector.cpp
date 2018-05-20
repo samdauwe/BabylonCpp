@@ -25,6 +25,7 @@
 #include <babylon/inspector/tabs/light_tab.h>
 #include <babylon/inspector/tabs/logs_tab.h>
 #include <babylon/inspector/tabs/material_tab.h>
+#include <babylon/inspector/tabs/mesh_tab.h>
 #include <babylon/inspector/tabs/scene_tab.h>
 #include <babylon/inspector/tabs/stats_tab.h>
 
@@ -59,6 +60,7 @@ void Inspector::setScene(Scene* scene)
   // Reset tabs
   _tabs[SCENE_TAB]    = ::std::make_unique<SceneTab>(*this);
   _tabs[STATS_TAB]    = ::std::make_unique<StatsTab>(*this);
+  _tabs[MESH_TAB]     = ::std::make_unique<MeshTab>(*this);
   _tabs[LIGHT_TAB]    = ::std::make_unique<LightTab>(*this);
   _tabs[MATERIAL_TAB] = ::std::make_unique<MaterialTab>(*this);
   _tabs[CAMERA_TAB]   = ::std::make_unique<CameraTab>(*this);

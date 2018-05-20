@@ -40,6 +40,14 @@ public:
    */
   string_t type() override;
 
+  /**
+   * @brief Returns the list of properties to be displayed for this adapter.
+   */
+  unique_ptr_t<PropertiesView>& getProperties() override;
+
+  /**
+   * @brief Returns the list of tools available for this adapter.
+   */
   vector_t<AbstractTreeToolUPtr>& getTools() override;
 
   void setVisible(bool b) override;
@@ -64,9 +72,17 @@ private:
    */
   void _drawAxis();
 
+  /**
+   * @brief Build the properties view.
+   */
+  void _buildPropertiesView();
+
 private:
   Node* _obj;
-  AbstractMesh* _mesh;
+  AbstractMesh* _abstractMesh;
+  Mesh* _mesh;
+  GroundMesh* _groundMesh;
+  unique_ptr_t<PropertiesView> _properties;
   vector_t<unique_ptr_t<AbstractTreeTool>> _tools;
   /** Keep track of the axis of the actual object */
   unique_ptr_t<Debug::AxesViewer> _axesViewer;

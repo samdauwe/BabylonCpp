@@ -19,10 +19,25 @@ public:
   TreeItem(const TreeItem& treeitem) = delete;
 
   TreeItem(TreeItem&& treeitem)
-      : _tab(treeitem._tab)
+      : children(::std::move(treeitem.children))
+      , _tab(treeitem._tab)
       , _adapter(::std::move(treeitem._adapter))
       , _active{::std::move(treeitem._active)}
   {
+  }
+
+  TreeItem& operator=(const TreeItem& treeitem) = delete;
+
+  TreeItem& operator=(TreeItem&& treeitem)
+  {
+    if (&treeitem != this) {
+      children = ::std::move(treeitem.children);
+      _tab     = treeitem._tab;
+      _adapter = ::std::move(treeitem._adapter);
+      _active  = ::std::move(treeitem._active);
+    }
+
+    return *this;
   }
 
   ~TreeItem()
@@ -61,10 +76,20 @@ public:
     return _active;
   }
 
+  /**
+   * @brief Updates the tree item.
+   */
+  void update()
+  {
+  }
+
   bool operator()(const TreeItem& lhs, const TreeItem& rhs)
   {
     return lhs.id() < rhs.id();
   }
+
+public:
+  vector_t<TreeItem<AdapterType>> children;
 
 private:
   // Reference to the tab
