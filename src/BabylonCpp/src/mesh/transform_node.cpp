@@ -51,6 +51,11 @@ TransformNode::~TransformNode()
 {
 }
 
+IReflect::Type TransformNode::type() const
+{
+  return IReflect::Type::TRANSFORMNODE;
+}
+
 const string_t TransformNode::getClassName() const
 {
   return "TransformNode";

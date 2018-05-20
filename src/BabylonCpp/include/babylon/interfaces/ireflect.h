@@ -46,6 +46,7 @@ public:
     INSTANCEDMESH = 152,
     LINESMESH     = 153,
     MESH          = 154,
+    TRANSFORMNODE = 155,
     // Particles
     PARTICLE       = 200,
     PARTICLESYSTEM = 201,

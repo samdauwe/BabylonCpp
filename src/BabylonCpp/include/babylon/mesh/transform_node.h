@@ -44,6 +44,8 @@ public:
                 bool isPure = true);
   ~TransformNode() override;
 
+  IReflect::Type type() const override;
+
   /**
    * @brief Gets a string idenfifying the name of the class.
    * @returns "TransformNode" string
