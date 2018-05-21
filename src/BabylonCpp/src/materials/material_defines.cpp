@@ -210,6 +210,15 @@ std::ostream& operator<<(std::ostream& os,
     }
   }
 
+  // The direct UV channel to use
+  os << "#define DIFFUSEDIRECTUV " << materialDefines.DIFFUSEDIRECTUV << "\n";
+  os << "#define AMBIENTDIRECTUV " << materialDefines.AMBIENTDIRECTUV << "\n";
+  os << "#define OPACITYDIRECTUV " << materialDefines.OPACITYDIRECTUV << "\n";
+  os << "#define EMISSIVEDIRECTUV " << materialDefines.EMISSIVEDIRECTUV << "\n";
+  os << "#define SPECULARDIRECTUV " << materialDefines.SPECULARDIRECTUV << "\n";
+  os << "#define BUMPDIRECTUV " << materialDefines.BUMPDIRECTUV << "\n";
+  os << "#define LIGHTMAPDIRECTUV " << materialDefines.LIGHTMAPDIRECTUV << "\n";
+
   return os;
 }
 

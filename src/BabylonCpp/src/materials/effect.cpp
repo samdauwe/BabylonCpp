@@ -405,16 +405,16 @@ void Effect::_processShaderConversion(
   const string_t regex(
     "#extension.+(GL_OES_standard_derivatives|GL_EXT_shader_texture_lod|GL_EXT_"
     "frag_depth|GL_EXT_draw_buffers).+(enable|require)");
-  string_t result = String::regexReplace(preparedSourceCode, regex, "");
+  auto result = String::regexReplace(preparedSourceCode, regex, "");
 
   // Migrate to GLSL v300
-  result = String::regexReplace(preparedSourceCode, "varying(?![\n\r])\\s",
+  result = String::regexReplace(result, "varying(?![\n\r])\\s",
                                 isFragment ? "in " : "out ");
-  result = String::regexReplace(preparedSourceCode, "attribute[ \t]", "in ");
-  result = String::regexReplace(preparedSourceCode, "[ \t]attribute", " in");
+  result = String::regexReplace(result, "attribute[ \t]", "in ");
+  result = String::regexReplace(result, "[ \t]attribute", " in");
 
   if (isFragment) {
-    const vector_t<pair_t<string_t, string_t>> fragMappings{
+    const vector_t<pair_t<string_t, string_t>> fragmentMappings{
       ::std::make_pair("texture2DLodEXT\\s*\\(", "textureLod("),   //
       ::std::make_pair("textureCubeLodEXT\\s*\\(", "textureLod("), //
       ::std::make_pair("texture2D\\s*\\(", "texture("),            //
@@ -429,9 +429,9 @@ void Effect::_processShaderConversion(
           "void main(")),
 
     };
-    for (const auto& fragMapping : fragMappings) {
-      result = String::regexReplace(preparedSourceCode, fragMapping.first,
-                                    fragMapping.second);
+    for (const auto& fragmentMapping : fragmentMappings) {
+      result = String::regexReplace(result, fragmentMapping.first,
+                                    fragmentMapping.second);
     }
   }
 

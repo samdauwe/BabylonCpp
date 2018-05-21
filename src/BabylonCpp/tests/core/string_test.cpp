@@ -229,6 +229,15 @@ TEST(TestString, regexReplace)
   using namespace BABYLON;
 
   {
+    const ::std::string s{
+      "#define CUSTOM_VERTEX_BEGIN\n\nattribute vec3 position;"};
+    const ::std::string regex{"attribute[ \t]"};
+    const ::std::string r{String::regexReplace(s, regex, "in ")};
+    const ::std::string e{"#define CUSTOM_VERTEX_BEGIN\n\nin vec3 position;"};
+    EXPECT_EQ(r, e);
+  }
+
+  {
     const ::std::string s{"#extension GL_OES_standard_derivatives : enable"};
     const ::std::string regex{
       "#extension.+(GL_OES_standard_derivatives|GL_EXT_shader_texture_lod|GL_"
@@ -367,8 +376,9 @@ TEST(TestString, regexReplaceWithCallback)
       return "\n" + ::std::to_string(i++) + "\t";
     };
     const ::std::string r{
-      "1\t" + String::regexReplace(
-                s, ::std::regex("\n", ::std::regex::optimize), callback)};
+      "1\t"
+      + String::regexReplace(s, ::std::regex("\n", ::std::regex::optimize),
+                             callback)};
     const ::std::string e{"1\tline1\n2\tline2\n3\tline3"};
     EXPECT_EQ(r, e);
   }

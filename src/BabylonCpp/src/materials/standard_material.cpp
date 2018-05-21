@@ -503,6 +503,27 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
     _imageProcessingConfiguration->prepareDefines(defines);
 
+    // Synchronize settings
+    {
+      auto ipcd = static_cast<IImageProcessingConfigurationDefines>(defines);
+      defines.defines[SMD::IMAGEPROCESSING] = ipcd.IMAGEPROCESSING;
+      defines.defines[SMD::VIGNETTE]        = ipcd.VIGNETTE;
+      defines.defines[SMD::VIGNETTEBLENDMODEMULTIPLY]
+        = ipcd.VIGNETTEBLENDMODEMULTIPLY;
+      defines.defines[SMD::VIGNETTEBLENDMODEOPAQUE]
+        = ipcd.VIGNETTEBLENDMODEOPAQUE;
+      defines.defines[SMD::TONEMAPPING]         = ipcd.TONEMAPPING;
+      defines.defines[SMD::CONTRAST]            = ipcd.CONTRAST;
+      defines.defines[SMD::EXPOSURE]            = ipcd.EXPOSURE;
+      defines.defines[SMD::COLORCURVES]         = ipcd.COLORCURVES;
+      defines.defines[SMD::COLORGRADING]        = ipcd.COLORGRADING;
+      defines.defines[SMD::COLORGRADING3D]      = ipcd.COLORGRADING3D;
+      defines.defines[SMD::SAMPLER3DGREENDEPTH] = ipcd.SAMPLER3DGREENDEPTH;
+      defines.defines[SMD::SAMPLER3DBGRMAP]     = ipcd.SAMPLER3DBGRMAP;
+      defines.defines[SMD::IMAGEPROCESSINGPOSTPROCESS]
+        = ipcd.IMAGEPROCESSINGPOSTPROCESS;
+    }
+
     defines.defines[SMD::IS_REFLECTION_LINEAR]
       = (reflectionTexture() != nullptr && !reflectionTexture()->gammaSpace);
     defines.defines[SMD::IS_REFRACTION_LINEAR]

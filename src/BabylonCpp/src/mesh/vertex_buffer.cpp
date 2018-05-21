@@ -75,7 +75,7 @@ VertexBuffer::VertexBuffer(
   bool updatable, const Nullable<bool>& postponeInternalCreation,
   Nullable<size_t> stride, const Nullable<bool>& instanced,
   const Nullable<unsigned int>& offset, const Nullable<size_t>& size,
-  Nullable<unsigned int> type, bool iNormalized, bool useBytes)
+  Nullable<unsigned int> iType, bool iNormalized, bool useBytes)
     : instanceDivisor{this, &VertexBuffer::get_instanceDivisor,
                       &VertexBuffer::set_instanceDivisor}
 {
@@ -94,14 +94,14 @@ VertexBuffer::VertexBuffer(
 
   _kind = kind;
 
-  if (type.isNull()) {
+  if (iType.isNull()) {
     type = VertexBuffer::FLOAT;
   }
   else {
-    type = type;
+    type = *iType;
   }
 
-  const auto typeByteLength = VertexBuffer::GetTypeByteLength(*type);
+  const auto typeByteLength = VertexBuffer::GetTypeByteLength(type);
 
   auto buffer = _buffer ? _buffer : _ownedBuffer.get();
   if (useBytes) {
