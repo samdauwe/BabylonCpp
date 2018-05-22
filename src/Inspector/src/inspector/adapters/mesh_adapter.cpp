@@ -37,6 +37,7 @@ MeshAdapter::MeshAdapter(Node* obj)
     }
     // GroundMesh
     if (_abstractMesh->type() == IReflect::Type::GROUNDMESH) {
+      _mesh       = static_cast<Mesh*>(obj);
       _groundMesh = static_cast<GroundMesh*>(obj);
     }
     // Bounding box
@@ -285,6 +286,10 @@ void MeshAdapter::_buildPropertiesView()
   view.addSizeTProperty("facetNb",
                         [&]() -> size_t { return _abstractMesh->facetNb(); },
                         [&](const size_t& /*value*/) {});
+  // - hasVertexAlpha
+  view.addBoolProperty(
+    "hasVertexAlpha", [&]() -> bool { return _abstractMesh->hasVertexAlpha(); },
+    [&](const bool& value) { _abstractMesh->setHasVertexAlpha(value); });
   // - isBlocked
   view.addBoolProperty("isBlocked",
                        [&]() -> bool { return _abstractMesh->isBlocked(); },
