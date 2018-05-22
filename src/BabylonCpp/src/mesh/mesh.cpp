@@ -690,7 +690,7 @@ Float32Array Mesh::_getPositionData(bool applySkeleton)
 SubMesh* Mesh::_createGlobalSubMesh(bool force)
 {
   auto totalVertices = getTotalVertices();
-  if (!totalVertices || getIndices().empty()) {
+  if (!totalVertices || (getIndices().empty() && !isReady())) {
     return nullptr;
   }
 

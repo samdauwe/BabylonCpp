@@ -61,6 +61,8 @@ IReflect::Type Light::type() const
 
 void Light::addToScene(unique_ptr_t<Light>&& newLight)
 {
+  newLight->_buildUniformLayout();
+  newLight->_resyncMeshes();
   getScene()->addLight(::std::move(newLight));
 }
 

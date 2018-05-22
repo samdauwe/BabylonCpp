@@ -19,8 +19,6 @@ HemisphericLight::HemisphericLight(const string_t& iName,
     , direction{iDirection}
     , _worldMatrix{nullptr}
 {
-  _buildUniformLayout();
-  _resyncMeshes();
 }
 
 HemisphericLight::~HemisphericLight()

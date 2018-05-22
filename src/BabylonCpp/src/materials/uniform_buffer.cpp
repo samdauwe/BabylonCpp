@@ -408,11 +408,11 @@ void UniformBuffer::_updateFloat2ForEffect(const string_t& name, float x,
 }
 
 void UniformBuffer::_updateFloat2ForUniform(const string_t& name, float x,
-                                            float y, const string_t& suffix)
+                                            float y, const string_t& /*suffix*/)
 {
   UniformBuffer::_tempBuffer[0] = x;
   UniformBuffer::_tempBuffer[1] = y;
-  updateUniform(name + suffix, UniformBuffer::_tempBuffer, 2);
+  updateUniform(name, UniformBuffer::_tempBuffer, 2);
 }
 
 void UniformBuffer::_updateFloat3ForEffect(const string_t& name, float x,
@@ -424,12 +424,12 @@ void UniformBuffer::_updateFloat3ForEffect(const string_t& name, float x,
 
 void UniformBuffer::_updateFloat3ForUniform(const string_t& name, float x,
                                             float y, float z,
-                                            const string_t& suffix)
+                                            const string_t& /*suffix*/)
 {
   UniformBuffer::_tempBuffer[0] = x;
   UniformBuffer::_tempBuffer[1] = y;
   UniformBuffer::_tempBuffer[2] = z;
-  updateUniform(name + suffix, UniformBuffer::_tempBuffer, 3);
+  updateUniform(name, UniformBuffer::_tempBuffer, 3);
 }
 
 void UniformBuffer::_updateFloat4ForEffect(const string_t& name, float x,
@@ -441,13 +441,13 @@ void UniformBuffer::_updateFloat4ForEffect(const string_t& name, float x,
 
 void UniformBuffer::_updateFloat4ForUniform(const string_t& name, float x,
                                             float y, float z, float w,
-                                            const string_t& suffix)
+                                            const string_t& /*suffix*/)
 {
   UniformBuffer::_tempBuffer[0] = x;
   UniformBuffer::_tempBuffer[1] = y;
   UniformBuffer::_tempBuffer[2] = z;
   UniformBuffer::_tempBuffer[3] = w;
-  updateUniform(name + suffix, UniformBuffer::_tempBuffer, 4);
+  updateUniform(name, UniformBuffer::_tempBuffer, 4);
 }
 
 void UniformBuffer::_updateMatrixForEffect(const string_t& name,
@@ -497,10 +497,10 @@ void UniformBuffer::_updateColor3ForEffect(const string_t& name,
 
 void UniformBuffer::_updateColor3ForUniform(const string_t& name,
                                             const Color3& color,
-                                            const string_t& suffix)
+                                            const string_t& /*suffix*/)
 {
   color.toArray(UniformBuffer::_tempBuffer);
-  updateUniform(name + suffix, UniformBuffer::_tempBuffer, 3);
+  updateUniform(name, UniformBuffer::_tempBuffer, 3);
 }
 
 void UniformBuffer::_updateColor4ForEffect(const string_t& name,
@@ -512,11 +512,11 @@ void UniformBuffer::_updateColor4ForEffect(const string_t& name,
 
 void UniformBuffer::_updateColor4ForUniform(const string_t& name,
                                             const Color3& color, float alpha,
-                                            const string_t& suffix)
+                                            const string_t& /*suffix*/)
 {
   color.toArray(UniformBuffer::_tempBuffer);
   UniformBuffer::_tempBuffer[3] = alpha;
-  updateUniform(name + suffix, UniformBuffer::_tempBuffer, 4);
+  updateUniform(name, UniformBuffer::_tempBuffer, 4);
 }
 
 void UniformBuffer::setTexture(const string_t& name, BaseTexture* texture)

@@ -288,7 +288,7 @@ void Geometry::_bind(Effect* effect, GL::IGLBuffer* indexToBind)
     return;
   }
 
-  if (indexToBind != _indexBuffer.get() || _vertexArrayObjects.empty()) {
+  if (indexToBind != _indexBuffer.get() /*|| _vertexArrayObjects.empty()*/) {
     _engine->bindBuffers(vbs, indexToBind, effect);
     return;
   }
@@ -534,7 +534,7 @@ void Geometry::applyToMesh(Mesh* mesh)
   mesh->setGeometry(this);
 
   // Geometry is already in scene when constructed
-  //_scene->pushGeometry(this);
+  // _scene->pushGeometry(this);
 
   _meshes.emplace_back(mesh);
 

@@ -666,7 +666,7 @@ void Effect::_prepareEffect()
 
     if (engine->supportsUniformBuffers()) {
       for (auto& item : _uniformBuffersNames) {
-        bindUniformBlock(name, item.second);
+        bindUniformBlock(item.first, item.second);
       }
     }
 

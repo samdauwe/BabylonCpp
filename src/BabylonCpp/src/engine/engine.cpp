@@ -1348,8 +1348,15 @@ void Engine::_vertexAttribPointer(GL::IGLBuffer* buffer, unsigned int indx,
   bool changed = false;
   if (_currentBufferPointers.find(indx) == _currentBufferPointers.end()) {
     changed                      = true;
-    _currentBufferPointers[indx] = BufferPointer(
-      true, indx, size, type, normalized, stride, offset, buffer);
+    _currentBufferPointers[indx] = BufferPointer(true,       // active
+                                                 indx,       // indx
+                                                 size,       // size
+                                                 type,       // type
+                                                 normalized, // normalized
+                                                 stride,     // stride
+                                                 offset,     // offset
+                                                 buffer      // buffer
+    );
   }
   else {
     auto& pointer = _currentBufferPointers[indx];
