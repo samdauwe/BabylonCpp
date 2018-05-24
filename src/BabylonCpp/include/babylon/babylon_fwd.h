@@ -513,12 +513,13 @@ class ReflectionProbe;
 // --- Rendering ---
 class BoundingBoxRenderer;
 class DepthRenderer;
+class EdgesRenderer;
 class FaceAdjacencies;
 class GeometryBufferRenderer;
-class EdgesRenderer;
 class OutlineRenderer;
 class RenderingGroup;
 class RenderingManager;
+class UtilityLayerRenderer;
 // --- Sprites ---
 class Sprite;
 class SpriteManager;

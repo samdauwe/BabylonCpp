@@ -3437,7 +3437,7 @@ void Scene::_checkIntersections()
 {
 }
 
-void Scene::render()
+void Scene::render(bool /*updateCameras*/)
 {
   if (isDisposed()) {
     return;
