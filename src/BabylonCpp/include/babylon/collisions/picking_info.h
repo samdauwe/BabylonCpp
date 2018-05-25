@@ -29,6 +29,7 @@ public:
   unsigned int faceId;
   unsigned int subMeshId;
   Sprite* pickedSprite;
+  Nullable<Ray> ray;
 
 }; // end of class PickingInfo
 

@@ -27,6 +27,11 @@ public:
   Vector2 localPosition;
   bool skipOnPointerObservable;
 
+  /**
+   * Ray from a pointer if available (eg. 6dof controller)
+   */
+  Nullable<Ray> ray;
+
 }; // end of class PointerInfoPre
 
 } // end of namespace BABYLON

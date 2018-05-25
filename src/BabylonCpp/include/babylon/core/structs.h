@@ -133,6 +133,15 @@ struct DeviceOrientationEvent {
   float beta;
 }; // end of struct DeviceOrientationEvent
 
+struct DragMoveEvent {
+  Vector3 delta;
+  Vector3 dragPlanePoint;
+}; // end of struct DragMoveEvent
+
+struct DragStartOrEndEvent {
+  Vector3 dragPlanePoint;
+}; // end of struct DragStartOrEndEvent
+
 struct Event {
   char* charCode;
   char* keyCode;
