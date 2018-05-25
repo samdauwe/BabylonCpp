@@ -70,6 +70,9 @@ struct Behavior;
 class AutoRotationBehavior;
 class BouncingBehavior;
 class FramingBehavior;
+// - Mesh
+class PointerDragBehavior;
+struct PointerDragBehaviorOptions;
 // --- Bones ---
 class Bone;
 class BoneIKController;
@@ -192,6 +195,10 @@ struct PoseEnabledControllerHelper;
 class ViveController;
 class WebVRController;
 class WindowsMotionController;
+// --- Gizmos ---
+class AxisDragGizmo;
+class Gizmo;
+class PositionGizmo;
 // --- Helpers ---
 class EnvironmentHelper;
 struct IEnvironmentHelperOptions;
