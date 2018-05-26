@@ -202,6 +202,8 @@ class PositionGizmo;
 // --- Helpers ---
 class EnvironmentHelper;
 struct IEnvironmentHelperOptions;
+struct IParticleSystemData;
+class ParticleHelper;
 struct ISceneSize;
 // --- Instrumentation ---
 struct _TimeToken;
