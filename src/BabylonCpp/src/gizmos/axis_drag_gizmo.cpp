@@ -50,12 +50,13 @@ AxisDragGizmo::AxisDragGizmo(UtilityLayerRenderer* gizmoLayer,
   options.pointerObservableScene = gizmoLayer->originalScene;
   _dragBehavior = ::std::make_unique<PointerDragBehavior>(options);
   _dragBehavior->moveAttached = false;
-  _rootMesh->addBehavior(_dragBehavior);
-  _dragBehavior->onDragObservable.add([&](DragMoveEvent& event) {
-    if (attachedMesh) {
-      attachedMesh->position().addInPlace(event.delta);
-    }
-  })
+  _rootMesh->addBehavior(_dragBehavior.get());
+  _dragBehavior->onDragObservable.add(
+    [&](DragMoveEvent* event, EventState& /*es*/) {
+      if (attachedMesh) {
+        attachedMesh->position().addInPlace(event->delta);
+      }
+    });
 }
 
 AxisDragGizmo::~AxisDragGizmo()

@@ -18,6 +18,7 @@ public:
   static const float rayl;
 
 public:
+  Ray();
   Ray(const Vector3& origin, const Vector3& direction,
       float length = numeric_limits_t<float>::max());
   Ray(const Ray& otherRay);

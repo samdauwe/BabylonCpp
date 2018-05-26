@@ -15,7 +15,7 @@ namespace BABYLON {
  * @brief A behavior that when attached to a mesh will allow the mesh to be
  * dragged around the screen based on pointer events.
  */
-class BABYLON_SHARED_EXPORT PointerDragBehavior : public Behavior<Mesh> {
+class BABYLON_SHARED_EXPORT PointerDragBehavior : public Behavior<Node> {
 
 public:
   /**
@@ -24,7 +24,7 @@ public:
    * across. pointerObservableScene can be used to listen to drag events from
    * another scene(eg. if the attached mesh is in an overlay scene).
    */
-  PointerDragBehavior(const Nullable<PointerDragBehaviorOptions>& options);
+  PointerDragBehavior(const PointerDragBehaviorOptions& options);
   virtual ~PointerDragBehavior();
 
   /**
@@ -41,7 +41,7 @@ public:
    * @brief Attaches the drag behavior the passed in mesh.
    * @param ownerNode The mesh that will be dragged around once attached
    */
-  void attach(Mesh* ownerNode) override;
+  void attach(Node* ownerNode) override;
 
   /**
    * @brief Detaches the behavior from the mesh.

@@ -8,13 +8,12 @@ namespace BABYLON {
 
 PositionGizmo::PositionGizmo(UtilityLayerRenderer* iGizmoLayer)
     : Gizmo{iGizmoLayer}
-    , attachedMesh{this, &PositionGizmo::set_attachedMesh}
     , _xDrag{::std::make_unique<AxisDragGizmo>(
-        gizmoLayer, Vector3(1.f, 0.f, 0.f), Color3::FromHexString("#00b894"))}
+        iGizmoLayer, Vector3(1.f, 0.f, 0.f), Color3::FromHexString("#00b894"))}
     , _yDrag{::std::make_unique<AxisDragGizmo>(
-        gizmoLayer, Vector3(0.f, 1.f, 0.f), Color3::FromHexString("#d63031"))}
+        iGizmoLayer, Vector3(0.f, 1.f, 0.f), Color3::FromHexString("#d63031"))}
     , _zDrag{::std::make_unique<AxisDragGizmo>(
-        gizmoLayer, Vector3(0.f, 0.f, 1.f), Color3::FromHexString("#0984e3"))}
+        iGizmoLayer, Vector3(0.f, 0.f, 1.f), Color3::FromHexString("#0984e3"))}
 {
 }
 
@@ -22,7 +21,7 @@ PositionGizmo::~PositionGizmo()
 {
 }
 
-void PositionGizmo::set_attachedMesh(Mesh* const& mesh)
+void PositionGizmo::setAttachedMesh(Mesh* mesh)
 {
   _xDrag->attachedMesh = mesh;
   _yDrag->attachedMesh = mesh;

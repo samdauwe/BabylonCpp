@@ -2,6 +2,7 @@
 #define BABYLON_COLLISIONS_PICKING_INFO_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/culling/ray.h>
 #include <babylon/math/vector3.h>
 
 #include <babylon/core/nullable.h>

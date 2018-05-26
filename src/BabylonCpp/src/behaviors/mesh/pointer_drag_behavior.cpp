@@ -7,8 +7,10 @@
 
 namespace BABYLON {
 
+unique_ptr_t<Scene> PointerDragBehavior::_planeScene = nullptr;
+
 PointerDragBehavior::PointerDragBehavior(
-  const Nullable<PointerDragBehaviorOptions>& iOptions)
+  const PointerDragBehaviorOptions& iOptions)
     : moveAttached{true}
     , _dragPlaneParent{nullptr}
     , _attachedNode{nullptr}
@@ -16,7 +18,7 @@ PointerDragBehavior::PointerDragBehavior(
     , _scene{nullptr}
     , _pointerObserver{nullptr}
     , _draggingID{-1}
-    , options{*iOptions}
+    , options{iOptions}
 {
   unsigned int optionCount = 0;
   if (options.dragAxis) {
@@ -49,7 +51,7 @@ void PointerDragBehavior::init()
 {
 }
 
-void PointerDragBehavior::attach(Mesh* ownerNode)
+void PointerDragBehavior::attach(Node* ownerNode)
 {
   _scene = ownerNode->getScene();
   if (!options.pointerObservableScene) {

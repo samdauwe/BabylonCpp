@@ -45,6 +45,7 @@ protected:
    */
   Mesh* _rootMesh;
 
+private:
   Observer<Scene>::Ptr _beforeRenderObserver;
 
 }; // end of class Gizmo

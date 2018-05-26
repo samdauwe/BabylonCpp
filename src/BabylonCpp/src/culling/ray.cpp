@@ -14,6 +14,15 @@ namespace BABYLON {
 const float Ray::smallnum = 0.00000001f;
 const float Ray::rayl     = 10e8f;
 
+Ray::Ray()
+    : origin{Vector3::Zero()}
+    , direction{Vector3::Zero()}
+    , length{0.f}
+    , _vectorsSet{false}
+    , _tmpRay{nullptr}
+{
+}
+
 Ray::Ray(const Vector3& iOrigin, const Vector3& iDirection, float iLength)
     : origin{iOrigin}
     , direction{iDirection}

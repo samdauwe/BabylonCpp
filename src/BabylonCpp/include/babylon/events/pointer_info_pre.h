@@ -2,6 +2,7 @@
 #define BABYLON_EVENTS_POINTER_INFO_PRE_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/culling/ray.h>
 #include <babylon/events/pointer_event_types.h>
 #include <babylon/events/pointer_info_base.h>
 

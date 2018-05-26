@@ -21,17 +21,13 @@ public:
   PositionGizmo(UtilityLayerRenderer* gizmoLayer);
   ~PositionGizmo() override;
 
+  void setAttachedMesh(Mesh* mesh);
+
   /**
    * @brief Disposes of the gizmo.
    */
   void dispose(bool doNotRecurse               = false,
                bool disposeMaterialAndTextures = false) override;
-
-protected:
-  void set_attachedMesh(Mesh* const& mesh);
-
-public:
-  WriteOnlyProperty<PositionGizmo, Mesh*> attachedMesh;
 
 private:
   unique_ptr_t<AxisDragGizmo> _xDrag;
