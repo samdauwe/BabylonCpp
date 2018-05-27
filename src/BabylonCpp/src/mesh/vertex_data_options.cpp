@@ -365,8 +365,12 @@ LineSystemOptions::LineSystemOptions(LinesOptions& options)
     , useVertexAlpha{options.useVertexAlpha}
     , instance{options.instance}
 {
-  lines.emplace_back(options.points);
-  colors.emplace_back(options.colors);
+  if (!options.points.empty()) {
+    lines.emplace_back(options.points);
+  }
+  if (!options.colors.empty()) {
+    colors.emplace_back(options.colors);
+  }
 }
 
 LineSystemOptions::~LineSystemOptions()

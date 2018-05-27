@@ -69,9 +69,7 @@ public:
 
 protected:
   ArcRotateCamera(const string_t& name, float alpha, float beta, float radius,
-                  Scene* scene, bool setActiveOnSceneIfNoneActive = true);
-  ArcRotateCamera(const string_t& name, float alpha, float beta, float radius,
-                  const Vector3& target, Scene* scene,
+                  const Nullable<Vector3>& target, Scene* scene,
                   bool setActiveOnSceneIfNoneActive = true);
 
   Vector3 _getTargetPosition();
@@ -116,11 +114,9 @@ public:
   float wheelPrecision;
   Vector2 targetScreenOffset;
   bool allowUpsideDown;
-  Matrix _viewMatrix;
   bool _useCtrlForPanning;
   MouseButtonType _panningMouseButton;
   unique_ptr_t<ArcRotateCameraInputsManager> inputs;
-  ::std::function<void()> _reset;
   // Panning
   unique_ptr_t<Vector3> panningAxis;
   // Behaviors

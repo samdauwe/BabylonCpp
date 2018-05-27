@@ -102,8 +102,8 @@ bool LinesMesh::checkCollisions()
 
 InstancedMesh* LinesMesh::createInstance(const string_t& /*name*/)
 {
-  BABYLON_LOG_WARN("InstancedMesh",
-                   "LinesMeshes do not support createInstance.");
+  BABYLON_LOG_ERROR("InstancedMesh",
+                    "LinesMeshes do not support createInstance.");
   return nullptr;
 }
 

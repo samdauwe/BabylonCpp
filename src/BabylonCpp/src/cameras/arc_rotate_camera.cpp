@@ -13,16 +13,8 @@
 namespace BABYLON {
 
 ArcRotateCamera::ArcRotateCamera(const string_t& iName, float iAlpha,
-                                 float iBeta, float iRadius, Scene* scene,
-                                 bool setActiveOnSceneIfNoneActive)
-    : ArcRotateCamera(iName, iAlpha, iBeta, iRadius, Vector3::Zero(), scene,
-                      setActiveOnSceneIfNoneActive)
-{
-}
-
-ArcRotateCamera::ArcRotateCamera(const string_t& iName, float iAlpha,
                                  float iBeta, float iRadius,
-                                 const Vector3& iTarget, Scene* scene,
+                                 const Nullable<Vector3>& iTarget, Scene* scene,
                                  bool setActiveOnSceneIfNoneActive)
     : TargetCamera{iName, Vector3::Zero(), scene, setActiveOnSceneIfNoneActive}
     , alpha{iAlpha}
@@ -59,6 +51,7 @@ ArcRotateCamera::ArcRotateCamera(const string_t& iName, float iAlpha,
                               &ArcRotateCamera::set_useAutoRotationBehavior}
     , checkCollisions{false}
     , collisionRadius{::std::make_unique<Vector3>(0.5f, 0.5f, 0.5f)}
+    , _target{Vector3::Zero()}
     , _targetHost{nullptr}
     , _collider{nullptr}
     , _previousPosition{Vector3::Zero()}
@@ -70,7 +63,9 @@ ArcRotateCamera::ArcRotateCamera(const string_t& iName, float iAlpha,
     , _autoRotationBehavior{nullptr}
     , _computationVector{Vector3::Zero()}
 {
-  setTarget(iTarget);
+  if (iTarget) {
+    setTarget(*iTarget);
+  }
   getViewMatrix();
   inputs = ::std::make_unique<ArcRotateCameraInputsManager>(this);
   inputs->addKeyboard().addMouseWheel().addPointers();
