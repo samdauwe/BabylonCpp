@@ -48,7 +48,8 @@ public:
    * lights) has to be done (false by default)
    * @return {boolean} is it ready
    */
-  bool isReady(bool completeCheck = false) const override;
+  bool isReady(bool completeCheck        = false,
+               bool forceInstanceSupport = false) override;
 
   /**
    * @brief Returns Float32Array of the requested kind of data : positons,

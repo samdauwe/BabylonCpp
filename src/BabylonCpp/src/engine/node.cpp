@@ -252,7 +252,7 @@ bool Node::hasNewParent(bool update)
   return true;
 }
 
-bool Node::isReady(bool /*completeCheck*/) const
+bool Node::isReady(bool /*completeCheck*/, bool /*forceInstanceSupport*/)
 {
   return _isReady;
 }

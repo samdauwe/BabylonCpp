@@ -134,7 +134,8 @@ public:
    * lights) has to be done (false by default)
    * @return true if the node is ready
    */
-  virtual bool isReady(bool completeCheck = false) const;
+  virtual bool isReady(bool completeCheck        = false,
+                       bool forceInstanceSupport = false);
 
   /**
    * @brief Is this node enabled?

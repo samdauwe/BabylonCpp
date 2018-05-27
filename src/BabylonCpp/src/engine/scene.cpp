@@ -3190,14 +3190,11 @@ void Scene::_activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh)
       subMeshes = mesh->_submeshesOctree->select(_frustumPlanes);
     }
     else {
-      subMeshes.reserve(mesh->subMeshes.size());
-      for (auto& subMesh : mesh->subMeshes) {
-        subMeshes.emplace_back(subMesh.get());
-      }
+      subMeshes = stl_util::to_raw_ptr_vector(mesh->subMeshes);
     }
 
-    for (auto& subMesh : mesh->subMeshes) {
-      _evaluateSubMesh(subMesh.get(), mesh);
+    for (auto& subMesh : subMeshes) {
+      _evaluateSubMesh(subMesh, mesh);
     }
   }
 }

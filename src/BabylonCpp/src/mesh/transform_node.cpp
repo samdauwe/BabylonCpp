@@ -207,12 +207,14 @@ bool TransformNode::_isSynchronized()
     return false;
   }
 
-  if (!_cache.position.equals(_position))
+  if (!_cache.position.equals(_position)) {
     return false;
+  }
 
   if (rotationQuaternion()) {
-    if (!_cache.rotationQuaternion.equals(*rotationQuaternion()))
+    if (!_cache.rotationQuaternion.equals(*rotationQuaternion())) {
       return false;
+    }
   }
 
   if (!_cache.rotation.equals(rotation())) {

@@ -294,16 +294,14 @@ void RenderingGroup::dispose()
   _edgesRenderers.clear();
 }
 
-void RenderingGroup::dispatch(SubMesh* subMesh, AbstractMesh* iMesh,
-                              Material* iMaterial)
+void RenderingGroup::dispatch(SubMesh* subMesh, AbstractMesh* mesh,
+                              Material* material)
 {
   // Get mesh and materials if not provided
-  auto mesh = iMesh;
   if (!mesh) {
     mesh = subMesh->getMesh();
   }
 
-  auto material = iMaterial;
   if (!material) {
     material = subMesh->getMaterial();
   }

@@ -139,7 +139,7 @@ bool Camera::isActiveMesh(AbstractMesh* mesh)
          != _activeMeshes.end();
 }
 
-bool Camera::isReady(bool completeCheck) const
+bool Camera::isReady(bool completeCheck, bool /*forceInstanceSupport*/)
 {
   if (completeCheck) {
     for (auto& pp : _postProcesses) {

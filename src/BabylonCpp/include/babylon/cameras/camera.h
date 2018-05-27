@@ -132,7 +132,8 @@ public:
    * has to be done (false by default)
    * @return true if the camera is ready
    */
-  bool isReady(bool completeCheck) const override;
+  bool isReady(bool completeCheck        = false,
+               bool forceInstanceSupport = false) override;
 
   /** Cache **/
   virtual void _initCache() override;

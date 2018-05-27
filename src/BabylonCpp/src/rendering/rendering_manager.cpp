@@ -198,11 +198,10 @@ void RenderingManager::dispatchParticles(IParticleSystem* particleSystem)
   _renderingGroups[renderingGroupId]->dispatchParticles(particleSystem);
 }
 
-void RenderingManager::dispatch(SubMesh* subMesh, AbstractMesh* iMesh,
+void RenderingManager::dispatch(SubMesh* subMesh, AbstractMesh* mesh,
                                 Material* material)
 {
-  auto mesh = iMesh;
-  if (!iMesh) {
+  if (!mesh) {
     mesh = subMesh->getMesh();
   }
   const auto& renderingGroupId = mesh->renderingGroupId;

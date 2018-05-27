@@ -318,7 +318,8 @@ public:
    * @returns true if all associated assets are ready (material, textures,
    * shaders)
    */
-  bool isReady(bool completeCheck = false, bool forceInstanceSupport = false);
+  bool isReady(bool completeCheck        = false,
+               bool forceInstanceSupport = false) override;
 
   /**
    * @brief Returns true if the normals aren't to be recomputed on next mesh

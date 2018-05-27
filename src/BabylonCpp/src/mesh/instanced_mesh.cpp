@@ -94,7 +94,7 @@ Mesh* InstancedMesh::sourceMesh() const
   return _sourceMesh;
 }
 
-bool InstancedMesh::isReady(bool completeCheck) const
+bool InstancedMesh::isReady(bool completeCheck, bool /*forceInstanceSupport*/)
 {
   return _sourceMesh->isReady(completeCheck, true);
 }
