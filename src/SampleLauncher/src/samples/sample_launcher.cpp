@@ -19,6 +19,7 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/impl/canvas.h>
+#include <babylon/mesh/abstract_mesh.h>
 
 // Inspector
 #include <babylon/inspector/inspector.h>
@@ -74,7 +75,7 @@ SampleLauncher::SampleLauncher(const SampleLauncherOptions& options)
     , _defaultWinResY{options.size.second}
     , _showInspectorWindow{options.showInspectorWindow}
     , _inspector{nullptr}
-    , _useOpenGLES{false}
+    , _useOpenGLES{true}
 {
   _sceneWindow                 = Window();
   _sceneWindow.title           = options.title;
@@ -217,11 +218,13 @@ int SampleLauncher::initGLFW()
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
     glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
   }
   else {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   }
 
   // Create the scene window
