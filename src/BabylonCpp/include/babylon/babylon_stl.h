@@ -465,7 +465,9 @@ private:
 // -- Thread support library -- //
 using condition_variable_t = ::std::condition_variable;
 using mutex_t              = ::std::mutex;
-using thread_t             = ::std::thread;
+template <class T>
+using promise_t = ::std::promise<T>;
+using thread_t  = ::std::thread;
 
 // -- Utilities library -- //
 template <size_t N>

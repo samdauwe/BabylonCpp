@@ -4,7 +4,6 @@
 #include <babylon/babylon_version.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/promise.h>
 #include <babylon/core/string.h>
 #include <babylon/core/time.h>
 #include <babylon/engine/depth_texture_creation_options.h>
@@ -5087,9 +5086,9 @@ unsigned int Engine::getGlAlgorithmType(unsigned int algorithmType) const
            GL::ANY_SAMPLES_PASSED;
 }
 
-Promise<string_t> Engine::_loadFileAsync(const string_t& /*url*/)
+promise_t<string_t> Engine::_loadFileAsync(const string_t& /*url*/)
 {
-  Promise<string_t> result;
+  promise_t<string_t> result;
   return result;
 }
 

@@ -2018,7 +2018,7 @@ public:
   /**
    * @brief Hidden
    */
-  Promise<string_t> _loadFileAsync(const string_t& url);
+  promise_t<string_t> _loadFileAsync(const string_t& url);
 
   /** Statics **/
 
