@@ -101,7 +101,7 @@ Example scenes can be found on the [samples](https://github.com/samdauwe/Babylon
 # Dependencies
 
 ## System ##
-* [CMake](https://cmake.org) (>= 3.5)
+* [CMake](https://cmake.org) (> 3.8)
 * [Python](https://www.python.org) (>= 2.7) for the `cmake_build.py` build script
 
 ## Available as git submodules ##

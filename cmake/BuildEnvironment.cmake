@@ -3,7 +3,7 @@
 # ============================================================================ #
 
 # CMake version
-cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
 # Be nice to vim users
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
