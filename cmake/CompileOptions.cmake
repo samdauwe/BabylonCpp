@@ -21,29 +21,29 @@ else()
     set(CMAKE_RELEASE_POSTFIX "_s")
 endif()
 
-# Check if compiler support the c++14 standard
+# Check if compiler support the c++17 standard
 include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
-if(COMPILER_SUPPORTS_CXX14)
-    set(CMAKE_CXX_STANDARD 14)
+CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
+if(COMPILER_SUPPORTS_CXX17)
+    set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
-else(COMPILER_SUPPORTS_CXX14)
-    message(STATUS "The compiler '${CMAKE_CXX_COMPILER}' has no C++14 support. Please use a more recent C++ compiler!")
+else(COMPILER_SUPPORTS_CXX17)
+    message(STATUS "The compiler '${CMAKE_CXX_COMPILER}' has no C++17 support. Please use a more recent C++ compiler!")
 endif()
 
 # Check compiler version
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    # c++14 require at least gcc 5.0.0
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.0.0)
-        message(FATAL_ERROR "GCC version must be at least 5.0.0!")
+    # c++17 require at least gcc 5.0.0
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0.0)
+        message(FATAL_ERROR "GCC version must be at least 7.0.0!")
     endif()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    # c++14 require at least clang 3.4
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.4)
-        message(FATAL_ERROR "Clang version must be at least 3.4!")
+    # c++17 require at least clang 3.4
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.0)
+        message(FATAL_ERROR "Clang version must be at least 4.0!")
     endif()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    # c++14 require at least Microsoft Visual Studio 2017
+    # c++17 require at least Microsoft Visual Studio 2017
     if (MSVC_VERSION VERSION_LESS 1910)
         message(FATAL_ERROR "MSVC version must be at Visual Studio 2017!")
     endif()

@@ -2,7 +2,7 @@
 
 [Babylon.js](http://www.babylonjs.com) is a complete JavaScript framework for building 3D games with HTML 5 and WebGL. BabylonJS was chosen because it is the most efficient, most feature-rich, and most modern WebGL graphics library available.
 
-The goal with BabylonCpp is to fully implement the relevant portions of the excellent Babylon.js 3D framework/engine in C++14, facilitating the creation of lightweight, cross-platform 3D games and applications with native performance.
+The goal with BabylonCpp is to fully implement the relevant portions of the excellent Babylon.js 3D framework/engine in C++17, facilitating the creation of lightweight, cross-platform 3D games and applications with native performance.
 
 # Get the Sources
 
@@ -111,8 +111,8 @@ Example scenes can be found on the [samples](https://github.com/samdauwe/Babylon
 * [GLXW](https://github.com/rikusalminen/glxw): OpenGL loader, used for the examples (Optional).
 
 ## Supported Compilers ##
-* GCC >= 5.0.0
-* Clang >= 3.4
+* GCC >= 7.0.0
+* Clang >= 4.0
 * MSVC >= 2017
 
 ## Supported Operating Systems ##
