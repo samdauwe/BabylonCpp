@@ -326,7 +326,7 @@ void RenderingGroup::dispatch(SubMesh* subMesh, AbstractMesh* mesh,
     _opaqueSubMeshes.emplace_back(subMesh); // Opaque
   }
 
-  if (mesh->_edgesRenderer) {
+  if (mesh->_edgesRenderer != nullptr && mesh->_edgesRenderer->isEnabled) {
     _edgesRenderers.emplace_back(mesh->_edgesRenderer.get());
   }
 }

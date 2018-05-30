@@ -12,15 +12,38 @@ namespace Debug {
 class BABYLON_SHARED_EXPORT AxesViewer {
 
 public:
+  /**
+   * @brief Creates a new AxesViewer.
+   * @param scene defines the hosting scene
+   * @param scaleLines defines a number used to scale line length (1 by default)
+   */
   AxesViewer(Scene* scene, float scaleLines = 1.f);
   ~AxesViewer();
 
+  /**
+   * @brief Force the viewer to update.
+   * @param position defines the position of the viewer
+   * @param xaxis defines the x axis of the viewer
+   * @param yaxis defines the y axis of the viewer
+   * @param zaxis defines the z axis of the viewer
+   */
   void update(const Vector3& position, const Vector3& xaxis,
               const Vector3& yaxis, const Vector3& zaxis);
+
+  /**
+   * @brief Releases resources.
+   */
   void dispose();
 
 public:
+  /**
+   * Gets the hosting scene
+   */
   Scene* scene;
+
+  /**
+   * Gets or sets a number used to scale line length
+   */
   float scaleLines;
 
 private:

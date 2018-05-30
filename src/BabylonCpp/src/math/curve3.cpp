@@ -147,29 +147,46 @@ Curve3 Curve3::CreateHermiteSpline(const Vector3& p1, const Vector3& t1,
   return Curve3(hermite);
 }
 
-Curve3 Curve3::CreateCatmullRomSpline(const vector_t<Vector3> points,
-                                      size_t nbPoints)
+Curve3 Curve3::CreateCatmullRomSpline(const vector_t<Vector3>& points,
+                                      size_t nbPoints, bool closed)
 {
-  vector_t<Vector3> totalPoints{points[0]};
-  stl_util::concat(totalPoints, points);
-  totalPoints.emplace_back(points.back());
   vector_t<Vector3> catmullRom;
   const float step = 1.f / static_cast<float>(nbPoints);
-  size_t i         = 0;
   float amount     = 0.f;
-  for (i = 0; i < totalPoints.size() - 3; ++i) {
-    amount = 0.f;
-    for (size_t c = 0; c < nbPoints; ++c) {
-      catmullRom.emplace_back(
-        Vector3::CatmullRom(totalPoints[i], totalPoints[i + 1],
-                            totalPoints[i + 2], totalPoints[i + 3], amount));
-      amount += step;
+  if (closed) {
+    const auto pointsCount = points.size();
+    for (size_t i = 0; i < pointsCount; ++i) {
+      amount = 0;
+      for (size_t c = 0; c < nbPoints; ++c) {
+        catmullRom.emplace_back(Vector3::CatmullRom(
+          points[i % pointsCount], points[(i + 1) % pointsCount],
+          points[(i + 2) % pointsCount], points[(i + 3) % pointsCount],
+          amount));
+        amount += step;
+      }
     }
+    catmullRom.emplace_back(catmullRom[0]);
   }
-  --i;
-  catmullRom.emplace_back(
-    Vector3::CatmullRom(totalPoints[i], totalPoints[i + 1], totalPoints[i + 2],
-                        totalPoints[i + 3], amount));
+  else {
+    vector_t<Vector3> totalPoints;
+    totalPoints.emplace_back(points[0]);
+    stl_util::concat(totalPoints, points);
+    totalPoints.emplace_back(points.back());
+    size_t i = 0;
+    for (i = 0; i < totalPoints.size() - 3; ++i) {
+      amount = 0;
+      for (size_t c = 0; c < nbPoints; ++c) {
+        catmullRom.emplace_back(
+          Vector3::CatmullRom(totalPoints[i], totalPoints[i + 1],
+                              totalPoints[i + 2], totalPoints[i + 3], amount));
+        amount += step;
+      }
+    }
+    --i;
+    catmullRom.emplace_back(
+      Vector3::CatmullRom(totalPoints[i], totalPoints[i + 1],
+                          totalPoints[i + 2], totalPoints[i + 3], amount));
+  }
   return Curve3(catmullRom);
 }
 

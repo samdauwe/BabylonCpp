@@ -165,6 +165,18 @@ public:
   Observable<GPUParticleSystem> onDisposeObservable;
 
   /**
+   * Minimum angular speed of emitting particles (Z-axis rotation for each
+   * particle).
+   */
+  float minAngularSpeed;
+
+  /**
+   * Maximum angular speed of emitting particles (Z-axis rotation for each
+   * particle).
+   */
+  float maxAngularSpeed;
+
+  /**
    * Random direction of each particle after it has been emitted, between
    * direction1 and direction2 vectors. This only works when particleEmitterTyps
    * is a BoxParticleEmitter

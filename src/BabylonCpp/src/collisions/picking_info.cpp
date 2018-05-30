@@ -17,6 +17,8 @@ PickingInfo::PickingInfo()
     , faceId{0}
     , subMeshId{0}
     , pickedSprite{nullptr}
+    , originMesh{nullptr}
+    , ray{nullptr}
 {
 }
 

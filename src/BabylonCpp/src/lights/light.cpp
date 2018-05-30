@@ -20,11 +20,11 @@ Light::Light(const string_t& iName, Scene* scene)
     , specular{Color3(1.f, 1.f, 1.f)}
     , intensity{1.f}
     , range{numeric_limits_t<float>::max()}
-    , shadowEnabled{true}
     , _shadowGenerator{nullptr}
     , _uniformBuffer{::std::make_unique<UniformBuffer>(scene->getEngine())}
     , intensityMode{this, &Light::get_intensityMode, &Light::set_intensityMode}
     , radius{this, &Light::get_radius, &Light::set_radius}
+    , shadowEnabled{this, &Light::get_shadowEnabled, &Light::set_shadowEnabled}
     , renderPriority{this, &Light::get_renderPriority,
                      &Light::set_renderPriority}
     , includedOnlyMeshes{this, &Light::get_includedOnlyMeshes,
@@ -40,6 +40,7 @@ Light::Light(const string_t& iName, Scene* scene)
     , _intensityMode{Light::INTENSITYMODE_AUTOMATIC()}
     , _radius{0.00001f}
     , _renderPriority{0}
+    , _shadowEnabled{true}
     , _includedOnlyMeshes{}
     , _excludedMeshes{}
     , _includeOnlyWithLayerMask{0}
@@ -119,6 +120,21 @@ void Light::set_radius(float value)
 {
   _radius = value;
   _computePhotometricScale();
+}
+
+bool Light::get_shadowEnabled() const
+{
+  return _shadowEnabled;
+}
+
+void Light::set_shadowEnabled(bool value)
+{
+  if (_shadowEnabled == value) {
+    return;
+  }
+
+  _shadowEnabled = value;
+  _markMeshesAsLightDirty();
 }
 
 int Light::get_renderPriority() const

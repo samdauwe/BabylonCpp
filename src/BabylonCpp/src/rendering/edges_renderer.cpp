@@ -16,6 +16,7 @@ EdgesRenderer::EdgesRenderer(AbstractMesh* source, float epsilon,
                              bool checkVerticesInsteadOfIndices)
     : edgesWidthScalerForOrthographic{1000.f}
     , edgesWidthScalerForPerspective{50.f}
+    , isEnabled{true}
     , _source{source}
     , _epsilon{epsilon}
     , _lineShader{nullptr}

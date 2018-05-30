@@ -28,7 +28,9 @@ bool GPUParticleSystem::IsSupported()
 GPUParticleSystem::GPUParticleSystem(const string_t& iName, size_t capacity,
                                      Nullable<int> randomTextureSize,
                                      Scene* scene)
-    : direction1{this, &GPUParticleSystem::get_direction1,
+    : minAngularSpeed{0}
+    , maxAngularSpeed{0}
+    , direction1{this, &GPUParticleSystem::get_direction1,
                  &GPUParticleSystem::set_direction1}
     , direction2{this, &GPUParticleSystem::get_direction2,
                  &GPUParticleSystem::set_direction2}
@@ -52,7 +54,7 @@ GPUParticleSystem::GPUParticleSystem(const string_t& iName, size_t capacity,
     , _stopped{false}
     , _timeDelta{0}
     , _randomTexture{nullptr}
-    , _attributesStrideSize{14}
+    , _attributesStrideSize{16}
     , _actualFrame{0}
     , _zeroVector3{Vector3::Zero()}
 {
@@ -93,14 +95,14 @@ GPUParticleSystem::GPUParticleSystem(const string_t& iName, size_t capacity,
 
   scene->particleSystems.emplace_back(this);
 
-  _updateEffectOptions->attributes
-    = {"position", "age", "life", "seed", "size", "color", "direction"};
+  _updateEffectOptions->attributes = {
+    "position", "age", "life", "seed", "size", "color", "direction", "angle"};
   _updateEffectOptions->uniformsNames
     = {"currentCount", "timeDelta",  "generalRandoms", "emitterWM",
        "lifeTime",     "color1",     "color2",         "sizeRange",
        "gravity",      "emitPower",  "direction1",     "direction2",
        "minEmitBox",   "maxEmitBox", "radius",         "directionRandomizer",
-       "height",       "angle",      "stopFactor"};
+       "height",       "coneAngle",  "stopFactor",     "angleRange"};
   _updateEffectOptions->uniformBuffersNames   = {};
   _updateEffectOptions->samplers              = {"randomSampler"};
   _updateEffectOptions->defines               = "";
@@ -110,8 +112,8 @@ GPUParticleSystem::GPUParticleSystem(const string_t& iName, size_t capacity,
   _updateEffectOptions->indexParameters       = {};
   _updateEffectOptions->maxSimultaneousLights = 0;
   _updateEffectOptions->transformFeedbackVaryings
-    = {"outPosition", "outAge",   "outLife",     "outSeed",
-       "outSize",     "outColor", "outDirection"};
+    = {"outPosition", "outAge",   "outLife",      "outSeed",
+       "outSize",     "outColor", "outDirection", "outAngle"};
 
   // Random data
   auto maxTextureSize
@@ -124,9 +126,9 @@ GPUParticleSystem::GPUParticleSystem(const string_t& iName, size_t capacity,
     d.emplace_back(Math::random());
   }
   _randomTexture = ::std::make_unique<RawTexture>(
-    ArrayBufferView(d), maxTextureSize, 1,
-    EngineConstants::TEXTUREFORMAT_RGBA32F, _scene, false, false,
-    TextureConstants::NEAREST_SAMPLINGMODE, EngineConstants::TEXTURETYPE_FLOAT);
+    ArrayBufferView(d), maxTextureSize, 1, EngineConstants::TEXTUREFORMAT_RGBA,
+    _scene, false, false, TextureConstants::NEAREST_SAMPLINGMODE,
+    EngineConstants::TEXTURETYPE_FLOAT);
   _randomTexture->wrapU = TextureConstants::WRAP_ADDRESSMODE;
   _randomTexture->wrapV = TextureConstants::WRAP_ADDRESSMODE;
 
@@ -288,6 +290,8 @@ GPUParticleSystem::_createUpdateVAO(Buffer* source)
     = source->createVertexBuffer(VertexBuffer::ColorKind, 7, 4);
   updateVertexBuffers["direction"]
     = source->createVertexBuffer(VertexBuffer::DirectionKind, 11, 3);
+  updateVertexBuffers["angle"]
+    = source->createVertexBuffer(VertexBuffer::AngleKind, 14, 2);
 
   auto vao = _engine->recordVertexArrayObject(
     stl_util::to_raw_ptr_map(updateVertexBuffers), nullptr,
@@ -301,16 +305,19 @@ unique_ptr_t<GL::IGLVertexArrayObject>
 GPUParticleSystem::_createRenderVAO(Buffer* source, Buffer* spriteSource)
 {
   unordered_map_t<string_t, unique_ptr_t<VertexBuffer>> renderVertexBuffers;
+  auto attributesStrideSizeT      = static_cast<size_t>(_attributesStrideSize);
   renderVertexBuffers["position"] = source->createVertexBuffer(
-    VertexBuffer::PositionKind, 0, 3, _attributesStrideSize, true);
+    VertexBuffer::PositionKind, 0, 3, attributesStrideSizeT, true);
   renderVertexBuffers["age"] = source->createVertexBuffer(
-    VertexBuffer::AgeKind, 3, 1, _attributesStrideSize, true);
+    VertexBuffer::AgeKind, 3, 1, attributesStrideSizeT, true);
   renderVertexBuffers["life"] = source->createVertexBuffer(
-    VertexBuffer::LifeKind, 4, 1, _attributesStrideSize, true);
+    VertexBuffer::LifeKind, 4, 1, attributesStrideSizeT, true);
   renderVertexBuffers["size"] = source->createVertexBuffer(
-    VertexBuffer::SizeKind, 6, 1, _attributesStrideSize, true);
+    VertexBuffer::SizeKind, 6, 1, attributesStrideSizeT, true);
   renderVertexBuffers["color"] = source->createVertexBuffer(
-    VertexBuffer::ColorKind, 7, 4, _attributesStrideSize, true);
+    VertexBuffer::ColorKind, 7, 4, attributesStrideSizeT, true);
+  renderVertexBuffers["angle"] = source->createVertexBuffer(
+    VertexBuffer::AngleKind, 14, 2, attributesStrideSizeT, true);
 
   renderVertexBuffers["offset"]
     = spriteSource->createVertexBuffer(VertexBuffer::OffsetKind, 0, 2);
@@ -358,6 +365,10 @@ void GPUParticleSystem::_initialize(bool force)
 
     // direction
     data.emplace_back(0.f);
+    data.emplace_back(0.f);
+    data.emplace_back(0.f);
+
+    // angle
     data.emplace_back(0.f);
     data.emplace_back(0.f);
   }
@@ -419,7 +430,7 @@ void GPUParticleSystem::_recreateRenderEffect()
 
   EffectCreationOptions renderEffectOptions;
   renderEffectOptions.attributes
-    = {"position", "age", "life", "size", "color", "offset", "uv"};
+    = {"position", "age", "life", "size", "color", "offset", "uv", "angle"};
   renderEffectOptions.uniformsNames
     = {"view", "projection", "colorDead", "invView", "vClipPlane"};
   renderEffectOptions.samplers = {"textureSampler"};
@@ -483,6 +494,7 @@ size_t GPUParticleSystem::render()
   _updateEffect->setDirectColor4("color1", color1);
   _updateEffect->setDirectColor4("color2", color2);
   _updateEffect->setFloat2("sizeRange", minSize, maxSize);
+  _updateEffect->setFloat2("angleRange", minAngularSpeed, maxAngularSpeed);
   _updateEffect->setVector3("gravity", gravity);
 
   if (particleEmitterType) {

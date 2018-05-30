@@ -36,6 +36,11 @@ public:
   float edgesWidthScalerForOrthographic;
   float edgesWidthScalerForPerspective;
 
+  /**
+   * Gets or sets a boolean indicating if the edgesRenderer is active
+   */
+  bool isEnabled;
+
 private:
   AbstractMesh* _source;
   Float32Array _linesPositions;

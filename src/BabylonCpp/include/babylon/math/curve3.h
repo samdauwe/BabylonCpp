@@ -89,12 +89,14 @@ public:
   /**
    * @brief Returns a Curve3 object along a CatmullRom Spline curve :
    * @param points (array of Vector3) the points the spline must pass through.
-   * At least, four points required.
+   * At least, four points required
    * @param nbPoints (integer) the wanted number of points between each curve
-   * control points.
+   * control points
+   * @param closed (boolean) optional with default false, when true forms a
+   * closed loop from the points
    */
-  static Curve3 CreateCatmullRomSpline(const vector_t<Vector3> points,
-                                       size_t nbPoints);
+  static Curve3 CreateCatmullRomSpline(const vector_t<Vector3>& points,
+                                       size_t nbPoints, bool closed = false);
 
 private:
   float computeLength(const vector_t<Vector3>& path);

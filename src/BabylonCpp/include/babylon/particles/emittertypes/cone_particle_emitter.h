@@ -97,16 +97,16 @@ protected:
 
 public:
   /**
-   * The radius of the emission cone.
+   * The radius of the emission cone
    */
   Property<ConeParticleEmitter, float> radius;
 
   /**
-   * The qngle of the emission cone.
+   * The qngle of the emission cone
    */
   float angle;
   /**
-   * The cone base angle.
+   * The cone base angle
    */
   float directionRandomizer;
 

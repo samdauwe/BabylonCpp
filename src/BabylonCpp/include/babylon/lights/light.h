@@ -326,6 +326,18 @@ protected:
   void set_radius(float value);
 
   /**
+   * @brief Gets wether or not the shadows are enabled for this light. This can
+   * help turning off/on shadow without detaching the current shadow generator.
+   */
+  bool get_shadowEnabled() const;
+
+  /**
+   * @brief Sets wether or not the shadows are enabled for this light. This can
+   * help turning off/on shadow without detaching the current shadow generator.
+   */
+  void set_shadowEnabled(bool value);
+
+  /**
    * @brief Gets the rendering priority of the lights. It can help in case of
    * fallback or number of lights exceeding the number allowed of the materials.
    */
@@ -439,12 +451,6 @@ public:
   float range;
 
   /**
-   * Defines wether or not the shadows are enabled for this light. This can help
-   * turning off/on shadow without detaching the current shadow generator.
-   */
-  bool shadowEnabled;
-
-  /**
    * Shadow generator associted to the light.
    * Internal use only.
    */
@@ -475,6 +481,12 @@ public:
    * Light radius used by PBR Materials to simulate soft area lights
    */
   Property<Light, float> radius;
+
+  /**
+   * Wether or not the shadows are enabled for this light. This can help turning
+   * off/on shadow without detaching the current shadow generator.
+   */
+  Property<Light, bool> shadowEnabled;
 
   /**
    * Rendering priority of the lights. It can help in case of fallback or number
@@ -517,6 +529,7 @@ private:
   unsigned int _intensityMode;
   float _radius;
   int _renderPriority;
+  bool _shadowEnabled;
   vector_t<AbstractMesh*> _includedOnlyMeshes;
   vector_t<AbstractMesh*> _excludedMeshes;
   unsigned int _includeOnlyWithLayerMask;

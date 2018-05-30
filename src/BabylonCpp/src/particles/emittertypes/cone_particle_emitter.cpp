@@ -75,11 +75,11 @@ void ConeParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
   // Better distribution in a cone at normal angles.
   h           = 1.f - h * h;
   auto radius = Scalar::RandomRange(0.f, _radius);
-  radius      = radius * h / _height;
+  radius      = radius * h;
 
   const auto randX = radius * ::std::sin(s);
   const auto randZ = radius * ::std::cos(s);
-  const auto randY = h;
+  const auto randY = h * _height;
 
   Vector3::TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix,
                                                positionToUpdate);
@@ -96,7 +96,7 @@ unique_ptr_t<IParticleEmitterType> ConeParticleEmitter::clone() const
 void ConeParticleEmitter::applyToShader(Effect* effect)
 {
   effect->setFloat("radius", radius);
-  effect->setFloat("angle", angle);
+  effect->setFloat("coneAngle", angle);
   effect->setFloat("height", _height);
   effect->setFloat("directionRandomizer", directionRandomizer);
 }

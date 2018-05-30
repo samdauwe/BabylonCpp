@@ -33,6 +33,7 @@ constexpr unsigned int VertexBuffer::DirectionKind;
 constexpr unsigned int VertexBuffer::OffsetKind;
 constexpr unsigned int VertexBuffer::SeedKind;
 constexpr unsigned int VertexBuffer::SizeKind;
+constexpr unsigned int VertexBuffer::AngleKind;
 
 constexpr const char* VertexBuffer::PositionKindChars;
 constexpr const char* VertexBuffer::NormalKindChars;
@@ -61,6 +62,7 @@ constexpr const char* VertexBuffer::DirectionKindChars;
 constexpr const char* VertexBuffer::OffsetKindChars;
 constexpr const char* VertexBuffer::SeedKindChars;
 constexpr const char* VertexBuffer::SizeKindChars;
+constexpr const char* VertexBuffer::AngleKindChars;
 
 constexpr const unsigned int VertexBuffer::BYTE;
 constexpr const unsigned int VertexBuffer::UNSIGNED_BYTE;
@@ -206,6 +208,8 @@ string_t VertexBuffer::KindAsString(unsigned int kind)
       return string_t(VertexBuffer::SeedKindChars);
     case VertexBuffer::SizeKind:
       return string_t(VertexBuffer::SizeKindChars);
+    case VertexBuffer::AngleKind:
+      return string_t(VertexBuffer::AngleKindChars);
   }
 }
 

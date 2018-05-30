@@ -9,27 +9,90 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Information about the result of picking within a scene.
+ * See https://doc.babylonjs.com/babylon101/picking_collisions
+ */
 class BABYLON_SHARED_EXPORT PickingInfo {
 
 public:
   PickingInfo();
   ~PickingInfo();
 
-  /** Methods **/
+  /**
+   * @brief Gets the normal corrispodning to the face the pick collided with.
+   * @param useWorldCoordinates If the resulting normal should be relative to
+   * the world (default: false)
+   * @param useVerticesNormals If the vertices normals should be used to
+   * calculate the normal instead of the normal map
+   * @returns The normal corrispodning to the face the pick collided with
+   */
   Nullable<Vector3> getNormal(bool useWorldCoordinates = false,
                               bool useVerticesNormals  = true);
+
+  /**
+   * @brief Gets the texture coordinates of where the pick occured.
+   * @returns the vector containing the coordnates of the texture
+   */
   Nullable<Vector2> getTextureCoordinates();
 
 public:
+  /**
+   * If the pick collided with an object
+   */
   bool hit;
+
+  /**
+   * Distance away where the pick collided
+   */
   float distance;
+
+  /**
+   * The location of pick collision
+   */
   Nullable<Vector3> pickedPoint;
+
+  /**
+   * The mesh corrisponding the the pick collision
+   */
   AbstractMesh* pickedMesh;
+
+  /**
+   * (See getTextureCoordinates) The barycentric U coordinate that is used when
+   * calulating the texture coordinates of the collision.
+   */
   float bu;
+
+  /**
+   * (See getTextureCoordinates) The barycentric V coordinate that is used when
+   * calulating the texture coordinates of the collision.
+   */
   float bv;
+
+  /**
+   * The id of the face on the mesh that was picked
+   */
   unsigned int faceId;
+
+  /**
+   * Id of the the submesh that was picked
+   */
   unsigned int subMeshId;
+
+  /**
+   * If a sprite was picked, this will be the sprite the pick collided with
+   */
   Sprite* pickedSprite;
+
+  /**
+   * If a mesh was used to do the picking (eg. 6dof controller) this will be
+   * populated.
+   */
+  AbstractMesh* originMesh;
+
+  /**
+   * The ray that was used to perform the picking.
+   */
   Nullable<Ray> ray;
 
 }; // end of class PickingInfo
