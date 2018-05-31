@@ -576,7 +576,7 @@ void ArcRotateCamera::_onCollisionPositionChange(int /*collisionId*/,
     up = up.negate();
   }
 
-  Matrix::LookAtLHToRef(position, _target, up, _viewMatrix);
+  _computeViewMatrix(position, target, up);
   _viewMatrix.m[12] += targetScreenOffset.x;
   _viewMatrix.m[13] += targetScreenOffset.y;
 

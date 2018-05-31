@@ -13,6 +13,9 @@ GearVRController::GearVRController(
       }}
 {
   controllerType = PoseEnabledControllerType::GEAR_VR;
+  // Initial starting position defaults to where hand would be (incase of only
+  // 3dof controller)
+  _calculatedPosition = Vector3(hand == "left" ? -0.15f : 0.15f, -0.5f, 0.4f);
 }
 
 GearVRController::~GearVRController()

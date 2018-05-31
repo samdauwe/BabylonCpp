@@ -174,7 +174,7 @@ protected:
    * @brief Creates the render target textures and post processes used in the
    * highlight layer.
    */
-  void createTextureAndPostProcesses();
+  void _createTextureAndPostProcesses() override;
 
   /**
    * @brief Implementation specific of rendering the generating effect on the

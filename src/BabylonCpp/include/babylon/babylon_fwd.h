@@ -64,8 +64,10 @@ class AudioEngine;
 class Sound;
 class SoundTrack;
 // --- Behaviors ---
-template <class TNode>
+template <class T>
 struct Behavior;
+template <class T>
+struct IBehaviorAware;
 // - Cameras
 class AutoRotationBehavior;
 class BouncingBehavior;

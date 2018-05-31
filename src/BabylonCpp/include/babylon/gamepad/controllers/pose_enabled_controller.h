@@ -131,13 +131,15 @@ public:
    */
   static constexpr const char* POINTING_POSE = "POINTING_POSE";
 
+protected:
+  Vector3 _calculatedPosition;
+
 private:
   // Represents device position and rotation in room space. Should only be used
   // to help calculate babylon space values
   Vector3 _deviceRoomPosition;
   Quaternion _deviceRoomRotationQuaternion;
 
-  Vector3 _calculatedPosition;
   Quaternion _calculatedRotation;
 
   TargetCamera* _poseControlledCamera;

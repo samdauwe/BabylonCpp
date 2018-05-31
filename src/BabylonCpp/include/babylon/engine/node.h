@@ -4,6 +4,7 @@
 #include <babylon/animations/animation_range.h>
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_global.h>
+#include <babylon/behaviors/ibehavior_aware.h>
 #include <babylon/core/structs.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/tools/observable.h>
@@ -15,7 +16,9 @@ namespace BABYLON {
  * @brief Node is the basic class for all scene objects (Mesh, Light, Camera,
  * etc.).
  */
-class BABYLON_SHARED_EXPORT Node : public IAnimatable, public IDisposable {
+class BABYLON_SHARED_EXPORT Node : public IAnimatable,
+                                   public IBehaviorAware<Node>,
+                                   public IDisposable {
 
 public:
   /**
@@ -59,7 +62,7 @@ public:
    * @param behavior defines the behavior to attach
    * @returns the current Node
    */
-  Node& addBehavior(Behavior<Node>* behavior);
+  Node& addBehavior(Behavior<Node>* behavior) override;
 
   /**
    * @brief Remove an attached behavior.
@@ -67,7 +70,7 @@ public:
    * @param behavior defines the behavior to attach
    * @returns the current Node
    */
-  Node& removeBehavior(Behavior<Node>* behavior);
+  Node& removeBehavior(Behavior<Node>* behavior) override;
 
   /**
    * @brief Gets an attached behavior by name.
@@ -75,7 +78,7 @@ public:
    * @see http://doc.babylonjs.com/features/behaviour
    * @returns null if behavior was not found else the requested behavior
    */
-  Behavior<Node>* getBehaviorByName(const string_t& name);
+  Behavior<Node>* getBehaviorByName(const string_t& name) override;
 
   /**
    * @brief Returns the world matrix of the node.

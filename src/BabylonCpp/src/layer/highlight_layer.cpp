@@ -139,7 +139,7 @@ Effect* HighlightLayer::_createMergeEffect()
                                _scene->getEngine());
 }
 
-void HighlightLayer::createTextureAndPostProcesses()
+void HighlightLayer::_createTextureAndPostProcesses()
 {
   int blurTextureWidth
     = static_cast<int>(static_cast<float>(_mainTextureDesiredSize.width)
@@ -154,9 +154,17 @@ void HighlightLayer::createTextureAndPostProcesses()
                         Tools::GetExponentOfTwo(blurTextureHeight, _maxSize) :
                         blurTextureHeight;
 
+  unsigned int textureType = 0;
+  if (_engine->getCaps().textureHalfFloatRender) {
+    textureType = EngineConstants::TEXTURETYPE_HALF_FLOAT;
+  }
+  else {
+    textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+  }
+
   _blurTexture = ::std::make_unique<RenderTargetTexture>(
     "HighlightLayerBlurRTT", ISize{blurTextureWidth, blurTextureHeight}, _scene,
-    false, true, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+    false, true, textureType);
   _blurTexture->wrapU                     = TextureConstants::CLAMP_ADDRESSMODE;
   _blurTexture->wrapV                     = TextureConstants::CLAMP_ADDRESSMODE;
   _blurTexture->anisotropicFilteringLevel = 16;
@@ -203,7 +211,8 @@ void HighlightLayer::createTextureAndPostProcesses()
     _horizontalBlurPostprocess = ::std::make_unique<GlowBlurPostProcess>(
       "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize,
       ToVariant<float, PostProcessOptions>(1.f), nullptr,
-      TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
+      TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine()/*, false,
+      textureType*/);
     _horizontalBlurPostprocess->width  = blurTextureWidth;
     _horizontalBlurPostprocess->height = blurTextureHeight;
     _horizontalBlurPostprocess->onApplyObservable.add(
@@ -214,7 +223,8 @@ void HighlightLayer::createTextureAndPostProcesses()
     _verticalBlurPostprocess = ::std::make_unique<GlowBlurPostProcess>(
       "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize,
       ToVariant<float, PostProcessOptions>(1.f), nullptr,
-      TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
+      TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine()/*, false,
+      textureType*/);
     _verticalBlurPostprocess->onApplyObservable.add(
       [&](Effect* effect, EventState&) {
         effect->setFloat2("screenSize", static_cast<float>(blurTextureWidth),

@@ -21,7 +21,6 @@ Material::Material(const string_t& iName, Scene* scene, bool doNotAdd)
     , name{iName}
     , checkReadyOnEveryCall{false}
     , checkReadyOnlyOnce{false}
-
     , doNotSerialize{false}
     , storeEffectOnSubMeshes{false}
     , disableDepthWrite{false}
@@ -43,6 +42,8 @@ Material::Material(const string_t& iName, Scene* scene, bool doNotAdd)
     , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _fillMode{Material::TriangleFillMode()}
 {
+  uniqueId = _scene->getUniqueId();
+
   if (_scene->useRightHandedSystem()) {
     sideOrientation = Material::ClockWiseSideOrientation();
   }

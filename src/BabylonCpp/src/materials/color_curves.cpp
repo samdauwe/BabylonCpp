@@ -12,6 +12,8 @@ ColorCurves::ColorCurves()
                     &ColorCurves::set_globalDensity}
     , globalSaturation{this, &ColorCurves::get_globalSaturation,
                        &ColorCurves::set_globalSaturation}
+    , globalExposure{this, &ColorCurves::get_globalExposure,
+                     &ColorCurves::set_globalExposure}
     , highlightsHue{this, &ColorCurves::get_highlightsHue,
                     &ColorCurves::set_highlightsHue}
     , highlightsDensity{this, &ColorCurves::get_highlightsDensity,
@@ -69,6 +71,8 @@ ColorCurves::ColorCurves(const ColorCurves& other)
                     &ColorCurves::set_globalDensity}
     , globalSaturation{this, &ColorCurves::get_globalSaturation,
                        &ColorCurves::set_globalSaturation}
+    , globalExposure{this, &ColorCurves::get_globalExposure,
+                     &ColorCurves::set_globalExposure}
     , highlightsHue{this, &ColorCurves::get_highlightsHue,
                     &ColorCurves::set_highlightsHue}
     , highlightsDensity{this, &ColorCurves::get_highlightsDensity,
@@ -126,6 +130,8 @@ ColorCurves::ColorCurves(ColorCurves&& other)
                     &ColorCurves::set_globalDensity}
     , globalSaturation{this, &ColorCurves::get_globalSaturation,
                        &ColorCurves::set_globalSaturation}
+    , globalExposure{this, &ColorCurves::get_globalExposure,
+                     &ColorCurves::set_globalExposure}
     , highlightsHue{this, &ColorCurves::get_highlightsHue,
                     &ColorCurves::set_highlightsHue}
     , highlightsDensity{this, &ColorCurves::get_highlightsDensity,
@@ -253,6 +259,17 @@ void ColorCurves::set_globalSaturation(float value)
 {
   _globalSaturation = value;
   _dirty            = true;
+}
+
+float ColorCurves::get_globalExposure() const
+{
+  return _globalExposure;
+}
+
+void ColorCurves::set_globalExposure(float value)
+{
+  _globalExposure = value;
+  _dirty          = true;
 }
 
 float ColorCurves::get_highlightsHue() const

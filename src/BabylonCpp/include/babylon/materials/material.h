@@ -637,6 +637,11 @@ public:
   string_t id;
 
   /**
+   * Gets or sets the unique id of the material
+   */
+  size_t uniqueId;
+
+  /**
    * The name of the material
    */
   string_t name;

@@ -203,6 +203,8 @@ enum GLEnums : GLenum {
   RGB32F = 0x8815,
   /* RGBA 16-bit floating-point color-renderable internal sized format */
   RGBA16F = 0x881A,
+  /* RGB 16-bit floating-point color-renderable internal sized format */
+  RGB16F = 0x881B,
   /* Uniform Buffers */
   UNIFORM_BUFFER = 0x8A11,
   /* Shaders */
@@ -421,7 +423,11 @@ enum GLEnums : GLenum {
   STENCIL_ATTACHMENT                           = 0x8D20,
   DEPTH_STENCIL_ATTACHMENT                     = 0x821A,
   RG                                           = 0x8227,
+  R8                                           = 0x8229,
+  RG8                                          = 0x822B,
+  R16F                                         = 0x822D,
   R32F                                         = 0x822E,
+  RG16F                                        = 0x822F,
   RG32F                                        = 0x8230,
   NONE                                         = 0x0000,
   FRAMEBUFFER_COMPLETE                         = 0x8CD5,

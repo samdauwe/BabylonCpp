@@ -5,16 +5,32 @@
 
 namespace BABYLON {
 
-template <class TNode>
+/**
+ * @brief Interface used to define a behavior.
+ */
+template <class T>
 struct BABYLON_SHARED_EXPORT Behavior {
-
+  /**
+   * gets or sets behavior's name
+   */
   string_t name;
 
-  virtual void init()              = 0;
-  virtual void attach(TNode* node) = 0;
-  virtual void detach()            = 0;
+  /**
+   * @brief Function called when the behavior needs to be initialized (after
+   * attaching it to a target).
+   */
+  virtual void init() = 0;
+  /**
+   * @brief Called when the behavior is attached to a target.
+   * @param target defines the target where the behavior is attached to
+   */
+  virtual void attach(T* target) = 0;
+  /**
+   * @brief Called when the behavior is detached from its target.
+   */
+  virtual void detach() = 0;
 
-}; // end of class Behavior<TNode>
+}; // end of struct Behavior<T>
 
 } // end of namespace BABYLON
 

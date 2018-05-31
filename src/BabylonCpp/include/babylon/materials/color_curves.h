@@ -157,6 +157,22 @@ protected:
   void set_globalSaturation(float value);
 
   /**
+   * @brief Gets the global Exposure value.
+   * This is an adjustment value in the range [-100,+100], where the default
+   * value of 0.0 makes no adjustment, positive values increase exposure and
+   * negative values decrease exposure.
+   */
+  float get_globalExposure() const;
+
+  /**
+   * @brief Sets the global Exposure value.
+   * This is an adjustment value in the range [-100,+100], where the default
+   * value of 0.0 makes no adjustment, positive values increase exposure and
+   * negative values decrease exposure.
+   */
+  void set_globalExposure(float value);
+
+  /**
    * @brief Gets the highlights Hue value.
    * The hue value is a standard HSB hue in the range [0,360] where 0=red,
    * 120=green and 240=blue. The default value is 30 degrees (orange).
@@ -362,6 +378,13 @@ public:
    * negative values decrease saturation.
    */
   Property<ColorCurves, float> globalSaturation;
+
+  /**
+   * This is an adjustment value in the range [-100,+100], where the default
+   * value of 0.0 makes no adjustment, positive values increase exposure and
+   * negative values decrease exposure.
+   */
+  Property<ColorCurves, float> globalExposure;
 
   /**
    * The hue value is a standard HSB hue in the range [0,360] where 0=red,

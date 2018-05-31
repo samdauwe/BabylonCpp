@@ -19,22 +19,23 @@ WebVRController* PoseEnabledControllerHelper::InitiateController(
     return new OculusTouchController(vrGamepad);
   }
   // Windows Mixed Reality controllers
-  else if (String::contains(vrGamepad->id,
-                            WindowsMotionController::GAMEPAD_ID_PREFIX)) {
+  else if (String::startsWith(vrGamepad->id,
+                              WindowsMotionController::GAMEPAD_ID_PREFIX)) {
     return new WindowsMotionController(vrGamepad);
   }
   // HTC Vive
   else if (String::contains(String::toLowerCase(vrGamepad->id), "openvr")) {
     return new ViveController(vrGamepad);
   }
-  // Samsung/Oculus Gear VR
-  else if (String::contains(vrGamepad->id,
-                            GearVRController::GAMEPAD_ID_PREFIX)) {
+  // Samsung/Oculus Gear VR or Oculus Go
+  else if (String::startsWith(vrGamepad->id,
+                              GearVRController::GAMEPAD_ID_PREFIX)
+           || String::contains(vrGamepad->id, "Oculus Go")) {
     return new GearVRController(vrGamepad);
   }
   // Google Daydream
-  else if (String::contains(vrGamepad->id,
-                            DaydreamController::GAMEPAD_ID_PREFIX)) {
+  else if (String::startsWith(vrGamepad->id,
+                              DaydreamController::GAMEPAD_ID_PREFIX)) {
     return new DaydreamController(vrGamepad);
   }
   // Generic
