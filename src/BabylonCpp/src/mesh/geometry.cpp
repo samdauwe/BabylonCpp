@@ -673,13 +673,13 @@ bool Geometry::_generatePointsArray()
     return true;
   }
 
-  _positions.clear();
-
   auto data = getVerticesData(VertexBuffer::PositionKind);
 
   if (data.empty()) {
     return false;
   }
+
+  _positions.clear();
 
   for (unsigned int index = 0; index < data.size(); index += 3) {
     _positions.emplace_back(Vector3::FromArray(data, index));

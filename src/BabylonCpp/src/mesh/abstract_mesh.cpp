@@ -609,6 +609,11 @@ AbstractMesh::enableEdgesRendering(float epsilon,
   return *this;
 }
 
+unique_ptr_t<EdgesRenderer>& AbstractMesh::edgesRenderer()
+{
+  return _edgesRenderer;
+}
+
 bool AbstractMesh::isBlocked() const
 {
   return false;
@@ -780,7 +785,9 @@ Vector3 AbstractMesh::calcRotatePOV(float flipBack, float twirlClockwise,
                  tiltRight * defForwardMult);
 }
 
-MinMax AbstractMesh::getHierarchyBoundingVectors(bool includeDescendants)
+MinMax AbstractMesh::getHierarchyBoundingVectors(
+  bool includeDescendants,
+  const ::std::function<bool(AbstractMesh* abstractMesh)>& predicate)
 {
   // Ensures that all world matrix will be recomputed.
   getScene()->incrementRenderId();
@@ -811,6 +818,11 @@ MinMax AbstractMesh::getHierarchyBoundingVectors(bool includeDescendants)
       auto childMesh = static_cast<class AbstractMesh*>(descendant);
 
       childMesh->computeWorldMatrix(true);
+
+      // Filters meshes based on custom predicate function.
+      if (predicate && !predicate(childMesh)) {
+        continue;
+      }
 
       // make sure we have the needed params to get mix and max
       if (childMesh->getTotalVertices() == 0) {

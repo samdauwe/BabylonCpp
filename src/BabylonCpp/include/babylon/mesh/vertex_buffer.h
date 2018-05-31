@@ -305,6 +305,16 @@ private:
 
 public:
   /**
+   * Hidden
+   */
+  unique_ptr_t<Buffer> _ownedBuffer;
+
+  /**
+   * Hidden
+   */
+  Buffer* _buffer;
+
+  /**
    * Instance divisor when in instanced mode
    */
   Property<VertexBuffer, unsigned int> instanceDivisor;
@@ -331,8 +341,6 @@ public:
   unsigned int type;
 
 private:
-  unique_ptr_t<Buffer> _ownedBuffer;
-  Buffer* _buffer;
   unsigned int _kind;
   size_t _size;
   bool _ownsBuffer;

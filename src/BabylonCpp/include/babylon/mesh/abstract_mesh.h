@@ -431,6 +431,11 @@ public:
                                      = false);
 
   /**
+   * @brief Gets the edgesRenderer associated with the mesh.
+   */
+  unique_ptr_t<EdgesRenderer>& edgesRenderer();
+
+  /**
    * @brief Returns true if the mesh is blocked. Implemented by child classes.
    */
   bool isBlocked() const;
@@ -655,12 +660,18 @@ public:
 
   /**
    * @brief Return the minimum and maximum world vectors of the entire hierarchy
-   * under current mesh.
+   * under current mesh
    * @param includeDescendants Include bounding info from descendants as well
    * (true by default)
+   * @param predicate defines a callback function that can be customize to
+   * filter what meshes should be included in the list used to compute the
+   * bounding vectors
    * @returns the new bounding vectors
    */
-  MinMax getHierarchyBoundingVectors(bool includeDescendants = true);
+  MinMax getHierarchyBoundingVectors(
+    bool includeDescendants = true,
+    const ::std::function<bool(AbstractMesh* abstractMesh)>& predicate
+    = nullptr);
 
   /**
    * @brief Hidden

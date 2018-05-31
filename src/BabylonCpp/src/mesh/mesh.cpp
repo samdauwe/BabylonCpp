@@ -73,9 +73,6 @@ Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
   scene = getScene();
 
   if (source) {
-    // Source mesh
-    _source = source;
-
     // Geometry
     if (source->_geometry) {
       source->_geometry->applyToMesh(this);
@@ -91,6 +88,9 @@ Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
                     ],
                     [ "_poseMatrix", "_source" ]);
 #endif
+
+    // Source mesh
+    _source = source;
 
     // Parent
     Node::set_parent(source->parent());

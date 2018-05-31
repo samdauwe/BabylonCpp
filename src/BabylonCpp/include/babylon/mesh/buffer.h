@@ -96,14 +96,18 @@ public:
 
 public:
   /**
-   * Gets the byte stride.
+   * Hidden
+   */
+  Float32Array _data;
+
+  /**
+   * Gets the byte stride
    */
   size_t byteStride;
 
 private:
   Engine* _engine;
   unique_ptr_t<GL::IGLBuffer> _buffer;
-  Float32Array _data;
   bool _updatable;
   bool _instanced;
 

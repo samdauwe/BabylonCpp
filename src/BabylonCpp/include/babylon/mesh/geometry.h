@@ -415,6 +415,13 @@ public:
   ::std::function<void(Geometry* geometry, unsigned int kind)>
     onGeometryUpdated;
 
+  /** Hidden */
+  IndicesArray _indices;
+  /** Hidden */
+  unordered_map_t<unsigned int, unique_ptr_t<VertexBuffer>> _vertexBuffers;
+  /** Hidden */
+  Uint32Array _delayInfo;
+  /** Hidden */
   Uint32Array _delayInfoKinds;
   /** Hidden */
   unique_ptr_t<BoundingInfo> _boundingInfo;
@@ -443,13 +450,9 @@ private:
   Engine* _engine;
   vector_t<Mesh*> _meshes;
   size_t _totalVertices;
-  IndicesArray _indices;
-  unordered_map_t<unsigned int, unique_ptr_t<VertexBuffer>> _vertexBuffers;
   bool _isDisposed;
   Nullable<MinMax> _extend;
   Nullable<Vector2> _boundingBias;
-  /** Hidden */
-  Uint32Array _delayInfo;
   unique_ptr_t<GL::IGLBuffer> _indexBuffer;
   bool _indexBufferIsUpdatable;
 
