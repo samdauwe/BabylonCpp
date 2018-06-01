@@ -280,6 +280,10 @@ public:
    */
   bool enablePixelPerfectMode;
   /**
+   * Force the postprocess to be applied without taking in account viewport
+   */
+  bool forceFullscreenViewport;
+  /**
    * Scale mode for the post process (default: Engine.SCALEMODE_FLOOR)
    */
   unsigned int scaleMode;

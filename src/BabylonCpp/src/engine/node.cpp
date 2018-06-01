@@ -131,6 +131,10 @@ Node& Node::addBehavior(Behavior<Node>* behavior)
   behavior->init();
   if (_scene->isLoading()) {
     // We defer the attach when the scene will be loaded
+    _scene->onDataLoadedObservable.addOnce(
+      [this, &behavior](Scene* /*scene*/, EventState /*es*/) {
+        behavior->attach(this);
+      });
   }
   else {
     behavior->attach(this);

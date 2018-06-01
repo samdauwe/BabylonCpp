@@ -28,6 +28,7 @@ PostProcess::PostProcess(
     , autoClear{true}
     , alphaMode{EngineConstants::ALPHA_DISABLE}
     , enablePixelPerfectMode{false}
+    , forceFullscreenViewport{true}
     , scaleMode{EngineConstants::SCALEMODE_FLOOR}
     , alwaysForcePOT{false}
     , samples{1}
@@ -334,11 +335,13 @@ InternalTexture* PostProcess::activate(Camera* camera,
     _scaleRatio.copyFromFloats(
       static_cast<float>(requiredWidth) / static_cast<float>(desiredWidth),
       static_cast<float>(requiredHeight) / static_cast<float>(desiredHeight));
-    _engine->bindFramebuffer(target, 0u, requiredWidth, requiredHeight, true);
+    _engine->bindFramebuffer(target, 0u, requiredWidth, requiredHeight,
+                             forceFullscreenViewport);
   }
   else {
     _scaleRatio.copyFromFloats(1.f, 1.f);
-    _engine->bindFramebuffer(target, 0u, nullptr, nullptr, true);
+    _engine->bindFramebuffer(target, 0u, nullptr, nullptr,
+                             forceFullscreenViewport);
   }
 
   onActivateObservable.notifyObservers(camera);
