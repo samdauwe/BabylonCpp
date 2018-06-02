@@ -40,7 +40,7 @@ public:
   bool _restoreStateValues() override;
 
   // Synchronized
-  bool _isSynchronizedViewMatrix();
+  bool _isSynchronizedViewMatrix() override;
 
   // Methods
   void attachControl(ICanvas* canvas, bool noPreventDefault = false,

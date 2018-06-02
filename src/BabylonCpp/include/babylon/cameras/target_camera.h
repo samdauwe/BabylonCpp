@@ -38,7 +38,7 @@ public:
   void _updateCache(bool ignoreParentClass) override;
 
   /** Synchronized **/
-  bool _isSynchronizedProjectionMatrix();
+  bool _isSynchronizedViewMatrix() override;
 
   /** Methods **/
   float _computeLocalCameraSpeed();

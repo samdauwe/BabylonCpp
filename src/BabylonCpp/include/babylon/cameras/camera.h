@@ -141,7 +141,7 @@ public:
 
   /** Synchronized **/
   bool _isSynchronized() override;
-  bool _isSynchronizedViewMatrix();
+  virtual bool _isSynchronizedViewMatrix();
   bool _isSynchronizedProjectionMatrix();
 
   /** Controls **/

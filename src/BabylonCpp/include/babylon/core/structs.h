@@ -261,7 +261,7 @@ struct NodeCache {
   Vector3 position;
   Vector3 scaling;
   bool pivotMatrixUpdated;
-  Quaternion rotationQuaternion;
+  Quaternion rotationQuaternion = Quaternion::Zero();
   bool localMatrixUpdated;
   Vector3 rotation;
   Vector3 upVector;

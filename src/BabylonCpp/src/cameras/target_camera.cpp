@@ -130,7 +130,7 @@ void TargetCamera::_updateCache(bool ignoreParentClass)
 }
 
 /** Synchronized **/
-bool TargetCamera::_isSynchronizedProjectionMatrix()
+bool TargetCamera::_isSynchronizedViewMatrix()
 {
   if (!Camera::_isSynchronizedViewMatrix()) {
     return false;

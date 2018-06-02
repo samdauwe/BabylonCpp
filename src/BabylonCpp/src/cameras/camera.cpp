@@ -369,7 +369,7 @@ Matrix& Camera::getViewMatrix(bool force)
     return _computedViewMatrix;
   }
 
-  _updateCache();
+  updateCache();
   _computedViewMatrix = _getViewMatrix();
   _currentRenderId    = getScene()->getRenderId();
   _childRenderId      = _currentRenderId;
