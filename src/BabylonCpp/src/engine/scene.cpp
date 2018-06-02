@@ -1976,8 +1976,9 @@ void Scene::setTransformMatrix(Matrix& view, Matrix& projection)
   _viewMatrix.multiplyToRef(_projectionMatrix, _transformMatrix);
 
   // Update frustum
-  if (_frustumPlanes.empty()) {
-    _frustumPlanes = Frustum::GetPlanes(_transformMatrix);
+  if (!_frustumPlanesSet) {
+    _frustumPlanes    = Frustum::GetPlanes(_transformMatrix);
+    _frustumPlanesSet = true;
   }
   else {
     Frustum::GetPlanesToRef(_transformMatrix, _frustumPlanes);
@@ -3019,7 +3020,7 @@ Scene& Scene::freezeActiveMeshes()
     return *this;
   }
 
-  if (_frustumPlanes.empty()) {
+  if (!_frustumPlanesSet) {
     setTransformMatrix(activeCamera->getViewMatrix(),
                        activeCamera->getProjectionMatrix());
   }

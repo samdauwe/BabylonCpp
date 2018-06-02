@@ -799,7 +799,12 @@ bool Effect::_cacheMatrix(const string_t& uniformName, const Matrix& matrix)
     return false;
   }
 
-  _valueCache[uniformName].emplace_back(static_cast<float>(flag));
+  if (_valueCache[uniformName].empty()) {
+    _valueCache[uniformName].emplace_back(static_cast<float>(flag));
+  }
+  else {
+    _valueCache[uniformName][0] = static_cast<float>(flag);
+  }
 
   return true;
 }
