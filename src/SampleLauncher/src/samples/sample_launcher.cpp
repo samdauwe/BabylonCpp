@@ -75,7 +75,7 @@ SampleLauncher::SampleLauncher(const SampleLauncherOptions& options)
     , _defaultWinResY{options.size.second}
     , _showInspectorWindow{options.showInspectorWindow}
     , _inspector{nullptr}
-    , _useOpenGLES{true}
+    , _useOpenGLES{false}
 {
   _sceneWindow                 = Window();
   _sceneWindow.title           = options.title;
@@ -222,9 +222,10 @@ int SampleLauncher::initGLFW()
   }
   else {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
+    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   }
 
   // Create the scene window
