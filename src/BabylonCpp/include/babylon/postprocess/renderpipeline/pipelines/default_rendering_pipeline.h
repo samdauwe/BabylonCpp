@@ -49,17 +49,18 @@ private:
 public:
   /**
    * @brief constructor
-   * @param {string} name - The rendering pipeline name
-   * @param {BABYLON.Scene} scene - The scene linked to this pipeline
-   * @param {any} ratio - The size of the postprocesses (0.5 means that your
-   * postprocess will have a width = canvas.width 0.5 and a height =
-   * canvas.height 0.5)
+   * @param {string} name - The rendering pipeline name (default: "")
+   * @param {boolean} hdr - If high dynamic range textures should be used
+   * (default: true)
+   * @param {BABYLON.Scene} scene - The scene linked to this pipeline (default:
+   * the last created scene)
    * @param {BABYLON.Camera[]} cameras - The array of cameras that the rendering
-   * pipeline will be attached to
+   * pipeline will be attached to (default: scene.cameras)
    * @param {boolean} automaticBuild - if false, you will have to manually call
-   * prepare() to update the pipeline
+   * prepare() to update the pipeline (default: true)
    */
-  DefaultRenderingPipeline(const string_t& name, bool hdr, Scene* scene,
+  DefaultRenderingPipeline(const string_t& name = "", bool hdr = true,
+                           Scene* scene = nullptr,
                            const unordered_map_t<string_t, Camera*>& cameras
                            = {},
                            bool automaticBuild = true);
@@ -161,6 +162,13 @@ private:
    */
   void set_imageProcessingEnabled(bool enabled);
   bool get_imageProcessingEnabled() const;
+
+  /**
+   * @brief If glow layer is enabled. (Adds a glow effect to emmissive
+   * materials)
+   */
+  void set_glowLayerEnabled(bool enabled);
+  bool get_glowLayerEnabled() const;
 
   /**
    * @brief Enable or disable the chromaticAberration process from the pipeline.
@@ -277,6 +285,11 @@ public:
   Property<DefaultRenderingPipeline, bool> imageProcessingEnabled;
 
   /**
+   * If glow layer is enabled. (Adds a glow effect to emmissive materials)
+   */
+  Property<DefaultRenderingPipeline, bool> glowLayerEnabled;
+
+  /**
    * Enable or disable the chromaticAberration process from the pipeline
    */
   Property<DefaultRenderingPipeline, bool> chromaticAberrationEnabled;
@@ -292,6 +305,11 @@ private:
   BloomEffect* bloom;
   PostProcessRenderEffect* _chromaticAberrationEffect;
   PostProcessRenderEffect* _grainEffect;
+
+  /**
+   * Glow post process which adds a glow to emmisive areas of the image
+   */
+  GlowLayer* _glowLayer;
 
   Observer<ImageProcessingConfiguration>::Ptr
     _imageProcessingConfigurationObserver;

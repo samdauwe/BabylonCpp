@@ -8,6 +8,7 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas.h>
+#include <babylon/layer/glow_layer.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/postprocess/bloom_effect.h>
@@ -30,7 +31,9 @@ namespace BABYLON {
 DefaultRenderingPipeline::DefaultRenderingPipeline(
   const string_t& iName, bool hdr, Scene* scene,
   const unordered_map_t<string_t, Camera*>& cameras, bool automaticBuild)
-    : PostProcessRenderPipeline(scene->getEngine(), iName)
+    : PostProcessRenderPipeline(scene ? scene->getEngine() :
+                                        Engine::LastCreatedScene()->getEngine(),
+                                iName)
     , fxaa{nullptr}
     , imageProcessing{nullptr}
     , bloomKernel{this, &DefaultRenderingPipeline::get_bloomKernel,
@@ -62,6 +65,8 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
                                get_imageProcessingEnabled,
                              &DefaultRenderingPipeline::
                                set_imageProcessingEnabled}
+    , glowLayerEnabled{this, &DefaultRenderingPipeline::get_glowLayerEnabled,
+                       &DefaultRenderingPipeline::set_glowLayerEnabled}
     , chromaticAberrationEnabled{this,
                                  &DefaultRenderingPipeline::
                                    get_chromaticAberrationEnabled,
@@ -69,6 +74,7 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
                                    set_chromaticAberrationEnabled}
     , grainEnabled{this, &DefaultRenderingPipeline::get_grainEnabled,
                    &DefaultRenderingPipeline::set_grainEnabled}
+    , _glowLayer{nullptr}
     , _imageProcessingConfigurationObserver{nullptr}
     , _sharpenEnabled{false}
     , _bloomEnabled{false}
@@ -94,8 +100,8 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
   _originalCameras = stl_util::extract_values(_cameras);
 
   // Initialize
-  _scene           = scene;
-  const auto& caps = scene->getEngine()->getCaps();
+  _scene           = scene ? scene : Engine::LastCreatedScene();
+  const auto& caps = _scene->getEngine()->getCaps();
   _hdr             = hdr;
 
   // Misc
@@ -112,7 +118,7 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
   }
 
   // Attach
-  scene->postProcessRenderPipelineManager()->addPipeline(this);
+  _scene->postProcessRenderPipelineManager()->addPipeline(this);
 
   auto engine = _scene->getEngine();
   // Create post processes before hand so they can be modified before enabled.
@@ -361,6 +367,22 @@ bool DefaultRenderingPipeline::get_imageProcessingEnabled() const
   return _imageProcessingEnabled;
 }
 
+void DefaultRenderingPipeline::set_glowLayerEnabled(bool enabled)
+{
+  if (enabled && !_glowLayer) {
+    _glowLayer = GlowLayer::New("", _scene);
+  }
+  else if (!enabled && _glowLayer) {
+    _glowLayer->dispose();
+    _glowLayer = nullptr;
+  }
+}
+
+bool DefaultRenderingPipeline::get_glowLayerEnabled() const
+{
+  return _glowLayer == nullptr;
+}
+
 void DefaultRenderingPipeline::set_chromaticAberrationEnabled(bool enabled)
 {
   if (_chromaticAberrationEnabled == enabled) {
@@ -568,6 +590,10 @@ void DefaultRenderingPipeline::_disposePostProcesses(bool disposeNonRecreated)
       if (grain) {
         grain->dispose(camera);
       }
+
+      if (_glowLayer) {
+        _glowLayer->dispose();
+      }
     }
   }
 
@@ -583,6 +609,7 @@ void DefaultRenderingPipeline::_disposePostProcesses(bool disposeNonRecreated)
     _chromaticAberrationEffect = nullptr;
     grain                      = nullptr;
     _grainEffect               = nullptr;
+    _glowLayer                 = nullptr;
   }
 }
 
