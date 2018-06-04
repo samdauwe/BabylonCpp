@@ -19,7 +19,16 @@ public:
    */
   AnimationEvent(int frame, const ::std::function<void()>& action,
                  bool onlyOnce = false);
+  AnimationEvent(const AnimationEvent& other);
+  AnimationEvent(AnimationEvent&& other);
+  AnimationEvent& operator=(const AnimationEvent& other);
+  AnimationEvent& operator=(AnimationEvent&& other);
   ~AnimationEvent();
+
+  /**
+   * @brief Hidden
+   */
+  AnimationEvent _clone() const;
 
 public:
   /**
