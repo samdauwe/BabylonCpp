@@ -23,14 +23,13 @@ public:
   void addMouseEventListener(
     EventType type, const ::std::function<void(PointerEvent&& evt)>& listener,
     bool useCapture = false);
-  void addKeyEventListener(EventType type,
-                           const ::std::function<void(Event&& evt)>& listener,
-                           bool useCapture = false);
+  void addKeyEventListener(
+    EventType type, const ::std::function<void(KeyboardEvent&& evt)>& listener,
+    bool useCapture = false);
   void removeMouseEventListener(
     EventType type, const ::std::function<void(PointerEvent&& evt)>& listener);
-  void
-  removeKeyEventListener(EventType type,
-                         const ::std::function<void(Event&& evt)>& listener);
+  void removeKeyEventListener(
+    EventType type, const ::std::function<void(KeyboardEvent&& evt)>& listener);
 
   void setFrameSize(int width, int height);
   void onError(int errorId, const char* errorDesc);
@@ -39,8 +38,8 @@ public:
   void onMouseButtonUp(int mouseX, int mouseY, MouseButtonType btn);
   void onMouseMove(int mouseX, int mouseY);
   void onMouseWheel(float wheelDelta);
-  void onKeyDown(bool ctrlKey, int keyCode);
-  void onKeyUp(bool ctrlKey, int keyCode);
+  void onKeyDown(bool ctrlKey, bool altKey, int keyCode);
+  void onKeyUp(bool ctrlKey, bool altKey, int keyCode);
 
   void focus();
   void applicationDidEnterBackground();

@@ -1902,8 +1902,8 @@ private:
   void _onPointerMoveEvent(PointerEvent&& evt);
   void _onPointerDownEvent(PointerEvent&& evt);
   void _onPointerUpEvent(PointerEvent&& evt);
-  void _onKeyDownEvent(Event&& evt);
-  void _onKeyUpEvent(Event&& evt);
+  void _onKeyDownEvent(KeyboardEvent&& evt);
+  void _onKeyUpEvent(KeyboardEvent&& evt);
   /** Audio **/
   void _disableAudio();
   void _enableAudio();

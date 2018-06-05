@@ -48,11 +48,72 @@ static void GLFWErrorCallback(int error, const char* description)
           description);
 }
 
-static void GLFWKeyCallback(GLFWwindow* window, int key, int /*scancode*/,
-                            int action, int /*mods*/)
+static void GLFWKeyCallback(GLFWwindow* window, int key, int scancode,
+                            int action, int mods)
 {
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, GL_TRUE);
+    return;
+  }
+
+  if (_sceneWindow.glfwWindow == window && _sceneWindow.renderCanvas) {
+    // Determine modifier
+    bool ctrlKey = (mods & GLFW_MOD_CONTROL);
+    bool altKey  = (mods & GLFW_MOD_ALT);
+    // Raise event
+    if (action == GLFW_PRESS) {
+      _sceneWindow.renderCanvas->onKeyDown(ctrlKey, altKey, scancode);
+    }
+    else if (action == GLFW_RELEASE) {
+      _sceneWindow.renderCanvas->onKeyUp(ctrlKey, altKey, scancode);
+    }
+  }
+}
+
+static void GLFWCursorPositionCallback(GLFWwindow* window, double xpos,
+                                       double ypos)
+{
+  if (_sceneWindow.glfwWindow == window && _sceneWindow.renderCanvas) {
+    _sceneWindow.renderCanvas->onMouseMove(static_cast<int>(xpos),
+                                           static_cast<int>(ypos));
+  }
+}
+
+static void GLFWMouseButtonCallback(GLFWwindow* window, int button, int action,
+                                    int /*mods*/)
+{
+  if (_sceneWindow.glfwWindow == window && _sceneWindow.renderCanvas) {
+    // Determine mouse button type
+    MouseButtonType buttonType{MouseButtonType::UNDEFINED};
+    if (button == GLFW_MOUSE_BUTTON_LEFT) {
+      buttonType = MouseButtonType::LEFT;
+    }
+    else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
+      buttonType = MouseButtonType::MIDDLE;
+    }
+    else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+      buttonType = MouseButtonType::RIGHT;
+    }
+    // Get cursor position
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    // Raise event
+    if (action == GLFW_PRESS) {
+      _sceneWindow.renderCanvas->onMouseButtonDown(
+        static_cast<int>(xpos), static_cast<int>(ypos), buttonType);
+    }
+    else if (action == GLFW_RELEASE) {
+      _sceneWindow.renderCanvas->onMouseButtonUp(
+        static_cast<int>(xpos), static_cast<int>(ypos), buttonType);
+    }
+  }
+}
+
+static void GLFWScrollCallback(GLFWwindow* window, double /*xoffset*/,
+                               double yoffset)
+{
+  if (_sceneWindow.glfwWindow == window && _sceneWindow.renderCanvas) {
+    _sceneWindow.renderCanvas->onMouseWheel(static_cast<float>(yoffset));
   }
 }
 
@@ -294,8 +355,16 @@ void SampleLauncher::CreateWindow(Window& window, int width, int height,
   // Enable vsync
   glfwSwapInterval(1);
 
-  // Setup callbacks
+  // -- Setup callbacks --
+  // Key input events
   glfwSetKeyCallback(window.glfwWindow, GLFWKeyCallback);
+  // Cursor position
+  glfwSetCursorPosCallback(window.glfwWindow, GLFWCursorPositionCallback);
+  // Mouse button input
+  glfwSetMouseButtonCallback(window.glfwWindow, GLFWMouseButtonCallback);
+  // Scroll input
+  glfwSetScrollCallback(window.glfwWindow, GLFWScrollCallback);
+  // Window resize events
   glfwSetWindowSizeCallback(window.glfwWindow, GLFWWindowSizeCallback);
 
   // Change the state of the window to intialized

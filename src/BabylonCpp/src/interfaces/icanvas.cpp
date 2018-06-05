@@ -1,6 +1,7 @@
 #include <babylon/interfaces/icanvas.h>
 
 #include <babylon/core/logging.h>
+#include <iostream>
 
 namespace BABYLON {
 
@@ -37,7 +38,8 @@ void ICanvas::addMouseEventListener(
 }
 
 void ICanvas::addKeyEventListener(
-  EventType /*type*/, const ::std::function<void(Event&& evt)>& /*listener*/,
+  EventType /*type*/,
+  const ::std::function<void(KeyboardEvent&& evt)>& /*listener*/,
   bool /*useCapture*/)
 {
 #if 0
@@ -61,7 +63,8 @@ void ICanvas::removeMouseEventListener(
 }
 
 void ICanvas::removeKeyEventListener(
-  EventType /*type*/, const ::std::function<void(Event&& evt)>& /*listener*/)
+  EventType /*type*/,
+  const ::std::function<void(KeyboardEvent&& evt)>& /*listener*/)
 {
 #if 0
   auto& listeners = keyEventListeners[static_cast<unsigned>(type)];
@@ -92,10 +95,8 @@ void ICanvas::onError(int errorId, const char* errorDesc)
                      errorId, errorDesc);
 }
 
-void ICanvas::onMouseButtonDown(int /*iMouseX*/, int /*iMouseY*/,
-                                MouseButtonType /*btn*/)
+void ICanvas::onMouseButtonDown(int iMouseX, int iMouseY, MouseButtonType btn)
 {
-#if 0
   const unsigned int type = static_cast<unsigned>(EventType::MOUSE_BUTTON_DOWN);
   for (auto& listener : mouseEventListeners[type]) {
     PointerEvent evt;
@@ -105,13 +106,10 @@ void ICanvas::onMouseButtonDown(int /*iMouseX*/, int /*iMouseY*/,
     evt.button  = btn;
     listener(::std::move(evt));
   }
-#endif
 }
 
-void ICanvas::onMouseButtonUp(int /*iMouseX*/, int /*iMouseY*/,
-                              MouseButtonType /*btn*/)
+void ICanvas::onMouseButtonUp(int iMouseX, int iMouseY, MouseButtonType btn)
 {
-#if 0
   const unsigned int type = static_cast<unsigned>(EventType::MOUSE_BUTTON_UP);
   for (auto& listener : mouseEventListeners[type]) {
     PointerEvent evt;
@@ -121,12 +119,10 @@ void ICanvas::onMouseButtonUp(int /*iMouseX*/, int /*iMouseY*/,
     evt.button  = btn;
     listener(::std::move(evt));
   }
-#endif
 }
 
-void ICanvas::onMouseMove(int /*iMouseX*/, int /*iMouseY*/)
+void ICanvas::onMouseMove(int iMouseX, int iMouseY)
 {
-#if 0
   const unsigned int type = static_cast<unsigned>(EventType::MOUSE_MOVE);
   for (auto& listener : mouseEventListeners[type]) {
     PointerEvent evt;
@@ -135,41 +131,34 @@ void ICanvas::onMouseMove(int /*iMouseX*/, int /*iMouseY*/)
     evt.type    = EventType::MOUSE_MOVE;
     listener(::std::move(evt));
   }
-#endif
 }
 
 void ICanvas::onMouseWheel(float /*wheelDelta*/)
 {
-#if 0
   const unsigned int type = static_cast<unsigned>(EventType::MOUSE_WHEEL);
   for (auto& listener : mouseEventListeners[type]) {
     PointerEvent evt;
     evt.type = EventType::MOUSE_WHEEL;
     listener(::std::move(evt));
   }
-#endif
 }
 
-void ICanvas::onKeyDown(bool /*ctrlKey*/, int /*keyCode*/)
+void ICanvas::onKeyDown(bool /*ctrlKey*/, bool /*altKey*/, int /*keyCode*/)
 {
-#if 0
   const unsigned int type = static_cast<unsigned>(EventType::KEY_DOWN);
   for (auto& listener : keyEventListeners[type]) {
     Event evt;
     listener(::std::move(evt));
   }
-#endif
 }
 
-void ICanvas::onKeyUp(bool /*ctrlKey*/, int /*keyCode*/)
+void ICanvas::onKeyUp(bool /*ctrlKey*/, bool /*altKey*/, int /*keyCode*/)
 {
-#if 0
   const unsigned int type = static_cast<unsigned>(EventType::KEY_UP);
   for (auto& listener : keyEventListeners[type]) {
     Event evt;
     listener(::std::move(evt));
   }
-#endif
 }
 
 void ICanvas::focus()

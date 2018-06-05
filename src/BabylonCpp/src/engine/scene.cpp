@@ -24,6 +24,8 @@
 #include <babylon/engine/click_info.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/iactive_mesh_candidate_provider.h>
+#include <babylon/events/keyboard_event_types.h>
+#include <babylon/events/keyboard_info_pre.h>
 #include <babylon/events/pointer_event_types.h>
 #include <babylon/gamepad/gamepad_manager.h>
 #include <babylon/helpers/environment_helper.h>
@@ -1048,13 +1050,20 @@ void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
   _onPointerUp
     = [this](PointerEvent&& evt) { _onPointerUpEvent(::std::move(evt)); };
 
-  // _onKeyDown
-  // = [this](KeyboardEvent&& evt) { _onKeyDownEvent(::std::move(evt)); };
+  _onKeyDown
+    = [this](KeyboardEvent&& evt) { _onKeyDownEvent(::std::move(evt)); };
 
-  // _onKeyUp = [this](KeyboardEvent&& evt) { _onKeyUpEvent(::std::move(evt));
-  // };
+  _onKeyUp = [this](KeyboardEvent&& evt) { _onKeyUpEvent(::std::move(evt)); };
 
   auto canvas = _engine->getRenderingCanvas();
+
+  if (!canvas) {
+    return;
+  }
+
+  canvas->addKeyEventListener(EventType::KEY_DOWN, _onKeyDown, false);
+  canvas->addKeyEventListener(EventType::KEY_UP, _onKeyUp, false);
+
   if (attachMove) {
     canvas->addMouseEventListener(EventType::MOUSE_MOVE, _onPointerMove, false);
     // Wheel
@@ -1073,9 +1082,6 @@ void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
   }
 
   canvas->tabIndex = 1;
-
-  // canvas->addKeyEventListener(EventType::KEY_DOWN, _onKeyDown, false);
-  // canvas->addKeyEventListener(EventType::KEY_UP, _onKeyUp, false);
 }
 
 void Scene::detachControl()
@@ -1105,8 +1111,8 @@ void Scene::detachControl()
   canvas->removeMouseEventListener(EventType::DOM_MOUSE_SCROLL, _onPointerMove);
 
   // Keyboard
-  // canvas->removeKeyEventListener(EventType::KEY_DOWN, _onKeyDown);
-  // canvas->removeKeyEventListener(EventType::KEY_UP, _onKeyUp);
+  canvas->removeKeyEventListener(EventType::KEY_DOWN, _onKeyDown);
+  canvas->removeKeyEventListener(EventType::KEY_UP, _onKeyUp);
 
   // Observables
   onKeyboardObservable.clear();
@@ -1460,19 +1466,47 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
   }
 }
 
-void Scene::_onKeyDownEvent(Event&& evt)
+void Scene::_onKeyDownEvent(KeyboardEvent&& evt)
 {
+  auto type = KeyboardEventTypes::KEYDOWN;
+  if (onPreKeyboardObservable.hasObservers()) {
+    KeyboardInfoPre pi(type, evt);
+    onPreKeyboardObservable.notifyObservers(&pi, static_cast<int>(type));
+    if (pi.skipOnPointerObservable) {
+      return;
+    }
+  }
+
+  if (onKeyboardObservable.hasObservers()) {
+    KeyboardInfo pi(type, evt);
+    onKeyboardObservable.notifyObservers(&pi, static_cast<int>(type));
+  }
+
   if (actionManager) {
-    actionManager->processTrigger(ActionManager::OnKeyDownTrigger(),
-                                  ActionEvent::CreateNewFromScene(this, evt));
+    // actionManager->processTrigger(ActionManager::OnKeyDownTrigger,
+    //                              ActionEvent::CreateNewFromScene(this, evt));
   }
 }
 
-void Scene::_onKeyUpEvent(Event&& evt)
+void Scene::_onKeyUpEvent(KeyboardEvent&& evt)
 {
+  auto type = KeyboardEventTypes::KEYUP;
+  if (onPreKeyboardObservable.hasObservers()) {
+    KeyboardInfoPre pi(type, evt);
+    onPreKeyboardObservable.notifyObservers(&pi, static_cast<int>(type));
+    if (pi.skipOnPointerObservable) {
+      return;
+    }
+  }
+
+  if (onKeyboardObservable.hasObservers()) {
+    KeyboardInfo pi(type, evt);
+    onKeyboardObservable.notifyObservers(&pi, static_cast<int>(type));
+  }
+
   if (actionManager) {
-    actionManager->processTrigger(ActionManager::OnKeyUpTrigger(),
-                                  ActionEvent::CreateNewFromScene(this, evt));
+    // actionManager->processTrigger(ActionManager::OnKeyUpTrigger,
+    //                              ActionEvent::CreateNewFromScene(this, evt));
   }
 }
 
