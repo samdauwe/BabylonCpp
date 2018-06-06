@@ -143,8 +143,8 @@ struct DragStartOrEndEvent {
 }; // end of struct DragStartOrEndEvent
 
 struct Event {
-  char* charCode;
-  char* keyCode;
+  int charCode;
+  int keyCode;
 }; // end of struct Event
 
 struct Exception {
@@ -202,10 +202,9 @@ struct Image {
   unsigned int mode;
 }; // end of struct Image
 
-struct KeyboardEvent {
+struct KeyboardEvent : public Event {
   bool ctrlKey;
   bool altKey;
-  int keyCode;
   void preventDefault() const
   {
   }

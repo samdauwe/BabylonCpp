@@ -75,12 +75,19 @@ public:
                          const Event& evt, const string_t& additionalData = "");
 
 public:
+  /** The mesh that triggered the action */
   AbstractMesh* source;
+  /** The sprite that triggered the action */
   Sprite* sprite;
+  /** The X mouse cursor position at the time of the event */
   int pointerX;
+  /** The Y mouse cursor position at the time of the event */
   int pointerY;
+  /** The mesh that is currently pointed at (can be null) */
   AbstractMesh* meshUnderPointer;
+  /** The original (browser) event that triggered the ActionEvent */
   Nullable<Event> sourceEvent;
+  /** Additional data for the event */
   string_t additionalData;
 
 }; // end of class ActionEvent

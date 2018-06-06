@@ -183,16 +183,20 @@ void ActionManager::processTrigger(unsigned int trigger,
           || trigger == ActionManager::OnKeyDownTrigger()) {
         const auto parameter   = action->getTriggerParameter();
         const auto sourceEvent = *evt.sourceEvent;
-        if (!parameter.empty() && parameter != sourceEvent.keyCode) {
+        if (!parameter.empty()
+            && parameter
+                 != ::std::to_string(static_cast<char>(sourceEvent.keyCode))) {
           auto lowerCase = String::toLowerCase(parameter);
           if (lowerCase.empty()) {
             continue;
           }
 
-          if (lowerCase != sourceEvent.keyCode) {
+          if (lowerCase
+              != ::std::to_string(static_cast<char>(sourceEvent.keyCode))) {
             auto unicode = sourceEvent.charCode ? sourceEvent.charCode :
                                                   sourceEvent.keyCode;
-            auto actualkey = String::toLowerCase(string_t(unicode));
+            auto actualkey = String::toLowerCase(
+              ::std::to_string(static_cast<char>(unicode)));
             if (actualkey != lowerCase) {
               continue;
             }

@@ -1879,6 +1879,9 @@ private:
   void _createAlternateUbo();
   Scene& _processPointerMove(const PickingInfo* pickResult,
                              const PointerEvent& evt);
+  bool _checkPrePointerObservable(const PickingInfo* pickResult,
+                                  const PointerEvent& evt,
+                                  PointerEventTypes type);
   Scene& _processPointerDown(const PickingInfo* pickResult,
                              const PointerEvent& evt);
   Scene& _processPointerUp(const PickingInfo* pickResult,
@@ -2668,9 +2671,9 @@ private:
   // Click events
   ::std::function<void(
     Observable<PointerInfoPre>& obs1, Observable<PointerInfo>& obs2,
-    PointerEvent&& evt,
+    const PointerEvent& evt,
     const ::std::function<void(const ClickInfo& clickInfo,
-                               const PointerInfo& pickResult)>& cb)>
+                               Nullable<PickingInfo>& pickResult)>& cb)>
     _initClickEvent;
   ::std::function<ActionManager*(ActionManager* act,
                                  const ClickInfo& clickInfo)>
@@ -2685,9 +2688,9 @@ private:
   bool _meshPickProceed;
   bool _previousButtonPressed;
   bool _previousHasSwiped;
-  unique_ptr_t<PickingInfo> _currentPickResult;
-  unique_ptr_t<PickingInfo> _previousPickResult;
-  bool _totalPointersPressed;
+  Nullable<PickingInfo> _currentPickResult;
+  Nullable<PickingInfo> _previousPickResult;
+  int _totalPointersPressed;
   bool _doubleClickOccured;
   int _pointerX;
   int _pointerY;
