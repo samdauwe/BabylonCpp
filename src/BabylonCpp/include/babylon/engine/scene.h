@@ -2686,7 +2686,7 @@ private:
   milliseconds_t _delayedSimpleClickTimeout;
   milliseconds_t _previousDelayedSimpleClickTimeout;
   bool _meshPickProceed;
-  bool _previousButtonPressed;
+  MouseButtonType _previousButtonPressed;
   bool _previousHasSwiped;
   Nullable<PickingInfo> _currentPickResult;
   Nullable<PickingInfo> _previousPickResult;

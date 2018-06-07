@@ -1076,6 +1076,161 @@ void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
     return act;
   };
 
+  _initClickEvent =
+    [this](Observable<PointerInfoPre>& obs1, Observable<PointerInfo>& obs2,
+           const PointerEvent& evt,
+           const ::std::function<void(const ClickInfo& clickInfo,
+                                      Nullable<PickingInfo>& pickResult)>& cb) {
+      ClickInfo clickInfo;
+      _currentPickResult = nullptr;
+      ActionManager* act = nullptr;
+
+      auto checkPicking
+        = obs1.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERPICK))
+          || obs2.hasSpecificMask(
+               static_cast<int>(PointerEventTypes::POINTERPICK))
+          || obs1.hasSpecificMask(
+               static_cast<int>(PointerEventTypes::POINTERTAP))
+          || obs2.hasSpecificMask(
+               static_cast<int>(PointerEventTypes::POINTERTAP))
+          || obs1.hasSpecificMask(
+               static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
+          || obs2.hasSpecificMask(
+               static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
+      if (!checkPicking && ActionManager::HasPickTriggers()) {
+        act = _initActionManager(act, clickInfo);
+        if (act) {
+          checkPicking = act->hasPickTriggers();
+        }
+      }
+      if (checkPicking) {
+        auto btn = evt.button;
+        clickInfo.hasSwiped
+          = ::std::abs(_startingPointerPosition.x - _pointerX)
+              > Scene::DragMovementThreshold
+            || ::std::abs(_startingPointerPosition.y - _pointerY)
+                 > Scene::DragMovementThreshold;
+
+        if (!clickInfo.hasSwiped) {
+          auto checkSingleClickImmediately = !Scene::ExclusiveDoubleClickMode;
+
+          if (!checkSingleClickImmediately) {
+            checkSingleClickImmediately
+              = !obs1.hasSpecificMask(
+                  static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
+                && !obs2.hasSpecificMask(
+                     static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
+
+            if (checkSingleClickImmediately
+                && !ActionManager::HasSpecificTrigger(
+                     ActionManager::OnDoublePickTrigger())) {
+              act = _initActionManager(act, clickInfo);
+              if (act) {
+                checkSingleClickImmediately = !act->hasSpecificTrigger(
+                  ActionManager::OnDoublePickTrigger());
+              }
+            }
+          }
+
+          if (checkSingleClickImmediately) {
+            // single click detected if double click delay is over or two
+            // different successive keys pressed without exclusive double click
+            // or no double click required
+            if (Time::fpTimeSince<long, ::std::milli>(
+                  _previousStartingPointerTime)
+                  > Scene::DoubleClickDelay.count()
+                || btn != _previousButtonPressed) {
+              clickInfo.singleClick = true;
+
+              cb(clickInfo, _currentPickResult);
+            }
+          }
+          // at least one double click is required to be check and exclusive
+          // double click is enabled
+          else {
+            // wait that no double click has been raised during the double click
+            // delay
+            _previousDelayedSimpleClickTimeout = _delayedSimpleClickTimeout;
+          }
+
+          auto checkDoubleClick
+            = obs1.hasSpecificMask(
+                static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
+              || obs2.hasSpecificMask(
+                   static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
+          if (!checkDoubleClick
+              && ActionManager::HasSpecificTrigger(
+                   ActionManager::OnDoublePickTrigger())) {
+            act = _initActionManager(act, clickInfo);
+            if (act) {
+              checkDoubleClick
+                = act->hasSpecificTrigger(ActionManager::OnDoublePickTrigger());
+            }
+          }
+          if (checkDoubleClick) {
+            // two successive keys pressed are equal, double click delay is not
+            // over and double click has not just occurred
+            if (btn == _previousButtonPressed
+                && Time::fpTimeSince<long, ::std::milli>(
+                     _previousStartingPointerTime)
+                     < Scene::DoubleClickDelay.count()
+                && !_doubleClickOccured) {
+              // pointer has not moved for 2 clicks, it's a double click
+              if (!clickInfo.hasSwiped
+                  && ::std::abs(_previousStartingPointerPosition.x
+                                - _startingPointerPosition.x)
+                       < Scene::DragMovementThreshold
+                  && ::std::abs(_previousStartingPointerPosition.y
+                                - _startingPointerPosition.y)
+                       < Scene::DragMovementThreshold) {
+                _previousStartingPointerTime = high_res_time_point_t();
+                _doubleClickOccured          = true;
+                clickInfo.doubleClick        = true;
+                clickInfo.ignore             = false;
+                if (Scene::ExclusiveDoubleClickMode
+                    && _previousDelayedSimpleClickTimeout.count() > 0) {
+                  // clearTimeout(_previousDelayedSimpleClickTimeout);
+                }
+                _previousDelayedSimpleClickTimeout = _delayedSimpleClickTimeout;
+                cb(clickInfo, _currentPickResult);
+              }
+              // if the two successive clicks are too far, it's just two simple
+              // clicks
+              else {
+                _doubleClickOccured                = false;
+                _previousStartingPointerTime       = _startingPointerTime;
+                _previousStartingPointerPosition.x = _startingPointerPosition.x;
+                _previousStartingPointerPosition.y = _startingPointerPosition.y;
+                _previousButtonPressed             = btn;
+                if (Scene::ExclusiveDoubleClickMode) {
+                  if (_previousDelayedSimpleClickTimeout.count() > 0) {
+                    // clearTimeout(_previousDelayedSimpleClickTimeout);
+                  }
+                  _previousDelayedSimpleClickTimeout
+                    = _delayedSimpleClickTimeout;
+
+                  cb(clickInfo, _previousPickResult);
+                }
+                else {
+                  cb(clickInfo, _currentPickResult);
+                }
+              }
+            }
+            // just the first click of the double has been raised
+            else {
+              _doubleClickOccured                = false;
+              _previousStartingPointerTime       = _startingPointerTime;
+              _previousStartingPointerPosition.x = _startingPointerPosition.x;
+              _previousStartingPointerPosition.y = _startingPointerPosition.y;
+              _previousButtonPressed             = btn;
+            }
+          }
+        }
+      }
+      clickInfo.ignore = true;
+      cb(clickInfo, _currentPickResult);
+    };
+
   spritePredicate = [](Sprite* sprite) {
     return sprite->isPickable && sprite->actionManager
            && sprite->actionManager->hasPointerTriggers();
