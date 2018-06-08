@@ -197,6 +197,15 @@ void Animatable::restart()
   _paused = false;
 }
 
+void Animatable::_raiseOnAnimationEnd()
+{
+  if (onAnimationEnd) {
+    onAnimationEnd();
+  }
+
+  onAnimationEndObservable.notifyObservers(this);
+}
+
 void Animatable::stop(const string_t& animationName)
 {
   if (!animationName.empty()) {
@@ -211,9 +220,7 @@ void Animatable::stop(const string_t& animationName)
       }
       if (_runtimeAnimations.empty()) {
         stl_util::splice(_scene->_activeAnimatables, idx, 1);
-        if (onAnimationEnd) {
-          onAnimationEnd();
-        }
+        _raiseOnAnimationEnd();
       }
     }
   }
@@ -224,9 +231,7 @@ void Animatable::stop(const string_t& animationName)
       for (auto& runtimeAnimation : _runtimeAnimations) {
         runtimeAnimation->dispose();
       }
-      if (onAnimationEnd) {
-        onAnimationEnd();
-      }
+      _raiseOnAnimationEnd();
     }
   }
 }
@@ -279,11 +284,10 @@ bool Animatable::_animate(const millisecond_t& delay)
     for (auto& runtimeAnimation : _runtimeAnimations) {
       runtimeAnimation->dispose();
     }
-  }
 
-  if (!running && onAnimationEnd) {
-    onAnimationEnd();
+    _raiseOnAnimationEnd();
     onAnimationEnd = nullptr;
+    onAnimationEndObservable.clear();
   }
 
   return running;

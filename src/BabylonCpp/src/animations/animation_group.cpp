@@ -146,12 +146,15 @@ AnimationGroup& AnimationGroup::start(bool loop, float speedRatio,
   }
 
   for (auto& targetedAnimation : _targetedAnimations) {
-    _animatables.emplace_back(_scene->beginDirectAnimation(
+    auto animatable = _scene->beginDirectAnimation(
       targetedAnimation->target, {targetedAnimation->animation},
-      !from.isNull() ? *from : _from, !to.isNull() ? *to : _to, loop,
-      speedRatio, [this, &targetedAnimation]() {
-        onAnimationEndObservable.notifyObservers(targetedAnimation.get());
-      }));
+      from.hasValue() ? *from : _from, to.hasValue() ? *to : _to, loop,
+      speedRatio);
+    animatable->onAnimationEnd = [&]() {
+      onAnimationEndObservable.notifyObservers(targetedAnimation.get());
+      _checkAnimationGroupEnded(animatable);
+    };
+    _animatables.emplace_back(animatable);
   }
 
   _speedRatio = speedRatio;
@@ -176,13 +179,15 @@ AnimationGroup& AnimationGroup::pause()
 
 AnimationGroup& AnimationGroup::play(bool loop)
 {
-  if (isStarted()) {
+  // only if all animatables are ready and exist
+  if (isStarted() && _animatables.size() == _targetedAnimations.size()) {
     for (auto& animatable : _animatables) {
       animatable->loopAnimation = loop;
     }
     restart();
   }
   else {
+    stop();
     start(loop, _speedRatio);
   }
 
@@ -278,6 +283,20 @@ void AnimationGroup::dispose(bool /*doNotRecurse*/,
         return animationGroup.get() == this;
       }),
     _scene->animationGroups.end());
+}
+
+void AnimationGroup::_checkAnimationGroupEnded(Animatable* animatable)
+{
+  // animatable should be taken out of the array
+  _animatables.erase(
+    ::std::remove(_animatables.begin(), _animatables.end(), animatable),
+    _animatables.end());
+
+  // all animatables were removed? animation group ended!
+  if (_animatables.empty()) {
+    _isStarted = false;
+    onAnimationGroupEndObservable.notifyObservers(this);
+  }
 }
 
 } // end of namespace BABYLON

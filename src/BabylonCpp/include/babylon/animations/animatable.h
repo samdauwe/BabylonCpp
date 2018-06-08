@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/core/nullable.h>
+#include <babylon/tools/observable.h>
 
 namespace BABYLON {
 
@@ -40,6 +41,10 @@ public:
   void pause();
   void restart();
   void stop(const string_t& animationName = "");
+
+  /**
+   * @brief Hidden
+   */
   bool _animate(const millisecond_t& delay);
 
 private:
@@ -75,6 +80,8 @@ private:
    */
   void set_speedRatio(float value);
 
+  void _raiseOnAnimationEnd();
+
 public:
   IAnimatable* target;
   bool animationStarted;
@@ -82,6 +89,11 @@ public:
   int toFrame;
   bool loopAnimation;
   ::std::function<void()> onAnimationEnd;
+
+  /**
+   * Observer raised when the animation ends
+   */
+  Observable<Animatable> onAnimationEndObservable;
 
   /**
    * Root Animatable used to synchronize and normalize animations

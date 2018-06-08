@@ -159,9 +159,16 @@ private:
    */
   vector_t<Animatable*>& get_animatables();
 
+  void _checkAnimationGroupEnded(Animatable* animatable);
+
 public:
   string_t name;
   Observable<TargetedAnimation> onAnimationEndObservable;
+
+  /**
+   * This observable will notify when all animations have ended.
+   */
+  Observable<AnimationGroup> onAnimationGroupEndObservable;
 
   /**
    * Gets the first frame

@@ -157,6 +157,8 @@ public:
   ReadOnlyProperty<RuntimeAnimation, IAnimatable*> target;
 
 private:
+  vector_t<AnimationEvent> _events;
+
   /**
    * The current frame of the runtime animation
    */

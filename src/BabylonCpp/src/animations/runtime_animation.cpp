@@ -1,5 +1,6 @@
 #include <babylon/animations/runtime_animation.h>
 
+#include <babylon/animations/animatable.h>
 #include <babylon/animations/animation.h>
 #include <babylon/animations/easing/ieasing_function.h>
 #include <babylon/animations/ianimatable.h>
@@ -28,6 +29,14 @@ RuntimeAnimation::RuntimeAnimation(IAnimatable* target, Animation* animation,
     , _previousRatio{0.f}
 {
   animation->_runtimeAnimations.emplace_back(this);
+
+  // Cloning events locally
+  const auto& events = animation->getEvents();
+  if (!events.empty()) {
+    for (const auto& e : events) {
+      _events.emplace_back(e);
+    }
+  }
 }
 
 RuntimeAnimation::~RuntimeAnimation()
@@ -77,6 +86,11 @@ void RuntimeAnimation::reset(bool restoreOriginal)
   _currentFrame   = 0;
   _blendingFactor = 0;
   _originalValue.clear();
+
+  // Events
+  for (auto& event : _events) {
+    event.isDone = false;
+  }
 }
 
 bool RuntimeAnimation::isStopped() const
@@ -206,7 +220,8 @@ bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
   _previousDelay = delay;
   _previousRatio = ratio;
 
-  if (((to > from && ratio > range) || (from > to && ratio < range)) && !loop) {
+  if (((to > from && ratio >= range) || (from > to && ratio <= range))
+      && !loop) {
     // If we are out of range and not looping get back to caller
     returnValue = false;
     // @TODO FIXME
@@ -293,14 +308,36 @@ bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
   auto repeatCount = static_cast<int>(ratio / range);
   auto _currentFrame
     = returnValue ? from + static_cast<int>(ratio) % range : to;
+
+  // Need to normalize?
+  if (_host && _host->syncRoot) {
+    auto syncRoot            = _host->syncRoot();
+    auto hostNormalizedFrame = (syncRoot->masterFrame - syncRoot->fromFrame)
+                               / (syncRoot->toFrame - syncRoot->fromFrame);
+    _currentFrame = from + (to - from) * hostNormalizedFrame;
+  }
+
+  // Reset events if looping
+  auto& events = _events;
+  if ((range > 0 && currentFrame > currentFrame)
+      || (range < 0 && currentFrame < currentFrame)) {
+    // Need to reset animation events
+    for (auto& event : events) {
+      if (!event.onlyOnce) {
+        // reset event, the animation is looping
+        event.isDone = false;
+      }
+    }
+  }
+
   auto currentValue
-    = _interpolate(_currentFrame, repeatCount, _animation->loopMode,
+    = _interpolate(currentFrame, repeatCount, _getCorrectLoopMode(),
                    offsetValue, highLimitValue);
 
   // Set value
   setValue(currentValue);
+
   // Check events
-  auto& events = _animation->getEvents();
   for (unsigned int index = 0; index < events.size(); ++index) {
     // Make sure current frame has passed event frame and that event frame is
     // within the current range
@@ -319,10 +356,6 @@ bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
         event.isDone = true;
         event.action();
       } // Don't do anything if the event has already be done.
-    }
-    else if (events[index].isDone && !events[index].onlyOnce) {
-      // reset event, the animation is looping
-      events[index].isDone = false;
     }
   }
   if (!returnValue) {
