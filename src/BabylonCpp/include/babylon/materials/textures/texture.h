@@ -44,7 +44,15 @@ public:
   unsigned int samplingMode() const;
 
   bool noMipmap() const;
-  void updateURL(const string_t& iUrl);
+
+  /**
+   * @brief Update the url (and optional buffer) of this texture if url was null
+   * during construction.
+   * @param url the url of the texture
+   * @param buffer the buffer of the texture (defaults to null)
+   */
+  void updateURL(const string_t& iUrl, Buffer* buffer);
+
   void delayLoad() override;
   void updateSamplingMode(unsigned int samplingMode);
   Matrix* getTextureMatrix() override;
@@ -93,6 +101,22 @@ public:
   float uAng;
   float vAng;
   float wAng;
+
+  /**
+   * Defines the center of rotation (U)
+   */
+  float uRotationCenter;
+
+  /**
+   * Defines the center of rotation (V)
+   */
+  float vRotationCenter;
+
+  /**
+   * Defines the center of rotation (W)
+   */
+  float wRotationCenter;
+
   bool _invertY;
   unsigned int _samplingMode;
 

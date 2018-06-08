@@ -3616,7 +3616,7 @@ InternalTexture* Engine::createPrefilteredCubeTexture(
   float /*offset*/,
   const ::std::function<void(InternalTexture*, EventState&)>& /*onLoad*/,
   const ::std::function<void()>& /*onError*/, unsigned int /*format*/,
-  const string_t& /*forcedExtension*/)
+  const string_t& /*forcedExtension*/, bool /*createPolynomials*/)
 {
   return nullptr;
 }
@@ -3810,7 +3810,8 @@ InternalTexture* Engine::createRawCubeTextureFromUrl(
 void Engine::updateRawTexture3D(InternalTexture* texture,
                                 const ArrayBufferView& data,
                                 unsigned int format, bool invertY,
-                                const string_t& compression)
+                                const string_t& compression,
+                                unsigned int /*textureType*/)
 {
   const auto& _data = data.uint8Array;
 
@@ -3853,7 +3854,8 @@ InternalTexture* Engine::createRawTexture3D(const ArrayBufferView& data,
                                             unsigned int format,
                                             bool generateMipMaps, bool invertY,
                                             unsigned int samplingMode,
-                                            const string_t& compression)
+                                            const string_t& compression,
+                                            unsigned int /*textureType*/)
 {
   auto texture = new InternalTexture(this, InternalTexture::DATASOURCE_RAW3D);
   texture->baseWidth       = width;

@@ -176,6 +176,8 @@ void InternalTexture::_rebuild()
           isReady = true;
         },
         nullptr, format, _extension);
+      proxy->_sphericalPolynomial
+        = ::std::unique_ptr<SphericalPolynomial>(&*_sphericalPolynomial);
     }
       return;
   }

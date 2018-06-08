@@ -30,12 +30,14 @@ CubeTexture::CreateFromImages(const vector_t<string_t>& iFiles, Scene* scene,
 
 unique_ptr_t<CubeTexture>
 CubeTexture::CreateFromPrefilteredData(const string_t& url, Scene* scene,
-                                       const string_t& forcedExtension)
+                                       const string_t& forcedExtension,
+                                       bool createPolynomials)
 {
   const vector_t<string_t> emptyStringList;
   return ::std::make_unique<CubeTexture>(
     url, scene, emptyStringList, false, emptyStringList, nullptr, nullptr,
-    EngineConstants::TEXTUREFORMAT_RGBA, true, forcedExtension);
+    EngineConstants::TEXTUREFORMAT_RGBA, true, forcedExtension,
+    createPolynomials);
 }
 
 CubeTexture::CubeTexture(
@@ -43,7 +45,7 @@ CubeTexture::CubeTexture(
   bool noMipmap, const vector_t<string_t>& iFiles,
   const ::std::function<void(InternalTexture*, EventState&)>& onLoad,
   const ::std::function<void()>& onError, unsigned int format, bool prefiltered,
-  const string_t& forcedExtension)
+  const string_t& forcedExtension, bool createPolynomials)
     : BaseTexture{scene}
     , url{rootUrl}
     , coordinatesMode{TextureConstants::CUBIC_MODE}
@@ -55,6 +57,7 @@ CubeTexture::CubeTexture(
     , _textureMatrix{::std::make_unique<Matrix>(Matrix::Identity())}
     , _format{format}
     , _prefiltered{prefiltered}
+    , _createPolynomials{createPolynomials}
 {
   isCube = true;
   if (prefiltered) {
@@ -103,7 +106,7 @@ CubeTexture::CubeTexture(
       if (prefiltered) {
         _texture = scene->getEngine()->createPrefilteredCubeTexture(
           rootUrl, scene, lodGenerationScale, lodGenerationOffset, onLoad,
-          onError, format, forcedExtension);
+          onError, format, forcedExtension, _createPolynomials);
       }
       else {
         _texture = scene->getEngine()->createCubeTexture(
@@ -179,7 +182,7 @@ void CubeTexture::delayLoad()
     if (_prefiltered) {
       _texture = scene->getEngine()->createPrefilteredCubeTexture(
         url, scene, lodGenerationScale, lodGenerationOffset, nullptr, nullptr,
-        _format);
+        _format, "", _createPolynomials);
     }
     else {
 

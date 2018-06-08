@@ -92,9 +92,10 @@ void DynamicTexture::clear()
   _context->fillRect(0, 0, size.width, size.height);
 }
 
-void DynamicTexture::update(bool invertY)
+void DynamicTexture::update(bool invertY, bool premulAlpha)
 {
-  _engine->updateDynamicTexture(_texture, _canvas, invertY, false, _format);
+  _engine->updateDynamicTexture(_texture, _canvas, invertY, premulAlpha,
+                                _format);
 }
 
 void DynamicTexture::drawText(const string_t& text, int x, int y,

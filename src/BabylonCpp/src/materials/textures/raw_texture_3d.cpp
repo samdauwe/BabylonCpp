@@ -7,10 +7,10 @@
 namespace BABYLON {
 
 RawTexture3D::RawTexture3D(const ArrayBufferView& data, int width, int height,
-                           int depth, unsigned int format, Scene* scene,
+                           int depth, unsigned int iFormat, Scene* scene,
                            bool generateMipMaps, bool invertY,
-                           unsigned int samplingMode)
-    : Texture{nullptr, scene, !generateMipMaps, invertY}
+                           unsigned int samplingMode, unsigned int textureType)
+    : Texture{nullptr, scene, !generateMipMaps, invertY}, format{iFormat}
 {
   _engine = scene->getEngine();
 
@@ -18,10 +18,12 @@ RawTexture3D::RawTexture3D(const ArrayBufferView& data, int width, int height,
                                                     width,           //
                                                     height,          //
                                                     depth,           //
-                                                    format,          //
+                                                    iFormat,         //
                                                     generateMipMaps, //
                                                     invertY,         //
-                                                    samplingMode     //
+                                                    samplingMode,    //
+                                                    "",              //
+                                                    textureType      //
   );
 
   is3D = true;
@@ -37,7 +39,7 @@ void RawTexture3D::update(const ArrayBufferView& data)
     return;
   }
   _engine->updateRawTexture3D(_texture, data, _texture->format,
-                              _texture->invertY);
+                              _texture->invertY, "", _texture->type);
 }
 
 } // end of namespace BABYLON

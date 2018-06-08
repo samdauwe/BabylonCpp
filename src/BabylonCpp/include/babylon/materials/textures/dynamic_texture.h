@@ -65,11 +65,13 @@ public:
   void clear();
 
   /**
-   * Updates the texture.
+   * @brief Updates the texture.
    * @param invertY defines the direction for the Y axis (default is true - y
    * increases downwards)
+   * @param premulAlpha defines if alpha is stored as premultiplied (default is
+   * false)
    */
-  void update(bool invertY = true);
+  void update(bool invertY = true, bool premulAlpha = false);
 
   /**
    * @brief Draws text onto the texture.

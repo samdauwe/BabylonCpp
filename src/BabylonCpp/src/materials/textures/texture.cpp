@@ -27,6 +27,9 @@ Texture::Texture(const string_t& _url, Scene* scene, bool noMipmap,
     , uAng{0.f}
     , vAng{0.f}
     , wAng{0.f}
+    , uRotationCenter{0.5f}
+    , vRotationCenter{0.5f}
+    , wRotationCenter{0.5f}
     , _invertY{invertY}
     , _samplingMode{samplingMode}
     , _format{format}
@@ -134,9 +137,14 @@ bool Texture::noMipmap() const
   return _noMipmap;
 }
 
-void Texture::updateURL(const string_t& iUrl)
+void Texture::updateURL(const string_t& iUrl, Buffer* buffer)
 {
+  if (iUrl.empty()) {
+    throw ::std::runtime_error("URL is already set");
+  }
+
   url            = iUrl;
+  _buffer        = buffer;
   delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
   delayLoad();
 }
@@ -204,16 +212,16 @@ void Texture::_prepareRowForTextureGeneration(float x, float y, float z,
   x *= uScale;
   y *= vScale;
 
-  x -= 0.5f * uScale;
-  y -= 0.5f * vScale;
-  z -= 0.5f;
+  x -= uRotationCenter * uScale;
+  y -= vRotationCenter * vScale;
+  z -= wRotationCenter;
 
   Vector3::TransformCoordinatesFromFloatsToRef(x, y, z, *_rowGenerationMatrix,
                                                t);
 
-  t.x += 0.5f * uScale + uOffset;
-  t.y += 0.5f * vScale + vOffset;
-  t.z += 0.5f;
+  t.x += uRotationCenter * uScale + uOffset;
+  t.y += vRotationCenter * vScale + vOffset;
+  t.z += wRotationCenter;
 }
 
 Matrix* Texture::getTextureMatrix()

@@ -1557,7 +1557,7 @@ public:
     const ::std::function<void(InternalTexture*, EventState&)>& onLoad
     = nullptr,
     const ::std::function<void()>& onError = nullptr, unsigned int format = 0,
-    const string_t& forcedExtension = "");
+    const string_t& forcedExtension = "", bool createPolynomials = true);
 
   /**
    * @brief Creates a cube texture.
@@ -1667,7 +1667,9 @@ public:
    */
   void updateRawTexture3D(InternalTexture* texture, const ArrayBufferView& data,
                           unsigned int format, bool invertY = true,
-                          const string_t& compression = "");
+                          const string_t& compression = "",
+                          unsigned int textureType
+                          = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
   /**
    * @brief Creates a new raw 3D texture.
@@ -1683,11 +1685,11 @@ public:
    * @param compression defines the compressed used (can be null)
    * @returns a new raw 3D texture (stored in an InternalTexture)
    */
-  InternalTexture* createRawTexture3D(const ArrayBufferView& data, int width,
-                                      int height, int depth,
-                                      unsigned int format, bool generateMipMaps,
-                                      bool invertY, unsigned int samplingMode,
-                                      const string_t& compression = "");
+  InternalTexture* createRawTexture3D(
+    const ArrayBufferView& data, int width, int height, int depth,
+    unsigned int format, bool generateMipMaps, bool invertY,
+    unsigned int samplingMode, const string_t& compression = "",
+    unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
   /**
    * @brief Hidden
