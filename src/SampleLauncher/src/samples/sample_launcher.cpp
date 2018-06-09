@@ -204,6 +204,11 @@ static int RemapGLFWKeyCode(int glfwKey)
   return glfwKey;
 }
 
+static float RescaleMouseScroll(double offset, float scaleFactor = 120.f)
+{
+  return static_cast<float>(offset) * scaleFactor;
+}
+
 static void GLFWErrorCallback(int error, const char* description)
 {
   fprintf(stderr, "GLFW Error occured, Error id: %i, Description: %s\n", error,
@@ -240,13 +245,19 @@ static void GLFWCursorPositionCallback(GLFWwindow* window, double xpos,
                                        double ypos)
 {
   if (_sceneWindow.glfwWindow == window && _sceneWindow.renderCanvas) {
-    _sceneWindow.renderCanvas->onMouseMove(static_cast<int>(xpos),
-                                           static_cast<int>(ypos));
+    // Determine modifier
+    bool ctrlKey = (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == 1)
+                   || (glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == 1);
+    bool shiftKey = (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == 1)
+                    || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == 1);
+    // Raise event
+    _sceneWindow.renderCanvas->onMouseMove(
+      ctrlKey, shiftKey, static_cast<int>(xpos), static_cast<int>(ypos));
   }
 }
 
 static void GLFWMouseButtonCallback(GLFWwindow* window, int button, int action,
-                                    int /*mods*/)
+                                    int mods)
 {
   if (_sceneWindow.glfwWindow == window && _sceneWindow.renderCanvas) {
     // Determine mouse button type
@@ -263,14 +274,19 @@ static void GLFWMouseButtonCallback(GLFWwindow* window, int button, int action,
     // Get cursor position
     double xpos, ypos;
     glfwGetCursorPos(window, &xpos, &ypos);
+    // Determine modifier
+    bool ctrlKey  = (mods & GLFW_MOD_CONTROL);
+    bool shiftKey = (mods & GLFW_MOD_SHIFT);
     // Raise event
     if (action == GLFW_PRESS) {
       _sceneWindow.renderCanvas->onMouseButtonDown(
-        static_cast<int>(xpos), static_cast<int>(ypos), buttonType);
+        ctrlKey, shiftKey, static_cast<int>(xpos), static_cast<int>(ypos),
+        buttonType);
     }
     else if (action == GLFW_RELEASE) {
       _sceneWindow.renderCanvas->onMouseButtonUp(
-        static_cast<int>(xpos), static_cast<int>(ypos), buttonType);
+        ctrlKey, shiftKey, static_cast<int>(xpos), static_cast<int>(ypos),
+        buttonType);
     }
   }
 }
@@ -279,7 +295,18 @@ static void GLFWScrollCallback(GLFWwindow* window, double /*xoffset*/,
                                double yoffset)
 {
   if (_sceneWindow.glfwWindow == window && _sceneWindow.renderCanvas) {
-    _sceneWindow.renderCanvas->onMouseWheel(static_cast<float>(yoffset));
+    // Get cursor position
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    // Determine modifier
+    bool ctrlKey = (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == 1)
+                   || (glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == 1);
+    bool shiftKey = (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == 1)
+                    || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == 1);
+    // Raise event
+    _sceneWindow.renderCanvas->onMouseWheel(
+      ctrlKey, shiftKey, static_cast<int>(xpos), static_cast<int>(ypos),
+      RescaleMouseScroll(yoffset));
   }
 }
 

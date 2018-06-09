@@ -539,7 +539,7 @@ public:
    * pointer event (eg. pointer id for multitouch)
    * @returns the current scene
    */
-  Scene& simulatePointerMove(const PickingInfo* pickResult);
+  Scene& simulatePointerMove(Nullable<PickingInfo>& pickResult);
 
   /**
    * @brief Use this method to simulate a pointer down on a mesh.
@@ -551,7 +551,7 @@ public:
    * pointer event (eg. pointer id for multitouch)
    * @returns the current scene
    */
-  Scene& simulatePointerDown(const PickingInfo* pickResult);
+  Scene& simulatePointerDown(const Nullable<PickingInfo>& pickResult);
 
   /**
    * @brief Use this method to simulate a pointer up on a mesh.
@@ -563,7 +563,7 @@ public:
    * pointer event (eg. pointer id for multitouch)
    * @returns the current scene
    */
-  Scene& simulatePointerUp(const PickingInfo* pickResult);
+  Scene& simulatePointerUp(const Nullable<PickingInfo>& pickResult);
 
   /**
    * @brief Attach events to the canvas (To handle actionManagers triggers and
@@ -1581,7 +1581,8 @@ public:
   Scene& createPickingRayInCameraSpaceToRef(int x, int y, Ray& result,
                                             Camera* camera = nullptr);
 
-  /** @brief Launch a ray to try to pick a mesh in the scene.
+  /**
+   * @brief Launch a ray to try to pick a mesh in the scene.
    * @param x position on screen
    * @param y position on screen
    * @param predicate Predicate function used to determine eligible meshes. Can
@@ -1593,11 +1594,12 @@ public:
    * this case, the scene.activeCamera will be used
    * @returns a PickingInfo
    */
-  PickingInfo* pick(int x, int y,
-                    const ::std::function<bool(AbstractMesh* mesh)>& predicate,
-                    bool fastCheck = false, Camera* camera = nullptr);
+  Nullable<PickingInfo>
+  pick(int x, int y, const ::std::function<bool(AbstractMesh* mesh)>& predicate,
+       bool fastCheck = false, Camera* camera = nullptr);
 
-  /** @brief Launch a ray to try to pick a sprite in the scene.
+  /**
+   * @brief Launch a ray to try to pick a sprite in the scene.
    * @param x position on screen
    * @param y position on screen
    * @param predicate Predicate function used to determine eligible sprites. Can
@@ -1608,7 +1610,7 @@ public:
    * null. In this case, the scene.activeCamera will be used
    * @returns a PickingInfo
    */
-  PickingInfo*
+  Nullable<PickingInfo>
   pickSprite(int x, int y,
              const ::std::function<bool(Sprite* sprite)>& predicate,
              bool fastCheck = false, Camera* camera = nullptr);
@@ -1621,7 +1623,7 @@ public:
    * set to null
    * @returns a PickingInfo
    */
-  PickingInfo*
+  Nullable<PickingInfo>
   pickWithRay(const Ray& ray,
               const ::std::function<bool(AbstractMesh* mesh)>& predicate,
               bool fastCheck = false);
@@ -1877,14 +1879,14 @@ private:
   void _updatePointerPosition(const PointerEvent evt);
   void _createUbo();
   void _createAlternateUbo();
-  Scene& _processPointerMove(const PickingInfo* pickResult,
+  Scene& _processPointerMove(Nullable<PickingInfo>& pickResult,
                              const PointerEvent& evt);
-  bool _checkPrePointerObservable(const PickingInfo* pickResult,
+  bool _checkPrePointerObservable(const Nullable<PickingInfo>& pickResult,
                                   const PointerEvent& evt,
                                   PointerEventTypes type);
-  Scene& _processPointerDown(const PickingInfo* pickResult,
+  Scene& _processPointerDown(const Nullable<PickingInfo>& pickResult,
                              const PointerEvent& evt);
-  Scene& _processPointerUp(const PickingInfo* pickResult,
+  Scene& _processPointerUp(const Nullable<PickingInfo>& pickResult,
                            const PointerEvent& evt, const ClickInfo& clickInfo);
   void _animate();
   AnimationValue _processLateAnimationBindingsForMatrices(
@@ -1913,14 +1915,14 @@ private:
   void _switchAudioModeForHeadphones();
   void _switchAudioModeForNormalSpeakers();
   /** Picking **/
-  PickingInfo*
+  Nullable<PickingInfo>
   _internalPick(const ::std::function<Ray(Matrix& world)>& rayFunction,
                 const ::std::function<bool(AbstractMesh* mesh)>& predicate,
                 bool fastCheck);
   vector_t<PickingInfo*> _internalMultiPick(
     const ::std::function<Ray(Matrix& world)>& rayFunction,
     const ::std::function<bool(AbstractMesh* mesh)>& predicate);
-  PickingInfo*
+  Nullable<PickingInfo>
   _internalPickSprites(const Ray& ray,
                        const ::std::function<bool(Sprite* sprite)>& predicate,
                        bool fastCheck, Camera* camera);
@@ -2167,19 +2169,23 @@ public:
   ::std::function<bool(AbstractMesh* Mesh)> pointerMovePredicate;
 
   /** Deprecated. Use onPointerObservable instead */
-  ::std::function<void(const PointerEvent& evt, const PickingInfo* pickInfo,
+  ::std::function<void(const PointerEvent& evt,
+                       const Nullable<PickingInfo>& pickInfo,
                        PointerEventTypes type)>
     onPointerMove;
   /** Deprecated. Use onPointerObservable instead */
-  ::std::function<void(const PointerEvent& evt, const PickingInfo* pickInfo,
+  ::std::function<void(const PointerEvent& evt,
+                       const Nullable<PickingInfo>& pickInfo,
                        PointerEventTypes type)>
     onPointerDown;
   /** Deprecated. Use onPointerObservable instead */
-  ::std::function<void(const PointerEvent& evt, const PickingInfo* pickInfo,
+  ::std::function<void(const PointerEvent& evt,
+                       const Nullable<PickingInfo>& pickInfo,
                        PointerEventTypes type)>
     onPointerUp;
   /** Deprecated. Use onPointerObservable instead */
-  ::std::function<void(const PointerEvent& evt, const PickingInfo* pickInfo)>
+  ::std::function<void(const PointerEvent& evt,
+                       const Nullable<PickingInfo>& pickInfo)>
     onPointerPick;
 
   /**

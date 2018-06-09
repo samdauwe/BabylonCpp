@@ -85,23 +85,26 @@ void PointerDragBehavior::attach(Node* ownerNode)
             _scene->pickWithRay(*pointerInfoPre->ray, pickPredicate) :
             _scene->pick(_scene->pointerX(), _scene->pointerY(), pickPredicate);
       if (pickInfo) {
-        pickInfo->ray = pointerInfoPre->ray;
-        if (!pickInfo->ray) {
+        auto _pickInfo = *pickInfo;
+        _pickInfo.ray  = pointerInfoPre->ray;
+        if (!_pickInfo.ray) {
           auto matIdentity = Matrix::Identity();
-          pickInfo->ray    = options.pointerObservableScene->createPickingRay(
+          _pickInfo.ray    = options.pointerObservableScene->createPickingRay(
             _scene->pointerX(), _scene->pointerY(), &matIdentity,
             _scene->activeCamera);
         }
-        if (pickInfo->hit) {
+        pickInfo = _pickInfo;
+        if (_pickInfo.hit) {
           eventState.skipNextObservers = true;
         }
       }
 
+      const auto& _pickInfo = *pickInfo;
       if (pointerInfoPre->type == PointerEventTypes::POINTERDOWN) {
-        if (!dragging && pickInfo && pickInfo->hit && pickInfo->pickedMesh
-            && pickInfo->ray) {
-          _updateDragPlanePosition(*pickInfo->ray);
-          auto pickedPoint = _pickWithRayOnDragPlane(pickInfo->ray);
+        if (!dragging && pickInfo && _pickInfo.hit && _pickInfo.pickedMesh
+            && _pickInfo.ray) {
+          _updateDragPlanePosition(*_pickInfo.ray);
+          auto pickedPoint = _pickWithRayOnDragPlane(_pickInfo.ray);
           if (pickedPoint) {
             dragging    = true;
             _draggingID = pointerInfoPre->pointerEvent.pointerId;
@@ -123,9 +126,9 @@ void PointerDragBehavior::attach(Node* ownerNode)
       }
       else if (pointerInfoPre->type == PointerEventTypes::POINTERMOVE) {
         if (_draggingID == pointerInfoPre->pointerEvent.pointerId && dragging
-            && pickInfo && pickInfo->ray) {
-          auto pickedPoint = _pickWithRayOnDragPlane(pickInfo->ray);
-          _updateDragPlanePosition(*pickInfo->ray);
+            && pickInfo && _pickInfo.ray) {
+          auto pickedPoint = _pickWithRayOnDragPlane(_pickInfo.ray);
+          _updateDragPlanePosition(*_pickInfo.ray);
           if (pickedPoint) {
             // depending on the drag mode option drag accordingly
             if (options.dragAxis) {
@@ -162,9 +165,9 @@ PointerDragBehavior::_pickWithRayOnDragPlane(const Nullable<Ray>& ray)
   }
   auto pickResult = PointerDragBehavior::_planeScene->pickWithRay(
     *ray, [this](AbstractMesh* m) -> bool { return m == _dragPlane; });
-  if (pickResult && pickResult->hit && pickResult->pickedMesh
-      && pickResult->pickedPoint) {
-    return pickResult->pickedPoint;
+  if (pickResult && (*pickResult).hit && (*pickResult).pickedMesh
+      && (*pickResult).pickedPoint) {
+    return (*pickResult).pickedPoint;
   }
   else {
     return nullptr;

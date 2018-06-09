@@ -772,13 +772,13 @@ void Scene::_createAlternateUbo()
   _alternateSceneUbo->addUniform("view", 16);
 }
 
-Scene& Scene::simulatePointerMove(const PickingInfo* pickResult)
+Scene& Scene::simulatePointerMove(Nullable<PickingInfo>& pickResult)
 {
   PointerEvent evt("pointermove");
   return _processPointerMove(pickResult, evt);
 }
 
-Scene& Scene::_processPointerMove(const PickingInfo* pickResult,
+Scene& Scene::_processPointerMove(Nullable<PickingInfo>& pickResult,
                                   const PointerEvent& evt)
 {
   auto canvas = _engine->getRenderingCanvas();
@@ -787,10 +787,10 @@ Scene& Scene::_processPointerMove(const PickingInfo* pickResult,
     return *this;
   }
 
-  if (pickResult && pickResult->hit && pickResult->pickedMesh) {
+  if (pickResult && (*pickResult).hit && (*pickResult).pickedMesh) {
     setPointerOverSprite(nullptr);
 
-    setPointerOverMesh(pickResult->pickedMesh);
+    setPointerOverMesh((*pickResult).pickedMesh);
 
     if (_pointerOverMesh && _pointerOverMesh->actionManager
         && _pointerOverMesh->actionManager->hasPointerTriggers()) {
@@ -811,8 +811,8 @@ Scene& Scene::_processPointerMove(const PickingInfo* pickResult,
     pickResult = pickSprite(_unTranslatedPointerX, _unTranslatedPointerY,
                             _spritePredicate, false, cameraToUseForPointers);
 
-    if (pickResult && pickResult->hit && pickResult->pickedSprite) {
-      setPointerOverSprite(pickResult->pickedSprite);
+    if (pickResult && (*pickResult).hit && (*pickResult).pickedSprite) {
+      setPointerOverSprite((*pickResult).pickedSprite);
       if (_pointerOverSprite && _pointerOverSprite->actionManager
           && !_pointerOverSprite->actionManager->hoverCursor.empty()) {
         canvas->style.cursor = _pointerOverSprite->actionManager->hoverCursor;
@@ -843,21 +843,29 @@ Scene& Scene::_processPointerMove(const PickingInfo* pickResult,
                       || evt.type == EventType::DOM_MOUSE_SCROLL ?
                     PointerEventTypes::POINTERWHEEL :
                     PointerEventTypes::POINTERMOVE;
-      auto pi = new PointerInfo(type, evt, *pickResult);
-      onPointerObservable.notifyObservers(pi, static_cast<int>(type));
+
+      if (type == PointerEventTypes::POINTERWHEEL) {
+        PointerInfo pi(type, *static_cast<MouseWheelEvent const*>(&evt),
+                       *pickResult);
+        onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
+      }
+      else {
+        PointerInfo pi(type, evt, *pickResult);
+        onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
+      }
     }
   }
 
   return *this;
 }
 
-bool Scene::_checkPrePointerObservable(const PickingInfo* pickResult,
+bool Scene::_checkPrePointerObservable(const Nullable<PickingInfo>& pickResult,
                                        const PointerEvent& evt,
                                        PointerEventTypes type)
 {
   PointerInfoPre pi(type, evt, _unTranslatedPointerX, _unTranslatedPointerY);
   if (pickResult) {
-    pi.ray = pickResult->ray;
+    pi.ray = (*pickResult).ray;
   }
   onPrePointerObservable.notifyObservers(&pi, static_cast<int>(type));
   if (pi.skipOnPointerObservable) {
@@ -868,38 +876,38 @@ bool Scene::_checkPrePointerObservable(const PickingInfo* pickResult,
   }
 }
 
-Scene& Scene::simulatePointerDown(const PickingInfo* pickResult)
+Scene& Scene::simulatePointerDown(const Nullable<PickingInfo>& pickResult)
 {
   PointerEvent evt("pointerdown");
   return _processPointerDown(pickResult, evt);
 }
 
-Scene& Scene::_processPointerDown(const PickingInfo* pickResult,
+Scene& Scene::_processPointerDown(const Nullable<PickingInfo>& pickResult,
                                   const PointerEvent& evt)
 {
-  if (pickResult && pickResult->hit && pickResult->pickedMesh) {
-    _pickedDownMesh    = pickResult->pickedMesh;
-    auto actionManager = pickResult->pickedMesh->actionManager;
+  if (pickResult && (*pickResult).hit && (*pickResult).pickedMesh) {
+    _pickedDownMesh    = (*pickResult).pickedMesh;
+    auto actionManager = _pickedDownMesh->actionManager;
     if (actionManager) {
       if (actionManager->hasPickTriggers()) {
         actionManager->processTrigger(
           ActionManager::OnPickDownTrigger(),
-          ActionEvent::CreateNew(pickResult->pickedMesh, evt));
+          ActionEvent::CreateNew(_pickedDownMesh, evt));
         switch (evt.button) {
           case MouseButtonType::LEFT:
             actionManager->processTrigger(
               ActionManager::OnLeftPickTrigger(),
-              ActionEvent::CreateNew(pickResult->pickedMesh, evt));
+              ActionEvent::CreateNew(_pickedDownMesh, evt));
             break;
           case MouseButtonType::MIDDLE:
             actionManager->processTrigger(
               ActionManager::OnCenterPickTrigger(),
-              ActionEvent::CreateNew(pickResult->pickedMesh, evt));
+              ActionEvent::CreateNew(_pickedDownMesh, evt));
             break;
           case MouseButtonType::RIGHT:
             actionManager->processTrigger(
               ActionManager::OnRightPickTrigger(),
-              ActionEvent::CreateNew(pickResult->pickedMesh, evt));
+              ActionEvent::CreateNew(_pickedDownMesh, evt));
             break;
           default:
             break;
@@ -951,15 +959,15 @@ Scene& Scene::_processPointerDown(const PickingInfo* pickResult,
 
     if (onPointerObservable.hasObservers()) {
       auto type = PointerEventTypes::POINTERDOWN;
-      auto pi   = new PointerInfo(type, evt, *pickResult);
-      onPointerObservable.notifyObservers(pi, static_cast<int>(type));
+      PointerInfo pi(type, evt, *pickResult);
+      onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
     }
   }
 
   return *this;
 }
 
-Scene& Scene::simulatePointerUp(const PickingInfo* pickResult)
+Scene& Scene::simulatePointerUp(const Nullable<PickingInfo>& pickResult)
 {
   PointerEvent evt("pointerup");
   ClickInfo clickInfo;
@@ -974,12 +982,13 @@ Scene& Scene::simulatePointerUp(const PickingInfo* pickResult)
   return _processPointerUp(pickResult, evt, clickInfo);
 }
 
-Scene& Scene::_processPointerUp(const PickingInfo* pickResult,
+Scene& Scene::_processPointerUp(const Nullable<PickingInfo>& pickResult,
                                 const PointerEvent& evt,
                                 const ClickInfo& clickInfo)
 {
-  if (pickResult && pickResult && pickResult->pickedMesh) {
-    _pickedUpMesh = pickResult->pickedMesh;
+  if (pickResult && pickResult && (*pickResult).pickedMesh) {
+    const auto& _pickResult = *pickResult;
+    _pickedUpMesh           = _pickResult.pickedMesh;
     if (_pickedDownMesh == _pickedUpMesh) {
       if (onPointerPick) {
         onPointerPick(evt, pickResult);
@@ -987,28 +996,28 @@ Scene& Scene::_processPointerUp(const PickingInfo* pickResult,
       if (clickInfo.singleClick() && !clickInfo.ignore()
           && onPointerObservable.hasObservers()) {
         auto type = PointerEventTypes::POINTERPICK;
-        auto pi   = new PointerInfo(type, evt, *pickResult);
-        onPointerObservable.notifyObservers(pi, static_cast<int>(type));
+        PointerInfo pi(type, evt, *pickResult);
+        onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
       }
     }
-    if (pickResult->pickedMesh->actionManager) {
+    if (_pickedUpMesh->actionManager) {
       if (clickInfo.ignore()) {
-        pickResult->pickedMesh->actionManager->processTrigger(
+        _pickedUpMesh->actionManager->processTrigger(
           ActionManager::OnPickUpTrigger(),
-          ActionEvent::CreateNew(pickResult->pickedMesh, evt));
+          ActionEvent::CreateNew(_pickedUpMesh, evt));
       }
       if (!clickInfo.hasSwiped() && !clickInfo.ignore()
           && clickInfo.singleClick()) {
-        pickResult->pickedMesh->actionManager->processTrigger(
+        _pickedUpMesh->actionManager->processTrigger(
           ActionManager::OnPickTrigger(),
-          ActionEvent::CreateNew(pickResult->pickedMesh, evt));
+          ActionEvent::CreateNew(_pickedUpMesh, evt));
       }
       if (clickInfo.doubleClick() && !clickInfo.ignore()
-          && pickResult->pickedMesh->actionManager->hasSpecificTrigger(
+          && _pickedUpMesh->actionManager->hasSpecificTrigger(
                ActionManager::OnDoublePickTrigger())) {
-        pickResult->pickedMesh->actionManager->processTrigger(
+        _pickedUpMesh->actionManager->processTrigger(
           ActionManager::OnDoublePickTrigger(),
-          ActionEvent::CreateNew(pickResult->pickedMesh, evt));
+          ActionEvent::CreateNew(_pickedUpMesh, evt));
       }
     }
   }
@@ -1030,22 +1039,22 @@ Scene& Scene::_processPointerUp(const PickingInfo* pickResult,
             && onPointerObservable.hasSpecificMask(
                  static_cast<int>(PointerEventTypes::POINTERTAP))) {
           auto type = PointerEventTypes::POINTERTAP;
-          auto pi   = new PointerInfo(type, evt, *pickResult);
-          onPointerObservable.notifyObservers(pi, static_cast<int>(type));
+          PointerInfo pi(type, evt, *pickResult);
+          onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
         }
         if (clickInfo.doubleClick()
             && onPointerObservable.hasSpecificMask(
                  static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
           auto type = PointerEventTypes::POINTERDOUBLETAP;
-          auto pi   = new PointerInfo(type, evt, *pickResult);
-          onPointerObservable.notifyObservers(pi, static_cast<int>(type));
+          PointerInfo pi(type, evt, *pickResult);
+          onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
         }
       }
     }
     else {
       auto type = PointerEventTypes::POINTERUP;
-      auto pi   = new PointerInfo(type, evt, *pickResult);
-      onPointerObservable.notifyObservers(pi, static_cast<int>(type));
+      PointerInfo pi(type, evt, *pickResult);
+      onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
     }
   }
 
@@ -1065,10 +1074,16 @@ void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
       auto pickResult
         = pick(_unTranslatedPointerX, _unTranslatedPointerY,
                pointerDownPredicate, false, cameraToUseForPointers);
-      _currentPickResult = *pickResult;
       if (pickResult) {
-        act = (pickResult->hit && pickResult->pickedMesh) ?
-                pickResult->pickedMesh->actionManager :
+        _currentPickResult = *pickResult;
+      }
+      else {
+        _currentPickResult = nullptr;
+      }
+      if (pickResult) {
+        const auto _pickResult = *pickResult;
+        act                    = (_pickResult.hit && _pickResult.pickedMesh) ?
+                _pickResult.pickedMesh->actionManager :
                 nullptr;
       }
       _meshPickProceed = true;
@@ -1398,36 +1413,33 @@ void Scene::_onPointerDownEvent(PointerEvent&& evt)
     pickResult = pickSprite(_unTranslatedPointerX, _unTranslatedPointerY,
                             _spritePredicate, false, cameraToUseForPointers);
 
-    if (pickResult && pickResult->hit && pickResult->pickedSprite) {
-      if (pickResult->pickedSprite->actionManager) {
-        _pickedDownSprite = pickResult->pickedSprite;
+    if (pickResult && (*pickResult).hit && (*pickResult).pickedSprite) {
+      const auto& _pickResult = *pickResult;
+      if (_pickResult.pickedSprite->actionManager) {
+        _pickedDownSprite = _pickResult.pickedSprite;
         switch (evt.button) {
           case MouseButtonType::LEFT:
-            pickResult->pickedSprite->actionManager->processTrigger(
+            _pickedDownSprite->actionManager->processTrigger(
               ActionManager::OnLeftPickTrigger(),
-              ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, this,
-                                               evt));
+              ActionEvent::CreateNewFromSprite(_pickedDownSprite, this, evt));
             break;
           case MouseButtonType::MIDDLE:
-            pickResult->pickedSprite->actionManager->processTrigger(
+            _pickedDownSprite->actionManager->processTrigger(
               ActionManager::OnCenterPickTrigger(),
-              ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, this,
-                                               evt));
+              ActionEvent::CreateNewFromSprite(_pickedDownSprite, this, evt));
             break;
           case MouseButtonType::RIGHT:
-            pickResult->pickedSprite->actionManager->processTrigger(
+            _pickedDownSprite->actionManager->processTrigger(
               ActionManager::OnRightPickTrigger(),
-              ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, this,
-                                               evt));
+              ActionEvent::CreateNewFromSprite(_pickedDownSprite, this, evt));
             break;
           default:
             break;
         }
-        if (pickResult->pickedSprite->actionManager) {
-          pickResult->pickedSprite->actionManager->processTrigger(
+        if (_pickedDownSprite->actionManager) {
+          _pickedDownSprite->actionManager->processTrigger(
             ActionManager::OnPickDownTrigger(),
-            ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, this,
-                                             evt));
+            ActionEvent::CreateNewFromSprite(_pickedDownSprite, this, evt));
         }
       }
     }
@@ -1502,7 +1514,7 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
         pickResult = *_currentPickResult;
       }
 
-      _processPointerUp(&(*pickResult), evt, clickInfo);
+      _processPointerUp(pickResult, evt, clickInfo);
 
       // Sprites
       if (!clickInfo.ignore) {
@@ -1512,28 +1524,29 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
                          _spritePredicate, false, cameraToUseForPointers);
 
           if (spritePickResult) {
-            if (spritePickResult->hit && spritePickResult->pickedSprite) {
-              if (spritePickResult->pickedSprite->actionManager) {
-                spritePickResult->pickedSprite->actionManager->processTrigger(
+            const auto& _spritePickResult = *spritePickResult;
+            if (_spritePickResult.hit && _spritePickResult.pickedSprite) {
+              if (_spritePickResult.pickedSprite->actionManager) {
+                _spritePickResult.pickedSprite->actionManager->processTrigger(
                   ActionManager::OnPickUpTrigger(),
                   ActionEvent::CreateNewFromSprite(
-                    spritePickResult->pickedSprite, this, evt));
-                if (spritePickResult->pickedSprite->actionManager) {
+                    _spritePickResult.pickedSprite, this, evt));
+                if (_spritePickResult.pickedSprite->actionManager) {
                   if (::std::abs(_startingPointerPosition.x - _pointerX)
                         < Scene::DragMovementThreshold
                       && ::std::abs(_startingPointerPosition.y - _pointerY)
                            < Scene::DragMovementThreshold) {
-                    spritePickResult->pickedSprite->actionManager
+                    _spritePickResult.pickedSprite->actionManager
                       ->processTrigger(
                         ActionManager::OnPickTrigger(),
                         ActionEvent::CreateNewFromSprite(
-                          spritePickResult->pickedSprite, this, evt));
+                          _spritePickResult.pickedSprite, this, evt));
                   }
                 }
               }
             }
             if (_pickedDownSprite && _pickedDownSprite->actionManager
-                && _pickedDownSprite != spritePickResult->pickedSprite) {
+                && _pickedDownSprite != _spritePickResult.pickedSprite) {
               _pickedDownSprite->actionManager->processTrigger(
                 ActionManager::OnPickOutTrigger(),
                 ActionEvent::CreateNewFromSprite(_pickedDownSprite, this, evt));
@@ -4318,12 +4331,12 @@ Scene& Scene::createPickingRayInCameraSpaceToRef(int x, int y, Ray& result,
   return *this;
 }
 
-PickingInfo*
+Nullable<PickingInfo>
 Scene::_internalPick(const ::std::function<Ray(Matrix& world)>& rayFunction,
                      const ::std::function<bool(AbstractMesh* mesh)>& predicate,
                      bool fastCheck)
 {
-  PickingInfo* pickingInfo = nullptr;
+  Nullable<PickingInfo> pickingInfo = nullptr;
 
   for (auto& mesh : meshes) {
     if (predicate) {
@@ -4344,18 +4357,18 @@ Scene::_internalPick(const ::std::function<Ray(Matrix& world)>& rayFunction,
     }
 
     if (!fastCheck && pickingInfo != nullptr
-        && result.distance >= pickingInfo->distance) {
+        && result.distance >= (*pickingInfo).distance) {
       continue;
     }
 
-    // pickingInfo = result;
+    pickingInfo = result;
 
     if (fastCheck) {
       break;
     }
   }
 
-  return pickingInfo;
+  return pickingInfo ? pickingInfo : PickingInfo();
 }
 
 vector_t<PickingInfo*> Scene::_internalMultiPick(
@@ -4388,11 +4401,11 @@ vector_t<PickingInfo*> Scene::_internalMultiPick(
   return pickingInfos;
 }
 
-PickingInfo* Scene::_internalPickSprites(
+Nullable<PickingInfo> Scene::_internalPickSprites(
   const Ray& ray, const ::std::function<bool(Sprite* sprite)>& predicate,
   bool fastCheck, Camera* camera)
 {
-  PickingInfo* pickingInfo = nullptr;
+  Nullable<PickingInfo> pickingInfo = nullptr;
 
   if (!camera) {
     if (!activeCamera) {
@@ -4414,11 +4427,11 @@ PickingInfo* Scene::_internalPickSprites(
       }
 
       if (!fastCheck && (pickingInfo != nullptr)
-          && (result->distance >= pickingInfo->distance)) {
+          && (result->distance >= (*pickingInfo).distance)) {
         continue;
       }
 
-      pickingInfo = result;
+      pickingInfo = *result;
 
       if (fastCheck) {
         break;
@@ -4426,10 +4439,10 @@ PickingInfo* Scene::_internalPickSprites(
     }
   }
 
-  return pickingInfo;
+  return pickingInfo ? pickingInfo : PickingInfo();
 }
 
-PickingInfo*
+Nullable<PickingInfo>
 Scene::pick(int x, int y,
             const ::std::function<bool(AbstractMesh* mesh)>& predicate,
             bool fastCheck, Camera* camera)
@@ -4442,7 +4455,7 @@ Scene::pick(int x, int y,
     predicate, fastCheck);
 }
 
-PickingInfo*
+Nullable<PickingInfo>
 Scene::pickSprite(int x, int y,
                   const ::std::function<bool(Sprite* sprite)>& predicate,
                   bool fastCheck, Camera* camera)
@@ -4452,7 +4465,7 @@ Scene::pickSprite(int x, int y,
   return _internalPickSprites(*_tempPickingRay, predicate, fastCheck, camera);
 }
 
-PickingInfo*
+Nullable<PickingInfo>
 Scene::pickWithRay(const Ray& ray,
                    const ::std::function<bool(AbstractMesh* mesh)>& predicate,
                    bool fastCheck)

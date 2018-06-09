@@ -34,10 +34,13 @@ public:
   void setFrameSize(int width, int height);
   void onError(int errorId, const char* errorDesc);
   // User unput handling
-  void onMouseButtonDown(int mouseX, int mouseY, MouseButtonType btn);
-  void onMouseButtonUp(int mouseX, int mouseY, MouseButtonType btn);
-  void onMouseMove(int mouseX, int mouseY);
-  void onMouseWheel(float wheelDelta);
+  void onMouseButtonDown(bool ctrlKey, bool shiftKey, int mouseX, int mouseY,
+                         MouseButtonType btn);
+  void onMouseButtonUp(bool ctrlKey, bool shiftKey, int mouseX, int mouseY,
+                       MouseButtonType btn);
+  void onMouseMove(bool ctrlKey, bool shiftKey, int mouseX, int mouseY);
+  void onMouseWheel(bool ctrlKey, bool shiftKey, int mouseX, int mouseY,
+                    float wheelDelta);
   void onKeyDown(bool ctrlKey, bool altKey, int keyCode, string_t code);
   void onKeyUp(bool ctrlKey, bool altKey, int keyCode, string_t code);
 

@@ -166,8 +166,11 @@ bool LensFlareSystem::_isVisible()
 
   Ray ray(_scene->activeCamera->globalPosition(), direction);
   auto pickInfo = _scene->pickWithRay(ray, meshesSelectionPredicate, true);
+  if (!pickInfo) {
+    return false;
+  }
 
-  return !pickInfo->hit || pickInfo->distance > distance;
+  return !(*pickInfo).hit || (*pickInfo).distance > distance;
 }
 
 bool LensFlareSystem::render()

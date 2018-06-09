@@ -228,8 +228,8 @@ void EditControl::onPointerDown(PointerEvent& evt)
     },
     false, mainCamera);
 
-  if (pickResult->hit) {
-    axisPicked  = static_cast<Mesh*>(pickResult->pickedMesh);
+  if ((*pickResult).hit) {
+    axisPicked  = static_cast<Mesh*>((*pickResult).pickedMesh);
     auto childs = axisPicked->getChildren();
     if (!childs.empty()) {
       static_cast<Mesh*>(childs[0])->setVisibility(visibility);
@@ -322,14 +322,14 @@ void EditControl::onPointerOver()
     },
     false, mainCamera);
 
-  if (pickResult->hit) {
-    if (static_cast<Mesh*>(pickResult->pickedMesh) != prevOverMesh) {
+  if ((*pickResult).hit) {
+    if (static_cast<Mesh*>((*pickResult).pickedMesh) != prevOverMesh) {
       pointerIsOver = true;
       if (prevOverMesh != nullptr) {
         prevOverMesh->setVisibility(0.f);
         restoreColor(prevOverMesh);
       }
-      prevOverMesh = static_cast<Mesh*>(pickResult->pickedMesh);
+      prevOverMesh = static_cast<Mesh*>((*pickResult).pickedMesh);
       if (rotEnabled) {
         savedCol
           = (static_cast<LinesMesh*>(prevOverMesh->getChildren()[0])->color);
@@ -803,8 +803,8 @@ std::tuple<Vector3, bool> EditControl::getPosOnPickPlane()
     = scene->pick(scene->pointerX(), scene->pointerY(),
                   [this](AbstractMesh* mesh) { return mesh == pickPlane; },
                   false, mainCamera);
-  if ((pickinfo->hit)) {
-    return std::make_tuple(*pickinfo->pickedPoint, true);
+  if ((*pickinfo).hit) {
+    return std::make_tuple(*(*pickinfo).pickedPoint, true);
   }
   else {
     return std::make_tuple(Vector3::Zero(), false);

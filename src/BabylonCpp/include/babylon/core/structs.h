@@ -143,7 +143,7 @@ struct DragStartOrEndEvent {
 }; // end of struct DragStartOrEndEvent
 
 struct Event {
-  unsigned int type;
+  EventType type;
   int charCode;
   int keyCode;
 }; // end of struct Event
@@ -248,14 +248,6 @@ struct MouseEvent {
   }
 }; // end of struct MouseEvent
 
-struct MouseWheelEvent {
-  float wheelDelta;
-  float detail;
-  void preventDefault() const
-  {
-  }
-}; // end of struct MouseWheelEvent
-
 struct NodeCache {
   Node* parent;
   // AbstractMesh
@@ -303,6 +295,70 @@ struct PointerEvent : public Event {
   PointerEvent(const string_t& /*type*/)
   {
   }
+  PointerEvent(const PointerEvent& other)
+      : clientX{other.clientX}
+      , clientY{other.clientY}
+      , movementX{other.movementX}
+      , movementY{other.movementY}
+      , pointerId{other.pointerId}
+      , pointerType{other.pointerType}
+      , ctrlKey{other.ctrlKey}
+      , shiftKey{other.shiftKey}
+      , button{other.button}
+      , buttons{other.buttons}
+      , srcElement{other.srcElement}
+  {
+  }
+  PointerEvent(PointerEvent&& other)
+      : clientX{::std::move(other.clientX)}
+      , clientY{::std::move(other.clientY)}
+      , movementX{::std::move(other.movementX)}
+      , movementY{::std::move(other.movementY)}
+      , pointerId{::std::move(other.pointerId)}
+      , pointerType{::std::move(other.pointerType)}
+      , ctrlKey{::std::move(other.ctrlKey)}
+      , shiftKey{::std::move(other.shiftKey)}
+      , button{::std::move(other.button)}
+      , buttons{::std::move(other.buttons)}
+      , srcElement{::std::move(other.srcElement)}
+  {
+  }
+  PointerEvent& operator=(const PointerEvent& other)
+  {
+    if (&other != this) {
+      clientX     = other.clientX;
+      clientY     = other.clientY;
+      movementX   = other.movementX;
+      movementY   = other.movementY;
+      pointerId   = other.pointerId;
+      pointerType = other.pointerType;
+      ctrlKey     = other.ctrlKey;
+      shiftKey    = other.shiftKey;
+      button      = other.button;
+      buttons     = other.buttons;
+      srcElement  = other.srcElement;
+    }
+
+    return *this;
+  }
+  PointerEvent& operator=(PointerEvent&& other)
+  {
+    if (&other != this) {
+      clientX     = ::std::move(other.clientX);
+      clientY     = ::std::move(other.clientY);
+      movementX   = ::std::move(other.movementX);
+      movementY   = ::std::move(other.movementY);
+      pointerId   = ::std::move(other.pointerId);
+      pointerType = ::std::move(other.pointerType);
+      ctrlKey     = ::std::move(other.ctrlKey);
+      shiftKey    = ::std::move(other.shiftKey);
+      button      = ::std::move(other.button);
+      buttons     = ::std::move(other.buttons);
+      srcElement  = ::std::move(other.srcElement);
+    }
+
+    return *this;
+  }
   int clientX;
   int clientY;
   int movementX;
@@ -311,7 +367,6 @@ struct PointerEvent : public Event {
   PointerType pointerType;
   bool ctrlKey;
   bool shiftKey;
-  EventType type;
   MouseButtonType button;
   int buttons;
   ICanvas* srcElement;
@@ -319,6 +374,47 @@ struct PointerEvent : public Event {
   {
   }
 }; // end of struct PointerEvent
+
+struct MouseWheelEvent : public PointerEvent {
+  MouseWheelEvent()
+  {
+  }
+  MouseWheelEvent(const MouseWheelEvent& other)
+      : PointerEvent{other}, wheelDelta{other.wheelDelta}, detail{other.detail}
+  {
+  }
+  MouseWheelEvent(MouseWheelEvent&& other)
+      : PointerEvent{::std::move(other)}
+      , wheelDelta{::std::move(other.wheelDelta)}
+      , detail{::std::move(other.detail)}
+  {
+  }
+  MouseWheelEvent& operator=(const MouseWheelEvent& other)
+  {
+    if (&other != this) {
+      PointerEvent::operator=(other);
+      wheelDelta            = other.wheelDelta;
+      detail                = other.detail;
+    }
+
+    return *this;
+  }
+  MouseWheelEvent& operator=(MouseWheelEvent&& other)
+  {
+    if (&other != this) {
+      PointerEvent::operator=(::std::move(other));
+      wheelDelta            = ::std::move(other.wheelDelta);
+      detail                = ::std::move(other.detail);
+    }
+
+    return *this;
+  }
+  float wheelDelta;
+  float detail;
+  void preventDefault() const
+  {
+  }
+}; // end of struct MouseWheelEvent
 
 struct Polyhedron {
   string_t name;
