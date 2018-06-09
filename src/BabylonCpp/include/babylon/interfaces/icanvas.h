@@ -38,8 +38,8 @@ public:
   void onMouseButtonUp(int mouseX, int mouseY, MouseButtonType btn);
   void onMouseMove(int mouseX, int mouseY);
   void onMouseWheel(float wheelDelta);
-  void onKeyDown(bool ctrlKey, bool altKey, int keyCode);
-  void onKeyUp(bool ctrlKey, bool altKey, int keyCode);
+  void onKeyDown(bool ctrlKey, bool altKey, int keyCode, string_t code);
+  void onKeyUp(bool ctrlKey, bool altKey, int keyCode, string_t code);
 
   void focus();
   void applicationDidEnterBackground();
@@ -62,7 +62,8 @@ protected:
   unique_ptr_t<GL::IGLRenderingContext> _renderingContext;
   vector_t<vector_t<::std::function<void(PointerEvent&& evt)>>>
     mouseEventListeners;
-  vector_t<vector_t<::std::function<void(Event&& evt)>>> keyEventListeners;
+  vector_t<vector_t<::std::function<void(KeyboardEvent&& evt)>>>
+    keyEventListeners;
 
 protected:
   bool _initialized;

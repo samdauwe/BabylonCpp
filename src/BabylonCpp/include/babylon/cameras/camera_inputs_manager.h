@@ -35,6 +35,7 @@ public:
   void attachElement(ICanvas* canvas, bool noPreventDefault = false);
   void detachElement(ICanvas* canvas, bool disconnect = false);
   void rebuildInputCheck();
+  void checkInputs();
 
   /**
    * @brief Remove all attached input methods from a camera
@@ -48,7 +49,6 @@ public:
   ICanvas* attachedElement;
   bool noPreventDefault;
   TCamera* camera;
-  ::std::function<void()> checkInputs;
 
 private:
   unordered_map_t<string_t, shared_ptr_t<ICameraInput<TCamera>>> attached;

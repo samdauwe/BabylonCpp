@@ -11,7 +11,6 @@ template <class TCamera>
 CameraInputsManager<TCamera>::CameraInputsManager(TCamera* _camera)
     : attachedElement{nullptr}, camera{_camera}
 {
-  checkInputs = []() {};
 }
 
 template <class TCamera>
@@ -31,19 +30,12 @@ void CameraInputsManager<TCamera>::add(
     return;
   }
 
-  attached[type]                  = ::std::move(input);
-  ICameraInput<TCamera>* inputPtr = attached[type].get();
+  attached[type] = ::std::move(input);
 
-  inputPtr->camera = camera;
-
-  // for checkInputs, we are dynamically creating a function the goal is to
-  // avoid the performance penalty of looping for inputs in the render loop
-  if (inputPtr->hasCheckInputs) {
-    checkInputs = _addCheckInputs([&inputPtr]() { inputPtr->checkInputs(); });
-  }
+  attached[type]->camera = camera;
 
   if (attachedElement) {
-    inputPtr->attachControl(attachedElement);
+    attached[type]->attachControl(attachedElement);
   }
 }
 
@@ -76,13 +68,10 @@ void CameraInputsManager<TCamera>::removeByType(const string_t& inputType)
 }
 
 template <class TCamera>
-::std::function<void()> CameraInputsManager<TCamera>::_addCheckInputs(
-  const ::std::function<void()>& /*fn*/)
+::std::function<void()>
+CameraInputsManager<TCamera>::_addCheckInputs(const ::std::function<void()>& fn)
 {
-  return [&]() {
-    // checkInputs();
-    // fn();
-  };
+  return [&]() { fn(); };
 }
 
 template <class TCamera>
@@ -134,12 +123,15 @@ void CameraInputsManager<TCamera>::detachElement(ICanvas* canvas,
 template <class TCamera>
 void CameraInputsManager<TCamera>::rebuildInputCheck()
 {
-  checkInputs = []() {};
+}
 
+template <class TCamera>
+void CameraInputsManager<TCamera>::checkInputs()
+{
   for (auto& item : attached) {
     auto& input = item.second;
     if (input->hasCheckInputs) {
-      checkInputs = _addCheckInputs([&input]() { input->checkInputs(); });
+      input->checkInputs();
     }
   }
 }
@@ -152,7 +144,6 @@ void CameraInputsManager<TCamera>::clear()
   }
   attached.clear();
   attachedElement = nullptr;
-  checkInputs     = []() {};
 }
 
 template <class TCamera>

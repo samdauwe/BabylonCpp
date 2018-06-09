@@ -1352,7 +1352,7 @@ void Scene::_onPointerMoveEvent(PointerEvent&& evt)
 
 void Scene::_onPointerDownEvent(PointerEvent&& evt)
 {
-  _totalPointersPressed++;
+  ++_totalPointersPressed;
   _pickedDownMesh  = nullptr;
   _meshPickProceed = false;
 
@@ -1441,7 +1441,7 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
     return; // So we need to test it the pointer down was pressed before.
   }
 
-  _totalPointersPressed--;
+  --_totalPointersPressed;
   _pickedUpMesh    = nullptr;
   _meshPickProceed = false;
 

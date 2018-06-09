@@ -42,13 +42,175 @@ const SampleLauncher::ResolutionSize SampleLauncher::FULL_RESOLUTION_SIZE
 static Window _sceneWindow;
 static Window _inspectorWindow;
 
+static unordered_map_t<int, string_t>& GetGLFWKeyMap()
+{
+  static unordered_map_t<int, string_t> glfwKeyMap{
+    // Inknown key
+    {GLFW_KEY_UNKNOWN, "Unknown"}, // -1
+    // Non-alphanumeric characters
+    {GLFW_KEY_SPACE, "Space"},           // 32
+    {GLFW_KEY_APOSTROPHE, "Apostrophe"}, // 39 /* ' */
+    {GLFW_KEY_COMMA, "Comma"},           // 44 /* , */
+    {GLFW_KEY_MINUS, "Minus"},           // 45 /* - */
+    {GLFW_KEY_PERIOD, "Period"},         // 46 /* . */
+    {GLFW_KEY_SLASH, "Slash"},           // 47 /* / */
+    // Digits
+    {GLFW_KEY_0, "Digit0"}, // 48
+    {GLFW_KEY_1, "Digit1"}, // 49
+    {GLFW_KEY_2, "Digit2"}, // 50
+    {GLFW_KEY_3, "Digit3"}, // 51
+    {GLFW_KEY_4, "Digit4"}, // 52
+    {GLFW_KEY_5, "Digit5"}, // 53
+    {GLFW_KEY_6, "Digit6"}, // 54
+    {GLFW_KEY_7, "Digit7"}, // 55
+    {GLFW_KEY_8, "Digit8"}, // 56
+    {GLFW_KEY_9, "Digit9"}, // 57
+    // ; and =
+    {GLFW_KEY_SEMICOLON, "Semicolon"}, // 59 /* ; */
+    {GLFW_KEY_EQUAL, "Equal"},         // 61 /* = */
+    // A-Z
+    {GLFW_KEY_A, "KeyA"}, // 65
+    {GLFW_KEY_B, "KeyB"}, // 66
+    {GLFW_KEY_C, "KeyC"}, // 67
+    {GLFW_KEY_D, "KeyD"}, // 68
+    {GLFW_KEY_E, "KeyE"}, // 69
+    {GLFW_KEY_F, "KeyF"}, // 70
+    {GLFW_KEY_G, "KeyG"}, // 71
+    {GLFW_KEY_H, "KeyH"}, // 72
+    {GLFW_KEY_I, "KeyI"}, // 73
+    {GLFW_KEY_J, "KeyJ"}, // 74
+    {GLFW_KEY_K, "KeyK"}, // 75
+    {GLFW_KEY_L, "KeyL"}, // 76
+    {GLFW_KEY_M, "KeyM"}, // 77
+    {GLFW_KEY_N, "KeyN"}, // 78
+    {GLFW_KEY_O, "KeyO"}, // 79
+    {GLFW_KEY_P, "KeyP"}, // 80
+    {GLFW_KEY_Q, "KeyQ"}, // 81
+    {GLFW_KEY_R, "KeyR"}, // 82
+    {GLFW_KEY_S, "KeyS"}, // 83
+    {GLFW_KEY_T, "KeyT"}, // 84
+    {GLFW_KEY_U, "KeyU"}, // 85
+    {GLFW_KEY_V, "KeyV"}, // 86
+    {GLFW_KEY_W, "KeyW"}, // 87
+    {GLFW_KEY_X, "KeyX"}, // 88
+    {GLFW_KEY_Y, "KeyY"}, // 89
+    {GLFW_KEY_Z, "KeyZ"}, // 90
+    // Special keys
+    {GLFW_KEY_LEFT_BRACKET, "LeftBracket"},   // 91 /* [ */
+    {GLFW_KEY_BACKSLASH, "Backslash"},        // 92 /* \ */
+    {GLFW_KEY_RIGHT_BRACKET, "RightBracket"}, // 93 /* ] */
+    {GLFW_KEY_GRAVE_ACCENT, "Accent"},        // 96 /* ` */
+    {GLFW_KEY_ESCAPE, "Escape"},              // 256
+    {GLFW_KEY_ENTER, "Enter"},                // 257
+    {GLFW_KEY_TAB, "Tab"},                    // 258
+    {GLFW_KEY_BACKSPACE, "Backspace"},        // 259
+    {GLFW_KEY_INSERT, "Insert"},              // 260
+    {GLFW_KEY_DELETE, "Delete"},              // 261
+    {GLFW_KEY_RIGHT, "ArrowRight"},           // 262
+    {GLFW_KEY_LEFT, "ArrowLeft"},             // 263
+    {GLFW_KEY_DOWN, "ArrowDown"},             // 264
+    {GLFW_KEY_UP, "ArrowUp"},                 // 265
+    {GLFW_KEY_PAGE_UP, "PageUp"},             // 266
+    {GLFW_KEY_PAGE_DOWN, "PageDown"},         // 267
+    {GLFW_KEY_HOME, "Home"},                  // 268
+    {GLFW_KEY_END, "End"},                    // 269
+    {GLFW_KEY_CAPS_LOCK, "CapsLock"},         // 280
+    {GLFW_KEY_SCROLL_LOCK, "ScrollLock"},     // 281
+    {GLFW_KEY_NUM_LOCK, "NumLock"},           // 282
+    {GLFW_KEY_PRINT_SCREEN, "PrintScreen"},   // 283
+    {GLFW_KEY_PAUSE, "Pause"},                // 284
+    // Function keys
+    {GLFW_KEY_F1, "F1"},   // 290
+    {GLFW_KEY_F2, "F2"},   // 291
+    {GLFW_KEY_F3, "F3"},   // 292
+    {GLFW_KEY_F4, "F4"},   // 293
+    {GLFW_KEY_F5, "F5"},   // 294
+    {GLFW_KEY_F6, "F6"},   // 295
+    {GLFW_KEY_F7, "F7"},   // 296
+    {GLFW_KEY_F8, "F8"},   // 297
+    {GLFW_KEY_F9, "F9"},   // 298
+    {GLFW_KEY_F10, "F10"}, // 299
+    {GLFW_KEY_F11, "F11"}, // 300
+    {GLFW_KEY_F12, "F12"}, // 301
+    {GLFW_KEY_F13, "F13"}, // 302
+    {GLFW_KEY_F14, "F14"}, // 303
+    {GLFW_KEY_F15, "F15"}, // 304
+    {GLFW_KEY_F16, "F16"}, // 305
+    {GLFW_KEY_F17, "F17"}, // 306
+    {GLFW_KEY_F18, "F18"}, // 307
+    {GLFW_KEY_F19, "F19"}, // 308
+    {GLFW_KEY_F20, "F20"}, // 309
+    {GLFW_KEY_F21, "F21"}, // 310
+    {GLFW_KEY_F22, "F22"}, // 311
+    {GLFW_KEY_F23, "F23"}, // 312
+    {GLFW_KEY_F24, "F24"}, // 313
+    {GLFW_KEY_F25, "F25"}, // 314
+    // Numpad keys
+    {GLFW_KEY_KP_0, "Numpad0"},                // 320
+    {GLFW_KEY_KP_1, "Numpad1"},                // 321
+    {GLFW_KEY_KP_2, "Numpad2"},                // 322
+    {GLFW_KEY_KP_3, "Numpad3"},                // 323
+    {GLFW_KEY_KP_4, "Numpad4"},                // 324
+    {GLFW_KEY_KP_5, "Numpad5"},                // 325
+    {GLFW_KEY_KP_6, "Numpad6"},                // 326
+    {GLFW_KEY_KP_7, "Numpad7"},                // 327
+    {GLFW_KEY_KP_8, "Numpad8"},                // 328
+    {GLFW_KEY_KP_9, "Numpad9"},                // 329
+    {GLFW_KEY_KP_DECIMAL, "NumpadDecimal"},    // 330
+    {GLFW_KEY_KP_DIVIDE, "NumpadDivide"},      // 331
+    {GLFW_KEY_KP_MULTIPLY, "NumpadMultiply"},  // 332
+    {GLFW_KEY_KP_SUBTRACT, "NumpadSubstract"}, // 333
+    {GLFW_KEY_KP_ADD, "NumpadAdd"},            // 334
+    {GLFW_KEY_KP_ENTER, "NumpadEnter"},        // 335
+    {GLFW_KEY_KP_EQUAL, "NumpadEqual"},        // 336
+    // Special keys
+    {GLFW_KEY_LEFT_SHIFT, "ShiftLeft"},       // 340
+    {GLFW_KEY_LEFT_CONTROL, "ControlLeft"},   // 341
+    {GLFW_KEY_LEFT_ALT, "AltLeft"},           // 342
+    {GLFW_KEY_LEFT_SUPER, "MetaLeft"},        // 343
+    {GLFW_KEY_RIGHT_SHIFT, "ShiftRight"},     // 344
+    {GLFW_KEY_RIGHT_CONTROL, "ControlRight"}, // 345
+    {GLFW_KEY_RIGHT_ALT, "AltRight"},         // 346
+    {GLFW_KEY_RIGHT_SUPER, "MetaRight"},      // 347
+    {GLFW_KEY_MENU, "ContextMenu"},           // 348
+  };
+  /// Return key map
+  return glfwKeyMap;
+}
+
+static string_t GLFWKeyToString(int glfwKey)
+{
+  static auto& glfwKeyMap = GetGLFWKeyMap();
+  return stl_util::contains(glfwKeyMap, glfwKey) ? glfwKeyMap[glfwKey] :
+                                                   "Unknown";
+}
+
+static int RemapGLFWKeyCode(int glfwKey)
+{
+  // Remap GLFW keycode to JS keycode
+  if (glfwKey == GLFW_KEY_RIGHT) {
+    return 39;
+  }
+  else if (glfwKey == GLFW_KEY_LEFT) {
+    return 37;
+  }
+  else if (glfwKey == GLFW_KEY_DOWN) {
+    return 40;
+  }
+  else if (glfwKey == GLFW_KEY_UP) {
+    return 38;
+  }
+
+  return glfwKey;
+}
+
 static void GLFWErrorCallback(int error, const char* description)
 {
   fprintf(stderr, "GLFW Error occured, Error id: %i, Description: %s\n", error,
           description);
 }
 
-static void GLFWKeyCallback(GLFWwindow* window, int key, int scancode,
+static void GLFWKeyCallback(GLFWwindow* window, int key, int /*scancode*/,
                             int action, int mods)
 {
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
@@ -60,12 +222,16 @@ static void GLFWKeyCallback(GLFWwindow* window, int key, int scancode,
     // Determine modifier
     bool ctrlKey = (mods & GLFW_MOD_CONTROL);
     bool altKey  = (mods & GLFW_MOD_ALT);
+    // Readable key name
+    auto code = GLFWKeyToString(key);
+    // Remap GLFW keycode to JS code
+    auto keyCode = RemapGLFWKeyCode(key);
     // Raise event
     if (action == GLFW_PRESS) {
-      _sceneWindow.renderCanvas->onKeyDown(ctrlKey, altKey, scancode);
+      _sceneWindow.renderCanvas->onKeyDown(ctrlKey, altKey, keyCode, code);
     }
     else if (action == GLFW_RELEASE) {
-      _sceneWindow.renderCanvas->onKeyUp(ctrlKey, altKey, scancode);
+      _sceneWindow.renderCanvas->onKeyUp(ctrlKey, altKey, keyCode, code);
     }
   }
 }

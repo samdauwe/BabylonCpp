@@ -143,6 +143,7 @@ struct DragStartOrEndEvent {
 }; // end of struct DragStartOrEndEvent
 
 struct Event {
+  unsigned int type;
   int charCode;
   int keyCode;
 }; // end of struct Event
@@ -205,6 +206,7 @@ struct Image {
 struct KeyboardEvent : public Event {
   bool ctrlKey;
   bool altKey;
+  string_t code;
   void preventDefault() const
   {
   }

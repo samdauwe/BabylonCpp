@@ -38,6 +38,7 @@ enum class EventType {
   KEY_DOWN          = 7,
   KEY_UP            = 8,
   BLUR              = 9,
+  UNKNOWN           = 10,
 }; // end of enum class EventType
 
 /** Mouse button types **/
