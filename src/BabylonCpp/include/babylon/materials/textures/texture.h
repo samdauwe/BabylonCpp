@@ -13,6 +13,8 @@ namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT Texture : public BaseTexture {
 
+  friend Scene;
+
 public:
   /**
    * Gets or sets a boolean which defines if the texture url must be build from

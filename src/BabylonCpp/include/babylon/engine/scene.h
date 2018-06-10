@@ -566,6 +566,15 @@ public:
   Scene& simulatePointerUp(const Nullable<PickingInfo>& pickResult);
 
   /**
+   * @brief Gets a boolean indicating if the current pointer event is captured
+   * (meaning that the scene has already handled the pointer down)
+   * @param pointerId defines the pointer id to use in a multi-touch scenario (0
+   * by default)
+   * @returns true if the pointer was captured
+   */
+  bool isPointerCaptured(int pointerId = 0);
+
+  /**
    * @brief Attach events to the canvas (To handle actionManagers triggers and
    * raise onPointerMove, onPointerDown and onPointerUp.
    * @param attachUp defines if you want to attach events to pointerup
@@ -846,8 +855,9 @@ public:
   /**
    * @brief Add a mesh to the list of scene's meshes.
    * @param newMesh defines the mesh to add
+   * @param recursive if all child meshes should also be added to the scene
    */
-  void addMesh(unique_ptr_t<AbstractMesh>&& newMesh);
+  void addMesh(unique_ptr_t<AbstractMesh>&& newMesh, bool recursive = false);
 
   /**
    * @brief Remove a mesh for the list of scene's meshes.
@@ -1509,6 +1519,19 @@ public:
    */
   void disposeSounds();
 
+  /**
+   * @brief Call this function to reduce memory footprint of the scene.
+   * Vertex buffers will not store CPU data anymore (this will prevent picking,
+   * collisions or physics to work correctly)
+   */
+  void clearCachedVertexData();
+
+  /**
+   * @brief This function will remove the local cached buffer data from texture.
+   * It will save memory but will prevent the texture from being rebuilt
+   */
+  void cleanCachedTextureBuffer();
+
   /** Octrees **/
 
   /**
@@ -1612,7 +1635,7 @@ public:
    */
   Nullable<PickingInfo>
   pickSprite(int x, int y,
-             const ::std::function<bool(Sprite* sprite)>& predicate,
+             const ::std::function<bool(Sprite* sprite)>& predicate = nullptr,
              bool fastCheck = false, Camera* camera = nullptr);
 
   /** @brief Use the given ray to pick a mesh in the scene.
@@ -1625,7 +1648,8 @@ public:
    */
   Nullable<PickingInfo>
   pickWithRay(const Ray& ray,
-              const ::std::function<bool(AbstractMesh* mesh)>& predicate,
+              const ::std::function<bool(AbstractMesh* mesh)>& predicate
+              = nullptr,
               bool fastCheck = false);
 
   /**
@@ -1879,6 +1903,12 @@ private:
   void _updatePointerPosition(const PointerEvent evt);
   void _createUbo();
   void _createAlternateUbo();
+  // Pointers handling
+  Nullable<PickingInfo> _pickSpriteButKeepRay(
+    const Nullable<PickingInfo>& originalPointerInfo, int x, int y,
+    const ::std::function<bool(Sprite* sprite)>& predicate = nullptr,
+    bool fastCheck = false, Camera* camera = nullptr);
+  void _setRayOnPointerInfo(PointerInfo& pointerInfo);
   Scene& _processPointerMove(Nullable<PickingInfo>& pickResult,
                              const PointerEvent& evt);
   bool _checkPrePointerObservable(const Nullable<PickingInfo>& pickResult,

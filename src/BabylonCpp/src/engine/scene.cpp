@@ -51,9 +51,11 @@
 #include <babylon/math/frustum.h>
 #include <babylon/math/tmp.h>
 #include <babylon/mesh/abstract_mesh.h>
+#include <babylon/mesh/buffer.h>
 #include <babylon/mesh/geometry.h>
 #include <babylon/mesh/simplification/simplification_queue.h>
 #include <babylon/mesh/sub_mesh.h>
+#include <babylon/mesh/vertex_buffer.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/physics/physics_engine.h>
@@ -772,9 +774,47 @@ void Scene::_createAlternateUbo()
   _alternateSceneUbo->addUniform("view", 16);
 }
 
+Nullable<PickingInfo> Scene::_pickSpriteButKeepRay(
+  const Nullable<PickingInfo>& originalPointerInfo, int x, int y,
+  const ::std::function<bool(Sprite* sprite)>& predicate, bool fastCheck,
+  Camera* camera)
+{
+  auto result = pickSprite(x, y, predicate, fastCheck, camera);
+  if (result) {
+    auto _result = *result;
+    _result.ray  = originalPointerInfo ? _result.ray : nullptr;
+    result       = _result;
+  }
+  return result;
+}
+
+void Scene::_setRayOnPointerInfo(PointerInfo& pointerInfo)
+{
+  /* if (pointerInfo.pickInfo) */ {
+    if (!pointerInfo.pickInfo.ray) {
+      auto identityMatrix = Matrix::Identity();
+      if (pointerInfo.type == PointerEventTypes::POINTERWHEEL) {
+        pointerInfo.pickInfo.ray = createPickingRay(
+          pointerInfo.mouseWheelEvent.offsetX,
+          pointerInfo.mouseWheelEvent.offsetY, &identityMatrix, activeCamera);
+      }
+      else if (pointerInfo.type == PointerEventTypes::POINTERMOVE) {
+        pointerInfo.pickInfo.ray = createPickingRay(
+          pointerInfo.pointerEvent.offsetX, pointerInfo.pointerEvent.offsetY,
+          &identityMatrix, activeCamera);
+      }
+    }
+  }
+}
+
 Scene& Scene::simulatePointerMove(Nullable<PickingInfo>& pickResult)
 {
   PointerEvent evt("pointermove");
+
+  if (_checkPrePointerObservable(pickResult, evt,
+                                 PointerEventTypes::POINTERMOVE)) {
+    return *this;
+  }
   return _processPointerMove(pickResult, evt);
 }
 
@@ -808,8 +848,9 @@ Scene& Scene::_processPointerMove(Nullable<PickingInfo>& pickResult,
   else {
     setPointerOverMesh(nullptr);
     // Sprites
-    pickResult = pickSprite(_unTranslatedPointerX, _unTranslatedPointerY,
-                            _spritePredicate, false, cameraToUseForPointers);
+    pickResult = _pickSpriteButKeepRay(pickResult, _unTranslatedPointerX,
+                                       _unTranslatedPointerY, _spritePredicate,
+                                       false, cameraToUseForPointers);
 
     if (pickResult && (*pickResult).hit && (*pickResult).pickedSprite) {
       setPointerOverSprite((*pickResult).pickedSprite);
@@ -847,10 +888,12 @@ Scene& Scene::_processPointerMove(Nullable<PickingInfo>& pickResult,
       if (type == PointerEventTypes::POINTERWHEEL) {
         PointerInfo pi(type, *static_cast<MouseWheelEvent const*>(&evt),
                        *pickResult);
+        _setRayOnPointerInfo(pi);
         onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
       }
       else {
         PointerInfo pi(type, evt, *pickResult);
+        _setRayOnPointerInfo(pi);
         onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
       }
     }
@@ -879,6 +922,12 @@ bool Scene::_checkPrePointerObservable(const Nullable<PickingInfo>& pickResult,
 Scene& Scene::simulatePointerDown(const Nullable<PickingInfo>& pickResult)
 {
   PointerEvent evt("pointerdown");
+
+  if (_checkPrePointerObservable(pickResult, evt,
+                                 PointerEventTypes::POINTERDOWN)) {
+    return *this;
+  }
+
   return _processPointerDown(pickResult, evt);
 }
 
@@ -958,8 +1007,8 @@ Scene& Scene::_processPointerDown(const Nullable<PickingInfo>& pickResult,
     }
 
     if (onPointerObservable.hasObservers()) {
-      auto type = PointerEventTypes::POINTERDOWN;
       PointerInfo pi(type, evt, *pickResult);
+      _setRayOnPointerInfo(pi);
       onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
     }
   }
@@ -997,6 +1046,7 @@ Scene& Scene::_processPointerUp(const Nullable<PickingInfo>& pickResult,
           && onPointerObservable.hasObservers()) {
         auto type = PointerEventTypes::POINTERPICK;
         PointerInfo pi(type, evt, *pickResult);
+        _setRayOnPointerInfo(pi);
         onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
       }
     }
@@ -1031,7 +1081,6 @@ Scene& Scene::_processPointerUp(const Nullable<PickingInfo>& pickResult,
   }
 
   auto type = PointerEventTypes::POINTERUP;
-
   if (onPointerObservable.hasObservers()) {
     if (!clickInfo.ignore()) {
       if (!clickInfo.hasSwiped()) {
@@ -1040,6 +1089,7 @@ Scene& Scene::_processPointerUp(const Nullable<PickingInfo>& pickResult,
                  static_cast<int>(PointerEventTypes::POINTERTAP))) {
           auto type = PointerEventTypes::POINTERTAP;
           PointerInfo pi(type, evt, *pickResult);
+          _setRayOnPointerInfo(pi);
           onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
         }
         if (clickInfo.doubleClick()
@@ -1047,6 +1097,7 @@ Scene& Scene::_processPointerUp(const Nullable<PickingInfo>& pickResult,
                  static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
           auto type = PointerEventTypes::POINTERDOUBLETAP;
           PointerInfo pi(type, evt, *pickResult);
+          _setRayOnPointerInfo(pi);
           onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
         }
       }
@@ -1054,6 +1105,7 @@ Scene& Scene::_processPointerUp(const Nullable<PickingInfo>& pickResult,
     else {
       auto type = PointerEventTypes::POINTERUP;
       PointerInfo pi(type, evt, *pickResult);
+      _setRayOnPointerInfo(pi);
       onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
     }
   }
@@ -1063,6 +1115,12 @@ Scene& Scene::_processPointerUp(const Nullable<PickingInfo>& pickResult,
   }
 
   return *this;
+}
+
+bool Scene::isPointerCaptured(int pointerId)
+{
+  return stl_util::contains(_pointerCaptures, pointerId)
+         && _pointerCaptures[pointerId];
 }
 
 void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
@@ -1838,7 +1896,10 @@ vector_t<Animatable*> Scene::beginDirectHierarchyAnimation(
   float speedRatio, const ::std::function<void()>& onAnimationEnd)
 {
   auto children = target->getDescendants(directDescendantsOnly);
+
   vector_t<Animatable*> result;
+  result.emplace_back(beginDirectAnimation(target, animations, from, to, loop,
+                                           speedRatio, onAnimationEnd));
   for (auto& child : children) {
     result.emplace_back(beginDirectAnimation(child, animations, from, to, loop,
                                              speedRatio, onAnimationEnd));
@@ -2170,7 +2231,7 @@ size_t Scene::getUniqueId()
   return result;
 }
 
-void Scene::addMesh(unique_ptr_t<AbstractMesh>&& newMesh)
+void Scene::addMesh(unique_ptr_t<AbstractMesh>&& newMesh, bool recursive)
 {
   meshes.emplace_back(::std::move(newMesh));
   auto _newMesh = meshes.back().get();
@@ -2182,6 +2243,12 @@ void Scene::addMesh(unique_ptr_t<AbstractMesh>&& newMesh)
   _newMesh->_resyncLightSources();
 
   onNewMeshAddedObservable.notifyObservers(_newMesh);
+
+  if (recursive) {
+    // for (auto& m : newMesh->getChildMeshes()) {
+    //   addMesh(m);
+    // }
+  }
 }
 
 int Scene::removeMesh(AbstractMesh* toRemove, bool recursive)
@@ -3562,7 +3629,7 @@ void Scene::_checkIntersections()
 {
 }
 
-void Scene::render(bool /*updateCameras*/)
+void Scene::render(bool updateCameras)
 {
   if (isDisposed()) {
     return;
@@ -3665,23 +3732,25 @@ void Scene::render(bool /*updateCameras*/)
   }
 
   // Update Cameras
-  if (!activeCameras.empty()) {
-    for (auto& camera : activeCameras) {
-      camera->update();
-      if (camera->cameraRigMode != Camera::RIG_MODE_NONE()) {
-        // Rig cameras
-        for (auto& rigCamera : camera->_rigCameras) {
-          rigCamera->update();
+  if (updateCameras) {
+    if (!activeCameras.empty()) {
+      for (auto& camera : activeCameras) {
+        camera->update();
+        if (camera->cameraRigMode != Camera::RIG_MODE_NONE()) {
+          // Rig cameras
+          for (auto& rigCamera : camera->_rigCameras) {
+            rigCamera->update();
+          }
         }
       }
     }
-  }
-  else if (activeCamera) {
-    activeCamera->update();
-    if (activeCamera->cameraRigMode != Camera::RIG_MODE_NONE()) {
-      // rig cameras
-      for (auto& rigCamera : activeCamera->_rigCameras) {
-        rigCamera->update();
+    else if (activeCamera) {
+      activeCamera->update();
+      if (activeCamera->cameraRigMode != Camera::RIG_MODE_NONE()) {
+        // rig cameras
+        for (auto& rigCamera : activeCamera->_rigCameras) {
+          rigCamera->update();
+        }
       }
     }
   }
@@ -4180,9 +4249,43 @@ bool Scene::isDisposed() const
   return _isDisposed;
 }
 
-/** Release sounds & sounds tracks **/
 void Scene::disposeSounds()
 {
+}
+
+void Scene::clearCachedVertexData()
+{
+  for (auto& abstractmesh : meshes) {
+    auto mesh = static_cast<Mesh*>(abstractmesh.get());
+    if (mesh) {
+      auto geometry = mesh->geometry();
+
+      if (geometry) {
+        geometry->_indices.clear();
+
+        for (auto& vb : geometry->_vertexBuffers) {
+          if (!stl_util::contains(geometry->_vertexBuffers, vb.first)) {
+            continue;
+          }
+          geometry->_vertexBuffers[vb.first]->_getBuffer()->_data.clear();
+        }
+      }
+    }
+  }
+}
+
+void Scene::cleanCachedTextureBuffer()
+{
+  for (auto& baseTexture : textures) {
+    auto texture = static_cast<Texture*>(baseTexture.get());
+    if (texture) {
+      auto buffer = texture->_buffer;
+
+      if (buffer) {
+        texture->_buffer = nullptr;
+      }
+    }
+  }
 }
 
 /** Octrees **/
@@ -4470,7 +4573,7 @@ Scene::pickWithRay(const Ray& ray,
                    const ::std::function<bool(AbstractMesh* mesh)>& predicate,
                    bool fastCheck)
 {
-  return _internalPick(
+  auto result = _internalPick(
     [this, &ray](Matrix& world) -> Ray {
       if (!_pickWithRayInverseMatrix) {
         _pickWithRayInverseMatrix
@@ -4487,6 +4590,12 @@ Scene::pickWithRay(const Ray& ray,
       return *_cachedRayForTransform;
     },
     predicate, fastCheck);
+  if (result) {
+    auto _result = *result;
+    _result.ray  = ray;
+    result       = _result;
+  }
+  return result;
 }
 
 vector_t<PickingInfo*>

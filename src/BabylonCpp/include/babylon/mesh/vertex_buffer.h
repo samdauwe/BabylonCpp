@@ -12,6 +12,8 @@ namespace BABYLON {
  */
 class BABYLON_SHARED_EXPORT VertexBuffer {
 
+  friend Scene;
+
 public:
   static constexpr unsigned int PositionKind             = 1;
   static constexpr unsigned int NormalKind               = 2;

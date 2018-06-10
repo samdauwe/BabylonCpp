@@ -300,6 +300,8 @@ struct PointerEvent : public Event {
       , clientY{other.clientY}
       , movementX{other.movementX}
       , movementY{other.movementY}
+      , offsetX{other.offsetX}
+      , offsetY{other.offsetY}
       , pointerId{other.pointerId}
       , pointerType{other.pointerType}
       , ctrlKey{other.ctrlKey}
@@ -314,6 +316,8 @@ struct PointerEvent : public Event {
       , clientY{::std::move(other.clientY)}
       , movementX{::std::move(other.movementX)}
       , movementY{::std::move(other.movementY)}
+      , offsetX{::std::move(other.offsetX)}
+      , offsetY{::std::move(other.offsetY)}
       , pointerId{::std::move(other.pointerId)}
       , pointerType{::std::move(other.pointerType)}
       , ctrlKey{::std::move(other.ctrlKey)}
@@ -330,6 +334,8 @@ struct PointerEvent : public Event {
       clientY     = other.clientY;
       movementX   = other.movementX;
       movementY   = other.movementY;
+      offsetX     = other.offsetX;
+      offsetY     = other.offsetY;
       pointerId   = other.pointerId;
       pointerType = other.pointerType;
       ctrlKey     = other.ctrlKey;
@@ -348,6 +354,8 @@ struct PointerEvent : public Event {
       clientY     = ::std::move(other.clientY);
       movementX   = ::std::move(other.movementX);
       movementY   = ::std::move(other.movementY);
+      offsetX     = ::std::move(other.offsetX);
+      offsetY     = ::std::move(other.offsetY);
       pointerId   = ::std::move(other.pointerId);
       pointerType = ::std::move(other.pointerType);
       ctrlKey     = ::std::move(other.ctrlKey);
@@ -359,17 +367,19 @@ struct PointerEvent : public Event {
 
     return *this;
   }
-  int clientX;
-  int clientY;
-  int movementX;
-  int movementY;
-  int pointerId;
+  int clientX   = 0;
+  int clientY   = 0;
+  int movementX = 0;
+  int movementY = 0;
+  int offsetX   = 0;
+  int offsetY   = 0;
+  int pointerId = 0;
   PointerType pointerType;
-  bool ctrlKey;
-  bool shiftKey;
+  bool ctrlKey  = false;
+  bool shiftKey = false;
   MouseButtonType button;
-  int buttons;
-  ICanvas* srcElement;
+  int buttons         = 0;
+  ICanvas* srcElement = nullptr;
   void preventDefault()
   {
   }
