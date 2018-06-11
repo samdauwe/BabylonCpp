@@ -112,24 +112,14 @@ struct BABYLON_SHARED_EXPORT EngineConstants {
   static constexpr unsigned int TEXTUREFORMAT_RGBA = 5;
 
   /**
-   * R32F
+   * R
    */
-  static constexpr unsigned int TEXTUREFORMAT_R32F = 6;
+  static constexpr unsigned int TEXTUREFORMAT_R = 6;
 
   /**
-   * RG32F
+   * RG
    */
-  static constexpr unsigned int TEXTUREFORMAT_RG32F = 7;
-
-  /**
-   * RGB32F
-   */
-  static constexpr unsigned int TEXTUREFORMAT_RGB32F = 8;
-
-  /**
-   * RGBA32F
-   */
-  static constexpr unsigned int TEXTUREFORMAT_RGBA32F = 9;
+  static constexpr unsigned int TEXTUREFORMAT_RG = 7;
 
   /**
    * UNSIGNED_INT

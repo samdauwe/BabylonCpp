@@ -406,6 +406,16 @@ bool Engine::needPOTTextures() const
   return _webGLVersion < 2.f || forcePOTTextures;
 }
 
+bool Engine::doNotHandleContextLost() const
+{
+  return _doNotHandleContextLost;
+}
+
+void Engine::setDoNotHandleContextLost(bool value)
+{
+  _doNotHandleContextLost = value;
+}
+
 PerformanceMonitor* Engine::performanceMonitor() const
 {
   return _performanceMonitor.get();
@@ -462,7 +472,13 @@ float Engine::getAspectRatio(Camera* camera, bool useScreen)
          / static_cast<float>(getRenderHeight(useScreen) * viewport.height);
 }
 
-int Engine::getRenderWidth(bool useScreen)
+float Engine::getScreenAspectRatio() const
+{
+  return static_cast<float>(getRenderWidth(true))
+         / static_cast<float>(getRenderHeight(true));
+}
+
+int Engine::getRenderWidth(bool useScreen) const
 {
   if (!useScreen && _currentRenderTarget) {
     return _currentRenderTarget->width;
@@ -471,7 +487,7 @@ int Engine::getRenderWidth(bool useScreen)
   return _gl->drawingBufferWidth;
 }
 
-int Engine::getRenderHeight(bool useScreen)
+int Engine::getRenderHeight(bool useScreen) const
 {
   if (!useScreen && _currentRenderTarget) {
     return _currentRenderTarget->height;
@@ -2644,8 +2660,10 @@ void Engine::updateRawTexture(InternalTexture* texture, const Uint8Array& data,
     return;
   }
 
+  // babylon's internalSizedFomat but gl's texImage2D internalFormat
   auto internalSizedFomat = _getRGBABufferInternalSizedFormat(type, format);
-  auto internalFormat     = _getInternalFormat(format);
+  // babylon's internalFormat but gl's texImage2D format
+  auto internalFormat = _getInternalFormat(format);
 
   auto textureType = _getWebGLTextureType(type);
   _bindTextureDirectly(GL::TEXTURE_2D, texture, true);
@@ -3121,7 +3139,8 @@ Engine::createRenderTargetTexture(ISize size,
                   Uint8Array());
 
   // Create the framebuffer
-  auto framebuffer = _gl->createFramebuffer();
+  auto currentFrameBuffer = _currentFramebuffer;
+  auto framebuffer        = _gl->createFramebuffer();
   bindUnboundFramebuffer(framebuffer.get());
   _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
                             GL::TEXTURE_2D, texture->_webGLTexture.get(), 0);
@@ -3136,7 +3155,7 @@ Engine::createRenderTargetTexture(ISize size,
   // Unbind
   _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
   _gl->bindRenderbuffer(GL::RENDERBUFFER, nullptr);
-  bindUnboundFramebuffer(nullptr);
+  bindUnboundFramebuffer(currentFrameBuffer);
 
   _texture->_framebuffer           = ::std::move(framebuffer);
   _texture->baseWidth              = width;
@@ -3811,11 +3830,15 @@ void Engine::updateRawTexture3D(InternalTexture* texture,
                                 const ArrayBufferView& data,
                                 unsigned int format, bool invertY,
                                 const string_t& compression,
-                                unsigned int /*textureType*/)
+                                unsigned int textureType)
 {
   const auto& _data = data.uint8Array;
 
+  auto internalType   = _getWebGLTextureType(textureType);
   auto internalFormat = _getInternalFormat(format);
+  auto internalSizedFomat
+    = _getRGBABufferInternalSizedFormat(textureType, format);
+
   _bindTextureDirectly(GL::TEXTURE_3D, texture, true);
   _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL, invertY ? 1 : 0);
 
@@ -3836,9 +3859,9 @@ void Engine::updateRawTexture3D(InternalTexture* texture,
     // texture->depth, 0, data);
   }
   else {
-    _gl->texImage3D(GL::TEXTURE_3D, 0, static_cast<int>(internalFormat),
+    _gl->texImage3D(GL::TEXTURE_3D, 0, static_cast<int>(internalSizedFomat),
                     texture->width, texture->height, texture->depth, 0,
-                    internalFormat, GL::UNSIGNED_BYTE, _data);
+                    internalFormat, internalType, _data);
   }
 
   if (texture->generateMipMaps) {
@@ -3855,7 +3878,7 @@ InternalTexture* Engine::createRawTexture3D(const ArrayBufferView& data,
                                             bool generateMipMaps, bool invertY,
                                             unsigned int samplingMode,
                                             const string_t& compression,
-                                            unsigned int /*textureType*/)
+                                            unsigned int textureType)
 {
   auto texture = new InternalTexture(this, InternalTexture::DATASOURCE_RAW3D);
   texture->baseWidth       = width;
@@ -3865,6 +3888,7 @@ InternalTexture* Engine::createRawTexture3D(const ArrayBufferView& data,
   texture->height          = height;
   texture->depth           = depth;
   texture->format          = format;
+  texture->type            = textureType;
   texture->generateMipMaps = generateMipMaps;
   texture->samplingMode    = samplingMode;
   texture->is3D            = true;
@@ -3873,7 +3897,7 @@ InternalTexture* Engine::createRawTexture3D(const ArrayBufferView& data,
     texture->_bufferView = data.uint8Array;
   }
 
-  updateRawTexture3D(texture, data, format, invertY, compression);
+  updateRawTexture3D(texture, data, format, invertY, compression, textureType);
   _bindTextureDirectly(GL::TEXTURE_3D, texture, true);
 
   // Filters
@@ -4904,17 +4928,15 @@ GL::GLenum Engine::_getInternalFormat(unsigned int format) const
       internalFormat = GL::LUMINANCE_ALPHA;
       break;
     case EngineConstants::TEXTUREFORMAT_RGB:
-    case EngineConstants::TEXTUREFORMAT_RGB32F:
       internalFormat = GL::RGB;
       break;
     case EngineConstants::TEXTUREFORMAT_RGBA:
-    case EngineConstants::TEXTUREFORMAT_RGBA32F:
       internalFormat = GL::RGBA;
       break;
-    case EngineConstants::TEXTUREFORMAT_R32F:
+    case EngineConstants::TEXTUREFORMAT_R:
       internalFormat = GL::RED;
       break;
-    case EngineConstants::TEXTUREFORMAT_RG32F:
+    case EngineConstants::TEXTUREFORMAT_RG:
       internalFormat = GL::RG;
       break;
   }
@@ -4943,6 +4965,8 @@ GL::GLenum Engine::_getRGBABufferInternalSizedFormat(
       switch (*format) {
         case EngineConstants::TEXTUREFORMAT_LUMINANCE:
           return GL::LUMINANCE;
+        case EngineConstants::TEXTUREFORMAT_ALPHA:
+          return GL::ALPHA;
       }
     }
     return GL::RGBA;
@@ -4951,17 +4975,27 @@ GL::GLenum Engine::_getRGBABufferInternalSizedFormat(
   if (type == EngineConstants::TEXTURETYPE_FLOAT) {
     if (format) {
       switch (*format) {
-        case EngineConstants::TEXTUREFORMAT_R32F:
+        case EngineConstants::TEXTUREFORMAT_R:
           return GL::R32F;
-        case EngineConstants::TEXTUREFORMAT_RG32F:
+        case EngineConstants::TEXTUREFORMAT_RG:
           return GL::RG32F;
-        case EngineConstants::TEXTUREFORMAT_RGB32F:
+        case EngineConstants::TEXTUREFORMAT_RGB:
           return GL::RGB32F;
       }
     }
     return GL::RGBA32F;
   }
   else if (type == EngineConstants::TEXTURETYPE_HALF_FLOAT) {
+    if (format) {
+      switch (*format) {
+        case EngineConstants::TEXTUREFORMAT_R:
+          return GL::R16F;
+        case EngineConstants::TEXTUREFORMAT_RG:
+          return GL::RG16F;
+        case EngineConstants::TEXTUREFORMAT_RGB:
+          return GL::RGB16F;
+      }
+    }
     return GL::RGBA16F;
   }
 
@@ -4971,6 +5005,12 @@ GL::GLenum Engine::_getRGBABufferInternalSizedFormat(
         return GL::LUMINANCE;
       case EngineConstants::TEXTUREFORMAT_RGB:
         return GL::RGB;
+      case EngineConstants::TEXTUREFORMAT_R:
+        return GL::R8;
+      case EngineConstants::TEXTUREFORMAT_RG:
+        return GL::RG8;
+      case EngineConstants::TEXTUREFORMAT_ALPHA:
+        return GL::ALPHA;
     }
   }
   return GL::RGBA;

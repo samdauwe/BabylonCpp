@@ -134,6 +134,22 @@ public:
   bool needPOTTextures() const;
 
   /**
+   * @brief Gets a boolean indicating if resources should be retained to be able
+   * to handle context lost events
+   * @see
+   * http://doc.babylonjs.com/how_to/optimizing_your_scene#handling-webgl-context-lost
+   */
+  bool doNotHandleContextLost() const;
+
+  /**
+   * @brief Sets a boolean indicating if resources should be retained to be able
+   * to handle context lost events
+   * @see
+   * http://doc.babylonjs.com/how_to/optimizing_your_scene#handling-webgl-context-lost
+   */
+  void setDoNotHandleContextLost(bool value);
+
+  /**
    * @brief Gets the performance monitor attached to this engine.
    * @see
    * http://doc.babylonjs.com/how_to/optimizing_your_scene#engineinstrumentation
@@ -185,12 +201,18 @@ public:
   float getAspectRatio(Camera* camera, bool useScreen = false);
 
   /**
+   * @brief Gets current screen aspect ratio.
+   * @returns a number defining the aspect ratio
+   */
+  float getScreenAspectRatio() const;
+
+  /**
    * @brief Gets the current render width.
    * @param useScreen defines if screen size must be used (or the current render
    * target if any)
    * @returns a number defining the current render width
    */
-  int getRenderWidth(bool useScreen = false);
+  int getRenderWidth(bool useScreen = false) const;
 
   /**
    * @brief Gets the current render height.
@@ -198,7 +220,7 @@ public:
    * target if any)
    * @returns a number defining the current render height
    */
-  int getRenderHeight(bool useScreen = false);
+  int getRenderHeight(bool useScreen = false) const;
 
   /**
    * @brief Gets the HTML canvas attached with the current webGL context.
@@ -1349,8 +1371,9 @@ public:
    * (Default: BABYLON.Texture.TRILINEAR_SAMPLINGMODE)
    * @param onLoad optional callback to be called upon successful completion
    * @param onError optional callback to be called upon failure
-   * @param buffer a source of a file previously fetched as either an
-   * ArrayBuffer (compressed or image format) or HTMLImageElement (image format)
+   * @param buffer a source of a file previously fetched as either a base64
+   * string, an ArrayBuffer (compressed or image format), HTMLImageElement
+   * (image format), or a Blob
    * @param fallback an internal argument in case the function must be called
    * again, due to etc1 not having alpha capabilities
    * @param format internal format.  Default: RGB when extension is '.jpg' else
@@ -1550,6 +1573,8 @@ public:
    * @param format defines the format of the data
    * @param forcedExtension defines the extension to use to pick the right
    * loader
+   * @param createPolynomials defines wheter or not to create polynomails
+   * harmonics for the texture
    * @returns the cube texture as an InternalTexture
    */
   InternalTexture* createPrefilteredCubeTexture(
@@ -1664,6 +1689,8 @@ public:
    * @param format defines the data format
    * @param invertY defines if data must be stored with Y axis inverted
    * @param compression defines the used compression (can be null)
+   * @param textureType defines the texture Type
+   * (Engine.TEXTURETYPE_UNSIGNED_INT, Engine.TEXTURETYPE_FLOAT...)
    */
   void updateRawTexture3D(InternalTexture* texture, const ArrayBufferView& data,
                           unsigned int format, bool invertY = true,
@@ -1683,6 +1710,7 @@ public:
    * @param samplingMode defines the required sampling mode (like
    * BABYLON.Texture.NEAREST_SAMPLINGMODE)
    * @param compression defines the compressed used (can be null)
+   * @param textureType defines the compressed used (can be null)
    * @returns a new raw 3D texture (stored in an InternalTexture)
    */
   InternalTexture* createRawTexture3D(
@@ -2401,6 +2429,7 @@ protected:
   unsigned int _alphaMode;
 
   // Cache
+  vector_t<unique_ptr_t<InternalTexture>> _internalTexturesCache;
 
   /**
    * Hidden
@@ -2507,9 +2536,6 @@ private:
   unique_ptr_t<PerformanceMonitor> _performanceMonitor;
   float _fps;
   float _deltaTime;
-
-  // Cache
-  vector_t<unique_ptr_t<InternalTexture>> _internalTexturesCache;
 
   /**
    * Hidden

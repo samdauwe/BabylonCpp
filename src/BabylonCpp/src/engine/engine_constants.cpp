@@ -24,10 +24,8 @@ constexpr unsigned int EngineConstants::TEXTUREFORMAT_LUMINANCE;
 constexpr unsigned int EngineConstants::TEXTUREFORMAT_LUMINANCE_ALPHA;
 constexpr unsigned int EngineConstants::TEXTUREFORMAT_RGB;
 constexpr unsigned int EngineConstants::TEXTUREFORMAT_RGBA;
-constexpr unsigned int EngineConstants::TEXTUREFORMAT_R32F;
-constexpr unsigned int EngineConstants::TEXTUREFORMAT_RG32F;
-constexpr unsigned int EngineConstants::TEXTUREFORMAT_RGB32F;
-constexpr unsigned int EngineConstants::TEXTUREFORMAT_RGBA32F;
+constexpr unsigned int EngineConstants::TEXTUREFORMAT_R;
+constexpr unsigned int EngineConstants::TEXTUREFORMAT_RG;
 
 constexpr unsigned int EngineConstants::TEXTURETYPE_UNSIGNED_INT;
 constexpr unsigned int EngineConstants::TEXTURETYPE_FLOAT;
