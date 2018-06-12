@@ -17,6 +17,7 @@
 #include <babylon/mesh/geometry.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/primitive_geometries.h>
+#include <babylon/morph/morph_target_manager.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/tools/tools.h>
 
@@ -84,7 +85,7 @@ bool BabylonFileLoader::importMesh(const vector_t<string_t>& meshesNames,
                                    vector_t<Skeleton*>& skeletons)
 {
   Json::value parsedData;
-  string_t err = Json::Parse(parsedData, data.c_str());
+  string_t err = Json::Parse(parsedData, data);
   if (!err.empty()) {
     string_t log = "importMesh has failed JSON parse";
     BABYLON_LOGF_ERROR("BabylonFileLoader", "%s", log.c_str());
@@ -108,7 +109,7 @@ bool BabylonFileLoader::importMesh(const vector_t<string_t>& meshesNames,
 
       // Geometry ?
       if (parsedMesh.contains("geometryId")) {
-        const string_t parsedMeshGeometryId
+        const auto parsedMeshGeometryId
           = Json::GetString(parsedMesh, "geometryId");
         // Does the file contain geometries?
         if (parsedData.contains("geometries")) {
@@ -241,6 +242,15 @@ bool BabylonFileLoader::importMesh(const vector_t<string_t>& meshesNames,
         }
       }
 
+      // Morph targets ?
+      if (parsedData.contains("morphTargetManagers")
+          && parsedData.get("morphTargetManagers").is<Json::array>()) {
+        for (const auto& managerData :
+             Json::GetArray(parsedData, "morphTargetManagers")) {
+          MorphTargetManager::Parse(managerData, scene);
+        }
+      }
+
       auto mesh = Mesh::Parse(parsedMesh, scene, rootUrl);
       meshes.emplace_back(mesh);
       log << "\n\tMesh " << mesh->toString(fullDetails);
@@ -268,14 +278,17 @@ bool BabylonFileLoader::importMesh(const vector_t<string_t>& meshesNames,
   }
 
   // Particles ?
-  for (const auto& parsedParticleSystem :
-       Json::GetArray(parsedData, "particleSystems")) {
-    const string_t parsedParticleSystemEmitterId
-      = Json::GetString(parsedParticleSystem, "emitterId");
-    if (!parsedParticleSystemEmitterId.empty()
-        && stl_util::contains(hierarchyIds, parsedParticleSystemEmitterId)) {
-      particleSystems.emplace_back(
-        ParticleSystem::Parse(parsedParticleSystem, scene, rootUrl));
+  if (parsedData.contains("particleSystems")
+      && parsedData.get("particleSystems").is<Json::array>()) {
+    for (const auto& parsedParticleSystem :
+         Json::GetArray(parsedData, "particleSystems")) {
+      const string_t parsedParticleSystemEmitterId
+        = Json::GetString(parsedParticleSystem, "emitterId");
+      if (!parsedParticleSystemEmitterId.empty()
+          && stl_util::contains(hierarchyIds, parsedParticleSystemEmitterId)) {
+        particleSystems.emplace_back(
+          ParticleSystem::Parse(parsedParticleSystem, scene, rootUrl));
+      }
     }
   }
 
@@ -290,7 +303,7 @@ bool BabylonFileLoader::importMesh(const vector_t<string_t>& meshesNames,
   }
 
   return true;
-}
+} // namespace BABYLON
 
 bool BabylonFileLoader::load(Scene* scene, const string_t& data,
                              const string_t& rootUrl)
