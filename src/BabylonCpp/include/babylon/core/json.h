@@ -7,9 +7,35 @@
 namespace BABYLON {
 namespace Json {
 
-inline string_t Parse(Json::value parsedData, const char* data)
+inline string_t Parse(Json::value& parsedData, const string_t& json)
 {
-  return picojson::parse(parsedData, data, data + strlen(data));
+  return picojson::parse(parsedData, json);
+}
+
+template <typename T>
+inline picojson::value ToJson(const std::deque<T>& items)
+{
+  picojson::array arr;
+
+  for (const auto& i : items) {
+    arr.push_back(picojson::value(i));
+  }
+
+  return picojson::value(arr);
+}
+
+template <typename T>
+inline std::deque<T>& FromJson(std::deque<T>& items,
+                               const picojson::value& input)
+{
+  if (input.is<picojson::array>()) {
+    const auto& array = input.get<picojson::array>();
+    for (const auto& a : array) {
+      items.push_back(a.get<T>());
+    }
+  }
+
+  return items;
 }
 
 template <class T,
