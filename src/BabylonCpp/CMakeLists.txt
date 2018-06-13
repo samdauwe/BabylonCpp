@@ -409,6 +409,20 @@ set_target_properties(${TARGET}
 )
 
 # ============================================================================ #
+#                        Include What You Use                                  #
+# ============================================================================ #
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    if(BUILD_IWYU)
+        find_program(IWYU_PATH NAMES include-what-you-use iwyu)
+        if(NOT IWYU_PATH)
+          message(FATAL_ERROR "Could not find the program include-what-you-use")
+        endif()
+        set_property(TARGET ${TARGET}
+                     PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
+    endif()
+endif()
+
+# ============================================================================ #
 #                       Setup test environment                                 #
 # ============================================================================ #
 
