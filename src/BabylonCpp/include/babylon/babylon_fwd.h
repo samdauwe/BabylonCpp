@@ -258,7 +258,9 @@ class ShadowGenerator;
 struct IRegisteredPlugin;
 struct ISceneLoaderPlugin;
 struct ISceneLoaderPluginExtensions;
+class ProgressEvent;
 class SceneLoader;
+class SceneLoaderProgressEvent;
 // - Plugins / babylon
 struct BabylonFileLoader;
 // --- Materials ---

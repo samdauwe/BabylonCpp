@@ -79,9 +79,12 @@ struct BABYLON_SHARED_EXPORT Tools {
             bool flipVertically = true);
   static void
   LoadFile(const string_t& url,
-           const ::std::function<void(const string_t& data)>& callback,
-           const ::std::function<void()>& progressCallBack = nullptr,
-           bool useArrayBuffer                             = false,
+           const ::std::function<void(const string_t& data,
+                                      const string_t& responseURL)>& callback,
+           const ::std::function<void(const SceneLoaderProgressEvent& event)>&
+             progressCallBack
+           = nullptr,
+           bool useArrayBuffer = false,
            const ::std::function<void(const string_t& exception)>& onError
            = nullptr);
   static void CheckExtends(Vector3& v, Vector3& min, Vector3& max);

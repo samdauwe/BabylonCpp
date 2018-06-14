@@ -14,18 +14,22 @@ struct BABYLON_SHARED_EXPORT BabylonFileLoader : public ISceneLoaderPlugin {
   Material* parseMaterialById(const string_t& id, const Json::value& parsedData,
                               Scene* scene, const string_t& rootUrl) const;
   bool isDescendantOf(const Json::value& mesh, const vector_t<string_t>& names,
-                      vector_t<string_t>& hierarchyIds);
+                      vector_t<string_t>& hierarchyIds) const;
   string_t logOperation(const string_t& operation) const;
   string_t logOperation(const string_t& operation,
                         const Json::value& producer) const;
 
-  bool importMesh(const vector_t<string_t>& meshesNames, Scene* scene,
-                  const string_t& data, const string_t& rootUrl,
-                  vector_t<AbstractMesh*>& meshes,
-                  vector_t<ParticleSystem*>& particleSystems,
-                  vector_t<Skeleton*>& skeletons) override;
-  bool load(Scene* scene, const string_t& data,
-            const string_t& rootUrl) override;
+  bool importMesh(
+    const vector_t<string_t>& meshesNames, Scene* scene, const string_t& data,
+    const string_t& rootUrl, vector_t<AbstractMesh*>& meshes,
+    vector_t<ParticleSystem*>& particleSystems, vector_t<Skeleton*>& skeletons,
+    const ::std::function<void(const string_t& message,
+                               const string_t& exception)>& onError
+    = nullptr) const override;
+  bool load(Scene* scene, const string_t& data, const string_t& rootUrl,
+            const ::std::function<void(const string_t& message,
+                                       const string_t& exception)>& onError
+            = nullptr) const override;
 
 }; // end of struct BabylonFileLoader
 

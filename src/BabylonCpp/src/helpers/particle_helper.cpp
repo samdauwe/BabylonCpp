@@ -37,7 +37,7 @@ ParticleHelper* ParticleHelper::CreateAsync(const string_t& type,
   _emitter = emitter;
 
   const auto url = String::concat(_baseAssetsUrl, "/systems/", type, ".json");
-  Tools::LoadFile(url, [](const string_t&) {}, nullptr, false);
+  Tools::LoadFile(url, [](const string_t&, const string_t&) {}, nullptr, false);
   return nullptr;
 }
 

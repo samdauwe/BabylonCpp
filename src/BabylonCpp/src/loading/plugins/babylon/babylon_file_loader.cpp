@@ -47,7 +47,7 @@ Material* BabylonFileLoader::parseMaterialById(const string_t& id,
 
 bool BabylonFileLoader::isDescendantOf(const Json::value& mesh,
                                        const vector_t<string_t>& names,
-                                       vector_t<string_t>& hierarchyIds)
+                                       vector_t<string_t>& hierarchyIds) const
 {
   for (auto& name : names) {
     if (Json::GetString(mesh, "name") == name) {
@@ -77,12 +77,12 @@ string_t BabylonFileLoader::logOperation(const string_t& operation,
          + Json::GetString(producer, "exporter_version");
 }
 
-bool BabylonFileLoader::importMesh(const vector_t<string_t>& meshesNames,
-                                   Scene* scene, const string_t& data,
-                                   const string_t& rootUrl,
-                                   vector_t<AbstractMesh*>& meshes,
-                                   vector_t<ParticleSystem*>& particleSystems,
-                                   vector_t<Skeleton*>& skeletons)
+bool BabylonFileLoader::importMesh(
+  const vector_t<string_t>& meshesNames, Scene* scene, const string_t& data,
+  const string_t& rootUrl, vector_t<AbstractMesh*>& meshes,
+  vector_t<ParticleSystem*>& particleSystems, vector_t<Skeleton*>& skeletons,
+  const ::std::function<void(const string_t& message,
+                             const string_t& exception)>& /*onError*/) const
 {
   Json::value parsedData;
   string_t err = Json::Parse(parsedData, data);
@@ -94,7 +94,7 @@ bool BabylonFileLoader::importMesh(const vector_t<string_t>& meshesNames,
   std::ostringstream log;
 
   bool fullDetails
-    = SceneLoader::LoggingLevel() == SceneLoader::DETAILED_LOGGING;
+    = SceneLoader::LoggingLevel() == SceneLoader::DETAILED_LOGGING();
 
   vector_t<string_t> loadedSkeletonsIds;
   vector_t<string_t> loadedMaterialsIds;
@@ -293,20 +293,25 @@ bool BabylonFileLoader::importMesh(const vector_t<string_t>& meshesNames,
   }
 
   const auto _log = log.str();
-  if (!_log.empty() && SceneLoader::LoggingLevel() != SceneLoader::NO_LOGGING) {
+  if (!_log.empty()
+      && SceneLoader::LoggingLevel() != SceneLoader::NO_LOGGING()) {
     string_t msg = parsedData.contains("producer") ?
                      logOperation("importMesh", parsedData.get("producer")) :
                      logOperation("importMesh");
     string_t logStr
-      = SceneLoader::LoggingLevel() != SceneLoader::MINIMAL_LOGGING ? _log : "";
+      = SceneLoader::LoggingLevel() != SceneLoader::MINIMAL_LOGGING() ? _log :
+                                                                        "";
     BABYLON_LOGF_INFO("BabylonFileLoader", "%s%s", msg.c_str(), logStr.c_str());
+    return false;
   }
 
   return true;
 } // namespace BABYLON
 
-bool BabylonFileLoader::load(Scene* scene, const string_t& data,
-                             const string_t& rootUrl)
+bool BabylonFileLoader::load(
+  Scene* scene, const string_t& data, const string_t& rootUrl,
+  const ::std::function<void(const string_t& message,
+                             const string_t& exception)>& /*onError*/) const
 {
   Json::value parsedData;
   string_t err = Json::Parse(parsedData, data.c_str());
@@ -317,7 +322,7 @@ bool BabylonFileLoader::load(Scene* scene, const string_t& data,
   }
   std::ostringstream log;
   bool fullDetails
-    = SceneLoader::LoggingLevel() == SceneLoader::DETAILED_LOGGING;
+    = SceneLoader::LoggingLevel() == SceneLoader::DETAILED_LOGGING();
 
   // Scene
   scene->useDelayedTextureLoading
@@ -560,12 +565,14 @@ bool BabylonFileLoader::load(Scene* scene, const string_t& data,
   }
 
   const auto _log = log.str();
-  if (!_log.empty() && SceneLoader::LoggingLevel() != SceneLoader::NO_LOGGING) {
+  if (!_log.empty()
+      && SceneLoader::LoggingLevel() != SceneLoader::NO_LOGGING()) {
     string_t msg = parsedData.contains("producer") ?
                      logOperation("importScene", parsedData.get("producer")) :
                      logOperation("importScene");
     string_t logStr
-      = SceneLoader::LoggingLevel() != SceneLoader::MINIMAL_LOGGING ? _log : "";
+      = SceneLoader::LoggingLevel() != SceneLoader::MINIMAL_LOGGING() ? _log :
+                                                                        "";
     BABYLON_LOGF_INFO("BabylonFileLoader", "%s%s", msg.c_str(), logStr.c_str());
   }
 

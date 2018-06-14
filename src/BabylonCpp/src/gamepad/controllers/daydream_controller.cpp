@@ -22,9 +22,10 @@ void DaydreamController::initControllerMesh(
   SceneLoader::ImportMesh(
     {}, DaydreamController::MODEL_BASE_URL, DaydreamController::MODEL_FILENAME,
     scene,
-    [this, &meshLoaded](vector_t<AbstractMesh*>& newMeshes,
-                        vector_t<ParticleSystem*>& /*particleSystems*/,
-                        vector_t<Skeleton*>& /*skeletons*/) {
+    [this, &meshLoaded](const vector_t<AbstractMesh*>& newMeshes,
+                        const vector_t<ParticleSystem*>& /*particleSystems*/,
+                        const vector_t<Skeleton*>& /*skeletons*/,
+                        const vector_t<AnimationGroup*>& /*animationGroups*/) {
       _defaultModel = newMeshes[1];
       attachToMesh(_defaultModel);
       if (meshLoaded) {

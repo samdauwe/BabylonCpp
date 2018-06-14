@@ -45,9 +45,10 @@ void OculusTouchController::initControllerMesh(
 
   SceneLoader::ImportMesh(
     {}, OculusTouchController::MODEL_BASE_URL, meshName, scene,
-    [this, &meshLoaded](vector_t<AbstractMesh*>& newMeshes,
-                        vector_t<ParticleSystem*>& /*particleSystems*/,
-                        vector_t<Skeleton*>& /*skeletons*/) {
+    [this, &meshLoaded](const vector_t<AbstractMesh*>& newMeshes,
+                        const vector_t<ParticleSystem*>& /*particleSystems*/,
+                        const vector_t<Skeleton*>& /*skeletons*/,
+                        const vector_t<AnimationGroup*>& /*animationGroups*/) {
       /*
       Parent Mesh name: oculus_touch_left
       - body
