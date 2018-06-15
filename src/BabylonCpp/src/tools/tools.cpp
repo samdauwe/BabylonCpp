@@ -20,15 +20,28 @@
 #pragma GCC diagnostic pop
 #endif
 
+#include <babylon/core/filesystem.h>
+#include <babylon/core/logging.h>
 #include <babylon/core/random.h>
 #include <babylon/core/string.h>
 #include <babylon/interfaces/igl_rendering_context.h>
+#include <babylon/loading/progress_event.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
 
-::std::function<string_t(const string_t& url)> Tools::PreprocessUrl
-  = [](const string_t& url) { return url; };
+::std::function<string_t(string_t url)> Tools::PreprocessUrl
+  = [](string_t url) {
+      if (String::startsWith(url, "file:")) {
+        url = url.substr(5);
+      }
+      // Check if the file is locally available
+      auto absolutePath = Filesystem::absolutePath(url);
+      if (Filesystem::exists(absolutePath)) {
+        return String::concat("file:", url);
+      }
+      return url;
+    };
 
 float Tools::Mix(float a, float b, float alpha)
 {
@@ -330,14 +343,64 @@ void Tools::LoadImage(const string_t& url,
 }
 
 void Tools::LoadFile(
-  const string_t& /*url*/,
+  string_t url,
   const ::std::function<void(const string_t& data,
-                             const string_t& responseURL)>& /*callback*/,
-  const ::std::function<
-    void(const SceneLoaderProgressEvent& event)>& /*progressCallBack*/,
-  bool /*useArrayBuffer*/,
-  const ::std::function<void(const string_t& exception)>& /*onError*/)
+                             const string_t& responseURL)>& onSuccess,
+  const ::std::function<void(const ProgressEvent& event)>& onProgress,
+  bool useArrayBuffer,
+  const ::std::function<void(const string_t& exception)>& onError)
 {
+  url = Tools::CleanUrl(url);
+
+  url = Tools::PreprocessUrl(url);
+
+  // If file and file input are set
+  if (String::startsWith(url, "file:")) {
+    const auto fileName = url.substr(5);
+    if (!fileName.empty()) {
+      Tools::ReadFile(fileName, onSuccess, onProgress, useArrayBuffer);
+      return;
+    }
+  }
+
+  // Report error
+  if (onError) {
+    onError("Unable to load file from location " + url);
+  }
+}
+
+void Tools::ReadFile(
+  string_t fileToLoad,
+  const ::std::function<void(const string_t& data,
+                             const string_t& responseURL)>& callback,
+  const ::std::function<void(const ProgressEvent& event)>& onProgress,
+  bool useArrayBuffer)
+{
+  if (!Filesystem::exists(fileToLoad)) {
+    BABYLON_LOGF_ERROR("Tools", "Error while reading file: %s",
+                       fileToLoad.c_str());
+    if (callback) {
+      callback("", "");
+    }
+    if (onProgress) {
+      onProgress(ProgressEvent{"ReadFileEvent", true, 100, 100});
+    }
+    return;
+  }
+
+  if (!useArrayBuffer) {
+    // Read file contents
+    if (callback) {
+      callback(Filesystem::readFileContents(fileToLoad.c_str()), "");
+    }
+    if (onProgress) {
+      onProgress(ProgressEvent{"ReadFileEvent", true, 100, 100});
+    }
+    return;
+  }
+  else {
+    // Not implemented yet
+  }
 }
 
 void Tools::CheckExtends(Vector3& v, Vector3& min, Vector3& max)

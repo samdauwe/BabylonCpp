@@ -71,22 +71,26 @@ struct BABYLON_SHARED_EXPORT Tools {
   // External files
   static string_t CleanUrl(string_t url);
   static string_t DecodeURIComponent(const string_t& s);
-  static ::std::function<string_t(const string_t& url)> PreprocessUrl;
+  static ::std::function<string_t(string_t url)> PreprocessUrl;
   static void
   LoadImage(const string_t& url,
             const ::std::function<void(const Image& img)>& onLoad,
             const ::std::function<void(const string_t& msg)>& onError,
             bool flipVertically = true);
+  static void LoadFile(
+    string_t url,
+    const ::std::function<void(const string_t& data,
+                               const string_t& responseURL)>& callback,
+    const ::std::function<void(const ProgressEvent& event)>& progressCallBack
+    = nullptr,
+    bool useArrayBuffer                                             = false,
+    const ::std::function<void(const string_t& exception)>& onError = nullptr);
   static void
-  LoadFile(const string_t& url,
+  ReadFile(string_t fileToLoad,
            const ::std::function<void(const string_t& data,
                                       const string_t& responseURL)>& callback,
-           const ::std::function<void(const SceneLoaderProgressEvent& event)>&
-             progressCallBack
-           = nullptr,
-           bool useArrayBuffer = false,
-           const ::std::function<void(const string_t& exception)>& onError
-           = nullptr);
+           const ::std::function<void(const ProgressEvent& event)>& onProgress,
+           bool useArrayBuffer);
   static void CheckExtends(Vector3& v, Vector3& min, Vector3& max);
   static string_t RandomId();
   static void SetImmediate(const ::std::function<void()>& immediate);

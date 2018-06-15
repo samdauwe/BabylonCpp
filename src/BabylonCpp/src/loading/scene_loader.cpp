@@ -7,6 +7,7 @@
 #include <babylon/engine/scene.h>
 #include <babylon/loading/iregistered_plugin.h>
 #include <babylon/loading/plugins/babylon/babylon_file_loader.h>
+#include <babylon/loading/scene_loader_progress_event.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -155,6 +156,24 @@ shared_ptr_t<ISceneLoaderPlugin> SceneLoader::_loadData(
         onSuccess(plugin, data, responseURL);
       };
 
+  const auto manifestChecked = [&]() {
+    auto url = rootUrl + sceneFilename;
+    ::std::function<void(const ProgressEvent& event)> progressCallback
+      = nullptr;
+    if (onProgress) {
+      progressCallback = [&](const ProgressEvent& event) {
+        onProgress(SceneLoaderProgressEvent::FromProgressEvent(event));
+      };
+    }
+
+    Tools::LoadFile(url, dataCallback, progressCallback, useArrayBuffer,
+                    [&](const string_t& exception) {
+                      onError("Failed to load scene."
+                                + (exception.empty() ? "" : " " + exception),
+                              exception);
+                    });
+  };
+
   if (!directLoad.empty()) {
     // Direct load
     dataCallback(directLoad, "");
@@ -163,8 +182,7 @@ shared_ptr_t<ISceneLoaderPlugin> SceneLoader::_loadData(
 
   // Loading file from disk
   if (!sceneFilename.empty()) {
-    Tools::LoadFile(rootUrl + sceneFilename, dataCallback, onProgress,
-                    useArrayBuffer);
+    manifestChecked();
   }
   else {
     onError("Unable to find file named " + sceneFilename, "");
