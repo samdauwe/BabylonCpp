@@ -36,9 +36,15 @@ namespace BABYLON {
         url = url.substr(5);
       }
       // Check if the file is locally available
+      // - Check in local folder
       auto absolutePath = Filesystem::absolutePath(url);
       if (Filesystem::exists(absolutePath)) {
-        return String::concat("file:", url);
+        return String::concat("file:", absolutePath);
+      }
+      // - Check in assets folder
+      absolutePath = Filesystem::absolutePath("../assets/" + url);
+      if (Filesystem::exists(absolutePath)) {
+        return String::concat("file:", absolutePath);
       }
       return url;
     };

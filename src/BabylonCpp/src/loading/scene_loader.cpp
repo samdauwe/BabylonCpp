@@ -295,7 +295,9 @@ shared_ptr_t<ISceneLoaderPlugin> SceneLoader::ImportMesh(
     rootUrl, sceneFilename, scene,
     [&](const shared_ptr_t<ISceneLoaderPlugin>& plugin, const string_t& data,
         const string_t& responseURL) {
-      rootUrl = plugin->rewriteRootURL(rootUrl, responseURL);
+      if (plugin->rewriteRootURL) {
+        rootUrl = plugin->rewriteRootURL(rootUrl, responseURL);
+      }
 
       if (sceneFilename == "") {
         if (sceneFilename == "") {
