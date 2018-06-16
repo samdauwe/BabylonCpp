@@ -35,6 +35,7 @@
 #include <babylon/samples/generic/super_ellipsoid_scene.h>
 #include <babylon/samples/generic/waves_scene.h>
 #include <babylon/samples/lights/lights_scene.h>
+#include <babylon/samples/loaders/import_meshes_skull_scene.h>
 #include <babylon/samples/materials/fresnel_parameters_torus_knot_scene.h>
 #include <babylon/samples/materials/shader_material_box_scene.h>
 #include <babylon/samples/materials/shader_material_boxes_scene.h>
@@ -251,6 +252,12 @@ SamplesIndex::SamplesIndex()
                         [](ICanvas* iCanvas) {                                //
                           return ::std::make_unique<IcoSphereScene>(iCanvas); //
                         });                                                   //
+  // Import Meshes Skull Scene
+  _samples["ImportMeshesSkullScene"] = ::std::make_tuple(
+    true,
+    [](ICanvas* iCanvas) {                                        //
+      return ::std::make_unique<ImportMeshesSkullScene>(iCanvas); //
+    });                                                           //
   // Infinite Loader Scene
   _samples["InfiniteLoaderScene"] = ::std::make_tuple(
     true,

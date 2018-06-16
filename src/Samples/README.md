@@ -6,6 +6,9 @@
 ## [Lights] ##
 ![lights_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lights_scene.png?raw=true "Lights Scene")
 
+## [Loaders] ##
+![import_meshes_skull_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/import_meshes_skull_scene.png?raw=true "Import Meshes Skull Scene")
+
 ## [Use FresnelParameters] ##
 ![fresnel_parameters_torus_knot_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/fresnel_parameters_torus_knot_scene.png?raw=true "Fresnel Parameters TorusKnot Scene")
 

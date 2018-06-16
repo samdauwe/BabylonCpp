@@ -33,11 +33,7 @@ struct Window {
   int frameCount                                 = 0;
 }; // end of struct Window
 
-struct SampleLauncherOptions {
-  std::string title        = "Sample";
-  std::pair<int, int> size = std::make_pair(800, 600);
-  bool showInspectorWindow = false;
-}; // end of struct SampleLauncherOptions
+struct SampleLauncherOptions;
 
 class SampleLauncher {
 
@@ -92,6 +88,12 @@ private:
   bool _useOpenGLES;
 
 }; // end of class SampleLauncher
+
+struct SampleLauncherOptions {
+  std::string title        = "Sample";
+  std::pair<int, int> size = SampleLauncher::SMALL_RESOLUTION_SIZE;
+  bool showInspectorWindow = false;
+}; // end of struct SampleLauncherOptions
 
 } // end of namespace Samples
 } // end of namespace BABYLON

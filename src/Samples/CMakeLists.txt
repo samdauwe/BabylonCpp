@@ -238,3 +238,7 @@ install(EXPORT ${TARGET}Config
 export(TARGETS ${TARGET}
     FILE ${TARGET}Config.cmake
 )
+
+# Copy asset directories
+## - Scenes
+copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/scenes")
