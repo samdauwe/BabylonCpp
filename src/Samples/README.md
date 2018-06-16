@@ -1,18 +1,18 @@
 # Working examples #
 
-## [Creating a Basic Scene] ##
+## Creating a Basic Scene ##
 ![basic_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/basic_scene.png?raw=true "Basic Scene")
 
-## [Lights] ##
+## Lights ##
 ![lights_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lights_scene.png?raw=true "Lights Scene")
 
-## [Loaders] ##
+## Loaders ##
 ![import_meshes_skull_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/import_meshes_skull_scene.png?raw=true "Import Meshes Skull Scene")
 
-## [Use FresnelParameters] ##
+## Use FresnelParameters ##
 ![fresnel_parameters_torus_knot_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/fresnel_parameters_torus_knot_scene.png?raw=true "Fresnel Parameters TorusKnot Scene")
 
-## [Understanding Shaders and ShaderMaterial] ##
+## Understanding Shaders and ShaderMaterial ##
 ![shader_material_tiles_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_tiles_scene.png?raw=true "Shader Material Tiles Scene")
 ![shader_material_boxes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_boxes_scene.png?raw=true "Shader Material Boxes Scene")
 ![shader_material_cylinders_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_cylinders_scene.png?raw=true "Shader Material Cylinders Scene")
@@ -47,18 +47,18 @@
 
 ## Mesh Basics ##
 
-### [Animations] ###
+### Animations ###
 ![animations_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/animations_scene.png?raw=true "Animations Scene")
 ![easing_functions_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/easing_functions_scene.png?raw=true "Easing Functions Scene")
 ![shape_easings_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shape_easings_scene.png?raw=true "Shape Easings Scene")
 
-### [Discover Basic Elements] ###
+### Discover Basic Elements ###
 ![basic_elements_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/basic_elements_scene.png?raw=true "Basic Elements Scene")
 
-### [How Rotations and Translations Work] ###
+### How Rotations and Translations Work ###
 ![rotation_and_scaling_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/rotation_and_scaling_scene.png?raw=true "Rotation And Scaling Scene")
 
-### [Mesh CreateXXX Methods With Options Parameter] ###
+### Mesh CreateXXX Methods With Options Parameter ###
 ![polyhedron_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polyhedron_scene.png?raw=true "Polyhedron Scene")
 ![ico_sphere_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/ico_sphere_scene.png?raw=true "Icosphere Scene")
 ![lathe_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lathe_scene.png?raw=true "Lathe Scene")
@@ -66,17 +66,17 @@
 ![lorenz_attractor_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lorenz_attractor_scene.png?raw=true "Lorenz Attractor Scene")
 ![extruded_polygon_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/extruded_polygon_scene.png?raw=true "Extruded Polygon Scene")
 
-### [Parametric Shapes] ###
+### Parametric Shapes ###
 ![tube_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/tube_scene.png?raw=true "Tube Scene")
 ![curved_helix_meshes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/curved_helix_meshes_scene.png?raw=true "Curved Helix Meshes Scene")
 ![extrusion_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/extrusion_scene.png?raw=true "Extrusion Scene")
 
 ## Mesh Intermediate ##
 
-### [Ribbon Tutorial] ###
+### Ribbon Tutorial ###
 ![ribbon_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/ribbon_scene.png?raw=true "Ribbon Scene")
 
-### [Using PolygonMeshBuilder] ###
+### Using PolygonMeshBuilder ###
 ![polygon_mesh_bird_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_bird_scene.png?raw=true "Polygon Mesh Bird Scene")
 ![polygon_mesh_monkey_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_monkey_scene.png?raw=true "Polygon Mesh Monkey Scene")
 ![polygon_mesh_puzzle_piece_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_puzzle_piece_scene.png?raw=true "Polygon Mesh Puzzle Piece Scene")
@@ -85,7 +85,7 @@
 
 ## Mesh Advanced ##
 
-### [How to Merge Meshes] ###
+### How to Merge Meshes ###
 ![merged_meshes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/merged_meshes_scene.png?raw=true "Merged Meshes Scene")
 
 ## Extensions ##
@@ -101,10 +101,10 @@
 
 ### Tree Generators ###
 
-#### [Quick Tree Generator] ####
+#### Quick Tree Generator ####
 ![simple_oak_tree_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/simple_oak_tree_scene.png?raw=true "Simple Oak Tree Scene")
 
-#### [Simple Pine Generator] ####
+#### Simple Pine Generator ####
 ![simple_pine_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/simple_pine_scene.png?raw=true "Simple Pine Scene")
 
 ## Interesting Playgrounds ##
