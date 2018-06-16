@@ -56,7 +56,7 @@ private:
   bool _showDockingWindow;
   int _menuHeight;
   // Tabs
-  array_t<unique_ptr_t<Tab>, 6> _tabs;
+  array_t<unique_ptr_t<Tab>, 7> _tabs;
 
 }; // end of class Inspector
 
