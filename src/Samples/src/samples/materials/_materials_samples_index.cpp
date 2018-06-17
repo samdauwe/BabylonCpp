@@ -32,6 +32,7 @@
 #include <babylon/samples/materials/shadermaterial/shader_material_with_fog_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_wolfenstein_3d_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_xyptonjtroz_scene.h>
+#include <babylon/samples/materials/x_ray_material_with_fresnel_skull_scene.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -46,6 +47,12 @@ _MaterialsSamplesIndex::_MaterialsSamplesIndex()
     [](ICanvas* iCanvas) {                                                 //
       return ::std::make_unique<FresnelParametersTorusKnotScene>(iCanvas); //
     });                                                                    //
+  // X-ray Material with Fresnel Skull Scene
+  _samples["XRayMaterialWithFresnelSkullScene"] = ::std::make_tuple(
+    true,                                                                    //
+    [](ICanvas* iCanvas) {                                                   //
+      return ::std::make_unique<XRayMaterialWithFresnelSkullScene>(iCanvas); //
+    });                                                                      //
 
   // -- Shader material examples --
 
