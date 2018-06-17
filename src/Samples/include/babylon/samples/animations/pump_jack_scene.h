@@ -11,7 +11,7 @@ class FunnyEase : public EasingFunction {
 
 public:
   FunnyEase(float distanceOfStick, float lengthOfStick);
-  ~FunnyEase();
+  ~FunnyEase() override;
 
   float easeInCore(float gradient) const override;
 
@@ -25,7 +25,7 @@ struct PumpJackScene : public IRenderableScene {
 
 public:
   PumpJackScene(ICanvas* iCanvas);
-  ~PumpJackScene();
+  ~PumpJackScene() override;
 
   const char* getName() override;
   void initializeScene(ICanvas* canvas, Scene* scene) override;

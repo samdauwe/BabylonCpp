@@ -10,7 +10,7 @@ class ShapeEasingsScene : public IRenderableScene {
 
 public:
   ShapeEasingsScene(ICanvas* iCanvas);
-  ~ShapeEasingsScene();
+  ~ShapeEasingsScene() override;
 
   const char* getName() override;
   void initializeScene(ICanvas* canvas, Scene* scene) override;

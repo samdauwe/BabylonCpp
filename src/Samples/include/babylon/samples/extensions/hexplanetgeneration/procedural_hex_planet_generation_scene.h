@@ -15,7 +15,7 @@ class ProceduralHexPlanetGenerationScene : public IRenderableScene {
 
 public:
   ProceduralHexPlanetGenerationScene(ICanvas* iCanvas);
-  virtual ~ProceduralHexPlanetGenerationScene();
+  ~ProceduralHexPlanetGenerationScene() override;
 
   const char* getName() override;
   void initializeScene(ICanvas* canvas, Scene* scene) override;

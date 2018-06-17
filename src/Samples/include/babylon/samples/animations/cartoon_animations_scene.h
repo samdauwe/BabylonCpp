@@ -10,7 +10,7 @@ struct CartoonAnimationsScene : public IRenderableScene {
 
 public:
   CartoonAnimationsScene(ICanvas* iCanvas);
-  ~CartoonAnimationsScene();
+  ~CartoonAnimationsScene() override;
 
   const char* getName() override;
   void initializeScene(ICanvas* canvas, Scene* scene) override;

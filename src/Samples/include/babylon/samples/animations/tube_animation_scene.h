@@ -9,7 +9,7 @@ namespace Samples {
 struct TubeAnimationScene : public IRenderableScene {
 
   TubeAnimationScene(ICanvas* iCanvas);
-  ~TubeAnimationScene();
+  ~TubeAnimationScene() override;
 
   const char* getName() override;
   void initializeScene(ICanvas* canvas, Scene* scene) override;

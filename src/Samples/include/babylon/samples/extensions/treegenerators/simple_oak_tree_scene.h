@@ -9,7 +9,7 @@ namespace Samples {
 struct SimpleOakTreeScene : public IRenderableScene {
 
   SimpleOakTreeScene(ICanvas* iCanvas);
-  ~SimpleOakTreeScene();
+  ~SimpleOakTreeScene() override;
 
   const char* getName() override;
   void initializeScene(ICanvas* canvas, Scene* scene) override;

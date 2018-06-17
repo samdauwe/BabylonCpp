@@ -10,7 +10,7 @@ class PolyhedraScene : public IRenderableScene {
 
 public:
   PolyhedraScene(ICanvas* iCanvas);
-  ~PolyhedraScene();
+  ~PolyhedraScene() override;
 
   const char* getName() override;
   void initializeScene(ICanvas* canvas, Scene* scene) override;

@@ -9,7 +9,7 @@ namespace Samples {
 struct EasingFunctionsScene : public IRenderableScene {
 
   EasingFunctionsScene(ICanvas* iCanvas);
-  ~EasingFunctionsScene();
+  ~EasingFunctionsScene() override;
 
   const char* getName() override;
   void initializeScene(ICanvas* canvas, Scene* scene) override;

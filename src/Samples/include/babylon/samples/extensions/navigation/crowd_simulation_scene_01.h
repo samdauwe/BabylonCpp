@@ -19,7 +19,7 @@ class CrowdSimulationScene01 : public IRenderableScene {
 
 public:
   CrowdSimulationScene01(ICanvas* iCanvas);
-  ~CrowdSimulationScene01();
+  ~CrowdSimulationScene01() override;
 
   const char* getName() override;
   void initializeScene(ICanvas* canvas, Scene* scene) override;

@@ -10,7 +10,7 @@ class HexIcosphereScene : public IRenderableScene {
 
 public:
   HexIcosphereScene(ICanvas* iCanvas);
-  virtual ~HexIcosphereScene();
+  virtual ~HexIcosphereScene() override;
 
   const char* getName() override;
   void initializeScene(ICanvas* canvas, Scene* scene) override;

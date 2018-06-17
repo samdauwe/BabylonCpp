@@ -14,7 +14,7 @@ class PerlinNoiseWavesScene : public IRenderableScene {
 
 public:
   PerlinNoiseWavesScene(ICanvas* iCanvas);
-  ~PerlinNoiseWavesScene();
+  ~PerlinNoiseWavesScene() override;
 
   const char* getName() override;
   void initializeScene(ICanvas* canvas, Scene* scene) override;

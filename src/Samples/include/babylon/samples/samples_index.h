@@ -2,16 +2,12 @@
 #define BABYLON_SAMPLES_SAMPLES_INDEX_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/samples/samples_common.h>
 
 namespace BABYLON {
 namespace Samples {
 
 class BABYLON_SHARED_EXPORT SamplesIndex {
-
-public:
-  using IRenderableScenePtr = ::std::unique_ptr<IRenderableScene>;
-  using FactoryMethod = ::std::function<IRenderableScenePtr(ICanvas* iCanvas)>;
-  using Sample        = ::std::tuple<bool, FactoryMethod>;
 
 public:
   SamplesIndex();
@@ -44,11 +40,11 @@ public:
    * @return the renderable scene
    */
   std::unique_ptr<IRenderableScene>
-  createRenderableScene(const string_t& sampleName, ICanvas* iCanvas);
+  createRenderableScene(const string_t& sampleName, ICanvas* iCanvas) const;
 
 private:
-  // Contains the mapping from sample name to enabled state
-  ::std::unordered_map<string_t, Sample> _samples;
+  // Contains the mapping from category to samples index
+  ::std::unordered_map<string_t, _ISamplesIndex> _samplesIndex;
 
 }; // end of class SamplesIndex
 

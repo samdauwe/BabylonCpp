@@ -9,7 +9,7 @@ namespace Samples {
 struct FresnelParametersTorusKnotScene : public IRenderableScene {
 
   FresnelParametersTorusKnotScene(ICanvas* iCanvas);
-  ~FresnelParametersTorusKnotScene();
+  ~FresnelParametersTorusKnotScene() override;
 
   const char* getName() override;
   void initializeScene(ICanvas* canvas, Scene* scene) override;

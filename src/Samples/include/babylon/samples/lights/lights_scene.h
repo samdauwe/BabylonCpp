@@ -10,7 +10,7 @@ class LightsScene : public IRenderableScene {
 
 public:
   LightsScene(ICanvas* iCanvas);
-  ~LightsScene();
+  ~LightsScene() override;
 
   const char* getName() override;
   void initializeScene(ICanvas* canvas, Scene* scene) override;
