@@ -6,6 +6,11 @@
 namespace BABYLON {
 namespace Samples {
 
+/**
+ * @brief Fog scene. This example demonstrates how to simulate fog in your
+ * scene.
+ * @see https://www.babylonjs-playground.com/#LR6389#0
+ */
 class FogScene : public IRenderableScene {
 
 public:

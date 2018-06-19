@@ -28,8 +28,8 @@ const char* FogScene::getName()
 
 void FogScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
-  // Create a FreeCamera (non-mesh), and set its position to (x:0, y:5, z:-30)
-  auto camera = FreeCamera::New("camera1", Vector3(0, 5, -20), scene);
+  // Create a FreeCamera (non-mesh)
+  auto camera = FreeCamera::New("Camera", Vector3(0.f, 0.f, -20.f), scene);
 
   // Target the camera to scene origin
   camera->setTarget(Vector3::Zero());
@@ -38,12 +38,12 @@ void FogScene::initializeScene(ICanvas* canvas, Scene* scene)
   camera->attachControl(canvas, true);
 
   // Create a point light
-  PointLight::New("light1", Vector3(20.f, 100.f, 2.f), scene);
+  PointLight::New("Omni", Vector3(20.f, 100.f, 2.f), scene);
 
   // Create spheres
-  _sphere0 = Mesh::CreateSphere("sphere0", 16, 3.f, scene);
-  _sphere1 = Mesh::CreateSphere("sphere1", 16, 3.f, scene);
-  _sphere2 = Mesh::CreateSphere("sphere2", 16, 3.f, scene);
+  _sphere0 = Mesh::CreateSphere("Sphere0", 16, 3.f, scene);
+  _sphere1 = Mesh::CreateSphere("Sphere1", 16, 3.f, scene);
+  _sphere2 = Mesh::CreateSphere("Sphere2", 16, 3.f, scene);
 
   // Create materials
   auto material0          = StandardMaterial::New("mat0", scene);
@@ -69,10 +69,10 @@ void FogScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Animations
   _scene->registerBeforeRender([this](Scene*, EventState&) {
     _sphere0->position().z = 4.f * std::cos(_alpha);
-    _sphere1->position().z = 10.f * std::sin(_alpha);
+    _sphere1->position().z = 4.f * std::sin(_alpha);
     _sphere2->position().z = 4.f * std::cos(_alpha);
 
-    _alpha += 0.08f;
+    _alpha += 0.1f;
   });
 }
 

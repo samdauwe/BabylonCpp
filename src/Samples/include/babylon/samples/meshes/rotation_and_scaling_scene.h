@@ -6,6 +6,11 @@
 namespace BABYLON {
 namespace Samples {
 
+/**
+ * @brief Rotation and scaling scene. This example demonstrates how to position
+ * mesh layout in space.
+ * @see https://www.babylonjs-playground.com/#CURCZC#0
+ */
 struct RotationAndScalingScene : public IRenderableScene {
 
   RotationAndScalingScene(ICanvas* iCanvas);
