@@ -242,3 +242,5 @@ export(TARGETS ${TARGET}
 # Copy asset directories
 ## - Scenes
 copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/scenes")
+## - Textures
+copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/textures")
