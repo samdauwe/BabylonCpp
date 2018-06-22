@@ -2467,8 +2467,8 @@ InternalTexture* Engine::createTexture(
   unsigned int samplingMode,
   const ::std::function<void(InternalTexture*, EventState&)>& onLoad,
   const ::std::function<void()>& onError,
-  const Variant<ArrayBuffer, Image>& buffer, InternalTexture* fallback,
-  unsigned int format)
+  const Nullable<Variant<ArrayBuffer, Image>>& /*buffer*/,
+  InternalTexture* fallback, const Nullable<unsigned int>& format)
 {
   // assign a new string, so that the original is still available in case of
   // fallback
@@ -2506,7 +2506,7 @@ InternalTexture* Engine::createTexture(
 
   if (!_doNotHandleContextLost) {
     // Keep a link to the buffer only if we plan to handle context lost
-    texture->_buffer = buffer;
+    // texture->_buffer = buffer;
   }
 
   if (onLoad && !fallback) {
@@ -2525,8 +2525,8 @@ InternalTexture* Engine::createTexture(
     // fallback for when compressed file not found to try again.  For instance,
     // etc1 does not have an alpha capable type
     if (isKTX) {
-      createTexture(urlArg, noMipmap, invertY, scene, samplingMode, nullptr,
-                    onError, buffer, texture);
+      // createTexture(urlArg, noMipmap, invertY, scene, samplingMode, nullptr,
+      //              onError, buffer, texture);
     }
     else if (onError) {
       onError();
@@ -2554,7 +2554,7 @@ InternalTexture* Engine::createTexture(
             const ::std::function<void()>& continuationCallback) {
           auto isPot = (img.width == potWidth && img.height == potHeight);
           auto internalFormat = format ?
-                                  _getInternalFormat(format) :
+                                  _getInternalFormat(*format) :
                                   ((extension == ".jpg") ? GL::RGB : GL::RGBA);
 
           if (isPot) {
@@ -2594,10 +2594,10 @@ InternalTexture* Engine::createTexture(
     };
 
     if (!fromData || isBase64) {
-      // Not implemented yet
+      Tools::LoadImage(url, onload, _onerror);
     }
     else {
-      Tools::LoadImage(url, onload, _onerror);
+      // Not implemented yet
     }
   }
 

@@ -16,7 +16,8 @@ bool Texture::UseSerializedUrlIfAny = false;
 Texture::Texture(const string_t& _url, Scene* scene, bool noMipmap,
                  bool invertY, unsigned int samplingMode,
                  const ::std::function<void()>& onLoad,
-                 const ::std::function<void()>& onError, Buffer* buffer,
+                 const ::std::function<void()>& onError,
+                 const Nullable<Variant<ArrayBuffer, Image>>& buffer,
                  bool deleteBuffer, unsigned int format)
     : BaseTexture{scene}
     , url{_url}
@@ -74,14 +75,12 @@ Texture::Texture(const string_t& _url, Scene* scene, bool noMipmap,
 
   if (!_texture) {
     if (!scene->useDelayedTextureLoading) {
-#if 0
       _texture = scene->getEngine()->createTexture(
         url, noMipmap, invertY, scene, _samplingMode, _load, onError, _buffer,
         nullptr, _format);
       if (deleteBuffer) {
-        delete _buffer;
+        _buffer = nullptr;
       }
-#endif
     }
     else {
       delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
@@ -137,7 +136,8 @@ bool Texture::noMipmap() const
   return _noMipmap;
 }
 
-void Texture::updateURL(const string_t& iUrl, Buffer* buffer)
+void Texture::updateURL(const string_t& iUrl,
+                        const Nullable<Variant<ArrayBuffer, Image>>& buffer)
 {
   if (iUrl.empty()) {
     throw ::std::runtime_error("URL is already set");
@@ -428,13 +428,11 @@ unique_ptr_t<BaseTexture> Texture::Parse(const Json::value& /*parsedTexture*/,
   return nullptr;
 }
 
-Texture* Texture::LoadFromDataString(const string_t& name, Buffer* buffer,
-                                     Scene* scene, bool deleteBuffer,
-                                     bool noMipmap, bool invertY,
-                                     unsigned int samplingMode,
-                                     const ::std::function<void()>& onLoad,
-                                     const ::std::function<void()>& onError,
-                                     unsigned int format)
+Texture* Texture::LoadFromDataString(
+  const string_t& name, const Nullable<Variant<ArrayBuffer, Image>>& buffer,
+  Scene* scene, bool deleteBuffer, bool noMipmap, bool invertY,
+  unsigned int samplingMode, const ::std::function<void()>& onLoad,
+  const ::std::function<void()>& onError, unsigned int format)
 {
   string_t _name = name;
   if (_name.substr(0, 5) != "data:") {

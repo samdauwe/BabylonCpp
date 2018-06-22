@@ -1385,10 +1385,10 @@ public:
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const ::std::function<void(InternalTexture*, EventState&)>& onLoad
     = nullptr,
-    const ::std::function<void()>& onError    = nullptr,
-    const Variant<ArrayBuffer, Image>& buffer = Variant<ArrayBuffer, Image>(),
-    InternalTexture* fallBack                 = nullptr,
-    unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
+    const ::std::function<void()>& onError              = nullptr,
+    const Nullable<Variant<ArrayBuffer, Image>>& buffer = nullptr,
+    InternalTexture* fallBack                           = nullptr,
+    const Nullable<unsigned int>& format                = nullptr);
 
   /**
    * @brief Update a raw texture.

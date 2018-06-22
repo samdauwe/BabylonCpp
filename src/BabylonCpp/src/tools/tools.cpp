@@ -321,31 +321,37 @@ string_t Tools::DecodeURIComponent(const string_t& s)
   return s;
 }
 
-void Tools::LoadImage(const string_t& url,
+void Tools::LoadImage(string_t url,
                       const ::std::function<void(const Image& img)>& onLoad,
                       const ::std::function<void(const string_t& msg)>& onError,
                       bool flipVertically)
 {
-  typedef unique_ptr_t<unsigned char, ::std::function<void(unsigned char*)>>
-    stbi_ptr;
+  url = Tools::CleanUrl(url);
 
-  int w, h, n;
-  stbi_set_flip_vertically_on_load(flipVertically);
-  stbi_ptr data(stbi_load(url.c_str(), &w, &h, &n, STBI_rgb_alpha),
-                [](unsigned char* _data) {
-                  if (_data) {
-                    stbi_image_free(_data);
-                  }
-                });
+  url = Tools::PreprocessUrl(url);
 
-  if (!data) {
-    onError("Error loading image from file " + url);
-    return;
+  if (String::startsWith(url, "file:")) {
+    using stbi_ptr
+      = unique_ptr_t<unsigned char, ::std::function<void(unsigned char*)>>;
+
+    int w, h, n;
+    stbi_set_flip_vertically_on_load(flipVertically);
+    stbi_ptr data(stbi_load(url.substr(5).c_str(), &w, &h, &n, STBI_rgb_alpha),
+                  [](unsigned char* _data) {
+                    if (_data) {
+                      stbi_image_free(_data);
+                    }
+                  });
+
+    if (!data) {
+      onError("Error loading image from file " + url);
+      return;
+    }
+
+    n = STBI_rgb_alpha;
+    Image image(data.get(), w * h * n, w, h, n, (n == 3) ? GL::RGB : GL::RGBA);
+    onLoad(image);
   }
-
-  n = STBI_rgb_alpha;
-  Image image(data.get(), w * h * n, w, h, n, (n == 3) ? GL::RGB : GL::RGBA);
-  onLoad(image);
 }
 
 void Tools::LoadFile(
@@ -452,8 +458,11 @@ string_t Tools::RandomId()
   return randomId;
 }
 
-void Tools::SetImmediate(const ::std::function<void()>& /*immediate*/)
+void Tools::SetImmediate(const ::std::function<void()>& immediate)
 {
+  if (immediate) {
+    immediate();
+  }
 }
 
 void Tools::DumpFramebuffer(int /*width*/, int /*height*/, Engine* /*engine*/)
