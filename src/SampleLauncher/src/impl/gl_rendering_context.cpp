@@ -18,6 +18,17 @@
 namespace BABYLON {
 namespace GL {
 
+void GLAPIENTRY MessageCallback(GLenum /*source*/, GLenum type, GLuint /*id*/,
+                                GLenum severity, GLsizei /*length*/,
+                                const GLchar* message,
+                                const void* /*userParam*/)
+{
+  fprintf(stderr,
+          "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+          (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity,
+          message);
+}
+
 GLRenderingContext::GLRenderingContext()
 {
   // Build map of string vs enums
@@ -94,7 +105,7 @@ GLRenderingContext::~GLRenderingContext()
 {
 }
 
-bool GLRenderingContext::initialize()
+bool GLRenderingContext::initialize(bool enableGLDebugging)
 {
   // Initialize GLEW
   if (glxwInit() != 0) {
@@ -110,6 +121,12 @@ bool GLRenderingContext::initialize()
   glEnable(GL_MULTISAMPLE);
 
   // backupGLState();
+
+  // Enable debug output
+  if (enableGLDebugging) {
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(MessageCallback, nullptr);
+  }
 
   return true;
 }
@@ -897,7 +914,9 @@ bool GLRenderingContext::linkProgram(const std::unique_ptr<IGLProgram>& program)
 
 void GLRenderingContext::pixelStorei(GLenum pname, GLint param)
 {
-  glPixelStorei(pname, param);
+  if (pname != UNPACK_FLIP_Y_WEBGL) {
+    glPixelStorei(pname, param);
+  }
 }
 
 void GLRenderingContext::polygonOffset(GLfloat factor, GLfloat units)
