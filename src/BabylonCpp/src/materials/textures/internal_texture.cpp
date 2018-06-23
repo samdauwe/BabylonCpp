@@ -22,7 +22,9 @@ constexpr unsigned int InternalTexture::DATASOURCE_RAW3D;
 constexpr unsigned int InternalTexture::DATASOURCE_DEPTHTEXTURE;
 
 InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource)
-    : _initialSlot{-1}
+    : isCube{false}
+    , is3D{false}
+    , _initialSlot{-1}
     , _designatedSlot{-1}
     , _dataSource{dataSource}
     , _cachedWrapU{0}

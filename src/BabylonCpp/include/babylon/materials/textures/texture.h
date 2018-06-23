@@ -93,7 +93,7 @@ protected:
           const ::std::function<void()>& onError              = nullptr,
           const Nullable<Variant<ArrayBuffer, Image>>& buffer = nullptr,
           bool deleteBuffer                                   = false,
-          unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
+          const Nullable<unsigned int>& format                = nullptr);
 
 private:
   void _prepareRowForTextureGeneration(float x, float y, float z, Vector3& t);
@@ -127,7 +127,7 @@ public:
   unsigned int _samplingMode;
 
 protected:
-  unsigned int _format;
+  const Nullable<unsigned int> _format;
   Nullable<Observable<Texture>> _onLoadObservable;
   bool _isBlocking;
 

@@ -2549,17 +2549,19 @@ InternalTexture* Engine::createTexture(
         texture->_buffer.set<Image>(img);
       }
 
-      const auto processFunction =
+      _prepareWebGLTexture(
+        texture, scene, img.width, img.height, invertY, noMipmap, false,
         [&](int potWidth, int potHeight,
             const ::std::function<void()>& continuationCallback) {
           auto isPot = (img.width == potWidth && img.height == potHeight);
-          auto internalFormat = format ?
-                                  _getInternalFormat(*format) :
-                                  ((extension == ".jpg") ? GL::RGB : GL::RGBA);
+          auto internalFormat
+            = (format ? _getInternalFormat(*format) :
+                        ((extension == ".jpg") ? GL::RGB : GL::RGBA));
 
           if (isPot) {
-            _gl->texImage2D(GL::TEXTURE_2D, 0, GL::RGBA, img.width, img.height,
-                            0, GL::RGBA, GL::UNSIGNED_BYTE, img.data);
+            _gl->texImage2D(GL::TEXTURE_2D, 0, static_cast<int>(internalFormat),
+                            img.width, img.height, 0, GL::RGBA,
+                            GL::UNSIGNED_BYTE, img.data);
             return false;
           }
 
@@ -2567,8 +2569,9 @@ InternalTexture* Engine::createTexture(
           auto source
             = new InternalTexture(this, InternalTexture::DATASOURCE_TEMP);
           _bindTextureDirectly(GL::TEXTURE_2D, source);
-          _gl->texImage2D(GL::TEXTURE_2D, 0, GL::RGBA, img.width, img.height, 0,
-                          GL::RGBA, GL::UNSIGNED_BYTE, img.data);
+          _gl->texImage2D(GL::TEXTURE_2D, 0, static_cast<int>(internalFormat),
+                          img.width, img.height, 0, GL::RGBA, GL::UNSIGNED_BYTE,
+                          img.data);
 
           _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER,
                              GL::LINEAR);
@@ -2587,10 +2590,8 @@ InternalTexture* Engine::createTexture(
           });
 
           return true;
-        };
-
-      _prepareWebGLTexture(texture, scene, img.width, img.height, invertY,
-                           noMipmap, false, processFunction, samplingMode);
+        },
+        samplingMode);
     };
 
     if (!fromData || isBase64) {
@@ -4228,7 +4229,7 @@ int Engine::_removeDesignatedSlot(InternalTexture* internalTexture)
 void Engine::_activateCurrentTexture()
 {
   if (_currentTextureChannel != _activeChannel) {
-    _gl->activeTexture((*_gl)["TEXTURE0" + ::std::to_string(_activeChannel)]);
+    _gl->activeTexture((*_gl)["TEXTURE" + ::std::to_string(_activeChannel)]);
     _currentTextureChannel = _activeChannel;
   }
 }

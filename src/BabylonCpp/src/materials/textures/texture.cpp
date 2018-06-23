@@ -18,7 +18,7 @@ Texture::Texture(const string_t& _url, Scene* scene, bool noMipmap,
                  const ::std::function<void()>& onLoad,
                  const ::std::function<void()>& onError,
                  const Nullable<Variant<ArrayBuffer, Image>>& buffer,
-                 bool deleteBuffer, unsigned int format)
+                 bool deleteBuffer, const Nullable<unsigned int>& format)
     : BaseTexture{scene}
     , url{_url}
     , uOffset{0.f}
