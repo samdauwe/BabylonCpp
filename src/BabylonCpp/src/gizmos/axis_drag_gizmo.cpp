@@ -36,11 +36,11 @@ AxisDragGizmo::AxisDragGizmo(UtilityLayerRenderer* gizmoLayer,
 
   // Position arrow pointing in its drag axis
   arrowMesh->scaling().scaleInPlace(0.1f);
-  arrowMesh->setMaterial(coloredMaterial);
+  arrowMesh->material     = coloredMaterial;
   arrowMesh->rotation().x = Math::PI_2;
   arrowMesh->position().z += 0.3f;
   arrowTail->rotation().x = Math::PI_2;
-  arrowTail->setMaterial(coloredMaterial);
+  arrowTail->material     = coloredMaterial;
   arrowTail->position().z += 0.2f;
   _rootMesh->lookAt(_rootMesh->position().subtract(dragAxis));
 

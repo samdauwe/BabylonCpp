@@ -35,11 +35,31 @@ Vector3 AbstractMesh::_lookAtVectorCache = Vector3(0.f, 0.f, 0.f);
 
 AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
     : TransformNode(iName, scene, false)
+    , facetNb{this, &AbstractMesh::get_facetNb}
+    , partitioningSubdivisions{this,
+                               &AbstractMesh::get_partitioningSubdivisions,
+                               &AbstractMesh::set_partitioningSubdivisions}
+    , partitioningBBoxRatio{this, &AbstractMesh::get_partitioningBBoxRatio,
+                            &AbstractMesh::set_partitioningBBoxRatio}
+    , mustDepthSortFacets{this, &AbstractMesh::get_mustDepthSortFacets,
+                          &AbstractMesh::set_mustDepthSortFacets}
+    , facetDepthSortFrom{this, &AbstractMesh::get_facetDepthSortFrom,
+                         &AbstractMesh::set_facetDepthSortFrom}
+    , isFacetDataEnabled{this, &AbstractMesh::get_isFacetDataEnabled}
+    , onCollide{this, &AbstractMesh::set_onCollide}
+    , onCollisionPositionChange{this,
+                                &AbstractMesh::set_onCollisionPositionChange}
     , definedFacingForward{true} // orientation for POV movement & rotation
     , occlusionQueryAlgorithmType{AbstractMesh::
                                     OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE}
     , occlusionType{AbstractMesh::OCCLUSION_TYPE_NONE}
     , occlusionRetryCount{-1}
+    , isOccluded{this, &AbstractMesh::get_isOccluded,
+                 &AbstractMesh::set_isOccluded}
+    , isOcclusionQueryInProgress{this,
+                                 &AbstractMesh::get_isOcclusionQueryInProgress}
+    , visibility{this, &AbstractMesh::get_visibility,
+                 &AbstractMesh::set_visibility}
     , alphaIndex{numeric_limits_t<int>::max()}
     , isVisible{true}
     , isPickable{true}
@@ -48,20 +68,39 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
     , isBlocker{false}
     , enablePointerMoveEvents{false}
     , renderingGroupId{0}
+    , material{this, &AbstractMesh::get_material, &AbstractMesh::set_material}
+    , receiveShadows{this, &AbstractMesh::get_receiveShadows,
+                     &AbstractMesh::set_receiveShadows}
     , renderOutline{false}
     , outlineColor{Color3::Red()}
     , outlineWidth{0.02f}
     , renderOverlay{false}
     , overlayColor{Color3::Red()}
     , overlayAlpha{0.5f}
+    , hasVertexAlpha{this, &AbstractMesh::get_hasVertexAlpha,
+                     &AbstractMesh::set_hasVertexAlpha}
+    , useVertexColors{this, &AbstractMesh::get_useVertexColors,
+                      &AbstractMesh::set_useVertexColors}
+    , computeBonesUsingShaders{this,
+                               &AbstractMesh::get_computeBonesUsingShaders,
+                               &AbstractMesh::set_computeBonesUsingShaders}
+    , numBoneInfluencers{this, &AbstractMesh::get_numBoneInfluencers,
+                         &AbstractMesh::set_numBoneInfluencers}
+    , applyFog{this, &AbstractMesh::get_applyFog, &AbstractMesh::set_applyFog}
     , useOctreeForRenderingSelection{true}
     , useOctreeForPicking{true}
     , useOctreeForCollisions{true}
+    , layerMask{this, &AbstractMesh::get_layerMask,
+                &AbstractMesh::set_layerMask}
     , alwaysSelectAsActiveMesh{false}
     , actionManager{nullptr}
     , physicsImpostor{nullptr}
     , ellipsoid{Vector3(0.5f, 1.f, 0.5f)}
     , ellipsoidOffset{Vector3(0, 0, 0)}
+    , collisionMask{this, &AbstractMesh::get_collisionMask,
+                    &AbstractMesh::set_collisionMask}
+    , collisionGroup{this, &AbstractMesh::get_collisionGroup,
+                     &AbstractMesh::set_collisionGroup}
     , edgesWidth{1.f}
     , edgesColor{Color4(1.f, 0.f, 0.f, 1.f)}
     , _edgesRenderer{nullptr}
@@ -72,6 +111,7 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
     , _submeshesOctree{nullptr}
     , _unIndexed{false}
     , _waitingFreezeWorldMatrix{nullptr}
+    , skeleton{this, &AbstractMesh::get_skeleton, &AbstractMesh::set_skeleton}
     , _isOccluded{false}
     , _facetNb{0}
     , _partitioningSubdivisions{10}
@@ -124,57 +164,52 @@ void AbstractMesh::addToScene(unique_ptr_t<AbstractMesh>&& newMesh)
   getScene()->addMesh(::std::move(newMesh));
 }
 
-size_t AbstractMesh::facetNb() const
+size_t AbstractMesh::get_facetNb() const
 {
   return _facetNb;
 }
 
-unsigned int AbstractMesh::partitioningSubdivisions() const
+unsigned int AbstractMesh::get_partitioningSubdivisions() const
 {
   return _partitioningSubdivisions;
 }
 
-void AbstractMesh::setPartitioningSubdivisions(unsigned int nb)
+void AbstractMesh::set_partitioningSubdivisions(unsigned int nb)
 {
   _partitioningSubdivisions = nb;
 }
 
-float AbstractMesh::partitioningBBoxRatio() const
+float AbstractMesh::get_partitioningBBoxRatio() const
 {
   return _partitioningBBoxRatio;
 }
 
-void AbstractMesh::setPartitioningBBoxRatio(float ratio)
+void AbstractMesh::set_partitioningBBoxRatio(float ratio)
 {
   _partitioningBBoxRatio = ratio;
 }
 
-bool AbstractMesh::mustDepthSortFacets() const
+bool AbstractMesh::get_mustDepthSortFacets() const
 {
   return _facetDepthSort;
 }
 
-void AbstractMesh::setMustDepthSortFacets(bool sort)
+void AbstractMesh::set_mustDepthSortFacets(bool sort)
 {
   _facetDepthSort = sort;
 }
 
-Vector3& AbstractMesh::facetDepthSortFrom()
+Vector3& AbstractMesh::get_facetDepthSortFrom()
 {
   return *_facetDepthSortFrom.get();
 }
 
-const Vector3& AbstractMesh::facetDepthSortFrom() const
-{
-  return *_facetDepthSortFrom.get();
-}
-
-void AbstractMesh::setFacetDepthSortFrom(const Vector3& location)
+void AbstractMesh::set_facetDepthSortFrom(const Vector3& location)
 {
   _facetDepthSortFrom = ::std::make_unique<Vector3>(location);
 }
 
-bool AbstractMesh::isFacetDataEnabled() const
+bool AbstractMesh::get_isFacetDataEnabled() const
 {
   return _facetDataEnabled;
 }
@@ -188,7 +223,7 @@ bool AbstractMesh::_updateNonUniformScalingState(bool value)
   return true;
 }
 
-void AbstractMesh::setOnCollide(
+void AbstractMesh::set_onCollide(
   const ::std::function<void(AbstractMesh*, EventState&)>& callback)
 {
   if (_onCollideObserver) {
@@ -197,7 +232,7 @@ void AbstractMesh::setOnCollide(
   _onCollideObserver = onCollideObservable.add(callback);
 }
 
-void AbstractMesh::setOnCollisionPositionChange(
+void AbstractMesh::set_onCollisionPositionChange(
   const ::std::function<void(Vector3*, EventState&)>& callback)
 {
   if (_onCollisionPositionChangeObserver) {
@@ -208,12 +243,12 @@ void AbstractMesh::setOnCollisionPositionChange(
     = onCollisionPositionChangeObservable.add(callback);
 }
 
-Material* AbstractMesh::material()
+Material*& AbstractMesh::get_material()
 {
   return _material;
 }
 
-void AbstractMesh::setMaterial(Material* value)
+void AbstractMesh::set_material(Material* const& value)
 {
   if (_material == value) {
     return;
@@ -232,12 +267,12 @@ void AbstractMesh::setMaterial(Material* value)
   _unBindEffect();
 }
 
-bool AbstractMesh::receiveShadows() const
+bool AbstractMesh::get_receiveShadows() const
 {
   return _receiveShadows;
 }
 
-void AbstractMesh::setReceiveShadows(bool value)
+void AbstractMesh::set_receiveShadows(bool value)
 {
   if (_receiveShadows == value) {
     return;
@@ -247,12 +282,12 @@ void AbstractMesh::setReceiveShadows(bool value)
   _markSubMeshesAsLightDirty();
 }
 
-bool AbstractMesh::hasVertexAlpha() const
+bool AbstractMesh::get_hasVertexAlpha() const
 {
   return _hasVertexAlpha;
 }
 
-void AbstractMesh::setHasVertexAlpha(bool value)
+void AbstractMesh::set_hasVertexAlpha(bool value)
 {
   if (_hasVertexAlpha == value) {
     return;
@@ -263,12 +298,12 @@ void AbstractMesh::setHasVertexAlpha(bool value)
   _markSubMeshesAsMiscDirty();
 }
 
-bool AbstractMesh::useVertexColors() const
+bool AbstractMesh::get_useVertexColors() const
 {
   return _useVertexColors;
 }
 
-void AbstractMesh::setUseVertexColors(bool value)
+void AbstractMesh::set_useVertexColors(bool value)
 {
   if (_useVertexColors == value) {
     return;
@@ -278,12 +313,12 @@ void AbstractMesh::setUseVertexColors(bool value)
   _markSubMeshesAsAttributesDirty();
 }
 
-bool AbstractMesh::computeBonesUsingShaders() const
+bool AbstractMesh::get_computeBonesUsingShaders() const
 {
   return _computeBonesUsingShaders;
 }
 
-void AbstractMesh::setComputeBonesUsingShaders(bool value)
+void AbstractMesh::set_computeBonesUsingShaders(bool value)
 {
   if (_computeBonesUsingShaders == value) {
     return;
@@ -293,12 +328,12 @@ void AbstractMesh::setComputeBonesUsingShaders(bool value)
   _markSubMeshesAsAttributesDirty();
 }
 
-unsigned int AbstractMesh::numBoneInfluencers() const
+unsigned int AbstractMesh::get_numBoneInfluencers() const
 {
   return _numBoneInfluencers;
 }
 
-void AbstractMesh::setNumBoneInfluencers(unsigned int value)
+void AbstractMesh::set_numBoneInfluencers(unsigned int value)
 {
   if (_numBoneInfluencers == value) {
     return;
@@ -308,12 +343,12 @@ void AbstractMesh::setNumBoneInfluencers(unsigned int value)
   _markSubMeshesAsAttributesDirty();
 }
 
-bool AbstractMesh::applyFog() const
+bool AbstractMesh::get_applyFog() const
 {
   return _applyFog;
 }
 
-void AbstractMesh::setApplyFog(bool value)
+void AbstractMesh::set_applyFog(bool value)
 {
   if (_applyFog == value) {
     return;
@@ -323,12 +358,12 @@ void AbstractMesh::setApplyFog(bool value)
   _markSubMeshesAsMiscDirty();
 }
 
-unsigned int AbstractMesh::layerMask() const
+unsigned int AbstractMesh::get_layerMask() const
 {
   return _layerMask;
 }
 
-void AbstractMesh::setLayerMask(unsigned int value)
+void AbstractMesh::set_layerMask(unsigned int value)
 {
   if (value == _layerMask) {
     return;
@@ -338,27 +373,27 @@ void AbstractMesh::setLayerMask(unsigned int value)
   _resyncLightSources();
 }
 
-bool AbstractMesh::isOccluded() const
+bool AbstractMesh::get_isOccluded() const
 {
   return _isOccluded;
 }
 
-void AbstractMesh::isOccluded(bool value)
+void AbstractMesh::set_isOccluded(bool value)
 {
   _isOccluded = value;
 }
 
-bool AbstractMesh::isOcclusionQueryInProgress() const
+bool AbstractMesh::get_isOcclusionQueryInProgress() const
 {
   return _isOcclusionQueryInProgress;
 }
 
-float AbstractMesh::visibility() const
+float AbstractMesh::get_visibility() const
 {
   return _visibility;
 }
 
-void AbstractMesh::setVisibility(float value)
+void AbstractMesh::set_visibility(float value)
 {
   if (stl_util::almost_equal(_visibility, value)) {
     return;
@@ -368,22 +403,22 @@ void AbstractMesh::setVisibility(float value)
   _markSubMeshesAsMiscDirty();
 }
 
-int AbstractMesh::collisionMask() const
+int AbstractMesh::get_collisionMask() const
 {
   return _collisionMask;
 }
 
-void AbstractMesh::setCollisionMask(int mask)
+void AbstractMesh::set_collisionMask(int mask)
 {
   _collisionMask = !isNan(mask) ? mask : -1;
 }
 
-int AbstractMesh::collisionGroup() const
+int AbstractMesh::get_collisionGroup() const
 {
   return _collisionGroup;
 }
 
-void AbstractMesh::setCollisionGroup(int mask)
+void AbstractMesh::set_collisionGroup(int mask)
 {
   _collisionGroup = !isNan(mask) ? mask : -1;
 }
@@ -537,7 +572,7 @@ Scene* AbstractMesh::getScene()
   return Node::getScene();
 }
 
-void AbstractMesh::setSkeleton(Skeleton* value)
+void AbstractMesh::set_skeleton(Skeleton* const& value)
 {
   if (_skeleton && _skeleton->needInitialSkinMatrix) {
     _skeleton->_unregisterMeshWithPoseMatrix(this);
@@ -556,7 +591,7 @@ void AbstractMesh::setSkeleton(Skeleton* value)
   _markSubMeshesAsAttributesDirty();
 }
 
-Skeleton* AbstractMesh::skeleton()
+Skeleton*& AbstractMesh::get_skeleton()
 {
   return _skeleton;
 }

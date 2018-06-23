@@ -430,7 +430,7 @@ Mesh* VolumetricLightScatteringPostProcess::CreateDefaultMesh(
   auto material = StandardMaterial::New(name + "Material", scene);
   material->setEmissiveColor(Color3(1.f, 1.f, 1.f));
 
-  mesh->setMaterial(material);
+  mesh->material = material;
 
   return mesh;
 }

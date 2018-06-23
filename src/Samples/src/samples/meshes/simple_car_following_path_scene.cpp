@@ -70,7 +70,7 @@ void SimpleCarFollowingPathScene::initializeScene(ICanvas* canvas, Scene* scene)
   extrudeShapeOptions.path  = extrudePath;
   extrudeShapeOptions.cap   = Mesh::NO_CAP();
   _carBody = MeshBuilder::ExtrudeShape("body", extrudeShapeOptions, scene);
-  _carBody->setMaterial(bodyMaterial);
+  _carBody->material = bodyMaterial;
   /*----------------------- End Car Body -------------------------------------*/
 
   /*----------------------- Wheels--------------------------------------------*/
@@ -91,7 +91,7 @@ void SimpleCarFollowingPathScene::initializeScene(ICanvas* canvas, Scene* scene)
     cylinderOptions.faceUV[0] = Vector4(0, 0, 1, 1);
     cylinderOptions.faceUV[2] = Vector4(0, 0, 1, 1);
     auto wheel = MeshBuilder::CreateCylinder(wheelName, cylinderOptions, scene);
-    wheel->setMaterial(wheelMaterial);
+    wheel->material = wheelMaterial;
     // Rotate wheel so tread in xz plane
     auto axis = Axis::X();
     wheel->rotate(axis, Math::PI_2, Space::WORLD);

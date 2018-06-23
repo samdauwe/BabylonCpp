@@ -64,8 +64,8 @@ void RibbonScene::initializeScene(ICanvas* canvas, Scene* scene)
     Mesh::CreateLines("par", path, scene);
   }
 
-  auto ribbon = Mesh::CreateRibbon("rib", paths, false, false, 0, scene);
-  ribbon->setMaterial(mat);
+  auto ribbon      = Mesh::CreateRibbon("rib", paths, false, false, 0, scene);
+  ribbon->material = mat;
 }
 
 } // end of namespace Samples

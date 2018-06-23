@@ -105,7 +105,7 @@ void InfiniteLoaderScene::initializeScene(ICanvas* canvas, Scene* scene)
     Ring ring  = createRing(30 * c, w + 1.5f * cf, ranges);
     ring.angle = angle * cf;
     for (auto& tube : ring.tubes) {
-      tube->setMaterial(materials[c % 2]);
+      tube->material = materials[c % 2];
     }
     _rings.emplace_back(ring);
   }

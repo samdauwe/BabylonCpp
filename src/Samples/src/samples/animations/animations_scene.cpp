@@ -61,8 +61,8 @@ void AnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto materialBox2         = StandardMaterial::New("texture2", scene);
 
   // Applying materials
-  box1->setMaterial(materialBox);
-  box2->setMaterial(materialBox2);
+  box1->material = materialBox;
+  box2->material = materialBox2;
 
   // Positioning box
   box2->position().x = 20.f;

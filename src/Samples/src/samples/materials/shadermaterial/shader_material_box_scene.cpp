@@ -54,7 +54,7 @@ void ShaderMaterialBoxScene::initializeScene(ICanvas* canvas, Scene* scene)
   shaderMaterialOptions.uniforms   = {"worldViewProjection", "time"};
   _shaderMaterial
     = ShaderMaterial::New("boxShader", scene, "custom", shaderMaterialOptions);
-  box->setMaterial(_shaderMaterial);
+  box->material = _shaderMaterial;
 
   // Animation
   scene->onAfterCameraRenderObservable.add([this](Camera*, EventState&) {

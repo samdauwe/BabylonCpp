@@ -613,7 +613,7 @@ void MaterialHelper::BindBonesParameters(AbstractMesh* mesh, Effect* effect)
   }
   if (mesh->computeBonesUsingShaders()
       && effect->_bonesComputationForcedToCPU) {
-    mesh->setComputeBonesUsingShaders(false);
+    mesh->computeBonesUsingShaders = false;
   }
 
   if (mesh->useBones() && mesh->computeBonesUsingShaders()

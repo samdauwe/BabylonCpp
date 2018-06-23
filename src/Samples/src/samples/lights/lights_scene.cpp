@@ -51,8 +51,8 @@ void LightsScene::initializeScene(ICanvas* canvas, Scene* scene)
     // Create light sphere
     auto lightSphere = Mesh::CreateSphere(
       String::concat("Sphere", _lightSpheres.size()), 16, 0.5f, _scene.get());
-    lightSphere->setMaterial(StandardMaterial::New(
-      String::concat("mat", _lightSpheres.size()), _scene.get()));
+    lightSphere->material = StandardMaterial::New(
+      String::concat("mat", _lightSpheres.size()), _scene.get());
     lightSphere->material()->setDiffuseColor(Color3::Black());
     lightSphere->material()->setSpecularColor(Color3::Black());
     lightSphere->material()->setEmissiveColor(color);
@@ -118,7 +118,7 @@ void LightsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   auto sphere
     = Mesh::CreateRibbon("Sphere", generateSphere(3.f), false, true, 0, scene);
-  sphere->setMaterial(material);
+  sphere->material = material;
 
   // Animations
   scene->onBeforeRenderObservable.add([this](Scene*, EventState&) {

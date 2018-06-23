@@ -76,9 +76,9 @@ void CurvedHelixMeshesScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto pathline   = Mesh::CreateLines("pl", path, scene);
   pathline->color = Color3::Magenta();
 
-  auto extruded = Mesh::ExtrudeShape("extruded", shape, path, 0.5f,
+  auto extruded      = Mesh::ExtrudeShape("extruded", shape, path, 0.5f,
                                      Math::PI / 5.f, 0, scene);
-  extruded->setMaterial(mat);
+  extruded->material = mat;
 
   // Show the axis
   _showAxis(5.f, scene);

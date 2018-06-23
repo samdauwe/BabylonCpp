@@ -305,7 +305,7 @@ void EnvironmentHelper::_setupGround(const ISceneSize& sceneSize)
       [this](Node* /*node*/, EventState& /*es*/) { _ground = nullptr; });
   }
 
-  _ground->setReceiveShadows(_options.enableGroundShadow);
+  _ground->receiveShadows = _options.enableGroundShadow;
 }
 
 void EnvironmentHelper::_setupGroundMaterial()
@@ -322,7 +322,7 @@ void EnvironmentHelper::_setupGroundMaterial()
   _groundMaterial->setEnableNoise(true);
 
   if (_ground) {
-    _ground->setMaterial(_groundMaterial);
+    _ground->material = _groundMaterial;
   }
 }
 
@@ -420,7 +420,7 @@ void EnvironmentHelper::_setupSkyboxMaterial()
   _skyboxMaterial->setPrimaryColor(_options.skyboxColor);
   _skyboxMaterial->setEnableNoise(true);
 
-  _skybox->setMaterial(_skyboxMaterial);
+  _skybox->material = _skyboxMaterial;
 }
 
 void EnvironmentHelper::_setupSkyboxReflectionTexture()

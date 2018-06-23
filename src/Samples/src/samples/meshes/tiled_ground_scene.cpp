@@ -69,7 +69,7 @@ void TiledGroundScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Part 3 : Apply the multi material
   // Define multimat as material of the tiled ground
-  tiledGround->setMaterial(multimat);
+  tiledGround->material = multimat;
 
   // Needed variables to set subMeshes
   auto verticesCount = tiledGround->getTotalVertices();

@@ -234,7 +234,7 @@ void MeshAdapter::_buildPropertiesView()
   // - applyFog
   view.addBoolProperty(
     "applyFog", [&]() -> bool { return _abstractMesh->applyFog(); },
-    [&](const bool& value) { _abstractMesh->setApplyFog(value); });
+    [&](const bool& value) { _abstractMesh->applyFog = value; });
   // - checkCollisions
   view.addBoolProperty(
     "checkCollisions",
@@ -243,17 +243,17 @@ void MeshAdapter::_buildPropertiesView()
   // - collisionGroup
   view.addIntProperty(
     "collisionGroup", [&]() -> int { return _abstractMesh->collisionGroup(); },
-    [&](const int& value) { _abstractMesh->setCollisionGroup(value); });
+    [&](const int& value) { _abstractMesh->collisionGroup = value; });
   // - collisionMask
   view.addIntProperty(
     "collisionMask", [&]() -> int { return _abstractMesh->collisionMask(); },
-    [&](const int& value) { _abstractMesh->setCollisionMask(value); });
+    [&](const int& value) { _abstractMesh->collisionMask = value; });
   // - computeBonesUsingShaders
   view.addBoolProperty(
     "computeBonesUsingShaders",
     [&]() -> bool { return _abstractMesh->computeBonesUsingShaders(); },
     [&](const bool& value) {
-      _abstractMesh->setComputeBonesUsingShaders(value);
+      _abstractMesh->computeBonesUsingShaders = value;
     });
   // - definedFacingForward
   view.addBoolProperty(
@@ -289,7 +289,7 @@ void MeshAdapter::_buildPropertiesView()
   // - hasVertexAlpha
   view.addBoolProperty(
     "hasVertexAlpha", [&]() -> bool { return _abstractMesh->hasVertexAlpha(); },
-    [&](const bool& value) { _abstractMesh->setHasVertexAlpha(value); });
+    [&](const bool& value) { _abstractMesh->hasVertexAlpha = value; });
   // - isBlocked
   view.addBoolProperty("isBlocked",
                        [&]() -> bool { return _abstractMesh->isBlocked(); },
@@ -324,19 +324,19 @@ void MeshAdapter::_buildPropertiesView()
   view.addSizeTProperty(
     "layerMask", [&]() -> size_t { return _abstractMesh->layerMask(); },
     [&](const size_t& value) {
-      _abstractMesh->setLayerMask(static_cast<unsigned>(value));
+      _abstractMesh->layerMask = static_cast<unsigned>(value);
     });
   // - mustDepthSortFacets
   view.addBoolProperty(
     "mustDepthSortFacets",
     [&]() -> bool { return _abstractMesh->mustDepthSortFacets(); },
-    [&](const bool& value) { _abstractMesh->setMustDepthSortFacets(value); });
+    [&](const bool& value) { _abstractMesh->mustDepthSortFacets = value; });
   // - numBoneInfluencers
   view.addSizeTProperty(
     "numBoneInfluencers",
     [&]() -> size_t { return _abstractMesh->numBoneInfluencers(); },
     [&](const size_t& value) {
-      _abstractMesh->setNumBoneInfluencers(static_cast<unsigned>(value));
+      _abstractMesh->numBoneInfluencers = static_cast<unsigned>(value);
     });
   // - occlusionQueryAlgorithmType
   view.addSizeTProperty(
@@ -378,20 +378,18 @@ void MeshAdapter::_buildPropertiesView()
   view.addFloatProperty(
     "partitioningBBoxRatio",
     [&]() -> float { return _abstractMesh->partitioningBBoxRatio(); },
-    [&](const float& value) {
-      _abstractMesh->setPartitioningBBoxRatio(value);
-    });
+    [&](const float& value) { _abstractMesh->partitioningBBoxRatio = value; });
   // - partitioningSubdivisions
   view.addSizeTProperty(
     "partitioningSubdivisions",
     [&]() -> size_t { return _abstractMesh->partitioningSubdivisions(); },
     [&](const size_t& value) {
-      _abstractMesh->setPartitioningSubdivisions(static_cast<unsigned>(value));
+      _abstractMesh->partitioningSubdivisions = static_cast<unsigned>(value);
     });
   // - receiveShadows
   view.addBoolProperty(
     "receiveShadows", [&]() -> bool { return _abstractMesh->receiveShadows(); },
-    [&](const bool& value) { _abstractMesh->setReceiveShadows(value); });
+    [&](const bool& value) { _abstractMesh->receiveShadows = value; });
   // - renderingGroupId
   view.addSizeTProperty(
     "renderingGroupId",
@@ -439,11 +437,11 @@ void MeshAdapter::_buildPropertiesView()
   view.addBoolProperty(
     "useVertexColors",
     [&]() -> bool { return _abstractMesh->useVertexColors(); },
-    [&](const bool& value) { _abstractMesh->setUseVertexColors(value); });
+    [&](const bool& value) { _abstractMesh->useVertexColors = value; });
   // - visibility
   view.addFloatProperty(
     "visibility", [&]() -> float { return _abstractMesh->visibility(); },
-    [&](const float& value) { _abstractMesh->setVisibility(value); });
+    [&](const float& value) { _abstractMesh->visibility = value; });
   /** Mesh properties **/
   if (_mesh) {
     // - areNormalsFrozen

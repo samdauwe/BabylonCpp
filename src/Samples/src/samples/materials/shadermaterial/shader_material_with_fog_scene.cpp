@@ -58,7 +58,7 @@ void ShaderMaterialWithFogScene::initializeScene(ICanvas* canvas, Scene* scene)
     = {"world", "view", "viewProjection", "vFogInfos", "vFogColor"};
   _boxMaterial
     = ShaderMaterial::New("boxShader", scene, "custom", shaderMaterialOptions);
-  box->setMaterial(_boxMaterial);
+  box->material = _boxMaterial;
 
   _boxMaterial->setOnBind([this](AbstractMesh*, EventState&) {
     auto effect = _boxMaterial->getEffect();

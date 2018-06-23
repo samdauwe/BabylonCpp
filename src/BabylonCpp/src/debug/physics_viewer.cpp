@@ -140,7 +140,7 @@ AbstractMesh* PhysicsViewer::_getDebugBoxMesh(Scene* scene)
       = MeshBuilder::CreateBox("physicsBodyBoxViewMesh", options, scene);
     _debugBoxMesh->renderingGroupId = 1;
     _debugBoxMesh->setRotationQuaternion(Quaternion::Identity());
-    _debugBoxMesh->setMaterial(_getDebugMaterial(scene));
+    _debugBoxMesh->material = _getDebugMaterial(scene);
     scene->removeMesh(_debugBoxMesh);
   }
 
@@ -155,7 +155,7 @@ AbstractMesh* PhysicsViewer::_getDebugSphereMesh(Scene* scene)
       = MeshBuilder::CreateSphere("physicsBodySphereViewMesh", options, scene);
     _debugSphereMesh->renderingGroupId = 1;
     _debugSphereMesh->setRotationQuaternion(Quaternion::Identity());
-    _debugSphereMesh->setMaterial(_getDebugMaterial(scene));
+    _debugSphereMesh->material = _getDebugMaterial(scene);
     scene->removeMesh(_debugSphereMesh);
   }
 

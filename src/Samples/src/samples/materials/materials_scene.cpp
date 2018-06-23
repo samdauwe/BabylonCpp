@@ -62,7 +62,7 @@ void MaterialsScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto materialSphere2          = StandardMaterial::New("texture2", scene);
   materialSphere2->diffuseColor = Color3(1, 0, 0); // Red
   materialSphere2->setAlpha(0.3f);
-#if 0
+
   // Creation of a material with an image texture
   auto materialSphere3 = StandardMaterial::New("texture3", scene);
   materialSphere3->setDiffuseTexture(Texture::New("textures/misc.jpg", scene));
@@ -88,25 +88,26 @@ void MaterialsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Creation of a repeated textured material
   auto materialPlane = StandardMaterial::New("texturePlane", scene);
+  materialPlane->setBackFaceCulling(
+    false); // Always show the front and the back of an element
   materialPlane->setDiffuseTexture(Texture::New("textures/grass.jpg", scene));
   texture         = static_cast<Texture*>(materialPlane->diffuseTexture());
   texture->uScale = 5.f; // Repeat 5 times on the Vertical Axes
   texture->vScale = 5.f; // Repeat 5 times on the Horizontal Axes
   materialPlane->setBackFaceCulling(
     false); // Always show the front and the back of an element
-#endif
+
   // Apply the materials to meshes
-  sphere1->setMaterial(materialSphere1);
-  sphere2->setMaterial(materialSphere2);
-#if 0
-  sphere3->setMaterial(materialSphere3);
-  sphere4->setMaterial(materialSphere4);
+  sphere1->material = materialSphere1;
+  sphere2->material = materialSphere2;
 
-  sphere5->setMaterial(materialSphere5);
-  sphere6->setMaterial(materialSphere6);
+  sphere3->material = materialSphere3;
+  sphere4->material = materialSphere4;
 
-  plane->setMaterial(materialPlane);
-#endif
+  sphere5->material = materialSphere5;
+  sphere6->material = materialSphere6;
+
+  plane->material = materialPlane;
 }
 
 } // end of namespace Samples

@@ -173,7 +173,7 @@ void SimplePlanet::render()
   vertexData->colors    = std::move(colors);
   vertexData->applyToMesh(_planet.mesh, false);
 
-  _planet.mesh->setMaterial(material);
+  _planet.mesh->material = material;
 }
 
 } // end of namespace Extensions

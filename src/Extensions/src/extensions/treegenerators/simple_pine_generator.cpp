@@ -57,8 +57,8 @@ Mesh* SimplePineGenerator::CreateTree(Scene* scene, Material* trunkMaterial,
                            nbL * 1.5f - nbL / 2.f - 1.f, 12, 1, scene);
   // trunk->convertToFlatShadedMesh();
 
-  leaves->setMaterial(leafMaterial);
-  trunk->setMaterial(trunkMaterial);
+  leaves->material = leafMaterial;
+  trunk->material  = trunkMaterial;
 
   auto tree       = Mesh::CreateBox("", 1.f, scene);
   tree->isVisible = false;

@@ -47,11 +47,11 @@ void WavesScene::initializeScene(ICanvas* canvas, Scene* scene)
   light->intensity = 0.7f;
 
   // Create ground meshes
-  _ground = Mesh::CreateGround("ground", 10, 10, 10, scene, true);
-  _ground->setMaterial(StandardMaterial::New("gmat", scene));
+  _ground           = Mesh::CreateGround("ground", 10, 10, 10, scene, true);
+  _ground->material = StandardMaterial::New("gmat", scene);
   _ground->material()->setDiffuseColor(Color3(0.4f, 0.4f, 0.8f));
-  _ground2 = Mesh::CreateGround("ground", 10, 10, 10, scene, true);
-  _ground2->setMaterial(StandardMaterial::New("gmat2", scene));
+  _ground2           = Mesh::CreateGround("ground", 10, 10, 10, scene, true);
+  _ground2->material = StandardMaterial::New("gmat2", scene);
   _ground2->material()->setDiffuseColor(Color3(1.f, 1.f, 1.f));
   _ground2->material()->setWireframe(true);
 

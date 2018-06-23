@@ -62,7 +62,7 @@ float InstancedMesh::visibility() const
   return _sourceMesh->visibility();
 }
 
-Skeleton* InstancedMesh::skeleton()
+Skeleton*& InstancedMesh::get_skeleton()
 {
   return _sourceMesh->skeleton();
 }

@@ -33,7 +33,7 @@ public:
   bool receiveShadows() const;
   Material* material() const;
   float visibility() const;
-  Skeleton* skeleton() override;
+  Skeleton*& get_skeleton() override;
 
   /**
    * @brief Returns the total number of vertices (integer).

@@ -293,7 +293,7 @@ void Radix::constructArrow(RadixFeatures feature, const std::string& name,
   arrow->setPosition(Vector3::TransformCoordinates(
     Vector3(0, _arrowLength - (_coneLength / 2.f), 0.f), transform));
   arrow->setRotationQuaternion(rotation);
-  arrow->setMaterial(mtl);
+  arrow->material = mtl;
   arrow->setParent(_rootMesh);
   arrow->renderingGroupId = 1;
   arrow->isPickable       = false;
@@ -331,7 +331,7 @@ void Radix::constructRotation(RadixFeatures /*feature*/,
   auto rotCyl
     = Mesh::CreateCylinder(name + "Cylinder", _coneLength, _coneRadius,
                            _coneRadius, 18, 1, _scene, false);
-  rotCyl->setMaterial(mtl);
+  rotCyl->material = mtl;
   rotCyl->setPosition(Vector3::TransformCoordinates(
     Vector3(0.f, _coneLength / 2.f, 0.f), transform));
   rotCyl->setRotationQuaternion(Quaternion::FromRotationMatrix(transform));

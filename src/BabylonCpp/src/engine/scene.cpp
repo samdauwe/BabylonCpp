@@ -4867,7 +4867,7 @@ Mesh* Scene::createDefaultSkybox(BaseTexture* iEnvironmentTexture, bool pbr,
     hdrSkyboxMaterial->disableLighting  = true;
     hdrSkyboxMaterial->twoSidedLighting = true;
     hdrSkybox->infiniteDistance         = true;
-    hdrSkybox->setMaterial(hdrSkyboxMaterial);
+    hdrSkybox->material                 = hdrSkyboxMaterial;
   }
   else {
     auto skyboxMaterial = StandardMaterial::New("skyBox", this);
@@ -4879,7 +4879,7 @@ Mesh* Scene::createDefaultSkybox(BaseTexture* iEnvironmentTexture, bool pbr,
     }
     skyboxMaterial->setDisableLighting(true);
     hdrSkybox->infiniteDistance = true;
-    hdrSkybox->setMaterial(skyboxMaterial);
+    hdrSkybox->material         = skyboxMaterial;
   }
 
   return hdrSkybox;

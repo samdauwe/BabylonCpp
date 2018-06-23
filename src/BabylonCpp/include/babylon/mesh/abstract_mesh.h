@@ -52,274 +52,10 @@ public:
   virtual IReflect::Type type() const override;
   void addToScene(unique_ptr_t<AbstractMesh>&& newMesh);
 
-  // FacetData private properties
-
-  /**
-   * @brief Gets the number of facets in the mesh.
-   * @see
-   * http://doc.babylonjs.com/how_to/how_to_use_facetdata#what-is-a-mesh-facet
-   */
-  size_t facetNb() const;
-
-  /**
-   * @brief Gets the number (integer) of subdivisions per axis in the partioning
-   * space.
-   * @see
-   * http://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
-   */
-  unsigned int partitioningSubdivisions() const;
-
-  /**
-   * @brief Set the number (integer) of subdivisions per axis in the partioning
-   * space.
-   * @see
-   * http://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
-   */
-  void setPartitioningSubdivisions(unsigned int nb);
-
-  /**
-   * @brief Gets the ratio (float) to apply to the bouding box size to set to
-   * the partioning space. Ex : 1.01 (default) the partioning space is 1% bigger
-   * than the bounding box
-   * @see
-   * http://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
-   */
-  float partitioningBBoxRatio() const;
-
-  /**
-   * @brief Set the ratio (float) to apply to the bouding box size to set to the
-   * partioning space. Ex : 1.01 (default) the partioning space is 1% bigger
-   * than the bounding box
-   * @see
-   * http://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
-   */
-  void setPartitioningBBoxRatio(float ratio);
-
-  /**
-   * @brief Gets a boolean indicating that the facets must be depth sorted on
-   * next call to `updateFacetData()`. Works only for updatable meshes. Doesn't
-   * work with multi-materials
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata#facet-depth-sort
-   */
-  bool mustDepthSortFacets() const;
-
-  /**
-   * @brief Sets a boolean indicating that the facets must be depth sorted on
-   * next call to `updateFacetData()`. Works only for updatable meshes. Doesn't
-   * work with multi-materials
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata#facet-depth-sort
-   */
-  void setMustDepthSortFacets(bool sort);
-
-  /**
-   * @brief Gets the location (Vector3) where the facet depth sort must be
-   * computed from. By default, the active camera position. Used only when facet
-   * depth sort is enabled
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata#facet-depth-sort
-   */
-  Vector3& facetDepthSortFrom();
-
-  /**
-   * @brief Gets the location (Vector3) where the facet depth sort must be
-   * computed from. By default, the active camera position. Used only when facet
-   * depth sort is enabled
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata#facet-depth-sort
-   */
-  const Vector3& facetDepthSortFrom() const;
-
-  /**
-   * @brief Sets the location (Vector3) where the facet depth sort must be
-   * computed from. By default, the active camera position. Used only when facet
-   * depth sort is enabled
-   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata#facet-depth-sort
-   */
-  void setFacetDepthSortFrom(const Vector3& location);
-
-  /**
-   * @brief Gets a boolean indicating if facetData is enabled.
-   * @see
-   * http://doc.babylonjs.com/how_to/how_to_use_facetdata#what-is-a-mesh-facet
-   */
-  bool isFacetDataEnabled() const;
-
   /**
    * @brief Hidden
    */
   bool _updateNonUniformScalingState(bool value) override;
-
-  // Events
-
-  /**
-   * @brief Set a function to call when this mesh collides with another one.
-   */
-  void setOnCollide(
-    const ::std::function<void(AbstractMesh*, EventState&)>& callback);
-
-  /**
-   * @brief An event triggered when the collision's position changes.
-   */
-  void setOnCollisionPositionChange(
-    const ::std::function<void(Vector3*, EventState&)>& callback);
-
-  // Properties
-
-  /**
-   * @brief Gets current material.
-   */
-  Material* material();
-
-  /**
-   * @brief Sets current material.
-   */
-  void setMaterial(Material* value);
-
-  /**
-   * @brief Gets a boolean indicating that this mesh can receive realtime
-   * shadows.
-   * @see http://doc.babylonjs.com/babylon101/shadows
-   */
-  bool receiveShadows() const;
-
-  /**
-   * @brief Sets a boolean indicating that this mesh can receive realtime
-   * shadows.
-   * @see http://doc.babylonjs.com/babylon101/shadows
-   */
-  void setReceiveShadows(bool value);
-
-  /**
-   * @brief Gets a boolean indicating that this mesh contains vertex color data
-   * with alpha values.
-   */
-  bool hasVertexAlpha() const;
-
-  /**
-   * @brief Sets a boolean indicating that this mesh contains vertex color data
-   * with alpha values.
-   */
-  void setHasVertexAlpha(bool value);
-
-  /**
-   * @brief Gets a boolean indicating that this mesh needs to use vertex color
-   * data to render (if this kind of vertex data is available in the geometry).
-   */
-  bool useVertexColors() const;
-
-  /**
-   * @brief Sets a boolean indicating that this mesh needs to use vertex color
-   * data to render (if this kind of vertex data is available in the geometry).
-   */
-  void setUseVertexColors(bool value);
-
-  /**
-   *  @brief Gets a boolean indicating that bone animations must be computed by
-   * the CPU (false by default).
-   */
-  bool computeBonesUsingShaders() const;
-
-  /**
-   * @brief Sets a boolean indicating that bone animations must be computed by
-   * the CPU (false by default).
-   */
-  void setComputeBonesUsingShaders(bool value);
-
-  /**
-   * @brief Gets the number of allowed bone influences per vertex (4 by
-   * default).
-   */
-  unsigned int numBoneInfluencers() const;
-
-  /**
-   * @brief Sets the number of allowed bone influences per vertex (4 by
-   * default).
-   */
-  void setNumBoneInfluencers(unsigned int value);
-
-  /**
-   * @brief Gets a boolean indicating that this mesh will allow fog to be
-   * rendered on it (true by default).
-   */
-  bool applyFog() const;
-
-  /**
-   * @brief Sets a boolean indicating that this mesh will allow fog to be
-   * rendered on it (true by default).
-   */
-  void setApplyFog(bool value);
-
-  /**
-   * @brief Gets the current layer mask (default is 0x0FFFFFFF).
-   * @see http://doc.babylonjs.com/how_to/layermasks_and_multi-cam_textures
-   */
-  unsigned int layerMask() const;
-
-  /**
-   * @brief Sets the current layer mask (default is 0x0FFFFFFF).
-   * @see http://doc.babylonjs.com/how_to/layermasks_and_multi-cam_textures
-   */
-  void setLayerMask(unsigned int value);
-
-  // Occlusion
-
-  /**
-   * @brief Gets whether the mesh is occluded or not, it is used also to set the
-   * intial state of the mesh to be occluded or not.
-   * @see http://doc.babylonjs.com/features/occlusionquery
-   */
-  bool isOccluded() const;
-
-  /**
-   * @brief Sets whether the mesh is occluded or not, it is used also to set the
-   * intial state of the mesh to be occluded or not.
-   * @see http://doc.babylonjs.com/features/occlusionquery
-   */
-  void isOccluded(bool value);
-
-  /**
-   * @brief Flag to check the progress status of the query.
-   * @see http://doc.babylonjs.com/features/occlusionquery
-   */
-  bool isOcclusionQueryInProgress() const;
-
-  /**
-   * @brief Gets mesh visibility between 0 and 1 (default is 1).
-   */
-  float visibility() const;
-
-  /**
-   * @brief Sets mesh visibility between 0 and 1 (default is 1).
-   */
-  void setVisibility(float value);
-
-  // Collisions
-
-  /**
-   * @brief Gets a collision mask used to mask collisions (default is -1).
-   * A collision between A and B will happen if A.collisionGroup &
-   * b.collisionMask !== 0
-   */
-  int collisionMask() const;
-
-  /**
-   * @brief Sets a collision mask used to mask collisions (default is -1).
-   * A collision between A and B will happen if A.collisionGroup &
-   * b.collisionMask !== 0
-   */
-  void setCollisionMask(int mask);
-
-  /**
-   * @brief Gets the current collision group mask (-1 by default).
-   * A collision between A and B will happen if A.collisionGroup &
-   * b.collisionMask !== 0
-   */
-  int collisionGroup() const;
-
-  /**
-   * @brief Sets the current collision group mask (-1 by default).
-   * A collision between A and B will happen if A.collisionGroup &
-   * b.collisionMask !== 0
-   */
-  void setCollisionGroup(int mask);
 
   /**
    * @brief Returns the string "AbstractMesh".
@@ -379,18 +115,6 @@ public:
    * @brief Hidden
    */
   Scene* getScene() override;
-
-  /**
-   * @brief  sets a skeleton to apply skining transformations.
-   * @see http://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
-   */
-  void setSkeleton(Skeleton* value);
-
-  /**
-   * @brief Gets a skeleton to apply skining transformations.
-   * @see http://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
-   */
-  virtual Skeleton* skeleton();
 
   /**
    * @brief Gets a Vector3 depicting the mesh scaling along each local axis X,
@@ -1100,6 +824,263 @@ protected:
    */
   void _checkOcclusionQuery();
 
+protected:
+  /**
+   * @brief Gets the number of facets in the mesh.
+   * @see
+   * http://doc.babylonjs.com/how_to/how_to_use_facetdata#what-is-a-mesh-facet
+   */
+  size_t get_facetNb() const;
+
+  /**
+   * @brief Gets the number (integer) of subdivisions per axis in the partioning
+   * space.
+   * @see
+   * http://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
+   */
+  unsigned int get_partitioningSubdivisions() const;
+
+  /**
+   * @brief Set the number (integer) of subdivisions per axis in the partioning
+   * space.
+   * @see
+   * http://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
+   */
+  void set_partitioningSubdivisions(unsigned int nb);
+
+  /**
+   * @brief Gets the ratio (float) to apply to the bouding box size to set to
+   * the partioning space. Ex : 1.01 (default) the partioning space is 1% bigger
+   * than the bounding box
+   * @see
+   * http://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
+   */
+  float get_partitioningBBoxRatio() const;
+
+  /**
+   * @brief Set the ratio (float) to apply to the bouding box size to set to the
+   * partioning space. Ex : 1.01 (default) the partioning space is 1% bigger
+   * than the bounding box
+   * @see
+   * http://doc.babylonjs.com/how_to/how_to_use_facetdata#tweaking-the-partitioning
+   */
+  void set_partitioningBBoxRatio(float ratio);
+
+  /**
+   * @brief Gets a boolean indicating that the facets must be depth sorted on
+   * next call to `updateFacetData()`. Works only for updatable meshes. Doesn't
+   * work with multi-materials
+   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata#facet-depth-sort
+   */
+  bool get_mustDepthSortFacets() const;
+
+  /**
+   * @brief Sets a boolean indicating that the facets must be depth sorted on
+   * next call to `updateFacetData()`. Works only for updatable meshes. Doesn't
+   * work with multi-materials
+   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata#facet-depth-sort
+   */
+  void set_mustDepthSortFacets(bool sort);
+
+  /**
+   * @brief Gets the location (Vector3) where the facet depth sort must be
+   * computed from. By default, the active camera position. Used only when facet
+   * depth sort is enabled
+   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata#facet-depth-sort
+   */
+  Vector3& get_facetDepthSortFrom();
+
+  /**
+   * @brief Sets the location (Vector3) where the facet depth sort must be
+   * computed from. By default, the active camera position. Used only when facet
+   * depth sort is enabled
+   * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata#facet-depth-sort
+   */
+  void set_facetDepthSortFrom(const Vector3& location);
+
+  /**
+   * @brief Gets a boolean indicating if facetData is enabled.
+   * @see
+   * http://doc.babylonjs.com/how_to/how_to_use_facetdata#what-is-a-mesh-facet
+   */
+  bool get_isFacetDataEnabled() const;
+
+  /**
+   * @brief Set a function to call when this mesh collides with another one.
+   */
+  void set_onCollide(
+    const ::std::function<void(AbstractMesh*, EventState&)>& callback);
+
+  /**
+   * @brief An event triggered when the collision's position changes.
+   */
+  void set_onCollisionPositionChange(
+    const ::std::function<void(Vector3*, EventState&)>& callback);
+
+  /**
+   * @brief Gets whether the mesh is occluded or not, it is used also to set the
+   * intial state of the mesh to be occluded or not.
+   * @see http://doc.babylonjs.com/features/occlusionquery
+   */
+  bool get_isOccluded() const;
+
+  /**
+   * @brief Sets whether the mesh is occluded or not, it is used also to set the
+   * intial state of the mesh to be occluded or not.
+   * @see http://doc.babylonjs.com/features/occlusionquery
+   */
+  void set_isOccluded(bool value);
+
+  /**
+   * @brief Flag to check the progress status of the query.
+   * @see http://doc.babylonjs.com/features/occlusionquery
+   */
+  bool get_isOcclusionQueryInProgress() const;
+
+  /**
+   * @brief Gets mesh visibility between 0 and 1 (default is 1).
+   */
+  float get_visibility() const;
+
+  /**
+   * @brief Sets mesh visibility between 0 and 1 (default is 1).
+   */
+  void set_visibility(float value);
+
+  /**
+   * @brief Gets current material.
+   */
+  Material*& get_material();
+
+  /**
+   * @brief Sets current material.
+   */
+  void set_material(Material* const& value);
+
+  /**
+   * @brief Gets a boolean indicating that this mesh can receive realtime
+   * shadows.
+   * @see http://doc.babylonjs.com/babylon101/shadows
+   */
+  bool get_receiveShadows() const;
+
+  /**
+   * @brief Sets a boolean indicating that this mesh can receive realtime
+   * shadows.
+   * @see http://doc.babylonjs.com/babylon101/shadows
+   */
+  void set_receiveShadows(bool value);
+
+  /**
+   * @brief Gets a boolean indicating that this mesh contains vertex color data
+   * with alpha values.
+   */
+  bool get_hasVertexAlpha() const;
+
+  /**
+   * @brief Sets a boolean indicating that this mesh contains vertex color data
+   * with alpha values.
+   */
+  void set_hasVertexAlpha(bool value);
+
+  /**
+   * @brief Gets a boolean indicating that this mesh needs to use vertex color
+   * data to render (if this kind of vertex data is available in the geometry).
+   */
+  bool get_useVertexColors() const;
+
+  /**
+   * @brief Sets a boolean indicating that this mesh needs to use vertex color
+   * data to render (if this kind of vertex data is available in the geometry).
+   */
+  void set_useVertexColors(bool value);
+
+  /**
+   * @brief Gets a boolean indicating that bone animations must be computed by
+   * the CPU (false by default).
+   */
+  bool get_computeBonesUsingShaders() const;
+
+  /**
+   * @brief Sets a boolean indicating that bone animations must be computed by
+   * the CPU (false by default).
+   */
+  void set_computeBonesUsingShaders(bool value);
+
+  /**
+   * @brief Gets the number of allowed bone influences per vertex (4 by
+   * default).
+   */
+  unsigned int get_numBoneInfluencers() const;
+
+  /**
+   * @brief Sets the number of allowed bone influences per vertex (4 by
+   * default).
+   */
+  void set_numBoneInfluencers(unsigned int value);
+
+  /**
+   * @brief Gets a boolean indicating that this mesh will allow fog to be
+   * rendered on it (true by default).
+   */
+  bool get_applyFog() const;
+
+  /**
+   * @brief Sets a boolean indicating that this mesh will allow fog to be
+   * rendered on it (true by default).
+   */
+  void set_applyFog(bool value);
+
+  /**
+   * @brief Gets the current layer mask (default is 0x0FFFFFFF).
+   * @see http://doc.babylonjs.com/how_to/layermasks_and_multi-cam_textures
+   */
+  unsigned int get_layerMask() const;
+
+  /**
+   * @brief Sets the current layer mask (default is 0x0FFFFFFF).
+   * @see http://doc.babylonjs.com/how_to/layermasks_and_multi-cam_textures
+   */
+  void set_layerMask(unsigned int value);
+
+  /**
+   * @brief Gets a collision mask used to mask collisions (default is -1). A
+   * collision between A and B will happen if A.collisionGroup & b.collisionMask
+   * !== 0
+   */
+  int get_collisionMask() const;
+
+  /**
+   * @brief Sets a collision mask used to mask collisions (default is -1). A
+   * collision between A and B will happen if A.collisionGroup & b.collisionMask
+   * !== 0
+   */
+  void set_collisionMask(int mask);
+
+  /**
+   * @brief Gets the current collision group mask (-1 by default). A collision
+   * between A and B will happen if A.collisionGroup & b.collisionMask !== 0
+   */
+  int get_collisionGroup() const;
+
+  /**
+   * @brief Sets the current collision group mask (-1 by default). A collision
+   * between A and B will happen if A.collisionGroup & b.collisionMask !== 0
+   */
+  void set_collisionGroup(int mask);
+
+  /**
+   * @brief Sets a skeleton to apply skining transformations.
+   * @see http://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
+   */
+  void set_skeleton(Skeleton* const& value);
+
+  /**
+   * @brief Gets a skeleton to apply skining transformations.
+   * @see http://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
+   */
+  virtual Skeleton*& get_skeleton();
+
 private:
   /**
    * @brief Hidden
@@ -1121,14 +1102,62 @@ private:
 
 public:
   /**
+   * The number of facets in the mesh
+   */
+  ReadOnlyProperty<AbstractMesh, size_t> facetNb;
+
+  /**
+   * The number (integer) of subdivisions per axis in the partioning space
+   */
+  Property<AbstractMesh, unsigned int> partitioningSubdivisions;
+
+  /**
+   * The ratio (float) to apply to the bouding box size to set to the partioning
+   * space.
+   */
+  Property<AbstractMesh, float> partitioningBBoxRatio;
+
+  /**
+   * A boolean indicating that the facets must be depth sorted on next call to
+   * `updateFacetData()`. Works only for updatable meshes. Doesn't work with
+   * multi-materials
+   */
+  Property<AbstractMesh, bool> mustDepthSortFacets;
+
+  /**
+   * The location (Vector3) where the facet depth sort must be computed from. By
+   * default, the active camera position. Used only when facet depth sort is
+   * enabled
+   */
+  Property<AbstractMesh, Vector3> facetDepthSortFrom;
+
+  /**
+   * A boolean indicating if facetData is enabled
+   */
+  ReadOnlyProperty<AbstractMesh, bool> isFacetDataEnabled;
+
+  /**
    * An event triggered when this mesh collides with another one
    */
   Observable<AbstractMesh> onCollideObservable;
 
   /**
+   * The function to call when this mesh collides with another one
+   */
+  WriteOnlyProperty<AbstractMesh,
+                    ::std::function<void(AbstractMesh*, EventState&)>>
+    onCollide;
+
+  /**
    * An event triggered when the collision's position changes
    */
   Observable<Vector3> onCollisionPositionChangeObservable;
+
+  /**
+   * @brief An event triggered when the collision's position changes
+   */
+  WriteOnlyProperty<AbstractMesh, ::std::function<void(Vector3*, EventState&)>>
+    onCollisionPositionChange;
 
   /**
    * An event triggered when material is changed
@@ -1182,6 +1211,22 @@ public:
   int occlusionRetryCount;
 
   /**
+   * Whether the mesh is occluded or not, it is used also to set the intial
+   * state of the mesh to be occluded or not
+   */
+  Property<AbstractMesh, bool> isOccluded;
+
+  /**
+   * Flag to check the progress status of the query
+   */
+  ReadOnlyProperty<AbstractMesh, bool> isOcclusionQueryInProgress;
+
+  /**
+   * The mesh visibility between 0 and 1 (default is 1)
+   */
+  Property<AbstractMesh, float> visibility;
+
+  /**
    * Gets or sets the alpha index used to sort transparent meshes
    * @see
    * http://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered#alpha-index
@@ -1233,6 +1278,16 @@ public:
   unsigned int renderingGroupId;
 
   /**
+   * The current material
+   */
+  Property<AbstractMesh, Material*> material;
+
+  /**
+   * A boolean indicating that this mesh can receive realtime shadows.
+   */
+  Property<AbstractMesh, bool> receiveShadows;
+
+  /**
    * Gets or sets a boolean indicating if the outline must be rendered as well
    * @see https://www.babylonjs-playground.com/#10WJ5S#3
    */
@@ -1265,6 +1320,35 @@ public:
   float overlayAlpha;
 
   /**
+   * A boolean indicating that this mesh contains vertex color data with alpha
+   * values
+   */
+  Property<AbstractMesh, bool> hasVertexAlpha;
+
+  /**
+   * A boolean indicating that this mesh needs to use vertex color data to
+   * render (if this kind of vertex data is available in the geometry)
+   */
+  Property<AbstractMesh, bool> useVertexColors;
+
+  /**
+   * A boolean indicating that bone animations must be computed by the CPU
+   * (false by default)
+   */
+  Property<AbstractMesh, bool> computeBonesUsingShaders;
+
+  /**
+   * The number of allowed bone influences per vertex (4 by default)
+   */
+  Property<AbstractMesh, unsigned int> numBoneInfluencers;
+
+  /**
+   * A boolean indicating that this mesh will allow fog to be rendered on it
+   * (true by default)
+   */
+  Property<AbstractMesh, bool> applyFog;
+
+  /**
    * Gets or sets a boolean indicating that internal octree (if available) can
    * be used to boost submeshes selection (true by default)
    */
@@ -1281,6 +1365,11 @@ public:
    * be used to boost submeshes collision (true by default)
    */
   bool useOctreeForCollisions;
+
+  /**
+   * The current layer mask (default is 0x0FFFFFFF)
+   */
+  Property<AbstractMesh, unsigned int> layerMask;
 
   /**
    * True if the mesh must be rendered in any case (this will shortcut the
@@ -1317,6 +1406,18 @@ public:
    * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
    */
   Vector3 ellipsoidOffset;
+
+  /**
+   * A collision mask used to mask collisions (default is -1). A collision
+   * between A and B will happen if A.collisionGroup & b.collisionMask !== 0
+   */
+  Property<AbstractMesh, int> collisionMask;
+
+  /**
+   * the current collision group mask (-1 by default). A collision between A and
+   * B will happen if A.collisionGroup & b.collisionMask !== 0
+   */
+  Property<AbstractMesh, int> collisionGroup;
 
   // Edges
 
@@ -1379,6 +1480,11 @@ public:
 
   /** Hidden */
   Float32Array _bonesTransformMatrices;
+
+  /**
+   * A skeleton to apply skining transformations
+   */
+  Property<AbstractMesh, Skeleton*> skeleton;
 
 protected:
   bool _isOccluded;

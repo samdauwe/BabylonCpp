@@ -46,12 +46,12 @@ void PerlinNoiseWavesScene::initializeScene(ICanvas* canvas, Scene* scene)
   light->intensity = 0.7f;
 
   // Create ground meshes
-  _ground = Mesh::CreateGround("ground", 650, 400, 16, scene, true);
-  _ground->setMaterial(StandardMaterial::New("gmat", scene));
+  _ground           = Mesh::CreateGround("ground", 650, 400, 16, scene, true);
+  _ground->material = StandardMaterial::New("gmat", scene);
   _ground->material()->setDiffuseColor(Color3::FromInts(255, 140, 0));
   _ground->position().y += 50;
-  _ground2 = Mesh::CreateGround("ground", 650, 400, 16, scene, true);
-  _ground2->setMaterial(StandardMaterial::New("gmat2", scene));
+  _ground2           = Mesh::CreateGround("ground", 650, 400, 16, scene, true);
+  _ground2->material = StandardMaterial::New("gmat2", scene);
   _ground2->material()->setDiffuseColor(Color3::FromInts(255, 140, 0));
   _ground2->material()->setWireframe(true);
   _ground2->position().y = _ground->position().y;
@@ -64,11 +64,11 @@ void PerlinNoiseWavesScene::initializeScene(ICanvas* canvas, Scene* scene)
   _scene->registerBeforeRender([this](Scene*, EventState&) {
     _alpha += 0.016f;
     for (unsigned int i = 0; i < _positions.size(); i += 3) {
-      _positions[i + 1]
-        = 32.f * static_cast<float>(_perlineNoise.noise(
-                   static_cast<double>(_positions[i] / 0.8f),
-                   static_cast<double>(_alpha * 0.2f),
-                   static_cast<double>(_positions[i + 2] / 0.8f)));
+      _positions[i + 1] = 32.f
+                          * static_cast<float>(_perlineNoise.noise(
+                              static_cast<double>(_positions[i] / 0.8f),
+                              static_cast<double>(_alpha * 0.2f),
+                              static_cast<double>(_positions[i + 2] / 0.8f)));
     }
     _ground->updateVerticesData(VertexBuffer::PositionKind, _positions, false,
                                 true);

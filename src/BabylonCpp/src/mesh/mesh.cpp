@@ -101,7 +101,7 @@ Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
     id = name + "." + source->id;
 
     // Material
-    setMaterial(source->getMaterial());
+    material = source->getMaterial();
     if (!doNotCloneChildren) {
       // Children
       for (auto& mesh : scene->meshes) {
@@ -1511,7 +1511,7 @@ Mesh& Mesh::setMaterialByID(const string_t& iId)
   const auto& materials = getScene()->materials;
   for (std::size_t index = materials.size(); index-- > 0;) {
     if (materials[index]->id == iId) {
-      setMaterial(materials[index].get());
+      material = materials[index].get();
       return *this;
     }
   }
@@ -1520,7 +1520,7 @@ Mesh& Mesh::setMaterialByID(const string_t& iId)
   const auto& multiMaterials = getScene()->multiMaterials;
   for (std::size_t index = multiMaterials.size(); index-- > 0;) {
     if (multiMaterials[index]->id == iId) {
-      setMaterial(multiMaterials[index].get());
+      material = multiMaterials[index].get();
       return *this;
     }
   }
@@ -2095,7 +2095,7 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
     = Json::GetBool(parsedMesh, "showSubMeshesBoundingBox");
 
   if (parsedMesh.contains("applyFog")) {
-    mesh->setApplyFog(Json::GetBool(parsedMesh, "applyFog", true));
+    mesh->applyFog = Json::GetBool(parsedMesh, "applyFog", true);
   }
 
   if (parsedMesh.contains("isPickable")) {
@@ -2107,12 +2107,12 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
       = Json::GetNumber(parsedMesh, "alphaIndex", numeric_limits_t<int>::max());
   }
 
-  mesh->setReceiveShadows(Json::GetBool(parsedMesh, "receiveShadows", false));
-  mesh->billboardMode = Json::GetNumber(parsedMesh, "billboardMode",
+  mesh->receiveShadows = Json::GetBool(parsedMesh, "receiveShadows", false);
+  mesh->billboardMode  = Json::GetNumber(parsedMesh, "billboardMode",
                                         AbstractMesh::BILLBOARDMODE_NONE);
 
   if (parsedMesh.contains("visibility")) {
-    mesh->setVisibility(Json::GetNumber(parsedMesh, "visibility", 1.f));
+    mesh->visibility = Json::GetNumber(parsedMesh, "visibility", 1.f);
   }
 
   mesh->setCheckCollisions(Json::GetBool(parsedMesh, "checkCollisions"));
@@ -2156,7 +2156,7 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
 
   // Geometry
   mesh->setIsUnIndexed(Json::GetBool(parsedMesh, "isUnIndexed", false));
-  mesh->setHasVertexAlpha(Json::GetBool(parsedMesh, "hasVertexAlpha", false));
+  mesh->hasVertexAlpha = Json::GetBool(parsedMesh, "hasVertexAlpha", false);
 
   if (parsedMesh.contains("delayLoadingFile")) {
     mesh->delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
@@ -2224,7 +2224,7 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
     mesh->setMaterialByID(Json::GetString(parsedMesh, "materialId"));
   }
   else {
-    mesh->setMaterial(nullptr);
+    mesh->material = nullptr;
   }
 
   // Morph targets
@@ -2239,10 +2239,10 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
   if (parsedMesh.contains("skeletonId")) {
     string_t parsedSkeletonId = Json::GetString(parsedMesh, "skeletonId");
     if (!parsedSkeletonId.empty()) {
-      mesh->setSkeleton(scene->getLastSkeletonByID(parsedSkeletonId));
+      mesh->skeleton = scene->getLastSkeletonByID(parsedSkeletonId);
       if (parsedMesh.contains("numBoneInfluencers")) {
-        mesh->setNumBoneInfluencers(
-          Json::GetNumber(parsedMesh, "numBoneInfluencers", 0u));
+        mesh->numBoneInfluencers
+          = Json::GetNumber(parsedMesh, "numBoneInfluencers", 0u);
       }
     }
   }
@@ -2267,12 +2267,12 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
   if (parsedMesh.contains("layerMask")) {
     auto layerMask = Json::GetString(parsedMesh, "layerMask");
     if (!layerMask.empty()) {
-      mesh->setLayerMask(static_cast<unsigned>(::std::stoi(layerMask)));
+      mesh->layerMask = static_cast<unsigned>(::std::stoi(layerMask));
     }
   }
   else {
-    mesh->setLayerMask(static_cast<unsigned>(
-      Json::GetNumber(parsedMesh, "layerMask", 0x0FFFFFFF)));
+    mesh->layerMask = static_cast<unsigned>(
+      Json::GetNumber(parsedMesh, "layerMask", 0x0FFFFFFF));
   }
 
   // Instances
@@ -2918,7 +2918,7 @@ Mesh* Mesh::MergeMeshes(vector_t<Mesh*>& meshes, bool disposeSource,
   vertexData->applyToMesh(meshSubclass);
 
   // Setting properties
-  meshSubclass->setMaterial(source->getMaterial());
+  meshSubclass->material = source->getMaterial();
   meshSubclass->setCheckCollisions(source->checkCollisions());
 
   // Cleaning

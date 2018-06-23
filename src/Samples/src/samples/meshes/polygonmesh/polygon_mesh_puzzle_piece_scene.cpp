@@ -51,8 +51,8 @@ void PolygonMeshPuzzlePieceScene::initializeScene(ICanvas* canvas, Scene* scene)
                    .addLineTo(-10.f, 10.f)
                    .close();
 
-  auto ground = PolygonMeshBuilder("ground1", polygon, scene).build();
-  ground->setMaterial(scene->defaultMaterial());
+  auto ground      = PolygonMeshBuilder("ground1", polygon, scene).build();
+  ground->material = scene->defaultMaterial();
   ground->material()->setBackFaceCulling(false);
   camera->setTarget(ground->position());
 }

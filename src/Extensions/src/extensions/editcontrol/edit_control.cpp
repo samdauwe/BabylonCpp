@@ -124,7 +124,7 @@ EditControl::EditControl(Mesh* iMesh, Camera* camera, ICanvas* iCanvas,
   theParent = Mesh::New("EditControl", scene);
   mesh->getAbsolutePivotPointToRef(theParent->position());
   theParent->setRotationQuaternion(*mesh->rotationQuaternion());
-  theParent->setVisibility(0.f);
+  theParent->visibility = 0.f;
   theParent->isPickable = false;
   createMaterials(scene);
   createGuideAxes();
@@ -232,37 +232,37 @@ void EditControl::onPointerDown(PointerEvent& evt)
     axisPicked  = static_cast<Mesh*>((*pickResult).pickedMesh);
     auto childs = axisPicked->getChildren();
     if (!childs.empty()) {
-      static_cast<Mesh*>(childs[0])->setVisibility(visibility);
+      static_cast<Mesh*>(childs[0])->visibility = visibility;
     }
     else {
-      axisPicked->setVisibility(visibility);
+      axisPicked->visibility = visibility;
     }
     const auto& name = axisPicked->name;
     if (name == "X") {
-      bXaxis->setVisibility(1.f);
+      bXaxis->visibility = 1.f;
     }
     else if (name == "Y") {
-      bYaxis->setVisibility(1.f);
+      bYaxis->visibility = 1.f;
     }
     else if (name == "Z") {
-      bZaxis->setVisibility(1.f);
+      bZaxis->visibility = 1.f;
     }
     else if (name == "XZ") {
-      bXaxis->setVisibility(1.f);
-      bZaxis->setVisibility(1.f);
+      bXaxis->visibility = 1.f;
+      bZaxis->visibility = 1.f;
     }
     else if ((name == "ZY")) {
-      bZaxis->setVisibility(1.f);
-      bYaxis->setVisibility(1.f);
+      bZaxis->visibility = 1.f;
+      bYaxis->visibility = 1.f;
     }
     else if ((name == "YX")) {
-      bYaxis->setVisibility(1.f);
-      bXaxis->setVisibility(1.f);
+      bYaxis->visibility = 1.f;
+      bXaxis->visibility = 1.f;
     }
     else if ((name == "ALL")) {
-      bXaxis->setVisibility(1.f);
-      bYaxis->setVisibility(1.f);
-      bZaxis->setVisibility(1.f);
+      bXaxis->visibility = 1.f;
+      bYaxis->visibility = 1.f;
+      bZaxis->visibility = 1.f;
     }
     editing = true;
     // lets find out where we are on the pickplane
@@ -326,7 +326,7 @@ void EditControl::onPointerOver()
     if (static_cast<Mesh*>((*pickResult).pickedMesh) != prevOverMesh) {
       pointerIsOver = true;
       if (prevOverMesh != nullptr) {
-        prevOverMesh->setVisibility(0.f);
+        prevOverMesh->visibility = 0.f;
         restoreColor(prevOverMesh);
       }
       prevOverMesh = static_cast<Mesh*>((*pickResult).pickedMesh);
@@ -340,11 +340,11 @@ void EditControl::onPointerOver()
         auto childs = prevOverMesh->getChildren();
         if (!childs.empty()) {
           savedMat = static_cast<Mesh*>(childs[0])->material();
-          static_cast<Mesh*>(childs[0])->setMaterial(whiteMat);
+          static_cast<Mesh*>(childs[0])->material = whiteMat;
         }
         else {
-          savedMat = prevOverMesh->material();
-          prevOverMesh->setMaterial(whiteMat);
+          savedMat               = prevOverMesh->material();
+          prevOverMesh->material = whiteMat;
         }
       }
       if (prevOverMesh->name == "X") {
@@ -386,10 +386,10 @@ void EditControl::restoreColor(Mesh* mesh)
   else {
     auto childs = mesh->getChildren();
     if (!childs.empty()) {
-      static_cast<Mesh*>(childs[0])->setMaterial(savedMat);
+      static_cast<Mesh*>(childs[0])->material = savedMat;
     }
     else {
-      mesh->setMaterial(savedMat);
+      mesh->material = savedMat;
     }
   }
 }
@@ -813,9 +813,9 @@ std::tuple<Vector3, bool> EditControl::getPosOnPickPlane()
 
 void EditControl::hideBaxis()
 {
-  bXaxis->setVisibility(0.f);
-  bYaxis->setVisibility(0.f);
-  bZaxis->setVisibility(0.f);
+  bXaxis->visibility = 0.f;
+  bYaxis->visibility = 0.f;
+  bZaxis->visibility = 0.f;
 }
 
 bool EditControl::isTranslationEnabled() const
@@ -830,14 +830,14 @@ void EditControl::enableTranslation()
     tCtl->setParent(theParent);
   }
   if (!transEnabled) {
-    tEndX->setVisibility(visibility);
-    tEndY->setVisibility(visibility);
-    tEndZ->setVisibility(visibility);
-    tEndXZ->setVisibility(visibility);
-    tEndZY->setVisibility(visibility);
-    tEndYX->setVisibility(visibility);
-    tEndAll->setVisibility(visibility);
-    transEnabled = true;
+    tEndX->visibility   = visibility;
+    tEndY->visibility   = visibility;
+    tEndZ->visibility   = visibility;
+    tEndXZ->visibility  = visibility;
+    tEndZY->visibility  = visibility;
+    tEndYX->visibility  = visibility;
+    tEndAll->visibility = visibility;
+    transEnabled        = true;
     disableRotation();
     disableScaling();
   }
@@ -846,14 +846,14 @@ void EditControl::enableTranslation()
 void EditControl::disableTranslation()
 {
   if (transEnabled) {
-    tEndX->setVisibility(0.f);
-    tEndY->setVisibility(0.f);
-    tEndZ->setVisibility(0.f);
-    tEndXZ->setVisibility(0.f);
-    tEndZY->setVisibility(0.f);
-    tEndYX->setVisibility(0.f);
-    tEndAll->setVisibility(0.f);
-    transEnabled = false;
+    tEndX->visibility   = 0.f;
+    tEndY->visibility   = 0.f;
+    tEndZ->visibility   = 0.f;
+    tEndXZ->visibility  = 0.f;
+    tEndZY->visibility  = 0.f;
+    tEndYX->visibility  = 0.f;
+    tEndAll->visibility = 0.f;
+    transEnabled        = false;
   }
 }
 
@@ -874,11 +874,11 @@ void EditControl::enableRotation()
     rCtl->setParent(theParent);
   }
   if (!rotEnabled) {
-    rEndX->setVisibility(visibility);
-    rEndY->setVisibility(visibility);
-    rEndZ->setVisibility(visibility);
-    rEndAll->setVisibility(visibility);
-    rotEnabled = true;
+    rEndX->visibility   = visibility;
+    rEndY->visibility   = visibility;
+    rEndZ->visibility   = visibility;
+    rEndAll->visibility = visibility;
+    rotEnabled          = true;
     disableTranslation();
     disableScaling();
   }
@@ -887,11 +887,11 @@ void EditControl::enableRotation()
 void EditControl::disableRotation()
 {
   if (rotEnabled) {
-    rEndX->setVisibility(0.f);
-    rEndY->setVisibility(0.f);
-    rEndZ->setVisibility(0.f);
-    rEndAll->setVisibility(0.f);
-    rotEnabled = false;
+    rEndX->visibility   = 0.f;
+    rEndY->visibility   = 0.f;
+    rEndZ->visibility   = 0.f;
+    rEndAll->visibility = 0.f;
+    rotEnabled          = false;
   }
 }
 
@@ -907,14 +907,14 @@ void EditControl::enableScaling()
     sCtl->setParent(theParent);
   }
   if (!scaleEnabled) {
-    sEndX->setVisibility(visibility);
-    sEndY->setVisibility(visibility);
-    sEndZ->setVisibility(visibility);
-    sEndXZ->setVisibility(visibility);
-    sEndZY->setVisibility(visibility);
-    sEndYX->setVisibility(visibility);
-    sEndAll->setVisibility(visibility);
-    scaleEnabled = true;
+    sEndX->visibility   = visibility;
+    sEndY->visibility   = visibility;
+    sEndZ->visibility   = visibility;
+    sEndXZ->visibility  = visibility;
+    sEndZY->visibility  = visibility;
+    sEndYX->visibility  = visibility;
+    sEndAll->visibility = visibility;
+    scaleEnabled        = true;
     disableTranslation();
     disableRotation();
   }
@@ -923,14 +923,14 @@ void EditControl::enableScaling()
 void EditControl::disableScaling()
 {
   if (scaleEnabled) {
-    sEndX->setVisibility(0.f);
-    sEndY->setVisibility(0.f);
-    sEndZ->setVisibility(0.f);
-    sEndXZ->setVisibility(0.f);
-    sEndZY->setVisibility(0.f);
-    sEndYX->setVisibility(0.f);
-    sEndAll->setVisibility(0.f);
-    scaleEnabled = false;
+    sEndX->visibility   = 0.f;
+    sEndY->visibility   = 0.f;
+    sEndZ->visibility   = 0.f;
+    sEndXZ->visibility  = 0.f;
+    sEndZY->visibility  = 0.f;
+    sEndYX->visibility  = 0.f;
+    sEndAll->visibility = 0.f;
+    scaleEnabled        = false;
   }
 }
 
@@ -996,10 +996,10 @@ void EditControl::createPickPlanes()
   pZY->isPickable  = false;
   pYX->isPickable  = false;
 
-  pALL->setVisibility(0.f);
-  pXZ->setVisibility(0.f);
-  pZY->setVisibility(0.f);
-  pYX->setVisibility(0.f);
+  pALL->visibility = 0.f;
+  pXZ->visibility  = 0.f;
+  pZY->visibility  = 0.f;
+  pYX->visibility  = 0.f;
 
   pALL->renderingGroupId = 1;
   pXZ->renderingGroupId  = 1;
@@ -1062,13 +1062,13 @@ void EditControl::createTransAxes()
   tX->rotation().y = 1.57f;
   tY->rotation().x -= 1.57f;
 
-  tX->setVisibility(0.f);
-  tY->setVisibility(0.f);
-  tZ->setVisibility(0.f);
-  tXZ->setVisibility(0.f);
-  tZY->setVisibility(0.f);
-  tYX->setVisibility(0.f);
-  tAll->setVisibility(0.f);
+  tX->visibility   = 0.f;
+  tY->visibility   = 0.f;
+  tZ->visibility   = 0.f;
+  tXZ->visibility  = 0.f;
+  tZY->visibility  = 0.f;
+  tYX->visibility  = 0.f;
+  tAll->visibility = 0.f;
 
   tX->renderingGroupId   = 1;
   tY->renderingGroupId   = 1;
@@ -1122,13 +1122,13 @@ void EditControl::createTransAxes()
   tEndY->position().z = l - cl / 2;
   tEndZ->position().z = l - cl / 2;
 
-  tEndX->setMaterial(redMat);
-  tEndY->setMaterial(greenMat);
-  tEndZ->setMaterial(blueMat);
-  tEndXZ->setMaterial(redMat);
-  tEndZY->setMaterial(blueMat);
-  tEndYX->setMaterial(greenMat);
-  tEndAll->setMaterial(yellowMat);
+  tEndX->material   = redMat;
+  tEndY->material   = greenMat;
+  tEndZ->material   = blueMat;
+  tEndXZ->material  = redMat;
+  tEndZY->material  = blueMat;
+  tEndYX->material  = greenMat;
+  tEndAll->material = yellowMat;
 
   tEndX->renderingGroupId   = 1;
   tEndY->renderingGroupId   = 1;
@@ -1179,10 +1179,10 @@ void EditControl::createRotAxes()
   rX->rotation().z   = 1.57f;
   rZ->rotation().x   = -1.57f;
   rAll->rotation().x = 1.57f;
-  rX->setVisibility(0.f);
-  rY->setVisibility(0.f);
-  rZ->setVisibility(0.f);
-  rAll->setVisibility(0.f);
+  rX->visibility     = 0.f;
+  rY->visibility     = 0.f;
+  rZ->visibility     = 0.f;
+  rAll->visibility   = 0.f;
 
   rX->renderingGroupId   = 1;
   rY->renderingGroupId   = 1;
@@ -1311,10 +1311,10 @@ void EditControl::createScaleAxes()
 
   sAll = Mesh::CreateBox("ALL", r * 2, scene);
 
-  sX->setMaterial(redMat);
-  sY->setMaterial(greenMat);
-  sZ->setMaterial(blueMat);
-  sAll->setMaterial(yellowMat);
+  sX->material   = redMat;
+  sY->material   = greenMat;
+  sZ->material   = blueMat;
+  sAll->material = yellowMat;
 
   sX->setParent(sCtl);
   sY->setParent(sCtl);
@@ -1326,13 +1326,13 @@ void EditControl::createScaleAxes()
 
   sX->rotation().y = 1.57f;
   sY->rotation().x -= 1.57f;
-  sX->setVisibility(0.f);
-  sY->setVisibility(0.f);
-  sZ->setVisibility(0.f);
-  sXZ->setVisibility(0.f);
-  sZY->setVisibility(0.f);
-  sYX->setVisibility(0.f);
-  sAll->setVisibility(0.f);
+  sX->visibility   = 0.f;
+  sY->visibility   = 0.f;
+  sZ->visibility   = 0.f;
+  sXZ->visibility  = 0.f;
+  sZY->visibility  = 0.f;
+  sYX->visibility  = 0.f;
+  sAll->visibility = 0.f;
 
   sX->renderingGroupId   = 1;
   sY->renderingGroupId   = 1;
@@ -1379,13 +1379,13 @@ void EditControl::createScaleAxes()
   sEndX->position().z = l - cr / 2.f;
   sEndY->position().z = l - cr / 2.f;
   sEndZ->position().z = l - cr / 2.f;
-  sEndX->setMaterial(redMat);
-  sEndY->setMaterial(greenMat);
-  sEndZ->setMaterial(blueMat);
-  sEndXZ->setMaterial(redMat);
-  sEndZY->setMaterial(blueMat);
-  sEndYX->setMaterial(greenMat);
-  sEndAll->setMaterial(yellowMat);
+  sEndX->material     = redMat;
+  sEndY->material     = greenMat;
+  sEndZ->material     = blueMat;
+  sEndXZ->material    = redMat;
+  sEndZY->material    = blueMat;
+  sEndYX->material    = greenMat;
+  sEndAll->material   = yellowMat;
 
   sEndX->renderingGroupId   = 1;
   sEndY->renderingGroupId   = 1;

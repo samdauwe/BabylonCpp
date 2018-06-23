@@ -49,11 +49,11 @@ void HeightMapScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto ground
     = Mesh::CreateGroundFromHeightMap("ground", "textures/worldHeightMap.jpg",
                                       200, 100, 250, 0, 10, scene, false);
-  ground->setMaterial(groundMaterial);
+  ground->material = groundMaterial;
 
   // Sphere to see the light's position
-  _sun = Mesh::CreateSphere("sun", 10, 4, scene);
-  _sun->setMaterial(StandardMaterial::New("sun", scene));
+  _sun           = Mesh::CreateSphere("sun", 10, 4, scene);
+  _sun->material = StandardMaterial::New("sun", scene);
   _sun->material()->setEmissiveColor(Color3(1.f, 1.f, 0.f));
 
   // Skybox
@@ -67,7 +67,7 @@ void HeightMapScene::initializeScene(ICanvas* canvas, Scene* scene)
   skyboxMaterial->diffuseColor  = Color3(0.f, 0.f, 0.f);
   skyboxMaterial->specularColor = Color3(0.f, 0.f, 0.f);
   skyboxMaterial->setDisableLighting(true);
-  skybox->setMaterial(skyboxMaterial);
+  skybox->material = skyboxMaterial;
 
   // Sun animation
   scene->registerBeforeRender([&](Scene* /*scene*/, EventState& /*es*/) {

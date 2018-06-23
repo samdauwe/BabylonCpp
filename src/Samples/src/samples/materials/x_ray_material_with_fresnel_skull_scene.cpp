@@ -70,7 +70,7 @@ void XRayMaterialWithFresnelSkullScene::initializeScene(ICanvas* canvas,
       if (!newMeshes.empty()) {
         auto mesh = newMeshes[0];
 
-        mesh->setMaterial(_xrayMat);
+        mesh->material = _xrayMat;
         mesh->setPosition(Vector3(0.f, 4.f, 0.f));
         mesh->setScaling(Vector3(0.1f, 0.1f, 0.1f));
 
@@ -92,7 +92,7 @@ void XRayMaterialWithFresnelSkullScene::initializeScene(ICanvas* canvas,
         auto ground         = Mesh::CreateBox("ground", 1, _scene.get());
         ground->scaling().x = 10.f;
         ground->scaling().z = 10.f;
-        ground->setMaterial(_xrayMat);
+        ground->material    = _xrayMat;
       }
     });
 }

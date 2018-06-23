@@ -63,7 +63,7 @@ void MeshNormalsScene::initializeScene(ICanvas* canvas, Scene* scene)
   options.segments      = 3;
   auto sphere1          = MeshBuilder::CreateSphere("sphere1", options, scene);
   sphere1->position().y = 1;
-  sphere1->setMaterial(StandardMaterial::New("mat1", scene));
+  sphere1->material     = StandardMaterial::New("mat1", scene);
   sphere1->material()->setWireframe(true);
   showNormals(sphere1, 0.25f, Color3(1.f, 0.f, 0.f), scene);
 
@@ -72,7 +72,7 @@ void MeshNormalsScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto sphere2     = MeshBuilder::CreateSphere("sphere2", options, scene);
   sphere2->convertToFlatShadedMesh();
   sphere2->position().y = -1;
-  sphere2->setMaterial(StandardMaterial::New("mat2", scene));
+  sphere2->material     = StandardMaterial::New("mat2", scene);
   sphere2->material()->setWireframe(true);
   showNormals(sphere2, 0.25, Color3(1.f, 0.f, 0.f), scene);
 }

@@ -91,8 +91,8 @@ Mesh* HexIcosphereScene::_createHexIcosphere(std::size_t degree, float scale,
     }
   }
 
-  auto mesh = Mesh::New("planet", scene);
-  mesh->setUseVertexColors(true);
+  auto mesh             = Mesh::New("planet", scene);
+  mesh->useVertexColors = true;
 
   auto vertexData       = std::make_unique<VertexData>();
   vertexData->indices   = std::move(indices);
@@ -104,7 +104,7 @@ Mesh* HexIcosphereScene::_createHexIcosphere(std::size_t degree, float scale,
   vertexData->normals = std::move(normals);
   vertexData->applyToMesh(mesh, false);
 
-  mesh->setMaterial(material);
+  mesh->material = material;
 
   return mesh;
 }

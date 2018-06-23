@@ -86,7 +86,7 @@ void ShaderMaterialBoxesScene::initializeScene(ICanvas* canvas, Scene* scene)
     if (i == 1) {
       shaderMaterial->setBackFaceCulling(false);
     }
-    box->setMaterial(shaderMaterial);
+    box->material       = shaderMaterial;
     _shaderMaterials[i] = shaderMaterial;
   }
 

@@ -105,7 +105,7 @@ void ExtrudedPolygonScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   auto wallmat          = StandardMaterial::New("wallmaterial", scene);
   wallmat->diffuseColor = Color3::FromInts(203, 65, 84);
-  wall->setMaterial(wallmat);
+  wall->material        = wallmat;
 
   /** Stairs **/
   auto stairsDepth     = 2.f;
@@ -184,7 +184,7 @@ void ExtrudedPolygonScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   auto floormat          = StandardMaterial::New("floormaterial", scene);
   floormat->diffuseColor = Color3::FromInts(168, 119, 90);
-  floor->setMaterial(floormat);
+  floor->material        = floormat;
 }
 
 } // end of namespace Samples

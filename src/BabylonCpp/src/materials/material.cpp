@@ -620,7 +620,7 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)
   Mesh* _mesh = nullptr;
   for (auto& mesh : _scene->meshes) {
     if (mesh->material() == this) {
-      mesh->setMaterial(nullptr);
+      mesh->material = nullptr;
 
       _mesh = static_cast<Mesh*>(mesh.get());
       if (_mesh && _mesh->geometry()) {

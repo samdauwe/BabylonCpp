@@ -56,11 +56,11 @@ void CrowdSimulationScene01::initializeScene(ICanvas* canvas, Scene* scene)
   groundMaterial->setDiffuseColor(Color3(0.36f, 0.36f, 0.36f));
 
   // Create the ground
-  auto ground          = Mesh::CreateBox("ground", 600.f, scene);
-  ground->position().y = -6.f;
-  ground->scaling().y  = 0.001f;
-  ground->setMaterial(groundMaterial);
-  ground->setReceiveShadows(true);
+  auto ground            = Mesh::CreateBox("ground", 600.f, scene);
+  ground->position().y   = -6.f;
+  ground->scaling().y    = 0.001f;
+  ground->material       = groundMaterial;
+  ground->receiveShadows = true;
 
   // Setup Scenario
   setupScenario(scene);

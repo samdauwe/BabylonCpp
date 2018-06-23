@@ -59,8 +59,8 @@ void PolyhedraScene::initializeScene(ICanvas* canvas, Scene* scene)
     options.custom = polyhedron;
     auto polygon   = Mesh::CreatePolyhedron(polyhedron.name, options, scene);
     // polygon->convertToFlatShadedMesh();
-    polygon->setMaterial(mat);
-    col = counter % 18;
+    polygon->material = mat;
+    col               = counter % 18;
     if (col == 0) {
       ++row;
     }

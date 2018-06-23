@@ -60,7 +60,7 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Lights
   SphereOptions spereOptions(0.2f);
   auto sphereLight = MeshBuilder::CreateSphere("sphere", spereOptions, scene);
-  sphereLight->setMaterial(StandardMaterial::New("", scene));
+  sphereLight->material = StandardMaterial::New("", scene);
   sphereLight->material()->setEmissiveColor(Color3(1, 1, 1));
   sphereLight->position().x = 2.f;
   sphereLight->position().y = 3.f;

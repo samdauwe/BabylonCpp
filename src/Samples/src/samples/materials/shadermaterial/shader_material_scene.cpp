@@ -63,12 +63,12 @@ void ShaderMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   polyhedronOptions.type = 0;
   _polyhedron
     = Mesh::CreatePolyhedron("CreatePolyhedron", polyhedronOptions, scene);
-  _polyhedron->setMaterial(_shaderMaterial);
+  _polyhedron->material = _shaderMaterial;
 
   // Create box
   auto box = Mesh::CreateBox("Box", 500, scene);
   box->flipFaces(true);
-  box->setMaterial(_shaderMaterial);
+  box->material = _shaderMaterial;
 
   // Animation
   scene->onAfterCameraRenderObservable.add([this](Camera*, EventState&) {

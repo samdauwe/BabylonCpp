@@ -121,8 +121,8 @@ string_t EffectFallbacks::reduce(string_t currentDefines, Effect* effect)
   // First we try to switch to CPU skinning
   if (_mesh && _mesh->computeBonesUsingShaders()
       && _mesh->numBoneInfluencers() > 0 && _mesh->material()) {
-    _mesh->setComputeBonesUsingShaders(false);
-    const string_t toReplace = string_t("#define NUM_BONE_INFLUENCERS ")
+    _mesh->computeBonesUsingShaders = false;
+    const string_t toReplace        = string_t("#define NUM_BONE_INFLUENCERS ")
                                + ::std::to_string(_mesh->numBoneInfluencers());
     String::replaceInPlace(currentDefines, toReplace,
                            "#define NUM_BONE_INFLUENCERS 0");
@@ -140,14 +140,14 @@ string_t EffectFallbacks::reduce(string_t currentDefines, Effect* effect)
       }
 
       if (otherMesh->material()->getEffect() == effect) {
-        otherMesh->setComputeBonesUsingShaders(false);
+        otherMesh->computeBonesUsingShaders = false;
       }
       else if (!otherMesh->subMeshes.empty()) {
         for (auto& subMesh : otherMesh->subMeshes) {
           auto subMeshEffect = subMesh->effect();
 
           if (subMeshEffect == effect) {
-            otherMesh->setComputeBonesUsingShaders(false);
+            otherMesh->computeBonesUsingShaders = false;
             break;
           }
         }

@@ -30,7 +30,7 @@ CrowdSimulationUtils::createAgentMeshes(Scene* scene, size_t totalNoAgents)
     mesh->position().z
       = totalNoAgents * std::sin(agentNof * Math::PI2 / totalNoAgentsf);
     mesh->position().y = 0.f;
-    mesh->setMaterial(material);
+    mesh->material     = material;
 
     agentsMesh[i] = mesh;
   }

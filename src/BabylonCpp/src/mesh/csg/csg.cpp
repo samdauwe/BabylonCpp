@@ -380,7 +380,7 @@ Mesh* CSG::CSG::toMesh(const string_t& name, Material* material, Scene* scene,
 {
   auto mesh = buildMeshGeometry(name, scene, keepSubMeshes);
 
-  mesh->setMaterial(material);
+  mesh->material = material;
 
   mesh->position().copyFrom(position);
   mesh->rotation().copyFrom(*rotation);

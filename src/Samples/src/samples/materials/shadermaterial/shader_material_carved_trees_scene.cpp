@@ -67,7 +67,7 @@ void ShaderMaterialCarvedTreesScene::initializeScene(ICanvas* canvas,
     = ShaderMaterial::New("boxShader", scene, "custom", shaderMaterialOptions);
 
   // box + sky = skybox !
-  skybox->setMaterial(_shaderMaterial);
+  skybox->material = _shaderMaterial;
 
   // Animation
   scene->onAfterCameraRenderObservable.add([this](Camera*, EventState&) {

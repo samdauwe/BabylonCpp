@@ -60,7 +60,7 @@ void ShaderMaterialSkyboxScene::initializeScene(ICanvas* canvas, Scene* scene)
   _shaderMaterial->setBackFaceCulling(false);
 
   // box + sky = skybox !
-  skybox->setMaterial(_shaderMaterial);
+  skybox->material = _shaderMaterial;
 }
 
 } // end of namespace Samples

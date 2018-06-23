@@ -83,8 +83,8 @@ void LatheScene::initializeScene(ICanvas* canvas, Scene* scene)
   material2->setWireframe(true);
 
   // Set object materials
-  tube->setMaterial(material1);
-  lathe->setMaterial(material2);
+  tube->material  = material1;
+  lathe->material = material2;
 }
 
 } // end of namespace Samples

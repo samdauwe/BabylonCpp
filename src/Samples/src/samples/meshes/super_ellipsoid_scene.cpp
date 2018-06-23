@@ -56,22 +56,22 @@ void SuperEllipsoidScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto mat5          = StandardMaterial::New("mat5", scene);
   mat5->diffuseColor = Color3::Yellow();
   mat5->setBackFaceCulling(false);
-  auto superello1 = _createSuperEllipsoid(48, 0.2f, 0.2f, 1, 1, 1, scene);
-  superello1->setMaterial(mat2);
-  auto superello2 = _createSuperEllipsoid(48, 0.2f, 0.2f, 1, 1, 1, scene);
+  auto superello1      = _createSuperEllipsoid(48, 0.2f, 0.2f, 1, 1, 1, scene);
+  superello1->material = mat2;
+  auto superello2      = _createSuperEllipsoid(48, 0.2f, 0.2f, 1, 1, 1, scene);
   superello2->position().x += 2.5f;
-  superello2->setMaterial(mat);
+  superello2->material = mat;
   superello2->material()->setWireframe(true);
   auto superello3 = _createSuperEllipsoid(48, 1.8f, 0.2f, 1, 1, 1, scene);
   superello3->position().x -= 2.5f;
-  superello3->setMaterial(mat3);
-  auto superello4 = _createSuperEllipsoid(48, 1.8f, 0.2f, 1, 1, 1, scene);
+  superello3->material = mat3;
+  auto superello4      = _createSuperEllipsoid(48, 1.8f, 0.2f, 1, 1, 1, scene);
   superello4->position().z += 2.5f;
-  superello4->setMaterial(mat4);
+  superello4->material = mat4;
   superello4->material()->setWireframe(true);
   auto superello5 = _createSuperEllipsoid(48, 0.2f, 2.9f, 1, 1, 1, scene);
   superello5->position().z -= 2.5f;
-  superello5->setMaterial(mat5);
+  superello5->material = mat5;
 }
 
 Vector3 SuperEllipsoidScene::_sampleSuperEllipsoid(float phi, float beta,

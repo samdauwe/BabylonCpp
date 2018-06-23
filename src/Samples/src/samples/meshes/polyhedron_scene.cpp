@@ -59,11 +59,11 @@ void PolyhedronScene::initializeScene(ICanvas* canvas, Scene* scene)
   int col = 0, row = 0;
   for (unsigned int type = 0; type < 15; ++type) {
     PolyhedronOptions options(2.f);
-    options.type  = type;
-    Mesh* polygon = MeshBuilder::CreatePolyhedron(
+    options.type = type;
+    auto polygon = MeshBuilder::CreatePolyhedron(
       String::concat("Polyhedron", type), options, scene);
-    polygon->setMaterial(mat);
-    col = type % 5;
+    polygon->material = mat;
+    col               = type % 5;
     if (col == 0) {
       ++row;
     }

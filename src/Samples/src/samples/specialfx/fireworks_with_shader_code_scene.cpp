@@ -66,7 +66,7 @@ void FireworksWithShaderCodeScene::initializeScene(ICanvas* canvas,
   SphereOptions sphereOptions(10.f);
   auto sphere = MeshBuilder::CreateSphere("sphere", sphereOptions, scene);
   sphere->convertToFlatShadedMesh();
-  sphere->setMaterial(_shaderMaterial);
+  sphere->material = _shaderMaterial;
 
   // Animation
   scene->registerBeforeRender([this](Scene*, EventState&) {

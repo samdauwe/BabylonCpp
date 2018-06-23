@@ -91,7 +91,7 @@ void MandelbrotFractalScene::initializeScene(ICanvas* canvas, Scene* scene)
   }
 
   auto ribbon = Mesh::CreateRibbon("mandel", paths, false, false, -1, scene);
-  ribbon->setMaterial(mat);
+  ribbon->material = mat;
   ribbon->position().x -= xrf / 2.f;
   ribbon->position().z -= yrf / 2.f;
 
