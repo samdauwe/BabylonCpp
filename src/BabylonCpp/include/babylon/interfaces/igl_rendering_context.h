@@ -692,9 +692,9 @@ public:
   int TRANSFORM_FEEDBACK_BUFFER;
 
 public:
-  virtual bool initialize(bool enableGLDebugging) = 0;
-  virtual void backupGLState()                    = 0;
-  virtual void restoreGLState()                   = 0;
+  virtual bool initialize(bool enableGLDebugging = false) = 0;
+  virtual void backupGLState()                            = 0;
+  virtual void restoreGLState()                           = 0;
   // virtual ICanvas* getCanvas() = 0;
   // virtual GLsizei getDrawingBufferWidth() = 0;
   // virtual GLsizei getDrawingBufferHeight() = 0;

@@ -12,7 +12,7 @@ public:
   GLRenderingContext();
   virtual ~GLRenderingContext();
 
-  bool initialize() override;
+  bool initialize(bool enableGLDebugging = false) override;
   void backupGLState() override;
   void restoreGLState() override;
   GLenum operator[](const std::string& name) override;
