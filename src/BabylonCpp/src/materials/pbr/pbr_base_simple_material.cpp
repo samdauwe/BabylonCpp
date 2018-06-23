@@ -46,7 +46,7 @@ void PBRBaseSimpleMaterial::setDoubleSided(bool value)
     return;
   }
   _twoSidedLighting = value;
-  setBackFaceCulling(!value);
+  backFaceCulling   = !value;
   _markAllSubMeshesAsTexturesDirty();
 }
 

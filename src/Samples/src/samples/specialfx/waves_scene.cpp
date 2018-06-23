@@ -53,7 +53,7 @@ void WavesScene::initializeScene(ICanvas* canvas, Scene* scene)
   _ground2           = Mesh::CreateGround("ground", 10, 10, 10, scene, true);
   _ground2->material = StandardMaterial::New("gmat2", scene);
   _ground2->material()->setDiffuseColor(Color3(1.f, 1.f, 1.f));
-  _ground2->material()->setWireframe(true);
+  _ground2->material()->wireframe = true;
 
   _positions = _ground->getVerticesData(VertexBuffer::PositionKind);
   _indices   = _ground->getIndices();

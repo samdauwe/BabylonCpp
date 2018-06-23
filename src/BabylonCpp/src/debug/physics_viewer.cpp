@@ -125,8 +125,8 @@ void PhysicsViewer::hideImpostor(PhysicsImpostor* impostor)
 Material* PhysicsViewer::_getDebugMaterial(Scene* scene)
 {
   if (!_debugMaterial) {
-    _debugMaterial = StandardMaterial::New("", scene);
-    _debugMaterial->setWireframe(true);
+    _debugMaterial            = StandardMaterial::New("", scene);
+    _debugMaterial->wireframe = true;
   }
 
   return _debugMaterial;

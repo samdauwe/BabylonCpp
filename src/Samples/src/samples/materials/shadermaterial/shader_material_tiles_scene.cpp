@@ -92,7 +92,7 @@ void ShaderMaterialTilesScene::initializeScene(ICanvas* canvas, Scene* scene)
     auto shaderMaterial = ShaderMaterial::New(
       "shader" + id, scene, "custom" + id, shaderMaterialOptions);
     if (i == 1) {
-      shaderMaterial->setBackFaceCulling(false);
+      shaderMaterial->backFaceCulling = false;
     }
     box->material       = shaderMaterial;
     _shaderMaterials[i] = shaderMaterial;

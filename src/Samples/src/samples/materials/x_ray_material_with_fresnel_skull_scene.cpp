@@ -40,7 +40,7 @@ void XRayMaterialWithFresnelSkullScene::initializeScene(ICanvas* canvas,
   // xray material
   _xrayMat                = StandardMaterial::New("xray", scene);
   _xrayMat->emissiveColor = Color3(1, 1, 1);
-  _xrayMat->setAlpha(0.1f);
+  _xrayMat->alpha         = 0.1f;
 
   // Set emissive fresnel parameters
   auto& emissiveFresnelParameters      = *_xrayMat->emissiveFresnelParameters();

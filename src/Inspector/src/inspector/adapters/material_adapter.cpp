@@ -49,19 +49,18 @@ void MaterialAdapter::_buildPropertiesView()
   auto& view = *_properties;
   /** Material properties **/
   // - alpha
-  view.addFloatProperty(
-    "alpha", [&]() -> float { return _material->alpha(); },
-    [&](const float& value) { _material->setAlpha(value); });
+  view.addFloatProperty("alpha", [&]() -> float { return _material->alpha(); },
+                        [&](const float& value) { _material->alpha = value; });
   // - alphaMode
   view.addSizeTProperty("alphaMode",
                         [&]() -> size_t { return _material->alphaMode(); },
                         [&](const size_t& value) {
-                          _material->setAlphaMode(static_cast<unsigned>(value));
+                          _material->alphaMode = static_cast<unsigned>(value);
                         });
   // - backFaceCulling
   view.addBoolProperty(
     "backFaceCulling", [&]() -> bool { return _material->backFaceCulling(); },
-    [&](const bool& value) { _material->setBackFaceCulling(value); });
+    [&](const bool& value) { _material->backFaceCulling = value; });
   // - id
   view.addStringProperty("id", [&]() -> string_t& { return _material->id; },
                          [&](const string_t& value) { _material->id = value; });
@@ -91,12 +90,12 @@ void MaterialAdapter::_buildPropertiesView()
   view.addSizeTProperty("fillMode",
                         [&]() -> size_t { return _material->fillMode(); },
                         [&](const size_t& value) {
-                          _material->setFillMode(static_cast<unsigned>(value));
+                          _material->fillMode = static_cast<unsigned>(value);
                         });
   // - fogEnabled
   view.addBoolProperty(
     "fogEnabled", [&]() -> bool { return _material->fogEnabled(); },
-    [&](const bool& value) { _material->setFogEnabled(value); });
+    [&](const bool& value) { _material->fogEnabled = value; });
   // - forceDepthWrite
   view.addBoolProperty(
     "forceDepthWrite", [&]() -> bool { return _material->forceDepthWrite; },
@@ -108,11 +107,11 @@ void MaterialAdapter::_buildPropertiesView()
   // - needDepthPrePass
   view.addBoolProperty(
     "needDepthPrePass", [&]() -> bool { return _material->needDepthPrePass(); },
-    [&](const bool& value) { _material->setNeedDepthPrePass(value); });
+    [&](const bool& value) { _material->needDepthPrePass = value; });
   // - pointsCloud
   view.addBoolProperty(
     "pointsCloud", [&]() -> bool { return _material->pointsCloud(); },
-    [&](const bool& value) { _material->setPointsCloud(value); });
+    [&](const bool& value) { _material->pointsCloud = value; });
   // - pointSize
   view.addFloatProperty(
     "pointSize", [&]() -> float { return _material->pointSize; },
@@ -134,7 +133,7 @@ void MaterialAdapter::_buildPropertiesView()
   // - wireframe
   view.addBoolProperty(
     "wireframe", [&]() -> bool { return _material->wireframe(); },
-    [&](const bool& value) { _material->setWireframe(value); });
+    [&](const bool& value) { _material->wireframe = value; });
   // - zOffset
   view.addFloatProperty(
     "zOffset", [&]() -> float { return _material->zOffset; },

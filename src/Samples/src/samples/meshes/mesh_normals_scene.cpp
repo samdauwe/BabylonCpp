@@ -64,16 +64,16 @@ void MeshNormalsScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto sphere1          = MeshBuilder::CreateSphere("sphere1", options, scene);
   sphere1->position().y = 1;
   sphere1->material     = StandardMaterial::New("mat1", scene);
-  sphere1->material()->setWireframe(true);
+  sphere1->material()->wireframe = true;
   showNormals(sphere1, 0.25f, Color3(1.f, 0.f, 0.f), scene);
 
   // Sphere 2
   options.segments = 6;
   auto sphere2     = MeshBuilder::CreateSphere("sphere2", options, scene);
   sphere2->convertToFlatShadedMesh();
-  sphere2->position().y = -1;
-  sphere2->material     = StandardMaterial::New("mat2", scene);
-  sphere2->material()->setWireframe(true);
+  sphere2->position().y          = -1;
+  sphere2->material              = StandardMaterial::New("mat2", scene);
+  sphere2->material()->wireframe = true;
   showNormals(sphere2, 0.25, Color3(1.f, 0.f, 0.f), scene);
 }
 

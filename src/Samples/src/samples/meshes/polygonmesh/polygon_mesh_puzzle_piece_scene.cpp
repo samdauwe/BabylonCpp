@@ -53,7 +53,7 @@ void PolygonMeshPuzzlePieceScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   auto ground      = PolygonMeshBuilder("ground1", polygon, scene).build();
   ground->material = scene->defaultMaterial();
-  ground->material()->setBackFaceCulling(false);
+  ground->material()->backFaceCulling = false;
   camera->setTarget(ground->position());
 }
 

@@ -4857,7 +4857,7 @@ Mesh* Scene::createDefaultSkybox(BaseTexture* iEnvironmentTexture, bool pbr,
   if (pbr) {
     auto hdrSkyboxMaterial
       = static_cast<PBRMaterial*>(PBRMaterial::New("skyBox", this));
-    hdrSkyboxMaterial->setBackFaceCulling(false);
+    hdrSkyboxMaterial->backFaceCulling   = false;
     hdrSkyboxMaterial->reflectionTexture = environmentTexture();
     if (hdrSkyboxMaterial->reflectionTexture) {
       hdrSkyboxMaterial->reflectionTexture->setCoordinatesMode(
@@ -4870,8 +4870,8 @@ Mesh* Scene::createDefaultSkybox(BaseTexture* iEnvironmentTexture, bool pbr,
     hdrSkybox->material                 = hdrSkyboxMaterial;
   }
   else {
-    auto skyboxMaterial = StandardMaterial::New("skyBox", this);
-    skyboxMaterial->setBackFaceCulling(false);
+    auto skyboxMaterial             = StandardMaterial::New("skyBox", this);
+    skyboxMaterial->backFaceCulling = false;
     skyboxMaterial->setReflectionTexture(environmentTexture());
     if (skyboxMaterial->reflectionTexture()) {
       skyboxMaterial->reflectionTexture()->setCoordinatesMode(

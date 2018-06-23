@@ -43,9 +43,9 @@ void FresnelParametersTorusKnotScene::initializeScene(ICanvas* canvas,
   material->diffuseColor  = Color3(0, 0, 0);
   material->emissiveColor = Color3(1, 1, 1);
   material->specularPower = 128;
-  material->setAlpha(0.2f);
-  material->setAlphaMode(EngineConstants::ALPHA_PREMULTIPLIED);
-  torusKnot->material = material;
+  material->alpha         = 0.2f;
+  material->alphaMode     = EngineConstants::ALPHA_PREMULTIPLIED;
+  torusKnot->material     = material;
 
   // Set opacity fresnel parameters
   auto& opacityFresnelParameters      = *material->opacityFresnelParameters();

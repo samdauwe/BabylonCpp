@@ -80,7 +80,7 @@ void LatheScene::initializeScene(ICanvas* canvas, Scene* scene)
   material1->setDiffuseColor(Color3(1.f, 0.5f, 0.5f));
   auto material2 = StandardMaterial::New("material2", scene);
   material2->setDiffuseColor(Color3(0.f, 0.5f, 1.f));
-  material2->setWireframe(true);
+  material2->wireframe = true;
 
   // Set object materials
   tube->material  = material1;

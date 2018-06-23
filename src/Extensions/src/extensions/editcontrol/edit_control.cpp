@@ -1514,11 +1514,11 @@ StandardMaterial* EditControl::getStandardMaterial(const std::string& name,
                                                    const Color3& col,
                                                    Scene* scene)
 {
-  auto mat           = StandardMaterial::New(name, scene);
-  mat->emissiveColor = col;
-  mat->diffuseColor  = Color3::Black();
-  mat->specularColor = Color3::Black();
-  mat->setBackFaceCulling(false);
+  auto mat             = StandardMaterial::New(name, scene);
+  mat->emissiveColor   = col;
+  mat->diffuseColor    = Color3::Black();
+  mat->specularColor   = Color3::Black();
+  mat->backFaceCulling = false;
   return mat;
 }
 

@@ -86,7 +86,7 @@ void ShaderMaterialCylindersScene::initializeScene(ICanvas* canvas,
     auto shaderMaterial              = ShaderMaterial::New(
       "shader" + id, scene, "custom" + id, shaderMaterialOptions);
     if (i == 1) {
-      shaderMaterial->setBackFaceCulling(false);
+      shaderMaterial->backFaceCulling = false;
     }
     cylinder->material = shaderMaterial;
     cylinder->rotation().y += Math::PI;

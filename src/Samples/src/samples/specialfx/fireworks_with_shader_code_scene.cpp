@@ -60,7 +60,7 @@ void FireworksWithShaderCodeScene::initializeScene(ICanvas* canvas,
   shaderMaterialOptions.needAlphaBlending = true;
   _shaderMaterial
     = ShaderMaterial::New("shader", scene, "custom", shaderMaterialOptions);
-  _shaderMaterial->setBackFaceCulling(false);
+  _shaderMaterial->backFaceCulling = false;
 
   // Create a built-in "sphere" shape
   SphereOptions sphereOptions(10.f);

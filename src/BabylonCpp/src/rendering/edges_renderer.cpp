@@ -46,7 +46,7 @@ void EdgesRenderer::_prepareResources()
                                     shaderMaterialOptions);
 
   _lineShader->disableDepthWrite = true;
-  _lineShader->setBackFaceCulling(false);
+  _lineShader->backFaceCulling   = false;
 }
 
 void EdgesRenderer::_rebuild()

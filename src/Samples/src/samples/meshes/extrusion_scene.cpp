@@ -85,8 +85,8 @@ void ExtrusionScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto lathe = createLathe(shape, 1, 40, scene);
   Vector3 translateVector(0.f, 1.f, 0.f);
   lathe->translate(translateVector, -4, Space::LOCAL);
-  lathe->material = StandardMaterial::New("mat", scene);
-  lathe->material()->setBackFaceCulling(false);
+  lathe->material                    = StandardMaterial::New("mat", scene);
+  lathe->material()->backFaceCulling = false;
 }
 
 } // end of namespace Samples

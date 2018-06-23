@@ -46,9 +46,9 @@ void SimpleCarFollowingPathScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   /*----------------------- Car Body -----------------------------------------*/
   // Car Body Material
-  auto bodyMaterial          = StandardMaterial::New("body_mat", scene);
-  bodyMaterial->diffuseColor = Color3(1.f, 0.25f, 0.25f);
-  bodyMaterial->setBackFaceCulling(false);
+  auto bodyMaterial             = StandardMaterial::New("body_mat", scene);
+  bodyMaterial->diffuseColor    = Color3(1.f, 0.25f, 0.25f);
+  bodyMaterial->backFaceCulling = false;
 
   // Array of points for trapezium side of car.
   vector_t<Vector3> side{

@@ -55,13 +55,13 @@ void MaterialsScene::initializeScene(ICanvas* canvas, Scene* scene)
   plane->rotation().x = Math::PI_2;
 
   // Creation of a material with wireFrame
-  auto materialSphere1 = StandardMaterial::New("texture1", scene);
-  materialSphere1->setWireframe(true);
+  auto materialSphere1       = StandardMaterial::New("texture1", scene);
+  materialSphere1->wireframe = true;
 
   // Creation of a red material with alpha
   auto materialSphere2          = StandardMaterial::New("texture2", scene);
   materialSphere2->diffuseColor = Color3(1, 0, 0); // Red
-  materialSphere2->setAlpha(0.3f);
+  materialSphere2->alpha        = 0.3f;
 
   // Creation of a material with an image texture
   auto materialSphere3 = StandardMaterial::New("texture3", scene);
@@ -83,19 +83,18 @@ void MaterialsScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto materialSphere6 = StandardMaterial::New("texture6", scene);
   materialSphere6->setDiffuseTexture(Texture::New("textures/tree.png", scene));
   materialSphere6->diffuseTexture()->setHasAlpha(true); // Have an alpha
-  materialSphere6->setBackFaceCulling(
-    false); // Show all the faces of the element
+  materialSphere6->backFaceCulling = false; // Show all the faces of the element
 
   // Creation of a repeated textured material
   auto materialPlane = StandardMaterial::New("texturePlane", scene);
-  materialPlane->setBackFaceCulling(
-    false); // Always show the front and the back of an element
+  materialPlane->backFaceCulling
+    = false; // Always show the front and the back of an element
   materialPlane->setDiffuseTexture(Texture::New("textures/grass.jpg", scene));
   texture         = static_cast<Texture*>(materialPlane->diffuseTexture());
   texture->uScale = 5.f; // Repeat 5 times on the Vertical Axes
   texture->vScale = 5.f; // Repeat 5 times on the Horizontal Axes
-  materialPlane->setBackFaceCulling(
-    false); // Always show the front and the back of an element
+  materialPlane->backFaceCulling
+    = false; // Always show the front and the back of an element
 
   // Apply the materials to meshes
   sphere1->material = materialSphere1;

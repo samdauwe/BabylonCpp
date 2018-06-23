@@ -21,13 +21,25 @@ Material::Material(const string_t& iName, Scene* scene, bool doNotAdd)
     , name{iName}
     , checkReadyOnEveryCall{false}
     , checkReadyOnlyOnce{false}
+    , alpha{this, &Material::get_alpha, &Material::set_alpha}
+    , backFaceCulling{this, &Material::get_backFaceCulling,
+                      &Material::set_backFaceCulling}
     , doNotSerialize{false}
     , storeEffectOnSubMeshes{false}
+    , onDispose{this, &Material::set_onDispose}
+    , onBind{this, &Material::set_onBind}
+    , alphaMode{this, &Material::get_alphaMode, &Material::set_alphaMode}
+    , needDepthPrePass{this, &Material::get_needDepthPrePass,
+                       &Material::set_needDepthPrePass}
     , disableDepthWrite{false}
     , forceDepthWrite{false}
     , separateCullingPass{false}
+    , fogEnabled{this, &Material::get_fogEnabled, &Material::set_fogEnabled}
     , pointSize{1.f}
     , zOffset{0.f}
+    , wireframe{this, &Material::get_wireframe, &Material::set_wireframe}
+    , pointsCloud{this, &Material::get_pointsCloud, &Material::set_pointsCloud}
+    , fillMode{this, &Material::get_fillMode, &Material::set_fillMode}
     , _effect{nullptr}
     , _wasPreviouslyReady{false}
     , _alpha{1.f}
@@ -62,7 +74,7 @@ Material::~Material()
 {
 }
 
-void Material::setAlpha(float value)
+void Material::set_alpha(float value)
 {
   if (stl_util::almost_equal(_alpha, value)) {
     return;
@@ -71,12 +83,12 @@ void Material::setAlpha(float value)
   markAsDirty(Material::MiscDirtyFlag());
 }
 
-float Material::alpha() const
+float Material::get_alpha() const
 {
   return _alpha;
 }
 
-void Material::setBackFaceCulling(bool value)
+void Material::set_backFaceCulling(bool value)
 {
   if (_backFaceCulling == value) {
     return;
@@ -85,7 +97,7 @@ void Material::setBackFaceCulling(bool value)
   markAsDirty(Material::TextureDirtyFlag());
 }
 
-bool Material::backFaceCulling() const
+bool Material::get_backFaceCulling() const
 {
   return _backFaceCulling;
 }
@@ -106,12 +118,12 @@ void Material::addMultiMaterialToScene(
   _scene->multiMaterials.emplace_back(::std::move(newMultiMaterial));
 }
 
-unsigned int Material::alphaMode() const
+unsigned int Material::get_alphaMode() const
 {
   return _alphaMode;
 }
 
-void Material::setAlphaMode(unsigned int value)
+void Material::set_alphaMode(unsigned int value)
 {
   if (_alphaMode == value) {
     return;
@@ -120,12 +132,12 @@ void Material::setAlphaMode(unsigned int value)
   markAsDirty(Material::TextureDirtyFlag());
 }
 
-bool Material::needDepthPrePass() const
+bool Material::get_needDepthPrePass() const
 {
   return _needDepthPrePass;
 }
 
-void Material::setNeedDepthPrePass(bool value)
+void Material::set_needDepthPrePass(bool value)
 {
   if (_needDepthPrePass == value) {
     return;
@@ -136,12 +148,12 @@ void Material::setNeedDepthPrePass(bool value)
   }
 }
 
-bool Material::fogEnabled() const
+bool Material::get_fogEnabled() const
 {
   return _fogEnabled;
 }
 
-void Material::setFogEnabled(bool value)
+void Material::set_fogEnabled(bool value)
 {
   if (_fogEnabled == value) {
     return;
@@ -181,7 +193,7 @@ vector_t<Animation*> Material::getAnimations()
 }
 
 // Events
-void Material::setOnDispose(
+void Material::set_onDispose(
   const ::std::function<void(Material*, EventState&)>& callback)
 {
   if (_onDisposeObserver) {
@@ -190,7 +202,7 @@ void Material::setOnDispose(
   _onDisposeObserver = onDisposeObservable.add(callback);
 }
 
-void Material::setOnBind(
+void Material::set_onBind(
   const ::std::function<void(AbstractMesh*, EventState&)>& callback)
 {
   if (_onBindObserver) {
@@ -199,7 +211,13 @@ void Material::setOnBind(
   _onBindObserver = onBindObservable.add(callback);
 }
 
-bool Material::wireframe() const
+void Material::set_wireframe(bool value)
+{
+  fillMode
+    = value ? Material::WireFrameFillMode() : Material::TriangleFillMode();
+}
+
+bool Material::get_wireframe() const
 {
   switch (_fillMode) {
     case Material::WireFrameFillMode():
@@ -212,13 +230,12 @@ bool Material::wireframe() const
   return _scene->forceWireframe();
 }
 
-void Material::setWireframe(bool value)
+void Material::set_pointsCloud(bool value)
 {
-  setFillMode(value ? Material::WireFrameFillMode() :
-                      Material::TriangleFillMode());
+  fillMode = value ? Material::PointFillMode() : Material::TriangleFillMode();
 }
 
-bool Material::pointsCloud() const
+bool Material::get_pointsCloud() const
 {
   switch (_fillMode) {
     case Material::PointFillMode():
@@ -229,17 +246,7 @@ bool Material::pointsCloud() const
   return _scene->forcePointsCloud();
 }
 
-void Material::setPointsCloud(bool value)
-{
-  setFillMode(value ? Material::PointFillMode() : Material::TriangleFillMode());
-}
-
-unsigned int Material::fillMode() const
-{
-  return _fillMode;
-}
-
-void Material::setFillMode(unsigned int value)
+void Material::set_fillMode(unsigned int value)
 {
   if (_fillMode == value) {
     return;
@@ -247,6 +254,11 @@ void Material::setFillMode(unsigned int value)
 
   _fillMode = value;
   markAsDirty(Material::MiscDirtyFlag());
+}
+
+unsigned int Material::get_fillMode() const
+{
+  return _fillMode;
 }
 
 string_t Material::toString(bool fullDetails) const
@@ -664,17 +676,17 @@ void Material::copyTo(Material* other) const
 {
   other->checkReadyOnlyOnce    = checkReadyOnlyOnce;
   other->checkReadyOnEveryCall = checkReadyOnEveryCall;
-  other->setAlpha(_alpha);
-  other->setFillMode(fillMode());
-  other->setBackFaceCulling(backFaceCulling());
-  other->setWireframe(wireframe());
-  other->setFogEnabled(fogEnabled());
-  other->zOffset = zOffset;
-  other->setAlphaMode(alphaMode());
-  other->sideOrientation   = sideOrientation;
-  other->disableDepthWrite = disableDepthWrite;
-  other->pointSize         = pointSize;
-  other->setPointsCloud(pointsCloud());
+  other->alpha                 = _alpha;
+  other->fillMode              = fillMode();
+  other->backFaceCulling       = backFaceCulling();
+  other->wireframe             = wireframe();
+  other->fogEnabled            = fogEnabled();
+  other->zOffset               = zOffset;
+  other->alphaMode             = alphaMode();
+  other->sideOrientation       = sideOrientation;
+  other->disableDepthWrite     = disableDepthWrite;
+  other->pointSize             = pointSize;
+  other->pointsCloud           = pointsCloud();
 }
 
 Json::object Material::serialize() const

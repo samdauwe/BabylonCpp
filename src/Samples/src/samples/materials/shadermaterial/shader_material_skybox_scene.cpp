@@ -57,7 +57,7 @@ void ShaderMaterialSkyboxScene::initializeScene(ICanvas* canvas, Scene* scene)
   _shaderMaterial->setFloat("offset", 0.f);
   _shaderMaterial->setColor3("topColor", Color3::FromInts(0, 119, 255));
   _shaderMaterial->setColor3("bottomColor", Color3::FromInts(240, 240, 255));
-  _shaderMaterial->setBackFaceCulling(false);
+  _shaderMaterial->backFaceCulling = false;
 
   // box + sky = skybox !
   skybox->material = _shaderMaterial;

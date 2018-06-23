@@ -53,8 +53,8 @@ void PerlinNoiseWavesScene::initializeScene(ICanvas* canvas, Scene* scene)
   _ground2           = Mesh::CreateGround("ground", 650, 400, 16, scene, true);
   _ground2->material = StandardMaterial::New("gmat2", scene);
   _ground2->material()->setDiffuseColor(Color3::FromInts(255, 140, 0));
-  _ground2->material()->setWireframe(true);
-  _ground2->position().y = _ground->position().y;
+  _ground2->material()->wireframe = true;
+  _ground2->position().y          = _ground->position().y;
 
   // Get positions and indices
   _positions = _ground->getVerticesData(VertexBuffer::PositionKind);

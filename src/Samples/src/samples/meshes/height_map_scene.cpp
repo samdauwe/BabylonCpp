@@ -57,9 +57,9 @@ void HeightMapScene::initializeScene(ICanvas* canvas, Scene* scene)
   _sun->material()->setEmissiveColor(Color3(1.f, 1.f, 0.f));
 
   // Skybox
-  auto skybox         = Mesh::CreateBox("skyBox", 800.f, scene);
-  auto skyboxMaterial = StandardMaterial::New("skyBox", scene);
-  skyboxMaterial->setBackFaceCulling(false);
+  auto skybox                     = Mesh::CreateBox("skyBox", 800.f, scene);
+  auto skyboxMaterial             = StandardMaterial::New("skyBox", scene);
+  skyboxMaterial->backFaceCulling = false;
   skyboxMaterial->setReflectionTexture(
     new CubeTexture("textures/skybox", scene));
   skyboxMaterial->reflectionTexture()->setCoordinatesMode(

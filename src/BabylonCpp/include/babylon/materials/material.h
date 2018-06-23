@@ -197,113 +197,6 @@ public:
   virtual IReflect::Type type() const override;
 
   /**
-   * @brief Sets the alpha value of the material.
-   */
-  void setAlpha(float value);
-
-  /**
-   * @brief Gets the alpha value of the material.
-   */
-  float alpha() const;
-
-  /**
-   * @brief Sets the back-face culling state.
-   */
-  void setBackFaceCulling(bool value);
-
-  /**
-   * @brief Gets the back-face culling state.
-   */
-  bool backFaceCulling() const;
-
-  /**
-   * @brief Called during a dispose event.
-   */
-  void
-  setOnDispose(const ::std::function<void(Material*, EventState&)>& callback);
-
-  /**
-   * @brief Called during a bind event.
-   */
-  void
-  setOnBind(const ::std::function<void(AbstractMesh*, EventState&)>& callback);
-
-  /**
-   * @brief Sets the value of the alpha mode.
-   *
-   * | Value | Type | Description |
-   * | --- | --- | --- |
-   * | 0 | ALPHA_DISABLE |   |
-   * | 1 | ALPHA_ADD |   |
-   * | 2 | ALPHA_COMBINE |   |
-   * | 3 | ALPHA_SUBTRACT |   |
-   * | 4 | ALPHA_MULTIPLY |   |
-   * | 5 | ALPHA_MAXIMIZED |   |
-   * | 6 | ALPHA_ONEONE |   |
-   * | 7 | ALPHA_PREMULTIPLIED |   |
-   * | 8 | ALPHA_PREMULTIPLIED_PORTERDUFF |   |
-   * | 9 | ALPHA_INTERPOLATE |   |
-   * | 10 | ALPHA_SCREENMODE |   |
-   *
-   */
-  void setAlphaMode(unsigned int value);
-
-  /**
-   * @brief Gets the value of the alpha mode.
-   */
-  unsigned int alphaMode() const;
-
-  /**
-   * @brief Gets the depth pre-pass value.
-   */
-  bool needDepthPrePass() const;
-
-  /**
-   * @brief Sets the need depth pre-pass value.
-   */
-  void setNeedDepthPrePass(bool value);
-
-  /**
-   * @brief Sets the state for enabling fog.
-   */
-  void setFogEnabled(bool value);
-
-  /**
-   * @brief Gets the value of the fog enabled state.
-   */
-  bool fogEnabled() const;
-
-  /**
-   * @brief Gets a value specifying if wireframe mode is enabled.
-   */
-  bool wireframe() const;
-
-  /**
-   * @brief Sets the state of wireframe mode.
-   */
-  void setWireframe(bool value);
-
-  /**
-   * @brief Gets the value specifying if point clouds are enabled.
-   */
-  bool pointsCloud() const;
-
-  /**
-   * @brief Sets the state of point cloud mode.
-   */
-  void setPointsCloud(bool value);
-
-  /**
-   * @brief Gets the material fill mode.
-   */
-  unsigned int fillMode() const;
-
-  /**
-   * @brief Sets the material fill mode.
-   */
-  void setFillMode(unsigned int value);
-
-  /**
    * @param Returns a string representation of the current material.
    * @param fullDetails defines a boolean indicating which levels of logging is
    * desired
@@ -550,6 +443,115 @@ protected:
    */
   Material(const string_t& name, Scene* scene, bool doNotAdd = false);
 
+protected:
+  /**
+   * @brief Sets the alpha value of the material.
+   */
+  void set_alpha(float value);
+
+  /**
+   * @brief Gets the alpha value of the material.
+   */
+  float get_alpha() const;
+
+  /**
+   * @brief Sets the back-face culling state.
+   */
+  void set_backFaceCulling(bool value);
+
+  /**
+   * @brief Gets the back-face culling state.
+   */
+  bool get_backFaceCulling() const;
+
+  /**
+   * @brief Called during a dispose event.
+   */
+  void
+  set_onDispose(const ::std::function<void(Material*, EventState&)>& callback);
+
+  /**
+   * @brief Called during a bind event.
+   */
+  void
+  set_onBind(const ::std::function<void(AbstractMesh*, EventState&)>& callback);
+
+  /**
+   * @brief Sets the value of the alpha mode.
+   *
+   * | Value | Type | Description |
+   * | --- | --- | --- |
+   * | 0 | ALPHA_DISABLE |   |
+   * | 1 | ALPHA_ADD |   |
+   * | 2 | ALPHA_COMBINE |   |
+   * | 3 | ALPHA_SUBTRACT |   |
+   * | 4 | ALPHA_MULTIPLY |   |
+   * | 5 | ALPHA_MAXIMIZED |   |
+   * | 6 | ALPHA_ONEONE |   |
+   * | 7 | ALPHA_PREMULTIPLIED |   |
+   * | 8 | ALPHA_PREMULTIPLIED_PORTERDUFF |   |
+   * | 9 | ALPHA_INTERPOLATE |   |
+   * | 10 | ALPHA_SCREENMODE |   |
+   *
+   */
+  void set_alphaMode(unsigned int value);
+
+  /**
+   * @brief Gets the value of the alpha mode.
+   */
+  unsigned int get_alphaMode() const;
+
+  /**
+   * @brief Sets the need depth pre-pass value.
+   */
+  void set_needDepthPrePass(bool value);
+
+  /**
+   * @brief Gets the depth pre-pass value.
+   */
+  bool get_needDepthPrePass() const;
+
+  /**
+   * @brief Sets the state for enabling fog.
+   */
+  void set_fogEnabled(bool value);
+
+  /**
+   * @brief Gets the value of the fog enabled state.
+   */
+  bool get_fogEnabled() const;
+
+  /**
+   * @brief Sets the state of wireframe mode.
+   */
+  void set_wireframe(bool value);
+
+  /**
+   * @brief Gets a value specifying if wireframe mode is enabled.
+   */
+  bool get_wireframe() const;
+
+  /**
+   * @brief Sets the state of point cloud mode.
+   */
+  void set_pointsCloud(bool value);
+
+  /**
+   * @brief Gets the value specifying if point clouds are enabled.
+   */
+  bool get_pointsCloud() const;
+
+  /**
+   * @brief Sets the material fill mode.
+   */
+  void set_fillMode(unsigned int value);
+
+  /**
+   * @brief Gets the material fill mode.
+   */
+  unsigned int get_fillMode() const;
+
+protected:
   /**
    * @brief Specifies if material alpha testing should be turned on for the
    * mesh.
@@ -657,6 +659,16 @@ public:
   bool checkReadyOnlyOnce;
 
   /**
+   * The alpha value of the material
+   */
+  Property<Material, float> alpha;
+
+  /**
+   * The back-face culling state
+   */
+  Property<Material, bool> backFaceCulling;
+
+  /**
    * Stores the value for side orientation
    */
   int sideOrientation;
@@ -692,6 +704,28 @@ public:
   vector_t<Animation*> animations;
 
   /**
+   * Called during a dispose event
+   */
+  WriteOnlyProperty<Material, ::std::function<void(Material*, EventState&)>>
+    onDispose;
+
+  /**
+   * Called during a bind event
+   */
+  WriteOnlyProperty<Material, ::std::function<void(AbstractMesh*, EventState&)>>
+    onBind;
+
+  /**
+   * The value of the alpha mode
+   */
+  Property<Material, unsigned int> alphaMode;
+
+  /**
+   * The need depth pre-pass value
+   */
+  Property<Material, bool> needDepthPrePass;
+
+  /**
    * Specifies if depth writing should be disabled
    */
   bool disableDepthWrite;
@@ -707,6 +741,11 @@ public:
   bool separateCullingPass;
 
   /**
+   * The state for enabling fog
+   */
+  Property<Material, bool> fogEnabled;
+
+  /**
    * Stores the size of points
    */
   float pointSize;
@@ -715,6 +754,21 @@ public:
    * Stores the z offset value
    */
   float zOffset;
+
+  /**
+   * The state of wireframe mode
+   */
+  Property<Material, bool> wireframe;
+
+  /**
+   * The state of point cloud mode
+   */
+  Property<Material, bool> pointsCloud;
+
+  /**
+   * The material fill mode
+   */
+  Property<Material, unsigned int> fillMode;
 
   /**
    * Stores the effects for the material
