@@ -35,11 +35,11 @@ void HeightMapScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Camera
   auto camera
-    = ArcRotateCamera::New("Camera", 0.f, 0.8f, 100.f, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("Camera", 0.f, 0.8f, 80.f, Vector3::Zero(), scene);
   camera->lowerBetaLimit   = 0.1f;
   camera->upperBetaLimit   = Math::PI_2 * 0.9f;
   camera->lowerRadiusLimit = 30;
-  camera->upperRadiusLimit = 250;
+  camera->upperRadiusLimit = 150;
   camera->attachControl(canvas, true);
 
   // Ground
