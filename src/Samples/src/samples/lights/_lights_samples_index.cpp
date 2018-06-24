@@ -2,6 +2,7 @@
 
 #include <babylon/samples/lights/directional_light_scene.h>
 #include <babylon/samples/lights/hemispheric_light_scene.h>
+#include <babylon/samples/lights/light_projected_texture_scene.h>
 #include <babylon/samples/lights/lights_scene.h>
 #include <babylon/samples/lights/point_light_scene.h>
 #include <babylon/samples/lights/spot_light_scene.h>
@@ -25,6 +26,12 @@ _LightsSamplesIndex::_LightsSamplesIndex()
     [](ICanvas* iCanvas) {                                       //
       return ::std::make_unique<HemisphericLightScene>(iCanvas); //
     });                                                          //
+  // Light Projected Texture Scene
+  _samples["LightProjectedTextureScene"] = ::std::make_tuple(
+    true,                                                             //
+    [](ICanvas* iCanvas) {                                            //
+      return ::std::make_unique<LightProjectedTextureScene>(iCanvas); //
+    });                                                               //
   // Lights Scene
   _samples["LightsScene"]
     = ::std::make_tuple(true,                                              //
