@@ -311,7 +311,8 @@ void EnvironmentHelper::_setupGround(const ISceneSize& sceneSize)
 void EnvironmentHelper::_setupGroundMaterial()
 {
   if (!_groundMaterial) {
-    _groundMaterial = new BackgroundMaterial("BackgroundPlaneMaterial", _scene);
+    _groundMaterial
+      = BackgroundMaterial::New("BackgroundPlaneMaterial", _scene);
   }
   _groundMaterial->alpha     = _options.groundOpacity;
   _groundMaterial->alphaMode = EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF;
@@ -413,7 +414,7 @@ void EnvironmentHelper::_setupSkyboxMaterial()
 
   if (!_skyboxMaterial) {
     _skyboxMaterial
-      = new BackgroundMaterial("BackgroundSkyboxMaterial", _scene);
+      = BackgroundMaterial::New("BackgroundSkyboxMaterial", _scene);
   }
   _skyboxMaterial->setUseRGBColor(false);
   _skyboxMaterial->setPrimaryColor(_options.skyboxColor);

@@ -73,8 +73,10 @@ class AutoRotationBehavior;
 class BouncingBehavior;
 class FramingBehavior;
 // - Mesh
+class MultiPointerScaleBehavior;
 class PointerDragBehavior;
 struct PointerDragBehaviorOptions;
+class SixDofDragBehavior;
 // --- Bones ---
 class Bone;
 class BoneIKController;
@@ -203,8 +205,10 @@ class PositionGizmo;
 class EnvironmentHelper;
 struct IEnvironmentHelperOptions;
 struct IParticleSystemData;
-class ParticleHelper;
 struct ISceneSize;
+class ParticleHelper;
+struct PhotoDomeOptions;
+class PhotoDome;
 // --- Instrumentation ---
 struct _TimeToken;
 class EngineInstrumentation;

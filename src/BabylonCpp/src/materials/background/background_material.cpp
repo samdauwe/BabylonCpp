@@ -923,6 +923,16 @@ void BackgroundMaterial::setSceneCenter(const Vector3& value)
   _sceneCenter = value;
 }
 
+bool BackgroundMaterial::opacityFresnel() const
+{
+  return _opacityFresnel;
+}
+
+void BackgroundMaterial::setOpacityFresnel(bool value)
+{
+  _opacityFresnel = value;
+}
+
 bool BackgroundMaterial::reflectionFresnel() const
 {
   return _reflectionFresnel;

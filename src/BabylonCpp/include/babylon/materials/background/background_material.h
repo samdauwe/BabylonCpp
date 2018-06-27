@@ -32,12 +32,14 @@ public:
   static float StandardReflectance90();
 
 public:
-  /**
-   * @brief Instantiates a Background Material in the given scene
-   * @param name The friendly name of the material
-   * @param scene The scene to add the material to
-   */
-  BackgroundMaterial(const string_t& name, Scene* scene);
+  template <typename... Ts>
+  static BackgroundMaterial* New(Ts&&... args)
+  {
+    auto material = new BackgroundMaterial(std::forward<Ts>(args)...);
+    material->addMaterialToScene(static_cast<unique_ptr_t<Material>>(material));
+
+    return material;
+  }
   ~BackgroundMaterial() override;
 
   /**
@@ -274,6 +276,8 @@ public:
   void setShadowLevel(float value);
   const Vector3& sceneCenter() const;
   void setSceneCenter(const Vector3& value);
+  bool opacityFresnel() const;
+  void setOpacityFresnel(bool value);
   bool reflectionFresnel() const;
   void setReflectionFresnel(bool value);
   float reflectionFalloffDistance() const;
@@ -290,6 +294,13 @@ public:
   void setEnableNoise(bool value);
 
 protected:
+  /**
+   * @brief Instantiates a Background Material in the given scene
+   * @param name The friendly name of the material
+   * @param scene The scene to add the material to
+   */
+  BackgroundMaterial(const string_t& name, Scene* scene);
+
   /**
    * @brief Attaches a new image processing configuration to the PBR Material.
    * @param configuration (if null the scene configuration will be use)
