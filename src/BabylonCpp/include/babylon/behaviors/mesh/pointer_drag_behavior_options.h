@@ -11,7 +11,6 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT PointerDragBehaviorOptions {
   Nullable<Vector3> dragAxis        = nullptr;
   Nullable<Vector3> dragPlaneNormal = nullptr;
-  Scene* pointerObservableScene     = nullptr;
 }; // end of struct PointerDragBehaviorOptions
 
 } // end of namespace BABYLON

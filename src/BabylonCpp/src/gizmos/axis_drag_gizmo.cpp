@@ -46,8 +46,8 @@ AxisDragGizmo::AxisDragGizmo(UtilityLayerRenderer* gizmoLayer,
 
   // Add drag behavior to handle events when the gizmo is dragged
   PointerDragBehaviorOptions options;
-  options.dragAxis               = dragAxis;
-  options.pointerObservableScene = gizmoLayer->originalScene;
+  options.dragAxis = dragAxis;
+  // options.pointerObservableScene = gizmoLayer->originalScene;
   _dragBehavior = ::std::make_unique<PointerDragBehavior>(options);
   _dragBehavior->moveAttached = false;
   _rootMesh->addBehavior(_dragBehavior.get());

@@ -24,7 +24,8 @@ public:
    * across. pointerObservableScene can be used to listen to drag events from
    * another scene(eg. if the attached mesh is in an overlay scene).
    */
-  PointerDragBehavior(const PointerDragBehaviorOptions& options);
+  PointerDragBehavior(const PointerDragBehaviorOptions& options
+                      = PointerDragBehaviorOptions());
   virtual ~PointerDragBehavior();
 
   /**
@@ -43,6 +44,8 @@ public:
    */
   void attach(Node* ownerNode) override;
 
+  void releaseDrag();
+
   /**
    * @brief Detaches the behavior from the mesh.
    */
@@ -55,11 +58,40 @@ private:
    * @brief Position the drag plane based on the attached mesh position, for
    * single axis rotate the plane along the axis to face the camera.
    */
-  void _updateDragPlanePosition(const Ray& ray);
+  void _updateDragPlanePosition(const Ray& ray,
+                                const Vector3& dragPlanePosition);
 
 public:
   /**
-   * Fires each time the attached mesh is dragged with the pointer
+   * The id of the pointer that is currently interacting with the behavior (-1
+   * when no pointer is active)
+   */
+  int currentDraggingPointerID;
+  /**
+   * The last position where the pointer hit the drag plane in world space
+   */
+  Vector3 lastDragPosition;
+  /**
+   * If the behavior is currently in a dragging state
+   */
+  bool dragging;
+  /**
+   * The distance towards the target drag position to move each frame. This
+   * can be useful to avoid jitter. Set this to 1 for no delay. (Default: 0.2)
+   */
+  float dragDeltaRatio;
+  /**
+   * If the drag plane orientation should be updated during the dragging
+   * (Default: true)
+   */
+  bool updateDragPlane;
+  /**
+   *  Fires each time the attached mesh is dragged with the pointer
+   *  * delta between last drag position and current drag position in world
+   *    space
+   *  * dragDistance along the drag axis
+   *  * dragPlaneNormal normal of the current drag plane used during the drag
+   *  * dragPlanePoint in world space where the drag intersects the drag plane
    */
   Observable<DragMoveEvent> onDragObservable;
   /**
@@ -75,17 +107,26 @@ public:
    */
   bool moveAttached;
   /**
-   *  Mesh with the position where the drag plane should be placed
+   *  If the drag behavior will react to drag events (Default: true)
    */
-  Mesh* _dragPlaneParent;
+  bool enabled;
+  /**
+   * If set, the drag plane/axis will be rotated based on the attached mesh's
+   * world rotation (Default: true)
+   */
+  bool useObjectOrienationForDragging;
+
+  static unique_ptr_t<Scene> _planeScene;
 
 private:
   Node* _attachedNode;
   Mesh* _dragPlane;
   Scene* _scene;
-  Observer<PointerInfoPre>::Ptr _pointerObserver;
-  static unique_ptr_t<Scene> _planeScene;
+  Observer<PointerInfo>::Ptr _pointerObserver;
   int _draggingID;
+  // Debug mode will display drag planes to help visualize behavior
+  bool _debugMode;
+  bool _moving;
 
   /**
    * The drag axis or normal of the plane that will be dragged across.
@@ -93,6 +134,18 @@ private:
    * scene(eg. if the attached mesh is in an overlay scene)
    */
   PointerDragBehaviorOptions options;
+
+  Vector3 _tmpVector;
+  Vector3 _worldDragAxis;
+
+  // Variables to avoid instantiation in the method _updateDragPlanePosition
+  Vector3 _pointA;
+  Vector3 _pointB;
+  Vector3 _pointC;
+  Vector3 _lineA;
+  Vector3 _lineB;
+  Vector3 _localAxis;
+  Vector3 _lookAt;
 
 }; // end of class PointerDragBehavior
 

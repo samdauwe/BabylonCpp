@@ -47,6 +47,14 @@ public:
 
   static Vector3 _lookAtVectorCache;
 
+  template <typename... Ts>
+  static AbstractMesh* New(Ts&&... args)
+  {
+    auto mesh = new AbstractMesh(::std::forward<Ts>(args)...);
+    mesh->addToScene(static_cast<unique_ptr_t<AbstractMesh>>(mesh));
+
+    return mesh;
+  }
   ~AbstractMesh() override;
 
   virtual IReflect::Type type() const override;

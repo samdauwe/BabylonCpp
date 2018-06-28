@@ -136,10 +136,14 @@ struct DeviceOrientationEvent {
 struct DragMoveEvent {
   Vector3 delta;
   Vector3 dragPlanePoint;
+  Vector3 dragPlaneNormal;
+  float dragDistance;
+  int pointerId;
 }; // end of struct DragMoveEvent
 
 struct DragStartOrEndEvent {
   Vector3 dragPlanePoint;
+  int pointerId;
 }; // end of struct DragStartOrEndEvent
 
 struct Event {
