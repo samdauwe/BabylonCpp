@@ -167,243 +167,6 @@ public:
   virtual ~ShadowGenerator();
 
   /**
-   * @brief Gets the bias: offset applied on the depth preventing acnea (in
-   * light direction).
-   */
-  float bias() const;
-
-  /**
-   * @brief Sets the bias: offset applied on the depth preventing acnea (in
-   * light direction).
-   */
-  void setBias(float bias);
-
-  /**
-   * @brief Gets the normalBias: offset applied on the depth preventing acnea
-   * (along side the normal direction and proportinal to the light/normal
-   * angle).
-   */
-  float normalBias() const;
-
-  /**
-   * @brief Sets the normalBias: offset applied on the depth preventing acnea
-   * (along side the normal direction and proportinal to the light/normal
-   * angle).
-   */
-  void setNormalBias(float normalBias);
-
-  /**
-   * @brief Gets the blur box offset: offset applied during the blur pass.
-   * Only usefull if useKernelBlur = false
-   */
-  int blurBoxOffset() const;
-
-  /**
-   * @brief Sets the blur box offset: offset applied during the blur pass.
-   * Only usefull if useKernelBlur = false
-   */
-  void setBlurBoxOffset(int value);
-
-  /**
-   * @brief Gets the blur scale: scale of the blurred texture compared to the
-   * main shadow map. 2 means half of the size.
-   */
-  float blurScale() const;
-
-  /**
-   * @brief Sets the blur scale: scale of the blurred texture compared to the
-   * main shadow map. 2 means half of the size.
-   */
-  void setBlurScale(float value);
-
-  /**
-   * @brief Gets the blur kernel: kernel size of the blur pass.
-   * Only usefull if useKernelBlur = true
-   */
-  float blurKernel() const;
-
-  /**
-   * @brief Sets the blur kernel: kernel size of the blur pass.
-   * Only usefull if useKernelBlur = true
-   */
-  void setBlurKernel(float value);
-
-  /**
-   * @brief Gets whether the blur pass is a kernel blur (if true) or box blur.
-   * Only usefull in filtered mode (useBlurExponentialShadowMap...)
-   */
-  bool useKernelBlur() const;
-
-  /**
-   * @brief Sets whether the blur pass is a kernel blur (if true) or box blur.
-   * Only usefull in filtered mode (useBlurExponentialShadowMap...)
-   */
-  void setUseKernelBlur(bool value);
-
-  /**
-   * @brief Gets the depth scale used in ESM mode.
-   */
-  float depthScale() const;
-
-  /**
-   * @brief Sets the depth scale used in ESM mode.
-   * This can override the scale stored on the light.
-   */
-  void setDepthScale(float value);
-
-  /**
-   * @brief Gets the current mode of the shadow generator (normal, PCF, ESM...).
-   * The returned value is a number equal to one of the available mode defined
-   * in ShadowMap.FILTER_x like _FILTER_NONE
-   */
-  unsigned int filter() const;
-
-  /**
-   * @brief Sets the current mode of the shadow generator (normal, PCF, ESM...).
-   * The returned value is a number equal to one of the available mode defined
-   * in ShadowMap.FILTER_x like _FILTER_NONE
-   */
-  void setFilter(unsigned int value);
-
-  /**
-   * @brief Gets if the current filter is set to Poisson Sampling.
-   */
-  bool usePoissonSampling() const;
-
-  /**
-   * @brief Sets the current filter to Poisson Sampling.
-   */
-  void setUsePoissonSampling(bool value);
-
-  /**
-   * @brief Gets if the current filter is set to VSM.
-   * DEPRECATED. Should use useExponentialShadowMap instead.
-   */
-  bool useVarianceShadowMap() const;
-
-  /**
-   * @brief Sets the current filter is to VSM.
-   * DEPRECATED. Should use useExponentialShadowMap instead.
-   */
-  void setUseVarianceShadowMap(bool value);
-
-  /**
-   * @brief Gets if the current filter is set to blurred VSM.
-   * DEPRECATED. Should use useBlurExponentialShadowMap instead.
-   */
-  bool useBlurVarianceShadowMap() const;
-
-  /**
-   * @brief Sets the current filter is to blurred VSM.
-   * DEPRECATED. Should use useBlurExponentialShadowMap instead.
-   */
-  void setUseBlurVarianceShadowMap(bool value);
-
-  /**
-   * @brief Gets if the current filter is set to ESM.
-   */
-  bool useExponentialShadowMap() const;
-
-  /**
-   * @brief Sets the current filter is to ESM.
-   */
-  void setUseExponentialShadowMap(bool value);
-
-  /**
-   * @brief Gets if the current filter is set to filtered ESM.
-   */
-  bool useBlurExponentialShadowMap() const;
-
-  /**
-   * @brief Gets if the current filter is set to filtered  ESM.
-   */
-  void setUseBlurExponentialShadowMap(bool value);
-
-  /**
-   * @brief Gets if the current filter is set to "close ESM" (using the inverse
-   * of the exponential to prevent steep falloff artifacts).
-   */
-  bool useCloseExponentialShadowMap() const;
-
-  /**
-   * @brief Sets the current filter to "close ESM" (using the inverse of the
-   * exponential to prevent steep falloff artifacts).
-   */
-  void setUseCloseExponentialShadowMap(bool value);
-
-  /**
-   * @brief Gets if the current filter is set to filtered "close ESM" (using the
-   * inverse of the exponential to prevent steep falloff artifacts).
-   */
-  bool useBlurCloseExponentialShadowMap() const;
-
-  /**
-   * @brief Sets the current filter to filtered "close ESM" (using the inverse
-   * of the exponential to prevent steep falloff artifacts).
-   */
-  void setUseBlurCloseExponentialShadowMap(bool value);
-
-  /**
-   * @brief Gets if the current filter is set to "PCF" (percentage closer
-   * filtering).
-   */
-  bool usePercentageCloserFiltering() const;
-
-  /**
-   * @brief Sets the current filter to "PCF" (percentage closer filtering).
-   */
-  void setUsePercentageCloserFiltering(bool value);
-
-  /**
-   * @brief Gets the PCF or PCSS Quality.
-   * Only valid if usePercentageCloserFiltering or usePercentageCloserFiltering
-   * is true.
-   */
-  unsigned int filteringQuality() const;
-
-  /**
-   * @brief Sets the PCF or PCSS Quality.
-   * Only valid if usePercentageCloserFiltering or usePercentageCloserFiltering
-   * is true.
-   */
-  void setFilteringQuality(unsigned int filteringQuality);
-
-  /**
-   * @brief Gets if the current filter is set to "PCSS" (contact hardening).
-   */
-  bool useContactHardeningShadow() const;
-
-  /**
-   * @brief Sets the current filter to "PCSS" (contact hardening).
-   */
-  void setUseContactHardeningShadow(bool value);
-
-  /**
-   * @brief Gets the Light Size (in shadow map uv unit) used in PCSS to
-   * determine the blocker search area and the penumbra size. Using a ratio
-   * helps keeping shape stability independently of the map size.
-   *
-   * It does not account for the light projection as it was having too much
-   * instability during the light setup or during light position changes.
-   *
-   * Only valid if useContactHardeningShadow is true.
-   */
-  float contactHardeningLightSizeUVRatio() const;
-
-  /**
-   * @brief Sets the Light Size (in shadow map uv unit) used in PCSS to
-   * determine the blocker search area and the penumbra size. Using a ratio
-   * helps keeping shape stability independently of the map size.
-   *
-   * It does not account for the light projection as it was having too much
-   * instability during the light setup or during light position changes.
-   *
-   * Only valid if useContactHardeningShadow is true.
-   */
-  void
-  setContactHardeningLightSizeUVRatio(float contactHardeningLightSizeUVRatio);
-
-  /**
    * @brief Returns the darkness value (float). This can only decrease the
    * actual darkness of a shadow. 0 means strongest and 1 would means no shadow.
    * @returns the darkness.
@@ -546,6 +309,244 @@ public:
   static ShadowGenerator* Parse(const Json::value& parsedShadowGenerator,
                                 Scene* scene);
 
+protected:
+  /**
+   * @brief Gets the bias: offset applied on the depth preventing acnea (in
+   * light direction).
+   */
+  float get_bias() const;
+
+  /**
+   * @brief Sets the bias: offset applied on the depth preventing acnea (in
+   * light direction).
+   */
+  void set_bias(float bias);
+
+  /**
+   * @brief Gets the normalBias: offset applied on the depth preventing acnea
+   * (along side the normal direction and proportinal to the light/normal
+   * angle).
+   */
+  float get_normalBias() const;
+
+  /**
+   * @brief Sets the normalBias: offset applied on the depth preventing acnea
+   * (along side the normal direction and proportinal to the light/normal
+   * angle).
+   */
+  void set_normalBias(float normalBias);
+
+  /**
+   * @brief Gets the blur box offset: offset applied during the blur pass.
+   * Only usefull if useKernelBlur = false
+   */
+  int get_blurBoxOffset() const;
+
+  /**
+   * @brief Sets the blur box offset: offset applied during the blur pass.
+   * Only usefull if useKernelBlur = false
+   */
+  void set_blurBoxOffset(int value);
+
+  /**
+   * @brief Gets the blur scale: scale of the blurred texture compared to the
+   * main shadow map. 2 means half of the size.
+   */
+  float get_blurScale() const;
+
+  /**
+   * @brief Sets the blur scale: scale of the blurred texture compared to the
+   * main shadow map. 2 means half of the size.
+   */
+  void set_blurScale(float value);
+
+  /**
+   * @brief Gets the blur kernel: kernel size of the blur pass.
+   * Only usefull if useKernelBlur = true
+   */
+  float get_blurKernel() const;
+
+  /**
+   * @brief Sets the blur kernel: kernel size of the blur pass.
+   * Only usefull if useKernelBlur = true
+   */
+  void set_blurKernel(float value);
+
+  /**
+   * @brief Gets whether the blur pass is a kernel blur (if true) or box blur.
+   * Only usefull in filtered mode (useBlurExponentialShadowMap...)
+   */
+  bool get_useKernelBlur() const;
+
+  /**
+   * @brief Sets whether the blur pass is a kernel blur (if true) or box blur.
+   * Only usefull in filtered mode (useBlurExponentialShadowMap...)
+   */
+  void set_useKernelBlur(bool value);
+
+  /**
+   * @brief Gets the depth scale used in ESM mode.
+   */
+  float get_depthScale() const;
+
+  /**
+   * @brief Sets the depth scale used in ESM mode.
+   * This can override the scale stored on the light.
+   */
+  void set_depthScale(float value);
+
+  /**
+   * @brief Gets the current mode of the shadow generator (normal, PCF, ESM...).
+   * The returned value is a number equal to one of the available mode defined
+   * in ShadowMap.FILTER_x like _FILTER_NONE
+   */
+  unsigned int get_filter() const;
+
+  /**
+   * @brief Sets the current mode of the shadow generator (normal, PCF, ESM...).
+   * The returned value is a number equal to one of the available mode defined
+   * in ShadowMap.FILTER_x like _FILTER_NONE
+   */
+  void set_filter(unsigned int value);
+
+  /**
+   * @brief Gets if the current filter is set to Poisson Sampling.
+   */
+  bool get_usePoissonSampling() const;
+
+  /**
+   * @brief Sets the current filter to Poisson Sampling.
+   */
+  void set_usePoissonSampling(bool value);
+
+  /**
+   * @brief Gets if the current filter is set to VSM.
+   * DEPRECATED. Should use useExponentialShadowMap instead.
+   */
+  bool get_useVarianceShadowMap() const;
+
+  /**
+   * @brief Sets the current filter is to VSM.
+   * DEPRECATED. Should use useExponentialShadowMap instead.
+   */
+  void set_useVarianceShadowMap(bool value);
+
+  /**
+   * @brief Gets if the current filter is set to blurred VSM.
+   * DEPRECATED. Should use useBlurExponentialShadowMap instead.
+   */
+  bool get_useBlurVarianceShadowMap() const;
+
+  /**
+   * @brief Sets the current filter is to blurred VSM.
+   * DEPRECATED. Should use useBlurExponentialShadowMap instead.
+   */
+  void set_useBlurVarianceShadowMap(bool value);
+
+  /**
+   * @brief Gets if the current filter is set to ESM.
+   */
+  bool get_useExponentialShadowMap() const;
+
+  /**
+   * @brief Sets the current filter is to ESM.
+   */
+  void set_useExponentialShadowMap(bool value);
+
+  /**
+   * @brief Gets if the current filter is set to filtered ESM.
+   */
+  bool get_useBlurExponentialShadowMap() const;
+
+  /**
+   * @brief Gets if the current filter is set to filtered  ESM.
+   */
+  void set_useBlurExponentialShadowMap(bool value);
+
+  /**
+   * @brief Gets if the current filter is set to "close ESM" (using the inverse
+   * of the exponential to prevent steep falloff artifacts).
+   */
+  bool get_useCloseExponentialShadowMap() const;
+
+  /**
+   * @brief Sets the current filter to "close ESM" (using the inverse of the
+   * exponential to prevent steep falloff artifacts).
+   */
+  void set_useCloseExponentialShadowMap(bool value);
+
+  /**
+   * @brief Gets if the current filter is set to filtered "close ESM" (using the
+   * inverse of the exponential to prevent steep falloff artifacts).
+   */
+  bool get_useBlurCloseExponentialShadowMap() const;
+
+  /**
+   * @brief Sets the current filter to filtered "close ESM" (using the inverse
+   * of the exponential to prevent steep falloff artifacts).
+   */
+  void set_useBlurCloseExponentialShadowMap(bool value);
+
+  /**
+   * @brief Gets if the current filter is set to "PCF" (percentage closer
+   * filtering).
+   */
+  bool get_usePercentageCloserFiltering() const;
+
+  /**
+   * @brief Sets the current filter to "PCF" (percentage closer filtering).
+   */
+  void set_usePercentageCloserFiltering(bool value);
+
+  /**
+   * @brief Gets the PCF or PCSS Quality.
+   * Only valid if usePercentageCloserFiltering or usePercentageCloserFiltering
+   * is true.
+   */
+  unsigned int get_filteringQuality() const;
+
+  /**
+   * @brief Sets the PCF or PCSS Quality.
+   * Only valid if usePercentageCloserFiltering or usePercentageCloserFiltering
+   * is true.
+   */
+  void set_filteringQuality(unsigned int filteringQuality);
+
+  /**
+   * @brief Gets if the current filter is set to "PCSS" (contact hardening).
+   */
+  bool get_useContactHardeningShadow() const;
+
+  /**
+   * @brief Sets the current filter to "PCSS" (contact hardening).
+   */
+  void set_useContactHardeningShadow(bool value);
+
+  /**
+   * @brief Gets the Light Size (in shadow map uv unit) used in PCSS to
+   * determine the blocker search area and the penumbra size. Using a ratio
+   * helps keeping shape stability independently of the map size.
+   *
+   * It does not account for the light projection as it was having too much
+   * instability during the light setup or during light position changes.
+   *
+   * Only valid if useContactHardeningShadow is true.
+   */
+  float get_contactHardeningLightSizeUVRatio() const;
+
+  /**
+   * @brief Sets the Light Size (in shadow map uv unit) used in PCSS to
+   * determine the blocker search area and the penumbra size. Using a ratio
+   * helps keeping shape stability independently of the map size.
+   *
+   * It does not account for the light projection as it was having too much
+   * instability during the light setup or during light position changes.
+   *
+   * Only valid if useContactHardeningShadow is true.
+   */
+  void
+  set_contactHardeningLightSizeUVRatio(float contactHardeningLightSizeUVRatio);
+
 private:
   void _initializeGenerator();
   void _initializeShadowMap();
@@ -560,6 +561,122 @@ private:
   void _disposeRTTandPostProcesses();
 
 public:
+  /**
+   * Gets the bias: offset applied on the depth preventing acnea (in light
+   * direction)
+   */
+  Property<ShadowGenerator, float> bias;
+
+  /**
+   * The normalBias: offset applied on the depth preventing acnea (along side
+   * the normal direction and proportinal to the light/normal angle)
+   */
+  Property<ShadowGenerator, float> normalBias;
+
+  /**
+   * The blur box offset: offset applied during the blur pass
+   * Only usefull if useKernelBlur = false
+   */
+  Property<ShadowGenerator, int> blurBoxOffset;
+
+  /**
+   * The blur scale: scale of the blurred texture compared to the main
+   * shadow map. 2 means half of the size
+   */
+  Property<ShadowGenerator, float> blurScale;
+
+  /**
+   * The blur kernel: kernel size of the blur pass
+   * Only usefull if useKernelBlur = true
+   */
+  Property<ShadowGenerator, float> blurKernel;
+
+  /**
+   * Whether the blur pass is a kernel blur (if true) or box blur
+   * Only usefull in filtered mode (useBlurExponentialShadowMap...)
+   */
+  Property<ShadowGenerator, bool> useKernelBlur;
+
+  /**
+   * The depth scale used in ESM mode
+   */
+  Property<ShadowGenerator, float> depthScale;
+
+  /**
+   * The current mode of the shadow generator (normal, PCF, ESM...)
+   * The returned value is a number equal to one of the available mode defined
+   * in ShadowMap.FILTER_x like _FILTER_NONE
+   */
+  Property<ShadowGenerator, unsigned int> filter;
+
+  /**
+   * If the current filter is set to Poisson Sampling
+   */
+  Property<ShadowGenerator, bool> usePoissonSampling;
+
+  /**
+   * If the current filter is set to VSM
+   * DEPRECATED. Should use useExponentialShadowMap instead.
+   */
+  Property<ShadowGenerator, bool> useVarianceShadowMap;
+
+  /**
+   * If the current filter is set to blurred VSM
+   * DEPRECATED. Should use useBlurExponentialShadowMap instead.
+   */
+  Property<ShadowGenerator, bool> useBlurVarianceShadowMap;
+
+  /**
+   * If the current filter is set to ESM
+   */
+  Property<ShadowGenerator, bool> useExponentialShadowMap;
+
+  /**
+   * If the current filter is set to filtered ESM
+   */
+  Property<ShadowGenerator, bool> useBlurExponentialShadowMap;
+
+  /**
+   * If the current filter is set to "close ESM" (using the inverse of the
+   * exponential to prevent steep falloff artifacts).
+   */
+  Property<ShadowGenerator, bool> useCloseExponentialShadowMap;
+
+  /**
+   * If the current filter is set to filtered "close ESM" (using the
+   * inverse of the exponential to prevent steep falloff artifacts).
+   */
+  Property<ShadowGenerator, bool> useBlurCloseExponentialShadowMap;
+
+  /**
+   * The current filter is set to "PCF" (percentage closer filtering).
+   */
+  Property<ShadowGenerator, bool> usePercentageCloserFiltering;
+
+  /**
+   * The PCF or PCSS Quality
+   * Only valid if usePercentageCloserFiltering or usePercentageCloserFiltering
+   * is true.
+   */
+  Property<ShadowGenerator, unsigned int> filteringQuality;
+
+  /**
+   * The current filter is set to "PCSS" (contact hardening)
+   */
+  Property<ShadowGenerator, bool> useContactHardeningShadow;
+
+  /**
+   * The Light Size (in shadow map uv unit) used in PCSS to determine the
+   * blocker search area and the penumbra size. Using a ratio helps keeping
+   * shape stability independently of the map size
+   *
+   * It does not account for the light projection as it was having too much
+   * instability during the light setup or during light position changes.
+   *
+   * Only valid if useContactHardeningShadow is true.
+   */
+  Property<ShadowGenerator, float> contactHardeningLightSizeUVRatio;
+
   /**
    * If true the shadow map is generated by rendering the back face of the mesh
    * instead of the front face. This can help with self-shadowing as the

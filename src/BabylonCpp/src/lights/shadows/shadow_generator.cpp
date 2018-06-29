@@ -42,7 +42,61 @@ ShadowGenerator::ShadowGenerator(int mapSize, IShadowLight* light,
 
 ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light,
                                  bool useFullFloatFirst)
-    : frustumEdgeFalloff{0.f}
+    : bias{this, &ShadowGenerator::get_bias, &ShadowGenerator::set_bias}
+    , normalBias{this, &ShadowGenerator::get_normalBias,
+                 &ShadowGenerator::set_normalBias}
+    , blurBoxOffset{this, &ShadowGenerator::get_blurBoxOffset,
+                    &ShadowGenerator::set_blurBoxOffset}
+    , blurScale{this, &ShadowGenerator::get_blurScale,
+                &ShadowGenerator::set_blurScale}
+    , blurKernel{this, &ShadowGenerator::get_blurKernel,
+                 &ShadowGenerator::set_blurKernel}
+    , useKernelBlur{this, &ShadowGenerator::get_useKernelBlur,
+                    &ShadowGenerator::set_useKernelBlur}
+    , depthScale{this, &ShadowGenerator::get_depthScale,
+                 &ShadowGenerator::set_depthScale}
+    , filter{this, &ShadowGenerator::get_filter, &ShadowGenerator::set_filter}
+    , usePoissonSampling{this, &ShadowGenerator::get_usePoissonSampling,
+                         &ShadowGenerator::set_usePoissonSampling}
+    , useVarianceShadowMap{this, &ShadowGenerator::get_useVarianceShadowMap,
+                           &ShadowGenerator::set_useVarianceShadowMap}
+    , useBlurVarianceShadowMap{this,
+                               &ShadowGenerator::get_useBlurVarianceShadowMap,
+                               &ShadowGenerator::set_useBlurVarianceShadowMap}
+    , useExponentialShadowMap{this,
+                              &ShadowGenerator::get_useExponentialShadowMap,
+                              &ShadowGenerator::set_useExponentialShadowMap}
+    , useBlurExponentialShadowMap{this,
+                                  &ShadowGenerator::
+                                    get_useBlurExponentialShadowMap,
+                                  &ShadowGenerator::
+                                    set_useBlurExponentialShadowMap}
+    , useCloseExponentialShadowMap{this,
+                                   &ShadowGenerator::
+                                     get_useCloseExponentialShadowMap,
+                                   &ShadowGenerator::
+                                     set_useCloseExponentialShadowMap}
+    , useBlurCloseExponentialShadowMap{this,
+                                       &ShadowGenerator::
+                                         get_useBlurCloseExponentialShadowMap,
+                                       &ShadowGenerator::
+                                         set_useBlurCloseExponentialShadowMap}
+    , usePercentageCloserFiltering{this,
+                                   &ShadowGenerator::
+                                     get_usePercentageCloserFiltering,
+                                   &ShadowGenerator::
+                                     set_usePercentageCloserFiltering}
+    , filteringQuality{this, &ShadowGenerator::get_filteringQuality,
+                       &ShadowGenerator::set_filteringQuality}
+    , useContactHardeningShadow{this,
+                                &ShadowGenerator::get_useContactHardeningShadow,
+                                &ShadowGenerator::set_useContactHardeningShadow}
+    , contactHardeningLightSizeUVRatio{this,
+                                       &ShadowGenerator::
+                                         get_contactHardeningLightSizeUVRatio,
+                                       &ShadowGenerator::
+                                         set_contactHardeningLightSizeUVRatio}
+    , frustumEdgeFalloff{0.f}
     , forceBackFacesOnly{false}
     , _bias{0.00005f}
     , _normalBias{0.f}
@@ -118,32 +172,32 @@ ShadowGenerator::~ShadowGenerator()
 {
 }
 
-float ShadowGenerator::bias() const
+float ShadowGenerator::get_bias() const
 {
   return _bias;
 }
 
-void ShadowGenerator::setBias(float iBias)
+void ShadowGenerator::set_bias(float iBias)
 {
   _bias = iBias;
 }
 
-float ShadowGenerator::normalBias() const
+float ShadowGenerator::get_normalBias() const
 {
   return _normalBias;
 }
 
-void ShadowGenerator::setNormalBias(float normalBias)
+void ShadowGenerator::set_normalBias(float normalBias)
 {
   _normalBias = normalBias;
 }
 
-int ShadowGenerator::blurBoxOffset() const
+int ShadowGenerator::get_blurBoxOffset() const
 {
   return _blurBoxOffset;
 }
 
-void ShadowGenerator::setBlurBoxOffset(int value)
+void ShadowGenerator::set_blurBoxOffset(int value)
 {
   if (_blurBoxOffset == value) {
     return;
@@ -153,12 +207,12 @@ void ShadowGenerator::setBlurBoxOffset(int value)
   _disposeBlurPostProcesses();
 }
 
-float ShadowGenerator::blurScale() const
+float ShadowGenerator::get_blurScale() const
 {
   return _blurScale;
 }
 
-void ShadowGenerator::setBlurScale(float value)
+void ShadowGenerator::set_blurScale(float value)
 {
   if (stl_util::almost_equal(_blurScale, value)) {
     return;
@@ -168,12 +222,12 @@ void ShadowGenerator::setBlurScale(float value)
   _disposeBlurPostProcesses();
 }
 
-float ShadowGenerator::blurKernel() const
+float ShadowGenerator::get_blurKernel() const
 {
   return _blurKernel;
 }
 
-void ShadowGenerator::setBlurKernel(float value)
+void ShadowGenerator::set_blurKernel(float value)
 {
   if (stl_util::almost_equal(_blurKernel, value)) {
     return;
@@ -183,12 +237,12 @@ void ShadowGenerator::setBlurKernel(float value)
   _disposeBlurPostProcesses();
 }
 
-bool ShadowGenerator::useKernelBlur() const
+bool ShadowGenerator::get_useKernelBlur() const
 {
   return _useKernelBlur;
 }
 
-void ShadowGenerator::setUseKernelBlur(bool value)
+void ShadowGenerator::set_useKernelBlur(bool value)
 {
   if (_useKernelBlur == value) {
     return;
@@ -198,38 +252,38 @@ void ShadowGenerator::setUseKernelBlur(bool value)
   _disposeBlurPostProcesses();
 }
 
-float ShadowGenerator::depthScale() const
+float ShadowGenerator::get_depthScale() const
 {
   return _depthScale ? *_depthScale : _light->getDepthScale();
 }
 
-void ShadowGenerator::setDepthScale(float value)
+void ShadowGenerator::set_depthScale(float value)
 {
   _depthScale = value;
 }
 
-unsigned int ShadowGenerator::filter() const
+unsigned int ShadowGenerator::get_filter() const
 {
   return _filter;
 }
 
-void ShadowGenerator::setFilter(unsigned int value)
+void ShadowGenerator::set_filter(unsigned int value)
 {
   // Blurring the cubemap is going to be too expensive. Reverting to unblurred
   // version
   if (_light->needCube()) {
     if (value == ShadowGenerator::FILTER_BLUREXPONENTIALSHADOWMAP()) {
-      setUseExponentialShadowMap(true);
+      useExponentialShadowMap = true;
       return;
     }
     else if (value == ShadowGenerator::FILTER_BLURCLOSEEXPONENTIALSHADOWMAP()) {
-      setUseCloseExponentialShadowMap(true);
+      useCloseExponentialShadowMap = true;
       return;
     }
     // PCF on cubemap would also be expensive
     else if (value == ShadowGenerator::FILTER_PCF()
              || value == ShadowGenerator::FILTER_PCSS()) {
-      setUsePoissonSampling(true);
+      usePoissonSampling = true;
       return;
     }
   }
@@ -238,7 +292,7 @@ void ShadowGenerator::setFilter(unsigned int value)
   if (value == ShadowGenerator::FILTER_PCF()
       || value == ShadowGenerator::FILTER_PCSS()) {
     if (_scene->getEngine()->webGLVersion() == 1.f) {
-      setUsePoissonSampling(true);
+      usePoissonSampling = true;
       return;
     }
   }
@@ -253,22 +307,22 @@ void ShadowGenerator::setFilter(unsigned int value)
   _light->_markMeshesAsLightDirty();
 }
 
-bool ShadowGenerator::usePoissonSampling() const
+bool ShadowGenerator::get_usePoissonSampling() const
 {
   return filter() == ShadowGenerator::FILTER_POISSONSAMPLING();
 }
 
-void ShadowGenerator::setUsePoissonSampling(bool value)
+void ShadowGenerator::set_usePoissonSampling(bool value)
 {
   if (!value && filter() != ShadowGenerator::FILTER_POISSONSAMPLING()) {
     return;
   }
 
-  setFilter(value ? ShadowGenerator::FILTER_POISSONSAMPLING() :
-                    ShadowGenerator::FILTER_NONE());
+  filter = value ? ShadowGenerator::FILTER_POISSONSAMPLING() :
+                   ShadowGenerator::FILTER_NONE();
 }
 
-bool ShadowGenerator::useVarianceShadowMap() const
+bool ShadowGenerator::get_useVarianceShadowMap() const
 {
   BABYLON_LOG_WARN(
     "ShadowGenerator",
@@ -276,15 +330,15 @@ bool ShadowGenerator::useVarianceShadowMap() const
   return useExponentialShadowMap();
 }
 
-void ShadowGenerator::setUseVarianceShadowMap(bool value)
+void ShadowGenerator::set_useVarianceShadowMap(bool value)
 {
   BABYLON_LOG_WARN(
     "ShadowGenerator",
     "VSM are now replaced by ESM. Please use useExponentialShadowMap instead.");
-  setUseExponentialShadowMap(value);
+  useExponentialShadowMap = value;
 }
 
-bool ShadowGenerator::useBlurVarianceShadowMap() const
+bool ShadowGenerator::get_useBlurVarianceShadowMap() const
 {
   BABYLON_LOG_WARN("ShadowGenerator",
                    "VSM are now replaced by ESM. Please use "
@@ -292,121 +346,121 @@ bool ShadowGenerator::useBlurVarianceShadowMap() const
   return useBlurExponentialShadowMap();
 }
 
-void ShadowGenerator::setUseBlurVarianceShadowMap(bool value)
+void ShadowGenerator::set_useBlurVarianceShadowMap(bool value)
 {
   BABYLON_LOG_WARN("ShadowGenerator",
                    "VSM are now replaced by ESM. Please use "
                    "useBlurExponentialShadowMap instead.");
-  setUseBlurExponentialShadowMap(value);
+  useBlurExponentialShadowMap = value;
 }
 
-bool ShadowGenerator::useExponentialShadowMap() const
+bool ShadowGenerator::get_useExponentialShadowMap() const
 {
   return filter() == ShadowGenerator::FILTER_EXPONENTIALSHADOWMAP();
 }
 
-void ShadowGenerator::setUseExponentialShadowMap(bool value)
+void ShadowGenerator::set_useExponentialShadowMap(bool value)
 {
   if (!value && filter() != ShadowGenerator::FILTER_EXPONENTIALSHADOWMAP()) {
     return;
   }
 
-  setFilter(value ? ShadowGenerator::FILTER_EXPONENTIALSHADOWMAP() :
-                    ShadowGenerator::FILTER_NONE());
+  filter = value ? ShadowGenerator::FILTER_EXPONENTIALSHADOWMAP() :
+                   ShadowGenerator::FILTER_NONE();
 }
 
-bool ShadowGenerator::useBlurExponentialShadowMap() const
+bool ShadowGenerator::get_useBlurExponentialShadowMap() const
 {
   return filter() == ShadowGenerator::FILTER_BLUREXPONENTIALSHADOWMAP();
 }
 
-void ShadowGenerator::setUseBlurExponentialShadowMap(bool value)
+void ShadowGenerator::set_useBlurExponentialShadowMap(bool value)
 {
   if (!value
       && filter() != ShadowGenerator::FILTER_BLUREXPONENTIALSHADOWMAP()) {
     return;
   }
 
-  setFilter(value ? ShadowGenerator::FILTER_BLUREXPONENTIALSHADOWMAP() :
-                    ShadowGenerator::FILTER_NONE());
+  filter = value ? ShadowGenerator::FILTER_BLUREXPONENTIALSHADOWMAP() :
+                   ShadowGenerator::FILTER_NONE();
 }
 
-bool ShadowGenerator::useCloseExponentialShadowMap() const
+bool ShadowGenerator::get_useCloseExponentialShadowMap() const
 {
   return filter() == ShadowGenerator::FILTER_CLOSEEXPONENTIALSHADOWMAP();
 }
 
-void ShadowGenerator::setUseCloseExponentialShadowMap(bool value)
+void ShadowGenerator::set_useCloseExponentialShadowMap(bool value)
 {
   if (!value
       && filter() != ShadowGenerator::FILTER_CLOSEEXPONENTIALSHADOWMAP()) {
     return;
   }
 
-  setFilter(value ? ShadowGenerator::FILTER_CLOSEEXPONENTIALSHADOWMAP() :
-                    ShadowGenerator::FILTER_NONE());
+  filter = value ? ShadowGenerator::FILTER_CLOSEEXPONENTIALSHADOWMAP() :
+                   ShadowGenerator::FILTER_NONE();
 }
 
-bool ShadowGenerator::useBlurCloseExponentialShadowMap() const
+bool ShadowGenerator::get_useBlurCloseExponentialShadowMap() const
 {
   return filter() == ShadowGenerator::FILTER_BLURCLOSEEXPONENTIALSHADOWMAP();
 }
 
-void ShadowGenerator::setUseBlurCloseExponentialShadowMap(bool value)
+void ShadowGenerator::set_useBlurCloseExponentialShadowMap(bool value)
 {
   if (!value
       && filter() != ShadowGenerator::FILTER_BLURCLOSEEXPONENTIALSHADOWMAP()) {
     return;
   }
 
-  setFilter(value ? ShadowGenerator::FILTER_BLURCLOSEEXPONENTIALSHADOWMAP() :
-                    ShadowGenerator::FILTER_NONE());
+  filter = value ? ShadowGenerator::FILTER_BLURCLOSEEXPONENTIALSHADOWMAP() :
+                   ShadowGenerator::FILTER_NONE();
 }
 
-bool ShadowGenerator::usePercentageCloserFiltering() const
+bool ShadowGenerator::get_usePercentageCloserFiltering() const
 {
   return filter() == ShadowGenerator::FILTER_PCF();
 }
 
-void ShadowGenerator::setUsePercentageCloserFiltering(bool value)
+void ShadowGenerator::set_usePercentageCloserFiltering(bool value)
 {
   if (!value && filter() != ShadowGenerator::FILTER_PCF()) {
     return;
   }
-  setFilter(value ? ShadowGenerator::FILTER_PCF() :
-                    ShadowGenerator::FILTER_NONE());
+  filter
+    = value ? ShadowGenerator::FILTER_PCF() : ShadowGenerator::FILTER_NONE();
 }
 
-unsigned int ShadowGenerator::filteringQuality() const
+unsigned int ShadowGenerator::get_filteringQuality() const
 {
   return _filteringQuality;
 }
 
-void ShadowGenerator::setFilteringQuality(unsigned int filteringQuality)
+void ShadowGenerator::set_filteringQuality(unsigned int filteringQuality)
 {
   _filteringQuality = filteringQuality;
 }
 
-bool ShadowGenerator::useContactHardeningShadow() const
+bool ShadowGenerator::get_useContactHardeningShadow() const
 {
   return filter() == ShadowGenerator::FILTER_PCSS();
 }
 
-void ShadowGenerator::setUseContactHardeningShadow(bool value)
+void ShadowGenerator::set_useContactHardeningShadow(bool value)
 {
   if (!value && filter() != ShadowGenerator::FILTER_PCSS()) {
     return;
   }
-  setFilter(value ? ShadowGenerator::FILTER_PCSS() :
-                    ShadowGenerator::FILTER_NONE());
+  filter
+    = value ? ShadowGenerator::FILTER_PCSS() : ShadowGenerator::FILTER_NONE();
 }
 
-float ShadowGenerator::contactHardeningLightSizeUVRatio() const
+float ShadowGenerator::get_contactHardeningLightSizeUVRatio() const
 {
   return _contactHardeningLightSizeUVRatio;
 }
 
-void ShadowGenerator::setContactHardeningLightSizeUVRatio(
+void ShadowGenerator::set_contactHardeningLightSizeUVRatio(
   float contactHardeningLightSizeUVRatio)
 {
   _contactHardeningLightSizeUVRatio = contactHardeningLightSizeUVRatio;
@@ -1133,7 +1187,7 @@ void ShadowGenerator::recreateShadowMap()
   // Reinitializes.
   _initializeGenerator();
   // Reaffect the filter to ensure a correct fallback if necessary.
-  setFilter(filter());
+  filter = filter();
   // Reaffect the filter.
   _applyFilterValues();
   // Reaffect Render List.
@@ -1225,83 +1279,88 @@ ShadowGenerator::Parse(const Json::value& parsedShadowGenerator, Scene* scene)
   }
 
   if (Json::GetBool(parsedShadowGenerator, "usePoissonSampling")) {
-    shadowGenerator->setUsePoissonSampling(true);
+    shadowGenerator->usePoissonSampling = true;
   }
   else if (Json::GetBool(parsedShadowGenerator, "useExponentialShadowMap")) {
-    shadowGenerator->setUseExponentialShadowMap(true);
+    shadowGenerator->useExponentialShadowMap = true;
   }
   else if (Json::GetBool(parsedShadowGenerator,
                          "useBlurExponentialShadowMap")) {
-    shadowGenerator->setUseBlurExponentialShadowMap(true);
+    shadowGenerator->useBlurExponentialShadowMap = true;
   }
   else if (Json::GetBool(parsedShadowGenerator,
                          "useCloseExponentialShadowMap")) {
-    shadowGenerator->setUseCloseExponentialShadowMap(true);
+    shadowGenerator->useCloseExponentialShadowMap = true;
   }
   else if (Json::GetBool(parsedShadowGenerator,
                          "useBlurCloseExponentialShadowMap")) {
-    shadowGenerator->setUseBlurCloseExponentialShadowMap(true);
+    shadowGenerator->useBlurCloseExponentialShadowMap = true;
   }
   else if (Json::GetBool(parsedShadowGenerator,
                          "usePercentageCloserFiltering")) {
-    shadowGenerator->setUsePercentageCloserFiltering(true);
+    shadowGenerator->usePercentageCloserFiltering = true;
   }
   else if (Json::GetBool(parsedShadowGenerator, "useContactHardeningShadow")) {
-    shadowGenerator->setUseContactHardeningShadow(true);
+    shadowGenerator->useContactHardeningShadow = true;
   }
 
   if (parsedShadowGenerator.contains("filteringQuality")) {
-    shadowGenerator->setFilteringQuality(
-      Json::GetNumber(parsedShadowGenerator, "filteringQuality",
-                      ShadowGenerator::QUALITY_HIGH()));
+    shadowGenerator->filteringQuality
+      = Json::GetNumber(parsedShadowGenerator, "filteringQuality",
+                        ShadowGenerator::QUALITY_HIGH());
   }
 
   if (parsedShadowGenerator.contains("contactHardeningLightSizeUVRatio")) {
-    shadowGenerator->setContactHardeningLightSizeUVRatio(Json::GetNumber(
-      parsedShadowGenerator, "contactHardeningLightSizeUVRatio", 0.1f));
+    shadowGenerator->contactHardeningLightSizeUVRatio = Json::GetNumber(
+      parsedShadowGenerator, "contactHardeningLightSizeUVRatio", 0.1f);
   }
 
   // Backward compat
   else if (Json::GetBool(parsedShadowGenerator, "useVarianceShadowMap")) {
-    shadowGenerator->setUseExponentialShadowMap(true);
+    shadowGenerator->useExponentialShadowMap = true;
   }
   else if (Json::GetBool(parsedShadowGenerator, "useBlurVarianceShadowMap")) {
-    shadowGenerator->setUseExponentialShadowMap(true);
+    shadowGenerator->useExponentialShadowMap = true;
   }
 
   if (parsedShadowGenerator.contains("depthScale")) {
-    shadowGenerator->setDepthScale(
-      Json::GetNumber(parsedShadowGenerator, "depthScale", 30.f));
+    shadowGenerator->depthScale
+      = Json::GetNumber(parsedShadowGenerator, "depthScale", 30.f);
   }
 
   if (parsedShadowGenerator.contains("blurScale")) {
-    shadowGenerator->setBlurScale(
-      Json::GetNumber(parsedShadowGenerator, "blurScale", 2.f));
+    shadowGenerator->blurScale
+      = Json::GetNumber(parsedShadowGenerator, "blurScale", 2.f);
   }
 
   if (parsedShadowGenerator.contains("blurBoxOffset")) {
-    shadowGenerator->setBlurBoxOffset(
-      Json::GetNumber(parsedShadowGenerator, "blurBoxOffset", 0));
+    shadowGenerator->blurBoxOffset
+      = Json::GetNumber(parsedShadowGenerator, "blurBoxOffset", 0);
   }
 
   if (parsedShadowGenerator.contains("useKernelBlur")) {
-    shadowGenerator->setUseKernelBlur(
-      Json::GetBool(parsedShadowGenerator, "useKernelBlur"));
+    shadowGenerator->useKernelBlur
+      = Json::GetBool(parsedShadowGenerator, "useKernelBlur");
   }
 
   if (parsedShadowGenerator.contains("blurKernel")) {
-    shadowGenerator->setBlurKernel(
-      Json::GetNumber(parsedShadowGenerator, "blurKernel", 1.f));
+    shadowGenerator->blurKernel
+      = Json::GetNumber(parsedShadowGenerator, "blurKernel", 1.f);
   }
 
   if (parsedShadowGenerator.contains("bias")) {
-    shadowGenerator->setBias(
-      Json::GetNumber(parsedShadowGenerator, "bias", 0.00005f));
+    shadowGenerator->bias
+      = Json::GetNumber(parsedShadowGenerator, "bias", 0.00005f);
   }
 
   if (parsedShadowGenerator.contains("normalBias")) {
-    shadowGenerator->setNormalBias(
-      Json::GetNumber(parsedShadowGenerator, "normalBias", 0.f));
+    shadowGenerator->normalBias
+      = Json::GetNumber(parsedShadowGenerator, "normalBias", 0.f);
+  }
+
+  if (parsedShadowGenerator.contains("frustumEdgeFalloff")) {
+    shadowGenerator->frustumEdgeFalloff
+      = Json::GetNumber(parsedShadowGenerator, "frustumEdgeFalloff", 0.f);
   }
 
   if (parsedShadowGenerator.contains("darkness")) {

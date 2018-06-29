@@ -498,7 +498,7 @@ void ParticleSystem::_update(int newParticles)
     }
     else {
       particleEmitterType->startDirectionFunction(
-        emitPower, worldMatrix, particle->direction, particle);
+        worldMatrix, particle->direction, particle);
     }
 
     particle->lifeTime = Scalar::RandomRange(minLifeTime, maxLifeTime);
