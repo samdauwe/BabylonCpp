@@ -20,8 +20,7 @@ BoxParticleEmitter::~BoxParticleEmitter()
 {
 }
 
-void BoxParticleEmitter::startDirectionFunction(float emitPower,
-                                                const Matrix& worldMatrix,
+void BoxParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                 Vector3& directionToUpdate,
                                                 Particle* /*particle*/)
 {
@@ -29,8 +28,7 @@ void BoxParticleEmitter::startDirectionFunction(float emitPower,
   const auto randY = Scalar::RandomRange(direction1.y, direction2.y);
   const auto randZ = Scalar::RandomRange(direction1.z, direction2.z);
 
-  Vector3::TransformNormalFromFloatsToRef(randX * emitPower, randY * emitPower,
-                                          randZ * emitPower, worldMatrix,
+  Vector3::TransformNormalFromFloatsToRef(randX, randY, randZ, worldMatrix,
                                           directionToUpdate);
 }
 
@@ -68,7 +66,7 @@ const char* BoxParticleEmitter::getEffectDefines() const
 
 const char* BoxParticleEmitter::getClassName() const
 {
-  return "BoxEmitter";
+  return "BoxParticleEmitter";
   ;
 }
 
@@ -80,20 +78,20 @@ Json::object BoxParticleEmitter::serialize() const
 void BoxParticleEmitter::parse(const Json::value& serializationObject)
 {
   if (serializationObject.contains("direction1")) {
-    direction1.copyFrom(Vector3::FromArray(
-      Json::ToArray<float>(serializationObject, "direction1")));
+    Vector3::FromArrayToRef(
+      Json::ToArray<float>(serializationObject, "direction1"), 0, direction1);
   }
   if (serializationObject.contains("direction2")) {
-    direction2.copyFrom(Vector3::FromArray(
-      Json::ToArray<float>(serializationObject, "direction2")));
+    Vector3::FromArrayToRef(
+      Json::ToArray<float>(serializationObject, "direction2"), 0, direction2);
   }
   if (serializationObject.contains("minEmitBox")) {
-    minEmitBox.copyFrom(Vector3::FromArray(
-      Json::ToArray<float>(serializationObject, "minEmitBox")));
+    Vector3::FromArrayToRef(
+      Json::ToArray<float>(serializationObject, "minEmitBox"), 0, minEmitBox);
   }
   if (serializationObject.contains("maxEmitBox")) {
-    maxEmitBox.copyFrom(Vector3::FromArray(
-      Json::ToArray<float>(serializationObject, "maxEmitBox")));
+    Vector3::FromArrayToRef(
+      Json::ToArray<float>(serializationObject, "maxEmitBox"), 0, maxEmitBox);
   }
 }
 

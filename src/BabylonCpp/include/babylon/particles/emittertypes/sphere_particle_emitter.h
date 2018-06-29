@@ -27,13 +27,11 @@ public:
   /**
    * @brief Called by the particle System when the direction is computed for the
    * created particle.
-   * @param emitPower is the power of the particle (speed)
    * @param worldMatrix is the world matrix of the particle system
    * @param directionToUpdate is the direction vector to update with the result
    * @param particle is the particle we are computed the direction for
    */
-  virtual void startDirectionFunction(float emitPower,
-                                      const Matrix& worldMatrix,
+  virtual void startDirectionFunction(const Matrix& worldMatrix,
                                       Vector3& directionToUpdate,
                                       Particle* particle) override;
 
@@ -86,11 +84,16 @@ public:
 
 public:
   /**
-   * The radius of the emission sphere.
+   * Gets or sets a value indicating where on the radius the start position
+   * should be picked (1 = everywhere, 0 = only surface)
+   */
+  float radiusRange;
+  /**
+   * The radius of the emission sphere
    */
   float radius;
   /**
-   * How much to randomize the particle direction [0-1].
+   * How much to randomize the particle direction [0-1]
    */
   float directionRandomizer;
 

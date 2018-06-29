@@ -11,7 +11,9 @@ namespace BABYLON {
 
 SphereParticleEmitter::SphereParticleEmitter(float iRadius,
                                              float iDirectionRandomizer)
-    : radius{iRadius}, directionRandomizer{iDirectionRandomizer}
+    : radiusRange{1.f}
+    , radius{iRadius}
+    , directionRandomizer{iDirectionRandomizer}
 {
 }
 
@@ -19,8 +21,7 @@ SphereParticleEmitter::~SphereParticleEmitter()
 {
 }
 
-void SphereParticleEmitter::startDirectionFunction(float emitPower,
-                                                   const Matrix& worldMatrix,
+void SphereParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                    Vector3& directionToUpdate,
                                                    Particle* particle)
 {
@@ -34,20 +35,22 @@ void SphereParticleEmitter::startDirectionFunction(float emitPower,
   direction.z += randZ;
   direction.normalize();
 
-  Vector3::TransformNormalFromFloatsToRef(
-    direction.x * emitPower, direction.y * emitPower, direction.z * emitPower,
-    worldMatrix, directionToUpdate);
+  Vector3::TransformNormalFromFloatsToRef(direction.x, direction.y, direction.z,
+                                          worldMatrix, directionToUpdate);
 }
 
 void SphereParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
                                                   Vector3& positionToUpdate,
                                                   Particle* /*particle*/)
 {
-  const auto phi   = Scalar::RandomRange(0.f, Math::PI2);
-  const auto theta = Scalar::RandomRange(0, Math::PI);
-  const auto randX = radius * ::std::cos(phi) * ::std::sin(theta);
-  const auto randY = radius * ::std::cos(theta);
-  const auto randZ = radius * ::std::sin(phi) * ::std::sin(theta);
+  const auto randRadius = radius - Scalar::RandomRange(0, radius * radiusRange);
+  const auto v          = Scalar::RandomRange(0.f, 1.f);
+  const auto phi        = Scalar::RandomRange(0.f, Math::PI2);
+  const auto theta      = ::std::acos(2.f * v - 1.f);
+
+  const auto randX = randRadius * ::std::cos(phi) * ::std::sin(theta);
+  const auto randY = randRadius * ::std::cos(theta);
+  const auto randZ = randRadius * ::std::sin(phi) * ::std::sin(theta);
   Vector3::TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix,
                                                positionToUpdate);
 }
@@ -63,6 +66,7 @@ unique_ptr_t<IParticleEmitterType> SphereParticleEmitter::clone() const
 void SphereParticleEmitter::applyToShader(Effect* effect)
 {
   effect->setFloat("radius", radius);
+  effect->setFloat("radiusRange", radiusRange);
   effect->setFloat("directionRandomizer", directionRandomizer);
 }
 
@@ -85,6 +89,10 @@ void SphereParticleEmitter::parse(const Json::value& serializationObject)
 {
   if (serializationObject.contains("radius")) {
     radius = Json::GetNumber<float>(serializationObject, "radius", 1.f);
+  }
+  if (serializationObject.contains("radiusRange")) {
+    radiusRange
+      = Json::GetNumber<float>(serializationObject, "radiusRange", 1.f);
   }
   if (serializationObject.contains("directionRandomizer")) {
     directionRandomizer

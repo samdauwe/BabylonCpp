@@ -15,14 +15,13 @@ struct BABYLON_SHARED_EXPORT IParticleEmitterType {
   /**
    * @brief Called by the particle System when the direction is computed for the
    * created particle.
-   * @param emitPower is the power of the particle (speed)
    * @param worldMatrix is the world matrix of the particle system
    * @param directionToUpdate is the direction vector to update with the result
    * @param particle is the particle we are computed the direction for
    */
-  virtual void
-  startDirectionFunction(float emitPower, const Matrix& worldMatrix,
-                         Vector3& directionToUpdate, Particle* particle)
+  virtual void startDirectionFunction(const Matrix& worldMatrix,
+                                      Vector3& directionToUpdate,
+                                      Particle* particle)
     = 0;
 
   /**

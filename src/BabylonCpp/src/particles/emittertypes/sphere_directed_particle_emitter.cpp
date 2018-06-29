@@ -19,14 +19,12 @@ SphereDirectedParticleEmitter::~SphereDirectedParticleEmitter()
 }
 
 void SphereDirectedParticleEmitter::startDirectionFunction(
-  float emitPower, const Matrix& worldMatrix, Vector3& directionToUpdate,
-  Particle* /*particle*/)
+  const Matrix& worldMatrix, Vector3& directionToUpdate, Particle* /*particle*/)
 {
   const auto randX = Scalar::RandomRange(direction1.x, direction2.x);
   const auto randY = Scalar::RandomRange(direction1.y, direction2.y);
   const auto randZ = Scalar::RandomRange(direction1.z, direction2.z);
-  Vector3::TransformNormalFromFloatsToRef(randX * emitPower, randY * emitPower,
-                                          randZ * emitPower, worldMatrix,
+  Vector3::TransformNormalFromFloatsToRef(randX, randY, randZ, worldMatrix,
                                           directionToUpdate);
 }
 
@@ -41,6 +39,7 @@ unique_ptr_t<IParticleEmitterType> SphereDirectedParticleEmitter::clone() const
 void SphereDirectedParticleEmitter::applyToShader(Effect* effect)
 {
   effect->setFloat("radius", radius);
+  effect->setFloat("radiusRange", radiusRange);
   effect->setVector3("direction1", direction1);
   effect->setVector3("direction2", direction2);
 }

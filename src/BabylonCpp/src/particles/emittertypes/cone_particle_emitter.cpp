@@ -13,9 +13,11 @@ ConeParticleEmitter::ConeParticleEmitter(float iRadius, float iAngle,
                                          float iDirectionRandomizer)
     : radius{this, &ConeParticleEmitter::get_radius,
              &ConeParticleEmitter::set_radius}
-    , angle{iAngle}
+    , angle{this, &ConeParticleEmitter::get_angle,
+            &ConeParticleEmitter::set_angle}
     , directionRandomizer{iDirectionRandomizer}
 {
+  angle  = iAngle;
   radius = iRadius;
 }
 
@@ -31,21 +33,36 @@ float ConeParticleEmitter::get_radius() const
 void ConeParticleEmitter::set_radius(float value)
 {
   _radius = value;
-  if (angle != 0.f) {
-    _height = value / ::std::tan(angle / 2.f);
+  _buildHeight();
+}
+
+float ConeParticleEmitter::get_angle() const
+{
+  return _angle;
+}
+
+void ConeParticleEmitter::set_angle(float value)
+{
+  _angle = value;
+  _buildHeight();
+}
+
+void ConeParticleEmitter::_buildHeight()
+{
+  if (_angle != 0.f) {
+    _height = _radius / ::std::tan(_angle / 2.f);
   }
   else {
     _height = 1.f;
   }
 }
 
-void ConeParticleEmitter::startDirectionFunction(float emitPower,
-                                                 const Matrix& worldMatrix,
+void ConeParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                  Vector3& directionToUpdate,
                                                  Particle* particle)
 {
-  if (angle == 0.f) {
-    Vector3::TransformNormalFromFloatsToRef(0, emitPower, 0, worldMatrix,
+  if (_angle == 0.f) {
+    Vector3::TransformNormalFromFloatsToRef(0, 1.0, 0, worldMatrix,
                                             directionToUpdate);
   }
   else {
@@ -61,8 +78,7 @@ void ConeParticleEmitter::startDirectionFunction(float emitPower,
     direction.normalize();
 
     Vector3::TransformNormalFromFloatsToRef(
-      direction.x * emitPower, direction.y * emitPower, direction.z * emitPower,
-      worldMatrix, directionToUpdate);
+      direction.x, direction.y, direction.z, worldMatrix, directionToUpdate);
   }
 }
 
@@ -87,7 +103,7 @@ void ConeParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
 
 unique_ptr_t<IParticleEmitterType> ConeParticleEmitter::clone() const
 {
-  auto newOne = ::std::make_unique<ConeParticleEmitter>(radius, angle,
+  auto newOne = ::std::make_unique<ConeParticleEmitter>(_radius, _angle,
                                                         directionRandomizer);
 
   return newOne;
@@ -95,8 +111,8 @@ unique_ptr_t<IParticleEmitterType> ConeParticleEmitter::clone() const
 
 void ConeParticleEmitter::applyToShader(Effect* effect)
 {
-  effect->setFloat("radius", radius);
-  effect->setFloat("coneAngle", angle);
+  effect->setFloat("radius", _radius);
+  effect->setFloat("coneAngle", _angle);
   effect->setFloat("height", _height);
   effect->setFloat("directionRandomizer", directionRandomizer);
 }
@@ -108,7 +124,7 @@ const char* ConeParticleEmitter::getEffectDefines() const
 
 const char* ConeParticleEmitter::getClassName() const
 {
-  return "ConeEmitter";
+  return "ConeParticleEmitter";
 }
 
 Json::object ConeParticleEmitter::serialize() const

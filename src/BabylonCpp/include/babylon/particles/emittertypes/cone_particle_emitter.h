@@ -19,7 +19,7 @@ public:
    * @param radius the radius of the emission cone (1 by default)
    * @param angles the cone base angle (PI by default)
    * @param directionRandomizer defines how much to randomize the particle
-   * direction [0-1]
+   * direction [0-1] (default is 0)
    */
   ConeParticleEmitter(float radius = 1.f, float angle = Math::PI,
                       float directionRandomizer = 0.f);
@@ -28,12 +28,11 @@ public:
   /**
    * @brief Called by the particle System when the direction is computed for the
    * created particle.
-   * @param emitPower is the power of the particle (speed)
    * @param worldMatrix is the world matrix of the particle system
    * @param directionToUpdate is the direction vector to update with the result
    * @param particle is the particle we are computed the direction for
    */
-  void startDirectionFunction(float emitPower, const Matrix& worldMatrix,
+  void startDirectionFunction(const Matrix& worldMatrix,
                               Vector3& directionToUpdate,
                               Particle* particle) override;
 
@@ -49,25 +48,26 @@ public:
                              Particle* particle) override;
 
   /**
-   * @brief Clones the current emitter and returns a copy of it
+   * @brief Clones the current emitter and returns a copy of it.
    * @returns the new emitter
    */
   unique_ptr_t<IParticleEmitterType> clone() const override;
 
   /**
-   * @brief Called by the {BABYLON.GPUParticleSystem} to setup the update shader
+   * @brief Called by the {BABYLON.GPUParticleSystem} to setup the update
+   * shader.
    * @param effect defines the update shader
    */
   void applyToShader(Effect* effect) override;
 
   /**
-   * @brief Returns a string to use to update the GPU particles update shader
+   * @brief Returns a string to use to update the GPU particles update shader.
    * @returns a string containng the defines string
    */
   const char* getEffectDefines() const override;
 
   /**
-   * @brief Returns the string "ConeEmitter"
+   * @brief Returns the string "ConeParticleEmitter".
    * @returns a string containing the class name
    */
   const char* getClassName() const override;
@@ -79,7 +79,7 @@ public:
   Json::object serialize() const override;
 
   /**
-   * @brief Parse properties from a JSON object
+   * @brief Parse properties from a JSON object.
    * @param serializationObject defines the JSON object
    */
   void parse(const Json::value& serializationObject) override;
@@ -95,6 +95,19 @@ protected:
    */
   void set_radius(float value);
 
+  /**
+   * @brief Gets the angle of the emission cone.
+   */
+  float get_angle() const;
+
+  /**
+   * @brief Sets the angle of the emission cone.
+   */
+  void set_angle(float value);
+
+private:
+  void _buildHeight();
+
 public:
   /**
    * The radius of the emission cone
@@ -102,9 +115,9 @@ public:
   Property<ConeParticleEmitter, float> radius;
 
   /**
-   * The qngle of the emission cone
+   * The angle of the emission cone
    */
-  float angle;
+  Property<ConeParticleEmitter, float> angle;
   /**
    * The cone base angle
    */
@@ -112,6 +125,7 @@ public:
 
 private:
   float _radius;
+  float _angle;
   float _height;
 
 }; // end of class ConeParticleEmitter

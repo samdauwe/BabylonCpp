@@ -23,12 +23,11 @@ public:
   /**
    * @brief Called by the particle System when the direction is computed for the
    * created particle.
-   * @param emitPower is the power of the particle (speed)
    * @param worldMatrix is the world matrix of the particle system
    * @param directionToUpdate is the direction vector to update with the result
    * @param particle is the particle we are computed the direction for
    */
-  void startDirectionFunction(float emitPower, const Matrix& worldMatrix,
+  void startDirectionFunction(const Matrix& worldMatrix,
                               Vector3& directionToUpdate,
                               Particle* particle) override;
 
@@ -62,7 +61,7 @@ public:
   const char* getEffectDefines() const override;
 
   /**
-   * @brief Returns the string "BoxEmitter"
+   * @brief Returns the string "BoxParticleEmitter"
    * @returns a string containing the class name
    */
   const char* getClassName() const override;
