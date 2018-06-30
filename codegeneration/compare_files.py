@@ -83,7 +83,7 @@ def main():
                  "babylon.webVRCamera.ts", "babylon.analyser.ts",
                  "babylon.stereoscopicCameras.ts", "babylon.sceneSerializer.ts",
                  "babylon.videoTexture.ts", "babylon.database.ts",
-                 "babylon.promise.ts"]
+                 "babylon.promise.ts", "babylon.videoDome.ts"]
     # Create mapping from BabylonJs version to full path
     for version in BabylonJsVersions:
         fullPath = os.path.join(os.path.expanduser('~'), "Projects",
