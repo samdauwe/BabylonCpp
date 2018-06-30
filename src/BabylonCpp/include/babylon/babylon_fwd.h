@@ -199,8 +199,14 @@ class WebVRController;
 class WindowsMotionController;
 // --- Gizmos ---
 class AxisDragGizmo;
+class AxisScaleGizmo;
+class BoundingBoxGizmo;
 class Gizmo;
+class GizmoManager;
+class PlaneRotationGizmo;
 class PositionGizmo;
+class RotationGizmo;
+class ScaleGizmo;
 // --- Helpers ---
 class EnvironmentHelper;
 struct IEnvironmentHelperOptions;
