@@ -494,7 +494,14 @@ public:
                                           const Vector2& segB);
 
 public:
+  /**
+   * Defines the first coordinate
+   */
   float x;
+
+  /**
+   * Defines the second coordinate
+   */
   float y;
 
 }; // end of class Vector2

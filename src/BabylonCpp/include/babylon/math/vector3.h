@@ -475,6 +475,12 @@ public:
   static Vector3 Up();
 
   /**
+   * @brief Returns a new Vector3 set to (0.0, -1.0, 0.0).
+   * @returns a new down Vector3
+   */
+  static Vector3 Down();
+
+  /**
    * @brief Returns a new Vector3 set to (0.0, 0.0, 1.0).
    * @returns a new forward Vector3
    */

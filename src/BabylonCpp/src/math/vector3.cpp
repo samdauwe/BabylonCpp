@@ -583,6 +583,11 @@ Vector3 Vector3::Up()
   return Vector3(0.f, 1.f, 0.f);
 }
 
+Vector3 Vector3::Down()
+{
+  return Vector3(0.f, -1.f, 0.f);
+}
+
 Vector3 Vector3::Forward()
 {
   return Vector3(0.f, 0.f, 1.f);

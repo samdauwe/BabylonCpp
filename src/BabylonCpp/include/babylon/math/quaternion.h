@@ -447,9 +447,24 @@ public:
                             const Quaternion& tangent2, float amount);
 
 public:
+  /**
+   * Defines the first component (0 by default)
+   */
   float x;
+
+  /**
+   * Defines the second component (0 by default)
+   */
   float y;
+
+  /**
+   * Defines the third component (0 by default)
+   */
   float z;
+
+  /**
+   * Defines the fourth component (1.0 by default)
+   */
   float w;
 
 }; // end of class Quaternion
