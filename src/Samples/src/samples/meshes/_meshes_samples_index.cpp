@@ -1,5 +1,6 @@
 #include <babylon/samples/meshes/_meshes_samples_index.h>
 
+#include <babylon/samples/meshes/airplane_model_scene.h>
 #include <babylon/samples/meshes/basic_elements_scene.h>
 #include <babylon/samples/meshes/basic_scene.h>
 #include <babylon/samples/meshes/circle_curves_from_beziers.h>
@@ -36,6 +37,12 @@ _MeshesSamplesIndex::_MeshesSamplesIndex()
 {
   // -- Mesh examples --
 
+  // Airplane Model Scene
+  _samples["AirplaneModelScene"] = ::std::make_tuple(
+    true,                                                     //
+    [](ICanvas* iCanvas) {                                    //
+      return ::std::make_unique<AirplaneModelScene>(iCanvas); //
+    });                                                       //
   // Basic Elements Scene
   _samples["BasicElementsScene"] = ::std::make_tuple(
     true,                                                     //
