@@ -1355,7 +1355,8 @@ public:
    * @param {boolean} subdivideWithSubMeshes - When true (false default),
    * subdivide mesh to his subMesh array with meshes source.
    */
-  static Mesh* MergeMeshes(vector_t<Mesh*>& meshes, bool disposeSource = true,
+  static Mesh* MergeMeshes(const vector_t<Mesh*>& meshes,
+                           bool disposeSource          = true,
                            bool allow32BitsIndices     = true,
                            Mesh* meshSubclass          = nullptr,
                            bool subdivideWithSubMeshes = false);

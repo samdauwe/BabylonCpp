@@ -98,6 +98,10 @@ Float32Array Vector3::asArray() const
 
 const Vector3& Vector3::toArray(Float32Array& array, unsigned int index) const
 {
+  if (array.size() < index + 3) {
+    array.resize(index + 3);
+  }
+
   array[index]     = x;
   array[index + 1] = y;
   array[index + 2] = z;

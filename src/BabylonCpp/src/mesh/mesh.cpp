@@ -2858,7 +2858,7 @@ Vector3 Mesh::Center(const vector_t<AbstractMesh*>& meshes)
   return Vector3::Center(minMaxVector.min, minMaxVector.max);
 }
 
-Mesh* Mesh::MergeMeshes(vector_t<Mesh*>& meshes, bool disposeSource,
+Mesh* Mesh::MergeMeshes(const vector_t<Mesh*>& meshes, bool disposeSource,
                         bool allow32BitsIndices, Mesh* meshSubclass,
                         bool subdivideWithSubMeshes)
 {
