@@ -1,8 +1,10 @@
 #include <babylon/gamepad/controllers/windows_motion_controller.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/core/logging.h>
 #include <babylon/culling/ray.h>
 #include <babylon/mesh/abstract_mesh.h>
+#include <babylon/mesh/mesh.h>
 
 namespace BABYLON {
 
@@ -100,12 +102,31 @@ WindowsMotionController::get_onTouchpadValuesChangedObservable()
   return onTrackpadValuesChangedObservable;
 }
 
+void WindowsMotionController::_updateTrackpad()
+{
+  if (_browserGamepad->axes.size() >= 4) {
+    if (!stl_util::almost_equal(_browserGamepad->axes[2], trackpad.x)
+        || !stl_util::almost_equal(_browserGamepad->axes[3], trackpad.y)) {
+      trackpad.x = _browserGamepad->axes[2];
+      trackpad.y = _browserGamepad->axes[3];
+      onTrackpadValuesChangedObservable.notifyObservers(&trackpad);
+    }
+  }
+}
+
 void WindowsMotionController::update()
 {
   WebVRController::update();
-
-  // Only need to animate axes if there is a loaded mesh
-  if (_loadedMeshInfo) {
+  if (!_browserGamepad->axes.empty()) {
+    _updateTrackpad();
+    // Only need to animate axes if there is a loaded mesh
+    if (_loadedMeshInfo) {
+      for (unsigned int axis = 0; axis < _mappingAxisMeshNames.size(); ++axis) {
+        if (axis < _browserGamepad->axes.size()) {
+          _lerpAxisTransform(axis, _browserGamepad->axes[axis]);
+        }
+      }
+    }
   }
 }
 
@@ -121,6 +142,10 @@ void WindowsMotionController::_handleButtonChange(
   if (buttonName.empty()) {
     return;
   }
+
+  // Update the trackpad to ensure trackpad.x/y are accurate during button
+  // events between frames
+  _updateTrackpad();
 
   auto _state = state;
 
@@ -213,10 +238,40 @@ void WindowsMotionController::initControllerMesh(
 }
 
 LoadedMeshInfo
-WindowsMotionController::processModel(Scene* /*scene*/,
-                                      const vector_t<AbstractMesh*>& /*meshes*/)
+WindowsMotionController::processModel(Scene* scene,
+                                      const vector_t<AbstractMesh*>& meshes)
 {
-  return LoadedMeshInfo();
+  LoadedMeshInfo loadedMeshInfo;
+
+  // Create a new mesh to contain the glTF hierarchy
+  auto parentMesh = Mesh::New(id + " " + hand, scene);
+
+  // Find the root node in the loaded glTF scene, and attach it as a child of
+  // 'parentMesh'
+  AbstractMesh* childMesh = nullptr;
+  for (auto& mesh : meshes) {
+    if (!mesh->parent()) {
+      // Exclude controller meshes from picking results
+      mesh->isPickable = false;
+
+      // Handle root node, attach to the new parentMesh
+      childMesh = mesh;
+      break;
+    }
+  }
+
+  if (childMesh) {
+    childMesh->setParent(parentMesh);
+
+    // Create our mesh info. Note that this method will always return non-null.
+    loadedMeshInfo = createMeshInfo(parentMesh);
+  }
+  else {
+    BABYLON_LOG_WARN("WindowsMotionController",
+                     "Could not find root node in model file.");
+  }
+
+  return loadedMeshInfo;
 }
 
 LoadedMeshInfo

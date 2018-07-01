@@ -15,11 +15,11 @@ struct BABYLON_SHARED_EXPORT IMeshInfo {
   /**
    * Index of the mesh inside the root mesh
    */
-  unsigned int index;
+  unsigned int index = 0;
   /**
    * The mesh
    */
-  AbstractMesh* value;
+  AbstractMesh* value = nullptr;
 }; // end of struct IMeshInfo
 
 /**
@@ -29,11 +29,11 @@ struct BABYLON_SHARED_EXPORT IButtonMeshInfo : public IMeshInfo {
   /**
    * The mesh that should be displayed when pressed
    */
-  AbstractMesh* pressed;
+  AbstractMesh* pressed = nullptr;
   /**
    * The mesh that should be displayed when not pressed
    */
-  AbstractMesh* unpressed;
+  AbstractMesh* unpressed = nullptr;
 }; // end of struct IButtonMeshInfo
 
 /**
@@ -43,11 +43,11 @@ struct BABYLON_SHARED_EXPORT IAxisMeshInfo : public IMeshInfo {
   /**
    * The mesh that should be set when at its min
    */
-  AbstractMesh* min;
+  AbstractMesh* min = nullptr;
   /**
    * The mesh that should be set when at its max
    */
-  AbstractMesh* max;
+  AbstractMesh* max = nullptr;
 }; // end of struct IAxisMeshInfo
 
 /**
@@ -58,12 +58,12 @@ struct BABYLON_SHARED_EXPORT LoadedMeshInfo {
   /**
    * Root of the mesh
    */
-  AbstractMesh* rootNode;
+  AbstractMesh* rootNode = nullptr;
   /**
    * Node of the mesh corrisponding to the direction the ray should be cast from
    * the controller
    */
-  AbstractMesh* pointingPoseNode;
+  AbstractMesh* pointingPoseNode = nullptr;
   /**
    * Map of the button meshes contained in the controller
    */
@@ -239,6 +239,8 @@ protected:
   Observable<StickValues>& get_onTouchpadValuesChangedObservable();
 
 private:
+  void _updateTrackpad();
+
   /**
    * @brief Takes a list of meshes (as loaded from the glTF file) and finds the
    * root node, as well as nodes that can be transformed by button presses and

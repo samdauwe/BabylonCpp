@@ -34,6 +34,11 @@ PoseEnabledController::~PoseEnabledController()
 void PoseEnabledController::update()
 {
   Gamepad::update();
+  _updatePoseAndMesh();
+}
+
+void PoseEnabledController::_updatePoseAndMesh()
+{
   const auto& pose = _browserGamepad->pose;
   if (pose) {
     updateFromDevice(*pose);
@@ -100,6 +105,23 @@ void PoseEnabledController::attachToMesh(AbstractMesh* mesh)
   if (!_mesh->rotationQuaternion()) {
     _mesh->setRotationQuaternion(Quaternion());
   }
+
+  // Sync controller mesh and pointing pose node's state with controller, this
+  // is done to avoid a frame where position is 0,0,0 when attaching mesh
+  _updatePoseAndMesh();
+  if (_pointingPoseNode) {
+    vector_t<Node*> parents;
+    auto obj = static_cast<Node*>(_pointingPoseNode);
+    while (obj && obj->parent()) {
+      parents.emplace_back(obj->parent());
+      obj = obj->parent();
+    }
+    ::std::reverse(parents.begin(), parents.end());
+    for (auto& p : parents) {
+      p->computeWorldMatrix(true);
+    }
+  }
+
   _meshAttachedObservable.notifyObservers(mesh);
 }
 
@@ -107,7 +129,7 @@ void PoseEnabledController::attachToPoseControlledCamera(TargetCamera* camera)
 {
   _poseControlledCamera = camera;
   if (_mesh) {
-    // _mesh->setParent(_poseControlledCamera);
+    //  _mesh->parent = _poseControlledCamera;
   }
 }
 

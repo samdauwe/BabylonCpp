@@ -91,6 +91,13 @@ public:
 
 protected:
   /**
+   * @brief Updates only the pose device and mesh without doing any button event
+   * checking.
+   */
+  void _updatePoseAndMesh();
+
+protected:
+  /**
    * @brief The mesh that is attached to the controller.
    */
   AbstractMesh*& get_mesh();
