@@ -27,17 +27,45 @@ public:
   void dispose(bool doNotRecurse               = false,
                bool disposeMaterialAndTextures = false) override;
 
+protected:
+  /**
+   * @brief Gets the mesh that the gizmo will be attached to. (eg. on a drag
+   * gizmo the mesh that will be dragged).
+   */
+  AbstractMesh*& get_attachedMesh();
+
+  /**
+   * @brief Sets the mesh that the gizmo will be attached to. (eg. on a drag
+   * gizmo the mesh that will be dragged).
+   */
+  virtual void set_attachedMesh(AbstractMesh* const& value);
+
+  virtual void _attachedMeshChanged(AbstractMesh* value);
+
 public:
   /**
    * Mesh that the gizmo will be attached to. (eg. on a drag gizmo the mesh that
    * will be dragged)
+   * * When set, interactions will be enabled
    */
-  Mesh* attachedMesh;
+  Property<Gizmo, AbstractMesh*> attachedMesh;
 
   /**
    * The utility layer the gizmo will be added to
    */
   UtilityLayerRenderer* gizmoLayer;
+
+  /**
+   * If set the gizmo's rotation will be updated to match the attached mesh each
+   * frame (Default: true)
+   */
+  bool updateGizmoRotationToMatchAttachedMesh;
+
+  /**
+   * If set the gizmo's position will be updated to match the attached mesh each
+   * frame (Default: true)
+   */
+  bool updateGizmoPositionToMatchAttachedMesh;
 
 protected:
   /**
@@ -45,7 +73,15 @@ protected:
    */
   Mesh* _rootMesh;
 
+  /**
+   * When set, the gizmo will always appear the same size no matter where the
+   * camera is (default: false)
+   */
+  bool _updateScale;
+  bool _interactionsEnabled;
+
 private:
+  AbstractMesh* _attachedMesh;
   Observer<Scene>::Ptr _beforeRenderObserver;
 
 }; // end of class Gizmo

@@ -478,6 +478,10 @@ struct SubdivisionsPerAxis {
   unsigned int Z;
 }; // end of struct SubdivisionsPerAxis
 
+struct SnapEvent {
+  float snapDistance;
+}; // end of struct SnapEvent
+
 struct TriggerOptions {
   string_t parameter;
   unsigned int trigger;

@@ -7,33 +7,68 @@
 
 namespace BABYLON {
 
-Gizmo::Gizmo(UtilityLayerRenderer* iGizmoLayer) : gizmoLayer{iGizmoLayer}
+Gizmo::Gizmo(UtilityLayerRenderer* iGizmoLayer)
+    : attachedMesh{this, &Gizmo::get_attachedMesh, &Gizmo::set_attachedMesh}
+    , gizmoLayer{iGizmoLayer}
+    , updateGizmoRotationToMatchAttachedMesh{true}
+    , updateGizmoPositionToMatchAttachedMesh{true}
+    , _updateScale{true}
+    , _interactionsEnabled{true}
 {
   _rootMesh = Mesh::New("gizmoRootNode", gizmoLayer->utilityLayerScene.get());
   _beforeRenderObserver
     = gizmoLayer->utilityLayerScene->onBeforeRenderObservable.add(
       [&](Scene* /*scene*/, EventState& /*es*/) {
-        if (gizmoLayer->utilityLayerScene->activeCamera && attachedMesh) {
+        if (_updateScale && gizmoLayer->utilityLayerScene->activeCamera
+            && attachedMesh) {
           auto dist
-            = attachedMesh->position()
+            = attachedMesh()
+                ->position()
                 .subtract(gizmoLayer->utilityLayerScene->activeCamera->position)
                 .length()
-              / 5.f;
+              / 3.f;
           _rootMesh->scaling().set(dist, dist, dist);
         }
         if (attachedMesh) {
-          _rootMesh->position().copyFrom(attachedMesh->position());
+          if (updateGizmoRotationToMatchAttachedMesh) {
+            if (!_rootMesh->rotationQuaternion()) {
+              _rootMesh->setRotationQuaternion(Quaternion());
+            }
+            Quaternion::FromRotationMatrixToRef(
+              attachedMesh()->getWorldMatrix()->getRotationMatrix(),
+              *_rootMesh->rotationQuaternion());
+          }
+          if (updateGizmoPositionToMatchAttachedMesh) {
+            _rootMesh->position().copyFrom(attachedMesh()->absolutePosition());
+          }
         }
       });
+  attachedMesh = nullptr;
 }
 
 Gizmo::~Gizmo()
 {
 }
 
-void Gizmo::dispose(bool /*doNotRecurse*/, bool /*disposeMaterialAndTextures*/)
+AbstractMesh*& Gizmo::get_attachedMesh()
 {
-  _rootMesh->dispose();
+  return _attachedMesh;
+}
+
+void Gizmo::set_attachedMesh(AbstractMesh* const& value)
+{
+  _attachedMesh = value;
+  _rootMesh->setEnabled(value ? true : false);
+  _attachedMeshChanged(value);
+}
+
+void Gizmo::_attachedMeshChanged(AbstractMesh* /*value*/)
+{
+}
+
+void Gizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
+{
+  _rootMesh->dispose(doNotRecurse, disposeMaterialAndTextures);
   if (_beforeRenderObserver) {
     gizmoLayer->utilityLayerScene->onBeforeRenderObservable.remove(
       _beforeRenderObserver);

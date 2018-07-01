@@ -1,5 +1,5 @@
-#ifndef BABYLON_GIZMOS_AXIS_DRAG_GIZMO_H
-#define BABYLON_GIZMOS_AXIS_DRAG_GIZMO_H
+#ifndef BABYLON_GIZMOS_PLANE_ROTATION_GIZMO_H
+#define BABYLON_GIZMOS_PLANE_ROTATION_GIZMO_H
 
 #include <babylon/babylon_global.h>
 #include <babylon/core/structs.h>
@@ -9,20 +9,21 @@
 namespace BABYLON {
 
 /**
- * @brief Single axis drag gizmo.
+ * @brief Single axis scale gizmo.
  */
-class BABYLON_SHARED_EXPORT AxisDragGizmo : public Gizmo {
+class BABYLON_SHARED_EXPORT PlaneRotationGizmo : public Gizmo {
 
 public:
   /**
-   * @brief Creates an AxisDragGizmo.
+   * @brief Creates a PlaneRotationGizmo.
    * @param gizmoLayer The utility layer the gizmo will be added to
-   * @param dragAxis The axis which the gizmo will be able to drag on
+   * @param planeNormal The normal of the plane which the gizmo will be able to
+   * rotate on
    * @param color The color of the gizmo
    */
-  AxisDragGizmo(UtilityLayerRenderer* gizmoLayer, const Vector3& dragAxis,
-                const Color3& color);
-  ~AxisDragGizmo() override;
+  PlaneRotationGizmo(UtilityLayerRenderer* gizmoLayer,
+                     const Vector3& planeNormal, const Color3& color);
+  ~PlaneRotationGizmo() override;
 
   /**
    * @brief Disposes of the gizmo.
@@ -35,8 +36,7 @@ protected:
 
 public:
   /**
-   * Drag distance in babylon units that the gizmo will snap to when dragged
-   * (Default: 0)
+   * Rotation distance in radians that the gizmo will snap to (Default: 0)
    */
   float snapDistance;
 
@@ -50,12 +50,14 @@ private:
   unique_ptr_t<PointerDragBehavior> _dragBehavior;
   Observer<PointerInfo>::Ptr _pointerObserver;
 
-  float _currentSnapDragDistance;
-  Vector3 _tmpVector;
+  Nullable<Vector3> _lastDragPosition;
+  Matrix _rotationMatrix;
+  Vector3 _planeNormalTowardsCamera;
+  Vector3 _localPlaneNormalTowardsCamera;
   SnapEvent _tmpSnapEvent;
 
-}; // end of class PositionGizmo
+}; // end of class PlaneRotationGizmo
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_GIZMOS_AXIS_DRAG_GIZMO_H
+#endif // end of BABYLON_GIZMOS_PLANE_ROTATION_GIZMO_H

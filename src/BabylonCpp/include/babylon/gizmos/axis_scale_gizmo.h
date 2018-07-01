@@ -1,5 +1,5 @@
-#ifndef BABYLON_GIZMOS_AXIS_DRAG_GIZMO_H
-#define BABYLON_GIZMOS_AXIS_DRAG_GIZMO_H
+#ifndef BABYLON_GIZMOS_AXIS_SCALE_GIZMO_H
+#define BABYLON_GIZMOS_AXIS_SCALE_GIZMO_H
 
 #include <babylon/babylon_global.h>
 #include <babylon/core/structs.h>
@@ -9,20 +9,20 @@
 namespace BABYLON {
 
 /**
- * @brief Single axis drag gizmo.
+ * @brief Single axis scale gizmo.
  */
-class BABYLON_SHARED_EXPORT AxisDragGizmo : public Gizmo {
+class BABYLON_SHARED_EXPORT AxisScaleGizmo : public Gizmo {
 
 public:
   /**
-   * @brief Creates an AxisDragGizmo.
+   * @brief Creates an AxisScaleGizmo.
    * @param gizmoLayer The utility layer the gizmo will be added to
    * @param dragAxis The axis which the gizmo will be able to drag on
    * @param color The color of the gizmo
    */
-  AxisDragGizmo(UtilityLayerRenderer* gizmoLayer, const Vector3& dragAxis,
-                const Color3& color);
-  ~AxisDragGizmo() override;
+  AxisScaleGizmo(UtilityLayerRenderer* gizmoLayer, const Vector3& dragAxis,
+                 const Color3& color);
+  ~AxisScaleGizmo() override;
 
   /**
    * @brief Disposes of the gizmo.
@@ -35,7 +35,7 @@ protected:
 
 public:
   /**
-   * Drag distance in babylon units that the gizmo will snap to when dragged
+   * Scale distance in babylon units that the gizmo will snap to when dragged
    * (Default: 0)
    */
   float snapDistance;
@@ -54,8 +54,8 @@ private:
   Vector3 _tmpVector;
   SnapEvent _tmpSnapEvent;
 
-}; // end of class PositionGizmo
+}; // end of class AxisScaleGizmo
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_GIZMOS_AXIS_DRAG_GIZMO_H
+#endif // end of BABYLON_GIZMOS_AXIS_SCALE_GIZMO_H

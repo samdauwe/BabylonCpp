@@ -1618,7 +1618,8 @@ public:
    * @returns a PickingInfo
    */
   Nullable<PickingInfo>
-  pick(int x, int y, const ::std::function<bool(AbstractMesh* mesh)>& predicate,
+  pick(int x, int y,
+       const ::std::function<bool(AbstractMesh* mesh)>& predicate = nullptr,
        bool fastCheck = false, Camera* camera = nullptr);
 
   /**
