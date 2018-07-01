@@ -31,7 +31,7 @@ RayHelper::~RayHelper()
 {
 }
 
-void RayHelper::show(Scene* scene, const Color3& color)
+void RayHelper::show(Scene* scene, const Nullable<Color3>& color)
 {
   if (!_renderFunction && ray) {
     _renderFunction = [this](Scene*, EventState&) { _render(); };
@@ -45,8 +45,8 @@ void RayHelper::show(Scene* scene, const Color3& color)
     }
   }
 
-  if (_renderLine) {
-    _renderLine->color.copyFrom(color);
+  if (color && _renderLine) {
+    _renderLine->color.copyFrom(*color);
   }
 }
 
@@ -70,8 +70,8 @@ void RayHelper::_render()
     return;
   }
 
-  auto& point = _renderPoints[1];
-  float len   = ::std::min(ray->length, 1000000.f);
+  auto& point    = _renderPoints[1];
+  const auto len = ::std::min(ray->length, 1000000.f);
 
   point.copyFrom(ray->direction);
   point.scaleInPlace(len);
