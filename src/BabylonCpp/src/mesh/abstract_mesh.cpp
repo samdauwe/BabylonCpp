@@ -1569,9 +1569,11 @@ vector_t<Vector3>& AbstractMesh::getFacetLocalPositions()
 
 vector_t<Uint32Array>& AbstractMesh::getFacetLocalPartitioning()
 {
+#if 0
   if (_facetPartitioning.empty()) {
     updateFacetData();
   }
+#endif
   return _facetPartitioning;
 }
 

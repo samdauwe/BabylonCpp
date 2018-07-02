@@ -186,9 +186,7 @@ void AirplaneModelScene::initializeScene(ICanvas* canvas, Scene* scene)
 void AirplaneModelScene::_reBake(Mesh* mesh)
 {
   mesh->bakeCurrentTransformIntoVertices();
-#if 0
   mesh->updateFacetData();
-#endif
   auto myVertexData = VertexData::ExtractFromMesh(mesh, true);
   myVertexData->transform(*mesh->getWorldMatrix());
   myVertexData->applyToMesh(mesh);
