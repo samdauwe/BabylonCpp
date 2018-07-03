@@ -987,7 +987,7 @@ unique_ptr_t<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
   unsigned int surfaceNb = 2 + (1 + quadNb) * ringNb;
   unsigned int f;
   for (f = 0; f < surfaceNb; ++f) {
-    if (f >= faceColors.size()) {
+    if (!faceColors.empty() && f >= faceColors.size()) {
       faceColors.emplace_back(Color4(1.f, 1.f, 1.f, 1.f));
     }
   }
@@ -1072,11 +1072,11 @@ unique_ptr_t<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
         else {
           v = faceUV[s].y + (faceUV[s].w - faceUV[s].y) * h;
         }
-        stl_util::concat(uvs, {faceUV[s].x
-                                 + (faceUV[s].z - faceUV[s].x)
-                                     * static_cast<float>(j)
-                                     / static_cast<float>(tessellation),
-                               v});
+        stl_util::concat(
+          uvs, {faceUV[s].x
+                  + (faceUV[s].z - faceUV[s].x) * static_cast<float>(j)
+                      / static_cast<float>(tessellation),
+                v});
         if (!faceColors.empty()) {
           stl_util::concat(colors, {faceColors[s].r, faceColors[s].g,
                                     faceColors[s].b, faceColors[s].a});

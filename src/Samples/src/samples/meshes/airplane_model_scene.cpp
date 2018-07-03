@@ -172,7 +172,6 @@ void AirplaneModelScene::initializeScene(ICanvas* canvas, Scene* scene)
   am1->alpha           = 1.f;
   am1->backFaceCulling = false;
 
-#if 0
   auto airplane = Mesh::MergeMeshes(
     {nose, nosecone, flightdeck, flightdecktaper, fuselage, taper, leftwing,
      rightwing, vstabilizer, lefthstabilizer, righthstabilizer},
@@ -180,7 +179,6 @@ void AirplaneModelScene::initializeScene(ICanvas* canvas, Scene* scene)
   airplane->rotation().y = Math::PI_2;
   _reBake(airplane);
   airplane->material = am1;
-#endif
 }
 
 void AirplaneModelScene::_reBake(Mesh* mesh)
@@ -288,18 +286,6 @@ AirplaneModelScene::MakeWingFunction AirplaneModelScene::_makeFormAppendage(
           0, 0, 1, // 7
         };
 
-        // colors per vertex
-        Float32Array colors{
-          1, 1, 0, 1, // 0
-          1, 1, 0, 1, // 1
-          1, 0, 0, 1, // 2
-          1, 0, 0, 1, // 3
-          0, 0, 1, 1, // 4
-          0, 0, 1, 1, // 5
-          0, 1, 0, 1, // 6
-          0, 1, 0, 1, // 7
-        };
-
         // texture skinning directions, maybe.
         Float32Array uvs{
           1.f, 0.f, // 0
@@ -320,9 +306,6 @@ AirplaneModelScene::MakeWingFunction AirplaneModelScene::_makeFormAppendage(
         vertexData->indices   = indices;
         vertexData->normals   = normals;
         vertexData->uvs       = uvs;
-
-        // turn on this line for per-vertex colors
-        // vertexData.colors = colors;
 
         // Use the vertexData object.. to shape-ify blankmesh
         vertexData->applyToMesh(mesh, true);

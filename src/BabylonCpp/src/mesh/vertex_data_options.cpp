@@ -71,7 +71,6 @@ CylinderOptions::CylinderOptions()
     , hasRings{false}
     , enclose{false}
     , faceUV{DefaultCylinderFaceUV}
-    , faceColors{DefaultCylinderFaceColors}
     , sideOrientation{Mesh::DEFAULTSIDE()}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
@@ -89,7 +88,6 @@ CylinderOptions::CylinderOptions(float diameter)
     , hasRings{false}
     , enclose{false}
     , faceUV{DefaultCylinderFaceUV}
-    , faceColors{DefaultCylinderFaceColors}
     , sideOrientation{Mesh::DEFAULTSIDE()}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
