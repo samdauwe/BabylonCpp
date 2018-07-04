@@ -296,7 +296,7 @@ ISceneSize EnvironmentHelper::_getSceneSize()
 
 void EnvironmentHelper::_setupGround(const ISceneSize& sceneSize)
 {
-  if (!_ground) {
+  if (!_ground || _ground->isDisposed()) {
     _ground
       = Mesh::CreatePlane("BackgroundPlane", sceneSize.groundSize, _scene);
     _ground->rotation().x = Math::PI_2; // Face up by default.
@@ -397,7 +397,7 @@ void EnvironmentHelper::_setupMirrorInGroundMaterial()
 
 void EnvironmentHelper::_setupSkybox(const ISceneSize& sceneSize)
 {
-  if (!_skybox) {
+  if (!_skybox || _skybox->isDisposed()) {
     _skybox = Mesh::CreateBox("BackgroundSkybox", sceneSize.skyboxSize, _scene,
                               false, Mesh::BACKSIDE());
     _skybox->onDisposeObservable.add(

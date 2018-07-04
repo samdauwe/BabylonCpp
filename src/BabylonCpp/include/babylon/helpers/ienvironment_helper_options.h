@@ -109,7 +109,7 @@ struct BABYLON_SHARED_EXPORT IEnvironmentHelperOptions {
 
   /**
    * Specifies a bias applied to the ground vertical position to prevent
-   * z-fighyting with the shown objects.
+   * z-fighting with the shown objects.
    */
   float groundYBias;
 

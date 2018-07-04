@@ -42,6 +42,9 @@ public:
    * @param targetTexture The target texture to render to.
    * @param forceFullscreenViewport force gl.viewport to be full screen eg.
    * 0,0,textureWidth,textureHeight
+   * @param faceIndex defines the face to render to if a cubemap is defined as
+   * the target
+   * @param lodLevel defines which lod of the texture to render to
    */
   void directRender(const vector_t<PostProcess*>& postProcesses,
                     InternalTexture* targetTexture = nullptr,

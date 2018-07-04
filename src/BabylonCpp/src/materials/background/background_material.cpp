@@ -144,12 +144,14 @@ void BackgroundMaterial::_attachImageProcessingConfiguration(
   }
 
   // Attaches observer.
-  _imageProcessingObserver
-    = _imageProcessingConfiguration->onUpdateParameters.add(
-      [this](ImageProcessingConfiguration* /*conf*/, EventState /*es*/) {
-        _computePrimaryColorFromPerceptualColor();
-        _markAllSubMeshesAsImageProcessingDirty();
-      });
+  if (_imageProcessingConfiguration) {
+    _imageProcessingObserver
+      = _imageProcessingConfiguration->onUpdateParameters.add(
+        [this](ImageProcessingConfiguration* /*conf*/, EventState /*es*/) {
+          _computePrimaryColorFromPerceptualColor();
+          _markAllSubMeshesAsImageProcessingDirty();
+        });
+  }
 }
 
 ImageProcessingConfiguration*
@@ -315,6 +317,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
         defines.defines[BMD::REFLECTION]      = true;
         defines.defines[BMD::GAMMAREFLECTION] = reflectionTexture->gammaSpace;
+        defines.defines[BMD::RGBDREFLECTION]  = reflectionTexture->isRGBD();
         defines.defines[BMD::REFLECTIONBLUR]  = _reflectionBlur > 0;
         defines.defines[BMD::REFLECTIONMAP_OPPOSITEZ]
           = getScene()->useRightHandedSystem() ? !reflectionTexture->invertZ :
@@ -400,6 +403,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         defines.defines[BMD::REFLECTIONMAP_OPPOSITEZ] = false;
         defines.defines[BMD::LODINREFLECTIONALPHA]    = false;
         defines.defines[BMD::GAMMAREFLECTION]         = false;
+        defines.defines[BMD::RGBDREFLECTION]          = false;
       }
     }
 
@@ -417,7 +421,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
             || _primaryColorHighlightLevel != 0.f);
   }
 
-  if (defines._areImageProcessingDirty) {
+  if (defines._areImageProcessingDirty && _imageProcessingConfiguration) {
     if (!_imageProcessingConfiguration->isReady()) {
       return false;
     }
@@ -784,12 +788,14 @@ void BackgroundMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     MaterialHelper::BindFogParameters(scene, mesh, _activeEffect);
 
     // image processing
-    _imageProcessingConfiguration->bind(_activeEffect);
+    if (_imageProcessingConfiguration) {
+      _imageProcessingConfiguration->bind(_activeEffect);
+    }
   }
 
   _uniformBuffer->update();
 
-  Material::_afterBind(mesh);
+  Material::_afterBind(mesh /*, _activeEffect*/);
 }
 
 void BackgroundMaterial::dispose(bool forceDisposeEffect,

@@ -153,11 +153,13 @@ void ImageProcessingPostProcess::_attachImageProcessingConfiguration(
   }
 
   // Attaches observer.
-  _imageProcessingObserver
-    = _imageProcessingConfiguration->onUpdateParameters.add(
-      [this](ImageProcessingConfiguration* /*conf*/, EventState& /*es*/) {
-        _updateParameters();
-      });
+  if (_imageProcessingConfiguration) {
+    _imageProcessingObserver
+      = _imageProcessingConfiguration->onUpdateParameters.add(
+        [this](ImageProcessingConfiguration* /*conf*/, EventState& /*es*/) {
+          _updateParameters();
+        });
+  }
 
   // Ensure the effect will be rebuilt.
   if (!doNotBuild) {
@@ -385,6 +387,8 @@ void ImageProcessingPostProcess::_updateParameters()
   ImageProcessingConfiguration::PrepareSamplers(samplers, _defines);
 
   vector_t<string_t> uniforms{"scale"};
+
+  ImageProcessingConfiguration::PrepareSamplers(samplers, _defines);
   ImageProcessingConfiguration::PrepareUniforms(uniforms, _defines);
 
   updateEffect(defines, uniforms, samplers);
@@ -399,7 +403,9 @@ void ImageProcessingPostProcess::dispose(Camera* camera)
       _imageProcessingObserver);
   }
 
-  _imageProcessingConfiguration->applyByPostProcess = false;
+  if (_imageProcessingConfiguration) {
+    _imageProcessingConfiguration->applyByPostProcess = false;
+  }
 }
 
 } // end of namespace BABYLON

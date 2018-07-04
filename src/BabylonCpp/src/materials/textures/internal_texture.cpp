@@ -31,6 +31,7 @@ InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource)
     , _cachedWrapV{0}
     , _cachedWrapR{0}
     , _comparisonFunction{0}
+    , _isRGBD{false}
     , _references{1}
     , _engine{engine}
 {

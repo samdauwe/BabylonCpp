@@ -1,5 +1,6 @@
 #include <babylon/instrumentation/scene_instrumentation.h>
 
+#include <babylon/cameras/camera.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/tools/tools.h>
@@ -55,6 +56,13 @@ SceneInstrumentation::SceneInstrumentation(Scene* scene)
     , renderTimeCounter{this, &SceneInstrumentation::get_renderTimeCounter}
     , captureRenderTime{this, &SceneInstrumentation::get_captureRenderTime,
                         &SceneInstrumentation::set_captureRenderTime}
+    , cameraRenderTimeCounter{this, &SceneInstrumentation::
+                                      get_cameraRenderTimeCounter}
+    , captureCameraRenderTime{this,
+                              &SceneInstrumentation::
+                                get_captureCameraRenderTime,
+                              &SceneInstrumentation::
+                                set_captureCameraRenderTime}
     , drawCallsCounter{this, &SceneInstrumentation::get_drawCallsCounter}
     , textureCollisionsCounter{this, &SceneInstrumentation::
                                        get_textureCollisionsCounter}
@@ -68,6 +76,7 @@ SceneInstrumentation::SceneInstrumentation(Scene* scene)
     , _captureSpritesRenderTime{false}
     , _capturePhysicsTime{false}
     , _captureAnimationsTime{false}
+    , _captureCameraRenderTime{false}
     , _onBeforeActiveMeshesEvaluationObserver{nullptr}
     , _onAfterActiveMeshesEvaluationObserver{nullptr}
     , _onBeforeRenderTargetsRenderObserver{nullptr}
@@ -83,6 +92,8 @@ SceneInstrumentation::SceneInstrumentation(Scene* scene)
     , _onBeforePhysicsObserver{nullptr}
     , _onAfterPhysicsObserver{nullptr}
     , _onAfterAnimationsObserver{nullptr}
+    , _onBeforeCameraRenderObserver{nullptr}
+    , _onAfterCameraRenderObserver{nullptr}
 {
   // Before render
   _onBeforeAnimationsObserver = scene->onBeforeAnimationsObservable.add(
@@ -457,6 +468,46 @@ void SceneInstrumentation::set_captureRenderTime(bool value)
   }
 }
 
+PerfCounter& SceneInstrumentation::get_cameraRenderTimeCounter()
+{
+  return _cameraRenderTime;
+}
+
+bool SceneInstrumentation::get_captureCameraRenderTime() const
+{
+  return _captureCameraRenderTime;
+}
+
+void SceneInstrumentation::set_captureCameraRenderTime(bool value)
+{
+  if (value == _captureCameraRenderTime) {
+    return;
+  }
+
+  _captureCameraRenderTime = value;
+
+  if (value) {
+    _onBeforeCameraRenderObserver = _scene->onBeforeCameraRenderObservable.add(
+      [this](Camera* camera, EventState& /*es*/) {
+        _cameraRenderTime.beginMonitoring();
+        Tools::StartPerformanceCounter("Rendering camera " + camera->name);
+      });
+
+    _onAfterCameraRenderObserver = _scene->onAfterCameraRenderObservable.add(
+      [this](Camera* camera, EventState& /*es*/) {
+        _cameraRenderTime.endMonitoring(false);
+        Tools::EndPerformanceCounter("Rendering camera " + camera->name);
+      });
+  }
+  else {
+    _scene->onBeforeCameraRenderObservable.remove(
+      _onBeforeCameraRenderObserver);
+    _onBeforeCameraRenderObserver = nullptr;
+    _scene->onAfterCameraRenderObservable.remove(_onAfterCameraRenderObserver);
+    _onAfterCameraRenderObserver = nullptr;
+  }
+}
+
 PerfCounter& SceneInstrumentation::get_drawCallsCounter()
 {
   return _scene->getEngine()->_drawCalls;
@@ -522,6 +573,12 @@ void SceneInstrumentation::dispose(bool /*doNotRecurse*/,
 
   _scene->onAfterAnimationsObservable.remove(_onAfterAnimationsObserver);
   _onAfterAnimationsObserver = nullptr;
+
+  _scene->onBeforeCameraRenderObservable.remove(_onBeforeCameraRenderObserver);
+  _onBeforeCameraRenderObserver = nullptr;
+
+  _scene->onAfterCameraRenderObservable.remove(_onAfterCameraRenderObserver);
+  _onAfterCameraRenderObserver = nullptr;
 
   _scene = nullptr;
 }

@@ -71,6 +71,11 @@ public:
 protected:
   BaseTexture(Scene* scene);
 
+  /**
+   * @brief Gets whether or not the texture contains RGBD data.
+   */
+  bool get_isRGBD() const;
+
   virtual void set_boundingBoxSize(const Nullable<Vector3>& value);
   virtual Nullable<Vector3>& get_boundingBoxSize();
 
@@ -128,6 +133,12 @@ public:
   bool isCube;
   bool is3D;
   bool gammaSpace;
+
+  /**
+   *Whether or not the texture contains RGBD data.
+   */
+  ReadOnlyProperty<BaseTexture, bool> isRGBD;
+
   bool invertZ;
   bool lodLevelInAlpha;
   float lodGenerationOffset;

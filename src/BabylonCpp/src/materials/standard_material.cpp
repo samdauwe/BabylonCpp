@@ -496,7 +496,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
          || alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF);
   }
 
-  if (defines._areImageProcessingDirty) {
+  if (defines._areImageProcessingDirty && _imageProcessingConfiguration) {
     if (!_imageProcessingConfiguration->isReady()) {
       return false;
     }
@@ -1154,7 +1154,8 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     MaterialHelper::BindLogDepth(defines, effect, scene, SMD::LOGARITHMICDEPTH);
 
     // Image processing
-    if (!_imageProcessingConfiguration->applyByPostProcess()) {
+    if (_imageProcessingConfiguration
+        && !_imageProcessingConfiguration->applyByPostProcess()) {
       _imageProcessingConfiguration->bind(_activeEffect);
     }
   }
@@ -1750,11 +1751,13 @@ void StandardMaterial::_attachImageProcessingConfiguration(
   }
 
   // Attaches observer.
-  _imageProcessingObserver
-    = _imageProcessingConfiguration->onUpdateParameters.add(
-      [this](ImageProcessingConfiguration*, EventState&) {
-        _markAllSubMeshesAsImageProcessingDirty();
-      });
+  if (_imageProcessingConfiguration) {
+    _imageProcessingObserver
+      = _imageProcessingConfiguration->onUpdateParameters.add(
+        [this](ImageProcessingConfiguration*, EventState&) {
+          _markAllSubMeshesAsImageProcessingDirty();
+        });
+  }
 }
 
 bool StandardMaterial::cameraColorCurvesEnabled() const

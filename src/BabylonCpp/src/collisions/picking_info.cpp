@@ -1,6 +1,7 @@
 #include <babylon/collisions/picking_info.h>
 
 #include <babylon/math/matrix.h>
+#include <babylon/math/tmp.h>
 #include <babylon/math/vector2.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
@@ -71,10 +72,24 @@ Nullable<Vector3> PickingInfo::getNormal(bool useWorldCoordinates,
   }
 
   if (useWorldCoordinates) {
-    result = Vector3::TransformNormal(result, *pickedMesh->getWorldMatrix());
+    auto wm = *pickedMesh->getWorldMatrix();
+
+    if (pickedMesh->nonUniformScaling()) {
+      Tmp::MatrixArray[0].copyFrom(wm);
+      wm = Tmp::MatrixArray[0];
+      wm.setTranslationFromFloats(0.f, 0.f, 0.f);
+      wm.invert();
+      wm.transposeToRef(Tmp::MatrixArray[1]);
+
+      wm = Tmp::MatrixArray[1];
+    }
+
+    result = Vector3::TransformNormal(result, wm);
   }
 
-  return Vector3::Normalize(result);
+  result.normalize();
+
+  return result;
 }
 
 Nullable<Vector2> PickingInfo::getTextureCoordinates()

@@ -24,6 +24,7 @@ BaseTexture::BaseTexture(Scene* scene)
     , isCube{false}
     , is3D{false}
     , gammaSpace{true}
+    , isRGBD{this, &BaseTexture::get_isRGBD}
     , invertZ{false}
     , lodLevelInAlpha{false}
     , lodGenerationOffset{0.f}
@@ -90,6 +91,11 @@ void BaseTexture::setCoordinatesMode(unsigned int value)
 unsigned int BaseTexture::coordinatesMode() const
 {
   return _coordinatesMode;
+}
+
+bool BaseTexture::get_isRGBD() const
+{
+  return _texture != nullptr && _texture->_isRGBD;
 }
 
 string_t BaseTexture::uid()

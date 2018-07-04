@@ -190,7 +190,7 @@ private:
    * Default environment texture URL.
    */
   static constexpr const char* _environmentTextureCDNUrl
-    = "https://assets.babylonjs.com/environments/environmentSpecular.dds";
+    = "https://assets.babylonjs.com/environments/environmentSpecular.env";
 
 private:
   Mesh* _rootMesh;

@@ -225,6 +225,7 @@ public:
   BaseTexture* _lodTextureHigh;
   BaseTexture* _lodTextureMid;
   BaseTexture* _lodTextureLow;
+  bool _isRGBD;
 
   shared_ptr_t<GL::IGLTexture> _webGLTexture;
   int _references;

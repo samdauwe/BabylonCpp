@@ -159,6 +159,21 @@ protected:
   void set_captureRenderTime(bool value);
 
   /**
+   * @brief Gets the perf counter used for camera render time capture.
+   */
+  PerfCounter& get_cameraRenderTimeCounter();
+
+  /**
+   * @brief Gets the camera render time capture status.
+   */
+  bool get_captureCameraRenderTime() const;
+
+  /**
+   * @brief Enable or disable the camera render time capture.
+   */
+  void set_captureCameraRenderTime(bool value);
+
+  /**
    * @brief Gets the perf counter used for draw calls.
    */
   PerfCounter& get_drawCallsCounter();
@@ -264,6 +279,16 @@ public:
   Property<SceneInstrumentation, bool> captureRenderTime;
 
   /**
+   *  Perf counter used for camera render time capture.
+   */
+  ReadOnlyProperty<SceneInstrumentation, PerfCounter> cameraRenderTimeCounter;
+
+  /**
+   * Camera render time capture status.
+   */
+  Property<SceneInstrumentation, bool> captureCameraRenderTime;
+
+  /**
    * Perf counter used for draw calls.
    */
   ReadOnlyProperty<SceneInstrumentation, PerfCounter> drawCallsCounter;
@@ -303,6 +328,9 @@ private:
   bool _captureAnimationsTime;
   PerfCounter _animationsTime;
 
+  bool _captureCameraRenderTime;
+  PerfCounter _cameraRenderTime;
+
   // Observers
   Observer<Scene>::Ptr _onBeforeActiveMeshesEvaluationObserver;
   Observer<Scene>::Ptr _onAfterActiveMeshesEvaluationObserver;
@@ -326,6 +354,9 @@ private:
   Observer<Scene>::Ptr _onAfterPhysicsObserver;
 
   Observer<Scene>::Ptr _onAfterAnimationsObserver;
+
+  Observer<Camera>::Ptr _onBeforeCameraRenderObserver;
+  Observer<Camera>::Ptr _onAfterCameraRenderObserver;
 
 }; // end of class SceneInstrumentation
 
