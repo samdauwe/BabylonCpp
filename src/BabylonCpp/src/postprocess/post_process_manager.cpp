@@ -95,7 +95,7 @@ bool PostProcessManager::_prepareFrame(
 
 void PostProcessManager::directRender(
   const vector_t<PostProcess*>& postProcesses, InternalTexture* targetTexture,
-  bool forceFullscreenViewport)
+  bool forceFullscreenViewport, unsigned int faceIndex, int lodLevel)
 {
   auto engine = _scene->getEngine();
 
@@ -105,8 +105,8 @@ void PostProcessManager::directRender(
     }
     else {
       if (targetTexture) {
-        engine->bindFramebuffer(targetTexture, 0u, nullptr, nullptr,
-                                forceFullscreenViewport);
+        engine->bindFramebuffer(targetTexture, faceIndex, nullptr, nullptr,
+                                forceFullscreenViewport, nullptr, lodLevel);
       }
       else {
         engine->restoreDefaultFramebuffer();

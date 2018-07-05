@@ -941,7 +941,7 @@ void Engine::bindFramebuffer(InternalTexture* texture,
                              Nullable<int> requiredWidth,
                              Nullable<int> requiredHeight,
                              Nullable<bool> forceFullscreenViewport,
-                             InternalTexture* depthStencilTexture)
+                             InternalTexture* depthStencilTexture, int lodLevel)
 {
   if (_currentRenderTarget) {
     unBindFramebuffer(_currentRenderTarget);
@@ -956,18 +956,20 @@ void Engine::bindFramebuffer(InternalTexture* texture,
     }
     _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
                               GL::TEXTURE_CUBE_MAP_POSITIVE_X + (*faceIndex),
-                              texture->_webGLTexture.get(), 0);
+                              texture->_webGLTexture.get(), lodLevel);
 
     if (depthStencilTexture) {
       if (depthStencilTexture->_generateStencilBuffer) {
         _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_STENCIL_ATTACHMENT,
                                   GL::TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex,
-                                  depthStencilTexture->_webGLTexture.get(), 0);
+                                  depthStencilTexture->_webGLTexture.get(),
+                                  lodLevel);
       }
       else {
         _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_ATTACHMENT,
                                   GL::TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex,
-                                  depthStencilTexture->_webGLTexture.get(), 0);
+                                  depthStencilTexture->_webGLTexture.get(),
+                                  lodLevel);
       }
     }
   }

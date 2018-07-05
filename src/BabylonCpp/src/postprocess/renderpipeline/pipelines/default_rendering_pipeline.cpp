@@ -613,6 +613,20 @@ void DefaultRenderingPipeline::_disposePostProcesses(bool disposeNonRecreated)
   }
 }
 
+void DefaultRenderingPipeline::addCamera(Camera* camera)
+{
+  _originalCameras.emplace_back(camera);
+  _buildPipeline();
+}
+
+void DefaultRenderingPipeline::removeCamera(Camera* camera)
+{
+  _originalCameras.erase(
+    ::std::remove(_originalCameras.begin(), _originalCameras.end(), camera),
+    _originalCameras.end());
+  _buildPipeline();
+}
+
 void DefaultRenderingPipeline::dispose(bool /*doNotRecurse*/,
                                        bool /*disposeMaterialAndTextures*/)
 {

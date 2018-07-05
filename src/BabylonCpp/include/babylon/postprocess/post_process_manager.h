@@ -48,7 +48,8 @@ public:
    */
   void directRender(const vector_t<PostProcess*>& postProcesses,
                     InternalTexture* targetTexture = nullptr,
-                    bool forceFullscreenViewport   = false);
+                    bool forceFullscreenViewport   = false,
+                    unsigned int faceIndex = 0, int lodLevel = 0);
 
   /**
    * @brief Finalize the result of the output of the postprocesses.

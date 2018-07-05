@@ -554,13 +554,15 @@ public:
    * @param forceFullscreenViewport Forces the viewport to be the entire
    * texture/screen if true
    * @param depthStencilTexture The depth stencil texture to use to render
+   * @param lodLevel defines le lod level to bind to the frame buffer
    */
   void bindFramebuffer(InternalTexture* texture,
                        Nullable<unsigned int> faceIndex       = nullptr,
                        Nullable<int> requiredWidth            = nullptr,
                        Nullable<int> requiredHeight           = nullptr,
                        Nullable<bool> forceFullscreenViewport = nullptr,
-                       InternalTexture* depthStencilTexture   = nullptr);
+                       InternalTexture* depthStencilTexture   = nullptr,
+                       int lodLevel                           = 0);
 
   /**
    * @brief Unbind the current render target texture from the webGL context.

@@ -72,6 +72,18 @@ public:
   void prepare();
 
   /**
+   * @brief Adds a camera to the pipeline.
+   * @param camera the camera to be added
+   */
+  void addCamera(Camera* camera);
+
+  /**
+   * @brief Removes a camera from the pipeline.
+   * @param camera the camera to remove
+   */
+  void removeCamera(Camera* camera);
+
+  /**
    * @brief Dispose of the pipeline and stop all post processes.
    */
   void dispose(bool doNotRecurse               = false,
