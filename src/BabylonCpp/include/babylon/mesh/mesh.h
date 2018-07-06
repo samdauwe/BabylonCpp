@@ -161,10 +161,10 @@ public:
   /**
    * @brief Add a mesh as LOD level triggered at the given distance.
    * tuto : http://doc.babylonjs.com/tutorials/How_to_use_LOD
-   * @param {number} distance The distance from the center of the object to show
-   * this level
-   * @param {Mesh} mesh The mesh to be added as LOD level
-   * @returns {Mesh} This mesh (for chaining)
+   * @param distance The distance from the center of the object to show this
+   * level
+   * @param mesh The mesh to be added as LOD level (can be null)
+   * @return This mesh (for chaining)
    */
   Mesh& addLODLevel(float distance, Mesh* mesh);
 
@@ -186,9 +186,9 @@ public:
   Mesh& removeLODLevel(Mesh* mesh);
 
   /**
-   * @brief Returns the registered LOD mesh distant from the parameter `camera`
+   * @brief Returns the registered LOD mesh distant from the parameter `camera`.
    * position if any, else returns the current mesh.
-   * tuto : http://doc.babylonjs.com/tutorials/How_to_use_LOD
+   * tuto : http://doc.babylonjs.com/how_to/how_to_use_lod
    */
   AbstractMesh* getLOD(Camera* camera,
                        BoundingSphere* boundingSphere = nullptr) override;

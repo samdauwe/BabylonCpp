@@ -129,6 +129,7 @@ Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
         system->clone(system->name, this);
       }
     }
+    refreshBoundingInfo();
     computeWorldMatrix(true);
   }
 
@@ -2317,6 +2318,15 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
           instance->animations.emplace_back(Animation::Parse(parsedAnimation));
         }
         Node::ParseAnimationRanges(instance, parsedMesh, scene);
+
+        if (parsedMesh.contains("autoAnimate")
+            && Json::GetBool(parsedMesh, "autoAnimate")) {
+          scene->beginAnimation(
+            instance, Json::GetNumber<int>(parsedMesh, "autoAnimateFrom", 0),
+            Json::GetNumber<int>(parsedMesh, "autoAnimateTo", 0),
+            Json::GetBool(parsedMesh, "autoAnimateLoop"),
+            Json::GetNumber<float>(parsedMesh, "autoAnimateSpeed", 1.0));
+        }
       }
     }
   }
@@ -2890,7 +2900,7 @@ Mesh* Mesh::MergeMeshes(const vector_t<Mesh*>& meshes, bool disposeSource,
   for (auto& mesh : meshes) {
     if (mesh) {
       mesh->computeWorldMatrix(true);
-      otherVertexData = VertexData::ExtractFromMesh(mesh, true);
+      otherVertexData = VertexData::ExtractFromMesh(mesh, true, true);
       otherVertexData->transform(*mesh->getWorldMatrix());
 
       if (vertexData) {
@@ -2932,11 +2942,11 @@ Mesh* Mesh::MergeMeshes(const vector_t<Mesh*>& meshes, bool disposeSource,
 
   // Subdivide
   if (subdivideWithSubMeshes) {
-    //-- Suppresions du submesh global
+    //-- removal of global submesh
     meshSubclass->releaseSubMeshes();
     index               = 0;
     unsigned int offset = 0;
-    //-- aplique la subdivision en fonction du tableau d'indices
+    //-- apply subdivision according to index table
     while (index < indiceArray.size()) {
       SubMesh::CreateFromIndices(0, offset, indiceArray[index], meshSubclass);
       offset += indiceArray[index];

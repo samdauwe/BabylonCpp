@@ -74,7 +74,7 @@ public:
   void _rebuild();
 
   /**
-   * @brief Affects all gemetry data in one call.
+   * @brief Affects all geometry data in one call.
    * @param vertexData defines the geometry data
    * @param updatable defines if the geometry must be flagged as updatable
    * (false as default)

@@ -437,9 +437,29 @@ protected:
   void _afterComputeWorldMatrix();
 
 public:
+  /**
+   * Set the billboard mode. Default is 0.
+   *
+   * | Value | Type | Description |
+   * | --- | --- | --- |
+   * | 0 | BILLBOARDMODE_NONE |  |
+   * | 1 | BILLBOARDMODE_X |  |
+   * | 2 | BILLBOARDMODE_Y |  |
+   * | 4 | BILLBOARDMODE_Z |  |
+   * | 7 | BILLBOARDMODE_ALL |  |
+   *
+   */
   unsigned int billboardMode;
   float scalingDeterminant;
   bool infiniteDistance;
+
+  /**
+   * Gets or sets a boolean indicating that non uniform scaling (when at least
+   * one component is different from others) should be ignored. By default the
+   * system will update normals to compensate
+   */
+  bool ignoreNonUniformScaling;
+
   // Cache
   unique_ptr_t<Matrix> _poseMatrix;
   unique_ptr_t<Matrix> _worldMatrix;

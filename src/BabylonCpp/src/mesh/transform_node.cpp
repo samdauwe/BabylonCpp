@@ -20,6 +20,7 @@ TransformNode::TransformNode(const string_t& name, Scene* scene, bool isPure)
     , billboardMode{TransformNode::BILLBOARDMODE_NONE}
     , scalingDeterminant{1.f}
     , infiniteDistance{false}
+    , ignoreNonUniformScaling{false}
     , _poseMatrix{::std::make_unique<Matrix>(Matrix::Zero())}
     , _worldMatrix{::std::make_unique<Matrix>(Matrix::Zero())}
     , _worldMatrixDeterminant{0.f}
@@ -459,7 +460,10 @@ TransformNode& TransformNode::getAbsolutePivotPointToRef(Vector3& result)
 
 TransformNode& TransformNode::setParent(Node* node)
 {
-  if (node == nullptr) {
+  if (!node && !parent()) {
+    return *this;
+  }
+  if (!node) {
     auto& rotation = Tmp::QuaternionArray[0];
     auto& position = Tmp::Vector3Array[0];
     auto& scale    = Tmp::Vector3Array[1];
@@ -530,7 +534,7 @@ bool TransformNode::_updateNonUniformScalingState(bool value)
     return false;
   }
 
-  _nonUniformScaling = true;
+  _nonUniformScaling = value;
   return true;
 }
 
@@ -821,13 +825,17 @@ Matrix& TransformNode::computeWorldMatrix(bool force)
   }
 
   // Normal matrix
-  if (scaling().isNonUniform()) {
-    _updateNonUniformScalingState(true);
-  }
-  else if (parent()) {
-    auto parentTransformNode = static_cast<TransformNode*>(parent());
-    if (parentTransformNode) {
+  if (!ignoreNonUniformScaling) {
+    if (scaling().isNonUniform()) {
+      _updateNonUniformScalingState(true);
+    }
+    else if (parent() && static_cast<TransformNode*>(parent())
+             && (static_cast<TransformNode*>(parent()))->_nonUniformScaling) {
+      const auto parentTransformNode = static_cast<TransformNode*>(parent());
       _updateNonUniformScalingState(parentTransformNode->_nonUniformScaling);
+    }
+    else {
+      _updateNonUniformScalingState(false);
     }
   }
   else {

@@ -182,8 +182,15 @@ bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
     return false;
   }
 
+  auto& keys = _animation->getKeys();
+
+  // Return immediately if there is only one key frame.
+  if (keys.size() == 1) {
+    setValue(keys[0].value, weight);
+    return !loop;
+  }
+
   bool returnValue = true;
-  auto& keys       = _animation->getKeys();
 
   // Adding a start key at frame 0 if missing
   if (keys[0].frame != 0) {

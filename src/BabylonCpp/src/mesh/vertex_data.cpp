@@ -167,6 +167,9 @@ VertexData& VertexData::_applyTo(IGetSetVerticesData* meshOrGeometry,
   if (!indices.empty()) {
     meshOrGeometry->setIndices(indices, 0, updatable);
   }
+  else {
+    meshOrGeometry->setIndices({}, 0);
+  }
 
   return *this;
 }
@@ -257,6 +260,7 @@ VertexData& VertexData::_update(IGetSetVerticesData* meshOrGeometry,
 
 VertexData& VertexData::transform(const Matrix& matrix)
 {
+  bool flip        = matrix.m[0] * matrix.m[5] * matrix.m[10] < 0.f;
   auto transformed = Vector3::Zero();
   if (!positions.empty()) {
     auto position = Vector3::Zero();
@@ -296,6 +300,12 @@ VertexData& VertexData::transform(const Matrix& matrix)
       tangents[index + 1] = tangentTransformed.y;
       tangents[index + 2] = tangentTransformed.z;
       tangents[index + 3] = tangentTransformed.w;
+    }
+  }
+
+  if (flip && !indices.empty()) {
+    for (size_t index = 0; index < indices.size(); index += 3) {
+      ::std::swap(indices[index + 1], indices[index + 2]);
     }
   }
 
