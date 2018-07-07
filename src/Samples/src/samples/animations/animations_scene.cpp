@@ -33,7 +33,7 @@ void AnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create a camera
   auto camera
-    = ArcRotateCamera::New("Camera", 0.f, 0.8f, 80.f, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("Camera", 0.f, 0.8f, 100.f, Vector3::Zero(), scene);
 
   // Attach the camera to the canvas
   camera->attachControl(canvas, true);
@@ -51,11 +51,10 @@ void AnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   options.faceColors[2] = Color4(1.f, 0.f, 1.f, 1.f);   // Magenta
   options.faceColors[3] = Color4(0.5f, 0.f, 0.5f, 1.f); // Purple
   auto box2             = MeshBuilder::CreateBox("Box2", options, scene);
-  // Box 3
-  auto box3          = MeshBuilder::CreateBox("Box1", options, scene);
-  box3->position().x = -20.f;
-  box3->position().z = -30.f;
-
+  // - Box 3
+  auto box3                 = MeshBuilder::CreateBox("Box1", options, scene);
+  box3->position().x        = -20.f;
+  box3->position().z        = -30.f;
   auto materialBox          = StandardMaterial::New("texture1", scene);
   materialBox->diffuseColor = Color3::Green();
   auto materialBox2         = StandardMaterial::New("texture2", scene);
@@ -68,7 +67,7 @@ void AnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   box2->position().x = 20.f;
 
   // Creation of a scaling animation with box 1
-  //-----------------------------------------
+  //-------------------------------------------
   // Create a scaling animation at 30 FPS
   auto animationBox1 = new Animation("scalingAnimation", "scaling.x", 30,
                                      Animation::ANIMATIONTYPE_FLOAT(),
@@ -95,7 +94,7 @@ void AnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   scene->beginAnimation(box1, 0, 100, true);
 
   // Creation of a rotation animation with box 2
-  //---------------------------------------------
+  //--------------------------------------------
   // Create a scaling animation at 30 FPS
   auto animationBox2RotX = new Animation("rotationAnimation", "rotation.x", 30,
                                          Animation::ANIMATIONTYPE_FLOAT(),
@@ -119,7 +118,7 @@ void AnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   scene->beginAnimation(box2, 0, 100, true);
 
   // Creation of a rotation animation with box 3
-  //---------------------------------------------
+  //--------------------------------------------
   // Create a scaling animation at 30 FPS
   auto animationBox3RotX = new Animation("rotationAnimation", "rotation.x", 30,
                                          Animation::ANIMATIONTYPE_FLOAT(),

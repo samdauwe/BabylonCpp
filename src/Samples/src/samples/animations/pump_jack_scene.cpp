@@ -25,7 +25,7 @@ float FunnyEase::easeInCore(float gradient) const
 {
   float angle = gradient * Math::PI2;
   angle += std::asin(std::sin(angle) * _distanceOfStick / _lengthOfStick);
-  gradient = angle / (Math::PI2);
+  gradient = angle / Math::PI2;
   return gradient;
 }
 
@@ -56,7 +56,7 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto myEase = new FunnyEase(distanceOfStick, lengthOfStick);
 
   // Initialization
-  auto camera = FreeCamera::New("camera1", Vector3(10.f, 10.f, -20.f), scene);
+  auto camera = FreeCamera::New("camera1", Vector3(0.f, 10.f, -25.f), scene);
   camera->setTarget(Vector3::Zero());
   camera->attachControl(canvas, true);
 
@@ -253,6 +253,7 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   pumpStickAnimation->setKeys(pumpStickIAnimationKeys);
   pumpStickAnimation->setEasingFunction(
     new BezierCurveEase(0.35f, 0.1f, 0.65f, 0.9f));
+
   pumpStick->animations.emplace_back(pumpStickAnimation);
   scene->beginAnimation(pumpStick, 0, animationFrames, true);
 

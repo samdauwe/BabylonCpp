@@ -21,6 +21,10 @@ private:
 
 }; // end of class FunnyEase
 
+/**
+ * @brief Pump Jack Scene.
+ * @see https://www.babylonjs-playground.com/#1XA6UQ#50
+ */
 struct PumpJackScene : public IRenderableScene {
 
 public:
