@@ -83,7 +83,8 @@ def main():
                  "babylon.webVRCamera.ts", "babylon.analyser.ts",
                  "babylon.stereoscopicCameras.ts", "babylon.sceneSerializer.ts",
                  "babylon.videoTexture.ts", "babylon.database.ts",
-                 "babylon.promise.ts", "babylon.videoDome.ts"]
+                 "babylon.promise.ts", "babylon.videoDome.ts",
+                 "babylon.sound.ts", "babylon.khronosTextureContainer.ts"]
     # Create mapping from BabylonJs version to full path
     for version in BabylonJsVersions:
         fullPath = os.path.join(os.path.expanduser('~'), "Projects",
@@ -95,7 +96,7 @@ def main():
     current = BabylonJsVersions[current]
     files = getFilesRecursively(current)
     fileComparisonDict = compareFiles(current, previous, files, whiteList)
-    print fileComparisonToStr(fileComparisonDict)
+    print(fileComparisonToStr(fileComparisonDict))
 
 if __name__ == "__main__":
     main()
