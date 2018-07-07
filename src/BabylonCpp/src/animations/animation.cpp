@@ -374,7 +374,7 @@ AnimationValue Animation::_getKeyValue(const AnimationValue& value) const
 }
 
 AnimationValue Animation::_interpolate(int currentFrame, int repeatCount,
-                                       Nullable<Matrix>& workValue,
+                                       Nullable<AnimationValue>& workValue,
                                        unsigned int loopMode,
                                        const AnimationValue& offsetValue,
                                        const AnimationValue& highLimitValue)
@@ -572,11 +572,13 @@ AnimationValue Animation::_interpolate(int currentFrame, int repeatCount,
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               if (Animation::AllowMatricesInterpolation()) {
-                auto _workValue    = *workValue;
-                newVale.matrixData = matrixInterpolateFunction(
-                  startValue.matrixData, endValue.matrixData, gradient,
-                  _workValue);
-                workValue = _workValue;
+                if (workValue) {
+                  auto _workValue    = *workValue;
+                  newVale.matrixData = matrixInterpolateFunction(
+                    startValue.matrixData, endValue.matrixData, gradient,
+                    _workValue.matrixData);
+                  workValue = _workValue;
+                }
                 return newVale;
               }
               newVale.matrixData = startValue.matrixData;

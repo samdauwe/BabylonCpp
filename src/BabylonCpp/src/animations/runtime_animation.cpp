@@ -5,6 +5,7 @@
 #include <babylon/animations/easing/ieasing_function.h>
 #include <babylon/animations/ianimatable.h>
 #include <babylon/animations/ianimation_key.h>
+#include <babylon/babylon_stl_util.h>
 
 namespace BABYLON {
 
@@ -13,6 +14,7 @@ RuntimeAnimation::RuntimeAnimation(IAnimatable* target, Animation* animation,
     : currentFrame{this, &RuntimeAnimation::get_currentFrame}
     , weight{this, &RuntimeAnimation::get_weight}
     , currentValue{this, &RuntimeAnimation::get_currentValue}
+    , _workValue{nullptr}
     , targetPath{this, &RuntimeAnimation::get_targetPath}
     , target{this, &RuntimeAnimation::get_target}
     , _currentFrame{0}
@@ -106,29 +108,42 @@ void RuntimeAnimation::dispose()
     runtimeAnimations.end());
 }
 
-AnimationValue
-RuntimeAnimation::_interpolate(int /*iCurrentFrame*/, int /*repeatCount*/,
-                               unsigned int /*loopMode*/,
-                               const AnimationValue& /*offsetValue*/,
-                               const AnimationValue& /*highLimitValue*/)
+AnimationValue RuntimeAnimation::_interpolate(
+  int iCurrentFrame, int repeatCount, unsigned int loopMode,
+  const AnimationValue& offsetValue, const AnimationValue& highLimitValue)
 {
-  return AnimationValue();
+  _currentFrame = iCurrentFrame;
+
+  if (_animation->dataType == Animation::ANIMATIONTYPE_MATRIX()
+      && !_workValue) {
+    _workValue = Matrix::Zero();
+  }
+
+  return _animation->_interpolate(currentFrame, repeatCount, _workValue,
+                                  loopMode, offsetValue, highLimitValue);
 }
 
-void RuntimeAnimation::setValue(const AnimationValue& /*currentValue*/,
+void RuntimeAnimation::setValue(const AnimationValue& currentValue,
                                 float weight)
 {
+  _setValue(_target, currentValue, weight);
+}
+
+void RuntimeAnimation::_setValue(IAnimatable* target,
+                                 const AnimationValue& currentValue,
+                                 float weight, unsigned int targetIndex)
+{
   // Set value
-  string_t path;
-  any destination;
+  string_t path   = "";
+  any destination = nullptr;
 
   const auto& targetPropertyPath = _animation->targetPropertyPath;
 
   if (targetPropertyPath.size() > 1) {
-    auto property = _target->getProperty(targetPropertyPath[0]);
+    auto property = target->getProperty(targetPropertyPath[0]);
 
     for (size_t index = 1; index < targetPropertyPath.size() - 1; ++index) {
-      property = _target->getProperty(property, targetPropertyPath[index]);
+      property = target->getProperty(property, targetPropertyPath[index]);
     }
 
     path        = targetPropertyPath.back();
@@ -136,12 +151,32 @@ void RuntimeAnimation::setValue(const AnimationValue& /*currentValue*/,
   }
   else {
     path        = targetPropertyPath[0];
-    destination = _target;
+    destination = target;
   }
 
   _targetPath   = path;
   _activeTarget = destination;
   _weight       = weight;
+
+  if (targetIndex >= _originalValue.size()) {
+    _originalValue.resize(targetIndex + 1);
+    _originalValue[targetIndex] = nullptr;
+  }
+
+  // Blending
+  auto enableBlending = false;
+  if (enableBlending && _blendingFactor <= 1.f) {
+  }
+  else {
+    _currentValue = currentValue;
+  }
+
+  if (!stl_util::almost_equal(weight, -1.f)) {
+  }
+  else {
+    any newValue = (*_currentValue).getValue();
+    target->setProperty(destination, path, newValue);
+  }
 }
 
 Nullable<unsigned int> RuntimeAnimation::_getCorrectLoopMode() const
@@ -174,7 +209,7 @@ void RuntimeAnimation::_prepareForSpeedRatioChange(float newSpeedRatio)
 }
 
 bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
-                               float speedRatio, float /*weight*/)
+                               float speedRatio, float iWeight)
 {
   const auto& targetPropertyPath = _animation->targetPropertyPath;
   if (targetPropertyPath.empty()) {
@@ -186,7 +221,7 @@ bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
 
   // Return immediately if there is only one key frame.
   if (keys.size() == 1) {
-    setValue(keys[0].value, weight);
+    setValue(keys[0].value, iWeight);
     return !loop;
   }
 
@@ -338,11 +373,11 @@ bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
   }
 
   auto currentValue
-    = _interpolate(currentFrame, repeatCount, _getCorrectLoopMode(),
+    = _interpolate(_currentFrame, repeatCount, _getCorrectLoopMode(),
                    offsetValue, highLimitValue);
 
   // Set value
-  setValue(currentValue);
+  setValue(currentValue, iWeight);
 
   // Check events
   for (unsigned int index = 0; index < events.size(); ++index) {

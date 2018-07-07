@@ -125,6 +125,9 @@ private:
                const AnimationValue& offsetValue    = AnimationValue(),
                const AnimationValue& highLimitValue = AnimationValue());
 
+  void _setValue(IAnimatable* target, const AnimationValue& currentValue,
+                 float weight, unsigned int targetIndex = 0);
+
 public:
   /**
    * Current frame of the runtime animation
@@ -144,7 +147,7 @@ public:
   /**
    * Hidden
    */
-  AnimationValue _workValue;
+  Nullable<AnimationValue> _workValue;
 
   /**
    * Target path of the runtime animation

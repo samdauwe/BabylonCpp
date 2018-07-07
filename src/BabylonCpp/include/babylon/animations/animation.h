@@ -561,8 +561,8 @@ public:
    * @brief Hidden Internal use only.
    */
   AnimationValue
-  _interpolate(int currentFrame, int repeatCount, Nullable<Matrix>& workValue,
-               unsigned int loopMode,
+  _interpolate(int currentFrame, int repeatCount,
+               Nullable<AnimationValue>& workValue, unsigned int loopMode,
                const AnimationValue& offsetValue    = AnimationValue(),
                const AnimationValue& highLimitValue = AnimationValue());
 

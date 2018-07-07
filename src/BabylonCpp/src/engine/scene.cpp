@@ -1838,7 +1838,7 @@ Animatable* Scene::beginAnimation(IAnimatable* target, int from, int to,
                                   Animatable* animatable, bool stopCurrent)
 {
   if (from > to && speedRatio > 0.f) {
-    speedRatio *= -1;
+    speedRatio *= -1.f;
   }
 
   if (stopCurrent) {
@@ -2042,9 +2042,11 @@ AnimationValue Scene::_processLateAnimationBindingsForMatrices(
     currentPosition.scaleAndAddToRef(scale, finalPosition);
   }
 
+  auto workValue = *originalAnimation->_workValue;
   Matrix::ComposeToRef(finalScaling, finalQuaternion, finalPosition,
-                       originalAnimation->_workValue.matrixData);
-  return originalAnimation->_workValue;
+                       workValue.matrixData);
+  originalAnimation->_workValue = workValue;
+  return (*originalAnimation->_workValue);
 }
 
 Quaternion Scene::_processLateAnimationBindingsForQuaternions(
