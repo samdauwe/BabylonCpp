@@ -3648,7 +3648,8 @@ InternalTexture* Engine::createCubeTexture(
   const vector_t<string_t>& /*extensions*/, bool /*noMipmap*/,
   const ::std::function<void(InternalTexture*, EventState&)>& /*onLoad*/,
   const ::std::function<void()>& /*onError*/, unsigned int /*format*/,
-  const string_t& /*forcedExtension*/, bool /*createPolynomials*/)
+  const string_t& /*forcedExtension*/, bool /*createPolynomials*/,
+  float /*lodScale*/, float /*lodOffset*/, InternalTexture* /*fallback*/)
 {
   return nullptr;
 }
@@ -4789,7 +4790,7 @@ void Engine::_measureFps()
 }
 
 ArrayBufferView Engine::_readTexturePixels(InternalTexture* texture, int width,
-                                           int height, int faceIndex)
+                                           int height, int faceIndex, int level)
 {
   if (!_dummyFramebuffer) {
     auto dummy = _gl->createFramebuffer();
@@ -4807,11 +4808,12 @@ ArrayBufferView Engine::_readTexturePixels(InternalTexture* texture, int width,
     auto _faceIndex = static_cast<unsigned>(faceIndex);
     _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
                               GL::TEXTURE_CUBE_MAP_POSITIVE_X + _faceIndex,
-                              texture->_webGLTexture.get(), 0);
+                              texture->_webGLTexture.get(), level);
   }
   else {
     _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
-                              GL::TEXTURE_2D, texture->_webGLTexture.get(), 0);
+                              GL::TEXTURE_2D, texture->_webGLTexture.get(),
+                              level);
   }
 
   auto readType = _getWebGLTextureType(texture->type);

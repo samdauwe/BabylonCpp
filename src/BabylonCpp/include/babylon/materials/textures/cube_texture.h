@@ -11,8 +11,8 @@ class BABYLON_SHARED_EXPORT CubeTexture : public BaseTexture {
 
 public:
   /**
-   * @brief Creates a cube texture to use with reflection for instance. It can
-   * be based upon dds or six images as well as prefiltered data.
+   * Creates a cube texture to use with reflection for instance. It can be based
+   * upon dds or six images as well as prefiltered data.
    * @param rootUrl defines the url of the texture or the root name of the six
    * images
    * @param scene defines the scene the texture is attached to
@@ -31,6 +31,10 @@ public:
    * of file to load) in case it is different from the file name
    * @param createPolynomials defines whether or not to create polynomial
    * harmonics from the texture data if necessary
+   * @param lodScale defines the scale applied to environment texture. This
+   * manages the range of LOD level used for IBL according to the roughness
+   * @param lodOffset defines the offset applied to environment texture. This
+   * manages first LOD level used for IBL according to the roughness
    * @return the cube texture
    */
   CubeTexture(const string_t& rootUrl, Scene* scene,
@@ -41,7 +45,8 @@ public:
               const ::std::function<void()>& onError = nullptr,
               unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA,
               bool prefiltered = false, const string_t& forcedExtension = "",
-              bool createPolynomials = false);
+              bool createPolynomials = false, float lodScale = 0.8f,
+              float lodOffset = 0.f);
   ~CubeTexture() override;
 
   void delayLoad() override;
@@ -111,6 +116,9 @@ public:
    */
   Property<CubeTexture, float> rotationY;
 
+  /** Hidden */
+  bool _prefiltered;
+
 private:
   Nullable<Vector3> _boundingBoxSize;
   float _rotationY;
@@ -119,7 +127,6 @@ private:
   vector_t<string_t> _extensions;
   unique_ptr_t<Matrix> _textureMatrix;
   unsigned int _format;
-  bool _prefiltered;
   bool _createPolynomials;
 
 }; // end of class CubeTexture

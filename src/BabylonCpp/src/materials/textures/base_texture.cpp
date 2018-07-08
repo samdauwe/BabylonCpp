@@ -27,8 +27,10 @@ BaseTexture::BaseTexture(Scene* scene)
     , isRGBD{this, &BaseTexture::get_isRGBD}
     , invertZ{false}
     , lodLevelInAlpha{false}
-    , lodGenerationOffset{0.f}
-    , lodGenerationScale{0.8f}
+    , lodGenerationOffset{this, &BaseTexture::get_lodGenerationOffset,
+                          &BaseTexture::set_lodGenerationOffset}
+    , lodGenerationScale{this, &BaseTexture::get_lodGenerationScale,
+                         &BaseTexture::set_lodGenerationScale}
     , isRenderTarget{false}
     , delayLoadState{EngineConstants::DELAYLOADSTATE_NONE}
     , _texture{nullptr}
@@ -41,6 +43,7 @@ BaseTexture::BaseTexture(Scene* scene)
     , _textureMatrix{Matrix::IdentityReadOnly()}
     , _reflectionTextureMatrix{Matrix::IdentityReadOnly()}
     , emptyVector3{nullptr}
+    , _cachedSize{Size::Zero()}
 {
 }
 
@@ -96,6 +99,38 @@ unsigned int BaseTexture::coordinatesMode() const
 bool BaseTexture::get_isRGBD() const
 {
   return _texture != nullptr && _texture->_isRGBD;
+}
+
+float BaseTexture::get_lodGenerationOffset() const
+{
+  if (_texture) {
+    return _texture->_lodGenerationOffset;
+  }
+
+  return 0.f;
+}
+
+void BaseTexture::set_lodGenerationOffset(float value)
+{
+  if (_texture) {
+    _texture->_lodGenerationOffset = value;
+  }
+}
+
+float BaseTexture::get_lodGenerationScale() const
+{
+  if (_texture) {
+    return _texture->_lodGenerationScale;
+  }
+
+  return 0.f;
+}
+
+void BaseTexture::set_lodGenerationScale(float value)
+{
+  if (_texture) {
+    _texture->_lodGenerationScale = value;
+  }
 }
 
 string_t BaseTexture::uid()
@@ -169,17 +204,23 @@ bool BaseTexture::isReady()
   return false;
 }
 
-ISize BaseTexture::getSize() const
+ISize BaseTexture::getSize()
 {
-  if (_texture && _texture->width) {
-    return Size(_texture->width, _texture->height);
+  if (_texture) {
+    if (_texture->width) {
+      _cachedSize.width  = _texture->width;
+      _cachedSize.height = _texture->height;
+      return _cachedSize;
+    }
+
+    if (_texture->_size) {
+      _cachedSize.width  = _texture->_size;
+      _cachedSize.height = _texture->_size;
+      return _cachedSize;
+    }
   }
 
-  if (_texture && _texture->_size) {
-    return Size(_texture->_size, _texture->_size);
-  }
-
-  return Size::Zero();
+  return _cachedSize;
 }
 
 ISize BaseTexture::getBaseSize()
@@ -272,14 +313,16 @@ unsigned int BaseTexture::textureFormat() const
                             EngineConstants::TEXTUREFORMAT_RGBA;
 }
 
-ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex)
+ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex, int level)
 {
   if (!_texture) {
     return ArrayBufferView();
   }
 
-  auto size  = getSize();
-  auto scene = getScene();
+  auto size   = getSize();
+  auto width  = size.width;
+  auto height = size.height;
+  auto scene  = getScene();
 
   if (!scene) {
     return ArrayBufferView();
@@ -287,12 +330,21 @@ ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex)
 
   auto engine = scene->getEngine();
 
-  if (_texture->isCube) {
-    return engine->_readTexturePixels(_texture, size.width, size.height,
-                                      static_cast<int>(faceIndex));
+  if (level != 0) {
+    width  = width / static_cast<int>(::std::pow(2, level));
+    height = height / static_cast<int>(::std::pow(2, level));
+
+    width  = static_cast<int>(::std::round(width));
+    height = static_cast<int>(::std::round(height));
   }
 
-  return engine->_readTexturePixels(_texture, size.width, size.height, -1);
+  if (_texture->isCube) {
+    return engine->_readTexturePixels(_texture, size.width, size.height,
+                                      static_cast<int>(faceIndex), level);
+  }
+
+  return engine->_readTexturePixels(_texture, size.width, size.height, -1,
+                                    level);
 }
 
 void BaseTexture::releaseInternalTexture()

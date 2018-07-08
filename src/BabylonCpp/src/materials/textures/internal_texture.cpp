@@ -31,6 +31,12 @@ InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource)
     , _cachedWrapV{0}
     , _cachedWrapR{0}
     , _comparisonFunction{0}
+    , _sphericalPolynomial{nullptr}
+    , _lodGenerationScale{0}
+    , _lodGenerationOffset{0}
+    , _lodTextureHigh{nullptr}
+    , _lodTextureMid{nullptr}
+    , _lodTextureLow{nullptr}
     , _isRGBD{false}
     , _references{1}
     , _engine{engine}
@@ -43,6 +49,11 @@ InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource)
 
 InternalTexture::~InternalTexture()
 {
+}
+
+Engine* InternalTexture::getEngine()
+{
+  return _engine;
 }
 
 unsigned int InternalTexture::dataSource() const

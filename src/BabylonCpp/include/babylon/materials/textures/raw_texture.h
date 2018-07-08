@@ -47,6 +47,12 @@ public:
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     unsigned int type         = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
+  static unique_ptr_t<RawTexture> CreateRTexture(
+    const ArrayBufferView& data, int width, int height, Scene* scene,
+    bool generateMipMaps = true, bool invertY = false,
+    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
+    unsigned int type         = EngineConstants::TEXTURETYPE_FLOAT);
+
   unsigned int format;
   unsigned int type;
 

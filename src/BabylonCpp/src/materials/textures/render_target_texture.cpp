@@ -23,7 +23,7 @@ RenderTargetTexture::RenderTargetTexture(
   const string_t& iName, const ISize& size, Scene* scene, bool generateMipMaps,
   bool doNotChangeAspectRatio, unsigned int type, bool iIsCube,
   unsigned int samplingMode, bool generateDepthBuffer,
-  bool generateStencilBuffer, bool isMulti)
+  bool generateStencilBuffer, bool isMulti, unsigned int format)
     : Texture{"", scene, !generateMipMaps}
     , renderParticles{true}
     , renderSprites{false}
@@ -33,6 +33,10 @@ RenderTargetTexture::RenderTargetTexture(
     , _generateMipMaps{generateMipMaps ? true : false}
     , boundingBoxPosition{Vector3::Zero()}
     , depthStencilTexture{nullptr}
+    , onAfterUnbind{this, &RenderTargetTexture::set_onAfterUnbind}
+    , onBeforeRender{this, &RenderTargetTexture::set_onBeforeRender}
+    , onAfterRender{this, &RenderTargetTexture::set_onAfterRender}
+    , onClear{this, &RenderTargetTexture::set_onClear}
     , samples{this, &RenderTargetTexture::get_samples,
               &RenderTargetTexture::set_samples}
     , refreshRate{this, &RenderTargetTexture::get_refreshRate,
@@ -74,6 +78,7 @@ RenderTargetTexture::RenderTargetTexture(
 
   _renderTargetOptions.generateMipMaps       = generateMipMaps;
   _renderTargetOptions.type                  = type;
+  _renderTargetOptions.format                = format;
   _renderTargetOptions.samplingMode          = samplingMode;
   _renderTargetOptions.generateDepthBuffer   = generateDepthBuffer;
   _renderTargetOptions.generateStencilBuffer = generateStencilBuffer;
@@ -123,7 +128,7 @@ Nullable<Vector3>& RenderTargetTexture::get_boundingBoxSize()
   return _boundingBoxSize;
 }
 
-void RenderTargetTexture::setOnAfterUnbind(
+void RenderTargetTexture::set_onAfterUnbind(
   const ::std::function<void(RenderTargetTexture*, EventState&)>& callback)
 {
   if (_onAfterUnbindObserver) {
@@ -132,7 +137,7 @@ void RenderTargetTexture::setOnAfterUnbind(
   _onAfterUnbindObserver = onAfterUnbindObservable.add(callback);
 }
 
-void RenderTargetTexture::setOnBeforeRender(
+void RenderTargetTexture::set_onBeforeRender(
   const ::std::function<void(int* faceIndex, EventState&)>& callback)
 {
   if (_onBeforeRenderObserver) {
@@ -141,7 +146,7 @@ void RenderTargetTexture::setOnBeforeRender(
   _onBeforeRenderObserver = onBeforeRenderObservable.add(callback);
 }
 
-void RenderTargetTexture::setOnAfterRender(
+void RenderTargetTexture::set_onAfterRender(
   const ::std::function<void(int* faceIndex, EventState&)>& callback)
 {
   if (_onAfterRenderObserver) {
@@ -150,7 +155,7 @@ void RenderTargetTexture::setOnAfterRender(
   _onAfterRenderObserver = onAfterRenderObservable.add(callback);
 }
 
-void RenderTargetTexture::setOnClear(
+void RenderTargetTexture::set_onClear(
   const ::std::function<void(Engine* engine, EventState&)>& callback)
 {
   if (_onClearObserver) {
@@ -633,7 +638,7 @@ void RenderTargetTexture::setRenderingAutoClearDepthStencil(
                                                        autoClearDepthStencil);
 }
 
-unique_ptr_t<RenderTargetTexture> RenderTargetTexture::clone() const
+unique_ptr_t<RenderTargetTexture> RenderTargetTexture::clone()
 {
   auto textureSize = getSize();
   auto newTexture  = ::std::make_unique<RenderTargetTexture>(

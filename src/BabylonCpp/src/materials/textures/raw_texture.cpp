@@ -88,4 +88,14 @@ RawTexture::CreateRGBATexture(const ArrayBufferView& data, int width,
     generateMipMaps, invertY, samplingMode, type);
 }
 
+unique_ptr_t<RawTexture>
+RawTexture::CreateRTexture(const ArrayBufferView& data, int width, int height,
+                           Scene* scene, bool generateMipMaps, bool invertY,
+                           unsigned int samplingMode, unsigned int type)
+{
+  return ::std::make_unique<RawTexture>(
+    data, width, height, EngineConstants::TEXTUREFORMAT_R, scene,
+    generateMipMaps, invertY, samplingMode, type);
+}
+
 } // end of namespace BABYLON

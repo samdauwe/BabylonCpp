@@ -278,6 +278,10 @@ void ProceduralTexture::resize(const Size& size, bool generateMipMaps)
   IRenderTargetOptions options;
   options.generateMipMaps = generateMipMaps;
   _texture                = _engine->createRenderTargetTexture(size, options);
+
+  // Update properties
+  _size            = size;
+  _generateMipMaps = generateMipMaps;
 }
 
 void ProceduralTexture::_checkUniform(const string_t& uniformName)
@@ -466,7 +470,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
   }
 }
 
-unique_ptr_t<ProceduralTexture> ProceduralTexture::clone() const
+unique_ptr_t<ProceduralTexture> ProceduralTexture::clone()
 {
   auto textureSize = getSize();
   auto newTexture  = ::std::make_unique<ProceduralTexture>(

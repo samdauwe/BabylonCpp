@@ -550,11 +550,15 @@ class _DepthCullingState;
 class _StencilState;
 } // end of namespace BABYLON
 // --- Tools ---
+class ColorGradient;
 struct DDS;
 struct DDSInfo;
 class DDSTools;
 class EventState;
+struct FactorGradient;
 struct IFileRequest;
+struct IValueGradient;
+class PerfCounter;
 class PerformanceMonitor;
 class RollingAverage;
 struct SerializationHelper;

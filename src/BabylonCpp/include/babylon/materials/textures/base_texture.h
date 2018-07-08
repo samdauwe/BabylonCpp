@@ -43,7 +43,7 @@ public:
   InternalTexture* getInternalTexture();
   virtual bool isReadyOrNotBlocking();
   virtual bool isReady();
-  ISize getSize() const;
+  ISize getSize();
   ISize getBaseSize();
   virtual void scale(float ratio);
   bool canRescale();
@@ -55,7 +55,18 @@ public:
   unique_ptr_t<BaseTexture> clone() const;
   unsigned int textureType() const;
   unsigned int textureFormat() const;
-  ArrayBufferView readPixels(unsigned int faceIndex = 0);
+
+  /**
+   * @brief Reads the pixels stored in the webgl texture and returns them as an
+   * ArrayBuffer. This will returns an RGBA array buffer containing either in
+   * values (0-255) or float values (0-1) depending of the underlying buffer
+   * type.
+   * @param faceIndex The face of the texture to read (in case of cube texture)
+   * @param level The LOD level of the texture to read (in case of Mip Maps)
+   * @returns The Array buffer containing the pixels data.
+   */
+  ArrayBufferView readPixels(unsigned int faceIndex = 0, int level = 0);
+
   void releaseInternalTexture();
   SphericalPolynomial* sphericalPolynomial();
   void setSphericalPolynomial(const SphericalPolynomial& value);
@@ -78,6 +89,10 @@ protected:
 
   virtual void set_boundingBoxSize(const Nullable<Vector3>& value);
   virtual Nullable<Vector3>& get_boundingBoxSize();
+  float get_lodGenerationOffset() const;
+  void set_lodGenerationOffset(float value);
+  float get_lodGenerationScale() const;
+  void set_lodGenerationScale(float value);
 
 public:
   string_t name;
@@ -141,8 +156,11 @@ public:
 
   bool invertZ;
   bool lodLevelInAlpha;
-  float lodGenerationOffset;
-  float lodGenerationScale;
+
+  Property<BaseTexture, float> lodGenerationOffset;
+
+  Property<BaseTexture, float> lodGenerationScale;
+
   bool isRenderTarget;
   vector_t<Animation*> animations;
   /**
@@ -166,6 +184,7 @@ private:
   Matrix _textureMatrix;
   Matrix _reflectionTextureMatrix;
   Nullable<Vector3> emptyVector3;
+  ISize _cachedSize;
 
 }; // end of class BaseTexture
 

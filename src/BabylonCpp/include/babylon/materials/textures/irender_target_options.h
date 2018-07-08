@@ -12,6 +12,7 @@ struct BABYLON_SHARED_EXPORT IRenderTargetOptions {
   bool generateDepthBuffer   = true;
   bool generateStencilBuffer = false;
   unsigned int type          = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+  unsigned int format        = EngineConstants::TEXTUREFORMAT_RGBA;
   unsigned int samplingMode  = TextureConstants::TRILINEAR_SAMPLINGMODE;
 }; // end of struct RenderTargetOptions
 

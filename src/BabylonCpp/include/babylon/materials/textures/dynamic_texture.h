@@ -97,7 +97,7 @@ public:
    * @brief Clones the texture.
    * @returns the clone of the texture.
    */
-  unique_ptr_t<DynamicTexture> clone() const;
+  unique_ptr_t<DynamicTexture> clone();
 
   void _rebuild() override;
 

@@ -22,7 +22,7 @@ RefractionTexture::~RefractionTexture()
 {
 }
 
-unique_ptr_t<RefractionTexture> RefractionTexture::clone() const
+unique_ptr_t<RefractionTexture> RefractionTexture::clone()
 {
   auto scene = getScene();
   if (!scene) {

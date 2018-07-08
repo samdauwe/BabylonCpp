@@ -21,7 +21,7 @@ public:
                 bool generateDepthBuffer = true);
   ~MirrorTexture() override;
 
-  unique_ptr_t<MirrorTexture> clone() const;
+  unique_ptr_t<MirrorTexture> clone();
   Json::object serialize() const;
   void dispose() override;
 

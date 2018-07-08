@@ -52,6 +52,12 @@ public:
   bool isPickable;
   ActionManager* actionManager;
 
+  /**
+   * Gets or sets a boolean indicating if the sprite is visible (renderable).
+   * Default is true
+   */
+  bool isVisible;
+
   Property<Sprite, int> size;
 
 private:

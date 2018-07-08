@@ -45,24 +45,22 @@ CubeTexture::CubeTexture(
   bool noMipmap, const vector_t<string_t>& iFiles,
   const ::std::function<void(InternalTexture*, EventState&)>& onLoad,
   const ::std::function<void()>& onError, unsigned int format, bool prefiltered,
-  const string_t& forcedExtension, bool createPolynomials)
+  const string_t& forcedExtension, bool createPolynomials, float lodScale,
+  float lodOffset)
     : BaseTexture{scene}
     , url{rootUrl}
     , coordinatesMode{TextureConstants::CUBIC_MODE}
     , boundingBoxPosition{Vector3::Zero()}
     , rotationY{this, &CubeTexture::get_rotationY, &CubeTexture::set_rotationY}
+    , _prefiltered{false}
     , _boundingBoxSize{nullptr}
     , _rotationY{0.f}
     , _noMipmap{noMipmap}
     , _textureMatrix{::std::make_unique<Matrix>(Matrix::Identity())}
     , _format{format}
-    , _prefiltered{prefiltered}
     , _createPolynomials{createPolynomials}
 {
   isCube = true;
-  if (prefiltered) {
-    gammaSpace = false;
-  }
 
   name = rootUrl;
   setHasAlpha(false);
@@ -70,8 +68,6 @@ CubeTexture::CubeTexture(
   if (rootUrl.empty() && iFiles.empty()) {
     return;
   }
-
-  _texture = _getFromCache(rootUrl, noMipmap);
 
   const auto lastDot = String::lastIndexOf(rootUrl, ".");
   const auto extension
@@ -81,13 +77,28 @@ CubeTexture::CubeTexture(
            String::toLowerCase(rootUrl.substr(static_cast<size_t>(lastDot))) :
            "");
   const auto isDDS = (extension == ".dds");
+  const auto isEnv = (extension == ".env");
+
+  if (isEnv) {
+    gammaSpace   = false;
+    _prefiltered = false;
+  }
+  else {
+    _prefiltered = prefiltered;
+
+    if (prefiltered) {
+      gammaSpace = false;
+    }
+  }
+
+  _texture = _getFromCache(rootUrl, noMipmap);
 
   _files = iFiles;
 
   if (iFiles.empty()) {
     _extensions = extensions;
 
-    if (!isDDS && _extensions.empty()) {
+    if (!isEnv && !isDDS && _extensions.empty()) {
       _extensions
         = {"_px.jpg", "_py.jpg", "_pz.jpg", "_nx.jpg", "_ny.jpg", "_nz.jpg"};
     }
@@ -105,13 +116,13 @@ CubeTexture::CubeTexture(
     if (!scene->useDelayedTextureLoading) {
       if (prefiltered) {
         _texture = scene->getEngine()->createPrefilteredCubeTexture(
-          rootUrl, scene, lodGenerationScale, lodGenerationOffset, onLoad,
-          onError, format, forcedExtension, _createPolynomials);
+          rootUrl, scene, lodScale, lodOffset, onLoad, onError, format,
+          forcedExtension, _createPolynomials);
       }
       else {
         _texture = scene->getEngine()->createCubeTexture(
           rootUrl, scene, extensions, noMipmap, onLoad, onError, _format,
-          forcedExtension);
+          forcedExtension, false, lodScale, lodOffset);
       }
     }
     else {

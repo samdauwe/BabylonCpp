@@ -18,6 +18,7 @@ Sprite::Sprite(const string_t& iName, SpriteManager* manager)
     , invertV{0}
     , isPickable{false}
     , actionManager{nullptr}
+    , isVisible{true}
     , size{this, &Sprite::get_size, &Sprite::set_size}
     , _animationStarted{false}
     , _loopAnimation{false}

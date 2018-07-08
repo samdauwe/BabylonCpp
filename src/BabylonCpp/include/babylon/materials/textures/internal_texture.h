@@ -82,6 +82,12 @@ public:
   ~InternalTexture();
 
   /**
+   * @brief Gets the Engine the texture belongs to.
+   * @returns The babylon engine
+   */
+  Engine* getEngine();
+
+  /**
    * @brief Gets the data source type of the texture (can be one of the
    * BABYLON.InternalTexture.DATASOURCE_XXXX).
    */
@@ -106,13 +112,12 @@ public:
    */
   void _rebuild();
 
+  void _swapAndDie(InternalTexture* target);
+
   /**
    * @brief Dispose the current allocated resources.
    */
   void dispose();
-
-private:
-  void _swapAndDie(InternalTexture* target);
 
 public:
   /**

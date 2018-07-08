@@ -40,7 +40,7 @@ public:
   ProceduralTexture& setVector3(const string_t& name, const Vector3& value);
   ProceduralTexture& setMatrix(const string_t& name, const Matrix& value);
   void render(bool useCameraPostProcess = false);
-  unique_ptr_t<ProceduralTexture> clone() const;
+  unique_ptr_t<ProceduralTexture> clone();
   void dispose() override;
 
 protected:

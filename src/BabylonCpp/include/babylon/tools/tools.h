@@ -5,6 +5,7 @@
 #include <babylon/core/nullable.h>
 #include <babylon/core/structs.h>
 #include <babylon/engine/engine_constants.h>
+#include <babylon/tools/ivalue_gradient.h>
 
 namespace BABYLON {
 
@@ -112,6 +113,18 @@ struct BABYLON_SHARED_EXPORT Tools {
   static void RequestFullscreen(ICanvas*)
   {
   }
+
+  /**
+   * @brief Gets the current gradient from an array of IValueGradient.
+   * @param ratio defines the current ratio to get
+   * @param gradients defines the array of IValueGradient
+   * @param updateFunc defines the callback function used to get the final value
+   * from the selected gradients
+   */
+  static void GetCurrentGradient(
+    float ratio, const vector_t<IValueGradient*>& gradients,
+    const ::std::function<void(IValueGradient* current, IValueGradient* next,
+                               float scale)>& updateFunc);
 
 }; // end of struct Tools
 

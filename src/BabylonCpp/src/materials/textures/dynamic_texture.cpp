@@ -132,7 +132,7 @@ void DynamicTexture::drawText(const string_t& text, int x, int y,
   }
 }
 
-unique_ptr_t<DynamicTexture> DynamicTexture::clone() const
+unique_ptr_t<DynamicTexture> DynamicTexture::clone()
 {
   auto scene = getScene();
   if (!scene) {

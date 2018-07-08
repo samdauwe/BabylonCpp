@@ -469,4 +469,22 @@ void Tools::DumpFramebuffer(int /*width*/, int /*height*/, Engine* /*engine*/)
 {
 }
 
+void Tools::GetCurrentGradient(
+  float ratio, const vector_t<IValueGradient*>& gradients,
+  const ::std::function<void(IValueGradient* current, IValueGradient* next,
+                             float scale)>& updateFunc)
+{
+  for (size_t gradientIndex = 0; gradientIndex < gradients.size() - 1;
+       ++gradientIndex) {
+    auto currentGradient = gradients[gradientIndex];
+    auto nextGradient    = gradients[gradientIndex + 1];
+
+    if (ratio >= currentGradient->gradient && ratio <= nextGradient->gradient) {
+      const auto scale = (ratio - currentGradient->gradient)
+                         / (nextGradient->gradient - currentGradient->gradient);
+      updateFunc(currentGradient, nextGradient, scale);
+    }
+  }
+}
+
 } // end of namespace BABYLON

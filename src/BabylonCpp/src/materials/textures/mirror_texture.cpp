@@ -208,7 +208,7 @@ void MirrorTexture::_preparePostProcesses()
   }
 }
 
-unique_ptr_t<MirrorTexture> MirrorTexture::clone() const
+unique_ptr_t<MirrorTexture> MirrorTexture::clone()
 {
   auto scene = getScene();
 

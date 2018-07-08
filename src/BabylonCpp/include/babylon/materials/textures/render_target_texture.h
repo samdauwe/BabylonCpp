@@ -38,7 +38,7 @@ public:
   /**
    * @brief Instantiate a render target texture. This is mainly to render of
    * screen the scene to for instance apply post processse or used a shadow,
-   * depth texture.
+   * depth texture...
    * @param name The friendly name of the texture
    * @param size The size of the RTT (number if square, or {with: number,
    * height:number} or {ratio:} to define a ratio from the main scene)
@@ -54,6 +54,8 @@ public:
    * @param generateDepthBuffer True to generate a depth buffer
    * @param generateStencilBuffer True to generate a stencil buffer
    * @param isMulti True if multiple textures need to be created (Draw Buffers)
+   * @param format The internal format of the buffer in the RTT (RED, RG, RGB,
+   * RGBA, ALPHA...)
    */
   RenderTargetTexture(
     const string_t& name, const ISize& size, Scene* scene,
@@ -62,7 +64,8 @@ public:
     bool isCube               = false,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     bool generateDepthBuffer = true, bool generateStencilBuffer = false,
-    bool isMulti = false);
+    bool isMulti        = false,
+    unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
   ~RenderTargetTexture() override;
 
   /**
@@ -81,16 +84,6 @@ public:
                                  bool generateStencil   = false);
 
   void _onRatioRescale();
-
-  /** Events **/
-  void setOnAfterUnbind(
-    const ::std::function<void(RenderTargetTexture*, EventState&)>& callback);
-  void setOnBeforeRender(
-    const ::std::function<void(int* faceIndex, EventState&)>& callback);
-  void setOnAfterRender(
-    const ::std::function<void(int* faceIndex, EventState&)>& callback);
-  void setOnClear(
-    const ::std::function<void(Engine* engine, EventState&)>& callback);
 
   RenderTargetCreationOptions& renderTargetOptions();
   const RenderTargetCreationOptions& renderTargetOptions() const;
@@ -140,7 +133,7 @@ public:
    */
   void setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
                                          bool autoClearDepthStencil);
-  unique_ptr_t<RenderTargetTexture> clone() const;
+  unique_ptr_t<RenderTargetTexture> clone();
   Json::object serialize() const;
 
   /**
@@ -169,6 +162,16 @@ protected:
    */
   virtual void set_boundingBoxSize(const Nullable<Vector3>& value) override;
   virtual Nullable<Vector3>& get_boundingBoxSize() override;
+
+  /** Events **/
+  void set_onAfterUnbind(
+    const ::std::function<void(RenderTargetTexture*, EventState&)>& callback);
+  void set_onBeforeRender(
+    const ::std::function<void(int* faceIndex, EventState&)>& callback);
+  void set_onAfterRender(
+    const ::std::function<void(int* faceIndex, EventState&)>& callback);
+  void set_onClear(
+    const ::std::function<void(Engine* engine, EventState&)>& callback);
 
   unsigned int get_samples() const;
   void set_samples(unsigned int value);
@@ -214,8 +217,8 @@ public:
   Nullable<Color4> clearColor;
   bool _generateMipMaps;
   vector_t<string_t> _waitingRenderList;
-  ::std::function<void()> onAfterRender;
-  ::std::function<void()> onBeforeRender;
+  // ::std::function<void()> onAfterRender;
+  // ::std::function<void()> onBeforeRender;
 
   /**
    * Gets or sets the center of the bounding box associated with the texture
@@ -243,20 +246,36 @@ public:
    */
   Observable<RenderTargetTexture> onAfterUnbindObservable;
 
+  WriteOnlyProperty<RenderTargetTexture,
+                    ::std::function<void(RenderTargetTexture*, EventState&)>>
+    onAfterUnbind;
+
   /**
    * An event triggered before rendering the texture
    */
   Observable<int> onBeforeRenderObservable;
+
+  WriteOnlyProperty<RenderTargetTexture,
+                    ::std::function<void(int* faceIndex, EventState&)>>
+    onBeforeRender;
 
   /**
    * An event triggered after rendering the texture
    */
   Observable<int> onAfterRenderObservable;
 
+  WriteOnlyProperty<RenderTargetTexture,
+                    ::std::function<void(int* faceIndex, EventState&)>>
+    onAfterRender;
+
   /**
    * An event triggered after the texture clear
    */
   Observable<Engine> onClearObservable;
+
+  WriteOnlyProperty<RenderTargetTexture,
+                    ::std::function<void(Engine* engine, EventState&)>>
+    onClear;
 
   Property<RenderTargetTexture, unsigned int> samples;
 

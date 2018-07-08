@@ -1602,6 +1602,12 @@ public:
    * loader
    * @param createPolynomials if a polynomial sphere should be created for the
    * cube texture
+   * @param lodScale defines the scale applied to environment texture. This
+   * manages the range of LOD level used for IBL according to the roughness
+   * @param lodOffset defines the offset applied to environment texture. This
+   * manages first LOD level used for IBL according to the roughness
+   * @param fallback defines texture to use while falling back when (compressed)
+   * texture file not found.
    * @returns the cube texture as an InternalTexture
    */
   InternalTexture* createCubeTexture(
@@ -1610,7 +1616,9 @@ public:
     const ::std::function<void(InternalTexture*, EventState&)>& onLoad
     = nullptr,
     const ::std::function<void()>& onError = nullptr, unsigned int format = 0,
-    const string_t& forcedExtension = "", bool createPolynomials = false);
+    const string_t& forcedExtension = "", bool createPolynomials = false,
+    float lodScale = 0.f, float lodOffset = 0.f,
+    InternalTexture* fallback = nullptr);
 
   /**
    * @brief Update a raw cube texture.
@@ -1910,7 +1918,8 @@ public:
    * @brief Hidden
    */
   ArrayBufferView _readTexturePixels(InternalTexture* texture, int width,
-                                     int height, int faceIndex = -1);
+                                     int height, int faceIndex = -1,
+                                     int level = 0);
 
   /**
    * @brief Hidden
