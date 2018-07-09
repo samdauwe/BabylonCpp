@@ -178,7 +178,8 @@ void _DepthCullingState::apply(GL::IGLRenderingContext& gl)
 
   // Cull
   if (_isCullDirty) {
-    if (cull()) {
+    const auto& cullFace = cull();
+    if (cullFace && *cullFace) {
       gl.enable(GL::CULL_FACE);
     }
     else {
