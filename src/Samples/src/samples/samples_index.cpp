@@ -10,6 +10,7 @@
 #include <babylon/samples/materials/_materials_samples_index.h>
 #include <babylon/samples/meshes/_meshes_samples_index.h>
 #include <babylon/samples/specialfx/_special_fx_samples_index.h>
+#include <babylon/samples/textures/_textures_samples_index.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -34,6 +35,8 @@ SamplesIndex::SamplesIndex()
     {_MeshesSamplesIndex::CategoryName(), _MeshesSamplesIndex()},
     // Special FX samples
     {_SpecialFXSamplesIndex::CategoryName(), _SpecialFXSamplesIndex()},
+    // Textures samples
+    {_TexturesSamplesIndex::CategoryName(), _TexturesSamplesIndex()},
   };
 }
 
