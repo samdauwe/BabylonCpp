@@ -2,6 +2,7 @@
 
 #include <babylon/samples/materials/fresnel_parameters_torus_knot_scene.h>
 #include <babylon/samples/materials/materials_scene.h>
+#include <babylon/samples/materials/multi_material_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_box_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_boxes_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_carved_trees_scene.h>
@@ -55,6 +56,12 @@ _MaterialsSamplesIndex::_MaterialsSamplesIndex()
                         [](ICanvas* iCanvas) {                                //
                           return ::std::make_unique<MaterialsScene>(iCanvas); //
                         });                                                   //
+  // Multi Material Scene
+  _samples["MultiMaterialScene"] = ::std::make_tuple(
+    true,                                                     //
+    [](ICanvas* iCanvas) {                                    //
+      return ::std::make_unique<MultiMaterialScene>(iCanvas); //
+    });                                                       //
   // X-ray Material with Fresnel Skull Scene
   _samples["XRayMaterialWithFresnelSkullScene"] = ::std::make_tuple(
     true,                                                                    //
