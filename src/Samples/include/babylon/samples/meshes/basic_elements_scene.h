@@ -6,6 +6,11 @@
 namespace BABYLON {
 namespace Samples {
 
+/**
+ * @brief Basic elements scene. Example demonstrating how to create Ball, box,
+ * plane, line, etc.
+ * @see https://www.babylonjs-playground.com/#A1210C#0
+ */
 class BasicElementsScene : public IRenderableScene {
 
 public:

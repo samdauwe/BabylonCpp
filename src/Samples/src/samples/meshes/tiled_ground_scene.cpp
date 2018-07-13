@@ -51,7 +51,7 @@ void TiledGroundScene::initializeScene(ICanvas* canvas, Scene* scene)
   ISize precision(2, 2);
   ISize subdivisions(8, 8);
   // Create the Tiled Ground
-  Mesh* tiledGround = Mesh::CreateTiledGround(
+  auto tiledGround = Mesh::CreateTiledGround(
     "Tiled Ground", xmin, zmin, xmax, zmax, subdivisions, precision, scene);
 
   // Part 2 : Create the multi material

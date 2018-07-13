@@ -23,6 +23,11 @@ struct Ring {
   float angle;
 }; // end of struct Ring
 
+/**
+ * @brief Hypnotizing infinite loader scene. Example demonstrating how to create
+ * visually apealing loading animation.
+ * @see https://www.babylonjs-playground.com/#VUJG1#1
+ */
 class InfiniteLoaderScene : public IRenderableScene {
 
 public:
