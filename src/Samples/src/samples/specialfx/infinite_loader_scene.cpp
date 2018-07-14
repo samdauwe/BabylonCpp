@@ -27,7 +27,7 @@ void Ring::addTube(const std::vector<Vector3>& points)
 {
   auto tube = Mesh::CreateTube("tube", points, 1, 3, nullptr, Mesh::CAP_ALL(),
                                center->getScene(), false, Mesh::FRONTSIDE());
-  tube->setParent(center);
+  tube->parent = center;
   tubes.emplace_back(tube);
 }
 
@@ -48,8 +48,8 @@ const char* InfiniteLoaderScene::getName()
 void InfiniteLoaderScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // camera
-  auto* camera = ArcRotateCamera::New("camera1", -Math::PI_2, 0.f, 70.f,
-                                      Vector3::Zero(), scene);
+  auto camera = ArcRotateCamera::New("camera1", -Math::PI_2, 0.f, 70.f,
+                                     Vector3::Zero(), scene);
   camera->attachControl(canvas, true);
 
   auto light = HemisphericLight::New("light1", Vector3(0.f, 1.f, 0.f), scene);

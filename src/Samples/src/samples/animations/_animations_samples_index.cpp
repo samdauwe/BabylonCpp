@@ -28,7 +28,7 @@ _AnimationsSamplesIndex::_AnimationsSamplesIndex()
     });                                                           //
   // Pump Jack Scene
   _samples["PumpJackScene"]
-    = ::std::make_tuple(false,                                               //
+    = ::std::make_tuple(true,                                                //
                         [](ICanvas* iCanvas) {                               //
                           return ::std::make_unique<PumpJackScene>(iCanvas); //
                         });                                                  //

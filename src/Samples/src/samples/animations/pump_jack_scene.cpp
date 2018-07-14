@@ -58,6 +58,7 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Initialization
   auto camera = FreeCamera::New("camera1", Vector3(0.f, 10.f, -25.f), scene);
   camera->setTarget(Vector3::Zero());
+  camera->position = Vector3(-5.f, 10.f, -25.f);
   camera->attachControl(canvas, true);
 
   auto light = HemisphericLight::New("Hemi0", Vector3(0.f, 1.f, 0.f), scene);
@@ -75,7 +76,7 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto motorAxis
     = Mesh::CreateCylinder("motorAxis", 5, 0.5f, 0.5f, 24, 1, scene, true, 0);
   motorAxis->rotation().x = Math::PI_2;
-  motorAxis->setParent(parentObject);
+  motorAxis->parent       = parentObject;
 
   auto motorAnimation
     = new Animation("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
@@ -96,27 +97,27 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Front Arm //
   //###########//
 
-  auto frontArmPaddle = Mesh::CreateBox("frontArmPaddle", 2.f, scene);
-  frontArmPaddle->setParent(parentObject);
+  auto frontArmPaddle          = Mesh::CreateBox("frontArmPaddle", 2.f, scene);
+  frontArmPaddle->parent       = parentObject;
   frontArmPaddle->scaling().y  = 2.f;
   frontArmPaddle->scaling().z  = 0.1f;
   frontArmPaddle->scaling().x  = 0.5f;
   frontArmPaddle->position().y = 1.5f;
   frontArmPaddle->position().z = -2.3f;
 
-  auto frontWeight = Mesh::CreateBox("frontWeight", 1.f, scene);
-  frontWeight->setParent(parentObject);
+  auto frontWeight          = Mesh::CreateBox("frontWeight", 1.f, scene);
+  frontWeight->parent       = parentObject;
   frontWeight->position().y = 3.f;
   frontWeight->position().z = -2.3f;
   frontWeight->setScaling(Vector3(3.f, 1.6f, 0.3f));
 
-  auto frontPivot = Mesh::CreateBox("frontPivot", 0.5f, scene);
-  frontPivot->setParent(parentObject);
+  auto frontPivot          = Mesh::CreateBox("frontPivot", 0.5f, scene);
+  frontPivot->parent       = parentObject;
   frontPivot->position().y = distanceOfStick;
   frontPivot->position().z = -2.3f;
 
-  auto frontStick = Mesh::CreateBox("frontStick", 1.f, scene);
-  frontStick->setParent(frontPivot);
+  auto frontStick          = Mesh::CreateBox("frontStick", 1.f, scene);
+  frontStick->parent       = frontPivot;
   frontStick->position().x = -(lengthOfStick / 2.f);
   frontStick->position().z = -0.3f;
   frontStick->setScaling(Vector3(lengthOfStick, 0.2f, 0.2f));
@@ -143,27 +144,27 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Back Arm //
   //###########//
 
-  auto backArmPaddle = Mesh::CreateBox("backArmPaddle", 2.f, scene);
-  backArmPaddle->setParent(parentObject);
+  auto backArmPaddle          = Mesh::CreateBox("backArmPaddle", 2.f, scene);
+  backArmPaddle->parent       = parentObject;
   backArmPaddle->scaling().y  = 2.f;
   backArmPaddle->scaling().z  = 0.1f;
   backArmPaddle->scaling().x  = 0.5f;
   backArmPaddle->position().y = 1.5f;
   backArmPaddle->position().z = 2.3f;
 
-  auto backWeight = Mesh::CreateBox("backWeight", 1.f, scene);
-  backWeight->setParent(parentObject);
+  auto backWeight          = Mesh::CreateBox("backWeight", 1.f, scene);
+  backWeight->parent       = parentObject;
   backWeight->position().y = 3.f;
   backWeight->position().z = 2.3f;
   backWeight->setScaling(Vector3(3.f, 1.6f, 0.3f));
 
-  auto backPivot = Mesh::CreateBox("backPivot", 0.5f, scene);
-  backPivot->setParent(parentObject);
+  auto backPivot          = Mesh::CreateBox("backPivot", 0.5f, scene);
+  backPivot->parent       = parentObject;
   backPivot->position().y = distanceOfStick;
   backPivot->position().z = 2.3f;
 
-  auto backStick = Mesh::CreateBox("backStick", 1.f, scene);
-  backStick->setParent(backPivot);
+  auto backStick          = Mesh::CreateBox("backStick", 1.f, scene);
+  backStick->parent       = backPivot;
   backStick->position().x = -(lengthOfStick / 2.f);
   backStick->position().z = 0.3f;
   backStick->setScaling(Vector3(lengthOfStick, 0.2f, 0.2f));
@@ -216,13 +217,13 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   auto topBar
     = Mesh::CreateCylinder("topBar", 5.5f, 0.7f, 0.7f, 24, 1, scene, true, 0);
-  topBar->setParent(topStick);
+  topBar->parent       = topStick;
   topBar->position().x = 0.5f;
   topBar->setScaling(Vector3(1.f / lengthOfTopStick, 5.f, 5.f));
   topBar->rotation().x = Math::PI_2;
 
-  auto topBall = Mesh::CreateSphere("topBall", 12, 1, scene, true, 0);
-  topBall->setParent(topStick);
+  auto topBall          = Mesh::CreateSphere("topBall", 12, 1, scene, true, 0);
+  topBall->parent       = topStick;
   topBall->position().x = -0.5f;
   topBall->setScaling(Vector3(1.f / lengthOfTopStick, 5.f, 5.f));
 
