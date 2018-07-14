@@ -1,0 +1,84 @@
+#ifndef BABYLON_PARTICLES_PARTICLE_SYSTEM_SET_H
+#define BABYLON_PARTICLES_PARTICLE_SYSTEM_SET_H
+
+#include <babylon/babylon_global.h>
+#include <babylon/interfaces/idisposable.h>
+#include <babylon/particles/particle_system_set_emitter_creation_options.h>
+
+namespace BABYLON {
+
+/**
+ * @brief Represents a set of particle systems working together to create a
+ * specific effect.
+ */
+class BABYLON_SHARED_EXPORT ParticleSystemSet : public IDisposable {
+
+public:
+  ParticleSystemSet();
+  virtual ~ParticleSystemSet();
+
+  /**
+   * @brief Creates a new emitter mesh as a sphere.
+   * @param options defines the options used to create the sphere
+   * @param renderingGroupId defines the renderingGroupId to use for the sphere
+   * @param scene defines the hosting scene
+   */
+  void setEmitterAsSphere(const EmitterCreationOptions& options,
+                          unsigned int renderingGroupId, Scene* scene);
+
+  /**
+   * @brief Starts all particle systems of the set.
+   * @param emitter defines an optional mesh to use as emitter for the particle
+   * systems
+   */
+  void start(AbstractMesh* emitter = nullptr);
+
+  /**
+   * @brief Release all associated resources.
+   */
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
+
+  /**
+   * @brief Serialize the set into a JSON compatible object.
+   * @returns a JSON compatible representation of the set
+   */
+  Json::object serialize() const;
+
+  /**
+   * @brief Parse a new ParticleSystemSet from a serialized source.
+   * @param data defines a JSON compatible representation of the set
+   * @param scene defines the hosting scene
+   * @param gpu defines if we want GPU particles or CPU particles
+   * @returns a new ParticleSystemSet
+   */
+  static unique_ptr_t<ParticleSystemSet> Parse(const Json::value& data,
+                                               Scene* scene, bool gpu = false);
+
+protected:
+  /**
+   * @brief Gets the emitter mesh used with this set.
+   */
+  Mesh*& get_emitterMesh();
+
+public:
+  /**
+   * Gets the particle system list
+   */
+  vector_t<IParticleSystem*> systems;
+
+  /**
+   * Gets the emitter mesh used with this set.
+   */
+  ReadOnlyProperty<ParticleSystemSet, Mesh*> emitterMesh;
+
+private:
+  ParticleSystemSetEmitterCreationOptions _emitterCreationOptions;
+  Mesh* _emitterMesh;
+
+}; // end of class ParticleSystemSetEmitterCreationOptions
+
+} // end of namespace BABYLON
+
+#endif // end of
+       // BABYLON_PARTICLES_PARTICLE_SYSTEM_SET_H

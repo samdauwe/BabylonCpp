@@ -210,9 +210,7 @@ class ScaleGizmo;
 // --- Helpers ---
 class EnvironmentHelper;
 struct IEnvironmentHelperOptions;
-struct IParticleSystemData;
 struct ISceneSize;
-class ParticleHelper;
 struct PhotoDomeOptions;
 class PhotoDome;
 // --- Instrumentation ---
@@ -442,11 +440,15 @@ class MorphTarget;
 class MorphTargetManager;
 // --- Particles ---
 struct DepthSortedParticle;
+struct EmitterCreationOptions;
 class GPUParticleSystem;
 struct IParticleSystem;
 class ModelShape;
 class Particle;
+struct ParticleHelper;
 class ParticleSystem;
+class ParticleSystemSet;
+struct ParticleSystemSetEmitterCreationOptions;
 class SolidParticle;
 class SolidParticleSystem;
 // - EmitterTypes
