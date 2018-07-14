@@ -10,18 +10,19 @@ Path3D::Path3D()
 {
 }
 
-Path3D::Path3D(const vector_t<Vector3>& path,
+Path3D::Path3D(const vector_t<Vector3>& iPath,
                const Nullable<Vector3>& firstNormal, bool raw)
-    : _raw{raw}
+    : path{iPath}, _raw{raw}
 {
-  for (auto& vector : path) {
+  for (auto& vector : iPath) {
     _curve.emplace_back(vector);
   }
   _compute(firstNormal);
 }
 
 Path3D::Path3D(const Path3D& otherPath)
-    : _curve{otherPath._curve}
+    : path{otherPath.path}
+    , _curve{otherPath._curve}
     , _distances{otherPath._distances}
     , _tangents{otherPath._tangents}
     , _normals{otherPath._normals}
@@ -31,7 +32,8 @@ Path3D::Path3D(const Path3D& otherPath)
 }
 
 Path3D::Path3D(Path3D&& otherPath)
-    : _curve{::std::move(otherPath._curve)}
+    : path{otherPath.path}
+    , _curve{::std::move(otherPath._curve)}
     , _distances{::std::move(otherPath._distances)}
     , _tangents{::std::move(otherPath._tangents)}
     , _normals{::std::move(otherPath._normals)}
@@ -43,6 +45,7 @@ Path3D::Path3D(Path3D&& otherPath)
 Path3D& Path3D::operator=(const Path3D& otherPath)
 {
   if (&otherPath != this) {
+    path       = otherPath.path;
     _curve     = otherPath._curve;
     _distances = otherPath._distances;
     _tangents  = otherPath._tangents;
@@ -57,6 +60,7 @@ Path3D& Path3D::operator=(const Path3D& otherPath)
 Path3D& Path3D::operator=(Path3D&& otherPath)
 {
   if (&otherPath != this) {
+    path       = ::std::move(otherPath.path);
     _curve     = ::std::move(otherPath._curve);
     _distances = ::std::move(otherPath._distances);
     _tangents  = ::std::move(otherPath._tangents);
@@ -183,7 +187,7 @@ void Path3D::_compute(const Nullable<Vector3>& firstNormal)
   // normals and binormals at first point : arbitrary vector with
   // _normalVector()
   const auto& tg0   = _tangents[0];
-  const Vector3 pp0 = _normalVector(_curve[0], tg0, *firstNormal);
+  const Vector3 pp0 = _normalVector(_curve[0], tg0, firstNormal);
   _normals[0]       = pp0;
   if (!_raw) {
     _normals[0].normalize();

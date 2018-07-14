@@ -505,16 +505,6 @@ public:
    * @param indices an array of indices in groups of three for each triangular
    * facet, [...., i, j, k, ......]
    * @param normals an array of vertex normals, [...., x, y, z, ......]
-   */
-  static void ComputeNormals(const Float32Array& positions,
-                             const Uint32Array& indices, Float32Array& normals);
-
-  /**
-   * @brief Compute normals for given positions and indices.
-   * @param positions an array of vertex positions, [...., x, y, z, ......]
-   * @param indices an array of indices in groups of three for each triangular
-   * facet, [...., i, j, k, ......]
-   * @param normals an array of vertex normals, [...., x, y, z, ......]
    * @param options an object used to set the following optional parameters for
    * the TorusKnot, optional
    * * facetNormals : optional array of facet normals (vector3)
@@ -539,7 +529,7 @@ public:
    */
   static void ComputeNormals(const Float32Array& positions,
                              const Uint32Array& indices, Float32Array& normals,
-                             FacetParameters& options);
+                             Nullable<FacetParameters> options = nullptr);
 
   /**
    * @brief Applies VertexData created from the imported parameters to the

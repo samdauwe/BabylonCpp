@@ -2648,70 +2648,16 @@ unique_ptr_t<VertexData> VertexData::CreateTorusKnot(TorusKnotOptions& options)
 }
 
 // Tools
+
 void VertexData::ComputeNormals(const Float32Array& positions,
                                 const Uint32Array& indices,
-                                Float32Array& normals)
+                                Float32Array& normals,
+                                Nullable<FacetParameters> iOptions)
 {
   if (normals.size() < positions.size()) {
     normals.resize(positions.size());
   }
 
-  unsigned int index = 0;
-
-  // temp Vector3
-  auto p1p2           = Vector3::Zero();
-  auto p3p2           = Vector3::Zero();
-  auto faceNormal     = Vector3::Zero();
-  auto vertexNormali1 = Vector3::Zero();
-
-  for (index = 0; index < positions.size(); ++index) {
-    normals[index] = 0.f;
-  }
-
-  // indice triplet = 1 face
-  size_t nbFaces = indices.size() / 3;
-  for (index = 0; index < nbFaces; ++index) {
-    auto i1 = static_cast<unsigned>(indices[index * 3 + 0]);
-    auto i2 = static_cast<unsigned>(indices[index * 3 + 1]);
-    auto i3 = static_cast<unsigned>(indices[index * 3 + 2]);
-
-    p1p2.x = positions[i1 * 3 + 0] - positions[i2 * 3 + 0];
-    p1p2.y = positions[i1 * 3 + 1] - positions[i2 * 3 + 1];
-    p1p2.z = positions[i1 * 3 + 2] - positions[i2 * 3 + 2];
-
-    p3p2.x = positions[i3 * 3 + 0] - positions[i2 * 3 + 0];
-    p3p2.y = positions[i3 * 3 + 1] - positions[i2 * 3 + 1];
-    p3p2.z = positions[i3 * 3 + 2] - positions[i2 * 3 + 2];
-
-    Vector3::CrossToRef(p1p2, p3p2, faceNormal);
-    faceNormal.normalize();
-
-    normals[i1 * 3 + 0] += faceNormal.x;
-    normals[i1 * 3 + 1] += faceNormal.y;
-    normals[i1 * 3 + 2] += faceNormal.z;
-    normals[i2 * 3 + 0] += faceNormal.x;
-    normals[i2 * 3 + 1] += faceNormal.y;
-    normals[i2 * 3 + 2] += faceNormal.z;
-    normals[i3 * 3 + 0] += faceNormal.x;
-    normals[i3 * 3 + 1] += faceNormal.y;
-    normals[i3 * 3 + 2] += faceNormal.z;
-  }
-
-  // last normalization of each normal
-  for (index = 0; index < normals.size() / 3; ++index) {
-    Vector3::FromFloatsToRef(normals[index * 3 + 0], normals[index * 3 + 1],
-                             normals[index * 3 + 2], vertexNormali1);
-    vertexNormali1.normalize();
-    normals[index * 3]     = vertexNormali1.x;
-    normals[index * 3 + 1] = vertexNormali1.y;
-    normals[index * 3 + 2] = vertexNormali1.z;
-  }
-}
-
-void VertexData::ComputeNormals(const Float32Array& positions,
-                                const Uint32Array& indices,
-                                Float32Array& normals, FacetParameters& options)
-{
   // temporary scalar variables
   unsigned int index         = 0;   // facet index
   float p1p2x                = 0.f; // p1p2 vector x coordinate
@@ -2733,23 +2679,38 @@ void VertexData::ComputeNormals(const Float32Array& positions,
   unsigned int v3x           = 0;   // vector3 x index in the positions array
   unsigned int v3y           = 0;   // vector3 y index in the positions array
   unsigned int v3z           = 0;   // vector3 z index in the positions array
-  bool computeFacetNormals   = (!options.facetNormals.empty()) ? true : false;
-  bool computeFacetPositions = (!options.facetPositions.empty()) ? true : false;
-  bool computeFacetPartitioning
-    = (!options.facetPartitioning.empty()) ? true : false;
-  bool computeDepthSort        = options.depthSort;
-  float faceNormalSign         = options.useRightHandedSystem ? -1.f : 1.f;
-  float ratio                  = options.ratio;
-  Nullable<Vector3> distanceTo = options.distanceTo;
+  bool computeFacetNormals   = false;
+  bool computeFacetPositions = false;
+  bool computeFacetPartitioning = false;
+  bool computeDepthSort         = false;
+  float faceNormalSign          = 1.f;
+  float ratio                   = 0;
+  Nullable<Vector3> distanceTo  = nullptr;
   vector_t<DepthSortedFacet> depthSortedFacets;
-  if (computeDepthSort) {
-    if (distanceTo.isNull()) {
-      distanceTo = Vector3::Zero();
+  if (iOptions) {
+    const auto& options   = *iOptions;
+    computeFacetNormals   = (!options.facetNormals.empty()) ? true : false;
+    computeFacetPositions = (!options.facetPositions.empty()) ? true : false;
+    computeFacetPartitioning
+      = (!options.facetPartitioning.empty()) ? true : false;
+    faceNormalSign   = (options.useRightHandedSystem == true) ? -1.f : 1.f;
+    ratio            = options.ratio ? *options.ratio : 0.f;
+    computeDepthSort = (options.depthSort) ? true : false;
+    distanceTo       = options.distanceTo;
+    if (computeDepthSort) {
+      if (distanceTo.isNull()) {
+        distanceTo = Vector3::Zero();
+      }
+      depthSortedFacets = options.depthSortedFacets;
     }
-    depthSortedFacets = options.depthSortedFacets;
   }
 
   // facetPartitioning reinit if needed
+  float xSubRatio    = 0.f;
+  float ySubRatio    = 0.f;
+  float zSubRatio    = 0.f;
+  unsigned int subSq = 0;
+
   unsigned int ox           = 0; // X partitioning index for facet position
   unsigned int oy           = 0; // Y partinioning index for facet position
   unsigned int oz           = 0; // Z partinioning index for facet position
@@ -2767,19 +2728,15 @@ void VertexData::ComputeNormals(const Float32Array& positions,
   unsigned int block_idx_v2 = 0; // v2 vertex block index
   unsigned int block_idx_v3 = 0; // v3 vertex block index
 
-  float xSubRatio    = 0.f;
-  float ySubRatio    = 0.f;
-  float zSubRatio    = 0.f;
-  unsigned int subSq = 0;
-
-  if (computeFacetPartitioning) {
-    float bbSizeMax = (options.bbSize.x > options.bbSize.y) ? options.bbSize.x :
-                                                              options.bbSize.y;
-    bbSizeMax = (bbSizeMax > options.bbSize.z) ? bbSizeMax : options.bbSize.z;
-    xSubRatio = options.subDiv.X * ratio / options.bbSize.x;
-    ySubRatio = options.subDiv.Y * ratio / options.bbSize.y;
-    zSubRatio = options.subDiv.Z * ratio / options.bbSize.z;
-    subSq     = options.subDiv.max * options.subDiv.max;
+  auto options = *iOptions;
+  if (computeFacetPartitioning && iOptions && (*iOptions).bbSize) {
+    const auto& bbSize = *options.bbSize;
+    float bbSizeMax    = (bbSize.x > bbSize.y) ? bbSize.x : bbSize.y;
+    bbSizeMax          = (bbSizeMax > bbSize.z) ? bbSizeMax : bbSize.z;
+    xSubRatio          = options.subDiv.X * ratio / bbSize.x;
+    ySubRatio          = options.subDiv.Y * ratio / bbSize.y;
+    zSubRatio          = options.subDiv.Z * ratio / bbSize.z;
+    subSq              = options.subDiv.max * options.subDiv.max;
     options.facetPartitioning.clear();
   }
 
@@ -2824,13 +2781,13 @@ void VertexData::ComputeNormals(const Float32Array& positions,
     faceNormaly /= length;
     faceNormalz /= length;
 
-    if (computeFacetNormals) {
+    if (computeFacetNormals && iOptions) {
       options.facetNormals[index].x = faceNormalx;
       options.facetNormals[index].y = faceNormaly;
       options.facetNormals[index].z = faceNormalz;
     }
 
-    if (computeFacetPositions) {
+    if (computeFacetPositions && iOptions) {
       // compute and the facet barycenter coordinates in the array
       // facetPositions
       options.facetPositions[index].x
@@ -2841,7 +2798,7 @@ void VertexData::ComputeNormals(const Float32Array& positions,
         = (positions[v1z] + positions[v2z] + positions[v3z]) / 3.f;
     }
 
-    if (computeFacetPartitioning) {
+    if (computeFacetPartitioning && iOptions) {
       // store the facet indexes in arrays in the main facetPartitioning array :
       // compute each facet vertex (+ facet barycenter) index in the partiniong
       // array
@@ -2901,7 +2858,7 @@ void VertexData::ComputeNormals(const Float32Array& positions,
       }
     }
 
-    if (computeDepthSort && !options.facetPositions.empty()) {
+    if (computeDepthSort && iOptions && !options.facetPositions.empty()) {
       if (nbFaces >= depthSortedFacets.size()) {
         depthSortedFacets.resize(nbFaces);
       }

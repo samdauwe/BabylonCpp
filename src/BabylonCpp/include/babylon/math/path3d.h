@@ -97,6 +97,9 @@ private:
   Vector3 _normalVector(const Vector3& v0, const Vector3& vt,
                         const Nullable<Vector3>& va);
 
+public:
+  vector_t<Vector3> path;
+
 private:
   vector_t<Vector3> _curve;
   Float32Array _distances;

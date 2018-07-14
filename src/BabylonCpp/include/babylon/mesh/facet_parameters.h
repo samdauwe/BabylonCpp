@@ -32,9 +32,9 @@ struct BABYLON_SHARED_EXPORT FacetParameters {
   SubdivisionsPerAxis subDiv;
   // Partitioning ratio / bounding box, required for facetPartitioning
   // computation
-  float ratio;
+  Nullable<float> ratio;
   // Bounding box size data, required for facetPartitioning computation
-  Vector3 bbSize;
+  Nullable<Vector3> bbSize;
   // Bounding info, required for facetPartitioning computation
   BoundingInfo bInfo;
   // Whether or not to use a right-handed coordinate system
