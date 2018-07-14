@@ -84,7 +84,8 @@ def main():
                  "babylon.stereoscopicCameras.ts", "babylon.sceneSerializer.ts",
                  "babylon.videoTexture.ts", "babylon.database.ts",
                  "babylon.promise.ts", "babylon.videoDome.ts",
-                 "babylon.sound.ts", "babylon.khronosTextureContainer.ts"]
+                 "babylon.sound.ts", "babylon.khronosTextureContainer.ts",
+                 "babylon.environmentTextureTools.ts"]
     # Create mapping from BabylonJs version to full path
     for version in BabylonJsVersions:
         fullPath = os.path.join(os.path.expanduser('~'), "Projects",
