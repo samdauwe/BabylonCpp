@@ -88,51 +88,53 @@ struct BABYLON_SHARED_EXPORT PBRMaterialDefines
   static constexpr unsigned int REFLECTIONMAP_OPPOSITEZ       = 59;
   static constexpr unsigned int LODINREFLECTIONALPHA          = 60;
   static constexpr unsigned int GAMMAREFLECTION               = 61;
-  static constexpr unsigned int RADIANCEOCCLUSION             = 62;
-  static constexpr unsigned int HORIZONOCCLUSION              = 63;
+  static constexpr unsigned int RGBDREFLECTION                = 62;
+  static constexpr unsigned int RADIANCEOCCLUSION             = 63;
+  static constexpr unsigned int HORIZONOCCLUSION              = 64;
 
-  static constexpr unsigned int REFRACTION                   = 64;
-  static constexpr unsigned int REFRACTIONMAP_3D             = 65;
-  static constexpr unsigned int REFRACTIONMAP_OPPOSITEZ      = 66;
-  static constexpr unsigned int LODINREFRACTIONALPHA         = 67;
-  static constexpr unsigned int GAMMAREFRACTION              = 68;
-  static constexpr unsigned int LINKREFRACTIONTOTRANSPARENCY = 69;
+  static constexpr unsigned int REFRACTION                   = 65;
+  static constexpr unsigned int REFRACTIONMAP_3D             = 66;
+  static constexpr unsigned int REFRACTIONMAP_OPPOSITEZ      = 67;
+  static constexpr unsigned int LODINREFRACTIONALPHA         = 68;
+  static constexpr unsigned int GAMMAREFRACTION              = 69;
+  static constexpr unsigned int RGBDREFRACTION               = 70;
+  static constexpr unsigned int LINKREFRACTIONTOTRANSPARENCY = 71;
 
-  static constexpr unsigned int INSTANCES = 70;
+  static constexpr unsigned int INSTANCES = 72;
 
-  static constexpr unsigned int NONUNIFORMSCALING = 71;
+  static constexpr unsigned int NONUNIFORMSCALING = 73;
 
-  static constexpr unsigned int MORPHTARGETS         = 72;
-  static constexpr unsigned int MORPHTARGETS_NORMAL  = 73;
-  static constexpr unsigned int MORPHTARGETS_TANGENT = 74;
+  static constexpr unsigned int MORPHTARGETS         = 74;
+  static constexpr unsigned int MORPHTARGETS_NORMAL  = 75;
+  static constexpr unsigned int MORPHTARGETS_TANGENT = 76;
 
-  static constexpr unsigned int IMAGEPROCESSING            = 75;
-  static constexpr unsigned int VIGNETTE                   = 76;
-  static constexpr unsigned int VIGNETTEBLENDMODEMULTIPLY  = 77;
-  static constexpr unsigned int VIGNETTEBLENDMODEOPAQUE    = 78;
-  static constexpr unsigned int TONEMAPPING                = 79;
-  static constexpr unsigned int CONTRAST                   = 80;
-  static constexpr unsigned int COLORCURVES                = 81;
-  static constexpr unsigned int COLORGRADING               = 82;
-  static constexpr unsigned int COLORGRADING3D             = 83;
-  static constexpr unsigned int SAMPLER3DGREENDEPTH        = 84;
-  static constexpr unsigned int SAMPLER3DBGRMAP            = 85;
-  static constexpr unsigned int IMAGEPROCESSINGPOSTPROCESS = 86;
-  static constexpr unsigned int EXPOSURE                   = 87;
+  static constexpr unsigned int IMAGEPROCESSING            = 77;
+  static constexpr unsigned int VIGNETTE                   = 78;
+  static constexpr unsigned int VIGNETTEBLENDMODEMULTIPLY  = 79;
+  static constexpr unsigned int VIGNETTEBLENDMODEOPAQUE    = 80;
+  static constexpr unsigned int TONEMAPPING                = 81;
+  static constexpr unsigned int CONTRAST                   = 82;
+  static constexpr unsigned int COLORCURVES                = 83;
+  static constexpr unsigned int COLORGRADING               = 84;
+  static constexpr unsigned int COLORGRADING3D             = 85;
+  static constexpr unsigned int SAMPLER3DGREENDEPTH        = 86;
+  static constexpr unsigned int SAMPLER3DBGRMAP            = 87;
+  static constexpr unsigned int IMAGEPROCESSINGPOSTPROCESS = 88;
+  static constexpr unsigned int EXPOSURE                   = 89;
 
-  static constexpr unsigned int USEPHYSICALLIGHTFALLOFF = 88;
-  static constexpr unsigned int TWOSIDEDLIGHTING        = 89;
-  static constexpr unsigned int SHADOWFLOAT             = 90;
-  static constexpr unsigned int CLIPPLANE               = 91;
-  static constexpr unsigned int POINTSIZE               = 92;
-  static constexpr unsigned int FOG                     = 93;
-  static constexpr unsigned int LOGARITHMICDEPTH        = 94;
+  static constexpr unsigned int USEPHYSICALLIGHTFALLOFF = 90;
+  static constexpr unsigned int TWOSIDEDLIGHTING        = 91;
+  static constexpr unsigned int SHADOWFLOAT             = 92;
+  static constexpr unsigned int CLIPPLANE               = 93;
+  static constexpr unsigned int POINTSIZE               = 94;
+  static constexpr unsigned int FOG                     = 95;
+  static constexpr unsigned int LOGARITHMICDEPTH        = 96;
 
-  static constexpr unsigned int FORCENORMALFORWARD = 95;
+  static constexpr unsigned int FORCENORMALFORWARD = 97;
 
-  static constexpr unsigned int SPECULARAA = 96;
+  static constexpr unsigned int SPECULARAA = 98;
 
-  static constexpr unsigned int UNLIT = 97;
+  static constexpr unsigned int UNLIT = 99;
 
   /**
    * @brief Initializes the PBR Material defines.

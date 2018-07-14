@@ -147,11 +147,13 @@ void PBRBaseMaterial::_attachImageProcessingConfiguration(
   }
 
   // Attaches observer.
-  _imageProcessingObserver
-    = _imageProcessingConfiguration->onUpdateParameters.add(
-      [this](ImageProcessingConfiguration*, EventState&) {
-        _markAllSubMeshesAsImageProcessingDirty();
-      });
+  if (_imageProcessingConfiguration) {
+    _imageProcessingObserver
+      = _imageProcessingConfiguration->onUpdateParameters.add(
+        [this](ImageProcessingConfiguration*, EventState&) {
+          _markAllSubMeshesAsImageProcessingDirty();
+        });
+  }
 }
 
 const string_t PBRBaseMaterial::getClassName() const
@@ -347,7 +349,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     }
   }
 
-  if (defines._areImageProcessingDirty) {
+  if (defines._areImageProcessingDirty && _imageProcessingConfiguration) {
     if (!_imageProcessingConfiguration->isReady()) {
       return false;
     }
@@ -571,8 +573,11 @@ Effect* PBRBaseMaterial::_prepareEffect(
     "reflectionSamplerHigh", "microSurfaceSampler", "environmentBrdfSampler"};
   vector_t<string_t> uniformBuffers{"Material", "Scene"};
 
-  ImageProcessingConfiguration::PrepareUniforms(uniforms, defines);
-  ImageProcessingConfiguration::PrepareSamplers(samplers, defines);
+  // if (ImageProcessingConfiguration)
+  {
+    ImageProcessingConfiguration::PrepareUniforms(uniforms, defines);
+    ImageProcessingConfiguration::PrepareSamplers(samplers, defines);
+  }
 
   unordered_map_t<string_t, unsigned int> indexParameters{
     {"maxSimultaneousLights", _maxSimultaneousLights},
@@ -654,6 +659,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
       if (reflectionTexture && StandardMaterial::ReflectionTextureEnabled()) {
         defines.defines[PMD::REFLECTION]      = true;
         defines.defines[PMD::GAMMAREFLECTION] = reflectionTexture->gammaSpace;
+        defines.defines[PMD::RGBDREFLECTION]  = reflectionTexture->isRGBD;
         defines.defines[PMD::REFLECTIONMAP_OPPOSITEZ]
           = getScene()->useRightHandedSystem() ? !reflectionTexture->invertZ :
                                                  reflectionTexture->invertZ;
@@ -735,6 +741,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
         defines.defines[PMD::REFLECTIONMAP_OPPOSITEZ]       = false;
         defines.defines[PMD::LODINREFLECTIONALPHA]          = false;
         defines.defines[PMD::GAMMAREFLECTION]               = false;
+        defines.defines[PMD::RGBDREFLECTION]                = false;
       }
 
       if (_lightmapTexture && StandardMaterial::LightmapTextureEnabled()) {
@@ -823,6 +830,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
         defines.defines[PMD::REFRACTION]       = true;
         defines.defines[PMD::REFRACTIONMAP_3D] = refractionTexture->isCube;
         defines.defines[PMD::GAMMAREFRACTION]  = refractionTexture->gammaSpace;
+        defines.defines[PMD::RGBDREFRACTION]   = refractionTexture->isRGBD;
         defines.defines[PMD::REFRACTIONMAP_OPPOSITEZ]
           = refractionTexture->invertZ;
         defines.defines[PMD::LODINREFRACTIONALPHA]
@@ -880,7 +888,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
         && _enableSpecularAntiAliasing;
   }
 
-  if (defines._areImageProcessingDirty) {
+  if (defines._areImageProcessingDirty && _imageProcessingConfiguration) {
     _imageProcessingConfiguration->prepareDefines(defines);
   }
 

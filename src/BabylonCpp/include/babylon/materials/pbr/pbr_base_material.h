@@ -53,6 +53,14 @@ public:
 
   /**
    * @brief Sets the transparency mode of the material.
+   *
+   * | Value | Type                                | Description |
+   * | ----- | ----------------------------------- | ----------- |
+   * | 0     | OPAQUE                              |             |
+   * | 1     | ALPHATEST                           |             |
+   * | 2     | ALPHABLEND                          |             |
+   * | 3     | ALPHATESTANDBLEND                   |             |
+   *
    */
   void setTransparencyMode(const Nullable<unsigned int>& value);
 
