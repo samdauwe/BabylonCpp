@@ -103,82 +103,7 @@ public:
 
   IReflect::Type type() const override;
 
-  // Events
-  /**
-   * @brief Sets a function to be executed when this scene is disposed.
-   */
-  void setOnDispose(
-    const ::std::function<void(Scene* scene, EventState& es)>& callback);
-
-  /**
-   * @brief Sets a function to be executed before rendering this scene.
-   */
-  void setBeforeRender(
-    const ::std::function<void(Scene* scene, EventState& es)>& callback);
-
-  /**
-   * @brief Sets a function to be executed after rendering this scene.
-   */
-  void setAfterRender(
-    const ::std::function<void(Scene* scene, EventState& es)>& callback);
-
-  /**
-   * @brief Sets a function to be executed before rendering a camera.
-   */
-  void setBeforeCameraRender(
-    const ::std::function<void(Camera* camera, EventState& es)>& callback);
-
-  /**
-   * @brief Sets a function to be executed after rendering a camera.
-   */
-  void setAfterCameraRender(
-    const ::std::function<void(Camera* camera, EventState& es)>& callback);
-
-  // Gamepads
-
-  /**
-   * @brief Gets the gamepad manager associated with the scene.
-   * @see http://doc.babylonjs.com/how_to/how_to_use_gamepads
-   */
-  GamepadManager& gamepadManager();
-
-  // Pointers
-
-  /**
-   * @brief Gets the pointer coordinates without any translation (ie. straight
-   * out of the pointer event).
-   */
-  Vector2& unTranslatedPointer();
-
   /** Properties **/
-
-  /**
-   * @brief Returns the texture used in all pbr material as the reflection
-   * texture.
-   * As in the majority of the scene they are the same (exception for multi room
-   * and so on), this is easier to reference from here than from all the
-   * materials.
-   */
-  BaseTexture* environmentTexture();
-
-  /**
-   * @brief Sets the texture used in all pbr material as the reflection texture.
-   * As in the majority of the scene they are the same (exception for multi room
-   * and so on), this is easier to set here than in all the materials.
-   */
-  void setEnvironmentTexture(BaseTexture* value);
-
-  /**
-   * @brief Gets a boolean indicating if the scene must use right-handed
-   * coordinates system.
-   */
-  bool useRightHandedSystem() const;
-
-  /**
-   * @brief Sets a boolean indicating if the scene must use right-handed
-   * coordinates system.
-   */
-  void setUseRightHandedSystem(bool value);
 
   /**
    * @brief Sets the step Id used by deterministic lock step.
@@ -201,203 +126,10 @@ public:
    */
   unsigned int getInternalStep() const;
 
-  /**
-   * @brief Default image processing configuration used either in the rendering
-   * Forward main pass or through the imageProcessingPostProcess if present.
-   * As in the majority of the scene they are the same (exception for multi
-   * camera), this is easier to reference from here than from all the materials
-   * and post process.
-   *
-   * No setter as we it is a shared configuration, you can set the values
-   * instead.
-   */
-  ImageProcessingConfiguration* imageProcessingConfiguration();
-
-  /**
-   * @brief Gets a boolean indicating if all rendering must be done in
-   * wireframe.
-   */
-  bool forceWireframe() const;
-
-  /**
-   * @brief Sets a boolean indicating if all rendering must be done in
-   * wireframe.
-   */
-  void setForceWireframe(bool value);
-
-  /**
-   * @brief Gets a boolean indicating if all rendering must be done in point
-   * cloud.
-   */
-  bool forcePointsCloud() const;
-
-  /**
-   * @brief Sets a boolean indicating if all rendering must be done in point
-   * cloud.
-   */
-  void setForcePointsCloud(bool value);
-
-  /**
-   * @brief Gets or sets a boolean indicating if fog is enabled on this scene.
-   * @see http://doc.babylonjs.com/babylon101/environment#fog
-   */
-  bool fogEnabled() const;
-
-  /**
-   * @brief Gets or sets a boolean indicating if fog is enabled on this scene.
-   * @see http://doc.babylonjs.com/babylon101/environment#fog
-   */
-  void setFogEnabled(bool value);
-
-  /**
-   * @brief Gets the fog mode to use.
-   * @see http://doc.babylonjs.com/babylon101/environment#fog
-   */
-  bool fogMode() const;
-
-  /**
-   * @brief Sets the fog mode to use.
-   * @see http://doc.babylonjs.com/babylon101/environment#fog
-   */
-  void setFogMode(unsigned int value);
-
-  /**
-   * @brief Gets a boolean indicating if shadows are enabled on this scene.
-   */
-  bool shadowsEnabled() const;
-
-  /**
-   * @brief Sets a boolean indicating if shadows are enabled on this scene.
-   */
-  void setShadowsEnabled(bool value);
-
-  /**
-   * @brief Gets a boolean indicating if lights are enabled on this scene.
-   */
-  bool lightsEnabled() const;
-
-  /**
-   * @brief Sets a boolean indicating if lights are enabled on this scene.
-   */
-  void setLightsEnabled(bool value);
-
-  /**
-   * @brief Gets a boolean indicating if textures are enabled on this scene.
-   */
-  bool texturesEnabled() const;
-
-  /**
-   * @brief Sets a boolean indicating if textures are enabled on this scene.
-   */
-  void setTexturesEnabled(bool value);
-
-  /**
-   * @brief Gets a boolean indicating if skeletons are enabled on this scene.
-   */
-  bool skeletonsEnabled() const;
-
-  /**
-   * @brief Sets a boolean indicating if skeletons are enabled on this scene.
-   */
-  void setSkeletonsEnabled(bool value);
-
-  /**
-   * @brief Gets the postprocess render pipeline manager.
-   * @see http://doc.babylonjs.com/how_to/how_to_use_postprocessrenderpipeline
-   * @see http://doc.babylonjs.com/how_to/using_default_rendering_pipeline
-   */
-  PostProcessRenderPipelineManager* postProcessRenderPipelineManager();
-
-  /**
-   * @brief Gets the main soundtrack associated with the scene.
-   */
-  SoundTrack* mainSoundTrack();
-
-  /**
-   * @brief Gets the current geometry buffer associated to the scene.
-   */
-  shared_ptr_t<GeometryBufferRenderer>& geometryBufferRenderer();
-
-  /**
-   * @brief Sets the current geometry buffer for the scene.
-   */
-  void setGeometryBufferRenderer(
-    const shared_ptr_t<GeometryBufferRenderer>& geometryBufferRenderer);
-
   Plane* clipPlane();
   void setClipPlane(const Plane& plane);
   void resetClipPlane();
   void setMirroredCameraPosition(const Vector3& newPosition);
-
-  /**
-   * @brief Gets the default material used on meshes when no material is
-   * affected.
-   */
-  Material* defaultMaterial();
-
-  /**
-   * @brief Sets the default material used on meshes when no material is
-   * affected.
-   */
-  void setDefaultMaterial(Material* value);
-
-  /**
-   * @brief Hidden
-   */
-  bool _isAlternateRenderingEnabled() const;
-
-  /**
-   * @brief Gets the list of frustum planes (built from the active camera).
-   */
-  array_t<Plane, 6>& frustumPlanes();
-
-  /**
-   * @brief Gets the list of frustum planes (built from the active camera).
-   */
-  const array_t<Plane, 6>& frustumPlanes() const;
-
-  /**
-   * @brief Gets the debug layer associated with the scene.
-   * @see http://doc.babylonjs.com/features/playground_debuglayer
-   */
-  DebugLayer* debugLayer();
-
-  /**
-   * @brief Sets a boolean indicating if collisions are processed on a web
-   * worker.
-   * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity#web-worker-based-collision-system-since-21
-   */
-  void setWorkerCollisions(bool enabled);
-
-  /**
-   * @brief Gets a boolean indicating if collisions are processed on a web
-   * worker.
-   * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity#web-worker-based-collision-system-since-21
-   */
-  bool workerCollisions() const;
-
-  /**
-   * @brief Gets the octree used to boost mesh selection (picking).
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene_with_octrees
-   */
-  Octree<AbstractMesh*>* selectionOctree();
-
-  /**
-   * @brief Gets the mesh that is currently under the pointer.
-   */
-  AbstractMesh* meshUnderPointer();
-
-  /**
-   * @brief Gets the current on-screen X position of the pointer.
-   */
-  int pointerX();
-
-  /**
-   * @brief Gets the current on-screen Y position of the pointer.
-   */
-  int pointerY();
 
   /**
    * @brief Gets the cached material (ie. the latest rendered one).
@@ -453,23 +185,11 @@ public:
   size_t getTotalVertices() const;
 
   /**
-   * @brief Gets the performance counter for total vertices.
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
-   */
-  PerfCounter& totalVerticesPerfCounter();
-
-  /**
    * @brief Gets the total number of active indices rendered per frame (You can
    * deduce the number of rendered triangles by dividing this number by 3).
    * @returns the total number of active indices rendered per frame
    */
   size_t getActiveIndices() const;
-
-  /**
-   * @brief Gets the performance counter for active indices.
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
-   */
-  PerfCounter& totalActiveIndicesPerfCounter();
 
   /**
    * @brief Gets the total number of active particles rendered per frame.
@@ -478,22 +198,10 @@ public:
   size_t getActiveParticles() const;
 
   /**
-   * @brief Gets the performance counter for active particles.
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
-   */
-  PerfCounter& activeParticlesPerfCounter();
-
-  /**
    * @brief Gets the total number of active bones rendered per frame.
    * @returns the total number of active bones rendered per frame
    */
   size_t getActiveBones() const;
-
-  /**
-   * @brief Gets the performance counter for active bones.
-   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
-   */
-  PerfCounter& activeBonesPerfCounter();
 
   /** Stats **/
 
@@ -653,11 +361,6 @@ public:
   void getWaitingItemsCount();
 
   /**
-   * @brief Returns a boolean indicating if the scene is still loading data.
-   */
-  bool isLoading() const;
-
-  /**
    * Registers a function to be executed when the scene is ready
    * @param {Function} func - the function to be executed
    */
@@ -771,11 +474,6 @@ public:
    * @returns an array of Animatables
    */
   vector_t<Animatable*> getAllAnimatablesByTarget(IAnimatable* target);
-
-  /**
-   * @brief Gets all animatable attached to the scene.
-   */
-  vector_t<Animatable*>& animatables();
 
   /**
    * @brief Will stop the animation of the given target.
@@ -1358,12 +1056,6 @@ public:
   GlowLayer* getGlowLayerByName(const string_t& name);
 
   /**
-   * @brief Return a unique id as a string which can serve as an identifier for
-   * the scene.
-   */
-  string_t& uid();
-
-  /**
    * @brief Clear the processed materials smart array preventing retention point
    * in material dispose.
    */
@@ -1435,32 +1127,6 @@ public:
    */
   void render(bool updateCameras = true);
 
-  /** Audio **/
-
-  /**
-   * @brief Gets if audio support is enabled.
-   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
-   */
-  bool audioEnabled() const;
-
-  /**
-   * @brief Sets if audio support is enabled.
-   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
-   */
-  void setAudioEnabled(bool value);
-
-  /**
-   * @brief Gets if audio will be output to headphones.
-   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
-   */
-  bool headphone() const;
-
-  /**
-   * @brief Sets if audio will be output to headphones.
-   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
-   */
-  void setHeadphone(bool value);
-
   /** Rendering **/
 
   /**
@@ -1508,11 +1174,6 @@ public:
    * @brief Releases all held ressources.
    */
   void dispose();
-
-  /**
-   * @brief Gets if the scene is already disposed.
-   */
-  bool isDisposed() const;
 
   /**
    *  @brief Releases sounds & soundtracks.
@@ -1960,6 +1621,354 @@ private:
   /** Tags **/
   vector_t<string_t> _getByTags();
 
+protected:
+  /**
+   * @brief Returns the texture used in all pbr material as the reflection
+   * texture.
+   * As in the majority of the scene they are the same (exception for multi room
+   * and so on), this is easier to reference from here than from all the
+   * materials.
+   */
+  BaseTexture*& get_environmentTexture();
+
+  /**
+   * @brief Sets the texture used in all pbr material as the reflection texture.
+   * As in the majority of the scene they are the same (exception for multi room
+   * and so on), this is easier to set here than in all the materials.
+   */
+  void set_environmentTexture(BaseTexture* const& value);
+
+  /**
+   * @brief Default image processing configuration used either in the rendering
+   * Forward main pass or through the imageProcessingPostProcess if present.
+   * As in the majority of the scene they are the same (exception for multi
+   * camera), this is easier to reference from here than from all the materials
+   * and post process.
+   *
+   * No setter as we it is a shared configuration, you can set the values
+   * instead.
+   */
+  unique_ptr_t<ImageProcessingConfiguration>&
+  get_imageProcessingConfiguration();
+
+  /**
+   * @brief Sets a boolean indicating if all rendering must be done in
+   * wireframe.
+   */
+  void set_forceWireframe(bool value);
+
+  /**
+   * @brief Gets a boolean indicating if all rendering must be done in
+   * wireframe.
+   */
+  bool get_forceWireframe() const;
+
+  /**
+   * @brief Sets a boolean indicating if all rendering must be done in point
+   * cloud.
+   */
+  void set_forcePointsCloud(bool value);
+
+  /**
+   * @brief Gets a boolean indicating if all rendering must be done in point
+   * cloud.
+   */
+  bool get_forcePointsCloud() const;
+
+  /**
+   * @brief Gets the animation properties override.
+   */
+  AnimationPropertiesOverride*& get_animationPropertiesOverride();
+
+  /**
+   * @brief Sets the animation properties override.
+   */
+  void
+  set_animationPropertiesOverride(AnimationPropertiesOverride* const& value);
+
+  // Events
+  /**
+   * @brief Sets a function to be executed when this scene is disposed.
+   */
+  void set_onDispose(
+    const ::std::function<void(Scene* scene, EventState& es)>& callback);
+
+  /**
+   * @brief Sets a function to be executed before rendering this scene.
+   */
+  void set_beforeRender(
+    const ::std::function<void(Scene* scene, EventState& es)>& callback);
+
+  /**
+   * @brief Sets a function to be executed after rendering this scene.
+   */
+  void set_afterRender(
+    const ::std::function<void(Scene* scene, EventState& es)>& callback);
+
+  /**
+   * @brief Sets a function to be executed before rendering a camera.
+   */
+  void set_beforeCameraRender(
+    const ::std::function<void(Camera* camera, EventState& es)>& callback);
+
+  /**
+   * @brief Sets a function to be executed after rendering a camera.
+   */
+  void set_afterCameraRender(
+    const ::std::function<void(Camera* camera, EventState& es)>& callback);
+
+  // Gamepads
+
+  /**
+   * @brief Gets the gamepad manager associated with the scene.
+   * @see http://doc.babylonjs.com/how_to/how_to_use_gamepads
+   */
+  GamepadManager& get_gamepadManager();
+
+  // Pointers
+
+  /**
+   * @brief Gets the pointer coordinates without any translation (ie. straight
+   * out of the pointer event).
+   */
+  Vector2& get_unTranslatedPointer();
+
+  /**
+   * @brief Gets a boolean indicating if the scene must use right-handed
+   * coordinates system.
+   */
+  bool get_useRightHandedSystem() const;
+
+  /**
+   * @brief Sets a boolean indicating if the scene must use right-handed
+   * coordinates system.
+   */
+  void set_useRightHandedSystem(bool value);
+
+  /**
+   * @brief Gets or sets a boolean indicating if fog is enabled on this scene.
+   * @see http://doc.babylonjs.com/babylon101/environment#fog
+   */
+  void set_fogEnabled(bool value);
+
+  /**
+   * @brief Gets or sets a boolean indicating if fog is enabled on this scene.
+   * @see http://doc.babylonjs.com/babylon101/environment#fog
+   */
+  bool get_fogEnabled() const;
+
+  /**
+   * @brief Sets the fog mode to use.
+   * @see http://doc.babylonjs.com/babylon101/environment#fog
+   */
+  void set_fogMode(unsigned int value);
+
+  /**
+   * @brief Gets the fog mode to use.
+   * @see http://doc.babylonjs.com/babylon101/environment#fog
+   */
+  unsigned int get_fogMode() const;
+
+  /**
+   * @brief Sets a boolean indicating if shadows are enabled on this scene.
+   */
+  void set_shadowsEnabled(bool value);
+
+  /**
+   * @brief Gets a boolean indicating if shadows are enabled on this scene.
+   */
+  bool get_shadowsEnabled() const;
+
+  /**
+   * @brief Sets a boolean indicating if lights are enabled on this scene.
+   */
+  void set_lightsEnabled(bool value);
+
+  /**
+   * @brief Gets a boolean indicating if lights are enabled on this scene.
+   */
+  bool get_lightsEnabled() const;
+
+  /**
+   * @brief Gets the default material used on meshes when no material is
+   * affected.
+   */
+  Material*& get_defaultMaterial();
+
+  /**
+   * @brief Sets the default material used on meshes when no material is
+   * affected.
+   */
+  void set_defaultMaterial(Material* const& value);
+
+  /**
+   * @brief Sets a boolean indicating if textures are enabled on this scene.
+   */
+  void set_texturesEnabled(bool value);
+
+  /**
+   * @brief Gets a boolean indicating if textures are enabled on this scene.
+   */
+  bool get_texturesEnabled() const;
+
+  /**
+   * @brief Sets a boolean indicating if skeletons are enabled on this scene.
+   */
+  void set_skeletonsEnabled(bool value);
+
+  /**
+   * @brief Gets a boolean indicating if skeletons are enabled on this scene.
+   */
+  bool get_skeletonsEnabled() const;
+
+  /**
+   * @brief Gets the postprocess render pipeline manager.
+   * @see http://doc.babylonjs.com/how_to/how_to_use_postprocessrenderpipeline
+   * @see http://doc.babylonjs.com/how_to/using_default_rendering_pipeline
+   */
+  unique_ptr_t<PostProcessRenderPipelineManager>&
+  get_postProcessRenderPipelineManager();
+
+  /**
+   * @brief Gets the main soundtrack associated with the scene.
+   */
+  unique_ptr_t<SoundTrack>& get_mainSoundTrack();
+
+  /**
+   * @brief Hidden
+   */
+  bool get_isAlternateRenderingEnabled() const;
+
+  /**
+   * @brief Gets the list of frustum planes (built from the active camera).
+   */
+  array_t<Plane, 6>& get_frustumPlanes();
+
+  /**
+   * @brief Gets the current geometry buffer associated to the scene.
+   */
+  shared_ptr_t<GeometryBufferRenderer>& get_geometryBufferRenderer();
+
+  /**
+   * @brief Sets the current geometry buffer for the scene.
+   */
+  void set_geometryBufferRenderer(
+    const shared_ptr_t<GeometryBufferRenderer>& geometryBufferRenderer);
+
+  /**
+   * @brief Gets the debug layer (aka Inspector) associated with the scene.
+   * @see http://doc.babylonjs.com/features/playground_debuglayer
+   */
+  unique_ptr_t<DebugLayer>& get_debugLayer();
+
+  /**
+   * @brief Sets a boolean indicating if collisions are processed on a web
+   * worker.
+   * @see
+   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity#web-worker-based-collision-system-since-21
+   */
+  void set_workerCollisions(bool enabled);
+
+  /**
+   * @brief Gets a boolean indicating if collisions are processed on a web
+   * worker.
+   * @see
+   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity#web-worker-based-collision-system-since-21
+   */
+  bool get_workerCollisions() const;
+
+  /**
+   * @brief Gets the octree used to boost mesh selection (picking).
+   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene_with_octrees
+   */
+  Octree<AbstractMesh*>*& get_selectionOctree();
+
+  /**
+   * @brief Gets the mesh that is currently under the pointer.
+   */
+  AbstractMesh*& get_meshUnderPointer();
+
+  /**
+   * @brief Gets the current on-screen X position of the pointer.
+   */
+  int get_pointerX() const;
+
+  /**
+   * @brief Gets the current on-screen Y position of the pointer.
+   */
+  int get_pointerY() const;
+
+  /**
+   * @brief Gets the performance counter for total vertices.
+   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
+   */
+  PerfCounter& get_totalVerticesPerfCounter();
+
+  /**
+   * @brief Gets the performance counter for active indices.
+   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
+   */
+  PerfCounter& get_totalActiveIndicesPerfCounter();
+
+  /**
+   * @brief Gets the performance counter for active particles.
+   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
+   */
+  PerfCounter& get_activeParticlesPerfCounter();
+
+  /**
+   * @brief Gets the performance counter for active bones.
+   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
+   */
+  PerfCounter& get_activeBonesPerfCounter();
+
+  /**
+   * @brief Returns a boolean indicating if the scene is still loading data.
+   */
+  bool get_isLoading() const;
+
+  /**
+   * @brief Gets all animatable attached to the scene.
+   */
+  vector_t<Animatable*>& get_animatables();
+
+  /**
+   * @brief Return a unique id as a string which can serve as an identifier for
+   * the scene.
+   */
+  string_t get_uid() const;
+
+  /** Audio **/
+
+  /**
+   * @brief Gets if audio support is enabled.
+   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
+   */
+  bool get_audioEnabled() const;
+
+  /**
+   * @brief Sets if audio support is enabled.
+   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
+   */
+  void set_audioEnabled(bool value);
+
+  /**
+   * @brief Gets if audio will be output to headphones.
+   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
+   */
+  bool get_headphone() const;
+
+  /**
+   * @brief Sets if audio will be output to headphones.
+   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
+   */
+  void set_headphone(bool value);
+
+  /**
+   * @brief Gets if the scene is already disposed.
+   */
+  bool get_isDisposed() const;
+
 public:
   // Members
 
@@ -1989,21 +1998,63 @@ public:
   /** Hidden */
   BaseTexture* _environmentBRDFTexture;
 
+  /**
+   * Returns the texture used in all pbr material as the reflection
+   * texture.
+   * As in the majority of the scene they are the same (exception for multi room
+   * and so on), this is easier to reference from here than from all the
+   * materials.
+   */
+  Property<Scene, BaseTexture*> environmentTexture;
+
+  /**
+   * Default image processing configuration used either in the rendering
+   * Forward main pass or through the imageProcessingPostProcess if present.
+   * As in the majority of the scene they are the same (exception for multi
+   * camera), this is easier to reference from here than from all the materials
+   * and post process.
+   *
+   * No setter as we it is a shared configuration, you can set the values
+   * instead.
+   */
+  ReadOnlyProperty<Scene, unique_ptr_t<ImageProcessingConfiguration>>
+    imageProcessingConfiguration;
+
   // Events
 
   /**
    * An event triggered when the scene is disposed.
    */
   Observable<Scene> onDisposeObservable;
+
+  /**
+   * Sets a function to be executed when this scene is disposed
+   */
+  WriteOnlyProperty<Scene, ::std::function<void(Scene* scene, EventState& es)>>
+    onDispose;
+
   /**
    * An event triggered before rendering the scene (right after animations and
    * physics)
    */
   Observable<Scene> onBeforeRenderObservable;
+
+  /**
+   * Sets a function to be executed before rendering this scene
+   */
+  WriteOnlyProperty<Scene, ::std::function<void(Scene* scene, EventState& es)>>
+    beforeRender;
+
   /**
    * An event triggered after rendering the scene
    */
   Observable<Scene> onAfterRenderObservable;
+
+  /**
+   * Sets a function to be executed after rendering this scene
+   */
+  WriteOnlyProperty<Scene, ::std::function<void(Scene* scene, EventState& es)>>
+    afterRender;
 
   /**
    * An event triggered before animating the scene
@@ -2043,10 +2094,22 @@ public:
    * An event triggered before rendering a camera
    */
   Observable<Camera> onBeforeCameraRenderObservable;
+
+  /**
+   * Sets a function to be executed before rendering a camera
+   */
+  WriteOnlyProperty<Scene, ::std::function<void(Camera* scene, EventState& es)>>
+    beforeCameraRender;
   /**
    * An event triggered after rendering a camera
    */
   Observable<Camera> onAfterCameraRenderObservable;
+
+  /**
+   * Sets a function to be executed after rendering a camera
+   */
+  WriteOnlyProperty<Scene, ::std::function<void(Camera* scene, EventState& es)>>
+    afterCameraRender;
 
   /**
    * An event triggered when active meshes evaluation is about to start
@@ -2220,6 +2283,18 @@ public:
     onPointerPick;
 
   /**
+   * Gets a boolean indicating if all rendering must be done in
+   * wireframe.
+   */
+  Property<Scene, bool> forceWireframe;
+
+  /**
+   * Gets a boolean indicating if all rendering must be done in point
+   * cloud
+   */
+  Property<Scene, bool> forcePointsCloud;
+
+  /**
    * Gets or sets a boolean indicating if all bounding boxes must be rendered
    */
   bool forceShowBoundingBoxes;
@@ -2287,6 +2362,14 @@ public:
    */
   vector_t<::std::regex> disableOfflineSupportExceptionRules;
 
+  // Gamepads
+
+  /**
+   * Gets the gamepad manager associated with the scene
+   * @see http://doc.babylonjs.com/how_to/how_to_use_gamepads
+   */
+  ReadOnlyProperty<Scene, GamepadManager> gamepadManager;
+
   // Pointers
 
   /**
@@ -2304,6 +2387,12 @@ public:
    * rendering canvas
    */
   Observable<PointerInfo> onPointerObservable;
+
+  /**
+   * Gets the pointer coordinates without any translation (ie. straight
+   * out of the pointer event)
+   */
+  ReadOnlyProperty<Scene, Vector2> unTranslatedPointer;
 
   /**
    * Define this parameter if you are using multiple cameras and you want to
@@ -2334,6 +2423,26 @@ public:
   Observable<KeyboardInfo> onKeyboardObservable;
 
   /**
+   * Gets a boolean indicating if the scene must use right-handed
+   * coordinates system.
+   */
+  Property<Scene, bool> useRightHandedSystem;
+
+  // Fog
+
+  /**
+   * Gets or sets a boolean indicating if fog is enabled on this scene
+   * @see http://doc.babylonjs.com/babylon101/environment#fog
+   */
+  Property<Scene, bool> fogEnabled;
+
+  /**
+   * Gets the fog mode to use.
+   * @see http://doc.babylonjs.com/babylon101/environment#fog
+   */
+  Property<Scene, unsigned int> fogMode;
+
+  /**
    * Gets or sets the fog color to use
    * @see http://doc.babylonjs.com/babylon101/environment#fog
    */
@@ -2358,6 +2467,17 @@ public:
   float fogEnd;
 
   // Lights
+
+  /**
+   * Gets a boolean indicating if shadows are enabled on this scene
+   */
+  Property<Scene, bool> shadowsEnabled;
+
+  /**
+   * Gets a boolean indicating if lights are enabled on this scene
+   */
+  Property<Scene, bool> lightsEnabled;
+
   /**
    * All of the lights added to this scene
    * @see http://doc.babylonjs.com/babylon101/lights
@@ -2365,6 +2485,7 @@ public:
   vector_t<unique_ptr_t<Light>> lights;
 
   // Cameras
+
   /**
    * All of the cameras added to this scene
    * @see http://doc.babylonjs.com/babylon101/cameras
@@ -2413,7 +2534,18 @@ public:
    */
   vector_t<unique_ptr_t<MultiMaterial>> multiMaterials;
 
+  /**
+   * Gets the default material used on meshes when no material is
+   * affected
+   */
+  Property<Scene, Material*> defaultMaterial;
+
   // Textures
+
+  /**
+   * Gets a boolean indicating if textures are enabled on this scene
+   */
+  Property<Scene, bool> texturesEnabled;
 
   /**
    * All of the textures added to this scene
@@ -2462,6 +2594,11 @@ public:
   vector_t<unique_ptr_t<HighlightLayer>> highlightLayers;
 
   // Skeletons
+
+  /**
+   * Gets a boolean indicating if skeletons are enabled on this scene
+   */
+  Property<Scene, bool> skeletonsEnabled;
 
   /**
    * The list of skeletons added to the scene
@@ -2525,6 +2662,14 @@ public:
    * Gets the current postprocess manager
    */
   unique_ptr_t<PostProcessManager> postProcessManager;
+
+  /**
+   * Gets the postprocess render pipeline manager
+   * @see http://doc.babylonjs.com/how_to/how_to_use_postprocessrenderpipeline
+   * @see http://doc.babylonjs.com/how_to/using_default_rendering_pipeline
+   */
+  ReadOnlyProperty<Scene, unique_ptr_t<PostProcessRenderPipelineManager>>
+    postProcessRenderPipelineManager;
 
   // Customs render targets
 
@@ -2614,6 +2759,11 @@ public:
    */
   vector_t<SoundTrack*> soundTracks;
 
+  /**
+   * Gets the main soundtrack associated with the scene
+   */
+  ReadOnlyProperty<Scene, unique_ptr_t<SoundTrack>> mainSoundTrack;
+
   // Simplification Queue
 
   /**
@@ -2663,23 +2813,120 @@ public:
   unique_ptr_t<Vector3> _forcedViewPosition;
 
   /**
+   * Hidden
+   */
+  ReadOnlyProperty<Scene, bool> _isAlternateRenderingEnabled;
+
+  /**
+   * Gets the list of frustum planes (built from the active camera)
+   */
+  ReadOnlyProperty<Scene, array_t<Plane, 6>> frustumPlanes;
+
+  /**
    * Gets or sets a boolean indicating if lights must be sorted by priority (off
    * by default) This is useful if there are more lights that the maximum
    * simulteanous authorized
    */
   bool requireLightSorting;
 
-protected:
   /**
-   * @brief Gets the animation properties override.
+   * Gets the current geometry buffer associated to the scene
    */
-  AnimationPropertiesOverride*& get_animationPropertiesOverride();
+  Property<Scene, shared_ptr_t<GeometryBufferRenderer>> geometryBufferRenderer;
 
   /**
-   * @brief Sets the animation properties override.
+   * Gets the debug layer (aka Inspector) associated with the scene
+   * @see http://doc.babylonjs.com/features/playground_debuglayer
    */
-  void
-  set_animationPropertiesOverride(AnimationPropertiesOverride* const& value);
+  ReadOnlyProperty<Scene, unique_ptr_t<DebugLayer>> debugLayer;
+
+  /**
+   * Gets a boolean indicating if collisions are processed on a web
+   * worker
+   * @see
+   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity#web-worker-based-collision-system-since-21
+   */
+  Property<Scene, bool> workerCollisions;
+
+  /**
+   * Gets the octree used to boost mesh selection (picking)
+   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene_with_octrees
+   */
+  ReadOnlyProperty<Scene, Octree<AbstractMesh*>*> selectionOctree;
+
+  /**
+   * Gets the mesh that is currently under the pointer
+   */
+  ReadOnlyProperty<Scene, AbstractMesh*> meshUnderPointer;
+
+  /**
+   * Gets the current on-screen X position of the pointer
+   */
+  ReadOnlyProperty<Scene, int> pointerX;
+
+  /**
+   * Gets the current on-screen Y position of the pointer
+   */
+  ReadOnlyProperty<Scene, int> pointerY;
+
+  /**
+   * Gets the performance counter for total vertices
+   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
+   */
+  ReadOnlyProperty<Scene, PerfCounter> totalVerticesPerfCounter;
+
+  /**
+   * Gets the performance counter for active indices
+   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
+   */
+  ReadOnlyProperty<Scene, PerfCounter> totalActiveIndicesPerfCounter;
+
+  /**
+   * Gets the performance counter for active particles
+   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
+   */
+  ReadOnlyProperty<Scene, PerfCounter> activeParticlesPerfCounter;
+
+  /**
+   * Gets the performance counter for active bones
+   * @see http://doc.babylonjs.com/how_to/optimizing_your_scene#instrumentation
+   */
+  ReadOnlyProperty<Scene, PerfCounter> activeBonesPerfCounter;
+
+  /**
+   * Returns a boolean indicating if the scene is still loading data
+   */
+  ReadOnlyProperty<Scene, bool> isLoading;
+
+  /**
+   * Gets all animatable attached to the scene
+   */
+  ReadOnlyProperty<Scene, vector_t<Animatable*>> animatables;
+
+  /**
+   * Return a unique id as a string which can serve as an identifier for
+   * the scene
+   */
+  ReadOnlyProperty<Scene, string_t> uid;
+
+  /** Audio **/
+
+  /**
+   * Gets if audio support is enabled
+   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
+   */
+  Property<Scene, bool> audioEnabled;
+
+  /**
+   * Gets if audio will be output to headphones
+   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
+   */
+  Property<Scene, bool> headphone;
+
+  /**
+   * Gets if the scene is already disposed
+   */
+  ReadOnlyProperty<Scene, bool> isDisposed;
 
 protected:
   /** Hidden */
@@ -2739,8 +2986,6 @@ private:
   high_res_time_point_t _previousStartingPointerTime;
   unordered_map_t<int, bool> _pointerCaptures;
   // AbstractMesh* _meshUnderPointer;
-  ::std::function<void()> beforeRender;
-  ::std::function<void()> afterRender;
   // Deterministic lockstep
   float _timeAccumulator;
   unsigned int _currentStepId;

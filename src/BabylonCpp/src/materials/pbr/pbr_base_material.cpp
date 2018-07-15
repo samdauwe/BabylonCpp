@@ -140,7 +140,8 @@ void PBRBaseMaterial::_attachImageProcessingConfiguration(
 
   // Pick the scene configuration if needed.
   if (!configuration) {
-    _imageProcessingConfiguration = getScene()->imageProcessingConfiguration();
+    _imageProcessingConfiguration
+      = getScene()->imageProcessingConfiguration().get();
   }
   else {
     _imageProcessingConfiguration = configuration;

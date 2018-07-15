@@ -90,9 +90,22 @@ Scene::Scene(Engine* engine)
     , clearColor{Color4(0.2f, 0.2f, 0.3f, 1.f)}
     , ambientColor{Color3(0.f, 0.f, 0.f)}
     , _environmentBRDFTexture{nullptr}
+    , environmentTexture{this, &Scene::get_environmentTexture,
+                         &Scene::set_environmentTexture}
+    , imageProcessingConfiguration{this,
+                                   &Scene::get_imageProcessingConfiguration}
+    , onDispose{this, &Scene::set_onDispose}
+    , beforeRender{this, &Scene::set_beforeRender}
+    , afterRender{this, &Scene::set_afterRender}
+    , beforeCameraRender{this, &Scene::set_beforeCameraRender}
+    , afterCameraRender{this, &Scene::set_afterCameraRender}
     , pointerDownPredicate{nullptr}
     , pointerUpPredicate{nullptr}
     , pointerMovePredicate{nullptr}
+    , forceWireframe{this, &Scene::get_forceWireframe,
+                     &Scene::set_forceWireframe}
+    , forcePointsCloud{this, &Scene::get_forcePointsCloud,
+                       &Scene::set_forcePointsCloud}
     , forceShowBoundingBoxes{false}
     , _clipPlane{nullptr}
     , animationsEnabled{true}
@@ -103,33 +116,76 @@ Scene::Scene(Engine* engine)
     , hoverCursor{"pointer"}
     , defaultCursor{""}
     , preventDefaultOnPointerDown{true}
+    , gamepadManager{this, &Scene::get_gamepadManager}
+    , unTranslatedPointer{this, &Scene::get_unTranslatedPointer}
     , cameraToUseForPointers(nullptr)
     , _mirroredCameraPosition{nullptr}
+    , useRightHandedSystem{this, &Scene::get_useRightHandedSystem,
+                           &Scene::set_useRightHandedSystem}
+    , fogEnabled{this, &Scene::get_fogEnabled, &Scene::set_fogEnabled}
+    , fogMode{this, &Scene::get_fogMode, &Scene::set_fogMode}
     , fogColor{Color3(0.2f, 0.2f, 0.3f)}
     , fogDensity{0.1f}
     , fogStart{0.f}
     , fogEnd{1000.f}
+    , shadowsEnabled{this, &Scene::get_shadowsEnabled,
+                     &Scene::set_shadowsEnabled}
+    , lightsEnabled{this, &Scene::get_lightsEnabled, &Scene::set_lightsEnabled}
     , activeCamera{nullptr}
+    , defaultMaterial{this, &Scene::get_defaultMaterial,
+                      &Scene::set_defaultMaterial}
+    , texturesEnabled{this, &Scene::get_texturesEnabled,
+                      &Scene::set_texturesEnabled}
     , particlesEnabled{true}
     , spritesEnabled{true}
+    , skeletonsEnabled{this, &Scene::get_skeletonsEnabled,
+                       &Scene::set_skeletonsEnabled}
     , lensFlaresEnabled{true}
     , collisionsEnabled{true}
     , collisionCoordinator{nullptr}
     , gravity{Vector3(0.f, -9.807f, 0.f)}
     , postProcessesEnabled{true}
     , postProcessManager{nullptr}
+    , postProcessRenderPipelineManager{this,
+                                       &Scene::
+                                         get_postProcessRenderPipelineManager}
     , renderTargetsEnabled{true}
     , dumpNextRenderTargets{false}
     , probesEnabled{true}
     , actionManager{nullptr}
     , proceduralTexturesEnabled{true}
+    , mainSoundTrack{this, &Scene::get_mainSoundTrack}
     , simplificationQueue{nullptr}
     , animationTimeScale{1}
     , _cachedMaterial{nullptr}
     , _cachedEffect{nullptr}
     , _cachedVisibility{0.f}
     , dispatchAllSubMeshesOfActiveMeshes{false}
+    , _forcedViewPosition{nullptr}
+    , _isAlternateRenderingEnabled{this,
+                                   &Scene::get_isAlternateRenderingEnabled}
+    , frustumPlanes{this, &Scene::get_frustumPlanes}
     , requireLightSorting{false}
+    , geometryBufferRenderer{this, &Scene::get_geometryBufferRenderer,
+                             &Scene::set_geometryBufferRenderer}
+    , debugLayer{this, &Scene::get_debugLayer}
+    , workerCollisions{this, &Scene::get_workerCollisions,
+                       &Scene::set_workerCollisions}
+    , selectionOctree{this, &Scene::get_selectionOctree}
+    , meshUnderPointer{this, &Scene::get_meshUnderPointer}
+    , pointerX{this, &Scene::get_pointerX}
+    , pointerY{this, &Scene::get_pointerY}
+    , totalVerticesPerfCounter{this, &Scene::get_totalVerticesPerfCounter}
+    , totalActiveIndicesPerfCounter{this,
+                                    &Scene::get_totalActiveIndicesPerfCounter}
+    , activeParticlesPerfCounter{this, &Scene::get_activeParticlesPerfCounter}
+    , activeBonesPerfCounter{this, &Scene::get_activeBonesPerfCounter}
+    , isLoading{this, &Scene::get_isLoading}
+    , animatables{this, &Scene::get_animatables}
+    , uid{this, &Scene::get_uid}
+    , audioEnabled{this, &Scene::get_audioEnabled, &Scene::set_audioEnabled}
+    , headphone{this, &Scene::get_headphone, &Scene::set_headphone}
+    , isDisposed{this, &Scene::get_isDisposed}
     , _environmentTexture{nullptr}
     , _animationPropertiesOverride{nullptr}
     , _spritePredicate{nullptr}
@@ -151,12 +207,12 @@ Scene::Scene(Engine* engine)
     , _previousPickResult{nullptr}
     , _totalPointersPressed{0}
     , _doubleClickOccured{false}
+    , _pointerX{0}
+    , _pointerY{0}
     , _startingPointerPosition{Vector2(0.f, 0.f)}
     , _previousStartingPointerPosition{Vector2(0.f, 0.f)}
     , _startingPointerTime{high_res_time_point_t()}
     , _previousStartingPointerTime{high_res_time_point_t()}
-    , beforeRender{nullptr}
-    , afterRender{nullptr}
     , _timeAccumulator{0}
     , _currentStepId{0}
     , _currentInternalStep{0}
@@ -212,7 +268,7 @@ Scene::Scene(Engine* engine)
     , _pickedDownMesh{nullptr}
     , _pickedUpMesh{nullptr}
     , _pickedDownSprite{nullptr}
-    , _uid{""}
+    , _uid{Tools::RandomId()}
     , _tempPickingRay{::std::make_unique<Ray>(Ray::Zero())}
     , _cachedRayForTransform{nullptr}
 {
@@ -220,9 +276,15 @@ Scene::Scene(Engine* engine)
 
   _renderingManager = ::std::make_unique<RenderingManager>(this);
 
-  postProcessManager = ::std::make_unique<PostProcessManager>(this);
+  // if (PostProcessManager) {
+  {
+    postProcessManager = ::std::make_unique<PostProcessManager>(this);
+  }
 
-  _outlineRenderer = ::std::make_unique<OutlineRenderer>(this);
+  // if (OutlineRenderer)
+  {
+    _outlineRenderer = ::std::make_unique<OutlineRenderer>(this);
+  }
 
   attachControl();
 
@@ -230,14 +292,17 @@ Scene::Scene(Engine* engine)
   simplificationQueue = ::std::make_unique<SimplificationQueue>();
 
   // Collision coordinator initialization.
-  setWorkerCollisions(false);
+  workerCollisions = false;
 
   // Uniform Buffer
   _createUbo();
 
   // Default Image processing definition.
-  _imageProcessingConfiguration
-    = ::std::make_unique<ImageProcessingConfiguration>();
+  // if (ImageProcessingConfiguration)
+  {
+    _imageProcessingConfiguration
+      = ::std::make_unique<ImageProcessingConfiguration>();
+  }
 }
 
 Scene::~Scene()
@@ -250,7 +315,7 @@ IReflect::Type Scene::type() const
 }
 
 // Events
-void Scene::setOnDispose(
+void Scene::set_onDispose(
   const ::std::function<void(Scene* scene, EventState& es)>& callback)
 {
   if (_onDisposeObserver) {
@@ -259,7 +324,7 @@ void Scene::setOnDispose(
   _onDisposeObserver = onDisposeObservable.add(callback);
 }
 
-void Scene::setBeforeRender(
+void Scene::set_beforeRender(
   const ::std::function<void(Scene* scene, EventState& es)>& callback)
 {
   if (_onBeforeRenderObserver) {
@@ -270,7 +335,7 @@ void Scene::setBeforeRender(
   }
 }
 
-void Scene::setAfterRender(
+void Scene::set_afterRender(
   const ::std::function<void(Scene* scene, EventState& es)>& callback)
 {
   if (_onAfterRenderObserver) {
@@ -281,7 +346,7 @@ void Scene::setAfterRender(
   }
 }
 
-void Scene::setBeforeCameraRender(
+void Scene::set_beforeCameraRender(
   const ::std::function<void(Camera* camera, EventState& es)>& callback)
 {
   if (_onBeforeCameraRenderObserver) {
@@ -291,7 +356,7 @@ void Scene::setBeforeCameraRender(
   _onBeforeCameraRenderObserver = onBeforeCameraRenderObservable.add(callback);
 }
 
-void Scene::setAfterCameraRender(
+void Scene::set_afterCameraRender(
   const ::std::function<void(Camera* camera, EventState& es)>& callback)
 {
   if (_onAfterCameraRenderObserver) {
@@ -301,7 +366,7 @@ void Scene::setAfterCameraRender(
 }
 
 // Gamepads
-GamepadManager& Scene::gamepadManager()
+GamepadManager& Scene::get_gamepadManager()
 {
   if (!_gamepadManager) {
     _gamepadManager = ::std::make_unique<GamepadManager>(this);
@@ -311,7 +376,7 @@ GamepadManager& Scene::gamepadManager()
 }
 
 // Pointers
-Vector2& Scene::unTranslatedPointer()
+Vector2& Scene::get_unTranslatedPointer()
 {
   _unTranslatedPointer = Vector2(static_cast<float>(_unTranslatedPointerX),
                                  static_cast<float>(_unTranslatedPointerY));
@@ -321,12 +386,12 @@ Vector2& Scene::unTranslatedPointer()
 
 // Properties
 
-BaseTexture* Scene::environmentTexture()
+BaseTexture*& Scene::get_environmentTexture()
 {
   return _environmentTexture;
 }
 
-void Scene::setEnvironmentTexture(BaseTexture* value)
+void Scene::set_environmentTexture(BaseTexture* const& value)
 {
   if (_environmentTexture == value) {
     return;
@@ -336,18 +401,18 @@ void Scene::setEnvironmentTexture(BaseTexture* value)
   markAllMaterialsAsDirty(Material::TextureDirtyFlag());
 }
 
-void Scene::setUseRightHandedSystem(bool value)
+bool Scene::get_useRightHandedSystem() const
+{
+  return _useRightHandedSystem;
+}
+
+void Scene::set_useRightHandedSystem(bool value)
 {
   if (_useRightHandedSystem == value) {
     return;
   }
   _useRightHandedSystem = value;
   markAllMaterialsAsDirty(Material::MiscDirtyFlag());
-}
-
-bool Scene::useRightHandedSystem() const
-{
-  return _useRightHandedSystem;
 }
 
 void Scene::setStepId(unsigned int newStepId)
@@ -365,17 +430,13 @@ unsigned int Scene::getInternalStep() const
   return _currentInternalStep;
 }
 
-ImageProcessingConfiguration* Scene::imageProcessingConfiguration()
+unique_ptr_t<ImageProcessingConfiguration>&
+Scene::get_imageProcessingConfiguration()
 {
-  return _imageProcessingConfiguration.get();
+  return _imageProcessingConfiguration;
 }
 
-bool Scene::forceWireframe() const
-{
-  return _forceWireframe;
-}
-
-void Scene::setForceWireframe(bool value)
+void Scene::set_forceWireframe(bool value)
 {
   if (_forceWireframe == value) {
     return;
@@ -384,12 +445,17 @@ void Scene::setForceWireframe(bool value)
   markAllMaterialsAsDirty(Material::MiscDirtyFlag());
 }
 
-bool Scene::forcePointsCloud() const
+bool Scene::get_forceWireframe() const
+{
+  return _forceWireframe;
+}
+
+bool Scene::get_forcePointsCloud() const
 {
   return _forcePointsCloud;
 }
 
-void Scene::setForcePointsCloud(bool value)
+void Scene::set_forcePointsCloud(bool value)
 {
   if (_forcePointsCloud == value) {
     return;
@@ -409,12 +475,7 @@ void Scene::set_animationPropertiesOverride(
   _animationPropertiesOverride = value;
 }
 
-bool Scene::fogEnabled() const
-{
-  return _fogEnabled;
-}
-
-void Scene::setFogEnabled(bool value)
+void Scene::set_fogEnabled(bool value)
 {
   if (_fogEnabled == value) {
     return;
@@ -423,12 +484,12 @@ void Scene::setFogEnabled(bool value)
   markAllMaterialsAsDirty(Material::MiscDirtyFlag());
 }
 
-bool Scene::fogMode() const
+bool Scene::get_fogEnabled() const
 {
-  return _fogMode;
+  return _fogEnabled;
 }
 
-void Scene::setFogMode(unsigned int value)
+void Scene::set_fogMode(unsigned int value)
 {
   if (_fogMode == value) {
     return;
@@ -437,12 +498,12 @@ void Scene::setFogMode(unsigned int value)
   markAllMaterialsAsDirty(Material::MiscDirtyFlag());
 }
 
-bool Scene::shadowsEnabled() const
+unsigned int Scene::get_fogMode() const
 {
-  return _shadowsEnabled;
+  return _fogMode;
 }
 
-void Scene::setShadowsEnabled(bool value)
+void Scene::set_shadowsEnabled(bool value)
 {
   if (_shadowsEnabled == value) {
     return;
@@ -451,12 +512,12 @@ void Scene::setShadowsEnabled(bool value)
   markAllMaterialsAsDirty(Material::LightDirtyFlag());
 }
 
-bool Scene::lightsEnabled() const
+bool Scene::get_shadowsEnabled() const
 {
-  return _lightsEnabled;
+  return _shadowsEnabled;
 }
 
-void Scene::setLightsEnabled(bool value)
+void Scene::set_lightsEnabled(bool value)
 {
   if (_lightsEnabled == value) {
     return;
@@ -465,12 +526,12 @@ void Scene::setLightsEnabled(bool value)
   markAllMaterialsAsDirty(Material::LightDirtyFlag());
 }
 
-bool Scene::texturesEnabled() const
+bool Scene::get_lightsEnabled() const
 {
-  return _texturesEnabled;
+  return _lightsEnabled;
 }
 
-void Scene::setTexturesEnabled(bool value)
+void Scene::set_texturesEnabled(bool value)
 {
   if (_texturesEnabled == value) {
     return;
@@ -479,12 +540,12 @@ void Scene::setTexturesEnabled(bool value)
   markAllMaterialsAsDirty(Material::TextureDirtyFlag());
 }
 
-bool Scene::skeletonsEnabled() const
+bool Scene::get_texturesEnabled() const
 {
-  return _skeletonsEnabled;
+  return _texturesEnabled;
 }
 
-void Scene::setSkeletonsEnabled(bool value)
+void Scene::set_skeletonsEnabled(bool value)
 {
   if (_skeletonsEnabled == value) {
     return;
@@ -493,31 +554,37 @@ void Scene::setSkeletonsEnabled(bool value)
   markAllMaterialsAsDirty(Material::AttributesDirtyFlag());
 }
 
-PostProcessRenderPipelineManager* Scene::postProcessRenderPipelineManager()
+bool Scene::get_skeletonsEnabled() const
+{
+  return _skeletonsEnabled;
+}
+
+unique_ptr_t<PostProcessRenderPipelineManager>&
+Scene::get_postProcessRenderPipelineManager()
 {
   if (!_postProcessRenderPipelineManager) {
     _postProcessRenderPipelineManager
       = ::std::make_unique<PostProcessRenderPipelineManager>();
   }
 
-  return _postProcessRenderPipelineManager.get();
+  return _postProcessRenderPipelineManager;
 }
 
-SoundTrack* Scene::mainSoundTrack()
+unique_ptr_t<SoundTrack>& Scene::get_mainSoundTrack()
 {
   if (!_mainSoundTrack) {
     _mainSoundTrack = ::std::make_unique<SoundTrack>(this, true);
   }
 
-  return _mainSoundTrack.get();
+  return _mainSoundTrack;
 }
 
-shared_ptr_t<GeometryBufferRenderer>& Scene::geometryBufferRenderer()
+shared_ptr_t<GeometryBufferRenderer>& Scene::get_geometryBufferRenderer()
 {
   return _geometryBufferRenderer;
 }
 
-void Scene::setGeometryBufferRenderer(
+void Scene::set_geometryBufferRenderer(
   const shared_ptr_t<GeometryBufferRenderer>& geometryBufferRenderer)
 {
   if (geometryBufferRenderer && geometryBufferRenderer->isSupported()) {
@@ -545,7 +612,7 @@ void Scene::setMirroredCameraPosition(const Vector3& newPosition)
   _mirroredCameraPosition = ::std::make_unique<Vector3>(newPosition);
 }
 
-Material* Scene::defaultMaterial()
+Material*& Scene::get_defaultMaterial()
 {
   if (!_defaultMaterial) {
     _defaultMaterial = StandardMaterial::New("default material", this);
@@ -554,35 +621,30 @@ Material* Scene::defaultMaterial()
   return _defaultMaterial;
 }
 
-void Scene::setDefaultMaterial(Material* value)
+void Scene::set_defaultMaterial(Material* const& value)
 {
   _defaultMaterial = value;
 }
 
-bool Scene::_isAlternateRenderingEnabled() const
+bool Scene::get_isAlternateRenderingEnabled() const
 {
   return _alternateRendering;
 }
 
-array_t<Plane, 6>& Scene::frustumPlanes()
+array_t<Plane, 6>& Scene::get_frustumPlanes()
 {
   return _frustumPlanes;
 }
 
-const array_t<Plane, 6>& Scene::frustumPlanes() const
-{
-  return _frustumPlanes;
-}
-
-DebugLayer* Scene::debugLayer()
+unique_ptr_t<DebugLayer>& Scene::get_debugLayer()
 {
   if (!_debugLayer) {
     _debugLayer = ::std::make_unique<DebugLayer>(this);
   }
-  return _debugLayer.get();
+  return _debugLayer;
 }
 
-void Scene::setWorkerCollisions(bool enabled)
+void Scene::set_workerCollisions(bool enabled)
 {
   _workerCollisions = enabled;
   if (collisionCoordinator) {
@@ -600,7 +662,7 @@ void Scene::setWorkerCollisions(bool enabled)
   collisionCoordinator->init(this);
 }
 
-bool Scene::workerCollisions() const
+bool Scene::get_workerCollisions() const
 {
   return _workerCollisions;
 }
@@ -618,22 +680,22 @@ vector_t<AbstractMesh*> Scene::getMeshes() const
   return _meshes;
 }
 
-Octree<AbstractMesh*>* Scene::selectionOctree()
+Octree<AbstractMesh*>*& Scene::get_selectionOctree()
 {
   return _selectionOctree;
 }
 
-AbstractMesh* Scene::meshUnderPointer()
+AbstractMesh*& Scene::get_meshUnderPointer()
 {
   return _pointerOverMesh;
 }
 
-int Scene::pointerX()
+int Scene::get_pointerX() const
 {
   return _pointerX;
 }
 
-int Scene::pointerY()
+int Scene::get_pointerY() const
 {
   return _pointerY;
 }
@@ -684,7 +746,7 @@ size_t Scene::getTotalVertices() const
   return _totalVertices.current();
 }
 
-PerfCounter& Scene::totalVerticesPerfCounter()
+PerfCounter& Scene::get_totalVerticesPerfCounter()
 {
   return _totalVertices;
 }
@@ -694,7 +756,7 @@ size_t Scene::getActiveIndices() const
   return _activeIndices.current();
 }
 
-PerfCounter& Scene::totalActiveIndicesPerfCounter()
+PerfCounter& Scene::get_totalActiveIndicesPerfCounter()
 {
   return _activeIndices;
 }
@@ -704,7 +766,7 @@ size_t Scene::getActiveParticles() const
   return _activeParticles.current();
 }
 
-PerfCounter& Scene::activeParticlesPerfCounter()
+PerfCounter& Scene::get_activeParticlesPerfCounter()
 {
   return _activeParticles;
 }
@@ -714,7 +776,7 @@ size_t Scene::getActiveBones() const
   return _activeBones.current();
 }
 
-PerfCounter& Scene::activeBonesPerfCounter()
+PerfCounter& Scene::get_activeBonesPerfCounter()
 {
   return _activeBones;
 }
@@ -1788,7 +1850,7 @@ void Scene::getWaitingItemsCount()
 {
 }
 
-bool Scene::isLoading() const
+bool Scene::get_isLoading() const
 {
   return _pendingData.size() > 0;
 }
@@ -1929,7 +1991,7 @@ vector_t<Animatable*> Scene::getAllAnimatablesByTarget(IAnimatable* target)
   return result;
 }
 
-vector_t<Animatable*>& Scene::animatables()
+vector_t<Animatable*>& Scene::get_animatables()
 {
   return _activeAnimatables;
 }
@@ -3114,11 +3176,8 @@ GlowLayer* Scene::getGlowLayerByName(const string_t& name)
                                       static_cast<GlowLayer*>((*it).get());
 }
 
-string_t& Scene::uid()
+string_t Scene::get_uid() const
 {
-  if (_uid.empty()) {
-    _uid = Tools::RandomId();
-  }
   return _uid;
 }
 
@@ -3427,8 +3486,6 @@ void Scene::_renderForCamera(Camera* camera, Camera* rigParent)
     return;
   }
 
-  Tools::StartPerformanceCounter("Rendering camera " + activeCamera->name);
-
   // Viewport
   engine->setViewport(activeCamera->viewport);
 
@@ -3529,7 +3586,9 @@ void Scene::_renderForCamera(Camera* camera, Camera* rigParent)
   onAfterRenderTargetsRenderObservable.notifyObservers(this);
 
   // Prepare Frame
-  postProcessManager->_prepareFrame(nullptr);
+  if (postProcessManager) {
+    postProcessManager->_prepareFrame(nullptr);
+  }
 
   // Backgrounds
   if (!layers.empty()) {
@@ -3598,7 +3657,9 @@ void Scene::_renderForCamera(Camera* camera, Camera* rigParent)
   }
 
   // Finalize frame
-  postProcessManager->_finalizeFrame(camera->isIntermediate);
+  if (postProcessManager) {
+    postProcessManager->_finalizeFrame(camera->isIntermediate);
+  }
 
   // Reset some special arrays
   _renderTargets.clear();
@@ -3606,8 +3667,6 @@ void Scene::_renderForCamera(Camera* camera, Camera* rigParent)
   _alternateRendering = false;
 
   onAfterCameraRenderObservable.notifyObservers(activeCamera);
-
-  Tools::EndPerformanceCounter("Rendering camera " + activeCamera->name);
 }
 
 void Scene::_processSubCameras(Camera* camera)
@@ -3899,11 +3958,6 @@ void Scene::render(bool updateCameras)
     _updateAudioParameters();
   }
 
-  // After render
-  if (afterRender) {
-    afterRender();
-  }
-
   onAfterRenderObservable.notifyObservers(this);
 
   // Cleaning
@@ -3929,12 +3983,12 @@ void Scene::_updateAudioParameters()
 {
 }
 
-bool Scene::audioEnabled() const
+bool Scene::get_audioEnabled() const
 {
   return _audioEnabled;
 }
 
-void Scene::setAudioEnabled(bool value)
+void Scene::set_audioEnabled(bool value)
 {
   _audioEnabled = value;
   if (_hasAudioEngine) {
@@ -3955,12 +4009,12 @@ void Scene::_enableAudio()
 {
 }
 
-bool Scene::headphone() const
+bool Scene::get_headphone() const
 {
   return _headphone;
 }
 
-void Scene::setHeadphone(bool value)
+void Scene::set_headphone(bool value)
 {
   _headphone = value;
   if (_hasAudioEngine) {
@@ -4246,7 +4300,7 @@ void Scene::dispose()
   _isDisposed = true;
 }
 
-bool Scene::isDisposed() const
+bool Scene::get_isDisposed() const
 {
   return _isDisposed;
 }
@@ -4552,12 +4606,20 @@ Scene::pick(int x, int y,
             const ::std::function<bool(AbstractMesh* mesh)>& predicate,
             bool fastCheck, Camera* camera)
 {
-  return _internalPick(
+  auto result = _internalPick(
     [this, x, y, &camera](Matrix& world) -> Ray {
       createPickingRayToRef(x, y, &world, *_tempPickingRay, camera);
       return *_tempPickingRay;
     },
     predicate, fastCheck);
+  if (result) {
+    auto _result     = *result;
+    auto identityMat = Matrix::Identity();
+    _result.ray
+      = createPickingRay(x, y, &identityMat, camera ? camera : nullptr);
+    result = _result;
+  }
+  return result;
 }
 
 Nullable<PickingInfo>
@@ -4850,7 +4912,7 @@ Mesh* Scene::createDefaultSkybox(BaseTexture* iEnvironmentTexture, bool pbr,
 
   if (setGlobalEnvTexture) {
     if (iEnvironmentTexture) {
-      setEnvironmentTexture(iEnvironmentTexture);
+      environmentTexture = iEnvironmentTexture;
     }
   }
 

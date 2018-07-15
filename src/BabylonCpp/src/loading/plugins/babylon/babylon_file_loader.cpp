@@ -375,7 +375,7 @@ bool BabylonFileLoader::load(
   // Fog
   auto fogMode = Json::GetNumber(parsedData, "fogMode", Scene::FOGMODE_NONE());
   if (fogMode != Scene::FOGMODE_NONE()) {
-    scene->setFogMode(fogMode);
+    scene->fogMode = fogMode;
     scene->fogColor
       = Color3::FromArray(Json::ToArray<float>(parsedData, "fogColor"));
     scene->fogStart   = Json::GetNumber(parsedData, "fogStart", 0.f);
@@ -408,7 +408,7 @@ bool BabylonFileLoader::load(
 
   // Collisions, if defined. otherwise, default is true
   scene->collisionsEnabled = Json::GetBool(parsedData, "physicsEnabled", true);
-  scene->setWorkerCollisions(Json::GetBool(parsedData, "workerCollisions"));
+  scene->workerCollisions  = Json::GetBool(parsedData, "workerCollisions");
 
   // Lights
   unsigned int index = 0;

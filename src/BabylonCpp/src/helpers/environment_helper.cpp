@@ -216,14 +216,14 @@ void EnvironmentHelper::_setupEnvironmentTexture()
   }
 
   if (_options.environmentTexture.is<BaseTexture*>()) {
-    _scene->setEnvironmentTexture(
-      _options.environmentTexture.get<BaseTexture*>());
+    _scene->environmentTexture
+      = _options.environmentTexture.get<BaseTexture*>();
     return;
   }
 
   const auto environmentTexture = CubeTexture::CreateFromPrefilteredData(
     _options.environmentTexture.get<string_t>(), _scene);
-  _scene->setEnvironmentTexture(environmentTexture.get());
+  _scene->environmentTexture = environmentTexture.get();
 }
 
 void EnvironmentHelper::_setupBackground()

@@ -146,7 +146,7 @@ void ImageProcessingPostProcess::_attachImageProcessingConfiguration(
       scene = Engine::LastCreatedScene();
     }
 
-    _imageProcessingConfiguration = scene->imageProcessingConfiguration();
+    _imageProcessingConfiguration = scene->imageProcessingConfiguration().get();
   }
   else {
     _imageProcessingConfiguration = configuration;

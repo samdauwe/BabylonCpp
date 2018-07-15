@@ -82,7 +82,7 @@ void SceneTab::_buildPropertiesView()
   // - audioEnabled
   view.addBoolProperty(
     "audioEnabled", [&]() -> bool { return _scene->audioEnabled(); },
-    [&](const bool& value) { _scene->setAudioEnabled(value); });
+    [&](const bool& value) { _scene->audioEnabled = value; });
   // - autoClear
   view.addBoolProperty("autoClear", [&]() -> bool { return _scene->autoClear; },
                        [&](const bool& value) { _scene->autoClear = value; });
@@ -132,9 +132,9 @@ void SceneTab::_buildPropertiesView()
     "fogDensity", [&]() -> float { return _scene->fogDensity; },
     [&](const float& value) { _scene->fogDensity = value; });
   // - fogEnabled
-  view.addBoolProperty(
-    "fogEnabled", [&]() -> bool { return _scene->fogEnabled(); },
-    [&](const bool& value) { _scene->setFogEnabled(value); });
+  view.addBoolProperty("fogEnabled",
+                       [&]() -> bool { return _scene->fogEnabled(); },
+                       [&](const bool& value) { _scene->fogEnabled = value; });
   // - fogEnd
   view.addFloatProperty("fogEnd", [&]() -> float { return _scene->fogEnd; },
                         [&](const float& value) { _scene->fogEnd = value; });
@@ -142,7 +142,7 @@ void SceneTab::_buildPropertiesView()
   view.addSizeTProperty("fogMode",
                         [&]() -> size_t { return _scene->fogMode(); },
                         [&](const size_t& value) {
-                          _scene->setFogMode(static_cast<unsigned>(value));
+                          _scene->fogMode = static_cast<unsigned>(value);
                         });
   // - fogStart
   view.addFloatProperty("fogStart", [&]() -> float { return _scene->fogStart; },
@@ -150,7 +150,7 @@ void SceneTab::_buildPropertiesView()
   // - forcePointsCloud
   view.addBoolProperty(
     "forcePointsCloud", [&]() -> bool { return _scene->forcePointsCloud(); },
-    [&](const bool& value) { _scene->setForcePointsCloud(value); });
+    [&](const bool& value) { _scene->forcePointsCloud = value; });
   // - forceShowBoundingBoxes
   view.addBoolProperty(
     "forceShowBoundingBoxes",
@@ -159,7 +159,7 @@ void SceneTab::_buildPropertiesView()
   // - forceWireframe
   view.addBoolProperty(
     "forceWireframe", [&]() -> bool { return _scene->forceWireframe(); },
-    [&](const bool& value) { _scene->setForceWireframe(value); });
+    [&](const bool& value) { _scene->forceWireframe = value; });
   // - gravity
   view.addVector3Property(
     "gravity", [&]() -> Vector3 const& { return _scene->gravity; },
@@ -167,7 +167,7 @@ void SceneTab::_buildPropertiesView()
   // - headphone
   view.addBoolProperty("headphone",
                        [&]() -> bool { return _scene->headphone(); },
-                       [&](const bool& value) { _scene->setHeadphone(value); });
+                       [&](const bool& value) { _scene->headphone = value; });
   // - hoverCursor
   view.addStringProperty(
     "hoverCursor", [&]() -> string_t& { return _scene->hoverCursor; },
@@ -194,7 +194,7 @@ void SceneTab::_buildPropertiesView()
   // - lightsEnabled
   view.addBoolProperty(
     "lightsEnabled", [&]() -> bool { return _scene->lightsEnabled(); },
-    [&](const bool& value) { _scene->setLightsEnabled(value); });
+    [&](const bool& value) { _scene->lightsEnabled = value; });
   // - particlesEnabled
   view.addBoolProperty(
     "particlesEnabled", [&]() -> bool { return _scene->particlesEnabled; },
@@ -237,11 +237,11 @@ void SceneTab::_buildPropertiesView()
   // - shadowsEnabled
   view.addBoolProperty(
     "shadowsEnabled", [&]() -> bool { return _scene->shadowsEnabled(); },
-    [&](const bool& value) { _scene->setShadowsEnabled(value); });
+    [&](const bool& value) { _scene->shadowsEnabled = value; });
   // - skeletonsEnabled
   view.addBoolProperty(
     "skeletonsEnabled", [&]() -> bool { return _scene->skeletonsEnabled(); },
-    [&](const bool& value) { _scene->setSkeletonsEnabled(value); });
+    [&](const bool& value) { _scene->skeletonsEnabled = value; });
   // - spritesEnabled
   view.addBoolProperty(
     "spritesEnabled", [&]() -> bool { return _scene->spritesEnabled; },
@@ -249,9 +249,9 @@ void SceneTab::_buildPropertiesView()
   // - texturesEnabled
   view.addBoolProperty(
     "texturesEnabled", [&]() -> bool { return _scene->texturesEnabled(); },
-    [&](const bool& value) { _scene->setTexturesEnabled(value); });
+    [&](const bool& value) { _scene->texturesEnabled = value; });
   // - uid
-  view.addStringProperty("uid", [&]() -> string_t& { return _scene->uid(); },
+  view.addStringProperty("uid", [&]() -> string_t { return _scene->uid(); },
                          [&](const string_t& /*value*/) {});
   // - unTranslatedPointer
   view.addVector2Property(
@@ -267,11 +267,11 @@ void SceneTab::_buildPropertiesView()
   view.addBoolProperty(
     "useRightHandedSystem",
     [&]() -> bool { return _scene->useRightHandedSystem(); },
-    [&](const bool& value) { _scene->setUseRightHandedSystem(value); });
+    [&](const bool& value) { _scene->useRightHandedSystem = value; });
   // - workerCollisions
   view.addBoolProperty(
     "workerCollisions", [&]() -> bool { return _scene->workerCollisions(); },
-    [&](const bool& value) { _scene->setWorkerCollisions(value); });
+    [&](const bool& value) { _scene->workerCollisions = value; });
   // -- Sort properties by property name -- //
   view.sortPropertiesByName();
 }
@@ -306,16 +306,16 @@ void SceneTab::_renderActions()
     // Handle render mode change
     if (renderModeChoice != currenRenderMode) {
       if (renderModeChoice == 0) {
-        _scene->setForceWireframe(false);
-        _scene->setForcePointsCloud(true);
+        _scene->forceWireframe   = false;
+        _scene->forcePointsCloud = true;
       }
       else if (renderModeChoice == 1) {
-        _scene->setForceWireframe(true);
-        _scene->setForcePointsCloud(false);
+        _scene->forceWireframe   = true;
+        _scene->forcePointsCloud = false;
       }
       else if (renderModeChoice == 2) {
-        _scene->setForceWireframe(false);
-        _scene->setForcePointsCloud(false);
+        _scene->forceWireframe   = false;
+        _scene->forcePointsCloud = false;
       }
     }
   }
@@ -428,7 +428,7 @@ void SceneTab::_renderActions()
       origValue = value = _scene->fogEnabled();
       ImGui::Checkbox("Fog", &value);
       if (origValue != value) {
-        _scene->setFogEnabled(value);
+        _scene->fogEnabled = value;
       }
     }
     // Lens Flares
@@ -440,7 +440,7 @@ void SceneTab::_renderActions()
       origValue = value = _scene->lightsEnabled();
       ImGui::Checkbox("Lights", &value);
       if (origValue != value) {
-        _scene->setLightsEnabled(value);
+        _scene->lightsEnabled = value;
       }
     }
     // Particles
@@ -469,7 +469,7 @@ void SceneTab::_renderActions()
       origValue = value = _scene->shadowsEnabled();
       ImGui::Checkbox("Shadows", &value);
       if (origValue != value) {
-        _scene->setShadowsEnabled(value);
+        _scene->shadowsEnabled = value;
       }
     }
     // Skeletons
@@ -477,7 +477,7 @@ void SceneTab::_renderActions()
       origValue = value = _scene->skeletonsEnabled();
       ImGui::Checkbox("Skeletons", &value);
       if (origValue != value) {
-        _scene->setSkeletonsEnabled(value);
+        _scene->skeletonsEnabled = value;
       }
     }
     // Sprites
@@ -489,7 +489,7 @@ void SceneTab::_renderActions()
       origValue = value = _scene->texturesEnabled();
       ImGui::Checkbox("Textures", &value);
       if (origValue != value) {
-        _scene->setTexturesEnabled(value);
+        _scene->texturesEnabled = value;
       }
     }
   }

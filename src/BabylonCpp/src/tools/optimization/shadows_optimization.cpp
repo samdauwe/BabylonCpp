@@ -15,7 +15,7 @@ ShadowsOptimization::~ShadowsOptimization()
 
 bool ShadowsOptimization::apply(Scene* scene)
 {
-  scene->setShadowsEnabled(false);
+  scene->shadowsEnabled = false;
   return true;
 }
 
