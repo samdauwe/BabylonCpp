@@ -6,6 +6,10 @@
 namespace BABYLON {
 namespace Samples {
 
+/**
+ * @brief Tube Animation Scene.
+ * @see https://www.babylonjs-playground.com/#14EGUT#39
+ */
 struct TubeAnimationScene : public IRenderableScene {
 
   TubeAnimationScene(ICanvas* iCanvas);

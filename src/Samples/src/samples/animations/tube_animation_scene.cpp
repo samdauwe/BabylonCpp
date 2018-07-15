@@ -38,12 +38,14 @@ void TubeAnimationScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create the camera
   auto camera = FreeCamera::New("FreeCam", Vector3(0.f, 5.f, -60.f), scene);
-  camera->position = Vector3(0, 0, -100);
+  camera->position = Vector3(0.f, 0.f, -70.f);
   camera->attachControl(canvas, true);
 
+  // Create a light
   auto light       = HemisphericLight::New("light1", Vector3(0, 1, 0), scene);
   light->intensity = 0.7f;
 
+  // Create a tube
   auto mat             = StandardMaterial::New("mat1", scene);
   mat->alpha           = 1.f;
   mat->diffuseColor    = Color3(0.5f, 0.5f, 1.0f);
@@ -60,7 +62,7 @@ void TubeAnimationScene::initializeScene(ICanvas* canvas, Scene* scene)
     return path;
   };
 
-  auto curve = curvePoints(40.f, 400.f);
+  auto curve = curvePoints(40.f, 200.f);
 
   // Create tube
   auto tube = Mesh::CreateTube("tube", curve, 5, 60, nullptr, 0, scene, false,
@@ -73,7 +75,7 @@ void TubeAnimationScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   BoxOptions options(2.f);
   options.faceColors[3] = Color4(1.f, 0.f, 0.f, 1.f); // Red
-  Mesh* cube            = MeshBuilder::CreateBox("box", options, scene);
+  auto cube             = MeshBuilder::CreateBox("box", options, scene);
   cube->setRotationQuaternion(Quaternion::Identity().copy());
 
   // Animation on position
@@ -84,7 +86,7 @@ void TubeAnimationScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Animation keys
   std::vector<IAnimationKey> keys;
   int frame = 0;
-  for (auto& point : curve) {
+  for (const auto& point : curve) {
     keys.emplace_back(IAnimationKey(frame, AnimationValue(point)));
     ++frame;
   }
@@ -121,7 +123,7 @@ void TubeAnimationScene::initializeScene(ICanvas* canvas, Scene* scene)
     matrix.m[9]  = axis3.y;
     matrix.m[10] = axis3.z;
 
-    Quaternion rotation = Quaternion::FromRotationMatrix(matrix);
+    auto rotation = Quaternion::FromRotationMatrix(matrix);
     rotationKeys.emplace_back(IAnimationKey(frame, AnimationValue(rotation)));
     ++frame;
   }
