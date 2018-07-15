@@ -63,10 +63,17 @@ int sampleLauncherMain(int l, int v, int i, const char* sample)
   SamplesIndex samples;
   int exitcode = 0;
   if (l > 0) {
-    const auto sampleNames = samples.getSampleNames();
-    printf("Found %zd sample(s):\n", sampleNames.size());
-    for (const auto& sampleName : sampleNames) {
-      printf(" - %s\n", sampleName.c_str());
+    const auto sampleNames   = samples.getSampleNames();
+    const auto categoryNames = samples.getCategoryNames();
+    printf("Found %zd sample(s) in %zd categories:\n", sampleNames.size(),
+           categoryNames.size());
+    for (const auto& categoryName : categoryNames) {
+      const auto sampleNames = samples.getSampleNamesInCategory(categoryName);
+      printf("       |- %zd sample(s) in catgeory %s\n", sampleNames.size(),
+             categoryName.c_str());
+      for (const auto& sampleName : sampleNames) {
+        printf("          |- %s\n", sampleName.c_str());
+      }
     }
   }
   else {

@@ -66,12 +66,44 @@ bool SamplesIndex::sampleExists(const string_t& sampleName)
   return false;
 }
 
-std::vector<string_t> SamplesIndex::getSampleNames()
+::std::vector<string_t> SamplesIndex::getCategoryNames() const
+{
+  // Extract the categpry names
+  auto categoryNames = stl_util::extract_keys(_samplesIndex);
+
+  // Sort the vector with category names in ascending order
+  std::sort(categoryNames.begin(), categoryNames.end());
+
+  return categoryNames;
+}
+
+std::vector<string_t> SamplesIndex::getSampleNames() const
 {
   // Extract the enabled sample names from the map
   std::vector<string_t> sampleNames;
-  for (auto const& samplesCategory : _samplesIndex) {
-    for (auto const& element : samplesCategory.second.samples()) {
+  for (const auto& samplesCategory : _samplesIndex) {
+    for (const auto& element : samplesCategory.second.samples()) {
+      // Check if enabled
+      if (std::get<0>(element.second)) {
+        sampleNames.emplace_back(element.first);
+      }
+    }
+  }
+
+  // Sort the vector with sample names in ascending order
+  std::sort(sampleNames.begin(), sampleNames.end());
+
+  return sampleNames;
+}
+
+::std::vector<string_t>
+SamplesIndex::getSampleNamesInCategory(const string_t& categoryName) const
+{
+  // Extract the enabled sample names for the given category from the map
+  std::vector<string_t> sampleNames;
+  if (stl_util::contains(_samplesIndex, categoryName)) {
+    const auto& samplesCategory = _samplesIndex.at(categoryName);
+    for (const auto& element : samplesCategory.samples()) {
       // Check if enabled
       if (std::get<0>(element.second)) {
         sampleNames.emplace_back(element.first);

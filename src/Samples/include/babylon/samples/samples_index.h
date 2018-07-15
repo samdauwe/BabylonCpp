@@ -28,10 +28,25 @@ public:
   bool sampleExists(const string_t& sampleName);
 
   /**
+   * @brief Returns a sorted list containing the category names.
+   * @return a sorted list containing the category names.
+   */
+  ::std::vector<string_t> getCategoryNames() const;
+
+  /**
    * @brief Returns a sorted list containing the enabled examples.
    * @return a sorted list containing the enabled examples.
    */
-  ::std::vector<string_t> getSampleNames();
+  ::std::vector<string_t> getSampleNames() const;
+
+  /**
+   * @brief Returns a sorted list containing the enabled examples in the
+   * specified category.
+   * @return a sorted list containing the enabled examples in the specified
+   * category.
+   */
+  ::std::vector<string_t>
+  getSampleNamesInCategory(const string_t& categoryName) const;
 
   /**
    * @brief Sample factory method
