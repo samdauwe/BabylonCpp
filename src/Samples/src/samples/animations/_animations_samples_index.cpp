@@ -34,7 +34,7 @@ _AnimationsSamplesIndex::_AnimationsSamplesIndex()
                         });                                                  //
   // Tube Animation Scene
   _samples["TubeAnimationScene"] = ::std::make_tuple(
-    false,                                                    //
+    true,                                                     //
     [](ICanvas* iCanvas) {                                    //
       return ::std::make_unique<TubeAnimationScene>(iCanvas); //
     });                                                       //
