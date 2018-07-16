@@ -4,6 +4,7 @@
 #include <babylon/core/logging.h>
 #include <babylon/samples/sample_launcher.h>
 #include <babylon/samples/samples_index.h>
+#include <sstream>
 
 struct ConsoleLogger {
 
@@ -63,18 +64,28 @@ int sampleLauncherMain(int l, int v, int i, const char* sample)
   SamplesIndex samples;
   int exitcode = 0;
   if (l > 0) {
+    ::std::ostringstream oss;
+    // Get sample names and category names
     const auto sampleNames   = samples.getSampleNames();
     const auto categoryNames = samples.getCategoryNames();
-    printf("Found %zd sample(s) in %zd categories:\n", sampleNames.size(),
-           categoryNames.size());
+    oss << "Found " << sampleNames.size() << " in " << categoryNames.size()
+        << " categories:\n";
+    // Print categorized samples
     for (const auto& categoryName : categoryNames) {
       const auto sampleNames = samples.getSampleNamesInCategory(categoryName);
-      printf("       |- %zd sample(s) in catgeory %s\n", sampleNames.size(),
-             categoryName.c_str());
+      oss << "       |- ";
+      if (sampleNames.size() < 10) {
+        oss << " " << sampleNames.size();
+      }
+      else if (sampleNames.size() < 100) {
+        oss << sampleNames.size();
+      }
+      oss << " sample(s) in category " << categoryName.c_str() << "\n";
       for (const auto& sampleName : sampleNames) {
-        printf("          |- %s\n", sampleName.c_str());
+        oss << "           |- " << sampleName.c_str() << "\n";
       }
     }
+    printf("%s", oss.str().c_str());
   }
   else {
     if (v > 0) {
