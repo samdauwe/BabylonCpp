@@ -17,8 +17,32 @@ public:
   ~RoadProceduralTexture();
 
   void updateShaderUniforms();
-  Color3& roadColor();
-  void setRoadColor(const Color3& value);
+
+  /**
+   * @brief Serializes this road procedural texture.
+   * @returns a serialized road procedural texture object
+   */
+  Json::object serialize() const;
+
+  /**
+   * @brief Creates a Road Procedural Texture from parsed road procedural
+   * texture data.
+   * @param parsedTexture defines parsed texture data
+   * @param scene defines the current scene
+   * @param rootUrl defines the root URL containing road procedural texture
+   * information
+   * @returns a parsed Road Procedural Texture
+   */
+  static unique_ptr_t<RoadProceduralTexture>
+  Parse(const Json::value& parsedTexture, Scene* scene,
+        const string_t& rootUrl);
+
+protected:
+  Color3& get_roadColor();
+  void set_roadColor(const Color3& value);
+
+public:
+  Property<RoadProceduralTexture, Color3> roadColor;
 
 private:
   Color3 _roadColor;

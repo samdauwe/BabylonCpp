@@ -1,5 +1,6 @@
 #include <babylon/proceduraltextureslibrary/perlinnoise/perlin_noise_procedural_texture.h>
 
+#include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 
@@ -16,7 +17,7 @@ PerlinNoiseProceduralTexture::PerlinNoiseProceduralTexture(
                         fallbackTexture,
                         generateMipMaps}
     , time{0.f}
-    , speed{1.f}
+    , timeScale{1.f}
     , translationSpeed{1.f}
     , _currentTranslation{0.f}
 {
@@ -31,10 +32,16 @@ void PerlinNoiseProceduralTexture::updateShaderUniforms()
 {
   setFloat("size", static_cast<float>(getRenderSize().width));
 
-  auto deltaTime = getScene()->getEngine()->getDeltaTime();
+  auto scene = getScene();
+
+  if (!scene) {
+    return;
+  }
+
+  auto deltaTime = scene->getEngine()->getDeltaTime();
 
   time += deltaTime;
-  setFloat("time", time * speed / 1000.f);
+  setFloat("time", time * timeScale / 1000.f);
 
   _currentTranslation += deltaTime * translationSpeed / 1000.f;
   setFloat("translationSpeed", _currentTranslation);
@@ -50,6 +57,19 @@ void PerlinNoiseProceduralTexture::resize(const Size& size,
                                           bool generateMipMaps)
 {
   ProceduralTexture::resize(size, generateMipMaps);
+}
+
+Json::object PerlinNoiseProceduralTexture::serialize() const
+{
+  return Json::object();
+}
+
+unique_ptr_t<PerlinNoiseProceduralTexture>
+PerlinNoiseProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
+                                    Scene* /*scene*/,
+                                    const string_t& /*rootUrl*/)
+{
+  return nullptr;
 }
 
 } // end of namespace ProceduralTexturesLibrary

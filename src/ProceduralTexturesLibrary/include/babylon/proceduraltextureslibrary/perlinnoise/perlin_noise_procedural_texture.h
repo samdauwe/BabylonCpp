@@ -8,7 +8,7 @@ namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
 class BABYLON_SHARED_EXPORT PerlinNoiseProceduralTexture
-  : public ProceduralTexture {
+    : public ProceduralTexture {
 
 public:
   PerlinNoiseProceduralTexture(const std::string& name, const Size& size,
@@ -20,9 +20,28 @@ public:
   void render(bool useCameraPostProcess = false);
   void resize(const Size& size, bool generateMipMaps = false);
 
+  /**
+   * @brief Serializes this perlin noise procedural texture.
+   * @returns a serialized perlin noise procedural texture object
+   */
+  Json::object serialize() const;
+
+  /**
+   * @brief Creates a Perlin Noise Procedural Texture from parsed perlin noise
+   * procedural texture data.
+   * @param parsedTexture defines parsed texture data
+   * @param scene defines the current scene
+   * @param rootUrl defines the root URL containing perlin noise procedural
+   * texture information
+   * @returns a parsed Perlin Noise Procedural Texture
+   */
+  static unique_ptr_t<PerlinNoiseProceduralTexture>
+  Parse(const Json::value& parsedTexture, Scene* scene,
+        const string_t& rootUrl);
+
 public:
   float time;
-  float speed;
+  float timeScale;
   float translationSpeed;
 
 private:

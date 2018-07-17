@@ -17,16 +17,38 @@ public:
   ~GrassProceduralTexture();
 
   void updateShaderUniforms();
-  std::vector<Color3>& grassColors();
-  void setGrassColors(const std::vector<Color3>& value);
-  Color3& groundColor();
-  void setGroundColor(const Color3& value);
+
+  /**
+   * @brief Serializes this grass procedural texture.
+   * @returns a serialized grass procedural texture object
+   */
+  Json::object serialize() const;
+
+  /**
+   * @brief Creates a Grass Procedural Texture from parsed grass procedural
+   * texture data.
+   * @param parsedTexture defines parsed texture data
+   * @param scene defines the current scene
+   * @param rootUrl defines the root URL containing grass procedural texture
+   * information
+   * @returns a parsed Grass Procedural Texture
+   */
+  static unique_ptr_t<GrassProceduralTexture>
+  Parse(const Json::value& parsedTexture, Scene* scene,
+        const string_t& rootUrl);
+
+protected:
+  std::vector<Color3>& get_grassColors();
+  void set_grassColors(const std::vector<Color3>& value);
+  Color3& get_groundColor();
+  void set_groundColor(const Color3& value);
+
+public:
+  Property<GrassProceduralTexture, std::vector<Color3>> grassColors;
+  Property<GrassProceduralTexture, Color3> groundColor;
 
 private:
   std::vector<Color3> _grassColors;
-  Color3 _herb1;
-  Color3 _herb2;
-  Color3 _herb3;
   Color3 _groundColor;
 
 }; // end of class GrassProceduralTexture

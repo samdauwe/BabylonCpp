@@ -1,5 +1,7 @@
 #include <babylon/proceduraltextureslibrary/grass/grass_procedural_texture.h>
 
+#include <babylon/core/json.h>
+
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
@@ -14,15 +16,17 @@ GrassProceduralTexture::GrassProceduralTexture(const std::string& iName,
                         scene,
                         fallbackTexture,
                         generateMipMaps}
-    , _herb1{Color3(0.29f, 0.38f, 0.02f)}
-    , _herb2{Color3(0.36f, 0.49f, 0.09f)}
-    , _herb3{Color3(0.51f, 0.60f, 0.28f)}
+    , grassColors{this, &GrassProceduralTexture::get_grassColors,
+                  &GrassProceduralTexture::set_grassColors}
+    , groundColor{this, &GrassProceduralTexture::get_groundColor,
+                  &GrassProceduralTexture::set_groundColor}
     , _groundColor{Color3(1.f, 1.f, 1.f)}
 {
-  _grassColors.clear();
-  _grassColors.emplace_back(Color3(0.29f, 0.38f, 0.02f));
-  _grassColors.emplace_back(Color3(0.36f, 0.49f, 0.09f));
-  _grassColors.emplace_back(Color3(0.51f, 0.60f, 0.28f));
+  _grassColors = {
+    Color3(0.29f, 0.38f, 0.02f), //
+    Color3(0.36f, 0.49f, 0.09f), //
+    Color3(0.51f, 0.60f, 0.28f)  //
+  };
 
   updateShaderUniforms();
 }
@@ -39,26 +43,38 @@ void GrassProceduralTexture::updateShaderUniforms()
   setColor3("groundColor", _groundColor);
 }
 
-std::vector<Color3>& GrassProceduralTexture::grassColors()
+std::vector<Color3>& GrassProceduralTexture::get_grassColors()
 {
   return _grassColors;
 }
 
-void GrassProceduralTexture::setGrassColors(const std::vector<Color3>& value)
+void GrassProceduralTexture::set_grassColors(const std::vector<Color3>& value)
 {
   _grassColors = value;
   updateShaderUniforms();
 }
 
-Color3& GrassProceduralTexture::groundColor()
+Color3& GrassProceduralTexture::get_groundColor()
 {
   return _groundColor;
 }
 
-void GrassProceduralTexture::setGroundColor(const Color3& value)
+void GrassProceduralTexture::set_groundColor(const Color3& value)
 {
   _groundColor = value;
   updateShaderUniforms();
+}
+
+Json::object GrassProceduralTexture::serialize() const
+{
+  return Json::object();
+}
+
+unique_ptr_t<GrassProceduralTexture>
+GrassProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
+                              Scene* /*scene*/, const string_t& /*rootUrl*/)
+{
+  return nullptr;
 }
 
 } // end of namespace ProceduralTexturesLibrary

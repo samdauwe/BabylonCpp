@@ -1,5 +1,6 @@
 #include <babylon/proceduraltextureslibrary/fire/fire_procedural_texture.h>
 
+#include <babylon/core/json.h>
 #include <babylon/engine/scene.h>
 
 namespace BABYLON {
@@ -15,6 +16,16 @@ FireProceduralTexture::FireProceduralTexture(const std::string& iName,
                         scene,
                         fallbackTexture,
                         generateMipMaps}
+    , autoGenerateTime{this, &FireProceduralTexture::get_autoGenerateTime,
+                       &FireProceduralTexture::set_autoGenerateTime}
+    , fireColors{this, &FireProceduralTexture::get_fireColors,
+                 &FireProceduralTexture::set_fireColors}
+    , time{this, &FireProceduralTexture::get_time,
+           &FireProceduralTexture::set_time}
+    , speed{this, &FireProceduralTexture::get_speed,
+            &FireProceduralTexture::set_speed}
+    , alphaThreshold{this, &FireProceduralTexture::get_alphaThreshold,
+                     &FireProceduralTexture::set_alphaThreshold}
     , _time{0.f}
     , _speed{Vector2(0.5f, 0.3f)}
     , _autoGenerateTime{true}
@@ -43,8 +54,9 @@ void FireProceduralTexture::updateShaderUniforms()
 
 void FireProceduralTexture::render(bool useCameraPostProcess)
 {
-  if (_autoGenerateTime) {
-    _time += getScene()->getAnimationRatio() * 0.03f;
+  auto scene = getScene();
+  if (_autoGenerateTime && scene) {
+    _time += scene->getAnimationRatio() * 0.03f;
     updateShaderUniforms();
   }
   ProceduralTexture::render(useCameraPostProcess);
@@ -90,48 +102,70 @@ std::vector<Color3> FireProceduralTexture::BlueFireColors()
           Color3(0.0f, 0.2f, 0.9f)};
 }
 
-std::vector<Color3>& FireProceduralTexture::fireColors()
+bool FireProceduralTexture::get_autoGenerateTime() const
+{
+  return _autoGenerateTime;
+}
+
+void FireProceduralTexture::set_autoGenerateTime(bool value)
+{
+  _autoGenerateTime = value;
+}
+
+std::vector<Color3>& FireProceduralTexture::get_fireColors()
 {
   return _fireColors;
 }
 
-void FireProceduralTexture::setFireColors(const std::vector<Color3>& value)
+void FireProceduralTexture::set_fireColors(const std::vector<Color3>& value)
 {
   _fireColors = value;
   updateShaderUniforms();
 }
 
-float FireProceduralTexture::time() const
+float FireProceduralTexture::get_time() const
 {
   return _time;
 }
 
-void FireProceduralTexture::setTime(float value)
+void FireProceduralTexture::set_time(float value)
 {
   _time = value;
   updateShaderUniforms();
 }
 
-Vector2& FireProceduralTexture::speed()
+Vector2& FireProceduralTexture::get_speed()
 {
   return _speed;
 }
 
-void FireProceduralTexture::setSpeed(const Vector2& value)
+void FireProceduralTexture::set_speed(const Vector2& value)
 {
   _speed = value;
   updateShaderUniforms();
 }
 
-float FireProceduralTexture::alphaThreshold() const
+float FireProceduralTexture::get_alphaThreshold() const
 {
   return _alphaThreshold;
 }
 
-void FireProceduralTexture::setAlphaThreshold(float value)
+void FireProceduralTexture::set_alphaThreshold(float value)
 {
   _alphaThreshold = value;
   updateShaderUniforms();
+}
+
+Json::object FireProceduralTexture::serialize() const
+{
+  return Json::object();
+}
+
+unique_ptr_t<FireProceduralTexture>
+FireProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
+                             Scene* /*scene*/, const string_t& /*rootUrl*/)
+{
+  return nullptr;
 }
 
 } // end of namespace ProceduralTexturesLibrary

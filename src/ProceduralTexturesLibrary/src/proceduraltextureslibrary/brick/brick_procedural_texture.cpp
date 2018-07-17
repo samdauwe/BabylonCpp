@@ -1,5 +1,7 @@
 #include <babylon/proceduraltextureslibrary/brick/brick_procedural_texture.h>
 
+#include <babylon/core/json.h>
+
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
@@ -13,6 +15,16 @@ BrickProceduralTexture::BrickProceduralTexture(const std::string& iName,
                         scene,
                         fallbackTexture,
                         generateMipMaps}
+    , numberOfBricksHeight{this,
+                           &BrickProceduralTexture::get_numberOfBricksHeight,
+                           &BrickProceduralTexture::set_numberOfBricksHeight}
+    , numberOfBricksWidth{this,
+                          &BrickProceduralTexture::get_numberOfBricksWidth,
+                          &BrickProceduralTexture::set_numberOfBricksWidth}
+    , jointColor{this, &BrickProceduralTexture::get_jointColor,
+                 &BrickProceduralTexture::set_jointColor}
+    , brickColor{this, &BrickProceduralTexture::get_brickColor,
+                 &BrickProceduralTexture::set_brickColor}
     , _numberOfBricksHeight{15.f}
     , _numberOfBricksWidth{5.f}
     , _jointColor{Color3(0.72f, 0.72f, 0.72f)}
@@ -33,48 +45,61 @@ void BrickProceduralTexture::updateShaderUniforms()
   setColor3("jointColor", _jointColor);
 }
 
-float BrickProceduralTexture::numberOfBricksHeight() const
+float BrickProceduralTexture::get_numberOfBricksHeight() const
 {
   return _numberOfBricksHeight;
 }
 
-void BrickProceduralTexture::setNumberOfBricksHeight(float value)
+void BrickProceduralTexture::set_numberOfBricksHeight(float value)
 {
   _numberOfBricksHeight = value;
   updateShaderUniforms();
 }
 
-float BrickProceduralTexture::numberOfBricksWidth() const
+float BrickProceduralTexture::get_numberOfBricksWidth() const
 {
   return _numberOfBricksWidth;
 }
 
-void BrickProceduralTexture::setNumberOfBricksWidth(float value)
+void BrickProceduralTexture::set_numberOfBricksWidth(float value)
 {
   _numberOfBricksWidth = value;
   updateShaderUniforms();
 }
 
-Color3& BrickProceduralTexture::jointColor()
+Color3& BrickProceduralTexture::get_jointColor()
 {
   return _jointColor;
 }
 
-void BrickProceduralTexture::setJointColor(const Color3& value)
+void BrickProceduralTexture::set_jointColor(const Color3& value)
 {
   _jointColor = value;
   updateShaderUniforms();
 }
 
-Color3& BrickProceduralTexture::brickColor()
+Color3& BrickProceduralTexture::get_brickColor()
 {
   return _brickColor;
 }
 
-void BrickProceduralTexture::setBrickColor(const Color3& value)
+void BrickProceduralTexture::BrickProceduralTexture::set_brickColor(
+  const Color3& value)
 {
   _brickColor = value;
   updateShaderUniforms();
+}
+
+Json::object BrickProceduralTexture::serialize() const
+{
+  return Json::object();
+}
+
+unique_ptr_t<BrickProceduralTexture>
+BrickProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
+                              Scene* /*scene*/, const string_t& /*rootUrl*/)
+{
+  return nullptr;
 }
 
 } // end of namespace ProceduralTexturesLibrary

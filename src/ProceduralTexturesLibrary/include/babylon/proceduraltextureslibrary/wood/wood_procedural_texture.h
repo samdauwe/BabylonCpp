@@ -17,10 +17,35 @@ public:
   ~WoodProceduralTexture();
 
   void updateShaderUniforms();
-  float ampScale() const;
-  void setAmpScale(float value);
-  Color3& woodColor();
-  void setWoodColor(const Color3& value);
+
+  /**
+   * @brief Serializes this wood procedural texture.
+   * @returns a serialized wood procedural texture object
+   */
+  Json::object serialize() const;
+
+  /**
+   * @brief Creates a Wood Procedural Texture from parsed wood procedural
+   * texture data.
+   * @param parsedTexture defines parsed texture data
+   * @param scene defines the current scene
+   * @param rootUrl defines the root URL containing wood procedural texture
+   * information
+   * @returns a parsed Wood Procedural Texture
+   */
+  static unique_ptr_t<WoodProceduralTexture>
+  Parse(const Json::value& parsedTexture, Scene* scene,
+        const string_t& rootUrl);
+
+protected:
+  float get_ampScale() const;
+  void set_ampScale(float value);
+  Color3& get_woodColor();
+  void set_woodColor(const Color3& value);
+
+public:
+  Property<WoodProceduralTexture, float> ampScale;
+  Property<WoodProceduralTexture, Color3> woodColor;
 
 private:
   float _ampScale;

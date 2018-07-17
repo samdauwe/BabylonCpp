@@ -1,5 +1,7 @@
 #include <babylon/proceduraltextureslibrary/normalmap/normal_map_procedural_texture.h>
 
+#include <babylon/core/json.h>
+
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
@@ -8,9 +10,15 @@ NormalMapProceduralTexture::NormalMapProceduralTexture(const std::string& iName,
                                                        Scene* scene,
                                                        Texture* fallbackTexture,
                                                        bool generateMipMaps)
-    : ProceduralTexture{
-        iName,           size,           "normalMapProceduralTexture", scene,
-        fallbackTexture, generateMipMaps}
+    : ProceduralTexture{iName,
+                        size,
+                        "normalMapProceduralTexture",
+                        scene,
+                        fallbackTexture,
+                        generateMipMaps}
+    , baseTexture{this, &NormalMapProceduralTexture::get_baseTexture,
+                  &NormalMapProceduralTexture::set_baseTexture}
+    , _baseTexture{nullptr}
 {
   updateShaderUniforms();
 }
@@ -38,15 +46,27 @@ void NormalMapProceduralTexture::resize(const Size& size, bool generateMipMaps)
   updateShaderUniforms();
 }
 
-Texture* NormalMapProceduralTexture::baseTexture() const
+Texture*& NormalMapProceduralTexture::get_baseTexture()
 {
   return _baseTexture;
 }
 
-void NormalMapProceduralTexture::setBaseTexture(Texture* texture)
+void NormalMapProceduralTexture::set_baseTexture(Texture* const& texture)
 {
   _baseTexture = texture;
   updateShaderUniforms();
+}
+
+Json::object NormalMapProceduralTexture::serialize() const
+{
+  return Json::object();
+}
+
+unique_ptr_t<NormalMapProceduralTexture>
+NormalMapProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
+                                  Scene* /*scene*/, const string_t& /*rootUrl*/)
+{
+  return nullptr;
 }
 
 } // end of namespace ProceduralTexturesLibrary

@@ -9,7 +9,7 @@ namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
 class BABYLON_SHARED_EXPORT StarfieldProceduralTexture
-  : public ProceduralTexture {
+    : public ProceduralTexture {
 
 public:
   StarfieldProceduralTexture(const std::string& name, const Size& size,
@@ -18,28 +18,62 @@ public:
   ~StarfieldProceduralTexture();
 
   void updateShaderUniforms();
-  float time() const;
-  void setTime(float value);
-  float alpha() const;
-  void setAlpha(float value);
-  float beta() const;
-  void setBeta(float value);
-  float zoom() const;
-  void setZoom(float value);
-  float formuparam() const;
-  void setFormuparam(float value);
-  float stepsize() const;
-  void setStepsize(float value);
-  float tile() const;
-  void setTile(float value);
-  float brightness() const;
-  void setBrightness(float value);
-  float darkmatter() const;
-  void setDarkmatter(float value);
-  float distfading() const;
-  void setDistfading(float value);
-  float saturation() const;
-  void setSaturation(float value);
+
+  /**
+   * @brief Serializes this starfield procedural texture.
+   * @returns a serialized starfield procedural texture object
+   */
+  Json::object serialize() const;
+
+  /**
+   * @brief Creates a Starfield Procedural Texture from parsed startfield
+   * procedural texture data.
+   * @param parsedTexture defines parsed texture data
+   * @param scene defines the current scene
+   * @param rootUrl defines the root URL containing startfield procedural
+   * texture information
+   * @returns a parsed Starfield Procedural Texture
+   */
+  static unique_ptr_t<StarfieldProceduralTexture>
+  Parse(const Json::value& parsedTexture, Scene* scene,
+        const string_t& rootUrl);
+
+protected:
+  float get_time() const;
+  void set_time(float value);
+  float get_alpha() const;
+  void set_alpha(float value);
+  float get_beta() const;
+  void set_beta(float value);
+  float get_zoom() const;
+  void set_zoom(float value);
+  float get_formuparam() const;
+  void set_formuparam(float value);
+  float get_stepsize() const;
+  void set_stepsize(float value);
+  float get_tile() const;
+  void set_tile(float value);
+  float get_brightness() const;
+  void set_brightness(float value);
+  float get_darkmatter() const;
+  void set_darkmatter(float value);
+  float get_distfading() const;
+  void set_distfading(float value);
+  float get_saturation() const;
+  void set_saturation(float value);
+
+public:
+  Property<StarfieldProceduralTexture, float> time;
+  Property<StarfieldProceduralTexture, float> alpha;
+  Property<StarfieldProceduralTexture, float> beta;
+  Property<StarfieldProceduralTexture, float> zoom;
+  Property<StarfieldProceduralTexture, float> formuparam;
+  Property<StarfieldProceduralTexture, float> stepsize;
+  Property<StarfieldProceduralTexture, float> tile;
+  Property<StarfieldProceduralTexture, float> brightness;
+  Property<StarfieldProceduralTexture, float> darkmatter;
+  Property<StarfieldProceduralTexture, float> distfading;
+  Property<StarfieldProceduralTexture, float> saturation;
 
 private:
   float _time;

@@ -1,5 +1,7 @@
 #include <babylon/proceduraltextureslibrary/cloud/cloud_procedural_texture.h>
 
+#include <babylon/core/json.h>
+
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
@@ -13,6 +15,10 @@ CloudProceduralTexture::CloudProceduralTexture(const std::string& iName,
                         scene,
                         fallbackTexture,
                         generateMipMaps}
+    , skyColor{this, &CloudProceduralTexture::get_skyColor,
+               &CloudProceduralTexture::set_skyColor}
+    , cloudColor{this, &CloudProceduralTexture::get_cloudColor,
+                 &CloudProceduralTexture::set_cloudColor}
     , _skyColor{Color4(0.15f, 0.68f, 1.f, 1.f)}
     , _cloudColor{Color4(1.f, 1.f, 1.f, 1.f)}
 {
@@ -29,26 +35,38 @@ void CloudProceduralTexture::updateShaderUniforms()
   setColor4("cloudColor", _cloudColor);
 }
 
-Color4& CloudProceduralTexture::skyColor()
+Color4& CloudProceduralTexture::get_skyColor()
 {
   return _skyColor;
 }
 
-void CloudProceduralTexture::setSkyColor(const Color4& value)
+void CloudProceduralTexture::set_skyColor(const Color4& value)
 {
   _skyColor = value;
   updateShaderUniforms();
 }
 
-Color4& CloudProceduralTexture::cloudColor()
+Color4& CloudProceduralTexture::get_cloudColor()
 {
   return _cloudColor;
 }
 
-void CloudProceduralTexture::setCloudColor(const Color4& value)
+void CloudProceduralTexture::set_cloudColor(const Color4& value)
 {
   _cloudColor = value;
   updateShaderUniforms();
+}
+
+Json::object CloudProceduralTexture::serialize() const
+{
+  return Json::object();
+}
+
+unique_ptr_t<CloudProceduralTexture>
+CloudProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
+                              Scene* /*scene*/, const string_t& /*rootUrl*/)
+{
+  return nullptr;
 }
 
 } // end of namespace ProceduralTexturesLibrary
