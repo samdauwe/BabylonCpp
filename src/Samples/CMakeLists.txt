@@ -81,9 +81,9 @@ set(BABYLON_SAMPLES_SOURCES
 set(HEADER_GROUP "Header Files (API)")
 set(SOURCE_GROUP "Source Files")
 source_group_by_path(${INCLUDE_PATH} "\\\\.h$|\\\\.hpp$"
-    ${HEADER_GROUP} ${BABYLON_SAMPLES_HEADERS})
+                     ${HEADER_GROUP} ${BABYLON_SAMPLES_HEADERS})
 source_group_by_path(${SOURCE_PATH}  "\\\\.cpp$|\\\\.c$|\\\\.h$|\\\\.hpp$"
-    ${SOURCE_GROUP} ${BABYLON_SAMPLES_SOURCES})
+                     ${SOURCE_GROUP} ${BABYLON_SAMPLES_SOURCES})
 
 # ============================================================================ #
 #                       Create library                                         #
@@ -140,6 +140,8 @@ target_include_directories(${TARGET}
     ${CMAKE_CURRENT_BINARY_DIR}/../BabylonCpp/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../Extensions/include
     ${CMAKE_CURRENT_BINARY_DIR}/../Extensions/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../ProceduralTexturesLibrary/include
+    ${CMAKE_CURRENT_BINARY_DIR}/../ProceduralTexturesLibrary/include
     PUBLIC
     INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -151,6 +153,7 @@ target_link_libraries(${TARGET}
     PRIVATE
     BabylonCpp
     Extensions
+    ProceduralTexturesLibrary
 )
 
 # Compile definitions
