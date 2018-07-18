@@ -13,9 +13,12 @@
 namespace BABYLON {
 
 BaseTexture::BaseTexture(Scene* scene)
-    : getAlphaFromRGB{false}
+    : hasAlpha{this, &BaseTexture::get_hasAlpha, &BaseTexture::set_hasAlpha}
+    , getAlphaFromRGB{false}
     , level{1.f}
     , coordinatesIndex{0}
+    , coordinatesMode{this, &BaseTexture::get_coordinatesMode,
+                      &BaseTexture::set_coordinatesMode}
     , wrapU{TextureConstants::WRAP_ADDRESSMODE}
     , wrapV{TextureConstants::WRAP_ADDRESSMODE}
     , wrapR{TextureConstants::WRAP_ADDRESSMODE}
@@ -25,6 +28,8 @@ BaseTexture::BaseTexture(Scene* scene)
     , is3D{false}
     , gammaSpace{true}
     , isRGBD{this, &BaseTexture::get_isRGBD}
+    , isBlocking{this, &BaseTexture::get_isBlocking,
+                 &BaseTexture::set_isBlocking}
     , invertZ{false}
     , lodLevelInAlpha{false}
     , lodGenerationOffset{this, &BaseTexture::get_lodGenerationOffset,
@@ -63,7 +68,7 @@ void BaseTexture::addToScene(unique_ptr_t<BaseTexture>&& newTexture)
   }
 }
 
-void BaseTexture::setHasAlpha(bool value)
+void BaseTexture::set_hasAlpha(bool value)
 {
   if (_hasAlpha == value) {
     return;
@@ -75,12 +80,12 @@ void BaseTexture::setHasAlpha(bool value)
   }
 }
 
-bool BaseTexture::hasAlpha() const
+bool BaseTexture::get_hasAlpha() const
 {
   return _hasAlpha;
 }
 
-void BaseTexture::setCoordinatesMode(unsigned int value)
+void BaseTexture::set_coordinatesMode(unsigned int value)
 {
   if (_coordinatesMode == value) {
     return;
@@ -91,7 +96,7 @@ void BaseTexture::setCoordinatesMode(unsigned int value)
   }
 }
 
-unsigned int BaseTexture::coordinatesMode() const
+unsigned int BaseTexture::get_coordinatesMode() const
 {
   return _coordinatesMode;
 }
@@ -160,9 +165,13 @@ void BaseTexture::setOnDispose(
   _onDisposeObserver = onDisposeObservable.add(callback);
 }
 
-bool BaseTexture::isBlocking() const
+bool BaseTexture::get_isBlocking() const
 {
   return true;
+}
+
+void BaseTexture::set_isBlocking(bool /*value*/)
+{
 }
 
 Scene* BaseTexture::getScene() const

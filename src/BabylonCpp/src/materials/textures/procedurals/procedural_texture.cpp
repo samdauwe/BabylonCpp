@@ -29,9 +29,6 @@ ProceduralTexture::ProceduralTexture(
     , _fallbackTexture{fallbackTexture}
     , _fallbackTextureUsed{false}
 {
-  // scene->_proceduralTextures.emplace_back(
-  //  ::std::make_unique<ProceduralTexture>(this));
-
   name           = _name;
   isRenderTarget = true;
 
@@ -83,8 +80,6 @@ ProceduralTexture::ProceduralTexture(const string_t& _name, const Size& size,
     , _fallbackTexture{fallbackTexture}
     , _fallbackTextureUsed{false}
 {
-  scene->proceduralTextures.emplace_back(this);
-
   name           = _name;
   isRenderTarget = true;
 
@@ -120,6 +115,11 @@ ProceduralTexture::ProceduralTexture(const string_t& _name, const Size& size,
 
 ProceduralTexture::~ProceduralTexture()
 {
+}
+
+void ProceduralTexture::addToScene(unique_ptr_t<ProceduralTexture>&& newTexture)
+{
+  getScene()->proceduralTextures.emplace_back(::std::move(newTexture));
 }
 
 void ProceduralTexture::_createIndexBuffer()
@@ -470,19 +470,19 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
   }
 }
 
-unique_ptr_t<ProceduralTexture> ProceduralTexture::clone()
+ProceduralTexture* ProceduralTexture::clone()
 {
   auto textureSize = getSize();
-  auto newTexture  = ::std::make_unique<ProceduralTexture>(
-    name, textureSize.width, _fragment, getScene(), _fallbackTexture,
-    _generateMipMaps);
+  auto newTexture
+    = ProceduralTexture::New(name, textureSize.width, _fragment, getScene(),
+                             _fallbackTexture, _generateMipMaps);
 
   // Base texture
-  newTexture->setHasAlpha(hasAlpha());
-  newTexture->level = level;
+  newTexture->hasAlpha = hasAlpha();
+  newTexture->level    = level;
 
   // RenderTarget Texture
-  newTexture->setCoordinatesMode(coordinatesMode());
+  newTexture->coordinatesMode = coordinatesMode();
 
   return newTexture;
 }

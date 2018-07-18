@@ -654,8 +654,8 @@ unique_ptr_t<RenderTargetTexture> RenderTargetTexture::clone()
   );
 
   // Base texture
-  newTexture->setHasAlpha(hasAlpha());
-  newTexture->level = level;
+  newTexture->hasAlpha = hasAlpha();
+  newTexture->level    = level;
 
   // RenderTarget Texture
   newTexture->coordinatesMode = coordinatesMode;

@@ -4924,8 +4924,8 @@ Mesh* Scene::createDefaultSkybox(BaseTexture* iEnvironmentTexture, bool pbr,
     hdrSkyboxMaterial->backFaceCulling   = false;
     hdrSkyboxMaterial->reflectionTexture = environmentTexture();
     if (hdrSkyboxMaterial->reflectionTexture) {
-      hdrSkyboxMaterial->reflectionTexture->setCoordinatesMode(
-        TextureConstants::SKYBOX_MODE);
+      hdrSkyboxMaterial->reflectionTexture->coordinatesMode
+        = TextureConstants::SKYBOX_MODE;
     }
     hdrSkyboxMaterial->microSurface     = 1.f - blur;
     hdrSkyboxMaterial->disableLighting  = true;
@@ -4938,8 +4938,8 @@ Mesh* Scene::createDefaultSkybox(BaseTexture* iEnvironmentTexture, bool pbr,
     skyboxMaterial->backFaceCulling = false;
     skyboxMaterial->setReflectionTexture(environmentTexture());
     if (skyboxMaterial->reflectionTexture()) {
-      skyboxMaterial->reflectionTexture()->setCoordinatesMode(
-        TextureConstants::SKYBOX_MODE);
+      skyboxMaterial->reflectionTexture()->coordinatesMode
+        = TextureConstants::SKYBOX_MODE;
     }
     skyboxMaterial->setDisableLighting(true);
     hdrSkybox->infiniteDistance = true;

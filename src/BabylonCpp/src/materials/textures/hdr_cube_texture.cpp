@@ -47,9 +47,9 @@ HDRCubeTexture::HDRCubeTexture(
     return;
   }
 
-  name = url;
-  url  = url;
-  setHasAlpha(false);
+  name           = url;
+  url            = url;
+  hasAlpha       = false;
   isCube         = true;
   _textureMatrix = Matrix::Identity();
   _onLoad        = onLoad;

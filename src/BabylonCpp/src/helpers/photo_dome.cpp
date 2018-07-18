@@ -75,9 +75,9 @@ void PhotoDome::set_photoTexture(Texture* const& value)
     // _material->setDiffuseTexture(_photoTexture);
   }
   else {
-    _photoTexture->setCoordinatesMode(
-      TextureConstants::FIXED_EQUIRECTANGULAR_MIRRORED_MODE); // matches
-                                                              // orientation
+    _photoTexture->coordinatesMode
+      = TextureConstants::FIXED_EQUIRECTANGULAR_MIRRORED_MODE; // matches
+                                                               // orientation
     _photoTexture->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
     // _material->setReflectionTexture(_photoTexture);
   }

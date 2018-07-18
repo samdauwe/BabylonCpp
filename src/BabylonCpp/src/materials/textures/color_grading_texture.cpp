@@ -22,12 +22,12 @@ ColorGradingTexture::ColorGradingTexture(const string_t& iUrl, Scene* scene)
   _textureMatrix = ::std::make_unique<Matrix>(Matrix::Identity());
   name           = iUrl;
   url            = iUrl;
-  setHasAlpha(false);
-  isCube = false;
-  is3D   = _engine->webGLVersion() > 1.f;
-  wrapU  = TextureConstants::CLAMP_ADDRESSMODE;
-  wrapV  = TextureConstants::CLAMP_ADDRESSMODE;
-  wrapR  = TextureConstants::CLAMP_ADDRESSMODE;
+  hasAlpha       = false;
+  isCube         = false;
+  is3D           = _engine->webGLVersion() > 1.f;
+  wrapU          = TextureConstants::CLAMP_ADDRESSMODE;
+  wrapV          = TextureConstants::CLAMP_ADDRESSMODE;
+  wrapR          = TextureConstants::CLAMP_ADDRESSMODE;
 
   anisotropicFilteringLevel = 1;
 
@@ -69,7 +69,6 @@ InternalTexture* ColorGradingTexture::load3dlTexture()
   _texture = texture;
 
   const auto callback = [&](Variant<string_t, ArrayBuffer>& iText) {
-
     if (!iText.is<string_t>()) {
       return;
     }

@@ -11,14 +11,17 @@ class BABYLON_SHARED_EXPORT ProceduralTexture : public Texture {
   friend class CustomProceduralTexture;
 
 public:
-  ProceduralTexture(const string_t& name, const Size& size,
-                    const unordered_map_t<string_t, string_t>& fragment,
-                    Scene* scene, Texture* fallbackTexture,
-                    bool generateMipMaps = true);
-  ProceduralTexture(const string_t& name, const Size& size,
-                    const string_t& fragment, Scene* scene,
-                    Texture* fallbackTexture, bool generateMipMaps = true);
+  template <typename... Ts>
+  static ProceduralTexture* New(Ts&&... args)
+  {
+    auto texture = new ProceduralTexture(::std::forward<Ts>(args)...);
+    texture->addToScene(static_cast<unique_ptr_t<ProceduralTexture>>(texture));
+
+    return texture;
+  }
   ~ProceduralTexture() override;
+
+  void addToScene(unique_ptr_t<ProceduralTexture>&& newTexture);
 
   void _rebuild() override;
   void reset();
@@ -40,10 +43,18 @@ public:
   ProceduralTexture& setVector3(const string_t& name, const Vector3& value);
   ProceduralTexture& setMatrix(const string_t& name, const Matrix& value);
   void render(bool useCameraPostProcess = false);
-  unique_ptr_t<ProceduralTexture> clone();
+  ProceduralTexture* clone();
   void dispose() override;
 
 protected:
+  ProceduralTexture(const string_t& name, const Size& size,
+                    const unordered_map_t<string_t, string_t>& fragment,
+                    Scene* scene, Texture* fallbackTexture,
+                    bool generateMipMaps = true);
+  ProceduralTexture(const string_t& name, const Size& size,
+                    const string_t& fragment, Scene* scene,
+                    Texture* fallbackTexture, bool generateMipMaps = true);
+
   int get_refreshRate() const;
 
   /**

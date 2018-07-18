@@ -228,8 +228,8 @@ unique_ptr_t<MirrorTexture> MirrorTexture::clone()
   );
 
   // Base texture
-  newTexture->setHasAlpha(hasAlpha());
-  newTexture->level = level;
+  newTexture->hasAlpha = hasAlpha();
+  newTexture->level    = level;
 
   // Mirror Texture
   newTexture->mirrorPlane = mirrorPlane;

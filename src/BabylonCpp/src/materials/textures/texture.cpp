@@ -31,8 +31,11 @@ Texture::Texture(const string_t& _url, Scene* scene, bool noMipmap,
     , uRotationCenter{0.5f}
     , vRotationCenter{0.5f}
     , wRotationCenter{0.5f}
+    , noMipmap{this, &Texture::get_noMipmap}
     , _invertY{invertY}
     , _samplingMode{samplingMode}
+    , samplingMode{this, &Texture::get_samplingMode}
+    , onLoadObservable{this, &Texture::get_onLoadObservable}
     , _format{format}
     , _isBlocking{true}
     , _noMipmap{noMipmap}
@@ -116,22 +119,22 @@ const char* Texture::getClassName() const
   return "Texture";
 }
 
-void Texture::setIsBlocking(bool value)
+void Texture::set_isBlocking(bool value)
 {
   _isBlocking = value;
 }
 
-bool Texture::isBlocking() const
+bool Texture::get_isBlocking() const
 {
   return _isBlocking;
 }
 
-unsigned int Texture::samplingMode() const
+unsigned int Texture::get_samplingMode() const
 {
   return _samplingMode;
 }
 
-bool Texture::noMipmap() const
+bool Texture::get_noMipmap() const
 {
   return _noMipmap;
 }
@@ -366,12 +369,12 @@ Texture* Texture::clone() const
                                  _noMipmap, _invertY, _samplingMode);
 
   // Base texture
-  newTexture->setHasAlpha(hasAlpha());
+  newTexture->hasAlpha         = hasAlpha();
   newTexture->level            = level;
   newTexture->wrapU            = wrapU;
   newTexture->wrapV            = wrapV;
   newTexture->coordinatesIndex = coordinatesIndex;
-  newTexture->setCoordinatesMode(coordinatesMode());
+  newTexture->coordinatesMode  = coordinatesMode();
 
   // Texture
   newTexture->uOffset = uOffset;
@@ -385,7 +388,7 @@ Texture* Texture::clone() const
   return newTexture;
 }
 
-Nullable<Observable<Texture>>& Texture::onLoadObservable()
+Nullable<Observable<Texture>>& Texture::get_onLoadObservable()
 {
   return _onLoadObservable;
 }

@@ -148,8 +148,8 @@ unique_ptr_t<DynamicTexture> DynamicTexture::clone()
                                                        _generateMipMaps);
 
   // Base texture
-  newTexture->setHasAlpha(hasAlpha());
-  newTexture->level = level;
+  newTexture->hasAlpha = hasAlpha();
+  newTexture->level    = level;
 
   // Dynamic Texture
   newTexture->wrapU = wrapU;

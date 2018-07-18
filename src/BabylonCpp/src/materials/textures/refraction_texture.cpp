@@ -34,8 +34,8 @@ unique_ptr_t<RefractionTexture> RefractionTexture::clone()
     name, Size(textureSize.width, textureSize.height), scene, _generateMipMaps);
 
   // Base texture
-  newTexture->setHasAlpha(hasAlpha());
-  newTexture->level = level;
+  newTexture->hasAlpha = hasAlpha();
+  newTexture->level    = level;
 
   // Mirror Texture
   newTexture->refractionPlane = refractionPlane;

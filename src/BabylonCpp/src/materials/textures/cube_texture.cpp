@@ -62,8 +62,8 @@ CubeTexture::CubeTexture(
 {
   isCube = true;
 
-  name = rootUrl;
-  setHasAlpha(false);
+  name     = rootUrl;
+  hasAlpha = false;
 
   if (rootUrl.empty() && iFiles.empty()) {
     return;

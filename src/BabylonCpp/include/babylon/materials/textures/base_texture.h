@@ -21,11 +21,6 @@ public:
   virtual IReflect::Type type() const override;
   void addToScene(unique_ptr_t<BaseTexture>&& newTexture);
 
-  void setHasAlpha(bool value);
-  bool hasAlpha() const;
-  void setCoordinatesMode(unsigned int value);
-  unsigned int coordinatesMode() const;
-
   string_t uid();
   virtual string_t toString() const;
 
@@ -36,7 +31,6 @@ public:
 
   void setOnDispose(
     const ::std::function<void(BaseTexture*, EventState&)>& callback);
-  virtual bool isBlocking() const;
   Scene* getScene() const;
   virtual Matrix* getTextureMatrix();
   virtual Matrix* getReflectionTextureMatrix();
@@ -82,11 +76,18 @@ public:
 protected:
   BaseTexture(Scene* scene);
 
+  void set_hasAlpha(bool value);
+  bool get_hasAlpha() const;
+  void set_coordinatesMode(unsigned int value);
+  unsigned int get_coordinatesMode() const;
+
   /**
    * @brief Gets whether or not the texture contains RGBD data.
    */
   bool get_isRGBD() const;
 
+  virtual bool get_isBlocking() const;
+  virtual void set_isBlocking(bool value);
   virtual void set_boundingBoxSize(const Nullable<Vector3>& value);
   virtual Nullable<Vector3>& get_boundingBoxSize();
   float get_lodGenerationOffset() const;
@@ -96,8 +97,10 @@ protected:
 
 public:
   string_t name;
+  Property<BaseTexture, bool> hasAlpha;
   bool getAlphaFromRGB;
   float level;
+  unsigned int coordinatesIndex;
 
   /**
    * How a texture is mapped.
@@ -115,7 +118,7 @@ public:
    * | 8     | FIXED_EQUIRECTANGULAR_MODE          |             |
    * | 9     | FIXED_EQUIRECTANGULAR_MIRRORED_MODE |             |
    */
-  unsigned int coordinatesIndex;
+  Property<BaseTexture, unsigned int> coordinatesMode;
 
   /**
    * | Value | Type               | Description |
@@ -153,6 +156,8 @@ public:
    *Whether or not the texture contains RGBD data.
    */
   ReadOnlyProperty<BaseTexture, bool> isRGBD;
+
+  Property<BaseTexture, bool> isBlocking;
 
   bool invertZ;
   bool lodLevelInAlpha;

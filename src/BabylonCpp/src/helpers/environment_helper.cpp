@@ -344,7 +344,7 @@ void EnvironmentHelper::_setupGroundDiffuseTexture()
   const auto diffuseTexture
     = Texture::New(_options.groundTexture.get<string_t>(), _scene);
   diffuseTexture->gammaSpace = false;
-  diffuseTexture->setHasAlpha(true);
+  diffuseTexture->hasAlpha   = true;
   // _groundMaterial->setDiffuseTexture(diffuseTexture);
 }
 

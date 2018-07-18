@@ -77,12 +77,12 @@ void MaterialsScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Creation of a material with an alpha texture
   auto materialSphere5 = StandardMaterial::New("texture5", scene);
   materialSphere5->setDiffuseTexture(Texture::New("textures/tree.png", scene));
-  materialSphere5->diffuseTexture()->setHasAlpha(true); // Has an alpha
+  materialSphere5->diffuseTexture()->hasAlpha = true; // Has an alpha
 
   // Creation of a material and show all the faces
   auto materialSphere6 = StandardMaterial::New("texture6", scene);
   materialSphere6->setDiffuseTexture(Texture::New("textures/tree.png", scene));
-  materialSphere6->diffuseTexture()->setHasAlpha(true); // Have an alpha
+  materialSphere6->diffuseTexture()->hasAlpha = true; // Have an alpha
   materialSphere6->backFaceCulling = false; // Show all the faces of the element
 
   // Creation of a repeated textured material

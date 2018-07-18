@@ -42,12 +42,6 @@ public:
    */
   const char* getClassName() const;
 
-  void setIsBlocking(bool value);
-  bool isBlocking() const override;
-  unsigned int samplingMode() const;
-
-  bool noMipmap() const;
-
   /**
    * @brief Update the url (and optional buffer) of this texture if url was null
    * during construction.
@@ -62,7 +56,6 @@ public:
   Matrix* getTextureMatrix() override;
   Matrix* getReflectionTextureMatrix() override;
   Texture* clone() const;
-  Nullable<Observable<Texture>>& onLoadObservable();
   Json::object serialize() const;
   void dispose() override;
 
@@ -95,6 +88,12 @@ protected:
           bool deleteBuffer                                   = false,
           const Nullable<unsigned int>& format                = nullptr);
 
+  bool get_noMipmap() const;
+  void set_isBlocking(bool value) override;
+  bool get_isBlocking() const override;
+  unsigned int get_samplingMode() const;
+  Nullable<Observable<Texture>>& get_onLoadObservable();
+
 private:
   void _prepareRowForTextureGeneration(float x, float y, float z, Vector3& t);
 
@@ -123,8 +122,13 @@ public:
    */
   float wRotationCenter;
 
+  ReadOnlyProperty<Texture, bool> noMipmap;
+
   bool _invertY;
   unsigned int _samplingMode;
+
+  ReadOnlyProperty<Texture, unsigned int> samplingMode;
+  ReadOnlyProperty<Texture, Nullable<Observable<Texture>>> onLoadObservable;
 
 protected:
   const Nullable<unsigned int> _format;

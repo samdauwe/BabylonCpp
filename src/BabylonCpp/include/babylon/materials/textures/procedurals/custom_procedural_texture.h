@@ -10,11 +10,16 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT CustomProceduralTexture : public ProceduralTexture {
 
 public:
-  CustomProceduralTexture(const string_t& name, const string_t& texturePath,
-                          int size, Scene* scene,
-                          Texture* fallbackTexture = nullptr,
-                          bool generateMipMaps     = false);
-  ~CustomProceduralTexture();
+  template <typename... Ts>
+  static CustomProceduralTexture* New(Ts&&... args)
+  {
+    auto texture = new CustomProceduralTexture(::std::forward<Ts>(args)...);
+    texture->addToScene(
+      static_cast<unique_ptr_t<CustomProceduralTexture>>(texture));
+
+    return texture;
+  }
+  ~CustomProceduralTexture() override;
 
   bool isReady() override;
   void render(bool useCameraPostProcess = false);
@@ -22,6 +27,12 @@ public:
   void updateShaderUniforms();
   bool animate() const;
   void setAnimate(bool value);
+
+protected:
+  CustomProceduralTexture(const string_t& name, const string_t& texturePath,
+                          int size, Scene* scene,
+                          Texture* fallbackTexture = nullptr,
+                          bool generateMipMaps     = false);
 
 private:
   void loadJson(const string_t& jsonUrl);
