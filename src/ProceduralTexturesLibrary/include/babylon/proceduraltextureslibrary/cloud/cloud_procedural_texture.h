@@ -11,9 +11,15 @@ namespace ProceduralTexturesLibrary {
 class BABYLON_SHARED_EXPORT CloudProceduralTexture : public ProceduralTexture {
 
 public:
-  CloudProceduralTexture(const std::string& name, const Size& size,
-                         Scene* scene, Texture* fallbackTexture = nullptr,
-                         bool generateMipMaps = true);
+  template <typename... Ts>
+  static CloudProceduralTexture* New(Ts&&... args)
+  {
+    auto texture = new CloudProceduralTexture(::std::forward<Ts>(args)...);
+    texture->addToScene(
+      static_cast<unique_ptr_t<CloudProceduralTexture>>(texture));
+
+    return texture;
+  }
   ~CloudProceduralTexture();
 
   void updateShaderUniforms();
@@ -38,6 +44,10 @@ public:
         const string_t& rootUrl);
 
 protected:
+  CloudProceduralTexture(const std::string& name, const Size& size,
+                         Scene* scene, Texture* fallbackTexture = nullptr,
+                         bool generateMipMaps = true);
+
   Color4& get_skyColor();
   void set_skyColor(const Color4& value);
   Color4& get_cloudColor();

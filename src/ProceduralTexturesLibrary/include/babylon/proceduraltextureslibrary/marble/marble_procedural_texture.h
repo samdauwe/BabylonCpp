@@ -11,9 +11,15 @@ namespace ProceduralTexturesLibrary {
 class BABYLON_SHARED_EXPORT MarbleProceduralTexture : public ProceduralTexture {
 
 public:
-  MarbleProceduralTexture(const std::string& name, const Size& size,
-                          Scene* scene, Texture* fallbackTexture = nullptr,
-                          bool generateMipMaps = false);
+  template <typename... Ts>
+  static MarbleProceduralTexture* New(Ts&&... args)
+  {
+    auto texture = new MarbleProceduralTexture(::std::forward<Ts>(args)...);
+    texture->addToScene(
+      static_cast<unique_ptr_t<MarbleProceduralTexture>>(texture));
+
+    return texture;
+  }
   ~MarbleProceduralTexture();
 
   void updateShaderUniforms();
@@ -38,6 +44,10 @@ public:
         const string_t& rootUrl);
 
 protected:
+  MarbleProceduralTexture(const std::string& name, const Size& size,
+                          Scene* scene, Texture* fallbackTexture = nullptr,
+                          bool generateMipMaps = false);
+
   float get_numberOfTilesHeight() const;
   void set_numberOfTilesHeight(float value);
   float get_numberOfTilesWidth() const;

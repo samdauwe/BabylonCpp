@@ -11,9 +11,15 @@ namespace ProceduralTexturesLibrary {
 class BABYLON_SHARED_EXPORT RoadProceduralTexture : public ProceduralTexture {
 
 public:
-  RoadProceduralTexture(const std::string& name, const Size& size, Scene* scene,
-                        Texture* fallbackTexture = nullptr,
-                        bool generateMipMaps     = false);
+  template <typename... Ts>
+  static RoadProceduralTexture* New(Ts&&... args)
+  {
+    auto texture = new RoadProceduralTexture(::std::forward<Ts>(args)...);
+    texture->addToScene(
+      static_cast<unique_ptr_t<RoadProceduralTexture>>(texture));
+
+    return texture;
+  }
   ~RoadProceduralTexture();
 
   void updateShaderUniforms();
@@ -38,6 +44,10 @@ public:
         const string_t& rootUrl);
 
 protected:
+  RoadProceduralTexture(const std::string& name, const Size& size, Scene* scene,
+                        Texture* fallbackTexture = nullptr,
+                        bool generateMipMaps     = false);
+
   Color3& get_roadColor();
   void set_roadColor(const Color3& value);
 

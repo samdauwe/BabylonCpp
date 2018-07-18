@@ -12,9 +12,15 @@ namespace ProceduralTexturesLibrary {
 class BABYLON_SHARED_EXPORT FireProceduralTexture : public ProceduralTexture {
 
 public:
-  FireProceduralTexture(const std::string& name, const Size& size, Scene* scene,
-                        Texture* fallbackTexture = nullptr,
-                        bool generateMipMaps     = false);
+  template <typename... Ts>
+  static FireProceduralTexture* New(Ts&&... args)
+  {
+    auto texture = new FireProceduralTexture(::std::forward<Ts>(args)...);
+    texture->addToScene(
+      static_cast<unique_ptr_t<FireProceduralTexture>>(texture));
+
+    return texture;
+  }
   ~FireProceduralTexture();
 
   void updateShaderUniforms();
@@ -45,6 +51,10 @@ public:
         const string_t& rootUrl);
 
 protected:
+  FireProceduralTexture(const std::string& name, const Size& size, Scene* scene,
+                        Texture* fallbackTexture = nullptr,
+                        bool generateMipMaps     = false);
+
   bool get_autoGenerateTime() const;
   void set_autoGenerateTime(bool value);
   std::vector<Color3>& get_fireColors();

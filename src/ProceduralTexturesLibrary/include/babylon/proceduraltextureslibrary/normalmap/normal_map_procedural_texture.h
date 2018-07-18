@@ -11,9 +11,15 @@ class BABYLON_SHARED_EXPORT NormalMapProceduralTexture
     : public ProceduralTexture {
 
 public:
-  NormalMapProceduralTexture(const std::string& name, const Size& size,
-                             Scene* scene, Texture* fallbackTexture = nullptr,
-                             bool generateMipMaps = false);
+  template <typename... Ts>
+  static NormalMapProceduralTexture* New(Ts&&... args)
+  {
+    auto texture = new NormalMapProceduralTexture(::std::forward<Ts>(args)...);
+    texture->addToScene(
+      static_cast<unique_ptr_t<NormalMapProceduralTexture>>(texture));
+
+    return texture;
+  }
   ~NormalMapProceduralTexture();
 
   void updateShaderUniforms();
@@ -40,6 +46,10 @@ public:
         const string_t& rootUrl);
 
 protected:
+  NormalMapProceduralTexture(const std::string& name, const Size& size,
+                             Scene* scene, Texture* fallbackTexture = nullptr,
+                             bool generateMipMaps = false);
+
   Texture*& get_baseTexture();
   void set_baseTexture(Texture* const& texture);
 

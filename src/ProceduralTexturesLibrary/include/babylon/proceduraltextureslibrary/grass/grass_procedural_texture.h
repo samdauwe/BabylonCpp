@@ -11,9 +11,15 @@ namespace ProceduralTexturesLibrary {
 class BABYLON_SHARED_EXPORT GrassProceduralTexture : public ProceduralTexture {
 
 public:
-  GrassProceduralTexture(const std::string& name, const Size& size,
-                         Scene* scene, Texture* fallbackTexture = nullptr,
-                         bool generateMipMaps = false);
+  template <typename... Ts>
+  static GrassProceduralTexture* New(Ts&&... args)
+  {
+    auto texture = new GrassProceduralTexture(::std::forward<Ts>(args)...);
+    texture->addToScene(
+      static_cast<unique_ptr_t<GrassProceduralTexture>>(texture));
+
+    return texture;
+  }
   ~GrassProceduralTexture();
 
   void updateShaderUniforms();
@@ -38,6 +44,10 @@ public:
         const string_t& rootUrl);
 
 protected:
+  GrassProceduralTexture(const std::string& name, const Size& size,
+                         Scene* scene, Texture* fallbackTexture = nullptr,
+                         bool generateMipMaps = false);
+
   std::vector<Color3>& get_grassColors();
   void set_grassColors(const std::vector<Color3>& value);
   Color3& get_groundColor();

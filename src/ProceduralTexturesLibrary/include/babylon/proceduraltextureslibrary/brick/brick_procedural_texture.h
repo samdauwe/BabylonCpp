@@ -11,9 +11,15 @@ namespace ProceduralTexturesLibrary {
 class BABYLON_SHARED_EXPORT BrickProceduralTexture : public ProceduralTexture {
 
 public:
-  BrickProceduralTexture(const std::string& name, const Size& size,
-                         Scene* scene, Texture* fallbackTexture = nullptr,
-                         bool generateMipMaps = true);
+  template <typename... Ts>
+  static BrickProceduralTexture* New(Ts&&... args)
+  {
+    auto texture = new BrickProceduralTexture(::std::forward<Ts>(args)...);
+    texture->addToScene(
+      static_cast<unique_ptr_t<BrickProceduralTexture>>(texture));
+
+    return texture;
+  }
   ~BrickProceduralTexture();
 
   void updateShaderUniforms();
@@ -38,6 +44,10 @@ public:
         const string_t& rootUrl);
 
 protected:
+  BrickProceduralTexture(const std::string& name, const Size& size,
+                         Scene* scene, Texture* fallbackTexture = nullptr,
+                         bool generateMipMaps = true);
+
   float get_numberOfBricksHeight() const;
   void set_numberOfBricksHeight(float value);
   float get_numberOfBricksWidth() const;

@@ -11,9 +11,16 @@ class BABYLON_SHARED_EXPORT PerlinNoiseProceduralTexture
     : public ProceduralTexture {
 
 public:
-  PerlinNoiseProceduralTexture(const std::string& name, const Size& size,
-                               Scene* scene, Texture* fallbackTexture = nullptr,
-                               bool generateMipMaps = false);
+  template <typename... Ts>
+  static PerlinNoiseProceduralTexture* New(Ts&&... args)
+  {
+    auto texture
+      = new PerlinNoiseProceduralTexture(::std::forward<Ts>(args)...);
+    texture->addToScene(
+      static_cast<unique_ptr_t<PerlinNoiseProceduralTexture>>(texture));
+
+    return texture;
+  }
   ~PerlinNoiseProceduralTexture();
 
   void updateShaderUniforms();
@@ -38,6 +45,10 @@ public:
   static unique_ptr_t<PerlinNoiseProceduralTexture>
   Parse(const Json::value& parsedTexture, Scene* scene,
         const string_t& rootUrl);
+
+  PerlinNoiseProceduralTexture(const std::string& name, const Size& size,
+                               Scene* scene, Texture* fallbackTexture = nullptr,
+                               bool generateMipMaps = false);
 
 public:
   float time;

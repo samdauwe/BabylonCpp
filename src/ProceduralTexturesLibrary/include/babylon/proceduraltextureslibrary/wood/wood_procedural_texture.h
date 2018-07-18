@@ -11,9 +11,15 @@ namespace ProceduralTexturesLibrary {
 class BABYLON_SHARED_EXPORT WoodProceduralTexture : public ProceduralTexture {
 
 public:
-  WoodProceduralTexture(const std::string& name, const Size& size, Scene* scene,
-                        Texture* fallbackTexture = nullptr,
-                        bool generateMipMaps     = false);
+  template <typename... Ts>
+  static WoodProceduralTexture* New(Ts&&... args)
+  {
+    auto texture = new WoodProceduralTexture(::std::forward<Ts>(args)...);
+    texture->addToScene(
+      static_cast<unique_ptr_t<WoodProceduralTexture>>(texture));
+
+    return texture;
+  }
   ~WoodProceduralTexture();
 
   void updateShaderUniforms();
@@ -38,6 +44,10 @@ public:
         const string_t& rootUrl);
 
 protected:
+  WoodProceduralTexture(const std::string& name, const Size& size, Scene* scene,
+                        Texture* fallbackTexture = nullptr,
+                        bool generateMipMaps     = false);
+
   float get_ampScale() const;
   void set_ampScale(float value);
   Color3& get_woodColor();

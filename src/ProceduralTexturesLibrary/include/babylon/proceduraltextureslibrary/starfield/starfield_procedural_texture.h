@@ -12,9 +12,15 @@ class BABYLON_SHARED_EXPORT StarfieldProceduralTexture
     : public ProceduralTexture {
 
 public:
-  StarfieldProceduralTexture(const std::string& name, const Size& size,
-                             Scene* scene, Texture* fallbackTexture = nullptr,
-                             bool generateMipMaps = false);
+  template <typename... Ts>
+  static StarfieldProceduralTexture* New(Ts&&... args)
+  {
+    auto texture = new StarfieldProceduralTexture(::std::forward<Ts>(args)...);
+    texture->addToScene(
+      static_cast<unique_ptr_t<StarfieldProceduralTexture>>(texture));
+
+    return texture;
+  }
   ~StarfieldProceduralTexture();
 
   void updateShaderUniforms();
@@ -39,6 +45,10 @@ public:
         const string_t& rootUrl);
 
 protected:
+  StarfieldProceduralTexture(const std::string& name, const Size& size,
+                             Scene* scene, Texture* fallbackTexture = nullptr,
+                             bool generateMipMaps = false);
+
   float get_time() const;
   void set_time(float value);
   float get_alpha() const;
