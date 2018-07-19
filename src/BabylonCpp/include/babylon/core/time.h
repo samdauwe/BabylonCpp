@@ -101,10 +101,8 @@ inline T fpMillisecondsDuration(const microsecond_t& d)
 
 /**
  * @brief Produces an ISO-8601 string representation of the timestamp
- *
  * @param timestamp the epoch time in seconds
  * @param include_timezone appends Z UTC flag at end of string if true
- *
  * @return a string representing the timestamp in UTC
  */
 inline string_t toIso8601(::std::time_t timestamp,
@@ -162,8 +160,20 @@ inline string_t toIso8601Ms(const system_time_point_t& system_time_point)
 }
 
 /**
+ * @brief Returns the number of milliseconds since the Unix epoch. Equivalent
+ * function of JavaScript function getTime().
+ * @return the number of milliseconds since the Unix epoch
+ */
+inline long unixtimeInMs()
+{
+  using namespace std::chrono;
+  return duration_cast<milliseconds>(
+           high_resolution_clock::now().time_since_epoch())
+    .count();
+}
+
+/**
  * @brief Calculate the current UTC time stamp
- *
  * @return the UTC time stamp
  */
 inline ::std::time_t utcTime()
