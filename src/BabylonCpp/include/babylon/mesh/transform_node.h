@@ -434,7 +434,7 @@ public:
                bool disposeMaterialAndTextures = false) override;
 
 protected:
-  void _afterComputeWorldMatrix();
+  virtual void _afterComputeWorldMatrix();
 
 public:
   /**

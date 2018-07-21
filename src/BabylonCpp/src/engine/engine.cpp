@@ -347,6 +347,8 @@ void Engine::_initGLContext()
                           static_cast<unsigned>(_gl->getParameteri(
                             GL::MAX_TEXTURE_MAX_ANISOTROPY_EXT)) :
                           0;
+  _caps.depthTextureExtension        = false;
+  _caps.vertexArrayObject            = false;
   _caps.instancedArrays              = false;
   _caps.uintIndices                  = true;
   _caps.fragmentDepthSupported       = true;
@@ -366,6 +368,11 @@ void Engine::_initGLContext()
     _gl->HALF_FLOAT_OES = 0x140B;
   }
   // _caps.textureHalfFloatRender = renderToHalfFloat;
+
+  // Instances count
+  if (_webGLVersion > 1.f) {
+    _caps.instancedArrays = true;
+  }
 
   auto highp
     = _gl->getShaderPrecisionFormat(GL::FRAGMENT_SHADER, GL::HIGH_FLOAT);

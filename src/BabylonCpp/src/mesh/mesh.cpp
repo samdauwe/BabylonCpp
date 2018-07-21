@@ -688,10 +688,10 @@ Float32Array Mesh::_getPositionData(bool applySkeleton)
   return data;
 }
 
-SubMesh* Mesh::_createGlobalSubMesh(bool force)
+shared_ptr_t<SubMesh> Mesh::_createGlobalSubMesh(bool force)
 {
   auto totalVertices = getTotalVertices();
-  if (!totalVertices || (getIndices().empty())) {
+  if (!totalVertices || (!_geometry->isReady() && getIndices().empty())) {
     return nullptr;
   }
 
@@ -724,7 +724,7 @@ SubMesh* Mesh::_createGlobalSubMesh(bool force)
     }
 
     if (!needToRecreate) {
-      return subMeshes[0].get();
+      return subMeshes[0];
     }
   }
 
@@ -1042,7 +1042,8 @@ _InstancesBatch* Mesh::_getInstancesRenderList(size_t subMeshId)
     if ((_batchCache->visibleInstances.find(subMeshId)
          != _batchCache->visibleInstances.end())
         && _batchCache->visibleInstances[subMeshId].size() > 0) {
-      if (_renderIdForInstances[subMeshId] == currentRenderId_) {
+      if (subMeshId < _renderIdForInstances.size()
+          && _renderIdForInstances[subMeshId] == currentRenderId_) {
         _batchCache->mustReturn = true;
         return _batchCache.get();
       }
@@ -1050,6 +1051,9 @@ _InstancesBatch* Mesh::_getInstancesRenderList(size_t subMeshId)
       if (currentRenderId_ != selfRenderId) {
         _batchCache->renderSelf[subMeshId] = false;
       }
+    }
+    if (subMeshId >= _renderIdForInstances.size()) {
+      _renderIdForInstances.resize(subMeshId + 1);
     }
     _renderIdForInstances[subMeshId] = currentRenderId_;
   }
@@ -1774,11 +1778,7 @@ Mesh& Mesh::convertToFlatShadedMesh()
   }
 
   // Save previous submeshes
-  vector_t<SubMesh*> previousSubmeshes;
-  ::std::for_each(subMeshes.begin(), subMeshes.end(),
-                  [&previousSubmeshes](const unique_ptr_t<SubMesh>& subMesh) {
-                    previousSubmeshes.emplace_back(subMesh.get());
-                  });
+  auto previousSubmeshes = stl_util::to_raw_ptr_vector(subMeshes);
 
   auto indices      = getIndices();
   auto totalIndices = getTotalIndices();
@@ -1862,11 +1862,7 @@ Mesh& Mesh::convertToUnIndexedMesh()
   }
 
   // Save previous submeshes
-  vector_t<SubMesh*> previousSubmeshes(subMeshes.size());
-  ::std::for_each(subMeshes.begin(), subMeshes.end(),
-                  [&previousSubmeshes](const unique_ptr_t<SubMesh>& subMesh) {
-                    previousSubmeshes.emplace_back(subMesh.get());
-                  });
+  auto previousSubmeshes = stl_util::to_raw_ptr_vector(subMeshes);
 
   auto indices      = getIndices();
   auto totalIndices = getTotalIndices();

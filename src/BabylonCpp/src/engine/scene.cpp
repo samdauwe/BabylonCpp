@@ -3314,14 +3314,6 @@ void Scene::_evaluateActiveMeshes()
     _boundingBoxRenderer->reset();
   }
 
-  if (!_frustumPlanesSet) {
-    _frustumPlanes    = Frustum::GetPlanes(_transformMatrix);
-    _frustumPlanesSet = true;
-  }
-  else {
-    Frustum::GetPlanesToRef(_transformMatrix, _frustumPlanes);
-  }
-
   // Meshes
   vector_t<AbstractMesh*> _meshes;
   bool checkIsEnabled = true;

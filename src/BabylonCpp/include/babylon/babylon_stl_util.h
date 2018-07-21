@@ -225,6 +225,16 @@ inline vector_t<T*> to_raw_ptr_vector(const vector_t<unique_ptr_t<T>>& c)
   return result;
 }
 
+template <typename T>
+inline vector_t<T*> to_raw_ptr_vector(const vector_t<shared_ptr_t<T>>& c)
+{
+  vector_t<T*> result;
+  result.reserve(c.size());
+  ::std::transform(c.begin(), c.end(), ::std::back_inserter(result),
+                   [](const shared_ptr_t<T>& ci) { return ci.get(); });
+  return result;
+}
+
 template <typename K, typename V>
 inline unordered_map_t<K, V*>
 to_raw_ptr_map(const unordered_map_t<K, unique_ptr_t<V>>& c)

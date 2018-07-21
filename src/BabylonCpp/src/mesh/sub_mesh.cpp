@@ -41,7 +41,7 @@ SubMesh::SubMesh(unsigned int iMaterialIndex, unsigned int iVerticesStart,
     _renderingMesh = static_cast<Mesh*>(mesh);
   }
 
-  _id = mesh->subMeshes.size() - 1;
+  _id = mesh->subMeshes.size() /*- 1*/; // Submesh is not yet to the list
 
   if (createBoundingBox) {
     refreshBoundingInfo();
@@ -53,16 +53,16 @@ SubMesh::~SubMesh()
 {
 }
 
-void SubMesh::addToMesh(unique_ptr_t<SubMesh>&& newSubMesh)
+void SubMesh::addToMesh(const shared_ptr_t<SubMesh>& newSubMesh)
 {
-  _mesh->subMeshes.emplace_back(::std::move(newSubMesh));
+  _mesh->subMeshes.emplace_back(newSubMesh);
 }
 
-SubMesh* SubMesh::AddToMesh(unsigned int materialIndex,
-                            unsigned int verticesStart, size_t verticesCount,
-                            unsigned int indexStart, size_t indexCount,
-                            AbstractMesh* mesh, Mesh* renderingMesh,
-                            bool createBoundingBox)
+shared_ptr_t<SubMesh>
+SubMesh::AddToMesh(unsigned int materialIndex, unsigned int verticesStart,
+                   size_t verticesCount, unsigned int indexStart,
+                   size_t indexCount, AbstractMesh* mesh, Mesh* renderingMesh,
+                   bool createBoundingBox)
 {
   return SubMesh::New(materialIndex, verticesStart, verticesCount, indexStart,
                       indexCount, mesh, renderingMesh, createBoundingBox);
@@ -323,7 +323,8 @@ void SubMesh::_rebuild()
 }
 
 // Clone
-SubMesh* SubMesh::clone(AbstractMesh* newMesh, Mesh* newRenderingMesh) const
+shared_ptr_t<SubMesh> SubMesh::clone(AbstractMesh* newMesh,
+                                     Mesh* newRenderingMesh) const
 {
   auto result
     = SubMesh::New(materialIndex, verticesStart, verticesCount, indexStart,
@@ -354,16 +355,18 @@ void SubMesh::dispose()
   // Remove from mesh
   _mesh->subMeshes.erase(
     ::std::remove_if(_mesh->subMeshes.begin(), _mesh->subMeshes.end(),
-                     [this](const unique_ptr_t<SubMesh>& subMesh) {
+                     [this](const shared_ptr_t<SubMesh>& subMesh) {
                        return subMesh.get() == this;
                      }),
     _mesh->subMeshes.end());
 }
 
 // Statics
-SubMesh* SubMesh::CreateFromIndices(unsigned int materialIndex,
-                                    unsigned int startIndex, size_t indexCount,
-                                    AbstractMesh* mesh, Mesh* renderingMesh)
+shared_ptr_t<SubMesh> SubMesh::CreateFromIndices(unsigned int materialIndex,
+                                                 unsigned int startIndex,
+                                                 size_t indexCount,
+                                                 AbstractMesh* mesh,
+                                                 Mesh* renderingMesh)
 {
   unsigned int minVertexIndex = numeric_limits_t<unsigned>::max();
   unsigned int maxVertexIndex = numeric_limits_t<unsigned>::min();

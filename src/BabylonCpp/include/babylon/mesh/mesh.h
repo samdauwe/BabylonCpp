@@ -367,7 +367,7 @@ public:
   Mesh& refreshBoundingInfo();
   Mesh& _refreshBoundingInfo(bool applySkeleton);
 
-  SubMesh* _createGlobalSubMesh(bool force);
+  shared_ptr_t<SubMesh> _createGlobalSubMesh(bool force);
   void subdivide(size_t count);
 
   Mesh* setVerticesData(unsigned int kind, const Float32Array& data,

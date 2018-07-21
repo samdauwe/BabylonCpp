@@ -17,16 +17,17 @@ class BABYLON_SHARED_EXPORT SubMesh : public BaseSubMesh, public ICullable {
 
 public:
   template <typename... Ts>
-  static SubMesh* New(Ts&&... args)
+  static shared_ptr_t<SubMesh> New(Ts&&... args)
   {
-    auto subMesh = new SubMesh(::std::forward<Ts>(args)...);
-    subMesh->addToMesh(static_cast<unique_ptr_t<SubMesh>>(subMesh));
+    auto subMeshRawPtr = new SubMesh(::std::forward<Ts>(args)...);
+    auto subMesh       = static_cast<shared_ptr_t<SubMesh>>(subMeshRawPtr);
+    subMesh->addToMesh(subMesh);
 
     return subMesh;
   }
   virtual ~SubMesh();
 
-  void addToMesh(unique_ptr_t<SubMesh>&& newSubMesh);
+  void addToMesh(const shared_ptr_t<SubMesh>& newSubMesh);
   bool isGlobal() const;
 
   /**
@@ -117,7 +118,8 @@ public:
   /**
    * @brief Creates a new Submesh from the passed Mesh.
    */
-  SubMesh* clone(AbstractMesh* newMesh, Mesh* newRenderingMesh) const;
+  shared_ptr_t<SubMesh> clone(AbstractMesh* newMesh,
+                              Mesh* newRenderingMesh) const;
 
   /** Dispose **/
 
@@ -128,11 +130,11 @@ public:
 
   /** Statics **/
 
-  static SubMesh* AddToMesh(unsigned int materialIndex,
-                            unsigned int verticesStart, size_t verticesCount,
-                            unsigned int indexStart, size_t indexCount,
-                            AbstractMesh* mesh, Mesh* renderingMesh = nullptr,
-                            bool createBoundingBox = true);
+  static shared_ptr_t<SubMesh>
+  AddToMesh(unsigned int materialIndex, unsigned int verticesStart,
+            size_t verticesCount, unsigned int indexStart, size_t indexCount,
+            AbstractMesh* mesh, Mesh* renderingMesh = nullptr,
+            bool createBoundingBox = true);
 
   /**
    * @brief Creates a new Submesh from the passed parameters.
@@ -145,10 +147,11 @@ public:
    * @param renderingMesh (optional Mesh) : rendering mesh.
    * @return The created SubMesh object.
    */
-  static SubMesh* CreateFromIndices(unsigned int materialIndex,
-                                    unsigned int startIndex, size_t indexCount,
-                                    AbstractMesh* mesh,
-                                    Mesh* renderingMesh = nullptr);
+  static shared_ptr_t<SubMesh> CreateFromIndices(unsigned int materialIndex,
+                                                 unsigned int startIndex,
+                                                 size_t indexCount,
+                                                 AbstractMesh* mesh,
+                                                 Mesh* renderingMesh = nullptr);
 
 protected:
   SubMesh(unsigned int materialIndex, unsigned int verticesStart,

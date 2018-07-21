@@ -825,7 +825,7 @@ protected:
   /**
    * @brief Hidden
    */
-  void _afterComputeWorldMatrix();
+  void _afterComputeWorldMatrix() override;
 
   /**
    * @brief Hidden
@@ -1462,7 +1462,7 @@ public:
    * Gets or sets the list of subMeshes
    * @see http://doc.babylonjs.com/how_to/multi_materials
    */
-  vector_t<unique_ptr_t<SubMesh>> subMeshes;
+  vector_t<shared_ptr_t<SubMesh>> subMeshes;
 
   /** Hidden */
   Octree<SubMesh*>* _submeshesOctree;
