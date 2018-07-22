@@ -5,6 +5,7 @@
 #include <babylon/cameras/target_camera.h>
 #include <babylon/core/random.h>
 #include <babylon/culling/bounding_info.h>
+#include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/math/axis.h>
 #include <babylon/math/color4.h>
@@ -21,22 +22,22 @@ namespace BABYLON {
 
 SolidParticleSystem::SolidParticleSystem(
   const string_t& iName, Scene* scene,
-  const SolidParticleSystemOptions& options)
+  const Nullable<SolidParticleSystemOptions>& options)
     : nbParticles{0}
     , billboard{false}
     , recomputeNormals{true}
     , counter{0}
     , name{iName}
     , mesh{nullptr}
-    , _bSphereOnly{options.boundingSphereOnly}
-    , _bSphereRadiusFactor{options.bSphereRadiusFactor}
-    , _scene{scene}
+    , _bSphereOnly{options ? (*options).boundingSphereOnly : false}
+    , _bSphereRadiusFactor{options ? (*options).bSphereRadiusFactor : 1.f}
+    , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _index{0}
-    , _updatable{options.updatable}
-    , _pickable{options.isPickable}
+    , _updatable{options ? (*options).updatable : true}
+    , _pickable{options ? (*options).isPickable : false}
     , _isVisibilityBoxLocked{false}
     , _alwaysVisible{false}
-    , _depthSort{options.enableDepthSort}
+    , _depthSort{options ? (*options).enableDepthSort : false}
     , _shapeCounter{0}
     , _copy{::std::make_unique<SolidParticle>(
         0, 0, 0, nullptr, 0, 0, this,
@@ -79,7 +80,7 @@ SolidParticleSystem::SolidParticleSystem(
     , _translation{Tmp::Vector3Array[3]}
     , _minBbox{Vector3::Zero()}
     , _maxBbox{Vector3::Zero()}
-    , _particlesIntersect{options.particleIntersection}
+    , _particlesIntersect{options ? (*options).particleIntersection : false}
     , _needs32Bits{false}
     , _pivotBackTranslation{Vector3::Zero()}
     , _scaledPivot{Vector3::Zero()}

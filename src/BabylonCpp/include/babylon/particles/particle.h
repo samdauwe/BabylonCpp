@@ -2,9 +2,12 @@
 #define BABYLON_PARTICLES_PARTICLE_H
 
 #include <babylon/babylon_global.h>
-
 #include <babylon/math/color4.h>
+#include <babylon/math/vector2.h>
 #include <babylon/math/vector3.h>
+#include <babylon/tools/color_gradient.h>
+
+#include <babylon/core/nullable.h>
 
 namespace BABYLON {
 
@@ -75,6 +78,11 @@ public:
   float size;
 
   /**
+   * The current scale of the particle.
+   */
+  Vector2 scale;
+
+  /**
    * The current angle of the particle.
    */
   float angle;
@@ -88,6 +96,19 @@ public:
    * Defines the cell index used by the particle to be rendered from a sprite.
    */
   unsigned int cellIndex;
+
+  /** Hidden */
+  Nullable<Vector3> _initialDirection;
+
+  /** Hidden */
+  float _initialSize;
+
+  /** Hidden */
+  Nullable<ColorGradient> _currentColorGradient;
+  /** Hidden */
+  Color4 _currentColor1;
+  /** Hidden */
+  Color4 _currentColor2;
 
   /**
    * Defines how the sprite cell index is updated for the particle. This is

@@ -245,6 +245,36 @@ public:
   static ParticleSystem* Parse(const Json::value& parsedParticleSystem,
                                Scene* scene, const string_t& url);
 
+  //---
+  IParticleSystem& addColorGradient(float /*gradient*/,
+                                    const Color4& /*color1*/,
+                                    const Nullable<Color4>& /*color2*/) override
+  {
+    return *this;
+  }
+  IParticleSystem& removeColorGradient(float /*gradient*/) override
+  {
+    return *this;
+  }
+  IParticleSystem& addSizeGradient(float /*gradient*/,
+                                   float /*factor*/) override
+  {
+    return *this;
+  }
+  IParticleSystem& removeSizeGradient(float /*gradient*/) override
+  {
+    return *this;
+  }
+  vector_t<ColorGradient> getColorGradients() override
+  {
+    return {};
+  }
+  vector_t<ColorGradient> getSizeGradients() override
+  {
+    return {};
+  }
+  //---
+
 protected:
   Vector3& get_direction1();
   void set_direction1(const Vector3& value);

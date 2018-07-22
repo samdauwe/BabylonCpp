@@ -6,6 +6,9 @@
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/vector3.h>
+#include <babylon/tools/color_gradient.h>
+
+#include <babylon/core/nullable.h>
 
 namespace BABYLON {
 
@@ -18,6 +21,11 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
 
   virtual ~IParticleSystem();
+
+  /**
+   * List of animations used by the particle system.
+   */
+  vector_t<Animation*> animations;
 
   /**
    * The id of the Particle system.
@@ -34,6 +42,12 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * system to.
    */
   Variant<AbstractMesh*, Vector3> emitter;
+
+  /**
+   * Gets or sets a boolean indicating if the particles must be rendered as
+   * billboard or aligned with the direction
+   */
+  bool isBillboardBased;
 
   /**
    * The rendering group used by the Particle system to chose when to render.
@@ -64,7 +78,8 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
 
   /**
    * Blend mode use to render the particle, it can be either
-   * ParticleSystem.BLENDMODE_ONEONE or ParticleSystem.BLENDMODE_STANDARD.
+   * ParticleSystem.BLENDMODE_ONEONE, ParticleSystem.BLENDMODE_STANDARD or
+   * ParticleSystem.BLENDMODE_ADD.
    */
   unsigned int blendMode;
 
@@ -87,6 +102,26 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * Maximum Size of emitting particles.
    */
   float maxSize;
+
+  /**
+   * Minimum scale of emitting particles on X axis.
+   */
+  float minScaleX;
+
+  /**
+   * Maximum scale of emitting particles on X axis.
+   */
+  float maxScaleX;
+
+  /**
+   * Minimum scale of emitting particles on Y axis.
+   */
+  float minScaleY;
+
+  /**
+   * Maximum scale of emitting particles on Y axis.
+   */
+  float maxScaleY;
 
   /**
    * Random color of each particle after it has been emitted, between color1 and
@@ -127,10 +162,45 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
   float maxEmitPower;
 
   /**
+   * Minimum angular speed of emitting particles (Z-axis rotation for each
+   * particle).
+   */
+  float minAngularSpeed;
+
+  /**
+   * Maximum angular speed of emitting particles (Z-axis rotation for each
+   * particle).
+   */
+  float maxAngularSpeed;
+
+  /**
+   * Gets or sets the minimal initial rotation in radians.
+   */
+  float minInitialRotation;
+
+  /**
+   * Gets or sets the maximal initial rotation in radians.
+   */
+  float maxInitialRotation;
+
+  /**
    * The particle emitter type defines the emitter used by the particle system.
    * It can be for example box, sphere, or cone...
    */
   unique_ptr_t<IParticleEmitterType> particleEmitterType;
+
+  /**
+   * Gets or sets a value indicating how many cycles (or frames) must be
+   * executed before first rendering (this value has to be set before starting
+   * the system). Default is 0
+   */
+  size_t preWarmCycles;
+
+  /**
+   * Gets or sets a value indicating the time step multiplier to use in pre-warm
+   * mode (default is 1)
+   */
+  size_t preWarmStepOffset;
 
   /**
    * @brief Returns whether or not the particle system has an emitter.
@@ -209,6 +279,51 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * @return true if the system is ready
    */
   virtual bool isReady() = 0;
+
+  /**
+   * @brief Adds a new color gradient
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param color defines the color to affect to the specified gradient
+   * @param color2 defines an additional color used to define a range ([color,
+   * color2]) with main color to pick the final color from
+   */
+  virtual IParticleSystem&
+  addColorGradient(float gradient, const Color4& color1,
+                   const Nullable<Color4>& color2 = nullptr)
+    = 0;
+
+  /**
+   * @brief Remove a specific color gradient
+   * @param gradient defines the gradient to remove
+   */
+  virtual IParticleSystem& removeColorGradient(float gradient) = 0;
+
+  /**
+   * @brief Adds a new size gradient
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param factor defines the size factor to affect to the specified gradient
+   */
+  virtual IParticleSystem& addSizeGradient(float gradient, float factor) = 0;
+
+  /**
+   * @brief Remove a specific size gradient
+   * @param gradient defines the gradient to remove
+   */
+  virtual IParticleSystem& removeSizeGradient(float gradient) = 0;
+
+  /**
+   * @brief Gets the current list of color gradients.
+   * You must use addColorGradient and removeColorGradient to udpate this list
+   * @returns the list of color gradients
+   */
+  virtual vector_t<ColorGradient> getColorGradients() = 0;
+
+  /**
+   * @brief Gets the current list of size gradients.
+   * You must use addSizeGradient and removeSizeGradient to udpate this list
+   * @returns the list of size gradients
+   */
+  virtual vector_t<ColorGradient> getSizeGradients() = 0;
 
 }; // end of struct IParticleSystem
 

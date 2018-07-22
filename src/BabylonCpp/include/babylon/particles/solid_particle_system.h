@@ -72,7 +72,8 @@ public:
    * exactly matches a spherical mesh.
    */
   SolidParticleSystem(const string_t& name, Scene* scene,
-                      const SolidParticleSystemOptions& options);
+                      const Nullable<SolidParticleSystemOptions>& options
+                      = nullptr);
   virtual ~SolidParticleSystem();
 
   /**

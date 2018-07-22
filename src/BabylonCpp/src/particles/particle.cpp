@@ -12,9 +12,14 @@ Particle::Particle(ParticleSystem* iParticleSystem)
     , lifeTime{1.f}
     , age{0.f}
     , size{0.f}
+    , scale{Vector2(1.f, 1.f)}
     , angle{0.f}
     , angularSpeed{0.f}
     , cellIndex{0}
+    , _initialDirection{nullptr}
+    , _currentColorGradient{nullptr}
+    , _currentColor1{Color4(0, 0, 0, 0)}
+    , _currentColor2{Color4(0, 0, 0, 0)}
     , particleSystem{iParticleSystem}
     , _currentFrameCounter{0}
 {
@@ -33,9 +38,14 @@ Particle::Particle(const Particle& other)
     , lifeTime{other.lifeTime}
     , age{other.age}
     , size{other.size}
+    , scale{other.scale}
     , angle{other.angle}
     , angularSpeed{other.angularSpeed}
     , cellIndex{other.cellIndex}
+    , _initialDirection{other._initialDirection}
+    , _currentColorGradient{other._currentColorGradient}
+    , _currentColor1{other._currentColor1}
+    , _currentColor2{other._currentColor2}
     , particleSystem{other.particleSystem}
     , _currentFrameCounter{other._currentFrameCounter}
 {
@@ -49,18 +59,23 @@ Particle::Particle(Particle&& other)
 Particle& Particle::operator=(const Particle& other)
 {
   if (&other != this) {
-    position             = other.position;
-    direction            = other.direction;
-    color                = other.color;
-    colorStep            = other.colorStep;
-    lifeTime             = other.lifeTime;
-    age                  = other.age;
-    size                 = other.size;
-    angle                = other.angle;
-    angularSpeed         = other.angularSpeed;
-    cellIndex            = other.cellIndex;
-    particleSystem       = other.particleSystem;
-    _currentFrameCounter = other._currentFrameCounter;
+    position              = other.position;
+    direction             = other.direction;
+    color                 = other.color;
+    colorStep             = other.colorStep;
+    lifeTime              = other.lifeTime;
+    age                   = other.age;
+    size                  = other.size;
+    scale                 = other.scale;
+    angle                 = other.angle;
+    angularSpeed          = other.angularSpeed;
+    cellIndex             = other.cellIndex;
+    _initialDirection     = other._initialDirection;
+    _currentColorGradient = other._currentColorGradient;
+    _currentColor1        = other._currentColor1;
+    _currentColor2        = other._currentColor2;
+    particleSystem        = other.particleSystem;
+    _currentFrameCounter  = other._currentFrameCounter;
   }
 
   return *this;
@@ -69,18 +84,23 @@ Particle& Particle::operator=(const Particle& other)
 Particle& Particle::operator=(Particle&& other)
 {
   if (&other != this) {
-    position             = ::std::move(other.position);
-    direction            = ::std::move(other.direction);
-    color                = ::std::move(other.color);
-    colorStep            = ::std::move(other.colorStep);
-    lifeTime             = ::std::move(other.lifeTime);
-    age                  = ::std::move(other.age);
-    size                 = ::std::move(other.size);
-    angle                = ::std::move(other.angle);
-    angularSpeed         = ::std::move(other.angularSpeed);
-    cellIndex            = ::std::move(other.cellIndex);
-    particleSystem       = ::std::move(other.particleSystem);
-    _currentFrameCounter = ::std::move(other._currentFrameCounter);
+    position              = ::std::move(other.position);
+    direction             = ::std::move(other.direction);
+    color                 = ::std::move(other.color);
+    colorStep             = ::std::move(other.colorStep);
+    lifeTime              = ::std::move(other.lifeTime);
+    age                   = ::std::move(other.age);
+    size                  = ::std::move(other.size);
+    scale                 = ::std::move(other.scale);
+    angle                 = ::std::move(other.angle);
+    angularSpeed          = ::std::move(other.angularSpeed);
+    cellIndex             = ::std::move(other.cellIndex);
+    _initialDirection     = ::std::move(other._initialDirection);
+    _currentColorGradient = ::std::move(other._currentColorGradient);
+    _currentColor1        = ::std::move(other._currentColor1);
+    _currentColor2        = ::std::move(other._currentColor2);
+    particleSystem        = ::std::move(other.particleSystem);
+    _currentFrameCounter  = ::std::move(other._currentFrameCounter);
   }
 
   return *this;
@@ -151,16 +171,33 @@ void Particle::_updateCellIndexWithCustomSpeed()
 void Particle::copyTo(Particle& other)
 {
   other.position.copyFrom(position);
+  if (_initialDirection) {
+    if (other._initialDirection) {
+      other._initialDirection = _initialDirection;
+    }
+    else {
+      other._initialDirection = _initialDirection;
+    }
+  }
+  else {
+    other._initialDirection = nullptr;
+  }
   other.direction.copyFrom(direction);
   other.color.copyFrom(color);
   other.colorStep.copyFrom(colorStep);
-  other.lifeTime       = lifeTime;
-  other.age            = age;
-  other.size           = size;
+  other.lifeTime = lifeTime;
+  other.age      = age;
+  other.size     = size;
+  other.scale.copyFrom(scale);
   other.angle          = angle;
   other.angularSpeed   = angularSpeed;
   other.particleSystem = particleSystem;
   other.cellIndex      = cellIndex;
+  if (_currentColorGradient) {
+    other._currentColorGradient = _currentColorGradient;
+    other._currentColor1.copyFrom(_currentColor1);
+    other._currentColor2.copyFrom(_currentColor2);
+  }
 }
 
 } // end of namespace BABYLON
