@@ -7,6 +7,7 @@
 #include <babylon/samples/materials/shadermaterial/shader_material_boxes_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_carved_trees_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_chains_and_gears_scene.h>
+#include <babylon/samples/materials/shadermaterial/shader_material_clouds_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_cylinders_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_double_helix_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_generators_scene.h>
@@ -95,6 +96,12 @@ _MaterialsSamplesIndex::_MaterialsSamplesIndex()
     [](ICanvas* iCanvas) {                                                   //
       return ::std::make_unique<ShaderMaterialChainsAndGearsScene>(iCanvas); //
     });                                                                      //
+  // Shader Material Clouds Scene
+  _samples["ShaderMaterialCloudsScene"] = ::std::make_tuple(
+    true,                                                            //
+    [](ICanvas* iCanvas) {                                           //
+      return ::std::make_unique<ShaderMaterialCloudsScene>(iCanvas); //
+    });                                                              //
   // Shader Material Cylinders Scene
   _samples["ShaderMaterialCylindersScene"] = ::std::make_tuple(
     true,                                                               //
