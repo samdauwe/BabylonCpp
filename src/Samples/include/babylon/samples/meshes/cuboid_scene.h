@@ -6,6 +6,11 @@
 namespace BABYLON {
 namespace Samples {
 
+/**
+ * @brief Cuboid Scene. Example demonstrating how to creates a 3D rectangle or
+ * cuboid directly without scaling a cube.
+ * @see https://www.babylonjs-playground.com/#K6M44R#48
+ */
 class CuboidScene : public IRenderableScene {
 
 public:
