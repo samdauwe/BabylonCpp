@@ -58,6 +58,7 @@ struct BuildFromPlanOptions {
  * extruding and adding door and window spaces at given positions.
  *
  * Source: https://doc.babylonjs.com/samples/house
+ * @see https://www.babylonjs-playground.com/#4GBWI5#96
  */
 class HouseFromFloorplanScene : public IRenderableScene {
 

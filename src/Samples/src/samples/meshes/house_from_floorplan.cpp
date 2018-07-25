@@ -170,7 +170,6 @@ Mesh* HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
   /**************** House Mesh Construction ***********************************/
 
   // Wall Construction
-  // var polygonCorners;
   vector_t<Vector2> polygonCorners;
   WallData wallData;
   auto wallDirection      = Vector3::Zero();
