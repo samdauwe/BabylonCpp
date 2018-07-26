@@ -49,6 +49,11 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
     , endSpriteCellID{0}
     , spriteCellWidth{0}
     , spriteCellHeight{0}
+    , onDispose{this, &ParticleSystem::set_onDispose}
+    , isAnimationSheetEnabled{this,
+                              &ParticleSystem::get_isAnimationSheetEnabled}
+    , isBillboardBased{this, &ParticleSystem::get_isBillboardBased,
+                       &ParticleSystem::set_isBillboardBased}
     , _vertexBufferSize{11}
     , _epsilon{epsilon}
     , _capacity{capacity}
@@ -60,10 +65,12 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
     , _scaledDirection{Vector3::Zero()}
     , _scaledGravity{Vector3::Zero()}
     , _currentRenderId{-1}
+    , _useInstancing{false}
     , _started{false}
     , _stopped{false}
     , _actualFrame{0}
     , _isAnimationSheetEnabled{isAnimationSheetEnabled}
+    , _isBillboardBased{true}
     , _appendParticleVertexes{nullptr}
     , _zeroVector3{Vector3::Zero()}
 {
@@ -101,51 +108,53 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
   }
 
   _createIndexBuffer();
-
-  // 11 floats per particle (x, y, z, r, g, b, a, angle, size, offsetX, offsetY)
-  // + 1 filler
-  _vertexData.resize(capacity * _vertexBufferSize * 4);
-  _vertexBuffer = ::std::make_unique<Buffer>(scene->getEngine(), _vertexData,
-                                             true, _vertexBufferSize);
-
-  auto positions
-    = _vertexBuffer->createVertexBuffer(VertexBuffer::PositionKind, 0, 3);
-  auto colors
-    = _vertexBuffer->createVertexBuffer(VertexBuffer::ColorKind, 3, 4);
-  auto options
-    = _vertexBuffer->createVertexBuffer(VertexBuffer::OptionsKind, 7, 4);
-
-  if (_isAnimationSheetEnabled) {
-    auto cellIndexBuffer
-      = _vertexBuffer->createVertexBuffer(VertexBuffer::CellIndexKind, 11, 1);
-    _vertexBuffers["cellIndex"] = ::std::move(cellIndexBuffer);
-  }
-
-  _vertexBuffers[VertexBuffer::PositionKindChars] = ::std::move(positions);
-  _vertexBuffers[VertexBuffer::ColorKindChars]    = ::std::move(colors);
-  _vertexBuffers["options"]                       = ::std::move(options);
+  _createVertexBuffers();
 
   // Default emitter type
   particleEmitterType = ::std::make_unique<BoxParticleEmitter>();
 
   updateFunction = [this](vector_t<Particle*>& _particles) {
-    for (unsigned int pIndex = 0; pIndex < _particles.size(); ++pIndex) {
-      auto particle = _particles[pIndex];
+    for (unsigned int index = 0; index < _particles.size(); ++index) {
+      auto particle = _particles[index];
       particle->age += static_cast<float>(_scaledUpdateSpeed);
 
       if (particle->age >= particle->lifeTime) {
         // Recycle by swapping with last particle
         _emitFromParticle(particle);
         recycleParticle(particle);
-        --pIndex;
+        --index;
         continue;
       }
       else {
-        particle->colorStep.scaleToRef(_scaledUpdateSpeed, _scaledColorStep);
-        particle->color.addInPlace(_scaledColorStep);
+        // auto ratio = particle->age / particle->lifeTime;
 
-        if (particle->color.a < 0.f) {
-          particle->color.a = 0.f;
+        // Color
+        if (!_colorGradients.empty()) {
+#if 0
+          Tools::GetCurrentGradient(
+            ratio, _colorGradients,
+            [&](ColorGradient& currentGradient, ColorGradient& nextGradient,
+                float scale) {
+              if (currentGradient != particle->_currentColorGradient) {
+                particle->_currentColor1.copyFrom(particle->_currentColor2);
+                static_cast<ColorGradient&>(nextGradient)
+                  .getColorToRef(particle->_currentColor2);
+                particle->_currentColorGradient
+                  = static_cast<ColorGradient&>(currentGradient);
+              }
+              Color4::LerpToRef(particle->_currentColor1,
+                                particle->_currentColor2, scale,
+                                particle->color);
+            });
+#endif
+        }
+        else {
+          particle->colorStep.scaleToRef(_scaledUpdateSpeed, _scaledColorStep);
+          particle->color.addInPlace(_scaledColorStep);
+
+          if (particle->color.a < 0.f) {
+            particle->color.a = 0.f;
+          }
         }
 
         particle->angle
@@ -156,6 +165,22 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
 
         gravity.scaleToRef(_scaledUpdateSpeed, _scaledGravity);
         particle->direction.addInPlace(_scaledGravity);
+
+        // Gradient
+        if (!_sizeGradients.empty()) {
+#if 0
+          Tools::GetCurrentGradient(
+            ratio, _sizeGradients,
+            [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
+                float scale) {
+              particle->size
+                = particle->_initialSize
+                  * Scalar::Lerp(
+                      static_cast<FactorGradient&>(currentGradient).factor,
+                      static_cast<FactorGradient&>(nextGradient).factor, scale);
+            });
+#endif
+        }
 
         if (_isAnimationSheetEnabled) {
           particle->updateCellIndex(_scaledUpdateSpeed);
@@ -174,28 +199,24 @@ IReflect::Type ParticleSystem::type() const
   return IReflect::Type::PARTICLESYSTEM;
 }
 
-vector_t<Particle*>& ParticleSystem::particles()
-{
-  return _particles;
-}
-
 const char* ParticleSystem::getClassName() const
 {
   return "ParticleSystem";
 }
 
-void ParticleSystem::setOnDispose(
-  const ::std::function<void(ParticleSystem*, EventState&)>& callback)
+vector_t<Particle*>& ParticleSystem::particles()
 {
-  if (_onDisposeObserver) {
-    onDisposeObservable.remove(_onDisposeObserver);
-  }
-  _onDisposeObserver = onDisposeObservable.add(callback);
+  return _particles;
 }
 
-bool ParticleSystem::isAnimationSheetEnabled() const
+vector_t<ColorGradient>& ParticleSystem::getColorGradients()
 {
-  return _isAnimationSheetEnabled;
+  return _colorGradients;
+}
+
+vector_t<FactorGradient>& ParticleSystem::getSizeGradients()
+{
+  return _sizeGradients;
 }
 
 Vector3& ParticleSystem::get_direction1()
@@ -270,8 +291,200 @@ void ParticleSystem::set_maxEmitBox(const Vector3& value)
   }
 }
 
+void ParticleSystem::set_onDispose(
+  const ::std::function<void(ParticleSystem*, EventState&)>& callback)
+{
+  if (_onDisposeObserver) {
+    onDisposeObservable.remove(_onDisposeObserver);
+  }
+  _onDisposeObserver = onDisposeObservable.add(callback);
+}
+
+bool ParticleSystem::get_isAnimationSheetEnabled() const
+{
+  return _isAnimationSheetEnabled;
+}
+
+bool ParticleSystem::get_isBillboardBased() const
+{
+  return _isBillboardBased;
+}
+
+void ParticleSystem::set_isBillboardBased(bool value)
+{
+  if (_isBillboardBased == value) {
+    return;
+  }
+
+  _isBillboardBased = value;
+  _resetEffect();
+}
+
+IParticleSystem& ParticleSystem::addSizeGradient(float gradient, float factor)
+{
+  FactorGradient sizeGradient;
+  sizeGradient.gradient = gradient;
+  sizeGradient.factor   = factor;
+  _sizeGradients.emplace_back(sizeGradient);
+
+  ::std::sort(_sizeGradients.begin(), _sizeGradients.end(),
+              [](const FactorGradient& a, const FactorGradient& b) {
+                if (a.gradient < b.gradient) {
+                  return -1;
+                }
+                else if (a.gradient > b.gradient) {
+                  return 1;
+                }
+
+                return 0;
+              });
+
+  return *this;
+}
+
+IParticleSystem& ParticleSystem::removeSizeGradient(float /*gradient*/)
+{
+  if (_sizeGradients.empty()) {
+    return *this;
+  }
+#if 0
+  _sizeGradients.erase(
+    ::std::remove(_sizeGradients.begin(), _sizeGradients.end(), gradient),
+    _sizeGradients.end());
+#endif
+  return *this;
+}
+
+IParticleSystem&
+ParticleSystem::addColorGradient(float gradient, const Color4& color,
+                                 const Nullable<Color4>& color2)
+{
+  ColorGradient colorGradient;
+  colorGradient.gradient = gradient;
+  colorGradient.color1   = color;
+  colorGradient.color2   = color2;
+  _colorGradients.emplace_back(colorGradient);
+
+  ::std::sort(_colorGradients.begin(), _colorGradients.end(),
+              [](const ColorGradient& a, const ColorGradient& b) {
+                if (a.gradient < b.gradient) {
+                  return -1;
+                }
+                else if (a.gradient > b.gradient) {
+                  return 1;
+                }
+
+                return 0;
+              });
+
+  return *this;
+}
+
+IParticleSystem& ParticleSystem::removeColorGradient(float /*gradient*/)
+{
+  if (_colorGradients.empty()) {
+    return *this;
+  }
+#if 0
+  _colorGradients.erase(
+    ::std::remove(_colorGradients.begin(), _colorGradients.end(), gradient),
+    _colorGradients.end());
+#endif
+  return *this;
+}
+
+void ParticleSystem::_resetEffect()
+{
+  if (_vertexBuffer) {
+    _vertexBuffer->dispose();
+    _vertexBuffer = nullptr;
+  }
+
+  if (_spriteBuffer) {
+    _spriteBuffer->dispose();
+    _spriteBuffer = nullptr;
+  }
+
+  _createVertexBuffers();
+}
+
+void ParticleSystem::_createVertexBuffers()
+{
+  _vertexBufferSize = _useInstancing ? 10 : 12;
+  if (_isAnimationSheetEnabled) {
+    _vertexBufferSize += 1;
+  }
+
+  if (!_isBillboardBased) {
+    _vertexBufferSize += 3;
+  }
+
+  auto engine = _scene->getEngine();
+  _vertexData
+    = Float32Array(_capacity * _vertexBufferSize * (_useInstancing ? 1 : 4));
+  _vertexBuffer
+    = ::std::make_unique<Buffer>(engine, _vertexData, true, _vertexBufferSize);
+
+  size_t dataOffset = 0;
+  auto positions
+    = _vertexBuffer->createVertexBuffer(VertexBuffer::PositionKind, dataOffset,
+                                        3, _vertexBufferSize, _useInstancing);
+  _vertexBuffers[VertexBuffer::PositionKindChars] = ::std::move(positions);
+  dataOffset += 3;
+
+  auto colors = _vertexBuffer->createVertexBuffer(
+    VertexBuffer::ColorKind, dataOffset, 4, _vertexBufferSize, _useInstancing);
+  _vertexBuffers[VertexBuffer::ColorKindChars] = ::std::move(colors);
+  dataOffset += 4;
+
+  auto options = _vertexBuffer->createVertexBuffer(
+    VertexBuffer::AngleKind, dataOffset, 1, _vertexBufferSize, _useInstancing);
+  _vertexBuffers[VertexBuffer::AngleKindChars] = ::std::move(options);
+  dataOffset += 1;
+
+  auto size = _vertexBuffer->createVertexBuffer(
+    VertexBuffer::SizeKind, dataOffset, 2, _vertexBufferSize, _useInstancing);
+  _vertexBuffers[VertexBuffer::SizeKindChars] = ::std::move(size);
+  dataOffset += 2;
+
+  if (_isAnimationSheetEnabled) {
+    auto cellIndexBuffer = _vertexBuffer->createVertexBuffer(
+      VertexBuffer::CellIndexKind, dataOffset, 1, _vertexBufferSize,
+      _useInstancing);
+    _vertexBuffers[VertexBuffer::CellIndexKindChars]
+      = ::std::move(cellIndexBuffer);
+    dataOffset += 1;
+  }
+
+  if (!_isBillboardBased) {
+    auto directionBuffer = _vertexBuffer->createVertexBuffer(
+      VertexBuffer::DirectionKind, dataOffset, 3, _vertexBufferSize,
+      _useInstancing);
+    _vertexBuffers[VertexBuffer::DirectionKindChars]
+      = ::std::move(directionBuffer);
+    dataOffset += 3;
+  }
+
+  unique_ptr_t<VertexBuffer> offsets = nullptr;
+  if (_useInstancing) {
+    Float32Array spriteData{0.f, 0.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f};
+    _spriteBuffer = ::std::make_unique<Buffer>(engine, spriteData, false, 2);
+    offsets = _spriteBuffer->createVertexBuffer(VertexBuffer::OffsetKind, 0, 2);
+  }
+  else {
+    offsets
+      = _vertexBuffer->createVertexBuffer(VertexBuffer::OffsetKind, dataOffset,
+                                          2, _vertexBufferSize, _useInstancing);
+    dataOffset += 2;
+  }
+  _vertexBuffers[VertexBuffer::OffsetKindChars] = ::std::move(offsets);
+}
+
 void ParticleSystem::_createIndexBuffer()
 {
+  if (_useInstancing) {
+    return;
+  }
   Uint32Array indices;
   int index = 0;
   for (size_t count = 0; count < _capacity; ++count) {
@@ -310,6 +523,12 @@ void ParticleSystem::start()
   if (!subEmitters.empty()) {
     activeSubSystems.clear();
   }
+
+  if (preWarmCycles) {
+    for (size_t index = 0; index < preWarmCycles; ++index) {
+      animate(true);
+    }
+  }
 }
 
 void ParticleSystem::stop()
@@ -337,54 +556,61 @@ void ParticleSystem::_appendParticleVertex(unsigned int index,
                                            Particle* particle, int offsetX,
                                            int offsetY)
 {
-  unsigned int offset      = index * _vertexBufferSize;
-  _vertexData[offset]      = particle->position.x;
-  _vertexData[offset + 1]  = particle->position.y;
-  _vertexData[offset + 2]  = particle->position.z;
-  _vertexData[offset + 3]  = particle->color.r;
-  _vertexData[offset + 4]  = particle->color.g;
-  _vertexData[offset + 5]  = particle->color.b;
-  _vertexData[offset + 6]  = particle->color.a;
-  _vertexData[offset + 7]  = particle->angle;
-  _vertexData[offset + 8]  = particle->size;
-  _vertexData[offset + 9]  = static_cast<float>(offsetX);
-  _vertexData[offset + 10] = static_cast<float>(offsetY);
-}
+  unsigned int offset = index * _vertexBufferSize;
 
-void ParticleSystem::_appendParticleVertexWithAnimation(unsigned int index,
-                                                        Particle* particle,
-                                                        int offsetX,
-                                                        int offsetY)
-{
-  auto _offsetX = static_cast<float>(offsetX);
-  auto _offsetY = static_cast<float>(offsetY);
-  if (offsetX == 0) {
-    _offsetX = _epsilon;
-  }
-  else if (offsetX == 1) {
-    _offsetX = 1.f - _epsilon;
+  _vertexData[offset++] = particle->position.x;
+  _vertexData[offset++] = particle->position.y;
+  _vertexData[offset++] = particle->position.z;
+  _vertexData[offset++] = particle->color.r;
+  _vertexData[offset++] = particle->color.g;
+  _vertexData[offset++] = particle->color.b;
+  _vertexData[offset++] = particle->color.a;
+  _vertexData[offset++] = particle->angle;
+
+  _vertexData[offset++] = particle->scale.x * particle->size;
+  _vertexData[offset++] = particle->scale.y * particle->size;
+
+  if (_isAnimationSheetEnabled) {
+    _vertexData[offset++] = particle->cellIndex;
   }
 
-  if (offsetY == 0) {
-    _offsetY = _epsilon;
-  }
-  else if (offsetY == 1) {
-    _offsetY = 1.f - _epsilon;
+  if (!_isBillboardBased) {
+    if (particle->_initialDirection) {
+      auto& particleInitialDirection = *particle->_initialDirection;
+      _vertexData[offset++]          = particleInitialDirection.x;
+      _vertexData[offset++]          = particleInitialDirection.y;
+      _vertexData[offset++]          = particleInitialDirection.z;
+    }
+    else {
+      _vertexData[offset++] = particle->direction.x;
+      _vertexData[offset++] = particle->direction.y;
+      _vertexData[offset++] = particle->direction.z;
+    }
   }
 
-  auto offset              = index * _vertexBufferSize;
-  _vertexData[offset]      = particle->position.x;
-  _vertexData[offset + 1]  = particle->position.y;
-  _vertexData[offset + 2]  = particle->position.z;
-  _vertexData[offset + 3]  = particle->color.r;
-  _vertexData[offset + 4]  = particle->color.g;
-  _vertexData[offset + 5]  = particle->color.b;
-  _vertexData[offset + 6]  = particle->color.a;
-  _vertexData[offset + 7]  = particle->angle;
-  _vertexData[offset + 8]  = particle->size;
-  _vertexData[offset + 9]  = _offsetX;
-  _vertexData[offset + 10] = _offsetY;
-  _vertexData[offset + 11] = particle->cellIndex;
+  if (!_useInstancing) {
+    auto _offsetX = static_cast<float>(offsetX);
+    auto _offsetY = static_cast<float>(offsetY);
+
+    if (_isAnimationSheetEnabled) {
+      if (offsetX == 0) {
+        _offsetX = _epsilon;
+      }
+      else if (offsetX == 1) {
+        _offsetX = 1.f - _epsilon;
+      }
+
+      if (offsetY == 0) {
+        _offsetY = _epsilon;
+      }
+      else if (offsetY == 1) {
+        _offsetY = 1.f - _epsilon;
+      }
+    }
+
+    _vertexData[offset++] = _offsetX;
+    _vertexData[offset++] = _offsetY;
+  }
 }
 
 void ParticleSystem::recycleParticle(Particle* particle)
@@ -415,8 +641,9 @@ Particle* ParticleSystem::_createParticle()
   if (!_stockParticles.empty()) {
     particle = _stockParticles.back();
     _stockParticles.pop_back();
-    particle->age       = 0;
-    particle->cellIndex = startSpriteCellID;
+    particle->age                   = 0;
+    particle->_currentColorGradient = nullptr;
+    particle->cellIndex             = startSpriteCellID;
   }
   else {
     particle = new Particle(this);
@@ -462,6 +689,7 @@ void ParticleSystem::_update(int newParticles)
 
   // Add new ones
   Matrix worldMatrix;
+
   if (emitter.is<AbstractMesh*>()) {
     auto emitterMesh = emitter.get<AbstractMesh*>();
     worldMatrix      = *emitterMesh->getWorldMatrix();
@@ -501,19 +729,86 @@ void ParticleSystem::_update(int newParticles)
         worldMatrix, particle->direction, particle);
     }
 
+    if (emitPower == 0.f) {
+      if (!particle->_initialDirection) {
+        particle->_initialDirection = particle->direction;
+      }
+      else {
+        particle->_initialDirection = particle->direction;
+      }
+    }
+    else {
+      particle->_initialDirection = nullptr;
+    }
+
+    particle->direction.scaleInPlace(emitPower);
+
     particle->lifeTime = Scalar::RandomRange(minLifeTime, maxLifeTime);
 
-    particle->size = Scalar::RandomRange(minSize, maxSize);
+    particle->size         = Scalar::RandomRange(minSize, maxSize);
+    particle->_initialSize = particle->size;
+    particle->scale.copyFromFloats(Scalar::RandomRange(minScaleX, maxScaleX),
+                                   Scalar::RandomRange(minScaleY, maxScaleY));
     particle->angularSpeed
       = Scalar::RandomRange(minAngularSpeed, maxAngularSpeed);
 
-    auto step = Scalar::RandomRange(0, 1.f);
+    particle->angle
+      = Scalar::RandomRange(minInitialRotation, maxInitialRotation);
 
-    Color4::LerpToRef(color1, color2, step, particle->color);
+    if (_colorGradients.empty()) {
+      auto step = Scalar::RandomRange(0.f, 1.f);
 
-    colorDead.subtractToRef(particle->color, _colorDiff);
-    _colorDiff.scaleToRef(1.f / particle->lifeTime, particle->colorStep);
+      Color4::LerpToRef(color1, color2, step, particle->color);
+
+      colorDead.subtractToRef(particle->color, _colorDiff);
+      _colorDiff.scaleToRef(1.f / particle->lifeTime, particle->colorStep);
+    }
+    else {
+      auto currentColorGradient = _colorGradients[0];
+      currentColorGradient.getColorToRef(particle->color);
+      particle->_currentColorGradient = currentColorGradient;
+      particle->_currentColor1.copyFrom(particle->color);
+
+      if (_colorGradients.size() > 1) {
+        _colorGradients[1].getColorToRef(particle->_currentColor2);
+      }
+      else {
+        particle->_currentColor2.copyFrom(particle->color);
+      }
+    }
   }
+}
+
+vector_t<string_t>
+ParticleSystem::_GetAttributeNamesOrOptions(bool isAnimationSheetEnabled,
+                                            bool isBillboardBased)
+{
+  vector_t<string_t> attributeNamesOrOptions{VertexBuffer::PositionKindChars,
+                                             VertexBuffer::ColorKindChars,
+                                             "angle", "offset", "size"};
+
+  if (isAnimationSheetEnabled) {
+    attributeNamesOrOptions.emplace_back("cellIndex");
+  }
+
+  if (!isBillboardBased) {
+    attributeNamesOrOptions.emplace_back("direction");
+  }
+
+  return attributeNamesOrOptions;
+}
+
+vector_t<string_t>
+ParticleSystem::_GetEffectCreationOptions(bool isAnimationSheetEnabled)
+{
+  vector_t<string_t> effectCreationOption{"invView", "view", "projection",
+                                          "vClipPlane", "textureMask"};
+
+  if (isAnimationSheetEnabled) {
+    effectCreationOption.emplace_back("particlesInfos");
+  }
+
+  return effectCreationOption;
 }
 
 Effect* ParticleSystem::_getEffect()
@@ -532,28 +827,25 @@ Effect* ParticleSystem::_getEffect()
     defines.emplace_back("#define ANIMATESHEET");
   }
 
+  if (_isBillboardBased) {
+    defines.emplace_back("#define BILLBOARD");
+  }
+
   // Effect
-  string_t joined = String::join(defines, '\n');
-  if (_cachedDefines != joined) {
-    _cachedDefines = joined;
+  string_t join = String::join(defines, '\n');
+  if (_cachedDefines != join) {
+    _cachedDefines = join;
+
+    auto attributesNamesOrOptions = ParticleSystem::_GetAttributeNamesOrOptions(
+      _isAnimationSheetEnabled, _isBillboardBased);
+    auto effectCreationOption
+      = ParticleSystem::_GetEffectCreationOptions(_isAnimationSheetEnabled);
 
     EffectCreationOptions options;
-    if (_isAnimationSheetEnabled) {
-      options.attributes
-        = {VertexBuffer::PositionKindChars, VertexBuffer::ColorKindChars,
-           "options", "cellIndex"};
-      options.uniformsNames = {"invView",        "view",       "projection",
-                               "particlesInfos", "vClipPlane", "textureMask"};
-    }
-    else {
-      options.attributes = {VertexBuffer::PositionKindChars,
-                            VertexBuffer::ColorKindChars, "options"};
-      options.uniformsNames
-        = {"invView", "view", "projection", "vClipPlane", "textureMask"};
-    }
-
-    options.samplers = {"diffuseSampler"};
-    options.defines  = ::std::move(joined);
+    options.attributes    = ::std::move(attributesNamesOrOptions);
+    options.uniformsNames = ::std::move(effectCreationOption);
+    options.samplers      = {"diffuseSampler"};
+    options.defines       = ::std::move(join);
 
     _effect = _scene->getEngine()->createEffect("particles", options,
                                                 _scene->getEngine());
@@ -562,27 +854,29 @@ Effect* ParticleSystem::_getEffect()
   return _effect;
 }
 
-void ParticleSystem::animate()
+void ParticleSystem::animate(bool preWarmOnly)
 {
   if (!_started) {
     return;
   }
 
-  auto effect = _getEffect();
+  if (!preWarmOnly) {
+    auto effect = _getEffect();
 
-  // Check
-  if (!hasEmitter() || !effect->isReady() || !particleTexture
-      || !particleTexture->isReady())
-    return;
+    // Check
+    if (!hasEmitter() || !effect->isReady() || !particleTexture
+        || !particleTexture->isReady())
+      return;
 
-  if (_currentRenderId == _scene->getRenderId()) {
-    return;
+    if (_currentRenderId == _scene->getRenderId()) {
+      return;
+    }
+    _currentRenderId = _scene->getRenderId();
   }
 
-  _currentRenderId = _scene->getRenderId();
-
-  _scaledUpdateSpeed
-    = static_cast<int>(updateSpeed * _scene->getAnimationRatio());
+  _scaledUpdateSpeed = static_cast<int>(
+    updateSpeed
+    * (preWarmOnly ? preWarmStepOffset : _scene->getAnimationRatio()));
 
   // determine the number of particles we need to create
   int newParticles = 0;
@@ -613,7 +907,6 @@ void ParticleSystem::animate()
   else {
     newParticles = 0;
   }
-
   _update(newParticles);
 
   // Stopped?
@@ -629,50 +922,33 @@ void ParticleSystem::animate()
     }
   }
 
-  // Animation sheet
-  if (_isAnimationSheetEnabled) {
-    _appendParticleVertexes = [this](unsigned int offset, Particle* particle) {
-      _appenedParticleVertexesWithSheet(offset, particle);
-    };
-  }
-  else {
-    _appendParticleVertexes = [this](unsigned int offset, Particle* particle) {
-      _appenedParticleVertexesWithSheet(offset, particle);
-    };
-  }
+  if (!preWarmOnly) {
+    // Update VBO
+    unsigned int offset = 0;
+    for (auto& particle : _particles) {
+      _appendParticleVertexes(offset, particle);
+      offset += _useInstancing ? 1 : 4;
+    }
 
-  // Update VBO
-  unsigned int offset = 0;
-  for (auto& particle : _particles) {
-    _appendParticleVertexes(offset, particle);
-    offset += 4;
-  }
+    if (_vertexBuffer) {
+      _vertexBuffer->update(_vertexData);
+    }
 
-  if (_vertexBuffer) {
-    _vertexBuffer->update(_vertexData);
-  }
-
-  if (manualEmitCount == 0 && disposeOnStop) {
-    stop();
+    if (manualEmitCount == 0 && disposeOnStop) {
+      stop();
+    }
   }
 }
 
-void ParticleSystem::_appenedParticleVertexesWithSheet(unsigned int offset,
-                                                       Particle* particle)
-{
-  _appendParticleVertexWithAnimation(offset++, particle, 0, 0);
-  _appendParticleVertexWithAnimation(offset++, particle, 1, 0);
-  _appendParticleVertexWithAnimation(offset++, particle, 1, 1);
-  _appendParticleVertexWithAnimation(offset++, particle, 0, 1);
-}
-
-void ParticleSystem::_appenedParticleVertexesNoSheet(unsigned int offset,
-                                                     Particle* particle)
+void ParticleSystem::_appendParticleVertices(unsigned int offset,
+                                             Particle* particle)
 {
   _appendParticleVertex(offset++, particle, 0, 0);
-  _appendParticleVertex(offset++, particle, 1, 0);
-  _appendParticleVertex(offset++, particle, 1, 1);
-  _appendParticleVertex(offset++, particle, 0, 1);
+  if (!_useInstancing) {
+    _appendParticleVertex(offset++, particle, 1, 0);
+    _appendParticleVertex(offset++, particle, 1, 1);
+    _appendParticleVertex(offset++, particle, 0, 1);
+  }
 }
 
 void ParticleSystem::rebuild()
@@ -743,10 +1019,13 @@ size_t ParticleSystem::render()
   engine->bindBuffers(vertexBuffersTmp, _indexBuffer.get(), effect);
 
   // Draw order
-  if (blendMode == ParticleSystem::BLENDMODE_ONEONE) {
+  if (blendMode == ParticleSystem::BLENDMODE_ADD) {
+    engine->setAlphaMode(EngineConstants::ALPHA_ADD);
+  }
+  else if (blendMode == ParticleSystem::BLENDMODE_ONEONE) {
     engine->setAlphaMode(EngineConstants::ALPHA_ONEONE);
   }
-  else {
+  else if (blendMode == ParticleSystem::BLENDMODE_STANDARD) {
     engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
   }
 
@@ -754,8 +1033,15 @@ size_t ParticleSystem::render()
     engine->setDepthWrite(true);
   }
 
-  engine->drawElementsType(Material::TriangleFillMode(), 0,
-                           static_cast<int>(_particles.size() * 6));
+  if (_useInstancing) {
+    engine->drawArraysType(Material::TriangleFanDrawMode(), 0, 4,
+                           static_cast<int>(_particles.size()));
+    engine->unbindInstanceAttributes();
+  }
+  else {
+    engine->drawElementsType(Material::TriangleFillMode(), 0,
+                             static_cast<int>(_particles.size() * 6));
+  }
   engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
 
   return _particles.size();
@@ -767,6 +1053,11 @@ void ParticleSystem::dispose(bool disposeTexture,
   if (_vertexBuffer) {
     _vertexBuffer->dispose();
     _vertexBuffer = nullptr;
+  }
+
+  if (_spriteBuffer) {
+    _spriteBuffer->dispose();
+    _spriteBuffer = nullptr;
   }
 
   if (_indexBuffer) {
@@ -865,6 +1156,19 @@ IParticleSystem* ParticleSystem::clone(const string_t& /*iName*/,
 Json::object ParticleSystem::serialize() const
 {
   return Json::object();
+}
+
+void ParticleSystem::_Serialize(Json::object& /*serializationObject*/,
+                                IParticleSystem* /*particleSystem*/)
+{
+}
+
+ParticleSystem*
+ParticleSystem::_Parse(const Json::value& /*parsedParticleSystem*/,
+                       IParticleSystem* /*particleSystem*/, Scene* /*scene*/,
+                       const string_t& /*url*/)
+{
+  return nullptr;
 }
 
 ParticleSystem* ParticleSystem::Parse(const Json::value& parsedParticleSystem,

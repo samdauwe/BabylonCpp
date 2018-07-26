@@ -86,7 +86,7 @@ public:
    * @brief Animates the particle system for the current frame by emitting new
    * particles and or animating the living ones.
    */
-  void animate() override;
+  void animate();
 
   /**
    * @brief Renders the particle system in its current state.

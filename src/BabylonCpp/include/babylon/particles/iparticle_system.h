@@ -7,6 +7,7 @@
 #include <babylon/math/color4.h>
 #include <babylon/math/vector3.h>
 #include <babylon/tools/color_gradient.h>
+#include <babylon/tools/factor_gradient.h>
 
 #include <babylon/core/nullable.h>
 
@@ -222,8 +223,10 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
 
   /**
    * @brief Animates the particle system for this frame.
+   * @param preWarmOnly will prevent the system from updating the vertex buffer
+   * (default is false)
    */
-  virtual void animate() = 0;
+  virtual void animate(bool preWarmOnly = false) = 0;
 
   /**
    * @brief Renders the particle system in its current state.
@@ -316,14 +319,14 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * You must use addColorGradient and removeColorGradient to udpate this list
    * @returns the list of color gradients
    */
-  virtual vector_t<ColorGradient> getColorGradients() = 0;
+  virtual vector_t<ColorGradient>& getColorGradients() = 0;
 
   /**
    * @brief Gets the current list of size gradients.
    * You must use addSizeGradient and removeSizeGradient to udpate this list
    * @returns the list of size gradients
    */
-  virtual vector_t<ColorGradient> getSizeGradients() = 0;
+  virtual vector_t<FactorGradient>& getSizeGradients() = 0;
 
 }; // end of struct IParticleSystem
 

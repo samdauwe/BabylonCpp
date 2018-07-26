@@ -33,6 +33,11 @@ public:
    */
   static constexpr int BLENDMODE_STANDARD = 1;
 
+  /**
+   * Add current color and particle color multiplied by particle’s alpha.
+   */
+  static constexpr int BLENDMODE_ADD = 2;
+
 public:
   /**
    * @brief Instantiates a particle system.
@@ -56,6 +61,49 @@ public:
   virtual IReflect::Type type() const override;
 
   /**
+   * @brief Gets the current list of color gradients.
+   * You must use addColorGradient and removeColorGradient to udpate this list
+   * @returns the list of color gradients
+   */
+  vector_t<ColorGradient>& getColorGradients() override;
+
+  /**
+   * @brief Gets the current list of size gradients.
+   * You must use addSizeGradient and removeSizeGradient to udpate this list
+   * @returns the list of size gradients
+   */
+  vector_t<FactorGradient>& getSizeGradients() override;
+
+  /**
+   * @brief Adds a new size gradient.
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param factor defines the size factor to affect to the specified gradient
+   */
+  IParticleSystem& addSizeGradient(float gradient, float factor) override;
+
+  /**
+   * @brief Remove a specific size gradient.
+   * @param gradient defines the gradient to remove
+   */
+  IParticleSystem& removeSizeGradient(float gradient) override;
+
+  /**
+   * @brief Adds a new color gradient.
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param color defines the color to affect to the specified gradient
+   * @param color2 defines an additional color used to define a range ([color,
+   * color2]) with main color to pick the final color from
+   */
+  IParticleSystem& addColorGradient(float gradient, const Color4& color,
+                                    const Nullable<Color4>& color2) override;
+
+  /**
+   * @brief Remove a specific color gradient.
+   * @param gradient defines the gradient to remove
+   */
+  IParticleSystem& removeColorGradient(float gradient) override;
+
+  /**
    * @brief Gets the current list of active particles.
    */
   vector_t<Particle*>& particles();
@@ -65,18 +113,6 @@ public:
    * @returns a string containing the class name
    */
   const char* getClassName() const;
-
-  /**
-   * @brief Sets a callback that will be triggered when the system is disposed.
-   */
-  void setOnDispose(
-    const ::std::function<void(ParticleSystem*, EventState&)>& callback);
-
-  /**
-   * @brief Gets wether an animation sprite sheet is enabled or not on the
-   * particle system.
-   */
-  bool isAnimationSheetEnabled() const;
 
   /**
    * @brief Gets the maximum number of particles active at the same time.
@@ -127,6 +163,26 @@ public:
                              int offsetX, int offsetY);
 
   /**
+   * @brief "Recycles" one of the particle by copying it back to the "stock" of
+   * particles and removing it from the active list. Its lifetime will start
+   * back at 0.
+   */
+  void recycleParticle(Particle* particle);
+
+  /**
+   * @brief Hidden
+   */
+  static vector_t<string_t>
+  _GetAttributeNamesOrOptions(bool isAnimationSheetEnabled = false,
+                              bool isBillboardBased        = false);
+
+  /**
+   * @brief Hidden
+   */
+  static vector_t<string_t>
+  _GetEffectCreationOptions(bool isAnimationSheetEnabled = false);
+
+  /**
    * @brief For internal use only.
    */
   void _appendParticleVertexWithAnimation(unsigned int index,
@@ -136,8 +192,10 @@ public:
   /**
    * @brief Animates the particle system for the current frame by emitting new
    * particles and or animating the living ones.
+   * @param preWarmOnly will prevent the system from updating the vertex buffer
+   * (default is false)
    */
-  void animate() override;
+  void animate(bool preWarmOnly = false) override;
 
   /**
    * @brief Rebuilds the particle system.
@@ -235,6 +293,19 @@ public:
   Json::object serialize() const override;
 
   /**
+   * @brief Hidden
+   */
+  static void _Serialize(Json::object& serializationObject,
+                         IParticleSystem* particleSystem);
+
+  /**
+   * @brief Hidden
+   */
+  static ParticleSystem* _Parse(const Json::value& parsedParticleSystem,
+                                IParticleSystem* particleSystem, Scene* scene,
+                                const string_t& url);
+
+  /**
    * @brief Parses a JSON object to create a particle system.
    * @param parsedParticleSystem The JSON object to parse
    * @param scene The scene to create the particle system in
@@ -244,36 +315,6 @@ public:
    */
   static ParticleSystem* Parse(const Json::value& parsedParticleSystem,
                                Scene* scene, const string_t& url);
-
-  //---
-  IParticleSystem& addColorGradient(float /*gradient*/,
-                                    const Color4& /*color1*/,
-                                    const Nullable<Color4>& /*color2*/) override
-  {
-    return *this;
-  }
-  IParticleSystem& removeColorGradient(float /*gradient*/) override
-  {
-    return *this;
-  }
-  IParticleSystem& addSizeGradient(float /*gradient*/,
-                                   float /*factor*/) override
-  {
-    return *this;
-  }
-  IParticleSystem& removeSizeGradient(float /*gradient*/) override
-  {
-    return *this;
-  }
-  vector_t<ColorGradient> getColorGradients() override
-  {
-    return {};
-  }
-  vector_t<ColorGradient> getSizeGradients() override
-  {
-    return {};
-  }
-  //---
 
 protected:
   Vector3& get_direction1();
@@ -285,15 +326,35 @@ protected:
   Vector3& get_maxEmitBox();
   void set_maxEmitBox(const Vector3& value);
 
+  /**
+   * @brief Sets a callback that will be triggered when the system is disposed.
+   */
+  void set_onDispose(
+    const ::std::function<void(ParticleSystem*, EventState&)>& callback);
+
+  /**
+   * @brief Gets wether an animation sprite sheet is enabled or not on the
+   * particle system.
+   */
+  bool get_isAnimationSheetEnabled() const;
+
+  /**
+   * @brief Gets or sets a boolean indicating if the particles must be rendered
+   * as billboard or aligned with the direction.
+   */
+  bool get_isBillboardBased() const;
+
+  /**
+   * @brief Sets a boolean indicating if the particles must be rendered as
+   * billboard or aligned with the direction.
+   */
+  void set_isBillboardBased(bool value);
+
 private:
+  void _resetEffect();
+  void _createVertexBuffers();
   void _createIndexBuffer();
   // start of sub system methods
-  /**
-   * @brief "Recycles" one of the particle by copying it back to the "stock" of
-   * particles and removing it from the active list. Its lifetime will start
-   * back at 0.
-   */
-  void recycleParticle(Particle* particle);
   void _stopSubEmitters();
   Particle* _createParticle();
   void _removeFromRoot();
@@ -301,9 +362,7 @@ private:
   // end of sub system methods
   void _update(int newParticles);
   Effect* _getEffect();
-  void _appenedParticleVertexesWithSheet(unsigned int offset,
-                                         Particle* particle);
-  void _appenedParticleVertexesNoSheet(unsigned int offset, Particle* particle);
+  void _appendParticleVertices(unsigned int offset, Particle* particle);
 
 public:
   /**
@@ -452,6 +511,25 @@ public:
    */
   Observable<ParticleSystem> onDisposeObservable;
 
+  /**
+   * Sets a callback that will be triggered when the system is disposed
+   */
+  WriteOnlyProperty<ParticleSystem,
+                    ::std::function<void(ParticleSystem*, EventState&)>>
+    onDispose;
+
+  /**
+   * Gets whether an animation sprite sheet is enabled or not on the particle
+   * system
+   */
+  ReadOnlyProperty<ParticleSystem, bool> isAnimationSheetEnabled;
+
+  /**
+   * Gets or sets a boolean indicating if the particles must be rendered as
+   * billboard or aligned with the direction
+   */
+  Property<ParticleSystem, bool> isBillboardBased;
+
   unsigned int _vertexBufferSize;
 
   // Sub-emitters
@@ -478,6 +556,7 @@ private:
   Float32Array _vertexData;
   unique_ptr_t<Buffer> _vertexBuffer;
   unordered_map_t<string_t, unique_ptr_t<VertexBuffer>> _vertexBuffers;
+  unique_ptr_t<Buffer> _spriteBuffer;
   unique_ptr_t<GL::IGLBuffer> _indexBuffer;
   Effect* _effect;
   Effect* _customEffect;
@@ -488,20 +567,24 @@ private:
   Vector3 _scaledDirection;
   Vector3 _scaledGravity;
   int _currentRenderId;
-
   bool _alive;
+  bool _useInstancing;
+
   bool _started;
   bool _stopped;
   int _actualFrame;
   int _scaledUpdateSpeed;
-
   bool _isAnimationSheetEnabled;
+  bool _isBillboardBased;
 
   ::std::function<void(unsigned int offset, Particle* particle)>
     _appendParticleVertexes;
 
   ParticleSystem* _rootParticleSystem;
   Vector3 _zeroVector3;
+
+  vector_t<ColorGradient> _colorGradients;
+  vector_t<FactorGradient> _sizeGradients;
 
 }; // end of class ParticleSystem
 
