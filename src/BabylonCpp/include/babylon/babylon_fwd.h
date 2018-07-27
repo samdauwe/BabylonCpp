@@ -324,6 +324,7 @@ class RenderTargetTexture;
 class Texture;
 // - Textures / Procedurals
 class CustomProceduralTexture;
+class NoiseProceduralTexture;
 class ProceduralTexture;
 // --- Math ---
 class Angle;
@@ -454,7 +455,9 @@ class SolidParticleSystem;
 // - EmitterTypes
 class BoxParticleEmitter;
 class ConeParticleEmitter;
+class HemisphericParticleEmitter;
 struct IParticleEmitterType;
+class PointParticleEmitter;
 class SphereDirectedParticleEmitter;
 class SphereParticleEmitter;
 // --- Physics ---
