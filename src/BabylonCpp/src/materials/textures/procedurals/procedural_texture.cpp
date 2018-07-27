@@ -15,26 +15,28 @@
 namespace BABYLON {
 
 ProceduralTexture::ProceduralTexture(
-  const string_t& _name, const Size& size,
+  const string_t& iName, const Size& size,
   const unordered_map_t<string_t, string_t>& fragment, Scene* scene,
-  Texture* fallbackTexture, bool generateMipMaps)
+  Texture* fallbackTexture, bool generateMipMaps, bool isCube)
     : Texture("", scene, !generateMipMaps)
     , _generateMipMaps{generateMipMaps}
     , isEnabled{true}
     , refreshRate{this, &ProceduralTexture::get_refreshRate,
                   &ProceduralTexture::set_refreshRate}
-    , _size{size}
     , _currentRefreshId{-1}
     , _refreshRate{1}
-    , _fallbackTexture{fallbackTexture}
     , _fallbackTextureUsed{false}
 {
-  name           = _name;
-  isRenderTarget = true;
-
-  setFragment(fragment);
+  scene = getScene();
 
   _engine = scene->getEngine();
+
+  name           = iName;
+  isRenderTarget = true;
+  _size          = size;
+  setFragment(fragment);
+
+  _fallbackTexture = fallbackTexture;
 
   if (isCube) {
     IRenderTargetOptions options;
@@ -65,27 +67,29 @@ ProceduralTexture::ProceduralTexture(
   _indexBuffer = _engine->createIndexBuffer(indices);
 }
 
-ProceduralTexture::ProceduralTexture(const string_t& _name, const Size& size,
+ProceduralTexture::ProceduralTexture(const string_t& iName, const Size& size,
                                      const string_t& fragment, Scene* scene,
                                      Texture* fallbackTexture,
-                                     bool generateMipMaps)
+                                     bool generateMipMaps, bool isCube)
     : Texture("", scene, !generateMipMaps)
     , _generateMipMaps{generateMipMaps}
     , isEnabled{true}
     , refreshRate{this, &ProceduralTexture::get_refreshRate,
                   &ProceduralTexture::set_refreshRate}
-    , _size{size}
     , _currentRefreshId{-1}
     , _refreshRate{1}
-    , _fallbackTexture{fallbackTexture}
     , _fallbackTextureUsed{false}
 {
-  name           = _name;
-  isRenderTarget = true;
-
-  setFragment(fragment);
+  scene = getScene();
 
   _engine = scene->getEngine();
+
+  name           = iName;
+  isRenderTarget = true;
+  _size          = size;
+  setFragment(fragment);
+
+  _fallbackTexture = fallbackTexture;
 
   if (isCube) {
     IRenderTargetOptions options;
@@ -158,6 +162,7 @@ void ProceduralTexture::reset()
   if (_effect == nullptr) {
     return;
   }
+
   _engine->_releaseEffect(_effect);
 }
 
@@ -221,8 +226,6 @@ void ProceduralTexture::setFragment(const string_t& fragment)
   _fragment["fragmentElement"] = fragment;
 }
 
-// Use 0 to render just once, 1 to render on every frame, 2 to render every two
-// frames and so on...
 int ProceduralTexture::get_refreshRate() const
 {
   return _refreshRate;
@@ -313,6 +316,14 @@ ProceduralTexture& ProceduralTexture::setFloat(const string_t& _name,
   return *this;
 }
 
+ProceduralTexture& ProceduralTexture::setInt(const string_t& _name, int value)
+{
+  _checkUniform(_name);
+  _ints[_name] = value;
+
+  return *this;
+}
+
 ProceduralTexture& ProceduralTexture::setFloats(const string_t& _name,
                                                 Float32Array value)
 {
@@ -384,6 +395,11 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
   // Texture
   for (auto& item : _textures) {
     _effect->setTexture(item.first, item.second);
+  }
+
+  // Int
+  for (auto& item : _ints) {
+    _effect->setInt(item.first, item.second);
   }
 
   // Float

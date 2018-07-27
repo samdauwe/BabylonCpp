@@ -36,24 +36,34 @@ public:
   void _checkUniform(const string_t& uniformName);
   ProceduralTexture& setTexture(const string_t& name, Texture* texture);
   ProceduralTexture& setFloat(const string_t& name, float value);
+
+  /**
+   * @brief Set the value of an uniform to an integer value.
+   * @param name defines the name of the uniform
+   * @param value defines the value to set
+   * @returns the current procedural texture
+   */
+  ProceduralTexture& setInt(const string_t& name, int value);
+
   ProceduralTexture& setFloats(const string_t& name, Float32Array value);
   ProceduralTexture& setColor3(const string_t& name, const Color3& value);
   ProceduralTexture& setColor4(const string_t& name, const Color4& value);
   ProceduralTexture& setVector2(const string_t& name, const Vector2& value);
   ProceduralTexture& setVector3(const string_t& name, const Vector3& value);
   ProceduralTexture& setMatrix(const string_t& name, const Matrix& value);
-  void render(bool useCameraPostProcess = false);
+  virtual void render(bool useCameraPostProcess = false);
   ProceduralTexture* clone();
   void dispose() override;
 
 protected:
   ProceduralTexture(const string_t& name, const Size& size,
                     const unordered_map_t<string_t, string_t>& fragment,
-                    Scene* scene, Texture* fallbackTexture,
-                    bool generateMipMaps = true);
+                    Scene* scene, Texture* fallbackTexture = nullptr,
+                    bool generateMipMaps = true, bool isCube = false);
   ProceduralTexture(const string_t& name, const Size& size,
                     const string_t& fragment, Scene* scene,
-                    Texture* fallbackTexture, bool generateMipMaps = true);
+                    Texture* fallbackTexture = nullptr,
+                    bool generateMipMaps = true, bool isCube = false);
 
   int get_refreshRate() const;
 
@@ -87,6 +97,7 @@ private:
   unordered_map_t<string_t, string_t> _fragment;
   unordered_map_t<string_t, Texture*> _textures;
   unordered_map_t<string_t, float> _floats;
+  unordered_map_t<string_t, int> _ints;
   unordered_map_t<string_t, Float32Array> _floatsArrays;
   unordered_map_t<string_t, Color3> _colors3;
   unordered_map_t<string_t, Color4> _colors4;

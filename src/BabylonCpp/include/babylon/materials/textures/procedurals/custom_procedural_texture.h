@@ -22,7 +22,7 @@ public:
   ~CustomProceduralTexture() override;
 
   bool isReady() override;
-  void render(bool useCameraPostProcess = false);
+  void render(bool useCameraPostProcess = false) override;
   void updateTextures();
   void updateShaderUniforms();
   bool animate() const;
