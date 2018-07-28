@@ -73,6 +73,8 @@ class AutoRotationBehavior;
 class BouncingBehavior;
 class FramingBehavior;
 // - Mesh
+class AttachToBoxBehavior;
+struct FaceDirectionInfo;
 class MultiPointerScaleBehavior;
 class PointerDragBehavior;
 struct PointerDragBehaviorOptions;

@@ -2,7 +2,6 @@
 #define BABYLON_BEHAVIORS_MESH_POINTER_DRAG_BEHAVIOR_H
 
 #include <babylon/babylon_global.h>
-
 #include <babylon/behaviors/behavior.h>
 #include <babylon/behaviors/mesh/pointer_drag_behavior_options.h>
 #include <babylon/core/structs.h>
