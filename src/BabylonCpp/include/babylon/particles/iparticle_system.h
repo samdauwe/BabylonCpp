@@ -107,22 +107,22 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
   /**
    * Minimum scale of emitting particles on X axis.
    */
-  float minScaleX;
+  float minScaleX = 1.f;
 
   /**
    * Maximum scale of emitting particles on X axis.
    */
-  float maxScaleX;
+  float maxScaleX = 1.f;
 
   /**
    * Minimum scale of emitting particles on Y axis.
    */
-  float minScaleY;
+  float minScaleY = 1.f;
 
   /**
    * Maximum scale of emitting particles on Y axis.
    */
-  float maxScaleY;
+  float maxScaleY = 1.f;
 
   /**
    * Random color of each particle after it has been emitted, between color1 and
@@ -177,12 +177,12 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
   /**
    * Gets or sets the minimal initial rotation in radians.
    */
-  float minInitialRotation;
+  float minInitialRotation = 0.f;
 
   /**
    * Gets or sets the maximal initial rotation in radians.
    */
-  float maxInitialRotation;
+  float maxInitialRotation = 0.f;
 
   /**
    * The particle emitter type defines the emitter used by the particle system.

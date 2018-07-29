@@ -333,8 +333,8 @@ protected:
     const ::std::function<void(ParticleSystem*, EventState&)>& callback);
 
   /**
-   * @brief Gets wether an animation sprite sheet is enabled or not on the
-   * particle system.
+   * @brief Gets whether an animation sprite sheet is enabled or not on the
+   * particle system
    */
   bool get_isAnimationSheetEnabled() const;
 
@@ -462,14 +462,15 @@ public:
 
   /**
    * This function can be defined to specify initial direction for every new
-   * particle. It by default use the emitterType defined function.
+   * particle. It by default use the emitterType defined function
    */
-  ::std::function<void(float emitPower, const Matrix& worldMatrix,
-                       Vector3& directionToUpdate, Particle* particle)>
+  ::std::function<void(const Matrix& worldMatrix, Vector3& directionToUpdate,
+                       Particle* particle)>
     startDirectionFunction;
+
   /**
    * This function can be defined to specify initial position for every new
-   * particle. It by default use the emitterType defined function.
+   * particle. It by default use the emitterType defined function
    */
   ::std::function<void(const Matrix& worldMatrix, Vector3& positionToUpdate,
                        Particle* particle)>
@@ -480,26 +481,31 @@ public:
    * animation should loop between startSpriteCellID and endSpriteCellID or not.
    */
   bool spriteCellLoop;
+
   /**
    * If using a spritesheet (isAnimationSheetEnabled) and spriteCellLoop defines
    * the speed of the sprite loop.
    */
   float spriteCellChangeSpeed;
+
   /**
    * If using a spritesheet (isAnimationSheetEnabled) and spriteCellLoop defines
    * the first sprite cell to display.
    */
   unsigned int startSpriteCellID;
+
   /**
    * If using a spritesheet (isAnimationSheetEnabled) and spriteCellLoop defines
    * the last sprite cell to display.
    */
   unsigned int endSpriteCellID;
+
   /**
    * If using a spritesheet (isAnimationSheetEnabled), defines the sprite cell
    * width to use.
    */
   unsigned int spriteCellWidth;
+
   /**
    * If using a spritesheet (isAnimationSheetEnabled), defines the sprite cell
    * height to use.
@@ -507,7 +513,7 @@ public:
   unsigned int spriteCellHeight;
 
   /**
-   * An event triggered when the system is disposed.
+   * An event triggered when the system is disposed
    */
   Observable<ParticleSystem> onDisposeObservable;
 

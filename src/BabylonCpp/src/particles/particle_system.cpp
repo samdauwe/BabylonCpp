@@ -74,8 +74,6 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
     , _appendParticleVertexes{nullptr}
     , _zeroVector3{Vector3::Zero()}
 {
-  _scene->particleSystems.emplace_back(this);
-
   // IParticleSystem
   {
     id                  = iName;
@@ -102,10 +100,9 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
     particleEmitterType = nullptr;
   }
 
-  _isAnimationSheetEnabled = isAnimationSheetEnabled;
-  if (isAnimationSheetEnabled) {
-    _vertexBufferSize = 12;
-  }
+  _scene->particleSystems.emplace_back(this);
+
+  _useInstancing = _scene->getEngine()->getCaps().instancedArrays;
 
   _createIndexBuffer();
   _createVertexBuffers();
@@ -721,8 +718,7 @@ void ParticleSystem::_update(int newParticles)
     }
 
     if (startDirectionFunction) {
-      startDirectionFunction(emitPower, worldMatrix, particle->direction,
-                             particle);
+      startDirectionFunction(worldMatrix, particle->direction, particle);
     }
     else {
       particleEmitterType->startDirectionFunction(
@@ -926,7 +922,7 @@ void ParticleSystem::animate(bool preWarmOnly)
     // Update VBO
     unsigned int offset = 0;
     for (auto& particle : _particles) {
-      _appendParticleVertexes(offset, particle);
+      _appendParticleVertices(offset, particle);
       offset += _useInstancing ? 1 : 4;
     }
 
