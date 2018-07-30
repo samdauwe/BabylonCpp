@@ -230,6 +230,7 @@ enum GLEnums : GLenum {
   ANY_SAMPLES_PASSED              = 0x8C2F,
   ANY_SAMPLES_PASSED_CONSERVATIVE = 0x8D6A,
   /* Half floating-point type (16-bit) */
+  HALF_FLOAT     = 0x140B,
   HALF_FLOAT_OES = 0x8D61,
   /* StencilFunction */
   NEVER    = 0x0200,
