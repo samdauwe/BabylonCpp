@@ -154,13 +154,13 @@ public:
       return false;
     }
 
-    auto it
-      = ::std::remove_if(_observers.begin(), _observers.end(),
-                         [observer](const typename Observer<T>::Ptr& obs) {
-                           return obs == observer;
-                         });
+    auto it = ::std::find_if(_observers.begin(), _observers.end(),
+                             [observer](const typename Observer<T>::Ptr& obs) {
+                               return obs == observer;
+                             });
+
     if (it != _observers.end()) {
-      _observers.erase(it);
+      _deferUnregister(*it);
       return true;
     }
     return false;
@@ -176,27 +176,48 @@ public:
   bool removeCallback(const CallbackFunc& callback)
   {
     auto it
-      = ::std::remove_if(_observers.begin(), _observers.end(),
-                         [callback](const typename Observer<T>::Ptr& obs) {
-                           auto ptr1
-                             = obs->callback.template target<CallbackFunc>();
-                           auto ptr2 = callback.template target<CallbackFunc>();
-                           return ptr1 < ptr2;
-                         });
+      = ::std::find_if(_observers.begin(), _observers.end(),
+                       [callback](const typename Observer<T>::Ptr& obs) {
+                         auto ptr1
+                           = obs->callback.template target<CallbackFunc>();
+                         auto ptr2 = callback.template target<CallbackFunc>();
+                         return ptr1 < ptr2;
+                       });
+
     if (it != _observers.end()) {
-      _observers.erase(it);
+      _deferUnregister(*it);
       return true;
     }
     return false;
   }
 
+private:
   void _deferUnregister(typename Observer<T>::Ptr& observer)
   {
     observer->unregisterOnNextCall = false;
     observer->_willBeUnregistered  = true;
-    remove(observer);
+    _remove(observer);
   }
 
+  // This should only be called when not iterating over _observers to avoid
+  // callback skipping. Removes an observer from the _observer Array.
+  bool _remove(typename Observer<T>::Ptr& observer)
+  {
+    if (!observer) {
+      return false;
+    }
+
+    auto index = ::std::find(_observers.begin(), _observers.end(), observer);
+
+    if (index != _observers.end()) {
+      _observers.erase(index);
+      return true;
+    }
+
+    return false;
+  }
+
+public:
   /**
    * @brief Notify all Observers by calling their respective callback with the
    * given data. Will return true if all observers were executed, false if an

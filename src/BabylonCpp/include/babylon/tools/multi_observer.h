@@ -55,7 +55,7 @@ public:
   Watch(const vector_t<typename Observable<T>::Ptr>& observables,
         const CallbackFunc& callback, int mask = -1, any* scope = nullptr)
   {
-    MultiObserver<T>::SPtr result = ::std::make_shared<MultiObserver<T>>();
+    auto result = ::std::make_shared<MultiObserver<T>>();
 
     result._observers.clear();
     result._observables = observables;
