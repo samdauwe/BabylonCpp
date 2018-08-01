@@ -21,8 +21,12 @@ public:
    */
   Color4(float red = 0.f, float green = 0.f, float blue = 0.f,
          float alpha = 1.f);
+  Color4(const Color3& otherColor);
   Color4(const Color4& otherColor);
+  Color4(Color3&& otherColor);
   Color4(Color4&& otherColor);
+  Color4& operator=(const Color3& otherColor);
+  Color4& operator=(Color3&& otherColor);
   Color4& operator=(const Color4& otherColor);
   Color4& operator=(Color4&& otherColor);
   ~Color4();

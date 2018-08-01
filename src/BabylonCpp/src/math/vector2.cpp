@@ -259,6 +259,16 @@ bool Vector2::equalsWithEpsilon(const Vector2& otherVector, float epsilon) const
          && Scalar::WithinEpsilon(y, otherVector.y, epsilon);
 }
 
+Vector2 Vector2::floor() const
+{
+  return Vector2(::std::floor(x), ::std::floor(y));
+}
+
+Vector2 Vector2::fract() const
+{
+  return Vector2(x - ::std::floor(x), y - ::std::floor(y));
+}
+
 /** Operator overloading **/
 std::ostream& operator<<(std::ostream& os, const Vector2& vector)
 {

@@ -355,6 +355,16 @@ bool Vector3::isNonUniform() const
   return false;
 }
 
+Vector3 Vector3::floor() const
+{
+  return Vector3(::std::floor(x), ::std::floor(y), ::std::floor(z));
+}
+
+Vector3 Vector3::fract() const
+{
+  return Vector3(x - ::std::floor(x), y - ::std::floor(y), z - ::std::floor(z));
+}
+
 /** Operator overloading **/
 std::ostream& operator<<(std::ostream& os, const Vector3& vector)
 {

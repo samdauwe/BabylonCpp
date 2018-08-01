@@ -183,8 +183,7 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
   sphericalHarmonics.convertIrradianceToLambertianRadiance();
 
   return ::std::make_unique<SphericalPolynomial>(
-    SphericalPolynomial::getSphericalPolynomialFromHarmonics(
-      sphericalHarmonics));
+    SphericalPolynomial::FromHarmonics(sphericalHarmonics));
 }
 
 } // end of namespace BABYLON

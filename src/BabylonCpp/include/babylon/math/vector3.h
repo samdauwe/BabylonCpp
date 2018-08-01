@@ -315,6 +315,18 @@ public:
    */
   bool isNonUniform() const;
 
+  /**
+   * @brief Gets a new Vector3 from current Vector3 floored values.
+   * @returns a new Vector3
+   */
+  Vector3 floor() const;
+
+  /**
+   * @brief Gets a new Vector3 from current Vector3 floored values.
+   * @returns a new Vector3
+   */
+  Vector3 fract() const;
+
   /** Operator overloading **/
   friend std::ostream& operator<<(std::ostream& os, const Vector3& vector);
   Vector3 operator+(const Vector3& otherVector) const;

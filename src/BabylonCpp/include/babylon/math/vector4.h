@@ -225,6 +225,18 @@ public:
    */
   Vector4& maximizeInPlace(const Vector4& other);
 
+  /**
+   * @brief Gets a new Vector4 from current Vector4 floored values.
+   * @returns a new Vector4
+   */
+  Vector4 floor() const;
+
+  /**
+   * @brief Gets a new Vector4 from current Vector3 floored values.
+   * @returns a new Vector4
+   */
+  Vector4 fract() const;
+
   /** Operator overloading **/
   friend std::ostream& operator<<(std::ostream& os, const Vector4& vector);
   Vector4 operator+(const Vector4& otherVector) const;

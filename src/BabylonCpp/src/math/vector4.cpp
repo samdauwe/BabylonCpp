@@ -328,6 +328,28 @@ Vector4& Vector4::maximizeInPlace(const Vector4& other)
   return *this;
 }
 
+Vector4 Vector4::floor() const
+{
+  return Vector4(::std::floor(x), //
+                 ::std::floor(y), //
+                 ::std::floor(z), //
+                 ::std::floor(w)  //
+  );
+}
+
+/**
+ * @brief Gets a new Vector4 from current Vector3 floored values.
+ * @returns a new Vector4
+ */
+Vector4 Vector4::fract() const
+{
+  return Vector4(x - ::std::floor(x), //
+                 y - ::std::floor(y), //
+                 z - ::std::floor(z), //
+                 w - ::std::floor(w)  //
+  );
+}
+
 /** Operator overloading **/
 std::ostream& operator<<(std::ostream& os, const Vector4& vector)
 {

@@ -101,31 +101,6 @@ void SphericalPolynomial::addAmbient(const Color3& color)
   zz = zz.add(colorVector);
 }
 
-SphericalPolynomial SphericalPolynomial::getSphericalPolynomialFromHarmonics(
-  const SphericalHarmonics& harmonics)
-{
-  SphericalPolynomial result;
-
-  result.x = harmonics.L11.scale(1.02333f);
-  result.y = harmonics.L1_1.scale(1.02333f);
-  result.z = harmonics.L10.scale(1.02333f);
-
-  result.xx = harmonics.L00.scale(0.886277f)
-                .subtract(harmonics.L20.scale(0.247708f))
-                .add(harmonics.L22.scale(0.429043f));
-  result.yy = harmonics.L00.scale(0.886277f)
-                .subtract(harmonics.L20.scale(0.247708f))
-                .subtract(harmonics.L22.scale(0.429043f));
-  result.zz
-    = harmonics.L00.scale(0.886277f).add(harmonics.L20.scale(0.495417f));
-
-  result.yz = harmonics.L2_1.scale(0.858086f);
-  result.zx = harmonics.L21.scale(0.858086f);
-  result.xy = harmonics.L2_2.scale(0.858086f);
-
-  return result;
-}
-
 void SphericalPolynomial::scale(float iScale)
 {
   x  = x.scale(iScale);
@@ -137,6 +112,56 @@ void SphericalPolynomial::scale(float iScale)
   yz = yz.scale(iScale);
   zx = zx.scale(iScale);
   xy = xy.scale(iScale);
+}
+
+SphericalPolynomial
+SphericalPolynomial::FromHarmonics(const SphericalHarmonics& harmonics)
+{
+  SphericalPolynomial result;
+
+  result.x = harmonics.l11.scale(1.02333f);
+  result.y = harmonics.l1_1.scale(1.02333f);
+  result.z = harmonics.l10.scale(1.02333f);
+
+  result.xx = harmonics.l00.scale(0.886277f)
+                .subtract(harmonics.l20.scale(0.247708f))
+                .add(harmonics.lL22.scale(0.429043f));
+  result.yy = harmonics.l00.scale(0.886277f)
+                .subtract(harmonics.l20.scale(0.247708f))
+                .subtract(harmonics.lL22.scale(0.429043f));
+  result.zz
+    = harmonics.l00.scale(0.886277f).add(harmonics.l20.scale(0.495417f));
+
+  result.yz = harmonics.l2_1.scale(0.858086f);
+  result.zx = harmonics.l21.scale(0.858086f);
+  result.xy = harmonics.l2_2.scale(0.858086f);
+
+  result.scale(1.f / Math::PI);
+
+  return result;
+
+  return result;
+}
+
+SphericalPolynomial
+SphericalPolynomial::FromArray(const vector_t<Float32Array>& data)
+{
+  SphericalPolynomial sp;
+  if (data.size() < 9) {
+    return sp;
+  }
+
+  Vector3::FromArrayToRef(data[0], 0, sp.x);
+  Vector3::FromArrayToRef(data[1], 0, sp.y);
+  Vector3::FromArrayToRef(data[2], 0, sp.z);
+  Vector3::FromArrayToRef(data[3], 0, sp.xx);
+  Vector3::FromArrayToRef(data[4], 0, sp.yy);
+  Vector3::FromArrayToRef(data[5], 0, sp.zz);
+  Vector3::FromArrayToRef(data[6], 0, sp.yz);
+  Vector3::FromArrayToRef(data[7], 0, sp.zx);
+  Vector3::FromArrayToRef(data[8], 0, sp.xy);
+
+  return sp;
 }
 
 } // end of namespace BABYLON

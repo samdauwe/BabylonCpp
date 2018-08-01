@@ -1,6 +1,7 @@
 #include <babylon/math/color4.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/math/color3.h>
 #include <babylon/math/scalar.h>
 #include <babylon/tools/tools.h>
 
@@ -11,8 +12,21 @@ Color4::Color4(float red, float green, float blue, float alpha)
 {
 }
 
+Color4::Color4(const Color3& otherColor)
+    : r{otherColor.r}, g{otherColor.g}, b{otherColor.b}, a{1.f}
+{
+}
+
 Color4::Color4(const Color4& otherColor)
     : r{otherColor.r}, g{otherColor.g}, b{otherColor.b}, a{otherColor.a}
+{
+}
+
+Color4::Color4(Color3&& otherColor)
+    : r{::std::move(otherColor.r)}
+    , g{::std::move(otherColor.g)}
+    , b{::std::move(otherColor.b)}
+    , a{1.f}
 {
 }
 
@@ -24,6 +38,16 @@ Color4::Color4(Color4&& otherColor)
 {
 }
 
+Color4& Color4::operator=(const Color3& otherColor)
+{
+  r = otherColor.r;
+  g = otherColor.g;
+  b = otherColor.b;
+  a = 1.f;
+
+  return *this;
+}
+
 Color4& Color4::operator=(const Color4& otherColor)
 {
   if (&otherColor != this) {
@@ -32,6 +56,16 @@ Color4& Color4::operator=(const Color4& otherColor)
     b = otherColor.b;
     a = otherColor.a;
   }
+
+  return *this;
+}
+
+Color4& Color4::operator=(Color3&& otherColor)
+{
+  r = ::std::move(otherColor.r);
+  g = ::std::move(otherColor.g);
+  b = ::std::move(otherColor.b);
+  a = 1.f;
 
   return *this;
 }

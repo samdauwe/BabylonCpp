@@ -198,7 +198,7 @@ public:
   const Vector2& divideToRef(const Vector2& otherVector, Vector2& result) const;
 
   /**
-   * @brief Divides the current Vector3 coordinates by the given ones.
+   * @brief Divides the current Vector2 coordinates by the given ones.
    * @param otherVector defines the other vector
    * @returns the current updated Vector2
    */
@@ -258,6 +258,18 @@ public:
    */
   bool equalsWithEpsilon(const Vector2& otherVector,
                          float epsilon = Math::Epsilon) const;
+
+  /**
+   * @brief Gets a new Vector2 from current Vector2 floored values.
+   * @returns a new Vector2
+   */
+  Vector2 floor() const;
+
+  /**
+   * @brief  Gets a new Vector2 from current Vector2 floored values.
+   * @returns a new Vector2
+   */
+  Vector2 fract() const;
 
   /** Operator overloading **/
   friend std::ostream& operator<<(std::ostream& os, const Vector2& vector);
