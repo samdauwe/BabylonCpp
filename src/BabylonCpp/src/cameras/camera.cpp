@@ -4,6 +4,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/arc_follow_camera.h>
 #include <babylon/cameras/arc_rotate_camera.h>
+#include <babylon/cameras/camera_inputs_manager.h>
 #include <babylon/cameras/follow_camera.h>
 #include <babylon/cameras/free_camera.h>
 #include <babylon/core/json.h>

@@ -8,8 +8,14 @@
 namespace BABYLON {
 
 template <class TCamera>
-CameraInputsManager<TCamera>::CameraInputsManager(TCamera* _camera)
-    : attachedElement{nullptr}, camera{_camera}
+CameraInputsManager<TCamera>::CameraInputsManager()
+    : attachedElement{nullptr}, camera{nullptr}
+{
+}
+
+template <class TCamera>
+CameraInputsManager<TCamera>::CameraInputsManager(TCamera* iCamera)
+    : attachedElement{nullptr}, camera{iCamera}
 {
 }
 
@@ -159,6 +165,7 @@ void CameraInputsManager<TCamera>::parse(const Json::value& /*parsedCamera*/)
 }
 
 template class CameraInputsManager<ArcRotateCamera>;
+template class CameraInputsManager<Camera>;
 template class CameraInputsManager<FreeCamera>;
 
 } // end of namespace BABYLON

@@ -17,7 +17,8 @@ ParticleSystemSet* ParticleHelper::CreateAsync(const string_t& /*type*/,
   }
 
   if (gpu && !GPUParticleSystem::IsSupported()) {
-    BABYLON_LOG_ERROR("Particle system with GPU is not supported.");
+    BABYLON_LOG_ERROR("ParticleSystemSet",
+                      "Particle system with GPU is not supported.");
     return nullptr;
   }
 

@@ -61,6 +61,11 @@ public:
    */
   int currentDraggingPointerID;
 
+  /**
+   * If camera controls should be detached during the drag
+   */
+  bool detachCameraControls;
+
 private:
   static unique_ptr_t<Scene> _virtualScene;
   Mesh* _ownerNode;
@@ -76,7 +81,7 @@ private:
   /**
    * How much faster the object should move when the controller is moving
    * towards it. This is useful to bring objects that are far away from the user
-   * to them faster. Set this to 0 to avoid any speed increase. (Default: 5)
+   * to them faster. Set this to 0 to avoid any speed increase. (Default: 3)
    */
   float zDragFactor;
 

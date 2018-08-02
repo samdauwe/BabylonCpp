@@ -62,6 +62,15 @@ private:
 
 public:
   /**
+   * The maximum tolerated angle between the drag plane and dragging pointer
+   * rays to trigger pointer events. Set to 0 to allow any angle (default: 0)
+   */
+  float maxDragAngle;
+  /**
+   * Hidden
+   */
+  bool _useAlternatePickedPointAboveMaxDragAngle;
+  /**
    * The id of the pointer that is currently interacting with the behavior (-1
    * when no pointer is active)
    */
@@ -110,6 +119,10 @@ public:
    */
   bool enabled;
   /**
+   * If camera controls should be detached during the drag
+   */
+  bool detachCameraControls;
+  /**
    * If set, the drag plane/axis will be rotated based on the attached mesh's
    * world rotation (Default: true)
    */
@@ -122,6 +135,7 @@ private:
   Mesh* _dragPlane;
   Scene* _scene;
   Observer<PointerInfo>::Ptr _pointerObserver;
+  Observer<Scene>::Ptr _beforeRenderObserver;
   int _draggingID;
   // Debug mode will display drag planes to help visualize behavior
   bool _debugMode;
@@ -132,9 +146,10 @@ private:
    * pointerObservableScene can be used to listen to drag events from another
    * scene(eg. if the attached mesh is in an overlay scene)
    */
-  PointerDragBehaviorOptions options;
+  PointerDragBehaviorOptions _options;
 
   Vector3 _tmpVector;
+  Vector3 _alternatePickedPoint;
   Vector3 _worldDragAxis;
 
   // Variables to avoid instantiation in the method _updateDragPlanePosition

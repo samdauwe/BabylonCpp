@@ -10,7 +10,8 @@ template <class TCamera>
 class BABYLON_SHARED_EXPORT CameraInputsManager {
 
 public:
-  CameraInputsManager(TCamera* camera);
+  CameraInputsManager();
+  CameraInputsManager(TCamera* iCamera);
   ~CameraInputsManager();
 
   /**

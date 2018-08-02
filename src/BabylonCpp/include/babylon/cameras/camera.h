@@ -2,6 +2,7 @@
 #define BABYLON_CAMERAS_CAMERA_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/cameras/camera_inputs_manager.h>
 #include <babylon/engine/node.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/idisposable.h>
@@ -231,6 +232,8 @@ private:
 
 public:
   /** Members **/
+  CameraInputsManager<Camera> inputs;
+
   Vector3 position;
 
   /**

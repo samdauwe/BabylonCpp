@@ -1,5 +1,6 @@
 #include <babylon/behaviors/mesh/six_dof_drag_behavior.h>
 
+#include <babylon/cameras/camera.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/mesh/mesh.h>
@@ -12,6 +13,7 @@ SixDofDragBehavior::SixDofDragBehavior()
     : dragging{false}
     , dragDeltaRatio{0.2f}
     , currentDraggingPointerID{-1}
+    , detachCameraControls{true}
     , _ownerNode{nullptr}
     , _sceneRenderObserver{nullptr}
     , _scene{nullptr}
@@ -20,7 +22,7 @@ SixDofDragBehavior::SixDofDragBehavior()
     , _virtualDragMesh{nullptr}
     , _pointerObserver{nullptr}
     , _moving{false}
-    , zDragFactor{5.f}
+    , zDragFactor{3.f}
 {
 }
 
@@ -62,14 +64,22 @@ void SixDofDragBehavior::attach(Mesh* ownerNode)
     return _ownerNode == m || m->isDescendantOf(_ownerNode);
   };
 
-  _pointerObserver = _scene->onPointerObservable.add([&](
+  ICanvas* attachedElement = nullptr;
+  _pointerObserver         = _scene->onPointerObservable.add([&](
                                                        PointerInfo* pointerInfo,
                                                        EventState& /*es*/) {
     if (pointerInfo->type == PointerEventTypes::POINTERDOWN) {
       if (!dragging && pointerInfo->pickInfo.hit
           && pointerInfo->pickInfo.pickedMesh && pointerInfo->pickInfo.ray
           && pickPredicate(pointerInfo->pickInfo.pickedMesh)) {
-        pickedMesh = pointerInfo->pickInfo.pickedMesh;
+        if (_scene->activeCamera
+            && _scene->activeCamera->cameraRigMode == Camera::RIG_MODE_NONE()) {
+          auto ray = *pointerInfo->pickInfo.ray;
+          ray.origin.copyFrom(_scene->activeCamera->position);
+          pointerInfo->pickInfo.ray = ray;
+        }
+
+        pickedMesh = _ownerNode;
         lastSixDofOriginPosition.copyFrom((*pointerInfo->pickInfo.ray).origin);
 
         // Set position and orientation of the controller
@@ -99,6 +109,19 @@ void SixDofDragBehavior::attach(Mesh* ownerNode)
         _targetPosition.copyFrom(_virtualDragMesh->absolutePosition());
         dragging                 = true;
         currentDraggingPointerID = (pointerInfo->pointerEvent).pointerId;
+
+        // Detatch camera controls
+        if (detachCameraControls && _scene->activeCamera
+            && !_scene->activeCamera->leftCamera()) {
+          if (_scene->activeCamera->inputs.attachedElement) {
+            attachedElement = _scene->activeCamera->inputs.attachedElement;
+            _scene->activeCamera->detachControl(
+              _scene->activeCamera->inputs.attachedElement);
+          }
+          else {
+            attachedElement = nullptr;
+          }
+        }
       }
     }
     else if (pointerInfo->type == PointerEventTypes::POINTERUP) {
@@ -108,30 +131,43 @@ void SixDofDragBehavior::attach(Mesh* ownerNode)
         currentDraggingPointerID = -1;
         pickedMesh               = nullptr;
         _virtualOriginMesh->removeChild(_virtualDragMesh);
+
+        // Reattach camera controls
+        if (detachCameraControls && attachedElement && _scene->activeCamera
+            && !_scene->activeCamera->leftCamera()) {
+          _scene->activeCamera->attachControl(attachedElement, true);
+        }
       }
     }
     else if (pointerInfo->type == PointerEventTypes::POINTERMOVE) {
       if (currentDraggingPointerID == (pointerInfo->pointerEvent).pointerId
           && dragging && pointerInfo->pickInfo.ray && pickedMesh) {
+        auto _zDragFactor = zDragFactor;
+        if (_scene->activeCamera
+            && _scene->activeCamera->cameraRigMode == Camera::RIG_MODE_NONE()) {
+          auto ray = *pointerInfo->pickInfo.ray;
+          ray.origin.copyFrom(_scene->activeCamera->position);
+          pointerInfo->pickInfo.ray = ray;
+          _zDragFactor              = 0.f;
+        }
+
         // Calculate controller drag distance in controller space
         auto originDragDifference
           = (*pointerInfo->pickInfo.ray)
               .origin.subtract(lastSixDofOriginPosition);
         lastSixDofOriginPosition.copyFrom((*pointerInfo->pickInfo.ray).origin);
-        auto rotMat = _virtualOriginMesh->getWorldMatrix()->getRotationMatrix();
-        auto localOriginDragDifference = Vector3::TransformCoordinates(
-          originDragDifference, Matrix::Invert(rotMat));
+
+        auto localOriginDragDifference = -Vector3::Dot(
+          originDragDifference, (*pointerInfo->pickInfo.ray).direction);
 
         _virtualOriginMesh->addChild(_virtualDragMesh);
         // Determine how much the controller moved to/away towards the dragged
         // object and use this to move the object further when its further away
-        auto zDragDistance
-          = Vector3::Dot(localOriginDragDifference,
-                         _virtualOriginMesh->position().normalizeToNew());
         _virtualDragMesh->position().z
           -= _virtualDragMesh->position().z < 1 ?
-               zDragDistance * zDragFactor :
-               zDragDistance * zDragFactor * _virtualDragMesh->position().z;
+               localOriginDragDifference * _zDragFactor :
+               localOriginDragDifference * _zDragFactor
+                 * _virtualDragMesh->position().z;
         if (_virtualDragMesh->position().z < 0) {
           _virtualDragMesh->position().z = 0;
         }
@@ -197,10 +233,19 @@ void SixDofDragBehavior::attach(Mesh* ownerNode)
 
 void SixDofDragBehavior::detach()
 {
-  _scene->onPointerObservable.remove(_pointerObserver);
-  _ownerNode->getScene()->onBeforeRenderObservable.remove(_sceneRenderObserver);
-  _virtualOriginMesh->dispose();
-  _virtualDragMesh->dispose();
+  if (_scene) {
+    _scene->onPointerObservable.remove(_pointerObserver);
+  }
+  if (_ownerNode) {
+    _ownerNode->getScene()->onBeforeRenderObservable.remove(
+      _sceneRenderObserver);
+  }
+  if (_virtualOriginMesh) {
+    _virtualOriginMesh->dispose();
+  }
+  if (_virtualDragMesh) {
+    _virtualDragMesh->dispose();
+  }
 }
 
 } // end of namespace BABYLON
