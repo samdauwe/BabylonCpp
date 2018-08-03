@@ -544,6 +544,7 @@ class DepthRenderer;
 class EdgesRenderer;
 class FaceAdjacencies;
 class GeometryBufferRenderer;
+struct IRenderingManagerAutoClearSetup;
 class OutlineRenderer;
 class RenderingGroup;
 class RenderingManager;

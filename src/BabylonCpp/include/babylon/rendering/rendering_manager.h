@@ -6,16 +6,6 @@
 
 namespace BABYLON {
 
-/**
- * @brief Interface describing the different options available in the rendering
- * manager regarding Auto Clear between groups.
- */
-struct BABYLON_SHARED_EXPORT RenderingManageAutoClearOptions {
-  bool autoClear;
-  bool depth;
-  bool stencil;
-}; // end of struct RenderingManageAutoClearOptions
-
 class BABYLON_SHARED_EXPORT RenderingManager {
 
 public:
@@ -109,23 +99,38 @@ public:
                                          bool depth   = true,
                                          bool stencil = true);
 
+  /**
+   * @brief Gets the current auto clear configuration for one rendering group of
+   * the rendering manager.
+   * @param index the rendering group index to get the information for
+   * @returns The auto clear setup for the requested rendering group
+   */
+  nullable_t<IRenderingManagerAutoClearSetup>
+  getAutoClearDepthStencilSetup(size_t index);
+
 private:
   void _clearDepthStencilBuffer(bool depth = true, bool stencil = true);
   void _prepareRenderingGroup(unsigned int renderingGroupId);
+
+public:
+  /**
+   * Hidden
+   */
+  bool _useSceneAutoClearSetup;
 
 private:
   Scene* _scene;
   vector_t<unique_ptr_t<RenderingGroup>> _renderingGroups;
   bool _depthStencilBufferAlreadyCleaned;
 
-  vector_t<RenderingManageAutoClearOptions> _autoClearDepthStencil;
+  vector_t<IRenderingManagerAutoClearSetup> _autoClearDepthStencil;
   vector_t<::std::function<int(SubMesh* a, SubMesh* b)>>
     _customOpaqueSortCompareFn;
   vector_t<::std::function<int(SubMesh* a, SubMesh* b)>>
     _customAlphaTestSortCompareFn;
   vector_t<::std::function<int(SubMesh* a, SubMesh* b)>>
     _customTransparentSortCompareFn;
-  unique_ptr_t<RenderingGroupInfo> _renderinGroupInfo;
+  unique_ptr_t<RenderingGroupInfo> _renderingGroupInfo;
 
 }; // end of class RenderingManager
 

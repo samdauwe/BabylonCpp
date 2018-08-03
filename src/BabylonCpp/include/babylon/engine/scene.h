@@ -1535,6 +1535,15 @@ public:
                                          bool stencil = true);
 
   /**
+   * @brief Gets the current auto clear configuration for one rendering group of
+   * the rendering manager.
+   * @param index the rendering group index to get the information for
+   * @returns The auto clear setup for the requested rendering group
+   */
+  nullable_t<IRenderingManagerAutoClearSetup>
+  getAutoClearDepthStencilSetup(size_t index);
+
+  /**
    * @brief Will flag all materials as dirty to trigger new shader compilation.
    * @param flag defines the flag used to specify which material part must be
    * marked as dirty
@@ -2228,14 +2237,24 @@ public:
   Observable<Scene> onAfterStepObservable;
 
   /**
-   * This Observable will be triggered for each stage of each renderingGroup of
+   * This Observable will be triggered before rendering each renderingGroup of
    * each rendered camera. The RenderinGroupInfo class contains all the
    * information about the context in which the observable is called If you wish
    * to register an Observer only for a given set of renderingGroup, use the
    * mask with a combination of the renderingGroup index elevated to the power
    * of two (1 for renderingGroup 0, 2 for renderingrOup1, 4 for 2 and 8 for 3)
    */
-  Observable<RenderingGroupInfo> onRenderingGroupObservable;
+  Observable<RenderingGroupInfo> onBeforeRenderingGroupObservable;
+
+  /**
+   * This Observable will be triggered after rendering each renderingGroup of
+   * each rendered camera. The RenderinGroupInfo class contains all the
+   * information about the context in which the observable is called If you wish
+   * to register an Observer only for a given set of renderingGroup, use the
+   * mask with a combination of the renderingGroup index elevated to the power
+   * of two (1 for renderingGroup 0, 2 for renderingrOup1, 4 for 2 and 8 for 3)
+   */
+  Observable<RenderingGroupInfo> onAfterRenderingGroupObservable;
 
   // Animations
 

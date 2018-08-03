@@ -6,6 +6,7 @@
 #include <babylon/materials/material.h>
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/particles/particle_system.h>
+#include <babylon/rendering/irendering_manager_auto_clear_setup.h>
 #include <babylon/rendering/rendering_group.h>
 #include <babylon/sprites/sprite_manager.h>
 
@@ -14,7 +15,9 @@ namespace BABYLON {
 bool RenderingManager::AUTOCLEAR = true;
 
 RenderingManager::RenderingManager(Scene* scene)
-    : _scene{scene}, _renderinGroupInfo{nullptr}
+    : _useSceneAutoClearSetup{false}
+    , _scene{scene}
+    , _renderingGroupInfo{::std::make_unique<RenderingGroupInfo>()}
 {
   _autoClearDepthStencil.resize(MAX_RENDERINGGROUPS);
   _customOpaqueSortCompareFn.resize(MAX_RENDERINGGROUPS);
@@ -54,16 +57,10 @@ void RenderingManager::render(
   const vector_t<AbstractMesh*>& activeMeshes, bool renderParticles,
   bool renderSprites)
 {
-  // Check if there's at least on observer on the onRenderingGroupObservable and
-  // initialize things to fire it
-  bool hasObservable = _scene->onRenderingGroupObservable.hasObservers();
-  if (hasObservable) {
-    if (!_renderinGroupInfo) {
-      _renderinGroupInfo = ::std::make_unique<RenderingGroupInfo>();
-    }
-    _renderinGroupInfo->scene  = _scene;
-    _renderinGroupInfo->camera = _scene->activeCamera;
-  }
+  // Update the observable context (not null as it only goes away on dispose)
+  auto& info   = _renderingGroupInfo;
+  info->scene  = _scene;
+  info->camera = _scene->activeCamera;
 
   // Dispatch sprites
   if (renderSprites) {
@@ -73,7 +70,6 @@ void RenderingManager::render(
   }
 
   // Render
-  auto info = _renderinGroupInfo.get();
   for (unsigned int index = RenderingManager::MIN_RENDERINGGROUPS;
        index < RenderingManager::MAX_RENDERINGGROUPS; ++index) {
     _depthStencilBufferAlreadyCleaned
@@ -81,53 +77,52 @@ void RenderingManager::render(
     RenderingGroup* renderingGroup = (index < _renderingGroups.size()) ?
                                        _renderingGroups[index].get() :
                                        nullptr;
-    if (!renderingGroup && !hasObservable) {
+    if (!renderingGroup) {
       continue;
     }
 
-    int renderingGroupMask = 0;
+    auto renderingGroupMask = static_cast<int>(::std::pow(2, index));
+    info->renderingGroupId  = index;
 
-    // Fire PRECLEAR stage
-    if (hasObservable && info) {
-      renderingGroupMask     = static_cast<int>(::std::pow(2, index));
-      info->renderStage      = RenderingGroupInfo::STAGE_PRECLEAR;
-      info->renderingGroupId = index;
-      _scene->onRenderingGroupObservable.notifyObservers(info,
-                                                         renderingGroupMask);
-    }
+    // Before Observable
+    _scene->onBeforeRenderingGroupObservable.notifyObservers(
+      info.get(), renderingGroupMask);
 
     // Clear depth/stencil if needed
     if (RenderingManager::AUTOCLEAR) {
-      if (index < _autoClearDepthStencil.size()) {
-        auto& autoClear = _autoClearDepthStencil[index];
-        if (autoClear.autoClear) {
-          _clearDepthStencilBuffer(autoClear.depth, autoClear.stencil);
+      if (_useSceneAutoClearSetup) {
+        auto autoClear = _scene->getAutoClearDepthStencilSetup(index);
+        if (autoClear.has_value() && (*autoClear).autoClear) {
+          _clearDepthStencilBuffer((*autoClear).depth, (*autoClear).stencil);
+        }
+      }
+      else {
+        if (index < _autoClearDepthStencil.size()) {
+          auto autoClear = _autoClearDepthStencil[index];
+          if (autoClear.autoClear) {
+            _clearDepthStencilBuffer(autoClear.depth, autoClear.stencil);
+          }
         }
       }
     }
 
-    if (hasObservable && info) {
-      // Fire PREOPAQUE stage
-      info->renderStage = RenderingGroupInfo::STAGE_PREOPAQUE;
-      _scene->onRenderingGroupObservable.notifyObservers(info,
-                                                         renderingGroupMask);
-      // Fire PRETRANSPARENT stage
-      info->renderStage = RenderingGroupInfo::STAGE_PRETRANSPARENT;
-      _scene->onRenderingGroupObservable.notifyObservers(info,
-                                                         renderingGroupMask);
+    // Render
+#if 0
+    for (auto& step : _scene->_beforeRenderingGroupDrawStage) {
+      step.action(index);
     }
+#endif
+    renderingGroup->render(customRenderFunction, renderSprites, renderParticles,
+                           activeMeshes);
+#if 0
+    for (auto& step : _scene->_afterRenderingGroupDrawStage) {
+      step.action(index);
+    }
+#endif
 
-    if (renderingGroup) {
-      renderingGroup->render(customRenderFunction, renderSprites,
-                             renderParticles, activeMeshes);
-    }
-
-    // Fire POSTTRANSPARENT stage
-    if (hasObservable && info) {
-      info->renderStage = RenderingGroupInfo::STAGE_POSTTRANSPARENT;
-      _scene->onRenderingGroupObservable.notifyObservers(info,
-                                                         renderingGroupMask);
-    }
+    // After Observable
+    _scene->onAfterRenderingGroupObservable.notifyObservers(info.get(),
+                                                            renderingGroupMask);
   }
 }
 
@@ -148,6 +143,7 @@ void RenderingManager::dispose()
 {
   freeRenderingGroups();
   _renderingGroups.clear();
+  _renderingGroupInfo = nullptr;
 }
 
 void RenderingManager::freeRenderingGroups()
@@ -235,8 +231,21 @@ void RenderingManager::setRenderingAutoClearDepthStencil(
   unsigned int renderingGroupId, bool autoClearDepthStencil, bool depth,
   bool stencil)
 {
-  _autoClearDepthStencil[renderingGroupId]
-    = {autoClearDepthStencil, depth, stencil};
+  _autoClearDepthStencil[renderingGroupId] = {
+    autoClearDepthStencil, // autoClear
+    depth,                 // depth
+    stencil                // stencil
+  };
+}
+
+nullable_t<IRenderingManagerAutoClearSetup>
+RenderingManager::getAutoClearDepthStencilSetup(size_t index)
+{
+  if (index >= _autoClearDepthStencil.size()) {
+    return nullopt_t;
+  }
+
+  return _autoClearDepthStencil[index];
 }
 
 } // end of namespace BABYLON

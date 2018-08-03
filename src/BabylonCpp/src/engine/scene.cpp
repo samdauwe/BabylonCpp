@@ -67,6 +67,7 @@
 #include <babylon/rendering/depth_renderer.h>
 #include <babylon/rendering/edges_renderer.h>
 #include <babylon/rendering/geometry_buffer_renderer.h>
+#include <babylon/rendering/irendering_manager_auto_clear_setup.h>
 #include <babylon/rendering/outline_renderer.h>
 #include <babylon/rendering/rendering_manager.h>
 #include <babylon/sprites/sprite_manager.h>
@@ -4991,6 +4992,12 @@ void Scene::setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
 {
   _renderingManager->setRenderingAutoClearDepthStencil(
     renderingGroupId, autoClearDepthStencil, depth, stencil);
+}
+
+nullable_t<IRenderingManagerAutoClearSetup>
+Scene::getAutoClearDepthStencilSetup(size_t index)
+{
+  return _renderingManager->getAutoClearDepthStencilSetup(index);
 }
 
 void Scene::markAllMaterialsAsDirty(
