@@ -76,6 +76,7 @@
 #include <cstddef>
 
 // Utilities library
+#include <optional>
 #include <utility>
 
 // Function objects
@@ -473,6 +474,10 @@ using thread_t  = ::std::thread;
 template <size_t N>
 using bitset_t = ::std::bitset<N>;
 
+template <class T>
+using nullable_t = ::std::optional<T>;
+
+constexpr auto nullopt_t = ::std::nullopt;
 using nullptr_t = ::std::nullptr_t;
 
 template <class T1, class T2>
