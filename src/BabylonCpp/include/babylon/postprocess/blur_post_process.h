@@ -135,12 +135,17 @@ private:
 
 public:
   /**
-   * Length in pixels of the blur sample region.
+   * The direction in which to blur the image
+   */
+  Vector2 direction;
+
+  /**
+   * Length in pixels of the blur sample region
    */
   Property<BlurPostProcess, float> kernel;
 
   /**
-   * Wether or not the blur needs to unpack/repack floats.
+   * Wether or not the blur needs to unpack/repack floats
    */
   Property<BlurPostProcess, bool> packedFloat;
 

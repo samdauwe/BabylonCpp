@@ -48,6 +48,10 @@ public:
 public:
   PostProcess* originalFromInput;
   PostProcess* blurred;
+
+  /**
+   * Weight of the bloom to be added to the original input
+   */
   float weight;
 
 }; // end of class BloomMergePostProcess
